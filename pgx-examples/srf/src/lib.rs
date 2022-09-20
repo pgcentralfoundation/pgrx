@@ -12,30 +12,25 @@ use pgx::*;
 pg_module_magic!();
 
 #[pg_extern]
-fn generate_series(
-    start: i64,
-    finish: i64,
-    step: default!(i64, 1),
-) -> impl std::iter::Iterator<Item = i64> {
-    (start..=finish).step_by(step as usize)
+fn generate_series(start: i64, finish: i64, step: default!(i64, 1)) -> SetOfIterator<'static, i64> {
+    SetOfIterator::new((start..=finish).step_by(step as usize))
 }
 
 #[pg_extern]
-fn random_values(
-    num_rows: i32,
-) -> impl std::iter::Iterator<Item = (name!(index, i32), name!(value, f64))> {
-    (1..=num_rows).map(|i| (i, rand::random::<f64>()))
+fn random_values(num_rows: i32) -> TableIterator<'static, (name!(index, i32), name!(value, f64))> {
+    TableIterator::new((1..=num_rows).map(|i| (i, rand::random::<f64>())))
 }
 
 #[pg_extern]
-fn vector_of_static_values() -> impl std::iter::Iterator<Item = &'static str> {
+fn vector_of_static_values() -> SetOfIterator<'static, &'static str> {
     let values = vec!["Brandy", "Sally", "Anchovy"];
-    values.into_iter()
+    SetOfIterator::new(values.into_iter())
 }
 
 #[pg_extern]
-fn return_tuple() -> (name!(id, i32), name!(name, &'static str), name!(age, f64)) {
-    (1, "Brandy", 4.5)
+fn return_tuple(
+) -> TableIterator<'static, (name!(id, i32), name!(name, &'static str), name!(age, f64))> {
+    TableIterator::once((1, "Brandy", 4.5))
 }
 
 #[cfg(any(test, feature = "pg_test"))]

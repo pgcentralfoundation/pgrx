@@ -14,10 +14,10 @@ use std::process::Command;
 pg_module_magic!();
 
 #[pg_extern]
-fn exec(
-    command: &str,
-    args: default!(Vec<Option<&str>>, "ARRAY[]::text[]"),
-) -> (name!(status, Option<i32>), name!(stdout, String)) {
+fn exec<'a>(
+    command: &'a str,
+    args: default!(Vec<Option<&'a str>>, "ARRAY[]::text[]"),
+) -> TableIterator<'static, (name!(status, Option<i32>), name!(stdout, String))> {
     let mut command = &mut Command::new(command);
 
     for arg in args {
@@ -35,10 +35,10 @@ fn exec(
         )
     }
 
-    (
+    TableIterator::once((
         output.status.code(),
         String::from_utf8(output.stdout).expect("stdout is not valid utf8"),
-    )
+    ))
 }
 
 #[pg_extern]

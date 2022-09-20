@@ -6,11 +6,19 @@ All rights reserved.
 
 Use of this source code is governed by the MIT license that can be found in the LICENSE file.
 */
-use eyre::{eyre, WrapErr};
-use std::{any::TypeId, collections::HashMap, fmt::Debug, path::Path};
+/*!
 
+Rust to SQL mapping support.
+
+> Like all of the [`sql_entity_graph`][crate::sql_entity_graph] APIs, this is considered **internal**
+to the `pgx` framework and very subject to change between versions. While you may use this, please do it with caution.
+
+*/
+
+use eyre::{eyre, WrapErr};
 use owo_colors::{OwoColorize, XtermColors};
 use petgraph::{dot::Dot, graph::NodeIndex, stable_graph::StableGraph};
+use std::{any::TypeId, collections::HashMap, fmt::Debug, path::Path};
 use tracing::instrument;
 
 use crate::sql_entity_graph::{
@@ -20,8 +28,8 @@ use crate::sql_entity_graph::{
         entity::{ExtensionSqlEntity, SqlDeclaredEntity},
         SqlDeclared,
     },
-    mapping::{RustSourceOnlySqlMapping, RustSqlMapping},
-    pg_extern::entity::{PgExternEntity, PgExternReturnEntity},
+    mapping::RustSourceOnlySqlMapping,
+    pg_extern::entity::PgExternEntity,
     pg_trigger::entity::PgTriggerEntity,
     positioning_ref::PositioningRef,
     postgres_enum::entity::PostgresEnumEntity,
@@ -33,7 +41,7 @@ use crate::sql_entity_graph::{
     SqlGraphEntity, SqlGraphIdentifier,
 };
 
-use super::pg_extern::entity::PgExternReturnEntityIteratedItem;
+use super::{PgExternReturnEntity, PgExternReturnEntityIteratedItem};
 
 #[derive(Debug, Clone, Copy, PartialEq, PartialOrd, Eq, Ord)]
 pub enum SqlGraphRelationship {
@@ -44,12 +52,7 @@ pub enum SqlGraphRelationship {
 
 #[derive(Debug, Clone)]
 pub struct RustToSqlMapping {
-    pub rust_type_id_to_sql: std::collections::HashSet<RustSqlMapping>,
     pub rust_source_to_sql: std::collections::HashSet<RustSourceOnlySqlMapping>,
-    /// True if it requires `[]` after it when printed to SQL
-    pub composite_type_collections: std::collections::HashMap<TypeId, bool>,
-    /// The internal type acts like the `Option` type, blocking strictness upgrades.
-    pub internal_type: core::any::TypeId,
 }
 
 /// A generator for SQL.
@@ -65,10 +68,7 @@ pub struct RustToSqlMapping {
 /// out of entities collected during a `pgx::pg_module_magic!()` call in a library.
 #[derive(Debug, Clone)]
 pub struct PgxSql {
-    pub type_mappings: HashMap<TypeId, RustSqlMapping>,
     pub source_mappings: HashMap<String, RustSourceOnlySqlMapping>,
-    pub composite_type_collections: std::collections::HashMap<TypeId, bool>,
-    pub internal_type: core::any::TypeId,
     pub control: ControlFile,
     pub graph: StableGraph<SqlGraphEntity, SqlGraphRelationship>,
     pub graph_root: NodeIndex,
@@ -97,10 +97,7 @@ impl PgxSql {
         versioned_so: bool,
     ) -> eyre::Result<Self> {
         let RustToSqlMapping {
-            rust_type_id_to_sql: type_mappings,
             rust_source_to_sql: source_mappings,
-            composite_type_collections,
-            internal_type,
         } = sql_mappings;
 
         let mut graph = StableGraph::new();
@@ -241,20 +238,14 @@ impl PgxSql {
             &mapped_enums,
             &mapped_builtin_types,
             &mapped_externs,
-        );
+        )?;
         connect_triggers(&mut graph, &mapped_triggers, &mapped_schemas);
 
-        let mut this = Self {
-            type_mappings: type_mappings
-                .into_iter()
-                .map(|x| (x.id.clone(), x))
-                .collect(),
+        let this = Self {
             source_mappings: source_mappings
                 .into_iter()
                 .map(|x| (x.rust.clone(), x))
                 .collect(),
-            composite_type_collections,
-            internal_type,
             control: control,
             schemas: mapped_schemas,
             extension_sqls: mapped_extension_sqls,
@@ -273,7 +264,6 @@ impl PgxSql {
             extension_name: extension_name,
             versioned_so,
         };
-        this.register_types();
         Ok(this)
     }
 
@@ -466,32 +456,6 @@ impl PgxSql {
         Ok(full_sql)
     }
 
-    #[instrument(level = "error", skip(self))]
-    pub fn register_types(&mut self) {
-        for (item, _index) in self.enums.clone() {
-            for mapping in &item.mappings {
-                assert_eq!(
-                    self.type_mappings
-                        .insert(mapping.id.clone(), mapping.clone()),
-                    None,
-                    "Cannot map `{}` twice.",
-                    item.full_path,
-                );
-            }
-        }
-        for (item, _index) in self.types.clone() {
-            for mapping in &item.mappings {
-                assert_eq!(
-                    self.type_mappings
-                        .insert(mapping.id.clone(), mapping.clone()),
-                    None,
-                    "Cannot map `{}` twice.",
-                    item.full_path,
-                );
-            }
-        }
-    }
-
     pub fn has_sql_declared_entity(&self, identifier: &SqlDeclared) -> Option<&SqlDeclaredEntity> {
         self.extension_sqls.iter().find_map(|(item, _index)| {
             let retval = item.creates.iter().find_map(|create_entity| {
@@ -505,42 +469,8 @@ impl PgxSql {
         })
     }
 
-    pub fn rust_to_sql(&self, ty_id: TypeId, ty_source: &str, full_path: &str) -> Option<String> {
-        self.source_only_to_sql_type(ty_source)
-            .or_else(|| self.type_id_to_sql_type(ty_id))
-            .or_else(|| {
-                if let Some(found) =
-                    self.has_sql_declared_entity(&SqlDeclared::Type(full_path.to_string()))
-                {
-                    Some(found.sql())
-                } else if let Some(found) =
-                    self.has_sql_declared_entity(&SqlDeclared::Enum(full_path.to_string()))
-                {
-                    Some(found.sql())
-                } else {
-                    None
-                }
-            })
-    }
-
-    pub fn type_id_to_sql_type(&self, id: TypeId) -> Option<String> {
-        self.type_mappings.get(&id).map(|f| f.sql.clone())
-    }
-
     pub fn source_only_to_sql_type(&self, ty_source: &str) -> Option<String> {
         self.source_mappings.get(ty_source).map(|f| f.sql.clone())
-    }
-
-    pub fn map_type_to_sql_type<T: 'static>(&mut self, sql: impl AsRef<str> + Debug) {
-        let sql = sql.as_ref().to_string();
-        self.type_mappings.insert(
-            TypeId::of::<T>(),
-            RustSqlMapping {
-                rust: core::any::type_name::<T>().to_string(),
-                sql: sql.clone(),
-                id: core::any::TypeId::of::<T>(),
-            },
-        );
     }
 
     pub fn get_module_pathname(&self) -> String {
@@ -552,13 +482,6 @@ impl PgxSql {
         } else {
             String::from("MODULE_PATHNAME")
         };
-    }
-
-    pub fn composite_type_requires_square_brackets(&self, ty_id: &TypeId) -> eyre::Result<bool> {
-        self.composite_type_collections
-            .get(ty_id)
-            .cloned()
-            .ok_or(eyre!("Not a Composite Type"))
     }
 }
 
@@ -923,7 +846,10 @@ fn initialize_externs(
                         });
                 }
             }
-            PgExternReturnEntity::Iterated(iterated_returns) => {
+            PgExternReturnEntity::Iterated {
+                tys: iterated_returns,
+                optional: _,
+            } => {
                 for PgExternReturnEntityIteratedItem {
                     ty: return_ty_entity,
                     ..
@@ -1123,7 +1049,10 @@ fn connect_externs(
                     }
                 }
             }
-            PgExternReturnEntity::Iterated(iterated_returns) => {
+            PgExternReturnEntity::Iterated {
+                tys: iterated_returns,
+                optional: _,
+            } => {
                 for PgExternReturnEntityIteratedItem {
                     ty: type_entity, ..
                 } in iterated_returns
@@ -1195,7 +1124,7 @@ fn connect_externs(
     Ok(())
 }
 
-#[tracing::instrument(level = "error", skip_all)]
+#[tracing::instrument(level = "info", skip_all)]
 fn initialize_ords(
     graph: &mut StableGraph<SqlGraphEntity, SqlGraphRelationship>,
     root: NodeIndex,
@@ -1213,7 +1142,7 @@ fn initialize_ords(
     Ok(mapped_ords)
 }
 
-#[tracing::instrument(level = "error", skip_all)]
+#[tracing::instrument(level = "info", skip_all)]
 fn connect_ords(
     graph: &mut StableGraph<SqlGraphEntity, SqlGraphRelationship>,
     ords: &HashMap<PostgresOrdEntity, NodeIndex>,
@@ -1243,9 +1172,8 @@ fn connect_ords(
         );
 
         for (extern_item, &extern_index) in externs {
-            let fn_matches = |fn_name| {
-                item.module_path == extern_item.module_path && extern_item.name == fn_name
-            };
+            let fn_matches =
+                |fn_name| item.module_path == extern_item.full_path && extern_item.name == fn_name;
             let cmp_fn_matches = fn_matches(item.cmp_fn_name());
             let lt_fn_matches = fn_matches(item.lt_fn_name());
             let lte_fn_matches = fn_matches(item.le_fn_name());
@@ -1266,7 +1194,7 @@ fn connect_ords(
     }
 }
 
-#[tracing::instrument(level = "error", skip_all)]
+#[tracing::instrument(level = "info", skip_all)]
 fn initialize_hashes(
     graph: &mut StableGraph<SqlGraphEntity, SqlGraphRelationship>,
     root: NodeIndex,
@@ -1284,7 +1212,7 @@ fn initialize_hashes(
     Ok(mapped_hashes)
 }
 
-#[tracing::instrument(level = "error", skip_all)]
+#[tracing::instrument(level = "info", skip_all)]
 fn connect_hashes(
     graph: &mut StableGraph<SqlGraphEntity, SqlGraphRelationship>,
     hashes: &HashMap<PostgresHashEntity, NodeIndex>,
@@ -1327,6 +1255,7 @@ fn connect_hashes(
     }
 }
 
+#[tracing::instrument(level = "info", skip_all)]
 fn initialize_aggregates(
     graph: &mut StableGraph<SqlGraphEntity, SqlGraphRelationship>,
     root: NodeIndex,
@@ -1373,6 +1302,188 @@ fn initialize_aggregates(
     Ok(mapped_aggregates)
 }
 
+#[tracing::instrument(level = "error", skip_all, fields(rust_identifier = %item.rust_identifier()))]
+fn connect_aggregate(
+    graph: &mut StableGraph<SqlGraphEntity, SqlGraphRelationship>,
+    item: &PgAggregateEntity,
+    index: NodeIndex,
+    schemas: &HashMap<SchemaEntity, NodeIndex>,
+    types: &HashMap<PostgresTypeEntity, NodeIndex>,
+    enums: &HashMap<PostgresEnumEntity, NodeIndex>,
+    builtin_types: &HashMap<String, NodeIndex>,
+    externs: &HashMap<PgExternEntity, NodeIndex>,
+) -> eyre::Result<()> {
+    make_schema_connection(
+        graph,
+        "Aggregate",
+        index,
+        &item.rust_identifier(),
+        item.module_path,
+        schemas,
+    );
+
+    make_type_or_enum_connection(
+        graph,
+        "Aggregate",
+        index,
+        &item.rust_identifier(),
+        &item.ty_id,
+        types,
+        enums,
+    );
+
+    for arg in &item.args {
+        let found = make_type_or_enum_connection(
+            graph,
+            "Aggregate",
+            index,
+            &item.rust_identifier(),
+            &arg.used_ty.ty_id,
+            types,
+            enums,
+        );
+        if !found {
+            let builtin_index = builtin_types.get(arg.used_ty.full_path).expect(&format!(
+                "Could not fetch Builtin Type {}.",
+                arg.used_ty.full_path
+            ));
+            tracing::debug!(from = %item.rust_identifier(), to = %arg.used_ty.full_path, "Adding Aggregate after BuiltIn Type edge");
+            graph.add_edge(*builtin_index, index, SqlGraphRelationship::RequiredByArg);
+        }
+    }
+
+    for arg in item.direct_args.as_ref().unwrap_or(&vec![]) {
+        let found = make_type_or_enum_connection(
+            graph,
+            "Aggregate",
+            index,
+            &item.rust_identifier(),
+            &arg.used_ty.ty_id,
+            types,
+            enums,
+        );
+        if !found {
+            let builtin_index = builtin_types.get(arg.used_ty.full_path).expect(&format!(
+                "Could not fetch Builtin Type {}.",
+                arg.used_ty.full_path
+            ));
+            tracing::debug!(from = %item.rust_identifier(), to = %arg.used_ty.full_path, "Adding Aggregate after BuiltIn Type edge");
+            graph.add_edge(*builtin_index, index, SqlGraphRelationship::RequiredByArg);
+        }
+    }
+
+    if let Some(arg) = &item.mstype {
+        let found = make_type_or_enum_connection(
+            graph,
+            "Aggregate",
+            index,
+            &item.rust_identifier(),
+            &arg.ty_id,
+            types,
+            enums,
+        );
+        if !found {
+            let builtin_index = builtin_types
+                .get(arg.full_path)
+                .expect(&format!("Could not fetch Builtin Type {}.", arg.full_path));
+            tracing::debug!(from = %item.rust_identifier(), to = %arg.full_path, "Adding Aggregate after BuiltIn Type edge");
+            graph.add_edge(*builtin_index, index, SqlGraphRelationship::RequiredByArg);
+        }
+    }
+
+    make_extern_connection(
+        graph,
+        "Aggregate",
+        index,
+        &item.rust_identifier(),
+        &(item.module_path.to_string() + "::" + item.sfunc),
+        externs,
+    )?;
+
+    if let Some(value) = item.finalfunc {
+        make_extern_connection(
+            graph,
+            "Aggregate",
+            index,
+            &item.rust_identifier(),
+            &(item.module_path.to_string() + "::" + value),
+            externs,
+        )?;
+    }
+    if let Some(value) = item.combinefunc {
+        make_extern_connection(
+            graph,
+            "Aggregate",
+            index,
+            &item.rust_identifier(),
+            &(item.module_path.to_string() + "::" + value),
+            externs,
+        )?;
+    }
+    if let Some(value) = item.serialfunc {
+        make_extern_connection(
+            graph,
+            "Aggregate",
+            index,
+            &item.rust_identifier(),
+            &(item.module_path.to_string() + "::" + value),
+            externs,
+        )?;
+    }
+    if let Some(value) = item.deserialfunc {
+        make_extern_connection(
+            graph,
+            "Aggregate",
+            index,
+            &item.rust_identifier(),
+            &(item.module_path.to_string() + "::" + value),
+            externs,
+        )?;
+    }
+    if let Some(value) = item.msfunc {
+        make_extern_connection(
+            graph,
+            "Aggregate",
+            index,
+            &item.rust_identifier(),
+            &(item.module_path.to_string() + "::" + value),
+            externs,
+        )?;
+    }
+    if let Some(value) = item.minvfunc {
+        make_extern_connection(
+            graph,
+            "Aggregate",
+            index,
+            &item.rust_identifier(),
+            &(item.module_path.to_string() + "::" + value),
+            externs,
+        )?;
+    }
+    if let Some(value) = item.mfinalfunc {
+        make_extern_connection(
+            graph,
+            "Aggregate",
+            index,
+            &item.rust_identifier(),
+            &(item.module_path.to_string() + "::" + value),
+            externs,
+        )?;
+    }
+    if let Some(value) = item.sortop {
+        make_extern_connection(
+            graph,
+            "Aggregate",
+            index,
+            &item.rust_identifier(),
+            &(item.module_path.to_string() + "::" + value),
+            externs,
+        )?;
+    }
+    Ok(())
+}
+
+#[tracing::instrument(level = "info", skip_all)]
 fn connect_aggregates(
     graph: &mut StableGraph<SqlGraphEntity, SqlGraphRelationship>,
     aggregates: &HashMap<PgAggregateEntity, NodeIndex>,
@@ -1381,197 +1492,23 @@ fn connect_aggregates(
     enums: &HashMap<PostgresEnumEntity, NodeIndex>,
     builtin_types: &HashMap<String, NodeIndex>,
     externs: &HashMap<PgExternEntity, NodeIndex>,
-) {
+) -> eyre::Result<()> {
     for (item, &index) in aggregates {
-        make_schema_connection(
+        connect_aggregate(
             graph,
-            "Aggregate",
+            item,
             index,
-            &item.rust_identifier(),
-            item.module_path,
             schemas,
-        );
-
-        make_type_or_enum_connection(
-            graph,
-            "Aggregate",
-            index,
-            &item.rust_identifier(),
-            &item.ty_id,
             types,
             enums,
-        );
-
-        for arg in &item.args {
-            let found = make_type_or_enum_connection(
-                graph,
-                "Aggregate",
-                index,
-                &item.rust_identifier(),
-                &arg.used_ty.ty_id,
-                types,
-                enums,
-            );
-            if !found {
-                let builtin_index = builtin_types.get(arg.used_ty.full_path).expect(&format!(
-                    "Could not fetch Builtin Type {}.",
-                    arg.used_ty.full_path
-                ));
-                tracing::debug!(from = %item.rust_identifier(), to = %arg.used_ty.full_path, "Adding Aggregate after BuiltIn Type edge");
-                graph.add_edge(*builtin_index, index, SqlGraphRelationship::RequiredByArg);
-            }
-        }
-
-        for arg in item.direct_args.as_ref().unwrap_or(&vec![]) {
-            let found = make_type_or_enum_connection(
-                graph,
-                "Aggregate",
-                index,
-                &item.rust_identifier(),
-                &arg.used_ty.ty_id,
-                types,
-                enums,
-            );
-            if !found {
-                let builtin_index = builtin_types.get(arg.used_ty.full_path).expect(&format!(
-                    "Could not fetch Builtin Type {}.",
-                    arg.used_ty.full_path
-                ));
-                tracing::debug!(from = %item.rust_identifier(), to = %arg.used_ty.full_path, "Adding Aggregate after BuiltIn Type edge");
-                graph.add_edge(*builtin_index, index, SqlGraphRelationship::RequiredByArg);
-            }
-        }
-
-        if let Some(arg) = &item.mstype {
-            let found = make_type_or_enum_connection(
-                graph,
-                "Aggregate",
-                index,
-                &item.rust_identifier(),
-                &arg.ty_id,
-                types,
-                enums,
-            );
-            if !found {
-                let builtin_index = builtin_types
-                    .get(arg.full_path)
-                    .expect(&format!("Could not fetch Builtin Type {}.", arg.full_path));
-                tracing::debug!(from = %item.rust_identifier(), to = %arg.full_path, "Adding Aggregate after BuiltIn Type edge");
-                graph.add_edge(*builtin_index, index, SqlGraphRelationship::RequiredByArg);
-            }
-        }
-
-        make_extern_connection(
-            graph,
-            "Aggregate",
-            index,
-            &item.rust_identifier(),
-            &(item.module_path.to_string() + "::" + item.sfunc),
+            builtin_types,
             externs,
-        );
-        if let Some(value) = item.finalfunc {
-            make_extern_connection(
-                graph,
-                "Aggregate",
-                index,
-                &item.rust_identifier(),
-                &(item.module_path.to_string() + "::" + value),
-                externs,
-            );
-        }
-        if let Some(value) = item.combinefunc {
-            make_extern_connection(
-                graph,
-                "Aggregate",
-                index,
-                &item.rust_identifier(),
-                &(item.module_path.to_string() + "::" + value),
-                externs,
-            );
-        }
-        if let Some(value) = item.serialfunc {
-            make_extern_connection(
-                graph,
-                "Aggregate",
-                index,
-                &item.rust_identifier(),
-                &(item.module_path.to_string() + "::" + value),
-                externs,
-            );
-        }
-        if let Some(value) = item.deserialfunc {
-            make_extern_connection(
-                graph,
-                "Aggregate",
-                index,
-                &item.rust_identifier(),
-                &(item.module_path.to_string() + "::" + value),
-                externs,
-            );
-        }
-        if let Some(value) = item.initcond {
-            make_extern_connection(
-                graph,
-                "Aggregate",
-                index,
-                &item.rust_identifier(),
-                &(item.module_path.to_string() + "::" + value),
-                externs,
-            );
-        }
-        if let Some(value) = item.msfunc {
-            make_extern_connection(
-                graph,
-                "Aggregate",
-                index,
-                &item.rust_identifier(),
-                &(item.module_path.to_string() + "::" + value),
-                externs,
-            );
-        }
-        if let Some(value) = item.minvfunc {
-            make_extern_connection(
-                graph,
-                "Aggregate",
-                index,
-                &item.rust_identifier(),
-                &(item.module_path.to_string() + "::" + value),
-                externs,
-            );
-        }
-        if let Some(value) = item.mfinalfunc {
-            make_extern_connection(
-                graph,
-                "Aggregate",
-                index,
-                &item.rust_identifier(),
-                &(item.module_path.to_string() + "::" + value),
-                externs,
-            );
-        }
-        if let Some(value) = item.minitcond {
-            make_extern_connection(
-                graph,
-                "Aggregate",
-                index,
-                &item.rust_identifier(),
-                &(item.module_path.to_string() + "::" + value),
-                externs,
-            );
-        }
-        if let Some(value) = item.sortop {
-            make_extern_connection(
-                graph,
-                "Aggregate",
-                index,
-                &item.rust_identifier(),
-                &(item.module_path.to_string() + "::" + value),
-                externs,
-            );
-        }
+        )?
     }
+    Ok(())
 }
 
+#[tracing::instrument(level = "info", skip_all)]
 fn initialize_triggers(
     graph: &mut StableGraph<SqlGraphEntity, SqlGraphRelationship>,
     root: NodeIndex,
@@ -1590,6 +1527,7 @@ fn initialize_triggers(
     Ok(mapped_triggers)
 }
 
+#[tracing::instrument(level = "info", skip_all)]
 fn connect_triggers(
     graph: &mut StableGraph<SqlGraphEntity, SqlGraphRelationship>,
     triggers: &HashMap<PgTriggerEntity, NodeIndex>,
@@ -1607,6 +1545,7 @@ fn connect_triggers(
     }
 }
 
+#[tracing::instrument(level = "info", skip_all, fields(rust_identifier))]
 fn make_schema_connection(
     graph: &mut StableGraph<SqlGraphEntity, SqlGraphRelationship>,
     kind: &str,
@@ -1627,6 +1566,7 @@ fn make_schema_connection(
     found
 }
 
+#[tracing::instrument(level = "error", skip_all, fields(%rust_identifier))]
 fn make_extern_connection(
     graph: &mut StableGraph<SqlGraphEntity, SqlGraphRelationship>,
     kind: &str,
@@ -1634,19 +1574,27 @@ fn make_extern_connection(
     rust_identifier: &str,
     full_path: &str,
     externs: &HashMap<PgExternEntity, NodeIndex>,
-) -> bool {
+) -> eyre::Result<()> {
     let mut found = false;
     for (extern_item, &extern_index) in externs {
         if full_path == extern_item.full_path {
-            tracing::debug!(from = ?rust_identifier, to = extern_item.module_path, "Adding {kind} after Extern edge.", kind = kind);
+            tracing::debug!(from = ?rust_identifier, to = extern_item.full_path, "Adding {kind} after Extern edge.", kind = kind);
             graph.add_edge(extern_index, index, SqlGraphRelationship::RequiredBy);
             found = true;
             break;
         }
     }
-    found
+    match found {
+        true => Ok(()),
+        false => Err(eyre!("Did not find connection `{full_path}` in {:#?}", {
+            let mut paths = externs.iter().map(|(v, _)| v.full_path).collect::<Vec<_>>();
+            paths.sort();
+            paths
+        })),
+    }
 }
 
+#[tracing::instrument(level = "info", skip_all, fields(rust_identifier))]
 fn make_type_or_enum_connection(
     graph: &mut StableGraph<SqlGraphEntity, SqlGraphRelationship>,
     kind: &str,

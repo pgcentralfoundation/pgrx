@@ -231,7 +231,7 @@ impl PgGuardRewriter {
         let return_type = format!("{}", quote! {#return_type});
         let return_type =
             proc_macro2::TokenStream::from_str(return_type.trim_start_matches("->")).unwrap();
-        let return_type = quote! {impl std::iter::Iterator<Item = #return_type>};
+        let return_type = quote! {TableIterator<#return_type>};
         let attrs = entity_submission
             .unwrap()
             .extern_attrs()
@@ -268,7 +268,7 @@ impl PgGuardRewriter {
     ) -> proc_macro2::TokenStream {
         let generic_type = proc_macro2::TokenStream::from_str(types.first().unwrap()).unwrap();
         let mut generic_type = syn::parse2::<syn::Type>(generic_type).unwrap();
-        crate::staticize_lifetimes(&mut generic_type);
+        crate::anonymize_lifetimes(&mut generic_type);
 
         let result_handler = if optional {
             quote! {
@@ -723,7 +723,7 @@ impl FunctionSignatureRewriter {
                         let ts = if is_option {
                             let option_type = extract_option_type(&type_);
                             let mut option_type = syn::parse2::<syn::Type>(option_type).unwrap();
-                            crate::staticize_lifetimes(&mut option_type);
+                            crate::anonymize_lifetimes(&mut option_type);
 
                             quote_spanned! {ident.span()=>
                                 let #name = pgx::pg_getarg::<#option_type>(#fcinfo_ident, #i);
@@ -744,7 +744,7 @@ impl FunctionSignatureRewriter {
                                 let #name = pgx::pg_getarg_datum_raw(#fcinfo_ident, #i) as #type_;
                             }
                         } else {
-                            crate::staticize_lifetimes(&mut type_);
+                            crate::anonymize_lifetimes(&mut type_);
                             quote_spanned! {ident.span()=>
                                 let #name = pgx::pg_getarg::<#type_>(#fcinfo_ident, #i).unwrap_or_else(|| panic!("{} is null", stringify!{#ident}));
                             }

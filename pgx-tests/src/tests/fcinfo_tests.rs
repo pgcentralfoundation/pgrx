@@ -83,18 +83,13 @@ fn returns_none() -> Option<i32> {
 }
 
 #[pg_extern]
-fn takes_void(_void: ()) {
+fn returns_void() {
     // noop
 }
 
 #[pg_extern]
-fn returns_void() -> () {
-    // noop
-}
-
-#[pg_extern]
-fn returns_tuple() -> (name!(id, i32), name!(title, String)) {
-    (42, "pgx".into())
+fn returns_tuple() -> TableIterator<'static, (name!(id, i32), name!(title, String))> {
+    TableIterator::once((42, "pgx".into()))
 }
 
 #[pg_extern]
@@ -277,12 +272,6 @@ mod tests {
     unsafe fn test_returns_none() {
         let result = direct_pg_extern_function_call::<i32>(super::returns_none_wrapper, vec![]);
         assert!(result.is_none())
-    }
-
-    #[pg_test]
-    fn test_takes_void() {
-        let result = Spi::get_one::<()>("SELECT takes_void(NULL::void);");
-        assert_eq!(result, None)
     }
 
     #[pg_test]

@@ -13,7 +13,11 @@ use crate::{
 
 impl FromDatum for pg_sys::ItemPointerData {
     #[inline]
-    unsafe fn from_datum(datum: pg_sys::Datum, is_null: bool) -> Option<pg_sys::ItemPointerData> {
+    unsafe fn from_datum(
+        datum: pg_sys::Datum,
+        is_null: bool,
+        _typoid: u32,
+    ) -> Option<pg_sys::ItemPointerData> {
         if is_null {
             None
         } else {

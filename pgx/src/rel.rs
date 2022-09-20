@@ -12,6 +12,9 @@ use crate::{
     direct_function_call, name_data_to_str, pg_sys, FromDatum, IntoDatum, PgBox, PgList,
     PgTupleDesc,
 };
+use pgx_utils::sql_entity_graph::metadata::{
+    ArgumentError, Returns, ReturnsError, SqlMapping, SqlTranslatable,
+};
 use std::ops::Deref;
 use std::os::raw::c_char;
 
@@ -308,7 +311,7 @@ impl Clone for PgRelation {
 }
 
 impl FromDatum for PgRelation {
-    unsafe fn from_datum(datum: pg_sys::Datum, is_null: bool) -> Option<PgRelation> {
+    unsafe fn from_datum(datum: pg_sys::Datum, is_null: bool, _typoid: u32) -> Option<PgRelation> {
         if is_null {
             None
         } else {
@@ -350,5 +353,14 @@ impl Drop for PgRelation {
                 }
             }
         }
+    }
+}
+
+unsafe impl SqlTranslatable for PgRelation {
+    fn argument_sql() -> Result<SqlMapping, ArgumentError> {
+        Ok(SqlMapping::literal("regclass"))
+    }
+    fn return_sql() -> Result<Returns, ReturnsError> {
+        Ok(Returns::One(SqlMapping::literal("regclass")))
     }
 }

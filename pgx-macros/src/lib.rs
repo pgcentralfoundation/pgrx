@@ -20,11 +20,11 @@ use pgx_utils::{
     *,
 };
 use proc_macro::TokenStream;
-use proc_macro2::{Ident, Span};
-use quote::{quote, quote_spanned, ToTokens};
+use proc_macro2::Ident;
+use quote::{quote, ToTokens};
 use std::collections::HashSet;
 use syn::spanned::Spanned;
-use syn::{parse_macro_input, Attribute, Data, DeriveInput, Item, ItemFn, ItemImpl};
+use syn::{parse_macro_input, Attribute, Data, DeriveInput, Item, ItemImpl};
 
 /// Declare a function as `#[pg_guard]` to indicate that it is called from a Postgres `extern "C"`
 /// function so that Rust `panic!()`s (and Postgres `elog(ERROR)`s) will be properly handled by `pgx`
@@ -557,61 +557,18 @@ fn example_return() -> pg_sys::Oid {
 */
 #[proc_macro_attribute]
 pub fn pg_extern(attr: TokenStream, item: TokenStream) -> TokenStream {
-    let args = parse_extern_attributes(proc_macro2::TokenStream::from(attr.clone()));
-
-    let sql_graph_entity_item = PgExtern::new(attr.clone().into(), item.clone().into()).unwrap();
-
-    let ast = parse_macro_input!(item as syn::Item);
-    match ast {
-        Item::Fn(func) => rewrite_item_fn(func, args, &sql_graph_entity_item).into(),
-        _ => panic!("#[pg_extern] can only be applied to top-level functions"),
+    fn wrapped(attr: TokenStream, item: TokenStream) -> Result<TokenStream, syn::Error> {
+        let pg_extern_item = PgExtern::new(attr.clone().into(), item.clone().into())?;
+        Ok(pg_extern_item.to_token_stream().into())
     }
-}
 
-fn rewrite_item_fn(
-    mut func: ItemFn,
-    extern_args: HashSet<ExternArgs>,
-    sql_graph_entity_submission: &PgExtern,
-) -> proc_macro2::TokenStream {
-    let is_raw = extern_args.contains(&ExternArgs::Raw);
-    let no_guard = extern_args.contains(&ExternArgs::NoGuard);
-
-    let finfo_name = syn::Ident::new(
-        &format!("pg_finfo_{}_wrapper", func.sig.ident),
-        Span::call_site(),
-    );
-
-    // use the PgGuardRewriter to go ahead and wrap the function here, rather than applying
-    // a #[pg_guard] macro to the original function.  This is necessary so that compiler
-    // errors/warnings indicate the proper line numbers
-    let rewriter = PgGuardRewriter::new();
-
-    // make the function 'extern "C"' because this is for the #[pg_extern[ macro
-    func.sig.abi = Some(syn::parse_str("extern \"C\"").unwrap());
-    let func_span = func.span();
-    let (rewritten_func, need_wrapper) = rewriter.item_fn(
-        func,
-        Some(sql_graph_entity_submission),
-        true,
-        is_raw,
-        no_guard,
-    );
-
-    if need_wrapper {
-        quote_spanned! {func_span=>
-            #[no_mangle]
-            #[doc(hidden)]
-            pub extern "C" fn #finfo_name() -> &'static pg_sys::Pg_finfo_record {
-                const V1_API: pg_sys::Pg_finfo_record = pg_sys::Pg_finfo_record { api_version: 1 };
-                &V1_API
-            }
-
-            #rewritten_func
-        }
-    } else {
-        quote_spanned! {func_span=>
-
-            #rewritten_func
+    match wrapped(attr, item) {
+        Ok(tokens) => tokens,
+        Err(e) => {
+            let msg = e.to_string();
+            TokenStream::from(quote! {
+              compile_error!(#msg);
+            })
         }
     }
 }
@@ -664,7 +621,7 @@ fn impl_postgres_enum(ast: DeriveInput) -> proc_macro2::TokenStream {
     stream.extend(quote! {
         impl pgx::FromDatum for #enum_ident {
             #[inline]
-            unsafe fn from_datum(datum: pgx::pg_sys::Datum, is_null: bool) -> Option<#enum_ident> {
+            unsafe fn from_datum(datum: pgx::pg_sys::Datum, is_null: bool, typeoid: pgx::pg_sys::Oid) -> Option<#enum_ident> {
                 if is_null {
                     None
                 } else {

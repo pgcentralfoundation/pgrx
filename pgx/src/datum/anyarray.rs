@@ -8,10 +8,14 @@ Use of this source code is governed by the MIT license that can be found in the 
 */
 
 use crate::{pg_sys, FromDatum, IntoDatum};
+use pgx_utils::sql_entity_graph::metadata::{
+    ArgumentError, Returns, ReturnsError, SqlMapping, SqlTranslatable,
+};
 
 #[derive(Debug, Clone, Copy)]
 pub struct AnyArray {
     datum: pg_sys::Datum,
+    typoid: pg_sys::Oid,
 }
 
 impl AnyArray {
@@ -19,19 +23,27 @@ impl AnyArray {
         self.datum
     }
 
+    pub fn oid(&self) -> pg_sys::Oid {
+        self.typoid
+    }
+
     #[inline]
     pub fn into<T: FromDatum>(&self) -> Option<T> {
-        unsafe { T::from_datum(self.datum(), false) }
+        unsafe { T::from_datum(self.datum(), false, self.oid()) }
     }
 }
 
 impl FromDatum for AnyArray {
     #[inline]
-    unsafe fn from_datum(datum: pg_sys::Datum, is_null: bool) -> Option<AnyArray> {
+    unsafe fn from_datum(
+        datum: pg_sys::Datum,
+        is_null: bool,
+        typoid: pg_sys::Oid,
+    ) -> Option<AnyArray> {
         if is_null {
             None
         } else {
-            Some(AnyArray { datum })
+            Some(AnyArray { datum, typoid })
         }
     }
 }
@@ -44,5 +56,14 @@ impl IntoDatum for AnyArray {
 
     fn type_oid() -> u32 {
         pg_sys::ANYARRAYOID
+    }
+}
+
+unsafe impl SqlTranslatable for AnyArray {
+    fn argument_sql() -> Result<SqlMapping, ArgumentError> {
+        Ok(SqlMapping::literal("anyarray"))
+    }
+    fn return_sql() -> Result<Returns, ReturnsError> {
+        Ok(Returns::One(SqlMapping::literal("anyarray")))
     }
 }

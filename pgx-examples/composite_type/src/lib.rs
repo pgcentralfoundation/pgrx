@@ -166,6 +166,7 @@ struct SumScritches;
 #[pg_aggregate]
 impl Aggregate for SumScritches {
     type State = i32;
+    const INITIAL_CONDITION: Option<&'static str> = Some("0");
     type Args = pgx::name!(value, pgx::composite_type!("Dog"));
 
     fn state(

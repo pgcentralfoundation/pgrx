@@ -14,6 +14,8 @@ mod polyfill;
 pub mod setjmp;
 mod tupdesc;
 mod utils;
+// Various SqlTranslatable mappings for SQL generation
+mod sql_translatable;
 
 pub use datum::Datum;
 // OnDrop(feature = "pg11"): remove this cfg if all supported versions of Postgres

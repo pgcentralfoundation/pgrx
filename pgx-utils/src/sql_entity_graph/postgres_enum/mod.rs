@@ -6,6 +6,14 @@ All rights reserved.
 
 Use of this source code is governed by the MIT license that can be found in the LICENSE file.
 */
+/*!
+
+`#[derive(PostgresEnum)]` related macro expansion for Rust to SQL translation
+
+> Like all of the [`sql_entity_graph`][crate::sql_entity_graph] APIs, this is considered **internal**
+to the `pgx` framework and very subject to change between versions. While you may use this, please do it with caution.
+
+*/
 pub mod entity;
 
 use crate::sql_entity_graph::ToSqlConfig;
@@ -103,10 +111,36 @@ impl ToTokens for PostgresEnum {
         // It's important we remap all lifetimes we spot to `'static` so they can be used during inventory submission.
         let name = self.name.clone();
         let mut static_generics = self.generics.clone();
-        for lifetime in static_generics.lifetimes_mut() {
-            lifetime.lifetime.ident = Ident::new("static", Span::call_site());
-        }
-        let (_impl_generics, ty_generics, _where_clauses) = static_generics.split_for_impl();
+        static_generics.params = static_generics
+            .params
+            .clone()
+            .into_iter()
+            .flat_map(|param| match param {
+                item @ syn::GenericParam::Type(_) | item @ syn::GenericParam::Const(_) => {
+                    Some(item)
+                }
+                syn::GenericParam::Lifetime(mut lifetime) => {
+                    lifetime.lifetime.ident = Ident::new("static", Span::call_site());
+                    Some(syn::GenericParam::Lifetime(lifetime))
+                }
+            })
+            .collect();
+        let mut staticless_generics = self.generics.clone();
+        staticless_generics.params = static_generics
+            .params
+            .clone()
+            .into_iter()
+            .flat_map(|param| match param {
+                item @ syn::GenericParam::Type(_) | item @ syn::GenericParam::Const(_) => {
+                    Some(item)
+                }
+                syn::GenericParam::Lifetime(_) => None,
+            })
+            .collect();
+        let (staticless_impl_generics, _staticless_ty_generics, _staticless_where_clauses) =
+            staticless_generics.split_for_impl();
+        let (_static_impl_generics, static_ty_generics, static_where_clauses) =
+            static_generics.split_for_impl();
 
         let variants = self.variants.iter();
         let sql_graph_entity_fn_name =
@@ -115,6 +149,16 @@ impl ToTokens for PostgresEnum {
         let to_sql_config = &self.to_sql_config;
 
         let inv = quote! {
+            unsafe impl #staticless_impl_generics ::pgx::utils::sql_entity_graph::metadata::SqlTranslatable for #name #static_ty_generics #static_where_clauses {
+                fn argument_sql() -> core::result::Result<::pgx::utils::sql_entity_graph::metadata::SqlMapping, ::pgx::utils::sql_entity_graph::metadata::ArgumentError> {
+                    Ok(::pgx::utils::sql_entity_graph::metadata::SqlMapping::As(String::from(stringify!(#name))))
+                }
+
+                fn return_sql() -> core::result::Result<::pgx::utils::sql_entity_graph::metadata::Returns, ::pgx::utils::sql_entity_graph::metadata::ReturnsError> {
+                    Ok(::pgx::utils::sql_entity_graph::metadata::Returns::One(::pgx::utils::sql_entity_graph::metadata::SqlMapping::As(String::from(stringify!(#name)))))
+                }
+            }
+
             #[no_mangle]
             #[doc(hidden)]
             pub extern "Rust" fn  #sql_graph_entity_fn_name() -> ::pgx::utils::sql_entity_graph::SqlGraphEntity {
@@ -122,17 +166,17 @@ impl ToTokens for PostgresEnum {
                 use alloc::vec::Vec;
                 use alloc::vec;
                 let mut mappings = Default::default();
-                <#name #ty_generics as ::pgx::datum::WithTypeIds>::register_with_refs(&mut mappings, stringify!(#name).to_string());
-                ::pgx::datum::WithSizedTypeIds::<#name #ty_generics>::register_sized_with_refs(&mut mappings, stringify!(#name).to_string());
-                ::pgx::datum::WithArrayTypeIds::<#name #ty_generics>::register_array_with_refs(&mut mappings, stringify!(#name).to_string());
-                ::pgx::datum::WithVarlenaTypeIds::<#name #ty_generics>::register_varlena_with_refs(&mut mappings, stringify!(#name).to_string());
+                <#name #static_ty_generics as ::pgx::datum::WithTypeIds>::register_with_refs(&mut mappings, stringify!(#name).to_string());
+                ::pgx::datum::WithSizedTypeIds::<#name #static_ty_generics>::register_sized_with_refs(&mut mappings, stringify!(#name).to_string());
+                ::pgx::datum::WithArrayTypeIds::<#name #static_ty_generics>::register_array_with_refs(&mut mappings, stringify!(#name).to_string());
+                ::pgx::datum::WithVarlenaTypeIds::<#name #static_ty_generics>::register_varlena_with_refs(&mut mappings, stringify!(#name).to_string());
 
                 let submission = ::pgx::utils::sql_entity_graph::PostgresEnumEntity {
                     name: stringify!(#name),
                     file: file!(),
                     line: line!(),
                     module_path: module_path!(),
-                    full_path: core::any::type_name::<#name #ty_generics>(),
+                    full_path: core::any::type_name::<#name #static_ty_generics>(),
                     mappings,
                     variants: vec![ #(  stringify!(#variants)  ),* ],
                     to_sql_config: #to_sql_config,

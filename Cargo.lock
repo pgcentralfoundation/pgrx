@@ -1424,6 +1424,7 @@ dependencies = [
  "pgx-utils",
  "quote",
  "seahash",
+ "seq-macro",
  "serde",
  "serde_cbor",
  "serde_json",
@@ -1511,12 +1512,14 @@ version = "0.5.0-beta.0"
 dependencies = [
  "atty",
  "convert_case",
+ "cstr_core",
  "eyre",
  "owo-colors",
  "petgraph",
  "proc-macro2",
  "quote",
  "regex",
+ "seq-macro",
  "serde",
  "serde_derive",
  "serde_json",
@@ -2019,6 +2022,12 @@ checksum = "00b0bef5b7f9e0df16536d3961cfb6e84331c065b4066afb39768d0e319411f7"
 dependencies = [
  "pest",
 ]
+
+[[package]]
+name = "seq-macro"
+version = "0.3.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "70d9841243dbc9928f5fed7946d2862292eebd823d96e13e556924d3db0120d2"
 
 [[package]]
 name = "serde"

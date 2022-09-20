@@ -9,6 +9,9 @@ Use of this source code is governed by the MIT license that can be found in the 
 
 use crate::{pg_sys, FromDatum, IntoDatum};
 use core::num::TryFromIntError;
+use pgx_utils::sql_entity_graph::metadata::{
+    ArgumentError, Returns, ReturnsError, SqlMapping, SqlTranslatable,
+};
 use std::ffi::CStr;
 
 pub const POSTGRES_EPOCH_JDATE: i32 = pg_sys::POSTGRES_EPOCH_JDATE as i32;
@@ -35,7 +38,7 @@ impl IntoDatum for Date {
 }
 
 impl FromDatum for Date {
-    unsafe fn from_datum(datum: pg_sys::Datum, is_null: bool) -> Option<Self>
+    unsafe fn from_datum(datum: pg_sys::Datum, is_null: bool, _: pg_sys::Oid) -> Option<Self>
     where
         Self: Sized,
     {
@@ -172,5 +175,14 @@ impl serde::Serialize for Date {
         serializer
             .serialize_str(cstr.to_str().unwrap())
             .map_err(|e| serde::ser::Error::custom(format!("Date formatting problem: {:?}", e)))
+    }
+}
+
+unsafe impl SqlTranslatable for Date {
+    fn argument_sql() -> Result<SqlMapping, ArgumentError> {
+        Ok(SqlMapping::literal("date"))
+    }
+    fn return_sql() -> Result<Returns, ReturnsError> {
+        Ok(Returns::One(SqlMapping::literal("date")))
     }
 }

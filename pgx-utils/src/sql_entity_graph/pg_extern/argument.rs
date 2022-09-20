@@ -6,6 +6,14 @@ All rights reserved.
 
 Use of this source code is governed by the MIT license that can be found in the LICENSE file.
 */
+/*!
+
+`#[pg_extern]` related argument macro expansion for Rust to SQL translation
+
+> Like all of the [`sql_entity_graph`][crate::sql_entity_graph] APIs, this is considered **internal**
+to the `pgx` framework and very subject to change between versions. While you may use this, please do it with caution.
+
+*/
 use crate::sql_entity_graph::UsedType;
 use proc_macro2::{Span, TokenStream as TokenStream2};
 use quote::{quote, ToTokens, TokenStreamExt};
@@ -16,19 +24,26 @@ use syn::{FnArg, Pat};
 /// It is created during [`PgExtern`](crate::sql_entity_graph::PgExtern) parsing.
 #[derive(Debug, Clone)]
 pub struct PgExternArgument {
-    pat: syn::Ident,
-    used_ty: UsedType,
+    pub fn_arg: syn::FnArg,
+    pub pat: syn::Ident,
+    pub used_ty: UsedType,
 }
 
 impl PgExternArgument {
-    pub fn build(value: FnArg) -> Result<Option<Self>, syn::Error> {
-        match value {
-            syn::FnArg::Typed(pat) => Self::build_from_pat_type(pat),
-            _ => Err(syn::Error::new(Span::call_site(), "Unable to parse FnArg")),
+    pub fn build(fn_arg: FnArg) -> Result<Self, syn::Error> {
+        match &fn_arg {
+            syn::FnArg::Typed(pat) => Self::build_from_pat_type(fn_arg.clone(), pat.clone()),
+            syn::FnArg::Receiver(_) => Err(syn::Error::new(
+                Span::call_site(),
+                "Unable to parse FnArg that is Self",
+            )),
         }
     }
 
-    pub fn build_from_pat_type(value: syn::PatType) -> Result<Option<Self>, syn::Error> {
+    pub fn build_from_pat_type(
+        fn_arg: syn::FnArg,
+        value: syn::PatType,
+    ) -> Result<Self, syn::Error> {
         let identifier = match *value.pat {
             Pat::Ident(ref p) => p.ident.clone(),
             Pat::Reference(ref p_ref) => match *p_ref.pat {
@@ -40,61 +55,14 @@ impl PgExternArgument {
 
         let used_ty = UsedType::new(*value.ty)?;
 
-        // We special case ignore `*mut pg_sys::FunctionCallInfoData`
-        match used_ty.resolved_ty {
-            syn::Type::Path(ref path) => {
-                let segments = &path.path;
-                let mut saw_pg_sys = false;
-                let mut saw_functioncallinfobasedata = false;
-
-                for segment in &segments.segments {
-                    let ident_string = segment.ident.to_string();
-                    match ident_string.as_str() {
-                        "pg_sys" => saw_pg_sys = true,
-                        "FunctionCallInfo" => saw_functioncallinfobasedata = true,
-                        _ => (),
-                    }
-                }
-                if (saw_pg_sys && saw_functioncallinfobasedata)
-                    || (saw_functioncallinfobasedata && segments.segments.len() == 1)
-                {
-                    return Ok(None);
-                }
-            }
-            syn::Type::Ptr(ref type_ptr) => match *type_ptr.elem {
-                syn::Type::Path(ref path) => {
-                    let segments = &path.path;
-                    let mut saw_pg_sys = false;
-                    let mut saw_functioncallinfobasedata = false;
-                    for segment in &segments.segments {
-                        if segment.ident.to_string() == "pg_sys" {
-                            saw_pg_sys = true;
-                        }
-                        if segment.ident.to_string() == "FunctionCallInfo" {
-                            saw_functioncallinfobasedata = true;
-                        }
-                    }
-                    if (saw_pg_sys && saw_functioncallinfobasedata)
-                        || (saw_functioncallinfobasedata && segments.segments.len() == 1)
-                    {
-                        // It's a FunctionCallInfoBaseData, skipping
-                        return Ok(None);
-                    }
-                }
-                _ => (),
-            },
-            _ => (),
-        };
-
-        Ok(Some(PgExternArgument {
+        Ok(PgExternArgument {
+            fn_arg,
             pat: identifier,
             used_ty,
-        }))
+        })
     }
-}
 
-impl ToTokens for PgExternArgument {
-    fn to_tokens(&self, tokens: &mut TokenStream2) {
+    pub fn entity_tokens(&self) -> TokenStream2 {
         let pat = &self.pat;
         let used_ty_entity = self.used_ty.entity_tokens();
 
@@ -103,6 +71,16 @@ impl ToTokens for PgExternArgument {
                 pattern: stringify!(#pat),
                 used_ty: #used_ty_entity,
             }
+        };
+        quoted
+    }
+}
+
+impl ToTokens for PgExternArgument {
+    fn to_tokens(&self, tokens: &mut TokenStream2) {
+        let fn_arg = &self.fn_arg;
+        let quoted = quote! {
+            #fn_arg
         };
         tokens.append_all(quoted);
     }

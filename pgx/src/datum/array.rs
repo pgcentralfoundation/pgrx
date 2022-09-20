@@ -10,11 +10,12 @@ Use of this source code is governed by the MIT license that can be found in the 
 use crate::{array::RawArray, layout::*, pg_sys, FromDatum, IntoDatum, PgMemoryContexts};
 use bitvec::slice::BitSlice;
 use core::ptr::NonNull;
+use pgx_utils::sql_entity_graph::metadata::{
+    ArgumentError, Returns, ReturnsError, SqlMapping, SqlTranslatable,
+};
 use serde::Serializer;
 use std::marker::PhantomData;
 use std::{mem, ptr, slice};
-
-pub type VariadicArray<'a, T> = Array<'a, T>;
 
 pub struct Array<'a, T: FromDatum> {
     _ptr: Option<NonNull<pg_sys::varlena>>,
@@ -65,15 +66,6 @@ impl<'a, T: FromDatum + serde::Serialize> serde::Serialize for Array<'a, T> {
         S: Serializer,
     {
         serializer.collect_seq(self.iter())
-    }
-}
-
-impl<'a, T: FromDatum + serde::Serialize> serde::Serialize for ArrayTypedIterator<'a, T> {
-    fn serialize<S>(&self, serializer: S) -> Result<<S as Serializer>::Ok, <S as Serializer>::Error>
-    where
-        S: Serializer,
-    {
-        serializer.collect_seq(self.array.iter())
     }
 }
 
@@ -280,8 +272,74 @@ impl<'a, T: FromDatum> Array<'a, T> {
         if i >= self.nelems {
             None
         } else {
-            Some(unsafe { T::from_datum(self.elem_slice[i], self.null_slice.get(i)?) })
+            Some(unsafe {
+                T::from_datum(
+                    self.elem_slice[i],
+                    self.null_slice.get(i)?,
+                    self.raw.as_ref().map(|r| r.oid()).unwrap_or_default(),
+                )
+            })
         }
+    }
+}
+
+pub struct VariadicArray<'a, T: FromDatum>(Array<'a, T>);
+
+impl<'a, T: FromDatum + serde::Serialize> serde::Serialize for VariadicArray<'a, T> {
+    fn serialize<S>(&self, serializer: S) -> Result<<S as Serializer>::Ok, <S as Serializer>::Error>
+    where
+        S: Serializer,
+    {
+        serializer.collect_seq(self.0.iter())
+    }
+}
+
+impl<'a, T: FromDatum> VariadicArray<'a, T> {
+    pub fn into_array_type(self) -> *const pg_sys::ArrayType {
+        self.0.into_array_type()
+    }
+
+    // # Panics
+    //
+    // Panics if it detects the slightest misalignment between types,
+    // or if a valid slice contains nulls, which may be uninit data.
+    #[deprecated(
+        since = "0.5.0",
+        note = "this function cannot be safe and is not generically sound\n\
+        even `unsafe fn as_slice(&self) -> &[T]` is not sound for all `&[T]`\n\
+        if you are sure your usage is sound, consider RawArray"
+    )]
+    #[allow(deprecated)]
+    pub fn as_slice(&self) -> &[T] {
+        self.0.as_slice()
+    }
+
+    /// Return an Iterator of Option<T> over the contained Datums.
+    pub fn iter(&self) -> ArrayIterator<'_, T> {
+        self.0.iter()
+    }
+
+    /// Return an Iterator of the contained Datums (converted to Rust types).
+    ///
+    /// This function will panic when called if the array contains any SQL NULL values.
+    pub fn iter_deny_null(&self) -> ArrayTypedIterator<'_, T> {
+        self.0.iter_deny_null()
+    }
+
+    #[inline]
+    pub fn len(&self) -> usize {
+        self.0.len()
+    }
+
+    #[inline]
+    pub fn is_empty(&self) -> bool {
+        self.0.is_empty()
+    }
+
+    #[allow(clippy::option_option)]
+    #[inline]
+    pub fn get(&self, i: usize) -> Option<Option<T>> {
+        self.0.get(i)
     }
 }
 
@@ -306,6 +364,15 @@ impl<'a, T: FromDatum> Iterator for ArrayTypedIterator<'a, T> {
             self.curr += 1;
             Some(element)
         }
+    }
+}
+
+impl<'a, T: FromDatum + serde::Serialize> serde::Serialize for ArrayTypedIterator<'a, T> {
+    fn serialize<S>(&self, serializer: S) -> Result<<S as Serializer>::Ok, <S as Serializer>::Error>
+    where
+        S: Serializer,
+    {
+        serializer.collect_seq(self.array.iter())
     }
 }
 
@@ -346,6 +413,18 @@ impl<'a, T: FromDatum> IntoIterator for Array<'a, T> {
     }
 }
 
+impl<'a, T: FromDatum> IntoIterator for VariadicArray<'a, T> {
+    type Item = Option<T>;
+    type IntoIter = ArrayIntoIterator<'a, T>;
+
+    fn into_iter(self) -> Self::IntoIter {
+        ArrayIntoIterator {
+            array: self.0,
+            curr: 0,
+        }
+    }
+}
+
 impl<'a, T: FromDatum> Iterator for ArrayIntoIterator<'a, T> {
     type Item = Option<T>;
 
@@ -376,9 +455,24 @@ impl<'a, T: FromDatum> Iterator for ArrayIntoIterator<'a, T> {
     }
 }
 
+impl<'a, T: FromDatum> FromDatum for VariadicArray<'a, T> {
+    #[inline]
+    unsafe fn from_datum(
+        datum: pg_sys::Datum,
+        is_null: bool,
+        oid: pg_sys::Oid,
+    ) -> Option<VariadicArray<'a, T>> {
+        Array::from_datum(datum, is_null, oid).map(Self)
+    }
+}
+
 impl<'a, T: FromDatum> FromDatum for Array<'a, T> {
     #[inline]
-    unsafe fn from_datum(datum: pg_sys::Datum, is_null: bool) -> Option<Array<'a, T>> {
+    unsafe fn from_datum(
+        datum: pg_sys::Datum,
+        is_null: bool,
+        _typoid: u32,
+    ) -> Option<Array<'a, T>> {
         if is_null || datum.is_null() {
             None
         } else {
@@ -397,11 +491,15 @@ impl<'a, T: FromDatum> FromDatum for Array<'a, T> {
 
 impl<T: FromDatum> FromDatum for Vec<T> {
     #[inline]
-    unsafe fn from_datum(datum: pg_sys::Datum, is_null: bool) -> Option<Vec<T>> {
+    unsafe fn from_datum(
+        datum: pg_sys::Datum,
+        is_null: bool,
+        typoid: pg_sys::Oid,
+    ) -> Option<Vec<T>> {
         if is_null {
             None
         } else {
-            let array = Array::<T>::from_datum(datum, is_null).unwrap();
+            let array = Array::<T>::from_datum(datum, is_null, typoid).unwrap();
             let mut v = Vec::with_capacity(array.len());
 
             for element in array.iter() {
@@ -503,5 +601,87 @@ where
     #[inline]
     fn is_compatible_with(other: pg_sys::Oid) -> bool {
         Self::type_oid() == other || other == unsafe { pg_sys::get_array_type(T::type_oid()) }
+    }
+}
+
+unsafe impl<'a, T> SqlTranslatable for Array<'a, T>
+where
+    T: SqlTranslatable + FromDatum,
+{
+    fn argument_sql() -> Result<SqlMapping, ArgumentError> {
+        match T::argument_sql()? {
+            SqlMapping::As(sql) => Ok(SqlMapping::As(format!("{sql}[]"))),
+            SqlMapping::Skip => Err(ArgumentError::SkipInArray),
+            SqlMapping::Composite { .. } => Ok(SqlMapping::Composite {
+                array_brackets: true,
+            }),
+            SqlMapping::Source { .. } => Ok(SqlMapping::Source {
+                array_brackets: true,
+            }),
+        }
+    }
+
+    fn return_sql() -> Result<Returns, ReturnsError> {
+        match T::return_sql()? {
+            Returns::One(SqlMapping::As(sql)) => {
+                Ok(Returns::One(SqlMapping::As(format!("{sql}[]"))))
+            }
+            Returns::One(SqlMapping::Composite { array_brackets: _ }) => {
+                Ok(Returns::One(SqlMapping::Composite {
+                    array_brackets: true,
+                }))
+            }
+            Returns::One(SqlMapping::Source { array_brackets: _ }) => {
+                Ok(Returns::One(SqlMapping::Source {
+                    array_brackets: true,
+                }))
+            }
+            Returns::One(SqlMapping::Skip) => Err(ReturnsError::SkipInArray),
+            Returns::SetOf(_) => Err(ReturnsError::SetOfInArray),
+            Returns::Table(_) => Err(ReturnsError::TableInArray),
+        }
+    }
+}
+
+unsafe impl<'a, T> SqlTranslatable for VariadicArray<'a, T>
+where
+    T: SqlTranslatable + FromDatum,
+{
+    fn argument_sql() -> Result<SqlMapping, ArgumentError> {
+        match T::argument_sql()? {
+            SqlMapping::As(sql) => Ok(SqlMapping::As(format!("{sql}[]"))),
+            SqlMapping::Skip => Err(ArgumentError::SkipInArray),
+            SqlMapping::Composite { .. } => Ok(SqlMapping::Composite {
+                array_brackets: true,
+            }),
+            SqlMapping::Source { .. } => Ok(SqlMapping::Source {
+                array_brackets: true,
+            }),
+        }
+    }
+
+    fn return_sql() -> Result<Returns, ReturnsError> {
+        match T::return_sql()? {
+            Returns::One(SqlMapping::As(sql)) => {
+                Ok(Returns::One(SqlMapping::As(format!("{sql}[]"))))
+            }
+            Returns::One(SqlMapping::Composite { array_brackets: _ }) => {
+                Ok(Returns::One(SqlMapping::Composite {
+                    array_brackets: true,
+                }))
+            }
+            Returns::One(SqlMapping::Source { array_brackets: _ }) => {
+                Ok(Returns::One(SqlMapping::Source {
+                    array_brackets: true,
+                }))
+            }
+            Returns::One(SqlMapping::Skip) => Err(ReturnsError::SkipInArray),
+            Returns::SetOf(_) => Err(ReturnsError::SetOfInArray),
+            Returns::Table(_) => Err(ReturnsError::TableInArray),
+        }
+    }
+
+    fn variadic() -> bool {
+        true
     }
 }

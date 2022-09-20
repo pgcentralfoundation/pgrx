@@ -11,6 +11,9 @@ use crate::{
     direct_function_call, direct_function_call_as_datum, pg_sys, vardata_any, varsize_any_exhdr,
     void_mut_ptr, FromDatum, IntoDatum,
 };
+use pgx_utils::sql_entity_graph::metadata::{
+    ArgumentError, Returns, ReturnsError, SqlMapping, SqlTranslatable,
+};
 use serde::{Serialize, Serializer};
 use serde_json::Value;
 
@@ -26,7 +29,7 @@ pub struct JsonString(pub String);
 /// for json
 impl FromDatum for Json {
     #[inline]
-    unsafe fn from_datum(datum: pg_sys::Datum, is_null: bool) -> Option<Json> {
+    unsafe fn from_datum(datum: pg_sys::Datum, is_null: bool, _: pg_sys::Oid) -> Option<Json> {
         if is_null {
             None
         } else {
@@ -42,7 +45,7 @@ impl FromDatum for Json {
 
 /// for jsonb
 impl FromDatum for JsonB {
-    unsafe fn from_datum(datum: pg_sys::Datum, is_null: bool) -> Option<JsonB> {
+    unsafe fn from_datum(datum: pg_sys::Datum, is_null: bool, _: pg_sys::Oid) -> Option<JsonB> {
         if is_null {
             None
         } else {
@@ -80,7 +83,11 @@ impl FromDatum for JsonB {
 /// This returns a **copy**, allocated and managed by Rust, of the underlying `varlena` Datum
 impl FromDatum for JsonString {
     #[inline]
-    unsafe fn from_datum(datum: pg_sys::Datum, is_null: bool) -> Option<JsonString> {
+    unsafe fn from_datum(
+        datum: pg_sys::Datum,
+        is_null: bool,
+        _: pg_sys::Oid,
+    ) -> Option<JsonString> {
         if is_null {
             None
         } else {
@@ -168,5 +175,23 @@ impl Serialize for JsonString {
         serde_json::to_value(self.0.as_str())
             .expect("JsonString is not valid JSON")
             .serialize(serializer)
+    }
+}
+
+unsafe impl SqlTranslatable for Json {
+    fn argument_sql() -> Result<SqlMapping, ArgumentError> {
+        Ok(SqlMapping::literal("json"))
+    }
+    fn return_sql() -> Result<Returns, ReturnsError> {
+        Ok(Returns::One(SqlMapping::literal("json")))
+    }
+}
+
+unsafe impl SqlTranslatable for crate::datum::JsonB {
+    fn argument_sql() -> Result<SqlMapping, ArgumentError> {
+        Ok(SqlMapping::literal("jsonb"))
+    }
+    fn return_sql() -> Result<Returns, ReturnsError> {
+        Ok(Returns::One(SqlMapping::literal("jsonb")))
     }
 }

@@ -8,6 +8,9 @@ Use of this source code is governed by the MIT license that can be found in the 
 */
 
 use crate::{pg_sys, FromDatum, IntoDatum};
+use pgx_utils::sql_entity_graph::metadata::{
+    ArgumentError, Returns, ReturnsError, SqlMapping, SqlTranslatable,
+};
 use std::ops::{Deref, DerefMut};
 use time::format_description::FormatItem;
 
@@ -21,7 +24,7 @@ pub(crate) const SEC_PER_MIN: i64 = 60;
 pub struct Time(pub(crate) time::Time);
 impl FromDatum for Time {
     #[inline]
-    unsafe fn from_datum(datum: pg_sys::Datum, is_null: bool) -> Option<Time> {
+    unsafe fn from_datum(datum: pg_sys::Datum, is_null: bool, _typoid: u32) -> Option<Time> {
         if is_null {
             None
         } else {
@@ -119,3 +122,12 @@ impl serde::Serialize for Time {
 
 static DEFAULT_TIME_FORMAT: &[FormatItem<'static>] =
     time::macros::format_description!("[hour]:[minute]:[second]");
+
+unsafe impl SqlTranslatable for Time {
+    fn argument_sql() -> Result<SqlMapping, ArgumentError> {
+        Ok(SqlMapping::literal("time"))
+    }
+    fn return_sql() -> Result<Returns, ReturnsError> {
+        Ok(Returns::One(SqlMapping::literal("time")))
+    }
+}

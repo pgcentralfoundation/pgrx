@@ -14,6 +14,9 @@ use crate::{
     StringInfo,
 };
 use pgx_pg_sys::varlena;
+use pgx_utils::sql_entity_graph::metadata::{
+    ArgumentError, Returns, ReturnsError, SqlMapping, SqlTranslatable,
+};
 use serde::{Deserialize, Serialize};
 use std::borrow::Cow;
 use std::marker::PhantomData;
@@ -298,7 +301,7 @@ impl<T> FromDatum for PgVarlena<T>
 where
     T: Copy + Sized,
 {
-    unsafe fn from_datum(datum: pg_sys::Datum, is_null: bool) -> Option<Self> {
+    unsafe fn from_datum(datum: pg_sys::Datum, is_null: bool, _typoid: u32) -> Option<Self> {
         if is_null {
             None
         } else {
@@ -310,6 +313,7 @@ where
         mut memory_context: PgMemoryContexts,
         datum: pg_sys::Datum,
         is_null: bool,
+        _typoid: u32,
     ) -> Option<Self> {
         if is_null {
             None
@@ -345,7 +349,7 @@ impl<'de, T> FromDatum for T
 where
     T: PostgresType + Deserialize<'de>,
 {
-    unsafe fn from_datum(datum: pg_sys::Datum, is_null: bool) -> Option<Self> {
+    unsafe fn from_datum(datum: pg_sys::Datum, is_null: bool, _typoid: u32) -> Option<Self> {
         if is_null {
             None
         } else {
@@ -357,6 +361,7 @@ where
         memory_context: PgMemoryContexts,
         datum: pg_sys::Datum,
         is_null: bool,
+        _typoid: u32,
     ) -> Option<Self> {
         if is_null {
             None
@@ -438,4 +443,17 @@ where
     let data = vardata_any(varlena);
     let slice = std::slice::from_raw_parts(data as *const u8, len);
     serde_json::from_slice(slice).expect("failed to decode JSON")
+}
+
+unsafe impl<T> SqlTranslatable for PgVarlena<T>
+where
+    T: SqlTranslatable + Copy,
+{
+    fn argument_sql() -> Result<SqlMapping, ArgumentError> {
+        T::argument_sql()
+    }
+
+    fn return_sql() -> Result<Returns, ReturnsError> {
+        T::return_sql()
+    }
 }
