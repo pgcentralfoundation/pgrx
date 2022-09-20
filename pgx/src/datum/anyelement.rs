@@ -61,9 +61,9 @@ impl IntoDatum for AnyElement {
 
 unsafe impl SqlTranslatable for AnyElement {
     fn argument_sql() -> Result<SqlMapping, ArgumentError> {
-        Ok(SqlMapping::literal("any"))
+        Ok(SqlMapping::literal("anyelement"))
     }
     fn return_sql() -> Result<Returns, ReturnsError> {
-        Ok(Returns::One(SqlMapping::literal("any")))
+        Ok(Returns::One(SqlMapping::literal("anyelement")))
     }
 }
