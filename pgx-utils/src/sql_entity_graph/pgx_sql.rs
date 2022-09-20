@@ -589,7 +589,9 @@ pub fn find_positioning_ref_target<'a>(
                 }
             }
             for (other, other_index) in externs {
-                if *last_segment == other.unaliased_name && other.module_path.ends_with(&module_path) {
+                if *last_segment == other.unaliased_name
+                    && other.module_path.ends_with(&module_path)
+                {
                     return Some(&other_index);
                 }
             }
