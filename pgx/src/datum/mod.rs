@@ -386,7 +386,8 @@ impl<T: FromDatum + 'static> WithArrayTypeIds<T> {
     pub const ARRAY_ID: Lazy<Option<TypeId>> = Lazy::new(|| Some(TypeId::of::<Array<T>>()));
     pub const OPTION_ARRAY_ID: Lazy<Option<TypeId>> =
         Lazy::new(|| Some(TypeId::of::<Option<Array<T>>>()));
-    pub const VARIADICARRAY_ID: Lazy<Option<TypeId>> = Lazy::new(|| Some(TypeId::of::<VariadicArray<T>>()));
+    pub const VARIADICARRAY_ID: Lazy<Option<TypeId>> =
+        Lazy::new(|| Some(TypeId::of::<VariadicArray<T>>()));
     pub const OPTION_VARIADICARRAY_ID: Lazy<Option<TypeId>> =
         Lazy::new(|| Some(TypeId::of::<Option<VariadicArray<T>>>()));
 
