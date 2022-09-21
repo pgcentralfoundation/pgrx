@@ -1,6 +1,6 @@
 use pgx::prelude::*;
 
-pg_module_magic!();
+pgx::pg_module_magic!();
 
 #[pg_extern]
 fn hello_{name}() -> &'static str {{

@@ -25,7 +25,7 @@ the trait itself has several items, only a few are required, the macro will fill
 use pgx::*;
 use serde::{Serialize, Deserialize};
 
-// pg_module_magic!(); // Uncomment this outside of docs!
+// pgx::pg_module_magic!(); // Uncomment this outside of docs!
 
 #[derive(Copy, Clone, Default, PostgresType, Serialize, Deserialize)]
 pub struct DemoSum {
