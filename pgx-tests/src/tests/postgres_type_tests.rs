@@ -78,8 +78,8 @@ mod tests {
     use crate::tests::postgres_type_tests::{
         CustomTextFormatSerializedType, JsonType, VarlenaType,
     };
-    use pgx::prelude::*;
     use pgx::*;
+    use pgx::{prelude::*, spi::Spi};
 
     #[pg_test]
     fn test_mytype() {

@@ -1,5 +1,8 @@
 // From "external" crates:
-pub use ::pgx_macros::{extension_sql, pg_aggregate, pg_extern, pg_guard, pg_schema, pg_test, PostgresType, PostgresEnum};
+pub use ::pgx_macros::{
+    extension_sql, pg_aggregate, pg_extern, pg_guard, pg_schema, pg_test, pg_trigger, PostgresEnum,
+    PostgresType,
+};
 pub use ::pgx_pg_sys as pg_sys;
 
 // Necessary local macros:
@@ -13,3 +16,5 @@ pub use crate::pgbox::PgBox;
 pub use crate::PgHeapTuple;
 
 pub use crate::datum::{Date, Time, TimeWithTimeZone, Timestamp, TimestampWithTimeZone};
+
+pub use crate::pg_sys::PgBuiltInOids;

@@ -9,8 +9,7 @@ Use of this source code is governed by the MIT license that can be found in the 
 
 #[pgx::pg_schema]
 mod test {
-    use pgx::prelude::*;
-    use pgx::*;
+    use pgx::{prelude::*, VariadicArray};
 
     #[pg_extern]
     fn func_with_variadic_array_args<'a>(
@@ -27,8 +26,7 @@ mod tests {
     #[allow(unused_imports)]
     use crate as pgx_tests;
 
-    use pgx::prelude::*;
-    use pgx::*;
+    use pgx::{prelude::*, spi::Spi};
 
     #[pg_test]
     fn test_func_with_variadic_array_args() {

@@ -147,8 +147,7 @@ impl Aggregate for DemoPercentileDisc {
 mod tests {
     #[allow(unused_imports)]
     use crate as pgx_tests;
-    use pgx::prelude::*;
-    use pgx::*;
+    use pgx::{prelude::*, spi::Spi};
 
     #[pg_test]
     fn aggregate_demo_sum() {
