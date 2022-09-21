@@ -8,6 +8,7 @@ Use of this source code is governed by the MIT license that can be found in the 
 */
 
 use maplit::*;
+use pgx::prelude::*;
 use pgx::*;
 use serde::*;
 use std::collections::HashMap;

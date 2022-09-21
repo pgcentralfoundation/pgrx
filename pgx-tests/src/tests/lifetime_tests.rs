@@ -7,6 +7,7 @@ All rights reserved.
 Use of this source code is governed by the MIT license that can be found in the LICENSE file.
 */
 //! This file exists just to ensure the code within compiles
+use pgx::prelude::*;
 use pgx::*;
 use serde::{Deserialize, Serialize};
 use std::marker::PhantomData;

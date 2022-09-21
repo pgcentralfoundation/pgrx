@@ -84,7 +84,6 @@ pub use hooks::*;
 pub use htup::*;
 pub use inoutfuncs::*;
 pub use itemptr::*;
-pub use iter::*;
 pub use list::*;
 pub use log::*;
 pub use lwlock::*;
