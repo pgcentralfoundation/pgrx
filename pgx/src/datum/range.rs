@@ -13,6 +13,9 @@ use crate::{
 };
 use pgx_pg_sys::{Oid, RangeBound};
 use std::marker::PhantomData;
+use pgx_utils::sql_entity_graph::metadata::{
+    ArgumentError, Returns, ReturnsError, SqlMapping, SqlTranslatable,
+};
 
 /// Represents Datum to serialized RangeType PG struct
 pub struct Range<T: FromDatum + IntoDatum + RangeSubType> {
@@ -70,7 +73,7 @@ where
     T: FromDatum + IntoDatum + RangeSubType,
 {
     #[inline]
-    unsafe fn from_datum(datum: pg_sys::Datum, is_null: bool) -> Option<Self>
+    unsafe fn from_datum(datum: pg_sys::Datum, is_null: bool, _: pg_sys::Oid) -> Option<Self>
     where
         Self: Sized,
     {
@@ -130,7 +133,7 @@ where
         if self.is_empty || self.lower.infinite {
             None
         } else {
-            unsafe { T::from_datum(self.lower.val, false) }
+            unsafe { T::from_datum(self.lower.val, false, T::range_type_oid()) }
         }
     }
 
@@ -141,7 +144,7 @@ where
         if self.is_empty || self.upper.infinite {
             None
         } else {
-            unsafe { T::from_datum(self.upper.val, false) }
+            unsafe { T::from_datum(self.upper.val, false, T::range_type_oid()) }
         }
     }
 
@@ -329,4 +332,60 @@ impl RangeSubType for TimestampWithTimeZone {
 pub enum RangeConversionError {
     #[error("Datum was null, unable to convert to RangeType")]
     NullDatum,
+}
+
+#[cfg(not(feature = "pg10"))]
+unsafe impl SqlTranslatable for Range<i32> {
+    fn argument_sql() -> Result<SqlMapping, ArgumentError> {
+        Ok(SqlMapping::literal("int4range"))
+    }
+    fn return_sql() -> Result<Returns, ReturnsError> {
+        Ok(Returns::One(SqlMapping::literal("int4range")))
+    }
+}
+
+#[cfg(not(feature = "pg10"))]
+unsafe impl SqlTranslatable for Range<i64> {
+    fn argument_sql() -> Result<SqlMapping, ArgumentError> {
+        Ok(SqlMapping::literal("int8range"))
+    }
+    fn return_sql() -> Result<Returns, ReturnsError> {
+        Ok(Returns::One(SqlMapping::literal("int8range")))
+    }
+}
+
+unsafe impl SqlTranslatable for Range<Numeric> {
+    fn argument_sql() -> Result<SqlMapping, ArgumentError> {
+        Ok(SqlMapping::literal("numrange"))
+    }
+    fn return_sql() -> Result<Returns, ReturnsError> {
+        Ok(Returns::One(SqlMapping::literal("numrange")))
+    }
+}
+
+unsafe impl SqlTranslatable for Range<Date> {
+    fn argument_sql() -> Result<SqlMapping, ArgumentError> {
+        Ok(SqlMapping::literal("daterange"))
+    }
+    fn return_sql() -> Result<Returns, ReturnsError> {
+        Ok(Returns::One(SqlMapping::literal("daterange")))
+    }
+}
+
+unsafe impl SqlTranslatable for Range<TimestampWithTimeZone> {
+    fn argument_sql() -> Result<SqlMapping, ArgumentError> {
+        Ok(SqlMapping::literal("tstzrange"))
+    }
+    fn return_sql() -> Result<Returns, ReturnsError> {
+        Ok(Returns::One(SqlMapping::literal("tstzrange")))
+    }
+}
+
+unsafe impl SqlTranslatable for Range<Timestamp> {
+    fn argument_sql() -> Result<SqlMapping, ArgumentError> {
+        Ok(SqlMapping::literal("tsrange"))
+    }
+    fn return_sql() -> Result<Returns, ReturnsError> {
+        Ok(Returns::One(SqlMapping::literal("tsrange")))
+    }
 }
