@@ -7,8 +7,7 @@ All rights reserved.
 Use of this source code is governed by the MIT license that can be found in the LICENSE file.
 */
 
-use pgx::prelude::*;
-use pgx::*;
+use pgx::{direct_function_call, prelude::*, AnyArray, IntoDatum, Json};
 
 #[pg_extern]
 fn anyarray_arg(array: AnyArray) -> Json {

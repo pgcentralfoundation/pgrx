@@ -11,8 +11,7 @@ Use of this source code is governed by the MIT license that can be found in the 
 mod tests {
     #[allow(unused_imports)]
     use crate as pgx_tests;
-    use pgx::prelude::*;
-    use pgx::*;
+    use pgx::{prelude::*, Internal};
 
     #[pg_test]
     fn internal_insert() {

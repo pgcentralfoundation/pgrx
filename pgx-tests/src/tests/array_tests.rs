@@ -8,8 +8,7 @@ Use of this source code is governed by the MIT license that can be found in the 
 */
 
 use pgx::array::RawArray;
-use pgx::*;
-use pgx::{prelude::*, Array};
+use pgx::{prelude::*, Array, Json};
 use serde_json::*;
 
 #[pg_extern(name = "sum_array")]

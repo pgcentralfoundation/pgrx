@@ -7,8 +7,7 @@ All rights reserved.
 Use of this source code is governed by the MIT license that can be found in the LICENSE file.
 */
 use pgx::cstr_core::CStr;
-use pgx::prelude::*;
-use pgx::*;
+use pgx::{prelude::*, InOutFuncs, PgVarlena, PgVarlenaInOutFuncs, StringInfo};
 use serde::{Deserialize, Serialize};
 use std::str::FromStr;
 
@@ -78,8 +77,7 @@ mod tests {
     use crate::tests::postgres_type_tests::{
         CustomTextFormatSerializedType, JsonType, VarlenaType,
     };
-    use pgx::*;
-    use pgx::{prelude::*, spi::Spi};
+    use pgx::{prelude::*, spi::Spi, PgVarlena};
 
     #[pg_test]
     fn test_mytype() {
