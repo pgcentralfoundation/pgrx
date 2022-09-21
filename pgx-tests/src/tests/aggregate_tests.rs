@@ -6,6 +6,7 @@ All rights reserved.
 
 Use of this source code is governed by the MIT license that can be found in the LICENSE file.
 */
+use pgx::prelude::*;
 use pgx::*;
 use serde::{Deserialize, Serialize};
 use std::collections::HashSet;
@@ -146,6 +147,7 @@ impl Aggregate for DemoPercentileDisc {
 mod tests {
     #[allow(unused_imports)]
     use crate as pgx_tests;
+    use pgx::prelude::*;
     use pgx::*;
 
     #[pg_test]

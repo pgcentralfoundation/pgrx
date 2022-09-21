@@ -7,7 +7,7 @@ All rights reserved.
 Use of this source code is governed by the MIT license that can be found in the LICENSE file.
 */
 
-use pgx::*;
+use pgx::prelude::*;
 
 #[pg_extern]
 fn negative_default_argument(i: default!(i32, -1)) -> i32 {
@@ -33,7 +33,7 @@ mod tests {
     #[allow(unused_imports)]
     use crate as pgx_tests;
 
-    use pgx::*;
+    use pgx::{prelude::*, spi::Spi};
 
     #[test]
     fn make_idea_happy() {}

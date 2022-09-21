@@ -11,6 +11,7 @@ use pgx::stringinfo::StringInfo;
 use pgx::utils::sql_entity_graph::metadata::{
     ArgumentError, Returns, ReturnsError, SqlMapping, SqlTranslatable,
 };
+use pgx::prelude::*;
 use pgx::*;
 
 use crate::get_named_capture;
@@ -82,6 +83,7 @@ mod tests {
     use crate as pgx_tests;
 
     use crate::tests::struct_type_tests::Complex;
+    use pgx::prelude::*;
     use pgx::*;
 
     #[pg_test]

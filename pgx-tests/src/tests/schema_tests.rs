@@ -6,12 +6,12 @@ All rights reserved.
 
 Use of this source code is governed by the MIT license that can be found in the LICENSE file.
 */
-use pgx::*;
+use pgx::prelude::*;
 
 #[pgx::pg_schema]
 mod test_schema {
+    use pgx::prelude::*;
     use pgx::utils::sql_entity_graph::{PgxSql, SqlGraphEntity};
-    use pgx::*;
     use serde::{Deserialize, Serialize};
 
     #[pg_extern]
@@ -87,7 +87,7 @@ mod tests {
     #[allow(unused_imports)]
     use crate as pgx_tests;
 
-    use pgx::*;
+    use pgx::{prelude::*, spi::Spi};
 
     #[pg_test]
     fn test_in_different_schema() {

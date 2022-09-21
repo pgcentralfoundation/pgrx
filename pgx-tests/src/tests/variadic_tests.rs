@@ -9,6 +9,7 @@ Use of this source code is governed by the MIT license that can be found in the 
 
 #[pgx::pg_schema]
 mod test {
+    use pgx::prelude::*;
     use pgx::*;
 
     #[pg_extern]
@@ -26,6 +27,7 @@ mod tests {
     #[allow(unused_imports)]
     use crate as pgx_tests;
 
+    use pgx::prelude::*;
     use pgx::*;
 
     #[pg_test]

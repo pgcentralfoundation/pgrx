@@ -169,6 +169,7 @@ mod tests {
     use crate::tests::fcinfo_tests::same_name;
     use crate::tests::fcinfo_tests::NullError;
     use crate::tests::fcinfo_tests::NullStrict;
+    use pgx::prelude::*;
     use pgx::*;
 
     #[test]

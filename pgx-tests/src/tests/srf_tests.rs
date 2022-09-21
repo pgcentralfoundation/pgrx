@@ -75,6 +75,7 @@ mod tests {
     #[allow(unused_imports)]
     use crate as pgx_tests;
 
+    use pgx::prelude::*;
     use pgx::*;
 
     #[pg_test]

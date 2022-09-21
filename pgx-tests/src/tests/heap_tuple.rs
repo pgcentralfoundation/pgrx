@@ -655,6 +655,7 @@ mod sql_generator_tests {
 mod tests {
     #[cfg(test)]
     use crate as pgx_tests;
+    use pgx::prelude::*;
     use pgx::*;
     use std::num::NonZeroUsize;
 

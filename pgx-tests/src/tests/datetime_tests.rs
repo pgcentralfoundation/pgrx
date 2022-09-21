@@ -7,7 +7,7 @@ All rights reserved.
 Use of this source code is governed by the MIT license that can be found in the LICENSE file.
 */
 
-use pgx::*;
+use pgx::prelude::*;
 use std::convert::TryFrom;
 use time::{OffsetDateTime, PrimitiveDateTime, UtcOffset};
 
@@ -104,7 +104,7 @@ fn timestamptz_to_i64(tstz: pg_sys::TimestampTz) -> i64 {
 #[pgx::pg_schema]
 mod date_epoch_tests {
     use pg_sys;
-    use pgx::*;
+    use pgx::prelude::*;
 
     #[test]
     fn test_to_pg_epoch_days() {
@@ -134,7 +134,7 @@ mod date_epoch_tests {
 #[cfg(test)]
 #[pgx::pg_schema]
 mod serialization_tests {
-    use pgx::*;
+    use pgx::prelude::*;
     use serde_json::*;
 
     #[test]
@@ -160,6 +160,7 @@ mod tests {
     #[allow(unused_imports)]
     use crate as pgx_tests;
 
+    use pgx::prelude::*;
     use pgx::*;
     use serde_json::*;
     use std::time::Duration;
