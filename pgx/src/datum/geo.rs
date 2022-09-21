@@ -10,7 +10,7 @@ Use of this source code is governed by the MIT license that can be found in the 
 use crate::{direct_function_call_as_datum, pg_sys, FromDatum, IntoDatum};
 
 impl FromDatum for pg_sys::BOX {
-    unsafe fn from_datum(datum: pg_sys::Datum, is_null: bool) -> Option<Self>
+    unsafe fn from_datum(datum: pg_sys::Datum, is_null: bool, _: pg_sys::Oid) -> Option<Self>
     where
         Self: Sized,
     {
@@ -40,7 +40,7 @@ impl IntoDatum for pg_sys::BOX {
 }
 
 impl FromDatum for pg_sys::Point {
-    unsafe fn from_datum(datum: pg_sys::Datum, is_null: bool) -> Option<Self>
+    unsafe fn from_datum(datum: pg_sys::Datum, is_null: bool, _: pg_sys::Oid) -> Option<Self>
     where
         Self: Sized,
     {

@@ -8,6 +8,10 @@ Use of this source code is governed by the MIT license that can be found in the 
 */
 
 use crate::{pg_sys, FromDatum, IntoDatum};
+use core::num::TryFromIntError;
+use pgx_utils::sql_entity_graph::metadata::{
+    ArgumentError, Returns, ReturnsError, SqlMapping, SqlTranslatable,
+};
 use std::ffi::CStr;
 
 pub const POSTGRES_EPOCH_JDATE: i32 = pg_sys::POSTGRES_EPOCH_JDATE as i32;
@@ -18,9 +22,9 @@ pub const UNIX_EPOCH_JDATE: i32 = pg_sys::UNIX_EPOCH_JDATE as i32;
 pub struct Date(i32);
 
 impl TryFrom<pg_sys::Datum> for Date {
-    type Error = i32;
+    type Error = TryFromIntError;
     fn try_from(d: pg_sys::Datum) -> Result<Self, Self::Error> {
-        Ok(Date(d.value() as i32))
+        i32::try_from(d.value() as isize).map(|d| Date(d))
     }
 }
 
@@ -34,14 +38,18 @@ impl IntoDatum for Date {
 }
 
 impl FromDatum for Date {
-    unsafe fn from_datum(datum: pg_sys::Datum, is_null: bool) -> Option<Self>
+    unsafe fn from_datum(datum: pg_sys::Datum, is_null: bool, _: pg_sys::Oid) -> Option<Self>
     where
         Self: Sized,
     {
         if is_null {
             None
         } else {
-            Some(datum.try_into().expect("Error converting date datum"))
+            if cfg!(feature = "pg10") {
+                Some(Date(datum.value() as i32))
+            } else {
+                Some(datum.try_into().expect("Error converting date datum"))
+            }
         }
     }
 }
@@ -167,5 +175,14 @@ impl serde::Serialize for Date {
         serializer
             .serialize_str(cstr.to_str().unwrap())
             .map_err(|e| serde::ser::Error::custom(format!("Date formatting problem: {:?}", e)))
+    }
+}
+
+unsafe impl SqlTranslatable for Date {
+    fn argument_sql() -> Result<SqlMapping, ArgumentError> {
+        Ok(SqlMapping::literal("date"))
+    }
+    fn return_sql() -> Result<Returns, ReturnsError> {
+        Ok(Returns::One(SqlMapping::literal("date")))
     }
 }

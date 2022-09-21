@@ -6,6 +6,15 @@ All rights reserved.
 
 Use of this source code is governed by the MIT license that can be found in the LICENSE file.
 */
+/*!
+
+`#[pg_aggregate]` related macro expansion for Rust to SQL translation
+
+> Like all of the [`sql_entity_graph`][crate::sql_entity_graph] APIs, this is considered **internal**
+to the `pgx` framework and very subject to change between versions. While you may use this, please do it with caution.
+
+
+*/
 mod aggregate_type;
 pub(crate) mod entity;
 mod options;
@@ -631,7 +640,7 @@ impl PgAggregate {
         let entity_item_fn: ItemFn = parse_quote! {
             #[no_mangle]
             #[doc(hidden)]
-            pub extern "C" fn #sql_graph_entity_fn_name() -> ::pgx::utils::sql_entity_graph::SqlGraphEntity {
+            pub extern "Rust" fn #sql_graph_entity_fn_name() -> ::pgx::utils::sql_entity_graph::SqlGraphEntity {
                 let submission = ::pgx::utils::sql_entity_graph::PgAggregateEntity {
                     full_path: ::core::any::type_name::<#target_ident>(),
                     module_path: module_path!(),

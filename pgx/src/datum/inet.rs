@@ -10,6 +10,9 @@ Use of this source code is governed by the MIT license that can be found in the 
 use crate::{
     direct_function_call, direct_function_call_as_datum, pg_sys, pg_try, FromDatum, IntoDatum,
 };
+use pgx_utils::sql_entity_graph::metadata::{
+    ArgumentError, Returns, ReturnsError, SqlMapping, SqlTranslatable,
+};
 use serde::de::{Error, Visitor};
 use serde::{Deserialize, Deserializer, Serialize, Serializer};
 use std::ffi::CStr;
@@ -83,7 +86,7 @@ impl<'de> Deserialize<'de> for Inet {
 }
 
 impl FromDatum for Inet {
-    unsafe fn from_datum(datum: pg_sys::Datum, is_null: bool) -> Option<Inet> {
+    unsafe fn from_datum(datum: pg_sys::Datum, is_null: bool, _typoid: u32) -> Option<Inet> {
         if is_null {
             None
         } else {
@@ -114,5 +117,14 @@ impl IntoDatum for Inet {
 impl Into<Inet> for String {
     fn into(self) -> Inet {
         Inet(self)
+    }
+}
+
+unsafe impl SqlTranslatable for Inet {
+    fn argument_sql() -> Result<SqlMapping, ArgumentError> {
+        Ok(SqlMapping::literal("inet"))
+    }
+    fn return_sql() -> Result<Returns, ReturnsError> {
+        Ok(Returns::One(SqlMapping::literal("inet")))
     }
 }

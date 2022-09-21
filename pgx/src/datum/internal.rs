@@ -8,6 +8,9 @@ Use of this source code is governed by the MIT license that can be found in the 
 */
 
 use crate::{pg_sys, FromDatum, IntoDatum, PgMemoryContexts};
+use pgx_utils::sql_entity_graph::metadata::{
+    ArgumentError, Returns, ReturnsError, SqlMapping, SqlTranslatable,
+};
 
 /// Represents Postgres' `internal` data type, which is documented as:
 ///
@@ -160,7 +163,7 @@ impl From<Option<pg_sys::Datum>> for Internal {
 
 impl FromDatum for Internal {
     #[inline]
-    unsafe fn from_datum(datum: pg_sys::Datum, is_null: bool) -> Option<Internal> {
+    unsafe fn from_datum(datum: pg_sys::Datum, is_null: bool, _: pg_sys::Oid) -> Option<Internal> {
         Some(Internal(if is_null { None } else { Some(datum) }))
     }
 }
@@ -174,5 +177,18 @@ impl IntoDatum for Internal {
     #[inline]
     fn type_oid() -> pg_sys::Oid {
         pg_sys::INTERNALOID
+    }
+}
+
+unsafe impl SqlTranslatable for crate::datum::Internal {
+    fn argument_sql() -> Result<SqlMapping, ArgumentError> {
+        Ok(SqlMapping::literal("internal"))
+    }
+    fn return_sql() -> Result<Returns, ReturnsError> {
+        Ok(Returns::One(SqlMapping::literal("internal")))
+    }
+    // We don't want to strict upgrade if internal is present.
+    fn optional() -> bool {
+        true
     }
 }

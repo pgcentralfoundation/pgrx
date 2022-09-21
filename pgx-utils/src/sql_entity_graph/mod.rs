@@ -6,10 +6,19 @@ All rights reserved.
 
 Use of this source code is governed by the MIT license that can be found in the LICENSE file.
 */
+/*!
+
+Rust to SQL mapping support.
+
+> Like all of the [`sql_entity_graph`][crate::sql_entity_graph] APIs, this is considered **internal**
+to the `pgx` framework and very subject to change between versions. While you may use this, please do it with caution.
+
+*/
 pub(crate) mod aggregate;
 pub(crate) mod control_file;
 pub(crate) mod extension_sql;
 pub(crate) mod mapping;
+pub mod metadata;
 pub(crate) mod pg_extern;
 pub(crate) mod pg_trigger;
 pub(crate) mod pgx_attribute;

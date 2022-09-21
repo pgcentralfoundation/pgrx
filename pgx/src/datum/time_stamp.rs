@@ -8,6 +8,9 @@ Use of this source code is governed by the MIT license that can be found in the 
 */
 
 use crate::{pg_sys, FromDatum, FromTimeError, IntoDatum, TimestampWithTimeZone};
+use pgx_utils::sql_entity_graph::metadata::{
+    ArgumentError, Returns, ReturnsError, SqlMapping, SqlTranslatable,
+};
 use std::ffi::CStr;
 
 #[derive(Debug, PartialEq, Eq, PartialOrd, Ord)]
@@ -119,7 +122,7 @@ impl IntoDatum for Timestamp {
 }
 
 impl FromDatum for Timestamp {
-    unsafe fn from_datum(datum: pg_sys::Datum, is_null: bool) -> Option<Self>
+    unsafe fn from_datum(datum: pg_sys::Datum, is_null: bool, _: pg_sys::Oid) -> Option<Self>
     where
         Self: Sized,
     {
@@ -192,5 +195,14 @@ impl serde::Serialize for Timestamp {
         serializer
             .serialize_str(cstr.to_str().unwrap())
             .map_err(|e| serde::ser::Error::custom(format!("Date formatting problem: {:?}", e)))
+    }
+}
+
+unsafe impl SqlTranslatable for crate::datum::Timestamp {
+    fn argument_sql() -> Result<SqlMapping, ArgumentError> {
+        Ok(SqlMapping::literal("timestamp"))
+    }
+    fn return_sql() -> Result<Returns, ReturnsError> {
+        Ok(Returns::One(SqlMapping::literal("timestamp")))
     }
 }

@@ -48,6 +48,7 @@ DEPENDENCIES_TO_UPDATE=(
     "pgx"
     "pgx-tests"
     "pgx-macros"
+    "pgx-pg-config"
     "pgx-pgx-sys"
     "pgx-utils"
     "cargo-pgx"

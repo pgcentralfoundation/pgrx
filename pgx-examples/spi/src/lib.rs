@@ -29,8 +29,7 @@ INSERT INTO spi_example (title) VALUES ('I like pudding');
 
 #[pg_extern]
 fn spi_return_query(
-) -> impl std::iter::Iterator<Item = (name!(oid, Option<pg_sys::Oid>), name!(name, Option<String>))>
-{
+) -> TableIterator<'static, (name!(oid, Option<pg_sys::Oid>), name!(name, Option<String>))> {
     #[cfg(feature = "pg10")]
     let query = "SELECT oid, relname::text || '-pg10' FROM pg_class";
     #[cfg(feature = "pg11")]
@@ -51,7 +50,7 @@ fn spi_return_query(
         Ok(Some(()))
     });
 
-    results.into_iter()
+    TableIterator::new(results.into_iter())
 }
 
 #[pg_extern(immutable, parallel_safe)]
@@ -101,13 +100,13 @@ fn spi_insert_title(title: &str) -> i64 {
 #[pg_extern]
 fn spi_insert_title2(
     title: &str,
-) -> impl std::iter::Iterator<Item = (name!(id, Option<i64>), name!(title, Option<String>))> {
+) -> TableIterator<(name!(id, Option<i64>), name!(title, Option<String>))> {
     let tuple = Spi::get_two_with_args(
         "INSERT INTO spi.spi_example(title) VALUES ($1) RETURNING id, title",
         vec![(PgBuiltInOids::TEXTOID.oid(), title.into_datum())],
     );
 
-    vec![tuple].into_iter()
+    TableIterator::once(tuple)
 }
 
 extension_sql!(

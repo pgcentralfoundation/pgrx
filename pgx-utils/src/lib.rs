@@ -29,6 +29,7 @@ pub mod __reexports {
 
 #[derive(Debug, Hash, Eq, PartialEq, Clone, PartialOrd, Ord)]
 pub enum ExternArgs {
+    CreateOrReplace,
     Immutable,
     Strict,
     Stable,
@@ -48,6 +49,7 @@ pub enum ExternArgs {
 impl core::fmt::Display for ExternArgs {
     fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
         match self {
+            ExternArgs::CreateOrReplace => write!(f, "CREATE OR REPLACE"),
             ExternArgs::Immutable => write!(f, "IMMUTABLE"),
             ExternArgs::Strict => write!(f, "STRICT"),
             ExternArgs::Stable => write!(f, "STABLE"),
@@ -69,6 +71,7 @@ impl core::fmt::Display for ExternArgs {
 impl ToTokens for ExternArgs {
     fn to_tokens(&self, tokens: &mut TokenStream) {
         match self {
+            ExternArgs::CreateOrReplace => tokens.append(format_ident!("CreateOrReplace")),
             ExternArgs::Immutable => tokens.append(format_ident!("Immutable")),
             ExternArgs::Strict => tokens.append(format_ident!("Strict")),
             ExternArgs::Stable => tokens.append(format_ident!("Stable")),
@@ -148,6 +151,7 @@ pub fn parse_extern_attributes(attr: TokenStream) -> HashSet<ExternArgs> {
             TokenTree::Ident(i) => {
                 let name = i.to_string();
                 match name.as_str() {
+                    "create_or_replace" => args.insert(ExternArgs::CreateOrReplace),
                     "immutable" => args.insert(ExternArgs::Immutable),
                     "strict" => args.insert(ExternArgs::Strict),
                     "stable" => args.insert(ExternArgs::Stable),
@@ -400,15 +404,83 @@ pub fn staticize_lifetimes(value: &mut syn::Type) {
             }
         }
 
+        syn::Type::Reference(type_ref) => match &mut type_ref.lifetime {
+            Some(ref mut lifetime) => {
+                lifetime.ident = syn::Ident::new("static", lifetime.ident.span());
+            }
+            this @ None => *this = Some(syn::parse_quote!('static)),
+        },
+
+        syn::Type::Tuple(type_tuple) => {
+            for elem in &mut type_tuple.elems {
+                staticize_lifetimes(elem);
+            }
+        }
+
+        _ => {}
+    }
+}
+
+pub fn anonymize_lifetimes_in_type_path(value: syn::TypePath) -> syn::TypePath {
+    let mut ty = syn::Type::Path(value);
+    anonymize_lifetimes(&mut ty);
+    match ty {
+        syn::Type::Path(type_path) => type_path,
+
+        // shouldn't happen
+        _ => panic!("not a TypePath"),
+    }
+}
+
+pub fn anonymize_lifetimes(value: &mut syn::Type) {
+    match value {
+        syn::Type::Path(type_path) => {
+            for segment in &mut type_path.path.segments {
+                match &mut segment.arguments {
+                    syn::PathArguments::AngleBracketed(bracketed) => {
+                        for arg in &mut bracketed.args {
+                            match arg {
+                                // rename lifetimes to the anonymous lifetime
+                                syn::GenericArgument::Lifetime(lifetime) => {
+                                    lifetime.ident = syn::Ident::new("_", lifetime.ident.span());
+                                }
+
+                                // recurse
+                                syn::GenericArgument::Type(ty) => anonymize_lifetimes(ty),
+                                syn::GenericArgument::Binding(binding) => {
+                                    anonymize_lifetimes(&mut binding.ty)
+                                }
+                                syn::GenericArgument::Constraint(constraint) => {
+                                    for bound in constraint.bounds.iter_mut() {
+                                        match bound {
+                                            syn::TypeParamBound::Lifetime(lifetime) => {
+                                                lifetime.ident =
+                                                    syn::Ident::new("_", lifetime.ident.span())
+                                            }
+                                            _ => {}
+                                        }
+                                    }
+                                }
+
+                                // nothing to do otherwise
+                                _ => {}
+                            }
+                        }
+                    }
+                    _ => {}
+                }
+            }
+        }
+
         syn::Type::Reference(type_ref) => {
             if let Some(lifetime) = type_ref.lifetime.as_mut() {
-                lifetime.ident = syn::Ident::new("static", lifetime.ident.span());
+                lifetime.ident = syn::Ident::new("_", lifetime.ident.span());
             }
         }
 
         syn::Type::Tuple(type_tuple) => {
             for elem in &mut type_tuple.elems {
-                staticize_lifetimes(elem);
+                anonymize_lifetimes(elem);
             }
         }
 

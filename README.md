@@ -97,7 +97,7 @@ scl enable devtoolset-7 bash
 First install the `cargo-pgx` sub-command and initialize the development environment:
 
 ```bash
-cargo install cargo-pgx
+cargo install --locked cargo-pgx
 cargo pgx init
 ```
 
@@ -151,7 +151,7 @@ You can upgrade your current `cargo-pgx` installation by passing the `--force` f
 to `cargo install`:
 
 ```bash
-cargo install --force cargo-pgx
+cargo install --force --locked cargo-pgx
 ```
 
 As new Postgres versions are supported by `pgx`, you can re-run the `pgx init` process to download and compile them:

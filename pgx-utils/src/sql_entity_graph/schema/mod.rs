@@ -6,6 +6,14 @@ All rights reserved.
 
 Use of this source code is governed by the MIT license that can be found in the LICENSE file.
 */
+/*!
+
+`#[pg_schema]` related macro expansion for Rust to SQL translation
+
+> Like all of the [`sql_entity_graph`][crate::sql_entity_graph] APIs, this is considered **internal**
+to the `pgx` framework and very subject to change between versions. While you may use this, please do it with caution.
+
+*/
 pub mod entity;
 
 use proc_macro2::{Span, TokenStream as TokenStream2};
@@ -75,18 +83,18 @@ impl ToTokens for Schema {
         updated_content.push(syn::parse_quote! {
                 #[no_mangle]
                 #[doc(hidden)]
-                pub extern "C" fn  #sql_graph_entity_fn_name() -> ::pgx::utils::sql_entity_graph::SqlGraphEntity {
-                extern crate alloc;
-                use alloc::vec::Vec;
-                use alloc::vec;
-                let submission = pgx::utils::sql_entity_graph::SchemaEntity {
-                        module_path: module_path!(),
-                        name: stringify!(#ident),
-                        file: file!(),
-                        line: line!(),
-                    };
-                ::pgx::utils::sql_entity_graph::SqlGraphEntity::Schema(submission)
-            }
+                pub extern "Rust" fn  #sql_graph_entity_fn_name() -> ::pgx::utils::sql_entity_graph::SqlGraphEntity {
+                    extern crate alloc;
+                    use alloc::vec::Vec;
+                    use alloc::vec;
+                    let submission = pgx::utils::sql_entity_graph::SchemaEntity {
+                            module_path: module_path!(),
+                            name: stringify!(#ident),
+                            file: file!(),
+                            line: line!(),
+                        };
+                    ::pgx::utils::sql_entity_graph::SqlGraphEntity::Schema(submission)
+                }
         });
         let _semi = &self.module.semi;
 

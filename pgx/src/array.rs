@@ -320,4 +320,17 @@ impl RawArray {
             ))
         }
     }
+
+    /// # Safety
+    /// See the entire thing just above. You're now instantly asserting validity for the slice.
+    pub(crate) unsafe fn assume_init_data_slice<T>(&self) -> &[T] {
+        // SAFETY: Assertion made by caller
+        unsafe {
+            &*NonNull::new_unchecked(slice_from_raw_parts_mut(
+                pgx_ARR_DATA_PTR(self.ptr.as_ptr()).cast(),
+                self.len,
+            ))
+            .as_ptr()
+        }
+    }
 }

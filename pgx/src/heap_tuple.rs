@@ -7,6 +7,9 @@ use crate::{
     AllocatedByPostgres, AllocatedByRust, FromDatum, IntoDatum, PgBox, PgMemoryContexts,
     PgTupleDesc, TriggerTuple, TryFromDatumError, WhoAllocated,
 };
+use pgx_utils::sql_entity_graph::metadata::{
+    ArgumentError, Returns, ReturnsError, SqlMapping, SqlTranslatable,
+};
 use std::num::NonZeroUsize;
 
 /// Describes errors that can occur when trying to create a new [PgHeapTuple].
@@ -37,7 +40,11 @@ pub struct PgHeapTuple<'a, AllocatedBy: WhoAllocated<pg_sys::HeapTupleData>> {
 }
 
 impl<'a> FromDatum for PgHeapTuple<'a, AllocatedByRust> {
-    unsafe fn from_datum(composite: pg_sys::Datum, is_null: bool) -> Option<Self> {
+    unsafe fn from_datum(
+        composite: pg_sys::Datum,
+        is_null: bool,
+        _oid: pg_sys::Oid,
+    ) -> Option<Self> {
         if is_null {
             None
         } else {
@@ -49,6 +56,7 @@ impl<'a> FromDatum for PgHeapTuple<'a, AllocatedByRust> {
         mut memory_context: PgMemoryContexts,
         composite: Datum,
         is_null: bool,
+        _oid: pg_sys::Oid,
     ) -> Option<Self>
     where
         Self: Sized,
@@ -578,4 +586,30 @@ macro_rules! composite_type {
     ($composite_type:expr) => {
         ::pgx::heap_tuple::PgHeapTuple<'static, ::pgx::AllocatedByRust>
     };
+}
+
+unsafe impl SqlTranslatable for crate::heap_tuple::PgHeapTuple<'static, AllocatedByPostgres> {
+    fn argument_sql() -> Result<SqlMapping, ArgumentError> {
+        Ok(SqlMapping::Composite {
+            array_brackets: false,
+        })
+    }
+    fn return_sql() -> Result<Returns, ReturnsError> {
+        Ok(Returns::One(SqlMapping::Composite {
+            array_brackets: false,
+        }))
+    }
+}
+
+unsafe impl SqlTranslatable for crate::heap_tuple::PgHeapTuple<'static, AllocatedByRust> {
+    fn argument_sql() -> Result<SqlMapping, ArgumentError> {
+        Ok(SqlMapping::Composite {
+            array_brackets: false,
+        })
+    }
+    fn return_sql() -> Result<Returns, ReturnsError> {
+        Ok(Returns::One(SqlMapping::Composite {
+            array_brackets: false,
+        }))
+    }
 }

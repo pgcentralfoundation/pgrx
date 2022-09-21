@@ -11,10 +11,10 @@ A video walkthrough of its abilities can be found here: https://www.twitch.tv/vi
 Install via crates.io:
 
 ```shell script
-$ cargo install cargo-pgx
+$ cargo install --locked cargo-pgx
 ```
 
-As new versions of `pgx` are released, you'll want to make sure you run this command again to update it.
+As new versions of `pgx` are released, you'll want to make sure you run this command again to update it. You should also reinstall `cargo-pgx` whenever you update `rustc` so that the same compiler is used to build `cargo-pgx` and your Postgres extensions. You can force `cargo` to reinstall an existing crate by passing `--force`.
 
 ## Usage
 

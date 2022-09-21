@@ -10,9 +10,12 @@ Use of this source code is governed by the MIT license that can be found in the 
 mod datum;
 pub mod guard;
 mod oids;
+mod polyfill;
 pub mod setjmp;
 mod tupdesc;
 mod utils;
+// Various SqlTranslatable mappings for SQL generation
+mod sql_translatable;
 
 pub use datum::Datum;
 // OnDrop(feature = "pg11"): remove this cfg if all supported versions of Postgres
@@ -21,6 +24,7 @@ pub use datum::Datum;
 pub use datum::NullableDatum;
 pub use guard::*;
 pub use oids::*;
+pub use polyfill::*;
 pub use tupdesc::*;
 pub use utils::*;
 

@@ -8,6 +8,9 @@ Use of this source code is governed by the MIT license that can be found in the 
 */
 use crate::{pg_sys, FromDatum, IntoDatum, PgMemoryContexts};
 use core::fmt::Write;
+use pgx_utils::sql_entity_graph::metadata::{
+    ArgumentError, Returns, ReturnsError, SqlMapping, SqlTranslatable,
+};
 use std::ops::{Deref, DerefMut};
 
 const UUID_BYTES_LEN: usize = 16;
@@ -35,7 +38,11 @@ impl IntoDatum for Uuid {
 
 impl FromDatum for Uuid {
     #[inline]
-    unsafe fn from_datum(datum: pg_sys::Datum, is_null: bool) -> Option<Uuid> {
+    unsafe fn from_datum(
+        datum: pg_sys::Datum,
+        is_null: bool,
+        _typoid: pg_sys::Oid,
+    ) -> Option<Uuid> {
         if is_null {
             None
         } else {
@@ -122,5 +129,14 @@ impl<'a> std::fmt::LowerHex for Uuid {
 impl<'a> std::fmt::UpperHex for Uuid {
     fn fmt(&self, f: &mut std::fmt::Formatter) -> Result<(), std::fmt::Error> {
         self.format(f, UuidFormatCase::Uppercase)
+    }
+}
+
+unsafe impl SqlTranslatable for crate::datum::Uuid {
+    fn argument_sql() -> Result<SqlMapping, ArgumentError> {
+        Ok(SqlMapping::literal("uuid"))
+    }
+    fn return_sql() -> Result<Returns, ReturnsError> {
+        Ok(Returns::One(SqlMapping::literal("uuid")))
     }
 }

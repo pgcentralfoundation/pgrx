@@ -9,6 +9,9 @@ Use of this source code is governed by the MIT license that can be found in the 
 
 use crate::{direct_function_call, direct_function_call_as_datum, pg_sys, FromDatum, IntoDatum};
 use pgx_pg_sys::pg_try;
+use pgx_utils::sql_entity_graph::metadata::{
+    ArgumentError, Returns, ReturnsError, SqlMapping, SqlTranslatable,
+};
 use serde::de::{Error, Visitor};
 use serde::{de, Deserialize, Deserializer, Serialize};
 use serde_json::Number;
@@ -156,7 +159,7 @@ impl Into<Numeric> for f64 {
 }
 
 impl FromDatum for Numeric {
-    unsafe fn from_datum(datum: pg_sys::Datum, is_null: bool) -> Option<Self>
+    unsafe fn from_datum(datum: pg_sys::Datum, is_null: bool, _typoid: u32) -> Option<Self>
     where
         Self: Sized,
     {
@@ -193,3 +196,25 @@ impl IntoDatum for Numeric {
         pg_sys::NUMERICOID
     }
 }
+
+unsafe impl SqlTranslatable for Numeric {
+    fn argument_sql() -> Result<SqlMapping, ArgumentError> {
+        Ok(SqlMapping::literal("NUMERIC"))
+    }
+    fn return_sql() -> Result<Returns, ReturnsError> {
+        Ok(Returns::One(SqlMapping::literal("NUMERIC")))
+    }
+}
+
+// impl<const PRECISION: i32, const SCALE: i32>
+//     SqlTranslatable
+//     for crate::datum::Numeric<PRECISION, SCALE>
+// {
+//     fn sql_type() -> String {
+//         if PRECISION == 0 && SCALE == 0 {
+//             String::from("NUMERIC")
+//         } else {
+//             format!("NUMERIC({PRECISION}, {SCALE})")
+//         }
+//     }
+// }
