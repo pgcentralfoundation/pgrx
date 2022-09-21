@@ -35,6 +35,11 @@ fn accept_time_with_time_zone(t: TimeWithTimeZone) -> TimeWithTimeZone {
 }
 
 #[pg_extern]
+fn convert_timetz_to_time(t: TimeWithTimeZone) -> Time {
+    t.to_utc().into()
+}
+
+#[pg_extern]
 fn accept_timestamp(t: Timestamp) -> Timestamp {
     t
 }
@@ -133,6 +138,7 @@ mod serialization_tests {
     use serde_json::*;
 
     #[test]
+    #[allow(deprecated)]
     fn test_time_with_timezone_serialization() {
         let time_with_timezone = TimeWithTimeZone::new(
             time::Time::from_hms(12, 23, 34).unwrap(),
@@ -140,8 +146,8 @@ mod serialization_tests {
         );
         let json = json!({ "time W/ Zone test": time_with_timezone });
 
-        // we automatically converted to UTC upon construction in ::new()
-        assert_eq!(10, time_with_timezone.hour());
+        let (h, ..) = time_with_timezone.to_utc().to_hms_micro();
+        assert_eq!(10, h);
 
         // b/c we always want our times output in UTC
         assert_eq!(json!({"time W/ Zone test":"10:23:34-00"}), json);
@@ -173,6 +179,7 @@ mod tests {
     }
 
     #[pg_test]
+    #[allow(deprecated)]
     fn test_time_serialization() {
         let time = Time::new(time::Time::from_hms(0, 0, 0).unwrap());
         let json = json!({ "time test": time });
@@ -261,12 +268,20 @@ mod tests {
     }
 
     #[pg_test]
-    fn test_accept_time_with_time_zone_now() {
-        let result = Spi::get_one::<bool>(
-            "SELECT accept_time_with_time_zone(now()::time with time zone at time zone 'America/Denver') = now()::time with time zone at time zone 'utc';",
+    fn test_convert_time_with_time_zone_now() {
+        // This test used to simply compare for equality in Postgres, assert on the bool
+        // however, failed `=` in Postgres doesn't say much if it fails.
+        // Thus this esoteric formulation: it derives a delta if there is one.
+        let result = Spi::get_one::<Time>(
+            "SELECT (
+                convert_timetz_to_time(now()::time with time zone at time zone 'America/Denver')
+                - convert_timetz_to_time(now()::time with time zone at time zone 'utc')
+                + 'allballs'::time
+            );",
         )
         .expect("failed to get SPI result");
-        assert!(result)
+
+        assert_eq!(result, Time::ALLBALLS)
     }
 
     #[pg_test]
