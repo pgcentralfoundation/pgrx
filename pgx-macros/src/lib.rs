@@ -726,24 +726,24 @@ fn impl_postgres_type(ast: DeriveInput) -> proc_macro2::TokenStream {
         };
 
         stream.extend(quote! {
-            impl #generics JsonInOutFuncs #inout_generics for #name #generics {}
+            impl #generics ::pgx::JsonInOutFuncs #inout_generics for #name #generics {}
 
             #[doc(hidden)]
             #[pg_extern(immutable,parallel_safe)]
             pub fn #funcname_in #generics(input: Option<&#lifetime ::pgx::cstr_core::CStr>) -> Option<#name #generics> {
                 input.map_or_else(|| {
-                    for m in #name::NULL_ERROR_MESSAGE {
+                    for m in <#name as ::pgx::JsonInOutFuncs>::NULL_ERROR_MESSAGE {
                         ::pgx::error!("{}", m);
                     }
                     None
-                }, |i| Some(#name::input(i)))
+                }, |i| Some(<#name as ::pgx::JsonInOutFuncs>::input(i)))
             }
 
             #[doc(hidden)]
             #[pg_extern(immutable,parallel_safe)]
             pub fn #funcname_out #generics(input: #name #generics) -> &#lifetime ::pgx::cstr_core::CStr {
-                let mut buffer = StringInfo::new();
-                input.output(&mut buffer);
+                let mut buffer = ::pgx::StringInfo::new();
+                ::pgx::JsonInOutFuncs::output(&input, &mut buffer);
                 buffer.into()
             }
 
@@ -755,18 +755,18 @@ fn impl_postgres_type(ast: DeriveInput) -> proc_macro2::TokenStream {
             #[pg_extern(immutable,parallel_safe)]
             pub fn #funcname_in #generics(input: Option<&#lifetime ::pgx::cstr_core::CStr>) -> Option<#name #generics> {
                 input.map_or_else(|| {
-                    for m in #name::NULL_ERROR_MESSAGE {
+                    for m in <#name as ::pgx::InOutFuncs>::NULL_ERROR_MESSAGE {
                         ::pgx::error!("{}", m);
                     }
                     None
-                }, |i| Some(#name::input(i)))
+                }, |i| Some(<#name as ::pgx::InOutFuncs>::input(i)))
             }
 
             #[doc(hidden)]
             #[pg_extern(immutable,parallel_safe)]
             pub fn #funcname_out #generics(input: #name #generics) -> &#lifetime ::pgx::cstr_core::CStr {
-                let mut buffer = StringInfo::new();
-                input.output(&mut buffer);
+                let mut buffer = ::pgx::StringInfo::new();
+                ::pgx::InOutFuncs::output(&input, &mut buffer);
                 buffer.into()
             }
         });
@@ -777,18 +777,18 @@ fn impl_postgres_type(ast: DeriveInput) -> proc_macro2::TokenStream {
             #[pg_extern(immutable,parallel_safe)]
             pub fn #funcname_in #generics(input: Option<&#lifetime ::pgx::cstr_core::CStr>) -> Option<::pgx::PgVarlena<#name #generics>> {
                 input.map_or_else(|| {
-                    for m in #name::NULL_ERROR_MESSAGE {
+                    for m in <#name as ::pgx::PgVarlenaInOutFuncs>::NULL_ERROR_MESSAGE {
                         ::pgx::error!("{}", m);
                     }
                     None
-                }, |i| Some(#name::input(i)))
+                }, |i| Some(<#name as ::pgx::PgVarlenaInOutFuncs>::input(i)))
             }
 
             #[doc(hidden)]
             #[pg_extern(immutable,parallel_safe)]
             pub fn #funcname_out #generics(input: ::pgx::PgVarlena<#name #generics>) -> &#lifetime ::pgx::cstr_core::CStr {
-                let mut buffer = StringInfo::new();
-                input.output(&mut buffer);
+                let mut buffer = ::pgx::StringInfo::new();
+                ::pgx::PgVarlenaInOutFuncs::output(&*input, &mut buffer);
                 buffer.into()
             }
         });
