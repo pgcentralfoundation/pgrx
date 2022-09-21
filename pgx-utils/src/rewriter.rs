@@ -211,7 +211,7 @@ impl PgGuardRewriter {
             #[allow(clippy::missing_safety_doc)]
             #[allow(clippy::redundant_closure)]
             #guard
-            #vis unsafe extern "C" fn #func_name_wrapper #generics(fcinfo: pg_sys::FunctionCallInfo) -> pg_sys::Datum {
+            #vis unsafe extern "C" fn #func_name_wrapper #generics(fcinfo: ::pgx::pg_sys::FunctionCallInfo) -> ::pgx::pg_sys::Datum {
 
                 #func_call
 
@@ -291,18 +291,18 @@ impl PgGuardRewriter {
         quote_spanned! {func_span=>
             #prolog
             #[pg_guard]
-            #vis unsafe extern "C" fn #func_name_wrapper #generics(fcinfo: pg_sys::FunctionCallInfo) -> pg_sys::Datum {
+            #vis unsafe extern "C" fn #func_name_wrapper #generics(fcinfo: ::pgx::pg_sys::FunctionCallInfo) -> ::pgx::pg_sys::Datum {
 
                 struct IteratorHolder<T> {
                     iter: *mut dyn Iterator<Item=T>,
                 }
 
-                let mut funcctx: pgx::PgBox<pg_sys::FuncCallContext>;
-                let mut iterator_holder: pgx::PgBox<IteratorHolder<#generic_type>>;
+                let mut funcctx: ::pgx::PgBox<pg_sys::FuncCallContext>;
+                let mut iterator_holder: ::pgx::PgBox<IteratorHolder<#generic_type>>;
 
                 if srf_is_first_call(fcinfo) {
-                    funcctx = pgx::srf_first_call_init(fcinfo);
-                    funcctx.user_fctx = pgx::PgMemoryContexts::For(funcctx.multi_call_memory_ctx).palloc_struct::<IteratorHolder<#generic_type>>() as void_mut_ptr;
+                    funcctx = ::pgx::srf_first_call_init(fcinfo);
+                    funcctx.user_fctx = ::pgx::PgMemoryContexts::For(funcctx.multi_call_memory_ctx).palloc_struct::<IteratorHolder<#generic_type>>() as void_mut_ptr;
 
                     iterator_holder = pgx::PgBox::from_pg(funcctx.user_fctx as *mut IteratorHolder<#generic_type>);
 
@@ -311,8 +311,8 @@ impl PgGuardRewriter {
                     iterator_holder.iter = pgx::PgMemoryContexts::For(funcctx.multi_call_memory_ctx).leak_trivial_alloc(result);
                 }
 
-                funcctx = pgx::srf_per_call_setup(fcinfo);
-                iterator_holder = pgx::PgBox::from_pg(funcctx.user_fctx as *mut IteratorHolder<#generic_type>);
+                funcctx = ::pgx::srf_per_call_setup(fcinfo);
+                iterator_holder = ::pgx::PgBox::from_pg(funcctx.user_fctx as *mut IteratorHolder<#generic_type>);
 
                 let mut iter = Box::from_raw(iterator_holder.iter);
                 match iter.next() {
@@ -322,7 +322,7 @@ impl PgGuardRewriter {
                         Box::leak(iter);
 
                         pgx::srf_return_next(fcinfo, &mut funcctx);
-                        match result.into_datum() {
+                        match pgx::datum::IntoDatum::into_datum(result) {
                             Some(datum) => datum,
                             None => pgx::pg_return_null(fcinfo),
                         }
@@ -363,7 +363,7 @@ impl PgGuardRewriter {
             // TODO:  how to detect that 'result.i' is an Option, and if it's none
             //        set nulls[i] to true?
             #(
-                let datum = result.#i.into_datum();
+                let datum = pgx::datum::IntoDatum::into_datum(result.#i);
                 match datum {
                     Some(datum) => { datums[#i] = datum.into(); },
                     None => { nulls[#i] = true; }
@@ -398,7 +398,7 @@ impl PgGuardRewriter {
         quote_spanned! {func_span=>
             #prolog
             #[pg_guard]
-            #vis unsafe extern "C" fn #func_name_wrapper #generics(fcinfo: pg_sys::FunctionCallInfo) -> pg_sys::Datum {
+            #vis unsafe extern "C" fn #func_name_wrapper #generics(fcinfo: ::pgx::pg_sys::FunctionCallInfo) -> ::pgx::pg_sys::Datum {
 
                 struct IteratorHolder<T> {
                     iter: *mut dyn Iterator<Item=T>,
@@ -669,7 +669,7 @@ impl FunctionSignatureRewriter {
                     stream.extend(quote! {
                         match result {
                             Some(result) => {
-                                result.into_datum().unwrap_or_else(|| panic!("returned Option<T> was NULL"))
+                                pgx::datum::IntoDatum::into_datum(result).unwrap_or_else(|| panic!("returned Option<T> was NULL"))
                             },
                             None => pgx::pg_return_null(fcinfo)
                         }
@@ -684,7 +684,7 @@ impl FunctionSignatureRewriter {
                     });
                 } else {
                     stream.extend(quote! {
-                        result.into_datum().unwrap_or_else(|| panic!("returned Datum was NULL"))
+                        pgx::datum::IntoDatum::into_datum(result).unwrap_or_else(|| panic!("returned Datum was NULL"))
                     });
                 }
             }

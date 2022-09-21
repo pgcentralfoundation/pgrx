@@ -423,14 +423,14 @@ impl PgExtern {
                     quote_spanned! { self.func.sig.output.span() =>
                         match #result_ident {
                             Some(result) => {
-                                result.into_datum().unwrap_or_else(|| panic!("returned Option<T> was NULL"))
+                                pgx::datum::IntoDatum::into_datum(result).unwrap_or_else(|| panic!("returned Option<T> was NULL"))
                             },
                             None => pgx::pg_return_null(#fcinfo_ident)
                         }
                     }
                 } else {
                     quote_spanned! { self.func.sig.output.span() =>
-                        #result_ident.into_datum().unwrap_or_else(|| panic!("returned Datum was NULL"))
+                        pgx::datum::IntoDatum::into_datum(#result_ident).unwrap_or_else(|| panic!("returned Datum was NULL"))
                     }
                 };
 
@@ -507,7 +507,7 @@ impl PgExtern {
                                 Box::leak(iter);
 
                                 pgx::srf_return_next(#fcinfo_ident, &mut funcctx);
-                                match result.into_datum() {
+                                match pgx::datum::IntoDatum::into_datum(result) {
                                     Some(datum) => datum,
                                     None => pgx::pg_return_null(#fcinfo_ident),
                                 }
@@ -540,7 +540,7 @@ impl PgExtern {
                     let mut nulls: [bool; #retval_tuple_len] = [false; #retval_tuple_len];
 
                     #(
-                        let datum = result.#retval_tuple_indexes.into_datum();
+                        let datum = pgx::datum::IntoDatum::into_datum(result.#retval_tuple_indexes);
                         match datum {
                             Some(datum) => { datums[#retval_tuple_indexes] = datum.into(); },
                             None => { nulls[#retval_tuple_indexes] = true; }
@@ -570,9 +570,9 @@ impl PgExtern {
                     #[no_mangle]
                     #[doc(hidden)]
                     #[pg_guard]
-                    pub unsafe extern "C" fn #func_name_wrapper #func_generics(#fcinfo_ident: pg_sys::FunctionCallInfo) -> pg_sys::Datum {
+                    pub unsafe extern "C" fn #func_name_wrapper #func_generics(#fcinfo_ident: ::pgx::pg_sys::FunctionCallInfo) -> ::pgx::pg_sys::Datum {
                         struct IteratorHolder<'__pgx_internal_lifetime, T: std::panic::UnwindSafe + std::panic::RefUnwindSafe> {
-                            iter: *mut TableIterator<'__pgx_internal_lifetime, T>,
+                            iter: *mut ::pgx::iter::TableIterator<'__pgx_internal_lifetime, T>,
                         }
 
                         let mut funcctx: pgx::PgBox<pg_sys::FuncCallContext>;

@@ -615,18 +615,18 @@ fn impl_postgres_enum(ast: DeriveInput) -> proc_macro2::TokenStream {
         let label_string = label_ident.to_string();
 
         from_datum.extend(quote! { #label_string => Some(#enum_ident::#label_ident), });
-        into_datum.extend(quote! { #enum_ident::#label_ident => Some(pgx::lookup_enum_by_label(#enum_name, #label_string)), });
+        into_datum.extend(quote! { #enum_ident::#label_ident => Some(::pgx::lookup_enum_by_label(#enum_name, #label_string)), });
     }
 
     stream.extend(quote! {
-        impl pgx::FromDatum for #enum_ident {
+        impl ::pgx::datum::FromDatum for #enum_ident {
             #[inline]
-            unsafe fn from_datum(datum: pgx::pg_sys::Datum, is_null: bool, typeoid: pgx::pg_sys::Oid) -> Option<#enum_ident> {
+            unsafe fn from_datum(datum: ::pgx::pg_sys::Datum, is_null: bool, typeoid: ::pgx::pg_sys::Oid) -> Option<#enum_ident> {
                 if is_null {
                     None
                 } else {
                     // GREPME: non-primitive cast u64 as Oid
-                    let (name, _, _) = pgx::lookup_enum_by_oid(datum.value() as pgx::pg_sys::Oid);
+                    let (name, _, _) = ::pgx::lookup_enum_by_oid(datum.value() as ::pgx::pg_sys::Oid);
                     match name.as_str() {
                         #from_datum
                         _ => panic!("invalid enum value: {}", name)
@@ -635,16 +635,16 @@ fn impl_postgres_enum(ast: DeriveInput) -> proc_macro2::TokenStream {
             }
         }
 
-        impl pgx::IntoDatum for #enum_ident {
+        impl ::pgx::datum::IntoDatum for #enum_ident {
             #[inline]
-            fn into_datum(self) -> Option<pgx::pg_sys::Datum> {
+            fn into_datum(self) -> Option<::pgx::pg_sys::Datum> {
                 match self {
                     #into_datum
                 }
             }
 
-            fn type_oid() -> pg_sys::Oid {
-                pgx::regtypein(#enum_name)
+            fn type_oid() -> ::pgx::pg_sys::Oid {
+                ::pgx::regtypein(#enum_name)
             }
 
         }
@@ -713,7 +713,7 @@ fn impl_postgres_type(ast: DeriveInput) -> proc_macro2::TokenStream {
 
     // all #[derive(PostgresType)] need to implement that trait
     stream.extend(quote! {
-        impl #generics pgx::PostgresType for #name #generics { }
+        impl #generics ::pgx::PostgresType for #name #generics { }
     });
 
     // and if we don't have custom inout/funcs, we use the JsonInOutFuncs trait
@@ -730,10 +730,10 @@ fn impl_postgres_type(ast: DeriveInput) -> proc_macro2::TokenStream {
 
             #[doc(hidden)]
             #[pg_extern(immutable,parallel_safe)]
-            pub fn #funcname_in #generics(input: Option<&#lifetime pgx::cstr_core::CStr>) -> Option<#name #generics> {
+            pub fn #funcname_in #generics(input: Option<&#lifetime ::pgx::cstr_core::CStr>) -> Option<#name #generics> {
                 input.map_or_else(|| {
                     for m in #name::NULL_ERROR_MESSAGE {
-                        pgx::error!("{}", m);
+                        ::pgx::error!("{}", m);
                     }
                     None
                 }, |i| Some(#name::input(i)))
@@ -741,7 +741,7 @@ fn impl_postgres_type(ast: DeriveInput) -> proc_macro2::TokenStream {
 
             #[doc(hidden)]
             #[pg_extern(immutable,parallel_safe)]
-            pub fn #funcname_out #generics(input: #name #generics) -> &#lifetime pgx::cstr_core::CStr {
+            pub fn #funcname_out #generics(input: #name #generics) -> &#lifetime ::pgx::cstr_core::CStr {
                 let mut buffer = StringInfo::new();
                 input.output(&mut buffer);
                 buffer.into()
@@ -753,10 +753,10 @@ fn impl_postgres_type(ast: DeriveInput) -> proc_macro2::TokenStream {
         stream.extend(quote! {
             #[doc(hidden)]
             #[pg_extern(immutable,parallel_safe)]
-            pub fn #funcname_in #generics(input: Option<&#lifetime pgx::cstr_core::CStr>) -> Option<#name #generics> {
+            pub fn #funcname_in #generics(input: Option<&#lifetime ::pgx::cstr_core::CStr>) -> Option<#name #generics> {
                 input.map_or_else(|| {
                     for m in #name::NULL_ERROR_MESSAGE {
-                        pgx::error!("{}", m);
+                        ::pgx::error!("{}", m);
                     }
                     None
                 }, |i| Some(#name::input(i)))
@@ -764,7 +764,7 @@ fn impl_postgres_type(ast: DeriveInput) -> proc_macro2::TokenStream {
 
             #[doc(hidden)]
             #[pg_extern(immutable,parallel_safe)]
-            pub fn #funcname_out #generics(input: #name #generics) -> &#lifetime pgx::cstr_core::CStr {
+            pub fn #funcname_out #generics(input: #name #generics) -> &#lifetime ::pgx::cstr_core::CStr {
                 let mut buffer = StringInfo::new();
                 input.output(&mut buffer);
                 buffer.into()
@@ -775,10 +775,10 @@ fn impl_postgres_type(ast: DeriveInput) -> proc_macro2::TokenStream {
         stream.extend(quote! {
             #[doc(hidden)]
             #[pg_extern(immutable,parallel_safe)]
-            pub fn #funcname_in #generics(input: Option<&#lifetime pgx::cstr_core::CStr>) -> Option<pgx::PgVarlena<#name #generics>> {
+            pub fn #funcname_in #generics(input: Option<&#lifetime ::pgx::cstr_core::CStr>) -> Option<::pgx::PgVarlena<#name #generics>> {
                 input.map_or_else(|| {
                     for m in #name::NULL_ERROR_MESSAGE {
-                        pgx::error!("{}", m);
+                        ::pgx::error!("{}", m);
                     }
                     None
                 }, |i| Some(#name::input(i)))
@@ -786,7 +786,7 @@ fn impl_postgres_type(ast: DeriveInput) -> proc_macro2::TokenStream {
 
             #[doc(hidden)]
             #[pg_extern(immutable,parallel_safe)]
-            pub fn #funcname_out #generics(input: pgx::PgVarlena<#name #generics>) -> &#lifetime pgx::cstr_core::CStr {
+            pub fn #funcname_out #generics(input: ::pgx::PgVarlena<#name #generics>) -> &#lifetime ::pgx::cstr_core::CStr {
                 let mut buffer = StringInfo::new();
                 input.output(&mut buffer);
                 buffer.into()
@@ -847,8 +847,8 @@ fn impl_guc_enum(ast: DeriveInput) -> proc_macro2::TokenStream {
         }
 
         build_array_body.extend(quote! {
-            pgx::PgBox::<_, pgx::AllocatedByPostgres>::with(&mut slice[#idx], |v| {
-                v.name = pgx::PgMemoryContexts::TopMemoryContext.pstrdup(#label);
+            ::pgx::PgBox::<_, ::pgx::AllocatedByPostgres>::with(&mut slice[#idx], |v| {
+                v.name = ::pgx::PgMemoryContexts::TopMemoryContext.pstrdup(#label);
                 v.val = #idx as i32;
                 v.hidden = #hidden;
             });
@@ -856,7 +856,7 @@ fn impl_guc_enum(ast: DeriveInput) -> proc_macro2::TokenStream {
     }
 
     stream.extend(quote! {
-        impl pgx::GucEnum<#enum_name> for #enum_name {
+        impl ::pgx::GucEnum<#enum_name> for #enum_name {
             fn from_ordinal(ordinal: i32) -> #enum_name {
                 match ordinal {
                     #from_match_arms
@@ -869,8 +869,8 @@ fn impl_guc_enum(ast: DeriveInput) -> proc_macro2::TokenStream {
                 }
             }
 
-            unsafe fn config_matrix(&self) -> *const pgx::pg_sys::config_enum_entry {
-                let slice = pgx::PgMemoryContexts::TopMemoryContext.palloc0_slice::<pg_sys::config_enum_entry>(#enum_len + 1usize);
+            unsafe fn config_matrix(&self) -> *const ::pgx::pg_sys::config_enum_entry {
+                let slice = ::pgx::PgMemoryContexts::TopMemoryContext.palloc0_slice::<pg_sys::config_enum_entry>(#enum_len + 1usize);
 
                 #build_array_body
 
