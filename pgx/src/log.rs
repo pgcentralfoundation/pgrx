@@ -456,7 +456,7 @@ pub fn elog(level: PgLogLevel, message: &str) {
     use std::ffi::CString;
     use std::os::raw::c_char;
 
-    #[cfg(feature = "postgrestd")]
+    #[cfg(feature = "plrust")]
     let level = {
         use PgLogLevel::*;
 
@@ -503,7 +503,7 @@ pub fn ereport(
     use std::ffi::CString;
     use std::os::raw::c_char;
 
-    #[cfg(feature = "postgrestd")]
+    #[cfg(feature = "plrust")]
     let level = {
         use PgLogLevel::*;
 
