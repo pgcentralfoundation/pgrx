@@ -10,12 +10,12 @@ Use of this source code is governed by the MIT license that can be found in the 
 extern crate proc_macro;
 
 use proc_macro2::Ident;
-use quote::{quote, quote_spanned, ToTokens};
+use quote::{quote, quote_spanned};
 use std::ops::Deref;
 use std::str::FromStr;
 use syn::spanned::Spanned;
 use syn::{
-    FnArg, ForeignItem, ForeignItemFn, ItemFn, ItemForeignMod, Pat, ReturnType, Signature, Type,
+    FnArg, ForeignItem, ForeignItemFn, ItemFn, ItemForeignMod, Pat, ReturnType, Signature,
     Visibility,
 };
 
@@ -189,174 +189,5 @@ impl PgGuardRewriter {
 
     pub fn get_return_type(sig: &Signature) -> ReturnType {
         sig.output.clone()
-    }
-
-    pub fn rewrite_args(&self, func: ItemFn, is_raw: bool) -> proc_macro2::TokenStream {
-        let fsr = FunctionSignatureRewriter::new(func);
-        let args = fsr.args(is_raw);
-
-        quote! {
-            #args
-        }
-    }
-
-    pub fn rewrite_return_type(&self, func: ItemFn) -> proc_macro2::TokenStream {
-        let fsr = FunctionSignatureRewriter::new(func);
-        let result = fsr.return_type();
-
-        quote! {
-            #result
-        }
-    }
-}
-
-struct FunctionSignatureRewriter {
-    func: ItemFn,
-}
-
-impl FunctionSignatureRewriter {
-    fn new(func: ItemFn) -> Self {
-        FunctionSignatureRewriter { func }
-    }
-
-    fn return_type(&self) -> proc_macro2::TokenStream {
-        let mut stream = proc_macro2::TokenStream::new();
-        match &self.func.sig.output {
-            ReturnType::Default => {
-                stream.extend(quote! {
-                    pgx::pg_return_void()
-                });
-            }
-            ReturnType::Type(_, type_) => {
-                if type_matches(type_, "Option") {
-                    stream.extend(quote! {
-                        match result {
-                            Some(result) => {
-                                result.into_datum().unwrap_or_else(|| panic!("returned Option<T> was NULL"))
-                            },
-                            None => pgx::pg_return_null(fcinfo)
-                        }
-                    });
-                } else if type_matches(type_, "pg_sys :: Datum") {
-                    stream.extend(quote! {
-                        result
-                    });
-                } else if type_matches(type_, "()") {
-                    stream.extend(quote! {
-                       pgx::pg_return_void()
-                    });
-                } else {
-                    stream.extend(quote! {
-                        result.into_datum().unwrap_or_else(|| panic!("returned Datum was NULL"))
-                    });
-                }
-            }
-        }
-
-        stream
-    }
-
-    fn args(&self, is_raw: bool) -> proc_macro2::TokenStream {
-        if self.func.sig.inputs.len() == 1 && self.return_type_is_datum() {
-            if let FnArg::Typed(ty) = self.func.sig.inputs.first().unwrap() {
-                if type_matches(&ty.ty, "pg_sys :: FunctionCallInfo")
-                    || type_matches(&ty.ty, "pgx :: pg_sys :: FunctionCallInfo")
-                {
-                    return proc_macro2::TokenStream::new();
-                }
-            }
-        }
-
-        let mut stream = proc_macro2::TokenStream::new();
-        let mut i = 0usize;
-        let fcinfo_ident: syn::Ident = syn::parse_quote! { fcinfo };
-
-        for arg in &self.func.sig.inputs {
-            match arg {
-                FnArg::Receiver(_) => panic!("Functions that take self are not supported"),
-                FnArg::Typed(ty) => match ty.pat.deref() {
-                    Pat::Ident(ident) => {
-                        let name = Ident::new(&format!("{}_", ident.ident), ident.span());
-                        let type_ = ty.ty.clone();
-                        let mut type_ = crate::sql_entity_graph::UsedType::new(*type_)
-                            .unwrap()
-                            .resolved_ty;
-                        let is_option = type_matches(&type_, "Option");
-
-                        let ts = if is_option {
-                            let option_type = extract_option_type(&type_);
-                            let mut option_type = syn::parse2::<syn::Type>(option_type).unwrap();
-                            crate::anonymize_lifetimes(&mut option_type);
-
-                            quote_spanned! {ident.span()=>
-                                let #name = pgx::pg_getarg::<#option_type>(#fcinfo_ident, #i);
-                            }
-                        } else if type_matches(&type_, "pg_sys :: FunctionCallInfo")
-                            || type_matches(&type_, "pgx :: pg_sys :: FunctionCallInfo")
-                        {
-                            quote_spanned! {ident.span()=>
-                                let #name = #fcinfo_ident;
-                            }
-                        } else if type_matches(&type_, "()") {
-                            quote_spanned! {ident.span()=>
-                                debug_assert!(pgx::pg_getarg::<()>(#fcinfo_ident, #i).is_none(), "A `()` argument should always recieve `NULL`");
-                                let #name: () = ();
-                            }
-                        } else if is_raw {
-                            quote_spanned! {ident.span()=>
-                                let #name = pgx::pg_getarg_datum_raw(#fcinfo_ident, #i) as #type_;
-                            }
-                        } else {
-                            crate::anonymize_lifetimes(&mut type_);
-                            quote_spanned! {ident.span()=>
-                                let #name = pgx::pg_getarg::<#type_>(#fcinfo_ident, #i).unwrap_or_else(|| panic!("{} is null", stringify!{#ident}));
-                            }
-                        };
-
-                        stream.extend(ts);
-
-                        i += 1;
-                    }
-                    _ => panic!(
-                        "Unrecognized function arg type: {}",
-                        arg.to_token_stream().to_string()
-                    ),
-                },
-            }
-        }
-
-        stream
-    }
-
-    fn return_type_is_datum(&self) -> bool {
-        match &self.func.sig.output {
-            ReturnType::Default => false,
-            ReturnType::Type(_, ty) => type_matches(ty, "pg_sys :: Datum"),
-        }
-    }
-}
-
-fn type_matches(ty: &Type, pattern: &str) -> bool {
-    let type_string = format!("{}", quote! {#ty});
-    type_string.starts_with(pattern)
-}
-
-fn extract_option_type(ty: &Type) -> proc_macro2::TokenStream {
-    match ty {
-        Type::Path(path) => {
-            let mut stream = proc_macro2::TokenStream::new();
-            for segment in &path.path.segments {
-                let arguments = &segment.arguments;
-
-                stream.extend(quote! { #arguments });
-            }
-
-            let string = stream.to_string();
-            let string = string.trim().trim_start_matches('<');
-            let string = string.trim().trim_end_matches('>');
-
-            proc_macro2::TokenStream::from_str(string.trim()).unwrap()
-        }
-        _ => panic!("No type found inside Option"),
     }
 }
