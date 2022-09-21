@@ -1,5 +1,5 @@
 // From "external" crates:
-pub use ::pgx_macros::{extension_sql, pg_aggregate, pg_extern, pg_guard, PostgresType};
+pub use ::pgx_macros::{extension_sql, pg_aggregate, pg_extern, pg_guard, pg_schema, pg_test, PostgresType, PostgresEnum};
 pub use ::pgx_pg_sys as pg_sys;
 
 // Necessary local macros:
