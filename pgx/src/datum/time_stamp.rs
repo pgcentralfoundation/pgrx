@@ -13,7 +13,7 @@ use pgx_utils::sql_entity_graph::metadata::{
 };
 use std::ffi::CStr;
 
-#[derive(Debug, PartialEq, Eq, PartialOrd, Ord)]
+#[derive(Debug, PartialEq, Eq, PartialOrd, Ord, Clone)]
 #[repr(transparent)]
 pub struct Timestamp(pg_sys::Timestamp);
 
