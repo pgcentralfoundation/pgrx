@@ -169,8 +169,7 @@ mod tests {
     use crate::tests::fcinfo_tests::same_name;
     use crate::tests::fcinfo_tests::NullError;
     use crate::tests::fcinfo_tests::NullStrict;
-    use pgx::prelude::*;
-    use pgx::*;
+    use pgx::{prelude::*, IntoDatum, direct_pg_extern_function_call};
 
     #[test]
     fn make_idea_happy() {
