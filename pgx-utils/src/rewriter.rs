@@ -302,7 +302,7 @@ impl PgGuardRewriter {
 
                 if srf_is_first_call(fcinfo) {
                     funcctx = ::pgx::srf_first_call_init(fcinfo);
-                    funcctx.user_fctx = ::pgx::PgMemoryContexts::For(funcctx.multi_call_memory_ctx).palloc_struct::<IteratorHolder<#generic_type>>() as void_mut_ptr;
+                    funcctx.user_fctx = ::pgx::PgMemoryContexts::For(funcctx.multi_call_memory_ctx).palloc_struct::<IteratorHolder<#generic_type>>() as *mut ::core::ffi::c_void;
 
                     iterator_holder = pgx::PgBox::from_pg(funcctx.user_fctx as *mut IteratorHolder<#generic_type>);
 
@@ -357,7 +357,7 @@ impl PgGuardRewriter {
         let i = (0..numtypes).map(syn::Index::from);
         // GREPME: expected struct Datum found
         let create_heap_tuple = quote! {
-            let mut datums: [Datum; #numtypes] = [Datum::from(0); #numtypes];
+            let mut datums: [::pgx::pg_sys::Datum; #numtypes] = [::pgx::pg_sys::Datum::from(0); #numtypes];
             let mut nulls: [bool; #numtypes] = [false; #numtypes];
 
             // TODO:  how to detect that 'result.i' is an Option, and if it's none
@@ -409,7 +409,7 @@ impl PgGuardRewriter {
 
                 if srf_is_first_call(fcinfo) {
                     funcctx = pgx::srf_first_call_init(fcinfo);
-                    funcctx.user_fctx = pgx::PgMemoryContexts::For(funcctx.multi_call_memory_ctx).palloc_struct::<IteratorHolder<#generic_type>>() as void_mut_ptr;
+                    funcctx.user_fctx = pgx::PgMemoryContexts::For(funcctx.multi_call_memory_ctx).palloc_struct::<IteratorHolder<#generic_type>>() as *mut ::core::ffi::c_void;;
                     funcctx.tuple_desc = pgx::PgMemoryContexts::For(funcctx.multi_call_memory_ctx).switch_to(|_| {
                         let mut tupdesc: *mut pgx::pg_sys::TupleDescData = std::ptr::null_mut();
 

@@ -65,7 +65,7 @@ pub struct NULL;
 /// ```
 ///
 /// ```rust
-/// use pgx::*;
+/// use pgx::prelude::*;
 ///
 /// #[pg_extern]
 /// fn get_a_set() -> TableIterator<'static, (name!(id, i32), name!(title, &'static str))> {
