@@ -27,6 +27,10 @@ pub trait PgVarlenaInOutFuncs {
 
     /// Convert `Self` into text by writing to the supplied `StringInfo` buffer
     fn output(&self, buffer: &mut StringInfo);
+
+    /// If PostgreSQL calls the conversion function with NULL as an argument, what
+    /// error message should be generated?
+    const NULL_ERROR_MESSAGE: Option<&'static str> = None;
 }
 
 /// `#[derive(Serialize, Deserialize, PostgresType)]` types may implement this trait if they prefer
@@ -41,6 +45,10 @@ pub trait InOutFuncs {
 
     /// Convert `Self` into text by writing to the supplied `StringInfo` buffer
     fn output(&self, buffer: &mut StringInfo);
+
+    /// If PostgreSQL calls the conversion function with NULL as an argument, what
+    /// error message should be generated?
+    const NULL_ERROR_MESSAGE: Option<&'static str> = None;
 }
 
 /// Automatically implemented for `#[derive(Serialize, Deserialize, PostgresType)]` types that do
@@ -59,4 +67,8 @@ pub trait JsonInOutFuncs<'de>: serde::de::Deserialize<'de> + serde::ser::Seriali
     {
         serde_json::to_writer(buffer, self).expect("failed to serialize to json")
     }
+
+    /// If PostgreSQL calls the conversion function with NULL as an argument, what
+    /// error message should be generated?
+    const NULL_ERROR_MESSAGE: Option<&'static str> = None;
 }
