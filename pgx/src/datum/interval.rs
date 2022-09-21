@@ -11,6 +11,9 @@ use std::ops::{Mul, Sub};
 
 use crate::{direct_function_call, pg_sys, FromDatum, IntoDatum, USECS_PER_SEC};
 use pg_sys::{DAYS_PER_MONTH, SECS_PER_DAY};
+use pgx_utils::sql_entity_graph::metadata::{
+    ArgumentError, Returns, ReturnsError, SqlMapping, SqlTranslatable,
+};
 use time::Duration;
 
 const MONTH_DURATION: Duration = Duration::days(DAYS_PER_MONTH as i64);
@@ -73,7 +76,7 @@ impl IntoDatum for Interval {
 }
 
 impl FromDatum for Interval {
-    unsafe fn from_datum(datum: pg_sys::Datum, is_null: bool) -> Option<Self>
+    unsafe fn from_datum(datum: pg_sys::Datum, is_null: bool, _: pg_sys::Oid) -> Option<Self>
     where
         Self: Sized,
     {
@@ -150,6 +153,15 @@ impl serde::Serialize for Interval {
 
             serializer.serialize_str(cstr.to_str().unwrap())
         }
+    }
+}
+
+unsafe impl SqlTranslatable for Interval {
+    fn argument_sql() -> Result<SqlMapping, ArgumentError> {
+        Ok(SqlMapping::literal("interval"))
+    }
+    fn return_sql() -> Result<Returns, ReturnsError> {
+        Ok(Returns::One(SqlMapping::literal("interval")))
     }
 }
 
