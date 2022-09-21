@@ -6,8 +6,13 @@ All rights reserved.
 
 Use of this source code is governed by the MIT license that can be found in the LICENSE file.
 */
-use pgx::bgworkers::*;
-use pgx::*;
+use pgx::{
+    bgworkers::*,
+    datum::{FromDatum, IntoDatum},
+    log,
+    prelude::*,
+    spi::Spi,
+};
 use std::time::Duration;
 
 /*
@@ -25,7 +30,7 @@ use std::time::Duration;
     this background worker
 */
 
-pg_module_magic!();
+pgx::pg_module_magic!();
 
 #[pg_guard]
 pub extern "C" fn _PG_init() {

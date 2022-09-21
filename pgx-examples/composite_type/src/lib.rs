@@ -20,10 +20,10 @@ A number of considerations are detailed in the [`pgx::composite_type`][pgx::comp
 [`PgHeapTuple`][pgx::PgHeapTuple] documentation which may assist in productionalizing extensions
 using composite types.
 */
-use pgx::*;
+use pgx::{opname, pg_operator, prelude::*, Aggregate};
 
 // All `pgx` extensions will do this:
-pg_module_magic!();
+pgx::pg_module_magic!();
 
 /* Composite types must be defined either before they are used.
 

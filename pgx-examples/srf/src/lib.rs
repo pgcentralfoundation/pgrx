@@ -8,9 +8,8 @@ Use of this source code is governed by the MIT license that can be found in the 
 */
 
 use pgx::prelude::*;
-use pgx::*;
 
-pg_module_magic!();
+pgx::pg_module_magic!();
 
 #[pg_extern]
 fn generate_series(start: i64, finish: i64, step: default!(i64, 1)) -> SetOfIterator<'static, i64> {
@@ -37,7 +36,7 @@ fn return_tuple(
 #[cfg(any(test, feature = "pg_test"))]
 #[pg_schema]
 mod tests {
-    use pgx::*;
+    use pgx::prelude::*;
 
     #[pg_test]
     fn test_it() {

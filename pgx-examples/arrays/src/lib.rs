@@ -7,11 +7,10 @@ All rights reserved.
 Use of this source code is governed by the MIT license that can be found in the LICENSE file.
 */
 
-use pgx::prelude::*;
-use pgx::*;
+use pgx::{prelude::*, Array};
 use serde::*;
 
-pg_module_magic!();
+pgx::pg_module_magic!();
 
 #[pg_extern]
 fn sq_euclid_pgx(a: Array<f32>, b: Array<f32>) -> f32 {
@@ -124,7 +123,8 @@ pub mod pg_test {
 #[cfg(any(test, feature = "pg_test"))]
 pub mod tests {
     use crate::SomeStruct;
-    use pgx::*;
+    use pgx::{prelude::*, spi::Spi};
+
     #[pg_test]
     #[search_path(@extschema@)]
     fn test_vec_of_customtype() {

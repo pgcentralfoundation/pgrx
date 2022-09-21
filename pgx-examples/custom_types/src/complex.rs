@@ -8,7 +8,7 @@ Use of this source code is governed by the MIT license that can be found in the 
 */
 
 use maplit::*;
-use pgx::*;
+use pgx::{prelude::*, Array};
 use serde::*;
 use std::collections::HashMap;
 
@@ -56,7 +56,7 @@ fn add_animal(mut animals: Animals, name: String, age: i32) -> Animals {
 mod tests {
     use crate::complex::{known_animals, Animals};
     use maplit::*;
-    use pgx::*;
+    use pgx::{prelude::*, spi::Spi};
 
     #[pg_test]
     fn test_known_animals_via_spi() {

@@ -6,9 +6,8 @@ Use of this source code is governed by the MIT license that can be found in the 
 */
 
 use pgx::prelude::*;
-use pgx::*;
 
-pg_module_magic!();
+pgx::pg_module_magic!();
 
 #[pg_extern]
 fn return_static() -> &'static str {
@@ -45,7 +44,7 @@ fn split_set<'a>(input: &'a str, pattern: &'a str) -> SetOfIterator<'a, &'a str>
 #[cfg(any(test, feature = "pg_test"))]
 #[pg_schema]
 mod tests {
-    use pgx::*;
+    use pgx::prelude::*;
 
     #[pg_test]
     fn test_it() {

@@ -6,13 +6,12 @@ All rights reserved.
 
 Use of this source code is governed by the MIT license that can be found in the LICENSE file.
 */
-use pgx::prelude::*;
-use pgx::*;
+use pgx::{atomics::*, lwlock::PgLwLock, pg_shmem_init, prelude::*, shmem::*, warning};
 use serde::*;
 use std::iter::Iterator;
 use std::sync::atomic::Ordering;
 
-pg_module_magic!();
+pgx::pg_module_magic!();
 
 // types behind a `LwLock` must derive/implement `Copy` and `Clone`
 #[derive(Copy, Clone)]

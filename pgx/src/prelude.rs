@@ -1,7 +1,7 @@
 // From "external" crates:
 pub use ::pgx_macros::{
-    extension_sql, pg_aggregate, pg_extern, pg_guard, pg_schema, pg_test, pg_trigger, PostgresEnum,
-    PostgresType,
+    extension_sql, extension_sql_file, pg_aggregate, pg_extern, pg_guard, pg_schema, pg_test,
+    pg_trigger, search_path, PostgresEnum, PostgresType,
 };
 pub use ::pgx_pg_sys as pg_sys;
 

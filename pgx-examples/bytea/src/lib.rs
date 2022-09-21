@@ -8,10 +8,10 @@ Use of this source code is governed by the MIT license that can be found in the 
 */
 
 use libflate::gzip::{Decoder, Encoder};
-use pgx::*;
+use pgx::prelude::*;
 use std::io::{Read, Write};
 
-pg_module_magic!();
+pgx::pg_module_magic!();
 
 /// gzip bytes.  Postgres will automatically convert `text`/`varchar` data into `bytea`
 #[pg_extern]
@@ -43,7 +43,7 @@ fn gunzip_as_text(bytes: &[u8]) -> String {
 #[cfg(any(test, feature = "pg_test"))]
 #[pg_schema]
 mod tests {
-    use pgx::*;
+    use pgx::{prelude::*, spi::Spi};
 
     #[pg_test]
     fn test_gzip_text() {
