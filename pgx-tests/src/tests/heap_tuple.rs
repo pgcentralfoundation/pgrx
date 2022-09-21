@@ -1,8 +1,7 @@
 // This is used by some, but not all, examples below.
 const DOG_COMPOSITE_TYPE: &str = "Dog";
 
-use pgx::prelude::*;
-use pgx::*;
+use pgx::{pgbox::AllocatedByRust, prelude::*, Aggregate, VariadicArray};
 
 extension_sql!(
     r#"
