@@ -36,7 +36,7 @@ mod tests {
     #[allow(unused_imports)]
     use crate as pgx_tests;
 
-    use pgx::{prelude::*, spi::Spi, pg_try};
+    use pgx::{pg_try, prelude::*, spi::Spi};
 
     #[pg_test(error = "panic in walker")]
     fn test_panic_in_extern_c_fn() {
