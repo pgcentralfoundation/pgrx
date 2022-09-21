@@ -655,8 +655,10 @@ mod sql_generator_tests {
 mod tests {
     #[cfg(test)]
     use crate as pgx_tests;
-    use pgx::prelude::*;
-    use pgx::*;
+    use pgx::{
+        datum::TryFromDatumError, heap_tuple::PgHeapTupleError, prelude::*, spi::Spi,
+        AllocatedByRust,
+    };
     use std::num::NonZeroUsize;
 
     #[pg_test]

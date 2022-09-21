@@ -259,7 +259,7 @@ fn add_scritches_to_dog(
 #[cfg(any(test, feature = "pg_test"))]
 #[pg_schema]
 mod tests {
-    use pgx::*;
+    use pgx::{prelude::*, spi::Spi, AllocatedByRust};
 
     #[pg_test]
     fn test_create_dog() {

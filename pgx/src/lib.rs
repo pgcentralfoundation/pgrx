@@ -79,7 +79,6 @@ pub use datum::*;
 pub use enum_helper::*;
 pub use fcinfo::*;
 pub use guc::*;
-pub use heap_tuple::*;
 pub use hooks::*;
 pub use htup::*;
 pub use inoutfuncs::*;

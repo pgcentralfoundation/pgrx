@@ -12,8 +12,8 @@ pub use crate::{default, name};
 pub use crate::iter::{SetOfIterator, TableIterator};
 
 // Needed for complex returns.
+pub use crate::heap_tuple::PgHeapTuple;
 pub use crate::pgbox::PgBox;
-pub use crate::PgHeapTuple;
 
 pub use crate::datum::{Date, Time, TimeWithTimeZone, Timestamp, TimestampWithTimeZone};
 
