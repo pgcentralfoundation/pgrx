@@ -185,7 +185,7 @@ mod tests {
     #[allow(unused_imports)]
     use crate as pgx_tests;
 
-    use pgx::{prelude::*, spi::Spi, IntoDatum, Json};
+    use pgx::{prelude::*, IntoDatum, Json};
     use serde_json::json;
 
     #[pg_test]

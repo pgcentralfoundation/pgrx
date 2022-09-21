@@ -123,7 +123,7 @@ pub mod pg_test {
 #[cfg(any(test, feature = "pg_test"))]
 pub mod tests {
     use crate::SomeStruct;
-    use pgx::{prelude::*, spi::Spi};
+    use pgx::prelude::*;
 
     #[pg_test]
     #[search_path(@extschema@)]

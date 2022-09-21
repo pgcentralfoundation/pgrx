@@ -57,7 +57,7 @@ INSERT INTO test (title, description, payload) VALUES ('Fox', 'a description', '
 #[cfg(any(test, feature = "pg_test"))]
 #[pg_schema]
 mod tests {
-    use pgx::{prelude::*, spi::Spi};
+    use pgx::prelude::*;
 
     #[pg_test]
     fn test_insert() {

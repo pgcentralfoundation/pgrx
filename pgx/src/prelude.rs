@@ -15,6 +15,11 @@ pub use crate::iter::{SetOfIterator, TableIterator};
 pub use crate::heap_tuple::PgHeapTuple;
 pub use crate::pgbox::PgBox;
 
+// These could be factored into a temporal type module that could be easily imported for code which works with them.
+// However, reexporting them seems fine for now.
 pub use crate::datum::{Date, Time, TimeWithTimeZone, Timestamp, TimestampWithTimeZone};
 
 pub use crate::pg_sys::PgBuiltInOids;
+
+// It's a database, gotta query it somehow.
+pub use crate::spi::Spi;

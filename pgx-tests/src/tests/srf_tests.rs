@@ -75,7 +75,7 @@ mod tests {
     #[allow(unused_imports)]
     use crate as pgx_tests;
 
-    use pgx::{prelude::*, spi::Spi};
+    use pgx::prelude::*;
 
     #[pg_test]
     fn test_generate_series() {

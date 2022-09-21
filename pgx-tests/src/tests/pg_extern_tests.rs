@@ -28,7 +28,6 @@ mod tests {
     use crate as pgx_tests;
 
     use pgx::prelude::*;
-    use pgx::*;
 
     #[pg_extern(immutable)]
     fn is_immutable() {}

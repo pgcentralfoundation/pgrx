@@ -161,7 +161,6 @@ mod tests {
     use crate as pgx_tests;
 
     use pgx::prelude::*;
-    use pgx::*;
     use serde_json::*;
     use std::time::Duration;
     use time;

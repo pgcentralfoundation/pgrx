@@ -82,7 +82,7 @@ extension_sql_file!("../sql/finalizer.sql", finalize);
 #[cfg(any(test, feature = "pg_test"))]
 #[pg_schema]
 mod tests {
-    use pgx::{prelude::*, spi::Spi};
+    use pgx::prelude::*;
 
     #[pg_test]
     fn test_ordering() {

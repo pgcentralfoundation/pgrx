@@ -30,7 +30,7 @@ mod tests {
     use crate as pgx_tests;
 
     use crate::tests::enum_type_tests::Foo;
-    use pgx::{prelude::*, spi::Spi};
+    use pgx::prelude::*;
 
     #[test]
     fn make_idea_happy() {}

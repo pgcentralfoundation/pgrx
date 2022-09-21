@@ -32,7 +32,7 @@ fn display_uuid(uuid: Uuid) -> String {
 mod tests {
     #[allow(unused_imports)]
     use crate as pgx_tests;
-    use pgx::{prelude::*, spi::Spi, Uuid};
+    use pgx::{prelude::*, Uuid};
 
     #[pg_test]
     fn test_display_uuid() {

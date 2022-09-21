@@ -21,7 +21,7 @@ mod tests {
     #[allow(unused_imports)]
     use crate as pgx_tests;
 
-    use pgx::{prelude::*, spi::Spi, Json};
+    use pgx::{prelude::*, Json};
     use serde_json::*;
 
     #[pg_test]

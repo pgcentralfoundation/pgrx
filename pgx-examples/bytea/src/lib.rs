@@ -43,7 +43,7 @@ fn gunzip_as_text(bytes: &[u8]) -> String {
 #[cfg(any(test, feature = "pg_test"))]
 #[pg_schema]
 mod tests {
-    use pgx::{prelude::*, spi::Spi};
+    use pgx::prelude::*;
 
     #[pg_test]
     fn test_gzip_text() {

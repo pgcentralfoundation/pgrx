@@ -12,7 +12,7 @@ Use of this source code is governed by the MIT license that can be found in the 
 mod tests {
     #[allow(unused_imports)]
     use crate as pgx_tests;
-    use pgx::{prelude::*, spi::Spi, AllocatedByPostgres, AllocatedByRust, WhoAllocated};
+    use pgx::{prelude::*, AllocatedByPostgres, AllocatedByRust, WhoAllocated};
 
     /// Test some various formats of trigger signature we expect to support
     ///

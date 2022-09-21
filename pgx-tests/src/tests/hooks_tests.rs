@@ -13,7 +13,7 @@ mod tests {
     #[allow(unused_imports)]
     use crate as pgx_tests;
 
-    use pgx::{hooks::*, prelude::*, spi::Spi, PgList};
+    use pgx::{hooks::*, prelude::*, PgList};
 
     #[pg_test]
     unsafe fn test_callbacks() {

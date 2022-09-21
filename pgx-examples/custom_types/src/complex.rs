@@ -56,7 +56,7 @@ fn add_animal(mut animals: Animals, name: String, age: i32) -> Animals {
 mod tests {
     use crate::complex::{known_animals, Animals};
     use maplit::*;
-    use pgx::{prelude::*, spi::Spi};
+    use pgx::prelude::*;
 
     #[pg_test]
     fn test_known_animals_via_spi() {

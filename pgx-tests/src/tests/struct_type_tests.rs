@@ -82,7 +82,7 @@ mod tests {
     use crate as pgx_tests;
 
     use crate::tests::struct_type_tests::Complex;
-    use pgx::{prelude::*, spi::Spi};
+    use pgx::prelude::*;
 
     #[pg_test]
     fn test_complex_in() {

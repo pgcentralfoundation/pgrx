@@ -68,7 +68,7 @@ mod tests {
     use crate::pg_catalog::MyPgCatalogType;
     use crate::some_schema::MySomeSchemaType;
     use crate::MyType;
-    use pgx::{prelude::*, spi::Spi};
+    use pgx::prelude::*;
 
     #[pg_test]
     fn test_hello_default_schema() {

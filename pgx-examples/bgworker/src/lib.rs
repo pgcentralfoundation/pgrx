@@ -11,7 +11,6 @@ use pgx::{
     datum::{FromDatum, IntoDatum},
     log,
     prelude::*,
-    spi::Spi,
 };
 use std::time::Duration;
 

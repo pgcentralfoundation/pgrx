@@ -656,8 +656,7 @@ mod tests {
     #[cfg(test)]
     use crate as pgx_tests;
     use pgx::{
-        datum::TryFromDatumError, heap_tuple::PgHeapTupleError, prelude::*, spi::Spi,
-        AllocatedByRust,
+        datum::TryFromDatumError, heap_tuple::PgHeapTupleError, prelude::*, AllocatedByRust,
     };
     use std::num::NonZeroUsize;
 
