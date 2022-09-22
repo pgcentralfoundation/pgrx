@@ -7,8 +7,6 @@ All rights reserved.
 Use of this source code is governed by the MIT license that can be found in the LICENSE file.
 */
 
-use pgx::prelude::*;
-
 mod complex;
 mod fixed_size;
 mod generic_enum;
@@ -17,7 +15,7 @@ mod hstore_clone;
 pgx::pg_module_magic!();
 
 #[cfg(test)]
-#[pg_schema]
+#[pgx::pg_schema]
 pub mod pg_test {
     pub fn setup(_options: Vec<&str>) {
         // perform one-off initialization when the pg_test framework starts
