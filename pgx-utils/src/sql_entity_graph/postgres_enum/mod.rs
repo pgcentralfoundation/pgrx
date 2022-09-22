@@ -165,6 +165,7 @@ impl ToTokens for PostgresEnum {
                 extern crate alloc;
                 use alloc::vec::Vec;
                 use alloc::vec;
+                use ::pgx::WithTypeIds;
                 let mut mappings = Default::default();
                 <#name #static_ty_generics as ::pgx::datum::WithTypeIds>::register_with_refs(&mut mappings, stringify!(#name).to_string());
                 ::pgx::datum::WithSizedTypeIds::<#name #static_ty_generics>::register_sized_with_refs(&mut mappings, stringify!(#name).to_string());

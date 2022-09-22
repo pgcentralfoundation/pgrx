@@ -13,7 +13,7 @@ mod tests {
     #[allow(unused_imports)]
     use crate as pgx_tests;
 
-    use pgx::*;
+    use pgx::{prelude::*, PgMemoryContexts};
     use std::sync::atomic::{AtomicBool, Ordering};
     use std::sync::Arc;
 

@@ -25,7 +25,7 @@ use crate::{pg_sys, void_mut_ptr, AllocatedByRust, FromDatum, PgBox, PgMemoryCon
 /// ```
 ///
 /// ```rust
-/// use crate::pgx::*;
+/// use pgx::prelude::*;
 ///
 /// #[pg_extern]
 /// fn fun_with_default_arg_value(a: i32, b: default!(i32, 99)) -> i32 {
@@ -65,7 +65,7 @@ pub struct NULL;
 /// ```
 ///
 /// ```rust
-/// use pgx::*;
+/// use pgx::prelude::*;
 ///
 /// #[pg_extern]
 /// fn get_a_set() -> TableIterator<'static, (name!(id, i32), name!(title, &'static str))> {

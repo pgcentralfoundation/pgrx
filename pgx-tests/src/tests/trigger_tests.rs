@@ -12,48 +12,44 @@ Use of this source code is governed by the MIT license that can be found in the 
 mod tests {
     #[allow(unused_imports)]
     use crate as pgx_tests;
-    use pgx::*;
+    use pgx::{prelude::*, AllocatedByPostgres, AllocatedByRust, WhoAllocated};
 
     /// Test some various formats of trigger signature we expect to support
     ///
     /// These tests don't run, but they get built to SQL and compile checked.
     #[pgx::pg_schema]
     mod trigger_signature_compile_tests {
-        use pgx::{AllocatedByPostgres, AllocatedByRust};
+        use pgx::{heap_tuple::PgHeapTupleError, prelude::*, AllocatedByPostgres, AllocatedByRust};
 
         use super::*;
 
         #[pg_trigger]
         fn signature_standard(
             trigger: &pgx::PgTrigger,
-        ) -> Result<
-            PgHeapTuple<'_, impl WhoAllocated<pgx::pg_sys::HeapTupleData>>,
-            pgx::PgHeapTupleError,
-        > {
+        ) -> Result<PgHeapTuple<'_, impl WhoAllocated<pgx::pg_sys::HeapTupleData>>, PgHeapTupleError>
+        {
             Ok(trigger.current().unwrap().into_owned())
         }
 
         #[pg_trigger]
         fn signature_explicit_lifetimes<'a>(
             trigger: &'a pgx::PgTrigger,
-        ) -> Result<
-            PgHeapTuple<'a, impl WhoAllocated<pgx::pg_sys::HeapTupleData>>,
-            pgx::PgHeapTupleError,
-        > {
+        ) -> Result<PgHeapTuple<'a, impl WhoAllocated<pgx::pg_sys::HeapTupleData>>, PgHeapTupleError>
+        {
             Ok(trigger.current().unwrap().into_owned())
         }
 
         #[pg_trigger]
         fn signature_alloc_by_postgres(
             trigger: &pgx::PgTrigger,
-        ) -> Result<PgHeapTuple<'_, AllocatedByPostgres>, pgx::PgHeapTupleError> {
+        ) -> Result<PgHeapTuple<'_, AllocatedByPostgres>, PgHeapTupleError> {
             Ok(trigger.current().unwrap())
         }
 
         #[pg_trigger]
         fn signature_alloc_by_rust(
             trigger: &pgx::PgTrigger,
-        ) -> Result<PgHeapTuple<'_, AllocatedByRust>, pgx::PgHeapTupleError> {
+        ) -> Result<PgHeapTuple<'_, AllocatedByRust>, PgHeapTupleError> {
             Ok(trigger.current().unwrap().into_owned())
         }
 

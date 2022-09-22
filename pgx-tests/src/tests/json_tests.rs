@@ -13,7 +13,7 @@ mod tests {
     #[allow(unused_imports)]
     use crate as pgx_tests;
 
-    use pgx::*;
+    use pgx::{prelude::*, Json, JsonB};
 
     #[pg_test]
     fn test_json() {

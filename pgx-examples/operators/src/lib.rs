@@ -7,11 +7,11 @@ All rights reserved.
 Use of this source code is governed by the MIT license that can be found in the LICENSE file.
 */
 
-use pgx::*;
+use pgx::{opname, pg_operator, prelude::*};
 use serde::{Deserialize, Serialize};
 mod derived;
 
-pg_module_magic!();
+pgx::pg_module_magic!();
 
 #[derive(PostgresType, Serialize, Deserialize, Eq, PartialEq)]
 pub struct MyType {

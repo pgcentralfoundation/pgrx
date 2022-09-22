@@ -13,7 +13,7 @@ mod tests {
     #[allow(unused_imports)]
     use crate as pgx_tests;
 
-    use pgx::*;
+    use pgx::{prelude::*, Inet};
 
     #[pg_test]
     fn test_deserialize_inet() {

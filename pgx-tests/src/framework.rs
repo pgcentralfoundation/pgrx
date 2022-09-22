@@ -12,7 +12,7 @@ use std::process::{Command, Stdio};
 use eyre::{eyre, WrapErr};
 use once_cell::sync::Lazy;
 use owo_colors::OwoColorize;
-use pgx::*;
+use pgx::prelude::*;
 use pgx_pg_config::{createdb, get_target_dir, PgConfig, Pgx};
 use postgres::error::DbError;
 use std::collections::HashMap;

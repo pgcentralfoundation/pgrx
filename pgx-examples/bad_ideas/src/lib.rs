@@ -6,12 +6,14 @@ All rights reserved.
 
 Use of this source code is governed by the MIT license that can be found in the LICENSE file.
 */
-use pgx::*;
+use pgx::{
+    check_for_interrupts, info, prelude::*, register_xact_callback, PgRelation, PgXactCallbackEvent,
+};
 use std::fs::File;
 use std::io::Write;
 use std::process::Command;
 
-pg_module_magic!();
+pgx::pg_module_magic!();
 
 #[pg_extern]
 fn exec<'a>(

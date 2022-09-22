@@ -1,5 +1,5 @@
 use pgx::bgworkers::*;
-use pgx::*;
+use pgx::prelude::*;
 use std::time::Duration;
 
 pg_module_magic!();

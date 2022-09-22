@@ -9,6 +9,7 @@ Use of this source code is governed by the MIT license that can be found in the 
 
 //! Provides a safe interface into Postgres' Configuration System (GUC)
 use crate::{pg_sys, PgMemoryContexts};
+pub use ::pgx_macros::PostgresGucEnum;
 use std::cell::Cell;
 use std::ffi::CStr;
 

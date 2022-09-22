@@ -1,7 +1,7 @@
 // This is used by some, but not all, examples below.
 const DOG_COMPOSITE_TYPE: &str = "Dog";
 
-use pgx::*;
+use pgx::{pgbox::AllocatedByRust, prelude::*, Aggregate, VariadicArray};
 
 extension_sql!(
     r#"
@@ -655,7 +655,9 @@ mod sql_generator_tests {
 mod tests {
     #[cfg(test)]
     use crate as pgx_tests;
-    use pgx::*;
+    use pgx::{
+        datum::TryFromDatumError, heap_tuple::PgHeapTupleError, prelude::*, AllocatedByRust,
+    };
     use std::num::NonZeroUsize;
 
     #[pg_test]
