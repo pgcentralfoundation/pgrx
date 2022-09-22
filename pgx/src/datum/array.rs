@@ -18,9 +18,11 @@ use std::marker::PhantomData;
 use std::{mem, ptr, slice};
 
 pub struct Array<'a, T: FromDatum> {
-    _ptr: Option<NonNull<pg_sys::varlena>>,
+    ptr: Option<NonNull<pg_sys::varlena>>,
     raw: Option<RawArray>,
     nelems: usize,
+    // Remove this field if/when we figure out how to stop using pg_sys::deconstruct_array
+    datum_palloc: Option<NonNull<pg_sys::Datum>>,
     elem_slice: &'a [pg_sys::Datum],
     null_slice: NullKind<'a>,
     elem_layout: Option<Layout>,
@@ -69,6 +71,33 @@ impl<'a, T: FromDatum + serde::Serialize> serde::Serialize for Array<'a, T> {
     }
 }
 
+impl<'a, T: FromDatum> Drop for Array<'a, T> {
+    fn drop(&mut self) {
+        if let Array {
+            ptr,
+            raw,
+            datum_palloc: Some(data),
+            elem_slice,
+            ..
+        } = self
+        {
+            // It's just a slice, dropping it doesn't "do" anything, but out of an abundance of caution:
+            mem::drop(elem_slice);
+            // No conflict possible with ditching this.
+            unsafe { pg_sys::pfree(data.as_ptr().cast()) };
+
+            // Now we check for detoasting clones
+            let raw = raw.take().map(|r| r.into_ptr());
+            let ptr = ptr.take();
+            match (ptr, raw) {
+                // SAFETY: if pgx detoasted a clone of this varlena, pfree the clone
+                (Some(p), Some(r)) if r.cast() != p => unsafe { pg_sys::pfree(r.as_ptr().cast()) },
+                _ => (),
+            }
+        }
+    }
+}
+
 #[deny(unsafe_op_in_unsafe_fn)]
 impl<'a, T: FromDatum> Array<'a, T> {
     /// Create an [`Array`](crate::datum::Array) over an array of [`pg_sys::Datum`](pg_sys::Datum) values and a corresponding array
@@ -100,13 +129,14 @@ impl<'a, T: FromDatum> Array<'a, T> {
         //
         // Remember to remove the Array::over tests in pgx-tests/src/tests/array_tests.rs
         // when you finally kill this off.
-        let _ptr: Option<NonNull<pg_sys::varlena>> = None;
+        let ptr: Option<NonNull<pg_sys::varlena>> = None;
         let raw: Option<RawArray> = None;
         let elem_layout: Option<Layout> = None;
         Array::<T> {
-            _ptr,
+            ptr,
             raw,
             nelems,
+            datum_palloc: None,
             elem_slice: unsafe { slice::from_raw_parts(elements, nelems) },
             null_slice: unsafe { slice::from_raw_parts(nulls, nelems) }.into(),
             elem_layout,
@@ -119,7 +149,7 @@ impl<'a, T: FromDatum> Array<'a, T> {
     /// This function requires that the RawArray was obtained in a properly-constructed form
     /// (probably from Postgres).
     unsafe fn deconstruct_from(
-        _ptr: Option<NonNull<pg_sys::varlena>>,
+        ptr: Option<NonNull<pg_sys::varlena>>,
         raw: RawArray,
         layout: Layout,
     ) -> Array<'a, T> {
@@ -137,9 +167,6 @@ impl<'a, T: FromDatum> Array<'a, T> {
         and clashes with assumptions of Array being a "zero-copy", lifetime-bound array,
         some of which are implicitly embedded in other methods (e.g. Array::over).
         It also risks leaking memory, as deconstruct_array calls palloc.
-
-        TODO(0.6.0): Start implementing Drop again when we no longer have Array::over.
-        See tcdi/pgx#627 and #633 for why this is the preferred resolution to this.
 
         SAFETY: We have already asserted the validity of the RawArray, so
         this only makes mistakes if we mix things up and pass Postgres the wrong data.
@@ -168,10 +195,23 @@ impl<'a, T: FromDatum> Array<'a, T> {
             .map(|nonnull| NullKind::Bits(unsafe { &*nonnull.as_ptr() }))
             .unwrap_or(NullKind::Strict(nelems));
 
+        // Assert correctness of our nullness checks and cleanup.
+        // SAFETY: Should be correctly constructed for slice validity.
+        let pallocd_null_slice = unsafe { slice::from_raw_parts(nulls, nelems) };
+        for i in 0..nelems {
+            assert_eq!(null_slice.get(i).unwrap(), pallocd_null_slice[i]);
+        }
+
+        // Throw away the slice we made.
+        mem::drop(pallocd_null_slice);
+        // SAFETY: We made it, we can break it. Or Postgres can, at least.
+        unsafe { pg_sys::pfree(nulls.cast()) };
+
         Array {
-            _ptr,
+            ptr,
             raw: Some(raw),
             nelems,
+            datum_palloc: NonNull::new(elements),
             elem_slice: /* SAFETY: &[Datum] from palloc'd [Datum] */ unsafe { slice::from_raw_parts(elements, nelems) },
             null_slice,
             elem_layout: Some(layout),
