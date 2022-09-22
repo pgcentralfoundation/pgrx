@@ -476,8 +476,8 @@ impl<'a, T: FromDatum> FromDatum for Array<'a, T> {
         if is_null || datum.is_null() {
             None
         } else {
-            let ptr = datum.ptr_cast();
-            let array = pg_sys::pg_detoast_datum(datum.ptr_cast()) as *mut pg_sys::ArrayType;
+            let ptr = datum.cast_mut_ptr();
+            let array = pg_sys::pg_detoast_datum(datum.cast_mut_ptr()) as *mut pg_sys::ArrayType;
             let raw =
                 RawArray::from_ptr(NonNull::new(array).expect("detoast returned null ArrayType*"));
             let ptr = NonNull::new(ptr);

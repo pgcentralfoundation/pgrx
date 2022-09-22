@@ -48,18 +48,14 @@ impl Datum {
         self.0.addr()
     }
 
-    /// Assume the datum is a pointer and treat it as void*.
-    pub fn to_void(self) -> *mut core::ffi::c_void {
-        self.0.cast()
-    }
-
     /// True if the datum is equal to the null pointer.
     pub fn is_null(self) -> bool {
         self.0.is_null()
     }
 
     /// Assume the datum is a pointer and cast it to point to T.
-    pub fn ptr_cast<T>(self) -> *mut T {
+    /// It is recommended to explicitly use `datum.cast_mut_ptr::<T>()`.
+    pub fn cast_mut_ptr<T>(self) -> *mut T {
         #[allow(unstable_name_collisions)]
         self.0.cast()
     }
