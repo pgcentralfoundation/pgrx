@@ -33,8 +33,17 @@ struct DatumBlob {
 ///
 /// Only create Datums from non-pointers when you know you want to pass a value, as
 /// it is erroneous for `unsafe` code to dereference the address of "only a value" as a pointer.
-/// It is still a "safe" operation to create such pointers: validity is asserted by dereferencing.
-/// For all intents and purposes, however, Postgres counts as `unsafe` code that may be relying
+/// It is still a "safe" operation to create such pointers: validity is asserted by dereferencing,
+/// **or by creating a safe reference such as &T or &mut T**. Also be aware that the validity
+/// of Datum's Copy is premised on the same implicit issues with pointers being Copy:
+/// while any `&T` is live, other `*mut T` must not be used to write to that `&T`,
+/// and `&mut T` implies no other `*mut T` even exists outside an `&mut T`'s borrowing ancestry.
+/// It is thus of dubious soundness for Rust code to receive `*mut T`, create another `*mut T`,
+/// cast the first to `&mut T`, and then later try to use the second `*mut T` to write.
+/// It _is_ sound for Postgres itself to pass a copied pointer as a Datum to Rust code, then later
+/// to mutate that data through its original pointer after Rust creates and releases a `&mut T`.
+///
+/// For all intents and purposes, Postgres counts as `unsafe` code that may be relying
 /// on you communicating pointers correctly to it. Do not play games with your database.
 #[repr(transparent)]
 #[derive(Debug, Copy, Clone, PartialEq)]
