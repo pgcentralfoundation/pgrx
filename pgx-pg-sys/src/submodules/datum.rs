@@ -133,6 +133,12 @@ impl From<i64> for Datum {
     }
 }
 
+impl From<bool> for Datum {
+    fn from(val: bool) -> Datum {
+        Datum::from(val as usize)
+    }
+}
+
 impl<T> From<*mut T> for Datum {
     fn from(val: *mut T) -> Datum {
         Datum(val.cast())
