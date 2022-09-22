@@ -6,7 +6,7 @@ All rights reserved.
 
 Use of this source code is governed by the MIT license that can be found in the LICENSE file.
 */
-use pgx::*;
+use pgx::{prelude::*, Uuid, UuidBytes};
 
 pub const TEST_UUID_V4: UuidBytes = [
     0x12, 0x3e, 0x45, 0x67, 0xe8, 0x9b, 0x12, 0xd3, 0xa4, 0x56, 0x42, 0x66, 0x14, 0x17, 0x40, 0x00,
@@ -32,7 +32,7 @@ fn display_uuid(uuid: Uuid) -> String {
 mod tests {
     #[allow(unused_imports)]
     use crate as pgx_tests;
-    use pgx::*;
+    use pgx::{prelude::*, Uuid};
 
     #[pg_test]
     fn test_display_uuid() {

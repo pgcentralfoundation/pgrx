@@ -30,6 +30,9 @@ extern crate bitflags;
 // expose our various derive macros
 pub use pgx_macros::*;
 
+/// The PGX prelude includes necessary imports to make extensions work.
+pub mod prelude;
+
 pub mod aggregate;
 pub mod callbacks;
 pub mod datum;
@@ -76,12 +79,10 @@ pub use datum::*;
 pub use enum_helper::*;
 pub use fcinfo::*;
 pub use guc::*;
-pub use heap_tuple::*;
 pub use hooks::*;
 pub use htup::*;
 pub use inoutfuncs::*;
 pub use itemptr::*;
-pub use iter::*;
 pub use list::*;
 pub use log::*;
 pub use lwlock::*;

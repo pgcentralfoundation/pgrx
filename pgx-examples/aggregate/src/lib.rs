@@ -7,11 +7,11 @@ All rights reserved.
 Use of this source code is governed by the MIT license that can be found in the LICENSE file.
 */
 use pgx::cstr_core::CStr;
-use pgx::*;
+use pgx::{aggregate::*, pgx, prelude::*, PgVarlena, PgVarlenaInOutFuncs, StringInfo};
 use serde::{Deserialize, Serialize};
 use std::str::FromStr;
 
-pg_module_magic!();
+pgx::pg_module_magic!();
 
 #[derive(Copy, Clone, PostgresType, Serialize, Deserialize)]
 #[pgvarlena_inoutfuncs]

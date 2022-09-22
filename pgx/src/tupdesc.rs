@@ -153,7 +153,7 @@ impl<'a> PgTupleDesc<'a> {
     /** Retrieve the tuple description of the shape of a defined composite type
 
     ```rust,no_run
-    use pgx::*;
+    use pgx::{prelude::*, PgTupleDesc};
 
     Spi::run("CREATE TYPE Dog AS (name text, age int);");
     let tuple_desc = PgTupleDesc::for_composite_type("Dog").unwrap();

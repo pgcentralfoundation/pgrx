@@ -193,6 +193,7 @@ impl ToTokens for PostgresType {
                 use alloc::vec::Vec;
                 use alloc::vec;
                 use alloc::string::{String, ToString};
+                use ::pgx::WithTypeIds;
 
                 let mut mappings = Default::default();
                 <#name #static_ty_generics as pgx::datum::WithTypeIds>::register_with_refs(

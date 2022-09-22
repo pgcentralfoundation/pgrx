@@ -13,7 +13,7 @@ mod tests {
     #[allow(unused_imports)]
     use crate as pgx_tests;
 
-    use pgx::*;
+    use pgx::{info, prelude::*, register_xact_callback, PgXactCallbackEvent};
 
     #[test]
     fn make_idea_happy() {}
