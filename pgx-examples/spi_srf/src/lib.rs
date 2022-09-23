@@ -6,10 +6,9 @@ All rights reserved.
 
 Use of this source code is governed by the MIT license that can be found in the LICENSE file.
 */
-use pgx::TableIterator;
-use pgx::*;
+use pgx::{prelude::*, IntoDatum, SpiTupleTable};
 
-pg_module_magic!();
+pgx::pg_module_magic!();
 
 extension_sql!(
     r#"   
@@ -25,7 +24,7 @@ INSERT INTO dog_daycare(dog_name, dog_age, dog_breed) VALUES ('Spot', 5, 'Poodle
 INSERT INTO dog_daycare(dog_name, dog_age, dog_breed) VALUES ('Rover', 7, 'Golden Retriever');
 INSERT INTO dog_daycare(dog_name, dog_age, dog_breed) VALUES ('Snoopy', 9, 'Beagle');
 INSERT INTO dog_daycare(dog_name, dog_age, dog_breed) VALUES ('Lassie', 11, 'Collie');
-INSERT INTO dog_daycare(dog_name, dog_age, dog_breed) VALUES ('Scooby', 13, 'Labrador');
+INSERT INTO dog_daycare(dog_name, dog_age, dog_breed) VALUES ('Scooby', 13, 'Great Dane');
 INSERT INTO dog_daycare(dog_name, dog_age, dog_breed) VALUES ('Moomba', 15, 'Labrador');
 
 
@@ -53,7 +52,7 @@ fn calculate_human_years() -> TableIterator<
     let mut results = Vec::new();
 
     Spi::connect(|client| {
-        let mut tup_table: pgx::SpiTupleTable = client.select(query, None, None);
+        let mut tup_table: SpiTupleTable = client.select(query, None, None);
 
         while let Some(row) = tup_table.next() {
             let dog_name: String = row["dog_name"].value().unwrap();
@@ -91,7 +90,7 @@ fn filter_by_breed(
     let mut results = Vec::new();
 
     Spi::connect(|client| {
-        let mut tup_table: pgx::SpiTupleTable = client.select(query, None, Some(args));
+        let mut tup_table: SpiTupleTable = client.select(query, None, Some(args));
 
         while let Some(row) = tup_table.next() {
             results.push((
