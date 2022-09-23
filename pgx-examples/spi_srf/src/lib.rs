@@ -121,7 +121,7 @@ mod tests {
         results.push(("Rover".to_string(), 7, "Golden Retriever".to_string(), 49));
         results.push(("Snoopy".to_string(), 9, "Beagle".to_string(), 63));
         results.push(("Lassie".to_string(), 11, "Collie".to_string(), 77));
-        results.push(("Scooby".to_string(), 13, "Labrador".to_string(), 91));
+        results.push(("Scooby".to_string(), 13, "Great Dane".to_string(), 91));
         results.push(("Moomba".to_string(), 15, "Labrador".to_string(), 105));
         let func_results = calculate_human_years();
 
