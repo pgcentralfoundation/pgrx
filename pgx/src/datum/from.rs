@@ -224,7 +224,7 @@ impl<'a> FromDatum for &'a str {
         if is_null || datum.is_null() {
             None
         } else {
-            let varlena = pg_sys::pg_detoast_datum_packed(datum.ptr_cast());
+            let varlena = pg_sys::pg_detoast_datum_packed(datum.cast_mut_ptr());
             Some(text_to_rust_str_unchecked(varlena))
         }
     }
@@ -243,7 +243,7 @@ impl<'a> FromDatum for &'a str {
         } else {
             memory_context.switch_to(|_| {
                 // this gets the varlena Datum copied into this memory context
-                let detoasted = pg_sys::pg_detoast_datum_copy(datum.ptr_cast());
+                let detoasted = pg_sys::pg_detoast_datum_copy(datum.cast_mut_ptr());
 
                 // and we need to unpack it (if necessary), which will decompress it too
                 let varlena = pg_sys::pg_detoast_datum_packed(detoasted);
@@ -283,7 +283,7 @@ impl<'a> FromDatum for &'a std::ffi::CStr {
         if is_null || datum.is_null() {
             None
         } else {
-            Some(std::ffi::CStr::from_ptr(datum.ptr_cast()))
+            Some(std::ffi::CStr::from_ptr(datum.cast_mut_ptr()))
         }
     }
 }
@@ -298,7 +298,7 @@ impl<'a> FromDatum for &'a crate::cstr_core::CStr {
         if is_null || datum.is_null() {
             None
         } else {
-            Some(crate::cstr_core::CStr::from_ptr(datum.ptr_cast()))
+            Some(crate::cstr_core::CStr::from_ptr(datum.cast_mut_ptr()))
         }
     }
 }
@@ -310,7 +310,7 @@ impl<'a> FromDatum for &'a [u8] {
         if is_null || datum.is_null() {
             None
         } else {
-            let varlena = pg_sys::pg_detoast_datum_packed(datum.ptr_cast());
+            let varlena = pg_sys::pg_detoast_datum_packed(datum.cast_mut_ptr());
             Some(varlena_to_byte_slice(varlena))
         }
     }
@@ -329,7 +329,7 @@ impl<'a> FromDatum for &'a [u8] {
         } else {
             memory_context.switch_to(|_| {
                 // this gets the varlena Datum copied into this memory context
-                let detoasted = pg_sys::pg_detoast_datum_copy(datum.ptr_cast());
+                let detoasted = pg_sys::pg_detoast_datum_copy(datum.cast_mut_ptr());
 
                 // and we need to unpack it (if necessary), which will decompress it too
                 let varlena = pg_sys::pg_detoast_datum_packed(detoasted);
@@ -375,7 +375,7 @@ impl<T> FromDatum for PgBox<T, AllocatedByPostgres> {
         if is_null || datum.is_null() {
             None
         } else {
-            Some(PgBox::<T>::from_pg(datum.ptr_cast()))
+            Some(PgBox::<T>::from_pg(datum.cast_mut_ptr()))
         }
     }
 
@@ -392,7 +392,7 @@ impl<T> FromDatum for PgBox<T, AllocatedByPostgres> {
             if is_null || datum.is_null() {
                 None
             } else {
-                let copied = context.copy_ptr_into(datum.ptr_cast(), std::mem::size_of::<T>());
+                let copied = context.copy_ptr_into(datum.cast_mut_ptr(), std::mem::size_of::<T>());
                 Some(PgBox::<T>::from_pg(copied))
             }
         })

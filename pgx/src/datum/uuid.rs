@@ -46,7 +46,8 @@ impl FromDatum for Uuid {
         if is_null {
             None
         } else {
-            let bytes = std::slice::from_raw_parts(datum.to_void() as *const u8, UUID_BYTES_LEN);
+            let bytes =
+                std::slice::from_raw_parts(datum.cast_mut_ptr::<u8>() as *const u8, UUID_BYTES_LEN);
             if let Ok(uuid) = Uuid::from_slice(bytes) {
                 Some(uuid)
             } else {

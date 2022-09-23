@@ -21,7 +21,7 @@ impl FromDatum for pg_sys::ItemPointerData {
         if is_null {
             None
         } else {
-            let tid = datum.ptr_cast();
+            let tid = datum.cast_mut_ptr();
             let (blockno, offno) = item_pointer_get_both(*tid);
             let mut tid_copy = pg_sys::ItemPointerData::default();
 

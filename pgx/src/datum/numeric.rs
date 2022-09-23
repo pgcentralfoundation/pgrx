@@ -84,7 +84,7 @@ impl<'de> Deserialize<'de> for Numeric {
                         let datum = Numeric(v.clone()).into_datum().unwrap();
 
                         // and don't leak the NumericData datum Postgres created
-                        pg_sys::pfree(datum.to_void());
+                        pg_sys::pfree(datum.cast_mut_ptr());
 
                         // we have it as a valid String
                         Ok(Numeric(v.clone()))

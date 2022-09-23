@@ -190,7 +190,7 @@ use std::ops::DerefMut;
 #[inline]
 pub fn pg_getarg_pointer<T>(fcinfo: pg_sys::FunctionCallInfo, num: usize) -> Option<*mut T> {
     match pg_getarg_datum(fcinfo, num) {
-        Some(datum) => Some(datum.ptr_cast::<T>()),
+        Some(datum) => Some(datum.cast_mut_ptr::<T>()),
         None => None,
     }
 }
