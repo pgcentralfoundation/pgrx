@@ -71,7 +71,7 @@ impl<'de> Deserialize<'de> for Inet {
                         let datum = Inet(v.clone()).into_datum().unwrap();
 
                         // and don't leak the 'inet' datum Postgres created
-                        pg_sys::pfree(datum.to_void());
+                        pg_sys::pfree(datum.cast_mut_ptr());
 
                         // we have it as a valid String
                         Ok(Inet(v.clone()))
