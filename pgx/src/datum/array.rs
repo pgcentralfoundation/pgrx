@@ -81,12 +81,15 @@ impl<'a, T: FromDatum> Drop for Array<'a, T> {
             ..
         } = self
         {
-            // It's just a slice, dropping it doesn't "do" anything, but out of an abundance of caution:
+            // If Drop has arrived here, it means that this Array is backed by an allocation or two
+            // If so, the first one is guaranteed, and was created by calling pg_sys::deconstruct_array
+            // This is just a slice, dropping it doesn't "do" anything, but out of an abundance of caution:
             mem::drop(elem_slice);
-            // No conflict possible with ditching this.
+            // Now there shouldn't be any other references to that slice, so this can be deallocated:
             unsafe { pg_sys::pfree(data.as_ptr().cast()) };
 
-            // Now we check for detoasting clones
+            // Detoasting the varlena may have allocated: the toasted varlena cloned as a detoasted ArrayType
+            // Checking for pointer equivalence is the only way we can truly tell
             let raw = raw.take().map(|r| r.into_ptr());
             let ptr = ptr.take();
             match (ptr, raw) {
@@ -195,8 +198,10 @@ impl<'a, T: FromDatum> Array<'a, T> {
             .map(|nonnull| NullKind::Bits(unsafe { &*nonnull.as_ptr() }))
             .unwrap_or(NullKind::Strict(nelems));
 
-        // Assert correctness of our nullness checks and cleanup.
-        // SAFETY: Should be correctly constructed for slice validity.
+        // The array was just deconstructed, which allocates twice: effectively [Datum] and [bool].
+        // But pgx doesn't actually need [bool] if NullKind's handling of BitSlices is correct.
+        // So, assert correctness of the NullKind implementation and cleanup.
+        // SAFETY: The pointer we got should be correctly constructed for slice validity.
         let pallocd_null_slice = unsafe { slice::from_raw_parts(nulls, nelems) };
         for i in 0..nelems {
             assert_eq!(null_slice.get(i).unwrap(), pallocd_null_slice[i]);
