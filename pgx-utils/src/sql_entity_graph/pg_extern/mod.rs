@@ -404,7 +404,8 @@ impl PgExtern {
                             #arg_fetches
                         )*
 
-                        #func_name(#(#arg_pats),*)
+                        #[allow(unused_unsafe)] // unwrapped fn might be unsafe
+                        unsafe { #func_name(#(#arg_pats),*) }
                     }
             },
             Returning::Type(retval_ty) => {
@@ -443,7 +444,8 @@ impl PgExtern {
                             #arg_fetches
                         )*
 
-                        let #result_ident = #func_name(#(#arg_pats),*);
+                        #[allow(unused_unsafe)] // unwrapped fn might be unsafe
+                        let #result_ident = unsafe { #func_name(#(#arg_pats),*) };
 
                         #retval_transform
                     }

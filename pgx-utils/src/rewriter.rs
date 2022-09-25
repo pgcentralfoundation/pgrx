@@ -78,7 +78,7 @@ impl PgGuardRewriter {
             #vis #sig {
                 #[allow(non_snake_case)]
                 #func
-                pg_sys::guard::guard( || #func_name(#arg_list) )
+                pg_sys::guard::guard( #[allow(unused_unsafe)] || unsafe { #func_name(#arg_list) } )
             }
         }
     }
