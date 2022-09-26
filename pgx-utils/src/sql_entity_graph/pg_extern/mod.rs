@@ -488,7 +488,6 @@ impl PgExtern {
                         let mut funcctx: ::pgx::PgBox<pg_sys::FuncCallContext>;
                         let mut iterator_holder: ::pgx::PgBox<IteratorHolder<#retval_ty_resolved>>;
 
-                        // SAFETY: I know what I'm doing. Scout's honor!
                         unsafe {
                             if ::pgx::srf_is_first_call(#fcinfo_ident) {
                                 funcctx = pgx::srf_first_call_init(#fcinfo_ident);
@@ -590,7 +589,6 @@ impl PgExtern {
                         let mut funcctx: pgx::PgBox<pg_sys::FuncCallContext>;
                         let mut iterator_holder: pgx::PgBox<IteratorHolder<#retval_tys_tuple>>;
 
-                        // SAFETY: I know what I'm doing. Scout's honor!
                         unsafe {
                             if ::pgx::srf_is_first_call(#fcinfo_ident) {
                                 funcctx = ::pgx::srf_first_call_init(#fcinfo_ident);
