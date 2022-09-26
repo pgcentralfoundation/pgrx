@@ -21,44 +21,50 @@ set -ex
 HEAD=$(git rev-parse HEAD)
 VERSION=$1
 
+# ordered in a topological fashion starting from the workspace root Cargo.toml
+# this isn't always necessary, but it's nice to use a mostly-consistent ordering
 CARGO_TOMLS_TO_BUMP=(
     ./Cargo.toml
-    ./pgx/Cargo.toml
+    ./pgx-pg-config/Cargo.toml
     ./pgx-utils/Cargo.toml
-    ./pgx-macros/Cargo.toml
-    ./pgx-tests/Cargo.toml
     ./cargo-pgx/Cargo.toml
+    ./pgx-macros/Cargo.toml
     ./pgx-pg-sys/Cargo.toml
+    ./pgx/Cargo.toml
+    ./pgx-tests/Cargo.toml
 )
 
 CARGO_TOMLS_TO_SED=(
+    ./Cargo.toml
+    ./pgx-pg-config/Cargo.toml
+    ./pgx-utils/Cargo.toml
+    ./cargo-pgx/Cargo.toml
+    ./pgx-macros/Cargo.toml
+    ./pgx-pg-sys/Cargo.toml
+    ./pgx/Cargo.toml
+    ./pgx-tests/Cargo.toml
+    ./pgx-examples/*/Cargo.toml
     ./cargo-pgx/src/templates/cargo_toml
     ./nix/templates/default/Cargo.toml
-    ./pgx/Cargo.toml
-    ./pgx-utils/Cargo.toml
-    ./pgx-macros/Cargo.toml
-    ./pgx-tests/Cargo.toml
-    ./cargo-pgx/Cargo.toml
-    ./pgx-pg-sys/Cargo.toml
-    ./pgx-examples/*/Cargo.toml
-    ./Cargo.toml
 )
 
 DEPENDENCIES_TO_UPDATE=(
-    "pgx"
-    "pgx-tests"
-    "pgx-macros"
     "pgx-pg-config"
-    "pgx-pgx-sys"
     "pgx-utils"
     "cargo-pgx"
+    "pgx-macros"
+    "pgx-pgx-sys"
+    "pgx"
+    "pgx-tests"
 )
 
 SEMVER_REGEX="(?P<major>0|[1-9]\d*)\.(?P<minor>0|[1-9]\d*)\.(?P<patch>0|[1-9]\d*)(?:-(?P<prerelease>(?:0|[1-9]\d*|\d*[a-zA-Z-][0-9a-zA-Z-]*)(?:\.(?:0|[1-9]\d*|\d*[a-zA-Z-][0-9a-zA-Z-]*))*))?(?:\+(?P<buildmetadata>[0-9a-zA-Z-]+(?:\.[0-9a-zA-Z-]+)*))?"
 
 for cargo_toml in ${CARGO_TOMLS_TO_SED[@]}; do
     for dependency in ${DEPENDENCIES_TO_UPDATE[@]}; do
-        rg --passthru -N "(?P<prefix>^${dependency}.*\")(?P<pin>=?)${SEMVER_REGEX}(?P<postfix>\".*$)" -r "\${prefix}=${VERSION}\${postfix}" ${cargo_toml} > ${cargo_toml}.tmp || true
+        rg --passthru --no-line-number \
+        --multiline --multiline-dotall \
+        "(?P<prefix>^${dependency}.*\")(?P<pin>=?)${SEMVER_REGEX}(?P<postfix>\".*$)" -r "\${prefix}=${VERSION}\${postfix}" ${cargo_toml} > ${cargo_toml}.tmp || true
         mv ${cargo_toml}.tmp ${cargo_toml}
     done
 done
