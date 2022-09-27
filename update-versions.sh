@@ -20,12 +20,12 @@ fi
 set -ex
 
 if ! which rg &> /dev/null; then
-    echo "Command `rg` (ripgrep) was not found. Please install it and try again."
+    echo "Command \`rg\` (ripgrep) was not found. Please install it and try again."
     exit 1
 fi
 
 if ! cargo set-version --help &> /dev/null; then
-    echo "Cargo extension `cargo-edit` is not installed. Please install it by running: cargo install cargo-edit"
+    echo "Cargo extension \`cargo-edit\` is not installed. Please install it by running: cargo install cargo-edit"
     exit 1
 fi
 
@@ -41,17 +41,15 @@ function update_main_files() {
     # EXCLUDE_PACKAGES+=('foo' 'bar' 'baz')
 
     # Ignore all packages in pgx-examples/
-    for file in $(find pgx-examples/ -type f -name "Cargo.toml"); do
-        EXCLUDE_PACKAGES+=($(cat $file | rg --multiline '\[package\](.*\n)(?:[^\[]*\n)*name\s?=\s?"(?P<name>[-_a-z]*)"(.*\n)*' -r "\${name}"))
+    for file in ./pgx-examples/**/Cargo.toml; do
+        EXCLUDE_PACKAGES+=("$(rg --multiline '\[package\](.*\n)(?:[^\[]*\n)*name\s?=\s?"(?P<name>[-_a-z]*)"(.*\n)*' -r "\${name}" "$file")")
     done
 
     echo "Excluding the following packages:"
-    for p in "${EXCLUDE_PACKAGES[@]}"; do
-        echo " * $p"
-    done
-    echo ""
+    echo "${EXCLUDE_PACKAGES[@]}"
 
-    cargo set-version $(echo "${EXCLUDE_PACKAGES[@]/#/--exclude }") --workspace $version
+    # shellcheck disable=2068 # allow the shell to split --exclude from each EXCLUDE_PACKAGES value
+    cargo set-version ${EXCLUDE_PACKAGES[@]/#/--exclude } --workspace "$version"
 }
 
 # This is a legacy holdover for updating extra toml files throughout various crates
