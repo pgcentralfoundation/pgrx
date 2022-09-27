@@ -320,16 +320,16 @@ pub const MAXIMUM_ALIGNOF: u32 = 8;
 pub const MEMSET_LOOP_LIMIT: u32 = 1024;
 pub const PACKAGE_BUGREPORT: &[u8; 26usize] = b"pgsql-bugs@postgresql.org\0";
 pub const PACKAGE_NAME: &[u8; 11usize] = b"PostgreSQL\0";
-pub const PACKAGE_STRING: &[u8; 17usize] = b"PostgreSQL 11.16\0";
+pub const PACKAGE_STRING: &[u8; 17usize] = b"PostgreSQL 11.17\0";
 pub const PACKAGE_TARNAME: &[u8; 11usize] = b"postgresql\0";
 pub const PACKAGE_URL: &[u8; 1usize] = b"\0";
-pub const PACKAGE_VERSION: &[u8; 6usize] = b"11.16\0";
+pub const PACKAGE_VERSION: &[u8; 6usize] = b"11.17\0";
 pub const PG_KRB_SRVNAM: &[u8; 9usize] = b"postgres\0";
 pub const PG_MAJORVERSION: &[u8; 3usize] = b"11\0";
-pub const PG_VERSION: &[u8; 6usize] = b"11.16\0";
-pub const PG_VERSION_NUM: u32 = 110016;
+pub const PG_VERSION: &[u8; 6usize] = b"11.17\0";
+pub const PG_VERSION_NUM: u32 = 110017;
 pub const PG_VERSION_STR: &[u8; 78usize] =
-    b"PostgreSQL 11.16 on x86_64-pc-linux-gnu, compiled by gcc (GCC) 12.1.0, 64-bit\0";
+    b"PostgreSQL 11.17 on x86_64-pc-linux-gnu, compiled by gcc (GCC) 12.2.0, 64-bit\0";
 pub const RELSEG_SIZE: u32 = 131072;
 pub const SIZEOF_BOOL: u32 = 1;
 pub const SIZEOF_LONG: u32 = 8;
@@ -399,7 +399,7 @@ pub const __STDC_IEC_60559_COMPLEX__: u32 = 201404;
 pub const __STDC_ISO_10646__: u32 = 201706;
 pub const __GNU_LIBRARY__: u32 = 6;
 pub const __GLIBC__: u32 = 2;
-pub const __GLIBC_MINOR__: u32 = 35;
+pub const __GLIBC_MINOR__: u32 = 36;
 pub const _SYS_CDEFS_H: u32 = 1;
 pub const __glibc_c99_flexarr_available: u32 = 1;
 pub const __LDOUBLE_REDIRECTS_TO_FLOAT128_ABI: u32 = 0;
@@ -901,6 +901,7 @@ pub const SOL_TLS: u32 = 282;
 pub const SOL_XDP: u32 = 283;
 pub const SOL_MPTCP: u32 = 284;
 pub const SOL_MCTP: u32 = 285;
+pub const SOL_SMC: u32 = 286;
 pub const SOMAXCONN: u32 = 4096;
 pub const _BITS_SOCKADDR_H: u32 = 1;
 pub const _SS_SIZE: u32 = 128;
@@ -990,6 +991,7 @@ pub const SO_BUSY_POLL_BUDGET: u32 = 70;
 pub const SO_NETNS_COOKIE: u32 = 71;
 pub const SO_BUF_LOCK: u32 = 72;
 pub const SO_RESERVE_MEM: u32 = 73;
+pub const SO_TXREHASH: u32 = 74;
 pub const SO_TIMESTAMP: u32 = 29;
 pub const SO_TIMESTAMPNS: u32 = 35;
 pub const SO_TIMESTAMPING: u32 = 37;
@@ -1183,7 +1185,7 @@ pub const NI_DGRAM: u32 = 16;
 pub const _PWD_H: u32 = 1;
 pub const NSS_BUFLEN_PASSWD: u32 = 1024;
 pub const PGINVALID_SOCKET: i32 = -1;
-pub const PG_BACKEND_VERSIONSTR: &[u8; 29usize] = b"postgres (PostgreSQL) 11.16\n\0";
+pub const PG_BACKEND_VERSIONSTR: &[u8; 29usize] = b"postgres (PostgreSQL) 11.17\n\0";
 pub const EXE: &[u8; 1usize] = b"\0";
 pub const DEVNULL: &[u8; 10usize] = b"/dev/null\0";
 pub const PG_IOLBF: u32 = 1;
@@ -2192,6 +2194,7 @@ pub const XACT_SERIALIZABLE: u32 = 3;
 pub const XACT_FLAGS_ACCESSEDTEMPREL: u32 = 1;
 pub const XACT_FLAGS_ACQUIREDACCESSEXCLUSIVELOCK: u32 = 2;
 pub const XACT_FLAGS_ACCESSEDTEMPNAMESPACE: u32 = 4;
+pub const XACT_FLAGS_NEEDIMMEDIATECOMMIT: u32 = 8;
 pub const XLOG_XACT_COMMIT: u32 = 0;
 pub const XLOG_XACT_PREPARE: u32 = 16;
 pub const XLOG_XACT_ABORT: u32 = 32;
@@ -3056,6 +3059,24 @@ pub const TYPECACHE_DOMAIN_BASE_INFO: u32 = 4096;
 pub const TYPECACHE_DOMAIN_CONSTR_INFO: u32 = 8192;
 pub const TYPECACHE_HASH_EXTENDED_PROC: u32 = 16384;
 pub const TYPECACHE_HASH_EXTENDED_PROC_FINFO: u32 = 32768;
+pub const RANGE_EMPTY: u32 = 1;
+pub const RANGE_LB_INC: u32 = 2;
+pub const RANGE_UB_INC: u32 = 4;
+pub const RANGE_LB_INF: u32 = 8;
+pub const RANGE_UB_INF: u32 = 16;
+pub const RANGE_LB_NULL: u32 = 32;
+pub const RANGE_UB_NULL: u32 = 64;
+pub const RANGE_CONTAIN_EMPTY: u32 = 128;
+pub const RANGESTRAT_BEFORE: u32 = 1;
+pub const RANGESTRAT_OVERLEFT: u32 = 2;
+pub const RANGESTRAT_OVERLAPS: u32 = 3;
+pub const RANGESTRAT_OVERRIGHT: u32 = 4;
+pub const RANGESTRAT_AFTER: u32 = 5;
+pub const RANGESTRAT_ADJACENT: u32 = 6;
+pub const RANGESTRAT_CONTAINS: u32 = 7;
+pub const RANGESTRAT_CONTAINED_BY: u32 = 8;
+pub const RANGESTRAT_CONTAINS_ELEM: u32 = 16;
+pub const RANGESTRAT_EQ: u32 = 18;
 pub type Oid = ::std::os::raw::c_uint;
 pub type pg_int64 = ::std::os::raw::c_long;
 pub type va_list = __builtin_va_list;
@@ -5285,6 +5306,30 @@ pub unsafe fn lcong48_r(
             ) -> ::std::os::raw::c_int;
         }
         lcong48_r(arg___param, arg___buffer)
+    })
+}
+pub unsafe fn arc4random() -> __uint32_t {
+    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
+        extern "C" {
+            fn arc4random() -> __uint32_t;
+        }
+        arc4random()
+    })
+}
+pub unsafe fn arc4random_buf(arg___buf: *mut ::std::os::raw::c_void, arg___size: usize) {
+    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
+        extern "C" {
+            fn arc4random_buf(arg___buf: *mut ::std::os::raw::c_void, arg___size: usize);
+        }
+        arc4random_buf(arg___buf, arg___size)
+    })
+}
+pub unsafe fn arc4random_uniform(arg___upper_bound: __uint32_t) -> __uint32_t {
+    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
+        extern "C" {
+            fn arc4random_uniform(arg___upper_bound: __uint32_t) -> __uint32_t;
+        }
+        arc4random_uniform(arg___upper_bound)
     })
 }
 pub unsafe fn malloc(arg___size: ::std::os::raw::c_ulong) -> *mut ::std::os::raw::c_void {
@@ -24656,6 +24701,14 @@ pub struct __dirstream {
     _unused: [u8; 0],
 }
 pub type DIR = __dirstream;
+pub unsafe fn closedir(arg___dirp: *mut DIR) -> ::std::os::raw::c_int {
+    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
+        extern "C" {
+            fn closedir(arg___dirp: *mut DIR) -> ::std::os::raw::c_int;
+        }
+        closedir(arg___dirp)
+    })
+}
 pub unsafe fn opendir(arg___name: *const ::std::os::raw::c_char) -> *mut DIR {
     crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
         extern "C" {
@@ -24670,14 +24723,6 @@ pub unsafe fn fdopendir(arg___fd: ::std::os::raw::c_int) -> *mut DIR {
             fn fdopendir(arg___fd: ::std::os::raw::c_int) -> *mut DIR;
         }
         fdopendir(arg___fd)
-    })
-}
-pub unsafe fn closedir(arg___dirp: *mut DIR) -> ::std::os::raw::c_int {
-    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
-        extern "C" {
-            fn closedir(arg___dirp: *mut DIR) -> ::std::os::raw::c_int;
-        }
-        closedir(arg___dirp)
     })
 }
 pub unsafe fn readdir(arg___dirp: *mut DIR) -> *mut dirent {
@@ -30395,6 +30440,7 @@ pub struct AlterTableCmd {
     pub def: *mut Node,
     pub behavior: DropBehavior,
     pub missing_ok: bool,
+    pub recurse: bool,
 }
 impl Default for AlterTableCmd {
     fn default() -> Self {
@@ -39594,6 +39640,22 @@ pub unsafe fn LWLockHeldByMe(arg_lock: *mut LWLock) -> bool {
             fn LWLockHeldByMe(arg_lock: *mut LWLock) -> bool;
         }
         LWLockHeldByMe(arg_lock)
+    })
+}
+pub unsafe fn LWLockAnyHeldByMe(
+    arg_lock: *mut LWLock,
+    arg_nlocks: ::std::os::raw::c_int,
+    arg_stride: usize,
+) -> bool {
+    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
+        extern "C" {
+            fn LWLockAnyHeldByMe(
+                arg_lock: *mut LWLock,
+                arg_nlocks: ::std::os::raw::c_int,
+                arg_stride: usize,
+            ) -> bool;
+        }
+        LWLockAnyHeldByMe(arg_lock, arg_nlocks, arg_stride)
     })
 }
 pub unsafe fn LWLockHeldByMeInMode(arg_lock: *mut LWLock, arg_mode: LWLockMode) -> bool {
@@ -49708,6 +49770,14 @@ pub unsafe fn recordDependencyOnCurrentExtension(
         recordDependencyOnCurrentExtension(arg_object, arg_isReplace)
     })
 }
+pub unsafe fn checkMembershipInCurrentExtension(arg_object: *const ObjectAddress) {
+    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
+        extern "C" {
+            fn checkMembershipInCurrentExtension(arg_object: *const ObjectAddress);
+        }
+        checkMembershipInCurrentExtension(arg_object)
+    })
+}
 pub unsafe fn deleteDependencyRecordsFor(
     arg_classId: Oid,
     arg_objectId: Oid,
@@ -54499,6 +54569,35 @@ pub unsafe fn renametrig(arg_stmt: *mut RenameStmt) -> ObjectAddress {
             fn renametrig(arg_stmt: *mut RenameStmt) -> ObjectAddress;
         }
         renametrig(arg_stmt)
+    })
+}
+pub unsafe fn EnableDisableTriggerNew(
+    arg_rel: Relation,
+    arg_tgname: *const ::std::os::raw::c_char,
+    arg_fires_when: ::std::os::raw::c_char,
+    arg_skip_system: bool,
+    arg_recurse: bool,
+    arg_lockmode: LOCKMODE,
+) {
+    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
+        extern "C" {
+            fn EnableDisableTriggerNew(
+                arg_rel: Relation,
+                arg_tgname: *const ::std::os::raw::c_char,
+                arg_fires_when: ::std::os::raw::c_char,
+                arg_skip_system: bool,
+                arg_recurse: bool,
+                arg_lockmode: LOCKMODE,
+            );
+        }
+        EnableDisableTriggerNew(
+            arg_rel,
+            arg_tgname,
+            arg_fires_when,
+            arg_skip_system,
+            arg_recurse,
+            arg_lockmode,
+        )
     })
 }
 pub unsafe fn EnableDisableTrigger(
@@ -96181,6 +96280,346 @@ pub unsafe fn SharedRecordTypmodRegistryAttach(arg_arg1: *mut SharedRecordTypmod
             fn SharedRecordTypmodRegistryAttach(arg_arg1: *mut SharedRecordTypmodRegistry);
         }
         SharedRecordTypmodRegistryAttach(arg_arg1)
+    })
+}
+#[repr(C)]
+#[derive(Debug, Default, Copy, Clone)]
+pub struct RangeType {
+    pub vl_len_: int32,
+    pub rangetypid: Oid,
+}
+#[repr(C)]
+pub struct RangeBound {
+    pub val: Datum,
+    pub infinite: bool,
+    pub inclusive: bool,
+    pub lower: bool,
+}
+impl Default for RangeBound {
+    fn default() -> Self {
+        let mut s = ::std::mem::MaybeUninit::<Self>::uninit();
+        unsafe {
+            ::std::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
+            s.assume_init()
+        }
+    }
+}
+pub unsafe fn range_contains_elem_internal(
+    arg_typcache: *mut TypeCacheEntry,
+    arg_r: *mut RangeType,
+    arg_val: Datum,
+) -> bool {
+    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
+        extern "C" {
+            fn range_contains_elem_internal(
+                arg_typcache: *mut TypeCacheEntry,
+                arg_r: *mut RangeType,
+                arg_val: Datum,
+            ) -> bool;
+        }
+        range_contains_elem_internal(arg_typcache, arg_r, arg_val)
+    })
+}
+pub unsafe fn range_eq_internal(
+    arg_typcache: *mut TypeCacheEntry,
+    arg_r1: *mut RangeType,
+    arg_r2: *mut RangeType,
+) -> bool {
+    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
+        extern "C" {
+            fn range_eq_internal(
+                arg_typcache: *mut TypeCacheEntry,
+                arg_r1: *mut RangeType,
+                arg_r2: *mut RangeType,
+            ) -> bool;
+        }
+        range_eq_internal(arg_typcache, arg_r1, arg_r2)
+    })
+}
+pub unsafe fn range_ne_internal(
+    arg_typcache: *mut TypeCacheEntry,
+    arg_r1: *mut RangeType,
+    arg_r2: *mut RangeType,
+) -> bool {
+    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
+        extern "C" {
+            fn range_ne_internal(
+                arg_typcache: *mut TypeCacheEntry,
+                arg_r1: *mut RangeType,
+                arg_r2: *mut RangeType,
+            ) -> bool;
+        }
+        range_ne_internal(arg_typcache, arg_r1, arg_r2)
+    })
+}
+pub unsafe fn range_contains_internal(
+    arg_typcache: *mut TypeCacheEntry,
+    arg_r1: *mut RangeType,
+    arg_r2: *mut RangeType,
+) -> bool {
+    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
+        extern "C" {
+            fn range_contains_internal(
+                arg_typcache: *mut TypeCacheEntry,
+                arg_r1: *mut RangeType,
+                arg_r2: *mut RangeType,
+            ) -> bool;
+        }
+        range_contains_internal(arg_typcache, arg_r1, arg_r2)
+    })
+}
+pub unsafe fn range_contained_by_internal(
+    arg_typcache: *mut TypeCacheEntry,
+    arg_r1: *mut RangeType,
+    arg_r2: *mut RangeType,
+) -> bool {
+    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
+        extern "C" {
+            fn range_contained_by_internal(
+                arg_typcache: *mut TypeCacheEntry,
+                arg_r1: *mut RangeType,
+                arg_r2: *mut RangeType,
+            ) -> bool;
+        }
+        range_contained_by_internal(arg_typcache, arg_r1, arg_r2)
+    })
+}
+pub unsafe fn range_before_internal(
+    arg_typcache: *mut TypeCacheEntry,
+    arg_r1: *mut RangeType,
+    arg_r2: *mut RangeType,
+) -> bool {
+    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
+        extern "C" {
+            fn range_before_internal(
+                arg_typcache: *mut TypeCacheEntry,
+                arg_r1: *mut RangeType,
+                arg_r2: *mut RangeType,
+            ) -> bool;
+        }
+        range_before_internal(arg_typcache, arg_r1, arg_r2)
+    })
+}
+pub unsafe fn range_after_internal(
+    arg_typcache: *mut TypeCacheEntry,
+    arg_r1: *mut RangeType,
+    arg_r2: *mut RangeType,
+) -> bool {
+    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
+        extern "C" {
+            fn range_after_internal(
+                arg_typcache: *mut TypeCacheEntry,
+                arg_r1: *mut RangeType,
+                arg_r2: *mut RangeType,
+            ) -> bool;
+        }
+        range_after_internal(arg_typcache, arg_r1, arg_r2)
+    })
+}
+pub unsafe fn range_adjacent_internal(
+    arg_typcache: *mut TypeCacheEntry,
+    arg_r1: *mut RangeType,
+    arg_r2: *mut RangeType,
+) -> bool {
+    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
+        extern "C" {
+            fn range_adjacent_internal(
+                arg_typcache: *mut TypeCacheEntry,
+                arg_r1: *mut RangeType,
+                arg_r2: *mut RangeType,
+            ) -> bool;
+        }
+        range_adjacent_internal(arg_typcache, arg_r1, arg_r2)
+    })
+}
+pub unsafe fn range_overlaps_internal(
+    arg_typcache: *mut TypeCacheEntry,
+    arg_r1: *mut RangeType,
+    arg_r2: *mut RangeType,
+) -> bool {
+    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
+        extern "C" {
+            fn range_overlaps_internal(
+                arg_typcache: *mut TypeCacheEntry,
+                arg_r1: *mut RangeType,
+                arg_r2: *mut RangeType,
+            ) -> bool;
+        }
+        range_overlaps_internal(arg_typcache, arg_r1, arg_r2)
+    })
+}
+pub unsafe fn range_overleft_internal(
+    arg_typcache: *mut TypeCacheEntry,
+    arg_r1: *mut RangeType,
+    arg_r2: *mut RangeType,
+) -> bool {
+    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
+        extern "C" {
+            fn range_overleft_internal(
+                arg_typcache: *mut TypeCacheEntry,
+                arg_r1: *mut RangeType,
+                arg_r2: *mut RangeType,
+            ) -> bool;
+        }
+        range_overleft_internal(arg_typcache, arg_r1, arg_r2)
+    })
+}
+pub unsafe fn range_overright_internal(
+    arg_typcache: *mut TypeCacheEntry,
+    arg_r1: *mut RangeType,
+    arg_r2: *mut RangeType,
+) -> bool {
+    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
+        extern "C" {
+            fn range_overright_internal(
+                arg_typcache: *mut TypeCacheEntry,
+                arg_r1: *mut RangeType,
+                arg_r2: *mut RangeType,
+            ) -> bool;
+        }
+        range_overright_internal(arg_typcache, arg_r1, arg_r2)
+    })
+}
+pub unsafe fn range_get_typcache(
+    arg_fcinfo: FunctionCallInfo,
+    arg_rngtypid: Oid,
+) -> *mut TypeCacheEntry {
+    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
+        extern "C" {
+            fn range_get_typcache(
+                arg_fcinfo: FunctionCallInfo,
+                arg_rngtypid: Oid,
+            ) -> *mut TypeCacheEntry;
+        }
+        range_get_typcache(arg_fcinfo, arg_rngtypid)
+    })
+}
+pub unsafe fn range_serialize(
+    arg_typcache: *mut TypeCacheEntry,
+    arg_lower: *mut RangeBound,
+    arg_upper: *mut RangeBound,
+    arg_empty: bool,
+) -> *mut RangeType {
+    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
+        extern "C" {
+            fn range_serialize(
+                arg_typcache: *mut TypeCacheEntry,
+                arg_lower: *mut RangeBound,
+                arg_upper: *mut RangeBound,
+                arg_empty: bool,
+            ) -> *mut RangeType;
+        }
+        range_serialize(arg_typcache, arg_lower, arg_upper, arg_empty)
+    })
+}
+pub unsafe fn range_deserialize(
+    arg_typcache: *mut TypeCacheEntry,
+    arg_range: *mut RangeType,
+    arg_lower: *mut RangeBound,
+    arg_upper: *mut RangeBound,
+    arg_empty: *mut bool,
+) {
+    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
+        extern "C" {
+            fn range_deserialize(
+                arg_typcache: *mut TypeCacheEntry,
+                arg_range: *mut RangeType,
+                arg_lower: *mut RangeBound,
+                arg_upper: *mut RangeBound,
+                arg_empty: *mut bool,
+            );
+        }
+        range_deserialize(arg_typcache, arg_range, arg_lower, arg_upper, arg_empty)
+    })
+}
+pub unsafe fn range_get_flags(arg_range: *mut RangeType) -> ::std::os::raw::c_char {
+    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
+        extern "C" {
+            fn range_get_flags(arg_range: *mut RangeType) -> ::std::os::raw::c_char;
+        }
+        range_get_flags(arg_range)
+    })
+}
+pub unsafe fn range_set_contain_empty(arg_range: *mut RangeType) {
+    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
+        extern "C" {
+            fn range_set_contain_empty(arg_range: *mut RangeType);
+        }
+        range_set_contain_empty(arg_range)
+    })
+}
+pub unsafe fn make_range(
+    arg_typcache: *mut TypeCacheEntry,
+    arg_lower: *mut RangeBound,
+    arg_upper: *mut RangeBound,
+    arg_empty: bool,
+) -> *mut RangeType {
+    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
+        extern "C" {
+            fn make_range(
+                arg_typcache: *mut TypeCacheEntry,
+                arg_lower: *mut RangeBound,
+                arg_upper: *mut RangeBound,
+                arg_empty: bool,
+            ) -> *mut RangeType;
+        }
+        make_range(arg_typcache, arg_lower, arg_upper, arg_empty)
+    })
+}
+pub unsafe fn range_cmp_bounds(
+    arg_typcache: *mut TypeCacheEntry,
+    arg_b1: *mut RangeBound,
+    arg_b2: *mut RangeBound,
+) -> ::std::os::raw::c_int {
+    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
+        extern "C" {
+            fn range_cmp_bounds(
+                arg_typcache: *mut TypeCacheEntry,
+                arg_b1: *mut RangeBound,
+                arg_b2: *mut RangeBound,
+            ) -> ::std::os::raw::c_int;
+        }
+        range_cmp_bounds(arg_typcache, arg_b1, arg_b2)
+    })
+}
+pub unsafe fn range_cmp_bound_values(
+    arg_typcache: *mut TypeCacheEntry,
+    arg_b1: *mut RangeBound,
+    arg_b2: *mut RangeBound,
+) -> ::std::os::raw::c_int {
+    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
+        extern "C" {
+            fn range_cmp_bound_values(
+                arg_typcache: *mut TypeCacheEntry,
+                arg_b1: *mut RangeBound,
+                arg_b2: *mut RangeBound,
+            ) -> ::std::os::raw::c_int;
+        }
+        range_cmp_bound_values(arg_typcache, arg_b1, arg_b2)
+    })
+}
+pub unsafe fn bounds_adjacent(
+    arg_typcache: *mut TypeCacheEntry,
+    arg_bound1: RangeBound,
+    arg_bound2: RangeBound,
+) -> bool {
+    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
+        extern "C" {
+            fn bounds_adjacent(
+                arg_typcache: *mut TypeCacheEntry,
+                arg_bound1: RangeBound,
+                arg_bound2: RangeBound,
+            ) -> bool;
+        }
+        bounds_adjacent(arg_typcache, arg_bound1, arg_bound2)
+    })
+}
+pub unsafe fn make_empty_range(arg_typcache: *mut TypeCacheEntry) -> *mut RangeType {
+    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
+        extern "C" {
+            fn make_empty_range(arg_typcache: *mut TypeCacheEntry) -> *mut RangeType;
+        }
+        make_empty_range(arg_typcache)
     })
 }
 pub type __builtin_va_list = [__va_list_tag; 1usize];
