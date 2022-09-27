@@ -12,8 +12,8 @@
 # * ripgrep
 # * Cargo extension 'cargo-edit'
 
-if [ "x$1" == "x" ]; then
-    echo "usage:  ./update-verions.sh <VERSION>"
+if [ "$1" == "" ]; then
+    echo "usage:  ./update-versions.sh <VERSION>"
     exit 1
 fi
 
@@ -82,7 +82,7 @@ function update_extras() {
         for dependency in ${DEPENDENCIES_TO_UPDATE[@]}; do
             rg --passthru --no-line-number \
             "(?P<prefix>^${dependency}.*\")(?P<pin>=?)${SEMVER_REGEX}(?P<postfix>\".*$)" \
-            -r "\${prefix}=${VERSION}\${postfix}" \
+            -r "\${prefix}=${version}\${postfix}" \
             ${cargo_toml} > ${cargo_toml}.tmp || true
             mv ${cargo_toml}.tmp ${cargo_toml}
         done
