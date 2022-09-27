@@ -245,6 +245,21 @@ impl Spi {
     >(
         f: F,
     ) -> Option<R> {
+        Self::connect_ext(false, f)
+    }
+
+    /// execute SPI commands via the provided `SpiClient` and return a value from SPI which is
+    /// automatically copied into the `CurrentMemoryContext` at the time of this function call
+    ///
+    /// Setting `nonatomic` to `true` allows transaction control calls (SPI_commit, SPI_rollback).
+    /// Otherwise, calling those functions will result in an immediate error.
+    pub fn connect_ext<
+        R: FromDatum + IntoDatum,
+        F: FnOnce(SpiClient) -> std::result::Result<Option<R>, SpiError>,
+    >(
+        nonatomic: bool,
+        f: F,
+    ) -> Option<R> {
         let outer_memory_context =
             PgMemoryContexts::For(PgMemoryContexts::CurrentMemoryContext.value());
 
@@ -252,9 +267,9 @@ impl Spi {
         struct SpiConnection;
         impl SpiConnection {
             /// Connect to Postgres' SPI system
-            fn connect() -> Self {
+            fn connect_ext(flags: u32) -> Self {
                 // connect to SPI
-                Spi::check_status(unsafe { pg_sys::SPI_connect() });
+                Spi::check_status(unsafe { pg_sys::SPI_connect_ext(flags as _) });
                 SpiConnection
             }
         }
@@ -268,7 +283,12 @@ impl Spi {
         }
 
         // connect to SPI
-        let _connection = SpiConnection::connect();
+        let flags = if nonatomic {
+            pg_sys::SPI_OPT_NONATOMIC
+        } else {
+            0
+        };
+        let _connection = SpiConnection::connect_ext(flags);
 
         // run the provided closure within the memory context that SPI_connect()
         // just put us un.  We'll disconnect from SPI when the closure is finished.
@@ -411,6 +431,40 @@ impl SpiClient {
             },
             current: -1,
         }
+    }
+
+    /// Commits the current transaction. It is approximately equivalent to running the SQL command COMMIT.
+    /// After the transaction is committed, a new transaction is automatically started using default transaction
+    /// characteristics, so that the caller can continue using SPI facilities. If there is a failure during commit,
+    /// the current transaction is instead rolled back and a new transaction is started, after which the error is
+    /// thrown in the usual way.
+    ///
+    /// Can only be executed if the SPI connection has been set as `nonatomic` in the call to `Spi::connect`.
+    pub fn commit(&self) {
+        unsafe { pg_sys::SPI_commit() }
+    }
+
+    /// Commits the current transaction same as `commit`, but the new transaction is started with the same transaction
+    /// characteristics as the just finished one, like with the SQL command COMMIT AND CHAIN.
+    ///
+    /// Can only be executed if the SPI connection has been set as `nonatomic` in the call to `Spi::connect`.
+    pub fn commit_and_chain(&self) {
+        unsafe { pg_sys::SPI_commit_and_chain() }
+    }
+
+    /// Rolls back the current transaction. It is approximately equivalent to running the SQL command ROLLBACK.
+    /// After the transaction is rolled back, a new transaction is automatically started using default transaction
+    /// characteristics, so that the caller can continue using SPI facilities.
+    ///
+    /// Can only be executed if the SPI connection has been set as `nonatomic` in the call to `Spi::connect`.
+    pub fn rollback(&self) {
+        unsafe { pg_sys::SPI_rollback() }
+    }
+
+    /// Rolls back the current transaction same as `rollback`, but the new transaction is started with the same
+    /// transaction characteristics as the just finished one, like with the SQL command ROLLBACK AND CHAIN.
+    pub fn rollback_and_chain(self: Self) {
+        unsafe { pg_sys::SPI_rollback_and_chain() }
     }
 }
 
