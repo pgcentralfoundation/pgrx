@@ -29,7 +29,6 @@ if ! cargo set-version --help &> /dev/null; then
     exit 1
 fi
 
-HEAD=$(git rev-parse HEAD)
 VERSION=$1
 
 # Use `cargo set-version` to update all main project files
@@ -61,13 +60,8 @@ function update_extras() {
 
     # ordered in a topological fashion starting from the workspace root Cargo.toml
     # this isn't always necessary, but it's nice to use a mostly-consistent ordering
-    CARGO_TOMLS_TO_BUMP=(
-        ./Cargo.toml
-    )
-
     CARGO_TOMLS_TO_SED=(
         ./Cargo.toml
-        ./pgx-examples/*/Cargo.toml
         ./cargo-pgx/src/templates/cargo_toml
         ./nix/templates/default/Cargo.toml
     )
@@ -94,10 +88,6 @@ function update_extras() {
         done
     done
 
-    for cargo_toml in ${CARGO_TOMLS_TO_BUMP[@]}; do
-        rg --passthru --no-line-number "(?P<prefix>^version = \")${SEMVER_REGEX}(?P<postfix>\"$)" -r "\${prefix}${VERSION}\${postfix}" ${cargo_toml} > ${cargo_toml}.tmp || true
-        mv ${cargo_toml}.tmp ${cargo_toml}
-    done
 }
 
 update_main_files $VERSION
