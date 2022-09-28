@@ -438,6 +438,7 @@ impl ToSql for PgExternEntity {
             } else {
                 let mut retval = extern_attrs
                     .iter()
+                    .filter(|attr| **attr != ExternArgs::CreateOrReplace)
                     .map(|attr| format!("{}", attr).to_uppercase())
                     .collect::<Vec<_>>()
                     .join(" ");
