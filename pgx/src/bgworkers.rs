@@ -256,10 +256,11 @@ impl BackgroundWorkerHandle {
 
     /// Causes the postmaster to send SIGTERM to the worker if it is running,
     /// and to unregister it as soon as it is not.
-    pub fn terminate(self) {
+    pub fn terminate(self) -> TerminatingBackgroundWorkerHandle {
         unsafe {
             pg_sys::TerminateBackgroundWorker(self.0);
         }
+        TerminatingBackgroundWorkerHandle(self.0)
     }
 
     /// Block until the postmaster has attempted to start the background worker,
@@ -277,6 +278,18 @@ impl BackgroundWorkerHandle {
         }
     }
 
+    /// Block until the background worker exits, or postmaster dies. When the background worker exits, the return value is unit,
+    /// if postmaster dies it will return error with `BackgroundWorkerStatus::PostmasterDied` status
+    ///
+    /// Requires `BackgroundWorkerBuilder.bgw_notify_pid` to be set to `pg_sys::MyProcPid`
+    pub fn wait_for_shutdown(self) -> Result<(), BackgroundWorkerStatus> {
+        TerminatingBackgroundWorkerHandle(self.0).wait_for_shutdown()
+    }
+}
+
+pub struct TerminatingBackgroundWorkerHandle(*mut pg_sys::BackgroundWorkerHandle);
+
+impl TerminatingBackgroundWorkerHandle {
     /// Block until the background worker exits, or postmaster dies. When the background worker exits, the return value is unit,
     /// if postmaster dies it will return error with `BackgroundWorkerStatus::PostmasterDied` status
     ///
