@@ -332,12 +332,18 @@ where
     }
 }
 
+pub trait IntoDatumFilter {
+    fn filter_for_datum(self) -> Self where Self: Sized {
+        self
+    }
+}
+
 impl<T> IntoDatum for T
 where
-    T: PostgresType + Serialize,
+    T: PostgresType + Serialize + IntoDatumFilter,
 {
     fn into_datum(self) -> Option<pg_sys::Datum> {
-        Some(cbor_encode(&self) as pg_sys::Datum)
+        Some(cbor_encode(&self.filter_for_datum()) as pg_sys::Datum)
     }
 
     fn type_oid() -> u32 {

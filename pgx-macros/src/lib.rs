@@ -693,11 +693,13 @@ Optionally accepts the following attributes:
 
 * `inoutfuncs(some_in_fn, some_out_fn)`: Define custom in/out functions for the type.
 * `pgvarlena_inoutfuncs(some_in_fn, some_out_fn)`: Define custom in/out functions for the `PgVarlena` of this type.
+* `filter_datum`: Mark that the type requires filtration before being serialized into a Datum.  You
+  must then `impl IntoDatumFilter for <type>` yourself.
 * `sql`: Same arguments as [`#[pgx(sql = ..)]`](macro@pgx).
 */
 #[proc_macro_derive(
     PostgresType,
-    attributes(inoutfuncs, pgvarlena_inoutfuncs, requires, pgx)
+    attributes(inoutfuncs, pgvarlena_inoutfuncs, filter_datum, requires, pgx)
 )]
 pub fn postgres_type(input: TokenStream) -> TokenStream {
     let ast = parse_macro_input!(input as syn::DeriveInput);
@@ -720,7 +722,7 @@ fn impl_postgres_type(ast: DeriveInput) -> proc_macro2::TokenStream {
         _ => panic!("#[derive(PostgresType)] can only be applied to structs"),
     }
 
-    if args.is_empty() {
+    if !args.contains(&PostgresTypeAttribute::InOutFuncs) && !args.contains(&PostgresTypeAttribute::PgVarlenaInOutFuncs) {
         // assume the user wants us to implement the InOutFuncs
         args.insert(PostgresTypeAttribute::Default);
     }
@@ -734,6 +736,14 @@ fn impl_postgres_type(ast: DeriveInput) -> proc_macro2::TokenStream {
     stream.extend(quote! {
         impl #generics pgx::PostgresType for #name #generics { }
     });
+
+    // provide the blanket datum filter implementation unless the type
+    // needs custom filtration
+    if !args.contains(&PostgresTypeAttribute::FilterDatum) {
+        stream.extend(quote! {
+            impl IntoDatumFilter for #name {}
+        })
+    }
 
     // and if we don't have custom inout/funcs, we use the JsonInOutFuncs trait
     // which implements _in and _out #[pg_extern] functions that just return the type itself
@@ -890,6 +900,7 @@ fn impl_guc_enum(ast: DeriveInput) -> proc_macro2::TokenStream {
 enum PostgresTypeAttribute {
     InOutFuncs,
     PgVarlenaInOutFuncs,
+    FilterDatum,
     Default,
 }
 
@@ -906,6 +917,10 @@ fn parse_postgres_type_args(attributes: &[Attribute]) -> HashSet<PostgresTypeAtt
 
             "pgvarlena_inoutfuncs" => {
                 categorized_attributes.insert(PostgresTypeAttribute::PgVarlenaInOutFuncs);
+            }
+
+            "filter_datum" => {
+                categorized_attributes.insert(PostgresTypeAttribute::FilterDatum);
             }
 
             _ => {
