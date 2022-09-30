@@ -9,7 +9,7 @@ Use of this source code is governed by the MIT license that can be found in the 
 
 extern crate build_deps;
 
-use bindgen::callbacks::MacroParsingBehavior;
+use bindgen::callbacks::{DeriveTrait, ImplementsTrait, MacroParsingBehavior};
 use eyre::{eyre, WrapErr};
 use pgx_pg_config::{prefix_path, PgConfig, PgConfigSelector, Pgx, SUPPORTED_MAJOR_VERSIONS};
 use pgx_utils::rewriter::PgGuardRewriter;
@@ -23,18 +23,18 @@ use std::{
 use syn::{ForeignItem, Item};
 
 #[derive(Debug)]
-struct IgnoredMacros(HashSet<String>);
+struct PgxOverrides(HashSet<String>);
 
 #[rustversion::nightly]
 const IS_NIGHTLY: bool = true;
 #[rustversion::not(nightly)]
 const IS_NIGHTLY: bool = false;
 
-impl IgnoredMacros {
+impl PgxOverrides {
     fn default() -> Self {
         // these cause duplicate definition problems on linux
         // see: https://github.com/rust-lang/rust-bindgen/issues/687
-        IgnoredMacros(
+        PgxOverrides(
             vec![
                 "FP_INFINITE".into(),
                 "FP_NAN".into(),
@@ -49,13 +49,30 @@ impl IgnoredMacros {
     }
 }
 
-impl bindgen::callbacks::ParseCallbacks for IgnoredMacros {
+impl bindgen::callbacks::ParseCallbacks for PgxOverrides {
     fn will_parse_macro(&self, name: &str) -> MacroParsingBehavior {
         if self.0.contains(name) {
             bindgen::callbacks::MacroParsingBehavior::Ignore
         } else {
             bindgen::callbacks::MacroParsingBehavior::Default
         }
+    }
+
+    fn blocklisted_type_implements_trait(
+        &self,
+        name: &str,
+        derive_trait: DeriveTrait,
+    ) -> Option<ImplementsTrait> {
+        if name != "Datum" && name != "NullableDatum" {
+            return None;
+        }
+
+        let implements_trait = match derive_trait {
+            DeriveTrait::Copy => ImplementsTrait::Yes,
+            DeriveTrait::Debug => ImplementsTrait::Yes,
+            _ => ImplementsTrait::No,
+        };
+        Some(implements_trait)
     }
 }
 
@@ -518,7 +535,7 @@ fn run_bindgen(pg_config: &PgConfig, include_h: &PathBuf) -> eyre::Result<syn::F
     let bindings = bindgen::Builder::default()
         .header(include_h.display().to_string())
         .clang_arg(&format!("-I{}", includedir_server.display()))
-        .parse_callbacks(Box::new(IgnoredMacros::default()))
+        .parse_callbacks(Box::new(PgxOverrides::default()))
         .blocklist_type("Datum") // manually wrapping datum types for correctness
         .blocklist_type("NullableDatum")
         .blocklist_function("varsize_any") // pgx converts the VARSIZE_ANY macro, so we don't want to also have this function, which is in heaptuple.c
