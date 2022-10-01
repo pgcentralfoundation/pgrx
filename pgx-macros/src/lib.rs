@@ -741,7 +741,7 @@ fn impl_postgres_type(ast: DeriveInput) -> proc_macro2::TokenStream {
     // needs custom filtration
     if !args.contains(&PostgresTypeAttribute::FilterDatum) {
         stream.extend(quote! {
-            impl IntoDatumFilter for #name {}
+            impl #generics pgx::IntoDatumFilter for #name #generics {}
         })
     }
 
