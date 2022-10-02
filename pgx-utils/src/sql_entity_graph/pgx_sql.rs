@@ -1171,9 +1171,16 @@ fn connect_ords(
             enums,
         );
 
+        // Make PostgresOrdEntities (which will be translated into `CREATE OPERATOR CLASS` statements) depend
+        // on the operators which they will reference. For example, a pgx-defined Postgres type `parakeet`
+        // which has `#[derive(PostgresOrd)]` will emit a `parakeet_btree_ops` operator class, which references
+        // a definition of a < operator (among others) on the `parakeet` type. This code should ensure that the
+        // < operator (along with all the others) is emitted before the `OPERATOR CLASS` itself.
+
         for (extern_item, &extern_index) in externs {
-            let fn_matches =
-                |fn_name| item.module_path == extern_item.full_path && extern_item.name == fn_name;
+            let fn_matches = |fn_name| {
+                item.module_path == extern_item.module_path && extern_item.name == fn_name
+            };
             let cmp_fn_matches = fn_matches(item.cmp_fn_name());
             let lt_fn_matches = fn_matches(item.lt_fn_name());
             let lte_fn_matches = fn_matches(item.le_fn_name());
