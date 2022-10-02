@@ -527,6 +527,7 @@ mod tests {
 
     #[pg_test]
     fn test_duration_to_interval_err() {
+        use pgx::IntervalConversionError;
         // normal limit of i32::MAX months
         let duration = time::Duration::days(pg_sys::DAYS_PER_MONTH as i64 * i32::MAX as i64);
 

@@ -9,7 +9,8 @@ Use of this source code is governed by the MIT license that can be found in the 
 
 use std::ops::{Mul, Sub};
 
-use crate::{direct_function_call, pg_sys, FromDatum, IntoDatum, USECS_PER_SEC};
+use crate::datum::time::USECS_PER_SEC;
+use crate::{direct_function_call, pg_sys, FromDatum, IntoDatum};
 use pg_sys::{DAYS_PER_MONTH, SECS_PER_DAY};
 use pgx_utils::sql_entity_graph::metadata::{
     ArgumentError, Returns, ReturnsError, SqlMapping, SqlTranslatable,
@@ -61,7 +62,7 @@ impl Interval {
 impl TryFrom<pg_sys::Datum> for Interval {
     type Error = &'static str;
     fn try_from(d: pg_sys::Datum) -> Result<Self, Self::Error> {
-        Ok(Interval(unsafe { *d.ptr_cast() }))
+        Ok(Interval(unsafe { *d.cast_mut_ptr::<pg_sys::Interval>() }))
     }
 }
 
@@ -118,8 +119,8 @@ impl TryFrom<Duration> for Interval {
 impl From<Interval> for Duration {
     fn from(interval: Interval) -> Duration {
         let interval = interval.0; // internal interval
-        let sec = interval.time / USECS_PER_SEC;
-        let fsec = ((interval.time - (sec * USECS_PER_SEC)) * 1000) as i32; // convert usec to nsec
+        let sec = interval.time / USECS_PER_SEC as i64;
+        let fsec = ((interval.time - (sec * USECS_PER_SEC as i64)) * 1000) as i32; // convert usec to nsec
 
         let mut duration = Duration::new(sec, fsec);
 
