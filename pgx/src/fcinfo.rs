@@ -200,7 +200,7 @@ pub fn pg_getarg_pointer<T>(fcinfo: pg_sys::FunctionCallInfo, num: usize) -> Opt
 /// The provided `fcinfo` must be valid otherwise this function results in undefined behavior due
 /// to an out of bounds read.
 #[inline]
-pub unsafe fn get_getarg_type(fcinfo: pg_sys::FunctionCallInfo, num: usize) -> pg_sys::Oid {
+pub unsafe fn pg_getarg_type(fcinfo: pg_sys::FunctionCallInfo, num: usize) -> pg_sys::Oid {
     pg_sys::get_fn_expr_argtype(fcinfo.as_ref().unwrap().flinfo, num as std::os::raw::c_int)
 }
 
