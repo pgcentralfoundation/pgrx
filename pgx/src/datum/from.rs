@@ -398,16 +398,3 @@ impl<T> FromDatum for PgBox<T, AllocatedByPostgres> {
         })
     }
 }
-
-impl<T> FromDatum for Option<T>
-where
-    T: FromDatum,
-{
-    #[inline]
-    unsafe fn from_datum(datum: pg_sys::Datum, is_null: bool, oid: pg_sys::Oid) -> Option<Self> {
-        match is_null {
-            true => None,
-            false => Some(T::from_datum(datum, is_null, oid)),
-        }
-    }
-}
