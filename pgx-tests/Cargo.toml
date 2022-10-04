@@ -9,7 +9,6 @@ repository = "https://github.com/zombodb/pgx"
 documentation = "https://docs.rs/pgx-tests"
 readme = "README.md"
 edition = "2021"
-rust-version = "1.58"
 
 [lib]
 crate-type = [ "cdylib", "lib" ]
