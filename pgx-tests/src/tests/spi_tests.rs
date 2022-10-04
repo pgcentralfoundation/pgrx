@@ -175,7 +175,7 @@ mod tests {
         Spi::execute(|client| {
             let res = client.select("SELECT 42 AS a, 'test' AS b", None, None);
 
-            assert_eq!(2, res.columns());
+            assert_eq!(Some(2), res.columns());
 
             assert_eq!(
                 res.column_type_oid(1).unwrap(),
@@ -190,6 +190,12 @@ mod tests {
             assert_eq!(res.column_name(1).unwrap(), "a");
 
             assert_eq!(res.column_name(2).unwrap(), "b");
+        });
+
+        Spi::execute(|mut client| {
+            let res = client.update("SET TIME ZONE 'PST8PDT'", None, None);
+
+            assert!(res.columns().is_none());
         });
     }
 }
