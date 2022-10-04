@@ -1,14 +1,8 @@
 use clap::Parser;
 use owo_colors::OwoColorize;
-use regex::Regex;
 use std::collections::HashSet;
 use std::fs;
-use std::{
-    collections::HashMap,
-    env,
-    ffi::OsStr,
-    path::{Path, PathBuf},
-};
+use std::{env, path::PathBuf};
 use toml_edit::{value, Document, Table};
 use walkdir::{DirEntry, WalkDir};
 
@@ -109,18 +103,11 @@ fn main() {
     let current_dir = env::current_dir().expect("Could not get current directory!");
 
     let mut deps_update_files_set: HashSet<String> = HashSet::new();
-    // for file in args.include_for_dep_updates {
-    //     deps_update_files_set.insert(fullpath(file).to_str().unwrap().to_string());
-    // }
-
-    // println!("deps_update_files_set: {:?}", deps_update_files_set);
 
     let mut exclude_version_files_set: HashSet<String> = HashSet::new();
     for file in args.exclude_from_version_change {
         exclude_version_files_set.insert(fullpath(file).to_str().unwrap().to_string());
     }
-
-    // println!("exclude_version_files_set: {:?}", exclude_version_files_set);
 
     let mut updatable_package_names_set: HashSet<String> = HashSet::new();
     let mut files_to_process_set: HashSet<String> = HashSet::new();
@@ -183,7 +170,7 @@ fn main() {
             }
 
             files_to_process_set.insert(filepath.clone());
-            // println!("{output}");
+            println!("{output}");
         }
     }
 
@@ -275,23 +262,13 @@ fn main() {
 
         for updatable_table in vec!["dependencies", "build-dependencies", "dev-dependencies"] {
             if doc.contains_table(updatable_table) {
-                let mut deps_table: &mut Table =
-                    // doc.get_mut("dependencies").unwrap().as_table_mut().unwrap();
-                    doc.get_mut(updatable_table).unwrap().as_table_mut().unwrap();
+                let deps_table: &mut Table = doc
+                    .get_mut(updatable_table)
+                    .unwrap()
+                    .as_table_mut()
+                    .unwrap();
 
                 for package in &updatable_package_names_set {
-                    // if deps_table.contains_table(package) {
-                    //     let inner_table =
-                    //         deps_table.get_mut(package).unwrap().as_table_mut().unwrap();
-
-                    //     let old_version = inner_table.get("version").unwrap();
-                    //     let new_version = parse_new_version(
-                    //         old_version.as_str().unwrap(),
-                    //         &args.update_version.as_str(),
-                    //     );
-                    //     inner_table["version"] = value(new_version);
-                    // }
-
                     if deps_table.contains_key(package) {
                         let dep_value = deps_table.get_mut(package).unwrap();
 
@@ -326,79 +303,7 @@ fn main() {
             }
         }
 
-        /*
-                if doc.contains_table("dependencies") {
-                    let mut deps_table: &mut Table =
-                        doc.get_mut("dependencies").unwrap().as_table_mut().unwrap();
-
-                    for package in &updatable_package_names_set {
-                        // if deps.contains_key(format!("dependencies.{package}").as_str()) {
-                        //     println!("=====================================================================================");
-                        // }
-                        // if deps.contains_key(format!("dependencies.{}", package).as_str()) {
-                        // println!(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>");
-                        // } else if deps.contains_key(package) {
-
-                        if deps_table.contains_table(package) {
-                            // println!("========================================");
-                            let inner_table = deps_table.get_mut(package).unwrap().as_table_mut().unwrap();
-
-                            // println!("GGGGGGGGGGGGGGGGGGGGGG: {:?}", g);
-                            let old_version = inner_table.get("version").unwrap();
-                            let new_version = parse_new_version(
-                                old_version.as_str().unwrap(),
-                                &args.update_version.as_str(),
-                            );
-                            inner_table["version"] = value(new_version);
-                        }
-
-                        if deps_table.contains_key(package) {
-                            let dep_value = deps_table.get(package).unwrap();
-
-                            if dep_value.is_table() {
-                                let table = dep_value.as_table().unwrap();
-                                // println!(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>  {} is normal table: {:#?}\n", package, table);
-                                // // let new_version = parse_new_version(
-                                // //     dep_value.as_str().unwrap(),
-                                // //     &args.update_version.as_str(),
-                                // // );
-                                // // deps[package] = value(new_version);
-                                // let table_name = format!("dependencies.{}", package);
-
-                                // deps[table_name.as_str()].as_table_mut().unwrap()["version"] =
-                                //     value("adsfsaf");
-
-                                // deps["dependencies.dsjkfljkas"][package]["version"] =
-                                //     value("+++++++++++++++++++++++++++++++++++++++++++++++");
-                                // table["version"] = value("dfjsaklfdjaskfjdkljfkl");
-                            } else if dep_value.is_inline_table() {
-                                // println!("is inline table: {:?}\n", dep_value);
-                                let inline_table = dep_value.as_inline_table().unwrap();
-
-                                if inline_table.contains_key("version") {
-                                    let old_version = inline_table.get("version").unwrap();
-                                    let new_version = parse_new_version(
-                                        old_version.as_str().unwrap(),
-                                        &args.update_version.as_str(),
-                                    );
-                                    deps_table[package]["version"] = value(new_version);
-                                }
-                                // pgx-pg-config= { path = "../pgx-pg-config/", version = "=0.5.0-beta.1" }
-                                // pgx-utils = { path = "../pgx-utils/", version = "=0.5.0-beta.1" }
-                            } else {
-                                // println!("is normal string: {:?}\n", dep_value);
-                                let new_version = parse_new_version(
-                                    dep_value.as_str().unwrap(),
-                                    &args.update_version.as_str(),
-                                );
-
-                                deps_table[package] = value(new_version);
-                            }
-                        }
-                    }
-                }
-        */
-        println!("doc: {}", doc);
-        fs::write(filepath, doc.to_string()).expect("Unable to write file");
+        // println!("doc: {}", doc);
+        // fs::write(filepath, doc.to_string()).expect("Unable to write file");
     }
 }
