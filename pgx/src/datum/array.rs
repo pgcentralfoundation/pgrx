@@ -555,6 +555,27 @@ impl<T: FromDatum> FromDatum for Vec<T> {
     }
 }
 
+impl<T: FromDatum> FromDatum for Vec<Option<T>> {
+    #[inline]
+    unsafe fn from_datum(
+        datum: pg_sys::Datum,
+        is_null: bool,
+        typoid: pg_sys::Oid,
+    ) -> Option<Vec<Option<T>>> {
+        if is_null || datum.is_null() {
+            None
+        } else {
+            let array = Array::<T>::from_datum(datum, is_null, typoid).unwrap();
+            let mut v = Vec::with_capacity(array.len());
+
+            for element in array.iter() {
+                v.push(element)
+            }
+            Some(v)
+        }
+    }
+}
+
 impl<T> IntoDatum for Vec<T>
 where
     T: IntoDatum,
