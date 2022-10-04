@@ -13,6 +13,7 @@ rust-version = "1.58"
 
 [dependencies]
 clap = { version = "3.2.2", features = [ "env", "derive" ] }
+diff = "0.1.13"
 owo-colors = "3.4.0"
 regex = "1"
 toml_edit = { version = "0.14.4" }

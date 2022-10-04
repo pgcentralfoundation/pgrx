@@ -29,6 +29,14 @@ struct Args {
     /// Version to be used in all updates
     #[clap(short, long, required = true)]
     update_version: String,
+
+    /// Do not make any changes to files
+    #[clap(short, long)]
+    dry_run: bool,
+
+    /// Ouptut resulting TOML file changes to stdout while processing
+    #[clap(short, long)]
+    output_toml: bool,
 }
 
 const IGNORE_DIRS: &'static [&'static str] = &[".git", "target"];
@@ -128,14 +136,15 @@ fn main() {
                 &filepath.cyan()
             );
 
-            if exclude_version_files_set.contains(&filepath) {
-                output.push_str(
-                    "\n           * Excluding from package version bump due to command line parameter"
-                        .dimmed()
-                        .to_string()
-                        .as_str(),
-                )
-            } else {
+            // if exclude_version_files_set.contains(&filepath) {
+            //     output.push_str(
+            //         "\n           * Excluding from package version bump due to command line parameter"
+            //             .dimmed()
+            //             .to_string()
+            //             .as_str(),
+            //     )
+            // } else {
+            if !exclude_version_files_set.contains(&filepath) {
                 let data = fs::read_to_string(&filepath)
                     .expect(format!("Unable to open file at {}", &filepath).as_str());
                 let doc = data.parse::<Document>().expect(
@@ -183,14 +192,15 @@ fn main() {
             &filepath.cyan()
         );
 
-        if exclude_version_files_set.contains(&filepath) {
-            output.push_str(
-                "\n           * Excluding from package version bump due to command line parameter"
-                    .dimmed()
-                    .to_string()
-                    .as_str(),
-            )
-        } else {
+        // if exclude_version_files_set.contains(&filepath) {
+        //     output.push_str(
+        //         "\n           * Excluding from package version bump due to command line parameter"
+        //             .dimmed()
+        //             .to_string()
+        //             .as_str(),
+        //     )
+        // } else {
+        if !exclude_version_files_set.contains(&filepath) {
             let data = fs::read_to_string(&filepath)
                 .expect(format!("Unable to open file at {}", &filepath).as_str());
             let doc = data.parse::<Document>().expect(
@@ -237,7 +247,7 @@ fn main() {
     }
 
     for filepath in files_to_process_set.union(&deps_update_files_set) {
-        println!(
+        let mut output = format!(
             "{} Cargo.toml file at {}",
             "Processing".bold().green(),
             &filepath.cyan()
@@ -254,7 +264,19 @@ fn main() {
             .as_str(),
         );
 
-        if !exclude_version_files_set.contains(filepath) {
+        // if !exclude_version_files_set.contains(filepath) {
+        //     if doc.contains_key("package") {
+        //         doc["package"]["version"] = value(args.update_version.clone());
+        //     }
+        // }
+        if exclude_version_files_set.contains(filepath) {
+            output.push_str(
+                "\n           * Excluding from package version bump due to command line parameter"
+                    .dimmed()
+                    .to_string()
+                    .as_str(),
+            )
+        } else {
             if doc.contains_key("package") {
                 doc["package"]["version"] = value(args.update_version.clone());
             }
@@ -303,7 +325,45 @@ fn main() {
             }
         }
 
-        // println!("doc: {}", doc);
-        // fs::write(filepath, doc.to_string()).expect("Unable to write file");
+        if args.output_toml {
+            // let left = "foo\nbar\nbaz\nquux";
+            // let right = "foo\nbaz\nbar\nquux";
+
+            println!(
+                "{} Cargo.toml file at {} will look like this:",
+                "   Updated".bold().green(),
+                &filepath.cyan(),
+            );
+
+            for diff in diff::lines(data.as_str(), doc.to_string().as_str()) {
+                match diff {
+                    diff::Result::Left(l) => println!("      - {}", l.red()),
+                    diff::Result::Both(l, _) => println!("        {}", l),
+                    diff::Result::Right(r) => println!("      + {}", r.green()),
+                }
+            }
+
+            // let mut doc_output = String::new();
+
+            // for line in doc.to_string().lines() {
+            //     doc_output.push_str(format!("           {}\n", line.dimmed()).as_str());
+            // }
+
+            // output.push_str(
+            //     format!(
+            //         "{} Cargo.toml file at {} will look like this:\n{}",
+            //         "\n   Updated".bold().green(),
+            //         &filepath.cyan(),
+            //         doc_output
+            //     )
+            //     .as_str(),
+            // );
+        }
+
+        println!("{output}");
+
+        if !args.dry_run {
+            fs::write(filepath, doc.to_string()).expect("Unable to write file");
+        }
     }
 }
