@@ -40,87 +40,8 @@ struct Args {
     show_diff: bool,
 }
 
-// Always return full path
-fn fullpath(test_path: String) -> PathBuf {
-    let mut path = PathBuf::new();
-    path.push(test_path.clone());
-
-    if path.is_absolute() {
-        path.canonicalize().unwrap()
-    } else {
-        let current_dir = env::current_dir().expect("Could not get current directory!");
-        path.push(current_dir);
-        path.push(test_path.clone());
-        path.canonicalize().unwrap()
-    }
-}
-
 // List of directories to ignore while Walkdir'ing. Add more here as necessary.
 const IGNORE_DIRS: &'static [&'static str] = &[".git", "target"];
-
-// Walkdir filter, ensure we don't traverse down a directory that should be ignored
-// e.g. .git/ and target/ directories should never be traversed.
-fn is_not_excluded_dir(entry: &DirEntry) -> bool {
-    let metadata = entry.metadata().expect(
-        format!(
-            "Could not get metadata for: {}",
-            entry.file_name().to_str().unwrap()
-        )
-        .as_str(),
-    );
-
-    if metadata.is_dir() {
-        return !IGNORE_DIRS.contains(&entry.file_name().to_str().unwrap());
-    }
-
-    true
-}
-
-// Check if a specific DirEntry is named "Cargo.toml"
-fn is_cargo_toml_file(entry: &DirEntry) -> bool {
-    let metadata = entry.metadata().expect(
-        format!(
-            "Could not get metadata for: {}",
-            entry.file_name().to_str().unwrap()
-        )
-        .as_str(),
-    );
-
-    if metadata.is_file() {
-        return entry.file_name().eq_ignore_ascii_case("Cargo.toml");
-    }
-
-    false
-}
-
-// Replace old version specifier with new updated version.
-// For example, if this line exists in a Cargo.toml file somewhere:
-//   pgx = "=1.2.3"
-// and the new version is meant to be:
-//   "1.3.0"
-// return the new version specifier as:
-//   "=1.3.0"
-// so that the resulting line in the Cargo.toml file will be:
-//   pgx = "=1.3.0"
-// It was necessary to keep the requirements specifications, such as "=" or "~".
-// The assumption here is that versions (sans requirement specifier) will always
-// start with a number.
-fn parse_new_version(old_version_specifier: &str, new_version: &str) -> String {
-    let mut result = String::new();
-
-    if old_version_specifier.chars().nth(0).unwrap().is_numeric() {
-        result.push_str(old_version_specifier);
-    } else {
-        let version_pos = old_version_specifier
-            .find(|c: char| c.is_numeric())
-            .unwrap();
-
-        result.push_str(&old_version_specifier[..version_pos]);
-        result.push_str(&new_version.clone());
-    }
-
-    result
-}
 
 fn main() {
     let args = Args::parse();
@@ -376,6 +297,85 @@ fn main() {
             fs::write(filepath, doc.to_string()).expect("Unable to write file");
         }
     }
+}
+
+// Always return full path
+fn fullpath(test_path: String) -> PathBuf {
+    let mut path = PathBuf::new();
+    path.push(test_path.clone());
+
+    if path.is_absolute() {
+        path.canonicalize().unwrap()
+    } else {
+        let current_dir = env::current_dir().expect("Could not get current directory!");
+        path.push(current_dir);
+        path.push(test_path.clone());
+        path.canonicalize().unwrap()
+    }
+}
+
+// Walkdir filter, ensure we don't traverse down a directory that should be ignored
+// e.g. .git/ and target/ directories should never be traversed.
+fn is_not_excluded_dir(entry: &DirEntry) -> bool {
+    let metadata = entry.metadata().expect(
+        format!(
+            "Could not get metadata for: {}",
+            entry.file_name().to_str().unwrap()
+        )
+        .as_str(),
+    );
+
+    if metadata.is_dir() {
+        return !IGNORE_DIRS.contains(&entry.file_name().to_str().unwrap());
+    }
+
+    true
+}
+
+// Check if a specific DirEntry is named "Cargo.toml"
+fn is_cargo_toml_file(entry: &DirEntry) -> bool {
+    let metadata = entry.metadata().expect(
+        format!(
+            "Could not get metadata for: {}",
+            entry.file_name().to_str().unwrap()
+        )
+        .as_str(),
+    );
+
+    if metadata.is_file() {
+        return entry.file_name().eq_ignore_ascii_case("Cargo.toml");
+    }
+
+    false
+}
+
+// Replace old version specifier with new updated version.
+// For example, if this line exists in a Cargo.toml file somewhere:
+//   pgx = "=1.2.3"
+// and the new version is meant to be:
+//   "1.3.0"
+// return the new version specifier as:
+//   "=1.3.0"
+// so that the resulting line in the Cargo.toml file will be:
+//   pgx = "=1.3.0"
+// It was necessary to keep the requirements specifications, such as "=" or "~".
+// The assumption here is that versions (sans requirement specifier) will always
+// start with a number.
+fn parse_new_version(old_version_specifier: &str, new_version: &str) -> String {
+    let mut result = String::new();
+
+    if old_version_specifier.chars().nth(0).unwrap().is_numeric() {
+        result.push_str(old_version_specifier);
+    } else {
+        let version_pos = old_version_specifier
+            .find(|c: char| c.is_numeric())
+            .unwrap();
+
+        result.push_str(&old_version_specifier[..version_pos]);
+        result.push_str(&new_version.clone());
+    }
+
+    result
 }
 
 // Given a filepath pointing to a Cargo.toml file, extract out the [package] name
