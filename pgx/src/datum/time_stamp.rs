@@ -11,9 +11,10 @@ use crate::{pg_sys, FromDatum, FromTimeError, IntoDatum, TimestampWithTimeZone};
 use pgx_utils::sql_entity_graph::metadata::{
     ArgumentError, Returns, ReturnsError, SqlMapping, SqlTranslatable,
 };
+use serde::Deserialize;
 use std::ffi::CStr;
 
-#[derive(Debug, PartialEq, Eq, PartialOrd, Ord, Clone)]
+#[derive(Clone, Debug, PartialEq, Eq, PartialOrd, Ord, Deserialize)]
 #[repr(transparent)]
 pub struct Timestamp(pg_sys::Timestamp);
 
