@@ -11,21 +11,17 @@ use walkdir::{DirEntry, WalkDir};
 #[derive(Parser, Debug)]
 #[clap(author, version, about, long_about = None)]
 struct Args {
-    /// Addional Cargo.toml file to include
+    /// Addional Cargo.toml file to include for processing that can't be detected automatically
     ///
-    /// Add multiple values using --include /path/foo --include /path/bar
+    /// Add multiple values using --include /path/foo/Cargo.toml --include /path/bar/Cargo.toml
     #[clap(short, long)]
     include_for_dep_updates: Vec<String>,
 
-    /// Exclude packages from being updated
+    /// Exclude Cargo.toml files from [package] version updates
     ///
-    /// Add multiple values using --exclude foo --exclude bar
+    /// Add multiple values using --exclude /path/foo/Cargo.toml --exclude /path/bar/Cargo.toml
     #[clap(short, long)]
     exclude_from_version_change: Vec<String>,
-
-    /// Maximum depth of directory traversal
-    #[clap(short, long, default_value_t = 3)]
-    max_depth: usize,
 
     /// Version to be used in all updates
     #[clap(short, long, required = true)]
@@ -35,7 +31,7 @@ struct Args {
     #[clap(short, long)]
     dry_run: bool,
 
-    /// Output diff beetween existing file and changes to be made
+    /// Output diff between existing file and changes to be made
     #[clap(short, long)]
     show_diff: bool,
 }
@@ -59,7 +55,7 @@ fn main() {
     //   [package]
     //   version = "0.1.0"
     //   ...
-    // Any such file is explicitly added via a command line argument. See help for details.
+    // Any such file is explicitly added via a command line argument.
     // Note that any files included here are still eligible to be processed for
     // *dependency* version updates.
     let mut exclude_version_files_set: HashSet<String> = HashSet::new();
