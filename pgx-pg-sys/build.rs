@@ -542,7 +542,6 @@ fn run_bindgen(pg_config: &PgConfig, include_h: &PathBuf) -> eyre::Result<syn::F
         .allowlist_file(".*syscache.h")
         .allowlist_file(".*mcxt.h")
         .allowlist_file(".*(storage|catalog|access|commands|executor|adt|optimizer|rewrite|postmaster|tcop|replication|nodes|postgres|parse|pg_|item|heap).*")
-        .allowlist_function("memcpy")
         .allowlist_var("SIG.*")
         .blocklist_type("Datum") // manually wrapping datum types for correctness
         .blocklist_type("NullableDatum")
