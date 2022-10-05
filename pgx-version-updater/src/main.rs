@@ -2,6 +2,8 @@ use clap::Parser;
 use owo_colors::OwoColorize;
 use std::collections::HashSet;
 use std::fs;
+use std::io::{BufRead, Write};
+use std::process::{Command, Stdio};
 use std::{env, path::PathBuf};
 use toml_edit::{value, Document, Table};
 use walkdir::{DirEntry, WalkDir};
@@ -34,9 +36,9 @@ struct Args {
     #[clap(short, long)]
     dry_run: bool,
 
-    /// Ouptut resulting TOML file changes to stdout while processing
+    /// Output diff beetween existing file and changes to be made
     #[clap(short, long)]
-    output_toml: bool,
+    show_diff: bool,
 }
 
 const IGNORE_DIRS: &'static [&'static str] = &[".git", "target"];
@@ -325,39 +327,44 @@ fn main() {
             }
         }
 
-        if args.output_toml {
-            // let left = "foo\nbar\nbaz\nquux";
-            // let right = "foo\nbaz\nbar\nquux";
+        if args.show_diff {
+            let mut child = Command::new("diff")
+                .arg(filepath)
+                .arg("-U")
+                .arg("5")
+                .arg("-")
+                .stdin(Stdio::piped())
+                .stdout(Stdio::piped())
+                .spawn()
+                .expect("Failed to spawn child process");
 
-            println!(
-                "{} Cargo.toml file at {} will look like this:",
-                "   Updated".bold().green(),
-                &filepath.cyan(),
-            );
+            let mut stdin = child.stdin.take().expect("Failed to open stdin");
+            let docstring = doc.to_string();
 
-            for diff in diff::lines(data.as_str(), doc.to_string().as_str()) {
-                match diff {
-                    diff::Result::Left(l) => println!("      - {}", l.red()),
-                    diff::Result::Both(l, _) => println!("        {}", l),
-                    diff::Result::Right(r) => println!("      + {}", r.green()),
+            std::thread::spawn(move || {
+                stdin
+                    .write_all(docstring.as_bytes())
+                    .expect("Failed to write to stdin");
+            });
+
+            let output = child.wait_with_output().expect("Failed to read stdout");
+
+            let output_lines = output.stdout.lines();
+
+            if output_lines.count() == 0 {
+                println!("           {}", "* No detectable diff found".dimmed());
+            } else {
+                println!("           {}", "* Diff:".dimmed());
+                for line in output.stdout.lines().skip(2) {
+                    let line = line.unwrap();
+
+                    match line.chars().nth(0).unwrap() {
+                        '-' => println!("            {}", line.red()),
+                        '+' => println!("            {}", line.green()),
+                        _ => println!("           {line}"),
+                    }
                 }
             }
-
-            // let mut doc_output = String::new();
-
-            // for line in doc.to_string().lines() {
-            //     doc_output.push_str(format!("           {}\n", line.dimmed()).as_str());
-            // }
-
-            // output.push_str(
-            //     format!(
-            //         "{} Cargo.toml file at {} will look like this:\n{}",
-            //         "\n   Updated".bold().green(),
-            //         &filepath.cyan(),
-            //         doc_output
-            //     )
-            //     .as_str(),
-            // );
         }
 
         println!("{output}");
