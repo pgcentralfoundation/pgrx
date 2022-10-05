@@ -8,7 +8,6 @@ use std::{env, path::PathBuf};
 use toml_edit::{value, Document, Table};
 use walkdir::{DirEntry, WalkDir};
 
-/// Simple program to greet a person
 #[derive(Parser, Debug)]
 #[clap(author, version, about, long_about = None)]
 struct Args {
@@ -41,23 +40,26 @@ struct Args {
     show_diff: bool,
 }
 
-const IGNORE_DIRS: &'static [&'static str] = &[".git", "target"];
-
 // Always return full path
 fn fullpath(test_path: String) -> PathBuf {
     let mut path = PathBuf::new();
     path.push(test_path.clone());
 
     if path.is_absolute() {
-        path
+        path.canonicalize().unwrap()
     } else {
         let current_dir = env::current_dir().expect("Could not get current directory!");
         path.push(current_dir);
         path.push(test_path.clone());
-        path
+        path.canonicalize().unwrap()
     }
 }
 
+// List of directories to ignore while Walkdir'ing. Add more here as necessary.
+const IGNORE_DIRS: &'static [&'static str] = &[".git", "target"];
+
+// Walkdir filter, ensure we don't traverse down a directory that should be ignored
+// e.g. .git/ and target/ directories should never be traversed.
 fn is_not_excluded_dir(entry: &DirEntry) -> bool {
     let metadata = entry.metadata().expect(
         format!(
@@ -74,6 +76,7 @@ fn is_not_excluded_dir(entry: &DirEntry) -> bool {
     true
 }
 
+// Check if a specific DirEntry is named "Cargo.toml"
 fn is_cargo_toml_file(entry: &DirEntry) -> bool {
     let metadata = entry.metadata().expect(
         format!(
@@ -84,13 +87,24 @@ fn is_cargo_toml_file(entry: &DirEntry) -> bool {
     );
 
     if metadata.is_file() {
-        if entry.file_name().eq_ignore_ascii_case("Cargo.toml") {}
-        return entry.file_name().eq("Cargo.toml");
+        return entry.file_name().eq_ignore_ascii_case("Cargo.toml");
     }
 
     false
 }
 
+// Replace old version specifier with new updated version.
+// For example, if this line exists in a Cargo.toml file somewhere:
+//   pgx = "=1.2.3"
+// and the new version is meant to be:
+//   "1.3.0"
+// return the new version specifier as:
+//   "=1.3.0"
+// so that the resulting line in the Cargo.toml file will be:
+//   pgx = "=1.3.0"
+// It was necessary to keep the requirements specifications, such as "=" or "~".
+// The assumption here is that versions (sans requirement specifier) will always
+// start with a number.
 fn parse_new_version(old_version_specifier: &str, new_version: &str) -> String {
     let mut result = String::new();
 
@@ -112,16 +126,28 @@ fn main() {
     let args = Args::parse();
     let current_dir = env::current_dir().expect("Could not get current directory!");
 
-    let mut deps_update_files_set: HashSet<String> = HashSet::new();
+    // Do we need this?
+    // let mut deps_update_files_set: HashSet<String> = HashSet::new();
 
+    let mut updatable_package_names_set: HashSet<String> = HashSet::new();
+
+    // This will eventually contain every file we want to process
+    let mut files_to_process_set: HashSet<String> = HashSet::new();
+
+    // Keep track of which files to exclude from a "package version" change.
+    // For example, some Cargo.toml files do not need this updated:
+    //   [package]
+    //   version = "0.1.0"
+    //   ...
+    // Any such file is explicitly added via a command line argument. See help for details.
+    // Note that any files included here are still eligible to be processed for
+    // *dependency* version updates.
     let mut exclude_version_files_set: HashSet<String> = HashSet::new();
     for file in args.exclude_from_version_change {
         exclude_version_files_set.insert(fullpath(file).to_str().unwrap().to_string());
     }
 
-    let mut updatable_package_names_set: HashSet<String> = HashSet::new();
-    let mut files_to_process_set: HashSet<String> = HashSet::new();
-
+    // Recursively walk down all directories to extract out any existing Cargo.toml files
     for entry in WalkDir::new(&current_dir)
         .into_iter()
         .filter_entry(|e| is_not_excluded_dir(e))
@@ -138,6 +164,20 @@ fn main() {
                 &filepath.cyan()
             );
 
+            // Extract package name from Cargo.toml files that are getting
+            // a [pacakge] version bump. This list will eventually be used to
+            // search for dependencies all Cargo.toml files.
+            // For example, if a particular Cargo.toml file has:
+            //   [package]
+            //   name = "pgx"
+            //   version = "0.1.2"
+            //
+            // and this file is considered eligible for a package version bump,
+            // then we need to extract the package name (e.g. "pgx") so that we
+            // can bump this package name in other Cargo.toml files that use this
+            // as a dependency, such as:
+            //   [dependencies]
+            //   pgx = "0.1.1"
             if !exclude_version_files_set.contains(&filepath) {
                 let data = fs::read_to_string(&filepath)
                     .expect(format!("Unable to open file at {}", &filepath).as_str());
@@ -177,6 +217,7 @@ fn main() {
         }
     }
 
+    // Loop through all files that are included for dependency updates via CLI params
     for file in args.include_for_dep_updates {
         let filepath: String = fullpath(file).display().to_string();
 
@@ -186,6 +227,7 @@ fn main() {
             &filepath.cyan()
         );
 
+        // TODO: Extract this into a method, use it above as well.
         if !exclude_version_files_set.contains(&filepath) {
             let data = fs::read_to_string(&filepath)
                 .expect(format!("Unable to open file at {}", &filepath).as_str());
@@ -221,9 +263,12 @@ fn main() {
         }
 
         println!("{output}");
-        deps_update_files_set.insert(filepath.clone());
+        // deps_update_files_set.insert(filepath.clone());
+        files_to_process_set.insert(filepath.clone());
     }
 
+    // Print out information about package names that were automatically discovered
+    // and parsed
     for package_name in &updatable_package_names_set {
         println!(
             "{} {} found for version updating",
@@ -232,7 +277,10 @@ fn main() {
         );
     }
 
-    for filepath in files_to_process_set.union(&deps_update_files_set) {
+    // for filepath in files_to_process_set.union(&deps_update_files_set) {
+    // Loop through every TOML file and update package versions and dependency
+    // versions where applicable
+    for filepath in files_to_process_set {
         let mut output = format!(
             "{} Cargo.toml file at {}",
             "Processing".bold().green(),
@@ -250,7 +298,7 @@ fn main() {
             .as_str(),
         );
 
-        if exclude_version_files_set.contains(filepath) {
+        if exclude_version_files_set.contains(&filepath) {
             output.push_str(
                 "\n           * Excluding from package version bump due to command line parameter"
                     .dimmed()
@@ -258,11 +306,14 @@ fn main() {
                     .as_str(),
             )
         } else {
+            // Bump pacakge version if we can
             if doc.contains_key("package") {
                 doc["package"]["version"] = value(args.update_version.clone());
             }
         }
 
+        // Process dependencies in each file. Generally dependencies can be found in
+        // [dependencies], [dependencies.foo], [build-dependencies], [dev-dependencies]
         for updatable_table in vec!["dependencies", "build-dependencies", "dev-dependencies"] {
             if doc.contains_table(updatable_table) {
                 let deps_table: &mut Table = doc
@@ -271,11 +322,17 @@ fn main() {
                     .as_table_mut()
                     .unwrap();
 
+                // Attempt to find auto-extracted package names in the various dependency
+                // declarations
                 for package in &updatable_package_names_set {
                     if deps_table.contains_key(package) {
                         let dep_value = deps_table.get_mut(package).unwrap();
 
                         if dep_value.is_table() {
+                            // Tables can contain other tables, and if that's the case we're
+                            // probably at a case of:
+                            //   [dependencies.pgx]
+                            //   version = "1.2.3"
                             let old_version = dep_value.get("version").unwrap();
                             let new_version = parse_new_version(
                                 old_version.as_str().unwrap(),
@@ -283,6 +340,9 @@ fn main() {
                             );
                             dep_value["version"] = value(new_version);
                         } else if dep_value.is_inline_table() {
+                            // Inline table covers the case of:
+                            //   [dependencies]
+                            //   pgx = { version = "1.2.3", features = ["..."] }
                             let inline_table = dep_value.as_inline_table().unwrap();
 
                             if inline_table.contains_key("version") {
@@ -294,6 +354,9 @@ fn main() {
                                 deps_table[package]["version"] = value(new_version);
                             }
                         } else {
+                            // Otherwise we are a string, such as:
+                            //   [dependencies]
+                            //   pgx = "0.1.2"
                             let new_version = parse_new_version(
                                 dep_value.as_str().unwrap(),
                                 &args.update_version.as_str(),
@@ -307,8 +370,9 @@ fn main() {
         }
 
         if args.show_diff {
+            // Call diff command, it provides the easiest way to show context.
             let mut child = Command::new("diff")
-                .arg(filepath)
+                .arg(&filepath)
                 .arg("-U")
                 .arg("5")
                 .arg("-")
@@ -348,6 +412,7 @@ fn main() {
 
         println!("{output}");
 
+        // Write it out!
         if !args.dry_run {
             fs::write(filepath, doc.to_string()).expect("Unable to write file");
         }
