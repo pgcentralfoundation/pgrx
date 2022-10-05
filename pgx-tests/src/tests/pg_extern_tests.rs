@@ -96,4 +96,17 @@ mod tests {
                 .expect("failed to get SPI result");
         assert_eq!(create_result, 42);
     }
+
+    #[pg_extern]
+    fn anyele_type(x: pgx::AnyElement) -> i32 {
+        x.oid() as i32
+    }
+
+    #[pg_test]
+    fn test_anyele_type() {
+        let interval_type =
+            Spi::get_one::<i32>(r#"SELECT tests."anyele_type"('5 hours'::interval)"#)
+                .expect("failed to get SPI result");
+        assert_eq!(interval_type as u32, pg_sys::INTERVALOID);
+    }
 }
