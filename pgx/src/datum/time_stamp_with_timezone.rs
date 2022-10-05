@@ -11,6 +11,7 @@ use crate::{pg_sys, FromDatum, IntoDatum};
 use pgx_utils::sql_entity_graph::metadata::{
     ArgumentError, Returns, ReturnsError, SqlMapping, SqlTranslatable,
 };
+use serde::Deserialize;
 use std::convert::TryFrom;
 use std::ffi::CStr;
 use std::ops::Sub;
@@ -25,7 +26,7 @@ const PG_EPOCH_DATETIME: time::PrimitiveDateTime = date!(2000 - 01 - 01).midnigh
 const MIN_TIMESTAMP_USEC: i64 = -211_813_488_000_000_000;
 const END_TIMESTAMP_USEC: i64 = 9_223_371_331_200_000_000 - 1; // dec by 1 to accommodate exclusive range match pattern
 
-#[derive(Debug, PartialEq, Eq, PartialOrd, Ord, Clone)]
+#[derive(Clone, Debug, PartialEq, Eq, PartialOrd, Ord, Deserialize)]
 #[repr(transparent)]
 pub struct TimestampWithTimeZone(pg_sys::TimestampTz);
 
