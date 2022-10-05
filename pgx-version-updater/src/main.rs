@@ -138,14 +138,6 @@ fn main() {
                 &filepath.cyan()
             );
 
-            // if exclude_version_files_set.contains(&filepath) {
-            //     output.push_str(
-            //         "\n           * Excluding from package version bump due to command line parameter"
-            //             .dimmed()
-            //             .to_string()
-            //             .as_str(),
-            //     )
-            // } else {
             if !exclude_version_files_set.contains(&filepath) {
                 let data = fs::read_to_string(&filepath)
                     .expect(format!("Unable to open file at {}", &filepath).as_str());
@@ -194,14 +186,6 @@ fn main() {
             &filepath.cyan()
         );
 
-        // if exclude_version_files_set.contains(&filepath) {
-        //     output.push_str(
-        //         "\n           * Excluding from package version bump due to command line parameter"
-        //             .dimmed()
-        //             .to_string()
-        //             .as_str(),
-        //     )
-        // } else {
         if !exclude_version_files_set.contains(&filepath) {
             let data = fs::read_to_string(&filepath)
                 .expect(format!("Unable to open file at {}", &filepath).as_str());
@@ -266,11 +250,6 @@ fn main() {
             .as_str(),
         );
 
-        // if !exclude_version_files_set.contains(filepath) {
-        //     if doc.contains_key("package") {
-        //         doc["package"]["version"] = value(args.update_version.clone());
-        //     }
-        // }
         if exclude_version_files_set.contains(filepath) {
             output.push_str(
                 "\n           * Excluding from package version bump due to command line parameter"
