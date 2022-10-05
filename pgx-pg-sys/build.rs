@@ -7,8 +7,6 @@ All rights reserved.
 Use of this source code is governed by the MIT license that can be found in the LICENSE file.
 */
 
-extern crate build_deps;
-
 use bindgen::callbacks::{DeriveTrait, ImplementsTrait, MacroParsingBehavior};
 use eyre::{eyre, WrapErr};
 use pgx_pg_config::{prefix_path, PgConfig, PgConfigSelector, Pgx, SUPPORTED_MAJOR_VERSIONS};
@@ -112,10 +110,12 @@ fn main() -> color_eyre::Result<()> {
 
     let pgx = Pgx::from_config()?;
 
-    build_deps::rerun_if_changed_paths(&Pgx::config_toml()?.display().to_string()).unwrap();
-    build_deps::rerun_if_changed_paths("include/*").unwrap();
-    build_deps::rerun_if_changed_paths("cshim/pgx-cshim.c").unwrap();
-    build_deps::rerun_if_changed_paths("cshim/Makefile").unwrap();
+    println!(
+        "cargo:rerun-if-changed={}",
+        Pgx::config_toml()?.display().to_string(),
+    );
+    println!("cargo:rerun-if-changed=include");
+    println!("cargo:rerun-if-changed=cshim");
 
     let pg_configs = if std::env::var("PGX_PG_SYS_GENERATE_BINDINGS_FOR_RELEASE")
         .unwrap_or("false".into())
