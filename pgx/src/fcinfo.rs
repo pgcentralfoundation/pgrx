@@ -95,7 +95,7 @@ mod pg_10_11 {
         let datum = unsafe { fcinfo.as_ref() }.unwrap().arg[num];
         let isnull = pg_arg_is_null(fcinfo, num);
         unsafe {
-            let typid = pg_sys::InvalidOid;
+            let typid = super::pg_getarg_type(fcinfo, num);
             T::from_datum(datum, isnull, typid)
         }
     }
@@ -134,7 +134,7 @@ mod pg_12_13_14 {
     pub fn pg_getarg<T: FromDatum>(fcinfo: pg_sys::FunctionCallInfo, num: usize) -> Option<T> {
         let datum = get_nullable_datum(fcinfo, num);
         unsafe {
-            let typid = pg_sys::InvalidOid;
+            let typid = super::pg_getarg_type(fcinfo, num);
             T::from_datum(datum.value, datum.isnull, typid)
         }
     }
