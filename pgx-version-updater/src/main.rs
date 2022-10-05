@@ -164,51 +164,20 @@ fn main() {
                 &filepath.cyan()
             );
 
-            // Extract package name from Cargo.toml files that are getting
-            // a [pacakge] version bump. This list will eventually be used to
-            // search for dependencies all Cargo.toml files.
-            // For example, if a particular Cargo.toml file has:
-            //   [package]
-            //   name = "pgx"
-            //   version = "0.1.2"
-            //
-            // and this file is considered eligible for a package version bump,
-            // then we need to extract the package name (e.g. "pgx") so that we
-            // can bump this package name in other Cargo.toml files that use this
-            // as a dependency, such as:
-            //   [dependencies]
-            //   pgx = "0.1.1"
+            // Extract the package name if possible
             if !exclude_version_files_set.contains(&filepath) {
-                let data = fs::read_to_string(&filepath)
-                    .expect(format!("Unable to open file at {}", &filepath).as_str());
-                let doc = data.parse::<Document>().expect(
-                    format!(
-                        "File at location {} is an invalid Cargo.toml file",
-                        &filepath
-                    )
-                    .as_str(),
-                );
-
-                if doc.contains_key("package") {
-                    let package_table = doc.get("package").unwrap().as_table().unwrap();
-
-                    if package_table.contains_key("name") {
-                        let package_name = package_table
-                            .get("name")
-                            .unwrap()
-                            .as_str()
-                            .unwrap()
-                            .to_string();
-
+                match extract_package_name(&filepath) {
+                    Some(package_name) => {
                         updatable_package_names_set.insert(package_name);
                     }
-                } else {
-                    output.push_str(
-                        "\n           * Could not determine package name due to [package] not existing -- skipping version bump."
-                            .dimmed()
-                            .to_string()
-                            .as_str(),
-                    )
+                    None => {
+                        output.push_str(
+                            "\n           * Could not determine package name due to [package] not existing -- skipping version bump."
+                                .dimmed()
+                                .to_string()
+                                .as_str(),
+                        )
+                    }
                 }
             }
 
@@ -227,43 +196,24 @@ fn main() {
             &filepath.cyan()
         );
 
-        // TODO: Extract this into a method, use it above as well.
+        // Extract the package name if possible
         if !exclude_version_files_set.contains(&filepath) {
-            let data = fs::read_to_string(&filepath)
-                .expect(format!("Unable to open file at {}", &filepath).as_str());
-            let doc = data.parse::<Document>().expect(
-                format!(
-                    "File at location {} is an invalid Cargo.toml file",
-                    &filepath
-                )
-                .as_str(),
-            );
-
-            if doc.contains_key("package") {
-                let package_table = doc.get("package").unwrap().as_table().unwrap();
-
-                if package_table.contains_key("name") {
-                    let package_name = package_table
-                        .get("name")
-                        .unwrap()
-                        .as_str()
-                        .unwrap()
-                        .to_string();
-
+            match extract_package_name(&filepath) {
+                Some(package_name) => {
                     updatable_package_names_set.insert(package_name);
                 }
-            } else {
-                output.push_str(
-                        "\n          * Could not determine package name due to [package] not existing -- skipping version bump."
+                None => {
+                    output.push_str(
+                        "\n           * Could not determine package name due to [package] not existing -- skipping version bump."
                             .dimmed()
                             .to_string()
                             .as_str(),
                     )
+                }
             }
         }
 
         println!("{output}");
-        // deps_update_files_set.insert(filepath.clone());
         files_to_process_set.insert(filepath.clone());
     }
 
@@ -390,24 +340,33 @@ fn main() {
                     .expect("Failed to write to stdin");
             });
 
-            let output = child.wait_with_output().expect("Failed to read stdout");
+            let child_output = child.wait_with_output().expect("Failed to read stdout");
+            let mut diff_output = String::new();
 
-            let output_lines = output.stdout.lines();
+            // Using an iterator here, so we need to keep track of certain things for proper output
+            let mut line_ctr = 0;
+            for line in child_output.stdout.lines().skip(2) {
+                let line = line.unwrap();
 
-            if output_lines.count() == 0 {
-                println!("           {}", "* No detectable diff found".dimmed());
-            } else {
-                println!("           {}", "* Diff:".dimmed());
-                for line in output.stdout.lines().skip(2) {
-                    let line = line.unwrap();
-
-                    match line.chars().nth(0).unwrap() {
-                        '-' => println!("            {}", line.red()),
-                        '+' => println!("            {}", line.green()),
-                        _ => println!("           {line}"),
-                    }
+                match line.chars().nth(0).unwrap() {
+                    '-' => diff_output.push_str(format!("\n            {}", line.red()).as_str()),
+                    '+' => diff_output.push_str(format!("\n            {}", line.green()).as_str()),
+                    _ => diff_output.push_str(format!("\n           {line}").as_str()),
                 }
+
+                line_ctr += 1;
             }
+
+            // The "diff" command will not print out anything if there is no difference.
+            if line_ctr == 0 {
+                diff_output.push_str(
+                    format!("\n           {}", "* No detectable diff found".dimmed()).as_str(),
+                )
+            } else {
+                diff_output = format!("\n           {}", "* Diff:".dimmed()) + diff_output.as_str();
+            }
+
+            output.push_str(diff_output.as_str());
         }
 
         println!("{output}");
@@ -416,5 +375,38 @@ fn main() {
         if !args.dry_run {
             fs::write(filepath, doc.to_string()).expect("Unable to write file");
         }
+    }
+}
+
+// Given a filepath pointing to a Cargo.toml file, extract out the [package] name
+// if it has one
+fn extract_package_name(filepath: &String) -> Option<String> {
+    let data = fs::read_to_string(&filepath)
+        .expect(format!("Unable to open file at {}", &filepath).as_str());
+    let doc = data.parse::<Document>().expect(
+        format!(
+            "File at location {} is an invalid Cargo.toml file",
+            &filepath
+        )
+        .as_str(),
+    );
+
+    if doc.contains_key("package") {
+        let package_table = doc.get("package").unwrap().as_table().unwrap();
+
+        if package_table.contains_key("name") {
+            let package_name = package_table
+                .get("name")
+                .unwrap()
+                .as_str()
+                .unwrap()
+                .to_string();
+
+            Some(package_name)
+        } else {
+            None
+        }
+    } else {
+        None
     }
 }
