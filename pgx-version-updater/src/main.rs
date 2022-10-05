@@ -47,9 +47,8 @@ fn main() {
     let args = Args::parse();
     let current_dir = env::current_dir().expect("Could not get current directory!");
 
-    // Do we need this?
-    // let mut deps_update_files_set: HashSet<String> = HashSet::new();
-
+    // Contains a set of package names (e.g. "pgx", "pgx-pg-sys") that wil be used
+    // to search for updatable dependencies later on
     let mut updatable_package_names_set: HashSet<String> = HashSet::new();
 
     // This will eventually contain every file we want to process
@@ -148,8 +147,8 @@ fn main() {
         );
     }
 
-    // for filepath in files_to_process_set.union(&deps_update_files_set) {
-    // Loop through every TOML file and update package versions and dependency
+    // Loop through every TOML file (automatically discovered and manaully included
+    // via command line params) and update package versions and dependency
     // versions where applicable
     for filepath in files_to_process_set {
         let mut output = format!(
@@ -197,24 +196,24 @@ fn main() {
                 // declarations
                 for package in &updatable_package_names_set {
                     if deps_table.contains_key(package) {
-                        let dep_value = deps_table.get_mut(package).unwrap();
+                        let dep_item = deps_table.get_mut(package).unwrap();
 
-                        if dep_value.is_table() {
+                        if dep_item.is_table() {
                             // Tables can contain other tables, and if that's the case we're
                             // probably at a case of:
                             //   [dependencies.pgx]
                             //   version = "1.2.3"
-                            let old_version = dep_value.get("version").unwrap();
+                            let old_version = dep_item.get("version").unwrap();
                             let new_version = parse_new_version(
                                 old_version.as_str().unwrap(),
                                 &args.update_version.as_str(),
                             );
-                            dep_value["version"] = value(new_version);
-                        } else if dep_value.is_inline_table() {
+                            dep_item["version"] = value(new_version);
+                        } else if dep_item.is_inline_table() {
                             // Inline table covers the case of:
                             //   [dependencies]
                             //   pgx = { version = "1.2.3", features = ["..."] }
-                            let inline_table = dep_value.as_inline_table().unwrap();
+                            let inline_table = dep_item.as_inline_table().unwrap();
 
                             if inline_table.contains_key("version") {
                                 let old_version = inline_table.get("version").unwrap();
@@ -229,7 +228,7 @@ fn main() {
                             //   [dependencies]
                             //   pgx = "0.1.2"
                             let new_version = parse_new_version(
-                                dep_value.as_str().unwrap(),
+                                dep_item.as_str().unwrap(),
                                 &args.update_version.as_str(),
                             );
 
