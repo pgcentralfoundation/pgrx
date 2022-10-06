@@ -22,6 +22,13 @@ use url::Url;
 pub static BASE_POSTGRES_PORT_NO: u16 = 28800;
 pub static BASE_POSTGRES_TESTING_PORT_NO: u16 = 32200;
 
+#[cfg(target_os = "macos")]
+/// The flags to specify to get a "C.UTF-8" locale on this system.
+pub const C_LOCALE_FLAGS: &[&str] = &["--locale=C", "--lc-ctype=UTF-8"];
+#[cfg(not(target_os = "macos"))]
+/// The flags to specify to get a "C.UTF-8" locale on this system.
+pub const C_LOCALE_FLAGS: &[&str] = &["--locale=C.UTF-8"];
+
 // These methods were originally in `pgx-utils`, but in an effort to consolidate
 // dependencies, the decision was made to package them into wherever made the
 // most sense. In this case, it made the most sense to put them into this
