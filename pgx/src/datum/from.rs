@@ -39,6 +39,9 @@ pub enum TryFromDatumError {
 /// If implementing this, also implement `IntoDatum` for the reverse
 /// conversion.
 pub trait FromDatum {
+    /// Should a type OID be fetched when calling `from_datum`?
+    const GET_TYPOID: bool = false;
+
     /// ## Safety
     ///
     /// This method is inherently unsafe as the `datum` argument can represent an arbitrary

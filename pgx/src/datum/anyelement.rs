@@ -34,6 +34,8 @@ impl AnyElement {
 }
 
 impl FromDatum for AnyElement {
+    const GET_TYPOID: bool = true;
+
     #[inline]
     unsafe fn from_datum(
         datum: pg_sys::Datum,
