@@ -555,6 +555,10 @@ fn run_bindgen(pg_config: &PgConfig, include_h: &PathBuf) -> eyre::Result<syn::F
         .blocklist_item("_*(HAVE|have)_.*") // these are for C's use
         .blocklist_item("__[A-Z].*") // these are reserved
         .blocklist_function("float[48].*") // Rust has plenty of float handling
+        .blocklist_item(".*[vV][aA]_(list|LIST|start|START|end|END|copy|COPY).*") // do not need va_list anything!
+        .blocklist_function("(pg_|p)v(sn?|f)?printf")
+        .blocklist_function("appendStringInfoVA")
+        .blocklist_file("stdarg.h")
         .size_t_is_usize(true)
         .rustfmt_bindings(false)
         .derive_debug(true)
