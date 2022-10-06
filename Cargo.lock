@@ -1439,7 +1439,6 @@ dependencies = [
  "pgx-utils",
  "proc-macro2",
  "quote",
- "rayon",
  "rustversion",
  "shlex",
  "sptr",
