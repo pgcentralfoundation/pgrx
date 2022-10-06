@@ -244,15 +244,6 @@ dependencies = [
 ]
 
 [[package]]
-name = "build-deps"
-version = "0.1.4"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "64f14468960818ce4f3e3553c32d524446687884f8e7af5d3e252331d8a87e43"
-dependencies = [
- "glob",
-]
-
-[[package]]
 name = "bumpalo"
 version = "3.11.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -1453,13 +1444,10 @@ name = "pgx-pg-sys"
 version = "0.5.0-beta.1"
 dependencies = [
  "bindgen",
- "build-deps",
  "color-eyre",
  "eyre",
  "memoffset",
- "num_cpus",
  "once_cell",
- "owo-colors",
  "pgx-macros",
  "pgx-pg-config",
  "pgx-utils",
