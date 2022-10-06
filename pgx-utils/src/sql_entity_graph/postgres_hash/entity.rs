@@ -53,9 +53,9 @@ impl PartialOrd for PostgresHashEntity {
     }
 }
 
-impl Into<SqlGraphEntity> for PostgresHashEntity {
-    fn into(self) -> SqlGraphEntity {
-        SqlGraphEntity::Hash(self)
+impl From<PostgresHashEntity> for SqlGraphEntity {
+    fn from(val: PostgresHashEntity) -> Self {
+        SqlGraphEntity::Hash(val)
     }
 }
 

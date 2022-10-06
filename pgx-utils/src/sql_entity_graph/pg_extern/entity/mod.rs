@@ -80,9 +80,9 @@ impl PartialOrd for PgExternEntity {
     }
 }
 
-impl Into<SqlGraphEntity> for PgExternEntity {
-    fn into(self) -> SqlGraphEntity {
-        SqlGraphEntity::Function(self)
+impl From<PgExternEntity> for SqlGraphEntity {
+    fn from(val: PgExternEntity) -> Self {
+        SqlGraphEntity::Function(val)
     }
 }
 

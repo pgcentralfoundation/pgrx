@@ -275,12 +275,12 @@ where
     }
 }
 
-impl<T> Into<Option<pg_sys::Datum>> for PgVarlena<T>
+impl<T> From<PgVarlena<T>> for Option<pg_sys::Datum>
 where
     T: Copy + Sized,
 {
-    fn into(self) -> Option<pg_sys::Datum> {
-        Some(self.into_pg().into())
+    fn from(val: PgVarlena<T>) -> Self {
+        Some(val.into_pg().into())
     }
 }
 

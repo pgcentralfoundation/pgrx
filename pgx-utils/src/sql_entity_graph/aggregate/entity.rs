@@ -161,9 +161,9 @@ impl PartialOrd for PgAggregateEntity {
     }
 }
 
-impl Into<SqlGraphEntity> for PgAggregateEntity {
-    fn into(self) -> SqlGraphEntity {
-        SqlGraphEntity::Aggregate(self)
+impl From<PgAggregateEntity> for SqlGraphEntity {
+    fn from(val: PgAggregateEntity) -> Self {
+        SqlGraphEntity::Aggregate(val)
     }
 }
 

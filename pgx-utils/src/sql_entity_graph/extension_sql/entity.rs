@@ -45,9 +45,9 @@ impl ExtensionSqlEntity {
     }
 }
 
-impl Into<SqlGraphEntity> for ExtensionSqlEntity {
-    fn into(self) -> SqlGraphEntity {
-        SqlGraphEntity::CustomSql(self)
+impl From<ExtensionSqlEntity> for SqlGraphEntity {
+    fn from(val: ExtensionSqlEntity) -> Self {
+        SqlGraphEntity::CustomSql(val)
     }
 }
 
