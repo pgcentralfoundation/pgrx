@@ -42,11 +42,11 @@ impl FromDatum for AnyElement {
         is_null: bool,
         typoid: pg_sys::Oid,
     ) -> Option<AnyElement> {
-        FromDatum::from_datum_with_typid(datum, is_null, typoid)
+        FromDatum::from_polymorphic_datum(datum, is_null, typoid)
     }
 
     #[inline]
-    unsafe fn from_datum_with_typid(
+    unsafe fn from_polymorphic_datum(
         datum: pg_sys::Datum,
         is_null: bool,
         typoid: pg_sys::Oid,

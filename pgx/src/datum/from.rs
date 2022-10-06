@@ -57,12 +57,13 @@ pub trait FromDatum {
     where
         Self: Sized;
 
-    /// Like `from_datum` but the typoid must have a value.
+    /// Like `from_datum` for instantiating polymorphic types
+    /// which require preserving the dynamic type metadata.
     ///
     /// ## Safety
     ///
     /// Same caveats as `FromDatum::from_datum(...)`.
-    unsafe fn from_datum_with_typid(
+    unsafe fn from_polymorphic_datum(
         datum: pg_sys::Datum,
         is_null: bool,
         typoid: pg_sys::Oid,

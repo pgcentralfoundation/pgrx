@@ -96,7 +96,7 @@ mod pg_10_11 {
         let isnull = pg_arg_is_null(fcinfo, num);
         unsafe {
             if T::GET_TYPOID {
-                T::from_datum_with_typid(datum, isnull, super::pg_getarg_type(fcinfo, num))
+                T::from_polymorphic_datum(datum, isnull, super::pg_getarg_type(fcinfo, num))
             } else {
                 T::from_datum(datum, isnull, pg_sys::InvalidOid)
             }
@@ -138,7 +138,7 @@ mod pg_12_13_14 {
         let datum = get_nullable_datum(fcinfo, num);
         unsafe {
             if T::GET_TYPOID {
-                T::from_datum_with_typid(
+                T::from_polymorphic_datum(
                     datum.value,
                     datum.isnull,
                     super::pg_getarg_type(fcinfo, num),
