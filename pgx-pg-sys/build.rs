@@ -93,18 +93,9 @@ fn main() -> color_eyre::Result<()> {
         println!("cargo:rustc-cfg=nightly")
     };
 
-    let manifest_dir = PathBuf::from(std::env::var("CARGO_MANIFEST_DIR").unwrap());
-    let out_dir = PathBuf::from(std::env::var("OUT_DIR").unwrap());
-    let mut src_dir = manifest_dir.clone();
-    src_dir.push("src");
-    let mut shim_src = manifest_dir.clone();
-    shim_src.push("cshim");
-    let mut shim_dst = out_dir.clone();
-    shim_dst.push("cshim");
+    let build_paths = BuildPaths::from_env();
 
-    eprintln!("manifest_dir={}", manifest_dir.display());
-    eprintln!("shim_src={}", shim_src.display());
-    eprintln!("shim_dst={}", shim_dst.display());
+    eprintln!("build_paths={build_paths:?}");
 
     let pgx = Pgx::from_config()?;
 
@@ -149,7 +140,7 @@ fn main() -> color_eyre::Result<()> {
         .map(|pg_config| {
             let major_version =
                 pg_config.major_version().wrap_err("could not determine major version")?;
-            let mut include_h = manifest_dir.clone();
+            let mut include_h = build_paths.manifest_dir.clone();
             include_h.push("include");
             include_h.push(format!("pg{}.h", major_version));
 
@@ -164,9 +155,9 @@ fn main() -> color_eyre::Result<()> {
                 .unwrap_or("false".into())
                 == "1"
             {
-                vec![out_dir.clone(), src_dir.clone()]
+                vec![build_paths.out_dir.clone(), build_paths.src_dir.clone()]
             } else {
-                vec![out_dir.clone()]
+                vec![build_paths.out_dir.clone()]
             };
             for dest_dir in dest_dirs {
                 let mut bindings_file = dest_dir.clone();
@@ -205,10 +196,39 @@ fn main() -> color_eyre::Result<()> {
 
     // compile the cshim for each binding
     for pg_config in pg_configs {
-        build_shim(&shim_src, &shim_dst, &pg_config)?;
+        build_shim(&build_paths.shim_src, &build_paths.shim_dst, &pg_config)?;
     }
 
     Ok(())
+}
+
+#[derive(Debug, Clone)]
+struct BuildPaths {
+    /// CARGO_MANIFEST_DIR
+    manifest_dir: PathBuf,
+    /// OUT_DIR
+    out_dir: PathBuf,
+    /// {manifest_dir}/src
+    src_dir: PathBuf,
+    /// {manifest_dir}/cshim
+    shim_src: PathBuf,
+    /// {out_dir}/cshim
+    shim_dst: PathBuf,
+}
+
+impl BuildPaths {
+    fn from_env() -> Self {
+        // Cargo guarantees these are provided, so unwrap is fine.
+        let manifest_dir = std::env::var_os("CARGO_MANIFEST_DIR").map(PathBuf::from).unwrap();
+        let out_dir = std::env::var_os("OUT_DIR").map(PathBuf::from).unwrap();
+        Self {
+            src_dir: manifest_dir.join("src"),
+            shim_src: manifest_dir.join("cshim"),
+            shim_dst: out_dir.join("cshim"),
+            out_dir,
+            manifest_dir,
+        }
+    }
 }
 
 fn write_rs_file(
