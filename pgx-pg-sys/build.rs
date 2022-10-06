@@ -137,61 +137,7 @@ fn main() -> color_eyre::Result<()> {
 
     pg_configs
         .par_iter()
-        .map(|pg_config| {
-            let major_version =
-                pg_config.major_version().wrap_err("could not determine major version")?;
-            let mut include_h = build_paths.manifest_dir.clone();
-            include_h.push("include");
-            include_h.push(format!("pg{}.h", major_version));
-
-            let bindgen_output = run_bindgen(&pg_config, &include_h)
-                .wrap_err_with(|| format!("bindgen failed for pg{}", major_version))?;
-
-            let oids = extract_oids(&bindgen_output);
-            let rewritten_items = rewrite_items(&bindgen_output, is_for_release)
-                .wrap_err_with(|| format!("failed to rewrite items for pg{}", major_version))?;
-
-            let dest_dirs = if std::env::var("PGX_PG_SYS_GENERATE_BINDINGS_FOR_RELEASE")
-                .unwrap_or("false".into())
-                == "1"
-            {
-                vec![build_paths.out_dir.clone(), build_paths.src_dir.clone()]
-            } else {
-                vec![build_paths.out_dir.clone()]
-            };
-            for dest_dir in dest_dirs {
-                let mut bindings_file = dest_dir.clone();
-                bindings_file.push(&format!("pg{}.rs", major_version));
-                write_rs_file(
-                    rewritten_items.clone(),
-                    &bindings_file,
-                    quote! {
-                        use crate as pg_sys;
-                        #[cfg(any(feature = "pg12", feature = "pg13", feature = "pg14"))]
-                        use crate::NullableDatum;
-                        use crate::{PgNode, Datum};
-                    },
-                )
-                .wrap_err_with(|| {
-                    format!(
-                        "Unable to write bindings file for pg{} to `{}`",
-                        major_version,
-                        bindings_file.display()
-                    )
-                })?;
-
-                let mut oids_file = dest_dir.clone();
-                oids_file.push(&format!("pg{}_oids.rs", major_version));
-                write_rs_file(oids.clone(), &oids_file, quote! {}).wrap_err_with(|| {
-                    format!(
-                        "Unable to write oids file for pg{} to `{}`",
-                        major_version,
-                        oids_file.display()
-                    )
-                })?;
-            }
-            Ok(())
-        })
+        .map(|pg_config| generate_bindings(pg_config, &build_paths, is_for_release))
         .collect::<eyre::Result<Vec<_>>>()?;
 
     // compile the cshim for each binding
@@ -199,6 +145,65 @@ fn main() -> color_eyre::Result<()> {
         build_shim(&build_paths.shim_src, &build_paths.shim_dst, &pg_config)?;
     }
 
+    Ok(())
+}
+
+fn generate_bindings(
+    pg_config: &PgConfig,
+    build_paths: &BuildPaths,
+    is_for_release: bool,
+) -> eyre::Result<()> {
+    let major_version = pg_config.major_version().wrap_err("could not determine major version")?;
+    let mut include_h = build_paths.manifest_dir.clone();
+    include_h.push("include");
+    include_h.push(format!("pg{}.h", major_version));
+
+    let bindgen_output = run_bindgen(&pg_config, &include_h)
+        .wrap_err_with(|| format!("bindgen failed for pg{}", major_version))?;
+
+    let oids = extract_oids(&bindgen_output);
+    let rewritten_items = rewrite_items(&bindgen_output, is_for_release)
+        .wrap_err_with(|| format!("failed to rewrite items for pg{}", major_version))?;
+
+    let dest_dirs = if std::env::var("PGX_PG_SYS_GENERATE_BINDINGS_FOR_RELEASE")
+        .unwrap_or("false".into())
+        == "1"
+    {
+        vec![build_paths.out_dir.clone(), build_paths.src_dir.clone()]
+    } else {
+        vec![build_paths.out_dir.clone()]
+    };
+    for dest_dir in dest_dirs {
+        let mut bindings_file = dest_dir.clone();
+        bindings_file.push(&format!("pg{}.rs", major_version));
+        write_rs_file(
+            rewritten_items.clone(),
+            &bindings_file,
+            quote! {
+                use crate as pg_sys;
+                #[cfg(any(feature = "pg12", feature = "pg13", feature = "pg14"))]
+                use crate::NullableDatum;
+                use crate::{PgNode, Datum};
+            },
+        )
+        .wrap_err_with(|| {
+            format!(
+                "Unable to write bindings file for pg{} to `{}`",
+                major_version,
+                bindings_file.display()
+            )
+        })?;
+
+        let mut oids_file = dest_dir.clone();
+        oids_file.push(&format!("pg{}_oids.rs", major_version));
+        write_rs_file(oids.clone(), &oids_file, quote! {}).wrap_err_with(|| {
+            format!(
+                "Unable to write oids file for pg{} to `{}`",
+                major_version,
+                oids_file.display()
+            )
+        })?;
+    }
     Ok(())
 }
 
