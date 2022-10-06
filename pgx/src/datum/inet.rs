@@ -114,9 +114,9 @@ impl IntoDatum for Inet {
     }
 }
 
-impl Into<Inet> for String {
-    fn into(self) -> Inet {
-        Inet(self)
+impl From<String> for Inet {
+    fn from(val: String) -> Self {
+        Inet(val)
     }
 }
 
