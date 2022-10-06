@@ -2,7 +2,6 @@
 name = "composite_type"
 version = "0.0.0"
 edition = "2021"
-rust-version = "1.58"
 
 [lib]
 crate-type = ["cdylib"]

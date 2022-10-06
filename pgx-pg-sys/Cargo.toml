@@ -9,7 +9,6 @@ repository = "https://github.com/zombodb/pgx"
 documentation = "https://docs.rs/pgx-pg-sys"
 readme = "README.md"
 edition = "2021"
-rust-version = "1.58"
 
 [features]
 default = [ ]
@@ -38,9 +37,6 @@ sptr = "0.3"
 
 [build-dependencies]
 bindgen = { version = "0.60.1", default-features = false, features = ["runtime"] }
-build-deps = "0.1.4"
-owo-colors = "3.5.0"
-num_cpus = "1.13.1"
 pgx-pg-config= { path = "../pgx-pg-config/", version = "=0.5.0-beta.1" }
 pgx-utils = { path = "../pgx-utils/", version = "=0.5.0-beta.1" }
 proc-macro2 = "1.0.44"

@@ -43,9 +43,9 @@ impl PartialOrd for PgTriggerEntity {
     }
 }
 
-impl Into<SqlGraphEntity> for PgTriggerEntity {
-    fn into(self) -> SqlGraphEntity {
-        SqlGraphEntity::Trigger(self)
+impl From<PgTriggerEntity> for SqlGraphEntity {
+    fn from(val: PgTriggerEntity) -> Self {
+        SqlGraphEntity::Trigger(val)
     }
 }
 

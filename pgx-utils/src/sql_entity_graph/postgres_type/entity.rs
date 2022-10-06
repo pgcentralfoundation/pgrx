@@ -69,9 +69,9 @@ impl PostgresTypeEntity {
     }
 }
 
-impl Into<SqlGraphEntity> for PostgresTypeEntity {
-    fn into(self) -> SqlGraphEntity {
-        SqlGraphEntity::Type(self)
+impl From<PostgresTypeEntity> for SqlGraphEntity {
+    fn from(val: PostgresTypeEntity) -> Self {
+        SqlGraphEntity::Type(val)
     }
 }
 

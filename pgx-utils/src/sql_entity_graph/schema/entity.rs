@@ -41,9 +41,9 @@ impl PartialOrd for SchemaEntity {
     }
 }
 
-impl Into<SqlGraphEntity> for SchemaEntity {
-    fn into(self) -> SqlGraphEntity {
-        SqlGraphEntity::Schema(self)
+impl From<SchemaEntity> for SqlGraphEntity {
+    fn from(val: SchemaEntity) -> Self {
+        SqlGraphEntity::Schema(val)
     }
 }
 

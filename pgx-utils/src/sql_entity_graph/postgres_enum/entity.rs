@@ -65,9 +65,9 @@ impl PostgresEnumEntity {
     }
 }
 
-impl Into<SqlGraphEntity> for PostgresEnumEntity {
-    fn into(self) -> SqlGraphEntity {
-        SqlGraphEntity::Enum(self)
+impl From<PostgresEnumEntity> for SqlGraphEntity {
+    fn from(val: PostgresEnumEntity) -> Self {
+        SqlGraphEntity::Enum(val)
     }
 }
 

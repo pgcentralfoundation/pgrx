@@ -103,9 +103,9 @@ impl ControlFile {
     }
 }
 
-impl Into<SqlGraphEntity> for ControlFile {
-    fn into(self) -> SqlGraphEntity {
-        SqlGraphEntity::ExtensionRoot(self)
+impl From<ControlFile> for SqlGraphEntity {
+    fn from(val: ControlFile) -> Self {
+        SqlGraphEntity::ExtensionRoot(val)
     }
 }
 

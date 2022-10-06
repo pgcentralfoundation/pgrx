@@ -73,9 +73,9 @@ impl PartialOrd for PostgresOrdEntity {
     }
 }
 
-impl Into<SqlGraphEntity> for PostgresOrdEntity {
-    fn into(self) -> SqlGraphEntity {
-        SqlGraphEntity::Ord(self)
+impl From<PostgresOrdEntity> for SqlGraphEntity {
+    fn from(val: PostgresOrdEntity) -> Self {
+        SqlGraphEntity::Ord(val)
     }
 }
 
