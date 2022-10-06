@@ -57,6 +57,22 @@ pub trait FromDatum {
     where
         Self: Sized;
 
+    /// Like `from_datum` but the typoid must have a value.
+    ///
+    /// ## Safety
+    ///
+    /// Same caveats as `FromDatum::from_datum(...)`.
+    unsafe fn from_datum_with_typid(
+        datum: pg_sys::Datum,
+        is_null: bool,
+        typoid: pg_sys::Oid,
+    ) -> Option<Self>
+    where
+        Self: Sized,
+    {
+        FromDatum::from_datum(datum, is_null, typoid)
+    }
+
     /// Default implementation switched to the specified memory context and then simply calls
     /// `FromDatum::from_datum(...)` from within that context.
     ///
