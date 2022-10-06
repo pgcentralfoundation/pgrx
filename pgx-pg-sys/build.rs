@@ -543,13 +543,10 @@ fn run_bindgen(pg_config: &PgConfig, include_h: &PathBuf) -> eyre::Result<syn::F
         .allowlist_file(".*mcxt.h")
         .allowlist_file(".*(storage|catalog|access|commands|executor|adt|optimizer|rewrite|postmaster|tcop|replication|nodes|postgres|parse|pg_|item|heap).*")
         .allowlist_var("SIG.*")
-        .blocklist_type("Datum") // manually wrapping datum types for correctness
-        .blocklist_type("NullableDatum")
+        .blocklist_type("(Nullable)?Datum") // manually wrapping datum types for correctness
         .blocklist_function("varsize_any") // pgx converts the VARSIZE_ANY macro, so we don't want to also have this function, which is in heaptuple.c
-        .blocklist_function("query_tree_walker")
-        .blocklist_function("expression_tree_walker")
-        .blocklist_function(".*setjmp")
-        .blocklist_function(".*longjmp")
+        .blocklist_function("(query|expression)_tree_walker")
+        .blocklist_function(".*(set|long)jmp")
         .blocklist_function("pg_re_throw")
         .blocklist_item("CONFIGURE_ARGS") // configuration during build is hopefully irrelevant
         .blocklist_item("_*(HAVE|have)_.*") // these are for C's use
