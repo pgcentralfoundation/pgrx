@@ -13,7 +13,6 @@ use crate::{
     pg_sys, text_to_rust_str_unchecked, varlena_to_byte_slice, AllocatedByPostgres, IntoDatum,
     PgBox, PgMemoryContexts,
 };
-use std::ffi::CStr;
 use std::num::NonZeroUsize;
 
 /// If converting a Datum to a Rust type fails, this is the set of possible reasons why.
@@ -338,32 +337,17 @@ impl FromDatum for char {
 }
 
 /// for cstring
-impl<'a> FromDatum for &'a std::ffi::CStr {
+impl<'a> FromDatum for &'a core::ffi::CStr {
     #[inline]
     unsafe fn from_polymorphic_datum(
         datum: pg_sys::Datum,
         is_null: bool,
         _: pg_sys::Oid,
-    ) -> Option<&'a CStr> {
+    ) -> Option<&'a core::ffi::CStr> {
         if is_null || datum.is_null() {
             None
         } else {
-            Some(std::ffi::CStr::from_ptr(datum.cast_mut_ptr()))
-        }
-    }
-}
-
-impl<'a> FromDatum for &'a crate::cstr_core::CStr {
-    #[inline]
-    unsafe fn from_polymorphic_datum(
-        datum: pg_sys::Datum,
-        is_null: bool,
-        _: pg_sys::Oid,
-    ) -> Option<&'a crate::cstr_core::CStr> {
-        if is_null || datum.is_null() {
-            None
-        } else {
-            Some(crate::cstr_core::CStr::from_ptr(datum.cast_mut_ptr()))
+            Some(core::ffi::CStr::from_ptr(datum.cast_mut_ptr()))
         }
     }
 }

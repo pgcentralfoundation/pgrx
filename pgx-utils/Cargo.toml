@@ -12,7 +12,6 @@ edition = "2021"
 
 [dependencies]
 seq-macro = "0.3"
-cstr_core = "0.2"
 atty = "0.2.14"
 convert_case = "0.5.0"
 eyre = "0.6.8"
