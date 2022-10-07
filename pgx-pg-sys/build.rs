@@ -537,27 +537,27 @@ fn run_bindgen(pg_config: &PgConfig, include_h: &PathBuf) -> eyre::Result<syn::F
         .clang_arg(&format!("-I{}", includedir_server.display()))
         .parse_callbacks(Box::new(PgxOverrides::default()))
         .allowlist_file(".*confdefs.h")
-        .allowlist_file(".*([fF]uncs|mgr).h")
-        .allowlist_file(".*htup(_details)?.h")
+        .allowlist_file(".*(?:[fF]uncs|mgr).h")
+        .allowlist_file(".*htup(?:_details)?.h")
         .allowlist_file(".*syscache.h")
         .allowlist_file(".*mcxt.h")
-        .allowlist_file(".*(storage|catalog|access|commands|executor|adt|optimizer|rewrite|postmaster|tcop|replication|nodes|postgres|parse|pg_|item|heap).*")
+        .allowlist_file(".*(?:storage|catalog|access|commands|executor|adt|optimizer|rewrite|postmaster|tcop|replication|nodes|postgres|parse|pg_|item|heap).*")
         .allowlist_var("SIG.*")
         .blocklist_type("(Nullable)?Datum") // manually wrapping datum types for correctness
         .blocklist_function("varsize_any") // pgx converts the VARSIZE_ANY macro, so we don't want to also have this function, which is in heaptuple.c
-        .blocklist_function("(query|expression)_tree_walker")
-        .blocklist_function(".*(set|long)jmp")
+        .blocklist_function("(?:query|expression)_tree_walker")
+        .blocklist_function(".*(?:set|long)jmp")
         .blocklist_function("pg_re_throw")
         .blocklist_item("CONFIGURE_ARGS") // configuration during build is hopefully irrelevant
-        .blocklist_item("(_*HAVE|__have)_.*") // header tracking metadata
+        .blocklist_item("_*(?:HAVE|have)_.*") // header tracking metadata
         .blocklist_item("_[A-Z_]+_H") // more header metadata
         .blocklist_item("__[A-Z].*") // these are reserved and unused by Postgres
         .blocklist_item("__darwin.*") // this should always be Apple's names
-        .blocklist_function("pq(Strerror|Get.*)") // wrappers around platform functions: user can call those themselves
+        .blocklist_function("pq(?:Strerror|Get.*)") // wrappers around platform functions: user can call those themselves
         .blocklist_item(".*pthread.*)") // shims for pthreads on non-pthread systems, just use std::thread
         .blocklist_function("float[48].*") // Rust has plenty of float handling
-        .blocklist_item(".*[vV][aA]_(list|LIST|start|START|end|END|copy|COPY).*") // do not need va_list anything!
-        .blocklist_function("(pg_|p)v(sn?|f)?printf")
+        .blocklist_item(".*(?i:va)_(?i:list|start|end|copy).*") // do not need va_list anything!
+        .blocklist_function("(?:pg_|p)v(?:sn?|f)?printf")
         .blocklist_function("appendStringInfoVA")
         .blocklist_file("stdarg.h")
         .size_t_is_usize(true)
