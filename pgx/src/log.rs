@@ -499,8 +499,7 @@ pub fn ereport(
     lineno: u32,
     colno: u32,
 ) {
-    use std::ffi::CStr;
-    use std::ffi::CString;
+    use std::ffi::{CStr, CString};
     use std::os::raw::c_char;
 
     #[cfg(feature = "plrust")]

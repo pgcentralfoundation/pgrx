@@ -225,10 +225,7 @@ impl<'a> PgTupleDesc<'a> {
 
     /// Iterate over our attributes
     pub fn iter(&self) -> TupleDescIterator {
-        TupleDescIterator {
-            tupdesc: self,
-            curr: 0,
-        }
+        TupleDescIterator { tupdesc: self, curr: 0 }
     }
 
     /// Convert this [PgTupleDesc] into a pointer for passing into Postgres.  You are responsible
@@ -312,10 +309,7 @@ impl<'a> IntoIterator for PgTupleDesc<'a> {
     type IntoIter = TupleDescDataIntoIterator<'a>;
 
     fn into_iter(self) -> Self::IntoIter {
-        TupleDescDataIntoIterator {
-            tupdesc: self,
-            curr: 0,
-        }
+        TupleDescDataIntoIterator { tupdesc: self, curr: 0 }
     }
 }
 

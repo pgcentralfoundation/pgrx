@@ -124,14 +124,12 @@ impl serde::Serialize for TimeWithTimeZone {
             )
         } else {
             serializer.serialize_str(
-                &time
-                    .format(&DEFAULT_TIMESTAMP_WITH_TIMEZONE_FORMAT)
-                    .map_err(|e| {
-                        serde::ser::Error::custom(format!(
-                            "TimeWithTimeZone formatting problem: {:?}",
-                            e
-                        ))
-                    })?,
+                &time.format(&DEFAULT_TIMESTAMP_WITH_TIMEZONE_FORMAT).map_err(|e| {
+                    serde::ser::Error::custom(format!(
+                        "TimeWithTimeZone formatting problem: {:?}",
+                        e
+                    ))
+                })?,
             )
         }
     }

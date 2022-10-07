@@ -13,7 +13,8 @@ mod tests {
     #[allow(unused_imports)]
     use crate as pgx_tests;
 
-    use pgx::{prelude::*, xid_to_64bit};
+    use pgx::prelude::*;
+    use pgx::xid_to_64bit;
 
     #[test]
     fn make_idea_happy() {}

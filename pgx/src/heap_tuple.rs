@@ -1,11 +1,10 @@
 //! Provides a safe interface to Postgres `HeapTuple` objects.
 //!
 //! [`PgHeapTuple`]s also describe composite types as defined by [`pgx::composite_type!()`][crate::composite_type].
+use crate::pg_sys::{Datum, Oid};
 use crate::{
-    heap_getattr_raw, pg_sys,
-    pg_sys::{Datum, Oid},
-    AllocatedByPostgres, AllocatedByRust, FromDatum, IntoDatum, PgBox, PgMemoryContexts,
-    PgTupleDesc, TriggerTuple, TryFromDatumError, WhoAllocated,
+    heap_getattr_raw, pg_sys, AllocatedByPostgres, AllocatedByRust, FromDatum, IntoDatum, PgBox,
+    PgMemoryContexts, PgTupleDesc, TriggerTuple, TryFromDatumError, WhoAllocated,
 };
 use pgx_utils::sql_entity_graph::metadata::{
     ArgumentError, Returns, ReturnsError, SqlMapping, SqlTranslatable,
@@ -85,10 +84,7 @@ impl<'a> PgHeapTuple<'a, AllocatedByPostgres> {
     /// nor can we guaratee that the provided [PgTupleDesc] properly describes the structure of
     /// the heap tuple.
     pub unsafe fn from_heap_tuple(tupdesc: PgTupleDesc<'a>, heap_tuple: pg_sys::HeapTuple) -> Self {
-        Self {
-            tuple: PgBox::from_pg(heap_tuple),
-            tupdesc,
-        }
+        Self { tuple: PgBox::from_pg(heap_tuple), tupdesc }
     }
 
     /// Creates a new [PgHeapTuple] from one of the two (`Current` or `New`) trigger tuples.  The returned
@@ -191,10 +187,7 @@ impl<'a> PgHeapTuple<'a, AllocatedByRust> {
             datums.push(datum.unwrap_or(0.into()));
         });
         if datums.len() != tupdesc.len() {
-            return Err(PgHeapTupleError::IncorrectAttributeCount(
-                datums.len(),
-                tupdesc.len(),
-            ));
+            return Err(PgHeapTupleError::IncorrectAttributeCount(datums.len(), tupdesc.len()));
         }
 
         unsafe {
@@ -233,10 +226,7 @@ impl<'a> PgHeapTuple<'a, AllocatedByRust> {
         data.t_len = crate::heap_tuple_header_get_datum_length(htup_header) as u32;
         data.t_data = htup_header;
 
-        Self {
-            tuple: data,
-            tupdesc: PgTupleDesc::from_pg(tupdesc),
-        }
+        Self { tuple: data, tupdesc: PgTupleDesc::from_pg(tupdesc) }
     }
 
     /// Given the name for an attribute in this [PgHeapTuple], change its value.
@@ -286,9 +276,8 @@ impl<'a> PgHeapTuple<'a, AllocatedByRust> {
                 }
             }
 
-            let mut datums = (0..self.tupdesc.len())
-                .map(|i| pg_sys::Datum::from(i))
-                .collect::<Vec<_>>();
+            let mut datums =
+                (0..self.tupdesc.len()).map(|i| pg_sys::Datum::from(i)).collect::<Vec<_>>();
             let mut nulls = (0..self.tupdesc.len()).map(|_| false).collect::<Vec<_>>();
             let mut do_replace = (0..self.tupdesc.len()).map(|_| false).collect::<Vec<_>>();
 
@@ -338,10 +327,7 @@ impl<'a, AllocatedBy: WhoAllocated<pg_sys::HeapTupleData>> PgHeapTuple<'a, Alloc
     /// data and the corresponding tuple descriptor information.
     pub fn into_composite_datum(self) -> Option<pg_sys::Datum> {
         unsafe {
-            Some(pg_sys::heap_copy_tuple_as_datum(
-                self.tuple.as_ptr(),
-                self.tupdesc.as_ptr(),
-            ))
+            Some(pg_sys::heap_copy_tuple_as_datum(self.tuple.as_ptr(), self.tupdesc.as_ptr()))
         }
     }
 
@@ -363,10 +349,7 @@ impl<'a, AllocatedBy: WhoAllocated<pg_sys::HeapTupleData>> PgHeapTuple<'a, Alloc
     pub fn attributes(
         &'a self,
     ) -> impl std::iter::Iterator<Item = (NonZeroUsize, &'a pg_sys::FormData_pg_attribute)> {
-        self.tupdesc
-            .iter()
-            .enumerate()
-            .map(|(i, att)| (NonZeroUsize::new(i + 1).unwrap(), att))
+        self.tupdesc.iter().enumerate().map(|(i, att)| (NonZeroUsize::new(i + 1).unwrap(), att))
     }
 
     /// Get the attribute information for the specified attribute number.  
@@ -591,26 +574,18 @@ macro_rules! composite_type {
 
 unsafe impl SqlTranslatable for crate::heap_tuple::PgHeapTuple<'static, AllocatedByPostgres> {
     fn argument_sql() -> Result<SqlMapping, ArgumentError> {
-        Ok(SqlMapping::Composite {
-            array_brackets: false,
-        })
+        Ok(SqlMapping::Composite { array_brackets: false })
     }
     fn return_sql() -> Result<Returns, ReturnsError> {
-        Ok(Returns::One(SqlMapping::Composite {
-            array_brackets: false,
-        }))
+        Ok(Returns::One(SqlMapping::Composite { array_brackets: false }))
     }
 }
 
 unsafe impl SqlTranslatable for crate::heap_tuple::PgHeapTuple<'static, AllocatedByRust> {
     fn argument_sql() -> Result<SqlMapping, ArgumentError> {
-        Ok(SqlMapping::Composite {
-            array_brackets: false,
-        })
+        Ok(SqlMapping::Composite { array_brackets: false })
     }
     fn return_sql() -> Result<Returns, ReturnsError> {
-        Ok(Returns::One(SqlMapping::Composite {
-            array_brackets: false,
-        }))
+        Ok(Returns::One(SqlMapping::Composite { array_brackets: false }))
     }
 }

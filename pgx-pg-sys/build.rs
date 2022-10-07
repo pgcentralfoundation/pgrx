@@ -13,11 +13,9 @@ use pgx_pg_config::{prefix_path, PgConfig, PgConfigSelector, Pgx, SUPPORTED_MAJO
 use pgx_utils::rewriter::PgGuardRewriter;
 use quote::{quote, ToTokens};
 use rayon::prelude::*;
-use std::{
-    collections::{HashMap, HashSet},
-    path::PathBuf,
-    process::{Command, Output},
-};
+use std::collections::{HashMap, HashSet};
+use std::path::PathBuf;
+use std::process::{Command, Output};
 use syn::{ForeignItem, Item};
 
 #[derive(Debug)]
@@ -110,10 +108,7 @@ fn main() -> color_eyre::Result<()> {
 
     let pgx = Pgx::from_config()?;
 
-    println!(
-        "cargo:rerun-if-changed={}",
-        Pgx::config_toml()?.display().to_string(),
-    );
+    println!("cargo:rerun-if-changed={}", Pgx::config_toml()?.display().to_string(),);
     println!("cargo:rerun-if-changed=include");
     println!("cargo:rerun-if-changed=cshim");
 
@@ -152,9 +147,8 @@ fn main() -> color_eyre::Result<()> {
     pg_configs
         .par_iter()
         .map(|pg_config| {
-            let major_version = pg_config
-                .major_version()
-                .wrap_err("could not determine major version")?;
+            let major_version =
+                pg_config.major_version().wrap_err("could not determine major version")?;
             let mut include_h = manifest_dir.clone();
             include_h.push("include");
             include_h.push(format!("pg{}.h", major_version));
@@ -473,22 +467,14 @@ impl<'a> From<&'a [syn::Item]> for StructGraph<'a> {
             }
         }
 
-        StructGraph {
-            name_tab,
-            item_offset_tab,
-            descriptors,
-        }
+        StructGraph { name_tab, item_offset_tab, descriptors }
     }
 }
 
 impl<'a> StructDescriptor<'a> {
     /// children returns an iterator over the children of this node in the graph
     fn children(&'a self, graph: &'a StructGraph) -> StructDescriptorChildren {
-        StructDescriptorChildren {
-            offset: 0,
-            descriptor: self,
-            graph,
-        }
+        StructDescriptorChildren { offset: 0, descriptor: self, graph }
     }
 }
 
@@ -774,10 +760,7 @@ fn run_command(mut command: &mut Command, version: &str) -> eyre::Result<Output>
             dbg.push_str(&format!("[{}] [stderr] {}\n", version, line));
         }
     }
-    dbg.push_str(&format!(
-        "[{}] /----------------------------------------\n",
-        version
-    ));
+    dbg.push_str(&format!("[{}] /----------------------------------------\n", version));
 
     eprintln!("{}", dbg);
     Ok(rc)
@@ -807,10 +790,7 @@ fn apply_pg_guard(items: &Vec<syn::Item>) -> eyre::Result<proc_macro2::TokenStre
 }
 
 fn rust_fmt(path: &PathBuf) -> eyre::Result<()> {
-    let out = run_command(
-        Command::new("rustfmt").arg(path).current_dir("."),
-        "[bindings_diff]",
-    );
+    let out = run_command(Command::new("rustfmt").arg(path).current_dir("."), "[bindings_diff]");
     match out {
         Ok(_) => Ok(()),
         Err(e)

@@ -14,14 +14,13 @@ Use of this source code is governed by the MIT license that can be found in the 
 to the `pgx` framework and very subject to change between versions. While you may use this, please do it with caution.
 
 */
-use crate::sql_entity_graph::{positioning_ref::PositioningRef, to_sql::ToSqlConfig};
+use crate::sql_entity_graph::positioning_ref::PositioningRef;
+use crate::sql_entity_graph::to_sql::ToSqlConfig;
 use proc_macro2::{Span, TokenStream as TokenStream2};
 use quote::{quote, ToTokens, TokenStreamExt};
-use syn::{
-    parse::{Parse, ParseStream},
-    punctuated::Punctuated,
-    Token,
-};
+use syn::parse::{Parse, ParseStream};
+use syn::punctuated::Punctuated;
+use syn::Token;
 
 #[derive(Debug, Clone, Hash, Eq, PartialEq)]
 pub enum Attribute {
@@ -75,10 +74,7 @@ impl Attribute {
                 quote! { ::pgx::utils::ExternArgs::Cost(format!("{}", #s)) }
             }
             Attribute::Requires(items) => {
-                let items_iter = items
-                    .iter()
-                    .map(|x| x.to_token_stream())
-                    .collect::<Vec<_>>();
+                let items_iter = items.iter().map(|x| x.to_token_stream()).collect::<Vec<_>>();
                 quote! { ::pgx::utils::ExternArgs::Requires(vec![#(#items_iter),*],) }
             }
             // This attribute is handled separately
@@ -121,10 +117,7 @@ impl ToTokens for Attribute {
                 quote! { cost = #s }
             }
             Attribute::Requires(items) => {
-                let items_iter = items
-                    .iter()
-                    .map(|x| x.to_token_stream())
-                    .collect::<Vec<_>>();
+                let items_iter = items.iter().map(|x| x.to_token_stream()).collect::<Vec<_>>();
                 quote! { requires = [#(#items_iter),*] }
             }
             // This attribute is handled separately

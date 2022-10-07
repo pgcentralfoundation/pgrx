@@ -142,10 +142,7 @@ where
 
         PgVarlena {
             leaked: None,
-            varlena: Cow::Owned(PallocdVarlena {
-                ptr,
-                len: unsafe { varsize_any(ptr) },
-            }),
+            varlena: Cow::Owned(PallocdVarlena { ptr, len: unsafe { varsize_any(ptr) } }),
             need_free: true,
             __marker: PhantomData,
         }

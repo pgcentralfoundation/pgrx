@@ -67,21 +67,13 @@ where
 
 impl FunctionMetadata<(), ()> for fn() {
     fn entity(&self) -> FunctionMetadataEntity {
-        FunctionMetadataEntity {
-            arguments: vec![],
-            retval: None,
-            path: self.path(),
-        }
+        FunctionMetadataEntity { arguments: vec![], retval: None, path: self.path() }
     }
 }
 
 impl FunctionMetadata<(), ()> for unsafe fn() {
     fn entity(&self) -> FunctionMetadataEntity {
-        FunctionMetadataEntity {
-            arguments: vec![],
-            retval: None,
-            path: self.path(),
-        }
+        FunctionMetadataEntity { arguments: vec![], retval: None, path: self.path() }
     }
 }
 seq_macro::seq!(I in 0..=32 {

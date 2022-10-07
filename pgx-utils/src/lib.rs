@@ -520,8 +520,6 @@ mod tests {
         let ts = proc_macro2::TokenStream::from_str(s).unwrap();
 
         let args = parse_extern_attributes(ts);
-        assert!(args.contains(&ExternArgs::Error(
-            "syntax error at or near \"THIS\"".to_string()
-        )));
+        assert!(args.contains(&ExternArgs::Error("syntax error at or near \"THIS\"".to_string())));
     }
 }

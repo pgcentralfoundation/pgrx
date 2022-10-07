@@ -96,10 +96,7 @@ impl FromDatum for Inet {
         } else {
             let cstr = direct_function_call::<&CStr>(pg_sys::inet_out, vec![Some(datum)]);
             Some(Inet(
-                cstr.unwrap()
-                    .to_str()
-                    .expect("unable to convert &cstr inet into &str")
-                    .to_owned(),
+                cstr.unwrap().to_str().expect("unable to convert &cstr inet into &str").to_owned(),
             ))
         }
     }

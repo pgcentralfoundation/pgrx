@@ -18,10 +18,8 @@ pub mod entity;
 
 use proc_macro2::{Span, TokenStream as TokenStream2};
 use quote::{quote, ToTokens, TokenStreamExt};
-use syn::{
-    parse::{Parse, ParseStream},
-    DeriveInput, Ident,
-};
+use syn::parse::{Parse, ParseStream};
+use syn::{DeriveInput, Ident};
 
 use crate::sql_entity_graph::ToSqlConfig;
 
@@ -80,10 +78,7 @@ impl PostgresOrd {
             crate::ident_is_acceptable_to_postgres(&name)?;
         }
 
-        Ok(Self {
-            name,
-            to_sql_config,
-        })
+        Ok(Self { name, to_sql_config })
     }
 
     pub fn from_derive_input(derive_input: DeriveInput) -> Result<Self, syn::Error> {
@@ -111,10 +106,8 @@ impl Parse for PostgresOrd {
 impl ToTokens for PostgresOrd {
     fn to_tokens(&self, tokens: &mut TokenStream2) {
         let name = &self.name;
-        let sql_graph_entity_fn_name = syn::Ident::new(
-            &format!("__pgx_internals_ord_{}", self.name),
-            Span::call_site(),
-        );
+        let sql_graph_entity_fn_name =
+            syn::Ident::new(&format!("__pgx_internals_ord_{}", self.name), Span::call_site());
         let to_sql_config = &self.to_sql_config;
         let inv = quote! {
             #[no_mangle]

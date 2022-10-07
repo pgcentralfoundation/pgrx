@@ -31,11 +31,7 @@ where
     C: IntoDatum,
 {
     fn into_datum(self) -> Option<pg_sys::Datum> {
-        let vec = vec![
-            self.0.into_datum(),
-            self.1.into_datum(),
-            self.2.into_datum(),
-        ];
+        let vec = vec![self.0.into_datum(), self.1.into_datum(), self.2.into_datum()];
         vec.into_datum()
     }
 

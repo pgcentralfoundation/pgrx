@@ -7,7 +7,8 @@ All rights reserved.
 Use of this source code is governed by the MIT license that can be found in the LICENSE file.
 */
 
-use pgx::{prelude::*, InOutFuncs, StringInfo};
+use pgx::prelude::*;
+use pgx::{InOutFuncs, StringInfo};
 use serde::{Deserialize, Serialize};
 
 #[pg_extern]
@@ -166,10 +167,9 @@ mod tests {
     #[allow(unused_imports)]
     use crate as pgx_tests;
 
-    use crate::tests::fcinfo_tests::same_name;
-    use crate::tests::fcinfo_tests::NullError;
-    use crate::tests::fcinfo_tests::NullStrict;
-    use pgx::{direct_pg_extern_function_call, prelude::*, IntoDatum};
+    use crate::tests::fcinfo_tests::{same_name, NullError, NullStrict};
+    use pgx::prelude::*;
+    use pgx::{direct_pg_extern_function_call, IntoDatum};
 
     #[test]
     fn make_idea_happy() {

@@ -75,10 +75,7 @@ impl Uuid {
         let len = b.len();
 
         if len != UUID_BYTES_LEN {
-            Err(format!(
-                "Expected UUID to be {} bytes, got {}",
-                UUID_BYTES_LEN, len
-            ))?;
+            Err(format!("Expected UUID to be {} bytes, got {}", UUID_BYTES_LEN, len))?;
         }
 
         let mut bytes = [0; UUID_BYTES_LEN];

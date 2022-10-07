@@ -6,12 +6,10 @@ All rights reserved.
 
 Use of this source code is governed by the MIT license that can be found in the LICENSE file.
 */
-use pgx::{
-    bgworkers::*,
-    datum::{FromDatum, IntoDatum},
-    log,
-    prelude::*,
-};
+use pgx::bgworkers::*;
+use pgx::datum::{FromDatum, IntoDatum};
+use pgx::log;
+use pgx::prelude::*;
 use std::time::Duration;
 
 /*
@@ -84,8 +82,5 @@ pub extern "C" fn background_worker_main(arg: pg_sys::Datum) {
         });
     }
 
-    log!(
-        "Goodbye from inside the {} BGWorker! ",
-        BackgroundWorker::get_name()
-    );
+    log!("Goodbye from inside the {} BGWorker! ", BackgroundWorker::get_name());
 }

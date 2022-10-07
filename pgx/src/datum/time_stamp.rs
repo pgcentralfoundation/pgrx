@@ -53,8 +53,7 @@ impl From<TimestampWithTimeZone> for Timestamp {
 
 impl From<Timestamp> for TimestampWithTimeZone {
     fn from(ts: Timestamp) -> Self {
-        ts.0.try_into()
-            .expect("error converting Timestamp to TimestampWithTimeZone")
+        ts.0.try_into().expect("error converting Timestamp to TimestampWithTimeZone")
     }
 }
 
@@ -134,11 +133,7 @@ impl FromDatum for Timestamp {
         if is_null {
             None
         } else {
-            Some(
-                datum
-                    .try_into()
-                    .expect("Error converting timestamp with time zone datum"),
-            )
+            Some(datum.try_into().expect("Error converting timestamp with time zone datum"))
         }
     }
 }
@@ -164,10 +159,8 @@ impl serde::Serialize for Timestamp {
                     pg_sys::EncodeSpecialTimestamp(self.0, buf);
                 }
                 _ => {
-                    let mut pg_tm: pg_sys::pg_tm = pg_sys::pg_tm {
-                        tm_zone: std::ptr::null_mut(),
-                        ..Default::default()
-                    };
+                    let mut pg_tm: pg_sys::pg_tm =
+                        pg_sys::pg_tm { tm_zone: std::ptr::null_mut(), ..Default::default() };
                     let mut tz = 0i32;
                     let mut fsec = 0 as pg_sys::fsec_t;
                     let mut tzn = std::ptr::null::<std::os::raw::c_char>();
