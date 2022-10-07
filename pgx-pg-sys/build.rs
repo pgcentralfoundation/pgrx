@@ -360,14 +360,13 @@ fn impl_pg_node(
         });
 
         // impl Rust's Display trait for all nodes
-        pgnode_impls.extend(
-            quote! {
-                impl std::fmt::Display for #struct_name {
-                    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-                        write!(f, "{}", self.display_node() )
-                    }
+        pgnode_impls.extend(quote! {
+            impl std::fmt::Display for #struct_name {
+                fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+                    write!(f, "{}", self.display_node() )
                 }
-            });
+            }
+        });
     }
 
     Ok(pgnode_impls)
