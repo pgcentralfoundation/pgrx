@@ -1,12 +1,10 @@
-use crate::{
-    heap_tuple::PgHeapTuple,
-    pg_sys,
-    pgbox::{AllocatedByPostgres, PgBox},
-    rel::PgRelation,
-    trigger_support::{
-        called_as_trigger, PgTriggerError, PgTriggerLevel, PgTriggerOperation, PgTriggerSafe,
-        PgTriggerWhen, TriggerEvent, TriggerTuple,
-    },
+use crate::heap_tuple::PgHeapTuple;
+use crate::pg_sys;
+use crate::pgbox::{AllocatedByPostgres, PgBox};
+use crate::rel::PgRelation;
+use crate::trigger_support::{
+    called_as_trigger, PgTriggerError, PgTriggerLevel, PgTriggerOperation, PgTriggerSafe,
+    PgTriggerWhen, TriggerEvent, TriggerTuple,
 };
 use cstr_core::c_char;
 use std::borrow::Borrow;
@@ -70,12 +68,7 @@ impl PgTrigger {
         }
         let relation_data = *relation_data_ptr;
 
-        Ok(Self {
-            relation_data,
-            trigger,
-            trigger_data,
-            fcinfo,
-        })
+        Ok(Self { relation_data, trigger, trigger_data, fcinfo })
     }
 
     /// The new HeapTuple
@@ -229,9 +222,7 @@ impl PgTrigger {
                 // containing a known good `TriggerData` which also contains a known good `Trigger`... and the user aggreed to
                 // our `unsafe` constructor safety rules, we choose to trust this is indeed a valid pointer offered to us by
                 // PostgreSQL, and that it trusts it.
-                unsafe { cstr_core::CStr::from_ptr(*v) }
-                    .to_str()
-                    .map(ToString::to_string)
+                unsafe { cstr_core::CStr::from_ptr(*v) }.to_str().map(ToString::to_string)
             })
             .collect::<Result<_, core::str::Utf8Error>>()?;
         Ok(args)

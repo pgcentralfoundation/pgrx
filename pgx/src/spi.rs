@@ -138,10 +138,7 @@ impl Spi {
         query: &str,
     ) -> (Option<A>, Option<B>) {
         Spi::connect(|client| {
-            let (a, b) = client
-                .select(query, Some(1), None)
-                .first()
-                .get_two::<A, B>();
+            let (a, b) = client.select(query, Some(1), None).first().get_two::<A, B>();
             Ok(Some((a, b)))
         })
         .unwrap()
@@ -155,10 +152,7 @@ impl Spi {
         query: &str,
     ) -> (Option<A>, Option<B>, Option<C>) {
         Spi::connect(|client| {
-            let (a, b, c) = client
-                .select(query, Some(1), None)
-                .first()
-                .get_three::<A, B, C>();
+            let (a, b, c) = client.select(query, Some(1), None).first().get_three::<A, B, C>();
             Ok(Some((a, b, c)))
         })
         .unwrap()
@@ -176,10 +170,7 @@ impl Spi {
         args: Vec<(PgOid, Option<pg_sys::Datum>)>,
     ) -> (Option<A>, Option<B>) {
         Spi::connect(|client| {
-            let (a, b) = client
-                .select(query, Some(1), Some(args))
-                .first()
-                .get_two::<A, B>();
+            let (a, b) = client.select(query, Some(1), Some(args)).first().get_two::<A, B>();
             Ok(Some((a, b)))
         })
         .unwrap()
@@ -194,10 +185,8 @@ impl Spi {
         args: Vec<(PgOid, Option<pg_sys::Datum>)>,
     ) -> (Option<A>, Option<B>, Option<C>) {
         Spi::connect(|client| {
-            let (a, b, c) = client
-                .select(query, Some(1), Some(args))
-                .first()
-                .get_three::<A, B, C>();
+            let (a, b, c) =
+                client.select(query, Some(1), Some(args)).first().get_three::<A, B, C>();
             Ok(Some((a, b, c)))
         })
         .unwrap()
@@ -217,14 +206,9 @@ impl Spi {
     /// explain a query, returning its result in json form
     pub fn explain(query: &str) -> Json {
         Spi::connect(|mut client| {
-            let table = client
-                .update(&format!("EXPLAIN (format json) {}", query), None, None)
-                .first();
-            Ok(Some(
-                table
-                    .get_one::<Json>()
-                    .expect("failed to get json EXPLAIN result"),
-            ))
+            let table =
+                client.update(&format!("EXPLAIN (format json) {}", query), None, None).first();
+            Ok(Some(table.get_one::<Json>().expect("failed to get json EXPLAIN result")))
         })
         .unwrap()
     }
@@ -508,21 +492,16 @@ impl SpiTupleTable {
 impl SpiHeapTupleData {
     /// Create a new `SpiHeapTupleData` from its constituent parts
     pub unsafe fn new(tupdesc: pg_sys::TupleDesc, htup: *mut pg_sys::HeapTupleData) -> Self {
-        let mut data = SpiHeapTupleData {
-            tupdesc,
-            entries: HashMap::default(),
-        };
+        let mut data = SpiHeapTupleData { tupdesc, entries: HashMap::default() };
 
         for i in 1..=tupdesc.as_ref().unwrap().natts {
             let mut is_null = false;
             let datum = pg_sys::SPI_getbinval(htup, tupdesc, i, &mut is_null);
 
-            data.entries
-                .entry(i as usize)
-                .or_insert_with(|| SpiHeapTupleDataEntry {
-                    datum: if is_null { None } else { Some(datum) },
-                    type_oid: pg_sys::SPI_gettypeid(tupdesc, i),
-                });
+            data.entries.entry(i as usize).or_insert_with(|| SpiHeapTupleDataEntry {
+                datum: if is_null { None } else { Some(datum) },
+                type_oid: pg_sys::SPI_gettypeid(tupdesc, i),
+            });
         }
 
         data
@@ -616,10 +595,7 @@ impl SpiHeapTupleData {
             } else {
                 self.entries.insert(
                     ordinal,
-                    SpiHeapTupleDataEntry {
-                        datum: datum.into_datum(),
-                        type_oid: T::type_oid(),
-                    },
+                    SpiHeapTupleDataEntry { datum: datum.into_datum(), type_oid: T::type_oid() },
                 );
                 Ok(())
             }
@@ -648,10 +624,7 @@ impl SpiHeapTupleData {
 
 impl<Datum: IntoDatum + FromDatum> From<Datum> for SpiHeapTupleDataEntry {
     fn from(datum: Datum) -> Self {
-        SpiHeapTupleDataEntry {
-            datum: datum.into_datum(),
-            type_oid: Datum::type_oid(),
-        }
+        SpiHeapTupleDataEntry { datum: datum.into_datum(), type_oid: Datum::type_oid() }
     }
 }
 

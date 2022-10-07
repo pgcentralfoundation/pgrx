@@ -187,11 +187,7 @@ impl IntoDatum for Numeric {
         unsafe {
             direct_function_call_as_datum(
                 pg_sys::numeric_in,
-                vec![
-                    cstr.into_datum(),
-                    pg_sys::InvalidOid.into_datum(),
-                    0i32.into_datum(),
-                ],
+                vec![cstr.into_datum(), pg_sys::InvalidOid.into_datum(), 0i32.into_datum()],
             )
         }
     }

@@ -17,9 +17,7 @@ pgx::pg_module_magic!();
 #[pg_extern]
 fn gzip(input: &[u8]) -> Vec<u8> {
     let mut encoder = Encoder::new(Vec::new()).expect("failed to construct gzip Encoder");
-    encoder
-        .write_all(input)
-        .expect("failed to write input to gzip encoder");
+    encoder.write_all(input).expect("failed to write input to gzip encoder");
     encoder.finish().into_result().unwrap()
 }
 
@@ -28,9 +26,7 @@ fn gzip(input: &[u8]) -> Vec<u8> {
 fn gunzip(mut bytes: &[u8]) -> Vec<u8> {
     let mut decoder = Decoder::new(&mut bytes).expect("failed to construct gzip Decoder");
     let mut buf = Vec::new();
-    decoder
-        .read_to_end(&mut buf)
-        .expect("failed to decode gzip data");
+    decoder.read_to_end(&mut buf).expect("failed to decode gzip data");
     buf
 }
 

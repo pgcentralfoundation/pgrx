@@ -41,19 +41,14 @@ impl<T> PgLwLock<T> {
     /// Create an empty lock which can be created as a global with None as a
     /// sentinel value
     pub const fn new() -> Self {
-        PgLwLock {
-            inner: OnceCell::new(),
-            name: OnceCell::new(),
-        }
+        PgLwLock { inner: OnceCell::new(), name: OnceCell::new() }
     }
 
     /// Create a new lock for T by attaching a LWLock, which is looked up by name
     pub fn from_named(input_name: &'static str, value: *mut T) -> Self {
         let inner = OnceCell::new();
         let name = OnceCell::new();
-        inner
-            .set(PgLwLockInner::<T>::new(input_name, value))
-            .unwrap();
+        inner.set(PgLwLockInner::<T>::new(input_name, value)).unwrap();
         name.set(input_name).unwrap();
         PgLwLock { inner, name }
     }
@@ -72,18 +67,12 @@ impl<T> PgLwLock<T> {
 
     /// Obtain a shared lock (which comes with `&T` access)
     pub fn share(&self) -> PgLwLockShareGuard<T> {
-        self.inner
-            .get()
-            .expect("Can't give out share, lock is in an empty state")
-            .share()
+        self.inner.get().expect("Can't give out share, lock is in an empty state").share()
     }
 
     /// Obtain an exclusive lock (which comes with `&mut T` access)
     pub fn exclusive(&self) -> PgLwLockExclusiveGuard<T> {
-        self.inner
-            .get()
-            .expect("Can't give out exclusive, lock is in an empty state")
-            .exclusive()
+        self.inner.get().expect("Can't give out exclusive, lock is in an empty state").exclusive()
     }
 
     /// Attach an empty PgLwLock lock to a LWLock, and wrap T
@@ -120,10 +109,7 @@ impl<'a, T> PgLwLockInner<T> {
         unsafe {
             pg_sys::LWLockAcquire(self.lock_ptr, pg_sys::LWLockMode_LW_SHARED);
 
-            PgLwLockShareGuard {
-                data: self.data.as_ref().unwrap(),
-                lock: self.lock_ptr,
-            }
+            PgLwLockShareGuard { data: self.data.as_ref().unwrap(), lock: self.lock_ptr }
         }
     }
 
@@ -131,10 +117,7 @@ impl<'a, T> PgLwLockInner<T> {
         unsafe {
             pg_sys::LWLockAcquire(self.lock_ptr, pg_sys::LWLockMode_LW_EXCLUSIVE);
 
-            PgLwLockExclusiveGuard {
-                data: self.data.as_mut().unwrap(),
-                lock: self.lock_ptr,
-            }
+            PgLwLockExclusiveGuard { data: self.data.as_mut().unwrap(), lock: self.lock_ptr }
         }
     }
 }

@@ -59,8 +59,7 @@ impl Internal {
     /// your responsibility.
     #[inline(always)]
     pub unsafe fn get<T>(&self) -> Option<&T> {
-        self.0
-            .and_then(|datum| (datum.cast_mut_ptr::<T>() as *const T).as_ref())
+        self.0.and_then(|datum| (datum.cast_mut_ptr::<T>() as *const T).as_ref())
     }
 
     /// Initializes the internal with `value`, then returns a mutable reference to it.
@@ -91,8 +90,7 @@ impl Internal {
     /// your responsibility.
     #[inline(always)]
     pub unsafe fn get_mut<T>(&self) -> Option<&mut T> {
-        self.0
-            .and_then(|datum| (datum.cast_mut_ptr::<T>()).as_mut())
+        self.0.and_then(|datum| (datum.cast_mut_ptr::<T>()).as_mut())
     }
 
     /// Initializes the internal with `value` if it is not initialized, then returns a mutable reference to
@@ -140,9 +138,8 @@ impl Internal {
     {
         let ptr = self.0.get_or_insert_with(|| {
             let result = f();
-            let datum = PgMemoryContexts::CurrentMemoryContext
-                .leak_and_drop_on_delete(result)
-                .into();
+            let datum =
+                PgMemoryContexts::CurrentMemoryContext.leak_and_drop_on_delete(result).into();
             datum
         });
         &mut *(ptr.cast_mut_ptr::<T>())

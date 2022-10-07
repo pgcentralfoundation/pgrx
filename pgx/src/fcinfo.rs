@@ -434,10 +434,7 @@ fn make_function_call_info(
 
     let slice = unsafe { fcinfo.args.as_mut_slice(nargs) };
     for i in 0..nargs {
-        slice[i] = pg_sys::NullableDatum {
-            value: arg_array[i],
-            isnull: null_array[i],
-        }
+        slice[i] = pg_sys::NullableDatum { value: arg_array[i], isnull: null_array[i] }
     }
 
     fcinfo_boxed

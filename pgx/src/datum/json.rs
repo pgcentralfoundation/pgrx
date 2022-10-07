@@ -67,8 +67,7 @@ impl FromDatum for JsonB {
             .expect("failed to convert jsonb to a cstring");
 
             let value = serde_json::from_str(
-                cstr.to_str()
-                    .expect("text version of jsonb is not valid UTF8"),
+                cstr.to_str().expect("text version of jsonb is not valid UTF8"),
             )
             .expect("failed to parse JsonB value");
 

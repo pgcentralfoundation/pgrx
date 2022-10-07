@@ -10,16 +10,13 @@ Use of this source code is governed by the MIT license that can be found in the 
 use eyre::{eyre, WrapErr};
 use owo_colors::OwoColorize;
 use serde_derive::{Deserialize, Serialize};
+use std::collections::HashMap;
+use std::ffi::OsString;
 use std::fmt::{self, Display, Formatter};
-use std::process::Stdio;
-use std::{
-    collections::HashMap,
-    ffi::OsString,
-    io::ErrorKind,
-    path::{Path, PathBuf},
-    process::Command,
-    str::FromStr,
-};
+use std::io::ErrorKind;
+use std::path::{Path, PathBuf};
+use std::process::{Command, Stdio};
+use std::str::FromStr;
 use url::Url;
 
 pub static BASE_POSTGRES_PORT_NO: u16 = 28800;
@@ -59,12 +56,8 @@ pub struct PgConfig {
 
 impl Display for PgConfig {
     fn fmt(&self, f: &mut Formatter<'_>) -> fmt::Result {
-        let major = self
-            .major_version()
-            .expect("could not determine major version");
-        let minor = self
-            .minor_version()
-            .expect("could not determine minor version");
+        let major = self.major_version().expect("could not determine major version");
+        let minor = self.minor_version().expect("could not determine minor version");
         let path = match self.pg_config.as_ref() {
             Some(path) => path.display().to_string(),
             None => self.version.as_ref().unwrap().url.to_string(),
@@ -75,28 +68,19 @@ impl Display for PgConfig {
 
 impl Default for PgConfig {
     fn default() -> Self {
-        PgConfig {
-            version: None,
-            pg_config: None,
-        }
+        PgConfig { version: None, pg_config: None }
     }
 }
 
 impl From<PgVersion> for PgConfig {
     fn from(version: PgVersion) -> Self {
-        PgConfig {
-            version: Some(version),
-            pg_config: None,
-        }
+        PgConfig { version: Some(version), pg_config: None }
     }
 }
 
 impl PgConfig {
     pub fn new(pg_config: PathBuf) -> Self {
-        PgConfig {
-            version: None,
-            pg_config: Some(pg_config),
-        }
+        PgConfig { version: None, pg_config: Some(pg_config) }
     }
 
     pub fn from_path() -> Self {
@@ -261,9 +245,7 @@ impl PgConfig {
 
     fn run(&self, arg: &str) -> eyre::Result<String> {
         let pg_config = self.pg_config.clone().unwrap_or_else(|| {
-            std::env::var("PG_CONFIG")
-                .unwrap_or_else(|_| "pg_config".to_string())
-                .into()
+            std::env::var("PG_CONFIG").unwrap_or_else(|_| "pg_config".to_string()).into()
         });
 
         match Command::new(&pg_config).arg(arg).output() {
@@ -360,11 +342,7 @@ impl Pgx {
                         .cmp(&b.major_version().expect("no major version"))
                 });
 
-                configs
-                    .into_iter()
-                    .map(|c| Ok(c))
-                    .collect::<Vec<_>>()
-                    .into_iter()
+                configs.into_iter().map(|c| Ok(c)).collect::<Vec<_>>().into_iter()
             }
             PgConfigSelector::Specific(label) => vec![self.get(label)].into_iter(),
         }

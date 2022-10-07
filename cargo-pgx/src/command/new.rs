@@ -8,7 +8,9 @@ Use of this source code is governed by the MIT license that can be found in the 
 */
 
 use eyre::eyre;
-use std::{io::Write, path::PathBuf, str::FromStr};
+use std::io::Write;
+use std::path::PathBuf;
+use std::str::FromStr;
 
 use crate::CommandExecute;
 

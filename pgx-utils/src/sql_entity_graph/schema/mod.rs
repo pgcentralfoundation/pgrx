@@ -19,10 +19,8 @@ pub mod entity;
 use proc_macro2::{Span, TokenStream as TokenStream2};
 use quote::{quote, ToTokens, TokenStreamExt};
 use std::hash::{Hash, Hasher};
-use syn::{
-    parse::{Parse, ParseStream},
-    ItemMod,
-};
+use syn::parse::{Parse, ParseStream};
+use syn::ItemMod;
 
 /// A parsed `#[pg_schema] mod example {}` item.
 ///
@@ -63,11 +61,8 @@ impl ToTokens for Schema {
         let mod_token = &self.module.mod_token;
         let ident = &self.module.ident;
 
-        let (_content_brace, content_items) = &self
-            .module
-            .content
-            .as_ref()
-            .expect("Can only support `mod {}` right now.");
+        let (_content_brace, content_items) =
+            &self.module.content.as_ref().expect("Can only support `mod {}` right now.");
 
         // A hack until https://github.com/rust-lang/rust/issues/54725 is fixed.
         let mut hasher = std::collections::hash_map::DefaultHasher::new();

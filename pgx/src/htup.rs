@@ -104,17 +104,9 @@ pub fn heap_getattr<
 ) -> Option<T> {
     let mut is_null = false;
     let datum = unsafe {
-        pgx_heap_getattr(
-            tuple.as_ptr(),
-            attno.get() as u32,
-            tupdesc.as_ptr(),
-            &mut is_null,
-        )
+        pgx_heap_getattr(tuple.as_ptr(), attno.get() as u32, tupdesc.as_ptr(), &mut is_null)
     };
-    let typoid = tupdesc
-        .get(attno.get() - 1)
-        .expect("no attribute")
-        .type_oid();
+    let typoid = tupdesc.get(attno.get() - 1).expect("no attribute").type_oid();
 
     if is_null {
         None
@@ -191,11 +183,5 @@ pub fn heap_getattr_datum_ex(
         pg_sys::get_typlenbyvalalign(typoid.value(), &mut typlen, &mut typbyval, &mut typalign);
     }
 
-    DatumWithTypeInfo {
-        datum,
-        is_null,
-        typoid,
-        typlen,
-        typbyval,
-    }
+    DatumWithTypeInfo { datum, is_null, typoid, typlen, typbyval }
 }
