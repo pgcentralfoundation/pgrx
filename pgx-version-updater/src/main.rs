@@ -45,10 +45,10 @@ fn main() {
 
     // Contains a set of package names (e.g. "pgx", "pgx-pg-sys") that wil be used
     // to search for updatable dependencies later on
-    let mut updatable_package_names_set: HashSet<String> = HashSet::new();
+    let mut updatable_package_names = HashSet::new();
 
     // This will eventually contain every file we want to process
-    let mut files_to_process_set: HashSet<String> = HashSet::new();
+    let mut files_to_process = HashSet::new();
 
     // Keep track of which files to exclude from a "package version" change.
     // For example, some Cargo.toml files do not need this updated:
@@ -58,9 +58,9 @@ fn main() {
     // Any such file is explicitly added via a command line argument.
     // Note that any files included here are still eligible to be processed for
     // *dependency* version updates.
-    let mut exclude_version_files_set: HashSet<String> = HashSet::new();
+    let mut exclude_version_files = HashSet::new();
     for file in args.exclude_from_version_change {
-        exclude_version_files_set.insert(fullpath(file).to_str().unwrap().to_string());
+        exclude_version_files.insert(fullpath(file).to_str().unwrap().to_string());
     }
 
     // Recursively walk down all directories to extract out any existing Cargo.toml files
@@ -81,10 +81,10 @@ fn main() {
             );
 
             // Extract the package name if possible
-            if !exclude_version_files_set.contains(&filepath) {
+            if !exclude_version_files.contains(&filepath) {
                 match extract_package_name(&filepath) {
                     Some(package_name) => {
-                        updatable_package_names_set.insert(package_name);
+                        updatable_package_names.insert(package_name);
                     }
                     None => {
                         output.push_str(
@@ -97,7 +97,7 @@ fn main() {
                 }
             }
 
-            files_to_process_set.insert(filepath.clone());
+            files_to_process.insert(filepath.clone());
             println!("{output}");
         }
     }
@@ -113,10 +113,10 @@ fn main() {
         );
 
         // Extract the package name if possible
-        if !exclude_version_files_set.contains(&filepath) {
+        if !exclude_version_files.contains(&filepath) {
             match extract_package_name(&filepath) {
                 Some(package_name) => {
-                    updatable_package_names_set.insert(package_name);
+                    updatable_package_names.insert(package_name);
                 }
                 None => {
                     output.push_str(
@@ -130,12 +130,12 @@ fn main() {
         }
 
         println!("{output}");
-        files_to_process_set.insert(filepath.clone());
+        files_to_process.insert(filepath.clone());
     }
 
     // Print out information about package names that were automatically discovered
     // and parsed
-    for package_name in &updatable_package_names_set {
+    for package_name in &updatable_package_names {
         println!(
             "{} {} found for version updating",
             "   Package".bold().green(),
@@ -146,7 +146,7 @@ fn main() {
     // Loop through every TOML file (automatically discovered and manually included
     // via command line params) and update package versions and dependency
     // versions where applicable
-    for filepath in files_to_process_set {
+    for filepath in files_to_process {
         let mut output = format!(
             "{} Cargo.toml file at {}",
             "Processing".bold().green(),
@@ -164,7 +164,7 @@ fn main() {
             .as_str(),
         );
 
-        if exclude_version_files_set.contains(&filepath) {
+        if exclude_version_files.contains(&filepath) {
             output.push_str(
                 "\n           * Excluding from package version bump due to command line parameter"
                     .dimmed()
@@ -190,7 +190,7 @@ fn main() {
 
                 // Attempt to find auto-extracted package names in the various dependency
                 // declarations
-                for package in &updatable_package_names_set {
+                for package in &updatable_package_names {
                     if deps_table.contains_key(package) {
                         let dep_item = deps_table.get_mut(package).unwrap();
 
