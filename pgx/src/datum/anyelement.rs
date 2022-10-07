@@ -34,8 +34,19 @@ impl AnyElement {
 }
 
 impl FromDatum for AnyElement {
+    const GET_TYPOID: bool = true;
+
     #[inline]
     unsafe fn from_datum(
+        datum: pg_sys::Datum,
+        is_null: bool,
+        typoid: pg_sys::Oid,
+    ) -> Option<AnyElement> {
+        FromDatum::from_polymorphic_datum(datum, is_null, typoid)
+    }
+
+    #[inline]
+    unsafe fn from_polymorphic_datum(
         datum: pg_sys::Datum,
         is_null: bool,
         typoid: pg_sys::Oid,

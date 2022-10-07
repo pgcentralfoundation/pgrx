@@ -39,6 +39,9 @@ pub enum TryFromDatumError {
 /// If implementing this, also implement `IntoDatum` for the reverse
 /// conversion.
 pub trait FromDatum {
+    /// Should a type OID be fetched when calling `from_datum`?
+    const GET_TYPOID: bool = false;
+
     /// ## Safety
     ///
     /// This method is inherently unsafe as the `datum` argument can represent an arbitrary
@@ -53,6 +56,23 @@ pub trait FromDatum {
     unsafe fn from_datum(datum: pg_sys::Datum, is_null: bool, typoid: pg_sys::Oid) -> Option<Self>
     where
         Self: Sized;
+
+    /// Like `from_datum` for instantiating polymorphic types
+    /// which require preserving the dynamic type metadata.
+    ///
+    /// ## Safety
+    ///
+    /// Same caveats as `FromDatum::from_datum(...)`.
+    unsafe fn from_polymorphic_datum(
+        datum: pg_sys::Datum,
+        is_null: bool,
+        typoid: pg_sys::Oid,
+    ) -> Option<Self>
+    where
+        Self: Sized,
+    {
+        FromDatum::from_datum(datum, is_null, typoid)
+    }
 
     /// Default implementation switched to the specified memory context and then simply calls
     /// `FromDatum::from_datum(...)` from within that context.
