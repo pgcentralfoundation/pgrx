@@ -7,7 +7,8 @@ All rights reserved.
 Use of this source code is governed by the MIT license that can be found in the LICENSE file.
 */
 
-use pgx::{opname, pg_operator, prelude::*};
+use pgx::prelude::*;
+use pgx::{opname, pg_operator};
 use serde::{Deserialize, Serialize};
 mod derived;
 

@@ -159,7 +159,11 @@ impl From<f64> for Numeric {
 }
 
 impl FromDatum for Numeric {
-    unsafe fn from_datum(datum: pg_sys::Datum, is_null: bool, _typoid: u32) -> Option<Self>
+    unsafe fn from_polymorphic_datum(
+        datum: pg_sys::Datum,
+        is_null: bool,
+        _typoid: u32,
+    ) -> Option<Self>
     where
         Self: Sized,
     {
@@ -183,11 +187,7 @@ impl IntoDatum for Numeric {
         unsafe {
             direct_function_call_as_datum(
                 pg_sys::numeric_in,
-                vec![
-                    cstr.into_datum(),
-                    pg_sys::InvalidOid.into_datum(),
-                    0i32.into_datum(),
-                ],
+                vec![cstr.into_datum(), pg_sys::InvalidOid.into_datum(), 0i32.into_datum()],
             )
         }
     }

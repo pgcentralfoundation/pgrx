@@ -1,7 +1,9 @@
 // This is used by some, but not all, examples below.
 const DOG_COMPOSITE_TYPE: &str = "Dog";
 
-use pgx::{pgbox::AllocatedByRust, prelude::*, Aggregate, VariadicArray};
+use pgx::pgbox::AllocatedByRust;
+use pgx::prelude::*;
+use pgx::{Aggregate, VariadicArray};
 
 extension_sql!(
     r#"
@@ -147,11 +149,8 @@ mod arguments {
             let dogs = dogs.unwrap();
             let mut sum_scritches = 0;
             for dog in dogs {
-                let scritches: i32 = dog
-                    .get_by_name("scritches")
-                    .ok()
-                    .unwrap_or_default()
-                    .unwrap_or_default();
+                let scritches: i32 =
+                    dog.get_by_name("scritches").ok().unwrap_or_default().unwrap_or_default();
                 sum_scritches += scritches;
             }
             sum_scritches
@@ -159,21 +158,15 @@ mod arguments {
 
         #[pg_extern]
         fn sum_scritches_for_names_default(
-            dogs: pgx::default!(
-                Vec<pgx::composite_type!("Dog")>,
-                "ARRAY[ROW('Nami', 0)]::Dog[]"
-            ),
+            dogs: pgx::default!(Vec<pgx::composite_type!("Dog")>, "ARRAY[ROW('Nami', 0)]::Dog[]"),
         ) -> i32 {
             // Gets resolved to:
             let dogs: Vec<PgHeapTuple<AllocatedByRust>> = dogs;
 
             let mut sum_scritches = 0;
             for dog in dogs {
-                let scritches: i32 = dog
-                    .get_by_name("scritches")
-                    .ok()
-                    .unwrap_or_default()
-                    .unwrap_or_default();
+                let scritches: i32 =
+                    dog.get_by_name("scritches").ok().unwrap_or_default().unwrap_or_default();
                 sum_scritches += scritches;
             }
             sum_scritches
@@ -186,11 +179,8 @@ mod arguments {
 
             let mut sum_scritches = 0;
             for dog in dogs {
-                let scritches: i32 = dog
-                    .get_by_name("scritches")
-                    .ok()
-                    .unwrap_or_default()
-                    .unwrap_or_default();
+                let scritches: i32 =
+                    dog.get_by_name("scritches").ok().unwrap_or_default().unwrap_or_default();
                 sum_scritches += scritches;
             }
             sum_scritches
@@ -206,11 +196,8 @@ mod arguments {
             let mut sum_scritches = 0;
             for dog in dogs {
                 let dog = dog.unwrap();
-                let scritches: i32 = dog
-                    .get_by_name("scritches")
-                    .ok()
-                    .unwrap_or_default()
-                    .unwrap_or_default();
+                let scritches: i32 =
+                    dog.get_by_name("scritches").ok().unwrap_or_default().unwrap_or_default();
                 sum_scritches += scritches;
             }
             sum_scritches
@@ -229,11 +216,8 @@ mod arguments {
             let mut sum_scritches = 0;
             for dog in dogs {
                 let dog = dog.unwrap();
-                let scritches: i32 = dog
-                    .get_by_name("scritches")
-                    .ok()
-                    .unwrap_or_default()
-                    .unwrap_or_default();
+                let scritches: i32 =
+                    dog.get_by_name("scritches").ok().unwrap_or_default().unwrap_or_default();
                 sum_scritches += scritches;
             }
             sum_scritches
@@ -271,11 +255,8 @@ mod arguments {
             let mut sum_scritches = 0;
             for dog in dogs {
                 let dog = dog.unwrap();
-                let scritches: i32 = dog
-                    .get_by_name("scritches")
-                    .ok()
-                    .unwrap_or_default()
-                    .unwrap_or_default();
+                let scritches: i32 =
+                    dog.get_by_name("scritches").ok().unwrap_or_default().unwrap_or_default();
                 sum_scritches += scritches;
             }
             sum_scritches
@@ -294,11 +275,8 @@ mod arguments {
             let mut sum_scritches = 0;
             for dog in dogs {
                 let dog = dog.unwrap();
-                let scritches: i32 = dog
-                    .get_by_name("scritches")
-                    .ok()
-                    .unwrap_or_default()
-                    .unwrap_or_default();
+                let scritches: i32 =
+                    dog.get_by_name("scritches").ok().unwrap_or_default().unwrap_or_default();
                 sum_scritches += scritches;
             }
             sum_scritches
@@ -314,11 +292,8 @@ mod arguments {
             let mut sum_scritches = 0;
             for dog in dogs {
                 let dog = dog.unwrap();
-                let scritches: i32 = dog
-                    .get_by_name("scritches")
-                    .ok()
-                    .unwrap_or_default()
-                    .unwrap_or_default();
+                let scritches: i32 =
+                    dog.get_by_name("scritches").ok().unwrap_or_default().unwrap_or_default();
                 sum_scritches += scritches;
             }
             sum_scritches
@@ -351,8 +326,7 @@ mod returning {
             let maybe_dog: Option<PgHeapTuple<AllocatedByRust>> = maybe_dog;
 
             let maybe_dog = if let Some(mut dog) = maybe_dog {
-                dog.set_by_name("scritches", dog.get_by_name::<i32>("scritches").unwrap())
-                    .unwrap();
+                dog.set_by_name("scritches", dog.get_by_name::<i32>("scritches").unwrap()).unwrap();
                 Some(dog)
             } else {
                 None
@@ -366,8 +340,7 @@ mod returning {
             // Gets resolved to:
             let mut dog: PgHeapTuple<AllocatedByRust> = dog;
 
-            dog.set_by_name("scritches", dog.get_by_name::<i32>("scritches").unwrap())
-                .unwrap();
+            dog.set_by_name("scritches", dog.get_by_name::<i32>("scritches").unwrap()).unwrap();
 
             dog
         }
@@ -404,8 +377,7 @@ mod returning {
             let mut dogs: Vec<PgHeapTuple<AllocatedByRust>> = dogs;
 
             for dog in dogs.iter_mut() {
-                dog.set_by_name("scritches", dog.get_by_name::<i32>("scritches").unwrap())
-                    .unwrap();
+                dog.set_by_name("scritches", dog.get_by_name::<i32>("scritches").unwrap()).unwrap();
             }
             dogs
         }
@@ -461,10 +433,7 @@ mod sql_generator_tests {
             name!(dog, Option<::pgx::composite_type!("Dog")>),
             name!(cat, Option<::pgx::composite_type!("Cat")>),
             name!(fish, Option<::pgx::composite_type!("Fish")>),
-            name!(
-                related_edges,
-                Option<Vec<::pgx::composite_type!("AnimalFriendshipEdge")>>
-            ),
+            name!(related_edges, Option<Vec<::pgx::composite_type!("AnimalFriendshipEdge")>>),
         ),
     > {
         TableIterator::new(Vec::new().into_iter())
@@ -473,10 +442,7 @@ mod sql_generator_tests {
     #[pg_extern]
     fn iterable_named_table() -> TableIterator<
         'static,
-        (
-            name!(dog, ::pgx::composite_type!("Dog")),
-            name!(cat, ::pgx::composite_type!("Cat")),
-        ),
+        (name!(dog, ::pgx::composite_type!("Dog")), name!(cat, ::pgx::composite_type!("Cat"))),
     > {
         TableIterator::new(Vec::new().into_iter())
     }
@@ -550,10 +516,7 @@ mod sql_generator_tests {
     #[pg_extern]
     fn return_table_two() -> TableIterator<
         'static,
-        (
-            name!(dog, pgx::composite_type!("Dog")),
-            name!(cat, pgx::composite_type!("Cat")),
-        ),
+        (name!(dog, pgx::composite_type!("Dog")), name!(cat, pgx::composite_type!("Cat"))),
     > {
         let mut dog_tuple = PgHeapTuple::new_composite_type("Dog").unwrap();
 
@@ -655,9 +618,10 @@ mod sql_generator_tests {
 mod tests {
     #[cfg(test)]
     use crate as pgx_tests;
-    use pgx::{
-        datum::TryFromDatumError, heap_tuple::PgHeapTupleError, prelude::*, AllocatedByRust,
-    };
+    use pgx::datum::TryFromDatumError;
+    use pgx::heap_tuple::PgHeapTupleError;
+    use pgx::prelude::*;
+    use pgx::AllocatedByRust;
     use std::num::NonZeroUsize;
 
     #[pg_test]
@@ -853,15 +817,10 @@ mod tests {
         assert_eq!(heap_tuple.get_by_name::<String>("name").unwrap(), None);
         assert_eq!(heap_tuple.get_by_name::<i32>("age").unwrap(), None);
 
-        heap_tuple
-            .set_by_name("name", "Brandy".to_string())
-            .unwrap();
+        heap_tuple.set_by_name("name", "Brandy".to_string()).unwrap();
         heap_tuple.set_by_name("age", 42).unwrap();
 
-        assert_eq!(
-            heap_tuple.get_by_name("name").unwrap(),
-            Some("Brandy".to_string())
-        );
+        assert_eq!(heap_tuple.get_by_name("name").unwrap(), Some("Brandy".to_string()));
         assert_eq!(heap_tuple.get_by_name("age").unwrap(), Some(42i32));
     }
 
@@ -888,16 +847,12 @@ mod tests {
         const NON_EXISTING_ATTRIBUTE: &str = "DEFINITELY_NOT_EXISTING";
         assert_eq!(
             heap_tuple.get_by_name::<String>(NON_EXISTING_ATTRIBUTE),
-            Err(TryFromDatumError::NoSuchAttributeName(
-                NON_EXISTING_ATTRIBUTE.into()
-            )),
+            Err(TryFromDatumError::NoSuchAttributeName(NON_EXISTING_ATTRIBUTE.into())),
         );
 
         assert_eq!(
             heap_tuple.set_by_name(NON_EXISTING_ATTRIBUTE, "Brandy".to_string()),
-            Err(TryFromDatumError::NoSuchAttributeName(
-                NON_EXISTING_ATTRIBUTE.into()
-            )),
+            Err(TryFromDatumError::NoSuchAttributeName(NON_EXISTING_ATTRIBUTE.into())),
         );
     }
 
@@ -909,16 +864,12 @@ mod tests {
         const NON_EXISTING_ATTRIBUTE: NonZeroUsize = unsafe { NonZeroUsize::new_unchecked(9001) };
         assert_eq!(
             heap_tuple.get_by_index::<String>(NON_EXISTING_ATTRIBUTE),
-            Err(TryFromDatumError::NoSuchAttributeNumber(
-                NON_EXISTING_ATTRIBUTE
-            )),
+            Err(TryFromDatumError::NoSuchAttributeNumber(NON_EXISTING_ATTRIBUTE)),
         );
 
         assert_eq!(
             heap_tuple.set_by_index(NON_EXISTING_ATTRIBUTE, "Brandy".to_string()),
-            Err(TryFromDatumError::NoSuchAttributeNumber(
-                NON_EXISTING_ATTRIBUTE
-            )),
+            Err(TryFromDatumError::NoSuchAttributeNumber(NON_EXISTING_ATTRIBUTE)),
         );
     }
 
@@ -948,9 +899,7 @@ mod tests {
         );
 
         // Now set them properly, to test that we get errors when they're set...
-        heap_tuple
-            .set_by_name("name", "Brandy".to_string())
-            .unwrap();
+        heap_tuple.set_by_name("name", "Brandy".to_string()).unwrap();
         heap_tuple.set_by_name("age", 42).unwrap();
 
         // These are **deliberately** the wrong types.

@@ -1,9 +1,7 @@
 use crate::datum::{Array, FromDatum};
 use crate::pg_sys::{self, bits8, ArrayType};
-use bitvec::{
-    prelude::*,
-    ptr::{bitslice_from_raw_parts_mut, BitPtr, BitPtrError, Mut},
-};
+use bitvec::prelude::*;
+use bitvec::ptr::{bitslice_from_raw_parts_mut, BitPtr, BitPtrError, Mut};
 use core::ptr::{slice_from_raw_parts_mut, NonNull};
 use core::slice;
 
@@ -95,10 +93,7 @@ impl RawArray {
         let array_type = arr.into_array_type() as *mut _;
         // SAFETY: Validity asserted by the caller.
         let len = unsafe { pgx_ARR_NELEMS(array_type) } as usize;
-        Some(RawArray {
-            ptr: NonNull::new(array_type)?,
-            len,
-        })
+        Some(RawArray { ptr: NonNull::new(array_type)?, len })
     }
 
     /// Returns the inner raw pointer to the ArrayType.

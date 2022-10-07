@@ -77,10 +77,7 @@ impl StringInfo {
     /// Unless `.into_pg()` or `.into_char_ptr()` are called, memory management of
     /// this `StringInfo` follow Rust's drop semantics.
     pub fn new() -> Self {
-        StringInfo {
-            sid: unsafe { pg_sys::makeStringInfo() },
-            needs_pfree: true,
-        }
+        StringInfo { sid: unsafe { pg_sys::makeStringInfo() }, needs_pfree: true }
     }
 
     /// Construct a new `StringInfo`, allocated by Postgres in `CurrentMemoryContext`, ensuring it
@@ -104,10 +101,7 @@ impl StringInfo {
         if sid.is_null() {
             None
         } else {
-            Some(StringInfo {
-                sid,
-                needs_pfree: false,
-            })
+            Some(StringInfo { sid, needs_pfree: false })
         }
     }
 

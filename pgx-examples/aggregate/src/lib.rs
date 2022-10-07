@@ -6,8 +6,10 @@ All rights reserved.
 
 Use of this source code is governed by the MIT license that can be found in the LICENSE file.
 */
+use pgx::aggregate::*;
 use pgx::cstr_core::CStr;
-use pgx::{aggregate::*, pgx, prelude::*, PgVarlena, PgVarlenaInOutFuncs, StringInfo};
+use pgx::prelude::*;
+use pgx::{pgx, PgVarlena, PgVarlenaInOutFuncs, StringInfo};
 use serde::{Deserialize, Serialize};
 use std::str::FromStr;
 

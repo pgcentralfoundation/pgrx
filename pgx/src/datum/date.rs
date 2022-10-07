@@ -38,7 +38,11 @@ impl IntoDatum for Date {
 }
 
 impl FromDatum for Date {
-    unsafe fn from_datum(datum: pg_sys::Datum, is_null: bool, _: pg_sys::Oid) -> Option<Self>
+    unsafe fn from_polymorphic_datum(
+        datum: pg_sys::Datum,
+        is_null: bool,
+        _: pg_sys::Oid,
+    ) -> Option<Self>
     where
         Self: Sized,
     {

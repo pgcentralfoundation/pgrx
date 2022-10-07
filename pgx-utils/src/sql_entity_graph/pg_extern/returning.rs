@@ -18,11 +18,9 @@ use crate::sql_entity_graph::UsedType;
 use proc_macro2::TokenStream as TokenStream2;
 use quote::{quote, ToTokens, TokenStreamExt};
 use std::convert::TryFrom;
-use syn::{
-    parse::{Parse, ParseStream},
-    spanned::Spanned,
-    Token,
-};
+use syn::parse::{Parse, ParseStream};
+use syn::spanned::Spanned;
+use syn::Token;
 
 #[derive(Debug, Clone)]
 pub struct ReturningIteratedItem {
@@ -34,14 +32,8 @@ pub struct ReturningIteratedItem {
 pub enum Returning {
     None,
     Type(UsedType),
-    SetOf {
-        ty: UsedType,
-        optional: bool,
-    },
-    Iterated {
-        tys: Vec<ReturningIteratedItem>,
-        optional: bool,
-    },
+    SetOf { ty: UsedType, optional: bool },
+    Iterated { tys: Vec<ReturningIteratedItem>, optional: bool },
     // /// Technically we don't ever create this, singe triggers have their own macro.
     // Trigger,
 }
@@ -51,9 +43,9 @@ impl Returning {
         let mac = &type_macro.mac;
         let archetype = mac.path.segments.last().unwrap();
         match archetype.ident.to_string().as_str() {
-            "composite_type" => Ok(Returning::Type(UsedType::new(syn::Type::Macro(
-                type_macro.clone(),
-            ))?)),
+            "composite_type" => {
+                Ok(Returning::Type(UsedType::new(syn::Type::Macro(type_macro.clone()))?))
+            }
             _ => unimplemented!("Don't support anything other than `composite_type!()`"),
         }
     }
@@ -165,10 +157,7 @@ impl TryFrom<&syn::ReturnType> for Returning {
                                         ))
                                     }
                                 };
-                                Ok(Returning::SetOf {
-                                    ty: used_ty,
-                                    optional,
-                                })
+                                Ok(Returning::SetOf { ty: used_ty, optional })
                             } else if saw_table_iterator {
                                 let iterator_path = if saw_option_ident {
                                     let inner_path =
@@ -403,36 +392,12 @@ impl Parse for NameMacro {
             .parse::<syn::Ident>()
             .map(|v| v.to_string())
             // Avoid making folks unable to use rust keywords.
-            .or_else(|_| {
-                input
-                    .parse::<syn::Token![type]>()
-                    .map(|_| String::from("type"))
-            })
-            .or_else(|_| {
-                input
-                    .parse::<syn::Token![mod]>()
-                    .map(|_| String::from("mod"))
-            })
-            .or_else(|_| {
-                input
-                    .parse::<syn::Token![extern]>()
-                    .map(|_| String::from("extern"))
-            })
-            .or_else(|_| {
-                input
-                    .parse::<syn::Token![async]>()
-                    .map(|_| String::from("async"))
-            })
-            .or_else(|_| {
-                input
-                    .parse::<syn::Token![crate]>()
-                    .map(|_| String::from("crate"))
-            })
-            .or_else(|_| {
-                input
-                    .parse::<syn::Token![use]>()
-                    .map(|_| String::from("use"))
-            })?;
+            .or_else(|_| input.parse::<syn::Token![type]>().map(|_| String::from("type")))
+            .or_else(|_| input.parse::<syn::Token![mod]>().map(|_| String::from("mod")))
+            .or_else(|_| input.parse::<syn::Token![extern]>().map(|_| String::from("extern")))
+            .or_else(|_| input.parse::<syn::Token![async]>().map(|_| String::from("async")))
+            .or_else(|_| input.parse::<syn::Token![crate]>().map(|_| String::from("crate")))
+            .or_else(|_| input.parse::<syn::Token![use]>().map(|_| String::from("use")))?;
         let _comma: Token![,] = input.parse()?;
         let ty: syn::Type = input.parse()?;
 

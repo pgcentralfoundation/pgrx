@@ -15,7 +15,8 @@ use serde::Deserialize;
 use std::convert::TryFrom;
 use std::ffi::CStr;
 use std::ops::Sub;
-use time::{macros::date, UtcOffset};
+use time::macros::date;
+use time::UtcOffset;
 
 pub(crate) const USECS_PER_SEC: i64 = 1_000_000;
 
@@ -143,18 +144,18 @@ impl IntoDatum for TimestampWithTimeZone {
 }
 
 impl FromDatum for TimestampWithTimeZone {
-    unsafe fn from_datum(datum: pg_sys::Datum, is_null: bool, _: pg_sys::Oid) -> Option<Self>
+    unsafe fn from_polymorphic_datum(
+        datum: pg_sys::Datum,
+        is_null: bool,
+        _: pg_sys::Oid,
+    ) -> Option<Self>
     where
         Self: Sized,
     {
         if is_null {
             None
         } else {
-            Some(
-                datum
-                    .try_into()
-                    .expect("Error converting timestamp with time zone datum"),
-            )
+            Some(datum.try_into().expect("Error converting timestamp with time zone datum"))
         }
     }
 }
@@ -198,10 +199,8 @@ impl serde::Serialize for TimestampWithTimeZone {
                     pg_sys::EncodeSpecialTimestamp(self.0, buf);
                 }
                 _ => {
-                    let mut pg_tm: pg_sys::pg_tm = pg_sys::pg_tm {
-                        tm_zone: std::ptr::null_mut(),
-                        ..Default::default()
-                    };
+                    let mut pg_tm: pg_sys::pg_tm =
+                        pg_sys::pg_tm { tm_zone: std::ptr::null_mut(), ..Default::default() };
                     let mut tz = 0i32;
                     let mut fsec = 0 as pg_sys::fsec_t;
                     let mut tzn = std::ptr::null::<std::os::raw::c_char>();
@@ -242,8 +241,6 @@ unsafe impl SqlTranslatable for TimestampWithTimeZone {
         Ok(SqlMapping::literal("timestamp with time zone"))
     }
     fn return_sql() -> Result<Returns, ReturnsError> {
-        Ok(Returns::One(SqlMapping::literal(
-            "timestamp with time zone",
-        )))
+        Ok(Returns::One(SqlMapping::literal("timestamp with time zone")))
     }
 }

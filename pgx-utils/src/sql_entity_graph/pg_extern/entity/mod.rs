@@ -22,15 +22,12 @@ pub use argument::PgExternArgumentEntity;
 pub use operator::PgOperatorEntity;
 pub use returning::{PgExternReturnEntity, PgExternReturnEntityIteratedItem};
 
-use crate::{
-    sql_entity_graph::{
-        metadata::{Returns, SqlMapping},
-        pgx_sql::PgxSql,
-        to_sql::{entity::ToSqlConfigEntity, ToSql},
-        SqlGraphEntity, SqlGraphIdentifier,
-    },
-    ExternArgs,
-};
+use crate::sql_entity_graph::metadata::{Returns, SqlMapping};
+use crate::sql_entity_graph::pgx_sql::PgxSql;
+use crate::sql_entity_graph::to_sql::entity::ToSqlConfigEntity;
+use crate::sql_entity_graph::to_sql::ToSql;
+use crate::sql_entity_graph::{SqlGraphEntity, SqlGraphIdentifier};
+use crate::ExternArgs;
 
 use eyre::{eyre, WrapErr};
 use std::cmp::Ordering;
@@ -581,10 +578,7 @@ impl ToSql for PgExternEntity {
                     _ => false,
                 })
                 .ok_or_else(|| {
-                    eyre!(
-                        "Could not find right arg type in graph. Got: {:?}",
-                        right_arg
-                    )
+                    eyre!("Could not find right arg type in graph. Got: {:?}", right_arg)
                 })?;
             let right_arg_sql = match right_arg.argument_sql {
                 Ok(SqlMapping::As(ref sql)) => sql.clone(),
