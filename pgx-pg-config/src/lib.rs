@@ -14,6 +14,7 @@ use std::fmt::{self, Display, Formatter};
 use std::process::Stdio;
 use std::{
     collections::HashMap,
+    ffi::OsString,
     io::ErrorKind,
     path::{Path, PathBuf},
     process::Command,
@@ -246,6 +247,10 @@ impl PgConfig {
 
     pub fn sharedir(&self) -> eyre::Result<PathBuf> {
         Ok(self.run("--sharedir")?.into())
+    }
+
+    pub fn cppflags(&self) -> eyre::Result<OsString> {
+        Ok(self.run("--cppflags")?.into())
     }
 
     pub fn extension_dir(&self) -> eyre::Result<PathBuf> {

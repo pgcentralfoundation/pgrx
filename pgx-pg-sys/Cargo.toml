@@ -46,3 +46,4 @@ syn = { version = "1.0.101", features = [ "extra-traits", "full", "fold", "parsi
 eyre = "0.6.8"
 color-eyre = "0.6.2"
 rustversion = "1.0"
+shlex = "1.1.0" # shell lexing, also used by many of our deps

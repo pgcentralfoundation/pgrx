@@ -1436,6 +1436,7 @@ dependencies = [
  "quote",
  "rayon",
  "rustversion",
+ "shlex",
  "sptr",
  "syn",
 ]
