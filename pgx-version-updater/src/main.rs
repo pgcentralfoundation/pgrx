@@ -3,6 +3,7 @@ use owo_colors::OwoColorize;
 use std::collections::HashSet;
 use std::fs;
 use std::io::{BufRead, Write};
+use std::path::Path;
 use std::process::{Command, Stdio};
 use std::{env, path::PathBuf};
 use toml_edit::{value, Document, Table};
@@ -64,7 +65,9 @@ fn main() {
     // *dependency* version updates.
     let mut exclude_version_files = HashSet::new();
     for file in args.exclude_from_version_change {
-        exclude_version_files.insert(fullpath(file).to_str().unwrap().to_string());
+        exclude_version_files.insert(
+            fullpath(&file).expect(format!("Could not get full path for file: {}", file).as_str()),
+        );
     }
 
     // Recursively walk down all directories to extract out any existing Cargo.toml files
@@ -74,14 +77,18 @@ fn main() {
         .filter_map(|v| v.ok())
     {
         if is_cargo_toml_file(&entry) {
-            let filepath: String = fullpath(entry.path().display().to_string())
-                .display()
-                .to_string();
+            let filepath = fullpath(entry.path()).expect(
+                format!(
+                    "Could not get full path for file {}",
+                    entry.path().display()
+                )
+                .as_str(),
+            );
 
             let mut output = format!(
                 "{} Cargo.toml file at {}",
                 "Discovered".bold().green(),
-                &filepath.cyan()
+                &filepath.display().cyan()
             );
 
             // Extract the package name if possible
@@ -111,12 +118,13 @@ fn main() {
 
     // Loop through all files that are included for dependency updates via CLI params
     for file in args.include_for_dep_updates {
-        let filepath: String = fullpath(file).display().to_string();
+        let filepath =
+            fullpath(&file).expect(format!("Could not get full path for file {}", file).as_str());
 
         let mut output = format!(
             "{} Cargo.toml file at {} for processing",
             " Including".bold().green(),
-            &filepath.cyan()
+            &filepath.display().cyan()
         );
 
         // Extract the package name if possible
@@ -160,16 +168,16 @@ fn main() {
         let mut output = format!(
             "{} Cargo.toml file at {}",
             "Processing".bold().green(),
-            &filepath.cyan()
+            &filepath.display().cyan()
         );
 
         let data = fs::read_to_string(&filepath)
-            .expect(format!("Unable to open file at {}", &filepath).as_str());
+            .expect(format!("Unable to open file at {}", &filepath.display()).as_str());
 
         let mut doc = data.parse::<Document>().expect(
             format!(
                 "File at location {} is an invalid Cargo.toml file",
-                &filepath
+                &filepath.display()
             )
             .as_str(),
         );
@@ -305,17 +313,16 @@ fn main() {
 }
 
 // Always return full path
-fn fullpath(test_path: String) -> PathBuf {
-    let mut path = PathBuf::new();
-    path.push(test_path.clone());
+fn fullpath<P: AsRef<Path>>(test_path: P) -> Result<PathBuf, std::io::Error> {
+    let path_ref = test_path.as_ref();
 
-    if path.is_absolute() {
-        path.canonicalize().unwrap()
+    if path_ref.is_absolute() {
+        Ok(PathBuf::from(path_ref))
     } else {
-        let current_dir = env::current_dir().expect("Could not get current directory!");
-        path.push(current_dir);
-        path.push(test_path.clone());
-        path.canonicalize().unwrap()
+        let mut current_dir = env::current_dir()?;
+        current_dir.push(path_ref);
+        current_dir.canonicalize()?;
+        Ok(current_dir)
     }
 }
 
@@ -385,13 +392,16 @@ fn parse_new_version(old_version_specifier: &str, new_version: &str) -> String {
 
 // Given a filepath pointing to a Cargo.toml file, extract out the [package] name
 // if it has one
-fn extract_package_name(filepath: &String) -> Option<String> {
+fn extract_package_name<P: AsRef<Path>>(filepath: P) -> Option<String> {
+    let filepath = filepath.as_ref();
+
     let data = fs::read_to_string(&filepath)
-        .expect(format!("Unable to open file at {}", &filepath).as_str());
+        .expect(format!("Unable to open file at {}", &filepath.display()).as_str());
+
     let doc = data.parse::<Document>().expect(
         format!(
             "File at location {} is an invalid Cargo.toml file",
-            &filepath
+            &filepath.display()
         )
         .as_str(),
     );
