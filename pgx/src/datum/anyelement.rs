@@ -37,10 +37,7 @@ impl FromDatum for AnyElement {
     const GET_TYPOID: bool = true;
 
     #[inline]
-    unsafe fn from_datum(
-        _datum: pg_sys::Datum,
-        _is_null: bool,
-    ) -> Option<AnyElement> {
+    unsafe fn from_datum(_datum: pg_sys::Datum, _is_null: bool) -> Option<AnyElement> {
         debug_assert!(false, "Can't create a polymorphic type using from_datum, call FromDatum::from_polymorphic_datum instead");
         None
     }

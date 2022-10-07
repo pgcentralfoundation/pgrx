@@ -492,7 +492,11 @@ impl SpiTupleTable {
                         let datum =
                             pg_sys::SPI_getbinval(heap_tuple, tupdesc, ordinal, &mut is_null);
 
-                        T::from_polymorphic_datum(datum, is_null, pg_sys::SPI_gettypeid(tupdesc, ordinal))
+                        T::from_polymorphic_datum(
+                            datum,
+                            is_null,
+                            pg_sys::SPI_gettypeid(tupdesc, ordinal),
+                        )
                     }
                 },
                 None => panic!("TupDesc is NULL"),

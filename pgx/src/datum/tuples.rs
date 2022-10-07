@@ -49,11 +49,16 @@ where
     A: FromDatum + IntoDatum,
     B: FromDatum + IntoDatum,
 {
-    unsafe fn from_polymorphic_datum(datum: pg_sys::Datum, is_null: bool, typoid: pg_sys::Oid) -> Option<Self>
+    unsafe fn from_polymorphic_datum(
+        datum: pg_sys::Datum,
+        is_null: bool,
+        typoid: pg_sys::Oid,
+    ) -> Option<Self>
     where
         Self: Sized,
     {
-        let mut vec = Vec::<Option<pg_sys::Datum>>::from_polymorphic_datum(datum, is_null, typoid).unwrap();
+        let mut vec =
+            Vec::<Option<pg_sys::Datum>>::from_polymorphic_datum(datum, is_null, typoid).unwrap();
         let b = vec.pop().unwrap();
         let a = vec.pop().unwrap();
 
@@ -79,11 +84,16 @@ where
     B: FromDatum + IntoDatum,
     C: FromDatum + IntoDatum,
 {
-    unsafe fn from_polymorphic_datum(datum: pg_sys::Datum, is_null: bool, typoid: pg_sys::Oid) -> Option<Self>
+    unsafe fn from_polymorphic_datum(
+        datum: pg_sys::Datum,
+        is_null: bool,
+        typoid: pg_sys::Oid,
+    ) -> Option<Self>
     where
         Self: Sized,
     {
-        let mut vec = Vec::<Option<pg_sys::Datum>>::from_polymorphic_datum(datum, is_null, typoid).unwrap();
+        let mut vec =
+            Vec::<Option<pg_sys::Datum>>::from_polymorphic_datum(datum, is_null, typoid).unwrap();
         let c = vec.pop().unwrap();
         let b = vec.pop().unwrap();
         let a = vec.pop().unwrap();

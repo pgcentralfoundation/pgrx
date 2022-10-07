@@ -29,7 +29,11 @@ pub struct JsonString(pub String);
 /// for json
 impl FromDatum for Json {
     #[inline]
-    unsafe fn from_polymorphic_datum(datum: pg_sys::Datum, is_null: bool, _: pg_sys::Oid) -> Option<Json> {
+    unsafe fn from_polymorphic_datum(
+        datum: pg_sys::Datum,
+        is_null: bool,
+        _: pg_sys::Oid,
+    ) -> Option<Json> {
         if is_null {
             None
         } else {
@@ -45,7 +49,11 @@ impl FromDatum for Json {
 
 /// for jsonb
 impl FromDatum for JsonB {
-    unsafe fn from_polymorphic_datum(datum: pg_sys::Datum, is_null: bool, _: pg_sys::Oid) -> Option<JsonB> {
+    unsafe fn from_polymorphic_datum(
+        datum: pg_sys::Datum,
+        is_null: bool,
+        _: pg_sys::Oid,
+    ) -> Option<JsonB> {
         if is_null {
             None
         } else {
