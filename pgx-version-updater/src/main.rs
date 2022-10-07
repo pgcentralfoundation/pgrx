@@ -190,9 +190,9 @@ fn main() {
                     .as_str(),
             )
         } else {
-            // Bump pacakge version if we can
-            if doc.contains_key("package") {
-                doc["package"]["version"] = value(args.update_version.clone());
+            // Bump package version if we can
+            if let Some(version) = doc.get_mut("package").and_then(|p| p.get_mut("version")) {
+                *version = value(args.update_version.clone());
             }
         }
 
