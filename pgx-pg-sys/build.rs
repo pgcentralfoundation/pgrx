@@ -549,7 +549,8 @@ fn run_bindgen(pg_config: &PgConfig, include_h: &PathBuf) -> eyre::Result<syn::F
         .blocklist_function(".*(set|long)jmp")
         .blocklist_function("pg_re_throw")
         .blocklist_item("CONFIGURE_ARGS") // configuration during build is hopefully irrelevant
-        .blocklist_item("_*(HAVE|have)_.*") // these are for C's use
+        .blocklist_item("(_*HAVE|__have)_.*") // header tracking metadata
+        .blocklist_item("_[A-Z_]+_H") // more header metadata
         .blocklist_item("__[A-Z].*") // these are reserved and unused by Postgres
         .blocklist_item("__darwin.*") // this should always be Apple's names
         .blocklist_function("float[48].*") // Rust has plenty of float handling
