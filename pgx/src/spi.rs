@@ -492,7 +492,11 @@ impl SpiTupleTable {
                         let datum =
                             pg_sys::SPI_getbinval(heap_tuple, tupdesc, ordinal, &mut is_null);
 
-                        T::from_datum(datum, is_null, pg_sys::SPI_gettypeid(tupdesc, ordinal))
+                        T::from_polymorphic_datum(
+                            datum,
+                            is_null,
+                            pg_sys::SPI_gettypeid(tupdesc, ordinal),
+                        )
                     }
                 },
                 None => panic!("TupDesc is NULL"),
@@ -654,7 +658,7 @@ impl<Datum: IntoDatum + FromDatum> From<Datum> for SpiHeapTupleDataEntry {
 impl SpiHeapTupleDataEntry {
     pub fn value<T: FromDatum>(&self) -> Option<T> {
         match self.datum.as_ref() {
-            Some(datum) => unsafe { T::from_datum(*datum, false, self.type_oid) },
+            Some(datum) => unsafe { T::from_polymorphic_datum(*datum, false, self.type_oid) },
             None => None,
         }
     }

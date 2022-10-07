@@ -159,7 +159,11 @@ impl From<f64> for Numeric {
 }
 
 impl FromDatum for Numeric {
-    unsafe fn from_datum(datum: pg_sys::Datum, is_null: bool, _typoid: u32) -> Option<Self>
+    unsafe fn from_polymorphic_datum(
+        datum: pg_sys::Datum,
+        is_null: bool,
+        _typoid: u32,
+    ) -> Option<Self>
     where
         Self: Sized,
     {

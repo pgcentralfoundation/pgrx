@@ -98,7 +98,7 @@ mod pg_10_11 {
             if T::GET_TYPOID {
                 T::from_polymorphic_datum(datum, isnull, super::pg_getarg_type(fcinfo, num))
             } else {
-                T::from_datum(datum, isnull, pg_sys::InvalidOid)
+                T::from_datum(datum, isnull)
             }
         }
     }
@@ -144,7 +144,7 @@ mod pg_12_13_14 {
                     super::pg_getarg_type(fcinfo, num),
                 )
             } else {
-                T::from_datum(datum.value, datum.isnull, pg_sys::InvalidOid)
+                T::from_datum(datum.value, datum.isnull)
             }
         }
     }
@@ -279,7 +279,7 @@ pub unsafe fn direct_function_call<R: FromDatum>(
 ) -> Option<R> {
     let datum = direct_function_call_as_datum(func, args);
     match datum {
-        Some(datum) => R::from_datum(datum, false, pg_sys::InvalidOid),
+        Some(datum) => R::from_datum(datum, false),
         None => None,
     }
 }
@@ -316,7 +316,7 @@ pub unsafe fn direct_pg_extern_function_call<R: FromDatum>(
 ) -> Option<R> {
     let datum = direct_pg_extern_function_call_as_datum(func, args);
     match datum {
-        Some(datum) => R::from_datum(datum, false, pg_sys::InvalidOid),
+        Some(datum) => R::from_datum(datum, false),
         None => None,
     }
 }
