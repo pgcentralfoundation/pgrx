@@ -679,7 +679,7 @@ fn extra_bindgen_clang_args(pg_config: &PgConfig) -> eyre::Result<Vec<String>> {
                     // The logic we'd like ideally is for `cargo pgx init` to
                     // choose a good SDK in the first place, and force postgres
                     // to use it. Then, the logic in this build script would
-                    // Just Work without changes (since we are using it's
+                    // Just Work without changes (since we are using its
                     // sysroot verbatim).
                     //
                     // The value of "Good" here is tricky, but the logic should
@@ -707,7 +707,7 @@ fn extra_bindgen_clang_args(pg_config: &PgConfig) -> eyre::Result<Vec<String>> {
                     // SDK version, but it's not an option for postgres.
                     let major_version = pg_config.major_version()?;
                     println!(
-                        "cargo:warning=postgres version {major_version} was compiled against a \
+                        "cargo:warning=postgres v{major_version} was compiled against an \
                          SDK Root which does not seem to exist on this machine ({}). You may \
                          need to re-run `cargo pgx init` and/or update your command line tools.",
                         pair[1],
