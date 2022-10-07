@@ -7,8 +7,6 @@ license = "MIT"
 description = "Standalone tool to update PGX Cargo.toml versions and dependencies in preparation for a release."
 homepage = "https://github.com/zombodb/pgx"
 repository = "https://github.com/zombodb/pgx"
-documentation = "https://docs.rs/pgx-utils"
-readme = "README.md"
 
 [dependencies]
 clap = { version = "3.2.2", features = [ "env", "derive" ] }
