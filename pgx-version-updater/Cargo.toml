@@ -9,7 +9,6 @@ homepage = "https://github.com/zombodb/pgx"
 repository = "https://github.com/zombodb/pgx"
 documentation = "https://docs.rs/pgx-utils"
 readme = "README.md"
-rust-version = "1.58"
 
 [dependencies]
 clap = { version = "3.2.2", features = [ "env", "derive" ] }
