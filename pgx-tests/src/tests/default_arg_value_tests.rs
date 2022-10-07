@@ -7,7 +7,7 @@ All rights reserved.
 Use of this source code is governed by the MIT license that can be found in the LICENSE file.
 */
 
-use pgx::*;
+use pgx::prelude::*;
 
 #[pg_extern]
 fn negative_default_argument(i: default!(i32, -1)) -> i32 {
@@ -20,7 +20,7 @@ fn default_argument(a: default!(i32, 99)) -> i32 {
 }
 
 #[pg_extern]
-fn option_default_argument(a: Option<default!(&str, "NULL")>) -> &str {
+fn option_default_argument(a: default!(Option<&str>, "NULL")) -> &str {
     match a {
         Some(a) => a,
         None => "got default of null",
@@ -33,7 +33,7 @@ mod tests {
     #[allow(unused_imports)]
     use crate as pgx_tests;
 
-    use pgx::*;
+    use pgx::prelude::*;
 
     #[test]
     fn make_idea_happy() {}

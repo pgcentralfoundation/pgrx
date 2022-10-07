@@ -9,14 +9,9 @@ Use of this source code is governed by the MIT license that can be found in the 
 
 use cargo_toml::Manifest;
 use eyre::{eyre, WrapErr};
-use pgx_utils::{
-    get_target_dir,
-    pg_config::{PgConfig, PgConfigSelector, Pgx},
-};
-use std::{
-    path::{Path, PathBuf},
-    process::{Command, Stdio},
-};
+use pgx_pg_config::{get_target_dir, PgConfig, PgConfigSelector, Pgx};
+use std::path::{Path, PathBuf};
+use std::process::{Command, Stdio};
 
 use crate::CommandExecute;
 
@@ -140,26 +135,9 @@ pub fn test_extension(
         .arg("test")
         .env("CARGO_TARGET_DIR", &target_dir)
         .env("PGX_FEATURES", features_arg.clone())
-        .env(
-            "PGX_NO_DEFAULT_FEATURES",
-            if no_default_features_arg {
-                "true"
-            } else {
-                "false"
-            },
-        )
-        .env(
-            "PGX_ALL_FEATURES",
-            if features.all_features {
-                "true"
-            } else {
-                "false"
-            },
-        )
-        .env(
-            "PGX_BUILD_PROFILE",
-            if is_release { "release" } else { "debug" },
-        )
+        .env("PGX_NO_DEFAULT_FEATURES", if no_default_features_arg { "true" } else { "false" })
+        .env("PGX_ALL_FEATURES", if features.all_features { "true" } else { "false" })
+        .env("PGX_BUILD_PROFILE", if is_release { "release" } else { "debug" })
         .env("PGX_NO_SCHEMA", if no_schema { "true" } else { "false" });
 
     if let Ok(rust_log) = std::env::var("RUST_LOG") {

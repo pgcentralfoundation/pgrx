@@ -13,8 +13,10 @@ use crate::CommandExecute;
 use cargo_toml::Manifest;
 use eyre::{eyre, WrapErr};
 use owo_colors::OwoColorize;
-use pgx_utils::pg_config::{PgConfig, PgConfigSelector, Pgx};
-use std::{os::unix::process::CommandExt, path::PathBuf, process::Stdio};
+use pgx_pg_config::{PgConfig, PgConfigSelector, Pgx};
+use std::os::unix::process::CommandExt;
+use std::path::PathBuf;
+use std::process::Stdio;
 
 /// Start a pgx-managed Postgres instance
 #[derive(clap::Args, Debug)]
@@ -98,11 +100,7 @@ pub(crate) fn start_postgres(pg_config: &PgConfig) -> eyre::Result<()> {
             .stdout(Stdio::piped())
             .stderr(Stdio::piped())
             .arg("start")
-            .arg(format!(
-                "-o -i -p {} -c unix_socket_directories={}",
-                port,
-                Pgx::home()?.display()
-            ))
+            .arg(format!("-o -i -p {} -c unix_socket_directories={}", port, Pgx::home()?.display()))
             .arg("-D")
             .arg(&datadir)
             .arg("-l")

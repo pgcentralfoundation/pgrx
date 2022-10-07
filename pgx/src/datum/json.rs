@@ -11,6 +11,9 @@ use crate::{
     direct_function_call, direct_function_call_as_datum, pg_sys, vardata_any, varsize_any_exhdr,
     void_mut_ptr, FromDatum, IntoDatum,
 };
+use pgx_utils::sql_entity_graph::metadata::{
+    ArgumentError, Returns, ReturnsError, SqlMapping, SqlTranslatable,
+};
 use serde::{Serialize, Serializer};
 use serde_json::Value;
 
@@ -26,13 +29,15 @@ pub struct JsonString(pub String);
 /// for json
 impl FromDatum for Json {
     #[inline]
-    unsafe fn from_datum(datum: pg_sys::Datum, is_null: bool, _: pg_sys::Oid) -> Option<Json> {
+    unsafe fn from_polymorphic_datum(
+        datum: pg_sys::Datum,
+        is_null: bool,
+        _: pg_sys::Oid,
+    ) -> Option<Json> {
         if is_null {
             None
-        } else if datum == 0 {
-            panic!("a json Datum was flagged as non-null but the datum is zero");
         } else {
-            let varlena = pg_sys::pg_detoast_datum(datum as *mut pg_sys::varlena);
+            let varlena = pg_sys::pg_detoast_datum(datum.cast_mut_ptr());
             let len = varsize_any_exhdr(varlena);
             let data = vardata_any(varlena);
             let slice = std::slice::from_raw_parts(data as *const u8, len);
@@ -44,24 +49,25 @@ impl FromDatum for Json {
 
 /// for jsonb
 impl FromDatum for JsonB {
-    unsafe fn from_datum(datum: pg_sys::Datum, is_null: bool, _: pg_sys::Oid) -> Option<JsonB> {
+    unsafe fn from_polymorphic_datum(
+        datum: pg_sys::Datum,
+        is_null: bool,
+        _: pg_sys::Oid,
+    ) -> Option<JsonB> {
         if is_null {
             None
-        } else if datum == 0 {
-            panic!("a jsonb Datum was flagged as non-null but the datum is zero")
         } else {
-            let varlena = datum as *mut pg_sys::varlena;
+            let varlena = datum.cast_mut_ptr();
             let detoasted = pg_sys::pg_detoast_datum_packed(varlena);
 
             let cstr = direct_function_call::<&std::ffi::CStr>(
                 pg_sys::jsonb_out,
-                vec![Some(detoasted as pg_sys::Datum)],
+                vec![Some(detoasted.into())],
             )
             .expect("failed to convert jsonb to a cstring");
 
             let value = serde_json::from_str(
-                cstr.to_str()
-                    .expect("text version of jsonb is not valid UTF8"),
+                cstr.to_str().expect("text version of jsonb is not valid UTF8"),
             )
             .expect("failed to parse JsonB value");
 
@@ -84,17 +90,15 @@ impl FromDatum for JsonB {
 /// This returns a **copy**, allocated and managed by Rust, of the underlying `varlena` Datum
 impl FromDatum for JsonString {
     #[inline]
-    unsafe fn from_datum(
+    unsafe fn from_polymorphic_datum(
         datum: pg_sys::Datum,
         is_null: bool,
         _: pg_sys::Oid,
     ) -> Option<JsonString> {
         if is_null {
             None
-        } else if datum == 0 {
-            panic!("a varlena Datum was flagged as non-null but the datum is zero");
         } else {
-            let varlena = datum as *mut pg_sys::varlena;
+            let varlena = datum.cast_mut_ptr();
             let detoasted = pg_sys::pg_detoast_datum_packed(varlena);
             let len = varsize_any_exhdr(detoasted);
             let data = vardata_any(detoasted);
@@ -132,10 +136,7 @@ impl IntoDatum for JsonB {
             std::ffi::CString::new(string).expect("string version of jsonb is not valid UTF8");
 
         unsafe {
-            direct_function_call_as_datum(
-                pg_sys::jsonb_in,
-                vec![Some(cstring.as_ptr() as pg_sys::Datum)],
-            )
+            direct_function_call_as_datum(pg_sys::jsonb_in, vec![Some(cstring.as_ptr().into())])
         }
     }
 
@@ -181,5 +182,23 @@ impl Serialize for JsonString {
         serde_json::to_value(self.0.as_str())
             .expect("JsonString is not valid JSON")
             .serialize(serializer)
+    }
+}
+
+unsafe impl SqlTranslatable for Json {
+    fn argument_sql() -> Result<SqlMapping, ArgumentError> {
+        Ok(SqlMapping::literal("json"))
+    }
+    fn return_sql() -> Result<Returns, ReturnsError> {
+        Ok(Returns::One(SqlMapping::literal("json")))
+    }
+}
+
+unsafe impl SqlTranslatable for crate::datum::JsonB {
+    fn argument_sql() -> Result<SqlMapping, ArgumentError> {
+        Ok(SqlMapping::literal("jsonb"))
+    }
+    fn return_sql() -> Result<Returns, ReturnsError> {
+        Ok(Returns::One(SqlMapping::literal("jsonb")))
     }
 }

@@ -11,10 +11,10 @@ A video walkthrough of its abilities can be found here: https://www.twitch.tv/vi
 Install via crates.io:
 
 ```shell script
-$ cargo install cargo-pgx
+$ cargo install --locked cargo-pgx
 ```
 
-As new versions of `pgx` are released, you'll want to make sure you run this command again to update it.
+As new versions of `pgx` are released, you'll want to make sure you run this command again to update it. You should also reinstall `cargo-pgx` whenever you update `rustc` so that the same compiler is used to build `cargo-pgx` and your Postgres extensions. You can force `cargo` to reinstall an existing crate by passing `--force`.
 
 ## Usage
 
@@ -132,13 +132,13 @@ USAGE:
 OPTIONS:
     -h, --help           Print help information
         --pg10 <PG10>    [env: PG10_PG_CONFIG=]
-        --pg11 <PG11>    If installed locally, the path to PG11's `pgconfig` tool, or `downLoad` to
+        --pg11 <PG11>    If installed locally, the path to PG11's `pgconfig` tool, or `download` to
                          have pgx download/compile/install it [env: PG11_PG_CONFIG=]
-        --pg12 <PG12>    If installed locally, the path to PG12's `pgconfig` tool, or `downLoad` to
+        --pg12 <PG12>    If installed locally, the path to PG12's `pgconfig` tool, or `download` to
                          have pgx download/compile/install it [env: PG12_PG_CONFIG=]
-        --pg13 <PG13>    If installed locally, the path to PG13's `pgconfig` tool, or `downLoad` to
+        --pg13 <PG13>    If installed locally, the path to PG13's `pgconfig` tool, or `download` to
                          have pgx download/compile/install it [env: PG13_PG_CONFIG=]
-        --pg14 <PG14>    If installed locally, the path to PG14's `pgconfig` tool, or `downLoad` to
+        --pg14 <PG14>    If installed locally, the path to PG14's `pgconfig` tool, or `download` to
                          have pgx download/compile/install it [env: PG14_PG_CONFIG=]
     -v, --verbose        Enable info logs, -vv for debug, -vvv for trace
     -V, --version        Print version information

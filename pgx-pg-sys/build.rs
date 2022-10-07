@@ -7,30 +7,30 @@ All rights reserved.
 Use of this source code is governed by the MIT license that can be found in the LICENSE file.
 */
 
-extern crate build_deps;
-
-use bindgen::callbacks::MacroParsingBehavior;
+use bindgen::callbacks::{DeriveTrait, ImplementsTrait, MacroParsingBehavior};
 use eyre::{eyre, WrapErr};
-use pgx_utils::pg_config::{PgConfig, PgConfigSelector, Pgx};
-use pgx_utils::prefix_path;
+use pgx_pg_config::{prefix_path, PgConfig, PgConfigSelector, Pgx, SUPPORTED_MAJOR_VERSIONS};
 use pgx_utils::rewriter::PgGuardRewriter;
 use quote::{quote, ToTokens};
 use rayon::prelude::*;
-use std::{
-    collections::{HashMap, HashSet},
-    path::PathBuf,
-    process::{Command, Output},
-};
+use std::collections::{HashMap, HashSet};
+use std::path::PathBuf;
+use std::process::{Command, Output};
 use syn::{ForeignItem, Item};
 
 #[derive(Debug)]
-struct IgnoredMacros(HashSet<String>);
+struct PgxOverrides(HashSet<String>);
 
-impl IgnoredMacros {
+#[rustversion::nightly]
+const IS_NIGHTLY: bool = true;
+#[rustversion::not(nightly)]
+const IS_NIGHTLY: bool = false;
+
+impl PgxOverrides {
     fn default() -> Self {
         // these cause duplicate definition problems on linux
         // see: https://github.com/rust-lang/rust-bindgen/issues/687
-        IgnoredMacros(
+        PgxOverrides(
             vec![
                 "FP_INFINITE".into(),
                 "FP_NAN".into(),
@@ -45,13 +45,30 @@ impl IgnoredMacros {
     }
 }
 
-impl bindgen::callbacks::ParseCallbacks for IgnoredMacros {
+impl bindgen::callbacks::ParseCallbacks for PgxOverrides {
     fn will_parse_macro(&self, name: &str) -> MacroParsingBehavior {
         if self.0.contains(name) {
             bindgen::callbacks::MacroParsingBehavior::Ignore
         } else {
             bindgen::callbacks::MacroParsingBehavior::Default
         }
+    }
+
+    fn blocklisted_type_implements_trait(
+        &self,
+        name: &str,
+        derive_trait: DeriveTrait,
+    ) -> Option<ImplementsTrait> {
+        if name != "Datum" && name != "NullableDatum" {
+            return None;
+        }
+
+        let implements_trait = match derive_trait {
+            DeriveTrait::Copy => ImplementsTrait::Yes,
+            DeriveTrait::Debug => ImplementsTrait::Yes,
+            _ => ImplementsTrait::No,
+        };
+        Some(implements_trait)
     }
 }
 
@@ -71,6 +88,11 @@ fn main() -> color_eyre::Result<()> {
         std::env::var("PGX_PG_SYS_GENERATE_BINDINGS_FOR_RELEASE").unwrap_or("0".to_string()) == "1";
     println!("cargo:rerun-if-env-changed=PGX_PG_SYS_GENERATE_BINDINGS_FOR_RELEASE");
 
+    // Do nightly detection to suppress silly warnings.
+    if IS_NIGHTLY {
+        println!("cargo:rustc-cfg=nightly")
+    };
+
     let manifest_dir = PathBuf::from(std::env::var("CARGO_MANIFEST_DIR").unwrap());
     let out_dir = PathBuf::from(std::env::var("OUT_DIR").unwrap());
     let mut src_dir = manifest_dir.clone();
@@ -86,10 +108,9 @@ fn main() -> color_eyre::Result<()> {
 
     let pgx = Pgx::from_config()?;
 
-    build_deps::rerun_if_changed_paths(&Pgx::config_toml()?.display().to_string()).unwrap();
-    build_deps::rerun_if_changed_paths("include/*").unwrap();
-    build_deps::rerun_if_changed_paths("cshim/pgx-cshim.c").unwrap();
-    build_deps::rerun_if_changed_paths("cshim/Makefile").unwrap();
+    println!("cargo:rerun-if-changed={}", Pgx::config_toml()?.display().to_string(),);
+    println!("cargo:rerun-if-changed=include");
+    println!("cargo:rerun-if-changed=cshim");
 
     let pg_configs = if std::env::var("PGX_PG_SYS_GENERATE_BINDINGS_FOR_RELEASE")
         .unwrap_or("false".into())
@@ -100,7 +121,7 @@ fn main() -> color_eyre::Result<()> {
             .collect::<eyre::Result<Vec<_>>>()?
     } else {
         let mut found = None;
-        for version in pgx_utils::SUPPORTED_MAJOR_VERSIONS {
+        for version in SUPPORTED_MAJOR_VERSIONS {
             if let Err(_) = std::env::var(&format!("CARGO_FEATURE_PG{}", version)) {
                 continue;
             }
@@ -112,7 +133,7 @@ fn main() -> color_eyre::Result<()> {
         let found = found.ok_or_else(|| {
             eyre!(
                 "Did not find `pg$VERSION` feature. `pgx-pg-sys` requires one of {} to be set",
-                pgx_utils::SUPPORTED_MAJOR_VERSIONS
+                SUPPORTED_MAJOR_VERSIONS
                     .iter()
                     .map(|x| format!("`pg{}`", x))
                     .collect::<Vec<_>>()
@@ -126,9 +147,8 @@ fn main() -> color_eyre::Result<()> {
     pg_configs
         .par_iter()
         .map(|pg_config| {
-            let major_version = pg_config
-                .major_version()
-                .wrap_err("could not determine major version")?;
+            let major_version =
+                pg_config.major_version().wrap_err("could not determine major version")?;
             let mut include_h = manifest_dir.clone();
             include_h.push("include");
             include_h.push(format!("pg{}.h", major_version));
@@ -156,7 +176,9 @@ fn main() -> color_eyre::Result<()> {
                     &bindings_file,
                     quote! {
                         use crate as pg_sys;
-                        use crate::PgNode;
+                        #[cfg(any(feature = "pg12", feature = "pg13", feature = "pg14"))]
+                        use crate::NullableDatum;
+                        use crate::{PgNode, Datum};
                     },
                 )
                 .wrap_err_with(|| {
@@ -445,22 +467,14 @@ impl<'a> From<&'a [syn::Item]> for StructGraph<'a> {
             }
         }
 
-        StructGraph {
-            name_tab,
-            item_offset_tab,
-            descriptors,
-        }
+        StructGraph { name_tab, item_offset_tab, descriptors }
     }
 }
 
 impl<'a> StructDescriptor<'a> {
     /// children returns an iterator over the children of this node in the graph
     fn children(&'a self, graph: &'a StructGraph) -> StructDescriptorChildren {
-        StructDescriptorChildren {
-            offset: 0,
-            descriptor: self,
-            graph,
-        }
+        StructDescriptorChildren { offset: 0, descriptor: self, graph }
     }
 }
 
@@ -507,13 +521,32 @@ fn run_bindgen(pg_config: &PgConfig, include_h: &PathBuf) -> eyre::Result<syn::F
     let bindings = bindgen::Builder::default()
         .header(include_h.display().to_string())
         .clang_arg(&format!("-I{}", includedir_server.display()))
-        .parse_callbacks(Box::new(IgnoredMacros::default()))
+        .clang_args(&extra_bindgen_clang_args(pg_config)?)
+        .parse_callbacks(Box::new(PgxOverrides::default()))
+        .allowlist_file(".*confdefs.h")
+        .allowlist_file(".*(?:[fF]uncs|mgr).h")
+        .allowlist_file(".*htup(?:_details)?.h")
+        .allowlist_file(".*syscache.h")
+        .allowlist_file(".*mcxt.h")
+        .allowlist_file(".*(?:storage|catalog|access|commands|executor|adt|optimizer|rewrite|postmaster|tcop|replication|nodes|postgres|parse|pg_|item|heap).*")
+        .allowlist_var("SIG.*")
+        .blocklist_type("(Nullable)?Datum") // manually wrapping datum types for correctness
         .blocklist_function("varsize_any") // pgx converts the VARSIZE_ANY macro, so we don't want to also have this function, which is in heaptuple.c
-        .blocklist_function("query_tree_walker")
-        .blocklist_function("expression_tree_walker")
-        .blocklist_function("sigsetjmp")
-        .blocklist_function("siglongjmp")
+        .blocklist_function("(?:query|expression)_tree_walker")
+        .blocklist_function(".*(?:set|long)jmp")
         .blocklist_function("pg_re_throw")
+        .blocklist_item("CONFIGURE_ARGS") // configuration during build is hopefully irrelevant
+        .blocklist_item("_*(?:HAVE|have)_.*") // header tracking metadata
+        .blocklist_item("_[A-Z_]+_H") // more header metadata
+        .blocklist_item("__[A-Z].*") // these are reserved and unused by Postgres
+        .blocklist_item("__darwin.*") // this should always be Apple's names
+        .blocklist_function("pq(?:Strerror|Get.*)") // wrappers around platform functions: user can call those themselves
+        .blocklist_item(".*pthread.*)") // shims for pthreads on non-pthread systems, just use std::thread
+        .blocklist_function("float[48].*") // Rust has plenty of float handling
+        .blocklist_item(".*(?i:va)_(?i:list|start|end|copy).*") // do not need va_list anything!
+        .blocklist_function("(?:pg_|p)v(?:sn?|f)?printf")
+        .blocklist_function("appendStringInfoVA")
+        .blocklist_file("stdarg.h")
         .size_t_is_usize(true)
         .rustfmt_bindings(false)
         .derive_debug(true)
@@ -604,6 +637,92 @@ fn build_shim_for_version(
     Ok(())
 }
 
+fn extra_bindgen_clang_args(pg_config: &PgConfig) -> eyre::Result<Vec<String>> {
+    let mut out = vec![];
+    if std::env::var("CARGO_CFG_TARGET_OS").unwrap_or_default() == "macos" {
+        // On macOS, find the `-isysroot` arg out of the c preprocessor flags,
+        // to handle the case where bindgen uses a libclang isn't provided by
+        // the system.
+        let flags = pg_config.cppflags()?;
+        // In practice this will always be valid UTF-8 because of how the
+        // `pgx-pg-config` crate is implemented, but even if it were not, the
+        // problem won't be with flags we are interested in.
+        let flags = shlex::split(&flags.to_string_lossy()).unwrap_or_default();
+        // Find the `-isysroot` flags -- The rest are `-I` flags that don't seem
+        // to be needed inside the code (and feel likely to cause bindgen to
+        // emit bindings for unrelated libraries)
+        for pair in flags.windows(2) {
+            if pair[0] == "-isysroot" {
+                if std::path::Path::new(&pair[1]).exists() {
+                    out.extend(pair.into_iter().cloned());
+                } else {
+                    // The SDK path doesnt exist. Emit a warning, which they'll
+                    // see if the build ends up failing (it may not fail in all
+                    // cases, so we don't panic here).
+                    //
+                    // There's a bunch of smarter things we can try here, but
+                    // most of them either break things that currently work, or
+                    // are very difficult to get right. If you try to fix this,
+                    // be sure to consider cases like:
+                    //
+                    // - User may have CommandLineTools and not Xcode, vice
+                    //   versa, or both installed.
+                    // - User may using a newer SDK than their OS, or vice
+                    //   versa.
+                    // - User may be using a newer SDK than their XCode (updated
+                    //   Command line tools, not OS), or vice versa.
+                    // - And so on.
+                    //
+                    // These are all actually fairly common. Note that the code
+                    // as-is is *not* broken in these cases (except on OS/SDK
+                    // updates), so care should be taken to avoid changing that
+                    // if possible.
+                    //
+                    // The logic we'd like ideally is for `cargo pgx init` to
+                    // choose a good SDK in the first place, and force postgres
+                    // to use it. Then, the logic in this build script would
+                    // Just Work without changes (since we are using its
+                    // sysroot verbatim).
+                    //
+                    // The value of "Good" here is tricky, but the logic should
+                    // probably:
+                    //
+                    // - prefer SDKs from the CLI tools to ones from XCode
+                    //   (since they're guaranteed compatible with the user's OS
+                    //   version)
+                    //
+                    // - prefer SDKs that specify only the major SDK version
+                    //   (e.g. MacOSX12.sdk and not MacOSX12.4.sdk or
+                    //   MacOSX.sdk), to avoid breaking too frequently (if we
+                    //   have a minor version) or being totally unable to detect
+                    //   what version of the SDK was used to build postgres (if
+                    //   we have neither).
+                    //
+                    // - Avoid choosing an SDK newer than the user's OS version,
+                    //   since postgres fails to detect that they are missing if
+                    //   you do.
+                    //
+                    // This is surprisingly hard to implement, as the
+                    // information is scattered across a dozen ini files.
+                    // Presumably Apple assumes you'll use
+                    // `MACOSX_DEPLOYMENT_TARGET`, rather than basing it off the
+                    // SDK version, but it's not an option for postgres.
+                    let major_version = pg_config.major_version()?;
+                    println!(
+                        "cargo:warning=postgres v{major_version} was compiled against an \
+                         SDK Root which does not seem to exist on this machine ({}). You may \
+                         need to re-run `cargo pgx init` and/or update your command line tools.",
+                        pair[1],
+                    );
+                };
+                // Either way, we stop here.
+                break;
+            }
+        }
+    }
+    Ok(out)
+}
+
 fn run_command(mut command: &mut Command, version: &str) -> eyre::Result<Output> {
     let mut dbg = String::new();
 
@@ -641,10 +760,7 @@ fn run_command(mut command: &mut Command, version: &str) -> eyre::Result<Output>
             dbg.push_str(&format!("[{}] [stderr] {}\n", version, line));
         }
     }
-    dbg.push_str(&format!(
-        "[{}] /----------------------------------------\n",
-        version
-    ));
+    dbg.push_str(&format!("[{}] /----------------------------------------\n", version));
 
     eprintln!("{}", dbg);
     Ok(rc)
@@ -674,10 +790,7 @@ fn apply_pg_guard(items: &Vec<syn::Item>) -> eyre::Result<proc_macro2::TokenStre
 }
 
 fn rust_fmt(path: &PathBuf) -> eyre::Result<()> {
-    let out = run_command(
-        Command::new("rustfmt").arg(path).current_dir("."),
-        "[bindings_diff]",
-    );
+    let out = run_command(Command::new("rustfmt").arg(path).current_dir("."), "[bindings_diff]");
     match out {
         Ok(_) => Ok(()),
         Err(e)

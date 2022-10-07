@@ -7,10 +7,11 @@ All rights reserved.
 Use of this source code is governed by the MIT license that can be found in the LICENSE file.
 */
 
-use crate::{
-    direct_function_call, direct_function_call_as_datum, pg_sys, void_mut_ptr, FromDatum, IntoDatum,
-};
+use crate::{direct_function_call, direct_function_call_as_datum, pg_sys, FromDatum, IntoDatum};
 use pgx_pg_sys::pg_try;
+use pgx_utils::sql_entity_graph::metadata::{
+    ArgumentError, Returns, ReturnsError, SqlMapping, SqlTranslatable,
+};
 use serde::de::{Error, Visitor};
 use serde::{de, Deserialize, Deserializer, Serialize};
 use serde_json::Number;
@@ -83,7 +84,7 @@ impl<'de> Deserialize<'de> for Numeric {
                         let datum = Numeric(v.clone()).into_datum().unwrap();
 
                         // and don't leak the NumericData datum Postgres created
-                        pg_sys::pfree(datum as void_mut_ptr);
+                        pg_sys::pfree(datum.cast_mut_ptr());
 
                         // we have it as a valid String
                         Ok(Numeric(v.clone()))
@@ -97,68 +98,72 @@ impl<'de> Deserialize<'de> for Numeric {
     }
 }
 
-impl Into<Numeric> for i8 {
-    fn into(self) -> Numeric {
-        Numeric(format!("{}", self))
+impl From<i8> for Numeric {
+    fn from(val: i8) -> Self {
+        Numeric(val.to_string())
     }
 }
 
-impl Into<Numeric> for i16 {
-    fn into(self) -> Numeric {
-        Numeric(format!("{}", self))
+impl From<i16> for Numeric {
+    fn from(val: i16) -> Self {
+        Numeric(val.to_string())
     }
 }
 
-impl Into<Numeric> for i32 {
-    fn into(self) -> Numeric {
-        Numeric(format!("{}", self))
+impl From<i32> for Numeric {
+    fn from(val: i32) -> Self {
+        Numeric(val.to_string())
     }
 }
 
-impl Into<Numeric> for i64 {
-    fn into(self) -> Numeric {
-        Numeric(format!("{}", self))
+impl From<i64> for Numeric {
+    fn from(val: i64) -> Self {
+        Numeric(val.to_string())
     }
 }
 
-impl Into<Numeric> for u8 {
-    fn into(self) -> Numeric {
-        Numeric(format!("{}", self))
+impl From<u8> for Numeric {
+    fn from(val: u8) -> Self {
+        Numeric(val.to_string())
     }
 }
 
-impl Into<Numeric> for u16 {
-    fn into(self) -> Numeric {
-        Numeric(format!("{}", self))
+impl From<u16> for Numeric {
+    fn from(val: u16) -> Self {
+        Numeric(val.to_string())
     }
 }
 
-impl Into<Numeric> for u32 {
-    fn into(self) -> Numeric {
-        Numeric(format!("{}", self))
+impl From<u32> for Numeric {
+    fn from(val: u32) -> Self {
+        Numeric(val.to_string())
     }
 }
 
-impl Into<Numeric> for u64 {
-    fn into(self) -> Numeric {
-        Numeric(format!("{}", self))
+impl From<u64> for Numeric {
+    fn from(val: u64) -> Self {
+        Numeric(val.to_string())
     }
 }
 
-impl Into<Numeric> for f32 {
-    fn into(self) -> Numeric {
-        Numeric(format!("{}", self))
+impl From<f32> for Numeric {
+    fn from(val: f32) -> Self {
+        Numeric(val.to_string())
     }
 }
 
-impl Into<Numeric> for f64 {
-    fn into(self) -> Numeric {
-        Numeric(format!("{}", self))
+impl From<f64> for Numeric {
+    fn from(val: f64) -> Self {
+        Numeric(val.to_string())
     }
 }
 
 impl FromDatum for Numeric {
-    unsafe fn from_datum(datum: usize, is_null: bool, _typoid: u32) -> Option<Self>
+    unsafe fn from_polymorphic_datum(
+        datum: pg_sys::Datum,
+        is_null: bool,
+        _typoid: u32,
+    ) -> Option<Self>
     where
         Self: Sized,
     {
@@ -182,11 +187,7 @@ impl IntoDatum for Numeric {
         unsafe {
             direct_function_call_as_datum(
                 pg_sys::numeric_in,
-                vec![
-                    cstr.into_datum(),
-                    pg_sys::InvalidOid.into_datum(),
-                    0i32.into_datum(),
-                ],
+                vec![cstr.into_datum(), pg_sys::InvalidOid.into_datum(), 0i32.into_datum()],
             )
         }
     }
@@ -195,3 +196,25 @@ impl IntoDatum for Numeric {
         pg_sys::NUMERICOID
     }
 }
+
+unsafe impl SqlTranslatable for Numeric {
+    fn argument_sql() -> Result<SqlMapping, ArgumentError> {
+        Ok(SqlMapping::literal("NUMERIC"))
+    }
+    fn return_sql() -> Result<Returns, ReturnsError> {
+        Ok(Returns::One(SqlMapping::literal("NUMERIC")))
+    }
+}
+
+// impl<const PRECISION: i32, const SCALE: i32>
+//     SqlTranslatable
+//     for crate::datum::Numeric<PRECISION, SCALE>
+// {
+//     fn sql_type() -> String {
+//         if PRECISION == 0 && SCALE == 0 {
+//             String::from("NUMERIC")
+//         } else {
+//             format!("NUMERIC({PRECISION}, {SCALE})")
+//         }
+//     }
+// }

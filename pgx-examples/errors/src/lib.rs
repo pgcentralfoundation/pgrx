@@ -7,9 +7,10 @@ All rights reserved.
 Use of this source code is governed by the MIT license that can be found in the LICENSE file.
 */
 
-use pgx::*;
+use pgx::prelude::*;
+use pgx::{error, info, warning, PgRelation, FATAL, PANIC};
 
-pg_module_magic!();
+pgx::pg_module_magic!();
 
 #[pg_extern]
 fn array_with_null_and_panic(input: Vec<Option<i32>>) -> i64 {
@@ -68,7 +69,7 @@ fn throw_pg_fatal(message: &str) {
 #[cfg(any(test, feature = "pg_test"))]
 #[pg_schema]
 mod tests {
-    use pgx::*;
+    use pgx::prelude::*;
 
     #[pg_test]
     fn test_it() {

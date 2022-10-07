@@ -6,6 +6,14 @@ All rights reserved.
 
 Use of this source code is governed by the MIT license that can be found in the LICENSE file.
 */
+/*!
+
+Rust to SQL mapping support for dependency graph generation
+
+> Like all of the [`sql_entity_graph`][crate::sql_entity_graph] APIs, this is considered **internal**
+to the `pgx` framework and very subject to change between versions. While you may use this, please do it with caution.
+
+*/
 use core::any::TypeId;
 
 /// A mapping from a Rust type to a SQL type, with a `TypeId`.
@@ -60,9 +68,6 @@ pub struct RustSourceOnlySqlMapping {
 
 impl RustSourceOnlySqlMapping {
     pub fn new(rust: String, sql: String) -> Self {
-        Self {
-            rust: rust.to_string(),
-            sql: sql.to_string(),
-        }
+        Self { rust: rust.to_string(), sql: sql.to_string() }
     }
 }

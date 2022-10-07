@@ -7,20 +7,18 @@ All rights reserved.
 Use of this source code is governed by the MIT license that can be found in the LICENSE file.
 */
 
-use crate::{
-    command::{
-        get::get_property, install::install_extension, start::start_postgres, stop::stop_postgres,
-    },
-    CommandExecute,
-};
+use crate::command::get::get_property;
+use crate::command::install::install_extension;
+use crate::command::start::start_postgres;
+use crate::command::stop::stop_postgres;
+use crate::CommandExecute;
 use cargo_toml::Manifest;
 use eyre::{eyre, WrapErr};
 use owo_colors::OwoColorize;
-use pgx_utils::{
-    createdb,
-    pg_config::{PgConfig, Pgx},
-};
-use std::{os::unix::process::CommandExt, path::Path, process::Command};
+use pgx_pg_config::{createdb, PgConfig, Pgx};
+use std::os::unix::process::CommandExt;
+use std::path::Path;
+use std::process::Command;
 /// Compile/install extension to a pgx-managed Postgres instance and start psql
 #[derive(clap::Args, Debug)]
 #[clap(author)]
@@ -144,11 +142,7 @@ pub(crate) fn run(
 
     // create the named database
     if !createdb(pg_config, dbname, false, true)? {
-        println!(
-            "{} existing database {}",
-            "    Re-using".bold().cyan(),
-            dbname
-        );
+        println!("{} existing database {}", "    Re-using".bold().cyan(), dbname);
     }
 
     // run psql

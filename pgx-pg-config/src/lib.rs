@@ -9,25 +9,42 @@ Use of this source code is governed by the MIT license that can be found in the 
 //! Wrapper around Postgres' `pg_config` command-line tool
 use eyre::{eyre, WrapErr};
 use owo_colors::OwoColorize;
-use std::{
-    collections::HashMap,
-    io::ErrorKind,
-    path::{Path, PathBuf},
-    process::Command,
-    str::FromStr,
-};
+use serde_derive::{Deserialize, Serialize};
+use std::collections::HashMap;
+use std::ffi::OsString;
+use std::fmt::{self, Display, Formatter};
+use std::io::ErrorKind;
+use std::path::{Path, PathBuf};
+use std::process::{Command, Stdio};
+use std::str::FromStr;
 use url::Url;
+
+pub static BASE_POSTGRES_PORT_NO: u16 = 28800;
+pub static BASE_POSTGRES_TESTING_PORT_NO: u16 = 32200;
+
+// These methods were originally in `pgx-utils`, but in an effort to consolidate
+// dependencies, the decision was made to package them into wherever made the
+// most sense. In this case, it made the most sense to put them into this
+// pgx-pg-config crate. That doesnt mean they can't be moved at a later date.
+mod path_methods;
+pub use path_methods::{get_target_dir, prefix_path};
 
 #[derive(Clone)]
 pub struct PgVersion {
-    major_version: u16,
-    minor_version: u16,
+    major: u16,
+    minor: u16,
     url: Url,
 }
 
+impl PgVersion {
+    pub fn new(major: u16, minor: u16, url: Url) -> PgVersion {
+        PgVersion { major, minor, url }
+    }
+}
+
 impl Display for PgVersion {
-    fn fmt(&self, f: &mut Formatter<'_>) -> std::fmt::Result {
-        write!(f, "{}.{}", self.major_version, self.minor_version)
+    fn fmt(&self, f: &mut Formatter<'_>) -> fmt::Result {
+        write!(f, "{}.{}", self.major, self.minor)
     }
 }
 
@@ -38,13 +55,9 @@ pub struct PgConfig {
 }
 
 impl Display for PgConfig {
-    fn fmt(&self, f: &mut Formatter<'_>) -> std::fmt::Result {
-        let major = self
-            .major_version()
-            .expect("could not determine major version");
-        let minor = self
-            .minor_version()
-            .expect("could not determine minor version");
+    fn fmt(&self, f: &mut Formatter<'_>) -> fmt::Result {
+        let major = self.major_version().expect("could not determine major version");
+        let minor = self.minor_version().expect("could not determine minor version");
         let path = match self.pg_config.as_ref() {
             Some(path) => path.display().to_string(),
             None => self.version.as_ref().unwrap().url.to_string(),
@@ -55,19 +68,19 @@ impl Display for PgConfig {
 
 impl Default for PgConfig {
     fn default() -> Self {
-        PgConfig {
-            version: None,
-            pg_config: None,
-        }
+        PgConfig { version: None, pg_config: None }
+    }
+}
+
+impl From<PgVersion> for PgConfig {
+    fn from(version: PgVersion) -> Self {
+        PgConfig { version: Some(version), pg_config: None }
     }
 }
 
 impl PgConfig {
     pub fn new(pg_config: PathBuf) -> Self {
-        PgConfig {
-            version: None,
-            pg_config: Some(pg_config),
-        }
+        PgConfig { version: None, pg_config: Some(pg_config) }
     }
 
     pub fn from_path() -> Self {
@@ -92,7 +105,7 @@ impl PgConfig {
 
     pub fn major_version(&self) -> eyre::Result<u16> {
         match &self.version {
-            Some(version) => Ok(version.major_version),
+            Some(version) => Ok(version.major),
             None => {
                 let version_string = self.run("--version")?;
                 let version_parts = version_string.split_whitespace().collect::<Vec<&str>>();
@@ -115,7 +128,7 @@ impl PgConfig {
 
     pub fn minor_version(&self) -> eyre::Result<u16> {
         match &self.version {
-            Some(version) => Ok(version.minor_version),
+            Some(version) => Ok(version.minor),
             None => {
                 let version_string = self.run("--version")?;
                 let version_parts = version_string.split_whitespace().collect::<Vec<&str>>();
@@ -220,6 +233,10 @@ impl PgConfig {
         Ok(self.run("--sharedir")?.into())
     }
 
+    pub fn cppflags(&self) -> eyre::Result<OsString> {
+        Ok(self.run("--cppflags")?.into())
+    }
+
     pub fn extension_dir(&self) -> eyre::Result<PathBuf> {
         let mut path = self.sharedir()?;
         path.push("extension");
@@ -228,9 +245,7 @@ impl PgConfig {
 
     fn run(&self, arg: &str) -> eyre::Result<String> {
         let pg_config = self.pg_config.clone().unwrap_or_else(|| {
-            std::env::var("PG_CONFIG")
-                .unwrap_or_else(|_| "pg_config".to_string())
-                .into()
+            std::env::var("PG_CONFIG").unwrap_or_else(|_| "pg_config".to_string()).into()
         });
 
         match Command::new(&pg_config).arg(arg).output() {
@@ -248,10 +263,6 @@ impl PgConfig {
 pub struct Pgx {
     pg_configs: Vec<PgConfig>,
 }
-
-use crate::{BASE_POSTGRES_PORT_NO, BASE_POSTGRES_TESTING_PORT_NO};
-use serde_derive::{Deserialize, Serialize};
-use std::fmt::{Display, Formatter};
 
 #[derive(Debug, Serialize, Deserialize)]
 struct ConfigToml {
@@ -276,19 +287,6 @@ impl<'a> PgConfigSelector<'a> {
 impl Pgx {
     pub fn new() -> Self {
         Pgx { pg_configs: vec![] }
-    }
-
-    pub fn default(supported_major_versions: &[u16]) -> eyre::Result<Self> {
-        let pgx = Self {
-            pg_configs: rss::PostgreSQLVersionRss::new(supported_major_versions)?
-                .into_iter()
-                .map(|version| PgConfig {
-                    version: Some(version),
-                    pg_config: None,
-                })
-                .collect(),
-        };
-        Ok(pgx)
     }
 
     pub fn from_config() -> eyre::Result<Self> {
@@ -344,11 +342,7 @@ impl Pgx {
                         .cmp(&b.major_version().expect("no major version"))
                 });
 
-                configs
-                    .into_iter()
-                    .map(|c| Ok(c))
-                    .collect::<Vec<_>>()
-                    .into_iter()
+                configs.into_iter().map(|c| Ok(c)).collect::<Vec<_>>().into_iter()
             }
             PgConfigSelector::Specific(label) => vec![self.get(label)].into_iter(),
         }
@@ -410,86 +404,93 @@ impl Pgx {
     }
 }
 
-mod rss {
-    use crate::pg_config::PgVersion;
-    use eyre::WrapErr;
-    use owo_colors::OwoColorize;
-    use rttp_client::{types::Proxy, HttpClient};
-    use serde_derive::Deserialize;
-    use url::Url;
+pub const SUPPORTED_MAJOR_VERSIONS: &[u16] = &[10, 11, 12, 13, 14];
 
-    pub(super) struct PostgreSQLVersionRss;
-
-    impl PostgreSQLVersionRss {
-        pub(super) fn new(supported_major_versions: &[u16]) -> eyre::Result<Vec<PgVersion>> {
-            static VERSIONS_RSS_URL: &str = "https://www.postgresql.org/versions.rss";
-
-            let mut http_client = HttpClient::new();
-            http_client.get().url(VERSIONS_RSS_URL);
-            if let Some((host, port)) = env_proxy::for_url_str(VERSIONS_RSS_URL).host_port() {
-                http_client.proxy(Proxy::https(host, port as u32));
-            }
-
-            let response = http_client
-                .emit()
-                .wrap_err_with(|| format!("unable to retrieve {}", VERSIONS_RSS_URL))?;
-
-            let rss: Rss = match serde_xml_rs::from_str(&response.body().to_string()) {
-                Ok(rss) => rss,
-                Err(e) => return Err(e.into()),
-            };
-
-            let mut versions = Vec::new();
-            for item in rss.channel.item {
-                let title = item.title.trim();
-                let mut parts = title.split('.');
-                let major = parts.next();
-                let minor = parts.next();
-
-                // if we don't have major/minor versions or if they don't parse correctly
-                // we'll just assume zero for them and eventually skip them
-                let major = major.unwrap().parse::<u16>().unwrap_or_default();
-                let minor = minor.unwrap().parse::<u16>().unwrap_or_default();
-
-                if supported_major_versions.contains(&major) {
-                    versions.push(PgVersion {
-                        major_version: major,
-                        minor_version: minor,
-                        url: Url::parse(
-                            &format!("https://ftp.postgresql.org/pub/source/v{major}.{minor}/postgresql-{major}.{minor}.tar.bz2",
-                                     major = major, minor = minor)
-                        )
-                            .expect("invalid url")
-                    })
-                }
-            }
-
-            println!(
-                "{} Postgres {}",
-                "  Discovered".white().bold(),
-                versions
-                    .iter()
-                    .map(|v| format!("v{}.{}", v.major_version, v.minor_version))
-                    .collect::<Vec<_>>()
-                    .join(", ")
-            );
-
-            Ok(versions)
-        }
+pub fn createdb(
+    pg_config: &PgConfig,
+    dbname: &str,
+    is_test: bool,
+    if_not_exists: bool,
+) -> eyre::Result<bool> {
+    if if_not_exists && does_db_exist(pg_config, dbname)? {
+        return Ok(false);
     }
 
-    #[derive(Deserialize)]
-    struct Rss {
-        channel: Channel,
+    println!("{} database {}", "     Creating".bold().green(), dbname);
+    let mut command = Command::new(pg_config.createdb_path()?);
+    command
+        .env_remove("PGDATABASE")
+        .env_remove("PGHOST")
+        .env_remove("PGPORT")
+        .env_remove("PGUSER")
+        .arg("-h")
+        .arg(pg_config.host())
+        .arg("-p")
+        .arg(if is_test {
+            pg_config.test_port()?.to_string()
+        } else {
+            pg_config.port()?.to_string()
+        })
+        .arg(dbname)
+        .stdout(Stdio::piped())
+        .stderr(Stdio::piped());
+
+    let command_str = format!("{:?}", command);
+
+    let child = command.spawn().wrap_err_with(|| {
+        format!("Failed to spawn process for creating database using command: '{command_str}': ")
+    })?;
+
+    let output = child.wait_with_output().wrap_err_with(|| {
+        format!(
+            "failed waiting for spawned process to create database using command: '{command_str}': "
+        )
+    })?;
+
+    if !output.status.success() {
+        return Err(eyre!(
+            "problem running createdb: {}\n\n{}{}",
+            command_str,
+            String::from_utf8(output.stdout).unwrap(),
+            String::from_utf8(output.stderr).unwrap()
+        ));
     }
 
-    #[derive(Deserialize)]
-    struct Channel {
-        item: Vec<Item>,
-    }
+    Ok(true)
+}
 
-    #[derive(Deserialize)]
-    struct Item {
-        title: String,
+fn does_db_exist(pg_config: &PgConfig, dbname: &str) -> eyre::Result<bool> {
+    let mut command = Command::new(pg_config.psql_path()?);
+    command
+        .arg("-XqAt")
+        .env_remove("PGUSER")
+        .arg("-h")
+        .arg(pg_config.host())
+        .arg("-p")
+        .arg(pg_config.port()?.to_string())
+        .arg("template1")
+        .arg("-c")
+        .arg(&format!(
+            "select count(*) from pg_database where datname = '{}';",
+            dbname.replace("'", "''")
+        ))
+        .stdout(Stdio::piped())
+        .stderr(Stdio::piped());
+
+    let command_str = format!("{:?}", command);
+    let output = command.output()?;
+
+    if !output.status.success() {
+        return Err(eyre!(
+            "problem checking if database '{}' exists: {}\n\n{}{}",
+            dbname,
+            command_str,
+            String::from_utf8(output.stdout).unwrap(),
+            String::from_utf8(output.stderr).unwrap()
+        ));
+    } else {
+        let count = i32::from_str(&String::from_utf8(output.stdout).unwrap().trim())
+            .wrap_err("result is not a number")?;
+        Ok(count > 0)
     }
 }

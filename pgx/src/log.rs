@@ -456,6 +456,19 @@ pub fn elog(level: PgLogLevel, message: &str) {
     use std::ffi::CString;
     use std::os::raw::c_char;
 
+    #[cfg(feature = "plrust")]
+    let level = {
+        use PgLogLevel::*;
+
+        // PL/Rust isn't permitted to abort the entire database.
+        match level {
+            level @ (DEBUG1 | DEBUG2 | DEBUG3 | DEBUG4 | DEBUG5 | LOG | LOG_SERVER_ONLY | INFO
+            | NOTICE | WARNING | ERROR) => level,
+            FATAL => ERROR,
+            PANIC => ERROR,
+        }
+    };
+
     unsafe {
         extern "C" {
             fn pgx_elog(level: i32, message: *const c_char);
@@ -486,9 +499,21 @@ pub fn ereport(
     lineno: u32,
     colno: u32,
 ) {
-    use std::ffi::CStr;
-    use std::ffi::CString;
+    use std::ffi::{CStr, CString};
     use std::os::raw::c_char;
+
+    #[cfg(feature = "plrust")]
+    let level = {
+        use PgLogLevel::*;
+
+        // PL/Rust isn't permitted to abort the entire database.
+        match level {
+            level @ (DEBUG1 | DEBUG2 | DEBUG3 | DEBUG4 | DEBUG5 | LOG | LOG_SERVER_ONLY | INFO
+            | NOTICE | WARNING | ERROR) => level,
+            FATAL => ERROR,
+            PANIC => ERROR,
+        }
+    };
 
     extern "C" {
         fn pgx_ereport(

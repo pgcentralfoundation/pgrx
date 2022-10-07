@@ -13,7 +13,8 @@ mod tests {
     #[allow(unused_imports)]
     use crate as pgx_tests;
 
-    use pgx::*;
+    use pgx::prelude::*;
+    use pgx::Numeric;
     use serde::Deserialize;
 
     #[pg_extern]
@@ -63,10 +64,7 @@ mod tests {
         Numeric::deserialize(&json!(18446744073709551615u64)).unwrap();
         Numeric::deserialize(&json!("64.64646464")).unwrap();
 
-        let error = Numeric::deserialize(&json!("foo"))
-            .err()
-            .unwrap()
-            .to_string();
+        let error = Numeric::deserialize(&json!("foo")).err().unwrap().to_string();
         assert_eq!("invalid Numeric value: foo", &error);
     }
 }

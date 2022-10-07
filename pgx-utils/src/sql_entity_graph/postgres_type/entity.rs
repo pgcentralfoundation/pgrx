@@ -6,18 +6,23 @@ All rights reserved.
 
 Use of this source code is governed by the MIT license that can be found in the LICENSE file.
 */
-use crate::sql_entity_graph::{
-    mapping::RustSqlMapping,
-    pgx_sql::PgxSql,
-    to_sql::{entity::ToSqlConfigEntity, ToSql},
-    SqlGraphEntity, SqlGraphIdentifier,
-};
+/*!
+
+`#[derive(PostgresType)]` related entities for Rust to SQL translation
+
+> Like all of the [`sql_entity_graph`][crate::sql_entity_graph] APIs, this is considered **internal**
+to the `pgx` framework and very subject to change between versions. While you may use this, please do it with caution.
+
+*/
+use crate::sql_entity_graph::mapping::RustSqlMapping;
+use crate::sql_entity_graph::pgx_sql::PgxSql;
+use crate::sql_entity_graph::to_sql::entity::ToSqlConfigEntity;
+use crate::sql_entity_graph::to_sql::ToSql;
+use crate::sql_entity_graph::{SqlGraphEntity, SqlGraphIdentifier};
 
 use eyre::eyre;
-use std::{
-    cmp::Ordering,
-    hash::{Hash, Hasher},
-};
+use std::cmp::Ordering;
+use std::hash::{Hash, Hasher};
 
 /// The output of a [`PostgresType`](crate::sql_entity_graph::postgres_type::PostgresType) from `quote::ToTokens::to_tokens`.
 #[derive(Debug, Clone, PartialEq, Eq)]
@@ -43,9 +48,7 @@ impl Hash for PostgresTypeEntity {
 
 impl Ord for PostgresTypeEntity {
     fn cmp(&self, other: &Self) -> Ordering {
-        self.file
-            .cmp(other.file)
-            .then_with(|| self.file.cmp(other.file))
+        self.file.cmp(other.file).then_with(|| self.file.cmp(other.file))
     }
 }
 
@@ -61,9 +64,9 @@ impl PostgresTypeEntity {
     }
 }
 
-impl Into<SqlGraphEntity> for PostgresTypeEntity {
-    fn into(self) -> SqlGraphEntity {
-        SqlGraphEntity::Type(self)
+impl From<PostgresTypeEntity> for SqlGraphEntity {
+    fn from(val: PostgresTypeEntity) -> Self {
+        SqlGraphEntity::Type(val)
     }
 }
 
@@ -108,11 +111,7 @@ impl ToSql for PostgresTypeEntity {
         let in_fn_path = format!(
             "{module_path}{maybe_colons}{in_fn}",
             module_path = in_fn_module_path,
-            maybe_colons = if !in_fn_module_path.is_empty() {
-                "::"
-            } else {
-                ""
-            },
+            maybe_colons = if !in_fn_module_path.is_empty() { "::" } else { "" },
             in_fn = item.in_fn,
         );
         let (_, _index) = context
@@ -142,11 +141,7 @@ impl ToSql for PostgresTypeEntity {
         let out_fn_path = format!(
             "{module_path}{maybe_colons}{out_fn}",
             module_path = out_fn_module_path,
-            maybe_colons = if !out_fn_module_path.is_empty() {
-                "::"
-            } else {
-                ""
-            },
+            maybe_colons = if !out_fn_module_path.is_empty() { "::" } else { "" },
             out_fn = item.out_fn,
         );
         let (_, _index) = context

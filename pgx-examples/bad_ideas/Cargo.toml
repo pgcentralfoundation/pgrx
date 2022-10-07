@@ -18,7 +18,7 @@ pg_test = []
 [dependencies]
 pgx = { path = "../../pgx", default-features = false }
 rand = "0.8.5"
-rttp_client = "0.1.0"
+ureq = "2.5.0"
 
 [dev-dependencies]
 pgx-tests = { path = "../../pgx-tests" }

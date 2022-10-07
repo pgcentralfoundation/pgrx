@@ -178,10 +178,7 @@ where
                 .remove(&which_event),
 
             // not in a transaction-end event, so just borrow our map
-            _ => XACT_HOOKS
-                .as_mut()
-                .expect("XACT_HOOKS was None")
-                .remove(&which_event),
+            _ => XACT_HOOKS.as_mut().expect("XACT_HOOKS was None").remove(&which_event),
         };
 
         // if we have a vec of hooks for this event they're consumed here and executed
@@ -212,9 +209,8 @@ where
                 pg_sys::RegisterXactCallback(Some(callback), std::ptr::null_mut());
             }
 
-            XACT_HOOKS
-                .as_mut()
-                .expect("XACT_HOOKS was None during maybe_initialize") // this should never happen
+            XACT_HOOKS.as_mut().expect("XACT_HOOKS was None during maybe_initialize")
+            // this should never happen
         }
     }
 
@@ -363,9 +359,8 @@ where
                 });
             }
 
-            SUB_HOOKS
-                .as_mut()
-                .expect("SUB_HOOKS was None during maybe_initialize()") // this should never happen
+            SUB_HOOKS.as_mut().expect("SUB_HOOKS was None during maybe_initialize()")
+            // this should never happen
         }
     }
 

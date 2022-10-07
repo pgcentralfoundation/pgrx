@@ -147,6 +147,9 @@ jobs:
     - name: Run bytea example tests
       run: cargo test --package bytea --features "pg$PG_VER" --no-default-features
 
+    - name: Run composite_type example tests
+      run: cargo test --package composite_type --features "pg$PG_VER" --no-default-features
+
     - name: Run custom_types example tests
       run: cargo test --package custom_types --features "pg$PG_VER" --no-default-features
 
@@ -170,6 +173,9 @@ jobs:
 
     - name: Run spi example tests
       run: cargo test --package spi --features "pg$PG_VER" --no-default-features
+
+    - name: Run spi_srf example tests
+      run: cargo test --package spi_srf --features "pg$PG_VER" --no-default-features
 
     - name: Run srf example tests
       run: cargo test --package srf --features "pg$PG_VER" --no-default-features
@@ -291,6 +297,9 @@ jobs:
 
     - name: Print sccache stats (before)
       run: sccache --show-stats
+
+    - name: Run rustfmt
+      run: cargo fmt --all -- --check
 
     - name: Install cargo-pgx
       run: cargo install --path cargo-pgx/ --debug --force

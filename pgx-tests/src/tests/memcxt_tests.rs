@@ -13,7 +13,8 @@ mod tests {
     #[allow(unused_imports)]
     use crate as pgx_tests;
 
-    use pgx::*;
+    use pgx::prelude::*;
+    use pgx::PgMemoryContexts;
     use std::sync::atomic::{AtomicBool, Ordering};
     use std::sync::Arc;
 
@@ -39,9 +40,7 @@ mod tests {
             max_block_size: 4096,
         }
         .switch_to(|context| {
-            let test_object = TestObject {
-                did_drop: did_drop.clone(),
-            };
+            let test_object = TestObject { did_drop: did_drop.clone() };
             context.leak_and_drop_on_delete(test_object);
         });
 

@@ -6,31 +6,32 @@ All rights reserved.
 
 Use of this source code is governed by the MIT license that can be found in the LICENSE file.
 */
-use crate::{
-    command::{
-        get::{find_control_file, get_property},
-        install::format_display_path,
-    },
-    CommandExecute,
-};
+use crate::command::get::{find_control_file, get_property};
+use crate::command::install::format_display_path;
+use crate::pgx_pg_sys_stub::PgxPgSysStub;
+use crate::CommandExecute;
 use cargo_toml::Manifest;
 use eyre::{eyre, WrapErr};
 use object::Object;
+use once_cell::sync::OnceCell;
 use owo_colors::OwoColorize;
-use pgx_utils::{
-    pg_config::{PgConfig, Pgx},
-    sql_entity_graph::{PgxSql, RustSourceOnlySqlMapping, RustSqlMapping, SqlGraphEntity},
-    PgxPgSysStub,
-};
-use std::{
-    collections::HashSet,
-    hash::{Hash, Hasher},
-    path::{Path, PathBuf},
-    process::{Command, Stdio},
-};
+use pgx_pg_config::{get_target_dir, PgConfig, Pgx};
+use pgx_utils::sql_entity_graph::{ControlFile, PgxSql, SqlGraphEntity};
+use std::collections::HashSet;
+use std::hash::{Hash, Hasher};
+use std::path::{Path, PathBuf};
+use std::process::{Command, Stdio};
 // Since we support extensions with `#[no_std]`
 extern crate alloc;
 use alloc::vec::Vec;
+
+// An apparent bug in `glibc` 2.17 prevents us from safely dropping this
+// otherwise users find issues such as https://github.com/tcdi/pgx/issues/572
+static POSTMASTER_LIBRARY: OnceCell<libloading::os::unix::Library> = OnceCell::new();
+
+// An apparent bug in `glibc` 2.17 prevents us from safely dropping this
+// otherwise users find issues such as https://github.com/tcdi/pgx/issues/572
+static EXTENSION_LIBRARY: OnceCell<libloading::os::unix::Library> = OnceCell::new();
 
 /// Generate extension schema files
 #[derive(clap::Args, Debug)]
@@ -169,7 +170,7 @@ pub(crate) fn generate_schema(
 
     let flags = std::env::var("PGX_BUILD_FLAGS").unwrap_or_default();
 
-    let mut target_dir_with_profile = pgx_utils::get_target_dir()?;
+    let mut target_dir_with_profile = get_target_dir()?;
     target_dir_with_profile.push(if is_release { "release" } else { "debug" });
 
     // First, build the SQL generator so we can get a look at the symbol table
@@ -229,9 +230,8 @@ pub(crate) fn generate_schema(
         );
 
         tracing::debug!(command = %command_str, "Running");
-        let cargo_output = command
-            .output()
-            .wrap_err_with(|| format!("failed to spawn cargo: {}", command_str))?;
+        let cargo_output =
+            command.output().wrap_err_with(|| format!("failed to spawn cargo: {}", command_str))?;
         tracing::trace!(status_code = %cargo_output.status, command = %command_str, "Finished");
 
         if !cargo_output.status.success() {
@@ -254,9 +254,7 @@ pub(crate) fn generate_schema(
             .ok_or(eyre!("couldn't get postmaster parent dir"))?,
     );
 
-    let postmaster_path = pg_config
-        .postmaster_path()
-        .wrap_err("could not get postmaster path")?;
+    let postmaster_path = pg_config.postmaster_path().wrap_err("could not get postmaster path")?;
 
     // The next action may take a few seconds, we'd like the user to know we're thinking.
     eprintln!("{} SQL entities", " Discovering".bold().green(),);
@@ -266,24 +264,15 @@ pub(crate) fn generate_schema(
     // Inspect the symbol table for a list of `__pgx_internals` we should have the generator call
     let mut lib_so = target_dir_with_profile.clone();
 
-    let so_extension = if cfg!(target_os = "macos") {
-        ".dylib"
-    } else {
-        ".so"
-    };
+    let so_extension = if cfg!(target_os = "macos") { ".dylib" } else { ".so" };
 
-    lib_so.push(&format!(
-        "lib{}{}",
-        package_name.replace("-", "_"),
-        so_extension
-    ));
+    lib_so.push(&format!("lib{}{}", package_name.replace("-", "_"), so_extension));
 
     let lib_so_data = std::fs::read(&lib_so).wrap_err("couldn't read extension shared object")?;
     let lib_so_obj_file =
         object::File::parse(&*lib_so_data).wrap_err("couldn't parse extension shared object")?;
-    let lib_so_exports = lib_so_obj_file
-        .exports()
-        .wrap_err("couldn't get exports from extension shared object")?;
+    let lib_so_exports =
+        lib_so_obj_file.exports().wrap_err("couldn't get exports from extension shared object")?;
 
     // Some users reported experiencing duplicate entries if we don't ensure `fns_to_call`
     // has unique entries.
@@ -306,6 +295,7 @@ pub(crate) fn generate_schema(
     }
     let mut seen_schemas = Vec::new();
     let mut num_funcs = 0_usize;
+    let mut num_triggers = 0_usize;
     let mut num_types = 0_usize;
     let mut num_enums = 0_usize;
     let mut num_sqls = 0_usize;
@@ -322,6 +312,8 @@ pub(crate) fn generate_schema(
             seen_schemas.push(schema);
         } else if func.starts_with("__pgx_internals_fn_") {
             num_funcs += 1;
+        } else if func.starts_with("__pgx_internals_trigger_") {
+            num_triggers += 1;
         } else if func.starts_with("__pgx_internals_type_") {
             num_types += 1;
         } else if func.starts_with("__pgx_internals_enum_") {
@@ -338,7 +330,7 @@ pub(crate) fn generate_schema(
     }
 
     eprintln!(
-        "{} {} SQL entities: {} schemas ({} unique), {} functions, {} types, {} enums, {} sqls, {} ords, {} hashes, {} aggregates",
+        "{} {} SQL entities: {} schemas ({} unique), {} functions, {} types, {} enums, {} sqls, {} ords, {} hashes, {} aggregates, {} triggers",
         "  Discovered".bold().green(),
         fns_to_call.len().to_string().bold().cyan(),
         seen_schemas.iter().count().to_string().bold().cyan(),
@@ -350,48 +342,54 @@ pub(crate) fn generate_schema(
         num_ords.to_string().bold().cyan(),
         num_hashes.to_string().bold().cyan(),
         num_aggregates.to_string().bold().cyan(),
+        num_triggers.to_string().bold().cyan(),
     );
 
     tracing::debug!("Collecting {} SQL entities", fns_to_call.len());
     let mut entities = Vec::default();
-    let typeid_sql_mapping;
-    let source_only_sql_mapping;
+    let sql_mapping;
 
+    #[rustfmt::skip] // explict extern "Rust" is more clear here
     unsafe {
-        let _postmaster = libloading::os::unix::Library::open(
-            Some(&postmaster_stub_built),
-            libloading::os::unix::RTLD_NOW | libloading::os::unix::RTLD_GLOBAL,
-        )
-        .expect(&format!(
-            "Couldn't libload {}",
-            postmaster_stub_built.display()
-        ));
+        // SAFETY: Calls foreign functions with the correct type signatures.
+        // Assumes that repr(Rust) enums are represented the same in this crate as in the external
+        // binary, which is the case in practice when the same compiler is used to compile the
+        // external crate.
 
-        let lib =
-            libloading::os::unix::Library::open(Some(&lib_so), libloading::os::unix::RTLD_LAZY)
-                .expect(&format!("Couldn't libload {}", lib_so.display()));
+        POSTMASTER_LIBRARY
+            .get_or_try_init(|| {
+                libloading::os::unix::Library::open(
+                    Some(&postmaster_stub_built),
+                    libloading::os::unix::RTLD_NOW | libloading::os::unix::RTLD_GLOBAL,
+                )
+            })
+            .wrap_err_with(|| format!("Couldn't libload {}", postmaster_stub_built.display()))?;
 
-        let typeid_sql_mappings_symbol: libloading::os::unix::Symbol<
-            unsafe extern "C" fn() -> &'static std::collections::HashSet<RustSqlMapping>,
+        let lib = EXTENSION_LIBRARY
+            .get_or_try_init(|| {
+                libloading::os::unix::Library::open(Some(&lib_so), libloading::os::unix::RTLD_LAZY)
+            })
+            .wrap_err_with(|| format!("Couldn't libload {}", lib_so.display()))?;
+
+        let sql_mappings_symbol: libloading::os::unix::Symbol<
+            unsafe extern "Rust" fn() -> ::pgx_utils::sql_entity_graph::RustToSqlMapping,
         > = lib
-            .get("__pgx_typeid_sql_mappings".as_bytes())
-            .expect(&format!("Couldn't call __pgx_typeid_sql_mappings"));
-        typeid_sql_mapping = typeid_sql_mappings_symbol();
-        let source_only_sql_mapping_symbol: libloading::os::unix::Symbol<
-            unsafe extern "C" fn() -> &'static std::collections::HashSet<RustSourceOnlySqlMapping>,
-        > = lib
-            .get("__pgx_source_only_sql_mappings".as_bytes())
-            .expect(&format!("Couldn't call __pgx_source_only_sql_mappings"));
-        source_only_sql_mapping = source_only_sql_mapping_symbol();
+            .get("__pgx_sql_mappings".as_bytes())
+            .expect(&format!("Couldn't call __pgx_sql_mappings"));
+        sql_mapping = sql_mappings_symbol();
 
-        let symbol: libloading::os::unix::Symbol<unsafe extern "C" fn() -> SqlGraphEntity> = lib
+        let symbol: libloading::os::unix::Symbol<
+            unsafe extern "Rust" fn() -> eyre::Result<ControlFile>,
+        > = lib
             .get("__pgx_marker".as_bytes())
             .expect(&format!("Couldn't call __pgx_marker"));
-        let control_file_entity = symbol();
+        let control_file_entity = SqlGraphEntity::ExtensionRoot(
+            symbol().expect("Failed to get control file information"),
+        );
         entities.push(control_file_entity);
 
         for symbol_to_call in fns_to_call {
-            let symbol: libloading::os::unix::Symbol<unsafe extern "C" fn() -> SqlGraphEntity> =
+            let symbol: libloading::os::unix::Symbol<unsafe extern "Rust" fn() -> SqlGraphEntity> =
                 lib.get(symbol_to_call.as_bytes())
                     .expect(&format!("Couldn't call {:#?}", symbol_to_call));
             let entity = symbol();
@@ -399,14 +397,9 @@ pub(crate) fn generate_schema(
         }
     };
 
-    let pgx_sql = PgxSql::build(
-        typeid_sql_mapping.clone().into_iter(),
-        source_only_sql_mapping.clone().into_iter(),
-        entities.into_iter(),
-        package_name.to_string(),
-        versioned_so,
-    )
-    .wrap_err("SQL generation error")?;
+    let pgx_sql =
+        PgxSql::build(sql_mapping, entities.into_iter(), package_name.to_string(), versioned_so)
+            .wrap_err("SQL generation error")?;
 
     if let Some(out_path) = path {
         let out_path = out_path.as_ref();
@@ -424,11 +417,7 @@ pub(crate) fn generate_schema(
             .to_file(out_path)
             .wrap_err_with(|| eyre!("Could not write SQL to {}", out_path.display()))?;
     } else {
-        eprintln!(
-            "{} SQL entities to {}",
-            "     Writing".bold().green(),
-            "/dev/stdout".cyan(),
-        );
+        eprintln!("{} SQL entities to {}", "     Writing".bold().green(), "/dev/stdout".cyan(),);
         pgx_sql
             .write(&mut std::io::stdout())
             .wrap_err_with(|| eyre!("Could not write SQL to stdout"))?;
@@ -527,16 +516,10 @@ fn create_stub(
     let so_rustc_invocation_str = format!("{:?}", so_rustc_invocation);
     tracing::debug!(command = %so_rustc_invocation_str, "Running");
     let output = so_rustc_invocation.output().wrap_err_with(|| {
-        eyre!(
-            "could not invoke `rustc` on {}",
-            &postmaster_stub_file.display()
-        )
+        eyre!("could not invoke `rustc` on {}", &postmaster_stub_file.display())
     })?;
 
-    let code = output
-        .status
-        .code()
-        .ok_or(eyre!("could not get status code of build"))?;
+    let code = output.status.code().ok_or(eyre!("could not get status code of build"))?;
     tracing::trace!(status_code = %code, command = %so_rustc_invocation_str, "Finished");
     if code != 0 {
         return Err(eyre!("rustc exited with code {}", code));

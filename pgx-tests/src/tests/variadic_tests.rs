@@ -9,10 +9,14 @@ Use of this source code is governed by the MIT license that can be found in the 
 
 #[pgx::pg_schema]
 mod test {
-    use pgx::*;
+    use pgx::prelude::*;
+    use pgx::VariadicArray;
 
     #[pg_extern]
-    fn func_with_variadic_array_args(_field: &str, values: VariadicArray<&str>) -> String {
+    fn func_with_variadic_array_args<'a>(
+        _field: &'a str,
+        values: VariadicArray<&'a str>,
+    ) -> String {
         values.get(0).unwrap().unwrap().to_string()
     }
 }
@@ -23,7 +27,7 @@ mod tests {
     #[allow(unused_imports)]
     use crate as pgx_tests;
 
-    use pgx::*;
+    use pgx::prelude::*;
 
     #[pg_test]
     fn test_func_with_variadic_array_args() {

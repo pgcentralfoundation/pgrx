@@ -7,15 +7,14 @@ All rights reserved.
 Use of this source code is governed by the MIT license that can be found in the LICENSE file.
 */
 
-use crate::{
-    command::{get::get_property, run::exec_psql, start::start_postgres},
-    CommandExecute,
-};
+use crate::command::get::get_property;
+use crate::command::run::exec_psql;
+use crate::command::start::start_postgres;
+use crate::CommandExecute;
 use cargo_toml::Manifest;
 use eyre::{eyre, WrapErr};
 use owo_colors::OwoColorize;
-use pgx_utils::createdb;
-use pgx_utils::pg_config::{PgConfig, Pgx};
+use pgx_pg_config::{createdb, PgConfig, Pgx};
 use std::path::PathBuf;
 
 /// Connect, via psql, to a Postgres instance
@@ -121,11 +120,7 @@ pub(crate) fn connect_psql(pg_config: &PgConfig, dbname: &str, pgcli: bool) -> e
 
     // create the named database
     if !createdb(pg_config, dbname, false, true)? {
-        println!(
-            "{} existing database {}",
-            "    Re-using".bold().cyan(),
-            dbname
-        );
+        println!("{} existing database {}", "    Re-using".bold().cyan(), dbname);
     }
 
     // run psql

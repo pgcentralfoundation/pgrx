@@ -7,7 +7,8 @@ All rights reserved.
 Use of this source code is governed by the MIT license that can be found in the LICENSE file.
 */
 use pgx::cstr_core::CStr;
-use pgx::*;
+use pgx::prelude::*;
+use pgx::{opname, pg_operator, PgVarlena, PgVarlenaInOutFuncs, StringInfo};
 use std::str::FromStr;
 
 #[derive(Copy, Clone, PostgresType)]
@@ -41,11 +42,7 @@ impl PgVarlenaInOutFuncs for FixedF32Array {
 #[pg_operator(immutable, parallel_safe)]
 #[opname(<#>)]
 fn fixedf32array_distance(left: PgVarlena<FixedF32Array>, right: PgVarlena<FixedF32Array>) -> f64 {
-    left.array
-        .iter()
-        .zip(right.array.iter())
-        .map(|(a, b)| ((a - b) * (a - b)) as f64)
-        .sum()
+    left.array.iter().zip(right.array.iter()).map(|(a, b)| ((a - b) * (a - b)) as f64).sum()
 }
 
 #[pg_operator(immutable, parallel_safe)]

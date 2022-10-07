@@ -216,10 +216,8 @@ pub unsafe fn varsize_any_exhdr(ptr: *const pg_sys::varlena) -> usize {
 #[inline]
 pub unsafe fn vardata_1b(ptr: *const pg_sys::varlena) -> *const std::os::raw::c_char {
     let va1b = ptr as *const pg_sys::varattrib_1b;
-    (*va1b)
-        .va_data
-        .as_slice(varsize_1b(ptr as *const pg_sys::varlena) as usize)
-        .as_ptr() as *const std::os::raw::c_char
+    (*va1b).va_data.as_slice(varsize_1b(ptr as *const pg_sys::varlena) as usize).as_ptr()
+        as *const std::os::raw::c_char
 }
 
 /// ```c
@@ -229,10 +227,8 @@ pub unsafe fn vardata_1b(ptr: *const pg_sys::varlena) -> *const std::os::raw::c_
 #[inline]
 pub unsafe fn vardata_4b(ptr: *const pg_sys::varlena) -> *const std::os::raw::c_char {
     let va1b = ptr as *const pg_sys::varattrib_4b__bindgen_ty_1; // 4byte
-    (*va1b)
-        .va_data
-        .as_slice(varsize_1b(ptr as *const pg_sys::varlena) as usize)
-        .as_ptr() as *const std::os::raw::c_char
+    (*va1b).va_data.as_slice(varsize_1b(ptr as *const pg_sys::varlena) as usize).as_ptr()
+        as *const std::os::raw::c_char
 }
 
 /// ```c
@@ -242,10 +238,8 @@ pub unsafe fn vardata_4b(ptr: *const pg_sys::varlena) -> *const std::os::raw::c_
 #[inline]
 pub unsafe fn vardata_4b_c(ptr: *const pg_sys::varlena) -> *const std::os::raw::c_char {
     let va1b = ptr as *const pg_sys::varattrib_4b__bindgen_ty_2; // compressed
-    (*va1b)
-        .va_data
-        .as_slice(varsize_1b(ptr as *const pg_sys::varlena) as usize)
-        .as_ptr() as *const std::os::raw::c_char
+    (*va1b).va_data.as_slice(varsize_1b(ptr as *const pg_sys::varlena) as usize).as_ptr()
+        as *const std::os::raw::c_char
 }
 
 /// ```c
@@ -255,10 +249,8 @@ pub unsafe fn vardata_4b_c(ptr: *const pg_sys::varlena) -> *const std::os::raw::
 #[inline]
 pub unsafe fn vardata_1b_e(ptr: *const pg_sys::varlena) -> *const std::os::raw::c_char {
     let va1b = ptr as *const pg_sys::varattrib_1b_e;
-    (*va1b)
-        .va_data
-        .as_slice(varsize_1b(ptr as *const pg_sys::varlena) as usize)
-        .as_ptr() as *const std::os::raw::c_char
+    (*va1b).va_data.as_slice(varsize_1b(ptr as *const pg_sys::varlena) as usize).as_ptr()
+        as *const std::os::raw::c_char
 }
 
 /// ```c

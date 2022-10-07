@@ -6,18 +6,19 @@ All rights reserved.
 
 Use of this source code is governed by the MIT license that can be found in the LICENSE file.
 */
-use pgx::*;
+use pgx::prelude::*;
+use pgx::{check_for_interrupts, info, register_xact_callback, PgRelation, PgXactCallbackEvent};
 use std::fs::File;
 use std::io::Write;
 use std::process::Command;
 
-pg_module_magic!();
+pgx::pg_module_magic!();
 
 #[pg_extern]
-fn exec(
-    command: &str,
-    args: default!(Vec<Option<&str>>, "ARRAY[]::text[]"),
-) -> (name!(status, Option<i32>), name!(stdout, String)) {
+fn exec<'a>(
+    command: &'a str,
+    args: default!(Vec<Option<&'a str>>, "ARRAY[]::text[]"),
+) -> TableIterator<'static, (name!(status, Option<i32>), name!(stdout, String))> {
     let mut command = &mut Command::new(command);
 
     for arg in args {
@@ -29,16 +30,13 @@ fn exec(
     let output = command.output().expect("command failed");
 
     if !output.stderr.is_empty() {
-        panic!(
-            "{}",
-            String::from_utf8(output.stderr).expect("stderr is not valid utf8")
-        )
+        panic!("{}", String::from_utf8(output.stderr).expect("stderr is not valid utf8"))
     }
 
-    (
+    TableIterator::once((
         output.status.code(),
         String::from_utf8(output.stdout).expect("stdout is not valid utf8"),
-    )
+    ))
 }
 
 #[pg_extern]
@@ -50,13 +48,9 @@ fn write_file(filename: &str, bytes: &[u8]) -> i64 {
 
 #[pg_extern]
 fn http(url: &str) -> String {
-    let response = rttp_client::HttpClient::new()
-        .get()
-        .url(url)
-        .emit()
-        .expect("invalid http response");
+    let response = ureq::Agent::new().get(url).call().expect("invalid http response");
 
-    response.to_string()
+    response.into_string().expect("invalid string from response")
 }
 
 #[pg_extern]

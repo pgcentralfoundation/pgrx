@@ -7,12 +7,14 @@ All rights reserved.
 Use of this source code is governed by the MIT license that can be found in the LICENSE file.
 */
 
-use crate::{command::status::status_postgres, CommandExecute};
+use crate::command::status::status_postgres;
+use crate::CommandExecute;
 use cargo_toml::Manifest;
 use eyre::{eyre, WrapErr};
 use owo_colors::OwoColorize;
-use pgx_utils::pg_config::{PgConfig, PgConfigSelector, Pgx};
-use std::{path::PathBuf, process::Stdio};
+use pgx_pg_config::{PgConfig, PgConfigSelector, Pgx};
+use std::path::PathBuf;
+use std::process::Stdio;
 
 /// Stop a pgx-managed Postgres instance
 #[derive(clap::Args, Debug)]
@@ -75,11 +77,7 @@ pub(crate) fn stop_postgres(pg_config: &PgConfig) -> eyre::Result<()> {
         return Ok(());
     }
 
-    println!(
-        "{} Postgres v{}",
-        "    Stopping".bold().green(),
-        pg_config.major_version()?
-    );
+    println!("{} Postgres v{}", "    Stopping".bold().green(), pg_config.major_version()?);
 
     let mut command = std::process::Command::new(format!("{}/pg_ctl", bindir.display()));
     command

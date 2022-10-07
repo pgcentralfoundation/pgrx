@@ -7,22 +7,61 @@ All rights reserved.
 Use of this source code is governed by the MIT license that can be found in the LICENSE file.
 */
 
-use crate::{pg_sys, void_mut_ptr, FromDatum, IntoDatum, PgMemoryContexts};
+use crate::array::RawArray;
+use crate::layout::*;
+use crate::{pg_sys, FromDatum, IntoDatum, PgMemoryContexts};
+use bitvec::slice::BitSlice;
+use core::ptr::NonNull;
+use pgx_utils::sql_entity_graph::metadata::{
+    ArgumentError, Returns, ReturnsError, SqlMapping, SqlTranslatable,
+};
 use serde::Serializer;
 use std::marker::PhantomData;
-
-pub type VariadicArray<'a, T> = Array<'a, T>;
+use std::{mem, ptr, slice};
 
 pub struct Array<'a, T: FromDatum> {
-    ptr: *mut pg_sys::varlena,
-    array_type: *mut pg_sys::ArrayType,
-    elements: *mut pg_sys::Datum,
-    nulls: *mut bool,
-    typoid: pg_sys::Oid,
+    ptr: Option<NonNull<pg_sys::varlena>>,
+    raw: Option<RawArray>,
     nelems: usize,
+    // Remove this field if/when we figure out how to stop using pg_sys::deconstruct_array
+    datum_palloc: Option<NonNull<pg_sys::Datum>>,
     elem_slice: &'a [pg_sys::Datum],
-    null_slice: &'a [bool],
+    null_slice: NullKind<'a>,
+    elem_layout: Option<Layout>,
     _marker: PhantomData<T>,
+}
+
+// FIXME: When Array::over gets removed, this enum can probably be dropped
+// since we won't be entertaining ArrayTypes which don't use bitslices anymore.
+// However, we could also use a static resolution? Hard to say what's best.
+enum NullKind<'a> {
+    Bits(&'a BitSlice<u8>),
+    Bytes(&'a [bool]),
+    Strict(usize),
+}
+
+impl<'a> From<&'a [bool]> for NullKind<'a> {
+    fn from(b8: &'a [bool]) -> NullKind<'a> {
+        NullKind::Bytes(b8)
+    }
+}
+
+impl NullKind<'_> {
+    fn get(&self, index: usize) -> Option<bool> {
+        match self {
+            Self::Bits(b1) => b1.get(index).map(|b| !b),
+            Self::Bytes(b8) => b8.get(index).map(|b| *b),
+            Self::Strict(len) => index.le(len).then(|| false),
+        }
+    }
+
+    fn any(&self) -> bool {
+        match self {
+            Self::Bits(b1) => !b1.all(),
+            Self::Bytes(b8) => b8.into_iter().any(|b| *b),
+            Self::Strict(_) => false,
+        }
+    }
 }
 
 impl<'a, T: FromDatum + serde::Serialize> serde::Serialize for Array<'a, T> {
@@ -34,15 +73,30 @@ impl<'a, T: FromDatum + serde::Serialize> serde::Serialize for Array<'a, T> {
     }
 }
 
-impl<'a, T: FromDatum + serde::Serialize> serde::Serialize for ArrayTypedIterator<'a, T> {
-    fn serialize<S>(&self, serializer: S) -> Result<<S as Serializer>::Ok, <S as Serializer>::Error>
-    where
-        S: Serializer,
-    {
-        serializer.collect_seq(self.array.iter())
+impl<'a, T: FromDatum> Drop for Array<'a, T> {
+    fn drop(&mut self) {
+        if let Array { ptr, raw, datum_palloc: Some(data), elem_slice, .. } = self {
+            // If Drop has arrived here, it means that this Array is backed by an allocation or two
+            // If so, the first one is guaranteed, and was created by calling pg_sys::deconstruct_array
+            // This is just a slice, dropping it doesn't "do" anything, but out of an abundance of caution:
+            mem::drop(elem_slice);
+            // Now there shouldn't be any other references to that slice, so this can be deallocated:
+            unsafe { pg_sys::pfree(data.as_ptr().cast()) };
+
+            // Detoasting the varlena may have allocated: the toasted varlena cloned as a detoasted ArrayType
+            // Checking for pointer equivalence is the only way we can truly tell
+            let raw = raw.take().map(|r| r.into_ptr());
+            let ptr = ptr.take();
+            match (ptr, raw) {
+                // SAFETY: if pgx detoasted a clone of this varlena, pfree the clone
+                (Some(p), Some(r)) if r.cast() != p => unsafe { pg_sys::pfree(r.as_ptr().cast()) },
+                _ => (),
+            }
+        }
     }
 }
 
+#[deny(unsafe_op_in_unsafe_fn)]
 impl<'a, T: FromDatum> Array<'a, T> {
     /// Create an [`Array`](crate::datum::Array) over an array of [`pg_sys::Datum`](pg_sys::Datum) values and a corresponding array
     /// of "is_null" indicators
@@ -51,90 +105,186 @@ impl<'a, T: FromDatum> Array<'a, T> {
     ///
     /// # Safety
     ///
-    /// This function is unsafe as it can't validate the provided pointer are valid or that
-    ///
+    /// This function requires that:
+    /// - `elements` is non-null
+    /// - `nulls` is non-null
+    /// - both `elements` and `nulls` point to a slice of equal-or-greater length than `nelems`
+    #[deprecated(
+        since = "0.5.0",
+        note = "creating arbitrary Arrays from raw pointers has unsound interactions!
+    please open an issue in tcdi/pgx if you need this, with your stated use-case"
+    )]
     pub unsafe fn over(
         elements: *mut pg_sys::Datum,
         nulls: *mut bool,
         nelems: usize,
     ) -> Array<'a, T> {
-        Array::<T> {
-            ptr: std::ptr::null_mut(),
-            array_type: std::ptr::null_mut(),
-            elements,
-            nulls,
-            typoid: pg_sys::InvalidOid,
-            nelems,
-            elem_slice: std::slice::from_raw_parts(elements, nelems),
-            null_slice: std::slice::from_raw_parts(nulls, nelems),
-            _marker: PhantomData,
-        }
-    }
-
-    unsafe fn from_pg(
-        ptr: *mut pg_sys::varlena,
-        array_type: *mut pg_sys::ArrayType,
-        elements: *mut pg_sys::Datum,
-        nulls: *mut bool,
-        typoid: pg_sys::Oid,
-        nelems: usize,
-    ) -> Self {
+        // FIXME: This function existing prevents simply using NonNull<varlena>
+        // or NonNull<ArrayType>. It has also caused issues like tcdi/pgx#633
+        // Ideally it would cease being used soon.
+        // It can be replaced with ways to make Postgres varlena arrays in Rust,
+        // if there are any users who desire such a thing.
+        //
+        // Remember to remove the Array::over tests in pgx-tests/src/tests/array_tests.rs
+        // when you finally kill this off.
+        let ptr: Option<NonNull<pg_sys::varlena>> = None;
+        let raw: Option<RawArray> = None;
+        let elem_layout: Option<Layout> = None;
         Array::<T> {
             ptr,
-            array_type,
-            elements,
-            nulls,
-            typoid,
+            raw,
             nelems,
-            elem_slice: std::slice::from_raw_parts(elements, nelems),
-            null_slice: std::slice::from_raw_parts(nulls, nelems),
+            datum_palloc: None,
+            elem_slice: unsafe { slice::from_raw_parts(elements, nelems) },
+            null_slice: unsafe { slice::from_raw_parts(nulls, nelems) }.into(),
+            elem_layout,
             _marker: PhantomData,
         }
     }
 
-    pub fn into_array_type(self) -> *const pg_sys::ArrayType {
-        if self.array_type.is_null() {
-            panic!("attempt to dereference a NULL array");
+    /// # Safety
+    ///
+    /// This function requires that the RawArray was obtained in a properly-constructed form
+    /// (probably from Postgres).
+    unsafe fn deconstruct_from(
+        ptr: Option<NonNull<pg_sys::varlena>>,
+        raw: RawArray,
+        layout: Layout,
+    ) -> Array<'a, T> {
+        let oid = raw.oid();
+        let len = raw.len();
+        let array = raw.into_ptr().as_ptr();
+
+        // outvals for deconstruct_array
+        let mut elements = ptr::null_mut();
+        let mut nulls = ptr::null_mut();
+        let mut nelems = 0;
+
+        /*
+        FIXME(jubilee): This way of getting array buffers causes problems for any Drop impl,
+        and clashes with assumptions of Array being a "zero-copy", lifetime-bound array,
+        some of which are implicitly embedded in other methods (e.g. Array::over).
+        It also risks leaking memory, as deconstruct_array calls palloc.
+
+        SAFETY: We have already asserted the validity of the RawArray, so
+        this only makes mistakes if we mix things up and pass Postgres the wrong data.
+        */
+        unsafe {
+            pg_sys::deconstruct_array(
+                array,
+                oid,
+                layout.size.as_typlen().into(),
+                layout.passbyval,
+                layout.align.as_typalign(),
+                &mut elements,
+                &mut nulls,
+                &mut nelems,
+            )
+        };
+
+        let nelems = nelems as usize;
+
+        // Check our RawArray len impl for correctness.
+        assert_eq!(nelems, len);
+        let mut raw = unsafe { RawArray::from_ptr(NonNull::new_unchecked(array)) };
+
+        let null_slice = raw
+            .nulls_bitslice()
+            .map(|nonnull| NullKind::Bits(unsafe { &*nonnull.as_ptr() }))
+            .unwrap_or(NullKind::Strict(nelems));
+
+        // The array was just deconstructed, which allocates twice: effectively [Datum] and [bool].
+        // But pgx doesn't actually need [bool] if NullKind's handling of BitSlices is correct.
+        // So, assert correctness of the NullKind implementation and cleanup.
+        // SAFETY: The pointer we got should be correctly constructed for slice validity.
+        let pallocd_null_slice = unsafe { slice::from_raw_parts(nulls, nelems) };
+        for i in 0..nelems {
+            assert_eq!(null_slice.get(i).unwrap(), pallocd_null_slice[i]);
         }
 
-        let ptr = self.array_type;
-        std::mem::forget(self);
-        ptr
+        // Throw away the slice we made.
+        mem::drop(pallocd_null_slice);
+        // SAFETY: We made it, we can break it. Or Postgres can, at least.
+        unsafe { pg_sys::pfree(nulls.cast()) };
+
+        Array {
+            ptr,
+            raw: Some(raw),
+            nelems,
+            datum_palloc: NonNull::new(elements),
+            elem_slice: /* SAFETY: &[Datum] from palloc'd [Datum] */ unsafe { slice::from_raw_parts(elements, nelems) },
+            null_slice,
+            elem_layout: Some(layout),
+            _marker: PhantomData,
+        }
     }
 
+    pub fn into_array_type(mut self) -> *const pg_sys::ArrayType {
+        let ptr = mem::take(&mut self.raw).map(|raw| raw.into_ptr().as_ptr() as _);
+        mem::forget(self);
+        ptr.unwrap_or(ptr::null())
+    }
+
+    // # Panics
+    //
+    // Panics if it detects the slightest misalignment between types,
+    // or if a valid slice contains nulls, which may be uninit data.
+    #[deprecated(
+        since = "0.5.0",
+        note = "this function cannot be safe and is not generically sound\n\
+        even `unsafe fn as_slice(&self) -> &[T]` is not sound for all `&[T]`\n\
+        if you are sure your usage is sound, consider RawArray"
+    )]
     pub fn as_slice(&self) -> &[T] {
-        let sizeof_type = std::mem::size_of::<T>();
-        let sizeof_datums = std::mem::size_of_val(self.elem_slice);
-        unsafe {
-            std::slice::from_raw_parts(
-                self.elem_slice.as_ptr() as *const T,
-                sizeof_datums / sizeof_type,
-            )
+        if let Some(Layout { size, passbyval, .. }) = &self.elem_layout {
+            if self.null_slice.any() {
+                panic!("null detected: can't expose potentially uninit data as a slice!")
+            }
+            const DATUM_SIZE: usize = mem::size_of::<pg_sys::Datum>();
+            let sizeof_type = match (passbyval, mem::size_of::<T>(), size.try_as_usize()) {
+                (true, rs @ (1 | 2 | 4 | 8), Some(pg @ (1 | 2 | 4 | 8))) if rs == pg => rs,
+                (true, _, _) => panic!("invalid sizes for pass-by-value datum"),
+                (false, DATUM_SIZE, _) => DATUM_SIZE,
+                (false, _, _) => panic!("invalid sizes for pass-by-reference datum"),
+            };
+            match (sizeof_type, self.raw.as_ref()) {
+                // SAFETY: Rust slice layout matches Postgres data layout and this array is "owned"
+                (1 | 2 | 4, Some(raw)) => unsafe { raw.assume_init_data_slice::<T>() },
+                (DATUM_SIZE, _) => {
+                    let sizeof_datums = mem::size_of_val(self.elem_slice);
+                    unsafe {
+                        slice::from_raw_parts(
+                            self.elem_slice.as_ptr() as *const T,
+                            sizeof_datums / sizeof_type,
+                        )
+                    }
+                }
+                (_, _) => panic!("no correctly-sized slice exists"),
+            }
+        } else {
+            panic!("not enough type information to slice correctly")
         }
     }
 
     /// Return an Iterator of Option<T> over the contained Datums.
     pub fn iter(&self) -> ArrayIterator<'_, T> {
-        ArrayIterator {
-            array: self,
-            curr: 0,
-        }
+        ArrayIterator { array: self, curr: 0 }
     }
 
     /// Return an Iterator of the contained Datums (converted to Rust types).
     ///
     /// This function will panic when called if the array contains any SQL NULL values.
     pub fn iter_deny_null(&self) -> ArrayTypedIterator<'_, T> {
-        if self.array_type.is_null() {
+        if let Some(at) = &self.raw {
+            // SAFETY: if Some, then the ArrayType is from Postgres
+            if unsafe { at.any_nulls() } {
+                panic!("array contains NULL");
+            }
+        } else {
             panic!("array is NULL");
-        } else if unsafe { pg_sys::array_contains_nulls(self.array_type) } {
-            panic!("array contains NULL");
-        }
+        };
 
-        ArrayTypedIterator {
-            array: self,
-            curr: 0,
-        }
+        ArrayTypedIterator { array: self, curr: 0 }
     }
 
     #[inline]
@@ -153,8 +303,74 @@ impl<'a, T: FromDatum> Array<'a, T> {
         if i >= self.nelems {
             None
         } else {
-            Some(unsafe { T::from_datum(self.elem_slice[i], self.null_slice[i], self.typoid) })
+            Some(unsafe {
+                T::from_polymorphic_datum(
+                    self.elem_slice[i],
+                    self.null_slice.get(i)?,
+                    self.raw.as_ref().map(|r| r.oid()).unwrap_or_default(),
+                )
+            })
         }
+    }
+}
+
+pub struct VariadicArray<'a, T: FromDatum>(Array<'a, T>);
+
+impl<'a, T: FromDatum + serde::Serialize> serde::Serialize for VariadicArray<'a, T> {
+    fn serialize<S>(&self, serializer: S) -> Result<<S as Serializer>::Ok, <S as Serializer>::Error>
+    where
+        S: Serializer,
+    {
+        serializer.collect_seq(self.0.iter())
+    }
+}
+
+impl<'a, T: FromDatum> VariadicArray<'a, T> {
+    pub fn into_array_type(self) -> *const pg_sys::ArrayType {
+        self.0.into_array_type()
+    }
+
+    // # Panics
+    //
+    // Panics if it detects the slightest misalignment between types,
+    // or if a valid slice contains nulls, which may be uninit data.
+    #[deprecated(
+        since = "0.5.0",
+        note = "this function cannot be safe and is not generically sound\n\
+        even `unsafe fn as_slice(&self) -> &[T]` is not sound for all `&[T]`\n\
+        if you are sure your usage is sound, consider RawArray"
+    )]
+    #[allow(deprecated)]
+    pub fn as_slice(&self) -> &[T] {
+        self.0.as_slice()
+    }
+
+    /// Return an Iterator of Option<T> over the contained Datums.
+    pub fn iter(&self) -> ArrayIterator<'_, T> {
+        self.0.iter()
+    }
+
+    /// Return an Iterator of the contained Datums (converted to Rust types).
+    ///
+    /// This function will panic when called if the array contains any SQL NULL values.
+    pub fn iter_deny_null(&self) -> ArrayTypedIterator<'_, T> {
+        self.0.iter_deny_null()
+    }
+
+    #[inline]
+    pub fn len(&self) -> usize {
+        self.0.len()
+    }
+
+    #[inline]
+    pub fn is_empty(&self) -> bool {
+        self.0.is_empty()
+    }
+
+    #[allow(clippy::option_option)]
+    #[inline]
+    pub fn get(&self, i: usize) -> Option<Option<T>> {
+        self.0.get(i)
     }
 }
 
@@ -179,6 +395,15 @@ impl<'a, T: FromDatum> Iterator for ArrayTypedIterator<'a, T> {
             self.curr += 1;
             Some(element)
         }
+    }
+}
+
+impl<'a, T: FromDatum + serde::Serialize> serde::Serialize for ArrayTypedIterator<'a, T> {
+    fn serialize<S>(&self, serializer: S) -> Result<<S as Serializer>::Ok, <S as Serializer>::Error>
+    where
+        S: Serializer,
+    {
+        serializer.collect_seq(self.array.iter())
     }
 }
 
@@ -212,10 +437,16 @@ impl<'a, T: FromDatum> IntoIterator for Array<'a, T> {
     type IntoIter = ArrayIntoIterator<'a, T>;
 
     fn into_iter(self) -> Self::IntoIter {
-        ArrayIntoIterator {
-            array: self,
-            curr: 0,
-        }
+        ArrayIntoIterator { array: self, curr: 0 }
+    }
+}
+
+impl<'a, T: FromDatum> IntoIterator for VariadicArray<'a, T> {
+    type Item = Option<T>;
+    type IntoIter = ArrayIntoIterator<'a, T>;
+
+    fn into_iter(self) -> Self::IntoIter {
+        ArrayIntoIterator { array: self.0, curr: 0 }
     }
 }
 
@@ -249,98 +480,51 @@ impl<'a, T: FromDatum> Iterator for ArrayIntoIterator<'a, T> {
     }
 }
 
-impl<'a, T: FromDatum> Drop for Array<'a, T> {
-    fn drop(&mut self) {
-        if !self.elements.is_null() {
-            unsafe {
-                pg_sys::pfree(self.elements as void_mut_ptr);
-            }
-        }
-
-        if !self.nulls.is_null() {
-            unsafe {
-                pg_sys::pfree(self.nulls as void_mut_ptr);
-            }
-        }
-
-        if !self.array_type.is_null() && self.array_type as *mut pg_sys::varlena != self.ptr {
-            unsafe {
-                pg_sys::pfree(self.array_type as void_mut_ptr);
-            }
-        }
-
-        // NB:  we don't pfree(self.ptr) because we don't know if it's actually
-        // safe to do that.  It'll be freed whenever Postgres deletes/resets its parent
-        // MemoryContext
+impl<'a, T: FromDatum> FromDatum for VariadicArray<'a, T> {
+    #[inline]
+    unsafe fn from_polymorphic_datum(
+        datum: pg_sys::Datum,
+        is_null: bool,
+        oid: pg_sys::Oid,
+    ) -> Option<VariadicArray<'a, T>> {
+        Array::from_polymorphic_datum(datum, is_null, oid).map(Self)
     }
 }
 
 impl<'a, T: FromDatum> FromDatum for Array<'a, T> {
     #[inline]
-    unsafe fn from_datum(datum: usize, is_null: bool, typoid: u32) -> Option<Array<'a, T>> {
-        if is_null {
+    unsafe fn from_polymorphic_datum(
+        datum: pg_sys::Datum,
+        is_null: bool,
+        _typoid: u32,
+    ) -> Option<Array<'a, T>> {
+        if is_null || datum.is_null() {
             None
-        } else if datum == 0 {
-            panic!("array was flagged not null but datum is zero");
         } else {
-            let ptr = datum as *mut pg_sys::varlena;
-            let array =
-                pg_sys::pg_detoast_datum(datum as *mut pg_sys::varlena) as *mut pg_sys::ArrayType;
-            let array_ref = array.as_ref().expect("ArrayType * was NULL");
+            let ptr = datum.cast_mut_ptr();
+            let array = pg_sys::pg_detoast_datum(datum.cast_mut_ptr()) as *mut pg_sys::ArrayType;
+            let raw =
+                RawArray::from_ptr(NonNull::new(array).expect("detoast returned null ArrayType*"));
+            let ptr = NonNull::new(ptr);
+            let oid = raw.oid();
+            let layout = Layout::lookup_oid(oid);
 
-            // outvals for get_typlenbyvalalign()
-            let mut typlen = 0;
-            let mut typbyval = false;
-            let mut typalign = 0;
-
-            pg_sys::get_typlenbyvalalign(
-                array_ref.elemtype,
-                &mut typlen,
-                &mut typbyval,
-                &mut typalign,
-            );
-
-            // outvals for deconstruct_array()
-            let mut elements = std::ptr::null_mut();
-            let mut nulls = std::ptr::null_mut();
-            let mut nelems = 0;
-
-            pg_sys::deconstruct_array(
-                array,
-                array_ref.elemtype,
-                typlen as i32,
-                typbyval,
-                typalign,
-                &mut elements,
-                &mut nulls,
-                &mut nelems,
-            );
-
-            Some(Array::from_pg(
-                ptr,
-                array,
-                elements,
-                nulls,
-                typoid,
-                nelems as usize,
-            ))
+            Some(Array::deconstruct_from(ptr, raw, layout))
         }
     }
 }
 
 impl<T: FromDatum> FromDatum for Vec<T> {
     #[inline]
-    unsafe fn from_datum(
+    unsafe fn from_polymorphic_datum(
         datum: pg_sys::Datum,
         is_null: bool,
         typoid: pg_sys::Oid,
     ) -> Option<Vec<T>> {
         if is_null {
             None
-        } else if datum == 0 {
-            panic!("array was flagged not null but datum is zero");
         } else {
-            let array = Array::<T>::from_datum(datum, is_null, typoid).unwrap();
+            let array = Array::<T>::from_polymorphic_datum(datum, is_null, typoid).unwrap();
             let mut v = Vec::with_capacity(array.len());
 
             for element in array.iter() {
@@ -353,17 +537,15 @@ impl<T: FromDatum> FromDatum for Vec<T> {
 
 impl<T: FromDatum> FromDatum for Vec<Option<T>> {
     #[inline]
-    unsafe fn from_datum(
+    unsafe fn from_polymorphic_datum(
         datum: pg_sys::Datum,
         is_null: bool,
         typoid: pg_sys::Oid,
     ) -> Option<Vec<Option<T>>> {
-        if is_null {
+        if is_null || datum.is_null() {
             None
-        } else if datum == 0 {
-            panic!("array was flagged not null but datum is zero");
         } else {
-            let array = Array::<T>::from_datum(datum, is_null, typoid).unwrap();
+            let array = Array::<T>::from_polymorphic_datum(datum, is_null, typoid).unwrap();
             let mut v = Vec::with_capacity(array.len());
 
             for element in array.iter() {
@@ -393,7 +575,7 @@ where
             unsafe {
                 state = pg_sys::accumArrayResult(
                     state,
-                    datum.unwrap_or(0usize),
+                    datum.unwrap_or(0.into()),
                     isnull,
                     T::type_oid(),
                     PgMemoryContexts::CurrentMemoryContext.value(),
@@ -414,11 +596,16 @@ where
     fn type_oid() -> u32 {
         unsafe { pg_sys::get_array_type(T::type_oid()) }
     }
+
+    #[inline]
+    fn is_compatible_with(other: pg_sys::Oid) -> bool {
+        Self::type_oid() == other || other == unsafe { pg_sys::get_array_type(T::type_oid()) }
+    }
 }
 
 impl<'a, T> IntoDatum for &'a [T]
 where
-    T: IntoDatum + Copy,
+    T: IntoDatum + Copy + 'a,
 {
     fn into_datum(self) -> Option<pg_sys::Datum> {
         let mut state = unsafe {
@@ -435,7 +622,7 @@ where
             unsafe {
                 state = pg_sys::accumArrayResult(
                     state,
-                    datum.unwrap_or(0usize),
+                    datum.unwrap_or(0.into()),
                     isnull,
                     T::type_oid(),
                     PgMemoryContexts::CurrentMemoryContext.value(),
@@ -455,5 +642,76 @@ where
 
     fn type_oid() -> u32 {
         unsafe { pg_sys::get_array_type(T::type_oid()) }
+    }
+
+    #[inline]
+    fn is_compatible_with(other: pg_sys::Oid) -> bool {
+        Self::type_oid() == other || other == unsafe { pg_sys::get_array_type(T::type_oid()) }
+    }
+}
+
+unsafe impl<'a, T> SqlTranslatable for Array<'a, T>
+where
+    T: SqlTranslatable + FromDatum,
+{
+    fn argument_sql() -> Result<SqlMapping, ArgumentError> {
+        match T::argument_sql()? {
+            SqlMapping::As(sql) => Ok(SqlMapping::As(format!("{sql}[]"))),
+            SqlMapping::Skip => Err(ArgumentError::SkipInArray),
+            SqlMapping::Composite { .. } => Ok(SqlMapping::Composite { array_brackets: true }),
+            SqlMapping::Source { .. } => Ok(SqlMapping::Source { array_brackets: true }),
+        }
+    }
+
+    fn return_sql() -> Result<Returns, ReturnsError> {
+        match T::return_sql()? {
+            Returns::One(SqlMapping::As(sql)) => {
+                Ok(Returns::One(SqlMapping::As(format!("{sql}[]"))))
+            }
+            Returns::One(SqlMapping::Composite { array_brackets: _ }) => {
+                Ok(Returns::One(SqlMapping::Composite { array_brackets: true }))
+            }
+            Returns::One(SqlMapping::Source { array_brackets: _ }) => {
+                Ok(Returns::One(SqlMapping::Source { array_brackets: true }))
+            }
+            Returns::One(SqlMapping::Skip) => Err(ReturnsError::SkipInArray),
+            Returns::SetOf(_) => Err(ReturnsError::SetOfInArray),
+            Returns::Table(_) => Err(ReturnsError::TableInArray),
+        }
+    }
+}
+
+unsafe impl<'a, T> SqlTranslatable for VariadicArray<'a, T>
+where
+    T: SqlTranslatable + FromDatum,
+{
+    fn argument_sql() -> Result<SqlMapping, ArgumentError> {
+        match T::argument_sql()? {
+            SqlMapping::As(sql) => Ok(SqlMapping::As(format!("{sql}[]"))),
+            SqlMapping::Skip => Err(ArgumentError::SkipInArray),
+            SqlMapping::Composite { .. } => Ok(SqlMapping::Composite { array_brackets: true }),
+            SqlMapping::Source { .. } => Ok(SqlMapping::Source { array_brackets: true }),
+        }
+    }
+
+    fn return_sql() -> Result<Returns, ReturnsError> {
+        match T::return_sql()? {
+            Returns::One(SqlMapping::As(sql)) => {
+                Ok(Returns::One(SqlMapping::As(format!("{sql}[]"))))
+            }
+            Returns::One(SqlMapping::Composite { array_brackets: _ }) => {
+                Ok(Returns::One(SqlMapping::Composite { array_brackets: true }))
+            }
+            Returns::One(SqlMapping::Source { array_brackets: _ }) => {
+                Ok(Returns::One(SqlMapping::Source { array_brackets: true }))
+            }
+            Returns::One(SqlMapping::Skip) => Err(ReturnsError::SkipInArray),
+            Returns::SetOf(_) => Err(ReturnsError::SetOfInArray),
+            Returns::Table(_) => Err(ReturnsError::TableInArray),
+        }
+    }
+
+    fn variadic() -> bool {
+        true
     }
 }

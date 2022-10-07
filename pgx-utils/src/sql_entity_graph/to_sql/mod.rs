@@ -6,6 +6,14 @@ All rights reserved.
 
 Use of this source code is governed by the MIT license that can be found in the LICENSE file.
 */
+/*!
+
+`sql = ...` fragment related macro expansion for Rust to SQL translation
+
+> Like all of the [`sql_entity_graph`][crate::sql_entity_graph] APIs, this is considered **internal**
+to the `pgx` framework and very subject to change between versions. While you may use this, please do it with caution.
+
+*/
 pub mod entity;
 
 use std::hash::Hash;
@@ -15,11 +23,9 @@ use quote::{quote, ToTokens, TokenStreamExt};
 use syn::spanned::Spanned;
 use syn::{AttrStyle, Attribute, Lit};
 
-use crate::sql_entity_graph::{
-    pgx_attribute::{ArgValue, PgxArg, PgxAttribute},
-    pgx_sql::PgxSql,
-    SqlGraphEntity,
-};
+use crate::sql_entity_graph::pgx_attribute::{ArgValue, PgxArg, PgxAttribute};
+use crate::sql_entity_graph::pgx_sql::PgxSql;
+use crate::sql_entity_graph::SqlGraphEntity;
 
 /// Able to be transformed into to SQL.
 pub trait ToSql {
@@ -53,38 +59,22 @@ pub struct ToSqlConfig {
 }
 impl From<bool> for ToSqlConfig {
     fn from(enabled: bool) -> Self {
-        Self {
-            enabled,
-            callback: None,
-            content: None,
-        }
+        Self { enabled, callback: None, content: None }
     }
 }
 impl From<syn::Path> for ToSqlConfig {
     fn from(path: syn::Path) -> Self {
-        Self {
-            enabled: true,
-            callback: Some(path),
-            content: None,
-        }
+        Self { enabled: true, callback: Some(path), content: None }
     }
 }
 impl From<syn::LitStr> for ToSqlConfig {
     fn from(content: syn::LitStr) -> Self {
-        Self {
-            enabled: true,
-            callback: None,
-            content: Some(content),
-        }
+        Self { enabled: true, callback: None, content: Some(content) }
     }
 }
 impl Default for ToSqlConfig {
     fn default() -> Self {
-        Self {
-            enabled: true,
-            callback: None,
-            content: None,
-        }
+        Self { enabled: true, callback: None, content: None }
     }
 }
 
@@ -117,11 +107,7 @@ impl ToSqlConfig {
                         }));
                     }
                     ArgValue::Lit(Lit::Bool(ref b)) => {
-                        return Ok(Some(Self {
-                            enabled: b.value,
-                            callback: None,
-                            content: None,
-                        }));
+                        return Ok(Some(Self { enabled: b.value, callback: None, content: None }));
                     }
                     ArgValue::Lit(Lit::Str(ref s)) => {
                         return Ok(Some(Self {
@@ -147,6 +133,10 @@ impl ToSqlConfig {
         } else {
             Ok(None)
         }
+    }
+
+    pub fn overrides_default(&self) -> bool {
+        self.enabled == false || self.callback.is_some() || self.content.is_some()
     }
 }
 

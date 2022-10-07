@@ -7,13 +7,12 @@ All rights reserved.
 Use of this source code is governed by the MIT license that can be found in the LICENSE file.
 */
 
-use crate::{
-    command::{get::get_property, install::install_extension},
-    CommandExecute,
-};
+use crate::command::get::get_property;
+use crate::command::install::install_extension;
+use crate::CommandExecute;
 use cargo_toml::Manifest;
 use eyre::{eyre, WrapErr};
-use pgx_utils::{get_target_dir, pg_config::PgConfig};
+use pgx_pg_config::{get_target_dir, PgConfig};
 use std::path::{Path, PathBuf};
 
 /// Create an installation package directory.

@@ -4,6 +4,7 @@ members = [
     "cargo-pgx",
     "pgx",
     "pgx-macros",
+    "pgx-pg-config",
     "pgx-pg-sys",
     "pgx-tests",
     "pgx-utils",
@@ -12,6 +13,7 @@ members = [
     "pgx-examples/bad_ideas",
     "pgx-examples/bgworker",
     "pgx-examples/bytea",
+    "pgx-examples/composite_type",
     "pgx-examples/custom_types",
     "pgx-examples/custom_sql",
     "pgx-examples/errors",
@@ -24,6 +26,7 @@ members = [
     "pgx-examples/strings",
     "pgx-examples/triggers",
     "pgx-examples/versioned_so",
+    "pgx-examples/spi_srf",
 ]
 
 [profile.dev.build-override]

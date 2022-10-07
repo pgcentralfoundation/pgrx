@@ -7,7 +7,9 @@ All rights reserved.
 Use of this source code is governed by the MIT license that can be found in the LICENSE file.
 */
 
-use pgx::*;
+use pgx::array::RawArray;
+use pgx::prelude::*;
+use pgx::{Array, Json};
 use serde_json::*;
 
 #[pg_extern(name = "sum_array")]
@@ -17,11 +19,11 @@ fn sum_array_i32(values: Array<i32>) -> i32 {
     let mut sum = 0_i32;
     for v in values {
         let v = v.unwrap_or(0);
-        let tmp = sum.overflowing_add(v);
-        if tmp.1 {
+        let (val, overflow) = sum.overflowing_add(v);
+        if overflow {
             panic!("attempt to add with overflow");
         } else {
-            sum = tmp.0;
+            sum = val;
         }
     }
     sum
@@ -32,12 +34,14 @@ fn sum_array_i64(values: Array<i64>) -> i64 {
     values.iter().map(|v| v.unwrap_or(0i64)).sum()
 }
 
-#[pg_extern(name = "sum_array_siced")]
+#[pg_extern(name = "sum_array_sliced")]
+#[allow(deprecated)]
 fn sum_array_i32_sliced(values: Array<i32>) -> i32 {
     values.as_slice().iter().sum()
 }
 
 #[pg_extern(name = "sum_array_sliced")]
+#[allow(deprecated)]
 fn sum_array_i64_sliced(values: Array<i64>) -> i64 {
     values.as_slice().iter().sum()
 }
@@ -48,6 +52,7 @@ fn count_true(values: Array<bool>) -> i32 {
 }
 
 #[pg_extern]
+#[allow(deprecated)]
 fn count_true_sliced(values: Array<bool>) -> i32 {
     values.as_slice().iter().filter(|b| **b).count() as i32
 }
@@ -70,7 +75,7 @@ fn iterate_array_with_deny_null(values: Array<i32>) {
 }
 
 #[pg_extern]
-fn optional_array_with_default(values: Option<default!(Array<i32>, NULL)>) -> i32 {
+fn optional_array_with_default(values: default!(Option<Array<i32>>, "NULL")) -> i32 {
     values.unwrap().iter().map(|v| v.unwrap_or(0)).sum()
 }
 
@@ -99,13 +104,90 @@ fn return_zero_length_vec() -> Vec<i32> {
     Vec::new()
 }
 
+#[pg_extern]
+fn get_arr_nelems(arr: Array<i32>) -> libc::c_int {
+    // SAFETY: Eh it's fine, it's just a len check.
+    unsafe { RawArray::from_array(arr) }.unwrap().len() as _
+}
+
+#[pg_extern]
+fn get_arr_data_ptr_nth_elem(arr: Array<i32>, elem: i32) -> Option<i32> {
+    // SAFETY: this is Known to be an Array from ArrayType,
+    // and it's valid-ish to see any bitpattern of an i32 inbounds of a slice.
+    unsafe {
+        let raw = RawArray::from_array(arr).unwrap().data::<i32>();
+        let slice = &(*raw.as_ptr());
+        slice.get(elem as usize).copied()
+    }
+}
+
+#[pg_extern]
+fn display_get_arr_nullbitmap(arr: Array<i32>) -> String {
+    let mut raw = unsafe { RawArray::from_array(arr) }.unwrap();
+
+    if let Some(slice) = raw.nulls() {
+        // SAFETY: If the test has gotten this far, the ptr is good for 0+ bytes,
+        // so reborrow NonNull<[u8]> as &[u8] for the hot second we're looking at it.
+        let slice = unsafe { &*slice.as_ptr() };
+        // might panic if the array is len 0
+        format!("{:#010b}", slice[0])
+    } else {
+        String::from("")
+    }
+}
+
+#[pg_extern]
+fn get_arr_ndim(arr: Array<i32>) -> libc::c_int {
+    // SAFETY: This is a valid ArrayType and it's just a field access.
+    unsafe { RawArray::from_array(arr) }.unwrap().dims().len() as _
+}
+
+#[pg_extern]
+#[allow(deprecated)]
+fn over_implicit_drop() -> Vec<i64> {
+    // Create an array of exactly Datum-sized numbers.
+    let mut vec: Vec<i64> = vec![1, 2, 3, 4, 5];
+    let mut nulls = vec![false, false, true, false, false];
+    // Verify we uphold the length contract.
+    assert_eq!(vec.len(), nulls.len());
+    let len = vec.len();
+    // Create an Array...
+    let _arr = unsafe { Array::<'_, i64>::over(vec.as_mut_ptr().cast(), nulls.as_mut_ptr(), len) };
+    vec
+    // Implicit drop of _arr
+}
+
+// This deliberately iterates the Array.
+// Because Array::iter currently iterates the Array as Datums, this is guaranteed to be "bug-free" regarding size.
+#[pg_extern]
+fn arr_mapped_vec(arr: Array<i32>) -> Vec<i32> {
+    arr.iter().filter_map(|x| x).collect()
+}
+
+/// Naive conversion. This causes errors if Array::as_slice doesn't handle differently sized slices well.
+#[pg_extern]
+#[allow(deprecated)]
+fn arr_into_vec(arr: Array<i32>) -> Vec<i32> {
+    arr.as_slice().to_vec()
+}
+
+#[pg_extern]
+#[allow(deprecated)]
+fn arr_sort_uniq(arr: Array<i32>) -> Vec<i32> {
+    let mut v: Vec<i32> = arr.as_slice().into();
+    v.sort();
+    v.dedup();
+    v
+}
+
 #[cfg(any(test, feature = "pg_test"))]
 #[pgx::pg_schema]
 mod tests {
     #[allow(unused_imports)]
     use crate as pgx_tests;
 
-    use pgx::*;
+    use pgx::prelude::*;
+    use pgx::{IntoDatum, Json};
     use serde_json::json;
 
     #[pg_test]
@@ -239,5 +321,87 @@ mod tests {
         })
         .expect("Failed to return json even though it's right there ^^");
         assert_eq!(json.0, json! {{"values": [1, 2, 3, null, 4]}});
+    }
+
+    #[pg_test]
+    fn test_arr_data_ptr() {
+        let len = Spi::get_one::<i32>("SELECT get_arr_nelems('{1,2,3,4,5}'::int[])")
+            .expect("failed to get SPI result");
+
+        assert_eq!(len, 5);
+    }
+
+    #[pg_test]
+    fn test_get_arr_data_ptr_nth_elem() {
+        let nth = Spi::get_one::<i32>("SELECT get_arr_data_ptr_nth_elem('{1,2,3,4,5}'::int[], 2)")
+            .expect("failed to get SPI result");
+
+        assert_eq!(nth, 3);
+    }
+
+    #[pg_test]
+    fn test_display_get_arr_nullbitmap() {
+        let bitmap_str = Spi::get_one::<String>(
+            "SELECT display_get_arr_nullbitmap(ARRAY[1,NULL,3,NULL,5]::int[])",
+        )
+        .expect("failed to get SPI result");
+
+        assert_eq!(bitmap_str, "0b00010101");
+
+        let bitmap_str =
+            Spi::get_one::<String>("SELECT display_get_arr_nullbitmap(ARRAY[1,2,3,4,5]::int[])")
+                .expect("failed to get SPI result");
+
+        assert_eq!(bitmap_str, "");
+    }
+
+    #[pg_test]
+    fn test_get_arr_ndim() {
+        let ndim = Spi::get_one::<i32>("SELECT get_arr_ndim(ARRAY[1,2,3,4,5]::int[])")
+            .expect("failed to get SPI result");
+
+        assert_eq!(ndim, 1);
+
+        let ndim = Spi::get_one::<i32>("SELECT get_arr_ndim('{{1,2,3},{4,5,6}}'::int[])")
+            .expect("failed to get SPI result");
+
+        assert_eq!(ndim, 2);
+    }
+
+    #[pg_test]
+    fn test_array_over_direct() {
+        let vals = crate::tests::array_tests::over_implicit_drop();
+        assert_eq!(vals, &[1, 2, 3, 4, 5]);
+    }
+
+    #[pg_test]
+    fn test_array_over_spi() {
+        let vals: Vec<i64> =
+            Spi::get_one("SELECT over_implicit_drop();").expect("over machine broke");
+        assert_eq!(vals, &[1, 2, 3, 4, 5]);
+    }
+
+    #[pg_test]
+    fn test_arr_to_vec() {
+        let result = Spi::get_one::<Vec<i32>>("SELECT arr_mapped_vec(ARRAY[3,2,2,1]::integer[])");
+        let other = Spi::get_one::<Vec<i32>>("SELECT arr_into_vec(ARRAY[3,2,2,1]::integer[])");
+        // One should be equivalent to the canonical form.
+        assert_eq!(result, Some(vec![3, 2, 2, 1]));
+        // And they should be equal to each other.
+        assert_eq!(result, other);
+    }
+
+    #[pg_test]
+    fn test_arr_sort_uniq() {
+        let result = Spi::get_one::<Vec<i32>>("SELECT arr_sort_uniq(ARRAY[3,2,2,1]::integer[])");
+        assert_eq!(result, Some(vec![1, 2, 3]));
+    }
+
+    #[pg_test]
+    #[should_panic]
+    fn test_arr_sort_uniq_with_null() {
+        let _result =
+            Spi::get_one::<Vec<i32>>("SELECT arr_sort_uniq(ARRAY[3,2,NULL,2,1]::integer[])");
+        // No assert because we're testing for the panic.
     }
 }

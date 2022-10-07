@@ -6,31 +6,35 @@ All rights reserved.
 
 Use of this source code is governed by the MIT license that can be found in the LICENSE file.
 */
-use core::any::TypeId;
+/*!
+
+`#[pg_extern]` related return value entities for Rust to SQL translation
+
+> Like all of the [`sql_entity_graph`][crate::sql_entity_graph] APIs, this is considered **internal**
+to the `pgx` framework and very subject to change between versions. While you may use this, please do it with caution.
+
+*/
+use crate::sql_entity_graph::UsedTypeEntity;
 
 #[derive(Debug, Clone, Hash, PartialEq, Eq, PartialOrd, Ord)]
 pub enum PgExternReturnEntity {
     None,
     Type {
-        id: TypeId,
-        source: &'static str,
-        full_path: &'static str,
-        module_path: String,
+        ty: UsedTypeEntity,
     },
     SetOf {
-        id: TypeId,
-        source: &'static str,
-        full_path: &'static str,
-        module_path: String,
+        ty: UsedTypeEntity,
+        optional: bool, /* Eg `Option<SetOfIterator<T>>` */
     },
-    Iterated(
-        Vec<(
-            TypeId,
-            &'static str,         // Source
-            &'static str,         // Full path
-            String,               // Module path
-            Option<&'static str>, // Name
-        )>,
-    ),
+    Iterated {
+        tys: Vec<PgExternReturnEntityIteratedItem>,
+        optional: bool, /* Eg `Option<TableIterator<T>>` */
+    },
     Trigger,
+}
+
+#[derive(Debug, Clone, Hash, PartialEq, Eq, PartialOrd, Ord)]
+pub struct PgExternReturnEntityIteratedItem {
+    pub ty: UsedTypeEntity,
+    pub name: Option<&'static str>,
 }

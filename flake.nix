@@ -3,15 +3,15 @@
 
   inputs = {
     nixpkgs.url = "nixpkgs";
-    rust-overlay.url = "github:oxalica/rust-overlay";
-    rust-overlay.inputs.nixpkgs.follows = "nixpkgs";
+    fenix.url = "github:nix-community/fenix";
+    fenix.inputs.nixpkgs.follows = "nixpkgs";
     naersk.url = "github:nix-community/naersk";
     naersk.inputs.nixpkgs.follows = "nixpkgs";
     gitignore.url = "github:hercules-ci/gitignore.nix";
     gitignore.inputs.nixpkgs.follows = "nixpkgs";
   };
 
-  outputs = { self, nixpkgs, rust-overlay, naersk, gitignore }:
+  outputs = { self, nixpkgs, fenix, naersk, gitignore }:
     let
       supportedSystems = [ "x86_64-linux" "aarch64-linux" "x86_64-darwin" "aarch64-darwin" ];
       forAllSystems = f: nixpkgs.lib.genAttrs supportedSystems (system: f system);
@@ -19,7 +19,7 @@
         inherit system;
         overlays = [
           self.overlay
-          rust-overlay.overlay
+          fenix.overlay
           (self: super: { inherit (self.rust-bin.stable.latest) rustc cargo rustdoc rust-std; })
         ] ++ extraOverlays;
       });
@@ -27,6 +27,14 @@
         "${attr}" = call args;
         "${attr}_debug" = call (args // { release = false; });
       };
+      fenixToolchain = system: with fenix.packages.${system};
+        combine ([
+          stable.clippy
+          stable.rustc
+          stable.cargo
+          stable.rustfmt
+          stable.rust-src
+        ]);
     in
     {
       lib = {
@@ -54,10 +62,12 @@
 
       overlay = final: prev: {
         cargo-pgx = final.callPackage ./cargo-pgx {
+          inherit fenixToolchain;
           inherit naersk;
           gitignoreSource = gitignore.lib.gitignoreSource;
         };
         cargo-pgx_debug = final.callPackage ./cargo-pgx {
+          inherit fenixToolchain;
           inherit naersk;
           release = false;
           gitignoreSource = gitignore.lib.gitignoreSource;
@@ -66,6 +76,7 @@
 
       devShell = forAllSystems (system:
         let
+          rust-toolchain = fenixToolchain system;
           pkgs = nixpkgsWithOverlays { inherit system nixpkgs; };
         in
         pkgs.mkShell {
@@ -80,9 +91,7 @@
             rustfmt
             nixpkgs-fmt
             cargo-pgx
-            rust-bin.stable.latest.minimal
-            rust-bin.stable.latest.rustfmt
-            rust-bin.stable.latest.clippy
+            rust-toolchain
             postgresql
             libiconv
             pkg-config

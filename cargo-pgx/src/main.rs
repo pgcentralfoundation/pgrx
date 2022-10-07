@@ -10,11 +10,14 @@ Use of this source code is governed by the MIT license that can be found in the 
 mod command;
 mod manifest;
 mod metadata;
+mod pgx_pg_sys_stub;
 
 use atty::Stream;
 use clap::Parser;
 use tracing_error::ErrorLayer;
-use tracing_subscriber::{layer::SubscriberExt, util::SubscriberInitExt, EnvFilter};
+use tracing_subscriber::layer::SubscriberExt;
+use tracing_subscriber::util::SubscriberInitExt;
+use tracing_subscriber::EnvFilter;
 
 trait CommandExecute {
     fn execute(self) -> eyre::Result<()>;

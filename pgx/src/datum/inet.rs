@@ -8,8 +8,10 @@ Use of this source code is governed by the MIT license that can be found in the 
 */
 
 use crate::{
-    direct_function_call, direct_function_call_as_datum, pg_sys, pg_try, void_mut_ptr, FromDatum,
-    IntoDatum,
+    direct_function_call, direct_function_call_as_datum, pg_sys, pg_try, FromDatum, IntoDatum,
+};
+use pgx_utils::sql_entity_graph::metadata::{
+    ArgumentError, Returns, ReturnsError, SqlMapping, SqlTranslatable,
 };
 use serde::de::{Error, Visitor};
 use serde::{Deserialize, Deserializer, Serialize, Serializer};
@@ -69,7 +71,7 @@ impl<'de> Deserialize<'de> for Inet {
                         let datum = Inet(v.clone()).into_datum().unwrap();
 
                         // and don't leak the 'inet' datum Postgres created
-                        pg_sys::pfree(datum as void_mut_ptr);
+                        pg_sys::pfree(datum.cast_mut_ptr());
 
                         // we have it as a valid String
                         Ok(Inet(v.clone()))
@@ -84,18 +86,17 @@ impl<'de> Deserialize<'de> for Inet {
 }
 
 impl FromDatum for Inet {
-    unsafe fn from_datum(datum: pg_sys::Datum, is_null: bool, _typoid: u32) -> Option<Inet> {
+    unsafe fn from_polymorphic_datum(
+        datum: pg_sys::Datum,
+        is_null: bool,
+        _typoid: u32,
+    ) -> Option<Inet> {
         if is_null {
             None
-        } else if datum == 0 {
-            panic!("inet datum is declared non-null but Datum is zero");
         } else {
             let cstr = direct_function_call::<&CStr>(pg_sys::inet_out, vec![Some(datum)]);
             Some(Inet(
-                cstr.unwrap()
-                    .to_str()
-                    .expect("unable to convert &cstr inet into &str")
-                    .to_owned(),
+                cstr.unwrap().to_str().expect("unable to convert &cstr inet into &str").to_owned(),
             ))
         }
     }
@@ -114,8 +115,17 @@ impl IntoDatum for Inet {
     }
 }
 
-impl Into<Inet> for String {
-    fn into(self) -> Inet {
-        Inet(self)
+impl From<String> for Inet {
+    fn from(val: String) -> Self {
+        Inet(val)
+    }
+}
+
+unsafe impl SqlTranslatable for Inet {
+    fn argument_sql() -> Result<SqlMapping, ArgumentError> {
+        Ok(SqlMapping::literal("inet"))
+    }
+    fn return_sql() -> Result<Returns, ReturnsError> {
+        Ok(Returns::One(SqlMapping::literal("inet")))
     }
 }

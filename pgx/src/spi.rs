@@ -10,20 +10,22 @@ Use of this source code is governed by the MIT license that can be found in the 
 //! Safe access to Postgres' *Server Programming Interface* (SPI).
 
 use crate::{pg_sys, FromDatum, IntoDatum, Json, PgMemoryContexts, PgOid};
-use enum_primitive_derive::*;
-use num_traits::FromPrimitive;
 use std::collections::HashMap;
 use std::fmt::Debug;
+use std::mem;
 use std::ops::{Index, IndexMut};
 
-#[derive(Debug, Primitive)]
+/// These match the Postgres `#define`d constants prefixed `SPI_OK_*` that you can find in `pg_sys`.
+#[derive(Debug, PartialEq)]
+#[repr(i32)]
+#[non_exhaustive]
 pub enum SpiOk {
     Connect = 1,
     Finish = 2,
     Fetch = 3,
     Utility = 4,
     Select = 5,
-    Selinto = 6,
+    SelInto = 6,
     Insert = 7,
     Delete = 8,
     Update = 9,
@@ -35,27 +37,67 @@ pub enum SpiOk {
     RelRegister = 15,
     RelUnregister = 16,
     TdRegister = 17,
+    /// Added in Postgres 15
+    Merge = 18,
 }
 
-#[derive(Debug, Primitive)]
+/// These match the Postgres `#define`d constants prefixed `SPI_ERROR_*` that you can find in `pg_sys`.
+/// It is hypothetically possible for a Postgres-defined status code to be `0`, AKA `NULL`, however,
+/// this should not usually occur in Rust code paths. If it does happen, please report such bugs to the pgx repo.
+#[derive(Debug, PartialEq)]
+#[repr(i32)]
 pub enum SpiError {
-    // NB:  These are #define'd as negative, but we redefine them as positive so that
-    // #[derive(Primitive)] will work.  We just need to negate result codes from the
-    // various SPI_xxx functions when looking for errors
-    Connect = 1,
-    Copy = 2,
-    Opunknown = 3,
-    Unconnected = 4,
+    Connect = -1,
+    Copy = -2,
+    OpUnknown = -3,
+    Unconnected = -4,
     #[allow(dead_code)]
-    Cursor = 5, /* not used anymore */
-    Argument = 6,
-    Param = 7,
-    Transaction = 8,
-    Noattribute = 9,
-    Nooutfunc = 10,
-    Typunknown = 11,
-    RelDuplicate = 12,
-    RelNotFound = 13,
+    Cursor = -5, /* not used anymore */
+    Argument = -6,
+    Param = -7,
+    Transaction = -8,
+    NoAttribute = -9,
+    NoOutFunc = -10,
+    TypUnknown = -11,
+    RelDuplicate = -12,
+    RelNotFound = -13,
+}
+
+#[derive(Debug)]
+pub struct UnknownVariant;
+
+impl TryFrom<libc::c_int> for SpiOk {
+    // Yes, this gives us nested results.
+    type Error = Result<SpiError, UnknownVariant>;
+
+    fn try_from(code: libc::c_int) -> Result<SpiOk, Result<SpiError, UnknownVariant>> {
+        // Cast to assure that we're obeying repr rules even on platforms where c_ints are not 4 bytes wide,
+        // as we don't support any but we may wish to in the future.
+        match code as i32 {
+            err @ -13..=-1 => Err(Ok(
+                // SAFETY: These values are described in SpiError, thus they are inbounds for transmute
+                unsafe { mem::transmute::<i32, SpiError>(err) },
+            )),
+            ok @ 1..=18 => Ok(
+                //SAFETY: These values are described in SpiOk, thus they are inbounds for transmute
+                unsafe { mem::transmute::<i32, SpiOk>(ok) },
+            ),
+            _unknown => Err(Err(UnknownVariant)),
+        }
+    }
+}
+
+impl TryFrom<libc::c_int> for SpiError {
+    // Yes, this gives us nested results.
+    type Error = Result<SpiOk, UnknownVariant>;
+
+    fn try_from(code: libc::c_int) -> Result<SpiError, Result<SpiOk, UnknownVariant>> {
+        match SpiOk::try_from(code) {
+            Ok(ok) => Err(Ok(ok)),
+            Err(Ok(err)) => Ok(err),
+            Err(Err(unknown)) => Err(Err(unknown)),
+        }
+    }
 }
 
 pub struct Spi;
@@ -96,10 +138,7 @@ impl Spi {
         query: &str,
     ) -> (Option<A>, Option<B>) {
         Spi::connect(|client| {
-            let (a, b) = client
-                .select(query, Some(1), None)
-                .first()
-                .get_two::<A, B>();
+            let (a, b) = client.select(query, Some(1), None).first().get_two::<A, B>();
             Ok(Some((a, b)))
         })
         .unwrap()
@@ -113,10 +152,7 @@ impl Spi {
         query: &str,
     ) -> (Option<A>, Option<B>, Option<C>) {
         Spi::connect(|client| {
-            let (a, b, c) = client
-                .select(query, Some(1), None)
-                .first()
-                .get_three::<A, B, C>();
+            let (a, b, c) = client.select(query, Some(1), None).first().get_three::<A, B, C>();
             Ok(Some((a, b, c)))
         })
         .unwrap()
@@ -134,10 +170,7 @@ impl Spi {
         args: Vec<(PgOid, Option<pg_sys::Datum>)>,
     ) -> (Option<A>, Option<B>) {
         Spi::connect(|client| {
-            let (a, b) = client
-                .select(query, Some(1), Some(args))
-                .first()
-                .get_two::<A, B>();
+            let (a, b) = client.select(query, Some(1), Some(args)).first().get_two::<A, B>();
             Ok(Some((a, b)))
         })
         .unwrap()
@@ -152,10 +185,8 @@ impl Spi {
         args: Vec<(PgOid, Option<pg_sys::Datum>)>,
     ) -> (Option<A>, Option<B>, Option<C>) {
         Spi::connect(|client| {
-            let (a, b, c) = client
-                .select(query, Some(1), Some(args))
-                .first()
-                .get_three::<A, B, C>();
+            let (a, b, c) =
+                client.select(query, Some(1), Some(args)).first().get_three::<A, B, C>();
             Ok(Some((a, b, c)))
         })
         .unwrap()
@@ -175,14 +206,9 @@ impl Spi {
     /// explain a query, returning its result in json form
     pub fn explain(query: &str) -> Json {
         Spi::connect(|mut client| {
-            let table = client
-                .update(&format!("EXPLAIN (format json) {}", query), None, None)
-                .first();
-            Ok(Some(
-                table
-                    .get_one::<Json>()
-                    .expect("failed to get json EXPLAIN result"),
-            ))
+            let table =
+                client.update(&format!("EXPLAIN (format json) {}", query), None, None).first();
+            Ok(Some(table.get_one::<Json>().expect("failed to get json EXPLAIN result")))
         })
         .unwrap()
     }
@@ -267,18 +293,10 @@ impl Spi {
     }
 
     pub fn check_status(status_code: i32) -> SpiOk {
-        if status_code > 0 {
-            let status_enum = SpiOk::from_i32(status_code);
-            match status_enum {
-                Some(ok) => ok,
-                None => panic!("unrecognized SPI status code {}", status_code),
-            }
-        } else {
-            let status_enum = SpiError::from_i32(-status_code);
-            match status_enum {
-                Some(e) => panic!("{:?}", e),
-                None => panic!("unrecognized SPI status code {}", status_code),
-            }
+        match SpiOk::try_from(status_code) {
+            Ok(ok) => ok,
+            Err(Err(UnknownVariant)) => panic!("unrecognized SPI status code: {status_code}"),
+            Err(Ok(code)) => panic!("{code:?}"),
         }
     }
 }
@@ -345,7 +363,7 @@ impl SpiClient {
 
                         None => {
                             // 'n' here means that the datum is null
-                            datums.push(0);
+                            datums.push(pg_sys::Datum::from(0usize));
                             nulls.push('n' as std::os::raw::c_char);
                         }
                     }
@@ -458,7 +476,11 @@ impl SpiTupleTable {
                         let datum =
                             pg_sys::SPI_getbinval(heap_tuple, tupdesc, ordinal, &mut is_null);
 
-                        T::from_datum(datum, is_null, pg_sys::SPI_gettypeid(tupdesc, ordinal))
+                        T::from_polymorphic_datum(
+                            datum,
+                            is_null,
+                            pg_sys::SPI_gettypeid(tupdesc, ordinal),
+                        )
                     }
                 },
                 None => panic!("TupDesc is NULL"),
@@ -470,21 +492,16 @@ impl SpiTupleTable {
 impl SpiHeapTupleData {
     /// Create a new `SpiHeapTupleData` from its constituent parts
     pub unsafe fn new(tupdesc: pg_sys::TupleDesc, htup: *mut pg_sys::HeapTupleData) -> Self {
-        let mut data = SpiHeapTupleData {
-            tupdesc,
-            entries: HashMap::default(),
-        };
+        let mut data = SpiHeapTupleData { tupdesc, entries: HashMap::default() };
 
         for i in 1..=tupdesc.as_ref().unwrap().natts {
             let mut is_null = false;
             let datum = pg_sys::SPI_getbinval(htup, tupdesc, i, &mut is_null);
 
-            data.entries
-                .entry(i as usize)
-                .or_insert_with(|| SpiHeapTupleDataEntry {
-                    datum: if is_null { None } else { Some(datum) },
-                    type_oid: pg_sys::SPI_gettypeid(tupdesc, i),
-                });
+            data.entries.entry(i as usize).or_insert_with(|| SpiHeapTupleDataEntry {
+                datum: if is_null { None } else { Some(datum) },
+                type_oid: pg_sys::SPI_gettypeid(tupdesc, i),
+            });
         }
 
         data
@@ -505,26 +522,26 @@ impl SpiHeapTupleData {
     ///
     /// The ordinal position is 1-based.
     ///
-    /// If the specified ordinal is out of bounds a `Err(SpiError::Noattribute)` is returned
+    /// If the specified ordinal is out of bounds a `Err(SpiError::NoAttribute)` is returned
     pub fn by_ordinal(
         &self,
         ordinal: usize,
     ) -> std::result::Result<&SpiHeapTupleDataEntry, SpiError> {
         match self.entries.get(&ordinal) {
             Some(datum) => Ok(datum),
-            None => Err(SpiError::Noattribute),
+            None => Err(SpiError::NoAttribute),
         }
     }
 
     /// Get a typed Datum value from this HeapTuple by its field name.  
     ///
-    /// If the specified name does not exist a `Err(SpiError::Noattribute)` is returned
+    /// If the specified name does not exist a `Err(SpiError::NoAttribute)` is returned
     pub fn by_name(&self, name: &str) -> std::result::Result<&SpiHeapTupleDataEntry, SpiError> {
         use crate::pg_sys::AsPgCStr;
         unsafe {
             let fnumber = pg_sys::SPI_fnumber(self.tupdesc, name.as_pg_cstr());
             if fnumber == pg_sys::SPI_ERROR_NOATTRIBUTE {
-                Err(SpiError::Noattribute)
+                Err(SpiError::NoAttribute)
             } else {
                 self.by_ordinal(fnumber as usize)
             }
@@ -535,20 +552,20 @@ impl SpiHeapTupleData {
     ///
     /// The ordinal position is 1-based.
     ///
-    /// If the specified ordinal is out of bounds a `Err(SpiError::Noattribute)` is returned
+    /// If the specified ordinal is out of bounds a `Err(SpiError::NoAttribute)` is returned
     pub fn by_ordinal_mut(
         &mut self,
         ordinal: usize,
     ) -> std::result::Result<&mut SpiHeapTupleDataEntry, SpiError> {
         match self.entries.get_mut(&ordinal) {
             Some(datum) => Ok(datum),
-            None => Err(SpiError::Noattribute),
+            None => Err(SpiError::NoAttribute),
         }
     }
 
     /// Get a mutable typed Datum value from this HeapTuple by its field name.  
     ///
-    /// If the specified name does not exist a `Err(SpiError::Noattribute)` is returned
+    /// If the specified name does not exist a `Err(SpiError::NoAttribute)` is returned
     pub fn by_name_mut(
         &mut self,
         name: &str,
@@ -557,7 +574,7 @@ impl SpiHeapTupleData {
         unsafe {
             let fnumber = pg_sys::SPI_fnumber(self.tupdesc, name.as_pg_cstr());
             if fnumber == pg_sys::SPI_ERROR_NOATTRIBUTE {
-                Err(SpiError::Noattribute)
+                Err(SpiError::NoAttribute)
             } else {
                 self.by_ordinal_mut(fnumber as usize)
             }
@@ -566,7 +583,7 @@ impl SpiHeapTupleData {
 
     /// Set a datum value for the specified ordinal position
     ///
-    /// If the specified ordinal is out of bounds a `Err(SpiError::Noattribute)` is returned
+    /// If the specified ordinal is out of bounds a `Err(SpiError::NoAttribute)` is returned
     pub fn set_by_ordinal<T: IntoDatum + FromDatum>(
         &mut self,
         ordinal: usize,
@@ -574,14 +591,11 @@ impl SpiHeapTupleData {
     ) -> std::result::Result<(), SpiError> {
         unsafe {
             if ordinal < 1 || ordinal > self.tupdesc.as_ref().unwrap().natts as usize {
-                Err(SpiError::Noattribute)
+                Err(SpiError::NoAttribute)
             } else {
                 self.entries.insert(
                     ordinal,
-                    SpiHeapTupleDataEntry {
-                        datum: datum.into_datum(),
-                        type_oid: T::type_oid(),
-                    },
+                    SpiHeapTupleDataEntry { datum: datum.into_datum(), type_oid: T::type_oid() },
                 );
                 Ok(())
             }
@@ -590,7 +604,7 @@ impl SpiHeapTupleData {
 
     /// Set a datum value for the specified field name
     ///
-    /// If the specified name does not exist a `Err(SpiError::Noattribute)` is returned
+    /// If the specified name does not exist a `Err(SpiError::NoAttribute)` is returned
     pub fn set_by_name<T: IntoDatum + FromDatum>(
         &mut self,
         name: &str,
@@ -600,7 +614,7 @@ impl SpiHeapTupleData {
         unsafe {
             let fnumber = pg_sys::SPI_fnumber(self.tupdesc, name.as_pg_cstr());
             if fnumber == pg_sys::SPI_ERROR_NOATTRIBUTE {
-                Err(SpiError::Noattribute)
+                Err(SpiError::NoAttribute)
             } else {
                 self.set_by_ordinal(fnumber as usize, datum)
             }
@@ -610,17 +624,14 @@ impl SpiHeapTupleData {
 
 impl<Datum: IntoDatum + FromDatum> From<Datum> for SpiHeapTupleDataEntry {
     fn from(datum: Datum) -> Self {
-        SpiHeapTupleDataEntry {
-            datum: datum.into_datum(),
-            type_oid: Datum::type_oid(),
-        }
+        SpiHeapTupleDataEntry { datum: datum.into_datum(), type_oid: Datum::type_oid() }
     }
 }
 
 impl SpiHeapTupleDataEntry {
     pub fn value<T: FromDatum>(&self) -> Option<T> {
         match self.datum.as_ref() {
-            Some(datum) => unsafe { T::from_datum(*datum, false, self.type_oid) },
+            Some(datum) => unsafe { T::from_polymorphic_datum(*datum, false, self.type_oid) },
             None => None,
         }
     }

@@ -7,7 +7,8 @@ All rights reserved.
 Use of this source code is governed by the MIT license that can be found in the LICENSE file.
 */
 
-use pgx::*;
+use pgx::prelude::*;
+use pgx::PgList;
 
 // if our Postgres ERROR and Rust panic!() handling is incorrect, this little bit of useless code
 // will crash postgres.  If things are correct it'll simply raise an ERROR saying "panic in walker".
@@ -36,7 +37,8 @@ mod tests {
     #[allow(unused_imports)]
     use crate as pgx_tests;
 
-    use pgx::*;
+    use pgx::pg_try;
+    use pgx::prelude::*;
 
     #[pg_test(error = "panic in walker")]
     fn test_panic_in_extern_c_fn() {
