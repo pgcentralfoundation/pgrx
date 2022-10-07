@@ -11,7 +11,7 @@ use walkdir::{DirEntry, WalkDir};
 #[derive(Parser, Debug)]
 #[clap(author, version, about, long_about = None)]
 struct Args {
-    /// Addional Cargo.toml file to include for processing that can't be detected automatically
+    /// Additional Cargo.toml file to include for processing that can't be detected automatically
     ///
     /// Add multiple values using --include /path/foo/Cargo.toml --include /path/bar/Cargo.toml
     #[clap(short, long)]
@@ -143,7 +143,7 @@ fn main() {
         );
     }
 
-    // Loop through every TOML file (automatically discovered and manaully included
+    // Loop through every TOML file (automatically discovered and manually included
     // via command line params) and update package versions and dependency
     // versions where applicable
     for filepath in files_to_process_set {
