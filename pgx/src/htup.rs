@@ -119,7 +119,7 @@ pub fn heap_getattr<
     if is_null {
         None
     } else {
-        unsafe { T::from_datum(datum, false, typoid.value()) }
+        unsafe { T::from_polymorphic_datum(datum, false, typoid.value()) }
     }
 }
 
@@ -166,7 +166,7 @@ pub struct DatumWithTypeInfo {
 impl DatumWithTypeInfo {
     #[inline]
     pub fn into_value<T: FromDatum>(self) -> T {
-        unsafe { T::from_datum(self.datum, self.is_null, self.typoid.value()).unwrap() }
+        unsafe { T::from_polymorphic_datum(self.datum, self.is_null, self.typoid.value()).unwrap() }
     }
 }
 

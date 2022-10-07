@@ -29,7 +29,7 @@ impl AnyArray {
 
     #[inline]
     pub fn into<T: FromDatum>(&self) -> Option<T> {
-        unsafe { T::from_datum(self.datum(), false, self.oid()) }
+        unsafe { T::from_polymorphic_datum(self.datum(), false, self.oid()) }
     }
 }
 
@@ -38,11 +38,11 @@ impl FromDatum for AnyArray {
 
     #[inline]
     unsafe fn from_datum(
-        datum: pg_sys::Datum,
-        is_null: bool,
-        typoid: pg_sys::Oid,
+        _datum: pg_sys::Datum,
+        _is_null: bool,
     ) -> Option<AnyArray> {
-        FromDatum::from_polymorphic_datum(datum, is_null, typoid)
+        debug_assert!(false, "Can't create a polymorphic type using from_datum, call FromDatum::from_polymorphic_datum instead");
+        None
     }
 
     #[inline]

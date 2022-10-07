@@ -318,7 +318,7 @@ impl<'a, T: FromDatum> Array<'a, T> {
             None
         } else {
             Some(unsafe {
-                T::from_datum(
+                T::from_polymorphic_datum(
                     self.elem_slice[i],
                     self.null_slice.get(i)?,
                     self.raw.as_ref().map(|r| r.oid()).unwrap_or_default(),
@@ -502,18 +502,18 @@ impl<'a, T: FromDatum> Iterator for ArrayIntoIterator<'a, T> {
 
 impl<'a, T: FromDatum> FromDatum for VariadicArray<'a, T> {
     #[inline]
-    unsafe fn from_datum(
+    unsafe fn from_polymorphic_datum(
         datum: pg_sys::Datum,
         is_null: bool,
         oid: pg_sys::Oid,
     ) -> Option<VariadicArray<'a, T>> {
-        Array::from_datum(datum, is_null, oid).map(Self)
+        Array::from_polymorphic_datum(datum, is_null, oid).map(Self)
     }
 }
 
 impl<'a, T: FromDatum> FromDatum for Array<'a, T> {
     #[inline]
-    unsafe fn from_datum(
+    unsafe fn from_polymorphic_datum(
         datum: pg_sys::Datum,
         is_null: bool,
         _typoid: u32,
@@ -536,7 +536,7 @@ impl<'a, T: FromDatum> FromDatum for Array<'a, T> {
 
 impl<T: FromDatum> FromDatum for Vec<T> {
     #[inline]
-    unsafe fn from_datum(
+    unsafe fn from_polymorphic_datum(
         datum: pg_sys::Datum,
         is_null: bool,
         typoid: pg_sys::Oid,
@@ -544,7 +544,7 @@ impl<T: FromDatum> FromDatum for Vec<T> {
         if is_null {
             None
         } else {
-            let array = Array::<T>::from_datum(datum, is_null, typoid).unwrap();
+            let array = Array::<T>::from_polymorphic_datum(datum, is_null, typoid).unwrap();
             let mut v = Vec::with_capacity(array.len());
 
             for element in array.iter() {
@@ -557,7 +557,7 @@ impl<T: FromDatum> FromDatum for Vec<T> {
 
 impl<T: FromDatum> FromDatum for Vec<Option<T>> {
     #[inline]
-    unsafe fn from_datum(
+    unsafe fn from_polymorphic_datum(
         datum: pg_sys::Datum,
         is_null: bool,
         typoid: pg_sys::Oid,
@@ -565,7 +565,7 @@ impl<T: FromDatum> FromDatum for Vec<Option<T>> {
         if is_null || datum.is_null() {
             None
         } else {
-            let array = Array::<T>::from_datum(datum, is_null, typoid).unwrap();
+            let array = Array::<T>::from_polymorphic_datum(datum, is_null, typoid).unwrap();
             let mut v = Vec::with_capacity(array.len());
 
             for element in array.iter() {

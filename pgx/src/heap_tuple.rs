@@ -40,7 +40,7 @@ pub struct PgHeapTuple<'a, AllocatedBy: WhoAllocated<pg_sys::HeapTupleData>> {
 }
 
 impl<'a> FromDatum for PgHeapTuple<'a, AllocatedByRust> {
-    unsafe fn from_datum(
+    unsafe fn from_polymorphic_datum(
         composite: pg_sys::Datum,
         is_null: bool,
         _oid: pg_sys::Oid,
