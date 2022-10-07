@@ -34,6 +34,10 @@ struct Args {
     /// Output diff between existing file and changes to be made
     #[clap(short, long)]
     show_diff: bool,
+
+    /// Be verbose in output
+    #[clap(short, long)]
+    verbose: bool,
 }
 
 // List of directories to ignore while Walkdir'ing. Add more here as necessary.
@@ -97,8 +101,11 @@ fn main() {
                 }
             }
 
+            if args.verbose {
+                println!("{output}");
+            }
+
             files_to_process.insert(filepath.clone());
-            println!("{output}");
         }
     }
 
@@ -129,7 +136,10 @@ fn main() {
             }
         }
 
-        println!("{output}");
+        if args.verbose {
+            println!("{output}");
+        }
+
         files_to_process.insert(filepath.clone());
     }
 
