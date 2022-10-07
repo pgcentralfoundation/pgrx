@@ -1507,11 +1507,10 @@ dependencies = [
 
 [[package]]
 name = "pgx-version-updater"
-version = "0.0.0"
+version = "0.1.0"
 dependencies = [
  "clap",
  "owo-colors",
- "regex",
  "toml_edit",
  "walkdir",
 ]
