@@ -184,8 +184,9 @@ fn main() {
             )
         } else {
             // Bump package version if we can
-            if let Some(version) = doc.get_mut("package").and_then(|p| p.get_mut("version")) {
-                *version = value(args.update_version.clone());
+            if let Some(package_version) = doc.get_mut("package").and_then(|p| p.get_mut("version"))
+            {
+                *package_version = value(args.update_version.clone());
             }
         }
 
