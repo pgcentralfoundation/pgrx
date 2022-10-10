@@ -6,7 +6,7 @@ use std::io::{BufRead, Write};
 use std::path::Path;
 use std::process::{Command, Stdio};
 use std::{env, path::PathBuf};
-use toml_edit::{value, Document, Table};
+use toml_edit::{value, Document};
 use walkdir::{DirEntry, WalkDir};
 
 #[derive(Parser, Debug)]
@@ -192,53 +192,57 @@ fn main() {
 
         // Process dependencies in each file. Generally dependencies can be found in
         // [dependencies], [dependencies.foo], [build-dependencies], [dev-dependencies]
-        for updatable_table in vec!["dependencies", "build-dependencies", "dev-dependencies"] {
-            if doc.contains_table(updatable_table) {
-                let deps_table: &mut Table =
-                    doc.get_mut(updatable_table).unwrap().as_table_mut().unwrap();
-
-                // Attempt to find auto-extracted package names in the various dependency
-                // declarations
+        for updatable_table_name in vec!["dependencies", "build-dependencies", "dev-dependencies"] {
+            if let Some(updatable_table) =
+                doc.get_mut(updatable_table_name).and_then(|i| i.as_table_mut())
+            {
                 for package in &updatable_package_names {
-                    if deps_table.contains_key(package) {
-                        let dep_item = deps_table.get_mut(package).unwrap();
-
-                        if dep_item.is_table() {
-                            // Tables can contain other tables, and if that's the case we're
-                            // probably at a case of:
-                            //   [dependencies.pgx]
-                            //   version = "1.2.3"
-                            let old_version = dep_item.get("version").unwrap();
-                            let new_version = parse_new_version(
-                                old_version.as_str().unwrap(),
-                                &args.update_version.as_str(),
-                            );
-                            dep_item["version"] = value(new_version);
-                        } else if dep_item.is_inline_table() {
-                            // Inline table covers the case of:
-                            //   [dependencies]
-                            //   pgx = { version = "1.2.3", features = ["..."] }
-                            let inline_table = dep_item.as_inline_table().unwrap();
-
-                            if inline_table.contains_key("version") {
-                                let old_version = inline_table.get("version").unwrap();
-                                let new_version = parse_new_version(
-                                    old_version.as_str().unwrap(),
+                    match updatable_table.get_mut(package) {
+                        // Tables can contain other tables, and if that's the case we're
+                        // probably at a case of:
+                        //   [dependencies.pgx]
+                        //   version = "1.2.3"
+                        Some(item) if item.is_table() => {
+                            if let Some(current_version) =
+                                item.get("version").and_then(|a| a.as_str())
+                            {
+                                item["version"] = value(parse_new_version(
+                                    current_version,
                                     &args.update_version.as_str(),
-                                );
-                                deps_table[package]["version"] = value(new_version);
+                                ))
                             }
-                        } else {
-                            // Otherwise we are a string, such as:
-                            //   [dependencies]
-                            //   pgx = "0.1.2"
-                            let new_version = parse_new_version(
-                                dep_item.as_str().unwrap(),
-                                &args.update_version.as_str(),
-                            );
-
-                            deps_table[package] = value(new_version);
                         }
+
+                        // Inline table covers the case of:
+                        //   [dependencies]
+                        //   pgx = { version = "1.2.3", features = ["..."] }
+                        Some(item) if item.is_inline_table() => {
+                            if let Some(current_version) = item
+                                .as_inline_table()
+                                .and_then(|i| i.get("version"))
+                                .and_then(|v| v.as_str())
+                            {
+                                updatable_table[package]["version"] = value(parse_new_version(
+                                    current_version,
+                                    &args.update_version.as_str(),
+                                ))
+                            }
+                        }
+
+                        // Otherwise we are a string, such as:
+                        //   [dependencies]
+                        //   pgx = "0.1.2"
+                        Some(item) => {
+                            if let Some(current_version) = item.as_str() {
+                                updatable_table[package] = value(parse_new_version(
+                                    current_version,
+                                    &args.update_version.as_str(),
+                                ))
+                            }
+                        }
+
+                        // Don't care!
+                        None => {}
                     }
                 }
             }
