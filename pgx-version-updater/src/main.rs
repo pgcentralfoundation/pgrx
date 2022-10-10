@@ -391,25 +391,4 @@ fn extract_package_name<P: AsRef<Path>>(filepath: P) -> Option<String> {
     } else {
         None
     }
-
-    // let table = doc.get("package").and_then(|i| i.as_table()).unwrap();
-
-    // if doc.contains_key("package") {
-    //     let package_table = doc.get("package").unwrap().as_table().unwrap();
-
-    //     if package_table.contains_key("name") {
-    //         let package_name = package_table
-    //             .get("name")
-    //             .unwrap()
-    //             .as_str()
-    //             .unwrap()
-    //             .to_string();
-
-    //         Some(package_name)
-    //     } else {
-    //         None
-    //     }
-    // } else {
-    //     None
-    // }
 }
