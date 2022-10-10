@@ -361,7 +361,13 @@ fn parse_new_version(current_version_specifier: &str, new_version: &str) -> Stri
     let mut result = String::new();
 
     match current_version_specifier.chars().nth(0) {
+        // If first character is numeric, then we have just a version specified,
+        // such as "0.5.2" or "4.15.0"
         Some(c) if c.is_numeric() => result.push_str(current_version_specifier),
+
+        // Otherwise, we have a specifier such as "=0.5.2" or "~0.4.6" or ">= 1.2.0"
+        // Extract out the non-numeric prefix and join it with the new version to
+        // be used. e.g. "=0.5.2" to new version "0.5.4" would result in "=0.5.4"
         Some(_) => {
             if let Some(version_pos) = current_version_specifier.find(|c: char| c.is_numeric()) {
                 result.push_str(&current_version_specifier[..version_pos]);
