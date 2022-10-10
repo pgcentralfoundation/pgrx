@@ -302,15 +302,14 @@ fn main() {
 
 // Always return full path
 fn fullpath<P: AsRef<Path>>(test_path: P) -> Result<PathBuf, std::io::Error> {
-    let path_ref = test_path.as_ref();
-
-    if path_ref.is_absolute() {
-        Ok(PathBuf::from(path_ref))
-    } else {
-        let mut current_dir = env::current_dir()?;
-        current_dir.push(path_ref);
-        current_dir.canonicalize()?;
-        Ok(current_dir)
+    match test_path.as_ref() {
+        path if path.is_absolute() => Ok(PathBuf::from(path)),
+        path => {
+            let mut current_dir = env::current_dir()?;
+            current_dir.push(path);
+            current_dir.canonicalize()?;
+            Ok(current_dir)
+        }
     }
 }
 
