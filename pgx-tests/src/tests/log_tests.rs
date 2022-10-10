@@ -13,12 +13,11 @@ mod tests {
     #[allow(unused_imports)]
     use crate as pgx_tests;
 
+    use pgx::log::{PgLogLevel, PgSqlErrorCode};
+    use pgx::prelude::*;
     use pgx::{
         check_for_interrupts, debug1, debug2, debug3, debug4, debug5, ereport, error, info, log,
-        log::{PgLogLevel, PgSqlErrorCode},
-        notice,
-        prelude::*,
-        warning,
+        notice, warning,
     };
 
     #[pg_test]

@@ -84,9 +84,7 @@ mod tests {
             "test",
             // we don't need to qualify "MyType" because whatever schema it was created in
             // is applied to the "search_path" of this test function
-            Spi::get_one::<MyType>("SELECT '\"test\"'::MyType")
-                .expect("SPI reault was NULL")
-                .0
+            Spi::get_one::<MyType>("SELECT '\"test\"'::MyType").expect("SPI reault was NULL").0
         );
     }
 

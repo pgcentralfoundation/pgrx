@@ -25,11 +25,10 @@ pub use options::{FinalizeModify, ParallelOption};
 use convert_case::{Case, Casing};
 use proc_macro2::{Ident, Span, TokenStream as TokenStream2};
 use quote::{quote, ToTokens, TokenStreamExt};
+use syn::parse::{Parse, ParseStream};
+use syn::spanned::Spanned;
 use syn::{
-    parse::{Parse, ParseStream},
-    parse_quote,
-    spanned::Spanned,
-    Expr, ImplItemConst, ImplItemMethod, ImplItemType, ItemFn, ItemImpl, Path, Type,
+    parse_quote, Expr, ImplItemConst, ImplItemMethod, ImplItemType, ItemFn, ItemImpl, Path, Type,
 };
 
 use crate::sql_entity_graph::ToSqlConfig;
@@ -110,10 +109,8 @@ impl PgAggregate {
         let target_path = get_target_path(&item_impl)?;
         let target_ident = get_target_ident(&target_path)?;
 
-        let snake_case_target_ident = Ident::new(
-            &target_ident.to_string().to_case(Case::Snake),
-            target_ident.span(),
-        );
+        let snake_case_target_ident =
+            Ident::new(&target_ident.to_string().to_case(Case::Snake), target_ident.span());
         crate::ident_is_acceptable_to_postgres(&snake_case_target_ident)?;
 
         let mut pg_externs = Vec::default();
@@ -191,53 +188,47 @@ impl PgAggregate {
 
         // `OrderBy` is an optional value, we default to nothing.
         let type_ordered_set_args = get_impl_type_by_name(&item_impl_snapshot, "OrderedSetArgs");
-        let type_ordered_set_args_value = type_ordered_set_args
-            .map(|v| AggregateTypeList::new(v.ty.clone()))
-            .transpose()?;
+        let type_ordered_set_args_value =
+            type_ordered_set_args.map(|v| AggregateTypeList::new(v.ty.clone())).transpose()?;
         if type_ordered_set_args.is_none() {
             item_impl.items.push(parse_quote! {
                 type OrderedSetArgs = ();
             })
         }
-        let (direct_args_with_names, direct_arg_names) =
-            if let Some(ref order_by_direct_args) = type_ordered_set_args_value {
-                let direct_args = order_by_direct_args
-                    .found
-                    .iter()
-                    .map(|x| {
-                        (
-                            x.name.clone(),
-                            x.used_ty.resolved_ty.clone(),
-                            x.used_ty.original_ty.clone(),
-                        )
-                    })
-                    .collect::<Vec<_>>();
-                let direct_arg_names = ARG_NAMES[0..direct_args.len()]
-                    .iter()
-                    .zip(direct_args.iter())
-                    .map(|(default_name, (custom_name, _ty, _orig))| {
-                        Ident::new(
-                            &custom_name
-                                .clone()
-                                .unwrap_or_else(|| default_name.to_string()),
-                            Span::mixed_site(),
-                        )
-                    })
-                    .collect::<Vec<_>>();
-                let direct_args_with_names = direct_args
-                    .iter()
-                    .zip(direct_arg_names.iter())
-                    .map(|(arg, name)| {
-                        let arg_ty = &arg.2; // original_type
-                        parse_quote! {
-                            #name: #arg_ty
-                        }
-                    })
-                    .collect::<Vec<syn::FnArg>>();
-                (direct_args_with_names, direct_arg_names)
-            } else {
-                (Vec::default(), Vec::default())
-            };
+        let (direct_args_with_names, direct_arg_names) = if let Some(ref order_by_direct_args) =
+            type_ordered_set_args_value
+        {
+            let direct_args = order_by_direct_args
+                .found
+                .iter()
+                .map(|x| {
+                    (x.name.clone(), x.used_ty.resolved_ty.clone(), x.used_ty.original_ty.clone())
+                })
+                .collect::<Vec<_>>();
+            let direct_arg_names = ARG_NAMES[0..direct_args.len()]
+                .iter()
+                .zip(direct_args.iter())
+                .map(|(default_name, (custom_name, _ty, _orig))| {
+                    Ident::new(
+                        &custom_name.clone().unwrap_or_else(|| default_name.to_string()),
+                        Span::mixed_site(),
+                    )
+                })
+                .collect::<Vec<_>>();
+            let direct_args_with_names = direct_args
+                .iter()
+                .zip(direct_arg_names.iter())
+                .map(|(arg, name)| {
+                    let arg_ty = &arg.2; // original_type
+                    parse_quote! {
+                        #name: #arg_ty
+                    }
+                })
+                .collect::<Vec<syn::FnArg>>();
+            (direct_args_with_names, direct_arg_names)
+        } else {
+            (Vec::default(), Vec::default())
+        };
 
         // `Args` is an optional value, we default to nothing.
         let type_args = get_impl_type_by_name(&item_impl_snapshot, "Args").ok_or_else(|| {
@@ -257,9 +248,7 @@ impl PgAggregate {
             .zip(args.iter())
             .map(|(default_name, (custom_name, ty))| {
                 Ident::new(
-                    &custom_name
-                        .clone()
-                        .unwrap_or_else(|| default_name.to_string()),
+                    &custom_name.clone().unwrap_or_else(|| default_name.to_string()),
                     ty.span(),
                 )
             })
@@ -289,10 +278,8 @@ impl PgAggregate {
         let fn_state = get_impl_func_by_name(&item_impl_snapshot, "state");
 
         let fn_state_name = if let Some(found) = fn_state {
-            let fn_name = Ident::new(
-                &format!("{}_state", snake_case_target_ident),
-                found.sig.ident.span(),
-            );
+            let fn_name =
+                Ident::new(&format!("{}_state", snake_case_target_ident), found.sig.ident.span());
             let pg_extern_attr = pg_extern_attr(found);
 
             pg_externs.push(parse_quote! {
@@ -315,10 +302,8 @@ impl PgAggregate {
 
         let fn_combine = get_impl_func_by_name(&item_impl_snapshot, "combine");
         let fn_combine_name = if let Some(found) = fn_combine {
-            let fn_name = Ident::new(
-                &format!("{}_combine", snake_case_target_ident),
-                found.sig.ident.span(),
-            );
+            let fn_name =
+                Ident::new(&format!("{}_combine", snake_case_target_ident), found.sig.ident.span());
             let pg_extern_attr = pg_extern_attr(found);
             pg_externs.push(parse_quote! {
                 #[allow(non_snake_case, clippy::too_many_arguments)]
@@ -383,10 +368,8 @@ impl PgAggregate {
 
         let fn_serial = get_impl_func_by_name(&item_impl_snapshot, "serial");
         let fn_serial_name = if let Some(found) = fn_serial {
-            let fn_name = Ident::new(
-                &format!("{}_serial", snake_case_target_ident),
-                found.sig.ident.span(),
-            );
+            let fn_name =
+                Ident::new(&format!("{}_serial", snake_case_target_ident), found.sig.ident.span());
             let pg_extern_attr = pg_extern_attr(found);
             pg_externs.push(parse_quote! {
                 #[allow(non_snake_case, clippy::too_many_arguments)]
@@ -514,11 +497,8 @@ impl PgAggregate {
                 found.sig.ident.span(),
             );
             let pg_extern_attr = pg_extern_attr(found);
-            let maybe_comma: Option<syn::Token![,]> = if direct_args_with_names.len() > 0 {
-                Some(parse_quote! {,})
-            } else {
-                None
-            };
+            let maybe_comma: Option<syn::Token![,]> =
+                if direct_args_with_names.len() > 0 { Some(parse_quote! {,}) } else { None };
 
             pg_externs.push(parse_quote! {
                 #[allow(non_snake_case, clippy::too_many_arguments)]
@@ -602,10 +582,8 @@ impl PgAggregate {
             .expect("Expected constructed PgAggregate to have target path.");
         let target_ident = get_target_ident(&target_path)
             .expect("Expected constructed PgAggregate to have target ident.");
-        let snake_case_target_ident = Ident::new(
-            &target_ident.to_string().to_case(Case::Snake),
-            target_ident.span(),
-        );
+        let snake_case_target_ident =
+            Ident::new(&target_ident.to_string().to_case(Case::Snake), target_ident.span());
         let sql_graph_entity_fn_name = syn::Ident::new(
             &format!("__pgx_internals_aggregate_{}", snake_case_target_ident),
             target_ident.span(),

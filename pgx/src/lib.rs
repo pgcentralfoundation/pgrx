@@ -104,8 +104,7 @@ pub use pgx_pg_sys as pg_sys; // the module only, not its contents
 pub use pgx_pg_sys::submodules::*;
 pub use pgx_pg_sys::PgBuiltInOids; // reexport this so it looks like it comes from here
 
-pub use cstr_core;
-pub use pgx_utils as utils;
+pub use {cstr_core, pgx_utils as utils};
 
 use once_cell::sync::Lazy;
 use std::collections::HashSet;
@@ -132,10 +131,7 @@ macro_rules! map_source_only {
 
         let ty = stringify!(Vec<$rust>).to_string().replace(" ", "");
         assert_eq!(
-            $map.insert(RustSourceOnlySqlMapping::new(
-                ty.clone(),
-                format!("{}[]", $sql),
-            )),
+            $map.insert(RustSourceOnlySqlMapping::new(ty.clone(), format!("{}[]", $sql),)),
             true,
             "Cannot map {} twice",
             ty
@@ -143,10 +139,7 @@ macro_rules! map_source_only {
 
         let ty = stringify!(Array<$rust>).to_string().replace(" ", "");
         assert_eq!(
-            $map.insert(RustSourceOnlySqlMapping::new(
-                ty.clone(),
-                format!("{}[]", $sql),
-            )),
+            $map.insert(RustSourceOnlySqlMapping::new(ty.clone(), format!("{}[]", $sql),)),
             true,
             "Cannot map {} twice",
             ty

@@ -33,10 +33,9 @@ impl PgExternArgument {
     pub fn build(fn_arg: FnArg) -> Result<Self, syn::Error> {
         match &fn_arg {
             syn::FnArg::Typed(pat) => Self::build_from_pat_type(fn_arg.clone(), pat.clone()),
-            syn::FnArg::Receiver(_) => Err(syn::Error::new(
-                Span::call_site(),
-                "Unable to parse FnArg that is Self",
-            )),
+            syn::FnArg::Receiver(_) => {
+                Err(syn::Error::new(Span::call_site(), "Unable to parse FnArg that is Self"))
+            }
         }
     }
 
@@ -55,11 +54,7 @@ impl PgExternArgument {
 
         let used_ty = UsedType::new(*value.ty)?;
 
-        Ok(PgExternArgument {
-            fn_arg,
-            pat: identifier,
-            used_ty,
-        })
+        Ok(PgExternArgument { fn_arg, pat: identifier, used_ty })
     }
 
     pub fn entity_tokens(&self) -> TokenStream2 {

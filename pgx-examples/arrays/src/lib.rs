@@ -7,17 +7,15 @@ All rights reserved.
 Use of this source code is governed by the MIT license that can be found in the LICENSE file.
 */
 
-use pgx::{prelude::*, Array};
+use pgx::prelude::*;
+use pgx::Array;
 use serde::*;
 
 pgx::pg_module_magic!();
 
 #[pg_extern]
 fn sq_euclid_pgx(a: Array<f32>, b: Array<f32>) -> f32 {
-    a.iter_deny_null()
-        .zip(b.iter_deny_null())
-        .map(|(a, b)| (a - b) * (a - b))
-        .sum()
+    a.iter_deny_null().zip(b.iter_deny_null()).map(|(a, b)| (a - b) * (a - b)).sum()
 }
 
 #[pg_extern(immutable, parallel_safe)]
@@ -90,11 +88,7 @@ fn i32_array_with_nulls() -> Vec<Option<i32>> {
 
 #[pg_extern]
 fn strip_nulls(input: Vec<Option<i32>>) -> Vec<i32> {
-    input
-        .into_iter()
-        .filter(|i| i.is_some())
-        .map(|i| i.unwrap())
-        .collect()
+    input.into_iter().filter(|i| i.is_some()).map(|i| i.unwrap()).collect()
 }
 
 #[derive(PostgresType, Serialize, Deserialize, Debug, Eq, PartialEq)]

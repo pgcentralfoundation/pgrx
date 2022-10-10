@@ -27,6 +27,7 @@ members = [
     "pgx-examples/strings",
     "pgx-examples/triggers",
     "pgx-examples/versioned_so",
+    "pgx-examples/spi_srf",
 ]
 
 [profile.dev.build-override]

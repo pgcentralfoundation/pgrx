@@ -7,19 +7,15 @@ All rights reserved.
 Use of this source code is governed by the MIT license that can be found in the LICENSE file.
 */
 
-use crate::{
-    command::get::{find_control_file, get_property},
-    CommandExecute,
-};
+use crate::command::get::{find_control_file, get_property};
+use crate::CommandExecute;
 use cargo_toml::Manifest;
 use eyre::{eyre, WrapErr};
 use owo_colors::OwoColorize;
 use pgx_pg_config::{get_target_dir, PgConfig};
-use std::{
-    io::BufReader,
-    path::{Path, PathBuf},
-    process::{Command, Stdio},
-};
+use std::io::BufReader;
+use std::path::{Path, PathBuf};
+use std::process::{Command, Stdio};
 
 /// Install the extension from the current crate to the Postgres specified by whatever `pg_config` is currently on your $PATH
 #[derive(clap::Args, Debug)]
@@ -98,10 +94,8 @@ pub(crate) fn install_extension(
     features: &clap_cargo::Features,
 ) -> eyre::Result<()> {
     let base_directory = base_directory.unwrap_or("/".into());
-    tracing::Span::current().record(
-        "base_directory",
-        &tracing::field::display(&base_directory.display()),
-    );
+    tracing::Span::current()
+        .record("base_directory", &tracing::field::display(&base_directory.display()));
 
     let manifest = Manifest::from_path(&package_manifest_path)?;
     let (control_file, extname) = find_control_file(&package_manifest_path)?;
@@ -115,12 +109,8 @@ pub(crate) fn install_extension(
 
     let versioned_so = get_property(&package_manifest_path, "module_pathname")?.is_none();
 
-    let build_command_output = build_extension(
-        user_manifest_path.as_ref(),
-        user_package,
-        is_release,
-        &features,
-    )?;
+    let build_command_output =
+        build_extension(user_manifest_path.as_ref(), user_package, is_release, &features)?;
     let build_command_bytes = build_command_output.stdout;
     let build_command_reader = BufReader::new(build_command_bytes.as_slice());
     let build_command_stream = cargo_metadata::Message::parse_stream(build_command_reader);
@@ -140,13 +130,7 @@ pub(crate) fn install_extension(
                 .file_name()
                 .ok_or_else(|| eyre!("Could not get filename for `{}`", control_file.display()))?,
         );
-        copy_file(
-            &control_file,
-            &dest,
-            "control file",
-            true,
-            &package_manifest_path,
-        )?;
+        copy_file(&control_file, &dest, "control file", true, &package_manifest_path)?;
     }
 
     {
@@ -171,13 +155,7 @@ pub(crate) fn install_extension(
                 })?;
             }
         }
-        copy_file(
-            &shlibpath,
-            &dest,
-            "shared library",
-            false,
-            &package_manifest_path,
-        )?;
+        copy_file(&shlibpath, &dest, "shared library", false, &package_manifest_path)?;
     }
 
     copy_sql_files(
@@ -206,19 +184,11 @@ fn copy_file(
 ) -> eyre::Result<()> {
     if !dest.parent().unwrap().exists() {
         std::fs::create_dir_all(dest.parent().unwrap()).wrap_err_with(|| {
-            format!(
-                "failed to create destination directory {}",
-                dest.parent().unwrap().display()
-            )
+            format!("failed to create destination directory {}", dest.parent().unwrap().display())
         })?;
     }
 
-    println!(
-        "{} {} to {}",
-        "     Copying".bold().green(),
-        msg,
-        format_display_path(&dest)?.cyan()
-    );
+    println!("{} {} to {}", "     Copying".bold().green(), msg, format_display_path(&dest)?.cyan());
 
     if do_filter {
         // we want to filter the contents of the file we're to copy
@@ -285,19 +255,10 @@ pub(crate) fn build_extension(
 
     let command = command.stderr(Stdio::inherit());
     let command_str = format!("{:?}", command);
-    println!(
-        "{} extension with features {}",
-        "    Building".bold().green(),
-        features_arg.cyan()
-    );
-    println!(
-        "{} command {}",
-        "     Running".bold().green(),
-        command_str.cyan()
-    );
-    let cargo_output = command
-        .output()
-        .wrap_err_with(|| format!("failed to spawn cargo: {}", command_str))?;
+    println!("{} extension with features {}", "    Building".bold().green(), features_arg.cyan());
+    println!("{} command {}", "     Running".bold().green(), command_str.cyan());
+    let cargo_output =
+        command.output().wrap_err_with(|| format!("failed to spawn cargo: {}", command_str))?;
     if !cargo_output.status.success() {
         // We explicitly do not want to return a spantraced error here.
         std::process::exit(1)
@@ -394,11 +355,7 @@ pub(crate) fn find_library_file(
                     continue;
                 }
                 for filename in &artifact.filenames {
-                    let so_extension = if cfg!(target_os = "macos") {
-                        "dylib"
-                    } else {
-                        "so"
-                    };
+                    let so_extension = if cfg!(target_os = "macos") { "dylib" } else { "so" };
                     if filename.extension() == Some(so_extension) {
                         library_file = Some(filename.to_string());
                         break;

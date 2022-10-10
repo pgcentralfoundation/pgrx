@@ -26,9 +26,7 @@ mod rss {
 
             let http_client = if let Some((host, port)) = for_url_str(VERSIONS_RSS_URL).host_port()
             {
-                AgentBuilder::new()
-                    .proxy(Proxy::new(format!("https://{host}:{port}"))?)
-                    .build()
+                AgentBuilder::new().proxy(Proxy::new(format!("https://{host}:{port}"))?).build()
             } else {
                 Agent::new()
             };
@@ -71,11 +69,7 @@ mod rss {
             println!(
                 "{} Postgres {}",
                 "  Discovered".white().bold(),
-                versions
-                    .iter()
-                    .map(|ver| format!("v{ver}"))
-                    .collect::<Vec<_>>()
-                    .join(", ")
+                versions.iter().map(|ver| format!("v{ver}")).collect::<Vec<_>>().join(", ")
             );
 
             Ok(versions)

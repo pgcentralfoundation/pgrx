@@ -16,8 +16,9 @@ to the `pgx` framework and very subject to change between versions. While you ma
 */
 use proc_macro2::TokenStream as TokenStream2;
 use quote::{quote, ToTokens, TokenStreamExt};
+use syn::parenthesized;
 use syn::parse::{Parse, ParseBuffer};
-use syn::{parenthesized, token::Paren};
+use syn::token::Paren;
 
 /// A parsed `#[pg_operator]` operator.
 ///

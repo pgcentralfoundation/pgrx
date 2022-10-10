@@ -6,7 +6,11 @@ All rights reserved.
 
 Use of this source code is governed by the MIT license that can be found in the LICENSE file.
 */
-use pgx::{atomics::*, lwlock::PgLwLock, pg_shmem_init, prelude::*, shmem::*, warning};
+use pgx::atomics::*;
+use pgx::lwlock::PgLwLock;
+use pgx::prelude::*;
+use pgx::shmem::*;
+use pgx::{pg_shmem_init, warning};
 use serde::*;
 use std::iter::Iterator;
 use std::sync::atomic::Ordering;
@@ -23,10 +27,7 @@ pub struct Pgtest {
 }
 impl Default for Pgtest {
     fn default() -> Self {
-        Pgtest {
-            value1: 0,
-            value2: 0,
-        }
+        Pgtest { value1: 0, value2: 0 }
     }
 }
 unsafe impl PGXSharedMemory for Pgtest {}
@@ -48,13 +49,7 @@ pub extern "C" fn _PG_init() {
 
 #[pg_extern]
 fn vec_select() -> SetOfIterator<'static, Pgtest> {
-    SetOfIterator::new(
-        VEC.share()
-            .iter()
-            .map(|i| *i)
-            .collect::<Vec<Pgtest>>()
-            .into_iter(),
-    )
+    SetOfIterator::new(VEC.share().iter().map(|i| *i).collect::<Vec<Pgtest>>().into_iter())
 }
 
 #[pg_extern]
@@ -72,9 +67,7 @@ fn vec_drain() -> SetOfIterator<'static, Pgtest> {
 
 #[pg_extern]
 fn vec_push(value: Pgtest) {
-    VEC.exclusive()
-        .push(value)
-        .unwrap_or_else(|_| warning!("Vector is full, discarding update"));
+    VEC.exclusive().push(value).unwrap_or_else(|_| warning!("Vector is full, discarding update"));
 }
 
 #[pg_extern]

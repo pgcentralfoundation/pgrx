@@ -22,10 +22,7 @@ fn example_generate_series(
 fn example_composite_set() -> TableIterator<'static, (name!(idx, i32), name!(value, &'static str))>
 {
     TableIterator::new(
-        vec!["a", "b", "c"]
-            .into_iter()
-            .enumerate()
-            .map(|(idx, value)| ((idx + 1) as i32, value)),
+        vec!["a", "b", "c"].into_iter().enumerate().map(|(idx, value)| ((idx + 1) as i32, value)),
     )
 }
 
@@ -33,10 +30,7 @@ fn example_composite_set() -> TableIterator<'static, (name!(idx, i32), name!(val
 fn return_some_iterator(
 ) -> Option<TableIterator<'static, (name!(idx, i32), name!(some_value, &'static str))>> {
     Some(TableIterator::new(
-        vec!["a", "b", "c"]
-            .into_iter()
-            .enumerate()
-            .map(|(idx, value)| ((idx + 1) as i32, value)),
+        vec!["a", "b", "c"].into_iter().enumerate().map(|(idx, value)| ((idx + 1) as i32, value)),
     ))
 }
 

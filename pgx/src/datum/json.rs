@@ -29,7 +29,11 @@ pub struct JsonString(pub String);
 /// for json
 impl FromDatum for Json {
     #[inline]
-    unsafe fn from_datum(datum: pg_sys::Datum, is_null: bool, _: pg_sys::Oid) -> Option<Json> {
+    unsafe fn from_polymorphic_datum(
+        datum: pg_sys::Datum,
+        is_null: bool,
+        _: pg_sys::Oid,
+    ) -> Option<Json> {
         if is_null {
             None
         } else {
@@ -45,7 +49,11 @@ impl FromDatum for Json {
 
 /// for jsonb
 impl FromDatum for JsonB {
-    unsafe fn from_datum(datum: pg_sys::Datum, is_null: bool, _: pg_sys::Oid) -> Option<JsonB> {
+    unsafe fn from_polymorphic_datum(
+        datum: pg_sys::Datum,
+        is_null: bool,
+        _: pg_sys::Oid,
+    ) -> Option<JsonB> {
         if is_null {
             None
         } else {
@@ -59,8 +67,7 @@ impl FromDatum for JsonB {
             .expect("failed to convert jsonb to a cstring");
 
             let value = serde_json::from_str(
-                cstr.to_str()
-                    .expect("text version of jsonb is not valid UTF8"),
+                cstr.to_str().expect("text version of jsonb is not valid UTF8"),
             )
             .expect("failed to parse JsonB value");
 
@@ -83,7 +90,7 @@ impl FromDatum for JsonB {
 /// This returns a **copy**, allocated and managed by Rust, of the underlying `varlena` Datum
 impl FromDatum for JsonString {
     #[inline]
-    unsafe fn from_datum(
+    unsafe fn from_polymorphic_datum(
         datum: pg_sys::Datum,
         is_null: bool,
         _: pg_sys::Oid,

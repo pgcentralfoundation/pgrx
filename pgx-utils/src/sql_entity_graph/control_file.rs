@@ -84,38 +84,29 @@ impl ControlFile {
                 })?
                 .to_string(),
             module_pathname: temp.get("module_pathname").map(|v| v.to_string()),
-            relocatable: temp
-                .get("relocatable")
-                .ok_or(ControlFileError::MissingField {
-                    field: "relocatable",
-                    context: SpanTrace::capture(),
-                })?
-                == &"true",
-            superuser: temp
-                .get("superuser")
-                .ok_or(ControlFileError::MissingField {
-                    field: "superuser",
-                    context: SpanTrace::capture(),
-                })?
-                == &"true",
+            relocatable: temp.get("relocatable").ok_or(ControlFileError::MissingField {
+                field: "relocatable",
+                context: SpanTrace::capture(),
+            })? == &"true",
+            superuser: temp.get("superuser").ok_or(ControlFileError::MissingField {
+                field: "superuser",
+                context: SpanTrace::capture(),
+            })? == &"true",
             schema: temp.get("schema").map(|v| v.to_string()),
         })
     }
 }
 
-impl Into<SqlGraphEntity> for ControlFile {
-    fn into(self) -> SqlGraphEntity {
-        SqlGraphEntity::ExtensionRoot(self)
+impl From<ControlFile> for SqlGraphEntity {
+    fn from(val: ControlFile) -> Self {
+        SqlGraphEntity::ExtensionRoot(val)
     }
 }
 
 /// An error met while parsing a `.control` file.
 #[derive(Debug, Clone)]
 pub enum ControlFileError {
-    MissingField {
-        field: &'static str,
-        context: SpanTrace,
-    },
+    MissingField { field: &'static str, context: SpanTrace },
 }
 
 impl std::fmt::Display for ControlFileError {

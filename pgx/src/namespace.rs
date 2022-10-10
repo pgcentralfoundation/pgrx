@@ -26,9 +26,7 @@ impl Default for PgQualifiedNameBuilder {
 
 impl PgQualifiedNameBuilder {
     pub fn new() -> PgQualifiedNameBuilder {
-        PgQualifiedNameBuilder {
-            list: PgList::<pg_sys::Value>::new(),
-        }
+        PgQualifiedNameBuilder { list: PgList::<pg_sys::Value>::new() }
     }
 
     pub fn push(mut self, value: &str) -> PgQualifiedNameBuilder {

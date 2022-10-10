@@ -41,12 +41,7 @@ pub struct PgxPanic {
 
 impl PgxPanic {
     pub fn new(message: &'static str, filename: &'static str, lineno: u32, colno: u32) -> Self {
-        PgxPanic {
-            message,
-            filename,
-            lineno,
-            colno,
-        }
+        PgxPanic { message, filename, lineno, colno }
     }
 }
 
@@ -63,11 +58,7 @@ fn take_panic_location() -> PanicLocation {
         Some(location) => location,
 
         // this case shouldn't happen
-        None => PanicLocation {
-            file: "<unknown>".to_string(),
-            line: 0,
-            col: 0,
-        },
+        None => PanicLocation { file: "<unknown>".to_string(), line: 0, col: 0 },
     })
 }
 
@@ -270,12 +261,7 @@ fn downcast_err(mut e: Box<dyn Any + Send>) -> Result<String, JumpContext> {
         // Cloning is overhead, this box is owned, and ownership is theft.
         Ok(mem::take(s))
     } else if let Some(s) = e.downcast_ref::<PgxPanic>() {
-        let PgxPanic {
-            message,
-            filename,
-            lineno,
-            colno,
-        } = s;
+        let PgxPanic { message, filename, lineno, colno } = s;
         Ok(format!("{message} at {filename}:{lineno}:{colno}"))
     } else {
         // not a type we understand, so use a generic string
