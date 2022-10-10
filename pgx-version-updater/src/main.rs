@@ -203,11 +203,11 @@ fn main() {
                         //   [dependencies.pgx]
                         //   version = "1.2.3"
                         Some(item) if item.is_table() => {
-                            if let Some(current_version) =
+                            if let Some(current_version_specifier) =
                                 item.get("version").and_then(|a| a.as_str())
                             {
                                 item["version"] = value(parse_new_version(
-                                    current_version,
+                                    current_version_specifier,
                                     &args.update_version.as_str(),
                                 ))
                             }
@@ -217,13 +217,13 @@ fn main() {
                         //   [dependencies]
                         //   pgx = { version = "1.2.3", features = ["..."] }
                         Some(item) if item.is_inline_table() => {
-                            if let Some(current_version) = item
+                            if let Some(current_version_specifier) = item
                                 .as_inline_table()
                                 .and_then(|i| i.get("version"))
                                 .and_then(|v| v.as_str())
                             {
                                 updatable_table[package]["version"] = value(parse_new_version(
-                                    current_version,
+                                    current_version_specifier,
                                     &args.update_version.as_str(),
                                 ))
                             }
@@ -233,9 +233,9 @@ fn main() {
                         //   [dependencies]
                         //   pgx = "0.1.2"
                         Some(item) => {
-                            if let Some(current_version) = item.as_str() {
+                            if let Some(current_version_specifier) = item.as_str() {
                                 updatable_table[package] = value(parse_new_version(
-                                    current_version,
+                                    current_version_specifier,
                                     &args.update_version.as_str(),
                                 ))
                             }
@@ -357,23 +357,23 @@ fn is_cargo_toml_file(entry: &DirEntry) -> bool {
 // It was necessary to keep the requirements specifications, such as "=" or "~".
 // The assumption here is that versions (sans requirement specifier) will always
 // start with a number.
-fn parse_new_version(old_version_specifier: &str, new_version: &str) -> String {
+fn parse_new_version(current_version_specifier: &str, new_version: &str) -> String {
     let mut result = String::new();
 
-    match old_version_specifier.chars().nth(0) {
-        Some(c) if c.is_numeric() => result.push_str(old_version_specifier),
+    match current_version_specifier.chars().nth(0) {
+        Some(c) if c.is_numeric() => result.push_str(current_version_specifier),
         Some(_) => {
-            if let Some(version_pos) = old_version_specifier.find(|c: char| c.is_numeric()) {
-                result.push_str(&old_version_specifier[..version_pos]);
+            if let Some(version_pos) = current_version_specifier.find(|c: char| c.is_numeric()) {
+                result.push_str(&current_version_specifier[..version_pos]);
                 result.push_str(&new_version.clone());
             } else {
                 panic!(
                     "Could not find an actual version in specifier: '{}'",
-                    old_version_specifier
+                    current_version_specifier
                 );
             }
         }
-        None => panic!("Version specifier '{}' is not valid!", old_version_specifier),
+        None => panic!("Version specifier '{}' is not valid!", current_version_specifier),
     }
 
     result
