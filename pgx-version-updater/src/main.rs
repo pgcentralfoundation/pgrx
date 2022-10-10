@@ -78,11 +78,7 @@ fn main() {
     {
         if is_cargo_toml_file(&entry) {
             let filepath = fullpath(entry.path()).expect(
-                format!(
-                    "Could not get full path for file {}",
-                    entry.path().display()
-                )
-                .as_str(),
+                format!("Could not get full path for file {}", entry.path().display()).as_str(),
             );
 
             let mut output = format!(
@@ -175,11 +171,8 @@ fn main() {
             .expect(format!("Unable to open file at {}", &filepath.display()).as_str());
 
         let mut doc = data.parse::<Document>().expect(
-            format!(
-                "File at location {} is an invalid Cargo.toml file",
-                &filepath.display()
-            )
-            .as_str(),
+            format!("File at location {} is an invalid Cargo.toml file", &filepath.display())
+                .as_str(),
         );
 
         if exclude_version_files.contains(&filepath) {
@@ -200,11 +193,8 @@ fn main() {
         // [dependencies], [dependencies.foo], [build-dependencies], [dev-dependencies]
         for updatable_table in vec!["dependencies", "build-dependencies", "dev-dependencies"] {
             if doc.contains_table(updatable_table) {
-                let deps_table: &mut Table = doc
-                    .get_mut(updatable_table)
-                    .unwrap()
-                    .as_table_mut()
-                    .unwrap();
+                let deps_table: &mut Table =
+                    doc.get_mut(updatable_table).unwrap().as_table_mut().unwrap();
 
                 // Attempt to find auto-extracted package names in the various dependency
                 // declarations
@@ -269,9 +259,7 @@ fn main() {
             let docstring = doc.to_string();
 
             std::thread::spawn(move || {
-                stdin
-                    .write_all(docstring.as_bytes())
-                    .expect("Failed to write to stdin");
+                stdin.write_all(docstring.as_bytes()).expect("Failed to write to stdin");
             });
 
             let child_output = child.wait_with_output().expect("Failed to read stdout");
@@ -330,15 +318,11 @@ fn fullpath<P: AsRef<Path>>(test_path: P) -> Result<PathBuf, std::io::Error> {
 // e.g. .git/ and target/ directories should never be traversed.
 fn is_not_excluded_dir(entry: &DirEntry) -> bool {
     let metadata = entry.metadata().expect(
-        format!(
-            "Could not get metadata for: {}",
-            entry.file_name().to_str().unwrap()
-        )
-        .as_str(),
+        format!("Could not get metadata for: {}", entry.file_name().to_string_lossy()).as_str(),
     );
 
     if metadata.is_dir() {
-        return !IGNORE_DIRS.contains(&entry.file_name().to_str().unwrap());
+        return !IGNORE_DIRS.contains(&entry.file_name().to_string_lossy().as_ref());
     }
 
     true
@@ -347,11 +331,7 @@ fn is_not_excluded_dir(entry: &DirEntry) -> bool {
 // Check if a specific DirEntry is named "Cargo.toml"
 fn is_cargo_toml_file(entry: &DirEntry) -> bool {
     let metadata = entry.metadata().expect(
-        format!(
-            "Could not get metadata for: {}",
-            entry.file_name().to_str().unwrap()
-        )
-        .as_str(),
+        format!("Could not get metadata for: {}", entry.file_name().to_string_lossy()).as_str(),
     );
 
     if metadata.is_file() {
@@ -376,15 +356,20 @@ fn is_cargo_toml_file(entry: &DirEntry) -> bool {
 fn parse_new_version(old_version_specifier: &str, new_version: &str) -> String {
     let mut result = String::new();
 
-    if old_version_specifier.chars().nth(0).unwrap().is_numeric() {
-        result.push_str(old_version_specifier);
-    } else {
-        let version_pos = old_version_specifier
-            .find(|c: char| c.is_numeric())
-            .unwrap();
-
-        result.push_str(&old_version_specifier[..version_pos]);
-        result.push_str(&new_version.clone());
+    match old_version_specifier.chars().nth(0) {
+        Some(c) if c.is_numeric() => result.push_str(old_version_specifier),
+        Some(_) => {
+            if let Some(version_pos) = old_version_specifier.find(|c: char| c.is_numeric()) {
+                result.push_str(&old_version_specifier[..version_pos]);
+                result.push_str(&new_version.clone());
+            } else {
+                panic!(
+                    "Could not find an actual version in specifier: '{}'",
+                    old_version_specifier
+                );
+            }
+        }
+        None => panic!("Version specifier '{}' is not valid!", old_version_specifier),
     }
 
     result
@@ -399,29 +384,33 @@ fn extract_package_name<P: AsRef<Path>>(filepath: P) -> Option<String> {
         .expect(format!("Unable to open file at {}", &filepath.display()).as_str());
 
     let doc = data.parse::<Document>().expect(
-        format!(
-            "File at location {} is an invalid Cargo.toml file",
-            &filepath.display()
-        )
-        .as_str(),
+        format!("File at location {} is an invalid Cargo.toml file", &filepath.display()).as_str(),
     );
 
-    if doc.contains_key("package") {
-        let package_table = doc.get("package").unwrap().as_table().unwrap();
-
-        if package_table.contains_key("name") {
-            let package_name = package_table
-                .get("name")
-                .unwrap()
-                .as_str()
-                .unwrap()
-                .to_string();
-
-            Some(package_name)
-        } else {
-            None
-        }
+    if let Some(table) = doc.get("package").and_then(|i| i.as_table()) {
+        table.get("name").and_then(|i| i.as_str().and_then(|i| Some(i.to_string())))
     } else {
         None
     }
+
+    // let table = doc.get("package").and_then(|i| i.as_table()).unwrap();
+
+    // if doc.contains_key("package") {
+    //     let package_table = doc.get("package").unwrap().as_table().unwrap();
+
+    //     if package_table.contains_key("name") {
+    //         let package_name = package_table
+    //             .get("name")
+    //             .unwrap()
+    //             .as_str()
+    //             .unwrap()
+    //             .to_string();
+
+    //         Some(package_name)
+    //     } else {
+    //         None
+    //     }
+    // } else {
+    //     None
+    // }
 }
