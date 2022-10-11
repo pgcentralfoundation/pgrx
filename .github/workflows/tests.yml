@@ -11,7 +11,8 @@ on:
       - develop
 
 env:
-  RUSTFLAGS: -Copt-level=0
+  # NB: Don't modify `RUSTFLAGS` here, since it would override the ones
+  # configured by `.cargo/config.toml` on macOS.
   RUST_BACKTRACE: 1
   CARGO_INCREMENTAL: "false"
   # CARGO_LOG: cargo::core::compiler::fingerprint=info # Uncomment this to output compiler fingerprint info
@@ -24,6 +25,7 @@ jobs:
     env:
       RUSTC_WRAPPER: sccache
       SCCACHE_DIR: /home/runner/.cache/sccache
+      RUSTFLAGS: -Copt-level=0
 
     strategy:
       matrix:
@@ -214,6 +216,7 @@ jobs:
     env:
       RUSTC_WRAPPER: sccache
       SCCACHE_DIR: /home/runner/.cache/sccache
+      RUSTFLAGS: -Copt-level=0
 
     strategy:
       matrix:
@@ -355,15 +358,6 @@ jobs:
         PG_VER=$(pg_config --version | awk '{split($2,a,"."); print a[1]}')
         echo "PG_VER=$PG_VER" >> $GITHUB_ENV
         cat $GITHUB_ENV
-
-        echo "----- Installing yq so .toml files can be parsed and queried -----"
-        pip3 install yq
-        echo ""
-
-        echo "----- Setting up RUSTFLAGS found in .cargo/config -----"
-        echo "RUSTFLAGS=$RUSTFLAGS $(tomlq --raw-output '.build.rustflags | join(" ")' .cargo/config)" >> $GITHUB_ENV
-        cat $GITHUB_ENV
-        echo ""
 
         echo "----- Set up Postgres permissions -----"
         sudo chmod a+rwx `$(which pg_config) --pkglibdir` `$(which pg_config) --sharedir`/extension
