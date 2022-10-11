@@ -54,7 +54,7 @@ pub(crate) fn create_crate_template(
     create_directory_structure(&path)?;
     create_control_file(&path, name)?;
     create_cargo_toml(&path, name)?;
-    create_dotcargo_config(&path, name)?;
+    create_dotcargo_config_toml(&path, name)?;
     create_lib_rs(&path, name, is_bgworker)?;
     create_git_ignore(&path, name)?;
 
@@ -98,14 +98,14 @@ fn create_cargo_toml(path: &PathBuf, name: &str) -> Result<(), std::io::Error> {
     Ok(())
 }
 
-fn create_dotcargo_config(path: &PathBuf, _name: &str) -> Result<(), std::io::Error> {
+fn create_dotcargo_config_toml(path: &PathBuf, _name: &str) -> Result<(), std::io::Error> {
     let mut filename = path.clone();
 
     filename.push(".cargo");
-    filename.push("config");
+    filename.push("config.toml");
     let mut file = std::fs::File::create(filename)?;
 
-    file.write_all(include_bytes!("../templates/cargo_config"))?;
+    file.write_all(include_bytes!("../templates/cargo_config_toml"))?;
 
     Ok(())
 }
