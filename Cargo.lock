@@ -1430,7 +1430,6 @@ name = "pgx-pg-sys"
 version = "0.5.0"
 dependencies = [
  "bindgen",
- "color-eyre",
  "eyre",
  "memoffset",
  "once_cell",

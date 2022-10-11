@@ -71,7 +71,7 @@ impl bindgen::callbacks::ParseCallbacks for PgxOverrides {
     }
 }
 
-fn main() -> color_eyre::Result<()> {
+fn main() -> eyre::Result<()> {
     if std::env::var("DOCS_RS").unwrap_or("false".into()) == "1" {
         return Ok(());
     }
