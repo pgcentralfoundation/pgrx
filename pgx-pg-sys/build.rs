@@ -810,7 +810,11 @@ fn apply_pg_guard(items: &Vec<syn::Item>) -> eyre::Result<proc_macro2::TokenStre
                 for item in &block.items {
                     match item {
                         ForeignItem::Fn(func) => {
-                            out.extend(PgGuardRewriter::new().foreign_item_fn(func))
+                            // Ignore other functions -- this will often be
+                            // variadic functions that we can't safely wrap.
+                            if let Ok(tokens) = PgGuardRewriter::new().foreign_item_fn(func) {
+                                out.extend(tokens);
+                            }
                         }
                         other => out.extend(quote! { extern "C" { #other } }),
                     }
