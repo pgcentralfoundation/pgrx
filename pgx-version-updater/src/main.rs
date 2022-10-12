@@ -268,24 +268,28 @@ fn main() {
             });
 
             let child_output = child.wait_with_output().expect("Failed to read stdout");
+
+            // Loop through all lines of the diff command output, if any. First 2 lines
+            // from the diff output above will produce irrelevant information, so we
+            // will skip it.
             let mut diff_output = String::new();
-
-            // Using an iterator here, so we need to keep track of certain things for proper output
-            let mut line_ctr = 0;
-            for line in child_output.stdout.lines().skip(2) {
-                let line = line.unwrap();
-
-                match line.chars().nth(0).unwrap() {
-                    '-' => diff_output.push_str(format!("\n            {}", line.red()).as_str()),
-                    '+' => diff_output.push_str(format!("\n            {}", line.green()).as_str()),
-                    _ => diff_output.push_str(format!("\n           {line}").as_str()),
+            for output_line in child_output.stdout.lines().skip(2) {
+                if let Ok(line) = output_line {
+                    match line.chars().nth(0) {
+                        Some(c) if c == '-' => {
+                            diff_output.push_str(format!("\n            {}", line.red()).as_str())
+                        }
+                        Some(c) if c == '+' => {
+                            diff_output.push_str(format!("\n            {}", line.green()).as_str())
+                        }
+                        Some(_) => diff_output.push_str(format!("\n           {line}").as_str()),
+                        _ => {}
+                    }
                 }
-
-                line_ctr += 1;
             }
 
             // The "diff" command will not print out anything if there is no difference.
-            if line_ctr == 0 {
+            if diff_output.is_empty() {
                 diff_output.push_str(
                     format!("\n           {}", "* No detectable diff found".dimmed()).as_str(),
                 )
@@ -368,6 +372,8 @@ fn parse_new_version(current_version_specifier: &str, new_version: &str) -> Stri
         // Otherwise, we have a specifier such as "=0.5.2" or "~0.4.6" or ">= 1.2.0"
         // Extract out the non-numeric prefix and join it with the new version to
         // be used. e.g. "=0.5.2" to new version "0.5.4" would result in "=0.5.4"
+        // TODO: This does not currently handle any specifiers with wildcards,
+        // such as "1.*"
         Some(_) => {
             if let Some(version_pos) = current_version_specifier.find(|c: char| c.is_numeric()) {
                 result.push_str(&current_version_specifier[..version_pos]);
