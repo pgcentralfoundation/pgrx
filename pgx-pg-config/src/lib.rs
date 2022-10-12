@@ -348,7 +348,6 @@ impl Pgx {
         }
     }
 
-    #[tracing::instrument(level = "error", skip(self))]
     pub fn get(&self, label: &str) -> eyre::Result<&PgConfig> {
         for pg_config in self.pg_configs.iter() {
             if pg_config.label()? == label {
