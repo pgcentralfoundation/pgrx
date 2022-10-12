@@ -20,10 +20,17 @@ use syn::{ForeignItem, Item};
 #[derive(Debug)]
 struct PgxOverrides(HashSet<String>);
 
-#[rustversion::nightly]
-const IS_NIGHTLY: bool = true;
-#[rustversion::not(nightly)]
-const IS_NIGHTLY: bool = false;
+fn is_nightly() -> bool {
+    let rustc = std::env::var_os("RUSTC").map(PathBuf::from).unwrap_or_else(|| "rustc".into());
+    let output = match std::process::Command::new(rustc).arg("--verbose").output() {
+        Ok(out) if out.status.success() => String::from_utf8_lossy(&out.stdout).trim().to_owned(),
+        _ => return false,
+    };
+    // Output looks like:
+    // - for nightly: `"rustc 1.66.0-nightly (0ca356586 2022-10-06)"`
+    // - for dev (locally built rust toolchain): `"rustc 1.66.0-dev"`
+    output.starts_with("rustc ") && (output.contains("-nightly") || output.contains("-dev"))
+}
 
 impl PgxOverrides {
     fn default() -> Self {
@@ -71,7 +78,7 @@ impl bindgen::callbacks::ParseCallbacks for PgxOverrides {
     }
 }
 
-fn main() -> color_eyre::Result<()> {
+fn main() -> eyre::Result<()> {
     if std::env::var("DOCS_RS").unwrap_or("false".into()) == "1" {
         return Ok(());
     }
@@ -88,7 +95,7 @@ fn main() -> color_eyre::Result<()> {
     println!("cargo:rerun-if-env-changed=PGX_PG_SYS_GENERATE_BINDINGS_FOR_RELEASE");
 
     // Do nightly detection to suppress silly warnings.
-    if IS_NIGHTLY {
+    if is_nightly() {
         println!("cargo:rustc-cfg=nightly")
     };
 
