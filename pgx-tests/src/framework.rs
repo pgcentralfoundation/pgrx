@@ -297,7 +297,7 @@ pub fn client() -> eyre::Result<(postgres::Client, String)> {
 
 fn install_extension() -> eyre::Result<()> {
     eprintln!("installing extension");
-    let is_release = std::env::var("PGX_BUILD_PROFILE").unwrap_or("debug".into()) == "release";
+    let profile = std::env::var("PGX_BUILD_PROFILE").unwrap_or("debug".into());
     let no_schema = std::env::var("PGX_NO_SCHEMA").unwrap_or("false".into()) == "true";
     let mut features = std::env::var("PGX_FEATURES").unwrap_or("".to_string());
     if !features.contains("pg_test") {
@@ -344,8 +344,16 @@ fn install_extension() -> eyre::Result<()> {
         command.arg("--all-features");
     }
 
-    if is_release {
-        command.arg("--release");
+    match profile.trim() {
+        // For legacy reasons, cargo has two names for the debug profile... (We
+        // also ignore the empty string here, just in case).
+        "debug" | "dev" | "" => {}
+        "release" => {
+            command.arg("--release");
+        }
+        profile => {
+            command.args(["--profile", profile]);
+        }
     }
 
     if no_schema {
