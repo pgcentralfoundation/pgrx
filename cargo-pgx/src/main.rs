@@ -12,6 +12,8 @@ mod manifest;
 mod metadata;
 mod pgx_pg_sys_stub;
 
+pub(crate) mod profile;
+
 use atty::Stream;
 use clap::Parser;
 use tracing_error::ErrorLayer;
