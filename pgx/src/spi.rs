@@ -513,7 +513,7 @@ impl SpiTupleTable {
         }
     }
 
-    // Returns column name
+    /// Returns column name
     pub fn column_name(&self, ordinal: i32) -> Option<String> {
         match self.tupdesc {
             Some(tupdesc) => unsafe {
