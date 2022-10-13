@@ -595,12 +595,7 @@ fn run_bindgen(pg_config: &PgConfig, include_h: &PathBuf) -> eyre::Result<syn::F
         .derive_partialord(false)
         .layout_tests(false)
         .generate()
-        .unwrap_or_else(|e| {
-            panic!(
-                "Unable to generate bindings for pg{}: {:?}",
-                major_version, e
-            )
-        });
+        .unwrap_or_else(|e| panic!("Unable to generate bindings for pg{}: {:?}", major_version, e));
 
     syn::parse_file(bindings.to_string().as_str()).map_err(|e| From::from(e))
 }
