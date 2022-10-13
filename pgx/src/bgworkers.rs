@@ -266,7 +266,8 @@ impl BackgroundWorkerHandle {
     /// or until the postmaster dies. If the background worker is running, the successful return value
     /// will be the worker's PID. therwise, the return value will be an error with the worker's status.
     ///
-    /// Requires `BackgroundWorkerBuilder.bgw_notify_pid` to be set to `pg_sys::MyProcPid`
+    /// Requires `BackgroundWorkerBuilder.bgw_notify_pid` to be set to `pg_sys::MyProcPid`, otherwise it'll
+    /// block forever.
     pub fn wait_for_startup(&self) -> Result<Pid, BackgroundWorkerStatus> {
         let mut pid: pg_sys::pid_t = 0;
         let status: BackgroundWorkerStatus =
@@ -280,12 +281,15 @@ impl BackgroundWorkerHandle {
     /// Block until the background worker exits, or postmaster dies. When the background worker exits, the return value is unit,
     /// if postmaster dies it will return error with `BackgroundWorkerStatus::PostmasterDied` status
     ///
-    /// Requires `BackgroundWorkerBuilder.bgw_notify_pid` to be set to `pg_sys::MyProcPid`
+    /// Requires `BackgroundWorkerBuilder.bgw_notify_pid` to be set to `pg_sys::MyProcPid`, otherwise it'll
+    /// block forever.
     pub fn wait_for_shutdown(self) -> Result<(), BackgroundWorkerStatus> {
         TerminatingBackgroundWorkerHandle(self.0).wait_for_shutdown()
     }
 }
 
+/// Handle of a dynamic background worker that is being terminated with
+/// [`BackgroundWorkerHandle::terminate`]. Only allows waiting for shutdown.
 pub struct TerminatingBackgroundWorkerHandle(*mut pg_sys::BackgroundWorkerHandle);
 
 impl TerminatingBackgroundWorkerHandle {
