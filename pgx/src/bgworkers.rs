@@ -213,7 +213,10 @@ unsafe extern "C" fn worker_spi_sigterm(_signal_args: i32) {
 }
 
 /// Dynamic background worker handle
-pub struct BackgroundWorkerHandle(*mut pg_sys::BackgroundWorkerHandle);
+pub struct BackgroundWorkerHandle {
+    handle: *mut pg_sys::BackgroundWorkerHandle,
+    notify_pid: pg_sys::pid_t,
+}
 
 /// PID
 pub type Pid = pg_sys::pid_t;
@@ -225,6 +228,7 @@ pub enum BackgroundWorkerStatus {
     NotYetStarted,
     Stopped,
     PostmasterDied,
+    Untracked,
     Unknown,
 }
 
@@ -246,7 +250,7 @@ impl BackgroundWorkerHandle {
     pub fn pid(&self) -> Result<Pid, BackgroundWorkerStatus> {
         let mut pid: pg_sys::pid_t = 0;
         let status: BackgroundWorkerStatus =
-            unsafe { pg_sys::GetBackgroundWorkerPid(self.0, &mut pid) }.into();
+            unsafe { pg_sys::GetBackgroundWorkerPid(self.handle, &mut pid) }.into();
         match status {
             BackgroundWorkerStatus::Started => Ok(pid),
             _ => Err(status),
@@ -257,9 +261,9 @@ impl BackgroundWorkerHandle {
     /// and to unregister it as soon as it is not.
     pub fn terminate(self) -> TerminatingBackgroundWorkerHandle {
         unsafe {
-            pg_sys::TerminateBackgroundWorker(self.0);
+            pg_sys::TerminateBackgroundWorker(self.handle);
         }
-        TerminatingBackgroundWorkerHandle(self.0)
+        TerminatingBackgroundWorkerHandle { handle: self.handle, notify_pid: self.notify_pid }
     }
 
     /// Block until the postmaster has attempted to start the background worker,
@@ -267,11 +271,16 @@ impl BackgroundWorkerHandle {
     /// will be the worker's PID. therwise, the return value will be an error with the worker's status.
     ///
     /// Requires `BackgroundWorkerBuilder.bgw_notify_pid` to be set to `pg_sys::MyProcPid`, otherwise it'll
-    /// block forever.
+    /// return [`BackgroundWorkerStatus::Untracked`] error
     pub fn wait_for_startup(&self) -> Result<Pid, BackgroundWorkerStatus> {
+        unsafe {
+            if self.notify_pid != pg_sys::MyProcPid {
+                return Err(BackgroundWorkerStatus::Untracked);
+            }
+        }
         let mut pid: pg_sys::pid_t = 0;
         let status: BackgroundWorkerStatus =
-            unsafe { pg_sys::WaitForBackgroundWorkerStartup(self.0, &mut pid) }.into();
+            unsafe { pg_sys::WaitForBackgroundWorkerStartup(self.handle, &mut pid) }.into();
         match status {
             BackgroundWorkerStatus::Started => Ok(pid),
             _ => Err(status),
@@ -282,24 +291,34 @@ impl BackgroundWorkerHandle {
     /// if postmaster dies it will return error with `BackgroundWorkerStatus::PostmasterDied` status
     ///
     /// Requires `BackgroundWorkerBuilder.bgw_notify_pid` to be set to `pg_sys::MyProcPid`, otherwise it'll
-    /// block forever.
+    /// return [`BackgroundWorkerStatus::Untracked`] error
     pub fn wait_for_shutdown(self) -> Result<(), BackgroundWorkerStatus> {
-        TerminatingBackgroundWorkerHandle(self.0).wait_for_shutdown()
+        TerminatingBackgroundWorkerHandle { handle: self.handle, notify_pid: self.notify_pid }
+            .wait_for_shutdown()
     }
 }
 
 /// Handle of a dynamic background worker that is being terminated with
 /// [`BackgroundWorkerHandle::terminate`]. Only allows waiting for shutdown.
-pub struct TerminatingBackgroundWorkerHandle(*mut pg_sys::BackgroundWorkerHandle);
+pub struct TerminatingBackgroundWorkerHandle {
+    handle: *mut pg_sys::BackgroundWorkerHandle,
+    notify_pid: pg_sys::pid_t,
+}
 
 impl TerminatingBackgroundWorkerHandle {
     /// Block until the background worker exits, or postmaster dies. When the background worker exits, the return value is unit,
     /// if postmaster dies it will return error with `BackgroundWorkerStatus::PostmasterDied` status
     ///
-    /// Requires `BackgroundWorkerBuilder.bgw_notify_pid` to be set to `pg_sys::MyProcPid`
+    /// Requires `BackgroundWorkerBuilder.bgw_notify_pid` to be set to `pg_sys::MyProcPid`, otherwise it'll
+    /// return [`BackgroundWorkerStatus::Untracked`] error
     pub fn wait_for_shutdown(&self) -> Result<(), BackgroundWorkerStatus> {
+        unsafe {
+            if self.notify_pid != pg_sys::MyProcPid {
+                return Err(BackgroundWorkerStatus::Untracked);
+            }
+        }
         let status: BackgroundWorkerStatus =
-            unsafe { pg_sys::WaitForBackgroundWorkerShutdown(self.0) }.into();
+            unsafe { pg_sys::WaitForBackgroundWorkerShutdown(self.handle) }.into();
         match status {
             BackgroundWorkerStatus::Stopped => Ok(()),
             _ => Err(status),
@@ -556,7 +575,7 @@ impl BackgroundWorkerBuilder {
             pg_sys::RegisterDynamicBackgroundWorker(&mut bgw, &mut handle);
         };
 
-        BackgroundWorkerHandle(handle)
+        BackgroundWorkerHandle { handle, notify_pid: bgw.bgw_notify_pid }
     }
 }
 

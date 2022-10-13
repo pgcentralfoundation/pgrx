@@ -22,20 +22,24 @@ pub extern "C" fn bgworker(arg: pg_sys::Datum) {
 
     let arg = unsafe { i32::from_datum(arg, false) }.expect("invalid arg");
 
-    BackgroundWorker::transaction(|| {
-        Spi::run("CREATE TABLE tests.bgworker_test (v INTEGER);");
-        Spi::execute(|mut client| {
-            client.update(
-                "INSERT INTO tests.bgworker_test VALUES ($1);",
-                None,
-                Some(vec![(PgOid::BuiltIn(PgBuiltInOids::INT4OID), arg.into_datum())]),
-            );
+    if arg > 0 {
+        BackgroundWorker::transaction(|| {
+            Spi::run("CREATE TABLE tests.bgworker_test (v INTEGER);");
+            Spi::execute(|mut client| {
+                client.update(
+                    "INSERT INTO tests.bgworker_test VALUES ($1);",
+                    None,
+                    Some(vec![(PgOid::BuiltIn(PgBuiltInOids::INT4OID), arg.into_datum())]),
+                );
+            });
         });
-    });
+    }
     while BackgroundWorker::wait_latch(Some(Duration::from_millis(100))) {}
-    BackgroundWorker::transaction(|| {
-        Spi::run("UPDATE tests.bgworker_test SET v = v + 1;");
-    });
+    if arg > 0 {
+        BackgroundWorker::transaction(|| {
+            Spi::run("UPDATE tests.bgworker_test SET v = v + 1;");
+        });
+    }
 }
 
 #[cfg(any(test, feature = "pg_test"))]
@@ -67,5 +71,29 @@ mod tests {
             Spi::get_one::<i32>("SELECT v FROM tests.bgworker_test;")
                 .expect("no return value from the worker")
         );
+    }
+
+    #[pg_test]
+    fn test_dynamic_bgworker_untracked() {
+        let worker = BackgroundWorkerBuilder::new("dynamic_bgworker")
+            .set_library("pgx_tests")
+            .set_function("bgworker")
+            .set_argument(0i32.into_datum())
+            .enable_spi_access()
+            .load_dynamic();
+        assert!(matches!(worker.wait_for_startup(), Err(BackgroundWorkerStatus::Untracked)));
+        assert!(matches!(worker.wait_for_shutdown(), Err(BackgroundWorkerStatus::Untracked)));
+    }
+
+    #[pg_test]
+    fn test_dynamic_bgworker_untracked_termination_handle() {
+        let worker = BackgroundWorkerBuilder::new("dynamic_bgworker")
+            .set_library("pgx_tests")
+            .set_function("bgworker")
+            .set_argument(0i32.into_datum())
+            .enable_spi_access()
+            .load_dynamic();
+        let handle = worker.terminate();
+        assert!(matches!(handle.wait_for_shutdown(), Err(BackgroundWorkerStatus::Untracked)));
     }
 }
