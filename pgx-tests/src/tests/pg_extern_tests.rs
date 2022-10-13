@@ -58,4 +58,55 @@ mod tests {
             .expect("failed to get SPI result");
         assert!(result)
     }
+
+    // Manually define the function first here. Note that it returns false
+    #[pg_extern(sql = r#"
+        CREATE FUNCTION tests."create_or_replace_method"() RETURNS bool
+        STRICT
+        LANGUAGE c /* Rust */
+        AS '@MODULE_PATHNAME@', '@FUNCTION_NAME@';
+    "#)]
+    fn create_or_replace_method_first() -> bool {
+        false
+    }
+
+    // Replace the "create_or_replace_method" function using pg_extern[create_or_replace]
+    // Note that it returns true, and that we use a "requires = []" here to ensure
+    // that there is an order of creation.
+    #[pg_extern(create_or_replace, requires = [create_or_replace_method_first])]
+    fn create_or_replace_method() -> bool {
+        true
+    }
+
+    // This will test to make sure that a function is created if it doesn't exist
+    // while using pg_extern[create_or_replace]
+    #[pg_extern(create_or_replace)]
+    fn create_or_replace_method_other() -> i32 {
+        42
+    }
+
+    #[pg_test]
+    fn test_create_or_replace() {
+        let replace_result = Spi::get_one::<bool>(r#"SELECT tests."create_or_replace_method"()"#)
+            .expect("failed to get SPI result");
+        assert!(replace_result);
+
+        let create_result =
+            Spi::get_one::<i32>(r#"SELECT tests."create_or_replace_method_other"()"#)
+                .expect("failed to get SPI result");
+        assert_eq!(create_result, 42);
+    }
+
+    #[pg_extern]
+    fn anyele_type(x: pgx::AnyElement) -> i32 {
+        x.oid() as i32
+    }
+
+    #[pg_test]
+    fn test_anyele_type() {
+        let interval_type =
+            Spi::get_one::<i32>(r#"SELECT tests."anyele_type"('5 hours'::interval)"#)
+                .expect("failed to get SPI result");
+        assert_eq!(interval_type as u32, pg_sys::INTERVALOID);
+    }
 }

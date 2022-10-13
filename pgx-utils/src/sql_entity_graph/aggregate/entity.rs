@@ -15,14 +15,14 @@ to the `pgx` framework and very subject to change between versions. While you ma
 
 
 */
-use crate::sql_entity_graph::{
-    aggregate::options::{FinalizeModify, ParallelOption},
-    metadata::SqlMapping,
-    pgx_sql::PgxSql,
-    to_sql::{entity::ToSqlConfigEntity, ToSql},
-    SqlGraphEntity, SqlGraphIdentifier, UsedTypeEntity,
-};
-use core::{any::TypeId, cmp::Ordering};
+use crate::sql_entity_graph::aggregate::options::{FinalizeModify, ParallelOption};
+use crate::sql_entity_graph::metadata::SqlMapping;
+use crate::sql_entity_graph::pgx_sql::PgxSql;
+use crate::sql_entity_graph::to_sql::entity::ToSqlConfigEntity;
+use crate::sql_entity_graph::to_sql::ToSql;
+use crate::sql_entity_graph::{SqlGraphEntity, SqlGraphIdentifier, UsedTypeEntity};
+use core::any::TypeId;
+use core::cmp::Ordering;
 use eyre::{eyre, WrapErr};
 
 #[derive(Debug, Clone, Hash, PartialEq, Eq)]
@@ -149,9 +149,7 @@ pub struct PgAggregateEntity {
 
 impl Ord for PgAggregateEntity {
     fn cmp(&self, other: &Self) -> Ordering {
-        self.file
-            .cmp(other.full_path)
-            .then_with(|| self.file.cmp(other.full_path))
+        self.file.cmp(other.full_path).then_with(|| self.file.cmp(other.full_path))
     }
 }
 
@@ -161,9 +159,9 @@ impl PartialOrd for PgAggregateEntity {
     }
 }
 
-impl Into<SqlGraphEntity> for PgAggregateEntity {
-    fn into(self) -> SqlGraphEntity {
-        SqlGraphEntity::Aggregate(self)
+impl From<PgAggregateEntity> for SqlGraphEntity {
+    fn from(val: PgAggregateEntity) -> Self {
+        SqlGraphEntity::Aggregate(val)
     }
 }
 
@@ -279,34 +277,22 @@ impl ToSql for PgAggregateEntity {
                 Ok(SqlMapping::As(ref argument_sql)) => Ok(argument_sql.to_string()),
                 Ok(SqlMapping::Composite { array_brackets }) => used_ty
                     .composite_type
-                    .map(|v| {
-                        if array_brackets {
-                            format!("{v}[]")
-                        } else {
-                            format!("{v}")
-                        }
-                    })
+                    .map(|v| if array_brackets { format!("{v}[]") } else { format!("{v}") })
                     .ok_or_else(|| {
                         eyre!("Macro expansion time suggested a composite_type!() in return")
                     }),
                 Ok(SqlMapping::Source { array_brackets }) => {
                     let sql = context
                         .source_only_to_sql_type(used_ty.ty_source)
-                        .map(|v| {
-                            if array_brackets {
-                                format!("{v}[]")
-                            } else {
-                                format!("{v}")
-                            }
-                        })
+                        .map(|v| if array_brackets { format!("{v}[]") } else { format!("{v}") })
                         .ok_or_else(|| {
                             eyre!("Macro expansion time suggested a source only mapping in return")
                         })?;
                     Ok(sql)
                 }
-                Ok(SqlMapping::Skip) => Err(eyre!(
-                    "Cannot use skipped SQL translatable type as aggregate const type"
-                )),
+                Ok(SqlMapping::Skip) => {
+                    Err(eyre!("Cannot use skipped SQL translatable type as aggregate const type"))
+                }
                 Err(err) => match context.source_only_to_sql_type(used_ty.ty_source) {
                     Some(source_only_mapping) => Ok(source_only_mapping.to_string()),
                     None => return Err(err).wrap_err("While mapping argument"),
@@ -320,10 +306,7 @@ impl ToSql for PgAggregateEntity {
             let mstype_sql = map_ty(&value).wrap_err("Mapping moving state type")?;
             optional_attributes.push((
                 format!("\tMSTYPE = {}", mstype_sql),
-                format!(
-                    "/* {}::MovingState = {} */",
-                    self.full_path, value.full_path
-                ),
+                format!("/* {}::MovingState = {} */", self.full_path, value.full_path),
             ));
         }
 
@@ -332,17 +315,9 @@ impl ToSql for PgAggregateEntity {
             let optional_attribute_string = format!(
                 "{optional_attribute}{maybe_comma} {comment}{maybe_newline}",
                 optional_attribute = optional_attribute,
-                maybe_comma = if index == optional_attributes.len() - 1 {
-                    ""
-                } else {
-                    ","
-                },
+                maybe_comma = if index == optional_attributes.len() - 1 { "" } else { "," },
                 comment = comment,
-                maybe_newline = if index == optional_attributes.len() - 1 {
-                    ""
-                } else {
-                    "\n"
-                }
+                maybe_newline = if index == optional_attributes.len() - 1 { "" } else { "\n" }
             );
             optional_attributes_string += &optional_attribute_string;
         }
@@ -366,11 +341,7 @@ impl ToSql for PgAggregateEntity {
             sfunc = self.sfunc,
             stype = stype_sql,
             stype_full_path = self.stype.used_ty.full_path,
-            maybe_comma_after_stype = if optional_attributes.len() == 0 {
-                ""
-            } else {
-                ","
-            },
+            maybe_comma_after_stype = if optional_attributes.len() == 0 { "" } else { "," },
             args = {
                 let mut args = Vec::new();
                 for (idx, arg) in self.args.iter().enumerate() {
@@ -499,11 +470,7 @@ impl ToSql for PgAggregateEntity {
             } else {
                 String::from("\n")
             } + &optional_attributes_string
-                + if optional_attributes.len() == 0 {
-                    ""
-                } else {
-                    "\n"
-                },
+                + if optional_attributes.len() == 0 { "" } else { "\n" },
         );
         tracing::trace!(%sql);
         Ok(sql)

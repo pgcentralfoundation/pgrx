@@ -50,10 +50,8 @@ impl PgGuardRewriter {
         // nor do we need a visibility beyond "private"
         func.vis = Visibility::Inherited;
 
-        func.sig.ident = Ident::new(
-            &format!("{}_inner", func.sig.ident.to_string()),
-            func.sig.ident.span(),
-        );
+        func.sig.ident =
+            Ident::new(&format!("{}_inner", func.sig.ident.to_string()), func.sig.ident.span());
 
         let arg_list = PgGuardRewriter::build_arg_list(&sig, false);
         let func_name = PgGuardRewriter::build_func_name(&func.sig);
@@ -78,7 +76,7 @@ impl PgGuardRewriter {
             #vis #sig {
                 #[allow(non_snake_case)]
                 #func
-                pg_sys::guard::guard( || #func_name(#arg_list) )
+                pg_sys::guard::guard( #[allow(unused_unsafe)] || unsafe { #func_name(#arg_list) } )
             }
         }
     }

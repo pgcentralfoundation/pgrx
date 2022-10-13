@@ -43,7 +43,8 @@
       - `NULL` Datums are safely represented as `Option::<T>::None`
 - **First-class UDF support**
    + Annotate functions with `#[pg_extern]` to expose them to Postgres
-   + Return `impl std::iter::Iterator<Item = T> where T: IntoDatum` for `RETURNS SETOF` and `RETURNS TABLE (...)`
+   + Return `pgx::iter::SetOfIterator<'a, T>` for `RETURNS SETOF`
+   + Return `pgx::iter::TableIterator<'a, T>` for `RETURNS TABLE (...)`
    + Create trigger functions with `#[pg_trigger]`
 - **Easy Custom Types**
    + `#[derive(PostgresType)]` to use a Rust struct as a Postgres type
@@ -213,11 +214,12 @@ custom types.
 There's probably more than are listed here, but a primary things of note are:
 
  - Threading is not really supported.  Postgres is strictly single-threaded.  As such, if you do venture into using threads, those threads **MUST NOT** call *any* internal Postgres function, or otherwise use any Postgres-provided pointer.  There's also a potential problem with Postgres' use of `sigprocmask`.  This was being discussed on the -hackers list, even with a patch provided, but the conversation seems to have stalled (https://www.postgresql.org/message-id/flat/5EF20168.2040508%40anastigmatix.net#4533edb74194d30adfa04a6a2ce635ba).
- - `async` interactions are unknown right now.
- - `pgx` uses lots of `unsafe` Rust.  That's generally the nature of the beast when doing FFI wrappers, so be aware.
+ - How to correctly interact with Postgres in an `async` context remains unexplored.
+ - `pgx` wraps a lot of `unsafe` code, some of which has poorly-defined safety conditions. It may be easy to induce illogical and undesirable behaviors even from safe code with `pgx`, and some of these wrappers may be fundamentally unsound. Please report any issues that may arise.
  - Not all of Postgres' internals are included or even wrapped.  This isn't due to it not being possible, it's simply due to it being an incredibly large task.  If you identify internal Postgres APIs you need, open an issue and we'll get them exposed, at least through the `pgx::pg_sys` module.
  - Windows is not supported.  It could be, but will require a bit of work with `cargo-pgx` and figuring out how to compile `pgx`'s "cshim" static library.
  - Sessions started before `ALTER EXTENSION my_extension UPDATE;` will continue to see the old version of `my_extension`. New sessions will see the updated version of the extension.
+ - `pgx` is used by many "in production", but it is not "1.0.0" or above, despite that being recommended by SemVer for production-quality software. This is because there are many unresolved soundness and ergonomics questions that will likely require breaking changes to resolve, in some cases requiring cutting-edge Rust features to be able to expose sound interfaces. While a 1.0.0 release is intended at some point, it seems prudent to wait until it seems like a 2.0.0 release would not be needed the next week and the remaining questions can be deferred.
 
 ## TODO
 
@@ -233,7 +235,8 @@ PGX has optional feature flags for Rust code that do not involve configuring the
 but rather extend additional support for other kinds of Rust code. These are not included by default.
 
 ### "time-crate": interop with the `time` crate
-This crate once used direct interop with the excellent [time crate][timecrate].
+
+`pgx` once used direct interop with the excellent [time crate][timecrate].
 However, due to complications involving performance and accurate interop with Postgres,
 this feature is now considered deprecated in favor of a lower-overhead interop.
 You may still request implementations of `TryFrom<time::Type> for pgx::MatchingType`
@@ -241,7 +244,7 @@ and `From<time::Type> for pgx::MatchingType` by enabling the `"time-crate"` feat
 
 ### Experimental Features
 
-Adding `pgx = { version = "0.5.0-beta.0", features = ["postgrestd"] }` to your Cargo.toml
+Adding `pgx = { version = "0.5.0", features = ["postgrestd"] }` to your Cargo.toml
 will enable a **highly** experimental variant of `pgx` designed for integration with `postgrestd`,
 a modified Rust standard library that executes the Rust runtime atop the Postgres runtime,
 instead of using the operating system's ordinary C runtime.
@@ -256,6 +259,11 @@ even if you know what you are doing. Especially if you know exactly what you're 
 as that almost certainly means you are developing this feature,
 and further extending both runtimes in ways neither initially had imagined.
 If you absolutely must enable this feature, you may wish to discuss it first on [Discord].
+
+Adding `pgx = { version = "0.5.0", features = ["plrust"] }` to your Cargo.toml
+will enable an even more experimental variant of the above with special carve-outs
+specifically for usage with `PL/Rust`. This feature may not last long,
+as it is likely that code may move into a separate crate.
 
 As a reminder: "THE SOFTWARE IS PROVIDED 'AS IS', WITHOUT WARRANTY OF ANY KIND..."
 

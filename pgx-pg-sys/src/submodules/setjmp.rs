@@ -1,3 +1,4 @@
+#![deny(unsafe_op_in_unsafe_fn)]
 /**
 Given a closure that is assumed to be a wrapped Postgres `extern "C"` function, [pg_guard_ffi_boundary]
 works with the Postgres and C runtimes to create a "barrier" that allows Rust to catch Postgres errors
@@ -45,7 +46,8 @@ being converted into a transaction-aborting Postgres `ERROR` by PGX.
 **/
 #[inline(always)]
 pub(crate) unsafe fn pg_guard_ffi_boundary<T, F: FnOnce() -> T>(f: F) -> T {
-    pg_guard_ffi_boundary_impl(f)
+    // SAFETY: Caller promises not to call us from anything but the main thread.
+    unsafe { pg_guard_ffi_boundary_impl(f) }
 }
 
 #[cfg(not(feature = "postgrestd"))]
@@ -54,32 +56,35 @@ unsafe fn pg_guard_ffi_boundary_impl<T, F: FnOnce() -> T>(f: F) -> T {
     //! This is the version that uses sigsetjmp and all that, for "normal" Rust/PGX interfaces.
     use crate as pg_sys;
 
-    // This should really, really not be done in a multithreaded context
-    let prev_exception_stack = pg_sys::PG_exception_stack;
-    let prev_error_context_stack = pg_sys::error_context_stack;
-    let mut jump_buffer = std::mem::MaybeUninit::uninit();
-    let jump_value = crate::sigsetjmp(jump_buffer.as_mut_ptr(), 0);
+    // SAFETY: This should really, really not be done in a multithreaded context as it
+    // accesses multiple `static mut`. The ultimate caller asserts this is the main thread.
+    unsafe {
+        let prev_exception_stack = pg_sys::PG_exception_stack;
+        let prev_error_context_stack = pg_sys::error_context_stack;
+        let mut jump_buffer = std::mem::MaybeUninit::uninit();
+        let jump_value = crate::sigsetjmp(jump_buffer.as_mut_ptr(), 0);
 
-    let result = if jump_value == 0 {
-        // first time through, not as the result of a longjmp
-        pg_sys::PG_exception_stack = jump_buffer.as_mut_ptr();
+        let result = if jump_value == 0 {
+            // first time through, not as the result of a longjmp
+            pg_sys::PG_exception_stack = jump_buffer.as_mut_ptr();
 
-        // execute the closure, which will be a wrapped internal Postgres function
-        f()
-    } else {
-        // we're back here b/c of a longjmp originating in Postgres
-        // as such, we need to put Postgres' understanding of its exception/error state back together
+            // execute the closure, which will be a wrapped internal Postgres function
+            f()
+        } else {
+            // we're back here b/c of a longjmp originating in Postgres
+            // as such, we need to put Postgres' understanding of its exception/error state back together
+            pg_sys::PG_exception_stack = prev_exception_stack;
+            pg_sys::error_context_stack = prev_error_context_stack;
+
+            // and ultimately we panic
+            std::panic::panic_any(pg_sys::JumpContext {});
+        };
+
         pg_sys::PG_exception_stack = prev_exception_stack;
         pg_sys::error_context_stack = prev_error_context_stack;
 
-        // and ultimately we panic
-        std::panic::panic_any(pg_sys::JumpContext {});
-    };
-
-    pg_sys::PG_exception_stack = prev_exception_stack;
-    pg_sys::error_context_stack = prev_error_context_stack;
-
-    result
+        result
+    }
 }
 
 #[cfg(feature = "postgrestd")]

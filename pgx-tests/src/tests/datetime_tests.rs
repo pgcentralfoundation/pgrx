@@ -414,10 +414,7 @@ mod tests {
         let json = json!({ "time stamp with timezone test": time_stamp_with_timezone });
 
         // but we serialize timestamps at UTC
-        assert_eq!(
-            json!({"time stamp with timezone test":"2022-02-02T14:57:11+00:00"}),
-            json
-        );
+        assert_eq!(json!({"time stamp with timezone test":"2022-02-02T14:57:11+00:00"}), json);
     }
 
     #[pg_test]

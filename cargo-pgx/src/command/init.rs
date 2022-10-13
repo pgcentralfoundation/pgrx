@@ -155,20 +155,13 @@ pub(crate) fn init_pgx(pgx: &Pgx) -> eyre::Result<()> {
         a.major_version()
             .ok()
             .expect("could not determine major version")
-            .cmp(
-                &b.major_version()
-                    .ok()
-                    .expect("could not determine major version"),
-            )
+            .cmp(&b.major_version().ok().expect("could not determine major version"))
     });
     for pg_config in output_configs.iter() {
         validate_pg_config(pg_config)?;
 
         if is_root_user() {
-            println!(
-                "{} initdb as current user is root user",
-                "   Skipping".bold().green(),
-            );
+            println!("{} initdb as current user is root user", "   Skipping".bold().green(),);
         } else {
             let datadir = pg_config.data_dir()?;
             let bindir = pg_config.bin_dir()?;
@@ -199,9 +192,7 @@ fn download_postgres(pg_config: &PgConfig, pgx_home: &PathBuf) -> eyre::Result<P
     let http_client = if let Some((host, port)) =
         for_url_str(pg_config.url().expect("no url for pg_config")).host_port()
     {
-        AgentBuilder::new()
-            .proxy(Proxy::new(format!("https://{host}:{port}"))?)
-            .build()
+        AgentBuilder::new().proxy(Proxy::new(format!("https://{host}:{port}"))?).build()
     } else {
         Agent::new()
     };
@@ -225,11 +216,7 @@ fn download_postgres(pg_config: &PgConfig, pgx_home: &PathBuf) -> eyre::Result<P
 
 fn untar(bytes: &[u8], pgxdir: &PathBuf, pg_config: &PgConfig) -> eyre::Result<PathBuf> {
     let mut pgdir = pgxdir.clone();
-    pgdir.push(format!(
-        "{}.{}",
-        pg_config.major_version()?,
-        pg_config.minor_version()?
-    ));
+    pgdir.push(format!("{}.{}", pg_config.major_version()?, pg_config.minor_version()?));
     if pgdir.exists() {
         // delete everything at this path if it already exists
         println!("{} {}", "     Removing".bold().green(), pgdir.display());
@@ -264,10 +251,7 @@ fn untar(bytes: &[u8], pgxdir: &PathBuf, pg_config: &PgConfig) -> eyre::Result<P
     if output.status.success() {
         Ok(pgdir)
     } else {
-        Err(eyre!(
-            "Command error: {}",
-            String::from_utf8(output.stderr)?
-        ))
+        Err(eyre!("Command error: {}", String::from_utf8(output.stderr)?))
     }
 }
 
@@ -419,10 +403,7 @@ fn write_config(pg_configs: &Vec<PgConfig>) -> eyre::Result<()> {
             format!(
                 "{}=\"{}\"\n",
                 pg_config.label()?,
-                pg_config
-                    .path()
-                    .ok_or(eyre!("no path for pg_config"))?
-                    .display()
+                pg_config.path().ok_or(eyre!("no path for pg_config"))?.display()
             )
             .as_bytes(),
         )?;
@@ -445,24 +426,14 @@ fn is_root_user() -> bool {
 }
 
 pub(crate) fn initdb(bindir: &PathBuf, datadir: &PathBuf) -> eyre::Result<()> {
-    println!(
-        " {} data directory at {}",
-        "Initializing".bold().green(),
-        datadir.display()
-    );
+    println!(" {} data directory at {}", "Initializing".bold().green(), datadir.display());
     let mut command = std::process::Command::new(format!("{}/initdb", bindir.display()));
-    command
-        .stdout(Stdio::piped())
-        .stderr(Stdio::piped())
-        .arg("-D")
-        .arg(&datadir);
+    command.stdout(Stdio::piped()).stderr(Stdio::piped()).arg("-D").arg(&datadir);
 
     let command_str = format!("{:?}", command);
     tracing::debug!(command = %command_str, "Running");
 
-    let output = command
-        .output()
-        .wrap_err_with(|| eyre!("unable to execute: {}", command_str))?;
+    let output = command.output().wrap_err_with(|| eyre!("unable to execute: {}", command_str))?;
     tracing::trace!(command = %command_str, status_code = %output.status, "Finished");
 
     if !output.status.success() {

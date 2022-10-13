@@ -12,8 +12,7 @@ Use of this source code is governed by the MIT license that can be found in the 
 //! See: [https://www.postgresql.org/docs/12/bgworker.html](https://www.postgresql.org/docs/12/bgworker.html)
 use crate::pg_sys;
 use std::convert::TryInto;
-use std::ffi::CStr;
-use std::ffi::CString;
+use std::ffi::{CStr, CString};
 use std::os::raw::c_char;
 use std::sync::atomic::{AtomicBool, Ordering};
 use std::time::Duration;

@@ -18,10 +18,8 @@ pub mod entity;
 
 use proc_macro2::{Ident, Span, TokenStream as TokenStream2};
 use quote::{quote, ToTokens, TokenStreamExt};
-use syn::{
-    parse::{Parse, ParseStream},
-    DeriveInput, Generics, ItemStruct,
-};
+use syn::parse::{Parse, ParseStream};
+use syn::{DeriveInput, Generics, ItemStruct};
 
 use crate::sql_entity_graph::ToSqlConfig;
 
@@ -67,23 +65,14 @@ impl PostgresType {
         if !to_sql_config.overrides_default() {
             crate::ident_is_acceptable_to_postgres(&name)?;
         }
-        Ok(Self {
-            generics,
-            name,
-            in_fn,
-            out_fn,
-            to_sql_config,
-        })
+        Ok(Self { generics, name, in_fn, out_fn, to_sql_config })
     }
 
     pub fn from_derive_input(derive_input: DeriveInput) -> Result<Self, syn::Error> {
         let _data_struct = match derive_input.data {
             syn::Data::Struct(data_struct) => data_struct,
             syn::Data::Union(_) | syn::Data::Enum(_) => {
-                return Err(syn::Error::new(
-                    derive_input.ident.span(),
-                    "expected struct",
-                ))
+                return Err(syn::Error::new(derive_input.ident.span(), "expected struct"))
             }
         };
         let to_sql_config =
@@ -111,21 +100,11 @@ impl Parse for PostgresType {
         let parsed: ItemStruct = input.parse()?;
         let to_sql_config =
             ToSqlConfig::from_attributes(parsed.attrs.as_slice())?.unwrap_or_default();
-        let funcname_in = Ident::new(
-            &format!("{}_in", parsed.ident).to_lowercase(),
-            parsed.ident.span(),
-        );
-        let funcname_out = Ident::new(
-            &format!("{}_out", parsed.ident).to_lowercase(),
-            parsed.ident.span(),
-        );
-        Self::new(
-            parsed.ident,
-            parsed.generics,
-            funcname_in,
-            funcname_out,
-            to_sql_config,
-        )
+        let funcname_in =
+            Ident::new(&format!("{}_in", parsed.ident).to_lowercase(), parsed.ident.span());
+        let funcname_out =
+            Ident::new(&format!("{}_out", parsed.ident).to_lowercase(), parsed.ident.span());
+        Self::new(parsed.ident, parsed.generics, funcname_in, funcname_out, to_sql_config)
     }
 }
 
@@ -167,10 +146,8 @@ impl ToTokens for PostgresType {
         let in_fn = &self.in_fn;
         let out_fn = &self.out_fn;
 
-        let sql_graph_entity_fn_name = syn::Ident::new(
-            &format!("__pgx_internals_type_{}", self.name),
-            Span::call_site(),
-        );
+        let sql_graph_entity_fn_name =
+            syn::Ident::new(&format!("__pgx_internals_type_{}", self.name), Span::call_site());
 
         let to_sql_config = &self.to_sql_config;
 

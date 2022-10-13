@@ -11,11 +11,9 @@ use std::ops::Deref;
 use crate::staticize_lifetimes;
 use proc_macro2::Span;
 use quote::ToTokens;
-use syn::{
-    parse::{Parse, ParseStream},
-    spanned::Spanned,
-    Token,
-};
+use syn::parse::{Parse, ParseStream};
+use syn::spanned::Spanned;
+use syn::Token;
 
 use super::metadata::FunctionMetadataTypeEntity;
 
@@ -106,10 +104,10 @@ impl UsedType {
             }
             syn::Type::Path(path) => {
                 let segments = &path.path;
-                let last = segments.segments.last().ok_or(syn::Error::new(
-                    path.span(),
-                    "Could not read last segment of path",
-                ))?;
+                let last = segments
+                    .segments
+                    .last()
+                    .ok_or(syn::Error::new(path.span(), "Could not read last segment of path"))?;
 
                 match last.ident.to_string().as_str() {
                     // Option<composite_type!(..)>
@@ -209,14 +207,7 @@ impl UsedType {
             original => (original, false, None),
         };
 
-        Ok(Self {
-            original_ty,
-            resolved_ty,
-            optional,
-            variadic,
-            default,
-            composite_type,
-        })
+        Ok(Self { original_ty, resolved_ty, optional, variadic, default, composite_type })
     }
 
     pub fn entity_tokens(&self) -> syn::Expr {
@@ -273,10 +264,10 @@ fn resolve_vec_inner(
     original: syn::TypePath,
 ) -> syn::Result<(syn::Type, Option<CompositeTypeMacro>)> {
     let segments = &original.path;
-    let last = segments.segments.last().ok_or(syn::Error::new(
-        original.span(),
-        "Could not read last segment of path",
-    ))?;
+    let last = segments
+        .segments
+        .last()
+        .ok_or(syn::Error::new(original.span(), "Could not read last segment of path"))?;
 
     match &last.arguments {
         syn::PathArguments::AngleBracketed(path_arg) => match path_arg.args.last() {
@@ -326,10 +317,11 @@ fn resolve_variadic_array_inner(
     mut original: syn::TypePath,
 ) -> syn::Result<(syn::Type, Option<CompositeTypeMacro>)> {
     let original_span = original.span().clone();
-    let last = original.path.segments.last_mut().ok_or(syn::Error::new(
-        original_span,
-        "Could not read last segment of path",
-    ))?;
+    let last = original
+        .path
+        .segments
+        .last_mut()
+        .ok_or(syn::Error::new(original_span, "Could not read last segment of path"))?;
 
     match last.arguments {
         syn::PathArguments::AngleBracketed(ref mut path_arg) => {
@@ -388,10 +380,11 @@ fn resolve_array_inner(
     mut original: syn::TypePath,
 ) -> syn::Result<(syn::Type, Option<CompositeTypeMacro>)> {
     let original_span = original.span().clone();
-    let last = original.path.segments.last_mut().ok_or(syn::Error::new(
-        original_span,
-        "Could not read last segment of path",
-    ))?;
+    let last = original
+        .path
+        .segments
+        .last_mut()
+        .ok_or(syn::Error::new(original_span, "Could not read last segment of path"))?;
 
     match last.arguments {
         syn::PathArguments::AngleBracketed(ref mut path_arg) => {
@@ -449,10 +442,10 @@ fn resolve_option_inner(
     original: syn::TypePath,
 ) -> syn::Result<(syn::Type, Option<CompositeTypeMacro>)> {
     let segments = &original.path;
-    let last = segments.segments.last().ok_or(syn::Error::new(
-        original.span(),
-        "Could not read last segment of path",
-    ))?;
+    let last = segments
+        .segments
+        .last()
+        .ok_or(syn::Error::new(original.span(), "Could not read last segment of path"))?;
 
     match &last.arguments {
         syn::PathArguments::AngleBracketed(path_arg) => match path_arg.args.first() {
@@ -530,61 +523,36 @@ fn handle_default_macro(mac: &syn::Macro) -> syn::Result<(syn::Type, Option<Stri
     let out: DefaultMacro = mac.parse_body()?;
     let true_ty = out.ty;
     match out.expr {
-        syn::Expr::Lit(syn::ExprLit {
-            lit: syn::Lit::Str(def),
-            ..
-        }) => {
+        syn::Expr::Lit(syn::ExprLit { lit: syn::Lit::Str(def), .. }) => {
             let value = def.value();
             Ok((true_ty, Some(value)))
         }
-        syn::Expr::Lit(syn::ExprLit {
-            lit: syn::Lit::Float(def),
-            ..
-        }) => {
+        syn::Expr::Lit(syn::ExprLit { lit: syn::Lit::Float(def), .. }) => {
             let value = def.base10_digits();
             Ok((true_ty, Some(value.to_string())))
         }
-        syn::Expr::Lit(syn::ExprLit {
-            lit: syn::Lit::Int(def),
-            ..
-        }) => {
+        syn::Expr::Lit(syn::ExprLit { lit: syn::Lit::Int(def), .. }) => {
             let value = def.base10_digits();
             Ok((true_ty, Some(value.to_string())))
         }
-        syn::Expr::Lit(syn::ExprLit {
-            lit: syn::Lit::Bool(def),
-            ..
-        }) => {
+        syn::Expr::Lit(syn::ExprLit { lit: syn::Lit::Bool(def), .. }) => {
             let value = def.value();
             Ok((true_ty, Some(value.to_string())))
         }
-        syn::Expr::Unary(syn::ExprUnary {
-            op: syn::UnOp::Neg(_),
-            ref expr,
-            ..
-        }) => match &**expr {
-            syn::Expr::Lit(syn::ExprLit {
-                lit: syn::Lit::Int(def),
-                ..
-            }) => {
+        syn::Expr::Unary(syn::ExprUnary { op: syn::UnOp::Neg(_), ref expr, .. }) => match &**expr {
+            syn::Expr::Lit(syn::ExprLit { lit: syn::Lit::Int(def), .. }) => {
                 let value = def.base10_digits();
                 Ok((true_ty, Some("-".to_owned() + value)))
             }
             _ => {
                 return Err(syn::Error::new(
                     Span::call_site(),
-                    format!(
-                        "Unrecognized UnaryExpr in `default!()` macro, got: {:?}",
-                        out.expr
-                    ),
+                    format!("Unrecognized UnaryExpr in `default!()` macro, got: {:?}", out.expr),
                 ))
             }
         },
         syn::Expr::Type(syn::ExprType { ref ty, .. }) => match ty.deref() {
-            syn::Type::Path(syn::TypePath {
-                path: syn::Path { segments, .. },
-                ..
-            }) => {
+            syn::Type::Path(syn::TypePath { path: syn::Path { segments, .. }, .. }) => {
                 let last = segments.last().expect("No last segment");
                 let last_string = last.ident.to_string();
                 if last_string.as_str() == "NULL" {
@@ -609,10 +577,7 @@ fn handle_default_macro(mac: &syn::Macro) -> syn::Result<(syn::Type, Option<Stri
                 ))
             }
         },
-        syn::Expr::Path(syn::ExprPath {
-            path: syn::Path { ref segments, .. },
-            ..
-        }) => {
+        syn::Expr::Path(syn::ExprPath { path: syn::Path { ref segments, .. }, .. }) => {
             let last = segments.last().expect("No last segment");
             let last_string = last.ident.to_string();
             if last_string.as_str() == "NULL" {
@@ -630,10 +595,7 @@ fn handle_default_macro(mac: &syn::Macro) -> syn::Result<(syn::Type, Option<Stri
         _ => {
             return Err(syn::Error::new(
                 Span::call_site(),
-                format!(
-                    "Unable to parse default value of `default!()` macro, got: {:?}",
-                    out.expr
-                ),
+                format!("Unable to parse default value of `default!()` macro, got: {:?}", out.expr),
             ))
         }
     }

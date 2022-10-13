@@ -26,7 +26,7 @@ pub struct TimeWithTimeZone {
 
 impl FromDatum for TimeWithTimeZone {
     #[inline]
-    unsafe fn from_datum(
+    unsafe fn from_polymorphic_datum(
         datum: pg_sys::Datum,
         is_null: bool,
         typoid: u32,
@@ -36,7 +36,7 @@ impl FromDatum for TimeWithTimeZone {
         } else {
             let timetz = PgBox::from_pg(datum.cast_mut_ptr::<pg_sys::TimeTzADT>());
 
-            let t = Time::from_datum(timetz.time.into(), false, typoid)
+            let t = Time::from_polymorphic_datum(timetz.time.into(), false, typoid)
                 .expect("failed to convert TimeWithTimeZone");
             let tz_secs = timetz.zone;
 
@@ -124,14 +124,12 @@ impl serde::Serialize for TimeWithTimeZone {
             )
         } else {
             serializer.serialize_str(
-                &time
-                    .format(&DEFAULT_TIMESTAMP_WITH_TIMEZONE_FORMAT)
-                    .map_err(|e| {
-                        serde::ser::Error::custom(format!(
-                            "TimeWithTimeZone formatting problem: {:?}",
-                            e
-                        ))
-                    })?,
+                &time.format(&DEFAULT_TIMESTAMP_WITH_TIMEZONE_FORMAT).map_err(|e| {
+                    serde::ser::Error::custom(format!(
+                        "TimeWithTimeZone formatting problem: {:?}",
+                        e
+                    ))
+                })?,
             )
         }
     }
