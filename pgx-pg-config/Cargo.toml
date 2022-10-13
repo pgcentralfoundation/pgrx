@@ -1,6 +1,6 @@
 [package]
 name = "pgx-pg-config"
-version = "0.5.0-beta.1"
+version = "0.5.0"
 authors = ["ZomboDB, LLC <zombodb@gmail.com>"]
 license = "MIT"
 description = "A Postgres pg_config wrapper for 'pgx'"
@@ -9,7 +9,6 @@ repository = "https://github.com/zombodb/pgx"
 #documentation = "https://docs.rs/pgx-utils"
 readme = "README.md"
 edition = "2021"
-rust-version = "1.58"
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
@@ -21,5 +20,4 @@ serde = { version = "1.0.145", features = [ "derive" ] }
 serde_derive = "1.0.145"
 serde_json = "1.0.85"
 toml = "0.5.9"
-tracing = "0.1.36"
 url = "2.3.1"

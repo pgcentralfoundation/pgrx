@@ -142,10 +142,7 @@ where
 
         PgVarlena {
             leaked: None,
-            varlena: Cow::Owned(PallocdVarlena {
-                ptr,
-                len: unsafe { varsize_any(ptr) },
-            }),
+            varlena: Cow::Owned(PallocdVarlena { ptr, len: unsafe { varsize_any(ptr) } }),
             need_free: true,
             __marker: PhantomData,
         }
@@ -275,12 +272,12 @@ where
     }
 }
 
-impl<T> Into<Option<pg_sys::Datum>> for PgVarlena<T>
+impl<T> From<PgVarlena<T>> for Option<pg_sys::Datum>
 where
     T: Copy + Sized,
 {
-    fn into(self) -> Option<pg_sys::Datum> {
-        Some(self.into_pg().into())
+    fn from(val: PgVarlena<T>) -> Self {
+        Some(val.into_pg().into())
     }
 }
 
@@ -301,7 +298,11 @@ impl<T> FromDatum for PgVarlena<T>
 where
     T: Copy + Sized,
 {
-    unsafe fn from_datum(datum: pg_sys::Datum, is_null: bool, _typoid: u32) -> Option<Self> {
+    unsafe fn from_polymorphic_datum(
+        datum: pg_sys::Datum,
+        is_null: bool,
+        _typoid: u32,
+    ) -> Option<Self> {
         if is_null {
             None
         } else {
@@ -349,7 +350,11 @@ impl<'de, T> FromDatum for T
 where
     T: PostgresType + Deserialize<'de>,
 {
-    unsafe fn from_datum(datum: pg_sys::Datum, is_null: bool, _typoid: u32) -> Option<Self> {
+    unsafe fn from_polymorphic_datum(
+        datum: pg_sys::Datum,
+        is_null: bool,
+        _typoid: u32,
+    ) -> Option<Self> {
         if is_null {
             None
         } else {

@@ -86,16 +86,17 @@ impl<'de> Deserialize<'de> for Inet {
 }
 
 impl FromDatum for Inet {
-    unsafe fn from_datum(datum: pg_sys::Datum, is_null: bool, _typoid: u32) -> Option<Inet> {
+    unsafe fn from_polymorphic_datum(
+        datum: pg_sys::Datum,
+        is_null: bool,
+        _typoid: u32,
+    ) -> Option<Inet> {
         if is_null {
             None
         } else {
             let cstr = direct_function_call::<&CStr>(pg_sys::inet_out, vec![Some(datum)]);
             Some(Inet(
-                cstr.unwrap()
-                    .to_str()
-                    .expect("unable to convert &cstr inet into &str")
-                    .to_owned(),
+                cstr.unwrap().to_str().expect("unable to convert &cstr inet into &str").to_owned(),
             ))
         }
     }
@@ -114,9 +115,9 @@ impl IntoDatum for Inet {
     }
 }
 
-impl Into<Inet> for String {
-    fn into(self) -> Inet {
-        Inet(self)
+impl From<String> for Inet {
+    fn from(val: String) -> Self {
+        Inet(val)
     }
 }
 

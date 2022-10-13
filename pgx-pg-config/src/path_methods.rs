@@ -1,6 +1,7 @@
 use eyre::{eyre, WrapErr};
 use serde_json::value::Value as JsonValue;
-use std::{path::PathBuf, process::Command};
+use std::path::PathBuf;
+use std::process::Command;
 
 // Originally part of `pgx-utils`
 pub fn prefix_path<P: Into<PathBuf>>(dir: P) -> String {
@@ -17,18 +18,11 @@ pub fn prefix_path<P: Into<PathBuf>>(dir: P) -> String {
 // Originally part of `pgx-utils`
 pub fn get_target_dir() -> eyre::Result<PathBuf> {
     let mut command = Command::new("cargo");
-    command
-        .arg("metadata")
-        .arg("--format-version=1")
-        .arg("--no-deps");
-    let output = command
-        .output()
-        .wrap_err("Unable to get target directory from `cargo metadata`")?;
+    command.arg("metadata").arg("--format-version=1").arg("--no-deps");
+    let output =
+        command.output().wrap_err("Unable to get target directory from `cargo metadata`")?;
     if !output.status.success() {
-        return Err(eyre!(
-            "'cargo metadata' failed with exit code: {}",
-            output.status
-        ));
+        return Err(eyre!("'cargo metadata' failed with exit code: {}", output.status));
     }
 
     let json: JsonValue =
@@ -36,9 +30,6 @@ pub fn get_target_dir() -> eyre::Result<PathBuf> {
     let target_dir = json.get("target_directory");
     match target_dir {
         Some(JsonValue::String(target_dir)) => Ok(target_dir.into()),
-        v => Err(eyre!(
-            "could not read target dir from `cargo metadata` got: {:?}",
-            v,
-        )),
+        v => Err(eyre!("could not read target dir from `cargo metadata` got: {:?}", v,)),
     }
 }

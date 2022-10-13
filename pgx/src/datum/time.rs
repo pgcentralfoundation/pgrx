@@ -7,8 +7,7 @@ All rights reserved.
 Use of this source code is governed by the MIT license that can be found in the LICENSE file.
 */
 
-use crate::FromTimeError;
-use crate::{pg_sys, FromDatum, IntoDatum};
+use crate::{pg_sys, FromDatum, FromTimeError, IntoDatum};
 use pgx_utils::sql_entity_graph::metadata::{
     ArgumentError, Returns, ReturnsError, SqlMapping, SqlTranslatable,
 };
@@ -26,7 +25,11 @@ pub(crate) const USECS_PER_DAY: u64 = USECS_PER_HOUR * 24;
 pub struct Time(pub u64 /* Microseconds since midnight */);
 impl FromDatum for Time {
     #[inline]
-    unsafe fn from_datum(datum: pg_sys::Datum, is_null: bool, _typoid: u32) -> Option<Time> {
+    unsafe fn from_polymorphic_datum(
+        datum: pg_sys::Datum,
+        is_null: bool,
+        _typoid: u32,
+    ) -> Option<Time> {
         if is_null {
             None
         } else {

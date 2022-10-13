@@ -15,14 +15,13 @@ to the `pgx` framework and very subject to change between versions. While you ma
 
 */
 use super::get_pgx_attr_macro;
-use crate::sql_entity_graph::{pg_extern::NameMacro, UsedType};
+use crate::sql_entity_graph::pg_extern::NameMacro;
+use crate::sql_entity_graph::UsedType;
 
 use proc_macro2::TokenStream as TokenStream2;
 use quote::ToTokens;
-use syn::{
-    parse::{Parse, ParseStream},
-    parse_quote, Expr, Type,
-};
+use syn::parse::{Parse, ParseStream};
+use syn::{parse_quote, Expr, Type};
 
 #[derive(Debug, Clone)]
 pub struct AggregateTypeList {
@@ -39,15 +38,11 @@ impl AggregateTypeList {
                     let parsed_elem = AggregateType::new(elem.clone())?;
                     coll.push(parsed_elem);
                 }
-                Ok(Self {
-                    found: coll,
-                    original: maybe_type_list,
-                })
+                Ok(Self { found: coll, original: maybe_type_list })
             }
-            ty => Ok(Self {
-                found: vec![AggregateType::new(ty.clone())?],
-                original: maybe_type_list,
-            }),
+            ty => {
+                Ok(Self { found: vec![AggregateType::new(ty.clone())?], original: maybe_type_list })
+            }
         }
     }
 

@@ -26,7 +26,8 @@ pub use argument::PgExternArgument;
 pub use operator::PgOperator;
 pub use returning::NameMacro;
 
-use crate::{sql_entity_graph::ToSqlConfig, staticize_lifetimes};
+use crate::sql_entity_graph::ToSqlConfig;
+use crate::staticize_lifetimes;
 use attribute::Attribute;
 use operator::{PgxOperatorAttributeWithIdent, PgxOperatorOpName};
 use search_path::SearchPathList;
@@ -34,12 +35,10 @@ use search_path::SearchPathList;
 use eyre::WrapErr;
 use proc_macro2::{Ident, Span, TokenStream as TokenStream2};
 use quote::{quote, quote_spanned, ToTokens, TokenStreamExt};
-use syn::{
-    parse::{Parse, ParseStream, Parser},
-    punctuated::Punctuated,
-    spanned::Spanned,
-    Meta, Token,
-};
+use syn::parse::{Parse, ParseStream, Parser};
+use syn::punctuated::Punctuated;
+use syn::spanned::Spanned;
+use syn::{Meta, Token};
 
 use self::returning::Returning;
 
@@ -97,10 +96,9 @@ impl PgExtern {
 
         if let Some(ref mut content) = to_sql_config.content {
             let value = content.value();
-            let updated_value = value.replace(
-                "@FUNCTION_NAME@",
-                &*(func.sig.ident.to_string() + "_wrapper"),
-            ) + "\n";
+            let updated_value = value
+                .replace("@FUNCTION_NAME@", &*(func.sig.ident.to_string() + "_wrapper"))
+                + "\n";
             *content = syn::LitStr::new(&updated_value, Span::call_site());
         }
 
@@ -108,11 +106,7 @@ impl PgExtern {
             crate::ident_is_acceptable_to_postgres(&func.sig.ident)?;
         }
 
-        Ok(Self {
-            attrs,
-            func,
-            to_sql_config,
-        })
+        Ok(Self { attrs, func, to_sql_config })
     }
 
     fn name(&self) -> String {
@@ -177,37 +171,27 @@ impl PgExtern {
                 "opname" => {
                     let attr: PgxOperatorOpName = syn::parse2(attr.tokens.clone())
                         .expect(&format!("Unable to parse {:?}", &attr.tokens));
-                    skel.get_or_insert_with(Default::default)
-                        .opname
-                        .get_or_insert(attr);
+                    skel.get_or_insert_with(Default::default).opname.get_or_insert(attr);
                 }
                 "commutator" => {
                     let attr: PgxOperatorAttributeWithIdent = syn::parse2(attr.tokens.clone())
                         .expect(&format!("Unable to parse {:?}", &attr.tokens));
-                    skel.get_or_insert_with(Default::default)
-                        .commutator
-                        .get_or_insert(attr);
+                    skel.get_or_insert_with(Default::default).commutator.get_or_insert(attr);
                 }
                 "negator" => {
                     let attr: PgxOperatorAttributeWithIdent = syn::parse2(attr.tokens.clone())
                         .expect(&format!("Unable to parse {:?}", &attr.tokens));
-                    skel.get_or_insert_with(Default::default)
-                        .negator
-                        .get_or_insert(attr);
+                    skel.get_or_insert_with(Default::default).negator.get_or_insert(attr);
                 }
                 "join" => {
                     let attr: PgxOperatorAttributeWithIdent = syn::parse2(attr.tokens.clone())
                         .expect(&format!("Unable to parse {:?}", &attr.tokens));
-                    skel.get_or_insert_with(Default::default)
-                        .join
-                        .get_or_insert(attr);
+                    skel.get_or_insert_with(Default::default).join.get_or_insert(attr);
                 }
                 "restrict" => {
                     let attr: PgxOperatorAttributeWithIdent = syn::parse2(attr.tokens.clone())
                         .expect(&format!("Unable to parse {:?}", &attr.tokens));
-                    skel.get_or_insert_with(Default::default)
-                        .restrict
-                        .get_or_insert(attr);
+                    skel.get_or_insert_with(Default::default).restrict.get_or_insert(attr);
                 }
                 "hashes" => {
                     skel.get_or_insert_with(Default::default).hashes = true;
@@ -715,10 +699,6 @@ impl Parse for PgExtern {
             crate::ident_is_acceptable_to_postgres(&func.sig.ident)?;
         }
 
-        Ok(Self {
-            attrs,
-            func,
-            to_sql_config,
-        })
+        Ok(Self { attrs, func, to_sql_config })
     }
 }

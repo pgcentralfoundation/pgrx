@@ -14,9 +14,7 @@ pub struct PgAtomic<T> {
 
 impl<T> PgAtomic<T> {
     pub const fn new() -> Self {
-        Self {
-            inner: OnceCell::new(),
-        }
+        Self { inner: OnceCell::new() }
     }
 }
 
@@ -25,18 +23,12 @@ where
     T: atomic_traits::Atomic + Default,
 {
     pub fn attach(&self, value: *mut T) {
-        self.inner
-            .set(value)
-            .expect("This PgAtomic is not empty, can't re-attach");
+        self.inner.set(value).expect("This PgAtomic is not empty, can't re-attach");
     }
 
     pub fn get(&self) -> &T {
         unsafe {
-            self.inner
-                .get()
-                .expect("This PgAtomic as not been initialized")
-                .as_ref()
-                .unwrap()
+            self.inner.get().expect("This PgAtomic as not been initialized").as_ref().unwrap()
         }
     }
 }

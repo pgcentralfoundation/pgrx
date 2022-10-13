@@ -8,10 +8,8 @@ to the `pgx` framework and very subject to change between versions. While you ma
 */
 use crate::sql_entity_graph::ToSqlConfig;
 use proc_macro2::Span;
-use syn::{
-    parse::{Parse, ParseStream},
-    Token,
-};
+use syn::parse::{Parse, ParseStream};
+use syn::Token;
 
 #[derive(Debug, Clone, Hash, Eq, PartialEq)]
 pub enum PgTriggerAttribute {

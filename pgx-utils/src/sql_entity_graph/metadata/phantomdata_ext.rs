@@ -8,10 +8,8 @@ to the `pgx` framework and very subject to change between versions. While you ma
 */
 use core::marker::PhantomData;
 
-use super::{
-    return_variant::ReturnsError, ArgumentError, FunctionMetadataTypeEntity, Returns, SqlMapping,
-    SqlTranslatable,
-};
+use super::return_variant::ReturnsError;
+use super::{ArgumentError, FunctionMetadataTypeEntity, Returns, SqlMapping, SqlTranslatable};
 
 /**
 An extension trait for [`PhantomData`][core::marker::PhantomData] offering SQL generation related info

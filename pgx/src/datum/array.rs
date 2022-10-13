@@ -7,7 +7,9 @@ All rights reserved.
 Use of this source code is governed by the MIT license that can be found in the LICENSE file.
 */
 
-use crate::{array::RawArray, layout::*, pg_sys, FromDatum, IntoDatum, PgMemoryContexts};
+use crate::array::RawArray;
+use crate::layout::*;
+use crate::{pg_sys, FromDatum, IntoDatum, PgMemoryContexts};
 use bitvec::slice::BitSlice;
 use core::ptr::NonNull;
 use pgx_utils::sql_entity_graph::metadata::{
@@ -73,14 +75,7 @@ impl<'a, T: FromDatum + serde::Serialize> serde::Serialize for Array<'a, T> {
 
 impl<'a, T: FromDatum> Drop for Array<'a, T> {
     fn drop(&mut self) {
-        if let Array {
-            ptr,
-            raw,
-            datum_palloc: Some(data),
-            elem_slice,
-            ..
-        } = self
-        {
+        if let Array { ptr, raw, datum_palloc: Some(data), elem_slice, .. } = self {
             // If Drop has arrived here, it means that this Array is backed by an allocation or two
             // If so, the first one is guaranteed, and was created by calling pg_sys::deconstruct_array
             // This is just a slice, dropping it doesn't "do" anything, but out of an abundance of caution:
@@ -241,10 +236,7 @@ impl<'a, T: FromDatum> Array<'a, T> {
         if you are sure your usage is sound, consider RawArray"
     )]
     pub fn as_slice(&self) -> &[T] {
-        if let Some(Layout {
-            size, passbyval, ..
-        }) = &self.elem_layout
-        {
+        if let Some(Layout { size, passbyval, .. }) = &self.elem_layout {
             if self.null_slice.any() {
                 panic!("null detected: can't expose potentially uninit data as a slice!")
             }
@@ -276,10 +268,7 @@ impl<'a, T: FromDatum> Array<'a, T> {
 
     /// Return an Iterator of Option<T> over the contained Datums.
     pub fn iter(&self) -> ArrayIterator<'_, T> {
-        ArrayIterator {
-            array: self,
-            curr: 0,
-        }
+        ArrayIterator { array: self, curr: 0 }
     }
 
     /// Return an Iterator of the contained Datums (converted to Rust types).
@@ -295,10 +284,7 @@ impl<'a, T: FromDatum> Array<'a, T> {
             panic!("array is NULL");
         };
 
-        ArrayTypedIterator {
-            array: self,
-            curr: 0,
-        }
+        ArrayTypedIterator { array: self, curr: 0 }
     }
 
     #[inline]
@@ -318,7 +304,7 @@ impl<'a, T: FromDatum> Array<'a, T> {
             None
         } else {
             Some(unsafe {
-                T::from_datum(
+                T::from_polymorphic_datum(
                     self.elem_slice[i],
                     self.null_slice.get(i)?,
                     self.raw.as_ref().map(|r| r.oid()).unwrap_or_default(),
@@ -451,10 +437,7 @@ impl<'a, T: FromDatum> IntoIterator for Array<'a, T> {
     type IntoIter = ArrayIntoIterator<'a, T>;
 
     fn into_iter(self) -> Self::IntoIter {
-        ArrayIntoIterator {
-            array: self,
-            curr: 0,
-        }
+        ArrayIntoIterator { array: self, curr: 0 }
     }
 }
 
@@ -463,10 +446,7 @@ impl<'a, T: FromDatum> IntoIterator for VariadicArray<'a, T> {
     type IntoIter = ArrayIntoIterator<'a, T>;
 
     fn into_iter(self) -> Self::IntoIter {
-        ArrayIntoIterator {
-            array: self.0,
-            curr: 0,
-        }
+        ArrayIntoIterator { array: self.0, curr: 0 }
     }
 }
 
@@ -502,18 +482,18 @@ impl<'a, T: FromDatum> Iterator for ArrayIntoIterator<'a, T> {
 
 impl<'a, T: FromDatum> FromDatum for VariadicArray<'a, T> {
     #[inline]
-    unsafe fn from_datum(
+    unsafe fn from_polymorphic_datum(
         datum: pg_sys::Datum,
         is_null: bool,
         oid: pg_sys::Oid,
     ) -> Option<VariadicArray<'a, T>> {
-        Array::from_datum(datum, is_null, oid).map(Self)
+        Array::from_polymorphic_datum(datum, is_null, oid).map(Self)
     }
 }
 
 impl<'a, T: FromDatum> FromDatum for Array<'a, T> {
     #[inline]
-    unsafe fn from_datum(
+    unsafe fn from_polymorphic_datum(
         datum: pg_sys::Datum,
         is_null: bool,
         _typoid: u32,
@@ -536,7 +516,7 @@ impl<'a, T: FromDatum> FromDatum for Array<'a, T> {
 
 impl<T: FromDatum> FromDatum for Vec<T> {
     #[inline]
-    unsafe fn from_datum(
+    unsafe fn from_polymorphic_datum(
         datum: pg_sys::Datum,
         is_null: bool,
         typoid: pg_sys::Oid,
@@ -544,11 +524,32 @@ impl<T: FromDatum> FromDatum for Vec<T> {
         if is_null {
             None
         } else {
-            let array = Array::<T>::from_datum(datum, is_null, typoid).unwrap();
+            let array = Array::<T>::from_polymorphic_datum(datum, is_null, typoid).unwrap();
             let mut v = Vec::with_capacity(array.len());
 
             for element in array.iter() {
                 v.push(element.expect("array element was NULL"))
+            }
+            Some(v)
+        }
+    }
+}
+
+impl<T: FromDatum> FromDatum for Vec<Option<T>> {
+    #[inline]
+    unsafe fn from_polymorphic_datum(
+        datum: pg_sys::Datum,
+        is_null: bool,
+        typoid: pg_sys::Oid,
+    ) -> Option<Vec<Option<T>>> {
+        if is_null || datum.is_null() {
+            None
+        } else {
+            let array = Array::<T>::from_polymorphic_datum(datum, is_null, typoid).unwrap();
+            let mut v = Vec::with_capacity(array.len());
+
+            for element in array.iter() {
+                v.push(element)
             }
             Some(v)
         }
@@ -657,12 +658,8 @@ where
         match T::argument_sql()? {
             SqlMapping::As(sql) => Ok(SqlMapping::As(format!("{sql}[]"))),
             SqlMapping::Skip => Err(ArgumentError::SkipInArray),
-            SqlMapping::Composite { .. } => Ok(SqlMapping::Composite {
-                array_brackets: true,
-            }),
-            SqlMapping::Source { .. } => Ok(SqlMapping::Source {
-                array_brackets: true,
-            }),
+            SqlMapping::Composite { .. } => Ok(SqlMapping::Composite { array_brackets: true }),
+            SqlMapping::Source { .. } => Ok(SqlMapping::Source { array_brackets: true }),
         }
     }
 
@@ -672,14 +669,10 @@ where
                 Ok(Returns::One(SqlMapping::As(format!("{sql}[]"))))
             }
             Returns::One(SqlMapping::Composite { array_brackets: _ }) => {
-                Ok(Returns::One(SqlMapping::Composite {
-                    array_brackets: true,
-                }))
+                Ok(Returns::One(SqlMapping::Composite { array_brackets: true }))
             }
             Returns::One(SqlMapping::Source { array_brackets: _ }) => {
-                Ok(Returns::One(SqlMapping::Source {
-                    array_brackets: true,
-                }))
+                Ok(Returns::One(SqlMapping::Source { array_brackets: true }))
             }
             Returns::One(SqlMapping::Skip) => Err(ReturnsError::SkipInArray),
             Returns::SetOf(_) => Err(ReturnsError::SetOfInArray),
@@ -696,12 +689,8 @@ where
         match T::argument_sql()? {
             SqlMapping::As(sql) => Ok(SqlMapping::As(format!("{sql}[]"))),
             SqlMapping::Skip => Err(ArgumentError::SkipInArray),
-            SqlMapping::Composite { .. } => Ok(SqlMapping::Composite {
-                array_brackets: true,
-            }),
-            SqlMapping::Source { .. } => Ok(SqlMapping::Source {
-                array_brackets: true,
-            }),
+            SqlMapping::Composite { .. } => Ok(SqlMapping::Composite { array_brackets: true }),
+            SqlMapping::Source { .. } => Ok(SqlMapping::Source { array_brackets: true }),
         }
     }
 
@@ -711,14 +700,10 @@ where
                 Ok(Returns::One(SqlMapping::As(format!("{sql}[]"))))
             }
             Returns::One(SqlMapping::Composite { array_brackets: _ }) => {
-                Ok(Returns::One(SqlMapping::Composite {
-                    array_brackets: true,
-                }))
+                Ok(Returns::One(SqlMapping::Composite { array_brackets: true }))
             }
             Returns::One(SqlMapping::Source { array_brackets: _ }) => {
-                Ok(Returns::One(SqlMapping::Source {
-                    array_brackets: true,
-                }))
+                Ok(Returns::One(SqlMapping::Source { array_brackets: true }))
             }
             Returns::One(SqlMapping::Skip) => Err(ReturnsError::SkipInArray),
             Returns::SetOf(_) => Err(ReturnsError::SetOfInArray),

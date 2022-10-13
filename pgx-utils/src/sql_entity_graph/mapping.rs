@@ -68,9 +68,6 @@ pub struct RustSourceOnlySqlMapping {
 
 impl RustSourceOnlySqlMapping {
     pub fn new(rust: String, sql: String) -> Self {
-        Self {
-            rust: rust.to_string(),
-            sql: sql.to_string(),
-        }
+        Self { rust: rust.to_string(), sql: sql.to_string() }
     }
 }
