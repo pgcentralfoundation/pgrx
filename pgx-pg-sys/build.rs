@@ -566,13 +566,6 @@ fn run_bindgen(pg_config: &PgConfig, include_h: &PathBuf) -> eyre::Result<syn::F
         .clang_arg(&format!("-I{}", includedir_server.display()))
         .clang_args(&extra_bindgen_clang_args(pg_config)?)
         .parse_callbacks(Box::new(PgxOverrides::default()))
-        .allowlist_file(".*confdefs.h")
-        .allowlist_file(".*(?:[fF]uncs|mgr).h")
-        .allowlist_file(".*htup(?:_details)?.h")
-        .allowlist_file(".*syscache.h")
-        .allowlist_file(".*mcxt.h")
-        .allowlist_file(".*(?:storage|catalog|access|commands|executor|adt|optimizer|rewrite|postmaster|tcop|replication|nodes|postgres|parse|pg_|item|heap).*")
-        .allowlist_var("SIG.*")
         .blocklist_type("(Nullable)?Datum") // manually wrapping datum types for correctness
         .blocklist_function("varsize_any") // pgx converts the VARSIZE_ANY macro, so we don't want to also have this function, which is in heaptuple.c
         .blocklist_function("(?:query|expression)_tree_walker")
