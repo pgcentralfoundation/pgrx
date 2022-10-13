@@ -6,9 +6,8 @@ All rights reserved.
 
 Use of this source code is governed by the MIT license that can be found in the LICENSE file.
 */
-use pgx::{
-    check_for_interrupts, info, prelude::*, register_xact_callback, PgRelation, PgXactCallbackEvent,
-};
+use pgx::prelude::*;
+use pgx::{check_for_interrupts, info, register_xact_callback, PgRelation, PgXactCallbackEvent};
 use std::fs::File;
 use std::io::Write;
 use std::process::Command;
@@ -31,10 +30,7 @@ fn exec<'a>(
     let output = command.output().expect("command failed");
 
     if !output.stderr.is_empty() {
-        panic!(
-            "{}",
-            String::from_utf8(output.stderr).expect("stderr is not valid utf8")
-        )
+        panic!("{}", String::from_utf8(output.stderr).expect("stderr is not valid utf8"))
     }
 
     TableIterator::once((
@@ -52,14 +48,9 @@ fn write_file(filename: &str, bytes: &[u8]) -> i64 {
 
 #[pg_extern]
 fn http(url: &str) -> String {
-    let response = ureq::Agent::new()
-        .get(url)
-        .call()
-        .expect("invalid http response");
+    let response = ureq::Agent::new().get(url).call().expect("invalid http response");
 
-    response
-        .into_string()
-        .expect("invalid string from response")
+    response.into_string().expect("invalid string from response")
 }
 
 #[pg_extern]

@@ -14,9 +14,7 @@ impl<'a, T> SetOfIterator<'a, T> {
     where
         I: IntoIterator<Item = T> + 'a,
     {
-        Self {
-            iter: Box::new(iter.into_iter()),
-        }
+        Self { iter: Box::new(iter.into_iter()) }
     }
 }
 
@@ -54,18 +52,14 @@ impl<'a, T> TableIterator<'a, T> {
     where
         I: Iterator<Item = T> + 'a,
     {
-        Self {
-            iter: Box::new(iter),
-        }
+        Self { iter: Box::new(iter) }
     }
 
     pub fn once(value: T) -> TableIterator<'a, T>
     where
         T: 'a,
     {
-        Self {
-            iter: Box::new(once(value)),
-        }
+        Self { iter: Box::new(once(value)) }
     }
 }
 

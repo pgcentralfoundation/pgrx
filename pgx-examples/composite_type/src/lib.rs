@@ -214,13 +214,8 @@ impl Aggregate for ScritchCollector {
             Some(v) => v,
             None => PgHeapTuple::new_composite_type(DOG_COMPOSITE_TYPE).unwrap(),
         };
-        let current_scritches: i32 = current
-            .get_by_name("scritches")
-            .unwrap()
-            .unwrap_or_default();
-        current
-            .set_by_name("scritches", current_scritches + arg)
-            .unwrap();
+        let current_scritches: i32 = current.get_by_name("scritches").unwrap().unwrap_or_default();
+        current.set_by_name("scritches", current_scritches + arg).unwrap();
         Some(current)
     }
 }
@@ -251,15 +246,15 @@ fn add_scritches_to_dog(
     right: i32,
 ) -> pgx::composite_type!("Dog") {
     let left_scritches: i32 = left.get_by_name("scritches").unwrap().unwrap_or_default();
-    left.set_by_name("scritches", left_scritches + right)
-        .unwrap();
+    left.set_by_name("scritches", left_scritches + right).unwrap();
     left
 }
 
 #[cfg(any(test, feature = "pg_test"))]
 #[pg_schema]
 mod tests {
-    use pgx::{prelude::*, AllocatedByRust};
+    use pgx::prelude::*;
+    use pgx::AllocatedByRust;
 
     #[pg_test]
     fn test_create_dog() {

@@ -8,7 +8,8 @@ to the `pgx` framework and very subject to change between versions. While you ma
 */
 use std::error::Error;
 
-use super::{return_variant::ReturnsError, FunctionMetadataTypeEntity, Returns};
+use super::return_variant::ReturnsError;
+use super::{FunctionMetadataTypeEntity, Returns};
 
 #[derive(Clone, Copy, Debug, Hash, Ord, PartialOrd, PartialEq, Eq)]
 pub enum ArgumentError {
@@ -156,12 +157,12 @@ where
             id if id == u8::type_name() => Ok(SqlMapping::As(format!("bytea"))),
             _ => match T::argument_sql() {
                 Ok(SqlMapping::As(val)) => Ok(SqlMapping::As(format!("{val}[]"))),
-                Ok(SqlMapping::Composite { array_brackets: _ }) => Ok(SqlMapping::Composite {
-                    array_brackets: true,
-                }),
-                Ok(SqlMapping::Source { array_brackets: _ }) => Ok(SqlMapping::Source {
-                    array_brackets: true,
-                }),
+                Ok(SqlMapping::Composite { array_brackets: _ }) => {
+                    Ok(SqlMapping::Composite { array_brackets: true })
+                }
+                Ok(SqlMapping::Source { array_brackets: _ }) => {
+                    Ok(SqlMapping::Source { array_brackets: true })
+                }
                 Ok(SqlMapping::Skip) => Ok(SqlMapping::Skip),
                 err @ Err(_) => err,
             },
@@ -175,14 +176,10 @@ where
                     Ok(Returns::One(SqlMapping::As(format!("{val}[]"))))
                 }
                 Ok(Returns::One(SqlMapping::Composite { array_brackets: _ })) => {
-                    Ok(Returns::One(SqlMapping::Composite {
-                        array_brackets: true,
-                    }))
+                    Ok(Returns::One(SqlMapping::Composite { array_brackets: true }))
                 }
                 Ok(Returns::One(SqlMapping::Source { array_brackets: _ })) => {
-                    Ok(Returns::One(SqlMapping::Source {
-                        array_brackets: true,
-                    }))
+                    Ok(Returns::One(SqlMapping::Source { array_brackets: true }))
                 }
                 Ok(Returns::One(SqlMapping::Skip)) => Ok(Returns::One(SqlMapping::Skip)),
                 Ok(Returns::SetOf(_)) => Err(ReturnsError::SetOfInArray),
@@ -216,14 +213,10 @@ unsafe impl SqlTranslatable for i32 {
 
 unsafe impl SqlTranslatable for u32 {
     fn argument_sql() -> Result<SqlMapping, ArgumentError> {
-        Ok(SqlMapping::Source {
-            array_brackets: false,
-        })
+        Ok(SqlMapping::Source { array_brackets: false })
     }
     fn return_sql() -> Result<Returns, ReturnsError> {
-        Ok(Returns::One(SqlMapping::Source {
-            array_brackets: false,
-        }))
+        Ok(Returns::One(SqlMapping::Source { array_brackets: false }))
     }
 }
 

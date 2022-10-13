@@ -14,7 +14,9 @@ Use of this source code is governed by the MIT license that can be found in the 
 to the `pgx` framework and very subject to change between versions. While you may use this, please do it with caution.
 
 */
-use crate::sql_entity_graph::{pgx_sql::PgxSql, to_sql::ToSqlFn, SqlGraphEntity};
+use crate::sql_entity_graph::pgx_sql::PgxSql;
+use crate::sql_entity_graph::to_sql::ToSqlFn;
+use crate::sql_entity_graph::SqlGraphEntity;
 
 /// Represents configuration options for tuning the SQL generator.
 ///

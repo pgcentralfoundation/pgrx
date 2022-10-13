@@ -130,10 +130,7 @@ impl<T> PgBox<T, AllocatedByPostgres> {
     /// allocated it, Postgres is responsible for freeing it.
     #[inline]
     pub unsafe fn from_pg(ptr: *mut T) -> PgBox<T, AllocatedByPostgres> {
-        PgBox::<T, AllocatedByPostgres> {
-            ptr: NonNull::new(ptr),
-            __marker: PhantomData,
-        }
+        PgBox::<T, AllocatedByPostgres> { ptr: NonNull::new(ptr), __marker: PhantomData }
     }
 }
 
@@ -205,10 +202,7 @@ impl<T, AllocatedBy: WhoAllocated<T>> PgBox<T, AllocatedBy> {
     /// If you need to give the boxed pointer to Postgres, call [`.into_pg()`][PgBox::into_pg]
     #[inline]
     pub unsafe fn from_rust(ptr: *mut T) -> PgBox<T, AllocatedByRust> {
-        PgBox::<T, AllocatedByRust> {
-            ptr: NonNull::new(ptr),
-            __marker: PhantomData,
-        }
+        PgBox::<T, AllocatedByRust> { ptr: NonNull::new(ptr), __marker: PhantomData }
     }
 
     /// Allocate enough memory for the type'd struct, within Postgres' `CurrentMemoryContext`  The
@@ -329,10 +323,7 @@ impl<T, AllocatedBy: WhoAllocated<T>> PgBox<T, AllocatedBy> {
     /// Box nothing
     #[inline]
     pub fn null() -> PgBox<T, AllocatedByPostgres> {
-        PgBox::<T, AllocatedByPostgres> {
-            ptr: None,
-            __marker: PhantomData,
-        }
+        PgBox::<T, AllocatedByPostgres> { ptr: None, __marker: PhantomData }
     }
 
     /// Are we boxing a NULL?

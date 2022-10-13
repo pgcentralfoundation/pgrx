@@ -95,8 +95,11 @@ mod pg_10_11 {
         let datum = unsafe { fcinfo.as_ref() }.unwrap().arg[num];
         let isnull = pg_arg_is_null(fcinfo, num);
         unsafe {
-            let typid = pg_sys::InvalidOid;
-            T::from_datum(datum, isnull, typid)
+            if T::GET_TYPOID {
+                T::from_polymorphic_datum(datum, isnull, super::pg_getarg_type(fcinfo, num))
+            } else {
+                T::from_datum(datum, isnull)
+            }
         }
     }
 
@@ -134,8 +137,15 @@ mod pg_12_13_14 {
     pub fn pg_getarg<T: FromDatum>(fcinfo: pg_sys::FunctionCallInfo, num: usize) -> Option<T> {
         let datum = get_nullable_datum(fcinfo, num);
         unsafe {
-            let typid = pg_sys::InvalidOid;
-            T::from_datum(datum.value, datum.isnull, typid)
+            if T::GET_TYPOID {
+                T::from_polymorphic_datum(
+                    datum.value,
+                    datum.isnull,
+                    super::pg_getarg_type(fcinfo, num),
+                )
+            } else {
+                T::from_datum(datum.value, datum.isnull)
+            }
         }
     }
 
@@ -200,7 +210,7 @@ pub fn pg_getarg_pointer<T>(fcinfo: pg_sys::FunctionCallInfo, num: usize) -> Opt
 /// The provided `fcinfo` must be valid otherwise this function results in undefined behavior due
 /// to an out of bounds read.
 #[inline]
-pub unsafe fn get_getarg_type(fcinfo: pg_sys::FunctionCallInfo, num: usize) -> pg_sys::Oid {
+pub unsafe fn pg_getarg_type(fcinfo: pg_sys::FunctionCallInfo, num: usize) -> pg_sys::Oid {
     pg_sys::get_fn_expr_argtype(fcinfo.as_ref().unwrap().flinfo, num as std::os::raw::c_int)
 }
 
@@ -269,7 +279,7 @@ pub unsafe fn direct_function_call<R: FromDatum>(
 ) -> Option<R> {
     let datum = direct_function_call_as_datum(func, args);
     match datum {
-        Some(datum) => R::from_datum(datum, false, pg_sys::InvalidOid),
+        Some(datum) => R::from_datum(datum, false),
         None => None,
     }
 }
@@ -306,7 +316,7 @@ pub unsafe fn direct_pg_extern_function_call<R: FromDatum>(
 ) -> Option<R> {
     let datum = direct_pg_extern_function_call_as_datum(func, args);
     match datum {
-        Some(datum) => R::from_datum(datum, false, pg_sys::InvalidOid),
+        Some(datum) => R::from_datum(datum, false),
         None => None,
     }
 }
@@ -424,10 +434,7 @@ fn make_function_call_info(
 
     let slice = unsafe { fcinfo.args.as_mut_slice(nargs) };
     for i in 0..nargs {
-        slice[i] = pg_sys::NullableDatum {
-            value: arg_array[i],
-            isnull: null_array[i],
-        }
+        slice[i] = pg_sys::NullableDatum { value: arg_array[i], isnull: null_array[i] }
     }
 
     fcinfo_boxed

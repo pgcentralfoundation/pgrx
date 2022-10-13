@@ -6,14 +6,11 @@ All rights reserved.
 
 Use of this source code is governed by the MIT license that can be found in the LICENSE file.
 */
-use crate::{
-    command::{
-        get::{find_control_file, get_property},
-        install::format_display_path,
-    },
-    pgx_pg_sys_stub::PgxPgSysStub,
-    CommandExecute,
-};
+use crate::command::get::{find_control_file, get_property};
+use crate::command::install::format_display_path;
+use crate::pgx_pg_sys_stub::PgxPgSysStub;
+use crate::profile::CargoProfile;
+use crate::CommandExecute;
 use cargo_toml::Manifest;
 use eyre::{eyre, WrapErr};
 use object::Object;
@@ -21,12 +18,10 @@ use once_cell::sync::OnceCell;
 use owo_colors::OwoColorize;
 use pgx_pg_config::{get_target_dir, PgConfig, Pgx};
 use pgx_utils::sql_entity_graph::{ControlFile, PgxSql, SqlGraphEntity};
-use std::{
-    collections::HashSet,
-    hash::{Hash, Hasher},
-    path::{Path, PathBuf},
-    process::{Command, Stdio},
-};
+use std::collections::HashSet;
+use std::hash::{Hash, Hasher};
+use std::path::{Path, PathBuf};
+use std::process::{Command, Stdio};
 // Since we support extensions with `#[no_std]`
 extern crate alloc;
 use alloc::vec::Vec;
@@ -55,8 +50,11 @@ pub(crate) struct Schema {
     /// Do you want to run against Postgres `pg10`, `pg11`, `pg12`, `pg13`, `pg14`?
     pg_version: Option<String>,
     /// Compile for release mode (default is debug)
-    #[clap(env = "PROFILE", long, short)]
+    #[clap(long, short)]
     release: bool,
+    /// Specific profile to use (conflicts with `--release`)
+    #[clap(long)]
+    profile: Option<String>,
     /// The `pg_config` path (default is first in $PATH)
     #[clap(long, short = 'c', parse(from_os_str))]
     pg_config: Option<PathBuf>,
@@ -120,12 +118,14 @@ impl CommandExecute for Schema {
         let features =
             crate::manifest::features_for_version(self.features, &package_manifest, &pg_version);
 
+        let profile = CargoProfile::from_flags(self.release, self.profile.as_deref())?;
+
         generate_schema(
             &pg_config,
             self.manifest_path.as_ref(),
             self.package.as_ref(),
             package_manifest_path,
-            self.release,
+            &profile,
             self.test,
             &features,
             self.out.as_ref(),
@@ -138,7 +138,7 @@ impl CommandExecute for Schema {
 
 #[tracing::instrument(level = "error", skip_all, fields(
     pg_version = %pg_config.version()?,
-    release = is_release,
+    profile = ?profile,
     test = is_test,
     path = path.as_ref().map(|path| tracing::field::display(path.as_ref().display())),
     dot,
@@ -149,7 +149,7 @@ pub(crate) fn generate_schema(
     user_manifest_path: Option<impl AsRef<Path>>,
     user_package: Option<&String>,
     package_manifest_path: impl AsRef<Path>,
-    is_release: bool,
+    profile: &CargoProfile,
     is_test: bool,
     features: &clap_cargo::Features,
     path: Option<impl AsRef<std::path::Path>>,
@@ -177,7 +177,7 @@ pub(crate) fn generate_schema(
     let flags = std::env::var("PGX_BUILD_FLAGS").unwrap_or_default();
 
     let mut target_dir_with_profile = get_target_dir()?;
-    target_dir_with_profile.push(if is_release { "release" } else { "debug" });
+    target_dir_with_profile.push(profile.target_subdir());
 
     // First, build the SQL generator so we can get a look at the symbol table
     if !skip_build {
@@ -201,9 +201,7 @@ pub(crate) fn generate_schema(
             command.arg(user_manifest_path.as_ref());
         }
 
-        if is_release {
-            command.arg("--release");
-        }
+        command.args(profile.cargo_args());
 
         if let Some(log_level) = &log_level {
             command.env("RUST_LOG", log_level);
@@ -236,9 +234,8 @@ pub(crate) fn generate_schema(
         );
 
         tracing::debug!(command = %command_str, "Running");
-        let cargo_output = command
-            .output()
-            .wrap_err_with(|| format!("failed to spawn cargo: {}", command_str))?;
+        let cargo_output =
+            command.output().wrap_err_with(|| format!("failed to spawn cargo: {}", command_str))?;
         tracing::trace!(status_code = %cargo_output.status, command = %command_str, "Finished");
 
         if !cargo_output.status.success() {
@@ -261,9 +258,7 @@ pub(crate) fn generate_schema(
             .ok_or(eyre!("couldn't get postmaster parent dir"))?,
     );
 
-    let postmaster_path = pg_config
-        .postmaster_path()
-        .wrap_err("could not get postmaster path")?;
+    let postmaster_path = pg_config.postmaster_path().wrap_err("could not get postmaster path")?;
 
     // The next action may take a few seconds, we'd like the user to know we're thinking.
     eprintln!("{} SQL entities", " Discovering".bold().green(),);
@@ -273,24 +268,15 @@ pub(crate) fn generate_schema(
     // Inspect the symbol table for a list of `__pgx_internals` we should have the generator call
     let mut lib_so = target_dir_with_profile.clone();
 
-    let so_extension = if cfg!(target_os = "macos") {
-        ".dylib"
-    } else {
-        ".so"
-    };
+    let so_extension = if cfg!(target_os = "macos") { ".dylib" } else { ".so" };
 
-    lib_so.push(&format!(
-        "lib{}{}",
-        package_name.replace("-", "_"),
-        so_extension
-    ));
+    lib_so.push(&format!("lib{}{}", package_name.replace("-", "_"), so_extension));
 
     let lib_so_data = std::fs::read(&lib_so).wrap_err("couldn't read extension shared object")?;
     let lib_so_obj_file =
         object::File::parse(&*lib_so_data).wrap_err("couldn't parse extension shared object")?;
-    let lib_so_exports = lib_so_obj_file
-        .exports()
-        .wrap_err("couldn't get exports from extension shared object")?;
+    let lib_so_exports =
+        lib_so_obj_file.exports().wrap_err("couldn't get exports from extension shared object")?;
 
     // Some users reported experiencing duplicate entries if we don't ensure `fns_to_call`
     // has unique entries.
@@ -415,13 +401,9 @@ pub(crate) fn generate_schema(
         }
     };
 
-    let pgx_sql = PgxSql::build(
-        sql_mapping,
-        entities.into_iter(),
-        package_name.to_string(),
-        versioned_so,
-    )
-    .wrap_err("SQL generation error")?;
+    let pgx_sql =
+        PgxSql::build(sql_mapping, entities.into_iter(), package_name.to_string(), versioned_so)
+            .wrap_err("SQL generation error")?;
 
     if let Some(out_path) = path {
         let out_path = out_path.as_ref();
@@ -439,11 +421,7 @@ pub(crate) fn generate_schema(
             .to_file(out_path)
             .wrap_err_with(|| eyre!("Could not write SQL to {}", out_path.display()))?;
     } else {
-        eprintln!(
-            "{} SQL entities to {}",
-            "     Writing".bold().green(),
-            "/dev/stdout".cyan(),
-        );
+        eprintln!("{} SQL entities to {}", "     Writing".bold().green(), "/dev/stdout".cyan(),);
         pgx_sql
             .write(&mut std::io::stdout())
             .wrap_err_with(|| eyre!("Could not write SQL to stdout"))?;
@@ -542,16 +520,10 @@ fn create_stub(
     let so_rustc_invocation_str = format!("{:?}", so_rustc_invocation);
     tracing::debug!(command = %so_rustc_invocation_str, "Running");
     let output = so_rustc_invocation.output().wrap_err_with(|| {
-        eyre!(
-            "could not invoke `rustc` on {}",
-            &postmaster_stub_file.display()
-        )
+        eyre!("could not invoke `rustc` on {}", &postmaster_stub_file.display())
     })?;
 
-    let code = output
-        .status
-        .code()
-        .ok_or(eyre!("could not get status code of build"))?;
+    let code = output.status.code().ok_or(eyre!("could not get status code of build"))?;
     tracing::trace!(status_code = %code, command = %so_rustc_invocation_str, "Finished");
     if code != 0 {
         return Err(eyre!("rustc exited with code {}", code));

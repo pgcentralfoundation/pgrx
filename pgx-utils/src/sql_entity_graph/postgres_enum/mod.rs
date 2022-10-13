@@ -19,11 +19,9 @@ pub mod entity;
 use crate::sql_entity_graph::ToSqlConfig;
 use proc_macro2::{Span, TokenStream as TokenStream2};
 use quote::{quote, ToTokens, TokenStreamExt};
-use syn::{
-    parse::{Parse, ParseStream},
-    DeriveInput, Generics, ItemEnum,
-};
-use syn::{punctuated::Punctuated, Ident, Token};
+use syn::parse::{Parse, ParseStream};
+use syn::punctuated::Punctuated;
+use syn::{DeriveInput, Generics, Ident, ItemEnum, Token};
 
 /// A parsed `#[derive(PostgresEnum)]` item.
 ///
@@ -66,12 +64,7 @@ impl PostgresEnum {
             crate::ident_is_acceptable_to_postgres(&name)?;
         }
 
-        Ok(Self {
-            name,
-            generics,
-            variants,
-            to_sql_config,
-        })
+        Ok(Self { name, generics, variants, to_sql_config })
     }
 
     pub fn from_derive_input(derive_input: DeriveInput) -> Result<Self, syn::Error> {
@@ -83,12 +76,7 @@ impl PostgresEnum {
                 return Err(syn::Error::new(derive_input.ident.span(), "expected enum"))
             }
         };
-        Self::new(
-            derive_input.ident,
-            derive_input.generics,
-            data_enum.variants,
-            to_sql_config,
-        )
+        Self::new(derive_input.ident, derive_input.generics, data_enum.variants, to_sql_config)
     }
 }
 
@@ -97,12 +85,7 @@ impl Parse for PostgresEnum {
         let parsed: ItemEnum = input.parse()?;
         let to_sql_config =
             ToSqlConfig::from_attributes(parsed.attrs.as_slice())?.unwrap_or_default();
-        Self::new(
-            parsed.ident,
-            parsed.generics,
-            parsed.variants,
-            to_sql_config,
-        )
+        Self::new(parsed.ident, parsed.generics, parsed.variants, to_sql_config)
     }
 }
 

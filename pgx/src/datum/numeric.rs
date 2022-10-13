@@ -98,68 +98,72 @@ impl<'de> Deserialize<'de> for Numeric {
     }
 }
 
-impl Into<Numeric> for i8 {
-    fn into(self) -> Numeric {
-        Numeric(format!("{}", self))
+impl From<i8> for Numeric {
+    fn from(val: i8) -> Self {
+        Numeric(val.to_string())
     }
 }
 
-impl Into<Numeric> for i16 {
-    fn into(self) -> Numeric {
-        Numeric(format!("{}", self))
+impl From<i16> for Numeric {
+    fn from(val: i16) -> Self {
+        Numeric(val.to_string())
     }
 }
 
-impl Into<Numeric> for i32 {
-    fn into(self) -> Numeric {
-        Numeric(format!("{}", self))
+impl From<i32> for Numeric {
+    fn from(val: i32) -> Self {
+        Numeric(val.to_string())
     }
 }
 
-impl Into<Numeric> for i64 {
-    fn into(self) -> Numeric {
-        Numeric(format!("{}", self))
+impl From<i64> for Numeric {
+    fn from(val: i64) -> Self {
+        Numeric(val.to_string())
     }
 }
 
-impl Into<Numeric> for u8 {
-    fn into(self) -> Numeric {
-        Numeric(format!("{}", self))
+impl From<u8> for Numeric {
+    fn from(val: u8) -> Self {
+        Numeric(val.to_string())
     }
 }
 
-impl Into<Numeric> for u16 {
-    fn into(self) -> Numeric {
-        Numeric(format!("{}", self))
+impl From<u16> for Numeric {
+    fn from(val: u16) -> Self {
+        Numeric(val.to_string())
     }
 }
 
-impl Into<Numeric> for u32 {
-    fn into(self) -> Numeric {
-        Numeric(format!("{}", self))
+impl From<u32> for Numeric {
+    fn from(val: u32) -> Self {
+        Numeric(val.to_string())
     }
 }
 
-impl Into<Numeric> for u64 {
-    fn into(self) -> Numeric {
-        Numeric(format!("{}", self))
+impl From<u64> for Numeric {
+    fn from(val: u64) -> Self {
+        Numeric(val.to_string())
     }
 }
 
-impl Into<Numeric> for f32 {
-    fn into(self) -> Numeric {
-        Numeric(format!("{}", self))
+impl From<f32> for Numeric {
+    fn from(val: f32) -> Self {
+        Numeric(val.to_string())
     }
 }
 
-impl Into<Numeric> for f64 {
-    fn into(self) -> Numeric {
-        Numeric(format!("{}", self))
+impl From<f64> for Numeric {
+    fn from(val: f64) -> Self {
+        Numeric(val.to_string())
     }
 }
 
 impl FromDatum for Numeric {
-    unsafe fn from_datum(datum: pg_sys::Datum, is_null: bool, _typoid: u32) -> Option<Self>
+    unsafe fn from_polymorphic_datum(
+        datum: pg_sys::Datum,
+        is_null: bool,
+        _typoid: u32,
+    ) -> Option<Self>
     where
         Self: Sized,
     {
@@ -183,11 +187,7 @@ impl IntoDatum for Numeric {
         unsafe {
             direct_function_call_as_datum(
                 pg_sys::numeric_in,
-                vec![
-                    cstr.into_datum(),
-                    pg_sys::InvalidOid.into_datum(),
-                    0i32.into_datum(),
-                ],
+                vec![cstr.into_datum(), pg_sys::InvalidOid.into_datum(), 0i32.into_datum()],
             )
         }
     }

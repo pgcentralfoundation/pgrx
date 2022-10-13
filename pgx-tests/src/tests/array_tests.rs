@@ -8,7 +8,8 @@ Use of this source code is governed by the MIT license that can be found in the 
 */
 
 use pgx::array::RawArray;
-use pgx::{prelude::*, Array, Json};
+use pgx::prelude::*;
+use pgx::{Array, Json};
 use serde_json::*;
 
 #[pg_extern(name = "sum_array")]
@@ -185,7 +186,8 @@ mod tests {
     #[allow(unused_imports)]
     use crate as pgx_tests;
 
-    use pgx::{prelude::*, IntoDatum, Json};
+    use pgx::prelude::*;
+    use pgx::{IntoDatum, Json};
     use serde_json::json;
 
     #[pg_test]

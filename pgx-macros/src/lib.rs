@@ -13,12 +13,10 @@ mod operators;
 use operators::{impl_postgres_eq, impl_postgres_hash, impl_postgres_ord};
 
 use pgx_utils::rewriter::*;
-use pgx_utils::{
-    sql_entity_graph::{
-        ExtensionSql, ExtensionSqlFile, PgAggregate, PgExtern, PostgresEnum, PostgresType, Schema,
-    },
-    *,
+use pgx_utils::sql_entity_graph::{
+    ExtensionSql, ExtensionSqlFile, PgAggregate, PgExtern, PostgresEnum, PostgresType, Schema,
 };
+use pgx_utils::*;
 use proc_macro::TokenStream;
 use proc_macro2::Ident;
 use quote::{quote, ToTokens};
@@ -621,7 +619,7 @@ fn impl_postgres_enum(ast: DeriveInput) -> proc_macro2::TokenStream {
     stream.extend(quote! {
         impl ::pgx::datum::FromDatum for #enum_ident {
             #[inline]
-            unsafe fn from_datum(datum: ::pgx::pg_sys::Datum, is_null: bool, typeoid: ::pgx::pg_sys::Oid) -> Option<#enum_ident> {
+            unsafe fn from_polymorphic_datum(datum: ::pgx::pg_sys::Datum, is_null: bool, typeoid: ::pgx::pg_sys::Oid) -> Option<#enum_ident> {
                 if is_null {
                     None
                 } else {
@@ -676,10 +674,7 @@ Optionally accepts the following attributes:
 * `pgvarlena_inoutfuncs(some_in_fn, some_out_fn)`: Define custom in/out functions for the `PgVarlena` of this type.
 * `sql`: Same arguments as [`#[pgx(sql = ..)]`](macro@pgx).
 */
-#[proc_macro_derive(
-    PostgresType,
-    attributes(inoutfuncs, pgvarlena_inoutfuncs, requires, pgx)
-)]
+#[proc_macro_derive(PostgresType, attributes(inoutfuncs, pgvarlena_inoutfuncs, requires, pgx))]
 pub fn postgres_type(input: TokenStream) -> TokenStream {
     let ast = parse_macro_input!(input as syn::DeriveInput);
 
@@ -933,9 +928,7 @@ Optionally accepts the following attributes:
 #[proc_macro_derive(PostgresEq, attributes(pgx))]
 pub fn postgres_eq(input: TokenStream) -> TokenStream {
     let ast = parse_macro_input!(input as syn::DeriveInput);
-    impl_postgres_eq(ast)
-        .unwrap_or_else(syn::Error::into_compile_error)
-        .into()
+    impl_postgres_eq(ast).unwrap_or_else(syn::Error::into_compile_error).into()
 }
 
 /**
@@ -961,9 +954,7 @@ Optionally accepts the following attributes:
 #[proc_macro_derive(PostgresOrd, attributes(pgx))]
 pub fn postgres_ord(input: TokenStream) -> TokenStream {
     let ast = parse_macro_input!(input as syn::DeriveInput);
-    impl_postgres_ord(ast)
-        .unwrap_or_else(syn::Error::into_compile_error)
-        .into()
+    impl_postgres_ord(ast).unwrap_or_else(syn::Error::into_compile_error).into()
 }
 
 /**
@@ -986,9 +977,7 @@ Optionally accepts the following attributes:
 #[proc_macro_derive(PostgresHash, attributes(pgx))]
 pub fn postgres_hash(input: TokenStream) -> TokenStream {
     let ast = parse_macro_input!(input as syn::DeriveInput);
-    impl_postgres_hash(ast)
-        .unwrap_or_else(syn::Error::into_compile_error)
-        .into()
+    impl_postgres_hash(ast).unwrap_or_else(syn::Error::into_compile_error).into()
 }
 
 /**
@@ -1052,7 +1041,9 @@ Review the `pgx::trigger_support::PgTrigger` documentation for use.
 pub fn pg_trigger(attrs: TokenStream, input: TokenStream) -> TokenStream {
     fn wrapped(attrs: TokenStream, input: TokenStream) -> Result<TokenStream, syn::Error> {
         use pgx_utils::sql_entity_graph::{PgTrigger, PgTriggerAttribute};
-        use syn::{parse::Parser, punctuated::Punctuated, Token};
+        use syn::parse::Parser;
+        use syn::punctuated::Punctuated;
+        use syn::Token;
 
         let attributes =
             Punctuated::<PgTriggerAttribute, Token![,]>::parse_terminated.parse(attrs)?;

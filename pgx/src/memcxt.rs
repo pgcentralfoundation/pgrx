@@ -18,6 +18,7 @@ Use of this source code is governed by the MIT license that can be found in the 
 use crate::pg_sys::AsPgCStr;
 use crate::{guard, pg_sys, PgBox};
 use core::panic::{RefUnwindSafe, UnwindSafe};
+use core::ptr;
 use std::fmt::Debug;
 
 /// A shorter type name for a `*const std::os::raw::c_void`
@@ -312,14 +313,19 @@ impl PgMemoryContexts {
 
     /// Copies `len` bytes, starting at `src` into this memory context and
     /// returns a raw `*mut T` pointer to the newly allocated location
+    #[warn(unsafe_op_in_unsafe_fn)]
     pub unsafe fn copy_ptr_into<T>(&mut self, src: *mut T, len: usize) -> *mut T {
         if src.is_null() {
             panic!("attempt to copy a null pointer");
         }
 
-        let dest = pg_sys::MemoryContextAlloc(self.value(), len);
-        pg_sys::memcpy(dest, src as void_mut_ptr, len as u64);
-        dest as *mut T
+        // SAFETY: We alloc new space, it should be non-overlapping!
+        unsafe {
+            // Make sure we copy bytes.
+            let dest = pg_sys::MemoryContextAlloc(self.value(), len).cast::<u8>();
+            ptr::copy_nonoverlapping(src.cast(), dest, len);
+            dest.cast()
+        }
     }
 
     /// Allocate memory in this context, which will be free'd whenever Postgres deletes this MemoryContext

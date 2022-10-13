@@ -9,8 +9,7 @@ Use of this source code is governed by the MIT license that can be found in the 
 use pgx_utils::sql_entity_graph::{PostgresHash, PostgresOrd};
 
 use proc_macro2::Ident;
-use quote::quote;
-use quote::ToTokens;
+use quote::{quote, ToTokens};
 use syn::DeriveInput;
 
 pub(crate) fn impl_postgres_eq(ast: DeriveInput) -> syn::Result<proc_macro2::TokenStream> {
@@ -49,10 +48,7 @@ pub(crate) fn impl_postgres_hash(ast: DeriveInput) -> syn::Result<proc_macro2::T
 }
 
 pub fn eq(type_name: &Ident) -> proc_macro2::TokenStream {
-    let pg_name = Ident::new(
-        &format!("{}_eq", type_name).to_lowercase(),
-        type_name.span(),
-    );
+    let pg_name = Ident::new(&format!("{}_eq", type_name).to_lowercase(), type_name.span());
     quote! {
         #[allow(non_snake_case)]
         #[pg_operator(immutable, parallel_safe)]
@@ -69,10 +65,7 @@ pub fn eq(type_name: &Ident) -> proc_macro2::TokenStream {
 }
 
 pub fn ne(type_name: &Ident) -> proc_macro2::TokenStream {
-    let pg_name = Ident::new(
-        &format!("{}_ne", type_name).to_lowercase(),
-        type_name.span(),
-    );
+    let pg_name = Ident::new(&format!("{}_ne", type_name).to_lowercase(), type_name.span());
     quote! {
         #[allow(non_snake_case)]
         #[pg_operator(immutable, parallel_safe)]
@@ -87,10 +80,7 @@ pub fn ne(type_name: &Ident) -> proc_macro2::TokenStream {
 }
 
 pub fn lt(type_name: &Ident) -> proc_macro2::TokenStream {
-    let pg_name = Ident::new(
-        &format!("{}_lt", type_name).to_lowercase(),
-        type_name.span(),
-    );
+    let pg_name = Ident::new(&format!("{}_lt", type_name).to_lowercase(), type_name.span());
     quote! {
         #[allow(non_snake_case)]
         #[pg_operator(immutable, parallel_safe)]
@@ -107,10 +97,7 @@ pub fn lt(type_name: &Ident) -> proc_macro2::TokenStream {
 }
 
 pub fn gt(type_name: &Ident) -> proc_macro2::TokenStream {
-    let pg_name = Ident::new(
-        &format!("{}_gt", type_name).to_lowercase(),
-        type_name.span(),
-    );
+    let pg_name = Ident::new(&format!("{}_gt", type_name).to_lowercase(), type_name.span());
     quote! {
         #[allow(non_snake_case)]
         #[pg_operator(immutable, parallel_safe)]
@@ -126,10 +113,7 @@ pub fn gt(type_name: &Ident) -> proc_macro2::TokenStream {
 }
 
 pub fn le(type_name: &Ident) -> proc_macro2::TokenStream {
-    let pg_name = Ident::new(
-        &format!("{}_le", type_name).to_lowercase(),
-        type_name.span(),
-    );
+    let pg_name = Ident::new(&format!("{}_le", type_name).to_lowercase(), type_name.span());
     quote! {
         #[allow(non_snake_case)]
         #[pg_operator(immutable, parallel_safe)]
@@ -145,10 +129,7 @@ pub fn le(type_name: &Ident) -> proc_macro2::TokenStream {
 }
 
 pub fn ge(type_name: &Ident) -> proc_macro2::TokenStream {
-    let pg_name = Ident::new(
-        &format!("{}_ge", type_name).to_lowercase(),
-        type_name.span(),
-    );
+    let pg_name = Ident::new(&format!("{}_ge", type_name).to_lowercase(), type_name.span());
     quote! {
         #[allow(non_snake_case)]
         #[pg_operator(immutable, parallel_safe)]
@@ -164,10 +145,7 @@ pub fn ge(type_name: &Ident) -> proc_macro2::TokenStream {
 }
 
 pub fn cmp(type_name: &Ident) -> proc_macro2::TokenStream {
-    let pg_name = Ident::new(
-        &format!("{}_cmp", type_name).to_lowercase(),
-        type_name.span(),
-    );
+    let pg_name = Ident::new(&format!("{}_cmp", type_name).to_lowercase(), type_name.span());
     quote! {
         #[allow(non_snake_case)]
         #[pg_extern(immutable, parallel_safe)]
@@ -178,10 +156,7 @@ pub fn cmp(type_name: &Ident) -> proc_macro2::TokenStream {
 }
 
 pub fn hash(type_name: &Ident) -> proc_macro2::TokenStream {
-    let pg_name = Ident::new(
-        &format!("{}_hash", type_name).to_lowercase(),
-        type_name.span(),
-    );
+    let pg_name = Ident::new(&format!("{}_hash", type_name).to_lowercase(), type_name.span());
     quote! {
         #[allow(non_snake_case)]
         #[pg_extern(immutable, parallel_safe)]

@@ -83,10 +83,7 @@ where
             let code = dberror.code().code();
             let severity = dberror.severity();
 
-            let mut message = format!("{} SQLSTATE[{}]", severity, code)
-                .bold()
-                .red()
-                .to_string();
+            let mut message = format!("{} SQLSTATE[{}]", severity, code).bold().red().to_string();
 
             message.push_str(format!(": {}", query_message.bold().white()).as_str());
             message.push_str(format!("\nquery: {}", query.bold().white()).as_str());
@@ -191,10 +188,7 @@ pub fn run_test(
                 panic!("Failed downcast to DbError:\n{e}")
             }
         } else {
-            panic!(
-                "Error without deeper source cause:\n{e}\n",
-                e = error_as_string.bold().red()
-            )
+            panic!("Error without deeper source cause:\n{e}\n", e = error_as_string.bold().red())
         }
     } else if let Some(message) = expected_error {
         // we expected an ERROR, but didn't get one
@@ -207,13 +201,7 @@ pub fn run_test(
 fn format_loglines(session_id: &str, loglines: &LogLines) -> String {
     let mut result = String::new();
 
-    for line in loglines
-        .lock()
-        .unwrap()
-        .entry(session_id.to_string())
-        .or_default()
-        .iter()
-    {
+    for line in loglines.lock().unwrap().entry(session_id.to_string()).or_default().iter() {
         result.push_str(line);
         result.push('\n');
     }
@@ -259,10 +247,7 @@ fn get_pg_config() -> eyre::Result<PgConfig> {
     let pg_config = pgx
         .get(&format!("pg{}", pg_version))
         .wrap_err_with(|| {
-            format!(
-                "Error getting pg_config: {} is not a valid postgres version",
-                pg_version
-            )
+            format!("Error getting pg_config: {} is not a valid postgres version", pg_version)
         })
         .unwrap()
         .clone();
@@ -274,11 +259,7 @@ pub fn client() -> eyre::Result<(postgres::Client, String)> {
     let pg_config = get_pg_config()?;
     let mut client = postgres::Config::new()
         .host(pg_config.host())
-        .port(
-            pg_config
-                .test_port()
-                .expect("unable to determine test port"),
-        )
+        .port(pg_config.test_port().expect("unable to determine test port"))
         .user(&get_pg_user())
         .dbname(&get_pg_dbname())
         .connect(postgres::NoTls)
@@ -296,25 +277,19 @@ pub fn client() -> eyre::Result<(postgres::Client, String)> {
         None => Err(eyre!("Failed to obtain a client Session ID from Postgres"))?,
     };
 
-    query_wrapper(
-        Some("SET log_min_messages TO 'INFO';".to_string()),
-        None,
-        |query, _| client.simple_query(query.unwrap().as_str()),
-    )
+    query_wrapper(Some("SET log_min_messages TO 'INFO';".to_string()), None, |query, _| {
+        client.simple_query(query.unwrap().as_str())
+    })
     .wrap_err("Postgres Client setup failed to SET log_min_messages TO 'INFO'")?;
 
-    query_wrapper(
-        Some("SET log_min_duration_statement TO 1000;".to_string()),
-        None,
-        |query, _| client.simple_query(query.unwrap().as_str()),
-    )
+    query_wrapper(Some("SET log_min_duration_statement TO 1000;".to_string()), None, |query, _| {
+        client.simple_query(query.unwrap().as_str())
+    })
     .wrap_err("Postgres Client setup failed to SET log_min_duration_statement TO 1000;")?;
 
-    query_wrapper(
-        Some("SET log_statement TO 'all';".to_string()),
-        None,
-        |query, _| client.simple_query(query.unwrap().as_str()),
-    )
+    query_wrapper(Some("SET log_statement TO 'all';".to_string()), None, |query, _| {
+        client.simple_query(query.unwrap().as_str())
+    })
     .wrap_err("Postgres Client setup failed to SET log_statement TO 'all';")?;
 
     Ok((client, session_id))
@@ -322,7 +297,7 @@ pub fn client() -> eyre::Result<(postgres::Client, String)> {
 
 fn install_extension() -> eyre::Result<()> {
     eprintln!("installing extension");
-    let is_release = std::env::var("PGX_BUILD_PROFILE").unwrap_or("debug".into()) == "release";
+    let profile = std::env::var("PGX_BUILD_PROFILE").unwrap_or("debug".into());
     let no_schema = std::env::var("PGX_NO_SCHEMA").unwrap_or("false".into()) == "true";
     let mut features = std::env::var("PGX_FEATURES").unwrap_or("".to_string());
     if !features.contains("pg_test") {
@@ -369,8 +344,16 @@ fn install_extension() -> eyre::Result<()> {
         command.arg("--all-features");
     }
 
-    if is_release {
-        command.arg("--release");
+    match profile.trim() {
+        // For legacy reasons, cargo has two names for the debug profile... (We
+        // also ignore the empty string here, just in case).
+        "debug" | "dev" | "" => {}
+        "release" => {
+            command.arg("--release");
+        }
+        profile => {
+            command.args(["--profile", profile]);
+        }
     }
 
     if no_schema {
@@ -410,11 +393,8 @@ fn initdb(postgresql_conf: Vec<&'static str>) -> eyre::Result<()> {
 
     if !pgdata.is_dir() {
         let pg_config = get_pg_config()?;
-        let mut command = Command::new(
-            pg_config
-                .initdb_path()
-                .wrap_err("unable to determine initdb path")?,
-        );
+        let mut command =
+            Command::new(pg_config.initdb_path().wrap_err("unable to determine initdb path")?);
 
         command
             .arg("-D")
@@ -469,11 +449,7 @@ fn modify_postgresql_conf(pgdata: PathBuf, postgresql_conf: Vec<&'static str>) -
 
     postgresql_conf_file
         .write_all(
-            format!(
-                "unix_socket_directories = '{}'",
-                Pgx::home().unwrap().display()
-            )
-            .as_bytes(),
+            format!("unix_socket_directories = '{}'", Pgx::home().unwrap().display()).as_bytes(),
         )
         .wrap_err("couldn't append `unix_socket_directories` setting to postgresql.conf")?;
     Ok(())
@@ -481,30 +457,17 @@ fn modify_postgresql_conf(pgdata: PathBuf, postgresql_conf: Vec<&'static str>) -
 
 fn start_pg(loglines: LogLines) -> eyre::Result<String> {
     let pg_config = get_pg_config()?;
-    let mut command = Command::new(
-        pg_config
-            .postmaster_path()
-            .wrap_err("unable to determine postmaster path")?,
-    );
+    let mut command =
+        Command::new(pg_config.postmaster_path().wrap_err("unable to determine postmaster path")?);
     command
         .arg("-D")
         .arg(get_pgdata_path()?.to_str().unwrap())
         .arg("-h")
         .arg(pg_config.host())
         .arg("-p")
-        .arg(
-            pg_config
-                .test_port()
-                .expect("unable to determine test port")
-                .to_string(),
-        )
+        .arg(pg_config.test_port().expect("unable to determine test port").to_string())
         // Redirecting logs to files can hang the test framework, override it
-        .args([
-            "-c",
-            "log_destination=stderr",
-            "-c",
-            "logging_collector=off",
-        ])
+        .args(["-c", "log_destination=stderr", "-c", "logging_collector=off"])
         .stdout(Stdio::inherit())
         .stderr(Stdio::piped());
 
@@ -517,10 +480,7 @@ fn start_pg(loglines: LogLines) -> eyre::Result<String> {
     // add a shutdown hook so we can terminate it when the test framework exits
     add_shutdown_hook(move || unsafe {
         let message_string = std::ffi::CString::new(
-            format!("stopping postgres (pid={pgpid})\n")
-                .bold()
-                .blue()
-                .to_string(),
+            format!("stopping postgres (pid={pgpid})\n").bold().blue().to_string(),
         )
         .unwrap();
         libc::printf(message_string.as_ptr());
@@ -538,20 +498,11 @@ fn monitor_pg(mut command: Command, cmd_string: String, loglines: LogLines) -> (
 
         let pid = child.id();
 
-        eprintln!(
-            "{cmd}\npid={p}",
-            cmd = cmd_string.bold().blue(),
-            p = pid.to_string().yellow()
-        );
+        eprintln!("{cmd}\npid={p}", cmd = cmd_string.bold().blue(), p = pid.to_string().yellow());
         eprintln!("{}", pg_sys::get_pg_version_string().bold().purple());
 
         // wait for the database to say its ready to start up
-        let reader = BufReader::new(
-            child
-                .stderr
-                .take()
-                .expect("couldn't take postmaster stderr"),
-        );
+        let reader = BufReader::new(child.stderr.take().expect("couldn't take postmaster stderr"));
 
         let regex = regex::Regex::new(r#"\[.*?\] \[.*?\] \[(?P<session_id>.*?)\]"#).unwrap();
         let mut is_started_yet = false;
@@ -609,36 +560,24 @@ fn monitor_pg(mut command: Command, cmd_string: String, loglines: LogLines) -> (
 
 fn dropdb() -> eyre::Result<()> {
     let pg_config = get_pg_config()?;
-    let output = Command::new(
-        pg_config
-            .dropdb_path()
-            .expect("unable to determine dropdb path"),
-    )
-    .env_remove("PGDATABASE")
-    .env_remove("PGHOST")
-    .env_remove("PGPORT")
-    .env_remove("PGUSER")
-    .arg("--if-exists")
-    .arg("-h")
-    .arg(pg_config.host())
-    .arg("-p")
-    .arg(
-        pg_config
-            .test_port()
-            .expect("unable to determine test port")
-            .to_string(),
-    )
-    .arg(get_pg_dbname())
-    .output()
-    .unwrap();
+    let output = Command::new(pg_config.dropdb_path().expect("unable to determine dropdb path"))
+        .env_remove("PGDATABASE")
+        .env_remove("PGHOST")
+        .env_remove("PGPORT")
+        .env_remove("PGUSER")
+        .arg("--if-exists")
+        .arg("-h")
+        .arg(pg_config.host())
+        .arg("-p")
+        .arg(pg_config.test_port().expect("unable to determine test port").to_string())
+        .arg(get_pg_dbname())
+        .output()
+        .unwrap();
 
     if !output.status.success() {
         // maybe the database didn't exist, and if so that's okay
         let stderr = String::from_utf8_lossy(output.stderr.as_slice());
-        if !stderr.contains(&format!(
-            "ERROR:  database \"{}\" does not exist",
-            get_pg_dbname()
-        )) {
+        if !stderr.contains(&format!("ERROR:  database \"{}\" does not exist", get_pg_dbname())) {
             // got some error we didn't expect
             let stdout = String::from_utf8_lossy(output.stdout.as_slice());
             eprintln!("unexpected error (stdout):\n{stdout}");
@@ -675,10 +614,7 @@ fn get_extension_name() -> String {
 
 fn get_pgdata_path() -> eyre::Result<PathBuf> {
     let mut target_dir = get_target_dir()?;
-    target_dir.push(&format!(
-        "pgx-test-data-{}",
-        pg_sys::get_pg_major_version_num()
-    ));
+    target_dir.push(&format!("pgx-test-data-{}", pg_sys::get_pg_major_version_num()));
     Ok(target_dir)
 }
 

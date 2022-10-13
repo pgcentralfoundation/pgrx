@@ -73,10 +73,7 @@ pub fn lookup_enum_by_label(typname: &str, label: &str) -> pg_sys::Datum {
     };
 
     if tup.is_null() {
-        panic!(
-            "could not find heap tuple for enum: {}.{}, typoid={}",
-            typname, label, enumtypoid
-        );
+        panic!("could not find heap tuple for enum: {}.{}, typoid={}", typname, label, enumtypoid);
     }
 
     // SAFETY:  we know that `tup` is valid because we just got it from Postgres above
