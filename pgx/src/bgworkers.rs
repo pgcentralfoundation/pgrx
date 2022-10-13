@@ -372,6 +372,9 @@ impl BackgroundWorkerBuilder {
     }
 
     /// Does this BackgroundWorker want Shared Memory access?
+    ///
+    /// `startup` allows specifying shared memory initialization startup hook. Ignored
+    /// if [`BackgroundWorkerBuilder::load_dynamic`] is used.
     pub fn enable_shmem_access(mut self: Self, startup: Option<unsafe extern "C" fn()>) -> Self {
         self.bgw_flags = self.bgw_flags | BGWflags::BGWORKER_SHMEM_ACCESS;
         self.shared_memory_startup_fn = startup;
@@ -547,12 +550,6 @@ impl BackgroundWorkerBuilder {
 
         unsafe {
             pg_sys::RegisterDynamicBackgroundWorker(&mut bgw, &mut handle);
-            if self.bgw_flags.contains(BGWflags::BGWORKER_SHMEM_ACCESS)
-                && self.shared_memory_startup_fn.is_some()
-            {
-                PREV_SHMEM_STARTUP_HOOK = pg_sys::shmem_startup_hook;
-                pg_sys::shmem_startup_hook = self.shared_memory_startup_fn;
-            }
         };
 
         BackgroundWorkerHandle(handle)
