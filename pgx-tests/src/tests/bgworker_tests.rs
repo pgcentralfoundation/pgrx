@@ -81,8 +81,11 @@ mod tests {
             .set_argument(0i32.into_datum())
             .enable_spi_access()
             .load_dynamic();
-        assert!(matches!(worker.wait_for_startup(), Err(BackgroundWorkerStatus::Untracked)));
-        assert!(matches!(worker.wait_for_shutdown(), Err(BackgroundWorkerStatus::Untracked)));
+        assert!(matches!(worker.wait_for_startup(), Err(BackgroundWorkerStatus::Untracked { .. })));
+        assert!(matches!(
+            worker.wait_for_shutdown(),
+            Err(BackgroundWorkerStatus::Untracked { .. })
+        ));
     }
 
     #[pg_test]
@@ -94,6 +97,9 @@ mod tests {
             .enable_spi_access()
             .load_dynamic();
         let handle = worker.terminate();
-        assert!(matches!(handle.wait_for_shutdown(), Err(BackgroundWorkerStatus::Untracked)));
+        assert!(matches!(
+            handle.wait_for_shutdown(),
+            Err(BackgroundWorkerStatus::Untracked { .. })
+        ));
     }
 }

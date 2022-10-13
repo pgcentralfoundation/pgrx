@@ -228,7 +228,13 @@ pub enum BackgroundWorkerStatus {
     NotYetStarted,
     Stopped,
     PostmasterDied,
-    Untracked,
+    /// `BackgroundWorkerBuilder.bgw_notify_pid` was not set to `pg_sys::MyProcPid`
+    ///
+    /// This makes worker's startup or shutdown untrackable by the current process.
+    Untracked {
+        /// `bgw_notify_pid` as specified in the builder
+        notify_pid: pg_sys::pid_t,
+    },
     Unknown,
 }
 
@@ -275,7 +281,7 @@ impl BackgroundWorkerHandle {
     pub fn wait_for_startup(&self) -> Result<Pid, BackgroundWorkerStatus> {
         unsafe {
             if self.notify_pid != pg_sys::MyProcPid {
-                return Err(BackgroundWorkerStatus::Untracked);
+                return Err(BackgroundWorkerStatus::Untracked { notify_pid: self.notify_pid });
             }
         }
         let mut pid: pg_sys::pid_t = 0;
@@ -314,7 +320,7 @@ impl TerminatingBackgroundWorkerHandle {
     pub fn wait_for_shutdown(&self) -> Result<(), BackgroundWorkerStatus> {
         unsafe {
             if self.notify_pid != pg_sys::MyProcPid {
-                return Err(BackgroundWorkerStatus::Untracked);
+                return Err(BackgroundWorkerStatus::Untracked { notify_pid: self.notify_pid });
             }
         }
         let status: BackgroundWorkerStatus =
