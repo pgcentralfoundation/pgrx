@@ -315,8 +315,11 @@ OPTIONS:
         --pgcli
             Use an existing `pgcli` on the $PATH [env: PGX_PGCLI=]
 
+        --profile <PROFILE>
+            Specific profile to use (conflicts with `--release`)
+
     -r, --release
-            Compile for release mode (default is debug) [env: PROFILE=]
+            Compile for release mode (default is debug)
 
     -v, --verbose
             Enable info logs, -vv for debug, -vvv for trace
@@ -444,8 +447,11 @@ OPTIONS:
     -p, --package <PACKAGE>
             Package to build (see `cargo help pkgid`)
 
+        --profile <PROFILE>
+            Specific profile to use (conflicts with `--release`)
+
     -r, --release
-            Compile for release mode (default is debug) [env: PROFILE=]
+            Compile for release mode (default is debug)
 
         --test
             Build in test mode (for `cargo pgx test`)
@@ -534,8 +540,11 @@ OPTIONS:
     -p, --package <PACKAGE>
             Package to build (see `cargo help pkgid`)
 
+        --profile <PROFILE>
+            Specific profile to use (conflicts with `--release`)
+
     -r, --release
-            compile for release mode (default is debug) [env: PROFILE=]
+            compile for release mode (default is debug)
 
     -v, --verbose
             Enable info logs, -vv for debug, -vvv for trace
@@ -595,7 +604,7 @@ OPTIONS:
             The `pg_config` path (default is first in $PATH)
 
     -d, --debug
-            Compile for debug mode (default is release) [env: PROFILE=]
+            Compile for debug mode (default is release)
 
         --features <FEATURES>
             Space-separated list of features to activate
@@ -615,6 +624,9 @@ OPTIONS:
 
     -p, --package <PACKAGE>
             Package to build (see `cargo help pkgid`)
+
+        --profile <PROFILE>
+            Specific profile to use (conflicts with `--debug`)
 
         --test
             Build in test mode (for `cargo pgx test`)
@@ -671,8 +683,11 @@ OPTIONS:
     -p, --package <PACKAGE>
             Package to build (see `cargo help pkgid`)
 
+        --profile <PROFILE>
+            Specific profile to use (conflicts with `--release`)
+
     -r, --release
-            Compile for release mode (default is debug) [env: PROFILE=]
+            Compile for release mode (default is debug)
 
         --skip-build
             Skip building a fresh extension shared object
