@@ -29,7 +29,7 @@ pub(crate) struct Install {
     #[clap(long, parse(from_os_str))]
     manifest_path: Option<PathBuf>,
     /// Compile for release mode (default is debug)
-    #[clap(env = "PROFILE", long, short)]
+    #[clap(long, short)]
     release: bool,
     /// Specific profile to use (conflicts with `--release`)
     #[clap(long)]

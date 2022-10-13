@@ -26,7 +26,7 @@ pub(crate) struct Package {
     #[clap(long, parse(from_os_str))]
     manifest_path: Option<PathBuf>,
     /// Compile for debug mode (default is release)
-    #[clap(env = "PROFILE", long, short)]
+    #[clap(long, short)]
     debug: bool,
     /// Specific profile to use (conflicts with `--debug`)
     #[clap(long)]
