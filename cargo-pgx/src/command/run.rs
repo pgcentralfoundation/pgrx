@@ -36,7 +36,7 @@ pub(crate) struct Run {
     #[clap(long)]
     manifest_path: Option<String>,
     /// Compile for release mode (default is debug)
-    #[clap(env = "PROFILE", long, short)]
+    #[clap(long, short)]
     release: bool,
     /// Specific profile to use (conflicts with `--release`)
     #[clap(long)]
