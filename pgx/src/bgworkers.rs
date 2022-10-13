@@ -235,7 +235,6 @@ pub enum BackgroundWorkerStatus {
         /// `bgw_notify_pid` as specified in the builder
         notify_pid: pg_sys::pid_t,
     },
-    Unknown,
 }
 
 impl From<pg_sys::BgwHandleStatus> for BackgroundWorkerStatus {
@@ -245,7 +244,7 @@ impl From<pg_sys::BgwHandleStatus> for BackgroundWorkerStatus {
             pg_sys::BgwHandleStatus_BGWH_NOT_YET_STARTED => BackgroundWorkerStatus::NotYetStarted,
             pg_sys::BgwHandleStatus_BGWH_STOPPED => BackgroundWorkerStatus::Stopped,
             pg_sys::BgwHandleStatus_BGWH_POSTMASTER_DIED => BackgroundWorkerStatus::PostmasterDied,
-            _ => BackgroundWorkerStatus::Unknown,
+            _ => unreachable!(),
         }
     }
 }
