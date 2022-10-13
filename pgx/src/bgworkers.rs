@@ -328,8 +328,9 @@ impl TerminatingBackgroundWorkerHandle {
 
 /// A builder-style interface for creating a new Background Worker
 ///
-/// This must be used from within your extension's `_PG_init()` function,
-/// finishing with the `.load()` function.
+/// For a static background worker, this must be used from within your extension's `_PG_init()` function,
+/// finishing with the `.load()` function. Dynamic background workers are loaded with `.load_dynamic()` and
+/// have no restriction as to where they can be loaded.
 ///
 /// ## Example
 ///
