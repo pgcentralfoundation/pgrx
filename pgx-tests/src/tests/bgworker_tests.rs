@@ -20,7 +20,7 @@ pub extern "C" fn bgworker(arg: pg_sys::Datum) {
         Some(crate::framework::get_pg_user().as_str()),
     );
 
-    let arg = unsafe { i32::from_datum(arg, false, pg_sys::INT4OID) }.expect("invalid arg");
+    let arg = unsafe { i32::from_datum(arg, false) }.expect("invalid arg");
 
     BackgroundWorker::transaction(|| {
         Spi::run("CREATE TABLE tests.bgworker_test (v INTEGER);");
@@ -28,10 +28,7 @@ pub extern "C" fn bgworker(arg: pg_sys::Datum) {
             client.update(
                 "INSERT INTO tests.bgworker_test VALUES ($1);",
                 None,
-                Some(vec![(
-                    PgOid::BuiltIn(PgBuiltInOids::INT4OID),
-                    arg.into_datum(),
-                )]),
+                Some(vec![(PgOid::BuiltIn(PgBuiltInOids::INT4OID), arg.into_datum())]),
             );
         });
     });
