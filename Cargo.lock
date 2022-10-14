@@ -272,7 +272,7 @@ dependencies = [
 
 [[package]]
 name = "cargo-pgx"
-version = "0.5.1"
+version = "0.5.0"
 dependencies = [
  "atty",
  "cargo_metadata",
@@ -999,9 +999,9 @@ checksum = "830d08ce1d1d941e6b30645f1a0eb5643013d835ce3779a5fc208261dbe10f55"
 
 [[package]]
 name = "libc"
-version = "0.2.135"
+version = "0.2.134"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "68783febc7782c6c5cb401fbda4de5a9898be1762314da0bb2c10ced61f18b0c"
+checksum = "329c933548736bc49fd575ee68c89e8be4d260064184389a5b77517cddd99ffb"
 
 [[package]]
 name = "libflate"
@@ -1372,7 +1372,7 @@ dependencies = [
 
 [[package]]
 name = "pgx"
-version = "0.5.1"
+version = "0.5.0"
 dependencies = [
  "atomic-traits",
  "bitflags",
@@ -1400,7 +1400,7 @@ dependencies = [
 
 [[package]]
 name = "pgx-macros"
-version = "0.5.1"
+version = "0.5.0"
 dependencies = [
  "pgx-utils",
  "proc-macro2",
@@ -1412,7 +1412,7 @@ dependencies = [
 
 [[package]]
 name = "pgx-pg-config"
-version = "0.5.1"
+version = "0.5.0"
 dependencies = [
  "dirs",
  "eyre",
@@ -1427,7 +1427,7 @@ dependencies = [
 
 [[package]]
 name = "pgx-pg-sys"
-version = "0.5.1"
+version = "0.5.0"
 dependencies = [
  "bindgen",
  "color-eyre",
@@ -1448,7 +1448,7 @@ dependencies = [
 
 [[package]]
 name = "pgx-tests"
-version = "0.5.1"
+version = "0.5.0"
 dependencies = [
  "eyre",
  "libc",
@@ -1469,7 +1469,7 @@ dependencies = [
 
 [[package]]
 name = "pgx-utils"
-version = "0.5.1"
+version = "0.5.0"
 dependencies = [
  "atty",
  "convert_case",
@@ -2034,9 +2034,9 @@ dependencies = [
 
 [[package]]
 name = "serde_json"
-version = "1.0.86"
+version = "1.0.85"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "41feea4228a6f1cd09ec7a3593a682276702cd67b5273544757dae23c096f074"
+checksum = "e55a28e3aaef9d5ce0506d0a14dbba8054ddc7e499ef522dd8b26859ec9d4a44"
 dependencies = [
  "itoa",
  "ryu",
@@ -2509,9 +2509,9 @@ checksum = "099b7128301d285f79ddd55b9a83d5e6b9e97c92e0ea0daebee7263e932de992"
 
 [[package]]
 name = "unicode-ident"
-version = "1.0.5"
+version = "1.0.4"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "6ceab39d59e4c9499d4e5a8ee0e2735b891bb7308ac83dfb4e80cad195c9f6f3"
+checksum = "dcc811dc4066ac62f84f11307873c4850cb653bfa9b1719cee2bd2204a4bc5dd"
 
 [[package]]
 name = "unicode-normalization"
@@ -2559,9 +2559,9 @@ dependencies = [
 
 [[package]]
 name = "uuid"
-version = "1.2.1"
+version = "1.1.2"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "feb41e78f93363bb2df8b0e86a2ca30eed7806ea16ea0c790d757cf93f79be83"
+checksum = "dd6469f4314d5f1ffec476e05f17cc9a78bc7a27a6a857842170bdf8d6f98d2f"
 dependencies = [
  "getrandom",
 ]
