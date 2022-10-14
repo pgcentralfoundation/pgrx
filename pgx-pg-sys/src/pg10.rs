@@ -169,25 +169,24 @@ pub const DEF_PGPORT_STR: &[u8; 6usize] = b"28810\0";
 pub const ENABLE_THREAD_SAFETY: u32 = 1;
 pub const FLOAT4PASSBYVAL: u32 = 1;
 pub const FLOAT8PASSBYVAL: u32 = 1;
-pub const HAVE_APPEND_HISTORY: u32 = 1;
 pub const HAVE_ATOMICS: u32 = 1;
 pub const HAVE_CBRT: u32 = 1;
 pub const HAVE_CLOCK_GETTIME: u32 = 1;
 pub const HAVE_COMPUTED_GOTO: u32 = 1;
 pub const HAVE_CRYPT: u32 = 1;
-pub const HAVE_CRYPT_H: u32 = 1;
-pub const HAVE_DECL_FDATASYNC: u32 = 1;
-pub const HAVE_DECL_F_FULLFSYNC: u32 = 0;
-pub const HAVE_DECL_POSIX_FADVISE: u32 = 1;
+pub const HAVE_DECL_FDATASYNC: u32 = 0;
+pub const HAVE_DECL_F_FULLFSYNC: u32 = 1;
+pub const HAVE_DECL_POSIX_FADVISE: u32 = 0;
 pub const HAVE_DECL_SNPRINTF: u32 = 1;
-pub const HAVE_DECL_STRLCAT: u32 = 0;
-pub const HAVE_DECL_STRLCPY: u32 = 0;
+pub const HAVE_DECL_STRLCAT: u32 = 1;
+pub const HAVE_DECL_STRLCPY: u32 = 1;
 pub const HAVE_DECL_STRNLEN: u32 = 1;
 pub const HAVE_DECL_STRTOLL: u32 = 1;
 pub const HAVE_DECL_STRTOULL: u32 = 1;
 pub const HAVE_DECL_VSNPRINTF: u32 = 1;
 pub const HAVE_DLOPEN: u32 = 1;
 pub const HAVE_FDATASYNC: u32 = 1;
+pub const HAVE_FLS: u32 = 1;
 pub const HAVE_FSEEKO: u32 = 1;
 pub const HAVE_FUNCNAME__FUNC: u32 = 1;
 pub const HAVE_GCC__ATOMIC_INT32_CAS: u32 = 1;
@@ -197,11 +196,11 @@ pub const HAVE_GCC__SYNC_INT32_CAS: u32 = 1;
 pub const HAVE_GCC__SYNC_INT32_TAS: u32 = 1;
 pub const HAVE_GCC__SYNC_INT64_CAS: u32 = 1;
 pub const HAVE_GETADDRINFO: u32 = 1;
-pub const HAVE_GETHOSTBYNAME_R: u32 = 1;
 pub const HAVE_GETIFADDRS: u32 = 1;
 pub const HAVE_GETOPT: u32 = 1;
 pub const HAVE_GETOPT_H: u32 = 1;
 pub const HAVE_GETOPT_LONG: u32 = 1;
+pub const HAVE_GETPEEREID: u32 = 1;
 pub const HAVE_GETPWUID_R: u32 = 1;
 pub const HAVE_GETRLIMIT: u32 = 1;
 pub const HAVE_GETRUSAGE: u32 = 1;
@@ -211,6 +210,7 @@ pub const HAVE_INET_ATON: u32 = 1;
 pub const HAVE_INTPTR_T: u32 = 1;
 pub const HAVE_INTTYPES_H: u32 = 1;
 pub const HAVE_INT_OPTERR: u32 = 1;
+pub const HAVE_INT_OPTRESET: u32 = 1;
 pub const HAVE_INT_TIMEZONE: u32 = 1;
 pub const HAVE_IPV6: u32 = 1;
 pub const HAVE_ISINF: u32 = 1;
@@ -221,6 +221,7 @@ pub const HAVE_LIBZ: u32 = 1;
 pub const HAVE_LOCALE_T: u32 = 1;
 pub const HAVE_LONG_INT_64: u32 = 1;
 pub const HAVE_LONG_LONG_INT: u32 = 1;
+pub const HAVE_MBSTOWCS_L: u32 = 1;
 pub const HAVE_MEMMOVE: u32 = 1;
 pub const HAVE_MEMORY_H: u32 = 1;
 pub const HAVE_MKDTEMP: u32 = 1;
@@ -228,9 +229,8 @@ pub const HAVE_NETINET_TCP_H: u32 = 1;
 pub const HAVE_NET_IF_H: u32 = 1;
 pub const HAVE_POLL: u32 = 1;
 pub const HAVE_POLL_H: u32 = 1;
-pub const HAVE_POSIX_FADVISE: u32 = 1;
-pub const HAVE_POSIX_FALLOCATE: u32 = 1;
 pub const HAVE_PTHREAD: u32 = 1;
+pub const HAVE_PTHREAD_IS_THREADED_NP: u32 = 1;
 pub const HAVE_PTHREAD_PRIO_INHERIT: u32 = 1;
 pub const HAVE_RANDOM: u32 = 1;
 pub const HAVE_READLINE_HISTORY_H: u32 = 1;
@@ -240,7 +240,6 @@ pub const HAVE_RINT: u32 = 1;
 pub const HAVE_RL_COMPLETION_APPEND_CHARACTER: u32 = 1;
 pub const HAVE_RL_COMPLETION_MATCHES: u32 = 1;
 pub const HAVE_RL_FILENAME_COMPLETION_FUNCTION: u32 = 1;
-pub const HAVE_RL_RESET_SCREEN_SIZE: u32 = 1;
 pub const HAVE_SETSID: u32 = 1;
 pub const HAVE_SHM_OPEN: u32 = 1;
 pub const HAVE_SNPRINTF: u32 = 1;
@@ -252,6 +251,8 @@ pub const HAVE_STRERROR: u32 = 1;
 pub const HAVE_STRERROR_R: u32 = 1;
 pub const HAVE_STRINGS_H: u32 = 1;
 pub const HAVE_STRING_H: u32 = 1;
+pub const HAVE_STRLCAT: u32 = 1;
+pub const HAVE_STRLCPY: u32 = 1;
 pub const HAVE_STRNLEN: u32 = 1;
 pub const HAVE_STRONG_RANDOM: u32 = 1;
 pub const HAVE_STRSIGNAL: u32 = 1;
@@ -259,20 +260,22 @@ pub const HAVE_STRTOLL: u32 = 1;
 pub const HAVE_STRTOULL: u32 = 1;
 pub const HAVE_STRUCT_ADDRINFO: u32 = 1;
 pub const HAVE_STRUCT_OPTION: u32 = 1;
+pub const HAVE_STRUCT_SOCKADDR_SA_LEN: u32 = 1;
 pub const HAVE_STRUCT_SOCKADDR_STORAGE: u32 = 1;
 pub const HAVE_STRUCT_SOCKADDR_STORAGE_SS_FAMILY: u32 = 1;
+pub const HAVE_STRUCT_SOCKADDR_STORAGE_SS_LEN: u32 = 1;
 pub const HAVE_STRUCT_TM_TM_ZONE: u32 = 1;
 pub const HAVE_SYMLINK: u32 = 1;
-pub const HAVE_SYNC_FILE_RANGE: u32 = 1;
 pub const HAVE_SYSLOG: u32 = 1;
-pub const HAVE_SYS_EPOLL_H: u32 = 1;
 pub const HAVE_SYS_IPC_H: u32 = 1;
 pub const HAVE_SYS_RESOURCE_H: u32 = 1;
 pub const HAVE_SYS_SELECT_H: u32 = 1;
 pub const HAVE_SYS_SEM_H: u32 = 1;
 pub const HAVE_SYS_SHM_H: u32 = 1;
+pub const HAVE_SYS_SOCKIO_H: u32 = 1;
 pub const HAVE_SYS_STAT_H: u32 = 1;
 pub const HAVE_SYS_TYPES_H: u32 = 1;
+pub const HAVE_SYS_UCRED_H: u32 = 1;
 pub const HAVE_SYS_UN_H: u32 = 1;
 pub const HAVE_TERMIOS_H: u32 = 1;
 pub const HAVE_TM_ZONE: u32 = 1;
@@ -280,6 +283,7 @@ pub const HAVE_TOWLOWER: u32 = 1;
 pub const HAVE_TYPEOF: u32 = 1;
 pub const HAVE_TZNAME: u32 = 1;
 pub const HAVE_UINTPTR_T: u32 = 1;
+pub const HAVE_UNION_SEMUN: u32 = 1;
 pub const HAVE_UNISTD_H: u32 = 1;
 pub const HAVE_UNIX_SOCKETS: u32 = 1;
 pub const HAVE_UNSETENV: u32 = 1;
@@ -291,43 +295,45 @@ pub const HAVE_UTIME_H: u32 = 1;
 pub const HAVE_VSNPRINTF: u32 = 1;
 pub const HAVE_WCHAR_H: u32 = 1;
 pub const HAVE_WCSTOMBS: u32 = 1;
+pub const HAVE_WCSTOMBS_L: u32 = 1;
 pub const HAVE_WCTYPE_H: u32 = 1;
 pub const HAVE__BUILTIN_BSWAP32: u32 = 1;
 pub const HAVE__BUILTIN_BSWAP64: u32 = 1;
 pub const HAVE__BUILTIN_CONSTANT_P: u32 = 1;
 pub const HAVE__BUILTIN_TYPES_COMPATIBLE_P: u32 = 1;
 pub const HAVE__BUILTIN_UNREACHABLE: u32 = 1;
-pub const HAVE__GET_CPUID: u32 = 1;
 pub const HAVE__STATIC_ASSERT: u32 = 1;
 pub const HAVE__VA_ARGS: u32 = 1;
 pub const INT64_MODIFIER: &[u8; 2usize] = b"l\0";
+pub const LOCALE_T_IN_XLOCALE: u32 = 1;
 pub const MAXIMUM_ALIGNOF: u32 = 8;
 pub const MEMSET_LOOP_LIMIT: u32 = 1024;
 pub const PACKAGE_BUGREPORT: &[u8; 26usize] = b"pgsql-bugs@postgresql.org\0";
 pub const PACKAGE_NAME: &[u8; 11usize] = b"PostgreSQL\0";
-pub const PACKAGE_STRING: &[u8; 17usize] = b"PostgreSQL 10.22\0";
+pub const PACKAGE_STRING: &[u8; 17usize] = b"PostgreSQL 10.19\0";
 pub const PACKAGE_TARNAME: &[u8; 11usize] = b"postgresql\0";
 pub const PACKAGE_URL: &[u8; 1usize] = b"\0";
-pub const PACKAGE_VERSION: &[u8; 6usize] = b"10.22\0";
+pub const PACKAGE_VERSION: &[u8; 6usize] = b"10.19\0";
 pub const PG_KRB_SRVNAM: &[u8; 9usize] = b"postgres\0";
 pub const PG_MAJORVERSION: &[u8; 3usize] = b"10\0";
-pub const PG_VERSION: &[u8; 6usize] = b"10.22\0";
-pub const PG_VERSION_NUM: u32 = 100022;
-pub const PG_VERSION_STR: &[u8; 78usize] =
-    b"PostgreSQL 10.22 on x86_64-pc-linux-gnu, compiled by gcc (GCC) 12.2.0, 64-bit\0";
+pub const PG_VERSION: &[u8; 6usize] = b"10.19\0";
+pub const PG_VERSION_NUM: u32 = 100019;
+pub const PG_VERSION_STR : & [u8 ; 112usize] = b"PostgreSQL 10.19 on arm-apple-darwin21.3.0, compiled by Apple clang version 13.0.0 (clang-1300.0.29.30), 64-bit\0" ;
 pub const RELSEG_SIZE: u32 = 131072;
 pub const SIZEOF_LONG: u32 = 8;
 pub const SIZEOF_OFF_T: u32 = 8;
 pub const SIZEOF_SIZE_T: u32 = 8;
 pub const SIZEOF_VOID_P: u32 = 8;
 pub const STDC_HEADERS: u32 = 1;
+pub const STRERROR_R_INT: u32 = 1;
 pub const USE_ASSERT_CHECKING: u32 = 1;
 pub const USE_DEV_URANDOM: u32 = 1;
 pub const USE_FLOAT4_BYVAL: u32 = 1;
 pub const USE_FLOAT8_BYVAL: u32 = 1;
-pub const USE_SSE42_CRC32C_WITH_RUNTIME_CHECK: u32 = 1;
+pub const USE_SLICING_BY_8_CRC32C: u32 = 1;
+pub const USE_SYSV_SEMAPHORES: u32 = 1;
 pub const USE_SYSV_SHARED_MEMORY: u32 = 1;
-pub const USE_UNNAMED_POSIX_SEMAPHORES: u32 = 1;
+pub const WCSTOMBS_L_IN_XLOCALE: u32 = 1;
 pub const XLOG_BLCKSZ: u32 = 8192;
 pub const XLOG_SEG_SIZE: u32 = 16777216;
 pub const NAMEDATALEN: u32 = 64;
@@ -342,25 +348,53 @@ pub const BITS_PER_BYTE: u32 = 8;
 pub const ALIGNOF_BUFFER: u32 = 32;
 pub const HAVE_WORKING_LINK: u32 = 1;
 pub const DEFAULT_BACKEND_FLUSH_AFTER: u32 = 0;
-pub const DEFAULT_BGWRITER_FLUSH_AFTER: u32 = 64;
-pub const DEFAULT_CHECKPOINT_FLUSH_AFTER: u32 = 32;
+pub const DEFAULT_BGWRITER_FLUSH_AFTER: u32 = 0;
+pub const DEFAULT_CHECKPOINT_FLUSH_AFTER: u32 = 0;
 pub const WRITEBACK_MAX_PENDING_FLUSHES: u32 = 256;
 pub const DEFAULT_PGSOCKET_DIR: &[u8; 5usize] = b"/tmp\0";
 pub const DEFAULT_EVENT_SOURCE: &[u8; 11usize] = b"PostgreSQL\0";
 pub const PG_CACHE_LINE_SIZE: u32 = 128;
 pub const TRACE_SORT: u32 = 1;
-pub const _BITS_PTHREADTYPES_COMMON_H: u32 = 1;
-pub const _BITS_PTHREADTYPES_ARCH_H: u32 = 1;
-pub const __SIZEOF_PTHREAD_MUTEX_T: u32 = 40;
-pub const __SIZEOF_PTHREAD_ATTR_T: u32 = 56;
-pub const __SIZEOF_PTHREAD_RWLOCK_T: u32 = 56;
-pub const __SIZEOF_PTHREAD_BARRIER_T: u32 = 32;
-pub const __SIZEOF_PTHREAD_MUTEXATTR_T: u32 = 4;
-pub const __SIZEOF_PTHREAD_COND_T: u32 = 48;
-pub const __SIZEOF_PTHREAD_CONDATTR_T: u32 = 4;
-pub const __SIZEOF_PTHREAD_RWLOCKATTR_T: u32 = 8;
-pub const __SIZEOF_PTHREAD_BARRIERATTR_T: u32 = 4;
-pub const __have_pthread_attr_t: u32 = 1;
+pub const __darwin__: u32 = 1;
+pub const SIGHUP: u32 = 1;
+pub const SIGINT: u32 = 2;
+pub const SIGQUIT: u32 = 3;
+pub const SIGILL: u32 = 4;
+pub const SIGTRAP: u32 = 5;
+pub const SIGABRT: u32 = 6;
+pub const SIGIOT: u32 = 6;
+pub const SIGEMT: u32 = 7;
+pub const SIGFPE: u32 = 8;
+pub const SIGKILL: u32 = 9;
+pub const SIGBUS: u32 = 10;
+pub const SIGSEGV: u32 = 11;
+pub const SIGSYS: u32 = 12;
+pub const SIGPIPE: u32 = 13;
+pub const SIGALRM: u32 = 14;
+pub const SIGTERM: u32 = 15;
+pub const SIGURG: u32 = 16;
+pub const SIGSTOP: u32 = 17;
+pub const SIGTSTP: u32 = 18;
+pub const SIGCONT: u32 = 19;
+pub const SIGCHLD: u32 = 20;
+pub const SIGTTIN: u32 = 21;
+pub const SIGTTOU: u32 = 22;
+pub const SIGIO: u32 = 23;
+pub const SIGXCPU: u32 = 24;
+pub const SIGXFSZ: u32 = 25;
+pub const SIGVTALRM: u32 = 26;
+pub const SIGPROF: u32 = 27;
+pub const SIGWINCH: u32 = 28;
+pub const SIGINFO: u32 = 29;
+pub const SIGUSR1: u32 = 30;
+pub const SIGUSR2: u32 = 31;
+pub const SIGEV_NONE: u32 = 0;
+pub const SIGEV_SIGNAL: u32 = 1;
+pub const SIGEV_THREAD: u32 = 3;
+pub const SIG_BLOCK: u32 = 1;
+pub const SIG_UNBLOCK: u32 = 2;
+pub const SIG_SETMASK: u32 = 3;
+pub const SIGSTKSZ: u32 = 131072;
 pub const SIG_ATOMIC_MIN: i32 = -2147483648;
 pub const SIG_ATOMIC_MAX: u32 = 2147483647;
 pub const HAVE_PG_ATTRIBUTE_NORETURN: u32 = 1;
@@ -391,7 +425,7 @@ pub const PG_BINARY_A: &[u8; 2usize] = b"a\0";
 pub const PG_BINARY_R: &[u8; 2usize] = b"r\0";
 pub const PG_BINARY_W: &[u8; 2usize] = b"w\0";
 pub const PGINVALID_SOCKET: i32 = -1;
-pub const PG_BACKEND_VERSIONSTR: &[u8; 29usize] = b"postgres (PostgreSQL) 10.22\n\0";
+pub const PG_BACKEND_VERSIONSTR: &[u8; 29usize] = b"postgres (PostgreSQL) 10.19\n\0";
 pub const EXE: &[u8; 1usize] = b"\0";
 pub const DEVNULL: &[u8; 10usize] = b"/dev/null\0";
 pub const PG_IOLBF: u32 = 1;
@@ -530,8 +564,8 @@ pub const AccessExclusiveLock: u32 = 8;
 pub const BITS_PER_BITMAPWORD: u32 = 32;
 pub const InvalidXLogRecPtr: u32 = 0;
 pub const PG_O_DIRECT: u32 = 0;
-pub const OPEN_SYNC_FLAG: u32 = 1052672;
-pub const OPEN_DATASYNC_FLAG: u32 = 4096;
+pub const OPEN_SYNC_FLAG: u32 = 128;
+pub const OPEN_DATASYNC_FLAG: u32 = 4194304;
 pub const MAX_TIMESTAMP_PRECISION: u32 = 6;
 pub const MAX_INTERVAL_PRECISION: u32 = 6;
 pub const TS_PREC_INV: f64 = 1000000.0;
@@ -575,7 +609,6 @@ pub const HEAP_INSERT_SKIP_FSM: u32 = 2;
 pub const HEAP_INSERT_FROZEN: u32 = 4;
 pub const HEAP_INSERT_SPECULATIVE: u32 = 8;
 pub const HEAP_INSERT_NO_LOGICAL: u32 = 16;
-pub const PG_INSTR_CLOCK: u32 = 1;
 pub const PARAM_FLAG_CONST: u32 = 1;
 pub const HASH_PARTITION: u32 = 1;
 pub const HASH_SEGMENT: u32 = 2;
@@ -651,6 +684,7 @@ pub const CURSOR_OPT_FAST_PLAN: u32 = 32;
 pub const CURSOR_OPT_GENERIC_PLAN: u32 = 64;
 pub const CURSOR_OPT_CUSTOM_PLAN: u32 = 128;
 pub const CURSOR_OPT_PARALLEL_OK: u32 = 256;
+pub const FETCH_ALL: u64 = 9223372036854775807;
 pub const REINDEXOPT_VERBOSE: u32 = 1;
 pub const FORKNAMECHARS: u32 = 4;
 pub const InvalidBackendId: i32 = -1;
@@ -825,44 +859,6 @@ pub const EXEC_FLAG_SKIP_TRIGGERS: u32 = 16;
 pub const EXEC_FLAG_WITH_OIDS: u32 = 32;
 pub const EXEC_FLAG_WITHOUT_OIDS: u32 = 64;
 pub const EXEC_FLAG_WITH_NO_DATA: u32 = 128;
-pub const SIGINT: u32 = 2;
-pub const SIGILL: u32 = 4;
-pub const SIGABRT: u32 = 6;
-pub const SIGFPE: u32 = 8;
-pub const SIGSEGV: u32 = 11;
-pub const SIGTERM: u32 = 15;
-pub const SIGHUP: u32 = 1;
-pub const SIGQUIT: u32 = 3;
-pub const SIGTRAP: u32 = 5;
-pub const SIGKILL: u32 = 9;
-pub const SIGPIPE: u32 = 13;
-pub const SIGALRM: u32 = 14;
-pub const SIGIOT: u32 = 6;
-pub const SIGSTKFLT: u32 = 16;
-pub const SIGPWR: u32 = 30;
-pub const SIGBUS: u32 = 7;
-pub const SIGSYS: u32 = 31;
-pub const SIGURG: u32 = 23;
-pub const SIGSTOP: u32 = 19;
-pub const SIGTSTP: u32 = 20;
-pub const SIGCONT: u32 = 18;
-pub const SIGCHLD: u32 = 17;
-pub const SIGTTIN: u32 = 21;
-pub const SIGTTOU: u32 = 22;
-pub const SIGPOLL: u32 = 29;
-pub const SIGXFSZ: u32 = 25;
-pub const SIGXCPU: u32 = 24;
-pub const SIGVTALRM: u32 = 26;
-pub const SIGPROF: u32 = 27;
-pub const SIGUSR1: u32 = 10;
-pub const SIGUSR2: u32 = 12;
-pub const SIGWINCH: u32 = 28;
-pub const SIGIO: u32 = 29;
-pub const SIGCLD: u32 = 17;
-pub const SIG_BLOCK: u32 = 0;
-pub const SIG_UNBLOCK: u32 = 1;
-pub const SIG_SETMASK: u32 = 2;
-pub const SIGSTKSZ: u32 = 8192;
 pub const TZ_STRLEN_MAX: u32 = 255;
 pub const InvalidPid: i32 = -1;
 pub const USE_POSTGRES_DATES: u32 = 0;
@@ -938,8 +934,6 @@ pub const PROC_RESERVED: u32 = 32;
 pub const PROC_VACUUM_STATE_MASK: u32 = 14;
 pub const FP_LOCK_SLOTS_PER_BACKEND: u32 = 16;
 pub const INVALID_PGPROCNO: u32 = 2147483647;
-pub const DELAY_CHKPT_START: u32 = 1;
-pub const DELAY_CHKPT_COMPLETE: u32 = 2;
 pub const NUM_AUXILIARY_PROCS: u32 = 4;
 pub const PGSTAT_STAT_PERMANENT_DIRECTORY: &[u8; 8usize] = b"pg_stat\0";
 pub const PGSTAT_STAT_PERMANENT_FILENAME: &[u8; 20usize] = b"pg_stat/global.stat\0";
@@ -1153,7 +1147,6 @@ pub const XACT_SERIALIZABLE: u32 = 3;
 pub const XACT_FLAGS_ACCESSEDTEMPREL: u32 = 1;
 pub const XACT_FLAGS_ACQUIREDACCESSEXCLUSIVELOCK: u32 = 2;
 pub const XACT_FLAGS_ACCESSEDTEMPNAMESPACE: u32 = 4;
-pub const XACT_FLAGS_NEEDIMMEDIATECOMMIT: u32 = 8;
 pub const XLOG_XACT_COMMIT: u32 = 0;
 pub const XLOG_XACT_PREPARE: u32 = 16;
 pub const XLOG_XACT_ABORT: u32 = 32;
@@ -1694,6 +1687,7 @@ pub const PROCARRAY_FLAGS_DEFAULT: u32 = 16;
 pub const PROCARRAY_FLAGS_VACUUM: u32 = 18;
 pub const PROCARRAY_FLAGS_ANALYZE: u32 = 20;
 pub const PROCARRAY_FLAGS_VACUUM_ANALYZE: u32 = 22;
+pub const MAX_KILOBYTES: u32 = 2147483647;
 pub const PG_AUTOCONF_FILENAME: &[u8; 21usize] = b"postgresql.auto.conf\0";
 pub const GUC_QUALIFIER_SEPARATOR: u8 = 46u8;
 pub const GUC_LIST_INPUT: u32 = 1;
@@ -1825,68 +1819,103 @@ pub const RANGESTRAT_CONTAINS_ELEM: u32 = 16;
 pub const RANGESTRAT_EQ: u32 = 18;
 pub type Oid = ::std::os::raw::c_uint;
 pub type pg_int64 = ::std::os::raw::c_long;
-pub type va_list = __builtin_va_list;
-pub type __uid_t = ::std::os::raw::c_uint;
-pub type __gid_t = ::std::os::raw::c_uint;
-pub type __ino_t = ::std::os::raw::c_ulong;
-pub type __off_t = ::std::os::raw::c_long;
-pub type __off64_t = ::std::os::raw::c_long;
-pub type __pid_t = ::std::os::raw::c_int;
-pub type __time_t = ::std::os::raw::c_long;
-pub type __syscall_slong_t = ::std::os::raw::c_long;
-pub type __socklen_t = ::std::os::raw::c_uint;
-pub type __sig_atomic_t = ::std::os::raw::c_int;
-pub type FILE = _IO_FILE;
+pub type __uint8_t = ::std::os::raw::c_uchar;
+pub type __uint16_t = ::std::os::raw::c_ushort;
+pub type __int32_t = ::std::os::raw::c_int;
+pub type __uint32_t = ::std::os::raw::c_uint;
+pub type __int64_t = ::std::os::raw::c_longlong;
+pub type __uint64_t = ::std::os::raw::c_ulonglong;
+pub type __darwin_size_t = ::std::os::raw::c_ulong;
+pub type __darwin_va_list = __builtin_va_list;
+pub type __darwin_socklen_t = __uint32_t;
+pub type __darwin_time_t = ::std::os::raw::c_long;
+pub type __darwin_gid_t = __uint32_t;
+pub type __darwin_off_t = __int64_t;
+pub type __darwin_pid_t = __int32_t;
+pub type __darwin_uid_t = __uint32_t;
 #[repr(C)]
 #[derive(Debug, Copy, Clone)]
-pub struct _IO_marker {
+pub struct _opaque_pthread_mutex_t {
+    pub __sig: ::std::os::raw::c_long,
+    pub __opaque: [::std::os::raw::c_char; 56usize],
+}
+impl Default for _opaque_pthread_mutex_t {
+    fn default() -> Self {
+        let mut s = ::std::mem::MaybeUninit::<Self>::uninit();
+        unsafe {
+            ::std::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
+            s.assume_init()
+        }
+    }
+}
+pub type __darwin_pthread_mutex_t = _opaque_pthread_mutex_t;
+pub type va_list = __darwin_va_list;
+pub type fpos_t = __darwin_off_t;
+#[repr(C)]
+#[derive(Debug, Copy, Clone)]
+pub struct __sbuf {
+    pub _base: *mut ::std::os::raw::c_uchar,
+    pub _size: ::std::os::raw::c_int,
+}
+impl Default for __sbuf {
+    fn default() -> Self {
+        let mut s = ::std::mem::MaybeUninit::<Self>::uninit();
+        unsafe {
+            ::std::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
+            s.assume_init()
+        }
+    }
+}
+#[repr(C)]
+#[derive(Debug, Copy, Clone)]
+pub struct __sFILEX {
     _unused: [u8; 0],
 }
 #[repr(C)]
 #[derive(Debug, Copy, Clone)]
-pub struct _IO_codecvt {
-    _unused: [u8; 0],
+pub struct __sFILE {
+    pub _p: *mut ::std::os::raw::c_uchar,
+    pub _r: ::std::os::raw::c_int,
+    pub _w: ::std::os::raw::c_int,
+    pub _flags: ::std::os::raw::c_short,
+    pub _file: ::std::os::raw::c_short,
+    pub _bf: __sbuf,
+    pub _lbfsize: ::std::os::raw::c_int,
+    pub _cookie: *mut ::std::os::raw::c_void,
+    pub _close: ::std::option::Option<
+        unsafe extern "C" fn(arg1: *mut ::std::os::raw::c_void) -> ::std::os::raw::c_int,
+    >,
+    pub _read: ::std::option::Option<
+        unsafe extern "C" fn(
+            arg1: *mut ::std::os::raw::c_void,
+            arg2: *mut ::std::os::raw::c_char,
+            arg3: ::std::os::raw::c_int,
+        ) -> ::std::os::raw::c_int,
+    >,
+    pub _seek: ::std::option::Option<
+        unsafe extern "C" fn(
+            arg1: *mut ::std::os::raw::c_void,
+            arg2: fpos_t,
+            arg3: ::std::os::raw::c_int,
+        ) -> fpos_t,
+    >,
+    pub _write: ::std::option::Option<
+        unsafe extern "C" fn(
+            arg1: *mut ::std::os::raw::c_void,
+            arg2: *const ::std::os::raw::c_char,
+            arg3: ::std::os::raw::c_int,
+        ) -> ::std::os::raw::c_int,
+    >,
+    pub _ub: __sbuf,
+    pub _extra: *mut __sFILEX,
+    pub _ur: ::std::os::raw::c_int,
+    pub _ubuf: [::std::os::raw::c_uchar; 3usize],
+    pub _nbuf: [::std::os::raw::c_uchar; 1usize],
+    pub _lb: __sbuf,
+    pub _blksize: ::std::os::raw::c_int,
+    pub _offset: fpos_t,
 }
-#[repr(C)]
-#[derive(Debug, Copy, Clone)]
-pub struct _IO_wide_data {
-    _unused: [u8; 0],
-}
-pub type _IO_lock_t = ::std::os::raw::c_void;
-#[repr(C)]
-#[derive(Debug, Copy, Clone)]
-pub struct _IO_FILE {
-    pub _flags: ::std::os::raw::c_int,
-    pub _IO_read_ptr: *mut ::std::os::raw::c_char,
-    pub _IO_read_end: *mut ::std::os::raw::c_char,
-    pub _IO_read_base: *mut ::std::os::raw::c_char,
-    pub _IO_write_base: *mut ::std::os::raw::c_char,
-    pub _IO_write_ptr: *mut ::std::os::raw::c_char,
-    pub _IO_write_end: *mut ::std::os::raw::c_char,
-    pub _IO_buf_base: *mut ::std::os::raw::c_char,
-    pub _IO_buf_end: *mut ::std::os::raw::c_char,
-    pub _IO_save_base: *mut ::std::os::raw::c_char,
-    pub _IO_backup_base: *mut ::std::os::raw::c_char,
-    pub _IO_save_end: *mut ::std::os::raw::c_char,
-    pub _markers: *mut _IO_marker,
-    pub _chain: *mut _IO_FILE,
-    pub _fileno: ::std::os::raw::c_int,
-    pub _flags2: ::std::os::raw::c_int,
-    pub _old_offset: __off_t,
-    pub _cur_column: ::std::os::raw::c_ushort,
-    pub _vtable_offset: ::std::os::raw::c_schar,
-    pub _shortbuf: [::std::os::raw::c_char; 1usize],
-    pub _lock: *mut _IO_lock_t,
-    pub _offset: __off64_t,
-    pub _codecvt: *mut _IO_codecvt,
-    pub _wide_data: *mut _IO_wide_data,
-    pub _freeres_list: *mut _IO_FILE,
-    pub _freeres_buf: *mut ::std::os::raw::c_void,
-    pub __pad5: usize,
-    pub _mode: ::std::os::raw::c_int,
-    pub _unused2: [::std::os::raw::c_char; 20usize],
-}
-impl Default for _IO_FILE {
+impl Default for __sFILE {
     fn default() -> Self {
         let mut s = ::std::mem::MaybeUninit::<Self>::uninit();
         unsafe {
@@ -1895,257 +1924,12 @@ impl Default for _IO_FILE {
         }
     }
 }
-pub type off_t = __off_t;
-pub type gid_t = __gid_t;
-pub type uid_t = __uid_t;
-pub type pid_t = __pid_t;
-#[repr(C)]
-#[derive(Debug, Default, Copy, Clone)]
-pub struct __sigset_t {
-    pub __val: [::std::os::raw::c_ulong; 16usize],
-}
-#[repr(C)]
-#[derive(Debug, Default, Copy, Clone)]
-pub struct timespec {
-    pub tv_sec: __time_t,
-    pub tv_nsec: __syscall_slong_t,
-}
-#[repr(C)]
-#[derive(Copy, Clone)]
-pub union __atomic_wide_counter {
-    pub __value64: ::std::os::raw::c_ulonglong,
-    pub __value32: __atomic_wide_counter__bindgen_ty_1,
-}
-#[repr(C)]
-#[derive(Debug, Default, Copy, Clone)]
-pub struct __atomic_wide_counter__bindgen_ty_1 {
-    pub __low: ::std::os::raw::c_uint,
-    pub __high: ::std::os::raw::c_uint,
-}
-impl Default for __atomic_wide_counter {
-    fn default() -> Self {
-        let mut s = ::std::mem::MaybeUninit::<Self>::uninit();
-        unsafe {
-            ::std::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
-            s.assume_init()
-        }
-    }
-}
-#[repr(C)]
-#[derive(Debug, Copy, Clone)]
-pub struct __pthread_internal_list {
-    pub __prev: *mut __pthread_internal_list,
-    pub __next: *mut __pthread_internal_list,
-}
-impl Default for __pthread_internal_list {
-    fn default() -> Self {
-        let mut s = ::std::mem::MaybeUninit::<Self>::uninit();
-        unsafe {
-            ::std::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
-            s.assume_init()
-        }
-    }
-}
-pub type __pthread_list_t = __pthread_internal_list;
-#[repr(C)]
-#[derive(Debug, Copy, Clone)]
-pub struct __pthread_mutex_s {
-    pub __lock: ::std::os::raw::c_int,
-    pub __count: ::std::os::raw::c_uint,
-    pub __owner: ::std::os::raw::c_int,
-    pub __nusers: ::std::os::raw::c_uint,
-    pub __kind: ::std::os::raw::c_int,
-    pub __spins: ::std::os::raw::c_short,
-    pub __elision: ::std::os::raw::c_short,
-    pub __list: __pthread_list_t,
-}
-impl Default for __pthread_mutex_s {
-    fn default() -> Self {
-        let mut s = ::std::mem::MaybeUninit::<Self>::uninit();
-        unsafe {
-            ::std::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
-            s.assume_init()
-        }
-    }
-}
-#[repr(C)]
-#[derive(Debug, Default, Copy, Clone)]
-pub struct __pthread_rwlock_arch_t {
-    pub __readers: ::std::os::raw::c_uint,
-    pub __writers: ::std::os::raw::c_uint,
-    pub __wrphase_futex: ::std::os::raw::c_uint,
-    pub __writers_futex: ::std::os::raw::c_uint,
-    pub __pad3: ::std::os::raw::c_uint,
-    pub __pad4: ::std::os::raw::c_uint,
-    pub __cur_writer: ::std::os::raw::c_int,
-    pub __shared: ::std::os::raw::c_int,
-    pub __rwelision: ::std::os::raw::c_schar,
-    pub __pad1: [::std::os::raw::c_uchar; 7usize],
-    pub __pad2: ::std::os::raw::c_ulong,
-    pub __flags: ::std::os::raw::c_uint,
-}
-#[repr(C)]
-#[derive(Copy, Clone)]
-pub struct __pthread_cond_s {
-    pub __wseq: __atomic_wide_counter,
-    pub __g1_start: __atomic_wide_counter,
-    pub __g_refs: [::std::os::raw::c_uint; 2usize],
-    pub __g_size: [::std::os::raw::c_uint; 2usize],
-    pub __g1_orig_size: ::std::os::raw::c_uint,
-    pub __wrefs: ::std::os::raw::c_uint,
-    pub __g_signals: [::std::os::raw::c_uint; 2usize],
-}
-impl Default for __pthread_cond_s {
-    fn default() -> Self {
-        let mut s = ::std::mem::MaybeUninit::<Self>::uninit();
-        unsafe {
-            ::std::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
-            s.assume_init()
-        }
-    }
-}
-pub type pthread_t = ::std::os::raw::c_ulong;
-#[repr(C)]
-#[derive(Copy, Clone)]
-pub union pthread_mutexattr_t {
-    pub __size: [::std::os::raw::c_char; 4usize],
-    pub __align: ::std::os::raw::c_int,
-}
-impl Default for pthread_mutexattr_t {
-    fn default() -> Self {
-        let mut s = ::std::mem::MaybeUninit::<Self>::uninit();
-        unsafe {
-            ::std::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
-            s.assume_init()
-        }
-    }
-}
-#[repr(C)]
-#[derive(Copy, Clone)]
-pub union pthread_condattr_t {
-    pub __size: [::std::os::raw::c_char; 4usize],
-    pub __align: ::std::os::raw::c_int,
-}
-impl Default for pthread_condattr_t {
-    fn default() -> Self {
-        let mut s = ::std::mem::MaybeUninit::<Self>::uninit();
-        unsafe {
-            ::std::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
-            s.assume_init()
-        }
-    }
-}
-pub type pthread_key_t = ::std::os::raw::c_uint;
-pub type pthread_once_t = ::std::os::raw::c_int;
-#[repr(C)]
-#[derive(Copy, Clone)]
-pub union pthread_attr_t {
-    pub __size: [::std::os::raw::c_char; 56usize],
-    pub __align: ::std::os::raw::c_long,
-}
-impl Default for pthread_attr_t {
-    fn default() -> Self {
-        let mut s = ::std::mem::MaybeUninit::<Self>::uninit();
-        unsafe {
-            ::std::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
-            s.assume_init()
-        }
-    }
-}
-#[repr(C)]
-#[derive(Copy, Clone)]
-pub union pthread_mutex_t {
-    pub __data: __pthread_mutex_s,
-    pub __size: [::std::os::raw::c_char; 40usize],
-    pub __align: ::std::os::raw::c_long,
-}
-impl Default for pthread_mutex_t {
-    fn default() -> Self {
-        let mut s = ::std::mem::MaybeUninit::<Self>::uninit();
-        unsafe {
-            ::std::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
-            s.assume_init()
-        }
-    }
-}
-#[repr(C)]
-#[derive(Copy, Clone)]
-pub union pthread_cond_t {
-    pub __data: __pthread_cond_s,
-    pub __size: [::std::os::raw::c_char; 48usize],
-    pub __align: ::std::os::raw::c_longlong,
-}
-impl Default for pthread_cond_t {
-    fn default() -> Self {
-        let mut s = ::std::mem::MaybeUninit::<Self>::uninit();
-        unsafe {
-            ::std::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
-            s.assume_init()
-        }
-    }
-}
-#[repr(C)]
-#[derive(Copy, Clone)]
-pub union pthread_rwlock_t {
-    pub __data: __pthread_rwlock_arch_t,
-    pub __size: [::std::os::raw::c_char; 56usize],
-    pub __align: ::std::os::raw::c_long,
-}
-impl Default for pthread_rwlock_t {
-    fn default() -> Self {
-        let mut s = ::std::mem::MaybeUninit::<Self>::uninit();
-        unsafe {
-            ::std::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
-            s.assume_init()
-        }
-    }
-}
-#[repr(C)]
-#[derive(Copy, Clone)]
-pub union pthread_rwlockattr_t {
-    pub __size: [::std::os::raw::c_char; 8usize],
-    pub __align: ::std::os::raw::c_long,
-}
-impl Default for pthread_rwlockattr_t {
-    fn default() -> Self {
-        let mut s = ::std::mem::MaybeUninit::<Self>::uninit();
-        unsafe {
-            ::std::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
-            s.assume_init()
-        }
-    }
-}
-pub type pthread_spinlock_t = ::std::os::raw::c_int;
-#[repr(C)]
-#[derive(Copy, Clone)]
-pub union pthread_barrier_t {
-    pub __size: [::std::os::raw::c_char; 32usize],
-    pub __align: ::std::os::raw::c_long,
-}
-impl Default for pthread_barrier_t {
-    fn default() -> Self {
-        let mut s = ::std::mem::MaybeUninit::<Self>::uninit();
-        unsafe {
-            ::std::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
-            s.assume_init()
-        }
-    }
-}
-#[repr(C)]
-#[derive(Copy, Clone)]
-pub union pthread_barrierattr_t {
-    pub __size: [::std::os::raw::c_char; 4usize],
-    pub __align: ::std::os::raw::c_int,
-}
-impl Default for pthread_barrierattr_t {
-    fn default() -> Self {
-        let mut s = ::std::mem::MaybeUninit::<Self>::uninit();
-        unsafe {
-            ::std::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
-            s.assume_init()
-        }
-    }
-}
+pub type FILE = __sFILE;
+pub type off_t = __darwin_off_t;
+pub type pid_t = __darwin_pid_t;
+pub type sig_atomic_t = ::std::os::raw::c_int;
+pub type uid_t = __darwin_uid_t;
+pub type gid_t = __darwin_gid_t;
 pub type BoolPtr = *mut bool;
 pub type Pointer = *mut ::std::os::raw::c_char;
 pub type int8 = ::std::os::raw::c_schar;
@@ -2259,14 +2043,24 @@ impl Default for PGAlignedXLogBlock {
         }
     }
 }
-pub type socklen_t = __socklen_t;
-pub type sa_family_t = ::std::os::raw::c_ushort;
+pub unsafe fn fdatasync(arg_fildes: ::std::os::raw::c_int) -> ::std::os::raw::c_int {
+    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
+        extern "C" {
+            fn fdatasync(arg_fildes: ::std::os::raw::c_int) -> ::std::os::raw::c_int;
+        }
+        fdatasync(arg_fildes)
+    })
+}
+pub type socklen_t = __darwin_socklen_t;
+pub type sa_family_t = __uint8_t;
 #[repr(C)]
 #[derive(Debug, Copy, Clone)]
 pub struct sockaddr_storage {
+    pub ss_len: __uint8_t,
     pub ss_family: sa_family_t,
-    pub __ss_padding: [::std::os::raw::c_char; 118usize],
-    pub __ss_align: ::std::os::raw::c_ulong,
+    pub __ss_pad1: [::std::os::raw::c_char; 6usize],
+    pub __ss_align: __int64_t,
+    pub __ss_pad2: [::std::os::raw::c_char; 112usize],
 }
 impl Default for sockaddr_storage {
     fn default() -> Self {
@@ -2300,11 +2094,14 @@ impl Default for hostent {
 pub struct passwd {
     pub pw_name: *mut ::std::os::raw::c_char,
     pub pw_passwd: *mut ::std::os::raw::c_char,
-    pub pw_uid: __uid_t,
-    pub pw_gid: __gid_t,
+    pub pw_uid: uid_t,
+    pub pw_gid: gid_t,
+    pub pw_change: __darwin_time_t,
+    pub pw_class: *mut ::std::os::raw::c_char,
     pub pw_gecos: *mut ::std::os::raw::c_char,
     pub pw_dir: *mut ::std::os::raw::c_char,
     pub pw_shell: *mut ::std::os::raw::c_char,
+    pub pw_expire: __darwin_time_t,
 }
 impl Default for passwd {
     fn default() -> Self {
@@ -2850,62 +2647,6 @@ pub unsafe fn pg_srand48(arg_seed: ::std::os::raw::c_long) {
         pg_srand48(arg_seed)
     })
 }
-pub unsafe fn fls(arg_mask: ::std::os::raw::c_int) -> ::std::os::raw::c_int {
-    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
-        extern "C" {
-            fn fls(arg_mask: ::std::os::raw::c_int) -> ::std::os::raw::c_int;
-        }
-        fls(arg_mask)
-    })
-}
-pub unsafe fn getpeereid(
-    arg_sock: ::std::os::raw::c_int,
-    arg_uid: *mut uid_t,
-    arg_gid: *mut gid_t,
-) -> ::std::os::raw::c_int {
-    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
-        extern "C" {
-            fn getpeereid(
-                arg_sock: ::std::os::raw::c_int,
-                arg_uid: *mut uid_t,
-                arg_gid: *mut gid_t,
-            ) -> ::std::os::raw::c_int;
-        }
-        getpeereid(arg_sock, arg_uid, arg_gid)
-    })
-}
-pub unsafe fn strlcat(
-    arg_dst: *mut ::std::os::raw::c_char,
-    arg_src: *const ::std::os::raw::c_char,
-    arg_siz: ::std::os::raw::c_ulong,
-) -> ::std::os::raw::c_ulong {
-    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
-        extern "C" {
-            fn strlcat(
-                arg_dst: *mut ::std::os::raw::c_char,
-                arg_src: *const ::std::os::raw::c_char,
-                arg_siz: ::std::os::raw::c_ulong,
-            ) -> ::std::os::raw::c_ulong;
-        }
-        strlcat(arg_dst, arg_src, arg_siz)
-    })
-}
-pub unsafe fn strlcpy(
-    arg_dst: *mut ::std::os::raw::c_char,
-    arg_src: *const ::std::os::raw::c_char,
-    arg_siz: ::std::os::raw::c_ulong,
-) -> ::std::os::raw::c_ulong {
-    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
-        extern "C" {
-            fn strlcpy(
-                arg_dst: *mut ::std::os::raw::c_char,
-                arg_src: *const ::std::os::raw::c_char,
-                arg_siz: ::std::os::raw::c_ulong,
-            ) -> ::std::os::raw::c_ulong;
-        }
-        strlcpy(arg_dst, arg_src, arg_siz)
-    })
-}
 pub unsafe fn pg_qsort(
     arg_base: *mut ::std::os::raw::c_void,
     arg_nel: usize,
@@ -3100,15 +2841,7 @@ pub unsafe fn wait_result_is_any_signal(
         wait_result_is_any_signal(arg_exit_status, arg_include_command_not_found)
     })
 }
-pub type __jmp_buf = [::std::os::raw::c_long; 8usize];
-#[repr(C)]
-#[derive(Debug, Default, Copy, Clone)]
-pub struct __jmp_buf_tag {
-    pub __jmpbuf: __jmp_buf,
-    pub __mask_was_saved: ::std::os::raw::c_int,
-    pub __saved_mask: __sigset_t,
-}
-pub type sigjmp_buf = [__jmp_buf_tag; 1usize];
+pub type sigjmp_buf = [::std::os::raw::c_int; 49usize];
 pub unsafe fn errstart(
     arg_elevel: ::std::os::raw::c_int,
     arg_filename: *const ::std::os::raw::c_char,
@@ -7260,7 +6993,7 @@ pub unsafe fn ScanKeyEntryInitializeWithInfo(
 #[repr(C)]
 #[derive(Debug, Default, Copy, Clone)]
 pub struct pg_atomic_flag {
-    pub value: ::std::os::raw::c_char,
+    pub value: ::std::os::raw::c_int,
 }
 #[repr(C)]
 #[derive(Debug, Default, Copy, Clone)]
@@ -8561,6 +8294,12 @@ extern "C" {
 }
 extern "C" {
     pub static mut criticalSharedRelcachesBuilt: bool;
+}
+#[repr(C)]
+#[derive(Debug, Default, Copy, Clone)]
+pub struct timespec {
+    pub tv_sec: __darwin_time_t,
+    pub tv_nsec: ::std::os::raw::c_long,
 }
 pub type XLogRecPtr = uint64;
 pub type XLogSegNo = uint64;
@@ -12013,7 +11752,6 @@ pub struct IndexOnlyScan {
     pub indexorderby: *mut List,
     pub indextlist: *mut List,
     pub indexorderdir: ScanDirection,
-    pub recheckqual: *mut List,
 }
 impl Default for IndexOnlyScan {
     fn default() -> Self {
@@ -13791,7 +13529,7 @@ pub unsafe fn tuplesort_restorepos(arg_state: *mut Tuplesortstate) {
         tuplesort_restorepos(arg_state)
     })
 }
-pub type slock_t = ::std::os::raw::c_uchar;
+pub type slock_t = ::std::os::raw::c_int;
 extern "C" {
     pub static mut dummy_spinlock: slock_t;
 }
@@ -14937,7 +14675,7 @@ impl Default for IndexScanState {
 #[derive(Debug, Copy, Clone)]
 pub struct IndexOnlyScanState {
     pub ss: ScanState,
-    pub recheckqual: *mut ExprState,
+    pub indexqual: *mut ExprState,
     pub ioss_ScanKeys: ScanKey,
     pub ioss_NumScanKeys: ::std::os::raw::c_int,
     pub ioss_OrderByKeys: ScanKey,
@@ -19716,22 +19454,6 @@ pub unsafe fn InitXLogInsert() {
     })
 }
 pub type pg_crc32c = uint32;
-pub unsafe fn pg_comp_crc32c_sse42(
-    arg_crc: pg_crc32c,
-    arg_data: *const ::std::os::raw::c_void,
-    arg_len: usize,
-) -> pg_crc32c {
-    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
-        extern "C" {
-            fn pg_comp_crc32c_sse42(
-                arg_crc: pg_crc32c,
-                arg_data: *const ::std::os::raw::c_void,
-                arg_len: usize,
-            ) -> pg_crc32c;
-        }
-        pg_comp_crc32c_sse42(arg_crc, arg_data, arg_len)
-    })
-}
 pub unsafe fn pg_comp_crc32c_sb8(
     arg_crc: pg_crc32c,
     arg_data: *const ::std::os::raw::c_void,
@@ -19747,15 +19469,6 @@ pub unsafe fn pg_comp_crc32c_sb8(
         }
         pg_comp_crc32c_sb8(arg_crc, arg_data, arg_len)
     })
-}
-extern "C" {
-    pub static mut pg_comp_crc32c: ::std::option::Option<
-        unsafe extern "C" fn(
-            crc: pg_crc32c,
-            data: *const ::std::os::raw::c_void,
-            len: usize,
-        ) -> pg_crc32c,
-    >;
 }
 #[repr(C)]
 #[derive(Debug, Default, Copy, Clone)]
@@ -20011,11 +19724,12 @@ pub unsafe fn XLogRecGetBlockTag(
 #[repr(C)]
 #[derive(Debug, Copy, Clone)]
 pub struct dirent {
-    pub d_ino: __ino_t,
-    pub d_off: __off_t,
-    pub d_reclen: ::std::os::raw::c_ushort,
-    pub d_type: ::std::os::raw::c_uchar,
-    pub d_name: [::std::os::raw::c_char; 256usize],
+    pub d_ino: __uint64_t,
+    pub d_seekoff: __uint64_t,
+    pub d_reclen: __uint16_t,
+    pub d_namlen: __uint16_t,
+    pub d_type: __uint8_t,
+    pub d_name: [::std::os::raw::c_char; 1024usize],
 }
 impl Default for dirent {
     fn default() -> Self {
@@ -20028,10 +19742,32 @@ impl Default for dirent {
 }
 #[repr(C)]
 #[derive(Debug, Copy, Clone)]
-pub struct __dirstream {
+pub struct _telldir {
     _unused: [u8; 0],
 }
-pub type DIR = __dirstream;
+#[repr(C)]
+#[derive(Debug, Copy, Clone)]
+pub struct DIR {
+    pub __dd_fd: ::std::os::raw::c_int,
+    pub __dd_loc: ::std::os::raw::c_long,
+    pub __dd_size: ::std::os::raw::c_long,
+    pub __dd_buf: *mut ::std::os::raw::c_char,
+    pub __dd_len: ::std::os::raw::c_int,
+    pub __dd_seek: ::std::os::raw::c_long,
+    pub __padding: ::std::os::raw::c_long,
+    pub __dd_flags: ::std::os::raw::c_int,
+    pub __dd_lock: __darwin_pthread_mutex_t,
+    pub __dd_td: *mut _telldir,
+}
+impl Default for DIR {
+    fn default() -> Self {
+        let mut s = ::std::mem::MaybeUninit::<Self>::uninit();
+        unsafe {
+            ::std::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
+            s.assume_init()
+        }
+    }
+}
 pub type FileName = *mut ::std::os::raw::c_char;
 pub type File = ::std::os::raw::c_int;
 extern "C" {
@@ -26424,12 +26160,6 @@ pub unsafe fn extract_variadic_args(
         )
     })
 }
-pub type sig_atomic_t = __sig_atomic_t;
-pub const SIGEV_SIGNAL: _bindgen_ty_16 = 0;
-pub const SIGEV_NONE: _bindgen_ty_16 = 1;
-pub const SIGEV_THREAD: _bindgen_ty_16 = 2;
-pub const SIGEV_THREAD_ID: _bindgen_ty_16 = 4;
-pub type _bindgen_ty_16 = ::std::os::raw::c_uint;
 pub type pg_time_t = int64;
 #[repr(C)]
 #[derive(Debug, Copy, Clone)]
@@ -29066,7 +28796,6 @@ pub struct PGPROC {
     pub heldLocks: LOCKMASK,
     pub waitLSN: XLogRecPtr,
     pub syncRepState: ::std::os::raw::c_int,
-    pub delayChkptEnd: bool,
     pub syncRepLinks: SHM_QUEUE,
     pub myProcLocks: [SHM_QUEUE; 16usize],
     pub subxids: XidCache,
@@ -34214,14 +33943,6 @@ pub unsafe fn recordDependencyOnCurrentExtension(
             );
         }
         recordDependencyOnCurrentExtension(arg_object, arg_isReplace)
-    })
-}
-pub unsafe fn checkMembershipInCurrentExtension(arg_object: *const ObjectAddress) {
-    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
-        extern "C" {
-            fn checkMembershipInCurrentExtension(arg_object: *const ObjectAddress);
-        }
-        checkMembershipInCurrentExtension(arg_object)
     })
 }
 pub unsafe fn deleteDependencyRecordsFor(
@@ -53341,18 +53062,6 @@ pub unsafe fn GetVirtualXIDsDelayingChkpt(
         GetVirtualXIDsDelayingChkpt(arg_nvxids)
     })
 }
-pub unsafe fn GetVirtualXIDsDelayingChkptEnd(
-    arg_nvxids: *mut ::std::os::raw::c_int,
-) -> *mut VirtualTransactionId {
-    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
-        extern "C" {
-            fn GetVirtualXIDsDelayingChkptEnd(
-                arg_nvxids: *mut ::std::os::raw::c_int,
-            ) -> *mut VirtualTransactionId;
-        }
-        GetVirtualXIDsDelayingChkptEnd(arg_nvxids)
-    })
-}
 pub unsafe fn HaveVirtualXIDsDelayingChkpt(
     arg_vxids: *mut VirtualTransactionId,
     arg_nvxids: ::std::os::raw::c_int,
@@ -53365,20 +53074,6 @@ pub unsafe fn HaveVirtualXIDsDelayingChkpt(
             ) -> bool;
         }
         HaveVirtualXIDsDelayingChkpt(arg_vxids, arg_nvxids)
-    })
-}
-pub unsafe fn HaveVirtualXIDsDelayingChkptEnd(
-    arg_vxids: *mut VirtualTransactionId,
-    arg_nvxids: ::std::os::raw::c_int,
-) -> bool {
-    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
-        extern "C" {
-            fn HaveVirtualXIDsDelayingChkptEnd(
-                arg_vxids: *mut VirtualTransactionId,
-                arg_nvxids: ::std::os::raw::c_int,
-            ) -> bool;
-        }
-        HaveVirtualXIDsDelayingChkptEnd(arg_vxids, arg_nvxids)
     })
 }
 pub unsafe fn BackendPidGetProc(arg_pid: ::std::os::raw::c_int) -> *mut PGPROC {
@@ -75955,20 +75650,6 @@ pub unsafe fn xidComparator(
         xidComparator(arg_arg1, arg_arg2)
     })
 }
-pub unsafe fn xidLogicalComparator(
-    arg_arg1: *const ::std::os::raw::c_void,
-    arg_arg2: *const ::std::os::raw::c_void,
-) -> ::std::os::raw::c_int {
-    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
-        extern "C" {
-            fn xidLogicalComparator(
-                arg_arg1: *const ::std::os::raw::c_void,
-                arg_arg2: *const ::std::os::raw::c_void,
-            ) -> ::std::os::raw::c_int;
-        }
-        xidLogicalComparator(arg_arg1, arg_arg2)
-    })
-}
 pub unsafe fn inet_cidr_ntop(
     arg_af: ::std::os::raw::c_int,
     arg_src: *const ::std::os::raw::c_void,
@@ -79184,24 +78865,7 @@ pub unsafe fn make_empty_range(arg_typcache: *mut TypeCacheEntry) -> *mut RangeT
         make_empty_range(arg_typcache)
     })
 }
-pub type __builtin_va_list = [__va_list_tag; 1usize];
-#[repr(C)]
-#[derive(Debug, Copy, Clone)]
-pub struct __va_list_tag {
-    pub gp_offset: ::std::os::raw::c_uint,
-    pub fp_offset: ::std::os::raw::c_uint,
-    pub overflow_arg_area: *mut ::std::os::raw::c_void,
-    pub reg_save_area: *mut ::std::os::raw::c_void,
-}
-impl Default for __va_list_tag {
-    fn default() -> Self {
-        let mut s = ::std::mem::MaybeUninit::<Self>::uninit();
-        unsafe {
-            ::std::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
-            s.assume_init()
-        }
-    }
-}
+pub type __builtin_va_list = *mut ::std::os::raw::c_char;
 #[repr(C)]
 #[derive(Debug, Default, Copy, Clone)]
 pub struct binaryheap {
