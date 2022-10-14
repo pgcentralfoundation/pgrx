@@ -490,10 +490,10 @@ impl SpiTupleTable {
     }
 
     /// Returns the number of columns
-    pub fn columns(&self) -> Option<i32> {
+    pub fn columns(&self) -> i32 {
         match self.tupdesc {
-            Some(tupdesc) => unsafe { Some((*tupdesc).natts) },
-            None => None,
+            Some(tupdesc) => unsafe { (*tupdesc).natts },
+            None => 0,
         }
     }
 
