@@ -59,10 +59,10 @@ unsafe impl SqlTranslatable for crate::BOX {
 
 unsafe impl SqlTranslatable for crate::Point {
     fn argument_sql() -> Result<SqlMapping, ArgumentError> {
-        Ok(SqlMapping::literal("box"))
+        Ok(SqlMapping::literal("point"))
     }
     fn return_sql() -> Result<Returns, ReturnsError> {
-        Ok(Returns::One(SqlMapping::literal("box")))
+        Ok(Returns::One(SqlMapping::literal("point")))
     }
 }
 
