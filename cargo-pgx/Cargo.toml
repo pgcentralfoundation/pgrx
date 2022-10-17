@@ -1,6 +1,6 @@
 [package]
 name = "cargo-pgx"
-version = "0.5.0"
+version = "0.5.2"
 authors = ["ZomboDB, LLC <zombodb@gmail.com>"]
 license = "MIT"
 description = "Cargo subcommand for 'pgx' to make Postgres extension development easy"
@@ -23,10 +23,10 @@ semver = "1.0.14"
 owo-colors = { version = "3.5.0", features = [ "supports-colors" ] }
 env_proxy = "0.4.1"
 num_cpus = "1.13.1"
-pgx-pg-config = { path = "../pgx-pg-config", version = "=0.5.0" }
-pgx-utils = { path = "../pgx-utils", version = "=0.5.0" }
-prettyplease = "0.1.20"
-proc-macro2 = { version = "1.0.46", features = [ "span-locations" ] }
+pgx-pg-config = { path = "../pgx-pg-config", version = "=0.5.2" }
+pgx-utils = { path = "../pgx-utils", version = "=0.5.2" }
+prettyplease = "0.1.21"
+proc-macro2 = { version = "1.0.47", features = [ "span-locations" ] }
 quote = "1.0.21"
 rayon = "1.5.3"
 regex = "1.6.0"
