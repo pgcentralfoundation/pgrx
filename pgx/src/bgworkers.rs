@@ -213,7 +213,7 @@ unsafe extern "C" fn worker_spi_sigterm(_signal_args: i32) {
 }
 
 /// Dynamic background worker handle
-pub struct BackgroundWorkerHandle {
+pub struct DynamicBackgroundWorker {
     handle: *mut pg_sys::BackgroundWorkerHandle,
     notify_pid: pg_sys::pid_t,
 }
@@ -249,7 +249,7 @@ impl From<pg_sys::BgwHandleStatus> for BackgroundWorkerStatus {
     }
 }
 
-impl BackgroundWorkerHandle {
+impl DynamicBackgroundWorker {
     /// Return dynamic background worker's PID if the worker is successfully registered,
     /// otherwise it return worker's status as an error.
     pub fn pid(&self) -> Result<Pid, BackgroundWorkerStatus> {
@@ -264,11 +264,11 @@ impl BackgroundWorkerHandle {
 
     /// Causes the postmaster to send SIGTERM to the worker if it is running,
     /// and to unregister it as soon as it is not.
-    pub fn terminate(self) -> TerminatingBackgroundWorkerHandle {
+    pub fn terminate(self) -> TerminatingDynamicBackgroundWorker {
         unsafe {
             pg_sys::TerminateBackgroundWorker(self.handle);
         }
-        TerminatingBackgroundWorkerHandle { handle: self.handle, notify_pid: self.notify_pid }
+        TerminatingDynamicBackgroundWorker { handle: self.handle, notify_pid: self.notify_pid }
     }
 
     /// Block until the postmaster has attempted to start the background worker,
@@ -298,19 +298,19 @@ impl BackgroundWorkerHandle {
     /// Requires `BackgroundWorkerBuilder.bgw_notify_pid` to be set to `pg_sys::MyProcPid`, otherwise it'll
     /// return [`BackgroundWorkerStatus::Untracked`] error
     pub fn wait_for_shutdown(self) -> Result<(), BackgroundWorkerStatus> {
-        TerminatingBackgroundWorkerHandle { handle: self.handle, notify_pid: self.notify_pid }
+        TerminatingDynamicBackgroundWorker { handle: self.handle, notify_pid: self.notify_pid }
             .wait_for_shutdown()
     }
 }
 
 /// Handle of a dynamic background worker that is being terminated with
-/// [`BackgroundWorkerHandle::terminate`]. Only allows waiting for shutdown.
-pub struct TerminatingBackgroundWorkerHandle {
+/// [`DynamicBackgroundWorker::terminate`]. Only allows waiting for shutdown.
+pub struct TerminatingDynamicBackgroundWorker {
     handle: *mut pg_sys::BackgroundWorkerHandle,
     notify_pid: pg_sys::pid_t,
 }
 
-impl TerminatingBackgroundWorkerHandle {
+impl TerminatingDynamicBackgroundWorker {
     /// Block until the background worker exits, or postmaster dies. When the background worker exits, the return value is unit,
     /// if postmaster dies it will return error with `BackgroundWorkerStatus::PostmasterDied` status
     ///
@@ -536,7 +536,7 @@ impl BackgroundWorkerBuilder {
     }
 
     /// Once properly configured, call `load_dynamic()` to get the BackgroundWorker registered and started dynamically.
-    pub fn load_dynamic(self: Self) -> BackgroundWorkerHandle {
+    pub fn load_dynamic(self: Self) -> DynamicBackgroundWorker {
         let mut bgw: pg_sys::BackgroundWorker = (&self).into();
         let mut handle: *mut pg_sys::BackgroundWorkerHandle = null_mut();
 
@@ -544,7 +544,7 @@ impl BackgroundWorkerBuilder {
             pg_sys::RegisterDynamicBackgroundWorker(&mut bgw, &mut handle);
         };
 
-        BackgroundWorkerHandle { handle, notify_pid: bgw.bgw_notify_pid }
+        DynamicBackgroundWorker { handle, notify_pid: bgw.bgw_notify_pid }
     }
 }
 
