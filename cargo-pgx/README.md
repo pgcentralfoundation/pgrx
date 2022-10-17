@@ -107,7 +107,7 @@ As shown by the screenshot above, it downloads the latest versions of Postgres v
 In cases when default ports pgx uses to run PostgreSQL within are not available, one can specify
 custom values for these during initialization using `--base-port` and `--base-testing-port`
 options. One of the use cases for this is using multiple installations of pgx (using `$PGX_HOME` variable)
-when developing multiple extensions at the same time.
+when developing multiple extensions at the same time. These values can be later changed in `$PGX_HOME/config.toml`.
 
 If you want to use your operating system's package manager to install Postgres, `cargo pgx init` has optional arguments that allow you to specify where they're installed (see below).
 
