@@ -519,7 +519,13 @@ impl BackgroundWorkerBuilder {
         self
     }
 
-    fn pg_sys_worker(&self) -> pg_sys::BackgroundWorker {
+    /// Returns [`pg_sys::BackgroundWorker`] to be used with `pg_sys` API directly
+    /// when necessary.
+    ///
+    /// This function is useful only in limited context, such as when this structure is required
+    /// by other libraries and the worker is not to be started by pgx itself. In this case,
+    /// the builder is useful for building this structure.
+    pub fn pg_sys_worker(&self) -> pg_sys::BackgroundWorker {
         #[cfg(feature = "pg10")]
         let bgw = pg_sys::BackgroundWorker {
             bgw_name: RpgffiChar::from(&self.bgw_name[..]).0,
