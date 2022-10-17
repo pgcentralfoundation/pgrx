@@ -519,13 +519,40 @@ impl BackgroundWorkerBuilder {
         self
     }
 
-    /// Returns [`pg_sys::BackgroundWorker`] to be used with `pg_sys` API directly
-    /// when necessary.
-    ///
-    /// This function is useful only in limited context, such as when this structure is required
-    /// by other libraries and the worker is not to be started by pgx itself. In this case,
-    /// the builder is useful for building this structure.
-    pub fn pg_sys_worker(&self) -> pg_sys::BackgroundWorker {
+    /// Once properly configured, call `load()` to get the BackgroundWorker registered and
+    /// started at the proper time by Postgres.
+    pub fn load(self: Self) {
+        let mut bgw: pg_sys::BackgroundWorker = (&self).into();
+
+        unsafe {
+            pg_sys::RegisterBackgroundWorker(&mut bgw);
+            if self.bgw_flags.contains(BGWflags::BGWORKER_SHMEM_ACCESS)
+                && self.shared_memory_startup_fn.is_some()
+            {
+                PREV_SHMEM_STARTUP_HOOK = pg_sys::shmem_startup_hook;
+                pg_sys::shmem_startup_hook = self.shared_memory_startup_fn;
+            }
+        };
+    }
+
+    /// Once properly configured, call `load_dynamic()` to get the BackgroundWorker registered and started dynamically.
+    pub fn load_dynamic(self: Self) -> BackgroundWorkerHandle {
+        let mut bgw: pg_sys::BackgroundWorker = (&self).into();
+        let mut handle: *mut pg_sys::BackgroundWorkerHandle = null_mut();
+
+        unsafe {
+            pg_sys::RegisterDynamicBackgroundWorker(&mut bgw, &mut handle);
+        };
+
+        BackgroundWorkerHandle { handle, notify_pid: bgw.bgw_notify_pid }
+    }
+}
+
+/// This conversion is useful only in limited context outside of pgx, such as when this structure is required
+/// by other libraries and the worker is not to be started by pgx itself. In this case,
+/// the builder is useful for building this structure.
+impl<'a> Into<pg_sys::BackgroundWorker> for &'a BackgroundWorkerBuilder {
+    fn into(self) -> pg_sys::BackgroundWorker {
         #[cfg(feature = "pg10")]
         let bgw = pg_sys::BackgroundWorker {
             bgw_name: RpgffiChar::from(&self.bgw_name[..]).0,
@@ -560,34 +587,6 @@ impl BackgroundWorkerBuilder {
         };
 
         bgw
-    }
-
-    /// Once properly configured, call `load()` to get the BackgroundWorker registered and
-    /// started at the proper time by Postgres.
-    pub fn load(self: Self) {
-        let mut bgw = self.pg_sys_worker();
-
-        unsafe {
-            pg_sys::RegisterBackgroundWorker(&mut bgw);
-            if self.bgw_flags.contains(BGWflags::BGWORKER_SHMEM_ACCESS)
-                && self.shared_memory_startup_fn.is_some()
-            {
-                PREV_SHMEM_STARTUP_HOOK = pg_sys::shmem_startup_hook;
-                pg_sys::shmem_startup_hook = self.shared_memory_startup_fn;
-            }
-        };
-    }
-
-    /// Once properly configured, call `load_dynamic()` to get the BackgroundWorker registered and started dynamically.
-    pub fn load_dynamic(self: Self) -> BackgroundWorkerHandle {
-        let mut bgw = self.pg_sys_worker();
-        let mut handle: *mut pg_sys::BackgroundWorkerHandle = null_mut();
-
-        unsafe {
-            pg_sys::RegisterDynamicBackgroundWorker(&mut bgw, &mut handle);
-        };
-
-        BackgroundWorkerHandle { handle, notify_pid: bgw.bgw_notify_pid }
     }
 }
 
