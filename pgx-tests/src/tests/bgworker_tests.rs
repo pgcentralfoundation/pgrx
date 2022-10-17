@@ -7,7 +7,7 @@ All rights reserved.
 Use of this source code is governed by the MIT license that can be found in the LICENSE file.
 */
 use pgx::prelude::*;
-use pgx::{pg_guard, pg_sys, FromDatum, IntoDatum, PgOid, Spi};
+use pgx::{FromDatum, IntoDatum, PgOid};
 
 #[pg_guard]
 #[no_mangle]
