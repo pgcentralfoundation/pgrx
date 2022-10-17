@@ -393,20 +393,17 @@ fn impl_pg_node(
 
         // impl the PgNode trait for all nodes
         pgnode_impls.extend(quote! {
-            impl pg_sys::PgNode for #struct_name {
-                type NodeType = #struct_name;
-            }
+            impl pg_sys::PgNode for #struct_name {}
         });
 
         // impl Rust's Display trait for all nodes
-        pgnode_impls.extend(
-            quote! {
-                impl std::fmt::Display for #struct_name {
-                    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-                        write!(f, "{}", crate::node_to_string_for_display(self.as_node_ptr() as *mut crate::Node))
-                    }
+        pgnode_impls.extend(quote! {
+            impl std::fmt::Display for #struct_name {
+                fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+                    write!(f, "{}", self.display_node() )
                 }
-            });
+            }
+        });
     }
 
     Ok(pgnode_impls)
