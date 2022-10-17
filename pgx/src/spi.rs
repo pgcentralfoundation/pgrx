@@ -498,6 +498,8 @@ impl SpiTupleTable {
     }
 
     /// Returns column type OID
+    ///
+    /// The ordinal position is 1-based
     pub fn column_type_oid(&self, ordinal: i32) -> Option<PgOid> {
         match self.tupdesc {
             Some(tupdesc) => unsafe {
@@ -514,6 +516,8 @@ impl SpiTupleTable {
     }
 
     /// Returns column name
+    ///
+    /// The ordinal position is 1-based
     pub fn column_name(&self, ordinal: i32) -> Option<String> {
         match self.tupdesc {
             Some(tupdesc) => unsafe {
