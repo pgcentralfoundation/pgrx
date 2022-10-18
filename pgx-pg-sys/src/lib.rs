@@ -28,8 +28,8 @@ std::compile_error!("exactly one one feature must be provided (pg10, pg11, pg12,
 
 pub mod submodules;
 
-use core::ffi::CStr;
 use core::ptr::NonNull;
+use std::ffi::CStr;
 pub use submodules::{guard, *};
 
 //
