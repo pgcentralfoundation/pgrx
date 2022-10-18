@@ -273,7 +273,7 @@ impl DynamicBackgroundWorker {
 
     /// Block until the postmaster has attempted to start the background worker,
     /// or until the postmaster dies. If the background worker is running, the successful return value
-    /// will be the worker's PID. therwise, the return value will be an error with the worker's status.
+    /// will be the worker's PID. Otherwise, the return value will be an error with the worker's status.
     ///
     /// Requires `BackgroundWorkerBuilder.bgw_notify_pid` to be set to `pg_sys::MyProcPid`, otherwise it'll
     /// return [`BackgroundWorkerStatus::Untracked`] error
