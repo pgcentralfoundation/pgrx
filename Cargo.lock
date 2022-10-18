@@ -1487,6 +1487,7 @@ version = "0.5.6"
 dependencies = [
  "bindgen",
  "eyre",
+ "libc",
  "memoffset",
  "once_cell",
  "pgx-macros",

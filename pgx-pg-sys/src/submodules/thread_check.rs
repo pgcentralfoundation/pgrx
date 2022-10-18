@@ -13,14 +13,14 @@
 use std::num::NonZeroUsize;
 use std::sync::atomic::{AtomicUsize, Ordering};
 
+static ACTIVE_THREAD: AtomicUsize = AtomicUsize::new(0);
 #[track_caller]
 pub(crate) fn check_active_thread() {
-    static ACTIVE_THREAD: AtomicUsize = AtomicUsize::new(0);
     let current_thread = nonzero_thread_id();
     // Relaxed is sufficient as we're only interested in the effects on a single
     // atomic variable, and don't need synchronization beyond that.
     return match ACTIVE_THREAD.load(Ordering::Relaxed) {
-        0 => init_active_thread(current_thread, &ACTIVE_THREAD),
+        0 => init_active_thread(current_thread),
         thread_id => {
             if current_thread.get() != thread_id {
                 thread_id_check_failed();
@@ -30,11 +30,16 @@ pub(crate) fn check_active_thread() {
 }
 
 #[track_caller]
-fn init_active_thread(tid: NonZeroUsize, atom: &AtomicUsize) {
-    match atom.compare_exchange(0, tid.get(), Ordering::Relaxed, Ordering::Relaxed) {
-        Ok(_) => {
-            // All good!
-        }
+fn init_active_thread(tid: NonZeroUsize) {
+    match ACTIVE_THREAD.compare_exchange(0, tid.get(), Ordering::Relaxed, Ordering::Relaxed) {
+        Ok(_) => unsafe {
+            // We won the race. Register an atfork handler to clear the atomic
+            // in any child processes we spawn.
+            extern "C" fn clear_in_child() {
+                ACTIVE_THREAD.store(0, Ordering::Relaxed);
+            }
+            libc::pthread_atfork(None, None, Some(clear_in_child));
+        },
         Err(_) => {
             thread_id_check_failed();
         }
