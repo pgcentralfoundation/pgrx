@@ -15,6 +15,10 @@ Quirks specific to Postgres.
 
 The `palloc*` family of functions may throw a Postgres error but will not return `nullptr`.
 
+You should be careful to avoid using data allocated by Postgres after it has been freed. In particular,
+when writing set returning functions, don't directly return data from the arguments without cloning the
+data into memory owned by Rust.
+
 ## Rust
 
 Quirks specific to Rust that specifically inform the design of this crate and not, say,
