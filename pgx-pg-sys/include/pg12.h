@@ -87,6 +87,7 @@ Use of this source code is governed by the MIT license that can be found in the 
 #include "storage/itemptr.h"
 #include "storage/lwlock.h"
 #include "storage/procarray.h"
+#include "storage/spin.h"
 #include "tsearch/ts_public.h"
 #include "tsearch/ts_utils.h"
 #include "tcop/tcopprot.h"
