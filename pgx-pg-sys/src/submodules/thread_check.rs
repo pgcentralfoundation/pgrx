@@ -45,7 +45,7 @@ fn init_active_thread(tid: NonZeroUsize, atom: &AtomicUsize) {
 #[inline(never)]
 #[track_caller]
 fn thread_id_check_failed() -> ! {
-    panic!("`pgx` may not functionality may not be used from multiple threads.");
+    panic!("`pgx` may not not be used from multiple threads.");
 }
 
 fn nonzero_thread_id() -> NonZeroUsize {
