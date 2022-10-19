@@ -36,7 +36,7 @@ around Postgres internals.
   - Makes use of `sigsetjmp`
   - Akin to Postgres' `PG_TRY/PG_CATCH/PG_FINALLY/PG_RE_THROW` C macros
   
-## Thead Safety
+## Thread Safety
 
 - As it relates to any Postgres-thing (calling a function, allocated memory, anything at all from `pgx_pg_sys::`), there is none
 - We (will) detect FFI calls into Postgres in non-the-main-thread and immediately panic
