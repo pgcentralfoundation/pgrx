@@ -440,22 +440,15 @@ impl PgExtern {
                 optional,
             } => {
                 let result_ident = syn::Ident::new("result", self.func.sig.span());
-                let funcctx_ident = syn::Ident::new("funcctx", self.func.sig.span());
                 let retval_ty_resolved = retval_ty.original_ty;
                 let result_handler = if optional {
                     // don't need unsafe annotations because of the larger unsafe block coming up
                     quote_spanned! { self.func.sig.span() =>
-                        let #result_ident = match pgx::PgMemoryContexts::For(funcctx.multi_call_memory_ctx).switch_to(|_| { #func_name(#(#arg_pats),*) }) {
-                            Some(result) => result,
-                            None => {
-                                pgx::srf_return_done(#fcinfo_ident, &mut funcctx);
-                                return pgx::pg_return_null(#fcinfo_ident)
-                            }
-                        };
+                        #func_name(#(#arg_pats),*)
                     }
                 } else {
                     quote_spanned! { self.func.sig.span() =>
-                        let #result_ident = pgx::PgMemoryContexts::For(#funcctx_ident.multi_call_memory_ctx).switch_to(|_| { #func_name(#(#arg_pats),*) });
+                        Some(#func_name(#(#arg_pats),*))
                     }
                 };
 
@@ -478,8 +471,19 @@ impl PgExtern {
                                 funcctx.user_fctx = pgx::PgMemoryContexts::For(funcctx.multi_call_memory_ctx).palloc_struct::<IteratorHolder<#retval_ty_resolved>>() as *mut ::core::ffi::c_void;
                                 iterator_holder = pgx::PgBox::from_pg(funcctx.user_fctx as *mut IteratorHolder<#retval_ty_resolved>);
 
-                                #( #arg_fetches )*
-                                #result_handler
+                                // function arguments need to be "fetched" while in the function call's
+                                // multi-call-memory-context to ensure that any detoasted datums will
+                                // live long enough for the SRF to use them over each call
+                                let #result_ident = match pgx::PgMemoryContexts::For(funcctx.multi_call_memory_ctx).switch_to(|_| {
+                                    #( #arg_fetches )*
+                                    #result_handler
+                                }) {
+                                    Some(result) => result,
+                                    None => {
+                                        pgx::srf_return_done(#fcinfo_ident, &mut funcctx);
+                                        return pgx::pg_return_null(#fcinfo_ident)
+                                    }
+                                };
 
                                 iterator_holder.iter = pgx::PgMemoryContexts::For(funcctx.multi_call_memory_ctx).leak_trivial_alloc(result);
                             }
@@ -546,17 +550,11 @@ impl PgExtern {
                 let result_handler = if optional {
                     // don't need unsafe annotations because of the larger unsafe block coming up
                     quote_spanned! { self.func.sig.span() =>
-                        let #result_ident = match pgx::PgMemoryContexts::For(funcctx.multi_call_memory_ctx).switch_to(|_| { #func_name(#(#arg_pats),*) }) {
-                            Some(result) => result,
-                            None => {
-                                pgx::srf_return_done(#fcinfo_ident, &mut funcctx);
-                                return pgx::pg_return_null(#fcinfo_ident)
-                            }
-                        };
+                        #func_name(#(#arg_pats),*)
                     }
                 } else {
                     quote_spanned! { self.func.sig.span() =>
-                        let #result_ident = pgx::PgMemoryContexts::For(#funcctx_ident.multi_call_memory_ctx).switch_to(|_| { #func_name(#(#arg_pats),*) });
+                        Some(#func_name(#(#arg_pats),*))
                     }
                 };
 
@@ -589,8 +587,19 @@ impl PgExtern {
                                 });
                                 iterator_holder = pgx::PgBox::from_pg(funcctx.user_fctx as *mut IteratorHolder<#retval_tys_tuple>);
 
-                                #( #arg_fetches )*
-                                #result_handler
+                                // function arguments need to be "fetched" while in the function call's
+                                // multi-call-memory-context to ensure that any detoasted datums will
+                                // live long enough for the SRF to use them over each call
+                                let #result_ident = match pgx::PgMemoryContexts::For(funcctx.multi_call_memory_ctx).switch_to(|_| {
+                                    #( #arg_fetches )*
+                                    #result_handler
+                                }) {
+                                    Some(result) => result,
+                                    None => {
+                                        pgx::srf_return_done(#fcinfo_ident, &mut funcctx);
+                                        return pgx::pg_return_null(#fcinfo_ident)
+                                    }
+                                };
 
                                 iterator_holder.iter = pgx::PgMemoryContexts::For(funcctx.multi_call_memory_ctx).leak_and_drop_on_delete(result);
                             }

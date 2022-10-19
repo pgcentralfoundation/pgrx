@@ -41,6 +41,14 @@ fn split_set<'a>(input: &'a str, pattern: &'a str) -> SetOfIterator<'a, &'a str>
     SetOfIterator::new(input.split_terminator(pattern).into_iter())
 }
 
+#[pg_extern]
+fn split_table<'a>(
+    input: &'a str,
+    pattern: &'a str,
+) -> TableIterator<'a, (name!(i, i32), name!(s, &'a str))> {
+    TableIterator::new(input.split_terminator(pattern).enumerate().map(|(i, s)| (i as i32, s)))
+}
+
 #[cfg(any(test, feature = "pg_test"))]
 #[pg_schema]
 mod tests {
