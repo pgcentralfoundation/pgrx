@@ -104,6 +104,11 @@ As shown by the screenshot above, it downloads the latest versions of Postgres v
 
 `pgx` is designed to support multiple Postgres versions in such a way that during development, you'll know if you're trying to use a Postgres API that isn't common across all versions. It's also designed to make testing your extension against these versions easy. This is why it requires you to have all fully compiled and installed versions of Postgres during development.
 
+In cases when default ports pgx uses to run PostgreSQL within are not available, one can specify
+custom values for these during initialization using `--base-port` and `--base-testing-port`
+options. One of the use cases for this is using multiple installations of pgx (using `$PGX_HOME` variable)
+when developing multiple extensions at the same time. These values can be later changed in `$PGX_HOME/config.toml`.
+
 If you want to use your operating system's package manager to install Postgres, `cargo pgx init` has optional arguments that allow you to specify where they're installed (see below).
 
 What you're telling `cargo pgx init` is the full path to `pg_config` for each version.
@@ -130,6 +135,12 @@ USAGE:
     cargo pgx init [OPTIONS]
 
 OPTIONS:
+        --base-port <BASE_PORT>
+            Base port number
+
+        --base-testing-port <BASE_TESTING_PORT>
+            Base testing port number
+
     -h, --help           Print help information
         --pg10 <PG10>    [env: PG10_PG_CONFIG=]
         --pg11 <PG11>    If installed locally, the path to PG11's `pgconfig` tool, or `download` to

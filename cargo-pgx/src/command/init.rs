@@ -60,6 +60,10 @@ pub(crate) struct Init {
     pg14: Option<String>,
     #[clap(from_global, parse(from_occurrences))]
     verbose: usize,
+    #[clap(long, help = "Base port number")]
+    base_port: Option<u16>,
+    #[clap(long, help = "Base testing port number")]
+    base_testing_port: Option<u16>,
 }
 
 impl CommandExecute for Init {
@@ -67,29 +71,29 @@ impl CommandExecute for Init {
     fn execute(self) -> eyre::Result<()> {
         let mut versions = HashMap::new();
 
-        if let Some(version) = self.pg10 {
+        if let Some(ref version) = self.pg10 {
             versions.insert("pg10", version.clone());
         }
-        if let Some(version) = self.pg11 {
+        if let Some(ref version) = self.pg11 {
             versions.insert("pg11", version.clone());
         }
-        if let Some(version) = self.pg12 {
+        if let Some(ref version) = self.pg12 {
             versions.insert("pg12", version.clone());
         }
-        if let Some(version) = self.pg13 {
+        if let Some(ref version) = self.pg13 {
             versions.insert("pg13", version.clone());
         }
-        if let Some(version) = self.pg14 {
+        if let Some(ref version) = self.pg14 {
             versions.insert("pg14", version.clone());
         }
 
         if versions.is_empty() {
             // no arguments specified, so we'll just install our defaults
-            init_pgx(&pgx_default(SUPPORTED_MAJOR_VERSIONS)?)
+            init_pgx(&pgx_default(SUPPORTED_MAJOR_VERSIONS)?, &self)
         } else {
             // user specified arguments, so we'll only install those versions of Postgres
             let mut default_pgx = None;
-            let mut pgx = Pgx::new();
+            let mut pgx = Pgx::default();
 
             for (pgver, pg_config_path) in versions {
                 let config = if pg_config_path == "download" {
@@ -103,18 +107,18 @@ impl CommandExecute for Init {
                         .wrap_err_with(|| format!("{} is not a known Postgres version", pgver))?
                         .clone()
                 } else {
-                    PgConfig::new(pg_config_path.into())
+                    PgConfig::new_with_defaults(pg_config_path.into())
                 };
                 pgx.push(config);
             }
 
-            init_pgx(&pgx)
+            init_pgx(&pgx, &self)
         }
     }
 }
 
 #[tracing::instrument(skip_all, fields(pgx_home = %Pgx::home()?.display()))]
-pub(crate) fn init_pgx(pgx: &Pgx) -> eyre::Result<()> {
+pub(crate) fn init_pgx(pgx: &Pgx, init: &Init) -> eyre::Result<()> {
     let dir = Pgx::home()?;
 
     let output_configs = Arc::new(Mutex::new(Vec::new()));
@@ -171,7 +175,7 @@ pub(crate) fn init_pgx(pgx: &Pgx) -> eyre::Result<()> {
         }
     }
 
-    write_config(output_configs)?;
+    write_config(output_configs, init)?;
     Ok(())
 }
 
@@ -371,7 +375,7 @@ fn make_install_postgres(version: &PgConfig, pgdir: &PathBuf) -> eyre::Result<Pg
         let mut pg_config = get_pg_installdir(pgdir);
         pg_config.push("bin");
         pg_config.push("pg_config");
-        Ok(PgConfig::new(pg_config))
+        Ok(PgConfig::new_with_defaults(pg_config))
     } else {
         Err(eyre!(
             "{}\n{}{}",
@@ -394,9 +398,17 @@ fn validate_pg_config(pg_config: &PgConfig) -> eyre::Result<()> {
     Ok(())
 }
 
-fn write_config(pg_configs: &Vec<PgConfig>) -> eyre::Result<()> {
+fn write_config(pg_configs: &Vec<PgConfig>, init: &Init) -> eyre::Result<()> {
     let config_path = Pgx::config_toml()?;
     let mut file = File::create(&config_path)?;
+
+    if let Some(port) = init.base_port {
+        file.write_all(format!("base_port = {}\n", port).as_bytes())?;
+    }
+    if let Some(port) = init.base_testing_port {
+        file.write_all(format!("base_testing_port = {}\n", port).as_bytes())?;
+    }
+
     file.write_all(b"[configs]\n")?;
     for pg_config in pg_configs {
         file.write_all(

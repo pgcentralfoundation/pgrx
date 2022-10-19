@@ -60,7 +60,7 @@ impl CommandExecute for Install {
 
         let pg_config = match self.pg_config {
             None => PgConfig::from_path(),
-            Some(config) => PgConfig::new(PathBuf::from(config)),
+            Some(config) => PgConfig::new_with_defaults(PathBuf::from(config)),
         };
         let pg_version = format!("pg{}", pg_config.major_version()?);
         let profile = CargoProfile::from_flags(self.release, self.profile.as_deref())?;

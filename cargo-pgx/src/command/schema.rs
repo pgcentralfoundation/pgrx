@@ -109,7 +109,7 @@ impl CommandExecute for Schema {
                 Some(pgver) => (Pgx::from_config()?.get(&pgver)?.clone(), pgver),
             },
             Some(config) => {
-                let pg_config = PgConfig::new(PathBuf::from(config));
+                let pg_config = PgConfig::new_with_defaults(PathBuf::from(config));
                 let pg_version = format!("pg{}", pg_config.major_version()?);
                 (pg_config, pg_version)
             }
