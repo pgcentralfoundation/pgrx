@@ -27,7 +27,7 @@ around Postgres internals.
 
 - `sigsetjmp` boundaries around **every** Postgres-internal FFI call
   - Allows pgx to catch Postgres `ERROR`s and convert to Rust `panic!()`s to ensure proper stack unwinding and that **Rust destructors are called**
-- `catch_uwind` boundaries for `#[pg_extern]`-style functions for converting Rust `panic!()`s to Postgres `ERROR`s
+- `catch_unwind` boundaries for `#[pg_extern]`-style functions for converting Rust `panic!()`s to Postgres `ERROR`s
   - Rust `panic!()`s are ultimately passed to Postgres' `ereport()`
 - No user-discernible difference between a Rust `panic!()` and a Postgres `error!()`
 - `#[pg_guard]` procmacro for wrapping Rust `extern "C"` functions that need to be passed to Postgres as function pointers
