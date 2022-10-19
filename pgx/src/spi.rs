@@ -490,9 +490,9 @@ impl SpiTupleTable {
     }
 
     /// Returns the number of columns
-    pub fn columns(&self) -> i32 {
+    pub fn columns(&self) -> usize {
         match self.tupdesc {
-            Some(tupdesc) => unsafe { (*tupdesc).natts },
+            Some(tupdesc) => unsafe { (*tupdesc).natts as usize },
             None => 0,
         }
     }
@@ -500,14 +500,14 @@ impl SpiTupleTable {
     /// Returns column type OID
     ///
     /// The ordinal position is 1-based
-    pub fn column_type_oid(&self, ordinal: i32) -> Option<PgOid> {
+    pub fn column_type_oid(&self, ordinal: usize) -> Option<PgOid> {
         match self.tupdesc {
             Some(tupdesc) => unsafe {
                 let nattrs = (*tupdesc).natts;
-                if ordinal < 1 || ordinal > nattrs {
+                if ordinal < 1 || ordinal > (nattrs as usize) {
                     None
                 } else {
-                    let oid = pg_sys::SPI_gettypeid(tupdesc, ordinal);
+                    let oid = pg_sys::SPI_gettypeid(tupdesc, ordinal as i32);
                     Some(PgOid::from(oid))
                 }
             },
@@ -518,14 +518,14 @@ impl SpiTupleTable {
     /// Returns column name
     ///
     /// The ordinal position is 1-based
-    pub fn column_name(&self, ordinal: i32) -> Option<String> {
+    pub fn column_name(&self, ordinal: usize) -> Option<String> {
         match self.tupdesc {
             Some(tupdesc) => unsafe {
                 let nattrs = (*tupdesc).natts;
-                if ordinal < 1 || ordinal > nattrs {
+                if ordinal < 1 || ordinal > (nattrs as usize) {
                     None
                 } else {
-                    let name = pg_sys::SPI_fname(tupdesc, ordinal);
+                    let name = pg_sys::SPI_fname(tupdesc, ordinal as i32);
                     let str = CStr::from_ptr(name).to_string_lossy().into_owned();
                     pg_sys::pfree(name as *mut _);
                     Some(str)
