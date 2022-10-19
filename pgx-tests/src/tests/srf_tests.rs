@@ -63,6 +63,19 @@ fn return_none_setof_iterator() -> Option<SetOfIterator<'static, i32>> {
     }
 }
 
+#[pg_extern]
+fn split_set_with_borrow<'a>(input: &'a str, pattern: &'a str) -> SetOfIterator<'a, &'a str> {
+    SetOfIterator::new(input.split_terminator(pattern))
+}
+
+#[pg_extern]
+fn split_table_with_borrow<'a>(
+    input: &'a str,
+    pattern: &'a str,
+) -> TableIterator<'a, (name!(i, i32), name!(s, &'a str))> {
+    TableIterator::new(input.split_terminator(pattern).enumerate().map(|(i, s)| (i as i32, s)))
+}
+
 #[cfg(any(test, feature = "pg_test"))]
 #[pgx::pg_schema]
 mod tests {
@@ -160,5 +173,41 @@ mod tests {
         });
 
         assert_eq!(cnt, Some(0))
+    }
+
+    #[pg_test]
+    fn test_srf_setof_datum_detoasting_with_borrow() {
+        let cnt = Spi::connect(|mut client| {
+            // build up a table with one large column that Postgres will be forced to TOAST
+            client.update("CREATE TABLE test_srf_datum_detoasting AS SELECT array_to_string(array_agg(g),' ') s FROM (SELECT 'a' g FROM generate_series(1, 1000000)) x;", None, None);
+
+            // and make sure we can use the DETOASTED value with our SRF function
+            let table = client.select(
+                "SELECT split_set_with_borrow(s, ' ') FROM test_srf_datum_detoasting",
+                None,
+                None,
+            );
+
+            Ok(Some(table.len() as i64))
+        });
+        assert_eq!(cnt, Some(1000000))
+    }
+
+    #[pg_test]
+    fn test_srf_table_datum_detoasting_with_borrow() {
+        let cnt = Spi::connect(|mut client| {
+            // build up a table with one large column that Postgres will be forced to TOAST
+            client.update("CREATE TABLE test_srf_datum_detoasting AS SELECT array_to_string(array_agg(g),' ') s FROM (SELECT 'a' g FROM generate_series(1, 1000000)) x;", None, None);
+
+            // and make sure we can use the DETOASTED value with our SRF function
+            let table = client.select(
+                "SELECT split_table_with_borrow(s, ' ') FROM test_srf_datum_detoasting",
+                None,
+                None,
+            );
+
+            Ok(Some(table.len() as i64))
+        });
+        assert_eq!(cnt, Some(1000000))
     }
 }
