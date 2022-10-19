@@ -6,17 +6,24 @@ All rights reserved.
 
 Use of this source code is governed by the MIT license that can be found in the LICENSE file.
 */
+/*!
+
+`pgx::extension_sql!()` related macro expansion for Rust to SQL translation
+
+> Like all of the [`sql_entity_graph`][crate::sql_entity_graph] APIs, this is considered **internal**
+to the `pgx` framework and very subject to change between versions. While you may use this, please do it with caution.
+
+
+*/
 pub mod entity;
 
 use crate::sql_entity_graph::positioning_ref::PositioningRef;
 
 use proc_macro2::{Ident, Span, TokenStream as TokenStream2};
 use quote::{quote, ToTokens, TokenStreamExt};
-use syn::{
-    parse::{Parse, ParseStream},
-    punctuated::Punctuated,
-    LitStr, Token,
-};
+use syn::parse::{Parse, ParseStream};
+use syn::punctuated::Punctuated;
+use syn::{LitStr, Token};
 
 /// A parsed `extension_sql_file!()` item.
 ///
@@ -93,14 +100,12 @@ impl ToTokens for ExtensionSqlFile {
         );
         let requires_iter = requires.iter();
         let creates_iter = creates.iter();
-        let sql_graph_entity_fn_name = syn::Ident::new(
-            &format!("__pgx_internals_sql_{}", name.clone()),
-            Span::call_site(),
-        );
+        let sql_graph_entity_fn_name =
+            syn::Ident::new(&format!("__pgx_internals_sql_{}", name.clone()), Span::call_site());
         let inv = quote! {
             #[no_mangle]
             #[doc(hidden)]
-            pub extern "C" fn  #sql_graph_entity_fn_name() -> ::pgx::utils::sql_entity_graph::SqlGraphEntity {
+            pub extern "Rust" fn  #sql_graph_entity_fn_name() -> ::pgx::utils::sql_entity_graph::SqlGraphEntity {
                 extern crate alloc;
                 use alloc::vec::Vec;
                 use alloc::vec;
@@ -201,13 +206,11 @@ impl ToTokens for ExtensionSql {
         let creates_iter = creates.iter();
         let name = &self.name;
 
-        let sql_graph_entity_fn_name = syn::Ident::new(
-            &format!("__pgx_internals_sql_{}", name.value()),
-            Span::call_site(),
-        );
+        let sql_graph_entity_fn_name =
+            syn::Ident::new(&format!("__pgx_internals_sql_{}", name.value()), Span::call_site());
         let inv = quote! {
             #[no_mangle]
-            pub extern "C" fn  #sql_graph_entity_fn_name() -> ::pgx::utils::sql_entity_graph::SqlGraphEntity {
+            pub extern "Rust" fn  #sql_graph_entity_fn_name() -> ::pgx::utils::sql_entity_graph::SqlGraphEntity {
                 extern crate alloc;
                 use alloc::vec::Vec;
                 use alloc::vec;
@@ -314,10 +317,8 @@ impl ToTokens for SqlDeclared {
         };
         let identifier_split = identifier.split("::").collect::<Vec<_>>();
         let identifier = if identifier_split.len() == 1 {
-            let identifier_infer = Ident::new(
-                identifier_split.last().unwrap(),
-                proc_macro2::Span::call_site(),
-            );
+            let identifier_infer =
+                Ident::new(identifier_split.last().unwrap(), proc_macro2::Span::call_site());
             quote! { concat!(module_path!(), "::", stringify!(#identifier_infer)) }
         } else {
             quote! { stringify!(#identifier) }

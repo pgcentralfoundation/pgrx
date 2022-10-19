@@ -6,7 +6,7 @@ All rights reserved.
 
 Use of this source code is governed by the MIT license that can be found in the LICENSE file.
 */
-use pgx::*;
+use pgx::prelude::*;
 
 #[pg_extern(name = "renamed_func")]
 fn func_to_rename() {}
@@ -17,7 +17,7 @@ mod tests {
     #[allow(unused_imports)]
     use crate as pgx_tests;
 
-    use pgx::*;
+    use pgx::prelude::*;
 
     #[pg_test]
     fn renamed_func() {

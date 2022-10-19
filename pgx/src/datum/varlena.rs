@@ -14,6 +14,9 @@ use crate::{
     StringInfo,
 };
 use pgx_pg_sys::varlena;
+use pgx_utils::sql_entity_graph::metadata::{
+    ArgumentError, Returns, ReturnsError, SqlMapping, SqlTranslatable,
+};
 use serde::{Deserialize, Serialize};
 use std::borrow::Cow;
 use std::marker::PhantomData;
@@ -139,10 +142,7 @@ where
 
         PgVarlena {
             leaked: None,
-            varlena: Cow::Owned(PallocdVarlena {
-                ptr,
-                len: unsafe { varsize_any(ptr) },
-            }),
+            varlena: Cow::Owned(PallocdVarlena { ptr, len: unsafe { varsize_any(ptr) } }),
             need_free: true,
             __marker: PhantomData,
         }
@@ -161,10 +161,10 @@ where
     /// This function is considered unsafe as it cannot guarantee the provided `pg_sys::Datum` is a
     /// valid `*mut pg_sys::varlena`.
     pub unsafe fn from_datum(datum: pg_sys::Datum) -> Self {
-        let ptr = pg_sys::pg_detoast_datum(datum as *mut pg_sys::varlena);
+        let ptr = pg_sys::pg_detoast_datum(datum.cast_mut_ptr());
         let len = varsize_any(ptr);
 
-        if ptr == datum as *mut pg_sys::varlena {
+        if ptr == datum.cast_mut_ptr() {
             // no detoasting happened so we're using borrowed memory
             let leaked = Box::leak(Box::new(PallocdVarlena { ptr, len }));
             PgVarlena {
@@ -174,7 +174,7 @@ where
                 __marker: PhantomData,
             }
         } else {
-            // datum was detoasted so we own and it need to free it
+            // datum was detoasted so we own and need to free it
             PgVarlena {
                 leaked: None,
                 varlena: Cow::Owned(PallocdVarlena { ptr, len }),
@@ -272,12 +272,12 @@ where
     }
 }
 
-impl<T> Into<Option<pg_sys::Datum>> for PgVarlena<T>
+impl<T> From<PgVarlena<T>> for Option<pg_sys::Datum>
 where
     T: Copy + Sized,
 {
-    fn into(self) -> Option<pg_sys::Datum> {
-        Some(self.into_pg() as pg_sys::Datum)
+    fn from(val: PgVarlena<T>) -> Self {
+        Some(val.into_pg().into())
     }
 }
 
@@ -286,7 +286,7 @@ where
     T: Copy + Sized,
 {
     fn into_datum(self) -> Option<pg_sys::Datum> {
-        Some(self.into_pg() as pg_sys::Datum)
+        Some(self.into_pg().into())
     }
 
     fn type_oid() -> pg_sys::Oid {
@@ -298,8 +298,11 @@ impl<T> FromDatum for PgVarlena<T>
 where
     T: Copy + Sized,
 {
-    const NEEDS_TYPID: bool = false;
-    unsafe fn from_datum(datum: pg_sys::Datum, is_null: bool, _typoid: u32) -> Option<Self> {
+    unsafe fn from_polymorphic_datum(
+        datum: pg_sys::Datum,
+        is_null: bool,
+        _typoid: u32,
+    ) -> Option<Self> {
         if is_null {
             None
         } else {
@@ -309,24 +312,22 @@ where
 
     unsafe fn from_datum_in_memory_context(
         mut memory_context: PgMemoryContexts,
-        datum: usize,
+        datum: pg_sys::Datum,
         is_null: bool,
         _typoid: u32,
     ) -> Option<Self> {
         if is_null {
             None
-        } else if datum == 0 {
-            panic!("a varlena Datum was flagged as non-null but the datum is zero");
         } else {
             memory_context.switch_to(|_| {
                 // this gets the varlena Datum copied into this memory context
-                let detoasted = pg_sys::pg_detoast_datum_copy(datum as *mut pg_sys::varlena);
+                let detoasted = pg_sys::pg_detoast_datum_copy(datum.cast_mut_ptr());
 
                 // and we need to unpack it (if necessary), which will decompress it too
                 let varlena = pg_sys::pg_detoast_datum_packed(detoasted);
 
                 // and now we return it as a &str
-                Some(PgVarlena::<T>::from_datum(varlena as pg_sys::Datum))
+                Some(PgVarlena::<T>::from_datum(varlena.into()))
             })
         }
     }
@@ -337,7 +338,7 @@ where
     T: PostgresType + Serialize,
 {
     fn into_datum(self) -> Option<pg_sys::Datum> {
-        Some(cbor_encode(&self) as pg_sys::Datum)
+        Some(cbor_encode(&self).into())
     }
 
     fn type_oid() -> u32 {
@@ -349,24 +350,28 @@ impl<'de, T> FromDatum for T
 where
     T: PostgresType + Deserialize<'de>,
 {
-    unsafe fn from_datum(datum: usize, is_null: bool, _typoid: u32) -> Option<Self> {
-        if is_null {
-            None
-        } else {
-            cbor_decode(datum as *mut pg_sys::varlena)
-        }
-    }
-
-    unsafe fn from_datum_in_memory_context(
-        memory_context: PgMemoryContexts,
-        datum: usize,
+    unsafe fn from_polymorphic_datum(
+        datum: pg_sys::Datum,
         is_null: bool,
         _typoid: u32,
     ) -> Option<Self> {
         if is_null {
             None
         } else {
-            cbor_decode_into_context(memory_context, datum as *mut pg_sys::varlena)
+            cbor_decode(datum.cast_mut_ptr())
+        }
+    }
+
+    unsafe fn from_datum_in_memory_context(
+        memory_context: PgMemoryContexts,
+        datum: pg_sys::Datum,
+        is_null: bool,
+        _typoid: u32,
+    ) -> Option<Self> {
+        if is_null {
+            None
+        } else {
+            cbor_decode_into_context(memory_context, datum.cast_mut_ptr())
         }
     }
 }
@@ -443,4 +448,17 @@ where
     let data = vardata_any(varlena);
     let slice = std::slice::from_raw_parts(data as *const u8, len);
     serde_json::from_slice(slice).expect("failed to decode JSON")
+}
+
+unsafe impl<T> SqlTranslatable for PgVarlena<T>
+where
+    T: SqlTranslatable + Copy,
+{
+    fn argument_sql() -> Result<SqlMapping, ArgumentError> {
+        T::argument_sql()
+    }
+
+    fn return_sql() -> Result<Returns, ReturnsError> {
+        T::return_sql()
+    }
 }

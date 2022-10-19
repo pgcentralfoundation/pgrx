@@ -6,7 +6,6 @@ All rights reserved.
 
 Use of this source code is governed by the MIT license that can be found in the LICENSE file.
 */
-
 //! `pgx` is a framework for creating Postgres extensions in 100% Rust
 //!
 //! ## Example
@@ -25,13 +24,14 @@ Use of this source code is governed by the MIT license that can be found in the 
 #![allow(clippy::cast_ptr_alignment)]
 extern crate pgx_macros;
 
-extern crate num_traits;
-
 #[macro_use]
 extern crate bitflags;
 
 // expose our various derive macros
 pub use pgx_macros::*;
+
+/// The PGX prelude includes necessary imports to make extensions work.
+pub mod prelude;
 
 pub mod aggregate;
 pub mod callbacks;
@@ -43,11 +43,14 @@ pub mod hooks;
 pub mod htup;
 pub mod inoutfuncs;
 pub mod itemptr;
+pub mod iter;
 pub mod list;
 #[macro_use]
 pub mod log;
+pub mod array;
 pub mod atomics;
 pub mod bgworkers;
+pub mod heap_tuple;
 pub mod lwlock;
 pub mod memcxt;
 pub mod misc;
@@ -66,6 +69,8 @@ pub mod xid;
 
 #[doc(hidden)]
 pub use once_cell;
+
+mod layout;
 
 pub use aggregate::*;
 pub use atomics::*;
@@ -99,14 +104,12 @@ pub use pgx_pg_sys as pg_sys; // the module only, not its contents
 pub use pgx_pg_sys::submodules::*;
 pub use pgx_pg_sys::PgBuiltInOids; // reexport this so it looks like it comes from here
 
-pub use cstr_core;
-pub use pgx_utils as utils;
+pub use {cstr_core, pgx_utils as utils};
 
-use core::any::TypeId;
 use once_cell::sync::Lazy;
 use std::collections::HashSet;
 
-use pgx_utils::sql_entity_graph::{RustSourceOnlySqlMapping, RustSqlMapping};
+use pgx_utils::sql_entity_graph::RustSourceOnlySqlMapping;
 
 macro_rules! map_source_only {
     ($map:ident, $rust:ty, $sql:expr) => {{
@@ -128,10 +131,7 @@ macro_rules! map_source_only {
 
         let ty = stringify!(Vec<$rust>).to_string().replace(" ", "");
         assert_eq!(
-            $map.insert(RustSourceOnlySqlMapping::new(
-                ty.clone(),
-                format!("{}[]", $sql),
-            )),
+            $map.insert(RustSourceOnlySqlMapping::new(ty.clone(), format!("{}[]", $sql),)),
             true,
             "Cannot map {} twice",
             ty
@@ -139,10 +139,7 @@ macro_rules! map_source_only {
 
         let ty = stringify!(Array<$rust>).to_string().replace(" ", "");
         assert_eq!(
-            $map.insert(RustSourceOnlySqlMapping::new(
-                ty.clone(),
-                format!("{}[]", $sql),
-            )),
+            $map.insert(RustSourceOnlySqlMapping::new(ty.clone(), format!("{}[]", $sql),)),
             true,
             "Cannot map {} twice",
             ty
@@ -150,89 +147,10 @@ macro_rules! map_source_only {
     }};
 }
 
-pub static DEFAULT_SOURCE_ONLY_SQL_MAPPING: Lazy<HashSet<RustSourceOnlySqlMapping>> =
-    Lazy::new(|| {
-        let mut m = HashSet::new();
-
-        map_source_only!(m, pg_sys::Oid, "Oid");
-        map_source_only!(m, pg_sys::TimestampTz, "timestamp with time zone");
-
-        m
-    });
-
-macro_rules! map_type {
-    ($map:ident, $rust:ty, $sql:expr) => {{
-        <$rust as WithTypeIds>::register_with_refs(&mut $map, $sql.to_string());
-        WithSizedTypeIds::<$rust>::register_sized_with_refs(&mut $map, $sql.to_string());
-        WithArrayTypeIds::<$rust>::register_array_with_refs(&mut $map, $sql.to_string());
-        WithVarlenaTypeIds::<$rust>::register_varlena_with_refs(&mut $map, $sql.to_string());
-    }};
-}
-
-/// The default lookup for [`TypeId`]s to both Rust and SQL types via a [`RustSqlMapping`].
-///
-/// This only contains types known to [`pgx`](crate), so it will not include types defined by things
-/// like [`derive@PostgresType`] in the local extension.
-pub static DEFAULT_TYPEID_SQL_MAPPING: Lazy<HashSet<RustSqlMapping>> = Lazy::new(|| {
+pub static DEFAULT_RUST_SOURCE_TO_SQL: Lazy<HashSet<RustSourceOnlySqlMapping>> = Lazy::new(|| {
     let mut m = HashSet::new();
 
-    // `str` isn't sized, so we can't lean on the macro.
-    <str as WithTypeIds>::register(&mut m, "text".to_string());
-    map_type!(m, &str, "text");
-
-    // Bytea is a special case, notice how it has no `bytea[]`.
-    m.insert(RustSqlMapping {
-        sql: String::from("bytea"),
-        id: TypeId::of::<&[u8]>(),
-        rust: core::any::type_name::<&[u8]>().to_string(),
-    });
-    m.insert(RustSqlMapping {
-        sql: String::from("bytea"),
-        id: TypeId::of::<Option<&[u8]>>(),
-        rust: core::any::type_name::<Option<&[u8]>>().to_string(),
-    });
-    m.insert(RustSqlMapping {
-        sql: String::from("bytea"),
-        id: TypeId::of::<Vec<u8>>(),
-        rust: core::any::type_name::<Vec<u8>>().to_string(),
-    });
-    m.insert(RustSqlMapping {
-        sql: String::from("bytea"),
-        id: TypeId::of::<Option<Vec<u8>>>(),
-        rust: core::any::type_name::<Option<Vec<u8>>>().to_string(),
-    });
-
-    map_type!(m, String, "text");
-    map_type!(m, &std::ffi::CStr, "cstring");
-    map_type!(m, &crate::cstr_core::CStr, "cstring");
-    map_type!(m, (), "void");
-    map_type!(m, i8, "\"char\"");
-    map_type!(m, i16, "smallint");
-    map_type!(m, i32, "integer");
-    map_type!(m, i64, "bigint");
-    map_type!(m, bool, "bool");
-    map_type!(m, char, "varchar");
-    map_type!(m, f32, "real");
-    map_type!(m, f64, "double precision");
-    map_type!(m, datum::JsonB, "jsonb");
-    map_type!(m, datum::Json, "json");
-    map_type!(m, pgx_pg_sys::ItemPointerData, "tid");
-    map_type!(m, pgx_pg_sys::Point, "point");
-    map_type!(m, pgx_pg_sys::BOX, "box");
-    map_type!(m, Date, "date");
-    map_type!(m, Time, "time");
-    map_type!(m, TimeWithTimeZone, "time with time zone");
-    map_type!(m, Timestamp, "timestamp");
-    map_type!(m, TimestampWithTimeZone, "timestamp with time zone");
-    map_type!(m, pgx_pg_sys::PlannerInfo, "internal");
-    map_type!(m, datum::Internal, "internal");
-    map_type!(m, pgbox::PgBox<pgx_pg_sys::IndexAmRoutine>, "internal");
-    map_type!(m, rel::PgRelation, "regclass");
-    map_type!(m, datum::Numeric, "numeric");
-    map_type!(m, datum::AnyElement, "anyelement");
-    map_type!(m, datum::AnyArray, "anyarray");
-    map_type!(m, datum::Inet, "inet");
-    map_type!(m, datum::Uuid, "uuid");
+    map_source_only!(m, pg_sys::Oid, "Oid");
 
     m
 });
@@ -344,26 +262,19 @@ macro_rules! pg_sql_graph_magic {
     () => {
         #[no_mangle]
         #[doc(hidden)]
-        pub extern "C" fn __pgx_typeid_sql_mappings(
-        ) -> &'static ::pgx::utils::__reexports::std::collections::HashSet<
-            ::pgx::utils::sql_entity_graph::RustSqlMapping,
-        > {
-            &::pgx::DEFAULT_TYPEID_SQL_MAPPING
-        }
-
-        #[no_mangle]
-        #[doc(hidden)]
-        pub extern "C" fn __pgx_source_only_sql_mappings(
-        ) -> &'static ::pgx::utils::__reexports::std::collections::HashSet<
-            ::pgx::utils::sql_entity_graph::RustSourceOnlySqlMapping,
-        > {
-            &::pgx::DEFAULT_SOURCE_ONLY_SQL_MAPPING
+        #[rustfmt::skip] // explict extern "Rust" is more clear here
+        pub extern "Rust" fn __pgx_sql_mappings() -> ::pgx::utils::sql_entity_graph::RustToSqlMapping {
+            ::pgx::utils::sql_entity_graph::RustToSqlMapping {
+                rust_source_to_sql: ::pgx::DEFAULT_RUST_SOURCE_TO_SQL.clone(),
+            }
         }
 
         // A marker which must exist in the root of the extension.
         #[no_mangle]
         #[doc(hidden)]
-        pub extern "C" fn __pgx_marker(
+        #[rustfmt::skip] // explict extern "Rust" is more clear here
+        pub extern "Rust" fn __pgx_marker(
+            _: (),
         ) -> ::pgx::utils::__reexports::eyre::Result<::pgx::utils::sql_entity_graph::ControlFile> {
             use ::core::convert::TryFrom;
             use ::pgx::utils::__reexports::eyre::WrapErr;
@@ -386,7 +297,7 @@ macro_rules! pg_sql_graph_magic {
 
 /// Initialize the extension with Postgres
 ///
-/// Sets up panic handling with [`register_pg_guard_panic_handler()`] to ensure that a crash within
+/// Sets up panic handling with [`register_pg_guard_panic_hook()`] to ensure that a crash within
 /// the extension does not adversely affect the entire server process.
 ///
 /// ## Note
@@ -395,5 +306,5 @@ macro_rules! pg_sql_graph_magic {
 /// directly.
 #[allow(unused)]
 pub fn initialize() {
-    register_pg_guard_panic_handler();
+    register_pg_guard_panic_hook();
 }

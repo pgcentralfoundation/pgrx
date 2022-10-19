@@ -17,6 +17,8 @@ Use of this source code is governed by the MIT license that can be found in the 
 //!
 use crate::pg_sys::AsPgCStr;
 use crate::{guard, pg_sys, PgBox};
+use core::panic::{RefUnwindSafe, UnwindSafe};
+use core::ptr;
 use std::fmt::Debug;
 
 /// A shorter type name for a `*const std::os::raw::c_void`
@@ -261,10 +263,7 @@ impl PgMemoryContexts {
     ///     })
     /// }
     /// ```
-    pub fn switch_to<
-        R,
-        F: FnOnce(&mut PgMemoryContexts) -> R + std::panic::UnwindSafe + std::panic::RefUnwindSafe,
-    >(
+    pub fn switch_to<R, F: FnOnce(&mut PgMemoryContexts) -> R + UnwindSafe + RefUnwindSafe>(
         &mut self,
         f: F,
     ) -> R {
@@ -314,14 +313,19 @@ impl PgMemoryContexts {
 
     /// Copies `len` bytes, starting at `src` into this memory context and
     /// returns a raw `*mut T` pointer to the newly allocated location
+    #[warn(unsafe_op_in_unsafe_fn)]
     pub unsafe fn copy_ptr_into<T>(&mut self, src: *mut T, len: usize) -> *mut T {
         if src.is_null() {
             panic!("attempt to copy a null pointer");
         }
 
-        let dest = pg_sys::MemoryContextAlloc(self.value(), len);
-        pg_sys::memcpy(dest, src as void_mut_ptr, len as u64);
-        dest as *mut T
+        // SAFETY: We alloc new space, it should be non-overlapping!
+        unsafe {
+            // Make sure we copy bytes.
+            let dest = pg_sys::MemoryContextAlloc(self.value(), len).cast::<u8>();
+            ptr::copy_nonoverlapping(src.cast(), dest, len);
+            dest.cast()
+        }
     }
 
     /// Allocate memory in this context, which will be free'd whenever Postgres deletes this MemoryContext
@@ -374,11 +378,26 @@ impl PgMemoryContexts {
         leaked_ptr
     }
 
+    /// Allocates and then leaks a "trivially dropped" type in the appropriate memory context.
+    /// If `feature = "postgrestd"` is enabled, this "forgets" it entirely, assuming that it is fine
+    /// to let Postgres `pfree` it later. Otherwise it is equivalent to `fn leak_and_drop_on_delete`.
+    ///
+    /// Accordingly, this may prove unwise to use on something that actually needs to run its Drop.
+    /// But note it is not actually unsound to `mem::forget` something in this way, just annoying
+    /// if you were expecting it to actually execute its Drop.
+    pub fn leak_trivial_alloc<T>(&mut self, v: T) -> *mut T {
+        #[cfg(feature = "postgrestd")]
+        {
+            self.unguarded_switch_to(|_cx| Box::leak(Box::new(v)))
+        }
+        #[cfg(not(feature = "postgrestd"))]
+        {
+            self.leak_and_drop_on_delete(v)
+        }
+    }
+
     /// helper function
-    fn exec_in_context<
-        R,
-        F: FnOnce(&mut PgMemoryContexts) -> R + std::panic::UnwindSafe + std::panic::RefUnwindSafe,
-    >(
+    fn exec_in_context<R, F: FnOnce(&mut PgMemoryContexts) -> R + UnwindSafe + RefUnwindSafe>(
         context: pg_sys::MemoryContext,
         f: F,
     ) -> R {
@@ -398,6 +417,60 @@ impl PgMemoryContexts {
         }
 
         result
+    }
+
+    pub fn unguarded_switch_to<R, F: FnOnce(&mut PgMemoryContexts) -> R>(&mut self, f: F) -> R {
+        fn unguarded_exec_in_context<R, F: FnOnce(&mut PgMemoryContexts) -> R>(
+            context: pg_sys::MemoryContext,
+            f: F,
+        ) -> R {
+            let prev_context;
+
+            // mimic what palloc.h does for switching memory contexts
+            unsafe {
+                prev_context = pg_sys::CurrentMemoryContext;
+                pg_sys::CurrentMemoryContext = context;
+            }
+
+            let result = f(&mut PgMemoryContexts::For(context));
+
+            // restore our understanding of the current memory context
+            unsafe {
+                pg_sys::CurrentMemoryContext = prev_context;
+            }
+
+            result
+        }
+
+        match self {
+            PgMemoryContexts::Transient {
+                parent,
+                name,
+                min_context_size,
+                initial_block_size,
+                max_block_size,
+            } => {
+                let context: pg_sys::MemoryContext = unsafe {
+                    let name = std::ffi::CString::new(*name).unwrap();
+                    pg_sys::AllocSetContextCreateExtended(
+                        *parent,
+                        name.into_raw(),
+                        *min_context_size as usize,
+                        *initial_block_size as usize,
+                        *max_block_size as usize,
+                    )
+                };
+
+                let result = unguarded_exec_in_context(context, f);
+
+                unsafe {
+                    pg_sys::MemoryContextDelete(context);
+                }
+
+                result
+            }
+            _ => unguarded_exec_in_context(self.value(), f),
+        }
     }
 
     ///

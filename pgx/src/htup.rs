@@ -9,6 +9,7 @@ Use of this source code is governed by the MIT license that can be found in the 
 
 //! Utility functions for working with `pg_sys::HeapTuple` and `pg_sys::HeapTupleHeader` structs
 use crate::*;
+use std::num::NonZeroUsize;
 
 /// Given a `pg_sys::Datum` representing a composite row type, return a boxed `HeapTupleData`,
 /// which can be used by the various `heap_getattr` methods
@@ -20,8 +21,8 @@ use crate::*;
 pub fn composite_row_type_make_tuple(
     row: pg_sys::Datum,
 ) -> PgBox<pg_sys::HeapTupleData, AllocatedByRust> {
-    let htup_header = unsafe { pg_sys::pg_detoast_datum_packed(row as *mut pg_sys::varlena) }
-        as pg_sys::HeapTupleHeader;
+    let htup_header =
+        unsafe { pg_sys::pg_detoast_datum_packed(row.cast_mut_ptr()) } as pg_sys::HeapTupleHeader;
     let mut tuple = PgBox::<pg_sys::HeapTupleData>::alloc0();
 
     tuple.t_len = heap_tuple_header_get_datum_length(htup_header) as u32;
@@ -98,18 +99,19 @@ pub fn heap_getattr<
     AllocatedBy: WhoAllocated<T> + WhoAllocated<pg_sys::HeapTupleData>,
 >(
     tuple: &PgBox<pg_sys::HeapTupleData, AllocatedBy>,
-    attno: usize,
+    attno: NonZeroUsize,
     tupdesc: &PgTupleDesc,
 ) -> Option<T> {
     let mut is_null = false;
-    let datum =
-        unsafe { pgx_heap_getattr(tuple.as_ptr(), attno as u32, tupdesc.as_ptr(), &mut is_null) };
-    let typoid = tupdesc.get(attno - 1).expect("no attribute").type_oid();
+    let datum = unsafe {
+        pgx_heap_getattr(tuple.as_ptr(), attno.get() as u32, tupdesc.as_ptr(), &mut is_null)
+    };
+    let typoid = tupdesc.get(attno.get() - 1).expect("no attribute").type_oid();
 
     if is_null {
         None
     } else {
-        unsafe { T::from_datum(datum, false, typoid.value()) }
+        unsafe { T::from_polymorphic_datum(datum, false, typoid.value()) }
     }
 }
 
@@ -132,11 +134,11 @@ pub fn heap_getattr<
 #[inline]
 pub unsafe fn heap_getattr_raw(
     tuple: *const pg_sys::HeapTupleData,
-    attno: usize,
+    attno: NonZeroUsize,
     tupdesc: pg_sys::TupleDesc,
 ) -> Option<pg_sys::Datum> {
     let mut is_null = false;
-    let datum = pgx_heap_getattr(tuple, attno as u32, tupdesc, &mut is_null);
+    let datum = pgx_heap_getattr(tuple, attno.get() as u32, tupdesc, &mut is_null);
     if is_null {
         None
     } else {
@@ -156,7 +158,7 @@ pub struct DatumWithTypeInfo {
 impl DatumWithTypeInfo {
     #[inline]
     pub fn into_value<T: FromDatum>(self) -> T {
-        unsafe { T::from_datum(self.datum, self.is_null, self.typoid.value()).unwrap() }
+        unsafe { T::from_polymorphic_datum(self.datum, self.is_null, self.typoid.value()).unwrap() }
     }
 }
 
@@ -181,11 +183,5 @@ pub fn heap_getattr_datum_ex(
         pg_sys::get_typlenbyvalalign(typoid.value(), &mut typlen, &mut typbyval, &mut typalign);
     }
 
-    DatumWithTypeInfo {
-        datum,
-        is_null,
-        typoid,
-        typlen,
-        typbyval,
-    }
+    DatumWithTypeInfo { datum, is_null, typoid, typlen, typbyval }
 }

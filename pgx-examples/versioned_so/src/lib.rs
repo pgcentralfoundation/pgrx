@@ -1,6 +1,6 @@
-use pgx::*;
+use pgx::prelude::*;
 
-pg_module_magic!();
+pgx::pg_module_magic!();
 
 #[pg_extern]
 fn hello_versioned_so() -> &'static str {
@@ -10,13 +10,12 @@ fn hello_versioned_so() -> &'static str {
 #[cfg(any(test, feature = "pg_test"))]
 #[pg_schema]
 mod tests {
-    use pgx::*;
+    use pgx::prelude::*;
 
     #[pg_test]
     fn test_hello_versioned_so() {
         assert_eq!("Hello, versioned_so", crate::hello_versioned_so());
     }
-
 }
 
 #[cfg(test)]

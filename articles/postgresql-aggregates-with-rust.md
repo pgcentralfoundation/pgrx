@@ -209,7 +209,7 @@ figure out if something is missing from error messages and then discover the req
 Install `cargo-pgx` then initialize its development PostgreSQL installations (used for `cargo pgx test` and `cargo pgx run`):
 
 ```bash
-$ cargo install cargo-pgx
+$ cargo install --locked cargo-pgx
 $ cargo pgx init
 # ...
 ```

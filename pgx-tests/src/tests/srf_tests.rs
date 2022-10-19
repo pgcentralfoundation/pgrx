@@ -7,63 +7,59 @@ All rights reserved.
 Use of this source code is governed by the MIT license that can be found in the LICENSE file.
 */
 
-use pgx::*;
+use pgx::prelude::*;
 
 #[pg_extern]
 fn example_generate_series(
     start: i32,
     end: i32,
     step: default!(i32, 1),
-) -> impl std::iter::Iterator<Item = i32> {
-    (start..=end).step_by(step as usize)
+) -> SetOfIterator<'static, i32> {
+    SetOfIterator::new((start..=end).step_by(step as usize).into_iter())
 }
 
 #[pg_extern]
-fn example_composite_set(
-) -> impl std::iter::Iterator<Item = (name!(idx, i32), name!(value, &'static str))> {
-    vec!["a", "b", "c"]
-        .into_iter()
-        .enumerate()
-        .map(|(idx, value)| ((idx + 1) as i32, value))
-}
-
-#[pg_extern]
-fn return_some_iterator(
-) -> Option<impl std::iter::Iterator<Item = (name!(idx, i32), name!(some_value, &'static str))>> {
-    Some(
-        vec!["a", "b", "c"]
-            .into_iter()
-            .enumerate()
-            .map(|(idx, value)| ((idx + 1) as i32, value)),
+fn example_composite_set() -> TableIterator<'static, (name!(idx, i32), name!(value, &'static str))>
+{
+    TableIterator::new(
+        vec!["a", "b", "c"].into_iter().enumerate().map(|(idx, value)| ((idx + 1) as i32, value)),
     )
 }
 
 #[pg_extern]
+fn return_some_iterator(
+) -> Option<TableIterator<'static, (name!(idx, i32), name!(some_value, &'static str))>> {
+    Some(TableIterator::new(
+        vec!["a", "b", "c"].into_iter().enumerate().map(|(idx, value)| ((idx + 1) as i32, value)),
+    ))
+}
+
+#[pg_extern]
 fn return_none_iterator(
-) -> Option<impl std::iter::Iterator<Item = (name!(idx, i32), name!(some_value, &'static str))>> {
+) -> Option<TableIterator<'static, (name!(idx, i32), name!(some_value, &'static str))>> {
     if true {
         None
     } else {
-        Some(
+        Some(TableIterator::new(
             vec!["a", "b", "c"]
                 .into_iter()
                 .enumerate()
                 .map(|(idx, value)| ((idx + 1) as i32, value)),
-        )
+        ))
     }
 }
 
 #[pg_extern]
-fn return_some_setof_iterator() -> Option<impl std::iter::Iterator<Item = i32>> {
-    Some(vec![1, 2, 3].into_iter())
+fn return_some_setof_iterator() -> Option<SetOfIterator<'static, i32>> {
+    Some(SetOfIterator::new(vec![1, 2, 3].into_iter()))
 }
 
 #[pg_extern]
-fn return_none_setof_iterator() -> Option<impl std::iter::Iterator<Item = i32>> {
+fn return_none_setof_iterator() -> Option<SetOfIterator<'static, i32>> {
     if true {
         None
     } else {
-        Some(vec![1, 2, 3].into_iter())
+        Some(SetOfIterator::new(vec![1, 2, 3].into_iter()))
     }
 }
 
@@ -73,7 +69,7 @@ mod tests {
     #[allow(unused_imports)]
     use crate as pgx_tests;
 
-    use pgx::*;
+    use pgx::prelude::*;
 
     #[pg_test]
     fn test_generate_series() {

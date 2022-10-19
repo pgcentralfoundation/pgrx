@@ -6,6 +6,14 @@ All rights reserved.
 
 Use of this source code is governed by the MIT license that can be found in the LICENSE file.
 */
+/*!
+
+Positioning references for Rust to SQL mapping support.
+
+> Like all of the [`sql_entity_graph`][crate::sql_entity_graph] APIs, this is considered **internal**
+to the `pgx` framework and very subject to change between versions. While you may use this, please do it with caution.
+
+*/
 use quote::{quote, ToTokens};
 use std::fmt::Display;
 use syn::parse::{Parse, ParseStream};

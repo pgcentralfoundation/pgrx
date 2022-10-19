@@ -6,6 +6,14 @@ All rights reserved.
 
 Use of this source code is governed by the MIT license that can be found in the LICENSE file.
 */
+/*!
+
+`pgx_module_magic!()` related macro expansion for Rust to SQL translation
+
+> Like all of the [`sql_entity_graph`][crate::sql_entity_graph] APIs, this is considered **internal**
+to the `pgx` framework and very subject to change between versions. While you may use this, please do it with caution.
+
+*/
 use super::{SqlGraphEntity, SqlGraphIdentifier, ToSql};
 use core::convert::TryFrom;
 use std::collections::HashMap;
@@ -76,38 +84,29 @@ impl ControlFile {
                 })?
                 .to_string(),
             module_pathname: temp.get("module_pathname").map(|v| v.to_string()),
-            relocatable: temp
-                .get("relocatable")
-                .ok_or(ControlFileError::MissingField {
-                    field: "relocatable",
-                    context: SpanTrace::capture(),
-                })?
-                == &"true",
-            superuser: temp
-                .get("superuser")
-                .ok_or(ControlFileError::MissingField {
-                    field: "superuser",
-                    context: SpanTrace::capture(),
-                })?
-                == &"true",
+            relocatable: temp.get("relocatable").ok_or(ControlFileError::MissingField {
+                field: "relocatable",
+                context: SpanTrace::capture(),
+            })? == &"true",
+            superuser: temp.get("superuser").ok_or(ControlFileError::MissingField {
+                field: "superuser",
+                context: SpanTrace::capture(),
+            })? == &"true",
             schema: temp.get("schema").map(|v| v.to_string()),
         })
     }
 }
 
-impl Into<SqlGraphEntity> for ControlFile {
-    fn into(self) -> SqlGraphEntity {
-        SqlGraphEntity::ExtensionRoot(self)
+impl From<ControlFile> for SqlGraphEntity {
+    fn from(val: ControlFile) -> Self {
+        SqlGraphEntity::ExtensionRoot(val)
     }
 }
 
 /// An error met while parsing a `.control` file.
 #[derive(Debug, Clone)]
 pub enum ControlFileError {
-    MissingField {
-        field: &'static str,
-        context: SpanTrace,
-    },
+    MissingField { field: &'static str, context: SpanTrace },
 }
 
 impl std::fmt::Display for ControlFileError {

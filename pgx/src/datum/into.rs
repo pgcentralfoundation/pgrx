@@ -16,6 +16,7 @@ use crate::{
     pg_sys, rust_byte_slice_to_bytea, rust_regtypein, rust_str_to_text_p, PgBox, PgOid,
     WhoAllocated,
 };
+use pgx_pg_sys::Oid;
 
 /// Convert a Rust type into a `pg_sys::Datum`.
 ///
@@ -29,8 +30,79 @@ use crate::{
 pub trait IntoDatum {
     fn into_datum(self) -> Option<pg_sys::Datum>;
     fn type_oid() -> pg_sys::Oid;
+
+    fn composite_type_oid(&self) -> Option<Oid> {
+        None
+    }
     fn array_type_oid() -> pg_sys::Oid {
         unsafe { pg_sys::get_array_type(Self::type_oid()) }
+    }
+
+    /// Is a Datum of this type compatible with another Postgres type?
+    ///
+    /// An example of this are the Postgres `text` and `varchar` types, which are both
+    /// technically compatible from a Rust type perspective.  They're both represented in Rust as
+    /// `String` (or `&str`), but the underlying Postgres types are different.
+    ///
+    /// If implementing this yourself, you likely want to follow a pattern like this:
+    ///
+    /// ```rust,no_run
+    /// # use pgx::*;
+    /// # #[repr(transparent)]
+    /// # struct FooType(String);
+    /// # impl pgx::IntoDatum for FooType {      
+    ///     fn is_compatible_with(other: pg_sys::Oid) -> bool {
+    ///         // first, if our type is the other type, then we're compatible
+    ///         Self::type_oid() == other
+    ///
+    ///         // and here's the other type we're compatible with
+    ///         || other == pg_sys::VARCHAROID
+    ///     }
+    ///
+    /// #    fn into_datum(self) -> Option<pg_sys::Datum> {
+    /// #        todo!()
+    /// #    }
+    /// #
+    /// #    fn type_oid() -> pg_sys::Oid {
+    /// #        pg_sys::TEXTOID
+    /// #    }
+    /// # }
+    /// ```
+    #[inline]
+    fn is_compatible_with(other: pg_sys::Oid) -> bool {
+        Self::type_oid() == other
+    }
+
+    /// Is a Datum of this type pass by value or pass by reference?
+    ///
+    /// We provide a hardcoded list of known Postgres types that are pass by value,
+    /// but you are free to implement this yourself for custom types.
+    #[inline]
+    fn is_pass_by_value() -> bool
+    where
+        Self: 'static,
+    {
+        let my_type = std::any::TypeId::of::<Self>();
+        my_type == std::any::TypeId::of::<i8>()
+            || my_type == std::any::TypeId::of::<i16>()
+            || my_type == std::any::TypeId::of::<i32>()
+            || my_type == std::any::TypeId::of::<i64>()
+            || my_type == std::any::TypeId::of::<u8>()
+            || my_type == std::any::TypeId::of::<u16>()
+            || my_type == std::any::TypeId::of::<u32>()
+            || my_type == std::any::TypeId::of::<u64>()
+            || my_type == std::any::TypeId::of::<f32>()
+            || my_type == std::any::TypeId::of::<f64>()
+            || my_type == std::any::TypeId::of::<bool>()
+            || my_type == std::any::TypeId::of::<()>()
+            || my_type == std::any::TypeId::of::<crate::Time>()
+            || my_type == std::any::TypeId::of::<crate::TimeWithTimeZone>()
+            || my_type == std::any::TypeId::of::<crate::Timestamp>()
+            || my_type == std::any::TypeId::of::<crate::TimestampWithTimeZone>()
+            || my_type == std::any::TypeId::of::<crate::Date>()
+            || my_type == std::any::TypeId::of::<PgOid>()
+            || my_type == std::any::TypeId::of::<pg_sys::Datum>()
+            || my_type == std::any::TypeId::of::<Option<pg_sys::Datum>>()
     }
 }
 
@@ -55,7 +127,7 @@ where
 impl IntoDatum for bool {
     #[inline]
     fn into_datum(self) -> Option<pg_sys::Datum> {
-        Some((if self { 1 } else { 0 }) as pg_sys::Datum)
+        Some(pg_sys::Datum::from(if self { 1 } else { 0 }))
     }
 
     fn type_oid() -> u32 {
@@ -66,7 +138,7 @@ impl IntoDatum for bool {
 /// for "char"
 impl IntoDatum for i8 {
     fn into_datum(self) -> Option<pg_sys::Datum> {
-        Some(self as pg_sys::Datum)
+        Some(pg_sys::Datum::from(self))
     }
 
     fn type_oid() -> u32 {
@@ -78,7 +150,7 @@ impl IntoDatum for i8 {
 impl IntoDatum for i16 {
     #[inline]
     fn into_datum(self) -> Option<pg_sys::Datum> {
-        Some(self as pg_sys::Datum)
+        Some(pg_sys::Datum::from(self))
     }
 
     fn type_oid() -> u32 {
@@ -90,7 +162,7 @@ impl IntoDatum for i16 {
 impl IntoDatum for i32 {
     #[inline]
     fn into_datum(self) -> Option<pg_sys::Datum> {
-        Some(self as pg_sys::Datum)
+        Some(pg_sys::Datum::from(self))
     }
 
     fn type_oid() -> u32 {
@@ -102,7 +174,7 @@ impl IntoDatum for i32 {
 impl IntoDatum for u32 {
     #[inline]
     fn into_datum(self) -> Option<pg_sys::Datum> {
-        Some(self as pg_sys::Datum)
+        Some(pg_sys::Datum::from(self))
     }
 
     fn type_oid() -> u32 {
@@ -114,7 +186,7 @@ impl IntoDatum for u32 {
 impl IntoDatum for i64 {
     #[inline]
     fn into_datum(self) -> Option<pg_sys::Datum> {
-        Some(self as pg_sys::Datum)
+        Some(pg_sys::Datum::from(self))
     }
 
     fn type_oid() -> u32 {
@@ -126,7 +198,7 @@ impl IntoDatum for i64 {
 impl IntoDatum for f32 {
     #[inline]
     fn into_datum(self) -> Option<pg_sys::Datum> {
-        Some(self.to_bits() as pg_sys::Datum)
+        Some(self.to_bits().into())
     }
 
     fn type_oid() -> u32 {
@@ -138,7 +210,7 @@ impl IntoDatum for f32 {
 impl IntoDatum for f64 {
     #[inline]
     fn into_datum(self) -> Option<pg_sys::Datum> {
-        Some(self.to_bits() as pg_sys::Datum)
+        Some(self.to_bits().into())
     }
 
     fn type_oid() -> u32 {
@@ -151,7 +223,7 @@ impl IntoDatum for PgOid {
     fn into_datum(self) -> Option<pg_sys::Datum> {
         match self {
             PgOid::InvalidOid => None,
-            oid => Some(oid.value() as pg_sys::Datum),
+            oid => Some(oid.value().into()),
         }
     }
 
@@ -168,12 +240,17 @@ impl<'a> IntoDatum for &'a str {
         if varlena.is_null() {
             None
         } else {
-            Some(varlena.into_pg() as pg_sys::Datum)
+            Some(varlena.into_pg().into())
         }
     }
 
     fn type_oid() -> u32 {
         pg_sys::TEXTOID
+    }
+
+    #[inline]
+    fn is_compatible_with(other: Oid) -> bool {
+        Self::type_oid() == other || other == pg_sys::VARCHAROID
     }
 }
 
@@ -186,6 +263,11 @@ impl IntoDatum for String {
     fn type_oid() -> u32 {
         pg_sys::TEXTOID
     }
+
+    #[inline]
+    fn is_compatible_with(other: Oid) -> bool {
+        Self::type_oid() == other || other == pg_sys::VARCHAROID
+    }
 }
 
 impl IntoDatum for &String {
@@ -196,6 +278,11 @@ impl IntoDatum for &String {
 
     fn type_oid() -> u32 {
         pg_sys::TEXTOID
+    }
+
+    #[inline]
+    fn is_compatible_with(other: Oid) -> bool {
+        Self::type_oid() == other || other == pg_sys::VARCHAROID
     }
 }
 
@@ -208,6 +295,11 @@ impl IntoDatum for char {
     fn type_oid() -> u32 {
         pg_sys::VARCHAROID
     }
+
+    #[inline]
+    fn is_compatible_with(other: Oid) -> bool {
+        Self::type_oid() == other || other == pg_sys::VARCHAROID
+    }
 }
 
 /// for cstring
@@ -218,7 +310,7 @@ impl IntoDatum for char {
 impl<'a> IntoDatum for &'a std::ffi::CStr {
     #[inline]
     fn into_datum(self) -> Option<pg_sys::Datum> {
-        Some(self.as_ptr() as pg_sys::Datum)
+        Some(self.as_ptr().into())
     }
 
     fn type_oid() -> u32 {
@@ -229,7 +321,7 @@ impl<'a> IntoDatum for &'a std::ffi::CStr {
 impl<'a> IntoDatum for &'a crate::cstr_core::CStr {
     #[inline]
     fn into_datum(self) -> Option<pg_sys::Datum> {
-        Some(self.as_ptr() as pg_sys::Datum)
+        Some(self.as_ptr().into())
     }
 
     fn type_oid() -> u32 {
@@ -245,7 +337,7 @@ impl<'a> IntoDatum for &'a [u8] {
         if varlena.is_null() {
             None
         } else {
-            Some(varlena.into_pg() as pg_sys::Datum)
+            Some(varlena.into_pg().into())
         }
     }
 
@@ -281,11 +373,12 @@ impl IntoDatum for () {
 
 /// for user types
 impl<T, AllocatedBy: WhoAllocated<T>> IntoDatum for PgBox<T, AllocatedBy> {
+    #[inline]
     fn into_datum(self) -> Option<pg_sys::Datum> {
         if self.is_null() {
             None
         } else {
-            Some(self.into_pg() as pg_sys::Datum)
+            Some(self.into_pg().into())
         }
     }
 

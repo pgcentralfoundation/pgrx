@@ -6,14 +6,14 @@ All rights reserved.
 
 Use of this source code is governed by the MIT license that can be found in the LICENSE file.
 */
-
+#![deny(unsafe_op_in_unsafe_fn)]
 #![allow(non_snake_case)]
 
 use crate::FlushErrorState;
 use std::any::Any;
 use std::cell::Cell;
-use std::panic::catch_unwind;
 use std::mem;
+use std::panic::{catch_unwind, RefUnwindSafe, UnwindSafe};
 
 extern "C" {
     fn pg_re_throw();
@@ -41,12 +41,7 @@ pub struct PgxPanic {
 
 impl PgxPanic {
     pub fn new(message: &'static str, filename: &'static str, lineno: u32, colno: u32) -> Self {
-        PgxPanic {
-            message,
-            filename,
-            lineno,
-            colno,
-        }
+        PgxPanic { message, filename, lineno, colno }
     }
 }
 
@@ -63,15 +58,11 @@ fn take_panic_location() -> PanicLocation {
         Some(location) => location,
 
         // this case shouldn't happen
-        None => PanicLocation {
-            file: "<unknown>".to_string(),
-            line: 0,
-            col: 0,
-        },
+        None => PanicLocation { file: "<unknown>".to_string(), line: 0, col: 0 },
     })
 }
 
-pub fn register_pg_guard_panic_handler() {
+pub fn register_pg_guard_panic_hook() {
     std::panic::set_hook(Box::new(|info| {
         PANIC_LOCATION.with(|p| {
             let existing = p.take();
@@ -110,11 +101,13 @@ impl<T> PgTryResult<T> {
     ///
     /// Doing so can potentially leave Postgres in an undefined state and ultimately cause it
     /// to crash.
+    // Maybe not actually unsafe? Depends on why an error is reached.
     pub unsafe fn unwrap_or(self, value: T) -> T {
         match self.0 {
             Ok(result) => result,
             Err(_) => {
-                FlushErrorState();
+                // SAFETY: Caller asserts it is okay to avoid rethrowing an ERROR.
+                unsafe { FlushErrorState() };
                 value
             }
         }
@@ -129,6 +122,7 @@ impl<T> PgTryResult<T> {
     ///
     /// Ignoring a caught error can leave Postgres in an undefined state and ultimately cause it
     /// to crash.
+    // Maybe not actually unsafe? Depends on why an error is reached.
     pub unsafe fn unwrap_or_else<F>(self, cleanup: F) -> T
     where
         F: FnOnce() -> T,
@@ -136,7 +130,8 @@ impl<T> PgTryResult<T> {
         match self.0 {
             Ok(result) => result,
             Err(_) => {
-                FlushErrorState();
+                // SAFETY: Caller asserts it is okay to avoid rethrowing an ERROR.
+                unsafe { FlushErrorState() };
                 cleanup()
             }
         }
@@ -189,7 +184,7 @@ impl<T> PgTryResult<T> {
 /// before they're converted into Postgres ERRORs
 pub fn guard<Func, R>(f: Func) -> R
 where
-    Func: FnOnce() -> R + std::panic::UnwindSafe + std::panic::RefUnwindSafe,
+    Func: FnOnce() -> R + UnwindSafe + RefUnwindSafe,
 {
     pg_try(f).unwrap()
 }
@@ -198,14 +193,14 @@ where
 /// performing cleanup work before the caught error is rethrown
 pub fn pg_try<Try, R>(try_func: Try) -> PgTryResult<R>
 where
-    Try: FnOnce() -> R + std::panic::UnwindSafe + std::panic::RefUnwindSafe,
+    Try: FnOnce() -> R + UnwindSafe + RefUnwindSafe,
 {
     try_guard(try_func)
 }
 
 fn try_guard<Try, R>(try_func: Try) -> PgTryResult<R>
 where
-    Try: FnOnce() -> R + std::panic::UnwindSafe + std::panic::RefUnwindSafe,
+    Try: FnOnce() -> R + UnwindSafe + RefUnwindSafe,
 {
     // run try_func() in a catch_unwind, as we never want a Rust panic! to leak
     // from this function.  It's imperative that we nevery try to panic! across
@@ -266,12 +261,7 @@ fn downcast_err(mut e: Box<dyn Any + Send>) -> Result<String, JumpContext> {
         // Cloning is overhead, this box is owned, and ownership is theft.
         Ok(mem::take(s))
     } else if let Some(s) = e.downcast_ref::<PgxPanic>() {
-        let PgxPanic {
-            message,
-            filename,
-            lineno,
-            colno,
-        } = s;
+        let PgxPanic { message, filename, lineno, colno } = s;
         Ok(format!("{message} at {filename}:{lineno}:{colno}"))
     } else {
         // not a type we understand, so use a generic string

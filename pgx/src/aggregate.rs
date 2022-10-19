@@ -25,7 +25,7 @@ the trait itself has several items, only a few are required, the macro will fill
 use pgx::*;
 use serde::{Serialize, Deserialize};
 
-// pg_module_magic!(); // Uncomment this outside of docs!
+// pgx::pg_module_magic!(); // Uncomment this outside of docs!
 
 #[derive(Copy, Clone, Default, PostgresType, Serialize, Deserialize)]
 pub struct DemoSum {
@@ -268,12 +268,10 @@ CREATE AGGREGATE DemoSum (
 
 */
 
-use crate::{
-    error,
-    memcxt::PgMemoryContexts,
-    pg_sys::{AggCheckCallContext, CurrentMemoryContext, FunctionCallInfo, MemoryContext},
-    pgbox::PgBox,
-};
+use crate::error;
+use crate::memcxt::PgMemoryContexts;
+use crate::pg_sys::{AggCheckCallContext, CurrentMemoryContext, FunctionCallInfo, MemoryContext};
+use crate::pgbox::PgBox;
 
 pub use pgx_utils::sql_entity_graph::{FinalizeModify, ParallelOption};
 

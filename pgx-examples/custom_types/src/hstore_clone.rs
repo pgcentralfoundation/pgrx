@@ -8,7 +8,7 @@ Use of this source code is governed by the MIT license that can be found in the 
 */
 
 use maplit::*;
-use pgx::*;
+use pgx::prelude::*;
 use serde::*;
 use std::collections::HashMap;
 
@@ -62,9 +62,9 @@ fn rstore_size(rstore: Option<RustStore>) -> i64 {
 #[pg_extern]
 fn rstore_table(
     rstore: Option<RustStore>,
-) -> impl std::iter::Iterator<Item = (name!(key, String), name!(value, String))> {
+) -> TableIterator<'static, (name!(key, String), name!(value, String))> {
     match rstore {
-        Some(rstore) => rstore.0.into_iter(),
-        None => HashMap::<String, String>::default().into_iter(),
+        Some(rstore) => TableIterator::new(rstore.0.into_iter()),
+        None => TableIterator::once((String::new(), String::new())),
     }
 }

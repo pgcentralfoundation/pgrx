@@ -9,7 +9,7 @@ Use of this source code is governed by the MIT license that can be found in the 
 use cargo_metadata::Metadata;
 use cargo_toml::Manifest;
 use eyre::eyre;
-use pgx_utils::SUPPORTED_MAJOR_VERSIONS;
+use pgx_pg_config::SUPPORTED_MAJOR_VERSIONS;
 use std::path::PathBuf;
 
 #[tracing::instrument(skip_all)]

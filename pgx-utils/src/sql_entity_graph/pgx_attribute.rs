@@ -6,9 +6,17 @@ All rights reserved.
 
 Use of this source code is governed by the MIT license that can be found in the LICENSE file.
 */
+/*!
+
+`#[pgx]` attribute for Rust to SQL mapping support.
+
+> Like all of the [`sql_entity_graph`][crate::sql_entity_graph] APIs, this is considered **internal**
+to the `pgx` framework and very subject to change between versions. While you may use this, please do it with caution.
+
+*/
 use syn::parse::{Parse, ParseStream};
-use syn::{parenthesized, punctuated::Punctuated};
-use syn::{token, Token};
+use syn::punctuated::Punctuated;
+use syn::{parenthesized, token, Token};
 
 /// This struct is intented to represent the contents of the `#[pgx]` attribute when parsed.
 ///
@@ -26,10 +34,7 @@ impl Parse for PgxAttribute {
     fn parse(input: ParseStream<'_>) -> syn::Result<Self> {
         let parser = Punctuated::<PgxArg, Token![,]>::parse_terminated;
         let punctuated = input.call(parser)?;
-        let args = punctuated
-            .into_pairs()
-            .map(|p| p.into_value())
-            .collect::<Vec<_>>();
+        let args = punctuated.into_pairs().map(|p| p.into_value()).collect::<Vec<_>>();
         Ok(Self { args })
     }
 }

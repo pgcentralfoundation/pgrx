@@ -7,28 +7,23 @@ All rights reserved.
 Use of this source code is governed by the MIT license that can be found in the LICENSE file.
 */
 
-use pgx::*;
+use pgx::prelude::*;
+use pgx::Array;
 use serde::*;
 
-pg_module_magic!();
+pgx::pg_module_magic!();
 
 #[pg_extern]
 fn sq_euclid_pgx(a: Array<f32>, b: Array<f32>) -> f32 {
-    a.as_slice()
-        .iter()
-        .zip(b.as_slice().iter())
-        .map(|(a, b)| (a - b) * (a - b))
-        .sum()
+    a.iter_deny_null().zip(b.iter_deny_null()).map(|(a, b)| (a - b) * (a - b)).sum()
 }
 
 #[pg_extern(immutable, parallel_safe)]
 fn approx_distance_pgx(compressed: Array<i64>, distances: Array<f64>) -> f64 {
-    let distances = distances.as_slice();
     compressed
-        .as_slice()
-        .iter()
+        .iter_deny_null()
         .map(|cc| {
-            let d = distances[*cc as usize];
+            let d = distances.get(cc as usize).unwrap().unwrap();
             pgx::info!("cc={}, d={}", cc, d);
             d
         })
@@ -70,13 +65,15 @@ fn static_names() -> Vec<Option<&'static str>> {
 }
 
 #[pg_extern]
-fn static_names_set() -> impl std::iter::Iterator<Item = Vec<Option<&'static str>>> {
-    vec![
-        vec![Some("Brandy"), Some("Sally"), None, Some("Anchovy")],
-        vec![Some("Eric"), Some("David")],
-        vec![Some("ZomboDB"), Some("PostgreSQL"), Some("Elasticsearch")],
-    ]
-    .into_iter()
+fn static_names_set() -> SetOfIterator<'static, Vec<Option<&'static str>>> {
+    SetOfIterator::new(
+        vec![
+            vec![Some("Brandy"), Some("Sally"), None, Some("Anchovy")],
+            vec![Some("Eric"), Some("David")],
+            vec![Some("ZomboDB"), Some("PostgreSQL"), Some("Elasticsearch")],
+        ]
+        .into_iter(),
+    )
 }
 
 #[pg_extern]
@@ -91,11 +88,7 @@ fn i32_array_with_nulls() -> Vec<Option<i32>> {
 
 #[pg_extern]
 fn strip_nulls(input: Vec<Option<i32>>) -> Vec<i32> {
-    input
-        .into_iter()
-        .filter(|i| i.is_some())
-        .map(|i| i.unwrap())
-        .collect()
+    input.into_iter().filter(|i| i.is_some()).map(|i| i.unwrap()).collect()
 }
 
 #[derive(PostgresType, Serialize, Deserialize, Debug, Eq, PartialEq)]
@@ -124,7 +117,8 @@ pub mod pg_test {
 #[cfg(any(test, feature = "pg_test"))]
 pub mod tests {
     use crate::SomeStruct;
-    use pgx::*;
+    use pgx::prelude::*;
+
     #[pg_test]
     #[search_path(@extschema@)]
     fn test_vec_of_customtype() {

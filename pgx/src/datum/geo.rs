@@ -10,17 +10,18 @@ Use of this source code is governed by the MIT license that can be found in the 
 use crate::{direct_function_call_as_datum, pg_sys, FromDatum, IntoDatum};
 
 impl FromDatum for pg_sys::BOX {
-    const NEEDS_TYPID: bool = false;
-    unsafe fn from_datum(datum: pg_sys::Datum, is_null: bool, _: pg_sys::Oid) -> Option<Self>
+    unsafe fn from_polymorphic_datum(
+        datum: pg_sys::Datum,
+        is_null: bool,
+        _: pg_sys::Oid,
+    ) -> Option<Self>
     where
         Self: Sized,
     {
         if is_null {
             None
-        } else if datum == 0 {
-            panic!("BOX datum declared not null, but datum is zero")
         } else {
-            let the_box = datum as *mut pg_sys::BOX;
+            let the_box = datum.cast_mut_ptr::<pg_sys::BOX>();
             Some(the_box.read())
         }
     }
@@ -32,7 +33,7 @@ impl IntoDatum for pg_sys::BOX {
         unsafe {
             direct_function_call_as_datum(
                 pg_sys::box_out,
-                vec![Some(the_box as *mut pg_sys::BOX as pg_sys::Datum)],
+                vec![Some(pg_sys::Datum::from(the_box as *mut pg_sys::BOX))],
             )
         }
     }
@@ -43,28 +44,30 @@ impl IntoDatum for pg_sys::BOX {
 }
 
 impl FromDatum for pg_sys::Point {
-    unsafe fn from_datum(datum: pg_sys::Datum, is_null: bool, _: pg_sys::Oid) -> Option<Self>
+    unsafe fn from_polymorphic_datum(
+        datum: pg_sys::Datum,
+        is_null: bool,
+        _: pg_sys::Oid,
+    ) -> Option<Self>
     where
         Self: Sized,
     {
         if is_null {
             None
-        } else if datum == 0 {
-            panic!("Point datum declared not null, but datum is zero")
         } else {
-            let point = datum as *mut pg_sys::Point;
+            let point: *mut Self = datum.cast_mut_ptr();
             Some(point.read())
         }
     }
 }
 
 impl IntoDatum for pg_sys::Point {
-    fn into_datum(mut self) -> Option<usize> {
+    fn into_datum(mut self) -> Option<pg_sys::Datum> {
         let point = &mut self;
         unsafe {
             direct_function_call_as_datum(
                 pg_sys::point_out,
-                vec![Some(point as *mut pg_sys::Point as pg_sys::Datum)],
+                vec![Some(pg_sys::Datum::from(point as *mut _))],
             )
         }
     }

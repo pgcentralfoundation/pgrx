@@ -16,10 +16,10 @@ pub fn lookup_enum_by_oid(enumval: pg_sys::Oid) -> (String, pg_sys::Oid, f32) {
     let tup = unsafe {
         pg_sys::SearchSysCache(
             pg_sys::SysCacheIdentifier_ENUMOID as i32,
-            enumval as pg_sys::Datum,
-            0,
-            0,
-            0,
+            pg_sys::Datum::from(enumval),
+            pg_sys::Datum::from(0),
+            pg_sys::Datum::from(0),
+            pg_sys::Datum::from(0),
         )
     };
     if tup.is_null() {
@@ -65,25 +65,22 @@ pub fn lookup_enum_by_label(typname: &str, label: &str) -> pg_sys::Datum {
             std::ffi::CString::new(label).expect("failed to convert enum typname to a CString");
         pg_sys::SearchSysCache(
             pg_sys::SysCacheIdentifier_ENUMTYPOIDNAME as i32,
-            enumtypoid as pg_sys::Datum,
-            label.as_ptr() as pg_sys::Datum,
-            0,
-            0,
+            pg_sys::Datum::from(enumtypoid),
+            pg_sys::Datum::from(label.as_ptr()),
+            pg_sys::Datum::from(0usize),
+            pg_sys::Datum::from(0usize),
         )
     };
 
     if tup.is_null() {
-        panic!(
-            "could not find heap tuple for enum: {}.{}, typoid={}",
-            typname, label, enumtypoid
-        );
+        panic!("could not find heap tuple for enum: {}.{}, typoid={}", typname, label, enumtypoid);
     }
 
     // SAFETY:  we know that `tup` is valid because we just got it from Postgres above
     unsafe {
         let oid = extract_enum_oid(tup);
         pg_sys::ReleaseSysCache(tup);
-        oid as pg_sys::Datum
+        pg_sys::Datum::from(oid)
     }
 }
 

@@ -6,15 +6,21 @@ All rights reserved.
 
 Use of this source code is governed by the MIT license that can be found in the LICENSE file.
 */
+/*!
+
+`#[pg_schema]` related macro expansion for Rust to SQL translation
+
+> Like all of the [`sql_entity_graph`][crate::sql_entity_graph] APIs, this is considered **internal**
+to the `pgx` framework and very subject to change between versions. While you may use this, please do it with caution.
+
+*/
 pub mod entity;
 
 use proc_macro2::{Span, TokenStream as TokenStream2};
 use quote::{quote, ToTokens, TokenStreamExt};
 use std::hash::{Hash, Hasher};
-use syn::{
-    parse::{Parse, ParseStream},
-    ItemMod,
-};
+use syn::parse::{Parse, ParseStream};
+use syn::ItemMod;
 
 /// A parsed `#[pg_schema] mod example {}` item.
 ///
@@ -43,7 +49,7 @@ pub struct Schema {
 impl Parse for Schema {
     fn parse(input: ParseStream) -> Result<Self, syn::Error> {
         let module: ItemMod = input.parse()?;
-
+        crate::ident_is_acceptable_to_postgres(&module.ident)?;
         Ok(Self { module })
     }
 }
@@ -54,11 +60,9 @@ impl ToTokens for Schema {
         let vis = &self.module.vis;
         let mod_token = &self.module.mod_token;
         let ident = &self.module.ident;
-        let (_content_brace, content_items) = &self
-            .module
-            .content
-            .as_ref()
-            .expect("Can only support `mod {}` right now.");
+
+        let (_content_brace, content_items) =
+            &self.module.content.as_ref().expect("Can only support `mod {}` right now.");
 
         // A hack until https://github.com/rust-lang/rust/issues/54725 is fixed.
         let mut hasher = std::collections::hash_map::DefaultHasher::new();
@@ -74,18 +78,18 @@ impl ToTokens for Schema {
         updated_content.push(syn::parse_quote! {
                 #[no_mangle]
                 #[doc(hidden)]
-                pub extern "C" fn  #sql_graph_entity_fn_name() -> ::pgx::utils::sql_entity_graph::SqlGraphEntity {
-                extern crate alloc;
-                use alloc::vec::Vec;
-                use alloc::vec;
-                let submission = pgx::utils::sql_entity_graph::SchemaEntity {
-                        module_path: module_path!(),
-                        name: stringify!(#ident),
-                        file: file!(),
-                        line: line!(),
-                    };
-                ::pgx::utils::sql_entity_graph::SqlGraphEntity::Schema(submission)
-            }
+                pub extern "Rust" fn  #sql_graph_entity_fn_name() -> ::pgx::utils::sql_entity_graph::SqlGraphEntity {
+                    extern crate alloc;
+                    use alloc::vec::Vec;
+                    use alloc::vec;
+                    let submission = pgx::utils::sql_entity_graph::SchemaEntity {
+                            module_path: module_path!(),
+                            name: stringify!(#ident),
+                            file: file!(),
+                            line: line!(),
+                        };
+                    ::pgx::utils::sql_entity_graph::SqlGraphEntity::Schema(submission)
+                }
         });
         let _semi = &self.module.semi;
 

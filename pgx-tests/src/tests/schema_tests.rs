@@ -6,12 +6,12 @@ All rights reserved.
 
 Use of this source code is governed by the MIT license that can be found in the LICENSE file.
 */
-use pgx::*;
+use pgx::prelude::*;
 
 #[pgx::pg_schema]
 mod test_schema {
+    use pgx::prelude::*;
     use pgx::utils::sql_entity_graph::{PgxSql, SqlGraphEntity};
-    use pgx::*;
     use serde::{Deserialize, Serialize};
 
     #[pg_extern]
@@ -43,12 +43,13 @@ mod test_schema {
         _context: &PgxSql,
     ) -> Result<String, Box<dyn std::error::Error + Send + Sync + 'static>> {
         if let SqlGraphEntity::Function(ref func) = entity {
-            Ok(format!("\
+            Ok(format!(
+                "\
                 CREATE FUNCTION test_schema.\"func_generated_with_custom_name\"() RETURNS void\n\
                 LANGUAGE c /* Rust */\n\
                 AS 'MODULE_PATHNAME', '{unaliased_name}_wrapper';\
                 ",
-                unaliased_name = func.unaliased_name,
+                unaliased_name = func.name,
             ))
         } else {
             panic!("expected extern function entity, got {:?}", entity);
@@ -86,7 +87,7 @@ mod tests {
     #[allow(unused_imports)]
     use crate as pgx_tests;
 
-    use pgx::*;
+    use pgx::prelude::*;
 
     #[pg_test]
     fn test_in_different_schema() {

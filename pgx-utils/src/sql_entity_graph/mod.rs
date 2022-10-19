@@ -6,11 +6,21 @@ All rights reserved.
 
 Use of this source code is governed by the MIT license that can be found in the LICENSE file.
 */
+/*!
+
+Rust to SQL mapping support.
+
+> Like all of the [`sql_entity_graph`][crate::sql_entity_graph] APIs, this is considered **internal**
+to the `pgx` framework and very subject to change between versions. While you may use this, please do it with caution.
+
+*/
 pub(crate) mod aggregate;
 pub(crate) mod control_file;
 pub(crate) mod extension_sql;
 pub(crate) mod mapping;
+pub mod metadata;
 pub(crate) mod pg_extern;
+pub(crate) mod pg_trigger;
 pub(crate) mod pgx_attribute;
 pub(crate) mod pgx_sql;
 pub(crate) mod positioning_ref;
@@ -20,29 +30,39 @@ pub(crate) mod postgres_ord;
 pub(crate) mod postgres_type;
 pub(crate) mod schema;
 pub(crate) mod to_sql;
+pub(crate) mod used_type;
 
+pub use aggregate::entity::{AggregateTypeEntity, PgAggregateEntity};
 pub use aggregate::{
-    entity::{AggregateTypeEntity, MaybeVariadicAggregateTypeEntity, PgAggregateEntity},
     AggregateType, AggregateTypeList, FinalizeModify, ParallelOption, PgAggregate,
 };
 pub use control_file::ControlFile;
-pub use extension_sql::{
-    entity::{ExtensionSqlEntity, SqlDeclaredEntity},
-    ExtensionSql, ExtensionSqlFile, SqlDeclared,
-};
+pub use extension_sql::entity::{ExtensionSqlEntity, SqlDeclaredEntity};
+pub use extension_sql::{ExtensionSql, ExtensionSqlFile, SqlDeclared};
 pub use mapping::{RustSourceOnlySqlMapping, RustSqlMapping};
-pub use pg_extern::{
-    entity::{PgExternArgumentEntity, PgExternEntity, PgExternReturnEntity, PgOperatorEntity},
-    NameMacro, PgExtern, PgExternArgument, PgOperator,
+pub use pg_extern::entity::{
+    PgExternArgumentEntity, PgExternEntity, PgExternReturnEntity, PgExternReturnEntityIteratedItem,
+    PgOperatorEntity,
 };
-pub use pgx_sql::PgxSql;
+pub use pg_extern::{NameMacro, PgExtern, PgExternArgument, PgOperator};
+pub use pg_trigger::attribute::PgTriggerAttribute;
+pub use pg_trigger::entity::PgTriggerEntity;
+pub use pg_trigger::PgTrigger;
+pub use pgx_sql::{PgxSql, RustToSqlMapping};
 pub use positioning_ref::PositioningRef;
-pub use postgres_enum::{entity::PostgresEnumEntity, PostgresEnum};
-pub use postgres_hash::{entity::PostgresHashEntity, PostgresHash};
-pub use postgres_ord::{entity::PostgresOrdEntity, PostgresOrd};
-pub use postgres_type::{entity::PostgresTypeEntity, PostgresType};
-pub use schema::{entity::SchemaEntity, Schema};
-pub use to_sql::{entity::ToSqlConfigEntity, ToSql, ToSqlConfig};
+pub use postgres_enum::entity::PostgresEnumEntity;
+pub use postgres_enum::PostgresEnum;
+pub use postgres_hash::entity::PostgresHashEntity;
+pub use postgres_hash::PostgresHash;
+pub use postgres_ord::entity::PostgresOrdEntity;
+pub use postgres_ord::PostgresOrd;
+pub use postgres_type::entity::PostgresTypeEntity;
+pub use postgres_type::PostgresType;
+pub use schema::entity::SchemaEntity;
+pub use schema::Schema;
+pub use to_sql::entity::ToSqlConfigEntity;
+pub use to_sql::{ToSql, ToSqlConfig};
+pub use used_type::{UsedType, UsedTypeEntity};
 
 pub use crate::ExternArgs;
 
@@ -79,6 +99,7 @@ pub enum SqlGraphEntity {
     Ord(PostgresOrdEntity),
     Hash(PostgresHashEntity),
     Aggregate(PgAggregateEntity),
+    Trigger(PgTriggerEntity),
 }
 
 impl SqlGraphEntity {
@@ -111,6 +132,7 @@ impl SqlGraphIdentifier for SqlGraphEntity {
             SqlGraphEntity::Ord(item) => item.dot_identifier(),
             SqlGraphEntity::Hash(item) => item.dot_identifier(),
             SqlGraphEntity::Aggregate(item) => item.dot_identifier(),
+            SqlGraphEntity::Trigger(item) => item.dot_identifier(),
             SqlGraphEntity::ExtensionRoot(item) => item.dot_identifier(),
         }
     }
@@ -126,6 +148,7 @@ impl SqlGraphIdentifier for SqlGraphEntity {
             SqlGraphEntity::Ord(item) => item.rust_identifier(),
             SqlGraphEntity::Hash(item) => item.rust_identifier(),
             SqlGraphEntity::Aggregate(item) => item.rust_identifier(),
+            SqlGraphEntity::Trigger(item) => item.rust_identifier(),
             SqlGraphEntity::ExtensionRoot(item) => item.rust_identifier(),
         }
     }
@@ -141,6 +164,7 @@ impl SqlGraphIdentifier for SqlGraphEntity {
             SqlGraphEntity::Ord(item) => item.file(),
             SqlGraphEntity::Hash(item) => item.file(),
             SqlGraphEntity::Aggregate(item) => item.file(),
+            SqlGraphEntity::Trigger(item) => item.file(),
             SqlGraphEntity::ExtensionRoot(item) => item.file(),
         }
     }
@@ -156,6 +180,7 @@ impl SqlGraphIdentifier for SqlGraphEntity {
             SqlGraphEntity::Ord(item) => item.line(),
             SqlGraphEntity::Hash(item) => item.line(),
             SqlGraphEntity::Aggregate(item) => item.line(),
+            SqlGraphEntity::Trigger(item) => item.line(),
             SqlGraphEntity::ExtensionRoot(item) => item.line(),
         }
     }
@@ -199,27 +224,25 @@ impl ToSql for SqlGraphEntity {
                     item.to_sql(context)
                 }
             }
-            SqlGraphEntity::Type(item) => item
-                .to_sql_config
-                .to_sql(self, context)
-                .unwrap_or_else(|| item.to_sql(context)),
+            SqlGraphEntity::Type(item) => {
+                item.to_sql_config.to_sql(self, context).unwrap_or_else(|| item.to_sql(context))
+            }
             SqlGraphEntity::BuiltinType(_) => Ok(String::default()),
-            SqlGraphEntity::Enum(item) => item
-                .to_sql_config
-                .to_sql(self, context)
-                .unwrap_or_else(|| item.to_sql(context)),
-            SqlGraphEntity::Ord(item) => item
-                .to_sql_config
-                .to_sql(self, context)
-                .unwrap_or_else(|| item.to_sql(context)),
-            SqlGraphEntity::Hash(item) => item
-                .to_sql_config
-                .to_sql(self, context)
-                .unwrap_or_else(|| item.to_sql(context)),
-            SqlGraphEntity::Aggregate(item) => item
-                .to_sql_config
-                .to_sql(self, context)
-                .unwrap_or_else(|| item.to_sql(context)),
+            SqlGraphEntity::Enum(item) => {
+                item.to_sql_config.to_sql(self, context).unwrap_or_else(|| item.to_sql(context))
+            }
+            SqlGraphEntity::Ord(item) => {
+                item.to_sql_config.to_sql(self, context).unwrap_or_else(|| item.to_sql(context))
+            }
+            SqlGraphEntity::Hash(item) => {
+                item.to_sql_config.to_sql(self, context).unwrap_or_else(|| item.to_sql(context))
+            }
+            SqlGraphEntity::Aggregate(item) => {
+                item.to_sql_config.to_sql(self, context).unwrap_or_else(|| item.to_sql(context))
+            }
+            SqlGraphEntity::Trigger(item) => {
+                item.to_sql_config.to_sql(self, context).unwrap_or_else(|| item.to_sql(context))
+            }
             SqlGraphEntity::ExtensionRoot(item) => item.to_sql(context),
         }
     }

@@ -6,14 +6,20 @@ All rights reserved.
 
 Use of this source code is governed by the MIT license that can be found in the LICENSE file.
 */
+/*!
+
+`#[derive(PostgresHash)]` related macro expansion for Rust to SQL translation
+
+> Like all of the [`sql_entity_graph`][crate::sql_entity_graph] APIs, this is considered **internal**
+to the `pgx` framework and very subject to change between versions. While you may use this, please do it with caution.
+
+*/
 pub mod entity;
 
 use proc_macro2::{Span, TokenStream as TokenStream2};
 use quote::{quote, ToTokens, TokenStreamExt};
-use syn::{
-    parse::{Parse, ParseStream},
-    DeriveInput, Ident,
-};
+use syn::parse::{Parse, ParseStream};
+use syn::{DeriveInput, Ident};
 
 use crate::sql_entity_graph::ToSqlConfig;
 
@@ -67,17 +73,17 @@ pub struct PostgresHash {
 }
 
 impl PostgresHash {
-    pub fn new(name: Ident, to_sql_config: ToSqlConfig) -> Self {
-        Self {
-            name,
-            to_sql_config,
+    pub fn new(name: Ident, to_sql_config: ToSqlConfig) -> Result<Self, syn::Error> {
+        if !to_sql_config.overrides_default() {
+            crate::ident_is_acceptable_to_postgres(&name)?;
         }
+        Ok(Self { name, to_sql_config })
     }
 
     pub fn from_derive_input(derive_input: DeriveInput) -> Result<Self, syn::Error> {
         let to_sql_config =
             ToSqlConfig::from_attributes(derive_input.attrs.as_slice())?.unwrap_or_default();
-        Ok(Self::new(derive_input.ident, to_sql_config))
+        Self::new(derive_input.ident, to_sql_config)
     }
 }
 
@@ -91,23 +97,22 @@ impl Parse for PostgresHash {
             Item::Struct(item) => (item.ident.clone(), item.attrs.as_slice()),
             _ => return Err(syn::Error::new(input.span(), "expected enum or struct")),
         };
+
         let to_sql_config = ToSqlConfig::from_attributes(attrs)?.unwrap_or_default();
-        Ok(Self::new(ident, to_sql_config))
+        Self::new(ident, to_sql_config)
     }
 }
 
 impl ToTokens for PostgresHash {
     fn to_tokens(&self, tokens: &mut TokenStream2) {
         let name = &self.name;
-        let sql_graph_entity_fn_name = syn::Ident::new(
-            &format!("__pgx_internals_hash_{}", self.name),
-            Span::call_site(),
-        );
+        let sql_graph_entity_fn_name =
+            syn::Ident::new(&format!("__pgx_internals_hash_{}", self.name), Span::call_site());
         let to_sql_config = &self.to_sql_config;
         let inv = quote! {
             #[no_mangle]
             #[doc(hidden)]
-            pub extern "C" fn  #sql_graph_entity_fn_name() -> ::pgx::utils::sql_entity_graph::SqlGraphEntity {
+            pub extern "Rust" fn  #sql_graph_entity_fn_name() -> ::pgx::utils::sql_entity_graph::SqlGraphEntity {
                 use core::any::TypeId;
                 extern crate alloc;
                 use alloc::vec::Vec;

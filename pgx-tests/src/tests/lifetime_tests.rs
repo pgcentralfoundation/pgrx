@@ -7,7 +7,7 @@ All rights reserved.
 Use of this source code is governed by the MIT license that can be found in the LICENSE file.
 */
 //! This file exists just to ensure the code within compiles
-use pgx::*;
+use pgx::prelude::*;
 use serde::{Deserialize, Serialize};
 use std::marker::PhantomData;
 
@@ -40,11 +40,11 @@ fn returns_option_ref_with_lifetime<'a>() -> Option<&'a str> {
 #[pg_extern]
 fn returns_tuple_with_lifetime(
     value: &'static str,
-) -> (name!(a, &'static str), name!(b, Option<&'static str>)) {
-    (value, Some(value))
+) -> TableIterator<(name!(a, &'static str), name!(b, Option<&'static str>))> {
+    TableIterator::once((value, Some(value)))
 }
 
 #[pg_extern]
-fn returns_iterator_with_lifetime<'a>(value: &'a str) -> impl std::iter::Iterator<Item = &'a str> {
-    value.split_whitespace()
+fn returns_iterator_with_lifetime<'a>(value: &'a str) -> SetOfIterator<&'a str> {
+    SetOfIterator::new(value.split_whitespace().into_iter())
 }

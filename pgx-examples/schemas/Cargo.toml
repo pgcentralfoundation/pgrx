@@ -17,7 +17,7 @@ pg_test = []
 
 [dependencies]
 pgx = { path = "../../pgx", default-features = false }
-serde = "1.0.137"
+serde = "1.0.145"
 
 [dev-dependencies]
 pgx-tests = { path = "../../pgx-tests" }

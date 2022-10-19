@@ -8,6 +8,9 @@ Use of this source code is governed by the MIT license that can be found in the 
 */
 use crate::{pg_sys, FromDatum, IntoDatum, PgMemoryContexts};
 use core::fmt::Write;
+use pgx_utils::sql_entity_graph::metadata::{
+    ArgumentError, Returns, ReturnsError, SqlMapping, SqlTranslatable,
+};
 use std::ops::{Deref, DerefMut};
 
 const UUID_BYTES_LEN: usize = 16;
@@ -24,7 +27,7 @@ impl IntoDatum for Uuid {
         let ptr = PgMemoryContexts::CurrentMemoryContext.palloc_slice::<u8>(UUID_BYTES_LEN);
         ptr.clone_from_slice(&self.0);
 
-        Some(ptr.as_ptr() as pg_sys::Datum)
+        Some(ptr.as_ptr().into())
     }
 
     #[inline]
@@ -35,13 +38,16 @@ impl IntoDatum for Uuid {
 
 impl FromDatum for Uuid {
     #[inline]
-    unsafe fn from_datum(datum: usize, is_null: bool, _typoid: pg_sys::Oid) -> Option<Uuid> {
+    unsafe fn from_polymorphic_datum(
+        datum: pg_sys::Datum,
+        is_null: bool,
+        _typoid: pg_sys::Oid,
+    ) -> Option<Uuid> {
         if is_null {
             None
-        } else if datum == 0 {
-            panic!("a uuid Datum as flagged as non-null but the datum is zero");
         } else {
-            let bytes = std::slice::from_raw_parts(datum as *const u8, UUID_BYTES_LEN);
+            let bytes =
+                std::slice::from_raw_parts(datum.cast_mut_ptr::<u8>() as *const u8, UUID_BYTES_LEN);
             if let Ok(uuid) = Uuid::from_slice(bytes) {
                 Some(uuid)
             } else {
@@ -69,10 +75,7 @@ impl Uuid {
         let len = b.len();
 
         if len != UUID_BYTES_LEN {
-            Err(format!(
-                "Expected UUID to be {} bytes, got {}",
-                UUID_BYTES_LEN, len
-            ))?;
+            Err(format!("Expected UUID to be {} bytes, got {}", UUID_BYTES_LEN, len))?;
         }
 
         let mut bytes = [0; UUID_BYTES_LEN];
@@ -124,5 +127,14 @@ impl<'a> std::fmt::LowerHex for Uuid {
 impl<'a> std::fmt::UpperHex for Uuid {
     fn fmt(&self, f: &mut std::fmt::Formatter) -> Result<(), std::fmt::Error> {
         self.format(f, UuidFormatCase::Uppercase)
+    }
+}
+
+unsafe impl SqlTranslatable for crate::datum::Uuid {
+    fn argument_sql() -> Result<SqlMapping, ArgumentError> {
+        Ok(SqlMapping::literal("uuid"))
+    }
+    fn return_sql() -> Result<Returns, ReturnsError> {
+        Ok(Returns::One(SqlMapping::literal("uuid")))
     }
 }

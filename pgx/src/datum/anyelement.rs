@@ -8,6 +8,9 @@ Use of this source code is governed by the MIT license that can be found in the 
 */
 
 use crate::{pg_sys, FromDatum, IntoDatum};
+use pgx_utils::sql_entity_graph::metadata::{
+    ArgumentError, Returns, ReturnsError, SqlMapping, SqlTranslatable,
+};
 
 #[derive(Debug, Clone, Copy)]
 pub struct AnyElement {
@@ -26,13 +29,21 @@ impl AnyElement {
 
     #[inline]
     pub fn into<T: FromDatum>(&self) -> Option<T> {
-        unsafe { T::from_datum(self.datum(), false, self.oid()) }
+        unsafe { T::from_polymorphic_datum(self.datum(), false, self.oid()) }
     }
 }
 
 impl FromDatum for AnyElement {
+    const GET_TYPOID: bool = true;
+
     #[inline]
-    unsafe fn from_datum(
+    unsafe fn from_datum(_datum: pg_sys::Datum, _is_null: bool) -> Option<AnyElement> {
+        debug_assert!(false, "Can't create a polymorphic type using from_datum, call FromDatum::from_polymorphic_datum instead");
+        None
+    }
+
+    #[inline]
+    unsafe fn from_polymorphic_datum(
         datum: pg_sys::Datum,
         is_null: bool,
         typoid: pg_sys::Oid,
@@ -53,5 +64,14 @@ impl IntoDatum for AnyElement {
 
     fn type_oid() -> u32 {
         pg_sys::ANYELEMENTOID
+    }
+}
+
+unsafe impl SqlTranslatable for AnyElement {
+    fn argument_sql() -> Result<SqlMapping, ArgumentError> {
+        Ok(SqlMapping::literal("anyelement"))
+    }
+    fn return_sql() -> Result<Returns, ReturnsError> {
+        Ok(Returns::One(SqlMapping::literal("anyelement")))
     }
 }

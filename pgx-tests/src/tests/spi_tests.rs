@@ -13,7 +13,7 @@ mod tests {
     #[allow(unused_imports)]
     use crate as pgx_tests;
 
-    use pgx::*;
+    use pgx::prelude::*;
 
     #[pg_test(error = "syntax error at or near \"THIS\"")]
     fn test_spi_failure() {
@@ -38,10 +38,7 @@ mod tests {
     #[pg_test]
     fn test_spi_returns_primitive() {
         let rc = Spi::connect(|client| {
-            Ok(client
-                .select("SELECT 42", None, None)
-                .first()
-                .get_datum::<i32>(1))
+            Ok(client.select("SELECT 42", None, None).first().get_datum::<i32>(1))
         });
 
         assert_eq!(42, rc.expect("SPI failed to return proper value"))
@@ -50,40 +47,25 @@ mod tests {
     #[pg_test]
     fn test_spi_returns_str() {
         let rc = Spi::connect(|client| {
-            Ok(client
-                .select("SELECT 'this is a test'", None, None)
-                .first()
-                .get_datum::<&str>(1))
+            Ok(client.select("SELECT 'this is a test'", None, None).first().get_datum::<&str>(1))
         });
 
-        assert_eq!(
-            "this is a test",
-            rc.expect("SPI failed to return proper value")
-        )
+        assert_eq!("this is a test", rc.expect("SPI failed to return proper value"))
     }
 
     #[pg_test]
     fn test_spi_returns_string() {
         let rc = Spi::connect(|client| {
-            Ok(client
-                .select("SELECT 'this is a test'", None, None)
-                .first()
-                .get_datum::<String>(1))
+            Ok(client.select("SELECT 'this is a test'", None, None).first().get_datum::<String>(1))
         });
 
-        assert_eq!(
-            "this is a test",
-            rc.expect("SPI failed to return proper value")
-        )
+        assert_eq!("this is a test", rc.expect("SPI failed to return proper value"))
     }
 
     #[pg_test]
     fn test_spi_get_one() {
         Spi::execute(|client| {
-            let i = client
-                .select("SELECT 42::bigint", None, None)
-                .first()
-                .get_one::<i64>();
+            let i = client.select("SELECT 42::bigint", None, None).first().get_one::<i64>();
             assert_eq!(42, i.unwrap());
         });
     }
@@ -91,10 +73,8 @@ mod tests {
     #[pg_test]
     fn test_spi_get_two() {
         Spi::execute(|client| {
-            let (i, s) = client
-                .select("SELECT 42, 'test'", None, None)
-                .first()
-                .get_two::<i64, &str>();
+            let (i, s) =
+                client.select("SELECT 42, 'test'", None, None).first().get_two::<i64, &str>();
 
             assert_eq!(42, i.unwrap());
             assert_eq!("test", s.unwrap());
@@ -118,10 +98,7 @@ mod tests {
     #[pg_test]
     fn test_spi_get_two_with_failure() {
         Spi::execute(|client| {
-            let (i, s) = client
-                .select("SELECT 42", None, None)
-                .first()
-                .get_two::<i64, &str>();
+            let (i, s) = client.select("SELECT 42", None, None).first().get_two::<i64, &str>();
 
             assert_eq!(42, i.unwrap());
             assert!(s.is_none());
