@@ -276,10 +276,10 @@ fn main() {
             for output_line in child_output.stdout.lines().skip(2) {
                 if let Ok(line) = output_line {
                     match line.chars().nth(0) {
-                        Some(c) if c == '-' => {
+                        Some('-') => {
                             diff_output.push_str(format!("\n            {}", line.red()).as_str())
                         }
-                        Some(c) if c == '+' => {
+                        Some('+') => {
                             diff_output.push_str(format!("\n            {}", line.green()).as_str())
                         }
                         Some(_) => diff_output.push_str(format!("\n           {line}").as_str()),
