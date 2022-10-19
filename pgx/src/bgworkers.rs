@@ -316,7 +316,7 @@ impl TerminatingDynamicBackgroundWorker {
     ///
     /// Requires `BackgroundWorkerBuilder.bgw_notify_pid` to be set to `pg_sys::MyProcPid`, otherwise it'll
     /// return [`BackgroundWorkerStatus::Untracked`] error
-    pub fn wait_for_shutdown(&self) -> Result<(), BackgroundWorkerStatus> {
+    pub fn wait_for_shutdown(self) -> Result<(), BackgroundWorkerStatus> {
         unsafe {
             if self.notify_pid != pg_sys::MyProcPid {
                 return Err(BackgroundWorkerStatus::Untracked { notify_pid: self.notify_pid });
