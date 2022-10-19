@@ -415,7 +415,6 @@ pub fn staticize_lifetimes(value: &mut syn::Type) {
                 "name" => {
                     let mut out: NameMacro = mac.parse_body().expect("name!() in wrong format");
                     staticize_lifetimes(&mut out.used_ty.resolved_ty);
-                    staticize_lifetimes(&mut out.used_ty.original_ty);
 
                     // rewrite the name!() macro so that it has a static lifetime, if any
                     let ident = syn::parse_str::<Ident>(&out.ident).unwrap();
