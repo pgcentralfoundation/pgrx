@@ -68,16 +68,16 @@
 
 - A Rust toolchain: `rustc`, `cargo`, and `rustfmt`. The recommended way to get these is from https://rustup.rs †
 - `git`
-- `libclang`
+- `libclang` 5.0 or greater (required by bindgen)
    - Ubuntu: `apt install libclang-dev` or `apt install clang`
    - RHEL: `yum install clang`
 - `tar`
 - `bzip2`
 - GCC 7 or newer
 - [PostgreSQL's build dependencies](https://wiki.postgresql.org/wiki/Compile_and_Install_from_source_code) ‡
- 
+
  † PGX has no MSRV policy, thus may require the latest stable version of Rust, available via Rustup
- 
+
  ‡ A local PostgreSQL server installation is not required. `cargo pgx` can download and compile PostgreSQL versions on its own.
 
 <details>

@@ -21,10 +21,17 @@ use syn::{ForeignItem, Item};
 #[derive(Debug)]
 struct PgxOverrides(HashSet<String>);
 
-#[rustversion::nightly]
-const IS_NIGHTLY: bool = true;
-#[rustversion::not(nightly)]
-const IS_NIGHTLY: bool = false;
+fn is_nightly() -> bool {
+    let rustc = std::env::var_os("RUSTC").map(PathBuf::from).unwrap_or_else(|| "rustc".into());
+    let output = match std::process::Command::new(rustc).arg("--verbose").output() {
+        Ok(out) if out.status.success() => String::from_utf8_lossy(&out.stdout).trim().to_owned(),
+        _ => return false,
+    };
+    // Output looks like:
+    // - for nightly: `"rustc 1.66.0-nightly (0ca356586 2022-10-06)"`
+    // - for dev (locally built rust toolchain): `"rustc 1.66.0-dev"`
+    output.starts_with("rustc ") && (output.contains("-nightly") || output.contains("-dev"))
+}
 
 impl PgxOverrides {
     fn default() -> Self {
@@ -72,7 +79,7 @@ impl bindgen::callbacks::ParseCallbacks for PgxOverrides {
     }
 }
 
-fn main() -> color_eyre::Result<()> {
+fn main() -> eyre::Result<()> {
     if std::env::var("DOCS_RS").unwrap_or("false".into()) == "1" {
         return Ok(());
     }
@@ -89,22 +96,13 @@ fn main() -> color_eyre::Result<()> {
     println!("cargo:rerun-if-env-changed=PGX_PG_SYS_GENERATE_BINDINGS_FOR_RELEASE");
 
     // Do nightly detection to suppress silly warnings.
-    if IS_NIGHTLY {
+    if is_nightly() {
         println!("cargo:rustc-cfg=nightly")
     };
 
-    let manifest_dir = PathBuf::from(std::env::var("CARGO_MANIFEST_DIR").unwrap());
-    let out_dir = PathBuf::from(std::env::var("OUT_DIR").unwrap());
-    let mut src_dir = manifest_dir.clone();
-    src_dir.push("src");
-    let mut shim_src = manifest_dir.clone();
-    shim_src.push("cshim");
-    let mut shim_dst = out_dir.clone();
-    shim_dst.push("cshim");
+    let build_paths = BuildPaths::from_env();
 
-    eprintln!("manifest_dir={}", manifest_dir.display());
-    eprintln!("shim_src={}", shim_src.display());
-    eprintln!("shim_dst={}", shim_dst.display());
+    eprintln!("build_paths={build_paths:?}");
 
     let pgx = Pgx::from_config()?;
 
@@ -146,69 +144,103 @@ fn main() -> color_eyre::Result<()> {
 
     pg_configs
         .par_iter()
-        .map(|pg_config| {
-            let major_version =
-                pg_config.major_version().wrap_err("could not determine major version")?;
-            let mut include_h = manifest_dir.clone();
-            include_h.push("include");
-            include_h.push(format!("pg{}.h", major_version));
-
-            let bindgen_output = run_bindgen(&pg_config, &include_h)
-                .wrap_err_with(|| format!("bindgen failed for pg{}", major_version))?;
-
-            let oids = extract_oids(&bindgen_output);
-            let rewritten_items = rewrite_items(&bindgen_output, is_for_release)
-                .wrap_err_with(|| format!("failed to rewrite items for pg{}", major_version))?;
-
-            let dest_dirs = if std::env::var("PGX_PG_SYS_GENERATE_BINDINGS_FOR_RELEASE")
-                .unwrap_or("false".into())
-                == "1"
-            {
-                vec![out_dir.clone(), src_dir.clone()]
-            } else {
-                vec![out_dir.clone()]
-            };
-            for dest_dir in dest_dirs {
-                let mut bindings_file = dest_dir.clone();
-                bindings_file.push(&format!("pg{}.rs", major_version));
-                write_rs_file(
-                    rewritten_items.clone(),
-                    &bindings_file,
-                    quote! {
-                        use crate as pg_sys;
-                        #[cfg(any(feature = "pg12", feature = "pg13", feature = "pg14"))]
-                        use crate::NullableDatum;
-                        use crate::{PgNode, Datum};
-                    },
-                )
-                .wrap_err_with(|| {
-                    format!(
-                        "Unable to write bindings file for pg{} to `{}`",
-                        major_version,
-                        bindings_file.display()
-                    )
-                })?;
-
-                let mut oids_file = dest_dir.clone();
-                oids_file.push(&format!("pg{}_oids.rs", major_version));
-                write_rs_file(oids.clone(), &oids_file, quote! {}).wrap_err_with(|| {
-                    format!(
-                        "Unable to write oids file for pg{} to `{}`",
-                        major_version,
-                        oids_file.display()
-                    )
-                })?;
-            }
-            Ok(())
-        })
+        .map(|pg_config| generate_bindings(pg_config, &build_paths, is_for_release))
         .collect::<eyre::Result<Vec<_>>>()?;
 
     // compile the cshim for each binding
     for pg_config in pg_configs {
-        build_shim(&shim_src, &shim_dst, &pg_config)?;
+        build_shim(&build_paths.shim_src, &build_paths.shim_dst, &pg_config)?;
     }
 
     Ok(())
+}
+
+fn generate_bindings(
+    pg_config: &PgConfig,
+    build_paths: &BuildPaths,
+    is_for_release: bool,
+) -> eyre::Result<()> {
+    let major_version = pg_config.major_version().wrap_err("could not determine major version")?;
+    let mut include_h = build_paths.manifest_dir.clone();
+    include_h.push("include");
+    include_h.push(format!("pg{}.h", major_version));
+
+    let bindgen_output = run_bindgen(&pg_config, &include_h)
+        .wrap_err_with(|| format!("bindgen failed for pg{}", major_version))?;
+
+    let oids = extract_oids(&bindgen_output);
+    let rewritten_items = rewrite_items(&bindgen_output, is_for_release)
+        .wrap_err_with(|| format!("failed to rewrite items for pg{}", major_version))?;
+
+    let dest_dirs = if std::env::var("PGX_PG_SYS_GENERATE_BINDINGS_FOR_RELEASE")
+        .unwrap_or("false".into())
+        == "1"
+    {
+        vec![build_paths.out_dir.clone(), build_paths.src_dir.clone()]
+    } else {
+        vec![build_paths.out_dir.clone()]
+    };
+    for dest_dir in dest_dirs {
+        let mut bindings_file = dest_dir.clone();
+        bindings_file.push(&format!("pg{}.rs", major_version));
+        write_rs_file(
+            rewritten_items.clone(),
+            &bindings_file,
+            quote! {
+                use crate as pg_sys;
+                #[cfg(any(feature = "pg12", feature = "pg13", feature = "pg14"))]
+                use crate::NullableDatum;
+                use crate::{PgNode, Datum};
+            },
+        )
+        .wrap_err_with(|| {
+            format!(
+                "Unable to write bindings file for pg{} to `{}`",
+                major_version,
+                bindings_file.display()
+            )
+        })?;
+
+        let mut oids_file = dest_dir.clone();
+        oids_file.push(&format!("pg{}_oids.rs", major_version));
+        write_rs_file(oids.clone(), &oids_file, quote! {}).wrap_err_with(|| {
+            format!(
+                "Unable to write oids file for pg{} to `{}`",
+                major_version,
+                oids_file.display()
+            )
+        })?;
+    }
+    Ok(())
+}
+
+#[derive(Debug, Clone)]
+struct BuildPaths {
+    /// CARGO_MANIFEST_DIR
+    manifest_dir: PathBuf,
+    /// OUT_DIR
+    out_dir: PathBuf,
+    /// {manifest_dir}/src
+    src_dir: PathBuf,
+    /// {manifest_dir}/cshim
+    shim_src: PathBuf,
+    /// {out_dir}/cshim
+    shim_dst: PathBuf,
+}
+
+impl BuildPaths {
+    fn from_env() -> Self {
+        // Cargo guarantees these are provided, so unwrap is fine.
+        let manifest_dir = std::env::var_os("CARGO_MANIFEST_DIR").map(PathBuf::from).unwrap();
+        let out_dir = std::env::var_os("OUT_DIR").map(PathBuf::from).unwrap();
+        Self {
+            src_dir: manifest_dir.join("src"),
+            shim_src: manifest_dir.join("cshim"),
+            shim_dst: out_dir.join("cshim"),
+            out_dir,
+            manifest_dir,
+        }
+    }
 }
 
 fn write_rs_file(
@@ -350,20 +382,17 @@ fn impl_pg_node(
 
         // impl the PgNode trait for all nodes
         pgnode_impls.extend(quote! {
-            impl pg_sys::PgNode for #struct_name {
-                type NodeType = #struct_name;
-            }
+            impl pg_sys::PgNode for #struct_name {}
         });
 
         // impl Rust's Display trait for all nodes
-        pgnode_impls.extend(
-            quote! {
-                impl std::fmt::Display for #struct_name {
-                    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-                        write!(f, "{}", crate::node_to_string_for_display(self.as_node_ptr() as *mut crate::Node))
-                    }
+        pgnode_impls.extend(quote! {
+            impl std::fmt::Display for #struct_name {
+                fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+                    write!(f, "{}", self.display_node() )
                 }
-            });
+            }
+        });
     }
 
     Ok(pgnode_impls)
@@ -523,13 +552,6 @@ fn run_bindgen(pg_config: &PgConfig, include_h: &PathBuf) -> eyre::Result<syn::F
         .clang_arg(&format!("-I{}", includedir_server.display()))
         .clang_args(&extra_bindgen_clang_args(pg_config)?)
         .parse_callbacks(Box::new(PgxOverrides::default()))
-        .allowlist_file(".*confdefs.h")
-        .allowlist_file(".*(?:[fF]uncs|mgr).h")
-        .allowlist_file(".*htup(?:_details)?.h")
-        .allowlist_file(".*syscache.h")
-        .allowlist_file(".*mcxt.h")
-        .allowlist_file(".*(?:storage|catalog|access|commands|executor|adt|optimizer|rewrite|postmaster|tcop|replication|nodes|postgres|parse|pg_|item|heap).*")
-        .allowlist_var("SIG.*")
         .blocklist_type("(Nullable)?Datum") // manually wrapping datum types for correctness
         .blocklist_function("varsize_any") // pgx converts the VARSIZE_ANY macro, so we don't want to also have this function, which is in heaptuple.c
         .blocklist_function("(?:query|expression)_tree_walker")
@@ -559,12 +581,7 @@ fn run_bindgen(pg_config: &PgConfig, include_h: &PathBuf) -> eyre::Result<syn::F
         .derive_partialord(false)
         .layout_tests(false)
         .generate()
-        .unwrap_or_else(|e| {
-            panic!(
-                "Unable to generate bindings for pg{}: {:?}",
-                major_version, e
-            )
-        });
+        .unwrap_or_else(|e| panic!("Unable to generate bindings for pg{}: {:?}", major_version, e));
 
     syn::parse_file(bindings.to_string().as_str()).map_err(|e| From::from(e))
 }
@@ -774,7 +791,11 @@ fn apply_pg_guard(items: &Vec<syn::Item>) -> eyre::Result<proc_macro2::TokenStre
                 for item in &block.items {
                     match item {
                         ForeignItem::Fn(func) => {
-                            out.extend(PgGuardRewriter::new().foreign_item_fn(func))
+                            // Ignore other functions -- this will often be
+                            // variadic functions that we can't safely wrap.
+                            if let Ok(tokens) = PgGuardRewriter::new().foreign_item_fn(func) {
+                                out.extend(tokens);
+                            }
                         }
                         other => out.extend(quote! { extern "C" { #other } }),
                     }

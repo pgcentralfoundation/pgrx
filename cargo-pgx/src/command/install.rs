@@ -8,6 +8,7 @@ Use of this source code is governed by the MIT license that can be found in the 
 */
 
 use crate::command::get::{find_control_file, get_property};
+use crate::profile::CargoProfile;
 use crate::CommandExecute;
 use cargo_toml::Manifest;
 use eyre::{eyre, WrapErr};
@@ -28,8 +29,11 @@ pub(crate) struct Install {
     #[clap(long, parse(from_os_str))]
     manifest_path: Option<PathBuf>,
     /// Compile for release mode (default is debug)
-    #[clap(env = "PROFILE", long, short)]
+    #[clap(long, short)]
     release: bool,
+    /// Specific profile to use (conflicts with `--release`)
+    #[clap(long)]
+    profile: Option<String>,
     /// Build in test mode (for `cargo pgx test`)
     #[clap(long)]
     test: bool,
@@ -56,9 +60,10 @@ impl CommandExecute for Install {
 
         let pg_config = match self.pg_config {
             None => PgConfig::from_path(),
-            Some(config) => PgConfig::new(PathBuf::from(config)),
+            Some(config) => PgConfig::new_with_defaults(PathBuf::from(config)),
         };
         let pg_version = format!("pg{}", pg_config.major_version()?);
+        let profile = CargoProfile::from_flags(self.release, self.profile.as_deref())?;
 
         let features =
             crate::manifest::features_for_version(self.features, &package_manifest, &pg_version);
@@ -68,7 +73,7 @@ impl CommandExecute for Install {
             self.package.as_ref(),
             package_manifest_path,
             &pg_config,
-            self.release,
+            &profile,
             self.test,
             None,
             &features,
@@ -78,7 +83,7 @@ impl CommandExecute for Install {
 
 #[tracing::instrument(skip_all, fields(
     pg_version = %pg_config.version()?,
-    release = is_release,
+    profile = ?profile,
     test = is_test,
     base_directory = tracing::field::Empty,
     features = ?features.features,
@@ -88,7 +93,7 @@ pub(crate) fn install_extension(
     user_package: Option<&String>,
     package_manifest_path: impl AsRef<Path>,
     pg_config: &PgConfig,
-    is_release: bool,
+    profile: &CargoProfile,
     is_test: bool,
     base_directory: Option<PathBuf>,
     features: &clap_cargo::Features,
@@ -110,7 +115,7 @@ pub(crate) fn install_extension(
     let versioned_so = get_property(&package_manifest_path, "module_pathname")?.is_none();
 
     let build_command_output =
-        build_extension(user_manifest_path.as_ref(), user_package, is_release, &features)?;
+        build_extension(user_manifest_path.as_ref(), user_package, &profile, &features)?;
     let build_command_bytes = build_command_output.stdout;
     let build_command_reader = BufReader::new(build_command_bytes.as_slice());
     let build_command_stream = cargo_metadata::Message::parse_stream(build_command_reader);
@@ -163,7 +168,7 @@ pub(crate) fn install_extension(
         user_package,
         &package_manifest_path,
         pg_config,
-        is_release,
+        profile,
         is_test,
         features,
         &extdir,
@@ -211,7 +216,7 @@ fn copy_file(
 pub(crate) fn build_extension(
     user_manifest_path: Option<impl AsRef<Path>>,
     user_package: Option<&String>,
-    is_release: bool,
+    profile: &CargoProfile,
     features: &clap_cargo::Features,
 ) -> eyre::Result<std::process::Output> {
     let flags = std::env::var("PGX_BUILD_FLAGS").unwrap_or_default();
@@ -228,10 +233,7 @@ pub(crate) fn build_extension(
         command.arg("--package");
         command.arg(user_package);
     }
-
-    if is_release {
-        command.arg("--release");
-    }
+    command.args(profile.cargo_args());
 
     let features_arg = features.features.join(" ");
     if !features_arg.trim().is_empty() {
@@ -287,7 +289,7 @@ fn copy_sql_files(
     user_package: Option<&String>,
     package_manifest_path: impl AsRef<Path>,
     pg_config: &PgConfig,
-    is_release: bool,
+    profile: &CargoProfile,
     is_test: bool,
     features: &clap_cargo::Features,
     extdir: &PathBuf,
@@ -302,7 +304,7 @@ fn copy_sql_files(
         user_manifest_path,
         user_package,
         &package_manifest_path,
-        is_release,
+        profile,
         is_test,
         features,
         Some(&dest),

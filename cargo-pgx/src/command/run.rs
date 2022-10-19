@@ -11,6 +11,7 @@ use crate::command::get::get_property;
 use crate::command::install::install_extension;
 use crate::command::start::start_postgres;
 use crate::command::stop::stop_postgres;
+use crate::profile::CargoProfile;
 use crate::CommandExecute;
 use cargo_toml::Manifest;
 use eyre::{eyre, WrapErr};
@@ -35,8 +36,11 @@ pub(crate) struct Run {
     #[clap(long)]
     manifest_path: Option<String>,
     /// Compile for release mode (default is debug)
-    #[clap(env = "PROFILE", long, short)]
+    #[clap(long, short)]
     release: bool,
+    /// Specific profile to use (conflicts with `--release`)
+    #[clap(long)]
+    profile: Option<String>,
     #[clap(flatten)]
     features: clap_cargo::Features,
     #[clap(from_global, parse(from_occurrences))]
@@ -93,6 +97,7 @@ impl CommandExecute for Run {
             None => get_property(&package_manifest_path, "extname")?
                 .ok_or(eyre!("could not determine extension name"))?,
         };
+        let profile = CargoProfile::from_flags(self.release, self.profile.as_deref())?;
 
         run(
             pg_config,
@@ -100,7 +105,7 @@ impl CommandExecute for Run {
             self.package.as_ref(),
             package_manifest_path,
             &dbname,
-            self.release,
+            &profile,
             self.pgcli,
             &features,
         )
@@ -110,7 +115,7 @@ impl CommandExecute for Run {
 #[tracing::instrument(level = "error", skip_all, fields(
     pg_version = %pg_config.version()?,
     dbname,
-    release = is_release,
+    profile = ?profile,
 ))]
 pub(crate) fn run(
     pg_config: &PgConfig,
@@ -118,7 +123,7 @@ pub(crate) fn run(
     user_package: Option<&String>,
     package_manifest_path: impl AsRef<Path>,
     dbname: &str,
-    is_release: bool,
+    profile: &CargoProfile,
     pgcli: bool,
     features: &clap_cargo::Features,
 ) -> eyre::Result<()> {
@@ -131,7 +136,7 @@ pub(crate) fn run(
         user_package,
         package_manifest_path,
         pg_config,
-        is_release,
+        profile,
         false,
         None,
         features,

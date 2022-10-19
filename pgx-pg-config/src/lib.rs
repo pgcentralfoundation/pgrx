@@ -52,6 +52,8 @@ impl Display for PgVersion {
 pub struct PgConfig {
     version: Option<PgVersion>,
     pg_config: Option<PathBuf>,
+    base_port: u16,
+    base_testing_port: u16,
 }
 
 impl Display for PgConfig {
@@ -68,23 +70,37 @@ impl Display for PgConfig {
 
 impl Default for PgConfig {
     fn default() -> Self {
-        PgConfig { version: None, pg_config: None }
+        PgConfig {
+            version: None,
+            pg_config: None,
+            base_port: BASE_POSTGRES_PORT_NO,
+            base_testing_port: BASE_POSTGRES_TESTING_PORT_NO,
+        }
     }
 }
 
 impl From<PgVersion> for PgConfig {
     fn from(version: PgVersion) -> Self {
-        PgConfig { version: Some(version), pg_config: None }
+        PgConfig { version: Some(version), pg_config: None, ..Default::default() }
     }
 }
 
 impl PgConfig {
-    pub fn new(pg_config: PathBuf) -> Self {
-        PgConfig { version: None, pg_config: Some(pg_config) }
+    pub fn new(pg_config: PathBuf, base_port: u16, base_testing_port: u16) -> Self {
+        PgConfig { version: None, pg_config: Some(pg_config), base_port, base_testing_port }
+    }
+
+    pub fn new_with_defaults(pg_config: PathBuf) -> Self {
+        PgConfig {
+            version: None,
+            pg_config: Some(pg_config),
+            base_port: BASE_POSTGRES_PORT_NO,
+            base_testing_port: BASE_POSTGRES_TESTING_PORT_NO,
+        }
     }
 
     pub fn from_path() -> Self {
-        PgConfig::new("pg_config".into())
+        Self::new_with_defaults("pg_config".into())
     }
 
     pub fn is_real(&self) -> bool {
@@ -164,11 +180,11 @@ impl PgConfig {
     }
 
     pub fn port(&self) -> eyre::Result<u16> {
-        Ok(BASE_POSTGRES_PORT_NO + self.major_version()?)
+        Ok(self.base_port + self.major_version()?)
     }
 
     pub fn test_port(&self) -> eyre::Result<u16> {
-        Ok(BASE_POSTGRES_TESTING_PORT_NO + self.major_version()?)
+        Ok(self.base_testing_port + self.major_version()?)
     }
 
     pub fn host(&self) -> &'static str {
@@ -262,11 +278,27 @@ impl PgConfig {
 
 pub struct Pgx {
     pg_configs: Vec<PgConfig>,
+    base_port: u16,
+    base_testing_port: u16,
+}
+
+impl Default for Pgx {
+    fn default() -> Self {
+        Self {
+            pg_configs: vec![],
+            base_port: BASE_POSTGRES_PORT_NO,
+            base_testing_port: BASE_POSTGRES_TESTING_PORT_NO,
+        }
+    }
 }
 
 #[derive(Debug, Serialize, Deserialize)]
 struct ConfigToml {
     configs: HashMap<String, PathBuf>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    base_port: Option<u16>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    base_testing_port: Option<u16>,
 }
 
 pub enum PgConfigSelector<'a> {
@@ -285,16 +317,16 @@ impl<'a> PgConfigSelector<'a> {
 }
 
 impl Pgx {
-    pub fn new() -> Self {
-        Pgx { pg_configs: vec![] }
+    pub fn new(base_port: u16, base_testing_port: u16) -> Self {
+        Pgx { pg_configs: vec![], base_port, base_testing_port }
     }
 
     pub fn from_config() -> eyre::Result<Self> {
         match std::env::var("PGX_PG_CONFIG_PATH") {
             Ok(pg_config) => {
                 // we have an environment variable that tells us the pg_config to use
-                let mut pgx = Pgx::new();
-                pgx.push(PgConfig::new(pg_config.into()));
+                let mut pgx = Pgx::default();
+                pgx.push(PgConfig::new(pg_config.into(), pgx.base_port, pgx.base_testing_port));
                 Ok(pgx)
             }
             Err(_) => {
@@ -310,10 +342,13 @@ impl Pgx {
 
                 match toml::from_str::<ConfigToml>(&std::fs::read_to_string(&path)?) {
                     Ok(configs) => {
-                        let mut pgx = Pgx::new();
+                        let mut pgx = Pgx::new(
+                            configs.base_port.unwrap_or(BASE_POSTGRES_PORT_NO),
+                            configs.base_testing_port.unwrap_or(BASE_POSTGRES_TESTING_PORT_NO),
+                        );
 
                         for (_, v) in configs.configs {
-                            pgx.push(PgConfig::new(v));
+                            pgx.push(PgConfig::new(v, pgx.base_port, pgx.base_testing_port));
                         }
                         Ok(pgx)
                     }
@@ -348,7 +383,6 @@ impl Pgx {
         }
     }
 
-    #[tracing::instrument(level = "error", skip(self))]
     pub fn get(&self, label: &str) -> eyre::Result<&PgConfig> {
         for pg_config in self.pg_configs.iter() {
             if pg_config.label()? == label {

@@ -9,6 +9,7 @@ Use of this source code is governed by the MIT license that can be found in the 
 use crate::command::get::{find_control_file, get_property};
 use crate::command::install::format_display_path;
 use crate::pgx_pg_sys_stub::PgxPgSysStub;
+use crate::profile::CargoProfile;
 use crate::CommandExecute;
 use cargo_toml::Manifest;
 use eyre::{eyre, WrapErr};
@@ -49,8 +50,11 @@ pub(crate) struct Schema {
     /// Do you want to run against Postgres `pg10`, `pg11`, `pg12`, `pg13`, `pg14`?
     pg_version: Option<String>,
     /// Compile for release mode (default is debug)
-    #[clap(env = "PROFILE", long, short)]
+    #[clap(long, short)]
     release: bool,
+    /// Specific profile to use (conflicts with `--release`)
+    #[clap(long)]
+    profile: Option<String>,
     /// The `pg_config` path (default is first in $PATH)
     #[clap(long, short = 'c', parse(from_os_str))]
     pg_config: Option<PathBuf>,
@@ -105,7 +109,7 @@ impl CommandExecute for Schema {
                 Some(pgver) => (Pgx::from_config()?.get(&pgver)?.clone(), pgver),
             },
             Some(config) => {
-                let pg_config = PgConfig::new(PathBuf::from(config));
+                let pg_config = PgConfig::new_with_defaults(PathBuf::from(config));
                 let pg_version = format!("pg{}", pg_config.major_version()?);
                 (pg_config, pg_version)
             }
@@ -114,12 +118,14 @@ impl CommandExecute for Schema {
         let features =
             crate::manifest::features_for_version(self.features, &package_manifest, &pg_version);
 
+        let profile = CargoProfile::from_flags(self.release, self.profile.as_deref())?;
+
         generate_schema(
             &pg_config,
             self.manifest_path.as_ref(),
             self.package.as_ref(),
             package_manifest_path,
-            self.release,
+            &profile,
             self.test,
             &features,
             self.out.as_ref(),
@@ -132,7 +138,7 @@ impl CommandExecute for Schema {
 
 #[tracing::instrument(level = "error", skip_all, fields(
     pg_version = %pg_config.version()?,
-    release = is_release,
+    profile = ?profile,
     test = is_test,
     path = path.as_ref().map(|path| tracing::field::display(path.as_ref().display())),
     dot,
@@ -143,7 +149,7 @@ pub(crate) fn generate_schema(
     user_manifest_path: Option<impl AsRef<Path>>,
     user_package: Option<&String>,
     package_manifest_path: impl AsRef<Path>,
-    is_release: bool,
+    profile: &CargoProfile,
     is_test: bool,
     features: &clap_cargo::Features,
     path: Option<impl AsRef<std::path::Path>>,
@@ -171,7 +177,7 @@ pub(crate) fn generate_schema(
     let flags = std::env::var("PGX_BUILD_FLAGS").unwrap_or_default();
 
     let mut target_dir_with_profile = get_target_dir()?;
-    target_dir_with_profile.push(if is_release { "release" } else { "debug" });
+    target_dir_with_profile.push(profile.target_subdir());
 
     // First, build the SQL generator so we can get a look at the symbol table
     if !skip_build {
@@ -195,9 +201,7 @@ pub(crate) fn generate_schema(
             command.arg(user_manifest_path.as_ref());
         }
 
-        if is_release {
-            command.arg("--release");
-        }
+        command.args(profile.cargo_args());
 
         if let Some(log_level) = &log_level {
             command.env("RUST_LOG", log_level);

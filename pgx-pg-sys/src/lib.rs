@@ -28,6 +28,8 @@ std::compile_error!("exactly one one feature must be provided (pg10, pg11, pg12,
 
 pub mod submodules;
 
+use core::ptr::NonNull;
+use std::ffi::CStr;
 pub use submodules::{guard, *};
 
 //
@@ -159,29 +161,38 @@ pub use internal::pg13::*;
 #[cfg(feature = "pg14")]
 pub use internal::pg14::*;
 
-/// A trait applied to all of Postgres' `pg_sys::Node` types and its subtypes
+/// A trait applied to all Postgres `pg_sys::Node` types and subtypes
 pub trait PgNode {
-    type NodeType;
+    // TODO(0.6.0): seal this trait or take this trait private?
 
-    /// Represent this node as a mutable pointer of its type
+    /// Format this node
     #[inline]
-    fn as_node_ptr(&self) -> *mut Self::NodeType {
-        self as *const _ as *mut Self::NodeType
+    fn display_node(&self) -> String {
+        // SAFETY: The trait is pub but this impl is private, and
+        // this is only implemented for things known to be "Nodes"
+        unsafe { display_node_impl(NonNull::from(self).cast()) }
     }
 }
 
 /// implementation function for `impl Display for $NodeType`
-pub(crate) fn node_to_string_for_display(node: *mut crate::Node) -> String {
+///
+/// # Safety
+/// Don't use this on anything that doesn't impl PgNode, or the type may be off
+#[warn(unsafe_op_in_unsafe_fn)]
+pub(crate) unsafe fn display_node_impl(node: NonNull<crate::Node>) -> String {
+    // SAFETY: It's fine to call nodeToString with non-null well-typed pointers,
+    // and pg_sys::nodeToString() returns data via palloc, which is never null
+    // as Postgres will ERROR rather than giving us a null pointer,
+    // and Postgres starts and finishes constructing StringInfos by writing '\0'
     unsafe {
-        // crate::nodeToString() will never return a null pointer
-        let node_to_string = crate::nodeToString(node as *mut std::ffi::c_void);
+        let node_cstr = crate::nodeToString(node.as_ptr().cast());
 
-        let result = match std::ffi::CStr::from_ptr(node_to_string).to_str() {
+        let result = match CStr::from_ptr(node_cstr).to_str() {
             Ok(cstr) => cstr.to_string(),
             Err(e) => format!("<ffi error: {:?}>", e),
         };
 
-        crate::pfree(node_to_string as *mut std::ffi::c_void);
+        crate::pfree(node_cstr.cast());
 
         result
     }

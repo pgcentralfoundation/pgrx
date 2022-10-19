@@ -15,8 +15,7 @@ to the `pgx` framework and very subject to change between versions. While you ma
 
 */
 
-use eyre::{eyre, WrapErr};
-use owo_colors::{OwoColorize, XtermColors};
+use eyre::eyre;
 use petgraph::dot::Dot;
 use petgraph::graph::NodeIndex;
 use petgraph::stable_graph::StableGraph;
@@ -283,43 +282,52 @@ impl PgxSql {
     #[instrument(level = "error", skip_all)]
     pub fn write(&self, out: &mut impl std::io::Write) -> eyre::Result<()> {
         let generated = self.to_sql()?;
-
         if atty::is(atty::Stream::Stdout) {
-            use syntect::easy::HighlightLines;
-            use syntect::highlighting::{Style, ThemeSet};
-            use syntect::parsing::SyntaxSet;
-            use syntect::util::LinesWithEndings;
-            let ps = SyntaxSet::load_defaults_newlines();
-            let theme_bytes = include_str!("../../assets/ansi.tmTheme").as_bytes();
-            let mut theme_reader = std::io::Cursor::new(theme_bytes);
-            let theme = ThemeSet::load_from_reader(&mut theme_reader)
-                .wrap_err("Couldn't parse theme for SQL highlighting, try piping to a file")?;
-
-            if let Some(syntax) = ps.find_syntax_by_extension("sql") {
-                let mut h = HighlightLines::new(syntax, &theme);
-                for line in LinesWithEndings::from(&generated) {
-                    let ranges: Vec<(Style, &str)> = h.highlight_line(line, &ps)?;
-                    // Concept from https://github.com/sharkdp/bat/blob/1b030dc03b906aa345f44b8266bffeea77d763fe/src/terminal.rs#L6
-                    for (style, content) in ranges {
-                        if style.foreground.a == 0x01 {
-                            write!(*out, "{}", content)?;
-                        } else {
-                            write!(
-                                *out,
-                                "{}",
-                                content.color(XtermColors::from(style.foreground.r))
-                            )?;
-                        }
-                    }
-                    write!(*out, "\x1b[0m")?;
-                }
-            } else {
-                write!(*out, "{}", generated)?;
-            }
+            self.write_highlighted(out, &generated)?;
         } else {
             write!(*out, "{}", generated)?;
         }
 
+        Ok(())
+    }
+
+    #[cfg(not(feature = "syntax-highlighting"))]
+    fn write_highlighted(&self, out: &mut dyn std::io::Write, generated: &str) -> eyre::Result<()> {
+        write!(*out, "{}", generated)?;
+        Ok(())
+    }
+
+    #[cfg(feature = "syntax-highlighting")]
+    fn write_highlighted(&self, out: &mut dyn std::io::Write, generated: &str) -> eyre::Result<()> {
+        use eyre::WrapErr as _;
+        use owo_colors::{OwoColorize, XtermColors};
+        use syntect::easy::HighlightLines;
+        use syntect::highlighting::{Style, ThemeSet};
+        use syntect::parsing::SyntaxSet;
+        use syntect::util::LinesWithEndings;
+        let ps = SyntaxSet::load_defaults_newlines();
+        let theme_bytes = include_str!("../../assets/ansi.tmTheme").as_bytes();
+        let mut theme_reader = std::io::Cursor::new(theme_bytes);
+        let theme = ThemeSet::load_from_reader(&mut theme_reader)
+            .wrap_err("Couldn't parse theme for SQL highlighting, try piping to a file")?;
+
+        if let Some(syntax) = ps.find_syntax_by_extension("sql") {
+            let mut h = HighlightLines::new(syntax, &theme);
+            for line in LinesWithEndings::from(&generated) {
+                let ranges: Vec<(Style, &str)> = h.highlight_line(line, &ps)?;
+                // Concept from https://github.com/sharkdp/bat/blob/1b030dc03b906aa345f44b8266bffeea77d763fe/src/terminal.rs#L6
+                for (style, content) in ranges {
+                    if style.foreground.a == 0x01 {
+                        write!(*out, "{}", content)?;
+                    } else {
+                        write!(*out, "{}", content.color(XtermColors::from(style.foreground.r)))?;
+                    }
+                }
+                write!(*out, "\x1b[0m")?;
+            }
+        } else {
+            write!(*out, "{}", generated)?;
+        }
         Ok(())
     }
 

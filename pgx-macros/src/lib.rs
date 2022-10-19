@@ -41,7 +41,12 @@ pub fn pg_guard(_attr: TokenStream, item: TokenStream) -> TokenStream {
         // process top-level functions
         // these functions get wrapped as public extern "C" functions with #[no_mangle] so they
         // can also be called from C code
-        Item::Fn(func) => rewriter.item_fn_without_rewrite(func).into(),
+        Item::Fn(func) => rewriter
+            .item_fn_without_rewrite(func)
+            .unwrap_or_else(|e| {
+                panic!("Invalid #[pg_guard] function: {e}");
+            })
+            .into(),
         _ => {
             panic!("#[pg_guard] can only be applied to extern \"C\" blocks and top-level functions")
         }
