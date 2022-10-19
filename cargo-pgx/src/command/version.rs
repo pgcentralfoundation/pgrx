@@ -1,7 +1,7 @@
 use pgx_pg_config::{PgConfig, Pgx};
 
 pub(crate) fn pgx_default(supported_major_versions: &[u16]) -> eyre::Result<Pgx> {
-    let mut pgx = Pgx::new();
+    let mut pgx = Pgx::default();
     rss::PostgreSQLVersionRss::new(supported_major_versions)?
         .into_iter()
         .for_each(|version| pgx.push(PgConfig::from(version)));

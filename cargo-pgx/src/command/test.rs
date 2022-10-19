@@ -13,6 +13,7 @@ use pgx_pg_config::{get_target_dir, PgConfig, PgConfigSelector, Pgx};
 use std::path::{Path, PathBuf};
 use std::process::{Command, Stdio};
 
+use crate::profile::CargoProfile;
 use crate::CommandExecute;
 
 /// Run the test suite for this crate
@@ -31,8 +32,11 @@ pub(crate) struct Test {
     #[clap(long, parse(from_os_str))]
     manifest_path: Option<PathBuf>,
     /// compile for release mode (default is debug)
-    #[clap(env = "PROFILE", long, short)]
+    #[clap(long, short)]
     release: bool,
+    /// Specific profile to use (conflicts with `--release`)
+    #[clap(long)]
+    profile: Option<String>,
     /// Don't regenerate the schema
     #[clap(long, short)]
     no_schema: bool,
@@ -61,6 +65,7 @@ impl CommandExecute for Test {
             None => crate::manifest::default_pg_version(&package_manifest)
                 .ok_or(eyre!("No provided `pg$VERSION` flag."))?,
         };
+        let profile = CargoProfile::from_flags(self.release, self.profile.as_deref())?;
 
         for pg_config in pgx.iter(PgConfigSelector::new(&pg_version)) {
             let mut testname = self.testname.clone();
@@ -91,7 +96,7 @@ impl CommandExecute for Test {
                 pg_config,
                 self.manifest_path.as_ref(),
                 self.package.as_ref(),
-                self.release,
+                &profile,
                 self.no_schema,
                 &features,
                 testname.clone(),
@@ -105,13 +110,13 @@ impl CommandExecute for Test {
 #[tracing::instrument(skip_all, fields(
     pg_version = %pg_config.version()?,
     testname =  tracing::field::Empty,
-    release = is_release,
+    ?profile,
 ))]
 pub fn test_extension(
     pg_config: &PgConfig,
     user_manifest_path: Option<impl AsRef<Path>>,
     user_package: Option<&String>,
-    is_release: bool,
+    profile: &CargoProfile,
     no_schema: bool,
     features: &clap_cargo::Features,
     testname: Option<impl AsRef<str>>,
@@ -137,7 +142,7 @@ pub fn test_extension(
         .env("PGX_FEATURES", features_arg.clone())
         .env("PGX_NO_DEFAULT_FEATURES", if no_default_features_arg { "true" } else { "false" })
         .env("PGX_ALL_FEATURES", if features.all_features { "true" } else { "false" })
-        .env("PGX_BUILD_PROFILE", if is_release { "release" } else { "debug" })
+        .env("PGX_BUILD_PROFILE", profile.name())
         .env("PGX_NO_SCHEMA", if no_schema { "true" } else { "false" });
 
     if let Ok(rust_log) = std::env::var("RUST_LOG") {
@@ -157,9 +162,7 @@ pub fn test_extension(
         command.arg("--all-features");
     }
 
-    if is_release {
-        command.arg("--release");
-    }
+    command.args(profile.cargo_args());
 
     if let Some(user_manifest_path) = user_manifest_path {
         command.arg("--manifest-path");

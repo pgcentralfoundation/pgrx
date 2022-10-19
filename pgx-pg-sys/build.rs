@@ -12,6 +12,7 @@ use eyre::{eyre, WrapErr};
 use pgx_pg_config::{prefix_path, PgConfig, PgConfigSelector, Pgx, SUPPORTED_MAJOR_VERSIONS};
 use pgx_utils::rewriter::PgGuardRewriter;
 use quote::{quote, ToTokens};
+use rayon::prelude::*;
 use std::collections::{HashMap, HashSet};
 use std::path::PathBuf;
 use std::process::{Command, Output};
@@ -140,24 +141,12 @@ fn main() -> eyre::Result<()> {
         let specific = pgx.get(&found)?;
         vec![specific]
     };
-    std::thread::scope(|scope| {
-        // This is pretty much either always 1 (normally) or 5 (for releases),
-        // but in the future if we ever have way more, we should consider
-        // chunking `pg_configs` based on `thread::available_parallelism()`.
-        let threads = pg_configs
-            .iter()
-            .map(|pg_config| {
-                scope.spawn(|| generate_bindings(pg_config, &build_paths, is_for_release))
-            })
-            .collect::<Vec<_>>();
-        // Most of the rest of this is just for better error handling --
-        // `thread::scope` already joins the threads for us before it returns.
-        let results = threads
-            .into_iter()
-            .map(|thread| thread.join().expect("thread panicked while generating bindings"))
-            .collect::<Vec<eyre::Result<_>>>();
-        results.into_iter().try_for_each(|r| r)
-    })?;
+
+    pg_configs
+        .par_iter()
+        .map(|pg_config| generate_bindings(pg_config, &build_paths, is_for_release))
+        .collect::<eyre::Result<Vec<_>>>()?;
+
     // compile the cshim for each binding
     for pg_config in pg_configs {
         build_shim(&build_paths.shim_src, &build_paths.shim_dst, &pg_config)?;
@@ -393,20 +382,17 @@ fn impl_pg_node(
 
         // impl the PgNode trait for all nodes
         pgnode_impls.extend(quote! {
-            impl pg_sys::PgNode for #struct_name {
-                type NodeType = #struct_name;
-            }
+            impl pg_sys::PgNode for #struct_name {}
         });
 
         // impl Rust's Display trait for all nodes
-        pgnode_impls.extend(
-            quote! {
-                impl std::fmt::Display for #struct_name {
-                    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-                        write!(f, "{}", crate::node_to_string_for_display(self.as_node_ptr() as *mut crate::Node))
-                    }
+        pgnode_impls.extend(quote! {
+            impl std::fmt::Display for #struct_name {
+                fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+                    write!(f, "{}", self.display_node() )
                 }
-            });
+            }
+        });
     }
 
     Ok(pgnode_impls)
@@ -566,13 +552,6 @@ fn run_bindgen(pg_config: &PgConfig, include_h: &PathBuf) -> eyre::Result<syn::F
         .clang_arg(&format!("-I{}", includedir_server.display()))
         .clang_args(&extra_bindgen_clang_args(pg_config)?)
         .parse_callbacks(Box::new(PgxOverrides::default()))
-        .allowlist_file(".*confdefs.h")
-        .allowlist_file(".*(?:[fF]uncs|mgr).h")
-        .allowlist_file(".*htup(?:_details)?.h")
-        .allowlist_file(".*syscache.h")
-        .allowlist_file(".*mcxt.h")
-        .allowlist_file(".*(?:storage|catalog|access|commands|executor|adt|optimizer|rewrite|postmaster|tcop|replication|nodes|postgres|parse|pg_|item|heap).*")
-        .allowlist_var("SIG.*")
         .blocklist_type("(Nullable)?Datum") // manually wrapping datum types for correctness
         .blocklist_function("varsize_any") // pgx converts the VARSIZE_ANY macro, so we don't want to also have this function, which is in heaptuple.c
         .blocklist_function("(?:query|expression)_tree_walker")
@@ -602,12 +581,7 @@ fn run_bindgen(pg_config: &PgConfig, include_h: &PathBuf) -> eyre::Result<syn::F
         .derive_partialord(false)
         .layout_tests(false)
         .generate()
-        .unwrap_or_else(|e| {
-            panic!(
-                "Unable to generate bindings for pg{}: {:?}",
-                major_version, e
-            )
-        });
+        .unwrap_or_else(|e| panic!("Unable to generate bindings for pg{}: {:?}", major_version, e));
 
     syn::parse_file(bindings.to_string().as_str()).map_err(|e| From::from(e))
 }
@@ -817,7 +791,11 @@ fn apply_pg_guard(items: &Vec<syn::Item>) -> eyre::Result<proc_macro2::TokenStre
                 for item in &block.items {
                     match item {
                         ForeignItem::Fn(func) => {
-                            out.extend(PgGuardRewriter::new().foreign_item_fn(func))
+                            // Ignore other functions -- this will often be
+                            // variadic functions that we can't safely wrap.
+                            if let Ok(tokens) = PgGuardRewriter::new().foreign_item_fn(func) {
+                                out.extend(tokens);
+                            }
                         }
                         other => out.extend(quote! { extern "C" { #other } }),
                     }
