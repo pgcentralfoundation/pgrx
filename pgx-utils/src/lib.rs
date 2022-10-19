@@ -7,8 +7,8 @@ All rights reserved.
 Use of this source code is governed by the MIT license that can be found in the LICENSE file.
 */
 
-use crate::sql_entity_graph::PositioningRef;
-use proc_macro2::{TokenStream, TokenTree};
+use crate::sql_entity_graph::{NameMacro, PositioningRef};
+use proc_macro2::{Ident, TokenStream, TokenTree};
 use quote::{format_ident, quote, ToTokens, TokenStreamExt};
 use std::collections::HashSet;
 use syn::{GenericArgument, PathArguments, Type, TypeParamBound};
@@ -408,6 +408,22 @@ pub fn staticize_lifetimes(value: &mut syn::Type) {
             }
         }
 
+        syn::Type::Macro(type_macro) => {
+            let mac = &type_macro.mac;
+            let archetype = mac.path.segments.last().unwrap();
+            match archetype.ident.to_string().as_str() {
+                "name" => {
+                    let mut out: NameMacro = mac.parse_body().expect("name!() in wrong format");
+                    staticize_lifetimes(&mut out.used_ty.resolved_ty);
+
+                    // rewrite the name!() macro so that it has a static lifetime, if any
+                    let ident = syn::parse_str::<Ident>(&out.ident).unwrap();
+                    let ty = out.used_ty.resolved_ty;
+                    type_macro.mac = syn::parse_quote! {name!(#ident, #ty)};
+                }
+                _ => {}
+            }
+        }
         _ => {}
     }
 }
