@@ -13,7 +13,7 @@
 
 `pgx` is a framework for developing PostgreSQL extensions in Rust and strives to be as idiomatic and safe as possible.
 
-`pgx` supports Postgres v10-v14.
+`pgx` supports Postgres v10-v15.
 
 **Feel free to join our [Discord Server](https://discord.gg/hPb93Y9).**
 
@@ -27,7 +27,7 @@
    + `cargo pgx package`: Create installation packages for your extension
    + More in the [`README.md`](./cargo-pgx/README.md)!
 - **Target Multiple Postgres Versions**
-   + Support Postgres v10-v14 from the same codebase
+   + Support Postgres v10-v15 from the same codebase
    + Use Rust feature gating to use version-specific APIs
    + Seamlessly test against all versions
 - **Automatic Schema Generation**
@@ -102,7 +102,7 @@ cargo install --locked cargo-pgx
 cargo pgx init
 ```
 
-The `init` command downloads PostgreSQL versions v10 through v14 compiles them to `~/.pgx/`, and runs `initdb`. It's also possible to use an existing (user-writable) PostgreSQL install, or install a subset of versions, see the [`README.md` of `cargo-pgx` for details](cargo-pgx/README.md#first-time-initialization).
+The `init` command downloads PostgreSQL versions v10 through v15 compiles them to `~/.pgx/`, and runs `initdb`. It's also possible to use an existing (user-writable) PostgreSQL install, or install a subset of versions, see the [`README.md` of `cargo-pgx` for details](cargo-pgx/README.md#first-time-initialization).
 
 ```bash
 cargo pgx new my_extension

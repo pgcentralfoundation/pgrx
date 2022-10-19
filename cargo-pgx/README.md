@@ -20,7 +20,7 @@ As new versions of `pgx` are released, you'll want to make sure you run this com
 
 ```shell script
 $ cargo pgx --help
-cargo-pgx 0.4.2
+cargo-pgx 0.5.0
 ZomboDB, LLC <zombodb@gmail.com>
 Cargo subcommand for 'pgx' to make Postgres extension development easy
 
@@ -126,8 +126,7 @@ Once complete, `cargo pgx init` also creates a configuration file (`~/.pgx/confi
 If a new minor Postgres version is released in the future you can simply run `cargo pgx init [args]` again, and your local version will be updated, preserving all existing databases and configuration.
 
 ```shell script
-$ cargo pgx init --help
-cargo-pgx-init 0.4.2
+cargo-pgx-init 0.5.0
 ZomboDB, LLC <zombodb@gmail.com>
 Initialize pgx development environment for the first time
 
@@ -151,6 +150,8 @@ OPTIONS:
                          have pgx download/compile/install it [env: PG13_PG_CONFIG=]
         --pg14 <PG14>    If installed locally, the path to PG14's `pgconfig` tool, or `download` to
                          have pgx download/compile/install it [env: PG14_PG_CONFIG=]
+        --pg15 <PG15>    If installed locally, the path to PG14's `pgconfig` tool, or `download` to
+                         have pgx download/compile/install it [env: PG15_PG_CONFIG=]
     -v, --verbose        Enable info logs, -vv for debug, -vvv for trace
     -V, --version        Print version information
 ```
@@ -175,7 +176,7 @@ If you'd like to create a "background worker" instead, specify the `--bgworker` 
 
 ```shell script
 $ cargo pgx new --help
-cargo-pgx-new 0.4.2
+cargo-pgx-new 0.5.0
 ZomboDB, LLC <zombodb@gmail.com>
 Create a new extension crate
 
@@ -291,7 +292,7 @@ For Postgres installations which are already on your computer, `cargo pgx run` w
 
 ```shell script
 $ cargo pgx run --help
-cargo-pgx-run 0.4.2
+cargo-pgx-run 0.5.0
 ZomboDB, LLC <zombodb@gmail.com>
 Compile/install extension to a pgx-managed Postgres instance and start psql
 
@@ -299,8 +300,8 @@ USAGE:
     cargo pgx run [OPTIONS] [ARGS]
 
 ARGS:
-    <PG_VERSION>    Do you want to run against Postgres `pg10`, `pg11`, `pg12`, `pg13`, `pg14`?
-                    [env: PG_VERSION=]
+    <PG_VERSION>    Do you want to run against Postgres `pg10`, `pg11`, `pg12`, `pg13`, `pg14`,
+                    `pg15`? [env: PG_VERSION=]
     <DBNAME>        The database to connect to (and create if the first time).  Defaults to a
                     database with the same name as the current extension name
 
@@ -366,8 +367,7 @@ If the specified database doesn't exist, `cargo pgx connect` will create it. Sim
 the specified version of Postgres isn't running, it'll be automatically started.
 
 ```shell script
-$ cargo pgx connect --help
-cargo-pgx-connect 0.4.2
+cargo-pgx-connect 0.5.
 ZomboDB, LLC <zombodb@gmail.com>
 Connect, via psql, to a Postgres instance
 
@@ -375,8 +375,8 @@ USAGE:
     cargo pgx connect [OPTIONS] [ARGS]
 
 ARGS:
-    <PG_VERSION>    Do you want to run against Postgres `pg10`, `pg11`, `pg12`, `pg13`, `pg14`?
-                    [env: PG_VERSION=]
+    <PG_VERSION>    Do you want to run against Postgres `pg10`, `pg11`, `pg12`, `pg13`, `pg14`,
+                    `pg15`? [env: PG_VERSION=]
     <DBNAME>        The database to connect to (and create if the first time).  Defaults to a
                     database with the same name as the current extension name [env: DBNAME=]
 
@@ -428,7 +428,7 @@ By default, `cargo pgx install` builds your extension in debug mode. Specifying 
 
 ```shell script
 $ cargo pgx install --help
-cargo-pgx-install 0.4.2
+cargo-pgx-install 0.5.0
 ZomboDB, LLC <zombodb@gmail.com>
 Install the extension from the current crate to the Postgres specified by whatever `pg_config` is
 currently on your $PATH
@@ -504,7 +504,7 @@ test result: ok. 2 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; fini
 Stopping Postgres
 ```
 
-`cargo pgx test [pg10 | pg11 | pg12 | pg13]` runs your `#[test]` and `#[pg_test]` annotated functions using cargo's test system.
+`cargo pgx test [pg10 | pg11 | pg12 | pg13 | pg14 | pg15]` runs your `#[test]` and `#[pg_test]` annotated functions using cargo's test system.
 
 During the testing process, `pgx` starts a tempory instance of Postgres with its `PGDATA` directory in `./target/pgx-test-data-PGVER/`. This Postgres instance is stopped as soon as the test framework has finished.
 
@@ -516,8 +516,7 @@ Additionally, a `#[pg_test]` function runs in a transaction that is aborted when
 make to the database are not preserved.
 
 ```shell script
-$ cargo pgx test --help
-cargo-pgx-test 0.4.2
+cargo-pgx-test 0.5.0
 ZomboDB, LLC <zombodb@gmail.com>
 Run the test suite for this crate
 
@@ -526,7 +525,7 @@ USAGE:
 
 ARGS:
     <PG_VERSION>    Do you want to run against Postgres `pg10`, `pg11`, `pg12`, `pg13`, `pg14`,
-                    or `all`? [env: PG_VERSION=]
+                    `pg15`, or `all`? [env: PG_VERSION=]
     <TESTNAME>      If specified, only run tests containing this string in their names
 
 OPTIONS:
@@ -600,7 +599,7 @@ distobutions or MacOS Postgres installations.
 
 ```shell script
 $ cargo pgx package --help
-cargo-pgx-package 0.4.2
+cargo-pgx-package 0.5.0
 ZomboDB, LLC <zombodb@gmail.com>
 Create an installation package directory
 
@@ -630,8 +629,8 @@ OPTIONS:
             Do not activate the `default` feature
 
         --out-dir <OUT_DIR>
-            The directory to output the package (default is `./target/[debug|release]/extname-
-            pgXX/`)
+            The directory to output the package (default is
+            `./target/[debug|release]/extname-pgXX/`)
 
     -p, --package <PACKAGE>
             Package to build (see `cargo help pkgid`)
@@ -656,7 +655,7 @@ If you just want to look at the full extension schema that pgx will generate, us
 
 ```shell script
 $ cargo pgx schema --help
-cargo-pgx-schema 0.4.2
+cargo-pgx-schema 0.5.0
 ZomboDB, LLC <zombodb@gmail.com>
 Generate extension schema files
 
@@ -664,7 +663,8 @@ USAGE:
     cargo pgx schema [OPTIONS] [PG_VERSION]
 
 ARGS:
-    <PG_VERSION>    Do you want to run against Postgres `pg10`, `pg11`, `pg12`, `pg13`, `pg14`?
+    <PG_VERSION>    Do you want to run against Postgres `pg10`, `pg11`, `pg12`, `pg13`, `pg14`,
+                    `pg15`?
 
 OPTIONS:
         --all-features
