@@ -11,7 +11,8 @@ docker build \
 
 echo "Running PGX test suite using Postgres version $PG_MAJOR_VER in container $DOCKERFILE_ID"
 
-docker run pgx
+docker run pgx cargo test --no-default-features --features pg$PG_MAJOR_VER
+
 # docker run \
 #   --rm \
 #   --volume "$(pwd)":/checkout:rw \
