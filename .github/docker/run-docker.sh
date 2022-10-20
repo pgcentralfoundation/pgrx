@@ -9,12 +9,15 @@ docker build -t pgx -f ".github/docker/Dockerfile.$DOCKERFILE_ID" .
 
 echo "Running PGX test suite using Postgres version $PG_VER in container $DOCKERFILE_ID"
 
-docker run \
-  --rm \
-  --volume "$(pwd)":/checkout:rw \
-  --workdir /checkout \
-  --privileged \
-  pgx
+docker run pgx
+# docker run \
+#   --rm \
+#   --volume "$(pwd)":/checkout:rw \
+#   --workdir /checkout \
+#   --privileged \
+#   pgx
+
+
 #   target=$(echo "${1}" | sed 's/-emulated//')
 #     echo "Building docker container for TARGET=${1}"
 #     docker build -t stdarch -f "ci/docker/${1}/Dockerfile" ci/
