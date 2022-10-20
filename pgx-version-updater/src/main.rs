@@ -403,9 +403,5 @@ fn extract_package_name<P: AsRef<Path>>(filepath: P) -> Option<String> {
         format!("File at location {} is an invalid Cargo.toml file", &filepath.display()).as_str(),
     );
 
-    if let Some(table) = doc.get("package").and_then(|i| i.as_table()) {
-        table.get("name").and_then(|i| i.as_str().and_then(|i| Some(i.to_string())))
-    } else {
-        None
-    }
+    doc.get("package")?.as_table()?.get("name")?.as_str().map(|s| s.to_string())
 }
