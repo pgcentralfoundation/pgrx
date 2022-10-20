@@ -106,9 +106,7 @@ impl PgGuardRewriter {
         Ok(quote! {
             pub unsafe fn #func_name ( #arg_list_with_types ) #return_type {
                 crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
-                    extern "C" {
-                        fn #func_name( #arg_list_with_types ) #return_type ;
-                    }
+                    extern "C" { #func }
                     #func_name(#arg_list)
                 })
             }
