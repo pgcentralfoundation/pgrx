@@ -2,6 +2,7 @@ FROM fedora:36
 
 RUN adduser -G wheel rust
 WORKDIR /checkout
+RUN chown -R rust:rust /checkout
 COPY --chown=rust:rust . /checkout
 
 # RUN chmod a+rw /checkout && \
