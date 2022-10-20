@@ -19,22 +19,38 @@ env:
 
 jobs:
   pgx_tests:
-    name: Test fedora build
-    runs-on: ubuntu-latest
-    container: fedora:36
+    name: Test conatiner builds
+    strategy:
+      matrix:
+        pg_version: [14]
+        container: ["fedora:36"]
     steps:
-      - run: cat /etc/os-release
-      - run: dnf install -y https://download.postgresql.org/pub/repos/yum/reporpms/F-36-x86_64/pgdg-fedora-repo-latest.noarch.rpm
-      - run: |
-          dnf install -y \
-            postgresql14-server \
-            postgresql14-devel \
-            openssl \
-            openssl-devel \
-            redhat-rpm-config
+      - uses: actions/checkout@v2
 
-      - run: chmod a+rwx `/usr/pgsql-14/bin/pg_config --pkglibdir` `/usr/pgsql-14/bin/pg_config --sharedir`/extension /var/run/postgresql/
-      - run: adduser -G wheel rust
+      - name: Run PGX tests for Postgres ${{ matrix.pg_version}} using container ${{ matrix.container }}
+        shell: bash
+        run: ./.github/docker/run-docker.sh ${{ matrix.pg_version }} ${{ matrix.container }}
+
+
+
+  #   name: Test fedora build
+  #   runs-on: ubuntu-latest
+  #   container: fedora:36
+  #   steps:
+  #     - run: cat /etc/os-release
+  #     - run: dnf install -y https://download.postgresql.org/pub/repos/yum/reporpms/F-36-x86_64/pgdg-fedora-repo-latest.noarch.rpm
+  #     - run: |
+  #         dnf install -y \
+  #           postgresql14-server \
+  #           postgresql14-devel \
+  #           openssl \
+  #           openssl-devel \
+  #           redhat-rpm-config
+
+  #     - run: chmod a+rwx `/usr/pgsql-14/bin/pg_config --pkglibdir` `/usr/pgsql-14/bin/pg_config --sharedir`/extension /var/run/postgresql/
+  #     - run: adduser -G wheel rust
+
+
 
   #   name: pgx-tests & examples
   #   runs-on: ${{ matrix.os }}

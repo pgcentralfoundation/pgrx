@@ -1,0 +1,32 @@
+FROM fedora:36
+
+# RUN dnf install -y https://download.postgresql.org/pub/repos/yum/reporpms/F-36-x86_64/pgdg-fedora-repo-latest.noarch.rpm
+# RUN dnf install -y \
+#   openssl \
+#   openssl-devel \
+#   postgresql14-server \
+#   postgresql14-devel \
+#   redhat-rpm-config \
+#   util-linux
+
+# RUN chmod a+rwx `/usr/pgsql-14/bin/pg_config --pkglibdir` `/usr/pgsql-14/bin/pg_config --sharedir`/extension /var/run/postgresql/
+# RUN adduser -G wheel rust
+
+
+# RUN su rust -l -- -c curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y
+# RUN su rust -l -- -c cargo --version
+
+CMD ["ls -lath"]
+
+
+# USER rust
+# ENV PATH="/home/rust/.cargo/bin:${PATH}"
+
+# RUN cargo install cargo-pgx
+# RUN cargo pgx init --pg14=/usr/pgsql-14/bin/pg_config
+
+# WORKDIR /app
+# COPY . /app
+
+# ENV USER=rust
+# CMD ["cargo", "test", "--no-default-features", "--features", "pg14"]
