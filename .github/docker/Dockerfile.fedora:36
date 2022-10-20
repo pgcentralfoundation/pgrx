@@ -15,6 +15,7 @@ COPY --chown=rust:rust . /checkout
 
 RUN dnf install -y https://download.postgresql.org/pub/repos/yum/reporpms/F-36-x86_64/pgdg-fedora-repo-latest.noarch.rpm
 RUN dnf install -y \
+  cmake \
   openssl \
   openssl-devel \
   postgresql$PG_MAJOR_VER-server \
