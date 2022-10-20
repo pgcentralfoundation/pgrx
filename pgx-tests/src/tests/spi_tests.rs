@@ -210,4 +210,9 @@ mod tests {
             assert_eq!(0, res.columns());
         });
     }
+
+    fn test_connect_return_anything() {
+        struct T;
+        assert!(matches!(Spi::connect(|_| Ok(Some(T))).unwrap(), T));
+    }
 }
