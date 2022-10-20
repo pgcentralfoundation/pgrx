@@ -192,7 +192,7 @@ fn main() {
 
         // Process dependencies in each file. Generally dependencies can be found in
         // [dependencies], [dependencies.foo], [build-dependencies], [dev-dependencies]
-        for updatable_table_name in vec!["dependencies", "build-dependencies", "dev-dependencies"] {
+        for updatable_table_name in ["dependencies", "build-dependencies", "dev-dependencies"] {
             if let Some(updatable_table) =
                 doc.get_mut(updatable_table_name).and_then(|i| i.as_table_mut())
             {
