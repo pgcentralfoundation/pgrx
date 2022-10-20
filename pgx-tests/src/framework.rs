@@ -618,11 +618,11 @@ fn get_pgdata_path() -> eyre::Result<PathBuf> {
     Ok(target_dir)
 }
 
-fn get_pg_dbname() -> &'static str {
+pub(crate) fn get_pg_dbname() -> &'static str {
     "pgx_tests"
 }
 
-fn get_pg_user() -> String {
+pub(crate) fn get_pg_user() -> String {
     std::env::var("USER")
         .unwrap_or_else(|_| panic!("USER environment var is unset or invalid UTF-8"))
 }
