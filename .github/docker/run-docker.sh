@@ -12,7 +12,6 @@ echo "Running PGX test suite using Postgres version $PG_VER in container $DOCKER
 docker run \
   --rm \
   --volume "$(pwd)":/checkout:rw \
-  --init \
   --workdir /checkout \
   --privileged \
   pgx
