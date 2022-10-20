@@ -23,14 +23,19 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        pg_version: [14]
+        pg_version: ["pg10", "pg11", "pg12", "pg13", "pg14"]
         container: ["fedora:36"]
     steps:
       - uses: actions/checkout@v2
 
-      - name: Run PGX tests for Postgres ${{ matrix.pg_version}} using container ${{ matrix.container }}
+      - name: Set up environment variables
+        run: |
+          export PG_MAJOR_VER=$(echo ${{ matrix.pg_version}} | cut -c3-)
+          echo "PG_MAJOR_VER=$PG_MAJOR_VER" >> $GITHUB_ENV
+
+      - name: Run PGX tests for Postgres ${{ matrix.pg_version }} using container ${{ matrix.container }}
         shell: bash
-        run: ./.github/docker/run-docker.sh ${{ matrix.pg_version }} ${{ matrix.container }}
+        run: ./.github/docker/run-docker.sh $PG_MAJOR_VER ${{ matrix.container }}
 
 
 
