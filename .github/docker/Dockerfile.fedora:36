@@ -20,8 +20,10 @@ RUN chmod a+rw /checkout && \
 
 USER rust
 ENV PATH="/home/rust/.cargo/bin:${PATH}"
-RUN curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y
-RUN whoami && cargo --version
+# RUN curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y
+# RUN whoami && cargo --version
+
+RUN ls -lath /checkout
 
 CMD ["ls", "-lath"]
 
