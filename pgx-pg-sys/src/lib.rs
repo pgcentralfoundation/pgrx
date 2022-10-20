@@ -250,6 +250,10 @@ mod all_versions {
         pub fn pgx_list_nth_oid(list: *mut super::List, nth: i32) -> super::Oid;
         pub fn pgx_list_nth_cell(list: *mut super::List, nth: i32) -> *mut super::ListCell;
         pub fn pgx_GETSTRUCT(tuple: pg_sys::HeapTuple) -> *mut std::os::raw::c_char;
+        pub fn pgx_SpinLockInit(lock: *mut pg_sys::slock_t);
+        pub fn pgx_SpinLockAcquire(lock: *mut pg_sys::slock_t);
+        pub fn pgx_SpinLockRelease(lock: *mut pg_sys::slock_t);
+        pub fn pgx_SpinLockFree(lock: *mut pg_sys::slock_t) -> bool;
     }
 
     #[inline]
