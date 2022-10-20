@@ -43,5 +43,6 @@ mod uuid_tests;
 mod variadic_tests;
 mod xact_callback_tests;
 mod xid64_tests;
+mod zero_datum_edge_cases;
 
 pgx::pg_magic_func!();

@@ -133,7 +133,7 @@ impl FromDatum for pg_sys::Datum {
         is_null: bool,
         _: pg_sys::Oid,
     ) -> Option<pg_sys::Datum> {
-        if is_null || datum.is_null() {
+        if is_null {
             None
         } else {
             Some(datum)
