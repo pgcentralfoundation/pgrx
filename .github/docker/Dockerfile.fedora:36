@@ -2,6 +2,7 @@ FROM fedora:36
 
 ARG PG_MAJOR_VER
 
+RUN echo ">>>>>>>>>>>>>>>>>>>>>>>> $PG_MAJOR_VER"
 RUN adduser -G wheel rust
 WORKDIR /checkout
 RUN chown -R rust:rust /checkout
