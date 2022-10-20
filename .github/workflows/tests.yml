@@ -24,6 +24,17 @@ jobs:
     container: fedora:36
     steps:
       - run: cat /etc/os-release
+      - run: dnf install -y https://download.postgresql.org/pub/repos/yum/reporpms/F-36-x86_64/pgdg-fedora-repo-latest.noarch.rpm
+      - run: |
+        dnf install -y \
+          postgresql14-server \
+          postgresql14-devel \
+          openssl \
+          openssl-devel \
+          redhat-rpm-config
+
+      - run: chmod a+rwx `/usr/pgsql-14/bin/pg_config --pkglibdir` `/usr/pgsql-14/bin/pg_config --sharedir`/extension /var/run/postgresql/
+      - run: adduser -G wheel rust
 
   #   name: pgx-tests & examples
   #   runs-on: ${{ matrix.os }}
