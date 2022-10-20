@@ -25,7 +25,8 @@ ENV PATH="/home/rust/.cargo/bin:${PATH}"
 
 RUN ls -lath /checkout
 
-CMD ["ls", "-lath"]
+# CMD ["ls", "-lath"]
+CMD ["pwd", "&&", "ls", "-lath"]
 
 
 # RUN su rust -l -- -c curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y
