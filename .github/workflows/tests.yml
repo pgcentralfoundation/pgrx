@@ -19,7 +19,7 @@ env:
 
 jobs:
   pgx_tests:
-    name: Test conatiner builds
+    name: Test container builds
     runs-on: ubuntu-latest
     strategy:
       matrix:
@@ -35,7 +35,7 @@ jobs:
 
       - name: Run PGX tests for Postgres ${{ matrix.pg_version }} using container ${{ matrix.container }}
         shell: bash
-        run: ./.github/docker/run-docker.sh $PG_MAJOR_VER ${{ matrix.container }}
+        run: ./.github/docker/run-docker.sh "$PG_MAJOR_VER" ${{ matrix.container }}
 
 
 
