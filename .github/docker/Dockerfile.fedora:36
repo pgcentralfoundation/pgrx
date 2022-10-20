@@ -1,7 +1,7 @@
 FROM fedora:36
 
 ARG PG_MAJOR_VER
-ENV PG_MAJOR_VER=${PG_MAJOR_VER}}
+ENV PG_MAJOR_VER=${PG_MAJOR_VER}
 
 RUN echo ">>>>>>>>>>>>>>>>>>>>>>>> $PG_MAJOR_VER"
 RUN adduser -G wheel rust
@@ -17,13 +17,13 @@ RUN dnf install -y https://download.postgresql.org/pub/repos/yum/reporpms/F-36-x
 RUN dnf install -y \
   openssl \
   openssl-devel \
-  postgresql${PG_MAJOR_VER}-server \
-  postgresql${PG_MAJOR_VER}-devel \
+  postgresql$PG_MAJOR_VER-server \
+  postgresql$PG_MAJOR_VER-devel \
   redhat-rpm-config \
   util-linux
 
-RUN chmod a+rwx `/usr/pgsql-${PG_MAJOR_VER}/bin/pg_config --pkglibdir` \
-  `/usr/pgsql-${PG_MAJOR_VER}/bin/pg_config --sharedir`/extension \
+RUN chmod a+rwx `/usr/pgsql-$PG_MAJOR_VER/bin/pg_config --pkglibdir` \
+  `/usr/pgsql-$PG_MAJOR_VER/bin/pg_config --sharedir`/extension \
   /var/run/postgresql/
 
 USER rust
@@ -42,7 +42,7 @@ RUN curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y
 # ENV PATH="/home/rust/.cargo/bin:${PATH}"
 
 RUN cargo install cargo-pgx
-RUN cargo pgx init --pg${PG_MAJOR_VER}=/usr/pgsql-${PG_MAJOR_VER}/bin/pg_config
+RUN cargo pgx init --pg$PG_MAJOR_VER=/usr/pgsql-$PG_MAJOR_VER/bin/pg_config
 
 # WORKDIR /app
 # COPY . /app
