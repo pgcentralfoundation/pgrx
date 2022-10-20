@@ -16,7 +16,7 @@ FROM fedora:36
 # RUN su rust -l -- -c curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y
 # RUN su rust -l -- -c cargo --version
 
-CMD ["ls -lath"]
+CMD ["ls", "-lath"]
 
 
 # USER rust
