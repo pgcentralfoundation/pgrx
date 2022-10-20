@@ -20,6 +20,7 @@ env:
 jobs:
   pgx_tests:
     name: Test conatiner builds
+    runs-on: ubuntu-latest
     strategy:
       matrix:
         pg_version: [14]
