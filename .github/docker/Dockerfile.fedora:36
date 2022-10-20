@@ -3,7 +3,7 @@ FROM fedora:36
 ARG PG_MAJOR_VER
 ENV PG_MAJOR_VER=${PG_MAJOR_VER}
 
-RUN echo ">>>>>>>>>>>>>>>>>>>>>>>> $PG_MAJOR_VER"
+# RUN echo ">>>>>>>>>>>>>>>>>>>>>>>> $PG_MAJOR_VER"
 RUN adduser -G wheel rust
 WORKDIR /checkout
 RUN chown -R rust:rust /checkout
@@ -15,6 +15,7 @@ COPY --chown=rust:rust . /checkout
 
 RUN dnf install -y https://download.postgresql.org/pub/repos/yum/reporpms/F-36-x86_64/pgdg-fedora-repo-latest.noarch.rpm
 RUN dnf install -y \
+  clang-tools-extra \
   cmake \
   make \
   gcc \
