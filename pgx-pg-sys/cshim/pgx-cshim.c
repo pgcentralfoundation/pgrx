@@ -26,6 +26,7 @@ Use of this source code is governed by the MIT license that can be found in the 
 #include "utils/memutils.h"
 #include "utils/builtins.h"
 #include "utils/array.h"
+#include "storage/spin.h"
 
 
 PGDLLEXPORT MemoryContext pgx_GetMemoryContextChunk(void *ptr);
@@ -140,4 +141,24 @@ bool pgx_ARR_HASNULL(ArrayType *arr) {
 PGDLLEXPORT int *pgx_ARR_DIMS(ArrayType *arr);
 int *pgx_ARR_DIMS(ArrayType *arr){
     return ARR_DIMS(arr);
+}
+
+PGDLLEXPORT void pgx_SpinLockInit(volatile slock_t *lock);
+void pgx_SpinLockInit(volatile slock_t *lock) {
+    SpinLockInit(lock);
+}
+
+PGDLLEXPORT void pgx_SpinLockAcquire(volatile slock_t *lock);
+void pgx_SpinLockAcquire(volatile slock_t *lock) {
+    SpinLockAcquire(lock);
+}
+
+PGDLLEXPORT void pgx_SpinLockRelease(volatile slock_t *lock);
+void pgx_SpinLockRelease(volatile slock_t *lock) {
+    SpinLockRelease(lock);
+}
+
+PGDLLEXPORT bool pgx_SpinLockFree(slock_t *lock);
+bool pgx_SpinLockFree(slock_t *lock) {
+    return SpinLockFree(lock);
 }
