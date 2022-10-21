@@ -24,7 +24,7 @@ jobs:
     strategy:
       matrix:
         pg_version: ["pg10", "pg11", "pg12", "pg13", "pg14"]
-        container: ["fedora:36"]
+        container: ["fedora:36", "debian:bullseye"]
     steps:
       - uses: actions/checkout@v2
 
