@@ -272,7 +272,7 @@ dependencies = [
 
 [[package]]
 name = "cargo-pgx"
-version = "0.5.5"
+version = "0.5.6"
 dependencies = [
  "atty",
  "cargo_metadata",
@@ -1372,7 +1372,7 @@ dependencies = [
 
 [[package]]
 name = "pgx"
-version = "0.5.5"
+version = "0.5.6"
 dependencies = [
  "atomic-traits",
  "bitflags",
@@ -1400,7 +1400,7 @@ dependencies = [
 
 [[package]]
 name = "pgx-macros"
-version = "0.5.5"
+version = "0.5.6"
 dependencies = [
  "pgx-utils",
  "proc-macro2",
@@ -1412,7 +1412,7 @@ dependencies = [
 
 [[package]]
 name = "pgx-pg-config"
-version = "0.5.5"
+version = "0.5.6"
 dependencies = [
  "dirs",
  "eyre",
@@ -1426,7 +1426,7 @@ dependencies = [
 
 [[package]]
 name = "pgx-pg-sys"
-version = "0.5.5"
+version = "0.5.6"
 dependencies = [
  "bindgen",
  "eyre",
@@ -1445,7 +1445,7 @@ dependencies = [
 
 [[package]]
 name = "pgx-tests"
-version = "0.5.5"
+version = "0.5.6"
 dependencies = [
  "eyre",
  "libc",
@@ -1466,7 +1466,7 @@ dependencies = [
 
 [[package]]
 name = "pgx-utils"
-version = "0.5.5"
+version = "0.5.6"
 dependencies = [
  "atty",
  "convert_case",
@@ -1983,9 +1983,9 @@ checksum = "0772c5c30e1a0d91f6834f8e545c69281c099dfa9a3ac58d96a9fd629c8d4898"
 
 [[package]]
 name = "serde"
-version = "1.0.146"
+version = "1.0.147"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "6df50b7a60a0ad48e1b42eb38373eac8ff785d619fb14db917b4e63d5439361f"
+checksum = "d193d69bae983fc11a79df82342761dfbf28a99fc8d203dca4c3c1b590948965"
 dependencies = [
  "serde_derive",
 ]
@@ -2014,9 +2014,9 @@ dependencies = [
 
 [[package]]
 name = "serde_derive"
-version = "1.0.146"
+version = "1.0.147"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "a714fd32ba1d66047ce7d53dabd809e9922d538f9047de13cc4cffca47b36205"
+checksum = "4f1d362ca8fc9c3e3a7484440752472d68a6caa98f1ab81d99b5dfe517cec852"
 dependencies = [
  "proc-macro2",
  "quote",
