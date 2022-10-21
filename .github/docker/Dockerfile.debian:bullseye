@@ -1,0 +1,44 @@
+FROM debian:bullseye
+
+ARG PG_MAJOR_VER
+ENV PG_MAJOR_VER=${PG_MAJOR_VER}
+
+RUN useradd --create-home --shell /bin/bash rust
+WORKDIR /checkout
+RUN chown -R rust:rust /checkout
+COPY --chown=rust:rust . /checkout
+
+ARG DEBIAN_FRONTEND=noninteractive
+
+RUN apt-get update
+RUN apt-get install -y wget gnupg
+RUN echo "deb http://apt.postgresql.org/pub/repos/apt/ bullseye-pgdg main" >> /etc/apt/sources.list.d/pgdg.list
+RUN wget --quiet -O - https://www.postgresql.org/media/keys/ACCC4CF8.asc | apt-key add -
+RUN apt-get update -y --fix-missing
+RUN apt-get install -y \
+  build-essential \
+  curl \
+  clang \
+  git \
+  gcc \
+  libssl-dev \
+  libz-dev \
+  make \
+  pkg-config \
+  postgresql-$PG_MAJOR_VER \
+  postgresql-server-dev-$PG_MAJOR_VER \
+  zlib1g-dev \
+  && rm -rf /var/lib/apt/lists/*
+
+RUN chmod a+rwx `$(which pg_config) --pkglibdir` \
+  `$(which pg_config) --sharedir`/extension \
+  /var/run/postgresql/
+
+USER rust
+ENV USER=rust
+ENV PATH="/home/rust/.cargo/bin:${PATH}"
+RUN curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y
+RUN cargo install --path cargo-pgx/
+RUN cargo pgx init --pg$PG_MAJOR_VER=$(which pg_config)
+
+CMD ["cargo", "test", "--no-default-features", "--features", "pg${PG_MAJOR_VER}"]
