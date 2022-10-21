@@ -73,13 +73,13 @@ impl<T> PgSpinLock<T> {
 /// structure falls out of scope (is dropped), the lock will be unlocked.
 ///
 /// See the documentation of [`PgSpinLock`] for more information.
-pub struct PgSpinLockGuard<'a, T> {
+pub struct PgSpinLockGuard<'a, T: 'a> {
     lock: &'a PgSpinLock<T>,
     // For !Send, variance, etc.
     _marker: PhantomData<*mut T>,
 }
 
-unsafe impl<'a, T: Sync> Sync for PgSpinLockGuard<'_, T> {}
+unsafe impl<T: Sync> Sync for PgSpinLockGuard<'_, T> {}
 
 impl<'a, T> Drop for PgSpinLockGuard<'a, T> {
     #[inline]
