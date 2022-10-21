@@ -224,14 +224,9 @@ impl Spi {
         args: Option<Vec<(PgOid, Option<pg_sys::Datum>)>>,
     ) -> Json {
         Spi::connect(|mut client| {
-            let table = client
-                .update(&format!("EXPLAIN (format json) {}", query), None, args)
-                .first();
-            Ok(Some(
-                table
-                    .get_one::<Json>()
-                    .expect("failed to get json EXPLAIN result"),
-            ))
+            let table =
+                client.update(&format!("EXPLAIN (format json) {}", query), None, args).first();
+            Ok(Some(table.get_one::<Json>().expect("failed to get json EXPLAIN result")))
         })
         .unwrap()
     }
