@@ -11,6 +11,7 @@ mod aggregate_tests;
 mod anyarray_tests;
 mod array_tests;
 mod attributes_tests;
+mod bgworker_tests;
 mod bytea_tests;
 mod cfg_tests;
 mod datetime_tests;
@@ -42,5 +43,6 @@ mod uuid_tests;
 mod variadic_tests;
 mod xact_callback_tests;
 mod xid64_tests;
+mod zero_datum_edge_cases;
 
 pgx::pg_magic_func!();

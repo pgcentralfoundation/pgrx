@@ -455,6 +455,19 @@ mod all_versions {
             context: *mut ::std::os::raw::c_void,
         ) -> bool;
     }
+
+    #[pgx_macros::pg_guard]
+    extern "C" {
+        fn pgx_SpinLockInit(lock: *mut pg_sys::slock_t);
+        fn pgx_SpinLockAcquire(lock: *mut pg_sys::slock_t);
+        fn pgx_SpinLockRelease(lock: *mut pg_sys::slock_t);
+        fn pgx_SpinLockFree(lock: *mut pg_sys::slock_t) -> bool;
+    }
+
+    pub use {
+        pgx_SpinLockAcquire as SpinLockAcquire, pgx_SpinLockFree as SpinLockFree,
+        pgx_SpinLockInit as SpinLockInit, pgx_SpinLockRelease as SpinLockRelease,
+    };
 }
 
 mod internal {

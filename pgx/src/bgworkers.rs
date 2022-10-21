@@ -14,6 +14,7 @@ use crate::pg_sys;
 use std::convert::TryInto;
 use std::ffi::{CStr, CString};
 use std::os::raw::c_char;
+use std::ptr::null_mut;
 use std::sync::atomic::{AtomicBool, Ordering};
 use std::time::Duration;
 
@@ -52,6 +53,7 @@ bitflags! {
 }
 
 /// The various points in which a BackgroundWorker can be started by Postgres
+#[derive(Copy, Clone)]
 pub enum BgWorkerStartTime {
     PostmasterStart = pg_sys::BgWorkerStartTime_BgWorkerStart_PostmasterStart as isize,
     ConsistentState = pg_sys::BgWorkerStartTime_BgWorkerStart_ConsistentState as isize,
@@ -210,10 +212,130 @@ unsafe extern "C" fn worker_spi_sigterm(_signal_args: i32) {
     pg_sys::SetLatch(pg_sys::MyLatch);
 }
 
+/// Dynamic background worker handle
+pub struct DynamicBackgroundWorker {
+    handle: *mut pg_sys::BackgroundWorkerHandle,
+    notify_pid: pg_sys::pid_t,
+}
+
+/// PID
+pub type Pid = pg_sys::pid_t;
+
+/// Dynamic background worker status
+#[derive(Debug, Clone, Copy)]
+pub enum BackgroundWorkerStatus {
+    Started,
+    NotYetStarted,
+    Stopped,
+    PostmasterDied,
+    /// `BackgroundWorkerBuilder.bgw_notify_pid` was not set to `pg_sys::MyProcPid`
+    ///
+    /// This makes worker's startup or shutdown untrackable by the current process.
+    Untracked {
+        /// `bgw_notify_pid` as specified in the builder
+        notify_pid: pg_sys::pid_t,
+    },
+}
+
+impl From<pg_sys::BgwHandleStatus> for BackgroundWorkerStatus {
+    fn from(s: pg_sys::BgwHandleStatus) -> Self {
+        match s {
+            pg_sys::BgwHandleStatus_BGWH_STARTED => BackgroundWorkerStatus::Started,
+            pg_sys::BgwHandleStatus_BGWH_NOT_YET_STARTED => BackgroundWorkerStatus::NotYetStarted,
+            pg_sys::BgwHandleStatus_BGWH_STOPPED => BackgroundWorkerStatus::Stopped,
+            pg_sys::BgwHandleStatus_BGWH_POSTMASTER_DIED => BackgroundWorkerStatus::PostmasterDied,
+            _ => unreachable!(),
+        }
+    }
+}
+
+impl DynamicBackgroundWorker {
+    /// Return dynamic background worker's PID if the worker is successfully registered,
+    /// otherwise it return worker's status as an error.
+    pub fn pid(&self) -> Result<Pid, BackgroundWorkerStatus> {
+        let mut pid: pg_sys::pid_t = 0;
+        let status: BackgroundWorkerStatus =
+            unsafe { pg_sys::GetBackgroundWorkerPid(self.handle, &mut pid) }.into();
+        match status {
+            BackgroundWorkerStatus::Started => Ok(pid),
+            _ => Err(status),
+        }
+    }
+
+    /// Causes the postmaster to send SIGTERM to the worker if it is running,
+    /// and to unregister it as soon as it is not.
+    pub fn terminate(self) -> TerminatingDynamicBackgroundWorker {
+        unsafe {
+            pg_sys::TerminateBackgroundWorker(self.handle);
+        }
+        TerminatingDynamicBackgroundWorker { handle: self.handle, notify_pid: self.notify_pid }
+    }
+
+    /// Block until the postmaster has attempted to start the background worker,
+    /// or until the postmaster dies. If the background worker is running, the successful return value
+    /// will be the worker's PID. Otherwise, the return value will be an error with the worker's status.
+    ///
+    /// Requires `BackgroundWorkerBuilder.bgw_notify_pid` to be set to `pg_sys::MyProcPid`, otherwise it'll
+    /// return [`BackgroundWorkerStatus::Untracked`] error
+    pub fn wait_for_startup(&self) -> Result<Pid, BackgroundWorkerStatus> {
+        unsafe {
+            if self.notify_pid != pg_sys::MyProcPid {
+                return Err(BackgroundWorkerStatus::Untracked { notify_pid: self.notify_pid });
+            }
+        }
+        let mut pid: pg_sys::pid_t = 0;
+        let status: BackgroundWorkerStatus =
+            unsafe { pg_sys::WaitForBackgroundWorkerStartup(self.handle, &mut pid) }.into();
+        match status {
+            BackgroundWorkerStatus::Started => Ok(pid),
+            _ => Err(status),
+        }
+    }
+
+    /// Block until the background worker exits, or postmaster dies. When the background worker exits, the return value is unit,
+    /// if postmaster dies it will return error with `BackgroundWorkerStatus::PostmasterDied` status
+    ///
+    /// Requires `BackgroundWorkerBuilder.bgw_notify_pid` to be set to `pg_sys::MyProcPid`, otherwise it'll
+    /// return [`BackgroundWorkerStatus::Untracked`] error
+    pub fn wait_for_shutdown(self) -> Result<(), BackgroundWorkerStatus> {
+        TerminatingDynamicBackgroundWorker { handle: self.handle, notify_pid: self.notify_pid }
+            .wait_for_shutdown()
+    }
+}
+
+/// Handle of a dynamic background worker that is being terminated with
+/// [`DynamicBackgroundWorker::terminate`]. Only allows waiting for shutdown.
+pub struct TerminatingDynamicBackgroundWorker {
+    handle: *mut pg_sys::BackgroundWorkerHandle,
+    notify_pid: pg_sys::pid_t,
+}
+
+impl TerminatingDynamicBackgroundWorker {
+    /// Block until the background worker exits, or postmaster dies. When the background worker exits, the return value is unit,
+    /// if postmaster dies it will return error with `BackgroundWorkerStatus::PostmasterDied` status
+    ///
+    /// Requires `BackgroundWorkerBuilder.bgw_notify_pid` to be set to `pg_sys::MyProcPid`, otherwise it'll
+    /// return [`BackgroundWorkerStatus::Untracked`] error
+    pub fn wait_for_shutdown(self) -> Result<(), BackgroundWorkerStatus> {
+        unsafe {
+            if self.notify_pid != pg_sys::MyProcPid {
+                return Err(BackgroundWorkerStatus::Untracked { notify_pid: self.notify_pid });
+            }
+        }
+        let status: BackgroundWorkerStatus =
+            unsafe { pg_sys::WaitForBackgroundWorkerShutdown(self.handle) }.into();
+        match status {
+            BackgroundWorkerStatus::Stopped => Ok(()),
+            _ => Err(status),
+        }
+    }
+}
+
 /// A builder-style interface for creating a new Background Worker
 ///
-/// This must be used from within your extension's `_PG_init()` function,
-/// finishing with the `.load()` function.
+/// For a static background worker, this must be used from within your extension's `_PG_init()` function,
+/// finishing with the `.load()` function. Dynamic background workers are loaded with `.load_dynamic()` and
+/// have no restriction as to where they can be loaded.
 ///
 /// ## Example
 ///
@@ -279,6 +401,9 @@ impl BackgroundWorkerBuilder {
     }
 
     /// Does this BackgroundWorker want Shared Memory access?
+    ///
+    /// `startup` allows specifying shared memory initialization startup hook. Ignored
+    /// if [`BackgroundWorkerBuilder::load_dynamic`] is used.
     pub fn enable_shmem_access(mut self: Self, startup: Option<unsafe extern "C" fn()>) -> Self {
         self.bgw_flags = self.bgw_flags | BGWflags::BGWORKER_SHMEM_ACCESS;
         self.shared_memory_startup_fn = startup;
@@ -397,8 +522,39 @@ impl BackgroundWorkerBuilder {
     /// Once properly configured, call `load()` to get the BackgroundWorker registered and
     /// started at the proper time by Postgres.
     pub fn load(self: Self) {
+        let mut bgw: pg_sys::BackgroundWorker = (&self).into();
+
+        unsafe {
+            pg_sys::RegisterBackgroundWorker(&mut bgw);
+            if self.bgw_flags.contains(BGWflags::BGWORKER_SHMEM_ACCESS)
+                && self.shared_memory_startup_fn.is_some()
+            {
+                PREV_SHMEM_STARTUP_HOOK = pg_sys::shmem_startup_hook;
+                pg_sys::shmem_startup_hook = self.shared_memory_startup_fn;
+            }
+        };
+    }
+
+    /// Once properly configured, call `load_dynamic()` to get the BackgroundWorker registered and started dynamically.
+    pub fn load_dynamic(self: Self) -> DynamicBackgroundWorker {
+        let mut bgw: pg_sys::BackgroundWorker = (&self).into();
+        let mut handle: *mut pg_sys::BackgroundWorkerHandle = null_mut();
+
+        unsafe {
+            pg_sys::RegisterDynamicBackgroundWorker(&mut bgw, &mut handle);
+        };
+
+        DynamicBackgroundWorker { handle, notify_pid: bgw.bgw_notify_pid }
+    }
+}
+
+/// This conversion is useful only in limited context outside of pgx, such as when this structure is required
+/// by other libraries and the worker is not to be started by pgx itself. In this case,
+/// the builder is useful for building this structure.
+impl<'a> Into<pg_sys::BackgroundWorker> for &'a BackgroundWorkerBuilder {
+    fn into(self) -> pg_sys::BackgroundWorker {
         #[cfg(feature = "pg10")]
-        let mut bgw = pg_sys::BackgroundWorker {
+        let bgw = pg_sys::BackgroundWorker {
             bgw_name: RpgffiChar::from(&self.bgw_name[..]).0,
             bgw_flags: self.bgw_flags.bits(),
             bgw_start_time: self.bgw_start_time as u32,
@@ -414,7 +570,7 @@ impl BackgroundWorkerBuilder {
         };
 
         #[cfg(any(feature = "pg11", feature = "pg12", feature = "pg13", feature = "pg14"))]
-        let mut bgw = pg_sys::BackgroundWorker {
+        let bgw = pg_sys::BackgroundWorker {
             bgw_name: RpgffiChar::from(&self.bgw_name[..]).0,
             bgw_type: RpgffiChar::from(&self.bgw_type[..]).0,
             bgw_flags: self.bgw_flags.bits(),
@@ -430,15 +586,7 @@ impl BackgroundWorkerBuilder {
             bgw_notify_pid: self.bgw_notify_pid,
         };
 
-        unsafe {
-            pg_sys::RegisterBackgroundWorker(&mut bgw);
-            if self.bgw_flags.contains(BGWflags::BGWORKER_SHMEM_ACCESS)
-                && self.shared_memory_startup_fn.is_some()
-            {
-                PREV_SHMEM_STARTUP_HOOK = pg_sys::shmem_startup_hook;
-                pg_sys::shmem_startup_hook = self.shared_memory_startup_fn;
-            }
-        };
+        bgw
     }
 }
 
