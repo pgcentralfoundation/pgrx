@@ -12,10 +12,10 @@ use crate::{
     pg_sys, void_mut_ptr, Date, FromDatum, IntoDatum, Numeric, Timestamp, TimestampWithTimeZone,
 };
 use pgx_pg_sys::{Oid, RangeBound};
-use std::marker::PhantomData;
 use pgx_utils::sql_entity_graph::metadata::{
     ArgumentError, Returns, ReturnsError, SqlMapping, SqlTranslatable,
 };
+use std::marker::PhantomData;
 
 /// Represents Datum to serialized RangeType PG struct
 pub struct Range<T: FromDatum + IntoDatum + RangeSubType> {
@@ -34,11 +34,7 @@ where
     /// - datum represents a RangeType datum
     #[inline]
     unsafe fn from_pg(ptr: *mut pg_sys::varlena, range_type: *mut pg_sys::RangeType) -> Self {
-        Range {
-            ptr,
-            range_type,
-            _marker: PhantomData,
-        }
+        Range { ptr, range_type, _marker: PhantomData }
     }
 }
 
@@ -72,7 +68,11 @@ where
     T: FromDatum + IntoDatum + RangeSubType,
 {
     #[inline]
-    unsafe fn from_polymorphic_datum(datum: pg_sys::Datum, is_null: bool, _: pg_sys::Oid) -> Option<Self>
+    unsafe fn from_polymorphic_datum(
+        datum: pg_sys::Datum,
+        is_null: bool,
+        _: pg_sys::Oid,
+    ) -> Option<Self>
     where
         Self: Sized,
     {
@@ -149,14 +149,8 @@ where
 
     /// Builds an "empty" range
     pub fn empty_range_data() -> Self {
-        let lower_bound = RangeBound {
-            lower: true,
-            ..RangeBound::default()
-        };
-        let upper_bound = RangeBound {
-            lower: false,
-            ..RangeBound::default()
-        };
+        let lower_bound = RangeBound { lower: true, ..RangeBound::default() };
+        let upper_bound = RangeBound { lower: false, ..RangeBound::default() };
         Self::from_range_bounds_internal(lower_bound, upper_bound, true)
     }
 
@@ -171,12 +165,7 @@ where
         upper_bound: RangeBound,
         is_empty: bool,
     ) -> Self {
-        RangeData {
-            lower: lower_bound,
-            upper: upper_bound,
-            is_empty,
-            __marker: PhantomData,
-        }
+        RangeData { lower: lower_bound, upper: upper_bound, is_empty, __marker: PhantomData }
     }
 
     /// Generate a RangeData<T> from the T values for lower/upper bounds, lower/upper inclusive
@@ -187,23 +176,16 @@ where
         lower_inc: bool,
         upper_inc: bool,
     ) -> Self {
-        let mut lower_bound = RangeBound {
-            lower: true,
-            inclusive: lower_inc,
-            ..Default::default()
-        };
+        let mut lower_bound =
+            RangeBound { lower: true, inclusive: lower_inc, ..Default::default() };
 
-        let mut upper_bound = RangeBound {
-            lower: false,
-            inclusive: upper_inc,
-            ..Default::default()
-        };
+        let mut upper_bound =
+            RangeBound { lower: false, inclusive: upper_inc, ..Default::default() };
 
         match lower_val {
             Some(lower_val) => {
-                lower_bound.val = lower_val
-                    .into_datum()
-                    .expect("Couldn't convert lower_val to Datum");
+                lower_bound.val =
+                    lower_val.into_datum().expect("Couldn't convert lower_val to Datum");
             }
             None => {
                 lower_bound.infinite = true;
@@ -212,9 +194,8 @@ where
 
         match upper_val {
             Some(upper_val) => {
-                upper_bound.val = upper_val
-                    .into_datum()
-                    .expect("Couldn't convert upper_val to Datum");
+                upper_bound.val =
+                    upper_val.into_datum().expect("Couldn't convert upper_val to Datum");
             }
             None => {
                 upper_bound.infinite = true;
