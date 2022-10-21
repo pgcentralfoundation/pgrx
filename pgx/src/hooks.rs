@@ -14,7 +14,7 @@ use std::ops::Deref;
 
 #[cfg(any(feature = "pg10", feature = "pg11", feature = "pg12", feature = "pg13"))]
 // JumbleState is not defined prior to postgres v14.
-// This opaque type is here to provide an inner type for
+// This zero-sized type is here to provide an inner type for
 // the option in post_parse_analyze_hook, but prior to v14
 // that option will always be set to None at runtime.
 pub struct JumbleState {}
