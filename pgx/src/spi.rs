@@ -635,6 +635,10 @@ impl SpiHeapTupleDataEntry {
             None => None,
         }
     }
+
+    pub fn oid(&self) -> pg_sys::Oid {
+        self.type_oid
+    }
 }
 
 /// Provide ordinal indexing into a `SpiHeapTupleData`.
