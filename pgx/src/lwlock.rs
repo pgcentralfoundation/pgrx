@@ -34,8 +34,8 @@ pub struct PgLwLock<T> {
     name: OnceCell<&'static str>,
 }
 
-unsafe impl<T> Send for PgLwLock<T> {}
-unsafe impl<T> Sync for PgLwLock<T> {}
+unsafe impl<T: Send> Send for PgLwLock<T> {}
+unsafe impl<T: Send + Sync> Sync for PgLwLock<T> {}
 
 impl<T> PgLwLock<T> {
     /// Create an empty lock which can be created as a global with None as a
