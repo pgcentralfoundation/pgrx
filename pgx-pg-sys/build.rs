@@ -563,14 +563,17 @@ fn run_bindgen(pg_config: &PgConfig, include_h: &PathBuf) -> eyre::Result<syn::F
         .blocklist_item("__[A-Z].*") // these are reserved and unused by Postgres
         .blocklist_item("__darwin.*") // this should always be Apple's names
         .blocklist_function("pq(?:Strerror|Get.*)") // wrappers around platform functions: user can call those themselves
-        .blocklist_function("sig(?:stack|return)") // these cause cause warnings on some systems, and are not useful for us.
-        .blocklist_function("gets|vfork") // these are (nearly) impossible to use correctly, and we don't need them.
         .blocklist_item(".*pthread.*)") // shims for pthreads on non-pthread systems, just use std::thread
         .blocklist_function("float[48].*") // Rust has plenty of float handling
         .blocklist_item(".*(?i:va)_(?i:list|start|end|copy).*") // do not need va_list anything!
         .blocklist_function("(?:pg_|p)v(?:sn?|f)?printf")
         .blocklist_function("appendStringInfoVA")
         .blocklist_file("stdarg.h")
+        // these cause cause warnings, errors, or deprecations on some systems,
+        // and are not useful for us.
+        .blocklist_function("(?:sigstack|sigreturn|siggetmask|gets|vfork|te?mpnam(?:_r)?|mktemp)")
+        // Missing on some systems, despite being in their headers.
+        .blocklist_function("inet_net_pton.*")
         .size_t_is_usize(true)
         .rustfmt_bindings(false)
         .derive_debug(true)
