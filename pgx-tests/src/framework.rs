@@ -13,7 +13,7 @@ use eyre::{eyre, WrapErr};
 use once_cell::sync::Lazy;
 use owo_colors::OwoColorize;
 use pgx::prelude::*;
-use pgx_pg_config::{createdb, get_target_dir, PgConfig, Pgx};
+use pgx_pg_config::{createdb, get_target_dir, PgConfig, Pgx, C_LOCALE_FLAGS};
 use postgres::error::DbError;
 use std::collections::HashMap;
 use std::fmt::Write as _;
@@ -397,6 +397,7 @@ fn initdb(postgresql_conf: Vec<&'static str>) -> eyre::Result<()> {
             Command::new(pg_config.initdb_path().wrap_err("unable to determine initdb path")?);
 
         command
+            .args(C_LOCALE_FLAGS)
             .arg("-D")
             .arg(pgdata.to_str().unwrap())
             .stdout(Stdio::inherit())

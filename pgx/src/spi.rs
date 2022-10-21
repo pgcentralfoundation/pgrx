@@ -10,6 +10,7 @@ Use of this source code is governed by the MIT license that can be found in the 
 //! Safe access to Postgres' *Server Programming Interface* (SPI).
 
 use crate::{pg_sys, FromDatum, IntoDatum, Json, PgMemoryContexts, PgOid};
+use cstr_core::CStr;
 use std::collections::HashMap;
 use std::fmt::Debug;
 use std::mem;
@@ -198,16 +199,33 @@ impl Spi {
     ///
     /// The statement runs in read/write mode
     pub fn run(query: &str) {
+        Spi::run_with_args(query, None)
+    }
+
+    /// run an arbitrary SQL statement with args.
+    ///
+    /// ## Safety
+    ///
+    /// The statement runs in read/write mode
+    pub fn run_with_args(query: &str, args: Option<Vec<(PgOid, Option<pg_sys::Datum>)>>) {
         Spi::execute(|mut client| {
-            client.update(query, None, None);
+            client.update(query, None, args);
         })
     }
 
     /// explain a query, returning its result in json form
     pub fn explain(query: &str) -> Json {
+        Spi::explain_with_args(query, None)
+    }
+
+    /// explain a query with args, returning its result in json form
+    pub fn explain_with_args(
+        query: &str,
+        args: Option<Vec<(PgOid, Option<pg_sys::Datum>)>>,
+    ) -> Json {
         Spi::connect(|mut client| {
             let table =
-                client.update(&format!("EXPLAIN (format json) {}", query), None, None).first();
+                client.update(&format!("EXPLAIN (format json) {}", query), None, args).first();
             Ok(Some(table.get_one::<Json>().expect("failed to get json EXPLAIN result")))
         })
         .unwrap()
@@ -485,6 +503,52 @@ impl SpiTupleTable {
                 },
                 None => panic!("TupDesc is NULL"),
             }
+        }
+    }
+
+    /// Returns the number of columns
+    pub fn columns(&self) -> usize {
+        match self.tupdesc {
+            Some(tupdesc) => unsafe { (*tupdesc).natts as usize },
+            None => 0,
+        }
+    }
+
+    /// Returns column type OID
+    ///
+    /// The ordinal position is 1-based
+    pub fn column_type_oid(&self, ordinal: usize) -> Option<PgOid> {
+        match self.tupdesc {
+            Some(tupdesc) => unsafe {
+                let nattrs = (*tupdesc).natts;
+                if ordinal < 1 || ordinal > (nattrs as usize) {
+                    None
+                } else {
+                    let oid = pg_sys::SPI_gettypeid(tupdesc, ordinal as i32);
+                    Some(PgOid::from(oid))
+                }
+            },
+            None => None,
+        }
+    }
+
+    /// Returns column name
+    ///
+    /// The ordinal position is 1-based
+    pub fn column_name(&self, ordinal: usize) -> Option<String> {
+        match self.tupdesc {
+            Some(tupdesc) => unsafe {
+                let nattrs = (*tupdesc).natts;
+                if ordinal < 1 || ordinal > (nattrs as usize) {
+                    None
+                } else {
+                    let name = pg_sys::SPI_fname(tupdesc, ordinal as i32);
+                    let str = CStr::from_ptr(name).to_string_lossy().into_owned();
+                    pg_sys::pfree(name as *mut _);
+                    Some(str)
+                }
+            },
+            None => None,
         }
     }
 }

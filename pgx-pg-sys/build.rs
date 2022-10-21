@@ -569,6 +569,11 @@ fn run_bindgen(pg_config: &PgConfig, include_h: &PathBuf) -> eyre::Result<syn::F
         .blocklist_function("(?:pg_|p)v(?:sn?|f)?printf")
         .blocklist_function("appendStringInfoVA")
         .blocklist_file("stdarg.h")
+        // these cause cause warnings, errors, or deprecations on some systems,
+        // and are not useful for us.
+        .blocklist_function("(?:sigstack|sigreturn|siggetmask|gets|vfork|te?mpnam(?:_r)?|mktemp)")
+        // Missing on some systems, despite being in their headers.
+        .blocklist_function("inet_net_pton.*")
         .size_t_is_usize(true)
         .rustfmt_bindings(false)
         .derive_debug(true)

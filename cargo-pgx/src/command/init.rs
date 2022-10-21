@@ -12,7 +12,9 @@ use crate::command::version::pgx_default;
 use crate::CommandExecute;
 use eyre::{eyre, WrapErr};
 use owo_colors::OwoColorize;
-use pgx_pg_config::{prefix_path, PgConfig, PgConfigSelector, Pgx, SUPPORTED_MAJOR_VERSIONS};
+use pgx_pg_config::{
+    prefix_path, PgConfig, PgConfigSelector, Pgx, C_LOCALE_FLAGS, SUPPORTED_MAJOR_VERSIONS,
+};
 use rayon::prelude::*;
 
 use std::collections::HashMap;
@@ -440,7 +442,12 @@ fn is_root_user() -> bool {
 pub(crate) fn initdb(bindir: &PathBuf, datadir: &PathBuf) -> eyre::Result<()> {
     println!(" {} data directory at {}", "Initializing".bold().green(), datadir.display());
     let mut command = std::process::Command::new(format!("{}/initdb", bindir.display()));
-    command.stdout(Stdio::piped()).stderr(Stdio::piped()).arg("-D").arg(&datadir);
+    command
+        .stdout(Stdio::piped())
+        .stderr(Stdio::piped())
+        .args(C_LOCALE_FLAGS)
+        .arg("-D")
+        .arg(&datadir);
 
     let command_str = format!("{:?}", command);
     tracing::debug!(command = %command_str, "Running");
