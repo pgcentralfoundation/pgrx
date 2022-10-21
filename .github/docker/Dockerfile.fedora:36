@@ -46,7 +46,7 @@ RUN curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y
 # RUN su rust -l -- -c cargo --version
 # ENV PATH="/home/rust/.cargo/bin:${PATH}"
 
-RUN cargo install cargo-pgx
+RUN cargo install --path cargo-pgx/
 RUN cargo pgx init --pg$PG_MAJOR_VER=/usr/pgsql-$PG_MAJOR_VER/bin/pg_config
 
 # WORKDIR /app
