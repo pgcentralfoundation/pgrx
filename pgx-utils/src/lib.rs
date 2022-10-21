@@ -413,13 +413,14 @@ pub fn staticize_lifetimes(value: &mut syn::Type) {
             if let Some(archetype) = mac.path.segments.last() {
                 match archetype.ident.to_string().as_str() {
                     "name" => {
-                        let mut out: NameMacro = mac.parse_body().expect("name!() in wrong format");
-                        staticize_lifetimes(&mut out.used_ty.resolved_ty);
+                        if let Ok(mut out) = mac.parse_body::<NameMacro>() {
+                            staticize_lifetimes(&mut out.used_ty.resolved_ty);
 
-                        // rewrite the name!() macro so that it has a static lifetime, if any
-                        if let Ok(ident) = syn::parse_str::<Ident>(&out.ident) {
-                            let ty = out.used_ty.resolved_ty;
-                            type_macro.mac = syn::parse_quote! {name!(#ident, #ty)};
+                            // rewrite the name!() macro so that it has a static lifetime, if any
+                            if let Ok(ident) = syn::parse_str::<Ident>(&out.ident) {
+                                let ty = out.used_ty.resolved_ty;
+                                type_macro.mac = syn::parse_quote! {name!(#ident, #ty)};
+                            }
                         }
                     }
                     _ => {}
