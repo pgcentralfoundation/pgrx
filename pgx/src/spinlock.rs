@@ -55,6 +55,7 @@ impl<T> PgSpinLock<T> {
     #[inline]
     #[doc(alias = "SpinLockFree")]
     pub fn is_locked(&self) -> bool {
+        // SAFETY: Doesn't actually modify state, despite appearances.
         unsafe { !pg_sys::SpinLockFree(self.lock.get()) }
     }
 
