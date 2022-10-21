@@ -145,4 +145,28 @@ mod tests {
         );
         assert_eq!(result, Some(1));
     }
+
+    #[pg_test]
+    fn test_columns() {
+        use pgx::{PgBuiltInOids, PgOid};
+        Spi::execute(|client| {
+            let res = client.select("SELECT 42 AS a, 'test' AS b", None, None);
+
+            assert_eq!(2, res.columns());
+
+            assert_eq!(res.column_type_oid(1).unwrap(), PgOid::BuiltIn(PgBuiltInOids::INT4OID));
+
+            assert_eq!(res.column_type_oid(2).unwrap(), PgOid::BuiltIn(PgBuiltInOids::TEXTOID));
+
+            assert_eq!(res.column_name(1).unwrap(), "a");
+
+            assert_eq!(res.column_name(2).unwrap(), "b");
+        });
+
+        Spi::execute(|mut client| {
+            let res = client.update("SET TIME ZONE 'PST8PDT'", None, None);
+
+            assert_eq!(0, res.columns());
+        });
+    }
 }
