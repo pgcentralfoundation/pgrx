@@ -157,8 +157,8 @@ mod tests {
         let result = Spi::explain_with_args(
             "SELECT $1 + $2 = 3",
             Some(vec![
-                (PgBuiltInOids::INT4OID.oid(), i.into_datum()),
-                (PgBuiltInOids::INT8OID.oid(), j.into_datum()),
+                (PgBuiltInOids::INT4OID.oid(), Some(i.into()),
+                (PgBuiltInOids::INT8OID.oid(), Some(j.into())),
             ]),
         );
 
