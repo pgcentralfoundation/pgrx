@@ -22,10 +22,11 @@ jobs:
     name: Test container builds
     runs-on: ubuntu-latest
     strategy:
+      fail-fast: false
       matrix:
         pg_version: ["pg10", "pg11", "pg12", "pg13", "pg14"]
-        container: ["alpine:3.16"]
-        # container: ["fedora:36", "debian:bullseye"]
+        container: ["amazon:2"]
+        # container: ["fedora:36", "debian:bullseye","alpine:3.16"]
     steps:
       - uses: actions/checkout@v2
 

@@ -1,0 +1,40 @@
+FROM amazonlinux:2
+ARG PG_MAJOR_VER
+ENV PG_MAJOR_VER=${PG_MAJOR_VER}
+
+RUN amazon-linux-extras enable postgresql$PG_MAJOR_VER
+RUN yum clean metadata
+
+RUN yum install -y \
+  libpq \
+  libpq-devel \
+  postgresql \
+  postgresql-devel \
+  postgresql-server \
+  postgresql-server-devel \
+  openssl \
+  openssl-devel \
+  bison \
+  flex \
+  readline \
+  readline-devel \
+  which \
+  clang
+
+RUN chmod a+rwx `$(which pg_config) --pkglibdir` \
+  `$(which pg_config) --sharedir`/extension \
+  /var/run/postgresql/
+
+RUN adduser -G wheel rust
+WORKDIR /checkout
+RUN chown -R rust:rust /checkout
+COPY --chown=rust:rust . /checkout
+
+USER rust
+ENV USER=rust
+
+RUN curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | bash -s -- -y
+ENV PATH="/home/rust/.cargo/bin:${PATH}"
+RUN cargo install --path cargo-pgx/
+RUN cargo pgx init --pg$PG_MAJOR_VER=$(which pg_config)
+CMD ["cargo", "test", "--no-default-features", "--features", "pg${PG_MAJOR_VER}"]
