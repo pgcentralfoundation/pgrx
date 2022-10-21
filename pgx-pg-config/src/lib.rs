@@ -119,49 +119,48 @@ impl PgConfig {
         self.path().unwrap().parent().unwrap().to_path_buf()
     }
 
+    fn parse_version_str(version_str: &str) -> eyre::Result<(u16, u16)> {
+        let version_parts = version_str.split_whitespace().collect::<Vec<&str>>();
+        let version = version_parts
+            .get(1)
+            .ok_or_else(|| eyre!("invalid version string: {}", version_str))?
+            .split('.')
+            .collect::<Vec<&str>>();
+        if version.len() < 2 {
+            return Err(eyre!("invalid version string: {}", version_str));
+        }
+        let major = u16::from_str(version[0])
+            .map_err(|e| eyre!("invalid major version number `{}`: {:?}", version[0], e))?;
+        let mut minor = version[1];
+        let mut end_index = minor.len();
+        for (i, c) in minor.chars().enumerate() {
+            if !c.is_ascii_digit() {
+                end_index = i;
+                break;
+            }
+        }
+        minor = &minor[0..end_index];
+        let minor = u16::from_str(minor)
+            .map_err(|e| eyre!("invalid minor version number `{}`: {:?}", minor, e))?;
+        return Ok((major, minor));
+    }
+
+    fn get_version(&self) -> eyre::Result<(u16, u16)> {
+        let version_string = self.run("--version")?;
+        Self::parse_version_str(&version_string)
+    }
+
     pub fn major_version(&self) -> eyre::Result<u16> {
         match &self.version {
             Some(version) => Ok(version.major),
-            None => {
-                let version_string = self.run("--version")?;
-                let version_parts = version_string.split_whitespace().collect::<Vec<&str>>();
-                let version = match version_parts.get(1) {
-                    Some(v) => v,
-                    None => {
-                        return Err(eyre!("invalid version string: {}", version_string));
-                    }
-                };
-                let version = match f64::from_str(version) {
-                    Ok(f) => f,
-                    Err(e) => {
-                        return Err(eyre!("invalid major version number `{}`: {:?}", version, e));
-                    }
-                };
-                Ok(version.floor() as u16)
-            }
+            None => Ok(self.get_version()?.0),
         }
     }
 
     pub fn minor_version(&self) -> eyre::Result<u16> {
         match &self.version {
             Some(version) => Ok(version.minor),
-            None => {
-                let version_string = self.run("--version")?;
-                let version_parts = version_string.split_whitespace().collect::<Vec<&str>>();
-                let version = match version_parts.get(1) {
-                    Some(v) => v.split('.').next().unwrap(),
-                    None => {
-                        return Err(eyre!("invalid version string: {}", version_string));
-                    }
-                };
-                let version = match u16::from_str(version) {
-                    Ok(u) => u,
-                    Err(e) => {
-                        return Err(eyre!("invalid minor version number `{}`: {:?}", version, e));
-                    }
-                };
-                Ok(version)
-            }
+            None => Ok(self.get_version()?.1),
         }
     }
 
@@ -527,4 +526,36 @@ fn does_db_exist(pg_config: &PgConfig, dbname: &str) -> eyre::Result<bool> {
             .wrap_err("result is not a number")?;
         Ok(count > 0)
     }
+}
+
+#[test]
+fn parse_version() {
+    // Check some valid version strings
+    let versions = [
+        ("PostgreSQL 10.22", 10, 22),
+        ("PostgreSQL 11.2", 11, 2),
+        ("PostgreSQL 11.17", 11, 17),
+        ("PostgreSQL 12.12", 12, 12),
+        ("PostgreSQL 13.8", 13, 8),
+        ("PostgreSQL 14.5", 14, 5),
+        ("PostgreSQL 11.2-FOO-BAR+", 11, 2),
+        ("PostgreSQL 10.22-", 10, 22),
+    ];
+    for (s, major_expected, minor_expected) in versions {
+        let (major, minor) =
+            PgConfig::parse_version_str(s).expect("Unable to parse version string");
+        assert_eq!(major, major_expected, "Major varsion should match");
+        assert_eq!(minor, minor_expected, "Minor version should match");
+    }
+
+    // Check some invalid version strings
+    let _ = PgConfig::parse_version_str("10.22").expect_err("Parsed invalid version string");
+    let _ =
+        PgConfig::parse_version_str("PostgresSQL 10").expect_err("Parsed invalid version string");
+    let _ =
+        PgConfig::parse_version_str("PostgresSQL 10.").expect_err("Parsed invalid version string");
+    let _ =
+        PgConfig::parse_version_str("PostgresSQL 12.f").expect_err("Parsed invalid version string");
+    let _ =
+        PgConfig::parse_version_str("PostgresSQL .53").expect_err("Parsed invalid version string");
 }
