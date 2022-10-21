@@ -1,0 +1,37 @@
+ARG PG_MAJOR_VER
+FROM postgres:${PG_MAJOR_VER}-alpine3.16
+ENV PG_MAJOR_VER=${PG_MAJOR_VER}
+
+ENV RUSTFLAGS="-C target-feature=-crt-static"
+
+RUN apk add --no-cache \
+  git \
+  curl \
+  bash \
+  musl-dev \
+  make \
+  gcc \
+  coreutils \
+  util-linux-dev \
+  musl-dev \
+  openssl-dev \
+  clang-libs \
+  tar
+
+RUN chmod a+rwx `$(which pg_config) --pkglibdir` \
+  `$(which pg_config) --sharedir`/extension \
+  /var/run/postgresql/
+
+RUN adduser -s /bin/bash -D rust
+WORKDIR /checkout
+RUN chown -R rust:rust /checkout
+COPY --chown=rust:rust . /checkout
+
+USER rust
+ENV USER=rust
+
+RUN curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | bash -s -- -y
+ENV PATH="/home/rust/.cargo/bin:${PATH}"
+RUN cargo install --path cargo-pgx/
+RUN cargo pgx init --pg$PG_MAJOR=$(which pg_config)
+CMD ["cargo", "test", "--no-default-features", "--features", "pg${PG_MAJOR_VER}"]
