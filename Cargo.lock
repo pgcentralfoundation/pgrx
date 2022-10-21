@@ -139,9 +139,9 @@ checksum = "f8fe8f5a8a398345e52358e18ff07cc17a568fbca5c6f73873d3a62056309603"
 
 [[package]]
 name = "base64"
-version = "0.13.0"
+version = "0.13.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "904dfeac50f3cdaba28fc6f57fdcddb75f49ed61346676a78c4ffe55877802fd"
+checksum = "9e1b586273c5702936fe7b7d6896644d8be71e6314cfe09d3167c95f712589e8"
 
 [[package]]
 name = "bgworker"
@@ -272,7 +272,7 @@ dependencies = [
 
 [[package]]
 name = "cargo-pgx"
-version = "0.5.4"
+version = "0.5.5"
 dependencies = [
  "atty",
  "cargo_metadata",
@@ -1372,7 +1372,7 @@ dependencies = [
 
 [[package]]
 name = "pgx"
-version = "0.5.4"
+version = "0.5.5"
 dependencies = [
  "atomic-traits",
  "bitflags",
@@ -1400,7 +1400,7 @@ dependencies = [
 
 [[package]]
 name = "pgx-macros"
-version = "0.5.4"
+version = "0.5.5"
 dependencies = [
  "pgx-utils",
  "proc-macro2",
@@ -1412,7 +1412,7 @@ dependencies = [
 
 [[package]]
 name = "pgx-pg-config"
-version = "0.5.4"
+version = "0.5.5"
 dependencies = [
  "dirs",
  "eyre",
@@ -1426,7 +1426,7 @@ dependencies = [
 
 [[package]]
 name = "pgx-pg-sys"
-version = "0.5.4"
+version = "0.5.5"
 dependencies = [
  "bindgen",
  "eyre",
@@ -1445,7 +1445,7 @@ dependencies = [
 
 [[package]]
 name = "pgx-tests"
-version = "0.5.4"
+version = "0.5.5"
 dependencies = [
  "eyre",
  "libc",
@@ -1466,7 +1466,7 @@ dependencies = [
 
 [[package]]
 name = "pgx-utils"
-version = "0.5.4"
+version = "0.5.5"
 dependencies = [
  "atty",
  "convert_case",
@@ -1983,9 +1983,9 @@ checksum = "0772c5c30e1a0d91f6834f8e545c69281c099dfa9a3ac58d96a9fd629c8d4898"
 
 [[package]]
 name = "serde"
-version = "1.0.145"
+version = "1.0.146"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "728eb6351430bccb993660dfffc5a72f91ccc1295abaa8ce19b27ebe4f75568b"
+checksum = "6df50b7a60a0ad48e1b42eb38373eac8ff785d619fb14db917b4e63d5439361f"
 dependencies = [
  "serde_derive",
 ]
@@ -2014,9 +2014,9 @@ dependencies = [
 
 [[package]]
 name = "serde_derive"
-version = "1.0.145"
+version = "1.0.146"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "81fa1584d3d1bcacd84c277a0dfe21f5b0f6accf4a23d04d4c6d61f1af522b4c"
+checksum = "a714fd32ba1d66047ce7d53dabd809e9922d538f9047de13cc4cffca47b36205"
 dependencies = [
  "proc-macro2",
  "quote",

@@ -8,7 +8,7 @@ Use of this source code is governed by the MIT license that can be found in the 
 */
 
 use crate::sql_entity_graph::{NameMacro, PositioningRef};
-use proc_macro2::{Ident, TokenStream, TokenTree};
+use proc_macro2::{TokenStream, TokenTree};
 use quote::{format_ident, quote, ToTokens, TokenStreamExt};
 use std::collections::HashSet;
 use syn::{GenericArgument, PathArguments, Type, TypeParamBound};
@@ -410,18 +410,25 @@ pub fn staticize_lifetimes(value: &mut syn::Type) {
 
         syn::Type::Macro(type_macro) => {
             let mac = &type_macro.mac;
-            let archetype = mac.path.segments.last().unwrap();
-            match archetype.ident.to_string().as_str() {
-                "name" => {
-                    let mut out: NameMacro = mac.parse_body().expect("name!() in wrong format");
-                    staticize_lifetimes(&mut out.used_ty.resolved_ty);
+            if let Some(archetype) = mac.path.segments.last() {
+                match archetype.ident.to_string().as_str() {
+                    "name" => {
+                        if let Ok(out) = mac.parse_body::<NameMacro>() {
+                            // We don't particularly care what the identifier is, so we parse a
+                            // raw TokenStream.  Specifically, it's okay for the identifier String,
+                            // which we end up using as a Postgres column name, to be nearly any
+                            // string, which can include Rust reserved words such as "type" or "match"
+                            if let Ok(ident) = syn::parse_str::<TokenStream>(&out.ident) {
+                                let mut ty = out.used_ty.resolved_ty;
 
-                    // rewrite the name!() macro so that it has a static lifetime, if any
-                    let ident = syn::parse_str::<Ident>(&out.ident).unwrap();
-                    let ty = out.used_ty.resolved_ty;
-                    type_macro.mac = syn::parse_quote! {name!(#ident, #ty)};
+                                // rewrite the name!() macro's type so that it has a static lifetime, if any
+                                staticize_lifetimes(&mut ty);
+                                type_macro.mac = syn::parse_quote! {name!(#ident, #ty)};
+                            }
+                        }
+                    }
+                    _ => {}
                 }
-                _ => {}
             }
         }
         _ => {}
