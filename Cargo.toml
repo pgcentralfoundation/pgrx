@@ -8,6 +8,7 @@ members = [
     "pgx-pg-sys",
     "pgx-tests",
     "pgx-utils",
+    "pgx-version-updater",
     "pgx-examples/aggregate",
     "pgx-examples/arrays",
     "pgx-examples/bad_ideas",
