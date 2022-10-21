@@ -60,6 +60,7 @@ pub mod pgbox;
 pub mod rel;
 pub mod shmem;
 pub mod spi;
+pub mod spinlock;
 pub mod stringinfo;
 pub mod trigger_support;
 pub mod tupdesc;
