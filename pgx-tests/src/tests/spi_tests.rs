@@ -137,7 +137,7 @@ mod tests {
         Spi::run_with_args(
             "SELECT $1 + $2 = 3",
             Some(vec![
-                (PgBuiltInOids::INT4OID.oid(), Some(i.into()),
+                (PgBuiltInOids::INT4OID.oid(), Some(i.into())),
                 (PgBuiltInOids::INT8OID.oid(), Some(j.into())),
             ]),
         )
