@@ -199,17 +199,39 @@ impl Spi {
     ///
     /// The statement runs in read/write mode
     pub fn run(query: &str) {
+        Spi::run_with_args(query, None)
+    }
+
+    /// run an arbitrary SQL statement with args.
+    ///
+    /// ## Safety
+    ///
+    /// The statement runs in read/write mode
+    pub fn run_with_args(query: &str, args: Option<Vec<(PgOid, Option<pg_sys::Datum>)>>) {
         Spi::execute(|mut client| {
-            client.update(query, None, None);
+            client.update(query, None, args);
         })
     }
 
     /// explain a query, returning its result in json form
     pub fn explain(query: &str) -> Json {
+        Spi::explain_with_args(query, None)
+    }
+
+    /// explain a query with args, returning its result in json form
+    pub fn explain_with_args(
+        query: &str,
+        args: Option<Vec<(PgOid, Option<pg_sys::Datum>)>>,
+    ) -> Json {
         Spi::connect(|mut client| {
-            let table =
-                client.update(&format!("EXPLAIN (format json) {}", query), None, None).first();
-            Ok(Some(table.get_one::<Json>().expect("failed to get json EXPLAIN result")))
+            let table = client
+                .update(&format!("EXPLAIN (format json) {}", query), None, args)
+                .first();
+            Ok(Some(
+                table
+                    .get_one::<Json>()
+                    .expect("failed to get json EXPLAIN result"),
+            ))
         })
         .unwrap()
     }

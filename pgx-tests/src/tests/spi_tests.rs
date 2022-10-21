@@ -124,6 +124,47 @@ mod tests {
         assert!(Spi::get_one::<i32>("SELECT 1 LIMIT 0").is_none());
     }
 
+    #[pg_test]
+    fn test_spi_run() {
+        Spi::run("SELECT 1")
+    }
+
+    #[pg_test]
+    fn test_spi_run_with_args() {
+        let i = 1 as i32;
+        let j = 2 as i64;
+
+        Spi::run_with_args(
+            "SELECT $1 + $2 = 3",
+            Some(vec![
+                (PgBuiltInOids::INT4OID.oid(), Some(i.into())),
+                (PgBuiltInOids::INT8OID.oid(), Some(j.into())),
+            ]),
+        )
+    }
+
+    #[pg_test]
+    fn test_spi_explain() {
+        let result = Spi::explain("SELECT 1");
+        assert!(result.0.get(0).unwrap().get("Plan").is_some());
+    }
+
+    #[pg_test]
+    fn test_spi_explain_with_args() {
+        let i = 1 as i32;
+        let j = 2 as i64;
+
+        let result = Spi::explain_with_args(
+            "SELECT $1 + $2 = 3",
+            Some(vec![
+                (PgBuiltInOids::INT4OID.oid(), Some(i.into())),
+                (PgBuiltInOids::INT8OID.oid(), Some(j.into())),
+            ]),
+        );
+
+        assert!(result.0.get(0).unwrap().get("Plan").is_some());
+    }
+
     #[pg_extern]
     fn do_panic() {
         panic!("did a panic");
