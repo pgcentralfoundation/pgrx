@@ -57,10 +57,9 @@ where
             Err(RangeConversionError::NullDatum)
         } else {
             unsafe {
-                let ptr = datum.ptr_cast();
+                let ptr = datum.cast_mut_ptr();
                 let range_type =
-                    pg_sys::pg_detoast_datum(datum.ptr_cast()) as *mut pg_sys::RangeType;
-                let _ = range_type.as_ref().expect("RangeType * was NULL");
+                    pg_sys::pg_detoast_datum(datum.cast_mut_ptr()) as *mut pg_sys::RangeType;
 
                 Ok(Range::<T>::from_pg(ptr, range_type))
             }
@@ -73,7 +72,7 @@ where
     T: FromDatum + IntoDatum + RangeSubType,
 {
     #[inline]
-    unsafe fn from_datum(datum: pg_sys::Datum, is_null: bool, _: pg_sys::Oid) -> Option<Self>
+    unsafe fn from_polymorphic_datum(datum: pg_sys::Datum, is_null: bool, _: pg_sys::Oid) -> Option<Self>
     where
         Self: Sized,
     {
@@ -133,7 +132,7 @@ where
         if self.is_empty || self.lower.infinite {
             None
         } else {
-            unsafe { T::from_datum(self.lower.val, false, T::range_type_oid()) }
+            unsafe { T::from_polymorphic_datum(self.lower.val, false, T::range_type_oid()) }
         }
     }
 
@@ -144,7 +143,7 @@ where
         if self.is_empty || self.upper.infinite {
             None
         } else {
-            unsafe { T::from_datum(self.upper.val, false, T::range_type_oid()) }
+            unsafe { T::from_polymorphic_datum(self.upper.val, false, T::range_type_oid()) }
         }
     }
 
