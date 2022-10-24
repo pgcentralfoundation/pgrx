@@ -458,16 +458,15 @@ mod all_versions {
 
     #[pgx_macros::pg_guard]
     extern "C" {
-        fn pgx_SpinLockInit(lock: *mut pg_sys::slock_t);
-        fn pgx_SpinLockAcquire(lock: *mut pg_sys::slock_t);
-        fn pgx_SpinLockRelease(lock: *mut pg_sys::slock_t);
-        fn pgx_SpinLockFree(lock: *mut pg_sys::slock_t) -> bool;
+        #[link_name = "pgx_SpinLockInit"]
+        pub fn SpinLockInit(lock: *mut pg_sys::slock_t);
+        #[link_name = "pgx_SpinLockAcquire"]
+        pub fn SpinLockAcquire(lock: *mut pg_sys::slock_t);
+        #[link_name = "pgx_SpinLockRelease"]
+        pub fn SpinLockRelease(lock: *mut pg_sys::slock_t);
+        #[link_name = "pgx_SpinLockFree"]
+        pub fn SpinLockFree(lock: *mut pg_sys::slock_t) -> bool;
     }
-
-    pub use {
-        pgx_SpinLockAcquire as SpinLockAcquire, pgx_SpinLockFree as SpinLockFree,
-        pgx_SpinLockInit as SpinLockInit, pgx_SpinLockRelease as SpinLockRelease,
-    };
 }
 
 mod internal {
