@@ -36,11 +36,7 @@ impl Interval {
         days: i32,
         usecs: i64,
     ) -> Result<Self, IntervalConversionError> {
-        Ok(Interval(pg_sys::Interval {
-            day: days,
-            month: months,
-            time: usecs,
-        }))
+        Ok(Interval(pg_sys::Interval { day: days, month: months, time: usecs }))
     }
 
     /// Total number of months before/after 2000-01-01
@@ -77,7 +73,11 @@ impl IntoDatum for Interval {
 }
 
 impl FromDatum for Interval {
-    unsafe fn from_datum(datum: pg_sys::Datum, is_null: bool, _: pg_sys::Oid) -> Option<Self>
+    unsafe fn from_polymorphic_datum(
+        datum: pg_sys::Datum,
+        is_null: bool,
+        _: pg_sys::Oid,
+    ) -> Option<Self>
     where
         Self: Sized,
     {
@@ -105,11 +105,7 @@ impl TryFrom<Duration> for Interval {
 
             let time = d.whole_microseconds() as i64;
 
-            Ok(Interval(pg_sys::Interval {
-                day: 0,
-                month,
-                time,
-            }))
+            Ok(Interval(pg_sys::Interval { day: 0, month, time }))
         } else {
             Err(IntervalConversionError::DurationMonthsOutOfBounds)
         }
@@ -129,10 +125,8 @@ impl From<Interval> for Duration {
         }
 
         if interval.day != 0 {
-            duration = duration.saturating_add(Duration::new(
-                (interval.day * SECS_PER_DAY as i32) as i64,
-                0,
-            ));
+            duration = duration
+                .saturating_add(Duration::new((interval.day * SECS_PER_DAY as i32) as i64, 0));
         }
 
         duration

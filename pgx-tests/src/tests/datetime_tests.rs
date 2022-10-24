@@ -108,9 +108,7 @@ fn accept_interval(interval: Interval) -> Interval {
 #[pg_extern]
 fn accept_interval_round_trip(interval: Interval) -> Interval {
     let duration: time::Duration = interval.into();
-    duration
-        .try_into()
-        .expect("Error converting Duration to PgInterval")
+    duration.try_into().expect("Error converting Duration to PgInterval")
 }
 
 #[cfg(test)]
