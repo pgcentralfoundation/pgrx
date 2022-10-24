@@ -161,11 +161,14 @@ fn generate_bindings(
     is_for_release: bool,
 ) -> eyre::Result<()> {
     let major_version = pg_config.major_version().wrap_err("could not determine major version")?;
-    let mut include_h = build_paths.manifest_dir.clone();
-    include_h.push("include");
-    include_h.push(format!("pg{}.h", major_version));
+    let header_src = format!(
+        r#"
+        #include "cshim/pgx-cshim.h"
+        #include "include/pg{major_version}.h"
+        "#
+    );
 
-    let bindgen_output = run_bindgen(&pg_config, &include_h)
+    let bindgen_output = run_bindgen(&pg_config, &build_paths.manifest_dir, &header_src)
         .wrap_err_with(|| format!("bindgen failed for pg{}", major_version))?;
 
     let oids = extract_oids(&bindgen_output);
@@ -543,13 +546,18 @@ struct StructDescriptor<'a> {
 
 /// Given a specific postgres version, `run_bindgen` generates bindings for the given
 /// postgres version and returns them as a token stream.
-fn run_bindgen(pg_config: &PgConfig, include_h: &PathBuf) -> eyre::Result<syn::File> {
+fn run_bindgen(
+    pg_config: &PgConfig,
+    manifest_path: &PathBuf,
+    header_src: &str,
+) -> eyre::Result<syn::File> {
     let major_version = pg_config.major_version()?;
     eprintln!("Generating bindings for pg{}", major_version);
     let includedir_server = pg_config.includedir_server()?;
     let bindings = bindgen::Builder::default()
-        .header(include_h.display().to_string())
+        .header_contents("combined-header.h", header_src)
         .clang_arg(&format!("-I{}", includedir_server.display()))
+        .clang_arg(&format!("-I{}", manifest_path.display()))
         .clang_args(&extra_bindgen_clang_args(pg_config)?)
         .parse_callbacks(Box::new(PgxOverrides::default()))
         .blocklist_type("(Nullable)?Datum") // manually wrapping datum types for correctness

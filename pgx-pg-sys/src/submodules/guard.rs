@@ -17,15 +17,6 @@ use std::panic::{catch_unwind, RefUnwindSafe, UnwindSafe};
 
 extern "C" {
     fn pg_re_throw();
-    fn pgx_ereport(
-        level: i32,
-        code: i32,
-        message: *const std::os::raw::c_char,
-        file: *const std::os::raw::c_char,
-        lineno: i32,
-        colno: i32,
-    );
-
 }
 
 #[derive(Clone, Debug)]
@@ -230,11 +221,11 @@ where
             let c_file = std::ffi::CString::new(location.file).unwrap();
 
             unsafe {
-                pgx_ereport(
+                crate::pgx_ereport(
                     crate::ERROR as i32,
                     2600, // ERRCODE_INTERNAL_ERROR
-                    c_message.as_ptr(),
-                    c_file.as_ptr(),
+                    c_message.as_ptr().cast::<std::os::raw::c_char>(),
+                    c_file.as_ptr().cast::<std::os::raw::c_char>(),
                     location.line as i32,
                     location.col as i32,
                 );

@@ -222,8 +222,6 @@ impl AsPgCStr for String {
 /// item declarations we want to add to all versions
 mod all_versions {
     use crate as pg_sys;
-    use pgx_macros::*;
-
     use memoffset::*;
     use std::str::FromStr;
 
@@ -242,15 +240,6 @@ mod all_versions {
     pub const FrozenTransactionId: super::TransactionId = 2 as super::TransactionId;
     pub const FirstNormalTransactionId: super::TransactionId = 3 as super::TransactionId;
     pub const MaxTransactionId: super::TransactionId = 0xFFFF_FFFF as super::TransactionId;
-
-    #[pgx_macros::pg_guard]
-    extern "C" {
-        pub fn pgx_list_nth(list: *mut super::List, nth: i32) -> *mut std::os::raw::c_void;
-        pub fn pgx_list_nth_int(list: *mut super::List, nth: i32) -> i32;
-        pub fn pgx_list_nth_oid(list: *mut super::List, nth: i32) -> super::Oid;
-        pub fn pgx_list_nth_cell(list: *mut super::List, nth: i32) -> *mut super::ListCell;
-        pub fn pgx_GETSTRUCT(tuple: pg_sys::HeapTuple) -> *mut std::os::raw::c_char;
-    }
 
     #[inline]
     pub fn VARHDRSZ_EXTERNAL() -> usize {
@@ -322,7 +311,7 @@ mod all_versions {
         index: super::Index,
         range_table: *mut super::List,
     ) -> *mut super::RangeTblEntry {
-        pgx_list_nth(range_table, index as i32 - 1) as *mut super::RangeTblEntry
+        pg_sys::pgx_list_nth(range_table, index as i32 - 1) as *mut super::RangeTblEntry
     }
 
     #[inline]
@@ -429,44 +418,14 @@ mod all_versions {
         if htup.is_null() {
             0 as *mut T
         } else {
-            unsafe { pgx_GETSTRUCT(htup) as *mut T }
+            unsafe { pg_sys::pgx_GETSTRUCT(htup) as *mut T }
         }
     }
 
-    #[pg_guard]
-    extern "C" {
-        pub fn query_tree_walker(
-            query: *mut super::Query,
-            walker: ::std::option::Option<
-                unsafe extern "C" fn(*mut super::Node, *mut ::std::os::raw::c_void) -> bool,
-            >,
-            context: *mut ::std::os::raw::c_void,
-            flags: ::std::os::raw::c_int,
-        ) -> bool;
-    }
-
-    #[pg_guard]
-    extern "C" {
-        pub fn expression_tree_walker(
-            node: *mut super::Node,
-            walker: ::std::option::Option<
-                unsafe extern "C" fn(*mut super::Node, *mut ::std::os::raw::c_void) -> bool,
-            >,
-            context: *mut ::std::os::raw::c_void,
-        ) -> bool;
-    }
-
-    #[pgx_macros::pg_guard]
-    extern "C" {
-        #[link_name = "pgx_SpinLockInit"]
-        pub fn SpinLockInit(lock: *mut pg_sys::slock_t);
-        #[link_name = "pgx_SpinLockAcquire"]
-        pub fn SpinLockAcquire(lock: *mut pg_sys::slock_t);
-        #[link_name = "pgx_SpinLockRelease"]
-        pub fn SpinLockRelease(lock: *mut pg_sys::slock_t);
-        #[link_name = "pgx_SpinLockFree"]
-        pub fn SpinLockFree(lock: *mut pg_sys::slock_t) -> bool;
-    }
+    pub use crate::{
+        pgx_SpinLockAcquire as SpinLockAcquire, pgx_SpinLockFree as SpinLockFree,
+        pgx_SpinLockInit as SpinLockInit, pgx_SpinLockRelease as SpinLockRelease,
+    };
 }
 
 mod internal {
