@@ -30,7 +30,7 @@ impl PgGuardRewriter {
         let mut stream = proc_macro2::TokenStream::new();
 
         for item in block.items.into_iter() {
-            stream.extend(self.foreign_item(item));
+            stream.extend(self.foreign_item(item, &block.abi));
         }
 
         stream
@@ -84,20 +84,28 @@ impl PgGuardRewriter {
         })
     }
 
-    pub fn foreign_item(&self, item: ForeignItem) -> eyre::Result<proc_macro2::TokenStream> {
+    pub fn foreign_item(
+        &self,
+        item: ForeignItem,
+        abi: &syn::Abi,
+    ) -> eyre::Result<proc_macro2::TokenStream> {
         match item {
             ForeignItem::Fn(func) => {
                 if func.sig.variadic.is_some() {
-                    return Ok(quote! { extern "C" { #func } });
+                    return Ok(quote! { #abi { #func } });
                 }
 
-                self.foreign_item_fn(&func)
+                self.foreign_item_fn(&func, abi)
             }
-            _ => Ok(quote! { extern "C" { #item } }),
+            _ => Ok(quote! { #abi { #item } }),
         }
     }
 
-    pub fn foreign_item_fn(&self, func: &ForeignItemFn) -> eyre::Result<proc_macro2::TokenStream> {
+    pub fn foreign_item_fn(
+        &self,
+        func: &ForeignItemFn,
+        abi: &syn::Abi,
+    ) -> eyre::Result<proc_macro2::TokenStream> {
         let func_name = PgGuardRewriter::build_func_name(&func.sig);
         let arg_list = PgGuardRewriter::rename_arg_list(&func.sig)?;
         let arg_list_with_types = PgGuardRewriter::rename_arg_list_with_types(&func.sig)?;
@@ -106,7 +114,7 @@ impl PgGuardRewriter {
         Ok(quote! {
             pub unsafe fn #func_name ( #arg_list_with_types ) #return_type {
                 crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
-                    extern "C" { #func }
+                    #abi { #func }
                     #func_name(#arg_list)
                 })
             }
