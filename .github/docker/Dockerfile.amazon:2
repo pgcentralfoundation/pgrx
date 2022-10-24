@@ -6,20 +6,21 @@ RUN amazon-linux-extras enable postgresql$PG_MAJOR_VER
 RUN yum clean metadata
 
 RUN yum install -y \
+  bison \
+  clang \
+  flex \
   libpq \
   libpq-devel \
+  openssl \
+  openssl-devel \
   postgresql \
   postgresql-devel \
   postgresql-server \
   postgresql-server-devel \
-  openssl \
-  openssl-devel \
-  bison \
-  flex \
   readline \
   readline-devel \
-  which \
-  clang
+  vim \
+  which
 
 RUN chmod a+rwx `$(which pg_config) --pkglibdir` \
   `$(which pg_config) --sharedir`/extension \

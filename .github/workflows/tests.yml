@@ -25,8 +25,8 @@ jobs:
       fail-fast: false
       matrix:
         pg_version: ["pg10", "pg11", "pg12", "pg13", "pg14"]
-        container: ["amazon:2"]
-        # container: ["fedora:36", "debian:bullseye","alpine:3.16"]
+        # container: ["amazon:2"]
+        container: ["fedora:36", "debian:bullseye","alpine:3.16","amazon:2"]
     steps:
       - uses: actions/checkout@v2
 
