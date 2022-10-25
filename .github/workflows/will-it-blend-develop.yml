@@ -1,0 +1,35 @@
+name: Will It Blend™, develop edition
+
+on:
+  schedule:
+   - cron: "08 21 * * *"
+
+env:
+  # NB: Don't modify `RUSTFLAGS` here, since it would override the ones
+  # configured by `.cargo/config.toml` on macOS.
+  RUST_BACKTRACE: 1
+  CARGO_INCREMENTAL: "false"
+  # CARGO_LOG: cargo::core::compiler::fingerprint=info # Uncomment this to output compiler fingerprint info
+
+jobs:
+  pgx_tests:
+    name: Distro tests
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        pg_version: ["pg10", "pg11", "pg12", "pg13", "pg14"]
+        container: ["fedora:36", "debian:bullseye", "alpine:3.16", "amazon:2"]
+    steps:
+      - uses: actions/checkout@v3
+        with:
+          ref: develop
+
+      - name: Set up environment variables
+        run: |
+          export PG_MAJOR_VER=$(echo ${{ matrix.pg_version}} | cut -c3-)
+          echo "PG_MAJOR_VER=$PG_MAJOR_VER" >> $GITHUB_ENV
+
+      - name: Run PGX tests for Postgres ${{ matrix.pg_version }} using container ${{ matrix.container }}
+        shell: bash
+        run: ./.github/docker/run-docker.sh "$PG_MAJOR_VER" ${{ matrix.container }}
