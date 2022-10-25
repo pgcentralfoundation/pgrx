@@ -31,8 +31,8 @@ jobs:
         container: ["fedora:36", "debian:bullseye", "alpine:3.16", "amazon:2"]
     steps:
       - uses: actions/checkout@v3
-        with:
-          ref: develop
+        # with:
+        #   ref: develop
 
       - name: Set up environment variables
         run: |
