@@ -211,6 +211,7 @@ mod tests {
         });
     }
 
+    #[pg_test]
     fn test_connect_return_anything() {
         struct T;
         assert!(matches!(Spi::connect(|_| Ok(Some(T))).unwrap(), T));
