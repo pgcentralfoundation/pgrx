@@ -2,7 +2,7 @@ name: Will It Blend, develop edition
 
 on:
   schedule:
-   - cron: "13 21 * * *"
+   - cron: '16 21 * * *'
 
 env:
   # NB: Don't modify `RUSTFLAGS` here, since it would override the ones
