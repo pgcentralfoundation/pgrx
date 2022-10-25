@@ -2,7 +2,8 @@ name: Will It Blend, develop edition
 
 on:
   schedule:
-   - cron: '35 21 * * *'
+   - cron: '0 23 * * *'
+  workflow_dispatch:
 
 env:
   # NB: Don't modify `RUSTFLAGS` here, since it would override the ones
