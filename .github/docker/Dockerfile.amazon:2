@@ -22,7 +22,8 @@ RUN yum install -y \
 
 RUN yum -y install http://mirror.centos.org/centos/7/extras/x86_64/Packages/centos-release-scl-rh-2-3.el7.centos.noarch.rpm
 RUN yum -y install http://mirror.centos.org/centos/7/extras/x86_64/Packages/centos-release-scl-2-3.el7.centos.noarch.rpm
-RUN yum -y install http://mirror.centos.org/centos/7/sclo/x86_64/rh/Packages/l/llvm-toolset-7-clang-4.0.1-1.el7.x86_64.rpm
+# RUN yum -y install http://mirror.centos.org/centos/7/sclo/x86_64/rh/Packages/l/llvm-toolset-7-clang-4.0.1-1.el7.x86_64.rpm
+RUN yum -y install http://mirror.centos.org/centos/7/sclo/x86_64/rh/Packages/l/llvm-toolset-7-clang-5.0.1-4.el7.x86_64.rpm
 
 # NOTE: Assumption here is x86_64, which might suffice for CI builds but care
 # should be taken if this is used as a template elsewhere.
