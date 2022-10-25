@@ -1,8 +1,8 @@
-name: Will It Blend™, develop edition
+name: Will It Blend, develop edition
 
 on:
   schedule:
-   - cron: "08 21 * * *"
+   - cron: "13 21 * * *"
 
 env:
   # NB: Don't modify `RUSTFLAGS` here, since it would override the ones
