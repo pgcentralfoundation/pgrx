@@ -2,7 +2,7 @@
 #   docker build --build-arg PG_MAJOR_VER=14 -f .github/docker/Dockerfile.alpine\:3.16 -t pgx-fedora .
 #
 # Example of how to run this container with test after building the imagine:
-#   docker run pgx-fedora cargo test --no-default-features --features pg14
+#   docker run pgx-fedora cargo test --no-default-features --features pg14 --locked
 #
 # Note that "PG_MAJOR_VER" build arg in the build step must match the
 # "--features pgXX" in the run step
@@ -46,7 +46,7 @@ RUN curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y
 ENV PATH="/home/rust/.cargo/bin:${PATH}"
 
 # Install cargo-pgx from source copied into this container
-RUN cargo install --path cargo-pgx/
+RUN cargo install --path cargo-pgx/ --locked
 
 # Initialize cargo pgx so that we can run the tests
 RUN cargo pgx init --pg$PG_MAJOR_VER=/usr/pgsql-$PG_MAJOR_VER/bin/pg_config
