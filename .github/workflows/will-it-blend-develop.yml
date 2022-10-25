@@ -2,7 +2,7 @@ name: Will It Blend, develop edition
 
 on:
   schedule:
-   - cron: '0 23 * * *'
+    - cron: '20 22 * * *'
   workflow_dispatch:
   push:
     branches:
