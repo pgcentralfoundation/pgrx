@@ -198,6 +198,7 @@ impl<'a, T: FromDatum> Array<'a, T> {
         // So, assert correctness of the NullKind implementation and cleanup.
         // SAFETY: The pointer we got should be correctly constructed for slice validity.
         let pallocd_null_slice = unsafe { slice::from_raw_parts(nulls, nelems) };
+        #[cfg(debug_assertions)]
         for i in 0..nelems {
             assert_eq!(null_slice.get(i).unwrap(), pallocd_null_slice[i]);
         }
