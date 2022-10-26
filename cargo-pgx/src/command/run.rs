@@ -43,8 +43,8 @@ pub(crate) struct Run {
     profile: Option<String>,
     #[clap(flatten)]
     features: clap_cargo::Features,
-    #[clap(from_global, parse(from_occurrences))]
-    verbose: usize,
+    #[clap(from_global, action = ArgAction::Count)]
+    verbose: u8,
     /// Use an existing `pgcli` on the $PATH.
     #[clap(env = "PGX_PGCLI", long)]
     pgcli: bool,
