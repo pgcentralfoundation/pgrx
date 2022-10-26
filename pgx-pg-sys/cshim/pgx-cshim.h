@@ -51,9 +51,11 @@ PGDLLEXPORT char *pgx_ARR_DATA_PTR(ArrayType *arr);
 PGDLLEXPORT int pgx_ARR_NELEMS(ArrayType *arr);
 PGDLLEXPORT bits8 *pgx_ARR_NULLBITMAP(ArrayType *arr);
 PGDLLEXPORT int pgx_ARR_NDIM(ArrayType *arr);
-PGDLLEXPORT bool pgx_ARR_HASNULL(ArrayType *arr);
 PGDLLEXPORT int *pgx_ARR_DIMS(ArrayType *arr);
 PGDLLEXPORT void pgx_SpinLockInit(volatile slock_t *lock);
 PGDLLEXPORT void pgx_SpinLockAcquire(volatile slock_t *lock);
 PGDLLEXPORT void pgx_SpinLockRelease(volatile slock_t *lock);
-PGDLLEXPORT bool pgx_SpinLockFree(slock_t *lock);
+// Use `_Bool` and not `bool` until we can drop PG10, since under that version
+// `bool` will be an 8 bit integer, which impacts bindgen output.
+PGDLLEXPORT _Bool pgx_ARR_HASNULL(ArrayType *arr);
+PGDLLEXPORT _Bool pgx_SpinLockFree(slock_t *lock);

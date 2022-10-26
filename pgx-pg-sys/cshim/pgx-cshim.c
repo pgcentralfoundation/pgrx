@@ -91,7 +91,7 @@ int pgx_ARR_NDIM(ArrayType *arr) {
     return ARR_NDIM(arr);
 }
 
-bool pgx_ARR_HASNULL(ArrayType *arr) {
+_Bool pgx_ARR_HASNULL(ArrayType *arr) {
     return ARR_HASNULL(arr);
 }
 
@@ -111,6 +111,6 @@ void pgx_SpinLockRelease(volatile slock_t *lock) {
     SpinLockRelease(lock);
 }
 
-bool pgx_SpinLockFree(slock_t *lock) {
+_Bool pgx_SpinLockFree(slock_t *lock) {
     return SpinLockFree(lock);
 }
