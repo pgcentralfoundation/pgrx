@@ -8,7 +8,7 @@ Use of this source code is governed by the MIT license that can be found in the 
 */
 use cargo_metadata::{Metadata, MetadataCommand};
 use eyre::eyre;
-use semver::{Version, VersionReq};
+use semver::VersionReq;
 use std::path::Path;
 
 pub fn metadata(
@@ -37,7 +37,7 @@ pub fn validate(metadata: &Metadata) -> eyre::Result<()> {
     });
 
     for package in pgx_packages {
-        let package_semver = metadata_version_to_semver(package.version.clone());
+        let package_semver = package.version.clone();
         if !cargo_pgx_version_req.matches(&package_semver) {
             return Err(eyre!(
                 r#"`{}-{}` shouldn't be used with `cargo-pgx-{}`, please use `{} = "~{}"` in your `Cargo.toml`."#,
@@ -58,14 +58,4 @@ pub fn validate(metadata: &Metadata) -> eyre::Result<()> {
     }
 
     Ok(())
-}
-
-fn metadata_version_to_semver(metadata_version: cargo_metadata::Version) -> semver::Version {
-    Version {
-        major: metadata_version.major,
-        minor: metadata_version.minor,
-        patch: metadata_version.patch,
-        pre: metadata_version.pre,
-        build: metadata_version.build,
-    }
 }

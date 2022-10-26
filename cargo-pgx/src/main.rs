@@ -32,8 +32,8 @@ struct CargoCommand {
     #[clap(subcommand)]
     subcommand: CargoSubcommands,
     /// Enable info logs, -vv for debug, -vvv for trace
-    #[clap(short = 'v', long, parse(from_occurrences), global = true)]
-    verbose: usize,
+    #[clap(short = 'v', long, action = clap::ArgAction::Count, global = true)]
+    verbose: u8,
 }
 
 impl CommandExecute for CargoCommand {
