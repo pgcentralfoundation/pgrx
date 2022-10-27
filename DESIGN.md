@@ -122,7 +122,7 @@ After Rust's stack has unwound, the `panic!()` is handed off to `ereport()`, pas
 to Postgres.
 
 This process is similar to Postgres' `PG_TRY`/`PG_CATCH` C macros.  However, it happens at *every* Rust-->Postgres 
-function call boundary, and allows Rust to unwind its stack, calling destructors before relinquishing control to 
+function call boundary, allowing Rust to unwind its stack and call destructors before relinquishing control to 
 Postgres.
 
 ### Protecting Postgres Transactions (read: asking Rust for help)
