@@ -44,7 +44,7 @@ jobs:
             echo "Running via schedule, so using branch develop"
             echo "NIGHTLY_BUILD_REF=develop" >> $GITHUB_ENV
           else
-            echo "Not running via schedule, so using branch $GITHUB_REF_NAME"
+            echo "Not running via schedule, so using branch $GITHUB_HEAD_REF"
             echo "NIGHTLY_BUILD_REF=$GITHUB_HEAD_REF" >> $GITHUB_ENV
           fi
 
