@@ -23,8 +23,8 @@ pub(crate) struct New {
     /// Create a background worker template
     #[clap(long, short)]
     bgworker: bool,
-    #[clap(from_global, parse(from_occurrences))]
-    verbose: usize,
+    #[clap(from_global, action = ArgAction::Count)]
+    verbose: u8,
 }
 
 impl CommandExecute for New {

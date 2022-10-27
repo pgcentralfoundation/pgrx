@@ -27,13 +27,13 @@ pub(crate) struct Connect {
     /// The database to connect to (and create if the first time).  Defaults to a database with the same name as the current extension name
     #[clap(env = "DBNAME")]
     dbname: Option<String>,
-    #[clap(from_global, parse(from_occurrences))]
+    #[clap(from_global, action = ArgAction::Count)]
     verbose: usize,
     /// Package to determine default `pg_version` with (see `cargo help pkgid`)
     #[clap(long, short)]
     package: Option<String>,
     /// Path to Cargo.toml
-    #[clap(long, parse(from_os_str))]
+    #[clap(long, value_parser)]
     manifest_path: Option<PathBuf>,
     /// Use an existing `pgcli` on the $PATH.
     #[clap(env = "PGX_PGCLI", long)]
