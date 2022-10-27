@@ -24,15 +24,16 @@ None of these appear active today.
 ## Goals
 
 pgx' primary goal is to make Rust extension development as natural to Rust programmers as possible.  This generally 
-means doing the best we can to avoid violating POLA as it relates to error handling, memory management, and type 
-conversion.  Where it can, pgx tries to provide larger Rust APIs around internal Postgres APIs.  
+means doing the best we can to avoid violating [the principle of least astonishment](https://en.wikipedia.org/wiki/Principle_of_least_astonishment) 
+as it relates to error handling, memory management, and type conversion.  
 
-Once such example is a safe Rust API for creating Postgres aggregate functions.  The developer implements a single trait, 
-`pgx::aggregate::Aggregate`, described in safe Rust, and pgx handles all the code and SQL generation to expose the
+As part of this goal, pgx tries to provide larger Rust APIs around internal Postgres APIs.  Once such example is its 
+safe Rust API for creating Postgres aggregate functions.  The developer implements a single trait, 
+`pgx::aggregate::Aggregate`, described in safe Rust, and pgx handles all the code and SQL generation to expose the 
 aggregate function to the SQL-level.
 
-On the unsafe side of things, pgx also provides "unsafe" access to all of Postgres' internals.  Doing so allows pgx,
-and especially developers, to access all Postgres internals -- especially those not yet wrapped in safe Rust APIs.
+pgx also provides "unsafe" access to all of Postgres' internals.  Doing so allows pgx, and especially developers, to 
+access all Postgres internals -- especially those not yet wrapped in safe Rust APIs.
 
 The secondary goal, which is not any less important, is an SQL schema generator that programmatically generates 
 extension SQL from the extension Rust sources.  Other than solving the lazy programmer problem, the schema generator 
@@ -50,8 +51,9 @@ enormous undertaking which will continue for many years.
 
 ## Rust Bindings Generation
 
-pgx uses [`bindgen`](https://github.com/rust-lang/rust-bindgen) to generate Rust "bindings" from Postgres' C headers.  
-Ultimately, a Rust version of Postgres' internal structs, typedefs, functions, globals, and enums is generated.
+pgx uses [`bindgen`](https://github.com/rust-lang/rust-bindgen) to generate Rust "bindings" from Postgres' C headers.
+Ultimately, Rust versions of Postgres' internal structs, typedefs, functions definitions, globals, and enums are 
+generated.
 
 The generated bindings are part of the sibling `pgx-pg-sys` crate and are exported through `pgx` as the `::pg_sys` 
 module.  One set of bindings are generated for each supported Postgres version, and the proper one is used based on Rust 
