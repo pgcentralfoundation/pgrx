@@ -34,7 +34,7 @@ jobs:
         run: env
       # If this workflow is being called from a schedule/cron job, then let's
       # force the "develop" branch. Otherwise, use whatever is passed in via
-      # GITHUB_REF_NAME. The result of this will be used below in the
+      # GITHUB_HEAD_REF. The result of this will be used below in the
       # actions/checkout@vX step. Note that at the time of this writing, Github
       # Actions does not allow us to specify which branch to run a schedule from
       # (it always runs from the default branch, which in this case is master).
@@ -45,7 +45,7 @@ jobs:
             echo "NIGHTLY_BUILD_REF=develop" >> $GITHUB_ENV
           else
             echo "Not running via schedule, so using branch $GITHUB_REF_NAME"
-            echo "NIGHTLY_BUILD_REF=$GITHUB_REF_NAME" >> $GITHUB_ENV
+            echo "NIGHTLY_BUILD_REF=$GITHUB_HEAD_REF" >> $GITHUB_ENV
           fi
 
       - uses: actions/checkout@v3
