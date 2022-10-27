@@ -4,14 +4,6 @@ on:
   schedule:
     - cron: '0 7 * * *'
   workflow_dispatch:
-  push:
-    branches:
-      - master
-      - develop
-  pull_request:
-    branches:
-      - master
-      - develop
 
 env:
   # NB: Don't modify `RUSTFLAGS` here, since it would override the ones
@@ -30,8 +22,6 @@ jobs:
         pg_version: ["pg10", "pg11", "pg12", "pg13", "pg14"]
         container: ["fedora:36", "debian:bullseye", "alpine:3.16", "amazon:2"]
     steps:
-      - name: Print env
-        run: env
       # If this workflow is being called from a schedule/cron job, then let's
       # force the "develop" branch. Otherwise, use whatever is passed in via
       # GITHUB_HEAD_REF. The result of this will be used below in the
