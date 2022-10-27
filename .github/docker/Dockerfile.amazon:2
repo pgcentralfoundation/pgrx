@@ -1,7 +1,7 @@
 # Example of how to build this container (ran from pgx checkout directory):
 #   docker build --build-arg PG_MAJOR_VER=14 -f .github/docker/Dockerfile.alpine\:3.16 -t pgx-amazonlinux2 .
 #
-# Example of how to run this container with test after building the imagine:
+# Example of how to run this container with tests after building the image:
 #   docker run pgx-amazonlinux2 cargo test --no-default-features --features pg14 --locked
 #
 # Note that "PG_MAJOR_VER" build arg in the build step must match the

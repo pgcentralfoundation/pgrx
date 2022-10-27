@@ -13,7 +13,7 @@ env:
   # CARGO_LOG: cargo::core::compiler::fingerprint=info # Uncomment this to output compiler fingerprint info
 
 jobs:
-  pgx_tests:
+  distro_tests:
     name: Distro tests
     runs-on: ubuntu-latest
     strategy:
