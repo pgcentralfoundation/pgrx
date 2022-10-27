@@ -30,6 +30,8 @@ jobs:
         pg_version: ["pg10", "pg11", "pg12", "pg13", "pg14"]
         container: ["fedora:36", "debian:bullseye", "alpine:3.16", "amazon:2"]
     steps:
+      - name: Print env
+        run: env
       # If this workflow is being called from a schedule/cron job, then let's
       # force the "develop" branch. Otherwise, use whatever is passed in via
       # GITHUB_REF_NAME. The result of this will be used below in the
