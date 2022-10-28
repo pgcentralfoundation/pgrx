@@ -160,25 +160,101 @@ original `#[pg_guard]`, the panic information is properly handed off to Postgres
 
 ---
 
-Together, these two error handling mechanisms allow a pgx-based extension to safely raise (and survive!) runtime 
-"errors" from both Rust and Postgres and "bounce" back-n-forth through either type.  Assuming `#[pg_guard]` is properly 
-applied a call chain like `Postgres-->Rust-->Rust-->Rust-->Postgres-->Rust(panic!)` will properly unwind the Rust stack, 
-call Rust destructors, and safely abort the active Postgres transaction. So will a call chain like 
+Together, these two error handling mechanisms allow a pgx extension to safely raise (and survive!) runtime "errors" from 
+both Rust and Postgres and "bounce" back-n-forth through either type.  Assuming `#[pg_guard]` is properly applied a call 
+chain like `Postgres-->Rust-->Rust-->Rust-->Postgres-->Rust(panic!)` will properly unwind the Rust stack, call Rust 
+destructors, and safely abort the active Postgres transaction. So will a call chain like 
 `Postgres-->Rust-->Postgres-->Rust-->Rust-->Postgres(ERROR)`.
 
 ## Memory Allocation
 
-- Rust allocates as it normally does
-  - No custom Rust GlobalAllocator
-  - `impl Drop` happens when expected
-- `PgBox` exists for managing Postgres-allocated pointers
-  - Knows (via a ZST) who allocated the backing pointer (via `palloc()`), and if Rust did so follows Rust's drop semantics, otherwise the backing pointer is freed by Postgres when it decides
-- Any Rust-allocated object can be purposely copied into a Postgres MemoryContext and have its `drop()` implementation called when Postgres frees that MemoryContext
-  - `PgMemoryContexts::leak_and_drop_on_delete()` is responsible for this
-- `PgMemoryContexts` enum for easily executing code within a specific Postgres memory context
-  - In general one doesn't worry since Rust is generally managing allocations
-- Direct access to `palloc/pfree` (and friends)
- 
+Postgres uses a system it calls `MemoryContext`s to manage memory.  A `MemoryContext` lives for a certain amount of time
+(not to be confused with Rust's concept of lifetimes), and typically this is no longer than the life of the current
+transaction.  When Postgres decides a `MemoryContext` is no longer needed, it is freed en mas. Combined with Postgres 
+transaction and error handling (described above), memory contexts serve as a simple garbage collection system, ensuring 
+a transaction doesn't leak memory.
+
+The most common context is the `CurrentMemoryContext`.  Executing code is run with `CurrenteMemoryContext` set to a 
+valid context and generally doesn't need to know how long it lives.  Except more often then not, executing code needs to 
+decide how long some allocated bytes live.  It's quite common for Postgres internals, and extensions, to "switch to" a
+different, longer-lived `MemoryContext`, allocate some bytes, and switch back to the previous `CurrentMemoryContext`.
+Failure to do so can result in, at least, use-after-free bugs.
+
+Rust, on the other hand, decides **at compile time**, when allocated memory should be freed.  The Rust compiler also 
+guarantees that all allocated objects are valid when they're used (barring use of `unsafe`) and aren't mutated 
+concurrently.  These approaches aren't exactly compatible.
+
+### The Rust Compiler is Smarter than You Are
+
+Working under the premise that pgx wants to be unsurprising to Rust developers, the only clear option is to let Rust and 
+the compiler do what they do, independent of Postgres' memory context system.  Rust developers *want* the compiler to 
+complain when they attempt to use memory before it's been allocated, after it's been freed, and try to concurrently
+mutate it.
+
+pgx does not replace Rust's `GlobalAllocator`.  If it did, it would presumably use the Postgres memory context system, 
+allocating against whatever `CurrentMemoryContext` happens to be.  The idea of a compiler reasoning about the lifetime 
+of allocated bytes coming from a runtime allocation system that doesn't follow the same rules is not very persuasive.  
+Additionally, Postgres is **not** thread-safe, which includes its memory management system.  It is a feature that pgx 
+extensions can take advantage of Rust's excellent concurrency support, so long as they follow certain conditions (more 
+on thead safety below).
+
+The goal is that developers shouldn't need to worry about `CurrentMemoryContext` because they're not using it.  Just as 
+in C, however, there are cases where allocated bytes need to live longer than the Rust compiler will allow.  
+Typically, this is dictated by a particular internal Postgres API.  
+
+For example, the set returning function API (SRF) requires that the "multi-call state" be allocated in a specific 
+`MemoryContext`. To help with this, pgx provides direct unsafe access to Postgres' memory context apis through the 
+`pg_sys` module.  It also provides an enum-based wrapper, `PgMemoryContexts`, which exposes a safe API for working with
+memory contexts, including switching Postgres to a different.
+
+### Who am I, why am I here?
+
+Having two different approaches to memory allocation leads to bytes coming from one or the other.  As it relates to 
+bytes/pointers provided by pgx, the rules are fairly straightforward:
+
+If pgx gives or wants a...
+
+  1. pointer (`mut *T`), it is allocated/freed by Postgres
+  2. `PgBox<T>`, its pointer is allocated by Postgres but may be freed by Rust during `drop()`, depending on construction
+  3. Rust reference (`&T:IntoDatum` or `&mut T:IntoDatum`), it is allocated/freed by Postgres
+  4. owned `T`, it is freed by Rust but may be holding Postgres-allocated pointers which are freed during `drop()`
+
+`PgBox<T, WhoAllocated>` is a type for managing a `palloc()`'d pointer.  That pointer could have come to life as the 
+return value of an internal Postgres function, allocated directly using `palloc()`, or by `PgBox` itself.
+
+Encoded in `PgBox`'s type is who performed the allocation -- Postgres or Rust.  When it's thought to be 
+`AllocatedByPostgres`, then it is left to Postgres to free the backing pointer whenever it thinks it should (typically 
+when its owning `MemoryContext` is deleted).  Only if it's thought to be `AllocatedByRust` is the backing pointer is 
+freed (via `pfree()`) when the `PgBox` instance is dropped.
+
+The `WhoAllocated` trait is a Zero Sized Type (ZST) and incurs no runtime overhead in terms of memory or branching -- 
+the compiler takes care of the implementation details through monomorphization.
+
+Functions such as `::alloc<T>()` exist (which delegate to `palloc()`) to create a new `PgBox` wrapping a pointer to a
+specific type.
+
+The `::into_pg(self)` function will relinquish `PgBox`'s ownership of the backing pointer and simply return it, which in
+turn passes responsibility of freeing the pointer to Postgres when it sees fit.
+
+`PgBox` also provides `Deref` and `DerefMut` implementations which will, as a safety measure, raise a Postgres ERROR 
+if the backing pointer be NULL.  These exist as a convenience for slightly more fluent code. 
+
+(as an aside, the `WhoAllocated` trait which determines much of `PgBox`'s behavior is poorly named.  It should be
+thought of as "WhoDrops", as it doesn't matter if the user calls `palloc()` directly and provides the pointer, if
+`PgBox` calls `palloc()` itself, or if it consumes a pointer provided by Postgres.  The decision it is making is if the 
+backing pointer should be freed following Rust's normal drop semantics or not)
+
+### Deferring Death
+
+Common concerns around "who allocated what and how long does it live" are typically centered around Datums (see
+below), passing pointers to internal Postgres functions, and holding on to pointers (regardless of source) for
+longer than the current Rust scope or life of `CurrentMemoryContext`.
+
+For the later case where Rust-allocated bytes need to live longer than the compiler will allow,
+`PgMemoryContexts.leak_and_drop_on_delete(T)` allows the thing to be leaked (returned to the caller as `*mut T`) and
+later dropped when Postgres decides to delete (free) the `MemoryContext` to which it was leaked.  The returned pointer
+can be stashed somewhere and later re-instantiated via `PgBox::from_pg()`.
+
 ## Thread Safety
 
 - As it relates to any Postgres-thing (calling a function, allocated memory, anything at all from `pgx_pg_sys::`), there is none
