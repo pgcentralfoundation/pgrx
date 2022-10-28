@@ -282,18 +282,63 @@ that situation is what happens with pgx -- the thread will die.
 
 ## Type Conversions
 
-- Postgres Datums are converted to equivalent Rust types via `pgx::FromDatum`
-  - Sometimes this is a built-in from Rust's standard library (ie, `text/varchar` -> `String`)
-  - Sometimes this is a pgx-specific wrapper type (ie, `timestamp with time zone` -> `pgx::TimestampWithTimeZone`)
-  - Some types are converted zero-copy (deTOASTING may occur, of course)
-- Rust type instances are converted into Postgres-allocated memory (for pass-by-reference Datums) via `pgx::IntoDatum`
-  - This is not a zero-copy conversion
-- Any supported type instance can be `NULL` if it's written as `Option<T>`
+pgx provides two traits for working with Postgres `Datum`s:  `FromDatum` and `IntoDatum`.  The former, given a `Datum`
+and its "is null" flag, creates a Rust type in the form of `Option<T>`.  The latter, given a Rust type, creates the
+equivalent Postgres `Datum`.
+
+Postgres datums are either pass-by-value or pass-by-reference.  Pass-by-value types, such as a `int4` have direct 
+conversions to the corresponding Rust type (`i32` in this case).  
+
+Pass-by-reference types are detoasted and either copied into a Rust-owned type or represented as a zero-copy reference.
+For example, pgx can represent the Postgres `text` datum as either a Rust-owned `String` or a `&str`.  Similar treatment
+exists for other pass-by-reference types such as `bytea` (`Vec<u8>` or `&[u8]`).
+
+In the case of converting a datum to a Rust reference, the backing memory is allocated in `CurrentMemoryContext`.
+However, pgx knows that in some situations, it needs to be allocated elsewhere and handles this automatically.  For
+example, pgx' SRF API implementation knows to allocate function arguments of type `&T:FromDatum` in the "multi-call 
+context".  Similarly, pgx' SPI API implementation knows to allocate datums returned from statements in the parent memory 
+context so that the value can outlive that specific pgx SPI session.
+
+When a Rust type is converted to a Datum, if it's pass-by-value, then it's a straightforward primitive cast.  When it's
+pass-by-reference, the proper Postgres pointer type is allocated in the `CurrentMemoryContext` and initialized in the
+way it most makes sense for that type.
+
+pgx represents its full understanding of a decoded datum as `Option<T>`.  This enables working with NULL values.
+
+Notes about some special-case handling:
+
+### TEXT/VARLENA
+
+Rust **requires** Strings to be UTF8.  If they're not, it's undefined behavior.  pgx assumes that `text` it receives
+from Postgres **is** UTF8.  This means pgx extensions, mainly those that do anything with text, won't necessarily work
+well in non-UTF8 Postgres databases.
+
+### Time Types
+
+pgx is zero-copy for Postgres' time types and can be converted to/from `u64` and `time::PrimitiveDateTime`.  Future work
+will involve implementing various Rust traits to provide operations such as addition and subtraction, including with
+intervals.  These will delegate to Postgres where appropriate.
+
+### ARRAY
+
+pgx Array handing is, as of this writing, receiving an overhaul to correct some memory safety issues and provide, when
+it can, a zero-copy view over the backing Postgres `ArrayType` instance.  Likely, pgx' ArrayType implementation will
+end up being something akin to an opaque `impl std::iter::Iterator<Item = Option<T>>`.
+
+### NUMERIC
+
+Numeric is being overhauled to be a zero-copy Rust type that will delegate all its math operations directly to the 
+corresponding Postgres functions.  For example, `impl Add<Numeric> for Numeric` will delegate to `pg_sys::numeric_add()`.
+
+### JSONB
+
+Currently, JSONB support incurs the overhead of serializing to a string, and then being deserialized by `serde`. 
+Perhaps a `serde::Deserialize` implementation that understands the JSONB format and allows borrows is possible.
 
 ## `cargo-pgx` is Your Friend
 
-TODO
+Please see the [cargo-pgx documentation](https://github.com/tcdi/pgx/blob/master/cargo-pgx/README.md)
 
 ## `postgrestd` Interactions
 
-- TODO:  What are they, why are they, and are we sure they're good decisions?
+TODO:  @workingjubilee, could I get a little help?
