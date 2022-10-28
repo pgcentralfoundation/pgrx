@@ -25,7 +25,7 @@ None of these appear active today.
 
 pgx' primary goal is to make Rust extension development as natural to Rust programmers as possible.  This generally 
 means doing the best we can to avoid violating [the principle of least astonishment](https://en.wikipedia.org/wiki/Principle_of_least_astonishment) 
-as it relates to error handling, memory management, and type conversion.  
+as it relates to error handling, memory management, and type conversion.
 
 As part of this goal, pgx tries to provide larger Rust APIs around internal Postgres APIs.  Once such example is its 
 safe Rust API for creating Postgres aggregate functions.  The developer implements a single trait, 
@@ -59,7 +59,7 @@ The generated bindings are part of the sibling `pgx-pg-sys` crate and are export
 module.  One set of bindings are generated for each supported Postgres version, and the proper one is used based on Rust 
 conditional compilation feature flags.
 
-A bit of post-processing is done to provide some developer conveniences.  
+A bit of post-processing is done to provide some developer conveniences.
 
 First, a graph is built of all Postgres internal structs that appear to be a Postgres `Node`.  The resulting struct 
 definitions are then augmented to `impl Display` (via `pg_sys::nodeToString()`) and to also`impl PgNode`, which is 
@@ -71,10 +71,10 @@ Postgres headers.
 pgx reserves the right to generate other convenience types, traits, etc in the future.  Such things may come from user
 requests or from the need to ensure more robust compile-time type checking and safety guarantees.
 
-The bindings are generated via the `build.rs` script in the `pgx-pg-sys` crate.  As some of Postgres header files are 
-themselves machine-generated, pgx requires its bindings be generated from these machine-generated headers.  When pgx is 
-managing Postgres instances itself (via `cargo-pgx`), it gets them from there, otherwise the "-server"/"-server-dev" 
-distribution packages must be locally installed.
+The bindings are generated via the `build.rs` script in the `pgx-pg-sys` crate.  As some of the Postgres header files 
+are themselves machine-generated, pgx requires its bindings be generated from these headers.  When pgx is managing 
+Postgres instances itself (via `cargo-pgx`), it gets them from there, otherwise the "-server"/"-server-dev" distribution 
+packages must be locally installed.
 
 ## Error Handling
 
@@ -90,15 +90,15 @@ recoverable error, not the entire process.
 
 ### Protecting the Rust Stack (read: lying to Postgres)
 
-Postgres uses the POSIX `sigsetjmp` and `longjmp` functions to implement its transaction error handling machinery.  
+Postgres uses the POSIX `sigsetjmp` and `longjmp` functions to implement its transaction error handling machinery.
 Essentially, at the point in the code where a new transaction begins, Postgres creates `sigsetjmp` point, and if an 
 ERROR is raised during the transaction, Postgres `longjmp`s back to that point, taking the other branch to abort the 
 transaction and perform necessary cleanup.  This means that Postgres is jumping to a stack frame from an earlier point 
-in time.  
+in time.
 
 Jumping across Rust stack frames is unsound at best, and completely unsafe at worst.  Specifically, doing so defeats any
 Rust destructor that was planned to execute during normal stack unwinding.  The ramifications of this can vary from 
-leaking memory to leaving things like reference-counted objects or locks completely unaware that they've been released.  
+leaking memory to leaving things like reference-counted objects or locks completely unaware that they've been released.
 If Rust's stack does not properly unwind, it is impossible to know the program state after `sigsetjmp`'s second return.
 
 With this in mind, it's also important to know that any Postgres internal function is subject to raise an ERROR, causing
@@ -153,7 +153,7 @@ pointers. In this case, each function needs a `#[pg_guard]` attached to it.
 a closure as its argument and returns a `Result`, where the `Error` variant contains the panic data.  The `Ok` variant, 
 of course, contains the closure's return value if no panic was raised.
 
-Everything executed within the `catch_unwind()` boundary adheres to proper Rust stack unwinding and destructor rules.  
+Everything executed within the `catch_unwind()` boundary adheres to proper Rust stack unwinding and destructor rules.
 When it does catch a `panic!()` pgx will then call Postgres' `ereport()` function with it.  How its handled from there
 depends how deep in the stack we are between Rust and internal Postgres functions, but ultimately, at the end of the
 original `#[pg_guard]`, the panic information is properly handed off to Postgres as an ERROR.
@@ -193,14 +193,14 @@ mutate it.
 
 pgx does not replace Rust's `GlobalAllocator`.  If it did, it would presumably use the Postgres memory context system, 
 allocating against whatever `CurrentMemoryContext` happens to be.  The idea of a compiler reasoning about the lifetime 
-of allocated bytes coming from a runtime allocation system that doesn't follow the same rules is not very persuasive.  
+of allocated bytes coming from a runtime allocation system that doesn't follow the same rules is not very persuasive.
 Additionally, Postgres is **not** thread-safe, which includes its memory management system.  It is a feature that pgx 
 extensions can take advantage of Rust's excellent concurrency support, so long as they follow certain conditions (more 
 on thead safety below).
 
 The goal is that developers shouldn't need to worry about `CurrentMemoryContext` because they're not using it.  Just as 
-in C, however, there are cases where allocated bytes need to live longer than the Rust compiler will allow.  
-Typically, this is dictated by a particular internal Postgres API.  
+in C, however, there are cases where allocated bytes need to live longer than the Rust compiler will allow.
+Typically, this is dictated by a particular internal Postgres API.
 
 For example, the set returning function API (SRF) requires that the "multi-call state" be allocated in a specific 
 `MemoryContext`. To help with this, pgx provides direct unsafe access to Postgres' memory context apis through the 
@@ -237,7 +237,7 @@ The `::into_pg(self)` function will relinquish `PgBox`'s ownership of the backin
 turn passes responsibility of freeing the pointer to Postgres when it sees fit.
 
 `PgBox` also provides `Deref` and `DerefMut` implementations which will, as a safety measure, raise a Postgres ERROR 
-if the backing pointer be NULL.  These exist as a convenience for slightly more fluent code. 
+if the backing pointer be NULL.  These exist as a convenience for slightly more fluent code.
 
 (as an aside, the `WhoAllocated` trait which determines much of `PgBox`'s behavior is poorly named.  It should be
 thought of as "WhoDrops", as it doesn't matter if the user calls `palloc()` directly and provides the pointer, if
