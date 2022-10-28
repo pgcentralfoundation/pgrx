@@ -25,13 +25,13 @@ pgx' primary goal is to make Rust extension development as natural to Rust progr
 means doing the best we can to avoid violating [the principle of least astonishment](https://en.wikipedia.org/wiki/Principle_of_least_astonishment) 
 as it relates to error handling, memory management, and type conversion.
 
-As part of this goal, pgx tries to provide larger Rust APIs around internal Postgres APIs.  Once such example is its 
+As part of this goal, pgx tries to provide larger Rust APIs around internal Postgres APIs.  One such example is pgx' 
 safe Rust API for creating Postgres aggregate functions.  The developer implements a single trait, 
 `pgx::aggregate::Aggregate`, described in safe Rust, and pgx handles all the code and SQL generation to expose the 
 aggregate function to the SQL-level.
 
-pgx also provides "unsafe" access to all of Postgres' internals.  Doing so allows pgx, and especially developers, to 
-access all Postgres internals -- especially those not yet wrapped in safe Rust APIs.
+pgx also provides "unsafe" access to all of Postgres' internals.  This allows developers (and pgx itself) to directly
+use internals not yet wrapped with safe Rust APIs.
 
 The secondary goal, which is not any less important, is an SQL schema generator that programmatically generates 
 extension SQL from the extension Rust sources.  Other than solving the lazy programmer problem, the schema generator 
@@ -71,8 +71,8 @@ requests or from the need to ensure more robust compile-time type checking and s
 
 The bindings are generated via the `build.rs` script in the `pgx-pg-sys` crate.  As some of the Postgres header files 
 are themselves machine-generated, pgx requires its bindings be generated from these headers.  When pgx is managing 
-Postgres instances itself (via `cargo-pgx`), it gets them from there, otherwise the "-server"/"-server-dev" distribution 
-packages must be locally installed.
+Postgres instances itself (via `cargo-pgx`), it gets them from there, otherwise it can use locally installed distro
+packages that include the header files.
 
 ## Error Handling
 
@@ -82,7 +82,7 @@ the current transaction, `FATAL` terminates the raising backend process, and `PA
 Rust only has one: `panic!()`, and it terminates the process.
 
 pgx, wanting to be as least surprising as possible to Rust developers, provides mechanisms for seamlessly handling
-Postgres `ERROR`s and Rust `panic!()`s.  There's two concerns here.  One is that Rust developers expect proper drop 
+Postgres `ERROR`s and Rust `panic!()`s.  There are two concerns here.  One is that Rust developers expect proper drop 
 semantics during stack unwinding.  The other is that Postgres expects the *transaction* to abort in the face of a 
 recoverable error, not the entire process.
 
@@ -192,9 +192,10 @@ mutate it.
 pgx does not replace Rust's `GlobalAllocator`.  If it did, it would presumably use the Postgres memory context system, 
 allocating against whatever `CurrentMemoryContext` happens to be.  The idea of a compiler reasoning about the lifetime 
 of allocated bytes coming from a runtime allocation system that doesn't follow the same rules is not very persuasive.
-Additionally, Postgres is **not** thread-safe, which includes its memory management system.  It is a feature that pgx 
-extensions can take advantage of Rust's excellent concurrency support, so long as they follow certain conditions (more 
-on thead safety below).
+Additionally, Postgres is **not** thread-safe, which includes its memory management system.  
+
+It is a feature, however, that pgx extensions can take advantage of Rust's excellent concurrency support, so long as 
+they follow certain conditions (more on thead safety below).
 
 The goal is that developers shouldn't need to worry about `CurrentMemoryContext` because they're not using it.  Just as 
 in C, however, there are cases where allocated bytes need to live longer than the Rust compiler will allow.
