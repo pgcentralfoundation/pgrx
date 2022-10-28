@@ -60,8 +60,8 @@ pub(crate) struct Init {
     /// If installed locally, the path to PG14's `pgconfig` tool, or `download` to have pgx download/compile/install it
     #[clap(env = "PG14_PG_CONFIG", long)]
     pg14: Option<String>,
-    #[clap(from_global, parse(from_occurrences))]
-    verbose: usize,
+    #[clap(from_global, action = ArgAction::Count)]
+    verbose: u8,
     #[clap(long, help = "Base port number")]
     base_port: Option<u16>,
     #[clap(long, help = "Base testing port number")]
