@@ -258,9 +258,27 @@ re-instantiated via `PgBox::from_pg()`.
 
 ## Thread Safety
 
-- As it relates to any Postgres-thing (calling a function, allocated memory, anything at all from `pgx_pg_sys::`), there is none
-- We (will) detect FFI calls into Postgres in non-the-main-thread and immediately panic
-- pgx extensions can use threads so long as they **don't use any** Postgres-thing within them
+As it relates to any Postgres thing (calling a function, allocated memory, anything at all from `pgx::*::*`), **there is 
+none!**  Postgres itself is purposely not thread safe and neither is pgx.
+
+It's difficult (right now) to ask the Rust compiler to ensure code is not using pgx from a thread.  We have been 
+discussing some ideas.  Until then, there's one simple rule:
+
+- Do **not** use anything from the `pgx` crate or any Postgres allocated memory from a thread
+
+You might be really smart and think you can sneak by doing something, but you're probably wrong.  Even if you're right,
+there's no help from the Rust compiler here, which means you're wrong.
+
+pgx does (rather, it's about to #777) detect if a Postgres `extern "C"` function is called from a thread that isn't the 
+main thread and go ahead and `panic!()`, but even this isn't a fool-proof guard and is only a runtime check.
+
+That said, it is okay for a pgx extension to use threads as long as they follow that one simple rule.  For example,
+there's no reason why an extension can't import `rayon` and parallel sort a Vec or take advantage of its amazing
+parallel iterators.  It's even fine to spawn a thread during `_PG_init()` and have it out there in the background
+doing whatever it does -- so long as it's not, not even a tiny bit, trying to use anything provided by pgx.
+
+Rust `panic!()`s from a thread do not interface with the pgx error handling machinery.  Whatever Rust normally does in 
+that situation is what happens with pgx -- the thread will die.
 
 ## Type Conversions
 
