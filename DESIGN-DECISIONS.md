@@ -1,5 +1,3 @@
-🚨 DRAFT OUTLINE 🚨
-
 This document attempts to describe the general design decisions `pgx` has made as it relates to providing a Rust-y API
 around Postgres internals.
 
