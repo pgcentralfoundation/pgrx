@@ -69,10 +69,10 @@ impl PostgresType {
     }
 
     pub fn from_derive_input(derive_input: DeriveInput) -> Result<Self, syn::Error> {
-        let _data_struct = match derive_input.data {
-            syn::Data::Struct(data_struct) => data_struct,
-            syn::Data::Union(_) | syn::Data::Enum(_) => {
-                return Err(syn::Error::new(derive_input.ident.span(), "expected struct"))
+        match derive_input.data {
+            syn::Data::Struct(_) | syn::Data::Enum(_) => {}
+            syn::Data::Union(_) => {
+                return Err(syn::Error::new(derive_input.ident.span(), "expected struct or enum"))
             }
         };
         let to_sql_config =

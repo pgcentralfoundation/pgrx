@@ -671,6 +671,11 @@ struct Dog {
     treats_recieved: i64,
     pets_gotten: i64,
 }
+
+#[derive(Debug, Serialize, Deserialize, PostgresType)]
+enum Animal {
+    Dog(Dog),
+}
 ```
 
 Optionally accepts the following attributes:
@@ -698,7 +703,12 @@ fn impl_postgres_type(ast: DeriveInput) -> proc_macro2::TokenStream {
     // validate that we're only operating on a struct
     match ast.data {
         Data::Struct(_) => { /* this is okay */ }
-        _ => panic!("#[derive(PostgresType)] can only be applied to structs"),
+        Data::Enum(_) => {
+            // this is okay and if there's an attempt to implement PostgresEnum,
+            // it will result in compile-time error of conflicting implementation
+            // of traits (IntoDatum, inout, etc.)
+        }
+        _ => panic!("#[derive(PostgresType)] can only be applied to structs or enums"),
     }
 
     if args.is_empty() {
