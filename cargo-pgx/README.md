@@ -277,7 +277,7 @@ strings=# select strings.to_lowercase('PGX');
 (1 row)
 ```
 
-`cargo pgx run <pg11 | pg12 | pg13 | pg14>` is the primary interface into compiling and interactively testing/using your extension during development.
+`cargo pgx run <pg11 | pg12 | pg13 | pg14 | pg15>` is the primary interface into compiling and interactively testing/using your extension during development.
 
 The very first time you execute `cargo pgx run pgXX`, it needs to compile not only your extension, but pgx itself, along with all its dependencies. Depending on your computer, this could take a bit of time (`pgx` is nearly 200k lines of Rust when counting the generated bindings for Postgres). Afterwards, however (as seen in the above screenshot), it's fairly fast.
 
@@ -357,7 +357,7 @@ strings=#
 ```
 
 If you'd simply like to connect to a managed version of Postgres without re-compiling and installing
-your extension, use `cargo pgx connect <pg11 | pg12 | pg13 | pg14>`.
+your extension, use `cargo pgx connect <pg11 | pg12 | pg13 | pg14 | pg15>`.
 
 This command will use the default database named for your extension, or you can specify another
 database name as the final argument.
