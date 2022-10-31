@@ -60,47 +60,47 @@ SUBCOMMANDS:
 
 ```shell script
 $ cargo pgx init
-  Discovered Postgres v14.1, v13.5, v12.9, v11.14, v10.19
-  Downloading Postgres v10.19 from https://ftp.postgresql.org/pub/source/v10.19/postgresql-10.19.tar.bz2
-  Downloading Postgres v14.1 from https://ftp.postgresql.org/pub/source/v14.1/postgresql-14.1.tar.bz2
-  Downloading Postgres v12.9 from https://ftp.postgresql.org/pub/source/v12.9/postgresql-12.9.tar.bz2
-  Downloading Postgres v11.14 from https://ftp.postgresql.org/pub/source/v11.14/postgresql-11.14.tar.bz2
-  Downloading Postgres v13.5 from https://ftp.postgresql.org/pub/source/v13.5/postgresql-13.5.tar.bz2
-     Removing /home/yourself/.pgx/10.19
-     Removing /home/yourself/.pgx/14.1
-     Removing /home/yourself/.pgx/12.9
-    Untarring Postgres v10.19 to /home/yourself/.pgx/10.19
-    Untarring Postgres v14.1 to /home/yourself/.pgx/14.1
-    Untarring Postgres v12.9 to /home/yourself/.pgx/12.9
-     Removing /home/yourself/.pgx/11.14
-    Untarring Postgres v11.14 to /home/yourself/.pgx/11.14
-     Removing /home/yourself/.pgx/13.5
-    Untarring Postgres v13.5 to /home/yourself/.pgx/13.5
-  Configuring Postgres v10.19
-  Configuring Postgres v12.9
-  Configuring Postgres v14.1
-  Configuring Postgres v11.14
-  Configuring Postgres v13.5
-    Compiling Postgres v10.19
-    Compiling Postgres v14.1
-    Compiling Postgres v12.9
-    Compiling Postgres v11.14
-    Compiling Postgres v13.5
-   Installing Postgres v10.19 to /home/yourself/.pgx/10.19/pgx-install
-   Installing Postgres v11.14 to /home/yourself/.pgx/11.14/pgx-install
-   Installing Postgres v12.9 to /home/yourself/.pgx/12.9/pgx-install
-   Installing Postgres v13.5 to /home/yourself/.pgx/13.5/pgx-install
-   Installing Postgres v14.1 to /home/yourself/.pgx/14.1/pgx-install
-   Validating /home/yourself/.pgx/10.19/pgx-install/bin/pg_config
-   Validating /home/yourself/.pgx/11.14/pgx-install/bin/pg_config
-   Validating /home/yourself/.pgx/12.9/pgx-install/bin/pg_config
-   Validating /home/yourself/.pgx/13.5/pgx-install/bin/pg_config
-   Validating /home/yourself/.pgx/14.1/pgx-install/bin/pg_config
+  Discovered Postgres v15.0, v14.5, v13.8, v12.12, v11.17
+  Downloading Postgres v15.0 from https://ftp.postgresql.org/pub/source/v15.0/postgresql-15.0.tar.bz2
+  Downloading Postgres v11.17 from https://ftp.postgresql.org/pub/source/v11.17/postgresql-11.17.tar.bz2
+  Downloading Postgres v12.12 from https://ftp.postgresql.org/pub/source/v12.12/postgresql-12.12.tar.bz2
+  Downloading Postgres v13.8 from https://ftp.postgresql.org/pub/source/v13.8/postgresql-13.8.tar.bz2
+  Downloading Postgres v14.5 from https://ftp.postgresql.org/pub/source/v14.5/postgresql-14.5.tar.bz2
+     Removing /home/yourself/.pgx/11.17
+    Untarring Postgres v11.17 to /home/yourself/.pgx/11.17
+     Removing /home/yourself/.pgx/14.5
+     Removing /home/yourself/.pgx/12.12
+    Untarring Postgres v14.5 to /home/yourself/.pgx/14.5
+    Untarring Postgres v12.12 to /home/yourself/.pgx/12.12
+     Removing /home/yourself/.pgx/15.0
+     Removing /home/yourself/.pgx/13.8
+    Untarring Postgres v15.0 to /home/yourself/.pgx/15.0
+    Untarring Postgres v13.8 to /home/yourself/.pgx/13.8
+  Configuring Postgres v11.17
+  Configuring Postgres v12.12
+  Configuring Postgres v14.5
+  Configuring Postgres v13.8
+  Configuring Postgres v15.0
+    Compiling Postgres v11.17
+    Compiling Postgres v12.12
+    Compiling Postgres v13.8
+    Compiling Postgres v14.5
+    Compiling Postgres v15.0
+   Installing Postgres v11.17 to /home/yourself/.pgx/11.17/pgx-install
+   Installing Postgres v12.12 to /home/yourself/.pgx/12.12/pgx-install
+   Installing Postgres v13.8 to /home/yourself/.pgx/13.8/pgx-install
+   Installing Postgres v14.5 to /home/yourself/.pgx/14.5/pgx-install
+   Installing Postgres v15.0 to /home/yourself/.pgx/15.0/pgx-install
+   Validating /home/yourself/.pgx/11.17/pgx-install/bin/pg_config
+   Validating /home/yourself/.pgx/12.12/pgx-install/bin/pg_config
+   Validating /home/yourself/.pgx/13.8/pgx-install/bin/pg_config
+   Validating /home/yourself/.pgx/14.5/pgx-install/bin/pg_config
+   Validating /home/yourself/.pgx/15.0/pgx-install/bin/pg_config
 ```
 
 `cargo pgx init` is required to be run once to properly configure the `pgx` development environment.
 
-As shown by the screenshot above, it downloads the latest versions of Postgres v10, v11, v12, v13, configures them, compiles them, and installs them to `~/.pgx/`. Other `pgx` commands such as `run` and `test` will fully manage and otherwise use these Postgres installations for you.
+As shown by the screenshot above, it downloads the latest versions of Postgres v11, v12, v13, v14, v15, configures them, compiles them, and installs them to `~/.pgx/`. Other `pgx` commands such as `run` and `test` will fully manage and otherwise use these Postgres installations for you.
 
 `pgx` is designed to support multiple Postgres versions in such a way that during development, you'll know if you're trying to use a Postgres API that isn't common across all versions. It's also designed to make testing your extension against these versions easy. This is why it requires you to have all fully compiled and installed versions of Postgres during development.
 
