@@ -20,7 +20,7 @@ use crate::CommandExecute;
 #[derive(clap::Args, Debug)]
 #[clap(author)]
 pub(crate) struct Test {
-    /// Do you want to run against Postgres `pg10`, `pg11`, `pg12`, `pg13`, `pg14`, `pg15`, or `all`?
+    /// Do you want to run against Postgres `pg11`, `pg12`, `pg13`, `pg14`, `pg15`, or `all`?
     #[clap(env = "PG_VERSION")]
     pg_version: Option<String>,
     /// If specified, only run tests containing this string in their names

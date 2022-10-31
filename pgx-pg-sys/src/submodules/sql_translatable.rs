@@ -12,7 +12,7 @@ unsafe impl SqlTranslatable for crate::FunctionCallInfoBaseData {
     }
 }
 
-#[cfg(any(feature = "pg10", feature = "pg11"))]
+#[cfg(any(feature = "pg11"))]
 unsafe impl SqlTranslatable for crate::FunctionCallInfoData {
     fn argument_sql() -> Result<SqlMapping, ArgumentError> {
         Ok(SqlMapping::Skip)

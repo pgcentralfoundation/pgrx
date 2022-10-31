@@ -68,8 +68,6 @@ pub struct BackgroundWorker {}
 impl BackgroundWorker {
     /// What is our name?
     pub fn get_name() -> &'static str {
-        #[cfg(feature = "pg10")]
-        const LEN: usize = 64;
         #[cfg(any(
             feature = "pg11",
             feature = "pg12",
@@ -159,9 +157,6 @@ impl BackgroundWorker {
         let user: *const c_char = user.as_ref().map_or(std::ptr::null(), |i| i.as_ptr());
 
         unsafe {
-            #[cfg(feature = "pg10")]
-            pg_sys::BackgroundWorkerInitializeConnection(db as *mut c_char, user as *mut c_char);
-
             #[cfg(any(
                 feature = "pg11",
                 feature = "pg12",
@@ -457,7 +452,7 @@ impl BackgroundWorkerBuilder {
     }
 
     /// What is the "main" function that should be run when the BackgroundWorker
-    /// process is started?  
+    /// process is started?
     ///
     /// The specified function **must** be:
     ///     - `extern "C"`,
@@ -565,22 +560,6 @@ impl BackgroundWorkerBuilder {
 /// the builder is useful for building this structure.
 impl<'a> Into<pg_sys::BackgroundWorker> for &'a BackgroundWorkerBuilder {
     fn into(self) -> pg_sys::BackgroundWorker {
-        #[cfg(feature = "pg10")]
-        let bgw = pg_sys::BackgroundWorker {
-            bgw_name: RpgffiChar::from(&self.bgw_name[..]).0,
-            bgw_flags: self.bgw_flags.bits(),
-            bgw_start_time: self.bgw_start_time as u32,
-            bgw_restart_time: match self.bgw_restart_time {
-                None => pg_sys::BGW_NEVER_RESTART,
-                Some(d) => d.as_secs() as i32,
-            },
-            bgw_library_name: RpgffiChar::from(&self.bgw_library_name[..]).0,
-            bgw_function_name: RpgffiChar::from(&self.bgw_function_name[..]).0,
-            bgw_main_arg: self.bgw_main_arg,
-            bgw_extra: RpgffiChar128::from(&self.bgw_extra[..]).0,
-            bgw_notify_pid: self.bgw_notify_pid,
-        };
-
         #[cfg(any(
             feature = "pg11",
             feature = "pg12",
@@ -622,9 +601,6 @@ fn wait_latch(timeout: i64, wakeup_flags: WLflags) -> i32 {
         latch
     }
 }
-
-#[cfg(feature = "pg10")]
-type RpgffiChar = RpgffiChar64;
 
 #[cfg(any(
     feature = "pg11",

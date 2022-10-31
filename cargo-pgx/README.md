@@ -141,7 +141,6 @@ OPTIONS:
             Base testing port number
 
     -h, --help           Print help information
-        --pg10 <PG10>    [env: PG10_PG_CONFIG=]
         --pg11 <PG11>    If installed locally, the path to PG11's `pgconfig` tool, or `download` to
                          have pgx download/compile/install it [env: PG11_PG_CONFIG=]
         --pg12 <PG12>    If installed locally, the path to PG12's `pgconfig` tool, or `download` to
@@ -278,7 +277,7 @@ strings=# select strings.to_lowercase('PGX');
 (1 row)
 ```
 
-`cargo pgx run <pg10 | pg11 | pg12 | pg13>` is the primary interface into compiling and interactively testing/using your extension during development.
+`cargo pgx run <pg11 | pg12 | pg13 | pg14>` is the primary interface into compiling and interactively testing/using your extension during development.
 
 The very first time you execute `cargo pgx run pgXX`, it needs to compile not only your extension, but pgx itself, along with all its dependencies. Depending on your computer, this could take a bit of time (`pgx` is nearly 200k lines of Rust when counting the generated bindings for Postgres). Afterwards, however (as seen in the above screenshot), it's fairly fast.
 
@@ -300,7 +299,7 @@ USAGE:
     cargo pgx run [OPTIONS] [ARGS]
 
 ARGS:
-    <PG_VERSION>    Do you want to run against Postgres `pg10`, `pg11`, `pg12`, `pg13`, `pg14`,
+    <PG_VERSION>    Do you want to run against Postgres `pg11`, `pg12`, `pg13`, `pg14`,
                     `pg15`? [env: PG_VERSION=]
     <DBNAME>        The database to connect to (and create if the first time).  Defaults to a
                     database with the same name as the current extension name
@@ -354,11 +353,11 @@ strings=# select strings.to_lowercase('PGX');
  pgx
 (1 row)
 
-strings=# 
+strings=#
 ```
 
 If you'd simply like to connect to a managed version of Postgres without re-compiling and installing
-your extension, use `cargo pgx connect <pg10 | pg11 | pg12 | pg13>`.
+your extension, use `cargo pgx connect <pg11 | pg12 | pg13 | pg14>`.
 
 This command will use the default database named for your extension, or you can specify another
 database name as the final argument.
@@ -375,7 +374,7 @@ USAGE:
     cargo pgx connect [OPTIONS] [ARGS]
 
 ARGS:
-    <PG_VERSION>    Do you want to run against Postgres `pg10`, `pg11`, `pg12`, `pg13`, `pg14`,
+    <PG_VERSION>    Do you want to run against Postgres `pg11`, `pg12`, `pg13`, `pg14`,
                     `pg15`? [env: PG_VERSION=]
     <DBNAME>        The database to connect to (and create if the first time).  Defaults to a
                     database with the same name as the current extension name [env: DBNAME=]
@@ -504,7 +503,7 @@ test result: ok. 2 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; fini
 Stopping Postgres
 ```
 
-`cargo pgx test [pg10 | pg11 | pg12 | pg13 | pg14 | pg15]` runs your `#[test]` and `#[pg_test]` annotated functions using cargo's test system.
+`cargo pgx test  pg11 | pg12 | pg13 | pg14 | pg15]` runs your `#[test]` and `#[pg_test]` annotated functions using cargo's test system.
 
 During the testing process, `pgx` starts a tempory instance of Postgres with its `PGDATA` directory in `./target/pgx-test-data-PGVER/`. This Postgres instance is stopped as soon as the test framework has finished.
 
@@ -524,7 +523,7 @@ USAGE:
     cargo pgx test [OPTIONS] [ARGS]
 
 ARGS:
-    <PG_VERSION>    Do you want to run against Postgres `pg10`, `pg11`, `pg12`, `pg13`, `pg14`,
+    <PG_VERSION>    Do you want to run against Postgres `pg11`, `pg12`, `pg13`, `pg14`,
                     `pg15`, or `all`? [env: PG_VERSION=]
     <TESTNAME>      If specified, only run tests containing this string in their names
 
@@ -663,7 +662,7 @@ USAGE:
     cargo pgx schema [OPTIONS] [PG_VERSION]
 
 ARGS:
-    <PG_VERSION>    Do you want to run against Postgres `pg10`, `pg11`, `pg12`, `pg13`, `pg14`,
+    <PG_VERSION>    Do you want to run against Postgres `pg11`, `pg12`, `pg13`, `pg14`,
                     `pg15`?
 
 OPTIONS:
@@ -779,7 +778,7 @@ This feature is not designed to assist in the backwards compatibility of data ty
 ### `@MODULE_PATHNAME@` Templating
 
 In case you are already providing custom SQL definitions for Rust functions, you can use the `@MODULE_PATHNAME@`
-template in your custom SQL. This value will be replaced with the path to the actual shared object. 
+template in your custom SQL. This value will be replaced with the path to the actual shared object.
 
 The following example illustrates how this works:
 

@@ -293,7 +293,7 @@ unsafe extern "C" fn pgx_executor_check_perms(
     hook.executor_check_perms(PgList::from_pg(range_table), ereport_on_violation, prev).inner
 }
 
-#[cfg(any(feature = "pg10", feature = "pg11", feature = "pg12", feature = "pg13"))]
+#[cfg(any(feature = "pg11", feature = "pg12", feature = "pg13"))]
 #[pg_guard]
 unsafe extern "C" fn pgx_process_utility(
     pstmt: *mut pg_sys::PlannedStmt,
@@ -392,7 +392,7 @@ unsafe extern "C" fn pgx_process_utility(
     .inner
 }
 
-#[cfg(any(feature = "pg10", feature = "pg11", feature = "pg12"))]
+#[cfg(any(feature = "pg11", feature = "pg12"))]
 #[pg_guard]
 unsafe extern "C" fn pgx_planner(
     parse: *mut pg_sys::Query,
@@ -427,7 +427,7 @@ unsafe extern "C" fn pgx_planner_impl(
         bound_params: PgBox<pg_sys::ParamListInfoData>,
     ) -> HookResult<*mut pg_sys::PlannedStmt> {
         HookResult::new(unsafe {
-            #[cfg(any(feature = "pg10", feature = "pg11", feature = "pg12"))]
+            #[cfg(any(feature = "pg11", feature = "pg12"))]
             {
                 (HOOKS.as_mut().unwrap().prev_planner_hook.as_ref().unwrap())(
                     parse.into_pg(),
@@ -494,7 +494,7 @@ unsafe extern "C" fn pgx_standard_executor_check_perms_wrapper(
     true
 }
 
-#[cfg(any(feature = "pg10", feature = "pg11", feature = "pg12", feature = "pg13"))]
+#[cfg(any(feature = "pg11", feature = "pg12", feature = "pg13"))]
 #[pg_guard]
 unsafe extern "C" fn pgx_standard_process_utility_wrapper(
     pstmt: *mut pg_sys::PlannedStmt,
@@ -540,7 +540,7 @@ unsafe extern "C" fn pgx_standard_process_utility_wrapper(
     )
 }
 
-#[cfg(any(feature = "pg10", feature = "pg11", feature = "pg12"))]
+#[cfg(any(feature = "pg11", feature = "pg12"))]
 #[pg_guard]
 unsafe extern "C" fn pgx_standard_planner_wrapper(
     parse: *mut pg_sys::Query,
