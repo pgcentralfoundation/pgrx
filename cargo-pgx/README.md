@@ -226,7 +226,7 @@ $ cargo pgx stop all
 
 `cargo pgx` has three commands for managing each Postgres installation: `start`, `stop`, and `status`. Additionally, `cargo pgx run` (see below) will automatically start its target Postgres instance if not already running.
 
-When starting a Postgres instance, `pgx` starts it on port `28800 + PG_MAJOR_VERSION`, so Postgres 10 runs on `28810`, 11 on `28811`, etc. Additionally, the first time any of these are started, it'll automaticaly initialize a `PGDATA` directory in `~/.pgx/data-[10 | 11 | 12]`. Doing so allows `pgx` to manage either Postgres versions it installed or ones already on your computer, and to make sure that in the latter case, `pgx` managed versions don't interfere with what might already be running.
+When starting a Postgres instance, `pgx` starts it on port `28800 + PG_MAJOR_VERSION`, so Postgres 11 runs on `28811`, 12 on `28812`, etc. Additionally, the first time any of these are started, it'll automaticaly initialize a `PGDATA` directory in `~/.pgx/data-[11 | 12 | 13 | 14 | 15]`. Doing so allows `pgx` to manage either Postgres versions it installed or ones already on your computer, and to make sure that in the latter case, `pgx` managed versions don't interfere with what might already be running.
 
 `pgx` doesn't tear down these instances. While they're stored in a hidden directory in your home directory, `pgx` considers these important and permanent database installations.
 
