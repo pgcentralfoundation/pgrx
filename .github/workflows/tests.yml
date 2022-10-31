@@ -96,7 +96,7 @@ jobs:
         echo ""
 
     - name: Cache cargo registry
-      uses: actions/cache@v2
+      uses: actions/cache@v3
       continue-on-error: false
       with:
         path: |
@@ -105,7 +105,7 @@ jobs:
         key: pgx-tests-cargo-${{ runner.os }}-${{ hashFiles('**/Cargo.lock', '.github/workflows/tests.yml') }}
 
     - name: Cache sccache directory
-      uses: actions/cache@v2
+      uses: actions/cache@v3
       continue-on-error: false
       with:
         path: /home/runner/.cache/sccache
@@ -280,7 +280,7 @@ jobs:
         echo ""
 
     - name: Cache cargo registry
-      uses: actions/cache@v2
+      uses: actions/cache@v3
       continue-on-error: false
       with:
         path: |
@@ -289,7 +289,7 @@ jobs:
         key: pgx-cargo_init_tests-cargo-${{ runner.os }}-${{ hashFiles('**/Cargo.lock', '.github/workflows/tests.yml') }}
 
     - name: Cache sccache directory
-      uses: actions/cache@v2
+      uses: actions/cache@v3
       continue-on-error: false
       with:
         path: /home/runner/.cache/sccache
@@ -373,7 +373,7 @@ jobs:
         echo ""
 
     - name: Cache sccache directory
-      uses: actions/cache@v2
+      uses: actions/cache@v3
       continue-on-error: false
       with:
         path: /Users/runner/Library/Caches/Mozilla.sccache
