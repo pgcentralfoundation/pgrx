@@ -29,7 +29,9 @@ impl crate::FormData_pg_attribute {
     }
 
     pub fn is_dropped(&self) -> bool {
-        self.attisdropped
+        // This is an `i8` under pg10, and `bool` otherwise. This expression
+        // is written in a somewhat awkward way to handle both.
+        (self.attisdropped as i8) != 0
     }
 
     pub fn rel_id(&self) -> crate::Oid {

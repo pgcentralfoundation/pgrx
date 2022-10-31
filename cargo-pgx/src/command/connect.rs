@@ -28,7 +28,7 @@ pub(crate) struct Connect {
     #[clap(env = "DBNAME")]
     dbname: Option<String>,
     #[clap(from_global, action = ArgAction::Count)]
-    verbose: usize,
+    verbose: u8,
     /// Package to determine default `pg_version` with (see `cargo help pkgid`)
     #[clap(long, short)]
     package: Option<String>,
