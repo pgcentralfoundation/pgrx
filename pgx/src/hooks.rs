@@ -341,7 +341,7 @@ unsafe extern "C" fn pgx_process_utility(
     )
     .inner
 }
-#[cfg(feature = "pg14")]
+#[cfg(any(feature = "pg14", feature = "pg15"))]
 #[pg_guard]
 unsafe extern "C" fn pgx_process_utility(
     pstmt: *mut pg_sys::PlannedStmt,
@@ -402,7 +402,7 @@ unsafe extern "C" fn pgx_planner(
     pgx_planner_impl(parse, std::ptr::null(), cursor_options, bound_params)
 }
 
-#[cfg(any(feature = "pg13", feature = "pg14"))]
+#[cfg(any(feature = "pg13", feature = "pg14", feature = "pg15"))]
 #[pg_guard]
 unsafe extern "C" fn pgx_planner(
     parse: *mut pg_sys::Query,
@@ -436,7 +436,7 @@ unsafe extern "C" fn pgx_planner_impl(
                 )
             }
 
-            #[cfg(any(feature = "pg13", feature = "pg14"))]
+            #[cfg(any(feature = "pg13", feature = "pg14", feature = "pg15"))]
             {
                 (HOOKS.as_mut().unwrap().prev_planner_hook.as_ref().unwrap())(
                     parse.into_pg(),
@@ -516,7 +516,7 @@ unsafe extern "C" fn pgx_standard_process_utility_wrapper(
     )
 }
 
-#[cfg(feature = "pg14")]
+#[cfg(any(feature = "pg14", feature = "pg15"))]
 #[pg_guard]
 unsafe extern "C" fn pgx_standard_process_utility_wrapper(
     pstmt: *mut pg_sys::PlannedStmt,
@@ -550,7 +550,7 @@ unsafe extern "C" fn pgx_standard_planner_wrapper(
     pg_sys::standard_planner(parse, cursor_options, bound_params)
 }
 
-#[cfg(any(feature = "pg13", feature = "pg14"))]
+#[cfg(any(feature = "pg13", feature = "pg14", feature = "pg15"))]
 #[pg_guard]
 unsafe extern "C" fn pgx_standard_planner_wrapper(
     parse: *mut pg_sys::Query,

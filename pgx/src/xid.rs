@@ -22,7 +22,7 @@ pub fn xid_to_64bit(xid: pg_sys::TransactionId) -> u64 {
     convert_xid_common(xid, last_xid, epoch)
 }
 
-#[cfg(any(feature = "pg12", feature = "pg13", feature = "pg14"))]
+#[cfg(any(feature = "pg12", feature = "pg13", feature = "pg14", feature = "pg15"))]
 #[inline]
 pub fn xid_to_64bit(xid: pg_sys::TransactionId) -> u64 {
     let full_xid = unsafe { pg_sys::ReadNextFullTransactionId() };

@@ -22,9 +22,11 @@ Use of this source code is governed by the MIT license that can be found in the 
 #[cfg(
     any(
         // no features at all will cause problems
-        not(any(feature = "pg10", feature = "pg11", feature = "pg12", feature = "pg13", feature = "pg14")),
+        not(any(feature = "pg10", feature = "pg11", feature = "pg12", feature = "pg13", feature = "pg14", feature = "pg15")),
   ))]
-std::compile_error!("exactly one one feature must be provided (pg10, pg11, pg12, pg13, pg14)");
+std::compile_error!(
+    "exactly one one feature must be provided (pg10, pg11, pg12, pg13, pg14, pg15)"
+);
 
 pub mod submodules;
 
@@ -72,6 +74,13 @@ mod pg14 {
 #[cfg(all(feature = "pg14", docsrs))]
 mod pg14;
 
+#[cfg(all(feature = "pg15", not(docsrs)))]
+mod pg15 {
+    include!(concat!(env!("OUT_DIR"), "/pg15.rs"));
+}
+#[cfg(all(feature = "pg15", docsrs))]
+mod pg15;
+
 // export each module publicly
 #[cfg(feature = "pg10")]
 pub use pg10::*;
@@ -83,6 +92,8 @@ pub use pg12::*;
 pub use pg13::*;
 #[cfg(feature = "pg14")]
 pub use pg14::*;
+#[cfg(feature = "pg15")]
+pub use pg15::*;
 
 // feature gate each pg-specific oid module
 #[cfg(all(feature = "pg10", not(docsrs)))]
@@ -120,6 +131,13 @@ mod pg14_oids {
 #[cfg(all(feature = "pg14", docsrs))]
 mod pg14_oids;
 
+#[cfg(all(feature = "pg15", not(docsrs)))]
+mod pg15_oids {
+    include!(concat!(env!("OUT_DIR"), "/pg15_oids.rs"));
+}
+#[cfg(all(feature = "pg15", docsrs))]
+mod pg15_oids;
+
 // export that module publicly
 #[cfg(feature = "pg10")]
 pub use pg10_oids::*;
@@ -131,6 +149,8 @@ pub use pg12_oids::*;
 pub use pg13_oids::*;
 #[cfg(feature = "pg14")]
 pub use pg14_oids::*;
+#[cfg(feature = "pg15")]
+pub use pg15_oids::*;
 
 // expose things we want available for all versions
 pub use all_versions::*;
@@ -161,13 +181,16 @@ pub use internal::pg13::*;
 #[cfg(feature = "pg14")]
 pub use internal::pg14::*;
 
+#[cfg(feature = "pg15")]
+pub use internal::pg15::*;
+
 /// A trait applied to all Postgres `pg_sys::Node` types and subtypes
 pub trait PgNode {
     // TODO(0.6.0): seal this trait or take this trait private?
 
     /// Format this node
     #[inline]
-    fn display_node(&self) -> String {
+    fn display_node(&self) -> std::string::String {
         // SAFETY: The trait is pub but this impl is private, and
         // this is only implemented for things known to be "Nodes"
         unsafe { display_node_impl(NonNull::from(self).cast()) }
@@ -179,7 +202,7 @@ pub trait PgNode {
 /// # Safety
 /// Don't use this on anything that doesn't impl PgNode, or the type may be off
 #[warn(unsafe_op_in_unsafe_fn)]
-pub(crate) unsafe fn display_node_impl(node: NonNull<crate::Node>) -> String {
+pub(crate) unsafe fn display_node_impl(node: NonNull<crate::Node>) -> std::string::String {
     // SAFETY: It's fine to call nodeToString with non-null well-typed pointers,
     // and pg_sys::nodeToString() returns data via palloc, which is never null
     // as Postgres will ERROR rather than giving us a null pointer,
@@ -213,7 +236,7 @@ impl<'a> AsPgCStr for &'a str {
     }
 }
 
-impl AsPgCStr for String {
+impl AsPgCStr for std::string::String {
     fn as_pg_cstr(&self) -> *mut std::os::raw::c_char {
         self.as_str().as_pg_cstr()
     }
@@ -679,6 +702,42 @@ mod internal {
         pub use crate::pg14::AllocSetContextCreateInternal as AllocSetContextCreateExtended;
 
         pub const QTW_EXAMINE_RTES: u32 = crate::pg14::QTW_EXAMINE_RTES_BEFORE;
+
+        /// # Safety
+        ///
+        /// This function wraps Postgres' internal `IndexBuildHeapScan` method, and therefore, is
+        /// inherently unsafe
+        pub unsafe fn IndexBuildHeapScan<T>(
+            heap_relation: crate::Relation,
+            index_relation: crate::Relation,
+            index_info: *mut crate::IndexInfo,
+            build_callback: crate::IndexBuildCallback,
+            build_callback_state: *mut T,
+        ) {
+            let heap_relation_ref = heap_relation.as_ref().unwrap();
+            let table_am = heap_relation_ref.rd_tableam.as_ref().unwrap();
+
+            table_am.index_build_range_scan.unwrap()(
+                heap_relation,
+                index_relation,
+                index_info,
+                true,
+                false,
+                true,
+                0,
+                crate::InvalidBlockNumber,
+                build_callback,
+                build_callback_state as *mut std::os::raw::c_void,
+                std::ptr::null_mut(),
+            );
+        }
+    }
+
+    #[cfg(feature = "pg15")]
+    pub(crate) mod pg15 {
+        pub use crate::pg15::AllocSetContextCreateInternal as AllocSetContextCreateExtended;
+
+        pub const QTW_EXAMINE_RTES: u32 = crate::pg15::QTW_EXAMINE_RTES_BEFORE;
 
         /// # Safety
         ///

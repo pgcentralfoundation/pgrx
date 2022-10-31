@@ -70,7 +70,13 @@ impl BackgroundWorker {
     pub fn get_name() -> &'static str {
         #[cfg(feature = "pg10")]
         const LEN: usize = 64;
-        #[cfg(any(feature = "pg11", feature = "pg12", feature = "pg13", feature = "pg14"))]
+        #[cfg(any(
+            feature = "pg11",
+            feature = "pg12",
+            feature = "pg13",
+            feature = "pg14",
+            feature = "pg15"
+        ))]
         const LEN: usize = 96;
 
         unsafe {
@@ -156,7 +162,13 @@ impl BackgroundWorker {
             #[cfg(feature = "pg10")]
             pg_sys::BackgroundWorkerInitializeConnection(db as *mut c_char, user as *mut c_char);
 
-            #[cfg(any(feature = "pg11", feature = "pg12", feature = "pg13", feature = "pg14"))]
+            #[cfg(any(
+                feature = "pg11",
+                feature = "pg12",
+                feature = "pg13",
+                feature = "pg14",
+                feature = "pg15"
+            ))]
             pg_sys::BackgroundWorkerInitializeConnection(db, user, 0);
         };
     }
@@ -569,7 +581,13 @@ impl<'a> Into<pg_sys::BackgroundWorker> for &'a BackgroundWorkerBuilder {
             bgw_notify_pid: self.bgw_notify_pid,
         };
 
-        #[cfg(any(feature = "pg11", feature = "pg12", feature = "pg13", feature = "pg14"))]
+        #[cfg(any(
+            feature = "pg11",
+            feature = "pg12",
+            feature = "pg13",
+            feature = "pg14",
+            feature = "pg15"
+        ))]
         let bgw = pg_sys::BackgroundWorker {
             bgw_name: RpgffiChar::from(&self.bgw_name[..]).0,
             bgw_type: RpgffiChar::from(&self.bgw_type[..]).0,
@@ -608,7 +626,13 @@ fn wait_latch(timeout: i64, wakeup_flags: WLflags) -> i32 {
 #[cfg(feature = "pg10")]
 type RpgffiChar = RpgffiChar64;
 
-#[cfg(any(feature = "pg11", feature = "pg12", feature = "pg13", feature = "pg14"))]
+#[cfg(any(
+    feature = "pg11",
+    feature = "pg12",
+    feature = "pg13",
+    feature = "pg14",
+    feature = "pg15"
+))]
 type RpgffiChar = RpgffiChar96;
 
 struct RpgffiChar64([c_char; 64]);

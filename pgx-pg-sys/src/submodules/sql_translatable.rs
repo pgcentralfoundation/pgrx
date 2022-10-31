@@ -2,7 +2,7 @@ use pgx_utils::sql_entity_graph::metadata::{
     ArgumentError, Returns, ReturnsError, SqlMapping, SqlTranslatable,
 };
 
-#[cfg(any(feature = "pg14", feature = "pg13", feature = "pg12"))]
+#[cfg(any(feature = "pg15", feature = "pg14", feature = "pg13", feature = "pg12"))]
 unsafe impl SqlTranslatable for crate::FunctionCallInfoBaseData {
     fn argument_sql() -> Result<SqlMapping, ArgumentError> {
         Ok(SqlMapping::Skip)

@@ -239,6 +239,27 @@ macro_rules! pg_magic_func {
                 float8byval: pgx::pg_sys::USE_FLOAT8_BYVAL as i32,
             };
 
+            #[cfg(any(feature = "pg15"))]
+            const MY_MAGIC: pgx::pg_sys::Pg_magic_struct = pgx::pg_sys::Pg_magic_struct {
+                len: size_of::<pgx::pg_sys::Pg_magic_struct>() as i32,
+                version: pgx::pg_sys::PG_VERSION_NUM as i32 / 100,
+                funcmaxargs: pgx::pg_sys::FUNC_MAX_ARGS as i32,
+                indexmaxkeys: pgx::pg_sys::INDEX_MAX_KEYS as i32,
+                namedatalen: pgx::pg_sys::NAMEDATALEN as i32,
+                float8byval: pgx::pg_sys::USE_FLOAT8_BYVAL as i32,
+                abi_extra: {
+                    // array::from_fn isn't const yet, boohoo, so const-copy a bstr
+                    let magic = b"PostgreSQL";
+                    let mut abi = [0 as i8; 32];
+                    let mut i = 0;
+                    while i < magic.len() {
+                        abi[i] = magic[i] as _;
+                        i += 1;
+                    }
+                    abi
+                },
+            };
+
             // go ahead and register our panic handler since Postgres
             // calls this function first
             pgx::initialize();

@@ -24,6 +24,7 @@ pg11 = [ "pgx-pg-sys/pg11" ]
 pg12 = [ "pgx-pg-sys/pg12" ]
 pg13 = [ "pgx-pg-sys/pg13" ]
 pg14 = [ "pgx-pg-sys/pg14" ]
+pg15 = [ "pgx-pg-sys/pg15" ]
 time-crate = [ ] # TODO(0.6.0): add "dep:time"
 
 [package.metadata.docs.rs]
