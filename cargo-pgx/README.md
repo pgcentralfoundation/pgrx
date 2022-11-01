@@ -503,7 +503,7 @@ test result: ok. 2 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; fini
 Stopping Postgres
 ```
 
-`cargo pgx test  pg11 | pg12 | pg13 | pg14 | pg15]` runs your `#[test]` and `#[pg_test]` annotated functions using cargo's test system.
+`cargo pgx test [pg11 | pg12 | pg13 | pg14 | pg15]` runs your `#[test]` and `#[pg_test]` annotated functions using cargo's test system.
 
 During the testing process, `pgx` starts a tempory instance of Postgres with its `PGDATA` directory in `./target/pgx-test-data-PGVER/`. This Postgres instance is stopped as soon as the test framework has finished.
 
