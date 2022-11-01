@@ -21,6 +21,9 @@ use std::io::{BufRead, BufReader, Write};
 use std::path::PathBuf;
 use std::sync::{Arc, Mutex};
 
+mod shutdown;
+pub use shutdown::add_shutdown_hook;
+
 type LogLines = Arc<Mutex<HashMap<String, Vec<String>>>>;
 
 struct SetupState {
@@ -36,24 +39,6 @@ static TEST_MUTEX: Lazy<Mutex<SetupState>> = Lazy::new(|| {
         system_session_id: "NONE".to_string(),
     })
 });
-static SHUTDOWN_HOOKS: Lazy<Mutex<Vec<Box<dyn Fn() + Send>>>> =
-    Lazy::new(|| Mutex::new(Vec::new()));
-
-fn register_shutdown_hook() {
-    extern "C" fn run_shutdown_hooks() {
-        for func in SHUTDOWN_HOOKS.lock().unwrap().iter() {
-            func();
-        }
-    }
-    shutdown_hooks::add_shutdown_hook(run_shutdown_hooks);
-}
-
-pub fn add_shutdown_hook<F: Fn()>(func: F)
-where
-    F: Send + 'static,
-{
-    SHUTDOWN_HOOKS.lock().unwrap().push(Box::new(func));
-}
 
 // The goal of this closure is to allow "wrapping" of anything that might issue
 // an SQL simple_quuery or query using either a postgres::Client or
@@ -222,8 +207,7 @@ fn initialize_test_framework(
     });
 
     if !state.installed {
-        register_shutdown_hook();
-
+        shutdown::register_shutdown_hook();
         install_extension()?;
         initdb(postgresql_conf)?;
 
@@ -476,28 +460,29 @@ fn start_pg(loglines: LogLines) -> eyre::Result<String> {
 
     // start Postgres and monitor its stderr in the background
     // also notify the main thread when it's ready to accept connections
-    let (pgpid, session_id) = monitor_pg(command, command_str, loglines);
-
-    // add a shutdown hook so we can terminate it when the test framework exits
-    add_shutdown_hook(move || unsafe {
-        let message_string = std::ffi::CString::new(
-            format!("stopping postgres (pid={pgpid})\n").bold().blue().to_string(),
-        )
-        .unwrap();
-        libc::printf(message_string.as_ptr());
-        libc::kill(pgpid as libc::pid_t, libc::SIGTERM);
-    });
+    let session_id = monitor_pg(command, command_str, loglines);
 
     Ok(session_id)
 }
 
-fn monitor_pg(mut command: Command, cmd_string: String, loglines: LogLines) -> (u32, String) {
+fn monitor_pg(mut command: Command, cmd_string: String, loglines: LogLines) -> String {
     let (sender, receiver) = std::sync::mpsc::channel();
 
     std::thread::spawn(move || {
         let mut child = command.spawn().expect("postmaster didn't spawn");
 
         let pid = child.id();
+        // Add a shutdown hook so we can terminate it when the test framework
+        // exits. TODO: Consider finding a way to handle cases where we fail to
+        // clean up due to a SIGNAL?
+        add_shutdown_hook(move || unsafe {
+            libc::kill(pid as libc::pid_t, libc::SIGTERM);
+            let message_string = std::ffi::CString::new(
+                format!("stopping postgres (pid={pid})\n").bold().blue().to_string(),
+            )
+            .unwrap();
+            libc::printf("%s\0".as_ptr().cast(), message_string.as_ptr());
+        });
 
         eprintln!("{cmd}\npid={p}", cmd = cmd_string.bold().blue(), p = pid.to_string().yellow());
         eprintln!("{}", pg_sys::get_pg_version_string().bold().purple());
@@ -516,7 +501,7 @@ fn monitor_pg(mut command: Command, cmd_string: String, loglines: LogLines) -> (
 
             if line.contains("database system is ready to accept connections") {
                 // Postgres says it's ready to go
-                sender.send((pid, session_id.clone())).unwrap();
+                sender.send(session_id.clone()).unwrap();
                 is_started_yet = true;
             }
 
