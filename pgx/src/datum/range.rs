@@ -29,36 +29,30 @@ where
     T: FromDatum + IntoDatum + RangeSubType,
 {
     /// ## Safety
-    /// function requires that
-    /// - datum is null OR
-    /// - datum represents a RangeType datum
+    /// This function is safe, but requires that
+    /// - datum is not null
+    /// - datum represents a PG RangeType datum
+    ///
+    /// or it will `panic!()`
     #[inline]
-    unsafe fn from_pg(ptr: *mut pg_sys::varlena, range_type: *mut pg_sys::RangeType) -> Self {
-        Range { ptr, range_type, _marker: PhantomData }
+    fn from_pg(datum: pg_sys::Datum) -> Self {
+        unsafe {
+            Self::from_polymorphic_datum(datum, false, T::range_type_oid())
+                .expect("Unable to convert datum to RangeType")
+        }
     }
 }
-
 impl<T> TryFrom<pg_sys::Datum> for Range<T>
 where
     T: FromDatum + IntoDatum + RangeSubType,
 {
     type Error = RangeConversionError;
 
-    /// ## Safety
-    /// function requires that
-    /// - datum is null OR
-    /// - datum represents a RangeType datum
     fn try_from(datum: pg_sys::Datum) -> Result<Self, Self::Error> {
         if datum.is_null() {
             Err(RangeConversionError::NullDatum)
         } else {
-            unsafe {
-                let ptr = datum.cast_mut_ptr();
-                let range_type =
-                    pg_sys::pg_detoast_datum(datum.cast_mut_ptr()) as *mut pg_sys::RangeType;
-
-                Ok(Range::<T>::from_pg(ptr, range_type))
-            }
+            Ok(Self::from_pg(datum))
         }
     }
 }
@@ -67,6 +61,10 @@ impl<T> FromDatum for Range<T>
 where
     T: FromDatum + IntoDatum + RangeSubType,
 {
+    /// ## Safety
+    /// function requires that
+    /// - is_null is true
+    /// - datum represents a PG RangeType datum
     #[inline]
     unsafe fn from_polymorphic_datum(
         datum: pg_sys::Datum,
@@ -79,7 +77,10 @@ where
         if is_null {
             None
         } else {
-            Some(datum.try_into().expect("Error converting RangeType datum"))
+            let ptr = datum.cast_mut_ptr();
+            let range_type =
+                pg_sys::pg_detoast_datum(datum.cast_mut_ptr()) as *mut pg_sys::RangeType;
+            Some(Range { ptr, range_type, _marker: PhantomData })
         }
     }
 }
@@ -104,8 +105,11 @@ where
     T: FromDatum + IntoDatum + RangeSubType,
 {
     fn drop(&mut self) {
+        // Detoasting the varlena may have allocated: the toasted varlena cloned as a detoasted RangeType
+        // Checking for pointer equivalence is the only way we can truly tell
         if !self.range_type.is_null() && self.range_type as *mut pg_sys::varlena != self.ptr {
             unsafe {
+                // SAFETY: if pgx detoasted a clone of this varlena, pfree the clone
                 pg_sys::pfree(self.range_type as void_mut_ptr);
             }
         }
@@ -132,7 +136,7 @@ where
         if self.is_empty || self.lower.infinite {
             None
         } else {
-            unsafe { T::from_polymorphic_datum(self.lower.val, false, T::range_type_oid()) }
+            unsafe { T::from_polymorphic_datum(self.lower.val, false, T::type_oid()) }
         }
     }
 
@@ -143,7 +147,7 @@ where
         if self.is_empty || self.upper.infinite {
             None
         } else {
-            unsafe { T::from_polymorphic_datum(self.upper.val, false, T::range_type_oid()) }
+            unsafe { T::from_polymorphic_datum(self.upper.val, false, T::type_oid()) }
         }
     }
 
@@ -242,7 +246,7 @@ where
     T: FromDatum + IntoDatum + RangeSubType,
 {
     fn from(range_data: RangeData<T>) -> Self {
-        unsafe {
+        let datum: pg_sys::Datum = unsafe {
             let typecache =
                 pg_sys::lookup_type_cache(T::range_type_oid(), pg_sys::TYPECACHE_RANGE_INFO as i32);
 
@@ -256,8 +260,9 @@ where
                 range_data.is_empty,
             );
 
-            Range::<T>::from_pg(range_type as *mut pg_sys::varlena, range_type)
-        }
+            range_type.into()
+        };
+        Range::<T>::from_pg(datum)
     }
 }
 
