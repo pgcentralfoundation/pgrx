@@ -19,7 +19,16 @@ pub use crate::pgbox::PgBox;
 // However, reexporting them seems fine for now.
 pub use crate::datum::{Date, Time, TimeWithTimeZone, Timestamp, TimestampWithTimeZone};
 
+pub use crate::pg_sys::oids::PgOid;
+pub use crate::pg_sys::panic_handling::{guard, pg_try};
+pub use crate::pg_sys::utils::name_data_to_str;
 pub use crate::pg_sys::PgBuiltInOids;
 
 // It's a database, gotta query it somehow.
 pub use crate::spi::Spi;
+
+// Logging and Error support
+pub use crate::pg_sys::{
+    check_for_interrupts, debug1, debug2, debug3, debug4, debug5, elog::PgLogLevel,
+    errcodes::PgSqlErrorCode, error, info, log, notice, warning, FATAL, PANIC,
+};

@@ -1,0 +1,299 @@
+/*
+Portions Copyright 2019-2021 ZomboDB, LLC.
+Portions Copyright 2021-2022 Technology Concepts & Design, Inc. <support@tcdi.com>
+
+All rights reserved.
+
+Use of this source code is governed by the MIT license that can be found in the LICENSE file.
+*/
+
+//! Access to Postgres' logging system
+
+/// Postgres' various logging levels
+#[allow(dead_code)]
+#[derive(Clone, Copy, Debug)]
+pub enum PgLogLevel {
+    /// Debugging messages, in categories of decreasing detail
+    DEBUG5 = crate::DEBUG5 as isize,
+
+    /// Debugging messages, in categories of decreasing detail
+    DEBUG4 = crate::DEBUG4 as isize,
+
+    /// Debugging messages, in categories of decreasing detail
+    DEBUG3 = crate::DEBUG3 as isize,
+
+    /// Debugging messages, in categories of decreasing detail
+    DEBUG2 = crate::DEBUG2 as isize,
+
+    /// Debugging messages, in categories of decreasing detail
+    /// NOTE:  used by GUC debug_* variables
+    DEBUG1 = crate::DEBUG1 as isize,
+
+    /// Server operational messages; sent only to server log by default.
+    LOG = crate::LOG as isize,
+
+    /// Same as LOG for server reporting, but never sent to client.
+    #[allow(non_camel_case_types)]
+    LOG_SERVER_ONLY = crate::LOG_SERVER_ONLY as isize,
+
+    /// Messages specifically requested by user (eg VACUUM VERBOSE output); always sent to client
+    /// regardless of client_min_messages, but by default not sent to server log.
+    INFO = crate::INFO as isize,
+
+    /// Helpful messages to users about query operation; sent to client and not to server log by default.
+    NOTICE = crate::NOTICE as isize,
+
+    /// Warnings.  \[NOTICE\] is for expected messages like implicit sequence creation by SERIAL.
+    /// \[WARNING\] is for unexpected messages.
+    WARNING = crate::WARNING as isize,
+
+    /// user error - abort transaction; return to known state
+    ERROR = crate::ERROR as isize,
+
+    /// fatal error - abort process
+    FATAL = crate::FATAL as isize,
+
+    /// take down the other backends with me
+    PANIC = crate::PANIC as isize,
+}
+
+/// Log to Postgres' `debug5` log level.
+///
+/// This macro accepts arguments like the [`println`](std::println) and [`format`](std::format) macros.
+/// See [`fmt`](std::fmt) for information about options.
+///
+/// The output these logs goes to the PostgreSQL log file at `DEBUG5` level, depending on how the
+/// [PostgreSQL settings](https://www.postgresql.org/docs/current/runtime-config-logging.html) are configured.
+#[macro_export]
+macro_rules! debug5 {
+    ($($arg:tt)*) => (
+        {
+            extern crate alloc;
+            $crate::ereport!($crate::elog::PgLogLevel::DEBUG5, $crate::errcodes::PgSqlErrorCode::ERRCODE_SUCCESSFUL_COMPLETION, alloc::format!($($arg)*).as_str());
+        }
+    )
+}
+
+/// Log to Postgres' `debug4` log level.
+///
+/// This macro accepts arguments like the [`println`](std::println) and [`format`](std::format) macros.
+/// See [`fmt`](std::fmt) for information about options.
+///
+/// The output these logs goes to the PostgreSQL log file at `DEBUG4` level, depending on how the
+/// [PostgreSQL settings](https://www.postgresql.org/docs/current/runtime-config-logging.html) are configured.
+#[macro_export]
+macro_rules! debug4 {
+    ($($arg:tt)*) => (
+        {
+            extern crate alloc;
+            $crate::ereport!($crate::elog::PgLogLevel::DEBUG4, $crate::errcodes::PgSqlErrorCode::ERRCODE_SUCCESSFUL_COMPLETION, alloc::format!($($arg)*).as_str());
+        }
+    )
+}
+
+/// Log to Postgres' `debug3` log level.
+///
+/// This macro accepts arguments like the [`println`](std::println) and [`format`](std::format) macros.
+/// See [`fmt`](std::fmt) for information about options.
+///
+/// The output these logs goes to the PostgreSQL log file at `DEBUG3` level, depending on how the
+/// [PostgreSQL settings](https://www.postgresql.org/docs/current/runtime-config-logging.html) are configured.
+#[macro_export]
+macro_rules! debug3 {
+    ($($arg:tt)*) => (
+        {
+            extern crate alloc;
+            $crate::ereport!($crate::elog::PgLogLevel::DEBUG3, $crate::errcodes::PgSqlErrorCode::ERRCODE_SUCCESSFUL_COMPLETION, alloc::format!($($arg)*).as_str());
+        }
+    )
+}
+
+/// Log to Postgres' `debug2` log level.
+///
+/// This macro accepts arguments like the [`println`](std::println) and [`format`](std::format) macros.
+/// See [`fmt`](std::fmt) for information about options.
+///
+/// The output these logs goes to the PostgreSQL log file at `DEBUG2` level, depending on how the
+/// [PostgreSQL settings](https://www.postgresql.org/docs/current/runtime-config-logging.html) are configured.
+#[macro_export]
+macro_rules! debug2 {
+    ($($arg:tt)*) => (
+        {
+            extern crate alloc;
+            $crate::ereport!($crate::elog::PgLogLevel::DEBUG2, $crate::errcodes::PgSqlErrorCode::ERRCODE_SUCCESSFUL_COMPLETION, alloc::format!($($arg)*).as_str());
+        }
+    )
+}
+
+/// Log to Postgres' `debug1` log level.
+///
+/// This macro accepts arguments like the [`println`](std::println) and [`format`](std::format) macros.
+/// See [`fmt`](std::fmt) for information about options.
+///
+/// The output these logs goes to the PostgreSQL log file at `DEBUG1` level, depending on how the
+/// [PostgreSQL settings](https://www.postgresql.org/docs/current/runtime-config-logging.html) are configured.
+#[macro_export]
+macro_rules! debug1 {
+    ($($arg:tt)*) => (
+        {
+            extern crate alloc;
+            $crate::ereport!($crate::elog::PgLogLevel::DEBUG1, $crate::errcodes::PgSqlErrorCode::ERRCODE_SUCCESSFUL_COMPLETION, alloc::format!($($arg)*).as_str());
+        }
+    )
+}
+
+/// Log to Postgres' `log` log level.
+///
+/// This macro accepts arguments like the [`println`](std::println) and [`format`](std::format) macros.
+/// See [`fmt`](std::fmt) for information about options.
+///
+/// The output these logs goes to the PostgreSQL log file at `LOG` level, depending on how the
+/// [PostgreSQL settings](https://www.postgresql.org/docs/current/runtime-config-logging.html) are configured.
+#[macro_export]
+macro_rules! log {
+    ($($arg:tt)*) => (
+        {
+            extern crate alloc;
+            $crate::ereport!($crate::elog::PgLogLevel::LOG, $crate::errcodes::PgSqlErrorCode::ERRCODE_SUCCESSFUL_COMPLETION, alloc::format!($($arg)*).as_str());
+        }
+    )
+}
+
+/// Log to Postgres' `info` log level.
+///
+/// This macro accepts arguments like the [`println`](std::println) and [`format`](std::format) macros.
+/// See [`fmt`](std::fmt) for information about options.
+#[macro_export]
+macro_rules! info {
+    ($($arg:tt)*) => (
+        {
+            extern crate alloc;
+            $crate::ereport!($crate::elog::PgLogLevel::INFO, $crate::errcodes::PgSqlErrorCode::ERRCODE_SUCCESSFUL_COMPLETION, alloc::format!($($arg)*).as_str());
+        }
+    )
+}
+
+/// Log to Postgres' `notice` log level.
+///
+/// This macro accepts arguments like the [`println`](std::println) and [`format`](std::format) macros.
+/// See [`fmt`](std::fmt) for information about options.
+#[macro_export]
+macro_rules! notice {
+    ($($arg:tt)*) => (
+        {
+            extern crate alloc;
+            $crate::ereport!($crate::elog::PgLogLevel::NOTICE, $crate::errcodes::PgSqlErrorCode::ERRCODE_SUCCESSFUL_COMPLETION, alloc::format!($($arg)*).as_str());
+        }
+    )
+}
+
+/// Log to Postgres' `warning` log level.
+///
+/// This macro accepts arguments like the [`println`](std::println) and [`format`](std::format) macros.
+/// See [`fmt`](std::fmt) for information about options.
+#[macro_export]
+macro_rules! warning {
+    ($($arg:tt)*) => (
+        {
+            extern crate alloc;
+            $crate::ereport!($crate::elog::PgLogLevel::WARNING, $crate::errcodes::PgSqlErrorCode::ERRCODE_WARNING, alloc::format!($($arg)*).as_str());
+        }
+    )
+}
+
+/// Log to Postgres' `error` log level.  This will abort the current Postgres transaction.
+///
+/// This macro accepts arguments like the [`println`](std::println) and [`format`](std::format) macros.
+/// See [`fmt`](std::fmt) for information about options.
+#[macro_export]
+macro_rules! error {
+    ($($arg:tt)*) => (
+        {
+            extern crate alloc;
+            $crate::ereport!($crate::elog::PgLogLevel::ERROR, $crate::errcodes::PgSqlErrorCode::ERRCODE_INTERNAL_ERROR, alloc::format!($($arg)*).as_str());
+            unsafe { core::hint::unreachable_unchecked() }
+        }
+    )
+}
+
+/// Log to Postgres' `fatal` log level.  This will abort the current Postgres backend connection processs.
+///
+/// This macro accepts arguments like the [`println`](std::println) and [`format`](std::format) macros.
+/// See [`fmt`](std::fmt) for information about options.
+#[allow(non_snake_case)]
+#[macro_export]
+macro_rules! FATAL {
+    ($($arg:tt)*) => (
+        {
+            extern crate alloc;
+            $crate::ereport!($crate::elog::PgLogLevel::ERROR, $crate::errcodes::PgSqlErrorCode::ERRCODE_INTERNAL_ERROR, alloc::format!($($arg)*).as_str());
+            unsafe { core::hint::unreachable_unchecked() }
+        }
+    )
+}
+
+/// Log to Postgres' `panic` log level.  This will cause the entire Postgres cluster to crash.
+///
+/// This macro accepts arguments like the [`println`](std::println) and [`format`](std::format) macros.
+/// See [`fmt`](std::fmt) for information about options.
+#[allow(non_snake_case)]
+#[macro_export]
+macro_rules! PANIC {
+    ($($arg:tt)*) => (
+        {
+            extern crate alloc;
+            $crate::ereport!($crate::elog::PgLogLevel::ERROR, $crate::errcodes::PgSqlErrorCode::ERRCODE_INTERNAL_ERROR, alloc::format!($($arg)*).as_str());
+            unsafe { core::hint::unreachable_unchecked() }
+        }
+    )
+}
+
+#[macro_export]
+macro_rules! ereport {
+    ($loglevel:expr, $errcode:expr, $message:expr) => {
+        $crate::panic_handling::PgxPanicData::new($errcode, $message).report($loglevel)
+    };
+
+    ($loglevel:expr, $errcode:expr, $message:expr, $detail:expr) => {
+        $crate::panic_handling::PgxPanicData::new($errcode, $message)
+            .detail($detail)
+            .report($loglevel)
+    };
+}
+
+/// Is an interrupt pending?
+#[inline]
+pub fn interrupt_pending() -> bool {
+    #[cfg(any(feature = "pg11"))]
+    unsafe {
+        crate::InterruptPending
+    }
+
+    #[cfg(any(feature = "pg12", feature = "pg13", feature = "pg14", feature = "pg15"))]
+    unsafe {
+        crate::InterruptPending != 0
+    }
+}
+
+/// If an interrupt is pending (perhaps a user-initiated "cancel query" message to this backend),
+/// this will safely abort the current transaction
+#[macro_export]
+macro_rules! check_for_interrupts {
+    () => {
+        #[cfg(any(feature = "pg11"))]
+        #[allow(unused_unsafe)]
+        unsafe {
+            if $crate::InterruptPending {
+                $crate::ProcessInterrupts();
+            }
+        }
+
+        #[cfg(any(feature = "pg12", feature = "pg13", feature = "pg14", feature = "pg15"))]
+        #[allow(unused_unsafe)]
+        unsafe {
+            if $crate::InterruptPending != 0 {
+                $crate::ProcessInterrupts();
+            }
+        }
+    };
+}

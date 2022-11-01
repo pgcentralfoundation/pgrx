@@ -596,7 +596,7 @@ fn wait_latch(timeout: i64, wakeup_flags: WLflags) -> i32 {
             pg_sys::PG_WAIT_EXTENSION,
         );
         pg_sys::ResetLatch(pg_sys::MyLatch);
-        check_for_interrupts!();
+        crate::check_for_interrupts!();
 
         latch
     }

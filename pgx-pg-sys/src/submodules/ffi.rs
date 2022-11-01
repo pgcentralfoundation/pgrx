@@ -1,4 +1,5 @@
 #![deny(unsafe_op_in_unsafe_fn)]
+
 /**
 Given a closure that is assumed to be a wrapped Postgres `extern "C"` function, [pg_guard_ffi_boundary]
 works with the Postgres and C runtimes to create a "barrier" that allows Rust to catch Postgres errors
@@ -77,7 +78,7 @@ unsafe fn pg_guard_ffi_boundary_impl<T, F: FnOnce() -> T>(f: F) -> T {
             pg_sys::error_context_stack = prev_error_context_stack;
 
             // and ultimately we panic
-            std::panic::panic_any(pg_sys::JumpContext {});
+            std::panic::panic_any(crate::panic_handling::PostgresError {});
         };
 
         pg_sys::PG_exception_stack = prev_exception_stack;

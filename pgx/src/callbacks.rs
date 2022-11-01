@@ -191,7 +191,7 @@ where
                 // effectively 'take' the hook from the internal RefCell
                 if let Some(hook) = hook.replace(None) {
                     // and execute it under guard for proper panic/elog(ERROR) handling
-                    crate::guard::guard(hook.0);
+                    pg_sys::guard(hook.0);
                 }
             }
         }
@@ -328,7 +328,7 @@ where
                 for hook in hooks.iter() {
                     let hook = hook.borrow();
                     if let Some(hook) = hook.as_ref() {
-                        crate::guard::guard(|| (hook.0)(my_subid, parent_subid));
+                        pg_sys::guard(|| (hook.0)(my_subid, parent_subid));
                     }
                 }
             }

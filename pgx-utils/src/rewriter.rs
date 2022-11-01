@@ -79,7 +79,7 @@ impl PgGuardRewriter {
             #vis #sig {
                 #[allow(non_snake_case)]
                 #func
-                pg_sys::guard::guard( #[allow(unused_unsafe)] || unsafe { #func_name(#arg_list) } )
+                pg_sys::panic_handling::guard( #[allow(unused_unsafe)] || unsafe { #func_name(#arg_list) } )
             }
         })
     }
@@ -113,7 +113,7 @@ impl PgGuardRewriter {
 
         Ok(quote! {
             pub unsafe fn #func_name ( #arg_list_with_types ) #return_type {
-                crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
+                crate::ffi::pg_guard_ffi_boundary(move || {
                     #abi { #func }
                     #func_name(#arg_list)
                 })

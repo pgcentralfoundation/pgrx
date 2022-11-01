@@ -7,13 +7,20 @@ All rights reserved.
 Use of this source code is governed by the MIT license that can be found in the LICENSE file.
 */
 
-mod datum;
-pub mod guard;
-mod oids;
-mod polyfill;
-pub mod setjmp;
-mod tupdesc;
-mod utils;
+pub mod datum;
+#[macro_use]
+pub mod elog;
+pub mod errcodes;
+pub mod ffi;
+pub mod oids;
+pub mod panic_handling;
+pub mod polyfill;
+pub mod tupdesc;
+
+pub use panic_handling::guard;
+
+pub mod utils;
+
 // Various SqlTranslatable mappings for SQL generation
 mod sql_translatable;
 
@@ -22,11 +29,6 @@ pub use datum::Datum;
 // now include NullableDatum.
 #[cfg(any(feature = "pg12", feature = "pg13", feature = "pg14", feature = "pg15"))]
 pub use datum::NullableDatum;
-pub use guard::*;
-pub use oids::*;
-pub use polyfill::*;
-pub use tupdesc::*;
-pub use utils::*;
 
 #[cfg(target_os = "linux")]
 extern "C" {

@@ -7,8 +7,9 @@ All rights reserved.
 Use of this source code is governed by the MIT license that can be found in the LICENSE file.
 */
 
-use crate::{direct_function_call, direct_function_call_as_datum, pg_sys, FromDatum, IntoDatum};
-use pgx_pg_sys::pg_try;
+use crate::{
+    direct_function_call, direct_function_call_as_datum, pg_sys, pg_try, FromDatum, IntoDatum,
+};
 use pgx_utils::sql_entity_graph::metadata::{
     ArgumentError, Returns, ReturnsError, SqlMapping, SqlTranslatable,
 };
