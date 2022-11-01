@@ -190,21 +190,22 @@ impl BackgroundWorker {
     }
 
     /// Once connected to SPI via `connect_worker_to_spi()`, begin a transaction to
-    /// use the `pgx::Spi` interface.
-    pub fn transaction<F: FnOnce() + std::panic::UnwindSafe + std::panic::RefUnwindSafe>(
+    /// use the `pgx::Spi` interface. Returns the return value of the `F` function.
+    pub fn transaction<F: FnOnce() -> R + std::panic::UnwindSafe + std::panic::RefUnwindSafe, R>(
         transaction_body: F,
-    ) {
+    ) -> R {
         unsafe {
             assert!(!pg_sys::MyBgworkerEntry.is_null(), "BackgroundWorker associated functions can only be called from a registered background worker");
             pg_sys::SetCurrentStatementStartTimestamp();
             pg_sys::StartTransactionCommand();
             pg_sys::PushActiveSnapshot(pg_sys::GetTransactionSnapshot());
         }
-        pg_sys::guard(|| transaction_body());
+        let result = pg_sys::guard(|| transaction_body());
         unsafe {
             pg_sys::PopActiveSnapshot();
             pg_sys::CommitTransactionCommand();
         }
+        result
     }
 }
 
