@@ -262,47 +262,47 @@ where
 }
 
 /// This trait allows a struct to be a valid subtype for a RangeType
-pub trait RangeSubType {
+pub unsafe trait RangeSubType {
     fn range_type_oid() -> Oid;
 }
 
 /// for int/int4range
-impl RangeSubType for i32 {
+unsafe impl RangeSubType for i32 {
     fn range_type_oid() -> Oid {
         pg_sys::INT4RANGEOID
     }
 }
 
 /// for bigint/int8range
-impl RangeSubType for i64 {
+unsafe impl RangeSubType for i64 {
     fn range_type_oid() -> Oid {
         pg_sys::INT8RANGEOID
     }
 }
 
 /// for numeric/numrange
-impl RangeSubType for Numeric {
+unsafe impl RangeSubType for Numeric {
     fn range_type_oid() -> Oid {
         pg_sys::NUMRANGEOID
     }
 }
 
 /// for date/daterange
-impl RangeSubType for Date {
+unsafe impl RangeSubType for Date {
     fn range_type_oid() -> Oid {
         pg_sys::DATERANGEOID
     }
 }
 
 /// for Timestamp/tsrange
-impl RangeSubType for Timestamp {
+unsafe impl RangeSubType for Timestamp {
     fn range_type_oid() -> Oid {
         pg_sys::TSRANGEOID
     }
 }
 
 /// for Timestamp With Time Zone/tstzrange
-impl RangeSubType for TimestampWithTimeZone {
+unsafe impl RangeSubType for TimestampWithTimeZone {
     fn range_type_oid() -> Oid {
         pg_sys::TSTZRANGEOID
     }
