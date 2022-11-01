@@ -22,7 +22,7 @@ use std::process::Stdio;
 #[derive(clap::Args, Debug)]
 #[clap(author)]
 pub(crate) struct Start {
-    /// The Postgres version to start (`pg10`, `pg11`, `pg12`, `pg13`, `pg14`, `pg15`, or `all`)
+    /// The Postgres version to start (`pg11`, `pg12`, `pg13`, `pg14`, `pg15`, or `all`)
     #[clap(env = "PG_VERSION")]
     pg_version: Option<String>,
     #[clap(from_global, action = ArgAction::Count)]
@@ -92,7 +92,7 @@ pub(crate) fn start_postgres(pg_config: &PgConfig) -> eyre::Result<()> {
     let mut command = std::process::Command::new(format!("{}/pg_ctl", bindir.display()));
     // Unsafe block is for the pre_exec setsid call below
     //
-    // This is to work around a bug in PG10 + PG11 which don't call setsid in pg_ctl
+    // This is to work around a bug in PG11 which does not call setsid in pg_ctl
     // This means that when cargo pgx run dumps a user into psql, pushing ctrl-c will abort
     // the postgres server started by pgx
     unsafe {

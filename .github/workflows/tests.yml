@@ -29,11 +29,11 @@ jobs:
 
     strategy:
       matrix:
-        version: ["postgres-10", "postgres-11", "postgres-12", "postgres-13", "postgres-14", "postgres-15"]
+        version: ["postgres-11", "postgres-12", "postgres-13", "postgres-14", "postgres-15"]
         os: ["ubuntu-20.04"]
 
     steps:
-    - uses: actions/checkout@v2
+    - uses: actions/checkout@v3
 
     - name: Set up prerequisites and environment
       run: |
@@ -96,7 +96,7 @@ jobs:
         echo ""
 
     - name: Cache cargo registry
-      uses: actions/cache@v2
+      uses: actions/cache@v3
       continue-on-error: false
       with:
         path: |
@@ -105,7 +105,7 @@ jobs:
         key: pgx-tests-cargo-${{ runner.os }}-${{ hashFiles('**/Cargo.lock', '.github/workflows/tests.yml') }}
 
     - name: Cache sccache directory
-      uses: actions/cache@v2
+      uses: actions/cache@v3
       continue-on-error: false
       with:
         path: /home/runner/.cache/sccache
@@ -224,7 +224,7 @@ jobs:
         os: ["ubuntu-20.04"]
 
     steps:
-    - uses: actions/checkout@v2
+    - uses: actions/checkout@v3
 
     - name: Set up prerequisites and environment
       run: |
@@ -280,7 +280,7 @@ jobs:
         echo ""
 
     - name: Cache cargo registry
-      uses: actions/cache@v2
+      uses: actions/cache@v3
       continue-on-error: false
       with:
         path: |
@@ -289,7 +289,7 @@ jobs:
         key: pgx-cargo_init_tests-cargo-${{ runner.os }}-${{ hashFiles('**/Cargo.lock', '.github/workflows/tests.yml') }}
 
     - name: Cache sccache directory
-      uses: actions/cache@v2
+      uses: actions/cache@v3
       continue-on-error: false
       with:
         path: /home/runner/.cache/sccache
@@ -342,7 +342,7 @@ jobs:
         os: ["macos-11"]
 
     steps:
-    - uses: actions/checkout@v2
+    - uses: actions/checkout@v3
 
     - name: Set up prerequisites and environment
       run: |
@@ -373,7 +373,7 @@ jobs:
         echo ""
 
     - name: Cache sccache directory
-      uses: actions/cache@v2
+      uses: actions/cache@v3
       continue-on-error: false
       with:
         path: /Users/runner/Library/Caches/Mozilla.sccache

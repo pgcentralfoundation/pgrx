@@ -218,7 +218,7 @@ macro_rules! pg_magic_func {
             use core::mem::size_of;
             use pgx;
 
-            #[cfg(any(feature = "pg10", feature = "pg11", feature = "pg12"))]
+            #[cfg(any(feature = "pg11", feature = "pg12"))]
             const MY_MAGIC: pgx::pg_sys::Pg_magic_struct = pgx::pg_sys::Pg_magic_struct {
                 len: size_of::<pgx::pg_sys::Pg_magic_struct>() as i32,
                 version: pgx::pg_sys::PG_VERSION_NUM as i32 / 100,

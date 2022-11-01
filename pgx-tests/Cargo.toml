@@ -15,7 +15,6 @@ crate-type = [ "cdylib", "lib" ]
 
 [features]
 default = [ ]
-pg10 = [ "pgx/pg10" ]
 pg11 = [ "pgx/pg11" ]
 pg12 = [ "pgx/pg12" ]
 pg13 = [ "pgx/pg13" ]

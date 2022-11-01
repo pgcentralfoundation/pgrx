@@ -444,7 +444,7 @@ impl Pgx {
     }
 }
 
-pub const SUPPORTED_MAJOR_VERSIONS: &[u16] = &[10, 11, 12, 13, 14, 15];
+pub const SUPPORTED_MAJOR_VERSIONS: &[u16] = &[11, 12, 13, 14, 15];
 
 pub fn createdb(
     pg_config: &PgConfig,
