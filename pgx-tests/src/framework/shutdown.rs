@@ -63,7 +63,7 @@ extern "C" fn run_shutdown_hooks() {
 /// Prevent panics in a block of code.
 ///
 /// Prints a message and aborts in its drop. Intended usage is like:
-/// ```
+/// ```ignore
 /// let guard = PanicGuard;
 /// // ...code that absolutely must never unwind goes here...
 /// core::mem::forget(guard);
