@@ -21,7 +21,6 @@ mod into;
 mod item_pointer_data;
 mod json;
 mod numeric;
-#[cfg(not(feature = "pg10"))]
 #[deny(unsafe_op_in_unsafe_fn)]
 mod range;
 mod time;
@@ -47,7 +46,6 @@ pub use item_pointer_data::*;
 pub use json::*;
 pub use numeric::*;
 use once_cell::sync::Lazy;
-#[cfg(not(feature = "pg10"))]
 pub use range::*;
 use std::any::TypeId;
 pub use time_stamp::*;

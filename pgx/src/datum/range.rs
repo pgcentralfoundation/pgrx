@@ -328,7 +328,6 @@ pub enum RangeConversionError {
     NullDatum,
 }
 
-#[cfg(not(feature = "pg10"))]
 unsafe impl SqlTranslatable for Range<i32> {
     fn argument_sql() -> Result<SqlMapping, ArgumentError> {
         Ok(SqlMapping::literal("int4range"))
@@ -338,7 +337,6 @@ unsafe impl SqlTranslatable for Range<i32> {
     }
 }
 
-#[cfg(not(feature = "pg10"))]
 unsafe impl SqlTranslatable for Range<i64> {
     fn argument_sql() -> Result<SqlMapping, ArgumentError> {
         Ok(SqlMapping::literal("int8range"))

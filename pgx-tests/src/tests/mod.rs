@@ -34,7 +34,6 @@ mod pg_extern_tests;
 mod pg_try_tests;
 mod pgbox_tests;
 mod postgres_type_tests;
-#[cfg(not(feature = "pg10"))]
 mod range_tests;
 mod schema_tests;
 mod spi_tests;
