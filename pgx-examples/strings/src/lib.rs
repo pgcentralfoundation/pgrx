@@ -10,6 +10,11 @@ use pgx::prelude::*;
 pgx::pg_module_magic!();
 
 #[pg_extern]
+fn log(s: String) {
+    log!("{}", s)
+}
+
+#[pg_extern]
 fn return_static() -> &'static str {
     "This is a static string xxx"
 }
