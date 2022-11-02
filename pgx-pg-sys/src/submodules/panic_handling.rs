@@ -25,45 +25,47 @@ use std::panic::{catch_unwind, Location, PanicInfo, RefUnwindSafe, UnwindSafe};
 pub(crate) struct PostgresError {}
 
 /// Represents the set of information necessary for pgx to promote a Rust `panic!()` to a Postgres
-/// `ERROR` (or any of its `[PgLogLevel]` levels)
+/// `ERROR` (or any [`PgLogLevel`] level)
 #[derive(Clone, Debug)]
-pub struct PgxPanicData {
-    pub(crate) errcode: PgSqlErrorCode,
-    pub(crate) message: String,
-    pub(crate) detail: Option<String>,
-    pub(crate) funcname: Option<String>,
-    pub(crate) location: PgxPanicLocation,
+pub struct PgErrorReport {
+    errcode: PgSqlErrorCode,
+    message: String,
+    detail: Option<String>,
+    funcname: Option<String>,
+    location: PgErrorReportLocation,
 }
 
 #[derive(Clone, Debug)]
-pub struct PgxPanicLocation {
-    pub(crate) file: String,
-    pub(crate) line: u32,
-    pub(crate) col: u32,
+struct PgErrorReportLocation {
+    file: String,
+    line: u32,
+    col: u32,
 }
 
-impl Default for PgxPanicLocation {
+impl Default for PgErrorReportLocation {
+    /// `#[track_caller]` is applied here so we can construct one with with
+    /// the correct code location information
     #[track_caller]
     fn default() -> Self {
         Location::caller().into()
     }
 }
 
-impl From<&Location<'_>> for PgxPanicLocation {
+impl From<&Location<'_>> for PgErrorReportLocation {
     fn from(location: &Location<'_>) -> Self {
         Self { file: location.file().to_string(), line: location.line(), col: location.column() }
     }
 }
 
-impl From<Option<&Location<'_>>> for PgxPanicLocation {
+impl From<Option<&Location<'_>>> for PgErrorReportLocation {
     fn from(location: Option<&Location<'_>>) -> Self {
         location.into()
     }
 }
 
-impl From<Option<PgxPanicLocation>> for PgxPanicLocation {
-    fn from(location: Option<PgxPanicLocation>) -> Self {
-        location.unwrap_or_else(|| PgxPanicLocation {
+impl From<Option<PgErrorReportLocation>> for PgErrorReportLocation {
+    fn from(location: Option<PgErrorReportLocation>) -> Self {
+        location.unwrap_or_else(|| PgErrorReportLocation {
             file: String::from("<unknown>"),
             line: 0,
             col: 0,
@@ -71,19 +73,19 @@ impl From<Option<PgxPanicLocation>> for PgxPanicLocation {
     }
 }
 
-impl From<&PanicInfo<'_>> for PgxPanicLocation {
+impl From<&PanicInfo<'_>> for PgErrorReportLocation {
     fn from(pi: &PanicInfo<'_>) -> Self {
         pi.location().into()
     }
 }
 
 #[derive(Clone, Debug)]
-struct PanicWithLevel {
+struct PgErrorReportWithLevel {
     level: PgLogLevel,
-    panic: PgxPanicData,
+    panic: PgErrorReport,
 }
 
-impl PanicWithLevel {
+impl PgErrorReportWithLevel {
     fn report(self) {
         // we define this here to make it difficult for not only pgx, but pgx users
         // to find and directly call this function.  They'd have to do the same as
@@ -127,8 +129,8 @@ impl PanicWithLevel {
             );
 
             if crate::ERROR <= self.level as _ {
-                // SAFETY:  this is true because if we're being reported as an ERROR or anything
-                // greater, we'll never return from the above call to `pgx_ereport()`
+                // SAFETY:  this is true because if we're being reported as an ERROR or greater,
+                // we'll never return from the above call to `pgx_ereport()`
                 unreachable_unchecked()
             }
 
@@ -144,9 +146,9 @@ impl PanicWithLevel {
     }
 }
 
-impl PgxPanicData {
-    /// Create a [PgxPanic] which can be raised via Rust's [std::panic::panic_any()] or as
-    /// a specific Postgres "ereport()` level via [PgxPanicData::report(PgLogLevel)]
+impl PgErrorReport {
+    /// Create a [PgErrorReport] which can be raised via Rust's [std::panic::panic_any()] or as
+    /// a specific Postgres "ereport()` level via [PgErrorReport::report(self, PgLogLevel)]
     ///
     /// Embedded "file:line:col" location information is taken from the caller's location
     #[track_caller]
@@ -156,16 +158,18 @@ impl PgxPanicData {
             message: message.into(),
             detail: None,
             funcname: None,
-            location: PgxPanicLocation::default(),
+            location: PgErrorReportLocation::default(),
         }
     }
 
-    /// Create a [PgxPanic] which can be raised via Rust's [std::panic::panic_any()] or as
-    /// a specific Postgres "ereport()` level via [PgxPanicData::report(PgLogLevel)]
-    pub fn with_location<S: Into<String>>(
+    /// Create a [PgErrorReport] which can be raised via Rust's [std::panic::panic_any()] or as
+    /// a specific Postgres "ereport()` level via [PgErrorReport::report(self, PgLogLevel)].
+    ///
+    /// For internal use only
+    fn with_location<S: Into<String>>(
         errcode: PgSqlErrorCode,
         message: S,
-        location: PgxPanicLocation,
+        location: PgErrorReportLocation,
     ) -> Self {
         Self { errcode, message: message.into(), detail: None, funcname: None, location }
     }
@@ -182,16 +186,16 @@ impl PgxPanicData {
         self
     }
 
-    /// Report this [PgxPanic], which will ultimately be reported by Postgres at the specified [PgLogLevel]
+    /// Report this [PgErrorReport], which will ultimately be reported by Postgres at the specified [PgLogLevel]
     #[inline]
     pub fn report(self, level: PgLogLevel) {
-        PanicWithLevel { level, panic: self }.report()
+        PgErrorReportWithLevel { level, panic: self }.report()
     }
 }
 
-thread_local! { static PANIC_LOCATION: Cell<Option<PgxPanicLocation >> = Cell::new(None) }
+thread_local! { static PANIC_LOCATION: Cell<Option<PgErrorReportLocation >> = Cell::new(None) }
 
-fn take_panic_location() -> PgxPanicLocation {
+fn take_panic_location() -> PgErrorReportLocation {
     PANIC_LOCATION.with(|p| p.take().into())
 }
 
@@ -400,11 +404,11 @@ where
 
     // determine how to rethrow the error
     match downcast_err(error) {
-        // the error is a [PanicWithLevel], so it's an error from either a Rust `panic!()` or
+        // the error is a [PgErrorReportWithLevel], so it's an error from either a Rust `panic!()` or
         // from an error-raising [PgLogLevel] `ereport!()` call.
         Ok(error) => {
             error.report();
-            unreachable!("PanicWithLevel.report() failed at depth==0");
+            unreachable!("PgErrorReportWithLevel.report() failed at depth==0");
         }
 
         // the error is a PostgresError, so all we can do is ask Postgres to rethrow it
@@ -421,24 +425,26 @@ where
 
 /// convert types of `e` that we understand/expect into either a
 /// `Ok(String)` or a `Err<JumpContext>`
-fn downcast_err(mut e: Box<dyn Any + Send>) -> Result<PanicWithLevel, PostgresError> {
+fn downcast_err(mut e: Box<dyn Any + Send>) -> Result<PgErrorReportWithLevel, PostgresError> {
     if e.downcast_mut::<PostgresError>().is_some() {
         Err(*e.downcast().unwrap())
-    } else if e.downcast_mut::<PgxPanicData>().is_some() {
-        Ok(PanicWithLevel { level: PgLogLevel::ERROR, panic: *e.downcast().unwrap() })
+    } else if e.downcast_mut::<PgErrorReportLocation>().is_some() {
+        Ok(*e.downcast().unwrap())
+    } else if e.downcast_mut::<PgErrorReport>().is_some() {
+        Ok(PgErrorReportWithLevel { level: PgLogLevel::ERROR, panic: *e.downcast().unwrap() })
     } else if e.downcast_ref::<&str>().is_some() {
-        Ok(PanicWithLevel {
+        Ok(PgErrorReportWithLevel {
             level: PgLogLevel::ERROR,
-            panic: PgxPanicData::with_location::<&str>(
+            panic: PgErrorReport::with_location::<&str>(
                 PgSqlErrorCode::ERRCODE_INTERNAL_ERROR,
                 *e.downcast().unwrap(),
                 take_panic_location(),
             ),
         })
     } else if e.downcast_ref::<String>().is_some() {
-        Ok(PanicWithLevel {
+        Ok(PgErrorReportWithLevel {
             level: PgLogLevel::ERROR,
-            panic: PgxPanicData::with_location::<String>(
+            panic: PgErrorReport::with_location::<String>(
                 PgSqlErrorCode::ERRCODE_INTERNAL_ERROR,
                 *e.downcast().unwrap(),
                 take_panic_location(),
@@ -446,9 +452,9 @@ fn downcast_err(mut e: Box<dyn Any + Send>) -> Result<PanicWithLevel, PostgresEr
         })
     } else {
         // not a type we understand, so use a generic string
-        Ok(PanicWithLevel {
+        Ok(PgErrorReportWithLevel {
             level: PgLogLevel::ERROR,
-            panic: PgxPanicData::with_location(
+            panic: PgErrorReport::with_location(
                 PgSqlErrorCode::ERRCODE_INTERNAL_ERROR,
                 "Box<Any>",
                 take_panic_location(),
