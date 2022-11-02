@@ -71,7 +71,7 @@ impl<'a> PgTupleDesc<'a> {
         }
     }
 
-    /// Wrap a Postgres-provided `pg_sys::TupleDescData`.  
+    /// Wrap a Postgres-provided `pg_sys::TupleDescData`.
     ///
     /// The wrapped TupleDesc will **not** have its reference count decremented  when this `PgTupleDesc`
     /// instance is dropped.
@@ -263,18 +263,13 @@ pub unsafe fn release_tupdesc(ptr: pg_sys::TupleDesc) {
 }
 
 /// `attno` is 0-based
-#[cfg(feature = "pg10")]
-#[inline]
-fn tupdesc_get_attr(
-    tupdesc: &PgBox<pg_sys::TupleDescData>,
-    attno: usize,
-) -> &pg_sys::FormData_pg_attribute {
-    let atts = unsafe { std::slice::from_raw_parts(tupdesc.attrs, tupdesc.natts as usize) };
-    unsafe { atts[attno].as_ref().unwrap() }
-}
-
-/// `attno` is 0-based
-#[cfg(any(feature = "pg11", feature = "pg12", feature = "pg13", feature = "pg14"))]
+#[cfg(any(
+    feature = "pg11",
+    feature = "pg12",
+    feature = "pg13",
+    feature = "pg14",
+    feature = "pg15"
+))]
 #[inline]
 fn tupdesc_get_attr(
     tupdesc: &PgBox<pg_sys::TupleDescData>,

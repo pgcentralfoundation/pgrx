@@ -8,7 +8,6 @@ Use of this source code is governed by the MIT license that can be found in the 
 */
 #include "postgres.h"
 
-#define IS_PG_10 (PG_VERSION_NUM >= 100000 && PG_VERSION_NUM < 110000)
 #define IS_PG_11 (PG_VERSION_NUM >= 110000 && PG_VERSION_NUM < 120000)
 #define IS_PG_12 (PG_VERSION_NUM >= 120000 && PG_VERSION_NUM < 130000)
 #define IS_PG_13 (PG_VERSION_NUM >= 130000 && PG_VERSION_NUM < 140000)
@@ -16,7 +15,7 @@ Use of this source code is governed by the MIT license that can be found in the 
 #include "access/htup.h"
 #include "access/htup_details.h"
 #include "catalog/pg_type.h"
-#if IS_PG_10 || IS_PG_11
+#if IS_PG_11
 #include "nodes/relation.h"
 #else
 #include "nodes/pathnodes.h"
@@ -101,7 +100,7 @@ ListCell *pgx_list_nth_cell(List *list, int nth) {
     return list_nth_cell(list, nth);
 }
 
-#if IS_PG_10 || IS_PG_11
+#if IS_PG_11
 PGDLLEXPORT Oid pgx_HeapTupleHeaderGetOid(HeapTupleHeader htup_header);
 Oid pgx_HeapTupleHeaderGetOid(HeapTupleHeader htup_header) {
     return HeapTupleHeaderGetOid(htup_header);

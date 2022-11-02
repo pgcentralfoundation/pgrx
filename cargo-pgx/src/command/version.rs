@@ -54,15 +54,16 @@ mod rss {
                 let minor = minor.unwrap().parse::<u16>().unwrap_or_default();
 
                 if supported_major_versions.contains(&major) {
-                    versions.push(PgVersion::new(
-                        major,
-                        minor,
-                        Url::parse(
-                            &format!("https://ftp.postgresql.org/pub/source/v{major}.{minor}/postgresql-{major}.{minor}.tar.bz2",
-                                     major = major, minor = minor)
-                        )
-                            .expect("invalid url")
-                    ))
+                    versions.push(
+                        PgVersion::new(
+                            major,
+                            minor,
+                            Url::parse(
+                                &format!("https://ftp.postgresql.org/pub/source/v{major}.{minor}/postgresql-{major}.{minor}.tar.bz2",
+                                         major = major, minor = minor)
+                            ).expect("invalid url")
+                        ),
+                    )
                 }
             }
 

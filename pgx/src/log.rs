@@ -898,14 +898,14 @@ macro_rules! testmsg {
 }
 
 /// Is an interrupt pending?
-#[cfg(any(feature = "pg10", feature = "pg11"))]
+#[cfg(any(feature = "pg11"))]
 #[inline]
 pub fn interrupt_pending() -> bool {
     unsafe { crate::pg_sys::InterruptPending }
 }
 
 /// Is an interrupt pending?
-#[cfg(any(feature = "pg12", feature = "pg13", feature = "pg14"))]
+#[cfg(any(feature = "pg12", feature = "pg13", feature = "pg14", feature = "pg15"))]
 #[inline]
 pub fn interrupt_pending() -> bool {
     unsafe { crate::pg_sys::InterruptPending != 0 }
@@ -916,7 +916,7 @@ pub fn interrupt_pending() -> bool {
 #[macro_export]
 macro_rules! check_for_interrupts {
     () => {
-        #[cfg(any(feature = "pg10", feature = "pg11"))]
+        #[cfg(any(feature = "pg11"))]
         #[allow(unused_unsafe)]
         unsafe {
             if $crate::pg_sys::InterruptPending {
@@ -924,7 +924,7 @@ macro_rules! check_for_interrupts {
             }
         }
 
-        #[cfg(any(feature = "pg12", feature = "pg13", feature = "pg14"))]
+        #[cfg(any(feature = "pg12", feature = "pg13", feature = "pg14", feature = "pg15"))]
         #[allow(unused_unsafe)]
         unsafe {
             if $crate::pg_sys::InterruptPending != 0 {

@@ -9,7 +9,7 @@ Use of this source code is governed by the MIT license that can be found in the 
 
 use crate::pg_sys;
 
-#[cfg(any(feature = "pg10", feature = "pg11"))]
+#[cfg(any(feature = "pg11"))]
 #[inline]
 pub fn xid_to_64bit(xid: pg_sys::TransactionId) -> u64 {
     let mut last_xid = pg_sys::InvalidTransactionId;
@@ -22,7 +22,7 @@ pub fn xid_to_64bit(xid: pg_sys::TransactionId) -> u64 {
     convert_xid_common(xid, last_xid, epoch)
 }
 
-#[cfg(any(feature = "pg12", feature = "pg13", feature = "pg14"))]
+#[cfg(any(feature = "pg12", feature = "pg13", feature = "pg14", feature = "pg15"))]
 #[inline]
 pub fn xid_to_64bit(xid: pg_sys::TransactionId) -> u64 {
     let full_xid = unsafe { pg_sys::ReadNextFullTransactionId() };

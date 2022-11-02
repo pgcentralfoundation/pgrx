@@ -20,7 +20,7 @@ As new versions of `pgx` are released, you'll want to make sure you run this com
 
 ```shell script
 $ cargo pgx --help
-cargo-pgx 0.4.2
+cargo-pgx 0.5.0
 ZomboDB, LLC <zombodb@gmail.com>
 Cargo subcommand for 'pgx' to make Postgres extension development easy
 
@@ -60,47 +60,47 @@ SUBCOMMANDS:
 
 ```shell script
 $ cargo pgx init
-  Discovered Postgres v14.1, v13.5, v12.9, v11.14, v10.19
-  Downloading Postgres v10.19 from https://ftp.postgresql.org/pub/source/v10.19/postgresql-10.19.tar.bz2
-  Downloading Postgres v14.1 from https://ftp.postgresql.org/pub/source/v14.1/postgresql-14.1.tar.bz2
-  Downloading Postgres v12.9 from https://ftp.postgresql.org/pub/source/v12.9/postgresql-12.9.tar.bz2
-  Downloading Postgres v11.14 from https://ftp.postgresql.org/pub/source/v11.14/postgresql-11.14.tar.bz2
-  Downloading Postgres v13.5 from https://ftp.postgresql.org/pub/source/v13.5/postgresql-13.5.tar.bz2
-     Removing /home/yourself/.pgx/10.19
-     Removing /home/yourself/.pgx/14.1
-     Removing /home/yourself/.pgx/12.9
-    Untarring Postgres v10.19 to /home/yourself/.pgx/10.19
-    Untarring Postgres v14.1 to /home/yourself/.pgx/14.1
-    Untarring Postgres v12.9 to /home/yourself/.pgx/12.9
-     Removing /home/yourself/.pgx/11.14
-    Untarring Postgres v11.14 to /home/yourself/.pgx/11.14
-     Removing /home/yourself/.pgx/13.5
-    Untarring Postgres v13.5 to /home/yourself/.pgx/13.5
-  Configuring Postgres v10.19
-  Configuring Postgres v12.9
-  Configuring Postgres v14.1
-  Configuring Postgres v11.14
-  Configuring Postgres v13.5
-    Compiling Postgres v10.19
-    Compiling Postgres v14.1
-    Compiling Postgres v12.9
-    Compiling Postgres v11.14
-    Compiling Postgres v13.5
-   Installing Postgres v10.19 to /home/yourself/.pgx/10.19/pgx-install
-   Installing Postgres v11.14 to /home/yourself/.pgx/11.14/pgx-install
-   Installing Postgres v12.9 to /home/yourself/.pgx/12.9/pgx-install
-   Installing Postgres v13.5 to /home/yourself/.pgx/13.5/pgx-install
-   Installing Postgres v14.1 to /home/yourself/.pgx/14.1/pgx-install
-   Validating /home/yourself/.pgx/10.19/pgx-install/bin/pg_config
-   Validating /home/yourself/.pgx/11.14/pgx-install/bin/pg_config
-   Validating /home/yourself/.pgx/12.9/pgx-install/bin/pg_config
-   Validating /home/yourself/.pgx/13.5/pgx-install/bin/pg_config
-   Validating /home/yourself/.pgx/14.1/pgx-install/bin/pg_config
+  Discovered Postgres v15.0, v14.5, v13.8, v12.12, v11.17
+  Downloading Postgres v15.0 from https://ftp.postgresql.org/pub/source/v15.0/postgresql-15.0.tar.bz2
+  Downloading Postgres v11.17 from https://ftp.postgresql.org/pub/source/v11.17/postgresql-11.17.tar.bz2
+  Downloading Postgres v12.12 from https://ftp.postgresql.org/pub/source/v12.12/postgresql-12.12.tar.bz2
+  Downloading Postgres v13.8 from https://ftp.postgresql.org/pub/source/v13.8/postgresql-13.8.tar.bz2
+  Downloading Postgres v14.5 from https://ftp.postgresql.org/pub/source/v14.5/postgresql-14.5.tar.bz2
+     Removing /home/yourself/.pgx/11.17
+    Untarring Postgres v11.17 to /home/yourself/.pgx/11.17
+     Removing /home/yourself/.pgx/14.5
+     Removing /home/yourself/.pgx/12.12
+    Untarring Postgres v14.5 to /home/yourself/.pgx/14.5
+    Untarring Postgres v12.12 to /home/yourself/.pgx/12.12
+     Removing /home/yourself/.pgx/15.0
+     Removing /home/yourself/.pgx/13.8
+    Untarring Postgres v15.0 to /home/yourself/.pgx/15.0
+    Untarring Postgres v13.8 to /home/yourself/.pgx/13.8
+  Configuring Postgres v11.17
+  Configuring Postgres v12.12
+  Configuring Postgres v14.5
+  Configuring Postgres v13.8
+  Configuring Postgres v15.0
+    Compiling Postgres v11.17
+    Compiling Postgres v12.12
+    Compiling Postgres v13.8
+    Compiling Postgres v14.5
+    Compiling Postgres v15.0
+   Installing Postgres v11.17 to /home/yourself/.pgx/11.17/pgx-install
+   Installing Postgres v12.12 to /home/yourself/.pgx/12.12/pgx-install
+   Installing Postgres v13.8 to /home/yourself/.pgx/13.8/pgx-install
+   Installing Postgres v14.5 to /home/yourself/.pgx/14.5/pgx-install
+   Installing Postgres v15.0 to /home/yourself/.pgx/15.0/pgx-install
+   Validating /home/yourself/.pgx/11.17/pgx-install/bin/pg_config
+   Validating /home/yourself/.pgx/12.12/pgx-install/bin/pg_config
+   Validating /home/yourself/.pgx/13.8/pgx-install/bin/pg_config
+   Validating /home/yourself/.pgx/14.5/pgx-install/bin/pg_config
+   Validating /home/yourself/.pgx/15.0/pgx-install/bin/pg_config
 ```
 
 `cargo pgx init` is required to be run once to properly configure the `pgx` development environment.
 
-As shown by the screenshot above, it downloads the latest versions of Postgres v10, v11, v12, v13, configures them, compiles them, and installs them to `~/.pgx/`. Other `pgx` commands such as `run` and `test` will fully manage and otherwise use these Postgres installations for you.
+As shown by the screenshot above, it downloads the latest versions of Postgres v11, v12, v13, v14, v15, configures them, compiles them, and installs them to `~/.pgx/`. Other `pgx` commands such as `run` and `test` will fully manage and otherwise use these Postgres installations for you.
 
 `pgx` is designed to support multiple Postgres versions in such a way that during development, you'll know if you're trying to use a Postgres API that isn't common across all versions. It's also designed to make testing your extension against these versions easy. This is why it requires you to have all fully compiled and installed versions of Postgres during development.
 
@@ -126,8 +126,7 @@ Once complete, `cargo pgx init` also creates a configuration file (`~/.pgx/confi
 If a new minor Postgres version is released in the future you can simply run `cargo pgx init [args]` again, and your local version will be updated, preserving all existing databases and configuration.
 
 ```shell script
-$ cargo pgx init --help
-cargo-pgx-init 0.4.2
+cargo-pgx-init 0.5.0
 ZomboDB, LLC <zombodb@gmail.com>
 Initialize pgx development environment for the first time
 
@@ -142,7 +141,6 @@ OPTIONS:
             Base testing port number
 
     -h, --help           Print help information
-        --pg10 <PG10>    [env: PG10_PG_CONFIG=]
         --pg11 <PG11>    If installed locally, the path to PG11's `pgconfig` tool, or `download` to
                          have pgx download/compile/install it [env: PG11_PG_CONFIG=]
         --pg12 <PG12>    If installed locally, the path to PG12's `pgconfig` tool, or `download` to
@@ -151,6 +149,8 @@ OPTIONS:
                          have pgx download/compile/install it [env: PG13_PG_CONFIG=]
         --pg14 <PG14>    If installed locally, the path to PG14's `pgconfig` tool, or `download` to
                          have pgx download/compile/install it [env: PG14_PG_CONFIG=]
+        --pg15 <PG15>    If installed locally, the path to PG14's `pgconfig` tool, or `download` to
+                         have pgx download/compile/install it [env: PG15_PG_CONFIG=]
     -v, --verbose        Enable info logs, -vv for debug, -vvv for trace
     -V, --version        Print version information
 ```
@@ -175,7 +175,7 @@ If you'd like to create a "background worker" instead, specify the `--bgworker` 
 
 ```shell script
 $ cargo pgx new --help
-cargo-pgx-new 0.4.2
+cargo-pgx-new 0.5.0
 ZomboDB, LLC <zombodb@gmail.com>
 Create a new extension crate
 
@@ -226,7 +226,7 @@ $ cargo pgx stop all
 
 `cargo pgx` has three commands for managing each Postgres installation: `start`, `stop`, and `status`. Additionally, `cargo pgx run` (see below) will automatically start its target Postgres instance if not already running.
 
-When starting a Postgres instance, `pgx` starts it on port `28800 + PG_MAJOR_VERSION`, so Postgres 10 runs on `28810`, 11 on `28811`, etc. Additionally, the first time any of these are started, it'll automaticaly initialize a `PGDATA` directory in `~/.pgx/data-[10 | 11 | 12]`. Doing so allows `pgx` to manage either Postgres versions it installed or ones already on your computer, and to make sure that in the latter case, `pgx` managed versions don't interfere with what might already be running.
+When starting a Postgres instance, `pgx` starts it on port `28800 + PG_MAJOR_VERSION`, so Postgres 11 runs on `28811`, 12 on `28812`, etc. Additionally, the first time any of these are started, it'll automaticaly initialize a `PGDATA` directory in `~/.pgx/data-[11 | 12 | 13 | 14 | 15]`. Doing so allows `pgx` to manage either Postgres versions it installed or ones already on your computer, and to make sure that in the latter case, `pgx` managed versions don't interfere with what might already be running.
 
 `pgx` doesn't tear down these instances. While they're stored in a hidden directory in your home directory, `pgx` considers these important and permanent database installations.
 
@@ -277,7 +277,7 @@ strings=# select strings.to_lowercase('PGX');
 (1 row)
 ```
 
-`cargo pgx run <pg10 | pg11 | pg12 | pg13>` is the primary interface into compiling and interactively testing/using your extension during development.
+`cargo pgx run <pg11 | pg12 | pg13 | pg14 | pg15>` is the primary interface into compiling and interactively testing/using your extension during development.
 
 The very first time you execute `cargo pgx run pgXX`, it needs to compile not only your extension, but pgx itself, along with all its dependencies. Depending on your computer, this could take a bit of time (`pgx` is nearly 200k lines of Rust when counting the generated bindings for Postgres). Afterwards, however (as seen in the above screenshot), it's fairly fast.
 
@@ -291,7 +291,7 @@ For Postgres installations which are already on your computer, `cargo pgx run` w
 
 ```shell script
 $ cargo pgx run --help
-cargo-pgx-run 0.4.2
+cargo-pgx-run 0.5.0
 ZomboDB, LLC <zombodb@gmail.com>
 Compile/install extension to a pgx-managed Postgres instance and start psql
 
@@ -299,8 +299,8 @@ USAGE:
     cargo pgx run [OPTIONS] [ARGS]
 
 ARGS:
-    <PG_VERSION>    Do you want to run against Postgres `pg10`, `pg11`, `pg12`, `pg13`, `pg14`?
-                    [env: PG_VERSION=]
+    <PG_VERSION>    Do you want to run against Postgres `pg11`, `pg12`, `pg13`, `pg14`,
+                    `pg15`? [env: PG_VERSION=]
     <DBNAME>        The database to connect to (and create if the first time).  Defaults to a
                     database with the same name as the current extension name
 
@@ -353,11 +353,11 @@ strings=# select strings.to_lowercase('PGX');
  pgx
 (1 row)
 
-strings=# 
+strings=#
 ```
 
 If you'd simply like to connect to a managed version of Postgres without re-compiling and installing
-your extension, use `cargo pgx connect <pg10 | pg11 | pg12 | pg13>`.
+your extension, use `cargo pgx connect <pg11 | pg12 | pg13 | pg14 | pg15>`.
 
 This command will use the default database named for your extension, or you can specify another
 database name as the final argument.
@@ -366,8 +366,7 @@ If the specified database doesn't exist, `cargo pgx connect` will create it. Sim
 the specified version of Postgres isn't running, it'll be automatically started.
 
 ```shell script
-$ cargo pgx connect --help
-cargo-pgx-connect 0.4.2
+cargo-pgx-connect 0.5.
 ZomboDB, LLC <zombodb@gmail.com>
 Connect, via psql, to a Postgres instance
 
@@ -375,8 +374,8 @@ USAGE:
     cargo pgx connect [OPTIONS] [ARGS]
 
 ARGS:
-    <PG_VERSION>    Do you want to run against Postgres `pg10`, `pg11`, `pg12`, `pg13`, `pg14`?
-                    [env: PG_VERSION=]
+    <PG_VERSION>    Do you want to run against Postgres `pg11`, `pg12`, `pg13`, `pg14`,
+                    `pg15`? [env: PG_VERSION=]
     <DBNAME>        The database to connect to (and create if the first time).  Defaults to a
                     database with the same name as the current extension name [env: DBNAME=]
 
@@ -428,7 +427,7 @@ By default, `cargo pgx install` builds your extension in debug mode. Specifying 
 
 ```shell script
 $ cargo pgx install --help
-cargo-pgx-install 0.4.2
+cargo-pgx-install 0.5.0
 ZomboDB, LLC <zombodb@gmail.com>
 Install the extension from the current crate to the Postgres specified by whatever `pg_config` is
 currently on your $PATH
@@ -504,7 +503,7 @@ test result: ok. 2 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; fini
 Stopping Postgres
 ```
 
-`cargo pgx test [pg10 | pg11 | pg12 | pg13]` runs your `#[test]` and `#[pg_test]` annotated functions using cargo's test system.
+`cargo pgx test [pg11 | pg12 | pg13 | pg14 | pg15]` runs your `#[test]` and `#[pg_test]` annotated functions using cargo's test system.
 
 During the testing process, `pgx` starts a tempory instance of Postgres with its `PGDATA` directory in `./target/pgx-test-data-PGVER/`. This Postgres instance is stopped as soon as the test framework has finished.
 
@@ -516,8 +515,7 @@ Additionally, a `#[pg_test]` function runs in a transaction that is aborted when
 make to the database are not preserved.
 
 ```shell script
-$ cargo pgx test --help
-cargo-pgx-test 0.4.2
+cargo-pgx-test 0.5.0
 ZomboDB, LLC <zombodb@gmail.com>
 Run the test suite for this crate
 
@@ -525,8 +523,8 @@ USAGE:
     cargo pgx test [OPTIONS] [ARGS]
 
 ARGS:
-    <PG_VERSION>    Do you want to run against Postgres `pg10`, `pg11`, `pg12`, `pg13`, `pg14`,
-                    or `all`? [env: PG_VERSION=]
+    <PG_VERSION>    Do you want to run against Postgres `pg11`, `pg12`, `pg13`, `pg14`,
+                    `pg15`, or `all`? [env: PG_VERSION=]
     <TESTNAME>      If specified, only run tests containing this string in their names
 
 OPTIONS:
@@ -600,7 +598,7 @@ distobutions or MacOS Postgres installations.
 
 ```shell script
 $ cargo pgx package --help
-cargo-pgx-package 0.4.2
+cargo-pgx-package 0.5.0
 ZomboDB, LLC <zombodb@gmail.com>
 Create an installation package directory
 
@@ -630,8 +628,8 @@ OPTIONS:
             Do not activate the `default` feature
 
         --out-dir <OUT_DIR>
-            The directory to output the package (default is `./target/[debug|release]/extname-
-            pgXX/`)
+            The directory to output the package (default is
+            `./target/[debug|release]/extname-pgXX/`)
 
     -p, --package <PACKAGE>
             Package to build (see `cargo help pkgid`)
@@ -656,7 +654,7 @@ If you just want to look at the full extension schema that pgx will generate, us
 
 ```shell script
 $ cargo pgx schema --help
-cargo-pgx-schema 0.4.2
+cargo-pgx-schema 0.5.0
 ZomboDB, LLC <zombodb@gmail.com>
 Generate extension schema files
 
@@ -664,7 +662,8 @@ USAGE:
     cargo pgx schema [OPTIONS] [PG_VERSION]
 
 ARGS:
-    <PG_VERSION>    Do you want to run against Postgres `pg10`, `pg11`, `pg12`, `pg13`, `pg14`?
+    <PG_VERSION>    Do you want to run against Postgres `pg11`, `pg12`, `pg13`, `pg14`,
+                    `pg15`?
 
 OPTIONS:
         --all-features
@@ -779,7 +778,7 @@ This feature is not designed to assist in the backwards compatibility of data ty
 ### `@MODULE_PATHNAME@` Templating
 
 In case you are already providing custom SQL definitions for Rust functions, you can use the `@MODULE_PATHNAME@`
-template in your custom SQL. This value will be replaced with the path to the actual shared object. 
+template in your custom SQL. This value will be replaced with the path to the actual shared object.
 
 The following example illustrates how this works:
 

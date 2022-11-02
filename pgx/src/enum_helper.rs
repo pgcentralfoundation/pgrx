@@ -84,7 +84,7 @@ pub fn lookup_enum_by_label(typname: &str, label: &str) -> pg_sys::Datum {
     }
 }
 
-#[cfg(any(feature = "pg10", feature = "pg11"))]
+#[cfg(any(feature = "pg11"))]
 unsafe fn extract_enum_oid(tup: *mut pg_sys::HeapTupleData) -> pg_sys::Oid {
     extern "C" {
         fn pgx_HeapTupleHeaderGetOid(htup_header: pg_sys::HeapTupleHeader) -> pg_sys::Oid;
@@ -93,7 +93,7 @@ unsafe fn extract_enum_oid(tup: *mut pg_sys::HeapTupleData) -> pg_sys::Oid {
     pgx_HeapTupleHeaderGetOid(tup.as_ref().unwrap().t_data)
 }
 
-#[cfg(any(feature = "pg12", feature = "pg13", feature = "pg14"))]
+#[cfg(any(feature = "pg12", feature = "pg13", feature = "pg14", feature = "pg15"))]
 unsafe fn extract_enum_oid(tup: *mut pg_sys::HeapTupleData) -> pg_sys::Oid {
     let en = pgx_GETSTRUCT(tup) as pg_sys::Form_pg_enum;
     let en = en.as_ref().unwrap();

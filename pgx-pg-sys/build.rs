@@ -188,7 +188,7 @@ fn generate_bindings(
             &bindings_file,
             quote! {
                 use crate as pg_sys;
-                #[cfg(any(feature = "pg12", feature = "pg13", feature = "pg14"))]
+                #[cfg(any(feature = "pg12", feature = "pg13", feature = "pg14", feature = "pg15"))]
                 use crate::NullableDatum;
                 use crate::{PgNode, Datum};
             },
@@ -700,7 +700,7 @@ fn extra_bindgen_clang_args(pg_config: &PgConfig) -> eyre::Result<Vec<String>> {
                     // updates), so care should be taken to avoid changing that
                     // if possible.
                     //
-                    // The logic we'd like ideally is for `cargo pgx init` to
+                    // The logic we'd like ideally is for `cargo pgx init` to
                     // choose a good SDK in the first place, and force postgres
                     // to use it. Then, the logic in this build script would
                     // Just Work without changes (since we are using its

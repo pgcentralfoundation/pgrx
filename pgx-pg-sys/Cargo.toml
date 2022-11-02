@@ -12,11 +12,11 @@ edition = "2021"
 
 [features]
 default = [ ]
-pg10 = [ ]
 pg11 = [ ]
 pg12 = [ ]
 pg13 = [ ]
 pg14 = [ ]
+pg15 = [ ]
 postgrestd = [ ]
 
 [package.metadata.docs.rs]
