@@ -30,6 +30,12 @@ pub use datum::Datum;
 #[cfg(any(feature = "pg12", feature = "pg13", feature = "pg14", feature = "pg15"))]
 pub use datum::NullableDatum;
 
+pub use oids::*;
+pub use polyfill::*;
+pub use polyfill::*;
+pub use tupdesc::*;
+pub use utils::*;
+
 #[cfg(target_os = "linux")]
 extern "C" {
     #[link_name = "__sigsetjmp"]

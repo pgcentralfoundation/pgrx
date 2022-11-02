@@ -218,13 +218,13 @@ impl<'a> AsPgCStr for Option<&'a str> {
     }
 }
 
-impl AsPgCStr for String {
+impl AsPgCStr for std::string::String {
     fn as_pg_cstr(self) -> *mut std::os::raw::c_char {
         self.as_str().as_pg_cstr()
     }
 }
 
-impl AsPgCStr for Option<String> {
+impl AsPgCStr for Option<std::string::String> {
     fn as_pg_cstr(self) -> *mut c_char {
         match self {
             Some(s) => s.as_pg_cstr(),

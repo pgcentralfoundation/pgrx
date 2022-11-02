@@ -29,15 +29,15 @@ pub(crate) struct PostgresError {}
 #[derive(Clone, Debug)]
 pub struct PgErrorReport {
     errcode: PgSqlErrorCode,
-    message: String,
-    detail: Option<String>,
-    funcname: Option<String>,
+    message: std::string::String,
+    detail: Option<std::string::String>,
+    funcname: Option<std::string::String>,
     location: PgErrorReportLocation,
 }
 
 #[derive(Clone, Debug)]
 struct PgErrorReportLocation {
-    file: String,
+    file: std::string::String,
     line: u32,
     col: u32,
 }
@@ -66,7 +66,7 @@ impl From<Option<&Location<'_>>> for PgErrorReportLocation {
 impl From<Option<PgErrorReportLocation>> for PgErrorReportLocation {
     fn from(location: Option<PgErrorReportLocation>) -> Self {
         location.unwrap_or_else(|| PgErrorReportLocation {
-            file: String::from("<unknown>"),
+            file: std::string::String::from("<unknown>"),
             line: 0,
             col: 0,
         })
@@ -152,7 +152,7 @@ impl PgErrorReport {
     ///
     /// Embedded "file:line:col" location information is taken from the caller's location
     #[track_caller]
-    pub fn new<S: Into<String>>(errcode: PgSqlErrorCode, message: S) -> Self {
+    pub fn new<S: Into<std::string::String>>(errcode: PgSqlErrorCode, message: S) -> Self {
         Self {
             errcode,
             message: message.into(),
@@ -166,7 +166,7 @@ impl PgErrorReport {
     /// a specific Postgres "ereport()` level via [PgErrorReport::report(self, PgLogLevel)].
     ///
     /// For internal use only
-    fn with_location<S: Into<String>>(
+    fn with_location<S: Into<std::string::String>>(
         errcode: PgSqlErrorCode,
         message: S,
         location: PgErrorReportLocation,
@@ -175,13 +175,13 @@ impl PgErrorReport {
     }
 
     /// Set the `detail` property, whose default is `None`
-    pub fn detail<S: Into<String>>(mut self, detail: S) -> Self {
+    pub fn detail<S: Into<std::string::String>>(mut self, detail: S) -> Self {
         self.detail = Some(detail.into());
         self
     }
 
     /// Set the `funcname` property, whose default is `None`
-    pub fn funcname<S: Into<String>>(mut self, funcname: S) -> Self {
+    pub fn funcname<S: Into<std::string::String>>(mut self, funcname: S) -> Self {
         self.funcname = Some(funcname.into());
         self
     }
@@ -441,10 +441,10 @@ fn downcast_err(mut e: Box<dyn Any + Send>) -> Result<PgErrorReportWithLevel, Po
                 take_panic_location(),
             ),
         })
-    } else if e.downcast_ref::<String>().is_some() {
+    } else if e.downcast_ref::<std::string::String>().is_some() {
         Ok(PgErrorReportWithLevel {
             level: PgLogLevel::ERROR,
-            panic: PgErrorReport::with_location::<String>(
+            panic: PgErrorReport::with_location::<std::string::String>(
                 PgSqlErrorCode::ERRCODE_INTERNAL_ERROR,
                 *e.downcast().unwrap(),
                 take_panic_location(),

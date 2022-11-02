@@ -43,50 +43,63 @@ void pgx_elog_error(char *message) {
     elog(ERROR, "%s", message);
 }
 
-PGDLLEXPORT void pgx_ereport(int level, int code, char *message, char *detail, char *funcname, char *file, int lineno, int colno);
-void pgx_ereport(int level, int code, char *message, char *detail, char *funcname, char *file, int lineno, int colno) {
+PGDLLEXPORT void pgx_ereport(const int level, int code, char *message, char *detail, char *funcname, char *file, int lineno, int colno);
+void pgx_ereport(const int level, int code, char *message, char *detail, char *funcname, char *file, int lineno, int colno) {
+// the below is basically Postgres' `#define ereport(...)` macro unrolled
 
-// these are taken from `elog.h` so that we can provide our own __FILE__ and __LINE__ information
-#ifdef HAVE__BUILTIN_CONSTANT_P
-    #define PGX_ereport_domain(elevel, domain, ...)	\
-	do { \
-		pg_prevent_errno_in_scope(); \
-		if (errstart(elevel, domain)) \
-			__VA_ARGS__, errfinish(file, lineno, funcname); \
-		if (__builtin_constant_p(elevel) && (elevel) >= ERROR) \
-			pg_unreachable(); \
-	} while(0)
-#else							/* !HAVE__BUILTIN_CONSTANT_P */
-#define PGX_ereport_domain(elevel, domain, ...)	\
-	do { \
-		const int elevel_ = (elevel); \
-		pg_prevent_errno_in_scope(); \
-		if (errstart(elevel_, domain)) \
-			__VA_ARGS__, errfinish(file, lineno, funcname); \
-		if (elevel_ >= ERROR) \
-			pg_unreachable(); \
-	} while(0)
-#endif							/* HAVE__BUILTIN_CONSTANT_P */
-
-#define PGX_ereport_macro(elevel, ...)	\
-	PGX_ereport_domain(elevel, TEXTDOMAIN, __VA_ARGS__)
-
-    if (detail != NULL) {
-        PGX_ereport_macro(level,
-            (
-                errcode(code),
-                errmsg("%s", message),
-                errdetail("%s", detail)
-            )
-        );
-    } else {
-        PGX_ereport_macro(level,
-            (
-                errcode(code),
-                errmsg("%s", message)
-            )
-        );
-    }
+#if (IS_PG_11 || IS_PG_12)
+#   ifdef HAVE__BUILTIN_CONSTANT_P
+        if (errstart(level, file, lineno, funcname, NULL)) {
+            if (detail != NULL) {
+                errfinish(level, errcode(code), errmsg("%s", message), errdetail("%s", detail));
+            } else {
+                errfinish(level, errcode(code), errmsg("%s", message));
+            }
+        }
+        if (__builtin_constant_p(level) && level >= ERROR) {
+            pg_unreachable();
+        }
+#   else    /* !HAVE__BUILTIN_CONSTANT_P */
+        if (errstart(level, file, lineno, funcname, NULL)) {
+            if (detail != NULL) {
+                errfinish(level, errcode(code), errmsg("%s", message), errdetail("%s", detail));
+            } else {
+                errfinish(level, errcode(code), errmsg("%s", message));
+            }
+        }
+        if (level >= ERROR) {
+            pg_unreachable();
+        }
+#   endif   /* HAVE__BUILTIN_CONSTANT_P */
+#else   /* IS_PG_11 || IS_PG_12 */
+#   ifdef HAVE__BUILTIN_CONSTANT_P
+        pg_prevent_errno_in_scope();
+        if (errstart(level, NULL)) {
+            errcode(code);
+            errmsg("%s", message);
+            if (detail != NULL) {
+                errdetail("%s", detail);
+            }
+            errfinish(file, lineno, funcname);
+        }
+        if (__builtin_constant_p(level) && level >= ERROR) {
+            pg_unreachable();
+        }
+#   else    /* !HAVE__BUILTIN_CONSTANT_P */
+        pg_prevent_errno_in_scope();
+        if (errstart(level, domain)) {
+            errcode(code);
+            errmsg("%s", message);
+            if (detail != NULL) {
+                errdetail("%s", detail);
+            }
+            errfinish(file, lineno, funcname);
+        }
+        if (level >= ERROR) {
+            pg_unreachable();
+        }
+#   endif   /* HAVE__BUILTIN_CONSTANT_P */
+#endif  /* IS_PG_11 || IS_PG_12 */
 }
 
 PGDLLEXPORT void pgx_SET_VARSIZE(struct varlena *ptr, int size);
