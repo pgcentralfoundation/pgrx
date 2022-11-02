@@ -20,13 +20,13 @@ use std::process::Command;
 pub(crate) struct Get {
     /// One of the properties from `$EXTENSION.control`
     name: String,
-    #[clap(from_global, parse(from_occurrences))]
-    verbose: usize,
+    #[clap(from_global, action = ArgAction::Count)]
+    verbose: u8,
     /// Package to determine default `pg_version` with (see `cargo help pkgid`)
     #[clap(long, short)]
     package: Option<String>,
     /// Path to Cargo.toml
-    #[clap(long, parse(from_os_str))]
+    #[clap(long, value_parser)]
     manifest_path: Option<PathBuf>,
 }
 

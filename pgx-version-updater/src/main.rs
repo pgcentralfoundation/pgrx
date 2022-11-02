@@ -6,7 +6,7 @@ use std::io::{BufRead, Write};
 use std::path::Path;
 use std::process::{Command, Stdio};
 use std::{env, path::PathBuf};
-use toml_edit::{value, Document};
+use toml_edit::{value, Document, Entry, Item};
 use walkdir::{DirEntry, WalkDir};
 
 #[derive(Parser, Debug)]
@@ -190,6 +190,15 @@ fn main() {
             }
         }
 
+        let update_package_version = |item: &mut Item| {
+            if let Some(current_version_specifier) = item.as_str() {
+                *item = value(parse_new_version(
+                    current_version_specifier,
+                    &args.update_version.as_str(),
+                ))
+            }
+        };
+
         // Process dependencies in each file. Generally dependencies can be found in
         // [dependencies], [dependencies.foo], [build-dependencies], [dev-dependencies]
         for updatable_table_name in ["dependencies", "build-dependencies", "dev-dependencies"] {
@@ -197,53 +206,26 @@ fn main() {
                 doc.get_mut(updatable_table_name).and_then(|i| i.as_table_mut())
             {
                 for package in &updatable_package_names {
-                    match updatable_table.get_mut(package) {
-                        // Tables can contain other tables, and if that's the case we're
-                        // probably at a case of:
-                        //   [dependencies.pgx]
-                        //   version = "1.2.3"
-                        Some(item) if item.is_table() => {
-                            if let Some(current_version_specifier) =
-                                item.get("version").and_then(|a| a.as_str())
-                            {
-                                item["version"] = value(parse_new_version(
-                                    current_version_specifier,
-                                    &args.update_version.as_str(),
-                                ))
-                            }
-                        }
-
-                        // Inline table covers the case of:
-                        //   [dependencies]
-                        //   pgx = { version = "1.2.3", features = ["..."] }
-                        Some(item) if item.is_inline_table() => {
-                            if let Some(current_version_specifier) = item
-                                .as_inline_table()
-                                .and_then(|i| i.get("version"))
-                                .and_then(|v| v.as_str())
-                            {
-                                updatable_table[package]["version"] = value(parse_new_version(
-                                    current_version_specifier,
-                                    &args.update_version.as_str(),
-                                ))
-                            }
-                        }
-
-                        // Otherwise we are a string, such as:
-                        //   [dependencies]
-                        //   pgx = "0.1.2"
-                        Some(item) => {
-                            if let Some(current_version_specifier) = item.as_str() {
-                                updatable_table[package] = value(parse_new_version(
-                                    current_version_specifier,
-                                    &args.update_version.as_str(),
-                                ))
-                            }
-                        }
-
-                        // Don't care!
-                        None => {}
+                    // Tables can contain other tables, and if that's the case we're
+                    // probably at a case of a table like this:
+                    //   [dependencies.pgx]
+                    //   version = "1.2.3"
+                    // or an inline table:
+                    //   [dependencies]
+                    //   pgx = { version = "1.2.3", features = ["..."] }
+                    // so we attempt to drill into a dyn TableLike with that entry
+                    if let Some(Entry::Occupied(key_version)) = updatable_table
+                        .get_mut(package)
+                        .and_then(|t| Some(t.as_table_like_mut()?.entry("version")))
+                    {
+                        update_package_version(key_version.into_mut());
                     }
+                    // Otherwise we are a string, such as:
+                    //   [dependencies]
+                    //   pgx = "0.1.2"
+                    else if let Some(item) = updatable_table.get_mut(package) {
+                        update_package_version(item)
+                    };
                 }
             }
         }

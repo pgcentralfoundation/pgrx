@@ -23,7 +23,7 @@ pub(crate) struct Package {
     #[clap(long, short)]
     package: Option<String>,
     /// Path to Cargo.toml
-    #[clap(long, parse(from_os_str))]
+    #[clap(long, value_parser)]
     manifest_path: Option<PathBuf>,
     /// Compile for debug mode (default is release)
     #[clap(long, short)]
@@ -35,15 +35,15 @@ pub(crate) struct Package {
     #[clap(long)]
     test: bool,
     /// The `pg_config` path (default is first in $PATH)
-    #[clap(long, short = 'c', parse(from_os_str))]
+    #[clap(long, short = 'c', value_parser)]
     pg_config: Option<PathBuf>,
     /// The directory to output the package (default is `./target/[debug|release]/extname-pgXX/`)
-    #[clap(long, parse(from_os_str))]
+    #[clap(long, value_parser)]
     out_dir: Option<PathBuf>,
     #[clap(flatten)]
     features: clap_cargo::Features,
-    #[clap(from_global, parse(from_occurrences))]
-    verbose: usize,
+    #[clap(from_global, action = ArgAction::Count)]
+    verbose: u8,
 }
 
 impl CommandExecute for Package {

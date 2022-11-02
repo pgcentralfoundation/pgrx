@@ -15,10 +15,10 @@ edition = "2021"
 
 [dependencies]
 atty = "0.2.14"
-cargo_metadata = "0.14.2"
+cargo_metadata = "0.15.1"
 cargo_toml = "0.11.8"
-clap = { version = "3.2.22", features = [ "env", "suggestions", "cargo", "derive" ] }
-clap-cargo = { version = "0.8.0", features = [ "cargo_metadata" ] }
+clap = { version = "4.0.18", features = [ "env", "suggestions", "cargo", "derive" ] }
+clap-cargo = { version = "0.10.0", features = [ "cargo_metadata" ] }
 semver = "1.0.14"
 owo-colors = { version = "3.5.0", features = [ "supports-colors" ] }
 env_proxy = "0.4.1"
