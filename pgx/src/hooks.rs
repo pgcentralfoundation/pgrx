@@ -12,6 +12,16 @@ use crate::prelude::*;
 use crate::{void_mut_ptr, PgBox, PgList};
 use std::ops::Deref;
 
+#[cfg(any(feature = "pg10", feature = "pg11", feature = "pg12", feature = "pg13"))]
+// JumbleState is not defined prior to postgres v14.
+// This zero-sized type is here to provide an inner type for
+// the option in post_parse_analyze_hook, but prior to v14
+// that option will always be set to None at runtime.
+pub struct JumbleState {}
+
+#[cfg(any(feature = "pg14", feature = "pg15"))]
+pub use pg_sys::JumbleState;
+
 pub struct HookResult<T> {
     pub inner: T,
 }
@@ -140,6 +150,20 @@ pub trait PgHooks {
         prev_hook(parse, query_string, cursor_options, bound_params)
     }
 
+    fn post_parse_analyze(
+        &mut self,
+        pstate: PgBox<pg_sys::ParseState>,
+        query: PgBox<pg_sys::Query>,
+        jumble_state: Option<PgBox<JumbleState>>,
+        prev_hook: fn(
+            pstate: PgBox<pg_sys::ParseState>,
+            query: PgBox<pg_sys::Query>,
+            jumble_state: Option<PgBox<JumbleState>>,
+        ) -> HookResult<()>,
+    ) -> HookResult<()> {
+        prev_hook(pstate, query, jumble_state)
+    }
+
     /// Called when the transaction aborts
     fn abort(&mut self) {}
 
@@ -156,6 +180,7 @@ struct Hooks {
     prev_executor_check_perms_hook: pg_sys::ExecutorCheckPerms_hook_type,
     prev_process_utility_hook: pg_sys::ProcessUtility_hook_type,
     prev_planner_hook: pg_sys::planner_hook_type,
+    prev_post_parse_analyze_hook: pg_sys::post_parse_analyze_hook_type,
 }
 
 static mut HOOKS: Option<Hooks> = None;
@@ -188,6 +213,8 @@ pub unsafe fn register_hook(hook: &'static mut (dyn PgHooks)) {
         prev_planner_hook: pg_sys::planner_hook
             .replace(pgx_planner)
             .or(Some(pgx_standard_planner_wrapper)),
+        prev_post_parse_analyze_hook: pg_sys::post_parse_analyze_hook
+            .replace(pgx_post_parse_analyze),
     });
 
     unsafe extern "C" fn xact_callback(event: pg_sys::XactEvent, _: void_mut_ptr) {
@@ -453,6 +480,61 @@ unsafe extern "C" fn pgx_planner_impl(
         query_string,
         cursor_options,
         PgBox::from_pg(bound_params),
+        prev,
+    )
+    .inner
+}
+
+#[cfg(any(feature = "pg10", feature = "pg11", feature = "pg12", feature = "pg13"))]
+#[pg_guard]
+unsafe extern "C" fn pgx_post_parse_analyze(
+    parse_state: *mut pg_sys::ParseState,
+    query: *mut pg_sys::Query,
+) {
+    fn prev(
+        parse_state: PgBox<pg_sys::ParseState>,
+        query: PgBox<pg_sys::Query>,
+        _jumble_state: Option<PgBox<JumbleState>>,
+    ) -> HookResult<()> {
+        HookResult::new(unsafe {
+            match HOOKS.as_mut().unwrap().prev_post_parse_analyze_hook.as_ref() {
+                None => (),
+                Some(f) => (f)(parse_state.as_ptr(), query.as_ptr()),
+            }
+        })
+    }
+
+    let hook = &mut HOOKS.as_mut().unwrap().current_hook;
+    hook.post_parse_analyze(PgBox::from_pg(parse_state), PgBox::from_pg(query), None, prev).inner
+}
+
+#[cfg(any(feature = "pg14", feature = "pg15"))]
+#[pg_guard]
+unsafe extern "C" fn pgx_post_parse_analyze(
+    parse_state: *mut pg_sys::ParseState,
+    query: *mut pg_sys::Query,
+    jumble_state: *mut JumbleState,
+) {
+    fn prev(
+        parse_state: PgBox<pg_sys::ParseState>,
+        query: PgBox<pg_sys::Query>,
+        jumble_state: Option<PgBox<JumbleState>>,
+    ) -> HookResult<()> {
+        HookResult::new(unsafe {
+            match HOOKS.as_mut().unwrap().prev_post_parse_analyze_hook.as_ref() {
+                None => (),
+                Some(f) => {
+                    (f)(parse_state.as_ptr(), query.as_ptr(), jumble_state.unwrap().as_ptr())
+                }
+            }
+        })
+    }
+
+    let hook = &mut HOOKS.as_mut().unwrap().current_hook;
+    hook.post_parse_analyze(
+        PgBox::from_pg(parse_state),
+        PgBox::from_pg(query),
+        Some(PgBox::from_pg(jumble_state)),
         prev,
     )
     .inner
