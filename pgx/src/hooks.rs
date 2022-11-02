@@ -19,7 +19,7 @@ use std::ops::Deref;
 // that option will always be set to None at runtime.
 pub struct JumbleState {}
 
-#[cfg(any(feature = "pg14"))]
+#[cfg(any(feature = "pg14", feature = "pg15"))]
 pub use pg_sys::JumbleState;
 
 pub struct HookResult<T> {
@@ -508,7 +508,7 @@ unsafe extern "C" fn pgx_post_parse_analyze(
     hook.post_parse_analyze(PgBox::from_pg(parse_state), PgBox::from_pg(query), None, prev).inner
 }
 
-#[cfg(any(feature = "pg14"))]
+#[cfg(any(feature = "pg14", feature = "pg15"))]
 #[pg_guard]
 unsafe extern "C" fn pgx_post_parse_analyze(
     parse_state: *mut pg_sys::ParseState,
