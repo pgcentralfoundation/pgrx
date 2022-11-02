@@ -22,6 +22,7 @@ mod item_pointer_data;
 mod json;
 mod numeric;
 #[cfg(not(feature = "pg10"))]
+#[deny(unsafe_op_in_unsafe_fn)]
 mod range;
 mod time;
 mod time_stamp;
