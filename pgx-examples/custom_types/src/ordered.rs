@@ -19,7 +19,7 @@ use pgx::pg_schema;
     PartialOrd,
     PostgresType,
     PostgresEq,
-    PostgresOrd,
+    PostgresOrd
 )]
 pub struct OrderedThing {
     item: String,
@@ -30,11 +30,7 @@ pub struct OrderedThing {
 impl Ord for OrderedThing {
     fn cmp(&self, other: &Self) -> Ordering {
         fn starts_lower(thing: &OrderedThing) -> bool {
-            thing
-                .item
-                .chars()
-                .next()
-                .map_or(false, |c| c.is_lowercase())
+            thing.item.chars().next().map_or(false, |c| c.is_lowercase())
         }
         if starts_lower(self) {
             if starts_lower(other) {
@@ -72,18 +68,10 @@ mod tests {
         assert_eq!(
             items,
             Some(vec![
-                OrderedThing {
-                    item: "Foo".to_string()
-                },
-                OrderedThing {
-                    item: "Bar".to_string()
-                },
-                OrderedThing {
-                    item: "bar".to_string()
-                },
-                OrderedThing {
-                    item: "foo".to_string()
-                },
+                OrderedThing { item: "Foo".to_string() },
+                OrderedThing { item: "Bar".to_string() },
+                OrderedThing { item: "bar".to_string() },
+                OrderedThing { item: "foo".to_string() },
             ])
         )
     }
