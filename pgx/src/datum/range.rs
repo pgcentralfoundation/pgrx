@@ -78,8 +78,9 @@ where
             None
         } else {
             let ptr = datum.cast_mut_ptr();
+            // Datum should be non-null and point to PG RangeType
             let range_type =
-                pg_sys::pg_detoast_datum(datum.cast_mut_ptr()) as *mut pg_sys::RangeType;
+                unsafe { pg_sys::pg_detoast_datum(datum.cast_mut_ptr()) as *mut pg_sys::RangeType };
             Some(Range { ptr, range_type, _marker: PhantomData })
         }
     }
@@ -217,17 +218,21 @@ where
     /// ## Safety
     /// Requires that:
     /// - range.range_type is valid pointer to RangeType PG struct
+    ///
+    /// Only PG will create the range_type, so this should always be valid
     fn from(range: Range<T>) -> Self {
         let mut lower_bound: RangeBound = Default::default();
         let mut upper_bound: RangeBound = Default::default();
         let mut is_empty = false;
 
         unsafe {
+            // range.range_type came from PG, so assume its rangetypid is valid
             let typecache = pg_sys::lookup_type_cache(
                 (*(range.range_type)).rangetypid,
                 pg_sys::TYPECACHE_RANGE_INFO as i32,
             );
 
+            // PG will deserialize into lower/upper RangeBounds and is_empty
             pg_sys::range_deserialize(
                 typecache,
                 range.range_type,
@@ -236,7 +241,8 @@ where
                 &mut is_empty,
             );
         }
-
+        // The lower_bound/upper_bound RangeBound value's .val will be a valid Datum of the T type
+        // If the range is_empty or either bound is infinite then .val = (Datum) 0
         RangeData::from_range_bounds_internal(lower_bound, upper_bound, is_empty)
     }
 }
@@ -247,12 +253,14 @@ where
 {
     fn from(range_data: RangeData<T>) -> Self {
         let datum: pg_sys::Datum = unsafe {
+            // T must have a valid registered "Range" Type ex. int4 -> int4range,
             let typecache =
                 pg_sys::lookup_type_cache(T::range_type_oid(), pg_sys::TYPECACHE_RANGE_INFO as i32);
 
             let mut lower_bound = range_data.lower;
             let mut upper_bound = range_data.upper;
 
+            // PG will serialize these lower/upper RangeBounds to a *RangeType ptr/datum
             let range_type = pg_sys::make_range(
                 typecache,
                 &mut lower_bound,
@@ -260,6 +268,7 @@ where
                 range_data.is_empty,
             );
 
+            // *RangeType into Datum
             range_type.into()
         };
         Range::<T>::from_pg(datum)
