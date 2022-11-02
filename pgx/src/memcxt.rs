@@ -239,6 +239,18 @@ impl PgMemoryContexts {
         }
     }
 
+    /// Returns parent memory context if any
+    pub fn parent(&self) -> Option<PgMemoryContexts> {
+        // SAFETY: We do this instead of simply plucking the .parent field ourselves
+        // mostly to let Postgres check the context validity if --enable-cassert is on
+        let parent = unsafe { pg_sys::MemoryContextGetParent(self.value()) };
+        if parent.is_null() {
+            None
+        } else {
+            Some(PgMemoryContexts::For(parent))
+        }
+    }
+
     /// Run the specified function "within" the `MemoryContext` represented by this enum.
     ///
     /// The important implementation detail is that Postgres' `CurrentMemoryContext` is changed
