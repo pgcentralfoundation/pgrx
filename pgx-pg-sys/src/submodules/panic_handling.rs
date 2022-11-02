@@ -394,6 +394,11 @@ where
     PgTryResult(result)
 }
 
+enum CaughtError {
+    PostgresError(PostgresError),
+    ErrorReport(PgErrorReportWithLevel),
+}
+
 fn catch_guard<Catch>(error: Box<dyn Any + std::marker::Send>, catch_func: Catch)
 where
     Catch: FnOnce(),
@@ -406,13 +411,13 @@ where
     match downcast_err(error) {
         // the error is a [PgErrorReportWithLevel], so it's an error from either a Rust `panic!()` or
         // from an error-raising [PgLogLevel] `ereport!()` call.
-        Ok(error) => {
+        CaughtError::ErrorReport(error) => {
             error.report();
             unreachable!("PgErrorReportWithLevel.report() failed at depth==0");
         }
 
         // the error is a PostgresError, so all we can do is ask Postgres to rethrow it
-        Err(_pg_error) => unsafe {
+        CaughtError::PostgresError(_) => unsafe {
             extern "C" {
                 // don't care to expose this to the rest of pgx
                 fn pg_re_throw();
@@ -425,15 +430,18 @@ where
 
 /// convert types of `e` that we understand/expect into either a
 /// `Ok(String)` or a `Err<JumpContext>`
-fn downcast_err(mut e: Box<dyn Any + Send>) -> Result<PgErrorReportWithLevel, PostgresError> {
+fn downcast_err(mut e: Box<dyn Any + Send>) -> CaughtError {
     if e.downcast_mut::<PostgresError>().is_some() {
-        Err(*e.downcast().unwrap())
+        CaughtError::PostgresError(*e.downcast().unwrap())
     } else if e.downcast_mut::<PgErrorReportLocation>().is_some() {
-        Ok(*e.downcast().unwrap())
+        CaughtError::ErrorReport(*e.downcast().unwrap())
     } else if e.downcast_mut::<PgErrorReport>().is_some() {
-        Ok(PgErrorReportWithLevel { level: PgLogLevel::ERROR, panic: *e.downcast().unwrap() })
+        CaughtError::ErrorReport(PgErrorReportWithLevel {
+            level: PgLogLevel::ERROR,
+            panic: *e.downcast().unwrap(),
+        })
     } else if e.downcast_ref::<&str>().is_some() {
-        Ok(PgErrorReportWithLevel {
+        CaughtError::ErrorReport(PgErrorReportWithLevel {
             level: PgLogLevel::ERROR,
             panic: PgErrorReport::with_location::<&str>(
                 PgSqlErrorCode::ERRCODE_INTERNAL_ERROR,
@@ -442,7 +450,7 @@ fn downcast_err(mut e: Box<dyn Any + Send>) -> Result<PgErrorReportWithLevel, Po
             ),
         })
     } else if e.downcast_ref::<std::string::String>().is_some() {
-        Ok(PgErrorReportWithLevel {
+        CaughtError::ErrorReport(PgErrorReportWithLevel {
             level: PgLogLevel::ERROR,
             panic: PgErrorReport::with_location::<std::string::String>(
                 PgSqlErrorCode::ERRCODE_INTERNAL_ERROR,
@@ -452,7 +460,7 @@ fn downcast_err(mut e: Box<dyn Any + Send>) -> Result<PgErrorReportWithLevel, Po
         })
     } else {
         // not a type we understand, so use a generic string
-        Ok(PgErrorReportWithLevel {
+        CaughtError::ErrorReport(PgErrorReportWithLevel {
             level: PgLogLevel::ERROR,
             panic: PgErrorReport::with_location(
                 PgSqlErrorCode::ERRCODE_INTERNAL_ERROR,
