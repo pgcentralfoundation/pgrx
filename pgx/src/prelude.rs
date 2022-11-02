@@ -28,7 +28,9 @@ pub use crate::pg_sys::PgBuiltInOids;
 pub use crate::spi::Spi;
 
 // Logging and Error support
+pub use crate::pg_sys::elog::PgLogLevel;
+pub use crate::pg_sys::errcodes::PgSqlErrorCode;
 pub use crate::pg_sys::{
-    check_for_interrupts, debug1, debug2, debug3, debug4, debug5, elog::PgLogLevel,
-    errcodes::PgSqlErrorCode, error, info, log, notice, warning, FATAL, PANIC,
+    check_for_interrupts, debug1, debug2, debug3, debug4, debug5, ereport, error, function_name,
+    info, log, notice, warning, FATAL, PANIC,
 };

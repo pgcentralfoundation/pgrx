@@ -481,6 +481,16 @@ mod all_versions {
         #[link_name = "pgx_SpinLockFree"]
         pub fn SpinLockFree(lock: *mut pg_sys::slock_t) -> bool;
     }
+
+    #[inline(always)]
+    pub fn MemoryContextSwitchTo(context: crate::MemoryContext) -> crate::MemoryContext {
+        unsafe {
+            let old = crate::CurrentMemoryContext;
+
+            crate::CurrentMemoryContext = context;
+            old
+        }
+    }
 }
 
 mod internal {

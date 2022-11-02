@@ -248,15 +248,63 @@ macro_rules! PANIC {
     )
 }
 
+// shamelessly borrowed from https://docs.rs/stdext/0.2.1/src/stdext/macros.rs.html#61-72
+/// This macro returns the name of the enclosing function.
+/// As the internal implementation is based on the [`std::any::type_name`], this macro derives
+/// all the limitations of this function.
+///
+/// [`std::any::type_name`]: https://doc.rust-lang.org/std/any/fn.type_name.html
+#[macro_export]
+macro_rules! function_name {
+    () => {{
+        // Okay, this is ugly, I get it. However, this is the best we can get on a stable rust.
+        fn f() {}
+        fn type_name_of<T>(_: T) -> &'static str {
+            std::any::type_name::<T>()
+        }
+        let name = type_name_of(f);
+        // `3` is the length of the `::f`.
+        &name[..name.len() - 3]
+    }};
+}
+
+/// Sends some kind of message to Postgres, and if it's a [PgLogLevel::ERROR] or greater, Postgres'
+/// error handling takes over and, in the case of [PgLogLevel::ERROR], aborts the current transaction.
+///
+/// This function is especially useful, and in fact, necessary, when one needs to supply a specific
+/// SQL error code as part of their error message.
+///
+/// The argument order is:
+/// - `reporting_level: [PgLogLevel]`
+/// - `error_code: [PgSqlErrorCode]`
+/// - `message: String`
+/// - (optional) `detail: String`
+///
+/// ## Examples
+///
+/// ```rust,no_run
+/// use pgx_pg_sys::ereport;
+/// use pgx_pg_sys::errcodes::PgSqlErrorCode;
+/// ereport!(PgLogLevel::ERROR, PgSqlErrorCode::ERRCODE_INTERNAL_ERROR, "oh noes!"); // abort the transaction
+/// ```
+///
+/// ```rust,no_run
+/// use pgx_pg_sys::ereport;
+/// use pgx_pg_sys::errcodes::PgSqlErrorCode;
+/// ereport!(PgLogLevel::LOG, PgSqlErrorCode::ERRCODE_SUCCESSFUL_COMPLETION, "this is just a message"); // log output only
+/// ```
 #[macro_export]
 macro_rules! ereport {
     ($loglevel:expr, $errcode:expr, $message:expr) => {
-        $crate::panic_handling::PgxPanicData::new($errcode, $message).report($loglevel)
+        $crate::panic_handling::PgxPanicData::new($errcode, $message)
+            .funcname($crate::function_name!())
+            .report($loglevel)
     };
 
     ($loglevel:expr, $errcode:expr, $message:expr, $detail:expr) => {
         $crate::panic_handling::PgxPanicData::new($errcode, $message)
             .detail($detail)
+            .funcname($crate::function_name!())
             .report($loglevel)
     };
 }

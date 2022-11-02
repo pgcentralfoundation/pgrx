@@ -108,8 +108,8 @@ pub use pg_sys::panic_handling::{guard, pg_try};
 pub use pg_sys::utils::name_data_to_str;
 pub use pg_sys::PgBuiltInOids;
 pub use pg_sys::{
-    check_for_interrupts, debug1, debug2, debug3, debug4, debug5, ereport, error, info, log,
-    notice, warning, FATAL, PANIC,
+    check_for_interrupts, debug1, debug2, debug3, debug4, debug5, ereport, error, function_name,
+    info, log, notice, warning, FATAL, PANIC,
 };
 
 use once_cell::sync::Lazy;

@@ -12,13 +12,13 @@ Use of this source code is governed by the MIT license that can be found in the 
 use crate::elog::PgLogLevel;
 use crate::errcodes::PgSqlErrorCode;
 use crate::{
-    AsPgCStr, CopyErrorData, CurrentMemoryContext, FlushErrorState, FreeErrorData,
-    TopTransactionContext,
+    pfree, AsPgCStr, CopyErrorData, CurrentMemoryContext, FlushErrorState, FreeErrorData,
+    MemoryContextSwitchTo, TopTransactionContext,
 };
 use std::any::Any;
 use std::cell::Cell;
 use std::hint::unreachable_unchecked;
-use std::panic::{catch_unwind, RefUnwindSafe, UnwindSafe};
+use std::panic::{catch_unwind, Location, PanicInfo, RefUnwindSafe, UnwindSafe};
 
 /// Represents an `ERROR` that we caught from Postgres, via our use of `sigsetjmp()`
 #[derive(Clone, Debug)]
@@ -31,14 +31,50 @@ pub struct PgxPanicData {
     pub(crate) errcode: PgSqlErrorCode,
     pub(crate) message: String,
     pub(crate) detail: Option<String>,
-    pub(crate) location: PanicLocation,
+    pub(crate) funcname: Option<String>,
+    pub(crate) location: PgxPanicLocation,
 }
 
 #[derive(Clone, Debug)]
-pub struct PanicLocation {
+pub struct PgxPanicLocation {
     pub(crate) file: String,
     pub(crate) line: u32,
     pub(crate) col: u32,
+}
+
+impl Default for PgxPanicLocation {
+    #[track_caller]
+    fn default() -> Self {
+        Location::caller().into()
+    }
+}
+
+impl From<&Location<'_>> for PgxPanicLocation {
+    fn from(location: &Location<'_>) -> Self {
+        Self { file: location.file().to_string(), line: location.line(), col: location.column() }
+    }
+}
+
+impl From<Option<&Location<'_>>> for PgxPanicLocation {
+    fn from(location: Option<&Location<'_>>) -> Self {
+        location.into()
+    }
+}
+
+impl From<Option<PgxPanicLocation>> for PgxPanicLocation {
+    fn from(location: Option<PgxPanicLocation>) -> Self {
+        location.unwrap_or_else(|| PgxPanicLocation {
+            file: String::from("<unknown>"),
+            line: 0,
+            col: 0,
+        })
+    }
+}
+
+impl From<&PanicInfo<'_>> for PgxPanicLocation {
+    fn from(pi: &PanicInfo<'_>) -> Self {
+        pi.location().into()
+    }
 }
 
 #[derive(Clone, Debug)]
@@ -58,6 +94,7 @@ impl PanicWithLevel {
                 code: i32,
                 message: *const std::os::raw::c_char,
                 detail: *const std::os::raw::c_char,
+                funcname: *const std::os::raw::c_char,
                 file: *const std::os::raw::c_char,
                 lineno: i32,
                 colno: i32,
@@ -65,22 +102,43 @@ impl PanicWithLevel {
         }
 
         unsafe {
+            // because of the calls to `.as_pg_cstr()`, which allocate using `palloc0()`,
+            // we need to be in the `ErrorContext` when we allocate those
+            //
+            // specifically, the problem here is `self.panic.location.file & .funcname`.  At the C level,
+            // Postgres expects these to be static strings, created at compile time, rather
+            // than something allocated from a MemoryContext.  Our version of ereport (pgx_ereport)
+            // accepts a user-provided strings for them, so we can report function/file/line information
+            // from rust code
+            let old_cxt = MemoryContextSwitchTo(crate::ErrorContext);
+            let funcname = self.panic.funcname.as_pg_cstr();
+            let file = self.panic.location.file.as_pg_cstr();
+            MemoryContextSwitchTo(old_cxt);
+
             pgx_ereport(
                 self.level as _,
                 self.panic.errcode as _,
                 self.panic.message.as_pg_cstr(),
                 self.panic.detail.as_pg_cstr(),
-                self.panic.location.file.as_pg_cstr(),
+                funcname,
+                file,
                 self.panic.location.line as _,
                 self.panic.location.col as _,
             );
-        }
 
-        if crate::ERROR <= self.level as _ {
-            unsafe {
+            if crate::ERROR <= self.level as _ {
                 // SAFETY:  this is true because if we're being reported as an ERROR or anything
                 // greater, we'll never return from the above call to `pgx_ereport()`
                 unreachable_unchecked()
+            }
+
+            // if pgx_ereport() returned control (user didn't report a message at a level >=ERROR)
+            // then lets not leak our fucname & file pointers
+            if !file.is_null() {
+                pfree(file.cast())
+            }
+            if !funcname.is_null() {
+                pfree(funcname.cast())
             }
         }
     }
@@ -97,7 +155,8 @@ impl PgxPanicData {
             errcode,
             message: message.into(),
             detail: None,
-            location: PanicLocation { file: file!().to_string(), line: line!(), col: column!() },
+            funcname: None,
+            location: PgxPanicLocation::default(),
         }
     }
 
@@ -106,14 +165,20 @@ impl PgxPanicData {
     pub fn with_location<S: Into<String>>(
         errcode: PgSqlErrorCode,
         message: S,
-        location: PanicLocation,
+        location: PgxPanicLocation,
     ) -> Self {
-        Self { errcode, message: message.into(), detail: None, location }
+        Self { errcode, message: message.into(), detail: None, funcname: None, location }
     }
 
     /// Set the `detail` property, whose default is `None`
     pub fn detail<S: Into<String>>(mut self, detail: S) -> Self {
         self.detail = Some(detail.into());
+        self
+    }
+
+    /// Set the `funcname` property, whose default is `None`
+    pub fn funcname<S: Into<String>>(mut self, funcname: S) -> Self {
+        self.funcname = Some(funcname.into());
         self
     }
 
@@ -124,15 +189,10 @@ impl PgxPanicData {
     }
 }
 
-thread_local! { static PANIC_LOCATION: Cell<Option<PanicLocation>> = Cell::new(None) }
+thread_local! { static PANIC_LOCATION: Cell<Option<PgxPanicLocation >> = Cell::new(None) }
 
-fn take_panic_location() -> PanicLocation {
-    PANIC_LOCATION.with(|p| match p.take() {
-        Some(location) => location,
-
-        // this case shouldn't happen
-        None => PanicLocation { file: "<unknown>".to_string(), line: 0, col: 0 },
-    })
+fn take_panic_location() -> PgxPanicLocation {
+    PANIC_LOCATION.with(|p| p.take().into())
 }
 
 pub fn register_pg_guard_panic_hook() {
@@ -140,18 +200,7 @@ pub fn register_pg_guard_panic_hook() {
         PANIC_LOCATION.with(|p| {
             let existing = p.take();
 
-            p.replace(if existing.is_none() {
-                match info.location() {
-                    Some(location) => Some(PanicLocation {
-                        file: location.file().to_string(),
-                        line: location.line(),
-                        col: location.column(),
-                    }),
-                    None => None,
-                }
-            } else {
-                existing
-            })
+            p.replace(if existing.is_none() { info.location().map(|l| l.into()) } else { existing })
         });
     }))
 }
@@ -351,22 +400,21 @@ where
 
     // determine how to rethrow the error
     match downcast_err(error) {
-        // the error is a String, which means it was originally a Rust panic!(), so
-        // translate it into an elog(ERROR), including the code location that caused
-        // the panic!()
+        // the error is a [PanicWithLevel], so it's an error from either a Rust `panic!()` or
+        // from an error-raising [PgLogLevel] `ereport!()` call.
         Ok(error) => {
             error.report();
-            unreachable!("ereport() failed at depth==0");
+            unreachable!("PanicWithLevel.report() failed at depth==0");
         }
 
-        // the error is a JumpContext, so we need to longjmp back into Postgres
-        Err(_) => unsafe {
+        // the error is a PostgresError, so all we can do is ask Postgres to rethrow it
+        Err(_pg_error) => unsafe {
             extern "C" {
                 // don't care to expose this to the rest of pgx
                 fn pg_re_throw();
             }
             pg_re_throw();
-            unreachable!("siglongjmp failed");
+            unreachable!("pg_re_throw() failed");
         },
     }
 }

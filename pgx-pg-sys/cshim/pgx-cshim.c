@@ -43,48 +43,48 @@ void pgx_elog_error(char *message) {
     elog(ERROR, "%s", message);
 }
 
-PGDLLEXPORT void pgx_ereport(int level, int code, char *message, char *detail, char *file, int lineno, int colno);
-void pgx_ereport(int level, int code, char *message, char *file, int lineno, int colno) {
-    // these are taken from `elog.h` so that we can provide our our __FILE__ and __LINE__ information
+PGDLLEXPORT void pgx_ereport(int level, int code, char *message, char *detail, char *funcname, char *file, int lineno, int colno);
+void pgx_ereport(int level, int code, char *message, char *detail, char *funcname, char *file, int lineno, int colno) {
+
+// these are taken from `elog.h` so that we can provide our own __FILE__ and __LINE__ information
 #ifdef HAVE__BUILTIN_CONSTANT_P
-    #define ereport_domain(elevel, domain, ...)	\
+    #define PGX_ereport_domain(elevel, domain, ...)	\
 	do { \
 		pg_prevent_errno_in_scope(); \
 		if (errstart(elevel, domain)) \
-			__VA_ARGS__, errfinish(file, lineno, PG_FUNCNAME_MACRO); \
+			__VA_ARGS__, errfinish(file, lineno, funcname); \
 		if (__builtin_constant_p(elevel) && (elevel) >= ERROR) \
 			pg_unreachable(); \
 	} while(0)
 #else							/* !HAVE__BUILTIN_CONSTANT_P */
-#define ereport_domain(elevel, domain, ...)	\
+#define PGX_ereport_domain(elevel, domain, ...)	\
 	do { \
 		const int elevel_ = (elevel); \
 		pg_prevent_errno_in_scope(); \
 		if (errstart(elevel_, domain)) \
-			__VA_ARGS__, errfinish(__FILE__, __LINE__, PG_FUNCNAME_MACRO); \
+			__VA_ARGS__, errfinish(file, lineno, funcname); \
 		if (elevel_ >= ERROR) \
 			pg_unreachable(); \
 	} while(0)
 #endif							/* HAVE__BUILTIN_CONSTANT_P */
 
-#define ereport(elevel, ...)	\
-	ereport_domain(elevel, TEXTDOMAIN, __VA_ARGS__)
+#define PGX_ereport_macro(elevel, ...)	\
+	PGX_ereport_domain(elevel, TEXTDOMAIN, __VA_ARGS__)
 
-
-    if detail != NIL {
-        ereport(level,
-                (
-                        errcode(code),
-                        errmsg("%s", message),
-                        errdetail("%s", detail)
-                )
+    if (detail != NULL) {
+        PGX_ereport_macro(level,
+            (
+                errcode(code),
+                errmsg("%s", message),
+                errdetail("%s", detail)
+            )
         );
     } else {
-        ereport(level,
-                (
-                        errcode(code),
-                        errmsg("%s", message),
-                )
+        PGX_ereport_macro(level,
+            (
+                errcode(code),
+                errmsg("%s", message)
+            )
         );
     }
 }

@@ -1,6 +1,4 @@
-use crate::panic_handling::{PanicLocation, PgxPanicData};
 use std::fmt::{Display, Formatter};
-use std::panic::panic_any;
 
 /// This list of SQL Error Codes is taken directly from Postgres 12's generated "utils/errcodes.h"
 #[allow(non_camel_case_types)]
@@ -387,52 +385,6 @@ impl Display for PgSqlErrorCode {
 }
 
 impl std::error::Error for PgSqlErrorCode {}
-
-impl PgSqlErrorCode {
-    /// Cause Postgres to report this `PgSqlErrorCode` as an `ERROR` with an accompanying error message.
-    ///
-    /// ## Examples
-    ///
-    /// ```rust,no_run
-    /// # use pgx_pg_sys::errcodes::PgSqlErrorCode;
-    /// PgSqlErrorCode::ERRCODE_NUMERIC_VALUE_OUT_OF_RANGE.report("value is too small")
-    /// ```
-    #[track_caller]
-    pub fn report<S: Into<String>>(self, message: S) -> ! {
-        panic_any(PgxPanicData {
-            errcode: self,
-            message: message.into(),
-            detail: None,
-            location: PanicLocation { file: file!().to_string(), line: line!(), col: column!() },
-        })
-    }
-
-    /// Cause Postgres to report this `PgSqlErrorCode` as an `ERROR` with an accompanying error
-    /// message and detail message
-    ///
-    /// ## Examples
-    ///
-    /// ```rust,no_run
-    /// # use pgx_pg_sys::errcodes::PgSqlErrorCode;
-    /// PgSqlErrorCode::ERRCODE_NUMERIC_VALUE_OUT_OF_RANGE.report_with_detail(
-    ///     "value is too small",
-    ///     "valid range is [1..10]"
-    /// )
-    /// ```
-    #[track_caller]
-    pub fn report_with_detail<S: Into<String>, S2: Into<String>>(
-        self,
-        message: S,
-        detail: S2,
-    ) -> ! {
-        panic_any(PgxPanicData {
-            errcode: self,
-            message: message.into(),
-            detail: Some(detail.into()),
-            location: PanicLocation { file: file!().to_string(), line: line!(), col: column!() },
-        })
-    }
-}
 
 impl From<isize> for PgSqlErrorCode {
     fn from(error_code: isize) -> Self {
