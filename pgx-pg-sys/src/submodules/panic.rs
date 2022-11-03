@@ -229,42 +229,29 @@ where
     match catch_unwind(f) {
         Ok(result) => result,
         Err(e) => {
-            let error = downcast_err(e);
-            match error {
-                CaughtError::PostgresError(ref errdata) => {
+            // don't care to expose these to the rest of pgx
+            // we also don't want our `#[pg_guard]` applied to them
+            extern "C" {
+                fn pg_re_throw() -> !;
+                fn pgx_errcontext_msg(message: *mut std::os::raw::c_char);
+            }
+            let report = match downcast_err(e) {
+                CaughtError::PostgresError(errdata) => {
                     unsafe {
-                        // don't care to expose these to the rest of pgx
-                        // we also don't want our `#[pg_guard]` applied to them
-                        extern "C" {
-                            fn pg_re_throw();
-                            fn pgx_errcontext_msg(message: *mut std::os::raw::c_char);
-                        }
-
                         pgx_errcontext_msg(errdata.location.to_string().as_pg_cstr());
-                        if !errdata.stack.is_empty() {
-                            pgx_errcontext_msg(contexts_as_pg_cstr(&errdata.stack))
-                        }
-
-                        // don't leak anything as `pg_re_throw` won't be returning
-                        drop(error);
-                        pg_re_throw();
-
-                        // SAFETY: Postgres **will not** return after a call to `pg_re_throw()`
-                        unreachable_unchecked()
+                        pgx_errcontext_msg(contexts_as_pg_cstr(&errdata.stack));
                     }
+                    None
                 }
-
-                CaughtError::ErrorReport(ref ereport)
-                | CaughtError::RustPanic { ref ereport, .. } => {
-                    // this clone will get dropped by `do_ereport`
-                    let ereport = ereport.clone();
-
-                    // drop the `error` and anything it might contain now as `do_ereport` won't be returning
-                    drop(error);
-                    do_ereport(ereport);
-
-                    unreachable!("pgx reported a CaughtError::ErrorReport that wasn't raised at ERROR or above")
+                CaughtError::ErrorReport(ereport) | CaughtError::RustPanic { ereport, .. } => {
+                    Some(ereport)
                 }
+            };
+            if let Some(ereport) = report {
+                do_ereport(ereport);
+                unreachable!("pgx reported a CaughtError that wasn't raised at ERROR or above");
+            } else {
+                unsafe { pg_re_throw() }
             }
         }
     }
