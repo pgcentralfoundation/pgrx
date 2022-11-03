@@ -75,7 +75,7 @@ if command -v pgx-version-updater &> /dev/null; then
   cargo_toml_version=$(cargo read-manifest --manifest-path pgx-version-updater/Cargo.toml | jq -r .version)
 
   if [ "$installed_version" == "$cargo_toml_version" ]; then
-    echo "Installed version of pgx-version-updater ($installed_version) matches version found in PGX source ($cargo_toml_version). SKipping."
+    echo "Installed version of pgx-version-updater ($installed_version) matches version found in PGX source ($cargo_toml_version). Skipping."
   else
     echo "Installed version of pgx-version-updater ($installed_version) does not match version found in PGX source ($cargo_toml_version). Updating -- this may take a few moments"
     cargo ${VERBOSE:+-q} install --path pgx-version-updater/
