@@ -104,7 +104,7 @@ pub use pgx_pg_sys as pg_sys; // the module only, not its contents
 pub use pg_sys::elog::PgLogLevel;
 pub use pg_sys::errcodes::PgSqlErrorCode;
 pub use pg_sys::oids::PgOid;
-pub use pg_sys::panic_handling::guard;
+pub use pg_sys::panic::guard;
 pub use pg_sys::pg_try::PgTryBuilder;
 pub use pg_sys::utils::name_data_to_str;
 pub use pg_sys::PgBuiltInOids;
@@ -334,5 +334,5 @@ macro_rules! pg_sql_graph_magic {
 /// directly.
 #[allow(unused)]
 pub fn initialize() {
-    pg_sys::panic_handling::register_pg_guard_panic_hook();
+    pg_sys::panic::register_pg_guard_panic_hook();
 }

@@ -10,11 +10,24 @@ use pgx::prelude::*;
 pgx::pg_module_magic!();
 
 #[pg_extern]
-fn try_it() -> Option<i32> {
+fn try_it(input: i32) -> Option<i32> {
     PgTryBuilder::new(|| {
-        ereport!(ERROR, PgSqlErrorCode::RustPanic, "here");
+        if input < 100 {
+            error!(PgSqlErrorCode::ERRCODE_NUMERIC_VALUE_OUT_OF_RANGE, "a number is too small")
+        }
+
+        // .. do some work ...
+        // cause a different error to happen
+        if input == 666 {
+            unsafe {
+                pg_sys::relation_open(0, 0);
+            }
+        } else if input >= 1000 {
+            panic!("rust panic with input of: {}", input)
+        }
+        Some(input)
     })
-    .catch_others(|e| e.rethrow())
+    .catch_when(PgSqlErrorCode::ERRCODE_NUMERIC_VALUE_OUT_OF_RANGE, |_caught_error| None)
     .execute()
 }
 

@@ -13,12 +13,12 @@ pub mod elog;
 pub mod errcodes;
 pub mod ffi;
 pub mod oids;
-pub mod panic_handling;
+pub mod panic;
 pub mod pg_try;
 pub mod polyfill;
 pub mod tupdesc;
 
-pub use panic_handling::guard;
+pub use panic::guard;
 
 pub mod utils;
 

@@ -1,6 +1,6 @@
 #![deny(unsafe_op_in_unsafe_fn)]
 
-use crate::panic_handling::ErrorData;
+use crate::panic::ErrorData;
 
 /**
 Given a closure that is assumed to be a wrapped Postgres `extern "C"` function, [pg_guard_ffi_boundary]

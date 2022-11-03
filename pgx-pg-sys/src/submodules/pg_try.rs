@@ -1,5 +1,5 @@
 use crate::errcodes::PgSqlErrorCode;
-use crate::panic_handling::CaughtError;
+use crate::panic::CaughtError;
 use std::collections::HashMap;
 use std::panic::{catch_unwind, UnwindSafe};
 
@@ -52,7 +52,7 @@ impl<'a, R, F: FnOnce() -> R + UnwindSafe> PgTryBuilder<'a, R, F> {
         let result = match result {
             Ok(result) => result,
             Err(error) => {
-                let (sqlerrcode, panic) = match crate::panic_handling::downcast_err(error) {
+                let (sqlerrcode, panic) = match crate::panic::downcast_err(error) {
                     panic @ CaughtError::RustPanic { .. } => (PgSqlErrorCode::RustPanic, panic),
                     CaughtError::ErrorReport(ereport) => {
                         let sqlerrcode = ereport.ereport.errcode;
