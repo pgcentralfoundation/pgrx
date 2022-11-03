@@ -79,7 +79,11 @@ impl PgGuardRewriter {
             #vis #sig {
                 #[allow(non_snake_case)]
                 #func
-                pg_sys::panic::guard( #[allow(unused_unsafe)] || unsafe { #func_name(#arg_list) } )
+
+                #[allow(unused_unsafe)]
+                unsafe {
+                    pg_sys::panic::guard( || #func_name(#arg_list) )
+                }
             }
         })
     }

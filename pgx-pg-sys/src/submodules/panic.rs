@@ -13,6 +13,7 @@ use std::any::Any;
 use std::cell::Cell;
 use std::fmt::{Display, Formatter};
 use std::hint::unreachable_unchecked;
+use std::mem::ManuallyDrop;
 use std::panic::{
     catch_unwind, panic_any, resume_unwind, Location, PanicInfo, RefUnwindSafe, UnwindSafe,
 };
@@ -107,7 +108,8 @@ impl ErrorReportWithLevel {
         if crate::ERROR <= self.level as _ {
             panic_any(self)
         } else {
-            do_ereport(self)
+            let ereport = ManuallyDrop::new(self);
+            do_ereport(ereport)
         }
     }
 }
@@ -211,6 +213,13 @@ impl CaughtError {
     }
 }
 
+#[derive(Debug, Clone)]
+enum GuardAction<R> {
+    Return(R),
+    ReThrow,
+    Report(ManuallyDrop<ErrorReportWithLevel>),
+}
+
 /// Guard a closure such that Rust Panics are properly converted into Postgres ERRORs.
 ///
 /// Note that any Postgres ERRORs raised within the supplied closure are transparently converted
@@ -220,40 +229,63 @@ impl CaughtError {
 /// behind the `#[pg_guard]` and `#[pg_extern]` macros.  Which means the function you'd like to guard
 /// is likely already guarded.
 ///
-/// This function is re-entrant and will properly "bubble-up" panics or errors to the top-level
-/// before they're converted into Postgres ERRORs
-pub fn guard<Func, R>(f: Func) -> R
+/// Where it does need to be used is as a wrapper around Rust `extern "C"` function pointers given
+/// to Postgres, and the `#[pg_guard]` macro takes care of this for you.
+///
+/// # Safety
+///
+/// The function needs to only have [trivially-deallocated stack frames]
+/// above it (well, in practice it does, and once that stabilizes it will be even more of a requirement).
+/// In the short term this probably looks like just making it `unsafe`.
+///
+/// I think we also will need to implement it a lot more carefully to ensure it's safe to longjmp out of,
+/// and probably do something about `Func` too...
+///
+/// [trivially-deallocated stack frames](https://github.com/rust-lang/rfcs/blob/master/text/2945-c-unwind-abi.md#plain-old-frames)
+pub unsafe fn guard<Func, R: Copy>(f: Func) -> R
 where
     Func: FnOnce() -> R + UnwindSafe + RefUnwindSafe,
 {
-    match catch_unwind(f) {
-        Ok(result) => result,
-        Err(e) => {
-            // don't care to expose these to the rest of pgx
-            // we also don't want our `#[pg_guard]` applied to them
-            extern "C" {
+    match run_guarded(f) {
+        GuardAction::Return(r) => r,
+        GuardAction::ReThrow => {
+            extern "C" /* "C-unwind" */ {
                 fn pg_re_throw() -> !;
-                fn pgx_errcontext_msg(message: *mut std::os::raw::c_char);
             }
-            let report = match downcast_err(e) {
-                CaughtError::PostgresError(errdata) => {
-                    unsafe {
-                        pgx_errcontext_msg(errdata.location.to_string().as_pg_cstr());
-                        pgx_errcontext_msg(contexts_as_pg_cstr(&errdata.stack));
-                    }
-                    None
-                }
-                CaughtError::ErrorReport(ereport) | CaughtError::RustPanic { ereport, .. } => {
-                    Some(ereport)
-                }
-            };
-            if let Some(ereport) = report {
-                do_ereport(ereport);
-                unreachable!("pgx reported a CaughtError that wasn't raised at ERROR or above");
-            } else {
-                unsafe { pg_re_throw() }
-            }
+            unsafe { pg_re_throw() }
         }
+        GuardAction::Report(ereport) => {
+            do_ereport(ereport);
+            unreachable!("pgx reported a CaughtError that wasn't raised at ERROR or above");
+        }
+    }
+}
+
+#[inline(never)]
+fn run_guarded<F, R: Copy>(f: F) -> GuardAction<R>
+where
+    F: FnOnce() -> R + UnwindSafe + RefUnwindSafe,
+{
+    match catch_unwind(f) {
+        Ok(v) => GuardAction::Return(v),
+        Err(e) => match downcast_err(e) {
+            CaughtError::PostgresError(errdata) => {
+                extern "C" {
+                    fn pgx_errcontext_msg(message: *mut std::os::raw::c_char);
+                }
+                unsafe {
+                    pgx_errcontext_msg(errdata.location.to_string().as_pg_cstr());
+                    pgx_errcontext_msg(contexts_as_pg_cstr(&errdata.stack));
+                }
+
+                // Return to the caller to rethrow -- we can't do it here
+                // since we this function's has non-POF frames.
+                GuardAction::ReThrow
+            }
+            CaughtError::ErrorReport(ereport) | CaughtError::RustPanic { ereport, .. } => {
+                GuardAction::Report(ManuallyDrop::new(ereport))
+            }
+        },
     }
 }
 
@@ -320,7 +352,7 @@ pub(crate) fn downcast_err(e: Box<dyn Any + Send>) -> CaughtError {
     }
 }
 
-fn do_ereport(ereport: ErrorReportWithLevel) {
+fn do_ereport(ereport: ManuallyDrop<ErrorReportWithLevel>) {
     // we define this here to make it difficult for not only pgx, but pgx users
     // to find and directly call this function.  They'd have to do the same as
     // this, and that seems like more work than a normal programmer would want to do
@@ -365,7 +397,7 @@ fn do_ereport(ereport: ErrorReportWithLevel) {
         //
         // the few `.as_pg_cstr()`s do their allocation in Postgres' `CurrentMemoryContext`, so they'll
         // be cleaned up by Postgres at the right time
-        drop(ereport);
+        let _ = ManuallyDrop::into_inner(ereport);
 
         // there's a good chance this will `longjump` us out of here
         pgx_ereport(level, errocode, message, detail, funcname, file, line, contexts);

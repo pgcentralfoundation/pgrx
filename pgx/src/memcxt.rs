@@ -409,7 +409,7 @@ impl PgMemoryContexts {
             pg_sys::CurrentMemoryContext = context;
         }
 
-        let result = pg_sys::guard(|| f(&mut PgMemoryContexts::For(context)));
+        let result = f(&mut PgMemoryContexts::For(context));
 
         // restore our understanding of the current memory context
         unsafe {
