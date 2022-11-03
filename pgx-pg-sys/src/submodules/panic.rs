@@ -231,7 +231,7 @@ where
         Err(e) => {
             let error = downcast_err(e);
             match error {
-                CaughtError::PostgresError(errdata) => {
+                CaughtError::PostgresError(ref errdata) => {
                     unsafe {
                         // don't care to expose these to the rest of pgx
                         // we also don't want our `#[pg_guard]` applied to them
@@ -241,9 +241,12 @@ where
                         }
 
                         pgx_errcontext_msg(errdata.location.to_string().as_pg_cstr());
-                        for location in errdata.stack {
-                            pgx_errcontext_msg(location.to_string().as_pg_cstr());
+                        if !errdata.stack.is_empty() {
+                            pgx_errcontext_msg(contexts_as_pg_cstr(&errdata.stack))
                         }
+
+                        // don't leak anything as `pg_re_throw` won't be returning
+                        drop(error);
                         pg_re_throw();
 
                         // SAFETY: Postgres **will not** return after a call to `pg_re_throw()`
@@ -251,9 +254,16 @@ where
                     }
                 }
 
-                CaughtError::ErrorReport(ereport) | CaughtError::RustPanic { ereport, .. } => {
+                CaughtError::ErrorReport(ref ereport)
+                | CaughtError::RustPanic { ref ereport, .. } => {
+                    // this clone will get dropped by `do_ereport`
+                    let ereport = ereport.clone();
+
+                    // drop the `error` and anything it might contain now as `do_ereport` won't be returning
+                    drop(error);
                     do_ereport(ereport);
-                    unreachable!("pgx reported a CaughtError that wasn't raised at ERROR or above")
+
+                    unreachable!("pgx reported a CaughtError::ErrorReport that wasn't raised at ERROR or above")
                 }
             }
         }
@@ -348,30 +358,32 @@ fn do_ereport(ereport: ErrorReportWithLevel) {
         // Postgres expects these to be static strings, created at compile time, rather
         // than something allocated from a MemoryContext.  Our version of ereport (pgx_ereport)
         // accepts a user-provided strings for them, so we can report function/file/line information
-        // from rust code
+        // from rust code.
+        //
+        // We just go ahead and allocate all the strings we need in the `ErrorContext` for convenience
         let old_cxt = MemoryContextSwitchTo(crate::ErrorContext);
-        let funcname = ereport.ereport.funcname.as_pg_cstr();
-        let file = ereport.ereport.location.file.as_pg_cstr();
+        let level = ereport.level as i32;
+        let errocode = ereport.ereport.errcode as i32;
+        let contexts = contexts_as_pg_cstr(&ereport.stack);
+        let funcname = ereport.ereport.funcname.as_ref().as_pg_cstr();
+        let file = ereport.ereport.location.file.as_str().as_pg_cstr();
+        let message = ereport.ereport.message.as_str().as_pg_cstr();
+        let detail = ereport.ereport.detail.as_ref().as_pg_cstr();
+        let line = ereport.ereport.location.line as i32;
         MemoryContextSwitchTo(old_cxt);
 
-        let contexts = if ereport.stack.is_empty() {
-            None
-        } else {
-            Some(ereport.stack.into_iter().map(|s| s.to_string()).collect::<Vec<_>>().join("\n"))
-        };
+        // before calling `pgx_ereport` it's imperative we drop everything Rust-allocated we possibly can.
+        // `pgx_ereport` very well might `longjmp` to somewhere else, either in pgx or Postgres, and
+        // we'd rather not be leaking memory during error handling
+        //
+        // the few `.as_pg_cstr()`s do their allocation in Postgres' `CurrentMemoryContext`, so they'll
+        // be cleaned up by Postgres at the right time
+        drop(ereport);
 
-        pgx_ereport(
-            ereport.level as _,
-            ereport.ereport.errcode as _,
-            ereport.ereport.message.as_pg_cstr(),
-            ereport.ereport.detail.as_pg_cstr(),
-            funcname,
-            file,
-            ereport.ereport.location.line as _,
-            contexts.as_pg_cstr(),
-        );
+        // there's a good chance this will `longjump` us out of here
+        pgx_ereport(level, errocode, message, detail, funcname, file, line, contexts);
 
-        if crate::ERROR <= ereport.level as _ {
+        if crate::ERROR <= level as _ {
             // SAFETY:  this is true because if we're being reported as an ERROR or greater,
             // we'll never return from the above call to `pgx_ereport()`
             unreachable_unchecked()
@@ -386,4 +398,18 @@ fn do_ereport(ereport: ErrorReportWithLevel) {
             pfree(funcname.cast())
         }
     }
+}
+
+// This creates temp variables with `Drop` impls -- pulling this into
+// a separate function lets those live in this functions frame rather
+// than the caller's, which would make it no longer be a
+// ["plain old frame"](https://github.com/rust-lang/rfcs/blob/master/text/2945-c-unwind-abi.md#plain-old-frames).
+#[inline(never)]
+fn contexts_as_pg_cstr(stack: &Vec<ErrorReportLocation>) -> *mut core::ffi::c_char {
+    let contexts = if stack.is_empty() {
+        None
+    } else {
+        Some(stack.iter().map(|s| s.to_string()).collect::<Vec<_>>().join("\n"))
+    };
+    contexts.as_pg_cstr()
 }
