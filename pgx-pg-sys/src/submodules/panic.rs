@@ -13,7 +13,6 @@ use std::any::Any;
 use std::cell::Cell;
 use std::fmt::{Display, Formatter};
 use std::hint::unreachable_unchecked;
-use std::mem::ManuallyDrop;
 use std::panic::{
     catch_unwind, panic_any, resume_unwind, Location, PanicInfo, RefUnwindSafe, UnwindSafe,
 };
@@ -95,8 +94,7 @@ impl ErrorReportWithLevel {
         if crate::ERROR <= self.level as _ {
             panic_any(self)
         } else {
-            let ereport = ManuallyDrop::new(self);
-            do_ereport(ereport)
+            do_ereport(self)
         }
     }
 }
@@ -206,7 +204,7 @@ impl CaughtError {
 enum GuardAction<R> {
     Return(R),
     ReThrow,
-    Report(ManuallyDrop<ErrorReportWithLevel>),
+    Report(ErrorReportWithLevel),
 }
 
 /// Guard a closure such that Rust Panics are properly converted into Postgres ERRORs.
@@ -272,7 +270,7 @@ where
                 GuardAction::ReThrow
             }
             CaughtError::ErrorReport(ereport) | CaughtError::RustPanic { ereport, .. } => {
-                GuardAction::Report(ManuallyDrop::new(ereport))
+                GuardAction::Report(ereport)
             }
         },
     }
@@ -341,7 +339,7 @@ pub(crate) fn downcast_err(e: Box<dyn Any + Send>) -> CaughtError {
     }
 }
 
-fn do_ereport(ereport: ManuallyDrop<ErrorReportWithLevel>) {
+fn do_ereport(ereport: ErrorReportWithLevel) {
     // we define this here to make it difficult for not only pgx, but pgx users
     // to find and directly call this function.  They'd have to do the same as
     // this, and that seems like more work than a normal programmer would want to do
@@ -386,7 +384,7 @@ fn do_ereport(ereport: ManuallyDrop<ErrorReportWithLevel>) {
         //
         // the few `.as_pg_cstr()`s do their allocation in Postgres' `CurrentMemoryContext`, so they'll
         // be cleaned up by Postgres at the right time
-        let _ = ManuallyDrop::into_inner(ereport);
+        drop(ereport);
 
         // there's a good chance this will `longjump` us out of here
         pgx_ereport(level, errocode, message, detail, funcname, file, line, contexts);
@@ -408,10 +406,6 @@ fn do_ereport(ereport: ManuallyDrop<ErrorReportWithLevel>) {
     }
 }
 
-// This creates temp variables with `Drop` impls -- pulling this into
-// a separate function lets those live in this functions frame rather
-// than the caller's, which would make it no longer be a
-// ["plain old frame"](https://github.com/rust-lang/rfcs/blob/master/text/2945-c-unwind-abi.md#plain-old-frames).
 #[inline(never)]
 fn contexts_as_pg_cstr(stack: &Vec<ErrorReportLocation>) -> *mut core::ffi::c_char {
     let contexts = if stack.is_empty() {
