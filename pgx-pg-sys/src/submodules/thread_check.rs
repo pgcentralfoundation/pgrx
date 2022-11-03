@@ -19,14 +19,14 @@ pub(crate) fn check_active_thread() {
     let current_thread = nonzero_thread_id();
     // Relaxed is sufficient as we're only interested in the effects on a single
     // atomic variable, and don't need synchronization beyond that.
-    return match ACTIVE_THREAD.load(Ordering::Relaxed) {
+    match ACTIVE_THREAD.load(Ordering::Relaxed) {
         0 => init_active_thread(current_thread),
         thread_id => {
             if current_thread.get() != thread_id {
                 thread_id_check_failed();
             }
         }
-    };
+    }
 }
 
 #[track_caller]
@@ -50,7 +50,7 @@ fn init_active_thread(tid: NonZeroUsize) {
 #[inline(never)]
 #[track_caller]
 fn thread_id_check_failed() -> ! {
-    panic!("`pgx` may not not be used from multiple threads.");
+    panic!("postgres FFI may not not be called from multiple threads.");
 }
 
 fn nonzero_thread_id() -> NonZeroUsize {
@@ -76,7 +76,7 @@ fn nonzero_thread_id() -> NonZeroUsize {
     BYTE.with(|p: &u8| {
         // Note: Avoid triggering the `unstable_name_collisions` lint.
         let addr = sptr::Strict::addr(p as *const u8);
-        // SAFETY: `&u8` is always nonnull, so it's address is always nonzero.
+        // SAFETY: `&u8` is always nonnull, so its address is always nonzero.
         unsafe { NonZeroUsize::new_unchecked(addr) }
     })
 }
