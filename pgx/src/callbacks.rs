@@ -160,6 +160,7 @@ where
     static mut XACT_HOOKS: Option<CallbackMap> = None;
 
     // internal function that we register as an XactCallback
+    #[pg_guard]
     unsafe extern "C" fn callback(event: pg_sys::XactEvent, _arg: *mut ::std::os::raw::c_void) {
         let which_event = PgXactCallbackEvent::translate_pg_event(event);
 
@@ -192,7 +193,7 @@ where
                 // effectively 'take' the hook from the internal RefCell
                 if let Some(hook) = hook.replace(None) {
                     // and execute it under guard for proper panic/elog(ERROR) handling
-                    pg_sys::guard(hook.0);
+                    hook.0();
                 }
             }
         }

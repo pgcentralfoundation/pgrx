@@ -45,10 +45,12 @@ impl PgGuardRewriter {
         let input_func_name = func.sig.ident.to_string();
         let sig = func.sig.clone();
         let vis = func.vis.clone();
+        let attrs = func.attrs.clone();
 
         // but for the inner function (the one we're wrapping) we don't need any kind of
         // abi classification
         func.sig.abi = None;
+        func.attrs.clear();
 
         // nor do we need a visibility beyond "private"
         func.vis = Visibility::Inherited;
@@ -68,14 +70,12 @@ impl PgGuardRewriter {
                 #[no_mangle]
             }
         } else {
-            quote! {
-                #[no_mangle]
-            }
+            quote! {}
         };
 
         Ok(quote_spanned! {func.span()=>
             #prolog
-            #[doc(hidden)]
+            #(#attrs)*
             #vis #sig {
                 #[allow(non_snake_case)]
                 #func

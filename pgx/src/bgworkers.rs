@@ -11,6 +11,7 @@ Use of this source code is governed by the MIT license that can be found in the 
 //!
 //! See: [https://www.postgresql.org/docs/12/bgworker.html](https://www.postgresql.org/docs/12/bgworker.html)
 use crate::pg_sys;
+use pgx_pg_sys::PgTryBuilder;
 use std::convert::TryInto;
 use std::ffi::{CStr, CString};
 use std::os::raw::c_char;
@@ -204,7 +205,7 @@ impl BackgroundWorker {
             pg_sys::PushActiveSnapshot(pg_sys::GetTransactionSnapshot());
         }
         unsafe {
-            let result = pg_sys::guard(|| transaction_body());
+            let result = PgTryBuilder::new(transaction_body).execute();
             pg_sys::PopActiveSnapshot();
             pg_sys::CommitTransactionCommand();
             result
