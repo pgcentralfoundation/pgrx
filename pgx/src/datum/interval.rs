@@ -10,7 +10,7 @@ Use of this source code is governed by the MIT license that can be found in the 
 use std::ops::{Mul, Sub};
 
 use crate::datum::time::USECS_PER_SEC;
-use crate::{direct_function_call, pg_sys, FromDatum, IntoDatum};
+use crate::{direct_function_call, pg_sys, FromDatum, IntoDatum, PgBox};
 use pg_sys::{DAYS_PER_MONTH, SECS_PER_DAY};
 use pgx_utils::sql_entity_graph::metadata::{
     ArgumentError, Returns, ReturnsError, SqlMapping, SqlTranslatable,
@@ -21,7 +21,7 @@ const MONTH_DURATION: Duration = Duration::days(DAYS_PER_MONTH as i64);
 
 /// From the PG docs  https://www.postgresql.org/docs/current/datatype-datetime.html#DATATYPE-INTERVAL-INPUT
 /// Internally interval values are stored as months, days, and microseconds. This is done because the number of days in a month varies,
-/// and a day can have 23 or 25 hours if a daylight savings time adjustment is involved. The months and days fields are integers while
+/// and a day can have 23 or 25hours if a daylight savings time adjustment is involved. The months and days fields are integers while
 /// the microseconds field can store fractional seconds. Because intervals are usually created from constant strings or timestamp
 /// subtraction, this storage method works well in most cases...
 #[derive(Debug)]
@@ -36,7 +36,11 @@ impl Interval {
         days: i32,
         usecs: i64,
     ) -> Result<Self, IntervalConversionError> {
-        Ok(Interval(pg_sys::Interval { day: days, month: months, time: usecs }))
+        let mut interval = PgBox::<pg_sys::Interval>::alloc();
+        interval.day = days;
+        interval.month = months;
+        interval.time = usecs;
+        Ok(Interval(*interval))
     }
 
     /// Total number of months before/after 2000-01-01
@@ -57,14 +61,18 @@ impl Interval {
 
 impl TryFrom<pg_sys::Datum> for Interval {
     type Error = &'static str;
-    fn try_from(d: pg_sys::Datum) -> Result<Self, Self::Error> {
-        Ok(Interval(unsafe { *d.cast_mut_ptr::<pg_sys::Interval>() }))
+    fn try_from(datum: pg_sys::Datum) -> Result<Self, Self::Error> {
+        if datum.is_null() {
+            return Err("NULL datum");
+        }
+        Ok(Interval(unsafe { *datum.cast_mut_ptr::<pg_sys::Interval>() }))
     }
 }
 
 impl IntoDatum for Interval {
     fn into_datum(mut self) -> Option<pg_sys::Datum> {
         let interval = &mut self.0;
+        // assume interval was allocated by PgBox
         Some(pg_sys::Datum::from(interval as *mut _))
     }
     fn type_oid() -> pg_sys::Oid {
@@ -105,7 +113,7 @@ impl TryFrom<Duration> for Interval {
 
             let time = d.whole_microseconds() as i64;
 
-            Ok(Interval(pg_sys::Interval { day: 0, month, time }))
+            Interval::try_from_months_days_usecs(month, 0, time)
         } else {
             Err(IntervalConversionError::DurationMonthsOutOfBounds)
         }
