@@ -63,7 +63,7 @@ void pgx_ereport(const int level, int code, char *message, char *detail, char *f
                 }
             } else {
                 if (context != NULL) {
-                    errfinish(level, errcode(code), errmsg("%s", message), errcontext_msg(context));
+                    errfinish(level, errcode(code), errmsg("%s", message), errcontext_msg("%s", context));
                 } else {
                     errfinish(level, errcode(code), errmsg("%s", message));
                 }
@@ -82,7 +82,7 @@ void pgx_ereport(const int level, int code, char *message, char *detail, char *f
                 }
             } else {
                 if (context != NULL) {
-                    errfinish(level, errcode(code), errmsg("%s", message), errcontext_msg(context));
+                    errfinish(level, errcode(code), errmsg("%s", message), errcontext_msg("%s", context));
                 } else {
                     errfinish(level, errcode(code), errmsg("%s", message));
                 }
