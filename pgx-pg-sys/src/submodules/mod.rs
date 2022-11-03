@@ -14,6 +14,7 @@ pub mod errcodes;
 pub mod ffi;
 pub mod oids;
 pub mod panic_handling;
+pub mod pg_try;
 pub mod polyfill;
 pub mod tupdesc;
 
@@ -31,6 +32,7 @@ pub use datum::Datum;
 pub use datum::NullableDatum;
 
 pub use oids::*;
+pub use pg_try::*;
 pub use polyfill::*;
 pub use polyfill::*;
 pub use tupdesc::*;

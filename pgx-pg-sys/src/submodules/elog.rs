@@ -11,7 +11,7 @@ Use of this source code is governed by the MIT license that can be found in the 
 
 /// Postgres' various logging levels
 #[allow(dead_code)]
-#[derive(Clone, Copy, Debug)]
+#[derive(Clone, Copy, Debug, Ord, PartialOrd, PartialEq, Eq)]
 pub enum PgLogLevel {
     /// Debugging messages, in categories of decreasing detail
     DEBUG5 = crate::DEBUG5 as isize,
@@ -207,16 +207,24 @@ macro_rules! warning {
 /// See [`fmt`](std::fmt) for information about options.
 #[macro_export]
 macro_rules! error {
+    ($errcode:expr, $($arg:tt)*) => (
+        {
+            extern crate alloc;
+            $crate::ereport!($crate::elog::PgLogLevel::ERROR, $errcode, alloc::format!($($arg)*).as_str());
+            unreachable!()
+        }
+    );
+
     ($($arg:tt)*) => (
         {
             extern crate alloc;
             $crate::ereport!($crate::elog::PgLogLevel::ERROR, $crate::errcodes::PgSqlErrorCode::ERRCODE_INTERNAL_ERROR, alloc::format!($($arg)*).as_str());
-            unsafe { core::hint::unreachable_unchecked() }
+            unreachable!()
         }
-    )
+    );
 }
 
-/// Log to Postgres' `fatal` log level.  This will abort the current Postgres backend connection processs.
+/// Log to Postgres' `fatal` log level.  This will abort the current Postgres backend connection process.
 ///
 /// This macro accepts arguments like the [`println`](std::println) and [`format`](std::format) macros.
 /// See [`fmt`](std::fmt) for information about options.
@@ -226,8 +234,8 @@ macro_rules! FATAL {
     ($($arg:tt)*) => (
         {
             extern crate alloc;
-            $crate::ereport!($crate::elog::PgLogLevel::ERROR, $crate::errcodes::PgSqlErrorCode::ERRCODE_INTERNAL_ERROR, alloc::format!($($arg)*).as_str());
-            unsafe { core::hint::unreachable_unchecked() }
+            $crate::ereport!($crate::elog::PgLogLevel::FATAL, $crate::errcodes::PgSqlErrorCode::ERRCODE_INTERNAL_ERROR, alloc::format!($($arg)*).as_str());
+            unreachable!()
         }
     )
 }
@@ -242,8 +250,8 @@ macro_rules! PANIC {
     ($($arg:tt)*) => (
         {
             extern crate alloc;
-            $crate::ereport!($crate::elog::PgLogLevel::ERROR, $crate::errcodes::PgSqlErrorCode::ERRCODE_INTERNAL_ERROR, alloc::format!($($arg)*).as_str());
-            unsafe { core::hint::unreachable_unchecked() }
+            $crate::ereport!($crate::elog::PgLogLevel::PANIC, $crate::errcodes::PgSqlErrorCode::ERRCODE_INTERNAL_ERROR, alloc::format!($($arg)*).as_str());
+            unreachable!()
         }
     )
 }
@@ -297,17 +305,92 @@ macro_rules! function_name {
 /// ```
 #[macro_export]
 macro_rules! ereport {
-    ($loglevel:expr, $errcode:expr, $message:expr) => {
-        $crate::panic_handling::PgErrorReport::new($errcode, $message)
+    (ERROR, $errcode:expr, $message:expr) => {
+        $crate::panic_handling::ErrorReport::new($errcode, $message)
             .funcname($crate::function_name!())
-            .report($loglevel)
+            .report($crate::elog::PgLogLevel::ERROR);
+        unreachable!()
+    };
+
+    (PANIC, $errcode:expr, $message:expr) => {
+        $crate::panic_handling::ErrorReport::new($errcode, $message)
+            .funcname($crate::function_name!())
+            .report($crate::elog::PgLogLevel::PANIC);
+        unreachable!()
+    };
+
+    (FATAL, $errcode:expr, $message:expr) => {
+        $crate::panic_handling::ErrorReport::new($errcode, $message)
+            .funcname($crate::function_name!())
+            .report($crate::elog::PgLogLevel::FATAL);
+        unreachable!()
+    };
+
+    (WARNING, $errcode:expr, $message:expr) => {
+        $crate::panic_handling::ErrorReport::new($errcode, $message)
+            .funcname($crate::function_name!())
+            .report($crate::elog::PgLogLevel::WARNING)
+    };
+
+    (NOTICE, $errcode:expr, $message:expr) => {
+        $crate::panic_handling::ErrorReport::new($errcode, $message)
+            .funcname($crate::function_name!())
+            .report($crate::elog::PgLogLevel::NOTICE)
+    };
+
+    (INFO, $errcode:expr, $message:expr) => {
+        $crate::panic_handling::ErrorReport::new($errcode, $message)
+            .funcname($crate::function_name!())
+            .report($crate::elog::PgLogLevel::INFO)
+    };
+
+    (LOG, $errcode:expr, $message:expr) => {
+        $crate::panic_handling::ErrorReport::new($errcode, $message)
+            .funcname($crate::function_name!())
+            .report($crate::elog::PgLogLevel::LOG)
+    };
+
+    (DEBUG5, $errcode:expr, $message:expr) => {
+        $crate::panic_handling::ErrorReport::new($errcode, $message)
+            .funcname($crate::function_name!())
+            .report($crate::elog::PgLogLevel::DEBUG5)
+    };
+
+    (DEBUG4, $errcode:expr, $message:expr) => {
+        $crate::panic_handling::ErrorReport::new($errcode, $message)
+            .funcname($crate::function_name!())
+            .report($crate::elog::PgLogLevel::DEBUG4)
+    };
+
+    (DEBUG3, $errcode:expr, $message:expr) => {
+        $crate::panic_handling::ErrorReport::new($errcode, $message)
+            .funcname($crate::function_name!())
+            .report($crate::elog::PgLogLevel::DEBUG3)
+    };
+
+    (DEBUG2, $errcode:expr, $message:expr) => {
+        $crate::panic_handling::ErrorReport::new($errcode, $message)
+            .funcname($crate::function_name!())
+            .report($crate::elog::PgLogLevel::DEBUG2)
+    };
+
+    (DEBUG1, $errcode:expr, $message:expr) => {
+        $crate::panic_handling::ErrorReport::new($errcode, $message)
+            .funcname($crate::function_name!())
+            .report($crate::elog::PgLogLevel::DEBUG1)
+    };
+
+    ($loglevel:expr, $errcode:expr, $message:expr) => {
+        $crate::panic_handling::ErrorReport::new($errcode, $message)
+            .funcname($crate::function_name!())
+            .report($loglevel);
     };
 
     ($loglevel:expr, $errcode:expr, $message:expr, $detail:expr) => {
-        $crate::panic_handling::PgErrorReport::new($errcode, $message)
+        $crate::panic_handling::ErrorReport::new($errcode, $message)
             .detail($detail)
             .funcname($crate::function_name!())
-            .report($loglevel)
+            .report($loglevel);
     };
 }
 

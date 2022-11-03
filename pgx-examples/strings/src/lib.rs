@@ -10,6 +10,15 @@ use pgx::prelude::*;
 pgx::pg_module_magic!();
 
 #[pg_extern]
+fn try_it() -> Option<i32> {
+    PgTryBuilder::new(|| {
+        ereport!(ERROR, PgSqlErrorCode::RustPanic, "here");
+    })
+    .catch_others(|e| e.rethrow())
+    .execute()
+}
+
+#[pg_extern]
 fn log(s: String) {
     log!("{}", s)
 }

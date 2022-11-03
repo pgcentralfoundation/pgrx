@@ -20,7 +20,8 @@ pub use crate::pgbox::PgBox;
 pub use crate::datum::{Date, Time, TimeWithTimeZone, Timestamp, TimestampWithTimeZone};
 
 pub use crate::pg_sys::oids::PgOid;
-pub use crate::pg_sys::panic_handling::{guard, pg_try};
+pub use crate::pg_sys::panic_handling::guard;
+pub use crate::pg_sys::pg_try::PgTryBuilder;
 pub use crate::pg_sys::utils::name_data_to_str;
 pub use crate::pg_sys::PgBuiltInOids;
 

@@ -1,5 +1,7 @@
 #![deny(unsafe_op_in_unsafe_fn)]
 
+use crate::panic_handling::ErrorData;
+
 /**
 Given a closure that is assumed to be a wrapped Postgres `extern "C"` function, [pg_guard_ffi_boundary]
 works with the Postgres and C runtimes to create a "barrier" that allows Rust to catch Postgres errors
@@ -45,14 +47,14 @@ This caught error is then converted into a Rust `panic!()` and propagated up the
 being converted into a transaction-aborting Postgres `ERROR` by PGX.
 
 **/
-#[inline(always)]
+#[track_caller]
 pub(crate) unsafe fn pg_guard_ffi_boundary<T, F: FnOnce() -> T>(f: F) -> T {
     // SAFETY: Caller promises not to call us from anything but the main thread.
     unsafe { pg_guard_ffi_boundary_impl(f) }
 }
 
 #[cfg(not(feature = "postgrestd"))]
-#[inline(always)]
+#[track_caller]
 unsafe fn pg_guard_ffi_boundary_impl<T, F: FnOnce() -> T>(f: F) -> T {
     //! This is the version that uses sigsetjmp and all that, for "normal" Rust/PGX interfaces.
     use crate as pg_sys;
@@ -74,11 +76,22 @@ unsafe fn pg_guard_ffi_boundary_impl<T, F: FnOnce() -> T>(f: F) -> T {
         } else {
             // we're back here b/c of a longjmp originating in Postgres
             // as such, we need to put Postgres' understanding of its exception/error state back together
+
+            // the overhead, such as it is, to get the current error code from Postgres and convert
+            // it into one of our [PgSqlErrorCode] enum variants seems worth it considering the
+            // value users get from pgx having it available.
+            //
+            // Note that this only happens in the case of us trapping an error
+            let sqlerrcode = pg_sys::geterrcode().into();
+
             pg_sys::PG_exception_stack = prev_exception_stack;
             pg_sys::error_context_stack = prev_error_context_stack;
 
-            // and ultimately we panic
-            std::panic::panic_any(crate::panic_handling::PostgresError {});
+            std::panic::panic_any(ErrorData {
+                sqlerrcode,
+                location: std::panic::Location::caller().into(),
+                stack: Default::default(),
+            });
         };
 
         pg_sys::PG_exception_stack = prev_exception_stack;

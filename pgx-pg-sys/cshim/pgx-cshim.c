@@ -43,17 +43,30 @@ void pgx_elog_error(char *message) {
     elog(ERROR, "%s", message);
 }
 
-PGDLLEXPORT void pgx_ereport(const int level, int code, char *message, char *detail, char *funcname, char *file, int lineno, int colno);
-void pgx_ereport(const int level, int code, char *message, char *detail, char *funcname, char *file, int lineno, int colno) {
+PGDLLEXPORT void pgx_errcontext_msg(char *message);
+void pgx_errcontext_msg(char *message) {
+    errcontext_msg("%s", message);
+}
+
+PGDLLEXPORT void pgx_ereport(const int level, int code, char *message, char *detail, char *funcname, char *file, int lineno, char *context);
+void pgx_ereport(const int level, int code, char *message, char *detail, char *funcname, char *file, int lineno, char *context) {
 // the below is basically Postgres' `#define ereport(...)` macro unrolled
 
 #if (IS_PG_11 || IS_PG_12)
 #   ifdef HAVE__BUILTIN_CONSTANT_P
         if (errstart(level, file, lineno, funcname, NULL)) {
             if (detail != NULL) {
-                errfinish(level, errcode(code), errmsg("%s", message), errdetail("%s", detail));
+                if (context != NULL) {
+                    errfinish(level, errcode(code), errmsg("%s", message), errdetail("%s", detail), errcontext_msg(context));
+                } else {
+                    errfinish(level, errcode(code), errmsg("%s", message), errdetail("%s", detail));
+                }
             } else {
-                errfinish(level, errcode(code), errmsg("%s", message));
+                if (context != NULL) {
+                    errfinish(level, errcode(code), errmsg("%s", message), errcontext_msg(context));
+                } else {
+                    errfinish(level, errcode(code), errmsg("%s", message));
+                }
             }
         }
         if (__builtin_constant_p(level) && level >= ERROR) {
@@ -62,9 +75,17 @@ void pgx_ereport(const int level, int code, char *message, char *detail, char *f
 #   else    /* !HAVE__BUILTIN_CONSTANT_P */
         if (errstart(level, file, lineno, funcname, NULL)) {
             if (detail != NULL) {
-                errfinish(level, errcode(code), errmsg("%s", message), errdetail("%s", detail));
+                if (context != NULL) {
+                    errfinish(level, errcode(code), errmsg("%s", message), errdetail("%s", detail), errcontext_msg(context));
+                } else {
+                    errfinish(level, errcode(code), errmsg("%s", message), errdetail("%s", detail));
+                }
             } else {
-                errfinish(level, errcode(code), errmsg("%s", message));
+                if (context != NULL) {
+                    errfinish(level, errcode(code), errmsg("%s", message), errcontext_msg(context));
+                } else {
+                    errfinish(level, errcode(code), errmsg("%s", message));
+                }
             }
         }
         if (level >= ERROR) {
@@ -80,6 +101,9 @@ void pgx_ereport(const int level, int code, char *message, char *detail, char *f
             if (detail != NULL) {
                 errdetail("%s", detail);
             }
+            if (context != NULL) {
+                errcontext_msg("%s", context);
+            }
             errfinish(file, lineno, funcname);
         }
         if (__builtin_constant_p(level) && level >= ERROR) {
@@ -92,6 +116,9 @@ void pgx_ereport(const int level, int code, char *message, char *detail, char *f
             errmsg("%s", message);
             if (detail != NULL) {
                 errdetail("%s", detail);
+            }
+            if (context != NULL) {
+                errcontext_msg("%s", context);
             }
             errfinish(file, lineno, funcname);
         }
