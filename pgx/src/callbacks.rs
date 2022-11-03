@@ -10,6 +10,7 @@ Use of this source code is governed by the MIT license that can be found in the 
 //! Provides safe wrappers around Postgres' "Transaction" and "Sub Transaction" hook system
 
 use crate::pg_sys;
+use pgx_macros::pg_guard;
 use std::cell::RefCell;
 use std::collections::HashMap;
 use std::rc::Rc;
@@ -310,6 +311,7 @@ where
 {
     static mut SUB_HOOKS: Option<SubCallbackMap> = None;
 
+    #[pg_guard]
     unsafe extern "C" fn callback(
         event: pg_sys::SubXactEvent,
         my_subid: pg_sys::SubTransactionId,
@@ -328,7 +330,7 @@ where
                 for hook in hooks.iter() {
                     let hook = hook.borrow();
                     if let Some(hook) = hook.as_ref() {
-                        pg_sys::guard(|| (hook.0)(my_subid, parent_subid));
+                        (hook.0)(my_subid, parent_subid)
                     }
                 }
             }

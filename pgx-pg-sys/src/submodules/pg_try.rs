@@ -1,11 +1,11 @@
 use crate::errcodes::PgSqlErrorCode;
 use crate::panic::CaughtError;
-use std::collections::HashMap;
+use std::collections::BTreeMap;
 use std::panic::{catch_unwind, UnwindSafe};
 
 pub struct PgTryBuilder<'a, R, F: FnOnce() -> R + UnwindSafe> {
     func: F,
-    when: HashMap<PgSqlErrorCode, Box<dyn FnMut(CaughtError) -> R + 'a>>,
+    when: BTreeMap<PgSqlErrorCode, Box<dyn FnMut(CaughtError) -> R + 'a>>,
     catch_others: Option<Box<dyn FnMut(CaughtError) -> R + 'a>>,
     finally: Option<Box<dyn FnMut() + 'a>>,
 }

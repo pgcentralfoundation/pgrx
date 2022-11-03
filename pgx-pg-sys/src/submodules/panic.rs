@@ -30,11 +30,8 @@ pub struct ErrorReportLocation {
 }
 
 impl Default for ErrorReportLocation {
-    /// `#[track_caller]` is applied here so we can construct one with with
-    /// the correct code location information
-    #[track_caller]
     fn default() -> Self {
-        Location::caller().into()
+        Self { file: std::string::String::from("<unknown>"), line: 0, col: 0 }
     }
 }
 
@@ -53,16 +50,6 @@ impl From<&Location<'_>> for ErrorReportLocation {
 impl From<Option<&Location<'_>>> for ErrorReportLocation {
     fn from(location: Option<&Location<'_>>) -> Self {
         location.into()
-    }
-}
-
-impl From<Option<ErrorReportLocation>> for ErrorReportLocation {
-    fn from(location: Option<ErrorReportLocation>) -> Self {
-        location.unwrap_or_else(|| ErrorReportLocation {
-            file: std::string::String::from("<unknown>"),
-            line: 0,
-            col: 0,
-        })
     }
 }
 
@@ -155,16 +142,18 @@ impl ErrorReport {
     }
 
     /// Report this [PgErrorReport], which will ultimately be reported by Postgres at the specified [PgLogLevel]
+    ///
+    /// If the provided `level` is >= [`PgLogLevel::ERROR`] this function will not return.
     #[track_caller]
     pub fn report(self, level: PgLogLevel) {
         ErrorReportWithLevel { level, ereport: self, stack: Default::default() }.report()
     }
 }
 
-thread_local! { static PANIC_LOCATION: Cell<Option<ErrorReportLocation >> = Cell::new(None) }
+thread_local! { static PANIC_LOCATION: Cell<Option<ErrorReportLocation >> = const { Cell::new(None) }}
 
 fn take_panic_location() -> ErrorReportLocation {
-    PANIC_LOCATION.with(|p| p.take().into())
+    PANIC_LOCATION.with(|p| p.take().unwrap_or_default())
 }
 
 pub fn register_pg_guard_panic_hook() {
