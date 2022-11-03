@@ -63,8 +63,7 @@ where
 {
     /// ## Safety
     /// function requires that
-    /// - is_null is true
-    /// - datum represents a PG RangeType datum
+    /// - is_null is true OR datum represents a PG RangeType datum
     #[inline]
     unsafe fn from_polymorphic_datum(
         datum: pg_sys::Datum,
@@ -74,10 +73,10 @@ where
     where
         Self: Sized,
     {
-        if is_null {
+        if is_null || datum.is_null() {
             None
         } else {
-            let ptr = datum.cast_mut_ptr();
+            let ptr: *mut pg_sys::varlena = datum.cast_mut_ptr();
             // Datum should be non-null and point to PG RangeType
             let range_type =
                 unsafe { pg_sys::pg_detoast_datum(datum.cast_mut_ptr()) as *mut pg_sys::RangeType };
