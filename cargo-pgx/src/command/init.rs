@@ -45,9 +45,6 @@ static PROCESS_ENV_DENYLIST: &'static [&'static str] = &[
 #[derive(clap::Args, Debug)]
 #[clap(author)]
 pub(crate) struct Init {
-    /// If installed locally, the path to PG10's `pgconfig` tool, or `download` to have pgx download/compile/install it
-    #[clap(env = "PG10_PG_CONFIG", long, help = "")]
-    pg10: Option<String>,
     /// If installed locally, the path to PG11's `pgconfig` tool, or `download` to have pgx download/compile/install it
     #[clap(env = "PG11_PG_CONFIG", long)]
     pg11: Option<String>,
@@ -60,6 +57,9 @@ pub(crate) struct Init {
     /// If installed locally, the path to PG14's `pgconfig` tool, or `download` to have pgx download/compile/install it
     #[clap(env = "PG14_PG_CONFIG", long)]
     pg14: Option<String>,
+    /// If installed locally, the path to PG14's `pgconfig` tool, or `download` to have pgx download/compile/install it
+    #[clap(env = "PG15_PG_CONFIG", long)]
+    pg15: Option<String>,
     #[clap(from_global, action = ArgAction::Count)]
     verbose: u8,
     #[clap(long, help = "Base port number")]
@@ -73,9 +73,6 @@ impl CommandExecute for Init {
     fn execute(self) -> eyre::Result<()> {
         let mut versions = HashMap::new();
 
-        if let Some(ref version) = self.pg10 {
-            versions.insert("pg10", version.clone());
-        }
         if let Some(ref version) = self.pg11 {
             versions.insert("pg11", version.clone());
         }
@@ -87,6 +84,9 @@ impl CommandExecute for Init {
         }
         if let Some(ref version) = self.pg14 {
             versions.insert("pg14", version.clone());
+        }
+        if let Some(ref version) = self.pg15 {
+            versions.insert("pg15", version.clone());
         }
 
         if versions.is_empty() {

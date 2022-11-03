@@ -11,6 +11,7 @@ mod complex;
 mod fixed_size;
 mod generic_enum;
 mod hstore_clone;
+mod ordered;
 
 pgx::pg_module_magic!();
 

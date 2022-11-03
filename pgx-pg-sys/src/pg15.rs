@@ -164,9 +164,10 @@ pub const ALIGNOF_LONG: u32 = 8;
 pub const ALIGNOF_PG_INT128_TYPE: u32 = 16;
 pub const ALIGNOF_SHORT: u32 = 2;
 pub const BLCKSZ: u32 = 8192;
-pub const CONFIGURE_ARGS : & [u8 ; 107usize] = b" '--prefix=/Users/e_ridge/.pgx/14.5/pgx-install' '--with-pgport=28814' '--enable-debug' '--enable-cassert'\0" ;
-pub const DEF_PGPORT: u32 = 28814;
-pub const DEF_PGPORT_STR: &[u8; 6usize] = b"28814\0";
+pub const CONFIGURE_ARGS : & [u8 ; 107usize] = b" '--prefix=/Users/e_ridge/.pgx/15.0/pgx-install' '--with-pgport=28815' '--enable-debug' '--enable-cassert'\0" ;
+pub const DEF_PGPORT: u32 = 28815;
+pub const DEF_PGPORT_STR: &[u8; 6usize] = b"28815\0";
+pub const DLSUFFIX: &[u8; 4usize] = b".so\0";
 pub const ENABLE_THREAD_SAFETY: u32 = 1;
 pub const HAVE_ATOMICS: u32 = 1;
 pub const HAVE_BACKTRACE_SYMBOLS: u32 = 1;
@@ -181,6 +182,7 @@ pub const HAVE_DECL_PREADV: u32 = 1;
 pub const HAVE_DECL_PWRITEV: u32 = 1;
 pub const HAVE_DECL_RTLD_GLOBAL: u32 = 1;
 pub const HAVE_DECL_RTLD_NOW: u32 = 1;
+pub const HAVE_DECL_SIGWAIT: u32 = 1;
 pub const HAVE_DECL_STRLCAT: u32 = 1;
 pub const HAVE_DECL_STRLCPY: u32 = 1;
 pub const HAVE_DECL_STRNLEN: u32 = 1;
@@ -210,6 +212,7 @@ pub const HAVE_GETRUSAGE: u32 = 1;
 pub const HAVE_HISTORY_TRUNCATE_FILE: u32 = 1;
 pub const HAVE_IFADDRS_H: u32 = 1;
 pub const HAVE_INET_ATON: u32 = 1;
+pub const HAVE_INET_PTON: u32 = 1;
 pub const HAVE_INTTYPES_H: u32 = 1;
 pub const HAVE_INT_OPTERR: u32 = 1;
 pub const HAVE_INT_OPTRESET: u32 = 1;
@@ -231,24 +234,24 @@ pub const HAVE_NETINET_TCP_H: u32 = 1;
 pub const HAVE_NET_IF_H: u32 = 1;
 pub const HAVE_POLL: u32 = 1;
 pub const HAVE_POLL_H: u32 = 1;
+pub const HAVE_POSIX_DECL_SIGWAIT: u32 = 1;
 pub const HAVE_PREAD: u32 = 1;
 pub const HAVE_PTHREAD: u32 = 1;
 pub const HAVE_PTHREAD_IS_THREADED_NP: u32 = 1;
 pub const HAVE_PTHREAD_PRIO_INHERIT: u32 = 1;
 pub const HAVE_PWRITE: u32 = 1;
-pub const HAVE_RANDOM: u32 = 1;
 pub const HAVE_READLINE_HISTORY_H: u32 = 1;
 pub const HAVE_READLINE_READLINE_H: u32 = 1;
 pub const HAVE_READLINK: u32 = 1;
 pub const HAVE_READV: u32 = 1;
-pub const HAVE_RL_COMPLETION_APPEND_CHARACTER: u32 = 1;
 pub const HAVE_RL_COMPLETION_MATCHES: u32 = 1;
 pub const HAVE_RL_FILENAME_COMPLETION_FUNCTION: u32 = 1;
+pub const HAVE_RL_VARIABLE_BIND: u32 = 1;
 pub const HAVE_SETENV: u32 = 1;
 pub const HAVE_SETSID: u32 = 1;
 pub const HAVE_SHM_OPEN: u32 = 1;
+pub const HAVE_SOCKLEN_T: u32 = 1;
 pub const HAVE_SPINLOCKS: u32 = 1;
-pub const HAVE_SRANDOM: u32 = 1;
 pub const HAVE_STDBOOL_H: u32 = 1;
 pub const HAVE_STDINT_H: u32 = 1;
 pub const HAVE_STDLIB_H: u32 = 1;
@@ -312,18 +315,18 @@ pub const MAXIMUM_ALIGNOF: u32 = 8;
 pub const MEMSET_LOOP_LIMIT: u32 = 1024;
 pub const PACKAGE_BUGREPORT: &[u8; 32usize] = b"pgsql-bugs@lists.postgresql.org\0";
 pub const PACKAGE_NAME: &[u8; 11usize] = b"PostgreSQL\0";
-pub const PACKAGE_STRING: &[u8; 16usize] = b"PostgreSQL 14.5\0";
+pub const PACKAGE_STRING: &[u8; 16usize] = b"PostgreSQL 15.0\0";
 pub const PACKAGE_TARNAME: &[u8; 11usize] = b"postgresql\0";
 pub const PACKAGE_URL: &[u8; 28usize] = b"https://www.postgresql.org/\0";
-pub const PACKAGE_VERSION: &[u8; 5usize] = b"14.5\0";
+pub const PACKAGE_VERSION: &[u8; 5usize] = b"15.0\0";
 pub const PG_KRB_SRVNAM: &[u8; 9usize] = b"postgres\0";
-pub const PG_MAJORVERSION: &[u8; 3usize] = b"14\0";
-pub const PG_MAJORVERSION_NUM: u32 = 14;
-pub const PG_MINORVERSION_NUM: u32 = 5;
+pub const PG_MAJORVERSION: &[u8; 3usize] = b"15\0";
+pub const PG_MAJORVERSION_NUM: u32 = 15;
+pub const PG_MINORVERSION_NUM: u32 = 0;
 pub const PG_USE_STDBOOL: u32 = 1;
-pub const PG_VERSION: &[u8; 5usize] = b"14.5\0";
-pub const PG_VERSION_NUM: u32 = 140005;
-pub const PG_VERSION_STR : & [u8 ; 116usize] = b"PostgreSQL 14.5 on aarch64-apple-darwin22.1.0, compiled by Apple clang version 14.0.0 (clang-1400.0.29.102), 64-bit\0" ;
+pub const PG_VERSION: &[u8; 5usize] = b"15.0\0";
+pub const PG_VERSION_NUM: u32 = 150000;
+pub const PG_VERSION_STR : & [u8 ; 116usize] = b"PostgreSQL 15.0 on aarch64-apple-darwin22.1.0, compiled by Apple clang version 14.0.0 (clang-1400.0.29.102), 64-bit\0" ;
 pub const RELSEG_SIZE: u32 = 131072;
 pub const SIZEOF_BOOL: u32 = 1;
 pub const SIZEOF_LONG: u32 = 8;
@@ -341,6 +344,7 @@ pub const XLOG_BLCKSZ: u32 = 8192;
 pub const DEFAULT_XLOG_SEG_SIZE: u32 = 16777216;
 pub const NAMEDATALEN: u32 = 64;
 pub const FUNC_MAX_ARGS: u32 = 100;
+pub const FMGR_ABI_EXTRA: &[u8; 11usize] = b"PostgreSQL\0";
 pub const INDEX_MAX_KEYS: u32 = 32;
 pub const PARTITION_MAX_KEYS: u32 = 32;
 pub const USE_FLOAT8_BYVAL: u32 = 1;
@@ -1060,6 +1064,974 @@ pub const _CTYPE_SW2: u32 = 2147483648;
 pub const _CTYPE_SW3: u32 = 3221225472;
 pub const _CTYPE_SWM: u32 = 3758096384;
 pub const _CTYPE_SWS: u32 = 30;
+pub const PGINVALID_SOCKET: i32 = -1;
+pub const PG_BACKEND_VERSIONSTR: &[u8; 28usize] = b"postgres (PostgreSQL) 15.0\n\0";
+pub const EXE: &[u8; 1usize] = b"\0";
+pub const DEVNULL: &[u8; 10usize] = b"/dev/null\0";
+pub const USE_REPL_SNPRINTF: u32 = 1;
+pub const PG_STRERROR_R_BUFLEN: u32 = 256;
+pub const PG_IOLBF: u32 = 1;
+pub const FP_SUPERNORMAL: u32 = 6;
+pub const FP_FAST_FMA: u32 = 1;
+pub const FP_FAST_FMAF: u32 = 1;
+pub const FP_FAST_FMAL: u32 = 1;
+pub const FP_ILOGB0: i32 = -2147483648;
+pub const FP_ILOGBNAN: i32 = -2147483648;
+pub const MATH_ERRNO: u32 = 1;
+pub const MATH_ERREXCEPT: u32 = 2;
+pub const M_E: f64 = 2.718281828459045;
+pub const M_LOG2E: f64 = 1.4426950408889634;
+pub const M_LOG10E: f64 = 0.4342944819032518;
+pub const M_LN2: f64 = 0.6931471805599453;
+pub const M_LN10: f64 = 2.302585092994046;
+pub const M_PI: f64 = 3.141592653589793;
+pub const M_PI_2: f64 = 1.5707963267948966;
+pub const M_PI_4: f64 = 0.7853981633974483;
+pub const M_1_PI: f64 = 0.3183098861837907;
+pub const M_2_PI: f64 = 0.6366197723675814;
+pub const M_2_SQRTPI: f64 = 1.1283791670955126;
+pub const M_SQRT2: f64 = 1.4142135623730951;
+pub const M_SQRT1_2: f64 = 0.7071067811865476;
+pub const DOMAIN: u32 = 1;
+pub const SING: u32 = 2;
+pub const OVERFLOW: u32 = 3;
+pub const UNDERFLOW: u32 = 4;
+pub const TLOSS: u32 = 5;
+pub const PLOSS: u32 = 6;
+pub const _JBLEN: u32 = 48;
+pub const DEBUG5: u32 = 10;
+pub const DEBUG4: u32 = 11;
+pub const DEBUG3: u32 = 12;
+pub const DEBUG2: u32 = 13;
+pub const DEBUG1: u32 = 14;
+pub const LOG: u32 = 15;
+pub const LOG_SERVER_ONLY: u32 = 16;
+pub const COMMERROR: u32 = 16;
+pub const INFO: u32 = 17;
+pub const NOTICE: u32 = 18;
+pub const WARNING: u32 = 19;
+pub const PGWARNING: u32 = 19;
+pub const WARNING_CLIENT_ONLY: u32 = 20;
+pub const ERROR: u32 = 21;
+pub const PGERROR: u32 = 21;
+pub const FATAL: u32 = 22;
+pub const PANIC: u32 = 23;
+pub const LOG_DESTINATION_STDERR: u32 = 1;
+pub const LOG_DESTINATION_SYSLOG: u32 = 2;
+pub const LOG_DESTINATION_EVENTLOG: u32 = 4;
+pub const LOG_DESTINATION_CSVLOG: u32 = 8;
+pub const LOG_DESTINATION_JSONLOG: u32 = 16;
+pub const MCXT_ALLOC_HUGE: u32 = 1;
+pub const MCXT_ALLOC_NO_OOM: u32 = 2;
+pub const MCXT_ALLOC_ZERO: u32 = 4;
+pub const VARLENA_EXTSIZE_BITS: u32 = 30;
+pub const VARLENA_EXTSIZE_MASK: u32 = 1073741823;
+pub const VARATT_SHORT_MAX: u32 = 127;
+pub const FIELDNO_NULLABLE_DATUM_DATUM: u32 = 0;
+pub const FIELDNO_NULLABLE_DATUM_ISNULL: u32 = 1;
+pub const SIZEOF_DATUM: u32 = 8;
+pub const InvalidAttrNumber: u32 = 0;
+pub const MaxAttrNumber: u32 = 32767;
+pub const AttributeRelationId: u32 = 1249;
+pub const AttributeRelation_Rowtype_Id: u32 = 75;
+pub const AttributeRelidNameIndexId: u32 = 2658;
+pub const AttributeRelidNumIndexId: u32 = 2659;
+pub const Anum_pg_attribute_attrelid: u32 = 1;
+pub const Anum_pg_attribute_attname: u32 = 2;
+pub const Anum_pg_attribute_atttypid: u32 = 3;
+pub const Anum_pg_attribute_attstattarget: u32 = 4;
+pub const Anum_pg_attribute_attlen: u32 = 5;
+pub const Anum_pg_attribute_attnum: u32 = 6;
+pub const Anum_pg_attribute_attndims: u32 = 7;
+pub const Anum_pg_attribute_attcacheoff: u32 = 8;
+pub const Anum_pg_attribute_atttypmod: u32 = 9;
+pub const Anum_pg_attribute_attbyval: u32 = 10;
+pub const Anum_pg_attribute_attalign: u32 = 11;
+pub const Anum_pg_attribute_attstorage: u32 = 12;
+pub const Anum_pg_attribute_attcompression: u32 = 13;
+pub const Anum_pg_attribute_attnotnull: u32 = 14;
+pub const Anum_pg_attribute_atthasdef: u32 = 15;
+pub const Anum_pg_attribute_atthasmissing: u32 = 16;
+pub const Anum_pg_attribute_attidentity: u32 = 17;
+pub const Anum_pg_attribute_attgenerated: u32 = 18;
+pub const Anum_pg_attribute_attisdropped: u32 = 19;
+pub const Anum_pg_attribute_attislocal: u32 = 20;
+pub const Anum_pg_attribute_attinhcount: u32 = 21;
+pub const Anum_pg_attribute_attcollation: u32 = 22;
+pub const Anum_pg_attribute_attacl: u32 = 23;
+pub const Anum_pg_attribute_attoptions: u32 = 24;
+pub const Anum_pg_attribute_attfdwoptions: u32 = 25;
+pub const Anum_pg_attribute_attmissingval: u32 = 26;
+pub const Natts_pg_attribute: u32 = 26;
+pub const ATTRIBUTE_IDENTITY_ALWAYS: u8 = 97u8;
+pub const ATTRIBUTE_IDENTITY_BY_DEFAULT: u8 = 100u8;
+pub const ATTRIBUTE_GENERATED_STORED: u8 = 115u8;
+pub const AGGSPLITOP_COMBINE: u32 = 1;
+pub const AGGSPLITOP_SKIPFINAL: u32 = 2;
+pub const AGGSPLITOP_SERIALIZE: u32 = 4;
+pub const AGGSPLITOP_DESERIALIZE: u32 = 8;
+pub const LP_UNUSED: u32 = 0;
+pub const LP_NORMAL: u32 = 1;
+pub const LP_REDIRECT: u32 = 2;
+pub const LP_DEAD: u32 = 3;
+pub const SpecTokenOffsetNumber: u32 = 65534;
+pub const MovedPartitionsOffsetNumber: u32 = 65533;
+pub const FIELDNO_HEAPTUPLEDATA_DATA: u32 = 3;
+pub const O_RDONLY: u32 = 0;
+pub const O_WRONLY: u32 = 1;
+pub const O_RDWR: u32 = 2;
+pub const O_ACCMODE: u32 = 3;
+pub const FREAD: u32 = 1;
+pub const FWRITE: u32 = 2;
+pub const O_NONBLOCK: u32 = 4;
+pub const O_APPEND: u32 = 8;
+pub const O_SYNC: u32 = 128;
+pub const O_SHLOCK: u32 = 16;
+pub const O_EXLOCK: u32 = 32;
+pub const O_ASYNC: u32 = 64;
+pub const O_FSYNC: u32 = 128;
+pub const O_NOFOLLOW: u32 = 256;
+pub const O_CREAT: u32 = 512;
+pub const O_TRUNC: u32 = 1024;
+pub const O_EXCL: u32 = 2048;
+pub const O_EVTONLY: u32 = 32768;
+pub const O_NOCTTY: u32 = 131072;
+pub const O_DIRECTORY: u32 = 1048576;
+pub const O_SYMLINK: u32 = 2097152;
+pub const O_DSYNC: u32 = 4194304;
+pub const O_CLOEXEC: u32 = 16777216;
+pub const O_NOFOLLOW_ANY: u32 = 536870912;
+pub const AT_FDCWD: i32 = -2;
+pub const AT_EACCESS: u32 = 16;
+pub const AT_SYMLINK_NOFOLLOW: u32 = 32;
+pub const AT_SYMLINK_FOLLOW: u32 = 64;
+pub const AT_REMOVEDIR: u32 = 128;
+pub const AT_REALDEV: u32 = 512;
+pub const AT_FDONLY: u32 = 1024;
+pub const AT_SYMLINK_NOFOLLOW_ANY: u32 = 2048;
+pub const O_DP_GETRAWENCRYPTED: u32 = 1;
+pub const O_DP_GETRAWUNENCRYPTED: u32 = 2;
+pub const FAPPEND: u32 = 8;
+pub const FASYNC: u32 = 64;
+pub const FFSYNC: u32 = 128;
+pub const FFDSYNC: u32 = 4194304;
+pub const FNONBLOCK: u32 = 4;
+pub const FNDELAY: u32 = 4;
+pub const O_NDELAY: u32 = 4;
+pub const CPF_OVERWRITE: u32 = 1;
+pub const CPF_IGNORE_MODE: u32 = 2;
+pub const CPF_MASK: u32 = 3;
+pub const F_DUPFD: u32 = 0;
+pub const F_GETFD: u32 = 1;
+pub const F_SETFD: u32 = 2;
+pub const F_GETFL: u32 = 3;
+pub const F_SETFL: u32 = 4;
+pub const F_GETOWN: u32 = 5;
+pub const F_SETOWN: u32 = 6;
+pub const F_GETLK: u32 = 7;
+pub const F_SETLK: u32 = 8;
+pub const F_SETLKW: u32 = 9;
+pub const F_SETLKWTIMEOUT: u32 = 10;
+pub const F_FLUSH_DATA: u32 = 40;
+pub const F_CHKCLEAN: u32 = 41;
+pub const F_PREALLOCATE: u32 = 42;
+pub const F_SETSIZE: u32 = 43;
+pub const F_RDADVISE: u32 = 44;
+pub const F_RDAHEAD: u32 = 45;
+pub const F_NOCACHE: u32 = 48;
+pub const F_LOG2PHYS: u32 = 49;
+pub const F_GETPATH: u32 = 50;
+pub const F_FULLFSYNC: u32 = 51;
+pub const F_PATHPKG_CHECK: u32 = 52;
+pub const F_FREEZE_FS: u32 = 53;
+pub const F_THAW_FS: u32 = 54;
+pub const F_GLOBAL_NOCACHE: u32 = 55;
+pub const F_ADDSIGS: u32 = 59;
+pub const F_ADDFILESIGS: u32 = 61;
+pub const F_NODIRECT: u32 = 62;
+pub const F_GETPROTECTIONCLASS: u32 = 63;
+pub const F_SETPROTECTIONCLASS: u32 = 64;
+pub const F_LOG2PHYS_EXT: u32 = 65;
+pub const F_GETLKPID: u32 = 66;
+pub const F_SETBACKINGSTORE: u32 = 70;
+pub const F_GETPATH_MTMINFO: u32 = 71;
+pub const F_GETCODEDIR: u32 = 72;
+pub const F_SETNOSIGPIPE: u32 = 73;
+pub const F_GETNOSIGPIPE: u32 = 74;
+pub const F_TRANSCODEKEY: u32 = 75;
+pub const F_SINGLE_WRITER: u32 = 76;
+pub const F_GETPROTECTIONLEVEL: u32 = 77;
+pub const F_FINDSIGS: u32 = 78;
+pub const F_ADDFILESIGS_FOR_DYLD_SIM: u32 = 83;
+pub const F_BARRIERFSYNC: u32 = 85;
+pub const F_ADDFILESIGS_RETURN: u32 = 97;
+pub const F_CHECK_LV: u32 = 98;
+pub const F_PUNCHHOLE: u32 = 99;
+pub const F_TRIM_ACTIVE_FILE: u32 = 100;
+pub const F_SPECULATIVE_READ: u32 = 101;
+pub const F_GETPATH_NOFIRMLINK: u32 = 102;
+pub const F_ADDFILESIGS_INFO: u32 = 103;
+pub const F_ADDFILESUPPL: u32 = 104;
+pub const F_GETSIGSINFO: u32 = 105;
+pub const F_FSRESERVED: u32 = 106;
+pub const FCNTL_FS_SPECIFIC_BASE: u32 = 65536;
+pub const F_DUPFD_CLOEXEC: u32 = 67;
+pub const FD_CLOEXEC: u32 = 1;
+pub const F_RDLCK: u32 = 1;
+pub const F_UNLCK: u32 = 2;
+pub const F_WRLCK: u32 = 3;
+pub const SEEK_HOLE: u32 = 3;
+pub const SEEK_DATA: u32 = 4;
+pub const S_IFMT: u32 = 61440;
+pub const S_IFIFO: u32 = 4096;
+pub const S_IFCHR: u32 = 8192;
+pub const S_IFDIR: u32 = 16384;
+pub const S_IFBLK: u32 = 24576;
+pub const S_IFREG: u32 = 32768;
+pub const S_IFLNK: u32 = 40960;
+pub const S_IFSOCK: u32 = 49152;
+pub const S_IFWHT: u32 = 57344;
+pub const S_IRWXU: u32 = 448;
+pub const S_IRUSR: u32 = 256;
+pub const S_IWUSR: u32 = 128;
+pub const S_IXUSR: u32 = 64;
+pub const S_IRWXG: u32 = 56;
+pub const S_IRGRP: u32 = 32;
+pub const S_IWGRP: u32 = 16;
+pub const S_IXGRP: u32 = 8;
+pub const S_IRWXO: u32 = 7;
+pub const S_IROTH: u32 = 4;
+pub const S_IWOTH: u32 = 2;
+pub const S_IXOTH: u32 = 1;
+pub const S_ISUID: u32 = 2048;
+pub const S_ISGID: u32 = 1024;
+pub const S_ISVTX: u32 = 512;
+pub const S_ISTXT: u32 = 512;
+pub const S_IREAD: u32 = 256;
+pub const S_IWRITE: u32 = 128;
+pub const S_IEXEC: u32 = 64;
+pub const F_ALLOCATECONTIG: u32 = 2;
+pub const F_ALLOCATEALL: u32 = 4;
+pub const F_PEOFPOSMODE: u32 = 3;
+pub const F_VOLPOSMODE: u32 = 4;
+pub const USER_FSIGNATURES_CDHASH_LEN: u32 = 20;
+pub const GETSIGSINFO_PLATFORM_BINARY: u32 = 1;
+pub const LOCK_SH: u32 = 1;
+pub const LOCK_EX: u32 = 2;
+pub const LOCK_NB: u32 = 4;
+pub const LOCK_UN: u32 = 8;
+pub const O_POPUP: u32 = 2147483648;
+pub const O_ALERT: u32 = 536870912;
+pub const InvalidXLogRecPtr: u32 = 0;
+pub const OPEN_SYNC_FLAG: u32 = 128;
+pub const OPEN_DATASYNC_FLAG: u32 = 4194304;
+pub const FirstGenbkiObjectId: u32 = 10000;
+pub const FirstUnpinnedObjectId: u32 = 12000;
+pub const FirstNormalObjectId: u32 = 16384;
+pub const TypeRelationId: u32 = 1247;
+pub const TypeRelation_Rowtype_Id: u32 = 71;
+pub const TypeOidIndexId: u32 = 2703;
+pub const TypeNameNspIndexId: u32 = 2704;
+pub const Anum_pg_type_oid: u32 = 1;
+pub const Anum_pg_type_typname: u32 = 2;
+pub const Anum_pg_type_typnamespace: u32 = 3;
+pub const Anum_pg_type_typowner: u32 = 4;
+pub const Anum_pg_type_typlen: u32 = 5;
+pub const Anum_pg_type_typbyval: u32 = 6;
+pub const Anum_pg_type_typtype: u32 = 7;
+pub const Anum_pg_type_typcategory: u32 = 8;
+pub const Anum_pg_type_typispreferred: u32 = 9;
+pub const Anum_pg_type_typisdefined: u32 = 10;
+pub const Anum_pg_type_typdelim: u32 = 11;
+pub const Anum_pg_type_typrelid: u32 = 12;
+pub const Anum_pg_type_typsubscript: u32 = 13;
+pub const Anum_pg_type_typelem: u32 = 14;
+pub const Anum_pg_type_typarray: u32 = 15;
+pub const Anum_pg_type_typinput: u32 = 16;
+pub const Anum_pg_type_typoutput: u32 = 17;
+pub const Anum_pg_type_typreceive: u32 = 18;
+pub const Anum_pg_type_typsend: u32 = 19;
+pub const Anum_pg_type_typmodin: u32 = 20;
+pub const Anum_pg_type_typmodout: u32 = 21;
+pub const Anum_pg_type_typanalyze: u32 = 22;
+pub const Anum_pg_type_typalign: u32 = 23;
+pub const Anum_pg_type_typstorage: u32 = 24;
+pub const Anum_pg_type_typnotnull: u32 = 25;
+pub const Anum_pg_type_typbasetype: u32 = 26;
+pub const Anum_pg_type_typtypmod: u32 = 27;
+pub const Anum_pg_type_typndims: u32 = 28;
+pub const Anum_pg_type_typcollation: u32 = 29;
+pub const Anum_pg_type_typdefaultbin: u32 = 30;
+pub const Anum_pg_type_typdefault: u32 = 31;
+pub const Anum_pg_type_typacl: u32 = 32;
+pub const Natts_pg_type: u32 = 32;
+pub const TYPTYPE_BASE: u8 = 98u8;
+pub const TYPTYPE_COMPOSITE: u8 = 99u8;
+pub const TYPTYPE_DOMAIN: u8 = 100u8;
+pub const TYPTYPE_ENUM: u8 = 101u8;
+pub const TYPTYPE_MULTIRANGE: u8 = 109u8;
+pub const TYPTYPE_PSEUDO: u8 = 112u8;
+pub const TYPTYPE_RANGE: u8 = 114u8;
+pub const TYPCATEGORY_INVALID: u8 = 0u8;
+pub const TYPCATEGORY_ARRAY: u8 = 65u8;
+pub const TYPCATEGORY_BOOLEAN: u8 = 66u8;
+pub const TYPCATEGORY_COMPOSITE: u8 = 67u8;
+pub const TYPCATEGORY_DATETIME: u8 = 68u8;
+pub const TYPCATEGORY_ENUM: u8 = 69u8;
+pub const TYPCATEGORY_GEOMETRIC: u8 = 71u8;
+pub const TYPCATEGORY_NETWORK: u8 = 73u8;
+pub const TYPCATEGORY_NUMERIC: u8 = 78u8;
+pub const TYPCATEGORY_PSEUDOTYPE: u8 = 80u8;
+pub const TYPCATEGORY_RANGE: u8 = 82u8;
+pub const TYPCATEGORY_STRING: u8 = 83u8;
+pub const TYPCATEGORY_TIMESPAN: u8 = 84u8;
+pub const TYPCATEGORY_USER: u8 = 85u8;
+pub const TYPCATEGORY_BITSTRING: u8 = 86u8;
+pub const TYPCATEGORY_UNKNOWN: u8 = 88u8;
+pub const TYPCATEGORY_INTERNAL: u8 = 90u8;
+pub const TYPALIGN_CHAR: u8 = 99u8;
+pub const TYPALIGN_SHORT: u8 = 115u8;
+pub const TYPALIGN_INT: u8 = 105u8;
+pub const TYPALIGN_DOUBLE: u8 = 100u8;
+pub const TYPSTORAGE_PLAIN: u8 = 112u8;
+pub const TYPSTORAGE_EXTERNAL: u8 = 101u8;
+pub const TYPSTORAGE_EXTENDED: u8 = 120u8;
+pub const TYPSTORAGE_MAIN: u8 = 109u8;
+pub const BOOLOID: u32 = 16;
+pub const BYTEAOID: u32 = 17;
+pub const CHAROID: u32 = 18;
+pub const NAMEOID: u32 = 19;
+pub const INT8OID: u32 = 20;
+pub const INT2OID: u32 = 21;
+pub const INT2VECTOROID: u32 = 22;
+pub const INT4OID: u32 = 23;
+pub const REGPROCOID: u32 = 24;
+pub const TEXTOID: u32 = 25;
+pub const OIDOID: u32 = 26;
+pub const TIDOID: u32 = 27;
+pub const XIDOID: u32 = 28;
+pub const CIDOID: u32 = 29;
+pub const OIDVECTOROID: u32 = 30;
+pub const JSONOID: u32 = 114;
+pub const XMLOID: u32 = 142;
+pub const PG_NODE_TREEOID: u32 = 194;
+pub const PG_NDISTINCTOID: u32 = 3361;
+pub const PG_DEPENDENCIESOID: u32 = 3402;
+pub const PG_MCV_LISTOID: u32 = 5017;
+pub const PG_DDL_COMMANDOID: u32 = 32;
+pub const XID8OID: u32 = 5069;
+pub const POINTOID: u32 = 600;
+pub const LSEGOID: u32 = 601;
+pub const PATHOID: u32 = 602;
+pub const BOXOID: u32 = 603;
+pub const POLYGONOID: u32 = 604;
+pub const LINEOID: u32 = 628;
+pub const FLOAT4OID: u32 = 700;
+pub const FLOAT8OID: u32 = 701;
+pub const UNKNOWNOID: u32 = 705;
+pub const CIRCLEOID: u32 = 718;
+pub const MONEYOID: u32 = 790;
+pub const MACADDROID: u32 = 829;
+pub const INETOID: u32 = 869;
+pub const CIDROID: u32 = 650;
+pub const MACADDR8OID: u32 = 774;
+pub const ACLITEMOID: u32 = 1033;
+pub const BPCHAROID: u32 = 1042;
+pub const VARCHAROID: u32 = 1043;
+pub const DATEOID: u32 = 1082;
+pub const TIMEOID: u32 = 1083;
+pub const TIMESTAMPOID: u32 = 1114;
+pub const TIMESTAMPTZOID: u32 = 1184;
+pub const INTERVALOID: u32 = 1186;
+pub const TIMETZOID: u32 = 1266;
+pub const BITOID: u32 = 1560;
+pub const VARBITOID: u32 = 1562;
+pub const NUMERICOID: u32 = 1700;
+pub const REFCURSOROID: u32 = 1790;
+pub const REGPROCEDUREOID: u32 = 2202;
+pub const REGOPEROID: u32 = 2203;
+pub const REGOPERATOROID: u32 = 2204;
+pub const REGCLASSOID: u32 = 2205;
+pub const REGCOLLATIONOID: u32 = 4191;
+pub const REGTYPEOID: u32 = 2206;
+pub const REGROLEOID: u32 = 4096;
+pub const REGNAMESPACEOID: u32 = 4089;
+pub const UUIDOID: u32 = 2950;
+pub const PG_LSNOID: u32 = 3220;
+pub const TSVECTOROID: u32 = 3614;
+pub const GTSVECTOROID: u32 = 3642;
+pub const TSQUERYOID: u32 = 3615;
+pub const REGCONFIGOID: u32 = 3734;
+pub const REGDICTIONARYOID: u32 = 3769;
+pub const JSONBOID: u32 = 3802;
+pub const JSONPATHOID: u32 = 4072;
+pub const TXID_SNAPSHOTOID: u32 = 2970;
+pub const PG_SNAPSHOTOID: u32 = 5038;
+pub const INT4RANGEOID: u32 = 3904;
+pub const NUMRANGEOID: u32 = 3906;
+pub const TSRANGEOID: u32 = 3908;
+pub const TSTZRANGEOID: u32 = 3910;
+pub const DATERANGEOID: u32 = 3912;
+pub const INT8RANGEOID: u32 = 3926;
+pub const INT4MULTIRANGEOID: u32 = 4451;
+pub const NUMMULTIRANGEOID: u32 = 4532;
+pub const TSMULTIRANGEOID: u32 = 4533;
+pub const TSTZMULTIRANGEOID: u32 = 4534;
+pub const DATEMULTIRANGEOID: u32 = 4535;
+pub const INT8MULTIRANGEOID: u32 = 4536;
+pub const RECORDOID: u32 = 2249;
+pub const RECORDARRAYOID: u32 = 2287;
+pub const CSTRINGOID: u32 = 2275;
+pub const ANYOID: u32 = 2276;
+pub const ANYARRAYOID: u32 = 2277;
+pub const VOIDOID: u32 = 2278;
+pub const TRIGGEROID: u32 = 2279;
+pub const EVENT_TRIGGEROID: u32 = 3838;
+pub const LANGUAGE_HANDLEROID: u32 = 2280;
+pub const INTERNALOID: u32 = 2281;
+pub const ANYELEMENTOID: u32 = 2283;
+pub const ANYNONARRAYOID: u32 = 2776;
+pub const ANYENUMOID: u32 = 3500;
+pub const FDW_HANDLEROID: u32 = 3115;
+pub const INDEX_AM_HANDLEROID: u32 = 325;
+pub const TSM_HANDLEROID: u32 = 3310;
+pub const TABLE_AM_HANDLEROID: u32 = 269;
+pub const ANYRANGEOID: u32 = 3831;
+pub const ANYCOMPATIBLEOID: u32 = 5077;
+pub const ANYCOMPATIBLEARRAYOID: u32 = 5078;
+pub const ANYCOMPATIBLENONARRAYOID: u32 = 5079;
+pub const ANYCOMPATIBLERANGEOID: u32 = 5080;
+pub const ANYMULTIRANGEOID: u32 = 4537;
+pub const ANYCOMPATIBLEMULTIRANGEOID: u32 = 4538;
+pub const PG_BRIN_BLOOM_SUMMARYOID: u32 = 4600;
+pub const PG_BRIN_MINMAX_MULTI_SUMMARYOID: u32 = 4601;
+pub const BOOLARRAYOID: u32 = 1000;
+pub const BYTEAARRAYOID: u32 = 1001;
+pub const CHARARRAYOID: u32 = 1002;
+pub const NAMEARRAYOID: u32 = 1003;
+pub const INT8ARRAYOID: u32 = 1016;
+pub const INT2ARRAYOID: u32 = 1005;
+pub const INT2VECTORARRAYOID: u32 = 1006;
+pub const INT4ARRAYOID: u32 = 1007;
+pub const REGPROCARRAYOID: u32 = 1008;
+pub const TEXTARRAYOID: u32 = 1009;
+pub const OIDARRAYOID: u32 = 1028;
+pub const TIDARRAYOID: u32 = 1010;
+pub const XIDARRAYOID: u32 = 1011;
+pub const CIDARRAYOID: u32 = 1012;
+pub const OIDVECTORARRAYOID: u32 = 1013;
+pub const PG_TYPEARRAYOID: u32 = 210;
+pub const PG_ATTRIBUTEARRAYOID: u32 = 270;
+pub const PG_PROCARRAYOID: u32 = 272;
+pub const PG_CLASSARRAYOID: u32 = 273;
+pub const JSONARRAYOID: u32 = 199;
+pub const XMLARRAYOID: u32 = 143;
+pub const XID8ARRAYOID: u32 = 271;
+pub const POINTARRAYOID: u32 = 1017;
+pub const LSEGARRAYOID: u32 = 1018;
+pub const PATHARRAYOID: u32 = 1019;
+pub const BOXARRAYOID: u32 = 1020;
+pub const POLYGONARRAYOID: u32 = 1027;
+pub const LINEARRAYOID: u32 = 629;
+pub const FLOAT4ARRAYOID: u32 = 1021;
+pub const FLOAT8ARRAYOID: u32 = 1022;
+pub const CIRCLEARRAYOID: u32 = 719;
+pub const MONEYARRAYOID: u32 = 791;
+pub const MACADDRARRAYOID: u32 = 1040;
+pub const INETARRAYOID: u32 = 1041;
+pub const CIDRARRAYOID: u32 = 651;
+pub const MACADDR8ARRAYOID: u32 = 775;
+pub const ACLITEMARRAYOID: u32 = 1034;
+pub const BPCHARARRAYOID: u32 = 1014;
+pub const VARCHARARRAYOID: u32 = 1015;
+pub const DATEARRAYOID: u32 = 1182;
+pub const TIMEARRAYOID: u32 = 1183;
+pub const TIMESTAMPARRAYOID: u32 = 1115;
+pub const TIMESTAMPTZARRAYOID: u32 = 1185;
+pub const INTERVALARRAYOID: u32 = 1187;
+pub const TIMETZARRAYOID: u32 = 1270;
+pub const BITARRAYOID: u32 = 1561;
+pub const VARBITARRAYOID: u32 = 1563;
+pub const NUMERICARRAYOID: u32 = 1231;
+pub const REFCURSORARRAYOID: u32 = 2201;
+pub const REGPROCEDUREARRAYOID: u32 = 2207;
+pub const REGOPERARRAYOID: u32 = 2208;
+pub const REGOPERATORARRAYOID: u32 = 2209;
+pub const REGCLASSARRAYOID: u32 = 2210;
+pub const REGCOLLATIONARRAYOID: u32 = 4192;
+pub const REGTYPEARRAYOID: u32 = 2211;
+pub const REGROLEARRAYOID: u32 = 4097;
+pub const REGNAMESPACEARRAYOID: u32 = 4090;
+pub const UUIDARRAYOID: u32 = 2951;
+pub const PG_LSNARRAYOID: u32 = 3221;
+pub const TSVECTORARRAYOID: u32 = 3643;
+pub const GTSVECTORARRAYOID: u32 = 3644;
+pub const TSQUERYARRAYOID: u32 = 3645;
+pub const REGCONFIGARRAYOID: u32 = 3735;
+pub const REGDICTIONARYARRAYOID: u32 = 3770;
+pub const JSONBARRAYOID: u32 = 3807;
+pub const JSONPATHARRAYOID: u32 = 4073;
+pub const TXID_SNAPSHOTARRAYOID: u32 = 2949;
+pub const PG_SNAPSHOTARRAYOID: u32 = 5039;
+pub const INT4RANGEARRAYOID: u32 = 3905;
+pub const NUMRANGEARRAYOID: u32 = 3907;
+pub const TSRANGEARRAYOID: u32 = 3909;
+pub const TSTZRANGEARRAYOID: u32 = 3911;
+pub const DATERANGEARRAYOID: u32 = 3913;
+pub const INT8RANGEARRAYOID: u32 = 3927;
+pub const INT4MULTIRANGEARRAYOID: u32 = 6150;
+pub const NUMMULTIRANGEARRAYOID: u32 = 6151;
+pub const TSMULTIRANGEARRAYOID: u32 = 6152;
+pub const TSTZMULTIRANGEARRAYOID: u32 = 6153;
+pub const DATEMULTIRANGEARRAYOID: u32 = 6155;
+pub const INT8MULTIRANGEARRAYOID: u32 = 6157;
+pub const CSTRINGARRAYOID: u32 = 1263;
+pub const PD_HAS_FREE_LINES: u32 = 1;
+pub const PD_PAGE_FULL: u32 = 2;
+pub const PD_ALL_VISIBLE: u32 = 4;
+pub const PD_VALID_FLAG_BITS: u32 = 7;
+pub const PG_PAGE_LAYOUT_VERSION: u32 = 4;
+pub const PG_DATA_CHECKSUM_VERSION: u32 = 1;
+pub const PAI_OVERWRITE: u32 = 1;
+pub const PAI_IS_HEAP: u32 = 2;
+pub const PIV_LOG_WARNING: u32 = 1;
+pub const PIV_REPORT_STAT: u32 = 2;
+pub const MaxTupleAttributeNumber: u32 = 1664;
+pub const MaxHeapAttributeNumber: u32 = 1600;
+pub const FIELDNO_HEAPTUPLEHEADERDATA_INFOMASK2: u32 = 2;
+pub const FIELDNO_HEAPTUPLEHEADERDATA_INFOMASK: u32 = 3;
+pub const FIELDNO_HEAPTUPLEHEADERDATA_HOFF: u32 = 4;
+pub const FIELDNO_HEAPTUPLEHEADERDATA_BITS: u32 = 5;
+pub const HEAP_HASNULL: u32 = 1;
+pub const HEAP_HASVARWIDTH: u32 = 2;
+pub const HEAP_HASEXTERNAL: u32 = 4;
+pub const HEAP_HASOID_OLD: u32 = 8;
+pub const HEAP_XMAX_KEYSHR_LOCK: u32 = 16;
+pub const HEAP_COMBOCID: u32 = 32;
+pub const HEAP_XMAX_EXCL_LOCK: u32 = 64;
+pub const HEAP_XMAX_LOCK_ONLY: u32 = 128;
+pub const HEAP_XMAX_SHR_LOCK: u32 = 80;
+pub const HEAP_LOCK_MASK: u32 = 80;
+pub const HEAP_XMIN_COMMITTED: u32 = 256;
+pub const HEAP_XMIN_INVALID: u32 = 512;
+pub const HEAP_XMIN_FROZEN: u32 = 768;
+pub const HEAP_XMAX_COMMITTED: u32 = 1024;
+pub const HEAP_XMAX_INVALID: u32 = 2048;
+pub const HEAP_XMAX_IS_MULTI: u32 = 4096;
+pub const HEAP_UPDATED: u32 = 8192;
+pub const HEAP_MOVED_OFF: u32 = 16384;
+pub const HEAP_MOVED_IN: u32 = 32768;
+pub const HEAP_MOVED: u32 = 49152;
+pub const HEAP_XACT_MASK: u32 = 65520;
+pub const HEAP_XMAX_BITS: u32 = 7376;
+pub const HEAP_NATTS_MASK: u32 = 2047;
+pub const HEAP_KEYS_UPDATED: u32 = 8192;
+pub const HEAP_HOT_UPDATED: u32 = 16384;
+pub const HEAP_ONLY_TUPLE: u32 = 32768;
+pub const HEAP2_XACT_MASK: u32 = 57344;
+pub const HEAP_TUPLE_HAS_MATCH: u32 = 32768;
+pub const MaxAttrSize: u32 = 10485760;
+pub const SelfItemPointerAttributeNumber: i32 = -1;
+pub const MinTransactionIdAttributeNumber: i32 = -2;
+pub const MinCommandIdAttributeNumber: i32 = -3;
+pub const MaxTransactionIdAttributeNumber: i32 = -4;
+pub const MaxCommandIdAttributeNumber: i32 = -5;
+pub const TableOidAttributeNumber: i32 = -6;
+pub const FirstLowInvalidHeapAttributeNumber: i32 = -7;
+pub const InvalidBuffer: u32 = 0;
+pub const TTS_FLAG_EMPTY: u32 = 2;
+pub const TTS_FLAG_SHOULDFREE: u32 = 4;
+pub const TTS_FLAG_SLOW: u32 = 8;
+pub const TTS_FLAG_FIXED: u32 = 16;
+pub const FIELDNO_TUPLETABLESLOT_FLAGS: u32 = 1;
+pub const FIELDNO_TUPLETABLESLOT_NVALID: u32 = 2;
+pub const FIELDNO_TUPLETABLESLOT_TUPLEDESCRIPTOR: u32 = 4;
+pub const FIELDNO_TUPLETABLESLOT_VALUES: u32 = 5;
+pub const FIELDNO_TUPLETABLESLOT_ISNULL: u32 = 6;
+pub const FIELDNO_HEAPTUPLETABLESLOT_TUPLE: u32 = 1;
+pub const FIELDNO_HEAPTUPLETABLESLOT_OFF: u32 = 2;
+pub const FIELDNO_MINIMALTUPLETABLESLOT_TUPLE: u32 = 1;
+pub const FIELDNO_MINIMALTUPLETABLESLOT_OFF: u32 = 4;
+pub const BITS_PER_BITMAPWORD: u32 = 64;
+pub const TIME_UTC: u32 = 1;
+pub const FIELDNO_FUNCTIONCALLINFODATA_ISNULL: u32 = 4;
+pub const FIELDNO_FUNCTIONCALLINFODATA_ARGS: u32 = 6;
+pub const PG_MAGIC_FUNCTION_NAME_STRING: &[u8; 14usize] = b"Pg_magic_func\0";
+pub const AGG_CONTEXT_AGGREGATE: u32 = 1;
+pub const AGG_CONTEXT_WINDOW: u32 = 2;
+pub const PARAM_FLAG_CONST: u32 = 1;
+pub const BTLessStrategyNumber: u32 = 1;
+pub const BTLessEqualStrategyNumber: u32 = 2;
+pub const BTEqualStrategyNumber: u32 = 3;
+pub const BTGreaterEqualStrategyNumber: u32 = 4;
+pub const BTGreaterStrategyNumber: u32 = 5;
+pub const BTMaxStrategyNumber: u32 = 5;
+pub const HTEqualStrategyNumber: u32 = 1;
+pub const HTMaxStrategyNumber: u32 = 1;
+pub const RTLeftStrategyNumber: u32 = 1;
+pub const RTOverLeftStrategyNumber: u32 = 2;
+pub const RTOverlapStrategyNumber: u32 = 3;
+pub const RTOverRightStrategyNumber: u32 = 4;
+pub const RTRightStrategyNumber: u32 = 5;
+pub const RTSameStrategyNumber: u32 = 6;
+pub const RTContainsStrategyNumber: u32 = 7;
+pub const RTContainedByStrategyNumber: u32 = 8;
+pub const RTOverBelowStrategyNumber: u32 = 9;
+pub const RTBelowStrategyNumber: u32 = 10;
+pub const RTAboveStrategyNumber: u32 = 11;
+pub const RTOverAboveStrategyNumber: u32 = 12;
+pub const RTOldContainsStrategyNumber: u32 = 13;
+pub const RTOldContainedByStrategyNumber: u32 = 14;
+pub const RTKNNSearchStrategyNumber: u32 = 15;
+pub const RTContainsElemStrategyNumber: u32 = 16;
+pub const RTAdjacentStrategyNumber: u32 = 17;
+pub const RTEqualStrategyNumber: u32 = 18;
+pub const RTNotEqualStrategyNumber: u32 = 19;
+pub const RTLessStrategyNumber: u32 = 20;
+pub const RTLessEqualStrategyNumber: u32 = 21;
+pub const RTGreaterStrategyNumber: u32 = 22;
+pub const RTGreaterEqualStrategyNumber: u32 = 23;
+pub const RTSubStrategyNumber: u32 = 24;
+pub const RTSubEqualStrategyNumber: u32 = 25;
+pub const RTSuperStrategyNumber: u32 = 26;
+pub const RTSuperEqualStrategyNumber: u32 = 27;
+pub const RTPrefixStrategyNumber: u32 = 28;
+pub const RTOldBelowStrategyNumber: u32 = 29;
+pub const RTOldAboveStrategyNumber: u32 = 30;
+pub const RTMaxStrategyNumber: u32 = 30;
+pub const INNER_VAR: i32 = -1;
+pub const OUTER_VAR: i32 = -2;
+pub const INDEX_VAR: i32 = -3;
+pub const ROWID_VAR: i32 = -4;
+pub const PRS2_OLD_VARNO: u32 = 1;
+pub const PRS2_NEW_VARNO: u32 = 2;
+pub const ACL_INSERT: u32 = 1;
+pub const ACL_SELECT: u32 = 2;
+pub const ACL_UPDATE: u32 = 4;
+pub const ACL_DELETE: u32 = 8;
+pub const ACL_TRUNCATE: u32 = 16;
+pub const ACL_REFERENCES: u32 = 32;
+pub const ACL_TRIGGER: u32 = 64;
+pub const ACL_EXECUTE: u32 = 128;
+pub const ACL_USAGE: u32 = 256;
+pub const ACL_CREATE: u32 = 512;
+pub const ACL_CREATE_TEMP: u32 = 1024;
+pub const ACL_CONNECT: u32 = 2048;
+pub const ACL_SET: u32 = 4096;
+pub const ACL_ALTER_SYSTEM: u32 = 8192;
+pub const N_ACL_RIGHTS: u32 = 14;
+pub const ACL_NO_RIGHTS: u32 = 0;
+pub const ACL_SELECT_FOR_UPDATE: u32 = 4;
+pub const FRAMEOPTION_NONDEFAULT: u32 = 1;
+pub const FRAMEOPTION_RANGE: u32 = 2;
+pub const FRAMEOPTION_ROWS: u32 = 4;
+pub const FRAMEOPTION_GROUPS: u32 = 8;
+pub const FRAMEOPTION_BETWEEN: u32 = 16;
+pub const FRAMEOPTION_START_UNBOUNDED_PRECEDING: u32 = 32;
+pub const FRAMEOPTION_END_UNBOUNDED_PRECEDING: u32 = 64;
+pub const FRAMEOPTION_START_UNBOUNDED_FOLLOWING: u32 = 128;
+pub const FRAMEOPTION_END_UNBOUNDED_FOLLOWING: u32 = 256;
+pub const FRAMEOPTION_START_CURRENT_ROW: u32 = 512;
+pub const FRAMEOPTION_END_CURRENT_ROW: u32 = 1024;
+pub const FRAMEOPTION_START_OFFSET_PRECEDING: u32 = 2048;
+pub const FRAMEOPTION_END_OFFSET_PRECEDING: u32 = 4096;
+pub const FRAMEOPTION_START_OFFSET_FOLLOWING: u32 = 8192;
+pub const FRAMEOPTION_END_OFFSET_FOLLOWING: u32 = 16384;
+pub const FRAMEOPTION_EXCLUDE_CURRENT_ROW: u32 = 32768;
+pub const FRAMEOPTION_EXCLUDE_GROUP: u32 = 65536;
+pub const FRAMEOPTION_EXCLUDE_TIES: u32 = 131072;
+pub const FRAMEOPTION_START_OFFSET: u32 = 10240;
+pub const FRAMEOPTION_END_OFFSET: u32 = 20480;
+pub const FRAMEOPTION_EXCLUSION: u32 = 229376;
+pub const FRAMEOPTION_DEFAULTS: u32 = 1058;
+pub const PARTITION_STRATEGY_HASH: u8 = 104u8;
+pub const PARTITION_STRATEGY_LIST: u8 = 108u8;
+pub const PARTITION_STRATEGY_RANGE: u8 = 114u8;
+pub const FKCONSTR_ACTION_NOACTION: u8 = 97u8;
+pub const FKCONSTR_ACTION_RESTRICT: u8 = 114u8;
+pub const FKCONSTR_ACTION_CASCADE: u8 = 99u8;
+pub const FKCONSTR_ACTION_SETNULL: u8 = 110u8;
+pub const FKCONSTR_ACTION_SETDEFAULT: u8 = 100u8;
+pub const FKCONSTR_MATCH_FULL: u8 = 102u8;
+pub const FKCONSTR_MATCH_PARTIAL: u8 = 112u8;
+pub const FKCONSTR_MATCH_SIMPLE: u8 = 115u8;
+pub const OPCLASS_ITEM_OPERATOR: u32 = 1;
+pub const OPCLASS_ITEM_FUNCTION: u32 = 2;
+pub const OPCLASS_ITEM_STORAGETYPE: u32 = 3;
+pub const CURSOR_OPT_BINARY: u32 = 1;
+pub const CURSOR_OPT_SCROLL: u32 = 2;
+pub const CURSOR_OPT_NO_SCROLL: u32 = 4;
+pub const CURSOR_OPT_INSENSITIVE: u32 = 8;
+pub const CURSOR_OPT_ASENSITIVE: u32 = 16;
+pub const CURSOR_OPT_HOLD: u32 = 32;
+pub const CURSOR_OPT_FAST_PLAN: u32 = 256;
+pub const CURSOR_OPT_GENERIC_PLAN: u32 = 512;
+pub const CURSOR_OPT_CUSTOM_PLAN: u32 = 1024;
+pub const CURSOR_OPT_PARALLEL_OK: u32 = 2048;
+pub const __DARWIN_CLK_TCK: u32 = 100;
+pub const CHAR_BIT: u32 = 8;
+pub const MB_LEN_MAX: u32 = 6;
+pub const CLK_TCK: u32 = 100;
+pub const SCHAR_MAX: u32 = 127;
+pub const SCHAR_MIN: i32 = -128;
+pub const UCHAR_MAX: u32 = 255;
+pub const CHAR_MAX: u32 = 127;
+pub const CHAR_MIN: i32 = -128;
+pub const USHRT_MAX: u32 = 65535;
+pub const SHRT_MAX: u32 = 32767;
+pub const SHRT_MIN: i32 = -32768;
+pub const UINT_MAX: u32 = 4294967295;
+pub const INT_MAX: u32 = 2147483647;
+pub const INT_MIN: i32 = -2147483648;
+pub const ULONG_MAX: i32 = -1;
+pub const LONG_MAX: u64 = 9223372036854775807;
+pub const LONG_MIN: i64 = -9223372036854775808;
+pub const ULLONG_MAX: i32 = -1;
+pub const LLONG_MAX: u64 = 9223372036854775807;
+pub const LLONG_MIN: i64 = -9223372036854775808;
+pub const LONG_BIT: u32 = 64;
+pub const SSIZE_MAX: u64 = 9223372036854775807;
+pub const WORD_BIT: u32 = 32;
+pub const SIZE_T_MAX: i32 = -1;
+pub const UQUAD_MAX: i32 = -1;
+pub const QUAD_MAX: u64 = 9223372036854775807;
+pub const QUAD_MIN: i64 = -9223372036854775808;
+pub const ARG_MAX: u32 = 1048576;
+pub const CHILD_MAX: u32 = 266;
+pub const GID_MAX: u32 = 2147483647;
+pub const LINK_MAX: u32 = 32767;
+pub const MAX_CANON: u32 = 1024;
+pub const MAX_INPUT: u32 = 1024;
+pub const NAME_MAX: u32 = 255;
+pub const NGROUPS_MAX: u32 = 16;
+pub const UID_MAX: u32 = 2147483647;
+pub const OPEN_MAX: u32 = 10240;
+pub const PATH_MAX: u32 = 1024;
+pub const PIPE_BUF: u32 = 512;
+pub const BC_BASE_MAX: u32 = 99;
+pub const BC_DIM_MAX: u32 = 2048;
+pub const BC_SCALE_MAX: u32 = 99;
+pub const BC_STRING_MAX: u32 = 1000;
+pub const CHARCLASS_NAME_MAX: u32 = 14;
+pub const COLL_WEIGHTS_MAX: u32 = 2;
+pub const EQUIV_CLASS_MAX: u32 = 2;
+pub const EXPR_NEST_MAX: u32 = 32;
+pub const LINE_MAX: u32 = 2048;
+pub const RE_DUP_MAX: u32 = 255;
+pub const NZERO: u32 = 20;
+pub const _POSIX_ARG_MAX: u32 = 4096;
+pub const _POSIX_CHILD_MAX: u32 = 25;
+pub const _POSIX_LINK_MAX: u32 = 8;
+pub const _POSIX_MAX_CANON: u32 = 255;
+pub const _POSIX_MAX_INPUT: u32 = 255;
+pub const _POSIX_NAME_MAX: u32 = 14;
+pub const _POSIX_NGROUPS_MAX: u32 = 8;
+pub const _POSIX_OPEN_MAX: u32 = 20;
+pub const _POSIX_PATH_MAX: u32 = 256;
+pub const _POSIX_PIPE_BUF: u32 = 512;
+pub const _POSIX_SSIZE_MAX: u32 = 32767;
+pub const _POSIX_STREAM_MAX: u32 = 8;
+pub const _POSIX_TZNAME_MAX: u32 = 6;
+pub const _POSIX2_BC_BASE_MAX: u32 = 99;
+pub const _POSIX2_BC_DIM_MAX: u32 = 2048;
+pub const _POSIX2_BC_SCALE_MAX: u32 = 99;
+pub const _POSIX2_BC_STRING_MAX: u32 = 1000;
+pub const _POSIX2_EQUIV_CLASS_MAX: u32 = 2;
+pub const _POSIX2_EXPR_NEST_MAX: u32 = 32;
+pub const _POSIX2_LINE_MAX: u32 = 2048;
+pub const _POSIX2_RE_DUP_MAX: u32 = 255;
+pub const _POSIX_AIO_LISTIO_MAX: u32 = 2;
+pub const _POSIX_AIO_MAX: u32 = 1;
+pub const _POSIX_DELAYTIMER_MAX: u32 = 32;
+pub const _POSIX_MQ_OPEN_MAX: u32 = 8;
+pub const _POSIX_MQ_PRIO_MAX: u32 = 32;
+pub const _POSIX_RTSIG_MAX: u32 = 8;
+pub const _POSIX_SEM_NSEMS_MAX: u32 = 256;
+pub const _POSIX_SEM_VALUE_MAX: u32 = 32767;
+pub const _POSIX_SIGQUEUE_MAX: u32 = 32;
+pub const _POSIX_TIMER_MAX: u32 = 32;
+pub const _POSIX_CLOCKRES_MIN: u32 = 20000000;
+pub const _POSIX_THREAD_DESTRUCTOR_ITERATIONS: u32 = 4;
+pub const _POSIX_THREAD_KEYS_MAX: u32 = 128;
+pub const _POSIX_THREAD_THREADS_MAX: u32 = 64;
+pub const PTHREAD_DESTRUCTOR_ITERATIONS: u32 = 4;
+pub const PTHREAD_KEYS_MAX: u32 = 512;
+pub const PTHREAD_STACK_MIN: u32 = 16384;
+pub const _POSIX_HOST_NAME_MAX: u32 = 255;
+pub const _POSIX_LOGIN_NAME_MAX: u32 = 9;
+pub const _POSIX_SS_REPL_MAX: u32 = 4;
+pub const _POSIX_SYMLINK_MAX: u32 = 255;
+pub const _POSIX_SYMLOOP_MAX: u32 = 8;
+pub const _POSIX_TRACE_EVENT_NAME_MAX: u32 = 30;
+pub const _POSIX_TRACE_NAME_MAX: u32 = 8;
+pub const _POSIX_TRACE_SYS_MAX: u32 = 8;
+pub const _POSIX_TRACE_USER_EVENT_MAX: u32 = 32;
+pub const _POSIX_TTY_NAME_MAX: u32 = 9;
+pub const _POSIX2_CHARCLASS_NAME_MAX: u32 = 14;
+pub const _POSIX2_COLL_WEIGHTS_MAX: u32 = 2;
+pub const _POSIX_RE_DUP_MAX: u32 = 255;
+pub const OFF_MIN: i64 = -9223372036854775808;
+pub const OFF_MAX: u64 = 9223372036854775807;
+pub const PASS_MAX: u32 = 128;
+pub const NL_ARGMAX: u32 = 9;
+pub const NL_LANGMAX: u32 = 14;
+pub const NL_MSGMAX: u32 = 32767;
+pub const NL_NMAX: u32 = 1;
+pub const NL_SETMAX: u32 = 255;
+pub const NL_TEXTMAX: u32 = 2048;
+pub const _XOPEN_IOV_MAX: u32 = 16;
+pub const IOV_MAX: u32 = 1024;
+pub const _XOPEN_NAME_MAX: u32 = 255;
+pub const _XOPEN_PATH_MAX: u32 = 1024;
+pub const DSM_IMPL_POSIX: u32 = 1;
+pub const DSM_IMPL_SYSV: u32 = 2;
+pub const DSM_IMPL_WINDOWS: u32 = 3;
+pub const DSM_IMPL_MMAP: u32 = 4;
+pub const DEFAULT_DYNAMIC_SHARED_MEMORY_TYPE: u32 = 1;
+pub const PG_DYNSHMEM_DIR: &[u8; 12usize] = b"pg_dynshmem\0";
+pub const PG_DYNSHMEM_MMAP_FILE_PREFIX: &[u8; 6usize] = b"mmap.\0";
+pub const DSM_CREATE_NULL_IF_MAXSEGMENTS: u32 = 1;
+pub const DSM_HANDLE_INVALID: u32 = 0;
+pub const SIZEOF_DSA_POINTER: u32 = 8;
+pub const DSA_POINTER_FORMAT: &[u8; 7usize] = b"%016lx\0";
+pub const DSA_ALLOC_HUGE: u32 = 1;
+pub const DSA_ALLOC_NO_OOM: u32 = 2;
+pub const DSA_ALLOC_ZERO: u32 = 4;
+pub const DEFAULT_SPINS_PER_DELAY: u32 = 100;
+pub const HASH_PARTITION: u32 = 1;
+pub const HASH_SEGMENT: u32 = 2;
+pub const HASH_DIRSIZE: u32 = 4;
+pub const HASH_ELEM: u32 = 8;
+pub const HASH_STRINGS: u32 = 16;
+pub const HASH_BLOBS: u32 = 32;
+pub const HASH_FUNCTION: u32 = 64;
+pub const HASH_COMPARE: u32 = 128;
+pub const HASH_KEYCOPY: u32 = 256;
+pub const HASH_ALLOC: u32 = 512;
+pub const HASH_CONTEXT: u32 = 1024;
+pub const HASH_SHARED_MEM: u32 = 2048;
+pub const HASH_ATTACH: u32 = 4096;
+pub const HASH_FIXED_SIZE: u32 = 8192;
+pub const NO_MAX_DSIZE: i32 = -1;
+pub const __DARWIN_MAXNAMLEN: u32 = 255;
+pub const __DARWIN_MAXPATHLEN: u32 = 1024;
+pub const MAXNAMLEN: u32 = 255;
+pub const DT_UNKNOWN: u32 = 0;
+pub const DT_FIFO: u32 = 1;
+pub const DT_CHR: u32 = 2;
+pub const DT_DIR: u32 = 4;
+pub const DT_BLK: u32 = 6;
+pub const DT_REG: u32 = 8;
+pub const DT_LNK: u32 = 10;
+pub const DT_SOCK: u32 = 12;
+pub const DT_WHT: u32 = 14;
+pub const DIRBLKSIZ: u32 = 1024;
+pub const DTF_HIDEW: u32 = 1;
+pub const DTF_NODUP: u32 = 2;
+pub const DTF_REWIND: u32 = 4;
+pub const __DTF_READALL: u32 = 8;
+pub const __DTF_SKIPREAD: u32 = 16;
+pub const __DTF_ATEND: u32 = 32;
+pub const PG_O_DIRECT: u32 = 2147483648;
+pub const PG_TEMP_FILES_DIR: &[u8; 10usize] = b"pgsql_tmp\0";
+pub const PG_TEMP_FILE_PREFIX: &[u8; 10usize] = b"pgsql_tmp\0";
+pub const SHARED_TUPLESTORE_SINGLE_PASS: u32 = 1;
+pub const MAX_TIMESTAMP_PRECISION: u32 = 6;
+pub const MAX_INTERVAL_PRECISION: u32 = 6;
+pub const TS_PREC_INV: f64 = 1000000.0;
+pub const DAYS_PER_YEAR: f64 = 365.25;
+pub const MONTHS_PER_YEAR: u32 = 12;
+pub const DAYS_PER_MONTH: u32 = 30;
+pub const HOURS_PER_DAY: u32 = 24;
+pub const SECS_PER_YEAR: u32 = 31557600;
+pub const SECS_PER_DAY: u32 = 86400;
+pub const SECS_PER_HOUR: u32 = 3600;
+pub const SECS_PER_MINUTE: u32 = 60;
+pub const MINS_PER_HOUR: u32 = 60;
+pub const MAX_TZDISP_HOUR: u32 = 15;
+pub const TZDISP_LIMIT: u32 = 57600;
+pub const JULIAN_MINYEAR: i32 = -4713;
+pub const JULIAN_MINMONTH: u32 = 11;
+pub const JULIAN_MINDAY: u32 = 24;
+pub const JULIAN_MAXYEAR: u32 = 5874898;
+pub const JULIAN_MAXMONTH: u32 = 6;
+pub const JULIAN_MAXDAY: u32 = 3;
+pub const UNIX_EPOCH_JDATE: u32 = 2440588;
+pub const POSTGRES_EPOCH_JDATE: u32 = 2451545;
+pub const DATETIME_MIN_JULIAN: u32 = 0;
+pub const DATE_END_JULIAN: u32 = 2147483494;
+pub const TIMESTAMP_END_JULIAN: u32 = 109203528;
+pub const RELCACHE_INIT_FILENAME: &[u8; 17usize] = b"pg_internal.init\0";
+pub const INDEX_SIZE_MASK: u32 = 8191;
+pub const INDEX_AM_RESERVED_BIT: u32 = 8192;
+pub const INDEX_VAR_MASK: u32 = 16384;
+pub const INDEX_NULL_MASK: u32 = 32768;
+pub const NUM_TUPLESORTMETHODS: u32 = 4;
+pub const TUPLESORT_NONE: u32 = 0;
+pub const TUPLESORT_RANDOMACCESS: u32 = 1;
+pub const TUPLESORT_ALLOWBOUNDED: u32 = 2;
+pub const EEO_FLAG_IS_QUAL: u32 = 1;
+pub const FIELDNO_EXPRSTATE_RESNULL: u32 = 2;
+pub const FIELDNO_EXPRSTATE_RESVALUE: u32 = 3;
+pub const FIELDNO_EXPRSTATE_RESULTSLOT: u32 = 4;
+pub const FIELDNO_EXPRSTATE_PARENT: u32 = 11;
+pub const FIELDNO_EXPRCONTEXT_SCANTUPLE: u32 = 1;
+pub const FIELDNO_EXPRCONTEXT_INNERTUPLE: u32 = 2;
+pub const FIELDNO_EXPRCONTEXT_OUTERTUPLE: u32 = 3;
+pub const FIELDNO_EXPRCONTEXT_AGGVALUES: u32 = 8;
+pub const FIELDNO_EXPRCONTEXT_AGGNULLS: u32 = 9;
+pub const FIELDNO_EXPRCONTEXT_CASEDATUM: u32 = 10;
+pub const FIELDNO_EXPRCONTEXT_CASENULL: u32 = 11;
+pub const FIELDNO_EXPRCONTEXT_DOMAINDATUM: u32 = 12;
+pub const FIELDNO_EXPRCONTEXT_DOMAINNULL: u32 = 13;
+pub const MERGE_INSERT: u32 = 1;
+pub const MERGE_UPDATE: u32 = 2;
+pub const MERGE_DELETE: u32 = 4;
+pub const FIELDNO_AGGSTATE_CURAGGCONTEXT: u32 = 14;
+pub const FIELDNO_AGGSTATE_CURPERTRANS: u32 = 16;
+pub const FIELDNO_AGGSTATE_CURRENT_SET: u32 = 20;
+pub const FIELDNO_AGGSTATE_ALL_PERGROUPS: u32 = 53;
+pub const COMPLETION_TAG_BUFSIZE: u32 = 64;
+pub const MaxAllocHugeSize: u32 = 0;
+pub const ALLOCSET_DEFAULT_MINSIZE: u32 = 0;
+pub const ALLOCSET_DEFAULT_INITSIZE: u32 = 8192;
+pub const ALLOCSET_DEFAULT_MAXSIZE: u32 = 8388608;
+pub const ALLOCSET_SMALL_MINSIZE: u32 = 0;
+pub const ALLOCSET_SMALL_INITSIZE: u32 = 1024;
+pub const ALLOCSET_SMALL_MAXSIZE: u32 = 8192;
+pub const ALLOCSET_SEPARATE_THRESHOLD: u32 = 8192;
+pub const SLAB_DEFAULT_BLOCK_SIZE: u32 = 8192;
+pub const SLAB_LARGE_BLOCK_SIZE: u32 = 8388608;
+pub const EXEC_FLAG_EXPLAIN_ONLY: u32 = 1;
+pub const EXEC_FLAG_REWIND: u32 = 2;
+pub const EXEC_FLAG_BACKWARD: u32 = 4;
+pub const EXEC_FLAG_MARK: u32 = 8;
+pub const EXEC_FLAG_SKIP_TRIGGERS: u32 = 16;
+pub const EXEC_FLAG_WITH_NO_DATA: u32 = 32;
+pub const SRF_SINGLE_USE_EXPECTED: u32 = 1;
+pub const SRF_SINGLE_BLESS: u32 = 2;
+pub const TZ_STRLEN_MAX: u32 = 255;
+pub const InvalidPid: i32 = -1;
+pub const USE_POSTGRES_DATES: u32 = 0;
+pub const USE_ISO_DATES: u32 = 1;
+pub const USE_SQL_DATES: u32 = 2;
+pub const USE_GERMAN_DATES: u32 = 3;
+pub const USE_XSD_DATES: u32 = 4;
+pub const DATEORDER_YMD: u32 = 0;
+pub const DATEORDER_DMY: u32 = 1;
+pub const DATEORDER_MDY: u32 = 2;
+pub const INTSTYLE_POSTGRES: u32 = 0;
+pub const INTSTYLE_POSTGRES_VERBOSE: u32 = 1;
+pub const INTSTYLE_SQL_STANDARD: u32 = 2;
+pub const INTSTYLE_ISO_8601: u32 = 3;
+pub const MAXTZLEN: u32 = 10;
+pub const SECURITY_LOCAL_USERID_CHANGE: u32 = 1;
+pub const SECURITY_RESTRICTED_OPERATION: u32 = 2;
+pub const SECURITY_NOFORCE_RLS: u32 = 4;
+pub const MIN_XFN_CHARS: u32 = 16;
+pub const MAX_XFN_CHARS: u32 = 40;
+pub const VALID_XFN_CHARS: &[u8; 40usize] = b"0123456789ABCDEF.history.backup.partial\0";
+pub const PGSTAT_NUM_PROGRESS_PARAM: u32 = 20;
 pub const KEV_INET_SUBCLASS: u32 = 1;
 pub const KEV_INET_NEW_ADDR: u32 = 1;
 pub const KEV_INET_CHANGED_ADDR: u32 = 2;
@@ -1659,983 +2631,6 @@ pub const NI_NUMERICSCOPE: u32 = 256;
 pub const NI_DGRAM: u32 = 16;
 pub const NI_WITHSCOPEID: u32 = 32;
 pub const SCOPE_DELIMITER: u8 = 37u8;
-pub const _PATH_PWD: &[u8; 5usize] = b"/etc\0";
-pub const _PATH_PASSWD: &[u8; 12usize] = b"/etc/passwd\0";
-pub const _PASSWD: &[u8; 7usize] = b"passwd\0";
-pub const _PATH_MASTERPASSWD: &[u8; 19usize] = b"/etc/master.passwd\0";
-pub const _PATH_MASTERPASSWD_LOCK: &[u8; 10usize] = b"/etc/ptmp\0";
-pub const _MASTERPASSWD: &[u8; 14usize] = b"master.passwd\0";
-pub const _PATH_MP_DB: &[u8; 12usize] = b"/etc/pwd.db\0";
-pub const _MP_DB: &[u8; 7usize] = b"pwd.db\0";
-pub const _PATH_SMP_DB: &[u8; 13usize] = b"/etc/spwd.db\0";
-pub const _SMP_DB: &[u8; 8usize] = b"spwd.db\0";
-pub const _PATH_PWD_MKDB: &[u8; 19usize] = b"/usr/sbin/pwd_mkdb\0";
-pub const _PW_KEYBYNAME: u8 = 49u8;
-pub const _PW_KEYBYNUM: u8 = 50u8;
-pub const _PW_KEYBYUID: u8 = 51u8;
-pub const _PASSWORD_EFMT1: u8 = 95u8;
-pub const _PASSWORD_LEN: u32 = 128;
-pub const _PASSWORD_NOUID: u32 = 1;
-pub const _PASSWORD_NOGID: u32 = 2;
-pub const _PASSWORD_NOCHG: u32 = 4;
-pub const _PASSWORD_NOEXP: u32 = 8;
-pub const _PASSWORD_WARNDAYS: u32 = 14;
-pub const _PASSWORD_CHGNOW: i32 = -1;
-pub const PGINVALID_SOCKET: i32 = -1;
-pub const PG_BACKEND_VERSIONSTR: &[u8; 28usize] = b"postgres (PostgreSQL) 14.5\n\0";
-pub const EXE: &[u8; 1usize] = b"\0";
-pub const DEVNULL: &[u8; 10usize] = b"/dev/null\0";
-pub const USE_REPL_SNPRINTF: u32 = 1;
-pub const PG_STRERROR_R_BUFLEN: u32 = 256;
-pub const PG_IOLBF: u32 = 1;
-pub const FP_SUPERNORMAL: u32 = 6;
-pub const FP_FAST_FMA: u32 = 1;
-pub const FP_FAST_FMAF: u32 = 1;
-pub const FP_FAST_FMAL: u32 = 1;
-pub const FP_ILOGB0: i32 = -2147483648;
-pub const FP_ILOGBNAN: i32 = -2147483648;
-pub const MATH_ERRNO: u32 = 1;
-pub const MATH_ERREXCEPT: u32 = 2;
-pub const M_E: f64 = 2.718281828459045;
-pub const M_LOG2E: f64 = 1.4426950408889634;
-pub const M_LOG10E: f64 = 0.4342944819032518;
-pub const M_LN2: f64 = 0.6931471805599453;
-pub const M_LN10: f64 = 2.302585092994046;
-pub const M_PI: f64 = 3.141592653589793;
-pub const M_PI_2: f64 = 1.5707963267948966;
-pub const M_PI_4: f64 = 0.7853981633974483;
-pub const M_1_PI: f64 = 0.3183098861837907;
-pub const M_2_PI: f64 = 0.6366197723675814;
-pub const M_2_SQRTPI: f64 = 1.1283791670955126;
-pub const M_SQRT2: f64 = 1.4142135623730951;
-pub const M_SQRT1_2: f64 = 0.7071067811865476;
-pub const DOMAIN: u32 = 1;
-pub const SING: u32 = 2;
-pub const OVERFLOW: u32 = 3;
-pub const UNDERFLOW: u32 = 4;
-pub const TLOSS: u32 = 5;
-pub const PLOSS: u32 = 6;
-pub const _JBLEN: u32 = 48;
-pub const DEBUG5: u32 = 10;
-pub const DEBUG4: u32 = 11;
-pub const DEBUG3: u32 = 12;
-pub const DEBUG2: u32 = 13;
-pub const DEBUG1: u32 = 14;
-pub const LOG: u32 = 15;
-pub const LOG_SERVER_ONLY: u32 = 16;
-pub const COMMERROR: u32 = 16;
-pub const INFO: u32 = 17;
-pub const NOTICE: u32 = 18;
-pub const WARNING: u32 = 19;
-pub const PGWARNING: u32 = 19;
-pub const WARNING_CLIENT_ONLY: u32 = 20;
-pub const ERROR: u32 = 21;
-pub const PGERROR: u32 = 21;
-pub const FATAL: u32 = 22;
-pub const PANIC: u32 = 23;
-pub const LOG_DESTINATION_STDERR: u32 = 1;
-pub const LOG_DESTINATION_SYSLOG: u32 = 2;
-pub const LOG_DESTINATION_EVENTLOG: u32 = 4;
-pub const LOG_DESTINATION_CSVLOG: u32 = 8;
-pub const MCXT_ALLOC_HUGE: u32 = 1;
-pub const MCXT_ALLOC_NO_OOM: u32 = 2;
-pub const MCXT_ALLOC_ZERO: u32 = 4;
-pub const VARLENA_EXTSIZE_BITS: u32 = 30;
-pub const VARLENA_EXTSIZE_MASK: u32 = 1073741823;
-pub const VARATT_SHORT_MAX: u32 = 127;
-pub const FIELDNO_NULLABLE_DATUM_DATUM: u32 = 0;
-pub const FIELDNO_NULLABLE_DATUM_ISNULL: u32 = 1;
-pub const SIZEOF_DATUM: u32 = 8;
-pub const InvalidAttrNumber: u32 = 0;
-pub const MaxAttrNumber: u32 = 32767;
-pub const AttributeRelationId: u32 = 1249;
-pub const AttributeRelation_Rowtype_Id: u32 = 75;
-pub const Anum_pg_attribute_attrelid: u32 = 1;
-pub const Anum_pg_attribute_attname: u32 = 2;
-pub const Anum_pg_attribute_atttypid: u32 = 3;
-pub const Anum_pg_attribute_attstattarget: u32 = 4;
-pub const Anum_pg_attribute_attlen: u32 = 5;
-pub const Anum_pg_attribute_attnum: u32 = 6;
-pub const Anum_pg_attribute_attndims: u32 = 7;
-pub const Anum_pg_attribute_attcacheoff: u32 = 8;
-pub const Anum_pg_attribute_atttypmod: u32 = 9;
-pub const Anum_pg_attribute_attbyval: u32 = 10;
-pub const Anum_pg_attribute_attalign: u32 = 11;
-pub const Anum_pg_attribute_attstorage: u32 = 12;
-pub const Anum_pg_attribute_attcompression: u32 = 13;
-pub const Anum_pg_attribute_attnotnull: u32 = 14;
-pub const Anum_pg_attribute_atthasdef: u32 = 15;
-pub const Anum_pg_attribute_atthasmissing: u32 = 16;
-pub const Anum_pg_attribute_attidentity: u32 = 17;
-pub const Anum_pg_attribute_attgenerated: u32 = 18;
-pub const Anum_pg_attribute_attisdropped: u32 = 19;
-pub const Anum_pg_attribute_attislocal: u32 = 20;
-pub const Anum_pg_attribute_attinhcount: u32 = 21;
-pub const Anum_pg_attribute_attcollation: u32 = 22;
-pub const Anum_pg_attribute_attacl: u32 = 23;
-pub const Anum_pg_attribute_attoptions: u32 = 24;
-pub const Anum_pg_attribute_attfdwoptions: u32 = 25;
-pub const Anum_pg_attribute_attmissingval: u32 = 26;
-pub const Natts_pg_attribute: u32 = 26;
-pub const ATTRIBUTE_IDENTITY_ALWAYS: u8 = 97u8;
-pub const ATTRIBUTE_IDENTITY_BY_DEFAULT: u8 = 100u8;
-pub const ATTRIBUTE_GENERATED_STORED: u8 = 115u8;
-pub const AttributeRelidNameIndexId: u32 = 2658;
-pub const AttributeRelidNumIndexId: u32 = 2659;
-pub const AGGSPLITOP_COMBINE: u32 = 1;
-pub const AGGSPLITOP_SKIPFINAL: u32 = 2;
-pub const AGGSPLITOP_SERIALIZE: u32 = 4;
-pub const AGGSPLITOP_DESERIALIZE: u32 = 8;
-pub const LP_UNUSED: u32 = 0;
-pub const LP_NORMAL: u32 = 1;
-pub const LP_REDIRECT: u32 = 2;
-pub const LP_DEAD: u32 = 3;
-pub const SpecTokenOffsetNumber: u32 = 65534;
-pub const MovedPartitionsOffsetNumber: u32 = 65533;
-pub const FIELDNO_HEAPTUPLEDATA_DATA: u32 = 3;
-pub const O_RDONLY: u32 = 0;
-pub const O_WRONLY: u32 = 1;
-pub const O_RDWR: u32 = 2;
-pub const O_ACCMODE: u32 = 3;
-pub const FREAD: u32 = 1;
-pub const FWRITE: u32 = 2;
-pub const O_NONBLOCK: u32 = 4;
-pub const O_APPEND: u32 = 8;
-pub const O_SYNC: u32 = 128;
-pub const O_SHLOCK: u32 = 16;
-pub const O_EXLOCK: u32 = 32;
-pub const O_ASYNC: u32 = 64;
-pub const O_FSYNC: u32 = 128;
-pub const O_NOFOLLOW: u32 = 256;
-pub const O_CREAT: u32 = 512;
-pub const O_TRUNC: u32 = 1024;
-pub const O_EXCL: u32 = 2048;
-pub const O_EVTONLY: u32 = 32768;
-pub const O_NOCTTY: u32 = 131072;
-pub const O_DIRECTORY: u32 = 1048576;
-pub const O_SYMLINK: u32 = 2097152;
-pub const O_DSYNC: u32 = 4194304;
-pub const O_CLOEXEC: u32 = 16777216;
-pub const O_NOFOLLOW_ANY: u32 = 536870912;
-pub const AT_FDCWD: i32 = -2;
-pub const AT_EACCESS: u32 = 16;
-pub const AT_SYMLINK_NOFOLLOW: u32 = 32;
-pub const AT_SYMLINK_FOLLOW: u32 = 64;
-pub const AT_REMOVEDIR: u32 = 128;
-pub const AT_REALDEV: u32 = 512;
-pub const AT_FDONLY: u32 = 1024;
-pub const AT_SYMLINK_NOFOLLOW_ANY: u32 = 2048;
-pub const O_DP_GETRAWENCRYPTED: u32 = 1;
-pub const O_DP_GETRAWUNENCRYPTED: u32 = 2;
-pub const FAPPEND: u32 = 8;
-pub const FASYNC: u32 = 64;
-pub const FFSYNC: u32 = 128;
-pub const FFDSYNC: u32 = 4194304;
-pub const FNONBLOCK: u32 = 4;
-pub const FNDELAY: u32 = 4;
-pub const O_NDELAY: u32 = 4;
-pub const CPF_OVERWRITE: u32 = 1;
-pub const CPF_IGNORE_MODE: u32 = 2;
-pub const CPF_MASK: u32 = 3;
-pub const F_DUPFD: u32 = 0;
-pub const F_GETFD: u32 = 1;
-pub const F_SETFD: u32 = 2;
-pub const F_GETFL: u32 = 3;
-pub const F_SETFL: u32 = 4;
-pub const F_GETOWN: u32 = 5;
-pub const F_SETOWN: u32 = 6;
-pub const F_GETLK: u32 = 7;
-pub const F_SETLK: u32 = 8;
-pub const F_SETLKW: u32 = 9;
-pub const F_SETLKWTIMEOUT: u32 = 10;
-pub const F_FLUSH_DATA: u32 = 40;
-pub const F_CHKCLEAN: u32 = 41;
-pub const F_PREALLOCATE: u32 = 42;
-pub const F_SETSIZE: u32 = 43;
-pub const F_RDADVISE: u32 = 44;
-pub const F_RDAHEAD: u32 = 45;
-pub const F_NOCACHE: u32 = 48;
-pub const F_LOG2PHYS: u32 = 49;
-pub const F_GETPATH: u32 = 50;
-pub const F_FULLFSYNC: u32 = 51;
-pub const F_PATHPKG_CHECK: u32 = 52;
-pub const F_FREEZE_FS: u32 = 53;
-pub const F_THAW_FS: u32 = 54;
-pub const F_GLOBAL_NOCACHE: u32 = 55;
-pub const F_ADDSIGS: u32 = 59;
-pub const F_ADDFILESIGS: u32 = 61;
-pub const F_NODIRECT: u32 = 62;
-pub const F_GETPROTECTIONCLASS: u32 = 63;
-pub const F_SETPROTECTIONCLASS: u32 = 64;
-pub const F_LOG2PHYS_EXT: u32 = 65;
-pub const F_GETLKPID: u32 = 66;
-pub const F_SETBACKINGSTORE: u32 = 70;
-pub const F_GETPATH_MTMINFO: u32 = 71;
-pub const F_GETCODEDIR: u32 = 72;
-pub const F_SETNOSIGPIPE: u32 = 73;
-pub const F_GETNOSIGPIPE: u32 = 74;
-pub const F_TRANSCODEKEY: u32 = 75;
-pub const F_SINGLE_WRITER: u32 = 76;
-pub const F_GETPROTECTIONLEVEL: u32 = 77;
-pub const F_FINDSIGS: u32 = 78;
-pub const F_ADDFILESIGS_FOR_DYLD_SIM: u32 = 83;
-pub const F_BARRIERFSYNC: u32 = 85;
-pub const F_ADDFILESIGS_RETURN: u32 = 97;
-pub const F_CHECK_LV: u32 = 98;
-pub const F_PUNCHHOLE: u32 = 99;
-pub const F_TRIM_ACTIVE_FILE: u32 = 100;
-pub const F_SPECULATIVE_READ: u32 = 101;
-pub const F_GETPATH_NOFIRMLINK: u32 = 102;
-pub const F_ADDFILESIGS_INFO: u32 = 103;
-pub const F_ADDFILESUPPL: u32 = 104;
-pub const F_GETSIGSINFO: u32 = 105;
-pub const F_FSRESERVED: u32 = 106;
-pub const FCNTL_FS_SPECIFIC_BASE: u32 = 65536;
-pub const F_DUPFD_CLOEXEC: u32 = 67;
-pub const FD_CLOEXEC: u32 = 1;
-pub const F_RDLCK: u32 = 1;
-pub const F_UNLCK: u32 = 2;
-pub const F_WRLCK: u32 = 3;
-pub const SEEK_HOLE: u32 = 3;
-pub const SEEK_DATA: u32 = 4;
-pub const S_IFMT: u32 = 61440;
-pub const S_IFIFO: u32 = 4096;
-pub const S_IFCHR: u32 = 8192;
-pub const S_IFDIR: u32 = 16384;
-pub const S_IFBLK: u32 = 24576;
-pub const S_IFREG: u32 = 32768;
-pub const S_IFLNK: u32 = 40960;
-pub const S_IFSOCK: u32 = 49152;
-pub const S_IFWHT: u32 = 57344;
-pub const S_IRWXU: u32 = 448;
-pub const S_IRUSR: u32 = 256;
-pub const S_IWUSR: u32 = 128;
-pub const S_IXUSR: u32 = 64;
-pub const S_IRWXG: u32 = 56;
-pub const S_IRGRP: u32 = 32;
-pub const S_IWGRP: u32 = 16;
-pub const S_IXGRP: u32 = 8;
-pub const S_IRWXO: u32 = 7;
-pub const S_IROTH: u32 = 4;
-pub const S_IWOTH: u32 = 2;
-pub const S_IXOTH: u32 = 1;
-pub const S_ISUID: u32 = 2048;
-pub const S_ISGID: u32 = 1024;
-pub const S_ISVTX: u32 = 512;
-pub const S_ISTXT: u32 = 512;
-pub const S_IREAD: u32 = 256;
-pub const S_IWRITE: u32 = 128;
-pub const S_IEXEC: u32 = 64;
-pub const F_ALLOCATECONTIG: u32 = 2;
-pub const F_ALLOCATEALL: u32 = 4;
-pub const F_PEOFPOSMODE: u32 = 3;
-pub const F_VOLPOSMODE: u32 = 4;
-pub const USER_FSIGNATURES_CDHASH_LEN: u32 = 20;
-pub const GETSIGSINFO_PLATFORM_BINARY: u32 = 1;
-pub const LOCK_SH: u32 = 1;
-pub const LOCK_EX: u32 = 2;
-pub const LOCK_NB: u32 = 4;
-pub const LOCK_UN: u32 = 8;
-pub const O_POPUP: u32 = 2147483648;
-pub const O_ALERT: u32 = 536870912;
-pub const InvalidXLogRecPtr: u32 = 0;
-pub const PG_O_DIRECT: u32 = 0;
-pub const OPEN_SYNC_FLAG: u32 = 128;
-pub const OPEN_DATASYNC_FLAG: u32 = 4194304;
-pub const FirstGenbkiObjectId: u32 = 10000;
-pub const FirstBootstrapObjectId: u32 = 12000;
-pub const FirstNormalObjectId: u32 = 16384;
-pub const TypeRelationId: u32 = 1247;
-pub const TypeRelation_Rowtype_Id: u32 = 71;
-pub const Anum_pg_type_oid: u32 = 1;
-pub const Anum_pg_type_typname: u32 = 2;
-pub const Anum_pg_type_typnamespace: u32 = 3;
-pub const Anum_pg_type_typowner: u32 = 4;
-pub const Anum_pg_type_typlen: u32 = 5;
-pub const Anum_pg_type_typbyval: u32 = 6;
-pub const Anum_pg_type_typtype: u32 = 7;
-pub const Anum_pg_type_typcategory: u32 = 8;
-pub const Anum_pg_type_typispreferred: u32 = 9;
-pub const Anum_pg_type_typisdefined: u32 = 10;
-pub const Anum_pg_type_typdelim: u32 = 11;
-pub const Anum_pg_type_typrelid: u32 = 12;
-pub const Anum_pg_type_typsubscript: u32 = 13;
-pub const Anum_pg_type_typelem: u32 = 14;
-pub const Anum_pg_type_typarray: u32 = 15;
-pub const Anum_pg_type_typinput: u32 = 16;
-pub const Anum_pg_type_typoutput: u32 = 17;
-pub const Anum_pg_type_typreceive: u32 = 18;
-pub const Anum_pg_type_typsend: u32 = 19;
-pub const Anum_pg_type_typmodin: u32 = 20;
-pub const Anum_pg_type_typmodout: u32 = 21;
-pub const Anum_pg_type_typanalyze: u32 = 22;
-pub const Anum_pg_type_typalign: u32 = 23;
-pub const Anum_pg_type_typstorage: u32 = 24;
-pub const Anum_pg_type_typnotnull: u32 = 25;
-pub const Anum_pg_type_typbasetype: u32 = 26;
-pub const Anum_pg_type_typtypmod: u32 = 27;
-pub const Anum_pg_type_typndims: u32 = 28;
-pub const Anum_pg_type_typcollation: u32 = 29;
-pub const Anum_pg_type_typdefaultbin: u32 = 30;
-pub const Anum_pg_type_typdefault: u32 = 31;
-pub const Anum_pg_type_typacl: u32 = 32;
-pub const Natts_pg_type: u32 = 32;
-pub const TYPTYPE_BASE: u8 = 98u8;
-pub const TYPTYPE_COMPOSITE: u8 = 99u8;
-pub const TYPTYPE_DOMAIN: u8 = 100u8;
-pub const TYPTYPE_ENUM: u8 = 101u8;
-pub const TYPTYPE_MULTIRANGE: u8 = 109u8;
-pub const TYPTYPE_PSEUDO: u8 = 112u8;
-pub const TYPTYPE_RANGE: u8 = 114u8;
-pub const TYPCATEGORY_INVALID: u8 = 0u8;
-pub const TYPCATEGORY_ARRAY: u8 = 65u8;
-pub const TYPCATEGORY_BOOLEAN: u8 = 66u8;
-pub const TYPCATEGORY_COMPOSITE: u8 = 67u8;
-pub const TYPCATEGORY_DATETIME: u8 = 68u8;
-pub const TYPCATEGORY_ENUM: u8 = 69u8;
-pub const TYPCATEGORY_GEOMETRIC: u8 = 71u8;
-pub const TYPCATEGORY_NETWORK: u8 = 73u8;
-pub const TYPCATEGORY_NUMERIC: u8 = 78u8;
-pub const TYPCATEGORY_PSEUDOTYPE: u8 = 80u8;
-pub const TYPCATEGORY_RANGE: u8 = 82u8;
-pub const TYPCATEGORY_STRING: u8 = 83u8;
-pub const TYPCATEGORY_TIMESPAN: u8 = 84u8;
-pub const TYPCATEGORY_USER: u8 = 85u8;
-pub const TYPCATEGORY_BITSTRING: u8 = 86u8;
-pub const TYPCATEGORY_UNKNOWN: u8 = 88u8;
-pub const TYPALIGN_CHAR: u8 = 99u8;
-pub const TYPALIGN_SHORT: u8 = 115u8;
-pub const TYPALIGN_INT: u8 = 105u8;
-pub const TYPALIGN_DOUBLE: u8 = 100u8;
-pub const TYPSTORAGE_PLAIN: u8 = 112u8;
-pub const TYPSTORAGE_EXTERNAL: u8 = 101u8;
-pub const TYPSTORAGE_EXTENDED: u8 = 120u8;
-pub const TYPSTORAGE_MAIN: u8 = 109u8;
-pub const BOOLOID: u32 = 16;
-pub const BYTEAOID: u32 = 17;
-pub const CHAROID: u32 = 18;
-pub const NAMEOID: u32 = 19;
-pub const INT8OID: u32 = 20;
-pub const INT2OID: u32 = 21;
-pub const INT2VECTOROID: u32 = 22;
-pub const INT4OID: u32 = 23;
-pub const REGPROCOID: u32 = 24;
-pub const TEXTOID: u32 = 25;
-pub const OIDOID: u32 = 26;
-pub const TIDOID: u32 = 27;
-pub const XIDOID: u32 = 28;
-pub const CIDOID: u32 = 29;
-pub const OIDVECTOROID: u32 = 30;
-pub const JSONOID: u32 = 114;
-pub const XMLOID: u32 = 142;
-pub const PG_NODE_TREEOID: u32 = 194;
-pub const PG_NDISTINCTOID: u32 = 3361;
-pub const PG_DEPENDENCIESOID: u32 = 3402;
-pub const PG_MCV_LISTOID: u32 = 5017;
-pub const PG_DDL_COMMANDOID: u32 = 32;
-pub const XID8OID: u32 = 5069;
-pub const POINTOID: u32 = 600;
-pub const LSEGOID: u32 = 601;
-pub const PATHOID: u32 = 602;
-pub const BOXOID: u32 = 603;
-pub const POLYGONOID: u32 = 604;
-pub const LINEOID: u32 = 628;
-pub const FLOAT4OID: u32 = 700;
-pub const FLOAT8OID: u32 = 701;
-pub const UNKNOWNOID: u32 = 705;
-pub const CIRCLEOID: u32 = 718;
-pub const MONEYOID: u32 = 790;
-pub const MACADDROID: u32 = 829;
-pub const INETOID: u32 = 869;
-pub const CIDROID: u32 = 650;
-pub const MACADDR8OID: u32 = 774;
-pub const ACLITEMOID: u32 = 1033;
-pub const BPCHAROID: u32 = 1042;
-pub const VARCHAROID: u32 = 1043;
-pub const DATEOID: u32 = 1082;
-pub const TIMEOID: u32 = 1083;
-pub const TIMESTAMPOID: u32 = 1114;
-pub const TIMESTAMPTZOID: u32 = 1184;
-pub const INTERVALOID: u32 = 1186;
-pub const TIMETZOID: u32 = 1266;
-pub const BITOID: u32 = 1560;
-pub const VARBITOID: u32 = 1562;
-pub const NUMERICOID: u32 = 1700;
-pub const REFCURSOROID: u32 = 1790;
-pub const REGPROCEDUREOID: u32 = 2202;
-pub const REGOPEROID: u32 = 2203;
-pub const REGOPERATOROID: u32 = 2204;
-pub const REGCLASSOID: u32 = 2205;
-pub const REGCOLLATIONOID: u32 = 4191;
-pub const REGTYPEOID: u32 = 2206;
-pub const REGROLEOID: u32 = 4096;
-pub const REGNAMESPACEOID: u32 = 4089;
-pub const UUIDOID: u32 = 2950;
-pub const PG_LSNOID: u32 = 3220;
-pub const TSVECTOROID: u32 = 3614;
-pub const GTSVECTOROID: u32 = 3642;
-pub const TSQUERYOID: u32 = 3615;
-pub const REGCONFIGOID: u32 = 3734;
-pub const REGDICTIONARYOID: u32 = 3769;
-pub const JSONBOID: u32 = 3802;
-pub const JSONPATHOID: u32 = 4072;
-pub const TXID_SNAPSHOTOID: u32 = 2970;
-pub const PG_SNAPSHOTOID: u32 = 5038;
-pub const INT4RANGEOID: u32 = 3904;
-pub const NUMRANGEOID: u32 = 3906;
-pub const TSRANGEOID: u32 = 3908;
-pub const TSTZRANGEOID: u32 = 3910;
-pub const DATERANGEOID: u32 = 3912;
-pub const INT8RANGEOID: u32 = 3926;
-pub const INT4MULTIRANGEOID: u32 = 4451;
-pub const NUMMULTIRANGEOID: u32 = 4532;
-pub const TSMULTIRANGEOID: u32 = 4533;
-pub const TSTZMULTIRANGEOID: u32 = 4534;
-pub const DATEMULTIRANGEOID: u32 = 4535;
-pub const INT8MULTIRANGEOID: u32 = 4536;
-pub const RECORDOID: u32 = 2249;
-pub const RECORDARRAYOID: u32 = 2287;
-pub const CSTRINGOID: u32 = 2275;
-pub const ANYOID: u32 = 2276;
-pub const ANYARRAYOID: u32 = 2277;
-pub const VOIDOID: u32 = 2278;
-pub const TRIGGEROID: u32 = 2279;
-pub const EVENT_TRIGGEROID: u32 = 3838;
-pub const LANGUAGE_HANDLEROID: u32 = 2280;
-pub const INTERNALOID: u32 = 2281;
-pub const ANYELEMENTOID: u32 = 2283;
-pub const ANYNONARRAYOID: u32 = 2776;
-pub const ANYENUMOID: u32 = 3500;
-pub const FDW_HANDLEROID: u32 = 3115;
-pub const INDEX_AM_HANDLEROID: u32 = 325;
-pub const TSM_HANDLEROID: u32 = 3310;
-pub const TABLE_AM_HANDLEROID: u32 = 269;
-pub const ANYRANGEOID: u32 = 3831;
-pub const ANYCOMPATIBLEOID: u32 = 5077;
-pub const ANYCOMPATIBLEARRAYOID: u32 = 5078;
-pub const ANYCOMPATIBLENONARRAYOID: u32 = 5079;
-pub const ANYCOMPATIBLERANGEOID: u32 = 5080;
-pub const ANYMULTIRANGEOID: u32 = 4537;
-pub const ANYCOMPATIBLEMULTIRANGEOID: u32 = 4538;
-pub const PG_BRIN_BLOOM_SUMMARYOID: u32 = 4600;
-pub const PG_BRIN_MINMAX_MULTI_SUMMARYOID: u32 = 4601;
-pub const BOOLARRAYOID: u32 = 1000;
-pub const BYTEAARRAYOID: u32 = 1001;
-pub const CHARARRAYOID: u32 = 1002;
-pub const NAMEARRAYOID: u32 = 1003;
-pub const INT8ARRAYOID: u32 = 1016;
-pub const INT2ARRAYOID: u32 = 1005;
-pub const INT2VECTORARRAYOID: u32 = 1006;
-pub const INT4ARRAYOID: u32 = 1007;
-pub const REGPROCARRAYOID: u32 = 1008;
-pub const TEXTARRAYOID: u32 = 1009;
-pub const OIDARRAYOID: u32 = 1028;
-pub const TIDARRAYOID: u32 = 1010;
-pub const XIDARRAYOID: u32 = 1011;
-pub const CIDARRAYOID: u32 = 1012;
-pub const OIDVECTORARRAYOID: u32 = 1013;
-pub const PG_TYPEARRAYOID: u32 = 210;
-pub const PG_ATTRIBUTEARRAYOID: u32 = 270;
-pub const PG_PROCARRAYOID: u32 = 272;
-pub const PG_CLASSARRAYOID: u32 = 273;
-pub const JSONARRAYOID: u32 = 199;
-pub const XMLARRAYOID: u32 = 143;
-pub const XID8ARRAYOID: u32 = 271;
-pub const POINTARRAYOID: u32 = 1017;
-pub const LSEGARRAYOID: u32 = 1018;
-pub const PATHARRAYOID: u32 = 1019;
-pub const BOXARRAYOID: u32 = 1020;
-pub const POLYGONARRAYOID: u32 = 1027;
-pub const LINEARRAYOID: u32 = 629;
-pub const FLOAT4ARRAYOID: u32 = 1021;
-pub const FLOAT8ARRAYOID: u32 = 1022;
-pub const CIRCLEARRAYOID: u32 = 719;
-pub const MONEYARRAYOID: u32 = 791;
-pub const MACADDRARRAYOID: u32 = 1040;
-pub const INETARRAYOID: u32 = 1041;
-pub const CIDRARRAYOID: u32 = 651;
-pub const MACADDR8ARRAYOID: u32 = 775;
-pub const ACLITEMARRAYOID: u32 = 1034;
-pub const BPCHARARRAYOID: u32 = 1014;
-pub const VARCHARARRAYOID: u32 = 1015;
-pub const DATEARRAYOID: u32 = 1182;
-pub const TIMEARRAYOID: u32 = 1183;
-pub const TIMESTAMPARRAYOID: u32 = 1115;
-pub const TIMESTAMPTZARRAYOID: u32 = 1185;
-pub const INTERVALARRAYOID: u32 = 1187;
-pub const TIMETZARRAYOID: u32 = 1270;
-pub const BITARRAYOID: u32 = 1561;
-pub const VARBITARRAYOID: u32 = 1563;
-pub const NUMERICARRAYOID: u32 = 1231;
-pub const REFCURSORARRAYOID: u32 = 2201;
-pub const REGPROCEDUREARRAYOID: u32 = 2207;
-pub const REGOPERARRAYOID: u32 = 2208;
-pub const REGOPERATORARRAYOID: u32 = 2209;
-pub const REGCLASSARRAYOID: u32 = 2210;
-pub const REGCOLLATIONARRAYOID: u32 = 4192;
-pub const REGTYPEARRAYOID: u32 = 2211;
-pub const REGROLEARRAYOID: u32 = 4097;
-pub const REGNAMESPACEARRAYOID: u32 = 4090;
-pub const UUIDARRAYOID: u32 = 2951;
-pub const PG_LSNARRAYOID: u32 = 3221;
-pub const TSVECTORARRAYOID: u32 = 3643;
-pub const GTSVECTORARRAYOID: u32 = 3644;
-pub const TSQUERYARRAYOID: u32 = 3645;
-pub const REGCONFIGARRAYOID: u32 = 3735;
-pub const REGDICTIONARYARRAYOID: u32 = 3770;
-pub const JSONBARRAYOID: u32 = 3807;
-pub const JSONPATHARRAYOID: u32 = 4073;
-pub const TXID_SNAPSHOTARRAYOID: u32 = 2949;
-pub const PG_SNAPSHOTARRAYOID: u32 = 5039;
-pub const INT4RANGEARRAYOID: u32 = 3905;
-pub const NUMRANGEARRAYOID: u32 = 3907;
-pub const TSRANGEARRAYOID: u32 = 3909;
-pub const TSTZRANGEARRAYOID: u32 = 3911;
-pub const DATERANGEARRAYOID: u32 = 3913;
-pub const INT8RANGEARRAYOID: u32 = 3927;
-pub const INT4MULTIRANGEARRAYOID: u32 = 6150;
-pub const NUMMULTIRANGEARRAYOID: u32 = 6151;
-pub const TSMULTIRANGEARRAYOID: u32 = 6152;
-pub const TSTZMULTIRANGEARRAYOID: u32 = 6153;
-pub const DATEMULTIRANGEARRAYOID: u32 = 6155;
-pub const INT8MULTIRANGEARRAYOID: u32 = 6157;
-pub const CSTRINGARRAYOID: u32 = 1263;
-pub const PD_HAS_FREE_LINES: u32 = 1;
-pub const PD_PAGE_FULL: u32 = 2;
-pub const PD_ALL_VISIBLE: u32 = 4;
-pub const PD_VALID_FLAG_BITS: u32 = 7;
-pub const PG_PAGE_LAYOUT_VERSION: u32 = 4;
-pub const PG_DATA_CHECKSUM_VERSION: u32 = 1;
-pub const PAI_OVERWRITE: u32 = 1;
-pub const PAI_IS_HEAP: u32 = 2;
-pub const PIV_LOG_WARNING: u32 = 1;
-pub const PIV_REPORT_STAT: u32 = 2;
-pub const MaxTupleAttributeNumber: u32 = 1664;
-pub const MaxHeapAttributeNumber: u32 = 1600;
-pub const FIELDNO_HEAPTUPLEHEADERDATA_INFOMASK2: u32 = 2;
-pub const FIELDNO_HEAPTUPLEHEADERDATA_INFOMASK: u32 = 3;
-pub const FIELDNO_HEAPTUPLEHEADERDATA_HOFF: u32 = 4;
-pub const FIELDNO_HEAPTUPLEHEADERDATA_BITS: u32 = 5;
-pub const HEAP_HASNULL: u32 = 1;
-pub const HEAP_HASVARWIDTH: u32 = 2;
-pub const HEAP_HASEXTERNAL: u32 = 4;
-pub const HEAP_HASOID_OLD: u32 = 8;
-pub const HEAP_XMAX_KEYSHR_LOCK: u32 = 16;
-pub const HEAP_COMBOCID: u32 = 32;
-pub const HEAP_XMAX_EXCL_LOCK: u32 = 64;
-pub const HEAP_XMAX_LOCK_ONLY: u32 = 128;
-pub const HEAP_XMAX_SHR_LOCK: u32 = 80;
-pub const HEAP_LOCK_MASK: u32 = 80;
-pub const HEAP_XMIN_COMMITTED: u32 = 256;
-pub const HEAP_XMIN_INVALID: u32 = 512;
-pub const HEAP_XMIN_FROZEN: u32 = 768;
-pub const HEAP_XMAX_COMMITTED: u32 = 1024;
-pub const HEAP_XMAX_INVALID: u32 = 2048;
-pub const HEAP_XMAX_IS_MULTI: u32 = 4096;
-pub const HEAP_UPDATED: u32 = 8192;
-pub const HEAP_MOVED_OFF: u32 = 16384;
-pub const HEAP_MOVED_IN: u32 = 32768;
-pub const HEAP_MOVED: u32 = 49152;
-pub const HEAP_XACT_MASK: u32 = 65520;
-pub const HEAP_XMAX_BITS: u32 = 7376;
-pub const HEAP_NATTS_MASK: u32 = 2047;
-pub const HEAP_KEYS_UPDATED: u32 = 8192;
-pub const HEAP_HOT_UPDATED: u32 = 16384;
-pub const HEAP_ONLY_TUPLE: u32 = 32768;
-pub const HEAP2_XACT_MASK: u32 = 57344;
-pub const HEAP_TUPLE_HAS_MATCH: u32 = 32768;
-pub const MaxAttrSize: u32 = 10485760;
-pub const SelfItemPointerAttributeNumber: i32 = -1;
-pub const MinTransactionIdAttributeNumber: i32 = -2;
-pub const MinCommandIdAttributeNumber: i32 = -3;
-pub const MaxTransactionIdAttributeNumber: i32 = -4;
-pub const MaxCommandIdAttributeNumber: i32 = -5;
-pub const TableOidAttributeNumber: i32 = -6;
-pub const FirstLowInvalidHeapAttributeNumber: i32 = -7;
-pub const InvalidBuffer: u32 = 0;
-pub const TTS_FLAG_EMPTY: u32 = 2;
-pub const TTS_FLAG_SHOULDFREE: u32 = 4;
-pub const TTS_FLAG_SLOW: u32 = 8;
-pub const TTS_FLAG_FIXED: u32 = 16;
-pub const FIELDNO_TUPLETABLESLOT_FLAGS: u32 = 1;
-pub const FIELDNO_TUPLETABLESLOT_NVALID: u32 = 2;
-pub const FIELDNO_TUPLETABLESLOT_TUPLEDESCRIPTOR: u32 = 4;
-pub const FIELDNO_TUPLETABLESLOT_VALUES: u32 = 5;
-pub const FIELDNO_TUPLETABLESLOT_ISNULL: u32 = 6;
-pub const FIELDNO_HEAPTUPLETABLESLOT_TUPLE: u32 = 1;
-pub const FIELDNO_HEAPTUPLETABLESLOT_OFF: u32 = 2;
-pub const FIELDNO_MINIMALTUPLETABLESLOT_TUPLE: u32 = 1;
-pub const FIELDNO_MINIMALTUPLETABLESLOT_OFF: u32 = 4;
-pub const BITS_PER_BITMAPWORD: u32 = 64;
-pub const TIME_UTC: u32 = 1;
-pub const FIELDNO_FUNCTIONCALLINFODATA_ISNULL: u32 = 4;
-pub const FIELDNO_FUNCTIONCALLINFODATA_ARGS: u32 = 6;
-pub const PG_MAGIC_FUNCTION_NAME_STRING: &[u8; 14usize] = b"Pg_magic_func\0";
-pub const AGG_CONTEXT_AGGREGATE: u32 = 1;
-pub const AGG_CONTEXT_WINDOW: u32 = 2;
-pub const PARAM_FLAG_CONST: u32 = 1;
-pub const BTLessStrategyNumber: u32 = 1;
-pub const BTLessEqualStrategyNumber: u32 = 2;
-pub const BTEqualStrategyNumber: u32 = 3;
-pub const BTGreaterEqualStrategyNumber: u32 = 4;
-pub const BTGreaterStrategyNumber: u32 = 5;
-pub const BTMaxStrategyNumber: u32 = 5;
-pub const HTEqualStrategyNumber: u32 = 1;
-pub const HTMaxStrategyNumber: u32 = 1;
-pub const RTLeftStrategyNumber: u32 = 1;
-pub const RTOverLeftStrategyNumber: u32 = 2;
-pub const RTOverlapStrategyNumber: u32 = 3;
-pub const RTOverRightStrategyNumber: u32 = 4;
-pub const RTRightStrategyNumber: u32 = 5;
-pub const RTSameStrategyNumber: u32 = 6;
-pub const RTContainsStrategyNumber: u32 = 7;
-pub const RTContainedByStrategyNumber: u32 = 8;
-pub const RTOverBelowStrategyNumber: u32 = 9;
-pub const RTBelowStrategyNumber: u32 = 10;
-pub const RTAboveStrategyNumber: u32 = 11;
-pub const RTOverAboveStrategyNumber: u32 = 12;
-pub const RTOldContainsStrategyNumber: u32 = 13;
-pub const RTOldContainedByStrategyNumber: u32 = 14;
-pub const RTKNNSearchStrategyNumber: u32 = 15;
-pub const RTContainsElemStrategyNumber: u32 = 16;
-pub const RTAdjacentStrategyNumber: u32 = 17;
-pub const RTEqualStrategyNumber: u32 = 18;
-pub const RTNotEqualStrategyNumber: u32 = 19;
-pub const RTLessStrategyNumber: u32 = 20;
-pub const RTLessEqualStrategyNumber: u32 = 21;
-pub const RTGreaterStrategyNumber: u32 = 22;
-pub const RTGreaterEqualStrategyNumber: u32 = 23;
-pub const RTSubStrategyNumber: u32 = 24;
-pub const RTSubEqualStrategyNumber: u32 = 25;
-pub const RTSuperStrategyNumber: u32 = 26;
-pub const RTSuperEqualStrategyNumber: u32 = 27;
-pub const RTPrefixStrategyNumber: u32 = 28;
-pub const RTOldBelowStrategyNumber: u32 = 29;
-pub const RTOldAboveStrategyNumber: u32 = 30;
-pub const RTMaxStrategyNumber: u32 = 30;
-pub const INNER_VAR: u32 = 65000;
-pub const OUTER_VAR: u32 = 65001;
-pub const INDEX_VAR: u32 = 65002;
-pub const ROWID_VAR: u32 = 65003;
-pub const PRS2_OLD_VARNO: u32 = 1;
-pub const PRS2_NEW_VARNO: u32 = 2;
-pub const __DARWIN_CLK_TCK: u32 = 100;
-pub const CHAR_BIT: u32 = 8;
-pub const MB_LEN_MAX: u32 = 6;
-pub const CLK_TCK: u32 = 100;
-pub const SCHAR_MAX: u32 = 127;
-pub const SCHAR_MIN: i32 = -128;
-pub const UCHAR_MAX: u32 = 255;
-pub const CHAR_MAX: u32 = 127;
-pub const CHAR_MIN: i32 = -128;
-pub const USHRT_MAX: u32 = 65535;
-pub const SHRT_MAX: u32 = 32767;
-pub const SHRT_MIN: i32 = -32768;
-pub const UINT_MAX: u32 = 4294967295;
-pub const INT_MAX: u32 = 2147483647;
-pub const INT_MIN: i32 = -2147483648;
-pub const ULONG_MAX: i32 = -1;
-pub const LONG_MAX: u64 = 9223372036854775807;
-pub const LONG_MIN: i64 = -9223372036854775808;
-pub const ULLONG_MAX: i32 = -1;
-pub const LLONG_MAX: u64 = 9223372036854775807;
-pub const LLONG_MIN: i64 = -9223372036854775808;
-pub const LONG_BIT: u32 = 64;
-pub const SSIZE_MAX: u64 = 9223372036854775807;
-pub const WORD_BIT: u32 = 32;
-pub const SIZE_T_MAX: i32 = -1;
-pub const UQUAD_MAX: i32 = -1;
-pub const QUAD_MAX: u64 = 9223372036854775807;
-pub const QUAD_MIN: i64 = -9223372036854775808;
-pub const ARG_MAX: u32 = 1048576;
-pub const CHILD_MAX: u32 = 266;
-pub const GID_MAX: u32 = 2147483647;
-pub const LINK_MAX: u32 = 32767;
-pub const MAX_CANON: u32 = 1024;
-pub const MAX_INPUT: u32 = 1024;
-pub const NAME_MAX: u32 = 255;
-pub const NGROUPS_MAX: u32 = 16;
-pub const UID_MAX: u32 = 2147483647;
-pub const OPEN_MAX: u32 = 10240;
-pub const PATH_MAX: u32 = 1024;
-pub const PIPE_BUF: u32 = 512;
-pub const BC_BASE_MAX: u32 = 99;
-pub const BC_DIM_MAX: u32 = 2048;
-pub const BC_SCALE_MAX: u32 = 99;
-pub const BC_STRING_MAX: u32 = 1000;
-pub const CHARCLASS_NAME_MAX: u32 = 14;
-pub const COLL_WEIGHTS_MAX: u32 = 2;
-pub const EQUIV_CLASS_MAX: u32 = 2;
-pub const EXPR_NEST_MAX: u32 = 32;
-pub const LINE_MAX: u32 = 2048;
-pub const RE_DUP_MAX: u32 = 255;
-pub const NZERO: u32 = 20;
-pub const _POSIX_ARG_MAX: u32 = 4096;
-pub const _POSIX_CHILD_MAX: u32 = 25;
-pub const _POSIX_LINK_MAX: u32 = 8;
-pub const _POSIX_MAX_CANON: u32 = 255;
-pub const _POSIX_MAX_INPUT: u32 = 255;
-pub const _POSIX_NAME_MAX: u32 = 14;
-pub const _POSIX_NGROUPS_MAX: u32 = 8;
-pub const _POSIX_OPEN_MAX: u32 = 20;
-pub const _POSIX_PATH_MAX: u32 = 256;
-pub const _POSIX_PIPE_BUF: u32 = 512;
-pub const _POSIX_SSIZE_MAX: u32 = 32767;
-pub const _POSIX_STREAM_MAX: u32 = 8;
-pub const _POSIX_TZNAME_MAX: u32 = 6;
-pub const _POSIX2_BC_BASE_MAX: u32 = 99;
-pub const _POSIX2_BC_DIM_MAX: u32 = 2048;
-pub const _POSIX2_BC_SCALE_MAX: u32 = 99;
-pub const _POSIX2_BC_STRING_MAX: u32 = 1000;
-pub const _POSIX2_EQUIV_CLASS_MAX: u32 = 2;
-pub const _POSIX2_EXPR_NEST_MAX: u32 = 32;
-pub const _POSIX2_LINE_MAX: u32 = 2048;
-pub const _POSIX2_RE_DUP_MAX: u32 = 255;
-pub const _POSIX_AIO_LISTIO_MAX: u32 = 2;
-pub const _POSIX_AIO_MAX: u32 = 1;
-pub const _POSIX_DELAYTIMER_MAX: u32 = 32;
-pub const _POSIX_MQ_OPEN_MAX: u32 = 8;
-pub const _POSIX_MQ_PRIO_MAX: u32 = 32;
-pub const _POSIX_RTSIG_MAX: u32 = 8;
-pub const _POSIX_SEM_NSEMS_MAX: u32 = 256;
-pub const _POSIX_SEM_VALUE_MAX: u32 = 32767;
-pub const _POSIX_SIGQUEUE_MAX: u32 = 32;
-pub const _POSIX_TIMER_MAX: u32 = 32;
-pub const _POSIX_CLOCKRES_MIN: u32 = 20000000;
-pub const _POSIX_THREAD_DESTRUCTOR_ITERATIONS: u32 = 4;
-pub const _POSIX_THREAD_KEYS_MAX: u32 = 128;
-pub const _POSIX_THREAD_THREADS_MAX: u32 = 64;
-pub const PTHREAD_DESTRUCTOR_ITERATIONS: u32 = 4;
-pub const PTHREAD_KEYS_MAX: u32 = 512;
-pub const PTHREAD_STACK_MIN: u32 = 16384;
-pub const _POSIX_HOST_NAME_MAX: u32 = 255;
-pub const _POSIX_LOGIN_NAME_MAX: u32 = 9;
-pub const _POSIX_SS_REPL_MAX: u32 = 4;
-pub const _POSIX_SYMLINK_MAX: u32 = 255;
-pub const _POSIX_SYMLOOP_MAX: u32 = 8;
-pub const _POSIX_TRACE_EVENT_NAME_MAX: u32 = 30;
-pub const _POSIX_TRACE_NAME_MAX: u32 = 8;
-pub const _POSIX_TRACE_SYS_MAX: u32 = 8;
-pub const _POSIX_TRACE_USER_EVENT_MAX: u32 = 32;
-pub const _POSIX_TTY_NAME_MAX: u32 = 9;
-pub const _POSIX2_CHARCLASS_NAME_MAX: u32 = 14;
-pub const _POSIX2_COLL_WEIGHTS_MAX: u32 = 2;
-pub const _POSIX_RE_DUP_MAX: u32 = 255;
-pub const OFF_MIN: i64 = -9223372036854775808;
-pub const OFF_MAX: u64 = 9223372036854775807;
-pub const PASS_MAX: u32 = 128;
-pub const NL_ARGMAX: u32 = 9;
-pub const NL_LANGMAX: u32 = 14;
-pub const NL_MSGMAX: u32 = 32767;
-pub const NL_NMAX: u32 = 1;
-pub const NL_SETMAX: u32 = 255;
-pub const NL_TEXTMAX: u32 = 2048;
-pub const _XOPEN_IOV_MAX: u32 = 16;
-pub const IOV_MAX: u32 = 1024;
-pub const _XOPEN_NAME_MAX: u32 = 255;
-pub const _XOPEN_PATH_MAX: u32 = 1024;
-pub const DSM_IMPL_POSIX: u32 = 1;
-pub const DSM_IMPL_SYSV: u32 = 2;
-pub const DSM_IMPL_WINDOWS: u32 = 3;
-pub const DSM_IMPL_MMAP: u32 = 4;
-pub const DEFAULT_DYNAMIC_SHARED_MEMORY_TYPE: u32 = 1;
-pub const PG_DYNSHMEM_DIR: &[u8; 12usize] = b"pg_dynshmem\0";
-pub const PG_DYNSHMEM_MMAP_FILE_PREFIX: &[u8; 6usize] = b"mmap.\0";
-pub const DSM_CREATE_NULL_IF_MAXSEGMENTS: u32 = 1;
-pub const DSM_HANDLE_INVALID: u32 = 0;
-pub const SIZEOF_DSA_POINTER: u32 = 8;
-pub const DSA_POINTER_FORMAT: &[u8; 7usize] = b"%016lx\0";
-pub const DSA_ALLOC_HUGE: u32 = 1;
-pub const DSA_ALLOC_NO_OOM: u32 = 2;
-pub const DSA_ALLOC_ZERO: u32 = 4;
-pub const DEFAULT_SPINS_PER_DELAY: u32 = 100;
-pub const HASH_PARTITION: u32 = 1;
-pub const HASH_SEGMENT: u32 = 2;
-pub const HASH_DIRSIZE: u32 = 4;
-pub const HASH_ELEM: u32 = 8;
-pub const HASH_STRINGS: u32 = 16;
-pub const HASH_BLOBS: u32 = 32;
-pub const HASH_FUNCTION: u32 = 64;
-pub const HASH_COMPARE: u32 = 128;
-pub const HASH_KEYCOPY: u32 = 256;
-pub const HASH_ALLOC: u32 = 512;
-pub const HASH_CONTEXT: u32 = 1024;
-pub const HASH_SHARED_MEM: u32 = 2048;
-pub const HASH_ATTACH: u32 = 4096;
-pub const HASH_FIXED_SIZE: u32 = 8192;
-pub const NO_MAX_DSIZE: i32 = -1;
-pub const __DARWIN_MAXNAMLEN: u32 = 255;
-pub const __DARWIN_MAXPATHLEN: u32 = 1024;
-pub const MAXNAMLEN: u32 = 255;
-pub const DT_UNKNOWN: u32 = 0;
-pub const DT_FIFO: u32 = 1;
-pub const DT_CHR: u32 = 2;
-pub const DT_DIR: u32 = 4;
-pub const DT_BLK: u32 = 6;
-pub const DT_REG: u32 = 8;
-pub const DT_LNK: u32 = 10;
-pub const DT_SOCK: u32 = 12;
-pub const DT_WHT: u32 = 14;
-pub const DIRBLKSIZ: u32 = 1024;
-pub const DTF_HIDEW: u32 = 1;
-pub const DTF_NODUP: u32 = 2;
-pub const DTF_REWIND: u32 = 4;
-pub const __DTF_READALL: u32 = 8;
-pub const __DTF_SKIPREAD: u32 = 16;
-pub const __DTF_ATEND: u32 = 32;
-pub const PG_TEMP_FILES_DIR: &[u8; 10usize] = b"pgsql_tmp\0";
-pub const PG_TEMP_FILE_PREFIX: &[u8; 10usize] = b"pgsql_tmp\0";
-pub const SHARED_TUPLESTORE_SINGLE_PASS: u32 = 1;
-pub const MAX_TIMESTAMP_PRECISION: u32 = 6;
-pub const MAX_INTERVAL_PRECISION: u32 = 6;
-pub const TS_PREC_INV: f64 = 1000000.0;
-pub const DAYS_PER_YEAR: f64 = 365.25;
-pub const MONTHS_PER_YEAR: u32 = 12;
-pub const DAYS_PER_MONTH: u32 = 30;
-pub const HOURS_PER_DAY: u32 = 24;
-pub const SECS_PER_YEAR: u32 = 31557600;
-pub const SECS_PER_DAY: u32 = 86400;
-pub const SECS_PER_HOUR: u32 = 3600;
-pub const SECS_PER_MINUTE: u32 = 60;
-pub const MINS_PER_HOUR: u32 = 60;
-pub const MAX_TZDISP_HOUR: u32 = 15;
-pub const TZDISP_LIMIT: u32 = 57600;
-pub const JULIAN_MINYEAR: i32 = -4713;
-pub const JULIAN_MINMONTH: u32 = 11;
-pub const JULIAN_MINDAY: u32 = 24;
-pub const JULIAN_MAXYEAR: u32 = 5874898;
-pub const JULIAN_MAXMONTH: u32 = 6;
-pub const JULIAN_MAXDAY: u32 = 3;
-pub const UNIX_EPOCH_JDATE: u32 = 2440588;
-pub const POSTGRES_EPOCH_JDATE: u32 = 2451545;
-pub const DATETIME_MIN_JULIAN: u32 = 0;
-pub const DATE_END_JULIAN: u32 = 2147483494;
-pub const TIMESTAMP_END_JULIAN: u32 = 109203528;
-pub const RELCACHE_INIT_FILENAME: &[u8; 17usize] = b"pg_internal.init\0";
-pub const INDEX_SIZE_MASK: u32 = 8191;
-pub const INDEX_AM_RESERVED_BIT: u32 = 8192;
-pub const INDEX_VAR_MASK: u32 = 16384;
-pub const INDEX_NULL_MASK: u32 = 32768;
-pub const NUM_TUPLESORTMETHODS: u32 = 4;
-pub const EEO_FLAG_IS_QUAL: u32 = 1;
-pub const FIELDNO_EXPRSTATE_RESNULL: u32 = 2;
-pub const FIELDNO_EXPRSTATE_RESVALUE: u32 = 3;
-pub const FIELDNO_EXPRSTATE_RESULTSLOT: u32 = 4;
-pub const FIELDNO_EXPRSTATE_PARENT: u32 = 11;
-pub const FIELDNO_EXPRCONTEXT_SCANTUPLE: u32 = 1;
-pub const FIELDNO_EXPRCONTEXT_INNERTUPLE: u32 = 2;
-pub const FIELDNO_EXPRCONTEXT_OUTERTUPLE: u32 = 3;
-pub const FIELDNO_EXPRCONTEXT_AGGVALUES: u32 = 8;
-pub const FIELDNO_EXPRCONTEXT_AGGNULLS: u32 = 9;
-pub const FIELDNO_EXPRCONTEXT_CASEDATUM: u32 = 10;
-pub const FIELDNO_EXPRCONTEXT_CASENULL: u32 = 11;
-pub const FIELDNO_EXPRCONTEXT_DOMAINDATUM: u32 = 12;
-pub const FIELDNO_EXPRCONTEXT_DOMAINNULL: u32 = 13;
-pub const FIELDNO_AGGSTATE_CURAGGCONTEXT: u32 = 14;
-pub const FIELDNO_AGGSTATE_CURPERTRANS: u32 = 16;
-pub const FIELDNO_AGGSTATE_CURRENT_SET: u32 = 20;
-pub const FIELDNO_AGGSTATE_ALL_PERGROUPS: u32 = 53;
-pub const COMPLETION_TAG_BUFSIZE: u32 = 64;
-pub const ACL_INSERT: u32 = 1;
-pub const ACL_SELECT: u32 = 2;
-pub const ACL_UPDATE: u32 = 4;
-pub const ACL_DELETE: u32 = 8;
-pub const ACL_TRUNCATE: u32 = 16;
-pub const ACL_REFERENCES: u32 = 32;
-pub const ACL_TRIGGER: u32 = 64;
-pub const ACL_EXECUTE: u32 = 128;
-pub const ACL_USAGE: u32 = 256;
-pub const ACL_CREATE: u32 = 512;
-pub const ACL_CREATE_TEMP: u32 = 1024;
-pub const ACL_CONNECT: u32 = 2048;
-pub const N_ACL_RIGHTS: u32 = 12;
-pub const ACL_NO_RIGHTS: u32 = 0;
-pub const ACL_SELECT_FOR_UPDATE: u32 = 4;
-pub const FRAMEOPTION_NONDEFAULT: u32 = 1;
-pub const FRAMEOPTION_RANGE: u32 = 2;
-pub const FRAMEOPTION_ROWS: u32 = 4;
-pub const FRAMEOPTION_GROUPS: u32 = 8;
-pub const FRAMEOPTION_BETWEEN: u32 = 16;
-pub const FRAMEOPTION_START_UNBOUNDED_PRECEDING: u32 = 32;
-pub const FRAMEOPTION_END_UNBOUNDED_PRECEDING: u32 = 64;
-pub const FRAMEOPTION_START_UNBOUNDED_FOLLOWING: u32 = 128;
-pub const FRAMEOPTION_END_UNBOUNDED_FOLLOWING: u32 = 256;
-pub const FRAMEOPTION_START_CURRENT_ROW: u32 = 512;
-pub const FRAMEOPTION_END_CURRENT_ROW: u32 = 1024;
-pub const FRAMEOPTION_START_OFFSET_PRECEDING: u32 = 2048;
-pub const FRAMEOPTION_END_OFFSET_PRECEDING: u32 = 4096;
-pub const FRAMEOPTION_START_OFFSET_FOLLOWING: u32 = 8192;
-pub const FRAMEOPTION_END_OFFSET_FOLLOWING: u32 = 16384;
-pub const FRAMEOPTION_EXCLUDE_CURRENT_ROW: u32 = 32768;
-pub const FRAMEOPTION_EXCLUDE_GROUP: u32 = 65536;
-pub const FRAMEOPTION_EXCLUDE_TIES: u32 = 131072;
-pub const FRAMEOPTION_START_OFFSET: u32 = 10240;
-pub const FRAMEOPTION_END_OFFSET: u32 = 20480;
-pub const FRAMEOPTION_EXCLUSION: u32 = 229376;
-pub const FRAMEOPTION_DEFAULTS: u32 = 1058;
-pub const PARTITION_STRATEGY_HASH: u8 = 104u8;
-pub const PARTITION_STRATEGY_LIST: u8 = 108u8;
-pub const PARTITION_STRATEGY_RANGE: u8 = 114u8;
-pub const FKCONSTR_ACTION_NOACTION: u8 = 97u8;
-pub const FKCONSTR_ACTION_RESTRICT: u8 = 114u8;
-pub const FKCONSTR_ACTION_CASCADE: u8 = 99u8;
-pub const FKCONSTR_ACTION_SETNULL: u8 = 110u8;
-pub const FKCONSTR_ACTION_SETDEFAULT: u8 = 100u8;
-pub const FKCONSTR_MATCH_FULL: u8 = 102u8;
-pub const FKCONSTR_MATCH_PARTIAL: u8 = 112u8;
-pub const FKCONSTR_MATCH_SIMPLE: u8 = 115u8;
-pub const OPCLASS_ITEM_OPERATOR: u32 = 1;
-pub const OPCLASS_ITEM_FUNCTION: u32 = 2;
-pub const OPCLASS_ITEM_STORAGETYPE: u32 = 3;
-pub const CURSOR_OPT_BINARY: u32 = 1;
-pub const CURSOR_OPT_SCROLL: u32 = 2;
-pub const CURSOR_OPT_NO_SCROLL: u32 = 4;
-pub const CURSOR_OPT_INSENSITIVE: u32 = 8;
-pub const CURSOR_OPT_ASENSITIVE: u32 = 16;
-pub const CURSOR_OPT_HOLD: u32 = 32;
-pub const CURSOR_OPT_FAST_PLAN: u32 = 256;
-pub const CURSOR_OPT_GENERIC_PLAN: u32 = 512;
-pub const CURSOR_OPT_CUSTOM_PLAN: u32 = 1024;
-pub const CURSOR_OPT_PARALLEL_OK: u32 = 2048;
-pub const FETCH_ALL: u64 = 9223372036854775807;
-pub const MaxAllocHugeSize: u32 = 0;
-pub const ALLOCSET_DEFAULT_MINSIZE: u32 = 0;
-pub const ALLOCSET_DEFAULT_INITSIZE: u32 = 8192;
-pub const ALLOCSET_DEFAULT_MAXSIZE: u32 = 8388608;
-pub const ALLOCSET_SMALL_MINSIZE: u32 = 0;
-pub const ALLOCSET_SMALL_INITSIZE: u32 = 1024;
-pub const ALLOCSET_SMALL_MAXSIZE: u32 = 8192;
-pub const ALLOCSET_SEPARATE_THRESHOLD: u32 = 8192;
-pub const SLAB_DEFAULT_BLOCK_SIZE: u32 = 8192;
-pub const SLAB_LARGE_BLOCK_SIZE: u32 = 8388608;
-pub const EXEC_FLAG_EXPLAIN_ONLY: u32 = 1;
-pub const EXEC_FLAG_REWIND: u32 = 2;
-pub const EXEC_FLAG_BACKWARD: u32 = 4;
-pub const EXEC_FLAG_MARK: u32 = 8;
-pub const EXEC_FLAG_SKIP_TRIGGERS: u32 = 16;
-pub const EXEC_FLAG_WITH_NO_DATA: u32 = 32;
-pub const TZ_STRLEN_MAX: u32 = 255;
-pub const InvalidPid: i32 = -1;
-pub const USE_POSTGRES_DATES: u32 = 0;
-pub const USE_ISO_DATES: u32 = 1;
-pub const USE_SQL_DATES: u32 = 2;
-pub const USE_GERMAN_DATES: u32 = 3;
-pub const USE_XSD_DATES: u32 = 4;
-pub const DATEORDER_YMD: u32 = 0;
-pub const DATEORDER_DMY: u32 = 1;
-pub const DATEORDER_MDY: u32 = 2;
-pub const INTSTYLE_POSTGRES: u32 = 0;
-pub const INTSTYLE_POSTGRES_VERBOSE: u32 = 1;
-pub const INTSTYLE_SQL_STANDARD: u32 = 2;
-pub const INTSTYLE_ISO_8601: u32 = 3;
-pub const MAXTZLEN: u32 = 10;
-pub const SECURITY_LOCAL_USERID_CHANGE: u32 = 1;
-pub const SECURITY_RESTRICTED_OPERATION: u32 = 2;
-pub const SECURITY_NOFORCE_RLS: u32 = 4;
-pub const MIN_XFN_CHARS: u32 = 16;
-pub const MAX_XFN_CHARS: u32 = 40;
-pub const VALID_XFN_CHARS: &[u8; 40usize] = b"0123456789ABCDEF.history.backup.partial\0";
-pub const PGSTAT_NUM_PROGRESS_PARAM: u32 = 20;
 pub const SOL_LOCAL: u32 = 0;
 pub const LOCAL_PEERCRED: u32 = 1;
 pub const LOCAL_PEERPID: u32 = 2;
@@ -2667,11 +2662,10 @@ pub const PG_WAIT_IPC: u32 = 134217728;
 pub const PG_WAIT_TIMEOUT: u32 = 150994944;
 pub const PG_WAIT_IO: u32 = 167772160;
 pub const PGSTAT_STAT_PERMANENT_DIRECTORY: &[u8; 8usize] = b"pg_stat\0";
-pub const PGSTAT_STAT_PERMANENT_FILENAME: &[u8; 20usize] = b"pg_stat/global.stat\0";
-pub const PGSTAT_STAT_PERMANENT_TMPFILE: &[u8; 19usize] = b"pg_stat/global.tmp\0";
+pub const PGSTAT_STAT_PERMANENT_FILENAME: &[u8; 20usize] = b"pg_stat/pgstat.stat\0";
+pub const PGSTAT_STAT_PERMANENT_TMPFILE: &[u8; 19usize] = b"pg_stat/pgstat.tmp\0";
 pub const PG_STAT_TMP_DIR: &[u8; 12usize] = b"pg_stat_tmp\0";
-pub const PGSTAT_MAX_MSG_SIZE: u32 = 1000;
-pub const PGSTAT_FILE_FORMAT_ID: u32 = 27638946;
+pub const PGSTAT_FILE_FORMAT_ID: u32 = 27638951;
 pub const SK_ISNULL: u32 = 1;
 pub const SK_UNARY: u32 = 2;
 pub const SK_ROW_HEADER: u32 = 4;
@@ -2691,7 +2685,13 @@ pub const ShareRowExclusiveLock: u32 = 6;
 pub const ExclusiveLock: u32 = 7;
 pub const AccessExclusiveLock: u32 = 8;
 pub const MaxLockMode: u32 = 8;
-pub const CATALOG_VERSION_NO: u32 = 202107181;
+pub const RM_MAX_ID: u32 = 255;
+pub const RM_MIN_CUSTOM_ID: u32 = 128;
+pub const RM_MAX_CUSTOM_ID: u32 = 255;
+pub const RM_N_IDS: u32 = 256;
+pub const RM_N_CUSTOM_IDS: u32 = 128;
+pub const RM_EXPERIMENTAL_ID: u32 = 128;
+pub const CATALOG_VERSION_NO: u32 = 202209061;
 pub const OIDCHARS: u32 = 10;
 pub const FORKNAMECHARS: u32 = 4;
 pub const InvalidBackendId: i32 = -1;
@@ -2700,8 +2700,10 @@ pub const XLR_RMGR_INFO_MASK: u32 = 240;
 pub const XLR_SPECIAL_REL_UPDATE: u32 = 1;
 pub const XLR_CHECK_CONSISTENCY: u32 = 2;
 pub const BKPIMAGE_HAS_HOLE: u32 = 1;
-pub const BKPIMAGE_IS_COMPRESSED: u32 = 2;
-pub const BKPIMAGE_APPLY: u32 = 4;
+pub const BKPIMAGE_APPLY: u32 = 2;
+pub const BKPIMAGE_COMPRESS_PGLZ: u32 = 4;
+pub const BKPIMAGE_COMPRESS_LZ4: u32 = 8;
+pub const BKPIMAGE_COMPRESS_ZSTD: u32 = 16;
 pub const BKPBLOCK_FORK_MASK: u32 = 15;
 pub const BKPBLOCK_FLAG_MASK: u32 = 240;
 pub const BKPBLOCK_HAS_IMAGE: u32 = 16;
@@ -2728,13 +2730,6 @@ pub const GIN_SEARCH_MODE_EVERYTHING: u32 = 3;
 pub const GIN_FALSE: u32 = 0;
 pub const GIN_TRUE: u32 = 1;
 pub const GIN_MAYBE: u32 = 2;
-pub const XLR_NORMAL_MAX_BLOCK_ID: u32 = 4;
-pub const XLR_NORMAL_RDATAS: u32 = 20;
-pub const REGBUF_FORCE_IMAGE: u32 = 1;
-pub const REGBUF_NO_IMAGE: u32 = 2;
-pub const REGBUF_WILL_INIT: u32 = 6;
-pub const REGBUF_STANDARD: u32 = 8;
-pub const REGBUF_KEEP_DATA: u32 = 16;
 pub const SYNC_METHOD_FSYNC: u32 = 0;
 pub const SYNC_METHOD_FDATASYNC: u32 = 1;
 pub const SYNC_METHOD_OPEN: u32 = 2;
@@ -2751,7 +2746,6 @@ pub const CHECKPOINT_CAUSE_XLOG: u32 = 128;
 pub const CHECKPOINT_CAUSE_TIME: u32 = 256;
 pub const XLOG_INCLUDE_ORIGIN: u32 = 1;
 pub const XLOG_MARK_UNIMPORTANT: u32 = 2;
-pub const XLOG_INCLUDE_XID: u32 = 4;
 pub const RECOVERY_SIGNAL_FILE: &[u8; 16usize] = b"recovery.signal\0";
 pub const STANDBY_SIGNAL_FILE: &[u8; 15usize] = b"standby.signal\0";
 pub const BACKUP_LABEL_FILE: &[u8; 13usize] = b"backup_label\0";
@@ -2807,6 +2801,7 @@ pub const XACT_XINFO_HAS_TWOPHASE: u32 = 16;
 pub const XACT_XINFO_HAS_ORIGIN: u32 = 32;
 pub const XACT_XINFO_HAS_AE_LOCKS: u32 = 64;
 pub const XACT_XINFO_HAS_GID: u32 = 128;
+pub const XACT_XINFO_HAS_DROPPED_STATS: u32 = 256;
 pub const XACT_COMPLETION_APPLY_FEEDBACK: u32 = 536870912;
 pub const XACT_COMPLETION_UPDATE_RELCACHE_FILE: u32 = 1073741824;
 pub const XACT_COMPLETION_FORCE_SYNC_COMMIT: u32 = 2147483648;
@@ -2839,9 +2834,13 @@ pub const GUC_UNIT_S: u32 = 131072;
 pub const GUC_UNIT_MIN: u32 = 196608;
 pub const GUC_UNIT_TIME: u32 = 983040;
 pub const GUC_EXPLAIN: u32 = 1048576;
+pub const GUC_RUNTIME_COMPUTED: u32 = 2097152;
 pub const GUC_UNIT: u32 = 1044480;
 pub const RelationRelationId: u32 = 1259;
 pub const RelationRelation_Rowtype_Id: u32 = 83;
+pub const ClassOidIndexId: u32 = 2662;
+pub const ClassNameNspIndexId: u32 = 2663;
+pub const ClassTblspcRelfilenodeIndexId: u32 = 3455;
 pub const Anum_pg_class_oid: u32 = 1;
 pub const Anum_pg_class_relname: u32 = 2;
 pub const Anum_pg_class_relnamespace: u32 = 3;
@@ -2893,36 +2892,36 @@ pub const REPLICA_IDENTITY_DEFAULT: u8 = 100u8;
 pub const REPLICA_IDENTITY_NOTHING: u8 = 110u8;
 pub const REPLICA_IDENTITY_FULL: u8 = 102u8;
 pub const REPLICA_IDENTITY_INDEX: u8 = 105u8;
-pub const ClassOidIndexId: u32 = 2662;
-pub const ClassNameNspIndexId: u32 = 2663;
-pub const ClassTblspcRelfilenodeIndexId: u32 = 3455;
 pub const IndexRelationId: u32 = 2610;
+pub const IndexIndrelidIndexId: u32 = 2678;
+pub const IndexRelidIndexId: u32 = 2679;
 pub const Anum_pg_index_indexrelid: u32 = 1;
 pub const Anum_pg_index_indrelid: u32 = 2;
 pub const Anum_pg_index_indnatts: u32 = 3;
 pub const Anum_pg_index_indnkeyatts: u32 = 4;
 pub const Anum_pg_index_indisunique: u32 = 5;
-pub const Anum_pg_index_indisprimary: u32 = 6;
-pub const Anum_pg_index_indisexclusion: u32 = 7;
-pub const Anum_pg_index_indimmediate: u32 = 8;
-pub const Anum_pg_index_indisclustered: u32 = 9;
-pub const Anum_pg_index_indisvalid: u32 = 10;
-pub const Anum_pg_index_indcheckxmin: u32 = 11;
-pub const Anum_pg_index_indisready: u32 = 12;
-pub const Anum_pg_index_indislive: u32 = 13;
-pub const Anum_pg_index_indisreplident: u32 = 14;
-pub const Anum_pg_index_indkey: u32 = 15;
-pub const Anum_pg_index_indcollation: u32 = 16;
-pub const Anum_pg_index_indclass: u32 = 17;
-pub const Anum_pg_index_indoption: u32 = 18;
-pub const Anum_pg_index_indexprs: u32 = 19;
-pub const Anum_pg_index_indpred: u32 = 20;
-pub const Natts_pg_index: u32 = 20;
+pub const Anum_pg_index_indnullsnotdistinct: u32 = 6;
+pub const Anum_pg_index_indisprimary: u32 = 7;
+pub const Anum_pg_index_indisexclusion: u32 = 8;
+pub const Anum_pg_index_indimmediate: u32 = 9;
+pub const Anum_pg_index_indisclustered: u32 = 10;
+pub const Anum_pg_index_indisvalid: u32 = 11;
+pub const Anum_pg_index_indcheckxmin: u32 = 12;
+pub const Anum_pg_index_indisready: u32 = 13;
+pub const Anum_pg_index_indislive: u32 = 14;
+pub const Anum_pg_index_indisreplident: u32 = 15;
+pub const Anum_pg_index_indkey: u32 = 16;
+pub const Anum_pg_index_indcollation: u32 = 17;
+pub const Anum_pg_index_indclass: u32 = 18;
+pub const Anum_pg_index_indoption: u32 = 19;
+pub const Anum_pg_index_indexprs: u32 = 20;
+pub const Anum_pg_index_indpred: u32 = 21;
+pub const Natts_pg_index: u32 = 21;
 pub const INDOPTION_DESC: u32 = 1;
 pub const INDOPTION_NULLS_FIRST: u32 = 2;
-pub const IndexIndrelidIndexId: u32 = 2678;
-pub const IndexRelidIndexId: u32 = 2679;
 pub const PublicationRelationId: u32 = 6104;
+pub const PublicationObjectIndexId: u32 = 6110;
+pub const PublicationNameIndexId: u32 = 6111;
 pub const Anum_pg_publication_oid: u32 = 1;
 pub const Anum_pg_publication_pubname: u32 = 2;
 pub const Anum_pg_publication_pubowner: u32 = 3;
@@ -2933,8 +2932,6 @@ pub const Anum_pg_publication_pubdelete: u32 = 7;
 pub const Anum_pg_publication_pubtruncate: u32 = 8;
 pub const Anum_pg_publication_pubviaroot: u32 = 9;
 pub const Natts_pg_publication: u32 = 9;
-pub const PublicationObjectIndexId: u32 = 6110;
-pub const PublicationNameIndexId: u32 = 6111;
 pub const HEAP_MIN_FILLFACTOR: u32 = 10;
 pub const HEAP_DEFAULT_FILLFACTOR: u32 = 100;
 pub const DEFAULT_TABLE_ACCESS_METHOD: &[u8; 5usize] = b"heap\0";
@@ -2998,6 +2995,10 @@ pub const REINDEX_REL_FORCE_INDEXES_UNLOGGED: u32 = 8;
 pub const REINDEX_REL_FORCE_INDEXES_PERMANENT: u32 = 16;
 pub const AuthIdRelationId: u32 = 1260;
 pub const AuthIdRelation_Rowtype_Id: u32 = 2842;
+pub const PgAuthidToastTable: u32 = 4175;
+pub const PgAuthidToastIndex: u32 = 4176;
+pub const AuthIdRolnameIndexId: u32 = 2676;
+pub const AuthIdOidIndexId: u32 = 2677;
 pub const Anum_pg_authid_oid: u32 = 1;
 pub const Anum_pg_authid_rolname: u32 = 2;
 pub const Anum_pg_authid_rolsuper: u32 = 3;
@@ -3023,42 +3024,45 @@ pub const ROLE_PG_READ_SERVER_FILES: u32 = 4569;
 pub const ROLE_PG_WRITE_SERVER_FILES: u32 = 4570;
 pub const ROLE_PG_EXECUTE_SERVER_PROGRAM: u32 = 4571;
 pub const ROLE_PG_SIGNAL_BACKEND: u32 = 4200;
-pub const PgAuthidToastTable: u32 = 4175;
-pub const PgAuthidToastIndex: u32 = 4176;
-pub const AuthIdRolnameIndexId: u32 = 2676;
-pub const AuthIdOidIndexId: u32 = 2677;
+pub const ROLE_PG_CHECKPOINT: u32 = 4544;
 pub const DatabaseRelationId: u32 = 1262;
 pub const DatabaseRelation_Rowtype_Id: u32 = 1248;
-pub const Anum_pg_database_oid: u32 = 1;
-pub const Anum_pg_database_datname: u32 = 2;
-pub const Anum_pg_database_datdba: u32 = 3;
-pub const Anum_pg_database_encoding: u32 = 4;
-pub const Anum_pg_database_datcollate: u32 = 5;
-pub const Anum_pg_database_datctype: u32 = 6;
-pub const Anum_pg_database_datistemplate: u32 = 7;
-pub const Anum_pg_database_datallowconn: u32 = 8;
-pub const Anum_pg_database_datconnlimit: u32 = 9;
-pub const Anum_pg_database_datlastsysoid: u32 = 10;
-pub const Anum_pg_database_datfrozenxid: u32 = 11;
-pub const Anum_pg_database_datminmxid: u32 = 12;
-pub const Anum_pg_database_dattablespace: u32 = 13;
-pub const Anum_pg_database_datacl: u32 = 14;
-pub const Natts_pg_database: u32 = 14;
-pub const TemplateDbOid: u32 = 1;
 pub const PgDatabaseToastTable: u32 = 4177;
 pub const PgDatabaseToastIndex: u32 = 4178;
 pub const DatabaseNameIndexId: u32 = 2671;
 pub const DatabaseOidIndexId: u32 = 2672;
+pub const Template0DbOid: u32 = 4;
+pub const PostgresDbOid: u32 = 5;
+pub const Anum_pg_database_oid: u32 = 1;
+pub const Anum_pg_database_datname: u32 = 2;
+pub const Anum_pg_database_datdba: u32 = 3;
+pub const Anum_pg_database_encoding: u32 = 4;
+pub const Anum_pg_database_datlocprovider: u32 = 5;
+pub const Anum_pg_database_datistemplate: u32 = 6;
+pub const Anum_pg_database_datallowconn: u32 = 7;
+pub const Anum_pg_database_datconnlimit: u32 = 8;
+pub const Anum_pg_database_datfrozenxid: u32 = 9;
+pub const Anum_pg_database_datminmxid: u32 = 10;
+pub const Anum_pg_database_dattablespace: u32 = 11;
+pub const Anum_pg_database_datcollate: u32 = 12;
+pub const Anum_pg_database_datctype: u32 = 13;
+pub const Anum_pg_database_daticulocale: u32 = 14;
+pub const Anum_pg_database_datcollversion: u32 = 15;
+pub const Anum_pg_database_datacl: u32 = 16;
+pub const Natts_pg_database: u32 = 16;
+pub const Template1DbOid: u32 = 1;
 pub const EnumRelationId: u32 = 3501;
+pub const EnumOidIndexId: u32 = 3502;
+pub const EnumTypIdLabelIndexId: u32 = 3503;
+pub const EnumTypIdSortOrderIndexId: u32 = 3534;
 pub const Anum_pg_enum_oid: u32 = 1;
 pub const Anum_pg_enum_enumtypid: u32 = 2;
 pub const Anum_pg_enum_enumsortorder: u32 = 3;
 pub const Anum_pg_enum_enumlabel: u32 = 4;
 pub const Natts_pg_enum: u32 = 4;
-pub const EnumOidIndexId: u32 = 3502;
-pub const EnumTypIdLabelIndexId: u32 = 3503;
-pub const EnumTypIdSortOrderIndexId: u32 = 3534;
 pub const OperatorRelationId: u32 = 2617;
+pub const OperatorOidIndexId: u32 = 2688;
+pub const OperatorNameNspIndexId: u32 = 2689;
 pub const Anum_pg_operator_oid: u32 = 1;
 pub const Anum_pg_operator_oprname: u32 = 2;
 pub const Anum_pg_operator_oprnamespace: u32 = 3;
@@ -3080,6 +3084,7 @@ pub const BooleanEqualOperator: u32 = 91;
 pub const Int4EqualOperator: u32 = 96;
 pub const Int4LessOperator: u32 = 97;
 pub const TextEqualOperator: u32 = 98;
+pub const TextPrefixOperator: u32 = 3877;
 pub const NameEqualTextOperator: u32 = 254;
 pub const NameLessTextOperator: u32 = 255;
 pub const NameGreaterEqualTextOperator: u32 = 257;
@@ -3172,10 +3177,10 @@ pub const OID_MULTIRANGE_LEFT_MULTIRANGE_OP: u32 = 4397;
 pub const OID_RANGE_RIGHT_MULTIRANGE_OP: u32 = 4398;
 pub const OID_MULTIRANGE_RIGHT_RANGE_OP: u32 = 4399;
 pub const OID_MULTIRANGE_RIGHT_MULTIRANGE_OP: u32 = 4400;
-pub const OperatorOidIndexId: u32 = 2688;
-pub const OperatorNameNspIndexId: u32 = 2689;
 pub const ProcedureRelationId: u32 = 1255;
 pub const ProcedureRelation_Rowtype_Id: u32 = 81;
+pub const ProcedureOidIndexId: u32 = 2690;
+pub const ProcedureNameArgsNspIndexId: u32 = 2691;
 pub const Anum_pg_proc_oid: u32 = 1;
 pub const Anum_pg_proc_proname: u32 = 2;
 pub const Anum_pg_proc_pronamespace: u32 = 3;
@@ -3222,9 +3227,10 @@ pub const PROARGMODE_OUT: u8 = 111u8;
 pub const PROARGMODE_INOUT: u8 = 98u8;
 pub const PROARGMODE_VARIADIC: u8 = 118u8;
 pub const PROARGMODE_TABLE: u8 = 116u8;
-pub const ProcedureOidIndexId: u32 = 2690;
-pub const ProcedureNameArgsNspIndexId: u32 = 2691;
 pub const TriggerRelationId: u32 = 2620;
+pub const TriggerConstraintIndexId: u32 = 2699;
+pub const TriggerRelidNameIndexId: u32 = 2701;
+pub const TriggerOidIndexId: u32 = 2702;
 pub const Anum_pg_trigger_oid: u32 = 1;
 pub const Anum_pg_trigger_tgrelid: u32 = 2;
 pub const Anum_pg_trigger_tgparentid: u32 = 3;
@@ -3257,12 +3263,9 @@ pub const TRIGGER_TYPE_STATEMENT: u32 = 0;
 pub const TRIGGER_TYPE_TIMING_MASK: u32 = 66;
 pub const TRIGGER_TYPE_AFTER: u32 = 0;
 pub const TRIGGER_TYPE_EVENT_MASK: u32 = 60;
-pub const TriggerConstraintIndexId: u32 = 2699;
-pub const TriggerRelidNameIndexId: u32 = 2701;
-pub const TriggerOidIndexId: u32 = 2702;
-pub const TypeOidIndexId: u32 = 2703;
-pub const TypeNameNspIndexId: u32 = 2704;
 pub const EventTriggerRelationId: u32 = 3466;
+pub const EventTriggerNameIndexId: u32 = 3467;
+pub const EventTriggerOidIndexId: u32 = 3468;
 pub const Anum_pg_event_trigger_oid: u32 = 1;
 pub const Anum_pg_event_trigger_evtname: u32 = 2;
 pub const Anum_pg_event_trigger_evtevent: u32 = 3;
@@ -3271,11 +3274,10 @@ pub const Anum_pg_event_trigger_evtfoid: u32 = 5;
 pub const Anum_pg_event_trigger_evtenabled: u32 = 6;
 pub const Anum_pg_event_trigger_evttags: u32 = 7;
 pub const Natts_pg_event_trigger: u32 = 7;
-pub const EventTriggerNameIndexId: u32 = 3467;
-pub const EventTriggerOidIndexId: u32 = 3468;
 pub const AT_REWRITE_ALTER_PERSISTENCE: u32 = 1;
 pub const AT_REWRITE_DEFAULT_VAL: u32 = 2;
 pub const AT_REWRITE_COLUMN_REWRITE: u32 = 4;
+pub const AT_REWRITE_ACCESS_METHOD: u32 = 8;
 pub const TRIGGER_EVENT_INSERT: u32 = 0;
 pub const TRIGGER_EVENT_DELETE: u32 = 1;
 pub const TRIGGER_EVENT_UPDATE: u32 = 2;
@@ -3298,7 +3300,45 @@ pub const TRIGGER_DISABLED: u8 = 68u8;
 pub const RI_TRIGGER_PK: u32 = 1;
 pub const RI_TRIGGER_FK: u32 = 2;
 pub const RI_TRIGGER_NONE: u32 = 0;
+pub const BGWORKER_SHMEM_ACCESS: u32 = 1;
+pub const BGWORKER_BACKEND_DATABASE_CONNECTION: u32 = 2;
+pub const BGWORKER_CLASS_PARALLEL: u32 = 16;
+pub const BGW_DEFAULT_RESTART_INTERVAL: u32 = 60;
+pub const BGW_NEVER_RESTART: i32 = -1;
+pub const BGW_MAXLEN: u32 = 96;
+pub const BGW_EXTRALEN: u32 = 128;
+pub const BGWORKER_BYPASS_ALLOWCONN: u32 = 1;
+pub const TRANSACTION_STATUS_IN_PROGRESS: u32 = 0;
+pub const TRANSACTION_STATUS_COMMITTED: u32 = 1;
+pub const TRANSACTION_STATUS_ABORTED: u32 = 2;
+pub const TRANSACTION_STATUS_SUB_COMMITTED: u32 = 3;
+pub const CLOG_ZEROPAGE: u32 = 0;
+pub const CLOG_TRUNCATE: u32 = 16;
+pub const WL_LATCH_SET: u32 = 1;
+pub const WL_SOCKET_READABLE: u32 = 2;
+pub const WL_SOCKET_WRITEABLE: u32 = 4;
+pub const WL_TIMEOUT: u32 = 8;
+pub const WL_POSTMASTER_DEATH: u32 = 16;
+pub const WL_EXIT_ON_PM_DEATH: u32 = 32;
+pub const WL_SOCKET_CONNECTED: u32 = 4;
+pub const WL_SOCKET_CLOSED: u32 = 128;
+pub const WL_SOCKET_MASK: u32 = 134;
+pub const PGPROC_MAX_CACHED_SUBXIDS: u32 = 64;
+pub const PROC_IS_AUTOVACUUM: u32 = 1;
+pub const PROC_IN_VACUUM: u32 = 2;
+pub const PROC_IN_SAFE_IC: u32 = 4;
+pub const PROC_VACUUM_FOR_WRAPAROUND: u32 = 8;
+pub const PROC_IN_LOGICAL_DECODING: u32 = 16;
+pub const PROC_AFFECTS_ALL_HORIZONS: u32 = 32;
+pub const PROC_VACUUM_STATE_MASK: u32 = 14;
+pub const PROC_XMIN_FLAGS: u32 = 6;
+pub const FP_LOCK_SLOTS_PER_BACKEND: u32 = 16;
+pub const INVALID_PGPROCNO: u32 = 2147483647;
+pub const DELAY_CHKPT_START: u32 = 1;
+pub const DELAY_CHKPT_COMPLETE: u32 = 2;
+pub const NUM_AUXILIARY_PROCS: u32 = 5;
 pub const StatisticRelationId: u32 = 2619;
+pub const StatisticRelidAttnumInhIndexId: u32 = 2696;
 pub const Anum_pg_statistic_starelid: u32 = 1;
 pub const Anum_pg_statistic_staattnum: u32 = 2;
 pub const Anum_pg_statistic_stainherit: u32 = 3;
@@ -3339,7 +3379,6 @@ pub const STATISTIC_KIND_DECHIST: u32 = 5;
 pub const STATISTIC_KIND_RANGE_LENGTH_HISTOGRAM: u32 = 6;
 pub const STATISTIC_KIND_BOUNDS_HISTOGRAM: u32 = 7;
 pub const STATISTIC_NUM_SLOTS: u32 = 5;
-pub const StatisticRelidAttnumInhIndexId: u32 = 2696;
 pub const VACUUM_OPTION_NO_PARALLEL: u32 = 0;
 pub const VACUUM_OPTION_PARALLEL_BULKDEL: u32 = 1;
 pub const VACUUM_OPTION_PARALLEL_COND_CLEANUP: u32 = 2;
@@ -3386,42 +3425,8 @@ pub const SPI_OK_REWRITTEN: u32 = 14;
 pub const SPI_OK_REL_REGISTER: u32 = 15;
 pub const SPI_OK_REL_UNREGISTER: u32 = 16;
 pub const SPI_OK_TD_REGISTER: u32 = 17;
+pub const SPI_OK_MERGE: u32 = 18;
 pub const SPI_OPT_NONATOMIC: u32 = 1;
-pub const BGWORKER_SHMEM_ACCESS: u32 = 1;
-pub const BGWORKER_BACKEND_DATABASE_CONNECTION: u32 = 2;
-pub const BGWORKER_CLASS_PARALLEL: u32 = 16;
-pub const BGW_DEFAULT_RESTART_INTERVAL: u32 = 60;
-pub const BGW_NEVER_RESTART: i32 = -1;
-pub const BGW_MAXLEN: u32 = 96;
-pub const BGW_EXTRALEN: u32 = 128;
-pub const BGWORKER_BYPASS_ALLOWCONN: u32 = 1;
-pub const TRANSACTION_STATUS_IN_PROGRESS: u32 = 0;
-pub const TRANSACTION_STATUS_COMMITTED: u32 = 1;
-pub const TRANSACTION_STATUS_ABORTED: u32 = 2;
-pub const TRANSACTION_STATUS_SUB_COMMITTED: u32 = 3;
-pub const CLOG_ZEROPAGE: u32 = 0;
-pub const CLOG_TRUNCATE: u32 = 16;
-pub const WL_LATCH_SET: u32 = 1;
-pub const WL_SOCKET_READABLE: u32 = 2;
-pub const WL_SOCKET_WRITEABLE: u32 = 4;
-pub const WL_TIMEOUT: u32 = 8;
-pub const WL_POSTMASTER_DEATH: u32 = 16;
-pub const WL_EXIT_ON_PM_DEATH: u32 = 32;
-pub const WL_SOCKET_CONNECTED: u32 = 4;
-pub const WL_SOCKET_MASK: u32 = 6;
-pub const PGPROC_MAX_CACHED_SUBXIDS: u32 = 64;
-pub const PROC_IS_AUTOVACUUM: u32 = 1;
-pub const PROC_IN_VACUUM: u32 = 2;
-pub const PROC_IN_SAFE_IC: u32 = 4;
-pub const PROC_VACUUM_FOR_WRAPAROUND: u32 = 8;
-pub const PROC_IN_LOGICAL_DECODING: u32 = 16;
-pub const PROC_VACUUM_STATE_MASK: u32 = 14;
-pub const PROC_XMIN_FLAGS: u32 = 6;
-pub const FP_LOCK_SLOTS_PER_BACKEND: u32 = 16;
-pub const INVALID_PGPROCNO: u32 = 2147483647;
-pub const DELAY_CHKPT_START: u32 = 1;
-pub const DELAY_CHKPT_COMPLETE: u32 = 2;
-pub const NUM_AUXILIARY_PROCS: u32 = 5;
 pub const HAVE_PLANNERINFO_TYPEDEF: u32 = 1;
 pub const AMFLAG_HAS_TID_RANGE: u32 = 1;
 pub const HAVE_INDEXOPTINFO_TYPEDEF: u32 = 1;
@@ -3490,6 +3495,7 @@ pub const MAX_UNICODE_EQUIVALENT_STRING: u32 = 16;
 pub const EXTNODENAME_MAX_LEN: u32 = 64;
 pub const CUSTOMPATH_SUPPORT_BACKWARD_SCAN: u32 = 1;
 pub const CUSTOMPATH_SUPPORT_MARK_RESTORE: u32 = 2;
+pub const CUSTOMPATH_SUPPORT_PROJECTION: u32 = 4;
 pub const QTW_IGNORE_RT_SUBQUERIES: u32 = 1;
 pub const QTW_IGNORE_CTE_SUBQUERIES: u32 = 2;
 pub const QTW_IGNORE_RC_SUBQUERIES: u32 = 3;
@@ -3506,6 +3512,7 @@ pub const DEFAULT_CPU_INDEX_TUPLE_COST: f64 = 0.005;
 pub const DEFAULT_CPU_OPERATOR_COST: f64 = 0.0025;
 pub const DEFAULT_PARALLEL_TUPLE_COST: f64 = 0.1;
 pub const DEFAULT_PARALLEL_SETUP_COST: f64 = 1000.0;
+pub const DEFAULT_RECURSIVE_WORKTABLE_FACTOR: f64 = 10.0;
 pub const DEFAULT_EFFECTIVE_CACHE_SIZE: u32 = 524288;
 pub const PVC_INCLUDE_AGGREGATES: u32 = 1;
 pub const PVC_RECURSE_AGGREGATES: u32 = 2;
@@ -3678,6 +3685,8 @@ pub const DTERR_INTERVAL_OVERFLOW: i32 = -4;
 pub const DTERR_TZDISP_OVERFLOW: i32 = -5;
 pub const RADIANS_PER_DEGREE: f64 = 0.017453292519943295;
 pub const NUMERIC_MAX_PRECISION: u32 = 1000;
+pub const NUMERIC_MIN_SCALE: i32 = -1000;
+pub const NUMERIC_MAX_SCALE: u32 = 1000;
 pub const NUMERIC_MAX_DISPLAY_SCALE: u32 = 1000;
 pub const NUMERIC_MIN_DISPLAY_SCALE: u32 = 0;
 pub const NUMERIC_MAX_RESULT_SCALE: u32 = 2000;
@@ -8723,2031 +8732,6 @@ pub unsafe fn __tolower(arg_arg1: __darwin_ct_rune_t) -> __darwin_ct_rune_t {
         __tolower(arg_arg1)
     })
 }
-pub type socklen_t = __darwin_socklen_t;
-pub type sa_family_t = __uint8_t;
-#[repr(C)]
-#[derive(Debug, Copy, Clone)]
-pub struct iovec {
-    pub iov_base: *mut ::std::os::raw::c_void,
-    pub iov_len: usize,
-}
-impl Default for iovec {
-    fn default() -> Self {
-        let mut s = ::std::mem::MaybeUninit::<Self>::uninit();
-        unsafe {
-            ::std::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
-            s.assume_init()
-        }
-    }
-}
-pub type sae_associd_t = __uint32_t;
-pub type sae_connid_t = __uint32_t;
-#[repr(C)]
-#[derive(Debug, Copy, Clone)]
-pub struct sa_endpoints {
-    pub sae_srcif: ::std::os::raw::c_uint,
-    pub sae_srcaddr: *const sockaddr,
-    pub sae_srcaddrlen: socklen_t,
-    pub sae_dstaddr: *const sockaddr,
-    pub sae_dstaddrlen: socklen_t,
-}
-impl Default for sa_endpoints {
-    fn default() -> Self {
-        let mut s = ::std::mem::MaybeUninit::<Self>::uninit();
-        unsafe {
-            ::std::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
-            s.assume_init()
-        }
-    }
-}
-pub type sa_endpoints_t = sa_endpoints;
-#[repr(C)]
-#[derive(Debug, Default, Copy, Clone)]
-pub struct linger {
-    pub l_onoff: ::std::os::raw::c_int,
-    pub l_linger: ::std::os::raw::c_int,
-}
-#[repr(C)]
-#[derive(Debug, Default, Copy, Clone)]
-pub struct so_np_extensions {
-    pub npx_flags: u_int32_t,
-    pub npx_mask: u_int32_t,
-}
-#[repr(C)]
-#[derive(Debug, Default, Copy, Clone)]
-pub struct sockaddr {
-    pub sa_len: __uint8_t,
-    pub sa_family: sa_family_t,
-    pub sa_data: [::std::os::raw::c_char; 14usize],
-}
-#[repr(C)]
-#[derive(Debug, Default, Copy, Clone)]
-pub struct sockproto {
-    pub sp_family: __uint16_t,
-    pub sp_protocol: __uint16_t,
-}
-#[repr(C)]
-#[derive(Debug, Copy, Clone)]
-pub struct sockaddr_storage {
-    pub ss_len: __uint8_t,
-    pub ss_family: sa_family_t,
-    pub __ss_pad1: [::std::os::raw::c_char; 6usize],
-    pub __ss_align: __int64_t,
-    pub __ss_pad2: [::std::os::raw::c_char; 112usize],
-}
-impl Default for sockaddr_storage {
-    fn default() -> Self {
-        let mut s = ::std::mem::MaybeUninit::<Self>::uninit();
-        unsafe {
-            ::std::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
-            s.assume_init()
-        }
-    }
-}
-#[repr(C)]
-#[derive(Debug, Copy, Clone)]
-pub struct msghdr {
-    pub msg_name: *mut ::std::os::raw::c_void,
-    pub msg_namelen: socklen_t,
-    pub msg_iov: *mut iovec,
-    pub msg_iovlen: ::std::os::raw::c_int,
-    pub msg_control: *mut ::std::os::raw::c_void,
-    pub msg_controllen: socklen_t,
-    pub msg_flags: ::std::os::raw::c_int,
-}
-impl Default for msghdr {
-    fn default() -> Self {
-        let mut s = ::std::mem::MaybeUninit::<Self>::uninit();
-        unsafe {
-            ::std::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
-            s.assume_init()
-        }
-    }
-}
-#[repr(C)]
-#[derive(Debug, Default, Copy, Clone)]
-pub struct cmsghdr {
-    pub cmsg_len: socklen_t,
-    pub cmsg_level: ::std::os::raw::c_int,
-    pub cmsg_type: ::std::os::raw::c_int,
-}
-#[repr(C)]
-#[derive(Debug, Copy, Clone)]
-pub struct sf_hdtr {
-    pub headers: *mut iovec,
-    pub hdr_cnt: ::std::os::raw::c_int,
-    pub trailers: *mut iovec,
-    pub trl_cnt: ::std::os::raw::c_int,
-}
-impl Default for sf_hdtr {
-    fn default() -> Self {
-        let mut s = ::std::mem::MaybeUninit::<Self>::uninit();
-        unsafe {
-            ::std::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
-            s.assume_init()
-        }
-    }
-}
-pub unsafe fn accept(
-    arg_arg1: ::std::os::raw::c_int,
-    arg_arg2: *mut sockaddr,
-    arg_arg3: *mut socklen_t,
-) -> ::std::os::raw::c_int {
-    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
-        extern "C" {
-            pub fn accept(
-                arg1: ::std::os::raw::c_int,
-                arg2: *mut sockaddr,
-                arg3: *mut socklen_t,
-            ) -> ::std::os::raw::c_int;
-        }
-        accept(arg_arg1, arg_arg2, arg_arg3)
-    })
-}
-pub unsafe fn bind(
-    arg_arg1: ::std::os::raw::c_int,
-    arg_arg2: *const sockaddr,
-    arg_arg3: socklen_t,
-) -> ::std::os::raw::c_int {
-    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
-        extern "C" {
-            pub fn bind(
-                arg1: ::std::os::raw::c_int,
-                arg2: *const sockaddr,
-                arg3: socklen_t,
-            ) -> ::std::os::raw::c_int;
-        }
-        bind(arg_arg1, arg_arg2, arg_arg3)
-    })
-}
-pub unsafe fn connect(
-    arg_arg1: ::std::os::raw::c_int,
-    arg_arg2: *const sockaddr,
-    arg_arg3: socklen_t,
-) -> ::std::os::raw::c_int {
-    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
-        extern "C" {
-            pub fn connect(
-                arg1: ::std::os::raw::c_int,
-                arg2: *const sockaddr,
-                arg3: socklen_t,
-            ) -> ::std::os::raw::c_int;
-        }
-        connect(arg_arg1, arg_arg2, arg_arg3)
-    })
-}
-pub unsafe fn getpeername(
-    arg_arg1: ::std::os::raw::c_int,
-    arg_arg2: *mut sockaddr,
-    arg_arg3: *mut socklen_t,
-) -> ::std::os::raw::c_int {
-    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
-        extern "C" {
-            pub fn getpeername(
-                arg1: ::std::os::raw::c_int,
-                arg2: *mut sockaddr,
-                arg3: *mut socklen_t,
-            ) -> ::std::os::raw::c_int;
-        }
-        getpeername(arg_arg1, arg_arg2, arg_arg3)
-    })
-}
-pub unsafe fn getsockname(
-    arg_arg1: ::std::os::raw::c_int,
-    arg_arg2: *mut sockaddr,
-    arg_arg3: *mut socklen_t,
-) -> ::std::os::raw::c_int {
-    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
-        extern "C" {
-            pub fn getsockname(
-                arg1: ::std::os::raw::c_int,
-                arg2: *mut sockaddr,
-                arg3: *mut socklen_t,
-            ) -> ::std::os::raw::c_int;
-        }
-        getsockname(arg_arg1, arg_arg2, arg_arg3)
-    })
-}
-pub unsafe fn getsockopt(
-    arg_arg1: ::std::os::raw::c_int,
-    arg_arg2: ::std::os::raw::c_int,
-    arg_arg3: ::std::os::raw::c_int,
-    arg_arg4: *mut ::std::os::raw::c_void,
-    arg_arg5: *mut socklen_t,
-) -> ::std::os::raw::c_int {
-    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
-        extern "C" {
-            pub fn getsockopt(
-                arg1: ::std::os::raw::c_int,
-                arg2: ::std::os::raw::c_int,
-                arg3: ::std::os::raw::c_int,
-                arg4: *mut ::std::os::raw::c_void,
-                arg5: *mut socklen_t,
-            ) -> ::std::os::raw::c_int;
-        }
-        getsockopt(arg_arg1, arg_arg2, arg_arg3, arg_arg4, arg_arg5)
-    })
-}
-pub unsafe fn listen(
-    arg_arg1: ::std::os::raw::c_int,
-    arg_arg2: ::std::os::raw::c_int,
-) -> ::std::os::raw::c_int {
-    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
-        extern "C" {
-            pub fn listen(
-                arg1: ::std::os::raw::c_int,
-                arg2: ::std::os::raw::c_int,
-            ) -> ::std::os::raw::c_int;
-        }
-        listen(arg_arg1, arg_arg2)
-    })
-}
-pub unsafe fn recv(
-    arg_arg1: ::std::os::raw::c_int,
-    arg_arg2: *mut ::std::os::raw::c_void,
-    arg_arg3: usize,
-    arg_arg4: ::std::os::raw::c_int,
-) -> isize {
-    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
-        extern "C" {
-            pub fn recv(
-                arg1: ::std::os::raw::c_int,
-                arg2: *mut ::std::os::raw::c_void,
-                arg3: usize,
-                arg4: ::std::os::raw::c_int,
-            ) -> isize;
-        }
-        recv(arg_arg1, arg_arg2, arg_arg3, arg_arg4)
-    })
-}
-pub unsafe fn recvfrom(
-    arg_arg1: ::std::os::raw::c_int,
-    arg_arg2: *mut ::std::os::raw::c_void,
-    arg_arg3: usize,
-    arg_arg4: ::std::os::raw::c_int,
-    arg_arg5: *mut sockaddr,
-    arg_arg6: *mut socklen_t,
-) -> isize {
-    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
-        extern "C" {
-            pub fn recvfrom(
-                arg1: ::std::os::raw::c_int,
-                arg2: *mut ::std::os::raw::c_void,
-                arg3: usize,
-                arg4: ::std::os::raw::c_int,
-                arg5: *mut sockaddr,
-                arg6: *mut socklen_t,
-            ) -> isize;
-        }
-        recvfrom(arg_arg1, arg_arg2, arg_arg3, arg_arg4, arg_arg5, arg_arg6)
-    })
-}
-pub unsafe fn recvmsg(
-    arg_arg1: ::std::os::raw::c_int,
-    arg_arg2: *mut msghdr,
-    arg_arg3: ::std::os::raw::c_int,
-) -> isize {
-    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
-        extern "C" {
-            pub fn recvmsg(
-                arg1: ::std::os::raw::c_int,
-                arg2: *mut msghdr,
-                arg3: ::std::os::raw::c_int,
-            ) -> isize;
-        }
-        recvmsg(arg_arg1, arg_arg2, arg_arg3)
-    })
-}
-pub unsafe fn send(
-    arg_arg1: ::std::os::raw::c_int,
-    arg_arg2: *const ::std::os::raw::c_void,
-    arg_arg3: usize,
-    arg_arg4: ::std::os::raw::c_int,
-) -> isize {
-    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
-        extern "C" {
-            pub fn send(
-                arg1: ::std::os::raw::c_int,
-                arg2: *const ::std::os::raw::c_void,
-                arg3: usize,
-                arg4: ::std::os::raw::c_int,
-            ) -> isize;
-        }
-        send(arg_arg1, arg_arg2, arg_arg3, arg_arg4)
-    })
-}
-pub unsafe fn sendmsg(
-    arg_arg1: ::std::os::raw::c_int,
-    arg_arg2: *const msghdr,
-    arg_arg3: ::std::os::raw::c_int,
-) -> isize {
-    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
-        extern "C" {
-            pub fn sendmsg(
-                arg1: ::std::os::raw::c_int,
-                arg2: *const msghdr,
-                arg3: ::std::os::raw::c_int,
-            ) -> isize;
-        }
-        sendmsg(arg_arg1, arg_arg2, arg_arg3)
-    })
-}
-pub unsafe fn sendto(
-    arg_arg1: ::std::os::raw::c_int,
-    arg_arg2: *const ::std::os::raw::c_void,
-    arg_arg3: usize,
-    arg_arg4: ::std::os::raw::c_int,
-    arg_arg5: *const sockaddr,
-    arg_arg6: socklen_t,
-) -> isize {
-    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
-        extern "C" {
-            pub fn sendto(
-                arg1: ::std::os::raw::c_int,
-                arg2: *const ::std::os::raw::c_void,
-                arg3: usize,
-                arg4: ::std::os::raw::c_int,
-                arg5: *const sockaddr,
-                arg6: socklen_t,
-            ) -> isize;
-        }
-        sendto(arg_arg1, arg_arg2, arg_arg3, arg_arg4, arg_arg5, arg_arg6)
-    })
-}
-pub unsafe fn setsockopt(
-    arg_arg1: ::std::os::raw::c_int,
-    arg_arg2: ::std::os::raw::c_int,
-    arg_arg3: ::std::os::raw::c_int,
-    arg_arg4: *const ::std::os::raw::c_void,
-    arg_arg5: socklen_t,
-) -> ::std::os::raw::c_int {
-    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
-        extern "C" {
-            pub fn setsockopt(
-                arg1: ::std::os::raw::c_int,
-                arg2: ::std::os::raw::c_int,
-                arg3: ::std::os::raw::c_int,
-                arg4: *const ::std::os::raw::c_void,
-                arg5: socklen_t,
-            ) -> ::std::os::raw::c_int;
-        }
-        setsockopt(arg_arg1, arg_arg2, arg_arg3, arg_arg4, arg_arg5)
-    })
-}
-pub unsafe fn shutdown(
-    arg_arg1: ::std::os::raw::c_int,
-    arg_arg2: ::std::os::raw::c_int,
-) -> ::std::os::raw::c_int {
-    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
-        extern "C" {
-            pub fn shutdown(
-                arg1: ::std::os::raw::c_int,
-                arg2: ::std::os::raw::c_int,
-            ) -> ::std::os::raw::c_int;
-        }
-        shutdown(arg_arg1, arg_arg2)
-    })
-}
-pub unsafe fn sockatmark(arg_arg1: ::std::os::raw::c_int) -> ::std::os::raw::c_int {
-    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
-        extern "C" {
-            pub fn sockatmark(arg1: ::std::os::raw::c_int) -> ::std::os::raw::c_int;
-        }
-        sockatmark(arg_arg1)
-    })
-}
-pub unsafe fn socket(
-    arg_arg1: ::std::os::raw::c_int,
-    arg_arg2: ::std::os::raw::c_int,
-    arg_arg3: ::std::os::raw::c_int,
-) -> ::std::os::raw::c_int {
-    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
-        extern "C" {
-            pub fn socket(
-                arg1: ::std::os::raw::c_int,
-                arg2: ::std::os::raw::c_int,
-                arg3: ::std::os::raw::c_int,
-            ) -> ::std::os::raw::c_int;
-        }
-        socket(arg_arg1, arg_arg2, arg_arg3)
-    })
-}
-pub unsafe fn socketpair(
-    arg_arg1: ::std::os::raw::c_int,
-    arg_arg2: ::std::os::raw::c_int,
-    arg_arg3: ::std::os::raw::c_int,
-    arg_arg4: *mut ::std::os::raw::c_int,
-) -> ::std::os::raw::c_int {
-    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
-        extern "C" {
-            pub fn socketpair(
-                arg1: ::std::os::raw::c_int,
-                arg2: ::std::os::raw::c_int,
-                arg3: ::std::os::raw::c_int,
-                arg4: *mut ::std::os::raw::c_int,
-            ) -> ::std::os::raw::c_int;
-        }
-        socketpair(arg_arg1, arg_arg2, arg_arg3, arg_arg4)
-    })
-}
-pub unsafe fn sendfile(
-    arg_arg1: ::std::os::raw::c_int,
-    arg_arg2: ::std::os::raw::c_int,
-    arg_arg3: off_t,
-    arg_arg4: *mut off_t,
-    arg_arg5: *mut sf_hdtr,
-    arg_arg6: ::std::os::raw::c_int,
-) -> ::std::os::raw::c_int {
-    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
-        extern "C" {
-            pub fn sendfile(
-                arg1: ::std::os::raw::c_int,
-                arg2: ::std::os::raw::c_int,
-                arg3: off_t,
-                arg4: *mut off_t,
-                arg5: *mut sf_hdtr,
-                arg6: ::std::os::raw::c_int,
-            ) -> ::std::os::raw::c_int;
-        }
-        sendfile(arg_arg1, arg_arg2, arg_arg3, arg_arg4, arg_arg5, arg_arg6)
-    })
-}
-pub unsafe fn pfctlinput(arg_arg1: ::std::os::raw::c_int, arg_arg2: *mut sockaddr) {
-    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
-        extern "C" {
-            pub fn pfctlinput(arg1: ::std::os::raw::c_int, arg2: *mut sockaddr);
-        }
-        pfctlinput(arg_arg1, arg_arg2)
-    })
-}
-pub unsafe fn connectx(
-    arg_arg1: ::std::os::raw::c_int,
-    arg_arg2: *const sa_endpoints_t,
-    arg_arg3: sae_associd_t,
-    arg_arg4: ::std::os::raw::c_uint,
-    arg_arg5: *const iovec,
-    arg_arg6: ::std::os::raw::c_uint,
-    arg_arg7: *mut usize,
-    arg_arg8: *mut sae_connid_t,
-) -> ::std::os::raw::c_int {
-    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
-        extern "C" {
-            pub fn connectx(
-                arg1: ::std::os::raw::c_int,
-                arg2: *const sa_endpoints_t,
-                arg3: sae_associd_t,
-                arg4: ::std::os::raw::c_uint,
-                arg5: *const iovec,
-                arg6: ::std::os::raw::c_uint,
-                arg7: *mut usize,
-                arg8: *mut sae_connid_t,
-            ) -> ::std::os::raw::c_int;
-        }
-        connectx(arg_arg1, arg_arg2, arg_arg3, arg_arg4, arg_arg5, arg_arg6, arg_arg7, arg_arg8)
-    })
-}
-pub unsafe fn disconnectx(
-    arg_arg1: ::std::os::raw::c_int,
-    arg_arg2: sae_associd_t,
-    arg_arg3: sae_connid_t,
-) -> ::std::os::raw::c_int {
-    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
-        extern "C" {
-            pub fn disconnectx(
-                arg1: ::std::os::raw::c_int,
-                arg2: sae_associd_t,
-                arg3: sae_connid_t,
-            ) -> ::std::os::raw::c_int;
-        }
-        disconnectx(arg_arg1, arg_arg2, arg_arg3)
-    })
-}
-#[repr(C)]
-#[derive(Debug, Default, Copy, Clone)]
-pub struct in_addr {
-    pub s_addr: in_addr_t,
-}
-#[repr(C)]
-#[derive(Debug, Default, Copy, Clone)]
-pub struct sockaddr_in {
-    pub sin_len: __uint8_t,
-    pub sin_family: sa_family_t,
-    pub sin_port: in_port_t,
-    pub sin_addr: in_addr,
-    pub sin_zero: [::std::os::raw::c_char; 8usize],
-}
-#[repr(C)]
-#[derive(Debug, Copy, Clone)]
-pub struct ip_opts {
-    pub ip_dst: in_addr,
-    pub ip_opts: [::std::os::raw::c_char; 40usize],
-}
-impl Default for ip_opts {
-    fn default() -> Self {
-        let mut s = ::std::mem::MaybeUninit::<Self>::uninit();
-        unsafe {
-            ::std::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
-            s.assume_init()
-        }
-    }
-}
-#[repr(C)]
-#[derive(Debug, Default, Copy, Clone)]
-pub struct ip_mreq {
-    pub imr_multiaddr: in_addr,
-    pub imr_interface: in_addr,
-}
-#[repr(C)]
-#[derive(Debug, Default, Copy, Clone)]
-pub struct ip_mreqn {
-    pub imr_multiaddr: in_addr,
-    pub imr_address: in_addr,
-    pub imr_ifindex: ::std::os::raw::c_int,
-}
-#[repr(C)]
-#[derive(Debug, Default, Copy, Clone)]
-pub struct ip_mreq_source {
-    pub imr_multiaddr: in_addr,
-    pub imr_sourceaddr: in_addr,
-    pub imr_interface: in_addr,
-}
-#[repr(C, packed(4))]
-#[derive(Debug, Copy, Clone)]
-pub struct group_req {
-    pub gr_interface: u32,
-    pub gr_group: sockaddr_storage,
-}
-impl Default for group_req {
-    fn default() -> Self {
-        let mut s = ::std::mem::MaybeUninit::<Self>::uninit();
-        unsafe {
-            ::std::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
-            s.assume_init()
-        }
-    }
-}
-#[repr(C, packed(4))]
-#[derive(Debug, Copy, Clone)]
-pub struct group_source_req {
-    pub gsr_interface: u32,
-    pub gsr_group: sockaddr_storage,
-    pub gsr_source: sockaddr_storage,
-}
-impl Default for group_source_req {
-    fn default() -> Self {
-        let mut s = ::std::mem::MaybeUninit::<Self>::uninit();
-        unsafe {
-            ::std::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
-            s.assume_init()
-        }
-    }
-}
-#[repr(C, packed(4))]
-#[derive(Debug, Copy, Clone)]
-pub struct __msfilterreq {
-    pub msfr_ifindex: u32,
-    pub msfr_fmode: u32,
-    pub msfr_nsrcs: u32,
-    pub __msfr_align: u32,
-    pub msfr_group: sockaddr_storage,
-    pub msfr_srcs: *mut sockaddr_storage,
-}
-impl Default for __msfilterreq {
-    fn default() -> Self {
-        let mut s = ::std::mem::MaybeUninit::<Self>::uninit();
-        unsafe {
-            ::std::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
-            s.assume_init()
-        }
-    }
-}
-pub unsafe fn setipv4sourcefilter(
-    arg_arg1: ::std::os::raw::c_int,
-    arg_arg2: in_addr,
-    arg_arg3: in_addr,
-    arg_arg4: u32,
-    arg_arg5: u32,
-    arg_arg6: *mut in_addr,
-) -> ::std::os::raw::c_int {
-    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
-        extern "C" {
-            pub fn setipv4sourcefilter(
-                arg1: ::std::os::raw::c_int,
-                arg2: in_addr,
-                arg3: in_addr,
-                arg4: u32,
-                arg5: u32,
-                arg6: *mut in_addr,
-            ) -> ::std::os::raw::c_int;
-        }
-        setipv4sourcefilter(arg_arg1, arg_arg2, arg_arg3, arg_arg4, arg_arg5, arg_arg6)
-    })
-}
-pub unsafe fn getipv4sourcefilter(
-    arg_arg1: ::std::os::raw::c_int,
-    arg_arg2: in_addr,
-    arg_arg3: in_addr,
-    arg_arg4: *mut u32,
-    arg_arg5: *mut u32,
-    arg_arg6: *mut in_addr,
-) -> ::std::os::raw::c_int {
-    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
-        extern "C" {
-            pub fn getipv4sourcefilter(
-                arg1: ::std::os::raw::c_int,
-                arg2: in_addr,
-                arg3: in_addr,
-                arg4: *mut u32,
-                arg5: *mut u32,
-                arg6: *mut in_addr,
-            ) -> ::std::os::raw::c_int;
-        }
-        getipv4sourcefilter(arg_arg1, arg_arg2, arg_arg3, arg_arg4, arg_arg5, arg_arg6)
-    })
-}
-pub unsafe fn setsourcefilter(
-    arg_arg1: ::std::os::raw::c_int,
-    arg_arg2: u32,
-    arg_arg3: *mut sockaddr,
-    arg_arg4: socklen_t,
-    arg_arg5: u32,
-    arg_arg6: u32,
-    arg_arg7: *mut sockaddr_storage,
-) -> ::std::os::raw::c_int {
-    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
-        extern "C" {
-            pub fn setsourcefilter(
-                arg1: ::std::os::raw::c_int,
-                arg2: u32,
-                arg3: *mut sockaddr,
-                arg4: socklen_t,
-                arg5: u32,
-                arg6: u32,
-                arg7: *mut sockaddr_storage,
-            ) -> ::std::os::raw::c_int;
-        }
-        setsourcefilter(arg_arg1, arg_arg2, arg_arg3, arg_arg4, arg_arg5, arg_arg6, arg_arg7)
-    })
-}
-pub unsafe fn getsourcefilter(
-    arg_arg1: ::std::os::raw::c_int,
-    arg_arg2: u32,
-    arg_arg3: *mut sockaddr,
-    arg_arg4: socklen_t,
-    arg_arg5: *mut u32,
-    arg_arg6: *mut u32,
-    arg_arg7: *mut sockaddr_storage,
-) -> ::std::os::raw::c_int {
-    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
-        extern "C" {
-            pub fn getsourcefilter(
-                arg1: ::std::os::raw::c_int,
-                arg2: u32,
-                arg3: *mut sockaddr,
-                arg4: socklen_t,
-                arg5: *mut u32,
-                arg6: *mut u32,
-                arg7: *mut sockaddr_storage,
-            ) -> ::std::os::raw::c_int;
-        }
-        getsourcefilter(arg_arg1, arg_arg2, arg_arg3, arg_arg4, arg_arg5, arg_arg6, arg_arg7)
-    })
-}
-#[repr(C)]
-#[derive(Debug, Default, Copy, Clone)]
-pub struct in_pktinfo {
-    pub ipi_ifindex: ::std::os::raw::c_uint,
-    pub ipi_spec_dst: in_addr,
-    pub ipi_addr: in_addr,
-}
-#[repr(C)]
-#[derive(Copy, Clone)]
-pub struct in6_addr {
-    pub __u6_addr: in6_addr__bindgen_ty_1,
-}
-#[repr(C)]
-#[derive(Copy, Clone)]
-pub union in6_addr__bindgen_ty_1 {
-    pub __u6_addr8: [__uint8_t; 16usize],
-    pub __u6_addr16: [__uint16_t; 8usize],
-    pub __u6_addr32: [__uint32_t; 4usize],
-}
-impl Default for in6_addr__bindgen_ty_1 {
-    fn default() -> Self {
-        let mut s = ::std::mem::MaybeUninit::<Self>::uninit();
-        unsafe {
-            ::std::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
-            s.assume_init()
-        }
-    }
-}
-impl Default for in6_addr {
-    fn default() -> Self {
-        let mut s = ::std::mem::MaybeUninit::<Self>::uninit();
-        unsafe {
-            ::std::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
-            s.assume_init()
-        }
-    }
-}
-pub type in6_addr_t = in6_addr;
-#[repr(C)]
-#[derive(Copy, Clone)]
-pub struct sockaddr_in6 {
-    pub sin6_len: __uint8_t,
-    pub sin6_family: sa_family_t,
-    pub sin6_port: in_port_t,
-    pub sin6_flowinfo: __uint32_t,
-    pub sin6_addr: in6_addr,
-    pub sin6_scope_id: __uint32_t,
-}
-impl Default for sockaddr_in6 {
-    fn default() -> Self {
-        let mut s = ::std::mem::MaybeUninit::<Self>::uninit();
-        unsafe {
-            ::std::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
-            s.assume_init()
-        }
-    }
-}
-extern "C" {
-    pub static in6addr_any: in6_addr;
-}
-extern "C" {
-    pub static in6addr_loopback: in6_addr;
-}
-extern "C" {
-    pub static in6addr_nodelocal_allnodes: in6_addr;
-}
-extern "C" {
-    pub static in6addr_linklocal_allnodes: in6_addr;
-}
-extern "C" {
-    pub static in6addr_linklocal_allrouters: in6_addr;
-}
-extern "C" {
-    pub static in6addr_linklocal_allv2routers: in6_addr;
-}
-#[repr(C)]
-#[derive(Copy, Clone)]
-pub struct ipv6_mreq {
-    pub ipv6mr_multiaddr: in6_addr,
-    pub ipv6mr_interface: ::std::os::raw::c_uint,
-}
-impl Default for ipv6_mreq {
-    fn default() -> Self {
-        let mut s = ::std::mem::MaybeUninit::<Self>::uninit();
-        unsafe {
-            ::std::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
-            s.assume_init()
-        }
-    }
-}
-#[repr(C)]
-#[derive(Copy, Clone)]
-pub struct in6_pktinfo {
-    pub ipi6_addr: in6_addr,
-    pub ipi6_ifindex: ::std::os::raw::c_uint,
-}
-impl Default for in6_pktinfo {
-    fn default() -> Self {
-        let mut s = ::std::mem::MaybeUninit::<Self>::uninit();
-        unsafe {
-            ::std::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
-            s.assume_init()
-        }
-    }
-}
-#[repr(C)]
-#[derive(Copy, Clone)]
-pub struct ip6_mtuinfo {
-    pub ip6m_addr: sockaddr_in6,
-    pub ip6m_mtu: u32,
-}
-impl Default for ip6_mtuinfo {
-    fn default() -> Self {
-        let mut s = ::std::mem::MaybeUninit::<Self>::uninit();
-        unsafe {
-            ::std::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
-            s.assume_init()
-        }
-    }
-}
-pub unsafe fn inet6_option_space(arg_arg1: ::std::os::raw::c_int) -> ::std::os::raw::c_int {
-    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
-        extern "C" {
-            pub fn inet6_option_space(arg1: ::std::os::raw::c_int) -> ::std::os::raw::c_int;
-        }
-        inet6_option_space(arg_arg1)
-    })
-}
-pub unsafe fn inet6_option_init(
-    arg_arg1: *mut ::std::os::raw::c_void,
-    arg_arg2: *mut *mut cmsghdr,
-    arg_arg3: ::std::os::raw::c_int,
-) -> ::std::os::raw::c_int {
-    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
-        extern "C" {
-            pub fn inet6_option_init(
-                arg1: *mut ::std::os::raw::c_void,
-                arg2: *mut *mut cmsghdr,
-                arg3: ::std::os::raw::c_int,
-            ) -> ::std::os::raw::c_int;
-        }
-        inet6_option_init(arg_arg1, arg_arg2, arg_arg3)
-    })
-}
-pub unsafe fn inet6_option_append(
-    arg_arg1: *mut cmsghdr,
-    arg_arg2: *const __uint8_t,
-    arg_arg3: ::std::os::raw::c_int,
-    arg_arg4: ::std::os::raw::c_int,
-) -> ::std::os::raw::c_int {
-    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
-        extern "C" {
-            pub fn inet6_option_append(
-                arg1: *mut cmsghdr,
-                arg2: *const __uint8_t,
-                arg3: ::std::os::raw::c_int,
-                arg4: ::std::os::raw::c_int,
-            ) -> ::std::os::raw::c_int;
-        }
-        inet6_option_append(arg_arg1, arg_arg2, arg_arg3, arg_arg4)
-    })
-}
-pub unsafe fn inet6_option_alloc(
-    arg_arg1: *mut cmsghdr,
-    arg_arg2: ::std::os::raw::c_int,
-    arg_arg3: ::std::os::raw::c_int,
-    arg_arg4: ::std::os::raw::c_int,
-) -> *mut __uint8_t {
-    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
-        extern "C" {
-            pub fn inet6_option_alloc(
-                arg1: *mut cmsghdr,
-                arg2: ::std::os::raw::c_int,
-                arg3: ::std::os::raw::c_int,
-                arg4: ::std::os::raw::c_int,
-            ) -> *mut __uint8_t;
-        }
-        inet6_option_alloc(arg_arg1, arg_arg2, arg_arg3, arg_arg4)
-    })
-}
-pub unsafe fn inet6_option_next(
-    arg_arg1: *const cmsghdr,
-    arg_arg2: *mut *mut __uint8_t,
-) -> ::std::os::raw::c_int {
-    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
-        extern "C" {
-            pub fn inet6_option_next(
-                arg1: *const cmsghdr,
-                arg2: *mut *mut __uint8_t,
-            ) -> ::std::os::raw::c_int;
-        }
-        inet6_option_next(arg_arg1, arg_arg2)
-    })
-}
-pub unsafe fn inet6_option_find(
-    arg_arg1: *const cmsghdr,
-    arg_arg2: *mut *mut __uint8_t,
-    arg_arg3: ::std::os::raw::c_int,
-) -> ::std::os::raw::c_int {
-    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
-        extern "C" {
-            pub fn inet6_option_find(
-                arg1: *const cmsghdr,
-                arg2: *mut *mut __uint8_t,
-                arg3: ::std::os::raw::c_int,
-            ) -> ::std::os::raw::c_int;
-        }
-        inet6_option_find(arg_arg1, arg_arg2, arg_arg3)
-    })
-}
-pub unsafe fn inet6_rthdr_space(
-    arg_arg1: ::std::os::raw::c_int,
-    arg_arg2: ::std::os::raw::c_int,
-) -> usize {
-    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
-        extern "C" {
-            pub fn inet6_rthdr_space(
-                arg1: ::std::os::raw::c_int,
-                arg2: ::std::os::raw::c_int,
-            ) -> usize;
-        }
-        inet6_rthdr_space(arg_arg1, arg_arg2)
-    })
-}
-pub unsafe fn inet6_rthdr_init(
-    arg_arg1: *mut ::std::os::raw::c_void,
-    arg_arg2: ::std::os::raw::c_int,
-) -> *mut cmsghdr {
-    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
-        extern "C" {
-            pub fn inet6_rthdr_init(
-                arg1: *mut ::std::os::raw::c_void,
-                arg2: ::std::os::raw::c_int,
-            ) -> *mut cmsghdr;
-        }
-        inet6_rthdr_init(arg_arg1, arg_arg2)
-    })
-}
-pub unsafe fn inet6_rthdr_add(
-    arg_arg1: *mut cmsghdr,
-    arg_arg2: *const in6_addr,
-    arg_arg3: ::std::os::raw::c_uint,
-) -> ::std::os::raw::c_int {
-    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
-        extern "C" {
-            pub fn inet6_rthdr_add(
-                arg1: *mut cmsghdr,
-                arg2: *const in6_addr,
-                arg3: ::std::os::raw::c_uint,
-            ) -> ::std::os::raw::c_int;
-        }
-        inet6_rthdr_add(arg_arg1, arg_arg2, arg_arg3)
-    })
-}
-pub unsafe fn inet6_rthdr_lasthop(
-    arg_arg1: *mut cmsghdr,
-    arg_arg2: ::std::os::raw::c_uint,
-) -> ::std::os::raw::c_int {
-    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
-        extern "C" {
-            pub fn inet6_rthdr_lasthop(
-                arg1: *mut cmsghdr,
-                arg2: ::std::os::raw::c_uint,
-            ) -> ::std::os::raw::c_int;
-        }
-        inet6_rthdr_lasthop(arg_arg1, arg_arg2)
-    })
-}
-pub unsafe fn inet6_rthdr_segments(arg_arg1: *const cmsghdr) -> ::std::os::raw::c_int {
-    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
-        extern "C" {
-            pub fn inet6_rthdr_segments(arg1: *const cmsghdr) -> ::std::os::raw::c_int;
-        }
-        inet6_rthdr_segments(arg_arg1)
-    })
-}
-pub unsafe fn inet6_rthdr_getaddr(
-    arg_arg1: *mut cmsghdr,
-    arg_arg2: ::std::os::raw::c_int,
-) -> *mut in6_addr {
-    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
-        extern "C" {
-            pub fn inet6_rthdr_getaddr(
-                arg1: *mut cmsghdr,
-                arg2: ::std::os::raw::c_int,
-            ) -> *mut in6_addr;
-        }
-        inet6_rthdr_getaddr(arg_arg1, arg_arg2)
-    })
-}
-pub unsafe fn inet6_rthdr_getflags(
-    arg_arg1: *const cmsghdr,
-    arg_arg2: ::std::os::raw::c_int,
-) -> ::std::os::raw::c_int {
-    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
-        extern "C" {
-            pub fn inet6_rthdr_getflags(
-                arg1: *const cmsghdr,
-                arg2: ::std::os::raw::c_int,
-            ) -> ::std::os::raw::c_int;
-        }
-        inet6_rthdr_getflags(arg_arg1, arg_arg2)
-    })
-}
-pub unsafe fn inet6_opt_init(
-    arg_arg1: *mut ::std::os::raw::c_void,
-    arg_arg2: socklen_t,
-) -> ::std::os::raw::c_int {
-    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
-        extern "C" {
-            pub fn inet6_opt_init(
-                arg1: *mut ::std::os::raw::c_void,
-                arg2: socklen_t,
-            ) -> ::std::os::raw::c_int;
-        }
-        inet6_opt_init(arg_arg1, arg_arg2)
-    })
-}
-pub unsafe fn inet6_opt_append(
-    arg_arg1: *mut ::std::os::raw::c_void,
-    arg_arg2: socklen_t,
-    arg_arg3: ::std::os::raw::c_int,
-    arg_arg4: __uint8_t,
-    arg_arg5: socklen_t,
-    arg_arg6: __uint8_t,
-    arg_arg7: *mut *mut ::std::os::raw::c_void,
-) -> ::std::os::raw::c_int {
-    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
-        extern "C" {
-            pub fn inet6_opt_append(
-                arg1: *mut ::std::os::raw::c_void,
-                arg2: socklen_t,
-                arg3: ::std::os::raw::c_int,
-                arg4: __uint8_t,
-                arg5: socklen_t,
-                arg6: __uint8_t,
-                arg7: *mut *mut ::std::os::raw::c_void,
-            ) -> ::std::os::raw::c_int;
-        }
-        inet6_opt_append(arg_arg1, arg_arg2, arg_arg3, arg_arg4, arg_arg5, arg_arg6, arg_arg7)
-    })
-}
-pub unsafe fn inet6_opt_finish(
-    arg_arg1: *mut ::std::os::raw::c_void,
-    arg_arg2: socklen_t,
-    arg_arg3: ::std::os::raw::c_int,
-) -> ::std::os::raw::c_int {
-    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
-        extern "C" {
-            pub fn inet6_opt_finish(
-                arg1: *mut ::std::os::raw::c_void,
-                arg2: socklen_t,
-                arg3: ::std::os::raw::c_int,
-            ) -> ::std::os::raw::c_int;
-        }
-        inet6_opt_finish(arg_arg1, arg_arg2, arg_arg3)
-    })
-}
-pub unsafe fn inet6_opt_set_val(
-    arg_arg1: *mut ::std::os::raw::c_void,
-    arg_arg2: ::std::os::raw::c_int,
-    arg_arg3: *mut ::std::os::raw::c_void,
-    arg_arg4: socklen_t,
-) -> ::std::os::raw::c_int {
-    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
-        extern "C" {
-            pub fn inet6_opt_set_val(
-                arg1: *mut ::std::os::raw::c_void,
-                arg2: ::std::os::raw::c_int,
-                arg3: *mut ::std::os::raw::c_void,
-                arg4: socklen_t,
-            ) -> ::std::os::raw::c_int;
-        }
-        inet6_opt_set_val(arg_arg1, arg_arg2, arg_arg3, arg_arg4)
-    })
-}
-pub unsafe fn inet6_opt_next(
-    arg_arg1: *mut ::std::os::raw::c_void,
-    arg_arg2: socklen_t,
-    arg_arg3: ::std::os::raw::c_int,
-    arg_arg4: *mut __uint8_t,
-    arg_arg5: *mut socklen_t,
-    arg_arg6: *mut *mut ::std::os::raw::c_void,
-) -> ::std::os::raw::c_int {
-    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
-        extern "C" {
-            pub fn inet6_opt_next(
-                arg1: *mut ::std::os::raw::c_void,
-                arg2: socklen_t,
-                arg3: ::std::os::raw::c_int,
-                arg4: *mut __uint8_t,
-                arg5: *mut socklen_t,
-                arg6: *mut *mut ::std::os::raw::c_void,
-            ) -> ::std::os::raw::c_int;
-        }
-        inet6_opt_next(arg_arg1, arg_arg2, arg_arg3, arg_arg4, arg_arg5, arg_arg6)
-    })
-}
-pub unsafe fn inet6_opt_find(
-    arg_arg1: *mut ::std::os::raw::c_void,
-    arg_arg2: socklen_t,
-    arg_arg3: ::std::os::raw::c_int,
-    arg_arg4: __uint8_t,
-    arg_arg5: *mut socklen_t,
-    arg_arg6: *mut *mut ::std::os::raw::c_void,
-) -> ::std::os::raw::c_int {
-    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
-        extern "C" {
-            pub fn inet6_opt_find(
-                arg1: *mut ::std::os::raw::c_void,
-                arg2: socklen_t,
-                arg3: ::std::os::raw::c_int,
-                arg4: __uint8_t,
-                arg5: *mut socklen_t,
-                arg6: *mut *mut ::std::os::raw::c_void,
-            ) -> ::std::os::raw::c_int;
-        }
-        inet6_opt_find(arg_arg1, arg_arg2, arg_arg3, arg_arg4, arg_arg5, arg_arg6)
-    })
-}
-pub unsafe fn inet6_opt_get_val(
-    arg_arg1: *mut ::std::os::raw::c_void,
-    arg_arg2: ::std::os::raw::c_int,
-    arg_arg3: *mut ::std::os::raw::c_void,
-    arg_arg4: socklen_t,
-) -> ::std::os::raw::c_int {
-    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
-        extern "C" {
-            pub fn inet6_opt_get_val(
-                arg1: *mut ::std::os::raw::c_void,
-                arg2: ::std::os::raw::c_int,
-                arg3: *mut ::std::os::raw::c_void,
-                arg4: socklen_t,
-            ) -> ::std::os::raw::c_int;
-        }
-        inet6_opt_get_val(arg_arg1, arg_arg2, arg_arg3, arg_arg4)
-    })
-}
-pub unsafe fn inet6_rth_space(
-    arg_arg1: ::std::os::raw::c_int,
-    arg_arg2: ::std::os::raw::c_int,
-) -> socklen_t {
-    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
-        extern "C" {
-            pub fn inet6_rth_space(
-                arg1: ::std::os::raw::c_int,
-                arg2: ::std::os::raw::c_int,
-            ) -> socklen_t;
-        }
-        inet6_rth_space(arg_arg1, arg_arg2)
-    })
-}
-pub unsafe fn inet6_rth_init(
-    arg_arg1: *mut ::std::os::raw::c_void,
-    arg_arg2: socklen_t,
-    arg_arg3: ::std::os::raw::c_int,
-    arg_arg4: ::std::os::raw::c_int,
-) -> *mut ::std::os::raw::c_void {
-    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
-        extern "C" {
-            pub fn inet6_rth_init(
-                arg1: *mut ::std::os::raw::c_void,
-                arg2: socklen_t,
-                arg3: ::std::os::raw::c_int,
-                arg4: ::std::os::raw::c_int,
-            ) -> *mut ::std::os::raw::c_void;
-        }
-        inet6_rth_init(arg_arg1, arg_arg2, arg_arg3, arg_arg4)
-    })
-}
-pub unsafe fn inet6_rth_add(
-    arg_arg1: *mut ::std::os::raw::c_void,
-    arg_arg2: *const in6_addr,
-) -> ::std::os::raw::c_int {
-    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
-        extern "C" {
-            pub fn inet6_rth_add(
-                arg1: *mut ::std::os::raw::c_void,
-                arg2: *const in6_addr,
-            ) -> ::std::os::raw::c_int;
-        }
-        inet6_rth_add(arg_arg1, arg_arg2)
-    })
-}
-pub unsafe fn inet6_rth_reverse(
-    arg_arg1: *const ::std::os::raw::c_void,
-    arg_arg2: *mut ::std::os::raw::c_void,
-) -> ::std::os::raw::c_int {
-    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
-        extern "C" {
-            pub fn inet6_rth_reverse(
-                arg1: *const ::std::os::raw::c_void,
-                arg2: *mut ::std::os::raw::c_void,
-            ) -> ::std::os::raw::c_int;
-        }
-        inet6_rth_reverse(arg_arg1, arg_arg2)
-    })
-}
-pub unsafe fn inet6_rth_segments(arg_arg1: *const ::std::os::raw::c_void) -> ::std::os::raw::c_int {
-    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
-        extern "C" {
-            pub fn inet6_rth_segments(arg1: *const ::std::os::raw::c_void)
-                -> ::std::os::raw::c_int;
-        }
-        inet6_rth_segments(arg_arg1)
-    })
-}
-pub unsafe fn inet6_rth_getaddr(
-    arg_arg1: *const ::std::os::raw::c_void,
-    arg_arg2: ::std::os::raw::c_int,
-) -> *mut in6_addr {
-    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
-        extern "C" {
-            pub fn inet6_rth_getaddr(
-                arg1: *const ::std::os::raw::c_void,
-                arg2: ::std::os::raw::c_int,
-            ) -> *mut in6_addr;
-        }
-        inet6_rth_getaddr(arg_arg1, arg_arg2)
-    })
-}
-pub unsafe fn bindresvport(
-    arg_arg1: ::std::os::raw::c_int,
-    arg_arg2: *mut sockaddr_in,
-) -> ::std::os::raw::c_int {
-    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
-        extern "C" {
-            pub fn bindresvport(
-                arg1: ::std::os::raw::c_int,
-                arg2: *mut sockaddr_in,
-            ) -> ::std::os::raw::c_int;
-        }
-        bindresvport(arg_arg1, arg_arg2)
-    })
-}
-pub unsafe fn bindresvport_sa(
-    arg_arg1: ::std::os::raw::c_int,
-    arg_arg2: *mut sockaddr,
-) -> ::std::os::raw::c_int {
-    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
-        extern "C" {
-            pub fn bindresvport_sa(
-                arg1: ::std::os::raw::c_int,
-                arg2: *mut sockaddr,
-            ) -> ::std::os::raw::c_int;
-        }
-        bindresvport_sa(arg_arg1, arg_arg2)
-    })
-}
-extern "C" {
-    pub static mut h_errno: ::std::os::raw::c_int;
-}
-#[repr(C)]
-#[derive(Debug, Copy, Clone)]
-pub struct hostent {
-    pub h_name: *mut ::std::os::raw::c_char,
-    pub h_aliases: *mut *mut ::std::os::raw::c_char,
-    pub h_addrtype: ::std::os::raw::c_int,
-    pub h_length: ::std::os::raw::c_int,
-    pub h_addr_list: *mut *mut ::std::os::raw::c_char,
-}
-impl Default for hostent {
-    fn default() -> Self {
-        let mut s = ::std::mem::MaybeUninit::<Self>::uninit();
-        unsafe {
-            ::std::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
-            s.assume_init()
-        }
-    }
-}
-#[repr(C)]
-#[derive(Debug, Copy, Clone)]
-pub struct netent {
-    pub n_name: *mut ::std::os::raw::c_char,
-    pub n_aliases: *mut *mut ::std::os::raw::c_char,
-    pub n_addrtype: ::std::os::raw::c_int,
-    pub n_net: u32,
-}
-impl Default for netent {
-    fn default() -> Self {
-        let mut s = ::std::mem::MaybeUninit::<Self>::uninit();
-        unsafe {
-            ::std::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
-            s.assume_init()
-        }
-    }
-}
-#[repr(C)]
-#[derive(Debug, Copy, Clone)]
-pub struct servent {
-    pub s_name: *mut ::std::os::raw::c_char,
-    pub s_aliases: *mut *mut ::std::os::raw::c_char,
-    pub s_port: ::std::os::raw::c_int,
-    pub s_proto: *mut ::std::os::raw::c_char,
-}
-impl Default for servent {
-    fn default() -> Self {
-        let mut s = ::std::mem::MaybeUninit::<Self>::uninit();
-        unsafe {
-            ::std::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
-            s.assume_init()
-        }
-    }
-}
-#[repr(C)]
-#[derive(Debug, Copy, Clone)]
-pub struct protoent {
-    pub p_name: *mut ::std::os::raw::c_char,
-    pub p_aliases: *mut *mut ::std::os::raw::c_char,
-    pub p_proto: ::std::os::raw::c_int,
-}
-impl Default for protoent {
-    fn default() -> Self {
-        let mut s = ::std::mem::MaybeUninit::<Self>::uninit();
-        unsafe {
-            ::std::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
-            s.assume_init()
-        }
-    }
-}
-#[repr(C)]
-#[derive(Debug, Copy, Clone)]
-pub struct addrinfo {
-    pub ai_flags: ::std::os::raw::c_int,
-    pub ai_family: ::std::os::raw::c_int,
-    pub ai_socktype: ::std::os::raw::c_int,
-    pub ai_protocol: ::std::os::raw::c_int,
-    pub ai_addrlen: socklen_t,
-    pub ai_canonname: *mut ::std::os::raw::c_char,
-    pub ai_addr: *mut sockaddr,
-    pub ai_next: *mut addrinfo,
-}
-impl Default for addrinfo {
-    fn default() -> Self {
-        let mut s = ::std::mem::MaybeUninit::<Self>::uninit();
-        unsafe {
-            ::std::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
-            s.assume_init()
-        }
-    }
-}
-#[repr(C)]
-#[derive(Debug, Copy, Clone)]
-pub struct rpcent {
-    pub r_name: *mut ::std::os::raw::c_char,
-    pub r_aliases: *mut *mut ::std::os::raw::c_char,
-    pub r_number: ::std::os::raw::c_int,
-}
-impl Default for rpcent {
-    fn default() -> Self {
-        let mut s = ::std::mem::MaybeUninit::<Self>::uninit();
-        unsafe {
-            ::std::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
-            s.assume_init()
-        }
-    }
-}
-pub unsafe fn endhostent() {
-    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
-        extern "C" {
-            pub fn endhostent();
-        }
-        endhostent()
-    })
-}
-pub unsafe fn endnetent() {
-    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
-        extern "C" {
-            pub fn endnetent();
-        }
-        endnetent()
-    })
-}
-pub unsafe fn endprotoent() {
-    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
-        extern "C" {
-            pub fn endprotoent();
-        }
-        endprotoent()
-    })
-}
-pub unsafe fn endservent() {
-    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
-        extern "C" {
-            pub fn endservent();
-        }
-        endservent()
-    })
-}
-pub unsafe fn freeaddrinfo(arg_arg1: *mut addrinfo) {
-    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
-        extern "C" {
-            pub fn freeaddrinfo(arg1: *mut addrinfo);
-        }
-        freeaddrinfo(arg_arg1)
-    })
-}
-pub unsafe fn gai_strerror(arg_arg1: ::std::os::raw::c_int) -> *const ::std::os::raw::c_char {
-    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
-        extern "C" {
-            pub fn gai_strerror(arg1: ::std::os::raw::c_int) -> *const ::std::os::raw::c_char;
-        }
-        gai_strerror(arg_arg1)
-    })
-}
-pub unsafe fn getaddrinfo(
-    arg_arg1: *const ::std::os::raw::c_char,
-    arg_arg2: *const ::std::os::raw::c_char,
-    arg_arg3: *const addrinfo,
-    arg_arg4: *mut *mut addrinfo,
-) -> ::std::os::raw::c_int {
-    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
-        extern "C" {
-            pub fn getaddrinfo(
-                arg1: *const ::std::os::raw::c_char,
-                arg2: *const ::std::os::raw::c_char,
-                arg3: *const addrinfo,
-                arg4: *mut *mut addrinfo,
-            ) -> ::std::os::raw::c_int;
-        }
-        getaddrinfo(arg_arg1, arg_arg2, arg_arg3, arg_arg4)
-    })
-}
-pub unsafe fn gethostbyaddr(
-    arg_arg1: *const ::std::os::raw::c_void,
-    arg_arg2: socklen_t,
-    arg_arg3: ::std::os::raw::c_int,
-) -> *mut hostent {
-    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
-        extern "C" {
-            pub fn gethostbyaddr(
-                arg1: *const ::std::os::raw::c_void,
-                arg2: socklen_t,
-                arg3: ::std::os::raw::c_int,
-            ) -> *mut hostent;
-        }
-        gethostbyaddr(arg_arg1, arg_arg2, arg_arg3)
-    })
-}
-pub unsafe fn gethostbyname(arg_arg1: *const ::std::os::raw::c_char) -> *mut hostent {
-    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
-        extern "C" {
-            pub fn gethostbyname(arg1: *const ::std::os::raw::c_char) -> *mut hostent;
-        }
-        gethostbyname(arg_arg1)
-    })
-}
-pub unsafe fn gethostent() -> *mut hostent {
-    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
-        extern "C" {
-            pub fn gethostent() -> *mut hostent;
-        }
-        gethostent()
-    })
-}
-pub unsafe fn getnameinfo(
-    arg_arg1: *const sockaddr,
-    arg_arg2: socklen_t,
-    arg_arg3: *mut ::std::os::raw::c_char,
-    arg_arg4: socklen_t,
-    arg_arg5: *mut ::std::os::raw::c_char,
-    arg_arg6: socklen_t,
-    arg_arg7: ::std::os::raw::c_int,
-) -> ::std::os::raw::c_int {
-    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
-        extern "C" {
-            pub fn getnameinfo(
-                arg1: *const sockaddr,
-                arg2: socklen_t,
-                arg3: *mut ::std::os::raw::c_char,
-                arg4: socklen_t,
-                arg5: *mut ::std::os::raw::c_char,
-                arg6: socklen_t,
-                arg7: ::std::os::raw::c_int,
-            ) -> ::std::os::raw::c_int;
-        }
-        getnameinfo(arg_arg1, arg_arg2, arg_arg3, arg_arg4, arg_arg5, arg_arg6, arg_arg7)
-    })
-}
-pub unsafe fn getnetbyaddr(arg_arg1: u32, arg_arg2: ::std::os::raw::c_int) -> *mut netent {
-    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
-        extern "C" {
-            pub fn getnetbyaddr(arg1: u32, arg2: ::std::os::raw::c_int) -> *mut netent;
-        }
-        getnetbyaddr(arg_arg1, arg_arg2)
-    })
-}
-pub unsafe fn getnetbyname(arg_arg1: *const ::std::os::raw::c_char) -> *mut netent {
-    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
-        extern "C" {
-            pub fn getnetbyname(arg1: *const ::std::os::raw::c_char) -> *mut netent;
-        }
-        getnetbyname(arg_arg1)
-    })
-}
-pub unsafe fn getnetent() -> *mut netent {
-    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
-        extern "C" {
-            pub fn getnetent() -> *mut netent;
-        }
-        getnetent()
-    })
-}
-pub unsafe fn getprotobyname(arg_arg1: *const ::std::os::raw::c_char) -> *mut protoent {
-    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
-        extern "C" {
-            pub fn getprotobyname(arg1: *const ::std::os::raw::c_char) -> *mut protoent;
-        }
-        getprotobyname(arg_arg1)
-    })
-}
-pub unsafe fn getprotobynumber(arg_arg1: ::std::os::raw::c_int) -> *mut protoent {
-    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
-        extern "C" {
-            pub fn getprotobynumber(arg1: ::std::os::raw::c_int) -> *mut protoent;
-        }
-        getprotobynumber(arg_arg1)
-    })
-}
-pub unsafe fn getprotoent() -> *mut protoent {
-    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
-        extern "C" {
-            pub fn getprotoent() -> *mut protoent;
-        }
-        getprotoent()
-    })
-}
-pub unsafe fn getservbyname(
-    arg_arg1: *const ::std::os::raw::c_char,
-    arg_arg2: *const ::std::os::raw::c_char,
-) -> *mut servent {
-    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
-        extern "C" {
-            pub fn getservbyname(
-                arg1: *const ::std::os::raw::c_char,
-                arg2: *const ::std::os::raw::c_char,
-            ) -> *mut servent;
-        }
-        getservbyname(arg_arg1, arg_arg2)
-    })
-}
-pub unsafe fn getservbyport(
-    arg_arg1: ::std::os::raw::c_int,
-    arg_arg2: *const ::std::os::raw::c_char,
-) -> *mut servent {
-    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
-        extern "C" {
-            pub fn getservbyport(
-                arg1: ::std::os::raw::c_int,
-                arg2: *const ::std::os::raw::c_char,
-            ) -> *mut servent;
-        }
-        getservbyport(arg_arg1, arg_arg2)
-    })
-}
-pub unsafe fn getservent() -> *mut servent {
-    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
-        extern "C" {
-            pub fn getservent() -> *mut servent;
-        }
-        getservent()
-    })
-}
-pub unsafe fn sethostent(arg_arg1: ::std::os::raw::c_int) {
-    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
-        extern "C" {
-            pub fn sethostent(arg1: ::std::os::raw::c_int);
-        }
-        sethostent(arg_arg1)
-    })
-}
-pub unsafe fn setnetent(arg_arg1: ::std::os::raw::c_int) {
-    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
-        extern "C" {
-            pub fn setnetent(arg1: ::std::os::raw::c_int);
-        }
-        setnetent(arg_arg1)
-    })
-}
-pub unsafe fn setprotoent(arg_arg1: ::std::os::raw::c_int) {
-    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
-        extern "C" {
-            pub fn setprotoent(arg1: ::std::os::raw::c_int);
-        }
-        setprotoent(arg_arg1)
-    })
-}
-pub unsafe fn setservent(arg_arg1: ::std::os::raw::c_int) {
-    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
-        extern "C" {
-            pub fn setservent(arg1: ::std::os::raw::c_int);
-        }
-        setservent(arg_arg1)
-    })
-}
-pub unsafe fn freehostent(arg_arg1: *mut hostent) {
-    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
-        extern "C" {
-            pub fn freehostent(arg1: *mut hostent);
-        }
-        freehostent(arg_arg1)
-    })
-}
-pub unsafe fn gethostbyname2(
-    arg_arg1: *const ::std::os::raw::c_char,
-    arg_arg2: ::std::os::raw::c_int,
-) -> *mut hostent {
-    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
-        extern "C" {
-            pub fn gethostbyname2(
-                arg1: *const ::std::os::raw::c_char,
-                arg2: ::std::os::raw::c_int,
-            ) -> *mut hostent;
-        }
-        gethostbyname2(arg_arg1, arg_arg2)
-    })
-}
-pub unsafe fn getipnodebyaddr(
-    arg_arg1: *const ::std::os::raw::c_void,
-    arg_arg2: usize,
-    arg_arg3: ::std::os::raw::c_int,
-    arg_arg4: *mut ::std::os::raw::c_int,
-) -> *mut hostent {
-    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
-        extern "C" {
-            pub fn getipnodebyaddr(
-                arg1: *const ::std::os::raw::c_void,
-                arg2: usize,
-                arg3: ::std::os::raw::c_int,
-                arg4: *mut ::std::os::raw::c_int,
-            ) -> *mut hostent;
-        }
-        getipnodebyaddr(arg_arg1, arg_arg2, arg_arg3, arg_arg4)
-    })
-}
-pub unsafe fn getipnodebyname(
-    arg_arg1: *const ::std::os::raw::c_char,
-    arg_arg2: ::std::os::raw::c_int,
-    arg_arg3: ::std::os::raw::c_int,
-    arg_arg4: *mut ::std::os::raw::c_int,
-) -> *mut hostent {
-    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
-        extern "C" {
-            pub fn getipnodebyname(
-                arg1: *const ::std::os::raw::c_char,
-                arg2: ::std::os::raw::c_int,
-                arg3: ::std::os::raw::c_int,
-                arg4: *mut ::std::os::raw::c_int,
-            ) -> *mut hostent;
-        }
-        getipnodebyname(arg_arg1, arg_arg2, arg_arg3, arg_arg4)
-    })
-}
-pub unsafe fn getrpcbyname(arg_name: *const ::std::os::raw::c_char) -> *mut rpcent {
-    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
-        extern "C" {
-            pub fn getrpcbyname(name: *const ::std::os::raw::c_char) -> *mut rpcent;
-        }
-        getrpcbyname(arg_name)
-    })
-}
-pub unsafe fn getrpcbynumber(arg_number: ::std::os::raw::c_int) -> *mut rpcent {
-    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
-        extern "C" {
-            pub fn getrpcbynumber(number: ::std::os::raw::c_int) -> *mut rpcent;
-        }
-        getrpcbynumber(arg_number)
-    })
-}
-pub unsafe fn getrpcent() -> *mut rpcent {
-    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
-        extern "C" {
-            pub fn getrpcent() -> *mut rpcent;
-        }
-        getrpcent()
-    })
-}
-pub unsafe fn setrpcent(arg_stayopen: ::std::os::raw::c_int) {
-    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
-        extern "C" {
-            pub fn setrpcent(stayopen: ::std::os::raw::c_int);
-        }
-        setrpcent(arg_stayopen)
-    })
-}
-pub unsafe fn endrpcent() {
-    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
-        extern "C" {
-            pub fn endrpcent();
-        }
-        endrpcent()
-    })
-}
-pub unsafe fn herror(arg_arg1: *const ::std::os::raw::c_char) {
-    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
-        extern "C" {
-            pub fn herror(arg1: *const ::std::os::raw::c_char);
-        }
-        herror(arg_arg1)
-    })
-}
-pub unsafe fn hstrerror(arg_arg1: ::std::os::raw::c_int) -> *const ::std::os::raw::c_char {
-    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
-        extern "C" {
-            pub fn hstrerror(arg1: ::std::os::raw::c_int) -> *const ::std::os::raw::c_char;
-        }
-        hstrerror(arg_arg1)
-    })
-}
-pub unsafe fn innetgr(
-    arg_arg1: *const ::std::os::raw::c_char,
-    arg_arg2: *const ::std::os::raw::c_char,
-    arg_arg3: *const ::std::os::raw::c_char,
-    arg_arg4: *const ::std::os::raw::c_char,
-) -> ::std::os::raw::c_int {
-    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
-        extern "C" {
-            pub fn innetgr(
-                arg1: *const ::std::os::raw::c_char,
-                arg2: *const ::std::os::raw::c_char,
-                arg3: *const ::std::os::raw::c_char,
-                arg4: *const ::std::os::raw::c_char,
-            ) -> ::std::os::raw::c_int;
-        }
-        innetgr(arg_arg1, arg_arg2, arg_arg3, arg_arg4)
-    })
-}
-pub unsafe fn getnetgrent(
-    arg_arg1: *mut *mut ::std::os::raw::c_char,
-    arg_arg2: *mut *mut ::std::os::raw::c_char,
-    arg_arg3: *mut *mut ::std::os::raw::c_char,
-) -> ::std::os::raw::c_int {
-    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
-        extern "C" {
-            pub fn getnetgrent(
-                arg1: *mut *mut ::std::os::raw::c_char,
-                arg2: *mut *mut ::std::os::raw::c_char,
-                arg3: *mut *mut ::std::os::raw::c_char,
-            ) -> ::std::os::raw::c_int;
-        }
-        getnetgrent(arg_arg1, arg_arg2, arg_arg3)
-    })
-}
-pub unsafe fn endnetgrent() {
-    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
-        extern "C" {
-            pub fn endnetgrent();
-        }
-        endnetgrent()
-    })
-}
-pub unsafe fn setnetgrent(arg_arg1: *const ::std::os::raw::c_char) {
-    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
-        extern "C" {
-            pub fn setnetgrent(arg1: *const ::std::os::raw::c_char);
-        }
-        setnetgrent(arg_arg1)
-    })
-}
-#[repr(C)]
-#[derive(Debug, Copy, Clone)]
-pub struct passwd {
-    pub pw_name: *mut ::std::os::raw::c_char,
-    pub pw_passwd: *mut ::std::os::raw::c_char,
-    pub pw_uid: uid_t,
-    pub pw_gid: gid_t,
-    pub pw_change: __darwin_time_t,
-    pub pw_class: *mut ::std::os::raw::c_char,
-    pub pw_gecos: *mut ::std::os::raw::c_char,
-    pub pw_dir: *mut ::std::os::raw::c_char,
-    pub pw_shell: *mut ::std::os::raw::c_char,
-    pub pw_expire: __darwin_time_t,
-}
-impl Default for passwd {
-    fn default() -> Self {
-        let mut s = ::std::mem::MaybeUninit::<Self>::uninit();
-        unsafe {
-            ::std::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
-            s.assume_init()
-        }
-    }
-}
-pub unsafe fn getpwuid(arg_arg1: uid_t) -> *mut passwd {
-    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
-        extern "C" {
-            pub fn getpwuid(arg1: uid_t) -> *mut passwd;
-        }
-        getpwuid(arg_arg1)
-    })
-}
-pub unsafe fn getpwnam(arg_arg1: *const ::std::os::raw::c_char) -> *mut passwd {
-    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
-        extern "C" {
-            pub fn getpwnam(arg1: *const ::std::os::raw::c_char) -> *mut passwd;
-        }
-        getpwnam(arg_arg1)
-    })
-}
-pub unsafe fn getpwuid_r(
-    arg_arg1: uid_t,
-    arg_arg2: *mut passwd,
-    arg_arg3: *mut ::std::os::raw::c_char,
-    arg_arg4: usize,
-    arg_arg5: *mut *mut passwd,
-) -> ::std::os::raw::c_int {
-    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
-        extern "C" {
-            pub fn getpwuid_r(
-                arg1: uid_t,
-                arg2: *mut passwd,
-                arg3: *mut ::std::os::raw::c_char,
-                arg4: usize,
-                arg5: *mut *mut passwd,
-            ) -> ::std::os::raw::c_int;
-        }
-        getpwuid_r(arg_arg1, arg_arg2, arg_arg3, arg_arg4, arg_arg5)
-    })
-}
-pub unsafe fn getpwnam_r(
-    arg_arg1: *const ::std::os::raw::c_char,
-    arg_arg2: *mut passwd,
-    arg_arg3: *mut ::std::os::raw::c_char,
-    arg_arg4: usize,
-    arg_arg5: *mut *mut passwd,
-) -> ::std::os::raw::c_int {
-    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
-        extern "C" {
-            pub fn getpwnam_r(
-                arg1: *const ::std::os::raw::c_char,
-                arg2: *mut passwd,
-                arg3: *mut ::std::os::raw::c_char,
-                arg4: usize,
-                arg5: *mut *mut passwd,
-            ) -> ::std::os::raw::c_int;
-        }
-        getpwnam_r(arg_arg1, arg_arg2, arg_arg3, arg_arg4, arg_arg5)
-    })
-}
-pub unsafe fn getpwent() -> *mut passwd {
-    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
-        extern "C" {
-            pub fn getpwent() -> *mut passwd;
-        }
-        getpwent()
-    })
-}
-pub unsafe fn setpwent() {
-    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
-        extern "C" {
-            pub fn setpwent();
-        }
-        setpwent()
-    })
-}
-pub unsafe fn endpwent() {
-    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
-        extern "C" {
-            pub fn endpwent();
-        }
-        endpwent()
-    })
-}
-pub type uuid_t = __darwin_uuid_t;
-pub type uuid_string_t = __darwin_uuid_string_t;
-extern "C" {
-    pub static UUID_NULL: uuid_t;
-}
-pub unsafe fn uuid_clear(arg_uu: *mut ::std::os::raw::c_uchar) {
-    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
-        extern "C" {
-            pub fn uuid_clear(uu: *mut ::std::os::raw::c_uchar);
-        }
-        uuid_clear(arg_uu)
-    })
-}
-pub unsafe fn uuid_compare(
-    arg_uu1: *mut ::std::os::raw::c_uchar,
-    arg_uu2: *mut ::std::os::raw::c_uchar,
-) -> ::std::os::raw::c_int {
-    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
-        extern "C" {
-            pub fn uuid_compare(
-                uu1: *mut ::std::os::raw::c_uchar,
-                uu2: *mut ::std::os::raw::c_uchar,
-            ) -> ::std::os::raw::c_int;
-        }
-        uuid_compare(arg_uu1, arg_uu2)
-    })
-}
-pub unsafe fn uuid_copy(
-    arg_dst: *mut ::std::os::raw::c_uchar,
-    arg_src: *mut ::std::os::raw::c_uchar,
-) {
-    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
-        extern "C" {
-            pub fn uuid_copy(dst: *mut ::std::os::raw::c_uchar, src: *mut ::std::os::raw::c_uchar);
-        }
-        uuid_copy(arg_dst, arg_src)
-    })
-}
-pub unsafe fn uuid_generate(arg_out: *mut ::std::os::raw::c_uchar) {
-    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
-        extern "C" {
-            pub fn uuid_generate(out: *mut ::std::os::raw::c_uchar);
-        }
-        uuid_generate(arg_out)
-    })
-}
-pub unsafe fn uuid_generate_random(arg_out: *mut ::std::os::raw::c_uchar) {
-    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
-        extern "C" {
-            pub fn uuid_generate_random(out: *mut ::std::os::raw::c_uchar);
-        }
-        uuid_generate_random(arg_out)
-    })
-}
-pub unsafe fn uuid_generate_time(arg_out: *mut ::std::os::raw::c_uchar) {
-    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
-        extern "C" {
-            pub fn uuid_generate_time(out: *mut ::std::os::raw::c_uchar);
-        }
-        uuid_generate_time(arg_out)
-    })
-}
-pub unsafe fn uuid_is_null(arg_uu: *mut ::std::os::raw::c_uchar) -> ::std::os::raw::c_int {
-    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
-        extern "C" {
-            pub fn uuid_is_null(uu: *mut ::std::os::raw::c_uchar) -> ::std::os::raw::c_int;
-        }
-        uuid_is_null(arg_uu)
-    })
-}
-pub unsafe fn uuid_parse(
-    arg_in_: *mut ::std::os::raw::c_char,
-    arg_uu: *mut ::std::os::raw::c_uchar,
-) -> ::std::os::raw::c_int {
-    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
-        extern "C" {
-            pub fn uuid_parse(
-                in_: *mut ::std::os::raw::c_char,
-                uu: *mut ::std::os::raw::c_uchar,
-            ) -> ::std::os::raw::c_int;
-        }
-        uuid_parse(arg_in_, arg_uu)
-    })
-}
-pub unsafe fn uuid_unparse(
-    arg_uu: *mut ::std::os::raw::c_uchar,
-    arg_out: *mut ::std::os::raw::c_char,
-) {
-    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
-        extern "C" {
-            pub fn uuid_unparse(uu: *mut ::std::os::raw::c_uchar, out: *mut ::std::os::raw::c_char);
-        }
-        uuid_unparse(arg_uu, arg_out)
-    })
-}
-pub unsafe fn uuid_unparse_lower(
-    arg_uu: *mut ::std::os::raw::c_uchar,
-    arg_out: *mut ::std::os::raw::c_char,
-) {
-    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
-        extern "C" {
-            pub fn uuid_unparse_lower(
-                uu: *mut ::std::os::raw::c_uchar,
-                out: *mut ::std::os::raw::c_char,
-            );
-        }
-        uuid_unparse_lower(arg_uu, arg_out)
-    })
-}
-pub unsafe fn uuid_unparse_upper(
-    arg_uu: *mut ::std::os::raw::c_uchar,
-    arg_out: *mut ::std::os::raw::c_char,
-) {
-    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
-        extern "C" {
-            pub fn uuid_unparse_upper(
-                uu: *mut ::std::os::raw::c_uchar,
-                out: *mut ::std::os::raw::c_char,
-            );
-        }
-        uuid_unparse_upper(arg_uu, arg_out)
-    })
-}
-pub unsafe fn setpassent(arg_arg1: ::std::os::raw::c_int) -> ::std::os::raw::c_int {
-    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
-        extern "C" {
-            pub fn setpassent(arg1: ::std::os::raw::c_int) -> ::std::os::raw::c_int;
-        }
-        setpassent(arg_arg1)
-    })
-}
-pub unsafe fn user_from_uid(
-    arg_arg1: uid_t,
-    arg_arg2: ::std::os::raw::c_int,
-) -> *mut ::std::os::raw::c_char {
-    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
-        extern "C" {
-            pub fn user_from_uid(
-                arg1: uid_t,
-                arg2: ::std::os::raw::c_int,
-            ) -> *mut ::std::os::raw::c_char;
-        }
-        user_from_uid(arg_arg1, arg_arg2)
-    })
-}
-pub unsafe fn getpwuuid(arg_arg1: *mut ::std::os::raw::c_uchar) -> *mut passwd {
-    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
-        extern "C" {
-            pub fn getpwuuid(arg1: *mut ::std::os::raw::c_uchar) -> *mut passwd;
-        }
-        getpwuuid(arg_arg1)
-    })
-}
-pub unsafe fn getpwuuid_r(
-    arg_arg1: *mut ::std::os::raw::c_uchar,
-    arg_arg2: *mut passwd,
-    arg_arg3: *mut ::std::os::raw::c_char,
-    arg_arg4: usize,
-    arg_arg5: *mut *mut passwd,
-) -> ::std::os::raw::c_int {
-    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
-        extern "C" {
-            pub fn getpwuuid_r(
-                arg1: *mut ::std::os::raw::c_uchar,
-                arg2: *mut passwd,
-                arg3: *mut ::std::os::raw::c_char,
-                arg4: usize,
-                arg5: *mut *mut passwd,
-            ) -> ::std::os::raw::c_int;
-        }
-        getpwuuid_r(arg_arg1, arg_arg2, arg_arg3, arg_arg4, arg_arg5)
-    })
-}
 pub type pgsocket = ::std::os::raw::c_int;
 pub unsafe fn pg_set_noblock(arg_sock: pgsocket) -> bool {
     crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
@@ -11352,38 +9336,6 @@ pub unsafe fn rmtree(arg_path: *const ::std::os::raw::c_char, arg_rmtopdir: bool
             pub fn rmtree(path: *const ::std::os::raw::c_char, rmtopdir: bool) -> bool;
         }
         rmtree(arg_path, arg_rmtopdir)
-    })
-}
-pub unsafe fn pg_erand48(arg_xseed: *mut ::std::os::raw::c_ushort) -> f64 {
-    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
-        extern "C" {
-            pub fn pg_erand48(xseed: *mut ::std::os::raw::c_ushort) -> f64;
-        }
-        pg_erand48(arg_xseed)
-    })
-}
-pub unsafe fn pg_lrand48() -> ::std::os::raw::c_long {
-    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
-        extern "C" {
-            pub fn pg_lrand48() -> ::std::os::raw::c_long;
-        }
-        pg_lrand48()
-    })
-}
-pub unsafe fn pg_jrand48(arg_xseed: *mut ::std::os::raw::c_ushort) -> ::std::os::raw::c_long {
-    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
-        extern "C" {
-            pub fn pg_jrand48(xseed: *mut ::std::os::raw::c_ushort) -> ::std::os::raw::c_long;
-        }
-        pg_jrand48(arg_xseed)
-    })
-}
-pub unsafe fn pg_srand48(arg_seed: ::std::os::raw::c_long) {
-    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
-        extern "C" {
-            pub fn pg_srand48(seed: ::std::os::raw::c_long);
-        }
-        pg_srand48(arg_seed)
     })
 }
 pub type float_t = f32;
@@ -12981,6 +10933,38 @@ pub unsafe fn explicit_bzero(arg_buf: *mut ::std::os::raw::c_void, arg_len: usiz
         explicit_bzero(arg_buf, arg_len)
     })
 }
+pub unsafe fn pg_get_user_name(
+    arg_user_id: uid_t,
+    arg_buffer: *mut ::std::os::raw::c_char,
+    arg_buflen: usize,
+) -> bool {
+    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
+        extern "C" {
+            pub fn pg_get_user_name(
+                user_id: uid_t,
+                buffer: *mut ::std::os::raw::c_char,
+                buflen: usize,
+            ) -> bool;
+        }
+        pg_get_user_name(arg_user_id, arg_buffer, arg_buflen)
+    })
+}
+pub unsafe fn pg_get_user_home_dir(
+    arg_user_id: uid_t,
+    arg_buffer: *mut ::std::os::raw::c_char,
+    arg_buflen: usize,
+) -> bool {
+    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
+        extern "C" {
+            pub fn pg_get_user_home_dir(
+                user_id: uid_t,
+                buffer: *mut ::std::os::raw::c_char,
+                buflen: usize,
+            ) -> bool;
+        }
+        pg_get_user_home_dir(arg_user_id, arg_buffer, arg_buflen)
+    })
+}
 pub unsafe fn pg_qsort(
     arg_base: *mut ::std::os::raw::c_void,
     arg_nel: usize,
@@ -13752,6 +11736,86 @@ pub unsafe fn in_error_recursion_trouble() -> bool {
         in_error_recursion_trouble()
     })
 }
+pub unsafe fn reset_formatted_start_time() {
+    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
+        extern "C" {
+            pub fn reset_formatted_start_time();
+        }
+        reset_formatted_start_time()
+    })
+}
+pub unsafe fn get_formatted_start_time() -> *mut ::std::os::raw::c_char {
+    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
+        extern "C" {
+            pub fn get_formatted_start_time() -> *mut ::std::os::raw::c_char;
+        }
+        get_formatted_start_time()
+    })
+}
+pub unsafe fn get_formatted_log_time() -> *mut ::std::os::raw::c_char {
+    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
+        extern "C" {
+            pub fn get_formatted_log_time() -> *mut ::std::os::raw::c_char;
+        }
+        get_formatted_log_time()
+    })
+}
+pub unsafe fn get_backend_type_for_log() -> *const ::std::os::raw::c_char {
+    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
+        extern "C" {
+            pub fn get_backend_type_for_log() -> *const ::std::os::raw::c_char;
+        }
+        get_backend_type_for_log()
+    })
+}
+pub unsafe fn check_log_of_query(arg_edata: *mut ErrorData) -> bool {
+    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
+        extern "C" {
+            pub fn check_log_of_query(edata: *mut ErrorData) -> bool;
+        }
+        check_log_of_query(arg_edata)
+    })
+}
+pub unsafe fn error_severity(arg_elevel: ::std::os::raw::c_int) -> *const ::std::os::raw::c_char {
+    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
+        extern "C" {
+            pub fn error_severity(elevel: ::std::os::raw::c_int) -> *const ::std::os::raw::c_char;
+        }
+        error_severity(arg_elevel)
+    })
+}
+pub unsafe fn write_pipe_chunks(
+    arg_data: *mut ::std::os::raw::c_char,
+    arg_len: ::std::os::raw::c_int,
+    arg_dest: ::std::os::raw::c_int,
+) {
+    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
+        extern "C" {
+            pub fn write_pipe_chunks(
+                data: *mut ::std::os::raw::c_char,
+                len: ::std::os::raw::c_int,
+                dest: ::std::os::raw::c_int,
+            );
+        }
+        write_pipe_chunks(arg_data, arg_len, arg_dest)
+    })
+}
+pub unsafe fn write_csvlog(arg_edata: *mut ErrorData) {
+    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
+        extern "C" {
+            pub fn write_csvlog(edata: *mut ErrorData);
+        }
+        write_csvlog(arg_edata)
+    })
+}
+pub unsafe fn write_jsonlog(arg_edata: *mut ErrorData) {
+    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
+        extern "C" {
+            pub fn write_jsonlog(edata: *mut ErrorData);
+        }
+        write_jsonlog(arg_edata)
+    })
+}
 pub unsafe fn set_syslog_parameters(
     arg_ident: *const ::std::os::raw::c_char,
     arg_facility: ::std::os::raw::c_int,
@@ -14129,110 +12193,110 @@ pub const NodeTag_T_ExprContext: NodeTag = 2;
 pub const NodeTag_T_ProjectionInfo: NodeTag = 3;
 pub const NodeTag_T_JunkFilter: NodeTag = 4;
 pub const NodeTag_T_OnConflictSetState: NodeTag = 5;
-pub const NodeTag_T_ResultRelInfo: NodeTag = 6;
-pub const NodeTag_T_EState: NodeTag = 7;
-pub const NodeTag_T_TupleTableSlot: NodeTag = 8;
-pub const NodeTag_T_Plan: NodeTag = 9;
-pub const NodeTag_T_Result: NodeTag = 10;
-pub const NodeTag_T_ProjectSet: NodeTag = 11;
-pub const NodeTag_T_ModifyTable: NodeTag = 12;
-pub const NodeTag_T_Append: NodeTag = 13;
-pub const NodeTag_T_MergeAppend: NodeTag = 14;
-pub const NodeTag_T_RecursiveUnion: NodeTag = 15;
-pub const NodeTag_T_BitmapAnd: NodeTag = 16;
-pub const NodeTag_T_BitmapOr: NodeTag = 17;
-pub const NodeTag_T_Scan: NodeTag = 18;
-pub const NodeTag_T_SeqScan: NodeTag = 19;
-pub const NodeTag_T_SampleScan: NodeTag = 20;
-pub const NodeTag_T_IndexScan: NodeTag = 21;
-pub const NodeTag_T_IndexOnlyScan: NodeTag = 22;
-pub const NodeTag_T_BitmapIndexScan: NodeTag = 23;
-pub const NodeTag_T_BitmapHeapScan: NodeTag = 24;
-pub const NodeTag_T_TidScan: NodeTag = 25;
-pub const NodeTag_T_TidRangeScan: NodeTag = 26;
-pub const NodeTag_T_SubqueryScan: NodeTag = 27;
-pub const NodeTag_T_FunctionScan: NodeTag = 28;
-pub const NodeTag_T_ValuesScan: NodeTag = 29;
-pub const NodeTag_T_TableFuncScan: NodeTag = 30;
-pub const NodeTag_T_CteScan: NodeTag = 31;
-pub const NodeTag_T_NamedTuplestoreScan: NodeTag = 32;
-pub const NodeTag_T_WorkTableScan: NodeTag = 33;
-pub const NodeTag_T_ForeignScan: NodeTag = 34;
-pub const NodeTag_T_CustomScan: NodeTag = 35;
-pub const NodeTag_T_Join: NodeTag = 36;
-pub const NodeTag_T_NestLoop: NodeTag = 37;
-pub const NodeTag_T_MergeJoin: NodeTag = 38;
-pub const NodeTag_T_HashJoin: NodeTag = 39;
-pub const NodeTag_T_Material: NodeTag = 40;
-pub const NodeTag_T_Memoize: NodeTag = 41;
-pub const NodeTag_T_Sort: NodeTag = 42;
-pub const NodeTag_T_IncrementalSort: NodeTag = 43;
-pub const NodeTag_T_Group: NodeTag = 44;
-pub const NodeTag_T_Agg: NodeTag = 45;
-pub const NodeTag_T_WindowAgg: NodeTag = 46;
-pub const NodeTag_T_Unique: NodeTag = 47;
-pub const NodeTag_T_Gather: NodeTag = 48;
-pub const NodeTag_T_GatherMerge: NodeTag = 49;
-pub const NodeTag_T_Hash: NodeTag = 50;
-pub const NodeTag_T_SetOp: NodeTag = 51;
-pub const NodeTag_T_LockRows: NodeTag = 52;
-pub const NodeTag_T_Limit: NodeTag = 53;
-pub const NodeTag_T_NestLoopParam: NodeTag = 54;
-pub const NodeTag_T_PlanRowMark: NodeTag = 55;
-pub const NodeTag_T_PartitionPruneInfo: NodeTag = 56;
-pub const NodeTag_T_PartitionedRelPruneInfo: NodeTag = 57;
-pub const NodeTag_T_PartitionPruneStepOp: NodeTag = 58;
-pub const NodeTag_T_PartitionPruneStepCombine: NodeTag = 59;
-pub const NodeTag_T_PlanInvalItem: NodeTag = 60;
-pub const NodeTag_T_PlanState: NodeTag = 61;
-pub const NodeTag_T_ResultState: NodeTag = 62;
-pub const NodeTag_T_ProjectSetState: NodeTag = 63;
-pub const NodeTag_T_ModifyTableState: NodeTag = 64;
-pub const NodeTag_T_AppendState: NodeTag = 65;
-pub const NodeTag_T_MergeAppendState: NodeTag = 66;
-pub const NodeTag_T_RecursiveUnionState: NodeTag = 67;
-pub const NodeTag_T_BitmapAndState: NodeTag = 68;
-pub const NodeTag_T_BitmapOrState: NodeTag = 69;
-pub const NodeTag_T_ScanState: NodeTag = 70;
-pub const NodeTag_T_SeqScanState: NodeTag = 71;
-pub const NodeTag_T_SampleScanState: NodeTag = 72;
-pub const NodeTag_T_IndexScanState: NodeTag = 73;
-pub const NodeTag_T_IndexOnlyScanState: NodeTag = 74;
-pub const NodeTag_T_BitmapIndexScanState: NodeTag = 75;
-pub const NodeTag_T_BitmapHeapScanState: NodeTag = 76;
-pub const NodeTag_T_TidScanState: NodeTag = 77;
-pub const NodeTag_T_TidRangeScanState: NodeTag = 78;
-pub const NodeTag_T_SubqueryScanState: NodeTag = 79;
-pub const NodeTag_T_FunctionScanState: NodeTag = 80;
-pub const NodeTag_T_TableFuncScanState: NodeTag = 81;
-pub const NodeTag_T_ValuesScanState: NodeTag = 82;
-pub const NodeTag_T_CteScanState: NodeTag = 83;
-pub const NodeTag_T_NamedTuplestoreScanState: NodeTag = 84;
-pub const NodeTag_T_WorkTableScanState: NodeTag = 85;
-pub const NodeTag_T_ForeignScanState: NodeTag = 86;
-pub const NodeTag_T_CustomScanState: NodeTag = 87;
-pub const NodeTag_T_JoinState: NodeTag = 88;
-pub const NodeTag_T_NestLoopState: NodeTag = 89;
-pub const NodeTag_T_MergeJoinState: NodeTag = 90;
-pub const NodeTag_T_HashJoinState: NodeTag = 91;
-pub const NodeTag_T_MaterialState: NodeTag = 92;
-pub const NodeTag_T_MemoizeState: NodeTag = 93;
-pub const NodeTag_T_SortState: NodeTag = 94;
-pub const NodeTag_T_IncrementalSortState: NodeTag = 95;
-pub const NodeTag_T_GroupState: NodeTag = 96;
-pub const NodeTag_T_AggState: NodeTag = 97;
-pub const NodeTag_T_WindowAggState: NodeTag = 98;
-pub const NodeTag_T_UniqueState: NodeTag = 99;
-pub const NodeTag_T_GatherState: NodeTag = 100;
-pub const NodeTag_T_GatherMergeState: NodeTag = 101;
-pub const NodeTag_T_HashState: NodeTag = 102;
-pub const NodeTag_T_SetOpState: NodeTag = 103;
-pub const NodeTag_T_LockRowsState: NodeTag = 104;
-pub const NodeTag_T_LimitState: NodeTag = 105;
-pub const NodeTag_T_Alias: NodeTag = 106;
-pub const NodeTag_T_RangeVar: NodeTag = 107;
-pub const NodeTag_T_TableFunc: NodeTag = 108;
-pub const NodeTag_T_Expr: NodeTag = 109;
+pub const NodeTag_T_MergeActionState: NodeTag = 6;
+pub const NodeTag_T_ResultRelInfo: NodeTag = 7;
+pub const NodeTag_T_EState: NodeTag = 8;
+pub const NodeTag_T_TupleTableSlot: NodeTag = 9;
+pub const NodeTag_T_Plan: NodeTag = 10;
+pub const NodeTag_T_Result: NodeTag = 11;
+pub const NodeTag_T_ProjectSet: NodeTag = 12;
+pub const NodeTag_T_ModifyTable: NodeTag = 13;
+pub const NodeTag_T_Append: NodeTag = 14;
+pub const NodeTag_T_MergeAppend: NodeTag = 15;
+pub const NodeTag_T_RecursiveUnion: NodeTag = 16;
+pub const NodeTag_T_BitmapAnd: NodeTag = 17;
+pub const NodeTag_T_BitmapOr: NodeTag = 18;
+pub const NodeTag_T_Scan: NodeTag = 19;
+pub const NodeTag_T_SeqScan: NodeTag = 20;
+pub const NodeTag_T_SampleScan: NodeTag = 21;
+pub const NodeTag_T_IndexScan: NodeTag = 22;
+pub const NodeTag_T_IndexOnlyScan: NodeTag = 23;
+pub const NodeTag_T_BitmapIndexScan: NodeTag = 24;
+pub const NodeTag_T_BitmapHeapScan: NodeTag = 25;
+pub const NodeTag_T_TidScan: NodeTag = 26;
+pub const NodeTag_T_TidRangeScan: NodeTag = 27;
+pub const NodeTag_T_SubqueryScan: NodeTag = 28;
+pub const NodeTag_T_FunctionScan: NodeTag = 29;
+pub const NodeTag_T_ValuesScan: NodeTag = 30;
+pub const NodeTag_T_TableFuncScan: NodeTag = 31;
+pub const NodeTag_T_CteScan: NodeTag = 32;
+pub const NodeTag_T_NamedTuplestoreScan: NodeTag = 33;
+pub const NodeTag_T_WorkTableScan: NodeTag = 34;
+pub const NodeTag_T_ForeignScan: NodeTag = 35;
+pub const NodeTag_T_CustomScan: NodeTag = 36;
+pub const NodeTag_T_Join: NodeTag = 37;
+pub const NodeTag_T_NestLoop: NodeTag = 38;
+pub const NodeTag_T_MergeJoin: NodeTag = 39;
+pub const NodeTag_T_HashJoin: NodeTag = 40;
+pub const NodeTag_T_Material: NodeTag = 41;
+pub const NodeTag_T_Memoize: NodeTag = 42;
+pub const NodeTag_T_Sort: NodeTag = 43;
+pub const NodeTag_T_IncrementalSort: NodeTag = 44;
+pub const NodeTag_T_Group: NodeTag = 45;
+pub const NodeTag_T_Agg: NodeTag = 46;
+pub const NodeTag_T_WindowAgg: NodeTag = 47;
+pub const NodeTag_T_Unique: NodeTag = 48;
+pub const NodeTag_T_Gather: NodeTag = 49;
+pub const NodeTag_T_GatherMerge: NodeTag = 50;
+pub const NodeTag_T_Hash: NodeTag = 51;
+pub const NodeTag_T_SetOp: NodeTag = 52;
+pub const NodeTag_T_LockRows: NodeTag = 53;
+pub const NodeTag_T_Limit: NodeTag = 54;
+pub const NodeTag_T_NestLoopParam: NodeTag = 55;
+pub const NodeTag_T_PlanRowMark: NodeTag = 56;
+pub const NodeTag_T_PartitionPruneInfo: NodeTag = 57;
+pub const NodeTag_T_PartitionedRelPruneInfo: NodeTag = 58;
+pub const NodeTag_T_PartitionPruneStepOp: NodeTag = 59;
+pub const NodeTag_T_PartitionPruneStepCombine: NodeTag = 60;
+pub const NodeTag_T_PlanInvalItem: NodeTag = 61;
+pub const NodeTag_T_PlanState: NodeTag = 62;
+pub const NodeTag_T_ResultState: NodeTag = 63;
+pub const NodeTag_T_ProjectSetState: NodeTag = 64;
+pub const NodeTag_T_ModifyTableState: NodeTag = 65;
+pub const NodeTag_T_AppendState: NodeTag = 66;
+pub const NodeTag_T_MergeAppendState: NodeTag = 67;
+pub const NodeTag_T_RecursiveUnionState: NodeTag = 68;
+pub const NodeTag_T_BitmapAndState: NodeTag = 69;
+pub const NodeTag_T_BitmapOrState: NodeTag = 70;
+pub const NodeTag_T_ScanState: NodeTag = 71;
+pub const NodeTag_T_SeqScanState: NodeTag = 72;
+pub const NodeTag_T_SampleScanState: NodeTag = 73;
+pub const NodeTag_T_IndexScanState: NodeTag = 74;
+pub const NodeTag_T_IndexOnlyScanState: NodeTag = 75;
+pub const NodeTag_T_BitmapIndexScanState: NodeTag = 76;
+pub const NodeTag_T_BitmapHeapScanState: NodeTag = 77;
+pub const NodeTag_T_TidScanState: NodeTag = 78;
+pub const NodeTag_T_TidRangeScanState: NodeTag = 79;
+pub const NodeTag_T_SubqueryScanState: NodeTag = 80;
+pub const NodeTag_T_FunctionScanState: NodeTag = 81;
+pub const NodeTag_T_TableFuncScanState: NodeTag = 82;
+pub const NodeTag_T_ValuesScanState: NodeTag = 83;
+pub const NodeTag_T_CteScanState: NodeTag = 84;
+pub const NodeTag_T_NamedTuplestoreScanState: NodeTag = 85;
+pub const NodeTag_T_WorkTableScanState: NodeTag = 86;
+pub const NodeTag_T_ForeignScanState: NodeTag = 87;
+pub const NodeTag_T_CustomScanState: NodeTag = 88;
+pub const NodeTag_T_JoinState: NodeTag = 89;
+pub const NodeTag_T_NestLoopState: NodeTag = 90;
+pub const NodeTag_T_MergeJoinState: NodeTag = 91;
+pub const NodeTag_T_HashJoinState: NodeTag = 92;
+pub const NodeTag_T_MaterialState: NodeTag = 93;
+pub const NodeTag_T_MemoizeState: NodeTag = 94;
+pub const NodeTag_T_SortState: NodeTag = 95;
+pub const NodeTag_T_IncrementalSortState: NodeTag = 96;
+pub const NodeTag_T_GroupState: NodeTag = 97;
+pub const NodeTag_T_AggState: NodeTag = 98;
+pub const NodeTag_T_WindowAggState: NodeTag = 99;
+pub const NodeTag_T_UniqueState: NodeTag = 100;
+pub const NodeTag_T_GatherState: NodeTag = 101;
+pub const NodeTag_T_GatherMergeState: NodeTag = 102;
+pub const NodeTag_T_HashState: NodeTag = 103;
+pub const NodeTag_T_SetOpState: NodeTag = 104;
+pub const NodeTag_T_LockRowsState: NodeTag = 105;
+pub const NodeTag_T_LimitState: NodeTag = 106;
+pub const NodeTag_T_Alias: NodeTag = 107;
+pub const NodeTag_T_RangeVar: NodeTag = 108;
+pub const NodeTag_T_TableFunc: NodeTag = 109;
 pub const NodeTag_T_Var: NodeTag = 110;
 pub const NodeTag_T_Const: NodeTag = 111;
 pub const NodeTag_T_Param: NodeTag = 112;
@@ -14331,29 +12395,29 @@ pub const NodeTag_T_LimitPath: NodeTag = 204;
 pub const NodeTag_T_EquivalenceClass: NodeTag = 205;
 pub const NodeTag_T_EquivalenceMember: NodeTag = 206;
 pub const NodeTag_T_PathKey: NodeTag = 207;
-pub const NodeTag_T_PathTarget: NodeTag = 208;
-pub const NodeTag_T_RestrictInfo: NodeTag = 209;
-pub const NodeTag_T_IndexClause: NodeTag = 210;
-pub const NodeTag_T_PlaceHolderVar: NodeTag = 211;
-pub const NodeTag_T_SpecialJoinInfo: NodeTag = 212;
-pub const NodeTag_T_AppendRelInfo: NodeTag = 213;
-pub const NodeTag_T_RowIdentityVarInfo: NodeTag = 214;
-pub const NodeTag_T_PlaceHolderInfo: NodeTag = 215;
-pub const NodeTag_T_MinMaxAggInfo: NodeTag = 216;
-pub const NodeTag_T_PlannerParamItem: NodeTag = 217;
-pub const NodeTag_T_RollupData: NodeTag = 218;
-pub const NodeTag_T_GroupingSetData: NodeTag = 219;
-pub const NodeTag_T_StatisticExtInfo: NodeTag = 220;
-pub const NodeTag_T_MemoryContext: NodeTag = 221;
-pub const NodeTag_T_AllocSetContext: NodeTag = 222;
-pub const NodeTag_T_SlabContext: NodeTag = 223;
-pub const NodeTag_T_GenerationContext: NodeTag = 224;
-pub const NodeTag_T_Value: NodeTag = 225;
+pub const NodeTag_T_PathKeyInfo: NodeTag = 208;
+pub const NodeTag_T_PathTarget: NodeTag = 209;
+pub const NodeTag_T_RestrictInfo: NodeTag = 210;
+pub const NodeTag_T_IndexClause: NodeTag = 211;
+pub const NodeTag_T_PlaceHolderVar: NodeTag = 212;
+pub const NodeTag_T_SpecialJoinInfo: NodeTag = 213;
+pub const NodeTag_T_AppendRelInfo: NodeTag = 214;
+pub const NodeTag_T_RowIdentityVarInfo: NodeTag = 215;
+pub const NodeTag_T_PlaceHolderInfo: NodeTag = 216;
+pub const NodeTag_T_MinMaxAggInfo: NodeTag = 217;
+pub const NodeTag_T_PlannerParamItem: NodeTag = 218;
+pub const NodeTag_T_RollupData: NodeTag = 219;
+pub const NodeTag_T_GroupingSetData: NodeTag = 220;
+pub const NodeTag_T_StatisticExtInfo: NodeTag = 221;
+pub const NodeTag_T_MergeAction: NodeTag = 222;
+pub const NodeTag_T_AllocSetContext: NodeTag = 223;
+pub const NodeTag_T_SlabContext: NodeTag = 224;
+pub const NodeTag_T_GenerationContext: NodeTag = 225;
 pub const NodeTag_T_Integer: NodeTag = 226;
 pub const NodeTag_T_Float: NodeTag = 227;
-pub const NodeTag_T_String: NodeTag = 228;
-pub const NodeTag_T_BitString: NodeTag = 229;
-pub const NodeTag_T_Null: NodeTag = 230;
+pub const NodeTag_T_Boolean: NodeTag = 228;
+pub const NodeTag_T_String: NodeTag = 229;
+pub const NodeTag_T_BitString: NodeTag = 230;
 pub const NodeTag_T_List: NodeTag = 231;
 pub const NodeTag_T_IntList: NodeTag = 232;
 pub const NodeTag_T_OidList: NodeTag = 233;
@@ -14364,197 +12428,203 @@ pub const NodeTag_T_PlannedStmt: NodeTag = 237;
 pub const NodeTag_T_InsertStmt: NodeTag = 238;
 pub const NodeTag_T_DeleteStmt: NodeTag = 239;
 pub const NodeTag_T_UpdateStmt: NodeTag = 240;
-pub const NodeTag_T_SelectStmt: NodeTag = 241;
-pub const NodeTag_T_ReturnStmt: NodeTag = 242;
-pub const NodeTag_T_PLAssignStmt: NodeTag = 243;
-pub const NodeTag_T_AlterTableStmt: NodeTag = 244;
-pub const NodeTag_T_AlterTableCmd: NodeTag = 245;
-pub const NodeTag_T_AlterDomainStmt: NodeTag = 246;
-pub const NodeTag_T_SetOperationStmt: NodeTag = 247;
-pub const NodeTag_T_GrantStmt: NodeTag = 248;
-pub const NodeTag_T_GrantRoleStmt: NodeTag = 249;
-pub const NodeTag_T_AlterDefaultPrivilegesStmt: NodeTag = 250;
-pub const NodeTag_T_ClosePortalStmt: NodeTag = 251;
-pub const NodeTag_T_ClusterStmt: NodeTag = 252;
-pub const NodeTag_T_CopyStmt: NodeTag = 253;
-pub const NodeTag_T_CreateStmt: NodeTag = 254;
-pub const NodeTag_T_DefineStmt: NodeTag = 255;
-pub const NodeTag_T_DropStmt: NodeTag = 256;
-pub const NodeTag_T_TruncateStmt: NodeTag = 257;
-pub const NodeTag_T_CommentStmt: NodeTag = 258;
-pub const NodeTag_T_FetchStmt: NodeTag = 259;
-pub const NodeTag_T_IndexStmt: NodeTag = 260;
-pub const NodeTag_T_CreateFunctionStmt: NodeTag = 261;
-pub const NodeTag_T_AlterFunctionStmt: NodeTag = 262;
-pub const NodeTag_T_DoStmt: NodeTag = 263;
-pub const NodeTag_T_RenameStmt: NodeTag = 264;
-pub const NodeTag_T_RuleStmt: NodeTag = 265;
-pub const NodeTag_T_NotifyStmt: NodeTag = 266;
-pub const NodeTag_T_ListenStmt: NodeTag = 267;
-pub const NodeTag_T_UnlistenStmt: NodeTag = 268;
-pub const NodeTag_T_TransactionStmt: NodeTag = 269;
-pub const NodeTag_T_ViewStmt: NodeTag = 270;
-pub const NodeTag_T_LoadStmt: NodeTag = 271;
-pub const NodeTag_T_CreateDomainStmt: NodeTag = 272;
-pub const NodeTag_T_CreatedbStmt: NodeTag = 273;
-pub const NodeTag_T_DropdbStmt: NodeTag = 274;
-pub const NodeTag_T_VacuumStmt: NodeTag = 275;
-pub const NodeTag_T_ExplainStmt: NodeTag = 276;
-pub const NodeTag_T_CreateTableAsStmt: NodeTag = 277;
-pub const NodeTag_T_CreateSeqStmt: NodeTag = 278;
-pub const NodeTag_T_AlterSeqStmt: NodeTag = 279;
-pub const NodeTag_T_VariableSetStmt: NodeTag = 280;
-pub const NodeTag_T_VariableShowStmt: NodeTag = 281;
-pub const NodeTag_T_DiscardStmt: NodeTag = 282;
-pub const NodeTag_T_CreateTrigStmt: NodeTag = 283;
-pub const NodeTag_T_CreatePLangStmt: NodeTag = 284;
-pub const NodeTag_T_CreateRoleStmt: NodeTag = 285;
-pub const NodeTag_T_AlterRoleStmt: NodeTag = 286;
-pub const NodeTag_T_DropRoleStmt: NodeTag = 287;
-pub const NodeTag_T_LockStmt: NodeTag = 288;
-pub const NodeTag_T_ConstraintsSetStmt: NodeTag = 289;
-pub const NodeTag_T_ReindexStmt: NodeTag = 290;
-pub const NodeTag_T_CheckPointStmt: NodeTag = 291;
-pub const NodeTag_T_CreateSchemaStmt: NodeTag = 292;
-pub const NodeTag_T_AlterDatabaseStmt: NodeTag = 293;
-pub const NodeTag_T_AlterDatabaseSetStmt: NodeTag = 294;
-pub const NodeTag_T_AlterRoleSetStmt: NodeTag = 295;
-pub const NodeTag_T_CreateConversionStmt: NodeTag = 296;
-pub const NodeTag_T_CreateCastStmt: NodeTag = 297;
-pub const NodeTag_T_CreateOpClassStmt: NodeTag = 298;
-pub const NodeTag_T_CreateOpFamilyStmt: NodeTag = 299;
-pub const NodeTag_T_AlterOpFamilyStmt: NodeTag = 300;
-pub const NodeTag_T_PrepareStmt: NodeTag = 301;
-pub const NodeTag_T_ExecuteStmt: NodeTag = 302;
-pub const NodeTag_T_DeallocateStmt: NodeTag = 303;
-pub const NodeTag_T_DeclareCursorStmt: NodeTag = 304;
-pub const NodeTag_T_CreateTableSpaceStmt: NodeTag = 305;
-pub const NodeTag_T_DropTableSpaceStmt: NodeTag = 306;
-pub const NodeTag_T_AlterObjectDependsStmt: NodeTag = 307;
-pub const NodeTag_T_AlterObjectSchemaStmt: NodeTag = 308;
-pub const NodeTag_T_AlterOwnerStmt: NodeTag = 309;
-pub const NodeTag_T_AlterOperatorStmt: NodeTag = 310;
-pub const NodeTag_T_AlterTypeStmt: NodeTag = 311;
-pub const NodeTag_T_DropOwnedStmt: NodeTag = 312;
-pub const NodeTag_T_ReassignOwnedStmt: NodeTag = 313;
-pub const NodeTag_T_CompositeTypeStmt: NodeTag = 314;
-pub const NodeTag_T_CreateEnumStmt: NodeTag = 315;
-pub const NodeTag_T_CreateRangeStmt: NodeTag = 316;
-pub const NodeTag_T_AlterEnumStmt: NodeTag = 317;
-pub const NodeTag_T_AlterTSDictionaryStmt: NodeTag = 318;
-pub const NodeTag_T_AlterTSConfigurationStmt: NodeTag = 319;
-pub const NodeTag_T_CreateFdwStmt: NodeTag = 320;
-pub const NodeTag_T_AlterFdwStmt: NodeTag = 321;
-pub const NodeTag_T_CreateForeignServerStmt: NodeTag = 322;
-pub const NodeTag_T_AlterForeignServerStmt: NodeTag = 323;
-pub const NodeTag_T_CreateUserMappingStmt: NodeTag = 324;
-pub const NodeTag_T_AlterUserMappingStmt: NodeTag = 325;
-pub const NodeTag_T_DropUserMappingStmt: NodeTag = 326;
-pub const NodeTag_T_AlterTableSpaceOptionsStmt: NodeTag = 327;
-pub const NodeTag_T_AlterTableMoveAllStmt: NodeTag = 328;
-pub const NodeTag_T_SecLabelStmt: NodeTag = 329;
-pub const NodeTag_T_CreateForeignTableStmt: NodeTag = 330;
-pub const NodeTag_T_ImportForeignSchemaStmt: NodeTag = 331;
-pub const NodeTag_T_CreateExtensionStmt: NodeTag = 332;
-pub const NodeTag_T_AlterExtensionStmt: NodeTag = 333;
-pub const NodeTag_T_AlterExtensionContentsStmt: NodeTag = 334;
-pub const NodeTag_T_CreateEventTrigStmt: NodeTag = 335;
-pub const NodeTag_T_AlterEventTrigStmt: NodeTag = 336;
-pub const NodeTag_T_RefreshMatViewStmt: NodeTag = 337;
-pub const NodeTag_T_ReplicaIdentityStmt: NodeTag = 338;
-pub const NodeTag_T_AlterSystemStmt: NodeTag = 339;
-pub const NodeTag_T_CreatePolicyStmt: NodeTag = 340;
-pub const NodeTag_T_AlterPolicyStmt: NodeTag = 341;
-pub const NodeTag_T_CreateTransformStmt: NodeTag = 342;
-pub const NodeTag_T_CreateAmStmt: NodeTag = 343;
-pub const NodeTag_T_CreatePublicationStmt: NodeTag = 344;
-pub const NodeTag_T_AlterPublicationStmt: NodeTag = 345;
-pub const NodeTag_T_CreateSubscriptionStmt: NodeTag = 346;
-pub const NodeTag_T_AlterSubscriptionStmt: NodeTag = 347;
-pub const NodeTag_T_DropSubscriptionStmt: NodeTag = 348;
-pub const NodeTag_T_CreateStatsStmt: NodeTag = 349;
-pub const NodeTag_T_AlterCollationStmt: NodeTag = 350;
-pub const NodeTag_T_CallStmt: NodeTag = 351;
-pub const NodeTag_T_AlterStatsStmt: NodeTag = 352;
-pub const NodeTag_T_A_Expr: NodeTag = 353;
-pub const NodeTag_T_ColumnRef: NodeTag = 354;
-pub const NodeTag_T_ParamRef: NodeTag = 355;
-pub const NodeTag_T_A_Const: NodeTag = 356;
-pub const NodeTag_T_FuncCall: NodeTag = 357;
-pub const NodeTag_T_A_Star: NodeTag = 358;
-pub const NodeTag_T_A_Indices: NodeTag = 359;
-pub const NodeTag_T_A_Indirection: NodeTag = 360;
-pub const NodeTag_T_A_ArrayExpr: NodeTag = 361;
-pub const NodeTag_T_ResTarget: NodeTag = 362;
-pub const NodeTag_T_MultiAssignRef: NodeTag = 363;
-pub const NodeTag_T_TypeCast: NodeTag = 364;
-pub const NodeTag_T_CollateClause: NodeTag = 365;
-pub const NodeTag_T_SortBy: NodeTag = 366;
-pub const NodeTag_T_WindowDef: NodeTag = 367;
-pub const NodeTag_T_RangeSubselect: NodeTag = 368;
-pub const NodeTag_T_RangeFunction: NodeTag = 369;
-pub const NodeTag_T_RangeTableSample: NodeTag = 370;
-pub const NodeTag_T_RangeTableFunc: NodeTag = 371;
-pub const NodeTag_T_RangeTableFuncCol: NodeTag = 372;
-pub const NodeTag_T_TypeName: NodeTag = 373;
-pub const NodeTag_T_ColumnDef: NodeTag = 374;
-pub const NodeTag_T_IndexElem: NodeTag = 375;
-pub const NodeTag_T_StatsElem: NodeTag = 376;
-pub const NodeTag_T_Constraint: NodeTag = 377;
-pub const NodeTag_T_DefElem: NodeTag = 378;
-pub const NodeTag_T_RangeTblEntry: NodeTag = 379;
-pub const NodeTag_T_RangeTblFunction: NodeTag = 380;
-pub const NodeTag_T_TableSampleClause: NodeTag = 381;
-pub const NodeTag_T_WithCheckOption: NodeTag = 382;
-pub const NodeTag_T_SortGroupClause: NodeTag = 383;
-pub const NodeTag_T_GroupingSet: NodeTag = 384;
-pub const NodeTag_T_WindowClause: NodeTag = 385;
-pub const NodeTag_T_ObjectWithArgs: NodeTag = 386;
-pub const NodeTag_T_AccessPriv: NodeTag = 387;
-pub const NodeTag_T_CreateOpClassItem: NodeTag = 388;
-pub const NodeTag_T_TableLikeClause: NodeTag = 389;
-pub const NodeTag_T_FunctionParameter: NodeTag = 390;
-pub const NodeTag_T_LockingClause: NodeTag = 391;
-pub const NodeTag_T_RowMarkClause: NodeTag = 392;
-pub const NodeTag_T_XmlSerialize: NodeTag = 393;
-pub const NodeTag_T_WithClause: NodeTag = 394;
-pub const NodeTag_T_InferClause: NodeTag = 395;
-pub const NodeTag_T_OnConflictClause: NodeTag = 396;
-pub const NodeTag_T_CTESearchClause: NodeTag = 397;
-pub const NodeTag_T_CTECycleClause: NodeTag = 398;
-pub const NodeTag_T_CommonTableExpr: NodeTag = 399;
-pub const NodeTag_T_RoleSpec: NodeTag = 400;
-pub const NodeTag_T_TriggerTransition: NodeTag = 401;
-pub const NodeTag_T_PartitionElem: NodeTag = 402;
-pub const NodeTag_T_PartitionSpec: NodeTag = 403;
-pub const NodeTag_T_PartitionBoundSpec: NodeTag = 404;
-pub const NodeTag_T_PartitionRangeDatum: NodeTag = 405;
-pub const NodeTag_T_PartitionCmd: NodeTag = 406;
-pub const NodeTag_T_VacuumRelation: NodeTag = 407;
-pub const NodeTag_T_IdentifySystemCmd: NodeTag = 408;
-pub const NodeTag_T_BaseBackupCmd: NodeTag = 409;
-pub const NodeTag_T_CreateReplicationSlotCmd: NodeTag = 410;
-pub const NodeTag_T_DropReplicationSlotCmd: NodeTag = 411;
-pub const NodeTag_T_StartReplicationCmd: NodeTag = 412;
-pub const NodeTag_T_TimeLineHistoryCmd: NodeTag = 413;
-pub const NodeTag_T_SQLCmd: NodeTag = 414;
-pub const NodeTag_T_TriggerData: NodeTag = 415;
-pub const NodeTag_T_EventTriggerData: NodeTag = 416;
-pub const NodeTag_T_ReturnSetInfo: NodeTag = 417;
-pub const NodeTag_T_WindowObjectData: NodeTag = 418;
-pub const NodeTag_T_TIDBitmap: NodeTag = 419;
-pub const NodeTag_T_InlineCodeBlock: NodeTag = 420;
-pub const NodeTag_T_FdwRoutine: NodeTag = 421;
-pub const NodeTag_T_IndexAmRoutine: NodeTag = 422;
-pub const NodeTag_T_TableAmRoutine: NodeTag = 423;
-pub const NodeTag_T_TsmRoutine: NodeTag = 424;
-pub const NodeTag_T_ForeignKeyCacheInfo: NodeTag = 425;
-pub const NodeTag_T_CallContext: NodeTag = 426;
-pub const NodeTag_T_SupportRequestSimplify: NodeTag = 427;
-pub const NodeTag_T_SupportRequestSelectivity: NodeTag = 428;
-pub const NodeTag_T_SupportRequestCost: NodeTag = 429;
-pub const NodeTag_T_SupportRequestRows: NodeTag = 430;
-pub const NodeTag_T_SupportRequestIndexCondition: NodeTag = 431;
+pub const NodeTag_T_MergeStmt: NodeTag = 241;
+pub const NodeTag_T_SelectStmt: NodeTag = 242;
+pub const NodeTag_T_ReturnStmt: NodeTag = 243;
+pub const NodeTag_T_PLAssignStmt: NodeTag = 244;
+pub const NodeTag_T_AlterTableStmt: NodeTag = 245;
+pub const NodeTag_T_AlterTableCmd: NodeTag = 246;
+pub const NodeTag_T_AlterDomainStmt: NodeTag = 247;
+pub const NodeTag_T_SetOperationStmt: NodeTag = 248;
+pub const NodeTag_T_GrantStmt: NodeTag = 249;
+pub const NodeTag_T_GrantRoleStmt: NodeTag = 250;
+pub const NodeTag_T_AlterDefaultPrivilegesStmt: NodeTag = 251;
+pub const NodeTag_T_ClosePortalStmt: NodeTag = 252;
+pub const NodeTag_T_ClusterStmt: NodeTag = 253;
+pub const NodeTag_T_CopyStmt: NodeTag = 254;
+pub const NodeTag_T_CreateStmt: NodeTag = 255;
+pub const NodeTag_T_DefineStmt: NodeTag = 256;
+pub const NodeTag_T_DropStmt: NodeTag = 257;
+pub const NodeTag_T_TruncateStmt: NodeTag = 258;
+pub const NodeTag_T_CommentStmt: NodeTag = 259;
+pub const NodeTag_T_FetchStmt: NodeTag = 260;
+pub const NodeTag_T_IndexStmt: NodeTag = 261;
+pub const NodeTag_T_CreateFunctionStmt: NodeTag = 262;
+pub const NodeTag_T_AlterFunctionStmt: NodeTag = 263;
+pub const NodeTag_T_DoStmt: NodeTag = 264;
+pub const NodeTag_T_RenameStmt: NodeTag = 265;
+pub const NodeTag_T_RuleStmt: NodeTag = 266;
+pub const NodeTag_T_NotifyStmt: NodeTag = 267;
+pub const NodeTag_T_ListenStmt: NodeTag = 268;
+pub const NodeTag_T_UnlistenStmt: NodeTag = 269;
+pub const NodeTag_T_TransactionStmt: NodeTag = 270;
+pub const NodeTag_T_ViewStmt: NodeTag = 271;
+pub const NodeTag_T_LoadStmt: NodeTag = 272;
+pub const NodeTag_T_CreateDomainStmt: NodeTag = 273;
+pub const NodeTag_T_CreatedbStmt: NodeTag = 274;
+pub const NodeTag_T_DropdbStmt: NodeTag = 275;
+pub const NodeTag_T_VacuumStmt: NodeTag = 276;
+pub const NodeTag_T_ExplainStmt: NodeTag = 277;
+pub const NodeTag_T_CreateTableAsStmt: NodeTag = 278;
+pub const NodeTag_T_CreateSeqStmt: NodeTag = 279;
+pub const NodeTag_T_AlterSeqStmt: NodeTag = 280;
+pub const NodeTag_T_VariableSetStmt: NodeTag = 281;
+pub const NodeTag_T_VariableShowStmt: NodeTag = 282;
+pub const NodeTag_T_DiscardStmt: NodeTag = 283;
+pub const NodeTag_T_CreateTrigStmt: NodeTag = 284;
+pub const NodeTag_T_CreatePLangStmt: NodeTag = 285;
+pub const NodeTag_T_CreateRoleStmt: NodeTag = 286;
+pub const NodeTag_T_AlterRoleStmt: NodeTag = 287;
+pub const NodeTag_T_DropRoleStmt: NodeTag = 288;
+pub const NodeTag_T_LockStmt: NodeTag = 289;
+pub const NodeTag_T_ConstraintsSetStmt: NodeTag = 290;
+pub const NodeTag_T_ReindexStmt: NodeTag = 291;
+pub const NodeTag_T_CheckPointStmt: NodeTag = 292;
+pub const NodeTag_T_CreateSchemaStmt: NodeTag = 293;
+pub const NodeTag_T_AlterDatabaseStmt: NodeTag = 294;
+pub const NodeTag_T_AlterDatabaseRefreshCollStmt: NodeTag = 295;
+pub const NodeTag_T_AlterDatabaseSetStmt: NodeTag = 296;
+pub const NodeTag_T_AlterRoleSetStmt: NodeTag = 297;
+pub const NodeTag_T_CreateConversionStmt: NodeTag = 298;
+pub const NodeTag_T_CreateCastStmt: NodeTag = 299;
+pub const NodeTag_T_CreateOpClassStmt: NodeTag = 300;
+pub const NodeTag_T_CreateOpFamilyStmt: NodeTag = 301;
+pub const NodeTag_T_AlterOpFamilyStmt: NodeTag = 302;
+pub const NodeTag_T_PrepareStmt: NodeTag = 303;
+pub const NodeTag_T_ExecuteStmt: NodeTag = 304;
+pub const NodeTag_T_DeallocateStmt: NodeTag = 305;
+pub const NodeTag_T_DeclareCursorStmt: NodeTag = 306;
+pub const NodeTag_T_CreateTableSpaceStmt: NodeTag = 307;
+pub const NodeTag_T_DropTableSpaceStmt: NodeTag = 308;
+pub const NodeTag_T_AlterObjectDependsStmt: NodeTag = 309;
+pub const NodeTag_T_AlterObjectSchemaStmt: NodeTag = 310;
+pub const NodeTag_T_AlterOwnerStmt: NodeTag = 311;
+pub const NodeTag_T_AlterOperatorStmt: NodeTag = 312;
+pub const NodeTag_T_AlterTypeStmt: NodeTag = 313;
+pub const NodeTag_T_DropOwnedStmt: NodeTag = 314;
+pub const NodeTag_T_ReassignOwnedStmt: NodeTag = 315;
+pub const NodeTag_T_CompositeTypeStmt: NodeTag = 316;
+pub const NodeTag_T_CreateEnumStmt: NodeTag = 317;
+pub const NodeTag_T_CreateRangeStmt: NodeTag = 318;
+pub const NodeTag_T_AlterEnumStmt: NodeTag = 319;
+pub const NodeTag_T_AlterTSDictionaryStmt: NodeTag = 320;
+pub const NodeTag_T_AlterTSConfigurationStmt: NodeTag = 321;
+pub const NodeTag_T_CreateFdwStmt: NodeTag = 322;
+pub const NodeTag_T_AlterFdwStmt: NodeTag = 323;
+pub const NodeTag_T_CreateForeignServerStmt: NodeTag = 324;
+pub const NodeTag_T_AlterForeignServerStmt: NodeTag = 325;
+pub const NodeTag_T_CreateUserMappingStmt: NodeTag = 326;
+pub const NodeTag_T_AlterUserMappingStmt: NodeTag = 327;
+pub const NodeTag_T_DropUserMappingStmt: NodeTag = 328;
+pub const NodeTag_T_AlterTableSpaceOptionsStmt: NodeTag = 329;
+pub const NodeTag_T_AlterTableMoveAllStmt: NodeTag = 330;
+pub const NodeTag_T_SecLabelStmt: NodeTag = 331;
+pub const NodeTag_T_CreateForeignTableStmt: NodeTag = 332;
+pub const NodeTag_T_ImportForeignSchemaStmt: NodeTag = 333;
+pub const NodeTag_T_CreateExtensionStmt: NodeTag = 334;
+pub const NodeTag_T_AlterExtensionStmt: NodeTag = 335;
+pub const NodeTag_T_AlterExtensionContentsStmt: NodeTag = 336;
+pub const NodeTag_T_CreateEventTrigStmt: NodeTag = 337;
+pub const NodeTag_T_AlterEventTrigStmt: NodeTag = 338;
+pub const NodeTag_T_RefreshMatViewStmt: NodeTag = 339;
+pub const NodeTag_T_ReplicaIdentityStmt: NodeTag = 340;
+pub const NodeTag_T_AlterSystemStmt: NodeTag = 341;
+pub const NodeTag_T_CreatePolicyStmt: NodeTag = 342;
+pub const NodeTag_T_AlterPolicyStmt: NodeTag = 343;
+pub const NodeTag_T_CreateTransformStmt: NodeTag = 344;
+pub const NodeTag_T_CreateAmStmt: NodeTag = 345;
+pub const NodeTag_T_CreatePublicationStmt: NodeTag = 346;
+pub const NodeTag_T_AlterPublicationStmt: NodeTag = 347;
+pub const NodeTag_T_CreateSubscriptionStmt: NodeTag = 348;
+pub const NodeTag_T_AlterSubscriptionStmt: NodeTag = 349;
+pub const NodeTag_T_DropSubscriptionStmt: NodeTag = 350;
+pub const NodeTag_T_CreateStatsStmt: NodeTag = 351;
+pub const NodeTag_T_AlterCollationStmt: NodeTag = 352;
+pub const NodeTag_T_CallStmt: NodeTag = 353;
+pub const NodeTag_T_AlterStatsStmt: NodeTag = 354;
+pub const NodeTag_T_A_Expr: NodeTag = 355;
+pub const NodeTag_T_ColumnRef: NodeTag = 356;
+pub const NodeTag_T_ParamRef: NodeTag = 357;
+pub const NodeTag_T_A_Const: NodeTag = 358;
+pub const NodeTag_T_FuncCall: NodeTag = 359;
+pub const NodeTag_T_A_Star: NodeTag = 360;
+pub const NodeTag_T_A_Indices: NodeTag = 361;
+pub const NodeTag_T_A_Indirection: NodeTag = 362;
+pub const NodeTag_T_A_ArrayExpr: NodeTag = 363;
+pub const NodeTag_T_ResTarget: NodeTag = 364;
+pub const NodeTag_T_MultiAssignRef: NodeTag = 365;
+pub const NodeTag_T_TypeCast: NodeTag = 366;
+pub const NodeTag_T_CollateClause: NodeTag = 367;
+pub const NodeTag_T_SortBy: NodeTag = 368;
+pub const NodeTag_T_WindowDef: NodeTag = 369;
+pub const NodeTag_T_RangeSubselect: NodeTag = 370;
+pub const NodeTag_T_RangeFunction: NodeTag = 371;
+pub const NodeTag_T_RangeTableSample: NodeTag = 372;
+pub const NodeTag_T_RangeTableFunc: NodeTag = 373;
+pub const NodeTag_T_RangeTableFuncCol: NodeTag = 374;
+pub const NodeTag_T_TypeName: NodeTag = 375;
+pub const NodeTag_T_ColumnDef: NodeTag = 376;
+pub const NodeTag_T_IndexElem: NodeTag = 377;
+pub const NodeTag_T_StatsElem: NodeTag = 378;
+pub const NodeTag_T_Constraint: NodeTag = 379;
+pub const NodeTag_T_DefElem: NodeTag = 380;
+pub const NodeTag_T_RangeTblEntry: NodeTag = 381;
+pub const NodeTag_T_RangeTblFunction: NodeTag = 382;
+pub const NodeTag_T_TableSampleClause: NodeTag = 383;
+pub const NodeTag_T_WithCheckOption: NodeTag = 384;
+pub const NodeTag_T_SortGroupClause: NodeTag = 385;
+pub const NodeTag_T_GroupingSet: NodeTag = 386;
+pub const NodeTag_T_WindowClause: NodeTag = 387;
+pub const NodeTag_T_ObjectWithArgs: NodeTag = 388;
+pub const NodeTag_T_AccessPriv: NodeTag = 389;
+pub const NodeTag_T_CreateOpClassItem: NodeTag = 390;
+pub const NodeTag_T_TableLikeClause: NodeTag = 391;
+pub const NodeTag_T_FunctionParameter: NodeTag = 392;
+pub const NodeTag_T_LockingClause: NodeTag = 393;
+pub const NodeTag_T_RowMarkClause: NodeTag = 394;
+pub const NodeTag_T_XmlSerialize: NodeTag = 395;
+pub const NodeTag_T_WithClause: NodeTag = 396;
+pub const NodeTag_T_InferClause: NodeTag = 397;
+pub const NodeTag_T_OnConflictClause: NodeTag = 398;
+pub const NodeTag_T_CTESearchClause: NodeTag = 399;
+pub const NodeTag_T_CTECycleClause: NodeTag = 400;
+pub const NodeTag_T_CommonTableExpr: NodeTag = 401;
+pub const NodeTag_T_MergeWhenClause: NodeTag = 402;
+pub const NodeTag_T_RoleSpec: NodeTag = 403;
+pub const NodeTag_T_TriggerTransition: NodeTag = 404;
+pub const NodeTag_T_PartitionElem: NodeTag = 405;
+pub const NodeTag_T_PartitionSpec: NodeTag = 406;
+pub const NodeTag_T_PartitionBoundSpec: NodeTag = 407;
+pub const NodeTag_T_PartitionRangeDatum: NodeTag = 408;
+pub const NodeTag_T_PartitionCmd: NodeTag = 409;
+pub const NodeTag_T_VacuumRelation: NodeTag = 410;
+pub const NodeTag_T_PublicationObjSpec: NodeTag = 411;
+pub const NodeTag_T_PublicationTable: NodeTag = 412;
+pub const NodeTag_T_IdentifySystemCmd: NodeTag = 413;
+pub const NodeTag_T_BaseBackupCmd: NodeTag = 414;
+pub const NodeTag_T_CreateReplicationSlotCmd: NodeTag = 415;
+pub const NodeTag_T_DropReplicationSlotCmd: NodeTag = 416;
+pub const NodeTag_T_ReadReplicationSlotCmd: NodeTag = 417;
+pub const NodeTag_T_StartReplicationCmd: NodeTag = 418;
+pub const NodeTag_T_TimeLineHistoryCmd: NodeTag = 419;
+pub const NodeTag_T_TriggerData: NodeTag = 420;
+pub const NodeTag_T_EventTriggerData: NodeTag = 421;
+pub const NodeTag_T_ReturnSetInfo: NodeTag = 422;
+pub const NodeTag_T_WindowObjectData: NodeTag = 423;
+pub const NodeTag_T_TIDBitmap: NodeTag = 424;
+pub const NodeTag_T_InlineCodeBlock: NodeTag = 425;
+pub const NodeTag_T_FdwRoutine: NodeTag = 426;
+pub const NodeTag_T_IndexAmRoutine: NodeTag = 427;
+pub const NodeTag_T_TableAmRoutine: NodeTag = 428;
+pub const NodeTag_T_TsmRoutine: NodeTag = 429;
+pub const NodeTag_T_ForeignKeyCacheInfo: NodeTag = 430;
+pub const NodeTag_T_CallContext: NodeTag = 431;
+pub const NodeTag_T_SupportRequestSimplify: NodeTag = 432;
+pub const NodeTag_T_SupportRequestSelectivity: NodeTag = 433;
+pub const NodeTag_T_SupportRequestCost: NodeTag = 434;
+pub const NodeTag_T_SupportRequestRows: NodeTag = 435;
+pub const NodeTag_T_SupportRequestIndexCondition: NodeTag = 436;
+pub const NodeTag_T_SupportRequestWFuncMonotonic: NodeTag = 437;
 pub type NodeTag = ::std::os::raw::c_uint;
 #[repr(C)]
 #[derive(Debug, Copy, Clone)]
@@ -14713,13 +12783,15 @@ pub unsafe fn equal(
 }
 pub type Selectivity = f64;
 pub type Cost = f64;
+pub type Cardinality = f64;
 pub const CmdType_CMD_UNKNOWN: CmdType = 0;
 pub const CmdType_CMD_SELECT: CmdType = 1;
 pub const CmdType_CMD_UPDATE: CmdType = 2;
 pub const CmdType_CMD_INSERT: CmdType = 3;
 pub const CmdType_CMD_DELETE: CmdType = 4;
-pub const CmdType_CMD_UTILITY: CmdType = 5;
-pub const CmdType_CMD_NOTHING: CmdType = 6;
+pub const CmdType_CMD_MERGE: CmdType = 5;
+pub const CmdType_CMD_UTILITY: CmdType = 6;
+pub const CmdType_CMD_NOTHING: CmdType = 7;
 pub type CmdType = ::std::os::raw::c_uint;
 pub const JoinType_JOIN_INNER: JoinType = 0;
 pub const JoinType_JOIN_LEFT: JoinType = 1;
@@ -15399,6 +13471,17 @@ pub unsafe fn list_copy(arg_list: *const List) -> *mut List {
             pub fn list_copy(list: *const List) -> *mut List;
         }
         list_copy(arg_list)
+    })
+}
+pub unsafe fn list_copy_head(
+    arg_oldlist: *const List,
+    arg_len: ::std::os::raw::c_int,
+) -> *mut List {
+    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
+        extern "C" {
+            pub fn list_copy_head(oldlist: *const List, len: ::std::os::raw::c_int) -> *mut List;
+        }
+        list_copy_head(arg_oldlist, arg_len)
     })
 }
 pub unsafe fn list_copy_tail(arg_list: *const List, arg_nskip: ::std::os::raw::c_int) -> *mut List {
@@ -16375,14 +14458,6 @@ pub unsafe fn TransactionIdDidAbort(arg_transactionId: TransactionId) -> bool {
         TransactionIdDidAbort(arg_transactionId)
     })
 }
-pub unsafe fn TransactionIdIsKnownCompleted(arg_transactionId: TransactionId) -> bool {
-    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
-        extern "C" {
-            pub fn TransactionIdIsKnownCompleted(transactionId: TransactionId) -> bool;
-        }
-        TransactionIdIsKnownCompleted(arg_transactionId)
-    })
-}
 pub unsafe fn TransactionIdCommitTree(
     arg_xid: TransactionId,
     arg_nxids: ::std::os::raw::c_int,
@@ -16549,6 +14624,14 @@ pub unsafe fn GetNewObjectId() -> Oid {
             pub fn GetNewObjectId() -> Oid;
         }
         GetNewObjectId()
+    })
+}
+pub unsafe fn StopGeneratingPinnedObjectIds() {
+    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
+        extern "C" {
+            pub fn StopGeneratingPinnedObjectIds();
+        }
+        StopGeneratingPinnedObjectIds()
     })
 }
 pub unsafe fn AssertTransactionIdInAllowableRange(arg_xid: TransactionId) {
@@ -18326,6 +16409,8 @@ pub struct BufferUsage {
     pub temp_blks_written: int64,
     pub blk_read_time: instr_time,
     pub blk_write_time: instr_time,
+    pub temp_blk_read_time: instr_time,
+    pub temp_blk_write_time: instr_time,
 }
 #[repr(C)]
 #[derive(Debug, Default, Copy, Clone)]
@@ -18658,6 +16743,7 @@ pub struct Pg_magic_struct {
     pub indexmaxkeys: ::std::os::raw::c_int,
     pub namedatalen: ::std::os::raw::c_int,
     pub float8byval: ::std::os::raw::c_int,
+    pub abi_extra: [::std::os::raw::c_char; 32usize],
 }
 pub type PGModuleMagicFunction =
     ::std::option::Option<unsafe extern "C" fn() -> *const Pg_magic_struct>;
@@ -19631,14 +17717,6 @@ pub unsafe fn fetch_finfo_record(
         fetch_finfo_record(arg_filehandle, arg_funcname)
     })
 }
-pub unsafe fn clear_external_function_hash(arg_filehandle: *mut ::std::os::raw::c_void) {
-    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
-        extern "C" {
-            pub fn clear_external_function_hash(filehandle: *mut ::std::os::raw::c_void);
-        }
-        clear_external_function_hash(arg_filehandle)
-    })
-}
 pub unsafe fn fmgr_internal_function(arg_proname: *const ::std::os::raw::c_char) -> Oid {
     crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
         extern "C" {
@@ -20518,7 +18596,7 @@ impl Default for Expr {
 #[derive(Debug, Copy, Clone)]
 pub struct Var {
     pub xpr: Expr,
-    pub varno: Index,
+    pub varno: ::std::os::raw::c_int,
     pub varattno: AttrNumber,
     pub vartype: Oid,
     pub vartypmod: int32,
@@ -20765,6 +18843,7 @@ pub struct ScalarArrayOpExpr {
     pub opno: Oid,
     pub opfuncid: Oid,
     pub hashfuncid: Oid,
+    pub negfuncid: Oid,
     pub useOr: bool,
     pub inputcollid: Oid,
     pub args: *mut List,
@@ -21486,6 +19565,3912 @@ impl Default for OnConflictExpr {
 }
 #[repr(C)]
 #[derive(Debug, Copy, Clone)]
+pub struct Integer {
+    pub type_: NodeTag,
+    pub ival: ::std::os::raw::c_int,
+}
+impl Default for Integer {
+    fn default() -> Self {
+        let mut s = ::std::mem::MaybeUninit::<Self>::uninit();
+        unsafe {
+            ::std::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
+            s.assume_init()
+        }
+    }
+}
+#[repr(C)]
+#[derive(Debug, Copy, Clone)]
+pub struct Float {
+    pub type_: NodeTag,
+    pub fval: *mut ::std::os::raw::c_char,
+}
+impl Default for Float {
+    fn default() -> Self {
+        let mut s = ::std::mem::MaybeUninit::<Self>::uninit();
+        unsafe {
+            ::std::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
+            s.assume_init()
+        }
+    }
+}
+#[repr(C)]
+#[derive(Debug, Copy, Clone)]
+pub struct Boolean {
+    pub type_: NodeTag,
+    pub boolval: bool,
+}
+impl Default for Boolean {
+    fn default() -> Self {
+        let mut s = ::std::mem::MaybeUninit::<Self>::uninit();
+        unsafe {
+            ::std::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
+            s.assume_init()
+        }
+    }
+}
+#[repr(C)]
+#[derive(Debug, Copy, Clone)]
+pub struct String {
+    pub type_: NodeTag,
+    pub sval: *mut ::std::os::raw::c_char,
+}
+impl Default for String {
+    fn default() -> Self {
+        let mut s = ::std::mem::MaybeUninit::<Self>::uninit();
+        unsafe {
+            ::std::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
+            s.assume_init()
+        }
+    }
+}
+#[repr(C)]
+#[derive(Debug, Copy, Clone)]
+pub struct BitString {
+    pub type_: NodeTag,
+    pub bsval: *mut ::std::os::raw::c_char,
+}
+impl Default for BitString {
+    fn default() -> Self {
+        let mut s = ::std::mem::MaybeUninit::<Self>::uninit();
+        unsafe {
+            ::std::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
+            s.assume_init()
+        }
+    }
+}
+pub unsafe fn makeInteger(arg_i: ::std::os::raw::c_int) -> *mut Integer {
+    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
+        extern "C" {
+            pub fn makeInteger(i: ::std::os::raw::c_int) -> *mut Integer;
+        }
+        makeInteger(arg_i)
+    })
+}
+pub unsafe fn makeFloat(arg_numericStr: *mut ::std::os::raw::c_char) -> *mut Float {
+    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
+        extern "C" {
+            pub fn makeFloat(numericStr: *mut ::std::os::raw::c_char) -> *mut Float;
+        }
+        makeFloat(arg_numericStr)
+    })
+}
+pub unsafe fn makeBoolean(arg_var: bool) -> *mut Boolean {
+    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
+        extern "C" {
+            pub fn makeBoolean(var: bool) -> *mut Boolean;
+        }
+        makeBoolean(arg_var)
+    })
+}
+pub unsafe fn makeString(arg_str_: *mut ::std::os::raw::c_char) -> *mut String {
+    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
+        extern "C" {
+            pub fn makeString(str_: *mut ::std::os::raw::c_char) -> *mut String;
+        }
+        makeString(arg_str_)
+    })
+}
+pub unsafe fn makeBitString(arg_str_: *mut ::std::os::raw::c_char) -> *mut BitString {
+    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
+        extern "C" {
+            pub fn makeBitString(str_: *mut ::std::os::raw::c_char) -> *mut BitString;
+        }
+        makeBitString(arg_str_)
+    })
+}
+#[repr(C)]
+#[derive(Debug, Copy, Clone)]
+pub struct PartitionBoundInfoData {
+    _unused: [u8; 0],
+}
+pub type PartitionBoundInfo = *mut PartitionBoundInfoData;
+#[repr(C)]
+#[derive(Debug, Copy, Clone)]
+pub struct PartitionKeyData {
+    _unused: [u8; 0],
+}
+pub type PartitionKey = *mut PartitionKeyData;
+#[repr(C)]
+#[derive(Debug, Copy, Clone)]
+pub struct PartitionDescData {
+    _unused: [u8; 0],
+}
+pub type PartitionDesc = *mut PartitionDescData;
+#[repr(C)]
+#[derive(Debug, Copy, Clone)]
+pub struct PartitionDirectoryData {
+    _unused: [u8; 0],
+}
+pub type PartitionDirectory = *mut PartitionDirectoryData;
+pub const OverridingKind_OVERRIDING_NOT_SET: OverridingKind = 0;
+pub const OverridingKind_OVERRIDING_USER_VALUE: OverridingKind = 1;
+pub const OverridingKind_OVERRIDING_SYSTEM_VALUE: OverridingKind = 2;
+pub type OverridingKind = ::std::os::raw::c_uint;
+pub const QuerySource_QSRC_ORIGINAL: QuerySource = 0;
+pub const QuerySource_QSRC_PARSER: QuerySource = 1;
+pub const QuerySource_QSRC_INSTEAD_RULE: QuerySource = 2;
+pub const QuerySource_QSRC_QUAL_INSTEAD_RULE: QuerySource = 3;
+pub const QuerySource_QSRC_NON_INSTEAD_RULE: QuerySource = 4;
+pub type QuerySource = ::std::os::raw::c_uint;
+pub const SortByDir_SORTBY_DEFAULT: SortByDir = 0;
+pub const SortByDir_SORTBY_ASC: SortByDir = 1;
+pub const SortByDir_SORTBY_DESC: SortByDir = 2;
+pub const SortByDir_SORTBY_USING: SortByDir = 3;
+pub type SortByDir = ::std::os::raw::c_uint;
+pub const SortByNulls_SORTBY_NULLS_DEFAULT: SortByNulls = 0;
+pub const SortByNulls_SORTBY_NULLS_FIRST: SortByNulls = 1;
+pub const SortByNulls_SORTBY_NULLS_LAST: SortByNulls = 2;
+pub type SortByNulls = ::std::os::raw::c_uint;
+pub const SetQuantifier_SET_QUANTIFIER_DEFAULT: SetQuantifier = 0;
+pub const SetQuantifier_SET_QUANTIFIER_ALL: SetQuantifier = 1;
+pub const SetQuantifier_SET_QUANTIFIER_DISTINCT: SetQuantifier = 2;
+pub type SetQuantifier = ::std::os::raw::c_uint;
+pub type AclMode = uint32;
+#[doc = "\tQuery Tree"]
+#[repr(C)]
+#[derive(Debug, Copy, Clone)]
+pub struct Query {
+    pub type_: NodeTag,
+    pub commandType: CmdType,
+    pub querySource: QuerySource,
+    pub queryId: uint64,
+    pub canSetTag: bool,
+    pub utilityStmt: *mut Node,
+    pub resultRelation: ::std::os::raw::c_int,
+    pub hasAggs: bool,
+    pub hasWindowFuncs: bool,
+    pub hasTargetSRFs: bool,
+    pub hasSubLinks: bool,
+    pub hasDistinctOn: bool,
+    pub hasRecursive: bool,
+    pub hasModifyingCTE: bool,
+    pub hasForUpdate: bool,
+    pub hasRowSecurity: bool,
+    pub isReturn: bool,
+    pub cteList: *mut List,
+    pub rtable: *mut List,
+    pub jointree: *mut FromExpr,
+    pub mergeActionList: *mut List,
+    pub mergeUseOuterJoin: bool,
+    pub targetList: *mut List,
+    pub override_: OverridingKind,
+    pub onConflict: *mut OnConflictExpr,
+    pub returningList: *mut List,
+    pub groupClause: *mut List,
+    pub groupDistinct: bool,
+    pub groupingSets: *mut List,
+    pub havingQual: *mut Node,
+    pub windowClause: *mut List,
+    pub distinctClause: *mut List,
+    pub sortClause: *mut List,
+    pub limitOffset: *mut Node,
+    pub limitCount: *mut Node,
+    pub limitOption: LimitOption,
+    pub rowMarks: *mut List,
+    pub setOperations: *mut Node,
+    pub constraintDeps: *mut List,
+    pub withCheckOptions: *mut List,
+    pub stmt_location: ::std::os::raw::c_int,
+    pub stmt_len: ::std::os::raw::c_int,
+}
+impl Default for Query {
+    fn default() -> Self {
+        let mut s = ::std::mem::MaybeUninit::<Self>::uninit();
+        unsafe {
+            ::std::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
+            s.assume_init()
+        }
+    }
+}
+#[doc = "\tSupporting data structures for Parse Trees"]
+#[doc = ""]
+#[doc = "\tMost of these node types appear in raw parsetrees output by the grammar,"]
+#[doc = "\tand get transformed to something else by the analyzer.  A few of them"]
+#[doc = "\tare used as-is in transformed querytrees."]
+#[repr(C)]
+#[derive(Debug, Copy, Clone)]
+pub struct TypeName {
+    pub type_: NodeTag,
+    pub names: *mut List,
+    pub typeOid: Oid,
+    pub setof: bool,
+    pub pct_type: bool,
+    pub typmods: *mut List,
+    pub typemod: int32,
+    pub arrayBounds: *mut List,
+    pub location: ::std::os::raw::c_int,
+}
+impl Default for TypeName {
+    fn default() -> Self {
+        let mut s = ::std::mem::MaybeUninit::<Self>::uninit();
+        unsafe {
+            ::std::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
+            s.assume_init()
+        }
+    }
+}
+#[repr(C)]
+#[derive(Debug, Copy, Clone)]
+pub struct ColumnRef {
+    pub type_: NodeTag,
+    pub fields: *mut List,
+    pub location: ::std::os::raw::c_int,
+}
+impl Default for ColumnRef {
+    fn default() -> Self {
+        let mut s = ::std::mem::MaybeUninit::<Self>::uninit();
+        unsafe {
+            ::std::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
+            s.assume_init()
+        }
+    }
+}
+#[repr(C)]
+#[derive(Debug, Copy, Clone)]
+pub struct ParamRef {
+    pub type_: NodeTag,
+    pub number: ::std::os::raw::c_int,
+    pub location: ::std::os::raw::c_int,
+}
+impl Default for ParamRef {
+    fn default() -> Self {
+        let mut s = ::std::mem::MaybeUninit::<Self>::uninit();
+        unsafe {
+            ::std::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
+            s.assume_init()
+        }
+    }
+}
+pub const A_Expr_Kind_AEXPR_OP: A_Expr_Kind = 0;
+pub const A_Expr_Kind_AEXPR_OP_ANY: A_Expr_Kind = 1;
+pub const A_Expr_Kind_AEXPR_OP_ALL: A_Expr_Kind = 2;
+pub const A_Expr_Kind_AEXPR_DISTINCT: A_Expr_Kind = 3;
+pub const A_Expr_Kind_AEXPR_NOT_DISTINCT: A_Expr_Kind = 4;
+pub const A_Expr_Kind_AEXPR_NULLIF: A_Expr_Kind = 5;
+pub const A_Expr_Kind_AEXPR_IN: A_Expr_Kind = 6;
+pub const A_Expr_Kind_AEXPR_LIKE: A_Expr_Kind = 7;
+pub const A_Expr_Kind_AEXPR_ILIKE: A_Expr_Kind = 8;
+pub const A_Expr_Kind_AEXPR_SIMILAR: A_Expr_Kind = 9;
+pub const A_Expr_Kind_AEXPR_BETWEEN: A_Expr_Kind = 10;
+pub const A_Expr_Kind_AEXPR_NOT_BETWEEN: A_Expr_Kind = 11;
+pub const A_Expr_Kind_AEXPR_BETWEEN_SYM: A_Expr_Kind = 12;
+pub const A_Expr_Kind_AEXPR_NOT_BETWEEN_SYM: A_Expr_Kind = 13;
+pub type A_Expr_Kind = ::std::os::raw::c_uint;
+#[repr(C)]
+#[derive(Debug, Copy, Clone)]
+pub struct A_Expr {
+    pub type_: NodeTag,
+    pub kind: A_Expr_Kind,
+    pub name: *mut List,
+    pub lexpr: *mut Node,
+    pub rexpr: *mut Node,
+    pub location: ::std::os::raw::c_int,
+}
+impl Default for A_Expr {
+    fn default() -> Self {
+        let mut s = ::std::mem::MaybeUninit::<Self>::uninit();
+        unsafe {
+            ::std::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
+            s.assume_init()
+        }
+    }
+}
+#[repr(C)]
+#[derive(Copy, Clone)]
+pub struct A_Const {
+    pub type_: NodeTag,
+    pub val: A_Const_ValUnion,
+    pub isnull: bool,
+    pub location: ::std::os::raw::c_int,
+}
+#[repr(C)]
+#[derive(Copy, Clone)]
+pub union A_Const_ValUnion {
+    pub node: Node,
+    pub ival: Integer,
+    pub fval: Float,
+    pub boolval: Boolean,
+    pub sval: String,
+    pub bsval: BitString,
+}
+impl Default for A_Const_ValUnion {
+    fn default() -> Self {
+        let mut s = ::std::mem::MaybeUninit::<Self>::uninit();
+        unsafe {
+            ::std::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
+            s.assume_init()
+        }
+    }
+}
+impl Default for A_Const {
+    fn default() -> Self {
+        let mut s = ::std::mem::MaybeUninit::<Self>::uninit();
+        unsafe {
+            ::std::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
+            s.assume_init()
+        }
+    }
+}
+#[repr(C)]
+#[derive(Debug, Copy, Clone)]
+pub struct TypeCast {
+    pub type_: NodeTag,
+    pub arg: *mut Node,
+    pub typeName: *mut TypeName,
+    pub location: ::std::os::raw::c_int,
+}
+impl Default for TypeCast {
+    fn default() -> Self {
+        let mut s = ::std::mem::MaybeUninit::<Self>::uninit();
+        unsafe {
+            ::std::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
+            s.assume_init()
+        }
+    }
+}
+#[repr(C)]
+#[derive(Debug, Copy, Clone)]
+pub struct CollateClause {
+    pub type_: NodeTag,
+    pub arg: *mut Node,
+    pub collname: *mut List,
+    pub location: ::std::os::raw::c_int,
+}
+impl Default for CollateClause {
+    fn default() -> Self {
+        let mut s = ::std::mem::MaybeUninit::<Self>::uninit();
+        unsafe {
+            ::std::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
+            s.assume_init()
+        }
+    }
+}
+pub const RoleSpecType_ROLESPEC_CSTRING: RoleSpecType = 0;
+pub const RoleSpecType_ROLESPEC_CURRENT_ROLE: RoleSpecType = 1;
+pub const RoleSpecType_ROLESPEC_CURRENT_USER: RoleSpecType = 2;
+pub const RoleSpecType_ROLESPEC_SESSION_USER: RoleSpecType = 3;
+pub const RoleSpecType_ROLESPEC_PUBLIC: RoleSpecType = 4;
+pub type RoleSpecType = ::std::os::raw::c_uint;
+#[repr(C)]
+#[derive(Debug, Copy, Clone)]
+pub struct RoleSpec {
+    pub type_: NodeTag,
+    pub roletype: RoleSpecType,
+    pub rolename: *mut ::std::os::raw::c_char,
+    pub location: ::std::os::raw::c_int,
+}
+impl Default for RoleSpec {
+    fn default() -> Self {
+        let mut s = ::std::mem::MaybeUninit::<Self>::uninit();
+        unsafe {
+            ::std::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
+            s.assume_init()
+        }
+    }
+}
+#[repr(C)]
+#[derive(Debug, Copy, Clone)]
+pub struct FuncCall {
+    pub type_: NodeTag,
+    pub funcname: *mut List,
+    pub args: *mut List,
+    pub agg_order: *mut List,
+    pub agg_filter: *mut Node,
+    pub over: *mut WindowDef,
+    pub agg_within_group: bool,
+    pub agg_star: bool,
+    pub agg_distinct: bool,
+    pub func_variadic: bool,
+    pub funcformat: CoercionForm,
+    pub location: ::std::os::raw::c_int,
+}
+impl Default for FuncCall {
+    fn default() -> Self {
+        let mut s = ::std::mem::MaybeUninit::<Self>::uninit();
+        unsafe {
+            ::std::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
+            s.assume_init()
+        }
+    }
+}
+#[repr(C)]
+#[derive(Debug, Copy, Clone)]
+pub struct A_Star {
+    pub type_: NodeTag,
+}
+impl Default for A_Star {
+    fn default() -> Self {
+        let mut s = ::std::mem::MaybeUninit::<Self>::uninit();
+        unsafe {
+            ::std::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
+            s.assume_init()
+        }
+    }
+}
+#[repr(C)]
+#[derive(Debug, Copy, Clone)]
+pub struct A_Indices {
+    pub type_: NodeTag,
+    pub is_slice: bool,
+    pub lidx: *mut Node,
+    pub uidx: *mut Node,
+}
+impl Default for A_Indices {
+    fn default() -> Self {
+        let mut s = ::std::mem::MaybeUninit::<Self>::uninit();
+        unsafe {
+            ::std::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
+            s.assume_init()
+        }
+    }
+}
+#[repr(C)]
+#[derive(Debug, Copy, Clone)]
+pub struct A_Indirection {
+    pub type_: NodeTag,
+    pub arg: *mut Node,
+    pub indirection: *mut List,
+}
+impl Default for A_Indirection {
+    fn default() -> Self {
+        let mut s = ::std::mem::MaybeUninit::<Self>::uninit();
+        unsafe {
+            ::std::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
+            s.assume_init()
+        }
+    }
+}
+#[repr(C)]
+#[derive(Debug, Copy, Clone)]
+pub struct A_ArrayExpr {
+    pub type_: NodeTag,
+    pub elements: *mut List,
+    pub location: ::std::os::raw::c_int,
+}
+impl Default for A_ArrayExpr {
+    fn default() -> Self {
+        let mut s = ::std::mem::MaybeUninit::<Self>::uninit();
+        unsafe {
+            ::std::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
+            s.assume_init()
+        }
+    }
+}
+#[repr(C)]
+#[derive(Debug, Copy, Clone)]
+pub struct ResTarget {
+    pub type_: NodeTag,
+    pub name: *mut ::std::os::raw::c_char,
+    pub indirection: *mut List,
+    pub val: *mut Node,
+    pub location: ::std::os::raw::c_int,
+}
+impl Default for ResTarget {
+    fn default() -> Self {
+        let mut s = ::std::mem::MaybeUninit::<Self>::uninit();
+        unsafe {
+            ::std::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
+            s.assume_init()
+        }
+    }
+}
+#[repr(C)]
+#[derive(Debug, Copy, Clone)]
+pub struct MultiAssignRef {
+    pub type_: NodeTag,
+    pub source: *mut Node,
+    pub colno: ::std::os::raw::c_int,
+    pub ncolumns: ::std::os::raw::c_int,
+}
+impl Default for MultiAssignRef {
+    fn default() -> Self {
+        let mut s = ::std::mem::MaybeUninit::<Self>::uninit();
+        unsafe {
+            ::std::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
+            s.assume_init()
+        }
+    }
+}
+#[repr(C)]
+#[derive(Debug, Copy, Clone)]
+pub struct SortBy {
+    pub type_: NodeTag,
+    pub node: *mut Node,
+    pub sortby_dir: SortByDir,
+    pub sortby_nulls: SortByNulls,
+    pub useOp: *mut List,
+    pub location: ::std::os::raw::c_int,
+}
+impl Default for SortBy {
+    fn default() -> Self {
+        let mut s = ::std::mem::MaybeUninit::<Self>::uninit();
+        unsafe {
+            ::std::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
+            s.assume_init()
+        }
+    }
+}
+#[repr(C)]
+#[derive(Debug, Copy, Clone)]
+pub struct WindowDef {
+    pub type_: NodeTag,
+    pub name: *mut ::std::os::raw::c_char,
+    pub refname: *mut ::std::os::raw::c_char,
+    pub partitionClause: *mut List,
+    pub orderClause: *mut List,
+    pub frameOptions: ::std::os::raw::c_int,
+    pub startOffset: *mut Node,
+    pub endOffset: *mut Node,
+    pub location: ::std::os::raw::c_int,
+}
+impl Default for WindowDef {
+    fn default() -> Self {
+        let mut s = ::std::mem::MaybeUninit::<Self>::uninit();
+        unsafe {
+            ::std::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
+            s.assume_init()
+        }
+    }
+}
+#[repr(C)]
+#[derive(Debug, Copy, Clone)]
+pub struct RangeSubselect {
+    pub type_: NodeTag,
+    pub lateral: bool,
+    pub subquery: *mut Node,
+    pub alias: *mut Alias,
+}
+impl Default for RangeSubselect {
+    fn default() -> Self {
+        let mut s = ::std::mem::MaybeUninit::<Self>::uninit();
+        unsafe {
+            ::std::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
+            s.assume_init()
+        }
+    }
+}
+#[repr(C)]
+#[derive(Debug, Copy, Clone)]
+pub struct RangeFunction {
+    pub type_: NodeTag,
+    pub lateral: bool,
+    pub ordinality: bool,
+    pub is_rowsfrom: bool,
+    pub functions: *mut List,
+    pub alias: *mut Alias,
+    pub coldeflist: *mut List,
+}
+impl Default for RangeFunction {
+    fn default() -> Self {
+        let mut s = ::std::mem::MaybeUninit::<Self>::uninit();
+        unsafe {
+            ::std::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
+            s.assume_init()
+        }
+    }
+}
+#[repr(C)]
+#[derive(Debug, Copy, Clone)]
+pub struct RangeTableFunc {
+    pub type_: NodeTag,
+    pub lateral: bool,
+    pub docexpr: *mut Node,
+    pub rowexpr: *mut Node,
+    pub namespaces: *mut List,
+    pub columns: *mut List,
+    pub alias: *mut Alias,
+    pub location: ::std::os::raw::c_int,
+}
+impl Default for RangeTableFunc {
+    fn default() -> Self {
+        let mut s = ::std::mem::MaybeUninit::<Self>::uninit();
+        unsafe {
+            ::std::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
+            s.assume_init()
+        }
+    }
+}
+#[repr(C)]
+#[derive(Debug, Copy, Clone)]
+pub struct RangeTableFuncCol {
+    pub type_: NodeTag,
+    pub colname: *mut ::std::os::raw::c_char,
+    pub typeName: *mut TypeName,
+    pub for_ordinality: bool,
+    pub is_not_null: bool,
+    pub colexpr: *mut Node,
+    pub coldefexpr: *mut Node,
+    pub location: ::std::os::raw::c_int,
+}
+impl Default for RangeTableFuncCol {
+    fn default() -> Self {
+        let mut s = ::std::mem::MaybeUninit::<Self>::uninit();
+        unsafe {
+            ::std::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
+            s.assume_init()
+        }
+    }
+}
+#[repr(C)]
+#[derive(Debug, Copy, Clone)]
+pub struct RangeTableSample {
+    pub type_: NodeTag,
+    pub relation: *mut Node,
+    pub method: *mut List,
+    pub args: *mut List,
+    pub repeatable: *mut Node,
+    pub location: ::std::os::raw::c_int,
+}
+impl Default for RangeTableSample {
+    fn default() -> Self {
+        let mut s = ::std::mem::MaybeUninit::<Self>::uninit();
+        unsafe {
+            ::std::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
+            s.assume_init()
+        }
+    }
+}
+#[repr(C)]
+#[derive(Debug, Copy, Clone)]
+pub struct ColumnDef {
+    pub type_: NodeTag,
+    pub colname: *mut ::std::os::raw::c_char,
+    pub typeName: *mut TypeName,
+    pub compression: *mut ::std::os::raw::c_char,
+    pub inhcount: ::std::os::raw::c_int,
+    pub is_local: bool,
+    pub is_not_null: bool,
+    pub is_from_type: bool,
+    pub storage: ::std::os::raw::c_char,
+    pub raw_default: *mut Node,
+    pub cooked_default: *mut Node,
+    pub identity: ::std::os::raw::c_char,
+    pub identitySequence: *mut RangeVar,
+    pub generated: ::std::os::raw::c_char,
+    pub collClause: *mut CollateClause,
+    pub collOid: Oid,
+    pub constraints: *mut List,
+    pub fdwoptions: *mut List,
+    pub location: ::std::os::raw::c_int,
+}
+impl Default for ColumnDef {
+    fn default() -> Self {
+        let mut s = ::std::mem::MaybeUninit::<Self>::uninit();
+        unsafe {
+            ::std::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
+            s.assume_init()
+        }
+    }
+}
+#[repr(C)]
+#[derive(Debug, Copy, Clone)]
+pub struct TableLikeClause {
+    pub type_: NodeTag,
+    pub relation: *mut RangeVar,
+    pub options: bits32,
+    pub relationOid: Oid,
+}
+impl Default for TableLikeClause {
+    fn default() -> Self {
+        let mut s = ::std::mem::MaybeUninit::<Self>::uninit();
+        unsafe {
+            ::std::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
+            s.assume_init()
+        }
+    }
+}
+pub const TableLikeOption_CREATE_TABLE_LIKE_COMMENTS: TableLikeOption = 1;
+pub const TableLikeOption_CREATE_TABLE_LIKE_COMPRESSION: TableLikeOption = 2;
+pub const TableLikeOption_CREATE_TABLE_LIKE_CONSTRAINTS: TableLikeOption = 4;
+pub const TableLikeOption_CREATE_TABLE_LIKE_DEFAULTS: TableLikeOption = 8;
+pub const TableLikeOption_CREATE_TABLE_LIKE_GENERATED: TableLikeOption = 16;
+pub const TableLikeOption_CREATE_TABLE_LIKE_IDENTITY: TableLikeOption = 32;
+pub const TableLikeOption_CREATE_TABLE_LIKE_INDEXES: TableLikeOption = 64;
+pub const TableLikeOption_CREATE_TABLE_LIKE_STATISTICS: TableLikeOption = 128;
+pub const TableLikeOption_CREATE_TABLE_LIKE_STORAGE: TableLikeOption = 256;
+pub const TableLikeOption_CREATE_TABLE_LIKE_ALL: TableLikeOption = 2147483647;
+pub type TableLikeOption = ::std::os::raw::c_uint;
+#[repr(C)]
+#[derive(Debug, Copy, Clone)]
+pub struct IndexElem {
+    pub type_: NodeTag,
+    pub name: *mut ::std::os::raw::c_char,
+    pub expr: *mut Node,
+    pub indexcolname: *mut ::std::os::raw::c_char,
+    pub collation: *mut List,
+    pub opclass: *mut List,
+    pub opclassopts: *mut List,
+    pub ordering: SortByDir,
+    pub nulls_ordering: SortByNulls,
+}
+impl Default for IndexElem {
+    fn default() -> Self {
+        let mut s = ::std::mem::MaybeUninit::<Self>::uninit();
+        unsafe {
+            ::std::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
+            s.assume_init()
+        }
+    }
+}
+pub const DefElemAction_DEFELEM_UNSPEC: DefElemAction = 0;
+pub const DefElemAction_DEFELEM_SET: DefElemAction = 1;
+pub const DefElemAction_DEFELEM_ADD: DefElemAction = 2;
+pub const DefElemAction_DEFELEM_DROP: DefElemAction = 3;
+pub type DefElemAction = ::std::os::raw::c_uint;
+#[repr(C)]
+#[derive(Debug, Copy, Clone)]
+pub struct DefElem {
+    pub type_: NodeTag,
+    pub defnamespace: *mut ::std::os::raw::c_char,
+    pub defname: *mut ::std::os::raw::c_char,
+    pub arg: *mut Node,
+    pub defaction: DefElemAction,
+    pub location: ::std::os::raw::c_int,
+}
+impl Default for DefElem {
+    fn default() -> Self {
+        let mut s = ::std::mem::MaybeUninit::<Self>::uninit();
+        unsafe {
+            ::std::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
+            s.assume_init()
+        }
+    }
+}
+#[repr(C)]
+#[derive(Debug, Copy, Clone)]
+pub struct LockingClause {
+    pub type_: NodeTag,
+    pub lockedRels: *mut List,
+    pub strength: LockClauseStrength,
+    pub waitPolicy: LockWaitPolicy,
+}
+impl Default for LockingClause {
+    fn default() -> Self {
+        let mut s = ::std::mem::MaybeUninit::<Self>::uninit();
+        unsafe {
+            ::std::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
+            s.assume_init()
+        }
+    }
+}
+#[repr(C)]
+#[derive(Debug, Copy, Clone)]
+pub struct XmlSerialize {
+    pub type_: NodeTag,
+    pub xmloption: XmlOptionType,
+    pub expr: *mut Node,
+    pub typeName: *mut TypeName,
+    pub location: ::std::os::raw::c_int,
+}
+impl Default for XmlSerialize {
+    fn default() -> Self {
+        let mut s = ::std::mem::MaybeUninit::<Self>::uninit();
+        unsafe {
+            ::std::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
+            s.assume_init()
+        }
+    }
+}
+#[repr(C)]
+#[derive(Debug, Copy, Clone)]
+pub struct PartitionElem {
+    pub type_: NodeTag,
+    pub name: *mut ::std::os::raw::c_char,
+    pub expr: *mut Node,
+    pub collation: *mut List,
+    pub opclass: *mut List,
+    pub location: ::std::os::raw::c_int,
+}
+impl Default for PartitionElem {
+    fn default() -> Self {
+        let mut s = ::std::mem::MaybeUninit::<Self>::uninit();
+        unsafe {
+            ::std::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
+            s.assume_init()
+        }
+    }
+}
+#[repr(C)]
+#[derive(Debug, Copy, Clone)]
+pub struct PartitionSpec {
+    pub type_: NodeTag,
+    pub strategy: *mut ::std::os::raw::c_char,
+    pub partParams: *mut List,
+    pub location: ::std::os::raw::c_int,
+}
+impl Default for PartitionSpec {
+    fn default() -> Self {
+        let mut s = ::std::mem::MaybeUninit::<Self>::uninit();
+        unsafe {
+            ::std::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
+            s.assume_init()
+        }
+    }
+}
+#[repr(C)]
+#[derive(Debug, Copy, Clone)]
+pub struct PartitionBoundSpec {
+    pub type_: NodeTag,
+    pub strategy: ::std::os::raw::c_char,
+    pub is_default: bool,
+    pub modulus: ::std::os::raw::c_int,
+    pub remainder: ::std::os::raw::c_int,
+    pub listdatums: *mut List,
+    pub lowerdatums: *mut List,
+    pub upperdatums: *mut List,
+    pub location: ::std::os::raw::c_int,
+}
+impl Default for PartitionBoundSpec {
+    fn default() -> Self {
+        let mut s = ::std::mem::MaybeUninit::<Self>::uninit();
+        unsafe {
+            ::std::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
+            s.assume_init()
+        }
+    }
+}
+pub const PartitionRangeDatumKind_PARTITION_RANGE_DATUM_MINVALUE: PartitionRangeDatumKind = -1;
+pub const PartitionRangeDatumKind_PARTITION_RANGE_DATUM_VALUE: PartitionRangeDatumKind = 0;
+pub const PartitionRangeDatumKind_PARTITION_RANGE_DATUM_MAXVALUE: PartitionRangeDatumKind = 1;
+pub type PartitionRangeDatumKind = ::std::os::raw::c_int;
+#[repr(C)]
+#[derive(Debug, Copy, Clone)]
+pub struct PartitionRangeDatum {
+    pub type_: NodeTag,
+    pub kind: PartitionRangeDatumKind,
+    pub value: *mut Node,
+    pub location: ::std::os::raw::c_int,
+}
+impl Default for PartitionRangeDatum {
+    fn default() -> Self {
+        let mut s = ::std::mem::MaybeUninit::<Self>::uninit();
+        unsafe {
+            ::std::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
+            s.assume_init()
+        }
+    }
+}
+#[repr(C)]
+#[derive(Debug, Copy, Clone)]
+pub struct PartitionCmd {
+    pub type_: NodeTag,
+    pub name: *mut RangeVar,
+    pub bound: *mut PartitionBoundSpec,
+    pub concurrent: bool,
+}
+impl Default for PartitionCmd {
+    fn default() -> Self {
+        let mut s = ::std::mem::MaybeUninit::<Self>::uninit();
+        unsafe {
+            ::std::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
+            s.assume_init()
+        }
+    }
+}
+pub const RTEKind_RTE_RELATION: RTEKind = 0;
+pub const RTEKind_RTE_SUBQUERY: RTEKind = 1;
+pub const RTEKind_RTE_JOIN: RTEKind = 2;
+pub const RTEKind_RTE_FUNCTION: RTEKind = 3;
+pub const RTEKind_RTE_TABLEFUNC: RTEKind = 4;
+pub const RTEKind_RTE_VALUES: RTEKind = 5;
+pub const RTEKind_RTE_CTE: RTEKind = 6;
+pub const RTEKind_RTE_NAMEDTUPLESTORE: RTEKind = 7;
+pub const RTEKind_RTE_RESULT: RTEKind = 8;
+pub type RTEKind = ::std::os::raw::c_uint;
+#[repr(C)]
+#[derive(Debug, Copy, Clone)]
+pub struct RangeTblEntry {
+    pub type_: NodeTag,
+    pub rtekind: RTEKind,
+    pub relid: Oid,
+    pub relkind: ::std::os::raw::c_char,
+    pub rellockmode: ::std::os::raw::c_int,
+    pub tablesample: *mut TableSampleClause,
+    pub subquery: *mut Query,
+    pub security_barrier: bool,
+    pub jointype: JoinType,
+    pub joinmergedcols: ::std::os::raw::c_int,
+    pub joinaliasvars: *mut List,
+    pub joinleftcols: *mut List,
+    pub joinrightcols: *mut List,
+    pub join_using_alias: *mut Alias,
+    pub functions: *mut List,
+    pub funcordinality: bool,
+    pub tablefunc: *mut TableFunc,
+    pub values_lists: *mut List,
+    pub ctename: *mut ::std::os::raw::c_char,
+    pub ctelevelsup: Index,
+    pub self_reference: bool,
+    pub coltypes: *mut List,
+    pub coltypmods: *mut List,
+    pub colcollations: *mut List,
+    pub enrname: *mut ::std::os::raw::c_char,
+    pub enrtuples: Cardinality,
+    pub alias: *mut Alias,
+    pub eref: *mut Alias,
+    pub lateral: bool,
+    pub inh: bool,
+    pub inFromCl: bool,
+    pub requiredPerms: AclMode,
+    pub checkAsUser: Oid,
+    pub selectedCols: *mut Bitmapset,
+    pub insertedCols: *mut Bitmapset,
+    pub updatedCols: *mut Bitmapset,
+    pub extraUpdatedCols: *mut Bitmapset,
+    pub securityQuals: *mut List,
+}
+impl Default for RangeTblEntry {
+    fn default() -> Self {
+        let mut s = ::std::mem::MaybeUninit::<Self>::uninit();
+        unsafe {
+            ::std::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
+            s.assume_init()
+        }
+    }
+}
+#[repr(C)]
+#[derive(Debug, Copy, Clone)]
+pub struct RangeTblFunction {
+    pub type_: NodeTag,
+    pub funcexpr: *mut Node,
+    pub funccolcount: ::std::os::raw::c_int,
+    pub funccolnames: *mut List,
+    pub funccoltypes: *mut List,
+    pub funccoltypmods: *mut List,
+    pub funccolcollations: *mut List,
+    pub funcparams: *mut Bitmapset,
+}
+impl Default for RangeTblFunction {
+    fn default() -> Self {
+        let mut s = ::std::mem::MaybeUninit::<Self>::uninit();
+        unsafe {
+            ::std::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
+            s.assume_init()
+        }
+    }
+}
+#[repr(C)]
+#[derive(Debug, Copy, Clone)]
+pub struct TableSampleClause {
+    pub type_: NodeTag,
+    pub tsmhandler: Oid,
+    pub args: *mut List,
+    pub repeatable: *mut Expr,
+}
+impl Default for TableSampleClause {
+    fn default() -> Self {
+        let mut s = ::std::mem::MaybeUninit::<Self>::uninit();
+        unsafe {
+            ::std::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
+            s.assume_init()
+        }
+    }
+}
+pub const WCOKind_WCO_VIEW_CHECK: WCOKind = 0;
+pub const WCOKind_WCO_RLS_INSERT_CHECK: WCOKind = 1;
+pub const WCOKind_WCO_RLS_UPDATE_CHECK: WCOKind = 2;
+pub const WCOKind_WCO_RLS_CONFLICT_CHECK: WCOKind = 3;
+pub const WCOKind_WCO_RLS_MERGE_UPDATE_CHECK: WCOKind = 4;
+pub const WCOKind_WCO_RLS_MERGE_DELETE_CHECK: WCOKind = 5;
+pub type WCOKind = ::std::os::raw::c_uint;
+#[repr(C)]
+#[derive(Debug, Copy, Clone)]
+pub struct WithCheckOption {
+    pub type_: NodeTag,
+    pub kind: WCOKind,
+    pub relname: *mut ::std::os::raw::c_char,
+    pub polname: *mut ::std::os::raw::c_char,
+    pub qual: *mut Node,
+    pub cascaded: bool,
+}
+impl Default for WithCheckOption {
+    fn default() -> Self {
+        let mut s = ::std::mem::MaybeUninit::<Self>::uninit();
+        unsafe {
+            ::std::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
+            s.assume_init()
+        }
+    }
+}
+#[repr(C)]
+#[derive(Debug, Copy, Clone)]
+pub struct SortGroupClause {
+    pub type_: NodeTag,
+    pub tleSortGroupRef: Index,
+    pub eqop: Oid,
+    pub sortop: Oid,
+    pub nulls_first: bool,
+    pub hashable: bool,
+}
+impl Default for SortGroupClause {
+    fn default() -> Self {
+        let mut s = ::std::mem::MaybeUninit::<Self>::uninit();
+        unsafe {
+            ::std::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
+            s.assume_init()
+        }
+    }
+}
+pub const GroupingSetKind_GROUPING_SET_EMPTY: GroupingSetKind = 0;
+pub const GroupingSetKind_GROUPING_SET_SIMPLE: GroupingSetKind = 1;
+pub const GroupingSetKind_GROUPING_SET_ROLLUP: GroupingSetKind = 2;
+pub const GroupingSetKind_GROUPING_SET_CUBE: GroupingSetKind = 3;
+pub const GroupingSetKind_GROUPING_SET_SETS: GroupingSetKind = 4;
+pub type GroupingSetKind = ::std::os::raw::c_uint;
+#[repr(C)]
+#[derive(Debug, Copy, Clone)]
+pub struct GroupingSet {
+    pub type_: NodeTag,
+    pub kind: GroupingSetKind,
+    pub content: *mut List,
+    pub location: ::std::os::raw::c_int,
+}
+impl Default for GroupingSet {
+    fn default() -> Self {
+        let mut s = ::std::mem::MaybeUninit::<Self>::uninit();
+        unsafe {
+            ::std::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
+            s.assume_init()
+        }
+    }
+}
+#[repr(C)]
+#[derive(Debug, Copy, Clone)]
+pub struct WindowClause {
+    pub type_: NodeTag,
+    pub name: *mut ::std::os::raw::c_char,
+    pub refname: *mut ::std::os::raw::c_char,
+    pub partitionClause: *mut List,
+    pub orderClause: *mut List,
+    pub frameOptions: ::std::os::raw::c_int,
+    pub startOffset: *mut Node,
+    pub endOffset: *mut Node,
+    pub runCondition: *mut List,
+    pub startInRangeFunc: Oid,
+    pub endInRangeFunc: Oid,
+    pub inRangeColl: Oid,
+    pub inRangeAsc: bool,
+    pub inRangeNullsFirst: bool,
+    pub winref: Index,
+    pub copiedOrder: bool,
+}
+impl Default for WindowClause {
+    fn default() -> Self {
+        let mut s = ::std::mem::MaybeUninit::<Self>::uninit();
+        unsafe {
+            ::std::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
+            s.assume_init()
+        }
+    }
+}
+#[repr(C)]
+#[derive(Debug, Copy, Clone)]
+pub struct RowMarkClause {
+    pub type_: NodeTag,
+    pub rti: Index,
+    pub strength: LockClauseStrength,
+    pub waitPolicy: LockWaitPolicy,
+    pub pushedDown: bool,
+}
+impl Default for RowMarkClause {
+    fn default() -> Self {
+        let mut s = ::std::mem::MaybeUninit::<Self>::uninit();
+        unsafe {
+            ::std::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
+            s.assume_init()
+        }
+    }
+}
+#[repr(C)]
+#[derive(Debug, Copy, Clone)]
+pub struct WithClause {
+    pub type_: NodeTag,
+    pub ctes: *mut List,
+    pub recursive: bool,
+    pub location: ::std::os::raw::c_int,
+}
+impl Default for WithClause {
+    fn default() -> Self {
+        let mut s = ::std::mem::MaybeUninit::<Self>::uninit();
+        unsafe {
+            ::std::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
+            s.assume_init()
+        }
+    }
+}
+#[repr(C)]
+#[derive(Debug, Copy, Clone)]
+pub struct InferClause {
+    pub type_: NodeTag,
+    pub indexElems: *mut List,
+    pub whereClause: *mut Node,
+    pub conname: *mut ::std::os::raw::c_char,
+    pub location: ::std::os::raw::c_int,
+}
+impl Default for InferClause {
+    fn default() -> Self {
+        let mut s = ::std::mem::MaybeUninit::<Self>::uninit();
+        unsafe {
+            ::std::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
+            s.assume_init()
+        }
+    }
+}
+#[repr(C)]
+#[derive(Debug, Copy, Clone)]
+pub struct OnConflictClause {
+    pub type_: NodeTag,
+    pub action: OnConflictAction,
+    pub infer: *mut InferClause,
+    pub targetList: *mut List,
+    pub whereClause: *mut Node,
+    pub location: ::std::os::raw::c_int,
+}
+impl Default for OnConflictClause {
+    fn default() -> Self {
+        let mut s = ::std::mem::MaybeUninit::<Self>::uninit();
+        unsafe {
+            ::std::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
+            s.assume_init()
+        }
+    }
+}
+pub const CTEMaterialize_CTEMaterializeDefault: CTEMaterialize = 0;
+pub const CTEMaterialize_CTEMaterializeAlways: CTEMaterialize = 1;
+pub const CTEMaterialize_CTEMaterializeNever: CTEMaterialize = 2;
+pub type CTEMaterialize = ::std::os::raw::c_uint;
+#[repr(C)]
+#[derive(Debug, Copy, Clone)]
+pub struct CTESearchClause {
+    pub type_: NodeTag,
+    pub search_col_list: *mut List,
+    pub search_breadth_first: bool,
+    pub search_seq_column: *mut ::std::os::raw::c_char,
+    pub location: ::std::os::raw::c_int,
+}
+impl Default for CTESearchClause {
+    fn default() -> Self {
+        let mut s = ::std::mem::MaybeUninit::<Self>::uninit();
+        unsafe {
+            ::std::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
+            s.assume_init()
+        }
+    }
+}
+#[repr(C)]
+#[derive(Debug, Copy, Clone)]
+pub struct CTECycleClause {
+    pub type_: NodeTag,
+    pub cycle_col_list: *mut List,
+    pub cycle_mark_column: *mut ::std::os::raw::c_char,
+    pub cycle_mark_value: *mut Node,
+    pub cycle_mark_default: *mut Node,
+    pub cycle_path_column: *mut ::std::os::raw::c_char,
+    pub location: ::std::os::raw::c_int,
+    pub cycle_mark_type: Oid,
+    pub cycle_mark_typmod: ::std::os::raw::c_int,
+    pub cycle_mark_collation: Oid,
+    pub cycle_mark_neop: Oid,
+}
+impl Default for CTECycleClause {
+    fn default() -> Self {
+        let mut s = ::std::mem::MaybeUninit::<Self>::uninit();
+        unsafe {
+            ::std::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
+            s.assume_init()
+        }
+    }
+}
+#[repr(C)]
+#[derive(Debug, Copy, Clone)]
+pub struct CommonTableExpr {
+    pub type_: NodeTag,
+    pub ctename: *mut ::std::os::raw::c_char,
+    pub aliascolnames: *mut List,
+    pub ctematerialized: CTEMaterialize,
+    pub ctequery: *mut Node,
+    pub search_clause: *mut CTESearchClause,
+    pub cycle_clause: *mut CTECycleClause,
+    pub location: ::std::os::raw::c_int,
+    pub cterecursive: bool,
+    pub cterefcount: ::std::os::raw::c_int,
+    pub ctecolnames: *mut List,
+    pub ctecoltypes: *mut List,
+    pub ctecoltypmods: *mut List,
+    pub ctecolcollations: *mut List,
+}
+impl Default for CommonTableExpr {
+    fn default() -> Self {
+        let mut s = ::std::mem::MaybeUninit::<Self>::uninit();
+        unsafe {
+            ::std::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
+            s.assume_init()
+        }
+    }
+}
+#[repr(C)]
+#[derive(Debug, Copy, Clone)]
+pub struct MergeWhenClause {
+    pub type_: NodeTag,
+    pub matched: bool,
+    pub commandType: CmdType,
+    pub override_: OverridingKind,
+    pub condition: *mut Node,
+    pub targetList: *mut List,
+    pub values: *mut List,
+}
+impl Default for MergeWhenClause {
+    fn default() -> Self {
+        let mut s = ::std::mem::MaybeUninit::<Self>::uninit();
+        unsafe {
+            ::std::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
+            s.assume_init()
+        }
+    }
+}
+#[repr(C)]
+#[derive(Debug, Copy, Clone)]
+pub struct MergeAction {
+    pub type_: NodeTag,
+    pub matched: bool,
+    pub commandType: CmdType,
+    pub override_: OverridingKind,
+    pub qual: *mut Node,
+    pub targetList: *mut List,
+    pub updateColnos: *mut List,
+}
+impl Default for MergeAction {
+    fn default() -> Self {
+        let mut s = ::std::mem::MaybeUninit::<Self>::uninit();
+        unsafe {
+            ::std::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
+            s.assume_init()
+        }
+    }
+}
+#[repr(C)]
+#[derive(Debug, Copy, Clone)]
+pub struct TriggerTransition {
+    pub type_: NodeTag,
+    pub name: *mut ::std::os::raw::c_char,
+    pub isNew: bool,
+    pub isTable: bool,
+}
+impl Default for TriggerTransition {
+    fn default() -> Self {
+        let mut s = ::std::mem::MaybeUninit::<Self>::uninit();
+        unsafe {
+            ::std::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
+            s.assume_init()
+        }
+    }
+}
+#[doc = "\t\tRaw Grammar Output Statements"]
+#[repr(C)]
+#[derive(Debug, Copy, Clone)]
+pub struct RawStmt {
+    pub type_: NodeTag,
+    pub stmt: *mut Node,
+    pub stmt_location: ::std::os::raw::c_int,
+    pub stmt_len: ::std::os::raw::c_int,
+}
+impl Default for RawStmt {
+    fn default() -> Self {
+        let mut s = ::std::mem::MaybeUninit::<Self>::uninit();
+        unsafe {
+            ::std::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
+            s.assume_init()
+        }
+    }
+}
+#[doc = "\t\tOptimizable Statements"]
+#[repr(C)]
+#[derive(Debug, Copy, Clone)]
+pub struct InsertStmt {
+    pub type_: NodeTag,
+    pub relation: *mut RangeVar,
+    pub cols: *mut List,
+    pub selectStmt: *mut Node,
+    pub onConflictClause: *mut OnConflictClause,
+    pub returningList: *mut List,
+    pub withClause: *mut WithClause,
+    pub override_: OverridingKind,
+}
+impl Default for InsertStmt {
+    fn default() -> Self {
+        let mut s = ::std::mem::MaybeUninit::<Self>::uninit();
+        unsafe {
+            ::std::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
+            s.assume_init()
+        }
+    }
+}
+#[repr(C)]
+#[derive(Debug, Copy, Clone)]
+pub struct DeleteStmt {
+    pub type_: NodeTag,
+    pub relation: *mut RangeVar,
+    pub usingClause: *mut List,
+    pub whereClause: *mut Node,
+    pub returningList: *mut List,
+    pub withClause: *mut WithClause,
+}
+impl Default for DeleteStmt {
+    fn default() -> Self {
+        let mut s = ::std::mem::MaybeUninit::<Self>::uninit();
+        unsafe {
+            ::std::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
+            s.assume_init()
+        }
+    }
+}
+#[repr(C)]
+#[derive(Debug, Copy, Clone)]
+pub struct UpdateStmt {
+    pub type_: NodeTag,
+    pub relation: *mut RangeVar,
+    pub targetList: *mut List,
+    pub whereClause: *mut Node,
+    pub fromClause: *mut List,
+    pub returningList: *mut List,
+    pub withClause: *mut WithClause,
+}
+impl Default for UpdateStmt {
+    fn default() -> Self {
+        let mut s = ::std::mem::MaybeUninit::<Self>::uninit();
+        unsafe {
+            ::std::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
+            s.assume_init()
+        }
+    }
+}
+#[repr(C)]
+#[derive(Debug, Copy, Clone)]
+pub struct MergeStmt {
+    pub type_: NodeTag,
+    pub relation: *mut RangeVar,
+    pub sourceRelation: *mut Node,
+    pub joinCondition: *mut Node,
+    pub mergeWhenClauses: *mut List,
+    pub withClause: *mut WithClause,
+}
+impl Default for MergeStmt {
+    fn default() -> Self {
+        let mut s = ::std::mem::MaybeUninit::<Self>::uninit();
+        unsafe {
+            ::std::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
+            s.assume_init()
+        }
+    }
+}
+pub const SetOperation_SETOP_NONE: SetOperation = 0;
+pub const SetOperation_SETOP_UNION: SetOperation = 1;
+pub const SetOperation_SETOP_INTERSECT: SetOperation = 2;
+pub const SetOperation_SETOP_EXCEPT: SetOperation = 3;
+pub type SetOperation = ::std::os::raw::c_uint;
+#[repr(C)]
+#[derive(Debug, Copy, Clone)]
+pub struct SelectStmt {
+    pub type_: NodeTag,
+    pub distinctClause: *mut List,
+    pub intoClause: *mut IntoClause,
+    pub targetList: *mut List,
+    pub fromClause: *mut List,
+    pub whereClause: *mut Node,
+    pub groupClause: *mut List,
+    pub groupDistinct: bool,
+    pub havingClause: *mut Node,
+    pub windowClause: *mut List,
+    pub valuesLists: *mut List,
+    pub sortClause: *mut List,
+    pub limitOffset: *mut Node,
+    pub limitCount: *mut Node,
+    pub limitOption: LimitOption,
+    pub lockingClause: *mut List,
+    pub withClause: *mut WithClause,
+    pub op: SetOperation,
+    pub all: bool,
+    pub larg: *mut SelectStmt,
+    pub rarg: *mut SelectStmt,
+}
+impl Default for SelectStmt {
+    fn default() -> Self {
+        let mut s = ::std::mem::MaybeUninit::<Self>::uninit();
+        unsafe {
+            ::std::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
+            s.assume_init()
+        }
+    }
+}
+#[repr(C)]
+#[derive(Debug, Copy, Clone)]
+pub struct SetOperationStmt {
+    pub type_: NodeTag,
+    pub op: SetOperation,
+    pub all: bool,
+    pub larg: *mut Node,
+    pub rarg: *mut Node,
+    pub colTypes: *mut List,
+    pub colTypmods: *mut List,
+    pub colCollations: *mut List,
+    pub groupClauses: *mut List,
+}
+impl Default for SetOperationStmt {
+    fn default() -> Self {
+        let mut s = ::std::mem::MaybeUninit::<Self>::uninit();
+        unsafe {
+            ::std::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
+            s.assume_init()
+        }
+    }
+}
+#[repr(C)]
+#[derive(Debug, Copy, Clone)]
+pub struct ReturnStmt {
+    pub type_: NodeTag,
+    pub returnval: *mut Node,
+}
+impl Default for ReturnStmt {
+    fn default() -> Self {
+        let mut s = ::std::mem::MaybeUninit::<Self>::uninit();
+        unsafe {
+            ::std::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
+            s.assume_init()
+        }
+    }
+}
+#[repr(C)]
+#[derive(Debug, Copy, Clone)]
+pub struct PLAssignStmt {
+    pub type_: NodeTag,
+    pub name: *mut ::std::os::raw::c_char,
+    pub indirection: *mut List,
+    pub nnames: ::std::os::raw::c_int,
+    pub val: *mut SelectStmt,
+    pub location: ::std::os::raw::c_int,
+}
+impl Default for PLAssignStmt {
+    fn default() -> Self {
+        let mut s = ::std::mem::MaybeUninit::<Self>::uninit();
+        unsafe {
+            ::std::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
+            s.assume_init()
+        }
+    }
+}
+pub const ObjectType_OBJECT_ACCESS_METHOD: ObjectType = 0;
+pub const ObjectType_OBJECT_AGGREGATE: ObjectType = 1;
+pub const ObjectType_OBJECT_AMOP: ObjectType = 2;
+pub const ObjectType_OBJECT_AMPROC: ObjectType = 3;
+pub const ObjectType_OBJECT_ATTRIBUTE: ObjectType = 4;
+pub const ObjectType_OBJECT_CAST: ObjectType = 5;
+pub const ObjectType_OBJECT_COLUMN: ObjectType = 6;
+pub const ObjectType_OBJECT_COLLATION: ObjectType = 7;
+pub const ObjectType_OBJECT_CONVERSION: ObjectType = 8;
+pub const ObjectType_OBJECT_DATABASE: ObjectType = 9;
+pub const ObjectType_OBJECT_DEFAULT: ObjectType = 10;
+pub const ObjectType_OBJECT_DEFACL: ObjectType = 11;
+pub const ObjectType_OBJECT_DOMAIN: ObjectType = 12;
+pub const ObjectType_OBJECT_DOMCONSTRAINT: ObjectType = 13;
+pub const ObjectType_OBJECT_EVENT_TRIGGER: ObjectType = 14;
+pub const ObjectType_OBJECT_EXTENSION: ObjectType = 15;
+pub const ObjectType_OBJECT_FDW: ObjectType = 16;
+pub const ObjectType_OBJECT_FOREIGN_SERVER: ObjectType = 17;
+pub const ObjectType_OBJECT_FOREIGN_TABLE: ObjectType = 18;
+pub const ObjectType_OBJECT_FUNCTION: ObjectType = 19;
+pub const ObjectType_OBJECT_INDEX: ObjectType = 20;
+pub const ObjectType_OBJECT_LANGUAGE: ObjectType = 21;
+pub const ObjectType_OBJECT_LARGEOBJECT: ObjectType = 22;
+pub const ObjectType_OBJECT_MATVIEW: ObjectType = 23;
+pub const ObjectType_OBJECT_OPCLASS: ObjectType = 24;
+pub const ObjectType_OBJECT_OPERATOR: ObjectType = 25;
+pub const ObjectType_OBJECT_OPFAMILY: ObjectType = 26;
+pub const ObjectType_OBJECT_PARAMETER_ACL: ObjectType = 27;
+pub const ObjectType_OBJECT_POLICY: ObjectType = 28;
+pub const ObjectType_OBJECT_PROCEDURE: ObjectType = 29;
+pub const ObjectType_OBJECT_PUBLICATION: ObjectType = 30;
+pub const ObjectType_OBJECT_PUBLICATION_NAMESPACE: ObjectType = 31;
+pub const ObjectType_OBJECT_PUBLICATION_REL: ObjectType = 32;
+pub const ObjectType_OBJECT_ROLE: ObjectType = 33;
+pub const ObjectType_OBJECT_ROUTINE: ObjectType = 34;
+pub const ObjectType_OBJECT_RULE: ObjectType = 35;
+pub const ObjectType_OBJECT_SCHEMA: ObjectType = 36;
+pub const ObjectType_OBJECT_SEQUENCE: ObjectType = 37;
+pub const ObjectType_OBJECT_SUBSCRIPTION: ObjectType = 38;
+pub const ObjectType_OBJECT_STATISTIC_EXT: ObjectType = 39;
+pub const ObjectType_OBJECT_TABCONSTRAINT: ObjectType = 40;
+pub const ObjectType_OBJECT_TABLE: ObjectType = 41;
+pub const ObjectType_OBJECT_TABLESPACE: ObjectType = 42;
+pub const ObjectType_OBJECT_TRANSFORM: ObjectType = 43;
+pub const ObjectType_OBJECT_TRIGGER: ObjectType = 44;
+pub const ObjectType_OBJECT_TSCONFIGURATION: ObjectType = 45;
+pub const ObjectType_OBJECT_TSDICTIONARY: ObjectType = 46;
+pub const ObjectType_OBJECT_TSPARSER: ObjectType = 47;
+pub const ObjectType_OBJECT_TSTEMPLATE: ObjectType = 48;
+pub const ObjectType_OBJECT_TYPE: ObjectType = 49;
+pub const ObjectType_OBJECT_USER_MAPPING: ObjectType = 50;
+pub const ObjectType_OBJECT_VIEW: ObjectType = 51;
+#[doc = "\t\tOther Statements (no optimizations required)"]
+#[doc = ""]
+#[doc = "\t\tThese are not touched by parser/analyze.c except to put them into"]
+#[doc = "\t\tthe utilityStmt field of a Query.  This is eventually passed to"]
+#[doc = "\t\tProcessUtility (by-passing rewriting and planning).  Some of the"]
+#[doc = "\t\tstatements do need attention from parse analysis, and this is"]
+#[doc = "\t\tdone by routines in parser/parse_utilcmd.c after ProcessUtility"]
+#[doc = "\t\treceives the command for execution."]
+#[doc = "\t\tDECLARE CURSOR, EXPLAIN, and CREATE TABLE AS are special cases:"]
+#[doc = "\t\tthey contain optimizable statements, which get processed normally"]
+#[doc = "\t\tby parser/analyze.c."]
+pub type ObjectType = ::std::os::raw::c_uint;
+#[repr(C)]
+#[derive(Debug, Copy, Clone)]
+pub struct CreateSchemaStmt {
+    pub type_: NodeTag,
+    pub schemaname: *mut ::std::os::raw::c_char,
+    pub authrole: *mut RoleSpec,
+    pub schemaElts: *mut List,
+    pub if_not_exists: bool,
+}
+impl Default for CreateSchemaStmt {
+    fn default() -> Self {
+        let mut s = ::std::mem::MaybeUninit::<Self>::uninit();
+        unsafe {
+            ::std::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
+            s.assume_init()
+        }
+    }
+}
+pub const DropBehavior_DROP_RESTRICT: DropBehavior = 0;
+pub const DropBehavior_DROP_CASCADE: DropBehavior = 1;
+pub type DropBehavior = ::std::os::raw::c_uint;
+#[repr(C)]
+#[derive(Debug, Copy, Clone)]
+pub struct AlterTableStmt {
+    pub type_: NodeTag,
+    pub relation: *mut RangeVar,
+    pub cmds: *mut List,
+    pub objtype: ObjectType,
+    pub missing_ok: bool,
+}
+impl Default for AlterTableStmt {
+    fn default() -> Self {
+        let mut s = ::std::mem::MaybeUninit::<Self>::uninit();
+        unsafe {
+            ::std::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
+            s.assume_init()
+        }
+    }
+}
+pub const AlterTableType_AT_AddColumn: AlterTableType = 0;
+pub const AlterTableType_AT_AddColumnRecurse: AlterTableType = 1;
+pub const AlterTableType_AT_AddColumnToView: AlterTableType = 2;
+pub const AlterTableType_AT_ColumnDefault: AlterTableType = 3;
+pub const AlterTableType_AT_CookedColumnDefault: AlterTableType = 4;
+pub const AlterTableType_AT_DropNotNull: AlterTableType = 5;
+pub const AlterTableType_AT_SetNotNull: AlterTableType = 6;
+pub const AlterTableType_AT_DropExpression: AlterTableType = 7;
+pub const AlterTableType_AT_CheckNotNull: AlterTableType = 8;
+pub const AlterTableType_AT_SetStatistics: AlterTableType = 9;
+pub const AlterTableType_AT_SetOptions: AlterTableType = 10;
+pub const AlterTableType_AT_ResetOptions: AlterTableType = 11;
+pub const AlterTableType_AT_SetStorage: AlterTableType = 12;
+pub const AlterTableType_AT_SetCompression: AlterTableType = 13;
+pub const AlterTableType_AT_DropColumn: AlterTableType = 14;
+pub const AlterTableType_AT_DropColumnRecurse: AlterTableType = 15;
+pub const AlterTableType_AT_AddIndex: AlterTableType = 16;
+pub const AlterTableType_AT_ReAddIndex: AlterTableType = 17;
+pub const AlterTableType_AT_AddConstraint: AlterTableType = 18;
+pub const AlterTableType_AT_AddConstraintRecurse: AlterTableType = 19;
+pub const AlterTableType_AT_ReAddConstraint: AlterTableType = 20;
+pub const AlterTableType_AT_ReAddDomainConstraint: AlterTableType = 21;
+pub const AlterTableType_AT_AlterConstraint: AlterTableType = 22;
+pub const AlterTableType_AT_ValidateConstraint: AlterTableType = 23;
+pub const AlterTableType_AT_ValidateConstraintRecurse: AlterTableType = 24;
+pub const AlterTableType_AT_AddIndexConstraint: AlterTableType = 25;
+pub const AlterTableType_AT_DropConstraint: AlterTableType = 26;
+pub const AlterTableType_AT_DropConstraintRecurse: AlterTableType = 27;
+pub const AlterTableType_AT_ReAddComment: AlterTableType = 28;
+pub const AlterTableType_AT_AlterColumnType: AlterTableType = 29;
+pub const AlterTableType_AT_AlterColumnGenericOptions: AlterTableType = 30;
+pub const AlterTableType_AT_ChangeOwner: AlterTableType = 31;
+pub const AlterTableType_AT_ClusterOn: AlterTableType = 32;
+pub const AlterTableType_AT_DropCluster: AlterTableType = 33;
+pub const AlterTableType_AT_SetLogged: AlterTableType = 34;
+pub const AlterTableType_AT_SetUnLogged: AlterTableType = 35;
+pub const AlterTableType_AT_DropOids: AlterTableType = 36;
+pub const AlterTableType_AT_SetAccessMethod: AlterTableType = 37;
+pub const AlterTableType_AT_SetTableSpace: AlterTableType = 38;
+pub const AlterTableType_AT_SetRelOptions: AlterTableType = 39;
+pub const AlterTableType_AT_ResetRelOptions: AlterTableType = 40;
+pub const AlterTableType_AT_ReplaceRelOptions: AlterTableType = 41;
+pub const AlterTableType_AT_EnableTrig: AlterTableType = 42;
+pub const AlterTableType_AT_EnableAlwaysTrig: AlterTableType = 43;
+pub const AlterTableType_AT_EnableReplicaTrig: AlterTableType = 44;
+pub const AlterTableType_AT_DisableTrig: AlterTableType = 45;
+pub const AlterTableType_AT_EnableTrigAll: AlterTableType = 46;
+pub const AlterTableType_AT_DisableTrigAll: AlterTableType = 47;
+pub const AlterTableType_AT_EnableTrigUser: AlterTableType = 48;
+pub const AlterTableType_AT_DisableTrigUser: AlterTableType = 49;
+pub const AlterTableType_AT_EnableRule: AlterTableType = 50;
+pub const AlterTableType_AT_EnableAlwaysRule: AlterTableType = 51;
+pub const AlterTableType_AT_EnableReplicaRule: AlterTableType = 52;
+pub const AlterTableType_AT_DisableRule: AlterTableType = 53;
+pub const AlterTableType_AT_AddInherit: AlterTableType = 54;
+pub const AlterTableType_AT_DropInherit: AlterTableType = 55;
+pub const AlterTableType_AT_AddOf: AlterTableType = 56;
+pub const AlterTableType_AT_DropOf: AlterTableType = 57;
+pub const AlterTableType_AT_ReplicaIdentity: AlterTableType = 58;
+pub const AlterTableType_AT_EnableRowSecurity: AlterTableType = 59;
+pub const AlterTableType_AT_DisableRowSecurity: AlterTableType = 60;
+pub const AlterTableType_AT_ForceRowSecurity: AlterTableType = 61;
+pub const AlterTableType_AT_NoForceRowSecurity: AlterTableType = 62;
+pub const AlterTableType_AT_GenericOptions: AlterTableType = 63;
+pub const AlterTableType_AT_AttachPartition: AlterTableType = 64;
+pub const AlterTableType_AT_DetachPartition: AlterTableType = 65;
+pub const AlterTableType_AT_DetachPartitionFinalize: AlterTableType = 66;
+pub const AlterTableType_AT_AddIdentity: AlterTableType = 67;
+pub const AlterTableType_AT_SetIdentity: AlterTableType = 68;
+pub const AlterTableType_AT_DropIdentity: AlterTableType = 69;
+pub const AlterTableType_AT_ReAddStatistics: AlterTableType = 70;
+pub type AlterTableType = ::std::os::raw::c_uint;
+#[repr(C)]
+#[derive(Debug, Copy, Clone)]
+pub struct ReplicaIdentityStmt {
+    pub type_: NodeTag,
+    pub identity_type: ::std::os::raw::c_char,
+    pub name: *mut ::std::os::raw::c_char,
+}
+impl Default for ReplicaIdentityStmt {
+    fn default() -> Self {
+        let mut s = ::std::mem::MaybeUninit::<Self>::uninit();
+        unsafe {
+            ::std::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
+            s.assume_init()
+        }
+    }
+}
+#[repr(C)]
+#[derive(Debug, Copy, Clone)]
+pub struct AlterTableCmd {
+    pub type_: NodeTag,
+    pub subtype: AlterTableType,
+    pub name: *mut ::std::os::raw::c_char,
+    pub num: int16,
+    pub newowner: *mut RoleSpec,
+    pub def: *mut Node,
+    pub behavior: DropBehavior,
+    pub missing_ok: bool,
+    pub recurse: bool,
+}
+impl Default for AlterTableCmd {
+    fn default() -> Self {
+        let mut s = ::std::mem::MaybeUninit::<Self>::uninit();
+        unsafe {
+            ::std::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
+            s.assume_init()
+        }
+    }
+}
+#[repr(C)]
+#[derive(Debug, Copy, Clone)]
+pub struct AlterCollationStmt {
+    pub type_: NodeTag,
+    pub collname: *mut List,
+}
+impl Default for AlterCollationStmt {
+    fn default() -> Self {
+        let mut s = ::std::mem::MaybeUninit::<Self>::uninit();
+        unsafe {
+            ::std::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
+            s.assume_init()
+        }
+    }
+}
+#[repr(C)]
+#[derive(Debug, Copy, Clone)]
+pub struct AlterDomainStmt {
+    pub type_: NodeTag,
+    pub subtype: ::std::os::raw::c_char,
+    pub typeName: *mut List,
+    pub name: *mut ::std::os::raw::c_char,
+    pub def: *mut Node,
+    pub behavior: DropBehavior,
+    pub missing_ok: bool,
+}
+impl Default for AlterDomainStmt {
+    fn default() -> Self {
+        let mut s = ::std::mem::MaybeUninit::<Self>::uninit();
+        unsafe {
+            ::std::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
+            s.assume_init()
+        }
+    }
+}
+pub const GrantTargetType_ACL_TARGET_OBJECT: GrantTargetType = 0;
+pub const GrantTargetType_ACL_TARGET_ALL_IN_SCHEMA: GrantTargetType = 1;
+pub const GrantTargetType_ACL_TARGET_DEFAULTS: GrantTargetType = 2;
+pub type GrantTargetType = ::std::os::raw::c_uint;
+#[repr(C)]
+#[derive(Debug, Copy, Clone)]
+pub struct GrantStmt {
+    pub type_: NodeTag,
+    pub is_grant: bool,
+    pub targtype: GrantTargetType,
+    pub objtype: ObjectType,
+    pub objects: *mut List,
+    pub privileges: *mut List,
+    pub grantees: *mut List,
+    pub grant_option: bool,
+    pub grantor: *mut RoleSpec,
+    pub behavior: DropBehavior,
+}
+impl Default for GrantStmt {
+    fn default() -> Self {
+        let mut s = ::std::mem::MaybeUninit::<Self>::uninit();
+        unsafe {
+            ::std::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
+            s.assume_init()
+        }
+    }
+}
+#[repr(C)]
+#[derive(Debug, Copy, Clone)]
+pub struct ObjectWithArgs {
+    pub type_: NodeTag,
+    pub objname: *mut List,
+    pub objargs: *mut List,
+    pub objfuncargs: *mut List,
+    pub args_unspecified: bool,
+}
+impl Default for ObjectWithArgs {
+    fn default() -> Self {
+        let mut s = ::std::mem::MaybeUninit::<Self>::uninit();
+        unsafe {
+            ::std::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
+            s.assume_init()
+        }
+    }
+}
+#[repr(C)]
+#[derive(Debug, Copy, Clone)]
+pub struct AccessPriv {
+    pub type_: NodeTag,
+    pub priv_name: *mut ::std::os::raw::c_char,
+    pub cols: *mut List,
+}
+impl Default for AccessPriv {
+    fn default() -> Self {
+        let mut s = ::std::mem::MaybeUninit::<Self>::uninit();
+        unsafe {
+            ::std::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
+            s.assume_init()
+        }
+    }
+}
+#[repr(C)]
+#[derive(Debug, Copy, Clone)]
+pub struct GrantRoleStmt {
+    pub type_: NodeTag,
+    pub granted_roles: *mut List,
+    pub grantee_roles: *mut List,
+    pub is_grant: bool,
+    pub admin_opt: bool,
+    pub grantor: *mut RoleSpec,
+    pub behavior: DropBehavior,
+}
+impl Default for GrantRoleStmt {
+    fn default() -> Self {
+        let mut s = ::std::mem::MaybeUninit::<Self>::uninit();
+        unsafe {
+            ::std::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
+            s.assume_init()
+        }
+    }
+}
+#[repr(C)]
+#[derive(Debug, Copy, Clone)]
+pub struct AlterDefaultPrivilegesStmt {
+    pub type_: NodeTag,
+    pub options: *mut List,
+    pub action: *mut GrantStmt,
+}
+impl Default for AlterDefaultPrivilegesStmt {
+    fn default() -> Self {
+        let mut s = ::std::mem::MaybeUninit::<Self>::uninit();
+        unsafe {
+            ::std::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
+            s.assume_init()
+        }
+    }
+}
+#[repr(C)]
+#[derive(Debug, Copy, Clone)]
+pub struct CopyStmt {
+    pub type_: NodeTag,
+    pub relation: *mut RangeVar,
+    pub query: *mut Node,
+    pub attlist: *mut List,
+    pub is_from: bool,
+    pub is_program: bool,
+    pub filename: *mut ::std::os::raw::c_char,
+    pub options: *mut List,
+    pub whereClause: *mut Node,
+}
+impl Default for CopyStmt {
+    fn default() -> Self {
+        let mut s = ::std::mem::MaybeUninit::<Self>::uninit();
+        unsafe {
+            ::std::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
+            s.assume_init()
+        }
+    }
+}
+pub const VariableSetKind_VAR_SET_VALUE: VariableSetKind = 0;
+pub const VariableSetKind_VAR_SET_DEFAULT: VariableSetKind = 1;
+pub const VariableSetKind_VAR_SET_CURRENT: VariableSetKind = 2;
+pub const VariableSetKind_VAR_SET_MULTI: VariableSetKind = 3;
+pub const VariableSetKind_VAR_RESET: VariableSetKind = 4;
+pub const VariableSetKind_VAR_RESET_ALL: VariableSetKind = 5;
+pub type VariableSetKind = ::std::os::raw::c_uint;
+#[repr(C)]
+#[derive(Debug, Copy, Clone)]
+pub struct VariableSetStmt {
+    pub type_: NodeTag,
+    pub kind: VariableSetKind,
+    pub name: *mut ::std::os::raw::c_char,
+    pub args: *mut List,
+    pub is_local: bool,
+}
+impl Default for VariableSetStmt {
+    fn default() -> Self {
+        let mut s = ::std::mem::MaybeUninit::<Self>::uninit();
+        unsafe {
+            ::std::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
+            s.assume_init()
+        }
+    }
+}
+#[repr(C)]
+#[derive(Debug, Copy, Clone)]
+pub struct VariableShowStmt {
+    pub type_: NodeTag,
+    pub name: *mut ::std::os::raw::c_char,
+}
+impl Default for VariableShowStmt {
+    fn default() -> Self {
+        let mut s = ::std::mem::MaybeUninit::<Self>::uninit();
+        unsafe {
+            ::std::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
+            s.assume_init()
+        }
+    }
+}
+#[repr(C)]
+#[derive(Debug, Copy, Clone)]
+pub struct CreateStmt {
+    pub type_: NodeTag,
+    pub relation: *mut RangeVar,
+    pub tableElts: *mut List,
+    pub inhRelations: *mut List,
+    pub partbound: *mut PartitionBoundSpec,
+    pub partspec: *mut PartitionSpec,
+    pub ofTypename: *mut TypeName,
+    pub constraints: *mut List,
+    pub options: *mut List,
+    pub oncommit: OnCommitAction,
+    pub tablespacename: *mut ::std::os::raw::c_char,
+    pub accessMethod: *mut ::std::os::raw::c_char,
+    pub if_not_exists: bool,
+}
+impl Default for CreateStmt {
+    fn default() -> Self {
+        let mut s = ::std::mem::MaybeUninit::<Self>::uninit();
+        unsafe {
+            ::std::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
+            s.assume_init()
+        }
+    }
+}
+pub const ConstrType_CONSTR_NULL: ConstrType = 0;
+pub const ConstrType_CONSTR_NOTNULL: ConstrType = 1;
+pub const ConstrType_CONSTR_DEFAULT: ConstrType = 2;
+pub const ConstrType_CONSTR_IDENTITY: ConstrType = 3;
+pub const ConstrType_CONSTR_GENERATED: ConstrType = 4;
+pub const ConstrType_CONSTR_CHECK: ConstrType = 5;
+pub const ConstrType_CONSTR_PRIMARY: ConstrType = 6;
+pub const ConstrType_CONSTR_UNIQUE: ConstrType = 7;
+pub const ConstrType_CONSTR_EXCLUSION: ConstrType = 8;
+pub const ConstrType_CONSTR_FOREIGN: ConstrType = 9;
+pub const ConstrType_CONSTR_ATTR_DEFERRABLE: ConstrType = 10;
+pub const ConstrType_CONSTR_ATTR_NOT_DEFERRABLE: ConstrType = 11;
+pub const ConstrType_CONSTR_ATTR_DEFERRED: ConstrType = 12;
+pub const ConstrType_CONSTR_ATTR_IMMEDIATE: ConstrType = 13;
+pub type ConstrType = ::std::os::raw::c_uint;
+#[repr(C)]
+#[derive(Debug, Copy, Clone)]
+pub struct Constraint {
+    pub type_: NodeTag,
+    pub contype: ConstrType,
+    pub conname: *mut ::std::os::raw::c_char,
+    pub deferrable: bool,
+    pub initdeferred: bool,
+    pub location: ::std::os::raw::c_int,
+    pub is_no_inherit: bool,
+    pub raw_expr: *mut Node,
+    pub cooked_expr: *mut ::std::os::raw::c_char,
+    pub generated_when: ::std::os::raw::c_char,
+    pub nulls_not_distinct: bool,
+    pub keys: *mut List,
+    pub including: *mut List,
+    pub exclusions: *mut List,
+    pub options: *mut List,
+    pub indexname: *mut ::std::os::raw::c_char,
+    pub indexspace: *mut ::std::os::raw::c_char,
+    pub reset_default_tblspc: bool,
+    pub access_method: *mut ::std::os::raw::c_char,
+    pub where_clause: *mut Node,
+    pub pktable: *mut RangeVar,
+    pub fk_attrs: *mut List,
+    pub pk_attrs: *mut List,
+    pub fk_matchtype: ::std::os::raw::c_char,
+    pub fk_upd_action: ::std::os::raw::c_char,
+    pub fk_del_action: ::std::os::raw::c_char,
+    pub fk_del_set_cols: *mut List,
+    pub old_conpfeqop: *mut List,
+    pub old_pktable_oid: Oid,
+    pub skip_validation: bool,
+    pub initially_valid: bool,
+}
+impl Default for Constraint {
+    fn default() -> Self {
+        let mut s = ::std::mem::MaybeUninit::<Self>::uninit();
+        unsafe {
+            ::std::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
+            s.assume_init()
+        }
+    }
+}
+#[repr(C)]
+#[derive(Debug, Copy, Clone)]
+pub struct CreateTableSpaceStmt {
+    pub type_: NodeTag,
+    pub tablespacename: *mut ::std::os::raw::c_char,
+    pub owner: *mut RoleSpec,
+    pub location: *mut ::std::os::raw::c_char,
+    pub options: *mut List,
+}
+impl Default for CreateTableSpaceStmt {
+    fn default() -> Self {
+        let mut s = ::std::mem::MaybeUninit::<Self>::uninit();
+        unsafe {
+            ::std::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
+            s.assume_init()
+        }
+    }
+}
+#[repr(C)]
+#[derive(Debug, Copy, Clone)]
+pub struct DropTableSpaceStmt {
+    pub type_: NodeTag,
+    pub tablespacename: *mut ::std::os::raw::c_char,
+    pub missing_ok: bool,
+}
+impl Default for DropTableSpaceStmt {
+    fn default() -> Self {
+        let mut s = ::std::mem::MaybeUninit::<Self>::uninit();
+        unsafe {
+            ::std::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
+            s.assume_init()
+        }
+    }
+}
+#[repr(C)]
+#[derive(Debug, Copy, Clone)]
+pub struct AlterTableSpaceOptionsStmt {
+    pub type_: NodeTag,
+    pub tablespacename: *mut ::std::os::raw::c_char,
+    pub options: *mut List,
+    pub isReset: bool,
+}
+impl Default for AlterTableSpaceOptionsStmt {
+    fn default() -> Self {
+        let mut s = ::std::mem::MaybeUninit::<Self>::uninit();
+        unsafe {
+            ::std::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
+            s.assume_init()
+        }
+    }
+}
+#[repr(C)]
+#[derive(Debug, Copy, Clone)]
+pub struct AlterTableMoveAllStmt {
+    pub type_: NodeTag,
+    pub orig_tablespacename: *mut ::std::os::raw::c_char,
+    pub objtype: ObjectType,
+    pub roles: *mut List,
+    pub new_tablespacename: *mut ::std::os::raw::c_char,
+    pub nowait: bool,
+}
+impl Default for AlterTableMoveAllStmt {
+    fn default() -> Self {
+        let mut s = ::std::mem::MaybeUninit::<Self>::uninit();
+        unsafe {
+            ::std::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
+            s.assume_init()
+        }
+    }
+}
+#[repr(C)]
+#[derive(Debug, Copy, Clone)]
+pub struct CreateExtensionStmt {
+    pub type_: NodeTag,
+    pub extname: *mut ::std::os::raw::c_char,
+    pub if_not_exists: bool,
+    pub options: *mut List,
+}
+impl Default for CreateExtensionStmt {
+    fn default() -> Self {
+        let mut s = ::std::mem::MaybeUninit::<Self>::uninit();
+        unsafe {
+            ::std::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
+            s.assume_init()
+        }
+    }
+}
+#[repr(C)]
+#[derive(Debug, Copy, Clone)]
+pub struct AlterExtensionStmt {
+    pub type_: NodeTag,
+    pub extname: *mut ::std::os::raw::c_char,
+    pub options: *mut List,
+}
+impl Default for AlterExtensionStmt {
+    fn default() -> Self {
+        let mut s = ::std::mem::MaybeUninit::<Self>::uninit();
+        unsafe {
+            ::std::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
+            s.assume_init()
+        }
+    }
+}
+#[repr(C)]
+#[derive(Debug, Copy, Clone)]
+pub struct AlterExtensionContentsStmt {
+    pub type_: NodeTag,
+    pub extname: *mut ::std::os::raw::c_char,
+    pub action: ::std::os::raw::c_int,
+    pub objtype: ObjectType,
+    pub object: *mut Node,
+}
+impl Default for AlterExtensionContentsStmt {
+    fn default() -> Self {
+        let mut s = ::std::mem::MaybeUninit::<Self>::uninit();
+        unsafe {
+            ::std::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
+            s.assume_init()
+        }
+    }
+}
+#[repr(C)]
+#[derive(Debug, Copy, Clone)]
+pub struct CreateFdwStmt {
+    pub type_: NodeTag,
+    pub fdwname: *mut ::std::os::raw::c_char,
+    pub func_options: *mut List,
+    pub options: *mut List,
+}
+impl Default for CreateFdwStmt {
+    fn default() -> Self {
+        let mut s = ::std::mem::MaybeUninit::<Self>::uninit();
+        unsafe {
+            ::std::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
+            s.assume_init()
+        }
+    }
+}
+#[repr(C)]
+#[derive(Debug, Copy, Clone)]
+pub struct AlterFdwStmt {
+    pub type_: NodeTag,
+    pub fdwname: *mut ::std::os::raw::c_char,
+    pub func_options: *mut List,
+    pub options: *mut List,
+}
+impl Default for AlterFdwStmt {
+    fn default() -> Self {
+        let mut s = ::std::mem::MaybeUninit::<Self>::uninit();
+        unsafe {
+            ::std::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
+            s.assume_init()
+        }
+    }
+}
+#[repr(C)]
+#[derive(Debug, Copy, Clone)]
+pub struct CreateForeignServerStmt {
+    pub type_: NodeTag,
+    pub servername: *mut ::std::os::raw::c_char,
+    pub servertype: *mut ::std::os::raw::c_char,
+    pub version: *mut ::std::os::raw::c_char,
+    pub fdwname: *mut ::std::os::raw::c_char,
+    pub if_not_exists: bool,
+    pub options: *mut List,
+}
+impl Default for CreateForeignServerStmt {
+    fn default() -> Self {
+        let mut s = ::std::mem::MaybeUninit::<Self>::uninit();
+        unsafe {
+            ::std::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
+            s.assume_init()
+        }
+    }
+}
+#[repr(C)]
+#[derive(Debug, Copy, Clone)]
+pub struct AlterForeignServerStmt {
+    pub type_: NodeTag,
+    pub servername: *mut ::std::os::raw::c_char,
+    pub version: *mut ::std::os::raw::c_char,
+    pub options: *mut List,
+    pub has_version: bool,
+}
+impl Default for AlterForeignServerStmt {
+    fn default() -> Self {
+        let mut s = ::std::mem::MaybeUninit::<Self>::uninit();
+        unsafe {
+            ::std::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
+            s.assume_init()
+        }
+    }
+}
+#[repr(C)]
+#[derive(Debug, Copy, Clone)]
+pub struct CreateForeignTableStmt {
+    pub base: CreateStmt,
+    pub servername: *mut ::std::os::raw::c_char,
+    pub options: *mut List,
+}
+impl Default for CreateForeignTableStmt {
+    fn default() -> Self {
+        let mut s = ::std::mem::MaybeUninit::<Self>::uninit();
+        unsafe {
+            ::std::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
+            s.assume_init()
+        }
+    }
+}
+#[repr(C)]
+#[derive(Debug, Copy, Clone)]
+pub struct CreateUserMappingStmt {
+    pub type_: NodeTag,
+    pub user: *mut RoleSpec,
+    pub servername: *mut ::std::os::raw::c_char,
+    pub if_not_exists: bool,
+    pub options: *mut List,
+}
+impl Default for CreateUserMappingStmt {
+    fn default() -> Self {
+        let mut s = ::std::mem::MaybeUninit::<Self>::uninit();
+        unsafe {
+            ::std::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
+            s.assume_init()
+        }
+    }
+}
+#[repr(C)]
+#[derive(Debug, Copy, Clone)]
+pub struct AlterUserMappingStmt {
+    pub type_: NodeTag,
+    pub user: *mut RoleSpec,
+    pub servername: *mut ::std::os::raw::c_char,
+    pub options: *mut List,
+}
+impl Default for AlterUserMappingStmt {
+    fn default() -> Self {
+        let mut s = ::std::mem::MaybeUninit::<Self>::uninit();
+        unsafe {
+            ::std::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
+            s.assume_init()
+        }
+    }
+}
+#[repr(C)]
+#[derive(Debug, Copy, Clone)]
+pub struct DropUserMappingStmt {
+    pub type_: NodeTag,
+    pub user: *mut RoleSpec,
+    pub servername: *mut ::std::os::raw::c_char,
+    pub missing_ok: bool,
+}
+impl Default for DropUserMappingStmt {
+    fn default() -> Self {
+        let mut s = ::std::mem::MaybeUninit::<Self>::uninit();
+        unsafe {
+            ::std::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
+            s.assume_init()
+        }
+    }
+}
+pub const ImportForeignSchemaType_FDW_IMPORT_SCHEMA_ALL: ImportForeignSchemaType = 0;
+pub const ImportForeignSchemaType_FDW_IMPORT_SCHEMA_LIMIT_TO: ImportForeignSchemaType = 1;
+pub const ImportForeignSchemaType_FDW_IMPORT_SCHEMA_EXCEPT: ImportForeignSchemaType = 2;
+pub type ImportForeignSchemaType = ::std::os::raw::c_uint;
+#[repr(C)]
+#[derive(Debug, Copy, Clone)]
+pub struct ImportForeignSchemaStmt {
+    pub type_: NodeTag,
+    pub server_name: *mut ::std::os::raw::c_char,
+    pub remote_schema: *mut ::std::os::raw::c_char,
+    pub local_schema: *mut ::std::os::raw::c_char,
+    pub list_type: ImportForeignSchemaType,
+    pub table_list: *mut List,
+    pub options: *mut List,
+}
+impl Default for ImportForeignSchemaStmt {
+    fn default() -> Self {
+        let mut s = ::std::mem::MaybeUninit::<Self>::uninit();
+        unsafe {
+            ::std::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
+            s.assume_init()
+        }
+    }
+}
+#[repr(C)]
+#[derive(Debug, Copy, Clone)]
+pub struct CreatePolicyStmt {
+    pub type_: NodeTag,
+    pub policy_name: *mut ::std::os::raw::c_char,
+    pub table: *mut RangeVar,
+    pub cmd_name: *mut ::std::os::raw::c_char,
+    pub permissive: bool,
+    pub roles: *mut List,
+    pub qual: *mut Node,
+    pub with_check: *mut Node,
+}
+impl Default for CreatePolicyStmt {
+    fn default() -> Self {
+        let mut s = ::std::mem::MaybeUninit::<Self>::uninit();
+        unsafe {
+            ::std::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
+            s.assume_init()
+        }
+    }
+}
+#[repr(C)]
+#[derive(Debug, Copy, Clone)]
+pub struct AlterPolicyStmt {
+    pub type_: NodeTag,
+    pub policy_name: *mut ::std::os::raw::c_char,
+    pub table: *mut RangeVar,
+    pub roles: *mut List,
+    pub qual: *mut Node,
+    pub with_check: *mut Node,
+}
+impl Default for AlterPolicyStmt {
+    fn default() -> Self {
+        let mut s = ::std::mem::MaybeUninit::<Self>::uninit();
+        unsafe {
+            ::std::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
+            s.assume_init()
+        }
+    }
+}
+#[repr(C)]
+#[derive(Debug, Copy, Clone)]
+pub struct CreateAmStmt {
+    pub type_: NodeTag,
+    pub amname: *mut ::std::os::raw::c_char,
+    pub handler_name: *mut List,
+    pub amtype: ::std::os::raw::c_char,
+}
+impl Default for CreateAmStmt {
+    fn default() -> Self {
+        let mut s = ::std::mem::MaybeUninit::<Self>::uninit();
+        unsafe {
+            ::std::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
+            s.assume_init()
+        }
+    }
+}
+#[repr(C)]
+#[derive(Debug, Copy, Clone)]
+pub struct CreateTrigStmt {
+    pub type_: NodeTag,
+    pub replace: bool,
+    pub isconstraint: bool,
+    pub trigname: *mut ::std::os::raw::c_char,
+    pub relation: *mut RangeVar,
+    pub funcname: *mut List,
+    pub args: *mut List,
+    pub row: bool,
+    pub timing: int16,
+    pub events: int16,
+    pub columns: *mut List,
+    pub whenClause: *mut Node,
+    pub transitionRels: *mut List,
+    pub deferrable: bool,
+    pub initdeferred: bool,
+    pub constrrel: *mut RangeVar,
+}
+impl Default for CreateTrigStmt {
+    fn default() -> Self {
+        let mut s = ::std::mem::MaybeUninit::<Self>::uninit();
+        unsafe {
+            ::std::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
+            s.assume_init()
+        }
+    }
+}
+#[repr(C)]
+#[derive(Debug, Copy, Clone)]
+pub struct CreateEventTrigStmt {
+    pub type_: NodeTag,
+    pub trigname: *mut ::std::os::raw::c_char,
+    pub eventname: *mut ::std::os::raw::c_char,
+    pub whenclause: *mut List,
+    pub funcname: *mut List,
+}
+impl Default for CreateEventTrigStmt {
+    fn default() -> Self {
+        let mut s = ::std::mem::MaybeUninit::<Self>::uninit();
+        unsafe {
+            ::std::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
+            s.assume_init()
+        }
+    }
+}
+#[repr(C)]
+#[derive(Debug, Copy, Clone)]
+pub struct AlterEventTrigStmt {
+    pub type_: NodeTag,
+    pub trigname: *mut ::std::os::raw::c_char,
+    pub tgenabled: ::std::os::raw::c_char,
+}
+impl Default for AlterEventTrigStmt {
+    fn default() -> Self {
+        let mut s = ::std::mem::MaybeUninit::<Self>::uninit();
+        unsafe {
+            ::std::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
+            s.assume_init()
+        }
+    }
+}
+#[repr(C)]
+#[derive(Debug, Copy, Clone)]
+pub struct CreatePLangStmt {
+    pub type_: NodeTag,
+    pub replace: bool,
+    pub plname: *mut ::std::os::raw::c_char,
+    pub plhandler: *mut List,
+    pub plinline: *mut List,
+    pub plvalidator: *mut List,
+    pub pltrusted: bool,
+}
+impl Default for CreatePLangStmt {
+    fn default() -> Self {
+        let mut s = ::std::mem::MaybeUninit::<Self>::uninit();
+        unsafe {
+            ::std::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
+            s.assume_init()
+        }
+    }
+}
+pub const RoleStmtType_ROLESTMT_ROLE: RoleStmtType = 0;
+pub const RoleStmtType_ROLESTMT_USER: RoleStmtType = 1;
+pub const RoleStmtType_ROLESTMT_GROUP: RoleStmtType = 2;
+pub type RoleStmtType = ::std::os::raw::c_uint;
+#[repr(C)]
+#[derive(Debug, Copy, Clone)]
+pub struct CreateRoleStmt {
+    pub type_: NodeTag,
+    pub stmt_type: RoleStmtType,
+    pub role: *mut ::std::os::raw::c_char,
+    pub options: *mut List,
+}
+impl Default for CreateRoleStmt {
+    fn default() -> Self {
+        let mut s = ::std::mem::MaybeUninit::<Self>::uninit();
+        unsafe {
+            ::std::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
+            s.assume_init()
+        }
+    }
+}
+#[repr(C)]
+#[derive(Debug, Copy, Clone)]
+pub struct AlterRoleStmt {
+    pub type_: NodeTag,
+    pub role: *mut RoleSpec,
+    pub options: *mut List,
+    pub action: ::std::os::raw::c_int,
+}
+impl Default for AlterRoleStmt {
+    fn default() -> Self {
+        let mut s = ::std::mem::MaybeUninit::<Self>::uninit();
+        unsafe {
+            ::std::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
+            s.assume_init()
+        }
+    }
+}
+#[repr(C)]
+#[derive(Debug, Copy, Clone)]
+pub struct AlterRoleSetStmt {
+    pub type_: NodeTag,
+    pub role: *mut RoleSpec,
+    pub database: *mut ::std::os::raw::c_char,
+    pub setstmt: *mut VariableSetStmt,
+}
+impl Default for AlterRoleSetStmt {
+    fn default() -> Self {
+        let mut s = ::std::mem::MaybeUninit::<Self>::uninit();
+        unsafe {
+            ::std::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
+            s.assume_init()
+        }
+    }
+}
+#[repr(C)]
+#[derive(Debug, Copy, Clone)]
+pub struct DropRoleStmt {
+    pub type_: NodeTag,
+    pub roles: *mut List,
+    pub missing_ok: bool,
+}
+impl Default for DropRoleStmt {
+    fn default() -> Self {
+        let mut s = ::std::mem::MaybeUninit::<Self>::uninit();
+        unsafe {
+            ::std::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
+            s.assume_init()
+        }
+    }
+}
+#[repr(C)]
+#[derive(Debug, Copy, Clone)]
+pub struct CreateSeqStmt {
+    pub type_: NodeTag,
+    pub sequence: *mut RangeVar,
+    pub options: *mut List,
+    pub ownerId: Oid,
+    pub for_identity: bool,
+    pub if_not_exists: bool,
+}
+impl Default for CreateSeqStmt {
+    fn default() -> Self {
+        let mut s = ::std::mem::MaybeUninit::<Self>::uninit();
+        unsafe {
+            ::std::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
+            s.assume_init()
+        }
+    }
+}
+#[repr(C)]
+#[derive(Debug, Copy, Clone)]
+pub struct AlterSeqStmt {
+    pub type_: NodeTag,
+    pub sequence: *mut RangeVar,
+    pub options: *mut List,
+    pub for_identity: bool,
+    pub missing_ok: bool,
+}
+impl Default for AlterSeqStmt {
+    fn default() -> Self {
+        let mut s = ::std::mem::MaybeUninit::<Self>::uninit();
+        unsafe {
+            ::std::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
+            s.assume_init()
+        }
+    }
+}
+#[repr(C)]
+#[derive(Debug, Copy, Clone)]
+pub struct DefineStmt {
+    pub type_: NodeTag,
+    pub kind: ObjectType,
+    pub oldstyle: bool,
+    pub defnames: *mut List,
+    pub args: *mut List,
+    pub definition: *mut List,
+    pub if_not_exists: bool,
+    pub replace: bool,
+}
+impl Default for DefineStmt {
+    fn default() -> Self {
+        let mut s = ::std::mem::MaybeUninit::<Self>::uninit();
+        unsafe {
+            ::std::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
+            s.assume_init()
+        }
+    }
+}
+#[repr(C)]
+#[derive(Debug, Copy, Clone)]
+pub struct CreateDomainStmt {
+    pub type_: NodeTag,
+    pub domainname: *mut List,
+    pub typeName: *mut TypeName,
+    pub collClause: *mut CollateClause,
+    pub constraints: *mut List,
+}
+impl Default for CreateDomainStmt {
+    fn default() -> Self {
+        let mut s = ::std::mem::MaybeUninit::<Self>::uninit();
+        unsafe {
+            ::std::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
+            s.assume_init()
+        }
+    }
+}
+#[repr(C)]
+#[derive(Debug, Copy, Clone)]
+pub struct CreateOpClassStmt {
+    pub type_: NodeTag,
+    pub opclassname: *mut List,
+    pub opfamilyname: *mut List,
+    pub amname: *mut ::std::os::raw::c_char,
+    pub datatype: *mut TypeName,
+    pub items: *mut List,
+    pub isDefault: bool,
+}
+impl Default for CreateOpClassStmt {
+    fn default() -> Self {
+        let mut s = ::std::mem::MaybeUninit::<Self>::uninit();
+        unsafe {
+            ::std::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
+            s.assume_init()
+        }
+    }
+}
+#[repr(C)]
+#[derive(Debug, Copy, Clone)]
+pub struct CreateOpClassItem {
+    pub type_: NodeTag,
+    pub itemtype: ::std::os::raw::c_int,
+    pub name: *mut ObjectWithArgs,
+    pub number: ::std::os::raw::c_int,
+    pub order_family: *mut List,
+    pub class_args: *mut List,
+    pub storedtype: *mut TypeName,
+}
+impl Default for CreateOpClassItem {
+    fn default() -> Self {
+        let mut s = ::std::mem::MaybeUninit::<Self>::uninit();
+        unsafe {
+            ::std::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
+            s.assume_init()
+        }
+    }
+}
+#[repr(C)]
+#[derive(Debug, Copy, Clone)]
+pub struct CreateOpFamilyStmt {
+    pub type_: NodeTag,
+    pub opfamilyname: *mut List,
+    pub amname: *mut ::std::os::raw::c_char,
+}
+impl Default for CreateOpFamilyStmt {
+    fn default() -> Self {
+        let mut s = ::std::mem::MaybeUninit::<Self>::uninit();
+        unsafe {
+            ::std::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
+            s.assume_init()
+        }
+    }
+}
+#[repr(C)]
+#[derive(Debug, Copy, Clone)]
+pub struct AlterOpFamilyStmt {
+    pub type_: NodeTag,
+    pub opfamilyname: *mut List,
+    pub amname: *mut ::std::os::raw::c_char,
+    pub isDrop: bool,
+    pub items: *mut List,
+}
+impl Default for AlterOpFamilyStmt {
+    fn default() -> Self {
+        let mut s = ::std::mem::MaybeUninit::<Self>::uninit();
+        unsafe {
+            ::std::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
+            s.assume_init()
+        }
+    }
+}
+#[repr(C)]
+#[derive(Debug, Copy, Clone)]
+pub struct DropStmt {
+    pub type_: NodeTag,
+    pub objects: *mut List,
+    pub removeType: ObjectType,
+    pub behavior: DropBehavior,
+    pub missing_ok: bool,
+    pub concurrent: bool,
+}
+impl Default for DropStmt {
+    fn default() -> Self {
+        let mut s = ::std::mem::MaybeUninit::<Self>::uninit();
+        unsafe {
+            ::std::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
+            s.assume_init()
+        }
+    }
+}
+#[repr(C)]
+#[derive(Debug, Copy, Clone)]
+pub struct TruncateStmt {
+    pub type_: NodeTag,
+    pub relations: *mut List,
+    pub restart_seqs: bool,
+    pub behavior: DropBehavior,
+}
+impl Default for TruncateStmt {
+    fn default() -> Self {
+        let mut s = ::std::mem::MaybeUninit::<Self>::uninit();
+        unsafe {
+            ::std::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
+            s.assume_init()
+        }
+    }
+}
+#[repr(C)]
+#[derive(Debug, Copy, Clone)]
+pub struct CommentStmt {
+    pub type_: NodeTag,
+    pub objtype: ObjectType,
+    pub object: *mut Node,
+    pub comment: *mut ::std::os::raw::c_char,
+}
+impl Default for CommentStmt {
+    fn default() -> Self {
+        let mut s = ::std::mem::MaybeUninit::<Self>::uninit();
+        unsafe {
+            ::std::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
+            s.assume_init()
+        }
+    }
+}
+#[repr(C)]
+#[derive(Debug, Copy, Clone)]
+pub struct SecLabelStmt {
+    pub type_: NodeTag,
+    pub objtype: ObjectType,
+    pub object: *mut Node,
+    pub provider: *mut ::std::os::raw::c_char,
+    pub label: *mut ::std::os::raw::c_char,
+}
+impl Default for SecLabelStmt {
+    fn default() -> Self {
+        let mut s = ::std::mem::MaybeUninit::<Self>::uninit();
+        unsafe {
+            ::std::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
+            s.assume_init()
+        }
+    }
+}
+#[repr(C)]
+#[derive(Debug, Copy, Clone)]
+pub struct DeclareCursorStmt {
+    pub type_: NodeTag,
+    pub portalname: *mut ::std::os::raw::c_char,
+    pub options: ::std::os::raw::c_int,
+    pub query: *mut Node,
+}
+impl Default for DeclareCursorStmt {
+    fn default() -> Self {
+        let mut s = ::std::mem::MaybeUninit::<Self>::uninit();
+        unsafe {
+            ::std::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
+            s.assume_init()
+        }
+    }
+}
+#[repr(C)]
+#[derive(Debug, Copy, Clone)]
+pub struct ClosePortalStmt {
+    pub type_: NodeTag,
+    pub portalname: *mut ::std::os::raw::c_char,
+}
+impl Default for ClosePortalStmt {
+    fn default() -> Self {
+        let mut s = ::std::mem::MaybeUninit::<Self>::uninit();
+        unsafe {
+            ::std::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
+            s.assume_init()
+        }
+    }
+}
+pub const FetchDirection_FETCH_FORWARD: FetchDirection = 0;
+pub const FetchDirection_FETCH_BACKWARD: FetchDirection = 1;
+pub const FetchDirection_FETCH_ABSOLUTE: FetchDirection = 2;
+pub const FetchDirection_FETCH_RELATIVE: FetchDirection = 3;
+pub type FetchDirection = ::std::os::raw::c_uint;
+#[repr(C)]
+#[derive(Debug, Copy, Clone)]
+pub struct FetchStmt {
+    pub type_: NodeTag,
+    pub direction: FetchDirection,
+    pub howMany: ::std::os::raw::c_long,
+    pub portalname: *mut ::std::os::raw::c_char,
+    pub ismove: bool,
+}
+impl Default for FetchStmt {
+    fn default() -> Self {
+        let mut s = ::std::mem::MaybeUninit::<Self>::uninit();
+        unsafe {
+            ::std::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
+            s.assume_init()
+        }
+    }
+}
+#[repr(C)]
+#[derive(Debug, Copy, Clone)]
+pub struct IndexStmt {
+    pub type_: NodeTag,
+    pub idxname: *mut ::std::os::raw::c_char,
+    pub relation: *mut RangeVar,
+    pub accessMethod: *mut ::std::os::raw::c_char,
+    pub tableSpace: *mut ::std::os::raw::c_char,
+    pub indexParams: *mut List,
+    pub indexIncludingParams: *mut List,
+    pub options: *mut List,
+    pub whereClause: *mut Node,
+    pub excludeOpNames: *mut List,
+    pub idxcomment: *mut ::std::os::raw::c_char,
+    pub indexOid: Oid,
+    pub oldNode: Oid,
+    pub oldCreateSubid: SubTransactionId,
+    pub oldFirstRelfilenodeSubid: SubTransactionId,
+    pub unique: bool,
+    pub nulls_not_distinct: bool,
+    pub primary: bool,
+    pub isconstraint: bool,
+    pub deferrable: bool,
+    pub initdeferred: bool,
+    pub transformed: bool,
+    pub concurrent: bool,
+    pub if_not_exists: bool,
+    pub reset_default_tblspc: bool,
+}
+impl Default for IndexStmt {
+    fn default() -> Self {
+        let mut s = ::std::mem::MaybeUninit::<Self>::uninit();
+        unsafe {
+            ::std::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
+            s.assume_init()
+        }
+    }
+}
+#[repr(C)]
+#[derive(Debug, Copy, Clone)]
+pub struct CreateStatsStmt {
+    pub type_: NodeTag,
+    pub defnames: *mut List,
+    pub stat_types: *mut List,
+    pub exprs: *mut List,
+    pub relations: *mut List,
+    pub stxcomment: *mut ::std::os::raw::c_char,
+    pub transformed: bool,
+    pub if_not_exists: bool,
+}
+impl Default for CreateStatsStmt {
+    fn default() -> Self {
+        let mut s = ::std::mem::MaybeUninit::<Self>::uninit();
+        unsafe {
+            ::std::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
+            s.assume_init()
+        }
+    }
+}
+#[repr(C)]
+#[derive(Debug, Copy, Clone)]
+pub struct StatsElem {
+    pub type_: NodeTag,
+    pub name: *mut ::std::os::raw::c_char,
+    pub expr: *mut Node,
+}
+impl Default for StatsElem {
+    fn default() -> Self {
+        let mut s = ::std::mem::MaybeUninit::<Self>::uninit();
+        unsafe {
+            ::std::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
+            s.assume_init()
+        }
+    }
+}
+#[repr(C)]
+#[derive(Debug, Copy, Clone)]
+pub struct AlterStatsStmt {
+    pub type_: NodeTag,
+    pub defnames: *mut List,
+    pub stxstattarget: ::std::os::raw::c_int,
+    pub missing_ok: bool,
+}
+impl Default for AlterStatsStmt {
+    fn default() -> Self {
+        let mut s = ::std::mem::MaybeUninit::<Self>::uninit();
+        unsafe {
+            ::std::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
+            s.assume_init()
+        }
+    }
+}
+#[repr(C)]
+#[derive(Debug, Copy, Clone)]
+pub struct CreateFunctionStmt {
+    pub type_: NodeTag,
+    pub is_procedure: bool,
+    pub replace: bool,
+    pub funcname: *mut List,
+    pub parameters: *mut List,
+    pub returnType: *mut TypeName,
+    pub options: *mut List,
+    pub sql_body: *mut Node,
+}
+impl Default for CreateFunctionStmt {
+    fn default() -> Self {
+        let mut s = ::std::mem::MaybeUninit::<Self>::uninit();
+        unsafe {
+            ::std::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
+            s.assume_init()
+        }
+    }
+}
+pub const FunctionParameterMode_FUNC_PARAM_IN: FunctionParameterMode = 105;
+pub const FunctionParameterMode_FUNC_PARAM_OUT: FunctionParameterMode = 111;
+pub const FunctionParameterMode_FUNC_PARAM_INOUT: FunctionParameterMode = 98;
+pub const FunctionParameterMode_FUNC_PARAM_VARIADIC: FunctionParameterMode = 118;
+pub const FunctionParameterMode_FUNC_PARAM_TABLE: FunctionParameterMode = 116;
+pub const FunctionParameterMode_FUNC_PARAM_DEFAULT: FunctionParameterMode = 100;
+pub type FunctionParameterMode = ::std::os::raw::c_uint;
+#[repr(C)]
+#[derive(Debug, Copy, Clone)]
+pub struct FunctionParameter {
+    pub type_: NodeTag,
+    pub name: *mut ::std::os::raw::c_char,
+    pub argType: *mut TypeName,
+    pub mode: FunctionParameterMode,
+    pub defexpr: *mut Node,
+}
+impl Default for FunctionParameter {
+    fn default() -> Self {
+        let mut s = ::std::mem::MaybeUninit::<Self>::uninit();
+        unsafe {
+            ::std::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
+            s.assume_init()
+        }
+    }
+}
+#[repr(C)]
+#[derive(Debug, Copy, Clone)]
+pub struct AlterFunctionStmt {
+    pub type_: NodeTag,
+    pub objtype: ObjectType,
+    pub func: *mut ObjectWithArgs,
+    pub actions: *mut List,
+}
+impl Default for AlterFunctionStmt {
+    fn default() -> Self {
+        let mut s = ::std::mem::MaybeUninit::<Self>::uninit();
+        unsafe {
+            ::std::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
+            s.assume_init()
+        }
+    }
+}
+#[repr(C)]
+#[derive(Debug, Copy, Clone)]
+pub struct DoStmt {
+    pub type_: NodeTag,
+    pub args: *mut List,
+}
+impl Default for DoStmt {
+    fn default() -> Self {
+        let mut s = ::std::mem::MaybeUninit::<Self>::uninit();
+        unsafe {
+            ::std::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
+            s.assume_init()
+        }
+    }
+}
+#[repr(C)]
+#[derive(Debug, Copy, Clone)]
+pub struct InlineCodeBlock {
+    pub type_: NodeTag,
+    pub source_text: *mut ::std::os::raw::c_char,
+    pub langOid: Oid,
+    pub langIsTrusted: bool,
+    pub atomic: bool,
+}
+impl Default for InlineCodeBlock {
+    fn default() -> Self {
+        let mut s = ::std::mem::MaybeUninit::<Self>::uninit();
+        unsafe {
+            ::std::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
+            s.assume_init()
+        }
+    }
+}
+#[repr(C)]
+#[derive(Debug, Copy, Clone)]
+pub struct CallStmt {
+    pub type_: NodeTag,
+    pub funccall: *mut FuncCall,
+    pub funcexpr: *mut FuncExpr,
+    pub outargs: *mut List,
+}
+impl Default for CallStmt {
+    fn default() -> Self {
+        let mut s = ::std::mem::MaybeUninit::<Self>::uninit();
+        unsafe {
+            ::std::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
+            s.assume_init()
+        }
+    }
+}
+#[repr(C)]
+#[derive(Debug, Copy, Clone)]
+pub struct CallContext {
+    pub type_: NodeTag,
+    pub atomic: bool,
+}
+impl Default for CallContext {
+    fn default() -> Self {
+        let mut s = ::std::mem::MaybeUninit::<Self>::uninit();
+        unsafe {
+            ::std::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
+            s.assume_init()
+        }
+    }
+}
+#[repr(C)]
+#[derive(Debug, Copy, Clone)]
+pub struct RenameStmt {
+    pub type_: NodeTag,
+    pub renameType: ObjectType,
+    pub relationType: ObjectType,
+    pub relation: *mut RangeVar,
+    pub object: *mut Node,
+    pub subname: *mut ::std::os::raw::c_char,
+    pub newname: *mut ::std::os::raw::c_char,
+    pub behavior: DropBehavior,
+    pub missing_ok: bool,
+}
+impl Default for RenameStmt {
+    fn default() -> Self {
+        let mut s = ::std::mem::MaybeUninit::<Self>::uninit();
+        unsafe {
+            ::std::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
+            s.assume_init()
+        }
+    }
+}
+#[repr(C)]
+#[derive(Debug, Copy, Clone)]
+pub struct AlterObjectDependsStmt {
+    pub type_: NodeTag,
+    pub objectType: ObjectType,
+    pub relation: *mut RangeVar,
+    pub object: *mut Node,
+    pub extname: *mut String,
+    pub remove: bool,
+}
+impl Default for AlterObjectDependsStmt {
+    fn default() -> Self {
+        let mut s = ::std::mem::MaybeUninit::<Self>::uninit();
+        unsafe {
+            ::std::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
+            s.assume_init()
+        }
+    }
+}
+#[repr(C)]
+#[derive(Debug, Copy, Clone)]
+pub struct AlterObjectSchemaStmt {
+    pub type_: NodeTag,
+    pub objectType: ObjectType,
+    pub relation: *mut RangeVar,
+    pub object: *mut Node,
+    pub newschema: *mut ::std::os::raw::c_char,
+    pub missing_ok: bool,
+}
+impl Default for AlterObjectSchemaStmt {
+    fn default() -> Self {
+        let mut s = ::std::mem::MaybeUninit::<Self>::uninit();
+        unsafe {
+            ::std::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
+            s.assume_init()
+        }
+    }
+}
+#[repr(C)]
+#[derive(Debug, Copy, Clone)]
+pub struct AlterOwnerStmt {
+    pub type_: NodeTag,
+    pub objectType: ObjectType,
+    pub relation: *mut RangeVar,
+    pub object: *mut Node,
+    pub newowner: *mut RoleSpec,
+}
+impl Default for AlterOwnerStmt {
+    fn default() -> Self {
+        let mut s = ::std::mem::MaybeUninit::<Self>::uninit();
+        unsafe {
+            ::std::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
+            s.assume_init()
+        }
+    }
+}
+#[repr(C)]
+#[derive(Debug, Copy, Clone)]
+pub struct AlterOperatorStmt {
+    pub type_: NodeTag,
+    pub opername: *mut ObjectWithArgs,
+    pub options: *mut List,
+}
+impl Default for AlterOperatorStmt {
+    fn default() -> Self {
+        let mut s = ::std::mem::MaybeUninit::<Self>::uninit();
+        unsafe {
+            ::std::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
+            s.assume_init()
+        }
+    }
+}
+#[repr(C)]
+#[derive(Debug, Copy, Clone)]
+pub struct AlterTypeStmt {
+    pub type_: NodeTag,
+    pub typeName: *mut List,
+    pub options: *mut List,
+}
+impl Default for AlterTypeStmt {
+    fn default() -> Self {
+        let mut s = ::std::mem::MaybeUninit::<Self>::uninit();
+        unsafe {
+            ::std::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
+            s.assume_init()
+        }
+    }
+}
+#[repr(C)]
+#[derive(Debug, Copy, Clone)]
+pub struct RuleStmt {
+    pub type_: NodeTag,
+    pub relation: *mut RangeVar,
+    pub rulename: *mut ::std::os::raw::c_char,
+    pub whereClause: *mut Node,
+    pub event: CmdType,
+    pub instead: bool,
+    pub actions: *mut List,
+    pub replace: bool,
+}
+impl Default for RuleStmt {
+    fn default() -> Self {
+        let mut s = ::std::mem::MaybeUninit::<Self>::uninit();
+        unsafe {
+            ::std::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
+            s.assume_init()
+        }
+    }
+}
+#[repr(C)]
+#[derive(Debug, Copy, Clone)]
+pub struct NotifyStmt {
+    pub type_: NodeTag,
+    pub conditionname: *mut ::std::os::raw::c_char,
+    pub payload: *mut ::std::os::raw::c_char,
+}
+impl Default for NotifyStmt {
+    fn default() -> Self {
+        let mut s = ::std::mem::MaybeUninit::<Self>::uninit();
+        unsafe {
+            ::std::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
+            s.assume_init()
+        }
+    }
+}
+#[repr(C)]
+#[derive(Debug, Copy, Clone)]
+pub struct ListenStmt {
+    pub type_: NodeTag,
+    pub conditionname: *mut ::std::os::raw::c_char,
+}
+impl Default for ListenStmt {
+    fn default() -> Self {
+        let mut s = ::std::mem::MaybeUninit::<Self>::uninit();
+        unsafe {
+            ::std::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
+            s.assume_init()
+        }
+    }
+}
+#[repr(C)]
+#[derive(Debug, Copy, Clone)]
+pub struct UnlistenStmt {
+    pub type_: NodeTag,
+    pub conditionname: *mut ::std::os::raw::c_char,
+}
+impl Default for UnlistenStmt {
+    fn default() -> Self {
+        let mut s = ::std::mem::MaybeUninit::<Self>::uninit();
+        unsafe {
+            ::std::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
+            s.assume_init()
+        }
+    }
+}
+pub const TransactionStmtKind_TRANS_STMT_BEGIN: TransactionStmtKind = 0;
+pub const TransactionStmtKind_TRANS_STMT_START: TransactionStmtKind = 1;
+pub const TransactionStmtKind_TRANS_STMT_COMMIT: TransactionStmtKind = 2;
+pub const TransactionStmtKind_TRANS_STMT_ROLLBACK: TransactionStmtKind = 3;
+pub const TransactionStmtKind_TRANS_STMT_SAVEPOINT: TransactionStmtKind = 4;
+pub const TransactionStmtKind_TRANS_STMT_RELEASE: TransactionStmtKind = 5;
+pub const TransactionStmtKind_TRANS_STMT_ROLLBACK_TO: TransactionStmtKind = 6;
+pub const TransactionStmtKind_TRANS_STMT_PREPARE: TransactionStmtKind = 7;
+pub const TransactionStmtKind_TRANS_STMT_COMMIT_PREPARED: TransactionStmtKind = 8;
+pub const TransactionStmtKind_TRANS_STMT_ROLLBACK_PREPARED: TransactionStmtKind = 9;
+pub type TransactionStmtKind = ::std::os::raw::c_uint;
+#[repr(C)]
+#[derive(Debug, Copy, Clone)]
+pub struct TransactionStmt {
+    pub type_: NodeTag,
+    pub kind: TransactionStmtKind,
+    pub options: *mut List,
+    pub savepoint_name: *mut ::std::os::raw::c_char,
+    pub gid: *mut ::std::os::raw::c_char,
+    pub chain: bool,
+}
+impl Default for TransactionStmt {
+    fn default() -> Self {
+        let mut s = ::std::mem::MaybeUninit::<Self>::uninit();
+        unsafe {
+            ::std::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
+            s.assume_init()
+        }
+    }
+}
+#[repr(C)]
+#[derive(Debug, Copy, Clone)]
+pub struct CompositeTypeStmt {
+    pub type_: NodeTag,
+    pub typevar: *mut RangeVar,
+    pub coldeflist: *mut List,
+}
+impl Default for CompositeTypeStmt {
+    fn default() -> Self {
+        let mut s = ::std::mem::MaybeUninit::<Self>::uninit();
+        unsafe {
+            ::std::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
+            s.assume_init()
+        }
+    }
+}
+#[repr(C)]
+#[derive(Debug, Copy, Clone)]
+pub struct CreateEnumStmt {
+    pub type_: NodeTag,
+    pub typeName: *mut List,
+    pub vals: *mut List,
+}
+impl Default for CreateEnumStmt {
+    fn default() -> Self {
+        let mut s = ::std::mem::MaybeUninit::<Self>::uninit();
+        unsafe {
+            ::std::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
+            s.assume_init()
+        }
+    }
+}
+#[repr(C)]
+#[derive(Debug, Copy, Clone)]
+pub struct CreateRangeStmt {
+    pub type_: NodeTag,
+    pub typeName: *mut List,
+    pub params: *mut List,
+}
+impl Default for CreateRangeStmt {
+    fn default() -> Self {
+        let mut s = ::std::mem::MaybeUninit::<Self>::uninit();
+        unsafe {
+            ::std::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
+            s.assume_init()
+        }
+    }
+}
+#[repr(C)]
+#[derive(Debug, Copy, Clone)]
+pub struct AlterEnumStmt {
+    pub type_: NodeTag,
+    pub typeName: *mut List,
+    pub oldVal: *mut ::std::os::raw::c_char,
+    pub newVal: *mut ::std::os::raw::c_char,
+    pub newValNeighbor: *mut ::std::os::raw::c_char,
+    pub newValIsAfter: bool,
+    pub skipIfNewValExists: bool,
+}
+impl Default for AlterEnumStmt {
+    fn default() -> Self {
+        let mut s = ::std::mem::MaybeUninit::<Self>::uninit();
+        unsafe {
+            ::std::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
+            s.assume_init()
+        }
+    }
+}
+pub const ViewCheckOption_NO_CHECK_OPTION: ViewCheckOption = 0;
+pub const ViewCheckOption_LOCAL_CHECK_OPTION: ViewCheckOption = 1;
+pub const ViewCheckOption_CASCADED_CHECK_OPTION: ViewCheckOption = 2;
+pub type ViewCheckOption = ::std::os::raw::c_uint;
+#[repr(C)]
+#[derive(Debug, Copy, Clone)]
+pub struct ViewStmt {
+    pub type_: NodeTag,
+    pub view: *mut RangeVar,
+    pub aliases: *mut List,
+    pub query: *mut Node,
+    pub replace: bool,
+    pub options: *mut List,
+    pub withCheckOption: ViewCheckOption,
+}
+impl Default for ViewStmt {
+    fn default() -> Self {
+        let mut s = ::std::mem::MaybeUninit::<Self>::uninit();
+        unsafe {
+            ::std::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
+            s.assume_init()
+        }
+    }
+}
+#[repr(C)]
+#[derive(Debug, Copy, Clone)]
+pub struct LoadStmt {
+    pub type_: NodeTag,
+    pub filename: *mut ::std::os::raw::c_char,
+}
+impl Default for LoadStmt {
+    fn default() -> Self {
+        let mut s = ::std::mem::MaybeUninit::<Self>::uninit();
+        unsafe {
+            ::std::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
+            s.assume_init()
+        }
+    }
+}
+#[repr(C)]
+#[derive(Debug, Copy, Clone)]
+pub struct CreatedbStmt {
+    pub type_: NodeTag,
+    pub dbname: *mut ::std::os::raw::c_char,
+    pub options: *mut List,
+}
+impl Default for CreatedbStmt {
+    fn default() -> Self {
+        let mut s = ::std::mem::MaybeUninit::<Self>::uninit();
+        unsafe {
+            ::std::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
+            s.assume_init()
+        }
+    }
+}
+#[repr(C)]
+#[derive(Debug, Copy, Clone)]
+pub struct AlterDatabaseStmt {
+    pub type_: NodeTag,
+    pub dbname: *mut ::std::os::raw::c_char,
+    pub options: *mut List,
+}
+impl Default for AlterDatabaseStmt {
+    fn default() -> Self {
+        let mut s = ::std::mem::MaybeUninit::<Self>::uninit();
+        unsafe {
+            ::std::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
+            s.assume_init()
+        }
+    }
+}
+#[repr(C)]
+#[derive(Debug, Copy, Clone)]
+pub struct AlterDatabaseRefreshCollStmt {
+    pub type_: NodeTag,
+    pub dbname: *mut ::std::os::raw::c_char,
+}
+impl Default for AlterDatabaseRefreshCollStmt {
+    fn default() -> Self {
+        let mut s = ::std::mem::MaybeUninit::<Self>::uninit();
+        unsafe {
+            ::std::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
+            s.assume_init()
+        }
+    }
+}
+#[repr(C)]
+#[derive(Debug, Copy, Clone)]
+pub struct AlterDatabaseSetStmt {
+    pub type_: NodeTag,
+    pub dbname: *mut ::std::os::raw::c_char,
+    pub setstmt: *mut VariableSetStmt,
+}
+impl Default for AlterDatabaseSetStmt {
+    fn default() -> Self {
+        let mut s = ::std::mem::MaybeUninit::<Self>::uninit();
+        unsafe {
+            ::std::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
+            s.assume_init()
+        }
+    }
+}
+#[repr(C)]
+#[derive(Debug, Copy, Clone)]
+pub struct DropdbStmt {
+    pub type_: NodeTag,
+    pub dbname: *mut ::std::os::raw::c_char,
+    pub missing_ok: bool,
+    pub options: *mut List,
+}
+impl Default for DropdbStmt {
+    fn default() -> Self {
+        let mut s = ::std::mem::MaybeUninit::<Self>::uninit();
+        unsafe {
+            ::std::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
+            s.assume_init()
+        }
+    }
+}
+#[repr(C)]
+#[derive(Debug, Copy, Clone)]
+pub struct AlterSystemStmt {
+    pub type_: NodeTag,
+    pub setstmt: *mut VariableSetStmt,
+}
+impl Default for AlterSystemStmt {
+    fn default() -> Self {
+        let mut s = ::std::mem::MaybeUninit::<Self>::uninit();
+        unsafe {
+            ::std::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
+            s.assume_init()
+        }
+    }
+}
+#[repr(C)]
+#[derive(Debug, Copy, Clone)]
+pub struct ClusterStmt {
+    pub type_: NodeTag,
+    pub relation: *mut RangeVar,
+    pub indexname: *mut ::std::os::raw::c_char,
+    pub params: *mut List,
+}
+impl Default for ClusterStmt {
+    fn default() -> Self {
+        let mut s = ::std::mem::MaybeUninit::<Self>::uninit();
+        unsafe {
+            ::std::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
+            s.assume_init()
+        }
+    }
+}
+#[repr(C)]
+#[derive(Debug, Copy, Clone)]
+pub struct VacuumStmt {
+    pub type_: NodeTag,
+    pub options: *mut List,
+    pub rels: *mut List,
+    pub is_vacuumcmd: bool,
+}
+impl Default for VacuumStmt {
+    fn default() -> Self {
+        let mut s = ::std::mem::MaybeUninit::<Self>::uninit();
+        unsafe {
+            ::std::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
+            s.assume_init()
+        }
+    }
+}
+#[repr(C)]
+#[derive(Debug, Copy, Clone)]
+pub struct VacuumRelation {
+    pub type_: NodeTag,
+    pub relation: *mut RangeVar,
+    pub oid: Oid,
+    pub va_cols: *mut List,
+}
+impl Default for VacuumRelation {
+    fn default() -> Self {
+        let mut s = ::std::mem::MaybeUninit::<Self>::uninit();
+        unsafe {
+            ::std::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
+            s.assume_init()
+        }
+    }
+}
+#[repr(C)]
+#[derive(Debug, Copy, Clone)]
+pub struct ExplainStmt {
+    pub type_: NodeTag,
+    pub query: *mut Node,
+    pub options: *mut List,
+}
+impl Default for ExplainStmt {
+    fn default() -> Self {
+        let mut s = ::std::mem::MaybeUninit::<Self>::uninit();
+        unsafe {
+            ::std::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
+            s.assume_init()
+        }
+    }
+}
+#[repr(C)]
+#[derive(Debug, Copy, Clone)]
+pub struct CreateTableAsStmt {
+    pub type_: NodeTag,
+    pub query: *mut Node,
+    pub into: *mut IntoClause,
+    pub objtype: ObjectType,
+    pub is_select_into: bool,
+    pub if_not_exists: bool,
+}
+impl Default for CreateTableAsStmt {
+    fn default() -> Self {
+        let mut s = ::std::mem::MaybeUninit::<Self>::uninit();
+        unsafe {
+            ::std::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
+            s.assume_init()
+        }
+    }
+}
+#[repr(C)]
+#[derive(Debug, Copy, Clone)]
+pub struct RefreshMatViewStmt {
+    pub type_: NodeTag,
+    pub concurrent: bool,
+    pub skipData: bool,
+    pub relation: *mut RangeVar,
+}
+impl Default for RefreshMatViewStmt {
+    fn default() -> Self {
+        let mut s = ::std::mem::MaybeUninit::<Self>::uninit();
+        unsafe {
+            ::std::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
+            s.assume_init()
+        }
+    }
+}
+#[repr(C)]
+#[derive(Debug, Copy, Clone)]
+pub struct CheckPointStmt {
+    pub type_: NodeTag,
+}
+impl Default for CheckPointStmt {
+    fn default() -> Self {
+        let mut s = ::std::mem::MaybeUninit::<Self>::uninit();
+        unsafe {
+            ::std::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
+            s.assume_init()
+        }
+    }
+}
+pub const DiscardMode_DISCARD_ALL: DiscardMode = 0;
+pub const DiscardMode_DISCARD_PLANS: DiscardMode = 1;
+pub const DiscardMode_DISCARD_SEQUENCES: DiscardMode = 2;
+pub const DiscardMode_DISCARD_TEMP: DiscardMode = 3;
+pub type DiscardMode = ::std::os::raw::c_uint;
+#[repr(C)]
+#[derive(Debug, Copy, Clone)]
+pub struct DiscardStmt {
+    pub type_: NodeTag,
+    pub target: DiscardMode,
+}
+impl Default for DiscardStmt {
+    fn default() -> Self {
+        let mut s = ::std::mem::MaybeUninit::<Self>::uninit();
+        unsafe {
+            ::std::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
+            s.assume_init()
+        }
+    }
+}
+#[repr(C)]
+#[derive(Debug, Copy, Clone)]
+pub struct LockStmt {
+    pub type_: NodeTag,
+    pub relations: *mut List,
+    pub mode: ::std::os::raw::c_int,
+    pub nowait: bool,
+}
+impl Default for LockStmt {
+    fn default() -> Self {
+        let mut s = ::std::mem::MaybeUninit::<Self>::uninit();
+        unsafe {
+            ::std::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
+            s.assume_init()
+        }
+    }
+}
+#[repr(C)]
+#[derive(Debug, Copy, Clone)]
+pub struct ConstraintsSetStmt {
+    pub type_: NodeTag,
+    pub constraints: *mut List,
+    pub deferred: bool,
+}
+impl Default for ConstraintsSetStmt {
+    fn default() -> Self {
+        let mut s = ::std::mem::MaybeUninit::<Self>::uninit();
+        unsafe {
+            ::std::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
+            s.assume_init()
+        }
+    }
+}
+pub const ReindexObjectType_REINDEX_OBJECT_INDEX: ReindexObjectType = 0;
+pub const ReindexObjectType_REINDEX_OBJECT_TABLE: ReindexObjectType = 1;
+pub const ReindexObjectType_REINDEX_OBJECT_SCHEMA: ReindexObjectType = 2;
+pub const ReindexObjectType_REINDEX_OBJECT_SYSTEM: ReindexObjectType = 3;
+pub const ReindexObjectType_REINDEX_OBJECT_DATABASE: ReindexObjectType = 4;
+pub type ReindexObjectType = ::std::os::raw::c_uint;
+#[repr(C)]
+#[derive(Debug, Copy, Clone)]
+pub struct ReindexStmt {
+    pub type_: NodeTag,
+    pub kind: ReindexObjectType,
+    pub relation: *mut RangeVar,
+    pub name: *const ::std::os::raw::c_char,
+    pub params: *mut List,
+}
+impl Default for ReindexStmt {
+    fn default() -> Self {
+        let mut s = ::std::mem::MaybeUninit::<Self>::uninit();
+        unsafe {
+            ::std::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
+            s.assume_init()
+        }
+    }
+}
+#[repr(C)]
+#[derive(Debug, Copy, Clone)]
+pub struct CreateConversionStmt {
+    pub type_: NodeTag,
+    pub conversion_name: *mut List,
+    pub for_encoding_name: *mut ::std::os::raw::c_char,
+    pub to_encoding_name: *mut ::std::os::raw::c_char,
+    pub func_name: *mut List,
+    pub def: bool,
+}
+impl Default for CreateConversionStmt {
+    fn default() -> Self {
+        let mut s = ::std::mem::MaybeUninit::<Self>::uninit();
+        unsafe {
+            ::std::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
+            s.assume_init()
+        }
+    }
+}
+#[repr(C)]
+#[derive(Debug, Copy, Clone)]
+pub struct CreateCastStmt {
+    pub type_: NodeTag,
+    pub sourcetype: *mut TypeName,
+    pub targettype: *mut TypeName,
+    pub func: *mut ObjectWithArgs,
+    pub context: CoercionContext,
+    pub inout: bool,
+}
+impl Default for CreateCastStmt {
+    fn default() -> Self {
+        let mut s = ::std::mem::MaybeUninit::<Self>::uninit();
+        unsafe {
+            ::std::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
+            s.assume_init()
+        }
+    }
+}
+#[repr(C)]
+#[derive(Debug, Copy, Clone)]
+pub struct CreateTransformStmt {
+    pub type_: NodeTag,
+    pub replace: bool,
+    pub type_name: *mut TypeName,
+    pub lang: *mut ::std::os::raw::c_char,
+    pub fromsql: *mut ObjectWithArgs,
+    pub tosql: *mut ObjectWithArgs,
+}
+impl Default for CreateTransformStmt {
+    fn default() -> Self {
+        let mut s = ::std::mem::MaybeUninit::<Self>::uninit();
+        unsafe {
+            ::std::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
+            s.assume_init()
+        }
+    }
+}
+#[repr(C)]
+#[derive(Debug, Copy, Clone)]
+pub struct PrepareStmt {
+    pub type_: NodeTag,
+    pub name: *mut ::std::os::raw::c_char,
+    pub argtypes: *mut List,
+    pub query: *mut Node,
+}
+impl Default for PrepareStmt {
+    fn default() -> Self {
+        let mut s = ::std::mem::MaybeUninit::<Self>::uninit();
+        unsafe {
+            ::std::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
+            s.assume_init()
+        }
+    }
+}
+#[repr(C)]
+#[derive(Debug, Copy, Clone)]
+pub struct ExecuteStmt {
+    pub type_: NodeTag,
+    pub name: *mut ::std::os::raw::c_char,
+    pub params: *mut List,
+}
+impl Default for ExecuteStmt {
+    fn default() -> Self {
+        let mut s = ::std::mem::MaybeUninit::<Self>::uninit();
+        unsafe {
+            ::std::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
+            s.assume_init()
+        }
+    }
+}
+#[repr(C)]
+#[derive(Debug, Copy, Clone)]
+pub struct DeallocateStmt {
+    pub type_: NodeTag,
+    pub name: *mut ::std::os::raw::c_char,
+}
+impl Default for DeallocateStmt {
+    fn default() -> Self {
+        let mut s = ::std::mem::MaybeUninit::<Self>::uninit();
+        unsafe {
+            ::std::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
+            s.assume_init()
+        }
+    }
+}
+#[repr(C)]
+#[derive(Debug, Copy, Clone)]
+pub struct DropOwnedStmt {
+    pub type_: NodeTag,
+    pub roles: *mut List,
+    pub behavior: DropBehavior,
+}
+impl Default for DropOwnedStmt {
+    fn default() -> Self {
+        let mut s = ::std::mem::MaybeUninit::<Self>::uninit();
+        unsafe {
+            ::std::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
+            s.assume_init()
+        }
+    }
+}
+#[repr(C)]
+#[derive(Debug, Copy, Clone)]
+pub struct ReassignOwnedStmt {
+    pub type_: NodeTag,
+    pub roles: *mut List,
+    pub newrole: *mut RoleSpec,
+}
+impl Default for ReassignOwnedStmt {
+    fn default() -> Self {
+        let mut s = ::std::mem::MaybeUninit::<Self>::uninit();
+        unsafe {
+            ::std::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
+            s.assume_init()
+        }
+    }
+}
+#[repr(C)]
+#[derive(Debug, Copy, Clone)]
+pub struct AlterTSDictionaryStmt {
+    pub type_: NodeTag,
+    pub dictname: *mut List,
+    pub options: *mut List,
+}
+impl Default for AlterTSDictionaryStmt {
+    fn default() -> Self {
+        let mut s = ::std::mem::MaybeUninit::<Self>::uninit();
+        unsafe {
+            ::std::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
+            s.assume_init()
+        }
+    }
+}
+pub const AlterTSConfigType_ALTER_TSCONFIG_ADD_MAPPING: AlterTSConfigType = 0;
+pub const AlterTSConfigType_ALTER_TSCONFIG_ALTER_MAPPING_FOR_TOKEN: AlterTSConfigType = 1;
+pub const AlterTSConfigType_ALTER_TSCONFIG_REPLACE_DICT: AlterTSConfigType = 2;
+pub const AlterTSConfigType_ALTER_TSCONFIG_REPLACE_DICT_FOR_TOKEN: AlterTSConfigType = 3;
+pub const AlterTSConfigType_ALTER_TSCONFIG_DROP_MAPPING: AlterTSConfigType = 4;
+pub type AlterTSConfigType = ::std::os::raw::c_uint;
+#[repr(C)]
+#[derive(Debug, Copy, Clone)]
+pub struct AlterTSConfigurationStmt {
+    pub type_: NodeTag,
+    pub kind: AlterTSConfigType,
+    pub cfgname: *mut List,
+    pub tokentype: *mut List,
+    pub dicts: *mut List,
+    pub override_: bool,
+    pub replace: bool,
+    pub missing_ok: bool,
+}
+impl Default for AlterTSConfigurationStmt {
+    fn default() -> Self {
+        let mut s = ::std::mem::MaybeUninit::<Self>::uninit();
+        unsafe {
+            ::std::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
+            s.assume_init()
+        }
+    }
+}
+#[repr(C)]
+#[derive(Debug, Copy, Clone)]
+pub struct PublicationTable {
+    pub type_: NodeTag,
+    pub relation: *mut RangeVar,
+    pub whereClause: *mut Node,
+    pub columns: *mut List,
+}
+impl Default for PublicationTable {
+    fn default() -> Self {
+        let mut s = ::std::mem::MaybeUninit::<Self>::uninit();
+        unsafe {
+            ::std::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
+            s.assume_init()
+        }
+    }
+}
+pub const PublicationObjSpecType_PUBLICATIONOBJ_TABLE: PublicationObjSpecType = 0;
+pub const PublicationObjSpecType_PUBLICATIONOBJ_TABLES_IN_SCHEMA: PublicationObjSpecType = 1;
+pub const PublicationObjSpecType_PUBLICATIONOBJ_TABLES_IN_CUR_SCHEMA: PublicationObjSpecType = 2;
+pub const PublicationObjSpecType_PUBLICATIONOBJ_CONTINUATION: PublicationObjSpecType = 3;
+pub type PublicationObjSpecType = ::std::os::raw::c_uint;
+#[repr(C)]
+#[derive(Debug, Copy, Clone)]
+pub struct PublicationObjSpec {
+    pub type_: NodeTag,
+    pub pubobjtype: PublicationObjSpecType,
+    pub name: *mut ::std::os::raw::c_char,
+    pub pubtable: *mut PublicationTable,
+    pub location: ::std::os::raw::c_int,
+}
+impl Default for PublicationObjSpec {
+    fn default() -> Self {
+        let mut s = ::std::mem::MaybeUninit::<Self>::uninit();
+        unsafe {
+            ::std::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
+            s.assume_init()
+        }
+    }
+}
+#[repr(C)]
+#[derive(Debug, Copy, Clone)]
+pub struct CreatePublicationStmt {
+    pub type_: NodeTag,
+    pub pubname: *mut ::std::os::raw::c_char,
+    pub options: *mut List,
+    pub pubobjects: *mut List,
+    pub for_all_tables: bool,
+}
+impl Default for CreatePublicationStmt {
+    fn default() -> Self {
+        let mut s = ::std::mem::MaybeUninit::<Self>::uninit();
+        unsafe {
+            ::std::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
+            s.assume_init()
+        }
+    }
+}
+pub const AlterPublicationAction_AP_AddObjects: AlterPublicationAction = 0;
+pub const AlterPublicationAction_AP_DropObjects: AlterPublicationAction = 1;
+pub const AlterPublicationAction_AP_SetObjects: AlterPublicationAction = 2;
+pub type AlterPublicationAction = ::std::os::raw::c_uint;
+#[repr(C)]
+#[derive(Debug, Copy, Clone)]
+pub struct AlterPublicationStmt {
+    pub type_: NodeTag,
+    pub pubname: *mut ::std::os::raw::c_char,
+    pub options: *mut List,
+    pub pubobjects: *mut List,
+    pub for_all_tables: bool,
+    pub action: AlterPublicationAction,
+}
+impl Default for AlterPublicationStmt {
+    fn default() -> Self {
+        let mut s = ::std::mem::MaybeUninit::<Self>::uninit();
+        unsafe {
+            ::std::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
+            s.assume_init()
+        }
+    }
+}
+#[repr(C)]
+#[derive(Debug, Copy, Clone)]
+pub struct CreateSubscriptionStmt {
+    pub type_: NodeTag,
+    pub subname: *mut ::std::os::raw::c_char,
+    pub conninfo: *mut ::std::os::raw::c_char,
+    pub publication: *mut List,
+    pub options: *mut List,
+}
+impl Default for CreateSubscriptionStmt {
+    fn default() -> Self {
+        let mut s = ::std::mem::MaybeUninit::<Self>::uninit();
+        unsafe {
+            ::std::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
+            s.assume_init()
+        }
+    }
+}
+pub const AlterSubscriptionType_ALTER_SUBSCRIPTION_OPTIONS: AlterSubscriptionType = 0;
+pub const AlterSubscriptionType_ALTER_SUBSCRIPTION_CONNECTION: AlterSubscriptionType = 1;
+pub const AlterSubscriptionType_ALTER_SUBSCRIPTION_SET_PUBLICATION: AlterSubscriptionType = 2;
+pub const AlterSubscriptionType_ALTER_SUBSCRIPTION_ADD_PUBLICATION: AlterSubscriptionType = 3;
+pub const AlterSubscriptionType_ALTER_SUBSCRIPTION_DROP_PUBLICATION: AlterSubscriptionType = 4;
+pub const AlterSubscriptionType_ALTER_SUBSCRIPTION_REFRESH: AlterSubscriptionType = 5;
+pub const AlterSubscriptionType_ALTER_SUBSCRIPTION_ENABLED: AlterSubscriptionType = 6;
+pub const AlterSubscriptionType_ALTER_SUBSCRIPTION_SKIP: AlterSubscriptionType = 7;
+pub type AlterSubscriptionType = ::std::os::raw::c_uint;
+#[repr(C)]
+#[derive(Debug, Copy, Clone)]
+pub struct AlterSubscriptionStmt {
+    pub type_: NodeTag,
+    pub kind: AlterSubscriptionType,
+    pub subname: *mut ::std::os::raw::c_char,
+    pub conninfo: *mut ::std::os::raw::c_char,
+    pub publication: *mut List,
+    pub options: *mut List,
+}
+impl Default for AlterSubscriptionStmt {
+    fn default() -> Self {
+        let mut s = ::std::mem::MaybeUninit::<Self>::uninit();
+        unsafe {
+            ::std::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
+            s.assume_init()
+        }
+    }
+}
+#[repr(C)]
+#[derive(Debug, Copy, Clone)]
+pub struct DropSubscriptionStmt {
+    pub type_: NodeTag,
+    pub subname: *mut ::std::os::raw::c_char,
+    pub missing_ok: bool,
+    pub behavior: DropBehavior,
+}
+impl Default for DropSubscriptionStmt {
+    fn default() -> Self {
+        let mut s = ::std::mem::MaybeUninit::<Self>::uninit();
+        unsafe {
+            ::std::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
+            s.assume_init()
+        }
+    }
+}
+#[repr(C)]
+#[derive(Debug, Copy, Clone)]
 pub struct PlannedStmt {
     pub type_: NodeTag,
     pub commandType: CmdType,
@@ -21526,7 +23511,7 @@ pub struct Plan {
     pub type_: NodeTag,
     pub startup_cost: Cost,
     pub total_cost: Cost,
-    pub plan_rows: f64,
+    pub plan_rows: Cardinality,
     pub plan_width: ::std::os::raw::c_int,
     pub parallel_aware: bool,
     pub parallel_safe: bool,
@@ -21602,6 +23587,7 @@ pub struct ModifyTable {
     pub onConflictWhere: *mut Node,
     pub exclRelRTI: Index,
     pub exclRelTlist: *mut List,
+    pub mergeActionLists: *mut List,
 }
 impl Default for ModifyTable {
     fn default() -> Self {
@@ -21719,7 +23705,20 @@ impl Default for Scan {
         }
     }
 }
-pub type SeqScan = Scan;
+#[repr(C)]
+#[derive(Debug, Copy, Clone)]
+pub struct SeqScan {
+    pub scan: Scan,
+}
+impl Default for SeqScan {
+    fn default() -> Self {
+        let mut s = ::std::mem::MaybeUninit::<Self>::uninit();
+        unsafe {
+            ::std::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
+            s.assume_init()
+        }
+    }
+}
 #[repr(C)]
 #[derive(Debug, Copy, Clone)]
 pub struct SampleScan {
@@ -21762,10 +23761,10 @@ pub struct IndexOnlyScan {
     pub scan: Scan,
     pub indexid: Oid,
     pub indexqual: *mut List,
+    pub recheckqual: *mut List,
     pub indexorderby: *mut List,
     pub indextlist: *mut List,
     pub indexorderdir: ScanDirection,
-    pub recheckqual: *mut List,
 }
 impl Default for IndexOnlyScan {
     fn default() -> Self {
@@ -21839,11 +23838,16 @@ impl Default for TidRangeScan {
         }
     }
 }
+pub const SubqueryScanStatus_SUBQUERY_SCAN_UNKNOWN: SubqueryScanStatus = 0;
+pub const SubqueryScanStatus_SUBQUERY_SCAN_TRIVIAL: SubqueryScanStatus = 1;
+pub const SubqueryScanStatus_SUBQUERY_SCAN_NONTRIVIAL: SubqueryScanStatus = 2;
+pub type SubqueryScanStatus = ::std::os::raw::c_uint;
 #[repr(C)]
 #[derive(Debug, Copy, Clone)]
 pub struct SubqueryScan {
     pub scan: Scan,
     pub subplan: *mut Plan,
+    pub scanstatus: SubqueryScanStatus,
 }
 impl Default for SubqueryScan {
     fn default() -> Self {
@@ -22205,11 +24209,14 @@ pub struct WindowAgg {
     pub frameOptions: ::std::os::raw::c_int,
     pub startOffset: *mut Node,
     pub endOffset: *mut Node,
+    pub runCondition: *mut List,
+    pub runConditionOrig: *mut List,
     pub startInRangeFunc: Oid,
     pub endInRangeFunc: Oid,
     pub inRangeColl: Oid,
     pub inRangeAsc: bool,
     pub inRangeNullsFirst: bool,
+    pub topWindow: bool,
 }
 impl Default for WindowAgg {
     fn default() -> Self {
@@ -22287,7 +24294,7 @@ pub struct Hash {
     pub skewTable: Oid,
     pub skewColumn: AttrNumber,
     pub skewInherit: bool,
-    pub rows_total: f64,
+    pub rows_total: Cardinality,
 }
 impl Default for Hash {
     fn default() -> Self {
@@ -22494,6 +24501,11 @@ impl Default for PlanInvalItem {
         }
     }
 }
+pub const MonotonicFunction_MONOTONICFUNC_NONE: MonotonicFunction = 0;
+pub const MonotonicFunction_MONOTONICFUNC_INCREASING: MonotonicFunction = 1;
+pub const MonotonicFunction_MONOTONICFUNC_DECREASING: MonotonicFunction = 2;
+pub const MonotonicFunction_MONOTONICFUNC_BOTH: MonotonicFunction = 3;
+pub type MonotonicFunction = ::std::os::raw::c_uint;
 #[repr(C)]
 #[derive(Debug, Default, Copy, Clone)]
 pub struct pg_atomic_flag {
@@ -23134,30 +25146,6 @@ pub unsafe fn tbm_calculate_entries(arg_maxbytes: f64) -> ::std::os::raw::c_long
         tbm_calculate_entries(arg_maxbytes)
     })
 }
-#[repr(C)]
-#[derive(Debug, Copy, Clone)]
-pub struct PartitionBoundInfoData {
-    _unused: [u8; 0],
-}
-pub type PartitionBoundInfo = *mut PartitionBoundInfoData;
-#[repr(C)]
-#[derive(Debug, Copy, Clone)]
-pub struct PartitionKeyData {
-    _unused: [u8; 0],
-}
-pub type PartitionKey = *mut PartitionKeyData;
-#[repr(C)]
-#[derive(Debug, Copy, Clone)]
-pub struct PartitionDescData {
-    _unused: [u8; 0],
-}
-pub type PartitionDesc = *mut PartitionDescData;
-#[repr(C)]
-#[derive(Debug, Copy, Clone)]
-pub struct PartitionDirectoryData {
-    _unused: [u8; 0],
-}
-pub type PartitionDirectory = *mut PartitionDirectoryData;
 #[repr(C)]
 #[derive(Debug, Default, Copy, Clone)]
 pub struct proclist_node {
@@ -24505,6 +26493,14 @@ pub unsafe fn InitFileAccess() {
         InitFileAccess()
     })
 }
+pub unsafe fn InitTemporaryFileAccess() {
+    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
+        extern "C" {
+            pub fn InitTemporaryFileAccess();
+        }
+        InitTemporaryFileAccess()
+    })
+}
 pub unsafe fn set_max_safe_fds() {
     crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
         extern "C" {
@@ -24777,13 +26773,80 @@ pub unsafe fn data_sync_elevel(arg_elevel: ::std::os::raw::c_int) -> ::std::os::
 }
 #[repr(C)]
 #[derive(Debug, Default, Copy, Clone)]
-pub struct SharedFileSet {
+pub struct FileSet {
     pub creator_pid: pid_t,
     pub number: uint32,
-    pub mutex: slock_t,
-    pub refcnt: ::std::os::raw::c_int,
     pub ntablespaces: ::std::os::raw::c_int,
     pub tablespaces: [Oid; 8usize],
+}
+pub unsafe fn FileSetInit(arg_fileset: *mut FileSet) {
+    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
+        extern "C" {
+            pub fn FileSetInit(fileset: *mut FileSet);
+        }
+        FileSetInit(arg_fileset)
+    })
+}
+pub unsafe fn FileSetCreate(
+    arg_fileset: *mut FileSet,
+    arg_name: *const ::std::os::raw::c_char,
+) -> File {
+    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
+        extern "C" {
+            pub fn FileSetCreate(
+                fileset: *mut FileSet,
+                name: *const ::std::os::raw::c_char,
+            ) -> File;
+        }
+        FileSetCreate(arg_fileset, arg_name)
+    })
+}
+pub unsafe fn FileSetOpen(
+    arg_fileset: *mut FileSet,
+    arg_name: *const ::std::os::raw::c_char,
+    arg_mode: ::std::os::raw::c_int,
+) -> File {
+    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
+        extern "C" {
+            pub fn FileSetOpen(
+                fileset: *mut FileSet,
+                name: *const ::std::os::raw::c_char,
+                mode: ::std::os::raw::c_int,
+            ) -> File;
+        }
+        FileSetOpen(arg_fileset, arg_name, arg_mode)
+    })
+}
+pub unsafe fn FileSetDelete(
+    arg_fileset: *mut FileSet,
+    arg_name: *const ::std::os::raw::c_char,
+    arg_error_on_failure: bool,
+) -> bool {
+    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
+        extern "C" {
+            pub fn FileSetDelete(
+                fileset: *mut FileSet,
+                name: *const ::std::os::raw::c_char,
+                error_on_failure: bool,
+            ) -> bool;
+        }
+        FileSetDelete(arg_fileset, arg_name, arg_error_on_failure)
+    })
+}
+pub unsafe fn FileSetDeleteAll(arg_fileset: *mut FileSet) {
+    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
+        extern "C" {
+            pub fn FileSetDeleteAll(fileset: *mut FileSet);
+        }
+        FileSetDeleteAll(arg_fileset)
+    })
+}
+#[repr(C)]
+#[derive(Debug, Default, Copy, Clone)]
+pub struct SharedFileSet {
+    pub fs: FileSet,
+    pub mutex: slock_t,
+    pub refcnt: ::std::os::raw::c_int,
 }
 pub unsafe fn SharedFileSetInit(arg_fileset: *mut SharedFileSet, arg_seg: *mut dsm_segment) {
     crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
@@ -24801,66 +26864,12 @@ pub unsafe fn SharedFileSetAttach(arg_fileset: *mut SharedFileSet, arg_seg: *mut
         SharedFileSetAttach(arg_fileset, arg_seg)
     })
 }
-pub unsafe fn SharedFileSetCreate(
-    arg_fileset: *mut SharedFileSet,
-    arg_name: *const ::std::os::raw::c_char,
-) -> File {
-    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
-        extern "C" {
-            pub fn SharedFileSetCreate(
-                fileset: *mut SharedFileSet,
-                name: *const ::std::os::raw::c_char,
-            ) -> File;
-        }
-        SharedFileSetCreate(arg_fileset, arg_name)
-    })
-}
-pub unsafe fn SharedFileSetOpen(
-    arg_fileset: *mut SharedFileSet,
-    arg_name: *const ::std::os::raw::c_char,
-    arg_mode: ::std::os::raw::c_int,
-) -> File {
-    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
-        extern "C" {
-            pub fn SharedFileSetOpen(
-                fileset: *mut SharedFileSet,
-                name: *const ::std::os::raw::c_char,
-                mode: ::std::os::raw::c_int,
-            ) -> File;
-        }
-        SharedFileSetOpen(arg_fileset, arg_name, arg_mode)
-    })
-}
-pub unsafe fn SharedFileSetDelete(
-    arg_fileset: *mut SharedFileSet,
-    arg_name: *const ::std::os::raw::c_char,
-    arg_error_on_failure: bool,
-) -> bool {
-    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
-        extern "C" {
-            pub fn SharedFileSetDelete(
-                fileset: *mut SharedFileSet,
-                name: *const ::std::os::raw::c_char,
-                error_on_failure: bool,
-            ) -> bool;
-        }
-        SharedFileSetDelete(arg_fileset, arg_name, arg_error_on_failure)
-    })
-}
 pub unsafe fn SharedFileSetDeleteAll(arg_fileset: *mut SharedFileSet) {
     crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
         extern "C" {
             pub fn SharedFileSetDeleteAll(fileset: *mut SharedFileSet);
         }
         SharedFileSetDeleteAll(arg_fileset)
-    })
-}
-pub unsafe fn SharedFileSetUnregister(arg_input_fileset: *mut SharedFileSet) {
-    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
-        extern "C" {
-            pub fn SharedFileSetUnregister(input_fileset: *mut SharedFileSet);
-        }
-        SharedFileSetUnregister(arg_input_fileset)
     })
 }
 #[repr(C)]
@@ -25001,6 +27010,25 @@ pub struct Interval {
     pub time: TimeOffset,
     pub day: int32,
     pub month: int32,
+}
+#[repr(C)]
+#[derive(Debug, Default, Copy, Clone)]
+pub struct pg_itm {
+    pub tm_usec: ::std::os::raw::c_int,
+    pub tm_sec: ::std::os::raw::c_int,
+    pub tm_min: ::std::os::raw::c_int,
+    pub tm_hour: int64,
+    pub tm_mday: ::std::os::raw::c_int,
+    pub tm_mon: ::std::os::raw::c_int,
+    pub tm_year: ::std::os::raw::c_int,
+}
+#[repr(C)]
+#[derive(Debug, Default, Copy, Clone)]
+pub struct pg_itm_in {
+    pub tm_usec: int64,
+    pub tm_mday: ::std::os::raw::c_int,
+    pub tm_mon: ::std::os::raw::c_int,
+    pub tm_year: ::std::os::raw::c_int,
 }
 pub const SnapshotType_SNAPSHOT_MVCC: SnapshotType = 0;
 pub const SnapshotType_SNAPSHOT_SELF: SnapshotType = 1;
@@ -25197,12 +27225,15 @@ pub unsafe fn RelationInitIndexAccessInfo(arg_relation: Relation) {
         RelationInitIndexAccessInfo(arg_relation)
     })
 }
-pub unsafe fn GetRelationPublicationActions(arg_relation: Relation) -> *mut PublicationActions {
+pub unsafe fn RelationBuildPublicationDesc(
+    arg_relation: Relation,
+    arg_pubdesc: *mut PublicationDesc,
+) {
     crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
         extern "C" {
-            pub fn GetRelationPublicationActions(relation: Relation) -> *mut PublicationActions;
+            pub fn RelationBuildPublicationDesc(relation: Relation, pubdesc: *mut PublicationDesc);
         }
-        GetRelationPublicationActions(arg_relation)
+        RelationBuildPublicationDesc(arg_relation, arg_pubdesc)
     })
 }
 pub unsafe fn RelationInitTableAccessMethod(arg_relation: Relation) {
@@ -25487,6 +27518,54 @@ impl Default for SortSupportData {
         }
     }
 }
+pub unsafe fn ssup_datum_unsigned_cmp(
+    arg_x: Datum,
+    arg_y: Datum,
+    arg_ssup: SortSupport,
+) -> ::std::os::raw::c_int {
+    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
+        extern "C" {
+            pub fn ssup_datum_unsigned_cmp(
+                x: Datum,
+                y: Datum,
+                ssup: SortSupport,
+            ) -> ::std::os::raw::c_int;
+        }
+        ssup_datum_unsigned_cmp(arg_x, arg_y, arg_ssup)
+    })
+}
+pub unsafe fn ssup_datum_signed_cmp(
+    arg_x: Datum,
+    arg_y: Datum,
+    arg_ssup: SortSupport,
+) -> ::std::os::raw::c_int {
+    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
+        extern "C" {
+            pub fn ssup_datum_signed_cmp(
+                x: Datum,
+                y: Datum,
+                ssup: SortSupport,
+            ) -> ::std::os::raw::c_int;
+        }
+        ssup_datum_signed_cmp(arg_x, arg_y, arg_ssup)
+    })
+}
+pub unsafe fn ssup_datum_int32_cmp(
+    arg_x: Datum,
+    arg_y: Datum,
+    arg_ssup: SortSupport,
+) -> ::std::os::raw::c_int {
+    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
+        extern "C" {
+            pub fn ssup_datum_int32_cmp(
+                x: Datum,
+                y: Datum,
+                ssup: SortSupport,
+            ) -> ::std::os::raw::c_int;
+        }
+        ssup_datum_int32_cmp(arg_x, arg_y, arg_ssup)
+    })
+}
 pub unsafe fn PrepareSortSupportComparisonShim(arg_cmpFunc: Oid, arg_ssup: SortSupport) {
     crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
         extern "C" {
@@ -25554,6 +27633,24 @@ pub unsafe fn index_form_tuple(
             ) -> IndexTuple;
         }
         index_form_tuple(arg_tupleDescriptor, arg_values, arg_isnull)
+    })
+}
+pub unsafe fn index_form_tuple_context(
+    arg_tupleDescriptor: TupleDesc,
+    arg_values: *mut Datum,
+    arg_isnull: *mut bool,
+    arg_context: MemoryContext,
+) -> IndexTuple {
+    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
+        extern "C" {
+            pub fn index_form_tuple_context(
+                tupleDescriptor: TupleDesc,
+                values: *mut Datum,
+                isnull: *mut bool,
+                context: MemoryContext,
+            ) -> IndexTuple;
+        }
+        index_form_tuple_context(arg_tupleDescriptor, arg_values, arg_isnull, arg_context)
     })
 }
 pub unsafe fn nocache_index_getattr(
@@ -25704,7 +27801,7 @@ pub unsafe fn tuplesort_begin_heap(
     arg_nullsFirstFlags: *mut bool,
     arg_workMem: ::std::os::raw::c_int,
     arg_coordinate: SortCoordinate,
-    arg_randomAccess: bool,
+    arg_sortopt: ::std::os::raw::c_int,
 ) -> *mut Tuplesortstate {
     crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
         extern "C" {
@@ -25717,7 +27814,7 @@ pub unsafe fn tuplesort_begin_heap(
                 nullsFirstFlags: *mut bool,
                 workMem: ::std::os::raw::c_int,
                 coordinate: SortCoordinate,
-                randomAccess: bool,
+                sortopt: ::std::os::raw::c_int,
             ) -> *mut Tuplesortstate;
         }
         tuplesort_begin_heap(
@@ -25729,7 +27826,7 @@ pub unsafe fn tuplesort_begin_heap(
             arg_nullsFirstFlags,
             arg_workMem,
             arg_coordinate,
-            arg_randomAccess,
+            arg_sortopt,
         )
     })
 }
@@ -25738,7 +27835,7 @@ pub unsafe fn tuplesort_begin_cluster(
     arg_indexRel: Relation,
     arg_workMem: ::std::os::raw::c_int,
     arg_coordinate: SortCoordinate,
-    arg_randomAccess: bool,
+    arg_sortopt: ::std::os::raw::c_int,
 ) -> *mut Tuplesortstate {
     crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
         extern "C" {
@@ -25747,25 +27844,20 @@ pub unsafe fn tuplesort_begin_cluster(
                 indexRel: Relation,
                 workMem: ::std::os::raw::c_int,
                 coordinate: SortCoordinate,
-                randomAccess: bool,
+                sortopt: ::std::os::raw::c_int,
             ) -> *mut Tuplesortstate;
         }
-        tuplesort_begin_cluster(
-            arg_tupDesc,
-            arg_indexRel,
-            arg_workMem,
-            arg_coordinate,
-            arg_randomAccess,
-        )
+        tuplesort_begin_cluster(arg_tupDesc, arg_indexRel, arg_workMem, arg_coordinate, arg_sortopt)
     })
 }
 pub unsafe fn tuplesort_begin_index_btree(
     arg_heapRel: Relation,
     arg_indexRel: Relation,
     arg_enforceUnique: bool,
+    arg_uniqueNullsNotDistinct: bool,
     arg_workMem: ::std::os::raw::c_int,
     arg_coordinate: SortCoordinate,
-    arg_randomAccess: bool,
+    arg_sortopt: ::std::os::raw::c_int,
 ) -> *mut Tuplesortstate {
     crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
         extern "C" {
@@ -25773,18 +27865,20 @@ pub unsafe fn tuplesort_begin_index_btree(
                 heapRel: Relation,
                 indexRel: Relation,
                 enforceUnique: bool,
+                uniqueNullsNotDistinct: bool,
                 workMem: ::std::os::raw::c_int,
                 coordinate: SortCoordinate,
-                randomAccess: bool,
+                sortopt: ::std::os::raw::c_int,
             ) -> *mut Tuplesortstate;
         }
         tuplesort_begin_index_btree(
             arg_heapRel,
             arg_indexRel,
             arg_enforceUnique,
+            arg_uniqueNullsNotDistinct,
             arg_workMem,
             arg_coordinate,
-            arg_randomAccess,
+            arg_sortopt,
         )
     })
 }
@@ -25796,7 +27890,7 @@ pub unsafe fn tuplesort_begin_index_hash(
     arg_max_buckets: uint32,
     arg_workMem: ::std::os::raw::c_int,
     arg_coordinate: SortCoordinate,
-    arg_randomAccess: bool,
+    arg_sortopt: ::std::os::raw::c_int,
 ) -> *mut Tuplesortstate {
     crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
         extern "C" {
@@ -25808,7 +27902,7 @@ pub unsafe fn tuplesort_begin_index_hash(
                 max_buckets: uint32,
                 workMem: ::std::os::raw::c_int,
                 coordinate: SortCoordinate,
-                randomAccess: bool,
+                sortopt: ::std::os::raw::c_int,
             ) -> *mut Tuplesortstate;
         }
         tuplesort_begin_index_hash(
@@ -25819,7 +27913,7 @@ pub unsafe fn tuplesort_begin_index_hash(
             arg_max_buckets,
             arg_workMem,
             arg_coordinate,
-            arg_randomAccess,
+            arg_sortopt,
         )
     })
 }
@@ -25828,7 +27922,7 @@ pub unsafe fn tuplesort_begin_index_gist(
     arg_indexRel: Relation,
     arg_workMem: ::std::os::raw::c_int,
     arg_coordinate: SortCoordinate,
-    arg_randomAccess: bool,
+    arg_sortopt: ::std::os::raw::c_int,
 ) -> *mut Tuplesortstate {
     crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
         extern "C" {
@@ -25837,7 +27931,7 @@ pub unsafe fn tuplesort_begin_index_gist(
                 indexRel: Relation,
                 workMem: ::std::os::raw::c_int,
                 coordinate: SortCoordinate,
-                randomAccess: bool,
+                sortopt: ::std::os::raw::c_int,
             ) -> *mut Tuplesortstate;
         }
         tuplesort_begin_index_gist(
@@ -25845,7 +27939,7 @@ pub unsafe fn tuplesort_begin_index_gist(
             arg_indexRel,
             arg_workMem,
             arg_coordinate,
-            arg_randomAccess,
+            arg_sortopt,
         )
     })
 }
@@ -25856,7 +27950,7 @@ pub unsafe fn tuplesort_begin_datum(
     arg_nullsFirstFlag: bool,
     arg_workMem: ::std::os::raw::c_int,
     arg_coordinate: SortCoordinate,
-    arg_randomAccess: bool,
+    arg_sortopt: ::std::os::raw::c_int,
 ) -> *mut Tuplesortstate {
     crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
         extern "C" {
@@ -25867,7 +27961,7 @@ pub unsafe fn tuplesort_begin_datum(
                 nullsFirstFlag: bool,
                 workMem: ::std::os::raw::c_int,
                 coordinate: SortCoordinate,
-                randomAccess: bool,
+                sortopt: ::std::os::raw::c_int,
             ) -> *mut Tuplesortstate;
         }
         tuplesort_begin_datum(
@@ -25877,7 +27971,7 @@ pub unsafe fn tuplesort_begin_datum(
             arg_nullsFirstFlag,
             arg_workMem,
             arg_coordinate,
-            arg_randomAccess,
+            arg_sortopt,
         )
     })
 }
@@ -26374,6 +28468,11 @@ pub struct ExprEvalStep {
 pub struct CopyMultiInsertBuffer {
     _unused: [u8; 0],
 }
+#[repr(C)]
+#[derive(Debug, Copy, Clone)]
+pub struct LogicalTapeSet {
+    _unused: [u8; 0],
+}
 pub type ExprStateEvalFunc = ::std::option::Option<
     unsafe extern "C" fn(
         expression: *mut ExprState,
@@ -26384,7 +28483,7 @@ pub type ExprStateEvalFunc = ::std::option::Option<
 #[repr(C)]
 #[derive(Debug, Copy, Clone)]
 pub struct ExprState {
-    pub tag: NodeTag,
+    pub type_: NodeTag,
     pub flags: uint8,
     pub resnull: bool,
     pub resvalue: Datum,
@@ -26430,7 +28529,10 @@ pub struct IndexInfo {
     pub ii_UniqueStrats: *mut uint16,
     pub ii_OpclassOptions: *mut Datum,
     pub ii_Unique: bool,
+    pub ii_NullsNotDistinct: bool,
     pub ii_ReadyForInserts: bool,
+    pub ii_CheckedUnchanged: bool,
+    pub ii_IndexUnchanged: bool,
     pub ii_Concurrent: bool,
     pub ii_BrokenHotChain: bool,
     pub ii_ParallelWorkers: ::std::os::raw::c_int,
@@ -26577,6 +28679,23 @@ impl Default for OnConflictSetState {
 }
 #[repr(C)]
 #[derive(Debug, Copy, Clone)]
+pub struct MergeActionState {
+    pub type_: NodeTag,
+    pub mas_action: *mut MergeAction,
+    pub mas_proj: *mut ProjectionInfo,
+    pub mas_whenqual: *mut ExprState,
+}
+impl Default for MergeActionState {
+    fn default() -> Self {
+        let mut s = ::std::mem::MaybeUninit::<Self>::uninit();
+        unsafe {
+            ::std::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
+            s.assume_init()
+        }
+    }
+}
+#[repr(C)]
+#[derive(Debug, Copy, Clone)]
 pub struct ResultRelInfo {
     pub type_: NodeTag,
     pub ri_RangeTableIndex: Index,
@@ -26613,6 +28732,8 @@ pub struct ResultRelInfo {
     pub ri_projectReturning: *mut ProjectionInfo,
     pub ri_onConflictArbiterIndexes: *mut List,
     pub ri_onConflict: *mut OnConflictSetState,
+    pub ri_matchedMergeAction: *mut List,
+    pub ri_notMatchedMergeAction: *mut List,
     pub ri_PartitionCheckExpr: *mut ExprState,
     pub ri_RootResultRelInfo: *mut ResultRelInfo,
     pub ri_RootToPartitionMap: *mut TupleConversionMap,
@@ -26620,6 +28741,7 @@ pub struct ResultRelInfo {
     pub ri_ChildToRootMap: *mut TupleConversionMap,
     pub ri_ChildToRootMapValid: bool,
     pub ri_CopyMultiInsertBuffer: *mut CopyMultiInsertBuffer,
+    pub ri_ancestorResultRels: *mut List,
 }
 impl Default for ResultRelInfo {
     fn default() -> Self {
@@ -26767,13 +28889,21 @@ extern "C" {
 extern "C" {
     pub static pg_number_of_ones: [uint8; 256usize];
 }
-extern "C" {
-    pub static mut pg_popcount32:
-        ::std::option::Option<unsafe extern "C" fn(word: uint32) -> ::std::os::raw::c_int>;
+pub unsafe fn pg_popcount32(arg_word: uint32) -> ::std::os::raw::c_int {
+    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
+        extern "C" {
+            pub fn pg_popcount32(word: uint32) -> ::std::os::raw::c_int;
+        }
+        pg_popcount32(arg_word)
+    })
 }
-extern "C" {
-    pub static mut pg_popcount64:
-        ::std::option::Option<unsafe extern "C" fn(word: uint64) -> ::std::os::raw::c_int>;
+pub unsafe fn pg_popcount64(arg_word: uint64) -> ::std::os::raw::c_int {
+    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
+        extern "C" {
+            pub fn pg_popcount64(word: uint64) -> ::std::os::raw::c_int;
+        }
+        pg_popcount64(arg_word)
+    })
 }
 pub unsafe fn pg_popcount(
     arg_buf: *const ::std::os::raw::c_char,
@@ -27252,6 +29382,10 @@ pub struct ModifyTableState {
     pub mt_partition_tuple_routing: *mut PartitionTupleRouting,
     pub mt_transition_capture: *mut TransitionCaptureState,
     pub mt_oc_transition_capture: *mut TransitionCaptureState,
+    pub mt_merge_subcommands: ::std::os::raw::c_int,
+    pub mt_merge_inserted: f64,
+    pub mt_merge_updated: f64,
+    pub mt_merge_deleted: f64,
 }
 impl Default for ModifyTableState {
     fn default() -> Self {
@@ -28076,6 +30210,7 @@ pub struct SortState {
     pub bound_Done: int64,
     pub tuplesortstate: *mut ::std::os::raw::c_void,
     pub am_worker: bool,
+    pub datumSort: bool,
     pub shared_info: *mut SharedSortInfo,
 }
 impl Default for SortState {
@@ -28240,7 +30375,7 @@ pub struct AggState {
     pub table_filled: bool,
     pub num_hashes: ::std::os::raw::c_int,
     pub hash_metacxt: MemoryContext,
-    pub hash_tapeinfo: *mut HashTapeInfo,
+    pub hash_tapeset: *mut LogicalTapeSet,
     pub hash_spills: *mut HashAggSpill,
     pub hash_spill_rslot: *mut TupleTableSlot,
     pub hash_spill_wslot: *mut TupleTableSlot,
@@ -28282,6 +30417,11 @@ pub struct WindowStatePerAggData {
     _unused: [u8; 0],
 }
 pub type WindowStatePerAgg = *mut WindowStatePerAggData;
+pub const WindowAggStatus_WINDOWAGG_DONE: WindowAggStatus = 0;
+pub const WindowAggStatus_WINDOWAGG_RUN: WindowAggStatus = 1;
+pub const WindowAggStatus_WINDOWAGG_PASSTHROUGH: WindowAggStatus = 2;
+pub const WindowAggStatus_WINDOWAGG_PASSTHROUGH_STRICT: WindowAggStatus = 3;
+pub type WindowAggStatus = ::std::os::raw::c_uint;
 #[repr(C)]
 #[derive(Debug, Copy, Clone)]
 pub struct WindowAggState {
@@ -28305,6 +30445,7 @@ pub struct WindowAggState {
     pub agg_winobj: *mut WindowObjectData,
     pub aggregatedbase: int64,
     pub aggregatedupto: int64,
+    pub status: WindowAggStatus,
     pub frameOptions: ::std::os::raw::c_int,
     pub startOffset: *mut ExprState,
     pub endOffset: *mut ExprState,
@@ -28324,8 +30465,10 @@ pub struct WindowAggState {
     pub aggcontext: MemoryContext,
     pub curaggcontext: MemoryContext,
     pub tmpcontext: *mut ExprContext,
+    pub runcondition: *mut ExprState,
+    pub use_pass_through: bool,
+    pub top_window: bool,
     pub all_first: bool,
-    pub all_done: bool,
     pub partition_spooled: bool,
     pub more_partitions: bool,
     pub framehead_valid: bool,
@@ -28695,36 +30838,37 @@ pub const CommandTag_CMDTAG_INSERT: CommandTag = 158;
 pub const CommandTag_CMDTAG_LISTEN: CommandTag = 159;
 pub const CommandTag_CMDTAG_LOAD: CommandTag = 160;
 pub const CommandTag_CMDTAG_LOCK_TABLE: CommandTag = 161;
-pub const CommandTag_CMDTAG_MOVE: CommandTag = 162;
-pub const CommandTag_CMDTAG_NOTIFY: CommandTag = 163;
-pub const CommandTag_CMDTAG_PREPARE: CommandTag = 164;
-pub const CommandTag_CMDTAG_PREPARE_TRANSACTION: CommandTag = 165;
-pub const CommandTag_CMDTAG_REASSIGN_OWNED: CommandTag = 166;
-pub const CommandTag_CMDTAG_REFRESH_MATERIALIZED_VIEW: CommandTag = 167;
-pub const CommandTag_CMDTAG_REINDEX: CommandTag = 168;
-pub const CommandTag_CMDTAG_RELEASE: CommandTag = 169;
-pub const CommandTag_CMDTAG_RESET: CommandTag = 170;
-pub const CommandTag_CMDTAG_REVOKE: CommandTag = 171;
-pub const CommandTag_CMDTAG_REVOKE_ROLE: CommandTag = 172;
-pub const CommandTag_CMDTAG_ROLLBACK: CommandTag = 173;
-pub const CommandTag_CMDTAG_ROLLBACK_PREPARED: CommandTag = 174;
-pub const CommandTag_CMDTAG_SAVEPOINT: CommandTag = 175;
-pub const CommandTag_CMDTAG_SECURITY_LABEL: CommandTag = 176;
-pub const CommandTag_CMDTAG_SELECT: CommandTag = 177;
-pub const CommandTag_CMDTAG_SELECT_FOR_KEY_SHARE: CommandTag = 178;
-pub const CommandTag_CMDTAG_SELECT_FOR_NO_KEY_UPDATE: CommandTag = 179;
-pub const CommandTag_CMDTAG_SELECT_FOR_SHARE: CommandTag = 180;
-pub const CommandTag_CMDTAG_SELECT_FOR_UPDATE: CommandTag = 181;
-pub const CommandTag_CMDTAG_SELECT_INTO: CommandTag = 182;
-pub const CommandTag_CMDTAG_SET: CommandTag = 183;
-pub const CommandTag_CMDTAG_SET_CONSTRAINTS: CommandTag = 184;
-pub const CommandTag_CMDTAG_SHOW: CommandTag = 185;
-pub const CommandTag_CMDTAG_START_TRANSACTION: CommandTag = 186;
-pub const CommandTag_CMDTAG_TRUNCATE_TABLE: CommandTag = 187;
-pub const CommandTag_CMDTAG_UNLISTEN: CommandTag = 188;
-pub const CommandTag_CMDTAG_UPDATE: CommandTag = 189;
-pub const CommandTag_CMDTAG_VACUUM: CommandTag = 190;
-pub const CommandTag_COMMAND_TAG_NEXTTAG: CommandTag = 191;
+pub const CommandTag_CMDTAG_MERGE: CommandTag = 162;
+pub const CommandTag_CMDTAG_MOVE: CommandTag = 163;
+pub const CommandTag_CMDTAG_NOTIFY: CommandTag = 164;
+pub const CommandTag_CMDTAG_PREPARE: CommandTag = 165;
+pub const CommandTag_CMDTAG_PREPARE_TRANSACTION: CommandTag = 166;
+pub const CommandTag_CMDTAG_REASSIGN_OWNED: CommandTag = 167;
+pub const CommandTag_CMDTAG_REFRESH_MATERIALIZED_VIEW: CommandTag = 168;
+pub const CommandTag_CMDTAG_REINDEX: CommandTag = 169;
+pub const CommandTag_CMDTAG_RELEASE: CommandTag = 170;
+pub const CommandTag_CMDTAG_RESET: CommandTag = 171;
+pub const CommandTag_CMDTAG_REVOKE: CommandTag = 172;
+pub const CommandTag_CMDTAG_REVOKE_ROLE: CommandTag = 173;
+pub const CommandTag_CMDTAG_ROLLBACK: CommandTag = 174;
+pub const CommandTag_CMDTAG_ROLLBACK_PREPARED: CommandTag = 175;
+pub const CommandTag_CMDTAG_SAVEPOINT: CommandTag = 176;
+pub const CommandTag_CMDTAG_SECURITY_LABEL: CommandTag = 177;
+pub const CommandTag_CMDTAG_SELECT: CommandTag = 178;
+pub const CommandTag_CMDTAG_SELECT_FOR_KEY_SHARE: CommandTag = 179;
+pub const CommandTag_CMDTAG_SELECT_FOR_NO_KEY_UPDATE: CommandTag = 180;
+pub const CommandTag_CMDTAG_SELECT_FOR_SHARE: CommandTag = 181;
+pub const CommandTag_CMDTAG_SELECT_FOR_UPDATE: CommandTag = 182;
+pub const CommandTag_CMDTAG_SELECT_INTO: CommandTag = 183;
+pub const CommandTag_CMDTAG_SET: CommandTag = 184;
+pub const CommandTag_CMDTAG_SET_CONSTRAINTS: CommandTag = 185;
+pub const CommandTag_CMDTAG_SHOW: CommandTag = 186;
+pub const CommandTag_CMDTAG_START_TRANSACTION: CommandTag = 187;
+pub const CommandTag_CMDTAG_TRUNCATE_TABLE: CommandTag = 188;
+pub const CommandTag_CMDTAG_UNLISTEN: CommandTag = 189;
+pub const CommandTag_CMDTAG_UPDATE: CommandTag = 190;
+pub const CommandTag_CMDTAG_VACUUM: CommandTag = 191;
+pub const CommandTag_COMMAND_TAG_NEXTTAG: CommandTag = 192;
 pub type CommandTag = ::std::os::raw::c_uint;
 #[repr(C)]
 #[derive(Debug, Copy, Clone)]
@@ -28957,3685 +31101,6 @@ pub unsafe fn FreeQueryDesc(arg_qdesc: *mut QueryDesc) {
         }
         FreeQueryDesc(arg_qdesc)
     })
-}
-#[repr(C)]
-#[derive(Copy, Clone)]
-pub struct Value {
-    pub type_: NodeTag,
-    pub val: Value_ValUnion,
-}
-#[repr(C)]
-#[derive(Copy, Clone)]
-pub union Value_ValUnion {
-    pub ival: ::std::os::raw::c_int,
-    pub str_: *mut ::std::os::raw::c_char,
-}
-impl Default for Value_ValUnion {
-    fn default() -> Self {
-        let mut s = ::std::mem::MaybeUninit::<Self>::uninit();
-        unsafe {
-            ::std::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
-            s.assume_init()
-        }
-    }
-}
-impl Default for Value {
-    fn default() -> Self {
-        let mut s = ::std::mem::MaybeUninit::<Self>::uninit();
-        unsafe {
-            ::std::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
-            s.assume_init()
-        }
-    }
-}
-pub unsafe fn makeInteger(arg_i: ::std::os::raw::c_int) -> *mut Value {
-    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
-        extern "C" {
-            pub fn makeInteger(i: ::std::os::raw::c_int) -> *mut Value;
-        }
-        makeInteger(arg_i)
-    })
-}
-pub unsafe fn makeFloat(arg_numericStr: *mut ::std::os::raw::c_char) -> *mut Value {
-    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
-        extern "C" {
-            pub fn makeFloat(numericStr: *mut ::std::os::raw::c_char) -> *mut Value;
-        }
-        makeFloat(arg_numericStr)
-    })
-}
-pub unsafe fn makeString(arg_str_: *mut ::std::os::raw::c_char) -> *mut Value {
-    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
-        extern "C" {
-            pub fn makeString(str_: *mut ::std::os::raw::c_char) -> *mut Value;
-        }
-        makeString(arg_str_)
-    })
-}
-pub unsafe fn makeBitString(arg_str_: *mut ::std::os::raw::c_char) -> *mut Value {
-    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
-        extern "C" {
-            pub fn makeBitString(str_: *mut ::std::os::raw::c_char) -> *mut Value;
-        }
-        makeBitString(arg_str_)
-    })
-}
-pub const OverridingKind_OVERRIDING_NOT_SET: OverridingKind = 0;
-pub const OverridingKind_OVERRIDING_USER_VALUE: OverridingKind = 1;
-pub const OverridingKind_OVERRIDING_SYSTEM_VALUE: OverridingKind = 2;
-pub type OverridingKind = ::std::os::raw::c_uint;
-pub const QuerySource_QSRC_ORIGINAL: QuerySource = 0;
-pub const QuerySource_QSRC_PARSER: QuerySource = 1;
-pub const QuerySource_QSRC_INSTEAD_RULE: QuerySource = 2;
-pub const QuerySource_QSRC_QUAL_INSTEAD_RULE: QuerySource = 3;
-pub const QuerySource_QSRC_NON_INSTEAD_RULE: QuerySource = 4;
-pub type QuerySource = ::std::os::raw::c_uint;
-pub const SortByDir_SORTBY_DEFAULT: SortByDir = 0;
-pub const SortByDir_SORTBY_ASC: SortByDir = 1;
-pub const SortByDir_SORTBY_DESC: SortByDir = 2;
-pub const SortByDir_SORTBY_USING: SortByDir = 3;
-pub type SortByDir = ::std::os::raw::c_uint;
-pub const SortByNulls_SORTBY_NULLS_DEFAULT: SortByNulls = 0;
-pub const SortByNulls_SORTBY_NULLS_FIRST: SortByNulls = 1;
-pub const SortByNulls_SORTBY_NULLS_LAST: SortByNulls = 2;
-pub type SortByNulls = ::std::os::raw::c_uint;
-pub const SetQuantifier_SET_QUANTIFIER_DEFAULT: SetQuantifier = 0;
-pub const SetQuantifier_SET_QUANTIFIER_ALL: SetQuantifier = 1;
-pub const SetQuantifier_SET_QUANTIFIER_DISTINCT: SetQuantifier = 2;
-pub type SetQuantifier = ::std::os::raw::c_uint;
-pub type AclMode = uint32;
-#[doc = "\tQuery Tree"]
-#[repr(C)]
-#[derive(Debug, Copy, Clone)]
-pub struct Query {
-    pub type_: NodeTag,
-    pub commandType: CmdType,
-    pub querySource: QuerySource,
-    pub queryId: uint64,
-    pub canSetTag: bool,
-    pub utilityStmt: *mut Node,
-    pub resultRelation: ::std::os::raw::c_int,
-    pub hasAggs: bool,
-    pub hasWindowFuncs: bool,
-    pub hasTargetSRFs: bool,
-    pub hasSubLinks: bool,
-    pub hasDistinctOn: bool,
-    pub hasRecursive: bool,
-    pub hasModifyingCTE: bool,
-    pub hasForUpdate: bool,
-    pub hasRowSecurity: bool,
-    pub isReturn: bool,
-    pub cteList: *mut List,
-    pub rtable: *mut List,
-    pub jointree: *mut FromExpr,
-    pub targetList: *mut List,
-    pub override_: OverridingKind,
-    pub onConflict: *mut OnConflictExpr,
-    pub returningList: *mut List,
-    pub groupClause: *mut List,
-    pub groupDistinct: bool,
-    pub groupingSets: *mut List,
-    pub havingQual: *mut Node,
-    pub windowClause: *mut List,
-    pub distinctClause: *mut List,
-    pub sortClause: *mut List,
-    pub limitOffset: *mut Node,
-    pub limitCount: *mut Node,
-    pub limitOption: LimitOption,
-    pub rowMarks: *mut List,
-    pub setOperations: *mut Node,
-    pub constraintDeps: *mut List,
-    pub withCheckOptions: *mut List,
-    pub stmt_location: ::std::os::raw::c_int,
-    pub stmt_len: ::std::os::raw::c_int,
-}
-impl Default for Query {
-    fn default() -> Self {
-        let mut s = ::std::mem::MaybeUninit::<Self>::uninit();
-        unsafe {
-            ::std::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
-            s.assume_init()
-        }
-    }
-}
-#[doc = "\tSupporting data structures for Parse Trees"]
-#[doc = ""]
-#[doc = "\tMost of these node types appear in raw parsetrees output by the grammar,"]
-#[doc = "\tand get transformed to something else by the analyzer.  A few of them"]
-#[doc = "\tare used as-is in transformed querytrees."]
-#[repr(C)]
-#[derive(Debug, Copy, Clone)]
-pub struct TypeName {
-    pub type_: NodeTag,
-    pub names: *mut List,
-    pub typeOid: Oid,
-    pub setof: bool,
-    pub pct_type: bool,
-    pub typmods: *mut List,
-    pub typemod: int32,
-    pub arrayBounds: *mut List,
-    pub location: ::std::os::raw::c_int,
-}
-impl Default for TypeName {
-    fn default() -> Self {
-        let mut s = ::std::mem::MaybeUninit::<Self>::uninit();
-        unsafe {
-            ::std::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
-            s.assume_init()
-        }
-    }
-}
-#[repr(C)]
-#[derive(Debug, Copy, Clone)]
-pub struct ColumnRef {
-    pub type_: NodeTag,
-    pub fields: *mut List,
-    pub location: ::std::os::raw::c_int,
-}
-impl Default for ColumnRef {
-    fn default() -> Self {
-        let mut s = ::std::mem::MaybeUninit::<Self>::uninit();
-        unsafe {
-            ::std::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
-            s.assume_init()
-        }
-    }
-}
-#[repr(C)]
-#[derive(Debug, Copy, Clone)]
-pub struct ParamRef {
-    pub type_: NodeTag,
-    pub number: ::std::os::raw::c_int,
-    pub location: ::std::os::raw::c_int,
-}
-impl Default for ParamRef {
-    fn default() -> Self {
-        let mut s = ::std::mem::MaybeUninit::<Self>::uninit();
-        unsafe {
-            ::std::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
-            s.assume_init()
-        }
-    }
-}
-pub const A_Expr_Kind_AEXPR_OP: A_Expr_Kind = 0;
-pub const A_Expr_Kind_AEXPR_OP_ANY: A_Expr_Kind = 1;
-pub const A_Expr_Kind_AEXPR_OP_ALL: A_Expr_Kind = 2;
-pub const A_Expr_Kind_AEXPR_DISTINCT: A_Expr_Kind = 3;
-pub const A_Expr_Kind_AEXPR_NOT_DISTINCT: A_Expr_Kind = 4;
-pub const A_Expr_Kind_AEXPR_NULLIF: A_Expr_Kind = 5;
-pub const A_Expr_Kind_AEXPR_IN: A_Expr_Kind = 6;
-pub const A_Expr_Kind_AEXPR_LIKE: A_Expr_Kind = 7;
-pub const A_Expr_Kind_AEXPR_ILIKE: A_Expr_Kind = 8;
-pub const A_Expr_Kind_AEXPR_SIMILAR: A_Expr_Kind = 9;
-pub const A_Expr_Kind_AEXPR_BETWEEN: A_Expr_Kind = 10;
-pub const A_Expr_Kind_AEXPR_NOT_BETWEEN: A_Expr_Kind = 11;
-pub const A_Expr_Kind_AEXPR_BETWEEN_SYM: A_Expr_Kind = 12;
-pub const A_Expr_Kind_AEXPR_NOT_BETWEEN_SYM: A_Expr_Kind = 13;
-pub type A_Expr_Kind = ::std::os::raw::c_uint;
-#[repr(C)]
-#[derive(Debug, Copy, Clone)]
-pub struct A_Expr {
-    pub type_: NodeTag,
-    pub kind: A_Expr_Kind,
-    pub name: *mut List,
-    pub lexpr: *mut Node,
-    pub rexpr: *mut Node,
-    pub location: ::std::os::raw::c_int,
-}
-impl Default for A_Expr {
-    fn default() -> Self {
-        let mut s = ::std::mem::MaybeUninit::<Self>::uninit();
-        unsafe {
-            ::std::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
-            s.assume_init()
-        }
-    }
-}
-#[repr(C)]
-#[derive(Copy, Clone)]
-pub struct A_Const {
-    pub type_: NodeTag,
-    pub val: Value,
-    pub location: ::std::os::raw::c_int,
-}
-impl Default for A_Const {
-    fn default() -> Self {
-        let mut s = ::std::mem::MaybeUninit::<Self>::uninit();
-        unsafe {
-            ::std::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
-            s.assume_init()
-        }
-    }
-}
-#[repr(C)]
-#[derive(Debug, Copy, Clone)]
-pub struct TypeCast {
-    pub type_: NodeTag,
-    pub arg: *mut Node,
-    pub typeName: *mut TypeName,
-    pub location: ::std::os::raw::c_int,
-}
-impl Default for TypeCast {
-    fn default() -> Self {
-        let mut s = ::std::mem::MaybeUninit::<Self>::uninit();
-        unsafe {
-            ::std::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
-            s.assume_init()
-        }
-    }
-}
-#[repr(C)]
-#[derive(Debug, Copy, Clone)]
-pub struct CollateClause {
-    pub type_: NodeTag,
-    pub arg: *mut Node,
-    pub collname: *mut List,
-    pub location: ::std::os::raw::c_int,
-}
-impl Default for CollateClause {
-    fn default() -> Self {
-        let mut s = ::std::mem::MaybeUninit::<Self>::uninit();
-        unsafe {
-            ::std::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
-            s.assume_init()
-        }
-    }
-}
-pub const RoleSpecType_ROLESPEC_CSTRING: RoleSpecType = 0;
-pub const RoleSpecType_ROLESPEC_CURRENT_ROLE: RoleSpecType = 1;
-pub const RoleSpecType_ROLESPEC_CURRENT_USER: RoleSpecType = 2;
-pub const RoleSpecType_ROLESPEC_SESSION_USER: RoleSpecType = 3;
-pub const RoleSpecType_ROLESPEC_PUBLIC: RoleSpecType = 4;
-pub type RoleSpecType = ::std::os::raw::c_uint;
-#[repr(C)]
-#[derive(Debug, Copy, Clone)]
-pub struct RoleSpec {
-    pub type_: NodeTag,
-    pub roletype: RoleSpecType,
-    pub rolename: *mut ::std::os::raw::c_char,
-    pub location: ::std::os::raw::c_int,
-}
-impl Default for RoleSpec {
-    fn default() -> Self {
-        let mut s = ::std::mem::MaybeUninit::<Self>::uninit();
-        unsafe {
-            ::std::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
-            s.assume_init()
-        }
-    }
-}
-#[repr(C)]
-#[derive(Debug, Copy, Clone)]
-pub struct FuncCall {
-    pub type_: NodeTag,
-    pub funcname: *mut List,
-    pub args: *mut List,
-    pub agg_order: *mut List,
-    pub agg_filter: *mut Node,
-    pub over: *mut WindowDef,
-    pub agg_within_group: bool,
-    pub agg_star: bool,
-    pub agg_distinct: bool,
-    pub func_variadic: bool,
-    pub funcformat: CoercionForm,
-    pub location: ::std::os::raw::c_int,
-}
-impl Default for FuncCall {
-    fn default() -> Self {
-        let mut s = ::std::mem::MaybeUninit::<Self>::uninit();
-        unsafe {
-            ::std::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
-            s.assume_init()
-        }
-    }
-}
-#[repr(C)]
-#[derive(Debug, Copy, Clone)]
-pub struct A_Star {
-    pub type_: NodeTag,
-}
-impl Default for A_Star {
-    fn default() -> Self {
-        let mut s = ::std::mem::MaybeUninit::<Self>::uninit();
-        unsafe {
-            ::std::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
-            s.assume_init()
-        }
-    }
-}
-#[repr(C)]
-#[derive(Debug, Copy, Clone)]
-pub struct A_Indices {
-    pub type_: NodeTag,
-    pub is_slice: bool,
-    pub lidx: *mut Node,
-    pub uidx: *mut Node,
-}
-impl Default for A_Indices {
-    fn default() -> Self {
-        let mut s = ::std::mem::MaybeUninit::<Self>::uninit();
-        unsafe {
-            ::std::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
-            s.assume_init()
-        }
-    }
-}
-#[repr(C)]
-#[derive(Debug, Copy, Clone)]
-pub struct A_Indirection {
-    pub type_: NodeTag,
-    pub arg: *mut Node,
-    pub indirection: *mut List,
-}
-impl Default for A_Indirection {
-    fn default() -> Self {
-        let mut s = ::std::mem::MaybeUninit::<Self>::uninit();
-        unsafe {
-            ::std::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
-            s.assume_init()
-        }
-    }
-}
-#[repr(C)]
-#[derive(Debug, Copy, Clone)]
-pub struct A_ArrayExpr {
-    pub type_: NodeTag,
-    pub elements: *mut List,
-    pub location: ::std::os::raw::c_int,
-}
-impl Default for A_ArrayExpr {
-    fn default() -> Self {
-        let mut s = ::std::mem::MaybeUninit::<Self>::uninit();
-        unsafe {
-            ::std::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
-            s.assume_init()
-        }
-    }
-}
-#[repr(C)]
-#[derive(Debug, Copy, Clone)]
-pub struct ResTarget {
-    pub type_: NodeTag,
-    pub name: *mut ::std::os::raw::c_char,
-    pub indirection: *mut List,
-    pub val: *mut Node,
-    pub location: ::std::os::raw::c_int,
-}
-impl Default for ResTarget {
-    fn default() -> Self {
-        let mut s = ::std::mem::MaybeUninit::<Self>::uninit();
-        unsafe {
-            ::std::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
-            s.assume_init()
-        }
-    }
-}
-#[repr(C)]
-#[derive(Debug, Copy, Clone)]
-pub struct MultiAssignRef {
-    pub type_: NodeTag,
-    pub source: *mut Node,
-    pub colno: ::std::os::raw::c_int,
-    pub ncolumns: ::std::os::raw::c_int,
-}
-impl Default for MultiAssignRef {
-    fn default() -> Self {
-        let mut s = ::std::mem::MaybeUninit::<Self>::uninit();
-        unsafe {
-            ::std::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
-            s.assume_init()
-        }
-    }
-}
-#[repr(C)]
-#[derive(Debug, Copy, Clone)]
-pub struct SortBy {
-    pub type_: NodeTag,
-    pub node: *mut Node,
-    pub sortby_dir: SortByDir,
-    pub sortby_nulls: SortByNulls,
-    pub useOp: *mut List,
-    pub location: ::std::os::raw::c_int,
-}
-impl Default for SortBy {
-    fn default() -> Self {
-        let mut s = ::std::mem::MaybeUninit::<Self>::uninit();
-        unsafe {
-            ::std::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
-            s.assume_init()
-        }
-    }
-}
-#[repr(C)]
-#[derive(Debug, Copy, Clone)]
-pub struct WindowDef {
-    pub type_: NodeTag,
-    pub name: *mut ::std::os::raw::c_char,
-    pub refname: *mut ::std::os::raw::c_char,
-    pub partitionClause: *mut List,
-    pub orderClause: *mut List,
-    pub frameOptions: ::std::os::raw::c_int,
-    pub startOffset: *mut Node,
-    pub endOffset: *mut Node,
-    pub location: ::std::os::raw::c_int,
-}
-impl Default for WindowDef {
-    fn default() -> Self {
-        let mut s = ::std::mem::MaybeUninit::<Self>::uninit();
-        unsafe {
-            ::std::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
-            s.assume_init()
-        }
-    }
-}
-#[repr(C)]
-#[derive(Debug, Copy, Clone)]
-pub struct RangeSubselect {
-    pub type_: NodeTag,
-    pub lateral: bool,
-    pub subquery: *mut Node,
-    pub alias: *mut Alias,
-}
-impl Default for RangeSubselect {
-    fn default() -> Self {
-        let mut s = ::std::mem::MaybeUninit::<Self>::uninit();
-        unsafe {
-            ::std::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
-            s.assume_init()
-        }
-    }
-}
-#[repr(C)]
-#[derive(Debug, Copy, Clone)]
-pub struct RangeFunction {
-    pub type_: NodeTag,
-    pub lateral: bool,
-    pub ordinality: bool,
-    pub is_rowsfrom: bool,
-    pub functions: *mut List,
-    pub alias: *mut Alias,
-    pub coldeflist: *mut List,
-}
-impl Default for RangeFunction {
-    fn default() -> Self {
-        let mut s = ::std::mem::MaybeUninit::<Self>::uninit();
-        unsafe {
-            ::std::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
-            s.assume_init()
-        }
-    }
-}
-#[repr(C)]
-#[derive(Debug, Copy, Clone)]
-pub struct RangeTableFunc {
-    pub type_: NodeTag,
-    pub lateral: bool,
-    pub docexpr: *mut Node,
-    pub rowexpr: *mut Node,
-    pub namespaces: *mut List,
-    pub columns: *mut List,
-    pub alias: *mut Alias,
-    pub location: ::std::os::raw::c_int,
-}
-impl Default for RangeTableFunc {
-    fn default() -> Self {
-        let mut s = ::std::mem::MaybeUninit::<Self>::uninit();
-        unsafe {
-            ::std::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
-            s.assume_init()
-        }
-    }
-}
-#[repr(C)]
-#[derive(Debug, Copy, Clone)]
-pub struct RangeTableFuncCol {
-    pub type_: NodeTag,
-    pub colname: *mut ::std::os::raw::c_char,
-    pub typeName: *mut TypeName,
-    pub for_ordinality: bool,
-    pub is_not_null: bool,
-    pub colexpr: *mut Node,
-    pub coldefexpr: *mut Node,
-    pub location: ::std::os::raw::c_int,
-}
-impl Default for RangeTableFuncCol {
-    fn default() -> Self {
-        let mut s = ::std::mem::MaybeUninit::<Self>::uninit();
-        unsafe {
-            ::std::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
-            s.assume_init()
-        }
-    }
-}
-#[repr(C)]
-#[derive(Debug, Copy, Clone)]
-pub struct RangeTableSample {
-    pub type_: NodeTag,
-    pub relation: *mut Node,
-    pub method: *mut List,
-    pub args: *mut List,
-    pub repeatable: *mut Node,
-    pub location: ::std::os::raw::c_int,
-}
-impl Default for RangeTableSample {
-    fn default() -> Self {
-        let mut s = ::std::mem::MaybeUninit::<Self>::uninit();
-        unsafe {
-            ::std::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
-            s.assume_init()
-        }
-    }
-}
-#[repr(C)]
-#[derive(Debug, Copy, Clone)]
-pub struct ColumnDef {
-    pub type_: NodeTag,
-    pub colname: *mut ::std::os::raw::c_char,
-    pub typeName: *mut TypeName,
-    pub compression: *mut ::std::os::raw::c_char,
-    pub inhcount: ::std::os::raw::c_int,
-    pub is_local: bool,
-    pub is_not_null: bool,
-    pub is_from_type: bool,
-    pub storage: ::std::os::raw::c_char,
-    pub raw_default: *mut Node,
-    pub cooked_default: *mut Node,
-    pub identity: ::std::os::raw::c_char,
-    pub identitySequence: *mut RangeVar,
-    pub generated: ::std::os::raw::c_char,
-    pub collClause: *mut CollateClause,
-    pub collOid: Oid,
-    pub constraints: *mut List,
-    pub fdwoptions: *mut List,
-    pub location: ::std::os::raw::c_int,
-}
-impl Default for ColumnDef {
-    fn default() -> Self {
-        let mut s = ::std::mem::MaybeUninit::<Self>::uninit();
-        unsafe {
-            ::std::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
-            s.assume_init()
-        }
-    }
-}
-#[repr(C)]
-#[derive(Debug, Copy, Clone)]
-pub struct TableLikeClause {
-    pub type_: NodeTag,
-    pub relation: *mut RangeVar,
-    pub options: bits32,
-    pub relationOid: Oid,
-}
-impl Default for TableLikeClause {
-    fn default() -> Self {
-        let mut s = ::std::mem::MaybeUninit::<Self>::uninit();
-        unsafe {
-            ::std::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
-            s.assume_init()
-        }
-    }
-}
-pub const TableLikeOption_CREATE_TABLE_LIKE_COMMENTS: TableLikeOption = 1;
-pub const TableLikeOption_CREATE_TABLE_LIKE_COMPRESSION: TableLikeOption = 2;
-pub const TableLikeOption_CREATE_TABLE_LIKE_CONSTRAINTS: TableLikeOption = 4;
-pub const TableLikeOption_CREATE_TABLE_LIKE_DEFAULTS: TableLikeOption = 8;
-pub const TableLikeOption_CREATE_TABLE_LIKE_GENERATED: TableLikeOption = 16;
-pub const TableLikeOption_CREATE_TABLE_LIKE_IDENTITY: TableLikeOption = 32;
-pub const TableLikeOption_CREATE_TABLE_LIKE_INDEXES: TableLikeOption = 64;
-pub const TableLikeOption_CREATE_TABLE_LIKE_STATISTICS: TableLikeOption = 128;
-pub const TableLikeOption_CREATE_TABLE_LIKE_STORAGE: TableLikeOption = 256;
-pub const TableLikeOption_CREATE_TABLE_LIKE_ALL: TableLikeOption = 2147483647;
-pub type TableLikeOption = ::std::os::raw::c_uint;
-#[repr(C)]
-#[derive(Debug, Copy, Clone)]
-pub struct IndexElem {
-    pub type_: NodeTag,
-    pub name: *mut ::std::os::raw::c_char,
-    pub expr: *mut Node,
-    pub indexcolname: *mut ::std::os::raw::c_char,
-    pub collation: *mut List,
-    pub opclass: *mut List,
-    pub opclassopts: *mut List,
-    pub ordering: SortByDir,
-    pub nulls_ordering: SortByNulls,
-}
-impl Default for IndexElem {
-    fn default() -> Self {
-        let mut s = ::std::mem::MaybeUninit::<Self>::uninit();
-        unsafe {
-            ::std::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
-            s.assume_init()
-        }
-    }
-}
-pub const DefElemAction_DEFELEM_UNSPEC: DefElemAction = 0;
-pub const DefElemAction_DEFELEM_SET: DefElemAction = 1;
-pub const DefElemAction_DEFELEM_ADD: DefElemAction = 2;
-pub const DefElemAction_DEFELEM_DROP: DefElemAction = 3;
-pub type DefElemAction = ::std::os::raw::c_uint;
-#[repr(C)]
-#[derive(Debug, Copy, Clone)]
-pub struct DefElem {
-    pub type_: NodeTag,
-    pub defnamespace: *mut ::std::os::raw::c_char,
-    pub defname: *mut ::std::os::raw::c_char,
-    pub arg: *mut Node,
-    pub defaction: DefElemAction,
-    pub location: ::std::os::raw::c_int,
-}
-impl Default for DefElem {
-    fn default() -> Self {
-        let mut s = ::std::mem::MaybeUninit::<Self>::uninit();
-        unsafe {
-            ::std::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
-            s.assume_init()
-        }
-    }
-}
-#[repr(C)]
-#[derive(Debug, Copy, Clone)]
-pub struct LockingClause {
-    pub type_: NodeTag,
-    pub lockedRels: *mut List,
-    pub strength: LockClauseStrength,
-    pub waitPolicy: LockWaitPolicy,
-}
-impl Default for LockingClause {
-    fn default() -> Self {
-        let mut s = ::std::mem::MaybeUninit::<Self>::uninit();
-        unsafe {
-            ::std::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
-            s.assume_init()
-        }
-    }
-}
-#[repr(C)]
-#[derive(Debug, Copy, Clone)]
-pub struct XmlSerialize {
-    pub type_: NodeTag,
-    pub xmloption: XmlOptionType,
-    pub expr: *mut Node,
-    pub typeName: *mut TypeName,
-    pub location: ::std::os::raw::c_int,
-}
-impl Default for XmlSerialize {
-    fn default() -> Self {
-        let mut s = ::std::mem::MaybeUninit::<Self>::uninit();
-        unsafe {
-            ::std::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
-            s.assume_init()
-        }
-    }
-}
-#[repr(C)]
-#[derive(Debug, Copy, Clone)]
-pub struct PartitionElem {
-    pub type_: NodeTag,
-    pub name: *mut ::std::os::raw::c_char,
-    pub expr: *mut Node,
-    pub collation: *mut List,
-    pub opclass: *mut List,
-    pub location: ::std::os::raw::c_int,
-}
-impl Default for PartitionElem {
-    fn default() -> Self {
-        let mut s = ::std::mem::MaybeUninit::<Self>::uninit();
-        unsafe {
-            ::std::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
-            s.assume_init()
-        }
-    }
-}
-#[repr(C)]
-#[derive(Debug, Copy, Clone)]
-pub struct PartitionSpec {
-    pub type_: NodeTag,
-    pub strategy: *mut ::std::os::raw::c_char,
-    pub partParams: *mut List,
-    pub location: ::std::os::raw::c_int,
-}
-impl Default for PartitionSpec {
-    fn default() -> Self {
-        let mut s = ::std::mem::MaybeUninit::<Self>::uninit();
-        unsafe {
-            ::std::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
-            s.assume_init()
-        }
-    }
-}
-#[repr(C)]
-#[derive(Debug, Copy, Clone)]
-pub struct PartitionBoundSpec {
-    pub type_: NodeTag,
-    pub strategy: ::std::os::raw::c_char,
-    pub is_default: bool,
-    pub modulus: ::std::os::raw::c_int,
-    pub remainder: ::std::os::raw::c_int,
-    pub listdatums: *mut List,
-    pub lowerdatums: *mut List,
-    pub upperdatums: *mut List,
-    pub location: ::std::os::raw::c_int,
-}
-impl Default for PartitionBoundSpec {
-    fn default() -> Self {
-        let mut s = ::std::mem::MaybeUninit::<Self>::uninit();
-        unsafe {
-            ::std::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
-            s.assume_init()
-        }
-    }
-}
-pub const PartitionRangeDatumKind_PARTITION_RANGE_DATUM_MINVALUE: PartitionRangeDatumKind = -1;
-pub const PartitionRangeDatumKind_PARTITION_RANGE_DATUM_VALUE: PartitionRangeDatumKind = 0;
-pub const PartitionRangeDatumKind_PARTITION_RANGE_DATUM_MAXVALUE: PartitionRangeDatumKind = 1;
-pub type PartitionRangeDatumKind = ::std::os::raw::c_int;
-#[repr(C)]
-#[derive(Debug, Copy, Clone)]
-pub struct PartitionRangeDatum {
-    pub type_: NodeTag,
-    pub kind: PartitionRangeDatumKind,
-    pub value: *mut Node,
-    pub location: ::std::os::raw::c_int,
-}
-impl Default for PartitionRangeDatum {
-    fn default() -> Self {
-        let mut s = ::std::mem::MaybeUninit::<Self>::uninit();
-        unsafe {
-            ::std::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
-            s.assume_init()
-        }
-    }
-}
-#[repr(C)]
-#[derive(Debug, Copy, Clone)]
-pub struct PartitionCmd {
-    pub type_: NodeTag,
-    pub name: *mut RangeVar,
-    pub bound: *mut PartitionBoundSpec,
-    pub concurrent: bool,
-}
-impl Default for PartitionCmd {
-    fn default() -> Self {
-        let mut s = ::std::mem::MaybeUninit::<Self>::uninit();
-        unsafe {
-            ::std::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
-            s.assume_init()
-        }
-    }
-}
-pub const RTEKind_RTE_RELATION: RTEKind = 0;
-pub const RTEKind_RTE_SUBQUERY: RTEKind = 1;
-pub const RTEKind_RTE_JOIN: RTEKind = 2;
-pub const RTEKind_RTE_FUNCTION: RTEKind = 3;
-pub const RTEKind_RTE_TABLEFUNC: RTEKind = 4;
-pub const RTEKind_RTE_VALUES: RTEKind = 5;
-pub const RTEKind_RTE_CTE: RTEKind = 6;
-pub const RTEKind_RTE_NAMEDTUPLESTORE: RTEKind = 7;
-pub const RTEKind_RTE_RESULT: RTEKind = 8;
-pub type RTEKind = ::std::os::raw::c_uint;
-#[repr(C)]
-#[derive(Debug, Copy, Clone)]
-pub struct RangeTblEntry {
-    pub type_: NodeTag,
-    pub rtekind: RTEKind,
-    pub relid: Oid,
-    pub relkind: ::std::os::raw::c_char,
-    pub rellockmode: ::std::os::raw::c_int,
-    pub tablesample: *mut TableSampleClause,
-    pub subquery: *mut Query,
-    pub security_barrier: bool,
-    pub jointype: JoinType,
-    pub joinmergedcols: ::std::os::raw::c_int,
-    pub joinaliasvars: *mut List,
-    pub joinleftcols: *mut List,
-    pub joinrightcols: *mut List,
-    pub join_using_alias: *mut Alias,
-    pub functions: *mut List,
-    pub funcordinality: bool,
-    pub tablefunc: *mut TableFunc,
-    pub values_lists: *mut List,
-    pub ctename: *mut ::std::os::raw::c_char,
-    pub ctelevelsup: Index,
-    pub self_reference: bool,
-    pub coltypes: *mut List,
-    pub coltypmods: *mut List,
-    pub colcollations: *mut List,
-    pub enrname: *mut ::std::os::raw::c_char,
-    pub enrtuples: f64,
-    pub alias: *mut Alias,
-    pub eref: *mut Alias,
-    pub lateral: bool,
-    pub inh: bool,
-    pub inFromCl: bool,
-    pub requiredPerms: AclMode,
-    pub checkAsUser: Oid,
-    pub selectedCols: *mut Bitmapset,
-    pub insertedCols: *mut Bitmapset,
-    pub updatedCols: *mut Bitmapset,
-    pub extraUpdatedCols: *mut Bitmapset,
-    pub securityQuals: *mut List,
-}
-impl Default for RangeTblEntry {
-    fn default() -> Self {
-        let mut s = ::std::mem::MaybeUninit::<Self>::uninit();
-        unsafe {
-            ::std::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
-            s.assume_init()
-        }
-    }
-}
-#[repr(C)]
-#[derive(Debug, Copy, Clone)]
-pub struct RangeTblFunction {
-    pub type_: NodeTag,
-    pub funcexpr: *mut Node,
-    pub funccolcount: ::std::os::raw::c_int,
-    pub funccolnames: *mut List,
-    pub funccoltypes: *mut List,
-    pub funccoltypmods: *mut List,
-    pub funccolcollations: *mut List,
-    pub funcparams: *mut Bitmapset,
-}
-impl Default for RangeTblFunction {
-    fn default() -> Self {
-        let mut s = ::std::mem::MaybeUninit::<Self>::uninit();
-        unsafe {
-            ::std::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
-            s.assume_init()
-        }
-    }
-}
-#[repr(C)]
-#[derive(Debug, Copy, Clone)]
-pub struct TableSampleClause {
-    pub type_: NodeTag,
-    pub tsmhandler: Oid,
-    pub args: *mut List,
-    pub repeatable: *mut Expr,
-}
-impl Default for TableSampleClause {
-    fn default() -> Self {
-        let mut s = ::std::mem::MaybeUninit::<Self>::uninit();
-        unsafe {
-            ::std::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
-            s.assume_init()
-        }
-    }
-}
-pub const WCOKind_WCO_VIEW_CHECK: WCOKind = 0;
-pub const WCOKind_WCO_RLS_INSERT_CHECK: WCOKind = 1;
-pub const WCOKind_WCO_RLS_UPDATE_CHECK: WCOKind = 2;
-pub const WCOKind_WCO_RLS_CONFLICT_CHECK: WCOKind = 3;
-pub type WCOKind = ::std::os::raw::c_uint;
-#[repr(C)]
-#[derive(Debug, Copy, Clone)]
-pub struct WithCheckOption {
-    pub type_: NodeTag,
-    pub kind: WCOKind,
-    pub relname: *mut ::std::os::raw::c_char,
-    pub polname: *mut ::std::os::raw::c_char,
-    pub qual: *mut Node,
-    pub cascaded: bool,
-}
-impl Default for WithCheckOption {
-    fn default() -> Self {
-        let mut s = ::std::mem::MaybeUninit::<Self>::uninit();
-        unsafe {
-            ::std::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
-            s.assume_init()
-        }
-    }
-}
-#[repr(C)]
-#[derive(Debug, Copy, Clone)]
-pub struct SortGroupClause {
-    pub type_: NodeTag,
-    pub tleSortGroupRef: Index,
-    pub eqop: Oid,
-    pub sortop: Oid,
-    pub nulls_first: bool,
-    pub hashable: bool,
-}
-impl Default for SortGroupClause {
-    fn default() -> Self {
-        let mut s = ::std::mem::MaybeUninit::<Self>::uninit();
-        unsafe {
-            ::std::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
-            s.assume_init()
-        }
-    }
-}
-pub const GroupingSetKind_GROUPING_SET_EMPTY: GroupingSetKind = 0;
-pub const GroupingSetKind_GROUPING_SET_SIMPLE: GroupingSetKind = 1;
-pub const GroupingSetKind_GROUPING_SET_ROLLUP: GroupingSetKind = 2;
-pub const GroupingSetKind_GROUPING_SET_CUBE: GroupingSetKind = 3;
-pub const GroupingSetKind_GROUPING_SET_SETS: GroupingSetKind = 4;
-pub type GroupingSetKind = ::std::os::raw::c_uint;
-#[repr(C)]
-#[derive(Debug, Copy, Clone)]
-pub struct GroupingSet {
-    pub type_: NodeTag,
-    pub kind: GroupingSetKind,
-    pub content: *mut List,
-    pub location: ::std::os::raw::c_int,
-}
-impl Default for GroupingSet {
-    fn default() -> Self {
-        let mut s = ::std::mem::MaybeUninit::<Self>::uninit();
-        unsafe {
-            ::std::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
-            s.assume_init()
-        }
-    }
-}
-#[repr(C)]
-#[derive(Debug, Copy, Clone)]
-pub struct WindowClause {
-    pub type_: NodeTag,
-    pub name: *mut ::std::os::raw::c_char,
-    pub refname: *mut ::std::os::raw::c_char,
-    pub partitionClause: *mut List,
-    pub orderClause: *mut List,
-    pub frameOptions: ::std::os::raw::c_int,
-    pub startOffset: *mut Node,
-    pub endOffset: *mut Node,
-    pub startInRangeFunc: Oid,
-    pub endInRangeFunc: Oid,
-    pub inRangeColl: Oid,
-    pub inRangeAsc: bool,
-    pub inRangeNullsFirst: bool,
-    pub winref: Index,
-    pub copiedOrder: bool,
-}
-impl Default for WindowClause {
-    fn default() -> Self {
-        let mut s = ::std::mem::MaybeUninit::<Self>::uninit();
-        unsafe {
-            ::std::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
-            s.assume_init()
-        }
-    }
-}
-#[repr(C)]
-#[derive(Debug, Copy, Clone)]
-pub struct RowMarkClause {
-    pub type_: NodeTag,
-    pub rti: Index,
-    pub strength: LockClauseStrength,
-    pub waitPolicy: LockWaitPolicy,
-    pub pushedDown: bool,
-}
-impl Default for RowMarkClause {
-    fn default() -> Self {
-        let mut s = ::std::mem::MaybeUninit::<Self>::uninit();
-        unsafe {
-            ::std::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
-            s.assume_init()
-        }
-    }
-}
-#[repr(C)]
-#[derive(Debug, Copy, Clone)]
-pub struct WithClause {
-    pub type_: NodeTag,
-    pub ctes: *mut List,
-    pub recursive: bool,
-    pub location: ::std::os::raw::c_int,
-}
-impl Default for WithClause {
-    fn default() -> Self {
-        let mut s = ::std::mem::MaybeUninit::<Self>::uninit();
-        unsafe {
-            ::std::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
-            s.assume_init()
-        }
-    }
-}
-#[repr(C)]
-#[derive(Debug, Copy, Clone)]
-pub struct InferClause {
-    pub type_: NodeTag,
-    pub indexElems: *mut List,
-    pub whereClause: *mut Node,
-    pub conname: *mut ::std::os::raw::c_char,
-    pub location: ::std::os::raw::c_int,
-}
-impl Default for InferClause {
-    fn default() -> Self {
-        let mut s = ::std::mem::MaybeUninit::<Self>::uninit();
-        unsafe {
-            ::std::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
-            s.assume_init()
-        }
-    }
-}
-#[repr(C)]
-#[derive(Debug, Copy, Clone)]
-pub struct OnConflictClause {
-    pub type_: NodeTag,
-    pub action: OnConflictAction,
-    pub infer: *mut InferClause,
-    pub targetList: *mut List,
-    pub whereClause: *mut Node,
-    pub location: ::std::os::raw::c_int,
-}
-impl Default for OnConflictClause {
-    fn default() -> Self {
-        let mut s = ::std::mem::MaybeUninit::<Self>::uninit();
-        unsafe {
-            ::std::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
-            s.assume_init()
-        }
-    }
-}
-pub const CTEMaterialize_CTEMaterializeDefault: CTEMaterialize = 0;
-pub const CTEMaterialize_CTEMaterializeAlways: CTEMaterialize = 1;
-pub const CTEMaterialize_CTEMaterializeNever: CTEMaterialize = 2;
-pub type CTEMaterialize = ::std::os::raw::c_uint;
-#[repr(C)]
-#[derive(Debug, Copy, Clone)]
-pub struct CTESearchClause {
-    pub type_: NodeTag,
-    pub search_col_list: *mut List,
-    pub search_breadth_first: bool,
-    pub search_seq_column: *mut ::std::os::raw::c_char,
-    pub location: ::std::os::raw::c_int,
-}
-impl Default for CTESearchClause {
-    fn default() -> Self {
-        let mut s = ::std::mem::MaybeUninit::<Self>::uninit();
-        unsafe {
-            ::std::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
-            s.assume_init()
-        }
-    }
-}
-#[repr(C)]
-#[derive(Debug, Copy, Clone)]
-pub struct CTECycleClause {
-    pub type_: NodeTag,
-    pub cycle_col_list: *mut List,
-    pub cycle_mark_column: *mut ::std::os::raw::c_char,
-    pub cycle_mark_value: *mut Node,
-    pub cycle_mark_default: *mut Node,
-    pub cycle_path_column: *mut ::std::os::raw::c_char,
-    pub location: ::std::os::raw::c_int,
-    pub cycle_mark_type: Oid,
-    pub cycle_mark_typmod: ::std::os::raw::c_int,
-    pub cycle_mark_collation: Oid,
-    pub cycle_mark_neop: Oid,
-}
-impl Default for CTECycleClause {
-    fn default() -> Self {
-        let mut s = ::std::mem::MaybeUninit::<Self>::uninit();
-        unsafe {
-            ::std::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
-            s.assume_init()
-        }
-    }
-}
-#[repr(C)]
-#[derive(Debug, Copy, Clone)]
-pub struct CommonTableExpr {
-    pub type_: NodeTag,
-    pub ctename: *mut ::std::os::raw::c_char,
-    pub aliascolnames: *mut List,
-    pub ctematerialized: CTEMaterialize,
-    pub ctequery: *mut Node,
-    pub search_clause: *mut CTESearchClause,
-    pub cycle_clause: *mut CTECycleClause,
-    pub location: ::std::os::raw::c_int,
-    pub cterecursive: bool,
-    pub cterefcount: ::std::os::raw::c_int,
-    pub ctecolnames: *mut List,
-    pub ctecoltypes: *mut List,
-    pub ctecoltypmods: *mut List,
-    pub ctecolcollations: *mut List,
-}
-impl Default for CommonTableExpr {
-    fn default() -> Self {
-        let mut s = ::std::mem::MaybeUninit::<Self>::uninit();
-        unsafe {
-            ::std::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
-            s.assume_init()
-        }
-    }
-}
-#[repr(C)]
-#[derive(Debug, Copy, Clone)]
-pub struct TriggerTransition {
-    pub type_: NodeTag,
-    pub name: *mut ::std::os::raw::c_char,
-    pub isNew: bool,
-    pub isTable: bool,
-}
-impl Default for TriggerTransition {
-    fn default() -> Self {
-        let mut s = ::std::mem::MaybeUninit::<Self>::uninit();
-        unsafe {
-            ::std::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
-            s.assume_init()
-        }
-    }
-}
-#[doc = "\t\tRaw Grammar Output Statements"]
-#[repr(C)]
-#[derive(Debug, Copy, Clone)]
-pub struct RawStmt {
-    pub type_: NodeTag,
-    pub stmt: *mut Node,
-    pub stmt_location: ::std::os::raw::c_int,
-    pub stmt_len: ::std::os::raw::c_int,
-}
-impl Default for RawStmt {
-    fn default() -> Self {
-        let mut s = ::std::mem::MaybeUninit::<Self>::uninit();
-        unsafe {
-            ::std::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
-            s.assume_init()
-        }
-    }
-}
-#[doc = "\t\tOptimizable Statements"]
-#[repr(C)]
-#[derive(Debug, Copy, Clone)]
-pub struct InsertStmt {
-    pub type_: NodeTag,
-    pub relation: *mut RangeVar,
-    pub cols: *mut List,
-    pub selectStmt: *mut Node,
-    pub onConflictClause: *mut OnConflictClause,
-    pub returningList: *mut List,
-    pub withClause: *mut WithClause,
-    pub override_: OverridingKind,
-}
-impl Default for InsertStmt {
-    fn default() -> Self {
-        let mut s = ::std::mem::MaybeUninit::<Self>::uninit();
-        unsafe {
-            ::std::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
-            s.assume_init()
-        }
-    }
-}
-#[repr(C)]
-#[derive(Debug, Copy, Clone)]
-pub struct DeleteStmt {
-    pub type_: NodeTag,
-    pub relation: *mut RangeVar,
-    pub usingClause: *mut List,
-    pub whereClause: *mut Node,
-    pub returningList: *mut List,
-    pub withClause: *mut WithClause,
-}
-impl Default for DeleteStmt {
-    fn default() -> Self {
-        let mut s = ::std::mem::MaybeUninit::<Self>::uninit();
-        unsafe {
-            ::std::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
-            s.assume_init()
-        }
-    }
-}
-#[repr(C)]
-#[derive(Debug, Copy, Clone)]
-pub struct UpdateStmt {
-    pub type_: NodeTag,
-    pub relation: *mut RangeVar,
-    pub targetList: *mut List,
-    pub whereClause: *mut Node,
-    pub fromClause: *mut List,
-    pub returningList: *mut List,
-    pub withClause: *mut WithClause,
-}
-impl Default for UpdateStmt {
-    fn default() -> Self {
-        let mut s = ::std::mem::MaybeUninit::<Self>::uninit();
-        unsafe {
-            ::std::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
-            s.assume_init()
-        }
-    }
-}
-pub const SetOperation_SETOP_NONE: SetOperation = 0;
-pub const SetOperation_SETOP_UNION: SetOperation = 1;
-pub const SetOperation_SETOP_INTERSECT: SetOperation = 2;
-pub const SetOperation_SETOP_EXCEPT: SetOperation = 3;
-pub type SetOperation = ::std::os::raw::c_uint;
-#[repr(C)]
-#[derive(Debug, Copy, Clone)]
-pub struct SelectStmt {
-    pub type_: NodeTag,
-    pub distinctClause: *mut List,
-    pub intoClause: *mut IntoClause,
-    pub targetList: *mut List,
-    pub fromClause: *mut List,
-    pub whereClause: *mut Node,
-    pub groupClause: *mut List,
-    pub groupDistinct: bool,
-    pub havingClause: *mut Node,
-    pub windowClause: *mut List,
-    pub valuesLists: *mut List,
-    pub sortClause: *mut List,
-    pub limitOffset: *mut Node,
-    pub limitCount: *mut Node,
-    pub limitOption: LimitOption,
-    pub lockingClause: *mut List,
-    pub withClause: *mut WithClause,
-    pub op: SetOperation,
-    pub all: bool,
-    pub larg: *mut SelectStmt,
-    pub rarg: *mut SelectStmt,
-}
-impl Default for SelectStmt {
-    fn default() -> Self {
-        let mut s = ::std::mem::MaybeUninit::<Self>::uninit();
-        unsafe {
-            ::std::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
-            s.assume_init()
-        }
-    }
-}
-#[repr(C)]
-#[derive(Debug, Copy, Clone)]
-pub struct SetOperationStmt {
-    pub type_: NodeTag,
-    pub op: SetOperation,
-    pub all: bool,
-    pub larg: *mut Node,
-    pub rarg: *mut Node,
-    pub colTypes: *mut List,
-    pub colTypmods: *mut List,
-    pub colCollations: *mut List,
-    pub groupClauses: *mut List,
-}
-impl Default for SetOperationStmt {
-    fn default() -> Self {
-        let mut s = ::std::mem::MaybeUninit::<Self>::uninit();
-        unsafe {
-            ::std::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
-            s.assume_init()
-        }
-    }
-}
-#[repr(C)]
-#[derive(Debug, Copy, Clone)]
-pub struct ReturnStmt {
-    pub type_: NodeTag,
-    pub returnval: *mut Node,
-}
-impl Default for ReturnStmt {
-    fn default() -> Self {
-        let mut s = ::std::mem::MaybeUninit::<Self>::uninit();
-        unsafe {
-            ::std::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
-            s.assume_init()
-        }
-    }
-}
-#[repr(C)]
-#[derive(Debug, Copy, Clone)]
-pub struct PLAssignStmt {
-    pub type_: NodeTag,
-    pub name: *mut ::std::os::raw::c_char,
-    pub indirection: *mut List,
-    pub nnames: ::std::os::raw::c_int,
-    pub val: *mut SelectStmt,
-    pub location: ::std::os::raw::c_int,
-}
-impl Default for PLAssignStmt {
-    fn default() -> Self {
-        let mut s = ::std::mem::MaybeUninit::<Self>::uninit();
-        unsafe {
-            ::std::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
-            s.assume_init()
-        }
-    }
-}
-pub const ObjectType_OBJECT_ACCESS_METHOD: ObjectType = 0;
-pub const ObjectType_OBJECT_AGGREGATE: ObjectType = 1;
-pub const ObjectType_OBJECT_AMOP: ObjectType = 2;
-pub const ObjectType_OBJECT_AMPROC: ObjectType = 3;
-pub const ObjectType_OBJECT_ATTRIBUTE: ObjectType = 4;
-pub const ObjectType_OBJECT_CAST: ObjectType = 5;
-pub const ObjectType_OBJECT_COLUMN: ObjectType = 6;
-pub const ObjectType_OBJECT_COLLATION: ObjectType = 7;
-pub const ObjectType_OBJECT_CONVERSION: ObjectType = 8;
-pub const ObjectType_OBJECT_DATABASE: ObjectType = 9;
-pub const ObjectType_OBJECT_DEFAULT: ObjectType = 10;
-pub const ObjectType_OBJECT_DEFACL: ObjectType = 11;
-pub const ObjectType_OBJECT_DOMAIN: ObjectType = 12;
-pub const ObjectType_OBJECT_DOMCONSTRAINT: ObjectType = 13;
-pub const ObjectType_OBJECT_EVENT_TRIGGER: ObjectType = 14;
-pub const ObjectType_OBJECT_EXTENSION: ObjectType = 15;
-pub const ObjectType_OBJECT_FDW: ObjectType = 16;
-pub const ObjectType_OBJECT_FOREIGN_SERVER: ObjectType = 17;
-pub const ObjectType_OBJECT_FOREIGN_TABLE: ObjectType = 18;
-pub const ObjectType_OBJECT_FUNCTION: ObjectType = 19;
-pub const ObjectType_OBJECT_INDEX: ObjectType = 20;
-pub const ObjectType_OBJECT_LANGUAGE: ObjectType = 21;
-pub const ObjectType_OBJECT_LARGEOBJECT: ObjectType = 22;
-pub const ObjectType_OBJECT_MATVIEW: ObjectType = 23;
-pub const ObjectType_OBJECT_OPCLASS: ObjectType = 24;
-pub const ObjectType_OBJECT_OPERATOR: ObjectType = 25;
-pub const ObjectType_OBJECT_OPFAMILY: ObjectType = 26;
-pub const ObjectType_OBJECT_POLICY: ObjectType = 27;
-pub const ObjectType_OBJECT_PROCEDURE: ObjectType = 28;
-pub const ObjectType_OBJECT_PUBLICATION: ObjectType = 29;
-pub const ObjectType_OBJECT_PUBLICATION_REL: ObjectType = 30;
-pub const ObjectType_OBJECT_ROLE: ObjectType = 31;
-pub const ObjectType_OBJECT_ROUTINE: ObjectType = 32;
-pub const ObjectType_OBJECT_RULE: ObjectType = 33;
-pub const ObjectType_OBJECT_SCHEMA: ObjectType = 34;
-pub const ObjectType_OBJECT_SEQUENCE: ObjectType = 35;
-pub const ObjectType_OBJECT_SUBSCRIPTION: ObjectType = 36;
-pub const ObjectType_OBJECT_STATISTIC_EXT: ObjectType = 37;
-pub const ObjectType_OBJECT_TABCONSTRAINT: ObjectType = 38;
-pub const ObjectType_OBJECT_TABLE: ObjectType = 39;
-pub const ObjectType_OBJECT_TABLESPACE: ObjectType = 40;
-pub const ObjectType_OBJECT_TRANSFORM: ObjectType = 41;
-pub const ObjectType_OBJECT_TRIGGER: ObjectType = 42;
-pub const ObjectType_OBJECT_TSCONFIGURATION: ObjectType = 43;
-pub const ObjectType_OBJECT_TSDICTIONARY: ObjectType = 44;
-pub const ObjectType_OBJECT_TSPARSER: ObjectType = 45;
-pub const ObjectType_OBJECT_TSTEMPLATE: ObjectType = 46;
-pub const ObjectType_OBJECT_TYPE: ObjectType = 47;
-pub const ObjectType_OBJECT_USER_MAPPING: ObjectType = 48;
-pub const ObjectType_OBJECT_VIEW: ObjectType = 49;
-#[doc = "\t\tOther Statements (no optimizations required)"]
-#[doc = ""]
-#[doc = "\t\tThese are not touched by parser/analyze.c except to put them into"]
-#[doc = "\t\tthe utilityStmt field of a Query.  This is eventually passed to"]
-#[doc = "\t\tProcessUtility (by-passing rewriting and planning).  Some of the"]
-#[doc = "\t\tstatements do need attention from parse analysis, and this is"]
-#[doc = "\t\tdone by routines in parser/parse_utilcmd.c after ProcessUtility"]
-#[doc = "\t\treceives the command for execution."]
-#[doc = "\t\tDECLARE CURSOR, EXPLAIN, and CREATE TABLE AS are special cases:"]
-#[doc = "\t\tthey contain optimizable statements, which get processed normally"]
-#[doc = "\t\tby parser/analyze.c."]
-pub type ObjectType = ::std::os::raw::c_uint;
-#[repr(C)]
-#[derive(Debug, Copy, Clone)]
-pub struct CreateSchemaStmt {
-    pub type_: NodeTag,
-    pub schemaname: *mut ::std::os::raw::c_char,
-    pub authrole: *mut RoleSpec,
-    pub schemaElts: *mut List,
-    pub if_not_exists: bool,
-}
-impl Default for CreateSchemaStmt {
-    fn default() -> Self {
-        let mut s = ::std::mem::MaybeUninit::<Self>::uninit();
-        unsafe {
-            ::std::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
-            s.assume_init()
-        }
-    }
-}
-pub const DropBehavior_DROP_RESTRICT: DropBehavior = 0;
-pub const DropBehavior_DROP_CASCADE: DropBehavior = 1;
-pub type DropBehavior = ::std::os::raw::c_uint;
-#[repr(C)]
-#[derive(Debug, Copy, Clone)]
-pub struct AlterTableStmt {
-    pub type_: NodeTag,
-    pub relation: *mut RangeVar,
-    pub cmds: *mut List,
-    pub objtype: ObjectType,
-    pub missing_ok: bool,
-}
-impl Default for AlterTableStmt {
-    fn default() -> Self {
-        let mut s = ::std::mem::MaybeUninit::<Self>::uninit();
-        unsafe {
-            ::std::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
-            s.assume_init()
-        }
-    }
-}
-pub const AlterTableType_AT_AddColumn: AlterTableType = 0;
-pub const AlterTableType_AT_AddColumnRecurse: AlterTableType = 1;
-pub const AlterTableType_AT_AddColumnToView: AlterTableType = 2;
-pub const AlterTableType_AT_ColumnDefault: AlterTableType = 3;
-pub const AlterTableType_AT_CookedColumnDefault: AlterTableType = 4;
-pub const AlterTableType_AT_DropNotNull: AlterTableType = 5;
-pub const AlterTableType_AT_SetNotNull: AlterTableType = 6;
-pub const AlterTableType_AT_DropExpression: AlterTableType = 7;
-pub const AlterTableType_AT_CheckNotNull: AlterTableType = 8;
-pub const AlterTableType_AT_SetStatistics: AlterTableType = 9;
-pub const AlterTableType_AT_SetOptions: AlterTableType = 10;
-pub const AlterTableType_AT_ResetOptions: AlterTableType = 11;
-pub const AlterTableType_AT_SetStorage: AlterTableType = 12;
-pub const AlterTableType_AT_SetCompression: AlterTableType = 13;
-pub const AlterTableType_AT_DropColumn: AlterTableType = 14;
-pub const AlterTableType_AT_DropColumnRecurse: AlterTableType = 15;
-pub const AlterTableType_AT_AddIndex: AlterTableType = 16;
-pub const AlterTableType_AT_ReAddIndex: AlterTableType = 17;
-pub const AlterTableType_AT_AddConstraint: AlterTableType = 18;
-pub const AlterTableType_AT_AddConstraintRecurse: AlterTableType = 19;
-pub const AlterTableType_AT_ReAddConstraint: AlterTableType = 20;
-pub const AlterTableType_AT_ReAddDomainConstraint: AlterTableType = 21;
-pub const AlterTableType_AT_AlterConstraint: AlterTableType = 22;
-pub const AlterTableType_AT_ValidateConstraint: AlterTableType = 23;
-pub const AlterTableType_AT_ValidateConstraintRecurse: AlterTableType = 24;
-pub const AlterTableType_AT_AddIndexConstraint: AlterTableType = 25;
-pub const AlterTableType_AT_DropConstraint: AlterTableType = 26;
-pub const AlterTableType_AT_DropConstraintRecurse: AlterTableType = 27;
-pub const AlterTableType_AT_ReAddComment: AlterTableType = 28;
-pub const AlterTableType_AT_AlterColumnType: AlterTableType = 29;
-pub const AlterTableType_AT_AlterColumnGenericOptions: AlterTableType = 30;
-pub const AlterTableType_AT_ChangeOwner: AlterTableType = 31;
-pub const AlterTableType_AT_ClusterOn: AlterTableType = 32;
-pub const AlterTableType_AT_DropCluster: AlterTableType = 33;
-pub const AlterTableType_AT_SetLogged: AlterTableType = 34;
-pub const AlterTableType_AT_SetUnLogged: AlterTableType = 35;
-pub const AlterTableType_AT_DropOids: AlterTableType = 36;
-pub const AlterTableType_AT_SetTableSpace: AlterTableType = 37;
-pub const AlterTableType_AT_SetRelOptions: AlterTableType = 38;
-pub const AlterTableType_AT_ResetRelOptions: AlterTableType = 39;
-pub const AlterTableType_AT_ReplaceRelOptions: AlterTableType = 40;
-pub const AlterTableType_AT_EnableTrig: AlterTableType = 41;
-pub const AlterTableType_AT_EnableAlwaysTrig: AlterTableType = 42;
-pub const AlterTableType_AT_EnableReplicaTrig: AlterTableType = 43;
-pub const AlterTableType_AT_DisableTrig: AlterTableType = 44;
-pub const AlterTableType_AT_EnableTrigAll: AlterTableType = 45;
-pub const AlterTableType_AT_DisableTrigAll: AlterTableType = 46;
-pub const AlterTableType_AT_EnableTrigUser: AlterTableType = 47;
-pub const AlterTableType_AT_DisableTrigUser: AlterTableType = 48;
-pub const AlterTableType_AT_EnableRule: AlterTableType = 49;
-pub const AlterTableType_AT_EnableAlwaysRule: AlterTableType = 50;
-pub const AlterTableType_AT_EnableReplicaRule: AlterTableType = 51;
-pub const AlterTableType_AT_DisableRule: AlterTableType = 52;
-pub const AlterTableType_AT_AddInherit: AlterTableType = 53;
-pub const AlterTableType_AT_DropInherit: AlterTableType = 54;
-pub const AlterTableType_AT_AddOf: AlterTableType = 55;
-pub const AlterTableType_AT_DropOf: AlterTableType = 56;
-pub const AlterTableType_AT_ReplicaIdentity: AlterTableType = 57;
-pub const AlterTableType_AT_EnableRowSecurity: AlterTableType = 58;
-pub const AlterTableType_AT_DisableRowSecurity: AlterTableType = 59;
-pub const AlterTableType_AT_ForceRowSecurity: AlterTableType = 60;
-pub const AlterTableType_AT_NoForceRowSecurity: AlterTableType = 61;
-pub const AlterTableType_AT_GenericOptions: AlterTableType = 62;
-pub const AlterTableType_AT_AttachPartition: AlterTableType = 63;
-pub const AlterTableType_AT_DetachPartition: AlterTableType = 64;
-pub const AlterTableType_AT_DetachPartitionFinalize: AlterTableType = 65;
-pub const AlterTableType_AT_AddIdentity: AlterTableType = 66;
-pub const AlterTableType_AT_SetIdentity: AlterTableType = 67;
-pub const AlterTableType_AT_DropIdentity: AlterTableType = 68;
-pub const AlterTableType_AT_ReAddStatistics: AlterTableType = 69;
-pub type AlterTableType = ::std::os::raw::c_uint;
-#[repr(C)]
-#[derive(Debug, Copy, Clone)]
-pub struct ReplicaIdentityStmt {
-    pub type_: NodeTag,
-    pub identity_type: ::std::os::raw::c_char,
-    pub name: *mut ::std::os::raw::c_char,
-}
-impl Default for ReplicaIdentityStmt {
-    fn default() -> Self {
-        let mut s = ::std::mem::MaybeUninit::<Self>::uninit();
-        unsafe {
-            ::std::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
-            s.assume_init()
-        }
-    }
-}
-#[repr(C)]
-#[derive(Debug, Copy, Clone)]
-pub struct AlterTableCmd {
-    pub type_: NodeTag,
-    pub subtype: AlterTableType,
-    pub name: *mut ::std::os::raw::c_char,
-    pub num: int16,
-    pub newowner: *mut RoleSpec,
-    pub def: *mut Node,
-    pub behavior: DropBehavior,
-    pub missing_ok: bool,
-    pub recurse: bool,
-}
-impl Default for AlterTableCmd {
-    fn default() -> Self {
-        let mut s = ::std::mem::MaybeUninit::<Self>::uninit();
-        unsafe {
-            ::std::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
-            s.assume_init()
-        }
-    }
-}
-#[repr(C)]
-#[derive(Debug, Copy, Clone)]
-pub struct AlterCollationStmt {
-    pub type_: NodeTag,
-    pub collname: *mut List,
-}
-impl Default for AlterCollationStmt {
-    fn default() -> Self {
-        let mut s = ::std::mem::MaybeUninit::<Self>::uninit();
-        unsafe {
-            ::std::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
-            s.assume_init()
-        }
-    }
-}
-#[repr(C)]
-#[derive(Debug, Copy, Clone)]
-pub struct AlterDomainStmt {
-    pub type_: NodeTag,
-    pub subtype: ::std::os::raw::c_char,
-    pub typeName: *mut List,
-    pub name: *mut ::std::os::raw::c_char,
-    pub def: *mut Node,
-    pub behavior: DropBehavior,
-    pub missing_ok: bool,
-}
-impl Default for AlterDomainStmt {
-    fn default() -> Self {
-        let mut s = ::std::mem::MaybeUninit::<Self>::uninit();
-        unsafe {
-            ::std::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
-            s.assume_init()
-        }
-    }
-}
-pub const GrantTargetType_ACL_TARGET_OBJECT: GrantTargetType = 0;
-pub const GrantTargetType_ACL_TARGET_ALL_IN_SCHEMA: GrantTargetType = 1;
-pub const GrantTargetType_ACL_TARGET_DEFAULTS: GrantTargetType = 2;
-pub type GrantTargetType = ::std::os::raw::c_uint;
-#[repr(C)]
-#[derive(Debug, Copy, Clone)]
-pub struct GrantStmt {
-    pub type_: NodeTag,
-    pub is_grant: bool,
-    pub targtype: GrantTargetType,
-    pub objtype: ObjectType,
-    pub objects: *mut List,
-    pub privileges: *mut List,
-    pub grantees: *mut List,
-    pub grant_option: bool,
-    pub grantor: *mut RoleSpec,
-    pub behavior: DropBehavior,
-}
-impl Default for GrantStmt {
-    fn default() -> Self {
-        let mut s = ::std::mem::MaybeUninit::<Self>::uninit();
-        unsafe {
-            ::std::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
-            s.assume_init()
-        }
-    }
-}
-#[repr(C)]
-#[derive(Debug, Copy, Clone)]
-pub struct ObjectWithArgs {
-    pub type_: NodeTag,
-    pub objname: *mut List,
-    pub objargs: *mut List,
-    pub objfuncargs: *mut List,
-    pub args_unspecified: bool,
-}
-impl Default for ObjectWithArgs {
-    fn default() -> Self {
-        let mut s = ::std::mem::MaybeUninit::<Self>::uninit();
-        unsafe {
-            ::std::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
-            s.assume_init()
-        }
-    }
-}
-#[repr(C)]
-#[derive(Debug, Copy, Clone)]
-pub struct AccessPriv {
-    pub type_: NodeTag,
-    pub priv_name: *mut ::std::os::raw::c_char,
-    pub cols: *mut List,
-}
-impl Default for AccessPriv {
-    fn default() -> Self {
-        let mut s = ::std::mem::MaybeUninit::<Self>::uninit();
-        unsafe {
-            ::std::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
-            s.assume_init()
-        }
-    }
-}
-#[repr(C)]
-#[derive(Debug, Copy, Clone)]
-pub struct GrantRoleStmt {
-    pub type_: NodeTag,
-    pub granted_roles: *mut List,
-    pub grantee_roles: *mut List,
-    pub is_grant: bool,
-    pub admin_opt: bool,
-    pub grantor: *mut RoleSpec,
-    pub behavior: DropBehavior,
-}
-impl Default for GrantRoleStmt {
-    fn default() -> Self {
-        let mut s = ::std::mem::MaybeUninit::<Self>::uninit();
-        unsafe {
-            ::std::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
-            s.assume_init()
-        }
-    }
-}
-#[repr(C)]
-#[derive(Debug, Copy, Clone)]
-pub struct AlterDefaultPrivilegesStmt {
-    pub type_: NodeTag,
-    pub options: *mut List,
-    pub action: *mut GrantStmt,
-}
-impl Default for AlterDefaultPrivilegesStmt {
-    fn default() -> Self {
-        let mut s = ::std::mem::MaybeUninit::<Self>::uninit();
-        unsafe {
-            ::std::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
-            s.assume_init()
-        }
-    }
-}
-#[repr(C)]
-#[derive(Debug, Copy, Clone)]
-pub struct CopyStmt {
-    pub type_: NodeTag,
-    pub relation: *mut RangeVar,
-    pub query: *mut Node,
-    pub attlist: *mut List,
-    pub is_from: bool,
-    pub is_program: bool,
-    pub filename: *mut ::std::os::raw::c_char,
-    pub options: *mut List,
-    pub whereClause: *mut Node,
-}
-impl Default for CopyStmt {
-    fn default() -> Self {
-        let mut s = ::std::mem::MaybeUninit::<Self>::uninit();
-        unsafe {
-            ::std::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
-            s.assume_init()
-        }
-    }
-}
-pub const VariableSetKind_VAR_SET_VALUE: VariableSetKind = 0;
-pub const VariableSetKind_VAR_SET_DEFAULT: VariableSetKind = 1;
-pub const VariableSetKind_VAR_SET_CURRENT: VariableSetKind = 2;
-pub const VariableSetKind_VAR_SET_MULTI: VariableSetKind = 3;
-pub const VariableSetKind_VAR_RESET: VariableSetKind = 4;
-pub const VariableSetKind_VAR_RESET_ALL: VariableSetKind = 5;
-pub type VariableSetKind = ::std::os::raw::c_uint;
-#[repr(C)]
-#[derive(Debug, Copy, Clone)]
-pub struct VariableSetStmt {
-    pub type_: NodeTag,
-    pub kind: VariableSetKind,
-    pub name: *mut ::std::os::raw::c_char,
-    pub args: *mut List,
-    pub is_local: bool,
-}
-impl Default for VariableSetStmt {
-    fn default() -> Self {
-        let mut s = ::std::mem::MaybeUninit::<Self>::uninit();
-        unsafe {
-            ::std::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
-            s.assume_init()
-        }
-    }
-}
-#[repr(C)]
-#[derive(Debug, Copy, Clone)]
-pub struct VariableShowStmt {
-    pub type_: NodeTag,
-    pub name: *mut ::std::os::raw::c_char,
-}
-impl Default for VariableShowStmt {
-    fn default() -> Self {
-        let mut s = ::std::mem::MaybeUninit::<Self>::uninit();
-        unsafe {
-            ::std::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
-            s.assume_init()
-        }
-    }
-}
-#[repr(C)]
-#[derive(Debug, Copy, Clone)]
-pub struct CreateStmt {
-    pub type_: NodeTag,
-    pub relation: *mut RangeVar,
-    pub tableElts: *mut List,
-    pub inhRelations: *mut List,
-    pub partbound: *mut PartitionBoundSpec,
-    pub partspec: *mut PartitionSpec,
-    pub ofTypename: *mut TypeName,
-    pub constraints: *mut List,
-    pub options: *mut List,
-    pub oncommit: OnCommitAction,
-    pub tablespacename: *mut ::std::os::raw::c_char,
-    pub accessMethod: *mut ::std::os::raw::c_char,
-    pub if_not_exists: bool,
-}
-impl Default for CreateStmt {
-    fn default() -> Self {
-        let mut s = ::std::mem::MaybeUninit::<Self>::uninit();
-        unsafe {
-            ::std::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
-            s.assume_init()
-        }
-    }
-}
-pub const ConstrType_CONSTR_NULL: ConstrType = 0;
-pub const ConstrType_CONSTR_NOTNULL: ConstrType = 1;
-pub const ConstrType_CONSTR_DEFAULT: ConstrType = 2;
-pub const ConstrType_CONSTR_IDENTITY: ConstrType = 3;
-pub const ConstrType_CONSTR_GENERATED: ConstrType = 4;
-pub const ConstrType_CONSTR_CHECK: ConstrType = 5;
-pub const ConstrType_CONSTR_PRIMARY: ConstrType = 6;
-pub const ConstrType_CONSTR_UNIQUE: ConstrType = 7;
-pub const ConstrType_CONSTR_EXCLUSION: ConstrType = 8;
-pub const ConstrType_CONSTR_FOREIGN: ConstrType = 9;
-pub const ConstrType_CONSTR_ATTR_DEFERRABLE: ConstrType = 10;
-pub const ConstrType_CONSTR_ATTR_NOT_DEFERRABLE: ConstrType = 11;
-pub const ConstrType_CONSTR_ATTR_DEFERRED: ConstrType = 12;
-pub const ConstrType_CONSTR_ATTR_IMMEDIATE: ConstrType = 13;
-pub type ConstrType = ::std::os::raw::c_uint;
-#[repr(C)]
-#[derive(Debug, Copy, Clone)]
-pub struct Constraint {
-    pub type_: NodeTag,
-    pub contype: ConstrType,
-    pub conname: *mut ::std::os::raw::c_char,
-    pub deferrable: bool,
-    pub initdeferred: bool,
-    pub location: ::std::os::raw::c_int,
-    pub is_no_inherit: bool,
-    pub raw_expr: *mut Node,
-    pub cooked_expr: *mut ::std::os::raw::c_char,
-    pub generated_when: ::std::os::raw::c_char,
-    pub keys: *mut List,
-    pub including: *mut List,
-    pub exclusions: *mut List,
-    pub options: *mut List,
-    pub indexname: *mut ::std::os::raw::c_char,
-    pub indexspace: *mut ::std::os::raw::c_char,
-    pub reset_default_tblspc: bool,
-    pub access_method: *mut ::std::os::raw::c_char,
-    pub where_clause: *mut Node,
-    pub pktable: *mut RangeVar,
-    pub fk_attrs: *mut List,
-    pub pk_attrs: *mut List,
-    pub fk_matchtype: ::std::os::raw::c_char,
-    pub fk_upd_action: ::std::os::raw::c_char,
-    pub fk_del_action: ::std::os::raw::c_char,
-    pub old_conpfeqop: *mut List,
-    pub old_pktable_oid: Oid,
-    pub skip_validation: bool,
-    pub initially_valid: bool,
-}
-impl Default for Constraint {
-    fn default() -> Self {
-        let mut s = ::std::mem::MaybeUninit::<Self>::uninit();
-        unsafe {
-            ::std::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
-            s.assume_init()
-        }
-    }
-}
-#[repr(C)]
-#[derive(Debug, Copy, Clone)]
-pub struct CreateTableSpaceStmt {
-    pub type_: NodeTag,
-    pub tablespacename: *mut ::std::os::raw::c_char,
-    pub owner: *mut RoleSpec,
-    pub location: *mut ::std::os::raw::c_char,
-    pub options: *mut List,
-}
-impl Default for CreateTableSpaceStmt {
-    fn default() -> Self {
-        let mut s = ::std::mem::MaybeUninit::<Self>::uninit();
-        unsafe {
-            ::std::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
-            s.assume_init()
-        }
-    }
-}
-#[repr(C)]
-#[derive(Debug, Copy, Clone)]
-pub struct DropTableSpaceStmt {
-    pub type_: NodeTag,
-    pub tablespacename: *mut ::std::os::raw::c_char,
-    pub missing_ok: bool,
-}
-impl Default for DropTableSpaceStmt {
-    fn default() -> Self {
-        let mut s = ::std::mem::MaybeUninit::<Self>::uninit();
-        unsafe {
-            ::std::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
-            s.assume_init()
-        }
-    }
-}
-#[repr(C)]
-#[derive(Debug, Copy, Clone)]
-pub struct AlterTableSpaceOptionsStmt {
-    pub type_: NodeTag,
-    pub tablespacename: *mut ::std::os::raw::c_char,
-    pub options: *mut List,
-    pub isReset: bool,
-}
-impl Default for AlterTableSpaceOptionsStmt {
-    fn default() -> Self {
-        let mut s = ::std::mem::MaybeUninit::<Self>::uninit();
-        unsafe {
-            ::std::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
-            s.assume_init()
-        }
-    }
-}
-#[repr(C)]
-#[derive(Debug, Copy, Clone)]
-pub struct AlterTableMoveAllStmt {
-    pub type_: NodeTag,
-    pub orig_tablespacename: *mut ::std::os::raw::c_char,
-    pub objtype: ObjectType,
-    pub roles: *mut List,
-    pub new_tablespacename: *mut ::std::os::raw::c_char,
-    pub nowait: bool,
-}
-impl Default for AlterTableMoveAllStmt {
-    fn default() -> Self {
-        let mut s = ::std::mem::MaybeUninit::<Self>::uninit();
-        unsafe {
-            ::std::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
-            s.assume_init()
-        }
-    }
-}
-#[repr(C)]
-#[derive(Debug, Copy, Clone)]
-pub struct CreateExtensionStmt {
-    pub type_: NodeTag,
-    pub extname: *mut ::std::os::raw::c_char,
-    pub if_not_exists: bool,
-    pub options: *mut List,
-}
-impl Default for CreateExtensionStmt {
-    fn default() -> Self {
-        let mut s = ::std::mem::MaybeUninit::<Self>::uninit();
-        unsafe {
-            ::std::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
-            s.assume_init()
-        }
-    }
-}
-#[repr(C)]
-#[derive(Debug, Copy, Clone)]
-pub struct AlterExtensionStmt {
-    pub type_: NodeTag,
-    pub extname: *mut ::std::os::raw::c_char,
-    pub options: *mut List,
-}
-impl Default for AlterExtensionStmt {
-    fn default() -> Self {
-        let mut s = ::std::mem::MaybeUninit::<Self>::uninit();
-        unsafe {
-            ::std::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
-            s.assume_init()
-        }
-    }
-}
-#[repr(C)]
-#[derive(Debug, Copy, Clone)]
-pub struct AlterExtensionContentsStmt {
-    pub type_: NodeTag,
-    pub extname: *mut ::std::os::raw::c_char,
-    pub action: ::std::os::raw::c_int,
-    pub objtype: ObjectType,
-    pub object: *mut Node,
-}
-impl Default for AlterExtensionContentsStmt {
-    fn default() -> Self {
-        let mut s = ::std::mem::MaybeUninit::<Self>::uninit();
-        unsafe {
-            ::std::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
-            s.assume_init()
-        }
-    }
-}
-#[repr(C)]
-#[derive(Debug, Copy, Clone)]
-pub struct CreateFdwStmt {
-    pub type_: NodeTag,
-    pub fdwname: *mut ::std::os::raw::c_char,
-    pub func_options: *mut List,
-    pub options: *mut List,
-}
-impl Default for CreateFdwStmt {
-    fn default() -> Self {
-        let mut s = ::std::mem::MaybeUninit::<Self>::uninit();
-        unsafe {
-            ::std::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
-            s.assume_init()
-        }
-    }
-}
-#[repr(C)]
-#[derive(Debug, Copy, Clone)]
-pub struct AlterFdwStmt {
-    pub type_: NodeTag,
-    pub fdwname: *mut ::std::os::raw::c_char,
-    pub func_options: *mut List,
-    pub options: *mut List,
-}
-impl Default for AlterFdwStmt {
-    fn default() -> Self {
-        let mut s = ::std::mem::MaybeUninit::<Self>::uninit();
-        unsafe {
-            ::std::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
-            s.assume_init()
-        }
-    }
-}
-#[repr(C)]
-#[derive(Debug, Copy, Clone)]
-pub struct CreateForeignServerStmt {
-    pub type_: NodeTag,
-    pub servername: *mut ::std::os::raw::c_char,
-    pub servertype: *mut ::std::os::raw::c_char,
-    pub version: *mut ::std::os::raw::c_char,
-    pub fdwname: *mut ::std::os::raw::c_char,
-    pub if_not_exists: bool,
-    pub options: *mut List,
-}
-impl Default for CreateForeignServerStmt {
-    fn default() -> Self {
-        let mut s = ::std::mem::MaybeUninit::<Self>::uninit();
-        unsafe {
-            ::std::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
-            s.assume_init()
-        }
-    }
-}
-#[repr(C)]
-#[derive(Debug, Copy, Clone)]
-pub struct AlterForeignServerStmt {
-    pub type_: NodeTag,
-    pub servername: *mut ::std::os::raw::c_char,
-    pub version: *mut ::std::os::raw::c_char,
-    pub options: *mut List,
-    pub has_version: bool,
-}
-impl Default for AlterForeignServerStmt {
-    fn default() -> Self {
-        let mut s = ::std::mem::MaybeUninit::<Self>::uninit();
-        unsafe {
-            ::std::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
-            s.assume_init()
-        }
-    }
-}
-#[repr(C)]
-#[derive(Debug, Copy, Clone)]
-pub struct CreateForeignTableStmt {
-    pub base: CreateStmt,
-    pub servername: *mut ::std::os::raw::c_char,
-    pub options: *mut List,
-}
-impl Default for CreateForeignTableStmt {
-    fn default() -> Self {
-        let mut s = ::std::mem::MaybeUninit::<Self>::uninit();
-        unsafe {
-            ::std::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
-            s.assume_init()
-        }
-    }
-}
-#[repr(C)]
-#[derive(Debug, Copy, Clone)]
-pub struct CreateUserMappingStmt {
-    pub type_: NodeTag,
-    pub user: *mut RoleSpec,
-    pub servername: *mut ::std::os::raw::c_char,
-    pub if_not_exists: bool,
-    pub options: *mut List,
-}
-impl Default for CreateUserMappingStmt {
-    fn default() -> Self {
-        let mut s = ::std::mem::MaybeUninit::<Self>::uninit();
-        unsafe {
-            ::std::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
-            s.assume_init()
-        }
-    }
-}
-#[repr(C)]
-#[derive(Debug, Copy, Clone)]
-pub struct AlterUserMappingStmt {
-    pub type_: NodeTag,
-    pub user: *mut RoleSpec,
-    pub servername: *mut ::std::os::raw::c_char,
-    pub options: *mut List,
-}
-impl Default for AlterUserMappingStmt {
-    fn default() -> Self {
-        let mut s = ::std::mem::MaybeUninit::<Self>::uninit();
-        unsafe {
-            ::std::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
-            s.assume_init()
-        }
-    }
-}
-#[repr(C)]
-#[derive(Debug, Copy, Clone)]
-pub struct DropUserMappingStmt {
-    pub type_: NodeTag,
-    pub user: *mut RoleSpec,
-    pub servername: *mut ::std::os::raw::c_char,
-    pub missing_ok: bool,
-}
-impl Default for DropUserMappingStmt {
-    fn default() -> Self {
-        let mut s = ::std::mem::MaybeUninit::<Self>::uninit();
-        unsafe {
-            ::std::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
-            s.assume_init()
-        }
-    }
-}
-pub const ImportForeignSchemaType_FDW_IMPORT_SCHEMA_ALL: ImportForeignSchemaType = 0;
-pub const ImportForeignSchemaType_FDW_IMPORT_SCHEMA_LIMIT_TO: ImportForeignSchemaType = 1;
-pub const ImportForeignSchemaType_FDW_IMPORT_SCHEMA_EXCEPT: ImportForeignSchemaType = 2;
-pub type ImportForeignSchemaType = ::std::os::raw::c_uint;
-#[repr(C)]
-#[derive(Debug, Copy, Clone)]
-pub struct ImportForeignSchemaStmt {
-    pub type_: NodeTag,
-    pub server_name: *mut ::std::os::raw::c_char,
-    pub remote_schema: *mut ::std::os::raw::c_char,
-    pub local_schema: *mut ::std::os::raw::c_char,
-    pub list_type: ImportForeignSchemaType,
-    pub table_list: *mut List,
-    pub options: *mut List,
-}
-impl Default for ImportForeignSchemaStmt {
-    fn default() -> Self {
-        let mut s = ::std::mem::MaybeUninit::<Self>::uninit();
-        unsafe {
-            ::std::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
-            s.assume_init()
-        }
-    }
-}
-#[repr(C)]
-#[derive(Debug, Copy, Clone)]
-pub struct CreatePolicyStmt {
-    pub type_: NodeTag,
-    pub policy_name: *mut ::std::os::raw::c_char,
-    pub table: *mut RangeVar,
-    pub cmd_name: *mut ::std::os::raw::c_char,
-    pub permissive: bool,
-    pub roles: *mut List,
-    pub qual: *mut Node,
-    pub with_check: *mut Node,
-}
-impl Default for CreatePolicyStmt {
-    fn default() -> Self {
-        let mut s = ::std::mem::MaybeUninit::<Self>::uninit();
-        unsafe {
-            ::std::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
-            s.assume_init()
-        }
-    }
-}
-#[repr(C)]
-#[derive(Debug, Copy, Clone)]
-pub struct AlterPolicyStmt {
-    pub type_: NodeTag,
-    pub policy_name: *mut ::std::os::raw::c_char,
-    pub table: *mut RangeVar,
-    pub roles: *mut List,
-    pub qual: *mut Node,
-    pub with_check: *mut Node,
-}
-impl Default for AlterPolicyStmt {
-    fn default() -> Self {
-        let mut s = ::std::mem::MaybeUninit::<Self>::uninit();
-        unsafe {
-            ::std::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
-            s.assume_init()
-        }
-    }
-}
-#[repr(C)]
-#[derive(Debug, Copy, Clone)]
-pub struct CreateAmStmt {
-    pub type_: NodeTag,
-    pub amname: *mut ::std::os::raw::c_char,
-    pub handler_name: *mut List,
-    pub amtype: ::std::os::raw::c_char,
-}
-impl Default for CreateAmStmt {
-    fn default() -> Self {
-        let mut s = ::std::mem::MaybeUninit::<Self>::uninit();
-        unsafe {
-            ::std::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
-            s.assume_init()
-        }
-    }
-}
-#[repr(C)]
-#[derive(Debug, Copy, Clone)]
-pub struct CreateTrigStmt {
-    pub type_: NodeTag,
-    pub replace: bool,
-    pub isconstraint: bool,
-    pub trigname: *mut ::std::os::raw::c_char,
-    pub relation: *mut RangeVar,
-    pub funcname: *mut List,
-    pub args: *mut List,
-    pub row: bool,
-    pub timing: int16,
-    pub events: int16,
-    pub columns: *mut List,
-    pub whenClause: *mut Node,
-    pub transitionRels: *mut List,
-    pub deferrable: bool,
-    pub initdeferred: bool,
-    pub constrrel: *mut RangeVar,
-}
-impl Default for CreateTrigStmt {
-    fn default() -> Self {
-        let mut s = ::std::mem::MaybeUninit::<Self>::uninit();
-        unsafe {
-            ::std::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
-            s.assume_init()
-        }
-    }
-}
-#[repr(C)]
-#[derive(Debug, Copy, Clone)]
-pub struct CreateEventTrigStmt {
-    pub type_: NodeTag,
-    pub trigname: *mut ::std::os::raw::c_char,
-    pub eventname: *mut ::std::os::raw::c_char,
-    pub whenclause: *mut List,
-    pub funcname: *mut List,
-}
-impl Default for CreateEventTrigStmt {
-    fn default() -> Self {
-        let mut s = ::std::mem::MaybeUninit::<Self>::uninit();
-        unsafe {
-            ::std::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
-            s.assume_init()
-        }
-    }
-}
-#[repr(C)]
-#[derive(Debug, Copy, Clone)]
-pub struct AlterEventTrigStmt {
-    pub type_: NodeTag,
-    pub trigname: *mut ::std::os::raw::c_char,
-    pub tgenabled: ::std::os::raw::c_char,
-}
-impl Default for AlterEventTrigStmt {
-    fn default() -> Self {
-        let mut s = ::std::mem::MaybeUninit::<Self>::uninit();
-        unsafe {
-            ::std::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
-            s.assume_init()
-        }
-    }
-}
-#[repr(C)]
-#[derive(Debug, Copy, Clone)]
-pub struct CreatePLangStmt {
-    pub type_: NodeTag,
-    pub replace: bool,
-    pub plname: *mut ::std::os::raw::c_char,
-    pub plhandler: *mut List,
-    pub plinline: *mut List,
-    pub plvalidator: *mut List,
-    pub pltrusted: bool,
-}
-impl Default for CreatePLangStmt {
-    fn default() -> Self {
-        let mut s = ::std::mem::MaybeUninit::<Self>::uninit();
-        unsafe {
-            ::std::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
-            s.assume_init()
-        }
-    }
-}
-pub const RoleStmtType_ROLESTMT_ROLE: RoleStmtType = 0;
-pub const RoleStmtType_ROLESTMT_USER: RoleStmtType = 1;
-pub const RoleStmtType_ROLESTMT_GROUP: RoleStmtType = 2;
-pub type RoleStmtType = ::std::os::raw::c_uint;
-#[repr(C)]
-#[derive(Debug, Copy, Clone)]
-pub struct CreateRoleStmt {
-    pub type_: NodeTag,
-    pub stmt_type: RoleStmtType,
-    pub role: *mut ::std::os::raw::c_char,
-    pub options: *mut List,
-}
-impl Default for CreateRoleStmt {
-    fn default() -> Self {
-        let mut s = ::std::mem::MaybeUninit::<Self>::uninit();
-        unsafe {
-            ::std::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
-            s.assume_init()
-        }
-    }
-}
-#[repr(C)]
-#[derive(Debug, Copy, Clone)]
-pub struct AlterRoleStmt {
-    pub type_: NodeTag,
-    pub role: *mut RoleSpec,
-    pub options: *mut List,
-    pub action: ::std::os::raw::c_int,
-}
-impl Default for AlterRoleStmt {
-    fn default() -> Self {
-        let mut s = ::std::mem::MaybeUninit::<Self>::uninit();
-        unsafe {
-            ::std::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
-            s.assume_init()
-        }
-    }
-}
-#[repr(C)]
-#[derive(Debug, Copy, Clone)]
-pub struct AlterRoleSetStmt {
-    pub type_: NodeTag,
-    pub role: *mut RoleSpec,
-    pub database: *mut ::std::os::raw::c_char,
-    pub setstmt: *mut VariableSetStmt,
-}
-impl Default for AlterRoleSetStmt {
-    fn default() -> Self {
-        let mut s = ::std::mem::MaybeUninit::<Self>::uninit();
-        unsafe {
-            ::std::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
-            s.assume_init()
-        }
-    }
-}
-#[repr(C)]
-#[derive(Debug, Copy, Clone)]
-pub struct DropRoleStmt {
-    pub type_: NodeTag,
-    pub roles: *mut List,
-    pub missing_ok: bool,
-}
-impl Default for DropRoleStmt {
-    fn default() -> Self {
-        let mut s = ::std::mem::MaybeUninit::<Self>::uninit();
-        unsafe {
-            ::std::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
-            s.assume_init()
-        }
-    }
-}
-#[repr(C)]
-#[derive(Debug, Copy, Clone)]
-pub struct CreateSeqStmt {
-    pub type_: NodeTag,
-    pub sequence: *mut RangeVar,
-    pub options: *mut List,
-    pub ownerId: Oid,
-    pub for_identity: bool,
-    pub if_not_exists: bool,
-}
-impl Default for CreateSeqStmt {
-    fn default() -> Self {
-        let mut s = ::std::mem::MaybeUninit::<Self>::uninit();
-        unsafe {
-            ::std::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
-            s.assume_init()
-        }
-    }
-}
-#[repr(C)]
-#[derive(Debug, Copy, Clone)]
-pub struct AlterSeqStmt {
-    pub type_: NodeTag,
-    pub sequence: *mut RangeVar,
-    pub options: *mut List,
-    pub for_identity: bool,
-    pub missing_ok: bool,
-}
-impl Default for AlterSeqStmt {
-    fn default() -> Self {
-        let mut s = ::std::mem::MaybeUninit::<Self>::uninit();
-        unsafe {
-            ::std::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
-            s.assume_init()
-        }
-    }
-}
-#[repr(C)]
-#[derive(Debug, Copy, Clone)]
-pub struct DefineStmt {
-    pub type_: NodeTag,
-    pub kind: ObjectType,
-    pub oldstyle: bool,
-    pub defnames: *mut List,
-    pub args: *mut List,
-    pub definition: *mut List,
-    pub if_not_exists: bool,
-    pub replace: bool,
-}
-impl Default for DefineStmt {
-    fn default() -> Self {
-        let mut s = ::std::mem::MaybeUninit::<Self>::uninit();
-        unsafe {
-            ::std::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
-            s.assume_init()
-        }
-    }
-}
-#[repr(C)]
-#[derive(Debug, Copy, Clone)]
-pub struct CreateDomainStmt {
-    pub type_: NodeTag,
-    pub domainname: *mut List,
-    pub typeName: *mut TypeName,
-    pub collClause: *mut CollateClause,
-    pub constraints: *mut List,
-}
-impl Default for CreateDomainStmt {
-    fn default() -> Self {
-        let mut s = ::std::mem::MaybeUninit::<Self>::uninit();
-        unsafe {
-            ::std::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
-            s.assume_init()
-        }
-    }
-}
-#[repr(C)]
-#[derive(Debug, Copy, Clone)]
-pub struct CreateOpClassStmt {
-    pub type_: NodeTag,
-    pub opclassname: *mut List,
-    pub opfamilyname: *mut List,
-    pub amname: *mut ::std::os::raw::c_char,
-    pub datatype: *mut TypeName,
-    pub items: *mut List,
-    pub isDefault: bool,
-}
-impl Default for CreateOpClassStmt {
-    fn default() -> Self {
-        let mut s = ::std::mem::MaybeUninit::<Self>::uninit();
-        unsafe {
-            ::std::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
-            s.assume_init()
-        }
-    }
-}
-#[repr(C)]
-#[derive(Debug, Copy, Clone)]
-pub struct CreateOpClassItem {
-    pub type_: NodeTag,
-    pub itemtype: ::std::os::raw::c_int,
-    pub name: *mut ObjectWithArgs,
-    pub number: ::std::os::raw::c_int,
-    pub order_family: *mut List,
-    pub class_args: *mut List,
-    pub storedtype: *mut TypeName,
-}
-impl Default for CreateOpClassItem {
-    fn default() -> Self {
-        let mut s = ::std::mem::MaybeUninit::<Self>::uninit();
-        unsafe {
-            ::std::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
-            s.assume_init()
-        }
-    }
-}
-#[repr(C)]
-#[derive(Debug, Copy, Clone)]
-pub struct CreateOpFamilyStmt {
-    pub type_: NodeTag,
-    pub opfamilyname: *mut List,
-    pub amname: *mut ::std::os::raw::c_char,
-}
-impl Default for CreateOpFamilyStmt {
-    fn default() -> Self {
-        let mut s = ::std::mem::MaybeUninit::<Self>::uninit();
-        unsafe {
-            ::std::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
-            s.assume_init()
-        }
-    }
-}
-#[repr(C)]
-#[derive(Debug, Copy, Clone)]
-pub struct AlterOpFamilyStmt {
-    pub type_: NodeTag,
-    pub opfamilyname: *mut List,
-    pub amname: *mut ::std::os::raw::c_char,
-    pub isDrop: bool,
-    pub items: *mut List,
-}
-impl Default for AlterOpFamilyStmt {
-    fn default() -> Self {
-        let mut s = ::std::mem::MaybeUninit::<Self>::uninit();
-        unsafe {
-            ::std::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
-            s.assume_init()
-        }
-    }
-}
-#[repr(C)]
-#[derive(Debug, Copy, Clone)]
-pub struct DropStmt {
-    pub type_: NodeTag,
-    pub objects: *mut List,
-    pub removeType: ObjectType,
-    pub behavior: DropBehavior,
-    pub missing_ok: bool,
-    pub concurrent: bool,
-}
-impl Default for DropStmt {
-    fn default() -> Self {
-        let mut s = ::std::mem::MaybeUninit::<Self>::uninit();
-        unsafe {
-            ::std::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
-            s.assume_init()
-        }
-    }
-}
-#[repr(C)]
-#[derive(Debug, Copy, Clone)]
-pub struct TruncateStmt {
-    pub type_: NodeTag,
-    pub relations: *mut List,
-    pub restart_seqs: bool,
-    pub behavior: DropBehavior,
-}
-impl Default for TruncateStmt {
-    fn default() -> Self {
-        let mut s = ::std::mem::MaybeUninit::<Self>::uninit();
-        unsafe {
-            ::std::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
-            s.assume_init()
-        }
-    }
-}
-#[repr(C)]
-#[derive(Debug, Copy, Clone)]
-pub struct CommentStmt {
-    pub type_: NodeTag,
-    pub objtype: ObjectType,
-    pub object: *mut Node,
-    pub comment: *mut ::std::os::raw::c_char,
-}
-impl Default for CommentStmt {
-    fn default() -> Self {
-        let mut s = ::std::mem::MaybeUninit::<Self>::uninit();
-        unsafe {
-            ::std::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
-            s.assume_init()
-        }
-    }
-}
-#[repr(C)]
-#[derive(Debug, Copy, Clone)]
-pub struct SecLabelStmt {
-    pub type_: NodeTag,
-    pub objtype: ObjectType,
-    pub object: *mut Node,
-    pub provider: *mut ::std::os::raw::c_char,
-    pub label: *mut ::std::os::raw::c_char,
-}
-impl Default for SecLabelStmt {
-    fn default() -> Self {
-        let mut s = ::std::mem::MaybeUninit::<Self>::uninit();
-        unsafe {
-            ::std::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
-            s.assume_init()
-        }
-    }
-}
-#[repr(C)]
-#[derive(Debug, Copy, Clone)]
-pub struct DeclareCursorStmt {
-    pub type_: NodeTag,
-    pub portalname: *mut ::std::os::raw::c_char,
-    pub options: ::std::os::raw::c_int,
-    pub query: *mut Node,
-}
-impl Default for DeclareCursorStmt {
-    fn default() -> Self {
-        let mut s = ::std::mem::MaybeUninit::<Self>::uninit();
-        unsafe {
-            ::std::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
-            s.assume_init()
-        }
-    }
-}
-#[repr(C)]
-#[derive(Debug, Copy, Clone)]
-pub struct ClosePortalStmt {
-    pub type_: NodeTag,
-    pub portalname: *mut ::std::os::raw::c_char,
-}
-impl Default for ClosePortalStmt {
-    fn default() -> Self {
-        let mut s = ::std::mem::MaybeUninit::<Self>::uninit();
-        unsafe {
-            ::std::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
-            s.assume_init()
-        }
-    }
-}
-pub const FetchDirection_FETCH_FORWARD: FetchDirection = 0;
-pub const FetchDirection_FETCH_BACKWARD: FetchDirection = 1;
-pub const FetchDirection_FETCH_ABSOLUTE: FetchDirection = 2;
-pub const FetchDirection_FETCH_RELATIVE: FetchDirection = 3;
-pub type FetchDirection = ::std::os::raw::c_uint;
-#[repr(C)]
-#[derive(Debug, Copy, Clone)]
-pub struct FetchStmt {
-    pub type_: NodeTag,
-    pub direction: FetchDirection,
-    pub howMany: ::std::os::raw::c_long,
-    pub portalname: *mut ::std::os::raw::c_char,
-    pub ismove: bool,
-}
-impl Default for FetchStmt {
-    fn default() -> Self {
-        let mut s = ::std::mem::MaybeUninit::<Self>::uninit();
-        unsafe {
-            ::std::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
-            s.assume_init()
-        }
-    }
-}
-#[repr(C)]
-#[derive(Debug, Copy, Clone)]
-pub struct IndexStmt {
-    pub type_: NodeTag,
-    pub idxname: *mut ::std::os::raw::c_char,
-    pub relation: *mut RangeVar,
-    pub accessMethod: *mut ::std::os::raw::c_char,
-    pub tableSpace: *mut ::std::os::raw::c_char,
-    pub indexParams: *mut List,
-    pub indexIncludingParams: *mut List,
-    pub options: *mut List,
-    pub whereClause: *mut Node,
-    pub excludeOpNames: *mut List,
-    pub idxcomment: *mut ::std::os::raw::c_char,
-    pub indexOid: Oid,
-    pub oldNode: Oid,
-    pub oldCreateSubid: SubTransactionId,
-    pub oldFirstRelfilenodeSubid: SubTransactionId,
-    pub unique: bool,
-    pub primary: bool,
-    pub isconstraint: bool,
-    pub deferrable: bool,
-    pub initdeferred: bool,
-    pub transformed: bool,
-    pub concurrent: bool,
-    pub if_not_exists: bool,
-    pub reset_default_tblspc: bool,
-}
-impl Default for IndexStmt {
-    fn default() -> Self {
-        let mut s = ::std::mem::MaybeUninit::<Self>::uninit();
-        unsafe {
-            ::std::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
-            s.assume_init()
-        }
-    }
-}
-#[repr(C)]
-#[derive(Debug, Copy, Clone)]
-pub struct CreateStatsStmt {
-    pub type_: NodeTag,
-    pub defnames: *mut List,
-    pub stat_types: *mut List,
-    pub exprs: *mut List,
-    pub relations: *mut List,
-    pub stxcomment: *mut ::std::os::raw::c_char,
-    pub transformed: bool,
-    pub if_not_exists: bool,
-}
-impl Default for CreateStatsStmt {
-    fn default() -> Self {
-        let mut s = ::std::mem::MaybeUninit::<Self>::uninit();
-        unsafe {
-            ::std::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
-            s.assume_init()
-        }
-    }
-}
-#[repr(C)]
-#[derive(Debug, Copy, Clone)]
-pub struct StatsElem {
-    pub type_: NodeTag,
-    pub name: *mut ::std::os::raw::c_char,
-    pub expr: *mut Node,
-}
-impl Default for StatsElem {
-    fn default() -> Self {
-        let mut s = ::std::mem::MaybeUninit::<Self>::uninit();
-        unsafe {
-            ::std::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
-            s.assume_init()
-        }
-    }
-}
-#[repr(C)]
-#[derive(Debug, Copy, Clone)]
-pub struct AlterStatsStmt {
-    pub type_: NodeTag,
-    pub defnames: *mut List,
-    pub stxstattarget: ::std::os::raw::c_int,
-    pub missing_ok: bool,
-}
-impl Default for AlterStatsStmt {
-    fn default() -> Self {
-        let mut s = ::std::mem::MaybeUninit::<Self>::uninit();
-        unsafe {
-            ::std::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
-            s.assume_init()
-        }
-    }
-}
-#[repr(C)]
-#[derive(Debug, Copy, Clone)]
-pub struct CreateFunctionStmt {
-    pub type_: NodeTag,
-    pub is_procedure: bool,
-    pub replace: bool,
-    pub funcname: *mut List,
-    pub parameters: *mut List,
-    pub returnType: *mut TypeName,
-    pub options: *mut List,
-    pub sql_body: *mut Node,
-}
-impl Default for CreateFunctionStmt {
-    fn default() -> Self {
-        let mut s = ::std::mem::MaybeUninit::<Self>::uninit();
-        unsafe {
-            ::std::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
-            s.assume_init()
-        }
-    }
-}
-pub const FunctionParameterMode_FUNC_PARAM_IN: FunctionParameterMode = 105;
-pub const FunctionParameterMode_FUNC_PARAM_OUT: FunctionParameterMode = 111;
-pub const FunctionParameterMode_FUNC_PARAM_INOUT: FunctionParameterMode = 98;
-pub const FunctionParameterMode_FUNC_PARAM_VARIADIC: FunctionParameterMode = 118;
-pub const FunctionParameterMode_FUNC_PARAM_TABLE: FunctionParameterMode = 116;
-pub const FunctionParameterMode_FUNC_PARAM_DEFAULT: FunctionParameterMode = 100;
-pub type FunctionParameterMode = ::std::os::raw::c_uint;
-#[repr(C)]
-#[derive(Debug, Copy, Clone)]
-pub struct FunctionParameter {
-    pub type_: NodeTag,
-    pub name: *mut ::std::os::raw::c_char,
-    pub argType: *mut TypeName,
-    pub mode: FunctionParameterMode,
-    pub defexpr: *mut Node,
-}
-impl Default for FunctionParameter {
-    fn default() -> Self {
-        let mut s = ::std::mem::MaybeUninit::<Self>::uninit();
-        unsafe {
-            ::std::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
-            s.assume_init()
-        }
-    }
-}
-#[repr(C)]
-#[derive(Debug, Copy, Clone)]
-pub struct AlterFunctionStmt {
-    pub type_: NodeTag,
-    pub objtype: ObjectType,
-    pub func: *mut ObjectWithArgs,
-    pub actions: *mut List,
-}
-impl Default for AlterFunctionStmt {
-    fn default() -> Self {
-        let mut s = ::std::mem::MaybeUninit::<Self>::uninit();
-        unsafe {
-            ::std::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
-            s.assume_init()
-        }
-    }
-}
-#[repr(C)]
-#[derive(Debug, Copy, Clone)]
-pub struct DoStmt {
-    pub type_: NodeTag,
-    pub args: *mut List,
-}
-impl Default for DoStmt {
-    fn default() -> Self {
-        let mut s = ::std::mem::MaybeUninit::<Self>::uninit();
-        unsafe {
-            ::std::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
-            s.assume_init()
-        }
-    }
-}
-#[repr(C)]
-#[derive(Debug, Copy, Clone)]
-pub struct InlineCodeBlock {
-    pub type_: NodeTag,
-    pub source_text: *mut ::std::os::raw::c_char,
-    pub langOid: Oid,
-    pub langIsTrusted: bool,
-    pub atomic: bool,
-}
-impl Default for InlineCodeBlock {
-    fn default() -> Self {
-        let mut s = ::std::mem::MaybeUninit::<Self>::uninit();
-        unsafe {
-            ::std::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
-            s.assume_init()
-        }
-    }
-}
-#[repr(C)]
-#[derive(Debug, Copy, Clone)]
-pub struct CallStmt {
-    pub type_: NodeTag,
-    pub funccall: *mut FuncCall,
-    pub funcexpr: *mut FuncExpr,
-    pub outargs: *mut List,
-}
-impl Default for CallStmt {
-    fn default() -> Self {
-        let mut s = ::std::mem::MaybeUninit::<Self>::uninit();
-        unsafe {
-            ::std::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
-            s.assume_init()
-        }
-    }
-}
-#[repr(C)]
-#[derive(Debug, Copy, Clone)]
-pub struct CallContext {
-    pub type_: NodeTag,
-    pub atomic: bool,
-}
-impl Default for CallContext {
-    fn default() -> Self {
-        let mut s = ::std::mem::MaybeUninit::<Self>::uninit();
-        unsafe {
-            ::std::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
-            s.assume_init()
-        }
-    }
-}
-#[repr(C)]
-#[derive(Debug, Copy, Clone)]
-pub struct RenameStmt {
-    pub type_: NodeTag,
-    pub renameType: ObjectType,
-    pub relationType: ObjectType,
-    pub relation: *mut RangeVar,
-    pub object: *mut Node,
-    pub subname: *mut ::std::os::raw::c_char,
-    pub newname: *mut ::std::os::raw::c_char,
-    pub behavior: DropBehavior,
-    pub missing_ok: bool,
-}
-impl Default for RenameStmt {
-    fn default() -> Self {
-        let mut s = ::std::mem::MaybeUninit::<Self>::uninit();
-        unsafe {
-            ::std::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
-            s.assume_init()
-        }
-    }
-}
-#[repr(C)]
-#[derive(Debug, Copy, Clone)]
-pub struct AlterObjectDependsStmt {
-    pub type_: NodeTag,
-    pub objectType: ObjectType,
-    pub relation: *mut RangeVar,
-    pub object: *mut Node,
-    pub extname: *mut Value,
-    pub remove: bool,
-}
-impl Default for AlterObjectDependsStmt {
-    fn default() -> Self {
-        let mut s = ::std::mem::MaybeUninit::<Self>::uninit();
-        unsafe {
-            ::std::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
-            s.assume_init()
-        }
-    }
-}
-#[repr(C)]
-#[derive(Debug, Copy, Clone)]
-pub struct AlterObjectSchemaStmt {
-    pub type_: NodeTag,
-    pub objectType: ObjectType,
-    pub relation: *mut RangeVar,
-    pub object: *mut Node,
-    pub newschema: *mut ::std::os::raw::c_char,
-    pub missing_ok: bool,
-}
-impl Default for AlterObjectSchemaStmt {
-    fn default() -> Self {
-        let mut s = ::std::mem::MaybeUninit::<Self>::uninit();
-        unsafe {
-            ::std::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
-            s.assume_init()
-        }
-    }
-}
-#[repr(C)]
-#[derive(Debug, Copy, Clone)]
-pub struct AlterOwnerStmt {
-    pub type_: NodeTag,
-    pub objectType: ObjectType,
-    pub relation: *mut RangeVar,
-    pub object: *mut Node,
-    pub newowner: *mut RoleSpec,
-}
-impl Default for AlterOwnerStmt {
-    fn default() -> Self {
-        let mut s = ::std::mem::MaybeUninit::<Self>::uninit();
-        unsafe {
-            ::std::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
-            s.assume_init()
-        }
-    }
-}
-#[repr(C)]
-#[derive(Debug, Copy, Clone)]
-pub struct AlterOperatorStmt {
-    pub type_: NodeTag,
-    pub opername: *mut ObjectWithArgs,
-    pub options: *mut List,
-}
-impl Default for AlterOperatorStmt {
-    fn default() -> Self {
-        let mut s = ::std::mem::MaybeUninit::<Self>::uninit();
-        unsafe {
-            ::std::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
-            s.assume_init()
-        }
-    }
-}
-#[repr(C)]
-#[derive(Debug, Copy, Clone)]
-pub struct AlterTypeStmt {
-    pub type_: NodeTag,
-    pub typeName: *mut List,
-    pub options: *mut List,
-}
-impl Default for AlterTypeStmt {
-    fn default() -> Self {
-        let mut s = ::std::mem::MaybeUninit::<Self>::uninit();
-        unsafe {
-            ::std::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
-            s.assume_init()
-        }
-    }
-}
-#[repr(C)]
-#[derive(Debug, Copy, Clone)]
-pub struct RuleStmt {
-    pub type_: NodeTag,
-    pub relation: *mut RangeVar,
-    pub rulename: *mut ::std::os::raw::c_char,
-    pub whereClause: *mut Node,
-    pub event: CmdType,
-    pub instead: bool,
-    pub actions: *mut List,
-    pub replace: bool,
-}
-impl Default for RuleStmt {
-    fn default() -> Self {
-        let mut s = ::std::mem::MaybeUninit::<Self>::uninit();
-        unsafe {
-            ::std::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
-            s.assume_init()
-        }
-    }
-}
-#[repr(C)]
-#[derive(Debug, Copy, Clone)]
-pub struct NotifyStmt {
-    pub type_: NodeTag,
-    pub conditionname: *mut ::std::os::raw::c_char,
-    pub payload: *mut ::std::os::raw::c_char,
-}
-impl Default for NotifyStmt {
-    fn default() -> Self {
-        let mut s = ::std::mem::MaybeUninit::<Self>::uninit();
-        unsafe {
-            ::std::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
-            s.assume_init()
-        }
-    }
-}
-#[repr(C)]
-#[derive(Debug, Copy, Clone)]
-pub struct ListenStmt {
-    pub type_: NodeTag,
-    pub conditionname: *mut ::std::os::raw::c_char,
-}
-impl Default for ListenStmt {
-    fn default() -> Self {
-        let mut s = ::std::mem::MaybeUninit::<Self>::uninit();
-        unsafe {
-            ::std::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
-            s.assume_init()
-        }
-    }
-}
-#[repr(C)]
-#[derive(Debug, Copy, Clone)]
-pub struct UnlistenStmt {
-    pub type_: NodeTag,
-    pub conditionname: *mut ::std::os::raw::c_char,
-}
-impl Default for UnlistenStmt {
-    fn default() -> Self {
-        let mut s = ::std::mem::MaybeUninit::<Self>::uninit();
-        unsafe {
-            ::std::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
-            s.assume_init()
-        }
-    }
-}
-pub const TransactionStmtKind_TRANS_STMT_BEGIN: TransactionStmtKind = 0;
-pub const TransactionStmtKind_TRANS_STMT_START: TransactionStmtKind = 1;
-pub const TransactionStmtKind_TRANS_STMT_COMMIT: TransactionStmtKind = 2;
-pub const TransactionStmtKind_TRANS_STMT_ROLLBACK: TransactionStmtKind = 3;
-pub const TransactionStmtKind_TRANS_STMT_SAVEPOINT: TransactionStmtKind = 4;
-pub const TransactionStmtKind_TRANS_STMT_RELEASE: TransactionStmtKind = 5;
-pub const TransactionStmtKind_TRANS_STMT_ROLLBACK_TO: TransactionStmtKind = 6;
-pub const TransactionStmtKind_TRANS_STMT_PREPARE: TransactionStmtKind = 7;
-pub const TransactionStmtKind_TRANS_STMT_COMMIT_PREPARED: TransactionStmtKind = 8;
-pub const TransactionStmtKind_TRANS_STMT_ROLLBACK_PREPARED: TransactionStmtKind = 9;
-pub type TransactionStmtKind = ::std::os::raw::c_uint;
-#[repr(C)]
-#[derive(Debug, Copy, Clone)]
-pub struct TransactionStmt {
-    pub type_: NodeTag,
-    pub kind: TransactionStmtKind,
-    pub options: *mut List,
-    pub savepoint_name: *mut ::std::os::raw::c_char,
-    pub gid: *mut ::std::os::raw::c_char,
-    pub chain: bool,
-}
-impl Default for TransactionStmt {
-    fn default() -> Self {
-        let mut s = ::std::mem::MaybeUninit::<Self>::uninit();
-        unsafe {
-            ::std::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
-            s.assume_init()
-        }
-    }
-}
-#[repr(C)]
-#[derive(Debug, Copy, Clone)]
-pub struct CompositeTypeStmt {
-    pub type_: NodeTag,
-    pub typevar: *mut RangeVar,
-    pub coldeflist: *mut List,
-}
-impl Default for CompositeTypeStmt {
-    fn default() -> Self {
-        let mut s = ::std::mem::MaybeUninit::<Self>::uninit();
-        unsafe {
-            ::std::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
-            s.assume_init()
-        }
-    }
-}
-#[repr(C)]
-#[derive(Debug, Copy, Clone)]
-pub struct CreateEnumStmt {
-    pub type_: NodeTag,
-    pub typeName: *mut List,
-    pub vals: *mut List,
-}
-impl Default for CreateEnumStmt {
-    fn default() -> Self {
-        let mut s = ::std::mem::MaybeUninit::<Self>::uninit();
-        unsafe {
-            ::std::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
-            s.assume_init()
-        }
-    }
-}
-#[repr(C)]
-#[derive(Debug, Copy, Clone)]
-pub struct CreateRangeStmt {
-    pub type_: NodeTag,
-    pub typeName: *mut List,
-    pub params: *mut List,
-}
-impl Default for CreateRangeStmt {
-    fn default() -> Self {
-        let mut s = ::std::mem::MaybeUninit::<Self>::uninit();
-        unsafe {
-            ::std::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
-            s.assume_init()
-        }
-    }
-}
-#[repr(C)]
-#[derive(Debug, Copy, Clone)]
-pub struct AlterEnumStmt {
-    pub type_: NodeTag,
-    pub typeName: *mut List,
-    pub oldVal: *mut ::std::os::raw::c_char,
-    pub newVal: *mut ::std::os::raw::c_char,
-    pub newValNeighbor: *mut ::std::os::raw::c_char,
-    pub newValIsAfter: bool,
-    pub skipIfNewValExists: bool,
-}
-impl Default for AlterEnumStmt {
-    fn default() -> Self {
-        let mut s = ::std::mem::MaybeUninit::<Self>::uninit();
-        unsafe {
-            ::std::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
-            s.assume_init()
-        }
-    }
-}
-pub const ViewCheckOption_NO_CHECK_OPTION: ViewCheckOption = 0;
-pub const ViewCheckOption_LOCAL_CHECK_OPTION: ViewCheckOption = 1;
-pub const ViewCheckOption_CASCADED_CHECK_OPTION: ViewCheckOption = 2;
-pub type ViewCheckOption = ::std::os::raw::c_uint;
-#[repr(C)]
-#[derive(Debug, Copy, Clone)]
-pub struct ViewStmt {
-    pub type_: NodeTag,
-    pub view: *mut RangeVar,
-    pub aliases: *mut List,
-    pub query: *mut Node,
-    pub replace: bool,
-    pub options: *mut List,
-    pub withCheckOption: ViewCheckOption,
-}
-impl Default for ViewStmt {
-    fn default() -> Self {
-        let mut s = ::std::mem::MaybeUninit::<Self>::uninit();
-        unsafe {
-            ::std::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
-            s.assume_init()
-        }
-    }
-}
-#[repr(C)]
-#[derive(Debug, Copy, Clone)]
-pub struct LoadStmt {
-    pub type_: NodeTag,
-    pub filename: *mut ::std::os::raw::c_char,
-}
-impl Default for LoadStmt {
-    fn default() -> Self {
-        let mut s = ::std::mem::MaybeUninit::<Self>::uninit();
-        unsafe {
-            ::std::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
-            s.assume_init()
-        }
-    }
-}
-#[repr(C)]
-#[derive(Debug, Copy, Clone)]
-pub struct CreatedbStmt {
-    pub type_: NodeTag,
-    pub dbname: *mut ::std::os::raw::c_char,
-    pub options: *mut List,
-}
-impl Default for CreatedbStmt {
-    fn default() -> Self {
-        let mut s = ::std::mem::MaybeUninit::<Self>::uninit();
-        unsafe {
-            ::std::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
-            s.assume_init()
-        }
-    }
-}
-#[repr(C)]
-#[derive(Debug, Copy, Clone)]
-pub struct AlterDatabaseStmt {
-    pub type_: NodeTag,
-    pub dbname: *mut ::std::os::raw::c_char,
-    pub options: *mut List,
-}
-impl Default for AlterDatabaseStmt {
-    fn default() -> Self {
-        let mut s = ::std::mem::MaybeUninit::<Self>::uninit();
-        unsafe {
-            ::std::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
-            s.assume_init()
-        }
-    }
-}
-#[repr(C)]
-#[derive(Debug, Copy, Clone)]
-pub struct AlterDatabaseSetStmt {
-    pub type_: NodeTag,
-    pub dbname: *mut ::std::os::raw::c_char,
-    pub setstmt: *mut VariableSetStmt,
-}
-impl Default for AlterDatabaseSetStmt {
-    fn default() -> Self {
-        let mut s = ::std::mem::MaybeUninit::<Self>::uninit();
-        unsafe {
-            ::std::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
-            s.assume_init()
-        }
-    }
-}
-#[repr(C)]
-#[derive(Debug, Copy, Clone)]
-pub struct DropdbStmt {
-    pub type_: NodeTag,
-    pub dbname: *mut ::std::os::raw::c_char,
-    pub missing_ok: bool,
-    pub options: *mut List,
-}
-impl Default for DropdbStmt {
-    fn default() -> Self {
-        let mut s = ::std::mem::MaybeUninit::<Self>::uninit();
-        unsafe {
-            ::std::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
-            s.assume_init()
-        }
-    }
-}
-#[repr(C)]
-#[derive(Debug, Copy, Clone)]
-pub struct AlterSystemStmt {
-    pub type_: NodeTag,
-    pub setstmt: *mut VariableSetStmt,
-}
-impl Default for AlterSystemStmt {
-    fn default() -> Self {
-        let mut s = ::std::mem::MaybeUninit::<Self>::uninit();
-        unsafe {
-            ::std::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
-            s.assume_init()
-        }
-    }
-}
-#[repr(C)]
-#[derive(Debug, Copy, Clone)]
-pub struct ClusterStmt {
-    pub type_: NodeTag,
-    pub relation: *mut RangeVar,
-    pub indexname: *mut ::std::os::raw::c_char,
-    pub params: *mut List,
-}
-impl Default for ClusterStmt {
-    fn default() -> Self {
-        let mut s = ::std::mem::MaybeUninit::<Self>::uninit();
-        unsafe {
-            ::std::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
-            s.assume_init()
-        }
-    }
-}
-#[repr(C)]
-#[derive(Debug, Copy, Clone)]
-pub struct VacuumStmt {
-    pub type_: NodeTag,
-    pub options: *mut List,
-    pub rels: *mut List,
-    pub is_vacuumcmd: bool,
-}
-impl Default for VacuumStmt {
-    fn default() -> Self {
-        let mut s = ::std::mem::MaybeUninit::<Self>::uninit();
-        unsafe {
-            ::std::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
-            s.assume_init()
-        }
-    }
-}
-#[repr(C)]
-#[derive(Debug, Copy, Clone)]
-pub struct VacuumRelation {
-    pub type_: NodeTag,
-    pub relation: *mut RangeVar,
-    pub oid: Oid,
-    pub va_cols: *mut List,
-}
-impl Default for VacuumRelation {
-    fn default() -> Self {
-        let mut s = ::std::mem::MaybeUninit::<Self>::uninit();
-        unsafe {
-            ::std::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
-            s.assume_init()
-        }
-    }
-}
-#[repr(C)]
-#[derive(Debug, Copy, Clone)]
-pub struct ExplainStmt {
-    pub type_: NodeTag,
-    pub query: *mut Node,
-    pub options: *mut List,
-}
-impl Default for ExplainStmt {
-    fn default() -> Self {
-        let mut s = ::std::mem::MaybeUninit::<Self>::uninit();
-        unsafe {
-            ::std::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
-            s.assume_init()
-        }
-    }
-}
-#[repr(C)]
-#[derive(Debug, Copy, Clone)]
-pub struct CreateTableAsStmt {
-    pub type_: NodeTag,
-    pub query: *mut Node,
-    pub into: *mut IntoClause,
-    pub objtype: ObjectType,
-    pub is_select_into: bool,
-    pub if_not_exists: bool,
-}
-impl Default for CreateTableAsStmt {
-    fn default() -> Self {
-        let mut s = ::std::mem::MaybeUninit::<Self>::uninit();
-        unsafe {
-            ::std::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
-            s.assume_init()
-        }
-    }
-}
-#[repr(C)]
-#[derive(Debug, Copy, Clone)]
-pub struct RefreshMatViewStmt {
-    pub type_: NodeTag,
-    pub concurrent: bool,
-    pub skipData: bool,
-    pub relation: *mut RangeVar,
-}
-impl Default for RefreshMatViewStmt {
-    fn default() -> Self {
-        let mut s = ::std::mem::MaybeUninit::<Self>::uninit();
-        unsafe {
-            ::std::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
-            s.assume_init()
-        }
-    }
-}
-#[repr(C)]
-#[derive(Debug, Copy, Clone)]
-pub struct CheckPointStmt {
-    pub type_: NodeTag,
-}
-impl Default for CheckPointStmt {
-    fn default() -> Self {
-        let mut s = ::std::mem::MaybeUninit::<Self>::uninit();
-        unsafe {
-            ::std::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
-            s.assume_init()
-        }
-    }
-}
-pub const DiscardMode_DISCARD_ALL: DiscardMode = 0;
-pub const DiscardMode_DISCARD_PLANS: DiscardMode = 1;
-pub const DiscardMode_DISCARD_SEQUENCES: DiscardMode = 2;
-pub const DiscardMode_DISCARD_TEMP: DiscardMode = 3;
-pub type DiscardMode = ::std::os::raw::c_uint;
-#[repr(C)]
-#[derive(Debug, Copy, Clone)]
-pub struct DiscardStmt {
-    pub type_: NodeTag,
-    pub target: DiscardMode,
-}
-impl Default for DiscardStmt {
-    fn default() -> Self {
-        let mut s = ::std::mem::MaybeUninit::<Self>::uninit();
-        unsafe {
-            ::std::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
-            s.assume_init()
-        }
-    }
-}
-#[repr(C)]
-#[derive(Debug, Copy, Clone)]
-pub struct LockStmt {
-    pub type_: NodeTag,
-    pub relations: *mut List,
-    pub mode: ::std::os::raw::c_int,
-    pub nowait: bool,
-}
-impl Default for LockStmt {
-    fn default() -> Self {
-        let mut s = ::std::mem::MaybeUninit::<Self>::uninit();
-        unsafe {
-            ::std::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
-            s.assume_init()
-        }
-    }
-}
-#[repr(C)]
-#[derive(Debug, Copy, Clone)]
-pub struct ConstraintsSetStmt {
-    pub type_: NodeTag,
-    pub constraints: *mut List,
-    pub deferred: bool,
-}
-impl Default for ConstraintsSetStmt {
-    fn default() -> Self {
-        let mut s = ::std::mem::MaybeUninit::<Self>::uninit();
-        unsafe {
-            ::std::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
-            s.assume_init()
-        }
-    }
-}
-pub const ReindexObjectType_REINDEX_OBJECT_INDEX: ReindexObjectType = 0;
-pub const ReindexObjectType_REINDEX_OBJECT_TABLE: ReindexObjectType = 1;
-pub const ReindexObjectType_REINDEX_OBJECT_SCHEMA: ReindexObjectType = 2;
-pub const ReindexObjectType_REINDEX_OBJECT_SYSTEM: ReindexObjectType = 3;
-pub const ReindexObjectType_REINDEX_OBJECT_DATABASE: ReindexObjectType = 4;
-pub type ReindexObjectType = ::std::os::raw::c_uint;
-#[repr(C)]
-#[derive(Debug, Copy, Clone)]
-pub struct ReindexStmt {
-    pub type_: NodeTag,
-    pub kind: ReindexObjectType,
-    pub relation: *mut RangeVar,
-    pub name: *const ::std::os::raw::c_char,
-    pub params: *mut List,
-}
-impl Default for ReindexStmt {
-    fn default() -> Self {
-        let mut s = ::std::mem::MaybeUninit::<Self>::uninit();
-        unsafe {
-            ::std::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
-            s.assume_init()
-        }
-    }
-}
-#[repr(C)]
-#[derive(Debug, Copy, Clone)]
-pub struct CreateConversionStmt {
-    pub type_: NodeTag,
-    pub conversion_name: *mut List,
-    pub for_encoding_name: *mut ::std::os::raw::c_char,
-    pub to_encoding_name: *mut ::std::os::raw::c_char,
-    pub func_name: *mut List,
-    pub def: bool,
-}
-impl Default for CreateConversionStmt {
-    fn default() -> Self {
-        let mut s = ::std::mem::MaybeUninit::<Self>::uninit();
-        unsafe {
-            ::std::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
-            s.assume_init()
-        }
-    }
-}
-#[repr(C)]
-#[derive(Debug, Copy, Clone)]
-pub struct CreateCastStmt {
-    pub type_: NodeTag,
-    pub sourcetype: *mut TypeName,
-    pub targettype: *mut TypeName,
-    pub func: *mut ObjectWithArgs,
-    pub context: CoercionContext,
-    pub inout: bool,
-}
-impl Default for CreateCastStmt {
-    fn default() -> Self {
-        let mut s = ::std::mem::MaybeUninit::<Self>::uninit();
-        unsafe {
-            ::std::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
-            s.assume_init()
-        }
-    }
-}
-#[repr(C)]
-#[derive(Debug, Copy, Clone)]
-pub struct CreateTransformStmt {
-    pub type_: NodeTag,
-    pub replace: bool,
-    pub type_name: *mut TypeName,
-    pub lang: *mut ::std::os::raw::c_char,
-    pub fromsql: *mut ObjectWithArgs,
-    pub tosql: *mut ObjectWithArgs,
-}
-impl Default for CreateTransformStmt {
-    fn default() -> Self {
-        let mut s = ::std::mem::MaybeUninit::<Self>::uninit();
-        unsafe {
-            ::std::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
-            s.assume_init()
-        }
-    }
-}
-#[repr(C)]
-#[derive(Debug, Copy, Clone)]
-pub struct PrepareStmt {
-    pub type_: NodeTag,
-    pub name: *mut ::std::os::raw::c_char,
-    pub argtypes: *mut List,
-    pub query: *mut Node,
-}
-impl Default for PrepareStmt {
-    fn default() -> Self {
-        let mut s = ::std::mem::MaybeUninit::<Self>::uninit();
-        unsafe {
-            ::std::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
-            s.assume_init()
-        }
-    }
-}
-#[repr(C)]
-#[derive(Debug, Copy, Clone)]
-pub struct ExecuteStmt {
-    pub type_: NodeTag,
-    pub name: *mut ::std::os::raw::c_char,
-    pub params: *mut List,
-}
-impl Default for ExecuteStmt {
-    fn default() -> Self {
-        let mut s = ::std::mem::MaybeUninit::<Self>::uninit();
-        unsafe {
-            ::std::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
-            s.assume_init()
-        }
-    }
-}
-#[repr(C)]
-#[derive(Debug, Copy, Clone)]
-pub struct DeallocateStmt {
-    pub type_: NodeTag,
-    pub name: *mut ::std::os::raw::c_char,
-}
-impl Default for DeallocateStmt {
-    fn default() -> Self {
-        let mut s = ::std::mem::MaybeUninit::<Self>::uninit();
-        unsafe {
-            ::std::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
-            s.assume_init()
-        }
-    }
-}
-#[repr(C)]
-#[derive(Debug, Copy, Clone)]
-pub struct DropOwnedStmt {
-    pub type_: NodeTag,
-    pub roles: *mut List,
-    pub behavior: DropBehavior,
-}
-impl Default for DropOwnedStmt {
-    fn default() -> Self {
-        let mut s = ::std::mem::MaybeUninit::<Self>::uninit();
-        unsafe {
-            ::std::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
-            s.assume_init()
-        }
-    }
-}
-#[repr(C)]
-#[derive(Debug, Copy, Clone)]
-pub struct ReassignOwnedStmt {
-    pub type_: NodeTag,
-    pub roles: *mut List,
-    pub newrole: *mut RoleSpec,
-}
-impl Default for ReassignOwnedStmt {
-    fn default() -> Self {
-        let mut s = ::std::mem::MaybeUninit::<Self>::uninit();
-        unsafe {
-            ::std::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
-            s.assume_init()
-        }
-    }
-}
-#[repr(C)]
-#[derive(Debug, Copy, Clone)]
-pub struct AlterTSDictionaryStmt {
-    pub type_: NodeTag,
-    pub dictname: *mut List,
-    pub options: *mut List,
-}
-impl Default for AlterTSDictionaryStmt {
-    fn default() -> Self {
-        let mut s = ::std::mem::MaybeUninit::<Self>::uninit();
-        unsafe {
-            ::std::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
-            s.assume_init()
-        }
-    }
-}
-pub const AlterTSConfigType_ALTER_TSCONFIG_ADD_MAPPING: AlterTSConfigType = 0;
-pub const AlterTSConfigType_ALTER_TSCONFIG_ALTER_MAPPING_FOR_TOKEN: AlterTSConfigType = 1;
-pub const AlterTSConfigType_ALTER_TSCONFIG_REPLACE_DICT: AlterTSConfigType = 2;
-pub const AlterTSConfigType_ALTER_TSCONFIG_REPLACE_DICT_FOR_TOKEN: AlterTSConfigType = 3;
-pub const AlterTSConfigType_ALTER_TSCONFIG_DROP_MAPPING: AlterTSConfigType = 4;
-pub type AlterTSConfigType = ::std::os::raw::c_uint;
-#[repr(C)]
-#[derive(Debug, Copy, Clone)]
-pub struct AlterTSConfigurationStmt {
-    pub type_: NodeTag,
-    pub kind: AlterTSConfigType,
-    pub cfgname: *mut List,
-    pub tokentype: *mut List,
-    pub dicts: *mut List,
-    pub override_: bool,
-    pub replace: bool,
-    pub missing_ok: bool,
-}
-impl Default for AlterTSConfigurationStmt {
-    fn default() -> Self {
-        let mut s = ::std::mem::MaybeUninit::<Self>::uninit();
-        unsafe {
-            ::std::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
-            s.assume_init()
-        }
-    }
-}
-#[repr(C)]
-#[derive(Debug, Copy, Clone)]
-pub struct CreatePublicationStmt {
-    pub type_: NodeTag,
-    pub pubname: *mut ::std::os::raw::c_char,
-    pub options: *mut List,
-    pub tables: *mut List,
-    pub for_all_tables: bool,
-}
-impl Default for CreatePublicationStmt {
-    fn default() -> Self {
-        let mut s = ::std::mem::MaybeUninit::<Self>::uninit();
-        unsafe {
-            ::std::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
-            s.assume_init()
-        }
-    }
-}
-#[repr(C)]
-#[derive(Debug, Copy, Clone)]
-pub struct AlterPublicationStmt {
-    pub type_: NodeTag,
-    pub pubname: *mut ::std::os::raw::c_char,
-    pub options: *mut List,
-    pub tables: *mut List,
-    pub for_all_tables: bool,
-    pub tableAction: DefElemAction,
-}
-impl Default for AlterPublicationStmt {
-    fn default() -> Self {
-        let mut s = ::std::mem::MaybeUninit::<Self>::uninit();
-        unsafe {
-            ::std::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
-            s.assume_init()
-        }
-    }
-}
-#[repr(C)]
-#[derive(Debug, Copy, Clone)]
-pub struct CreateSubscriptionStmt {
-    pub type_: NodeTag,
-    pub subname: *mut ::std::os::raw::c_char,
-    pub conninfo: *mut ::std::os::raw::c_char,
-    pub publication: *mut List,
-    pub options: *mut List,
-}
-impl Default for CreateSubscriptionStmt {
-    fn default() -> Self {
-        let mut s = ::std::mem::MaybeUninit::<Self>::uninit();
-        unsafe {
-            ::std::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
-            s.assume_init()
-        }
-    }
-}
-pub const AlterSubscriptionType_ALTER_SUBSCRIPTION_OPTIONS: AlterSubscriptionType = 0;
-pub const AlterSubscriptionType_ALTER_SUBSCRIPTION_CONNECTION: AlterSubscriptionType = 1;
-pub const AlterSubscriptionType_ALTER_SUBSCRIPTION_SET_PUBLICATION: AlterSubscriptionType = 2;
-pub const AlterSubscriptionType_ALTER_SUBSCRIPTION_ADD_PUBLICATION: AlterSubscriptionType = 3;
-pub const AlterSubscriptionType_ALTER_SUBSCRIPTION_DROP_PUBLICATION: AlterSubscriptionType = 4;
-pub const AlterSubscriptionType_ALTER_SUBSCRIPTION_REFRESH: AlterSubscriptionType = 5;
-pub const AlterSubscriptionType_ALTER_SUBSCRIPTION_ENABLED: AlterSubscriptionType = 6;
-pub type AlterSubscriptionType = ::std::os::raw::c_uint;
-#[repr(C)]
-#[derive(Debug, Copy, Clone)]
-pub struct AlterSubscriptionStmt {
-    pub type_: NodeTag,
-    pub kind: AlterSubscriptionType,
-    pub subname: *mut ::std::os::raw::c_char,
-    pub conninfo: *mut ::std::os::raw::c_char,
-    pub publication: *mut List,
-    pub options: *mut List,
-}
-impl Default for AlterSubscriptionStmt {
-    fn default() -> Self {
-        let mut s = ::std::mem::MaybeUninit::<Self>::uninit();
-        unsafe {
-            ::std::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
-            s.assume_init()
-        }
-    }
-}
-#[repr(C)]
-#[derive(Debug, Copy, Clone)]
-pub struct DropSubscriptionStmt {
-    pub type_: NodeTag,
-    pub subname: *mut ::std::os::raw::c_char,
-    pub missing_ok: bool,
-    pub behavior: DropBehavior,
-}
-impl Default for DropSubscriptionStmt {
-    fn default() -> Self {
-        let mut s = ::std::mem::MaybeUninit::<Self>::uninit();
-        unsafe {
-            ::std::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
-            s.assume_init()
-        }
-    }
 }
 #[repr(C)]
 #[derive(Debug, Default, Copy, Clone)]
@@ -32974,17 +31439,27 @@ pub unsafe fn SlabContextCreate(
 pub unsafe fn GenerationContextCreate(
     arg_parent: MemoryContext,
     arg_name: *const ::std::os::raw::c_char,
-    arg_blockSize: Size,
+    arg_minContextSize: Size,
+    arg_initBlockSize: Size,
+    arg_maxBlockSize: Size,
 ) -> MemoryContext {
     crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
         extern "C" {
             pub fn GenerationContextCreate(
                 parent: MemoryContext,
                 name: *const ::std::os::raw::c_char,
-                blockSize: Size,
+                minContextSize: Size,
+                initBlockSize: Size,
+                maxBlockSize: Size,
             ) -> MemoryContext;
         }
-        GenerationContextCreate(arg_parent, arg_name, arg_blockSize)
+        GenerationContextCreate(
+            arg_parent,
+            arg_name,
+            arg_minContextSize,
+            arg_initBlockSize,
+            arg_maxBlockSize,
+        )
     })
 }
 pub type ExecutorStart_hook_type = ::std::option::Option<
@@ -33517,12 +31992,31 @@ pub unsafe fn InitResultRelInfo(
 pub unsafe fn ExecGetTriggerResultRel(
     arg_estate: *mut EState,
     arg_relid: Oid,
+    arg_rootRelInfo: *mut ResultRelInfo,
 ) -> *mut ResultRelInfo {
     crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
         extern "C" {
-            pub fn ExecGetTriggerResultRel(estate: *mut EState, relid: Oid) -> *mut ResultRelInfo;
+            pub fn ExecGetTriggerResultRel(
+                estate: *mut EState,
+                relid: Oid,
+                rootRelInfo: *mut ResultRelInfo,
+            ) -> *mut ResultRelInfo;
         }
-        ExecGetTriggerResultRel(arg_estate, arg_relid)
+        ExecGetTriggerResultRel(arg_estate, arg_relid, arg_rootRelInfo)
+    })
+}
+pub unsafe fn ExecGetAncestorResultRels(
+    arg_estate: *mut EState,
+    arg_resultRelInfo: *mut ResultRelInfo,
+) -> *mut List {
+    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
+        extern "C" {
+            pub fn ExecGetAncestorResultRels(
+                estate: *mut EState,
+                resultRelInfo: *mut ResultRelInfo,
+            ) -> *mut List;
+        }
+        ExecGetAncestorResultRels(arg_estate, arg_resultRelInfo)
     })
 }
 pub unsafe fn ExecConstraints(
@@ -34138,10 +32632,16 @@ pub unsafe fn ExecAssignScanProjectionInfo(arg_node: *mut ScanState) {
         ExecAssignScanProjectionInfo(arg_node)
     })
 }
-pub unsafe fn ExecAssignScanProjectionInfoWithVarno(arg_node: *mut ScanState, arg_varno: Index) {
+pub unsafe fn ExecAssignScanProjectionInfoWithVarno(
+    arg_node: *mut ScanState,
+    arg_varno: ::std::os::raw::c_int,
+) {
     crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
         extern "C" {
-            pub fn ExecAssignScanProjectionInfoWithVarno(node: *mut ScanState, varno: Index);
+            pub fn ExecAssignScanProjectionInfoWithVarno(
+                node: *mut ScanState,
+                varno: ::std::os::raw::c_int,
+            );
         }
         ExecAssignScanProjectionInfoWithVarno(arg_node, arg_varno)
     })
@@ -34451,14 +32951,14 @@ pub unsafe fn ExecAssignProjectionInfo(arg_planstate: *mut PlanState, arg_inputD
 pub unsafe fn ExecConditionalAssignProjectionInfo(
     arg_planstate: *mut PlanState,
     arg_inputDesc: TupleDesc,
-    arg_varno: Index,
+    arg_varno: ::std::os::raw::c_int,
 ) {
     crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
         extern "C" {
             pub fn ExecConditionalAssignProjectionInfo(
                 planstate: *mut PlanState,
                 inputDesc: TupleDesc,
-                varno: Index,
+                varno: ::std::os::raw::c_int,
             );
         }
         ExecConditionalAssignProjectionInfo(arg_planstate, arg_inputDesc, arg_varno)
@@ -35294,6 +33794,14 @@ pub unsafe fn HeapTupleHeaderGetDatum(arg_tuple: HeapTupleHeader) -> Datum {
         HeapTupleHeaderGetDatum(arg_tuple)
     })
 }
+pub unsafe fn SetSingleFuncCall(arg_fcinfo: FunctionCallInfo, arg_flags: bits32) {
+    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
+        extern "C" {
+            pub fn SetSingleFuncCall(fcinfo: FunctionCallInfo, flags: bits32);
+        }
+        SetSingleFuncCall(arg_fcinfo, arg_flags)
+    })
+}
 pub unsafe fn init_MultiFuncCall(arg_fcinfo: FunctionCallInfo) -> *mut FuncCallContext {
     crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
         extern "C" {
@@ -35949,6 +34457,9 @@ extern "C" {
     pub static mut LogMemoryContextPending: sig_atomic_t;
 }
 extern "C" {
+    pub static mut IdleStatsUpdateTimeoutPending: sig_atomic_t;
+}
+extern "C" {
     pub static mut CheckClientConnectionPending: sig_atomic_t;
 }
 extern "C" {
@@ -36224,8 +34735,7 @@ pub const BackendType_B_WAL_RECEIVER: BackendType = 8;
 pub const BackendType_B_WAL_SENDER: BackendType = 9;
 pub const BackendType_B_WAL_WRITER: BackendType = 10;
 pub const BackendType_B_ARCHIVER: BackendType = 11;
-pub const BackendType_B_STATS_COLLECTOR: BackendType = 12;
-pub const BackendType_B_LOGGER: BackendType = 13;
+pub const BackendType_B_LOGGER: BackendType = 12;
 pub type BackendType = ::std::os::raw::c_uint;
 extern "C" {
     pub static mut MyBackendType: BackendType;
@@ -36441,15 +34951,13 @@ extern "C" {
     pub static mut Mode: ProcessingMode;
 }
 pub const AuxProcType_NotAnAuxProcess: AuxProcType = -1;
-pub const AuxProcType_CheckerProcess: AuxProcType = 0;
-pub const AuxProcType_BootstrapProcess: AuxProcType = 1;
-pub const AuxProcType_StartupProcess: AuxProcType = 2;
-pub const AuxProcType_BgWriterProcess: AuxProcType = 3;
-pub const AuxProcType_ArchiverProcess: AuxProcType = 4;
-pub const AuxProcType_CheckpointerProcess: AuxProcType = 5;
-pub const AuxProcType_WalWriterProcess: AuxProcType = 6;
-pub const AuxProcType_WalReceiverProcess: AuxProcType = 7;
-pub const AuxProcType_NUM_AUXPROCTYPES: AuxProcType = 8;
+pub const AuxProcType_StartupProcess: AuxProcType = 0;
+pub const AuxProcType_BgWriterProcess: AuxProcType = 1;
+pub const AuxProcType_ArchiverProcess: AuxProcType = 2;
+pub const AuxProcType_CheckpointerProcess: AuxProcType = 3;
+pub const AuxProcType_WalWriterProcess: AuxProcType = 4;
+pub const AuxProcType_WalReceiverProcess: AuxProcType = 5;
+pub const AuxProcType_NUM_AUXPROCTYPES: AuxProcType = 6;
 pub type AuxProcType = ::std::os::raw::c_int;
 extern "C" {
     pub static mut MyAuxProcType: AuxProcType;
@@ -36485,8 +34993,9 @@ pub unsafe fn InitPostgres(
     arg_dboid: Oid,
     arg_username: *const ::std::os::raw::c_char,
     arg_useroid: Oid,
-    arg_out_dbname: *mut ::std::os::raw::c_char,
+    arg_load_session_libraries: bool,
     arg_override_allow_connections: bool,
+    arg_out_dbname: *mut ::std::os::raw::c_char,
 ) {
     crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
         extern "C" {
@@ -36495,8 +35004,9 @@ pub unsafe fn InitPostgres(
                 dboid: Oid,
                 username: *const ::std::os::raw::c_char,
                 useroid: Oid,
-                out_dbname: *mut ::std::os::raw::c_char,
+                load_session_libraries: bool,
                 override_allow_connections: bool,
+                out_dbname: *mut ::std::os::raw::c_char,
             );
         }
         InitPostgres(
@@ -36504,8 +35014,9 @@ pub unsafe fn InitPostgres(
             arg_dboid,
             arg_username,
             arg_useroid,
-            arg_out_dbname,
+            arg_load_session_libraries,
             arg_override_allow_connections,
+            arg_out_dbname,
         )
     })
 }
@@ -36522,6 +35033,12 @@ extern "C" {
 }
 extern "C" {
     pub static mut process_shared_preload_libraries_in_progress: bool;
+}
+extern "C" {
+    pub static mut process_shared_preload_libraries_done: bool;
+}
+extern "C" {
+    pub static mut process_shmem_requests_in_progress: bool;
 }
 extern "C" {
     pub static mut session_preload_libraries_string: *mut ::std::os::raw::c_char;
@@ -36610,6 +35127,14 @@ pub unsafe fn process_session_preload_libraries() {
         process_session_preload_libraries()
     })
 }
+pub unsafe fn process_shmem_requests() {
+    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
+        extern "C" {
+            pub fn process_shmem_requests();
+        }
+        process_shmem_requests()
+    })
+}
 pub unsafe fn pg_bindtextdomain(arg_domain: *const ::std::os::raw::c_char) {
     crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
         extern "C" {
@@ -36626,21 +35151,9 @@ pub unsafe fn has_rolreplication(arg_roleid: Oid) -> bool {
         has_rolreplication(arg_roleid)
     })
 }
-pub unsafe fn BackupInProgress() -> bool {
-    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
-        extern "C" {
-            pub fn BackupInProgress() -> bool;
-        }
-        BackupInProgress()
-    })
-}
-pub unsafe fn CancelBackup() {
-    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
-        extern "C" {
-            pub fn CancelBackup();
-        }
-        CancelBackup()
-    })
+pub type shmem_request_hook_type = ::std::option::Option<unsafe extern "C" fn()>;
+extern "C" {
+    pub static mut shmem_request_hook: shmem_request_hook_type;
 }
 pub unsafe fn get_hash_memory_limit() -> usize {
     crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
@@ -36648,14 +35161,6 @@ pub unsafe fn get_hash_memory_limit() -> usize {
             pub fn get_hash_memory_limit() -> usize;
         }
         get_hash_memory_limit()
-    })
-}
-pub unsafe fn get_hash_mem() -> ::std::os::raw::c_int {
-    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
-        extern "C" {
-            pub fn get_hash_mem() -> ::std::os::raw::c_int;
-        }
-        get_hash_mem()
     })
 }
 pub unsafe fn PgArchShmemSize() -> Size {
@@ -36696,6 +35201,42 @@ pub unsafe fn PgArchWakeup() {
             pub fn PgArchWakeup();
         }
         PgArchWakeup()
+    })
+}
+pub unsafe fn PgArchForceDirScan() {
+    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
+        extern "C" {
+            pub fn PgArchForceDirScan();
+        }
+        PgArchForceDirScan()
+    })
+}
+extern "C" {
+    pub static mut XLogArchiveLibrary: *mut ::std::os::raw::c_char;
+}
+pub type ArchiveCheckConfiguredCB = ::std::option::Option<unsafe extern "C" fn() -> bool>;
+pub type ArchiveFileCB = ::std::option::Option<
+    unsafe extern "C" fn(
+        file: *const ::std::os::raw::c_char,
+        path: *const ::std::os::raw::c_char,
+    ) -> bool,
+>;
+pub type ArchiveShutdownCB = ::std::option::Option<unsafe extern "C" fn()>;
+#[repr(C)]
+#[derive(Debug, Default, Copy, Clone)]
+pub struct ArchiveModuleCallbacks {
+    pub check_configured_cb: ArchiveCheckConfiguredCB,
+    pub archive_file_cb: ArchiveFileCB,
+    pub shutdown_cb: ArchiveShutdownCB,
+}
+pub type ArchiveModuleInit =
+    ::std::option::Option<unsafe extern "C" fn(cb: *mut ArchiveModuleCallbacks)>;
+pub unsafe fn shell_archive_init(arg_cb: *mut ArchiveModuleCallbacks) {
+    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
+        extern "C" {
+            pub fn shell_archive_init(cb: *mut ArchiveModuleCallbacks);
+        }
+        shell_archive_init(arg_cb)
     })
 }
 pub const ProgressCommandType_PROGRESS_COMMAND_INVALID: ProgressCommandType = 0;
@@ -36744,6 +35285,1755 @@ pub unsafe fn pgstat_progress_end_command() {
             pub fn pgstat_progress_end_command();
         }
         pgstat_progress_end_command()
+    })
+}
+pub type sa_family_t = __uint8_t;
+pub type socklen_t = __darwin_socklen_t;
+#[repr(C)]
+#[derive(Debug, Copy, Clone)]
+pub struct iovec {
+    pub iov_base: *mut ::std::os::raw::c_void,
+    pub iov_len: usize,
+}
+impl Default for iovec {
+    fn default() -> Self {
+        let mut s = ::std::mem::MaybeUninit::<Self>::uninit();
+        unsafe {
+            ::std::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
+            s.assume_init()
+        }
+    }
+}
+pub type sae_associd_t = __uint32_t;
+pub type sae_connid_t = __uint32_t;
+#[repr(C)]
+#[derive(Debug, Copy, Clone)]
+pub struct sa_endpoints {
+    pub sae_srcif: ::std::os::raw::c_uint,
+    pub sae_srcaddr: *const sockaddr,
+    pub sae_srcaddrlen: socklen_t,
+    pub sae_dstaddr: *const sockaddr,
+    pub sae_dstaddrlen: socklen_t,
+}
+impl Default for sa_endpoints {
+    fn default() -> Self {
+        let mut s = ::std::mem::MaybeUninit::<Self>::uninit();
+        unsafe {
+            ::std::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
+            s.assume_init()
+        }
+    }
+}
+pub type sa_endpoints_t = sa_endpoints;
+#[repr(C)]
+#[derive(Debug, Default, Copy, Clone)]
+pub struct linger {
+    pub l_onoff: ::std::os::raw::c_int,
+    pub l_linger: ::std::os::raw::c_int,
+}
+#[repr(C)]
+#[derive(Debug, Default, Copy, Clone)]
+pub struct so_np_extensions {
+    pub npx_flags: u_int32_t,
+    pub npx_mask: u_int32_t,
+}
+#[repr(C)]
+#[derive(Debug, Default, Copy, Clone)]
+pub struct sockaddr {
+    pub sa_len: __uint8_t,
+    pub sa_family: sa_family_t,
+    pub sa_data: [::std::os::raw::c_char; 14usize],
+}
+#[repr(C)]
+#[derive(Debug, Default, Copy, Clone)]
+pub struct sockproto {
+    pub sp_family: __uint16_t,
+    pub sp_protocol: __uint16_t,
+}
+#[repr(C)]
+#[derive(Debug, Copy, Clone)]
+pub struct sockaddr_storage {
+    pub ss_len: __uint8_t,
+    pub ss_family: sa_family_t,
+    pub __ss_pad1: [::std::os::raw::c_char; 6usize],
+    pub __ss_align: __int64_t,
+    pub __ss_pad2: [::std::os::raw::c_char; 112usize],
+}
+impl Default for sockaddr_storage {
+    fn default() -> Self {
+        let mut s = ::std::mem::MaybeUninit::<Self>::uninit();
+        unsafe {
+            ::std::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
+            s.assume_init()
+        }
+    }
+}
+#[repr(C)]
+#[derive(Debug, Copy, Clone)]
+pub struct msghdr {
+    pub msg_name: *mut ::std::os::raw::c_void,
+    pub msg_namelen: socklen_t,
+    pub msg_iov: *mut iovec,
+    pub msg_iovlen: ::std::os::raw::c_int,
+    pub msg_control: *mut ::std::os::raw::c_void,
+    pub msg_controllen: socklen_t,
+    pub msg_flags: ::std::os::raw::c_int,
+}
+impl Default for msghdr {
+    fn default() -> Self {
+        let mut s = ::std::mem::MaybeUninit::<Self>::uninit();
+        unsafe {
+            ::std::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
+            s.assume_init()
+        }
+    }
+}
+#[repr(C)]
+#[derive(Debug, Default, Copy, Clone)]
+pub struct cmsghdr {
+    pub cmsg_len: socklen_t,
+    pub cmsg_level: ::std::os::raw::c_int,
+    pub cmsg_type: ::std::os::raw::c_int,
+}
+#[repr(C)]
+#[derive(Debug, Copy, Clone)]
+pub struct sf_hdtr {
+    pub headers: *mut iovec,
+    pub hdr_cnt: ::std::os::raw::c_int,
+    pub trailers: *mut iovec,
+    pub trl_cnt: ::std::os::raw::c_int,
+}
+impl Default for sf_hdtr {
+    fn default() -> Self {
+        let mut s = ::std::mem::MaybeUninit::<Self>::uninit();
+        unsafe {
+            ::std::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
+            s.assume_init()
+        }
+    }
+}
+pub unsafe fn accept(
+    arg_arg1: ::std::os::raw::c_int,
+    arg_arg2: *mut sockaddr,
+    arg_arg3: *mut socklen_t,
+) -> ::std::os::raw::c_int {
+    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
+        extern "C" {
+            pub fn accept(
+                arg1: ::std::os::raw::c_int,
+                arg2: *mut sockaddr,
+                arg3: *mut socklen_t,
+            ) -> ::std::os::raw::c_int;
+        }
+        accept(arg_arg1, arg_arg2, arg_arg3)
+    })
+}
+pub unsafe fn bind(
+    arg_arg1: ::std::os::raw::c_int,
+    arg_arg2: *const sockaddr,
+    arg_arg3: socklen_t,
+) -> ::std::os::raw::c_int {
+    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
+        extern "C" {
+            pub fn bind(
+                arg1: ::std::os::raw::c_int,
+                arg2: *const sockaddr,
+                arg3: socklen_t,
+            ) -> ::std::os::raw::c_int;
+        }
+        bind(arg_arg1, arg_arg2, arg_arg3)
+    })
+}
+pub unsafe fn connect(
+    arg_arg1: ::std::os::raw::c_int,
+    arg_arg2: *const sockaddr,
+    arg_arg3: socklen_t,
+) -> ::std::os::raw::c_int {
+    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
+        extern "C" {
+            pub fn connect(
+                arg1: ::std::os::raw::c_int,
+                arg2: *const sockaddr,
+                arg3: socklen_t,
+            ) -> ::std::os::raw::c_int;
+        }
+        connect(arg_arg1, arg_arg2, arg_arg3)
+    })
+}
+pub unsafe fn getpeername(
+    arg_arg1: ::std::os::raw::c_int,
+    arg_arg2: *mut sockaddr,
+    arg_arg3: *mut socklen_t,
+) -> ::std::os::raw::c_int {
+    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
+        extern "C" {
+            pub fn getpeername(
+                arg1: ::std::os::raw::c_int,
+                arg2: *mut sockaddr,
+                arg3: *mut socklen_t,
+            ) -> ::std::os::raw::c_int;
+        }
+        getpeername(arg_arg1, arg_arg2, arg_arg3)
+    })
+}
+pub unsafe fn getsockname(
+    arg_arg1: ::std::os::raw::c_int,
+    arg_arg2: *mut sockaddr,
+    arg_arg3: *mut socklen_t,
+) -> ::std::os::raw::c_int {
+    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
+        extern "C" {
+            pub fn getsockname(
+                arg1: ::std::os::raw::c_int,
+                arg2: *mut sockaddr,
+                arg3: *mut socklen_t,
+            ) -> ::std::os::raw::c_int;
+        }
+        getsockname(arg_arg1, arg_arg2, arg_arg3)
+    })
+}
+pub unsafe fn getsockopt(
+    arg_arg1: ::std::os::raw::c_int,
+    arg_arg2: ::std::os::raw::c_int,
+    arg_arg3: ::std::os::raw::c_int,
+    arg_arg4: *mut ::std::os::raw::c_void,
+    arg_arg5: *mut socklen_t,
+) -> ::std::os::raw::c_int {
+    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
+        extern "C" {
+            pub fn getsockopt(
+                arg1: ::std::os::raw::c_int,
+                arg2: ::std::os::raw::c_int,
+                arg3: ::std::os::raw::c_int,
+                arg4: *mut ::std::os::raw::c_void,
+                arg5: *mut socklen_t,
+            ) -> ::std::os::raw::c_int;
+        }
+        getsockopt(arg_arg1, arg_arg2, arg_arg3, arg_arg4, arg_arg5)
+    })
+}
+pub unsafe fn listen(
+    arg_arg1: ::std::os::raw::c_int,
+    arg_arg2: ::std::os::raw::c_int,
+) -> ::std::os::raw::c_int {
+    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
+        extern "C" {
+            pub fn listen(
+                arg1: ::std::os::raw::c_int,
+                arg2: ::std::os::raw::c_int,
+            ) -> ::std::os::raw::c_int;
+        }
+        listen(arg_arg1, arg_arg2)
+    })
+}
+pub unsafe fn recv(
+    arg_arg1: ::std::os::raw::c_int,
+    arg_arg2: *mut ::std::os::raw::c_void,
+    arg_arg3: usize,
+    arg_arg4: ::std::os::raw::c_int,
+) -> isize {
+    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
+        extern "C" {
+            pub fn recv(
+                arg1: ::std::os::raw::c_int,
+                arg2: *mut ::std::os::raw::c_void,
+                arg3: usize,
+                arg4: ::std::os::raw::c_int,
+            ) -> isize;
+        }
+        recv(arg_arg1, arg_arg2, arg_arg3, arg_arg4)
+    })
+}
+pub unsafe fn recvfrom(
+    arg_arg1: ::std::os::raw::c_int,
+    arg_arg2: *mut ::std::os::raw::c_void,
+    arg_arg3: usize,
+    arg_arg4: ::std::os::raw::c_int,
+    arg_arg5: *mut sockaddr,
+    arg_arg6: *mut socklen_t,
+) -> isize {
+    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
+        extern "C" {
+            pub fn recvfrom(
+                arg1: ::std::os::raw::c_int,
+                arg2: *mut ::std::os::raw::c_void,
+                arg3: usize,
+                arg4: ::std::os::raw::c_int,
+                arg5: *mut sockaddr,
+                arg6: *mut socklen_t,
+            ) -> isize;
+        }
+        recvfrom(arg_arg1, arg_arg2, arg_arg3, arg_arg4, arg_arg5, arg_arg6)
+    })
+}
+pub unsafe fn recvmsg(
+    arg_arg1: ::std::os::raw::c_int,
+    arg_arg2: *mut msghdr,
+    arg_arg3: ::std::os::raw::c_int,
+) -> isize {
+    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
+        extern "C" {
+            pub fn recvmsg(
+                arg1: ::std::os::raw::c_int,
+                arg2: *mut msghdr,
+                arg3: ::std::os::raw::c_int,
+            ) -> isize;
+        }
+        recvmsg(arg_arg1, arg_arg2, arg_arg3)
+    })
+}
+pub unsafe fn send(
+    arg_arg1: ::std::os::raw::c_int,
+    arg_arg2: *const ::std::os::raw::c_void,
+    arg_arg3: usize,
+    arg_arg4: ::std::os::raw::c_int,
+) -> isize {
+    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
+        extern "C" {
+            pub fn send(
+                arg1: ::std::os::raw::c_int,
+                arg2: *const ::std::os::raw::c_void,
+                arg3: usize,
+                arg4: ::std::os::raw::c_int,
+            ) -> isize;
+        }
+        send(arg_arg1, arg_arg2, arg_arg3, arg_arg4)
+    })
+}
+pub unsafe fn sendmsg(
+    arg_arg1: ::std::os::raw::c_int,
+    arg_arg2: *const msghdr,
+    arg_arg3: ::std::os::raw::c_int,
+) -> isize {
+    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
+        extern "C" {
+            pub fn sendmsg(
+                arg1: ::std::os::raw::c_int,
+                arg2: *const msghdr,
+                arg3: ::std::os::raw::c_int,
+            ) -> isize;
+        }
+        sendmsg(arg_arg1, arg_arg2, arg_arg3)
+    })
+}
+pub unsafe fn sendto(
+    arg_arg1: ::std::os::raw::c_int,
+    arg_arg2: *const ::std::os::raw::c_void,
+    arg_arg3: usize,
+    arg_arg4: ::std::os::raw::c_int,
+    arg_arg5: *const sockaddr,
+    arg_arg6: socklen_t,
+) -> isize {
+    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
+        extern "C" {
+            pub fn sendto(
+                arg1: ::std::os::raw::c_int,
+                arg2: *const ::std::os::raw::c_void,
+                arg3: usize,
+                arg4: ::std::os::raw::c_int,
+                arg5: *const sockaddr,
+                arg6: socklen_t,
+            ) -> isize;
+        }
+        sendto(arg_arg1, arg_arg2, arg_arg3, arg_arg4, arg_arg5, arg_arg6)
+    })
+}
+pub unsafe fn setsockopt(
+    arg_arg1: ::std::os::raw::c_int,
+    arg_arg2: ::std::os::raw::c_int,
+    arg_arg3: ::std::os::raw::c_int,
+    arg_arg4: *const ::std::os::raw::c_void,
+    arg_arg5: socklen_t,
+) -> ::std::os::raw::c_int {
+    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
+        extern "C" {
+            pub fn setsockopt(
+                arg1: ::std::os::raw::c_int,
+                arg2: ::std::os::raw::c_int,
+                arg3: ::std::os::raw::c_int,
+                arg4: *const ::std::os::raw::c_void,
+                arg5: socklen_t,
+            ) -> ::std::os::raw::c_int;
+        }
+        setsockopt(arg_arg1, arg_arg2, arg_arg3, arg_arg4, arg_arg5)
+    })
+}
+pub unsafe fn shutdown(
+    arg_arg1: ::std::os::raw::c_int,
+    arg_arg2: ::std::os::raw::c_int,
+) -> ::std::os::raw::c_int {
+    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
+        extern "C" {
+            pub fn shutdown(
+                arg1: ::std::os::raw::c_int,
+                arg2: ::std::os::raw::c_int,
+            ) -> ::std::os::raw::c_int;
+        }
+        shutdown(arg_arg1, arg_arg2)
+    })
+}
+pub unsafe fn sockatmark(arg_arg1: ::std::os::raw::c_int) -> ::std::os::raw::c_int {
+    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
+        extern "C" {
+            pub fn sockatmark(arg1: ::std::os::raw::c_int) -> ::std::os::raw::c_int;
+        }
+        sockatmark(arg_arg1)
+    })
+}
+pub unsafe fn socket(
+    arg_arg1: ::std::os::raw::c_int,
+    arg_arg2: ::std::os::raw::c_int,
+    arg_arg3: ::std::os::raw::c_int,
+) -> ::std::os::raw::c_int {
+    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
+        extern "C" {
+            pub fn socket(
+                arg1: ::std::os::raw::c_int,
+                arg2: ::std::os::raw::c_int,
+                arg3: ::std::os::raw::c_int,
+            ) -> ::std::os::raw::c_int;
+        }
+        socket(arg_arg1, arg_arg2, arg_arg3)
+    })
+}
+pub unsafe fn socketpair(
+    arg_arg1: ::std::os::raw::c_int,
+    arg_arg2: ::std::os::raw::c_int,
+    arg_arg3: ::std::os::raw::c_int,
+    arg_arg4: *mut ::std::os::raw::c_int,
+) -> ::std::os::raw::c_int {
+    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
+        extern "C" {
+            pub fn socketpair(
+                arg1: ::std::os::raw::c_int,
+                arg2: ::std::os::raw::c_int,
+                arg3: ::std::os::raw::c_int,
+                arg4: *mut ::std::os::raw::c_int,
+            ) -> ::std::os::raw::c_int;
+        }
+        socketpair(arg_arg1, arg_arg2, arg_arg3, arg_arg4)
+    })
+}
+pub unsafe fn sendfile(
+    arg_arg1: ::std::os::raw::c_int,
+    arg_arg2: ::std::os::raw::c_int,
+    arg_arg3: off_t,
+    arg_arg4: *mut off_t,
+    arg_arg5: *mut sf_hdtr,
+    arg_arg6: ::std::os::raw::c_int,
+) -> ::std::os::raw::c_int {
+    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
+        extern "C" {
+            pub fn sendfile(
+                arg1: ::std::os::raw::c_int,
+                arg2: ::std::os::raw::c_int,
+                arg3: off_t,
+                arg4: *mut off_t,
+                arg5: *mut sf_hdtr,
+                arg6: ::std::os::raw::c_int,
+            ) -> ::std::os::raw::c_int;
+        }
+        sendfile(arg_arg1, arg_arg2, arg_arg3, arg_arg4, arg_arg5, arg_arg6)
+    })
+}
+pub unsafe fn pfctlinput(arg_arg1: ::std::os::raw::c_int, arg_arg2: *mut sockaddr) {
+    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
+        extern "C" {
+            pub fn pfctlinput(arg1: ::std::os::raw::c_int, arg2: *mut sockaddr);
+        }
+        pfctlinput(arg_arg1, arg_arg2)
+    })
+}
+pub unsafe fn connectx(
+    arg_arg1: ::std::os::raw::c_int,
+    arg_arg2: *const sa_endpoints_t,
+    arg_arg3: sae_associd_t,
+    arg_arg4: ::std::os::raw::c_uint,
+    arg_arg5: *const iovec,
+    arg_arg6: ::std::os::raw::c_uint,
+    arg_arg7: *mut usize,
+    arg_arg8: *mut sae_connid_t,
+) -> ::std::os::raw::c_int {
+    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
+        extern "C" {
+            pub fn connectx(
+                arg1: ::std::os::raw::c_int,
+                arg2: *const sa_endpoints_t,
+                arg3: sae_associd_t,
+                arg4: ::std::os::raw::c_uint,
+                arg5: *const iovec,
+                arg6: ::std::os::raw::c_uint,
+                arg7: *mut usize,
+                arg8: *mut sae_connid_t,
+            ) -> ::std::os::raw::c_int;
+        }
+        connectx(arg_arg1, arg_arg2, arg_arg3, arg_arg4, arg_arg5, arg_arg6, arg_arg7, arg_arg8)
+    })
+}
+pub unsafe fn disconnectx(
+    arg_arg1: ::std::os::raw::c_int,
+    arg_arg2: sae_associd_t,
+    arg_arg3: sae_connid_t,
+) -> ::std::os::raw::c_int {
+    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
+        extern "C" {
+            pub fn disconnectx(
+                arg1: ::std::os::raw::c_int,
+                arg2: sae_associd_t,
+                arg3: sae_connid_t,
+            ) -> ::std::os::raw::c_int;
+        }
+        disconnectx(arg_arg1, arg_arg2, arg_arg3)
+    })
+}
+#[repr(C)]
+#[derive(Debug, Default, Copy, Clone)]
+pub struct in_addr {
+    pub s_addr: in_addr_t,
+}
+#[repr(C)]
+#[derive(Debug, Default, Copy, Clone)]
+pub struct sockaddr_in {
+    pub sin_len: __uint8_t,
+    pub sin_family: sa_family_t,
+    pub sin_port: in_port_t,
+    pub sin_addr: in_addr,
+    pub sin_zero: [::std::os::raw::c_char; 8usize],
+}
+#[repr(C)]
+#[derive(Debug, Copy, Clone)]
+pub struct ip_opts {
+    pub ip_dst: in_addr,
+    pub ip_opts: [::std::os::raw::c_char; 40usize],
+}
+impl Default for ip_opts {
+    fn default() -> Self {
+        let mut s = ::std::mem::MaybeUninit::<Self>::uninit();
+        unsafe {
+            ::std::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
+            s.assume_init()
+        }
+    }
+}
+#[repr(C)]
+#[derive(Debug, Default, Copy, Clone)]
+pub struct ip_mreq {
+    pub imr_multiaddr: in_addr,
+    pub imr_interface: in_addr,
+}
+#[repr(C)]
+#[derive(Debug, Default, Copy, Clone)]
+pub struct ip_mreqn {
+    pub imr_multiaddr: in_addr,
+    pub imr_address: in_addr,
+    pub imr_ifindex: ::std::os::raw::c_int,
+}
+#[repr(C)]
+#[derive(Debug, Default, Copy, Clone)]
+pub struct ip_mreq_source {
+    pub imr_multiaddr: in_addr,
+    pub imr_sourceaddr: in_addr,
+    pub imr_interface: in_addr,
+}
+#[repr(C, packed(4))]
+#[derive(Debug, Copy, Clone)]
+pub struct group_req {
+    pub gr_interface: u32,
+    pub gr_group: sockaddr_storage,
+}
+impl Default for group_req {
+    fn default() -> Self {
+        let mut s = ::std::mem::MaybeUninit::<Self>::uninit();
+        unsafe {
+            ::std::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
+            s.assume_init()
+        }
+    }
+}
+#[repr(C, packed(4))]
+#[derive(Debug, Copy, Clone)]
+pub struct group_source_req {
+    pub gsr_interface: u32,
+    pub gsr_group: sockaddr_storage,
+    pub gsr_source: sockaddr_storage,
+}
+impl Default for group_source_req {
+    fn default() -> Self {
+        let mut s = ::std::mem::MaybeUninit::<Self>::uninit();
+        unsafe {
+            ::std::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
+            s.assume_init()
+        }
+    }
+}
+#[repr(C, packed(4))]
+#[derive(Debug, Copy, Clone)]
+pub struct __msfilterreq {
+    pub msfr_ifindex: u32,
+    pub msfr_fmode: u32,
+    pub msfr_nsrcs: u32,
+    pub __msfr_align: u32,
+    pub msfr_group: sockaddr_storage,
+    pub msfr_srcs: *mut sockaddr_storage,
+}
+impl Default for __msfilterreq {
+    fn default() -> Self {
+        let mut s = ::std::mem::MaybeUninit::<Self>::uninit();
+        unsafe {
+            ::std::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
+            s.assume_init()
+        }
+    }
+}
+pub unsafe fn setipv4sourcefilter(
+    arg_arg1: ::std::os::raw::c_int,
+    arg_arg2: in_addr,
+    arg_arg3: in_addr,
+    arg_arg4: u32,
+    arg_arg5: u32,
+    arg_arg6: *mut in_addr,
+) -> ::std::os::raw::c_int {
+    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
+        extern "C" {
+            pub fn setipv4sourcefilter(
+                arg1: ::std::os::raw::c_int,
+                arg2: in_addr,
+                arg3: in_addr,
+                arg4: u32,
+                arg5: u32,
+                arg6: *mut in_addr,
+            ) -> ::std::os::raw::c_int;
+        }
+        setipv4sourcefilter(arg_arg1, arg_arg2, arg_arg3, arg_arg4, arg_arg5, arg_arg6)
+    })
+}
+pub unsafe fn getipv4sourcefilter(
+    arg_arg1: ::std::os::raw::c_int,
+    arg_arg2: in_addr,
+    arg_arg3: in_addr,
+    arg_arg4: *mut u32,
+    arg_arg5: *mut u32,
+    arg_arg6: *mut in_addr,
+) -> ::std::os::raw::c_int {
+    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
+        extern "C" {
+            pub fn getipv4sourcefilter(
+                arg1: ::std::os::raw::c_int,
+                arg2: in_addr,
+                arg3: in_addr,
+                arg4: *mut u32,
+                arg5: *mut u32,
+                arg6: *mut in_addr,
+            ) -> ::std::os::raw::c_int;
+        }
+        getipv4sourcefilter(arg_arg1, arg_arg2, arg_arg3, arg_arg4, arg_arg5, arg_arg6)
+    })
+}
+pub unsafe fn setsourcefilter(
+    arg_arg1: ::std::os::raw::c_int,
+    arg_arg2: u32,
+    arg_arg3: *mut sockaddr,
+    arg_arg4: socklen_t,
+    arg_arg5: u32,
+    arg_arg6: u32,
+    arg_arg7: *mut sockaddr_storage,
+) -> ::std::os::raw::c_int {
+    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
+        extern "C" {
+            pub fn setsourcefilter(
+                arg1: ::std::os::raw::c_int,
+                arg2: u32,
+                arg3: *mut sockaddr,
+                arg4: socklen_t,
+                arg5: u32,
+                arg6: u32,
+                arg7: *mut sockaddr_storage,
+            ) -> ::std::os::raw::c_int;
+        }
+        setsourcefilter(arg_arg1, arg_arg2, arg_arg3, arg_arg4, arg_arg5, arg_arg6, arg_arg7)
+    })
+}
+pub unsafe fn getsourcefilter(
+    arg_arg1: ::std::os::raw::c_int,
+    arg_arg2: u32,
+    arg_arg3: *mut sockaddr,
+    arg_arg4: socklen_t,
+    arg_arg5: *mut u32,
+    arg_arg6: *mut u32,
+    arg_arg7: *mut sockaddr_storage,
+) -> ::std::os::raw::c_int {
+    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
+        extern "C" {
+            pub fn getsourcefilter(
+                arg1: ::std::os::raw::c_int,
+                arg2: u32,
+                arg3: *mut sockaddr,
+                arg4: socklen_t,
+                arg5: *mut u32,
+                arg6: *mut u32,
+                arg7: *mut sockaddr_storage,
+            ) -> ::std::os::raw::c_int;
+        }
+        getsourcefilter(arg_arg1, arg_arg2, arg_arg3, arg_arg4, arg_arg5, arg_arg6, arg_arg7)
+    })
+}
+#[repr(C)]
+#[derive(Debug, Default, Copy, Clone)]
+pub struct in_pktinfo {
+    pub ipi_ifindex: ::std::os::raw::c_uint,
+    pub ipi_spec_dst: in_addr,
+    pub ipi_addr: in_addr,
+}
+#[repr(C)]
+#[derive(Copy, Clone)]
+pub struct in6_addr {
+    pub __u6_addr: in6_addr__bindgen_ty_1,
+}
+#[repr(C)]
+#[derive(Copy, Clone)]
+pub union in6_addr__bindgen_ty_1 {
+    pub __u6_addr8: [__uint8_t; 16usize],
+    pub __u6_addr16: [__uint16_t; 8usize],
+    pub __u6_addr32: [__uint32_t; 4usize],
+}
+impl Default for in6_addr__bindgen_ty_1 {
+    fn default() -> Self {
+        let mut s = ::std::mem::MaybeUninit::<Self>::uninit();
+        unsafe {
+            ::std::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
+            s.assume_init()
+        }
+    }
+}
+impl Default for in6_addr {
+    fn default() -> Self {
+        let mut s = ::std::mem::MaybeUninit::<Self>::uninit();
+        unsafe {
+            ::std::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
+            s.assume_init()
+        }
+    }
+}
+pub type in6_addr_t = in6_addr;
+#[repr(C)]
+#[derive(Copy, Clone)]
+pub struct sockaddr_in6 {
+    pub sin6_len: __uint8_t,
+    pub sin6_family: sa_family_t,
+    pub sin6_port: in_port_t,
+    pub sin6_flowinfo: __uint32_t,
+    pub sin6_addr: in6_addr,
+    pub sin6_scope_id: __uint32_t,
+}
+impl Default for sockaddr_in6 {
+    fn default() -> Self {
+        let mut s = ::std::mem::MaybeUninit::<Self>::uninit();
+        unsafe {
+            ::std::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
+            s.assume_init()
+        }
+    }
+}
+extern "C" {
+    pub static in6addr_any: in6_addr;
+}
+extern "C" {
+    pub static in6addr_loopback: in6_addr;
+}
+extern "C" {
+    pub static in6addr_nodelocal_allnodes: in6_addr;
+}
+extern "C" {
+    pub static in6addr_linklocal_allnodes: in6_addr;
+}
+extern "C" {
+    pub static in6addr_linklocal_allrouters: in6_addr;
+}
+extern "C" {
+    pub static in6addr_linklocal_allv2routers: in6_addr;
+}
+#[repr(C)]
+#[derive(Copy, Clone)]
+pub struct ipv6_mreq {
+    pub ipv6mr_multiaddr: in6_addr,
+    pub ipv6mr_interface: ::std::os::raw::c_uint,
+}
+impl Default for ipv6_mreq {
+    fn default() -> Self {
+        let mut s = ::std::mem::MaybeUninit::<Self>::uninit();
+        unsafe {
+            ::std::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
+            s.assume_init()
+        }
+    }
+}
+#[repr(C)]
+#[derive(Copy, Clone)]
+pub struct in6_pktinfo {
+    pub ipi6_addr: in6_addr,
+    pub ipi6_ifindex: ::std::os::raw::c_uint,
+}
+impl Default for in6_pktinfo {
+    fn default() -> Self {
+        let mut s = ::std::mem::MaybeUninit::<Self>::uninit();
+        unsafe {
+            ::std::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
+            s.assume_init()
+        }
+    }
+}
+#[repr(C)]
+#[derive(Copy, Clone)]
+pub struct ip6_mtuinfo {
+    pub ip6m_addr: sockaddr_in6,
+    pub ip6m_mtu: u32,
+}
+impl Default for ip6_mtuinfo {
+    fn default() -> Self {
+        let mut s = ::std::mem::MaybeUninit::<Self>::uninit();
+        unsafe {
+            ::std::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
+            s.assume_init()
+        }
+    }
+}
+pub unsafe fn inet6_option_space(arg_arg1: ::std::os::raw::c_int) -> ::std::os::raw::c_int {
+    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
+        extern "C" {
+            pub fn inet6_option_space(arg1: ::std::os::raw::c_int) -> ::std::os::raw::c_int;
+        }
+        inet6_option_space(arg_arg1)
+    })
+}
+pub unsafe fn inet6_option_init(
+    arg_arg1: *mut ::std::os::raw::c_void,
+    arg_arg2: *mut *mut cmsghdr,
+    arg_arg3: ::std::os::raw::c_int,
+) -> ::std::os::raw::c_int {
+    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
+        extern "C" {
+            pub fn inet6_option_init(
+                arg1: *mut ::std::os::raw::c_void,
+                arg2: *mut *mut cmsghdr,
+                arg3: ::std::os::raw::c_int,
+            ) -> ::std::os::raw::c_int;
+        }
+        inet6_option_init(arg_arg1, arg_arg2, arg_arg3)
+    })
+}
+pub unsafe fn inet6_option_append(
+    arg_arg1: *mut cmsghdr,
+    arg_arg2: *const __uint8_t,
+    arg_arg3: ::std::os::raw::c_int,
+    arg_arg4: ::std::os::raw::c_int,
+) -> ::std::os::raw::c_int {
+    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
+        extern "C" {
+            pub fn inet6_option_append(
+                arg1: *mut cmsghdr,
+                arg2: *const __uint8_t,
+                arg3: ::std::os::raw::c_int,
+                arg4: ::std::os::raw::c_int,
+            ) -> ::std::os::raw::c_int;
+        }
+        inet6_option_append(arg_arg1, arg_arg2, arg_arg3, arg_arg4)
+    })
+}
+pub unsafe fn inet6_option_alloc(
+    arg_arg1: *mut cmsghdr,
+    arg_arg2: ::std::os::raw::c_int,
+    arg_arg3: ::std::os::raw::c_int,
+    arg_arg4: ::std::os::raw::c_int,
+) -> *mut __uint8_t {
+    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
+        extern "C" {
+            pub fn inet6_option_alloc(
+                arg1: *mut cmsghdr,
+                arg2: ::std::os::raw::c_int,
+                arg3: ::std::os::raw::c_int,
+                arg4: ::std::os::raw::c_int,
+            ) -> *mut __uint8_t;
+        }
+        inet6_option_alloc(arg_arg1, arg_arg2, arg_arg3, arg_arg4)
+    })
+}
+pub unsafe fn inet6_option_next(
+    arg_arg1: *const cmsghdr,
+    arg_arg2: *mut *mut __uint8_t,
+) -> ::std::os::raw::c_int {
+    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
+        extern "C" {
+            pub fn inet6_option_next(
+                arg1: *const cmsghdr,
+                arg2: *mut *mut __uint8_t,
+            ) -> ::std::os::raw::c_int;
+        }
+        inet6_option_next(arg_arg1, arg_arg2)
+    })
+}
+pub unsafe fn inet6_option_find(
+    arg_arg1: *const cmsghdr,
+    arg_arg2: *mut *mut __uint8_t,
+    arg_arg3: ::std::os::raw::c_int,
+) -> ::std::os::raw::c_int {
+    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
+        extern "C" {
+            pub fn inet6_option_find(
+                arg1: *const cmsghdr,
+                arg2: *mut *mut __uint8_t,
+                arg3: ::std::os::raw::c_int,
+            ) -> ::std::os::raw::c_int;
+        }
+        inet6_option_find(arg_arg1, arg_arg2, arg_arg3)
+    })
+}
+pub unsafe fn inet6_rthdr_space(
+    arg_arg1: ::std::os::raw::c_int,
+    arg_arg2: ::std::os::raw::c_int,
+) -> usize {
+    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
+        extern "C" {
+            pub fn inet6_rthdr_space(
+                arg1: ::std::os::raw::c_int,
+                arg2: ::std::os::raw::c_int,
+            ) -> usize;
+        }
+        inet6_rthdr_space(arg_arg1, arg_arg2)
+    })
+}
+pub unsafe fn inet6_rthdr_init(
+    arg_arg1: *mut ::std::os::raw::c_void,
+    arg_arg2: ::std::os::raw::c_int,
+) -> *mut cmsghdr {
+    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
+        extern "C" {
+            pub fn inet6_rthdr_init(
+                arg1: *mut ::std::os::raw::c_void,
+                arg2: ::std::os::raw::c_int,
+            ) -> *mut cmsghdr;
+        }
+        inet6_rthdr_init(arg_arg1, arg_arg2)
+    })
+}
+pub unsafe fn inet6_rthdr_add(
+    arg_arg1: *mut cmsghdr,
+    arg_arg2: *const in6_addr,
+    arg_arg3: ::std::os::raw::c_uint,
+) -> ::std::os::raw::c_int {
+    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
+        extern "C" {
+            pub fn inet6_rthdr_add(
+                arg1: *mut cmsghdr,
+                arg2: *const in6_addr,
+                arg3: ::std::os::raw::c_uint,
+            ) -> ::std::os::raw::c_int;
+        }
+        inet6_rthdr_add(arg_arg1, arg_arg2, arg_arg3)
+    })
+}
+pub unsafe fn inet6_rthdr_lasthop(
+    arg_arg1: *mut cmsghdr,
+    arg_arg2: ::std::os::raw::c_uint,
+) -> ::std::os::raw::c_int {
+    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
+        extern "C" {
+            pub fn inet6_rthdr_lasthop(
+                arg1: *mut cmsghdr,
+                arg2: ::std::os::raw::c_uint,
+            ) -> ::std::os::raw::c_int;
+        }
+        inet6_rthdr_lasthop(arg_arg1, arg_arg2)
+    })
+}
+pub unsafe fn inet6_rthdr_segments(arg_arg1: *const cmsghdr) -> ::std::os::raw::c_int {
+    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
+        extern "C" {
+            pub fn inet6_rthdr_segments(arg1: *const cmsghdr) -> ::std::os::raw::c_int;
+        }
+        inet6_rthdr_segments(arg_arg1)
+    })
+}
+pub unsafe fn inet6_rthdr_getaddr(
+    arg_arg1: *mut cmsghdr,
+    arg_arg2: ::std::os::raw::c_int,
+) -> *mut in6_addr {
+    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
+        extern "C" {
+            pub fn inet6_rthdr_getaddr(
+                arg1: *mut cmsghdr,
+                arg2: ::std::os::raw::c_int,
+            ) -> *mut in6_addr;
+        }
+        inet6_rthdr_getaddr(arg_arg1, arg_arg2)
+    })
+}
+pub unsafe fn inet6_rthdr_getflags(
+    arg_arg1: *const cmsghdr,
+    arg_arg2: ::std::os::raw::c_int,
+) -> ::std::os::raw::c_int {
+    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
+        extern "C" {
+            pub fn inet6_rthdr_getflags(
+                arg1: *const cmsghdr,
+                arg2: ::std::os::raw::c_int,
+            ) -> ::std::os::raw::c_int;
+        }
+        inet6_rthdr_getflags(arg_arg1, arg_arg2)
+    })
+}
+pub unsafe fn inet6_opt_init(
+    arg_arg1: *mut ::std::os::raw::c_void,
+    arg_arg2: socklen_t,
+) -> ::std::os::raw::c_int {
+    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
+        extern "C" {
+            pub fn inet6_opt_init(
+                arg1: *mut ::std::os::raw::c_void,
+                arg2: socklen_t,
+            ) -> ::std::os::raw::c_int;
+        }
+        inet6_opt_init(arg_arg1, arg_arg2)
+    })
+}
+pub unsafe fn inet6_opt_append(
+    arg_arg1: *mut ::std::os::raw::c_void,
+    arg_arg2: socklen_t,
+    arg_arg3: ::std::os::raw::c_int,
+    arg_arg4: __uint8_t,
+    arg_arg5: socklen_t,
+    arg_arg6: __uint8_t,
+    arg_arg7: *mut *mut ::std::os::raw::c_void,
+) -> ::std::os::raw::c_int {
+    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
+        extern "C" {
+            pub fn inet6_opt_append(
+                arg1: *mut ::std::os::raw::c_void,
+                arg2: socklen_t,
+                arg3: ::std::os::raw::c_int,
+                arg4: __uint8_t,
+                arg5: socklen_t,
+                arg6: __uint8_t,
+                arg7: *mut *mut ::std::os::raw::c_void,
+            ) -> ::std::os::raw::c_int;
+        }
+        inet6_opt_append(arg_arg1, arg_arg2, arg_arg3, arg_arg4, arg_arg5, arg_arg6, arg_arg7)
+    })
+}
+pub unsafe fn inet6_opt_finish(
+    arg_arg1: *mut ::std::os::raw::c_void,
+    arg_arg2: socklen_t,
+    arg_arg3: ::std::os::raw::c_int,
+) -> ::std::os::raw::c_int {
+    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
+        extern "C" {
+            pub fn inet6_opt_finish(
+                arg1: *mut ::std::os::raw::c_void,
+                arg2: socklen_t,
+                arg3: ::std::os::raw::c_int,
+            ) -> ::std::os::raw::c_int;
+        }
+        inet6_opt_finish(arg_arg1, arg_arg2, arg_arg3)
+    })
+}
+pub unsafe fn inet6_opt_set_val(
+    arg_arg1: *mut ::std::os::raw::c_void,
+    arg_arg2: ::std::os::raw::c_int,
+    arg_arg3: *mut ::std::os::raw::c_void,
+    arg_arg4: socklen_t,
+) -> ::std::os::raw::c_int {
+    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
+        extern "C" {
+            pub fn inet6_opt_set_val(
+                arg1: *mut ::std::os::raw::c_void,
+                arg2: ::std::os::raw::c_int,
+                arg3: *mut ::std::os::raw::c_void,
+                arg4: socklen_t,
+            ) -> ::std::os::raw::c_int;
+        }
+        inet6_opt_set_val(arg_arg1, arg_arg2, arg_arg3, arg_arg4)
+    })
+}
+pub unsafe fn inet6_opt_next(
+    arg_arg1: *mut ::std::os::raw::c_void,
+    arg_arg2: socklen_t,
+    arg_arg3: ::std::os::raw::c_int,
+    arg_arg4: *mut __uint8_t,
+    arg_arg5: *mut socklen_t,
+    arg_arg6: *mut *mut ::std::os::raw::c_void,
+) -> ::std::os::raw::c_int {
+    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
+        extern "C" {
+            pub fn inet6_opt_next(
+                arg1: *mut ::std::os::raw::c_void,
+                arg2: socklen_t,
+                arg3: ::std::os::raw::c_int,
+                arg4: *mut __uint8_t,
+                arg5: *mut socklen_t,
+                arg6: *mut *mut ::std::os::raw::c_void,
+            ) -> ::std::os::raw::c_int;
+        }
+        inet6_opt_next(arg_arg1, arg_arg2, arg_arg3, arg_arg4, arg_arg5, arg_arg6)
+    })
+}
+pub unsafe fn inet6_opt_find(
+    arg_arg1: *mut ::std::os::raw::c_void,
+    arg_arg2: socklen_t,
+    arg_arg3: ::std::os::raw::c_int,
+    arg_arg4: __uint8_t,
+    arg_arg5: *mut socklen_t,
+    arg_arg6: *mut *mut ::std::os::raw::c_void,
+) -> ::std::os::raw::c_int {
+    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
+        extern "C" {
+            pub fn inet6_opt_find(
+                arg1: *mut ::std::os::raw::c_void,
+                arg2: socklen_t,
+                arg3: ::std::os::raw::c_int,
+                arg4: __uint8_t,
+                arg5: *mut socklen_t,
+                arg6: *mut *mut ::std::os::raw::c_void,
+            ) -> ::std::os::raw::c_int;
+        }
+        inet6_opt_find(arg_arg1, arg_arg2, arg_arg3, arg_arg4, arg_arg5, arg_arg6)
+    })
+}
+pub unsafe fn inet6_opt_get_val(
+    arg_arg1: *mut ::std::os::raw::c_void,
+    arg_arg2: ::std::os::raw::c_int,
+    arg_arg3: *mut ::std::os::raw::c_void,
+    arg_arg4: socklen_t,
+) -> ::std::os::raw::c_int {
+    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
+        extern "C" {
+            pub fn inet6_opt_get_val(
+                arg1: *mut ::std::os::raw::c_void,
+                arg2: ::std::os::raw::c_int,
+                arg3: *mut ::std::os::raw::c_void,
+                arg4: socklen_t,
+            ) -> ::std::os::raw::c_int;
+        }
+        inet6_opt_get_val(arg_arg1, arg_arg2, arg_arg3, arg_arg4)
+    })
+}
+pub unsafe fn inet6_rth_space(
+    arg_arg1: ::std::os::raw::c_int,
+    arg_arg2: ::std::os::raw::c_int,
+) -> socklen_t {
+    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
+        extern "C" {
+            pub fn inet6_rth_space(
+                arg1: ::std::os::raw::c_int,
+                arg2: ::std::os::raw::c_int,
+            ) -> socklen_t;
+        }
+        inet6_rth_space(arg_arg1, arg_arg2)
+    })
+}
+pub unsafe fn inet6_rth_init(
+    arg_arg1: *mut ::std::os::raw::c_void,
+    arg_arg2: socklen_t,
+    arg_arg3: ::std::os::raw::c_int,
+    arg_arg4: ::std::os::raw::c_int,
+) -> *mut ::std::os::raw::c_void {
+    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
+        extern "C" {
+            pub fn inet6_rth_init(
+                arg1: *mut ::std::os::raw::c_void,
+                arg2: socklen_t,
+                arg3: ::std::os::raw::c_int,
+                arg4: ::std::os::raw::c_int,
+            ) -> *mut ::std::os::raw::c_void;
+        }
+        inet6_rth_init(arg_arg1, arg_arg2, arg_arg3, arg_arg4)
+    })
+}
+pub unsafe fn inet6_rth_add(
+    arg_arg1: *mut ::std::os::raw::c_void,
+    arg_arg2: *const in6_addr,
+) -> ::std::os::raw::c_int {
+    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
+        extern "C" {
+            pub fn inet6_rth_add(
+                arg1: *mut ::std::os::raw::c_void,
+                arg2: *const in6_addr,
+            ) -> ::std::os::raw::c_int;
+        }
+        inet6_rth_add(arg_arg1, arg_arg2)
+    })
+}
+pub unsafe fn inet6_rth_reverse(
+    arg_arg1: *const ::std::os::raw::c_void,
+    arg_arg2: *mut ::std::os::raw::c_void,
+) -> ::std::os::raw::c_int {
+    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
+        extern "C" {
+            pub fn inet6_rth_reverse(
+                arg1: *const ::std::os::raw::c_void,
+                arg2: *mut ::std::os::raw::c_void,
+            ) -> ::std::os::raw::c_int;
+        }
+        inet6_rth_reverse(arg_arg1, arg_arg2)
+    })
+}
+pub unsafe fn inet6_rth_segments(arg_arg1: *const ::std::os::raw::c_void) -> ::std::os::raw::c_int {
+    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
+        extern "C" {
+            pub fn inet6_rth_segments(arg1: *const ::std::os::raw::c_void)
+                -> ::std::os::raw::c_int;
+        }
+        inet6_rth_segments(arg_arg1)
+    })
+}
+pub unsafe fn inet6_rth_getaddr(
+    arg_arg1: *const ::std::os::raw::c_void,
+    arg_arg2: ::std::os::raw::c_int,
+) -> *mut in6_addr {
+    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
+        extern "C" {
+            pub fn inet6_rth_getaddr(
+                arg1: *const ::std::os::raw::c_void,
+                arg2: ::std::os::raw::c_int,
+            ) -> *mut in6_addr;
+        }
+        inet6_rth_getaddr(arg_arg1, arg_arg2)
+    })
+}
+pub unsafe fn bindresvport(
+    arg_arg1: ::std::os::raw::c_int,
+    arg_arg2: *mut sockaddr_in,
+) -> ::std::os::raw::c_int {
+    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
+        extern "C" {
+            pub fn bindresvport(
+                arg1: ::std::os::raw::c_int,
+                arg2: *mut sockaddr_in,
+            ) -> ::std::os::raw::c_int;
+        }
+        bindresvport(arg_arg1, arg_arg2)
+    })
+}
+pub unsafe fn bindresvport_sa(
+    arg_arg1: ::std::os::raw::c_int,
+    arg_arg2: *mut sockaddr,
+) -> ::std::os::raw::c_int {
+    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
+        extern "C" {
+            pub fn bindresvport_sa(
+                arg1: ::std::os::raw::c_int,
+                arg2: *mut sockaddr,
+            ) -> ::std::os::raw::c_int;
+        }
+        bindresvport_sa(arg_arg1, arg_arg2)
+    })
+}
+extern "C" {
+    pub static mut h_errno: ::std::os::raw::c_int;
+}
+#[repr(C)]
+#[derive(Debug, Copy, Clone)]
+pub struct hostent {
+    pub h_name: *mut ::std::os::raw::c_char,
+    pub h_aliases: *mut *mut ::std::os::raw::c_char,
+    pub h_addrtype: ::std::os::raw::c_int,
+    pub h_length: ::std::os::raw::c_int,
+    pub h_addr_list: *mut *mut ::std::os::raw::c_char,
+}
+impl Default for hostent {
+    fn default() -> Self {
+        let mut s = ::std::mem::MaybeUninit::<Self>::uninit();
+        unsafe {
+            ::std::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
+            s.assume_init()
+        }
+    }
+}
+#[repr(C)]
+#[derive(Debug, Copy, Clone)]
+pub struct netent {
+    pub n_name: *mut ::std::os::raw::c_char,
+    pub n_aliases: *mut *mut ::std::os::raw::c_char,
+    pub n_addrtype: ::std::os::raw::c_int,
+    pub n_net: u32,
+}
+impl Default for netent {
+    fn default() -> Self {
+        let mut s = ::std::mem::MaybeUninit::<Self>::uninit();
+        unsafe {
+            ::std::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
+            s.assume_init()
+        }
+    }
+}
+#[repr(C)]
+#[derive(Debug, Copy, Clone)]
+pub struct servent {
+    pub s_name: *mut ::std::os::raw::c_char,
+    pub s_aliases: *mut *mut ::std::os::raw::c_char,
+    pub s_port: ::std::os::raw::c_int,
+    pub s_proto: *mut ::std::os::raw::c_char,
+}
+impl Default for servent {
+    fn default() -> Self {
+        let mut s = ::std::mem::MaybeUninit::<Self>::uninit();
+        unsafe {
+            ::std::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
+            s.assume_init()
+        }
+    }
+}
+#[repr(C)]
+#[derive(Debug, Copy, Clone)]
+pub struct protoent {
+    pub p_name: *mut ::std::os::raw::c_char,
+    pub p_aliases: *mut *mut ::std::os::raw::c_char,
+    pub p_proto: ::std::os::raw::c_int,
+}
+impl Default for protoent {
+    fn default() -> Self {
+        let mut s = ::std::mem::MaybeUninit::<Self>::uninit();
+        unsafe {
+            ::std::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
+            s.assume_init()
+        }
+    }
+}
+#[repr(C)]
+#[derive(Debug, Copy, Clone)]
+pub struct addrinfo {
+    pub ai_flags: ::std::os::raw::c_int,
+    pub ai_family: ::std::os::raw::c_int,
+    pub ai_socktype: ::std::os::raw::c_int,
+    pub ai_protocol: ::std::os::raw::c_int,
+    pub ai_addrlen: socklen_t,
+    pub ai_canonname: *mut ::std::os::raw::c_char,
+    pub ai_addr: *mut sockaddr,
+    pub ai_next: *mut addrinfo,
+}
+impl Default for addrinfo {
+    fn default() -> Self {
+        let mut s = ::std::mem::MaybeUninit::<Self>::uninit();
+        unsafe {
+            ::std::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
+            s.assume_init()
+        }
+    }
+}
+#[repr(C)]
+#[derive(Debug, Copy, Clone)]
+pub struct rpcent {
+    pub r_name: *mut ::std::os::raw::c_char,
+    pub r_aliases: *mut *mut ::std::os::raw::c_char,
+    pub r_number: ::std::os::raw::c_int,
+}
+impl Default for rpcent {
+    fn default() -> Self {
+        let mut s = ::std::mem::MaybeUninit::<Self>::uninit();
+        unsafe {
+            ::std::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
+            s.assume_init()
+        }
+    }
+}
+pub unsafe fn endhostent() {
+    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
+        extern "C" {
+            pub fn endhostent();
+        }
+        endhostent()
+    })
+}
+pub unsafe fn endnetent() {
+    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
+        extern "C" {
+            pub fn endnetent();
+        }
+        endnetent()
+    })
+}
+pub unsafe fn endprotoent() {
+    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
+        extern "C" {
+            pub fn endprotoent();
+        }
+        endprotoent()
+    })
+}
+pub unsafe fn endservent() {
+    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
+        extern "C" {
+            pub fn endservent();
+        }
+        endservent()
+    })
+}
+pub unsafe fn freeaddrinfo(arg_arg1: *mut addrinfo) {
+    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
+        extern "C" {
+            pub fn freeaddrinfo(arg1: *mut addrinfo);
+        }
+        freeaddrinfo(arg_arg1)
+    })
+}
+pub unsafe fn gai_strerror(arg_arg1: ::std::os::raw::c_int) -> *const ::std::os::raw::c_char {
+    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
+        extern "C" {
+            pub fn gai_strerror(arg1: ::std::os::raw::c_int) -> *const ::std::os::raw::c_char;
+        }
+        gai_strerror(arg_arg1)
+    })
+}
+pub unsafe fn getaddrinfo(
+    arg_arg1: *const ::std::os::raw::c_char,
+    arg_arg2: *const ::std::os::raw::c_char,
+    arg_arg3: *const addrinfo,
+    arg_arg4: *mut *mut addrinfo,
+) -> ::std::os::raw::c_int {
+    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
+        extern "C" {
+            pub fn getaddrinfo(
+                arg1: *const ::std::os::raw::c_char,
+                arg2: *const ::std::os::raw::c_char,
+                arg3: *const addrinfo,
+                arg4: *mut *mut addrinfo,
+            ) -> ::std::os::raw::c_int;
+        }
+        getaddrinfo(arg_arg1, arg_arg2, arg_arg3, arg_arg4)
+    })
+}
+pub unsafe fn gethostbyaddr(
+    arg_arg1: *const ::std::os::raw::c_void,
+    arg_arg2: socklen_t,
+    arg_arg3: ::std::os::raw::c_int,
+) -> *mut hostent {
+    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
+        extern "C" {
+            pub fn gethostbyaddr(
+                arg1: *const ::std::os::raw::c_void,
+                arg2: socklen_t,
+                arg3: ::std::os::raw::c_int,
+            ) -> *mut hostent;
+        }
+        gethostbyaddr(arg_arg1, arg_arg2, arg_arg3)
+    })
+}
+pub unsafe fn gethostbyname(arg_arg1: *const ::std::os::raw::c_char) -> *mut hostent {
+    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
+        extern "C" {
+            pub fn gethostbyname(arg1: *const ::std::os::raw::c_char) -> *mut hostent;
+        }
+        gethostbyname(arg_arg1)
+    })
+}
+pub unsafe fn gethostent() -> *mut hostent {
+    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
+        extern "C" {
+            pub fn gethostent() -> *mut hostent;
+        }
+        gethostent()
+    })
+}
+pub unsafe fn getnameinfo(
+    arg_arg1: *const sockaddr,
+    arg_arg2: socklen_t,
+    arg_arg3: *mut ::std::os::raw::c_char,
+    arg_arg4: socklen_t,
+    arg_arg5: *mut ::std::os::raw::c_char,
+    arg_arg6: socklen_t,
+    arg_arg7: ::std::os::raw::c_int,
+) -> ::std::os::raw::c_int {
+    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
+        extern "C" {
+            pub fn getnameinfo(
+                arg1: *const sockaddr,
+                arg2: socklen_t,
+                arg3: *mut ::std::os::raw::c_char,
+                arg4: socklen_t,
+                arg5: *mut ::std::os::raw::c_char,
+                arg6: socklen_t,
+                arg7: ::std::os::raw::c_int,
+            ) -> ::std::os::raw::c_int;
+        }
+        getnameinfo(arg_arg1, arg_arg2, arg_arg3, arg_arg4, arg_arg5, arg_arg6, arg_arg7)
+    })
+}
+pub unsafe fn getnetbyaddr(arg_arg1: u32, arg_arg2: ::std::os::raw::c_int) -> *mut netent {
+    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
+        extern "C" {
+            pub fn getnetbyaddr(arg1: u32, arg2: ::std::os::raw::c_int) -> *mut netent;
+        }
+        getnetbyaddr(arg_arg1, arg_arg2)
+    })
+}
+pub unsafe fn getnetbyname(arg_arg1: *const ::std::os::raw::c_char) -> *mut netent {
+    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
+        extern "C" {
+            pub fn getnetbyname(arg1: *const ::std::os::raw::c_char) -> *mut netent;
+        }
+        getnetbyname(arg_arg1)
+    })
+}
+pub unsafe fn getnetent() -> *mut netent {
+    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
+        extern "C" {
+            pub fn getnetent() -> *mut netent;
+        }
+        getnetent()
+    })
+}
+pub unsafe fn getprotobyname(arg_arg1: *const ::std::os::raw::c_char) -> *mut protoent {
+    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
+        extern "C" {
+            pub fn getprotobyname(arg1: *const ::std::os::raw::c_char) -> *mut protoent;
+        }
+        getprotobyname(arg_arg1)
+    })
+}
+pub unsafe fn getprotobynumber(arg_arg1: ::std::os::raw::c_int) -> *mut protoent {
+    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
+        extern "C" {
+            pub fn getprotobynumber(arg1: ::std::os::raw::c_int) -> *mut protoent;
+        }
+        getprotobynumber(arg_arg1)
+    })
+}
+pub unsafe fn getprotoent() -> *mut protoent {
+    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
+        extern "C" {
+            pub fn getprotoent() -> *mut protoent;
+        }
+        getprotoent()
+    })
+}
+pub unsafe fn getservbyname(
+    arg_arg1: *const ::std::os::raw::c_char,
+    arg_arg2: *const ::std::os::raw::c_char,
+) -> *mut servent {
+    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
+        extern "C" {
+            pub fn getservbyname(
+                arg1: *const ::std::os::raw::c_char,
+                arg2: *const ::std::os::raw::c_char,
+            ) -> *mut servent;
+        }
+        getservbyname(arg_arg1, arg_arg2)
+    })
+}
+pub unsafe fn getservbyport(
+    arg_arg1: ::std::os::raw::c_int,
+    arg_arg2: *const ::std::os::raw::c_char,
+) -> *mut servent {
+    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
+        extern "C" {
+            pub fn getservbyport(
+                arg1: ::std::os::raw::c_int,
+                arg2: *const ::std::os::raw::c_char,
+            ) -> *mut servent;
+        }
+        getservbyport(arg_arg1, arg_arg2)
+    })
+}
+pub unsafe fn getservent() -> *mut servent {
+    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
+        extern "C" {
+            pub fn getservent() -> *mut servent;
+        }
+        getservent()
+    })
+}
+pub unsafe fn sethostent(arg_arg1: ::std::os::raw::c_int) {
+    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
+        extern "C" {
+            pub fn sethostent(arg1: ::std::os::raw::c_int);
+        }
+        sethostent(arg_arg1)
+    })
+}
+pub unsafe fn setnetent(arg_arg1: ::std::os::raw::c_int) {
+    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
+        extern "C" {
+            pub fn setnetent(arg1: ::std::os::raw::c_int);
+        }
+        setnetent(arg_arg1)
+    })
+}
+pub unsafe fn setprotoent(arg_arg1: ::std::os::raw::c_int) {
+    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
+        extern "C" {
+            pub fn setprotoent(arg1: ::std::os::raw::c_int);
+        }
+        setprotoent(arg_arg1)
+    })
+}
+pub unsafe fn setservent(arg_arg1: ::std::os::raw::c_int) {
+    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
+        extern "C" {
+            pub fn setservent(arg1: ::std::os::raw::c_int);
+        }
+        setservent(arg_arg1)
+    })
+}
+pub unsafe fn freehostent(arg_arg1: *mut hostent) {
+    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
+        extern "C" {
+            pub fn freehostent(arg1: *mut hostent);
+        }
+        freehostent(arg_arg1)
+    })
+}
+pub unsafe fn gethostbyname2(
+    arg_arg1: *const ::std::os::raw::c_char,
+    arg_arg2: ::std::os::raw::c_int,
+) -> *mut hostent {
+    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
+        extern "C" {
+            pub fn gethostbyname2(
+                arg1: *const ::std::os::raw::c_char,
+                arg2: ::std::os::raw::c_int,
+            ) -> *mut hostent;
+        }
+        gethostbyname2(arg_arg1, arg_arg2)
+    })
+}
+pub unsafe fn getipnodebyaddr(
+    arg_arg1: *const ::std::os::raw::c_void,
+    arg_arg2: usize,
+    arg_arg3: ::std::os::raw::c_int,
+    arg_arg4: *mut ::std::os::raw::c_int,
+) -> *mut hostent {
+    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
+        extern "C" {
+            pub fn getipnodebyaddr(
+                arg1: *const ::std::os::raw::c_void,
+                arg2: usize,
+                arg3: ::std::os::raw::c_int,
+                arg4: *mut ::std::os::raw::c_int,
+            ) -> *mut hostent;
+        }
+        getipnodebyaddr(arg_arg1, arg_arg2, arg_arg3, arg_arg4)
+    })
+}
+pub unsafe fn getipnodebyname(
+    arg_arg1: *const ::std::os::raw::c_char,
+    arg_arg2: ::std::os::raw::c_int,
+    arg_arg3: ::std::os::raw::c_int,
+    arg_arg4: *mut ::std::os::raw::c_int,
+) -> *mut hostent {
+    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
+        extern "C" {
+            pub fn getipnodebyname(
+                arg1: *const ::std::os::raw::c_char,
+                arg2: ::std::os::raw::c_int,
+                arg3: ::std::os::raw::c_int,
+                arg4: *mut ::std::os::raw::c_int,
+            ) -> *mut hostent;
+        }
+        getipnodebyname(arg_arg1, arg_arg2, arg_arg3, arg_arg4)
+    })
+}
+pub unsafe fn getrpcbyname(arg_name: *const ::std::os::raw::c_char) -> *mut rpcent {
+    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
+        extern "C" {
+            pub fn getrpcbyname(name: *const ::std::os::raw::c_char) -> *mut rpcent;
+        }
+        getrpcbyname(arg_name)
+    })
+}
+pub unsafe fn getrpcbynumber(arg_number: ::std::os::raw::c_int) -> *mut rpcent {
+    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
+        extern "C" {
+            pub fn getrpcbynumber(number: ::std::os::raw::c_int) -> *mut rpcent;
+        }
+        getrpcbynumber(arg_number)
+    })
+}
+pub unsafe fn getrpcent() -> *mut rpcent {
+    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
+        extern "C" {
+            pub fn getrpcent() -> *mut rpcent;
+        }
+        getrpcent()
+    })
+}
+pub unsafe fn setrpcent(arg_stayopen: ::std::os::raw::c_int) {
+    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
+        extern "C" {
+            pub fn setrpcent(stayopen: ::std::os::raw::c_int);
+        }
+        setrpcent(arg_stayopen)
+    })
+}
+pub unsafe fn endrpcent() {
+    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
+        extern "C" {
+            pub fn endrpcent();
+        }
+        endrpcent()
+    })
+}
+pub unsafe fn herror(arg_arg1: *const ::std::os::raw::c_char) {
+    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
+        extern "C" {
+            pub fn herror(arg1: *const ::std::os::raw::c_char);
+        }
+        herror(arg_arg1)
+    })
+}
+pub unsafe fn hstrerror(arg_arg1: ::std::os::raw::c_int) -> *const ::std::os::raw::c_char {
+    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
+        extern "C" {
+            pub fn hstrerror(arg1: ::std::os::raw::c_int) -> *const ::std::os::raw::c_char;
+        }
+        hstrerror(arg_arg1)
+    })
+}
+pub unsafe fn innetgr(
+    arg_arg1: *const ::std::os::raw::c_char,
+    arg_arg2: *const ::std::os::raw::c_char,
+    arg_arg3: *const ::std::os::raw::c_char,
+    arg_arg4: *const ::std::os::raw::c_char,
+) -> ::std::os::raw::c_int {
+    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
+        extern "C" {
+            pub fn innetgr(
+                arg1: *const ::std::os::raw::c_char,
+                arg2: *const ::std::os::raw::c_char,
+                arg3: *const ::std::os::raw::c_char,
+                arg4: *const ::std::os::raw::c_char,
+            ) -> ::std::os::raw::c_int;
+        }
+        innetgr(arg_arg1, arg_arg2, arg_arg3, arg_arg4)
+    })
+}
+pub unsafe fn getnetgrent(
+    arg_arg1: *mut *mut ::std::os::raw::c_char,
+    arg_arg2: *mut *mut ::std::os::raw::c_char,
+    arg_arg3: *mut *mut ::std::os::raw::c_char,
+) -> ::std::os::raw::c_int {
+    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
+        extern "C" {
+            pub fn getnetgrent(
+                arg1: *mut *mut ::std::os::raw::c_char,
+                arg2: *mut *mut ::std::os::raw::c_char,
+                arg3: *mut *mut ::std::os::raw::c_char,
+            ) -> ::std::os::raw::c_int;
+        }
+        getnetgrent(arg_arg1, arg_arg2, arg_arg3)
+    })
+}
+pub unsafe fn endnetgrent() {
+    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
+        extern "C" {
+            pub fn endnetgrent();
+        }
+        endnetgrent()
+    })
+}
+pub unsafe fn setnetgrent(arg_arg1: *const ::std::os::raw::c_char) {
+    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
+        extern "C" {
+            pub fn setnetgrent(arg1: *const ::std::os::raw::c_char);
+        }
+        setnetgrent(arg_arg1)
     })
 }
 #[repr(C)]
@@ -37065,12 +37355,11 @@ pub const WaitEventActivity_WAIT_EVENT_BGWRITER_MAIN: WaitEventActivity = 838860
 pub const WaitEventActivity_WAIT_EVENT_CHECKPOINTER_MAIN: WaitEventActivity = 83886084;
 pub const WaitEventActivity_WAIT_EVENT_LOGICAL_APPLY_MAIN: WaitEventActivity = 83886085;
 pub const WaitEventActivity_WAIT_EVENT_LOGICAL_LAUNCHER_MAIN: WaitEventActivity = 83886086;
-pub const WaitEventActivity_WAIT_EVENT_PGSTAT_MAIN: WaitEventActivity = 83886087;
-pub const WaitEventActivity_WAIT_EVENT_RECOVERY_WAL_STREAM: WaitEventActivity = 83886088;
-pub const WaitEventActivity_WAIT_EVENT_SYSLOGGER_MAIN: WaitEventActivity = 83886089;
-pub const WaitEventActivity_WAIT_EVENT_WAL_RECEIVER_MAIN: WaitEventActivity = 83886090;
-pub const WaitEventActivity_WAIT_EVENT_WAL_SENDER_MAIN: WaitEventActivity = 83886091;
-pub const WaitEventActivity_WAIT_EVENT_WAL_WRITER_MAIN: WaitEventActivity = 83886092;
+pub const WaitEventActivity_WAIT_EVENT_RECOVERY_WAL_STREAM: WaitEventActivity = 83886087;
+pub const WaitEventActivity_WAIT_EVENT_SYSLOGGER_MAIN: WaitEventActivity = 83886088;
+pub const WaitEventActivity_WAIT_EVENT_WAL_RECEIVER_MAIN: WaitEventActivity = 83886089;
+pub const WaitEventActivity_WAIT_EVENT_WAL_SENDER_MAIN: WaitEventActivity = 83886090;
+pub const WaitEventActivity_WAIT_EVENT_WAL_WRITER_MAIN: WaitEventActivity = 83886091;
 pub type WaitEventActivity = ::std::os::raw::c_uint;
 pub const WaitEventClient_WAIT_EVENT_CLIENT_READ: WaitEventClient = 100663296;
 pub const WaitEventClient_WAIT_EVENT_CLIENT_WRITE: WaitEventClient = 100663297;
@@ -37082,136 +37371,140 @@ pub const WaitEventClient_WAIT_EVENT_WAL_SENDER_WAIT_WAL: WaitEventClient = 1006
 pub const WaitEventClient_WAIT_EVENT_WAL_SENDER_WRITE_DATA: WaitEventClient = 100663303;
 pub type WaitEventClient = ::std::os::raw::c_uint;
 pub const WaitEventIPC_WAIT_EVENT_APPEND_READY: WaitEventIPC = 134217728;
-pub const WaitEventIPC_WAIT_EVENT_BACKEND_TERMINATION: WaitEventIPC = 134217729;
-pub const WaitEventIPC_WAIT_EVENT_BACKUP_WAIT_WAL_ARCHIVE: WaitEventIPC = 134217730;
-pub const WaitEventIPC_WAIT_EVENT_BGWORKER_SHUTDOWN: WaitEventIPC = 134217731;
-pub const WaitEventIPC_WAIT_EVENT_BGWORKER_STARTUP: WaitEventIPC = 134217732;
-pub const WaitEventIPC_WAIT_EVENT_BTREE_PAGE: WaitEventIPC = 134217733;
-pub const WaitEventIPC_WAIT_EVENT_BUFFER_IO: WaitEventIPC = 134217734;
-pub const WaitEventIPC_WAIT_EVENT_CHECKPOINT_DONE: WaitEventIPC = 134217735;
-pub const WaitEventIPC_WAIT_EVENT_CHECKPOINT_START: WaitEventIPC = 134217736;
-pub const WaitEventIPC_WAIT_EVENT_EXECUTE_GATHER: WaitEventIPC = 134217737;
-pub const WaitEventIPC_WAIT_EVENT_HASH_BATCH_ALLOCATE: WaitEventIPC = 134217738;
-pub const WaitEventIPC_WAIT_EVENT_HASH_BATCH_ELECT: WaitEventIPC = 134217739;
-pub const WaitEventIPC_WAIT_EVENT_HASH_BATCH_LOAD: WaitEventIPC = 134217740;
-pub const WaitEventIPC_WAIT_EVENT_HASH_BUILD_ALLOCATE: WaitEventIPC = 134217741;
-pub const WaitEventIPC_WAIT_EVENT_HASH_BUILD_ELECT: WaitEventIPC = 134217742;
-pub const WaitEventIPC_WAIT_EVENT_HASH_BUILD_HASH_INNER: WaitEventIPC = 134217743;
-pub const WaitEventIPC_WAIT_EVENT_HASH_BUILD_HASH_OUTER: WaitEventIPC = 134217744;
-pub const WaitEventIPC_WAIT_EVENT_HASH_GROW_BATCHES_ALLOCATE: WaitEventIPC = 134217745;
-pub const WaitEventIPC_WAIT_EVENT_HASH_GROW_BATCHES_DECIDE: WaitEventIPC = 134217746;
-pub const WaitEventIPC_WAIT_EVENT_HASH_GROW_BATCHES_ELECT: WaitEventIPC = 134217747;
-pub const WaitEventIPC_WAIT_EVENT_HASH_GROW_BATCHES_FINISH: WaitEventIPC = 134217748;
-pub const WaitEventIPC_WAIT_EVENT_HASH_GROW_BATCHES_REPARTITION: WaitEventIPC = 134217749;
-pub const WaitEventIPC_WAIT_EVENT_HASH_GROW_BUCKETS_ALLOCATE: WaitEventIPC = 134217750;
-pub const WaitEventIPC_WAIT_EVENT_HASH_GROW_BUCKETS_ELECT: WaitEventIPC = 134217751;
-pub const WaitEventIPC_WAIT_EVENT_HASH_GROW_BUCKETS_REINSERT: WaitEventIPC = 134217752;
-pub const WaitEventIPC_WAIT_EVENT_LOGICAL_SYNC_DATA: WaitEventIPC = 134217753;
-pub const WaitEventIPC_WAIT_EVENT_LOGICAL_SYNC_STATE_CHANGE: WaitEventIPC = 134217754;
-pub const WaitEventIPC_WAIT_EVENT_MQ_INTERNAL: WaitEventIPC = 134217755;
-pub const WaitEventIPC_WAIT_EVENT_MQ_PUT_MESSAGE: WaitEventIPC = 134217756;
-pub const WaitEventIPC_WAIT_EVENT_MQ_RECEIVE: WaitEventIPC = 134217757;
-pub const WaitEventIPC_WAIT_EVENT_MQ_SEND: WaitEventIPC = 134217758;
-pub const WaitEventIPC_WAIT_EVENT_PARALLEL_BITMAP_SCAN: WaitEventIPC = 134217759;
-pub const WaitEventIPC_WAIT_EVENT_PARALLEL_CREATE_INDEX_SCAN: WaitEventIPC = 134217760;
-pub const WaitEventIPC_WAIT_EVENT_PARALLEL_FINISH: WaitEventIPC = 134217761;
-pub const WaitEventIPC_WAIT_EVENT_PROCARRAY_GROUP_UPDATE: WaitEventIPC = 134217762;
-pub const WaitEventIPC_WAIT_EVENT_PROC_SIGNAL_BARRIER: WaitEventIPC = 134217763;
-pub const WaitEventIPC_WAIT_EVENT_PROMOTE: WaitEventIPC = 134217764;
-pub const WaitEventIPC_WAIT_EVENT_RECOVERY_CONFLICT_SNAPSHOT: WaitEventIPC = 134217765;
-pub const WaitEventIPC_WAIT_EVENT_RECOVERY_CONFLICT_TABLESPACE: WaitEventIPC = 134217766;
-pub const WaitEventIPC_WAIT_EVENT_RECOVERY_PAUSE: WaitEventIPC = 134217767;
-pub const WaitEventIPC_WAIT_EVENT_REPLICATION_ORIGIN_DROP: WaitEventIPC = 134217768;
-pub const WaitEventIPC_WAIT_EVENT_REPLICATION_SLOT_DROP: WaitEventIPC = 134217769;
-pub const WaitEventIPC_WAIT_EVENT_SAFE_SNAPSHOT: WaitEventIPC = 134217770;
-pub const WaitEventIPC_WAIT_EVENT_SYNC_REP: WaitEventIPC = 134217771;
-pub const WaitEventIPC_WAIT_EVENT_WAL_RECEIVER_EXIT: WaitEventIPC = 134217772;
-pub const WaitEventIPC_WAIT_EVENT_WAL_RECEIVER_WAIT_START: WaitEventIPC = 134217773;
-pub const WaitEventIPC_WAIT_EVENT_XACT_GROUP_UPDATE: WaitEventIPC = 134217774;
+pub const WaitEventIPC_WAIT_EVENT_ARCHIVE_CLEANUP_COMMAND: WaitEventIPC = 134217729;
+pub const WaitEventIPC_WAIT_EVENT_ARCHIVE_COMMAND: WaitEventIPC = 134217730;
+pub const WaitEventIPC_WAIT_EVENT_BACKEND_TERMINATION: WaitEventIPC = 134217731;
+pub const WaitEventIPC_WAIT_EVENT_BACKUP_WAIT_WAL_ARCHIVE: WaitEventIPC = 134217732;
+pub const WaitEventIPC_WAIT_EVENT_BGWORKER_SHUTDOWN: WaitEventIPC = 134217733;
+pub const WaitEventIPC_WAIT_EVENT_BGWORKER_STARTUP: WaitEventIPC = 134217734;
+pub const WaitEventIPC_WAIT_EVENT_BTREE_PAGE: WaitEventIPC = 134217735;
+pub const WaitEventIPC_WAIT_EVENT_BUFFER_IO: WaitEventIPC = 134217736;
+pub const WaitEventIPC_WAIT_EVENT_CHECKPOINT_DONE: WaitEventIPC = 134217737;
+pub const WaitEventIPC_WAIT_EVENT_CHECKPOINT_START: WaitEventIPC = 134217738;
+pub const WaitEventIPC_WAIT_EVENT_EXECUTE_GATHER: WaitEventIPC = 134217739;
+pub const WaitEventIPC_WAIT_EVENT_HASH_BATCH_ALLOCATE: WaitEventIPC = 134217740;
+pub const WaitEventIPC_WAIT_EVENT_HASH_BATCH_ELECT: WaitEventIPC = 134217741;
+pub const WaitEventIPC_WAIT_EVENT_HASH_BATCH_LOAD: WaitEventIPC = 134217742;
+pub const WaitEventIPC_WAIT_EVENT_HASH_BUILD_ALLOCATE: WaitEventIPC = 134217743;
+pub const WaitEventIPC_WAIT_EVENT_HASH_BUILD_ELECT: WaitEventIPC = 134217744;
+pub const WaitEventIPC_WAIT_EVENT_HASH_BUILD_HASH_INNER: WaitEventIPC = 134217745;
+pub const WaitEventIPC_WAIT_EVENT_HASH_BUILD_HASH_OUTER: WaitEventIPC = 134217746;
+pub const WaitEventIPC_WAIT_EVENT_HASH_GROW_BATCHES_ALLOCATE: WaitEventIPC = 134217747;
+pub const WaitEventIPC_WAIT_EVENT_HASH_GROW_BATCHES_DECIDE: WaitEventIPC = 134217748;
+pub const WaitEventIPC_WAIT_EVENT_HASH_GROW_BATCHES_ELECT: WaitEventIPC = 134217749;
+pub const WaitEventIPC_WAIT_EVENT_HASH_GROW_BATCHES_FINISH: WaitEventIPC = 134217750;
+pub const WaitEventIPC_WAIT_EVENT_HASH_GROW_BATCHES_REPARTITION: WaitEventIPC = 134217751;
+pub const WaitEventIPC_WAIT_EVENT_HASH_GROW_BUCKETS_ALLOCATE: WaitEventIPC = 134217752;
+pub const WaitEventIPC_WAIT_EVENT_HASH_GROW_BUCKETS_ELECT: WaitEventIPC = 134217753;
+pub const WaitEventIPC_WAIT_EVENT_HASH_GROW_BUCKETS_REINSERT: WaitEventIPC = 134217754;
+pub const WaitEventIPC_WAIT_EVENT_LOGICAL_SYNC_DATA: WaitEventIPC = 134217755;
+pub const WaitEventIPC_WAIT_EVENT_LOGICAL_SYNC_STATE_CHANGE: WaitEventIPC = 134217756;
+pub const WaitEventIPC_WAIT_EVENT_MQ_INTERNAL: WaitEventIPC = 134217757;
+pub const WaitEventIPC_WAIT_EVENT_MQ_PUT_MESSAGE: WaitEventIPC = 134217758;
+pub const WaitEventIPC_WAIT_EVENT_MQ_RECEIVE: WaitEventIPC = 134217759;
+pub const WaitEventIPC_WAIT_EVENT_MQ_SEND: WaitEventIPC = 134217760;
+pub const WaitEventIPC_WAIT_EVENT_PARALLEL_BITMAP_SCAN: WaitEventIPC = 134217761;
+pub const WaitEventIPC_WAIT_EVENT_PARALLEL_CREATE_INDEX_SCAN: WaitEventIPC = 134217762;
+pub const WaitEventIPC_WAIT_EVENT_PARALLEL_FINISH: WaitEventIPC = 134217763;
+pub const WaitEventIPC_WAIT_EVENT_PROCARRAY_GROUP_UPDATE: WaitEventIPC = 134217764;
+pub const WaitEventIPC_WAIT_EVENT_PROC_SIGNAL_BARRIER: WaitEventIPC = 134217765;
+pub const WaitEventIPC_WAIT_EVENT_PROMOTE: WaitEventIPC = 134217766;
+pub const WaitEventIPC_WAIT_EVENT_RECOVERY_CONFLICT_SNAPSHOT: WaitEventIPC = 134217767;
+pub const WaitEventIPC_WAIT_EVENT_RECOVERY_CONFLICT_TABLESPACE: WaitEventIPC = 134217768;
+pub const WaitEventIPC_WAIT_EVENT_RECOVERY_END_COMMAND: WaitEventIPC = 134217769;
+pub const WaitEventIPC_WAIT_EVENT_RECOVERY_PAUSE: WaitEventIPC = 134217770;
+pub const WaitEventIPC_WAIT_EVENT_REPLICATION_ORIGIN_DROP: WaitEventIPC = 134217771;
+pub const WaitEventIPC_WAIT_EVENT_REPLICATION_SLOT_DROP: WaitEventIPC = 134217772;
+pub const WaitEventIPC_WAIT_EVENT_RESTORE_COMMAND: WaitEventIPC = 134217773;
+pub const WaitEventIPC_WAIT_EVENT_SAFE_SNAPSHOT: WaitEventIPC = 134217774;
+pub const WaitEventIPC_WAIT_EVENT_SYNC_REP: WaitEventIPC = 134217775;
+pub const WaitEventIPC_WAIT_EVENT_WAL_RECEIVER_EXIT: WaitEventIPC = 134217776;
+pub const WaitEventIPC_WAIT_EVENT_WAL_RECEIVER_WAIT_START: WaitEventIPC = 134217777;
+pub const WaitEventIPC_WAIT_EVENT_XACT_GROUP_UPDATE: WaitEventIPC = 134217778;
 pub type WaitEventIPC = ::std::os::raw::c_uint;
 pub const WaitEventTimeout_WAIT_EVENT_BASE_BACKUP_THROTTLE: WaitEventTimeout = 150994944;
-pub const WaitEventTimeout_WAIT_EVENT_PG_SLEEP: WaitEventTimeout = 150994945;
-pub const WaitEventTimeout_WAIT_EVENT_RECOVERY_APPLY_DELAY: WaitEventTimeout = 150994946;
+pub const WaitEventTimeout_WAIT_EVENT_CHECKPOINT_WRITE_DELAY: WaitEventTimeout = 150994945;
+pub const WaitEventTimeout_WAIT_EVENT_PG_SLEEP: WaitEventTimeout = 150994946;
+pub const WaitEventTimeout_WAIT_EVENT_RECOVERY_APPLY_DELAY: WaitEventTimeout = 150994947;
 pub const WaitEventTimeout_WAIT_EVENT_RECOVERY_RETRIEVE_RETRY_INTERVAL: WaitEventTimeout =
-    150994947;
-pub const WaitEventTimeout_WAIT_EVENT_VACUUM_DELAY: WaitEventTimeout = 150994948;
-pub const WaitEventTimeout_WAIT_EVENT_CHECKPOINT_WRITE_DELAY: WaitEventTimeout = 150994949;
-pub const WaitEventTimeout_WAIT_EVENT_REGISTER_SYNC_REQUEST: WaitEventTimeout = 150994950;
+    150994948;
+pub const WaitEventTimeout_WAIT_EVENT_REGISTER_SYNC_REQUEST: WaitEventTimeout = 150994949;
+pub const WaitEventTimeout_WAIT_EVENT_VACUUM_DELAY: WaitEventTimeout = 150994950;
+pub const WaitEventTimeout_WAIT_EVENT_VACUUM_TRUNCATE: WaitEventTimeout = 150994951;
 pub type WaitEventTimeout = ::std::os::raw::c_uint;
 pub const WaitEventIO_WAIT_EVENT_BASEBACKUP_READ: WaitEventIO = 167772160;
-pub const WaitEventIO_WAIT_EVENT_BUFFILE_READ: WaitEventIO = 167772161;
-pub const WaitEventIO_WAIT_EVENT_BUFFILE_WRITE: WaitEventIO = 167772162;
-pub const WaitEventIO_WAIT_EVENT_BUFFILE_TRUNCATE: WaitEventIO = 167772163;
-pub const WaitEventIO_WAIT_EVENT_CONTROL_FILE_READ: WaitEventIO = 167772164;
-pub const WaitEventIO_WAIT_EVENT_CONTROL_FILE_SYNC: WaitEventIO = 167772165;
-pub const WaitEventIO_WAIT_EVENT_CONTROL_FILE_SYNC_UPDATE: WaitEventIO = 167772166;
-pub const WaitEventIO_WAIT_EVENT_CONTROL_FILE_WRITE: WaitEventIO = 167772167;
-pub const WaitEventIO_WAIT_EVENT_CONTROL_FILE_WRITE_UPDATE: WaitEventIO = 167772168;
-pub const WaitEventIO_WAIT_EVENT_COPY_FILE_READ: WaitEventIO = 167772169;
-pub const WaitEventIO_WAIT_EVENT_COPY_FILE_WRITE: WaitEventIO = 167772170;
-pub const WaitEventIO_WAIT_EVENT_DATA_FILE_EXTEND: WaitEventIO = 167772171;
-pub const WaitEventIO_WAIT_EVENT_DATA_FILE_FLUSH: WaitEventIO = 167772172;
-pub const WaitEventIO_WAIT_EVENT_DATA_FILE_IMMEDIATE_SYNC: WaitEventIO = 167772173;
-pub const WaitEventIO_WAIT_EVENT_DATA_FILE_PREFETCH: WaitEventIO = 167772174;
-pub const WaitEventIO_WAIT_EVENT_DATA_FILE_READ: WaitEventIO = 167772175;
-pub const WaitEventIO_WAIT_EVENT_DATA_FILE_SYNC: WaitEventIO = 167772176;
-pub const WaitEventIO_WAIT_EVENT_DATA_FILE_TRUNCATE: WaitEventIO = 167772177;
-pub const WaitEventIO_WAIT_EVENT_DATA_FILE_WRITE: WaitEventIO = 167772178;
-pub const WaitEventIO_WAIT_EVENT_DSM_FILL_ZERO_WRITE: WaitEventIO = 167772179;
-pub const WaitEventIO_WAIT_EVENT_LOCK_FILE_ADDTODATADIR_READ: WaitEventIO = 167772180;
-pub const WaitEventIO_WAIT_EVENT_LOCK_FILE_ADDTODATADIR_SYNC: WaitEventIO = 167772181;
-pub const WaitEventIO_WAIT_EVENT_LOCK_FILE_ADDTODATADIR_WRITE: WaitEventIO = 167772182;
-pub const WaitEventIO_WAIT_EVENT_LOCK_FILE_CREATE_READ: WaitEventIO = 167772183;
-pub const WaitEventIO_WAIT_EVENT_LOCK_FILE_CREATE_SYNC: WaitEventIO = 167772184;
-pub const WaitEventIO_WAIT_EVENT_LOCK_FILE_CREATE_WRITE: WaitEventIO = 167772185;
-pub const WaitEventIO_WAIT_EVENT_LOCK_FILE_RECHECKDATADIR_READ: WaitEventIO = 167772186;
-pub const WaitEventIO_WAIT_EVENT_LOGICAL_REWRITE_CHECKPOINT_SYNC: WaitEventIO = 167772187;
-pub const WaitEventIO_WAIT_EVENT_LOGICAL_REWRITE_MAPPING_SYNC: WaitEventIO = 167772188;
-pub const WaitEventIO_WAIT_EVENT_LOGICAL_REWRITE_MAPPING_WRITE: WaitEventIO = 167772189;
-pub const WaitEventIO_WAIT_EVENT_LOGICAL_REWRITE_SYNC: WaitEventIO = 167772190;
-pub const WaitEventIO_WAIT_EVENT_LOGICAL_REWRITE_TRUNCATE: WaitEventIO = 167772191;
-pub const WaitEventIO_WAIT_EVENT_LOGICAL_REWRITE_WRITE: WaitEventIO = 167772192;
-pub const WaitEventIO_WAIT_EVENT_RELATION_MAP_READ: WaitEventIO = 167772193;
-pub const WaitEventIO_WAIT_EVENT_RELATION_MAP_SYNC: WaitEventIO = 167772194;
-pub const WaitEventIO_WAIT_EVENT_RELATION_MAP_WRITE: WaitEventIO = 167772195;
-pub const WaitEventIO_WAIT_EVENT_REORDER_BUFFER_READ: WaitEventIO = 167772196;
-pub const WaitEventIO_WAIT_EVENT_REORDER_BUFFER_WRITE: WaitEventIO = 167772197;
-pub const WaitEventIO_WAIT_EVENT_REORDER_LOGICAL_MAPPING_READ: WaitEventIO = 167772198;
-pub const WaitEventIO_WAIT_EVENT_REPLICATION_SLOT_READ: WaitEventIO = 167772199;
-pub const WaitEventIO_WAIT_EVENT_REPLICATION_SLOT_RESTORE_SYNC: WaitEventIO = 167772200;
-pub const WaitEventIO_WAIT_EVENT_REPLICATION_SLOT_SYNC: WaitEventIO = 167772201;
-pub const WaitEventIO_WAIT_EVENT_REPLICATION_SLOT_WRITE: WaitEventIO = 167772202;
-pub const WaitEventIO_WAIT_EVENT_SLRU_FLUSH_SYNC: WaitEventIO = 167772203;
-pub const WaitEventIO_WAIT_EVENT_SLRU_READ: WaitEventIO = 167772204;
-pub const WaitEventIO_WAIT_EVENT_SLRU_SYNC: WaitEventIO = 167772205;
-pub const WaitEventIO_WAIT_EVENT_SLRU_WRITE: WaitEventIO = 167772206;
-pub const WaitEventIO_WAIT_EVENT_SNAPBUILD_READ: WaitEventIO = 167772207;
-pub const WaitEventIO_WAIT_EVENT_SNAPBUILD_SYNC: WaitEventIO = 167772208;
-pub const WaitEventIO_WAIT_EVENT_SNAPBUILD_WRITE: WaitEventIO = 167772209;
-pub const WaitEventIO_WAIT_EVENT_TIMELINE_HISTORY_FILE_SYNC: WaitEventIO = 167772210;
-pub const WaitEventIO_WAIT_EVENT_TIMELINE_HISTORY_FILE_WRITE: WaitEventIO = 167772211;
-pub const WaitEventIO_WAIT_EVENT_TIMELINE_HISTORY_READ: WaitEventIO = 167772212;
-pub const WaitEventIO_WAIT_EVENT_TIMELINE_HISTORY_SYNC: WaitEventIO = 167772213;
-pub const WaitEventIO_WAIT_EVENT_TIMELINE_HISTORY_WRITE: WaitEventIO = 167772214;
-pub const WaitEventIO_WAIT_EVENT_TWOPHASE_FILE_READ: WaitEventIO = 167772215;
-pub const WaitEventIO_WAIT_EVENT_TWOPHASE_FILE_SYNC: WaitEventIO = 167772216;
-pub const WaitEventIO_WAIT_EVENT_TWOPHASE_FILE_WRITE: WaitEventIO = 167772217;
-pub const WaitEventIO_WAIT_EVENT_WALSENDER_TIMELINE_HISTORY_READ: WaitEventIO = 167772218;
-pub const WaitEventIO_WAIT_EVENT_WAL_BOOTSTRAP_SYNC: WaitEventIO = 167772219;
-pub const WaitEventIO_WAIT_EVENT_WAL_BOOTSTRAP_WRITE: WaitEventIO = 167772220;
-pub const WaitEventIO_WAIT_EVENT_WAL_COPY_READ: WaitEventIO = 167772221;
-pub const WaitEventIO_WAIT_EVENT_WAL_COPY_SYNC: WaitEventIO = 167772222;
-pub const WaitEventIO_WAIT_EVENT_WAL_COPY_WRITE: WaitEventIO = 167772223;
-pub const WaitEventIO_WAIT_EVENT_WAL_INIT_SYNC: WaitEventIO = 167772224;
-pub const WaitEventIO_WAIT_EVENT_WAL_INIT_WRITE: WaitEventIO = 167772225;
-pub const WaitEventIO_WAIT_EVENT_WAL_READ: WaitEventIO = 167772226;
-pub const WaitEventIO_WAIT_EVENT_WAL_SYNC: WaitEventIO = 167772227;
-pub const WaitEventIO_WAIT_EVENT_WAL_SYNC_METHOD_ASSIGN: WaitEventIO = 167772228;
-pub const WaitEventIO_WAIT_EVENT_WAL_WRITE: WaitEventIO = 167772229;
-pub const WaitEventIO_WAIT_EVENT_LOGICAL_CHANGES_READ: WaitEventIO = 167772230;
-pub const WaitEventIO_WAIT_EVENT_LOGICAL_CHANGES_WRITE: WaitEventIO = 167772231;
-pub const WaitEventIO_WAIT_EVENT_LOGICAL_SUBXACT_READ: WaitEventIO = 167772232;
-pub const WaitEventIO_WAIT_EVENT_LOGICAL_SUBXACT_WRITE: WaitEventIO = 167772233;
+pub const WaitEventIO_WAIT_EVENT_BASEBACKUP_SYNC: WaitEventIO = 167772161;
+pub const WaitEventIO_WAIT_EVENT_BASEBACKUP_WRITE: WaitEventIO = 167772162;
+pub const WaitEventIO_WAIT_EVENT_BUFFILE_READ: WaitEventIO = 167772163;
+pub const WaitEventIO_WAIT_EVENT_BUFFILE_WRITE: WaitEventIO = 167772164;
+pub const WaitEventIO_WAIT_EVENT_BUFFILE_TRUNCATE: WaitEventIO = 167772165;
+pub const WaitEventIO_WAIT_EVENT_CONTROL_FILE_READ: WaitEventIO = 167772166;
+pub const WaitEventIO_WAIT_EVENT_CONTROL_FILE_SYNC: WaitEventIO = 167772167;
+pub const WaitEventIO_WAIT_EVENT_CONTROL_FILE_SYNC_UPDATE: WaitEventIO = 167772168;
+pub const WaitEventIO_WAIT_EVENT_CONTROL_FILE_WRITE: WaitEventIO = 167772169;
+pub const WaitEventIO_WAIT_EVENT_CONTROL_FILE_WRITE_UPDATE: WaitEventIO = 167772170;
+pub const WaitEventIO_WAIT_EVENT_COPY_FILE_READ: WaitEventIO = 167772171;
+pub const WaitEventIO_WAIT_EVENT_COPY_FILE_WRITE: WaitEventIO = 167772172;
+pub const WaitEventIO_WAIT_EVENT_DATA_FILE_EXTEND: WaitEventIO = 167772173;
+pub const WaitEventIO_WAIT_EVENT_DATA_FILE_FLUSH: WaitEventIO = 167772174;
+pub const WaitEventIO_WAIT_EVENT_DATA_FILE_IMMEDIATE_SYNC: WaitEventIO = 167772175;
+pub const WaitEventIO_WAIT_EVENT_DATA_FILE_PREFETCH: WaitEventIO = 167772176;
+pub const WaitEventIO_WAIT_EVENT_DATA_FILE_READ: WaitEventIO = 167772177;
+pub const WaitEventIO_WAIT_EVENT_DATA_FILE_SYNC: WaitEventIO = 167772178;
+pub const WaitEventIO_WAIT_EVENT_DATA_FILE_TRUNCATE: WaitEventIO = 167772179;
+pub const WaitEventIO_WAIT_EVENT_DATA_FILE_WRITE: WaitEventIO = 167772180;
+pub const WaitEventIO_WAIT_EVENT_DSM_FILL_ZERO_WRITE: WaitEventIO = 167772181;
+pub const WaitEventIO_WAIT_EVENT_LOCK_FILE_ADDTODATADIR_READ: WaitEventIO = 167772182;
+pub const WaitEventIO_WAIT_EVENT_LOCK_FILE_ADDTODATADIR_SYNC: WaitEventIO = 167772183;
+pub const WaitEventIO_WAIT_EVENT_LOCK_FILE_ADDTODATADIR_WRITE: WaitEventIO = 167772184;
+pub const WaitEventIO_WAIT_EVENT_LOCK_FILE_CREATE_READ: WaitEventIO = 167772185;
+pub const WaitEventIO_WAIT_EVENT_LOCK_FILE_CREATE_SYNC: WaitEventIO = 167772186;
+pub const WaitEventIO_WAIT_EVENT_LOCK_FILE_CREATE_WRITE: WaitEventIO = 167772187;
+pub const WaitEventIO_WAIT_EVENT_LOCK_FILE_RECHECKDATADIR_READ: WaitEventIO = 167772188;
+pub const WaitEventIO_WAIT_EVENT_LOGICAL_REWRITE_CHECKPOINT_SYNC: WaitEventIO = 167772189;
+pub const WaitEventIO_WAIT_EVENT_LOGICAL_REWRITE_MAPPING_SYNC: WaitEventIO = 167772190;
+pub const WaitEventIO_WAIT_EVENT_LOGICAL_REWRITE_MAPPING_WRITE: WaitEventIO = 167772191;
+pub const WaitEventIO_WAIT_EVENT_LOGICAL_REWRITE_SYNC: WaitEventIO = 167772192;
+pub const WaitEventIO_WAIT_EVENT_LOGICAL_REWRITE_TRUNCATE: WaitEventIO = 167772193;
+pub const WaitEventIO_WAIT_EVENT_LOGICAL_REWRITE_WRITE: WaitEventIO = 167772194;
+pub const WaitEventIO_WAIT_EVENT_RELATION_MAP_READ: WaitEventIO = 167772195;
+pub const WaitEventIO_WAIT_EVENT_RELATION_MAP_SYNC: WaitEventIO = 167772196;
+pub const WaitEventIO_WAIT_EVENT_RELATION_MAP_WRITE: WaitEventIO = 167772197;
+pub const WaitEventIO_WAIT_EVENT_REORDER_BUFFER_READ: WaitEventIO = 167772198;
+pub const WaitEventIO_WAIT_EVENT_REORDER_BUFFER_WRITE: WaitEventIO = 167772199;
+pub const WaitEventIO_WAIT_EVENT_REORDER_LOGICAL_MAPPING_READ: WaitEventIO = 167772200;
+pub const WaitEventIO_WAIT_EVENT_REPLICATION_SLOT_READ: WaitEventIO = 167772201;
+pub const WaitEventIO_WAIT_EVENT_REPLICATION_SLOT_RESTORE_SYNC: WaitEventIO = 167772202;
+pub const WaitEventIO_WAIT_EVENT_REPLICATION_SLOT_SYNC: WaitEventIO = 167772203;
+pub const WaitEventIO_WAIT_EVENT_REPLICATION_SLOT_WRITE: WaitEventIO = 167772204;
+pub const WaitEventIO_WAIT_EVENT_SLRU_FLUSH_SYNC: WaitEventIO = 167772205;
+pub const WaitEventIO_WAIT_EVENT_SLRU_READ: WaitEventIO = 167772206;
+pub const WaitEventIO_WAIT_EVENT_SLRU_SYNC: WaitEventIO = 167772207;
+pub const WaitEventIO_WAIT_EVENT_SLRU_WRITE: WaitEventIO = 167772208;
+pub const WaitEventIO_WAIT_EVENT_SNAPBUILD_READ: WaitEventIO = 167772209;
+pub const WaitEventIO_WAIT_EVENT_SNAPBUILD_SYNC: WaitEventIO = 167772210;
+pub const WaitEventIO_WAIT_EVENT_SNAPBUILD_WRITE: WaitEventIO = 167772211;
+pub const WaitEventIO_WAIT_EVENT_TIMELINE_HISTORY_FILE_SYNC: WaitEventIO = 167772212;
+pub const WaitEventIO_WAIT_EVENT_TIMELINE_HISTORY_FILE_WRITE: WaitEventIO = 167772213;
+pub const WaitEventIO_WAIT_EVENT_TIMELINE_HISTORY_READ: WaitEventIO = 167772214;
+pub const WaitEventIO_WAIT_EVENT_TIMELINE_HISTORY_SYNC: WaitEventIO = 167772215;
+pub const WaitEventIO_WAIT_EVENT_TIMELINE_HISTORY_WRITE: WaitEventIO = 167772216;
+pub const WaitEventIO_WAIT_EVENT_TWOPHASE_FILE_READ: WaitEventIO = 167772217;
+pub const WaitEventIO_WAIT_EVENT_TWOPHASE_FILE_SYNC: WaitEventIO = 167772218;
+pub const WaitEventIO_WAIT_EVENT_TWOPHASE_FILE_WRITE: WaitEventIO = 167772219;
+pub const WaitEventIO_WAIT_EVENT_VERSION_FILE_WRITE: WaitEventIO = 167772220;
+pub const WaitEventIO_WAIT_EVENT_WALSENDER_TIMELINE_HISTORY_READ: WaitEventIO = 167772221;
+pub const WaitEventIO_WAIT_EVENT_WAL_BOOTSTRAP_SYNC: WaitEventIO = 167772222;
+pub const WaitEventIO_WAIT_EVENT_WAL_BOOTSTRAP_WRITE: WaitEventIO = 167772223;
+pub const WaitEventIO_WAIT_EVENT_WAL_COPY_READ: WaitEventIO = 167772224;
+pub const WaitEventIO_WAIT_EVENT_WAL_COPY_SYNC: WaitEventIO = 167772225;
+pub const WaitEventIO_WAIT_EVENT_WAL_COPY_WRITE: WaitEventIO = 167772226;
+pub const WaitEventIO_WAIT_EVENT_WAL_INIT_SYNC: WaitEventIO = 167772227;
+pub const WaitEventIO_WAIT_EVENT_WAL_INIT_WRITE: WaitEventIO = 167772228;
+pub const WaitEventIO_WAIT_EVENT_WAL_READ: WaitEventIO = 167772229;
+pub const WaitEventIO_WAIT_EVENT_WAL_SYNC: WaitEventIO = 167772230;
+pub const WaitEventIO_WAIT_EVENT_WAL_SYNC_METHOD_ASSIGN: WaitEventIO = 167772231;
+pub const WaitEventIO_WAIT_EVENT_WAL_WRITE: WaitEventIO = 167772232;
 pub type WaitEventIO = ::std::os::raw::c_uint;
 pub unsafe fn pgstat_get_wait_event(arg_wait_event_info: uint32) -> *const ::std::os::raw::c_char {
     crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
@@ -37252,44 +37545,68 @@ pub unsafe fn pgstat_reset_wait_event_storage() {
 extern "C" {
     pub static mut my_wait_event_info: *mut uint32;
 }
+pub const PgStat_Kind_PGSTAT_KIND_INVALID: PgStat_Kind = 0;
+pub const PgStat_Kind_PGSTAT_KIND_DATABASE: PgStat_Kind = 1;
+pub const PgStat_Kind_PGSTAT_KIND_RELATION: PgStat_Kind = 2;
+pub const PgStat_Kind_PGSTAT_KIND_FUNCTION: PgStat_Kind = 3;
+pub const PgStat_Kind_PGSTAT_KIND_REPLSLOT: PgStat_Kind = 4;
+pub const PgStat_Kind_PGSTAT_KIND_SUBSCRIPTION: PgStat_Kind = 5;
+pub const PgStat_Kind_PGSTAT_KIND_ARCHIVER: PgStat_Kind = 6;
+pub const PgStat_Kind_PGSTAT_KIND_BGWRITER: PgStat_Kind = 7;
+pub const PgStat_Kind_PGSTAT_KIND_CHECKPOINTER: PgStat_Kind = 8;
+pub const PgStat_Kind_PGSTAT_KIND_SLRU: PgStat_Kind = 9;
+pub const PgStat_Kind_PGSTAT_KIND_WAL: PgStat_Kind = 10;
+pub type PgStat_Kind = ::std::os::raw::c_uint;
 pub const TrackFunctionsLevel_TRACK_FUNC_OFF: TrackFunctionsLevel = 0;
 pub const TrackFunctionsLevel_TRACK_FUNC_PL: TrackFunctionsLevel = 1;
 pub const TrackFunctionsLevel_TRACK_FUNC_ALL: TrackFunctionsLevel = 2;
 pub type TrackFunctionsLevel = ::std::os::raw::c_uint;
+pub const PgStat_FetchConsistency_PGSTAT_FETCH_CONSISTENCY_NONE: PgStat_FetchConsistency = 0;
+pub const PgStat_FetchConsistency_PGSTAT_FETCH_CONSISTENCY_CACHE: PgStat_FetchConsistency = 1;
+pub const PgStat_FetchConsistency_PGSTAT_FETCH_CONSISTENCY_SNAPSHOT: PgStat_FetchConsistency = 2;
+pub type PgStat_FetchConsistency = ::std::os::raw::c_uint;
 pub const SessionEndType_DISCONNECT_NOT_YET: SessionEndType = 0;
 pub const SessionEndType_DISCONNECT_NORMAL: SessionEndType = 1;
 pub const SessionEndType_DISCONNECT_CLIENT_EOF: SessionEndType = 2;
 pub const SessionEndType_DISCONNECT_FATAL: SessionEndType = 3;
 pub const SessionEndType_DISCONNECT_KILLED: SessionEndType = 4;
 pub type SessionEndType = ::std::os::raw::c_uint;
-pub const StatMsgType_PGSTAT_MTYPE_DUMMY: StatMsgType = 0;
-pub const StatMsgType_PGSTAT_MTYPE_INQUIRY: StatMsgType = 1;
-pub const StatMsgType_PGSTAT_MTYPE_TABSTAT: StatMsgType = 2;
-pub const StatMsgType_PGSTAT_MTYPE_TABPURGE: StatMsgType = 3;
-pub const StatMsgType_PGSTAT_MTYPE_DROPDB: StatMsgType = 4;
-pub const StatMsgType_PGSTAT_MTYPE_RESETCOUNTER: StatMsgType = 5;
-pub const StatMsgType_PGSTAT_MTYPE_RESETSHAREDCOUNTER: StatMsgType = 6;
-pub const StatMsgType_PGSTAT_MTYPE_RESETSINGLECOUNTER: StatMsgType = 7;
-pub const StatMsgType_PGSTAT_MTYPE_RESETSLRUCOUNTER: StatMsgType = 8;
-pub const StatMsgType_PGSTAT_MTYPE_RESETREPLSLOTCOUNTER: StatMsgType = 9;
-pub const StatMsgType_PGSTAT_MTYPE_AUTOVAC_START: StatMsgType = 10;
-pub const StatMsgType_PGSTAT_MTYPE_VACUUM: StatMsgType = 11;
-pub const StatMsgType_PGSTAT_MTYPE_ANALYZE: StatMsgType = 12;
-pub const StatMsgType_PGSTAT_MTYPE_ARCHIVER: StatMsgType = 13;
-pub const StatMsgType_PGSTAT_MTYPE_BGWRITER: StatMsgType = 14;
-pub const StatMsgType_PGSTAT_MTYPE_WAL: StatMsgType = 15;
-pub const StatMsgType_PGSTAT_MTYPE_SLRU: StatMsgType = 16;
-pub const StatMsgType_PGSTAT_MTYPE_FUNCSTAT: StatMsgType = 17;
-pub const StatMsgType_PGSTAT_MTYPE_FUNCPURGE: StatMsgType = 18;
-pub const StatMsgType_PGSTAT_MTYPE_RECOVERYCONFLICT: StatMsgType = 19;
-pub const StatMsgType_PGSTAT_MTYPE_TEMPFILE: StatMsgType = 20;
-pub const StatMsgType_PGSTAT_MTYPE_DEADLOCK: StatMsgType = 21;
-pub const StatMsgType_PGSTAT_MTYPE_CHECKSUMFAILURE: StatMsgType = 22;
-pub const StatMsgType_PGSTAT_MTYPE_REPLSLOT: StatMsgType = 23;
-pub const StatMsgType_PGSTAT_MTYPE_CONNECT: StatMsgType = 24;
-pub const StatMsgType_PGSTAT_MTYPE_DISCONNECT: StatMsgType = 25;
-pub type StatMsgType = ::std::os::raw::c_uint;
 pub type PgStat_Counter = int64;
+#[repr(C)]
+#[derive(Debug, Default, Copy, Clone)]
+pub struct PgStat_FunctionCounts {
+    pub f_numcalls: PgStat_Counter,
+    pub f_total_time: instr_time,
+    pub f_self_time: instr_time,
+}
+#[repr(C)]
+#[derive(Debug, Default, Copy, Clone)]
+pub struct PgStat_BackendFunctionEntry {
+    pub f_counts: PgStat_FunctionCounts,
+}
+#[repr(C)]
+#[derive(Debug, Copy, Clone)]
+pub struct PgStat_FunctionCallUsage {
+    pub fs: *mut PgStat_FunctionCounts,
+    pub save_f_total_time: instr_time,
+    pub save_total: instr_time,
+    pub f_start: instr_time,
+}
+impl Default for PgStat_FunctionCallUsage {
+    fn default() -> Self {
+        let mut s = ::std::mem::MaybeUninit::<Self>::uninit();
+        unsafe {
+            ::std::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
+            s.assume_init()
+        }
+    }
+}
+#[repr(C)]
+#[derive(Debug, Default, Copy, Clone)]
+pub struct PgStat_BackendSubEntry {
+    pub apply_error_count: PgStat_Counter,
+    pub sync_error_count: PgStat_Counter,
+}
 #[repr(C)]
 #[derive(Debug, Default, Copy, Clone)]
 pub struct PgStat_TableCounts {
@@ -37300,20 +37617,13 @@ pub struct PgStat_TableCounts {
     pub t_tuples_updated: PgStat_Counter,
     pub t_tuples_deleted: PgStat_Counter,
     pub t_tuples_hot_updated: PgStat_Counter,
-    pub t_truncated: bool,
+    pub t_truncdropped: bool,
     pub t_delta_live_tuples: PgStat_Counter,
     pub t_delta_dead_tuples: PgStat_Counter,
     pub t_changed_tuples: PgStat_Counter,
     pub t_blocks_fetched: PgStat_Counter,
     pub t_blocks_hit: PgStat_Counter,
 }
-pub const PgStat_Shared_Reset_Target_RESET_ARCHIVER: PgStat_Shared_Reset_Target = 0;
-pub const PgStat_Shared_Reset_Target_RESET_BGWRITER: PgStat_Shared_Reset_Target = 1;
-pub const PgStat_Shared_Reset_Target_RESET_WAL: PgStat_Shared_Reset_Target = 2;
-pub type PgStat_Shared_Reset_Target = ::std::os::raw::c_uint;
-pub const PgStat_Single_Reset_Type_RESET_TABLE: PgStat_Single_Reset_Type = 0;
-pub const PgStat_Single_Reset_Type_RESET_FUNCTION: PgStat_Single_Reset_Type = 1;
-pub type PgStat_Single_Reset_Type = ::std::os::raw::c_uint;
 #[repr(C)]
 #[derive(Debug, Copy, Clone)]
 pub struct PgStat_TableStatus {
@@ -37321,6 +37631,7 @@ pub struct PgStat_TableStatus {
     pub t_shared: bool,
     pub trans: *mut PgStat_TableXactStatus,
     pub t_counts: PgStat_TableCounts,
+    pub relation: Relation,
 }
 impl Default for PgStat_TableStatus {
     fn default() -> Self {
@@ -37337,10 +37648,10 @@ pub struct PgStat_TableXactStatus {
     pub tuples_inserted: PgStat_Counter,
     pub tuples_updated: PgStat_Counter,
     pub tuples_deleted: PgStat_Counter,
-    pub truncated: bool,
-    pub inserted_pre_trunc: PgStat_Counter,
-    pub updated_pre_trunc: PgStat_Counter,
-    pub deleted_pre_trunc: PgStat_Counter,
+    pub truncdropped: bool,
+    pub inserted_pre_truncdrop: PgStat_Counter,
+    pub updated_pre_truncdrop: PgStat_Counter,
+    pub deleted_pre_truncdrop: PgStat_Counter,
     pub nest_level: ::std::os::raw::c_int,
     pub upper: *mut PgStat_TableXactStatus,
     pub parent: *mut PgStat_TableStatus,
@@ -37357,42 +37668,16 @@ impl Default for PgStat_TableXactStatus {
 }
 #[repr(C)]
 #[derive(Debug, Copy, Clone)]
-pub struct PgStat_MsgHdr {
-    pub m_type: StatMsgType,
-    pub m_size: ::std::os::raw::c_int,
+pub struct PgStat_ArchiverStats {
+    pub archived_count: PgStat_Counter,
+    pub last_archived_wal: [::std::os::raw::c_char; 41usize],
+    pub last_archived_timestamp: TimestampTz,
+    pub failed_count: PgStat_Counter,
+    pub last_failed_wal: [::std::os::raw::c_char; 41usize],
+    pub last_failed_timestamp: TimestampTz,
+    pub stat_reset_timestamp: TimestampTz,
 }
-impl Default for PgStat_MsgHdr {
-    fn default() -> Self {
-        let mut s = ::std::mem::MaybeUninit::<Self>::uninit();
-        unsafe {
-            ::std::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
-            s.assume_init()
-        }
-    }
-}
-#[repr(C)]
-#[derive(Debug, Copy, Clone)]
-pub struct PgStat_MsgDummy {
-    pub m_hdr: PgStat_MsgHdr,
-}
-impl Default for PgStat_MsgDummy {
-    fn default() -> Self {
-        let mut s = ::std::mem::MaybeUninit::<Self>::uninit();
-        unsafe {
-            ::std::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
-            s.assume_init()
-        }
-    }
-}
-#[repr(C)]
-#[derive(Debug, Copy, Clone)]
-pub struct PgStat_MsgInquiry {
-    pub m_hdr: PgStat_MsgHdr,
-    pub clock_time: TimestampTz,
-    pub cutoff_time: TimestampTz,
-    pub databaseid: Oid,
-}
-impl Default for PgStat_MsgInquiry {
+impl Default for PgStat_ArchiverStats {
     fn default() -> Self {
         let mut s = ::std::mem::MaybeUninit::<Self>::uninit();
         unsafe {
@@ -37403,505 +37688,26 @@ impl Default for PgStat_MsgInquiry {
 }
 #[repr(C)]
 #[derive(Debug, Default, Copy, Clone)]
-pub struct PgStat_TableEntry {
-    pub t_id: Oid,
-    pub t_counts: PgStat_TableCounts,
-}
-#[repr(C)]
-#[derive(Debug, Copy, Clone)]
-pub struct PgStat_MsgTabstat {
-    pub m_hdr: PgStat_MsgHdr,
-    pub m_databaseid: Oid,
-    pub m_nentries: ::std::os::raw::c_int,
-    pub m_xact_commit: ::std::os::raw::c_int,
-    pub m_xact_rollback: ::std::os::raw::c_int,
-    pub m_block_read_time: PgStat_Counter,
-    pub m_block_write_time: PgStat_Counter,
-    pub m_session_time: PgStat_Counter,
-    pub m_active_time: PgStat_Counter,
-    pub m_idle_in_xact_time: PgStat_Counter,
-    pub m_entry: [PgStat_TableEntry; 8usize],
-}
-impl Default for PgStat_MsgTabstat {
-    fn default() -> Self {
-        let mut s = ::std::mem::MaybeUninit::<Self>::uninit();
-        unsafe {
-            ::std::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
-            s.assume_init()
-        }
-    }
-}
-#[repr(C)]
-#[derive(Debug, Copy, Clone)]
-pub struct PgStat_MsgTabpurge {
-    pub m_hdr: PgStat_MsgHdr,
-    pub m_databaseid: Oid,
-    pub m_nentries: ::std::os::raw::c_int,
-    pub m_tableid: [Oid; 246usize],
-}
-impl Default for PgStat_MsgTabpurge {
-    fn default() -> Self {
-        let mut s = ::std::mem::MaybeUninit::<Self>::uninit();
-        unsafe {
-            ::std::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
-            s.assume_init()
-        }
-    }
-}
-#[repr(C)]
-#[derive(Debug, Copy, Clone)]
-pub struct PgStat_MsgDropdb {
-    pub m_hdr: PgStat_MsgHdr,
-    pub m_databaseid: Oid,
-}
-impl Default for PgStat_MsgDropdb {
-    fn default() -> Self {
-        let mut s = ::std::mem::MaybeUninit::<Self>::uninit();
-        unsafe {
-            ::std::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
-            s.assume_init()
-        }
-    }
-}
-#[repr(C)]
-#[derive(Debug, Copy, Clone)]
-pub struct PgStat_MsgResetcounter {
-    pub m_hdr: PgStat_MsgHdr,
-    pub m_databaseid: Oid,
-}
-impl Default for PgStat_MsgResetcounter {
-    fn default() -> Self {
-        let mut s = ::std::mem::MaybeUninit::<Self>::uninit();
-        unsafe {
-            ::std::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
-            s.assume_init()
-        }
-    }
-}
-#[repr(C)]
-#[derive(Debug, Copy, Clone)]
-pub struct PgStat_MsgResetsharedcounter {
-    pub m_hdr: PgStat_MsgHdr,
-    pub m_resettarget: PgStat_Shared_Reset_Target,
-}
-impl Default for PgStat_MsgResetsharedcounter {
-    fn default() -> Self {
-        let mut s = ::std::mem::MaybeUninit::<Self>::uninit();
-        unsafe {
-            ::std::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
-            s.assume_init()
-        }
-    }
-}
-#[repr(C)]
-#[derive(Debug, Copy, Clone)]
-pub struct PgStat_MsgResetsinglecounter {
-    pub m_hdr: PgStat_MsgHdr,
-    pub m_databaseid: Oid,
-    pub m_resettype: PgStat_Single_Reset_Type,
-    pub m_objectid: Oid,
-}
-impl Default for PgStat_MsgResetsinglecounter {
-    fn default() -> Self {
-        let mut s = ::std::mem::MaybeUninit::<Self>::uninit();
-        unsafe {
-            ::std::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
-            s.assume_init()
-        }
-    }
-}
-#[repr(C)]
-#[derive(Debug, Copy, Clone)]
-pub struct PgStat_MsgResetslrucounter {
-    pub m_hdr: PgStat_MsgHdr,
-    pub m_index: ::std::os::raw::c_int,
-}
-impl Default for PgStat_MsgResetslrucounter {
-    fn default() -> Self {
-        let mut s = ::std::mem::MaybeUninit::<Self>::uninit();
-        unsafe {
-            ::std::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
-            s.assume_init()
-        }
-    }
-}
-#[repr(C)]
-#[derive(Debug, Copy, Clone)]
-pub struct PgStat_MsgResetreplslotcounter {
-    pub m_hdr: PgStat_MsgHdr,
-    pub m_slotname: NameData,
-    pub clearall: bool,
-}
-impl Default for PgStat_MsgResetreplslotcounter {
-    fn default() -> Self {
-        let mut s = ::std::mem::MaybeUninit::<Self>::uninit();
-        unsafe {
-            ::std::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
-            s.assume_init()
-        }
-    }
-}
-#[repr(C)]
-#[derive(Debug, Copy, Clone)]
-pub struct PgStat_MsgAutovacStart {
-    pub m_hdr: PgStat_MsgHdr,
-    pub m_databaseid: Oid,
-    pub m_start_time: TimestampTz,
-}
-impl Default for PgStat_MsgAutovacStart {
-    fn default() -> Self {
-        let mut s = ::std::mem::MaybeUninit::<Self>::uninit();
-        unsafe {
-            ::std::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
-            s.assume_init()
-        }
-    }
-}
-#[repr(C)]
-#[derive(Debug, Copy, Clone)]
-pub struct PgStat_MsgVacuum {
-    pub m_hdr: PgStat_MsgHdr,
-    pub m_databaseid: Oid,
-    pub m_tableoid: Oid,
-    pub m_autovacuum: bool,
-    pub m_vacuumtime: TimestampTz,
-    pub m_live_tuples: PgStat_Counter,
-    pub m_dead_tuples: PgStat_Counter,
-}
-impl Default for PgStat_MsgVacuum {
-    fn default() -> Self {
-        let mut s = ::std::mem::MaybeUninit::<Self>::uninit();
-        unsafe {
-            ::std::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
-            s.assume_init()
-        }
-    }
-}
-#[repr(C)]
-#[derive(Debug, Copy, Clone)]
-pub struct PgStat_MsgAnalyze {
-    pub m_hdr: PgStat_MsgHdr,
-    pub m_databaseid: Oid,
-    pub m_tableoid: Oid,
-    pub m_autovacuum: bool,
-    pub m_resetcounter: bool,
-    pub m_analyzetime: TimestampTz,
-    pub m_live_tuples: PgStat_Counter,
-    pub m_dead_tuples: PgStat_Counter,
-}
-impl Default for PgStat_MsgAnalyze {
-    fn default() -> Self {
-        let mut s = ::std::mem::MaybeUninit::<Self>::uninit();
-        unsafe {
-            ::std::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
-            s.assume_init()
-        }
-    }
-}
-#[repr(C)]
-#[derive(Debug, Copy, Clone)]
-pub struct PgStat_MsgArchiver {
-    pub m_hdr: PgStat_MsgHdr,
-    pub m_failed: bool,
-    pub m_xlog: [::std::os::raw::c_char; 41usize],
-    pub m_timestamp: TimestampTz,
-}
-impl Default for PgStat_MsgArchiver {
-    fn default() -> Self {
-        let mut s = ::std::mem::MaybeUninit::<Self>::uninit();
-        unsafe {
-            ::std::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
-            s.assume_init()
-        }
-    }
-}
-#[repr(C)]
-#[derive(Debug, Copy, Clone)]
-pub struct PgStat_MsgBgWriter {
-    pub m_hdr: PgStat_MsgHdr,
-    pub m_timed_checkpoints: PgStat_Counter,
-    pub m_requested_checkpoints: PgStat_Counter,
-    pub m_buf_written_checkpoints: PgStat_Counter,
-    pub m_buf_written_clean: PgStat_Counter,
-    pub m_maxwritten_clean: PgStat_Counter,
-    pub m_buf_written_backend: PgStat_Counter,
-    pub m_buf_fsync_backend: PgStat_Counter,
-    pub m_buf_alloc: PgStat_Counter,
-    pub m_checkpoint_write_time: PgStat_Counter,
-    pub m_checkpoint_sync_time: PgStat_Counter,
-}
-impl Default for PgStat_MsgBgWriter {
-    fn default() -> Self {
-        let mut s = ::std::mem::MaybeUninit::<Self>::uninit();
-        unsafe {
-            ::std::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
-            s.assume_init()
-        }
-    }
-}
-#[repr(C)]
-#[derive(Debug, Copy, Clone)]
-pub struct PgStat_MsgWal {
-    pub m_hdr: PgStat_MsgHdr,
-    pub m_wal_records: PgStat_Counter,
-    pub m_wal_fpi: PgStat_Counter,
-    pub m_wal_bytes: uint64,
-    pub m_wal_buffers_full: PgStat_Counter,
-    pub m_wal_write: PgStat_Counter,
-    pub m_wal_sync: PgStat_Counter,
-    pub m_wal_write_time: PgStat_Counter,
-    pub m_wal_sync_time: PgStat_Counter,
-}
-impl Default for PgStat_MsgWal {
-    fn default() -> Self {
-        let mut s = ::std::mem::MaybeUninit::<Self>::uninit();
-        unsafe {
-            ::std::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
-            s.assume_init()
-        }
-    }
-}
-#[repr(C)]
-#[derive(Debug, Copy, Clone)]
-pub struct PgStat_MsgSLRU {
-    pub m_hdr: PgStat_MsgHdr,
-    pub m_index: PgStat_Counter,
-    pub m_blocks_zeroed: PgStat_Counter,
-    pub m_blocks_hit: PgStat_Counter,
-    pub m_blocks_read: PgStat_Counter,
-    pub m_blocks_written: PgStat_Counter,
-    pub m_blocks_exists: PgStat_Counter,
-    pub m_flush: PgStat_Counter,
-    pub m_truncate: PgStat_Counter,
-}
-impl Default for PgStat_MsgSLRU {
-    fn default() -> Self {
-        let mut s = ::std::mem::MaybeUninit::<Self>::uninit();
-        unsafe {
-            ::std::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
-            s.assume_init()
-        }
-    }
-}
-#[repr(C)]
-#[derive(Debug, Copy, Clone)]
-pub struct PgStat_MsgReplSlot {
-    pub m_hdr: PgStat_MsgHdr,
-    pub m_slotname: NameData,
-    pub m_create: bool,
-    pub m_drop: bool,
-    pub m_spill_txns: PgStat_Counter,
-    pub m_spill_count: PgStat_Counter,
-    pub m_spill_bytes: PgStat_Counter,
-    pub m_stream_txns: PgStat_Counter,
-    pub m_stream_count: PgStat_Counter,
-    pub m_stream_bytes: PgStat_Counter,
-    pub m_total_txns: PgStat_Counter,
-    pub m_total_bytes: PgStat_Counter,
-}
-impl Default for PgStat_MsgReplSlot {
-    fn default() -> Self {
-        let mut s = ::std::mem::MaybeUninit::<Self>::uninit();
-        unsafe {
-            ::std::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
-            s.assume_init()
-        }
-    }
-}
-#[repr(C)]
-#[derive(Debug, Copy, Clone)]
-pub struct PgStat_MsgRecoveryConflict {
-    pub m_hdr: PgStat_MsgHdr,
-    pub m_databaseid: Oid,
-    pub m_reason: ::std::os::raw::c_int,
-}
-impl Default for PgStat_MsgRecoveryConflict {
-    fn default() -> Self {
-        let mut s = ::std::mem::MaybeUninit::<Self>::uninit();
-        unsafe {
-            ::std::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
-            s.assume_init()
-        }
-    }
-}
-#[repr(C)]
-#[derive(Debug, Copy, Clone)]
-pub struct PgStat_MsgTempFile {
-    pub m_hdr: PgStat_MsgHdr,
-    pub m_databaseid: Oid,
-    pub m_filesize: usize,
-}
-impl Default for PgStat_MsgTempFile {
-    fn default() -> Self {
-        let mut s = ::std::mem::MaybeUninit::<Self>::uninit();
-        unsafe {
-            ::std::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
-            s.assume_init()
-        }
-    }
+pub struct PgStat_BgWriterStats {
+    pub buf_written_clean: PgStat_Counter,
+    pub maxwritten_clean: PgStat_Counter,
+    pub buf_alloc: PgStat_Counter,
+    pub stat_reset_timestamp: TimestampTz,
 }
 #[repr(C)]
 #[derive(Debug, Default, Copy, Clone)]
-pub struct PgStat_FunctionCounts {
-    pub f_numcalls: PgStat_Counter,
-    pub f_total_time: instr_time,
-    pub f_self_time: instr_time,
+pub struct PgStat_CheckpointerStats {
+    pub timed_checkpoints: PgStat_Counter,
+    pub requested_checkpoints: PgStat_Counter,
+    pub checkpoint_write_time: PgStat_Counter,
+    pub checkpoint_sync_time: PgStat_Counter,
+    pub buf_written_checkpoints: PgStat_Counter,
+    pub buf_written_backend: PgStat_Counter,
+    pub buf_fsync_backend: PgStat_Counter,
 }
 #[repr(C)]
 #[derive(Debug, Default, Copy, Clone)]
-pub struct PgStat_BackendFunctionEntry {
-    pub f_id: Oid,
-    pub f_counts: PgStat_FunctionCounts,
-}
-#[repr(C)]
-#[derive(Debug, Default, Copy, Clone)]
-pub struct PgStat_FunctionEntry {
-    pub f_id: Oid,
-    pub f_numcalls: PgStat_Counter,
-    pub f_total_time: PgStat_Counter,
-    pub f_self_time: PgStat_Counter,
-}
-#[repr(C)]
-#[derive(Debug, Copy, Clone)]
-pub struct PgStat_MsgFuncstat {
-    pub m_hdr: PgStat_MsgHdr,
-    pub m_databaseid: Oid,
-    pub m_nentries: ::std::os::raw::c_int,
-    pub m_entry: [PgStat_FunctionEntry; 30usize],
-}
-impl Default for PgStat_MsgFuncstat {
-    fn default() -> Self {
-        let mut s = ::std::mem::MaybeUninit::<Self>::uninit();
-        unsafe {
-            ::std::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
-            s.assume_init()
-        }
-    }
-}
-#[repr(C)]
-#[derive(Debug, Copy, Clone)]
-pub struct PgStat_MsgFuncpurge {
-    pub m_hdr: PgStat_MsgHdr,
-    pub m_databaseid: Oid,
-    pub m_nentries: ::std::os::raw::c_int,
-    pub m_functionid: [Oid; 246usize],
-}
-impl Default for PgStat_MsgFuncpurge {
-    fn default() -> Self {
-        let mut s = ::std::mem::MaybeUninit::<Self>::uninit();
-        unsafe {
-            ::std::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
-            s.assume_init()
-        }
-    }
-}
-#[repr(C)]
-#[derive(Debug, Copy, Clone)]
-pub struct PgStat_MsgDeadlock {
-    pub m_hdr: PgStat_MsgHdr,
-    pub m_databaseid: Oid,
-}
-impl Default for PgStat_MsgDeadlock {
-    fn default() -> Self {
-        let mut s = ::std::mem::MaybeUninit::<Self>::uninit();
-        unsafe {
-            ::std::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
-            s.assume_init()
-        }
-    }
-}
-#[repr(C)]
-#[derive(Debug, Copy, Clone)]
-pub struct PgStat_MsgChecksumFailure {
-    pub m_hdr: PgStat_MsgHdr,
-    pub m_databaseid: Oid,
-    pub m_failurecount: ::std::os::raw::c_int,
-    pub m_failure_time: TimestampTz,
-}
-impl Default for PgStat_MsgChecksumFailure {
-    fn default() -> Self {
-        let mut s = ::std::mem::MaybeUninit::<Self>::uninit();
-        unsafe {
-            ::std::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
-            s.assume_init()
-        }
-    }
-}
-#[repr(C)]
-#[derive(Debug, Copy, Clone)]
-pub struct PgStat_MsgConnect {
-    pub m_hdr: PgStat_MsgHdr,
-    pub m_databaseid: Oid,
-}
-impl Default for PgStat_MsgConnect {
-    fn default() -> Self {
-        let mut s = ::std::mem::MaybeUninit::<Self>::uninit();
-        unsafe {
-            ::std::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
-            s.assume_init()
-        }
-    }
-}
-#[repr(C)]
-#[derive(Debug, Copy, Clone)]
-pub struct PgStat_MsgDisconnect {
-    pub m_hdr: PgStat_MsgHdr,
-    pub m_databaseid: Oid,
-    pub m_cause: SessionEndType,
-}
-impl Default for PgStat_MsgDisconnect {
-    fn default() -> Self {
-        let mut s = ::std::mem::MaybeUninit::<Self>::uninit();
-        unsafe {
-            ::std::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
-            s.assume_init()
-        }
-    }
-}
-#[repr(C)]
-#[derive(Copy, Clone)]
-pub union PgStat_Msg {
-    pub msg_hdr: PgStat_MsgHdr,
-    pub msg_dummy: PgStat_MsgDummy,
-    pub msg_inquiry: PgStat_MsgInquiry,
-    pub msg_tabstat: PgStat_MsgTabstat,
-    pub msg_tabpurge: PgStat_MsgTabpurge,
-    pub msg_dropdb: PgStat_MsgDropdb,
-    pub msg_resetcounter: PgStat_MsgResetcounter,
-    pub msg_resetsharedcounter: PgStat_MsgResetsharedcounter,
-    pub msg_resetsinglecounter: PgStat_MsgResetsinglecounter,
-    pub msg_resetslrucounter: PgStat_MsgResetslrucounter,
-    pub msg_resetreplslotcounter: PgStat_MsgResetreplslotcounter,
-    pub msg_autovacuum_start: PgStat_MsgAutovacStart,
-    pub msg_vacuum: PgStat_MsgVacuum,
-    pub msg_analyze: PgStat_MsgAnalyze,
-    pub msg_archiver: PgStat_MsgArchiver,
-    pub msg_bgwriter: PgStat_MsgBgWriter,
-    pub msg_wal: PgStat_MsgWal,
-    pub msg_slru: PgStat_MsgSLRU,
-    pub msg_funcstat: PgStat_MsgFuncstat,
-    pub msg_funcpurge: PgStat_MsgFuncpurge,
-    pub msg_recoveryconflict: PgStat_MsgRecoveryConflict,
-    pub msg_deadlock: PgStat_MsgDeadlock,
-    pub msg_tempfile: PgStat_MsgTempFile,
-    pub msg_checksumfailure: PgStat_MsgChecksumFailure,
-    pub msg_replslot: PgStat_MsgReplSlot,
-    pub msg_connect: PgStat_MsgConnect,
-    pub msg_disconnect: PgStat_MsgDisconnect,
-}
-impl Default for PgStat_Msg {
-    fn default() -> Self {
-        let mut s = ::std::mem::MaybeUninit::<Self>::uninit();
-        unsafe {
-            ::std::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
-            s.assume_init()
-        }
-    }
-}
-#[repr(C)]
-#[derive(Debug, Copy, Clone)]
 pub struct PgStat_StatDBEntry {
-    pub databaseid: Oid,
     pub n_xact_commit: PgStat_Counter,
     pub n_xact_rollback: PgStat_Counter,
     pub n_blocks_fetched: PgStat_Counter,
@@ -37932,119 +37738,18 @@ pub struct PgStat_StatDBEntry {
     pub n_sessions_fatal: PgStat_Counter,
     pub n_sessions_killed: PgStat_Counter,
     pub stat_reset_timestamp: TimestampTz,
-    pub stats_timestamp: TimestampTz,
-    pub tables: *mut HTAB,
-    pub functions: *mut HTAB,
-}
-impl Default for PgStat_StatDBEntry {
-    fn default() -> Self {
-        let mut s = ::std::mem::MaybeUninit::<Self>::uninit();
-        unsafe {
-            ::std::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
-            s.assume_init()
-        }
-    }
-}
-#[repr(C)]
-#[derive(Debug, Default, Copy, Clone)]
-pub struct PgStat_StatTabEntry {
-    pub tableid: Oid,
-    pub numscans: PgStat_Counter,
-    pub tuples_returned: PgStat_Counter,
-    pub tuples_fetched: PgStat_Counter,
-    pub tuples_inserted: PgStat_Counter,
-    pub tuples_updated: PgStat_Counter,
-    pub tuples_deleted: PgStat_Counter,
-    pub tuples_hot_updated: PgStat_Counter,
-    pub n_live_tuples: PgStat_Counter,
-    pub n_dead_tuples: PgStat_Counter,
-    pub changes_since_analyze: PgStat_Counter,
-    pub unused_counter: PgStat_Counter,
-    pub inserts_since_vacuum: PgStat_Counter,
-    pub blocks_fetched: PgStat_Counter,
-    pub blocks_hit: PgStat_Counter,
-    pub vacuum_timestamp: TimestampTz,
-    pub vacuum_count: PgStat_Counter,
-    pub autovac_vacuum_timestamp: TimestampTz,
-    pub autovac_vacuum_count: PgStat_Counter,
-    pub analyze_timestamp: TimestampTz,
-    pub analyze_count: PgStat_Counter,
-    pub autovac_analyze_timestamp: TimestampTz,
-    pub autovac_analyze_count: PgStat_Counter,
 }
 #[repr(C)]
 #[derive(Debug, Default, Copy, Clone)]
 pub struct PgStat_StatFuncEntry {
-    pub functionid: Oid,
     pub f_numcalls: PgStat_Counter,
     pub f_total_time: PgStat_Counter,
     pub f_self_time: PgStat_Counter,
 }
 #[repr(C)]
 #[derive(Debug, Copy, Clone)]
-pub struct PgStat_ArchiverStats {
-    pub archived_count: PgStat_Counter,
-    pub last_archived_wal: [::std::os::raw::c_char; 41usize],
-    pub last_archived_timestamp: TimestampTz,
-    pub failed_count: PgStat_Counter,
-    pub last_failed_wal: [::std::os::raw::c_char; 41usize],
-    pub last_failed_timestamp: TimestampTz,
-    pub stat_reset_timestamp: TimestampTz,
-}
-impl Default for PgStat_ArchiverStats {
-    fn default() -> Self {
-        let mut s = ::std::mem::MaybeUninit::<Self>::uninit();
-        unsafe {
-            ::std::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
-            s.assume_init()
-        }
-    }
-}
-#[repr(C)]
-#[derive(Debug, Default, Copy, Clone)]
-pub struct PgStat_GlobalStats {
-    pub stats_timestamp: TimestampTz,
-    pub timed_checkpoints: PgStat_Counter,
-    pub requested_checkpoints: PgStat_Counter,
-    pub checkpoint_write_time: PgStat_Counter,
-    pub checkpoint_sync_time: PgStat_Counter,
-    pub buf_written_checkpoints: PgStat_Counter,
-    pub buf_written_clean: PgStat_Counter,
-    pub maxwritten_clean: PgStat_Counter,
-    pub buf_written_backend: PgStat_Counter,
-    pub buf_fsync_backend: PgStat_Counter,
-    pub buf_alloc: PgStat_Counter,
-    pub stat_reset_timestamp: TimestampTz,
-}
-#[repr(C)]
-#[derive(Debug, Default, Copy, Clone)]
-pub struct PgStat_WalStats {
-    pub wal_records: PgStat_Counter,
-    pub wal_fpi: PgStat_Counter,
-    pub wal_bytes: uint64,
-    pub wal_buffers_full: PgStat_Counter,
-    pub wal_write: PgStat_Counter,
-    pub wal_sync: PgStat_Counter,
-    pub wal_write_time: PgStat_Counter,
-    pub wal_sync_time: PgStat_Counter,
-    pub stat_reset_timestamp: TimestampTz,
-}
-#[repr(C)]
-#[derive(Debug, Default, Copy, Clone)]
-pub struct PgStat_SLRUStats {
-    pub blocks_zeroed: PgStat_Counter,
-    pub blocks_hit: PgStat_Counter,
-    pub blocks_read: PgStat_Counter,
-    pub blocks_written: PgStat_Counter,
-    pub blocks_exists: PgStat_Counter,
-    pub flush: PgStat_Counter,
-    pub truncate: PgStat_Counter,
-    pub stat_reset_timestamp: TimestampTz,
-}
-#[repr(C)]
-#[derive(Debug, Copy, Clone)]
 pub struct PgStat_StatReplSlotEntry {
-    pub slotname: NameData,
+    pub slotname_unused: NameData,
     pub spill_txns: PgStat_Counter,
     pub spill_count: PgStat_Counter,
     pub spill_bytes: PgStat_Counter,
@@ -38065,128 +37770,124 @@ impl Default for PgStat_StatReplSlotEntry {
     }
 }
 #[repr(C)]
-#[derive(Debug, Copy, Clone)]
-pub struct PgStat_FunctionCallUsage {
-    pub fs: *mut PgStat_FunctionCounts,
-    pub save_f_total_time: instr_time,
-    pub save_total: instr_time,
-    pub f_start: instr_time,
+#[derive(Debug, Default, Copy, Clone)]
+pub struct PgStat_SLRUStats {
+    pub blocks_zeroed: PgStat_Counter,
+    pub blocks_hit: PgStat_Counter,
+    pub blocks_read: PgStat_Counter,
+    pub blocks_written: PgStat_Counter,
+    pub blocks_exists: PgStat_Counter,
+    pub flush: PgStat_Counter,
+    pub truncate: PgStat_Counter,
+    pub stat_reset_timestamp: TimestampTz,
 }
-impl Default for PgStat_FunctionCallUsage {
-    fn default() -> Self {
-        let mut s = ::std::mem::MaybeUninit::<Self>::uninit();
-        unsafe {
-            ::std::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
-            s.assume_init()
-        }
-    }
+#[repr(C)]
+#[derive(Debug, Default, Copy, Clone)]
+pub struct PgStat_StatSubEntry {
+    pub apply_error_count: PgStat_Counter,
+    pub sync_error_count: PgStat_Counter,
+    pub stat_reset_timestamp: TimestampTz,
 }
-extern "C" {
-    pub static mut pgstat_track_counts: bool;
+#[repr(C)]
+#[derive(Debug, Default, Copy, Clone)]
+pub struct PgStat_StatTabEntry {
+    pub numscans: PgStat_Counter,
+    pub tuples_returned: PgStat_Counter,
+    pub tuples_fetched: PgStat_Counter,
+    pub tuples_inserted: PgStat_Counter,
+    pub tuples_updated: PgStat_Counter,
+    pub tuples_deleted: PgStat_Counter,
+    pub tuples_hot_updated: PgStat_Counter,
+    pub n_live_tuples: PgStat_Counter,
+    pub n_dead_tuples: PgStat_Counter,
+    pub changes_since_analyze: PgStat_Counter,
+    pub inserts_since_vacuum: PgStat_Counter,
+    pub blocks_fetched: PgStat_Counter,
+    pub blocks_hit: PgStat_Counter,
+    pub vacuum_timestamp: TimestampTz,
+    pub vacuum_count: PgStat_Counter,
+    pub autovac_vacuum_timestamp: TimestampTz,
+    pub autovac_vacuum_count: PgStat_Counter,
+    pub analyze_timestamp: TimestampTz,
+    pub analyze_count: PgStat_Counter,
+    pub autovac_analyze_timestamp: TimestampTz,
+    pub autovac_analyze_count: PgStat_Counter,
 }
-extern "C" {
-    pub static mut pgstat_track_functions: ::std::os::raw::c_int;
+#[repr(C)]
+#[derive(Debug, Default, Copy, Clone)]
+pub struct PgStat_WalStats {
+    pub wal_records: PgStat_Counter,
+    pub wal_fpi: PgStat_Counter,
+    pub wal_bytes: uint64,
+    pub wal_buffers_full: PgStat_Counter,
+    pub wal_write: PgStat_Counter,
+    pub wal_sync: PgStat_Counter,
+    pub wal_write_time: PgStat_Counter,
+    pub wal_sync_time: PgStat_Counter,
+    pub stat_reset_timestamp: TimestampTz,
 }
-extern "C" {
-    pub static mut pgstat_stat_directory: *mut ::std::os::raw::c_char;
-}
-extern "C" {
-    pub static mut pgstat_stat_tmpname: *mut ::std::os::raw::c_char;
-}
-extern "C" {
-    pub static mut pgstat_stat_filename: *mut ::std::os::raw::c_char;
-}
-extern "C" {
-    pub static mut BgWriterStats: PgStat_MsgBgWriter;
-}
-extern "C" {
-    pub static mut WalStats: PgStat_MsgWal;
-}
-extern "C" {
-    pub static mut pgStatBlockReadTime: PgStat_Counter;
-}
-extern "C" {
-    pub static mut pgStatBlockWriteTime: PgStat_Counter;
-}
-extern "C" {
-    pub static mut pgStatActiveTime: PgStat_Counter;
-}
-extern "C" {
-    pub static mut pgStatTransactionIdleTime: PgStat_Counter;
-}
-extern "C" {
-    pub static mut pgStatSessionEndCause: SessionEndType;
-}
-pub unsafe fn pgstat_init() {
+pub unsafe fn StatsShmemSize() -> Size {
     crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
         extern "C" {
-            pub fn pgstat_init();
+            pub fn StatsShmemSize() -> Size;
         }
-        pgstat_init()
+        StatsShmemSize()
     })
 }
-pub unsafe fn pgstat_start() -> ::std::os::raw::c_int {
+pub unsafe fn StatsShmemInit() {
     crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
         extern "C" {
-            pub fn pgstat_start() -> ::std::os::raw::c_int;
+            pub fn StatsShmemInit();
         }
-        pgstat_start()
+        StatsShmemInit()
     })
 }
-pub unsafe fn pgstat_reset_all() {
+pub unsafe fn pgstat_restore_stats() {
     crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
         extern "C" {
-            pub fn pgstat_reset_all();
+            pub fn pgstat_restore_stats();
         }
-        pgstat_reset_all()
+        pgstat_restore_stats()
     })
 }
-pub unsafe fn allow_immediate_pgstat_restart() {
+pub unsafe fn pgstat_discard_stats() {
     crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
         extern "C" {
-            pub fn allow_immediate_pgstat_restart();
+            pub fn pgstat_discard_stats();
         }
-        allow_immediate_pgstat_restart()
+        pgstat_discard_stats()
     })
 }
-pub unsafe fn pgstat_ping() {
+pub unsafe fn pgstat_before_server_shutdown(arg_code: ::std::os::raw::c_int, arg_arg: Datum) {
     crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
         extern "C" {
-            pub fn pgstat_ping();
+            pub fn pgstat_before_server_shutdown(code: ::std::os::raw::c_int, arg: Datum);
         }
-        pgstat_ping()
+        pgstat_before_server_shutdown(arg_code, arg_arg)
     })
 }
-pub unsafe fn pgstat_report_stat(arg_force: bool) {
+pub unsafe fn pgstat_initialize() {
     crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
         extern "C" {
-            pub fn pgstat_report_stat(force: bool);
+            pub fn pgstat_initialize();
+        }
+        pgstat_initialize()
+    })
+}
+pub unsafe fn pgstat_report_stat(arg_force: bool) -> ::std::os::raw::c_long {
+    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
+        extern "C" {
+            pub fn pgstat_report_stat(force: bool) -> ::std::os::raw::c_long;
         }
         pgstat_report_stat(arg_force)
     })
 }
-pub unsafe fn pgstat_vacuum_stat() {
+pub unsafe fn pgstat_force_next_flush() {
     crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
         extern "C" {
-            pub fn pgstat_vacuum_stat();
+            pub fn pgstat_force_next_flush();
         }
-        pgstat_vacuum_stat()
-    })
-}
-pub unsafe fn pgstat_drop_database(arg_databaseid: Oid) {
-    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
-        extern "C" {
-            pub fn pgstat_drop_database(databaseid: Oid);
-        }
-        pgstat_drop_database(arg_databaseid)
-    })
-}
-pub unsafe fn pgstat_clear_snapshot() {
-    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
-        extern "C" {
-            pub fn pgstat_clear_snapshot();
-        }
-        pgstat_clear_snapshot()
+        pgstat_force_next_flush()
     })
 }
 pub unsafe fn pgstat_reset_counters() {
@@ -38197,44 +37898,108 @@ pub unsafe fn pgstat_reset_counters() {
         pgstat_reset_counters()
     })
 }
-pub unsafe fn pgstat_reset_shared_counters(arg_arg1: *const ::std::os::raw::c_char) {
+pub unsafe fn pgstat_reset(arg_kind: PgStat_Kind, arg_dboid: Oid, arg_objectid: Oid) {
     crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
         extern "C" {
-            pub fn pgstat_reset_shared_counters(arg1: *const ::std::os::raw::c_char);
+            pub fn pgstat_reset(kind: PgStat_Kind, dboid: Oid, objectid: Oid);
         }
-        pgstat_reset_shared_counters(arg_arg1)
+        pgstat_reset(arg_kind, arg_dboid, arg_objectid)
     })
 }
-pub unsafe fn pgstat_reset_single_counter(arg_objectid: Oid, arg_type_: PgStat_Single_Reset_Type) {
+pub unsafe fn pgstat_reset_of_kind(arg_kind: PgStat_Kind) {
     crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
         extern "C" {
-            pub fn pgstat_reset_single_counter(objectid: Oid, type_: PgStat_Single_Reset_Type);
+            pub fn pgstat_reset_of_kind(kind: PgStat_Kind);
         }
-        pgstat_reset_single_counter(arg_objectid, arg_type_)
+        pgstat_reset_of_kind(arg_kind)
     })
 }
-pub unsafe fn pgstat_reset_slru_counter(arg_arg1: *const ::std::os::raw::c_char) {
+pub unsafe fn pgstat_clear_snapshot() {
     crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
         extern "C" {
-            pub fn pgstat_reset_slru_counter(arg1: *const ::std::os::raw::c_char);
+            pub fn pgstat_clear_snapshot();
         }
-        pgstat_reset_slru_counter(arg_arg1)
+        pgstat_clear_snapshot()
     })
 }
-pub unsafe fn pgstat_reset_replslot_counter(arg_name: *const ::std::os::raw::c_char) {
+pub unsafe fn pgstat_get_stat_snapshot_timestamp(arg_have_snapshot: *mut bool) -> TimestampTz {
     crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
         extern "C" {
-            pub fn pgstat_reset_replslot_counter(name: *const ::std::os::raw::c_char);
+            pub fn pgstat_get_stat_snapshot_timestamp(have_snapshot: *mut bool) -> TimestampTz;
         }
-        pgstat_reset_replslot_counter(arg_name)
+        pgstat_get_stat_snapshot_timestamp(arg_have_snapshot)
     })
 }
-pub unsafe fn pgstat_report_connect(arg_dboid: Oid) {
+pub unsafe fn pgstat_get_kind_from_str(arg_kind_str: *mut ::std::os::raw::c_char) -> PgStat_Kind {
     crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
         extern "C" {
-            pub fn pgstat_report_connect(dboid: Oid);
+            pub fn pgstat_get_kind_from_str(kind_str: *mut ::std::os::raw::c_char) -> PgStat_Kind;
         }
-        pgstat_report_connect(arg_dboid)
+        pgstat_get_kind_from_str(arg_kind_str)
+    })
+}
+pub unsafe fn pgstat_have_entry(arg_kind: PgStat_Kind, arg_dboid: Oid, arg_objoid: Oid) -> bool {
+    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
+        extern "C" {
+            pub fn pgstat_have_entry(kind: PgStat_Kind, dboid: Oid, objoid: Oid) -> bool;
+        }
+        pgstat_have_entry(arg_kind, arg_dboid, arg_objoid)
+    })
+}
+pub unsafe fn pgstat_report_archiver(arg_xlog: *const ::std::os::raw::c_char, arg_failed: bool) {
+    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
+        extern "C" {
+            pub fn pgstat_report_archiver(xlog: *const ::std::os::raw::c_char, failed: bool);
+        }
+        pgstat_report_archiver(arg_xlog, arg_failed)
+    })
+}
+pub unsafe fn pgstat_fetch_stat_archiver() -> *mut PgStat_ArchiverStats {
+    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
+        extern "C" {
+            pub fn pgstat_fetch_stat_archiver() -> *mut PgStat_ArchiverStats;
+        }
+        pgstat_fetch_stat_archiver()
+    })
+}
+pub unsafe fn pgstat_report_bgwriter() {
+    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
+        extern "C" {
+            pub fn pgstat_report_bgwriter();
+        }
+        pgstat_report_bgwriter()
+    })
+}
+pub unsafe fn pgstat_fetch_stat_bgwriter() -> *mut PgStat_BgWriterStats {
+    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
+        extern "C" {
+            pub fn pgstat_fetch_stat_bgwriter() -> *mut PgStat_BgWriterStats;
+        }
+        pgstat_fetch_stat_bgwriter()
+    })
+}
+pub unsafe fn pgstat_report_checkpointer() {
+    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
+        extern "C" {
+            pub fn pgstat_report_checkpointer();
+        }
+        pgstat_report_checkpointer()
+    })
+}
+pub unsafe fn pgstat_fetch_stat_checkpointer() -> *mut PgStat_CheckpointerStats {
+    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
+        extern "C" {
+            pub fn pgstat_fetch_stat_checkpointer() -> *mut PgStat_CheckpointerStats;
+        }
+        pgstat_fetch_stat_checkpointer()
+    })
+}
+pub unsafe fn pgstat_drop_database(arg_databaseid: Oid) {
+    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
+        extern "C" {
+            pub fn pgstat_drop_database(databaseid: Oid);
+        }
+        pgstat_drop_database(arg_databaseid)
     })
 }
 pub unsafe fn pgstat_report_autovac(arg_dboid: Oid) {
@@ -38243,42 +38008,6 @@ pub unsafe fn pgstat_report_autovac(arg_dboid: Oid) {
             pub fn pgstat_report_autovac(dboid: Oid);
         }
         pgstat_report_autovac(arg_dboid)
-    })
-}
-pub unsafe fn pgstat_report_vacuum(
-    arg_tableoid: Oid,
-    arg_shared: bool,
-    arg_livetuples: PgStat_Counter,
-    arg_deadtuples: PgStat_Counter,
-) {
-    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
-        extern "C" {
-            pub fn pgstat_report_vacuum(
-                tableoid: Oid,
-                shared: bool,
-                livetuples: PgStat_Counter,
-                deadtuples: PgStat_Counter,
-            );
-        }
-        pgstat_report_vacuum(arg_tableoid, arg_shared, arg_livetuples, arg_deadtuples)
-    })
-}
-pub unsafe fn pgstat_report_analyze(
-    arg_rel: Relation,
-    arg_livetuples: PgStat_Counter,
-    arg_deadtuples: PgStat_Counter,
-    arg_resetcounter: bool,
-) {
-    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
-        extern "C" {
-            pub fn pgstat_report_analyze(
-                rel: Relation,
-                livetuples: PgStat_Counter,
-                deadtuples: PgStat_Counter,
-                resetcounter: bool,
-            );
-        }
-        pgstat_report_analyze(arg_rel, arg_livetuples, arg_deadtuples, arg_resetcounter)
     })
 }
 pub unsafe fn pgstat_report_recovery_conflict(arg_reason: ::std::os::raw::c_int) {
@@ -38319,44 +38048,69 @@ pub unsafe fn pgstat_report_checksum_failure() {
         pgstat_report_checksum_failure()
     })
 }
-pub unsafe fn pgstat_report_replslot(arg_repSlotStat: *const PgStat_StatReplSlotEntry) {
+pub unsafe fn pgstat_report_connect(arg_dboid: Oid) {
     crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
         extern "C" {
-            pub fn pgstat_report_replslot(repSlotStat: *const PgStat_StatReplSlotEntry);
+            pub fn pgstat_report_connect(dboid: Oid);
         }
-        pgstat_report_replslot(arg_repSlotStat)
+        pgstat_report_connect(arg_dboid)
     })
 }
-pub unsafe fn pgstat_report_replslot_create(arg_slotname: *const ::std::os::raw::c_char) {
+pub unsafe fn pgstat_fetch_stat_dbentry(arg_dbid: Oid) -> *mut PgStat_StatDBEntry {
     crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
         extern "C" {
-            pub fn pgstat_report_replslot_create(slotname: *const ::std::os::raw::c_char);
+            pub fn pgstat_fetch_stat_dbentry(dbid: Oid) -> *mut PgStat_StatDBEntry;
         }
-        pgstat_report_replslot_create(arg_slotname)
+        pgstat_fetch_stat_dbentry(arg_dbid)
     })
 }
-pub unsafe fn pgstat_report_replslot_drop(arg_slotname: *const ::std::os::raw::c_char) {
+pub unsafe fn pgstat_create_function(arg_proid: Oid) {
     crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
         extern "C" {
-            pub fn pgstat_report_replslot_drop(slotname: *const ::std::os::raw::c_char);
+            pub fn pgstat_create_function(proid: Oid);
         }
-        pgstat_report_replslot_drop(arg_slotname)
+        pgstat_create_function(arg_proid)
     })
 }
-pub unsafe fn pgstat_initialize() {
+pub unsafe fn pgstat_drop_function(arg_proid: Oid) {
     crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
         extern "C" {
-            pub fn pgstat_initialize();
+            pub fn pgstat_drop_function(proid: Oid);
         }
-        pgstat_initialize()
+        pgstat_drop_function(arg_proid)
     })
 }
-pub unsafe fn find_tabstat_entry(arg_rel_id: Oid) -> *mut PgStat_TableStatus {
+pub unsafe fn pgstat_init_function_usage(
+    arg_fcinfo: *mut FunctionCallInfoBaseData,
+    arg_fcu: *mut PgStat_FunctionCallUsage,
+) {
     crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
         extern "C" {
-            pub fn find_tabstat_entry(rel_id: Oid) -> *mut PgStat_TableStatus;
+            pub fn pgstat_init_function_usage(
+                fcinfo: *mut FunctionCallInfoBaseData,
+                fcu: *mut PgStat_FunctionCallUsage,
+            );
         }
-        find_tabstat_entry(arg_rel_id)
+        pgstat_init_function_usage(arg_fcinfo, arg_fcu)
+    })
+}
+pub unsafe fn pgstat_end_function_usage(
+    arg_fcu: *mut PgStat_FunctionCallUsage,
+    arg_finalize: bool,
+) {
+    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
+        extern "C" {
+            pub fn pgstat_end_function_usage(fcu: *mut PgStat_FunctionCallUsage, finalize: bool);
+        }
+        pgstat_end_function_usage(arg_fcu, arg_finalize)
+    })
+}
+pub unsafe fn pgstat_fetch_stat_funcentry(arg_funcid: Oid) -> *mut PgStat_StatFuncEntry {
+    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
+        extern "C" {
+            pub fn pgstat_fetch_stat_funcentry(funcid: Oid) -> *mut PgStat_StatFuncEntry;
+        }
+        pgstat_fetch_stat_funcentry(arg_funcid)
     })
 }
 pub unsafe fn find_funcstat_entry(arg_func_id: Oid) -> *mut PgStat_BackendFunctionEntry {
@@ -38367,12 +38121,88 @@ pub unsafe fn find_funcstat_entry(arg_func_id: Oid) -> *mut PgStat_BackendFuncti
         find_funcstat_entry(arg_func_id)
     })
 }
-pub unsafe fn pgstat_initstats(arg_rel: Relation) {
+pub unsafe fn pgstat_create_relation(arg_rel: Relation) {
     crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
         extern "C" {
-            pub fn pgstat_initstats(rel: Relation);
+            pub fn pgstat_create_relation(rel: Relation);
         }
-        pgstat_initstats(arg_rel)
+        pgstat_create_relation(arg_rel)
+    })
+}
+pub unsafe fn pgstat_drop_relation(arg_rel: Relation) {
+    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
+        extern "C" {
+            pub fn pgstat_drop_relation(rel: Relation);
+        }
+        pgstat_drop_relation(arg_rel)
+    })
+}
+pub unsafe fn pgstat_copy_relation_stats(arg_dstrel: Relation, arg_srcrel: Relation) {
+    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
+        extern "C" {
+            pub fn pgstat_copy_relation_stats(dstrel: Relation, srcrel: Relation);
+        }
+        pgstat_copy_relation_stats(arg_dstrel, arg_srcrel)
+    })
+}
+pub unsafe fn pgstat_init_relation(arg_rel: Relation) {
+    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
+        extern "C" {
+            pub fn pgstat_init_relation(rel: Relation);
+        }
+        pgstat_init_relation(arg_rel)
+    })
+}
+pub unsafe fn pgstat_assoc_relation(arg_rel: Relation) {
+    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
+        extern "C" {
+            pub fn pgstat_assoc_relation(rel: Relation);
+        }
+        pgstat_assoc_relation(arg_rel)
+    })
+}
+pub unsafe fn pgstat_unlink_relation(arg_rel: Relation) {
+    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
+        extern "C" {
+            pub fn pgstat_unlink_relation(rel: Relation);
+        }
+        pgstat_unlink_relation(arg_rel)
+    })
+}
+pub unsafe fn pgstat_report_vacuum(
+    arg_tableoid: Oid,
+    arg_shared: bool,
+    arg_livetuples: PgStat_Counter,
+    arg_deadtuples: PgStat_Counter,
+) {
+    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
+        extern "C" {
+            pub fn pgstat_report_vacuum(
+                tableoid: Oid,
+                shared: bool,
+                livetuples: PgStat_Counter,
+                deadtuples: PgStat_Counter,
+            );
+        }
+        pgstat_report_vacuum(arg_tableoid, arg_shared, arg_livetuples, arg_deadtuples)
+    })
+}
+pub unsafe fn pgstat_report_analyze(
+    arg_rel: Relation,
+    arg_livetuples: PgStat_Counter,
+    arg_deadtuples: PgStat_Counter,
+    arg_resetcounter: bool,
+) {
+    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
+        extern "C" {
+            pub fn pgstat_report_analyze(
+                rel: Relation,
+                livetuples: PgStat_Counter,
+                deadtuples: PgStat_Counter,
+                resetcounter: bool,
+            );
+        }
+        pgstat_report_analyze(arg_rel, arg_livetuples, arg_deadtuples, arg_resetcounter)
     })
 }
 pub unsafe fn pgstat_count_heap_insert(arg_rel: Relation, arg_n: PgStat_Counter) {
@@ -38415,63 +38245,6 @@ pub unsafe fn pgstat_update_heap_dead_tuples(arg_rel: Relation, arg_delta: ::std
         pgstat_update_heap_dead_tuples(arg_rel, arg_delta)
     })
 }
-pub unsafe fn pgstat_init_function_usage(
-    arg_fcinfo: *mut FunctionCallInfoBaseData,
-    arg_fcu: *mut PgStat_FunctionCallUsage,
-) {
-    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
-        extern "C" {
-            pub fn pgstat_init_function_usage(
-                fcinfo: *mut FunctionCallInfoBaseData,
-                fcu: *mut PgStat_FunctionCallUsage,
-            );
-        }
-        pgstat_init_function_usage(arg_fcinfo, arg_fcu)
-    })
-}
-pub unsafe fn pgstat_end_function_usage(
-    arg_fcu: *mut PgStat_FunctionCallUsage,
-    arg_finalize: bool,
-) {
-    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
-        extern "C" {
-            pub fn pgstat_end_function_usage(fcu: *mut PgStat_FunctionCallUsage, finalize: bool);
-        }
-        pgstat_end_function_usage(arg_fcu, arg_finalize)
-    })
-}
-pub unsafe fn AtEOXact_PgStat(arg_isCommit: bool, arg_parallel: bool) {
-    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
-        extern "C" {
-            pub fn AtEOXact_PgStat(isCommit: bool, parallel: bool);
-        }
-        AtEOXact_PgStat(arg_isCommit, arg_parallel)
-    })
-}
-pub unsafe fn AtEOSubXact_PgStat(arg_isCommit: bool, arg_nestDepth: ::std::os::raw::c_int) {
-    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
-        extern "C" {
-            pub fn AtEOSubXact_PgStat(isCommit: bool, nestDepth: ::std::os::raw::c_int);
-        }
-        AtEOSubXact_PgStat(arg_isCommit, arg_nestDepth)
-    })
-}
-pub unsafe fn AtPrepare_PgStat() {
-    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
-        extern "C" {
-            pub fn AtPrepare_PgStat();
-        }
-        AtPrepare_PgStat()
-    })
-}
-pub unsafe fn PostPrepare_PgStat() {
-    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
-        extern "C" {
-            pub fn PostPrepare_PgStat();
-        }
-        PostPrepare_PgStat()
-    })
-}
 pub unsafe fn pgstat_twophase_postcommit(
     arg_xid: TransactionId,
     arg_info: uint16,
@@ -38508,38 +38281,6 @@ pub unsafe fn pgstat_twophase_postabort(
         pgstat_twophase_postabort(arg_xid, arg_info, arg_recdata, arg_len)
     })
 }
-pub unsafe fn pgstat_send_archiver(arg_xlog: *const ::std::os::raw::c_char, arg_failed: bool) {
-    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
-        extern "C" {
-            pub fn pgstat_send_archiver(xlog: *const ::std::os::raw::c_char, failed: bool);
-        }
-        pgstat_send_archiver(arg_xlog, arg_failed)
-    })
-}
-pub unsafe fn pgstat_send_bgwriter() {
-    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
-        extern "C" {
-            pub fn pgstat_send_bgwriter();
-        }
-        pgstat_send_bgwriter()
-    })
-}
-pub unsafe fn pgstat_send_wal(arg_force: bool) {
-    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
-        extern "C" {
-            pub fn pgstat_send_wal(force: bool);
-        }
-        pgstat_send_wal(arg_force)
-    })
-}
-pub unsafe fn pgstat_fetch_stat_dbentry(arg_dbid: Oid) -> *mut PgStat_StatDBEntry {
-    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
-        extern "C" {
-            pub fn pgstat_fetch_stat_dbentry(dbid: Oid) -> *mut PgStat_StatDBEntry;
-        }
-        pgstat_fetch_stat_dbentry(arg_dbid)
-    })
-}
 pub unsafe fn pgstat_fetch_stat_tabentry(arg_relid: Oid) -> *mut PgStat_StatTabEntry {
     crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
         extern "C" {
@@ -38548,44 +38289,77 @@ pub unsafe fn pgstat_fetch_stat_tabentry(arg_relid: Oid) -> *mut PgStat_StatTabE
         pgstat_fetch_stat_tabentry(arg_relid)
     })
 }
-pub unsafe fn pgstat_fetch_stat_funcentry(arg_funcid: Oid) -> *mut PgStat_StatFuncEntry {
+pub unsafe fn pgstat_fetch_stat_tabentry_ext(
+    arg_shared: bool,
+    arg_relid: Oid,
+) -> *mut PgStat_StatTabEntry {
     crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
         extern "C" {
-            pub fn pgstat_fetch_stat_funcentry(funcid: Oid) -> *mut PgStat_StatFuncEntry;
+            pub fn pgstat_fetch_stat_tabentry_ext(
+                shared: bool,
+                relid: Oid,
+            ) -> *mut PgStat_StatTabEntry;
         }
-        pgstat_fetch_stat_funcentry(arg_funcid)
+        pgstat_fetch_stat_tabentry_ext(arg_shared, arg_relid)
     })
 }
-pub unsafe fn pgstat_fetch_stat_archiver() -> *mut PgStat_ArchiverStats {
+pub unsafe fn find_tabstat_entry(arg_rel_id: Oid) -> *mut PgStat_TableStatus {
     crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
         extern "C" {
-            pub fn pgstat_fetch_stat_archiver() -> *mut PgStat_ArchiverStats;
+            pub fn find_tabstat_entry(rel_id: Oid) -> *mut PgStat_TableStatus;
         }
-        pgstat_fetch_stat_archiver()
+        find_tabstat_entry(arg_rel_id)
     })
 }
-pub unsafe fn pgstat_fetch_global() -> *mut PgStat_GlobalStats {
+pub unsafe fn pgstat_reset_replslot(arg_name: *const ::std::os::raw::c_char) {
     crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
         extern "C" {
-            pub fn pgstat_fetch_global() -> *mut PgStat_GlobalStats;
+            pub fn pgstat_reset_replslot(name: *const ::std::os::raw::c_char);
         }
-        pgstat_fetch_global()
+        pgstat_reset_replslot(arg_name)
     })
 }
-pub unsafe fn pgstat_fetch_stat_wal() -> *mut PgStat_WalStats {
+#[repr(C)]
+#[derive(Debug, Copy, Clone)]
+pub struct ReplicationSlot {
+    _unused: [u8; 0],
+}
+pub unsafe fn pgstat_report_replslot(
+    arg_slot: *mut ReplicationSlot,
+    arg_repSlotStat: *const PgStat_StatReplSlotEntry,
+) {
     crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
         extern "C" {
-            pub fn pgstat_fetch_stat_wal() -> *mut PgStat_WalStats;
+            pub fn pgstat_report_replslot(
+                slot: *mut ReplicationSlot,
+                repSlotStat: *const PgStat_StatReplSlotEntry,
+            );
         }
-        pgstat_fetch_stat_wal()
+        pgstat_report_replslot(arg_slot, arg_repSlotStat)
     })
 }
-pub unsafe fn pgstat_fetch_slru() -> *mut PgStat_SLRUStats {
+pub unsafe fn pgstat_create_replslot(arg_slot: *mut ReplicationSlot) {
     crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
         extern "C" {
-            pub fn pgstat_fetch_slru() -> *mut PgStat_SLRUStats;
+            pub fn pgstat_create_replslot(slot: *mut ReplicationSlot);
         }
-        pgstat_fetch_slru()
+        pgstat_create_replslot(arg_slot)
+    })
+}
+pub unsafe fn pgstat_acquire_replslot(arg_slot: *mut ReplicationSlot) {
+    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
+        extern "C" {
+            pub fn pgstat_acquire_replslot(slot: *mut ReplicationSlot);
+        }
+        pgstat_acquire_replslot(arg_slot)
+    })
+}
+pub unsafe fn pgstat_drop_replslot(arg_slot: *mut ReplicationSlot) {
+    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
+        extern "C" {
+            pub fn pgstat_drop_replslot(slot: *mut ReplicationSlot);
+        }
+        pgstat_drop_replslot(arg_slot)
     })
 }
 pub unsafe fn pgstat_fetch_replslot(arg_slotname: NameData) -> *mut PgStat_StatReplSlotEntry {
@@ -38594,6 +38368,14 @@ pub unsafe fn pgstat_fetch_replslot(arg_slotname: NameData) -> *mut PgStat_StatR
             pub fn pgstat_fetch_replslot(slotname: NameData) -> *mut PgStat_StatReplSlotEntry;
         }
         pgstat_fetch_replslot(arg_slotname)
+    })
+}
+pub unsafe fn pgstat_reset_slru(arg_arg1: *const ::std::os::raw::c_char) {
+    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
+        extern "C" {
+            pub fn pgstat_reset_slru(arg1: *const ::std::os::raw::c_char);
+        }
+        pgstat_reset_slru(arg_arg1)
     })
 }
 pub unsafe fn pgstat_count_slru_page_zeroed(arg_slru_idx: ::std::os::raw::c_int) {
@@ -38652,25 +38434,180 @@ pub unsafe fn pgstat_count_slru_truncate(arg_slru_idx: ::std::os::raw::c_int) {
         pgstat_count_slru_truncate(arg_slru_idx)
     })
 }
-pub unsafe fn pgstat_slru_name(
+pub unsafe fn pgstat_get_slru_name(
     arg_slru_idx: ::std::os::raw::c_int,
 ) -> *const ::std::os::raw::c_char {
     crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
         extern "C" {
-            pub fn pgstat_slru_name(
+            pub fn pgstat_get_slru_name(
                 slru_idx: ::std::os::raw::c_int,
             ) -> *const ::std::os::raw::c_char;
         }
-        pgstat_slru_name(arg_slru_idx)
+        pgstat_get_slru_name(arg_slru_idx)
     })
 }
-pub unsafe fn pgstat_slru_index(arg_name: *const ::std::os::raw::c_char) -> ::std::os::raw::c_int {
+pub unsafe fn pgstat_get_slru_index(
+    arg_name: *const ::std::os::raw::c_char,
+) -> ::std::os::raw::c_int {
     crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
         extern "C" {
-            pub fn pgstat_slru_index(name: *const ::std::os::raw::c_char) -> ::std::os::raw::c_int;
+            pub fn pgstat_get_slru_index(
+                name: *const ::std::os::raw::c_char,
+            ) -> ::std::os::raw::c_int;
         }
-        pgstat_slru_index(arg_name)
+        pgstat_get_slru_index(arg_name)
     })
+}
+pub unsafe fn pgstat_fetch_slru() -> *mut PgStat_SLRUStats {
+    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
+        extern "C" {
+            pub fn pgstat_fetch_slru() -> *mut PgStat_SLRUStats;
+        }
+        pgstat_fetch_slru()
+    })
+}
+pub unsafe fn pgstat_report_subscription_error(arg_subid: Oid, arg_is_apply_error: bool) {
+    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
+        extern "C" {
+            pub fn pgstat_report_subscription_error(subid: Oid, is_apply_error: bool);
+        }
+        pgstat_report_subscription_error(arg_subid, arg_is_apply_error)
+    })
+}
+pub unsafe fn pgstat_create_subscription(arg_subid: Oid) {
+    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
+        extern "C" {
+            pub fn pgstat_create_subscription(subid: Oid);
+        }
+        pgstat_create_subscription(arg_subid)
+    })
+}
+pub unsafe fn pgstat_drop_subscription(arg_subid: Oid) {
+    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
+        extern "C" {
+            pub fn pgstat_drop_subscription(subid: Oid);
+        }
+        pgstat_drop_subscription(arg_subid)
+    })
+}
+pub unsafe fn pgstat_fetch_stat_subscription(arg_subid: Oid) -> *mut PgStat_StatSubEntry {
+    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
+        extern "C" {
+            pub fn pgstat_fetch_stat_subscription(subid: Oid) -> *mut PgStat_StatSubEntry;
+        }
+        pgstat_fetch_stat_subscription(arg_subid)
+    })
+}
+pub unsafe fn AtEOXact_PgStat(arg_isCommit: bool, arg_parallel: bool) {
+    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
+        extern "C" {
+            pub fn AtEOXact_PgStat(isCommit: bool, parallel: bool);
+        }
+        AtEOXact_PgStat(arg_isCommit, arg_parallel)
+    })
+}
+pub unsafe fn AtEOSubXact_PgStat(arg_isCommit: bool, arg_nestDepth: ::std::os::raw::c_int) {
+    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
+        extern "C" {
+            pub fn AtEOSubXact_PgStat(isCommit: bool, nestDepth: ::std::os::raw::c_int);
+        }
+        AtEOSubXact_PgStat(arg_isCommit, arg_nestDepth)
+    })
+}
+pub unsafe fn AtPrepare_PgStat() {
+    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
+        extern "C" {
+            pub fn AtPrepare_PgStat();
+        }
+        AtPrepare_PgStat()
+    })
+}
+pub unsafe fn PostPrepare_PgStat() {
+    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
+        extern "C" {
+            pub fn PostPrepare_PgStat();
+        }
+        PostPrepare_PgStat()
+    })
+}
+pub unsafe fn pgstat_get_transactional_drops(
+    arg_isCommit: bool,
+    arg_items: *mut *mut xl_xact_stats_item,
+) -> ::std::os::raw::c_int {
+    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
+        extern "C" {
+            pub fn pgstat_get_transactional_drops(
+                isCommit: bool,
+                items: *mut *mut xl_xact_stats_item,
+            ) -> ::std::os::raw::c_int;
+        }
+        pgstat_get_transactional_drops(arg_isCommit, arg_items)
+    })
+}
+pub unsafe fn pgstat_execute_transactional_drops(
+    arg_ndrops: ::std::os::raw::c_int,
+    arg_items: *mut xl_xact_stats_item,
+    arg_is_redo: bool,
+) {
+    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
+        extern "C" {
+            pub fn pgstat_execute_transactional_drops(
+                ndrops: ::std::os::raw::c_int,
+                items: *mut xl_xact_stats_item,
+                is_redo: bool,
+            );
+        }
+        pgstat_execute_transactional_drops(arg_ndrops, arg_items, arg_is_redo)
+    })
+}
+pub unsafe fn pgstat_report_wal(arg_force: bool) {
+    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
+        extern "C" {
+            pub fn pgstat_report_wal(force: bool);
+        }
+        pgstat_report_wal(arg_force)
+    })
+}
+pub unsafe fn pgstat_fetch_stat_wal() -> *mut PgStat_WalStats {
+    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
+        extern "C" {
+            pub fn pgstat_fetch_stat_wal() -> *mut PgStat_WalStats;
+        }
+        pgstat_fetch_stat_wal()
+    })
+}
+extern "C" {
+    pub static mut pgstat_track_counts: bool;
+}
+extern "C" {
+    pub static mut pgstat_track_functions: ::std::os::raw::c_int;
+}
+extern "C" {
+    pub static mut pgstat_fetch_consistency: ::std::os::raw::c_int;
+}
+extern "C" {
+    pub static mut PendingBgWriterStats: PgStat_BgWriterStats;
+}
+extern "C" {
+    pub static mut PendingCheckpointerStats: PgStat_CheckpointerStats;
+}
+extern "C" {
+    pub static mut pgStatBlockReadTime: PgStat_Counter;
+}
+extern "C" {
+    pub static mut pgStatBlockWriteTime: PgStat_Counter;
+}
+extern "C" {
+    pub static mut pgStatActiveTime: PgStat_Counter;
+}
+extern "C" {
+    pub static mut pgStatTransactionIdleTime: PgStat_Counter;
+}
+extern "C" {
+    pub static mut pgStatSessionEndCause: SessionEndType;
+}
+extern "C" {
+    pub static mut PendingWalStats: PgStat_WalStats;
 }
 #[repr(C)]
 #[derive(Debug, Copy, Clone)]
@@ -39772,6 +39709,7 @@ pub struct DecodedBkpBlock {
     pub rnode: RelFileNode,
     pub forknum: ForkNumber,
     pub blkno: BlockNumber,
+    pub prefetch_buffer: Buffer,
     pub flags: uint8,
     pub has_image: bool,
     pub apply_image: bool,
@@ -39795,6 +39733,31 @@ impl Default for DecodedBkpBlock {
     }
 }
 #[repr(C)]
+#[derive(Debug)]
+pub struct DecodedXLogRecord {
+    pub size: usize,
+    pub oversized: bool,
+    pub next: *mut DecodedXLogRecord,
+    pub lsn: XLogRecPtr,
+    pub next_lsn: XLogRecPtr,
+    pub header: XLogRecord,
+    pub record_origin: RepOriginId,
+    pub toplevel_xid: TransactionId,
+    pub main_data: *mut ::std::os::raw::c_char,
+    pub main_data_len: uint32,
+    pub max_block_id: ::std::os::raw::c_int,
+    pub blocks: __IncompleteArrayField<DecodedBkpBlock>,
+}
+impl Default for DecodedXLogRecord {
+    fn default() -> Self {
+        let mut s = ::std::mem::MaybeUninit::<Self>::uninit();
+        unsafe {
+            ::std::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
+            s.assume_init()
+        }
+    }
+}
+#[repr(C)]
 #[derive(Debug, Copy, Clone)]
 pub struct XLogReaderState {
     pub routine: XLogReaderRoutine,
@@ -39802,14 +39765,20 @@ pub struct XLogReaderState {
     pub private_data: *mut ::std::os::raw::c_void,
     pub ReadRecPtr: XLogRecPtr,
     pub EndRecPtr: XLogRecPtr,
-    pub decoded_record: *mut XLogRecord,
-    pub main_data: *mut ::std::os::raw::c_char,
-    pub main_data_len: uint32,
-    pub main_data_bufsz: uint32,
-    pub record_origin: RepOriginId,
-    pub toplevel_xid: TransactionId,
-    pub blocks: [DecodedBkpBlock; 33usize],
-    pub max_block_id: ::std::os::raw::c_int,
+    pub abortedRecPtr: XLogRecPtr,
+    pub missingContrecPtr: XLogRecPtr,
+    pub overwrittenRecPtr: XLogRecPtr,
+    pub DecodeRecPtr: XLogRecPtr,
+    pub NextRecPtr: XLogRecPtr,
+    pub PrevRecPtr: XLogRecPtr,
+    pub record: *mut DecodedXLogRecord,
+    pub decode_buffer: *mut ::std::os::raw::c_char,
+    pub decode_buffer_size: usize,
+    pub free_decode_buffer: bool,
+    pub decode_buffer_head: *mut ::std::os::raw::c_char,
+    pub decode_buffer_tail: *mut ::std::os::raw::c_char,
+    pub decode_queue_head: *mut DecodedXLogRecord,
+    pub decode_queue_tail: *mut DecodedXLogRecord,
     pub readBuf: *mut ::std::os::raw::c_char,
     pub readLen: uint32,
     pub segcxt: WALSegmentContext,
@@ -39824,9 +39793,8 @@ pub struct XLogReaderState {
     pub readRecordBuf: *mut ::std::os::raw::c_char,
     pub readRecordBufSize: uint32,
     pub errormsg_buf: *mut ::std::os::raw::c_char,
-    pub abortedRecPtr: XLogRecPtr,
-    pub missingContrecPtr: XLogRecPtr,
-    pub overwrittenRecPtr: XLogRecPtr,
+    pub errormsg_deferred: bool,
+    pub nonblocking: bool,
 }
 impl Default for XLogReaderState {
     fn default() -> Self {
@@ -39871,6 +39839,22 @@ pub unsafe fn XLogReaderFree(arg_state: *mut XLogReaderState) {
         XLogReaderFree(arg_state)
     })
 }
+pub unsafe fn XLogReaderSetDecodeBuffer(
+    arg_state: *mut XLogReaderState,
+    arg_buffer: *mut ::std::os::raw::c_void,
+    arg_size: usize,
+) {
+    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
+        extern "C" {
+            pub fn XLogReaderSetDecodeBuffer(
+                state: *mut XLogReaderState,
+                buffer: *mut ::std::os::raw::c_void,
+                size: usize,
+            );
+        }
+        XLogReaderSetDecodeBuffer(arg_state, arg_buffer, arg_size)
+    })
+}
 pub unsafe fn XLogBeginRead(arg_state: *mut XLogReaderState, arg_RecPtr: XLogRecPtr) {
     crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
         extern "C" {
@@ -39879,6 +39863,24 @@ pub unsafe fn XLogBeginRead(arg_state: *mut XLogReaderState, arg_RecPtr: XLogRec
         XLogBeginRead(arg_state, arg_RecPtr)
     })
 }
+pub unsafe fn XLogFindNextRecord(
+    arg_state: *mut XLogReaderState,
+    arg_RecPtr: XLogRecPtr,
+) -> XLogRecPtr {
+    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
+        extern "C" {
+            pub fn XLogFindNextRecord(
+                state: *mut XLogReaderState,
+                RecPtr: XLogRecPtr,
+            ) -> XLogRecPtr;
+        }
+        XLogFindNextRecord(arg_state, arg_RecPtr)
+    })
+}
+pub const XLogPageReadResult_XLREAD_SUCCESS: XLogPageReadResult = 0;
+pub const XLogPageReadResult_XLREAD_FAIL: XLogPageReadResult = -1;
+pub const XLogPageReadResult_XLREAD_WOULDBLOCK: XLogPageReadResult = -2;
+pub type XLogPageReadResult = ::std::os::raw::c_int;
 pub unsafe fn XLogReadRecord(
     arg_state: *mut XLogReaderState,
     arg_errormsg: *mut *mut ::std::os::raw::c_char,
@@ -39891,6 +39893,42 @@ pub unsafe fn XLogReadRecord(
             ) -> *mut XLogRecord;
         }
         XLogReadRecord(arg_state, arg_errormsg)
+    })
+}
+pub unsafe fn XLogNextRecord(
+    arg_state: *mut XLogReaderState,
+    arg_errormsg: *mut *mut ::std::os::raw::c_char,
+) -> *mut DecodedXLogRecord {
+    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
+        extern "C" {
+            pub fn XLogNextRecord(
+                state: *mut XLogReaderState,
+                errormsg: *mut *mut ::std::os::raw::c_char,
+            ) -> *mut DecodedXLogRecord;
+        }
+        XLogNextRecord(arg_state, arg_errormsg)
+    })
+}
+pub unsafe fn XLogReleasePreviousRecord(arg_state: *mut XLogReaderState) -> XLogRecPtr {
+    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
+        extern "C" {
+            pub fn XLogReleasePreviousRecord(state: *mut XLogReaderState) -> XLogRecPtr;
+        }
+        XLogReleasePreviousRecord(arg_state)
+    })
+}
+pub unsafe fn XLogReadAhead(
+    arg_state: *mut XLogReaderState,
+    arg_nonblocking: bool,
+) -> *mut DecodedXLogRecord {
+    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
+        extern "C" {
+            pub fn XLogReadAhead(
+                state: *mut XLogReaderState,
+                nonblocking: bool,
+            ) -> *mut DecodedXLogRecord;
+        }
+        XLogReadAhead(arg_state, arg_nonblocking)
     })
 }
 pub unsafe fn XLogReaderValidatePageHeader(
@@ -39907,6 +39945,14 @@ pub unsafe fn XLogReaderValidatePageHeader(
             ) -> bool;
         }
         XLogReaderValidatePageHeader(arg_state, arg_recptr, arg_phdr)
+    })
+}
+pub unsafe fn XLogReaderResetError(arg_state: *mut XLogReaderState) {
+    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
+        extern "C" {
+            pub fn XLogReaderResetError(state: *mut XLogReaderState);
+        }
+        XLogReaderResetError(arg_state)
     })
 }
 #[repr(C)]
@@ -39940,20 +39986,32 @@ pub unsafe fn WALRead(
         WALRead(arg_state, arg_buf, arg_startptr, arg_count, arg_tli, arg_errinfo)
     })
 }
+pub unsafe fn DecodeXLogRecordRequiredSpace(arg_xl_tot_len: usize) -> usize {
+    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
+        extern "C" {
+            pub fn DecodeXLogRecordRequiredSpace(xl_tot_len: usize) -> usize;
+        }
+        DecodeXLogRecordRequiredSpace(arg_xl_tot_len)
+    })
+}
 pub unsafe fn DecodeXLogRecord(
     arg_state: *mut XLogReaderState,
+    arg_decoded: *mut DecodedXLogRecord,
     arg_record: *mut XLogRecord,
+    arg_lsn: XLogRecPtr,
     arg_errmsg: *mut *mut ::std::os::raw::c_char,
 ) -> bool {
     crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
         extern "C" {
             pub fn DecodeXLogRecord(
                 state: *mut XLogReaderState,
+                decoded: *mut DecodedXLogRecord,
                 record: *mut XLogRecord,
+                lsn: XLogRecPtr,
                 errmsg: *mut *mut ::std::os::raw::c_char,
             ) -> bool;
         }
-        DecodeXLogRecord(arg_state, arg_record, arg_errmsg)
+        DecodeXLogRecord(arg_state, arg_decoded, arg_record, arg_lsn, arg_errmsg)
     })
 }
 pub unsafe fn XLogRecGetFullXid(arg_record: *mut XLogReaderState) -> FullTransactionId {
@@ -40002,7 +40060,7 @@ pub unsafe fn XLogRecGetBlockTag(
     arg_rnode: *mut RelFileNode,
     arg_forknum: *mut ForkNumber,
     arg_blknum: *mut BlockNumber,
-) -> bool {
+) {
     crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
         extern "C" {
             pub fn XLogRecGetBlockTag(
@@ -40011,9 +40069,38 @@ pub unsafe fn XLogRecGetBlockTag(
                 rnode: *mut RelFileNode,
                 forknum: *mut ForkNumber,
                 blknum: *mut BlockNumber,
-            ) -> bool;
+            );
         }
         XLogRecGetBlockTag(arg_record, arg_block_id, arg_rnode, arg_forknum, arg_blknum)
+    })
+}
+pub unsafe fn XLogRecGetBlockTagExtended(
+    arg_record: *mut XLogReaderState,
+    arg_block_id: uint8,
+    arg_rnode: *mut RelFileNode,
+    arg_forknum: *mut ForkNumber,
+    arg_blknum: *mut BlockNumber,
+    arg_prefetch_buffer: *mut Buffer,
+) -> bool {
+    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
+        extern "C" {
+            pub fn XLogRecGetBlockTagExtended(
+                record: *mut XLogReaderState,
+                block_id: uint8,
+                rnode: *mut RelFileNode,
+                forknum: *mut ForkNumber,
+                blknum: *mut BlockNumber,
+                prefetch_buffer: *mut Buffer,
+            ) -> bool;
+        }
+        XLogRecGetBlockTagExtended(
+            arg_record,
+            arg_block_id,
+            arg_rnode,
+            arg_forknum,
+            arg_blknum,
+            arg_prefetch_buffer,
+        )
     })
 }
 #[repr(C)]
@@ -40053,234 +40140,9 @@ pub unsafe fn ginUpdateStats(
         ginUpdateStats(arg_index, arg_stats, arg_is_build)
     })
 }
-pub unsafe fn XLogBeginInsert() {
-    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
-        extern "C" {
-            pub fn XLogBeginInsert();
-        }
-        XLogBeginInsert()
-    })
-}
-pub unsafe fn XLogSetRecordFlags(arg_flags: uint8) {
-    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
-        extern "C" {
-            pub fn XLogSetRecordFlags(flags: uint8);
-        }
-        XLogSetRecordFlags(arg_flags)
-    })
-}
-pub unsafe fn XLogInsert(arg_rmid: RmgrId, arg_info: uint8) -> XLogRecPtr {
-    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
-        extern "C" {
-            pub fn XLogInsert(rmid: RmgrId, info: uint8) -> XLogRecPtr;
-        }
-        XLogInsert(arg_rmid, arg_info)
-    })
-}
-pub unsafe fn XLogEnsureRecordSpace(
-    arg_max_block_id: ::std::os::raw::c_int,
-    arg_ndatas: ::std::os::raw::c_int,
-) {
-    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
-        extern "C" {
-            pub fn XLogEnsureRecordSpace(
-                max_block_id: ::std::os::raw::c_int,
-                ndatas: ::std::os::raw::c_int,
-            );
-        }
-        XLogEnsureRecordSpace(arg_max_block_id, arg_ndatas)
-    })
-}
-pub unsafe fn XLogRegisterData(
-    arg_data: *mut ::std::os::raw::c_char,
-    arg_len: ::std::os::raw::c_int,
-) {
-    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
-        extern "C" {
-            pub fn XLogRegisterData(data: *mut ::std::os::raw::c_char, len: ::std::os::raw::c_int);
-        }
-        XLogRegisterData(arg_data, arg_len)
-    })
-}
-pub unsafe fn XLogRegisterBuffer(arg_block_id: uint8, arg_buffer: Buffer, arg_flags: uint8) {
-    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
-        extern "C" {
-            pub fn XLogRegisterBuffer(block_id: uint8, buffer: Buffer, flags: uint8);
-        }
-        XLogRegisterBuffer(arg_block_id, arg_buffer, arg_flags)
-    })
-}
-pub unsafe fn XLogRegisterBlock(
-    arg_block_id: uint8,
-    arg_rnode: *mut RelFileNode,
-    arg_forknum: ForkNumber,
-    arg_blknum: BlockNumber,
-    arg_page: *mut ::std::os::raw::c_char,
-    arg_flags: uint8,
-) {
-    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
-        extern "C" {
-            pub fn XLogRegisterBlock(
-                block_id: uint8,
-                rnode: *mut RelFileNode,
-                forknum: ForkNumber,
-                blknum: BlockNumber,
-                page: *mut ::std::os::raw::c_char,
-                flags: uint8,
-            );
-        }
-        XLogRegisterBlock(arg_block_id, arg_rnode, arg_forknum, arg_blknum, arg_page, arg_flags)
-    })
-}
-pub unsafe fn XLogRegisterBufData(
-    arg_block_id: uint8,
-    arg_data: *mut ::std::os::raw::c_char,
-    arg_len: ::std::os::raw::c_int,
-) {
-    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
-        extern "C" {
-            pub fn XLogRegisterBufData(
-                block_id: uint8,
-                data: *mut ::std::os::raw::c_char,
-                len: ::std::os::raw::c_int,
-            );
-        }
-        XLogRegisterBufData(arg_block_id, arg_data, arg_len)
-    })
-}
-pub unsafe fn XLogResetInsertion() {
-    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
-        extern "C" {
-            pub fn XLogResetInsertion();
-        }
-        XLogResetInsertion()
-    })
-}
-pub unsafe fn XLogCheckBufferNeedsBackup(arg_buffer: Buffer) -> bool {
-    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
-        extern "C" {
-            pub fn XLogCheckBufferNeedsBackup(buffer: Buffer) -> bool;
-        }
-        XLogCheckBufferNeedsBackup(arg_buffer)
-    })
-}
-pub unsafe fn log_newpage(
-    arg_rnode: *mut RelFileNode,
-    arg_forkNum: ForkNumber,
-    arg_blk: BlockNumber,
-    arg_page: *mut ::std::os::raw::c_char,
-    arg_page_std: bool,
-) -> XLogRecPtr {
-    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
-        extern "C" {
-            pub fn log_newpage(
-                rnode: *mut RelFileNode,
-                forkNum: ForkNumber,
-                blk: BlockNumber,
-                page: *mut ::std::os::raw::c_char,
-                page_std: bool,
-            ) -> XLogRecPtr;
-        }
-        log_newpage(arg_rnode, arg_forkNum, arg_blk, arg_page, arg_page_std)
-    })
-}
-pub unsafe fn log_newpages(
-    arg_rnode: *mut RelFileNode,
-    arg_forkNum: ForkNumber,
-    arg_num_pages: ::std::os::raw::c_int,
-    arg_blknos: *mut BlockNumber,
-    arg_pages: *mut *mut ::std::os::raw::c_char,
-    arg_page_std: bool,
-) {
-    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
-        extern "C" {
-            pub fn log_newpages(
-                rnode: *mut RelFileNode,
-                forkNum: ForkNumber,
-                num_pages: ::std::os::raw::c_int,
-                blknos: *mut BlockNumber,
-                pages: *mut *mut ::std::os::raw::c_char,
-                page_std: bool,
-            );
-        }
-        log_newpages(arg_rnode, arg_forkNum, arg_num_pages, arg_blknos, arg_pages, arg_page_std)
-    })
-}
-pub unsafe fn log_newpage_buffer(arg_buffer: Buffer, arg_page_std: bool) -> XLogRecPtr {
-    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
-        extern "C" {
-            pub fn log_newpage_buffer(buffer: Buffer, page_std: bool) -> XLogRecPtr;
-        }
-        log_newpage_buffer(arg_buffer, arg_page_std)
-    })
-}
-pub unsafe fn log_newpage_range(
-    arg_rel: Relation,
-    arg_forkNum: ForkNumber,
-    arg_startblk: BlockNumber,
-    arg_endblk: BlockNumber,
-    arg_page_std: bool,
-) {
-    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
-        extern "C" {
-            pub fn log_newpage_range(
-                rel: Relation,
-                forkNum: ForkNumber,
-                startblk: BlockNumber,
-                endblk: BlockNumber,
-                page_std: bool,
-            );
-        }
-        log_newpage_range(arg_rel, arg_forkNum, arg_startblk, arg_endblk, arg_page_std)
-    })
-}
-pub unsafe fn XLogSaveBufferForHint(arg_buffer: Buffer, arg_buffer_std: bool) -> XLogRecPtr {
-    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
-        extern "C" {
-            pub fn XLogSaveBufferForHint(buffer: Buffer, buffer_std: bool) -> XLogRecPtr;
-        }
-        XLogSaveBufferForHint(arg_buffer, arg_buffer_std)
-    })
-}
-pub unsafe fn InitXLogInsert() {
-    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
-        extern "C" {
-            pub fn InitXLogInsert();
-        }
-        InitXLogInsert()
-    })
-}
 extern "C" {
     pub static mut sync_method: ::std::os::raw::c_int;
 }
-extern "C" {
-    pub static mut ThisTimeLineID: TimeLineID;
-}
-extern "C" {
-    pub static mut InRecovery: bool;
-}
-pub const HotStandbyState_STANDBY_DISABLED: HotStandbyState = 0;
-pub const HotStandbyState_STANDBY_INITIALIZED: HotStandbyState = 1;
-pub const HotStandbyState_STANDBY_SNAPSHOT_PENDING: HotStandbyState = 2;
-pub const HotStandbyState_STANDBY_SNAPSHOT_READY: HotStandbyState = 3;
-pub type HotStandbyState = ::std::os::raw::c_uint;
-extern "C" {
-    pub static mut standbyState: HotStandbyState;
-}
-pub const RecoveryTargetType_RECOVERY_TARGET_UNSET: RecoveryTargetType = 0;
-pub const RecoveryTargetType_RECOVERY_TARGET_XID: RecoveryTargetType = 1;
-pub const RecoveryTargetType_RECOVERY_TARGET_TIME: RecoveryTargetType = 2;
-pub const RecoveryTargetType_RECOVERY_TARGET_NAME: RecoveryTargetType = 3;
-pub const RecoveryTargetType_RECOVERY_TARGET_LSN: RecoveryTargetType = 4;
-pub const RecoveryTargetType_RECOVERY_TARGET_IMMEDIATE: RecoveryTargetType = 5;
-pub type RecoveryTargetType = ::std::os::raw::c_uint;
-pub const RecoveryTargetTimeLineGoal_RECOVERY_TARGET_TIMELINE_CONTROLFILE:
-    RecoveryTargetTimeLineGoal = 0;
-pub const RecoveryTargetTimeLineGoal_RECOVERY_TARGET_TIMELINE_LATEST: RecoveryTargetTimeLineGoal =
-    1;
-pub const RecoveryTargetTimeLineGoal_RECOVERY_TARGET_TIMELINE_NUMERIC: RecoveryTargetTimeLineGoal =
-    2;
-pub type RecoveryTargetTimeLineGoal = ::std::os::raw::c_uint;
 extern "C" {
     pub static mut ProcLastRecPtr: XLogRecPtr;
 }
@@ -40289,9 +40151,6 @@ extern "C" {
 }
 extern "C" {
     pub static mut XactLastCommitEnd: XLogRecPtr;
-}
-extern "C" {
-    pub static mut reachedConsistency: bool;
 }
 extern "C" {
     pub static mut wal_segment_size: ::std::os::raw::c_int;
@@ -40330,7 +40189,7 @@ extern "C" {
     pub static mut wal_log_hints: bool;
 }
 extern "C" {
-    pub static mut wal_compression: bool;
+    pub static mut wal_compression: ::std::os::raw::c_int;
 }
 extern "C" {
     pub static mut wal_init_zero: bool;
@@ -40348,70 +40207,13 @@ extern "C" {
     pub static mut log_checkpoints: bool;
 }
 extern "C" {
-    pub static mut recoveryRestoreCommand: *mut ::std::os::raw::c_char;
-}
-extern "C" {
-    pub static mut recoveryEndCommand: *mut ::std::os::raw::c_char;
-}
-extern "C" {
-    pub static mut archiveCleanupCommand: *mut ::std::os::raw::c_char;
-}
-extern "C" {
-    pub static mut recoveryTargetInclusive: bool;
-}
-extern "C" {
-    pub static mut recoveryTargetAction: ::std::os::raw::c_int;
-}
-extern "C" {
-    pub static mut recovery_min_apply_delay: ::std::os::raw::c_int;
-}
-extern "C" {
-    pub static mut PrimaryConnInfo: *mut ::std::os::raw::c_char;
-}
-extern "C" {
-    pub static mut PrimarySlotName: *mut ::std::os::raw::c_char;
-}
-extern "C" {
-    pub static mut wal_receiver_create_temp_slot: bool;
-}
-extern "C" {
     pub static mut track_wal_io_timing: bool;
 }
 extern "C" {
-    pub static mut recoveryTargetXid: TransactionId;
-}
-extern "C" {
-    pub static mut recovery_target_time_string: *mut ::std::os::raw::c_char;
-}
-extern "C" {
-    pub static mut recoveryTargetName: *const ::std::os::raw::c_char;
-}
-extern "C" {
-    pub static mut recoveryTargetLSN: XLogRecPtr;
-}
-extern "C" {
-    pub static mut recoveryTarget: RecoveryTargetType;
-}
-extern "C" {
-    pub static mut PromoteTriggerFile: *mut ::std::os::raw::c_char;
-}
-extern "C" {
-    pub static mut recoveryTargetTimeLineGoal: RecoveryTargetTimeLineGoal;
-}
-extern "C" {
-    pub static mut recoveryTargetTLIRequested: TimeLineID;
-}
-extern "C" {
-    pub static mut recoveryTargetTLI: TimeLineID;
+    pub static mut wal_decode_buffer_size: ::std::os::raw::c_int;
 }
 extern "C" {
     pub static mut CheckPointSegments: ::std::os::raw::c_int;
-}
-extern "C" {
-    pub static mut StandbyModeRequested: bool;
-}
-extern "C" {
-    pub static mut StandbyMode: bool;
 }
 pub const ArchiveMode_ARCHIVE_MODE_OFF: ArchiveMode = 0;
 pub const ArchiveMode_ARCHIVE_MODE_ON: ArchiveMode = 1;
@@ -40424,14 +40226,15 @@ pub const WalLevel_WAL_LEVEL_MINIMAL: WalLevel = 0;
 pub const WalLevel_WAL_LEVEL_REPLICA: WalLevel = 1;
 pub const WalLevel_WAL_LEVEL_LOGICAL: WalLevel = 2;
 pub type WalLevel = ::std::os::raw::c_uint;
+pub const WalCompression_WAL_COMPRESSION_NONE: WalCompression = 0;
+pub const WalCompression_WAL_COMPRESSION_PGLZ: WalCompression = 1;
+pub const WalCompression_WAL_COMPRESSION_LZ4: WalCompression = 2;
+pub const WalCompression_WAL_COMPRESSION_ZSTD: WalCompression = 3;
+pub type WalCompression = ::std::os::raw::c_uint;
 pub const RecoveryState_RECOVERY_STATE_CRASH: RecoveryState = 0;
 pub const RecoveryState_RECOVERY_STATE_ARCHIVE: RecoveryState = 1;
 pub const RecoveryState_RECOVERY_STATE_DONE: RecoveryState = 2;
 pub type RecoveryState = ::std::os::raw::c_uint;
-pub const RecoveryPauseState_RECOVERY_NOT_PAUSED: RecoveryPauseState = 0;
-pub const RecoveryPauseState_RECOVERY_PAUSE_REQUESTED: RecoveryPauseState = 1;
-pub const RecoveryPauseState_RECOVERY_PAUSED: RecoveryPauseState = 2;
-pub type RecoveryPauseState = ::std::os::raw::c_uint;
 extern "C" {
     pub static mut wal_level: ::std::os::raw::c_int;
 }
@@ -40470,6 +40273,7 @@ pub unsafe fn XLogInsertRecord(
     arg_fpw_lsn: XLogRecPtr,
     arg_flags: uint8,
     arg_num_fpi: ::std::os::raw::c_int,
+    arg_topxid_included: bool,
 ) -> XLogRecPtr {
     crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
         extern "C" {
@@ -40478,9 +40282,10 @@ pub unsafe fn XLogInsertRecord(
                 fpw_lsn: XLogRecPtr,
                 flags: uint8,
                 num_fpi: ::std::os::raw::c_int,
+                topxid_included: bool,
             ) -> XLogRecPtr;
         }
-        XLogInsertRecord(arg_rdata, arg_fpw_lsn, arg_flags, arg_num_fpi)
+        XLogInsertRecord(arg_rdata, arg_fpw_lsn, arg_flags, arg_num_fpi, arg_topxid_included)
     })
 }
 pub unsafe fn XLogFlush(arg_RecPtr: XLogRecPtr) {
@@ -40507,28 +40312,20 @@ pub unsafe fn XLogNeedsFlush(arg_RecPtr: XLogRecPtr) -> bool {
         XLogNeedsFlush(arg_RecPtr)
     })
 }
-pub unsafe fn XLogFileInit(
-    arg_segno: XLogSegNo,
-    arg_use_existent: *mut bool,
-    arg_use_lock: bool,
-) -> ::std::os::raw::c_int {
+pub unsafe fn XLogFileInit(arg_segno: XLogSegNo, arg_tli: TimeLineID) -> ::std::os::raw::c_int {
     crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
         extern "C" {
-            pub fn XLogFileInit(
-                segno: XLogSegNo,
-                use_existent: *mut bool,
-                use_lock: bool,
-            ) -> ::std::os::raw::c_int;
+            pub fn XLogFileInit(segno: XLogSegNo, tli: TimeLineID) -> ::std::os::raw::c_int;
         }
-        XLogFileInit(arg_segno, arg_use_existent, arg_use_lock)
+        XLogFileInit(arg_segno, arg_tli)
     })
 }
-pub unsafe fn XLogFileOpen(arg_segno: XLogSegNo) -> ::std::os::raw::c_int {
+pub unsafe fn XLogFileOpen(arg_segno: XLogSegNo, arg_tli: TimeLineID) -> ::std::os::raw::c_int {
     crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
         extern "C" {
-            pub fn XLogFileOpen(segno: XLogSegNo) -> ::std::os::raw::c_int;
+            pub fn XLogFileOpen(segno: XLogSegNo, tli: TimeLineID) -> ::std::os::raw::c_int;
         }
-        XLogFileOpen(arg_segno)
+        XLogFileOpen(arg_segno, arg_tli)
     })
 }
 pub unsafe fn CheckXLogRemoved(arg_segno: XLogSegNo, arg_tli: TimeLineID) {
@@ -40587,12 +40384,16 @@ pub unsafe fn xlog_identify(arg_info: uint8) -> *const ::std::os::raw::c_char {
         xlog_identify(arg_info)
     })
 }
-pub unsafe fn issue_xlog_fsync(arg_fd: ::std::os::raw::c_int, arg_segno: XLogSegNo) {
+pub unsafe fn issue_xlog_fsync(
+    arg_fd: ::std::os::raw::c_int,
+    arg_segno: XLogSegNo,
+    arg_tli: TimeLineID,
+) {
     crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
         extern "C" {
-            pub fn issue_xlog_fsync(fd: ::std::os::raw::c_int, segno: XLogSegNo);
+            pub fn issue_xlog_fsync(fd: ::std::os::raw::c_int, segno: XLogSegNo, tli: TimeLineID);
         }
-        issue_xlog_fsync(arg_fd, arg_segno)
+        issue_xlog_fsync(arg_fd, arg_segno, arg_tli)
     })
 }
 pub unsafe fn RecoveryInProgress() -> bool {
@@ -40611,44 +40412,12 @@ pub unsafe fn GetRecoveryState() -> RecoveryState {
         GetRecoveryState()
     })
 }
-pub unsafe fn HotStandbyActive() -> bool {
-    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
-        extern "C" {
-            pub fn HotStandbyActive() -> bool;
-        }
-        HotStandbyActive()
-    })
-}
-pub unsafe fn HotStandbyActiveInReplay() -> bool {
-    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
-        extern "C" {
-            pub fn HotStandbyActiveInReplay() -> bool;
-        }
-        HotStandbyActiveInReplay()
-    })
-}
 pub unsafe fn XLogInsertAllowed() -> bool {
     crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
         extern "C" {
             pub fn XLogInsertAllowed() -> bool;
         }
         XLogInsertAllowed()
-    })
-}
-pub unsafe fn GetXLogReceiptTime(arg_rtime: *mut TimestampTz, arg_fromStream: *mut bool) {
-    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
-        extern "C" {
-            pub fn GetXLogReceiptTime(rtime: *mut TimestampTz, fromStream: *mut bool);
-        }
-        GetXLogReceiptTime(arg_rtime, arg_fromStream)
-    })
-}
-pub unsafe fn GetXLogReplayRecPtr(arg_replayTLI: *mut TimeLineID) -> XLogRecPtr {
-    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
-        extern "C" {
-            pub fn GetXLogReplayRecPtr(replayTLI: *mut TimeLineID) -> XLogRecPtr;
-        }
-        GetXLogReplayRecPtr(arg_replayTLI)
     })
 }
 pub unsafe fn GetXLogInsertRecPtr() -> XLogRecPtr {
@@ -40665,46 +40434,6 @@ pub unsafe fn GetXLogWriteRecPtr() -> XLogRecPtr {
             pub fn GetXLogWriteRecPtr() -> XLogRecPtr;
         }
         GetXLogWriteRecPtr()
-    })
-}
-pub unsafe fn GetRecoveryPauseState() -> RecoveryPauseState {
-    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
-        extern "C" {
-            pub fn GetRecoveryPauseState() -> RecoveryPauseState;
-        }
-        GetRecoveryPauseState()
-    })
-}
-pub unsafe fn SetRecoveryPause(arg_recoveryPause: bool) {
-    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
-        extern "C" {
-            pub fn SetRecoveryPause(recoveryPause: bool);
-        }
-        SetRecoveryPause(arg_recoveryPause)
-    })
-}
-pub unsafe fn GetLatestXTime() -> TimestampTz {
-    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
-        extern "C" {
-            pub fn GetLatestXTime() -> TimestampTz;
-        }
-        GetLatestXTime()
-    })
-}
-pub unsafe fn GetCurrentChunkReplayStartTime() -> TimestampTz {
-    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
-        extern "C" {
-            pub fn GetCurrentChunkReplayStartTime() -> TimestampTz;
-        }
-        GetCurrentChunkReplayStartTime()
-    })
-}
-pub unsafe fn UpdateControlFile() {
-    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
-        extern "C" {
-            pub fn UpdateControlFile();
-        }
-        UpdateControlFile()
     })
 }
 pub unsafe fn GetSystemIdentifier() -> uint64 {
@@ -40787,14 +40516,6 @@ pub unsafe fn ShutdownXLOG(arg_code: ::std::os::raw::c_int, arg_arg: Datum) {
         ShutdownXLOG(arg_code, arg_arg)
     })
 }
-pub unsafe fn InitXLOGAccess() {
-    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
-        extern "C" {
-            pub fn InitXLOGAccess();
-        }
-        InitXLOGAccess()
-    })
-}
 pub unsafe fn CreateCheckPoint(arg_flags: ::std::os::raw::c_int) {
     crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
         extern "C" {
@@ -40817,14 +40538,6 @@ pub unsafe fn GetWALAvailability(arg_targetLSN: XLogRecPtr) -> WALAvailability {
             pub fn GetWALAvailability(targetLSN: XLogRecPtr) -> WALAvailability;
         }
         GetWALAvailability(arg_targetLSN)
-    })
-}
-pub unsafe fn CalculateMaxmumSafeLSN() -> XLogRecPtr {
-    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
-        extern "C" {
-            pub fn CalculateMaxmumSafeLSN() -> XLogRecPtr;
-        }
-        CalculateMaxmumSafeLSN()
     })
 }
 pub unsafe fn XLogPutNextOid(arg_nextOid: Oid) {
@@ -40878,12 +40591,20 @@ pub unsafe fn GetInsertRecPtr() -> XLogRecPtr {
         GetInsertRecPtr()
     })
 }
-pub unsafe fn GetFlushRecPtr() -> XLogRecPtr {
+pub unsafe fn GetFlushRecPtr(arg_insertTLI: *mut TimeLineID) -> XLogRecPtr {
     crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
         extern "C" {
-            pub fn GetFlushRecPtr() -> XLogRecPtr;
+            pub fn GetFlushRecPtr(insertTLI: *mut TimeLineID) -> XLogRecPtr;
         }
-        GetFlushRecPtr()
+        GetFlushRecPtr(arg_insertTLI)
+    })
+}
+pub unsafe fn GetWALInsertionTimeLine() -> TimeLineID {
+    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
+        extern "C" {
+            pub fn GetWALInsertionTimeLine() -> TimeLineID;
+        }
+        GetWALInsertionTimeLine()
     })
 }
 pub unsafe fn GetLastImportantRecPtr() -> XLogRecPtr {
@@ -40894,60 +40615,12 @@ pub unsafe fn GetLastImportantRecPtr() -> XLogRecPtr {
         GetLastImportantRecPtr()
     })
 }
-pub unsafe fn RemovePromoteSignalFiles() {
-    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
-        extern "C" {
-            pub fn RemovePromoteSignalFiles();
-        }
-        RemovePromoteSignalFiles()
-    })
-}
-pub unsafe fn PromoteIsTriggered() -> bool {
-    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
-        extern "C" {
-            pub fn PromoteIsTriggered() -> bool;
-        }
-        PromoteIsTriggered()
-    })
-}
-pub unsafe fn CheckPromoteSignal() -> bool {
-    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
-        extern "C" {
-            pub fn CheckPromoteSignal() -> bool;
-        }
-        CheckPromoteSignal()
-    })
-}
-pub unsafe fn WakeupRecovery() {
-    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
-        extern "C" {
-            pub fn WakeupRecovery();
-        }
-        WakeupRecovery()
-    })
-}
 pub unsafe fn SetWalWriterSleeping(arg_sleeping: bool) {
     crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
         extern "C" {
             pub fn SetWalWriterSleeping(sleeping: bool);
         }
         SetWalWriterSleeping(arg_sleeping)
-    })
-}
-pub unsafe fn StartupRequestWalReceiverRestart() {
-    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
-        extern "C" {
-            pub fn StartupRequestWalReceiverRestart();
-        }
-        StartupRequestWalReceiverRestart()
-    })
-}
-pub unsafe fn XLogRequestWalReceiverReply() {
-    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
-        extern "C" {
-            pub fn XLogRequestWalReceiverReply();
-        }
-        XLogRequestWalReceiverReply()
     })
 }
 pub unsafe fn assign_max_wal_size(
@@ -40978,11 +40651,66 @@ pub unsafe fn assign_checkpoint_completion_target(
         assign_checkpoint_completion_target(arg_newval, arg_extra)
     })
 }
+pub unsafe fn RemoveNonParentXlogFiles(arg_switchpoint: XLogRecPtr, arg_newTLI: TimeLineID) {
+    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
+        extern "C" {
+            pub fn RemoveNonParentXlogFiles(switchpoint: XLogRecPtr, newTLI: TimeLineID);
+        }
+        RemoveNonParentXlogFiles(arg_switchpoint, arg_newTLI)
+    })
+}
+pub unsafe fn XLogCheckpointNeeded(arg_new_segno: XLogSegNo) -> bool {
+    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
+        extern "C" {
+            pub fn XLogCheckpointNeeded(new_segno: XLogSegNo) -> bool;
+        }
+        XLogCheckpointNeeded(arg_new_segno)
+    })
+}
+pub unsafe fn SwitchIntoArchiveRecovery(arg_EndRecPtr: XLogRecPtr, arg_replayTLI: TimeLineID) {
+    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
+        extern "C" {
+            pub fn SwitchIntoArchiveRecovery(EndRecPtr: XLogRecPtr, replayTLI: TimeLineID);
+        }
+        SwitchIntoArchiveRecovery(arg_EndRecPtr, arg_replayTLI)
+    })
+}
+pub unsafe fn ReachedEndOfBackup(arg_EndRecPtr: XLogRecPtr, arg_tli: TimeLineID) {
+    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
+        extern "C" {
+            pub fn ReachedEndOfBackup(EndRecPtr: XLogRecPtr, tli: TimeLineID);
+        }
+        ReachedEndOfBackup(arg_EndRecPtr, arg_tli)
+    })
+}
+pub unsafe fn SetInstallXLogFileSegmentActive() {
+    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
+        extern "C" {
+            pub fn SetInstallXLogFileSegmentActive();
+        }
+        SetInstallXLogFileSegmentActive()
+    })
+}
+pub unsafe fn IsInstallXLogFileSegmentActive() -> bool {
+    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
+        extern "C" {
+            pub fn IsInstallXLogFileSegmentActive() -> bool;
+        }
+        IsInstallXLogFileSegmentActive()
+    })
+}
+pub unsafe fn XLogShutdownWalRcv() {
+    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
+        extern "C" {
+            pub fn XLogShutdownWalRcv();
+        }
+        XLogShutdownWalRcv()
+    })
+}
 pub const SessionBackupState_SESSION_BACKUP_NONE: SessionBackupState = 0;
-pub const SessionBackupState_SESSION_BACKUP_EXCLUSIVE: SessionBackupState = 1;
-pub const SessionBackupState_SESSION_BACKUP_NON_EXCLUSIVE: SessionBackupState = 2;
+pub const SessionBackupState_SESSION_BACKUP_RUNNING: SessionBackupState = 1;
 pub type SessionBackupState = ::std::os::raw::c_uint;
-pub unsafe fn do_pg_start_backup(
+pub unsafe fn do_pg_backup_start(
     arg_backupidstr: *const ::std::os::raw::c_char,
     arg_fast: bool,
     arg_starttli_p: *mut TimeLineID,
@@ -40992,7 +40720,7 @@ pub unsafe fn do_pg_start_backup(
 ) -> XLogRecPtr {
     crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
         extern "C" {
-            pub fn do_pg_start_backup(
+            pub fn do_pg_backup_start(
                 backupidstr: *const ::std::os::raw::c_char,
                 fast: bool,
                 starttli_p: *mut TimeLineID,
@@ -41001,7 +40729,7 @@ pub unsafe fn do_pg_start_backup(
                 tblspcmapfile: StringInfo,
             ) -> XLogRecPtr;
         }
-        do_pg_start_backup(
+        do_pg_backup_start(
             arg_backupidstr,
             arg_fast,
             arg_starttli_p,
@@ -41011,20 +40739,20 @@ pub unsafe fn do_pg_start_backup(
         )
     })
 }
-pub unsafe fn do_pg_stop_backup(
+pub unsafe fn do_pg_backup_stop(
     arg_labelfile: *mut ::std::os::raw::c_char,
     arg_waitforarchive: bool,
     arg_stoptli_p: *mut TimeLineID,
 ) -> XLogRecPtr {
     crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
         extern "C" {
-            pub fn do_pg_stop_backup(
+            pub fn do_pg_backup_stop(
                 labelfile: *mut ::std::os::raw::c_char,
                 waitforarchive: bool,
                 stoptli_p: *mut TimeLineID,
             ) -> XLogRecPtr;
         }
-        do_pg_stop_backup(arg_labelfile, arg_waitforarchive, arg_stoptli_p)
+        do_pg_backup_stop(arg_labelfile, arg_waitforarchive, arg_stoptli_p)
     })
 }
 pub unsafe fn do_pg_abort_backup(arg_code: ::std::os::raw::c_int, arg_arg: Datum) {
@@ -41573,6 +41301,13 @@ pub type SubXactCallback = ::std::option::Option<
     ),
 >;
 #[repr(C)]
+#[derive(Debug, Default, Copy, Clone)]
+pub struct SavedTransactionCharacteristics {
+    pub save_XactIsoLevel: ::std::os::raw::c_int,
+    pub save_XactReadOnly: bool,
+    pub save_XactDeferrable: bool,
+}
+#[repr(C)]
 #[derive(Debug, Default)]
 pub struct xl_xact_assignment {
     pub xtop: TransactionId,
@@ -41601,6 +41336,19 @@ pub struct xl_xact_subxacts {
 pub struct xl_xact_relfilenodes {
     pub nrels: ::std::os::raw::c_int,
     pub xnodes: __IncompleteArrayField<RelFileNode>,
+}
+#[repr(C)]
+#[derive(Debug, Default, Copy, Clone)]
+pub struct xl_xact_stats_item {
+    pub kind: ::std::os::raw::c_int,
+    pub dboid: Oid,
+    pub objoid: Oid,
+}
+#[repr(C)]
+#[derive(Debug, Default)]
+pub struct xl_xact_stats_items {
+    pub nitems: ::std::os::raw::c_int,
+    pub items: __IncompleteArrayField<xl_xact_stats_item>,
 }
 #[repr(C)]
 pub struct xl_xact_invals {
@@ -41649,6 +41397,8 @@ pub struct xl_xact_prepare {
     pub nsubxacts: int32,
     pub ncommitrels: int32,
     pub nabortrels: int32,
+    pub ncommitstats: int32,
+    pub nabortstats: int32,
     pub ninvalmsgs: int32,
     pub initfileinval: bool,
     pub gidlen: uint16,
@@ -41666,12 +41416,16 @@ pub struct xl_xact_parsed_commit {
     pub subxacts: *mut TransactionId,
     pub nrels: ::std::os::raw::c_int,
     pub xnodes: *mut RelFileNode,
+    pub nstats: ::std::os::raw::c_int,
+    pub stats: *mut xl_xact_stats_item,
     pub nmsgs: ::std::os::raw::c_int,
     pub msgs: *mut SharedInvalidationMessage,
     pub twophase_xid: TransactionId,
     pub twophase_gid: [::std::os::raw::c_char; 200usize],
     pub nabortrels: ::std::os::raw::c_int,
     pub abortnodes: *mut RelFileNode,
+    pub nabortstats: ::std::os::raw::c_int,
+    pub abortstats: *mut xl_xact_stats_item,
     pub origin_lsn: XLogRecPtr,
     pub origin_timestamp: TimestampTz,
 }
@@ -41696,6 +41450,8 @@ pub struct xl_xact_parsed_abort {
     pub subxacts: *mut TransactionId,
     pub nrels: ::std::os::raw::c_int,
     pub xnodes: *mut RelFileNode,
+    pub nstats: ::std::os::raw::c_int,
+    pub stats: *mut xl_xact_stats_item,
     pub twophase_xid: TransactionId,
     pub twophase_gid: [::std::os::raw::c_char; 200usize],
     pub origin_lsn: XLogRecPtr,
@@ -41910,20 +41666,20 @@ pub unsafe fn StartTransactionCommand() {
         StartTransactionCommand()
     })
 }
-pub unsafe fn SaveTransactionCharacteristics() {
+pub unsafe fn SaveTransactionCharacteristics(arg_s: *mut SavedTransactionCharacteristics) {
     crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
         extern "C" {
-            pub fn SaveTransactionCharacteristics();
+            pub fn SaveTransactionCharacteristics(s: *mut SavedTransactionCharacteristics);
         }
-        SaveTransactionCharacteristics()
+        SaveTransactionCharacteristics(arg_s)
     })
 }
-pub unsafe fn RestoreTransactionCharacteristics() {
+pub unsafe fn RestoreTransactionCharacteristics(arg_s: *const SavedTransactionCharacteristics) {
     crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
         extern "C" {
-            pub fn RestoreTransactionCharacteristics();
+            pub fn RestoreTransactionCharacteristics(s: *const SavedTransactionCharacteristics);
         }
-        RestoreTransactionCharacteristics()
+        RestoreTransactionCharacteristics(arg_s)
     })
 }
 pub unsafe fn CommitTransactionCommand() {
@@ -42216,20 +41972,20 @@ pub unsafe fn UnregisterSubXactCallback(
         UnregisterSubXactCallback(arg_callback, arg_arg)
     })
 }
-pub unsafe fn IsSubTransactionAssignmentPending() -> bool {
+pub unsafe fn IsSubxactTopXidLogPending() -> bool {
     crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
         extern "C" {
-            pub fn IsSubTransactionAssignmentPending() -> bool;
+            pub fn IsSubxactTopXidLogPending() -> bool;
         }
-        IsSubTransactionAssignmentPending()
+        IsSubxactTopXidLogPending()
     })
 }
-pub unsafe fn MarkSubTransactionAssigned() {
+pub unsafe fn MarkSubxactTopXidLogged() {
     crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
         extern "C" {
-            pub fn MarkSubTransactionAssigned();
+            pub fn MarkSubxactTopXidLogged();
         }
-        MarkSubTransactionAssigned()
+        MarkSubxactTopXidLogged()
     })
 }
 pub unsafe fn xactGetCommittedChildren(arg_ptr: *mut *mut TransactionId) -> ::std::os::raw::c_int {
@@ -42246,6 +42002,8 @@ pub unsafe fn XactLogCommitRecord(
     arg_subxacts: *mut TransactionId,
     arg_nrels: ::std::os::raw::c_int,
     arg_rels: *mut RelFileNode,
+    arg_nstats: ::std::os::raw::c_int,
+    arg_stats: *mut xl_xact_stats_item,
     arg_nmsgs: ::std::os::raw::c_int,
     arg_msgs: *mut SharedInvalidationMessage,
     arg_relcacheInval: bool,
@@ -42261,6 +42019,8 @@ pub unsafe fn XactLogCommitRecord(
                 subxacts: *mut TransactionId,
                 nrels: ::std::os::raw::c_int,
                 rels: *mut RelFileNode,
+                nstats: ::std::os::raw::c_int,
+                stats: *mut xl_xact_stats_item,
                 nmsgs: ::std::os::raw::c_int,
                 msgs: *mut SharedInvalidationMessage,
                 relcacheInval: bool,
@@ -42275,6 +42035,8 @@ pub unsafe fn XactLogCommitRecord(
             arg_subxacts,
             arg_nrels,
             arg_rels,
+            arg_nstats,
+            arg_stats,
             arg_nmsgs,
             arg_msgs,
             arg_relcacheInval,
@@ -42290,6 +42052,8 @@ pub unsafe fn XactLogAbortRecord(
     arg_subxacts: *mut TransactionId,
     arg_nrels: ::std::os::raw::c_int,
     arg_rels: *mut RelFileNode,
+    arg_nstats: ::std::os::raw::c_int,
+    arg_stats: *mut xl_xact_stats_item,
     arg_xactflags: ::std::os::raw::c_int,
     arg_twophase_xid: TransactionId,
     arg_twophase_gid: *const ::std::os::raw::c_char,
@@ -42302,6 +42066,8 @@ pub unsafe fn XactLogAbortRecord(
                 subxacts: *mut TransactionId,
                 nrels: ::std::os::raw::c_int,
                 rels: *mut RelFileNode,
+                nstats: ::std::os::raw::c_int,
+                stats: *mut xl_xact_stats_item,
                 xactflags: ::std::os::raw::c_int,
                 twophase_xid: TransactionId,
                 twophase_gid: *const ::std::os::raw::c_char,
@@ -42313,6 +42079,8 @@ pub unsafe fn XactLogAbortRecord(
             arg_subxacts,
             arg_nrels,
             arg_rels,
+            arg_nstats,
+            arg_stats,
             arg_xactflags,
             arg_twophase_xid,
             arg_twophase_gid,
@@ -44105,12 +43873,12 @@ pub unsafe fn DefineCustomEnumVariable(
         )
     })
 }
-pub unsafe fn EmitWarningsOnPlaceholders(arg_className: *const ::std::os::raw::c_char) {
+pub unsafe fn MarkGUCPrefixReserved(arg_className: *const ::std::os::raw::c_char) {
     crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
         extern "C" {
-            pub fn EmitWarningsOnPlaceholders(className: *const ::std::os::raw::c_char);
+            pub fn MarkGUCPrefixReserved(className: *const ::std::os::raw::c_char);
         }
-        EmitWarningsOnPlaceholders(arg_className)
+        MarkGUCPrefixReserved(arg_className)
     })
 }
 pub unsafe fn GetConfigOption(
@@ -44163,12 +43931,40 @@ pub unsafe fn ProcessConfigFile(arg_context: GucContext) {
         ProcessConfigFile(arg_context)
     })
 }
+pub unsafe fn convert_GUC_name_for_parameter_acl(
+    arg_name: *const ::std::os::raw::c_char,
+) -> *mut ::std::os::raw::c_char {
+    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
+        extern "C" {
+            pub fn convert_GUC_name_for_parameter_acl(
+                name: *const ::std::os::raw::c_char,
+            ) -> *mut ::std::os::raw::c_char;
+        }
+        convert_GUC_name_for_parameter_acl(arg_name)
+    })
+}
+pub unsafe fn check_GUC_name_for_parameter_acl(arg_name: *const ::std::os::raw::c_char) -> bool {
+    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
+        extern "C" {
+            pub fn check_GUC_name_for_parameter_acl(name: *const ::std::os::raw::c_char) -> bool;
+        }
+        check_GUC_name_for_parameter_acl(arg_name)
+    })
+}
 pub unsafe fn InitializeGUCOptions() {
     crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
         extern "C" {
             pub fn InitializeGUCOptions();
         }
         InitializeGUCOptions()
+    })
+}
+pub unsafe fn InitializeWalConsistencyChecking() {
+    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
+        extern "C" {
+            pub fn InitializeWalConsistencyChecking();
+        }
+        InitializeWalConsistencyChecking()
     })
 }
 pub unsafe fn SelectConfigFiles(
@@ -44313,6 +44109,44 @@ pub unsafe fn set_config_option(
             arg_value,
             arg_context,
             arg_source,
+            arg_action,
+            arg_changeVal,
+            arg_elevel,
+            arg_is_reload,
+        )
+    })
+}
+pub unsafe fn set_config_option_ext(
+    arg_name: *const ::std::os::raw::c_char,
+    arg_value: *const ::std::os::raw::c_char,
+    arg_context: GucContext,
+    arg_source: GucSource,
+    arg_srole: Oid,
+    arg_action: GucAction,
+    arg_changeVal: bool,
+    arg_elevel: ::std::os::raw::c_int,
+    arg_is_reload: bool,
+) -> ::std::os::raw::c_int {
+    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
+        extern "C" {
+            pub fn set_config_option_ext(
+                name: *const ::std::os::raw::c_char,
+                value: *const ::std::os::raw::c_char,
+                context: GucContext,
+                source: GucSource,
+                srole: Oid,
+                action: GucAction,
+                changeVal: bool,
+                elevel: ::std::os::raw::c_int,
+                is_reload: bool,
+            ) -> ::std::os::raw::c_int;
+        }
+        set_config_option_ext(
+            arg_name,
+            arg_value,
+            arg_context,
+            arg_source,
+            arg_srole,
             arg_action,
             arg_changeVal,
             arg_elevel,
@@ -44623,6 +44457,48 @@ pub unsafe fn assign_xlog_sync_method(
         assign_xlog_sync_method(arg_new_sync_method, arg_extra)
     })
 }
+pub unsafe fn check_recovery_prefetch(
+    arg_new_value: *mut ::std::os::raw::c_int,
+    arg_extra: *mut *mut ::std::os::raw::c_void,
+    arg_source: GucSource,
+) -> bool {
+    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
+        extern "C" {
+            pub fn check_recovery_prefetch(
+                new_value: *mut ::std::os::raw::c_int,
+                extra: *mut *mut ::std::os::raw::c_void,
+                source: GucSource,
+            ) -> bool;
+        }
+        check_recovery_prefetch(arg_new_value, arg_extra, arg_source)
+    })
+}
+pub unsafe fn assign_recovery_prefetch(
+    arg_new_value: ::std::os::raw::c_int,
+    arg_extra: *mut ::std::os::raw::c_void,
+) {
+    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
+        extern "C" {
+            pub fn assign_recovery_prefetch(
+                new_value: ::std::os::raw::c_int,
+                extra: *mut ::std::os::raw::c_void,
+            );
+        }
+        assign_recovery_prefetch(arg_new_value, arg_extra)
+    })
+}
+pub unsafe fn errdetail_relkind_not_supported(
+    arg_relkind: ::std::os::raw::c_char,
+) -> ::std::os::raw::c_int {
+    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
+        extern "C" {
+            pub fn errdetail_relkind_not_supported(
+                relkind: ::std::os::raw::c_char,
+            ) -> ::std::os::raw::c_int;
+        }
+        errdetail_relkind_not_supported(arg_relkind)
+    })
+}
 #[repr(C)]
 #[derive(Debug, Copy, Clone)]
 pub struct FormData_pg_class {
@@ -44675,6 +44551,7 @@ pub struct FormData_pg_index {
     pub indnatts: int16,
     pub indnkeyatts: int16,
     pub indisunique: bool,
+    pub indnullsnotdistinct: bool,
     pub indisprimary: bool,
     pub indisexclusion: bool,
     pub indimmediate: bool,
@@ -45020,6 +44897,15 @@ pub struct PublicationActions {
     pub pubtruncate: bool,
 }
 #[repr(C)]
+#[derive(Debug, Default, Copy, Clone)]
+pub struct PublicationDesc {
+    pub pubactions: PublicationActions,
+    pub rf_valid_for_update: bool,
+    pub rf_valid_for_delete: bool,
+    pub cols_valid_for_update: bool,
+    pub cols_valid_for_delete: bool,
+}
+#[repr(C)]
 #[derive(Debug, Copy, Clone)]
 pub struct Publication {
     pub oid: Oid,
@@ -45029,6 +44915,22 @@ pub struct Publication {
     pub pubactions: PublicationActions,
 }
 impl Default for Publication {
+    fn default() -> Self {
+        let mut s = ::std::mem::MaybeUninit::<Self>::uninit();
+        unsafe {
+            ::std::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
+            s.assume_init()
+        }
+    }
+}
+#[repr(C)]
+#[derive(Debug, Copy, Clone)]
+pub struct PublicationRelInfo {
+    pub relation: Relation,
+    pub whereClause: *mut Node,
+    pub columns: *mut List,
+}
+impl Default for PublicationRelInfo {
     fn default() -> Self {
         let mut s = ::std::mem::MaybeUninit::<Self>::uninit();
         unsafe {
@@ -45101,28 +45003,48 @@ pub unsafe fn GetAllTablesPublicationRelations(arg_pubviaroot: bool) -> *mut Lis
         GetAllTablesPublicationRelations(arg_pubviaroot)
     })
 }
-pub unsafe fn is_publishable_relation(arg_rel: Relation) -> bool {
+pub unsafe fn GetPublicationSchemas(arg_pubid: Oid) -> *mut List {
     crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
         extern "C" {
-            pub fn is_publishable_relation(rel: Relation) -> bool;
+            pub fn GetPublicationSchemas(pubid: Oid) -> *mut List;
         }
-        is_publishable_relation(arg_rel)
+        GetPublicationSchemas(arg_pubid)
     })
 }
-pub unsafe fn publication_add_relation(
-    arg_pubid: Oid,
-    arg_targetrel: Relation,
-    arg_if_not_exists: bool,
-) -> ObjectAddress {
+pub unsafe fn GetSchemaPublications(arg_schemaid: Oid) -> *mut List {
     crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
         extern "C" {
-            pub fn publication_add_relation(
-                pubid: Oid,
-                targetrel: Relation,
-                if_not_exists: bool,
-            ) -> ObjectAddress;
+            pub fn GetSchemaPublications(schemaid: Oid) -> *mut List;
         }
-        publication_add_relation(arg_pubid, arg_targetrel, arg_if_not_exists)
+        GetSchemaPublications(arg_schemaid)
+    })
+}
+pub unsafe fn GetSchemaPublicationRelations(
+    arg_schemaid: Oid,
+    arg_pub_partopt: PublicationPartOpt,
+) -> *mut List {
+    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
+        extern "C" {
+            pub fn GetSchemaPublicationRelations(
+                schemaid: Oid,
+                pub_partopt: PublicationPartOpt,
+            ) -> *mut List;
+        }
+        GetSchemaPublicationRelations(arg_schemaid, arg_pub_partopt)
+    })
+}
+pub unsafe fn GetAllSchemaPublicationRelations(
+    arg_puboid: Oid,
+    arg_pub_partopt: PublicationPartOpt,
+) -> *mut List {
+    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
+        extern "C" {
+            pub fn GetAllSchemaPublicationRelations(
+                puboid: Oid,
+                pub_partopt: PublicationPartOpt,
+            ) -> *mut List;
+        }
+        GetAllSchemaPublicationRelations(arg_puboid, arg_pub_partopt)
     })
 }
 pub unsafe fn GetPubPartitionOptionRelations(
@@ -45139,6 +45061,86 @@ pub unsafe fn GetPubPartitionOptionRelations(
             ) -> *mut List;
         }
         GetPubPartitionOptionRelations(arg_result, arg_pub_partopt, arg_relid)
+    })
+}
+pub unsafe fn GetTopMostAncestorInPublication(
+    arg_puboid: Oid,
+    arg_ancestors: *mut List,
+    arg_ancestor_level: *mut ::std::os::raw::c_int,
+) -> Oid {
+    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
+        extern "C" {
+            pub fn GetTopMostAncestorInPublication(
+                puboid: Oid,
+                ancestors: *mut List,
+                ancestor_level: *mut ::std::os::raw::c_int,
+            ) -> Oid;
+        }
+        GetTopMostAncestorInPublication(arg_puboid, arg_ancestors, arg_ancestor_level)
+    })
+}
+pub unsafe fn is_publishable_relation(arg_rel: Relation) -> bool {
+    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
+        extern "C" {
+            pub fn is_publishable_relation(rel: Relation) -> bool;
+        }
+        is_publishable_relation(arg_rel)
+    })
+}
+pub unsafe fn is_schema_publication(arg_pubid: Oid) -> bool {
+    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
+        extern "C" {
+            pub fn is_schema_publication(pubid: Oid) -> bool;
+        }
+        is_schema_publication(arg_pubid)
+    })
+}
+pub unsafe fn publication_add_relation(
+    arg_pubid: Oid,
+    arg_pri: *mut PublicationRelInfo,
+    arg_if_not_exists: bool,
+) -> ObjectAddress {
+    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
+        extern "C" {
+            pub fn publication_add_relation(
+                pubid: Oid,
+                pri: *mut PublicationRelInfo,
+                if_not_exists: bool,
+            ) -> ObjectAddress;
+        }
+        publication_add_relation(arg_pubid, arg_pri, arg_if_not_exists)
+    })
+}
+pub unsafe fn publication_add_schema(
+    arg_pubid: Oid,
+    arg_schemaid: Oid,
+    arg_if_not_exists: bool,
+) -> ObjectAddress {
+    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
+        extern "C" {
+            pub fn publication_add_schema(
+                pubid: Oid,
+                schemaid: Oid,
+                if_not_exists: bool,
+            ) -> ObjectAddress;
+        }
+        publication_add_schema(arg_pubid, arg_schemaid, arg_if_not_exists)
+    })
+}
+pub unsafe fn pub_collist_to_bitmapset(
+    arg_columns: *mut Bitmapset,
+    arg_pubcols: Datum,
+    arg_mcxt: MemoryContext,
+) -> *mut Bitmapset {
+    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
+        extern "C" {
+            pub fn pub_collist_to_bitmapset(
+                columns: *mut Bitmapset,
+                pubcols: Datum,
+                mcxt: MemoryContext,
+            ) -> *mut Bitmapset;
+        }
+        pub_collist_to_bitmapset(arg_columns, arg_pubcols, arg_mcxt)
     })
 }
 pub unsafe fn get_publication_oid(
@@ -45204,6 +45206,290 @@ impl Default for RuleLock {
     }
 }
 #[repr(C)]
+#[derive(Debug, Copy, Clone)]
+pub struct SMgrRelationData {
+    pub smgr_rnode: RelFileNodeBackend,
+    pub smgr_owner: *mut *mut SMgrRelationData,
+    pub smgr_targblock: BlockNumber,
+    pub smgr_cached_nblocks: [BlockNumber; 4usize],
+    pub smgr_which: ::std::os::raw::c_int,
+    pub md_num_open_segs: [::std::os::raw::c_int; 4usize],
+    pub md_seg_fds: [*mut _MdfdVec; 4usize],
+    pub node: dlist_node,
+}
+impl Default for SMgrRelationData {
+    fn default() -> Self {
+        let mut s = ::std::mem::MaybeUninit::<Self>::uninit();
+        unsafe {
+            ::std::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
+            s.assume_init()
+        }
+    }
+}
+pub type SMgrRelation = *mut SMgrRelationData;
+pub unsafe fn smgrinit() {
+    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
+        extern "C" {
+            pub fn smgrinit();
+        }
+        smgrinit()
+    })
+}
+pub unsafe fn smgropen(arg_rnode: RelFileNode, arg_backend: BackendId) -> SMgrRelation {
+    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
+        extern "C" {
+            pub fn smgropen(rnode: RelFileNode, backend: BackendId) -> SMgrRelation;
+        }
+        smgropen(arg_rnode, arg_backend)
+    })
+}
+pub unsafe fn smgrexists(arg_reln: SMgrRelation, arg_forknum: ForkNumber) -> bool {
+    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
+        extern "C" {
+            pub fn smgrexists(reln: SMgrRelation, forknum: ForkNumber) -> bool;
+        }
+        smgrexists(arg_reln, arg_forknum)
+    })
+}
+pub unsafe fn smgrsetowner(arg_owner: *mut SMgrRelation, arg_reln: SMgrRelation) {
+    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
+        extern "C" {
+            pub fn smgrsetowner(owner: *mut SMgrRelation, reln: SMgrRelation);
+        }
+        smgrsetowner(arg_owner, arg_reln)
+    })
+}
+pub unsafe fn smgrclearowner(arg_owner: *mut SMgrRelation, arg_reln: SMgrRelation) {
+    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
+        extern "C" {
+            pub fn smgrclearowner(owner: *mut SMgrRelation, reln: SMgrRelation);
+        }
+        smgrclearowner(arg_owner, arg_reln)
+    })
+}
+pub unsafe fn smgrclose(arg_reln: SMgrRelation) {
+    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
+        extern "C" {
+            pub fn smgrclose(reln: SMgrRelation);
+        }
+        smgrclose(arg_reln)
+    })
+}
+pub unsafe fn smgrcloseall() {
+    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
+        extern "C" {
+            pub fn smgrcloseall();
+        }
+        smgrcloseall()
+    })
+}
+pub unsafe fn smgrclosenode(arg_rnode: RelFileNodeBackend) {
+    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
+        extern "C" {
+            pub fn smgrclosenode(rnode: RelFileNodeBackend);
+        }
+        smgrclosenode(arg_rnode)
+    })
+}
+pub unsafe fn smgrrelease(arg_reln: SMgrRelation) {
+    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
+        extern "C" {
+            pub fn smgrrelease(reln: SMgrRelation);
+        }
+        smgrrelease(arg_reln)
+    })
+}
+pub unsafe fn smgrreleaseall() {
+    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
+        extern "C" {
+            pub fn smgrreleaseall();
+        }
+        smgrreleaseall()
+    })
+}
+pub unsafe fn smgrcreate(arg_reln: SMgrRelation, arg_forknum: ForkNumber, arg_isRedo: bool) {
+    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
+        extern "C" {
+            pub fn smgrcreate(reln: SMgrRelation, forknum: ForkNumber, isRedo: bool);
+        }
+        smgrcreate(arg_reln, arg_forknum, arg_isRedo)
+    })
+}
+pub unsafe fn smgrdosyncall(arg_rels: *mut SMgrRelation, arg_nrels: ::std::os::raw::c_int) {
+    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
+        extern "C" {
+            pub fn smgrdosyncall(rels: *mut SMgrRelation, nrels: ::std::os::raw::c_int);
+        }
+        smgrdosyncall(arg_rels, arg_nrels)
+    })
+}
+pub unsafe fn smgrdounlinkall(
+    arg_rels: *mut SMgrRelation,
+    arg_nrels: ::std::os::raw::c_int,
+    arg_isRedo: bool,
+) {
+    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
+        extern "C" {
+            pub fn smgrdounlinkall(
+                rels: *mut SMgrRelation,
+                nrels: ::std::os::raw::c_int,
+                isRedo: bool,
+            );
+        }
+        smgrdounlinkall(arg_rels, arg_nrels, arg_isRedo)
+    })
+}
+pub unsafe fn smgrextend(
+    arg_reln: SMgrRelation,
+    arg_forknum: ForkNumber,
+    arg_blocknum: BlockNumber,
+    arg_buffer: *mut ::std::os::raw::c_char,
+    arg_skipFsync: bool,
+) {
+    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
+        extern "C" {
+            pub fn smgrextend(
+                reln: SMgrRelation,
+                forknum: ForkNumber,
+                blocknum: BlockNumber,
+                buffer: *mut ::std::os::raw::c_char,
+                skipFsync: bool,
+            );
+        }
+        smgrextend(arg_reln, arg_forknum, arg_blocknum, arg_buffer, arg_skipFsync)
+    })
+}
+pub unsafe fn smgrprefetch(
+    arg_reln: SMgrRelation,
+    arg_forknum: ForkNumber,
+    arg_blocknum: BlockNumber,
+) -> bool {
+    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
+        extern "C" {
+            pub fn smgrprefetch(
+                reln: SMgrRelation,
+                forknum: ForkNumber,
+                blocknum: BlockNumber,
+            ) -> bool;
+        }
+        smgrprefetch(arg_reln, arg_forknum, arg_blocknum)
+    })
+}
+pub unsafe fn smgrread(
+    arg_reln: SMgrRelation,
+    arg_forknum: ForkNumber,
+    arg_blocknum: BlockNumber,
+    arg_buffer: *mut ::std::os::raw::c_char,
+) {
+    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
+        extern "C" {
+            pub fn smgrread(
+                reln: SMgrRelation,
+                forknum: ForkNumber,
+                blocknum: BlockNumber,
+                buffer: *mut ::std::os::raw::c_char,
+            );
+        }
+        smgrread(arg_reln, arg_forknum, arg_blocknum, arg_buffer)
+    })
+}
+pub unsafe fn smgrwrite(
+    arg_reln: SMgrRelation,
+    arg_forknum: ForkNumber,
+    arg_blocknum: BlockNumber,
+    arg_buffer: *mut ::std::os::raw::c_char,
+    arg_skipFsync: bool,
+) {
+    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
+        extern "C" {
+            pub fn smgrwrite(
+                reln: SMgrRelation,
+                forknum: ForkNumber,
+                blocknum: BlockNumber,
+                buffer: *mut ::std::os::raw::c_char,
+                skipFsync: bool,
+            );
+        }
+        smgrwrite(arg_reln, arg_forknum, arg_blocknum, arg_buffer, arg_skipFsync)
+    })
+}
+pub unsafe fn smgrwriteback(
+    arg_reln: SMgrRelation,
+    arg_forknum: ForkNumber,
+    arg_blocknum: BlockNumber,
+    arg_nblocks: BlockNumber,
+) {
+    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
+        extern "C" {
+            pub fn smgrwriteback(
+                reln: SMgrRelation,
+                forknum: ForkNumber,
+                blocknum: BlockNumber,
+                nblocks: BlockNumber,
+            );
+        }
+        smgrwriteback(arg_reln, arg_forknum, arg_blocknum, arg_nblocks)
+    })
+}
+pub unsafe fn smgrnblocks(arg_reln: SMgrRelation, arg_forknum: ForkNumber) -> BlockNumber {
+    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
+        extern "C" {
+            pub fn smgrnblocks(reln: SMgrRelation, forknum: ForkNumber) -> BlockNumber;
+        }
+        smgrnblocks(arg_reln, arg_forknum)
+    })
+}
+pub unsafe fn smgrnblocks_cached(arg_reln: SMgrRelation, arg_forknum: ForkNumber) -> BlockNumber {
+    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
+        extern "C" {
+            pub fn smgrnblocks_cached(reln: SMgrRelation, forknum: ForkNumber) -> BlockNumber;
+        }
+        smgrnblocks_cached(arg_reln, arg_forknum)
+    })
+}
+pub unsafe fn smgrtruncate(
+    arg_reln: SMgrRelation,
+    arg_forknum: *mut ForkNumber,
+    arg_nforks: ::std::os::raw::c_int,
+    arg_nblocks: *mut BlockNumber,
+) {
+    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
+        extern "C" {
+            pub fn smgrtruncate(
+                reln: SMgrRelation,
+                forknum: *mut ForkNumber,
+                nforks: ::std::os::raw::c_int,
+                nblocks: *mut BlockNumber,
+            );
+        }
+        smgrtruncate(arg_reln, arg_forknum, arg_nforks, arg_nblocks)
+    })
+}
+pub unsafe fn smgrimmedsync(arg_reln: SMgrRelation, arg_forknum: ForkNumber) {
+    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
+        extern "C" {
+            pub fn smgrimmedsync(reln: SMgrRelation, forknum: ForkNumber);
+        }
+        smgrimmedsync(arg_reln, arg_forknum)
+    })
+}
+pub unsafe fn AtEOXact_SMgr() {
+    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
+        extern "C" {
+            pub fn AtEOXact_SMgr();
+        }
+        AtEOXact_SMgr()
+    })
+}
+pub unsafe fn ProcessBarrierSmgrRelease() -> bool {
+    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
+        extern "C" {
+            pub fn ProcessBarrierSmgrRelease() -> bool;
+        }
+        ProcessBarrierSmgrRelease()
+    })
+}
+#[repr(C)]
 #[derive(Debug, Default, Copy, Clone)]
 pub struct LockRelId {
     pub relId: Oid,
@@ -45219,7 +45505,7 @@ pub type LockInfo = *mut LockInfoData;
 #[derive(Debug, Copy, Clone)]
 pub struct RelationData {
     pub rd_node: RelFileNode,
-    pub rd_smgr: *mut SMgrRelationData,
+    pub rd_smgr: SMgrRelation,
     pub rd_refcnt: ::std::os::raw::c_int,
     pub rd_backend: BackendId,
     pub rd_islocaltemp: bool,
@@ -45259,7 +45545,7 @@ pub struct RelationData {
     pub rd_keyattr: *mut Bitmapset,
     pub rd_pkattr: *mut Bitmapset,
     pub rd_idattr: *mut Bitmapset,
-    pub rd_pubactions: *mut PublicationActions,
+    pub rd_pubdesc: *mut PublicationDesc,
     pub rd_options: *mut bytea,
     pub rd_amhandler: Oid,
     pub rd_tableam: *const TableAmRoutine,
@@ -45282,6 +45568,7 @@ pub struct RelationData {
     pub rd_amcache: *mut ::std::os::raw::c_void,
     pub rd_fdwroutine: *mut FdwRoutine,
     pub rd_toastoid: Oid,
+    pub pgstat_enabled: bool,
     pub pgstat_info: *mut PgStat_TableStatus,
 }
 impl Default for RelationData {
@@ -45368,6 +45655,7 @@ pub type ViewOptCheckOption = ::std::os::raw::c_uint;
 pub struct ViewOptions {
     pub vl_len_: int32,
     pub security_barrier: bool,
+    pub security_invoker: bool,
     pub check_option: ViewOptCheckOption,
 }
 impl Default for ViewOptions {
@@ -45450,6 +45738,8 @@ pub struct TM_IndexStatus {
 #[repr(C)]
 #[derive(Debug, Copy, Clone)]
 pub struct TM_IndexDeleteOp {
+    pub irel: Relation,
+    pub iblknum: BlockNumber,
     pub bottomup: bool,
     pub bottomupfreespace: ::std::os::raw::c_int,
     pub ndeltids: ::std::os::raw::c_int,
@@ -46584,6 +46874,7 @@ pub unsafe fn heap_fetch(
     arg_snapshot: Snapshot,
     arg_tuple: HeapTuple,
     arg_userbuf: *mut Buffer,
+    arg_keep_buf: bool,
 ) -> bool {
     crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
         extern "C" {
@@ -46592,29 +46883,10 @@ pub unsafe fn heap_fetch(
                 snapshot: Snapshot,
                 tuple: HeapTuple,
                 userbuf: *mut Buffer,
-            ) -> bool;
-        }
-        heap_fetch(arg_relation, arg_snapshot, arg_tuple, arg_userbuf)
-    })
-}
-pub unsafe fn heap_fetch_extended(
-    arg_relation: Relation,
-    arg_snapshot: Snapshot,
-    arg_tuple: HeapTuple,
-    arg_userbuf: *mut Buffer,
-    arg_keep_buf: bool,
-) -> bool {
-    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
-        extern "C" {
-            pub fn heap_fetch_extended(
-                relation: Relation,
-                snapshot: Snapshot,
-                tuple: HeapTuple,
-                userbuf: *mut Buffer,
                 keep_buf: bool,
             ) -> bool;
         }
-        heap_fetch_extended(arg_relation, arg_snapshot, arg_tuple, arg_userbuf, arg_keep_buf)
+        heap_fetch(arg_relation, arg_snapshot, arg_tuple, arg_userbuf, arg_keep_buf)
     })
 }
 pub unsafe fn heap_hot_search_buffer(
@@ -46875,22 +47147,30 @@ pub unsafe fn heap_freeze_tuple(
         )
     })
 }
-pub unsafe fn heap_tuple_needs_freeze(
+pub unsafe fn heap_tuple_would_freeze(
     arg_tuple: HeapTupleHeader,
     arg_cutoff_xid: TransactionId,
     arg_cutoff_multi: MultiXactId,
-    arg_buf: Buffer,
+    arg_relfrozenxid_out: *mut TransactionId,
+    arg_relminmxid_out: *mut MultiXactId,
 ) -> bool {
     crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
         extern "C" {
-            pub fn heap_tuple_needs_freeze(
+            pub fn heap_tuple_would_freeze(
                 tuple: HeapTupleHeader,
                 cutoff_xid: TransactionId,
                 cutoff_multi: MultiXactId,
-                buf: Buffer,
+                relfrozenxid_out: *mut TransactionId,
+                relminmxid_out: *mut MultiXactId,
             ) -> bool;
         }
-        heap_tuple_needs_freeze(arg_tuple, arg_cutoff_xid, arg_cutoff_multi, arg_buf)
+        heap_tuple_would_freeze(
+            arg_tuple,
+            arg_cutoff_xid,
+            arg_cutoff_multi,
+            arg_relfrozenxid_out,
+            arg_relminmxid_out,
+        )
     })
 }
 pub unsafe fn heap_tuple_needs_eventual_freeze(arg_tuple: HeapTupleHeader) -> bool {
@@ -46962,7 +47242,7 @@ pub unsafe fn heap_page_prune(
     arg_vistest: *mut GlobalVisState,
     arg_old_snap_xmin: TransactionId,
     arg_old_snap_ts_ts: TimestampTz,
-    arg_report_stats: bool,
+    arg_nnewlpdead: *mut ::std::os::raw::c_int,
     arg_off_loc: *mut OffsetNumber,
 ) -> ::std::os::raw::c_int {
     crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
@@ -46973,7 +47253,7 @@ pub unsafe fn heap_page_prune(
                 vistest: *mut GlobalVisState,
                 old_snap_xmin: TransactionId,
                 old_snap_ts_ts: TimestampTz,
-                report_stats: bool,
+                nnewlpdead: *mut ::std::os::raw::c_int,
                 off_loc: *mut OffsetNumber,
             ) -> ::std::os::raw::c_int;
         }
@@ -46983,7 +47263,7 @@ pub unsafe fn heap_page_prune(
             arg_vistest,
             arg_old_snap_xmin,
             arg_old_snap_ts_ts,
-            arg_report_stats,
+            arg_nnewlpdead,
             arg_off_loc,
         )
     })
@@ -47042,14 +47322,6 @@ pub unsafe fn heap_vacuum_rel(
             );
         }
         heap_vacuum_rel(arg_rel, arg_params, arg_bstrategy)
-    })
-}
-pub unsafe fn parallel_vacuum_main(arg_seg: *mut dsm_segment, arg_toc: *mut shm_toc) {
-    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
-        extern "C" {
-            pub fn parallel_vacuum_main(seg: *mut dsm_segment, toc: *mut shm_toc);
-        }
-        parallel_vacuum_main(arg_seg, arg_toc)
     })
 }
 pub unsafe fn HeapTupleSatisfiesVisibility(
@@ -47491,7 +47763,10 @@ pub const BuiltinTrancheIds_LWTRANCHE_SHARED_TUPLESTORE: BuiltinTrancheIds = 68;
 pub const BuiltinTrancheIds_LWTRANCHE_SHARED_TIDBITMAP: BuiltinTrancheIds = 69;
 pub const BuiltinTrancheIds_LWTRANCHE_PARALLEL_APPEND: BuiltinTrancheIds = 70;
 pub const BuiltinTrancheIds_LWTRANCHE_PER_XACT_PREDICATE_LIST: BuiltinTrancheIds = 71;
-pub const BuiltinTrancheIds_LWTRANCHE_FIRST_USER_DEFINED: BuiltinTrancheIds = 72;
+pub const BuiltinTrancheIds_LWTRANCHE_PGSTATS_DSA: BuiltinTrancheIds = 72;
+pub const BuiltinTrancheIds_LWTRANCHE_PGSTATS_HASH: BuiltinTrancheIds = 73;
+pub const BuiltinTrancheIds_LWTRANCHE_PGSTATS_DATA: BuiltinTrancheIds = 74;
+pub const BuiltinTrancheIds_LWTRANCHE_FIRST_USER_DEFINED: BuiltinTrancheIds = 75;
 pub type BuiltinTrancheIds = ::std::os::raw::c_uint;
 pub type LWLockId = *mut LWLock;
 extern "C" {
@@ -47664,36 +47939,34 @@ pub unsafe fn dt2time(
         dt2time(arg_dt, arg_hour, arg_min, arg_sec, arg_fsec)
     })
 }
-pub unsafe fn interval2tm(
-    arg_span: Interval,
-    arg_tm: *mut pg_tm,
-    arg_fsec: *mut fsec_t,
-) -> ::std::os::raw::c_int {
+pub unsafe fn interval2itm(arg_span: Interval, arg_itm: *mut pg_itm) {
     crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
         extern "C" {
-            pub fn interval2tm(
-                span: Interval,
-                tm: *mut pg_tm,
-                fsec: *mut fsec_t,
-            ) -> ::std::os::raw::c_int;
+            pub fn interval2itm(span: Interval, itm: *mut pg_itm);
         }
-        interval2tm(arg_span, arg_tm, arg_fsec)
+        interval2itm(arg_span, arg_itm)
     })
 }
-pub unsafe fn tm2interval(
-    arg_tm: *mut pg_tm,
-    arg_fsec: fsec_t,
+pub unsafe fn itm2interval(arg_itm: *mut pg_itm, arg_span: *mut Interval) -> ::std::os::raw::c_int {
+    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
+        extern "C" {
+            pub fn itm2interval(itm: *mut pg_itm, span: *mut Interval) -> ::std::os::raw::c_int;
+        }
+        itm2interval(arg_itm, arg_span)
+    })
+}
+pub unsafe fn itmin2interval(
+    arg_itm_in: *mut pg_itm_in,
     arg_span: *mut Interval,
 ) -> ::std::os::raw::c_int {
     crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
         extern "C" {
-            pub fn tm2interval(
-                tm: *mut pg_tm,
-                fsec: fsec_t,
+            pub fn itmin2interval(
+                itm_in: *mut pg_itm_in,
                 span: *mut Interval,
             ) -> ::std::os::raw::c_int;
         }
-        tm2interval(arg_tm, arg_fsec, arg_span)
+        itmin2interval(arg_itm_in, arg_span)
     })
 }
 pub unsafe fn SetEpochTimestamp() -> Timestamp {
@@ -49330,9 +49603,7 @@ pub const DependencyType_DEPENDENCY_PARTITION_PRI: DependencyType = 80;
 pub const DependencyType_DEPENDENCY_PARTITION_SEC: DependencyType = 83;
 pub const DependencyType_DEPENDENCY_EXTENSION: DependencyType = 101;
 pub const DependencyType_DEPENDENCY_AUTO_EXTENSION: DependencyType = 120;
-pub const DependencyType_DEPENDENCY_PIN: DependencyType = 112;
 pub type DependencyType = ::std::os::raw::c_uint;
-pub const SharedDependencyType_SHARED_DEPENDENCY_PIN: SharedDependencyType = 112;
 pub const SharedDependencyType_SHARED_DEPENDENCY_OWNER: SharedDependencyType = 111;
 pub const SharedDependencyType_SHARED_DEPENDENCY_ACL: SharedDependencyType = 97;
 pub const SharedDependencyType_SHARED_DEPENDENCY_POLICY: SharedDependencyType = 114;
@@ -49377,11 +49648,13 @@ pub const ObjectClass_OCLASS_USER_MAPPING: ObjectClass = 29;
 pub const ObjectClass_OCLASS_DEFACL: ObjectClass = 30;
 pub const ObjectClass_OCLASS_EXTENSION: ObjectClass = 31;
 pub const ObjectClass_OCLASS_EVENT_TRIGGER: ObjectClass = 32;
-pub const ObjectClass_OCLASS_POLICY: ObjectClass = 33;
-pub const ObjectClass_OCLASS_PUBLICATION: ObjectClass = 34;
-pub const ObjectClass_OCLASS_PUBLICATION_REL: ObjectClass = 35;
-pub const ObjectClass_OCLASS_SUBSCRIPTION: ObjectClass = 36;
-pub const ObjectClass_OCLASS_TRANSFORM: ObjectClass = 37;
+pub const ObjectClass_OCLASS_PARAMETER_ACL: ObjectClass = 33;
+pub const ObjectClass_OCLASS_POLICY: ObjectClass = 34;
+pub const ObjectClass_OCLASS_PUBLICATION: ObjectClass = 35;
+pub const ObjectClass_OCLASS_PUBLICATION_NAMESPACE: ObjectClass = 36;
+pub const ObjectClass_OCLASS_PUBLICATION_REL: ObjectClass = 37;
+pub const ObjectClass_OCLASS_SUBSCRIPTION: ObjectClass = 38;
+pub const ObjectClass_OCLASS_TRANSFORM: ObjectClass = 39;
 pub type ObjectClass = ::std::os::raw::c_uint;
 pub unsafe fn AcquireDeletionLock(
     arg_object: *const ObjectAddress,
@@ -51130,12 +51403,10 @@ pub struct FormData_pg_database {
     pub datname: NameData,
     pub datdba: Oid,
     pub encoding: int32,
-    pub datcollate: NameData,
-    pub datctype: NameData,
+    pub datlocprovider: ::std::os::raw::c_char,
     pub datistemplate: bool,
     pub datallowconn: bool,
     pub datconnlimit: int32,
-    pub datlastsysoid: Oid,
     pub datfrozenxid: TransactionId,
     pub datminmxid: TransactionId,
     pub dattablespace: Oid,
@@ -51881,31 +52152,32 @@ pub const ParseExprKind_EXPR_KIND_SELECT_TARGET: ParseExprKind = 14;
 pub const ParseExprKind_EXPR_KIND_INSERT_TARGET: ParseExprKind = 15;
 pub const ParseExprKind_EXPR_KIND_UPDATE_SOURCE: ParseExprKind = 16;
 pub const ParseExprKind_EXPR_KIND_UPDATE_TARGET: ParseExprKind = 17;
-pub const ParseExprKind_EXPR_KIND_GROUP_BY: ParseExprKind = 18;
-pub const ParseExprKind_EXPR_KIND_ORDER_BY: ParseExprKind = 19;
-pub const ParseExprKind_EXPR_KIND_DISTINCT_ON: ParseExprKind = 20;
-pub const ParseExprKind_EXPR_KIND_LIMIT: ParseExprKind = 21;
-pub const ParseExprKind_EXPR_KIND_OFFSET: ParseExprKind = 22;
-pub const ParseExprKind_EXPR_KIND_RETURNING: ParseExprKind = 23;
-pub const ParseExprKind_EXPR_KIND_VALUES: ParseExprKind = 24;
-pub const ParseExprKind_EXPR_KIND_VALUES_SINGLE: ParseExprKind = 25;
-pub const ParseExprKind_EXPR_KIND_CHECK_CONSTRAINT: ParseExprKind = 26;
-pub const ParseExprKind_EXPR_KIND_DOMAIN_CHECK: ParseExprKind = 27;
-pub const ParseExprKind_EXPR_KIND_COLUMN_DEFAULT: ParseExprKind = 28;
-pub const ParseExprKind_EXPR_KIND_FUNCTION_DEFAULT: ParseExprKind = 29;
-pub const ParseExprKind_EXPR_KIND_INDEX_EXPRESSION: ParseExprKind = 30;
-pub const ParseExprKind_EXPR_KIND_INDEX_PREDICATE: ParseExprKind = 31;
-pub const ParseExprKind_EXPR_KIND_STATS_EXPRESSION: ParseExprKind = 32;
-pub const ParseExprKind_EXPR_KIND_ALTER_COL_TRANSFORM: ParseExprKind = 33;
-pub const ParseExprKind_EXPR_KIND_EXECUTE_PARAMETER: ParseExprKind = 34;
-pub const ParseExprKind_EXPR_KIND_TRIGGER_WHEN: ParseExprKind = 35;
-pub const ParseExprKind_EXPR_KIND_POLICY: ParseExprKind = 36;
-pub const ParseExprKind_EXPR_KIND_PARTITION_BOUND: ParseExprKind = 37;
-pub const ParseExprKind_EXPR_KIND_PARTITION_EXPRESSION: ParseExprKind = 38;
-pub const ParseExprKind_EXPR_KIND_CALL_ARGUMENT: ParseExprKind = 39;
-pub const ParseExprKind_EXPR_KIND_COPY_WHERE: ParseExprKind = 40;
-pub const ParseExprKind_EXPR_KIND_GENERATED_COLUMN: ParseExprKind = 41;
-pub const ParseExprKind_EXPR_KIND_CYCLE_MARK: ParseExprKind = 42;
+pub const ParseExprKind_EXPR_KIND_MERGE_WHEN: ParseExprKind = 18;
+pub const ParseExprKind_EXPR_KIND_GROUP_BY: ParseExprKind = 19;
+pub const ParseExprKind_EXPR_KIND_ORDER_BY: ParseExprKind = 20;
+pub const ParseExprKind_EXPR_KIND_DISTINCT_ON: ParseExprKind = 21;
+pub const ParseExprKind_EXPR_KIND_LIMIT: ParseExprKind = 22;
+pub const ParseExprKind_EXPR_KIND_OFFSET: ParseExprKind = 23;
+pub const ParseExprKind_EXPR_KIND_RETURNING: ParseExprKind = 24;
+pub const ParseExprKind_EXPR_KIND_VALUES: ParseExprKind = 25;
+pub const ParseExprKind_EXPR_KIND_VALUES_SINGLE: ParseExprKind = 26;
+pub const ParseExprKind_EXPR_KIND_CHECK_CONSTRAINT: ParseExprKind = 27;
+pub const ParseExprKind_EXPR_KIND_DOMAIN_CHECK: ParseExprKind = 28;
+pub const ParseExprKind_EXPR_KIND_COLUMN_DEFAULT: ParseExprKind = 29;
+pub const ParseExprKind_EXPR_KIND_FUNCTION_DEFAULT: ParseExprKind = 30;
+pub const ParseExprKind_EXPR_KIND_INDEX_EXPRESSION: ParseExprKind = 31;
+pub const ParseExprKind_EXPR_KIND_INDEX_PREDICATE: ParseExprKind = 32;
+pub const ParseExprKind_EXPR_KIND_STATS_EXPRESSION: ParseExprKind = 33;
+pub const ParseExprKind_EXPR_KIND_ALTER_COL_TRANSFORM: ParseExprKind = 34;
+pub const ParseExprKind_EXPR_KIND_EXECUTE_PARAMETER: ParseExprKind = 35;
+pub const ParseExprKind_EXPR_KIND_TRIGGER_WHEN: ParseExprKind = 36;
+pub const ParseExprKind_EXPR_KIND_POLICY: ParseExprKind = 37;
+pub const ParseExprKind_EXPR_KIND_PARTITION_BOUND: ParseExprKind = 38;
+pub const ParseExprKind_EXPR_KIND_PARTITION_EXPRESSION: ParseExprKind = 39;
+pub const ParseExprKind_EXPR_KIND_CALL_ARGUMENT: ParseExprKind = 40;
+pub const ParseExprKind_EXPR_KIND_COPY_WHERE: ParseExprKind = 41;
+pub const ParseExprKind_EXPR_KIND_GENERATED_COLUMN: ParseExprKind = 42;
+pub const ParseExprKind_EXPR_KIND_CYCLE_MARK: ParseExprKind = 43;
 pub type ParseExprKind = ::std::os::raw::c_uint;
 pub type PreParseColumnRefHook = ::std::option::Option<
     unsafe extern "C" fn(pstate: *mut ParseState, cref: *mut ColumnRef) -> *mut Node,
@@ -52114,20 +52386,12 @@ pub unsafe fn transformContainerSubscripts(
         )
     })
 }
-pub unsafe fn make_const(
-    arg_pstate: *mut ParseState,
-    arg_value: *mut Value,
-    arg_location: ::std::os::raw::c_int,
-) -> *mut Const {
+pub unsafe fn make_const(arg_pstate: *mut ParseState, arg_aconst: *mut A_Const) -> *mut Const {
     crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
         extern "C" {
-            pub fn make_const(
-                pstate: *mut ParseState,
-                value: *mut Value,
-                location: ::std::os::raw::c_int,
-            ) -> *mut Const;
+            pub fn make_const(pstate: *mut ParseState, aconst: *mut A_Const) -> *mut Const;
         }
-        make_const(arg_pstate, arg_value, arg_location)
+        make_const(arg_pstate, arg_aconst)
     })
 }
 pub unsafe fn createdb(arg_pstate: *mut ParseState, arg_stmt: *const CreatedbStmt) -> Oid {
@@ -52186,6 +52450,18 @@ pub unsafe fn AlterDatabase(
             ) -> Oid;
         }
         AlterDatabase(arg_pstate, arg_stmt, arg_isTopLevel)
+    })
+}
+pub unsafe fn AlterDatabaseRefreshColl(
+    arg_stmt: *mut AlterDatabaseRefreshCollStmt,
+) -> ObjectAddress {
+    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
+        extern "C" {
+            pub fn AlterDatabaseRefreshColl(
+                stmt: *mut AlterDatabaseRefreshCollStmt,
+            ) -> ObjectAddress;
+        }
+        AlterDatabaseRefreshColl(arg_stmt)
     })
 }
 pub unsafe fn AlterDatabaseSet(arg_stmt: *mut AlterDatabaseSetStmt) -> Oid {
@@ -52462,12 +52738,12 @@ pub unsafe fn IsThereFunctionInNamespace(
         IsThereFunctionInNamespace(arg_proname, arg_pronargs, arg_proargtypes, arg_nspOid)
     })
 }
-pub unsafe fn ExecuteDoStmt(arg_stmt: *mut DoStmt, arg_atomic: bool) {
+pub unsafe fn ExecuteDoStmt(arg_pstate: *mut ParseState, arg_stmt: *mut DoStmt, arg_atomic: bool) {
     crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
         extern "C" {
-            pub fn ExecuteDoStmt(stmt: *mut DoStmt, atomic: bool);
+            pub fn ExecuteDoStmt(pstate: *mut ParseState, stmt: *mut DoStmt, atomic: bool);
         }
-        ExecuteDoStmt(arg_stmt, arg_atomic)
+        ExecuteDoStmt(arg_pstate, arg_stmt, arg_atomic)
     })
 }
 pub unsafe fn ExecuteCallStmt(
@@ -52600,6 +52876,14 @@ pub unsafe fn RemoveStatisticsById(arg_statsOid: Oid) {
             pub fn RemoveStatisticsById(statsOid: Oid);
         }
         RemoveStatisticsById(arg_statsOid)
+    })
+}
+pub unsafe fn RemoveStatisticsDataById(arg_statsOid: Oid, arg_inh: bool) {
+    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
+        extern "C" {
+            pub fn RemoveStatisticsDataById(statsOid: Oid, inh: bool);
+        }
+        RemoveStatisticsDataById(arg_statsOid, arg_inh)
     })
 }
 pub unsafe fn StatisticsGetRelation(arg_statId: Oid, arg_missing_ok: bool) -> Oid {
@@ -52836,20 +53120,32 @@ pub unsafe fn AlterForeignDataWrapperOwner_oid(arg_fwdId: Oid, arg_newOwnerId: O
         AlterForeignDataWrapperOwner_oid(arg_fwdId, arg_newOwnerId)
     })
 }
-pub unsafe fn CreateForeignDataWrapper(arg_stmt: *mut CreateFdwStmt) -> ObjectAddress {
+pub unsafe fn CreateForeignDataWrapper(
+    arg_pstate: *mut ParseState,
+    arg_stmt: *mut CreateFdwStmt,
+) -> ObjectAddress {
     crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
         extern "C" {
-            pub fn CreateForeignDataWrapper(stmt: *mut CreateFdwStmt) -> ObjectAddress;
+            pub fn CreateForeignDataWrapper(
+                pstate: *mut ParseState,
+                stmt: *mut CreateFdwStmt,
+            ) -> ObjectAddress;
         }
-        CreateForeignDataWrapper(arg_stmt)
+        CreateForeignDataWrapper(arg_pstate, arg_stmt)
     })
 }
-pub unsafe fn AlterForeignDataWrapper(arg_stmt: *mut AlterFdwStmt) -> ObjectAddress {
+pub unsafe fn AlterForeignDataWrapper(
+    arg_pstate: *mut ParseState,
+    arg_stmt: *mut AlterFdwStmt,
+) -> ObjectAddress {
     crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
         extern "C" {
-            pub fn AlterForeignDataWrapper(stmt: *mut AlterFdwStmt) -> ObjectAddress;
+            pub fn AlterForeignDataWrapper(
+                pstate: *mut ParseState,
+                stmt: *mut AlterFdwStmt,
+            ) -> ObjectAddress;
         }
-        AlterForeignDataWrapper(arg_stmt)
+        AlterForeignDataWrapper(arg_pstate, arg_stmt)
     })
 }
 pub unsafe fn CreateForeignServer(arg_stmt: *mut CreateForeignServerStmt) -> ObjectAddress {
@@ -53044,6 +53340,14 @@ pub unsafe fn defGetStringList(arg_def: *mut DefElem) -> *mut List {
             pub fn defGetStringList(def: *mut DefElem) -> *mut List;
         }
         defGetStringList(arg_def)
+    })
+}
+pub unsafe fn errorConflictingDefElem(arg_defel: *mut DefElem, arg_pstate: *mut ParseState) {
+    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
+        extern "C" {
+            pub fn errorConflictingDefElem(defel: *mut DefElem, pstate: *mut ParseState);
+        }
+        errorConflictingDefElem(arg_defel, arg_pstate)
     })
 }
 #[repr(C)]
@@ -54498,6 +54802,24 @@ pub unsafe fn CreateTriggerFiringOn(
         )
     })
 }
+pub unsafe fn TriggerSetParentTrigger(
+    arg_trigRel: Relation,
+    arg_childTrigId: Oid,
+    arg_parentTrigId: Oid,
+    arg_childTableId: Oid,
+) {
+    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
+        extern "C" {
+            pub fn TriggerSetParentTrigger(
+                trigRel: Relation,
+                childTrigId: Oid,
+                parentTrigId: Oid,
+                childTableId: Oid,
+            );
+        }
+        TriggerSetParentTrigger(arg_trigRel, arg_childTrigId, arg_parentTrigId, arg_childTableId)
+    })
+}
 pub unsafe fn RemoveTriggerById(arg_trigOid: Oid) {
     crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
         extern "C" {
@@ -54772,6 +55094,7 @@ pub unsafe fn ExecARDeleteTriggers(
     arg_tupleid: ItemPointer,
     arg_fdw_trigtuple: HeapTuple,
     arg_transition_capture: *mut TransitionCaptureState,
+    arg_is_crosspart_update: bool,
 ) {
     crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
         extern "C" {
@@ -54781,6 +55104,7 @@ pub unsafe fn ExecARDeleteTriggers(
                 tupleid: ItemPointer,
                 fdw_trigtuple: HeapTuple,
                 transition_capture: *mut TransitionCaptureState,
+                is_crosspart_update: bool,
             );
         }
         ExecARDeleteTriggers(
@@ -54789,6 +55113,7 @@ pub unsafe fn ExecARDeleteTriggers(
             arg_tupleid,
             arg_fdw_trigtuple,
             arg_transition_capture,
+            arg_is_crosspart_update,
         )
     })
 }
@@ -54839,6 +55164,7 @@ pub unsafe fn ExecBRUpdateTriggers(
     arg_tupleid: ItemPointer,
     arg_fdw_trigtuple: HeapTuple,
     arg_slot: *mut TupleTableSlot,
+    arg_tmfdp: *mut TM_FailureData,
 ) -> bool {
     crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
         extern "C" {
@@ -54849,6 +55175,7 @@ pub unsafe fn ExecBRUpdateTriggers(
                 tupleid: ItemPointer,
                 fdw_trigtuple: HeapTuple,
                 slot: *mut TupleTableSlot,
+                tmfdp: *mut TM_FailureData,
             ) -> bool;
         }
         ExecBRUpdateTriggers(
@@ -54858,38 +55185,48 @@ pub unsafe fn ExecBRUpdateTriggers(
             arg_tupleid,
             arg_fdw_trigtuple,
             arg_slot,
+            arg_tmfdp,
         )
     })
 }
 pub unsafe fn ExecARUpdateTriggers(
     arg_estate: *mut EState,
     arg_relinfo: *mut ResultRelInfo,
+    arg_src_partinfo: *mut ResultRelInfo,
+    arg_dst_partinfo: *mut ResultRelInfo,
     arg_tupleid: ItemPointer,
     arg_fdw_trigtuple: HeapTuple,
     arg_slot: *mut TupleTableSlot,
     arg_recheckIndexes: *mut List,
     arg_transition_capture: *mut TransitionCaptureState,
+    arg_is_crosspart_update: bool,
 ) {
     crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
         extern "C" {
             pub fn ExecARUpdateTriggers(
                 estate: *mut EState,
                 relinfo: *mut ResultRelInfo,
+                src_partinfo: *mut ResultRelInfo,
+                dst_partinfo: *mut ResultRelInfo,
                 tupleid: ItemPointer,
                 fdw_trigtuple: HeapTuple,
                 slot: *mut TupleTableSlot,
                 recheckIndexes: *mut List,
                 transition_capture: *mut TransitionCaptureState,
+                is_crosspart_update: bool,
             );
         }
         ExecARUpdateTriggers(
             arg_estate,
             arg_relinfo,
+            arg_src_partinfo,
+            arg_dst_partinfo,
             arg_tupleid,
             arg_fdw_trigtuple,
             arg_slot,
             arg_recheckIndexes,
             arg_transition_capture,
+            arg_is_crosspart_update,
         )
     })
 }
@@ -55075,6 +55412,1414 @@ pub unsafe fn RI_FKey_trigger_type(arg_tgfoid: Oid) -> ::std::os::raw::c_int {
         RI_FKey_trigger_type(arg_tgfoid)
     })
 }
+pub type bgworker_main_type = ::std::option::Option<unsafe extern "C" fn(main_arg: Datum)>;
+pub const BgWorkerStartTime_BgWorkerStart_PostmasterStart: BgWorkerStartTime = 0;
+pub const BgWorkerStartTime_BgWorkerStart_ConsistentState: BgWorkerStartTime = 1;
+pub const BgWorkerStartTime_BgWorkerStart_RecoveryFinished: BgWorkerStartTime = 2;
+pub type BgWorkerStartTime = ::std::os::raw::c_uint;
+#[repr(C)]
+#[derive(Debug, Copy, Clone)]
+pub struct BackgroundWorker {
+    pub bgw_name: [::std::os::raw::c_char; 96usize],
+    pub bgw_type: [::std::os::raw::c_char; 96usize],
+    pub bgw_flags: ::std::os::raw::c_int,
+    pub bgw_start_time: BgWorkerStartTime,
+    pub bgw_restart_time: ::std::os::raw::c_int,
+    pub bgw_library_name: [::std::os::raw::c_char; 96usize],
+    pub bgw_function_name: [::std::os::raw::c_char; 96usize],
+    pub bgw_main_arg: Datum,
+    pub bgw_extra: [::std::os::raw::c_char; 128usize],
+    pub bgw_notify_pid: pid_t,
+}
+impl Default for BackgroundWorker {
+    fn default() -> Self {
+        let mut s = ::std::mem::MaybeUninit::<Self>::uninit();
+        unsafe {
+            ::std::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
+            s.assume_init()
+        }
+    }
+}
+pub const BgwHandleStatus_BGWH_STARTED: BgwHandleStatus = 0;
+pub const BgwHandleStatus_BGWH_NOT_YET_STARTED: BgwHandleStatus = 1;
+pub const BgwHandleStatus_BGWH_STOPPED: BgwHandleStatus = 2;
+pub const BgwHandleStatus_BGWH_POSTMASTER_DIED: BgwHandleStatus = 3;
+pub type BgwHandleStatus = ::std::os::raw::c_uint;
+#[repr(C)]
+#[derive(Debug, Copy, Clone)]
+pub struct BackgroundWorkerHandle {
+    _unused: [u8; 0],
+}
+pub unsafe fn RegisterBackgroundWorker(arg_worker: *mut BackgroundWorker) {
+    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
+        extern "C" {
+            pub fn RegisterBackgroundWorker(worker: *mut BackgroundWorker);
+        }
+        RegisterBackgroundWorker(arg_worker)
+    })
+}
+pub unsafe fn RegisterDynamicBackgroundWorker(
+    arg_worker: *mut BackgroundWorker,
+    arg_handle: *mut *mut BackgroundWorkerHandle,
+) -> bool {
+    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
+        extern "C" {
+            pub fn RegisterDynamicBackgroundWorker(
+                worker: *mut BackgroundWorker,
+                handle: *mut *mut BackgroundWorkerHandle,
+            ) -> bool;
+        }
+        RegisterDynamicBackgroundWorker(arg_worker, arg_handle)
+    })
+}
+pub unsafe fn GetBackgroundWorkerPid(
+    arg_handle: *mut BackgroundWorkerHandle,
+    arg_pidp: *mut pid_t,
+) -> BgwHandleStatus {
+    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
+        extern "C" {
+            pub fn GetBackgroundWorkerPid(
+                handle: *mut BackgroundWorkerHandle,
+                pidp: *mut pid_t,
+            ) -> BgwHandleStatus;
+        }
+        GetBackgroundWorkerPid(arg_handle, arg_pidp)
+    })
+}
+pub unsafe fn WaitForBackgroundWorkerStartup(
+    arg_handle: *mut BackgroundWorkerHandle,
+    arg_pid: *mut pid_t,
+) -> BgwHandleStatus {
+    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
+        extern "C" {
+            pub fn WaitForBackgroundWorkerStartup(
+                handle: *mut BackgroundWorkerHandle,
+                pid: *mut pid_t,
+            ) -> BgwHandleStatus;
+        }
+        WaitForBackgroundWorkerStartup(arg_handle, arg_pid)
+    })
+}
+pub unsafe fn WaitForBackgroundWorkerShutdown(
+    arg_arg1: *mut BackgroundWorkerHandle,
+) -> BgwHandleStatus {
+    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
+        extern "C" {
+            pub fn WaitForBackgroundWorkerShutdown(
+                arg1: *mut BackgroundWorkerHandle,
+            ) -> BgwHandleStatus;
+        }
+        WaitForBackgroundWorkerShutdown(arg_arg1)
+    })
+}
+pub unsafe fn GetBackgroundWorkerTypeByPid(arg_pid: pid_t) -> *const ::std::os::raw::c_char {
+    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
+        extern "C" {
+            pub fn GetBackgroundWorkerTypeByPid(pid: pid_t) -> *const ::std::os::raw::c_char;
+        }
+        GetBackgroundWorkerTypeByPid(arg_pid)
+    })
+}
+pub unsafe fn TerminateBackgroundWorker(arg_handle: *mut BackgroundWorkerHandle) {
+    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
+        extern "C" {
+            pub fn TerminateBackgroundWorker(handle: *mut BackgroundWorkerHandle);
+        }
+        TerminateBackgroundWorker(arg_handle)
+    })
+}
+extern "C" {
+    pub static mut MyBgworkerEntry: *mut BackgroundWorker;
+}
+pub unsafe fn BackgroundWorkerInitializeConnection(
+    arg_dbname: *const ::std::os::raw::c_char,
+    arg_username: *const ::std::os::raw::c_char,
+    arg_flags: uint32,
+) {
+    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
+        extern "C" {
+            pub fn BackgroundWorkerInitializeConnection(
+                dbname: *const ::std::os::raw::c_char,
+                username: *const ::std::os::raw::c_char,
+                flags: uint32,
+            );
+        }
+        BackgroundWorkerInitializeConnection(arg_dbname, arg_username, arg_flags)
+    })
+}
+pub unsafe fn BackgroundWorkerInitializeConnectionByOid(
+    arg_dboid: Oid,
+    arg_useroid: Oid,
+    arg_flags: uint32,
+) {
+    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
+        extern "C" {
+            pub fn BackgroundWorkerInitializeConnectionByOid(
+                dboid: Oid,
+                useroid: Oid,
+                flags: uint32,
+            );
+        }
+        BackgroundWorkerInitializeConnectionByOid(arg_dboid, arg_useroid, arg_flags)
+    })
+}
+pub unsafe fn BackgroundWorkerBlockSignals() {
+    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
+        extern "C" {
+            pub fn BackgroundWorkerBlockSignals();
+        }
+        BackgroundWorkerBlockSignals()
+    })
+}
+pub unsafe fn BackgroundWorkerUnblockSignals() {
+    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
+        extern "C" {
+            pub fn BackgroundWorkerUnblockSignals();
+        }
+        BackgroundWorkerUnblockSignals()
+    })
+}
+pub const SyncRequestType_SYNC_REQUEST: SyncRequestType = 0;
+pub const SyncRequestType_SYNC_UNLINK_REQUEST: SyncRequestType = 1;
+pub const SyncRequestType_SYNC_FORGET_REQUEST: SyncRequestType = 2;
+pub const SyncRequestType_SYNC_FILTER_REQUEST: SyncRequestType = 3;
+pub type SyncRequestType = ::std::os::raw::c_uint;
+pub const SyncRequestHandler_SYNC_HANDLER_MD: SyncRequestHandler = 0;
+pub const SyncRequestHandler_SYNC_HANDLER_CLOG: SyncRequestHandler = 1;
+pub const SyncRequestHandler_SYNC_HANDLER_COMMIT_TS: SyncRequestHandler = 2;
+pub const SyncRequestHandler_SYNC_HANDLER_MULTIXACT_OFFSET: SyncRequestHandler = 3;
+pub const SyncRequestHandler_SYNC_HANDLER_MULTIXACT_MEMBER: SyncRequestHandler = 4;
+pub const SyncRequestHandler_SYNC_HANDLER_NONE: SyncRequestHandler = 5;
+pub type SyncRequestHandler = ::std::os::raw::c_uint;
+#[repr(C)]
+#[derive(Debug, Default, Copy, Clone)]
+pub struct FileTag {
+    pub handler: int16,
+    pub forknum: int16,
+    pub rnode: RelFileNode,
+    pub segno: uint32,
+}
+pub unsafe fn InitSync() {
+    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
+        extern "C" {
+            pub fn InitSync();
+        }
+        InitSync()
+    })
+}
+pub unsafe fn SyncPreCheckpoint() {
+    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
+        extern "C" {
+            pub fn SyncPreCheckpoint();
+        }
+        SyncPreCheckpoint()
+    })
+}
+pub unsafe fn SyncPostCheckpoint() {
+    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
+        extern "C" {
+            pub fn SyncPostCheckpoint();
+        }
+        SyncPostCheckpoint()
+    })
+}
+pub unsafe fn ProcessSyncRequests() {
+    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
+        extern "C" {
+            pub fn ProcessSyncRequests();
+        }
+        ProcessSyncRequests()
+    })
+}
+pub unsafe fn RememberSyncRequest(arg_ftag: *const FileTag, arg_type_: SyncRequestType) {
+    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
+        extern "C" {
+            pub fn RememberSyncRequest(ftag: *const FileTag, type_: SyncRequestType);
+        }
+        RememberSyncRequest(arg_ftag, arg_type_)
+    })
+}
+pub unsafe fn RegisterSyncRequest(
+    arg_ftag: *const FileTag,
+    arg_type_: SyncRequestType,
+    arg_retryOnError: bool,
+) -> bool {
+    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
+        extern "C" {
+            pub fn RegisterSyncRequest(
+                ftag: *const FileTag,
+                type_: SyncRequestType,
+                retryOnError: bool,
+            ) -> bool;
+        }
+        RegisterSyncRequest(arg_ftag, arg_type_, arg_retryOnError)
+    })
+}
+pub type XidStatus = ::std::os::raw::c_int;
+#[repr(C)]
+#[derive(Debug, Default, Copy, Clone)]
+pub struct xl_clog_truncate {
+    pub pageno: ::std::os::raw::c_int,
+    pub oldestXact: TransactionId,
+    pub oldestXactDb: Oid,
+}
+pub unsafe fn TransactionIdSetTreeStatus(
+    arg_xid: TransactionId,
+    arg_nsubxids: ::std::os::raw::c_int,
+    arg_subxids: *mut TransactionId,
+    arg_status: XidStatus,
+    arg_lsn: XLogRecPtr,
+) {
+    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
+        extern "C" {
+            pub fn TransactionIdSetTreeStatus(
+                xid: TransactionId,
+                nsubxids: ::std::os::raw::c_int,
+                subxids: *mut TransactionId,
+                status: XidStatus,
+                lsn: XLogRecPtr,
+            );
+        }
+        TransactionIdSetTreeStatus(arg_xid, arg_nsubxids, arg_subxids, arg_status, arg_lsn)
+    })
+}
+pub unsafe fn TransactionIdGetStatus(
+    arg_xid: TransactionId,
+    arg_lsn: *mut XLogRecPtr,
+) -> XidStatus {
+    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
+        extern "C" {
+            pub fn TransactionIdGetStatus(xid: TransactionId, lsn: *mut XLogRecPtr) -> XidStatus;
+        }
+        TransactionIdGetStatus(arg_xid, arg_lsn)
+    })
+}
+pub unsafe fn CLOGShmemBuffers() -> Size {
+    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
+        extern "C" {
+            pub fn CLOGShmemBuffers() -> Size;
+        }
+        CLOGShmemBuffers()
+    })
+}
+pub unsafe fn CLOGShmemSize() -> Size {
+    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
+        extern "C" {
+            pub fn CLOGShmemSize() -> Size;
+        }
+        CLOGShmemSize()
+    })
+}
+pub unsafe fn CLOGShmemInit() {
+    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
+        extern "C" {
+            pub fn CLOGShmemInit();
+        }
+        CLOGShmemInit()
+    })
+}
+pub unsafe fn BootStrapCLOG() {
+    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
+        extern "C" {
+            pub fn BootStrapCLOG();
+        }
+        BootStrapCLOG()
+    })
+}
+pub unsafe fn StartupCLOG() {
+    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
+        extern "C" {
+            pub fn StartupCLOG();
+        }
+        StartupCLOG()
+    })
+}
+pub unsafe fn TrimCLOG() {
+    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
+        extern "C" {
+            pub fn TrimCLOG();
+        }
+        TrimCLOG()
+    })
+}
+pub unsafe fn CheckPointCLOG() {
+    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
+        extern "C" {
+            pub fn CheckPointCLOG();
+        }
+        CheckPointCLOG()
+    })
+}
+pub unsafe fn ExtendCLOG(arg_newestXact: TransactionId) {
+    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
+        extern "C" {
+            pub fn ExtendCLOG(newestXact: TransactionId);
+        }
+        ExtendCLOG(arg_newestXact)
+    })
+}
+pub unsafe fn TruncateCLOG(arg_oldestXact: TransactionId, arg_oldestxid_datoid: Oid) {
+    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
+        extern "C" {
+            pub fn TruncateCLOG(oldestXact: TransactionId, oldestxid_datoid: Oid);
+        }
+        TruncateCLOG(arg_oldestXact, arg_oldestxid_datoid)
+    })
+}
+pub unsafe fn clogsyncfiletag(
+    arg_ftag: *const FileTag,
+    arg_path: *mut ::std::os::raw::c_char,
+) -> ::std::os::raw::c_int {
+    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
+        extern "C" {
+            pub fn clogsyncfiletag(
+                ftag: *const FileTag,
+                path: *mut ::std::os::raw::c_char,
+            ) -> ::std::os::raw::c_int;
+        }
+        clogsyncfiletag(arg_ftag, arg_path)
+    })
+}
+pub unsafe fn clog_redo(arg_record: *mut XLogReaderState) {
+    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
+        extern "C" {
+            pub fn clog_redo(record: *mut XLogReaderState);
+        }
+        clog_redo(arg_record)
+    })
+}
+pub unsafe fn clog_desc(arg_buf: StringInfo, arg_record: *mut XLogReaderState) {
+    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
+        extern "C" {
+            pub fn clog_desc(buf: StringInfo, record: *mut XLogReaderState);
+        }
+        clog_desc(arg_buf, arg_record)
+    })
+}
+pub unsafe fn clog_identify(arg_info: uint8) -> *const ::std::os::raw::c_char {
+    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
+        extern "C" {
+            pub fn clog_identify(info: uint8) -> *const ::std::os::raw::c_char;
+        }
+        clog_identify(arg_info)
+    })
+}
+#[repr(C)]
+#[derive(Debug, Default, Copy, Clone)]
+pub struct Latch {
+    pub is_set: sig_atomic_t,
+    pub maybe_sleeping: sig_atomic_t,
+    pub is_shared: bool,
+    pub owner_pid: ::std::os::raw::c_int,
+}
+#[repr(C)]
+#[derive(Debug, Copy, Clone)]
+pub struct WaitEvent {
+    pub pos: ::std::os::raw::c_int,
+    pub events: uint32,
+    pub fd: pgsocket,
+    pub user_data: *mut ::std::os::raw::c_void,
+}
+impl Default for WaitEvent {
+    fn default() -> Self {
+        let mut s = ::std::mem::MaybeUninit::<Self>::uninit();
+        unsafe {
+            ::std::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
+            s.assume_init()
+        }
+    }
+}
+pub unsafe fn InitializeLatchSupport() {
+    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
+        extern "C" {
+            pub fn InitializeLatchSupport();
+        }
+        InitializeLatchSupport()
+    })
+}
+pub unsafe fn InitLatch(arg_latch: *mut Latch) {
+    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
+        extern "C" {
+            pub fn InitLatch(latch: *mut Latch);
+        }
+        InitLatch(arg_latch)
+    })
+}
+pub unsafe fn InitSharedLatch(arg_latch: *mut Latch) {
+    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
+        extern "C" {
+            pub fn InitSharedLatch(latch: *mut Latch);
+        }
+        InitSharedLatch(arg_latch)
+    })
+}
+pub unsafe fn OwnLatch(arg_latch: *mut Latch) {
+    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
+        extern "C" {
+            pub fn OwnLatch(latch: *mut Latch);
+        }
+        OwnLatch(arg_latch)
+    })
+}
+pub unsafe fn DisownLatch(arg_latch: *mut Latch) {
+    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
+        extern "C" {
+            pub fn DisownLatch(latch: *mut Latch);
+        }
+        DisownLatch(arg_latch)
+    })
+}
+pub unsafe fn SetLatch(arg_latch: *mut Latch) {
+    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
+        extern "C" {
+            pub fn SetLatch(latch: *mut Latch);
+        }
+        SetLatch(arg_latch)
+    })
+}
+pub unsafe fn ResetLatch(arg_latch: *mut Latch) {
+    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
+        extern "C" {
+            pub fn ResetLatch(latch: *mut Latch);
+        }
+        ResetLatch(arg_latch)
+    })
+}
+pub unsafe fn ShutdownLatchSupport() {
+    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
+        extern "C" {
+            pub fn ShutdownLatchSupport();
+        }
+        ShutdownLatchSupport()
+    })
+}
+pub unsafe fn CreateWaitEventSet(
+    arg_context: MemoryContext,
+    arg_nevents: ::std::os::raw::c_int,
+) -> *mut WaitEventSet {
+    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
+        extern "C" {
+            pub fn CreateWaitEventSet(
+                context: MemoryContext,
+                nevents: ::std::os::raw::c_int,
+            ) -> *mut WaitEventSet;
+        }
+        CreateWaitEventSet(arg_context, arg_nevents)
+    })
+}
+pub unsafe fn FreeWaitEventSet(arg_set: *mut WaitEventSet) {
+    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
+        extern "C" {
+            pub fn FreeWaitEventSet(set: *mut WaitEventSet);
+        }
+        FreeWaitEventSet(arg_set)
+    })
+}
+pub unsafe fn AddWaitEventToSet(
+    arg_set: *mut WaitEventSet,
+    arg_events: uint32,
+    arg_fd: pgsocket,
+    arg_latch: *mut Latch,
+    arg_user_data: *mut ::std::os::raw::c_void,
+) -> ::std::os::raw::c_int {
+    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
+        extern "C" {
+            pub fn AddWaitEventToSet(
+                set: *mut WaitEventSet,
+                events: uint32,
+                fd: pgsocket,
+                latch: *mut Latch,
+                user_data: *mut ::std::os::raw::c_void,
+            ) -> ::std::os::raw::c_int;
+        }
+        AddWaitEventToSet(arg_set, arg_events, arg_fd, arg_latch, arg_user_data)
+    })
+}
+pub unsafe fn ModifyWaitEvent(
+    arg_set: *mut WaitEventSet,
+    arg_pos: ::std::os::raw::c_int,
+    arg_events: uint32,
+    arg_latch: *mut Latch,
+) {
+    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
+        extern "C" {
+            pub fn ModifyWaitEvent(
+                set: *mut WaitEventSet,
+                pos: ::std::os::raw::c_int,
+                events: uint32,
+                latch: *mut Latch,
+            );
+        }
+        ModifyWaitEvent(arg_set, arg_pos, arg_events, arg_latch)
+    })
+}
+pub unsafe fn WaitEventSetWait(
+    arg_set: *mut WaitEventSet,
+    arg_timeout: ::std::os::raw::c_long,
+    arg_occurred_events: *mut WaitEvent,
+    arg_nevents: ::std::os::raw::c_int,
+    arg_wait_event_info: uint32,
+) -> ::std::os::raw::c_int {
+    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
+        extern "C" {
+            pub fn WaitEventSetWait(
+                set: *mut WaitEventSet,
+                timeout: ::std::os::raw::c_long,
+                occurred_events: *mut WaitEvent,
+                nevents: ::std::os::raw::c_int,
+                wait_event_info: uint32,
+            ) -> ::std::os::raw::c_int;
+        }
+        WaitEventSetWait(
+            arg_set,
+            arg_timeout,
+            arg_occurred_events,
+            arg_nevents,
+            arg_wait_event_info,
+        )
+    })
+}
+pub unsafe fn WaitLatch(
+    arg_latch: *mut Latch,
+    arg_wakeEvents: ::std::os::raw::c_int,
+    arg_timeout: ::std::os::raw::c_long,
+    arg_wait_event_info: uint32,
+) -> ::std::os::raw::c_int {
+    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
+        extern "C" {
+            pub fn WaitLatch(
+                latch: *mut Latch,
+                wakeEvents: ::std::os::raw::c_int,
+                timeout: ::std::os::raw::c_long,
+                wait_event_info: uint32,
+            ) -> ::std::os::raw::c_int;
+        }
+        WaitLatch(arg_latch, arg_wakeEvents, arg_timeout, arg_wait_event_info)
+    })
+}
+pub unsafe fn WaitLatchOrSocket(
+    arg_latch: *mut Latch,
+    arg_wakeEvents: ::std::os::raw::c_int,
+    arg_sock: pgsocket,
+    arg_timeout: ::std::os::raw::c_long,
+    arg_wait_event_info: uint32,
+) -> ::std::os::raw::c_int {
+    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
+        extern "C" {
+            pub fn WaitLatchOrSocket(
+                latch: *mut Latch,
+                wakeEvents: ::std::os::raw::c_int,
+                sock: pgsocket,
+                timeout: ::std::os::raw::c_long,
+                wait_event_info: uint32,
+            ) -> ::std::os::raw::c_int;
+        }
+        WaitLatchOrSocket(arg_latch, arg_wakeEvents, arg_sock, arg_timeout, arg_wait_event_info)
+    })
+}
+pub unsafe fn InitializeLatchWaitSet() {
+    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
+        extern "C" {
+            pub fn InitializeLatchWaitSet();
+        }
+        InitializeLatchWaitSet()
+    })
+}
+pub unsafe fn GetNumRegisteredWaitEvents(arg_set: *mut WaitEventSet) -> ::std::os::raw::c_int {
+    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
+        extern "C" {
+            pub fn GetNumRegisteredWaitEvents(set: *mut WaitEventSet) -> ::std::os::raw::c_int;
+        }
+        GetNumRegisteredWaitEvents(arg_set)
+    })
+}
+pub unsafe fn WaitEventSetCanReportClosed() -> bool {
+    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
+        extern "C" {
+            pub fn WaitEventSetCanReportClosed() -> bool;
+        }
+        WaitEventSetCanReportClosed()
+    })
+}
+#[repr(C)]
+#[derive(Debug, Copy, Clone)]
+pub struct PGSemaphoreData {
+    _unused: [u8; 0],
+}
+pub type PGSemaphore = *mut PGSemaphoreData;
+pub unsafe fn PGSemaphoreShmemSize(arg_maxSemas: ::std::os::raw::c_int) -> Size {
+    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
+        extern "C" {
+            pub fn PGSemaphoreShmemSize(maxSemas: ::std::os::raw::c_int) -> Size;
+        }
+        PGSemaphoreShmemSize(arg_maxSemas)
+    })
+}
+pub unsafe fn PGReserveSemaphores(arg_maxSemas: ::std::os::raw::c_int) {
+    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
+        extern "C" {
+            pub fn PGReserveSemaphores(maxSemas: ::std::os::raw::c_int);
+        }
+        PGReserveSemaphores(arg_maxSemas)
+    })
+}
+pub unsafe fn PGSemaphoreCreate() -> PGSemaphore {
+    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
+        extern "C" {
+            pub fn PGSemaphoreCreate() -> PGSemaphore;
+        }
+        PGSemaphoreCreate()
+    })
+}
+pub unsafe fn PGSemaphoreReset(arg_sema: PGSemaphore) {
+    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
+        extern "C" {
+            pub fn PGSemaphoreReset(sema: PGSemaphore);
+        }
+        PGSemaphoreReset(arg_sema)
+    })
+}
+pub unsafe fn PGSemaphoreLock(arg_sema: PGSemaphore) {
+    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
+        extern "C" {
+            pub fn PGSemaphoreLock(sema: PGSemaphore);
+        }
+        PGSemaphoreLock(arg_sema)
+    })
+}
+pub unsafe fn PGSemaphoreUnlock(arg_sema: PGSemaphore) {
+    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
+        extern "C" {
+            pub fn PGSemaphoreUnlock(sema: PGSemaphore);
+        }
+        PGSemaphoreUnlock(arg_sema)
+    })
+}
+pub unsafe fn PGSemaphoreTryLock(arg_sema: PGSemaphore) -> bool {
+    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
+        extern "C" {
+            pub fn PGSemaphoreTryLock(sema: PGSemaphore) -> bool;
+        }
+        PGSemaphoreTryLock(arg_sema)
+    })
+}
+#[repr(C)]
+#[derive(Debug, Default, Copy, Clone)]
+pub struct XidCacheStatus {
+    pub count: uint8,
+    pub overflowed: bool,
+}
+#[repr(C)]
+#[derive(Debug, Copy, Clone)]
+pub struct XidCache {
+    pub xids: [TransactionId; 64usize],
+}
+impl Default for XidCache {
+    fn default() -> Self {
+        let mut s = ::std::mem::MaybeUninit::<Self>::uninit();
+        unsafe {
+            ::std::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
+            s.assume_init()
+        }
+    }
+}
+pub const ProcWaitStatus_PROC_WAIT_STATUS_OK: ProcWaitStatus = 0;
+pub const ProcWaitStatus_PROC_WAIT_STATUS_WAITING: ProcWaitStatus = 1;
+pub const ProcWaitStatus_PROC_WAIT_STATUS_ERROR: ProcWaitStatus = 2;
+pub type ProcWaitStatus = ::std::os::raw::c_uint;
+#[repr(C)]
+#[derive(Debug, Copy, Clone)]
+pub struct PGPROC {
+    pub links: SHM_QUEUE,
+    pub procgloballist: *mut *mut PGPROC,
+    pub sem: PGSemaphore,
+    pub waitStatus: ProcWaitStatus,
+    pub procLatch: Latch,
+    pub xid: TransactionId,
+    pub xmin: TransactionId,
+    pub lxid: LocalTransactionId,
+    pub pid: ::std::os::raw::c_int,
+    pub pgxactoff: ::std::os::raw::c_int,
+    pub pgprocno: ::std::os::raw::c_int,
+    pub backendId: BackendId,
+    pub databaseId: Oid,
+    pub roleId: Oid,
+    pub tempNamespaceId: Oid,
+    pub isBackgroundWorker: bool,
+    pub recoveryConflictPending: bool,
+    pub lwWaiting: bool,
+    pub lwWaitMode: uint8,
+    pub lwWaitLink: proclist_node,
+    pub cvWaitLink: proclist_node,
+    pub waitLock: *mut LOCK,
+    pub waitProcLock: *mut PROCLOCK,
+    pub waitLockMode: LOCKMODE,
+    pub heldLocks: LOCKMASK,
+    pub waitStart: pg_atomic_uint64,
+    pub delayChkptFlags: ::std::os::raw::c_int,
+    pub statusFlags: uint8,
+    pub waitLSN: XLogRecPtr,
+    pub syncRepState: ::std::os::raw::c_int,
+    pub syncRepLinks: SHM_QUEUE,
+    pub myProcLocks: [SHM_QUEUE; 16usize],
+    pub subxidStatus: XidCacheStatus,
+    pub subxids: XidCache,
+    pub procArrayGroupMember: bool,
+    pub procArrayGroupNext: pg_atomic_uint32,
+    pub procArrayGroupMemberXid: TransactionId,
+    pub wait_event_info: uint32,
+    pub clogGroupMember: bool,
+    pub clogGroupNext: pg_atomic_uint32,
+    pub clogGroupMemberXid: TransactionId,
+    pub clogGroupMemberXidStatus: XidStatus,
+    pub clogGroupMemberPage: ::std::os::raw::c_int,
+    pub clogGroupMemberLsn: XLogRecPtr,
+    pub fpInfoLock: LWLock,
+    pub fpLockBits: uint64,
+    pub fpRelId: [Oid; 16usize],
+    pub fpVXIDLock: bool,
+    pub fpLocalTransactionId: LocalTransactionId,
+    pub lockGroupLeader: *mut PGPROC,
+    pub lockGroupMembers: dlist_head,
+    pub lockGroupLink: dlist_node,
+}
+impl Default for PGPROC {
+    fn default() -> Self {
+        let mut s = ::std::mem::MaybeUninit::<Self>::uninit();
+        unsafe {
+            ::std::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
+            s.assume_init()
+        }
+    }
+}
+extern "C" {
+    pub static mut MyProc: *mut PGPROC;
+}
+#[repr(C)]
+#[derive(Debug, Copy, Clone)]
+pub struct PROC_HDR {
+    pub allProcs: *mut PGPROC,
+    pub xids: *mut TransactionId,
+    pub subxidStates: *mut XidCacheStatus,
+    pub statusFlags: *mut uint8,
+    pub allProcCount: uint32,
+    pub freeProcs: *mut PGPROC,
+    pub autovacFreeProcs: *mut PGPROC,
+    pub bgworkerFreeProcs: *mut PGPROC,
+    pub walsenderFreeProcs: *mut PGPROC,
+    pub procArrayGroupFirst: pg_atomic_uint32,
+    pub clogGroupFirst: pg_atomic_uint32,
+    pub walwriterLatch: *mut Latch,
+    pub checkpointerLatch: *mut Latch,
+    pub spins_per_delay: ::std::os::raw::c_int,
+    pub startupBufferPinWaitBufId: ::std::os::raw::c_int,
+}
+impl Default for PROC_HDR {
+    fn default() -> Self {
+        let mut s = ::std::mem::MaybeUninit::<Self>::uninit();
+        unsafe {
+            ::std::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
+            s.assume_init()
+        }
+    }
+}
+extern "C" {
+    pub static mut ProcGlobal: *mut PROC_HDR;
+}
+extern "C" {
+    pub static mut PreparedXactProcs: *mut PGPROC;
+}
+extern "C" {
+    pub static mut DeadlockTimeout: ::std::os::raw::c_int;
+}
+extern "C" {
+    pub static mut StatementTimeout: ::std::os::raw::c_int;
+}
+extern "C" {
+    pub static mut LockTimeout: ::std::os::raw::c_int;
+}
+extern "C" {
+    pub static mut IdleInTransactionSessionTimeout: ::std::os::raw::c_int;
+}
+extern "C" {
+    pub static mut IdleSessionTimeout: ::std::os::raw::c_int;
+}
+extern "C" {
+    pub static mut log_lock_waits: bool;
+}
+pub unsafe fn ProcGlobalSemas() -> ::std::os::raw::c_int {
+    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
+        extern "C" {
+            pub fn ProcGlobalSemas() -> ::std::os::raw::c_int;
+        }
+        ProcGlobalSemas()
+    })
+}
+pub unsafe fn ProcGlobalShmemSize() -> Size {
+    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
+        extern "C" {
+            pub fn ProcGlobalShmemSize() -> Size;
+        }
+        ProcGlobalShmemSize()
+    })
+}
+pub unsafe fn InitProcGlobal() {
+    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
+        extern "C" {
+            pub fn InitProcGlobal();
+        }
+        InitProcGlobal()
+    })
+}
+pub unsafe fn InitProcess() {
+    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
+        extern "C" {
+            pub fn InitProcess();
+        }
+        InitProcess()
+    })
+}
+pub unsafe fn InitProcessPhase2() {
+    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
+        extern "C" {
+            pub fn InitProcessPhase2();
+        }
+        InitProcessPhase2()
+    })
+}
+pub unsafe fn InitAuxiliaryProcess() {
+    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
+        extern "C" {
+            pub fn InitAuxiliaryProcess();
+        }
+        InitAuxiliaryProcess()
+    })
+}
+pub unsafe fn SetStartupBufferPinWaitBufId(arg_bufid: ::std::os::raw::c_int) {
+    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
+        extern "C" {
+            pub fn SetStartupBufferPinWaitBufId(bufid: ::std::os::raw::c_int);
+        }
+        SetStartupBufferPinWaitBufId(arg_bufid)
+    })
+}
+pub unsafe fn GetStartupBufferPinWaitBufId() -> ::std::os::raw::c_int {
+    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
+        extern "C" {
+            pub fn GetStartupBufferPinWaitBufId() -> ::std::os::raw::c_int;
+        }
+        GetStartupBufferPinWaitBufId()
+    })
+}
+pub unsafe fn HaveNFreeProcs(arg_n: ::std::os::raw::c_int) -> bool {
+    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
+        extern "C" {
+            pub fn HaveNFreeProcs(n: ::std::os::raw::c_int) -> bool;
+        }
+        HaveNFreeProcs(arg_n)
+    })
+}
+pub unsafe fn ProcReleaseLocks(arg_isCommit: bool) {
+    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
+        extern "C" {
+            pub fn ProcReleaseLocks(isCommit: bool);
+        }
+        ProcReleaseLocks(arg_isCommit)
+    })
+}
+pub unsafe fn ProcQueueInit(arg_queue: *mut PROC_QUEUE) {
+    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
+        extern "C" {
+            pub fn ProcQueueInit(queue: *mut PROC_QUEUE);
+        }
+        ProcQueueInit(arg_queue)
+    })
+}
+pub unsafe fn ProcSleep(
+    arg_locallock: *mut LOCALLOCK,
+    arg_lockMethodTable: LockMethod,
+) -> ProcWaitStatus {
+    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
+        extern "C" {
+            pub fn ProcSleep(
+                locallock: *mut LOCALLOCK,
+                lockMethodTable: LockMethod,
+            ) -> ProcWaitStatus;
+        }
+        ProcSleep(arg_locallock, arg_lockMethodTable)
+    })
+}
+pub unsafe fn ProcWakeup(arg_proc_: *mut PGPROC, arg_waitStatus: ProcWaitStatus) -> *mut PGPROC {
+    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
+        extern "C" {
+            pub fn ProcWakeup(proc_: *mut PGPROC, waitStatus: ProcWaitStatus) -> *mut PGPROC;
+        }
+        ProcWakeup(arg_proc_, arg_waitStatus)
+    })
+}
+pub unsafe fn ProcLockWakeup(arg_lockMethodTable: LockMethod, arg_lock: *mut LOCK) {
+    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
+        extern "C" {
+            pub fn ProcLockWakeup(lockMethodTable: LockMethod, lock: *mut LOCK);
+        }
+        ProcLockWakeup(arg_lockMethodTable, arg_lock)
+    })
+}
+pub unsafe fn CheckDeadLockAlert() {
+    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
+        extern "C" {
+            pub fn CheckDeadLockAlert();
+        }
+        CheckDeadLockAlert()
+    })
+}
+pub unsafe fn IsWaitingForLock() -> bool {
+    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
+        extern "C" {
+            pub fn IsWaitingForLock() -> bool;
+        }
+        IsWaitingForLock()
+    })
+}
+pub unsafe fn LockErrorCleanup() {
+    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
+        extern "C" {
+            pub fn LockErrorCleanup();
+        }
+        LockErrorCleanup()
+    })
+}
+pub unsafe fn ProcWaitForSignal(arg_wait_event_info: uint32) {
+    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
+        extern "C" {
+            pub fn ProcWaitForSignal(wait_event_info: uint32);
+        }
+        ProcWaitForSignal(arg_wait_event_info)
+    })
+}
+pub unsafe fn ProcSendSignal(arg_pgprocno: ::std::os::raw::c_int) {
+    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
+        extern "C" {
+            pub fn ProcSendSignal(pgprocno: ::std::os::raw::c_int);
+        }
+        ProcSendSignal(arg_pgprocno)
+    })
+}
+pub unsafe fn AuxiliaryPidGetProc(arg_pid: ::std::os::raw::c_int) -> *mut PGPROC {
+    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
+        extern "C" {
+            pub fn AuxiliaryPidGetProc(pid: ::std::os::raw::c_int) -> *mut PGPROC;
+        }
+        AuxiliaryPidGetProc(arg_pid)
+    })
+}
+pub unsafe fn BecomeLockGroupLeader() {
+    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
+        extern "C" {
+            pub fn BecomeLockGroupLeader();
+        }
+        BecomeLockGroupLeader()
+    })
+}
+pub unsafe fn BecomeLockGroupMember(
+    arg_leader: *mut PGPROC,
+    arg_pid: ::std::os::raw::c_int,
+) -> bool {
+    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
+        extern "C" {
+            pub fn BecomeLockGroupMember(leader: *mut PGPROC, pid: ::std::os::raw::c_int) -> bool;
+        }
+        BecomeLockGroupMember(arg_leader, arg_pid)
+    })
+}
+#[repr(C)]
+#[derive(Debug, Copy, Clone)]
+pub struct shm_mq {
+    _unused: [u8; 0],
+}
+#[repr(C)]
+#[derive(Debug, Copy, Clone)]
+pub struct shm_mq_handle {
+    _unused: [u8; 0],
+}
+#[repr(C)]
+#[derive(Debug, Copy, Clone)]
+pub struct shm_mq_iovec {
+    pub data: *const ::std::os::raw::c_char,
+    pub len: Size,
+}
+impl Default for shm_mq_iovec {
+    fn default() -> Self {
+        let mut s = ::std::mem::MaybeUninit::<Self>::uninit();
+        unsafe {
+            ::std::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
+            s.assume_init()
+        }
+    }
+}
+pub const shm_mq_result_SHM_MQ_SUCCESS: shm_mq_result = 0;
+pub const shm_mq_result_SHM_MQ_WOULD_BLOCK: shm_mq_result = 1;
+pub const shm_mq_result_SHM_MQ_DETACHED: shm_mq_result = 2;
+pub type shm_mq_result = ::std::os::raw::c_uint;
+pub unsafe fn shm_mq_create(
+    arg_address: *mut ::std::os::raw::c_void,
+    arg_size: Size,
+) -> *mut shm_mq {
+    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
+        extern "C" {
+            pub fn shm_mq_create(address: *mut ::std::os::raw::c_void, size: Size) -> *mut shm_mq;
+        }
+        shm_mq_create(arg_address, arg_size)
+    })
+}
+pub unsafe fn shm_mq_set_receiver(arg_mq: *mut shm_mq, arg_arg1: *mut PGPROC) {
+    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
+        extern "C" {
+            pub fn shm_mq_set_receiver(mq: *mut shm_mq, arg1: *mut PGPROC);
+        }
+        shm_mq_set_receiver(arg_mq, arg_arg1)
+    })
+}
+pub unsafe fn shm_mq_set_sender(arg_mq: *mut shm_mq, arg_arg1: *mut PGPROC) {
+    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
+        extern "C" {
+            pub fn shm_mq_set_sender(mq: *mut shm_mq, arg1: *mut PGPROC);
+        }
+        shm_mq_set_sender(arg_mq, arg_arg1)
+    })
+}
+pub unsafe fn shm_mq_get_receiver(arg_arg1: *mut shm_mq) -> *mut PGPROC {
+    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
+        extern "C" {
+            pub fn shm_mq_get_receiver(arg1: *mut shm_mq) -> *mut PGPROC;
+        }
+        shm_mq_get_receiver(arg_arg1)
+    })
+}
+pub unsafe fn shm_mq_get_sender(arg_arg1: *mut shm_mq) -> *mut PGPROC {
+    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
+        extern "C" {
+            pub fn shm_mq_get_sender(arg1: *mut shm_mq) -> *mut PGPROC;
+        }
+        shm_mq_get_sender(arg_arg1)
+    })
+}
+pub unsafe fn shm_mq_attach(
+    arg_mq: *mut shm_mq,
+    arg_seg: *mut dsm_segment,
+    arg_handle: *mut BackgroundWorkerHandle,
+) -> *mut shm_mq_handle {
+    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
+        extern "C" {
+            pub fn shm_mq_attach(
+                mq: *mut shm_mq,
+                seg: *mut dsm_segment,
+                handle: *mut BackgroundWorkerHandle,
+            ) -> *mut shm_mq_handle;
+        }
+        shm_mq_attach(arg_mq, arg_seg, arg_handle)
+    })
+}
+pub unsafe fn shm_mq_set_handle(
+    arg_arg1: *mut shm_mq_handle,
+    arg_arg2: *mut BackgroundWorkerHandle,
+) {
+    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
+        extern "C" {
+            pub fn shm_mq_set_handle(arg1: *mut shm_mq_handle, arg2: *mut BackgroundWorkerHandle);
+        }
+        shm_mq_set_handle(arg_arg1, arg_arg2)
+    })
+}
+pub unsafe fn shm_mq_detach(arg_mqh: *mut shm_mq_handle) {
+    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
+        extern "C" {
+            pub fn shm_mq_detach(mqh: *mut shm_mq_handle);
+        }
+        shm_mq_detach(arg_mqh)
+    })
+}
+pub unsafe fn shm_mq_get_queue(arg_mqh: *mut shm_mq_handle) -> *mut shm_mq {
+    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
+        extern "C" {
+            pub fn shm_mq_get_queue(mqh: *mut shm_mq_handle) -> *mut shm_mq;
+        }
+        shm_mq_get_queue(arg_mqh)
+    })
+}
+pub unsafe fn shm_mq_send(
+    arg_mqh: *mut shm_mq_handle,
+    arg_nbytes: Size,
+    arg_data: *const ::std::os::raw::c_void,
+    arg_nowait: bool,
+    arg_force_flush: bool,
+) -> shm_mq_result {
+    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
+        extern "C" {
+            pub fn shm_mq_send(
+                mqh: *mut shm_mq_handle,
+                nbytes: Size,
+                data: *const ::std::os::raw::c_void,
+                nowait: bool,
+                force_flush: bool,
+            ) -> shm_mq_result;
+        }
+        shm_mq_send(arg_mqh, arg_nbytes, arg_data, arg_nowait, arg_force_flush)
+    })
+}
+pub unsafe fn shm_mq_sendv(
+    arg_mqh: *mut shm_mq_handle,
+    arg_iov: *mut shm_mq_iovec,
+    arg_iovcnt: ::std::os::raw::c_int,
+    arg_nowait: bool,
+    arg_force_flush: bool,
+) -> shm_mq_result {
+    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
+        extern "C" {
+            pub fn shm_mq_sendv(
+                mqh: *mut shm_mq_handle,
+                iov: *mut shm_mq_iovec,
+                iovcnt: ::std::os::raw::c_int,
+                nowait: bool,
+                force_flush: bool,
+            ) -> shm_mq_result;
+        }
+        shm_mq_sendv(arg_mqh, arg_iov, arg_iovcnt, arg_nowait, arg_force_flush)
+    })
+}
+pub unsafe fn shm_mq_receive(
+    arg_mqh: *mut shm_mq_handle,
+    arg_nbytesp: *mut Size,
+    arg_datap: *mut *mut ::std::os::raw::c_void,
+    arg_nowait: bool,
+) -> shm_mq_result {
+    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
+        extern "C" {
+            pub fn shm_mq_receive(
+                mqh: *mut shm_mq_handle,
+                nbytesp: *mut Size,
+                datap: *mut *mut ::std::os::raw::c_void,
+                nowait: bool,
+            ) -> shm_mq_result;
+        }
+        shm_mq_receive(arg_mqh, arg_nbytesp, arg_datap, arg_nowait)
+    })
+}
+pub unsafe fn shm_mq_wait_for_attach(arg_mqh: *mut shm_mq_handle) -> shm_mq_result {
+    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
+        extern "C" {
+            pub fn shm_mq_wait_for_attach(mqh: *mut shm_mq_handle) -> shm_mq_result;
+        }
+        shm_mq_wait_for_attach(arg_mqh)
+    })
+}
+extern "C" {
+    pub static shm_mq_minimum_size: Size;
+}
+pub type parallel_worker_main_type =
+    ::std::option::Option<unsafe extern "C" fn(seg: *mut dsm_segment, toc: *mut shm_toc)>;
+#[repr(C)]
+#[derive(Debug, Copy, Clone)]
+pub struct ParallelWorkerInfo {
+    pub bgwhandle: *mut BackgroundWorkerHandle,
+    pub error_mqh: *mut shm_mq_handle,
+    pub pid: int32,
+}
+impl Default for ParallelWorkerInfo {
+    fn default() -> Self {
+        let mut s = ::std::mem::MaybeUninit::<Self>::uninit();
+        unsafe {
+            ::std::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
+            s.assume_init()
+        }
+    }
+}
+#[repr(C)]
+#[derive(Debug, Copy, Clone)]
+pub struct ParallelContext {
+    pub node: dlist_node,
+    pub subid: SubTransactionId,
+    pub nworkers: ::std::os::raw::c_int,
+    pub nworkers_to_launch: ::std::os::raw::c_int,
+    pub nworkers_launched: ::std::os::raw::c_int,
+    pub library_name: *mut ::std::os::raw::c_char,
+    pub function_name: *mut ::std::os::raw::c_char,
+    pub error_context_stack: *mut ErrorContextCallback,
+    pub estimator: shm_toc_estimator,
+    pub seg: *mut dsm_segment,
+    pub private_memory: *mut ::std::os::raw::c_void,
+    pub toc: *mut shm_toc,
+    pub worker: *mut ParallelWorkerInfo,
+    pub nknown_attached_workers: ::std::os::raw::c_int,
+    pub known_attached_workers: *mut bool,
+}
+impl Default for ParallelContext {
+    fn default() -> Self {
+        let mut s = ::std::mem::MaybeUninit::<Self>::uninit();
+        unsafe {
+            ::std::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
+            s.assume_init()
+        }
+    }
+}
+#[repr(C)]
+#[derive(Debug, Copy, Clone)]
+pub struct ParallelWorkerContext {
+    pub seg: *mut dsm_segment,
+    pub toc: *mut shm_toc,
+}
+impl Default for ParallelWorkerContext {
+    fn default() -> Self {
+        let mut s = ::std::mem::MaybeUninit::<Self>::uninit();
+        unsafe {
+            ::std::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
+            s.assume_init()
+        }
+    }
+}
+extern "C" {
+    pub static mut ParallelMessagePending: bool;
+}
+extern "C" {
+    pub static mut ParallelWorkerNumber: ::std::os::raw::c_int;
+}
+extern "C" {
+    pub static mut InitializingParallelWorker: bool;
+}
+pub unsafe fn CreateParallelContext(
+    arg_library_name: *const ::std::os::raw::c_char,
+    arg_function_name: *const ::std::os::raw::c_char,
+    arg_nworkers: ::std::os::raw::c_int,
+) -> *mut ParallelContext {
+    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
+        extern "C" {
+            pub fn CreateParallelContext(
+                library_name: *const ::std::os::raw::c_char,
+                function_name: *const ::std::os::raw::c_char,
+                nworkers: ::std::os::raw::c_int,
+            ) -> *mut ParallelContext;
+        }
+        CreateParallelContext(arg_library_name, arg_function_name, arg_nworkers)
+    })
+}
+pub unsafe fn InitializeParallelDSM(arg_pcxt: *mut ParallelContext) {
+    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
+        extern "C" {
+            pub fn InitializeParallelDSM(pcxt: *mut ParallelContext);
+        }
+        InitializeParallelDSM(arg_pcxt)
+    })
+}
+pub unsafe fn ReinitializeParallelDSM(arg_pcxt: *mut ParallelContext) {
+    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
+        extern "C" {
+            pub fn ReinitializeParallelDSM(pcxt: *mut ParallelContext);
+        }
+        ReinitializeParallelDSM(arg_pcxt)
+    })
+}
+pub unsafe fn ReinitializeParallelWorkers(
+    arg_pcxt: *mut ParallelContext,
+    arg_nworkers_to_launch: ::std::os::raw::c_int,
+) {
+    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
+        extern "C" {
+            pub fn ReinitializeParallelWorkers(
+                pcxt: *mut ParallelContext,
+                nworkers_to_launch: ::std::os::raw::c_int,
+            );
+        }
+        ReinitializeParallelWorkers(arg_pcxt, arg_nworkers_to_launch)
+    })
+}
+pub unsafe fn LaunchParallelWorkers(arg_pcxt: *mut ParallelContext) {
+    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
+        extern "C" {
+            pub fn LaunchParallelWorkers(pcxt: *mut ParallelContext);
+        }
+        LaunchParallelWorkers(arg_pcxt)
+    })
+}
+pub unsafe fn WaitForParallelWorkersToAttach(arg_pcxt: *mut ParallelContext) {
+    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
+        extern "C" {
+            pub fn WaitForParallelWorkersToAttach(pcxt: *mut ParallelContext);
+        }
+        WaitForParallelWorkersToAttach(arg_pcxt)
+    })
+}
+pub unsafe fn WaitForParallelWorkersToFinish(arg_pcxt: *mut ParallelContext) {
+    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
+        extern "C" {
+            pub fn WaitForParallelWorkersToFinish(pcxt: *mut ParallelContext);
+        }
+        WaitForParallelWorkersToFinish(arg_pcxt)
+    })
+}
+pub unsafe fn DestroyParallelContext(arg_pcxt: *mut ParallelContext) {
+    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
+        extern "C" {
+            pub fn DestroyParallelContext(pcxt: *mut ParallelContext);
+        }
+        DestroyParallelContext(arg_pcxt)
+    })
+}
+pub unsafe fn ParallelContextActive() -> bool {
+    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
+        extern "C" {
+            pub fn ParallelContextActive() -> bool;
+        }
+        ParallelContextActive()
+    })
+}
+pub unsafe fn HandleParallelMessageInterrupt() {
+    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
+        extern "C" {
+            pub fn HandleParallelMessageInterrupt();
+        }
+        HandleParallelMessageInterrupt()
+    })
+}
+pub unsafe fn HandleParallelMessages() {
+    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
+        extern "C" {
+            pub fn HandleParallelMessages();
+        }
+        HandleParallelMessages()
+    })
+}
+pub unsafe fn AtEOXact_Parallel(arg_isCommit: bool) {
+    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
+        extern "C" {
+            pub fn AtEOXact_Parallel(isCommit: bool);
+        }
+        AtEOXact_Parallel(arg_isCommit)
+    })
+}
+pub unsafe fn AtEOSubXact_Parallel(arg_isCommit: bool, arg_mySubId: SubTransactionId) {
+    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
+        extern "C" {
+            pub fn AtEOSubXact_Parallel(isCommit: bool, mySubId: SubTransactionId);
+        }
+        AtEOSubXact_Parallel(arg_isCommit, arg_mySubId)
+    })
+}
+pub unsafe fn ParallelWorkerReportLastRecEnd(arg_last_xlog_end: XLogRecPtr) {
+    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
+        extern "C" {
+            pub fn ParallelWorkerReportLastRecEnd(last_xlog_end: XLogRecPtr);
+        }
+        ParallelWorkerReportLastRecEnd(arg_last_xlog_end)
+    })
+}
+pub unsafe fn ParallelWorkerMain(arg_main_arg: Datum) {
+    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
+        extern "C" {
+            pub fn ParallelWorkerMain(main_arg: Datum);
+        }
+        ParallelWorkerMain(arg_main_arg)
+    })
+}
 #[repr(C)]
 #[derive(Debug, Default, Copy, Clone)]
 pub struct FormData_pg_statistic {
@@ -55101,6 +56846,11 @@ pub struct FormData_pg_statistic {
     pub stacoll5: Oid,
 }
 pub type Form_pg_statistic = *mut FormData_pg_statistic;
+#[repr(C)]
+#[derive(Debug, Copy, Clone)]
+pub struct ParallelVacuumState {
+    _unused: [u8; 0],
+}
 pub type VacAttrStatsP = *mut VacAttrStats;
 pub type AnalyzeAttrFetchFunc = ::std::option::Option<
     unsafe extern "C" fn(
@@ -55187,6 +56937,13 @@ impl Default for VacuumParams {
             s.assume_init()
         }
     }
+}
+#[repr(C)]
+#[derive(Debug, Default)]
+pub struct VacDeadItems {
+    pub max_items: ::std::os::raw::c_int,
+    pub num_items: ::std::os::raw::c_int,
+    pub items: __IncompleteArrayField<ItemPointerData>,
 }
 extern "C" {
     pub static mut default_statistics_target: ::std::os::raw::c_int;
@@ -55308,6 +57065,8 @@ pub unsafe fn vac_update_relstats(
     arg_hasindex: bool,
     arg_frozenxid: TransactionId,
     arg_minmulti: MultiXactId,
+    arg_frozenxid_updated: *mut bool,
+    arg_minmulti_updated: *mut bool,
     arg_in_outer_xact: bool,
 ) {
     crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
@@ -55320,6 +57079,8 @@ pub unsafe fn vac_update_relstats(
                 hasindex: bool,
                 frozenxid: TransactionId,
                 minmulti: MultiXactId,
+                frozenxid_updated: *mut bool,
+                minmulti_updated: *mut bool,
                 in_outer_xact: bool,
             );
         }
@@ -55331,6 +57092,8 @@ pub unsafe fn vac_update_relstats(
             arg_hasindex,
             arg_frozenxid,
             arg_minmulti,
+            arg_frozenxid_updated,
+            arg_minmulti_updated,
             arg_in_outer_xact,
         )
     })
@@ -55342,11 +57105,10 @@ pub unsafe fn vacuum_set_xid_limits(
     arg_multixact_freeze_min_age: ::std::os::raw::c_int,
     arg_multixact_freeze_table_age: ::std::os::raw::c_int,
     arg_oldestXmin: *mut TransactionId,
+    arg_oldestMxact: *mut MultiXactId,
     arg_freezeLimit: *mut TransactionId,
-    arg_xidFullScanLimit: *mut TransactionId,
     arg_multiXactCutoff: *mut MultiXactId,
-    arg_mxactFullScanLimit: *mut MultiXactId,
-) {
+) -> bool {
     crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
         extern "C" {
             pub fn vacuum_set_xid_limits(
@@ -55356,11 +57118,10 @@ pub unsafe fn vacuum_set_xid_limits(
                 multixact_freeze_min_age: ::std::os::raw::c_int,
                 multixact_freeze_table_age: ::std::os::raw::c_int,
                 oldestXmin: *mut TransactionId,
+                oldestMxact: *mut MultiXactId,
                 freezeLimit: *mut TransactionId,
-                xidFullScanLimit: *mut TransactionId,
                 multiXactCutoff: *mut MultiXactId,
-                mxactFullScanLimit: *mut MultiXactId,
-            );
+            ) -> bool;
         }
         vacuum_set_xid_limits(
             arg_rel,
@@ -55369,10 +57130,9 @@ pub unsafe fn vacuum_set_xid_limits(
             arg_multixact_freeze_min_age,
             arg_multixact_freeze_table_age,
             arg_oldestXmin,
+            arg_oldestMxact,
             arg_freezeLimit,
-            arg_xidFullScanLimit,
             arg_multiXactCutoff,
-            arg_mxactFullScanLimit,
         )
     })
 }
@@ -55440,6 +57200,149 @@ pub unsafe fn vacuum_open_relation(
             ) -> Relation;
         }
         vacuum_open_relation(arg_relid, arg_relation, arg_options, arg_verbose, arg_lmode)
+    })
+}
+pub unsafe fn vac_bulkdel_one_index(
+    arg_ivinfo: *mut IndexVacuumInfo,
+    arg_istat: *mut IndexBulkDeleteResult,
+    arg_dead_items: *mut VacDeadItems,
+) -> *mut IndexBulkDeleteResult {
+    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
+        extern "C" {
+            pub fn vac_bulkdel_one_index(
+                ivinfo: *mut IndexVacuumInfo,
+                istat: *mut IndexBulkDeleteResult,
+                dead_items: *mut VacDeadItems,
+            ) -> *mut IndexBulkDeleteResult;
+        }
+        vac_bulkdel_one_index(arg_ivinfo, arg_istat, arg_dead_items)
+    })
+}
+pub unsafe fn vac_cleanup_one_index(
+    arg_ivinfo: *mut IndexVacuumInfo,
+    arg_istat: *mut IndexBulkDeleteResult,
+) -> *mut IndexBulkDeleteResult {
+    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
+        extern "C" {
+            pub fn vac_cleanup_one_index(
+                ivinfo: *mut IndexVacuumInfo,
+                istat: *mut IndexBulkDeleteResult,
+            ) -> *mut IndexBulkDeleteResult;
+        }
+        vac_cleanup_one_index(arg_ivinfo, arg_istat)
+    })
+}
+pub unsafe fn vac_max_items_to_alloc_size(arg_max_items: ::std::os::raw::c_int) -> Size {
+    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
+        extern "C" {
+            pub fn vac_max_items_to_alloc_size(max_items: ::std::os::raw::c_int) -> Size;
+        }
+        vac_max_items_to_alloc_size(arg_max_items)
+    })
+}
+pub unsafe fn parallel_vacuum_init(
+    arg_rel: Relation,
+    arg_indrels: *mut Relation,
+    arg_nindexes: ::std::os::raw::c_int,
+    arg_nrequested_workers: ::std::os::raw::c_int,
+    arg_max_items: ::std::os::raw::c_int,
+    arg_elevel: ::std::os::raw::c_int,
+    arg_bstrategy: BufferAccessStrategy,
+) -> *mut ParallelVacuumState {
+    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
+        extern "C" {
+            pub fn parallel_vacuum_init(
+                rel: Relation,
+                indrels: *mut Relation,
+                nindexes: ::std::os::raw::c_int,
+                nrequested_workers: ::std::os::raw::c_int,
+                max_items: ::std::os::raw::c_int,
+                elevel: ::std::os::raw::c_int,
+                bstrategy: BufferAccessStrategy,
+            ) -> *mut ParallelVacuumState;
+        }
+        parallel_vacuum_init(
+            arg_rel,
+            arg_indrels,
+            arg_nindexes,
+            arg_nrequested_workers,
+            arg_max_items,
+            arg_elevel,
+            arg_bstrategy,
+        )
+    })
+}
+pub unsafe fn parallel_vacuum_end(
+    arg_pvs: *mut ParallelVacuumState,
+    arg_istats: *mut *mut IndexBulkDeleteResult,
+) {
+    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
+        extern "C" {
+            pub fn parallel_vacuum_end(
+                pvs: *mut ParallelVacuumState,
+                istats: *mut *mut IndexBulkDeleteResult,
+            );
+        }
+        parallel_vacuum_end(arg_pvs, arg_istats)
+    })
+}
+pub unsafe fn parallel_vacuum_get_dead_items(
+    arg_pvs: *mut ParallelVacuumState,
+) -> *mut VacDeadItems {
+    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
+        extern "C" {
+            pub fn parallel_vacuum_get_dead_items(
+                pvs: *mut ParallelVacuumState,
+            ) -> *mut VacDeadItems;
+        }
+        parallel_vacuum_get_dead_items(arg_pvs)
+    })
+}
+pub unsafe fn parallel_vacuum_bulkdel_all_indexes(
+    arg_pvs: *mut ParallelVacuumState,
+    arg_num_table_tuples: ::std::os::raw::c_long,
+    arg_num_index_scans: ::std::os::raw::c_int,
+) {
+    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
+        extern "C" {
+            pub fn parallel_vacuum_bulkdel_all_indexes(
+                pvs: *mut ParallelVacuumState,
+                num_table_tuples: ::std::os::raw::c_long,
+                num_index_scans: ::std::os::raw::c_int,
+            );
+        }
+        parallel_vacuum_bulkdel_all_indexes(arg_pvs, arg_num_table_tuples, arg_num_index_scans)
+    })
+}
+pub unsafe fn parallel_vacuum_cleanup_all_indexes(
+    arg_pvs: *mut ParallelVacuumState,
+    arg_num_table_tuples: ::std::os::raw::c_long,
+    arg_num_index_scans: ::std::os::raw::c_int,
+    arg_estimated_count: bool,
+) {
+    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
+        extern "C" {
+            pub fn parallel_vacuum_cleanup_all_indexes(
+                pvs: *mut ParallelVacuumState,
+                num_table_tuples: ::std::os::raw::c_long,
+                num_index_scans: ::std::os::raw::c_int,
+                estimated_count: bool,
+            );
+        }
+        parallel_vacuum_cleanup_all_indexes(
+            arg_pvs,
+            arg_num_table_tuples,
+            arg_num_index_scans,
+            arg_estimated_count,
+        )
+    })
+}
+pub unsafe fn parallel_vacuum_main(arg_seg: *mut dsm_segment, arg_toc: *mut shm_toc) {
+    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
+        extern "C" {
+            pub fn parallel_vacuum_main(seg: *mut dsm_segment, toc: *mut shm_toc);
+        }
+        parallel_vacuum_main(arg_seg, arg_toc)
     })
 }
 pub unsafe fn analyze_rel(
@@ -56027,6 +57930,7 @@ pub struct PortalData {
     pub cleanup: ::std::option::Option<unsafe extern "C" fn(portal: Portal)>,
     pub createSubid: SubTransactionId,
     pub activeSubid: SubTransactionId,
+    pub createLevel: ::std::os::raw::c_int,
     pub sourceText: *const ::std::os::raw::c_char,
     pub commandTag: CommandTag,
     pub qc: QueryCompletion,
@@ -56052,7 +57956,6 @@ pub struct PortalData {
     pub portalPos: uint64,
     pub creation_time: TimestampTz,
     pub visible: bool,
-    pub createLevel: ::std::os::raw::c_int,
 }
 impl Default for PortalData {
     fn default() -> Self {
@@ -57176,14 +59079,6 @@ pub unsafe fn SPI_rollback_and_chain() {
         SPI_rollback_and_chain()
     })
 }
-pub unsafe fn SPICleanup() {
-    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
-        extern "C" {
-            pub fn SPICleanup();
-        }
-        SPICleanup()
-    })
-}
 pub unsafe fn AtEOXact_SPI(arg_isCommit: bool) {
     crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
         extern "C" {
@@ -57208,1421 +59103,6 @@ pub unsafe fn SPI_inside_nonatomic_context() -> bool {
         SPI_inside_nonatomic_context()
     })
 }
-pub type bgworker_main_type = ::std::option::Option<unsafe extern "C" fn(main_arg: Datum)>;
-pub const BgWorkerStartTime_BgWorkerStart_PostmasterStart: BgWorkerStartTime = 0;
-pub const BgWorkerStartTime_BgWorkerStart_ConsistentState: BgWorkerStartTime = 1;
-pub const BgWorkerStartTime_BgWorkerStart_RecoveryFinished: BgWorkerStartTime = 2;
-pub type BgWorkerStartTime = ::std::os::raw::c_uint;
-#[repr(C)]
-#[derive(Debug, Copy, Clone)]
-pub struct BackgroundWorker {
-    pub bgw_name: [::std::os::raw::c_char; 96usize],
-    pub bgw_type: [::std::os::raw::c_char; 96usize],
-    pub bgw_flags: ::std::os::raw::c_int,
-    pub bgw_start_time: BgWorkerStartTime,
-    pub bgw_restart_time: ::std::os::raw::c_int,
-    pub bgw_library_name: [::std::os::raw::c_char; 96usize],
-    pub bgw_function_name: [::std::os::raw::c_char; 96usize],
-    pub bgw_main_arg: Datum,
-    pub bgw_extra: [::std::os::raw::c_char; 128usize],
-    pub bgw_notify_pid: pid_t,
-}
-impl Default for BackgroundWorker {
-    fn default() -> Self {
-        let mut s = ::std::mem::MaybeUninit::<Self>::uninit();
-        unsafe {
-            ::std::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
-            s.assume_init()
-        }
-    }
-}
-pub const BgwHandleStatus_BGWH_STARTED: BgwHandleStatus = 0;
-pub const BgwHandleStatus_BGWH_NOT_YET_STARTED: BgwHandleStatus = 1;
-pub const BgwHandleStatus_BGWH_STOPPED: BgwHandleStatus = 2;
-pub const BgwHandleStatus_BGWH_POSTMASTER_DIED: BgwHandleStatus = 3;
-pub type BgwHandleStatus = ::std::os::raw::c_uint;
-#[repr(C)]
-#[derive(Debug, Copy, Clone)]
-pub struct BackgroundWorkerHandle {
-    _unused: [u8; 0],
-}
-pub unsafe fn RegisterBackgroundWorker(arg_worker: *mut BackgroundWorker) {
-    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
-        extern "C" {
-            pub fn RegisterBackgroundWorker(worker: *mut BackgroundWorker);
-        }
-        RegisterBackgroundWorker(arg_worker)
-    })
-}
-pub unsafe fn RegisterDynamicBackgroundWorker(
-    arg_worker: *mut BackgroundWorker,
-    arg_handle: *mut *mut BackgroundWorkerHandle,
-) -> bool {
-    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
-        extern "C" {
-            pub fn RegisterDynamicBackgroundWorker(
-                worker: *mut BackgroundWorker,
-                handle: *mut *mut BackgroundWorkerHandle,
-            ) -> bool;
-        }
-        RegisterDynamicBackgroundWorker(arg_worker, arg_handle)
-    })
-}
-pub unsafe fn GetBackgroundWorkerPid(
-    arg_handle: *mut BackgroundWorkerHandle,
-    arg_pidp: *mut pid_t,
-) -> BgwHandleStatus {
-    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
-        extern "C" {
-            pub fn GetBackgroundWorkerPid(
-                handle: *mut BackgroundWorkerHandle,
-                pidp: *mut pid_t,
-            ) -> BgwHandleStatus;
-        }
-        GetBackgroundWorkerPid(arg_handle, arg_pidp)
-    })
-}
-pub unsafe fn WaitForBackgroundWorkerStartup(
-    arg_handle: *mut BackgroundWorkerHandle,
-    arg_pid: *mut pid_t,
-) -> BgwHandleStatus {
-    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
-        extern "C" {
-            pub fn WaitForBackgroundWorkerStartup(
-                handle: *mut BackgroundWorkerHandle,
-                pid: *mut pid_t,
-            ) -> BgwHandleStatus;
-        }
-        WaitForBackgroundWorkerStartup(arg_handle, arg_pid)
-    })
-}
-pub unsafe fn WaitForBackgroundWorkerShutdown(
-    arg_arg1: *mut BackgroundWorkerHandle,
-) -> BgwHandleStatus {
-    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
-        extern "C" {
-            pub fn WaitForBackgroundWorkerShutdown(
-                arg1: *mut BackgroundWorkerHandle,
-            ) -> BgwHandleStatus;
-        }
-        WaitForBackgroundWorkerShutdown(arg_arg1)
-    })
-}
-pub unsafe fn GetBackgroundWorkerTypeByPid(arg_pid: pid_t) -> *const ::std::os::raw::c_char {
-    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
-        extern "C" {
-            pub fn GetBackgroundWorkerTypeByPid(pid: pid_t) -> *const ::std::os::raw::c_char;
-        }
-        GetBackgroundWorkerTypeByPid(arg_pid)
-    })
-}
-pub unsafe fn TerminateBackgroundWorker(arg_handle: *mut BackgroundWorkerHandle) {
-    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
-        extern "C" {
-            pub fn TerminateBackgroundWorker(handle: *mut BackgroundWorkerHandle);
-        }
-        TerminateBackgroundWorker(arg_handle)
-    })
-}
-extern "C" {
-    pub static mut MyBgworkerEntry: *mut BackgroundWorker;
-}
-pub unsafe fn BackgroundWorkerInitializeConnection(
-    arg_dbname: *const ::std::os::raw::c_char,
-    arg_username: *const ::std::os::raw::c_char,
-    arg_flags: uint32,
-) {
-    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
-        extern "C" {
-            pub fn BackgroundWorkerInitializeConnection(
-                dbname: *const ::std::os::raw::c_char,
-                username: *const ::std::os::raw::c_char,
-                flags: uint32,
-            );
-        }
-        BackgroundWorkerInitializeConnection(arg_dbname, arg_username, arg_flags)
-    })
-}
-pub unsafe fn BackgroundWorkerInitializeConnectionByOid(
-    arg_dboid: Oid,
-    arg_useroid: Oid,
-    arg_flags: uint32,
-) {
-    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
-        extern "C" {
-            pub fn BackgroundWorkerInitializeConnectionByOid(
-                dboid: Oid,
-                useroid: Oid,
-                flags: uint32,
-            );
-        }
-        BackgroundWorkerInitializeConnectionByOid(arg_dboid, arg_useroid, arg_flags)
-    })
-}
-pub unsafe fn BackgroundWorkerBlockSignals() {
-    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
-        extern "C" {
-            pub fn BackgroundWorkerBlockSignals();
-        }
-        BackgroundWorkerBlockSignals()
-    })
-}
-pub unsafe fn BackgroundWorkerUnblockSignals() {
-    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
-        extern "C" {
-            pub fn BackgroundWorkerUnblockSignals();
-        }
-        BackgroundWorkerUnblockSignals()
-    })
-}
-pub const SyncRequestType_SYNC_REQUEST: SyncRequestType = 0;
-pub const SyncRequestType_SYNC_UNLINK_REQUEST: SyncRequestType = 1;
-pub const SyncRequestType_SYNC_FORGET_REQUEST: SyncRequestType = 2;
-pub const SyncRequestType_SYNC_FILTER_REQUEST: SyncRequestType = 3;
-pub type SyncRequestType = ::std::os::raw::c_uint;
-pub const SyncRequestHandler_SYNC_HANDLER_MD: SyncRequestHandler = 0;
-pub const SyncRequestHandler_SYNC_HANDLER_CLOG: SyncRequestHandler = 1;
-pub const SyncRequestHandler_SYNC_HANDLER_COMMIT_TS: SyncRequestHandler = 2;
-pub const SyncRequestHandler_SYNC_HANDLER_MULTIXACT_OFFSET: SyncRequestHandler = 3;
-pub const SyncRequestHandler_SYNC_HANDLER_MULTIXACT_MEMBER: SyncRequestHandler = 4;
-pub const SyncRequestHandler_SYNC_HANDLER_NONE: SyncRequestHandler = 5;
-pub type SyncRequestHandler = ::std::os::raw::c_uint;
-#[repr(C)]
-#[derive(Debug, Default, Copy, Clone)]
-pub struct FileTag {
-    pub handler: int16,
-    pub forknum: int16,
-    pub rnode: RelFileNode,
-    pub segno: uint32,
-}
-pub unsafe fn InitSync() {
-    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
-        extern "C" {
-            pub fn InitSync();
-        }
-        InitSync()
-    })
-}
-pub unsafe fn SyncPreCheckpoint() {
-    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
-        extern "C" {
-            pub fn SyncPreCheckpoint();
-        }
-        SyncPreCheckpoint()
-    })
-}
-pub unsafe fn SyncPostCheckpoint() {
-    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
-        extern "C" {
-            pub fn SyncPostCheckpoint();
-        }
-        SyncPostCheckpoint()
-    })
-}
-pub unsafe fn ProcessSyncRequests() {
-    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
-        extern "C" {
-            pub fn ProcessSyncRequests();
-        }
-        ProcessSyncRequests()
-    })
-}
-pub unsafe fn RememberSyncRequest(arg_ftag: *const FileTag, arg_type_: SyncRequestType) {
-    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
-        extern "C" {
-            pub fn RememberSyncRequest(ftag: *const FileTag, type_: SyncRequestType);
-        }
-        RememberSyncRequest(arg_ftag, arg_type_)
-    })
-}
-pub unsafe fn EnableSyncRequestForwarding() {
-    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
-        extern "C" {
-            pub fn EnableSyncRequestForwarding();
-        }
-        EnableSyncRequestForwarding()
-    })
-}
-pub unsafe fn RegisterSyncRequest(
-    arg_ftag: *const FileTag,
-    arg_type_: SyncRequestType,
-    arg_retryOnError: bool,
-) -> bool {
-    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
-        extern "C" {
-            pub fn RegisterSyncRequest(
-                ftag: *const FileTag,
-                type_: SyncRequestType,
-                retryOnError: bool,
-            ) -> bool;
-        }
-        RegisterSyncRequest(arg_ftag, arg_type_, arg_retryOnError)
-    })
-}
-pub type XidStatus = ::std::os::raw::c_int;
-#[repr(C)]
-#[derive(Debug, Default, Copy, Clone)]
-pub struct xl_clog_truncate {
-    pub pageno: ::std::os::raw::c_int,
-    pub oldestXact: TransactionId,
-    pub oldestXactDb: Oid,
-}
-pub unsafe fn TransactionIdSetTreeStatus(
-    arg_xid: TransactionId,
-    arg_nsubxids: ::std::os::raw::c_int,
-    arg_subxids: *mut TransactionId,
-    arg_status: XidStatus,
-    arg_lsn: XLogRecPtr,
-) {
-    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
-        extern "C" {
-            pub fn TransactionIdSetTreeStatus(
-                xid: TransactionId,
-                nsubxids: ::std::os::raw::c_int,
-                subxids: *mut TransactionId,
-                status: XidStatus,
-                lsn: XLogRecPtr,
-            );
-        }
-        TransactionIdSetTreeStatus(arg_xid, arg_nsubxids, arg_subxids, arg_status, arg_lsn)
-    })
-}
-pub unsafe fn TransactionIdGetStatus(
-    arg_xid: TransactionId,
-    arg_lsn: *mut XLogRecPtr,
-) -> XidStatus {
-    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
-        extern "C" {
-            pub fn TransactionIdGetStatus(xid: TransactionId, lsn: *mut XLogRecPtr) -> XidStatus;
-        }
-        TransactionIdGetStatus(arg_xid, arg_lsn)
-    })
-}
-pub unsafe fn CLOGShmemBuffers() -> Size {
-    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
-        extern "C" {
-            pub fn CLOGShmemBuffers() -> Size;
-        }
-        CLOGShmemBuffers()
-    })
-}
-pub unsafe fn CLOGShmemSize() -> Size {
-    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
-        extern "C" {
-            pub fn CLOGShmemSize() -> Size;
-        }
-        CLOGShmemSize()
-    })
-}
-pub unsafe fn CLOGShmemInit() {
-    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
-        extern "C" {
-            pub fn CLOGShmemInit();
-        }
-        CLOGShmemInit()
-    })
-}
-pub unsafe fn BootStrapCLOG() {
-    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
-        extern "C" {
-            pub fn BootStrapCLOG();
-        }
-        BootStrapCLOG()
-    })
-}
-pub unsafe fn StartupCLOG() {
-    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
-        extern "C" {
-            pub fn StartupCLOG();
-        }
-        StartupCLOG()
-    })
-}
-pub unsafe fn TrimCLOG() {
-    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
-        extern "C" {
-            pub fn TrimCLOG();
-        }
-        TrimCLOG()
-    })
-}
-pub unsafe fn CheckPointCLOG() {
-    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
-        extern "C" {
-            pub fn CheckPointCLOG();
-        }
-        CheckPointCLOG()
-    })
-}
-pub unsafe fn ExtendCLOG(arg_newestXact: TransactionId) {
-    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
-        extern "C" {
-            pub fn ExtendCLOG(newestXact: TransactionId);
-        }
-        ExtendCLOG(arg_newestXact)
-    })
-}
-pub unsafe fn TruncateCLOG(arg_oldestXact: TransactionId, arg_oldestxid_datoid: Oid) {
-    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
-        extern "C" {
-            pub fn TruncateCLOG(oldestXact: TransactionId, oldestxid_datoid: Oid);
-        }
-        TruncateCLOG(arg_oldestXact, arg_oldestxid_datoid)
-    })
-}
-pub unsafe fn clogsyncfiletag(
-    arg_ftag: *const FileTag,
-    arg_path: *mut ::std::os::raw::c_char,
-) -> ::std::os::raw::c_int {
-    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
-        extern "C" {
-            pub fn clogsyncfiletag(
-                ftag: *const FileTag,
-                path: *mut ::std::os::raw::c_char,
-            ) -> ::std::os::raw::c_int;
-        }
-        clogsyncfiletag(arg_ftag, arg_path)
-    })
-}
-pub unsafe fn clog_redo(arg_record: *mut XLogReaderState) {
-    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
-        extern "C" {
-            pub fn clog_redo(record: *mut XLogReaderState);
-        }
-        clog_redo(arg_record)
-    })
-}
-pub unsafe fn clog_desc(arg_buf: StringInfo, arg_record: *mut XLogReaderState) {
-    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
-        extern "C" {
-            pub fn clog_desc(buf: StringInfo, record: *mut XLogReaderState);
-        }
-        clog_desc(arg_buf, arg_record)
-    })
-}
-pub unsafe fn clog_identify(arg_info: uint8) -> *const ::std::os::raw::c_char {
-    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
-        extern "C" {
-            pub fn clog_identify(info: uint8) -> *const ::std::os::raw::c_char;
-        }
-        clog_identify(arg_info)
-    })
-}
-#[repr(C)]
-#[derive(Debug, Default, Copy, Clone)]
-pub struct Latch {
-    pub is_set: sig_atomic_t,
-    pub maybe_sleeping: sig_atomic_t,
-    pub is_shared: bool,
-    pub owner_pid: ::std::os::raw::c_int,
-}
-#[repr(C)]
-#[derive(Debug, Copy, Clone)]
-pub struct WaitEvent {
-    pub pos: ::std::os::raw::c_int,
-    pub events: uint32,
-    pub fd: pgsocket,
-    pub user_data: *mut ::std::os::raw::c_void,
-}
-impl Default for WaitEvent {
-    fn default() -> Self {
-        let mut s = ::std::mem::MaybeUninit::<Self>::uninit();
-        unsafe {
-            ::std::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
-            s.assume_init()
-        }
-    }
-}
-pub unsafe fn InitializeLatchSupport() {
-    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
-        extern "C" {
-            pub fn InitializeLatchSupport();
-        }
-        InitializeLatchSupport()
-    })
-}
-pub unsafe fn InitLatch(arg_latch: *mut Latch) {
-    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
-        extern "C" {
-            pub fn InitLatch(latch: *mut Latch);
-        }
-        InitLatch(arg_latch)
-    })
-}
-pub unsafe fn InitSharedLatch(arg_latch: *mut Latch) {
-    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
-        extern "C" {
-            pub fn InitSharedLatch(latch: *mut Latch);
-        }
-        InitSharedLatch(arg_latch)
-    })
-}
-pub unsafe fn OwnLatch(arg_latch: *mut Latch) {
-    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
-        extern "C" {
-            pub fn OwnLatch(latch: *mut Latch);
-        }
-        OwnLatch(arg_latch)
-    })
-}
-pub unsafe fn DisownLatch(arg_latch: *mut Latch) {
-    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
-        extern "C" {
-            pub fn DisownLatch(latch: *mut Latch);
-        }
-        DisownLatch(arg_latch)
-    })
-}
-pub unsafe fn SetLatch(arg_latch: *mut Latch) {
-    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
-        extern "C" {
-            pub fn SetLatch(latch: *mut Latch);
-        }
-        SetLatch(arg_latch)
-    })
-}
-pub unsafe fn ResetLatch(arg_latch: *mut Latch) {
-    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
-        extern "C" {
-            pub fn ResetLatch(latch: *mut Latch);
-        }
-        ResetLatch(arg_latch)
-    })
-}
-pub unsafe fn ShutdownLatchSupport() {
-    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
-        extern "C" {
-            pub fn ShutdownLatchSupport();
-        }
-        ShutdownLatchSupport()
-    })
-}
-pub unsafe fn CreateWaitEventSet(
-    arg_context: MemoryContext,
-    arg_nevents: ::std::os::raw::c_int,
-) -> *mut WaitEventSet {
-    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
-        extern "C" {
-            pub fn CreateWaitEventSet(
-                context: MemoryContext,
-                nevents: ::std::os::raw::c_int,
-            ) -> *mut WaitEventSet;
-        }
-        CreateWaitEventSet(arg_context, arg_nevents)
-    })
-}
-pub unsafe fn FreeWaitEventSet(arg_set: *mut WaitEventSet) {
-    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
-        extern "C" {
-            pub fn FreeWaitEventSet(set: *mut WaitEventSet);
-        }
-        FreeWaitEventSet(arg_set)
-    })
-}
-pub unsafe fn AddWaitEventToSet(
-    arg_set: *mut WaitEventSet,
-    arg_events: uint32,
-    arg_fd: pgsocket,
-    arg_latch: *mut Latch,
-    arg_user_data: *mut ::std::os::raw::c_void,
-) -> ::std::os::raw::c_int {
-    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
-        extern "C" {
-            pub fn AddWaitEventToSet(
-                set: *mut WaitEventSet,
-                events: uint32,
-                fd: pgsocket,
-                latch: *mut Latch,
-                user_data: *mut ::std::os::raw::c_void,
-            ) -> ::std::os::raw::c_int;
-        }
-        AddWaitEventToSet(arg_set, arg_events, arg_fd, arg_latch, arg_user_data)
-    })
-}
-pub unsafe fn ModifyWaitEvent(
-    arg_set: *mut WaitEventSet,
-    arg_pos: ::std::os::raw::c_int,
-    arg_events: uint32,
-    arg_latch: *mut Latch,
-) {
-    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
-        extern "C" {
-            pub fn ModifyWaitEvent(
-                set: *mut WaitEventSet,
-                pos: ::std::os::raw::c_int,
-                events: uint32,
-                latch: *mut Latch,
-            );
-        }
-        ModifyWaitEvent(arg_set, arg_pos, arg_events, arg_latch)
-    })
-}
-pub unsafe fn WaitEventSetWait(
-    arg_set: *mut WaitEventSet,
-    arg_timeout: ::std::os::raw::c_long,
-    arg_occurred_events: *mut WaitEvent,
-    arg_nevents: ::std::os::raw::c_int,
-    arg_wait_event_info: uint32,
-) -> ::std::os::raw::c_int {
-    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
-        extern "C" {
-            pub fn WaitEventSetWait(
-                set: *mut WaitEventSet,
-                timeout: ::std::os::raw::c_long,
-                occurred_events: *mut WaitEvent,
-                nevents: ::std::os::raw::c_int,
-                wait_event_info: uint32,
-            ) -> ::std::os::raw::c_int;
-        }
-        WaitEventSetWait(
-            arg_set,
-            arg_timeout,
-            arg_occurred_events,
-            arg_nevents,
-            arg_wait_event_info,
-        )
-    })
-}
-pub unsafe fn WaitLatch(
-    arg_latch: *mut Latch,
-    arg_wakeEvents: ::std::os::raw::c_int,
-    arg_timeout: ::std::os::raw::c_long,
-    arg_wait_event_info: uint32,
-) -> ::std::os::raw::c_int {
-    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
-        extern "C" {
-            pub fn WaitLatch(
-                latch: *mut Latch,
-                wakeEvents: ::std::os::raw::c_int,
-                timeout: ::std::os::raw::c_long,
-                wait_event_info: uint32,
-            ) -> ::std::os::raw::c_int;
-        }
-        WaitLatch(arg_latch, arg_wakeEvents, arg_timeout, arg_wait_event_info)
-    })
-}
-pub unsafe fn WaitLatchOrSocket(
-    arg_latch: *mut Latch,
-    arg_wakeEvents: ::std::os::raw::c_int,
-    arg_sock: pgsocket,
-    arg_timeout: ::std::os::raw::c_long,
-    arg_wait_event_info: uint32,
-) -> ::std::os::raw::c_int {
-    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
-        extern "C" {
-            pub fn WaitLatchOrSocket(
-                latch: *mut Latch,
-                wakeEvents: ::std::os::raw::c_int,
-                sock: pgsocket,
-                timeout: ::std::os::raw::c_long,
-                wait_event_info: uint32,
-            ) -> ::std::os::raw::c_int;
-        }
-        WaitLatchOrSocket(arg_latch, arg_wakeEvents, arg_sock, arg_timeout, arg_wait_event_info)
-    })
-}
-pub unsafe fn InitializeLatchWaitSet() {
-    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
-        extern "C" {
-            pub fn InitializeLatchWaitSet();
-        }
-        InitializeLatchWaitSet()
-    })
-}
-pub unsafe fn GetNumRegisteredWaitEvents(arg_set: *mut WaitEventSet) -> ::std::os::raw::c_int {
-    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
-        extern "C" {
-            pub fn GetNumRegisteredWaitEvents(set: *mut WaitEventSet) -> ::std::os::raw::c_int;
-        }
-        GetNumRegisteredWaitEvents(arg_set)
-    })
-}
-#[repr(C)]
-#[derive(Debug, Copy, Clone)]
-pub struct PGSemaphoreData {
-    _unused: [u8; 0],
-}
-pub type PGSemaphore = *mut PGSemaphoreData;
-pub unsafe fn PGSemaphoreShmemSize(arg_maxSemas: ::std::os::raw::c_int) -> Size {
-    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
-        extern "C" {
-            pub fn PGSemaphoreShmemSize(maxSemas: ::std::os::raw::c_int) -> Size;
-        }
-        PGSemaphoreShmemSize(arg_maxSemas)
-    })
-}
-pub unsafe fn PGReserveSemaphores(arg_maxSemas: ::std::os::raw::c_int) {
-    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
-        extern "C" {
-            pub fn PGReserveSemaphores(maxSemas: ::std::os::raw::c_int);
-        }
-        PGReserveSemaphores(arg_maxSemas)
-    })
-}
-pub unsafe fn PGSemaphoreCreate() -> PGSemaphore {
-    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
-        extern "C" {
-            pub fn PGSemaphoreCreate() -> PGSemaphore;
-        }
-        PGSemaphoreCreate()
-    })
-}
-pub unsafe fn PGSemaphoreReset(arg_sema: PGSemaphore) {
-    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
-        extern "C" {
-            pub fn PGSemaphoreReset(sema: PGSemaphore);
-        }
-        PGSemaphoreReset(arg_sema)
-    })
-}
-pub unsafe fn PGSemaphoreLock(arg_sema: PGSemaphore) {
-    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
-        extern "C" {
-            pub fn PGSemaphoreLock(sema: PGSemaphore);
-        }
-        PGSemaphoreLock(arg_sema)
-    })
-}
-pub unsafe fn PGSemaphoreUnlock(arg_sema: PGSemaphore) {
-    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
-        extern "C" {
-            pub fn PGSemaphoreUnlock(sema: PGSemaphore);
-        }
-        PGSemaphoreUnlock(arg_sema)
-    })
-}
-pub unsafe fn PGSemaphoreTryLock(arg_sema: PGSemaphore) -> bool {
-    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
-        extern "C" {
-            pub fn PGSemaphoreTryLock(sema: PGSemaphore) -> bool;
-        }
-        PGSemaphoreTryLock(arg_sema)
-    })
-}
-#[repr(C)]
-#[derive(Debug, Default, Copy, Clone)]
-pub struct XidCacheStatus {
-    pub count: uint8,
-    pub overflowed: bool,
-}
-#[repr(C)]
-#[derive(Debug, Copy, Clone)]
-pub struct XidCache {
-    pub xids: [TransactionId; 64usize],
-}
-impl Default for XidCache {
-    fn default() -> Self {
-        let mut s = ::std::mem::MaybeUninit::<Self>::uninit();
-        unsafe {
-            ::std::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
-            s.assume_init()
-        }
-    }
-}
-pub const ProcWaitStatus_PROC_WAIT_STATUS_OK: ProcWaitStatus = 0;
-pub const ProcWaitStatus_PROC_WAIT_STATUS_WAITING: ProcWaitStatus = 1;
-pub const ProcWaitStatus_PROC_WAIT_STATUS_ERROR: ProcWaitStatus = 2;
-pub type ProcWaitStatus = ::std::os::raw::c_uint;
-#[repr(C)]
-#[derive(Debug, Copy, Clone)]
-pub struct PGPROC {
-    pub links: SHM_QUEUE,
-    pub procgloballist: *mut *mut PGPROC,
-    pub sem: PGSemaphore,
-    pub waitStatus: ProcWaitStatus,
-    pub procLatch: Latch,
-    pub xid: TransactionId,
-    pub xmin: TransactionId,
-    pub lxid: LocalTransactionId,
-    pub pid: ::std::os::raw::c_int,
-    pub pgxactoff: ::std::os::raw::c_int,
-    pub pgprocno: ::std::os::raw::c_int,
-    pub backendId: BackendId,
-    pub databaseId: Oid,
-    pub roleId: Oid,
-    pub tempNamespaceId: Oid,
-    pub isBackgroundWorker: bool,
-    pub recoveryConflictPending: bool,
-    pub lwWaiting: bool,
-    pub lwWaitMode: uint8,
-    pub lwWaitLink: proclist_node,
-    pub cvWaitLink: proclist_node,
-    pub waitLock: *mut LOCK,
-    pub waitProcLock: *mut PROCLOCK,
-    pub waitLockMode: LOCKMODE,
-    pub heldLocks: LOCKMASK,
-    pub waitStart: pg_atomic_uint64,
-    pub delayChkpt: bool,
-    pub statusFlags: uint8,
-    pub delayChkptEnd: bool,
-    pub waitLSN: XLogRecPtr,
-    pub syncRepState: ::std::os::raw::c_int,
-    pub syncRepLinks: SHM_QUEUE,
-    pub myProcLocks: [SHM_QUEUE; 16usize],
-    pub subxidStatus: XidCacheStatus,
-    pub subxids: XidCache,
-    pub procArrayGroupMember: bool,
-    pub procArrayGroupNext: pg_atomic_uint32,
-    pub procArrayGroupMemberXid: TransactionId,
-    pub wait_event_info: uint32,
-    pub clogGroupMember: bool,
-    pub clogGroupNext: pg_atomic_uint32,
-    pub clogGroupMemberXid: TransactionId,
-    pub clogGroupMemberXidStatus: XidStatus,
-    pub clogGroupMemberPage: ::std::os::raw::c_int,
-    pub clogGroupMemberLsn: XLogRecPtr,
-    pub fpInfoLock: LWLock,
-    pub fpLockBits: uint64,
-    pub fpRelId: [Oid; 16usize],
-    pub fpVXIDLock: bool,
-    pub fpLocalTransactionId: LocalTransactionId,
-    pub lockGroupLeader: *mut PGPROC,
-    pub lockGroupMembers: dlist_head,
-    pub lockGroupLink: dlist_node,
-}
-impl Default for PGPROC {
-    fn default() -> Self {
-        let mut s = ::std::mem::MaybeUninit::<Self>::uninit();
-        unsafe {
-            ::std::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
-            s.assume_init()
-        }
-    }
-}
-extern "C" {
-    pub static mut MyProc: *mut PGPROC;
-}
-#[repr(C)]
-#[derive(Debug, Copy, Clone)]
-pub struct PROC_HDR {
-    pub allProcs: *mut PGPROC,
-    pub xids: *mut TransactionId,
-    pub subxidStates: *mut XidCacheStatus,
-    pub statusFlags: *mut uint8,
-    pub allProcCount: uint32,
-    pub freeProcs: *mut PGPROC,
-    pub autovacFreeProcs: *mut PGPROC,
-    pub bgworkerFreeProcs: *mut PGPROC,
-    pub walsenderFreeProcs: *mut PGPROC,
-    pub procArrayGroupFirst: pg_atomic_uint32,
-    pub clogGroupFirst: pg_atomic_uint32,
-    pub walwriterLatch: *mut Latch,
-    pub checkpointerLatch: *mut Latch,
-    pub spins_per_delay: ::std::os::raw::c_int,
-    pub startupProc: *mut PGPROC,
-    pub startupProcPid: ::std::os::raw::c_int,
-    pub startupBufferPinWaitBufId: ::std::os::raw::c_int,
-}
-impl Default for PROC_HDR {
-    fn default() -> Self {
-        let mut s = ::std::mem::MaybeUninit::<Self>::uninit();
-        unsafe {
-            ::std::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
-            s.assume_init()
-        }
-    }
-}
-extern "C" {
-    pub static mut ProcGlobal: *mut PROC_HDR;
-}
-extern "C" {
-    pub static mut PreparedXactProcs: *mut PGPROC;
-}
-extern "C" {
-    pub static mut DeadlockTimeout: ::std::os::raw::c_int;
-}
-extern "C" {
-    pub static mut StatementTimeout: ::std::os::raw::c_int;
-}
-extern "C" {
-    pub static mut LockTimeout: ::std::os::raw::c_int;
-}
-extern "C" {
-    pub static mut IdleInTransactionSessionTimeout: ::std::os::raw::c_int;
-}
-extern "C" {
-    pub static mut IdleSessionTimeout: ::std::os::raw::c_int;
-}
-extern "C" {
-    pub static mut log_lock_waits: bool;
-}
-pub unsafe fn ProcGlobalSemas() -> ::std::os::raw::c_int {
-    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
-        extern "C" {
-            pub fn ProcGlobalSemas() -> ::std::os::raw::c_int;
-        }
-        ProcGlobalSemas()
-    })
-}
-pub unsafe fn ProcGlobalShmemSize() -> Size {
-    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
-        extern "C" {
-            pub fn ProcGlobalShmemSize() -> Size;
-        }
-        ProcGlobalShmemSize()
-    })
-}
-pub unsafe fn InitProcGlobal() {
-    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
-        extern "C" {
-            pub fn InitProcGlobal();
-        }
-        InitProcGlobal()
-    })
-}
-pub unsafe fn InitProcess() {
-    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
-        extern "C" {
-            pub fn InitProcess();
-        }
-        InitProcess()
-    })
-}
-pub unsafe fn InitProcessPhase2() {
-    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
-        extern "C" {
-            pub fn InitProcessPhase2();
-        }
-        InitProcessPhase2()
-    })
-}
-pub unsafe fn InitAuxiliaryProcess() {
-    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
-        extern "C" {
-            pub fn InitAuxiliaryProcess();
-        }
-        InitAuxiliaryProcess()
-    })
-}
-pub unsafe fn PublishStartupProcessInformation() {
-    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
-        extern "C" {
-            pub fn PublishStartupProcessInformation();
-        }
-        PublishStartupProcessInformation()
-    })
-}
-pub unsafe fn SetStartupBufferPinWaitBufId(arg_bufid: ::std::os::raw::c_int) {
-    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
-        extern "C" {
-            pub fn SetStartupBufferPinWaitBufId(bufid: ::std::os::raw::c_int);
-        }
-        SetStartupBufferPinWaitBufId(arg_bufid)
-    })
-}
-pub unsafe fn GetStartupBufferPinWaitBufId() -> ::std::os::raw::c_int {
-    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
-        extern "C" {
-            pub fn GetStartupBufferPinWaitBufId() -> ::std::os::raw::c_int;
-        }
-        GetStartupBufferPinWaitBufId()
-    })
-}
-pub unsafe fn HaveNFreeProcs(arg_n: ::std::os::raw::c_int) -> bool {
-    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
-        extern "C" {
-            pub fn HaveNFreeProcs(n: ::std::os::raw::c_int) -> bool;
-        }
-        HaveNFreeProcs(arg_n)
-    })
-}
-pub unsafe fn ProcReleaseLocks(arg_isCommit: bool) {
-    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
-        extern "C" {
-            pub fn ProcReleaseLocks(isCommit: bool);
-        }
-        ProcReleaseLocks(arg_isCommit)
-    })
-}
-pub unsafe fn ProcQueueInit(arg_queue: *mut PROC_QUEUE) {
-    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
-        extern "C" {
-            pub fn ProcQueueInit(queue: *mut PROC_QUEUE);
-        }
-        ProcQueueInit(arg_queue)
-    })
-}
-pub unsafe fn ProcSleep(
-    arg_locallock: *mut LOCALLOCK,
-    arg_lockMethodTable: LockMethod,
-) -> ProcWaitStatus {
-    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
-        extern "C" {
-            pub fn ProcSleep(
-                locallock: *mut LOCALLOCK,
-                lockMethodTable: LockMethod,
-            ) -> ProcWaitStatus;
-        }
-        ProcSleep(arg_locallock, arg_lockMethodTable)
-    })
-}
-pub unsafe fn ProcWakeup(arg_proc_: *mut PGPROC, arg_waitStatus: ProcWaitStatus) -> *mut PGPROC {
-    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
-        extern "C" {
-            pub fn ProcWakeup(proc_: *mut PGPROC, waitStatus: ProcWaitStatus) -> *mut PGPROC;
-        }
-        ProcWakeup(arg_proc_, arg_waitStatus)
-    })
-}
-pub unsafe fn ProcLockWakeup(arg_lockMethodTable: LockMethod, arg_lock: *mut LOCK) {
-    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
-        extern "C" {
-            pub fn ProcLockWakeup(lockMethodTable: LockMethod, lock: *mut LOCK);
-        }
-        ProcLockWakeup(arg_lockMethodTable, arg_lock)
-    })
-}
-pub unsafe fn CheckDeadLockAlert() {
-    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
-        extern "C" {
-            pub fn CheckDeadLockAlert();
-        }
-        CheckDeadLockAlert()
-    })
-}
-pub unsafe fn IsWaitingForLock() -> bool {
-    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
-        extern "C" {
-            pub fn IsWaitingForLock() -> bool;
-        }
-        IsWaitingForLock()
-    })
-}
-pub unsafe fn LockErrorCleanup() {
-    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
-        extern "C" {
-            pub fn LockErrorCleanup();
-        }
-        LockErrorCleanup()
-    })
-}
-pub unsafe fn ProcWaitForSignal(arg_wait_event_info: uint32) {
-    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
-        extern "C" {
-            pub fn ProcWaitForSignal(wait_event_info: uint32);
-        }
-        ProcWaitForSignal(arg_wait_event_info)
-    })
-}
-pub unsafe fn ProcSendSignal(arg_pid: ::std::os::raw::c_int) {
-    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
-        extern "C" {
-            pub fn ProcSendSignal(pid: ::std::os::raw::c_int);
-        }
-        ProcSendSignal(arg_pid)
-    })
-}
-pub unsafe fn AuxiliaryPidGetProc(arg_pid: ::std::os::raw::c_int) -> *mut PGPROC {
-    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
-        extern "C" {
-            pub fn AuxiliaryPidGetProc(pid: ::std::os::raw::c_int) -> *mut PGPROC;
-        }
-        AuxiliaryPidGetProc(arg_pid)
-    })
-}
-pub unsafe fn BecomeLockGroupLeader() {
-    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
-        extern "C" {
-            pub fn BecomeLockGroupLeader();
-        }
-        BecomeLockGroupLeader()
-    })
-}
-pub unsafe fn BecomeLockGroupMember(
-    arg_leader: *mut PGPROC,
-    arg_pid: ::std::os::raw::c_int,
-) -> bool {
-    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
-        extern "C" {
-            pub fn BecomeLockGroupMember(leader: *mut PGPROC, pid: ::std::os::raw::c_int) -> bool;
-        }
-        BecomeLockGroupMember(arg_leader, arg_pid)
-    })
-}
-#[repr(C)]
-#[derive(Debug, Copy, Clone)]
-pub struct shm_mq {
-    _unused: [u8; 0],
-}
-#[repr(C)]
-#[derive(Debug, Copy, Clone)]
-pub struct shm_mq_handle {
-    _unused: [u8; 0],
-}
-#[repr(C)]
-#[derive(Debug, Copy, Clone)]
-pub struct shm_mq_iovec {
-    pub data: *const ::std::os::raw::c_char,
-    pub len: Size,
-}
-impl Default for shm_mq_iovec {
-    fn default() -> Self {
-        let mut s = ::std::mem::MaybeUninit::<Self>::uninit();
-        unsafe {
-            ::std::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
-            s.assume_init()
-        }
-    }
-}
-pub const shm_mq_result_SHM_MQ_SUCCESS: shm_mq_result = 0;
-pub const shm_mq_result_SHM_MQ_WOULD_BLOCK: shm_mq_result = 1;
-pub const shm_mq_result_SHM_MQ_DETACHED: shm_mq_result = 2;
-pub type shm_mq_result = ::std::os::raw::c_uint;
-pub unsafe fn shm_mq_create(
-    arg_address: *mut ::std::os::raw::c_void,
-    arg_size: Size,
-) -> *mut shm_mq {
-    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
-        extern "C" {
-            pub fn shm_mq_create(address: *mut ::std::os::raw::c_void, size: Size) -> *mut shm_mq;
-        }
-        shm_mq_create(arg_address, arg_size)
-    })
-}
-pub unsafe fn shm_mq_set_receiver(arg_mq: *mut shm_mq, arg_arg1: *mut PGPROC) {
-    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
-        extern "C" {
-            pub fn shm_mq_set_receiver(mq: *mut shm_mq, arg1: *mut PGPROC);
-        }
-        shm_mq_set_receiver(arg_mq, arg_arg1)
-    })
-}
-pub unsafe fn shm_mq_set_sender(arg_mq: *mut shm_mq, arg_arg1: *mut PGPROC) {
-    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
-        extern "C" {
-            pub fn shm_mq_set_sender(mq: *mut shm_mq, arg1: *mut PGPROC);
-        }
-        shm_mq_set_sender(arg_mq, arg_arg1)
-    })
-}
-pub unsafe fn shm_mq_get_receiver(arg_arg1: *mut shm_mq) -> *mut PGPROC {
-    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
-        extern "C" {
-            pub fn shm_mq_get_receiver(arg1: *mut shm_mq) -> *mut PGPROC;
-        }
-        shm_mq_get_receiver(arg_arg1)
-    })
-}
-pub unsafe fn shm_mq_get_sender(arg_arg1: *mut shm_mq) -> *mut PGPROC {
-    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
-        extern "C" {
-            pub fn shm_mq_get_sender(arg1: *mut shm_mq) -> *mut PGPROC;
-        }
-        shm_mq_get_sender(arg_arg1)
-    })
-}
-pub unsafe fn shm_mq_attach(
-    arg_mq: *mut shm_mq,
-    arg_seg: *mut dsm_segment,
-    arg_handle: *mut BackgroundWorkerHandle,
-) -> *mut shm_mq_handle {
-    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
-        extern "C" {
-            pub fn shm_mq_attach(
-                mq: *mut shm_mq,
-                seg: *mut dsm_segment,
-                handle: *mut BackgroundWorkerHandle,
-            ) -> *mut shm_mq_handle;
-        }
-        shm_mq_attach(arg_mq, arg_seg, arg_handle)
-    })
-}
-pub unsafe fn shm_mq_set_handle(
-    arg_arg1: *mut shm_mq_handle,
-    arg_arg2: *mut BackgroundWorkerHandle,
-) {
-    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
-        extern "C" {
-            pub fn shm_mq_set_handle(arg1: *mut shm_mq_handle, arg2: *mut BackgroundWorkerHandle);
-        }
-        shm_mq_set_handle(arg_arg1, arg_arg2)
-    })
-}
-pub unsafe fn shm_mq_detach(arg_mqh: *mut shm_mq_handle) {
-    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
-        extern "C" {
-            pub fn shm_mq_detach(mqh: *mut shm_mq_handle);
-        }
-        shm_mq_detach(arg_mqh)
-    })
-}
-pub unsafe fn shm_mq_get_queue(arg_mqh: *mut shm_mq_handle) -> *mut shm_mq {
-    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
-        extern "C" {
-            pub fn shm_mq_get_queue(mqh: *mut shm_mq_handle) -> *mut shm_mq;
-        }
-        shm_mq_get_queue(arg_mqh)
-    })
-}
-pub unsafe fn shm_mq_send(
-    arg_mqh: *mut shm_mq_handle,
-    arg_nbytes: Size,
-    arg_data: *const ::std::os::raw::c_void,
-    arg_nowait: bool,
-) -> shm_mq_result {
-    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
-        extern "C" {
-            pub fn shm_mq_send(
-                mqh: *mut shm_mq_handle,
-                nbytes: Size,
-                data: *const ::std::os::raw::c_void,
-                nowait: bool,
-            ) -> shm_mq_result;
-        }
-        shm_mq_send(arg_mqh, arg_nbytes, arg_data, arg_nowait)
-    })
-}
-pub unsafe fn shm_mq_sendv(
-    arg_mqh: *mut shm_mq_handle,
-    arg_iov: *mut shm_mq_iovec,
-    arg_iovcnt: ::std::os::raw::c_int,
-    arg_nowait: bool,
-) -> shm_mq_result {
-    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
-        extern "C" {
-            pub fn shm_mq_sendv(
-                mqh: *mut shm_mq_handle,
-                iov: *mut shm_mq_iovec,
-                iovcnt: ::std::os::raw::c_int,
-                nowait: bool,
-            ) -> shm_mq_result;
-        }
-        shm_mq_sendv(arg_mqh, arg_iov, arg_iovcnt, arg_nowait)
-    })
-}
-pub unsafe fn shm_mq_receive(
-    arg_mqh: *mut shm_mq_handle,
-    arg_nbytesp: *mut Size,
-    arg_datap: *mut *mut ::std::os::raw::c_void,
-    arg_nowait: bool,
-) -> shm_mq_result {
-    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
-        extern "C" {
-            pub fn shm_mq_receive(
-                mqh: *mut shm_mq_handle,
-                nbytesp: *mut Size,
-                datap: *mut *mut ::std::os::raw::c_void,
-                nowait: bool,
-            ) -> shm_mq_result;
-        }
-        shm_mq_receive(arg_mqh, arg_nbytesp, arg_datap, arg_nowait)
-    })
-}
-pub unsafe fn shm_mq_wait_for_attach(arg_mqh: *mut shm_mq_handle) -> shm_mq_result {
-    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
-        extern "C" {
-            pub fn shm_mq_wait_for_attach(mqh: *mut shm_mq_handle) -> shm_mq_result;
-        }
-        shm_mq_wait_for_attach(arg_mqh)
-    })
-}
-extern "C" {
-    pub static shm_mq_minimum_size: Size;
-}
-pub type parallel_worker_main_type =
-    ::std::option::Option<unsafe extern "C" fn(seg: *mut dsm_segment, toc: *mut shm_toc)>;
-#[repr(C)]
-#[derive(Debug, Copy, Clone)]
-pub struct ParallelWorkerInfo {
-    pub bgwhandle: *mut BackgroundWorkerHandle,
-    pub error_mqh: *mut shm_mq_handle,
-    pub pid: int32,
-}
-impl Default for ParallelWorkerInfo {
-    fn default() -> Self {
-        let mut s = ::std::mem::MaybeUninit::<Self>::uninit();
-        unsafe {
-            ::std::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
-            s.assume_init()
-        }
-    }
-}
-#[repr(C)]
-#[derive(Debug, Copy, Clone)]
-pub struct ParallelContext {
-    pub node: dlist_node,
-    pub subid: SubTransactionId,
-    pub nworkers: ::std::os::raw::c_int,
-    pub nworkers_to_launch: ::std::os::raw::c_int,
-    pub nworkers_launched: ::std::os::raw::c_int,
-    pub library_name: *mut ::std::os::raw::c_char,
-    pub function_name: *mut ::std::os::raw::c_char,
-    pub error_context_stack: *mut ErrorContextCallback,
-    pub estimator: shm_toc_estimator,
-    pub seg: *mut dsm_segment,
-    pub private_memory: *mut ::std::os::raw::c_void,
-    pub toc: *mut shm_toc,
-    pub worker: *mut ParallelWorkerInfo,
-    pub nknown_attached_workers: ::std::os::raw::c_int,
-    pub known_attached_workers: *mut bool,
-}
-impl Default for ParallelContext {
-    fn default() -> Self {
-        let mut s = ::std::mem::MaybeUninit::<Self>::uninit();
-        unsafe {
-            ::std::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
-            s.assume_init()
-        }
-    }
-}
-#[repr(C)]
-#[derive(Debug, Copy, Clone)]
-pub struct ParallelWorkerContext {
-    pub seg: *mut dsm_segment,
-    pub toc: *mut shm_toc,
-}
-impl Default for ParallelWorkerContext {
-    fn default() -> Self {
-        let mut s = ::std::mem::MaybeUninit::<Self>::uninit();
-        unsafe {
-            ::std::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
-            s.assume_init()
-        }
-    }
-}
-extern "C" {
-    pub static mut ParallelMessagePending: bool;
-}
-extern "C" {
-    pub static mut ParallelWorkerNumber: ::std::os::raw::c_int;
-}
-extern "C" {
-    pub static mut InitializingParallelWorker: bool;
-}
-pub unsafe fn CreateParallelContext(
-    arg_library_name: *const ::std::os::raw::c_char,
-    arg_function_name: *const ::std::os::raw::c_char,
-    arg_nworkers: ::std::os::raw::c_int,
-) -> *mut ParallelContext {
-    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
-        extern "C" {
-            pub fn CreateParallelContext(
-                library_name: *const ::std::os::raw::c_char,
-                function_name: *const ::std::os::raw::c_char,
-                nworkers: ::std::os::raw::c_int,
-            ) -> *mut ParallelContext;
-        }
-        CreateParallelContext(arg_library_name, arg_function_name, arg_nworkers)
-    })
-}
-pub unsafe fn InitializeParallelDSM(arg_pcxt: *mut ParallelContext) {
-    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
-        extern "C" {
-            pub fn InitializeParallelDSM(pcxt: *mut ParallelContext);
-        }
-        InitializeParallelDSM(arg_pcxt)
-    })
-}
-pub unsafe fn ReinitializeParallelDSM(arg_pcxt: *mut ParallelContext) {
-    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
-        extern "C" {
-            pub fn ReinitializeParallelDSM(pcxt: *mut ParallelContext);
-        }
-        ReinitializeParallelDSM(arg_pcxt)
-    })
-}
-pub unsafe fn ReinitializeParallelWorkers(
-    arg_pcxt: *mut ParallelContext,
-    arg_nworkers_to_launch: ::std::os::raw::c_int,
-) {
-    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
-        extern "C" {
-            pub fn ReinitializeParallelWorkers(
-                pcxt: *mut ParallelContext,
-                nworkers_to_launch: ::std::os::raw::c_int,
-            );
-        }
-        ReinitializeParallelWorkers(arg_pcxt, arg_nworkers_to_launch)
-    })
-}
-pub unsafe fn LaunchParallelWorkers(arg_pcxt: *mut ParallelContext) {
-    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
-        extern "C" {
-            pub fn LaunchParallelWorkers(pcxt: *mut ParallelContext);
-        }
-        LaunchParallelWorkers(arg_pcxt)
-    })
-}
-pub unsafe fn WaitForParallelWorkersToAttach(arg_pcxt: *mut ParallelContext) {
-    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
-        extern "C" {
-            pub fn WaitForParallelWorkersToAttach(pcxt: *mut ParallelContext);
-        }
-        WaitForParallelWorkersToAttach(arg_pcxt)
-    })
-}
-pub unsafe fn WaitForParallelWorkersToFinish(arg_pcxt: *mut ParallelContext) {
-    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
-        extern "C" {
-            pub fn WaitForParallelWorkersToFinish(pcxt: *mut ParallelContext);
-        }
-        WaitForParallelWorkersToFinish(arg_pcxt)
-    })
-}
-pub unsafe fn DestroyParallelContext(arg_pcxt: *mut ParallelContext) {
-    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
-        extern "C" {
-            pub fn DestroyParallelContext(pcxt: *mut ParallelContext);
-        }
-        DestroyParallelContext(arg_pcxt)
-    })
-}
-pub unsafe fn ParallelContextActive() -> bool {
-    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
-        extern "C" {
-            pub fn ParallelContextActive() -> bool;
-        }
-        ParallelContextActive()
-    })
-}
-pub unsafe fn HandleParallelMessageInterrupt() {
-    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
-        extern "C" {
-            pub fn HandleParallelMessageInterrupt();
-        }
-        HandleParallelMessageInterrupt()
-    })
-}
-pub unsafe fn HandleParallelMessages() {
-    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
-        extern "C" {
-            pub fn HandleParallelMessages();
-        }
-        HandleParallelMessages()
-    })
-}
-pub unsafe fn AtEOXact_Parallel(arg_isCommit: bool) {
-    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
-        extern "C" {
-            pub fn AtEOXact_Parallel(isCommit: bool);
-        }
-        AtEOXact_Parallel(arg_isCommit)
-    })
-}
-pub unsafe fn AtEOSubXact_Parallel(arg_isCommit: bool, arg_mySubId: SubTransactionId) {
-    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
-        extern "C" {
-            pub fn AtEOSubXact_Parallel(isCommit: bool, mySubId: SubTransactionId);
-        }
-        AtEOSubXact_Parallel(arg_isCommit, arg_mySubId)
-    })
-}
-pub unsafe fn ParallelWorkerReportLastRecEnd(arg_last_xlog_end: XLogRecPtr) {
-    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
-        extern "C" {
-            pub fn ParallelWorkerReportLastRecEnd(last_xlog_end: XLogRecPtr);
-        }
-        ParallelWorkerReportLastRecEnd(arg_last_xlog_end)
-    })
-}
-pub unsafe fn ParallelWorkerMain(arg_main_arg: Datum) {
-    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
-        extern "C" {
-            pub fn ParallelWorkerMain(main_arg: Datum);
-        }
-        ParallelWorkerMain(arg_main_arg)
-    })
-}
 pub type Relids = *mut Bitmapset;
 pub const CostSelector_STARTUP_COST: CostSelector = 0;
 pub const CostSelector_TOTAL_COST: CostSelector = 1;
@@ -58644,9 +59124,10 @@ pub const UpperRelationKind_UPPERREL_SETOP: UpperRelationKind = 0;
 pub const UpperRelationKind_UPPERREL_PARTIAL_GROUP_AGG: UpperRelationKind = 1;
 pub const UpperRelationKind_UPPERREL_GROUP_AGG: UpperRelationKind = 2;
 pub const UpperRelationKind_UPPERREL_WINDOW: UpperRelationKind = 3;
-pub const UpperRelationKind_UPPERREL_DISTINCT: UpperRelationKind = 4;
-pub const UpperRelationKind_UPPERREL_ORDERED: UpperRelationKind = 5;
-pub const UpperRelationKind_UPPERREL_FINAL: UpperRelationKind = 6;
+pub const UpperRelationKind_UPPERREL_PARTIAL_DISTINCT: UpperRelationKind = 4;
+pub const UpperRelationKind_UPPERREL_DISTINCT: UpperRelationKind = 5;
+pub const UpperRelationKind_UPPERREL_ORDERED: UpperRelationKind = 6;
+pub const UpperRelationKind_UPPERREL_FINAL: UpperRelationKind = 7;
 pub type UpperRelationKind = ::std::os::raw::c_uint;
 #[repr(C)]
 #[derive(Debug, Copy, Clone)]
@@ -58726,16 +59207,16 @@ pub struct PlannerInfo {
     pub sort_pathkeys: *mut List,
     pub part_schemes: *mut List,
     pub initial_rels: *mut List,
-    pub upper_rels: [*mut List; 7usize],
-    pub upper_targets: [*mut PathTarget; 7usize],
+    pub upper_rels: [*mut List; 8usize],
+    pub upper_targets: [*mut PathTarget; 8usize],
     pub processed_tlist: *mut List,
     pub update_colnos: *mut List,
     pub grouping_map: *mut AttrNumber,
     pub minmax_aggs: *mut List,
     pub planner_cxt: MemoryContext,
-    pub total_table_pages: f64,
-    pub tuple_fraction: f64,
-    pub limit_tuples: f64,
+    pub total_table_pages: Cardinality,
+    pub tuple_fraction: Selectivity,
+    pub limit_tuples: Cardinality,
     pub qual_security_level: Index,
     pub hasJoinRTEs: bool,
     pub hasLateralRTEs: bool,
@@ -58802,7 +59283,7 @@ pub struct RelOptInfo {
     pub type_: NodeTag,
     pub reloptkind: RelOptKind,
     pub relids: Relids,
-    pub rows: f64,
+    pub rows: Cardinality,
     pub consider_startup: bool,
     pub consider_param_startup: bool,
     pub consider_parallel: bool,
@@ -58828,7 +59309,7 @@ pub struct RelOptInfo {
     pub indexlist: *mut List,
     pub statlist: *mut List,
     pub pages: BlockNumber,
-    pub tuples: f64,
+    pub tuples: Cardinality,
     pub allvisfrac: f64,
     pub eclass_indexes: *mut Bitmapset,
     pub subroot: *mut PlannerInfo,
@@ -58855,6 +59336,7 @@ pub struct RelOptInfo {
     pub partbounds_merged: bool,
     pub partition_qual: *mut List,
     pub part_rels: *mut *mut RelOptInfo,
+    pub live_parts: *mut Bitmapset,
     pub all_partrels: Relids,
     pub partexprs: *mut *mut List,
     pub nullable_partexprs: *mut *mut List,
@@ -58876,7 +59358,7 @@ pub struct IndexOptInfo {
     pub reltablespace: Oid,
     pub rel: *mut RelOptInfo,
     pub pages: BlockNumber,
-    pub tuples: f64,
+    pub tuples: Cardinality,
     pub tree_height: ::std::os::raw::c_int,
     pub ncolumns: ::std::os::raw::c_int,
     pub nkeycolumns: ::std::os::raw::c_int,
@@ -58949,6 +59431,7 @@ impl Default for ForeignKeyOptInfo {
 pub struct StatisticExtInfo {
     pub type_: NodeTag,
     pub statOid: Oid,
+    pub inherit: bool,
     pub rel: *mut RelOptInfo,
     pub kind: ::std::os::raw::c_char,
     pub keys: *mut Bitmapset,
@@ -59057,7 +59540,7 @@ impl Default for PathTarget {
 pub struct ParamPathInfo {
     pub type_: NodeTag,
     pub ppi_req_outer: Relids,
-    pub ppi_rows: f64,
+    pub ppi_rows: Cardinality,
     pub ppi_clauses: *mut List,
 }
 impl Default for ParamPathInfo {
@@ -59080,7 +59563,7 @@ pub struct Path {
     pub parallel_aware: bool,
     pub parallel_safe: bool,
     pub parallel_workers: ::std::os::raw::c_int,
-    pub rows: f64,
+    pub rows: Cardinality,
     pub startup_cost: Cost,
     pub total_cost: Cost,
     pub pathkeys: *mut List,
@@ -59266,7 +59749,7 @@ pub struct AppendPath {
     pub path: Path,
     pub subpaths: *mut List,
     pub first_partial_path: ::std::os::raw::c_int,
-    pub limit_tuples: f64,
+    pub limit_tuples: Cardinality,
 }
 impl Default for AppendPath {
     fn default() -> Self {
@@ -59290,7 +59773,7 @@ pub unsafe fn is_dummy_rel(arg_rel: *mut RelOptInfo) -> bool {
 pub struct MergeAppendPath {
     pub path: Path,
     pub subpaths: *mut List,
-    pub limit_tuples: f64,
+    pub limit_tuples: Cardinality,
 }
 impl Default for MergeAppendPath {
     fn default() -> Self {
@@ -59340,7 +59823,7 @@ pub struct MemoizePath {
     pub param_exprs: *mut List,
     pub singlerow: bool,
     pub binary_mode: bool,
-    pub calls: f64,
+    pub calls: Cardinality,
     pub est_entries: uint32,
 }
 impl Default for MemoizePath {
@@ -59426,7 +59909,20 @@ impl Default for JoinPath {
         }
     }
 }
-pub type NestPath = JoinPath;
+#[repr(C)]
+#[derive(Debug, Copy, Clone)]
+pub struct NestPath {
+    pub jpath: JoinPath,
+}
+impl Default for NestPath {
+    fn default() -> Self {
+        let mut s = ::std::mem::MaybeUninit::<Self>::uninit();
+        unsafe {
+            ::std::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
+            s.assume_init()
+        }
+    }
+}
 #[repr(C)]
 #[derive(Debug, Copy, Clone)]
 pub struct MergePath {
@@ -59452,7 +59948,7 @@ pub struct HashPath {
     pub jpath: JoinPath,
     pub path_hashclauses: *mut List,
     pub num_batches: ::std::os::raw::c_int,
-    pub inner_rows_total: f64,
+    pub inner_rows_total: Cardinality,
 }
 impl Default for HashPath {
     fn default() -> Self {
@@ -59564,7 +60060,7 @@ pub struct AggPath {
     pub subpath: *mut Path,
     pub aggstrategy: AggStrategy,
     pub aggsplit: AggSplit,
-    pub numGroups: f64,
+    pub numGroups: Cardinality,
     pub transitionSpace: uint64,
     pub groupClause: *mut List,
     pub qual: *mut List,
@@ -59583,7 +60079,7 @@ impl Default for AggPath {
 pub struct GroupingSetData {
     pub type_: NodeTag,
     pub set: *mut List,
-    pub numGroups: f64,
+    pub numGroups: Cardinality,
 }
 impl Default for GroupingSetData {
     fn default() -> Self {
@@ -59601,7 +60097,7 @@ pub struct RollupData {
     pub groupClause: *mut List,
     pub gsets: *mut List,
     pub gsets_data: *mut List,
-    pub numGroups: f64,
+    pub numGroups: Cardinality,
     pub hashable: bool,
     pub is_hashed: bool,
 }
@@ -59655,6 +60151,8 @@ pub struct WindowAggPath {
     pub path: Path,
     pub subpath: *mut Path,
     pub winclause: *mut WindowClause,
+    pub qual: *mut List,
+    pub topwindow: bool,
 }
 impl Default for WindowAggPath {
     fn default() -> Self {
@@ -59675,7 +60173,7 @@ pub struct SetOpPath {
     pub distinctList: *mut List,
     pub flagColIdx: AttrNumber,
     pub firstFlag: ::std::os::raw::c_int,
-    pub numGroups: f64,
+    pub numGroups: Cardinality,
 }
 impl Default for SetOpPath {
     fn default() -> Self {
@@ -59694,7 +60192,7 @@ pub struct RecursiveUnionPath {
     pub rightpath: *mut Path,
     pub distinctList: *mut List,
     pub wtParam: ::std::os::raw::c_int,
-    pub numGroups: f64,
+    pub numGroups: Cardinality,
 }
 impl Default for RecursiveUnionPath {
     fn default() -> Self {
@@ -59739,6 +60237,7 @@ pub struct ModifyTablePath {
     pub rowMarks: *mut List,
     pub onconflict: *mut OnConflictExpr,
     pub epqParam: ::std::os::raw::c_int,
+    pub mergeActionLists: *mut List,
 }
 impl Default for ModifyTablePath {
     fn default() -> Self {
@@ -59802,7 +60301,8 @@ pub struct RestrictInfo {
     pub right_bucketsize: Selectivity,
     pub left_mcvfreq: Selectivity,
     pub right_mcvfreq: Selectivity,
-    pub hasheqoperator: Oid,
+    pub left_hasheqoperator: Oid,
+    pub right_hasheqoperator: Oid,
 }
 impl Default for RestrictInfo {
     fn default() -> Self {
@@ -60020,7 +60520,7 @@ impl Default for GroupPathExtraData {
 #[derive(Debug, Default, Copy, Clone)]
 pub struct FinalPathExtraData {
     pub limit_needed: bool,
-    pub limit_tuples: f64,
+    pub limit_tuples: Cardinality,
     pub count_est: int64,
     pub offset_est: int64,
 }
@@ -60032,13 +60532,13 @@ pub struct JoinCostWorkspace {
     pub run_cost: Cost,
     pub inner_run_cost: Cost,
     pub inner_rescan_run_cost: Cost,
-    pub outer_rows: f64,
-    pub inner_rows: f64,
-    pub outer_skip_rows: f64,
-    pub inner_skip_rows: f64,
+    pub outer_rows: Cardinality,
+    pub inner_rows: Cardinality,
+    pub outer_skip_rows: Cardinality,
+    pub inner_skip_rows: Cardinality,
     pub numbuckets: ::std::os::raw::c_int,
     pub numbatches: ::std::os::raw::c_int,
-    pub inner_rows_total: f64,
+    pub inner_rows_total: Cardinality,
 }
 #[repr(C)]
 #[derive(Debug, Copy, Clone)]
@@ -62052,7 +62552,7 @@ pub unsafe fn makeSimpleA_Expr(
     })
 }
 pub unsafe fn makeVar(
-    arg_varno: Index,
+    arg_varno: ::std::os::raw::c_int,
     arg_varattno: AttrNumber,
     arg_vartype: Oid,
     arg_vartypmod: int32,
@@ -62062,7 +62562,7 @@ pub unsafe fn makeVar(
     crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
         extern "C" {
             pub fn makeVar(
-                varno: Index,
+                varno: ::std::os::raw::c_int,
                 varattno: AttrNumber,
                 vartype: Oid,
                 vartypmod: int32,
@@ -62073,17 +62573,23 @@ pub unsafe fn makeVar(
         makeVar(arg_varno, arg_varattno, arg_vartype, arg_vartypmod, arg_varcollid, arg_varlevelsup)
     })
 }
-pub unsafe fn makeVarFromTargetEntry(arg_varno: Index, arg_tle: *mut TargetEntry) -> *mut Var {
+pub unsafe fn makeVarFromTargetEntry(
+    arg_varno: ::std::os::raw::c_int,
+    arg_tle: *mut TargetEntry,
+) -> *mut Var {
     crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
         extern "C" {
-            pub fn makeVarFromTargetEntry(varno: Index, tle: *mut TargetEntry) -> *mut Var;
+            pub fn makeVarFromTargetEntry(
+                varno: ::std::os::raw::c_int,
+                tle: *mut TargetEntry,
+            ) -> *mut Var;
         }
         makeVarFromTargetEntry(arg_varno, arg_tle)
     })
 }
 pub unsafe fn makeWholeRowVar(
     arg_rte: *mut RangeTblEntry,
-    arg_varno: Index,
+    arg_varno: ::std::os::raw::c_int,
     arg_varlevelsup: Index,
     arg_allowScalar: bool,
 ) -> *mut Var {
@@ -62091,7 +62597,7 @@ pub unsafe fn makeWholeRowVar(
         extern "C" {
             pub fn makeWholeRowVar(
                 rte: *mut RangeTblEntry,
-                varno: Index,
+                varno: ::std::os::raw::c_int,
                 varlevelsup: Index,
                 allowScalar: bool,
             ) -> *mut Var;
@@ -62431,6 +62937,7 @@ pub unsafe fn makeIndexInfo(
     arg_expressions: *mut List,
     arg_predicates: *mut List,
     arg_unique: bool,
+    arg_nulls_not_distinct: bool,
     arg_isready: bool,
     arg_concurrent: bool,
 ) -> *mut IndexInfo {
@@ -62443,6 +62950,7 @@ pub unsafe fn makeIndexInfo(
                 expressions: *mut List,
                 predicates: *mut List,
                 unique: bool,
+                nulls_not_distinct: bool,
                 isready: bool,
                 concurrent: bool,
             ) -> *mut IndexInfo;
@@ -62454,6 +62962,7 @@ pub unsafe fn makeIndexInfo(
             arg_expressions,
             arg_predicates,
             arg_unique,
+            arg_nulls_not_distinct,
             arg_isready,
             arg_concurrent,
         )
@@ -63032,11 +63541,11 @@ impl Default for StartReplicationCmd {
 }
 #[repr(C)]
 #[derive(Debug, Copy, Clone)]
-pub struct TimeLineHistoryCmd {
+pub struct ReadReplicationSlotCmd {
     pub type_: NodeTag,
-    pub timeline: TimeLineID,
+    pub slotname: *mut ::std::os::raw::c_char,
 }
-impl Default for TimeLineHistoryCmd {
+impl Default for ReadReplicationSlotCmd {
     fn default() -> Self {
         let mut s = ::std::mem::MaybeUninit::<Self>::uninit();
         unsafe {
@@ -63047,10 +63556,11 @@ impl Default for TimeLineHistoryCmd {
 }
 #[repr(C)]
 #[derive(Debug, Copy, Clone)]
-pub struct SQLCmd {
+pub struct TimeLineHistoryCmd {
     pub type_: NodeTag,
+    pub timeline: TimeLineID,
 }
-impl Default for SQLCmd {
+impl Default for TimeLineHistoryCmd {
     fn default() -> Self {
         let mut s = ::std::mem::MaybeUninit::<Self>::uninit();
         unsafe {
@@ -63150,6 +63660,23 @@ pub struct SupportRequestIndexCondition {
     pub lossy: bool,
 }
 impl Default for SupportRequestIndexCondition {
+    fn default() -> Self {
+        let mut s = ::std::mem::MaybeUninit::<Self>::uninit();
+        unsafe {
+            ::std::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
+            s.assume_init()
+        }
+    }
+}
+#[repr(C)]
+#[derive(Debug, Copy, Clone)]
+pub struct SupportRequestWFuncMonotonic {
+    pub type_: NodeTag,
+    pub window_func: *mut WindowFunc,
+    pub window_clause: *mut WindowClause,
+    pub monotonic: MonotonicFunction,
+}
+impl Default for SupportRequestWFuncMonotonic {
     fn default() -> Self {
         let mut s = ::std::mem::MaybeUninit::<Self>::uninit();
         unsafe {
@@ -64809,6 +65336,9 @@ extern "C" {
     pub static mut parallel_setup_cost: f64;
 }
 extern "C" {
+    pub static mut recursive_worktable_factor: f64;
+}
+extern "C" {
     pub static mut effective_cache_size: ::std::os::raw::c_int;
 }
 pub unsafe fn clamp_row_est(arg_nrows: f64) -> f64 {
@@ -64817,6 +65347,14 @@ pub unsafe fn clamp_row_est(arg_nrows: f64) -> f64 {
             pub fn clamp_row_est(nrows: f64) -> f64;
         }
         clamp_row_est(arg_nrows)
+    })
+}
+pub unsafe fn clamp_cardinality_to_long(arg_x: Cardinality) -> ::std::os::raw::c_long {
+    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
+        extern "C" {
+            pub fn clamp_cardinality_to_long(x: Cardinality) -> ::std::os::raw::c_long;
+        }
+        clamp_cardinality_to_long(arg_x)
     })
 }
 pub unsafe fn is_pseudo_constant_for_index(
@@ -66397,6 +66935,8 @@ pub unsafe fn create_windowagg_path(
     arg_target: *mut PathTarget,
     arg_windowFuncs: *mut List,
     arg_winclause: *mut WindowClause,
+    arg_qual: *mut List,
+    arg_topwindow: bool,
 ) -> *mut WindowAggPath {
     crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
         extern "C" {
@@ -66407,6 +66947,8 @@ pub unsafe fn create_windowagg_path(
                 target: *mut PathTarget,
                 windowFuncs: *mut List,
                 winclause: *mut WindowClause,
+                qual: *mut List,
+                topwindow: bool,
             ) -> *mut WindowAggPath;
         }
         create_windowagg_path(
@@ -66416,6 +66958,8 @@ pub unsafe fn create_windowagg_path(
             arg_target,
             arg_windowFuncs,
             arg_winclause,
+            arg_qual,
+            arg_topwindow,
         )
     })
 }
@@ -66530,6 +67074,7 @@ pub unsafe fn create_modifytable_path(
     arg_returningLists: *mut List,
     arg_rowMarks: *mut List,
     arg_onconflict: *mut OnConflictExpr,
+    arg_mergeActionLists: *mut List,
     arg_epqParam: ::std::os::raw::c_int,
 ) -> *mut ModifyTablePath {
     crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
@@ -66549,6 +67094,7 @@ pub unsafe fn create_modifytable_path(
                 returningLists: *mut List,
                 rowMarks: *mut List,
                 onconflict: *mut OnConflictExpr,
+                mergeActionLists: *mut List,
                 epqParam: ::std::os::raw::c_int,
             ) -> *mut ModifyTablePath;
         }
@@ -66567,6 +67113,7 @@ pub unsafe fn create_modifytable_path(
             arg_returningLists,
             arg_rowMarks,
             arg_onconflict,
+            arg_mergeActionLists,
             arg_epqParam,
         )
     })
@@ -67357,20 +67904,6 @@ pub unsafe fn find_computable_ec_member(
             arg_relids,
             arg_require_parallel_safe,
         )
-    })
-}
-pub unsafe fn find_em_expr_for_rel(
-    arg_ec: *mut EquivalenceClass,
-    arg_rel: *mut RelOptInfo,
-) -> *mut Expr {
-    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
-        extern "C" {
-            pub fn find_em_expr_for_rel(
-                ec: *mut EquivalenceClass,
-                rel: *mut RelOptInfo,
-            ) -> *mut Expr;
-        }
-        find_em_expr_for_rel(arg_ec, arg_rel)
     })
 }
 pub unsafe fn relation_can_be_sorted_early(
@@ -68455,6 +68988,14 @@ pub unsafe fn set_plan_references(arg_root: *mut PlannerInfo, arg_plan: *mut Pla
             pub fn set_plan_references(root: *mut PlannerInfo, plan: *mut Plan) -> *mut Plan;
         }
         set_plan_references(arg_root, arg_plan)
+    })
+}
+pub unsafe fn trivial_subqueryscan(arg_plan: *mut SubqueryScan) -> bool {
+    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
+        extern "C" {
+            pub fn trivial_subqueryscan(plan: *mut SubqueryScan) -> bool;
+        }
+        trivial_subqueryscan(arg_plan)
     })
 }
 pub unsafe fn record_plan_function_dependency(arg_root: *mut PlannerInfo, arg_funcid: Oid) {
@@ -69876,7 +70417,7 @@ impl Default for ReorderBufferChange {
     }
 }
 #[repr(C)]
-#[derive(Debug, Copy, Clone)]
+#[derive(Copy, Clone)]
 pub struct ReorderBufferTXN {
     pub txn_flags: bits32,
     pub xid: TransactionId,
@@ -69889,7 +70430,7 @@ pub struct ReorderBufferTXN {
     pub restart_decoding_lsn: XLogRecPtr,
     pub origin_id: RepOriginId,
     pub origin_lsn: XLogRecPtr,
-    pub commit_time: TimestampTz,
+    pub xact_time: ReorderBufferTXN__bindgen_ty_1,
     pub base_snapshot: Snapshot,
     pub base_snapshot_lsn: XLogRecPtr,
     pub base_snapshot_node: dlist_node,
@@ -69911,6 +70452,21 @@ pub struct ReorderBufferTXN {
     pub total_size: Size,
     pub concurrent_abort: bool,
     pub output_plugin_private: *mut ::std::os::raw::c_void,
+}
+#[repr(C)]
+#[derive(Copy, Clone)]
+pub union ReorderBufferTXN__bindgen_ty_1 {
+    pub commit_time: TimestampTz,
+    pub prepare_time: TimestampTz,
+}
+impl Default for ReorderBufferTXN__bindgen_ty_1 {
+    fn default() -> Self {
+        let mut s = ::std::mem::MaybeUninit::<Self>::uninit();
+        unsafe {
+            ::std::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
+            s.assume_init()
+        }
+    }
 }
 impl Default for ReorderBufferTXN {
     fn default() -> Self {
@@ -70268,7 +70824,7 @@ pub unsafe fn ReorderBufferFinishPrepared(
     arg_xid: TransactionId,
     arg_commit_lsn: XLogRecPtr,
     arg_end_lsn: XLogRecPtr,
-    arg_initial_consistent_point: XLogRecPtr,
+    arg_two_phase_at: XLogRecPtr,
     arg_commit_time: TimestampTz,
     arg_origin_id: RepOriginId,
     arg_origin_lsn: XLogRecPtr,
@@ -70282,7 +70838,7 @@ pub unsafe fn ReorderBufferFinishPrepared(
                 xid: TransactionId,
                 commit_lsn: XLogRecPtr,
                 end_lsn: XLogRecPtr,
-                initial_consistent_point: XLogRecPtr,
+                two_phase_at: XLogRecPtr,
                 commit_time: TimestampTz,
                 origin_id: RepOriginId,
                 origin_lsn: XLogRecPtr,
@@ -70295,7 +70851,7 @@ pub unsafe fn ReorderBufferFinishPrepared(
             arg_xid,
             arg_commit_lsn,
             arg_end_lsn,
-            arg_initial_consistent_point,
+            arg_two_phase_at,
             arg_commit_time,
             arg_origin_id,
             arg_origin_lsn,
@@ -70874,12 +71430,15 @@ pub unsafe fn OutputPluginWrite(arg_ctx: *mut LogicalDecodingContext, arg_last_w
         OutputPluginWrite(arg_ctx, arg_last_write)
     })
 }
-pub unsafe fn OutputPluginUpdateProgress(arg_ctx: *mut LogicalDecodingContext) {
+pub unsafe fn OutputPluginUpdateProgress(
+    arg_ctx: *mut LogicalDecodingContext,
+    arg_skipped_xact: bool,
+) {
     crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
         extern "C" {
-            pub fn OutputPluginUpdateProgress(ctx: *mut LogicalDecodingContext);
+            pub fn OutputPluginUpdateProgress(ctx: *mut LogicalDecodingContext, skipped_xact: bool);
         }
-        OutputPluginUpdateProgress(arg_ctx)
+        OutputPluginUpdateProgress(arg_ctx, arg_skipped_xact)
     })
 }
 pub unsafe fn QueryRewrite(arg_parsetree: *mut Query) -> *mut List {
@@ -71254,6 +71813,14 @@ pub unsafe fn ThereAreNoPriorRegisteredSnapshots() -> bool {
         ThereAreNoPriorRegisteredSnapshots()
     })
 }
+pub unsafe fn HaveRegisteredOrActiveSnapshot() -> bool {
+    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
+        extern "C" {
+            pub fn HaveRegisteredOrActiveSnapshot() -> bool;
+        }
+        HaveRegisteredOrActiveSnapshot()
+    })
+}
 pub unsafe fn TransactionIdLimitedForOldSnapshots(
     arg_recentXmin: TransactionId,
     arg_relation: Relation,
@@ -71475,11 +72042,6 @@ pub struct PrefetchBufferResult {
 pub struct WritebackContext {
     _unused: [u8; 0],
 }
-#[repr(C)]
-#[derive(Debug, Copy, Clone)]
-pub struct SMgrRelationData {
-    _unused: [u8; 0],
-}
 extern "C" {
     pub static mut zero_damaged_pages: bool;
 }
@@ -71603,6 +72165,7 @@ pub unsafe fn ReadBufferWithoutRelcache(
     arg_blockNum: BlockNumber,
     arg_mode: ReadBufferMode,
     arg_strategy: BufferAccessStrategy,
+    arg_permanent: bool,
 ) -> Buffer {
     crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
         extern "C" {
@@ -71612,9 +72175,17 @@ pub unsafe fn ReadBufferWithoutRelcache(
                 blockNum: BlockNumber,
                 mode: ReadBufferMode,
                 strategy: BufferAccessStrategy,
+                permanent: bool,
             ) -> Buffer;
         }
-        ReadBufferWithoutRelcache(arg_rnode, arg_forkNum, arg_blockNum, arg_mode, arg_strategy)
+        ReadBufferWithoutRelcache(
+            arg_rnode,
+            arg_forkNum,
+            arg_blockNum,
+            arg_mode,
+            arg_strategy,
+            arg_permanent,
+        )
     })
 }
 pub unsafe fn ReleaseBuffer(arg_buffer: Buffer) {
@@ -71679,14 +72250,6 @@ pub unsafe fn InitBufferPoolAccess() {
             pub fn InitBufferPoolAccess();
         }
         InitBufferPoolAccess()
-    })
-}
-pub unsafe fn InitBufferPoolBackend() {
-    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
-        extern "C" {
-            pub fn InitBufferPoolBackend();
-        }
-        InitBufferPoolBackend()
     })
 }
 pub unsafe fn AtEOXact_Buffers(arg_isCommit: bool) {
@@ -71763,6 +72326,22 @@ pub unsafe fn FlushRelationsAllBuffers(
             );
         }
         FlushRelationsAllBuffers(arg_smgrs, arg_nrels)
+    })
+}
+pub unsafe fn CreateAndCopyRelationData(
+    arg_src_rnode: RelFileNode,
+    arg_dst_rnode: RelFileNode,
+    arg_permanent: bool,
+) {
+    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
+        extern "C" {
+            pub fn CreateAndCopyRelationData(
+                src_rnode: RelFileNode,
+                dst_rnode: RelFileNode,
+                permanent: bool,
+            );
+        }
+        CreateAndCopyRelationData(arg_src_rnode, arg_dst_rnode, arg_permanent)
     })
 }
 pub unsafe fn FlushDatabaseBuffers(arg_dbid: Oid) {
@@ -72094,72 +72673,76 @@ pub unsafe fn BufFileAppend(
         BufFileAppend(arg_target, arg_source)
     })
 }
-pub unsafe fn BufFileCreateShared(
-    arg_fileset: *mut SharedFileSet,
+pub unsafe fn BufFileCreateFileSet(
+    arg_fileset: *mut FileSet,
     arg_name: *const ::std::os::raw::c_char,
 ) -> *mut BufFile {
     crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
         extern "C" {
-            pub fn BufFileCreateShared(
-                fileset: *mut SharedFileSet,
+            pub fn BufFileCreateFileSet(
+                fileset: *mut FileSet,
                 name: *const ::std::os::raw::c_char,
             ) -> *mut BufFile;
         }
-        BufFileCreateShared(arg_fileset, arg_name)
+        BufFileCreateFileSet(arg_fileset, arg_name)
     })
 }
-pub unsafe fn BufFileExportShared(arg_file: *mut BufFile) {
+pub unsafe fn BufFileExportFileSet(arg_file: *mut BufFile) {
     crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
         extern "C" {
-            pub fn BufFileExportShared(file: *mut BufFile);
+            pub fn BufFileExportFileSet(file: *mut BufFile);
         }
-        BufFileExportShared(arg_file)
+        BufFileExportFileSet(arg_file)
     })
 }
-pub unsafe fn BufFileOpenShared(
-    arg_fileset: *mut SharedFileSet,
+pub unsafe fn BufFileOpenFileSet(
+    arg_fileset: *mut FileSet,
     arg_name: *const ::std::os::raw::c_char,
     arg_mode: ::std::os::raw::c_int,
+    arg_missing_ok: bool,
 ) -> *mut BufFile {
     crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
         extern "C" {
-            pub fn BufFileOpenShared(
-                fileset: *mut SharedFileSet,
+            pub fn BufFileOpenFileSet(
+                fileset: *mut FileSet,
                 name: *const ::std::os::raw::c_char,
                 mode: ::std::os::raw::c_int,
+                missing_ok: bool,
             ) -> *mut BufFile;
         }
-        BufFileOpenShared(arg_fileset, arg_name, arg_mode)
+        BufFileOpenFileSet(arg_fileset, arg_name, arg_mode, arg_missing_ok)
     })
 }
-pub unsafe fn BufFileDeleteShared(
-    arg_fileset: *mut SharedFileSet,
+pub unsafe fn BufFileDeleteFileSet(
+    arg_fileset: *mut FileSet,
     arg_name: *const ::std::os::raw::c_char,
+    arg_missing_ok: bool,
 ) {
     crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
         extern "C" {
-            pub fn BufFileDeleteShared(
-                fileset: *mut SharedFileSet,
+            pub fn BufFileDeleteFileSet(
+                fileset: *mut FileSet,
                 name: *const ::std::os::raw::c_char,
+                missing_ok: bool,
             );
         }
-        BufFileDeleteShared(arg_fileset, arg_name)
+        BufFileDeleteFileSet(arg_fileset, arg_name, arg_missing_ok)
     })
 }
-pub unsafe fn BufFileTruncateShared(
+pub unsafe fn BufFileTruncateFileSet(
     arg_file: *mut BufFile,
     arg_fileno: ::std::os::raw::c_int,
     arg_offset: off_t,
 ) {
     crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
         extern "C" {
-            pub fn BufFileTruncateShared(
+            pub fn BufFileTruncateFileSet(
                 file: *mut BufFile,
                 fileno: ::std::os::raw::c_int,
                 offset: off_t,
             );
         }
-        BufFileTruncateShared(arg_file, arg_fileno, arg_offset)
+        BufFileTruncateFileSet(arg_file, arg_fileno, arg_offset)
     })
 }
 pub type pg_on_exit_callback =
@@ -72238,12 +72821,28 @@ pub unsafe fn check_on_shmem_exit_lists_are_empty() {
 extern "C" {
     pub static mut shmem_startup_hook: shmem_startup_hook_type;
 }
+pub unsafe fn CalculateShmemSize(arg_num_semaphores: *mut ::std::os::raw::c_int) -> Size {
+    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
+        extern "C" {
+            pub fn CalculateShmemSize(num_semaphores: *mut ::std::os::raw::c_int) -> Size;
+        }
+        CalculateShmemSize(arg_num_semaphores)
+    })
+}
 pub unsafe fn CreateSharedMemoryAndSemaphores() {
     crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
         extern "C" {
             pub fn CreateSharedMemoryAndSemaphores();
         }
         CreateSharedMemoryAndSemaphores()
+    })
+}
+pub unsafe fn InitializeShmemGUCs() {
+    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
+        extern "C" {
+            pub fn InitializeShmemGUCs();
+        }
+        InitializeShmemGUCs()
     })
 }
 pub const ProcSignalReason_PROCSIG_CATCHUP_INTERRUPT: ProcSignalReason = 0;
@@ -72260,7 +72859,7 @@ pub const ProcSignalReason_PROCSIG_RECOVERY_CONFLICT_BUFFERPIN: ProcSignalReason
 pub const ProcSignalReason_PROCSIG_RECOVERY_CONFLICT_STARTUP_DEADLOCK: ProcSignalReason = 11;
 pub const ProcSignalReason_NUM_PROCSIGNALS: ProcSignalReason = 12;
 pub type ProcSignalReason = ::std::os::raw::c_uint;
-pub const ProcSignalBarrierType_PROCSIGNAL_BARRIER_PLACEHOLDER: ProcSignalBarrierType = 0;
+pub const ProcSignalBarrierType_PROCSIGNAL_BARRIER_SMGRRELEASE: ProcSignalBarrierType = 0;
 pub type ProcSignalBarrierType = ::std::os::raw::c_uint;
 pub unsafe fn ProcSignalShmemSize() -> Size {
     crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
@@ -72915,54 +73514,32 @@ pub unsafe fn GetReplicationHorizons(
 }
 pub unsafe fn GetVirtualXIDsDelayingChkpt(
     arg_nvxids: *mut ::std::os::raw::c_int,
+    arg_type_: ::std::os::raw::c_int,
 ) -> *mut VirtualTransactionId {
     crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
         extern "C" {
             pub fn GetVirtualXIDsDelayingChkpt(
                 nvxids: *mut ::std::os::raw::c_int,
+                type_: ::std::os::raw::c_int,
             ) -> *mut VirtualTransactionId;
         }
-        GetVirtualXIDsDelayingChkpt(arg_nvxids)
-    })
-}
-pub unsafe fn GetVirtualXIDsDelayingChkptEnd(
-    arg_nvxids: *mut ::std::os::raw::c_int,
-) -> *mut VirtualTransactionId {
-    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
-        extern "C" {
-            pub fn GetVirtualXIDsDelayingChkptEnd(
-                nvxids: *mut ::std::os::raw::c_int,
-            ) -> *mut VirtualTransactionId;
-        }
-        GetVirtualXIDsDelayingChkptEnd(arg_nvxids)
+        GetVirtualXIDsDelayingChkpt(arg_nvxids, arg_type_)
     })
 }
 pub unsafe fn HaveVirtualXIDsDelayingChkpt(
     arg_vxids: *mut VirtualTransactionId,
     arg_nvxids: ::std::os::raw::c_int,
+    arg_type_: ::std::os::raw::c_int,
 ) -> bool {
     crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
         extern "C" {
             pub fn HaveVirtualXIDsDelayingChkpt(
                 vxids: *mut VirtualTransactionId,
                 nvxids: ::std::os::raw::c_int,
+                type_: ::std::os::raw::c_int,
             ) -> bool;
         }
-        HaveVirtualXIDsDelayingChkpt(arg_vxids, arg_nvxids)
-    })
-}
-pub unsafe fn HaveVirtualXIDsDelayingChkptEnd(
-    arg_vxids: *mut VirtualTransactionId,
-    arg_nvxids: ::std::os::raw::c_int,
-) -> bool {
-    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
-        extern "C" {
-            pub fn HaveVirtualXIDsDelayingChkptEnd(
-                vxids: *mut VirtualTransactionId,
-                nvxids: ::std::os::raw::c_int,
-            ) -> bool;
-        }
-        HaveVirtualXIDsDelayingChkptEnd(arg_vxids, arg_nvxids)
+        HaveVirtualXIDsDelayingChkpt(arg_vxids, arg_nvxids, arg_type_)
     })
 }
 pub unsafe fn BackendPidGetProc(arg_pid: ::std::os::raw::c_int) -> *mut PGPROC {
@@ -73226,24 +73803,24 @@ pub unsafe fn pg_rewrite_query(arg_query: *mut Query) -> *mut List {
         pg_rewrite_query(arg_query)
     })
 }
-pub unsafe fn pg_analyze_and_rewrite(
+pub unsafe fn pg_analyze_and_rewrite_fixedparams(
     arg_parsetree: *mut RawStmt,
     arg_query_string: *const ::std::os::raw::c_char,
-    arg_paramTypes: *mut Oid,
+    arg_paramTypes: *const Oid,
     arg_numParams: ::std::os::raw::c_int,
     arg_queryEnv: *mut QueryEnvironment,
 ) -> *mut List {
     crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
         extern "C" {
-            pub fn pg_analyze_and_rewrite(
+            pub fn pg_analyze_and_rewrite_fixedparams(
                 parsetree: *mut RawStmt,
                 query_string: *const ::std::os::raw::c_char,
-                paramTypes: *mut Oid,
+                paramTypes: *const Oid,
                 numParams: ::std::os::raw::c_int,
                 queryEnv: *mut QueryEnvironment,
             ) -> *mut List;
         }
-        pg_analyze_and_rewrite(
+        pg_analyze_and_rewrite_fixedparams(
             arg_parsetree,
             arg_query_string,
             arg_paramTypes,
@@ -73252,7 +73829,33 @@ pub unsafe fn pg_analyze_and_rewrite(
         )
     })
 }
-pub unsafe fn pg_analyze_and_rewrite_params(
+pub unsafe fn pg_analyze_and_rewrite_varparams(
+    arg_parsetree: *mut RawStmt,
+    arg_query_string: *const ::std::os::raw::c_char,
+    arg_paramTypes: *mut *mut Oid,
+    arg_numParams: *mut ::std::os::raw::c_int,
+    arg_queryEnv: *mut QueryEnvironment,
+) -> *mut List {
+    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
+        extern "C" {
+            pub fn pg_analyze_and_rewrite_varparams(
+                parsetree: *mut RawStmt,
+                query_string: *const ::std::os::raw::c_char,
+                paramTypes: *mut *mut Oid,
+                numParams: *mut ::std::os::raw::c_int,
+                queryEnv: *mut QueryEnvironment,
+            ) -> *mut List;
+        }
+        pg_analyze_and_rewrite_varparams(
+            arg_parsetree,
+            arg_query_string,
+            arg_paramTypes,
+            arg_numParams,
+            arg_queryEnv,
+        )
+    })
+}
+pub unsafe fn pg_analyze_and_rewrite_withcb(
     arg_parsetree: *mut RawStmt,
     arg_query_string: *const ::std::os::raw::c_char,
     arg_parserSetup: ParserSetupHook,
@@ -73261,7 +73864,7 @@ pub unsafe fn pg_analyze_and_rewrite_params(
 ) -> *mut List {
     crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
         extern "C" {
-            pub fn pg_analyze_and_rewrite_params(
+            pub fn pg_analyze_and_rewrite_withcb(
                 parsetree: *mut RawStmt,
                 query_string: *const ::std::os::raw::c_char,
                 parserSetup: ParserSetupHook,
@@ -73269,7 +73872,7 @@ pub unsafe fn pg_analyze_and_rewrite_params(
                 queryEnv: *mut QueryEnvironment,
             ) -> *mut List;
         }
-        pg_analyze_and_rewrite_params(
+        pg_analyze_and_rewrite_withcb(
             arg_parsetree,
             arg_query_string,
             arg_parserSetup,
@@ -73418,22 +74021,34 @@ pub unsafe fn process_postgres_switches(
         process_postgres_switches(arg_argc, arg_argv, arg_ctx, arg_dbname)
     })
 }
-pub unsafe fn PostgresMain(
+pub unsafe fn PostgresSingleUserMain(
     arg_argc: ::std::os::raw::c_int,
     arg_argv: *mut *mut ::std::os::raw::c_char,
+    arg_username: *const ::std::os::raw::c_char,
+) {
+    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
+        extern "C" {
+            pub fn PostgresSingleUserMain(
+                argc: ::std::os::raw::c_int,
+                argv: *mut *mut ::std::os::raw::c_char,
+                username: *const ::std::os::raw::c_char,
+            );
+        }
+        PostgresSingleUserMain(arg_argc, arg_argv, arg_username)
+    })
+}
+pub unsafe fn PostgresMain(
     arg_dbname: *const ::std::os::raw::c_char,
     arg_username: *const ::std::os::raw::c_char,
 ) {
     crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
         extern "C" {
             pub fn PostgresMain(
-                argc: ::std::os::raw::c_int,
-                argv: *mut *mut ::std::os::raw::c_char,
                 dbname: *const ::std::os::raw::c_char,
                 username: *const ::std::os::raw::c_char,
             );
         }
-        PostgresMain(arg_argc, arg_argv, arg_dbname, arg_username)
+        PostgresMain(arg_dbname, arg_username)
     })
 }
 pub unsafe fn get_stack_depth_rlimit() -> ::std::os::raw::c_long {
@@ -75751,14 +76366,6 @@ pub unsafe fn lseg_center(arg_fcinfo: FunctionCallInfo) -> Datum {
         lseg_center(arg_fcinfo)
     })
 }
-pub unsafe fn path_center(arg_fcinfo: FunctionCallInfo) -> Datum {
-    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
-        extern "C" {
-            pub fn path_center(fcinfo: FunctionCallInfo) -> Datum;
-        }
-        path_center(arg_fcinfo)
-    })
-}
 pub unsafe fn poly_center(arg_fcinfo: FunctionCallInfo) -> Datum {
     crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
         extern "C" {
@@ -77367,14 +77974,6 @@ pub unsafe fn dist_lp(arg_fcinfo: FunctionCallInfo) -> Datum {
         dist_lp(arg_fcinfo)
     })
 }
-pub unsafe fn dist_bl(arg_fcinfo: FunctionCallInfo) -> Datum {
-    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
-        extern "C" {
-            pub fn dist_bl(fcinfo: FunctionCallInfo) -> Datum;
-        }
-        dist_bl(arg_fcinfo)
-    })
-}
 pub unsafe fn dist_ls(arg_fcinfo: FunctionCallInfo) -> Datum {
     crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
         extern "C" {
@@ -77477,14 +78076,6 @@ pub unsafe fn dist_pl(arg_fcinfo: FunctionCallInfo) -> Datum {
             pub fn dist_pl(fcinfo: FunctionCallInfo) -> Datum;
         }
         dist_pl(arg_fcinfo)
-    })
-}
-pub unsafe fn dist_lb(arg_fcinfo: FunctionCallInfo) -> Datum {
-    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
-        extern "C" {
-            pub fn dist_lb(fcinfo: FunctionCallInfo) -> Datum;
-        }
-        dist_lb(arg_fcinfo)
     })
 }
 pub unsafe fn dist_sl(arg_fcinfo: FunctionCallInfo) -> Datum {
@@ -78549,22 +79140,6 @@ pub unsafe fn close_pl(arg_fcinfo: FunctionCallInfo) -> Datum {
             pub fn close_pl(fcinfo: FunctionCallInfo) -> Datum;
         }
         close_pl(arg_fcinfo)
-    })
-}
-pub unsafe fn close_sl(arg_fcinfo: FunctionCallInfo) -> Datum {
-    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
-        extern "C" {
-            pub fn close_sl(fcinfo: FunctionCallInfo) -> Datum;
-        }
-        close_sl(arg_fcinfo)
-    })
-}
-pub unsafe fn close_lb(arg_fcinfo: FunctionCallInfo) -> Datum {
-    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
-        extern "C" {
-            pub fn close_lb(fcinfo: FunctionCallInfo) -> Datum;
-        }
-        close_lb(arg_fcinfo)
     })
 }
 pub unsafe fn be_lo_unlink(arg_fcinfo: FunctionCallInfo) -> Datum {
@@ -83559,6 +84134,14 @@ pub unsafe fn pg_column_compression(arg_fcinfo: FunctionCallInfo) -> Datum {
         pg_column_compression(arg_fcinfo)
     })
 }
+pub unsafe fn pg_stat_force_next_flush(arg_fcinfo: FunctionCallInfo) -> Datum {
+    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
+        extern "C" {
+            pub fn pg_stat_force_next_flush(fcinfo: FunctionCallInfo) -> Datum;
+        }
+        pg_stat_force_next_flush(arg_fcinfo)
+    })
+}
 pub unsafe fn text_pattern_lt(arg_fcinfo: FunctionCallInfo) -> Datum {
     crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
         extern "C" {
@@ -83639,20 +84222,12 @@ pub unsafe fn pg_cancel_backend(arg_fcinfo: FunctionCallInfo) -> Datum {
         pg_cancel_backend(arg_fcinfo)
     })
 }
-pub unsafe fn pg_start_backup(arg_fcinfo: FunctionCallInfo) -> Datum {
+pub unsafe fn pg_backup_start(arg_fcinfo: FunctionCallInfo) -> Datum {
     crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
         extern "C" {
-            pub fn pg_start_backup(fcinfo: FunctionCallInfo) -> Datum;
+            pub fn pg_backup_start(fcinfo: FunctionCallInfo) -> Datum;
         }
-        pg_start_backup(arg_fcinfo)
-    })
-}
-pub unsafe fn pg_stop_backup(arg_fcinfo: FunctionCallInfo) -> Datum {
-    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
-        extern "C" {
-            pub fn pg_stop_backup(fcinfo: FunctionCallInfo) -> Datum;
-        }
-        pg_stop_backup(arg_fcinfo)
+        pg_backup_start(arg_fcinfo)
     })
 }
 pub unsafe fn bpchar_pattern_lt(arg_fcinfo: FunctionCallInfo) -> Datum {
@@ -86295,12 +86870,12 @@ pub unsafe fn dcotd(arg_fcinfo: FunctionCallInfo) -> Datum {
         dcotd(arg_fcinfo)
     })
 }
-pub unsafe fn pg_stop_backup_v2(arg_fcinfo: FunctionCallInfo) -> Datum {
+pub unsafe fn pg_backup_stop(arg_fcinfo: FunctionCallInfo) -> Datum {
     crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
         extern "C" {
-            pub fn pg_stop_backup_v2(fcinfo: FunctionCallInfo) -> Datum;
+            pub fn pg_backup_stop(fcinfo: FunctionCallInfo) -> Datum;
         }
-        pg_stop_backup_v2(arg_fcinfo)
+        pg_backup_stop(arg_fcinfo)
     })
 }
 pub unsafe fn numeric_avg_serialize(arg_fcinfo: FunctionCallInfo) -> Datum {
@@ -92359,22 +92934,6 @@ pub unsafe fn int8_cash(arg_fcinfo: FunctionCallInfo) -> Datum {
         int8_cash(arg_fcinfo)
     })
 }
-pub unsafe fn pg_is_in_backup(arg_fcinfo: FunctionCallInfo) -> Datum {
-    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
-        extern "C" {
-            pub fn pg_is_in_backup(fcinfo: FunctionCallInfo) -> Datum;
-        }
-        pg_is_in_backup(arg_fcinfo)
-    })
-}
-pub unsafe fn pg_backup_start_time(arg_fcinfo: FunctionCallInfo) -> Datum {
-    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
-        extern "C" {
-            pub fn pg_backup_start_time(fcinfo: FunctionCallInfo) -> Datum;
-        }
-        pg_backup_start_time(arg_fcinfo)
-    })
-}
 pub unsafe fn pg_collation_is_visible(arg_fcinfo: FunctionCallInfo) -> Datum {
     crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
         extern "C" {
@@ -94863,6 +95422,38 @@ pub unsafe fn pg_log_backend_memory_contexts(arg_fcinfo: FunctionCallInfo) -> Da
         pg_log_backend_memory_contexts(arg_fcinfo)
     })
 }
+pub unsafe fn binary_upgrade_set_next_heap_relfilenode(arg_fcinfo: FunctionCallInfo) -> Datum {
+    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
+        extern "C" {
+            pub fn binary_upgrade_set_next_heap_relfilenode(fcinfo: FunctionCallInfo) -> Datum;
+        }
+        binary_upgrade_set_next_heap_relfilenode(arg_fcinfo)
+    })
+}
+pub unsafe fn binary_upgrade_set_next_index_relfilenode(arg_fcinfo: FunctionCallInfo) -> Datum {
+    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
+        extern "C" {
+            pub fn binary_upgrade_set_next_index_relfilenode(fcinfo: FunctionCallInfo) -> Datum;
+        }
+        binary_upgrade_set_next_index_relfilenode(arg_fcinfo)
+    })
+}
+pub unsafe fn binary_upgrade_set_next_toast_relfilenode(arg_fcinfo: FunctionCallInfo) -> Datum {
+    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
+        extern "C" {
+            pub fn binary_upgrade_set_next_toast_relfilenode(fcinfo: FunctionCallInfo) -> Datum;
+        }
+        binary_upgrade_set_next_toast_relfilenode(arg_fcinfo)
+    })
+}
+pub unsafe fn binary_upgrade_set_next_pg_tablespace_oid(arg_fcinfo: FunctionCallInfo) -> Datum {
+    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
+        extern "C" {
+            pub fn binary_upgrade_set_next_pg_tablespace_oid(fcinfo: FunctionCallInfo) -> Datum;
+        }
+        binary_upgrade_set_next_pg_tablespace_oid(arg_fcinfo)
+    })
+}
 pub unsafe fn pg_event_trigger_table_rewrite_oid(arg_fcinfo: FunctionCallInfo) -> Datum {
     crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
         extern "C" {
@@ -95655,6 +96246,22 @@ pub unsafe fn xid8cmp(arg_fcinfo: FunctionCallInfo) -> Datum {
         xid8cmp(arg_fcinfo)
     })
 }
+pub unsafe fn xid8_larger(arg_fcinfo: FunctionCallInfo) -> Datum {
+    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
+        extern "C" {
+            pub fn xid8_larger(fcinfo: FunctionCallInfo) -> Datum;
+        }
+        xid8_larger(arg_fcinfo)
+    })
+}
+pub unsafe fn xid8_smaller(arg_fcinfo: FunctionCallInfo) -> Datum {
+    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
+        extern "C" {
+            pub fn xid8_smaller(fcinfo: FunctionCallInfo) -> Datum;
+        }
+        xid8_smaller(arg_fcinfo)
+    })
+}
 pub unsafe fn pg_replication_origin_create(arg_fcinfo: FunctionCallInfo) -> Datum {
     crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
         extern "C" {
@@ -96087,6 +96694,326 @@ pub unsafe fn extract_interval(arg_fcinfo: FunctionCallInfo) -> Datum {
         extract_interval(arg_fcinfo)
     })
 }
+pub unsafe fn has_parameter_privilege_name_name(arg_fcinfo: FunctionCallInfo) -> Datum {
+    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
+        extern "C" {
+            pub fn has_parameter_privilege_name_name(fcinfo: FunctionCallInfo) -> Datum;
+        }
+        has_parameter_privilege_name_name(arg_fcinfo)
+    })
+}
+pub unsafe fn has_parameter_privilege_id_name(arg_fcinfo: FunctionCallInfo) -> Datum {
+    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
+        extern "C" {
+            pub fn has_parameter_privilege_id_name(fcinfo: FunctionCallInfo) -> Datum;
+        }
+        has_parameter_privilege_id_name(arg_fcinfo)
+    })
+}
+pub unsafe fn has_parameter_privilege_name(arg_fcinfo: FunctionCallInfo) -> Datum {
+    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
+        extern "C" {
+            pub fn has_parameter_privilege_name(fcinfo: FunctionCallInfo) -> Datum;
+        }
+        has_parameter_privilege_name(arg_fcinfo)
+    })
+}
+pub unsafe fn pg_get_wal_resource_managers(arg_fcinfo: FunctionCallInfo) -> Datum {
+    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
+        extern "C" {
+            pub fn pg_get_wal_resource_managers(fcinfo: FunctionCallInfo) -> Datum;
+        }
+        pg_get_wal_resource_managers(arg_fcinfo)
+    })
+}
+pub unsafe fn multirange_agg_transfn(arg_fcinfo: FunctionCallInfo) -> Datum {
+    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
+        extern "C" {
+            pub fn multirange_agg_transfn(fcinfo: FunctionCallInfo) -> Datum;
+        }
+        multirange_agg_transfn(arg_fcinfo)
+    })
+}
+pub unsafe fn pg_stat_have_stats(arg_fcinfo: FunctionCallInfo) -> Datum {
+    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
+        extern "C" {
+            pub fn pg_stat_have_stats(fcinfo: FunctionCallInfo) -> Datum;
+        }
+        pg_stat_have_stats(arg_fcinfo)
+    })
+}
+pub unsafe fn pg_stat_get_subscription_stats(arg_fcinfo: FunctionCallInfo) -> Datum {
+    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
+        extern "C" {
+            pub fn pg_stat_get_subscription_stats(fcinfo: FunctionCallInfo) -> Datum;
+        }
+        pg_stat_get_subscription_stats(arg_fcinfo)
+    })
+}
+pub unsafe fn pg_stat_reset_subscription_stats(arg_fcinfo: FunctionCallInfo) -> Datum {
+    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
+        extern "C" {
+            pub fn pg_stat_reset_subscription_stats(fcinfo: FunctionCallInfo) -> Datum;
+        }
+        pg_stat_reset_subscription_stats(arg_fcinfo)
+    })
+}
+pub unsafe fn window_row_number_support(arg_fcinfo: FunctionCallInfo) -> Datum {
+    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
+        extern "C" {
+            pub fn window_row_number_support(fcinfo: FunctionCallInfo) -> Datum;
+        }
+        window_row_number_support(arg_fcinfo)
+    })
+}
+pub unsafe fn window_rank_support(arg_fcinfo: FunctionCallInfo) -> Datum {
+    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
+        extern "C" {
+            pub fn window_rank_support(fcinfo: FunctionCallInfo) -> Datum;
+        }
+        window_rank_support(arg_fcinfo)
+    })
+}
+pub unsafe fn window_dense_rank_support(arg_fcinfo: FunctionCallInfo) -> Datum {
+    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
+        extern "C" {
+            pub fn window_dense_rank_support(fcinfo: FunctionCallInfo) -> Datum;
+        }
+        window_dense_rank_support(arg_fcinfo)
+    })
+}
+pub unsafe fn int8inc_support(arg_fcinfo: FunctionCallInfo) -> Datum {
+    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
+        extern "C" {
+            pub fn int8inc_support(fcinfo: FunctionCallInfo) -> Datum;
+        }
+        int8inc_support(arg_fcinfo)
+    })
+}
+pub unsafe fn pg_settings_get_flags(arg_fcinfo: FunctionCallInfo) -> Datum {
+    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
+        extern "C" {
+            pub fn pg_settings_get_flags(fcinfo: FunctionCallInfo) -> Datum;
+        }
+        pg_settings_get_flags(arg_fcinfo)
+    })
+}
+pub unsafe fn pg_stop_making_pinned_objects(arg_fcinfo: FunctionCallInfo) -> Datum {
+    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
+        extern "C" {
+            pub fn pg_stop_making_pinned_objects(fcinfo: FunctionCallInfo) -> Datum;
+        }
+        pg_stop_making_pinned_objects(arg_fcinfo)
+    })
+}
+pub unsafe fn text_starts_with_support(arg_fcinfo: FunctionCallInfo) -> Datum {
+    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
+        extern "C" {
+            pub fn text_starts_with_support(fcinfo: FunctionCallInfo) -> Datum;
+        }
+        text_starts_with_support(arg_fcinfo)
+    })
+}
+pub unsafe fn pg_stat_get_recovery_prefetch(arg_fcinfo: FunctionCallInfo) -> Datum {
+    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
+        extern "C" {
+            pub fn pg_stat_get_recovery_prefetch(fcinfo: FunctionCallInfo) -> Datum;
+        }
+        pg_stat_get_recovery_prefetch(arg_fcinfo)
+    })
+}
+pub unsafe fn pg_database_collation_actual_version(arg_fcinfo: FunctionCallInfo) -> Datum {
+    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
+        extern "C" {
+            pub fn pg_database_collation_actual_version(fcinfo: FunctionCallInfo) -> Datum;
+        }
+        pg_database_collation_actual_version(arg_fcinfo)
+    })
+}
+pub unsafe fn pg_ident_file_mappings(arg_fcinfo: FunctionCallInfo) -> Datum {
+    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
+        extern "C" {
+            pub fn pg_ident_file_mappings(fcinfo: FunctionCallInfo) -> Datum;
+        }
+        pg_ident_file_mappings(arg_fcinfo)
+    })
+}
+pub unsafe fn textregexreplace_extended(arg_fcinfo: FunctionCallInfo) -> Datum {
+    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
+        extern "C" {
+            pub fn textregexreplace_extended(fcinfo: FunctionCallInfo) -> Datum;
+        }
+        textregexreplace_extended(arg_fcinfo)
+    })
+}
+pub unsafe fn textregexreplace_extended_no_flags(arg_fcinfo: FunctionCallInfo) -> Datum {
+    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
+        extern "C" {
+            pub fn textregexreplace_extended_no_flags(fcinfo: FunctionCallInfo) -> Datum;
+        }
+        textregexreplace_extended_no_flags(arg_fcinfo)
+    })
+}
+pub unsafe fn textregexreplace_extended_no_n(arg_fcinfo: FunctionCallInfo) -> Datum {
+    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
+        extern "C" {
+            pub fn textregexreplace_extended_no_n(fcinfo: FunctionCallInfo) -> Datum;
+        }
+        textregexreplace_extended_no_n(arg_fcinfo)
+    })
+}
+pub unsafe fn regexp_count_no_start(arg_fcinfo: FunctionCallInfo) -> Datum {
+    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
+        extern "C" {
+            pub fn regexp_count_no_start(fcinfo: FunctionCallInfo) -> Datum;
+        }
+        regexp_count_no_start(arg_fcinfo)
+    })
+}
+pub unsafe fn regexp_count_no_flags(arg_fcinfo: FunctionCallInfo) -> Datum {
+    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
+        extern "C" {
+            pub fn regexp_count_no_flags(fcinfo: FunctionCallInfo) -> Datum;
+        }
+        regexp_count_no_flags(arg_fcinfo)
+    })
+}
+pub unsafe fn regexp_count(arg_fcinfo: FunctionCallInfo) -> Datum {
+    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
+        extern "C" {
+            pub fn regexp_count(fcinfo: FunctionCallInfo) -> Datum;
+        }
+        regexp_count(arg_fcinfo)
+    })
+}
+pub unsafe fn regexp_instr_no_start(arg_fcinfo: FunctionCallInfo) -> Datum {
+    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
+        extern "C" {
+            pub fn regexp_instr_no_start(fcinfo: FunctionCallInfo) -> Datum;
+        }
+        regexp_instr_no_start(arg_fcinfo)
+    })
+}
+pub unsafe fn regexp_instr_no_n(arg_fcinfo: FunctionCallInfo) -> Datum {
+    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
+        extern "C" {
+            pub fn regexp_instr_no_n(fcinfo: FunctionCallInfo) -> Datum;
+        }
+        regexp_instr_no_n(arg_fcinfo)
+    })
+}
+pub unsafe fn regexp_instr_no_endoption(arg_fcinfo: FunctionCallInfo) -> Datum {
+    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
+        extern "C" {
+            pub fn regexp_instr_no_endoption(fcinfo: FunctionCallInfo) -> Datum;
+        }
+        regexp_instr_no_endoption(arg_fcinfo)
+    })
+}
+pub unsafe fn regexp_instr_no_flags(arg_fcinfo: FunctionCallInfo) -> Datum {
+    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
+        extern "C" {
+            pub fn regexp_instr_no_flags(fcinfo: FunctionCallInfo) -> Datum;
+        }
+        regexp_instr_no_flags(arg_fcinfo)
+    })
+}
+pub unsafe fn regexp_instr_no_subexpr(arg_fcinfo: FunctionCallInfo) -> Datum {
+    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
+        extern "C" {
+            pub fn regexp_instr_no_subexpr(fcinfo: FunctionCallInfo) -> Datum;
+        }
+        regexp_instr_no_subexpr(arg_fcinfo)
+    })
+}
+pub unsafe fn regexp_instr(arg_fcinfo: FunctionCallInfo) -> Datum {
+    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
+        extern "C" {
+            pub fn regexp_instr(fcinfo: FunctionCallInfo) -> Datum;
+        }
+        regexp_instr(arg_fcinfo)
+    })
+}
+pub unsafe fn regexp_like_no_flags(arg_fcinfo: FunctionCallInfo) -> Datum {
+    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
+        extern "C" {
+            pub fn regexp_like_no_flags(fcinfo: FunctionCallInfo) -> Datum;
+        }
+        regexp_like_no_flags(arg_fcinfo)
+    })
+}
+pub unsafe fn regexp_like(arg_fcinfo: FunctionCallInfo) -> Datum {
+    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
+        extern "C" {
+            pub fn regexp_like(fcinfo: FunctionCallInfo) -> Datum;
+        }
+        regexp_like(arg_fcinfo)
+    })
+}
+pub unsafe fn regexp_substr_no_start(arg_fcinfo: FunctionCallInfo) -> Datum {
+    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
+        extern "C" {
+            pub fn regexp_substr_no_start(fcinfo: FunctionCallInfo) -> Datum;
+        }
+        regexp_substr_no_start(arg_fcinfo)
+    })
+}
+pub unsafe fn regexp_substr_no_n(arg_fcinfo: FunctionCallInfo) -> Datum {
+    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
+        extern "C" {
+            pub fn regexp_substr_no_n(fcinfo: FunctionCallInfo) -> Datum;
+        }
+        regexp_substr_no_n(arg_fcinfo)
+    })
+}
+pub unsafe fn regexp_substr_no_flags(arg_fcinfo: FunctionCallInfo) -> Datum {
+    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
+        extern "C" {
+            pub fn regexp_substr_no_flags(fcinfo: FunctionCallInfo) -> Datum;
+        }
+        regexp_substr_no_flags(arg_fcinfo)
+    })
+}
+pub unsafe fn regexp_substr_no_subexpr(arg_fcinfo: FunctionCallInfo) -> Datum {
+    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
+        extern "C" {
+            pub fn regexp_substr_no_subexpr(fcinfo: FunctionCallInfo) -> Datum;
+        }
+        regexp_substr_no_subexpr(arg_fcinfo)
+    })
+}
+pub unsafe fn regexp_substr(arg_fcinfo: FunctionCallInfo) -> Datum {
+    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
+        extern "C" {
+            pub fn regexp_substr(fcinfo: FunctionCallInfo) -> Datum;
+        }
+        regexp_substr(arg_fcinfo)
+    })
+}
+pub unsafe fn pg_ls_logicalsnapdir(arg_fcinfo: FunctionCallInfo) -> Datum {
+    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
+        extern "C" {
+            pub fn pg_ls_logicalsnapdir(fcinfo: FunctionCallInfo) -> Datum;
+        }
+        pg_ls_logicalsnapdir(arg_fcinfo)
+    })
+}
+pub unsafe fn pg_ls_logicalmapdir(arg_fcinfo: FunctionCallInfo) -> Datum {
+    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
+        extern "C" {
+            pub fn pg_ls_logicalmapdir(fcinfo: FunctionCallInfo) -> Datum;
+        }
+        pg_ls_logicalmapdir(arg_fcinfo)
+    })
+}
+pub unsafe fn pg_ls_replslotdir(arg_fcinfo: FunctionCallInfo) -> Datum {
+    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
+        extern "C" {
+            pub fn pg_ls_replslotdir(fcinfo: FunctionCallInfo) -> Datum;
+        }
+        pg_ls_replslotdir(arg_fcinfo)
+    })
+}
 pub unsafe fn parse_bool(arg_value: *const ::std::os::raw::c_char, arg_result: *mut bool) -> bool {
     crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
         extern "C" {
@@ -96221,22 +97148,6 @@ pub unsafe fn namestrcmp(
         namestrcmp(arg_name, arg_str_)
     })
 }
-pub unsafe fn pg_atoi(
-    arg_s: *const ::std::os::raw::c_char,
-    arg_size: ::std::os::raw::c_int,
-    arg_c: ::std::os::raw::c_int,
-) -> int32 {
-    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
-        extern "C" {
-            pub fn pg_atoi(
-                s: *const ::std::os::raw::c_char,
-                size: ::std::os::raw::c_int,
-                c: ::std::os::raw::c_int,
-            ) -> int32;
-        }
-        pg_atoi(arg_s, arg_size, arg_c)
-    })
-}
 pub unsafe fn pg_strtoint16(arg_s: *const ::std::os::raw::c_char) -> int16 {
     crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
         extern "C" {
@@ -96251,6 +97162,14 @@ pub unsafe fn pg_strtoint32(arg_s: *const ::std::os::raw::c_char) -> int32 {
             pub fn pg_strtoint32(s: *const ::std::os::raw::c_char) -> int32;
         }
         pg_strtoint32(arg_s)
+    })
+}
+pub unsafe fn pg_strtoint64(arg_s: *const ::std::os::raw::c_char) -> int64 {
+    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
+        extern "C" {
+            pub fn pg_strtoint64(s: *const ::std::os::raw::c_char) -> int64;
+        }
+        pg_strtoint64(arg_s)
     })
 }
 pub unsafe fn pg_itoa(arg_i: int16, arg_a: *mut ::std::os::raw::c_char) -> ::std::os::raw::c_int {
@@ -96327,22 +97246,6 @@ pub unsafe fn pg_ultostr(
             ) -> *mut ::std::os::raw::c_char;
         }
         pg_ultostr(arg_str_, arg_value)
-    })
-}
-pub unsafe fn pg_strtouint64(
-    arg_str_: *const ::std::os::raw::c_char,
-    arg_endptr: *mut *mut ::std::os::raw::c_char,
-    arg_base: ::std::os::raw::c_int,
-) -> uint64 {
-    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
-        extern "C" {
-            pub fn pg_strtouint64(
-                str_: *const ::std::os::raw::c_char,
-                endptr: *mut *mut ::std::os::raw::c_char,
-                base: ::std::os::raw::c_int,
-            ) -> uint64;
-        }
-        pg_strtouint64(arg_str_, arg_endptr, arg_base)
     })
 }
 pub unsafe fn buildoidvector(arg_oids: *const Oid, arg_n: ::std::os::raw::c_int) -> *mut oidvector {
@@ -97104,8 +98007,7 @@ pub unsafe fn DecodeInterval(
     arg_nf: ::std::os::raw::c_int,
     arg_range: ::std::os::raw::c_int,
     arg_dtype: *mut ::std::os::raw::c_int,
-    arg_tm: *mut pg_tm,
-    arg_fsec: *mut fsec_t,
+    arg_itm_in: *mut pg_itm_in,
 ) -> ::std::os::raw::c_int {
     crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
         extern "C" {
@@ -97115,29 +98017,26 @@ pub unsafe fn DecodeInterval(
                 nf: ::std::os::raw::c_int,
                 range: ::std::os::raw::c_int,
                 dtype: *mut ::std::os::raw::c_int,
-                tm: *mut pg_tm,
-                fsec: *mut fsec_t,
+                itm_in: *mut pg_itm_in,
             ) -> ::std::os::raw::c_int;
         }
-        DecodeInterval(arg_field, arg_ftype, arg_nf, arg_range, arg_dtype, arg_tm, arg_fsec)
+        DecodeInterval(arg_field, arg_ftype, arg_nf, arg_range, arg_dtype, arg_itm_in)
     })
 }
 pub unsafe fn DecodeISO8601Interval(
     arg_str_: *mut ::std::os::raw::c_char,
     arg_dtype: *mut ::std::os::raw::c_int,
-    arg_tm: *mut pg_tm,
-    arg_fsec: *mut fsec_t,
+    arg_itm_in: *mut pg_itm_in,
 ) -> ::std::os::raw::c_int {
     crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
         extern "C" {
             pub fn DecodeISO8601Interval(
                 str_: *mut ::std::os::raw::c_char,
                 dtype: *mut ::std::os::raw::c_int,
-                tm: *mut pg_tm,
-                fsec: *mut fsec_t,
+                itm_in: *mut pg_itm_in,
             ) -> ::std::os::raw::c_int;
         }
-        DecodeISO8601Interval(arg_str_, arg_dtype, arg_tm, arg_fsec)
+        DecodeISO8601Interval(arg_str_, arg_dtype, arg_itm_in)
     })
 }
 pub unsafe fn DateTimeParseError(
@@ -97267,21 +98166,19 @@ pub unsafe fn EncodeDateTime(
     })
 }
 pub unsafe fn EncodeInterval(
-    arg_tm: *mut pg_tm,
-    arg_fsec: fsec_t,
+    arg_itm: *mut pg_itm,
     arg_style: ::std::os::raw::c_int,
     arg_str_: *mut ::std::os::raw::c_char,
 ) {
     crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
         extern "C" {
             pub fn EncodeInterval(
-                tm: *mut pg_tm,
-                fsec: fsec_t,
+                itm: *mut pg_itm,
                 style: ::std::os::raw::c_int,
                 str_: *mut ::std::os::raw::c_char,
             );
         }
-        EncodeInterval(arg_tm, arg_fsec, arg_style, arg_str_)
+        EncodeInterval(arg_itm, arg_style, arg_str_)
     })
 }
 pub unsafe fn EncodeSpecialTimestamp(arg_dt: Timestamp, arg_str_: *mut ::std::os::raw::c_char) {
@@ -99317,25 +100214,131 @@ pub unsafe fn get_index_isclustered(arg_index_oid: Oid) -> bool {
         get_index_isclustered(arg_index_oid)
     })
 }
-pub type SamplerRandomState = [::std::os::raw::c_ushort; 3usize];
-pub unsafe fn sampler_random_init_state(
-    arg_seed: ::std::os::raw::c_long,
-    arg_randstate: *mut ::std::os::raw::c_ushort,
-) {
+#[repr(C)]
+#[derive(Debug, Default, Copy, Clone)]
+pub struct pg_prng_state {
+    pub s0: uint64,
+    pub s1: uint64,
+}
+extern "C" {
+    pub static mut pg_global_prng_state: pg_prng_state;
+}
+pub unsafe fn pg_prng_seed(arg_state: *mut pg_prng_state, arg_seed: uint64) {
     crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
         extern "C" {
-            pub fn sampler_random_init_state(
-                seed: ::std::os::raw::c_long,
-                randstate: *mut ::std::os::raw::c_ushort,
-            );
+            pub fn pg_prng_seed(state: *mut pg_prng_state, seed: uint64);
+        }
+        pg_prng_seed(arg_state, arg_seed)
+    })
+}
+pub unsafe fn pg_prng_fseed(arg_state: *mut pg_prng_state, arg_fseed: f64) {
+    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
+        extern "C" {
+            pub fn pg_prng_fseed(state: *mut pg_prng_state, fseed: f64);
+        }
+        pg_prng_fseed(arg_state, arg_fseed)
+    })
+}
+pub unsafe fn pg_prng_seed_check(arg_state: *mut pg_prng_state) -> bool {
+    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
+        extern "C" {
+            pub fn pg_prng_seed_check(state: *mut pg_prng_state) -> bool;
+        }
+        pg_prng_seed_check(arg_state)
+    })
+}
+pub unsafe fn pg_prng_uint64(arg_state: *mut pg_prng_state) -> uint64 {
+    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
+        extern "C" {
+            pub fn pg_prng_uint64(state: *mut pg_prng_state) -> uint64;
+        }
+        pg_prng_uint64(arg_state)
+    })
+}
+pub unsafe fn pg_prng_uint64_range(
+    arg_state: *mut pg_prng_state,
+    arg_rmin: uint64,
+    arg_rmax: uint64,
+) -> uint64 {
+    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
+        extern "C" {
+            pub fn pg_prng_uint64_range(
+                state: *mut pg_prng_state,
+                rmin: uint64,
+                rmax: uint64,
+            ) -> uint64;
+        }
+        pg_prng_uint64_range(arg_state, arg_rmin, arg_rmax)
+    })
+}
+pub unsafe fn pg_prng_int64(arg_state: *mut pg_prng_state) -> int64 {
+    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
+        extern "C" {
+            pub fn pg_prng_int64(state: *mut pg_prng_state) -> int64;
+        }
+        pg_prng_int64(arg_state)
+    })
+}
+pub unsafe fn pg_prng_int64p(arg_state: *mut pg_prng_state) -> int64 {
+    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
+        extern "C" {
+            pub fn pg_prng_int64p(state: *mut pg_prng_state) -> int64;
+        }
+        pg_prng_int64p(arg_state)
+    })
+}
+pub unsafe fn pg_prng_uint32(arg_state: *mut pg_prng_state) -> uint32 {
+    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
+        extern "C" {
+            pub fn pg_prng_uint32(state: *mut pg_prng_state) -> uint32;
+        }
+        pg_prng_uint32(arg_state)
+    })
+}
+pub unsafe fn pg_prng_int32(arg_state: *mut pg_prng_state) -> int32 {
+    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
+        extern "C" {
+            pub fn pg_prng_int32(state: *mut pg_prng_state) -> int32;
+        }
+        pg_prng_int32(arg_state)
+    })
+}
+pub unsafe fn pg_prng_int32p(arg_state: *mut pg_prng_state) -> int32 {
+    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
+        extern "C" {
+            pub fn pg_prng_int32p(state: *mut pg_prng_state) -> int32;
+        }
+        pg_prng_int32p(arg_state)
+    })
+}
+pub unsafe fn pg_prng_double(arg_state: *mut pg_prng_state) -> f64 {
+    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
+        extern "C" {
+            pub fn pg_prng_double(state: *mut pg_prng_state) -> f64;
+        }
+        pg_prng_double(arg_state)
+    })
+}
+pub unsafe fn pg_prng_bool(arg_state: *mut pg_prng_state) -> bool {
+    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
+        extern "C" {
+            pub fn pg_prng_bool(state: *mut pg_prng_state) -> bool;
+        }
+        pg_prng_bool(arg_state)
+    })
+}
+pub unsafe fn sampler_random_init_state(arg_seed: uint32, arg_randstate: *mut pg_prng_state) {
+    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
+        extern "C" {
+            pub fn sampler_random_init_state(seed: uint32, randstate: *mut pg_prng_state);
         }
         sampler_random_init_state(arg_seed, arg_randstate)
     })
 }
-pub unsafe fn sampler_random_fract(arg_randstate: *mut ::std::os::raw::c_ushort) -> f64 {
+pub unsafe fn sampler_random_fract(arg_randstate: *mut pg_prng_state) -> f64 {
     crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
         extern "C" {
-            pub fn sampler_random_fract(randstate: *mut ::std::os::raw::c_ushort) -> f64;
+            pub fn sampler_random_fract(randstate: *mut pg_prng_state) -> f64;
         }
         sampler_random_fract(arg_randstate)
     })
@@ -99347,14 +100350,14 @@ pub struct BlockSamplerData {
     pub n: ::std::os::raw::c_int,
     pub t: BlockNumber,
     pub m: ::std::os::raw::c_int,
-    pub randstate: SamplerRandomState,
+    pub randstate: pg_prng_state,
 }
 pub type BlockSampler = *mut BlockSamplerData;
 pub unsafe fn BlockSampler_Init(
     arg_bs: BlockSampler,
     arg_nblocks: BlockNumber,
     arg_samplesize: ::std::os::raw::c_int,
-    arg_randseed: ::std::os::raw::c_long,
+    arg_randseed: uint32,
 ) -> BlockNumber {
     crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
         extern "C" {
@@ -99362,7 +100365,7 @@ pub unsafe fn BlockSampler_Init(
                 bs: BlockSampler,
                 nblocks: BlockNumber,
                 samplesize: ::std::os::raw::c_int,
-                randseed: ::std::os::raw::c_long,
+                randseed: uint32,
             ) -> BlockNumber;
         }
         BlockSampler_Init(arg_bs, arg_nblocks, arg_samplesize, arg_randseed)
@@ -99388,7 +100391,7 @@ pub unsafe fn BlockSampler_Next(arg_bs: BlockSampler) -> BlockNumber {
 #[derive(Debug, Default, Copy, Clone)]
 pub struct ReservoirStateData {
     pub W: f64,
-    pub randstate: SamplerRandomState,
+    pub randstate: pg_prng_state,
 }
 pub type ReservoirState = *mut ReservoirStateData;
 pub unsafe fn reservoir_init_selection_state(arg_rs: ReservoirState, arg_n: ::std::os::raw::c_int) {
@@ -100118,44 +101121,48 @@ pub const SysCacheIdentifier_OPERNAMENSP: SysCacheIdentifier = 37;
 pub const SysCacheIdentifier_OPEROID: SysCacheIdentifier = 38;
 pub const SysCacheIdentifier_OPFAMILYAMNAMENSP: SysCacheIdentifier = 39;
 pub const SysCacheIdentifier_OPFAMILYOID: SysCacheIdentifier = 40;
-pub const SysCacheIdentifier_PARTRELID: SysCacheIdentifier = 41;
-pub const SysCacheIdentifier_PROCNAMEARGSNSP: SysCacheIdentifier = 42;
-pub const SysCacheIdentifier_PROCOID: SysCacheIdentifier = 43;
-pub const SysCacheIdentifier_PUBLICATIONNAME: SysCacheIdentifier = 44;
-pub const SysCacheIdentifier_PUBLICATIONOID: SysCacheIdentifier = 45;
-pub const SysCacheIdentifier_PUBLICATIONREL: SysCacheIdentifier = 46;
-pub const SysCacheIdentifier_PUBLICATIONRELMAP: SysCacheIdentifier = 47;
-pub const SysCacheIdentifier_RANGEMULTIRANGE: SysCacheIdentifier = 48;
-pub const SysCacheIdentifier_RANGETYPE: SysCacheIdentifier = 49;
-pub const SysCacheIdentifier_RELNAMENSP: SysCacheIdentifier = 50;
-pub const SysCacheIdentifier_RELOID: SysCacheIdentifier = 51;
-pub const SysCacheIdentifier_REPLORIGIDENT: SysCacheIdentifier = 52;
-pub const SysCacheIdentifier_REPLORIGNAME: SysCacheIdentifier = 53;
-pub const SysCacheIdentifier_RULERELNAME: SysCacheIdentifier = 54;
-pub const SysCacheIdentifier_SEQRELID: SysCacheIdentifier = 55;
-pub const SysCacheIdentifier_STATEXTDATASTXOID: SysCacheIdentifier = 56;
-pub const SysCacheIdentifier_STATEXTNAMENSP: SysCacheIdentifier = 57;
-pub const SysCacheIdentifier_STATEXTOID: SysCacheIdentifier = 58;
-pub const SysCacheIdentifier_STATRELATTINH: SysCacheIdentifier = 59;
-pub const SysCacheIdentifier_SUBSCRIPTIONNAME: SysCacheIdentifier = 60;
-pub const SysCacheIdentifier_SUBSCRIPTIONOID: SysCacheIdentifier = 61;
-pub const SysCacheIdentifier_SUBSCRIPTIONRELMAP: SysCacheIdentifier = 62;
-pub const SysCacheIdentifier_TABLESPACEOID: SysCacheIdentifier = 63;
-pub const SysCacheIdentifier_TRFOID: SysCacheIdentifier = 64;
-pub const SysCacheIdentifier_TRFTYPELANG: SysCacheIdentifier = 65;
-pub const SysCacheIdentifier_TSCONFIGMAP: SysCacheIdentifier = 66;
-pub const SysCacheIdentifier_TSCONFIGNAMENSP: SysCacheIdentifier = 67;
-pub const SysCacheIdentifier_TSCONFIGOID: SysCacheIdentifier = 68;
-pub const SysCacheIdentifier_TSDICTNAMENSP: SysCacheIdentifier = 69;
-pub const SysCacheIdentifier_TSDICTOID: SysCacheIdentifier = 70;
-pub const SysCacheIdentifier_TSPARSERNAMENSP: SysCacheIdentifier = 71;
-pub const SysCacheIdentifier_TSPARSEROID: SysCacheIdentifier = 72;
-pub const SysCacheIdentifier_TSTEMPLATENAMENSP: SysCacheIdentifier = 73;
-pub const SysCacheIdentifier_TSTEMPLATEOID: SysCacheIdentifier = 74;
-pub const SysCacheIdentifier_TYPENAMENSP: SysCacheIdentifier = 75;
-pub const SysCacheIdentifier_TYPEOID: SysCacheIdentifier = 76;
-pub const SysCacheIdentifier_USERMAPPINGOID: SysCacheIdentifier = 77;
-pub const SysCacheIdentifier_USERMAPPINGUSERSERVER: SysCacheIdentifier = 78;
+pub const SysCacheIdentifier_PARAMETERACLNAME: SysCacheIdentifier = 41;
+pub const SysCacheIdentifier_PARAMETERACLOID: SysCacheIdentifier = 42;
+pub const SysCacheIdentifier_PARTRELID: SysCacheIdentifier = 43;
+pub const SysCacheIdentifier_PROCNAMEARGSNSP: SysCacheIdentifier = 44;
+pub const SysCacheIdentifier_PROCOID: SysCacheIdentifier = 45;
+pub const SysCacheIdentifier_PUBLICATIONNAME: SysCacheIdentifier = 46;
+pub const SysCacheIdentifier_PUBLICATIONNAMESPACE: SysCacheIdentifier = 47;
+pub const SysCacheIdentifier_PUBLICATIONNAMESPACEMAP: SysCacheIdentifier = 48;
+pub const SysCacheIdentifier_PUBLICATIONOID: SysCacheIdentifier = 49;
+pub const SysCacheIdentifier_PUBLICATIONREL: SysCacheIdentifier = 50;
+pub const SysCacheIdentifier_PUBLICATIONRELMAP: SysCacheIdentifier = 51;
+pub const SysCacheIdentifier_RANGEMULTIRANGE: SysCacheIdentifier = 52;
+pub const SysCacheIdentifier_RANGETYPE: SysCacheIdentifier = 53;
+pub const SysCacheIdentifier_RELNAMENSP: SysCacheIdentifier = 54;
+pub const SysCacheIdentifier_RELOID: SysCacheIdentifier = 55;
+pub const SysCacheIdentifier_REPLORIGIDENT: SysCacheIdentifier = 56;
+pub const SysCacheIdentifier_REPLORIGNAME: SysCacheIdentifier = 57;
+pub const SysCacheIdentifier_RULERELNAME: SysCacheIdentifier = 58;
+pub const SysCacheIdentifier_SEQRELID: SysCacheIdentifier = 59;
+pub const SysCacheIdentifier_STATEXTDATASTXOID: SysCacheIdentifier = 60;
+pub const SysCacheIdentifier_STATEXTNAMENSP: SysCacheIdentifier = 61;
+pub const SysCacheIdentifier_STATEXTOID: SysCacheIdentifier = 62;
+pub const SysCacheIdentifier_STATRELATTINH: SysCacheIdentifier = 63;
+pub const SysCacheIdentifier_SUBSCRIPTIONNAME: SysCacheIdentifier = 64;
+pub const SysCacheIdentifier_SUBSCRIPTIONOID: SysCacheIdentifier = 65;
+pub const SysCacheIdentifier_SUBSCRIPTIONRELMAP: SysCacheIdentifier = 66;
+pub const SysCacheIdentifier_TABLESPACEOID: SysCacheIdentifier = 67;
+pub const SysCacheIdentifier_TRFOID: SysCacheIdentifier = 68;
+pub const SysCacheIdentifier_TRFTYPELANG: SysCacheIdentifier = 69;
+pub const SysCacheIdentifier_TSCONFIGMAP: SysCacheIdentifier = 70;
+pub const SysCacheIdentifier_TSCONFIGNAMENSP: SysCacheIdentifier = 71;
+pub const SysCacheIdentifier_TSCONFIGOID: SysCacheIdentifier = 72;
+pub const SysCacheIdentifier_TSDICTNAMENSP: SysCacheIdentifier = 73;
+pub const SysCacheIdentifier_TSDICTOID: SysCacheIdentifier = 74;
+pub const SysCacheIdentifier_TSPARSERNAMENSP: SysCacheIdentifier = 75;
+pub const SysCacheIdentifier_TSPARSEROID: SysCacheIdentifier = 76;
+pub const SysCacheIdentifier_TSTEMPLATENAMENSP: SysCacheIdentifier = 77;
+pub const SysCacheIdentifier_TSTEMPLATEOID: SysCacheIdentifier = 78;
+pub const SysCacheIdentifier_TYPENAMENSP: SysCacheIdentifier = 79;
+pub const SysCacheIdentifier_TYPEOID: SysCacheIdentifier = 80;
+pub const SysCacheIdentifier_USERMAPPINGOID: SysCacheIdentifier = 81;
+pub const SysCacheIdentifier_USERMAPPINGUSERSERVER: SysCacheIdentifier = 82;
 pub type SysCacheIdentifier = ::std::os::raw::c_uint;
 pub unsafe fn InitCatalogCache() {
     crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
@@ -101205,11 +102212,6 @@ pub struct memoize_hash {
 }
 #[repr(C)]
 #[derive(Debug, Default, Copy, Clone)]
-pub struct HashTapeInfo {
-    pub _address: u8,
-}
-#[repr(C)]
-#[derive(Debug, Default, Copy, Clone)]
 pub struct HashAggSpill {
     pub _address: u8,
 }
@@ -101226,6 +102228,11 @@ pub struct ParallelExecutorInfo {
 #[repr(C)]
 #[derive(Debug, Default, Copy, Clone)]
 pub struct TupleQueueReader {
+    pub _address: u8,
+}
+#[repr(C)]
+#[derive(Debug, Default, Copy, Clone)]
+pub struct _MdfdVec {
     pub _address: u8,
 }
 #[repr(C)]
@@ -101312,6 +102319,12 @@ impl std::fmt::Display for Alias {
 }
 impl pg_sys::PgNode for AlterCollationStmt {}
 impl std::fmt::Display for AlterCollationStmt {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(f, "{}", self.display_node())
+    }
+}
+impl pg_sys::PgNode for AlterDatabaseRefreshCollStmt {}
+impl std::fmt::Display for AlterDatabaseRefreshCollStmt {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         write!(f, "{}", self.display_node())
     }
@@ -101556,6 +102569,12 @@ impl std::fmt::Display for BaseBackupCmd {
         write!(f, "{}", self.display_node())
     }
 }
+impl pg_sys::PgNode for BitString {}
+impl std::fmt::Display for BitString {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(f, "{}", self.display_node())
+    }
+}
 impl pg_sys::PgNode for BitmapAnd {}
 impl std::fmt::Display for BitmapAnd {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
@@ -101624,6 +102643,12 @@ impl std::fmt::Display for BitmapOrState {
 }
 impl pg_sys::PgNode for BoolExpr {}
 impl std::fmt::Display for BoolExpr {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(f, "{}", self.display_node())
+    }
+}
+impl pg_sys::PgNode for Boolean {}
+impl std::fmt::Display for Boolean {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         write!(f, "{}", self.display_node())
     }
@@ -102198,6 +103223,12 @@ impl std::fmt::Display for FieldStore {
         write!(f, "{}", self.display_node())
     }
 }
+impl pg_sys::PgNode for Float {}
+impl std::fmt::Display for Float {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(f, "{}", self.display_node())
+    }
+}
 impl pg_sys::PgNode for ForeignKeyCacheInfo {}
 impl std::fmt::Display for ForeignKeyCacheInfo {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
@@ -102516,6 +103547,12 @@ impl std::fmt::Display for InsertStmt {
         write!(f, "{}", self.display_node())
     }
 }
+impl pg_sys::PgNode for Integer {}
+impl std::fmt::Display for Integer {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(f, "{}", self.display_node())
+    }
+}
 impl pg_sys::PgNode for IntoClause {}
 impl std::fmt::Display for IntoClause {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
@@ -102660,6 +103697,18 @@ impl std::fmt::Display for MemoryContextData {
         write!(f, "{}", self.display_node())
     }
 }
+impl pg_sys::PgNode for MergeAction {}
+impl std::fmt::Display for MergeAction {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(f, "{}", self.display_node())
+    }
+}
+impl pg_sys::PgNode for MergeActionState {}
+impl std::fmt::Display for MergeActionState {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(f, "{}", self.display_node())
+    }
+}
 impl pg_sys::PgNode for MergeAppend {}
 impl std::fmt::Display for MergeAppend {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
@@ -102692,6 +103741,18 @@ impl std::fmt::Display for MergeJoinState {
 }
 impl pg_sys::PgNode for MergePath {}
 impl std::fmt::Display for MergePath {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(f, "{}", self.display_node())
+    }
+}
+impl pg_sys::PgNode for MergeStmt {}
+impl std::fmt::Display for MergeStmt {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(f, "{}", self.display_node())
+    }
+}
+impl pg_sys::PgNode for MergeWhenClause {}
+impl std::fmt::Display for MergeWhenClause {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         write!(f, "{}", self.display_node())
     }
@@ -102776,6 +103837,12 @@ impl std::fmt::Display for NestLoopParam {
 }
 impl pg_sys::PgNode for NestLoopState {}
 impl std::fmt::Display for NestLoopState {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(f, "{}", self.display_node())
+    }
+}
+impl pg_sys::PgNode for NestPath {}
+impl std::fmt::Display for NestPath {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         write!(f, "{}", self.display_node())
     }
@@ -103032,6 +104099,18 @@ impl std::fmt::Display for ProjectionPath {
         write!(f, "{}", self.display_node())
     }
 }
+impl pg_sys::PgNode for PublicationObjSpec {}
+impl std::fmt::Display for PublicationObjSpec {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(f, "{}", self.display_node())
+    }
+}
+impl pg_sys::PgNode for PublicationTable {}
+impl std::fmt::Display for PublicationTable {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(f, "{}", self.display_node())
+    }
+}
 impl pg_sys::PgNode for Query {}
 impl std::fmt::Display for Query {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
@@ -103094,6 +104173,12 @@ impl std::fmt::Display for RangeVar {
 }
 impl pg_sys::PgNode for RawStmt {}
 impl std::fmt::Display for RawStmt {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(f, "{}", self.display_node())
+    }
+}
+impl pg_sys::PgNode for ReadReplicationSlotCmd {}
+impl std::fmt::Display for ReadReplicationSlotCmd {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         write!(f, "{}", self.display_node())
     }
@@ -103242,12 +104327,6 @@ impl std::fmt::Display for RuleStmt {
         write!(f, "{}", self.display_node())
     }
 }
-impl pg_sys::PgNode for SQLCmd {}
-impl std::fmt::Display for SQLCmd {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        write!(f, "{}", self.display_node())
-    }
-}
 impl pg_sys::PgNode for SQLValueFunction {}
 impl std::fmt::Display for SQLValueFunction {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
@@ -103292,6 +104371,12 @@ impl std::fmt::Display for SecLabelStmt {
 }
 impl pg_sys::PgNode for SelectStmt {}
 impl std::fmt::Display for SelectStmt {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(f, "{}", self.display_node())
+    }
+}
+impl pg_sys::PgNode for SeqScan {}
+impl std::fmt::Display for SeqScan {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         write!(f, "{}", self.display_node())
     }
@@ -103392,6 +104477,12 @@ impl std::fmt::Display for StatsElem {
         write!(f, "{}", self.display_node())
     }
 }
+impl pg_sys::PgNode for String {}
+impl std::fmt::Display for String {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(f, "{}", self.display_node())
+    }
+}
 impl pg_sys::PgNode for SubLink {}
 impl std::fmt::Display for SubLink {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
@@ -103460,6 +104551,12 @@ impl std::fmt::Display for SupportRequestSelectivity {
 }
 impl pg_sys::PgNode for SupportRequestSimplify {}
 impl std::fmt::Display for SupportRequestSimplify {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(f, "{}", self.display_node())
+    }
+}
+impl pg_sys::PgNode for SupportRequestWFuncMonotonic {}
+impl std::fmt::Display for SupportRequestWFuncMonotonic {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         write!(f, "{}", self.display_node())
     }
@@ -103634,12 +104731,6 @@ impl std::fmt::Display for VacuumRelation {
 }
 impl pg_sys::PgNode for VacuumStmt {}
 impl std::fmt::Display for VacuumStmt {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        write!(f, "{}", self.display_node())
-    }
-}
-impl pg_sys::PgNode for Value {}
-impl std::fmt::Display for Value {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         write!(f, "{}", self.display_node())
     }

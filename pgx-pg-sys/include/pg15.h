@@ -6,9 +6,6 @@ All rights reserved.
 
 Use of this source code is governed by the MIT license that can be found in the LICENSE file.
 */
-#include <stdbool.h>
-#define USE_STDBOOL 1
-
 #include "postgres.h"
 #include "pg_config.h"
 #include "funcapi.h"
@@ -22,10 +19,12 @@ Use of this source code is governed by the MIT license that can be found in the 
 #include "access/heapam.h"
 #include "access/htup.h"
 #include "access/htup_details.h"
+#include "access/relation.h"
 #include "access/reloptions.h"
 #include "access/relscan.h"
 #include "access/skey.h"
 #include "access/sysattr.h"
+#include "access/table.h"
 #include "access/xact.h"
 #include "catalog/dependency.h"
 #include "catalog/index.h"
@@ -53,21 +52,20 @@ Use of this source code is governed by the MIT license that can be found in the 
 #include "foreign/fdwapi.h"
 #include "foreign/foreign.h"
 #include "mb/pg_wchar.h"
-
-#define ScanKey struct ScanKeyData *
 #include "nodes/execnodes.h"
-#undef ScanKey
-
 #include "nodes/extensible.h"
 #include "nodes/makefuncs.h"
 #include "nodes/nodeFuncs.h"
 #include "nodes/nodes.h"
 #include "nodes/print.h"
 #include "nodes/replnodes.h"
+#include "nodes/supportnodes.h"
 #include "nodes/tidbitmap.h"
 #include "nodes/value.h"
+#include "optimizer/appendinfo.h"
 #include "optimizer/clauses.h"
 #include "optimizer/cost.h"
+#include "optimizer/optimizer.h"
 #include "optimizer/pathnode.h"
 #include "optimizer/paths.h"
 #include "optimizer/planmain.h"
@@ -97,11 +95,8 @@ Use of this source code is governed by the MIT license that can be found in the 
 #include "utils/builtins.h"
 #include "utils/date.h"
 #include "utils/datetime.h"
-
-#define double float8
+#include "utils/float.h"
 #include "utils/geo_decls.h"
-#undef double
-
 #include "utils/guc.h"
 #include "utils/json.h"
 #include "utils/jsonb.h"

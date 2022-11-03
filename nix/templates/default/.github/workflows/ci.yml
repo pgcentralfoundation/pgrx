@@ -6,11 +6,11 @@ jobs:
       fail-fast: false
       matrix:
         pg_version:
-          - 10
           - 11
           - 12
           - 13
           - 14
+          - 15
         target:
           - os: ubuntu-latest
             platform: x86_64-linux

@@ -86,8 +86,8 @@ macro_rules! variadic {
     };
 }
 
-#[cfg(any(feature = "pg10", feature = "pg11"))]
-mod pg_10_11 {
+#[cfg(any(feature = "pg11"))]
+mod pg_11 {
     use crate::{pg_sys, FromDatum};
 
     #[inline]
@@ -129,8 +129,8 @@ mod pg_10_11 {
     }
 }
 
-#[cfg(any(feature = "pg12", feature = "pg13", feature = "pg14"))]
-mod pg_12_13_14 {
+#[cfg(any(feature = "pg12", feature = "pg13", feature = "pg14", feature = "pg15"))]
+mod pg_12_13_14_15 {
     use crate::{pg_sys, FromDatum};
 
     #[inline]
@@ -190,11 +190,11 @@ mod pg_12_13_14 {
 // common
 //
 
-#[cfg(any(feature = "pg10", feature = "pg11"))]
-pub use pg_10_11::*;
+#[cfg(any(feature = "pg11"))]
+pub use pg_11::*;
 
-#[cfg(any(feature = "pg12", feature = "pg13", feature = "pg14"))]
-pub use pg_12_13_14::*;
+#[cfg(any(feature = "pg12", feature = "pg13", feature = "pg14", feature = "pg15"))]
+pub use pg_12_13_14_15::*;
 use std::ops::DerefMut;
 
 #[inline]
@@ -397,7 +397,7 @@ pub unsafe fn direct_pg_extern_function_call_as_datum(
     }
 }
 
-#[cfg(any(feature = "pg10", feature = "pg11"))]
+#[cfg(any(feature = "pg11"))]
 fn make_function_call_info(
     nargs: usize,
     arg_array: [pg_sys::Datum; 100],
@@ -413,7 +413,7 @@ fn make_function_call_info(
     fcinfo_boxed
 }
 
-#[cfg(any(feature = "pg12", feature = "pg13", feature = "pg14"))]
+#[cfg(any(feature = "pg12", feature = "pg13", feature = "pg14", feature = "pg15"))]
 fn make_function_call_info(
     nargs: usize,
     arg_array: [pg_sys::Datum; 100],
