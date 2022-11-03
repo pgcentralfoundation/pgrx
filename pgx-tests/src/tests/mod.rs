@@ -35,6 +35,7 @@ mod pg_try_tests;
 mod pgbox_tests;
 mod postgres_type_tests;
 mod schema_tests;
+mod shmem_tests;
 mod spi_tests;
 mod srf_tests;
 mod struct_type_tests;

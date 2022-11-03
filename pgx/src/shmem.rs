@@ -49,7 +49,24 @@ pub unsafe trait PGXSharedMemory {}
 #[macro_export]
 macro_rules! pg_shmem_init {
     ($thing:expr) => {
+        #[cfg(not(feature = "pg15"))]
         $thing.pg_init();
+        #[cfg(feature = "pg15")]
+        unsafe {
+            static mut PREV_SHMEM_REQUEST_HOOK: Option<unsafe extern "C" fn()> = None;
+            PREV_SHMEM_REQUEST_HOOK = pg_sys::shmem_request_hook;
+            pg_sys::shmem_request_hook = Some(__pgx_private_shmem_request_hook);
+
+            #[pg_guard]
+            extern "C" fn __pgx_private_shmem_request_hook() {
+                unsafe {
+                    if let Some(i) = PREV_SHMEM_REQUEST_HOOK {
+                        i();
+                    }
+                }
+                $thing.pg_init();
+            }
+        }
 
         unsafe {
             static mut PREV_SHMEM_STARTUP_HOOK: Option<unsafe extern "C" fn()> = None;
