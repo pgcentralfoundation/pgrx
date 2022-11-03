@@ -87,6 +87,13 @@ jobs:
         sudo chmod a+rwx `/usr/lib/postgresql/$PG_VER/bin/pg_config --pkglibdir` `/usr/lib/postgresql/$PG_VER/bin/pg_config --sharedir`/extension /var/run/postgresql/
         echo ""
 
+        echo "----- Setting timezone -----"
+        # Use the Pacific/Chatham (UTC+12:45) timezone to find code that assumes:
+        # - it's in UTC
+        # - it's in a timezone with an integer UTC offset
+        sudo timedatectl set-timezone Pacific/Chatham
+        echo ""
+
         echo "----- Print env -----"
         env
         echo ""
@@ -275,6 +282,11 @@ jobs:
         cargo --version
         echo ""
 
+        echo "----- Setting timezone -----"
+        # See the reasoning for this timezone in the pgx_tests job
+        sudo timedatectl set-timezone Pacific/Chatham
+        echo ""
+
         echo "----- Outputting env -----"
         env
         echo ""
@@ -366,6 +378,12 @@ jobs:
 
         echo "----- Output Cargo version -----"
         cargo --version
+        echo ""
+
+
+        echo "----- Setting timezone -----"
+        # See the reasoning for this timezone in the pgx_tests job
+        sudo systemsetup -settimezone Pacific/Chatham
         echo ""
 
         echo "----- Outputting env -----"

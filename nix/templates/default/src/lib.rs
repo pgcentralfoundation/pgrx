@@ -49,6 +49,6 @@ pub mod pg_test {
     }
 
     pub fn postgresql_conf_options() -> Vec<&'static str> {
-        vec![&*WORK_DIR, &*PG_CONFIG]
+        vec![&*WORK_DIR, &*PG_CONFIG, "timezone = 'UTC'"]
     }
 }
