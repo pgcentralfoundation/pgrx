@@ -207,14 +207,6 @@ macro_rules! warning {
 /// See [`fmt`](std::fmt) for information about options.
 #[macro_export]
 macro_rules! error {
-    ($errcode:expr, $($arg:tt)*) => (
-        {
-            extern crate alloc;
-            $crate::ereport!($crate::elog::PgLogLevel::ERROR, $errcode, alloc::format!($($arg)*).as_str());
-            unreachable!()
-        }
-    );
-
     ($($arg:tt)*) => (
         {
             extern crate alloc;
