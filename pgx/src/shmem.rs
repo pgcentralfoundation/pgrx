@@ -46,12 +46,34 @@ pub unsafe trait PGXSharedMemory {}
 ///     pg_shmem_init!(ATOMIC);
 /// }
 /// ```
+#[cfg(not(feature = "pg15"))]
 #[macro_export]
 macro_rules! pg_shmem_init {
     ($thing:expr) => {
-        #[cfg(not(feature = "pg15"))]
         $thing.pg_init();
-        #[cfg(feature = "pg15")]
+
+        unsafe {
+            static mut PREV_SHMEM_STARTUP_HOOK: Option<unsafe extern "C" fn()> = None;
+            PREV_SHMEM_STARTUP_HOOK = pg_sys::shmem_startup_hook;
+            pg_sys::shmem_startup_hook = Some(__pgx_private_shmem_hook);
+
+            #[pg_guard]
+            extern "C" fn __pgx_private_shmem_hook() {
+                unsafe {
+                    if let Some(i) = PREV_SHMEM_STARTUP_HOOK {
+                        i();
+                    }
+                }
+                $thing.shmem_init();
+            }
+        }
+    };
+}
+
+#[cfg(feature = "pg15")]
+#[macro_export]
+macro_rules! pg_shmem_init {
+    ($thing:expr) => {
         unsafe {
             static mut PREV_SHMEM_REQUEST_HOOK: Option<unsafe extern "C" fn()> = None;
             PREV_SHMEM_REQUEST_HOOK = pg_sys::shmem_request_hook;
@@ -85,6 +107,7 @@ macro_rules! pg_shmem_init {
         }
     };
 }
+
 /// A trait that types can implement to provide their own Postgres Shared Memory initialization process
 pub trait PgSharedMemoryInitialization {
     /// Automatically called when the an extension is loaded.  If using the `pg_shmem_init!()` macro
