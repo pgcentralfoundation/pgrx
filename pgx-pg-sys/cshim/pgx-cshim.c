@@ -57,7 +57,7 @@ void pgx_ereport(const int level, int code, char *message, char *detail, char *f
         if (errstart(level, file, lineno, funcname, NULL)) {
             if (detail != NULL) {
                 if (context != NULL) {
-                    errfinish(level, errcode(code), errmsg("%s", message), errdetail("%s", detail), errcontext_msg(context));
+                    errfinish(level, errcode(code), errmsg("%s", message), errdetail("%s", detail), errcontext_msg("%s", context));
                 } else {
                     errfinish(level, errcode(code), errmsg("%s", message), errdetail("%s", detail));
                 }
