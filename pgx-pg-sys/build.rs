@@ -115,7 +115,17 @@ fn main() -> eyre::Result<()> {
         == "1"
     {
         pgx.iter(PgConfigSelector::All)
-            .map(|v| v.wrap_err("invalid pg_config"))
+            .map(|r| r.expect("invalid pg_config"))
+            .map(|c| (c.major_version().expect("invalid major version"), c))
+            .filter(|c| {
+                if SUPPORTED_MAJOR_VERSIONS.contains(&c.0) {
+                    true
+                } else {
+                    println!("cargo:warning=Your PGX configuration is set up to use an unsupported version of Postgres:{}", c.0);
+                    false
+                }
+            })
+            .map(|c| Ok(c.1))
             .collect::<eyre::Result<Vec<_>>>()?
     } else {
         let mut found = None;
