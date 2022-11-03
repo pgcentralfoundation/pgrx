@@ -104,7 +104,7 @@ pub use pgx_pg_sys as pg_sys; // the module only, not its contents
 pub use pg_sys::elog::PgLogLevel;
 pub use pg_sys::errcodes::PgSqlErrorCode;
 pub use pg_sys::oids::PgOid;
-pub use pg_sys::panic::guard;
+pub use pg_sys::panic::pgx_extern_c_guard;
 pub use pg_sys::pg_try::PgTryBuilder;
 pub use pg_sys::utils::name_data_to_str;
 pub use pg_sys::PgBuiltInOids;

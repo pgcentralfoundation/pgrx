@@ -219,6 +219,13 @@ enum GuardAction<R> {
 /// Where it does need to be used is as a wrapper around Rust `extern "C"` function pointers given
 /// to Postgres, and the `#[pg_guard]` macro takes care of this for you.
 ///
+/// In other words, this isn't the function you're looking for.
+///
+/// You're probably looking for the `#[pg_guard]` macro.
+///
+/// Alternatively, if you're trying to mimic Postgres' C `PG_TRY/PG_CATCH` API, then you instead
+/// want [`crate::pg_try::PgTryBuilder`].
+///
 /// # Safety
 ///
 /// The function needs to only have [trivially-deallocated stack frames]
@@ -229,7 +236,8 @@ enum GuardAction<R> {
 /// and probably do something about `Func` too...
 ///
 /// [trivially-deallocated stack frames](https://github.com/rust-lang/rfcs/blob/master/text/2945-c-unwind-abi.md#plain-old-frames)
-pub unsafe fn guard<Func, R: Copy>(f: Func) -> R
+#[doc(hidden)]
+pub unsafe fn pgx_extern_c_guard<Func, R: Copy>(f: Func) -> R
 where
     Func: FnOnce() -> R + UnwindSafe + RefUnwindSafe,
 {
@@ -406,7 +414,6 @@ fn do_ereport(ereport: ErrorReportWithLevel) {
     }
 }
 
-#[inline(never)]
 fn contexts_as_pg_cstr(stack: &Vec<ErrorReportLocation>) -> *mut core::ffi::c_char {
     let contexts = if stack.is_empty() {
         None

@@ -82,7 +82,7 @@ impl PgGuardRewriter {
 
                 #[allow(unused_unsafe)]
                 unsafe {
-                    pg_sys::panic::guard( || #func_name(#arg_list) )
+                    pg_sys::panic::pgx_extern_c_guard( || #func_name(#arg_list) )
                 }
             }
         })

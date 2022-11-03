@@ -18,8 +18,6 @@ pub mod pg_try;
 pub mod polyfill;
 pub mod tupdesc;
 
-pub use panic::guard;
-
 pub mod utils;
 
 // Various SqlTranslatable mappings for SQL generation
