@@ -92,7 +92,7 @@ impl FromDatum for Interval {
         if is_null {
             None
         } else {
-            Some(datum.try_into().expect("Error converting interval datum"))
+            Some(datum.try_into().ok()?)
         }
     }
 }
