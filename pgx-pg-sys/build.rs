@@ -117,16 +117,21 @@ fn main() -> eyre::Result<()> {
         pgx.iter(PgConfigSelector::All)
             .map(|r| r.expect("invalid pg_config"))
             .map(|c| (c.major_version().expect("invalid major version"), c))
-            .filter(|c| {
-                if SUPPORTED_MAJOR_VERSIONS.contains(&c.0) {
-                    true
+            .filter_map(|t| {
+                if SUPPORTED_MAJOR_VERSIONS.contains(&t.0) {
+                    Some(t.1)
                 } else {
-                    println!("cargo:warning=Your PGX configuration is set up to use an unsupported version of Postgres:{}", c.0);
-                    false
+                    println!(
+                        "cargo:warning={} is configured for pg{}, which pgx does not support.",
+                        Pgx::config_toml()
+                            .expect("Could not get PGX configuration TOML")
+                            .to_string_lossy(),
+                        t.0
+                    );
+                    None
                 }
             })
-            .map(|c| Ok(c.1))
-            .collect::<eyre::Result<Vec<_>>>()?
+            .collect()
     } else {
         let mut found = None;
         for version in SUPPORTED_MAJOR_VERSIONS {
