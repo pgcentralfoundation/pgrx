@@ -46,15 +46,9 @@ impl From<&Location<'_>> for ErrorReportLocation {
     }
 }
 
-impl From<Option<&Location<'_>>> for ErrorReportLocation {
-    fn from(location: Option<&Location<'_>>) -> Self {
-        location.into()
-    }
-}
-
 impl From<&PanicInfo<'_>> for ErrorReportLocation {
     fn from(pi: &PanicInfo<'_>) -> Self {
-        pi.location().into()
+        pi.location().map(|l| l.into()).unwrap_or_default()
     }
 }
 

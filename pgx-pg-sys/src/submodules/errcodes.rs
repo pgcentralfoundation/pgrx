@@ -4,8 +4,6 @@ use std::fmt::{Display, Formatter};
 #[allow(non_camel_case_types)]
 #[derive(Clone, Copy, Debug, Eq, PartialEq, Hash, Ord, PartialOrd)]
 pub enum PgSqlErrorCode {
-    None = -1,
-
     /// Class 00 - Successful Completion
     ERRCODE_SUCCESSFUL_COMPLETION = MAKE_SQLSTATE('0', '0', '0', '0', '0') as isize,
 
