@@ -73,7 +73,7 @@ impl<'a, R, F: FnOnce() -> R + UnwindSafe> PgTryBuilder<'a, R, F> {
                 // not run.  Normal rust drop semantics during stack unwinding will, however.
                 // So in practice it seems reasonable that users likely won't have finally blocks
                 // anyways
-                if let Some(handler) = self.when.get_mut(&sqlerrcode) {
+                let handler_result = if let Some(handler) = self.when.get_mut(&sqlerrcode) {
                     // we have a registered catch handler for the error code we caught
                     handler(panic)
                 } else if let Some(mut handler) = self.catch_others {
@@ -83,11 +83,30 @@ impl<'a, R, F: FnOnce() -> R + UnwindSafe> PgTryBuilder<'a, R, F> {
                     // we have no catch handler so we need call our finally handler and rethrow
                     finally();
                     panic.rethrow_ignore_location()
+                };
+
+                // Being here means the catch handler didn't rethrow the error.  As such, we must
+                // instruct Postgres to flush its error state
+                //
+                // Postgres says:
+                unsafe {
+                    /*
+                     * FlushErrorState --- flush the error state after error recovery
+                     *
+                     * This should be called by an error handler after it's done processing
+                     * the error; or as soon as it's done CopyErrorData, if it intends to
+                     * do stuff that is likely to provoke another error.  You are not "out" of
+                     * the error subsystem until you have done this.
+                     */
+                    crate::FlushErrorState();
                 }
+                handler_result
             }
         };
 
-        // make sure to run the finally block and return whatever the catch handler may have returned
+        // Make sure to run the finally block and return whatever result we have.
+        //
+        // That result could be from a successful execution or returned from a catch handler
         finally();
         result
     }
