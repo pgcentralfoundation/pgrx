@@ -57,6 +57,45 @@ pub enum PgLogLevel {
     PANIC = crate::PANIC as isize,
 }
 
+impl From<isize> for PgLogLevel {
+    #[inline]
+    fn from(i: isize) -> Self {
+        if i == PgLogLevel::DEBUG5 as _ {
+            PgLogLevel::DEBUG5
+        } else if i == PgLogLevel::DEBUG4 as _ {
+            PgLogLevel::DEBUG4
+        } else if i == PgLogLevel::DEBUG3 as _ {
+            PgLogLevel::DEBUG3
+        } else if i == PgLogLevel::DEBUG2 as _ {
+            PgLogLevel::DEBUG2
+        } else if i == PgLogLevel::DEBUG1 as _ {
+            PgLogLevel::DEBUG1
+        } else if i == PgLogLevel::INFO as _ {
+            PgLogLevel::INFO
+        } else if i == PgLogLevel::NOTICE as _ {
+            PgLogLevel::NOTICE
+        } else if i == PgLogLevel::WARNING as _ {
+            PgLogLevel::WARNING
+        } else if i == PgLogLevel::ERROR as _ {
+            PgLogLevel::ERROR
+        } else if i == PgLogLevel::FATAL as _ {
+            PgLogLevel::FATAL
+        } else if i == PgLogLevel::PANIC as _ {
+            PgLogLevel::PANIC
+        } else {
+            // ERROR seems like a good default
+            PgLogLevel::ERROR
+        }
+    }
+}
+
+impl From<i32> for PgLogLevel {
+    #[inline]
+    fn from(i: i32) -> Self {
+        (i as isize).into()
+    }
+}
+
 /// Log to Postgres' `debug5` log level.
 ///
 /// This macro accepts arguments like the [`println`](std::println) and [`format`](std::format) macros.
