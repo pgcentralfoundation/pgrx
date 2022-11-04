@@ -142,21 +142,6 @@ fn get_arr_ndim(arr: Array<i32>) -> libc::c_int {
     unsafe { RawArray::from_array(arr) }.unwrap().dims().len() as _
 }
 
-#[pg_extern]
-#[allow(deprecated)]
-fn over_implicit_drop() -> Vec<i64> {
-    // Create an array of exactly Datum-sized numbers.
-    let mut vec: Vec<i64> = vec![1, 2, 3, 4, 5];
-    let mut nulls = vec![false, false, true, false, false];
-    // Verify we uphold the length contract.
-    assert_eq!(vec.len(), nulls.len());
-    let len = vec.len();
-    // Create an Array...
-    let _arr = unsafe { Array::<'_, i64>::over(vec.as_mut_ptr().cast(), nulls.as_mut_ptr(), len) };
-    vec
-    // Implicit drop of _arr
-}
-
 // This deliberately iterates the Array.
 // Because Array::iter currently iterates the Array as Datums, this is guaranteed to be "bug-free" regarding size.
 #[pg_extern]
@@ -366,19 +351,6 @@ mod tests {
             .expect("failed to get SPI result");
 
         assert_eq!(ndim, 2);
-    }
-
-    #[pg_test]
-    fn test_array_over_direct() {
-        let vals = crate::tests::array_tests::over_implicit_drop();
-        assert_eq!(vals, &[1, 2, 3, 4, 5]);
-    }
-
-    #[pg_test]
-    fn test_array_over_spi() {
-        let vals: Vec<i64> =
-            Spi::get_one("SELECT over_implicit_drop();").expect("over machine broke");
-        assert_eq!(vals, &[1, 2, 3, 4, 5]);
     }
 
     #[pg_test]
