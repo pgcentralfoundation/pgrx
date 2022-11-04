@@ -59,8 +59,10 @@ impl PgGuardRewriter {
         let arg_list = PgGuardRewriter::build_arg_list(&sig, false)?;
         let func_name = PgGuardRewriter::build_func_name(&func.sig);
 
-        let prolog = if input_func_name == "__pgx_private_shmem_hook" {
-            // we do not want "no_mangle" on this function
+        let prolog = if input_func_name == "__pgx_private_shmem_hook"
+            || input_func_name == "__pgx_private_shmem_request_hook"
+        {
+            // we do not want "no_mangle" on these functions
             quote! {}
         } else if input_func_name == "_PG_init" || input_func_name == "_PG_fini" {
             quote! {
