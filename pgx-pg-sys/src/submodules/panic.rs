@@ -264,7 +264,9 @@ where
                 }
                 unsafe {
                     pgx_errcontext_msg(errdata.location.to_string().as_pg_cstr());
-                    pgx_errcontext_msg(contexts_as_pg_cstr(&errdata.stack));
+                    if let Some(contexts) = contexts_as_pg_cstr(&errdata.stack) {
+                        pgx_errcontext_msg(contexts.as_pg_cstr());
+                    }
                 }
 
                 // Return to the caller to rethrow -- we can't do it here
@@ -372,7 +374,7 @@ fn do_ereport(ereport: ErrorReportWithLevel) {
         let old_cxt = MemoryContextSwitchTo(crate::ErrorContext);
         let level = ereport.level as i32;
         let errocode = ereport.ereport.errcode as i32;
-        let contexts = contexts_as_pg_cstr(&ereport.stack);
+        let contexts = contexts_as_pg_cstr(&ereport.stack).as_pg_cstr();
         let funcname = ereport.ereport.funcname.as_ref().as_pg_cstr();
         let file = ereport.ereport.location.file.as_str().as_pg_cstr();
         let message = ereport.ereport.message.as_str().as_pg_cstr();
@@ -408,11 +410,10 @@ fn do_ereport(ereport: ErrorReportWithLevel) {
     }
 }
 
-fn contexts_as_pg_cstr(stack: &Vec<ErrorReportLocation>) -> *mut core::ffi::c_char {
-    let contexts = if stack.is_empty() {
+fn contexts_as_pg_cstr(stack: &Vec<ErrorReportLocation>) -> Option<String> {
+    if stack.is_empty() {
         None
     } else {
         Some(stack.iter().map(|s| s.to_string()).collect::<Vec<_>>().join("\n"))
-    };
-    contexts.as_pg_cstr()
+    }
 }
