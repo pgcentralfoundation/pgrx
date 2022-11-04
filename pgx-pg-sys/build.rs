@@ -122,7 +122,7 @@ fn main() -> eyre::Result<()> {
                     Some(t.1)
                 } else {
                     println!(
-                        "cargo:warning={} is configured for pg{}, which pgx does not support.",
+                        "cargo:warning={} contains a configuration for pg{}, which pgx does not support.",
                         Pgx::config_toml()
                             .expect("Could not get PGX configuration TOML")
                             .to_string_lossy(),
