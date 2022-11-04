@@ -31,6 +31,22 @@ extern "C" fn walker() -> bool {
     panic!("panic in walker");
 }
 
+#[pg_extern]
+fn get_relation_name(oid: pg_sys::Oid) -> String {
+    PgTryBuilder::new(|| unsafe {
+        // pg_sys::relation_open will raise a XX000 if the specified oid isn't a valid relation
+        let rel = PgBox::from_pg(pg_sys::relation_open(oid, pg_sys::AccessShareLock as _));
+        let pg_class_entry = PgBox::from_pg(rel.rd_rel);
+        let relname = &pg_class_entry.relname;
+        name_data_to_str(relname).to_string()
+    })
+    .catch_when(PgSqlErrorCode::ERRCODE_INTERNAL_ERROR, |_error| {
+        // so in the case the oid isn't a valid relation, just return a generic string
+        format!("<{oid} is not a relation>")
+    })
+    .execute()
+}
+
 #[cfg(any(test, feature = "pg_test"))]
 #[pg_schema]
 mod tests {
@@ -40,6 +56,13 @@ mod tests {
     use std::sync::atomic::{AtomicBool, Ordering};
 
     use pgx::prelude::*;
+
+    // see: c5cd61d7bfdfb5236ef0f8b98f433b35a2444346
+    #[allow(non_snake_case)]
+    #[pg_test]
+    fn test_we_dont_blow_out_ERRDATA_STACK_SIZE() {
+        Spi::run("SELECT get_relation_name(x) FROM generate_series(1, 1000) x");
+    }
 
     #[pg_test(error = "panic in walker")]
     fn test_panic_in_extern_c_fn() {
