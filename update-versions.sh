@@ -9,7 +9,6 @@
 # the LICENSE file.
 
 # requires:
-# * ripgrep
 # * pgx-version-updater (no intervention required -- built on demand from this project)
 #
 # To run this with more output, set environment variable VERBOSE to either 1 or true. E.g.
@@ -21,11 +20,6 @@ if [ "$1" == "" ]; then
 fi
 
 set -e
-
-if ! command -v rg &> /dev/null; then
-  echo "Command \`rg\` (ripgrep) was not found. Please install it and try again."
-  exit 1
-fi
 
 if ! command -v jq &> /dev/null; then
   echo "Command \`jq\` was not found. Please install it and try again."
