@@ -6,7 +6,7 @@ All rights reserved.
 
 Use of this source code is governed by the MIT license that can be found in the LICENSE file.
 */
-use pgx::cstr_core::CStr;
+use core::ffi::CStr;
 use pgx::prelude::*;
 use pgx::{InOutFuncs, PgVarlena, PgVarlenaInOutFuncs, StringInfo};
 use serde::{Deserialize, Serialize};

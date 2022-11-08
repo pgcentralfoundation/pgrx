@@ -26,6 +26,7 @@ extern crate pgx_macros;
 
 #[macro_use]
 extern crate bitflags;
+extern crate alloc;
 
 // expose our various derive macros
 pub use pgx_macros::*;
@@ -105,7 +106,13 @@ pub use pgx_pg_sys as pg_sys; // the module only, not its contents
 pub use pgx_pg_sys::submodules::*;
 pub use pgx_pg_sys::PgBuiltInOids; // reexport this so it looks like it comes from here
 
-pub use {cstr_core, pgx_utils as utils};
+pub use pgx_utils as utils;
+
+#[deprecated = "Please use the types in `{core,alloc,std}::ffi` instead"]
+pub mod cstr_core {
+    pub use alloc::ffi::{CString, FromVecWithNulError, NulError};
+    pub use core::ffi::{c_char, CStr, FromBytesWithNulError};
+}
 
 use once_cell::sync::Lazy;
 use std::collections::HashSet;
