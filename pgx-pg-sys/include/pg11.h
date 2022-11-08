@@ -104,6 +104,8 @@ Use of this source code is governed by the MIT license that can be found in the 
 #include "utils/geo_decls.h"
 #undef double
 
+#include "utils/elog.h"
+#include "utils/fmgrprotos.h"
 #include "utils/guc.h"
 #include "utils/json.h"
 #include "utils/jsonb.h"

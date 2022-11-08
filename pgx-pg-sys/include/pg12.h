@@ -99,6 +99,7 @@ Use of this source code is governed by the MIT license that can be found in the 
 #include "utils/builtins.h"
 #include "utils/date.h"
 #include "utils/datetime.h"
+#include "utils/elog.h"
 #include "utils/float.h"
 #include "utils/geo_decls.h"
 #include "utils/guc.h"

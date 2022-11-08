@@ -16,7 +16,7 @@ Use of this source code is governed by the MIT license that can be found in the 
 //! simple accessibility to working with MemoryContexts in a compiler-checked manner
 //!
 use crate::pg_sys::AsPgCStr;
-use crate::{guard, pg_sys, PgBox};
+use crate::{pg_sys, PgBox};
 use core::panic::{RefUnwindSafe, UnwindSafe};
 use core::ptr;
 use std::fmt::Debug;
@@ -421,7 +421,7 @@ impl PgMemoryContexts {
             pg_sys::CurrentMemoryContext = context;
         }
 
-        let result = guard::guard(|| f(&mut PgMemoryContexts::For(context)));
+        let result = f(&mut PgMemoryContexts::For(context));
 
         // restore our understanding of the current memory context
         unsafe {

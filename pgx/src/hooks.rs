@@ -217,13 +217,12 @@ pub unsafe fn register_hook(hook: &'static mut (dyn PgHooks)) {
             .replace(pgx_post_parse_analyze),
     });
 
-    unsafe extern "C" fn xact_callback(event: pg_sys::XactEvent, _: void_mut_ptr) {
+    #[pg_guard]
+    unsafe extern "C" fn xact_callback(event: pg_sys::XactEvent, _data: void_mut_ptr) {
         match event {
-            pg_sys::XactEvent_XACT_EVENT_ABORT => {
-                crate::guard(|| HOOKS.as_mut().unwrap().current_hook.abort());
-            }
+            pg_sys::XactEvent_XACT_EVENT_ABORT => HOOKS.as_mut().unwrap().current_hook.abort(),
             pg_sys::XactEvent_XACT_EVENT_PRE_COMMIT => {
-                crate::guard(|| HOOKS.as_mut().unwrap().current_hook.commit());
+                HOOKS.as_mut().unwrap().current_hook.commit()
             }
             _ => { /* noop */ }
         }

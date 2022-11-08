@@ -11,6 +11,7 @@ Use of this source code is governed by the MIT license that can be found in the 
 //!
 //! See: [https://www.postgresql.org/docs/12/bgworker.html](https://www.postgresql.org/docs/12/bgworker.html)
 use crate::pg_sys;
+use pgx_pg_sys::PgTryBuilder;
 use std::convert::TryInto;
 use std::ffi::{CStr, CString};
 use std::os::raw::c_char;
@@ -191,7 +192,10 @@ impl BackgroundWorker {
 
     /// Once connected to SPI via `connect_worker_to_spi()`, begin a transaction to
     /// use the `pgx::Spi` interface. Returns the return value of the `F` function.
-    pub fn transaction<F: FnOnce() -> R + std::panic::UnwindSafe + std::panic::RefUnwindSafe, R>(
+    pub fn transaction<
+        F: FnOnce() -> R + std::panic::UnwindSafe + std::panic::RefUnwindSafe,
+        R: Copy,
+    >(
         transaction_body: F,
     ) -> R {
         unsafe {
@@ -200,12 +204,12 @@ impl BackgroundWorker {
             pg_sys::StartTransactionCommand();
             pg_sys::PushActiveSnapshot(pg_sys::GetTransactionSnapshot());
         }
-        let result = pg_sys::guard(|| transaction_body());
         unsafe {
+            let result = PgTryBuilder::new(transaction_body).execute();
             pg_sys::PopActiveSnapshot();
             pg_sys::CommitTransactionCommand();
+            result
         }
-        result
     }
 }
 
@@ -597,7 +601,7 @@ fn wait_latch(timeout: i64, wakeup_flags: WLflags) -> i32 {
             pg_sys::PG_WAIT_EXTENSION,
         );
         pg_sys::ResetLatch(pg_sys::MyLatch);
-        check_for_interrupts!();
+        pg_sys::check_for_interrupts!();
 
         latch
     }

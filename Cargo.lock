@@ -1412,6 +1412,14 @@ dependencies = [
 ]
 
 [[package]]
+name = "pgtrybuilder"
+version = "0.1.0"
+dependencies = [
+ "pgx",
+ "pgx-tests",
+]
+
+[[package]]
 name = "pgx"
 version = "0.5.6"
 dependencies = [

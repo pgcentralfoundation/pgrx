@@ -19,6 +19,7 @@ members = [
     "pgx-examples/custom_sql",
     "pgx-examples/errors",
     "pgx-examples/nostd",
+    "pgx-examples/pgtrybuilder",
     "pgx-examples/operators",
     "pgx-examples/schemas",
     "pgx-examples/shmem",

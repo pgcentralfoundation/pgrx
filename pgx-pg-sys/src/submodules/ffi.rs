@@ -1,4 +1,8 @@
 #![deny(unsafe_op_in_unsafe_fn)]
+
+use crate::panic::{CaughtError, ErrorReport, ErrorReportLocation, ErrorReportWithLevel};
+use std::ffi::CStr;
+
 /**
 Given a closure that is assumed to be a wrapped Postgres `extern "C"` function, [pg_guard_ffi_boundary]
 works with the Postgres and C runtimes to create a "barrier" that allows Rust to catch Postgres errors
@@ -65,31 +69,78 @@ unsafe fn pg_guard_ffi_boundary_impl<T, F: FnOnce() -> T>(f: F) -> T {
     // SAFETY: This should really, really not be done in a multithreaded context as it
     // accesses multiple `static mut`. The ultimate caller asserts this is the main thread.
     unsafe {
+        let caller_memxct = pg_sys::CurrentMemoryContext;
         let prev_exception_stack = pg_sys::PG_exception_stack;
         let prev_error_context_stack = pg_sys::error_context_stack;
         let mut jump_buffer = std::mem::MaybeUninit::uninit();
         let jump_value = crate::sigsetjmp(jump_buffer.as_mut_ptr(), 0);
 
-        let result = if jump_value == 0 {
+        if jump_value == 0 {
             // first time through, not as the result of a longjmp
             pg_sys::PG_exception_stack = jump_buffer.as_mut_ptr();
 
             // execute the closure, which will be a wrapped internal Postgres function
-            f()
-        } else {
-            // we're back here b/c of a longjmp originating in Postgres
-            // as such, we need to put Postgres' understanding of its exception/error state back together
+            let result = f();
+
+            // restore Postgres' understanding of where its next longjmp should go
             pg_sys::PG_exception_stack = prev_exception_stack;
             pg_sys::error_context_stack = prev_error_context_stack;
 
-            // and ultimately we panic
-            std::panic::panic_any(pg_sys::JumpContext {});
-        };
+            return result;
+        } else {
+            // we're back here b/c of a longjmp originating in Postgres
 
-        pg_sys::PG_exception_stack = prev_exception_stack;
-        pg_sys::error_context_stack = prev_error_context_stack;
+            // the overhead to get the current [ErrorData] from Postgres and convert
+            // it into our [ErrorReportWithLevel] seems worth the user benefit
+            //
+            // Note that this only happens in the case of us trapping an error
 
-        result
+            // At this point, we're running within `pg_sys::ErrorContext`, but should be in the
+            // memory context the caller was in before we call [CopyErrorData()] and start using it
+            pg_sys::CurrentMemoryContext = caller_memxct;
+
+            // SAFETY: `pg_sys::CopyErrorData()` will always give us a valid pointer, so just assume so
+            let errdata_ptr = pg_sys::CopyErrorData();
+            let errdata = errdata_ptr.as_ref().unwrap_unchecked();
+
+            // copy out the fields we need to support pgx' error handling
+            let level = errdata.elevel.into();
+            let sqlerrcode = errdata.sqlerrcode.into();
+            let message = errdata
+                .message
+                .is_null()
+                .then(|| String::from("<null error message>"))
+                .unwrap_or_else(|| CStr::from_ptr(errdata.message).to_string_lossy().to_string());
+            let detail = errdata.detail.is_null().then(|| None).unwrap_or_else(|| {
+                Some(CStr::from_ptr(errdata.detail).to_string_lossy().to_string())
+            });
+            let funcname = errdata.funcname.is_null().then(|| None).unwrap_or_else(|| {
+                Some(CStr::from_ptr(errdata.funcname).to_string_lossy().to_string())
+            });
+            let file =
+                errdata.filename.is_null().then(|| String::from("<null filename>")).unwrap_or_else(
+                    || CStr::from_ptr(errdata.filename).to_string_lossy().to_string(),
+                );
+            let line = errdata.lineno as _;
+
+            // clean up after ourselves by freeing the result of [CopyErrorData] and restoring
+            // Postgres' understanding of where its next longjmp should go
+            pg_sys::FreeErrorData(errdata_ptr);
+            pg_sys::PG_exception_stack = prev_exception_stack;
+            pg_sys::error_context_stack = prev_error_context_stack;
+
+            // finally, turn this Postgres error into a Rust panic so that we can ensure proper
+            // Rust stack unwinding and also defer handling until later
+            std::panic::panic_any(CaughtError::PostgresError(ErrorReportWithLevel {
+                level,
+                inner: ErrorReport {
+                    sqlerrcode,
+                    message,
+                    detail,
+                    location: ErrorReportLocation { file, funcname, line, col: 0 },
+                },
+            }))
+        }
     }
 }
 
