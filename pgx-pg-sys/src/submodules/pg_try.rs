@@ -3,6 +3,10 @@ use crate::panic::{downcast_panic_payload, CaughtError};
 use std::collections::BTreeMap;
 use std::panic::{catch_unwind, resume_unwind, AssertUnwindSafe, RefUnwindSafe, UnwindSafe};
 
+/// [`PgTryBuilder`] is a mechanism to mimic Postgres C macros `PG_TRY` and `PG_CATCH`.
+///
+/// A primary difference is that the [`PgTryBuilder::finally()`] block runs even if a catch handler
+/// rethrows (or throws a new) error.
 pub struct PgTryBuilder<'a, R, F: FnOnce() -> R + UnwindSafe> {
     func: F,
     when: BTreeMap<
@@ -15,11 +19,51 @@ pub struct PgTryBuilder<'a, R, F: FnOnce() -> R + UnwindSafe> {
 }
 
 impl<'a, R, F: FnOnce() -> R + UnwindSafe> PgTryBuilder<'a, R, F> {
+    /// Create a new `[PgTryBuilder]`.  The `func` argument specifies the closure that is to run.
+    ///
+    /// If it fails with either a Rust panic or a Postgres error, a registered catch handler
+    /// for that specific error is run.  Whether one exists or not, the finally block also runs
+    /// at the end, for any necessary cleanup.
+    ///
+    /// ## Example
+    ///
+    /// ```rust,no_run
+    /// # use pgx_pg_sys::{ereport, PgTryBuilder};
+    /// # use pgx_pg_sys::errcodes::PgSqlErrorCode;
+    ///
+    /// let i = 41;
+    /// let mut finished = false;
+    /// let result = PgTryBuilder::new(|| {
+    ///     if i < 42 {
+    ///         ereport!(ERROR, PgSqlErrorCode::ERRCODE_NUMERIC_VALUE_OUT_OF_RANGE, "number too small")
+    ///     }
+    ///     i
+    /// })
+    ///     .catch_when(PgSqlErrorCode::ERRCODE_NUMERIC_VALUE_OUT_OF_RANGE, |cause| cause.rethrow())
+    ///     .finally(|| finished = true)
+    ///     .execute();
+    ///
+    /// assert_eq(finished, true);
+    /// assert_eq!(result, 42);
+    /// ```
     #[must_use = "must call `PgTryBuilder::execute(self)` in order for it to run"]
     pub fn new(func: F) -> Self {
         Self { func, when: Default::default(), others: None, rust: None, finally: None }
     }
 
+    /// Add a catch handler to run should a specific error occur during execution.
+    ///
+    /// The argument to the catch handler closure is a [`CaughtError`] which can be
+    /// rethrown via [`CatchError::rethrow()`]
+    ///
+    /// The return value must be of the same type as the main execution block, or the supplied
+    /// error cause must be rethrown.
+    ///
+    /// ## Safety
+    ///
+    /// While this function isn't itself unsafe, catching and then ignoring an important internal
+    /// Postgres error may very well leave your database in an undesirable state.  This is your
+    /// responsibility.
     #[must_use = "must call `PgTryBuilder::execute(self)` in order for it to run"]
     pub fn catch_when(
         mut self,
@@ -30,6 +74,20 @@ impl<'a, R, F: FnOnce() -> R + UnwindSafe> PgTryBuilder<'a, R, F> {
         self
     }
 
+    /// Add a catch-all handler to catch a raised error that wasn't explicitly caught via
+    /// [PgTryBuilder::catch_when].
+    ///
+    /// The argument to the catch handler closure is a [`CaughtError`] which can be
+    /// rethrown via [`CatchError::rethrow()`].
+    ///
+    /// The return value must be of the same type as the main execution block, or the supplied
+    /// error cause must be rethrown.
+    ///
+    /// ## Safety
+    ///
+    /// While this function isn't itself unsafe, catching and then ignoring an important internal
+    /// Postgres error may very well leave your database in an undesirable state.  This is your
+    /// responsibility.
     #[must_use = "must call `PgTryBuilder::execute(self)` in order for it to run"]
     pub fn catch_others(
         mut self,
@@ -39,6 +97,14 @@ impl<'a, R, F: FnOnce() -> R + UnwindSafe> PgTryBuilder<'a, R, F> {
         self
     }
 
+    /// Add a handler to specifically respond to a Rust panic.
+    ///
+    /// The catch handler's closure argument is a [`CaughtError::PostgresError {ereport, payload}`]
+    /// that you can inspect in whatever way makes sense.
+    ///
+    /// The return value must be of the same type as the main execution block, or the supplied
+    /// error cause must be rethrown.
+    ///
     #[must_use = "must call `PgTryBuilder::execute(self)` in order for it to run"]
     pub fn catch_rust_panic(
         mut self,
@@ -48,12 +114,19 @@ impl<'a, R, F: FnOnce() -> R + UnwindSafe> PgTryBuilder<'a, R, F> {
         self
     }
 
+    /// The finally block, of which there can be only one.  Successive calls to this function
+    /// will replace the prior finally block.
+    ///
+    /// The finally block closure is called after successful return from the main execution handler
+    /// or a catch handler.  The finally block does not return a value.
     #[must_use = "must call `PgTryBuilder::execute(self)` in order for it to run"]
     pub fn finally(mut self, f: impl FnMut() + 'a) -> Self {
         self.finally = Some(Box::new(f));
         self
     }
 
+    /// Run the main execution block closure.  Any error raised will be passed to a registered
+    /// catch handler, and when finished, the finally block will be run.
     pub fn execute(mut self) -> R {
         let result = catch_unwind(self.func);
 
