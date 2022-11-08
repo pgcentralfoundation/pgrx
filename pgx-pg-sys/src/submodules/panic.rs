@@ -207,13 +207,14 @@ enum GuardAction<R> {
 /// want [`crate::pg_try::PgTryBuilder`].
 ///
 /// # Safety
-///
 /// The function needs to only have [trivially-deallocated stack frames]
-/// above it (well, in practice it does, and once that stabilizes it will be even more of a requirement).
-/// In the short term this probably looks like just making it `unsafe`.
+/// above it. That is, the caller (and their caller, etc) cannot have
+/// objects with pending destructors in their stack frames, unless those
+/// objects have already been dropped.
 ///
-/// I think we also will need to implement it a lot more carefully to ensure it's safe to longjmp out of,
-/// and probably do something about `Func` too...
+/// In practice, this should only ever be called at the top level of an
+/// `extern "C" fn` (ideally `extern "C-unwind"`) implemented in
+/// Rust.
 ///
 /// [trivially-deallocated stack frames](https://github.com/rust-lang/rfcs/blob/master/text/2945-c-unwind-abi.md#plain-old-frames)
 #[doc(hidden)]
