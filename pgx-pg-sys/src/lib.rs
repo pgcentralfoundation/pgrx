@@ -508,12 +508,10 @@ mod all_versions {
 
     #[inline(always)]
     pub unsafe fn MemoryContextSwitchTo(context: crate::MemoryContext) -> crate::MemoryContext {
-        unsafe {
-            let old = crate::CurrentMemoryContext;
+        let old = crate::CurrentMemoryContext;
 
-            crate::CurrentMemoryContext = context;
-            old
-        }
+        crate::CurrentMemoryContext = context;
+        old
     }
 }
 
