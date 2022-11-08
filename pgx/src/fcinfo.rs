@@ -25,7 +25,7 @@ use crate::{pg_sys, void_mut_ptr, AllocatedByRust, FromDatum, PgBox, PgMemoryCon
 /// ```
 ///
 /// ```rust
-/// use crate::pgx::*;
+/// use pgx::prelude::*;
 ///
 /// #[pg_extern]
 /// fn fun_with_default_arg_value(a: i32, b: default!(i32, 99)) -> i32 {
@@ -65,11 +65,11 @@ pub struct NULL;
 /// ```
 ///
 /// ```rust
-/// use pgx::*;
+/// use pgx::prelude::*;
 ///
 /// #[pg_extern]
-/// fn get_a_set() -> impl std::iter::Iterator<Item=(name!(id, i32), name!(title, &'static str))> {
-///     vec![1, 2, 3].into_iter().zip(vec!["A", "B", "C"].into_iter())
+/// fn get_a_set() -> TableIterator<'static, (name!(id, i32), name!(title, &'static str))> {
+///     TableIterator::new(vec![1, 2, 3].into_iter().zip(vec!["A", "B", "C"].into_iter()))
 /// }
 /// ```
 #[macro_export]
@@ -86,15 +86,21 @@ macro_rules! variadic {
     };
 }
 
-#[cfg(any(feature = "pg10", feature = "pg11"))]
-mod pg_10_11 {
+#[cfg(any(feature = "pg11"))]
+mod pg_11 {
     use crate::{pg_sys, FromDatum};
 
     #[inline]
     pub fn pg_getarg<T: FromDatum>(fcinfo: pg_sys::FunctionCallInfo, num: usize) -> Option<T> {
         let datum = unsafe { fcinfo.as_ref() }.unwrap().arg[num];
         let isnull = pg_arg_is_null(fcinfo, num);
-        unsafe { T::from_datum(datum, isnull) }
+        unsafe {
+            if T::GET_TYPOID {
+                T::from_polymorphic_datum(datum, isnull, super::pg_getarg_type(fcinfo, num))
+            } else {
+                T::from_datum(datum, isnull)
+            }
+        }
     }
 
     #[inline]
@@ -123,14 +129,24 @@ mod pg_10_11 {
     }
 }
 
-#[cfg(any(feature = "pg12", feature = "pg13", feature = "pg14"))]
-mod pg_12_13_14 {
+#[cfg(any(feature = "pg12", feature = "pg13", feature = "pg14", feature = "pg15"))]
+mod pg_12_13_14_15 {
     use crate::{pg_sys, FromDatum};
 
     #[inline]
     pub fn pg_getarg<T: FromDatum>(fcinfo: pg_sys::FunctionCallInfo, num: usize) -> Option<T> {
         let datum = get_nullable_datum(fcinfo, num);
-        unsafe { T::from_datum(datum.value, datum.isnull) }
+        unsafe {
+            if T::GET_TYPOID {
+                T::from_polymorphic_datum(
+                    datum.value,
+                    datum.isnull,
+                    super::pg_getarg_type(fcinfo, num),
+                )
+            } else {
+                T::from_datum(datum.value, datum.isnull)
+            }
+        }
     }
 
     #[inline]
@@ -174,17 +190,17 @@ mod pg_12_13_14 {
 // common
 //
 
-#[cfg(any(feature = "pg10", feature = "pg11"))]
-pub use pg_10_11::*;
+#[cfg(any(feature = "pg11"))]
+pub use pg_11::*;
 
-#[cfg(any(feature = "pg12", feature = "pg13", feature = "pg14"))]
-pub use pg_12_13_14::*;
+#[cfg(any(feature = "pg12", feature = "pg13", feature = "pg14", feature = "pg15"))]
+pub use pg_12_13_14_15::*;
 use std::ops::DerefMut;
 
 #[inline]
 pub fn pg_getarg_pointer<T>(fcinfo: pg_sys::FunctionCallInfo, num: usize) -> Option<*mut T> {
     match pg_getarg_datum(fcinfo, num) {
-        Some(datum) => Some(datum.ptr_cast::<T>()),
+        Some(datum) => Some(datum.cast_mut_ptr::<T>()),
         None => None,
     }
 }
@@ -194,7 +210,7 @@ pub fn pg_getarg_pointer<T>(fcinfo: pg_sys::FunctionCallInfo, num: usize) -> Opt
 /// The provided `fcinfo` must be valid otherwise this function results in undefined behavior due
 /// to an out of bounds read.
 #[inline]
-pub unsafe fn get_getarg_type(fcinfo: pg_sys::FunctionCallInfo, num: usize) -> pg_sys::Oid {
+pub unsafe fn pg_getarg_type(fcinfo: pg_sys::FunctionCallInfo, num: usize) -> pg_sys::Oid {
     pg_sys::get_fn_expr_argtype(fcinfo.as_ref().unwrap().flinfo, num as std::os::raw::c_int)
 }
 
@@ -381,7 +397,7 @@ pub unsafe fn direct_pg_extern_function_call_as_datum(
     }
 }
 
-#[cfg(any(feature = "pg10", feature = "pg11"))]
+#[cfg(any(feature = "pg11"))]
 fn make_function_call_info(
     nargs: usize,
     arg_array: [pg_sys::Datum; 100],
@@ -397,7 +413,7 @@ fn make_function_call_info(
     fcinfo_boxed
 }
 
-#[cfg(any(feature = "pg12", feature = "pg13", feature = "pg14"))]
+#[cfg(any(feature = "pg12", feature = "pg13", feature = "pg14", feature = "pg15"))]
 fn make_function_call_info(
     nargs: usize,
     arg_array: [pg_sys::Datum; 100],
@@ -418,10 +434,7 @@ fn make_function_call_info(
 
     let slice = unsafe { fcinfo.args.as_mut_slice(nargs) };
     for i in 0..nargs {
-        slice[i] = pg_sys::NullableDatum {
-            value: arg_array[i],
-            isnull: null_array[i],
-        }
+        slice[i] = pg_sys::NullableDatum { value: arg_array[i], isnull: null_array[i] }
     }
 
     fcinfo_boxed

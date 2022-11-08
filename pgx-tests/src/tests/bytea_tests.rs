@@ -13,7 +13,7 @@ mod tests {
     #[allow(unused_imports)]
     use crate as pgx_tests;
 
-    use pgx::*;
+    use pgx::prelude::*;
 
     #[pg_extern]
     fn return_bytes() -> &'static [u8] {

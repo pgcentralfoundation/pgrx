@@ -9,7 +9,7 @@ Use of this source code is governed by the MIT license that can be found in the 
 
 #![allow(dead_code)]
 /// the purpose of this test is to just make sure this code compiles!
-use pgx::*;
+use pgx::prelude::*;
 use serde::*;
 
 fn foo<'a>(_s: Vec<Option<&'a str>>) {

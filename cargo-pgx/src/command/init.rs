@@ -8,16 +8,17 @@ Use of this source code is governed by the MIT license that can be found in the 
 */
 
 use crate::command::stop::stop_postgres;
+use crate::command::version::pgx_default;
 use crate::CommandExecute;
 use eyre::{eyre, WrapErr};
 use owo_colors::OwoColorize;
-use pgx_utils::{
-    pg_config::{PgConfig, PgConfigSelector, Pgx},
-    prefix_path, SUPPORTED_MAJOR_VERSIONS,
+use pgx_pg_config::{
+    prefix_path, PgConfig, PgConfigSelector, Pgx, C_LOCALE_FLAGS, SUPPORTED_MAJOR_VERSIONS,
 };
 use rayon::prelude::*;
 
 use std::collections::HashMap;
+use std::env;
 use std::fs::File;
 use std::io::{Read, Write};
 use std::path::PathBuf;
@@ -44,9 +45,6 @@ static PROCESS_ENV_DENYLIST: &'static [&'static str] = &[
 #[derive(clap::Args, Debug)]
 #[clap(author)]
 pub(crate) struct Init {
-    /// If installed locally, the path to PG10's `pgconfig` tool, or `download` to have pgx download/compile/install it
-    #[clap(env = "PG10_PG_CONFIG", long, help = "")]
-    pg10: Option<String>,
     /// If installed locally, the path to PG11's `pgconfig` tool, or `download` to have pgx download/compile/install it
     #[clap(env = "PG11_PG_CONFIG", long)]
     pg11: Option<String>,
@@ -59,8 +57,15 @@ pub(crate) struct Init {
     /// If installed locally, the path to PG14's `pgconfig` tool, or `download` to have pgx download/compile/install it
     #[clap(env = "PG14_PG_CONFIG", long)]
     pg14: Option<String>,
-    #[clap(from_global, parse(from_occurrences))]
-    verbose: usize,
+    /// If installed locally, the path to PG14's `pgconfig` tool, or `download` to have pgx download/compile/install it
+    #[clap(env = "PG15_PG_CONFIG", long)]
+    pg15: Option<String>,
+    #[clap(from_global, action = ArgAction::Count)]
+    verbose: u8,
+    #[clap(long, help = "Base port number")]
+    base_port: Option<u16>,
+    #[clap(long, help = "Base testing port number")]
+    base_testing_port: Option<u16>,
 }
 
 impl CommandExecute for Init {
@@ -68,34 +73,34 @@ impl CommandExecute for Init {
     fn execute(self) -> eyre::Result<()> {
         let mut versions = HashMap::new();
 
-        if let Some(version) = self.pg10 {
-            versions.insert("pg10", version.clone());
-        }
-        if let Some(version) = self.pg11 {
+        if let Some(ref version) = self.pg11 {
             versions.insert("pg11", version.clone());
         }
-        if let Some(version) = self.pg12 {
+        if let Some(ref version) = self.pg12 {
             versions.insert("pg12", version.clone());
         }
-        if let Some(version) = self.pg13 {
+        if let Some(ref version) = self.pg13 {
             versions.insert("pg13", version.clone());
         }
-        if let Some(version) = self.pg14 {
+        if let Some(ref version) = self.pg14 {
             versions.insert("pg14", version.clone());
+        }
+        if let Some(ref version) = self.pg15 {
+            versions.insert("pg15", version.clone());
         }
 
         if versions.is_empty() {
             // no arguments specified, so we'll just install our defaults
-            init_pgx(&Pgx::default(SUPPORTED_MAJOR_VERSIONS)?)
+            init_pgx(&pgx_default(SUPPORTED_MAJOR_VERSIONS)?, &self)
         } else {
             // user specified arguments, so we'll only install those versions of Postgres
             let mut default_pgx = None;
-            let mut pgx = Pgx::new();
+            let mut pgx = Pgx::default();
 
             for (pgver, pg_config_path) in versions {
                 let config = if pg_config_path == "download" {
                     if default_pgx.is_none() {
-                        default_pgx = Some(Pgx::default(SUPPORTED_MAJOR_VERSIONS)?);
+                        default_pgx = Some(pgx_default(SUPPORTED_MAJOR_VERSIONS)?);
                     }
                     default_pgx
                         .as_ref()
@@ -104,18 +109,18 @@ impl CommandExecute for Init {
                         .wrap_err_with(|| format!("{} is not a known Postgres version", pgver))?
                         .clone()
                 } else {
-                    PgConfig::new(pg_config_path.into())
+                    PgConfig::new_with_defaults(pg_config_path.into())
                 };
                 pgx.push(config);
             }
 
-            init_pgx(&pgx)
+            init_pgx(&pgx, &self)
         }
     }
 }
 
 #[tracing::instrument(skip_all, fields(pgx_home = %Pgx::home()?.display()))]
-pub(crate) fn init_pgx(pgx: &Pgx) -> eyre::Result<()> {
+pub(crate) fn init_pgx(pgx: &Pgx, init: &Init) -> eyre::Result<()> {
     let dir = Pgx::home()?;
 
     let output_configs = Arc::new(Mutex::new(Vec::new()));
@@ -156,23 +161,23 @@ pub(crate) fn init_pgx(pgx: &Pgx) -> eyre::Result<()> {
         a.major_version()
             .ok()
             .expect("could not determine major version")
-            .cmp(
-                &b.major_version()
-                    .ok()
-                    .expect("could not determine major version"),
-            )
+            .cmp(&b.major_version().ok().expect("could not determine major version"))
     });
     for pg_config in output_configs.iter() {
         validate_pg_config(pg_config)?;
 
-        let datadir = pg_config.data_dir()?;
-        let bindir = pg_config.bin_dir()?;
-        if !datadir.exists() {
-            initdb(&bindir, &datadir)?;
+        if is_root_user() {
+            println!("{} initdb as current user is root user", "   Skipping".bold().green(),);
+        } else {
+            let datadir = pg_config.data_dir()?;
+            let bindir = pg_config.bin_dir()?;
+            if !datadir.exists() {
+                initdb(&bindir, &datadir)?;
+            }
         }
     }
 
-    write_config(output_configs)?;
+    write_config(output_configs, init)?;
     Ok(())
 }
 
@@ -193,9 +198,7 @@ fn download_postgres(pg_config: &PgConfig, pgx_home: &PathBuf) -> eyre::Result<P
     let http_client = if let Some((host, port)) =
         for_url_str(pg_config.url().expect("no url for pg_config")).host_port()
     {
-        AgentBuilder::new()
-            .proxy(Proxy::new(format!("https://{host}:{port}"))?)
-            .build()
+        AgentBuilder::new().proxy(Proxy::new(format!("https://{host}:{port}"))?).build()
     } else {
         Agent::new()
     };
@@ -219,11 +222,7 @@ fn download_postgres(pg_config: &PgConfig, pgx_home: &PathBuf) -> eyre::Result<P
 
 fn untar(bytes: &[u8], pgxdir: &PathBuf, pg_config: &PgConfig) -> eyre::Result<PathBuf> {
     let mut pgdir = pgxdir.clone();
-    pgdir.push(format!(
-        "{}.{}",
-        pg_config.major_version()?,
-        pg_config.minor_version()?
-    ));
+    pgdir.push(format!("{}.{}", pg_config.major_version()?, pg_config.minor_version()?));
     if pgdir.exists() {
         // delete everything at this path if it already exists
         println!("{} {}", "     Removing".bold().green(), pgdir.display());
@@ -258,10 +257,7 @@ fn untar(bytes: &[u8], pgxdir: &PathBuf, pg_config: &PgConfig) -> eyre::Result<P
     if output.status.success() {
         Ok(pgdir)
     } else {
-        Err(eyre!(
-            "Command error: {}",
-            String::from_utf8(output.stderr)?
-        ))
+        Err(eyre!("Command error: {}", String::from_utf8(output.stderr)?))
     }
 }
 
@@ -381,7 +377,7 @@ fn make_install_postgres(version: &PgConfig, pgdir: &PathBuf) -> eyre::Result<Pg
         let mut pg_config = get_pg_installdir(pgdir);
         pg_config.push("bin");
         pg_config.push("pg_config");
-        Ok(PgConfig::new(pg_config))
+        Ok(PgConfig::new_with_defaults(pg_config))
     } else {
         Err(eyre!(
             "{}\n{}{}",
@@ -404,19 +400,24 @@ fn validate_pg_config(pg_config: &PgConfig) -> eyre::Result<()> {
     Ok(())
 }
 
-fn write_config(pg_configs: &Vec<PgConfig>) -> eyre::Result<()> {
+fn write_config(pg_configs: &Vec<PgConfig>, init: &Init) -> eyre::Result<()> {
     let config_path = Pgx::config_toml()?;
     let mut file = File::create(&config_path)?;
+
+    if let Some(port) = init.base_port {
+        file.write_all(format!("base_port = {}\n", port).as_bytes())?;
+    }
+    if let Some(port) = init.base_testing_port {
+        file.write_all(format!("base_testing_port = {}\n", port).as_bytes())?;
+    }
+
     file.write_all(b"[configs]\n")?;
     for pg_config in pg_configs {
         file.write_all(
             format!(
                 "{}=\"{}\"\n",
                 pg_config.label()?,
-                pg_config
-                    .path()
-                    .ok_or(eyre!("no path for pg_config"))?
-                    .display()
+                pg_config.path().ok_or(eyre!("no path for pg_config"))?.display()
             )
             .as_bytes(),
         )?;
@@ -431,25 +432,27 @@ fn get_pg_installdir(pgdir: &PathBuf) -> PathBuf {
     dir
 }
 
+fn is_root_user() -> bool {
+    match env::var("USER") {
+        Ok(val) => val == "root",
+        Err(_) => false,
+    }
+}
+
 pub(crate) fn initdb(bindir: &PathBuf, datadir: &PathBuf) -> eyre::Result<()> {
-    println!(
-        " {} data directory at {}",
-        "Initializing".bold().green(),
-        datadir.display()
-    );
+    println!(" {} data directory at {}", "Initializing".bold().green(), datadir.display());
     let mut command = std::process::Command::new(format!("{}/initdb", bindir.display()));
     command
         .stdout(Stdio::piped())
         .stderr(Stdio::piped())
+        .args(C_LOCALE_FLAGS)
         .arg("-D")
         .arg(&datadir);
 
     let command_str = format!("{:?}", command);
     tracing::debug!(command = %command_str, "Running");
 
-    let output = command
-        .output()
-        .wrap_err_with(|| eyre!("unable to execute: {}", command_str))?;
+    let output = command.output().wrap_err_with(|| eyre!("unable to execute: {}", command_str))?;
     tracing::trace!(command = %command_str, status_code = %output.status, "Finished");
 
     if !output.status.success() {

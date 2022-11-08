@@ -1,11 +1,17 @@
+/*!
+
+`#[pg_trigger]` related entities for Rust to SQL translation
+
+> Like all of the [`sql_entity_graph`][crate::sql_entity_graph] APIs, this is considered **internal**
+to the `pgx` framework and very subject to change between versions. While you may use this, please do it with caution.
+
+*/
 use crate::sql_entity_graph::{
     PgxSql, SqlGraphEntity, SqlGraphIdentifier, ToSql, ToSqlConfigEntity,
 };
-use core::{
-    cmp::{Eq, Ord, Ordering, PartialEq, PartialOrd},
-    fmt::Debug,
-    hash::Hash,
-};
+use core::cmp::{Eq, Ord, Ordering, PartialEq, PartialOrd};
+use core::fmt::Debug;
+use core::hash::Hash;
 
 #[derive(Debug, Clone, Hash, PartialEq, Eq)]
 pub struct PgTriggerEntity {
@@ -35,9 +41,9 @@ impl PartialOrd for PgTriggerEntity {
     }
 }
 
-impl Into<SqlGraphEntity> for PgTriggerEntity {
-    fn into(self) -> SqlGraphEntity {
-        SqlGraphEntity::Trigger(self)
+impl From<PgTriggerEntity> for SqlGraphEntity {
+    fn from(val: PgTriggerEntity) -> Self {
+        SqlGraphEntity::Trigger(val)
     }
 }
 

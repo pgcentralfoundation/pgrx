@@ -13,14 +13,19 @@
 , llvmPackages
 , gitignoreSource
 , release ? true
-,
+, callPackage
+, fenixToolchain
 }:
 
 let
   cargoToml = (builtins.fromTOML (builtins.readFile ./Cargo.toml));
+  naerskLib = callPackage naersk {
+    cargo = fenixToolchain hostPlatform.system;
+    rustc = fenixToolchain hostPlatform.system;
+  };
 in
 
-naersk.lib."${hostPlatform.system}".buildPackage rec {
+naerskLib.buildPackage rec {
   name = cargoToml.package.name;
   version = cargoToml.package.version;
 

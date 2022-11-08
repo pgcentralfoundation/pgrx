@@ -12,13 +12,16 @@ Use of this source code is governed by the MIT license that can be found in the 
 mod tests {
     #[allow(unused_imports)]
     use crate as pgx_tests;
-    use pgx::*;
+    use pgx::prelude::*;
+    use pgx::{AllocatedByPostgres, AllocatedByRust, WhoAllocated};
 
     /// Test some various formats of trigger signature we expect to support
     ///
     /// These tests don't run, but they get built to SQL and compile checked.
     #[pgx::pg_schema]
     mod trigger_signature_compile_tests {
+        use pgx::heap_tuple::PgHeapTupleError;
+        use pgx::prelude::*;
         use pgx::{AllocatedByPostgres, AllocatedByRust};
 
         use super::*;
@@ -26,34 +29,30 @@ mod tests {
         #[pg_trigger]
         fn signature_standard(
             trigger: &pgx::PgTrigger,
-        ) -> Result<
-            PgHeapTuple<'_, impl WhoAllocated<pgx::pg_sys::HeapTupleData>>,
-            pgx::PgHeapTupleError,
-        > {
+        ) -> Result<PgHeapTuple<'_, impl WhoAllocated<pgx::pg_sys::HeapTupleData>>, PgHeapTupleError>
+        {
             Ok(trigger.current().unwrap().into_owned())
         }
 
         #[pg_trigger]
         fn signature_explicit_lifetimes<'a>(
             trigger: &'a pgx::PgTrigger,
-        ) -> Result<
-            PgHeapTuple<'a, impl WhoAllocated<pgx::pg_sys::HeapTupleData>>,
-            pgx::PgHeapTupleError,
-        > {
+        ) -> Result<PgHeapTuple<'a, impl WhoAllocated<pgx::pg_sys::HeapTupleData>>, PgHeapTupleError>
+        {
             Ok(trigger.current().unwrap().into_owned())
         }
 
         #[pg_trigger]
         fn signature_alloc_by_postgres(
             trigger: &pgx::PgTrigger,
-        ) -> Result<PgHeapTuple<'_, AllocatedByPostgres>, pgx::PgHeapTupleError> {
+        ) -> Result<PgHeapTuple<'_, AllocatedByPostgres>, PgHeapTupleError> {
             Ok(trigger.current().unwrap())
         }
 
         #[pg_trigger]
         fn signature_alloc_by_rust(
             trigger: &pgx::PgTrigger,
-        ) -> Result<PgHeapTuple<'_, AllocatedByRust>, pgx::PgHeapTupleError> {
+        ) -> Result<PgHeapTuple<'_, AllocatedByRust>, PgHeapTupleError> {
             Ok(trigger.current().unwrap().into_owned())
         }
 
@@ -264,16 +263,12 @@ mod tests {
         current.set_by_name("trigger_relid", trigger_relid)?;
 
         let trigger_old_transition_table_name = trigger.old_transition_table_name()?;
-        current.set_by_name(
-            "trigger_old_transition_table_name",
-            trigger_old_transition_table_name,
-        )?;
+        current
+            .set_by_name("trigger_old_transition_table_name", trigger_old_transition_table_name)?;
 
         let trigger_new_transition_table_name = trigger.new_transition_table_name()?;
-        current.set_by_name(
-            "trigger_new_transition_table_name",
-            trigger_new_transition_table_name,
-        )?;
+        current
+            .set_by_name("trigger_new_transition_table_name", trigger_new_transition_table_name)?;
 
         let trigger_table_name = unsafe { trigger.table_name()? };
         current.set_by_name("trigger_table_name", trigger_table_name)?;
@@ -362,10 +357,7 @@ mod tests {
         assert_eq!(trigger_new_transition_table_name, None);
         assert_eq!(trigger_table_name, Some("before_insert_trigger_metadata"));
         assert_eq!(trigger_table_schema, Some("tests"));
-        assert_eq!(
-            trigger_extra_args,
-            Some(vec!["Bears".to_string(), "Dogs".to_string()])
-        );
+        assert_eq!(trigger_extra_args, Some(vec!["Bears".to_string(), "Dogs".to_string()]));
     }
 
     #[pg_trigger]
@@ -396,14 +388,10 @@ mod tests {
         current_owned.set_by_name("trigger_level", level.to_string())?;
         current_owned.set_by_name("trigger_op", op.to_string())?;
         current_owned.set_by_name("trigger_relid", relid)?;
-        current_owned.set_by_name(
-            "trigger_old_transition_table_name",
-            old_transition_table_name,
-        )?;
-        current_owned.set_by_name(
-            "trigger_new_transition_table_name",
-            new_transition_table_name,
-        )?;
+        current_owned
+            .set_by_name("trigger_old_transition_table_name", old_transition_table_name)?;
+        current_owned
+            .set_by_name("trigger_new_transition_table_name", new_transition_table_name)?;
         current_owned.set_by_name("trigger_table_name", table_name)?;
         current_owned.set_by_name("trigger_table_schema", table_schema)?;
         current_owned.set_by_name("trigger_extra_args", extra_args)?;
@@ -488,15 +476,9 @@ mod tests {
         assert!(trigger_relid.is_some());
         assert_eq!(trigger_old_transition_table_name, None);
         assert_eq!(trigger_new_transition_table_name, None);
-        assert_eq!(
-            trigger_table_name,
-            Some("before_insert_trigger_metadata_safe")
-        );
+        assert_eq!(trigger_table_name, Some("before_insert_trigger_metadata_safe"));
         assert_eq!(trigger_table_schema, Some("tests"));
-        assert_eq!(
-            trigger_extra_args,
-            Some(vec!["Bears".to_string(), "Dogs".to_string()])
-        );
+        assert_eq!(trigger_extra_args, Some(vec!["Bears".to_string(), "Dogs".to_string()]));
     }
 
     #[pg_trigger(sql = r#"

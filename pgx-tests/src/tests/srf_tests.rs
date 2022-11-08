@@ -7,64 +7,73 @@ All rights reserved.
 Use of this source code is governed by the MIT license that can be found in the LICENSE file.
 */
 
-use pgx::*;
+use pgx::prelude::*;
 
 #[pg_extern]
 fn example_generate_series(
     start: i32,
     end: i32,
     step: default!(i32, 1),
-) -> impl std::iter::Iterator<Item = i32> {
-    (start..=end).step_by(step as usize)
+) -> SetOfIterator<'static, i32> {
+    SetOfIterator::new((start..=end).step_by(step as usize).into_iter())
 }
 
 #[pg_extern]
-fn example_composite_set(
-) -> impl std::iter::Iterator<Item = (name!(idx, i32), name!(value, &'static str))> {
-    vec!["a", "b", "c"]
-        .into_iter()
-        .enumerate()
-        .map(|(idx, value)| ((idx + 1) as i32, value))
-}
-
-#[pg_extern]
-fn return_some_iterator(
-) -> Option<impl std::iter::Iterator<Item = (name!(idx, i32), name!(some_value, &'static str))>> {
-    Some(
-        vec!["a", "b", "c"]
-            .into_iter()
-            .enumerate()
-            .map(|(idx, value)| ((idx + 1) as i32, value)),
+fn example_composite_set() -> TableIterator<'static, (name!(idx, i32), name!(value, &'static str))>
+{
+    TableIterator::new(
+        vec!["a", "b", "c"].into_iter().enumerate().map(|(idx, value)| ((idx + 1) as i32, value)),
     )
 }
 
 #[pg_extern]
+fn return_some_iterator(
+) -> Option<TableIterator<'static, (name!(idx, i32), name!(some_value, &'static str))>> {
+    Some(TableIterator::new(
+        vec!["a", "b", "c"].into_iter().enumerate().map(|(idx, value)| ((idx + 1) as i32, value)),
+    ))
+}
+
+#[pg_extern]
 fn return_none_iterator(
-) -> Option<impl std::iter::Iterator<Item = (name!(idx, i32), name!(some_value, &'static str))>> {
+) -> Option<TableIterator<'static, (name!(idx, i32), name!(some_value, &'static str))>> {
     if true {
         None
     } else {
-        Some(
+        Some(TableIterator::new(
             vec!["a", "b", "c"]
                 .into_iter()
                 .enumerate()
                 .map(|(idx, value)| ((idx + 1) as i32, value)),
-        )
+        ))
     }
 }
 
 #[pg_extern]
-fn return_some_setof_iterator() -> Option<impl std::iter::Iterator<Item = i32>> {
-    Some(vec![1, 2, 3].into_iter())
+fn return_some_setof_iterator() -> Option<SetOfIterator<'static, i32>> {
+    Some(SetOfIterator::new(vec![1, 2, 3].into_iter()))
 }
 
 #[pg_extern]
-fn return_none_setof_iterator() -> Option<impl std::iter::Iterator<Item = i32>> {
+fn return_none_setof_iterator() -> Option<SetOfIterator<'static, i32>> {
     if true {
         None
     } else {
-        Some(vec![1, 2, 3].into_iter())
+        Some(SetOfIterator::new(vec![1, 2, 3].into_iter()))
     }
+}
+
+#[pg_extern]
+fn split_set_with_borrow<'a>(input: &'a str, pattern: &'a str) -> SetOfIterator<'a, &'a str> {
+    SetOfIterator::new(input.split_terminator(pattern))
+}
+
+#[pg_extern]
+fn split_table_with_borrow<'a>(
+    input: &'a str,
+    pattern: &'a str,
+) -> TableIterator<'a, (name!(i, i32), name!(s, &'a str))> {
+    TableIterator::new(input.split_terminator(pattern).enumerate().map(|(i, s)| (i as i32, s)))
 }
 
 #[cfg(any(test, feature = "pg_test"))]
@@ -73,7 +82,7 @@ mod tests {
     #[allow(unused_imports)]
     use crate as pgx_tests;
 
-    use pgx::*;
+    use pgx::prelude::*;
 
     #[pg_test]
     fn test_generate_series() {
@@ -164,5 +173,41 @@ mod tests {
         });
 
         assert_eq!(cnt, Some(0))
+    }
+
+    #[pg_test]
+    fn test_srf_setof_datum_detoasting_with_borrow() {
+        let cnt = Spi::connect(|mut client| {
+            // build up a table with one large column that Postgres will be forced to TOAST
+            client.update("CREATE TABLE test_srf_datum_detoasting AS SELECT array_to_string(array_agg(g),' ') s FROM (SELECT 'a' g FROM generate_series(1, 1000000)) x;", None, None);
+
+            // and make sure we can use the DETOASTED value with our SRF function
+            let table = client.select(
+                "SELECT split_set_with_borrow(s, ' ') FROM test_srf_datum_detoasting",
+                None,
+                None,
+            );
+
+            Ok(Some(table.len() as i64))
+        });
+        assert_eq!(cnt, Some(1000000))
+    }
+
+    #[pg_test]
+    fn test_srf_table_datum_detoasting_with_borrow() {
+        let cnt = Spi::connect(|mut client| {
+            // build up a table with one large column that Postgres will be forced to TOAST
+            client.update("CREATE TABLE test_srf_datum_detoasting AS SELECT array_to_string(array_agg(g),' ') s FROM (SELECT 'a' g FROM generate_series(1, 1000000)) x;", None, None);
+
+            // and make sure we can use the DETOASTED value with our SRF function
+            let table = client.select(
+                "SELECT split_table_with_borrow(s, ' ') FROM test_srf_datum_detoasting",
+                None,
+                None,
+            );
+
+            Ok(Some(table.len() as i64))
+        });
+        assert_eq!(cnt, Some(1000000))
     }
 }

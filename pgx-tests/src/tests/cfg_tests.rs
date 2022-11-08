@@ -6,7 +6,7 @@ All rights reserved.
 
 Use of this source code is governed by the MIT license that can be found in the LICENSE file.
 */
-use pgx::*;
+use pgx::prelude::*;
 
 #[cfg(any(test, feature = "pg_test"))]
 #[pg_extern]
@@ -22,7 +22,7 @@ mod tests {
     #[allow(unused_imports)]
     use crate as pgx_tests;
 
-    use pgx::*;
+    use pgx::prelude::*;
 
     #[pg_test]
     fn test_cfg_exists() {

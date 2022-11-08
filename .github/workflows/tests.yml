@@ -11,7 +11,8 @@ on:
       - develop
 
 env:
-  RUSTFLAGS: -Copt-level=0
+  # NB: Don't modify `RUSTFLAGS` here, since it would override the ones
+  # configured by `.cargo/config.toml` on macOS.
   RUST_BACKTRACE: 1
   CARGO_INCREMENTAL: "false"
   # CARGO_LOG: cargo::core::compiler::fingerprint=info # Uncomment this to output compiler fingerprint info
@@ -24,14 +25,15 @@ jobs:
     env:
       RUSTC_WRAPPER: sccache
       SCCACHE_DIR: /home/runner/.cache/sccache
+      RUSTFLAGS: -Copt-level=0
 
     strategy:
       matrix:
-        version: ["postgres-10", "postgres-11", "postgres-12", "postgres-13", "postgres-14"]
+        version: ["postgres-11", "postgres-12", "postgres-13", "postgres-14", "postgres-15"]
         os: ["ubuntu-20.04"]
 
     steps:
-    - uses: actions/checkout@v2
+    - uses: actions/checkout@v3
 
     - name: Set up prerequisites and environment
       run: |
@@ -94,7 +96,7 @@ jobs:
         echo ""
 
     - name: Cache cargo registry
-      uses: actions/cache@v2
+      uses: actions/cache@v3
       continue-on-error: false
       with:
         path: |
@@ -103,7 +105,7 @@ jobs:
         key: pgx-tests-cargo-${{ runner.os }}-${{ hashFiles('**/Cargo.lock', '.github/workflows/tests.yml') }}
 
     - name: Cache sccache directory
-      uses: actions/cache@v2
+      uses: actions/cache@v3
       continue-on-error: false
       with:
         path: /home/runner/.cache/sccache
@@ -147,6 +149,9 @@ jobs:
     - name: Run bytea example tests
       run: cargo test --package bytea --features "pg$PG_VER" --no-default-features
 
+    - name: Run composite_type example tests
+      run: cargo test --package composite_type --features "pg$PG_VER" --no-default-features
+
     - name: Run custom_types example tests
       run: cargo test --package custom_types --features "pg$PG_VER" --no-default-features
 
@@ -159,6 +164,9 @@ jobs:
     - name: Run nostd example tests
       run: cargo test --package nostd --features "pg$PG_VER" --no-default-features
 
+    - name: Run pgtrybuilder example tests
+      run: cargo test --package pgtrybuilder --features "pg$PG_VER" --no-default-features
+
     - name: Run operators example tests
       run: cargo test --package operators --features "pg$PG_VER" --no-default-features
 
@@ -170,6 +178,9 @@ jobs:
 
     - name: Run spi example tests
       run: cargo test --package spi --features "pg$PG_VER" --no-default-features
+
+    - name: Run spi_srf example tests
+      run: cargo test --package spi_srf --features "pg$PG_VER" --no-default-features
 
     - name: Run srf example tests
       run: cargo test --package srf --features "pg$PG_VER" --no-default-features
@@ -208,14 +219,15 @@ jobs:
     env:
       RUSTC_WRAPPER: sccache
       SCCACHE_DIR: /home/runner/.cache/sccache
+      RUSTFLAGS: -Copt-level=0
 
     strategy:
       matrix:
-        version: ["postgres-14"]
+        version: ["postgres-15"]
         os: ["ubuntu-20.04"]
 
     steps:
-    - uses: actions/checkout@v2
+    - uses: actions/checkout@v3
 
     - name: Set up prerequisites and environment
       run: |
@@ -271,7 +283,7 @@ jobs:
         echo ""
 
     - name: Cache cargo registry
-      uses: actions/cache@v2
+      uses: actions/cache@v3
       continue-on-error: false
       with:
         path: |
@@ -280,7 +292,7 @@ jobs:
         key: pgx-cargo_init_tests-cargo-${{ runner.os }}-${{ hashFiles('**/Cargo.lock', '.github/workflows/tests.yml') }}
 
     - name: Cache sccache directory
-      uses: actions/cache@v2
+      uses: actions/cache@v3
       continue-on-error: false
       with:
         path: /home/runner/.cache/sccache
@@ -333,7 +345,7 @@ jobs:
         os: ["macos-11"]
 
     steps:
-    - uses: actions/checkout@v2
+    - uses: actions/checkout@v3
 
     - name: Set up prerequisites and environment
       run: |
@@ -350,15 +362,6 @@ jobs:
         echo "PG_VER=$PG_VER" >> $GITHUB_ENV
         cat $GITHUB_ENV
 
-        echo "----- Installing yq so .toml files can be parsed and queried -----"
-        pip3 install yq
-        echo ""
-
-        echo "----- Setting up RUSTFLAGS found in .cargo/config -----"
-        echo "RUSTFLAGS=$RUSTFLAGS $(tomlq --raw-output '.build.rustflags | join(" ")' .cargo/config)" >> $GITHUB_ENV
-        cat $GITHUB_ENV
-        echo ""
-
         echo "----- Set up Postgres permissions -----"
         sudo chmod a+rwx `$(which pg_config) --pkglibdir` `$(which pg_config) --sharedir`/extension
         ls -lath `$(which pg_config) --pkglibdir` `$(which pg_config) --sharedir`/extension
@@ -373,7 +376,7 @@ jobs:
         echo ""
 
     - name: Cache sccache directory
-      uses: actions/cache@v2
+      uses: actions/cache@v3
       continue-on-error: false
       with:
         path: /Users/runner/Library/Caches/Mozilla.sccache

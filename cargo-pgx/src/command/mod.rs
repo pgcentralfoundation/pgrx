@@ -20,3 +20,4 @@ pub(crate) mod start;
 pub(crate) mod status;
 pub(crate) mod stop;
 pub(crate) mod test;
+pub(crate) mod version;

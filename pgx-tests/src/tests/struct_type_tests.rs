@@ -7,9 +7,14 @@ All rights reserved.
 Use of this source code is governed by the MIT license that can be found in the LICENSE file.
 */
 
+use pgx::prelude::*;
 use pgx::stringinfo::StringInfo;
-use pgx::*;
-use pgx_utils::get_named_capture;
+use pgx::utils::sql_entity_graph::metadata::{
+    ArgumentError, Returns, ReturnsError, SqlMapping, SqlTranslatable,
+};
+use pgx::AllocatedByRust;
+
+use crate::get_named_capture;
 
 #[derive(Debug)]
 #[repr(C)]
@@ -23,6 +28,16 @@ extension_sql!(
     name = "create_complex_shell_type",
     creates = [Type(Complex)]
 );
+
+unsafe impl SqlTranslatable for Complex {
+    fn argument_sql() -> Result<SqlMapping, ArgumentError> {
+        Ok(SqlMapping::literal("Complex"))
+    }
+
+    fn return_sql() -> Result<Returns, ReturnsError> {
+        Ok(Returns::One(SqlMapping::literal("Complex")))
+    }
+}
 
 #[pg_extern(immutable)]
 fn complex_in(input: &std::ffi::CStr) -> PgBox<Complex, AllocatedByRust> {
@@ -68,7 +83,7 @@ mod tests {
     use crate as pgx_tests;
 
     use crate::tests::struct_type_tests::Complex;
-    use pgx::*;
+    use pgx::prelude::*;
 
     #[pg_test]
     fn test_complex_in() {

@@ -23,13 +23,10 @@ pub fn lookup_enum_by_oid(enumval: pg_sys::Oid) -> (String, pg_sys::Oid, f32) {
         )
     };
     if tup.is_null() {
-        ereport(
+        ereport!(
             PgLogLevel::ERROR,
             PgSqlErrorCode::ERRCODE_INVALID_BINARY_REPRESENTATION,
-            &format!("invalid internal value for enum: {}", enumval),
-            file!(),
-            line!(),
-            column!(),
+            format!("invalid internal value for enum: {}", enumval)
         );
     }
 
@@ -73,10 +70,7 @@ pub fn lookup_enum_by_label(typname: &str, label: &str) -> pg_sys::Datum {
     };
 
     if tup.is_null() {
-        panic!(
-            "could not find heap tuple for enum: {}.{}, typoid={}",
-            typname, label, enumtypoid
-        );
+        panic!("could not find heap tuple for enum: {}.{}, typoid={}", typname, label, enumtypoid);
     }
 
     // SAFETY:  we know that `tup` is valid because we just got it from Postgres above
@@ -87,7 +81,7 @@ pub fn lookup_enum_by_label(typname: &str, label: &str) -> pg_sys::Datum {
     }
 }
 
-#[cfg(any(feature = "pg10", feature = "pg11"))]
+#[cfg(any(feature = "pg11"))]
 unsafe fn extract_enum_oid(tup: *mut pg_sys::HeapTupleData) -> pg_sys::Oid {
     extern "C" {
         fn pgx_HeapTupleHeaderGetOid(htup_header: pg_sys::HeapTupleHeader) -> pg_sys::Oid;
@@ -96,7 +90,7 @@ unsafe fn extract_enum_oid(tup: *mut pg_sys::HeapTupleData) -> pg_sys::Oid {
     pgx_HeapTupleHeaderGetOid(tup.as_ref().unwrap().t_data)
 }
 
-#[cfg(any(feature = "pg12", feature = "pg13", feature = "pg14"))]
+#[cfg(any(feature = "pg12", feature = "pg13", feature = "pg14", feature = "pg15"))]
 unsafe fn extract_enum_oid(tup: *mut pg_sys::HeapTupleData) -> pg_sys::Oid {
     let en = pgx_GETSTRUCT(tup) as pg_sys::Form_pg_enum;
     let en = en.as_ref().unwrap();

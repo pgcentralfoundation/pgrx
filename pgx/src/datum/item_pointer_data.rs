@@ -13,11 +13,15 @@ use crate::{
 
 impl FromDatum for pg_sys::ItemPointerData {
     #[inline]
-    unsafe fn from_datum(datum: pg_sys::Datum, is_null: bool) -> Option<pg_sys::ItemPointerData> {
+    unsafe fn from_polymorphic_datum(
+        datum: pg_sys::Datum,
+        is_null: bool,
+        _typoid: u32,
+    ) -> Option<pg_sys::ItemPointerData> {
         if is_null {
             None
         } else {
-            let tid = datum.ptr_cast();
+            let tid = datum.cast_mut_ptr();
             let (blockno, offno) = item_pointer_get_both(*tid);
             let mut tid_copy = pg_sys::ItemPointerData::default();
 

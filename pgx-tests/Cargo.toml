@@ -1,6 +1,6 @@
 [package]
 name = "pgx-tests"
-version = "0.5.0-beta.0"
+version = "0.5.6"
 authors = ["ZomboDB, LLC <zombodb@gmail.com>"]
 license = "MIT"
 description = "Test framework for 'pgx'-based Postgres extensions"
@@ -9,18 +9,17 @@ repository = "https://github.com/zombodb/pgx"
 documentation = "https://docs.rs/pgx-tests"
 readme = "README.md"
 edition = "2021"
-rust-version = "1.58"
 
 [lib]
 crate-type = [ "cdylib", "lib" ]
 
 [features]
 default = [ ]
-pg10 = [ "pgx/pg10" ]
 pg11 = [ "pgx/pg11" ]
 pg12 = [ "pgx/pg12" ]
 pg13 = [ "pgx/pg13" ]
 pg14 = [ "pgx/pg14" ]
+pg15 = [ "pgx/pg15" ]
 pg_test = [ ]
 
 [package.metadata.docs.rs]
@@ -32,17 +31,23 @@ rustc-args = ["--cfg", "docsrs"]
 rustdoc-args = ["--cfg", "docsrs"]
 
 [dependencies]
-owo-colors = "3.4.0"
-once_cell = "1.10.0"
-libc = "0.2.126"
-pgx = { path = "../pgx", default-features = false, version= "=0.5.0-beta.0" }
-pgx-macros = { path = "../pgx-macros", version= "=0.5.0-beta.0" }
-pgx-utils = { path = "../pgx-utils", version= "=0.5.0-beta.0" }
-postgres = "0.19.3"
-regex = "1.5.5"
-serde = "1.0.137"
-serde_json = "1.0.81"
+owo-colors = "3.5.0"
+once_cell = "1.15.0"
+libc = "0.2.135"
+pgx-macros = { path = "../pgx-macros", version = "=0.5.6" }
+pgx-pg-config = { path = "../pgx-pg-config", version = "=0.5.6" }
+pgx-utils = { path = "../pgx-utils", version = "=0.5.6" }
+postgres = "0.19.4"
+regex = "1.6.0"
+serde = "1.0.146"
+serde_json = "1.0.87"
 shutdown_hooks = "0.1.0"
-time = "0.3.9"
+time = "0.3.15"
 eyre = "0.6.8"
 thiserror = "1.0"
+
+[dependencies.pgx]
+path = "../pgx"
+default-features = false
+features = [ "time-crate" ] # testing purposes
+version = "=0.5.6"

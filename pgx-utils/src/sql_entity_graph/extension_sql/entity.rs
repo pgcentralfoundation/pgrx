@@ -6,10 +6,20 @@ All rights reserved.
 
 Use of this source code is governed by the MIT license that can be found in the LICENSE file.
 */
-use crate::sql_entity_graph::{
-    extension_sql::SqlDeclared, pgx_sql::PgxSql, positioning_ref::PositioningRef, to_sql::ToSql,
-    SqlGraphEntity, SqlGraphIdentifier,
-};
+/*!
+
+`pgx::extension_sql!()` related entities for Rust to SQL translation
+
+> Like all of the [`sql_entity_graph`][crate::sql_entity_graph] APIs, this is considered **internal**
+to the `pgx` framework and very subject to change between versions. While you may use this, please do it with caution.
+
+
+*/
+use crate::sql_entity_graph::extension_sql::SqlDeclared;
+use crate::sql_entity_graph::pgx_sql::PgxSql;
+use crate::sql_entity_graph::positioning_ref::PositioningRef;
+use crate::sql_entity_graph::to_sql::ToSql;
+use crate::sql_entity_graph::{SqlGraphEntity, SqlGraphIdentifier};
 
 use std::fmt::Display;
 
@@ -30,15 +40,13 @@ pub struct ExtensionSqlEntity {
 
 impl ExtensionSqlEntity {
     pub fn has_sql_declared_entity(&self, identifier: &SqlDeclared) -> Option<&SqlDeclaredEntity> {
-        self.creates
-            .iter()
-            .find(|created| created.has_sql_declared_entity(identifier))
+        self.creates.iter().find(|created| created.has_sql_declared_entity(identifier))
     }
 }
 
-impl Into<SqlGraphEntity> for ExtensionSqlEntity {
-    fn into(self) -> SqlGraphEntity {
-        SqlGraphEntity::CustomSql(self)
+impl From<ExtensionSqlEntity> for SqlGraphEntity {
+    fn from(val: ExtensionSqlEntity) -> Self {
+        SqlGraphEntity::CustomSql(val)
     }
 }
 
@@ -170,10 +178,7 @@ impl SqlDeclaredEntity {
             pg_box: vec![
                 format!("pgx::pgbox::PgBox<{}>", name),
                 format!("pgx::pgbox::PgBox<{}, pgx::pgbox::AllocatedByRust>", name),
-                format!(
-                    "pgx::pgbox::PgBox<{}, pgx::pgbox::AllocatedByPostgres>",
-                    name
-                ),
+                format!("pgx::pgbox::PgBox<{}, pgx::pgbox::AllocatedByPostgres>", name),
             ],
         };
         let retval = match variant.as_ref() {

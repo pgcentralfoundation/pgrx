@@ -30,6 +30,10 @@ use pgx_pg_sys::Oid;
 pub trait IntoDatum {
     fn into_datum(self) -> Option<pg_sys::Datum>;
     fn type_oid() -> pg_sys::Oid;
+
+    fn composite_type_oid(&self) -> Option<Oid> {
+        None
+    }
     fn array_type_oid() -> pg_sys::Oid {
         unsafe { pg_sys::get_array_type(Self::type_oid()) }
     }
@@ -303,18 +307,7 @@ impl IntoDatum for char {
 /// ## Safety
 ///
 /// The `&CStr` better be allocated by Postgres
-impl<'a> IntoDatum for &'a std::ffi::CStr {
-    #[inline]
-    fn into_datum(self) -> Option<pg_sys::Datum> {
-        Some(self.as_ptr().into())
-    }
-
-    fn type_oid() -> u32 {
-        pg_sys::CSTRINGOID
-    }
-}
-
-impl<'a> IntoDatum for &'a crate::cstr_core::CStr {
+impl<'a> IntoDatum for &'a core::ffi::CStr {
     #[inline]
     fn into_datum(self) -> Option<pg_sys::Datum> {
         Some(self.as_ptr().into())

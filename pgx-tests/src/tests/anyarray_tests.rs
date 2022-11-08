@@ -7,7 +7,8 @@ All rights reserved.
 Use of this source code is governed by the MIT license that can be found in the LICENSE file.
 */
 
-use pgx::*;
+use pgx::prelude::*;
+use pgx::{direct_function_call, AnyArray, IntoDatum, Json};
 
 #[pg_extern]
 fn anyarray_arg(array: AnyArray) -> Json {
@@ -21,7 +22,8 @@ mod tests {
     #[allow(unused_imports)]
     use crate as pgx_tests;
 
-    use pgx::*;
+    use pgx::prelude::*;
+    use pgx::Json;
     use serde_json::*;
 
     #[pg_test]

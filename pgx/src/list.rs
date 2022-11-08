@@ -36,11 +36,7 @@ impl<T> PgList<T> {
     }
 
     pub unsafe fn from_pg(list: *mut pg_sys::List) -> Self {
-        PgList {
-            list,
-            allocated_by_pg: true,
-            _marker: PhantomData,
-        }
+        PgList { list, allocated_by_pg: true, _marker: PhantomData }
     }
 
     pub fn as_ptr(&self) -> *mut pg_sys::List {
@@ -128,21 +124,21 @@ impl<T> PgList<T> {
         }
     }
 
-    #[cfg(any(feature = "pg10", feature = "pg11", feature = "pg12"))]
+    #[cfg(any(feature = "pg11", feature = "pg12"))]
     #[inline]
     pub unsafe fn replace_ptr(&mut self, i: usize, with: *mut T) {
         let cell = pg_sys::pgx_list_nth_cell(self.list, i as i32);
         cell.as_mut().expect("cell is null").data.ptr_value = with as void_mut_ptr;
     }
 
-    #[cfg(any(feature = "pg13", feature = "pg14"))]
+    #[cfg(any(feature = "pg13", feature = "pg14", feature = "pg15"))]
     #[inline]
     pub unsafe fn replace_ptr(&mut self, i: usize, with: *mut T) {
         let cell = pg_sys::pgx_list_nth_cell(self.list, i as i32);
         cell.as_mut().expect("cell is null").ptr_value = with as void_mut_ptr;
     }
 
-    #[cfg(any(feature = "pg10", feature = "pg11", feature = "pg12"))]
+    #[cfg(any(feature = "pg11", feature = "pg12"))]
     #[inline]
     pub fn replace_int(&mut self, i: usize, with: i32) {
         unsafe {
@@ -151,7 +147,7 @@ impl<T> PgList<T> {
         }
     }
 
-    #[cfg(any(feature = "pg13", feature = "pg14"))]
+    #[cfg(any(feature = "pg13", feature = "pg14", feature = "pg15"))]
     #[inline]
     pub fn replace_int(&mut self, i: usize, with: i32) {
         unsafe {
@@ -160,7 +156,7 @@ impl<T> PgList<T> {
         }
     }
 
-    #[cfg(any(feature = "pg10", feature = "pg11", feature = "pg12"))]
+    #[cfg(any(feature = "pg11", feature = "pg12"))]
     #[inline]
     pub fn replace_oid(&mut self, i: usize, with: pg_sys::Oid) {
         unsafe {
@@ -169,7 +165,7 @@ impl<T> PgList<T> {
         }
     }
 
-    #[cfg(any(feature = "pg13", feature = "pg14"))]
+    #[cfg(any(feature = "pg13", feature = "pg14", feature = "pg15"))]
     #[inline]
     pub fn replace_oid(&mut self, i: usize, with: pg_sys::Oid) {
         unsafe {
@@ -180,26 +176,17 @@ impl<T> PgList<T> {
 
     #[inline]
     pub fn iter_ptr(&self) -> impl Iterator<Item = *mut T> + '_ {
-        PgListIteratorPtr {
-            list: &self,
-            pos: 0,
-        }
+        PgListIteratorPtr { list: &self, pos: 0 }
     }
 
     #[inline]
     pub fn iter_oid(&self) -> impl Iterator<Item = pg_sys::Oid> + '_ {
-        PgListIteratorOid {
-            list: &self,
-            pos: 0,
-        }
+        PgListIteratorOid { list: &self, pos: 0 }
     }
 
     #[inline]
     pub fn iter_int(&self) -> impl Iterator<Item = i32> + '_ {
-        PgListIteratorInt {
-            list: &self,
-            pos: 0,
-        }
+        PgListIteratorInt { list: &self, pos: 0 }
     }
 
     /// Add a pointer value to the end of this list

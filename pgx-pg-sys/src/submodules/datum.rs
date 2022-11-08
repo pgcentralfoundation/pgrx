@@ -33,8 +33,17 @@ struct DatumBlob {
 ///
 /// Only create Datums from non-pointers when you know you want to pass a value, as
 /// it is erroneous for `unsafe` code to dereference the address of "only a value" as a pointer.
-/// It is still a "safe" operation to create such pointers: validity is asserted by dereferencing.
-/// For all intents and purposes, however, Postgres counts as `unsafe` code that may be relying
+/// It is still a "safe" operation to create such pointers: validity is asserted by dereferencing,
+/// **or by creating a safe reference such as &T or &mut T**. Also be aware that the validity
+/// of Datum's Copy is premised on the same implicit issues with pointers being Copy:
+/// while any `&T` is live, other `*mut T` must not be used to write to that `&T`,
+/// and `&mut T` implies no other `*mut T` even exists outside an `&mut T`'s borrowing ancestry.
+/// It is thus of dubious soundness for Rust code to receive `*mut T`, create another `*mut T`,
+/// cast the first to `&mut T`, and then later try to use the second `*mut T` to write.
+/// It _is_ sound for Postgres itself to pass a copied pointer as a Datum to Rust code, then later
+/// to mutate that data through its original pointer after Rust creates and releases a `&mut T`.
+///
+/// For all intents and purposes, Postgres counts as `unsafe` code that may be relying
 /// on you communicating pointers correctly to it. Do not play games with your database.
 #[repr(transparent)]
 #[derive(Debug, Copy, Clone, PartialEq)]
@@ -48,18 +57,14 @@ impl Datum {
         self.0.addr()
     }
 
-    /// Assume the datum is a pointer and treat it as void*.
-    pub fn to_void(self) -> *mut core::ffi::c_void {
-        self.0.cast()
-    }
-
     /// True if the datum is equal to the null pointer.
     pub fn is_null(self) -> bool {
         self.0.is_null()
     }
 
     /// Assume the datum is a pointer and cast it to point to T.
-    pub fn ptr_cast<T>(self) -> *mut T {
+    /// It is recommended to explicitly use `datum.cast_mut_ptr::<T>()`.
+    pub fn cast_mut_ptr<T>(self) -> *mut T {
         #[allow(unstable_name_collisions)]
         self.0.cast()
     }
@@ -133,6 +138,12 @@ impl From<i64> for Datum {
     }
 }
 
+impl From<bool> for Datum {
+    fn from(val: bool) -> Datum {
+        Datum::from(val as usize)
+    }
+}
+
 impl<T> From<*mut T> for Datum {
     fn from(val: *mut T) -> Datum {
         Datum(val.cast())
@@ -165,4 +176,23 @@ impl<T> PartialEq<Datum> for *mut T {
 pub struct NullableDatum {
     pub value: Datum,
     pub isnull: bool,
+}
+
+impl TryFrom<NullableDatum> for Datum {
+    type Error = ();
+
+    fn try_from(nd: NullableDatum) -> Result<Datum, ()> {
+        let NullableDatum { value, isnull } = nd;
+        if isnull {
+            Err(())
+        } else {
+            Ok(value)
+        }
+    }
+}
+
+impl From<NullableDatum> for Option<Datum> {
+    fn from(nd: NullableDatum) -> Option<Datum> {
+        Some(Datum::try_from(nd).ok()?)
+    }
 }

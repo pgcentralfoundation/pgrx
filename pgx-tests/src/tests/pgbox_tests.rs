@@ -11,7 +11,8 @@ Use of this source code is governed by the MIT license that can be found in the 
 mod tests {
     #[allow(unused_imports)]
     use crate as pgx_tests;
-    use pgx::{AllocatedByRust, *};
+    use pgx::prelude::*;
+    use pgx::{AllocatedByRust, PgMemoryContexts};
 
     #[pg_test]
     fn pgbox_alloc() {

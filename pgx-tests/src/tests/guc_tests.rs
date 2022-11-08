@@ -13,7 +13,8 @@ mod tests {
     #[allow(unused_imports)]
     use crate as pgx_tests;
 
-    use pgx::*;
+    use pgx::guc::*;
+    use pgx::prelude::*;
 
     #[pg_test]
     fn test_bool_guc() {

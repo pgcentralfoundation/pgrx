@@ -22,13 +22,17 @@ Use of this source code is governed by the MIT license that can be found in the 
 #[cfg(
     any(
         // no features at all will cause problems
-        not(any(feature = "pg10", feature = "pg11", feature = "pg12", feature = "pg13", feature = "pg14")),
+        not(any(feature = "pg11", feature = "pg12", feature = "pg13", feature = "pg14", feature = "pg15")),
   ))]
-std::compile_error!("exactly one one feature must be provided (pg10, pg11, pg12, pg13, pg14)");
+std::compile_error!("exactly one one feature must be provided (pg11, pg12, pg13, pg14, pg15)");
 
 pub mod submodules;
 
-pub use submodules::guard;
+use core::ptr::NonNull;
+use std::ffi::CStr;
+use std::os::raw::c_char;
+
+// for convenience we pull up everything submodules exposes
 pub use submodules::*;
 
 //
@@ -36,13 +40,6 @@ pub use submodules::*;
 //
 
 // feature gate each pg version module
-#[cfg(all(feature = "pg10", not(docsrs)))]
-mod pg10 {
-    include!(concat!(env!("OUT_DIR"), "/pg10.rs"));
-}
-#[cfg(all(feature = "pg10", docsrs))]
-mod pg10;
-
 #[cfg(all(feature = "pg11", not(docsrs)))]
 mod pg11 {
     include!(concat!(env!("OUT_DIR"), "/pg11.rs"));
@@ -71,9 +68,14 @@ mod pg14 {
 #[cfg(all(feature = "pg14", docsrs))]
 mod pg14;
 
+#[cfg(all(feature = "pg15", not(docsrs)))]
+mod pg15 {
+    include!(concat!(env!("OUT_DIR"), "/pg15.rs"));
+}
+#[cfg(all(feature = "pg15", docsrs))]
+mod pg15;
+
 // export each module publicly
-#[cfg(feature = "pg10")]
-pub use pg10::*;
 #[cfg(feature = "pg11")]
 pub use pg11::*;
 #[cfg(feature = "pg12")]
@@ -82,15 +84,10 @@ pub use pg12::*;
 pub use pg13::*;
 #[cfg(feature = "pg14")]
 pub use pg14::*;
+#[cfg(feature = "pg15")]
+pub use pg15::*;
 
 // feature gate each pg-specific oid module
-#[cfg(all(feature = "pg10", not(docsrs)))]
-mod pg10_oids {
-    include!(concat!(env!("OUT_DIR"), "/pg10_oids.rs"));
-}
-#[cfg(all(feature = "pg10", docsrs))]
-mod pg10_oids;
-
 #[cfg(all(feature = "pg11", not(docsrs)))]
 mod pg11_oids {
     include!(concat!(env!("OUT_DIR"), "/pg11_oids.rs"));
@@ -119,9 +116,14 @@ mod pg14_oids {
 #[cfg(all(feature = "pg14", docsrs))]
 mod pg14_oids;
 
+#[cfg(all(feature = "pg15", not(docsrs)))]
+mod pg15_oids {
+    include!(concat!(env!("OUT_DIR"), "/pg15_oids.rs"));
+}
+#[cfg(all(feature = "pg15", docsrs))]
+mod pg15_oids;
+
 // export that module publicly
-#[cfg(feature = "pg10")]
-pub use pg10_oids::*;
 #[cfg(feature = "pg11")]
 pub use pg11_oids::*;
 #[cfg(feature = "pg12")]
@@ -130,22 +132,13 @@ pub use pg12_oids::*;
 pub use pg13_oids::*;
 #[cfg(feature = "pg14")]
 pub use pg14_oids::*;
+#[cfg(feature = "pg15")]
+pub use pg15_oids::*;
 
 // expose things we want available for all versions
 pub use all_versions::*;
 
 // and things that are version-specific
-#[cfg(feature = "pg10")]
-pub use internal::pg10::add_bool_reloption;
-#[cfg(feature = "pg10")]
-pub use internal::pg10::add_int_reloption;
-#[cfg(feature = "pg10")]
-pub use internal::pg10::add_string_reloption;
-#[cfg(feature = "pg10")]
-pub use internal::pg10::IndexBuildHeapScan;
-#[cfg(feature = "pg10")]
-pub use internal::pg10::*;
-
 #[cfg(feature = "pg11")]
 pub use internal::pg11::IndexBuildHeapScan;
 #[cfg(feature = "pg11")]
@@ -160,29 +153,41 @@ pub use internal::pg13::*;
 #[cfg(feature = "pg14")]
 pub use internal::pg14::*;
 
-/// A trait applied to all of Postgres' `pg_sys::Node` types and its subtypes
-pub trait PgNode {
-    type NodeType;
+#[cfg(feature = "pg15")]
+pub use internal::pg15::*;
 
-    /// Represent this node as a mutable pointer of its type
+/// A trait applied to all Postgres `pg_sys::Node` types and subtypes
+pub trait PgNode {
+    // TODO(0.6.0): seal this trait or take this trait private?
+
+    /// Format this node
     #[inline]
-    fn as_node_ptr(&self) -> *mut Self::NodeType {
-        self as *const _ as *mut Self::NodeType
+    fn display_node(&self) -> std::string::String {
+        // SAFETY: The trait is pub but this impl is private, and
+        // this is only implemented for things known to be "Nodes"
+        unsafe { display_node_impl(NonNull::from(self).cast()) }
     }
 }
 
 /// implementation function for `impl Display for $NodeType`
-pub(crate) fn node_to_string_for_display(node: *mut crate::Node) -> String {
+///
+/// # Safety
+/// Don't use this on anything that doesn't impl PgNode, or the type may be off
+#[warn(unsafe_op_in_unsafe_fn)]
+pub(crate) unsafe fn display_node_impl(node: NonNull<crate::Node>) -> std::string::String {
+    // SAFETY: It's fine to call nodeToString with non-null well-typed pointers,
+    // and pg_sys::nodeToString() returns data via palloc, which is never null
+    // as Postgres will ERROR rather than giving us a null pointer,
+    // and Postgres starts and finishes constructing StringInfos by writing '\0'
     unsafe {
-        // crate::nodeToString() will never return a null pointer
-        let node_to_string = crate::nodeToString(node as *mut std::ffi::c_void);
+        let node_cstr = crate::nodeToString(node.as_ptr().cast());
 
-        let result = match std::ffi::CStr::from_ptr(node_to_string).to_str() {
+        let result = match CStr::from_ptr(node_cstr).to_str() {
             Ok(cstr) => cstr.to_string(),
             Err(e) => format!("<ffi error: {:?}>", e),
         };
 
-        crate::pfree(node_to_string as *mut std::ffi::c_void);
+        crate::pfree(node_cstr.cast());
 
         result
     }
@@ -190,11 +195,12 @@ pub(crate) fn node_to_string_for_display(node: *mut crate::Node) -> String {
 
 /// A trait for converting a thing into a `char *` that is allocated by Postgres' palloc
 pub trait AsPgCStr {
-    fn as_pg_cstr(&self) -> *mut std::os::raw::c_char;
+    /// Consumes `self` and converts it into a Postgres-allocated `char *`
+    fn as_pg_cstr(self) -> *mut std::os::raw::c_char;
 }
 
 impl<'a> AsPgCStr for &'a str {
-    fn as_pg_cstr(&self) -> *mut std::os::raw::c_char {
+    fn as_pg_cstr(self) -> *mut std::os::raw::c_char {
         let self_bytes = self.as_bytes();
         let pg_cstr = unsafe { crate::palloc0(self_bytes.len() + 1) as *mut std::os::raw::c_uchar };
         let slice = unsafe { std::slice::from_raw_parts_mut(pg_cstr, self_bytes.len()) };
@@ -203,9 +209,51 @@ impl<'a> AsPgCStr for &'a str {
     }
 }
 
-impl AsPgCStr for String {
-    fn as_pg_cstr(&self) -> *mut std::os::raw::c_char {
+impl<'a> AsPgCStr for Option<&'a str> {
+    fn as_pg_cstr(self) -> *mut c_char {
+        match self {
+            Some(s) => s.as_pg_cstr(),
+            None => std::ptr::null_mut(),
+        }
+    }
+}
+
+impl AsPgCStr for std::string::String {
+    fn as_pg_cstr(self) -> *mut std::os::raw::c_char {
         self.as_str().as_pg_cstr()
+    }
+}
+
+impl AsPgCStr for &std::string::String {
+    fn as_pg_cstr(self) -> *mut std::os::raw::c_char {
+        self.as_str().as_pg_cstr()
+    }
+}
+
+impl AsPgCStr for Option<std::string::String> {
+    fn as_pg_cstr(self) -> *mut c_char {
+        match self {
+            Some(s) => s.as_pg_cstr(),
+            None => std::ptr::null_mut(),
+        }
+    }
+}
+
+impl AsPgCStr for Option<&std::string::String> {
+    fn as_pg_cstr(self) -> *mut c_char {
+        match self {
+            Some(s) => s.as_pg_cstr(),
+            None => std::ptr::null_mut(),
+        }
+    }
+}
+
+impl AsPgCStr for &Option<std::string::String> {
+    fn as_pg_cstr(self) -> *mut c_char {
+        match self {
+            Some(s) => s.as_pg_cstr(),
+            None => std::ptr::null_mut(),
+        }
     }
 }
 
@@ -445,111 +493,32 @@ mod all_versions {
             context: *mut ::std::os::raw::c_void,
         ) -> bool;
     }
+
+    #[pgx_macros::pg_guard]
+    extern "C" {
+        #[link_name = "pgx_SpinLockInit"]
+        pub fn SpinLockInit(lock: *mut pg_sys::slock_t);
+        #[link_name = "pgx_SpinLockAcquire"]
+        pub fn SpinLockAcquire(lock: *mut pg_sys::slock_t);
+        #[link_name = "pgx_SpinLockRelease"]
+        pub fn SpinLockRelease(lock: *mut pg_sys::slock_t);
+        #[link_name = "pgx_SpinLockFree"]
+        pub fn SpinLockFree(lock: *mut pg_sys::slock_t) -> bool;
+    }
+
+    #[inline(always)]
+    pub unsafe fn MemoryContextSwitchTo(context: crate::MemoryContext) -> crate::MemoryContext {
+        let old = crate::CurrentMemoryContext;
+
+        crate::CurrentMemoryContext = context;
+        old
+    }
 }
 
 mod internal {
     //
     // for specific versions
     //
-
-    #[cfg(feature = "pg10")]
-    pub(crate) mod pg10 {
-        use crate::pg10::*;
-
-        pub use crate::pg10::tupleDesc as TupleDescData;
-        pub use crate::pg10::AllocSetContextCreate as AllocSetContextCreateExtended;
-        pub type QueryCompletion = std::os::raw::c_char;
-
-        pub unsafe fn add_string_reloption(
-            kinds: bits32,
-            name: *const ::std::os::raw::c_char,
-            desc: *const ::std::os::raw::c_char,
-            default_val: *const ::std::os::raw::c_char,
-            validator: ::std::option::Option<
-                unsafe extern "C" fn(value: *const ::std::os::raw::c_char),
-            >,
-        ) {
-            // PG10 defines the validator function as taking a "*mut c_char"
-            // whereas PG11/12 want a "*const c_char".
-            //
-            // For ease of use by users of this crate, we cast the provided
-            // 'validator' function to what PG10 wants, using transmute
-            //
-            // If there's a better way to do this, I'ld love to know!
-            let func_as_mut_arg = match validator {
-                Some(func) => {
-                    let func_ptr = std::mem::transmute::<
-                        unsafe extern "C" fn(*const ::std::os::raw::c_char),
-                        unsafe extern "C" fn(*mut ::std::os::raw::c_char),
-                    >(func);
-                    Some(func_ptr)
-                }
-                None => None,
-            };
-
-            crate::pg10::add_string_reloption(
-                kinds,
-                name as *mut std::os::raw::c_char,
-                desc as *mut std::os::raw::c_char,
-                default_val as *mut std::os::raw::c_char,
-                func_as_mut_arg,
-            );
-        }
-
-        pub unsafe fn add_int_reloption(
-            kinds: bits32,
-            name: *const ::std::os::raw::c_char,
-            desc: *const ::std::os::raw::c_char,
-            default_val: ::std::os::raw::c_int,
-            min_val: ::std::os::raw::c_int,
-            max_val: ::std::os::raw::c_int,
-        ) {
-            crate::pg10::add_int_reloption(
-                kinds,
-                name as *mut std::os::raw::c_char,
-                desc as *mut std::os::raw::c_char,
-                default_val,
-                min_val,
-                max_val,
-            );
-        }
-
-        pub unsafe fn add_bool_reloption(
-            kinds: bits32,
-            name: *const ::std::os::raw::c_char,
-            desc: *const ::std::os::raw::c_char,
-            default_val: bool,
-        ) {
-            crate::pg10::add_bool_reloption(
-                kinds,
-                name as *mut std::os::raw::c_char,
-                desc as *mut std::os::raw::c_char,
-                default_val,
-            );
-        }
-
-        /// # Safety
-        ///
-        /// This function wraps Postgres' internal `IndexBuildHeapScan` method, and therefore, is
-        /// inherently unsafe
-        pub unsafe fn IndexBuildHeapScan<T>(
-            heap_relation: crate::Relation,
-            index_relation: crate::Relation,
-            index_info: *mut crate::pg10::IndexInfo,
-            build_callback: crate::IndexBuildCallback,
-            build_callback_state: *mut T,
-        ) {
-            crate::pg10::IndexBuildHeapScan(
-                heap_relation,
-                index_relation,
-                index_info,
-                true,
-                build_callback,
-                build_callback_state as *mut std::os::raw::c_void,
-            );
-        }
-    }
-
     #[cfg(feature = "pg11")]
     pub(crate) mod pg11 {
         pub use crate::pg11::tupleDesc as TupleDescData;
@@ -686,4 +655,48 @@ mod internal {
             );
         }
     }
+
+    #[cfg(feature = "pg15")]
+    pub(crate) mod pg15 {
+        pub use crate::pg15::AllocSetContextCreateInternal as AllocSetContextCreateExtended;
+
+        pub const QTW_EXAMINE_RTES: u32 = crate::pg15::QTW_EXAMINE_RTES_BEFORE;
+
+        /// # Safety
+        ///
+        /// This function wraps Postgres' internal `IndexBuildHeapScan` method, and therefore, is
+        /// inherently unsafe
+        pub unsafe fn IndexBuildHeapScan<T>(
+            heap_relation: crate::Relation,
+            index_relation: crate::Relation,
+            index_info: *mut crate::IndexInfo,
+            build_callback: crate::IndexBuildCallback,
+            build_callback_state: *mut T,
+        ) {
+            let heap_relation_ref = heap_relation.as_ref().unwrap();
+            let table_am = heap_relation_ref.rd_tableam.as_ref().unwrap();
+
+            table_am.index_build_range_scan.unwrap()(
+                heap_relation,
+                index_relation,
+                index_info,
+                true,
+                false,
+                true,
+                0,
+                crate::InvalidBlockNumber,
+                build_callback,
+                build_callback_state as *mut std::os::raw::c_void,
+                std::ptr::null_mut(),
+            );
+        }
+    }
 }
+
+// Hack to fix linker errors that we get under amazonlinux2 on some PG versions
+// due to our wrappers for various system library functions. Should be fairly
+// harmless, but ideally we would not wrap these functions
+// (https://github.com/tcdi/pgx/issues/730).
+#[cfg(target_os = "linux")]
+#[link(name = "resolv")]
+extern "C" {}

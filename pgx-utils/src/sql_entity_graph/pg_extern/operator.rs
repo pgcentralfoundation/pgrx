@@ -6,10 +6,19 @@ All rights reserved.
 
 Use of this source code is governed by the MIT license that can be found in the LICENSE file.
 */
+/*!
+
+`#[pg_operator]` related macro expansion for Rust to SQL translation
+
+> Like all of the [`sql_entity_graph`][crate::sql_entity_graph] APIs, this is considered **internal**
+to the `pgx` framework and very subject to change between versions. While you may use this, please do it with caution.
+
+*/
 use proc_macro2::TokenStream as TokenStream2;
 use quote::{quote, ToTokens, TokenStreamExt};
+use syn::parenthesized;
 use syn::parse::{Parse, ParseBuffer};
-use syn::{parenthesized, token::Paren};
+use syn::token::Paren;
 
 /// A parsed `#[pg_operator]` operator.
 ///

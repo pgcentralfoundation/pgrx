@@ -6,12 +6,16 @@ All rights reserved.
 
 Use of this source code is governed by the MIT license that can be found in the LICENSE file.
 */
-use pgx::*;
+use pgx::atomics::*;
+use pgx::lwlock::PgLwLock;
+use pgx::prelude::*;
+use pgx::shmem::*;
+use pgx::{pg_shmem_init, warning};
 use serde::*;
 use std::iter::Iterator;
 use std::sync::atomic::Ordering;
 
-pg_module_magic!();
+pgx::pg_module_magic!();
 
 // types behind a `LwLock` must derive/implement `Copy` and `Clone`
 #[derive(Copy, Clone)]
@@ -23,10 +27,7 @@ pub struct Pgtest {
 }
 impl Default for Pgtest {
     fn default() -> Self {
-        Pgtest {
-            value1: 0,
-            value2: 0,
-        }
+        Pgtest { value1: 0, value2: 0 }
     }
 }
 unsafe impl PGXSharedMemory for Pgtest {}
@@ -47,12 +48,8 @@ pub extern "C" fn _PG_init() {
 }
 
 #[pg_extern]
-fn vec_select() -> impl Iterator<Item = Pgtest> {
-    VEC.share()
-        .iter()
-        .map(|i| *i)
-        .collect::<Vec<Pgtest>>()
-        .into_iter()
+fn vec_select() -> SetOfIterator<'static, Pgtest> {
+    SetOfIterator::new(VEC.share().iter().map(|i| *i).collect::<Vec<Pgtest>>().into_iter())
 }
 
 #[pg_extern]
@@ -61,18 +58,16 @@ fn vec_count() -> i32 {
 }
 
 #[pg_extern]
-fn vec_drain() -> impl Iterator<Item = Pgtest> {
+fn vec_drain() -> SetOfIterator<'static, Pgtest> {
     let mut vec = VEC.exclusive();
     let r = vec.iter().map(|i| *i).collect::<Vec<Pgtest>>();
     vec.clear();
-    r.into_iter()
+    SetOfIterator::new(r.into_iter())
 }
 
 #[pg_extern]
 fn vec_push(value: Pgtest) {
-    VEC.exclusive()
-        .push(value)
-        .unwrap_or_else(|_| warning!("Vector is full, discarding update"));
+    VEC.exclusive().push(value).unwrap_or_else(|_| warning!("Vector is full, discarding update"));
 }
 
 #[pg_extern]

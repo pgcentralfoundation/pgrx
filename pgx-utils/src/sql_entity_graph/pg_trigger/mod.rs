@@ -1,11 +1,18 @@
+/*!
+
+`#[pg_trigger]` related macro expansion for Rust to SQL translation
+
+> Like all of the [`sql_entity_graph`][crate::sql_entity_graph] APIs, this is considered **internal**
+to the `pgx` framework and very subject to change between versions. While you may use this, please do it with caution.
+
+*/
 pub mod attribute;
 pub mod entity;
 
 use crate::sql_entity_graph::ToSqlConfig;
 use attribute::PgTriggerAttribute;
 use proc_macro2::{Span, TokenStream as TokenStream2};
-use quote::ToTokens;
-use quote::{quote, TokenStreamExt};
+use quote::{quote, ToTokens, TokenStreamExt};
 use syn::{ItemFn, Token};
 
 #[derive(Debug, Clone)]
@@ -31,10 +38,9 @@ impl PgTrigger {
             .map(|PgTriggerAttribute::Sql(mut config)| {
                 if let Some(ref mut content) = config.content {
                     let value = content.value();
-                    let updated_value = value.replace(
-                        "@FUNCTION_NAME@",
-                        &*(func.sig.ident.to_string() + "_wrapper"),
-                    ) + "\n";
+                    let updated_value = value
+                        .replace("@FUNCTION_NAME@", &*(func.sig.ident.to_string() + "_wrapper"))
+                        + "\n";
                     *content = syn::LitStr::new(&updated_value, Span::call_site());
                 };
                 config
@@ -45,18 +51,12 @@ impl PgTrigger {
             crate::ident_is_acceptable_to_postgres(&func.sig.ident)?;
         }
 
-        Ok(Self {
-            func,
-            to_sql_config,
-        })
+        Ok(Self { func, to_sql_config })
     }
 
     pub fn entity_tokens(&self) -> Result<ItemFn, syn::Error> {
         let sql_graph_entity_fn_name = syn::Ident::new(
-            &format!(
-                "__pgx_internals_trigger_{}",
-                self.func.sig.ident.to_string()
-            ),
+            &format!("__pgx_internals_trigger_{}", self.func.sig.ident.to_string()),
             self.func.sig.ident.span(),
         );
         let func_sig_ident = &self.func.sig.ident;
@@ -66,7 +66,7 @@ impl PgTrigger {
         let tokens = quote! {
             #[no_mangle]
             #[doc(hidden)]
-            pub extern "C" fn #sql_graph_entity_fn_name() -> ::pgx::utils::sql_entity_graph::SqlGraphEntity {
+            pub extern "Rust" fn #sql_graph_entity_fn_name() -> ::pgx::utils::sql_entity_graph::SqlGraphEntity {
                 use core::any::TypeId;
                 extern crate alloc;
                 use alloc::vec::Vec;
@@ -98,13 +98,15 @@ impl PgTrigger {
                 let maybe_pg_trigger = unsafe { ::pgx::trigger_support::PgTrigger::from_fcinfo(fcinfo) };
                 let pg_trigger = maybe_pg_trigger.expect("PgTrigger::from_fcinfo failed");
                 let trigger_fn_result: Result<
-                    ::pgx::PgHeapTuple<'_, _>,
+                    ::pgx::heap_tuple::PgHeapTuple<'_, _>,
                     _,
                 > = #function_ident(&pg_trigger);
 
                 let trigger_retval = trigger_fn_result.expect("Trigger function panic");
-                let retval_datum = trigger_retval.into_datum();
-                retval_datum.expect("Failed to turn trigger function return value into Datum")
+                match trigger_retval.into_trigger_datum() {
+                    None => ::pgx::pg_return_null(fcinfo),
+                    Some(datum) => datum,
+                }
             }
 
         };
@@ -130,15 +132,9 @@ impl PgTrigger {
 
 impl ToTokens for PgTrigger {
     fn to_tokens(&self, tokens: &mut TokenStream2) {
-        let entity_func = self
-            .entity_tokens()
-            .expect("Generating entity function for trigger");
-        let wrapper_func = self
-            .wrapper_tokens()
-            .expect("Generating wrappper function for trigger");
-        let finfo_func = self
-            .finfo_tokens()
-            .expect("Generating finfo function for trigger");
+        let entity_func = self.entity_tokens().expect("Generating entity function for trigger");
+        let wrapper_func = self.wrapper_tokens().expect("Generating wrappper function for trigger");
+        let finfo_func = self.finfo_tokens().expect("Generating finfo function for trigger");
         let func = &self.func;
 
         let items = quote! {

@@ -22,7 +22,7 @@ pub fn composite_row_type_make_tuple(
     row: pg_sys::Datum,
 ) -> PgBox<pg_sys::HeapTupleData, AllocatedByRust> {
     let htup_header =
-        unsafe { pg_sys::pg_detoast_datum_packed(row.ptr_cast()) } as pg_sys::HeapTupleHeader;
+        unsafe { pg_sys::pg_detoast_datum_packed(row.cast_mut_ptr()) } as pg_sys::HeapTupleHeader;
     let mut tuple = PgBox::<pg_sys::HeapTupleData>::alloc0();
 
     tuple.t_len = heap_tuple_header_get_datum_length(htup_header) as u32;
@@ -102,16 +102,16 @@ pub fn heap_getattr<
     attno: NonZeroUsize,
     tupdesc: &PgTupleDesc,
 ) -> Option<T> {
-    unsafe {
-        let mut is_null = false;
-        let datum = pgx_heap_getattr(
-            tuple.as_ptr(),
-            attno.get() as u32,
-            tupdesc.as_ptr(),
-            &mut is_null,
-        );
+    let mut is_null = false;
+    let datum = unsafe {
+        pgx_heap_getattr(tuple.as_ptr(), attno.get() as u32, tupdesc.as_ptr(), &mut is_null)
+    };
+    let typoid = tupdesc.get(attno.get() - 1).expect("no attribute").type_oid();
 
-        T::from_datum(datum, is_null)
+    if is_null {
+        None
+    } else {
+        unsafe { T::from_polymorphic_datum(datum, false, typoid.value()) }
     }
 }
 
@@ -158,7 +158,7 @@ pub struct DatumWithTypeInfo {
 impl DatumWithTypeInfo {
     #[inline]
     pub fn into_value<T: FromDatum>(self) -> T {
-        unsafe { T::from_datum(self.datum, self.is_null).unwrap() }
+        unsafe { T::from_polymorphic_datum(self.datum, self.is_null, self.typoid.value()).unwrap() }
     }
 }
 
@@ -183,11 +183,5 @@ pub fn heap_getattr_datum_ex(
         pg_sys::get_typlenbyvalalign(typoid.value(), &mut typlen, &mut typbyval, &mut typalign);
     }
 
-    DatumWithTypeInfo {
-        datum,
-        is_null,
-        typoid,
-        typlen,
-        typbyval,
-    }
+    DatumWithTypeInfo { datum, is_null, typoid, typlen, typbyval }
 }

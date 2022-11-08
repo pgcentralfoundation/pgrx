@@ -10,14 +10,18 @@ Use of this source code is governed by the MIT license that can be found in the 
 use crate::{direct_function_call_as_datum, pg_sys, FromDatum, IntoDatum};
 
 impl FromDatum for pg_sys::BOX {
-    unsafe fn from_datum(datum: pg_sys::Datum, is_null: bool) -> Option<Self>
+    unsafe fn from_polymorphic_datum(
+        datum: pg_sys::Datum,
+        is_null: bool,
+        _: pg_sys::Oid,
+    ) -> Option<Self>
     where
         Self: Sized,
     {
         if is_null {
             None
         } else {
-            let the_box = datum.ptr_cast::<pg_sys::BOX>();
+            let the_box = datum.cast_mut_ptr::<pg_sys::BOX>();
             Some(the_box.read())
         }
     }
@@ -40,14 +44,18 @@ impl IntoDatum for pg_sys::BOX {
 }
 
 impl FromDatum for pg_sys::Point {
-    unsafe fn from_datum(datum: pg_sys::Datum, is_null: bool) -> Option<Self>
+    unsafe fn from_polymorphic_datum(
+        datum: pg_sys::Datum,
+        is_null: bool,
+        _: pg_sys::Oid,
+    ) -> Option<Self>
     where
         Self: Sized,
     {
         if is_null {
             None
         } else {
-            let point: *mut Self = datum.ptr_cast();
+            let point: *mut Self = datum.cast_mut_ptr();
             Some(point.read())
         }
     }

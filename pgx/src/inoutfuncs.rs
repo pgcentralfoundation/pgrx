@@ -21,12 +21,16 @@ pub trait PgVarlenaInOutFuncs {
     /// Given a string representation of `Self`, parse it into a `PgVarlena<Self>`.
     ///
     /// It is expected that malformed input will raise an `error!()` or `panic!()`
-    fn input(input: &crate::cstr_core::CStr) -> PgVarlena<Self>
+    fn input(input: &core::ffi::CStr) -> PgVarlena<Self>
     where
         Self: Copy + Sized;
 
     /// Convert `Self` into text by writing to the supplied `StringInfo` buffer
     fn output(&self, buffer: &mut StringInfo);
+
+    /// If PostgreSQL calls the conversion function with NULL as an argument, what
+    /// error message should be generated?
+    const NULL_ERROR_MESSAGE: Option<&'static str> = None;
 }
 
 /// `#[derive(Serialize, Deserialize, PostgresType)]` types may implement this trait if they prefer
@@ -35,19 +39,23 @@ pub trait InOutFuncs {
     /// Given a string representation of `Self`, parse it into `Self`.
     ///
     /// It is expected that malformed input will raise an `error!()` or `panic!()`
-    fn input(input: &crate::cstr_core::CStr) -> Self
+    fn input(input: &core::ffi::CStr) -> Self
     where
         Self: Sized;
 
     /// Convert `Self` into text by writing to the supplied `StringInfo` buffer
     fn output(&self, buffer: &mut StringInfo);
+
+    /// If PostgreSQL calls the conversion function with NULL as an argument, what
+    /// error message should be generated?
+    const NULL_ERROR_MESSAGE: Option<&'static str> = None;
 }
 
 /// Automatically implemented for `#[derive(Serialize, Deserialize, PostgresType)]` types that do
 /// **not** also have the `#[inoutfuncs]` attribute macro
 pub trait JsonInOutFuncs<'de>: serde::de::Deserialize<'de> + serde::ser::Serialize {
     /// Uses `serde_json` to deserialize the input, which is assumed to be JSON
-    fn input(input: &'de crate::cstr_core::CStr) -> Self {
+    fn input(input: &'de core::ffi::CStr) -> Self {
         serde_json::from_str(input.to_str().expect("text input is not valid UTF8"))
             .expect("failed to deserialize json")
     }
@@ -59,4 +67,8 @@ pub trait JsonInOutFuncs<'de>: serde::de::Deserialize<'de> + serde::ser::Seriali
     {
         serde_json::to_writer(buffer, self).expect("failed to serialize to json")
     }
+
+    /// If PostgreSQL calls the conversion function with NULL as an argument, what
+    /// error message should be generated?
+    const NULL_ERROR_MESSAGE: Option<&'static str> = None;
 }

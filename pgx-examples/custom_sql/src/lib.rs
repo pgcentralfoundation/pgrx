@@ -7,10 +7,10 @@ All rights reserved.
 Use of this source code is governed by the MIT license that can be found in the LICENSE file.
 */
 
-use pgx::*;
+use pgx::prelude::*;
 use serde::{Deserialize, Serialize};
 
-pg_module_magic!();
+pgx::pg_module_magic!();
 
 #[pg_schema]
 mod home {
@@ -82,7 +82,7 @@ extension_sql_file!("../sql/finalizer.sql", finalize);
 #[cfg(any(test, feature = "pg_test"))]
 #[pg_schema]
 mod tests {
-    use pgx::*;
+    use pgx::prelude::*;
 
     #[pg_test]
     fn test_ordering() {

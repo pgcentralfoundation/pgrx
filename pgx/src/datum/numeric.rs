@@ -7,8 +7,12 @@ All rights reserved.
 Use of this source code is governed by the MIT license that can be found in the LICENSE file.
 */
 
-use crate::{direct_function_call, pg_sys, FromDatum, IntoDatum};
-use pgx_pg_sys::{pg_try, AsPgCStr, InvalidOid};
+use crate::{direct_function_call, direct_function_call_as_datum, pg_sys, FromDatum, IntoDatum};
+use pg_sys::errcodes::PgSqlErrorCode;
+use pg_sys::{AsPgCStr, Datum, InvalidOid, PgTryBuilder};
+use pgx_utils::sql_entity_graph::metadata::{
+    ArgumentError, Returns, ReturnsError, SqlMapping, SqlTranslatable,
+};
 use serde::de::{Error, Visitor};
 use serde::{de, Deserialize, Deserializer, Serialize, Serializer};
 use serde_json::Number;
@@ -35,9 +39,7 @@ impl<const PRECISION: i32, const SCALE: i32> std::fmt::Display for Numeric<PRECI
             )
             .unwrap()
         };
-        let s = numeric_out
-            .to_str()
-            .expect("numeric_out is not a valid UTF8 string");
+        let s = numeric_out.to_str().expect("numeric_out is not a valid UTF8 string");
         fmt.write_str(s)
     }
 }
@@ -104,17 +106,23 @@ impl<'de, const PRECISION: i32, const SCALE: i32> Deserialize<'de> for Numeric<P
                 E: Error,
             {
                 // try to convert the provided String value into a Postgres Numeric Datum
-                // if it doesn't raise an ERROR, then we're good
-                unsafe {
-                    pg_try(|| {
-                        // this might throw, but that's okay
-                        let numeric = v.clone().into();
+                // if it doesn't raise an conversion error, then we're good
+                PgTryBuilder::new(|| {
+                    // this might throw, but that's okay
+                    let datum = Numeric(v.clone()).into_datum().unwrap();
 
-                        // we have it as a valid String
-                        Ok(numeric)
-                    })
-                    .unwrap_or(Err(Error::custom(format!("invalid Numeric value: {}", v))))
-                }
+                    unsafe {
+                        // and don't leak the 'inet' datum Postgres created
+                        pg_sys::pfree(datum.cast_mut_ptr());
+                    }
+
+                    // we have it as a valid String
+                    Ok(Numeric(v.clone()))
+                })
+                .catch_when(PgSqlErrorCode::ERRCODE_INVALID_TEXT_REPRESENTATION, |_| {
+                    Err(Error::custom(format!("invalid Numeric value: {}", v)))
+                })
+                .execute()
             }
         }
 
@@ -244,7 +252,11 @@ impl<const PRECISION: i32, const SCALE: i32> Into<Numeric<PRECISION, SCALE>> for
 
 impl<const PRECISION: i32, const SCALE: i32> FromDatum for Numeric<PRECISION, SCALE> {
     #[inline]
-    unsafe fn from_datum(datum: pg_sys::Datum, is_null: bool) -> Option<Self>
+    unsafe fn from_polymorphic_datum(
+        datum: Datum,
+        is_null: bool,
+        _typoid: pg_sys::Oid,
+    ) -> Option<Self>
     where
         Self: Sized,
     {
@@ -265,5 +277,23 @@ impl<const PRECISION: i32, const SCALE: i32> IntoDatum for Numeric<PRECISION, SC
 
     fn type_oid() -> u32 {
         pg_sys::NUMERICOID
+    }
+}
+
+unsafe impl<const PRECISION: i32, const SCALE: i32> SqlTranslatable for Numeric<PRECISION, SCALE> {
+    fn argument_sql() -> Result<SqlMapping, ArgumentError> {
+        match (PRECISION, SCALE) {
+            (0, 0) => Ok(SqlMapping::literal("NUMERIC")),
+            (p, 0) => Ok(SqlMapping::As(format!("NUMERIC({p})"))),
+            (p, s) => Ok(SqlMapping::As(format!("NUMERIC({p}, {s})"))),
+        }
+    }
+
+    fn return_sql() -> Result<Returns, ReturnsError> {
+        match (PRECISION, SCALE) {
+            (0, 0) => Ok(Returns::One(SqlMapping::literal("NUMERIC"))),
+            (p, 0) => Ok(Returns::One(SqlMapping::As(format!("NUMERIC({p})")))),
+            (p, s) => Ok(Returns::One(SqlMapping::As(format!("NUMERIC({p}, {s})")))),
+        }
     }
 }

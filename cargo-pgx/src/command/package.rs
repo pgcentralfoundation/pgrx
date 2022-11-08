@@ -7,13 +7,12 @@ All rights reserved.
 Use of this source code is governed by the MIT license that can be found in the LICENSE file.
 */
 
-use crate::{
-    command::{get::get_property, install::install_extension},
-    CommandExecute,
-};
+use crate::command::install::install_extension;
+use crate::CommandExecute;
+use crate::{command::get::get_property, profile::CargoProfile};
 use cargo_toml::Manifest;
 use eyre::{eyre, WrapErr};
-use pgx_utils::{get_target_dir, pg_config::PgConfig};
+use pgx_pg_config::{get_target_dir, PgConfig};
 use std::path::{Path, PathBuf};
 
 /// Create an installation package directory.
@@ -24,24 +23,27 @@ pub(crate) struct Package {
     #[clap(long, short)]
     package: Option<String>,
     /// Path to Cargo.toml
-    #[clap(long, parse(from_os_str))]
+    #[clap(long, value_parser)]
     manifest_path: Option<PathBuf>,
     /// Compile for debug mode (default is release)
-    #[clap(env = "PROFILE", long, short)]
+    #[clap(long, short)]
     debug: bool,
+    /// Specific profile to use (conflicts with `--debug`)
+    #[clap(long)]
+    profile: Option<String>,
     /// Build in test mode (for `cargo pgx test`)
     #[clap(long)]
     test: bool,
     /// The `pg_config` path (default is first in $PATH)
-    #[clap(long, short = 'c', parse(from_os_str))]
+    #[clap(long, short = 'c', value_parser)]
     pg_config: Option<PathBuf>,
     /// The directory to output the package (default is `./target/[debug|release]/extname-pgXX/`)
-    #[clap(long, parse(from_os_str))]
+    #[clap(long, value_parser)]
     out_dir: Option<PathBuf>,
     #[clap(flatten)]
     features: clap_cargo::Features,
-    #[clap(from_global, parse(from_occurrences))]
-    verbose: usize,
+    #[clap(from_global, action = ArgAction::Count)]
+    verbose: u8,
 }
 
 impl CommandExecute for Package {
@@ -58,17 +60,17 @@ impl CommandExecute for Package {
 
         let pg_config = match self.pg_config {
             None => PgConfig::from_path(),
-            Some(config) => PgConfig::new(PathBuf::from(config)),
+            Some(config) => PgConfig::new_with_defaults(PathBuf::from(config)),
         };
         let pg_version = format!("pg{}", pg_config.major_version()?);
 
         let features =
             crate::manifest::features_for_version(self.features, &package_manifest, &pg_version);
-
+        let profile = CargoProfile::from_flags(!self.debug, self.profile.as_deref())?;
         let out_dir = if let Some(out_dir) = self.out_dir {
             out_dir
         } else {
-            build_base_path(&pg_config, &package_manifest_path, self.debug)?
+            build_base_path(&pg_config, &package_manifest_path, &profile)?
         };
         package_extension(
             self.manifest_path.as_ref(),
@@ -76,7 +78,7 @@ impl CommandExecute for Package {
             &package_manifest_path,
             &pg_config,
             out_dir,
-            self.debug,
+            &profile,
             self.test,
             &features,
         )
@@ -85,7 +87,7 @@ impl CommandExecute for Package {
 
 #[tracing::instrument(level = "error", skip_all, fields(
     pg_version = %pg_config.version()?,
-    release = !is_debug,
+    profile = ?profile,
     test = is_test,
 ))]
 pub(crate) fn package_extension(
@@ -94,7 +96,7 @@ pub(crate) fn package_extension(
     package_manifest_path: impl AsRef<Path>,
     pg_config: &PgConfig,
     out_dir: PathBuf,
-    is_debug: bool,
+    profile: &CargoProfile,
     is_test: bool,
     features: &clap_cargo::Features,
 ) -> eyre::Result<()> {
@@ -107,7 +109,7 @@ pub(crate) fn package_extension(
         user_package,
         &package_manifest_path,
         pg_config,
-        !is_debug,
+        profile,
         is_test,
         Some(out_dir),
         features,
@@ -117,13 +119,13 @@ pub(crate) fn package_extension(
 fn build_base_path(
     pg_config: &PgConfig,
     manifest_path: impl AsRef<Path>,
-    is_debug: bool,
+    profile: &CargoProfile,
 ) -> eyre::Result<PathBuf> {
     let mut target_dir = get_target_dir()?;
     let pgver = pg_config.major_version()?;
     let extname = get_property(manifest_path, "extname")?
         .ok_or(eyre!("could not determine extension name"))?;
-    target_dir.push(if is_debug { "debug" } else { "release" });
+    target_dir.push(profile.target_subdir());
     target_dir.push(format!("{}-pg{}", extname, pgver));
     Ok(target_dir)
 }

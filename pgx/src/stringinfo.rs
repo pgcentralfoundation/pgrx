@@ -20,33 +20,19 @@ pub struct StringInfo {
     needs_pfree: bool,
 }
 
-impl Into<pg_sys::StringInfo> for StringInfo {
-    fn into(self) -> pg_sys::StringInfo {
-        self.sid
+impl From<StringInfo> for pg_sys::StringInfo {
+    fn from(val: StringInfo) -> Self {
+        val.sid
     }
 }
 
-impl Into<&'static std::ffi::CStr> for StringInfo {
-    fn into(self) -> &'static std::ffi::CStr {
-        let len = self.len();
-        let ptr = self.into_char_ptr();
+impl From<StringInfo> for &'static core::ffi::CStr {
+    fn from(val: StringInfo) -> Self {
+        let len = val.len();
+        let ptr = val.into_char_ptr();
 
         unsafe {
-            std::ffi::CStr::from_bytes_with_nul_unchecked(std::slice::from_raw_parts(
-                ptr as *const u8,
-                (len + 1) as usize, // +1 to get the trailing null byte
-            ))
-        }
-    }
-}
-
-impl Into<&'static crate::cstr_core::CStr> for StringInfo {
-    fn into(self) -> &'static crate::cstr_core::CStr {
-        let len = self.len();
-        let ptr = self.into_char_ptr();
-
-        unsafe {
-            crate::cstr_core::CStr::from_bytes_with_nul_unchecked(std::slice::from_raw_parts(
+            core::ffi::CStr::from_bytes_with_nul_unchecked(std::slice::from_raw_parts(
                 ptr as *const u8,
                 (len + 1) as usize, // +1 to get the trailing null byte
             ))
@@ -77,10 +63,7 @@ impl StringInfo {
     /// Unless `.into_pg()` or `.into_char_ptr()` are called, memory management of
     /// this `StringInfo` follow Rust's drop semantics.
     pub fn new() -> Self {
-        StringInfo {
-            sid: unsafe { pg_sys::makeStringInfo() },
-            needs_pfree: true,
-        }
+        StringInfo { sid: unsafe { pg_sys::makeStringInfo() }, needs_pfree: true }
     }
 
     /// Construct a new `StringInfo`, allocated by Postgres in `CurrentMemoryContext`, ensuring it
@@ -104,10 +87,7 @@ impl StringInfo {
         if sid.is_null() {
             None
         } else {
-            Some(StringInfo {
-                sid,
-                needs_pfree: false,
-            })
+            Some(StringInfo { sid, needs_pfree: false })
         }
     }
 

@@ -7,8 +7,11 @@ All rights reserved.
 Use of this source code is governed by the MIT license that can be found in the LICENSE file.
 */
 
-use crate::{
-    direct_function_call, direct_function_call_as_datum, pg_sys, pg_try, FromDatum, IntoDatum,
+use crate::{direct_function_call, direct_function_call_as_datum, pg_sys, FromDatum, IntoDatum};
+use pgx_pg_sys::errcodes::PgSqlErrorCode;
+use pgx_pg_sys::PgTryBuilder;
+use pgx_utils::sql_entity_graph::metadata::{
+    ArgumentError, Returns, ReturnsError, SqlMapping, SqlTranslatable,
 };
 use serde::de::{Error, Visitor};
 use serde::{Deserialize, Deserializer, Serialize, Serializer};
@@ -60,21 +63,24 @@ impl<'de> Deserialize<'de> for Inet {
             where
                 E: Error,
             {
-                // try to convert the provided String value into a Postgres Numeric Datum
-                // if it doesn't raise an ERROR, then we're good
-                unsafe {
-                    pg_try(|| {
-                        // this might throw, but that's okay
-                        let datum = Inet(v.clone()).into_datum().unwrap();
+                // try to convert the provided String value into a Postgres Inet Datum
+                // if it doesn't raise an conversion error, then we're good
+                PgTryBuilder::new(|| {
+                    // this might throw, but that's okay
+                    let datum = Inet(v.clone()).into_datum().unwrap();
 
+                    unsafe {
                         // and don't leak the 'inet' datum Postgres created
-                        pg_sys::pfree(datum.to_void());
+                        pg_sys::pfree(datum.cast_mut_ptr());
+                    }
 
-                        // we have it as a valid String
-                        Ok(Inet(v.clone()))
-                    })
-                    .unwrap_or_else(|| Err(Error::custom(format!("invalid inet value: {}", v))))
-                }
+                    // we have it as a valid String
+                    Ok(Inet(v.clone()))
+                })
+                .catch_when(PgSqlErrorCode::ERRCODE_INVALID_TEXT_REPRESENTATION, |_| {
+                    Err(Error::custom(format!("invalid inet value: {}", v)))
+                })
+                .execute()
             }
         }
 
@@ -83,16 +89,17 @@ impl<'de> Deserialize<'de> for Inet {
 }
 
 impl FromDatum for Inet {
-    unsafe fn from_datum(datum: pg_sys::Datum, is_null: bool) -> Option<Inet> {
+    unsafe fn from_polymorphic_datum(
+        datum: pg_sys::Datum,
+        is_null: bool,
+        _typoid: u32,
+    ) -> Option<Inet> {
         if is_null {
             None
         } else {
             let cstr = direct_function_call::<&CStr>(pg_sys::inet_out, vec![Some(datum)]);
             Some(Inet(
-                cstr.unwrap()
-                    .to_str()
-                    .expect("unable to convert &cstr inet into &str")
-                    .to_owned(),
+                cstr.unwrap().to_str().expect("unable to convert &cstr inet into &str").to_owned(),
             ))
         }
     }
@@ -111,8 +118,17 @@ impl IntoDatum for Inet {
     }
 }
 
-impl Into<Inet> for String {
-    fn into(self) -> Inet {
-        Inet(self)
+impl From<String> for Inet {
+    fn from(val: String) -> Self {
+        Inet(val)
+    }
+}
+
+unsafe impl SqlTranslatable for Inet {
+    fn argument_sql() -> Result<SqlMapping, ArgumentError> {
+        Ok(SqlMapping::literal("inet"))
+    }
+    fn return_sql() -> Result<Returns, ReturnsError> {
+        Ok(Returns::One(SqlMapping::literal("inet")))
     }
 }
