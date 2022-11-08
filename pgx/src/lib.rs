@@ -26,6 +26,7 @@ extern crate pgx_macros;
 
 #[macro_use]
 extern crate bitflags;
+extern crate alloc;
 
 // expose our various derive macros
 pub use pgx_macros::*;
@@ -112,11 +113,17 @@ pub use pg_sys::{
     check_for_interrupts, debug1, debug2, debug3, debug4, debug5, ereport, error, function_name,
     info, log, notice, warning, FATAL, PANIC,
 };
+pub use pgx_utils as utils;
+
+#[deprecated = "Please use the types in `{core,alloc,std}::ffi` instead"]
+pub mod cstr_core {
+    pub use alloc::ffi::{CString, FromVecWithNulError, NulError};
+    pub use core::ffi::{c_char, CStr, FromBytesWithNulError};
+}
 
 use once_cell::sync::Lazy;
 use pgx_utils::sql_entity_graph::RustSourceOnlySqlMapping;
 use std::collections::HashSet;
-pub use {cstr_core, pgx_utils as utils};
 
 macro_rules! map_source_only {
     ($map:ident, $rust:ty, $sql:expr) => {{

@@ -16,6 +16,7 @@ pub mod oids;
 pub mod panic;
 pub mod pg_try;
 pub mod polyfill;
+pub(crate) mod thread_check;
 pub mod tupdesc;
 
 pub mod utils;
@@ -31,7 +32,6 @@ pub use datum::NullableDatum;
 
 pub use oids::*;
 pub use pg_try::*;
-pub use polyfill::*;
 pub use polyfill::*;
 pub use tupdesc::*;
 pub use utils::*;

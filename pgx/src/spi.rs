@@ -241,15 +241,9 @@ impl Spi {
 
     /// execute SPI commands via the provided `SpiClient` and return a value from SPI which is
     /// automatically copied into the `CurrentMemoryContext` at the time of this function call
-    pub fn connect<
-        R: FromDatum + IntoDatum,
-        F: FnOnce(SpiClient) -> std::result::Result<Option<R>, SpiError>,
-    >(
+    pub fn connect<R, F: FnOnce(SpiClient) -> std::result::Result<Option<R>, SpiError>>(
         f: F,
     ) -> Option<R> {
-        let outer_memory_context =
-            PgMemoryContexts::For(PgMemoryContexts::CurrentMemoryContext.value());
-
         /// a struct to manage our SPI connection lifetime
         struct SpiConnection;
         impl SpiConnection {
@@ -276,38 +270,7 @@ impl Spi {
         // just put us un.  We'll disconnect from SPI when the closure is finished.
         // If there's a panic or elog(ERROR), we don't care about also disconnecting from
         // SPI b/c Postgres will do that for us automatically
-        match f(SpiClient) {
-            // copy the result to the outer memory context we saved above
-            Ok(result) => {
-                // we need to copy the resulting Datum into the outer memory context
-                // *before* we disconnect from SPI, otherwise we're copying free'd memory
-                // see https://github.com/zombodb/pgx/issues/17
-                let copied_datum = match result {
-                    Some(result) => {
-                        let as_datum = result.into_datum();
-                        if as_datum.is_none() {
-                            // SPI function returned Some(()), which means we just want to return None
-                            None
-                        } else {
-                            unsafe {
-                                R::from_datum_in_memory_context(
-                                    outer_memory_context,
-                                    as_datum.expect("SPI result datum was NULL"),
-                                    false,
-                                    pg_sys::InvalidOid,
-                                )
-                            }
-                        }
-                    }
-                    None => None,
-                };
-
-                copied_datum
-            }
-
-            // closure returned an error
-            Err(e) => panic!("{:?}", e),
-        }
+        f(SpiClient).unwrap()
     }
 
     pub fn check_status(status_code: i32) -> SpiOk {
@@ -494,7 +457,10 @@ impl SpiTupleTable {
                         let datum =
                             pg_sys::SPI_getbinval(heap_tuple, tupdesc, ordinal, &mut is_null);
 
-                        T::from_polymorphic_datum(
+                        T::from_datum_in_memory_context(
+                            PgMemoryContexts::CurrentMemoryContext
+                                .parent()
+                                .expect("parent memory context is absent"),
                             datum,
                             is_null,
                             pg_sys::SPI_gettypeid(tupdesc, ordinal),

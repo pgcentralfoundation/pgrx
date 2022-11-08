@@ -115,8 +115,23 @@ fn main() -> eyre::Result<()> {
         == "1"
     {
         pgx.iter(PgConfigSelector::All)
-            .map(|v| v.wrap_err("invalid pg_config"))
-            .collect::<eyre::Result<Vec<_>>>()?
+            .map(|r| r.expect("invalid pg_config"))
+            .map(|c| (c.major_version().expect("invalid major version"), c))
+            .filter_map(|t| {
+                if SUPPORTED_MAJOR_VERSIONS.contains(&t.0) {
+                    Some(t.1)
+                } else {
+                    println!(
+                        "cargo:warning={} contains a configuration for pg{}, which pgx does not support.",
+                        Pgx::config_toml()
+                            .expect("Could not get PGX configuration TOML")
+                            .to_string_lossy(),
+                        t.0
+                    );
+                    None
+                }
+            })
+            .collect()
     } else {
         let mut found = None;
         for version in SUPPORTED_MAJOR_VERSIONS {
