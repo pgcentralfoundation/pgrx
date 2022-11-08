@@ -159,8 +159,13 @@ pub fn register_pg_guard_panic_hook() {
 /// What kind of error was caught?
 #[derive(Debug)]
 pub enum CaughtError {
+    /// An error raised from within Postgres
     PostgresError(ErrorReportWithLevel),
+
+    /// A `pgx::error!()` or `pgx::ereport!(ERROR, ...)` raised from within Rust
     ErrorReport(ErrorReportWithLevel),
+
+    /// A Rust `panic!()` or `std::panic::panic_any()`
     RustPanic { ereport: ErrorReportWithLevel, payload: Box<dyn Any + Send> },
 }
 
