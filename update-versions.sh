@@ -65,7 +65,8 @@ done
 # Ensure that pgx-version-updater is installed and/or updated to the most recent version
 if command -v pgx-version-updater &> /dev/null; then
   echo "pgx-version-updater found. Checking to see if update is necessary."
-  installed_version=$(pgx-version-updater --version | awk '{print $2}')
+  installed_version=$(pgx-version-updater --version)
+  installed_version=${installed_version##pgx-version-updater } # strips the prefix
   cargo_toml_version=$(cargo read-manifest --manifest-path pgx-version-updater/Cargo.toml | jq -r .version)
 
   if [ "$installed_version" == "$cargo_toml_version" ]; then
