@@ -374,9 +374,6 @@ pub enum PgSqlErrorCode {
     ERRCODE_INTERNAL_ERROR = MAKE_SQLSTATE('X', 'X', '0', '0', '0') as isize,
     ERRCODE_DATA_CORRUPTED = MAKE_SQLSTATE('X', 'X', '0', '0', '1') as isize,
     ERRCODE_INDEX_CORRUPTED = MAKE_SQLSTATE('X', 'X', '0', '0', '2') as isize,
-
-    /// Not a real Postgres error code, but helps with pgx' error handling
-    RustPanic = MAKE_SQLSTATE('X', 'X', '9', '9', '9') as isize,
 }
 
 impl Display for PgSqlErrorCode {
@@ -1265,7 +1262,6 @@ impl From<isize> for PgSqlErrorCode {
             x if x == PgSqlErrorCode::ERRCODE_INDEX_CORRUPTED as isize => {
                 PgSqlErrorCode::ERRCODE_INDEX_CORRUPTED
             }
-            x if x == PgSqlErrorCode::RustPanic as isize => PgSqlErrorCode::RustPanic,
 
             _ => PgSqlErrorCode::ERRCODE_INTERNAL_ERROR,
         }

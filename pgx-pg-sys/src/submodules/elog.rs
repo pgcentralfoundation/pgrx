@@ -337,90 +337,76 @@ macro_rules! function_name {
 #[macro_export]
 macro_rules! ereport {
     (ERROR, $errcode:expr, $message:expr) => {
-        $crate::panic::ErrorReport::new($errcode, $message)
-            .funcname($crate::function_name!())
+        $crate::panic::ErrorReport::new($errcode, $message, $crate::function_name!())
             .report($crate::elog::PgLogLevel::ERROR);
         unreachable!()
     };
 
     (PANIC, $errcode:expr, $message:expr) => {
-        $crate::panic::ErrorReport::new($errcode, $message)
-            .funcname($crate::function_name!())
+        $crate::panic::ErrorReport::new($errcode, $message, $crate::function_name!())
             .report($crate::elog::PgLogLevel::PANIC);
         unreachable!()
     };
 
     (FATAL, $errcode:expr, $message:expr) => {
-        $crate::panic::ErrorReport::new($errcode, $message)
-            .funcname($crate::function_name!())
+        $crate::panic::ErrorReport::new($errcode, $message, $crate::function_name!())
             .report($crate::elog::PgLogLevel::FATAL);
         unreachable!()
     };
 
     (WARNING, $errcode:expr, $message:expr) => {
-        $crate::panic::ErrorReport::new($errcode, $message)
-            .funcname($crate::function_name!())
+        $crate::panic::ErrorReport::new($errcode, $message, $crate::function_name!())
             .report($crate::elog::PgLogLevel::WARNING)
     };
 
     (NOTICE, $errcode:expr, $message:expr) => {
-        $crate::panic::ErrorReport::new($errcode, $message)
-            .funcname($crate::function_name!())
+        $crate::panic::ErrorReport::new($errcode, $message, $crate::function_name!())
             .report($crate::elog::PgLogLevel::NOTICE)
     };
 
     (INFO, $errcode:expr, $message:expr) => {
-        $crate::panic::ErrorReport::new($errcode, $message)
-            .funcname($crate::function_name!())
+        $crate::panic::ErrorReport::new($errcode, $message, $crate::function_name!())
             .report($crate::elog::PgLogLevel::INFO)
     };
 
     (LOG, $errcode:expr, $message:expr) => {
-        $crate::panic::ErrorReport::new($errcode, $message)
-            .funcname($crate::function_name!())
+        $crate::panic::ErrorReport::new($errcode, $message, $crate::function_name!())
             .report($crate::elog::PgLogLevel::LOG)
     };
 
     (DEBUG5, $errcode:expr, $message:expr) => {
-        $crate::panic::ErrorReport::new($errcode, $message)
-            .funcname($crate::function_name!())
+        $crate::panic::ErrorReport::new($errcode, $message, $crate::function_name!())
             .report($crate::elog::PgLogLevel::DEBUG5)
     };
 
     (DEBUG4, $errcode:expr, $message:expr) => {
-        $crate::panic::ErrorReport::new($errcode, $message)
-            .funcname($crate::function_name!())
+        $crate::panic::ErrorReport::new($errcode, $message, $crate::function_name!())
             .report($crate::elog::PgLogLevel::DEBUG4)
     };
 
     (DEBUG3, $errcode:expr, $message:expr) => {
-        $crate::panic::ErrorReport::new($errcode, $message)
-            .funcname($crate::function_name!())
+        $crate::panic::ErrorReport::new($errcode, $message, $crate::function_name!())
             .report($crate::elog::PgLogLevel::DEBUG3)
     };
 
     (DEBUG2, $errcode:expr, $message:expr) => {
-        $crate::panic::ErrorReport::new($errcode, $message)
-            .funcname($crate::function_name!())
+        $crate::panic::ErrorReport::new($errcode, $message, $crate::function_name!())
             .report($crate::elog::PgLogLevel::DEBUG2)
     };
 
     (DEBUG1, $errcode:expr, $message:expr) => {
-        $crate::panic::ErrorReport::new($errcode, $message)
-            .funcname($crate::function_name!())
+        $crate::panic::ErrorReport::new($errcode, $message, $crate::function_name!())
             .report($crate::elog::PgLogLevel::DEBUG1)
     };
 
     ($loglevel:expr, $errcode:expr, $message:expr) => {
-        $crate::panic::ErrorReport::new($errcode, $message)
-            .funcname($crate::function_name!())
+        $crate::panic::ErrorReport::new($errcode, $message, $crate::function_name!())
             .report($loglevel);
     };
 
     ($loglevel:expr, $errcode:expr, $message:expr, $detail:expr) => {
-        $crate::panic::ErrorReport::new($errcode, $message)
+        $crate::panic::ErrorReport::new($errcode, $message, $crate::function_name!())
             .detail($detail)
-            .funcname($crate::function_name!())
             .report($loglevel);
     };
 }

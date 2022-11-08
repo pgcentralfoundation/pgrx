@@ -248,6 +248,15 @@ impl AsPgCStr for Option<&std::string::String> {
     }
 }
 
+impl AsPgCStr for &Option<std::string::String> {
+    fn as_pg_cstr(self) -> *mut c_char {
+        match self {
+            Some(s) => s.as_pg_cstr(),
+            None => std::ptr::null_mut(),
+        }
+    }
+}
+
 /// item declarations we want to add to all versions
 mod all_versions {
     use crate as pg_sys;

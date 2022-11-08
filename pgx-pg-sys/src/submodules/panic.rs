@@ -23,26 +23,41 @@ use crate::{pfree, AsPgCStr, MemoryContextSwitchTo};
 
 #[derive(Clone, Debug)]
 pub struct ErrorReportLocation {
-    file: String,
-    line: u32,
-    col: u32,
+    pub(crate) file: String,
+    pub(crate) funcname: Option<String>,
+    pub(crate) line: u32,
+    pub(crate) col: u32,
 }
 
 impl Default for ErrorReportLocation {
     fn default() -> Self {
-        Self { file: std::string::String::from("<unknown>"), line: 0, col: 0 }
+        Self { file: std::string::String::from("<unknown>"), funcname: None, line: 0, col: 0 }
     }
 }
 
 impl Display for ErrorReportLocation {
     fn fmt(&self, f: &mut Formatter<'_>) -> std::fmt::Result {
-        write!(f, "{}:{}:{}", self.file, self.line, self.col)
+        match &self.funcname {
+            Some(funcname) => {
+                // mimic's Postgres' output for this, but includes a column number
+                write!(f, "{}, {}:{}:{}", funcname, self.file, self.line, self.col)
+            }
+
+            None => {
+                write!(f, "{}:{}:{}", self.file, self.line, self.col)
+            }
+        }
     }
 }
 
 impl From<&Location<'_>> for ErrorReportLocation {
     fn from(location: &Location<'_>) -> Self {
-        Self { file: location.file().to_string(), line: location.line(), col: location.column() }
+        Self {
+            file: location.file().to_string(),
+            funcname: None,
+            line: location.line(),
+            col: location.column(),
+        }
     }
 }
 
@@ -52,34 +67,23 @@ impl From<&PanicInfo<'_>> for ErrorReportLocation {
     }
 }
 
-/// Represents the details of a Postgres `ERROR` that we caught via our use of `sigsetjmp()`
-#[derive(Clone, Debug)]
-pub struct ErrorData {
-    pub(crate) sqlerrcode: PgSqlErrorCode,
-    pub(crate) location: ErrorReportLocation,
-    pub(crate) stack: Vec<ErrorReportLocation>,
-}
-
 /// Represents the set of information necessary for pgx to promote a Rust `panic!()` to a Postgres
 /// `ERROR` (or any [`PgLogLevel`] level)
 #[derive(Clone, Debug)]
 pub struct ErrorReport {
-    pub(crate) errcode: PgSqlErrorCode,
-    message: String,
-    detail: Option<String>,
-    funcname: Option<String>,
-    location: ErrorReportLocation,
+    pub(crate) sqlerrcode: PgSqlErrorCode,
+    pub(crate) message: String,
+    pub(crate) detail: Option<String>,
+    pub(crate) location: ErrorReportLocation,
 }
 
 #[derive(Clone, Debug)]
 pub struct ErrorReportWithLevel {
-    level: PgLogLevel,
-    pub(crate) ereport: ErrorReport,
-    stack: Vec<ErrorReportLocation>,
+    pub(crate) level: PgLogLevel,
+    pub(crate) inner: ErrorReport,
 }
 
 impl ErrorReportWithLevel {
-    #[track_caller]
     fn report(self) {
         // ONLY if the log level is >=ERROR, we convert ourselves into a Rust panic and ask
         // rust to raise us as a `panic!()`
@@ -91,6 +95,10 @@ impl ErrorReportWithLevel {
             do_ereport(self)
         }
     }
+
+    fn context_message(&self) -> String {
+        self.inner.location.to_string()
+    }
 }
 
 impl ErrorReport {
@@ -99,14 +107,15 @@ impl ErrorReport {
     ///
     /// Embedded "file:line:col" location information is taken from the caller's location
     #[track_caller]
-    pub fn new<S: Into<String>>(errcode: PgSqlErrorCode, message: S) -> Self {
-        Self {
-            errcode,
-            message: message.into(),
-            detail: None,
-            funcname: None,
-            location: Location::caller().into(),
-        }
+    pub fn new<S: Into<String>>(
+        sqlerrcode: PgSqlErrorCode,
+        message: S,
+        funcname: &'static str,
+    ) -> Self {
+        let mut location: ErrorReportLocation = Location::caller().into();
+        location.funcname = Some(funcname.to_string());
+
+        Self { sqlerrcode, message: message.into(), detail: None, location }
     }
 
     /// Create a [PgErrorReport] which can be raised via Rust's [std::panic::panic_any()] or as
@@ -114,11 +123,11 @@ impl ErrorReport {
     ///
     /// For internal use only
     fn with_location<S: Into<String>>(
-        errcode: PgSqlErrorCode,
+        sqlerrcode: PgSqlErrorCode,
         message: S,
         location: ErrorReportLocation,
     ) -> Self {
-        Self { errcode, message: message.into(), detail: None, funcname: None, location }
+        Self { sqlerrcode, message: message.into(), detail: None, location }
     }
 
     /// Set the `detail` property, whose default is `None`
@@ -127,18 +136,11 @@ impl ErrorReport {
         self
     }
 
-    /// Set the `funcname` property, whose default is `None`
-    pub fn funcname<S: Into<String>>(mut self, funcname: S) -> Self {
-        self.funcname = Some(funcname.into());
-        self
-    }
-
     /// Report this [PgErrorReport], which will ultimately be reported by Postgres at the specified [PgLogLevel]
     ///
     /// If the provided `level` is >= [`PgLogLevel::ERROR`] this function will not return.
-    #[track_caller]
     pub fn report(self, level: PgLogLevel) {
-        ErrorReportWithLevel { level, ereport: self, stack: Default::default() }.report()
+        ErrorReportWithLevel { level, inner: self }.report()
     }
 }
 
@@ -150,22 +152,14 @@ fn take_panic_location() -> ErrorReportLocation {
 
 pub fn register_pg_guard_panic_hook() {
     std::panic::set_hook(Box::new(|info| {
-        PANIC_LOCATION.with(|thread_local| {
-            let existing = thread_local.take();
-
-            thread_local.replace(if existing.is_none() {
-                info.location().map(|l| l.into())
-            } else {
-                existing
-            })
-        });
+        PANIC_LOCATION.with(|thread_local| thread_local.replace(Some(info.into())));
     }))
 }
 
 /// What kind of error was caught?
 #[derive(Debug)]
 pub enum CaughtError {
-    PostgresError(ErrorData),
+    PostgresError(ErrorReportWithLevel),
     ErrorReport(ErrorReportWithLevel),
     RustPanic { ereport: ErrorReportWithLevel, payload: Box<dyn Any + Send> },
 }
@@ -174,20 +168,7 @@ impl CaughtError {
     /// Rethrow this [CaughtError].  
     ///
     /// This is the same as [std::panic::resume_unwind()] and has the same semantics.
-    #[track_caller]
-    pub fn rethrow(mut self) -> ! {
-        let location = Location::caller().into();
-        match &mut self {
-            CaughtError::PostgresError(errdata) => errdata.stack.push(location),
-            CaughtError::ErrorReport(ereport) => ereport.stack.push(location),
-            CaughtError::RustPanic { ereport, .. } => ereport.stack.push(location),
-        }
-
-        self.rethrow_ignore_location()
-    }
-
-    #[inline]
-    pub(crate) fn rethrow_ignore_location(self) -> ! {
+    pub fn rethrow(self) -> ! {
         // we resume_unwind here as [CaughtError] represents a previously caught panic, not a new
         // one to be thrown
         resume_unwind(Box::new(self))
@@ -241,7 +222,10 @@ where
             extern "C" /* "C-unwind" */ {
                 fn pg_re_throw() -> !;
             }
-            unsafe { pg_re_throw() }
+            unsafe {
+                crate::CurrentMemoryContext = crate::ErrorContext;
+                pg_re_throw()
+            }
         }
         GuardAction::Report(ereport) => {
             do_ereport(ereport);
@@ -257,18 +241,8 @@ where
 {
     match catch_unwind(f) {
         Ok(v) => GuardAction::Return(v),
-        Err(e) => match downcast_err(e) {
-            CaughtError::PostgresError(errdata) => {
-                extern "C" {
-                    fn pgx_errcontext_msg(message: *mut std::os::raw::c_char);
-                }
-                unsafe {
-                    pgx_errcontext_msg(errdata.location.to_string().as_pg_cstr());
-                    if let Some(contexts) = contexts_as_pg_cstr(&errdata.stack) {
-                        pgx_errcontext_msg(contexts.as_pg_cstr());
-                    }
-                }
-
+        Err(e) => match downcast_panic_payload(e) {
+            CaughtError::PostgresError(_) => {
                 // Return to the caller to rethrow -- we can't do it here
                 // since we this function's has non-POF frames.
                 GuardAction::ReThrow
@@ -281,13 +255,10 @@ where
 }
 
 /// convert types of `e` that we understand/expect into the representative [CaughtError]
-pub(crate) fn downcast_err(e: Box<dyn Any + Send>) -> CaughtError {
+pub(crate) fn downcast_panic_payload(e: Box<dyn Any + Send>) -> CaughtError {
     if e.downcast_ref::<CaughtError>().is_some() {
         // caught a previously caught CaughtError that is being rethrown
-        *e.downcast().unwrap()
-    } else if e.downcast_ref::<ErrorData>().is_some() {
-        // caught an error via our `sigsetjmp` handling at FFI boundaries
-        CaughtError::PostgresError(*e.downcast().unwrap())
+        *e.downcast::<CaughtError>().unwrap()
     } else if e.downcast_ref::<ErrorReportWithLevel>().is_some() {
         // someone called `panic_any(PgErrorReportWithLevel)`
         CaughtError::ErrorReport(*e.downcast().unwrap())
@@ -295,20 +266,18 @@ pub(crate) fn downcast_err(e: Box<dyn Any + Send>) -> CaughtError {
         // someone called `panic_any(PgErrorReport)` so we convert it to be PgLogLevel::ERROR
         CaughtError::ErrorReport(ErrorReportWithLevel {
             level: PgLogLevel::ERROR,
-            ereport: *e.downcast().unwrap(),
-            stack: Default::default(),
+            inner: *e.downcast().unwrap(),
         })
     } else if let Some(message) = e.downcast_ref::<&str>() {
         // something panic'd with a &str, so it gets raised as an INTERNAL_ERROR at the ERROR level
         CaughtError::RustPanic {
             ereport: ErrorReportWithLevel {
                 level: PgLogLevel::ERROR,
-                ereport: ErrorReport::with_location(
+                inner: ErrorReport::with_location(
                     PgSqlErrorCode::ERRCODE_INTERNAL_ERROR,
                     *message,
                     take_panic_location(),
                 ),
-                stack: Default::default(),
             },
             payload: e,
         }
@@ -317,12 +286,11 @@ pub(crate) fn downcast_err(e: Box<dyn Any + Send>) -> CaughtError {
         CaughtError::RustPanic {
             ereport: ErrorReportWithLevel {
                 level: PgLogLevel::ERROR,
-                ereport: ErrorReport::with_location(
+                inner: ErrorReport::with_location(
                     PgSqlErrorCode::ERRCODE_INTERNAL_ERROR,
                     message,
                     take_panic_location(),
                 ),
-                stack: Default::default(),
             },
             payload: e,
         }
@@ -331,12 +299,11 @@ pub(crate) fn downcast_err(e: Box<dyn Any + Send>) -> CaughtError {
         CaughtError::RustPanic {
             ereport: ErrorReportWithLevel {
                 level: PgLogLevel::ERROR,
-                ereport: ErrorReport::with_location(
+                inner: ErrorReport::with_location(
                     PgSqlErrorCode::ERRCODE_INTERNAL_ERROR,
                     "Box<Any>",
                     take_panic_location(),
                 ),
-                stack: Default::default(),
             },
             payload: e,
         }
@@ -350,7 +317,7 @@ fn do_ereport(ereport: ErrorReportWithLevel) {
     extern "C" {
         fn pgx_ereport(
             level: i32,
-            code: i32,
+            sqlerrcode: i32,
             message: *const std::os::raw::c_char,
             detail: *const std::os::raw::c_char,
             funcname: *const std::os::raw::c_char,
@@ -364,34 +331,31 @@ fn do_ereport(ereport: ErrorReportWithLevel) {
         // because of the calls to `.as_pg_cstr()`, which allocate using `palloc0()`,
         // we need to be in the `ErrorContext` when we allocate those
         //
-        // specifically, the problem here is `self.panic.location.file & .funcname`.  At the C level,
-        // Postgres expects these to be static strings, created at compile time, rather
+        // specifically, the problem here is `self.inner.location.file & .funcname`.  At the C level,
+        // Postgres expects these to be static const char *, created at compile time, rather
         // than something allocated from a MemoryContext.  Our version of ereport (pgx_ereport)
-        // accepts a user-provided strings for them, so we can report function/file/line information
+        // accepts a user-provided string for them, so we can report function/file/line information
         // from rust code.
         //
         // We just go ahead and allocate all the strings we need in the `ErrorContext` for convenience
         let old_cxt = MemoryContextSwitchTo(crate::ErrorContext);
-        let level = ereport.level as i32;
-        let errocode = ereport.ereport.errcode as i32;
-        let contexts = contexts_as_pg_cstr(&ereport.stack).as_pg_cstr();
-        let funcname = ereport.ereport.funcname.as_ref().as_pg_cstr();
-        let file = ereport.ereport.location.file.as_str().as_pg_cstr();
-        let message = ereport.ereport.message.as_str().as_pg_cstr();
-        let detail = ereport.ereport.detail.as_ref().as_pg_cstr();
-        let line = ereport.ereport.location.line as i32;
+        let level = ereport.level as _;
+        let sqlerrcode = ereport.inner.sqlerrcode as _;
+        let contexts = ereport.context_message().as_pg_cstr();
+        let funcname = (&ereport.inner.location.funcname).as_pg_cstr();
+        let file = ereport.inner.location.file.as_str().as_pg_cstr();
+        let message = (&ereport.inner.message).as_pg_cstr();
+        let detail = ereport.inner.detail.as_ref().as_pg_cstr();
+        let line = ereport.inner.location.line as _;
         MemoryContextSwitchTo(old_cxt);
 
         // before calling `pgx_ereport` it's imperative we drop everything Rust-allocated we possibly can.
         // `pgx_ereport` very well might `longjmp` to somewhere else, either in pgx or Postgres, and
         // we'd rather not be leaking memory during error handling
-        //
-        // the few `.as_pg_cstr()`s do their allocation in Postgres' `CurrentMemoryContext`, so they'll
-        // be cleaned up by Postgres at the right time
         drop(ereport);
 
         // there's a good chance this will `longjump` us out of here
-        pgx_ereport(level, errocode, message, detail, funcname, file, line, contexts);
+        pgx_ereport(level, sqlerrcode, message, detail, funcname, file, line, contexts);
 
         if crate::ERROR <= level as _ {
             // SAFETY:  this is true because if we're being reported as an ERROR or greater,
@@ -407,13 +371,5 @@ fn do_ereport(ereport: ErrorReportWithLevel) {
         if !funcname.is_null() {
             pfree(funcname.cast())
         }
-    }
-}
-
-fn contexts_as_pg_cstr(stack: &Vec<ErrorReportLocation>) -> Option<String> {
-    if stack.is_empty() {
-        None
-    } else {
-        Some(stack.iter().map(|s| s.to_string()).collect::<Vec<_>>().join("\n"))
     }
 }

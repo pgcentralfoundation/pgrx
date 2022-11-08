@@ -163,15 +163,15 @@ mod tests {
     #[pg_test]
     fn test_pg_try_finally_with_catch_rethrow() {
         let finally = Rc::new(AtomicBool::new(false));
-        std::panic::catch_unwind(|| {
+        let result = std::panic::catch_unwind(|| {
             PgTryBuilder::new(|| panic!("panic"))
                 .catch_others(|e| e.rethrow())
                 .finally(|| finally.store(true, Ordering::SeqCst))
                 .execute()
-        })
-        .ok();
-        // finally block doesn't run if a catch block throws
-        assert_eq!(false, finally.load(Ordering::SeqCst));
+        });
+        // finally block does run, even if a catch block throws
+        assert_eq!(true, finally.load(Ordering::SeqCst));
+        assert!(result.is_err());
     }
 
     #[pg_test]
