@@ -43,7 +43,7 @@ impl<'a, R, F: FnOnce() -> R + UnwindSafe> PgTryBuilder<'a, R, F> {
     ///     .finally(|| finished = true)
     ///     .execute();
     ///
-    /// assert_eq(finished, true);
+    /// assert_eq!(finished, true);
     /// assert_eq!(result, 42);
     /// ```
     #[must_use = "must call `PgTryBuilder::execute(self)` in order for it to run"]
