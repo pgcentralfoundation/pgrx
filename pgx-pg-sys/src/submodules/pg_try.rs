@@ -35,7 +35,7 @@ impl<'a, R, F: FnOnce() -> R + UnwindSafe> PgTryBuilder<'a, R, F> {
     /// let mut finished = false;
     /// let result = PgTryBuilder::new(|| {
     ///     if i < 42 {
-    ///         ereport!(ERROR, PgSqlErrorCode::ERRCODE_NUMERIC_VALUE_OUT_OF_RANGE, "number too small")
+    ///         ereport!(ERROR, PgSqlErrorCode::ERRCODE_NUMERIC_VALUE_OUT_OF_RANGE, "number too small");
     ///     }
     ///     i
     /// })

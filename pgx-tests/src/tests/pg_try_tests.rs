@@ -58,9 +58,8 @@ mod tests {
     use pgx::prelude::*;
 
     // see: c5cd61d7bfdfb5236ef0f8b98f433b35a2444346
-    #[allow(non_snake_case)]
     #[pg_test]
-    fn test_we_dont_blow_out_ERRDATA_STACK_SIZE() {
+    fn test_we_dont_blow_out_errdata_stack_size() {
         Spi::run("SELECT get_relation_name(x) FROM generate_series(1, 1000) x");
     }
 

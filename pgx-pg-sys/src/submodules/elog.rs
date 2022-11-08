@@ -339,19 +339,19 @@ macro_rules! ereport {
     (ERROR, $errcode:expr, $message:expr) => {
         $crate::panic::ErrorReport::new($errcode, $message, $crate::function_name!())
             .report($crate::elog::PgLogLevel::ERROR);
-        unreachable!()
+        unreachable!();
     };
 
     (PANIC, $errcode:expr, $message:expr) => {
         $crate::panic::ErrorReport::new($errcode, $message, $crate::function_name!())
             .report($crate::elog::PgLogLevel::PANIC);
-        unreachable!()
+        unreachable!();
     };
 
     (FATAL, $errcode:expr, $message:expr) => {
         $crate::panic::ErrorReport::new($errcode, $message, $crate::function_name!())
             .report($crate::elog::PgLogLevel::FATAL);
-        unreachable!()
+        unreachable!();
     };
 
     (WARNING, $errcode:expr, $message:expr) => {
