@@ -12,6 +12,7 @@ pub mod guard;
 mod oids;
 mod polyfill;
 pub mod setjmp;
+pub(crate) mod thread_check;
 mod tupdesc;
 mod utils;
 // Various SqlTranslatable mappings for SQL generation

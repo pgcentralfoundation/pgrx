@@ -45,6 +45,7 @@ being converted into a transaction-aborting Postgres `ERROR` by PGX.
 
 **/
 #[inline(always)]
+#[track_caller]
 pub(crate) unsafe fn pg_guard_ffi_boundary<T, F: FnOnce() -> T>(f: F) -> T {
     // SAFETY: Caller promises not to call us from anything but the main thread.
     unsafe { pg_guard_ffi_boundary_impl(f) }
@@ -52,9 +53,14 @@ pub(crate) unsafe fn pg_guard_ffi_boundary<T, F: FnOnce() -> T>(f: F) -> T {
 
 #[cfg(not(feature = "postgrestd"))]
 #[inline(always)]
+#[track_caller]
 unsafe fn pg_guard_ffi_boundary_impl<T, F: FnOnce() -> T>(f: F) -> T {
     //! This is the version that uses sigsetjmp and all that, for "normal" Rust/PGX interfaces.
     use crate as pg_sys;
+
+    // The next code is definitely thread-unsafe (it manipulates statics in an
+    // unsynchronized manner), so we may as well check here.
+    super::thread_check::check_active_thread();
 
     // SAFETY: This should really, really not be done in a multithreaded context as it
     // accesses multiple `static mut`. The ultimate caller asserts this is the main thread.
