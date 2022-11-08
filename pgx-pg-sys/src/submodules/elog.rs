@@ -60,27 +60,27 @@ pub enum PgLogLevel {
 impl From<isize> for PgLogLevel {
     #[inline]
     fn from(i: isize) -> Self {
-        if i == PgLogLevel::DEBUG5 as _ {
+        if i == PgLogLevel::DEBUG5 as isize {
             PgLogLevel::DEBUG5
-        } else if i == PgLogLevel::DEBUG4 as _ {
+        } else if i == PgLogLevel::DEBUG4 as isize {
             PgLogLevel::DEBUG4
-        } else if i == PgLogLevel::DEBUG3 as _ {
+        } else if i == PgLogLevel::DEBUG3 as isize {
             PgLogLevel::DEBUG3
-        } else if i == PgLogLevel::DEBUG2 as _ {
+        } else if i == PgLogLevel::DEBUG2 as isize {
             PgLogLevel::DEBUG2
-        } else if i == PgLogLevel::DEBUG1 as _ {
+        } else if i == PgLogLevel::DEBUG1 as isize {
             PgLogLevel::DEBUG1
-        } else if i == PgLogLevel::INFO as _ {
+        } else if i == PgLogLevel::INFO as isize {
             PgLogLevel::INFO
-        } else if i == PgLogLevel::NOTICE as _ {
+        } else if i == PgLogLevel::NOTICE as isize {
             PgLogLevel::NOTICE
-        } else if i == PgLogLevel::WARNING as _ {
+        } else if i == PgLogLevel::WARNING as isize {
             PgLogLevel::WARNING
-        } else if i == PgLogLevel::ERROR as _ {
+        } else if i == PgLogLevel::ERROR as isize {
             PgLogLevel::ERROR
-        } else if i == PgLogLevel::FATAL as _ {
+        } else if i == PgLogLevel::FATAL as isize {
             PgLogLevel::FATAL
-        } else if i == PgLogLevel::PANIC as _ {
+        } else if i == PgLogLevel::PANIC as isize {
             PgLogLevel::PANIC
         } else {
             // ERROR seems like a good default
