@@ -115,8 +115,23 @@ fn main() -> eyre::Result<()> {
         == "1"
     {
         pgx.iter(PgConfigSelector::All)
-            .map(|v| v.wrap_err("invalid pg_config"))
-            .collect::<eyre::Result<Vec<_>>>()?
+            .map(|r| r.expect("invalid pg_config"))
+            .map(|c| (c.major_version().expect("invalid major version"), c))
+            .filter_map(|t| {
+                if SUPPORTED_MAJOR_VERSIONS.contains(&t.0) {
+                    Some(t.1)
+                } else {
+                    println!(
+                        "cargo:warning={} contains a configuration for pg{}, which pgx does not support.",
+                        Pgx::config_toml()
+                            .expect("Could not get PGX configuration TOML")
+                            .to_string_lossy(),
+                        t.0
+                    );
+                    None
+                }
+            })
+            .collect()
     } else {
         let mut found = None;
         for version in SUPPORTED_MAJOR_VERSIONS {
@@ -563,6 +578,7 @@ fn run_bindgen(pg_config: &PgConfig, include_h: &PathBuf) -> eyre::Result<syn::F
         .blocklist_item("__[A-Z].*") // these are reserved and unused by Postgres
         .blocklist_item("__darwin.*") // this should always be Apple's names
         .blocklist_function("pq(?:Strerror|Get.*)") // wrappers around platform functions: user can call those themselves
+        .blocklist_function("log")
         .blocklist_item(".*pthread.*)") // shims for pthreads on non-pthread systems, just use std::thread
         .blocklist_function("float[48].*") // Rust has plenty of float handling
         .blocklist_item(".*(?i:va)_(?i:list|start|end|copy).*") // do not need va_list anything!

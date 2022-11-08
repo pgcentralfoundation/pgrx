@@ -376,6 +376,7 @@ impl<T, AllocatedBy: WhoAllocated<T>> PgBox<T, AllocatedBy> {
 impl<T, AllocatedBy: WhoAllocated<T>> Deref for PgBox<T, AllocatedBy> {
     type Target = T;
 
+    #[track_caller]
     fn deref(&self) -> &Self::Target {
         match self.ptr.as_ref() {
             Some(ptr) => unsafe { ptr.as_ref() },
@@ -385,6 +386,7 @@ impl<T, AllocatedBy: WhoAllocated<T>> Deref for PgBox<T, AllocatedBy> {
 }
 
 impl<T, AllocatedBy: WhoAllocated<T>> DerefMut for PgBox<T, AllocatedBy> {
+    #[track_caller]
     fn deref_mut(&mut self) -> &mut T {
         match self.ptr.as_mut() {
             Some(ptr) => unsafe { ptr.as_mut() },

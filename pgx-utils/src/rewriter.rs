@@ -45,10 +45,12 @@ impl PgGuardRewriter {
         let input_func_name = func.sig.ident.to_string();
         let sig = func.sig.clone();
         let vis = func.vis.clone();
+        let attrs = func.attrs.clone();
 
         // but for the inner function (the one we're wrapping) we don't need any kind of
         // abi classification
         func.sig.abi = None;
+        func.attrs.clear();
 
         // nor do we need a visibility beyond "private"
         func.vis = Visibility::Inherited;
@@ -59,8 +61,10 @@ impl PgGuardRewriter {
         let arg_list = PgGuardRewriter::build_arg_list(&sig, false)?;
         let func_name = PgGuardRewriter::build_func_name(&func.sig);
 
-        let prolog = if input_func_name == "__pgx_private_shmem_hook" {
-            // we do not want "no_mangle" on this function
+        let prolog = if input_func_name == "__pgx_private_shmem_hook"
+            || input_func_name == "__pgx_private_shmem_request_hook"
+        {
+            // we do not want "no_mangle" on these functions
             quote! {}
         } else if input_func_name == "_PG_init" || input_func_name == "_PG_fini" {
             quote! {
@@ -68,18 +72,20 @@ impl PgGuardRewriter {
                 #[no_mangle]
             }
         } else {
-            quote! {
-                #[no_mangle]
-            }
+            quote! {}
         };
 
         Ok(quote_spanned! {func.span()=>
             #prolog
-            #[doc(hidden)]
+            #(#attrs)*
             #vis #sig {
                 #[allow(non_snake_case)]
                 #func
-                pg_sys::guard::guard( #[allow(unused_unsafe)] || unsafe { #func_name(#arg_list) } )
+
+                #[allow(unused_unsafe)]
+                unsafe {
+                    pg_sys::panic::pgx_extern_c_guard( || #func_name(#arg_list) )
+                }
             }
         })
     }
@@ -113,7 +119,7 @@ impl PgGuardRewriter {
 
         Ok(quote! {
             pub unsafe fn #func_name ( #arg_list_with_types ) #return_type {
-                crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
+                crate::ffi::pg_guard_ffi_boundary(move || {
                     #abi { #func }
                     #func_name(#arg_list)
                 })

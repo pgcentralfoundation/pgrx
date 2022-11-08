@@ -8,7 +8,8 @@ Use of this source code is governed by the MIT license that can be found in the 
 */
 
 use crate::{direct_function_call, direct_function_call_as_datum, pg_sys, FromDatum, IntoDatum};
-use pgx_pg_sys::pg_try;
+use pgx_pg_sys::errcodes::PgSqlErrorCode;
+use pgx_pg_sys::PgTryBuilder;
 use pgx_utils::sql_entity_graph::metadata::{
     ArgumentError, Returns, ReturnsError, SqlMapping, SqlTranslatable,
 };
@@ -77,20 +78,23 @@ impl<'de> Deserialize<'de> for Numeric {
                 E: Error,
             {
                 // try to convert the provided String value into a Postgres Numeric Datum
-                // if it doesn't raise an ERROR, then we're good
-                unsafe {
-                    pg_try(|| {
-                        // this might throw, but that's okay
-                        let datum = Numeric(v.clone()).into_datum().unwrap();
+                // if it doesn't raise an conversion error, then we're good
+                PgTryBuilder::new(|| {
+                    // this might throw, but that's okay
+                    let datum = Numeric(v.clone()).into_datum().unwrap();
 
-                        // and don't leak the NumericData datum Postgres created
+                    unsafe {
+                        // and don't leak the 'inet' datum Postgres created
                         pg_sys::pfree(datum.cast_mut_ptr());
+                    }
 
-                        // we have it as a valid String
-                        Ok(Numeric(v.clone()))
-                    })
-                    .unwrap_or(Err(Error::custom(format!("invalid Numeric value: {}", v))))
-                }
+                    // we have it as a valid String
+                    Ok(Numeric(v.clone()))
+                })
+                .catch_when(PgSqlErrorCode::ERRCODE_INVALID_TEXT_REPRESENTATION, |_| {
+                    Err(Error::custom(format!("invalid Numeric value: {}", v)))
+                })
+                .execute()
             }
         }
 
