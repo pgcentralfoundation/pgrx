@@ -12,6 +12,13 @@ use pgx_utils::sql_entity_graph::metadata::{
     ArgumentError, Returns, ReturnsError, SqlMapping, SqlTranslatable,
 };
 
+/// The [`anyarray` polymorphic pseudo-type][anyarray].
+///
+// rustdoc doesn't directly support a warning block: https://github.com/rust-lang/rust/issues/73935
+/// **Warning**: Calling [`FromDatum::from_datum`] with this type will unconditonally panic. Call
+/// [`FromDatum::from_polymorphic_datum`] with a type ID instead.
+///
+/// [anyarray]: https://www.postgresql.org/docs/current/extend-type-system.html#EXTEND-TYPES-POLYMORPHIC
 #[derive(Debug, Clone, Copy)]
 pub struct AnyArray {
     datum: pg_sys::Datum,
@@ -36,10 +43,12 @@ impl AnyArray {
 impl FromDatum for AnyArray {
     const GET_TYPOID: bool = true;
 
+    /// You should **never** call this function to make this type; it will unconditionally panic.
+    /// For polymorphic types such as this one, you must use [`FromDatum::from_polymorphic_datum`]
+    /// and pass a type ID.
     #[inline]
     unsafe fn from_datum(_datum: pg_sys::Datum, _is_null: bool) -> Option<AnyArray> {
-        debug_assert!(false, "Can't create a polymorphic type using from_datum, call FromDatum::from_polymorphic_datum instead");
-        None
+        panic!("Can't create a polymorphic type using from_datum, call FromDatum::from_polymorphic_datum instead")
     }
 
     #[inline]
