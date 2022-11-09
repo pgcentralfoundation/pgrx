@@ -21,22 +21,15 @@ fi
 
 set -e
 
-if ! command -v jq &> /dev/null; then
-  echo "Command \`jq\` was not found. Please install it and try again."
-  exit 1
-fi
-
 VERSION=$1
 
 if [ "$VERBOSE" == "1" ] || [ "$VERBOSE" == "true" ]; then
   echo "Verbose output requested."
   VERBOSE=1
-else
-  unset VERBOSE
-fi
-
-if [[ -v VERBOSE ]]; then
   set -x
+else
+  CARGO_QUIET_FLAG=-q
+  unset VERBOSE
 fi
 
 # INCLUDE_FOR_DEP_UPDATES specifies an array of relative paths that point to Cargo
@@ -67,26 +60,27 @@ if command -v pgx-version-updater &> /dev/null; then
   echo "pgx-version-updater found. Checking to see if update is necessary."
   installed_version=$(pgx-version-updater --version)
   installed_version=${installed_version##pgx-version-updater } # strips the prefix
-  cargo_toml_version=$(cargo read-manifest --manifest-path pgx-version-updater/Cargo.toml | jq -r .version)
+  cargo_toml_version=$(pgx-version-updater query-cargo-version)
 
   if [ "$installed_version" == "$cargo_toml_version" ]; then
     echo "Installed version of pgx-version-updater ($installed_version) matches version found in PGX source ($cargo_toml_version). Skipping."
   else
     echo "Installed version of pgx-version-updater ($installed_version) does not match version found in PGX source ($cargo_toml_version). Updating -- this may take a few moments"
-    cargo ${VERBOSE:+-q} install --path pgx-version-updater/
+    cargo $CARGO_QUIET_FLAG install --path pgx-version-updater/
     echo "Done."
   fi
 else
   echo "pgx-version-updater not found. Building and installing now -- this may take a few moments."
-  cargo ${VERBOSE:+-q} install --path pgx-version-updater/
+    cargo $CARGO_QUIET_FLAG install --path pgx-version-updater/
   echo "Done."
 fi
 
 # shellcheck disable=SC2086,SC2068
 pgx-version-updater \
+  update-files \
+  --update-version "$VERSION" \
   ${INCLUDE_FOR_DEP_UPDATES[@]/#/-i } \
   ${EXCLUDE_FROM_VERSION_BUMP[@]/#/-e } \
-  --update-version "$VERSION" \
   ${VERBOSE:+--show-diff} \
   ${VERBOSE:+--verbose}
 
@@ -94,6 +88,6 @@ echo "Generating/updating lockfile"
 cargo generate-lockfile
 
 echo "Generating bindings -- this may take a few moments"
-PGX_PG_SYS_GENERATE_BINDINGS_FOR_RELEASE=1 cargo test --no-run --quiet --workspace --no-default-features --features "pg14"
+PGX_PG_SYS_GENERATE_BINDINGS_FOR_RELEASE=1 cargo test --no-run $CARGO_QUIET_FLAG --workspace --no-default-features --features "pg14"
 
 echo "Done!"

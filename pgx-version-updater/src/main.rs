@@ -1,4 +1,4 @@
-use clap::Parser;
+use clap::{Args, Parser, Subcommand};
 use owo_colors::OwoColorize;
 use std::collections::HashSet;
 use std::fs;
@@ -9,9 +9,34 @@ use std::{env, path::PathBuf};
 use toml_edit::{value, Document, Entry, Item};
 use walkdir::{DirEntry, WalkDir};
 
-#[derive(Parser, Debug)]
+#[derive(Parser)]
 #[clap(author, version, about, long_about = None)]
-struct Args {
+#[clap(propagate_version = true)]
+struct Cli {
+    #[clap(subcommand)]
+    command: Commands,
+}
+
+#[derive(Subcommand)]
+enum Commands {
+    /// Queries pgx-version-updater Cargo.toml file for package version
+    QueryCargoVersion(QueryCargoVersionArgs),
+
+    /// Updates all project Cargo.toml files in preparation for a release
+    UpdateFiles(UpdateFilesArgs),
+}
+
+#[derive(Args, Debug, Clone)]
+struct QueryCargoVersionArgs {
+    /// Optionally specify path to pgx-version-updater Cargo.toml. Without specifying this, it assumes being ran from the root of a PGX checkout directory
+    #[clap(short, long, required = false)]
+    file_path: Option<String>,
+}
+
+// #[derive(Parser, Debug)]
+// #[clap(author, version, about, long_about = None)]
+#[derive(Args, Debug, Clone)]
+struct UpdateFilesArgs {
     /// Additional Cargo.toml file to include for processing that can't be detected automatically
     ///
     /// Add multiple values using --include /path/foo/Cargo.toml --include /path/bar/Cargo.toml
@@ -45,7 +70,51 @@ struct Args {
 const IGNORE_DIRS: &'static [&'static str] = &[".git", "target"];
 
 fn main() {
-    let args = Args::parse();
+    let cli = Cli::parse();
+
+    match &cli.command {
+        Commands::QueryCargoVersion(query_args) => {
+            query_toml(query_args);
+        }
+        Commands::UpdateFiles(update_args) => {
+            update_files(update_args);
+        }
+    }
+}
+
+// Attempts to open, parse and display the package version of the pgx-version-updater
+// Cargo.toml file
+fn query_toml(query_args: &QueryCargoVersionArgs) {
+    // If a path was specified via a command line arg, use that. Otherwise,
+    // default to <cwd>/pgx-version-updater/Cargo.toml where <cwd> is assumed to be
+    // the root of a PGX checkout directory
+    let filepath = match &query_args.file_path {
+        Some(path) => {
+            fullpath(&path).expect(format!("Could not get full path for file: {}", path).as_str())
+        }
+        None => {
+            let mut current_dir = env::current_dir().expect("Could not get current_dir!");
+            current_dir.push("pgx-version-updater/Cargo.toml");
+            current_dir
+        }
+    };
+
+    // Open the Cargo.toml via toml_edit and parse it out.
+    let data = fs::read_to_string(&filepath)
+        .expect(format!("Unable to open file at {}", &filepath.display()).as_str());
+
+    let doc = data.parse::<Document>().expect(
+        format!("File at location {} is an invalid Cargo.toml file", &filepath.display()).as_str(),
+    );
+
+    if let Some(package_version) = doc.get("package").and_then(|p| p.get("version")) {
+        println!("{}", package_version.as_str().expect("Could not turn package version into str"));
+    } else {
+        panic!("pgx-version-updater Cargo.toml does not have a package version specified.");
+    }
+}
+
+fn update_files(args: &UpdateFilesArgs) {
     let current_dir = env::current_dir().expect("Could not get current directory!");
 
     // Contains a set of package names (e.g. "pgx", "pgx-pg-sys") that wil be used
@@ -64,7 +133,7 @@ fn main() {
     // Note that any files included here are still eligible to be processed for
     // *dependency* version updates.
     let mut exclude_version_files = HashSet::new();
-    for file in args.exclude_from_version_change {
+    for file in &args.exclude_from_version_change {
         exclude_version_files.insert(
             fullpath(&file).expect(format!("Could not get full path for file: {}", file).as_str()),
         );
@@ -113,7 +182,7 @@ fn main() {
     }
 
     // Loop through all files that are included for dependency updates via CLI params
-    for file in args.include_for_dep_updates {
+    for file in &args.include_for_dep_updates {
         let filepath =
             fullpath(&file).expect(format!("Could not get full path for file {}", file).as_str());
 
