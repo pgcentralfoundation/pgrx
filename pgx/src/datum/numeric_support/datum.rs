@@ -1,4 +1,4 @@
-use crate::{AnyNumeric, FromDatum, IntoDatum, Numeric, pg_sys};
+use crate::{pg_sys, AnyNumeric, FromDatum, IntoDatum, Numeric};
 
 impl FromDatum for AnyNumeric {
     #[inline]
