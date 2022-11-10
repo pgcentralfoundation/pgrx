@@ -169,4 +169,35 @@ mod tests {
             other => panic!("{:?}", other),
         }
     }
+
+    #[pg_test]
+    fn test_nan_ordering() {
+        let mut v = vec![
+            (1, AnyNumeric::try_from("nan").unwrap()),
+            (3, AnyNumeric::try_from("nan").unwrap()),
+            (2, AnyNumeric::try_from("nan").unwrap()),
+        ];
+
+        v.sort_by(|a, b| a.1.cmp(&b.1));
+        assert_eq!(
+            v,
+            vec![
+                (1, AnyNumeric::try_from("nan").unwrap()),
+                (3, AnyNumeric::try_from("nan").unwrap()),
+                (2, AnyNumeric::try_from("nan").unwrap())
+            ]
+        )
+    }
+
+    #[pg_test]
+    fn test_ordering() {
+        let mut v =
+            vec![(3, AnyNumeric::from(3)), (2, AnyNumeric::from(2)), (1, AnyNumeric::from(1))];
+
+        v.sort_by(|a, b| a.1.cmp(&b.1));
+        assert_eq!(
+            v,
+            vec![(1, AnyNumeric::from(1)), (2, AnyNumeric::from(2)), (3, AnyNumeric::from(3)),]
+        )
+    }
 }
