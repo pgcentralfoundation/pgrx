@@ -13,11 +13,12 @@ including the full range of `f32` and `f64`.
 This type is mutable in that the various Rust math "XxxAssign" traits are implemented (ie, `AddAssign`).  
 
 Conversion trait implementations:
-    - `From<{integer}> for AnyNumeric`
-    - `TryFrom<f32/64> for AnyNumeric`
-    - `TryFrom<&str> for AnyNumeric`
-    - `TryFrom<&CStr> for AnyNumeric` (b/c reasons)
-    - `FromStr for AnyNumeric`
+
+- `From<{integer}> for AnyNumeric`
+- `TryFrom<f32/64> for AnyNumeric`
+- `TryFrom<&str> for AnyNumeric`
+- `TryFrom<&CStr> for AnyNumeric` (b/c reasons)
+- `FromStr for AnyNumeric`
 
 For conversion from `AnyNumeric` to a primitive, `TryFrom` is implemented for all the primitive types.
 
@@ -37,11 +38,12 @@ That said, performing math operations on a `Numeric<P, S>` (such as `a + b`) aut
 `AnyNumeric`, even if the P and S values are the same on both sides of the operator.
 
 Conversion trait implementations:
-    - `TryFrom<{integer}> for Numeric<P, S>`
-    - `TryFrom<{f32/64}> for Numeric<P, S>`
-    - `TryFrom<&str> for Numeric<P, S>`
-    - `TryFrom<&CStr> for Numeric<P, S>` (b/c reasons)
-    - `FromStr for Numeric<P, S>`
+
+- `TryFrom<{integer}> for Numeric<P, S>`
+- `TryFrom<{f32/64}> for Numeric<P, S>`
+- `TryFrom<&str> for Numeric<P, S>`
+- `TryFrom<&CStr> for Numeric<P, S>` (b/c reasons)
+- `FromStr for Numeric<P, S>`
 
 One can try to "rescale" a `Numeric<P, S>` to a different precision and/or scale via the `::rescale<P, S>()` 
 function.
