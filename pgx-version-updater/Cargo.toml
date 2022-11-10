@@ -1,6 +1,6 @@
 [package]
 name = "pgx-version-updater"
-version = "0.1.0"
+version = "0.1.1"
 edition = "2021"
 authors = ["ZomboDB, LLC <zombodb@gmail.com>"]
 license = "MIT"

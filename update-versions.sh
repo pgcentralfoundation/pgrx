@@ -9,88 +9,85 @@
 # the LICENSE file.
 
 # requires:
-# * ripgrep
-# * Cargo extension 'cargo-edit'
+# * pgx-version-updater (no intervention required -- built on demand from this project)
+#
+# To run this with more output, set environment variable VERBOSE to either 1 or true. E.g.
+#   $ VERBOSE=1 ./update-versions.sh 1.6.0
 
 if [ "$1" == "" ]; then
-    echo "usage:  ./update-versions.sh <VERSION>"
-    exit 1
+  echo "usage:  ./update-versions.sh <VERSION>"
+  exit 1
 fi
 
-set -ex
-
-if ! which rg &> /dev/null; then
-    echo "Command \`rg\` (ripgrep) was not found. Please install it and try again."
-    exit 1
-fi
-
-if ! cargo set-version --help &> /dev/null; then
-    echo "Cargo extension \`cargo-edit\` is not installed. Please install it by running: cargo install cargo-edit"
-    exit 1
-fi
+set -e
 
 VERSION=$1
 
-# Use `cargo set-version` to update all main project files
-function update_main_files() {
-    local version=$1
+if [ "$VERBOSE" == "1" ] || [ "$VERBOSE" == "true" ]; then
+  echo "Verbose output requested."
+  VERBOSE=1
+  set -x
+else
+  CARGO_QUIET_FLAG=-q
+  unset VERBOSE
+fi
 
-    EXCLUDE_PACKAGES=()
+# INCLUDE_FOR_DEP_UPDATES specifies an array of relative paths that point to Cargo
+# TOML files that are not automatically found by the pgx-version-updater tool but
+# still have PGX dependencies that require updating.
+INCLUDE_FOR_DEP_UPDATES=(
+  'cargo-pgx/src/templates/cargo_toml'
+  'nix/templates/default/Cargo.toml'
+)
 
-    # Add additional packages to ignore by using the following syntax:
-    # EXCLUDE_PACKAGES+=('foo' 'bar' 'baz')
+# EXCLUDE_FROM_VERSION_BUMP specifies an array of relative paths that point to
+# Cargo TOML files that should be *excluded* from package version bumps. Also used
+# below to include all pgx-example Cargo TOML files since they do not get their
+# versions bumped at release time.
+EXCLUDE_FROM_VERSION_BUMP=(
+  'cargo-pgx/src/templates/cargo_toml'
+  'nix/templates/default/Cargo.toml'
+  'pgx-version-updater/Cargo.toml'
+)
 
-    # Ignore all packages in pgx-examples/
-    for file in ./pgx-examples/**/Cargo.toml; do
-        EXCLUDE_PACKAGES+=("$(rg --multiline '\[package\](.*\n)(?:[^\[]*\n)*name\s?=\s?"(?P<name>[-_a-z]*)"(.*\n)*' -r "\${name}" "$file")")
-    done
+# Exclude all pgx-examples Cargo.toml files from version bumping
+for file in pgx-examples/**/Cargo.toml; do
+  EXCLUDE_FROM_VERSION_BUMP+=("$file")
+done
 
-    echo "Excluding the following packages:"
-    echo "${EXCLUDE_PACKAGES[@]}"
+# Ensure that pgx-version-updater is installed and/or updated to the most recent version
+if command -v pgx-version-updater &> /dev/null; then
+  echo "pgx-version-updater found. Checking to see if update is necessary."
+  installed_version=$(pgx-version-updater --version)
+  installed_version=${installed_version##pgx-version-updater } # strips the prefix
+  cargo_toml_version=$(pgx-version-updater query-cargo-version)
 
-    # shellcheck disable=2068 # allow the shell to split --exclude from each EXCLUDE_PACKAGES value
-    cargo set-version ${EXCLUDE_PACKAGES[@]/#/--exclude } --workspace "$version"
-}
+  if [ "$installed_version" == "$cargo_toml_version" ]; then
+    echo "Installed version of pgx-version-updater ($installed_version) matches version found in PGX source ($cargo_toml_version). Skipping."
+  else
+    echo "Installed version of pgx-version-updater ($installed_version) does not match version found in PGX source ($cargo_toml_version). Updating -- this may take a few moments"
+    cargo $CARGO_QUIET_FLAG install --path pgx-version-updater/
+    echo "Done."
+  fi
+else
+  echo "pgx-version-updater not found. Building and installing now -- this may take a few moments."
+    cargo $CARGO_QUIET_FLAG install --path pgx-version-updater/
+  echo "Done."
+fi
 
-# This is a legacy holdover for updating extra toml files throughout various crates
-function update_extras() {
-    local version=$1
+# shellcheck disable=SC2086,SC2068
+pgx-version-updater \
+  update-files \
+  --update-version "$VERSION" \
+  ${INCLUDE_FOR_DEP_UPDATES[@]/#/-i } \
+  ${EXCLUDE_FROM_VERSION_BUMP[@]/#/-e } \
+  ${VERBOSE:+--show-diff} \
+  ${VERBOSE:+--verbose}
 
-    # ordered in a topological fashion starting from the workspace root Cargo.toml
-    # this isn't always necessary, but it's nice to use a mostly-consistent ordering
-    CARGO_TOMLS_TO_SED=(
-        ./Cargo.toml
-        ./cargo-pgx/src/templates/cargo_toml
-        ./nix/templates/default/Cargo.toml
-    )
-
-    DEPENDENCIES_TO_UPDATE=(
-        "pgx-pg-config"
-        "pgx-utils"
-        "cargo-pgx"
-        "pgx-macros"
-        "pgx-pgx-sys"
-        "pgx"
-        "pgx-tests"
-    )
-
-    SEMVER_REGEX="(?P<major>0|[1-9]\d*)\.(?P<minor>0|[1-9]\d*)\.(?P<patch>0|[1-9]\d*)(?:-(?P<prerelease>(?:0|[1-9]\d*|\d*[a-zA-Z-][0-9a-zA-Z-]*)(?:\.(?:0|[1-9]\d*|\d*[a-zA-Z-][0-9a-zA-Z-]*))*))?(?:\+(?P<buildmetadata>[0-9a-zA-Z-]+(?:\.[0-9a-zA-Z-]+)*))?"
-
-    for cargo_toml in ${CARGO_TOMLS_TO_SED[@]}; do
-        for dependency in ${DEPENDENCIES_TO_UPDATE[@]}; do
-            rg --passthru --no-line-number \
-            "(?P<prefix>^${dependency}.*\")(?P<pin>=?)${SEMVER_REGEX}(?P<postfix>\".*$)" \
-            -r "\${prefix}=${version}\${postfix}" \
-            ${cargo_toml} > ${cargo_toml}.tmp || true
-            mv ${cargo_toml}.tmp ${cargo_toml}
-        done
-    done
-
-}
-
-update_main_files $VERSION
-update_extras $VERSION
-
+echo "Generating/updating lockfile"
 cargo generate-lockfile
 
-PGX_PG_SYS_GENERATE_BINDINGS_FOR_RELEASE=1 cargo test --no-run --workspace --no-default-features --features "pg14"
+echo "Generating bindings -- this may take a few moments"
+PGX_PG_SYS_GENERATE_BINDINGS_FOR_RELEASE=1 cargo test --no-run $CARGO_QUIET_FLAG --workspace --no-default-features --features "pg14"
+
+echo "Done!"
