@@ -59,14 +59,6 @@ impl<'de> Deserialize<'de> for AnyNumeric {
             {
                 AnyNumeric::try_from(v).map_err(E::custom)
             }
-
-            #[inline]
-            fn visit_string<E>(self, v: String) -> Result<Self::Value, E>
-            where
-                E: serde::de::Error,
-            {
-                AnyNumeric::try_from(v.as_str()).map_err(E::custom)
-            }
         }
 
         deserializer.deserialize_any(NumericVisitor)

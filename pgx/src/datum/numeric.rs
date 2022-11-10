@@ -71,7 +71,7 @@ impl Display for AnyNumeric {
             direct_function_call::<&CStr>(pg_sys::numeric_out, vec![self.as_datum()]).unwrap()
         };
         let s = numeric_out.to_str().expect("numeric_out is not a valid UTF8 string");
-        fmt.write_str(s)
+        fmt.pad(s)
     }
 }
 
@@ -97,27 +97,35 @@ pub(crate) const fn make_typmod(precision: u32, scale: u32) -> i32 {
 }
 
 /// Which way does a [`AnyNumeric`] sign face?
+#[derive(Debug, PartialEq, Eq, Hash)]
 pub enum Sign {
     Negative,
     Positive,
     Zero,
+    NaN,
 }
 
 impl AnyNumeric {
     /// Returns the sign of this [`AnyNumeric`]
     pub fn sign(&self) -> Sign {
-        unsafe {
-            let sign: AnyNumeric =
-                direct_function_call(pg_sys::numeric_sign, vec![self.as_datum()]).unwrap();
+        if self.is_nan() {
+            Sign::NaN
+        } else {
             let zero: AnyNumeric = 0.try_into().unwrap();
-            if sign < zero {
-                return Sign::Negative;
-            } else if sign > zero {
-                return Sign::Positive;
+
+            if self < &zero {
+                Sign::Negative
+            } else if self > &zero {
+                Sign::Positive
             } else {
-                return Sign::Zero;
+                Sign::Zero
             }
         }
+    }
+
+    /// Is this [`AnyNumeric`] not-a-number?
+    pub fn is_nan(&self) -> bool {
+        unsafe { pg_sys::numeric_is_nan(self.inner) }
     }
 
     /// The absolute value of this [`AnyNumeric`]
@@ -155,7 +163,7 @@ impl AnyNumeric {
 
     /// Calculate the greatest common divisor of this an another [`AnyNumeric`]
     #[cfg(not(any(feature = "pg11", feature = "pg12")))]
-    pub fn gcd<const P: u32, const S: u32>(&self, n: &AnyNumeric) -> AnyNumeric {
+    pub fn gcd(&self, n: &AnyNumeric) -> AnyNumeric {
         unsafe {
             direct_function_call(pg_sys::numeric_gcd, vec![self.as_datum(), n.as_datum()]).unwrap()
         }

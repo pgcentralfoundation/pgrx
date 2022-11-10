@@ -3,6 +3,7 @@ use std::fmt::{Display, Formatter};
 
 /// Represents some kind of conversion error when working with Postgres numerics
 #[derive(Debug, Eq, PartialEq)]
+#[non_exhaustive]
 pub enum Error {
     /// A conversion to Numeric would produce a value outside the precision and scale constraints
     /// of the target Numeric

@@ -98,7 +98,7 @@ impl ErrorReportWithLevel {
 
     /// Returns the error message of this error report
     pub fn message(&self) -> &str {
-        &self.inner.message()
+        self.inner.message()
     }
 
     fn context_message(&self) -> String {

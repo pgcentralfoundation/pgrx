@@ -20,11 +20,23 @@ impl PartialEq<AnyNumeric> for AnyNumeric {
     }
 }
 
-impl Eq for AnyNumeric {}
-
 impl PartialOrd for AnyNumeric {
     fn partial_cmp(&self, other: &Self) -> Option<Ordering> {
-        Some(self.cmp(other))
+        if self.is_nan() || other.is_nan() {
+            None
+        } else {
+            let cmp: i32 = unsafe {
+                direct_function_call(pg_sys::numeric_cmp, vec![self.as_datum(), other.as_datum()])
+                    .unwrap()
+            };
+            if cmp < 0 {
+                Some(Ordering::Less)
+            } else if cmp > 0 {
+                Some(Ordering::Greater)
+            } else {
+                Some(Ordering::Equal)
+            }
+        }
     }
 
     #[inline]
@@ -60,23 +72,6 @@ impl PartialOrd for AnyNumeric {
     }
 }
 
-impl Ord for AnyNumeric {
-    #[inline]
-    fn cmp(&self, other: &Self) -> Ordering {
-        let cmp: i32 = unsafe {
-            direct_function_call(pg_sys::numeric_cmp, vec![self.as_datum(), other.as_datum()])
-                .unwrap()
-        };
-        if cmp < 0 {
-            Ordering::Less
-        } else if cmp > 0 {
-            Ordering::Greater
-        } else {
-            Ordering::Equal
-        }
-    }
-}
-
 impl<const P: u32, const S: u32> PartialEq for Numeric<P, S> {
     #[inline]
     fn eq(&self, other: &Self) -> bool {
@@ -88,8 +83,6 @@ impl<const P: u32, const S: u32> PartialEq for Numeric<P, S> {
         self.as_anynumeric().ne(other.as_anynumeric())
     }
 }
-
-impl<const P: u32, const S: u32> Eq for Numeric<P, S> {}
 
 impl<const P: u32, const S: u32> PartialOrd for Numeric<P, S> {
     #[inline]
@@ -115,12 +108,5 @@ impl<const P: u32, const S: u32> PartialOrd for Numeric<P, S> {
     #[inline]
     fn ge(&self, other: &Self) -> bool {
         self.as_anynumeric().ge(other.as_anynumeric())
-    }
-}
-
-impl<const P: u32, const S: u32> Ord for Numeric<P, S> {
-    #[inline]
-    fn cmp(&self, other: &Self) -> Ordering {
-        self.as_anynumeric().cmp(other.as_anynumeric())
     }
 }

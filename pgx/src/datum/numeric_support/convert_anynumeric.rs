@@ -34,10 +34,7 @@ macro_rules! anynumeric_from_oversized_primitive {
             fn from(value: $ty) -> Self {
                 match <$signed>::try_from(value) {
                     Ok(value) => AnyNumeric::from(value),
-                    Err(_) => unsafe {
-                        // SAFETY:  conversion from value.to_string() will always work
-                        AnyNumeric::try_from(value.to_string().as_str()).unwrap_unchecked()
-                    },
+                    Err(_) => AnyNumeric::try_from(value.to_string().as_str()).unwrap(),
                 }
             }
         }
