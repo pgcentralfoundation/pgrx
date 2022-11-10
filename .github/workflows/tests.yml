@@ -164,6 +164,9 @@ jobs:
     - name: Run nostd example tests
       run: cargo test --package nostd --features "pg$PG_VER" --no-default-features
 
+    - name: Run numeric example tests
+      run: cargo test --package numeric --features "pg$PG_VER" --no-default-features
+
     - name: Run pgtrybuilder example tests
       run: cargo test --package pgtrybuilder --features "pg$PG_VER" --no-default-features
 
