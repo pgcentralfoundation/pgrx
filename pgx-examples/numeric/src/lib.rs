@@ -1,5 +1,4 @@
 use pgx::*;
-use std::str::FromStr;
 
 pg_module_magic!();
 
