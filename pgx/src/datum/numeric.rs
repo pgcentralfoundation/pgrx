@@ -7,293 +7,225 @@ All rights reserved.
 Use of this source code is governed by the MIT license that can be found in the LICENSE file.
 */
 
-use crate::{direct_function_call, direct_function_call_as_datum, pg_sys, FromDatum, IntoDatum};
-use pg_sys::errcodes::PgSqlErrorCode;
-use pg_sys::{AsPgCStr, Datum, InvalidOid, PgTryBuilder};
-use pgx_utils::sql_entity_graph::metadata::{
-    ArgumentError, Returns, ReturnsError, SqlMapping, SqlTranslatable,
-};
-use serde::de::{Error, Visitor};
-use serde::{de, Deserialize, Deserializer, Serialize, Serializer};
-use serde_json::Number;
+use core::fmt::{Debug, Display, Formatter};
 use std::ffi::CStr;
 use std::fmt;
 
-pub const NUMERIC_MAX_PRECISION: i32 = 1000;
-pub const NUMERIC_MAX_RESULT_SCALE: i32 = NUMERIC_MAX_PRECISION * 2;
+use crate::numeric_support::convert::from_primitive_helper;
+pub use crate::numeric_support::error::Error;
+use crate::{direct_function_call, pg_sys, varsize, PgMemoryContexts};
 
-#[derive(Debug)]
-pub struct Numeric<const PRECISION: i32, const SCALE: i32>(pg_sys::Numeric);
+/// A wrapper around the Postgres SQL `NUMERIC(P, S)` type.  Its `Precision` and `Scale` values
+/// are known at compile-time to assist with scale conversions and general type safety.
+///
+/// PostgreSQL permits the scale in a numeric type declaration to be any value in the range
+/// -1000 to 1000. However, the SQL standard requires the scale to be in the range 0 to precision.
+/// Using scales outside that range may not be portable to other database systems.
+///
+/// `pgx`, by using a `u32` for the scale, restricts it to be in line with the SQL standard.  While
+/// it is possible to specify value larger than 1000, ultimately Postgres will reject such values.
+///
+/// All the various Rust arithmetic traits are implemented for [`AnyNumeric`], but using them, even
+/// if the (P, S) is the same on both sides of the operator converts the result to an [`AnyNumeric`].
+/// It is [`AnyNumeric`] that also supports the various "Assign" (ie, [`AddAssign`]) traits.
+///
+/// [`Numeric`] is well-suited for a `#[pg_extern]` return type, moreso than a function argument.
+/// Use [`AnyNumeric`] for those.
+#[derive(Debug, Clone)]
+#[repr(transparent)]
+pub struct Numeric<const P: u32, const S: u32>(pub(crate) AnyNumeric);
 
-#[inline(always)]
-const fn make_typmod(precision: i32, scale: i32) -> i32 {
-    ((precision << 16) | scale) + pg_sys::VARHDRSZ as i32
+/// A plain Postgres SQL `NUMERIC` with default precision and scale values.  This is a sufficient type
+/// to represent any Rust primitive value from `i128::MIN` to `u128::MAX` and anything in between.
+///
+/// Generally, this is the type you'll want to use as function arguments.
+pub struct AnyNumeric {
+    pub(crate) inner: pg_sys::Numeric,
+    pub(crate) need_pfree: bool,
 }
 
-impl<const PRECISION: i32, const SCALE: i32> std::fmt::Display for Numeric<PRECISION, SCALE> {
-    fn fmt(&self, fmt: &mut std::fmt::Formatter<'_>) -> std::result::Result<(), std::fmt::Error> {
+impl Clone for AnyNumeric {
+    /// Performs a deep clone of this [`AnyNumeric`] into the [`pg_sys::CurrentMemoryContext`].
+    fn clone(&self) -> Self {
+        unsafe {
+            let copy = PgMemoryContexts::CurrentMemoryContext
+                .copy_ptr_into(self.inner, varsize(self.inner.cast()));
+            AnyNumeric { inner: copy, need_pfree: true }
+        }
+    }
+}
+
+impl Drop for AnyNumeric {
+    fn drop(&mut self) {
+        if self.need_pfree {
+            unsafe {
+                pg_sys::pfree(self.inner.cast());
+            }
+        }
+    }
+}
+
+impl Display for AnyNumeric {
+    fn fmt(&self, fmt: &mut Formatter<'_>) -> fmt::Result {
         let numeric_out = unsafe {
-            direct_function_call::<&CStr>(
-                pg_sys::numeric_out,
-                vec![Some(pg_sys::Datum::from(self.0))],
-            )
-            .unwrap()
+            direct_function_call::<&CStr>(pg_sys::numeric_out, vec![self.as_datum()]).unwrap()
         };
         let s = numeric_out.to_str().expect("numeric_out is not a valid UTF8 string");
         fmt.write_str(s)
     }
 }
 
-impl<const PRECISION: i32, const SCALE: i32> Serialize for Numeric<PRECISION, SCALE> {
-    fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
-    where
-        S: Serializer,
-    {
-        serializer.serialize_str(&format!("{}", self))
+impl Debug for AnyNumeric {
+    fn fmt(&self, fmt: &mut Formatter<'_>) -> fmt::Result {
+        write!(fmt, "AnyNumeric(inner: {self}, need_pfree:{})", self.need_pfree)
     }
 }
 
-impl<'de, const PRECISION: i32, const SCALE: i32> Deserialize<'de> for Numeric<PRECISION, SCALE> {
-    fn deserialize<D>(deserializer: D) -> Result<Self, <D as Deserializer<'de>>::Error>
-    where
-        D: Deserializer<'de>,
-    {
-        struct NumericVisitor<const PRECISION: i32, const SCALE: i32>;
+impl<const P: u32, const S: u32> Display for Numeric<P, S> {
+    fn fmt(&self, fmt: &mut Formatter<'_>) -> Result<(), fmt::Error> {
+        write!(fmt, "{}", self.0)
+    }
+}
 
-        impl<'de, const PRECISION: i32, const SCALE: i32> Visitor<'de>
-            for NumericVisitor<PRECISION, SCALE>
-        {
-            type Value = Numeric<PRECISION, SCALE>;
+#[inline(always)]
+pub(crate) const fn make_typmod(precision: u32, scale: u32) -> i32 {
+    let (precision, scale) = (precision as i32, scale as i32);
+    match (precision, scale) {
+        (0, 0) => -1,
+        (p, s) => ((p << 16) | s) + pg_sys::VARHDRSZ as i32,
+    }
+}
 
-            fn expecting(&self, formatter: &mut fmt::Formatter) -> fmt::Result {
-                formatter.write_str("a JSON number or a \"quoted JSON number\"")
-            }
+/// Which way does a [`AnyNumeric`] sign face?
+pub enum Sign {
+    Negative,
+    Positive,
+    Zero,
+}
 
-            #[inline]
-            fn visit_i64<E>(self, value: i64) -> Result<Numeric<PRECISION, SCALE>, E> {
-                Ok(value.into())
-            }
-
-            #[inline]
-            fn visit_u64<E>(self, value: u64) -> Result<Numeric<PRECISION, SCALE>, E> {
-                Ok(value.into())
-            }
-
-            #[inline]
-            fn visit_f64<E>(self, value: f64) -> Result<Numeric<PRECISION, SCALE>, E>
-            where
-                E: de::Error,
-            {
-                let result =
-                    Number::from_f64(value).ok_or_else(|| de::Error::custom("not a JSON number"));
-                match result {
-                    Ok(num) => Ok(num.as_f64().unwrap().into()),
-                    Err(e) => Err(e),
-                }
-            }
-
-            #[inline]
-            fn visit_str<E>(self, v: &str) -> Result<Self::Value, E>
-            where
-                E: Error,
-            {
-                self.visit_string(v.to_owned())
-            }
-
-            #[inline]
-            fn visit_string<E>(self, v: String) -> Result<Self::Value, E>
-            where
-                E: Error,
-            {
-                // try to convert the provided String value into a Postgres Numeric Datum
-                // if it doesn't raise an conversion error, then we're good
-                PgTryBuilder::new(|| {
-                    // this might throw, but that's okay
-                    let datum = Numeric(v.clone()).into_datum().unwrap();
-
-                    unsafe {
-                        // and don't leak the 'inet' datum Postgres created
-                        pg_sys::pfree(datum.cast_mut_ptr());
-                    }
-
-                    // we have it as a valid String
-                    Ok(Numeric(v.clone()))
-                })
-                .catch_when(PgSqlErrorCode::ERRCODE_INVALID_TEXT_REPRESENTATION, |_| {
-                    Err(Error::custom(format!("invalid Numeric value: {}", v)))
-                })
-                .execute()
+impl AnyNumeric {
+    /// Returns the sign of this [`AnyNumeric`]
+    pub fn sign(&self) -> Sign {
+        unsafe {
+            let sign: AnyNumeric =
+                direct_function_call(pg_sys::numeric_sign, vec![self.as_datum()]).unwrap();
+            let zero: AnyNumeric = 0.try_into().unwrap();
+            if sign < zero {
+                return Sign::Negative;
+            } else if sign > zero {
+                return Sign::Positive;
+            } else {
+                return Sign::Zero;
             }
         }
-
-        deserializer.deserialize_any(NumericVisitor)
     }
-}
 
-impl<const PRECISION: i32, const SCALE: i32> Into<Numeric<PRECISION, SCALE>> for i8 {
-    fn into(self) -> Numeric<PRECISION, SCALE> {
-        format!("{}", self).into()
+    /// The absolute value of this [`AnyNumeric`]
+    pub fn abs(&self) -> Self {
+        unsafe { direct_function_call(pg_sys::numeric_abs, vec![self.as_datum()]).unwrap() }
     }
-}
 
-impl<const PRECISION: i32, const SCALE: i32> Into<Numeric<PRECISION, SCALE>> for i16 {
-    #[inline]
-    fn into(self) -> Numeric<PRECISION, SCALE> {
+    /// Compute the logarithm of this [`AnyNumeric`] in the given base
+    pub fn log(&self, base: AnyNumeric) -> Self {
         unsafe {
-            direct_function_call::<Numeric<PRECISION, SCALE>>(
-                pg_sys::int2_numeric,
-                vec![self.into_datum()],
-            )
+            direct_function_call(pg_sys::numeric_log, vec![self.as_datum(), base.as_datum()])
+                .unwrap()
         }
-        .unwrap()
     }
-}
 
-impl<const PRECISION: i32, const SCALE: i32> Into<Numeric<PRECISION, SCALE>> for i32 {
-    #[inline]
-    fn into(self) -> Numeric<PRECISION, SCALE> {
+    /// Raise `e` to the power of `x`
+    pub fn exp(x: &AnyNumeric) -> Self {
+        unsafe { direct_function_call(pg_sys::numeric_exp, vec![x.as_datum()]).unwrap() }
+    }
+
+    /// Compute the square root of this [`AnyNumeric`]
+    pub fn sqrt(&self) -> Self {
+        unsafe { direct_function_call(pg_sys::numeric_sqrt, vec![self.as_datum()]).unwrap() }
+    }
+
+    /// Return the smallest integer greater than or equal to this [`AnyNumeric`]
+    pub fn ceil(&self) -> Self {
+        unsafe { direct_function_call(pg_sys::numeric_ceil, vec![self.as_datum()]).unwrap() }
+    }
+
+    /// Return the largest integer equal to or less than this [`AnyNumeric`]
+    pub fn floor(&self) -> Self {
+        unsafe { direct_function_call(pg_sys::numeric_floor, vec![self.as_datum()]).unwrap() }
+    }
+
+    /// Calculate the greatest common divisor of this an another [`AnyNumeric`]
+    #[cfg(not(any(feature = "pg11", feature = "pg12")))]
+    pub fn gcd<const P: u32, const S: u32>(&self, n: &AnyNumeric) -> AnyNumeric {
         unsafe {
-            direct_function_call::<Numeric<PRECISION, SCALE>>(
-                pg_sys::int4_numeric,
-                vec![self.into_datum()],
-            )
+            direct_function_call(pg_sys::numeric_gcd, vec![self.as_datum(), n.as_datum()]).unwrap()
         }
-        .unwrap()
     }
-}
 
-impl<const PRECISION: i32, const SCALE: i32> Into<Numeric<PRECISION, SCALE>> for i64 {
-    #[inline]
-    fn into(self) -> Numeric<PRECISION, SCALE> {
+    /// Output function for numeric data type, suppressing insignificant trailing
+    /// zeroes and then any trailing decimal point.  The intent of this is to
+    /// produce strings that are equal if and only if the input numeric values
+    /// compare equal.
+    pub fn normalize(&self) -> &str {
         unsafe {
-            direct_function_call::<Numeric<PRECISION, SCALE>>(
-                pg_sys::int8_numeric,
-                vec![self.into_datum()],
-            )
-        }
-        .unwrap()
-    }
-}
-
-impl<const PRECISION: i32, const SCALE: i32> Into<Numeric<PRECISION, SCALE>> for u8 {
-    #[inline]
-    fn into(self) -> Numeric<PRECISION, SCALE> {
-        format!("{}", self).into()
-    }
-}
-
-impl<const PRECISION: i32, const SCALE: i32> Into<Numeric<PRECISION, SCALE>> for u16 {
-    #[inline]
-    fn into(self) -> Numeric<PRECISION, SCALE> {
-        format!("{}", self).into()
-    }
-}
-
-impl<const PRECISION: i32, const SCALE: i32> Into<Numeric<PRECISION, SCALE>> for u32 {
-    #[inline]
-    fn into(self) -> Numeric<PRECISION, SCALE> {
-        format!("{}", self).into()
-    }
-}
-
-impl<const PRECISION: i32, const SCALE: i32> Into<Numeric<PRECISION, SCALE>> for u64 {
-    #[inline]
-    fn into(self) -> Numeric<PRECISION, SCALE> {
-        format!("{}", self).into()
-    }
-}
-
-impl<const PRECISION: i32, const SCALE: i32> Into<Numeric<PRECISION, SCALE>> for f32 {
-    #[inline]
-    fn into(self) -> Numeric<PRECISION, SCALE> {
-        unsafe {
-            direct_function_call::<Numeric<PRECISION, SCALE>>(
-                pg_sys::float4_numeric,
-                vec![self.into_datum()],
-            )
-        }
-        .unwrap()
-    }
-}
-
-impl<const PRECISION: i32, const SCALE: i32> Into<Numeric<PRECISION, SCALE>> for f64 {
-    #[inline]
-    fn into(self) -> Numeric<PRECISION, SCALE> {
-        unsafe {
-            direct_function_call::<Numeric<PRECISION, SCALE>>(
-                pg_sys::float8_numeric,
-                vec![self.into_datum()],
-            )
-        }
-        .unwrap()
-    }
-}
-
-impl<const PRECISION: i32, const SCALE: i32> Into<Numeric<PRECISION, SCALE>> for String {
-    #[inline]
-    fn into(self) -> Numeric<PRECISION, SCALE> {
-        unsafe {
-            let s = self.as_pg_cstr();
-            let numeric = direct_function_call::<Numeric<PRECISION, SCALE>>(
-                pg_sys::numeric_in,
-                vec![
-                    Some(pg_sys::Datum::from(s)),
-                    InvalidOid.into_datum(),
-                    make_typmod(PRECISION, SCALE).into_datum(),
-                ],
-            )
-            .unwrap();
-
-            pg_sys::pfree(s as _);
-            numeric
-        }
-    }
-}
-
-impl<const PRECISION: i32, const SCALE: i32> FromDatum for Numeric<PRECISION, SCALE> {
-    #[inline]
-    unsafe fn from_polymorphic_datum(
-        datum: Datum,
-        is_null: bool,
-        _typoid: pg_sys::Oid,
-    ) -> Option<Self>
-    where
-        Self: Sized,
-    {
-        if is_null {
-            None
-        } else {
-            let datum = pg_sys::pg_detoast_datum(datum.ptr_cast()) as pg_sys::Numeric;
-            Some(Numeric(datum))
-        }
-    }
-}
-
-impl<const PRECISION: i32, const SCALE: i32> IntoDatum for Numeric<PRECISION, SCALE> {
-    #[inline]
-    fn into_datum(self) -> Option<pg_sys::Datum> {
-        Some(pg_sys::Datum::from(self.0))
-    }
-
-    fn type_oid() -> u32 {
-        pg_sys::NUMERICOID
-    }
-}
-
-unsafe impl<const PRECISION: i32, const SCALE: i32> SqlTranslatable for Numeric<PRECISION, SCALE> {
-    fn argument_sql() -> Result<SqlMapping, ArgumentError> {
-        match (PRECISION, SCALE) {
-            (0, 0) => Ok(SqlMapping::literal("NUMERIC")),
-            (p, 0) => Ok(SqlMapping::As(format!("NUMERIC({p})"))),
-            (p, s) => Ok(SqlMapping::As(format!("NUMERIC({p}, {s})"))),
+            let s = pg_sys::numeric_normalize(self.inner.cast());
+            let cstr = CStr::from_ptr(s);
+            let normalized = cstr.to_str().unwrap();
+            normalized
         }
     }
 
-    fn return_sql() -> Result<Returns, ReturnsError> {
-        match (PRECISION, SCALE) {
-            (0, 0) => Ok(Returns::One(SqlMapping::literal("NUMERIC"))),
-            (p, 0) => Ok(Returns::One(SqlMapping::As(format!("NUMERIC({p})")))),
-            (p, s) => Ok(Returns::One(SqlMapping::As(format!("NUMERIC({p}, {s})")))),
-        }
+    /// Consume this [`AnyNumeric`] and apply a `Precision` and `Scale`.
+    ///
+    /// Returns an [`Error`] if this [`AnyNumeric`] doesn't fit within the new constraints.
+    ///
+    /// ## Examples
+    ///
+    /// ```rust,no_run
+    /// use pgx::{AnyNumeric, Numeric};
+    /// let start = AnyNumeric::try_from(42.42).unwrap();
+    /// let rescaled:f32 = start.rescale::<3, 1>().unwrap().try_into().unwrap();
+    /// assert_eq!(rescaled, 42.4);
+    /// ```
+    #[inline]
+    pub fn rescale<const P: u32, const S: u32>(self) -> Result<Numeric<P, S>, Error> {
+        Numeric::try_from(self)
+    }
+
+    #[inline]
+    pub(crate) fn as_datum(&self) -> Option<pg_sys::Datum> {
+        Some(pg_sys::Datum::from(self.inner))
+    }
+
+    #[inline]
+    pub(crate) fn copy(&self) -> AnyNumeric {
+        AnyNumeric { inner: self.inner, need_pfree: false }
+    }
+}
+
+impl<const P: u32, const S: u32> Numeric<P, S> {
+    /// Borrow this [`AnyNumeric`] as the more generic [`AnyNumeric`]
+    #[inline]
+    pub fn as_anynumeric(&self) -> &AnyNumeric {
+        &self.0
+    }
+
+    /// Consume this [`AnyNumeric`] and a new `Precision` and `Scale`.
+    ///
+    /// Returns an [`Error`] if this [`AnyNumeric`] doesn't fit within the new constraints.
+    ///
+    /// ## Examples
+    ///
+    /// ```rust,no_run
+    /// use pgx::{AnyNumeric, Numeric};
+    /// use pgx_pg_sys::float4;
+    /// let start = AnyNumeric::try_from(42.42).unwrap();
+    /// let rescaled:float4 = start.rescale::<3, 1>().unwrap().try_into().unwrap();
+    /// assert_eq!(rescaled, 42.4);
+    /// ```
+    #[inline]
+    pub fn rescale<const NEW_P: u32, const NEW_S: u32>(
+        self,
+    ) -> Result<Numeric<NEW_P, NEW_S>, Error> {
+        from_primitive_helper::<_, NEW_P, NEW_S>(self, pg_sys::numeric)
     }
 }

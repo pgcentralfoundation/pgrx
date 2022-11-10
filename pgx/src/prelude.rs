@@ -17,7 +17,9 @@ pub use crate::pgbox::PgBox;
 
 // These could be factored into a temporal type module that could be easily imported for code which works with them.
 // However, reexporting them seems fine for now.
-pub use crate::datum::{Date, Time, TimeWithTimeZone, Timestamp, TimestampWithTimeZone};
+pub use crate::datum::{
+    AnyNumeric, Date, Numeric, Time, TimeWithTimeZone, Timestamp, TimestampWithTimeZone,
+};
 
 pub use crate::pg_sys::oids::PgOid;
 pub use crate::pg_sys::pg_try::PgTryBuilder;

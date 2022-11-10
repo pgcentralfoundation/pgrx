@@ -1261,6 +1261,7 @@ version = "0.0.0"
 dependencies = [
  "pgx",
  "pgx-tests",
+ "rand",
 ]
 
 [[package]]

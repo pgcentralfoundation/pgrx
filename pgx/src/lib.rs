@@ -27,6 +27,7 @@ extern crate pgx_macros;
 #[macro_use]
 extern crate bitflags;
 extern crate alloc;
+extern crate core;
 
 // expose our various derive macros
 pub use pgx_macros::*;
