@@ -96,6 +96,11 @@ impl ErrorReportWithLevel {
         }
     }
 
+    /// Returns the error message of this error report
+    pub fn message(&self) -> &str {
+        self.inner.message()
+    }
+
     fn context_message(&self) -> String {
         self.inner.location.to_string()
     }
@@ -134,6 +139,11 @@ impl ErrorReport {
     pub fn detail<S: Into<String>>(mut self, detail: S) -> Self {
         self.detail = Some(detail.into());
         self
+    }
+
+    /// Returns the error message of this error report
+    pub fn message(&self) -> &str {
+        &self.message
     }
 
     /// Report this [PgErrorReport], which will ultimately be reported by Postgres at the specified [PgLogLevel]

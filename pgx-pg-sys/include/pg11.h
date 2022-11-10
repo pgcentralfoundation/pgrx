@@ -111,6 +111,7 @@ Use of this source code is governed by the MIT license that can be found in the 
 #include "utils/jsonb.h"
 #include "utils/lsyscache.h"
 #include "utils/memutils.h"
+#include "utils/numeric.h"
 #include "utils/palloc.h"
 #include "utils/rel.h"
 #include "utils/relcache.h"

@@ -580,7 +580,6 @@ fn run_bindgen(pg_config: &PgConfig, include_h: &PathBuf) -> eyre::Result<syn::F
         .blocklist_function("pq(?:Strerror|Get.*)") // wrappers around platform functions: user can call those themselves
         .blocklist_function("log")
         .blocklist_item(".*pthread.*)") // shims for pthreads on non-pthread systems, just use std::thread
-        .blocklist_function("float[48].*") // Rust has plenty of float handling
         .blocklist_item(".*(?i:va)_(?i:list|start|end|copy).*") // do not need va_list anything!
         .blocklist_function("(?:pg_|p)v(?:sn?|f)?printf")
         .blocklist_function("appendStringInfoVA")

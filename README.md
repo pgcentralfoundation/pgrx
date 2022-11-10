@@ -190,7 +190,7 @@ Postgres Type | Rust Type (as `Option<T>`)
 `tid` | `pgx::pg_sys::ItemPointerData`
 `cstring` | `&std::ffi::CStr`
 `inet` | `pgx::Inet(String)` -- TODO: needs better support
-`numeric` | `pgx::Numeric(String)` -- TODO: needs better support
+`numeric` | `pgx::Numeric<P, S> or pgx::AnyNumeric`
 `void` | `()`
 `ARRAY[]::<type>` | `Vec<Option<T>>` or `pgx::Array<T>` (zero-copy)
 `NULL` | `Option::None`
