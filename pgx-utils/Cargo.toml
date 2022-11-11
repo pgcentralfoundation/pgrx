@@ -1,6 +1,6 @@
 [package]
 name = "pgx-utils"
-version = "0.5.6"
+version = "0.6.0-alpha.0"
 authors = ["ZomboDB, LLC <zombodb@gmail.com>"]
 license = "MIT"
 description = "Utility functions for 'pgx'"
@@ -22,9 +22,9 @@ owo-colors = { version = "3.5.0", optional = true }
 petgraph = "0.6.2"
 proc-macro2 = { version = "1.0.47", features = [ "span-locations" ] }
 quote = "1.0.21"
-regex = "1.6.0"
-serde = { version = "1.0.146", features = [ "derive" ] }
-serde_derive = "1.0.146"
+regex = "1.7.0"
+serde = { version = "1.0.147", features = [ "derive" ] }
+serde_derive = "1.0.147"
 serde_json = "1.0.87"
 syn = { version = "1.0.103", features = [ "extra-traits", "full", "fold", "parsing" ] }
 syntect = { version = "5.0.0", default-features = false, features = ["default-fancy"], optional = true }
