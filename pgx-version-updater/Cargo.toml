@@ -5,8 +5,6 @@ edition = "2021"
 authors = ["ZomboDB, LLC <zombodb@gmail.com>"]
 license = "MIT"
 description = "Standalone tool to update PGX Cargo.toml versions and dependencies in preparation for a release."
-homepage = "https://github.com/zombodb/pgx"
-repository = "https://github.com/zombodb/pgx"
 
 [dependencies]
 clap = { version = "3.2.23", features = [ "env", "derive" ] }
