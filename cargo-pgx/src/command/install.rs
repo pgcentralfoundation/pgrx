@@ -26,7 +26,7 @@ pub(crate) struct Install {
     #[clap(long, short)]
     package: Option<String>,
     /// Path to Cargo.toml
-    #[clap(long, parse(from_os_str))]
+    #[clap(long, value_parser)]
     manifest_path: Option<PathBuf>,
     /// Compile for release mode (default is debug)
     #[clap(long, short)]
@@ -42,8 +42,8 @@ pub(crate) struct Install {
     pg_config: Option<String>,
     #[clap(flatten)]
     features: clap_cargo::Features,
-    #[clap(from_global, parse(from_occurrences))]
-    verbose: usize,
+    #[clap(from_global, action = ArgAction::Count)]
+    verbose: u8,
 }
 
 impl CommandExecute for Install {

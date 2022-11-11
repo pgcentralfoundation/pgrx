@@ -190,7 +190,7 @@ Extensions can, of course, create aggregates too. Next, let's explore how to do 
 
 # Familiarizing with `pgx`
 
-[`pgx`][pgx] is a suite of crates that provide everything required to build, test, and package extensions for PostgreSQL versions 10 through 14 using pure Rust.
+[`pgx`][pgx] is a suite of crates that provide everything required to build, test, and package extensions for PostgreSQL versions 11 through 15 using pure Rust.
 
 It includes:
 
@@ -426,7 +426,7 @@ CREATE TYPE DemoSum;
 -- src/lib.rs:6
 -- exploring_aggregates::demosum_in
 CREATE OR REPLACE FUNCTION "demosum_in"(
-	"input" cstring /* &cstr_core::CStr */
+	"input" cstring /* &core::ffi::CStr */
 ) RETURNS DemoSum /* exploring_aggregates::DemoSum */
 IMMUTABLE PARALLEL SAFE STRICT
 LANGUAGE c /* Rust */
@@ -436,7 +436,7 @@ AS 'MODULE_PATHNAME', 'demosum_in_wrapper';
 -- exploring_aggregates::demosum_out
 CREATE OR REPLACE FUNCTION "demosum_out"(
 	"input" DemoSum /* exploring_aggregates::DemoSum */
-) RETURNS cstring /* &cstr_core::CStr */
+) RETURNS cstring /* &core::ffi::CStr */
 IMMUTABLE PARALLEL SAFE STRICT
 LANGUAGE c /* Rust */
 AS 'MODULE_PATHNAME', 'demosum_out_wrapper';

@@ -12,7 +12,6 @@ use eyre::{eyre, WrapErr};
 use pgx_pg_config::{prefix_path, PgConfig, PgConfigSelector, Pgx, SUPPORTED_MAJOR_VERSIONS};
 use pgx_utils::rewriter::PgGuardRewriter;
 use quote::{quote, ToTokens};
-use rayon::prelude::*;
 use std::collections::{HashMap, HashSet};
 use std::path::PathBuf;
 use std::process::{Command, Output};
@@ -115,8 +114,23 @@ fn main() -> eyre::Result<()> {
         == "1"
     {
         pgx.iter(PgConfigSelector::All)
-            .map(|v| v.wrap_err("invalid pg_config"))
-            .collect::<eyre::Result<Vec<_>>>()?
+            .map(|r| r.expect("invalid pg_config"))
+            .map(|c| (c.major_version().expect("invalid major version"), c))
+            .filter_map(|t| {
+                if SUPPORTED_MAJOR_VERSIONS.contains(&t.0) {
+                    Some(t.1)
+                } else {
+                    println!(
+                        "cargo:warning={} contains a configuration for pg{}, which pgx does not support.",
+                        Pgx::config_toml()
+                            .expect("Could not get PGX configuration TOML")
+                            .to_string_lossy(),
+                        t.0
+                    );
+                    None
+                }
+            })
+            .collect()
     } else {
         let mut found = None;
         for version in SUPPORTED_MAJOR_VERSIONS {
@@ -141,12 +155,24 @@ fn main() -> eyre::Result<()> {
         let specific = pgx.get(&found)?;
         vec![specific]
     };
-
-    pg_configs
-        .par_iter()
-        .map(|pg_config| generate_bindings(pg_config, &build_paths, is_for_release))
-        .collect::<eyre::Result<Vec<_>>>()?;
-
+    std::thread::scope(|scope| {
+        // This is pretty much either always 1 (normally) or 5 (for releases),
+        // but in the future if we ever have way more, we should consider
+        // chunking `pg_configs` based on `thread::available_parallelism()`.
+        let threads = pg_configs
+            .iter()
+            .map(|pg_config| {
+                scope.spawn(|| generate_bindings(pg_config, &build_paths, is_for_release))
+            })
+            .collect::<Vec<_>>();
+        // Most of the rest of this is just for better error handling --
+        // `thread::scope` already joins the threads for us before it returns.
+        let results = threads
+            .into_iter()
+            .map(|thread| thread.join().expect("thread panicked while generating bindings"))
+            .collect::<Vec<eyre::Result<_>>>();
+        results.into_iter().try_for_each(|r| r)
+    })?;
     // compile the cshim for each binding
     for pg_config in pg_configs {
         build_shim(&build_paths.shim_src, &build_paths.shim_dst, &pg_config)?;
@@ -188,7 +214,7 @@ fn generate_bindings(
             &bindings_file,
             quote! {
                 use crate as pg_sys;
-                #[cfg(any(feature = "pg12", feature = "pg13", feature = "pg14"))]
+                #[cfg(any(feature = "pg12", feature = "pg13", feature = "pg14", feature = "pg15"))]
                 use crate::NullableDatum;
                 use crate::{PgNode, Datum};
             },
@@ -563,12 +589,17 @@ fn run_bindgen(pg_config: &PgConfig, include_h: &PathBuf) -> eyre::Result<syn::F
         .blocklist_item("__[A-Z].*") // these are reserved and unused by Postgres
         .blocklist_item("__darwin.*") // this should always be Apple's names
         .blocklist_function("pq(?:Strerror|Get.*)") // wrappers around platform functions: user can call those themselves
+        .blocklist_function("log")
         .blocklist_item(".*pthread.*)") // shims for pthreads on non-pthread systems, just use std::thread
-        .blocklist_function("float[48].*") // Rust has plenty of float handling
         .blocklist_item(".*(?i:va)_(?i:list|start|end|copy).*") // do not need va_list anything!
         .blocklist_function("(?:pg_|p)v(?:sn?|f)?printf")
         .blocklist_function("appendStringInfoVA")
         .blocklist_file("stdarg.h")
+        // these cause cause warnings, errors, or deprecations on some systems,
+        // and are not useful for us.
+        .blocklist_function("(?:sigstack|sigreturn|siggetmask|gets|vfork|te?mpnam(?:_r)?|mktemp)")
+        // Missing on some systems, despite being in their headers.
+        .blocklist_function("inet_net_pton.*")
         .size_t_is_usize(true)
         .rustfmt_bindings(false)
         .derive_debug(true)
@@ -695,7 +726,7 @@ fn extra_bindgen_clang_args(pg_config: &PgConfig) -> eyre::Result<Vec<String>> {
                     // updates), so care should be taken to avoid changing that
                     // if possible.
                     //
-                    // The logic we'd like ideally is for `cargo pgx init` to
+                    // The logic we'd like ideally is for `cargo pgx init` to
                     // choose a good SDK in the first place, and force postgres
                     // to use it. Then, the logic in this build script would
                     // Just Work without changes (since we are using its
@@ -788,16 +819,17 @@ fn apply_pg_guard(items: &Vec<syn::Item>) -> eyre::Result<proc_macro2::TokenStre
     for item in items {
         match item {
             Item::ForeignMod(block) => {
+                let abi = &block.abi;
                 for item in &block.items {
                     match item {
                         ForeignItem::Fn(func) => {
                             // Ignore other functions -- this will often be
                             // variadic functions that we can't safely wrap.
-                            if let Ok(tokens) = PgGuardRewriter::new().foreign_item_fn(func) {
+                            if let Ok(tokens) = PgGuardRewriter::new().foreign_item_fn(func, abi) {
                                 out.extend(tokens);
                             }
                         }
-                        other => out.extend(quote! { extern "C" { #other } }),
+                        other => out.extend(quote! { #abi { #other } }),
                     }
                 }
             }

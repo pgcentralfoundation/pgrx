@@ -8,7 +8,6 @@ Use of this source code is governed by the MIT license that can be found in the 
 */
 #include "postgres.h"
 
-#define IS_PG_10 (PG_VERSION_NUM >= 100000 && PG_VERSION_NUM < 110000)
 #define IS_PG_11 (PG_VERSION_NUM >= 110000 && PG_VERSION_NUM < 120000)
 #define IS_PG_12 (PG_VERSION_NUM >= 120000 && PG_VERSION_NUM < 130000)
 #define IS_PG_13 (PG_VERSION_NUM >= 130000 && PG_VERSION_NUM < 140000)
@@ -16,7 +15,7 @@ Use of this source code is governed by the MIT license that can be found in the 
 #include "access/htup.h"
 #include "access/htup_details.h"
 #include "catalog/pg_type.h"
-#if IS_PG_10 || IS_PG_11
+#if IS_PG_11
 #include "nodes/relation.h"
 #else
 #include "nodes/pathnodes.h"
@@ -44,11 +43,90 @@ void pgx_elog_error(char *message) {
     elog(ERROR, "%s", message);
 }
 
-PGDLLEXPORT void pgx_ereport(int level, int code, char *message, char *file, int lineno, int colno);
-void pgx_ereport(int level, int code, char *message, char *file, int lineno, int colno) {
-    ereport(level,
-            (errcode(code),
-                    errmsg("%s", message), errcontext_msg("%s:%d:%d", file, lineno, colno)));
+PGDLLEXPORT void pgx_errcontext_msg(char *message);
+void pgx_errcontext_msg(char *message) {
+    errcontext_msg("%s", message);
+}
+
+PGDLLEXPORT void pgx_ereport(const int level, int code, char *message, char *detail, char *funcname, char *file, int lineno, char *context);
+void pgx_ereport(const int level, int code, char *message, char *detail, char *funcname, char *file, int lineno, char *context) {
+// the below is basically Postgres' `#define ereport(...)` macro unrolled
+
+#if (IS_PG_11 || IS_PG_12)
+#   ifdef HAVE__BUILTIN_CONSTANT_P
+        if (errstart(level, file, lineno, funcname, NULL)) {
+            if (detail != NULL) {
+                if (context != NULL) {
+                    errfinish(level, errcode(code), errmsg("%s", message), errdetail("%s", detail), errcontext_msg("%s", context));
+                } else {
+                    errfinish(level, errcode(code), errmsg("%s", message), errdetail("%s", detail));
+                }
+            } else {
+                if (context != NULL) {
+                    errfinish(level, errcode(code), errmsg("%s", message), errcontext_msg("%s", context));
+                } else {
+                    errfinish(level, errcode(code), errmsg("%s", message));
+                }
+            }
+        }
+        if (__builtin_constant_p(level) && level >= ERROR) {
+            pg_unreachable();
+        }
+#   else    /* !HAVE__BUILTIN_CONSTANT_P */
+        if (errstart(level, file, lineno, funcname, NULL)) {
+            if (detail != NULL) {
+                if (context != NULL) {
+                    errfinish(level, errcode(code), errmsg("%s", message), errdetail("%s", detail), errcontext_msg(context));
+                } else {
+                    errfinish(level, errcode(code), errmsg("%s", message), errdetail("%s", detail));
+                }
+            } else {
+                if (context != NULL) {
+                    errfinish(level, errcode(code), errmsg("%s", message), errcontext_msg("%s", context));
+                } else {
+                    errfinish(level, errcode(code), errmsg("%s", message));
+                }
+            }
+        }
+        if (level >= ERROR) {
+            pg_unreachable();
+        }
+#   endif   /* HAVE__BUILTIN_CONSTANT_P */
+#else   /* IS_PG_11 || IS_PG_12 */
+#   ifdef HAVE__BUILTIN_CONSTANT_P
+        pg_prevent_errno_in_scope();
+        if (errstart(level, NULL)) {
+            errcode(code);
+            errmsg("%s", message);
+            if (detail != NULL) {
+                errdetail("%s", detail);
+            }
+            if (context != NULL) {
+                errcontext_msg("%s", context);
+            }
+            errfinish(file, lineno, funcname);
+        }
+        if (__builtin_constant_p(level) && level >= ERROR) {
+            pg_unreachable();
+        }
+#   else    /* !HAVE__BUILTIN_CONSTANT_P */
+        pg_prevent_errno_in_scope();
+        if (errstart(level, domain)) {
+            errcode(code);
+            errmsg("%s", message);
+            if (detail != NULL) {
+                errdetail("%s", detail);
+            }
+            if (context != NULL) {
+                errcontext_msg("%s", context);
+            }
+            errfinish(file, lineno, funcname);
+        }
+        if (level >= ERROR) {
+            pg_unreachable();
+        }
+#   endif   /* HAVE__BUILTIN_CONSTANT_P */
+#endif  /* IS_PG_11 || IS_PG_12 */
 }
 
 PGDLLEXPORT void pgx_SET_VARSIZE(struct varlena *ptr, int size);
@@ -101,7 +179,7 @@ ListCell *pgx_list_nth_cell(List *list, int nth) {
     return list_nth_cell(list, nth);
 }
 
-#if IS_PG_10 || IS_PG_11
+#if IS_PG_11
 PGDLLEXPORT Oid pgx_HeapTupleHeaderGetOid(HeapTupleHeader htup_header);
 Oid pgx_HeapTupleHeaderGetOid(HeapTupleHeader htup_header) {
     return HeapTupleHeaderGetOid(htup_header);

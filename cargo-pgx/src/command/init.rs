@@ -12,7 +12,9 @@ use crate::command::version::pgx_default;
 use crate::CommandExecute;
 use eyre::{eyre, WrapErr};
 use owo_colors::OwoColorize;
-use pgx_pg_config::{prefix_path, PgConfig, PgConfigSelector, Pgx, SUPPORTED_MAJOR_VERSIONS};
+use pgx_pg_config::{
+    prefix_path, PgConfig, PgConfigSelector, Pgx, C_LOCALE_FLAGS, SUPPORTED_MAJOR_VERSIONS,
+};
 use rayon::prelude::*;
 
 use std::collections::HashMap;
@@ -43,9 +45,6 @@ static PROCESS_ENV_DENYLIST: &'static [&'static str] = &[
 #[derive(clap::Args, Debug)]
 #[clap(author)]
 pub(crate) struct Init {
-    /// If installed locally, the path to PG10's `pgconfig` tool, or `download` to have pgx download/compile/install it
-    #[clap(env = "PG10_PG_CONFIG", long, help = "")]
-    pg10: Option<String>,
     /// If installed locally, the path to PG11's `pgconfig` tool, or `download` to have pgx download/compile/install it
     #[clap(env = "PG11_PG_CONFIG", long)]
     pg11: Option<String>,
@@ -58,8 +57,11 @@ pub(crate) struct Init {
     /// If installed locally, the path to PG14's `pgconfig` tool, or `download` to have pgx download/compile/install it
     #[clap(env = "PG14_PG_CONFIG", long)]
     pg14: Option<String>,
-    #[clap(from_global, parse(from_occurrences))]
-    verbose: usize,
+    /// If installed locally, the path to PG14's `pgconfig` tool, or `download` to have pgx download/compile/install it
+    #[clap(env = "PG15_PG_CONFIG", long)]
+    pg15: Option<String>,
+    #[clap(from_global, action = ArgAction::Count)]
+    verbose: u8,
     #[clap(long, help = "Base port number")]
     base_port: Option<u16>,
     #[clap(long, help = "Base testing port number")]
@@ -71,9 +73,6 @@ impl CommandExecute for Init {
     fn execute(self) -> eyre::Result<()> {
         let mut versions = HashMap::new();
 
-        if let Some(ref version) = self.pg10 {
-            versions.insert("pg10", version.clone());
-        }
         if let Some(ref version) = self.pg11 {
             versions.insert("pg11", version.clone());
         }
@@ -85,6 +84,9 @@ impl CommandExecute for Init {
         }
         if let Some(ref version) = self.pg14 {
             versions.insert("pg14", version.clone());
+        }
+        if let Some(ref version) = self.pg15 {
+            versions.insert("pg15", version.clone());
         }
 
         if versions.is_empty() {
@@ -440,7 +442,12 @@ fn is_root_user() -> bool {
 pub(crate) fn initdb(bindir: &PathBuf, datadir: &PathBuf) -> eyre::Result<()> {
     println!(" {} data directory at {}", "Initializing".bold().green(), datadir.display());
     let mut command = std::process::Command::new(format!("{}/initdb", bindir.display()));
-    command.stdout(Stdio::piped()).stderr(Stdio::piped()).arg("-D").arg(&datadir);
+    command
+        .stdout(Stdio::piped())
+        .stderr(Stdio::piped())
+        .args(C_LOCALE_FLAGS)
+        .arg("-D")
+        .arg(&datadir);
 
     let command_str = format!("{:?}", command);
     tracing::debug!(command = %command_str, "Running");

@@ -12,13 +12,7 @@ Use of this source code is governed by the MIT license that can be found in the 
 mod tests {
     #[allow(unused_imports)]
     use crate as pgx_tests;
-
-    use pgx::log::{PgLogLevel, PgSqlErrorCode};
     use pgx::prelude::*;
-    use pgx::{
-        check_for_interrupts, debug1, debug2, debug3, debug4, debug5, ereport, error, info, log,
-        notice, warning,
-    };
 
     #[pg_test]
     fn test_info() {
@@ -77,14 +71,7 @@ mod tests {
 
     #[pg_test(error = "ereport error")]
     fn test_ereport() {
-        ereport(
-            PgLogLevel::ERROR,
-            PgSqlErrorCode::ERRCODE_INTERNAL_ERROR,
-            "ereport error",
-            file!(),
-            line!(),
-            column!(),
-        )
+        pgx::ereport!(PgLogLevel::ERROR, PgSqlErrorCode::ERRCODE_INTERNAL_ERROR, "ereport error")
     }
 
     #[pg_test(error = "panic message")]

@@ -26,6 +26,8 @@ extern crate pgx_macros;
 
 #[macro_use]
 extern crate bitflags;
+extern crate alloc;
+extern crate core;
 
 // expose our various derive macros
 pub use pgx_macros::*;
@@ -34,23 +36,21 @@ pub use pgx_macros::*;
 pub mod prelude;
 
 pub mod aggregate;
+pub mod array;
+pub mod atomics;
+pub mod bgworkers;
 pub mod callbacks;
 pub mod datum;
 pub mod enum_helper;
 pub mod fcinfo;
 pub mod guc;
+pub mod heap_tuple;
 pub mod hooks;
 pub mod htup;
 pub mod inoutfuncs;
 pub mod itemptr;
 pub mod iter;
 pub mod list;
-#[macro_use]
-pub mod log;
-pub mod array;
-pub mod atomics;
-pub mod bgworkers;
-pub mod heap_tuple;
 pub mod lwlock;
 pub mod memcxt;
 pub mod misc;
@@ -60,6 +60,7 @@ pub mod pgbox;
 pub mod rel;
 pub mod shmem;
 pub mod spi;
+pub mod spinlock;
 pub mod stringinfo;
 pub mod trigger_support;
 pub mod tupdesc;
@@ -84,7 +85,6 @@ pub use htup::*;
 pub use inoutfuncs::*;
 pub use itemptr::*;
 pub use list::*;
-pub use log::*;
 pub use lwlock::*;
 pub use memcxt::*;
 pub use namespace::*;
@@ -101,15 +101,30 @@ pub use wrappers::*;
 pub use xid::*;
 
 pub use pgx_pg_sys as pg_sys; // the module only, not its contents
-pub use pgx_pg_sys::submodules::*;
-pub use pgx_pg_sys::PgBuiltInOids; // reexport this so it looks like it comes from here
 
-pub use {cstr_core, pgx_utils as utils};
+// and re-export these
+pub use pg_sys::elog::PgLogLevel;
+pub use pg_sys::errcodes::PgSqlErrorCode;
+pub use pg_sys::oids::PgOid;
+pub use pg_sys::panic::pgx_extern_c_guard;
+pub use pg_sys::pg_try::PgTryBuilder;
+pub use pg_sys::utils::name_data_to_str;
+pub use pg_sys::PgBuiltInOids;
+pub use pg_sys::{
+    check_for_interrupts, debug1, debug2, debug3, debug4, debug5, ereport, error, function_name,
+    info, log, notice, warning, FATAL, PANIC,
+};
+pub use pgx_utils as utils;
+
+#[deprecated = "Please use the types in `{core,alloc,std}::ffi` instead"]
+pub mod cstr_core {
+    pub use alloc::ffi::{CString, FromVecWithNulError, NulError};
+    pub use core::ffi::{c_char, CStr, FromBytesWithNulError};
+}
 
 use once_cell::sync::Lazy;
-use std::collections::HashSet;
-
 use pgx_utils::sql_entity_graph::RustSourceOnlySqlMapping;
+use std::collections::HashSet;
 
 macro_rules! map_source_only {
     ($map:ident, $rust:ty, $sql:expr) => {{
@@ -217,7 +232,7 @@ macro_rules! pg_magic_func {
             use core::mem::size_of;
             use pgx;
 
-            #[cfg(any(feature = "pg10", feature = "pg11", feature = "pg12"))]
+            #[cfg(any(feature = "pg11", feature = "pg12"))]
             const MY_MAGIC: pgx::pg_sys::Pg_magic_struct = pgx::pg_sys::Pg_magic_struct {
                 len: size_of::<pgx::pg_sys::Pg_magic_struct>() as i32,
                 version: pgx::pg_sys::PG_VERSION_NUM as i32 / 100,
@@ -236,6 +251,27 @@ macro_rules! pg_magic_func {
                 indexmaxkeys: pgx::pg_sys::INDEX_MAX_KEYS as i32,
                 namedatalen: pgx::pg_sys::NAMEDATALEN as i32,
                 float8byval: pgx::pg_sys::USE_FLOAT8_BYVAL as i32,
+            };
+
+            #[cfg(any(feature = "pg15"))]
+            const MY_MAGIC: pgx::pg_sys::Pg_magic_struct = pgx::pg_sys::Pg_magic_struct {
+                len: size_of::<pgx::pg_sys::Pg_magic_struct>() as i32,
+                version: pgx::pg_sys::PG_VERSION_NUM as i32 / 100,
+                funcmaxargs: pgx::pg_sys::FUNC_MAX_ARGS as i32,
+                indexmaxkeys: pgx::pg_sys::INDEX_MAX_KEYS as i32,
+                namedatalen: pgx::pg_sys::NAMEDATALEN as i32,
+                float8byval: pgx::pg_sys::USE_FLOAT8_BYVAL as i32,
+                abi_extra: {
+                    // array::from_fn isn't const yet, boohoo, so const-copy a bstr
+                    let magic = b"PostgreSQL";
+                    let mut abi = [0 as i8; 32];
+                    let mut i = 0;
+                    while i < magic.len() {
+                        abi[i] = magic[i] as _;
+                        i += 1;
+                    }
+                    abi
+                },
             };
 
             // go ahead and register our panic handler since Postgres
@@ -306,5 +342,5 @@ macro_rules! pg_sql_graph_magic {
 /// directly.
 #[allow(unused)]
 pub fn initialize() {
-    register_pg_guard_panic_hook();
+    pg_sys::panic::register_pg_guard_panic_hook();
 }

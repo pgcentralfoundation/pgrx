@@ -11,6 +11,7 @@ Use of this source code is governed by the MIT license that can be found in the 
 
 use crate::{pg_sys, FromDatum, IntoDatum, Json, PgMemoryContexts, PgOid};
 use std::collections::HashMap;
+use std::ffi::CStr;
 use std::fmt::Debug;
 use std::mem;
 use std::ops::{Index, IndexMut};
@@ -198,16 +199,33 @@ impl Spi {
     ///
     /// The statement runs in read/write mode
     pub fn run(query: &str) {
+        Spi::run_with_args(query, None)
+    }
+
+    /// run an arbitrary SQL statement with args.
+    ///
+    /// ## Safety
+    ///
+    /// The statement runs in read/write mode
+    pub fn run_with_args(query: &str, args: Option<Vec<(PgOid, Option<pg_sys::Datum>)>>) {
         Spi::execute(|mut client| {
-            client.update(query, None, None);
+            client.update(query, None, args);
         })
     }
 
     /// explain a query, returning its result in json form
     pub fn explain(query: &str) -> Json {
+        Spi::explain_with_args(query, None)
+    }
+
+    /// explain a query with args, returning its result in json form
+    pub fn explain_with_args(
+        query: &str,
+        args: Option<Vec<(PgOid, Option<pg_sys::Datum>)>>,
+    ) -> Json {
         Spi::connect(|mut client| {
             let table =
-                client.update(&format!("EXPLAIN (format json) {}", query), None, None).first();
+                client.update(&format!("EXPLAIN (format json) {}", query), None, args).first();
             Ok(Some(table.get_one::<Json>().expect("failed to get json EXPLAIN result")))
         })
         .unwrap()
@@ -223,15 +241,9 @@ impl Spi {
 
     /// execute SPI commands via the provided `SpiClient` and return a value from SPI which is
     /// automatically copied into the `CurrentMemoryContext` at the time of this function call
-    pub fn connect<
-        R: FromDatum + IntoDatum,
-        F: FnOnce(SpiClient) -> std::result::Result<Option<R>, SpiError>,
-    >(
+    pub fn connect<R, F: FnOnce(SpiClient) -> std::result::Result<Option<R>, SpiError>>(
         f: F,
     ) -> Option<R> {
-        let outer_memory_context =
-            PgMemoryContexts::For(PgMemoryContexts::CurrentMemoryContext.value());
-
         /// a struct to manage our SPI connection lifetime
         struct SpiConnection;
         impl SpiConnection {
@@ -258,38 +270,7 @@ impl Spi {
         // just put us un.  We'll disconnect from SPI when the closure is finished.
         // If there's a panic or elog(ERROR), we don't care about also disconnecting from
         // SPI b/c Postgres will do that for us automatically
-        match f(SpiClient) {
-            // copy the result to the outer memory context we saved above
-            Ok(result) => {
-                // we need to copy the resulting Datum into the outer memory context
-                // *before* we disconnect from SPI, otherwise we're copying free'd memory
-                // see https://github.com/zombodb/pgx/issues/17
-                let copied_datum = match result {
-                    Some(result) => {
-                        let as_datum = result.into_datum();
-                        if as_datum.is_none() {
-                            // SPI function returned Some(()), which means we just want to return None
-                            None
-                        } else {
-                            unsafe {
-                                R::from_datum_in_memory_context(
-                                    outer_memory_context,
-                                    as_datum.expect("SPI result datum was NULL"),
-                                    false,
-                                    pg_sys::InvalidOid,
-                                )
-                            }
-                        }
-                    }
-                    None => None,
-                };
-
-                copied_datum
-            }
-
-            // closure returned an error
-            Err(e) => panic!("{:?}", e),
-        }
+        f(SpiClient).unwrap()
     }
 
     pub fn check_status(status_code: i32) -> SpiOk {
@@ -476,7 +457,10 @@ impl SpiTupleTable {
                         let datum =
                             pg_sys::SPI_getbinval(heap_tuple, tupdesc, ordinal, &mut is_null);
 
-                        T::from_polymorphic_datum(
+                        T::from_datum_in_memory_context(
+                            PgMemoryContexts::CurrentMemoryContext
+                                .parent()
+                                .expect("parent memory context is absent"),
                             datum,
                             is_null,
                             pg_sys::SPI_gettypeid(tupdesc, ordinal),
@@ -485,6 +469,52 @@ impl SpiTupleTable {
                 },
                 None => panic!("TupDesc is NULL"),
             }
+        }
+    }
+
+    /// Returns the number of columns
+    pub fn columns(&self) -> usize {
+        match self.tupdesc {
+            Some(tupdesc) => unsafe { (*tupdesc).natts as usize },
+            None => 0,
+        }
+    }
+
+    /// Returns column type OID
+    ///
+    /// The ordinal position is 1-based
+    pub fn column_type_oid(&self, ordinal: usize) -> Option<PgOid> {
+        match self.tupdesc {
+            Some(tupdesc) => unsafe {
+                let nattrs = (*tupdesc).natts;
+                if ordinal < 1 || ordinal > (nattrs as usize) {
+                    None
+                } else {
+                    let oid = pg_sys::SPI_gettypeid(tupdesc, ordinal as i32);
+                    Some(PgOid::from(oid))
+                }
+            },
+            None => None,
+        }
+    }
+
+    /// Returns column name
+    ///
+    /// The ordinal position is 1-based
+    pub fn column_name(&self, ordinal: usize) -> Option<String> {
+        match self.tupdesc {
+            Some(tupdesc) => unsafe {
+                let nattrs = (*tupdesc).natts;
+                if ordinal < 1 || ordinal > (nattrs as usize) {
+                    None
+                } else {
+                    let name = pg_sys::SPI_fname(tupdesc, ordinal as i32);
+                    let str = CStr::from_ptr(name).to_string_lossy().into_owned();
+                    pg_sys::pfree(name as *mut _);
+                    Some(str)
+                }
+            },
+            None => None,
         }
     }
 }
@@ -634,6 +664,10 @@ impl SpiHeapTupleDataEntry {
             Some(datum) => unsafe { T::from_polymorphic_datum(*datum, false, self.type_oid) },
             None => None,
         }
+    }
+
+    pub fn oid(&self) -> pg_sys::Oid {
+        self.type_oid
     }
 }
 

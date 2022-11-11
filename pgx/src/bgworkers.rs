@@ -11,6 +11,7 @@ Use of this source code is governed by the MIT license that can be found in the 
 //!
 //! See: [https://www.postgresql.org/docs/12/bgworker.html](https://www.postgresql.org/docs/12/bgworker.html)
 use crate::pg_sys;
+use pgx_pg_sys::PgTryBuilder;
 use std::convert::TryInto;
 use std::ffi::{CStr, CString};
 use std::os::raw::c_char;
@@ -68,9 +69,13 @@ pub struct BackgroundWorker {}
 impl BackgroundWorker {
     /// What is our name?
     pub fn get_name() -> &'static str {
-        #[cfg(feature = "pg10")]
-        const LEN: usize = 64;
-        #[cfg(any(feature = "pg11", feature = "pg12", feature = "pg13", feature = "pg14"))]
+        #[cfg(any(
+            feature = "pg11",
+            feature = "pg12",
+            feature = "pg13",
+            feature = "pg14",
+            feature = "pg15"
+        ))]
         const LEN: usize = 96;
 
         unsafe {
@@ -153,10 +158,13 @@ impl BackgroundWorker {
         let user: *const c_char = user.as_ref().map_or(std::ptr::null(), |i| i.as_ptr());
 
         unsafe {
-            #[cfg(feature = "pg10")]
-            pg_sys::BackgroundWorkerInitializeConnection(db as *mut c_char, user as *mut c_char);
-
-            #[cfg(any(feature = "pg11", feature = "pg12", feature = "pg13", feature = "pg14"))]
+            #[cfg(any(
+                feature = "pg11",
+                feature = "pg12",
+                feature = "pg13",
+                feature = "pg14",
+                feature = "pg15"
+            ))]
             pg_sys::BackgroundWorkerInitializeConnection(db, user, 0);
         };
     }
@@ -183,20 +191,24 @@ impl BackgroundWorker {
     }
 
     /// Once connected to SPI via `connect_worker_to_spi()`, begin a transaction to
-    /// use the `pgx::Spi` interface.
-    pub fn transaction<F: FnOnce() + std::panic::UnwindSafe + std::panic::RefUnwindSafe>(
+    /// use the `pgx::Spi` interface. Returns the return value of the `F` function.
+    pub fn transaction<
+        F: FnOnce() -> R + std::panic::UnwindSafe + std::panic::RefUnwindSafe,
+        R: Copy,
+    >(
         transaction_body: F,
-    ) {
+    ) -> R {
         unsafe {
             assert!(!pg_sys::MyBgworkerEntry.is_null(), "BackgroundWorker associated functions can only be called from a registered background worker");
             pg_sys::SetCurrentStatementStartTimestamp();
             pg_sys::StartTransactionCommand();
             pg_sys::PushActiveSnapshot(pg_sys::GetTransactionSnapshot());
         }
-        pg_sys::guard(|| transaction_body());
         unsafe {
+            let result = PgTryBuilder::new(transaction_body).execute();
             pg_sys::PopActiveSnapshot();
             pg_sys::CommitTransactionCommand();
+            result
         }
     }
 }
@@ -445,7 +457,7 @@ impl BackgroundWorkerBuilder {
     }
 
     /// What is the "main" function that should be run when the BackgroundWorker
-    /// process is started?  
+    /// process is started?
     ///
     /// The specified function **must** be:
     ///     - `extern "C"`,
@@ -553,23 +565,13 @@ impl BackgroundWorkerBuilder {
 /// the builder is useful for building this structure.
 impl<'a> Into<pg_sys::BackgroundWorker> for &'a BackgroundWorkerBuilder {
     fn into(self) -> pg_sys::BackgroundWorker {
-        #[cfg(feature = "pg10")]
-        let bgw = pg_sys::BackgroundWorker {
-            bgw_name: RpgffiChar::from(&self.bgw_name[..]).0,
-            bgw_flags: self.bgw_flags.bits(),
-            bgw_start_time: self.bgw_start_time as u32,
-            bgw_restart_time: match self.bgw_restart_time {
-                None => pg_sys::BGW_NEVER_RESTART,
-                Some(d) => d.as_secs() as i32,
-            },
-            bgw_library_name: RpgffiChar::from(&self.bgw_library_name[..]).0,
-            bgw_function_name: RpgffiChar::from(&self.bgw_function_name[..]).0,
-            bgw_main_arg: self.bgw_main_arg,
-            bgw_extra: RpgffiChar128::from(&self.bgw_extra[..]).0,
-            bgw_notify_pid: self.bgw_notify_pid,
-        };
-
-        #[cfg(any(feature = "pg11", feature = "pg12", feature = "pg13", feature = "pg14"))]
+        #[cfg(any(
+            feature = "pg11",
+            feature = "pg12",
+            feature = "pg13",
+            feature = "pg14",
+            feature = "pg15"
+        ))]
         let bgw = pg_sys::BackgroundWorker {
             bgw_name: RpgffiChar::from(&self.bgw_name[..]).0,
             bgw_type: RpgffiChar::from(&self.bgw_type[..]).0,
@@ -599,16 +601,19 @@ fn wait_latch(timeout: i64, wakeup_flags: WLflags) -> i32 {
             pg_sys::PG_WAIT_EXTENSION,
         );
         pg_sys::ResetLatch(pg_sys::MyLatch);
-        check_for_interrupts!();
+        pg_sys::check_for_interrupts!();
 
         latch
     }
 }
 
-#[cfg(feature = "pg10")]
-type RpgffiChar = RpgffiChar64;
-
-#[cfg(any(feature = "pg11", feature = "pg12", feature = "pg13", feature = "pg14"))]
+#[cfg(any(
+    feature = "pg11",
+    feature = "pg12",
+    feature = "pg13",
+    feature = "pg14",
+    feature = "pg15"
+))]
 type RpgffiChar = RpgffiChar96;
 
 struct RpgffiChar64([c_char; 64]);

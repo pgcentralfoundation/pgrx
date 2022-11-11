@@ -16,7 +16,7 @@ Use of this source code is governed by the MIT license that can be found in the 
 //! simple accessibility to working with MemoryContexts in a compiler-checked manner
 //!
 use crate::pg_sys::AsPgCStr;
-use crate::{guard, pg_sys, PgBox};
+use crate::{pg_sys, PgBox};
 use core::panic::{RefUnwindSafe, UnwindSafe};
 use core::ptr;
 use std::fmt::Debug;
@@ -239,6 +239,18 @@ impl PgMemoryContexts {
         }
     }
 
+    /// Returns parent memory context if any
+    pub fn parent(&self) -> Option<PgMemoryContexts> {
+        // SAFETY: We do this instead of simply plucking the .parent field ourselves
+        // mostly to let Postgres check the context validity if --enable-cassert is on
+        let parent = unsafe { pg_sys::MemoryContextGetParent(self.value()) };
+        if parent.is_null() {
+            None
+        } else {
+            Some(PgMemoryContexts::For(parent))
+        }
+    }
+
     /// Run the specified function "within" the `MemoryContext` represented by this enum.
     ///
     /// The important implementation detail is that Postgres' `CurrentMemoryContext` is changed
@@ -409,7 +421,7 @@ impl PgMemoryContexts {
             pg_sys::CurrentMemoryContext = context;
         }
 
-        let result = guard::guard(|| f(&mut PgMemoryContexts::For(context)));
+        let result = f(&mut PgMemoryContexts::For(context));
 
         // restore our understanding of the current memory context
         unsafe {

@@ -42,12 +42,12 @@ pub(crate) struct Schema {
     #[clap(long, short)]
     package: Option<String>,
     /// Path to Cargo.toml
-    #[clap(long, parse(from_os_str))]
+    #[clap(long, value_parser)]
     manifest_path: Option<PathBuf>,
     /// Build in test mode (for `cargo pgx test`)
     #[clap(long)]
     test: bool,
-    /// Do you want to run against Postgres `pg10`, `pg11`, `pg12`, `pg13`, `pg14`?
+    /// Do you want to run against Postgres `pg11`, `pg12`, `pg13`, `pg14`, `pg15`?
     pg_version: Option<String>,
     /// Compile for release mode (default is debug)
     #[clap(long, short)]
@@ -56,18 +56,18 @@ pub(crate) struct Schema {
     #[clap(long)]
     profile: Option<String>,
     /// The `pg_config` path (default is first in $PATH)
-    #[clap(long, short = 'c', parse(from_os_str))]
+    #[clap(long, short = 'c', value_parser)]
     pg_config: Option<PathBuf>,
     #[clap(flatten)]
     features: clap_cargo::Features,
     /// A path to output a produced SQL file (default is `stdout`)
-    #[clap(long, short, parse(from_os_str))]
+    #[clap(long, short, value_parser)]
     out: Option<PathBuf>,
     /// A path to output a produced GraphViz DOT file
-    #[clap(long, short, parse(from_os_str))]
+    #[clap(long, short, value_parser)]
     dot: Option<PathBuf>,
-    #[clap(from_global, parse(from_occurrences))]
-    verbose: usize,
+    #[clap(from_global, action = ArgAction::Count)]
+    verbose: u8,
     /// Skip building a fresh extension shared object.
     #[clap(long)]
     skip_build: bool,

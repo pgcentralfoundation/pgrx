@@ -21,19 +21,19 @@ use std::path::PathBuf;
 #[derive(clap::Args, Debug)]
 #[clap(author)]
 pub(crate) struct Connect {
-    /// Do you want to run against Postgres `pg10`, `pg11`, `pg12`, `pg13`, `pg14`?
+    /// Do you want to run against Postgres `pg11`, `pg12`, `pg13`, `pg14`, `pg15`?
     #[clap(env = "PG_VERSION")]
     pg_version: Option<String>,
     /// The database to connect to (and create if the first time).  Defaults to a database with the same name as the current extension name
     #[clap(env = "DBNAME")]
     dbname: Option<String>,
-    #[clap(from_global, parse(from_occurrences))]
+    #[clap(from_global, action = ArgAction::Count)]
     verbose: usize,
     /// Package to determine default `pg_version` with (see `cargo help pkgid`)
     #[clap(long, short)]
     package: Option<String>,
     /// Path to Cargo.toml
-    #[clap(long, parse(from_os_str))]
+    #[clap(long, value_parser)]
     manifest_path: Option<PathBuf>,
     /// Use an existing `pgcli` on the $PATH.
     #[clap(env = "PGX_PGCLI", long)]

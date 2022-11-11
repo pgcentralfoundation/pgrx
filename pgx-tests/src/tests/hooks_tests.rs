@@ -91,12 +91,27 @@ mod tests {
                 self.events += 1;
                 prev_hook(parse, query_string, cursor_options, bound_params)
             }
+
+            fn post_parse_analyze(
+                &mut self,
+                parse_state: PgBox<pg_sys::ParseState>,
+                query: PgBox<pg_sys::Query>,
+                jumble_state: Option<PgBox<JumbleState>>,
+                prev_hook: fn(
+                    parse_state: PgBox<pg_sys::ParseState>,
+                    query: PgBox<pg_sys::Query>,
+                    jumble_state: Option<PgBox<JumbleState>>,
+                ) -> HookResult<()>,
+            ) -> HookResult<()> {
+                self.events += 1;
+                prev_hook(parse_state, query, jumble_state)
+            }
         }
 
         static mut HOOK: TestHook = TestHook { events: 0 };
         pgx::hooks::register_hook(&mut HOOK);
         Spi::run("SELECT 1");
-        assert_eq!(6, HOOK.events);
+        assert_eq!(7, HOOK.events);
 
         // TODO:  it'd be nice to also test that .commit() and .abort() also get called
         //    but I don't see how to do that since we're running *inside* a transaction here

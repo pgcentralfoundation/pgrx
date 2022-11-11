@@ -30,7 +30,7 @@ impl PgGuardRewriter {
         let mut stream = proc_macro2::TokenStream::new();
 
         for item in block.items.into_iter() {
-            stream.extend(self.foreign_item(item));
+            stream.extend(self.foreign_item(item, &block.abi));
         }
 
         stream
@@ -45,10 +45,12 @@ impl PgGuardRewriter {
         let input_func_name = func.sig.ident.to_string();
         let sig = func.sig.clone();
         let vis = func.vis.clone();
+        let attrs = func.attrs.clone();
 
         // but for the inner function (the one we're wrapping) we don't need any kind of
         // abi classification
         func.sig.abi = None;
+        func.attrs.clear();
 
         // nor do we need a visibility beyond "private"
         func.vis = Visibility::Inherited;
@@ -59,8 +61,10 @@ impl PgGuardRewriter {
         let arg_list = PgGuardRewriter::build_arg_list(&sig, false)?;
         let func_name = PgGuardRewriter::build_func_name(&func.sig);
 
-        let prolog = if input_func_name == "__pgx_private_shmem_hook" {
-            // we do not want "no_mangle" on this function
+        let prolog = if input_func_name == "__pgx_private_shmem_hook"
+            || input_func_name == "__pgx_private_shmem_request_hook"
+        {
+            // we do not want "no_mangle" on these functions
             quote! {}
         } else if input_func_name == "_PG_init" || input_func_name == "_PG_fini" {
             quote! {
@@ -68,36 +72,46 @@ impl PgGuardRewriter {
                 #[no_mangle]
             }
         } else {
-            quote! {
-                #[no_mangle]
-            }
+            quote! {}
         };
 
         Ok(quote_spanned! {func.span()=>
             #prolog
-            #[doc(hidden)]
+            #(#attrs)*
             #vis #sig {
                 #[allow(non_snake_case)]
                 #func
-                pg_sys::guard::guard( #[allow(unused_unsafe)] || unsafe { #func_name(#arg_list) } )
+
+                #[allow(unused_unsafe)]
+                unsafe {
+                    pg_sys::panic::pgx_extern_c_guard( || #func_name(#arg_list) )
+                }
             }
         })
     }
 
-    pub fn foreign_item(&self, item: ForeignItem) -> eyre::Result<proc_macro2::TokenStream> {
+    pub fn foreign_item(
+        &self,
+        item: ForeignItem,
+        abi: &syn::Abi,
+    ) -> eyre::Result<proc_macro2::TokenStream> {
         match item {
             ForeignItem::Fn(func) => {
                 if func.sig.variadic.is_some() {
-                    return Ok(quote! { extern "C" { #func } });
+                    return Ok(quote! { #abi { #func } });
                 }
 
-                self.foreign_item_fn(&func)
+                self.foreign_item_fn(&func, abi)
             }
-            _ => Ok(quote! { extern "C" { #item } }),
+            _ => Ok(quote! { #abi { #item } }),
         }
     }
 
-    pub fn foreign_item_fn(&self, func: &ForeignItemFn) -> eyre::Result<proc_macro2::TokenStream> {
+    pub fn foreign_item_fn(
+        &self,
+        func: &ForeignItemFn,
+        abi: &syn::Abi,
+    ) -> eyre::Result<proc_macro2::TokenStream> {
         let func_name = PgGuardRewriter::build_func_name(&func.sig);
         let arg_list = PgGuardRewriter::rename_arg_list(&func.sig)?;
         let arg_list_with_types = PgGuardRewriter::rename_arg_list_with_types(&func.sig)?;
@@ -105,10 +119,8 @@ impl PgGuardRewriter {
 
         Ok(quote! {
             pub unsafe fn #func_name ( #arg_list_with_types ) #return_type {
-                crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
-                    extern "C" {
-                        fn #func_name( #arg_list_with_types ) #return_type ;
-                    }
+                crate::ffi::pg_guard_ffi_boundary(move || {
+                    #abi { #func }
                     #func_name(#arg_list)
                 })
             }
