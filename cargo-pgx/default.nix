@@ -2,7 +2,6 @@
 , naersk
 , hostPlatform
 , fetchFromGitHub
-, postgresql_10
 , postgresql_11
 , postgresql_12
 , postgresql_13
