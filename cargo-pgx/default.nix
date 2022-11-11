@@ -1,13 +1,8 @@
 { lib
 , naersk
 , hostPlatform
-, fetchFromGitHub
-, postgresql_11
-, postgresql_12
-, postgresql_13
 , pkg-config
 , openssl
-, rustfmt
 , libiconv
 , llvmPackages
 , gitignoreSource
