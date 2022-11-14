@@ -118,6 +118,7 @@ impl PgGuardRewriter {
         let return_type = PgGuardRewriter::get_return_type(&func.sig);
 
         Ok(quote! {
+            #[track_caller]
             pub unsafe fn #func_name ( #arg_list_with_types ) #return_type {
                 crate::ffi::pg_guard_ffi_boundary(move || {
                     #abi { #func }
