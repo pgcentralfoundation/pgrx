@@ -54,7 +54,7 @@ impl<'a, R, F: FnOnce() -> R + UnwindSafe> PgTryBuilder<'a, R, F> {
     /// Add a catch handler to run should a specific error occur during execution.
     ///
     /// The argument to the catch handler closure is a [`CaughtError`] which can be
-    /// rethrown via [`CatchError::rethrow()`]
+    /// rethrown via [`CaughtError::rethrow()`]
     ///
     /// The return value must be of the same type as the main execution block, or the supplied
     /// error cause must be rethrown.
@@ -78,7 +78,7 @@ impl<'a, R, F: FnOnce() -> R + UnwindSafe> PgTryBuilder<'a, R, F> {
     /// [PgTryBuilder::catch_when].
     ///
     /// The argument to the catch handler closure is a [`CaughtError`] which can be
-    /// rethrown via [`CatchError::rethrow()`].
+    /// rethrown via [`CaughtError::rethrow()`].
     ///
     /// The return value must be of the same type as the main execution block, or the supplied
     /// error cause must be rethrown.

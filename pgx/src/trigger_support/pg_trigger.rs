@@ -6,7 +6,7 @@ use crate::trigger_support::{
     called_as_trigger, PgTriggerError, PgTriggerLevel, PgTriggerOperation, PgTriggerSafe,
     PgTriggerWhen, TriggerEvent, TriggerTuple,
 };
-use core::ffi::c_char;
+use cstr_core::c_char;
 use std::borrow::Borrow;
 
 /**
@@ -96,7 +96,7 @@ impl PgTrigger {
         // containing a known good `TriggerData` which also contains a known good `Trigger`... and the user aggreed to
         // our `unsafe` constructor safety rules, we choose to trust this is indeed a valid pointer offered to us by
         // PostgreSQL, and that it trusts it.
-        let name_cstr = unsafe { core::ffi::CStr::from_ptr(name_ptr) };
+        let name_cstr = unsafe { cstr_core::CStr::from_ptr(name_ptr) };
         let name_str = name_cstr.to_str()?;
         Ok(name_str)
     }
@@ -136,7 +136,7 @@ impl PgTrigger {
             // containing a known good `TriggerData` which also contains a known good `Trigger`... and the user aggreed to
             // our `unsafe` constructor safety rules, we choose to trust this is indeed a valid pointer offered to us by
             // PostgreSQL, and that it trusts it.
-            let table_name_cstr = unsafe { core::ffi::CStr::from_ptr(tgoldtable) };
+            let table_name_cstr = unsafe { cstr_core::CStr::from_ptr(tgoldtable) };
             let table_name_str = table_name_cstr.to_str()?;
             Ok(Some(table_name_str))
         } else {
@@ -152,7 +152,7 @@ impl PgTrigger {
             // containing a known good `TriggerData` which also contains a known good `Trigger`... and the user aggreed to
             // our `unsafe` constructor safety rules, we choose to trust this is indeed a valid pointer offered to us by
             // PostgreSQL, and that it trusts it.
-            let table_name_cstr = unsafe { core::ffi::CStr::from_ptr(tgnewtable) };
+            let table_name_cstr = unsafe { cstr_core::CStr::from_ptr(tgnewtable) };
             let table_name_str = table_name_cstr.to_str()?;
             Ok(Some(table_name_str))
         } else {
@@ -222,7 +222,7 @@ impl PgTrigger {
                 // containing a known good `TriggerData` which also contains a known good `Trigger`... and the user aggreed to
                 // our `unsafe` constructor safety rules, we choose to trust this is indeed a valid pointer offered to us by
                 // PostgreSQL, and that it trusts it.
-                unsafe { core::ffi::CStr::from_ptr(*v) }.to_str().map(ToString::to_string)
+                unsafe { cstr_core::CStr::from_ptr(*v) }.to_str().map(ToString::to_string)
             })
             .collect::<Result<_, core::str::Utf8Error>>()?;
         Ok(args)

@@ -12,6 +12,7 @@ use eyre::{eyre, WrapErr};
 use pgx_pg_config::{prefix_path, PgConfig, PgConfigSelector, Pgx, SUPPORTED_MAJOR_VERSIONS};
 use pgx_utils::rewriter::PgGuardRewriter;
 use quote::{quote, ToTokens};
+use rayon::prelude::*;
 use std::collections::{HashMap, HashSet};
 use std::path::PathBuf;
 use std::process::{Command, Output};
@@ -155,24 +156,12 @@ fn main() -> eyre::Result<()> {
         let specific = pgx.get(&found)?;
         vec![specific]
     };
-    std::thread::scope(|scope| {
-        // This is pretty much either always 1 (normally) or 5 (for releases),
-        // but in the future if we ever have way more, we should consider
-        // chunking `pg_configs` based on `thread::available_parallelism()`.
-        let threads = pg_configs
-            .iter()
-            .map(|pg_config| {
-                scope.spawn(|| generate_bindings(pg_config, &build_paths, is_for_release))
-            })
-            .collect::<Vec<_>>();
-        // Most of the rest of this is just for better error handling --
-        // `thread::scope` already joins the threads for us before it returns.
-        let results = threads
-            .into_iter()
-            .map(|thread| thread.join().expect("thread panicked while generating bindings"))
-            .collect::<Vec<eyre::Result<_>>>();
-        results.into_iter().try_for_each(|r| r)
-    })?;
+
+    pg_configs
+        .par_iter()
+        .map(|pg_config| generate_bindings(pg_config, &build_paths, is_for_release))
+        .collect::<eyre::Result<Vec<_>>>()?;
+
     // compile the cshim for each binding
     for pg_config in pg_configs {
         build_shim(&build_paths.shim_src, &build_paths.shim_dst, &pg_config)?;
