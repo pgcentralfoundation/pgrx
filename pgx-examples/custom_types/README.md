@@ -1,12 +1,33 @@
 ## Custom Types Using `#[derive(PostgresType)]`
 
-`pgx` is capable of using Rust structs as Postgres data types.  There are two forms.  Rust types
+`pgx` is capable of using Rust structs and enums as Postgres data types.  There are two forms.  Rust types
 that implement `serde::Serialize` and `serde::Deserialize` are represented as [CBOR](https://crates.io/crates/serde_cbor)
 on-disk and as JSON for its text representation.
 
 Rust types that instead can `#[derive(Copy, Clone)]` are represented as a bitwise version of that 
 type as a Postgres [`varlena`](https://github.com/postgres/postgres/blob/7559d8ebfa11d98728e816f6b655582ce41150f3/src/include/c.h#L542-L562)
 with either a short (1-byte) or a full (4-byte) header, depending on the size_of() the Rust struct.  Such a type's text representation must be implemented manually.
+
+It is also important to note that `PostgresType` can be derived for Rust enums as well if
+those enums are not supposed to be
+Postgres [enumerated types](https://www.postgresql.org/docs/current/datatype-enum.html),
+in which case, `PostgresEnum` should be used instead.
+
+## Custom Types Using `#[derive(PostgresEnum)]`
+
+Rust enums can also be used to declare Postgres [enumerated types](https://www.postgresql.org/docs/current/datatype-enum.html).
+These enums' variants must have no associated values.
+
+```rust
+#[derive(PostgresEnum, Serialize)]
+pub enum SomeValue {
+    One,
+    Two,
+    Three,
+    Four,
+    Five,
+}
+```
 
 ## serde-compatible Types
 
