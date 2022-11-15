@@ -814,6 +814,11 @@ fn run_command(mut command: &mut Command, version: &str) -> eyre::Result<Output>
     Ok(rc)
 }
 
+fn should_rewrite(func: &syn::ForeignItemFn) -> bool {
+    const NO_ERROR_SHIM: &[&str] = &["SetLatch"];
+    !NO_ERROR_SHIM.contains(&&*func.sig.ident.to_string())
+}
+
 fn apply_pg_guard(items: &Vec<syn::Item>) -> eyre::Result<proc_macro2::TokenStream> {
     let mut out = proc_macro2::TokenStream::new();
     for item in items {
@@ -822,7 +827,7 @@ fn apply_pg_guard(items: &Vec<syn::Item>) -> eyre::Result<proc_macro2::TokenStre
                 let abi = &block.abi;
                 for item in &block.items {
                     match item {
-                        ForeignItem::Fn(func) => {
+                        ForeignItem::Fn(func) if should_rewrite(func) => {
                             // Ignore other functions -- this will often be
                             // variadic functions that we can't safely wrap.
                             if let Ok(tokens) = PgGuardRewriter::new().foreign_item_fn(func, abi) {
