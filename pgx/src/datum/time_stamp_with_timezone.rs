@@ -20,12 +20,12 @@ pub(crate) const USECS_PER_SEC: i64 = 1_000_000;
 #[cfg(feature = "time-crate")]
 mod with_time_crate {
     use super::*;
-    use time::macros::date;
     use std::ops::Sub;
+    use time::macros::date;
 
     const PG_EPOCH_OFFSET: time::OffsetDateTime = date!(2000 - 01 - 01).midnight().assume_utc();
     const PG_EPOCH_DATETIME: time::PrimitiveDateTime = date!(2000 - 01 - 01).midnight();
-    
+
     impl TryFrom<time::OffsetDateTime> for TimestampWithTimeZone {
         type Error = FromTimeError;
         fn try_from(offset: time::OffsetDateTime) -> Result<Self, Self::Error> {
@@ -33,7 +33,7 @@ mod with_time_crate {
             usecs.try_into()
         }
     }
-    
+
     impl TryFrom<TimestampWithTimeZone> for time::PrimitiveDateTime {
         type Error = FromTimeError;
         fn try_from(tstz: TimestampWithTimeZone) -> Result<Self, Self::Error> {
@@ -52,16 +52,16 @@ mod with_time_crate {
             }
         }
     }
-    
+
     impl TryFrom<time::PrimitiveDateTime> for TimestampWithTimeZone {
         type Error = FromTimeError;
-    
+
         fn try_from(datetime: time::PrimitiveDateTime) -> Result<Self, Self::Error> {
             let offset = datetime.assume_utc();
             offset.try_into()
         }
     }
-    
+
     impl TryFrom<TimestampWithTimeZone> for time::OffsetDateTime {
         type Error = FromTimeError;
         fn try_from(tstz: TimestampWithTimeZone) -> Result<Self, Self::Error> {
@@ -69,7 +69,6 @@ mod with_time_crate {
             Ok(datetime.assume_utc())
         }
     }
-    
 }
 
 impl TryFrom<pg_sys::Datum> for TimestampWithTimeZone {
@@ -121,7 +120,6 @@ impl TryFrom<pg_sys::TimestampTz> for TimestampWithTimeZone {
         }
     }
 }
-
 
 impl IntoDatum for TimestampWithTimeZone {
     fn into_datum(self) -> Option<pg_sys::Datum> {
