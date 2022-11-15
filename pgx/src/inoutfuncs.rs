@@ -21,7 +21,7 @@ pub trait PgVarlenaInOutFuncs {
     /// Given a string representation of `Self`, parse it into a `PgVarlena<Self>`.
     ///
     /// It is expected that malformed input will raise an `error!()` or `panic!()`
-    fn input(input: &core::ffi::CStr) -> PgVarlena<Self>
+    fn input(input: &crate::cstr_core::CStr) -> PgVarlena<Self>
     where
         Self: Copy + Sized;
 
@@ -39,7 +39,7 @@ pub trait InOutFuncs {
     /// Given a string representation of `Self`, parse it into `Self`.
     ///
     /// It is expected that malformed input will raise an `error!()` or `panic!()`
-    fn input(input: &core::ffi::CStr) -> Self
+    fn input(input: &crate::cstr_core::CStr) -> Self
     where
         Self: Sized;
 
@@ -55,7 +55,7 @@ pub trait InOutFuncs {
 /// **not** also have the `#[inoutfuncs]` attribute macro
 pub trait JsonInOutFuncs<'de>: serde::de::Deserialize<'de> + serde::ser::Serialize {
     /// Uses `serde_json` to deserialize the input, which is assumed to be JSON
-    fn input(input: &'de core::ffi::CStr) -> Self {
+    fn input(input: &'de crate::cstr_core::CStr) -> Self {
         serde_json::from_str(input.to_str().expect("text input is not valid UTF8"))
             .expect("failed to deserialize json")
     }

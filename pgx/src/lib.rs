@@ -116,11 +116,7 @@ pub use pg_sys::{
 };
 pub use pgx_utils as utils;
 
-#[deprecated = "Please use the types in `{core,alloc,std}::ffi` instead"]
-pub mod cstr_core {
-    pub use alloc::ffi::{CString, FromVecWithNulError, NulError};
-    pub use core::ffi::{c_char, CStr, FromBytesWithNulError};
-}
+pub use cstr_core;
 
 use once_cell::sync::Lazy;
 use pgx_utils::sql_entity_graph::RustSourceOnlySqlMapping;

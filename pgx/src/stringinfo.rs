@@ -26,13 +26,27 @@ impl From<StringInfo> for pg_sys::StringInfo {
     }
 }
 
-impl From<StringInfo> for &'static core::ffi::CStr {
+impl From<StringInfo> for &'static std::ffi::CStr {
     fn from(val: StringInfo) -> Self {
         let len = val.len();
         let ptr = val.into_char_ptr();
 
         unsafe {
-            core::ffi::CStr::from_bytes_with_nul_unchecked(std::slice::from_raw_parts(
+            std::ffi::CStr::from_bytes_with_nul_unchecked(std::slice::from_raw_parts(
+                ptr as *const u8,
+                (len + 1) as usize, // +1 to get the trailing null byte
+            ))
+        }
+    }
+}
+
+impl From<StringInfo> for &'static crate::cstr_core::CStr {
+    fn from(val: StringInfo) -> Self {
+        let len = val.len();
+        let ptr = val.into_char_ptr();
+
+        unsafe {
+            crate::cstr_core::CStr::from_bytes_with_nul_unchecked(std::slice::from_raw_parts(
                 ptr as *const u8,
                 (len + 1) as usize, // +1 to get the trailing null byte
             ))
