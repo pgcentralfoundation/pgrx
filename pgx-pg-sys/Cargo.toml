@@ -42,6 +42,7 @@ pgx-pg-config= { path = "../pgx-pg-config/", version = "=0.6.0-alpha.0" }
 pgx-utils = { path = "../pgx-utils/", version = "=0.6.0-alpha.0" }
 proc-macro2 = "1.0.47"
 quote = "1.0.21"
+rayon = "1.5.3"
 syn = { version = "1.0.103", features = [ "extra-traits", "full", "fold", "parsing" ] }
 eyre = "0.6.8"
 shlex = "1.1.0" # shell lexing, also used by many of our deps
