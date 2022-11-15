@@ -133,7 +133,7 @@ fn fcinfo_not_named_no_arg(fcinfo: pg_sys::FunctionCallInfo) -> i32 {
 pub struct NullStrict {}
 
 impl InOutFuncs for NullStrict {
-    fn input(_input: &core::ffi::CStr) -> Self
+    fn input(_input: &pgx::cstr_core::CStr) -> Self
     where
         Self: Sized,
     {
@@ -149,7 +149,7 @@ impl InOutFuncs for NullStrict {
 pub struct NullError {}
 
 impl InOutFuncs for NullError {
-    fn input(_input: &core::ffi::CStr) -> Self
+    fn input(_input: &pgx::cstr_core::CStr) -> Self
     where
         Self: Sized,
     {

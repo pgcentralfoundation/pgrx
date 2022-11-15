@@ -322,7 +322,7 @@ unsafe impl SqlTranslatable for f64 {
     }
 }
 
-unsafe impl SqlTranslatable for &'static core::ffi::CStr {
+unsafe impl SqlTranslatable for std::ffi::CStr {
     fn argument_sql() -> Result<SqlMapping, ArgumentError> {
         Ok(SqlMapping::literal("cstring"))
     }
@@ -331,7 +331,25 @@ unsafe impl SqlTranslatable for &'static core::ffi::CStr {
     }
 }
 
-unsafe impl SqlTranslatable for core::ffi::CStr {
+unsafe impl SqlTranslatable for &'static std::ffi::CStr {
+    fn argument_sql() -> Result<SqlMapping, ArgumentError> {
+        Ok(SqlMapping::literal("cstring"))
+    }
+    fn return_sql() -> Result<Returns, ReturnsError> {
+        Ok(Returns::One(SqlMapping::literal("cstring")))
+    }
+}
+
+unsafe impl SqlTranslatable for &'static cstr_core::CStr {
+    fn argument_sql() -> Result<SqlMapping, ArgumentError> {
+        Ok(SqlMapping::literal("cstring"))
+    }
+    fn return_sql() -> Result<Returns, ReturnsError> {
+        Ok(Returns::One(SqlMapping::literal("cstring")))
+    }
+}
+
+unsafe impl SqlTranslatable for cstr_core::CStr {
     fn argument_sql() -> Result<SqlMapping, ArgumentError> {
         Ok(SqlMapping::literal("cstring"))
     }

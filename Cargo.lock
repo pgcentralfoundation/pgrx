@@ -631,6 +631,22 @@ dependencies = [
 ]
 
 [[package]]
+name = "cstr_core"
+version = "0.2.6"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "dd98742e4fdca832d40cab219dc2e3048de17d873248f83f17df47c1bea70956"
+dependencies = [
+ "cty",
+ "memchr",
+]
+
+[[package]]
+name = "cty"
+version = "0.2.2"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "b365fabc795046672053e29c954733ec3b05e4be654ab130fe8f1f94d7051f35"
+
+[[package]]
 name = "custom_sql"
 version = "0.0.0"
 dependencies = [
@@ -1426,6 +1442,7 @@ dependencies = [
  "atomic-traits",
  "bitflags",
  "bitvec",
+ "cstr_core",
  "eyre",
  "heapless",
  "libc",
@@ -1486,6 +1503,7 @@ dependencies = [
  "pgx-utils",
  "proc-macro2",
  "quote",
+ "rayon",
  "shlex",
  "sptr",
  "syn",
@@ -1518,6 +1536,7 @@ version = "0.6.0-alpha.0"
 dependencies = [
  "atty",
  "convert_case",
+ "cstr_core",
  "eyre",
  "owo-colors",
  "petgraph",

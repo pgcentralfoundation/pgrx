@@ -307,7 +307,18 @@ impl IntoDatum for char {
 /// ## Safety
 ///
 /// The `&CStr` better be allocated by Postgres
-impl<'a> IntoDatum for &'a core::ffi::CStr {
+impl<'a> IntoDatum for &'a std::ffi::CStr {
+    #[inline]
+    fn into_datum(self) -> Option<pg_sys::Datum> {
+        Some(self.as_ptr().into())
+    }
+
+    fn type_oid() -> u32 {
+        pg_sys::CSTRINGOID
+    }
+}
+
+impl<'a> IntoDatum for &'a crate::cstr_core::CStr {
     #[inline]
     fn into_datum(self) -> Option<pg_sys::Datum> {
         Some(self.as_ptr().into())
