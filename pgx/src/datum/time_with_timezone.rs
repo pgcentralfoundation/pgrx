@@ -67,6 +67,7 @@ impl TimeWithTimeZone {
         note = "the repr of pgx::TimeWithTimeZone is no longer time::Time \
     and this fn will be removed in a future version"
     )]
+    #[cfg(feature = "time-crate")]
     pub fn new(time: time::Time, at_tz_offset: time::UtcOffset) -> Self {
         let (h, m, s, micro) = time.as_hms_micro();
         let t = Time::from_hms_micro(h, m, s, micro).unwrap();

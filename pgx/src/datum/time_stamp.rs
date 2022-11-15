@@ -31,18 +31,6 @@ impl Timestamp {
     pub fn is_neg_infinity(&self) -> bool {
         self == &Self::NEG_INFINITY
     }
-
-    #[inline]
-    #[deprecated(
-        since = "0.5.0",
-        note = "the repr of pgx::Timestamp is no longer time::PrimitiveDateTime \
-    and this fn will be removed in a future version"
-    )]
-    pub fn new(timestamp: time::PrimitiveDateTime) -> Self {
-        let tstz = TryInto::<TimestampWithTimeZone>::try_into(timestamp)
-            .expect("unable to convert time::PrimitiveDateTime to pgx::TimestampWithTimeZone");
-        tstz.into()
-    }
 }
 
 impl From<TimestampWithTimeZone> for Timestamp {

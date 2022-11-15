@@ -54,16 +54,6 @@ impl IntoDatum for Time {
 impl Time {
     pub const ALLBALLS: Self = Time(0);
 
-    #[deprecated(
-        since = "0.5",
-        note = "the repr of pgx::Time is no longer time::Time \
-    and this fn will be removed in a future version"
-    )]
-    pub fn new(time: time::Time) -> Self {
-        let (h, m, s, micro) = time.as_hms_micro();
-        Self::from_hms_micro(h, m, s, micro).unwrap()
-    }
-
     pub fn from_hms_micro(h: u8, m: u8, s: u8, micro: u32) -> Result<Time, FromTimeError> {
         match (h, m, s, micro) {
             (24, 0, 0, 0) => Ok(Time(u64::from(h) * USECS_PER_HOUR)),

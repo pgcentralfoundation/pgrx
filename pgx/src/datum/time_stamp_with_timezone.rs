@@ -16,7 +16,6 @@ use std::convert::TryFrom;
 use std::ffi::CStr;
 use std::ops::Sub;
 use time::macros::date;
-use time::UtcOffset;
 
 pub(crate) const USECS_PER_SEC: i64 = 1_000_000;
 
@@ -43,23 +42,6 @@ impl TimestampWithTimeZone {
     #[inline]
     pub fn is_neg_infinity(&self) -> bool {
         self == &Self::NEG_INFINITY
-    }
-
-    #[inline]
-    #[deprecated(
-        since = "0.5.0",
-        note = "the repr of pgx::TimestampWithTimeZone is no longer time::OffsetDateTime \
-    and this fn will be removed in a future version"
-    )]
-    pub fn new(time: time::PrimitiveDateTime, at_tz_offset: UtcOffset) -> Self {
-        let offset = time.assume_utc()
-                        .to_offset(
-                            UtcOffset::from_whole_seconds(-at_tz_offset.whole_seconds())
-                                .expect("Unexpected error in `UtcOffset::from_whole_seconds` during `TimestampWithTimeZone::new`")
-                        );
-        offset
-            .try_into()
-            .expect("unable to convert time::PrimitiveDateTime to pgx::TimestampWithTimeZone")
     }
 }
 

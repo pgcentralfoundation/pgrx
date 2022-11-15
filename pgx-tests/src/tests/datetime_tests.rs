@@ -181,7 +181,7 @@ mod tests {
     #[pg_test]
     #[allow(deprecated)]
     fn test_time_serialization() {
-        let time = Time::new(time::Time::from_hms(0, 0, 0).unwrap());
+        let time = Time::ALLBALLS;
         let json = json!({ "time test": time });
 
         assert_eq!(json!({"time test":"00:00:00"}), json);

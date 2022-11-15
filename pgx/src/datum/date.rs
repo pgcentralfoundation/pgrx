@@ -59,17 +59,6 @@ impl Date {
     pub const INFINITY: Self = Date(i32::MAX);
 
     #[inline]
-    #[deprecated(
-        since = "0.5.0",
-        note = "the repr of pgx::Date is no longer time::Date and this fn will be broken in a future version\n\
-    please use pgx's `time-crate` feature to opt-in to `From<time::Date> for pgx::Date`"
-    )]
-    pub fn new(date: time::Date) -> Date {
-        // TODO(0.6.0): remove this
-        timecrate_date_to_pg_date(date)
-    }
-
-    #[inline]
     pub fn from_pg_epoch_days(pg_epoch_days: i32) -> Date {
         Date(pg_epoch_days)
     }
