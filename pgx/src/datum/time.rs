@@ -11,6 +11,7 @@ use crate::{pg_sys, FromDatum, FromTimeError, IntoDatum};
 use pgx_utils::sql_entity_graph::metadata::{
     ArgumentError, Returns, ReturnsError, SqlMapping, SqlTranslatable,
 };
+#[cfg(feature = "time-crate")]
 use time::format_description::FormatItem;
 
 const MINS_PER_HOUR: u64 = 60;
@@ -95,14 +96,16 @@ impl Time {
 }
 
 #[cfg(feature = "time-crate")]
-impl TryFrom<time::Time> for Time {
-    type Error = FromTimeError;
-    fn try_from(t: time::Time) -> Result<Time, Self::Error> {
-        let (h, m, s, micro) = t.as_hms_micro();
-        Self::from_hms_micro(h, m, s, micro)
+mod with_time_crate {
+    impl TryFrom<time::Time> for crate::Time {
+        type Error = crate::FromTimeError;
+        fn try_from(t: time::Time) -> Result<crate::Time, Self::Error> {
+            let (h, m, s, micro) = t.as_hms_micro();
+            Self::from_hms_micro(h, m, s, micro)
+        }
     }
 }
-
+#[cfg(feature = "time-crate")]
 impl serde::Serialize for Time {
     fn serialize<S>(
         &self,
@@ -135,7 +138,7 @@ impl serde::Serialize for Time {
         }
     }
 }
-
+#[cfg(feature = "time-crate")]
 static DEFAULT_TIME_FORMAT: &[FormatItem<'static>] =
     time::macros::format_description!("[hour]:[minute]:[second]");
 

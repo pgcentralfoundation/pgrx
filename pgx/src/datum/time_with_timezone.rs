@@ -12,6 +12,7 @@ use crate::{pg_sys, FromDatum, IntoDatum, PgBox};
 use pgx_utils::sql_entity_graph::metadata::{
     ArgumentError, Returns, ReturnsError, SqlMapping, SqlTranslatable,
 };
+#[cfg(feature = "time-crate")]
 use time::format_description::FormatItem;
 
 #[derive(Debug, Clone)]
@@ -91,6 +92,7 @@ impl From<Time> for TimeWithTimeZone {
     }
 }
 
+#[cfg(feature = "time-crate")]
 impl serde::Serialize for TimeWithTimeZone {
     fn serialize<S>(
         &self,
@@ -136,6 +138,7 @@ impl serde::Serialize for TimeWithTimeZone {
     }
 }
 
+#[cfg(feature = "time-crate")]
 static DEFAULT_TIMESTAMP_WITH_TIMEZONE_FORMAT: &[FormatItem<'static>] =
     time::macros::format_description!("[hour]:[minute]:[second]-00");
 

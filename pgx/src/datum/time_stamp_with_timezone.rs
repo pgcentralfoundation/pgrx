@@ -14,13 +14,70 @@ use pgx_utils::sql_entity_graph::metadata::{
 use serde::Deserialize;
 use std::convert::TryFrom;
 use std::ffi::CStr;
-use std::ops::Sub;
-use time::macros::date;
 
 pub(crate) const USECS_PER_SEC: i64 = 1_000_000;
 
-const PG_EPOCH_OFFSET: time::OffsetDateTime = date!(2000 - 01 - 01).midnight().assume_utc();
-const PG_EPOCH_DATETIME: time::PrimitiveDateTime = date!(2000 - 01 - 01).midnight();
+#[cfg(feature = "time-crate")]
+mod with_time_crate {
+    use super::*;
+    use time::macros::date;
+    use std::ops::Sub;
+
+    const PG_EPOCH_OFFSET: time::OffsetDateTime = date!(2000 - 01 - 01).midnight().assume_utc();
+    const PG_EPOCH_DATETIME: time::PrimitiveDateTime = date!(2000 - 01 - 01).midnight();
+    
+    impl TryFrom<time::OffsetDateTime> for TimestampWithTimeZone {
+        type Error = FromTimeError;
+        fn try_from(offset: time::OffsetDateTime) -> Result<Self, Self::Error> {
+            let usecs = offset.sub(PG_EPOCH_OFFSET).whole_microseconds() as i64;
+            usecs.try_into()
+        }
+    }
+    
+    impl TryFrom<TimestampWithTimeZone> for time::PrimitiveDateTime {
+        type Error = FromTimeError;
+        fn try_from(tstz: TimestampWithTimeZone) -> Result<Self, Self::Error> {
+            match tstz {
+                TimestampWithTimeZone::NEG_INFINITY => Err(FromTimeError::NegInfinity),
+                TimestampWithTimeZone::INFINITY => Err(FromTimeError::Infinity),
+                _ => {
+                    let sec = tstz.0 / USECS_PER_SEC;
+                    let usec = tstz.0 - (sec * USECS_PER_SEC);
+                    let duration = time::Duration::new(sec, (usec as i32) * 1000);
+                    match PG_EPOCH_DATETIME.checked_add(duration) {
+                        Some(datetime) => Ok(datetime),
+                        None => Err(FromTimeError::TimeCrate),
+                    }
+                }
+            }
+        }
+    }
+    
+    impl TryFrom<time::PrimitiveDateTime> for TimestampWithTimeZone {
+        type Error = FromTimeError;
+    
+        fn try_from(datetime: time::PrimitiveDateTime) -> Result<Self, Self::Error> {
+            let offset = datetime.assume_utc();
+            offset.try_into()
+        }
+    }
+    
+    impl TryFrom<TimestampWithTimeZone> for time::OffsetDateTime {
+        type Error = FromTimeError;
+        fn try_from(tstz: TimestampWithTimeZone) -> Result<Self, Self::Error> {
+            let datetime: time::PrimitiveDateTime = tstz.try_into()?;
+            Ok(datetime.assume_utc())
+        }
+    }
+    
+}
+
+impl TryFrom<pg_sys::Datum> for TimestampWithTimeZone {
+    type Error = FromTimeError;
+    fn try_from(datum: pg_sys::Datum) -> Result<Self, Self::Error> {
+        (datum.value() as pg_sys::TimestampTz).try_into()
+    }
+}
 
 // taken from /include/datatype/timestamp.h
 const MIN_TIMESTAMP_USEC: i64 = -211_813_488_000_000_000;
@@ -65,56 +122,6 @@ impl TryFrom<pg_sys::TimestampTz> for TimestampWithTimeZone {
     }
 }
 
-impl TryFrom<pg_sys::Datum> for TimestampWithTimeZone {
-    type Error = FromTimeError;
-    fn try_from(datum: pg_sys::Datum) -> Result<Self, Self::Error> {
-        (datum.value() as pg_sys::TimestampTz).try_into()
-    }
-}
-
-impl TryFrom<time::OffsetDateTime> for TimestampWithTimeZone {
-    type Error = FromTimeError;
-    fn try_from(offset: time::OffsetDateTime) -> Result<Self, Self::Error> {
-        let usecs = offset.sub(PG_EPOCH_OFFSET).whole_microseconds() as i64;
-        usecs.try_into()
-    }
-}
-
-impl TryFrom<TimestampWithTimeZone> for time::PrimitiveDateTime {
-    type Error = FromTimeError;
-    fn try_from(tstz: TimestampWithTimeZone) -> Result<Self, Self::Error> {
-        match tstz {
-            TimestampWithTimeZone::NEG_INFINITY => Err(FromTimeError::NegInfinity),
-            TimestampWithTimeZone::INFINITY => Err(FromTimeError::Infinity),
-            _ => {
-                let sec = tstz.0 / USECS_PER_SEC;
-                let usec = tstz.0 - (sec * USECS_PER_SEC);
-                let duration = time::Duration::new(sec, (usec as i32) * 1000);
-                match PG_EPOCH_DATETIME.checked_add(duration) {
-                    Some(datetime) => Ok(datetime),
-                    None => Err(FromTimeError::TimeCrate),
-                }
-            }
-        }
-    }
-}
-
-impl TryFrom<time::PrimitiveDateTime> for TimestampWithTimeZone {
-    type Error = FromTimeError;
-
-    fn try_from(datetime: time::PrimitiveDateTime) -> Result<Self, Self::Error> {
-        let offset = datetime.assume_utc();
-        offset.try_into()
-    }
-}
-
-impl TryFrom<TimestampWithTimeZone> for time::OffsetDateTime {
-    type Error = FromTimeError;
-    fn try_from(tstz: TimestampWithTimeZone) -> Result<Self, Self::Error> {
-        let datetime: time::PrimitiveDateTime = tstz.try_into()?;
-        Ok(datetime.assume_utc())
-    }
-}
 
 impl IntoDatum for TimestampWithTimeZone {
     fn into_datum(self) -> Option<pg_sys::Datum> {
