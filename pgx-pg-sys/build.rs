@@ -440,7 +440,6 @@ fn impl_pg_node(
         let type_ = format_ident!("{}", node_type);
         node_traverse_body.extend(quote! {
             #nodetag => {
-                emit(format!("Calling specific traverse for item of type {}", stringify!(#type_)));
                 #type_::traverse(
                     &mut unsafe { std::ptr::read(self as *mut Node as *mut #type_) },
                     walker_fn,
@@ -505,15 +504,11 @@ fn impl_pg_node(
         quote! {
             impl pg_sys::PgNode for List {
                 fn traverse<T>(&mut self, walker_fn: fn(*mut Node, &mut T) -> (), context: &mut T) {
-                    emit(format!("Preparing to traverse a linked list of {} elements", self.length));
-
                     if self.length == 0 { return; }
                     let mut cell = unsafe { *self.head };
                     for _index in 0..self.length {
                         let item = unsafe { cell.data.ptr_value as *mut Node };
                         if !item.is_null() {
-                            emit(format!("Traversing list[{}]: {:?}", _index, item));
-
                             walker_fn(item, context);
                             Node::traverse::<T>( unsafe { &mut *(item as *mut Node) }, walker_fn, context);
                         }
@@ -521,7 +516,6 @@ fn impl_pg_node(
                             cell = unsafe { *cell.next };
                         }
                     }
-                    emit(format!("Done traversing a list of {} elements", self.length));
                 }
             }
             impl std::fmt::Display for List {
@@ -552,17 +546,13 @@ fn impl_pg_node(
         quote! {
             impl pg_sys::PgNode for List {
                 fn traverse<T>(&mut self, walker_fn: fn(*mut Node, &mut T) -> (), context: &mut T) {
-                    emit(format!("Preparing to traverse an arraylist of {} elements", self.length));
-
                     for index in 0..self.length {
                         let item = unsafe { (*self.elements.offset(index as isize)).ptr_value as *mut Node };
                         if !item.is_null() {
-                            emit(format!("Traversing list[{}]: {:?}", index, item));
                             walker_fn(item, context);
                             Node::traverse::<T>( unsafe { &mut *(item as *mut Node) }, walker_fn, context);
                         }
                     }
-                    emit(format!("Done traversing a list of {} elements", self.length));
                 }
             }
             impl std::fmt::Display for List {
@@ -586,16 +576,6 @@ fn impl_pg_node(
     };
 
     pgnode_impls.extend(quote! {
-        pub fn emit(string: std::string::String) {
-            // let mut file = ::std::fs::OpenOptions::new()
-            //     .write(true)
-            //     .append(true)
-            //     .open("/tmp/log")
-            //     .unwrap();
-            // ::std::writeln!(file, "{}", string).unwrap();
-            eprintln!("{}", string);
-        }
-
         unsafe fn list_length(list: *mut List) -> i32 {
             if list.is_null() {
                 0
@@ -932,11 +912,6 @@ fn impl_pg_node(
             _ => {}
         }
         let mut traverse_elements: Vec<proc_macro2::TokenStream> = Vec::new();
-        if struct_name != "A_Const" && struct_name != "Value" {
-            traverse_elements.push(quote!{
-                emit(format!("Preparing to process struct {} {:?} at {}", stringify!(#struct_name), self, &self));
-            });
-        }
 
         for field in node_struct.struct_.fields.iter() {
             let field_name = field.ident.as_ref().unwrap();
@@ -977,12 +952,8 @@ fn impl_pg_node(
                             ) {
                                 does_walking = true;
                                 traverse_elements.push(quote!{
-                                    emit(format!("Traversing array {}::{} with value {:?}",
-                                        stringify!(#struct_name), stringify!(#field_name), self.#field_name));
-                                    for (index, item) in self.#field_name.iter().enumerate() {
+                                    for item in self.#field_name.iter() {
                                         if !item.is_null() {
-                                            emit(format!("Traversing array:item {}::{}[{}] with value {:?}",
-                                                stringify!(#struct_name), stringify!(#field_name), index, item));
                                             walker_fn(item.clone() as *mut Node, context);
                                             Node::traverse::<T>( unsafe { &mut *(*item as *mut Node) }, walker_fn, context);
                                         }
@@ -1004,18 +975,9 @@ fn impl_pg_node(
                             &node_types,
                             &nodes,
                         ) {
-                            let debug_log = if field_name.to_string() == "extname" {
-                                quote! {}
-                            } else {
-                                quote! {
-                                    emit(format!("Traversing ptr:item {}::{} at {:?}",
-                                        stringify!(#struct_name), stringify!(#field_name), self.#field_name));
-                                }
-                            };
                             does_walking = true;
                             traverse_elements.push(quote!{
                                 if !self.#field_name.is_null() {
-                                    #debug_log
                                     walker_fn(self.#field_name as *mut Node, context);
                                     Node::traverse::<T>(unsafe { &mut *(self.#field_name as *mut Node) }, walker_fn, context);
                                 }
@@ -1036,12 +998,6 @@ fn impl_pg_node(
                     ) {
                         let type_ = &p.path;
                         does_walking = true;
-                        if struct_name != "A_Const" {
-                            traverse_elements.push(quote!{
-                                emit(format!("Traversing item {}::{} with value {:?}",
-                                    stringify!(#struct_name), stringify!(#field_name), self.#field_name));
-                            });
-                        }
                         traverse_elements.push(quote! {
                             walker_fn((&mut self.#field_name) as *mut #type_ as *mut Node, context);
                             // Explicitly don't look at _type here - for example, a Result has a concrete Plan as its
@@ -1063,7 +1019,6 @@ fn impl_pg_node(
             quote! {
                 impl pg_sys::PgNode for #struct_name {
                     fn traverse<T>(&mut self, _walker_fn: fn(*mut Node, &mut T) -> (), _context: &mut T) {
-                        emit(format!("Empty traverse function for {}", stringify!(#struct_name)));
                         #traversal
                     }
                 }
@@ -1072,9 +1027,7 @@ fn impl_pg_node(
             quote! {
                 impl pg_sys::PgNode for #struct_name {
                     fn traverse<T>(&mut self, walker_fn: fn(*mut Node, &mut T) -> (), context: &mut T) {
-                        emit(format!("Begin traverse function for {}", stringify!(#struct_name)));
                         #traversal
-                        emit(format!("Finish traverse function for {}", stringify!(#struct_name)));
                     }
                 }
             }
