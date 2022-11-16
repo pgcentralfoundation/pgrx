@@ -818,7 +818,7 @@ Although this may be relaxed in the future, currently schema generation involves
 `cargo-pgx`, using a command like the following
 
 ```shell script
-$ cargo install --locked cargo-pgx
+$ cargo install --force --locked cargo-pgx
 ```
 
 Possibly with a explicit `--version`, if needed.
