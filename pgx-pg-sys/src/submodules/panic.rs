@@ -354,10 +354,16 @@ fn do_ereport(ereport: ErrorReportWithLevel) {
         // from rust code.
         //
         // We just go ahead and allocate all the strings we need in the `ErrorContext` for convenience
+        //
+        // NB:  It's not necessary for pgx to add a CONTEXT message to the ereport as pgx doesn't
+        // (currently) have any more context than funcname/file:line:col info, which we already
+        // store in the LOCATION slot.  If in the future pgx learns how to build a backtrace (and
+        // it might be interesting for it to do that for level >=ERROR messages), the context slot
+        // is where that information should go.
         let old_cxt = MemoryContextSwitchTo(crate::ErrorContext);
         let level = ereport.level as _;
         let sqlerrcode = ereport.inner.sqlerrcode as _;
-        let contexts = ereport.context_message().as_pg_cstr();
+        let contexts = std::ptr::null_mut();
         let funcname = (&ereport.inner.location.funcname).as_pg_cstr();
         let file = ereport.inner.location.file.as_str().as_pg_cstr();
         let message = (&ereport.inner.message).as_pg_cstr();
