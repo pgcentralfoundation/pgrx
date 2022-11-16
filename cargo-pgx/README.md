@@ -55,6 +55,7 @@ SUBCOMMANDS:
 - `PGX_BUILD_FLAGS` - If set during `cargo pgx run/test/install`, these additional flags are passed to `cargo build` while building the extension
 - `PGX_BUILD_VERBOSE` - Set to true to enable verbose "build.rs" output -- useful for debugging build issues
 - `HTTPS_PROXY` - If set during `cargo pgx init`, it will download the Postgres sources using these proxy settings. For more details refer to the [env_proxy crate documentation](https://docs.rs/env_proxy/*/env_proxy/fn.for_url.html).
+- `PGX_IGNORE_RUST_VERSIONS` - Set to true to disable the `rustc` version check we have when performing schema generation (schema generation requires the same version of `rustc` be used to build `cargo-pgx` as the crate in question).
 
 ## First Time Initialization
 
@@ -802,3 +803,30 @@ Postgres, so loading two versions of the shared library will cause trouble.
 These scenarios are:
 - when using shared memory
 - when using query planner hooks
+
+## Compiler Version Dependence
+
+The version of the Rust compiler and toolchain used to build `cargo-pgx` must be
+the same as the version used to build your extension.
+
+Several subcommands (including `cargo pgx schema`, `cargo pgx test`, `cargo pgx
+install`, ...) will produce an error message if these do not match.
+
+Although this may be relaxed in the future, currently schema generation involves
+`dlopen`ing the extension and calling `extern "Rust"` functions on
+`#[repr(Rust)]` types. Generally, the appropriate way to fix this is reinstall
+`cargo-pgx`, using a command like the following
+
+```shell script
+$ cargo install --force --locked cargo-pgx
+```
+
+Possibly with a explicit `--version`, if needed.
+
+If you are certain that in this case, it is fine, you may set
+`PGX_IGNORE_RUST_VERSIONS` in the environment (to any value other than `"0"`),
+and the check will be bypassed. However, note that while the check is not
+fool-proof, it tries to be fairly liberal in what it allows.
+
+See <https://github.com/tcdi/pgx/issues/774> and <https://github.com/tcdi/pgx/pull/873>
+for further information.
