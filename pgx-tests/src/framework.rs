@@ -481,6 +481,7 @@ fn monitor_pg(mut command: Command, cmd_string: String, loglines: LogLines) -> S
                 format!("stopping postgres (pid={pid})\n").bold().blue().to_string(),
             )
             .unwrap();
+            // IMPORTANT: Rust string literals are not naturally null-terminated
             libc::printf("%s\0".as_ptr().cast(), message_string.as_ptr());
         });
 
