@@ -9,7 +9,8 @@ Use of this source code is governed by the MIT license that can be found in the 
 
 //! Utility functions for working with `pg_sys::RangeType` structs
 use crate::{
-    pg_sys, void_mut_ptr, Date, FromDatum, IntoDatum, Numeric, Timestamp, TimestampWithTimeZone,
+    pg_sys, void_mut_ptr, AnyNumeric, Date, FromDatum, IntoDatum, Numeric, Timestamp,
+    TimestampWithTimeZone,
 };
 use pgx_pg_sys::{Oid, RangeBound};
 use pgx_utils::sql_entity_graph::metadata::{
@@ -294,7 +295,14 @@ unsafe impl RangeSubType for i64 {
 }
 
 /// for numeric/numrange
-unsafe impl RangeSubType for Numeric {
+unsafe impl RangeSubType for AnyNumeric {
+    fn range_type_oid() -> Oid {
+        pg_sys::NUMRANGEOID
+    }
+}
+
+/// for numeric/numrange
+unsafe impl<const P: u32, const S: u32> RangeSubType for Numeric<P, S> {
     fn range_type_oid() -> Oid {
         pg_sys::NUMRANGEOID
     }
@@ -345,7 +353,16 @@ unsafe impl SqlTranslatable for Range<i64> {
     }
 }
 
-unsafe impl SqlTranslatable for Range<Numeric> {
+unsafe impl SqlTranslatable for Range<AnyNumeric> {
+    fn argument_sql() -> Result<SqlMapping, ArgumentError> {
+        Ok(SqlMapping::literal("numrange"))
+    }
+    fn return_sql() -> Result<Returns, ReturnsError> {
+        Ok(Returns::One(SqlMapping::literal("numrange")))
+    }
+}
+
+unsafe impl<const P: u32, const S: u32> SqlTranslatable for Range<Numeric<P, S>> {
     fn argument_sql() -> Result<SqlMapping, ArgumentError> {
         Ok(SqlMapping::literal("numrange"))
     }

@@ -20,7 +20,7 @@ fn accept_range_i64(range: Range<i64>) -> Range<i64> {
 }
 
 #[pg_extern]
-fn accept_range_numeric(range: Range<Numeric>) -> Range<Numeric> {
+fn accept_range_numeric(range: Range<AnyNumeric>) -> Range<AnyNumeric> {
     range
 }
 
@@ -104,12 +104,12 @@ fn range_i64_rt_bounds(range: Range<i64>) -> Range<i64> {
 }
 
 #[pg_extern]
-fn range_num_rt_values(range: Range<Numeric>) -> Range<Numeric> {
+fn range_num_rt_values(range: Range<AnyNumeric>) -> Range<AnyNumeric> {
     range_round_trip_values(range)
 }
 
 #[pg_extern]
-fn range_num_rt_bounds(range: Range<Numeric>) -> Range<Numeric> {
+fn range_num_rt_bounds(range: Range<AnyNumeric>) -> Range<AnyNumeric> {
     range_round_trip_bounds(range)
 }
 
