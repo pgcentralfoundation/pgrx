@@ -1525,7 +1525,6 @@ dependencies = [
  "regex",
  "serde",
  "serde_json",
- "shutdown_hooks",
  "thiserror",
  "time",
 ]
@@ -2145,12 +2144,6 @@ dependencies = [
  "pgx-tests",
  "serde",
 ]
-
-[[package]]
-name = "shutdown_hooks"
-version = "0.1.0"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "6057adedbec913419c92996f395ba69931acbd50b7d56955394cd3f7bedbfa45"
 
 [[package]]
 name = "siphasher"
