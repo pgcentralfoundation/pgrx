@@ -437,6 +437,7 @@ Optionally accepts the following attributes:
 * `parallel_restricted`: Corresponds to [`PARALLEL RESTRICTED`](https://www.postgresql.org/docs/current/sql-createfunction.html).
 * `no_guard`: Do not use `#[pg_guard]` with the function.
 * `sql`: Same arguments as [`#[pgx(sql = ..)]`](macro@pgx).
+* `name`: Specifies target function name. Defaults to Rust function name.
 
 Functions can accept and return any type which `pgx` supports. `pgx` supports many PostgreSQL types by default.
 New types can be defined via [`macro@PostgresType`] or [`macro@PostgresEnum`].
