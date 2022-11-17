@@ -26,6 +26,8 @@ extern crate pgx_macros;
 
 #[macro_use]
 extern crate bitflags;
+extern crate alloc;
+extern crate core;
 
 // expose our various derive macros
 pub use pgx_macros::*;
@@ -34,23 +36,22 @@ pub use pgx_macros::*;
 pub mod prelude;
 
 pub mod aggregate;
+pub mod array;
+pub mod atomics;
+pub mod bgworkers;
 pub mod callbacks;
 pub mod datum;
 pub mod enum_helper;
 pub mod fcinfo;
+pub mod ffi;
 pub mod guc;
+pub mod heap_tuple;
 pub mod hooks;
 pub mod htup;
 pub mod inoutfuncs;
 pub mod itemptr;
 pub mod iter;
 pub mod list;
-#[macro_use]
-pub mod log;
-pub mod array;
-pub mod atomics;
-pub mod bgworkers;
-pub mod heap_tuple;
 pub mod lwlock;
 pub mod memcxt;
 pub mod misc;
@@ -85,7 +86,6 @@ pub use htup::*;
 pub use inoutfuncs::*;
 pub use itemptr::*;
 pub use list::*;
-pub use log::*;
 pub use lwlock::*;
 pub use memcxt::*;
 pub use namespace::*;
@@ -102,15 +102,26 @@ pub use wrappers::*;
 pub use xid::*;
 
 pub use pgx_pg_sys as pg_sys; // the module only, not its contents
-pub use pgx_pg_sys::submodules::*;
-pub use pgx_pg_sys::PgBuiltInOids; // reexport this so it looks like it comes from here
 
-pub use {cstr_core, pgx_utils as utils};
+// and re-export these
+pub use pg_sys::elog::PgLogLevel;
+pub use pg_sys::errcodes::PgSqlErrorCode;
+pub use pg_sys::oids::PgOid;
+pub use pg_sys::panic::pgx_extern_c_guard;
+pub use pg_sys::pg_try::PgTryBuilder;
+pub use pg_sys::utils::name_data_to_str;
+pub use pg_sys::PgBuiltInOids;
+pub use pg_sys::{
+    check_for_interrupts, debug1, debug2, debug3, debug4, debug5, ereport, error, function_name,
+    info, log, notice, warning, FATAL, PANIC,
+};
+pub use pgx_utils as utils;
+
+pub use cstr_core;
 
 use once_cell::sync::Lazy;
-use std::collections::HashSet;
-
 use pgx_utils::sql_entity_graph::RustSourceOnlySqlMapping;
+use std::collections::HashSet;
 
 macro_rules! map_source_only {
     ($map:ident, $rust:ty, $sql:expr) => {{
@@ -250,7 +261,7 @@ macro_rules! pg_magic_func {
                 abi_extra: {
                     // array::from_fn isn't const yet, boohoo, so const-copy a bstr
                     let magic = b"PostgreSQL";
-                    let mut abi = [0 as i8; 32];
+                    let mut abi = [0 as ::pgx::ffi::c_char; 32];
                     let mut i = 0;
                     while i < magic.len() {
                         abi[i] = magic[i] as _;
@@ -328,5 +339,5 @@ macro_rules! pg_sql_graph_magic {
 /// directly.
 #[allow(unused)]
 pub fn initialize() {
-    register_pg_guard_panic_hook();
+    pg_sys::panic::register_pg_guard_panic_hook();
 }

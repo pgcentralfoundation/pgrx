@@ -20,7 +20,8 @@ mod internal;
 mod into;
 mod item_pointer_data;
 mod json;
-mod numeric;
+pub mod numeric;
+pub mod numeric_support;
 #[deny(unsafe_op_in_unsafe_fn)]
 mod range;
 mod time;
@@ -44,7 +45,7 @@ pub use internal::*;
 pub use into::*;
 pub use item_pointer_data::*;
 pub use json::*;
-pub use numeric::*;
+pub use numeric::{AnyNumeric, Numeric};
 use once_cell::sync::Lazy;
 pub use range::*;
 use std::any::TypeId;

@@ -136,6 +136,53 @@ impl CommandExecute for Schema {
     }
 }
 
+// This is *mostly* a copy of the function in `build.rs`, except using
+// `CARGO`/`cargo` rather than `RUSTC`/`rustc`. It seems too painful to try and
+// share them, given how they're close-but-not-identical.
+fn rust_minor_version() -> Option<u32> {
+    // In order to support `cargo +whatever pgx`, use `CARGO` here (which
+    // cargo sets for subcommands to allow this), if present.
+    let rustc = std::env::var_os("CARGO").unwrap_or_else(|| "cargo".into());
+    let output = std::process::Command::new(rustc).arg("--version").output().ok()?;
+    let version = std::str::from_utf8(&output.stdout).ok()?;
+    let mut iter = version.split('.');
+    if iter.next() != Some("cargo 1") {
+        None
+    } else {
+        iter.next()?.parse().ok()
+    }
+}
+
+/// Returns an error if the Rust minor version at build time doesn't match the
+/// one at runtime.
+///
+/// This is an error because we `dlopen` rust code that we build, and call
+/// `extern "Rust"` functions on `#[repr(Rust)]` types. This may be relaxed in
+/// the future, but for now is a requirement.
+///
+/// To waive this, you may set `PGX_IGNORE_RUST_VERSIONS` in the environment (to
+/// any value other than `"0"`). Also, note that this check is best-effort only,
+/// and is expected to error only if there is a definite mismatch.
+///
+/// It also cannot detect versions of `cargo-pgx` and `pgx` differing, which
+/// could cause similar issues (in the future this may be detected).
+fn check_rust_version() -> eyre::Result<()> {
+    const COMPILE_TIME_MINOR_VERSION: Option<&str> = option_env!("MINOR_RUST_VERSION");
+    if matches!(std::env::var("PGX_IGNORE_RUST_VERSIONS"), Ok(s) if s != "0") {
+        return Ok(());
+    }
+    let parsed = COMPILE_TIME_MINOR_VERSION.and_then(|s| s.trim().parse::<u32>().ok());
+    if let (Some(from_env), Some(run_locally)) = (parsed, rust_minor_version()) {
+        if from_env != run_locally {
+            eyre::bail!(
+                "Mismatched rust versions: `cargo-pgx` was built with Rust `1.{from_env}`, but \
+                Rust `1.{run_locally}` is currently in use.",
+            );
+        }
+    }
+    Ok(())
+}
+
 #[tracing::instrument(level = "error", skip_all, fields(
     pg_version = %pg_config.version()?,
     profile = ?profile,
@@ -157,6 +204,7 @@ pub(crate) fn generate_schema(
     log_level: Option<String>,
     skip_build: bool,
 ) -> eyre::Result<()> {
+    check_rust_version()?;
     let manifest = Manifest::from_path(&package_manifest_path)?;
     let (control_file, _extname) = find_control_file(&package_manifest_path)?;
     let package_name = &manifest

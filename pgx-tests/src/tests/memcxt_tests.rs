@@ -46,4 +46,10 @@ mod tests {
 
         assert!(did_drop.load(Ordering::SeqCst))
     }
+
+    #[pg_test]
+    fn parent() {
+        assert!(PgMemoryContexts::TopMemoryContext.parent().is_none());
+        assert!(PgMemoryContexts::CurrentMemoryContext.parent().is_some());
+    }
 }

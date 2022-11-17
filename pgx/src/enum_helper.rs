@@ -23,13 +23,10 @@ pub fn lookup_enum_by_oid(enumval: pg_sys::Oid) -> (String, pg_sys::Oid, f32) {
         )
     };
     if tup.is_null() {
-        ereport(
+        ereport!(
             PgLogLevel::ERROR,
             PgSqlErrorCode::ERRCODE_INVALID_BINARY_REPRESENTATION,
-            &format!("invalid internal value for enum: {}", enumval),
-            file!(),
-            line!(),
-            column!(),
+            format!("invalid internal value for enum: {}", enumval)
         );
     }
 

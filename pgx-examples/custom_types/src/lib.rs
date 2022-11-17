@@ -12,6 +12,7 @@ mod fixed_size;
 mod generic_enum;
 mod hstore_clone;
 mod ordered;
+mod rust_enum;
 
 pgx::pg_module_magic!();
 

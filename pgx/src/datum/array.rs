@@ -20,7 +20,7 @@ use std::marker::PhantomData;
 use std::{mem, ptr, slice};
 
 pub struct Array<'a, T: FromDatum> {
-    ptr: Option<NonNull<pg_sys::varlena>>,
+    ptr: NonNull<pg_sys::varlena>,
     raw: Option<RawArray>,
     nelems: usize,
     // Remove this field if/when we figure out how to stop using pg_sys::deconstruct_array
@@ -36,21 +36,13 @@ pub struct Array<'a, T: FromDatum> {
 // However, we could also use a static resolution? Hard to say what's best.
 enum NullKind<'a> {
     Bits(&'a BitSlice<u8>),
-    Bytes(&'a [bool]),
     Strict(usize),
-}
-
-impl<'a> From<&'a [bool]> for NullKind<'a> {
-    fn from(b8: &'a [bool]) -> NullKind<'a> {
-        NullKind::Bytes(b8)
-    }
 }
 
 impl NullKind<'_> {
     fn get(&self, index: usize) -> Option<bool> {
         match self {
             Self::Bits(b1) => b1.get(index).map(|b| !b),
-            Self::Bytes(b8) => b8.get(index).map(|b| *b),
             Self::Strict(len) => index.le(len).then(|| false),
         }
     }
@@ -58,7 +50,6 @@ impl NullKind<'_> {
     fn any(&self) -> bool {
         match self {
             Self::Bits(b1) => !b1.all(),
-            Self::Bytes(b8) => b8.into_iter().any(|b| *b),
             Self::Strict(_) => false,
         }
     }
@@ -75,7 +66,7 @@ impl<'a, T: FromDatum + serde::Serialize> serde::Serialize for Array<'a, T> {
 
 impl<'a, T: FromDatum> Drop for Array<'a, T> {
     fn drop(&mut self) {
-        if let Array { ptr, raw, datum_palloc: Some(data), elem_slice, .. } = self {
+        if let Array { raw, datum_palloc: Some(data), elem_slice, .. } = self {
             // If Drop has arrived here, it means that this Array is backed by an allocation or two
             // If so, the first one is guaranteed, and was created by calling pg_sys::deconstruct_array
             // This is just a slice, dropping it doesn't "do" anything, but out of an abundance of caution:
@@ -86,11 +77,11 @@ impl<'a, T: FromDatum> Drop for Array<'a, T> {
             // Detoasting the varlena may have allocated: the toasted varlena cloned as a detoasted ArrayType
             // Checking for pointer equivalence is the only way we can truly tell
             let raw = raw.take().map(|r| r.into_ptr());
-            let ptr = ptr.take();
-            match (ptr, raw) {
+            if let Some(raw) = raw {
                 // SAFETY: if pgx detoasted a clone of this varlena, pfree the clone
-                (Some(p), Some(r)) if r.cast() != p => unsafe { pg_sys::pfree(r.as_ptr().cast()) },
-                _ => (),
+                if raw.cast() != self.ptr {
+                    unsafe { pg_sys::pfree(raw.as_ptr().cast()) }
+                }
             }
         }
     }
@@ -98,56 +89,12 @@ impl<'a, T: FromDatum> Drop for Array<'a, T> {
 
 #[deny(unsafe_op_in_unsafe_fn)]
 impl<'a, T: FromDatum> Array<'a, T> {
-    /// Create an [`Array`](crate::datum::Array) over an array of [`pg_sys::Datum`](pg_sys::Datum) values and a corresponding array
-    /// of "is_null" indicators
-    ///
-    /// `T` can be [`pg_sys::Datum`](pg_sys::Datum) if the elements are not all of the same type
-    ///
-    /// # Safety
-    ///
-    /// This function requires that:
-    /// - `elements` is non-null
-    /// - `nulls` is non-null
-    /// - both `elements` and `nulls` point to a slice of equal-or-greater length than `nelems`
-    #[deprecated(
-        since = "0.5.0",
-        note = "creating arbitrary Arrays from raw pointers has unsound interactions!
-    please open an issue in tcdi/pgx if you need this, with your stated use-case"
-    )]
-    pub unsafe fn over(
-        elements: *mut pg_sys::Datum,
-        nulls: *mut bool,
-        nelems: usize,
-    ) -> Array<'a, T> {
-        // FIXME: This function existing prevents simply using NonNull<varlena>
-        // or NonNull<ArrayType>. It has also caused issues like tcdi/pgx#633
-        // Ideally it would cease being used soon.
-        // It can be replaced with ways to make Postgres varlena arrays in Rust,
-        // if there are any users who desire such a thing.
-        //
-        // Remember to remove the Array::over tests in pgx-tests/src/tests/array_tests.rs
-        // when you finally kill this off.
-        let ptr: Option<NonNull<pg_sys::varlena>> = None;
-        let raw: Option<RawArray> = None;
-        let elem_layout: Option<Layout> = None;
-        Array::<T> {
-            ptr,
-            raw,
-            nelems,
-            datum_palloc: None,
-            elem_slice: unsafe { slice::from_raw_parts(elements, nelems) },
-            null_slice: unsafe { slice::from_raw_parts(nulls, nelems) }.into(),
-            elem_layout,
-            _marker: PhantomData,
-        }
-    }
-
     /// # Safety
     ///
     /// This function requires that the RawArray was obtained in a properly-constructed form
     /// (probably from Postgres).
     unsafe fn deconstruct_from(
-        ptr: Option<NonNull<pg_sys::varlena>>,
+        ptr: NonNull<pg_sys::varlena>,
         raw: RawArray,
         layout: Layout,
     ) -> Array<'a, T> {
@@ -499,14 +446,13 @@ impl<'a, T: FromDatum> FromDatum for Array<'a, T> {
         is_null: bool,
         _typoid: u32,
     ) -> Option<Array<'a, T>> {
-        if is_null || datum.is_null() {
+        if is_null {
             None
         } else {
-            let ptr = datum.cast_mut_ptr();
+            let ptr = NonNull::new(datum.cast_mut_ptr())?;
             let array = pg_sys::pg_detoast_datum(datum.cast_mut_ptr()) as *mut pg_sys::ArrayType;
             let raw =
                 RawArray::from_ptr(NonNull::new(array).expect("detoast returned null ArrayType*"));
-            let ptr = NonNull::new(ptr);
             let oid = raw.oid();
             let layout = Layout::lookup_oid(oid);
 

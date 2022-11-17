@@ -39,8 +39,6 @@ pub fn pg_guard(_attr: TokenStream, item: TokenStream) -> TokenStream {
         Item::ForeignMod(block) => rewriter.extern_block(block).into(),
 
         // process top-level functions
-        // these functions get wrapped as public extern "C" functions with #[no_mangle] so they
-        // can also be called from C code
         Item::Fn(func) => rewriter
             .item_fn_without_rewrite(func)
             .unwrap_or_else(|e| {
@@ -439,6 +437,7 @@ Optionally accepts the following attributes:
 * `parallel_restricted`: Corresponds to [`PARALLEL RESTRICTED`](https://www.postgresql.org/docs/current/sql-createfunction.html).
 * `no_guard`: Do not use `#[pg_guard]` with the function.
 * `sql`: Same arguments as [`#[pgx(sql = ..)]`](macro@pgx).
+* `name`: Specifies target function name. Defaults to Rust function name.
 
 Functions can accept and return any type which `pgx` supports. `pgx` supports many PostgreSQL types by default.
 New types can be defined via [`macro@PostgresType`] or [`macro@PostgresEnum`].
@@ -671,6 +670,11 @@ struct Dog {
     treats_recieved: i64,
     pets_gotten: i64,
 }
+
+#[derive(Debug, Serialize, Deserialize, PostgresType)]
+enum Animal {
+    Dog(Dog),
+}
 ```
 
 Optionally accepts the following attributes:
@@ -698,7 +702,12 @@ fn impl_postgres_type(ast: DeriveInput) -> proc_macro2::TokenStream {
     // validate that we're only operating on a struct
     match ast.data {
         Data::Struct(_) => { /* this is okay */ }
-        _ => panic!("#[derive(PostgresType)] can only be applied to structs"),
+        Data::Enum(_) => {
+            // this is okay and if there's an attempt to implement PostgresEnum,
+            // it will result in compile-time error of conflicting implementation
+            // of traits (IntoDatum, inout, etc.)
+        }
+        _ => panic!("#[derive(PostgresType)] can only be applied to structs or enums"),
     }
 
     if args.is_empty() {
