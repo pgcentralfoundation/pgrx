@@ -183,7 +183,7 @@ impl PgRelation {
     }
 
     /// Return an iterator of indices, as `PgRelation`s, attached to this relation
-    pub fn indicies(
+    pub fn indices(
         &self,
         lockmode: pg_sys::LOCKMODE,
     ) -> impl std::iter::Iterator<Item = PgRelation> {

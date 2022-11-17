@@ -8,7 +8,6 @@ Use of this source code is governed by the MIT license that can be found in the 
 */
 use pgx::bgworkers::*;
 use pgx::datum::{FromDatum, IntoDatum};
-use pgx::log;
 use pgx::prelude::*;
 use std::time::Duration;
 
