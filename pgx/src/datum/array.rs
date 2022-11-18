@@ -103,69 +103,94 @@ impl<'a, T: FromDatum> Array<'a, T> {
         let len = raw.len();
         let array = raw.into_ptr().as_ptr();
 
-        // outvals for deconstruct_array
-        let mut elements = ptr::null_mut();
-        let mut nulls = ptr::null_mut();
-        let mut nelems = 0;
+        match (elem_layout.matches::<T>(), elem_layout.pass) {
+            (Some(1 | 2 | 4), PassBy::Value) => {
+                let mut raw = unsafe { RawArray::from_ptr(NonNull::new_unchecked(array)) };
 
-        /*
-        FIXME(jubilee): This way of getting array buffers causes problems for any Drop impl,
-        and clashes with assumptions of Array being a "zero-copy", lifetime-bound array,
-        some of which are implicitly embedded in other methods (e.g. Array::over).
-        It also risks leaking memory, as deconstruct_array calls palloc.
+                let null_slice = raw
+                    .nulls_bitslice()
+                    .map(|nonnull| NullKind::Bits(unsafe { &*nonnull.as_ptr() }))
+                    .unwrap_or(NullKind::Strict(len));
+                let elems = raw.data::<T>().cast();
 
-        SAFETY: We have already asserted the validity of the RawArray, so
-        this only makes mistakes if we mix things up and pass Postgres the wrong data.
-        */
-        unsafe {
-            pg_sys::deconstruct_array(
-                array,
-                oid,
-                elem_layout.size.as_typlen().into(),
-                matches!(elem_layout.pass, PassBy::Value),
-                elem_layout.align.as_typalign(),
-                &mut elements,
-                &mut nulls,
-                &mut nelems,
-            )
-        };
+                Array {
+                    ptr,
+                    raw: Some(raw),
+                    nelems: len,
+                    datum_palloc: None,
+                    datum_slice: None,
+                    elems_ptr: Some(elems),
+                    null_slice,
+                    elem_layout,
+                    _marker: PhantomData,
+                }
+            }
+            (_, _) => {
+                // outvals for deconstruct_array
+                let mut elements = ptr::null_mut();
+                let mut nulls = ptr::null_mut();
+                let mut nelems = 0;
 
-        let nelems = nelems as usize;
+                /*
+                FIXME(jubilee): This way of getting array buffers causes problems for any Drop impl,
+                and clashes with assumptions of Array being a "zero-copy", lifetime-bound array,
+                some of which are implicitly embedded in other methods (e.g. Array::over).
+                It also risks leaking memory, as deconstruct_array calls palloc.
 
-        // Check our RawArray len impl for correctness.
-        assert_eq!(nelems, len);
-        let mut raw = unsafe { RawArray::from_ptr(NonNull::new_unchecked(array)) };
+                SAFETY: We have already asserted the validity of the RawArray, so
+                this only makes mistakes if we mix things up and pass Postgres the wrong data.
+                */
+                unsafe {
+                    pg_sys::deconstruct_array(
+                        array,
+                        oid,
+                        elem_layout.size.as_typlen().into(),
+                        matches!(elem_layout.pass, PassBy::Value),
+                        elem_layout.align.as_typalign(),
+                        &mut elements,
+                        &mut nulls,
+                        &mut nelems,
+                    )
+                };
 
-        let null_slice = raw
-            .nulls_bitslice()
-            .map(|nonnull| NullKind::Bits(unsafe { &*nonnull.as_ptr() }))
-            .unwrap_or(NullKind::Strict(nelems));
+                let nelems = nelems as usize;
 
-        // The array was just deconstructed, which allocates twice: effectively [Datum] and [bool].
-        // But pgx doesn't actually need [bool] if NullKind's handling of BitSlices is correct.
-        // So, assert correctness of the NullKind implementation and cleanup.
-        // SAFETY: The pointer we got should be correctly constructed for slice validity.
-        let pallocd_null_slice = unsafe { slice::from_raw_parts(nulls, nelems) };
-        #[cfg(debug_assertions)]
-        for i in 0..nelems {
-            assert_eq!(null_slice.get(i).unwrap(), pallocd_null_slice[i]);
-        }
+                // Check our RawArray len impl for correctness.
+                assert_eq!(nelems, len);
+                let mut raw = unsafe { RawArray::from_ptr(NonNull::new_unchecked(array)) };
 
-        // Throw away the slice we made.
-        mem::drop(pallocd_null_slice);
-        // SAFETY: We made it, we can break it. Or Postgres can, at least.
-        unsafe { pg_sys::pfree(nulls.cast()) };
+                let null_slice = raw
+                    .nulls_bitslice()
+                    .map(|nonnull| NullKind::Bits(unsafe { &*nonnull.as_ptr() }))
+                    .unwrap_or(NullKind::Strict(nelems));
 
-        Array {
-            ptr,
-            raw: Some(raw),
-            nelems,
-            datum_palloc: NonNull::new(elements),
-            datum_slice: /* SAFETY: &[Datum] from palloc'd [Datum] */ Some(unsafe { slice::from_raw_parts(elements, nelems) }),
-            elems_ptr: None,
-            null_slice,
-            elem_layout,
-            _marker: PhantomData,
+                // The array was just deconstructed, which allocates twice: effectively [Datum] and [bool].
+                // But pgx doesn't actually need [bool] if NullKind's handling of BitSlices is correct.
+                // So, assert correctness of the NullKind implementation and cleanup.
+                // SAFETY: The pointer we got should be correctly constructed for slice validity.
+                let pallocd_null_slice = unsafe { slice::from_raw_parts(nulls, nelems) };
+                #[cfg(debug_assertions)]
+                for i in 0..nelems {
+                    assert_eq!(null_slice.get(i).unwrap(), pallocd_null_slice[i]);
+                }
+
+                // Throw away the slice we made.
+                mem::drop(pallocd_null_slice);
+                // SAFETY: We made it, we can break it. Or Postgres can, at least.
+                unsafe { pg_sys::pfree(nulls.cast()) };
+
+                Array {
+                    ptr,
+                    raw: Some(raw),
+                    nelems,
+                    datum_palloc: NonNull::new(elements),
+                    datum_slice: /* SAFETY: &[Datum] from palloc'd [Datum] */ Some(unsafe { slice::from_raw_parts(elements, nelems) }),
+                    elems_ptr: None,
+                    null_slice,
+                    elem_layout,
+                    _marker: PhantomData,
+                }
+            }
         }
     }
 
@@ -249,7 +274,7 @@ impl<'a, T: FromDatum> Array<'a, T> {
                 // by just doing something wildly unsafe instead: reading a raw addr.
                 // the only reason this is okay is because we make elems_ptr = Some(ptr)
                 // if and only if we believe we can get away with this
-                is_null.then(|| unsafe { elems.as_ptr().add(i).read() })
+                (!is_null).then(|| unsafe { elems.as_ptr().add(i).read() })
             } else {
                 panic!("poorly constructed array type!");
             }
