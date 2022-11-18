@@ -32,7 +32,7 @@ use alloc::vec::Vec;
 static LIBRARIES: OnceCell<Libraries> = OnceCell::new();
 
 struct Libraries {
-    postmaster_shim: libloading::os::unix::Library,
+    _postmaster_shim: libloading::os::unix::Library,
     extension: libloading::os::unix::Library,
 }
 
@@ -44,6 +44,14 @@ impl Libraries {
             ffi::{c_void, CString},
             mem::MaybeUninit,
         };
+        unsafe fn dl_error() -> String {
+            let p = libc::dlerror();
+            if p.is_null() {
+                return "no error message given".into();
+            }
+            let cstr = std::ffi::CStr::from_ptr(p);
+            String::from_utf8_lossy(cstr.to_bytes()).to_string()
+        }
         let postmaster_cstr = CString::new(postmaster_stub_built).unwrap();
         // Open the postmaster shim in a new namespace.
         let postmaster_handle = libc::dlmopen(
@@ -52,8 +60,7 @@ impl Libraries {
             libc::RTLD_NOW | libc::RTLD_GLOBAL,
         );
         if postmaster_handle.is_null() {
-            // TODO(thom): wrangle dlerror
-            eyre::bail!("couldn't dlmopen {postmaster_stub_built:?}");
+            eyre::bail!("couldn't dlmopen {postmaster_stub_built:?}: {}", dl_error());
         }
         // Get a pointer to the namespace it was opened in (the fresh
         // namespace it created).
@@ -63,18 +70,16 @@ impl Libraries {
         if ret < 0 {
             // Intentionally leak `postmaster_handle` -- dlclose would
             // probably crash.
-            // TODO(thom): wrangle dlerror
-            eyre::bail!("couldn't dlinfo {postmaster_stub_built:?}");
+            eyre::bail!("couldn't dlinfo {postmaster_stub_built:?}: {}", dl_error());
         }
         // Open the the extension in the same namespace
         let extension_cstr = CString::new(lib_so).unwrap();
         let extension_handle = libc::dlmopen(lmid, extension_cstr.as_ptr().cast(), libc::RTLD_LAZY);
         if extension_handle.is_null() {
-            // TODO(thom): wrangle dlerror
-            eyre::bail!("couldn't dlmopen {lib_so:?}");
+            eyre::bail!("couldn't dlmopen {lib_so:?}: {}", dl_error());
         }
         Ok(Self {
-            postmaster_shim: libloading::os::unix::Library::from_raw(postmaster_handle),
+            _postmaster_shim: libloading::os::unix::Library::from_raw(postmaster_handle),
             extension: libloading::os::unix::Library::from_raw(extension_handle),
         })
     }
@@ -90,7 +95,7 @@ impl Libraries {
         let extension_library =
             libloading::os::unix::Library::open(Some(&lib_so), libloading::os::unix::RTLD_LAZY)
                 .wrap_err_with(|| format!("Couldn't libload {lib_so}"))?;
-        Ok(Self { postmaster_shim: postmaster_library, extension: extension_library })
+        Ok(Self { _postmaster_shim: postmaster_library, extension: extension_library })
     }
 }
 
