@@ -1,6 +1,6 @@
 [package]
 name = "pgx-utils"
-version = "0.6.0-alpha.1"
+version = "0.6.0-alpha.2"
 authors = ["ZomboDB, LLC <zombodb@gmail.com>"]
 license = "MIT"
 description = "Utility functions for 'pgx'"
@@ -26,7 +26,7 @@ quote = "1.0.21"
 regex = "1.7.0"
 serde = { version = "1.0.147", features = [ "derive" ] }
 serde_derive = "1.0.147"
-serde_json = "1.0.87"
+serde_json = "1.0.88"
 syn = { version = "1.0.103", features = [ "extra-traits", "full", "fold", "parsing" ] }
 syntect = { version = "5.0.0", default-features = false, features = ["default-fancy"], optional = true }
 unescape = "0.1.0"
