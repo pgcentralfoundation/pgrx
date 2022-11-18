@@ -25,7 +25,8 @@ pub struct Array<'a, T: FromDatum> {
     nelems: usize,
     // Remove this field if/when we figure out how to stop using pg_sys::deconstruct_array
     datum_palloc: Option<NonNull<pg_sys::Datum>>,
-    elem_slice: &'a [pg_sys::Datum],
+    datum_slice: Option<&'a [pg_sys::Datum]>,
+    elems_ptr: Option<NonNull<T>>,
     null_slice: NullKind<'a>,
     elem_layout: Layout,
     _marker: PhantomData<T>,
@@ -66,11 +67,11 @@ impl<'a, T: FromDatum + serde::Serialize> serde::Serialize for Array<'a, T> {
 
 impl<'a, T: FromDatum> Drop for Array<'a, T> {
     fn drop(&mut self) {
-        if let Array { raw, datum_palloc: Some(data), elem_slice, .. } = self {
+        if let Array { raw, datum_palloc: Some(data), datum_slice, .. } = self {
             // If Drop has arrived here, it means that this Array is backed by an allocation or two
             // If so, the first one is guaranteed, and was created by calling pg_sys::deconstruct_array
             // This is just a slice, dropping it doesn't "do" anything, but out of an abundance of caution:
-            mem::drop(elem_slice);
+            mem::drop(datum_slice);
             // Now there shouldn't be any other references to that slice, so this can be deallocated:
             unsafe { pg_sys::pfree(data.as_ptr().cast()) };
 
@@ -160,7 +161,8 @@ impl<'a, T: FromDatum> Array<'a, T> {
             raw: Some(raw),
             nelems,
             datum_palloc: NonNull::new(elements),
-            elem_slice: /* SAFETY: &[Datum] from palloc'd [Datum] */ unsafe { slice::from_raw_parts(elements, nelems) },
+            datum_slice: /* SAFETY: &[Datum] from palloc'd [Datum] */ Some(unsafe { slice::from_raw_parts(elements, nelems) }),
+            elems_ptr: None,
             null_slice,
             elem_layout,
             _marker: PhantomData,
@@ -228,20 +230,30 @@ impl<'a, T: FromDatum> Array<'a, T> {
         self.nelems == 0
     }
 
+    /// # Panics
+    /// Panics if you attempt to do random access on a pass-by-value array
     #[allow(clippy::option_option)]
     #[inline]
     pub fn get(&self, i: usize) -> Option<Option<T>> {
-        if i >= self.nelems {
-            None
-        } else {
-            Some(unsafe {
-                T::from_polymorphic_datum(
-                    self.elem_slice[i],
-                    self.null_slice.get(i)?,
-                    self.raw.as_ref().map(|r| r.oid()).unwrap_or_default(),
-                )
-            })
-        }
+        self.null_slice.get(i).map(|is_null| {
+            if let Some(datums) = self.datum_slice {
+                unsafe {
+                    T::from_polymorphic_datum(
+                        datums[i],
+                        is_null,
+                        self.raw.as_ref().map(|r| r.oid())?,
+                    )
+                }
+            } else if let Some(elems) = self.elems_ptr {
+                // SAFETY: barely. we're getting around the trait bounds not being better
+                // by just doing something wildly unsafe instead: reading a raw addr.
+                // the only reason this is okay is because we make elems_ptr = Some(ptr)
+                // if and only if we believe we can get away with this
+                is_null.then(|| unsafe { elems.as_ptr().add(i).read() })
+            } else {
+                panic!("poorly constructed array type!");
+            }
+        })
     }
 }
 
