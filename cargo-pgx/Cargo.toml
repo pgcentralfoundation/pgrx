@@ -46,6 +46,7 @@ color-eyre = "0.6.2"
 tracing = "0.1.37"
 tracing-error = "0.2.0"
 tracing-subscriber = { version = "0.3.16", features = [ "env-filter" ] }
+libc = "0.2"
 
 [features]
 default = ["ureq/native-tls"]

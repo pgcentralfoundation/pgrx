@@ -283,6 +283,7 @@ dependencies = [
  "env_proxy",
  "eyre",
  "fork",
+ "libc",
  "libloading",
  "num_cpus",
  "object 0.28.4",
