@@ -455,15 +455,10 @@ impl<'a> SpiClient<'a> {
     /// Cursor name can be retrieved via [`SpiCursor::into_name`].
     ///
     /// See [`SpiCursor`] docs for usage details.
-    pub fn find_cursor(
-        &mut self,
-        name: String,
-    ) -> SpiCursor {
+    pub fn find_cursor(&mut self, name: String) -> SpiCursor {
         use pgx_pg_sys::AsPgCStr;
 
-        let ptr = unsafe {
-            pg_sys::SPI_cursor_find(name.as_pg_cstr())
-        };
+        let ptr = unsafe { pg_sys::SPI_cursor_find(name.as_pg_cstr()) };
         if ptr.is_null() {
             error!("cursor named \"{}\" not found", name);
         }
@@ -529,20 +524,11 @@ impl SpiCursor {
     /// Fetch up to `count` rows from the cursor, moving forward
     ///
     /// If `fetch` runs off the end of the available rows, an empty [`SpiTupleTable`] is returned.
-    pub fn fetch(
-        &mut self,
-        count: i64
-    ) -> SpiTupleTable {
+    pub fn fetch(&mut self, count: i64) -> SpiTupleTable {
         unsafe {
             pg_sys::SPI_tuptable = std::ptr::null_mut();
         }
-        unsafe {
-            pg_sys::SPI_cursor_fetch(
-                self.ptr,
-                true,
-                count,
-            )
-        }
+        unsafe { pg_sys::SPI_cursor_fetch(self.ptr, true, count) }
         SpiTupleTable {
             status_code: SpiOk::Fetch,
             table: unsafe { pg_sys::SPI_tuptable },
@@ -563,7 +549,9 @@ impl SpiCursor {
     /// using [`SpiClient::find_cursor()`]
     pub fn into_name(self) -> String {
         unsafe { std::ffi::CStr::from_ptr((*self.ptr).name) }
-            .to_str().expect("non-utf8 cursor name").to_string()
+            .to_str()
+            .expect("non-utf8 cursor name")
+            .to_string()
     }
 
     /// Close the cursor, releasing its resources
@@ -573,12 +561,9 @@ impl SpiCursor {
     /// transaction using [`SpiClient::find_cursor()`].
     pub fn close(mut self) {
         let ptr = std::mem::replace(&mut self.ptr, std::ptr::null_mut());
-        unsafe {
-            pg_sys::SPI_cursor_close(ptr)
-        }
+        unsafe { pg_sys::SPI_cursor_close(ptr) }
     }
 }
-
 
 impl SpiTupleTable {
     /// `SpiTupleTable`s are positioned before the start, for iteration purposes.
