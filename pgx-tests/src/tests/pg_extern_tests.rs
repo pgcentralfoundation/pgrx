@@ -118,4 +118,16 @@ mod tests {
                 .expect("failed to get SPI result");
         assert_eq!(interval_type as u32, pg_sys::INTERVALOID);
     }
+
+    #[pg_extern(name = "custom_name")]
+    fn fn_custom() -> bool {
+        true
+    }
+
+    #[pg_test]
+    fn test_name() {
+        let result = Spi::get_one::<bool>(r#"SELECT tests."custom_name"()"#)
+            .expect("failed to get SPI result");
+        assert!(result);
+    }
 }

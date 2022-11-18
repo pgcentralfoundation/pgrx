@@ -1,11 +1,11 @@
 [package]
 name = "pgx-utils"
-version = "0.6.0-alpha.0"
+version = "0.6.0-alpha.2"
 authors = ["ZomboDB, LLC <zombodb@gmail.com>"]
 license = "MIT"
 description = "Utility functions for 'pgx'"
-homepage = "https://github.com/zombodb/pgx"
-repository = "https://github.com/zombodb/pgx"
+homepage = "https://github.com/tcdi/pgx"
+repository = "https://github.com/tcdi/pgx"
 documentation = "https://docs.rs/pgx-utils"
 readme = "README.md"
 edition = "2021"
@@ -15,6 +15,7 @@ syntax-highlighting = ["dep:syntect", "dep:owo-colors"]
 
 [dependencies]
 seq-macro = "0.3"
+cstr_core = "0.2"
 atty = "0.2.14"
 convert_case = "0.5.0"
 eyre = "0.6.8"
@@ -25,7 +26,7 @@ quote = "1.0.21"
 regex = "1.7.0"
 serde = { version = "1.0.147", features = [ "derive" ] }
 serde_derive = "1.0.147"
-serde_json = "1.0.87"
+serde_json = "1.0.88"
 syn = { version = "1.0.103", features = [ "extra-traits", "full", "fold", "parsing" ] }
 syntect = { version = "5.0.0", default-features = false, features = ["default-fancy"], optional = true }
 unescape = "0.1.0"

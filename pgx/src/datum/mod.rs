@@ -22,6 +22,8 @@ mod item_pointer_data;
 mod json;
 pub mod numeric;
 pub mod numeric_support;
+#[deny(unsafe_op_in_unsafe_fn)]
+mod range;
 mod time;
 mod time_stamp;
 mod time_stamp_with_timezone;
@@ -45,6 +47,7 @@ pub use item_pointer_data::*;
 pub use json::*;
 pub use numeric::{AnyNumeric, Numeric};
 use once_cell::sync::Lazy;
+pub use range::*;
 use std::any::TypeId;
 pub use time_stamp::*;
 pub use time_stamp_with_timezone::*;

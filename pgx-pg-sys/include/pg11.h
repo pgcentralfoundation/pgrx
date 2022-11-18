@@ -26,6 +26,7 @@ Use of this source code is governed by the MIT license that can be found in the 
 #include "access/xact.h"
 #include "catalog/dependency.h"
 #include "catalog/index.h"
+#include "catalog/indexing.h"
 #include "catalog/namespace.h"
 #include "catalog/objectaddress.h"
 #include "catalog/pg_authid.h"

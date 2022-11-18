@@ -1,4 +1,4 @@
-![Logo](logo-transparent.png)
+![Logo](art/pgx-logo-color-transparent-475x518.png)
 
 # `pgx`
 

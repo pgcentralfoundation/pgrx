@@ -43,6 +43,7 @@ pub mod callbacks;
 pub mod datum;
 pub mod enum_helper;
 pub mod fcinfo;
+pub mod ffi;
 pub mod guc;
 pub mod heap_tuple;
 pub mod hooks;
@@ -116,11 +117,7 @@ pub use pg_sys::{
 };
 pub use pgx_utils as utils;
 
-#[deprecated = "Please use the types in `{core,alloc,std}::ffi` instead"]
-pub mod cstr_core {
-    pub use alloc::ffi::{CString, FromVecWithNulError, NulError};
-    pub use core::ffi::{c_char, CStr, FromBytesWithNulError};
-}
+pub use cstr_core;
 
 use once_cell::sync::Lazy;
 use pgx_utils::sql_entity_graph::RustSourceOnlySqlMapping;
@@ -264,7 +261,7 @@ macro_rules! pg_magic_func {
                 abi_extra: {
                     // array::from_fn isn't const yet, boohoo, so const-copy a bstr
                     let magic = b"PostgreSQL";
-                    let mut abi = [0 as i8; 32];
+                    let mut abi = [0 as ::pgx::ffi::c_char; 32];
                     let mut i = 0;
                     while i < magic.len() {
                         abi[i] = magic[i] as _;
