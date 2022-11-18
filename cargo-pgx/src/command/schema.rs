@@ -26,13 +26,73 @@ use std::process::{Command, Stdio};
 extern crate alloc;
 use alloc::vec::Vec;
 
-// An apparent bug in `glibc` 2.17 prevents us from safely dropping this
-// otherwise users find issues such as https://github.com/tcdi/pgx/issues/572
-static POSTMASTER_LIBRARY: OnceCell<libloading::os::unix::Library> = OnceCell::new();
+// `dlclose` is wildly unsafe at the best of times, and unsupported by the Rust
+// stdlib. It will lead to issues like https://github.com/tcdi/pgx/issues/572,
+// among others
+static LIBRARIES: OnceCell<Libraries> = OnceCell::new();
 
-// An apparent bug in `glibc` 2.17 prevents us from safely dropping this
-// otherwise users find issues such as https://github.com/tcdi/pgx/issues/572
-static EXTENSION_LIBRARY: OnceCell<libloading::os::unix::Library> = OnceCell::new();
+struct Libraries {
+    postmaster_shim: libloading::os::unix::Library,
+    extension: libloading::os::unix::Library,
+}
+
+impl Libraries {
+    /// Safety: Same as [`libloading::os::unix::Library::open`]
+    #[cfg(target_os = "linux")]
+    unsafe fn load(postmaster_stub_built: &str, lib_so: &str) -> eyre::Result<Self> {
+        use std::{
+            ffi::{c_void, CString},
+            mem::MaybeUninit,
+        };
+        let postmaster_cstr = CString::new(postmaster_stub_built).unwrap();
+        // Open the postmaster shim in a new namespace.
+        let postmaster_handle = libc::dlmopen(
+            libc::LM_ID_NEWLM,
+            postmaster_cstr.as_ptr().cast(),
+            libc::RTLD_NOW | libc::RTLD_GLOBAL,
+        );
+        if postmaster_handle.is_null() {
+            // TODO(thom): wrangle dlerror
+            eyre::bail!("couldn't dlmopen {postmaster_stub_built:?}");
+        }
+        // Get a pointer to the namespace it was opened in (the fresh
+        // namespace it created).
+        let mut lmid: libc::Lmid_t = MaybeUninit::zeroed().assume_init();
+        let ret =
+            libc::dlinfo(postmaster_handle, libc::RTLD_DI_LMID, &mut lmid as *mut _ as *mut c_void);
+        if ret < 0 {
+            // Intentionally leak `postmaster_handle` -- dlclose would
+            // probably crash.
+            // TODO(thom): wrangle dlerror
+            eyre::bail!("couldn't dlinfo {postmaster_stub_built:?}");
+        }
+        // Open the the extension in the same namespace
+        let extension_cstr = CString::new(lib_so).unwrap();
+        let extension_handle = libc::dlmopen(lmid, extension_cstr.as_ptr().cast(), libc::RTLD_LAZY);
+        if extension_handle.is_null() {
+            // TODO(thom): wrangle dlerror
+            eyre::bail!("couldn't dlmopen {lib_so:?}");
+        }
+        Ok(Self {
+            postmaster_shim: libloading::os::unix::Library::from_raw(postmaster_handle),
+            extension: libloading::os::unix::Library::from_raw(extension_handle),
+        })
+    }
+
+    /// Safety: Same as [`libloading::os::unix::Library::open`]
+    #[cfg(not(target_os = "linux"))]
+    unsafe fn load(postmaster_stub_built: &str, lib_so: &str) -> eyre::Result<Self> {
+        let postmaster_library = libloading::os::unix::Library::open(
+            Some(&postmaster_stub_built),
+            libloading::os::unix::RTLD_NOW | libloading::os::unix::RTLD_GLOBAL,
+        )
+        .wrap_err_with(|| format!("Couldn't libload {postmaster_stub_built:?}"))?;
+        let extension_library =
+            libloading::os::unix::Library::open(Some(&lib_so), libloading::os::unix::RTLD_LAZY)
+                .wrap_err_with(|| format!("Couldn't libload {lib_so}"))?;
+        Ok(Self { postmaster_shim: postmaster_library, extension: extension_library })
+    }
+}
 
 /// Generate extension schema files
 #[derive(clap::Args, Debug)]
@@ -407,32 +467,21 @@ pub(crate) fn generate_schema(
         // Assumes that repr(Rust) enums are represented the same in this crate as in the external
         // binary, which is the case in practice when the same compiler is used to compile the
         // external crate.
-
-        POSTMASTER_LIBRARY
+        let libs = LIBRARIES
             .get_or_try_init(|| {
-                libloading::os::unix::Library::open(
-                    Some(&postmaster_stub_built),
-                    libloading::os::unix::RTLD_NOW | libloading::os::unix::RTLD_GLOBAL,
-                )
-            })
-            .wrap_err_with(|| format!("Couldn't libload {}", postmaster_stub_built.display()))?;
-
-        let lib = EXTENSION_LIBRARY
-            .get_or_try_init(|| {
-                libloading::os::unix::Library::open(Some(&lib_so), libloading::os::unix::RTLD_LAZY)
-            })
-            .wrap_err_with(|| format!("Couldn't libload {}", lib_so.display()))?;
+                Libraries::load(&postmaster_stub_built.display().to_string(), &lib_so.display().to_string())
+            })?;
 
         let sql_mappings_symbol: libloading::os::unix::Symbol<
             unsafe extern "Rust" fn() -> ::pgx_utils::sql_entity_graph::RustToSqlMapping,
-        > = lib
+        > = libs.extension
             .get("__pgx_sql_mappings".as_bytes())
             .expect(&format!("Couldn't call __pgx_sql_mappings"));
         sql_mapping = sql_mappings_symbol();
 
         let symbol: libloading::os::unix::Symbol<
             unsafe extern "Rust" fn() -> eyre::Result<ControlFile>,
-        > = lib
+        > = libs.extension
             .get("__pgx_marker".as_bytes())
             .expect(&format!("Couldn't call __pgx_marker"));
         let control_file_entity = SqlGraphEntity::ExtensionRoot(
@@ -442,7 +491,7 @@ pub(crate) fn generate_schema(
 
         for symbol_to_call in fns_to_call {
             let symbol: libloading::os::unix::Symbol<unsafe extern "Rust" fn() -> SqlGraphEntity> =
-                lib.get(symbol_to_call.as_bytes())
+            libs.extension.get(symbol_to_call.as_bytes())
                     .expect(&format!("Couldn't call {:#?}", symbol_to_call));
             let entity = symbol();
             entities.push(entity);
