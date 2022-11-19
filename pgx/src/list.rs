@@ -9,7 +9,7 @@ Use of this source code is governed by the MIT license that can be found in the 
 
 //! A safe wrapper around Postgres' internal [`List`][crate::pg_sys::List] structure.
 //!
-//! It functions similarly to a Rust [`Vec`][std::vec::Vec], including Iterator support, but provides separate
+//! It functions similarly to a Rust [`Vec`][std::vec::Vec], including iterator support, but provides separate
 //! understandings of [`List`][crate::pg_sys::List]s of [`Oid`][crate::pg_sys::Oid]s, Integers, and Pointers.
 
 use crate::{is_a, pg_sys, void_mut_ptr};
