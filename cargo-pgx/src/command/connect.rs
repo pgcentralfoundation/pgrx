@@ -7,34 +7,33 @@ All rights reserved.
 Use of this source code is governed by the MIT license that can be found in the LICENSE file.
 */
 
-use crate::{
-    command::{get::get_property, run::exec_psql, start::start_postgres},
-    CommandExecute,
-};
+use crate::command::get::get_property;
+use crate::command::run::exec_psql;
+use crate::command::start::start_postgres;
+use crate::CommandExecute;
 use cargo_toml::Manifest;
 use eyre::{eyre, WrapErr};
 use owo_colors::OwoColorize;
-use pgx_utils::createdb;
-use pgx_utils::pg_config::{PgConfig, Pgx};
+use pgx_pg_config::{createdb, PgConfig, Pgx};
 use std::path::PathBuf;
 
 /// Connect, via psql, to a Postgres instance
 #[derive(clap::Args, Debug)]
 #[clap(author)]
 pub(crate) struct Connect {
-    /// Do you want to run against Postgres `pg10`, `pg11`, `pg12`, `pg13`, `pg14`?
+    /// Do you want to run against Postgres `pg11`, `pg12`, `pg13`, `pg14`, `pg15`?
     #[clap(env = "PG_VERSION")]
     pg_version: Option<String>,
     /// The database to connect to (and create if the first time).  Defaults to a database with the same name as the current extension name
     #[clap(env = "DBNAME")]
     dbname: Option<String>,
-    #[clap(from_global, parse(from_occurrences))]
+    #[clap(from_global, action = ArgAction::Count)]
     verbose: usize,
     /// Package to determine default `pg_version` with (see `cargo help pkgid`)
     #[clap(long, short)]
     package: Option<String>,
     /// Path to Cargo.toml
-    #[clap(long, parse(from_os_str))]
+    #[clap(long, value_parser)]
     manifest_path: Option<PathBuf>,
     /// Use an existing `pgcli` on the $PATH.
     #[clap(env = "PGX_PGCLI", long)]
@@ -121,11 +120,7 @@ pub(crate) fn connect_psql(pg_config: &PgConfig, dbname: &str, pgcli: bool) -> e
 
     // create the named database
     if !createdb(pg_config, dbname, false, true)? {
-        println!(
-            "{} existing database {}",
-            "    Re-using".bold().cyan(),
-            dbname
-        );
+        println!("{} existing database {}", "    Re-using".bold().cyan(), dbname);
     }
 
     // run psql

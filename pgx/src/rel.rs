@@ -12,6 +12,9 @@ use crate::{
     direct_function_call, name_data_to_str, pg_sys, FromDatum, IntoDatum, PgBox, PgList,
     PgTupleDesc,
 };
+use pgx_utils::sql_entity_graph::metadata::{
+    ArgumentError, Returns, ReturnsError, SqlMapping, SqlTranslatable,
+};
 use std::ops::Deref;
 use std::os::raw::c_char;
 
@@ -31,22 +34,14 @@ impl PgRelation {
     ///
     /// This method is unsafe as we cannot ensure that this relation will later be closed by Postgres
     pub unsafe fn from_pg(ptr: pg_sys::Relation) -> Self {
-        PgRelation {
-            boxed: PgBox::from_pg(ptr),
-            need_close: false,
-            lockmode: None,
-        }
+        PgRelation { boxed: PgBox::from_pg(ptr), need_close: false, lockmode: None }
     }
 
     /// Wrap a Postgres-provided `pg_sys::Relation`.
     ///
     /// The provided `Relation` will be closed via `pg_sys::RelationClose` when this instance is dropped
     pub unsafe fn from_pg_owned(ptr: pg_sys::Relation) -> Self {
-        PgRelation {
-            boxed: PgBox::from_pg(ptr),
-            need_close: true,
-            lockmode: None,
-        }
+        PgRelation { boxed: PgBox::from_pg(ptr), need_close: true, lockmode: None }
     }
 
     /// Given a relation oid, use `pg_sys::RelationIdGetRelation()` to open the relation
@@ -69,11 +64,7 @@ impl PgRelation {
             panic!("Cannot open relation with oid={}", oid);
         }
 
-        PgRelation {
-            boxed: PgBox::from_pg(rel),
-            need_close: true,
-            lockmode: None,
-        }
+        PgRelation { boxed: PgBox::from_pg(rel), need_close: true, lockmode: None }
     }
 
     /// relation_open - open any relation by relation OID
@@ -138,10 +129,9 @@ impl PgRelation {
                 pg_sys::to_regclass,
                 vec![relname.into_datum()],
             ) {
-                Some(oid) => Ok(PgRelation::with_lock(
-                    oid,
-                    pg_sys::AccessShareLock as pg_sys::LOCKMODE,
-                )),
+                Some(oid) => {
+                    Ok(PgRelation::with_lock(oid, pg_sys::AccessShareLock as pg_sys::LOCKMODE))
+                }
                 None => Err("no such relation"),
             }
         }
@@ -193,7 +183,7 @@ impl PgRelation {
     }
 
     /// Return an iterator of indices, as `PgRelation`s, attached to this relation
-    pub fn indicies(
+    pub fn indices(
         &self,
         lockmode: pg_sys::LOCKMODE,
     ) -> impl std::iter::Iterator<Item = PgRelation> {
@@ -228,9 +218,7 @@ impl PgRelation {
 
     /// Number of tuples in this relation (not always up-to-date)
     pub fn reltuples(&self) -> Option<f32> {
-        let reltuples = unsafe { self.boxed.rd_rel.as_ref() }
-            .expect("rd_rel is NULL")
-            .reltuples;
+        let reltuples = unsafe { self.boxed.rd_rel.as_ref() }.expect("rd_rel is NULL").reltuples;
 
         if reltuples == 0f32 {
             None
@@ -308,7 +296,11 @@ impl Clone for PgRelation {
 }
 
 impl FromDatum for PgRelation {
-    unsafe fn from_datum(datum: pg_sys::Datum, is_null: bool) -> Option<PgRelation> {
+    unsafe fn from_polymorphic_datum(
+        datum: pg_sys::Datum,
+        is_null: bool,
+        _typoid: u32,
+    ) -> Option<PgRelation> {
         if is_null {
             None
         } else {
@@ -350,5 +342,14 @@ impl Drop for PgRelation {
                 }
             }
         }
+    }
+}
+
+unsafe impl SqlTranslatable for PgRelation {
+    fn argument_sql() -> Result<SqlMapping, ArgumentError> {
+        Ok(SqlMapping::literal("regclass"))
+    }
+    fn return_sql() -> Result<Returns, ReturnsError> {
+        Ok(Returns::One(SqlMapping::literal("regclass")))
     }
 }

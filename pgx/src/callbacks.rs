@@ -10,6 +10,7 @@ Use of this source code is governed by the MIT license that can be found in the 
 //! Provides safe wrappers around Postgres' "Transaction" and "Sub Transaction" hook system
 
 use crate::pg_sys;
+use pgx_macros::pg_guard;
 use std::cell::RefCell;
 use std::collections::HashMap;
 use std::rc::Rc;
@@ -159,6 +160,7 @@ where
     static mut XACT_HOOKS: Option<CallbackMap> = None;
 
     // internal function that we register as an XactCallback
+    #[pg_guard]
     unsafe extern "C" fn callback(event: pg_sys::XactEvent, _arg: *mut ::std::os::raw::c_void) {
         let which_event = PgXactCallbackEvent::translate_pg_event(event);
 
@@ -178,10 +180,7 @@ where
                 .remove(&which_event),
 
             // not in a transaction-end event, so just borrow our map
-            _ => XACT_HOOKS
-                .as_mut()
-                .expect("XACT_HOOKS was None")
-                .remove(&which_event),
+            _ => XACT_HOOKS.as_mut().expect("XACT_HOOKS was None").remove(&which_event),
         };
 
         // if we have a vec of hooks for this event they're consumed here and executed
@@ -194,7 +193,7 @@ where
                 // effectively 'take' the hook from the internal RefCell
                 if let Some(hook) = hook.replace(None) {
                     // and execute it under guard for proper panic/elog(ERROR) handling
-                    crate::guard::guard(hook.0);
+                    hook.0();
                 }
             }
         }
@@ -212,9 +211,8 @@ where
                 pg_sys::RegisterXactCallback(Some(callback), std::ptr::null_mut());
             }
 
-            XACT_HOOKS
-                .as_mut()
-                .expect("XACT_HOOKS was None during maybe_initialize") // this should never happen
+            XACT_HOOKS.as_mut().expect("XACT_HOOKS was None during maybe_initialize")
+            // this should never happen
         }
     }
 
@@ -314,6 +312,7 @@ where
 {
     static mut SUB_HOOKS: Option<SubCallbackMap> = None;
 
+    #[pg_guard]
     unsafe extern "C" fn callback(
         event: pg_sys::SubXactEvent,
         my_subid: pg_sys::SubTransactionId,
@@ -332,7 +331,7 @@ where
                 for hook in hooks.iter() {
                     let hook = hook.borrow();
                     if let Some(hook) = hook.as_ref() {
-                        crate::guard::guard(|| (hook.0)(my_subid, parent_subid));
+                        (hook.0)(my_subid, parent_subid)
                     }
                 }
             }
@@ -363,9 +362,8 @@ where
                 });
             }
 
-            SUB_HOOKS
-                .as_mut()
-                .expect("SUB_HOOKS was None during maybe_initialize()") // this should never happen
+            SUB_HOOKS.as_mut().expect("SUB_HOOKS was None during maybe_initialize()")
+            // this should never happen
         }
     }
 

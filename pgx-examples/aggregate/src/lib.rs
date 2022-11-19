@@ -6,12 +6,14 @@ All rights reserved.
 
 Use of this source code is governed by the MIT license that can be found in the LICENSE file.
 */
+use pgx::aggregate::*;
 use pgx::cstr_core::CStr;
-use pgx::*;
+use pgx::prelude::*;
+use pgx::{pgx, PgVarlena, PgVarlenaInOutFuncs, StringInfo};
 use serde::{Deserialize, Serialize};
 use std::str::FromStr;
 
-pg_module_magic!();
+pgx::pg_module_magic!();
 
 #[derive(Copy, Clone, PostgresType, Serialize, Deserialize)]
 #[pgvarlena_inoutfuncs]
@@ -26,8 +28,10 @@ impl IntegerAvgState {
         mut current: <Self as Aggregate>::State,
         arg: <Self as Aggregate>::Args,
     ) -> <Self as Aggregate>::State {
-        current.sum += arg;
-        current.n += 1;
+        arg.map(|a| {
+            current.sum += a;
+            current.n += 1;
+        });
         current
     }
 
@@ -70,7 +74,7 @@ impl PgVarlenaInOutFuncs for IntegerAvgState {
 #[pg_aggregate]
 impl Aggregate for IntegerAvgState {
     type State = PgVarlena<Self>;
-    type Args = pgx::name!(value, i32);
+    type Args = pgx::name!(value, Option<i32>);
     const NAME: &'static str = "DEMOAVG";
 
     const INITIAL_CONDITION: Option<&'static str> = Some("0,0");
@@ -146,9 +150,9 @@ mod tests {
     #[pg_test]
     fn test_integer_avg_state() {
         let avg_state = PgVarlena::<IntegerAvgState>::default();
-        let avg_state = IntegerAvgState::state(avg_state, 1);
-        let avg_state = IntegerAvgState::state(avg_state, 2);
-        let avg_state = IntegerAvgState::state(avg_state, 3);
+        let avg_state = IntegerAvgState::state(avg_state, Some(1));
+        let avg_state = IntegerAvgState::state(avg_state, Some(2));
+        let avg_state = IntegerAvgState::state(avg_state, Some(3));
         assert_eq!(2, IntegerAvgState::finalize(avg_state),);
     }
 
@@ -156,6 +160,14 @@ mod tests {
     fn test_integer_avg_state_sql() {
         Spi::run("CREATE TABLE demo_table (value INTEGER);");
         Spi::run("INSERT INTO demo_table (value) VALUES (1), (2), (3);");
+        let retval = Spi::get_one::<i32>("SELECT DEMOAVG(value) FROM demo_table;")
+            .expect("SQL select failed");
+        assert_eq!(retval, 2);
+    }
+    #[pg_test]
+    fn test_integer_avg_with_null() {
+        Spi::run("CREATE TABLE demo_table (value INTEGER);");
+        Spi::run("INSERT INTO demo_table (value) VALUES (1), (NULL), (3);");
         let retval = Spi::get_one::<i32>("SELECT DEMOAVG(value) FROM demo_table;")
             .expect("SQL select failed");
         assert_eq!(retval, 2);

@@ -1,15 +1,13 @@
 /*
 Portions Copyright 2019-2021 ZomboDB, LLC.
 Portions Copyright 2021-2022 Technology Concepts & Design, Inc. <support@tcdi.com>
-
 All rights reserved.
-
 Use of this source code is governed by the MIT license that can be found in the LICENSE file.
 */
 
-use pgx::*;
+use pgx::prelude::*;
 
-pg_module_magic!();
+pgx::pg_module_magic!();
 
 #[pg_extern]
 fn return_static() -> &'static str {
@@ -39,17 +37,22 @@ fn split(input: &'static str, pattern: &str) -> Vec<&'static str> {
 }
 
 #[pg_extern]
-fn split_set(
-    input: &'static str,
-    pattern: &'static str,
-) -> impl std::iter::Iterator<Item = &'static str> {
-    input.split_terminator(pattern).into_iter()
+fn split_set<'a>(input: &'a str, pattern: &'a str) -> SetOfIterator<'a, &'a str> {
+    SetOfIterator::new(input.split_terminator(pattern).into_iter())
+}
+
+#[pg_extern]
+fn split_table<'a>(
+    input: &'a str,
+    pattern: &'a str,
+) -> TableIterator<'a, (name!(i, i32), name!(s, &'a str))> {
+    TableIterator::new(input.split_terminator(pattern).enumerate().map(|(i, s)| (i as i32, s)))
 }
 
 #[cfg(any(test, feature = "pg_test"))]
 #[pg_schema]
 mod tests {
-    use pgx::*;
+    use pgx::prelude::*;
 
     #[pg_test]
     fn test_it() {

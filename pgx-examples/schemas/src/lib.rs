@@ -9,10 +9,10 @@ Use of this source code is governed by the MIT license that can be found in the 
 /// All top-level pgx objects, **regardless** of the ".rs" file they're defined in, are created
 /// in the schema determined by `CREATE EXTENSION`.  It could be `public` (the default), or a
 /// user-specified schema. We have no idea what that is.
-use pgx::*;
+use pgx::prelude::*;
 use serde::{Deserialize, Serialize};
 
-pg_module_magic!();
+pgx::pg_module_magic!();
 
 #[derive(PostgresType, Serialize, Deserialize)]
 pub struct MyType(pub(crate) String);
@@ -54,7 +54,7 @@ mod pg_catalog {
 /// proper permissions by the user calling `CREATE EXTENSION`
 #[pg_schema]
 mod public {
-    use pgx::*;
+    use pgx::prelude::*;
 
     #[pg_extern]
     pub fn hello_public() -> &'static str {
@@ -68,7 +68,7 @@ mod tests {
     use crate::pg_catalog::MyPgCatalogType;
     use crate::some_schema::MySomeSchemaType;
     use crate::MyType;
-    use pgx::*;
+    use pgx::prelude::*;
 
     #[pg_test]
     fn test_hello_default_schema() {
@@ -84,9 +84,7 @@ mod tests {
             "test",
             // we don't need to qualify "MyType" because whatever schema it was created in
             // is applied to the "search_path" of this test function
-            Spi::get_one::<MyType>("SELECT '\"test\"'::MyType")
-                .expect("SPI reault was NULL")
-                .0
+            Spi::get_one::<MyType>("SELECT '\"test\"'::MyType").expect("SPI reault was NULL").0
         );
     }
 

@@ -13,23 +13,25 @@ use crate::CommandExecute;
 use cargo_toml::Manifest;
 use eyre::{eyre, WrapErr};
 use owo_colors::OwoColorize;
-use pgx_utils::pg_config::{PgConfig, PgConfigSelector, Pgx};
-use std::{os::unix::process::CommandExt, path::PathBuf, process::Stdio};
+use pgx_pg_config::{PgConfig, PgConfigSelector, Pgx};
+use std::os::unix::process::CommandExt;
+use std::path::PathBuf;
+use std::process::Stdio;
 
 /// Start a pgx-managed Postgres instance
 #[derive(clap::Args, Debug)]
 #[clap(author)]
 pub(crate) struct Start {
-    /// The Postgres version to start (`pg10`, `pg11`, `pg12`, `pg13`, `pg14`, or `all`)
+    /// The Postgres version to start (`pg11`, `pg12`, `pg13`, `pg14`, `pg15`, or `all`)
     #[clap(env = "PG_VERSION")]
     pg_version: Option<String>,
-    #[clap(from_global, parse(from_occurrences))]
-    verbose: usize,
+    #[clap(from_global, action = ArgAction::Count)]
+    verbose: u8,
     /// Package to determine default `pg_version` with (see `cargo help pkgid`)
     #[clap(long, short)]
     package: Option<String>,
     /// Path to Cargo.toml
-    #[clap(long, parse(from_os_str))]
+    #[clap(long, value_parser)]
     manifest_path: Option<PathBuf>,
 }
 
@@ -90,7 +92,7 @@ pub(crate) fn start_postgres(pg_config: &PgConfig) -> eyre::Result<()> {
     let mut command = std::process::Command::new(format!("{}/pg_ctl", bindir.display()));
     // Unsafe block is for the pre_exec setsid call below
     //
-    // This is to work around a bug in PG10 + PG11 which don't call setsid in pg_ctl
+    // This is to work around a bug in PG11 which does not call setsid in pg_ctl
     // This means that when cargo pgx run dumps a user into psql, pushing ctrl-c will abort
     // the postgres server started by pgx
     unsafe {
@@ -98,11 +100,7 @@ pub(crate) fn start_postgres(pg_config: &PgConfig) -> eyre::Result<()> {
             .stdout(Stdio::piped())
             .stderr(Stdio::piped())
             .arg("start")
-            .arg(format!(
-                "-o -i -p {} -c unix_socket_directories={}",
-                port,
-                Pgx::home()?.display()
-            ))
+            .arg(format!("-o -i -p {} -c unix_socket_directories={}", port, Pgx::home()?.display()))
             .arg("-D")
             .arg(&datadir)
             .arg("-l")

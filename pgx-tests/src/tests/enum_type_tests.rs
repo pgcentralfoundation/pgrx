@@ -7,7 +7,7 @@ All rights reserved.
 Use of this source code is governed by the MIT license that can be found in the LICENSE file.
 */
 
-use pgx::*;
+use pgx::prelude::*;
 
 #[derive(PostgresEnum, PartialEq, Debug)]
 pub enum Foo {
@@ -30,7 +30,7 @@ mod tests {
     use crate as pgx_tests;
 
     use crate::tests::enum_type_tests::Foo;
-    use pgx::*;
+    use pgx::prelude::*;
 
     #[test]
     fn make_idea_happy() {}

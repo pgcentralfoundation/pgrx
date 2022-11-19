@@ -9,8 +9,9 @@ Use of this source code is governed by the MIT license that can be found in the 
 
 use eyre::eyre;
 use owo_colors::OwoColorize;
-use pgx_utils::pg_config::{PgConfig, PgConfigSelector, Pgx};
-use std::{path::PathBuf, process::Stdio};
+use pgx_pg_config::{PgConfig, PgConfigSelector, Pgx};
+use std::path::PathBuf;
+use std::process::Stdio;
 
 use crate::CommandExecute;
 
@@ -21,13 +22,13 @@ pub(crate) struct Status {
     /// The Postgres version
     #[clap(env = "PG_VERSION")]
     pg_version: Option<String>,
-    #[clap(from_global, parse(from_occurrences))]
-    verbose: usize,
+    #[clap(from_global, action = ArgAction::Count)]
+    verbose: u8,
     /// Package to determine default `pg_version` with (see `cargo help pkgid`)
     #[clap(long, short)]
     package: Option<String>,
     /// Path to Cargo.toml
-    #[clap(long, parse(from_os_str))]
+    #[clap(long, value_parser)]
     manifest_path: Option<PathBuf>,
 }
 
@@ -44,17 +45,9 @@ impl CommandExecute for Status {
         for pg_config in pgx.iter(PgConfigSelector::new(&pg_version)) {
             let pg_config = pg_config?;
             if status_postgres(pg_config)? {
-                println!(
-                    "Postgres v{} is {}",
-                    pg_config.major_version()?,
-                    "running".bold().green()
-                )
+                println!("Postgres v{} is {}", pg_config.major_version()?, "running".bold().green())
             } else {
-                println!(
-                    "Postgres v{} is {}",
-                    pg_config.major_version()?,
-                    "stopped".bold().red()
-                )
+                println!("Postgres v{} is {}", pg_config.major_version()?, "stopped".bold().red())
             }
         }
 
@@ -74,12 +67,7 @@ pub(crate) fn status_postgres(pg_config: &PgConfig) -> eyre::Result<bool> {
     }
 
     let mut command = std::process::Command::new(format!("{}/pg_ctl", bindir.display()));
-    command
-        .stdout(Stdio::piped())
-        .stderr(Stdio::piped())
-        .arg("status")
-        .arg("-D")
-        .arg(&datadir);
+    command.stdout(Stdio::piped()).stderr(Stdio::piped()).arg("status").arg("-D").arg(&datadir);
     let command_str = format!("{:?}", command);
     tracing::debug!(command = %command_str, "Running");
 

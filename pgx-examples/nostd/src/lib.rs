@@ -16,7 +16,7 @@ use serde::{Deserialize, Serialize};
 
 use alloc::string::String;
 
-pg_module_magic!();
+pgx::pg_module_magic!();
 
 /// standard Rust equality/comparison derives
 #[derive(Eq, PartialEq, Ord, Hash, PartialOrd)]

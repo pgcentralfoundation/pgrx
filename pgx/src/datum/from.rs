@@ -13,39 +13,24 @@ use crate::{
     pg_sys, text_to_rust_str_unchecked, varlena_to_byte_slice, AllocatedByPostgres, IntoDatum,
     PgBox, PgMemoryContexts,
 };
-use std::error::Error;
 use std::ffi::CStr;
-use std::fmt::{Display, Formatter};
 use std::num::NonZeroUsize;
 
-/// Reasons converting a Datum to a Rust type may fail
-#[derive(Debug)]
+/// If converting a Datum to a Rust type fails, this is the set of possible reasons why.
+#[derive(thiserror::Error, Debug, Clone, PartialEq, Eq)]
 pub enum TryFromDatumError {
-    /// The specified type of the Datum is not compatible with the desired Rust type.
+    #[error("The specified type of the Datum is not compatible with the desired Rust type.")]
     IncompatibleTypes,
 
-    /// We were asked to convert a Datum that is NULL (but flagged as "not null")
+    #[error("We were asked to convert a Datum that is NULL (but flagged as \"not null\")")]
     NullDatumPointer,
 
-    /// The specified attribute number is invalid
+    #[error("The specified attribute number `{0}` is not present")]
     NoSuchAttributeNumber(NonZeroUsize),
 
-    /// The specified attribute name is invalid
+    #[error("The specified attribute name `{0}` is not present")]
     NoSuchAttributeName(String),
 }
-
-impl Display for TryFromDatumError {
-    fn fmt(&self, f: &mut Formatter<'_>) -> std::fmt::Result {
-        match self {
-            TryFromDatumError::IncompatibleTypes => f.write_str("Incompatible types"),
-            TryFromDatumError::NullDatumPointer => f.write_str("Null Datum pointer"),
-            TryFromDatumError::NoSuchAttributeNumber(_) => f.write_str("No such attribute number"),
-            TryFromDatumError::NoSuchAttributeName(_) => f.write_str("No such attribute name"),
-        }
-    }
-}
-
-impl Error for TryFromDatumError {}
 
 /// Convert a `(pg_sys::Datum, is_null:bool` pair into a Rust type
 ///
@@ -54,6 +39,9 @@ impl Error for TryFromDatumError {}
 /// If implementing this, also implement `IntoDatum` for the reverse
 /// conversion.
 pub trait FromDatum {
+    /// Should a type OID be fetched when calling `from_datum`?
+    const GET_TYPOID: bool = false;
+
     /// ## Safety
     ///
     /// This method is inherently unsafe as the `datum` argument can represent an arbitrary
@@ -66,6 +54,23 @@ pub trait FromDatum {
     /// If, however, you're providing an arbitrary datum value, it needs to be considered unsafe
     /// and that unsafeness should be propagated through your API.
     unsafe fn from_datum(datum: pg_sys::Datum, is_null: bool) -> Option<Self>
+    where
+        Self: Sized,
+    {
+        FromDatum::from_polymorphic_datum(datum, is_null, pg_sys::InvalidOid)
+    }
+
+    /// Like `from_datum` for instantiating polymorphic types
+    /// which require preserving the dynamic type metadata.
+    ///
+    /// ## Safety
+    ///
+    /// Same caveats as `FromDatum::from_datum(...)`.
+    unsafe fn from_polymorphic_datum(
+        datum: pg_sys::Datum,
+        is_null: bool,
+        typoid: pg_sys::Oid,
+    ) -> Option<Self>
     where
         Self: Sized;
 
@@ -86,11 +91,12 @@ pub trait FromDatum {
         mut memory_context: PgMemoryContexts,
         datum: pg_sys::Datum,
         is_null: bool,
+        typoid: pg_sys::Oid,
     ) -> Option<Self>
     where
         Self: Sized,
     {
-        memory_context.switch_to(|_| FromDatum::from_datum(datum, is_null))
+        memory_context.switch_to(|_| FromDatum::from_polymorphic_datum(datum, is_null, typoid))
     }
 
     /// `try_from_datum` is a convenience wrapper around `FromDatum::from_datum` that returns a
@@ -114,7 +120,7 @@ pub trait FromDatum {
         } else if !is_null && datum.is_null() && !Self::is_pass_by_value() {
             Err(TryFromDatumError::NullDatumPointer)
         } else {
-            Ok(FromDatum::from_datum(datum, is_null))
+            Ok(FromDatum::from_polymorphic_datum(datum, is_null, type_oid))
         }
     }
 }
@@ -122,7 +128,11 @@ pub trait FromDatum {
 /// for pg_sys::Datum
 impl FromDatum for pg_sys::Datum {
     #[inline]
-    unsafe fn from_datum(datum: pg_sys::Datum, is_null: bool) -> Option<pg_sys::Datum> {
+    unsafe fn from_polymorphic_datum(
+        datum: pg_sys::Datum,
+        is_null: bool,
+        _: pg_sys::Oid,
+    ) -> Option<pg_sys::Datum> {
         if is_null {
             None
         } else {
@@ -134,7 +144,11 @@ impl FromDatum for pg_sys::Datum {
 /// for bool
 impl FromDatum for bool {
     #[inline]
-    unsafe fn from_datum(datum: pg_sys::Datum, is_null: bool) -> Option<bool> {
+    unsafe fn from_polymorphic_datum(
+        datum: pg_sys::Datum,
+        is_null: bool,
+        _: pg_sys::Oid,
+    ) -> Option<bool> {
         if is_null {
             None
         } else {
@@ -146,7 +160,11 @@ impl FromDatum for bool {
 /// for `"char"`
 impl FromDatum for i8 {
     #[inline]
-    unsafe fn from_datum(datum: pg_sys::Datum, is_null: bool) -> Option<i8> {
+    unsafe fn from_polymorphic_datum(
+        datum: pg_sys::Datum,
+        is_null: bool,
+        _: pg_sys::Oid,
+    ) -> Option<i8> {
         if is_null {
             None
         } else {
@@ -158,7 +176,11 @@ impl FromDatum for i8 {
 /// for smallint
 impl FromDatum for i16 {
     #[inline]
-    unsafe fn from_datum(datum: pg_sys::Datum, is_null: bool) -> Option<i16> {
+    unsafe fn from_polymorphic_datum(
+        datum: pg_sys::Datum,
+        is_null: bool,
+        _: pg_sys::Oid,
+    ) -> Option<i16> {
         if is_null {
             None
         } else {
@@ -170,7 +192,11 @@ impl FromDatum for i16 {
 /// for integer
 impl FromDatum for i32 {
     #[inline]
-    unsafe fn from_datum(datum: pg_sys::Datum, is_null: bool) -> Option<i32> {
+    unsafe fn from_polymorphic_datum(
+        datum: pg_sys::Datum,
+        is_null: bool,
+        _: pg_sys::Oid,
+    ) -> Option<i32> {
         if is_null {
             None
         } else {
@@ -182,7 +208,11 @@ impl FromDatum for i32 {
 /// for oid
 impl FromDatum for u32 {
     #[inline]
-    unsafe fn from_datum(datum: pg_sys::Datum, is_null: bool) -> Option<u32> {
+    unsafe fn from_polymorphic_datum(
+        datum: pg_sys::Datum,
+        is_null: bool,
+        _: pg_sys::Oid,
+    ) -> Option<u32> {
         if is_null {
             None
         } else {
@@ -194,7 +224,11 @@ impl FromDatum for u32 {
 /// for bigint
 impl FromDatum for i64 {
     #[inline]
-    unsafe fn from_datum(datum: pg_sys::Datum, is_null: bool) -> Option<i64> {
+    unsafe fn from_polymorphic_datum(
+        datum: pg_sys::Datum,
+        is_null: bool,
+        _: pg_sys::Oid,
+    ) -> Option<i64> {
         if is_null {
             None
         } else {
@@ -206,7 +240,11 @@ impl FromDatum for i64 {
 /// for real
 impl FromDatum for f32 {
     #[inline]
-    unsafe fn from_datum(datum: pg_sys::Datum, is_null: bool) -> Option<f32> {
+    unsafe fn from_polymorphic_datum(
+        datum: pg_sys::Datum,
+        is_null: bool,
+        _: pg_sys::Oid,
+    ) -> Option<f32> {
         if is_null {
             None
         } else {
@@ -218,7 +256,11 @@ impl FromDatum for f32 {
 /// for double precision
 impl FromDatum for f64 {
     #[inline]
-    unsafe fn from_datum(datum: pg_sys::Datum, is_null: bool) -> Option<f64> {
+    unsafe fn from_polymorphic_datum(
+        datum: pg_sys::Datum,
+        is_null: bool,
+        _: pg_sys::Oid,
+    ) -> Option<f64> {
         if is_null {
             None
         } else {
@@ -230,11 +272,15 @@ impl FromDatum for f64 {
 /// for text, varchar
 impl<'a> FromDatum for &'a str {
     #[inline]
-    unsafe fn from_datum(datum: pg_sys::Datum, is_null: bool) -> Option<&'a str> {
-        if is_null {
+    unsafe fn from_polymorphic_datum(
+        datum: pg_sys::Datum,
+        is_null: bool,
+        _: pg_sys::Oid,
+    ) -> Option<&'a str> {
+        if is_null || datum.is_null() {
             None
         } else {
-            let varlena = pg_sys::pg_detoast_datum_packed(datum.ptr_cast());
+            let varlena = pg_sys::pg_detoast_datum_packed(datum.cast_mut_ptr());
             Some(text_to_rust_str_unchecked(varlena))
         }
     }
@@ -243,16 +289,17 @@ impl<'a> FromDatum for &'a str {
         mut memory_context: PgMemoryContexts,
         datum: pg_sys::Datum,
         is_null: bool,
+        _typoid: u32,
     ) -> Option<Self>
     where
         Self: Sized,
     {
-        if is_null {
+        if is_null || datum.is_null() {
             None
         } else {
             memory_context.switch_to(|_| {
                 // this gets the varlena Datum copied into this memory context
-                let detoasted = pg_sys::pg_detoast_datum_copy(datum.ptr_cast());
+                let detoasted = pg_sys::pg_detoast_datum_copy(datum.cast_mut_ptr());
 
                 // and we need to unpack it (if necessary), which will decompress it too
                 let varlena = pg_sys::pg_detoast_datum_packed(detoasted);
@@ -269,48 +316,54 @@ impl<'a> FromDatum for &'a str {
 /// This returns a **copy**, allocated and managed by Rust, of the underlying `varlena` Datum
 impl FromDatum for String {
     #[inline]
-    unsafe fn from_datum(datum: pg_sys::Datum, is_null: bool) -> Option<String> {
-        let refstr: Option<&str> = FromDatum::from_datum(datum, is_null);
-        match refstr {
-            Some(refstr) => Some(refstr.to_owned()),
-            None => None,
-        }
+    unsafe fn from_polymorphic_datum(
+        datum: pg_sys::Datum,
+        is_null: bool,
+        typoid: pg_sys::Oid,
+    ) -> Option<String> {
+        FromDatum::from_polymorphic_datum(datum, is_null, typoid).map(|s: &str| s.to_owned())
     }
 }
 
 impl FromDatum for char {
     #[inline]
-    unsafe fn from_datum(datum: pg_sys::Datum, is_null: bool) -> Option<char> {
-        let refstr: Option<&str> = FromDatum::from_datum(datum, is_null);
-        match refstr {
-            Some(refstr) => refstr.chars().next(),
-            None => None,
-        }
+    unsafe fn from_polymorphic_datum(
+        datum: pg_sys::Datum,
+        is_null: bool,
+        typoid: pg_sys::Oid,
+    ) -> Option<char> {
+        FromDatum::from_polymorphic_datum(datum, is_null, typoid)
+            .and_then(|s: &str| s.chars().next())
     }
 }
 
 /// for cstring
 impl<'a> FromDatum for &'a std::ffi::CStr {
     #[inline]
-    unsafe fn from_datum(datum: pg_sys::Datum, is_null: bool) -> Option<&'a CStr> {
-        if is_null {
+    unsafe fn from_polymorphic_datum(
+        datum: pg_sys::Datum,
+        is_null: bool,
+        _: pg_sys::Oid,
+    ) -> Option<&'a CStr> {
+        if is_null || datum.is_null() {
             None
         } else {
-            Some(std::ffi::CStr::from_ptr(datum.ptr_cast()))
+            Some(std::ffi::CStr::from_ptr(datum.cast_mut_ptr()))
         }
     }
 }
 
 impl<'a> FromDatum for &'a crate::cstr_core::CStr {
     #[inline]
-    unsafe fn from_datum(
+    unsafe fn from_polymorphic_datum(
         datum: pg_sys::Datum,
         is_null: bool,
+        _: pg_sys::Oid,
     ) -> Option<&'a crate::cstr_core::CStr> {
-        if is_null {
+        if is_null || datum.is_null() {
             None
         } else {
-            Some(crate::cstr_core::CStr::from_ptr(datum.ptr_cast()))
+            Some(crate::cstr_core::CStr::from_ptr(datum.cast_mut_ptr()))
         }
     }
 }
@@ -318,11 +371,15 @@ impl<'a> FromDatum for &'a crate::cstr_core::CStr {
 /// for bytea
 impl<'a> FromDatum for &'a [u8] {
     #[inline]
-    unsafe fn from_datum(datum: pg_sys::Datum, is_null: bool) -> Option<&'a [u8]> {
-        if is_null {
+    unsafe fn from_polymorphic_datum(
+        datum: pg_sys::Datum,
+        is_null: bool,
+        _typoid: u32,
+    ) -> Option<&'a [u8]> {
+        if is_null || datum.is_null() {
             None
         } else {
-            let varlena = pg_sys::pg_detoast_datum_packed(datum.ptr_cast());
+            let varlena = pg_sys::pg_detoast_datum_packed(datum.cast_mut_ptr());
             Some(varlena_to_byte_slice(varlena))
         }
     }
@@ -331,16 +388,17 @@ impl<'a> FromDatum for &'a [u8] {
         mut memory_context: PgMemoryContexts,
         datum: pg_sys::Datum,
         is_null: bool,
+        _typoid: u32,
     ) -> Option<Self>
     where
         Self: Sized,
     {
-        if is_null {
+        if is_null || datum.is_null() {
             None
         } else {
             memory_context.switch_to(|_| {
                 // this gets the varlena Datum copied into this memory context
-                let detoasted = pg_sys::pg_detoast_datum_copy(datum.ptr_cast());
+                let detoasted = pg_sys::pg_detoast_datum_copy(datum.cast_mut_ptr());
 
                 // and we need to unpack it (if necessary), which will decompress it too
                 let varlena = pg_sys::pg_detoast_datum_packed(detoasted);
@@ -354,12 +412,16 @@ impl<'a> FromDatum for &'a [u8] {
 
 impl FromDatum for Vec<u8> {
     #[inline]
-    unsafe fn from_datum(datum: pg_sys::Datum, is_null: bool) -> Option<Vec<u8>> {
-        if is_null {
+    unsafe fn from_polymorphic_datum(
+        datum: pg_sys::Datum,
+        is_null: bool,
+        typoid: u32,
+    ) -> Option<Vec<u8>> {
+        if is_null || datum.is_null() {
             None
         } else {
             // Vec<u8> conversion is initially the same as for &[u8]
-            let bytes: Option<&[u8]> = FromDatum::from_datum(datum, is_null);
+            let bytes: Option<&[u8]> = FromDatum::from_polymorphic_datum(datum, is_null, typoid);
 
             match bytes {
                 // but then we need to convert it into an owned Vec where the backing
@@ -374,7 +436,11 @@ impl FromDatum for Vec<u8> {
 /// for NULL -- always converts to a `None`, even if the is_null argument is false
 impl FromDatum for () {
     #[inline]
-    unsafe fn from_datum(_datum: pg_sys::Datum, _is_null: bool) -> Option<()> {
+    unsafe fn from_polymorphic_datum(
+        _datum: pg_sys::Datum,
+        _is_null: bool,
+        _: pg_sys::Oid,
+    ) -> Option<()> {
         None
     }
 }
@@ -382,11 +448,15 @@ impl FromDatum for () {
 /// for user types
 impl<T> FromDatum for PgBox<T, AllocatedByPostgres> {
     #[inline]
-    unsafe fn from_datum(datum: pg_sys::Datum, is_null: bool) -> Option<Self> {
-        if is_null {
+    unsafe fn from_polymorphic_datum(
+        datum: pg_sys::Datum,
+        is_null: bool,
+        _: pg_sys::Oid,
+    ) -> Option<Self> {
+        if is_null || datum.is_null() {
             None
         } else {
-            Some(PgBox::<T>::from_pg(datum.ptr_cast()))
+            Some(PgBox::<T>::from_pg(datum.cast_mut_ptr()))
         }
     }
 
@@ -394,15 +464,16 @@ impl<T> FromDatum for PgBox<T, AllocatedByPostgres> {
         mut memory_context: PgMemoryContexts,
         datum: pg_sys::Datum,
         is_null: bool,
+        _typoid: u32,
     ) -> Option<Self>
     where
         Self: Sized,
     {
         memory_context.switch_to(|context| {
-            if is_null {
+            if is_null || datum.is_null() {
                 None
             } else {
-                let copied = context.copy_ptr_into(datum.ptr_cast(), std::mem::size_of::<T>());
+                let copied = context.copy_ptr_into(datum.cast_mut_ptr(), std::mem::size_of::<T>());
                 Some(PgBox::<T>::from_pg(copied))
             }
         })

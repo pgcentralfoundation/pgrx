@@ -6,7 +6,8 @@ All rights reserved.
 
 Use of this source code is governed by the MIT license that can be found in the LICENSE file.
 */
-use pgx::*;
+use pgx::prelude::*;
+use pgx::{Uuid, UuidBytes};
 
 pub const TEST_UUID_V4: UuidBytes = [
     0x12, 0x3e, 0x45, 0x67, 0xe8, 0x9b, 0x12, 0xd3, 0xa4, 0x56, 0x42, 0x66, 0x14, 0x17, 0x40, 0x00,
@@ -32,7 +33,8 @@ fn display_uuid(uuid: Uuid) -> String {
 mod tests {
     #[allow(unused_imports)]
     use crate as pgx_tests;
-    use pgx::*;
+    use pgx::prelude::*;
+    use pgx::Uuid;
 
     #[pg_test]
     fn test_display_uuid() {
@@ -44,17 +46,11 @@ mod tests {
         assert_eq!(format!("{}", uuid), "123e4567-e89b-12d3-a456-426614174000");
 
         // Lowercase hex formatting
-        assert_eq!(
-            format!("{:-x}", uuid),
-            "123e4567-e89b-12d3-a456-426614174000"
-        );
+        assert_eq!(format!("{:-x}", uuid), "123e4567-e89b-12d3-a456-426614174000");
         assert_eq!(format!("{:x}", uuid), "123e4567e89b12d3a456426614174000");
 
         // Uppercase hex formatting
-        assert_eq!(
-            format!("{:-X}", uuid),
-            "123E4567-E89B-12D3-A456-426614174000"
-        );
+        assert_eq!(format!("{:-X}", uuid), "123E4567-E89B-12D3-A456-426614174000");
         assert_eq!(format!("{:X}", uuid), "123E4567E89B12D3A456426614174000");
     }
 

@@ -6,14 +6,21 @@ All rights reserved.
 
 Use of this source code is governed by the MIT license that can be found in the LICENSE file.
 */
-use crate::sql_entity_graph::{positioning_ref::PositioningRef, to_sql::ToSqlConfig};
+/*!
+
+`#[pg_extern]` related attributes for Rust to SQL translation
+
+> Like all of the [`sql_entity_graph`][crate::sql_entity_graph] APIs, this is considered **internal**
+to the `pgx` framework and very subject to change between versions. While you may use this, please do it with caution.
+
+*/
+use crate::sql_entity_graph::positioning_ref::PositioningRef;
+use crate::sql_entity_graph::to_sql::ToSqlConfig;
 use proc_macro2::{Span, TokenStream as TokenStream2};
 use quote::{quote, ToTokens, TokenStreamExt};
-use syn::{
-    parse::{Parse, ParseStream},
-    punctuated::Punctuated,
-    Token,
-};
+use syn::parse::{Parse, ParseStream};
+use syn::punctuated::Punctuated;
+use syn::Token;
 
 #[derive(Debug, Clone, Hash, Eq, PartialEq)]
 pub enum Attribute {
@@ -23,6 +30,7 @@ pub enum Attribute {
     Volatile,
     Raw,
     NoGuard,
+    CreateOrReplace,
     ParallelSafe,
     ParallelUnsafe,
     ParallelRestricted,
@@ -43,6 +51,7 @@ impl Attribute {
             Attribute::Volatile => quote! { ::pgx::utils::ExternArgs::Volatile },
             Attribute::Raw => quote! { ::pgx::utils::ExternArgs::Raw },
             Attribute::NoGuard => quote! { ::pgx::utils::ExternArgs::NoGuard },
+            Attribute::CreateOrReplace => quote! { ::pgx::utils::ExternArgs::CreateOrReplace },
             Attribute::ParallelSafe => {
                 quote! { ::pgx::utils::ExternArgs::ParallelSafe }
             }
@@ -65,10 +74,7 @@ impl Attribute {
                 quote! { ::pgx::utils::ExternArgs::Cost(format!("{}", #s)) }
             }
             Attribute::Requires(items) => {
-                let items_iter = items
-                    .iter()
-                    .map(|x| x.to_token_stream())
-                    .collect::<Vec<_>>();
+                let items_iter = items.iter().map(|x| x.to_token_stream()).collect::<Vec<_>>();
                 quote! { ::pgx::utils::ExternArgs::Requires(vec![#(#items_iter),*],) }
             }
             // This attribute is handled separately
@@ -88,6 +94,7 @@ impl ToTokens for Attribute {
             Attribute::Volatile => quote! { volatile },
             Attribute::Raw => quote! { raw },
             Attribute::NoGuard => quote! { no_guard },
+            Attribute::CreateOrReplace => quote! { create_or_replace },
             Attribute::ParallelSafe => {
                 quote! { parallel_safe }
             }
@@ -110,10 +117,7 @@ impl ToTokens for Attribute {
                 quote! { cost = #s }
             }
             Attribute::Requires(items) => {
-                let items_iter = items
-                    .iter()
-                    .map(|x| x.to_token_stream())
-                    .collect::<Vec<_>>();
+                let items_iter = items.iter().map(|x| x.to_token_stream()).collect::<Vec<_>>();
                 quote! { requires = [#(#items_iter),*] }
             }
             // This attribute is handled separately
@@ -135,6 +139,7 @@ impl Parse for Attribute {
             "volatile" => Self::Volatile,
             "raw" => Self::Raw,
             "no_guard" => Self::NoGuard,
+            "create_or_replace" => Self::CreateOrReplace,
             "parallel_safe" => Self::ParallelSafe,
             "parallel_unsafe" => Self::ParallelUnsafe,
             "parallel_restricted" => Self::ParallelRestricted,

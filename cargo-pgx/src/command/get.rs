@@ -9,12 +9,10 @@ Use of this source code is governed by the MIT license that can be found in the 
 
 use crate::CommandExecute;
 use eyre::{eyre, WrapErr};
-use std::{
-    fs::File,
-    io::{BufRead, BufReader},
-    path::{Path, PathBuf},
-    process::Command,
-};
+use std::fs::File;
+use std::io::{BufRead, BufReader};
+use std::path::{Path, PathBuf};
+use std::process::Command;
 
 /// Get a property from the extension control file
 #[derive(clap::Args, Debug)]
@@ -22,13 +20,13 @@ use std::{
 pub(crate) struct Get {
     /// One of the properties from `$EXTENSION.control`
     name: String,
-    #[clap(from_global, parse(from_occurrences))]
-    verbose: usize,
+    #[clap(from_global, action = ArgAction::Count)]
+    verbose: u8,
     /// Package to determine default `pg_version` with (see `cargo help pkgid`)
     #[clap(long, short)]
     package: Option<String>,
     /// Path to Cargo.toml
-    #[clap(long, parse(from_os_str))]
+    #[clap(long, value_parser)]
     manifest_path: Option<PathBuf>,
 }
 
@@ -89,18 +87,13 @@ pub fn get_property(manifest_path: impl AsRef<Path>, name: &str) -> eyre::Result
 pub(crate) fn find_control_file(
     manifest_path: impl AsRef<Path>,
 ) -> eyre::Result<(PathBuf, String)> {
-    let parent = manifest_path.as_ref().parent().ok_or_else(|| {
-        eyre!(
-            "could not get parent of `{}`",
-            manifest_path.as_ref().display()
-        )
-    })?;
+    let parent = manifest_path
+        .as_ref()
+        .parent()
+        .ok_or_else(|| eyre!("could not get parent of `{}`", manifest_path.as_ref().display()))?;
 
     for f in std::fs::read_dir(parent).wrap_err_with(|| {
-        eyre!(
-            "cannot open current directory `{}` for reading",
-            parent.display()
-        )
+        eyre!("cannot open current directory `{}` for reading", parent.display())
     })? {
         if f.is_ok() {
             if let Ok(f) = f {
@@ -112,10 +105,7 @@ pub(crate) fn find_control_file(
                     let file_stem = file_stem
                         .to_str()
                         .ok_or_else(|| {
-                            eyre!(
-                                "could not get file stem as String from `{}`",
-                                f_path.display()
-                            )
+                            eyre!("could not get file stem as String from `{}`", f_path.display())
                         })?
                         .to_string();
                     return Ok((f_path, file_stem));
@@ -124,10 +114,7 @@ pub(crate) fn find_control_file(
         }
     }
 
-    Err(eyre!(
-        "control file not found in `{}`",
-        manifest_path.as_ref().display()
-    ))
+    Err(eyre!("control file not found in `{}`", manifest_path.as_ref().display()))
 }
 
 fn determine_git_hash() -> eyre::Result<Option<String>> {

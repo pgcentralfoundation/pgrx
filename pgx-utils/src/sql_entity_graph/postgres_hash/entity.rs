@@ -6,11 +6,18 @@ All rights reserved.
 
 Use of this source code is governed by the MIT license that can be found in the LICENSE file.
 */
-use crate::sql_entity_graph::{
-    pgx_sql::PgxSql,
-    to_sql::{entity::ToSqlConfigEntity, ToSql},
-    SqlGraphEntity, SqlGraphIdentifier,
-};
+/*!
+
+`#[derive(PostgresHash)]` related entities for Rust to SQL translation
+
+> Like all of the [`sql_entity_graph`][crate::sql_entity_graph] APIs, this is considered **internal**
+to the `pgx` framework and very subject to change between versions. While you may use this, please do it with caution.
+
+*/
+use crate::sql_entity_graph::pgx_sql::PgxSql;
+use crate::sql_entity_graph::to_sql::entity::ToSqlConfigEntity;
+use crate::sql_entity_graph::to_sql::ToSql;
+use crate::sql_entity_graph::{SqlGraphEntity, SqlGraphIdentifier};
 use std::cmp::Ordering;
 
 /// The output of a [`PostgresHash`](crate::sql_entity_graph::postgres_hash::PostgresHash) from `quote::ToTokens::to_tokens`.
@@ -33,9 +40,7 @@ impl PostgresHashEntity {
 
 impl Ord for PostgresHashEntity {
     fn cmp(&self, other: &Self) -> Ordering {
-        self.file
-            .cmp(other.file)
-            .then_with(|| self.file.cmp(other.file))
+        self.file.cmp(other.file).then_with(|| self.file.cmp(other.file))
     }
 }
 
@@ -45,9 +50,9 @@ impl PartialOrd for PostgresHashEntity {
     }
 }
 
-impl Into<SqlGraphEntity> for PostgresHashEntity {
-    fn into(self) -> SqlGraphEntity {
-        SqlGraphEntity::Hash(self)
+impl From<PostgresHashEntity> for SqlGraphEntity {
+    fn from(val: PostgresHashEntity) -> Self {
+        SqlGraphEntity::Hash(val)
     }
 }
 

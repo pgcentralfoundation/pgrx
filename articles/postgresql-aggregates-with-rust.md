@@ -190,7 +190,7 @@ Extensions can, of course, create aggregates too. Next, let's explore how to do 
 
 # Familiarizing with `pgx`
 
-[`pgx`][pgx] is a suite of crates that provide everything required to build, test, and package extensions for PostgreSQL versions 10 through 14 using pure Rust.
+[`pgx`][pgx] is a suite of crates that provide everything required to build, test, and package extensions for PostgreSQL versions 11 through 15 using pure Rust.
 
 It includes:
 
@@ -209,7 +209,7 @@ figure out if something is missing from error messages and then discover the req
 Install `cargo-pgx` then initialize its development PostgreSQL installations (used for `cargo pgx test` and `cargo pgx run`):
 
 ```bash
-$ cargo install cargo-pgx
+$ cargo install --locked cargo-pgx
 $ cargo pgx init
 # ...
 ```

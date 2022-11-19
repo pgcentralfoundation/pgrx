@@ -1,0 +1,59 @@
+# Example of how to build this container (ran from pgx checkout directory):
+#   docker build --build-arg PG_MAJOR_VER=14 -f .github/docker/Dockerfile.alpine\:3.16 -t pgx-alpine .
+#
+# Example of how to run this container with tests after building the image:
+#   docker run pgx-alpine cargo test --no-default-features --features pg14 --locked
+#
+# Note that "PG_MAJOR_VER" build arg in the build step must match the
+# "--features pgXX" in the run step
+
+ARG PG_MAJOR_VER
+# Use Postgres' official alpine version, it's just easier that way
+FROM postgres:${PG_MAJOR_VER}-alpine3.16
+ENV PG_MAJOR_VER=${PG_MAJOR_VER}
+
+# Required for compiling Rust
+ENV RUSTFLAGS="-C target-feature=-crt-static"
+
+RUN apk add --no-cache \
+  git \
+  curl \
+  bash \
+  musl-dev \
+  make \
+  gcc \
+  coreutils \
+  util-linux-dev \
+  musl-dev \
+  openssl-dev \
+  clang-libs \
+  tar
+
+# Set up permissions so that the rust user below can create extensions
+RUN chmod a+rwx `$(which pg_config) --pkglibdir` \
+  `$(which pg_config) --sharedir`/extension \
+  /var/run/postgresql/
+
+# Running pgx and tests require a non-root user
+RUN adduser -s /bin/bash -D rust
+WORKDIR /checkout
+RUN chown -R rust:rust /checkout
+COPY --chown=rust:rust . /checkout
+
+USER rust
+# This environment variable is required for postgres while running the tests
+ENV USER=rust
+
+# Install cargo and Rust
+RUN curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | bash -s -- -y
+ENV PATH="/home/rust/.cargo/bin:${PATH}"
+
+# Install cargo-pgx from source copied into this container
+RUN cargo install --path cargo-pgx/ --locked
+
+# This seems strange, but by this point $PG_MAJOR_VER is blank and
+# $PG_MAJOR is always set to the correct version. I think it's something built
+# into the postgres:XX-alpine3.16 images, so it was easier to go with the grain
+RUN cargo pgx init --pg$PG_MAJOR=$(which pg_config)
+
+CMD ["cargo", "test", "--no-default-features", "--features", "pg${PG_MAJOR_VER}"]

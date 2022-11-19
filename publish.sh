@@ -11,10 +11,10 @@
 DIR=`pwd`
 set -x
 
+cd $DIR/pgx-pg-config && cargo publish && sleep 30
 cd $DIR/pgx-utils && cargo publish && sleep 30
 cd $DIR/pgx-macros && cargo publish && sleep 30
 cd $DIR/pgx-pg-sys && cargo publish --no-verify && sleep 30
 cd $DIR/pgx && cargo publish --no-verify && sleep 30
 cd $DIR/pgx-tests && cargo publish --no-verify && sleep 30
-cd $DIR/cargo-pgx && cargo publish
-
+cd $DIR/cargo-pgx && cargo publish # cargo-pgx last so the templates are correct

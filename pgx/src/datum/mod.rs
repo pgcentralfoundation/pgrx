@@ -20,7 +20,10 @@ mod internal;
 mod into;
 mod item_pointer_data;
 mod json;
-mod numeric;
+pub mod numeric;
+pub mod numeric_support;
+#[deny(unsafe_op_in_unsafe_fn)]
+mod range;
 mod time;
 mod time_stamp;
 mod time_stamp_with_timezone;
@@ -42,8 +45,9 @@ pub use internal::*;
 pub use into::*;
 pub use item_pointer_data::*;
 pub use json::*;
-pub use numeric::*;
+pub use numeric::{AnyNumeric, Numeric};
 use once_cell::sync::Lazy;
+pub use range::*;
 use std::any::TypeId;
 pub use time_stamp::*;
 pub use time_stamp_with_timezone::*;
@@ -90,7 +94,10 @@ pub trait WithTypeIds {
     const OPTION_VEC_OPTION_ID: Lazy<Option<TypeId>>;
     const ARRAY_ID: Lazy<Option<TypeId>>;
     const OPTION_ARRAY_ID: Lazy<Option<TypeId>>;
+    const VARIADICARRAY_ID: Lazy<Option<TypeId>>;
+    const OPTION_VARIADICARRAY_ID: Lazy<Option<TypeId>>;
     const VARLENA_ID: Lazy<Option<TypeId>>;
+    const OPTION_VARLENA_ID: Lazy<Option<TypeId>>;
 
     fn register_with_refs(map: &mut std::collections::HashSet<RustSqlMapping>, single_sql: String)
     where
@@ -177,7 +184,10 @@ impl<T: 'static + ?Sized> WithTypeIds for T {
     const OPTION_VEC_OPTION_ID: Lazy<Option<TypeId>> = Lazy::new(|| None);
     const ARRAY_ID: Lazy<Option<TypeId>> = Lazy::new(|| None);
     const OPTION_ARRAY_ID: Lazy<Option<TypeId>> = Lazy::new(|| None);
+    const VARIADICARRAY_ID: Lazy<Option<TypeId>> = Lazy::new(|| None);
+    const OPTION_VARIADICARRAY_ID: Lazy<Option<TypeId>> = Lazy::new(|| None);
     const VARLENA_ID: Lazy<Option<TypeId>> = Lazy::new(|| None);
+    const OPTION_VARLENA_ID: Lazy<Option<TypeId>> = Lazy::new(|| None);
 }
 
 /// A type which can have its [`core::any::TypeId`]s registered for Rust to SQL mapping.
@@ -269,11 +279,7 @@ impl<T: 'static> WithSizedTypeIds<T> {
         if let Some(id) = *WithSizedTypeIds::<T>::PG_BOX_VEC_ID {
             let rust = core::any::type_name::<crate::PgBox<Vec<T>>>().to_string();
             assert_eq!(
-                map.insert(RustSqlMapping {
-                    sql: set_sql.clone(),
-                    rust: rust.to_string(),
-                    id: id,
-                }),
+                map.insert(RustSqlMapping { sql: set_sql.clone(), rust: rust.to_string(), id: id }),
                 true,
                 "Cannot map `{}` twice.",
                 rust,
@@ -297,11 +303,7 @@ impl<T: 'static> WithSizedTypeIds<T> {
         if let Some(id) = *WithSizedTypeIds::<T>::VEC_ID {
             let rust = core::any::type_name::<T>().to_string();
             assert_eq!(
-                map.insert(RustSqlMapping {
-                    sql: set_sql.clone(),
-                    rust: rust.to_string(),
-                    id: id,
-                }),
+                map.insert(RustSqlMapping { sql: set_sql.clone(), rust: rust.to_string(), id: id }),
                 true,
                 "Cannot map `{}` twice.",
                 rust,
@@ -310,11 +312,7 @@ impl<T: 'static> WithSizedTypeIds<T> {
         if let Some(id) = *WithSizedTypeIds::<T>::VEC_OPTION_ID {
             let rust = core::any::type_name::<Vec<Option<T>>>();
             assert_eq!(
-                map.insert(RustSqlMapping {
-                    sql: set_sql.clone(),
-                    rust: rust.to_string(),
-                    id: id,
-                }),
+                map.insert(RustSqlMapping { sql: set_sql.clone(), rust: rust.to_string(), id: id }),
                 true,
                 "Cannot map `{}` twice.",
                 rust,
@@ -323,11 +321,7 @@ impl<T: 'static> WithSizedTypeIds<T> {
         if let Some(id) = *WithSizedTypeIds::<T>::OPTION_VEC_ID {
             let rust = core::any::type_name::<Option<Vec<T>>>();
             assert_eq!(
-                map.insert(RustSqlMapping {
-                    sql: set_sql.clone(),
-                    rust: rust.to_string(),
-                    id: id,
-                }),
+                map.insert(RustSqlMapping { sql: set_sql.clone(), rust: rust.to_string(), id: id }),
                 true,
                 "Cannot map `{}` twice.",
                 rust,
@@ -336,11 +330,7 @@ impl<T: 'static> WithSizedTypeIds<T> {
         if let Some(id) = *WithSizedTypeIds::<T>::OPTION_VEC_OPTION_ID {
             let rust = core::any::type_name::<Option<Vec<Option<T>>>>();
             assert_eq!(
-                map.insert(RustSqlMapping {
-                    sql: set_sql.clone(),
-                    rust: rust.to_string(),
-                    id: id,
-                }),
+                map.insert(RustSqlMapping { sql: set_sql.clone(), rust: rust.to_string(), id: id }),
                 true,
                 "Cannot map `{}` twice.",
                 rust,
@@ -382,6 +372,10 @@ impl<T: FromDatum + 'static> WithArrayTypeIds<T> {
     pub const ARRAY_ID: Lazy<Option<TypeId>> = Lazy::new(|| Some(TypeId::of::<Array<T>>()));
     pub const OPTION_ARRAY_ID: Lazy<Option<TypeId>> =
         Lazy::new(|| Some(TypeId::of::<Option<Array<T>>>()));
+    pub const VARIADICARRAY_ID: Lazy<Option<TypeId>> =
+        Lazy::new(|| Some(TypeId::of::<VariadicArray<T>>()));
+    pub const OPTION_VARIADICARRAY_ID: Lazy<Option<TypeId>> =
+        Lazy::new(|| Some(TypeId::of::<Option<VariadicArray<T>>>()));
 
     pub fn register_array_with_refs(
         map: &mut std::collections::HashSet<RustSqlMapping>,
@@ -400,11 +394,7 @@ impl<T: FromDatum + 'static> WithArrayTypeIds<T> {
         if let Some(id) = *WithArrayTypeIds::<T>::ARRAY_ID {
             let rust = core::any::type_name::<Array<T>>().to_string();
             assert_eq!(
-                map.insert(RustSqlMapping {
-                    sql: set_sql.clone(),
-                    rust: rust.to_string(),
-                    id: id,
-                }),
+                map.insert(RustSqlMapping { sql: set_sql.clone(), rust: rust.to_string(), id: id }),
                 true,
                 "Cannot map `{}` twice.",
                 rust,
@@ -413,11 +403,26 @@ impl<T: FromDatum + 'static> WithArrayTypeIds<T> {
         if let Some(id) = *WithArrayTypeIds::<T>::OPTION_ARRAY_ID {
             let rust = core::any::type_name::<Option<Array<T>>>().to_string();
             assert_eq!(
-                map.insert(RustSqlMapping {
-                    sql: set_sql.clone(),
-                    rust: rust.to_string(),
-                    id: id,
-                }),
+                map.insert(RustSqlMapping { sql: set_sql.clone(), rust: rust.to_string(), id: id }),
+                true,
+                "Cannot map `{}` twice.",
+                rust,
+            );
+        }
+
+        if let Some(id) = *WithArrayTypeIds::<T>::VARIADICARRAY_ID {
+            let rust = core::any::type_name::<VariadicArray<T>>().to_string();
+            assert_eq!(
+                map.insert(RustSqlMapping { sql: set_sql.clone(), rust: rust.to_string(), id: id }),
+                true,
+                "Cannot map `{}` twice.",
+                rust,
+            );
+        }
+        if let Some(id) = *WithArrayTypeIds::<T>::OPTION_VARIADICARRAY_ID {
+            let rust = core::any::type_name::<Option<VariadicArray<T>>>().to_string();
+            assert_eq!(
+                map.insert(RustSqlMapping { sql: set_sql.clone(), rust: rust.to_string(), id: id }),
                 true,
                 "Cannot map `{}` twice.",
                 rust,
@@ -459,6 +464,8 @@ impl<T: Copy + 'static> WithVarlenaTypeIds<T> {
     pub const VARLENA_ID: Lazy<Option<TypeId>> = Lazy::new(|| Some(TypeId::of::<PgVarlena<T>>()));
     pub const PG_BOX_VARLENA_ID: Lazy<Option<TypeId>> =
         Lazy::new(|| Some(TypeId::of::<PgBox<PgVarlena<T>>>()));
+    pub const OPTION_VARLENA_ID: Lazy<Option<TypeId>> =
+        Lazy::new(|| Some(TypeId::of::<Option<PgVarlena<T>>>()));
 
     pub fn register_varlena_with_refs(
         map: &mut std::collections::HashSet<RustSqlMapping>,
@@ -491,6 +498,19 @@ impl<T: Copy + 'static> WithVarlenaTypeIds<T> {
 
         if let Some(id) = *WithVarlenaTypeIds::<T>::PG_BOX_VARLENA_ID {
             let rust = core::any::type_name::<PgBox<PgVarlena<T>>>().to_string();
+            assert_eq!(
+                map.insert(RustSqlMapping {
+                    sql: single_sql.clone(),
+                    rust: rust.to_string(),
+                    id: id,
+                }),
+                true,
+                "Cannot map `{}` twice.",
+                rust,
+            );
+        }
+        if let Some(id) = *WithVarlenaTypeIds::<T>::OPTION_VARLENA_ID {
+            let rust = core::any::type_name::<Option<PgVarlena<T>>>().to_string();
             assert_eq!(
                 map.insert(RustSqlMapping {
                     sql: single_sql.clone(),

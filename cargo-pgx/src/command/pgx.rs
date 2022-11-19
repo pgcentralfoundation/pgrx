@@ -15,8 +15,8 @@ use std::path::Path;
 pub(crate) struct Pgx {
     #[clap(subcommand)]
     subcommand: CargoPgxSubCommands,
-    #[clap(from_global, parse(from_occurrences))]
-    verbose: usize,
+    #[clap(from_global, action = ArgAction::Count)]
+    verbose: u8,
 }
 
 impl CommandExecute for Pgx {

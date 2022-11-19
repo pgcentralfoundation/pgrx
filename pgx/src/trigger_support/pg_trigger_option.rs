@@ -1,7 +1,5 @@
-use crate::{
-    pg_sys,
-    trigger_support::{PgTriggerError, TriggerEvent},
-};
+use crate::pg_sys;
+use crate::trigger_support::{PgTriggerError, TriggerEvent};
 
 /// The operation for which the trigger was fired
 ///

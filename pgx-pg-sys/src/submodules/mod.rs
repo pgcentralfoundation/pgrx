@@ -7,20 +7,32 @@ All rights reserved.
 Use of this source code is governed by the MIT license that can be found in the LICENSE file.
 */
 
-mod datum;
-pub mod guard;
-mod oids;
-pub mod setjmp;
-mod tupdesc;
-mod utils;
+pub mod datum;
+#[macro_use]
+pub mod elog;
+pub mod errcodes;
+pub mod ffi;
+pub mod oids;
+pub mod panic;
+pub mod pg_try;
+pub mod polyfill;
+pub(crate) mod thread_check;
+pub mod tupdesc;
+
+pub mod utils;
+
+// Various SqlTranslatable mappings for SQL generation
+mod sql_translatable;
 
 pub use datum::Datum;
 // OnDrop(feature = "pg11"): remove this cfg if all supported versions of Postgres
 // now include NullableDatum.
-#[cfg(any(feature = "pg12", feature = "pg13", feature = "pg14"))]
+#[cfg(any(feature = "pg12", feature = "pg13", feature = "pg14", feature = "pg15"))]
 pub use datum::NullableDatum;
-pub use guard::*;
+
 pub use oids::*;
+pub use pg_try::*;
+pub use polyfill::*;
 pub use tupdesc::*;
 pub use utils::*;
 

@@ -6,7 +6,17 @@ All rights reserved.
 
 Use of this source code is governed by the MIT license that can be found in the LICENSE file.
 */
-use crate::sql_entity_graph::{pgx_sql::PgxSql, to_sql::ToSql, SqlGraphEntity, SqlGraphIdentifier};
+/*!
+
+`#[pg_schema]` related entities for Rust to SQL translation
+
+> Like all of the [`sql_entity_graph`][crate::sql_entity_graph] APIs, this is considered **internal**
+to the `pgx` framework and very subject to change between versions. While you may use this, please do it with caution.
+
+*/
+use crate::sql_entity_graph::pgx_sql::PgxSql;
+use crate::sql_entity_graph::to_sql::ToSql;
+use crate::sql_entity_graph::{SqlGraphEntity, SqlGraphIdentifier};
 
 use std::cmp::Ordering;
 
@@ -21,9 +31,7 @@ pub struct SchemaEntity {
 
 impl Ord for SchemaEntity {
     fn cmp(&self, other: &Self) -> Ordering {
-        self.file
-            .cmp(other.file)
-            .then_with(|| self.file.cmp(other.file))
+        self.file.cmp(other.file).then_with(|| self.file.cmp(other.file))
     }
 }
 
@@ -33,9 +41,9 @@ impl PartialOrd for SchemaEntity {
     }
 }
 
-impl Into<SqlGraphEntity> for SchemaEntity {
-    fn into(self) -> SqlGraphEntity {
-        SqlGraphEntity::Schema(self)
+impl From<SchemaEntity> for SqlGraphEntity {
+    fn from(val: SchemaEntity) -> Self {
+        SqlGraphEntity::Schema(val)
     }
 }
 
