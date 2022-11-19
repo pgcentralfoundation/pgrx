@@ -16,7 +16,6 @@ use std::fmt::Debug;
 use std::marker::PhantomData;
 use std::mem;
 use std::ops::{Index, IndexMut};
-use tracing::error;
 
 /// These match the Postgres `#define`d constants prefixed `SPI_OK_*` that you can find in `pg_sys`.
 #[derive(Debug, PartialEq)]
@@ -455,12 +454,12 @@ impl<'a> SpiClient<'a> {
     /// Cursor name can be retrieved via [`SpiCursor::into_name`].
     ///
     /// See [`SpiCursor`] docs for usage details.
-    pub fn find_cursor(&mut self, name: String) -> SpiCursor {
+    pub fn find_cursor(&mut self, name: &str) -> SpiCursor {
         use pgx_pg_sys::AsPgCStr;
 
         let ptr = unsafe { pg_sys::SPI_cursor_find(name.as_pg_cstr()) };
         if ptr.is_null() {
-            error!("cursor named \"{}\" not found", name);
+            panic!("cursor named \"{}\" not found", name);
         }
         SpiCursor { ptr }
     }
@@ -508,7 +507,7 @@ impl<'a> SpiClient<'a> {
 ///     // <--- first SpiTupleTable gets freed by Spi::connect at this point
 /// }).unwrap();
 /// Spi::connect(|mut client| {
-///     let mut cursor = client.find_cursor(cursor_name);
+///     let mut cursor = client.find_cursor(&cursor_name);
 ///     assert_eq!(Some(2u32), cursor.fetch(1).get_one());
 ///     drop(cursor); // <-- cursor gets dropped here
 ///     // ... more code ...

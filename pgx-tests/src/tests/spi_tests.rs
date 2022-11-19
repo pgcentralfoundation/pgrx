@@ -199,7 +199,7 @@ mod tests {
             );
             let mut portal = client.open_cursor("SELECT * FROM tests.cursor_table", None);
 
-            fn sum_all(table: SpiTupleTable) -> i32 {
+            fn sum_all(table: pgx::SpiTupleTable) -> i32 {
                 table.map(|r| r.by_ordinal(1).unwrap().value::<i32>().unwrap()).sum()
             }
             assert_eq!(sum_all(portal.fetch(3)), 1 + 2 + 3);
@@ -209,6 +209,7 @@ mod tests {
         });
     }
 
+    #[pg_test]
     fn test_cursor_by_name() {
         let cursor_name = Spi::connect(|mut client| {
             client.update("CREATE TABLE tests.cursor_table (id int)", None, None);
@@ -224,18 +225,18 @@ mod tests {
         })
         .unwrap();
 
-        fn sum_all(table: SpiTupleTable) -> i32 {
+        fn sum_all(table: pgx::SpiTupleTable) -> i32 {
             table.map(|r| r.by_ordinal(1).unwrap().value::<i32>().unwrap()).sum()
         }
         Spi::connect(|mut client| {
-            let mut cursor = client.find_cursor(cursor_name.clone());
+            let mut cursor = client.find_cursor(&cursor_name);
             assert_eq!(sum_all(cursor.fetch(3)), 4 + 5 + 6);
             assert_eq!(sum_all(cursor.fetch(3)), 7 + 8 + 9);
             Ok(None::<()>)
         });
 
         Spi::connect(|mut client| {
-            let mut cursor = client.find_cursor(cursor_name);
+            let mut cursor = client.find_cursor(&cursor_name);
             assert_eq!(sum_all(cursor.fetch(3)), 10);
             Ok(None::<()>)
         });
@@ -260,7 +261,7 @@ mod tests {
     #[pg_test(error = "cursor named \"NOT A CURSOR\" not found")]
     fn test_cursor_not_found() {
         Spi::connect(|mut client| {
-            client.find_cursor("NOT A CURSOR".to_string());
+            client.find_cursor("NOT A CURSOR");
             Ok(None::<()>)
         });
     }
