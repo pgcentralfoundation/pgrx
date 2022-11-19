@@ -16,7 +16,7 @@ use std::ops::{Deref, DerefMut};
 const UUID_BYTES_LEN: usize = 16;
 pub type UuidBytes = [u8; UUID_BYTES_LEN];
 
-/// A Universally Unique Identifier (UUID).
+/// A Universally Unique Identifier (`UUID`) from PostgreSQL
 #[derive(Clone, Copy, Eq, Hash, Ord, PartialEq, PartialOrd, Debug)]
 #[repr(transparent)]
 pub struct Uuid(UuidBytes);

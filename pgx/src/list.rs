@@ -7,10 +7,10 @@ All rights reserved.
 Use of this source code is governed by the MIT license that can be found in the LICENSE file.
 */
 
-//! A safe wrapper around Postgres' internal `List` structure.
+//! A safe wrapper around Postgres' internal [`List`][crate::pg_sys::List] structure.
 //!
-//! It functions similarly to a Rust `Vec`, including Iterator support, but provides separate
-//! understandings of Lists of Oids, Integers, and Pointers.
+//! It functions similarly to a Rust [`Vec`][std::vec::Vec], including iterator support, but provides separate
+//! understandings of [`List`][crate::pg_sys::List]s of [`Oid`][crate::pg_sys::Oid]s, Integers, and Pointers.
 
 use crate::{is_a, pg_sys, void_mut_ptr};
 use std::marker::PhantomData;
