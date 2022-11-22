@@ -31,18 +31,12 @@ pub fn get_c_locale_flags() -> &'static [&'static str] {
     }
     #[cfg(not(target_os = "macos"))]
     {
-        let cmd_output = Command::new("locale").arg("-a").output();
-        if let Ok(cmd_output) = cmd_output {
-            let hasCUtf8 =
-                String::from_utf8_lossy(&cmd_output.stdout).lines().any(|l| l == "C.UTF-8");
-            if hasCUtf8 {
+        match Command::new("locale").arg("-a").output() {
+            Ok(cmd) if String::from_utf8_lossy(&cmd.stdout).lines().any(|l| l == "C.UTF-8") => {
                 &["--locale=C.UTF-8"]
-            } else {
-                &["--locale=C"]
             }
-        } else {
             // fallback to C if we can't list locales
-            &["--locale=C"]
+            _ => &["--locale=C"],
         }
     }
 }
