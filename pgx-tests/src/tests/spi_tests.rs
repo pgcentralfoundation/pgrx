@@ -14,6 +14,7 @@ mod tests {
     use crate as pgx_tests;
 
     use pgx::prelude::*;
+    use pgx::SpiSingletonClient;
 
     #[pg_test(error = "syntax error at or near \"THIS\"")]
     fn test_spi_failure() {
@@ -219,7 +220,6 @@ mod tests {
 
     #[pg_test]
     fn test_client() {
-        use pgx::SpiError;
         let client = Spi::client().unwrap();
         assert!(matches!(client.select("SELECT 1", None, None).first().get_one::<i32>(), Some(1)));
         let client1 = client.clone();
@@ -227,5 +227,24 @@ mod tests {
 
         // Can create another client
         assert!(Spi::client().is_ok());
+    }
+
+    #[pg_test]
+    fn test_singleton_client() {
+        let client = Spi::client().unwrap();
+        let client_clone = client.clone();
+        let singleton_attempt: Result<SpiSingletonClient, _> = client.try_into();
+
+        match singleton_attempt {
+            Ok(_) => {
+                // client_clone is still alive
+                assert!(false, "Singleton should not be created");
+            }
+            Err(client) => {
+                drop(client_clone);
+                let mut singleton: SpiSingletonClient = client.try_into().unwrap();
+                let _ = singleton.update("SELECT 1", None, None);
+            }
+        }
     }
 }

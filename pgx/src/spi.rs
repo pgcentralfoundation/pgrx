@@ -14,7 +14,7 @@ use std::collections::HashMap;
 use std::ffi::CStr;
 use std::fmt::Debug;
 use std::mem;
-use std::ops::{Index, IndexMut};
+use std::ops::{Deref, DerefMut, Index, IndexMut};
 use std::rc::Rc;
 
 /// These match the Postgres `#define`d constants prefixed `SPI_OK_*` that you can find in `pg_sys`.
@@ -105,6 +105,7 @@ impl TryFrom<libc::c_int> for SpiError {
 pub struct Spi;
 
 /// An internal type to manage SPI connection lifetime
+#[derive(Debug)]
 struct SpiConnection;
 
 impl SpiConnection {
@@ -128,13 +129,55 @@ impl Drop for SpiConnection {
     }
 }
 
-/// SPI connection client entry point.
-#[derive(Clone)]
+/// SPI connection client
+#[derive(Debug, Clone)]
 pub struct SpiClient {
     // this connection is never used explicitly but is rather used to track the reference
     // counter
     #[allow(dead_code)]
     connection: Rc<SpiConnection>,
+}
+
+/// SPI connection client that is guaranteed to have no clones
+///
+/// This type is useful for scenarios where one needs to be able to do things like
+/// consuming the entire client, ensuring that there are no outstanding client clones.
+///
+/// Values of this type can be created using `TryFrom<SpiClient>`
+// We re-use SpiClient here (with Rc inside) because we want to Deref/DerefMut
+// to SpiClient. Since SpiSingletonClient does not implement Clone, this is just a minor
+// overhead.
+#[derive(Debug)]
+pub struct SpiSingletonClient(SpiClient);
+
+impl Deref for SpiSingletonClient {
+    type Target = SpiClient;
+
+    fn deref(&self) -> &Self::Target {
+        &self.0
+    }
+}
+
+impl DerefMut for SpiSingletonClient {
+    fn deref_mut(&mut self) -> &mut Self::Target {
+        &mut self.0
+    }
+}
+
+impl TryFrom<SpiClient> for SpiSingletonClient {
+    type Error = SpiClient;
+
+    fn try_from(value: SpiClient) -> Result<Self, Self::Error> {
+        Rc::try_unwrap(value.connection)
+            .map(|connection| Self(SpiClient { connection: Rc::new(connection) }))
+            .map_err(|connection| SpiClient { connection })
+    }
+}
+
+impl From<SpiSingletonClient> for SpiClient {
+    fn from(value: SpiSingletonClient) -> Self {
+        value.0
+    }
 }
 
 #[derive(Debug)]
