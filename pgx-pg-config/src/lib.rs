@@ -35,7 +35,7 @@ pub fn get_c_locale_flags() -> &'static [&'static str] {
             Ok(cmd) if String::from_utf8_lossy(&cmd.stdout).lines().any(|l| l == "C.UTF-8") => {
                 &["--locale=C.UTF-8"]
             }
-            // fallback to C if we can't list locales
+            // fallback to C if we can't list locales or don't have C.UTF-8
             _ => &["--locale=C"],
         }
     }
