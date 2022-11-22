@@ -216,4 +216,16 @@ mod tests {
         struct T;
         assert!(matches!(Spi::connect(|_| Ok(Some(T))).unwrap(), T));
     }
+
+    #[pg_test]
+    fn test_client() {
+        use pgx::SpiError;
+        let client = Spi::client().unwrap();
+        assert!(matches!(client.select("SELECT 1", None, None).first().get_one::<i32>(), Some(1)));
+        let client1 = client.clone();
+        assert!(matches!(client1.select("SELECT 1", None, None).first().get_one::<i32>(), Some(1)));
+
+        // Can create another client
+        assert!(Spi::client().is_ok());
+    }
 }

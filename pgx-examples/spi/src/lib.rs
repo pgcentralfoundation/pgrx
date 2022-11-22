@@ -42,16 +42,11 @@ fn spi_return_query(
     #[cfg(feature = "pg15")]
     let query = "SELECT oid, relname::text || '-pg15' FROM pg_class";
 
-    let mut results = Vec::new();
-    Spi::connect(|client| {
-        client
-            .select(query, None, None)
-            .map(|row| (row["oid"].value(), row[2].value()))
-            .for_each(|tuple| results.push(tuple));
-        Ok(Some(()))
-    });
+    let client = Spi::client().unwrap();
 
-    TableIterator::new(results.into_iter())
+    TableIterator::new(
+        client.select(query, None, None).map(|row| (row["oid"].value(), row[2].value())),
+    )
 }
 
 #[pg_extern(immutable, parallel_safe)]

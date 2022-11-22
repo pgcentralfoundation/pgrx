@@ -15,6 +15,7 @@ use std::ffi::CStr;
 use std::fmt::Debug;
 use std::mem;
 use std::ops::{Index, IndexMut};
+use std::rc::Rc;
 
 /// These match the Postgres `#define`d constants prefixed `SPI_OK_*` that you can find in `pg_sys`.
 #[derive(Debug, PartialEq)]
@@ -103,7 +104,38 @@ impl TryFrom<libc::c_int> for SpiError {
 
 pub struct Spi;
 
-pub struct SpiClient;
+/// An internal type to manage SPI connection lifetime
+struct SpiConnection;
+
+impl SpiConnection {
+    /// Connect to Postgres' SPI system
+    fn connect() -> Result<Self, SpiError> {
+        // connect to SPI
+        let status_code = unsafe { pg_sys::SPI_connect() };
+        match SpiOk::try_from(status_code) {
+            Ok(_) => Ok(Self),
+            Err(Err(UnknownVariant)) => panic!("unrecognized SPI status code: {status_code}"),
+            Err(Ok(code)) => Err(code),
+        }
+    }
+}
+
+impl Drop for SpiConnection {
+    /// when SpiConnection is dropped, we make sure to disconnect from SPI
+    fn drop(&mut self) {
+        // disconnect from SPI
+        Spi::check_status(unsafe { pg_sys::SPI_finish() });
+    }
+}
+
+/// SPI connection client entry point.
+#[derive(Clone)]
+pub struct SpiClient {
+    // this connection is never used explicitly but is rather used to track the reference
+    // counter
+    #[allow(dead_code)]
+    connection: Rc<SpiConnection>,
+}
 
 #[derive(Debug)]
 pub struct SpiTupleTable {
@@ -239,38 +271,35 @@ impl Spi {
         });
     }
 
+    /// Returns a new client to SPI
+    ///
+    /// # Safety
+    ///
+    /// Extreme care must be taken with respect to obtaining an instance of the client.
+    ///
+    /// Due to the need  to be able to have multiple clients on the stack (Rust code executing SQL queries
+    /// that involve invocation of Rust-implemented functions that use `SpiClient`), this function *will not*
+    /// return an error if a client is instantiated while there is another `SpiClient` present.
+    ///
+    /// It is *not recommended* to use more than one client instance at a time as it may result in unpredictable
+    /// behavior and, ultimately, crashes.
+    ///
+    /// It is, however, fine to `clone` a singular instance of `SpiClient` as it is a reference-counted value
+    /// that drops the connection when all clones are dropped.
+    pub fn client() -> Result<SpiClient, SpiError> {
+        Ok(SpiClient { connection: Rc::new(SpiConnection::connect()?) })
+    }
+
     /// execute SPI commands via the provided `SpiClient` and return a value from SPI which is
     /// automatically copied into the `CurrentMemoryContext` at the time of this function call
     pub fn connect<R, F: FnOnce(SpiClient) -> std::result::Result<Option<R>, SpiError>>(
         f: F,
     ) -> Option<R> {
-        /// a struct to manage our SPI connection lifetime
-        struct SpiConnection;
-        impl SpiConnection {
-            /// Connect to Postgres' SPI system
-            fn connect() -> Self {
-                // connect to SPI
-                Spi::check_status(unsafe { pg_sys::SPI_connect() });
-                SpiConnection
-            }
-        }
-
-        impl Drop for SpiConnection {
-            /// when SpiConnection is dropped, we make sure to disconnect from SPI
-            fn drop(&mut self) {
-                // disconnect from SPI
-                Spi::check_status(unsafe { pg_sys::SPI_finish() });
-            }
-        }
-
-        // connect to SPI
-        let _connection = SpiConnection::connect();
-
         // run the provided closure within the memory context that SPI_connect()
         // just put us un.  We'll disconnect from SPI when the closure is finished.
         // If there's a panic or elog(ERROR), we don't care about also disconnecting from
         // SPI b/c Postgres will do that for us automatically
-        f(SpiClient).unwrap()
+        f(Self::client().ok()?).unwrap()
     }
 
     pub fn check_status(status_code: i32) -> SpiOk {
