@@ -22,12 +22,30 @@ use url::Url;
 pub static BASE_POSTGRES_PORT_NO: u16 = 28800;
 pub static BASE_POSTGRES_TESTING_PORT_NO: u16 = 32200;
 
-#[cfg(target_os = "macos")]
-/// The flags to specify to get a "C.UTF-8" locale on this system.
-pub const C_LOCALE_FLAGS: &[&str] = &["--locale=C", "--lc-ctype=UTF-8"];
-#[cfg(not(target_os = "macos"))]
-/// The flags to specify to get a "C.UTF-8" locale on this system.
-pub const C_LOCALE_FLAGS: &[&str] = &["--locale=C.UTF-8"];
+/// The flags to specify to get a "C.UTF-8" locale on this system, or "C" locale on systems without
+/// a "C.UTF-8" locale equivalent.
+pub fn get_c_locale_flags() -> &'static [&'static str] {
+    #[cfg(target_os = "macos")]
+    {
+        &["--locale=C", "--lc-ctype=UTF-8"]
+    }
+    #[cfg(not(target_os = "macos"))]
+    {
+        let cmd_output = Command::new("locale").arg("-a").output();
+        if let Ok(cmd_output) = cmd_output {
+            let hasCUtf8 =
+                String::from_utf8_lossy(&cmd_output.stdout).lines().any(|l| l == "C.UTF-8");
+            if hasCUtf8 {
+                &["--locale=C.UTF-8"]
+            } else {
+                &["--locale=C"]
+            }
+        } else {
+            // fallback to C if we can't list locales
+            &["--locale=C"]
+        }
+    }
+}
 
 // These methods were originally in `pgx-utils`, but in an effort to consolidate
 // dependencies, the decision was made to package them into wherever made the
