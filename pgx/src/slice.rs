@@ -22,9 +22,7 @@ impl<'a, T> PallocSlice<'a, T> {
     /// You must know the underlying type at that index is validly initialized in Rust.
     #[inline]
     pub unsafe fn get(&self, index: usize) -> Option<&T> {
-        index
-            .le(&self.pallocd.len())
-            .then(|| self.pallocd.as_ptr().cast::<T>().add(index).as_ref().unwrap_unchecked())
+        index.le(&self.pallocd.len()).then(|| self.get_unchecked(index))
     }
 
     /// # Safety
