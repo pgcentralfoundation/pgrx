@@ -225,9 +225,15 @@ impl<'a, T: FromDatum> Array<'a, T> {
             match (sizeof_type, self.raw.as_ref()) {
                 // SAFETY: Rust slice layout matches Postgres data layout and this array is "owned"
                 (1 | 2 | 4, Some(raw)) => unsafe { raw.assume_init_data_slice::<T>() },
-                (DATUM_SIZE, _) => unsafe {
-                    self.raw.as_ref().unwrap().assume_init_data_slice::<T>()
-                },
+                (DATUM_SIZE, _) => {
+                    let sizeof_datums = mem::size_of_val(self.elem_slice);
+                    unsafe {
+                        slice::from_raw_parts(
+                            self.elem_slice.as_ptr() as *const T,
+                            sizeof_datums / sizeof_type,
+                        )
+                    }
+                }
                 (_, _) => panic!("no correctly-sized slice exists"),
             }
         } else {
