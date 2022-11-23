@@ -15,7 +15,7 @@ use std::ffi::CStr;
 use std::fmt::Debug;
 use std::marker::PhantomData;
 use std::mem;
-use std::ops::{Index, IndexMut};
+use std::ops::{Deref, Index, IndexMut};
 
 /// These match the Postgres `#define`d constants prefixed `SPI_OK_*` that you can find in `pg_sys`.
 #[derive(Debug, PartialEq)]
@@ -384,6 +384,60 @@ impl<'a> SpiClient<'a> {
             None => unsafe { pg_sys::SPI_execute(src.as_ptr(), read_only, limit.unwrap_or(0)) },
         };
 
+        Self::prepare_tuple_table(status_code)
+    }
+
+    /// Executes a prepared statement
+    pub fn execute_prepared_statement(
+        &self,
+        prepared_statement: &PreparedStatement,
+        read_only: bool,
+        limit: Option<i64>,
+        args: Option<Vec<Option<pg_sys::Datum>>>,
+    ) -> Result<SpiTupleTable, PreparedStatementError> {
+        unsafe {
+            pg_sys::SPI_tuptable = std::ptr::null_mut();
+        }
+        let args = args.unwrap_or_default();
+        let mut datums = vec![];
+        let mut nulls = vec![];
+        let nargs = args.len();
+        let expected = unsafe { pg_sys::SPI_getargcount(prepared_statement.plan) } as usize;
+
+        if nargs != expected {
+            return Err(PreparedStatementError::ArgumentCountMismatch { expected, got: nargs });
+        }
+
+        for datum in args {
+            match datum {
+                Some(datum) => {
+                    // ' ' here means that the datum is not null
+                    datums.push(datum);
+                    nulls.push(' ' as std::os::raw::c_char);
+                }
+
+                None => {
+                    // 'n' here means that the datum is null
+                    datums.push(pg_sys::Datum::from(0usize));
+                    nulls.push('n' as std::os::raw::c_char);
+                }
+            }
+        }
+
+        let status_code = unsafe {
+            pg_sys::SPI_execute_plan(
+                prepared_statement.plan,
+                datums.as_mut_ptr(),
+                nulls.as_mut_ptr(),
+                read_only,
+                limit.unwrap_or(0),
+            )
+        };
+
+        Ok(Self::prepare_tuple_table(status_code))
+    }
+
+    fn prepare_tuple_table(status_code: i32) -> SpiTupleTable {
         SpiTupleTable {
             status_code: Spi::check_status(status_code),
             table: unsafe { pg_sys::SPI_tuptable },
@@ -395,6 +449,68 @@ impl<'a> SpiClient<'a> {
             },
             current: -1,
         }
+    }
+}
+
+/// Errors during prepared statements execution
+#[derive(thiserror::Error, Debug)]
+pub enum PreparedStatementError {
+    #[error("argument count mismatch (expected {expected}, got {got})")]
+    ArgumentCountMismatch { expected: usize, got: usize },
+}
+
+/// Client lifetime-bound prepared statement
+pub struct PreparedStatement<'a> {
+    phantom: PhantomData<&'a ()>,
+    plan: pg_sys::SPIPlanPtr,
+}
+
+/// Static lifetime-bound prepared statement
+pub struct OwnedPreparedStatement(PreparedStatement<'static>);
+
+impl Deref for OwnedPreparedStatement {
+    type Target = PreparedStatement<'static>;
+
+    fn deref(&self) -> &Self::Target {
+        &self.0
+    }
+}
+
+impl Drop for OwnedPreparedStatement {
+    fn drop(&mut self) {
+        unsafe {
+            pg_sys::SPI_freeplan(self.0.plan);
+        }
+    }
+}
+
+impl<'a> PreparedStatement<'a> {
+    /// Converts prepared statement into an owner prepared statement
+    ///
+    /// These statements have static lifetime and are freed only when dropped
+    pub fn keep(&self) -> OwnedPreparedStatement {
+        unsafe {
+            pg_sys::SPI_keepplan(self.plan);
+        }
+        OwnedPreparedStatement(PreparedStatement { phantom: PhantomData, plan: self.plan })
+    }
+}
+
+impl<'a> SpiClient<'a> {
+    /// Prepares a statement that is valid for the lifetime of the client
+    pub fn prepare(&self, query: &str, args: Option<Vec<PgOid>>) -> PreparedStatement {
+        let src = std::ffi::CString::new(query).expect("query contained a null byte");
+        let args = args.unwrap_or_default();
+        let nargs = args.len();
+
+        let plan = unsafe {
+            pg_sys::SPI_prepare(
+                src.as_ptr(),
+                nargs as i32,
+                args.into_iter().map(PgOid::value).collect::<Vec<_>>().as_mut_ptr(),
+            )
+        };
+        PreparedStatement { phantom: PhantomData, plan }
     }
 }
 

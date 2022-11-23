@@ -12,6 +12,7 @@ Use of this source code is governed by the MIT license that can be found in the 
 mod tests {
     #[allow(unused_imports)]
     use crate as pgx_tests;
+    use pgx::IntoDatum;
 
     use pgx::prelude::*;
 
@@ -226,5 +227,58 @@ mod tests {
             .execute();
             Ok(Some(()))
         });
+    }
+
+    #[pg_test]
+    fn test_prepared_statement() {
+        let rc = Spi::connect(|client| {
+            let prepared =
+                client.prepare("SELECT $1", Some(vec![PgOid::BuiltIn(PgBuiltInOids::INT4OID)]));
+            Ok(client
+                .execute_prepared_statement(&prepared, false, None, Some(vec![42.into_datum()]))
+                .unwrap()
+                .first()
+                .get_datum::<i32>(1))
+        });
+
+        assert_eq!(42, rc.expect("SPI failed to return proper value"))
+    }
+
+    #[pg_test]
+    fn test_prepared_statement_argument_mismatch() {
+        use pgx::PreparedStatementError;
+        let err = Spi::connect(|client| {
+            let prepared =
+                client.prepare("SELECT $1", Some(vec![PgOid::BuiltIn(PgBuiltInOids::INT4OID)]));
+            Ok(Some(client.execute_prepared_statement(&prepared, false, None, None)))
+        })
+        .unwrap()
+        .unwrap_err();
+
+        assert!(matches!(
+            err,
+            PreparedStatementError::ArgumentCountMismatch { expected: 1, got: 0 }
+        ));
+    }
+
+    #[pg_test]
+    fn test_owned_prepared_statement() {
+        let prepared = Spi::connect(|client| {
+            Ok(Some(
+                client
+                    .prepare("SELECT $1", Some(vec![PgOid::BuiltIn(PgBuiltInOids::INT4OID)]))
+                    .keep(),
+            ))
+        })
+        .unwrap();
+        let rc = Spi::connect(|client| {
+            Ok(client
+                .execute_prepared_statement(&prepared, false, None, Some(vec![42.into_datum()]))
+                .unwrap()
+                .first()
+                .get_datum::<i32>(1))
+        });
+
+        assert_eq!(42, rc.expect("SPI failed to return proper value"))
     }
 }
