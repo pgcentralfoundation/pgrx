@@ -60,7 +60,7 @@ pub struct Array<'a, T: FromDatum> {
     datum_palloc: Option<NonNull<pg_sys::Datum>>,
     elem_slice: &'a [pg_sys::Datum],
     null_slice: NullKind<'a>,
-    elem_layout: Option<Layout>,
+    elem_layout: Layout,
     _marker: PhantomData<T>,
 }
 
@@ -129,7 +129,7 @@ impl<'a, T: FromDatum> Array<'a, T> {
     unsafe fn deconstruct_from(
         ptr: NonNull<pg_sys::varlena>,
         raw: RawArray,
-        layout: Layout,
+        elem_layout: Layout,
     ) -> Array<'a, T> {
         let oid = raw.oid();
         let len = raw.len();
@@ -153,9 +153,9 @@ impl<'a, T: FromDatum> Array<'a, T> {
             pg_sys::deconstruct_array(
                 array,
                 oid,
-                layout.size.as_typlen().into(),
-                layout.passbyval,
-                layout.align.as_typalign(),
+                elem_layout.size.as_typlen().into(),
+                matches!(elem_layout.pass, PassBy::Value),
+                elem_layout.align.as_typalign(),
                 &mut elements,
                 &mut nulls,
                 &mut nelems,
@@ -195,7 +195,7 @@ impl<'a, T: FromDatum> Array<'a, T> {
             datum_palloc: NonNull::new(elements),
             elem_slice: /* SAFETY: &[Datum] from palloc'd [Datum] */ unsafe { slice::from_raw_parts(elements, nelems) },
             null_slice,
-            elem_layout: Some(layout),
+            elem_layout,
             _marker: PhantomData,
         }
     }
@@ -217,33 +217,16 @@ impl<'a, T: FromDatum> Array<'a, T> {
         if you are sure your usage is sound, consider RawArray"
     )]
     pub fn as_slice(&self) -> &[T] {
-        if let Some(Layout { size, passbyval, .. }) = &self.elem_layout {
-            if self.null_slice.any() {
-                panic!("null detected: can't expose potentially uninit data as a slice!")
-            }
-            const DATUM_SIZE: usize = mem::size_of::<pg_sys::Datum>();
-            let sizeof_type = match (passbyval, mem::size_of::<T>(), size.try_as_usize()) {
-                (true, rs @ (1 | 2 | 4 | 8), Some(pg @ (1 | 2 | 4 | 8))) if rs == pg => rs,
-                (true, _, _) => panic!("invalid sizes for pass-by-value datum"),
-                (false, DATUM_SIZE, _) => DATUM_SIZE,
-                (false, _, _) => panic!("invalid sizes for pass-by-reference datum"),
-            };
-            match (sizeof_type, self.raw.as_ref()) {
-                // SAFETY: Rust slice layout matches Postgres data layout and this array is "owned"
-                (1 | 2 | 4, Some(raw)) => unsafe { raw.assume_init_data_slice::<T>() },
-                (DATUM_SIZE, _) => {
-                    let sizeof_datums = mem::size_of_val(self.elem_slice);
-                    unsafe {
-                        slice::from_raw_parts(
-                            self.elem_slice.as_ptr() as *const T,
-                            sizeof_datums / sizeof_type,
-                        )
-                    }
-                }
-                (_, _) => panic!("no correctly-sized slice exists"),
-            }
-        } else {
-            panic!("not enough type information to slice correctly")
+        const DATUM_SIZE: usize = mem::size_of::<pg_sys::Datum>();
+        if self.null_slice.any() {
+            panic!("null detected: can't expose potentially uninit data as a slice!")
+        }
+        match (self.elem_layout.size_matches::<T>(), self.raw.as_ref()) {
+            // SAFETY: Rust slice layout matches Postgres data layout and this array is "owned"
+            (Some(1 | 2 | 4 | DATUM_SIZE), Some(raw)) => unsafe {
+                raw.assume_init_data_slice::<T>()
+            },
+            (_, _) => panic!("no correctly-sized slice exists"),
         }
     }
 
