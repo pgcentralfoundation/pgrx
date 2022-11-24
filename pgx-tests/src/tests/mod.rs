@@ -39,6 +39,7 @@ mod schema_tests;
 mod shmem_tests;
 mod spi_tests;
 mod srf_tests;
+mod stringinfo_tests;
 mod struct_type_tests;
 mod trigger_tests;
 mod uuid_tests;

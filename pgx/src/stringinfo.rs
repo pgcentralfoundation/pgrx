@@ -11,7 +11,9 @@ Use of this source code is governed by the MIT license that can be found in the 
 #![allow(dead_code, non_snake_case)]
 
 use crate::{pg_sys, void_mut_ptr};
+use std::collections::Bound;
 use std::io::Error;
+use std::ops::RangeBounds;
 
 /// StringInfoData holds information about an extensible string that is allocated by Postgres'
 /// memory system, but generally follows Rust's drop semantics
@@ -187,6 +189,48 @@ impl StringInfo {
 
             std::slice::from_raw_parts((*self.sid).data as *const u8, self.len())
         }
+    }
+
+    /// Reads a range of bytes, modifying the underlying cursor to reflect what was read
+    ///
+    /// Returns None if the underlying remaining binary is smaller than requested with the range.
+    ///
+    /// Ranges can start from an offset, resulting in skipped information.
+    ///
+    /// Most common use-case for this is reading the underlying data in full (`read(..)`)
+    pub fn read<R: RangeBounds<usize>>(&mut self, range: R) -> Option<&[u8]> {
+        use std::ffi::c_int;
+        let remaining = unsafe { (*self.sid).len - (*self.sid).cursor } as usize;
+        let start = match range.start_bound() {
+            Bound::Included(bound) => *bound,
+            Bound::Excluded(bound) => *bound + 1,
+            Bound::Unbounded => 0,
+        };
+        let end = match range.end_bound() {
+            Bound::Included(bound) => *bound,
+            Bound::Excluded(bound) => *bound - 1,
+            Bound::Unbounded => remaining,
+        };
+        let total = end - start;
+
+        if total > remaining {
+            return None;
+        }
+
+        // safe:  self.sid will never be null
+        Some(unsafe {
+            if (*self.sid).data.is_null() {
+                &[]
+            } else {
+                (*self.sid).cursor += start as c_int;
+                let result = std::slice::from_raw_parts(
+                    (*self.sid).data.add((*self.sid).cursor as usize) as *const u8,
+                    total,
+                );
+                (*self.sid).cursor += total as c_int;
+                result
+            }
+        })
     }
 
     /// A mutable `&[u8]` byte slice representation

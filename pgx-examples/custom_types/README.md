@@ -110,6 +110,29 @@ fn do_a_thing(mut input: PgVarlena<MyType>) -> PgVarlena<MyType> {
 }
 ```
 
+## External Binary Representation
+
+PostgreSQL allows types to have an external binary representation for more efficient communication with
+clients (as a matter of fact, Rust's [https://crates.io/crates/postgres](postgres) crate uses binary types
+exclusively). By default, `PostgresType` do not have any external binary representation, however, this can
+be done by specifying `#[sendrecvfuncs]` attribute on the type and implementing `SendRecvFuncs` trait:
+
+```rust
+#[derive(PostgresType, Serialize, Deserialize, Debug, PartialEq)]
+#[sendrecvfuncs]
+pub struct BinaryEncodedType(Vec<u8>);
+
+impl SendRecvFuncs for BinaryEncodedType {
+    fn send(&self) -> Vec<u8> {
+        self.0.clone()
+    }
+
+    fn recv(buffer: &[u8]) -> Self {
+        Self(buffer.to_vec())
+    }
+}
+```
+
 ## Notes
 
 - For serde-compatible types, you can use the `#[inoutfuncs]` annotation (instead of `#[pgvarlena_inoutfuncs]`) if you'd 

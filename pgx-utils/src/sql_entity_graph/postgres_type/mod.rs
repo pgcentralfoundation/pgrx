@@ -51,6 +51,8 @@ pub struct PostgresType {
     generics: Generics,
     in_fn: Ident,
     out_fn: Ident,
+    send_fn: Option<Ident>,
+    recv_fn: Option<Ident>,
     to_sql_config: ToSqlConfig,
 }
 
@@ -60,15 +62,20 @@ impl PostgresType {
         generics: Generics,
         in_fn: Ident,
         out_fn: Ident,
+        send_fn: Option<Ident>,
+        recv_fn: Option<Ident>,
         to_sql_config: ToSqlConfig,
     ) -> Result<Self, syn::Error> {
         if !to_sql_config.overrides_default() {
             crate::ident_is_acceptable_to_postgres(&name)?;
         }
-        Ok(Self { generics, name, in_fn, out_fn, to_sql_config })
+        Ok(Self { generics, name, in_fn, out_fn, send_fn, recv_fn, to_sql_config })
     }
 
-    pub fn from_derive_input(derive_input: DeriveInput) -> Result<Self, syn::Error> {
+    pub fn from_derive_input(
+        derive_input: DeriveInput,
+        sendrecv: bool,
+    ) -> Result<Self, syn::Error> {
         match derive_input.data {
             syn::Data::Struct(_) | syn::Data::Enum(_) => {}
             syn::Data::Union(_) => {
@@ -85,11 +92,29 @@ impl PostgresType {
             &format!("{}_out", derive_input.ident).to_lowercase(),
             derive_input.ident.span(),
         );
+
+        let (funcname_send, funcname_recv) = if sendrecv {
+            (
+                Some(Ident::new(
+                    &format!("{}_send", derive_input.ident).to_lowercase(),
+                    derive_input.ident.span(),
+                )),
+                Some(Ident::new(
+                    &format!("{}_recv", derive_input.ident).to_lowercase(),
+                    derive_input.ident.span(),
+                )),
+            )
+        } else {
+            (None, None)
+        };
+
         Self::new(
             derive_input.ident,
             derive_input.generics,
             funcname_in,
             funcname_out,
+            funcname_send,
+            funcname_recv,
             to_sql_config,
         )
     }
@@ -104,7 +129,29 @@ impl Parse for PostgresType {
             Ident::new(&format!("{}_in", parsed.ident).to_lowercase(), parsed.ident.span());
         let funcname_out =
             Ident::new(&format!("{}_out", parsed.ident).to_lowercase(), parsed.ident.span());
-        Self::new(parsed.ident, parsed.generics, funcname_in, funcname_out, to_sql_config)
+
+        let (mut send_fn, mut recv_fn) = (None, None);
+
+        if parsed.attrs.iter().any(|attr| attr.path.is_ident("sendrecvfuncs")) {
+            send_fn.replace(Ident::new(
+                &format!("{}_send", parsed.ident).to_lowercase(),
+                parsed.ident.span(),
+            ));
+            recv_fn.replace(Ident::new(
+                &format!("{}_recv", parsed.ident).to_lowercase(),
+                parsed.ident.span(),
+            ));
+        }
+
+        Self::new(
+            parsed.ident,
+            parsed.generics,
+            funcname_in,
+            funcname_out,
+            send_fn,
+            recv_fn,
+            to_sql_config,
+        )
     }
 }
 
@@ -145,6 +192,17 @@ impl ToTokens for PostgresType {
 
         let in_fn = &self.in_fn;
         let out_fn = &self.out_fn;
+
+        let send_fn = self
+            .send_fn
+            .as_ref()
+            .map(|s| quote! { Some(stringify!(#s)) })
+            .unwrap_or_else(|| quote! { None });
+        let recv_fn = self
+            .recv_fn
+            .as_ref()
+            .map(|s| quote! { Some(stringify!(#s)) })
+            .unwrap_or_else(|| quote! { None });
 
         let sql_graph_entity_fn_name =
             syn::Ident::new(&format!("__pgx_internals_type_{}", self.name), Span::call_site());
@@ -207,6 +265,20 @@ impl ToTokens for PostgresType {
                     out_fn_module_path: {
                         let out_fn = stringify!(#out_fn);
                         let mut path_items: Vec<_> = out_fn.split("::").collect();
+                        let _ = path_items.pop(); // Drop the one we don't want.
+                        path_items.join("::")
+                    },
+                    send_fn: #send_fn,
+                    send_fn_module_path: {
+                        let send_fn = #send_fn.unwrap_or("");
+                        let mut path_items: Vec<_> = send_fn.split("::").collect();
+                        let _ = path_items.pop(); // Drop the one we don't want.
+                        path_items.join("::")
+                    },
+                    recv_fn: #recv_fn,
+                    recv_fn_module_path: {
+                        let recv_fn = #recv_fn.unwrap_or("");
+                        let mut path_items: Vec<_> = recv_fn.split("::").collect();
                         let _ = path_items.pop(); // Drop the one we don't want.
                         path_items.join("::")
                     },

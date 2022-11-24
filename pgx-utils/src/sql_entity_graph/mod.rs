@@ -205,7 +205,8 @@ impl ToSql for SqlGraphEntity {
                 if context.graph.neighbors_undirected(context.externs.get(item).unwrap().clone()).any(|neighbor| {
                     let neighbor_item = &context.graph[neighbor];
                     match neighbor_item {
-                        SqlGraphEntity::Type(PostgresTypeEntity { in_fn, in_fn_module_path, out_fn, out_fn_module_path, .. }) => {
+                        SqlGraphEntity::Type(PostgresTypeEntity { in_fn, in_fn_module_path, out_fn, out_fn_module_path, send_fn, recv_fn,
+                                                 send_fn_module_path, recv_fn_module_path, .. }) => {
                             let is_in_fn = item.full_path.starts_with(in_fn_module_path) && item.full_path.ends_with(in_fn);
                             if is_in_fn {
                                 tracing::trace!(r#type = %neighbor_item.dot_identifier(), "Skipping, is an in_fn.");
@@ -214,7 +215,15 @@ impl ToSql for SqlGraphEntity {
                             if is_out_fn {
                                 tracing::trace!(r#type = %neighbor_item.dot_identifier(), "Skipping, is an out_fn.");
                             }
-                            is_in_fn || is_out_fn
+                            let is_send_fn = send_fn.is_some() && item.full_path.starts_with(send_fn_module_path) && item.full_path.ends_with(send_fn.unwrap_or_default());
+                            if is_send_fn {
+                                tracing::trace!(r#type = %neighbor_item.dot_identifier(), "Skipping, is an send_fn.");
+                            }
+                            let is_recv_fn = recv_fn.is_some() && item.full_path.starts_with(recv_fn_module_path) && item.full_path.ends_with(recv_fn.unwrap_or_default());
+                            if is_recv_fn {
+                                tracing::trace!(r#type = %neighbor_item.dot_identifier(), "Skipping, is an recv_fn.");
+                            }
+                            is_in_fn || is_out_fn || is_send_fn || is_recv_fn
                         },
                         _ => false,
                     }

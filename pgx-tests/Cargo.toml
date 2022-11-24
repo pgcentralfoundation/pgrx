@@ -44,6 +44,7 @@ serde_json = "1.0.88"
 time = "0.3.17"
 eyre = "0.6.8"
 thiserror = "1.0"
+bytes = "1.2.1"
 
 [dependencies.pgx]
 path = "../pgx"
