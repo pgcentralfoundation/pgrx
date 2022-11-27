@@ -13,10 +13,7 @@ mod test {
     use pgx::VariadicArray;
 
     #[pg_extern]
-    fn func_with_variadic_array_args<'a>(
-        _field: &'a str,
-        values: VariadicArray<&'a str>,
-    ) -> String {
+    fn func_with_variadic_array_args(_field: &str, values: VariadicArray<&str>) -> String {
         values.get(0).unwrap().unwrap().to_string()
     }
 }
@@ -31,10 +28,10 @@ mod tests {
 
     #[pg_test]
     fn test_func_with_variadic_array_args() {
-        let result = Spi::get_one::<&str>(
+        let result = Spi::get_one::<String>(
             "SELECT test.func_with_variadic_array_args('test', 'a', 'b', 'c');",
         )
         .expect("didn't get SPI result");
-        assert_eq!(result, "a");
+        assert_eq!(result, String::from("a"));
     }
 }

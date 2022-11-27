@@ -17,12 +17,15 @@ use pgx_utils::sql_entity_graph::metadata::{
 use serde::{Serialize, Serializer};
 use serde_json::Value;
 
+/// A `json` type from PostgreSQL
 #[derive(Debug)]
 pub struct Json(pub Value);
 
+/// A `jsonb` type from PostgreSQL
 #[derive(Debug)]
 pub struct JsonB(pub Value);
 
+/// A wholly Rust-[`String`][std::string::String] owned copy of a `json` type from PostgreSQL
 #[derive(Debug)]
 pub struct JsonString(pub String);
 

@@ -13,7 +13,7 @@ use crate::CommandExecute;
 use eyre::{eyre, WrapErr};
 use owo_colors::OwoColorize;
 use pgx_pg_config::{
-    prefix_path, PgConfig, PgConfigSelector, Pgx, C_LOCALE_FLAGS, SUPPORTED_MAJOR_VERSIONS,
+    get_c_locale_flags, prefix_path, PgConfig, PgConfigSelector, Pgx, SUPPORTED_MAJOR_VERSIONS,
 };
 use rayon::prelude::*;
 
@@ -445,7 +445,7 @@ pub(crate) fn initdb(bindir: &PathBuf, datadir: &PathBuf) -> eyre::Result<()> {
     command
         .stdout(Stdio::piped())
         .stderr(Stdio::piped())
-        .args(C_LOCALE_FLAGS)
+        .args(get_c_locale_flags())
         .arg("-D")
         .arg(&datadir);
 

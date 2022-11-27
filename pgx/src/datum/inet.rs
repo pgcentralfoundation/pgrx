@@ -19,6 +19,7 @@ use std::ffi::CStr;
 use std::fmt;
 use std::ops::Deref;
 
+/// An `inet` type from PostgreSQL
 #[derive(Debug, Ord, PartialOrd, Eq, PartialEq)]
 pub struct Inet(pub String);
 
