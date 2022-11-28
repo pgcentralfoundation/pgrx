@@ -6,7 +6,7 @@ use pg_sys::{
     RangeTblEntry, FLOAT4OID, FLOAT8OID, NUMERICOID,
 };
 use pgx::{
-    cstr_core::c_char, error, hooks::PgHooks, prelude::*, register_hook, warning, FromDatum,
+    cstr_core::c_char, error, hooks::PgHooks, prelude::*, warning, FromDatum,
     HookResult, PgList,
 };
 
@@ -143,7 +143,7 @@ mod tests {
             register_hook(&mut HOOK);
         }
         warning!("Registered hook!");
-        Spi::run("SELECT 1 where 3.141 < 4 group by 1 order by 1;");
+        assert_eq!(Ok(1), Spi::run("SELECT 1 where 3.141 < 4 group by 1 order by 1;"));
     }
     #[pg_test(error = "Found a bad approximation for pi!")]
     fn in_targetlist() {
