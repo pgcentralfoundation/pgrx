@@ -322,26 +322,14 @@ fn extract_oids(code: &syn::File) -> proc_macro2::TokenStream {
         }
     }
 }
-fn is_node_struct(name: &str, node_types: &HashSet<String>, nodes: &Vec<StructDescriptor>) -> bool {
-    let node = nodes.iter().filter(|n| n.struct_.ident.to_string() == name).next();
-    match node {
-        None => false,
-        Some(n) => {
-            let first_field = n.struct_.fields.iter().next();
-            match first_field {
-                None => false,
-                Some(f) => match &f.ty {
-                    Type::Path(p) => {
-                        let first_field_type_name =
-                            p.path.segments.first().unwrap().ident.to_string();
-                        if first_field_type_name == "NodeTag" {
-                            return true;
-                        }
-                        is_node_struct(first_field_type_name.as_ref(), node_types, nodes)
-                    }
-                    _ => false,
-                },
-            }
+
+/// Produces code which calls `walker_fn` on the given identifier-like field name.
+fn walk_field_definition(field_name: proc_macro2::TokenStream) -> proc_macro2::TokenStream {
+    quote! {
+        if !#field_name.is_null() {
+            let item = unsafe { &mut *(#field_name as *mut Node) };
+            walker_fn(item, context);
+            Node::traverse::<T>(item, walker_fn, context);
         }
     }
 }
@@ -397,7 +385,7 @@ fn impl_pg_node(
     }
 
     // the set of types which subclass `Node` according to postgres' object system
-    let mut node_set = HashSet::new();
+    let mut node_set = HashMap::new();
     // fill in any children of the roots with a recursive DFS
     // (we are not operating on user input, so it is ok to just
     //  use direct recursion rather than an explicit stack).
@@ -405,14 +393,35 @@ fn impl_pg_node(
         dfs_find_nodes(root, &struct_graph, &mut node_set);
     }
 
-    let mut nodes = node_set.into_iter().collect::<Vec<_>>();
+    let mut nodes = node_set.values().collect::<Vec<_>>();
     if is_for_release {
         // if it's for release we want to sort by struct name to avoid diff churn
         // otherwise we don't care and want to avoid the CPU overhead of sorting
         nodes.sort_by_key(|s| &s.struct_.ident);
     }
+    // Provide a special implementation of PgNode for the Node itself: depending on the `type_` field,
+    // call the override for that type. That way, when we get a `*mut Node` out of a List object, we
+    // can call this function and let it route appropriately.
+    let mut node_traverse_body = proc_macro2::TokenStream::new();
+    let mut node_display_body = proc_macro2::TokenStream::new();
 
-    let node_types = items
+    let mut join_fields_traverse = proc_macro2::TokenStream::new();
+    join_fields_traverse.extend(
+        if std::env::var("CARGO_FEATURE_PG11").is_ok()
+            || std::env::var("CARGO_FEATURE_PG12").is_ok()
+        {
+            vec![]
+        } else if std::env::var("CARGO_FEATURE_PG13").is_ok() {
+            vec![quote! { joinleftcols }, quote! { joinrightcols }]
+        } else {
+            vec![quote! { joinleftcols }, quote! { joinrightcols }, quote! { join_using_alias }]
+        }
+        .into_iter()
+        .map(|f| quote! { self.#f })
+        .map(walk_field_definition),
+    );
+
+    let nodetag_t_values = items
         .iter()
         .filter_map(|i| match i {
             Item::Const(c) if c.ident.to_string().starts_with("NodeTag_T_") => {
@@ -420,73 +429,8 @@ fn impl_pg_node(
             }
             _ => None,
         })
-        .filter(|t| match t.as_ref() {
-            // `NodeTag_T_`s that don't have a corresponding struct we care about. This is a single
-            // list, for convenience, but technically it's different in different versions of
-            // Postgres.
-            "BitString" | "Invalid" | "Null" | "IntList" | "OidList" | "AllocSetContext"
-            | "SlabContext" | "Integer" | "PathKeyInfo" | "GenerationContext" | "Float"
-            | "TsmRoutine" | "String" | "WindowObjectData" | "MemoryContext" | "TIDBitmap" => false,
-            _ => true,
-        })
         .collect::<HashSet<String>>();
 
-    // Provide a special implementation of PgNode for the Node itself: depending on the `type_` field,
-    // call the override for that type. That way, when we get a `*mut Node` out of a List object, we
-    // can call this function and let it route appropriately.
-    let mut node_traverse_body = proc_macro2::TokenStream::new();
-    for node_type in &node_types {
-        let nodetag = format_ident!("NodeTag_T_{}", node_type.to_string());
-        let type_ = format_ident!("{}", node_type);
-        node_traverse_body.extend(quote! {
-            #nodetag => {
-                #type_::traverse(
-                    &mut unsafe { std::ptr::read(self as *mut Node as *mut #type_) },
-                    walker_fn,
-                    context)
-            },
-        });
-    }
-    let mut node_display_body = proc_macro2::TokenStream::new();
-    for node_type in &node_types {
-        let nodetag = format_ident!("NodeTag_T_{}", node_type.to_string());
-        let type_ = format_ident!("{}", node_type);
-        node_display_body.extend(quote! {
-            #nodetag => #type_::fmt(&unsafe { std::ptr::read(self as *const Node as *const #type_) }, f),
-        });
-    }
-
-    let join_fields_traverse = if std::env::var("CARGO_FEATURE_PG11").is_ok()
-        || std::env::var("CARGO_FEATURE_PG12").is_ok()
-    {
-        quote! {}
-    } else if std::env::var("CARGO_FEATURE_PG13").is_ok() {
-        quote! {
-            if !self.joinleftcols.is_null() {
-                walker_fn(self.joinleftcols as *mut Node, context);
-                Node::traverse::<T>(unsafe { &mut *(self.joinleftcols as *mut Node) }, walker_fn, context);
-            }
-            if !self.joinrightcols.is_null() {
-                walker_fn(self.joinrightcols as *mut Node, context);
-                Node::traverse::<T>(unsafe { &mut *(self.joinrightcols as *mut Node) }, walker_fn, context);
-            }
-        }
-    } else {
-        quote! {
-            if !self.joinleftcols.is_null() {
-                walker_fn(self.joinleftcols as *mut Node, context);
-                Node::traverse::<T>(unsafe { &mut *(self.joinleftcols as *mut Node) }, walker_fn, context);
-            }
-            if !self.joinrightcols.is_null() {
-                walker_fn(self.joinrightcols as *mut Node, context);
-                Node::traverse::<T>(unsafe { &mut *(self.joinrightcols as *mut Node) }, walker_fn, context);
-            }
-            if !self.join_using_alias.is_null() {
-                walker_fn(self.join_using_alias as *mut Node, context);
-                Node::traverse::<T>(unsafe { &mut *(self.join_using_alias as *mut Node) }, walker_fn, context);
-            }
-        }
-    };
     let rtekind_result_handling = if std::env::var("CARGO_FEATURE_PG11").is_ok() {
         quote! {}
     } else {
@@ -497,6 +441,7 @@ fn impl_pg_node(
         }
     };
 
+    let walk_item = walk_field_definition(quote! { item });
     // Older Postgres' List is linked.
     let list_fns = if std::env::var("CARGO_FEATURE_PG11").is_ok()
         || std::env::var("CARGO_FEATURE_PG12").is_ok()
@@ -504,14 +449,11 @@ fn impl_pg_node(
         quote! {
             impl pg_sys::PgNode for List {
                 fn traverse<T>(&mut self, walker_fn: fn(*mut Node, &mut T) -> (), context: &mut T) {
-                    if self.length == 0 { return; }
+                    if self.type_ != NodeTag_T_List || self.length == 0 { return; }
                     let mut cell = unsafe { *self.head };
                     for _index in 0..self.length {
                         let item = unsafe { cell.data.ptr_value as *mut Node };
-                        if !item.is_null() {
-                            walker_fn(item, context);
-                            Node::traverse::<T>( unsafe { &mut *(item as *mut Node) }, walker_fn, context);
-                        }
+                        #walk_item
                         if !cell.next.is_null() {
                             cell = unsafe { *cell.next };
                         }
@@ -546,27 +488,26 @@ fn impl_pg_node(
         quote! {
             impl pg_sys::PgNode for List {
                 fn traverse<T>(&mut self, walker_fn: fn(*mut Node, &mut T) -> (), context: &mut T) {
-                    for index in 0..self.length {
-                        let item = unsafe { (*self.elements.offset(index as isize)).ptr_value as *mut Node };
-                        if !item.is_null() {
-                            walker_fn(item, context);
-                            Node::traverse::<T>( unsafe { &mut *(item as *mut Node) }, walker_fn, context);
-                        }
+                    if self.type_ != NodeTag_T_List { return; }
+                    let slice = unsafe { std::slice::from_raw_parts::<ListCell>(self.elements, self.length as usize) };
+                    for item in slice {
+                        let item = unsafe { item.ptr_value };
+                        #walk_item
                     }
                 }
             }
             impl std::fmt::Display for List {
                 fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
                     write!(f, "[")?;
-                    for index in 0..self.length {
+                    let slice = unsafe { std::slice::from_raw_parts(self.elements, self.length as usize) };
+                    for (index, item) in slice.iter().enumerate() {
                         if index != 0 {
                             write!(f, ", ")?;
                         }
-                        let item = unsafe { (*self.elements.offset(index as isize)).ptr_value as *mut Node };
-                        if item.is_null() {
+                        if unsafe { item.ptr_value }.is_null() {
                             write!(f, "(null)")?;
                         } else {
-                            write!(f, "{}", unsafe { *item })?;
+                            write!(f, "{}", unsafe { *(item.ptr_value as *mut Node) })?;
                         }
                     }
                     write!(f, "]")
@@ -574,166 +515,6 @@ fn impl_pg_node(
             }
         }
     };
-
-    pgnode_impls.extend(quote! {
-        unsafe fn list_length(list: *mut List) -> i32 {
-            if list.is_null() {
-                0
-            } else {
-                (*list).length
-            }
-        }
-        #list_fns
-
-        impl pg_sys::PgNode for Node {
-            fn traverse<T>(&mut self, walker_fn: fn(*mut Node, &mut T) -> (), context: &mut T) {
-                match self.type_ {
-                    #node_traverse_body
-                    _ => {},
-                }
-            }
-        }
-        impl std::fmt::Display for Node {
-            fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-                match self.type_ {
-                    #node_display_body
-                    _ => write!(f, "[unknown type {}]", self.type_),
-                }
-            }
-        }
-        impl pg_sys::PgNode for RangeTblEntry {
-            fn traverse<T>(&mut self, walker_fn: fn(*mut Node, &mut T) -> (), context: &mut T) {
-                // Derived from the implementation of `_outRangeTblEntry` in outfuncs.c.
-                // TODO: consider making the if/walk/traverse stanza into a macro?
-                if !self.alias.is_null() {
-                    walker_fn(self.alias as *mut Node, context);
-                    Node::traverse::<T>(unsafe { &mut *(self.alias as *mut Node) }, walker_fn, context);
-                }
-                if !self.eref.is_null() {
-                    walker_fn(self.eref as *mut Node, context);
-                    Node::traverse::<T>(unsafe { &mut *(self.eref as *mut Node) }, walker_fn, context);
-                }
-                // WRITE_ENUM_FIELD(rtekind, RTEKind);
-
-                match self.rtekind {
-                    RTEKind_RTE_RELATION => {
-                        // WRITE_OID_FIELD(relid);
-                        // WRITE_CHAR_FIELD(relkind);
-                        // WRITE_INT_FIELD(rellockmode);
-                        if !self.tablesample.is_null() {
-                            walker_fn(self.tablesample as *mut Node, context);
-                            Node::traverse::<T>(unsafe { &mut *(self.tablesample as *mut Node) }, walker_fn, context);
-                        }
-                    },
-                    RTEKind_RTE_SUBQUERY => {
-                        if !self.subquery.is_null() {
-                            walker_fn(self.subquery as *mut Node, context);
-                            Node::traverse::<T>(unsafe { &mut *(self.subquery as *mut Node) }, walker_fn, context);
-                        }
-                        // WRITE_BOOL_FIELD(security_barrier);
-                    },
-                    RTEKind_RTE_JOIN => {
-                        // WRITE_ENUM_FIELD(jointype, JoinType);
-                        // WRITE_INT_FIELD(joinmergedcols);
-
-                        if !self.joinaliasvars.is_null() {
-                            walker_fn(self.joinaliasvars as *mut Node, context);
-                            Node::traverse::<T>(unsafe { &mut *(self.joinaliasvars as *mut Node) }, walker_fn, context);
-                        }
-                        #join_fields_traverse
-                    }
-                    RTEKind_RTE_FUNCTION => {
-                        if !self.functions.is_null() {
-                            walker_fn(self.functions as *mut Node, context);
-                            Node::traverse::<T>(unsafe { &mut *(self.functions as *mut Node) }, walker_fn, context);
-                        }
-                        // WRITE_BOOL_FIELD(funcordinality);
-                    }
-                    RTEKind_RTE_TABLEFUNC => {
-                        if !self.tablefunc.is_null() {
-                            walker_fn(self.tablefunc as *mut Node, context);
-                            Node::traverse::<T>(unsafe { &mut *(self.tablefunc as *mut Node) }, walker_fn, context);
-                        }
-                    }
-                    RTEKind_RTE_VALUES => {
-                        if !self.values_lists.is_null() {
-                            walker_fn(self.values_lists as *mut Node, context);
-                            Node::traverse::<T>(unsafe { &mut *(self.values_lists as *mut Node) }, walker_fn, context);
-                        }
-                        if !self.coltypes.is_null() {
-                            walker_fn(self.coltypes as *mut Node, context);
-                            Node::traverse::<T>(unsafe { &mut *(self.coltypes as *mut Node) }, walker_fn, context);
-                        }
-                        if !self.coltypmods.is_null() {
-                            walker_fn(self.coltypmods as *mut Node, context);
-                            Node::traverse::<T>(unsafe { &mut *(self.coltypmods as *mut Node)}, walker_fn, context);
-                        }
-                        if !self.colcollations.is_null() {
-                            walker_fn(self.colcollations as *mut Node, context);
-                            Node::traverse::<T>(unsafe { &mut *(self.colcollations as *mut Node) }, walker_fn, context);
-                        }
-                    }
-                    RTEKind_RTE_CTE => {
-                        // WRITE_STRING_FIELD(ctename);
-                        // WRITE_UINT_FIELD(ctelevelsup);
-                        // WRITE_BOOL_FIELD(self_reference);
-                        if !self.coltypes.is_null() {
-                            walker_fn(self.coltypes as *mut Node, context);
-                            Node::traverse::<T>(unsafe { &mut *(self.coltypes as *mut Node) }, walker_fn, context);
-                        }
-                        if !self.coltypmods.is_null() {
-                            walker_fn(self.coltypmods as *mut Node, context);
-                            Node::traverse::<T>(unsafe { &mut *(self.coltypmods as *mut Node) }, walker_fn, context);
-                        }
-                        if !self.colcollations.is_null() {
-                            walker_fn(self.colcollations as *mut Node, context);
-                            Node::traverse::<T>(unsafe { &mut *(self.colcollations as *mut Node) }, walker_fn, context);
-                        }
-                    }
-                    RTEKind_RTE_NAMEDTUPLESTORE => {
-                        // WRITE_STRING_FIELD(enrname);
-                        // WRITE_FLOAT_FIELD(enrtuples, "%.0f");
-                        // WRITE_OID_FIELD(relid);
-                        if !self.coltypes.is_null() {
-                            walker_fn(self.coltypes as *mut Node, context);
-                            Node::traverse::<T>(unsafe { &mut *(self.coltypes as *mut Node) }, walker_fn, context);
-                        }
-                        if !self.coltypmods.is_null() {
-                            walker_fn(self.coltypmods as *mut Node, context);
-                            Node::traverse::<T>(unsafe { &mut *(self.coltypmods as *mut Node) }, walker_fn, context);
-                        }
-                        if !self.colcollations.is_null() {
-                            walker_fn(self.colcollations as *mut Node, context);
-                            Node::traverse::<T>(unsafe { &mut *(self.colcollations as *mut Node) }, walker_fn, context);
-                        }
-                    }
-                    #rtekind_result_handling
-                    _ => {
-                        unsafe { pre_format_elog_string(ERROR as i32, format!("unrecognized RTE kind: {}", self.rtekind).as_ptr() as *const i8); }
-                    }
-                }
-
-                // WRITE_BOOL_FIELD(lateral);
-                // WRITE_BOOL_FIELD(inh);
-                // WRITE_BOOL_FIELD(inFromCl);
-                // WRITE_UINT_FIELD(requiredPerms);
-                // WRITE_OID_FIELD(checkAsUser);
-                // WRITE_BITMAPSET_FIELD(selectedCols);
-                // WRITE_BITMAPSET_FIELD(insertedCols);
-                // WRITE_BITMAPSET_FIELD(updatedCols);
-                // WRITE_BITMAPSET_FIELD(extraUpdatedCols);
-                if !self.securityQuals.is_null() {
-                    walker_fn(self.securityQuals as *mut Node, context);
-                    Node::traverse::<T>(unsafe { &mut *(self.securityQuals as *mut Node) }, walker_fn, context);
-                }
-            }
-        }
-        impl std::fmt::Display for RangeTblEntry {
-            fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-                write!(f, "{}", self.display_node() )
-            }
-        }
-    });
 
     struct ArrayBoundsInfo {
         n: Option<proc_macro2::TokenStream>,
@@ -756,7 +537,7 @@ fn impl_pg_node(
     in_versions(
         &[14, 15],
         ("AppendState", "as_asyncrequests"),
-        Some(quote! { unsafe { bms_num_members(self.as_valid_asyncplans) } }),
+        Some(quote! { bms_num_members(self.as_valid_asyncplans) }),
     );
     in_versions(
         &[14, 15],
@@ -847,7 +628,7 @@ fn impl_pg_node(
     in_versions(
         &[11, 12, 13, 14, 15],
         ("ResultRelInfo", "ri_ConstraintExprs"),
-        Some(quote! { unsafe { (*(*(*self.ri_RelationDesc).rd_att).constr).num_check } }),
+        Some(quote! { (*(*(*self.ri_RelationDesc).rd_att).constr).num_check }),
     );
     in_versions(&[12, 13, 14, 15], ("ResultRelInfo", "ri_GeneratedExprs"), None);
     in_versions(
@@ -858,7 +639,7 @@ fn impl_pg_node(
     in_versions(
         &[11, 12, 13, 14, 15],
         ("ResultRelInfo", "ri_TrigWhenExprs"),
-        Some(quote! { unsafe { *self.ri_TrigDesc }.numtriggers  }),
+        Some(quote! { (*self.ri_TrigDesc).numtriggers  }),
     );
     in_versions(
         &[14, 15],
@@ -882,27 +663,25 @@ fn impl_pg_node(
     );
 
     fn handle_length_bounded_array(
-        ts: &mut Vec<proc_macro2::TokenStream>,
         n: &proc_macro2::TokenStream,
         array: &str,
-    ) {
+    ) -> proc_macro2::TokenStream {
         let array = Ident::new(array, Span::call_site());
-        ts.push(quote! {
-            for index in 0..(#n) {
-                let item = unsafe { self.#array.offset(index as isize) };
-                if !item.is_null() {
-                    walker_fn(item as *mut Node, context);
-                    Node::traverse::<T>(unsafe { &mut *(item as *mut Node) }, walker_fn, context);
+        quote! {
+            let slice = unsafe { std::slice::from_raw_parts::<*mut Node>(self.#array as *mut *mut Node, (#n) as usize) };
+            for ptr in slice {
+                if !ptr.is_null() {
+                    walker_fn(*ptr, context);
+                    Node::traverse::<T>(unsafe { &mut **ptr }, walker_fn, context);
                 }
             }
-        });
+        }
     }
 
     let mut ptr_problems: Vec<String> = Vec::new();
 
     // now we can finally iterate the Nodes and emit various trait impls
     for node_struct in &nodes {
-        let mut does_walking = false;
         let struct_name = &node_struct.struct_.ident;
         match struct_name.to_string().as_ref() {
             "Node" | "RangeTblEntry" | "List" => {
@@ -915,18 +694,14 @@ fn impl_pg_node(
 
         for field in node_struct.struct_.fields.iter() {
             let field_name = field.ident.as_ref().unwrap();
-            println!("Handling {} -> {} of type {:?}", struct_name, field_name, &field.ty);
             // Some structures have array fields in them, rather than Lists. Handle those specially.
             match array_fields
                 .get(&(struct_name.to_string().as_ref(), field_name.to_string().as_ref()))
             {
                 Some(abi) => {
                     match &abi.n {
-                        Some(n) => handle_length_bounded_array(
-                            &mut traverse_elements,
-                            n,
-                            field_name.to_string().as_ref(),
-                        ),
+                        Some(n) => traverse_elements
+                            .push(handle_length_bounded_array(n, field_name.to_string().as_ref())),
                         _ => {}
                     }
                     continue;
@@ -945,17 +720,15 @@ fn impl_pg_node(
                 Type::Array(a) => {
                     if let Type::Ptr(ptr) = a.elem.as_ref() {
                         if let Type::Path(p) = ptr.elem.as_ref() {
-                            if is_node_struct(
-                                &p.path.segments.first().unwrap().ident.to_string(),
-                                &node_types,
-                                &nodes,
-                            ) {
-                                does_walking = true;
-                                traverse_elements.push(quote!{
-                                    for item in self.#field_name.iter() {
-                                        if !item.is_null() {
-                                            walker_fn(item.clone() as *mut Node, context);
-                                            Node::traverse::<T>( unsafe { &mut *(*item as *mut Node) }, walker_fn, context);
+                            if node_set
+                                .contains_key(&p.path.segments.first().unwrap().ident.to_string())
+                            {
+                                traverse_elements.push(quote! {
+                                    for ptr in self.#field_name.iter() {
+                                        if !ptr.is_null() {
+                                            let item = unsafe { &mut *(*ptr as *mut Node) };
+                                            walker_fn(item, context);
+                                            Node::traverse::<T>(item, walker_fn, context);
                                         }
                                     }
                                 });
@@ -970,18 +743,11 @@ fn impl_pg_node(
                 }
                 Type::Ptr(t) => {
                     if let Type::Path(p) = t.elem.as_ref() {
-                        if is_node_struct(
-                            &p.path.segments.first().unwrap().ident.to_string(),
-                            &node_types,
-                            &nodes,
-                        ) {
-                            does_walking = true;
-                            traverse_elements.push(quote!{
-                                if !self.#field_name.is_null() {
-                                    walker_fn(self.#field_name as *mut Node, context);
-                                    Node::traverse::<T>(unsafe { &mut *(self.#field_name as *mut Node) }, walker_fn, context);
-                                }
-                            });
+                        if node_set
+                            .contains_key(&p.path.segments.first().unwrap().ident.to_string())
+                        {
+                            traverse_elements
+                                .push(walk_field_definition(quote! { self.#field_name }));
                         }
                     } else {
                         ptr_problems.push(format!(
@@ -991,13 +757,8 @@ fn impl_pg_node(
                     }
                 }
                 Type::Path(p) => {
-                    if is_node_struct(
-                        &p.path.segments.first().unwrap().ident.to_string(),
-                        &node_types,
-                        &nodes,
-                    ) {
+                    if node_set.contains_key(&p.path.segments.first().unwrap().ident.to_string()) {
                         let type_ = &p.path;
-                        does_walking = true;
                         traverse_elements.push(quote! {
                             walker_fn((&mut self.#field_name) as *mut #type_ as *mut Node, context);
                             // Explicitly don't look at _type here - for example, a Result has a concrete Plan as its
@@ -1011,27 +772,39 @@ fn impl_pg_node(
             }
         }
         // impl the PgNode trait for all nodes
-        let mut traversal = proc_macro2::TokenStream::new();
-        for item in traverse_elements {
-            traversal.extend(item);
-        }
-        pgnode_impls.extend(if !does_walking {
-            quote! {
-                impl pg_sys::PgNode for #struct_name {
-                    fn traverse<T>(&mut self, _walker_fn: fn(*mut Node, &mut T) -> (), _context: &mut T) {
-                        #traversal
-                    }
-                }
-            }
+        let traversal_function = if traverse_elements.is_empty() {
+            quote! {}
         } else {
+            let traversal = proc_macro2::TokenStream::from_iter(traverse_elements.into_iter());
             quote! {
-                impl pg_sys::PgNode for #struct_name {
-                    fn traverse<T>(&mut self, walker_fn: fn(*mut Node, &mut T) -> (), context: &mut T) {
-                        #traversal
-                    }
+                fn traverse<T>(&mut self, walker_fn: fn(*mut Node, &mut T) -> (), context: &mut T) {
+                    #traversal
                 }
             }
-        });
+        };
+
+        if node_set.contains_key(&struct_name.to_string()) {
+            pgnode_impls.extend(quote! {
+                impl pg_sys::PgNode for #struct_name {
+                    #traversal_function
+                }
+            });
+            if nodetag_t_values.contains(&struct_name.to_string()) {
+                let nodetag = format_ident!("NodeTag_T_{}", struct_name);
+                let type_ = format_ident!("{}", struct_name);
+                node_traverse_body.extend(quote! {
+                    #nodetag => {
+                        #type_::traverse(
+                            &mut unsafe { std::ptr::read(self as *mut Node as *mut #type_) },
+                            walker_fn,
+                            context)
+                    },
+                });
+                node_display_body.extend(quote! {
+                    #nodetag => #type_::fmt(&unsafe { std::ptr::read(self as *const Node as *const #type_) }, f),
+                });
+            }
+        }
 
         // impl Rust's Display trait for all nodes
         pgnode_impls.extend(quote! {
@@ -1046,6 +819,114 @@ fn impl_pg_node(
         panic!("{}", ptr_problems.join("\n"));
     }
 
+    let rte_traversal = proc_macro2::TokenStream::from_iter(vec![
+        // Order and field names for each case are taken from the implementation of `_outRangeTblEntry` in outfuncs.c.
+        walk_field_definition(quote! { self.alias }),
+        walk_field_definition(quote! { self.eref }),
+        quote! { match self.rtekind },
+        proc_macro2::TokenStream::from(proc_macro2::TokenTree::Group(proc_macro2::Group::new(
+            proc_macro2::Delimiter::Brace,
+            proc_macro2::TokenStream::from_iter(vec![
+                quote! { RTEKind_RTE_RELATION => },
+                walk_field_definition(quote! { self.tablesample }),
+                quote! { RTEKind_RTE_SUBQUERY => },
+                walk_field_definition(quote! { self.subquery }),
+                quote! { RTEKind_RTE_JOIN => },
+                proc_macro2::TokenStream::from(proc_macro2::TokenTree::Group(
+                    proc_macro2::Group::new(
+                        proc_macro2::Delimiter::Brace,
+                        proc_macro2::TokenStream::from_iter(vec![
+                            walk_field_definition(quote! { self.joinaliasvars }),
+                            join_fields_traverse,
+                        ]),
+                    ),
+                )),
+                quote! { RTEKind_RTE_FUNCTION => },
+                walk_field_definition(quote! { self.functions }),
+                quote! { RTEKind_RTE_TABLEFUNC => },
+                walk_field_definition(quote! { self.tablefunc }),
+                quote! { RTEKind_RTE_VALUES => },
+                proc_macro2::TokenStream::from(proc_macro2::TokenTree::Group(
+                    proc_macro2::Group::new(
+                        proc_macro2::Delimiter::Brace,
+                        proc_macro2::TokenStream::from_iter(vec![
+                            walk_field_definition(quote! { self.values_lists }),
+                            walk_field_definition(quote! { self.coltypes }),
+                            walk_field_definition(quote! { self.coltypmods }),
+                            walk_field_definition(quote! { self.colcollations }),
+                        ]),
+                    ),
+                )),
+                quote! { RTEKind_RTE_CTE => },
+                proc_macro2::TokenStream::from(proc_macro2::TokenTree::Group(
+                    proc_macro2::Group::new(
+                        proc_macro2::Delimiter::Brace,
+                        proc_macro2::TokenStream::from_iter(vec![
+                            walk_field_definition(quote! { self.coltypes }),
+                            walk_field_definition(quote! { self.coltypmods }),
+                            walk_field_definition(quote! { self.colcollations }),
+                        ]),
+                    ),
+                )),
+                quote! { RTEKind_RTE_NAMEDTUPLESTORE => },
+                proc_macro2::TokenStream::from(proc_macro2::TokenTree::Group(
+                    proc_macro2::Group::new(
+                        proc_macro2::Delimiter::Brace,
+                        proc_macro2::TokenStream::from_iter(vec![
+                            walk_field_definition(quote! { self.coltypes }),
+                            walk_field_definition(quote! { self.coltypmods }),
+                            walk_field_definition(quote! { self.colcollations }),
+                        ]),
+                    ),
+                )),
+                rtekind_result_handling,
+                quote! {
+                    _ => {
+                        unsafe { pre_format_elog_string(ERROR as i32, format!("unrecognized RTE kind: {}", self.rtekind).as_ptr() as *const i8); }
+                    }
+                },
+            ]),
+        ))),
+        walk_field_definition(quote! { self.securityQuals }),
+    ]);
+
+    pgnode_impls.extend(quote! {
+        #list_fns
+
+        impl pg_sys::PgNode for Node {
+            fn traverse<T>(&mut self, walker_fn: fn(*mut Node, &mut T) -> (), context: &mut T) {
+                match self.type_ {
+                    NodeTag_T_List => List::traverse(&mut unsafe { std::ptr::read(self as *mut Node as *mut List) },
+                        walker_fn,
+                        context),
+                    NodeTag_T_RangeTblEntry => RangeTblEntry::traverse(&mut unsafe { std::ptr::read(self as *mut Node as *mut RangeTblEntry) },
+                        walker_fn,
+                        context),
+                    #node_traverse_body
+                    _ => {}, // any types with no explicit traverse method defined will be skipped.
+                }
+            }
+        }
+        impl std::fmt::Display for Node {
+            fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+                match self.type_ {
+                    #node_display_body
+                    _ => write!(f, "[unknown type {}]", self.type_),
+                }
+            }
+        }
+        impl pg_sys::PgNode for RangeTblEntry {
+            fn traverse<T>(&mut self, walker_fn: fn(*mut Node, &mut T) -> (), context: &mut T) {
+                #rte_traversal
+            }
+        }
+        impl std::fmt::Display for RangeTblEntry {
+            fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+                write!(f, "{}", self.display_node() )
+            }
+        }
+    });
+
     Ok(pgnode_impls)
 }
 
@@ -1053,12 +934,12 @@ fn impl_pg_node(
 fn dfs_find_nodes<'graph>(
     node: &'graph StructDescriptor<'graph>,
     graph: &'graph StructGraph<'graph>,
-    node_set: &mut HashSet<StructDescriptor<'graph>>,
+    node_set: &mut HashMap<String, StructDescriptor<'graph>>,
 ) {
-    node_set.insert(node.clone());
+    node_set.insert(node.struct_.ident.to_string(), node.clone());
 
     for child in node.children(graph) {
-        if node_set.contains(child) {
+        if node_set.contains_key(&child.struct_.ident.to_string()) {
             continue;
         }
         dfs_find_nodes(child, graph, node_set);

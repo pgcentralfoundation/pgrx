@@ -169,7 +169,9 @@ pub trait PgNode {
     }
 
     /// Traverse the object graph, calling the callback at any `Node`s found as children of this object.
-    fn traverse<T>(&mut self, walker_fn: fn(*mut Node, &mut T) -> (), context: &mut T);
+    fn traverse<T>(&mut self, _walker_fn: fn(*mut Node, &mut T) -> (), _context: &mut T) {
+        // Do nothing by default, but override for structs that need it.
+    }
 }
 
 /// implementation function for `impl Display for $NodeType`
