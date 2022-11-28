@@ -57,7 +57,7 @@ pub struct Array<'a, T: FromDatum> {
     raw: Option<RawArray>,
     nelems: usize,
     // Remove this field if/when we figure out how to stop using pg_sys::deconstruct_array
-    datum_slice: Option<PallocSlice<'a, pg_sys::Datum>>,
+    datum_slice: Option<PallocSlice<pg_sys::Datum>>,
     needs_pfree: bool,
     null_slice: NullKind<'a>,
     elem_layout: Layout,
