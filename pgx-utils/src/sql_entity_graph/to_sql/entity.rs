@@ -105,33 +105,24 @@ impl ToSqlConfigEntity {
         None
     }
 }
+
 impl std::cmp::PartialEq for ToSqlConfigEntity {
     fn eq(&self, other: &Self) -> bool {
-        if self.enabled != other.enabled {
-            return false;
-        }
-        match (self.callback, other.callback) {
-            (None, None) => match (self.content, other.content) {
-                (None, None) => true,
-                (Some(a), Some(b)) => a == b,
-                _ => false,
-            },
-            (Some(a), Some(b)) => std::ptr::eq(std::ptr::addr_of!(a), std::ptr::addr_of!(b)),
-            _ => false,
-        }
+        (self.enabled, self.content, self.callback.map(|f| f as usize))
+            == (other.enabled, other.content, other.callback.map(|f| f as usize))
     }
 }
 impl std::cmp::Eq for ToSqlConfigEntity {}
 impl std::hash::Hash for ToSqlConfigEntity {
     fn hash<H: std::hash::Hasher>(&self, state: &mut H) {
         self.enabled.hash(state);
-        self.callback.map(|cb| std::ptr::addr_of!(cb)).hash(state);
+        self.callback.map(|cb| cb as usize).hash(state);
         self.content.hash(state);
     }
 }
 impl std::fmt::Debug for ToSqlConfigEntity {
     fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
-        let callback = self.callback.map(|cb| std::ptr::addr_of!(cb));
+        let callback = self.callback.map(|cb| cb as usize);
         f.debug_struct("ToSqlConfigEntity")
             .field("enabled", &self.enabled)
             .field("callback", &format_args!("{:?}", &callback))
