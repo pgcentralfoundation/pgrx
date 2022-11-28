@@ -70,18 +70,22 @@ impl PgRelation {
     /// relation_open - open any relation by relation OID
     ///
     /// If lockmode is not "NoLock", the specified kind of lock is
-    /// obtained on the relation.  (Generally, NoLock should only be
-    /// used if the caller knows it has some appropriate lock on the
-    /// relation already.)
+    /// obtained on the relation.
     ///
     /// An error is raised if the relation does not exist.
+    ///
+    /// # Safety
+    ///
+    /// Using an inappropriate lockmode, such as using NoLock on a relation
+    /// that has not been previously locked, may result in undefined behavior.
     ///
     /// NB: a "relation" is anything with a pg_class entry.  The caller is
     /// expected to check whether the relkind is something it can handle.
     ///
     /// The opened relation is automatically closed via `pg_sys::relation_close()`
     /// when this instance is dropped
-    pub fn with_lock(oid: pg_sys::Oid, lockmode: pg_sys::LOCKMODE) -> Self {
+    #[deny(unsafe_op_in_unsafe_fn)]
+    pub unsafe fn with_lock(oid: pg_sys::Oid, lockmode: pg_sys::LOCKMODE) -> Self {
         unsafe {
             PgRelation {
                 boxed: PgBox::from_pg(pg_sys::relation_open(oid, lockmode)),
@@ -194,7 +198,7 @@ impl PgRelation {
 
         list.iter_oid()
             .filter(|oid| *oid != pg_sys::InvalidOid)
-            .map(|oid| PgRelation::with_lock(oid, lockmode))
+            .map(|oid| unsafe { PgRelation::with_lock(oid, lockmode) })
             .collect::<Vec<PgRelation>>()
             .into_iter()
     }
@@ -291,7 +295,7 @@ impl PgRelation {
 impl Clone for PgRelation {
     /// Same as calling `PgRelation::with_lock(AccessShareLock)` on the underlying relation id
     fn clone(&self) -> Self {
-        PgRelation::with_lock(self.rd_id, pg_sys::AccessShareLock as pg_sys::LOCKMODE)
+        unsafe { PgRelation::with_lock(self.rd_id, pg_sys::AccessShareLock as pg_sys::LOCKMODE) }
     }
 }
 
