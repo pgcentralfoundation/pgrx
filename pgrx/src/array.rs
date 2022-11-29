@@ -1,5 +1,6 @@
 use crate::datum::{Array, FromDatum};
 use crate::pg_sys;
+use crate::toast::{Toast, Toasty};
 use bitvec::prelude::*;
 use bitvec::ptr::{bitslice_from_raw_parts_mut, BitPtr, BitPtrError, Mut};
 use core::ptr::{slice_from_raw_parts_mut, NonNull};
@@ -217,6 +218,21 @@ impl RawArray {
         // SAFETY: Validity asserted by the caller.
         let len = unsafe { ARR_NELEMS(ptr.as_ptr()) } as usize;
         RawArray { ptr, len }
+    }
+
+    pub(crate) unsafe fn detoast_from_varlena(stale: NonNull<pg_sys::varlena>) -> Toast<RawArray> {
+        // SAFETY: Validity asserted by the caller.
+        unsafe {
+            let toast = NonNull::new(
+                pg_sys::pg_detoast_datum(stale.as_ptr().cast())
+            )
+            .unwrap();
+            if stale == toast {
+                Toast::Stale(RawArray::from_ptr(toast.cast()))
+            } else {
+                Toast::Fresh(RawArray::from_ptr(toast.cast()))
+            }
+        }
     }
 
     /// # Safety
@@ -460,5 +476,15 @@ impl RawArray {
             ))
             .as_ptr()
         }
+    }
+}
+
+impl Toasty for RawArray {
+    fn detoast(self) -> Toast<RawArray> {
+        unsafe { RawArray::detoast_from_varlena(self.into_ptr().cast()) }
+    }
+
+    fn drop_toast(&mut self) {
+        unsafe { pg_sys::pfree(self.ptr.as_ptr().cast()) }
     }
 }
