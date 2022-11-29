@@ -135,8 +135,10 @@ impl From<Interval> for time::Duration {
         }
 
         if interval.day != 0 {
-            duration = duration
-                .saturating_add(time::Duration::new((interval.day * SECS_PER_DAY as i32) as i64, 0));
+            duration = duration.saturating_add(time::Duration::new(
+                (interval.day * SECS_PER_DAY as i32) as i64,
+                0,
+            ));
         }
 
         duration
