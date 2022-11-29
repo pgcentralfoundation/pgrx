@@ -30,10 +30,9 @@ use crate::sql_entity_graph::{SqlGraphEntity, SqlGraphIdentifier};
 use crate::ExternArgs;
 
 use eyre::{eyre, WrapErr};
-use std::cmp::Ordering;
 
 /// The output of a [`PgExtern`](crate::sql_entity_graph::pg_extern::PgExtern) from `quote::ToTokens::to_tokens`.
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, Eq, Ord, PartialEq, PartialOrd, Hash)]
 pub struct PgExternEntity {
     pub name: &'static str,
     pub unaliased_name: &'static str,
@@ -49,32 +48,6 @@ pub struct PgExternEntity {
     pub search_path: Option<Vec<&'static str>>,
     pub operator: Option<PgOperatorEntity>,
     pub to_sql_config: ToSqlConfigEntity,
-}
-
-impl std::hash::Hash for PgExternEntity {
-    fn hash<H: std::hash::Hasher>(&self, state: &mut H) {
-        self.full_path.hash(state);
-    }
-}
-
-impl PartialEq for PgExternEntity {
-    fn eq(&self, other: &Self) -> bool {
-        self.full_path.eq(other.full_path)
-    }
-}
-
-impl Eq for PgExternEntity {}
-
-impl Ord for PgExternEntity {
-    fn cmp(&self, other: &Self) -> Ordering {
-        self.full_path.cmp(&other.full_path)
-    }
-}
-
-impl PartialOrd for PgExternEntity {
-    fn partial_cmp(&self, other: &Self) -> Option<Ordering> {
-        Some(self.cmp(other))
-    }
 }
 
 impl From<PgExternEntity> for SqlGraphEntity {

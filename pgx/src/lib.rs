@@ -298,7 +298,7 @@ macro_rules! pg_sql_graph_magic {
         #[rustfmt::skip] // explict extern "Rust" is more clear here
         pub extern "Rust" fn __pgx_sql_mappings() -> ::pgx::utils::sql_entity_graph::RustToSqlMapping {
             ::pgx::utils::sql_entity_graph::RustToSqlMapping {
-                rust_source_to_sql: ::pgx::DEFAULT_RUST_SOURCE_TO_SQL.clone(),
+                rust_source_to_sql: ::pgx::DEFAULT_RUST_SOURCE_TO_SQL.iter().cloned().collect(),
             }
         }
 
