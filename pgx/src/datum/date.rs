@@ -59,17 +59,6 @@ impl Date {
     pub const INFINITY: Self = Date(i32::MAX);
 
     #[inline]
-    #[deprecated(
-        since = "0.5.0",
-        note = "the repr of pgx::Date is no longer time::Date and this fn will be broken in a future version\n\
-    please use pgx's `time-crate` feature to opt-in to `From<time::Date> for pgx::Date`"
-    )]
-    pub fn new(date: time::Date) -> Date {
-        // TODO(0.6.0): remove this
-        timecrate_date_to_pg_date(date)
-    }
-
-    #[inline]
     pub fn from_pg_epoch_days(pg_epoch_days: i32) -> Date {
         Date(pg_epoch_days)
     }
@@ -109,17 +98,11 @@ impl Date {
 impl From<time::Date> for Date {
     #[inline]
     fn from(date: time::Date) -> Self {
-        timecrate_date_to_pg_date(date)
+        Date::from_pg_epoch_days(date.to_julian_day() - POSTGRES_EPOCH_JDATE)
     }
 }
 
-// This function only exists as a temporary shim while the deprecation cycle for Date::new is running
-// TODO(0.6.0): remove this
-#[inline(always)]
-fn timecrate_date_to_pg_date(date: time::Date) -> Date {
-    Date::from_pg_epoch_days(date.to_julian_day() - POSTGRES_EPOCH_JDATE)
-}
-
+#[cfg(feature = "time-crate")]
 impl TryFrom<Date> for time::Date {
     type Error = i32;
     fn try_from(date: Date) -> Result<time::Date, Self::Error> {

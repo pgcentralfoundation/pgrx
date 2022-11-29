@@ -327,6 +327,11 @@ pub(crate) fn downcast_panic_payload(e: Box<dyn Any + Send>) -> CaughtError {
 }
 
 fn do_ereport(ereport: ErrorReportWithLevel) {
+    // The next code is definitely thread-unsafe -- not-the-main-thread can't be creating Postgres
+    // ereports and our secret `extern "C"` definition isn't wrapped by #[pg_guard], so we need
+    // to manually do the active thread check
+    crate::thread_check::check_active_thread();
+
     // we define this here to make it difficult for not only pgx, but pgx users
     // to find and directly call this function.  They'd have to do the same as
     // this, and that seems like more work than a normal programmer would want to do

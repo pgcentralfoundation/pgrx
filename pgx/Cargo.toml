@@ -4,8 +4,8 @@ version = "0.6.0-alpha.2"
 authors = ["ZomboDB, LLC <zombodb@gmail.com>"]
 license = "MIT"
 description = "pgx:  A Rust framework for creating Postgres extensions"
-homepage = "https://github.com/zombodb/pgx"
-repository = "https://github.com/zombodb/pgx"
+homepage = "https://github.com/tcdi/pgx"
+repository = "https://github.com/tcdi/pgx"
 documentation = "https://docs.rs/pgx"
 categories = ["database"]
 keywords = ["database", "postgres", "postgresql", "extension"]
@@ -24,7 +24,7 @@ pg12 = [ "pgx-pg-sys/pg12" ]
 pg13 = [ "pgx-pg-sys/pg13" ]
 pg14 = [ "pgx-pg-sys/pg14" ]
 pg15 = [ "pgx-pg-sys/pg15" ]
-time-crate = [ ] # TODO(0.6.0): add "dep:time"
+time-crate = ["dep:time"]
 
 [package.metadata.docs.rs]
 features = ["pg14"]
@@ -60,4 +60,5 @@ seahash = "4.1.0" # derive(PostgresHash)
 serde = { version = "1.0.147", features = [ "derive" ] } # impls on pub types
 serde_cbor = "0.11.2" # derive(PostgresType)
 serde_json = "1.0.88" # everything JSON
-time = { version = "0.3.17", features = ["formatting", "parsing", "alloc", "macros"] } # TODO(0.6.0): add `optional = true`
+time = { version = "0.3.17", features = ["formatting", "parsing", "alloc", "macros"], optional = true }
+

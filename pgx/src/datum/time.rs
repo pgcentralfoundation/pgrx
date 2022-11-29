@@ -11,7 +11,6 @@ use crate::{pg_sys, FromDatum, FromTimeError, IntoDatum};
 use pgx_utils::sql_entity_graph::metadata::{
     ArgumentError, Returns, ReturnsError, SqlMapping, SqlTranslatable,
 };
-use time::format_description::FormatItem;
 
 const MINS_PER_HOUR: u64 = 60;
 const SEC_PER_MIN: u64 = 60;
@@ -54,16 +53,6 @@ impl IntoDatum for Time {
 impl Time {
     pub const ALLBALLS: Self = Time(0);
 
-    #[deprecated(
-        since = "0.5",
-        note = "the repr of pgx::Time is no longer time::Time \
-    and this fn will be removed in a future version"
-    )]
-    pub fn new(time: time::Time) -> Self {
-        let (h, m, s, micro) = time.as_hms_micro();
-        Self::from_hms_micro(h, m, s, micro).unwrap()
-    }
-
     pub fn from_hms_micro(h: u8, m: u8, s: u8, micro: u32) -> Result<Time, FromTimeError> {
         match (h, m, s, micro) {
             (24, 0, 0, 0) => Ok(Time(u64::from(h) * USECS_PER_HOUR)),
@@ -105,11 +94,13 @@ impl Time {
 }
 
 #[cfg(feature = "time-crate")]
-impl TryFrom<time::Time> for Time {
-    type Error = FromTimeError;
-    fn try_from(t: time::Time) -> Result<Time, Self::Error> {
-        let (h, m, s, micro) = t.as_hms_micro();
-        Self::from_hms_micro(h, m, s, micro)
+mod with_time_crate {
+    impl TryFrom<time::Time> for crate::Time {
+        type Error = crate::FromTimeError;
+        fn try_from(t: time::Time) -> Result<crate::Time, Self::Error> {
+            let (h, m, s, micro) = t.as_hms_micro();
+            Self::from_hms_micro(h, m, s, micro)
+        }
     }
 }
 
@@ -121,33 +112,12 @@ impl serde::Serialize for Time {
     where
         S: serde::Serializer,
     {
-        let (h, m, s, micro) = self.clone().to_hms_micro();
-        let t = time::Time::from_hms_micro(h, m, s, micro).unwrap();
-        if t.millisecond() > 0 {
-            serializer.serialize_str(
-                &t.format(
-                    &time::format_description::parse(&format!(
-                        "[hour]:[minute]:[second].{}",
-                        t.millisecond()
-                    ))
-                    .map_err(|e| {
-                        serde::ser::Error::custom(format!("Time invalid format problem: {:?}", e))
-                    })?,
-                )
-                .map_err(|e| {
-                    serde::ser::Error::custom(format!("Time formatting problem: {:?}", e))
-                })?,
-            )
-        } else {
-            serializer.serialize_str(&t.format(&DEFAULT_TIME_FORMAT).map_err(|e| {
-                serde::ser::Error::custom(format!("Time formatting problem: {:?}", e))
-            })?)
-        }
+        let cstr: Option<&cstr_core::CStr> = unsafe {
+            crate::direct_function_call(pg_sys::time_out, vec![self.clone().into_datum()])
+        };
+        serializer.serialize_str(cstr.and_then(|c| c.to_str().ok()).unwrap())
     }
 }
-
-static DEFAULT_TIME_FORMAT: &[FormatItem<'static>] =
-    time::macros::format_description!("[hour]:[minute]:[second]");
 
 unsafe impl SqlTranslatable for Time {
     fn argument_sql() -> Result<SqlMapping, ArgumentError> {
