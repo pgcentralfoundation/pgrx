@@ -100,60 +100,6 @@ fn timestamptz_to_i64(tstz: pg_sys::TimestampTz) -> i64 {
     tstz
 }
 
-#[cfg(test)]
-#[pgx::pg_schema]
-mod date_epoch_tests {
-    use pg_sys;
-    use pgx::prelude::*;
-
-    #[test]
-    fn test_to_pg_epoch_days() {
-        let d = time::Date::from_calendar_date(2000, time::Month::January, 2).unwrap();
-        let date: Date = d.into();
-
-        assert_eq!(date.to_pg_epoch_days(), 1);
-    }
-
-    #[test]
-    fn test_to_posix_time() {
-        let d = time::Date::from_calendar_date(1970, time::Month::January, 2).unwrap();
-        let date: Date = d.into();
-
-        assert_eq!(date.to_posix_time(), 86400);
-    }
-
-    #[test]
-    fn test_to_julian_days() {
-        let d = time::Date::from_calendar_date(2000, time::Month::January, 1).unwrap();
-        let date: Date = d.into();
-
-        assert_eq!(date.to_julian_days(), pg_sys::POSTGRES_EPOCH_JDATE as i32);
-    }
-}
-
-#[cfg(test)]
-#[pgx::pg_schema]
-mod serialization_tests {
-    use pgx::prelude::*;
-    use serde_json::*;
-
-    #[test]
-    #[allow(deprecated)]
-    fn test_time_with_timezone_serialization() {
-        let time_with_timezone = TimeWithTimeZone::new(
-            time::Time::from_hms(12, 23, 34).unwrap(),
-            time::UtcOffset::from_hms(2, 0, 0).unwrap(),
-        );
-        let json = json!({ "time W/ Zone test": time_with_timezone });
-
-        let (h, ..) = time_with_timezone.to_utc().to_hms_micro();
-        assert_eq!(10, h);
-
-        // b/c we always want our times output in UTC
-        assert_eq!(json!({"time W/ Zone test":"10:23:34-00"}), json);
-    }
-}
-
 #[cfg(any(test, feature = "pg_test"))]
 #[pgx::pg_schema]
 mod tests {
@@ -165,6 +111,46 @@ mod tests {
     use std::time::Duration;
     use time;
     use time::PrimitiveDateTime;
+
+    #[pg_test]
+    fn test_to_pg_epoch_days() {
+        let d = time::Date::from_calendar_date(2000, time::Month::January, 2).unwrap();
+        let date: Date = d.into();
+
+        assert_eq!(date.to_pg_epoch_days(), 1);
+    }
+
+    #[pg_test]
+    fn test_to_posix_time() {
+        let d = time::Date::from_calendar_date(1970, time::Month::January, 2).unwrap();
+        let date: Date = d.into();
+
+        assert_eq!(date.to_posix_time(), 86400);
+    }
+
+    #[pg_test]
+    fn test_to_julian_days() {
+        let d = time::Date::from_calendar_date(2000, time::Month::January, 1).unwrap();
+        let date: Date = d.into();
+
+        assert_eq!(date.to_julian_days(), pg_sys::POSTGRES_EPOCH_JDATE as i32);
+    }
+
+    #[pg_test]
+    #[allow(deprecated)]
+    fn test_time_with_timezone_serialization() {
+        let time_with_timezone = TimeWithTimeZone::new(
+            time::Time::from_hms(12, 23, 34).unwrap(),
+            time::UtcOffset::from_hms(2, 0, 0).unwrap(),
+        );
+        let json = json!({ "time W/ Zone test": time_with_timezone });
+
+        let (h, ..) = time_with_timezone.to_utc().to_hms_micro();
+        assert_eq!(10, h);
+
+        // however Postgres wants to format it is fine by us
+        assert_eq!(json!({"time W/ Zone test":"12:23:34+02"}), json);
+    }
 
     #[pg_test]
     fn test_date_serialization() {
@@ -181,7 +167,7 @@ mod tests {
     #[pg_test]
     #[allow(deprecated)]
     fn test_time_serialization() {
-        let time = Time::new(time::Time::from_hms(0, 0, 0).unwrap());
+        let time = Time::ALLBALLS;
         let json = json!({ "time test": time });
 
         assert_eq!(json!({"time test":"00:00:00"}), json);

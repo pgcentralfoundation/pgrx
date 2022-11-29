@@ -12,7 +12,6 @@ use crate::{pg_sys, FromDatum, IntoDatum, PgBox};
 use pgx_utils::sql_entity_graph::metadata::{
     ArgumentError, Returns, ReturnsError, SqlMapping, SqlTranslatable,
 };
-use time::format_description::FormatItem;
 
 #[derive(Debug, Clone)]
 #[repr(C)]
@@ -67,6 +66,7 @@ impl TimeWithTimeZone {
         note = "the repr of pgx::TimeWithTimeZone is no longer time::Time \
     and this fn will be removed in a future version"
     )]
+    #[cfg(feature = "time-crate")]
     pub fn new(time: time::Time, at_tz_offset: time::UtcOffset) -> Self {
         let (h, m, s, micro) = time.as_hms_micro();
         let t = Time::from_hms_micro(h, m, s, micro).unwrap();
@@ -98,45 +98,15 @@ impl serde::Serialize for TimeWithTimeZone {
     where
         S: serde::Serializer,
     {
-        let (h, m, s, micro) = self.clone().to_utc().to_hms_micro();
-        let time = time::Time::from_hms_micro(h, m, s, micro).unwrap();
-        if time.millisecond() > 0 {
-            serializer.serialize_str(
-                &time
-                    .format(
-                        &time::format_description::parse(&format!(
-                            "[hour]:[minute]:[second].{}-00",
-                            time.millisecond()
-                        ))
-                        .map_err(|e| {
-                            serde::ser::Error::custom(format!(
-                                "TimeWithTimeZone invalid format problem: {:?}",
-                                e
-                            ))
-                        })?,
-                    )
-                    .map_err(|e| {
-                        serde::ser::Error::custom(format!(
-                            "TimeWithTimeZone formatting problem: {:?}",
-                            e
-                        ))
-                    })?,
+        let cstr: Option<&cstr_core::CStr> = unsafe {
+            crate::direct_function_call(
+                pg_sys::timetz_out,
+                vec![Some(pg_sys::Datum::from(self as *const Self))],
             )
-        } else {
-            serializer.serialize_str(
-                &time.format(&DEFAULT_TIMESTAMP_WITH_TIMEZONE_FORMAT).map_err(|e| {
-                    serde::ser::Error::custom(format!(
-                        "TimeWithTimeZone formatting problem: {:?}",
-                        e
-                    ))
-                })?,
-            )
-        }
+        };
+        serializer.serialize_str(cstr.and_then(|c| c.to_str().ok()).unwrap())
     }
 }
-
-static DEFAULT_TIMESTAMP_WITH_TIMEZONE_FORMAT: &[FormatItem<'static>] =
-    time::macros::format_description!("[hour]:[minute]:[second]-00");
 
 unsafe impl SqlTranslatable for TimeWithTimeZone {
     fn argument_sql() -> Result<SqlMapping, ArgumentError> {
