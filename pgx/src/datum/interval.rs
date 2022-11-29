@@ -15,9 +15,9 @@ use pg_sys::{DAYS_PER_MONTH, SECS_PER_DAY};
 use pgx_utils::sql_entity_graph::metadata::{
     ArgumentError, Returns, ReturnsError, SqlMapping, SqlTranslatable,
 };
-use time::Duration;
 
-const MONTH_DURATION: Duration = Duration::days(DAYS_PER_MONTH as i64);
+#[cfg(feature = "time-crate")]
+const MONTH_DURATION: time::Duration = time::Duration::days(DAYS_PER_MONTH as i64);
 
 /// From the PG docs  https://www.postgresql.org/docs/current/datatype-datetime.html#DATATYPE-INTERVAL-INPUT
 /// Internally interval values are stored as months, days, and microseconds. This is done because the number of days in a month varies,
@@ -97,16 +97,17 @@ impl FromDatum for Interval {
     }
 }
 
-impl TryFrom<Duration> for Interval {
+#[cfg(feature = "time-crate")]
+impl TryFrom<time::Duration> for Interval {
     type Error = IntervalConversionError;
-    fn try_from(duration: Duration) -> Result<Interval, Self::Error> {
+    fn try_from(duration: time::Duration) -> Result<Interval, Self::Error> {
         let total_months = duration.whole_days() / (pg_sys::DAYS_PER_MONTH as i64);
 
         if total_months >= (i32::MIN as i64) && total_months <= (i32::MAX as i64) {
             let mut month = 0;
             let mut d = duration;
 
-            if Duration::abs(d) >= MONTH_DURATION {
+            if time::Duration::abs(d) >= MONTH_DURATION {
                 month = total_months as i32;
                 d = d.sub(MONTH_DURATION.mul(month));
             }
@@ -120,13 +121,14 @@ impl TryFrom<Duration> for Interval {
     }
 }
 
-impl From<Interval> for Duration {
-    fn from(interval: Interval) -> Duration {
+#[cfg(feature = "time-crate")]
+impl From<Interval> for time::Duration {
+    fn from(interval: Interval) -> time::Duration {
         let interval = interval.0; // internal interval
         let sec = interval.time / USECS_PER_SEC as i64;
         let fsec = ((interval.time - (sec * USECS_PER_SEC as i64)) * 1000) as i32; // convert usec to nsec
 
-        let mut duration = Duration::new(sec, fsec);
+        let mut duration = time::Duration::new(sec, fsec);
 
         if interval.month != 0 {
             duration = duration.saturating_add(MONTH_DURATION.mul(interval.month));
@@ -134,7 +136,7 @@ impl From<Interval> for Duration {
 
         if interval.day != 0 {
             duration = duration
-                .saturating_add(Duration::new((interval.day * SECS_PER_DAY as i32) as i64, 0));
+                .saturating_add(time::Duration::new((interval.day * SECS_PER_DAY as i32) as i64, 0));
         }
 
         duration
