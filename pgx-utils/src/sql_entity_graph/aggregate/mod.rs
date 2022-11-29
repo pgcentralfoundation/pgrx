@@ -618,7 +618,7 @@ impl PgAggregate {
         let entity_item_fn: ItemFn = parse_quote! {
             #[no_mangle]
             #[doc(hidden)]
-            pub extern "Rust" fn #sql_graph_entity_fn_name() -> ::pgx::utils::sql_entity_graph::SqlGraphEntity {
+            pub extern "C" fn #sql_graph_entity_fn_name() -> *mut u8 {
                 let submission = ::pgx::utils::sql_entity_graph::PgAggregateEntity {
                     full_path: ::core::any::type_name::<#target_ident>().into(),
                     module_path: module_path!().into(),
@@ -649,6 +649,7 @@ impl PgAggregate {
                     to_sql_config: #to_sql_config,
                 };
                 ::pgx::utils::sql_entity_graph::SqlGraphEntity::Aggregate(submission)
+                    .to_malloced_json_cstr()
             }
         };
         entity_item_fn

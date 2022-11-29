@@ -17,7 +17,7 @@ use object::Object;
 use once_cell::sync::OnceCell;
 use owo_colors::OwoColorize;
 use pgx_pg_config::{get_target_dir, PgConfig, Pgx};
-use pgx_utils::sql_entity_graph::{ControlFile, PgxSql, SqlGraphEntity};
+use pgx_utils::sql_entity_graph::{ControlFile, PgxSql, RustToSqlMapping, SqlGraphEntity};
 use std::collections::HashSet;
 use std::hash::{Hash, Hasher};
 use std::path::{Path, PathBuf};
@@ -401,7 +401,6 @@ pub(crate) fn generate_schema(
     let mut entities = Vec::default();
     let sql_mapping;
 
-    #[rustfmt::skip] // explict extern "Rust" is more clear here
     unsafe {
         // SAFETY: Calls foreign functions with the correct type signatures.
         // Assumes that repr(Rust) enums are represented the same in this crate as in the external
@@ -422,29 +421,33 @@ pub(crate) fn generate_schema(
                 libloading::os::unix::Library::open(Some(&lib_so), libloading::os::unix::RTLD_LAZY)
             })
             .wrap_err_with(|| format!("Couldn't libload {}", lib_so.display()))?;
+        // Returns serialized `::pgx_utils::sql_entity_graph::RustToSqlMapping`.
+        let sql_mappings_symbol: libloading::os::unix::Symbol<unsafe extern "C" fn() -> *mut u8> =
+            lib.get("__pgx_sql_mappings".as_bytes())
+                .expect(&format!("Couldn't call __pgx_sql_mappings"));
+        sql_mapping = deserialize_and_free_json_cstr::<RustToSqlMapping>(sql_mappings_symbol())
+            .wrap_err_with(|| {
+                format!("Failed to deserialize RustToSqlMapping returned by `__pgx_sql_mappings`.")
+            })?;
+        // Returns ControlFile
+        let symbol: libloading::os::unix::Symbol<unsafe extern "C" fn() -> *mut u8> =
+            lib.get("__pgx_marker".as_bytes()).expect(&format!("Couldn't call __pgx_marker"));
 
-        let sql_mappings_symbol: libloading::os::unix::Symbol<
-            unsafe extern "Rust" fn() -> ::pgx_utils::sql_entity_graph::RustToSqlMapping,
-        > = lib
-            .get("__pgx_sql_mappings".as_bytes())
-            .expect(&format!("Couldn't call __pgx_sql_mappings"));
-        sql_mapping = sql_mappings_symbol();
-
-        let symbol: libloading::os::unix::Symbol<
-            unsafe extern "Rust" fn() -> eyre::Result<ControlFile>,
-        > = lib
-            .get("__pgx_marker".as_bytes())
-            .expect(&format!("Couldn't call __pgx_marker"));
         let control_file_entity = SqlGraphEntity::ExtensionRoot(
-            symbol().expect("Failed to get control file information"),
+            deserialize_and_free_json_cstr::<ControlFile>(symbol()).wrap_err_with(|| {
+                format!("Failed to deserialize ControLFile returned by `__pgx_marker`",)
+            })?,
         );
         entities.push(control_file_entity);
 
         for symbol_to_call in fns_to_call {
-            let symbol: libloading::os::unix::Symbol<unsafe extern "Rust" fn() -> SqlGraphEntity> =
-                lib.get(symbol_to_call.as_bytes())
-                    .expect(&format!("Couldn't call {:#?}", symbol_to_call));
-            let entity = symbol();
+            let symbol: libloading::os::unix::Symbol<unsafe fn() -> *mut u8> = lib
+                .get(symbol_to_call.as_bytes())
+                .expect(&format!("Couldn't call {:#?}", symbol_to_call));
+            let entity =
+                deserialize_and_free_json_cstr::<SqlGraphEntity>(symbol()).wrap_err_with(|| {
+                    format!("Failed to deserialize SqlGraphEntity returned by `{symbol_to_call}`")
+                })?;
             entities.push(entity);
         }
     };
@@ -581,4 +584,16 @@ fn create_stub(
         .wrap_err("could not write postmaster stub hash")?;
 
     Ok(postmaster_stub_built)
+}
+
+unsafe fn deserialize_and_free_json_cstr<T: serde::de::DeserializeOwned>(
+    malloced_json: *mut u8,
+) -> eyre::Result<T> {
+    assert!(
+        !malloced_json.is_null(),
+        "The functions that return JSON strings should not ever return null.",
+    );
+    let json_str = std::ffi::CStr::from_ptr(malloced_json.cast()).to_owned();
+    unsafe { libc::free(malloced_json.cast()) };
+    Ok(serde_json::from_str(json_str.to_str()?)?)
 }

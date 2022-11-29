@@ -144,7 +144,7 @@ impl ToTokens for PostgresEnum {
 
             #[no_mangle]
             #[doc(hidden)]
-            pub extern "Rust" fn  #sql_graph_entity_fn_name() -> ::pgx::utils::sql_entity_graph::SqlGraphEntity {
+            pub extern "C" fn #sql_graph_entity_fn_name() -> *mut u8 {
                 extern crate alloc;
                 use alloc::vec::Vec;
                 use alloc::vec;
@@ -166,6 +166,7 @@ impl ToTokens for PostgresEnum {
                     to_sql_config: #to_sql_config,
                 };
                 ::pgx::utils::sql_entity_graph::SqlGraphEntity::Enum(submission)
+                    .to_malloced_json_cstr()
             }
         };
         tokens.append_all(inv);

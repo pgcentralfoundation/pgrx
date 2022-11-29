@@ -14,7 +14,7 @@ Use of this source code is governed by the MIT license that can be found in the 
 to the `pgx` framework and very subject to change between versions. While you may use this, please do it with caution.
 
 */
-use super::{SqlGraphEntity, SqlGraphIdentifier, ToSql};
+use super::{to_malloced_json_cstr, SqlGraphEntity, SqlGraphIdentifier, ToSql};
 use crate::FastHashMap;
 use core::convert::TryFrom;
 use tracing_error::SpanTrace;
@@ -94,6 +94,10 @@ impl ControlFile {
             })? == &"true",
             schema: temp.get("schema").map(|v| v.to_string()),
         })
+    }
+
+    pub fn to_malloced_json_cstr(&self) -> *mut u8 {
+        to_malloced_json_cstr(self)
     }
 }
 

@@ -293,22 +293,22 @@ macro_rules! pg_magic_func {
 #[macro_export]
 macro_rules! pg_sql_graph_magic {
     () => {
+        // Returns a JSON-serialized `RustToSqlMapping`.
         #[no_mangle]
         #[doc(hidden)]
-        #[rustfmt::skip] // explict extern "Rust" is more clear here
-        pub extern "Rust" fn __pgx_sql_mappings() -> ::pgx::utils::sql_entity_graph::RustToSqlMapping {
+        pub extern "C" fn __pgx_sql_mappings() -> *mut u8 {
             ::pgx::utils::sql_entity_graph::RustToSqlMapping {
                 rust_source_to_sql: ::pgx::DEFAULT_RUST_SOURCE_TO_SQL.iter().cloned().collect(),
             }
+            .to_malloced_json_cstr()
         }
 
         // A marker which must exist in the root of the extension.
+        //
+        // Returns a JSON-serialized `ControlFile`.
         #[no_mangle]
         #[doc(hidden)]
-        #[rustfmt::skip] // explict extern "Rust" is more clear here
-        pub extern "Rust" fn __pgx_marker(
-            _: (),
-        ) -> ::pgx::utils::__reexports::eyre::Result<::pgx::utils::sql_entity_graph::ControlFile> {
+        pub extern "C" fn __pgx_marker() -> *mut u8 {
             use ::core::convert::TryFrom;
             use ::pgx::utils::__reexports::eyre::WrapErr;
             let package_version = env!("CARGO_PKG_VERSION");
@@ -322,8 +322,12 @@ macro_rules! pg_sql_graph_magic {
 
             let control_file =
                 ::pgx::utils::sql_entity_graph::ControlFile::try_from(context.as_str())
-                    .wrap_err_with(|| "Could not parse control file, is it valid?")?;
-            Ok(control_file)
+                    .unwrap_or_else(|e| {
+                        // Technically panic over the FFI is not allowed, but this
+                        // should never happen in normal conditions
+                        panic!("Could not parse control file, is it valid? {:?}", e);
+                    });
+            control_file.to_malloced_json_cstr()
         }
     };
 }

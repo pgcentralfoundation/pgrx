@@ -105,7 +105,7 @@ impl ToTokens for ExtensionSqlFile {
         let inv = quote! {
             #[no_mangle]
             #[doc(hidden)]
-            pub extern "Rust" fn  #sql_graph_entity_fn_name() -> ::pgx::utils::sql_entity_graph::SqlGraphEntity {
+            pub extern "C" fn #sql_graph_entity_fn_name() -> *mut u8 {
                 extern crate alloc;
                 use alloc::vec::Vec;
                 use alloc::vec;
@@ -122,6 +122,7 @@ impl ToTokens for ExtensionSqlFile {
                     creates: vec![#(#creates_iter),*],
                 };
                 ::pgx::utils::sql_entity_graph::SqlGraphEntity::CustomSql(submission)
+                    .to_malloced_json_cstr()
             }
         };
         tokens.append_all(inv);
@@ -210,7 +211,7 @@ impl ToTokens for ExtensionSql {
             syn::Ident::new(&format!("__pgx_internals_sql_{}", name.value()), Span::call_site());
         let inv = quote! {
             #[no_mangle]
-            pub extern "Rust" fn  #sql_graph_entity_fn_name() -> ::pgx::utils::sql_entity_graph::SqlGraphEntity {
+            pub extern "C" fn #sql_graph_entity_fn_name() -> *mut u8 {
                 extern crate alloc;
                 use alloc::vec::Vec;
                 use alloc::vec;
@@ -227,6 +228,7 @@ impl ToTokens for ExtensionSql {
                     creates: vec![#(#creates_iter),*],
                 };
                 ::pgx::utils::sql_entity_graph::SqlGraphEntity::CustomSql(submission)
+                    .to_malloced_json_cstr()
             }
         };
         tokens.append_all(inv);

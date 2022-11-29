@@ -66,7 +66,7 @@ impl PgTrigger {
         let tokens = quote! {
             #[no_mangle]
             #[doc(hidden)]
-            pub extern "Rust" fn #sql_graph_entity_fn_name() -> ::pgx::utils::sql_entity_graph::SqlGraphEntity {
+            pub extern "C" fn #sql_graph_entity_fn_name() -> *mut u8 {
                 use core::any::TypeId;
                 extern crate alloc;
                 use alloc::vec::Vec;
@@ -80,6 +80,7 @@ impl PgTrigger {
                     to_sql_config: #to_sql_config,
                 };
                 ::pgx::utils::sql_entity_graph::SqlGraphEntity::Trigger(submission)
+                    .to_malloced_json_cstr()
             }
         };
         syn::parse2(tokens)

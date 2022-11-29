@@ -120,6 +120,10 @@ impl SqlGraphEntity {
             rust_identifier = self.rust_identifier(),
         )
     }
+
+    pub fn to_malloced_json_cstr(&self) -> *mut u8 {
+        to_malloced_json_cstr(self)
+    }
 }
 
 impl SqlGraphIdentifier for SqlGraphEntity {
@@ -248,4 +252,40 @@ impl ToSql for SqlGraphEntity {
             SqlGraphEntity::ExtensionRoot(item) => item.to_sql(context),
         }
     }
+}
+
+/// Return the JSON representation of `val` as a NUL-terminated C string
+/// allocated via `libc::malloc`. This should generally be used via an inherent
+/// method (on `SqlGraphEntity`, for example).
+///
+/// This suitable for passing over the FFI to a separate dynamic library, which
+/// should free it using `libc::free`.
+///
+/// Panics if anything goes wrong rather than returning NUL, since the error
+/// cases all should/can not happen in practice.
+///
+/// This returns `*mut u8` rather than `*mut c_char` because `core::ffi::c_char`
+/// is not available in our MSRV, and we seem to want to avoid direct use of
+/// `std::` in macro-generated code.
+fn to_malloced_json_cstr<T>(v: &T) -> *mut u8
+where
+    T: serde::Serialize + core::fmt::Debug,
+{
+    let json = serde_json::to_string(v).unwrap_or_else(|e| {
+        panic!("SqlGraphEntity serialization should not fail: {e:?}. Failed to serialize:\n{v:?}");
+    });
+    debug_assert!(!json.as_bytes().contains(&0u8), "Valid JSON should not contain NUL bytes");
+    // Safety: `len_with_nul` cannot be 0, as `json.len() + 1` cannot
+    // overflow (Rust objects cap out at `isize::MAX` bytes).
+    let allocated: *mut u8 = unsafe { libc::malloc(json.len() + 1).cast() };
+    assert!(!allocated.is_null(), "Failed to malloc space for {:?} bytes.", json.len() + 1);
+    // Safety: `malloc` returned non-null, so the pointer should be valid
+    // for writes of `json.len() + 1` bytes.
+    unsafe {
+        // Copy the string.
+        allocated.copy_from_nonoverlapping(json.as_ptr(), json.len());
+        // Append a NUL-terminator.
+        allocated.add(json.len()).write(0);
+    }
+    allocated
 }

@@ -292,7 +292,7 @@ impl PgExtern {
         quote_spanned! { self.func.sig.span() =>
             #[no_mangle]
             #[doc(hidden)]
-            pub extern "Rust" fn  #sql_graph_entity_fn_name() -> ::pgx::utils::sql_entity_graph::SqlGraphEntity {
+            pub extern "C" fn #sql_graph_entity_fn_name() -> *mut u8 {
                 extern crate alloc;
                 #[allow(unused_imports)]
                 use alloc::{vec, vec::Vec};
@@ -315,6 +315,7 @@ impl PgExtern {
                     to_sql_config: #to_sql_config,
                 };
                 ::pgx::utils::sql_entity_graph::SqlGraphEntity::Function(submission)
+                    .to_malloced_json_cstr()
             }
         }
     }

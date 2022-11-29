@@ -34,3 +34,4 @@ tracing = "0.1.37"
 tracing-error = "0.2.0"
 tracing-subscriber = { version = "0.3.16", features = [ "env-filter" ] }
 rustc-hash = "1.1.0"
+libc = "0.2"

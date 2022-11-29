@@ -38,7 +38,7 @@ use crate::sql_entity_graph::postgres_ord::entity::PostgresOrdEntity;
 use crate::sql_entity_graph::postgres_type::entity::PostgresTypeEntity;
 use crate::sql_entity_graph::schema::entity::SchemaEntity;
 use crate::sql_entity_graph::to_sql::ToSql;
-use crate::sql_entity_graph::{SqlGraphEntity, SqlGraphIdentifier, TyId};
+use crate::sql_entity_graph::{to_malloced_json_cstr, SqlGraphEntity, SqlGraphIdentifier, TyId};
 
 use super::{PgExternReturnEntity, PgExternReturnEntityIteratedItem};
 
@@ -49,9 +49,15 @@ pub enum SqlGraphRelationship {
     RequiredByReturn,
 }
 
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
 pub struct RustToSqlMapping {
     pub rust_source_to_sql: FastHashSet<RustSourceOnlySqlMapping>,
+}
+
+impl RustToSqlMapping {
+    pub fn to_malloced_json_cstr(&self) -> *mut u8 {
+        to_malloced_json_cstr(self)
+    }
 }
 
 /// A generator for SQL.
