@@ -177,7 +177,7 @@ mod tests {
 
     #[pg_test]
     fn test_inserting_null() {
-        Spi::execute(|mut client| {
+        Spi::execute(|client| {
             client.update("CREATE TABLE tests.null_test (id uuid)", None, None);
         });
         let result = Spi::get_one_with_args::<i32>(
@@ -204,7 +204,7 @@ mod tests {
             assert_eq!(res.column_name(2).unwrap(), "b");
         });
 
-        Spi::execute(|mut client| {
+        Spi::execute(|client| {
             let res = client.update("SET TIME ZONE 'PST8PDT'", None, None);
 
             assert_eq!(0, res.columns());
