@@ -19,39 +19,19 @@ use crate::sql_entity_graph::pgx_sql::PgxSql;
 use crate::sql_entity_graph::to_sql::entity::ToSqlConfigEntity;
 use crate::sql_entity_graph::to_sql::ToSql;
 use crate::sql_entity_graph::{SqlGraphEntity, SqlGraphIdentifier};
-
-use std::cmp::Ordering;
-use std::hash::{Hash, Hasher};
+use std::collections::BTreeSet;
 
 /// The output of a [`PostgresEnum`](crate::sql_entity_graph::postgres_enum::PostgresEnum) from `quote::ToTokens::to_tokens`.
-#[derive(Debug, Clone, PartialEq, Eq)]
+#[derive(Debug, Clone, PartialEq, Eq, Hash, Ord, PartialOrd)]
 pub struct PostgresEnumEntity {
     pub name: &'static str,
     pub file: &'static str,
     pub line: u32,
     pub full_path: &'static str,
     pub module_path: &'static str,
-    pub mappings: std::collections::HashSet<RustSqlMapping>,
+    pub mappings: BTreeSet<RustSqlMapping>,
     pub variants: Vec<&'static str>,
     pub to_sql_config: ToSqlConfigEntity,
-}
-
-impl Hash for PostgresEnumEntity {
-    fn hash<H: Hasher>(&self, state: &mut H) {
-        self.full_path.hash(state);
-    }
-}
-
-impl Ord for PostgresEnumEntity {
-    fn cmp(&self, other: &Self) -> Ordering {
-        self.file.cmp(other.file).then_with(|| self.file.cmp(other.file))
-    }
-}
-
-impl PartialOrd for PostgresEnumEntity {
-    fn partial_cmp(&self, other: &Self) -> Option<Ordering> {
-        Some(self.cmp(other))
-    }
 }
 
 impl PostgresEnumEntity {

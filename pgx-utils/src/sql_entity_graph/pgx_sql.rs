@@ -15,12 +15,12 @@ to the `pgx` framework and very subject to change between versions. While you ma
 
 */
 
+use crate::{FastHashMap, FastHashSet};
 use eyre::eyre;
 use petgraph::dot::Dot;
 use petgraph::graph::NodeIndex;
 use petgraph::stable_graph::StableGraph;
 use std::any::TypeId;
-use std::collections::HashMap;
 use std::fmt::Debug;
 use std::path::Path;
 use tracing::instrument;
@@ -52,7 +52,7 @@ pub enum SqlGraphRelationship {
 
 #[derive(Debug, Clone)]
 pub struct RustToSqlMapping {
-    pub rust_source_to_sql: std::collections::HashSet<RustSourceOnlySqlMapping>,
+    pub rust_source_to_sql: FastHashSet<RustSourceOnlySqlMapping>,
 }
 
 /// A generator for SQL.
@@ -68,22 +68,22 @@ pub struct RustToSqlMapping {
 /// out of entities collected during a `pgx::pg_module_magic!()` call in a library.
 #[derive(Debug, Clone)]
 pub struct PgxSql {
-    pub source_mappings: HashMap<String, RustSourceOnlySqlMapping>,
+    pub source_mappings: FastHashMap<String, RustSourceOnlySqlMapping>,
     pub control: ControlFile,
     pub graph: StableGraph<SqlGraphEntity, SqlGraphRelationship>,
     pub graph_root: NodeIndex,
     pub graph_bootstrap: Option<NodeIndex>,
     pub graph_finalize: Option<NodeIndex>,
-    pub schemas: HashMap<SchemaEntity, NodeIndex>,
-    pub extension_sqls: HashMap<ExtensionSqlEntity, NodeIndex>,
-    pub externs: HashMap<PgExternEntity, NodeIndex>,
-    pub types: HashMap<PostgresTypeEntity, NodeIndex>,
-    pub builtin_types: HashMap<String, NodeIndex>,
-    pub enums: HashMap<PostgresEnumEntity, NodeIndex>,
-    pub ords: HashMap<PostgresOrdEntity, NodeIndex>,
-    pub hashes: HashMap<PostgresHashEntity, NodeIndex>,
-    pub aggregates: HashMap<PgAggregateEntity, NodeIndex>,
-    pub triggers: HashMap<PgTriggerEntity, NodeIndex>,
+    pub schemas: FastHashMap<SchemaEntity, NodeIndex>,
+    pub extension_sqls: FastHashMap<ExtensionSqlEntity, NodeIndex>,
+    pub externs: FastHashMap<PgExternEntity, NodeIndex>,
+    pub types: FastHashMap<PostgresTypeEntity, NodeIndex>,
+    pub builtin_types: FastHashMap<String, NodeIndex>,
+    pub enums: FastHashMap<PostgresEnumEntity, NodeIndex>,
+    pub ords: FastHashMap<PostgresOrdEntity, NodeIndex>,
+    pub hashes: FastHashMap<PostgresHashEntity, NodeIndex>,
+    pub aggregates: FastHashMap<PgAggregateEntity, NodeIndex>,
+    pub triggers: FastHashMap<PgTriggerEntity, NodeIndex>,
     pub extension_name: String,
     pub versioned_so: bool,
 }
@@ -499,10 +499,11 @@ fn initialize_extension_sqls<'a>(
     graph: &'a mut StableGraph<SqlGraphEntity, SqlGraphRelationship>,
     root: NodeIndex,
     extension_sqls: Vec<ExtensionSqlEntity>,
-) -> eyre::Result<(HashMap<ExtensionSqlEntity, NodeIndex>, Option<NodeIndex>, Option<NodeIndex>)> {
+) -> eyre::Result<(FastHashMap<ExtensionSqlEntity, NodeIndex>, Option<NodeIndex>, Option<NodeIndex>)>
+{
     let mut bootstrap = None;
     let mut finalize = None;
-    let mut mapped_extension_sqls = HashMap::default();
+    let mut mapped_extension_sqls = FastHashMap::default();
     for item in extension_sqls {
         let entity: SqlGraphEntity = item.clone().into();
         let index = graph.add_node(entity);
@@ -551,12 +552,12 @@ fn initialize_extension_sqls<'a>(
 /// A best effort attempt to find the related [`NodeIndex`] for some [`PositioningRef`].
 pub fn find_positioning_ref_target<'a>(
     positioning_ref: &'a PositioningRef,
-    types: &'a HashMap<PostgresTypeEntity, NodeIndex>,
-    enums: &'a HashMap<PostgresEnumEntity, NodeIndex>,
-    externs: &'a HashMap<PgExternEntity, NodeIndex>,
-    schemas: &'a HashMap<SchemaEntity, NodeIndex>,
-    extension_sqls: &'a HashMap<ExtensionSqlEntity, NodeIndex>,
-    triggers: &'a HashMap<PgTriggerEntity, NodeIndex>,
+    types: &'a FastHashMap<PostgresTypeEntity, NodeIndex>,
+    enums: &'a FastHashMap<PostgresEnumEntity, NodeIndex>,
+    externs: &'a FastHashMap<PgExternEntity, NodeIndex>,
+    schemas: &'a FastHashMap<SchemaEntity, NodeIndex>,
+    extension_sqls: &'a FastHashMap<ExtensionSqlEntity, NodeIndex>,
+    triggers: &'a FastHashMap<PgTriggerEntity, NodeIndex>,
 ) -> Option<&'a NodeIndex> {
     match positioning_ref {
         PositioningRef::FullPath(path) => {
@@ -610,12 +611,12 @@ pub fn find_positioning_ref_target<'a>(
 #[tracing::instrument(level = "error", skip_all)]
 fn connect_extension_sqls(
     graph: &mut StableGraph<SqlGraphEntity, SqlGraphRelationship>,
-    extension_sqls: &HashMap<ExtensionSqlEntity, NodeIndex>,
-    schemas: &HashMap<SchemaEntity, NodeIndex>,
-    types: &HashMap<PostgresTypeEntity, NodeIndex>,
-    enums: &HashMap<PostgresEnumEntity, NodeIndex>,
-    externs: &HashMap<PgExternEntity, NodeIndex>,
-    triggers: &HashMap<PgTriggerEntity, NodeIndex>,
+    extension_sqls: &FastHashMap<ExtensionSqlEntity, NodeIndex>,
+    schemas: &FastHashMap<SchemaEntity, NodeIndex>,
+    types: &FastHashMap<PostgresTypeEntity, NodeIndex>,
+    enums: &FastHashMap<PostgresEnumEntity, NodeIndex>,
+    externs: &FastHashMap<PgExternEntity, NodeIndex>,
+    triggers: &FastHashMap<PgTriggerEntity, NodeIndex>,
 ) -> eyre::Result<()> {
     for (item, &index) in extension_sqls {
         make_schema_connection(
@@ -665,8 +666,8 @@ fn initialize_schemas(
     bootstrap: Option<NodeIndex>,
     finalize: Option<NodeIndex>,
     schemas: Vec<SchemaEntity>,
-) -> eyre::Result<HashMap<SchemaEntity, NodeIndex>> {
-    let mut mapped_schemas = HashMap::default();
+) -> eyre::Result<FastHashMap<SchemaEntity, NodeIndex>> {
+    let mut mapped_schemas = FastHashMap::default();
     for item in schemas {
         let entity = item.clone().into();
         let index = graph.add_node(entity);
@@ -684,7 +685,7 @@ fn initialize_schemas(
 #[tracing::instrument(level = "error", skip_all)]
 fn connect_schemas(
     graph: &mut StableGraph<SqlGraphEntity, SqlGraphRelationship>,
-    schemas: &HashMap<SchemaEntity, NodeIndex>,
+    schemas: &FastHashMap<SchemaEntity, NodeIndex>,
     root: NodeIndex,
 ) {
     for (_item, &index) in schemas {
@@ -699,8 +700,8 @@ fn initialize_enums(
     bootstrap: Option<NodeIndex>,
     finalize: Option<NodeIndex>,
     enums: Vec<PostgresEnumEntity>,
-) -> eyre::Result<HashMap<PostgresEnumEntity, NodeIndex>> {
-    let mut mapped_enums = HashMap::default();
+) -> eyre::Result<FastHashMap<PostgresEnumEntity, NodeIndex>> {
+    let mut mapped_enums = FastHashMap::default();
     for item in enums {
         let entity: SqlGraphEntity = item.clone().into();
         let index = graph.add_node(entity);
@@ -713,8 +714,8 @@ fn initialize_enums(
 #[tracing::instrument(level = "error", skip_all)]
 fn connect_enums(
     graph: &mut StableGraph<SqlGraphEntity, SqlGraphRelationship>,
-    enums: &HashMap<PostgresEnumEntity, NodeIndex>,
-    schemas: &HashMap<SchemaEntity, NodeIndex>,
+    enums: &FastHashMap<PostgresEnumEntity, NodeIndex>,
+    schemas: &FastHashMap<SchemaEntity, NodeIndex>,
 ) {
     for (item, &index) in enums {
         make_schema_connection(
@@ -735,8 +736,8 @@ fn initialize_types(
     bootstrap: Option<NodeIndex>,
     finalize: Option<NodeIndex>,
     types: Vec<PostgresTypeEntity>,
-) -> eyre::Result<HashMap<PostgresTypeEntity, NodeIndex>> {
-    let mut mapped_types = HashMap::default();
+) -> eyre::Result<FastHashMap<PostgresTypeEntity, NodeIndex>> {
+    let mut mapped_types = FastHashMap::default();
     for item in types {
         let entity = item.clone().into();
         let index = graph.add_node(entity);
@@ -749,8 +750,8 @@ fn initialize_types(
 #[tracing::instrument(level = "error", skip_all)]
 fn connect_types(
     graph: &mut StableGraph<SqlGraphEntity, SqlGraphRelationship>,
-    types: &HashMap<PostgresTypeEntity, NodeIndex>,
-    schemas: &HashMap<SchemaEntity, NodeIndex>,
+    types: &FastHashMap<PostgresTypeEntity, NodeIndex>,
+    schemas: &FastHashMap<SchemaEntity, NodeIndex>,
 ) {
     for (item, &index) in types {
         make_schema_connection(
@@ -771,11 +772,11 @@ fn initialize_externs(
     bootstrap: Option<NodeIndex>,
     finalize: Option<NodeIndex>,
     externs: Vec<PgExternEntity>,
-    mapped_types: &HashMap<PostgresTypeEntity, NodeIndex>,
-    mapped_enums: &HashMap<PostgresEnumEntity, NodeIndex>,
-) -> eyre::Result<(HashMap<PgExternEntity, NodeIndex>, HashMap<String, NodeIndex>)> {
-    let mut mapped_externs = HashMap::default();
-    let mut mapped_builtin_types = HashMap::default();
+    mapped_types: &FastHashMap<PostgresTypeEntity, NodeIndex>,
+    mapped_enums: &FastHashMap<PostgresEnumEntity, NodeIndex>,
+) -> eyre::Result<(FastHashMap<PgExternEntity, NodeIndex>, FastHashMap<String, NodeIndex>)> {
+    let mut mapped_externs = FastHashMap::default();
+    let mut mapped_builtin_types = FastHashMap::default();
     for item in externs {
         let entity: SqlGraphEntity = item.clone().into();
         let index = graph.add_node(entity.clone());
@@ -865,14 +866,14 @@ fn initialize_externs(
 #[tracing::instrument(level = "error", skip_all)]
 fn connect_externs(
     graph: &mut StableGraph<SqlGraphEntity, SqlGraphRelationship>,
-    externs: &HashMap<PgExternEntity, NodeIndex>,
-    hashes: &HashMap<PostgresHashEntity, NodeIndex>,
-    schemas: &HashMap<SchemaEntity, NodeIndex>,
-    types: &HashMap<PostgresTypeEntity, NodeIndex>,
-    enums: &HashMap<PostgresEnumEntity, NodeIndex>,
-    builtin_types: &HashMap<String, NodeIndex>,
-    extension_sqls: &HashMap<ExtensionSqlEntity, NodeIndex>,
-    triggers: &HashMap<PgTriggerEntity, NodeIndex>,
+    externs: &FastHashMap<PgExternEntity, NodeIndex>,
+    hashes: &FastHashMap<PostgresHashEntity, NodeIndex>,
+    schemas: &FastHashMap<SchemaEntity, NodeIndex>,
+    types: &FastHashMap<PostgresTypeEntity, NodeIndex>,
+    enums: &FastHashMap<PostgresEnumEntity, NodeIndex>,
+    builtin_types: &FastHashMap<String, NodeIndex>,
+    extension_sqls: &FastHashMap<ExtensionSqlEntity, NodeIndex>,
+    triggers: &FastHashMap<PgTriggerEntity, NodeIndex>,
 ) -> eyre::Result<()> {
     for (item, &index) in externs {
         let mut found_schema_declaration = false;
@@ -1097,8 +1098,8 @@ fn initialize_ords(
     bootstrap: Option<NodeIndex>,
     finalize: Option<NodeIndex>,
     ords: Vec<PostgresOrdEntity>,
-) -> eyre::Result<HashMap<PostgresOrdEntity, NodeIndex>> {
-    let mut mapped_ords = HashMap::default();
+) -> eyre::Result<FastHashMap<PostgresOrdEntity, NodeIndex>> {
+    let mut mapped_ords = FastHashMap::default();
     for item in ords {
         let entity = item.clone().into();
         let index = graph.add_node(entity);
@@ -1111,11 +1112,11 @@ fn initialize_ords(
 #[tracing::instrument(level = "info", skip_all)]
 fn connect_ords(
     graph: &mut StableGraph<SqlGraphEntity, SqlGraphRelationship>,
-    ords: &HashMap<PostgresOrdEntity, NodeIndex>,
-    schemas: &HashMap<SchemaEntity, NodeIndex>,
-    types: &HashMap<PostgresTypeEntity, NodeIndex>,
-    enums: &HashMap<PostgresEnumEntity, NodeIndex>,
-    externs: &HashMap<PgExternEntity, NodeIndex>,
+    ords: &FastHashMap<PostgresOrdEntity, NodeIndex>,
+    schemas: &FastHashMap<SchemaEntity, NodeIndex>,
+    types: &FastHashMap<PostgresTypeEntity, NodeIndex>,
+    enums: &FastHashMap<PostgresEnumEntity, NodeIndex>,
+    externs: &FastHashMap<PgExternEntity, NodeIndex>,
 ) {
     for (item, &index) in ords {
         make_schema_connection(
@@ -1174,8 +1175,8 @@ fn initialize_hashes(
     bootstrap: Option<NodeIndex>,
     finalize: Option<NodeIndex>,
     hashes: Vec<PostgresHashEntity>,
-) -> eyre::Result<HashMap<PostgresHashEntity, NodeIndex>> {
-    let mut mapped_hashes = HashMap::default();
+) -> eyre::Result<FastHashMap<PostgresHashEntity, NodeIndex>> {
+    let mut mapped_hashes = FastHashMap::default();
     for item in hashes {
         let entity: SqlGraphEntity = item.clone().into();
         let index = graph.add_node(entity);
@@ -1188,11 +1189,11 @@ fn initialize_hashes(
 #[tracing::instrument(level = "info", skip_all)]
 fn connect_hashes(
     graph: &mut StableGraph<SqlGraphEntity, SqlGraphRelationship>,
-    hashes: &HashMap<PostgresHashEntity, NodeIndex>,
-    schemas: &HashMap<SchemaEntity, NodeIndex>,
-    types: &HashMap<PostgresTypeEntity, NodeIndex>,
-    enums: &HashMap<PostgresEnumEntity, NodeIndex>,
-    externs: &HashMap<PgExternEntity, NodeIndex>,
+    hashes: &FastHashMap<PostgresHashEntity, NodeIndex>,
+    schemas: &FastHashMap<SchemaEntity, NodeIndex>,
+    types: &FastHashMap<PostgresTypeEntity, NodeIndex>,
+    enums: &FastHashMap<PostgresEnumEntity, NodeIndex>,
+    externs: &FastHashMap<PgExternEntity, NodeIndex>,
 ) {
     for (item, &index) in hashes {
         make_schema_connection(
@@ -1235,11 +1236,11 @@ fn initialize_aggregates(
     bootstrap: Option<NodeIndex>,
     finalize: Option<NodeIndex>,
     aggregates: Vec<PgAggregateEntity>,
-    mapped_builtin_types: &mut HashMap<String, NodeIndex>,
-    mapped_enums: &HashMap<PostgresEnumEntity, NodeIndex>,
-    mapped_types: &HashMap<PostgresTypeEntity, NodeIndex>,
-) -> eyre::Result<HashMap<PgAggregateEntity, NodeIndex>> {
-    let mut mapped_aggregates = HashMap::default();
+    mapped_builtin_types: &mut FastHashMap<String, NodeIndex>,
+    mapped_enums: &FastHashMap<PostgresEnumEntity, NodeIndex>,
+    mapped_types: &FastHashMap<PostgresTypeEntity, NodeIndex>,
+) -> eyre::Result<FastHashMap<PgAggregateEntity, NodeIndex>> {
+    let mut mapped_aggregates = FastHashMap::default();
     for item in aggregates {
         let entity: SqlGraphEntity = item.clone().into();
         let index = graph.add_node(entity);
@@ -1280,11 +1281,11 @@ fn connect_aggregate(
     graph: &mut StableGraph<SqlGraphEntity, SqlGraphRelationship>,
     item: &PgAggregateEntity,
     index: NodeIndex,
-    schemas: &HashMap<SchemaEntity, NodeIndex>,
-    types: &HashMap<PostgresTypeEntity, NodeIndex>,
-    enums: &HashMap<PostgresEnumEntity, NodeIndex>,
-    builtin_types: &HashMap<String, NodeIndex>,
-    externs: &HashMap<PgExternEntity, NodeIndex>,
+    schemas: &FastHashMap<SchemaEntity, NodeIndex>,
+    types: &FastHashMap<PostgresTypeEntity, NodeIndex>,
+    enums: &FastHashMap<PostgresEnumEntity, NodeIndex>,
+    builtin_types: &FastHashMap<String, NodeIndex>,
+    externs: &FastHashMap<PgExternEntity, NodeIndex>,
 ) -> eyre::Result<()> {
     make_schema_connection(
         graph,
@@ -1457,12 +1458,12 @@ fn connect_aggregate(
 #[tracing::instrument(level = "info", skip_all)]
 fn connect_aggregates(
     graph: &mut StableGraph<SqlGraphEntity, SqlGraphRelationship>,
-    aggregates: &HashMap<PgAggregateEntity, NodeIndex>,
-    schemas: &HashMap<SchemaEntity, NodeIndex>,
-    types: &HashMap<PostgresTypeEntity, NodeIndex>,
-    enums: &HashMap<PostgresEnumEntity, NodeIndex>,
-    builtin_types: &HashMap<String, NodeIndex>,
-    externs: &HashMap<PgExternEntity, NodeIndex>,
+    aggregates: &FastHashMap<PgAggregateEntity, NodeIndex>,
+    schemas: &FastHashMap<SchemaEntity, NodeIndex>,
+    types: &FastHashMap<PostgresTypeEntity, NodeIndex>,
+    enums: &FastHashMap<PostgresEnumEntity, NodeIndex>,
+    builtin_types: &FastHashMap<String, NodeIndex>,
+    externs: &FastHashMap<PgExternEntity, NodeIndex>,
 ) -> eyre::Result<()> {
     for (item, &index) in aggregates {
         connect_aggregate(graph, item, index, schemas, types, enums, builtin_types, externs)?
@@ -1477,8 +1478,8 @@ fn initialize_triggers(
     bootstrap: Option<NodeIndex>,
     finalize: Option<NodeIndex>,
     triggers: Vec<PgTriggerEntity>,
-) -> eyre::Result<HashMap<PgTriggerEntity, NodeIndex>> {
-    let mut mapped_triggers = HashMap::default();
+) -> eyre::Result<FastHashMap<PgTriggerEntity, NodeIndex>> {
+    let mut mapped_triggers = FastHashMap::default();
     for item in triggers {
         let entity: SqlGraphEntity = item.clone().into();
         let index = graph.add_node(entity);
@@ -1492,8 +1493,8 @@ fn initialize_triggers(
 #[tracing::instrument(level = "info", skip_all)]
 fn connect_triggers(
     graph: &mut StableGraph<SqlGraphEntity, SqlGraphRelationship>,
-    triggers: &HashMap<PgTriggerEntity, NodeIndex>,
-    schemas: &HashMap<SchemaEntity, NodeIndex>,
+    triggers: &FastHashMap<PgTriggerEntity, NodeIndex>,
+    schemas: &FastHashMap<SchemaEntity, NodeIndex>,
 ) {
     for (item, &index) in triggers {
         make_schema_connection(
@@ -1514,7 +1515,7 @@ fn make_schema_connection(
     index: NodeIndex,
     rust_identifier: &str,
     module_path: &str,
-    schemas: &HashMap<SchemaEntity, NodeIndex>,
+    schemas: &FastHashMap<SchemaEntity, NodeIndex>,
 ) -> bool {
     let mut found = false;
     for (schema_item, &schema_index) in schemas {
@@ -1535,7 +1536,7 @@ fn make_extern_connection(
     index: NodeIndex,
     rust_identifier: &str,
     full_path: &str,
-    externs: &HashMap<PgExternEntity, NodeIndex>,
+    externs: &FastHashMap<PgExternEntity, NodeIndex>,
 ) -> eyre::Result<()> {
     let mut found = false;
     for (extern_item, &extern_index) in externs {
@@ -1563,8 +1564,8 @@ fn make_type_or_enum_connection(
     index: NodeIndex,
     rust_identifier: &str,
     ty_id: &TypeId,
-    types: &HashMap<PostgresTypeEntity, NodeIndex>,
-    enums: &HashMap<PostgresEnumEntity, NodeIndex>,
+    types: &FastHashMap<PostgresTypeEntity, NodeIndex>,
+    enums: &FastHashMap<PostgresEnumEntity, NodeIndex>,
 ) -> bool {
     let mut found = false;
     for (ty_item, &ty_index) in types {

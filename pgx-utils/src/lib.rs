@@ -10,21 +10,18 @@ Use of this source code is governed by the MIT license that can be found in the 
 use crate::sql_entity_graph::{NameMacro, PositioningRef};
 use proc_macro2::{TokenStream, TokenTree};
 use quote::{format_ident, quote, ToTokens, TokenStreamExt};
-use std::collections::HashSet;
 use syn::{GenericArgument, PathArguments, Type, TypeParamBound};
+
+// Faster and deterministic hashmaps. Not suitable for attacker-controlled data.
+pub use rustc_hash::{FxHashMap as FastHashMap, FxHashSet as FastHashSet};
 
 pub mod rewriter;
 pub mod sql_entity_graph;
 
 #[doc(hidden)]
 pub mod __reexports {
+    pub use super::{FastHashMap, FastHashSet};
     pub use eyre;
-    // For `#[no_std]` based `pgx` extensions we use `HashSet` for type mappings.
-    pub mod std {
-        pub mod collections {
-            pub use std::collections::HashSet;
-        }
-    }
 }
 
 #[derive(Debug, Hash, Eq, PartialEq, Clone, PartialOrd, Ord)]
@@ -138,8 +135,8 @@ pub enum CategorizedType {
     Default,
 }
 
-pub fn parse_extern_attributes(attr: TokenStream) -> HashSet<ExternArgs> {
-    let mut args = HashSet::<ExternArgs>::new();
+pub fn parse_extern_attributes(attr: TokenStream) -> FastHashSet<ExternArgs> {
+    let mut args = FastHashSet::<ExternArgs>::default();
     let mut itr = attr.into_iter();
     while let Some(t) = itr.next() {
         match t {

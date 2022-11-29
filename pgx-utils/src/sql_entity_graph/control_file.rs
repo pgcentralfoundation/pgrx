@@ -16,7 +16,7 @@ to the `pgx` framework and very subject to change between versions. While you ma
 */
 use super::{SqlGraphEntity, SqlGraphIdentifier, ToSql};
 use core::convert::TryFrom;
-use std::collections::HashMap;
+use crate::FastHashMap;
 use tracing_error::SpanTrace;
 
 /// The parsed contents of a `.control` file.
@@ -53,7 +53,7 @@ impl ControlFile {
     /// ```
     #[tracing::instrument(level = "error")]
     pub fn from_str(input: &str) -> Result<Self, ControlFileError> {
-        let mut temp = HashMap::new();
+        let mut temp = FastHashMap::default();
         for line in input.lines() {
             let parts: Vec<&str> = line.split('=').collect();
 

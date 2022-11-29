@@ -1542,6 +1542,7 @@ dependencies = [
  "proc-macro2",
  "quote",
  "regex",
+ "rustc-hash",
  "seq-macro",
  "serde",
  "serde_derive",

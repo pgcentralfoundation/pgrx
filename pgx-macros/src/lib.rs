@@ -20,7 +20,6 @@ use pgx_utils::*;
 use proc_macro::TokenStream;
 use proc_macro2::Ident;
 use quote::{quote, ToTokens};
-use std::collections::HashSet;
 use syn::spanned::Spanned;
 use syn::{parse_macro_input, Attribute, Data, DeriveInput, Item, ItemImpl};
 
@@ -898,8 +897,8 @@ enum PostgresTypeAttribute {
     Default,
 }
 
-fn parse_postgres_type_args(attributes: &[Attribute]) -> HashSet<PostgresTypeAttribute> {
-    let mut categorized_attributes = HashSet::new();
+fn parse_postgres_type_args(attributes: &[Attribute]) -> FastHashSet<PostgresTypeAttribute> {
+    let mut categorized_attributes = FastHashSet::default();
 
     for a in attributes {
         let path = &a.path;

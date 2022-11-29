@@ -19,43 +19,23 @@ use crate::sql_entity_graph::pgx_sql::PgxSql;
 use crate::sql_entity_graph::to_sql::entity::ToSqlConfigEntity;
 use crate::sql_entity_graph::to_sql::ToSql;
 use crate::sql_entity_graph::{SqlGraphEntity, SqlGraphIdentifier};
-
 use eyre::eyre;
-use std::cmp::Ordering;
-use std::hash::{Hash, Hasher};
+use std::collections::BTreeSet;
 
 /// The output of a [`PostgresType`](crate::sql_entity_graph::postgres_type::PostgresType) from `quote::ToTokens::to_tokens`.
-#[derive(Debug, Clone, PartialEq, Eq)]
+#[derive(Debug, Clone, PartialEq, Eq, Hash, Ord, PartialOrd)]
 pub struct PostgresTypeEntity {
     pub name: &'static str,
     pub file: &'static str,
     pub line: u32,
     pub full_path: &'static str,
     pub module_path: &'static str,
-    pub mappings: std::collections::HashSet<RustSqlMapping>,
+    pub mappings: BTreeSet<RustSqlMapping>,
     pub in_fn: &'static str,
     pub in_fn_module_path: String,
     pub out_fn: &'static str,
     pub out_fn_module_path: String,
     pub to_sql_config: ToSqlConfigEntity,
-}
-
-impl Hash for PostgresTypeEntity {
-    fn hash<H: Hasher>(&self, state: &mut H) {
-        self.full_path.hash(state);
-    }
-}
-
-impl Ord for PostgresTypeEntity {
-    fn cmp(&self, other: &Self) -> Ordering {
-        self.file.cmp(other.file).then_with(|| self.file.cmp(other.file))
-    }
-}
-
-impl PartialOrd for PostgresTypeEntity {
-    fn partial_cmp(&self, other: &Self) -> Option<Ordering> {
-        Some(self.cmp(other))
-    }
 }
 
 impl PostgresTypeEntity {
