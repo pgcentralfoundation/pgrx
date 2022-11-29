@@ -11,8 +11,6 @@ use crate::{pg_sys, FromDatum, FromTimeError, IntoDatum};
 use pgx_utils::sql_entity_graph::metadata::{
     ArgumentError, Returns, ReturnsError, SqlMapping, SqlTranslatable,
 };
-#[cfg(feature = "time-crate")]
-use time::format_description::FormatItem;
 
 const MINS_PER_HOUR: u64 = 60;
 const SEC_PER_MIN: u64 = 60;
@@ -105,7 +103,7 @@ mod with_time_crate {
         }
     }
 }
-#[cfg(feature = "time-crate")]
+
 impl serde::Serialize for Time {
     fn serialize<S>(
         &self,
@@ -114,33 +112,12 @@ impl serde::Serialize for Time {
     where
         S: serde::Serializer,
     {
-        let (h, m, s, micro) = self.clone().to_hms_micro();
-        let t = time::Time::from_hms_micro(h, m, s, micro).unwrap();
-        if t.millisecond() > 0 {
-            serializer.serialize_str(
-                &t.format(
-                    &time::format_description::parse(&format!(
-                        "[hour]:[minute]:[second].{}",
-                        t.millisecond()
-                    ))
-                    .map_err(|e| {
-                        serde::ser::Error::custom(format!("Time invalid format problem: {:?}", e))
-                    })?,
-                )
-                .map_err(|e| {
-                    serde::ser::Error::custom(format!("Time formatting problem: {:?}", e))
-                })?,
-            )
-        } else {
-            serializer.serialize_str(&t.format(&DEFAULT_TIME_FORMAT).map_err(|e| {
-                serde::ser::Error::custom(format!("Time formatting problem: {:?}", e))
-            })?)
-        }
+        let cstr: Option<&cstr_core::CStr> = unsafe {
+            crate::direct_function_call(pg_sys::time_out, vec![self.clone().into_datum()])
+        };
+        serializer.serialize_str(cstr.and_then(|c| c.to_str().ok()).unwrap())
     }
 }
-#[cfg(feature = "time-crate")]
-static DEFAULT_TIME_FORMAT: &[FormatItem<'static>] =
-    time::macros::format_description!("[hour]:[minute]:[second]");
 
 unsafe impl SqlTranslatable for Time {
     fn argument_sql() -> Result<SqlMapping, ArgumentError> {
