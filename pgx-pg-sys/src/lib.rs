@@ -157,9 +157,7 @@ pub use internal::pg14::*;
 pub use internal::pg15::*;
 
 /// A trait applied to all Postgres `pg_sys::Node` types and subtypes
-pub trait PgNode {
-    // TODO(0.6.0): seal this trait or take this trait private?
-
+pub trait PgNode: seal::Sealed {
     /// Format this node
     #[inline]
     fn display_node(&self) -> std::string::String {
@@ -172,6 +170,10 @@ pub trait PgNode {
     fn traverse<T>(&mut self, _walker_fn: fn(*mut Node, &mut T) -> (), _context: &mut T) {
         // Do nothing by default, but override for structs that need it.
     }
+}
+
+mod seal {
+    pub trait Sealed {}
 }
 
 /// implementation function for `impl Display for $NodeType`
