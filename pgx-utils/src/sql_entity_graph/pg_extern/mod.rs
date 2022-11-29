@@ -311,7 +311,9 @@ impl PgExtern {
                     file: file!(),
                     line: line!(),
                     extern_attrs: vec![#extern_attrs],
+                    #[allow(clippy::or_fun_call)]
                     search_path: None #( .unwrap_or_else(|| Some(vec![#search_path])) )*,
+                    #[allow(clippy::or_fun_call)]
                     operator: None #( .unwrap_or_else(|| Some(#operator)) )*,
                     to_sql_config: #to_sql_config,
                 };
