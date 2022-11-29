@@ -216,4 +216,15 @@ mod tests {
         struct T;
         assert!(matches!(Spi::connect(|_| Ok(Some(T))).unwrap(), T));
     }
+
+    #[pg_test]
+    fn test_spi_unwind_safe() {
+        Spi::connect(|client| {
+            PgTryBuilder::new(|| {
+                client.update("SELECT 1", None, None);
+            })
+            .execute();
+            Ok(Some(()))
+        });
+    }
 }
