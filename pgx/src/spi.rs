@@ -232,7 +232,7 @@ impl Spi {
     }
 
     /// execute SPI commands via the provided `SpiClient`
-    pub fn execute<F: FnOnce(&mut SpiClient) + std::panic::UnwindSafe>(f: F) {
+    pub fn execute<F: FnOnce(&SpiClient) + std::panic::UnwindSafe>(f: F) {
         Spi::connect(|client| {
             f(client);
             Ok(Some(()))
@@ -241,7 +241,7 @@ impl Spi {
 
     /// execute SPI commands via the provided `SpiClient` and return a value from SPI which is
     /// automatically copied into the `CurrentMemoryContext` at the time of this function call
-    pub fn connect<R, F: FnOnce(&mut SpiClient) -> std::result::Result<Option<R>, SpiError>>(
+    pub fn connect<R, F: FnOnce(&SpiClient) -> std::result::Result<Option<R>, SpiError>>(
         f: F,
     ) -> Option<R> {
         /// a struct to manage our SPI connection lifetime
@@ -270,7 +270,7 @@ impl Spi {
         // just put us un.  We'll disconnect from SPI when the closure is finished.
         // If there's a panic or elog(ERROR), we don't care about also disconnecting from
         // SPI b/c Postgres will do that for us automatically
-        f(&mut SpiClient(())).unwrap()
+        f(&SpiClient(())).unwrap()
     }
 
     pub fn check_status(status_code: i32) -> SpiOk {
@@ -306,7 +306,7 @@ impl SpiClient {
 
     /// perform any query (including utility statements) that modify the database in some way
     pub fn update(
-        &mut self,
+        &self,
         query: &str,
         limit: Option<i64>,
         args: Option<Vec<(PgOid, Option<pg_sys::Datum>)>>,
