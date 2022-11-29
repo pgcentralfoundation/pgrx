@@ -11,12 +11,13 @@ use bindgen::callbacks::{DeriveTrait, ImplementsTrait, MacroParsingBehavior};
 use eyre::{eyre, WrapErr};
 use pgx_pg_config::{prefix_path, PgConfig, PgConfigSelector, Pgx, SUPPORTED_MAJOR_VERSIONS};
 use pgx_utils::rewriter::PgGuardRewriter;
-use quote::{quote, ToTokens};
+use proc_macro2::Span;
+use quote::{format_ident, quote, ToTokens};
 use rayon::prelude::*;
 use std::collections::{HashMap, HashSet};
 use std::path::PathBuf;
 use std::process::{Command, Output};
-use syn::{ForeignItem, Item};
+use syn::{ForeignItem, Ident, Item, Type};
 
 #[derive(Debug)]
 struct PgxOverrides(HashSet<String>);
@@ -322,6 +323,17 @@ fn extract_oids(code: &syn::File) -> proc_macro2::TokenStream {
     }
 }
 
+/// Produces code which calls `walker_fn` on the given identifier-like field name.
+fn walk_field_definition(field_name: proc_macro2::TokenStream) -> proc_macro2::TokenStream {
+    quote! {
+        if !#field_name.is_null() {
+            let item = unsafe { &mut *(#field_name as *mut Node) };
+            walker_fn(item, context);
+            Node::traverse::<T>(item, walker_fn, context);
+        }
+    }
+}
+
 /// Implement our `PgNode` marker trait for `pg_sys::Node` and its "subclasses"
 fn impl_pg_node(
     items: &Vec<syn::Item>,
@@ -373,7 +385,7 @@ fn impl_pg_node(
     }
 
     // the set of types which subclass `Node` according to postgres' object system
-    let mut node_set = HashSet::new();
+    let mut node_set = HashMap::new();
     // fill in any children of the roots with a recursive DFS
     // (we are not operating on user input, so it is ok to just
     //  use direct recursion rather than an explicit stack).
@@ -381,24 +393,418 @@ fn impl_pg_node(
         dfs_find_nodes(root, &struct_graph, &mut node_set);
     }
 
-    let nodes: Box<dyn std::iter::Iterator<Item = StructDescriptor>> = if is_for_release {
+    let mut nodes = node_set.values().collect::<Vec<_>>();
+    if is_for_release {
         // if it's for release we want to sort by struct name to avoid diff churn
-        let mut set = node_set.into_iter().collect::<Vec<_>>();
-        set.sort_by(|a, b| a.struct_.ident.cmp(&b.struct_.ident));
-        Box::new(set.into_iter())
-    } else {
         // otherwise we don't care and want to avoid the CPU overhead of sorting
-        Box::new(node_set.into_iter())
+        nodes.sort_by_key(|s| &s.struct_.ident);
+    }
+    // Provide a special implementation of PgNode for the Node itself: depending on the `type_` field,
+    // call the override for that type. That way, when we get a `*mut Node` out of a List object, we
+    // can call this function and let it route appropriately.
+    let mut node_traverse_body = proc_macro2::TokenStream::new();
+    let mut node_display_body = proc_macro2::TokenStream::new();
+
+    let mut join_fields_traverse = proc_macro2::TokenStream::new();
+    join_fields_traverse.extend(
+        if std::env::var("CARGO_FEATURE_PG11").is_ok()
+            || std::env::var("CARGO_FEATURE_PG12").is_ok()
+        {
+            vec![]
+        } else if std::env::var("CARGO_FEATURE_PG13").is_ok() {
+            vec![quote! { joinleftcols }, quote! { joinrightcols }]
+        } else {
+            vec![quote! { joinleftcols }, quote! { joinrightcols }, quote! { join_using_alias }]
+        }
+        .into_iter()
+        .map(|f| quote! { self.#f })
+        .map(walk_field_definition),
+    );
+
+    let nodetag_t_values = items
+        .iter()
+        .filter_map(|i| match i {
+            Item::Const(c) if c.ident.to_string().starts_with("NodeTag_T_") => {
+                Some(c.ident.to_string()["NodeTag_T_".len()..].to_string())
+            }
+            _ => None,
+        })
+        .collect::<HashSet<String>>();
+
+    let rtekind_result_handling = if std::env::var("CARGO_FEATURE_PG11").is_ok() {
+        quote! {}
+    } else {
+        quote! {
+            RTEKind_RTE_RESULT => {
+                /* no extra fields */
+            },
+        }
     };
 
-    // now we can finally iterate the Nodes and emit out Display impl
-    for node_struct in nodes {
-        let struct_name = &node_struct.struct_.ident;
+    let walk_item = walk_field_definition(quote! { item });
+    // Older Postgres' List is linked.
+    let list_fns = if std::env::var("CARGO_FEATURE_PG11").is_ok()
+        || std::env::var("CARGO_FEATURE_PG12").is_ok()
+    {
+        quote! {
+            impl pg_sys::PgNode for List {
+                fn traverse<T>(&mut self, walker_fn: fn(*mut Node, &mut T) -> (), context: &mut T) {
+                    if self.type_ != NodeTag_T_List || self.length == 0 { return; }
+                    let mut cell = unsafe { *self.head };
+                    for _index in 0..self.length {
+                        let item = unsafe { cell.data.ptr_value as *mut Node };
+                        #walk_item
+                        if !cell.next.is_null() {
+                            cell = unsafe { *cell.next };
+                        }
+                    }
+                }
+            }
+            impl std::fmt::Display for List {
+                fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+                    write!(f, "[")?;
+                    if self.length != 0 {
+                        let mut cell = unsafe { *self.head };
+                        for index in 0..self.length {
+                            if index != 0 {
+                                write!(f, ", ")?;
+                            }
+                            let item = unsafe { cell.data.ptr_value as *mut Node };
+                            if item.is_null() {
+                                write!(f, "(null)")?;
+                            } else {
+                                write!(f, "{}", unsafe { *item })?;
+                            }
+                            if !cell.next.is_null() {
+                                cell = unsafe { *cell.next };
+                            }
+                        }
+                    }
+                    write!(f, "]")
+                }
+            }
+        }
+    } else {
+        quote! {
+            impl pg_sys::PgNode for List {
+                fn traverse<T>(&mut self, walker_fn: fn(*mut Node, &mut T) -> (), context: &mut T) {
+                    if self.type_ != NodeTag_T_List { return; }
+                    let slice = unsafe { std::slice::from_raw_parts::<ListCell>(self.elements, self.length as usize) };
+                    for item in slice {
+                        let item = unsafe { item.ptr_value };
+                        #walk_item
+                    }
+                }
+            }
+            impl std::fmt::Display for List {
+                fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+                    write!(f, "[")?;
+                    let slice = unsafe { std::slice::from_raw_parts(self.elements, self.length as usize) };
+                    for (index, item) in slice.iter().enumerate() {
+                        if index != 0 {
+                            write!(f, ", ")?;
+                        }
+                        if unsafe { item.ptr_value }.is_null() {
+                            write!(f, "(null)")?;
+                        } else {
+                            write!(f, "{}", unsafe { *(item.ptr_value as *mut Node) })?;
+                        }
+                    }
+                    write!(f, "]")
+                }
+            }
+        }
+    };
 
+    struct ArrayBoundsInfo {
+        n: Option<proc_macro2::TokenStream>,
+    }
+    let mut array_fields: HashMap<(&'static str, &'static str), ArrayBoundsInfo> = HashMap::new();
+    let mut in_versions = |versions: &[u8],
+                           matchable: (&'static str, &'static str),
+                           n: Option<proc_macro2::TokenStream>| {
+        if versions.iter().any(|v| std::env::var(format!("CARGO_FEATURE_PG{}", v)).is_ok()) {
+            array_fields.insert(matchable, ArrayBoundsInfo { n: n });
+        }
+    };
+    in_versions(&[11, 12, 13, 14, 15], ("AggState", "aggcontexts"), Some(quote! { self.numaggs }));
+    in_versions(
+        &[11, 12, 13, 14, 15],
+        ("AppendState", "appendplans"),
+        Some(quote! { self.as_nplans }),
+    );
+    in_versions(&[14, 15], ("AppendState", "as_asyncplans"), Some(quote! { self.as_nasyncplans }));
+    in_versions(
+        &[14, 15],
+        ("AppendState", "as_asyncrequests"),
+        Some(quote! { bms_num_members(self.as_valid_asyncplans) }),
+    );
+    in_versions(
+        &[14, 15],
+        ("AppendState", "as_asyncresults"),
+        Some(quote! { self.as_nasyncresults }),
+    );
+    in_versions(
+        &[11, 12, 13, 14, 15],
+        ("BitmapAndState", "bitmapplans"),
+        Some(quote! { self.nplans }),
+    );
+    in_versions(
+        &[11, 12, 13, 14, 15],
+        ("BitmapOrState", "bitmapplans"),
+        Some(quote! { self.nplans }),
+    );
+    in_versions(
+        &[11, 12, 13],
+        ("EState", "es_result_relations"),
+        Some(quote! { self.es_num_result_relations }),
+    );
+    in_versions(
+        &[14, 15],
+        ("EState", "es_result_relations"),
+        Some(quote! { self.es_range_table_size }),
+    );
+    in_versions(
+        &[12],
+        ("EState", "es_range_table_array"),
+        Some(quote! { self.es_range_table_size }),
+    );
+    in_versions(
+        &[12, 13, 14, 15],
+        ("EState", "es_rowmarks"),
+        Some(quote! { self.es_range_table_size }),
+    );
+    in_versions(
+        &[11, 12, 13, 14, 15],
+        ("GatherMergeState", "gm_slots"),
+        Some(quote! { self.nreaders + 1 }),
+    );
+    in_versions(
+        &[11, 12, 13, 14, 15],
+        ("GatherMergeState", "reader"),
+        Some(quote! { self.nreaders }),
+    );
+    in_versions(&[11, 12, 13, 14, 15], ("GatherState", "reader"), Some(quote! { self.nreaders }));
+    in_versions(&[13, 14, 15], ("IndexOptInfo", "opclassoptions"), None); // ignored, just a byte array.
+    in_versions(&[14, 15], ("MemoizeState", "param_exprs"), Some(quote! { self.nkeys }));
+    in_versions(
+        &[11, 12, 13, 14, 15],
+        ("MergeAppendState", "mergeplans"),
+        Some(quote! { self.ms_nplans }),
+    );
+    in_versions(
+        &[11, 12, 13, 14, 15],
+        ("MergeAppendState", "ms_slots"),
+        Some(quote! { self.ms_nplans }),
+    );
+    in_versions(&[11, 12, 13], ("ModifyTableState", "mt_plans"), Some(quote! { self.mt_nplans }));
+    in_versions(&[12, 13], ("ModifyTableState", "mt_scans"), Some(quote! { self.mt_nplans }));
+    in_versions(
+        &[11, 12, 13, 14, 15],
+        ("PlannerInfo", "append_rel_array"),
+        Some(quote! { self.simple_rel_array_size }),
+    );
+    // I couldn't figure out how to traverse this list, I'm not sure how long it is.
+    in_versions(&[11, 12, 13, 14, 15], ("PlannerInfo", "join_rel_level"), None);
+    in_versions(
+        &[11, 12, 13, 14, 15],
+        ("PlannerInfo", "simple_rel_array"),
+        Some(quote! { self.simple_rel_array_size }),
+    );
+    // in_versions(&[11], ("PlannerInfo", "append_rte_array"), Some(quote! { self.simple_rel_array_size }));
+    in_versions(
+        &[11, 12, 13, 14, 15],
+        ("PlannerInfo", "simple_rte_array"),
+        Some(quote! { self.simple_rel_array_size }),
+    );
+    in_versions(&[11, 12, 13, 14, 15], ("ProjectSetState", "elems"), Some(quote! { self.nelems }));
+    in_versions(&[11, 12, 13, 14, 15], ("RelOptInfo", "part_rels"), Some(quote! { self.nparts }));
+    in_versions(&[11, 12, 13, 14, 15], ("RelOptInfo", "partexprs"), Some(quote! { self.nparts }));
+    in_versions(
+        &[11, 12, 13, 14, 15],
+        ("RelOptInfo", "nullable_partexprs"),
+        Some(quote! { self.nparts }),
+    );
+    in_versions(
+        &[11, 12, 13, 14, 15],
+        ("ResultRelInfo", "ri_ConstraintExprs"),
+        Some(quote! { (*(*(*self.ri_RelationDesc).rd_att).constr).num_check }),
+    );
+    in_versions(&[12, 13, 14, 15], ("ResultRelInfo", "ri_GeneratedExprs"), None);
+    in_versions(
+        &[11, 12, 13, 14, 15],
+        ("ResultRelInfo", "ri_IndexRelationInfo"),
+        Some(quote! { self.ri_NumIndices }),
+    );
+    in_versions(
+        &[11, 12, 13, 14, 15],
+        ("ResultRelInfo", "ri_TrigWhenExprs"),
+        Some(quote! { (*self.ri_TrigDesc).numtriggers  }),
+    );
+    in_versions(
+        &[14, 15],
+        ("ResultRelInfo", "ri_Slots"),
+        Some(quote! { self.ri_NumSlotsInitialized }),
+    );
+    in_versions(
+        &[14, 15],
+        ("ResultRelInfo", "ri_PlanSlots"),
+        Some(quote! { self.ri_NumSlotsInitialized }),
+    );
+    in_versions(
+        &[11, 12, 13, 14, 15],
+        ("ValuesScanState", "exprlists"),
+        Some(quote! { self.array_len }),
+    );
+    in_versions(
+        &[11, 12, 13, 14, 15],
+        ("ValuesScanState", "exprstatelists"),
+        Some(quote! { self.array_len }),
+    );
+
+    fn handle_length_bounded_array(
+        n: &proc_macro2::TokenStream,
+        array: &str,
+    ) -> proc_macro2::TokenStream {
+        let array = Ident::new(array, Span::call_site());
+        quote! {
+            let slice = unsafe { std::slice::from_raw_parts::<*mut Node>(self.#array as *mut *mut Node, (#n) as usize) };
+            for ptr in slice {
+                if !ptr.is_null() {
+                    walker_fn(*ptr, context);
+                    Node::traverse::<T>(unsafe { &mut **ptr }, walker_fn, context);
+                }
+            }
+        }
+    }
+
+    let mut ptr_problems: Vec<String> = Vec::new();
+
+    // now we can finally iterate the Nodes and emit various trait impls
+    for node_struct in &nodes {
+        let struct_name = &node_struct.struct_.ident;
+        match struct_name.to_string().as_ref() {
+            "Node" | "RangeTblEntry" | "List" => {
+                // use the special implementation defined above.
+                continue;
+            }
+            _ => {}
+        }
+        let mut traverse_elements: Vec<proc_macro2::TokenStream> = Vec::new();
+
+        for field in node_struct.struct_.fields.iter() {
+            let field_name = field.ident.as_ref().unwrap();
+            // Some structures have array fields in them, rather than Lists. Handle those specially.
+            match array_fields
+                .get(&(struct_name.to_string().as_ref(), field_name.to_string().as_ref()))
+            {
+                Some(abi) => {
+                    match &abi.n {
+                        Some(n) => traverse_elements
+                            .push(handle_length_bounded_array(n, field_name.to_string().as_ref())),
+                        _ => {}
+                    }
+                    continue;
+                }
+                _ => {}
+            }
+            // Some structures have fields that we need to handle specially because they're not populated, or are Lists
+            // that don't contain pointers.
+            match (struct_name.to_string().as_ref(), field_name.to_string().as_ref()) {
+                ("ModifyTableState", "mt_arowmarks")
+                | ("ModifyTableState", "mt_per_subplan_tupconv_maps")
+                | (_, "xpr") => continue,
+                _ => {}
+            }
+            match &field.ty {
+                Type::Array(a) => {
+                    if let Type::Ptr(ptr) = a.elem.as_ref() {
+                        if let Type::Path(p) = ptr.elem.as_ref() {
+                            if node_set
+                                .contains_key(&p.path.segments.first().unwrap().ident.to_string())
+                            {
+                                traverse_elements.push(quote! {
+                                    for ptr in self.#field_name.iter() {
+                                        if !ptr.is_null() {
+                                            let item = unsafe { &mut *(*ptr as *mut Node) };
+                                            walker_fn(item, context);
+                                            Node::traverse::<T>(item, walker_fn, context);
+                                        }
+                                    }
+                                });
+                            }
+                        } else {
+                            ptr_problems.push(format!(
+                                "Unexpected type inside array:ptr {} -> field {}: {:?}",
+                                struct_name, field_name, ptr.elem
+                            ));
+                        }
+                    }
+                }
+                Type::Ptr(t) => {
+                    if let Type::Path(p) = t.elem.as_ref() {
+                        if node_set
+                            .contains_key(&p.path.segments.first().unwrap().ident.to_string())
+                        {
+                            traverse_elements
+                                .push(walk_field_definition(quote! { self.#field_name }));
+                        }
+                    } else {
+                        ptr_problems.push(format!(
+                            "Unexpected type inside ptr {} -> field {}: {:?}",
+                            struct_name, field_name, t.elem
+                        ));
+                    }
+                }
+                Type::Path(p) => {
+                    if node_set.contains_key(&p.path.segments.first().unwrap().ident.to_string()) {
+                        let type_ = &p.path;
+                        traverse_elements.push(quote! {
+                            walker_fn((&mut self.#field_name) as *mut #type_ as *mut Node, context);
+                            // Explicitly don't look at _type here - for example, a Result has a concrete Plan as its
+                            // first member, but has _type == NodeTag_T_Result so if we delegated to `Node::traverse`
+                            // we'd be recursing forever.
+                            self.#field_name.traverse(walker_fn, context);
+                        });
+                    }
+                }
+                _ => panic!("In {}: Don't know how to handle {:?}", struct_name, field.ty),
+            }
+        }
         // impl the PgNode trait for all nodes
-        pgnode_impls.extend(quote! {
-            impl pg_sys::PgNode for #struct_name {}
-        });
+        let traversal_function = if traverse_elements.is_empty() {
+            quote! {}
+        } else {
+            let traversal = proc_macro2::TokenStream::from_iter(traverse_elements.into_iter());
+            quote! {
+                fn traverse<T>(&mut self, walker_fn: fn(*mut Node, &mut T) -> (), context: &mut T) {
+                    #traversal
+                }
+            }
+        };
+
+        if node_set.contains_key(&struct_name.to_string()) {
+            pgnode_impls.extend(quote! {
+                impl pg_sys::PgNode for #struct_name {
+                    #traversal_function
+                }
+            });
+            if nodetag_t_values.contains(&struct_name.to_string()) {
+                let nodetag = format_ident!("NodeTag_T_{}", struct_name);
+                let type_ = format_ident!("{}", struct_name);
+                node_traverse_body.extend(quote! {
+                    #nodetag => {
+                        #type_::traverse(
+                            &mut unsafe { std::ptr::read(self as *mut Node as *mut #type_) },
+                            walker_fn,
+                            context)
+                    },
+                });
+                node_display_body.extend(quote! {
+                    #nodetag => #type_::fmt(&unsafe { std::ptr::read(self as *const Node as *const #type_) }, f),
+                });
+            }
+        }
 
         // impl Rust's Display trait for all nodes
         pgnode_impls.extend(quote! {
@@ -409,6 +815,117 @@ fn impl_pg_node(
             }
         });
     }
+    if !ptr_problems.is_empty() {
+        panic!("{}", ptr_problems.join("\n"));
+    }
+
+    let rte_traversal = proc_macro2::TokenStream::from_iter(vec![
+        // Order and field names for each case are taken from the implementation of `_outRangeTblEntry` in outfuncs.c.
+        walk_field_definition(quote! { self.alias }),
+        walk_field_definition(quote! { self.eref }),
+        quote! { match self.rtekind },
+        proc_macro2::TokenStream::from(proc_macro2::TokenTree::Group(proc_macro2::Group::new(
+            proc_macro2::Delimiter::Brace,
+            proc_macro2::TokenStream::from_iter(vec![
+                quote! { RTEKind_RTE_RELATION => },
+                walk_field_definition(quote! { self.tablesample }),
+                quote! { RTEKind_RTE_SUBQUERY => },
+                walk_field_definition(quote! { self.subquery }),
+                quote! { RTEKind_RTE_JOIN => },
+                proc_macro2::TokenStream::from(proc_macro2::TokenTree::Group(
+                    proc_macro2::Group::new(
+                        proc_macro2::Delimiter::Brace,
+                        proc_macro2::TokenStream::from_iter(vec![
+                            walk_field_definition(quote! { self.joinaliasvars }),
+                            join_fields_traverse,
+                        ]),
+                    ),
+                )),
+                quote! { RTEKind_RTE_FUNCTION => },
+                walk_field_definition(quote! { self.functions }),
+                quote! { RTEKind_RTE_TABLEFUNC => },
+                walk_field_definition(quote! { self.tablefunc }),
+                quote! { RTEKind_RTE_VALUES => },
+                proc_macro2::TokenStream::from(proc_macro2::TokenTree::Group(
+                    proc_macro2::Group::new(
+                        proc_macro2::Delimiter::Brace,
+                        proc_macro2::TokenStream::from_iter(vec![
+                            walk_field_definition(quote! { self.values_lists }),
+                            walk_field_definition(quote! { self.coltypes }),
+                            walk_field_definition(quote! { self.coltypmods }),
+                            walk_field_definition(quote! { self.colcollations }),
+                        ]),
+                    ),
+                )),
+                quote! { RTEKind_RTE_CTE => },
+                proc_macro2::TokenStream::from(proc_macro2::TokenTree::Group(
+                    proc_macro2::Group::new(
+                        proc_macro2::Delimiter::Brace,
+                        proc_macro2::TokenStream::from_iter(vec![
+                            walk_field_definition(quote! { self.coltypes }),
+                            walk_field_definition(quote! { self.coltypmods }),
+                            walk_field_definition(quote! { self.colcollations }),
+                        ]),
+                    ),
+                )),
+                quote! { RTEKind_RTE_NAMEDTUPLESTORE => },
+                proc_macro2::TokenStream::from(proc_macro2::TokenTree::Group(
+                    proc_macro2::Group::new(
+                        proc_macro2::Delimiter::Brace,
+                        proc_macro2::TokenStream::from_iter(vec![
+                            walk_field_definition(quote! { self.coltypes }),
+                            walk_field_definition(quote! { self.coltypmods }),
+                            walk_field_definition(quote! { self.colcollations }),
+                        ]),
+                    ),
+                )),
+                rtekind_result_handling,
+                quote! {
+                    _ => {
+                        unsafe { pre_format_elog_string(ERROR as i32, format!("unrecognized RTE kind: {}", self.rtekind).as_ptr() as *const i8); }
+                    }
+                },
+            ]),
+        ))),
+        walk_field_definition(quote! { self.securityQuals }),
+    ]);
+
+    pgnode_impls.extend(quote! {
+        #list_fns
+
+        impl pg_sys::PgNode for Node {
+            fn traverse<T>(&mut self, walker_fn: fn(*mut Node, &mut T) -> (), context: &mut T) {
+                match self.type_ {
+                    NodeTag_T_List => List::traverse(&mut unsafe { std::ptr::read(self as *mut Node as *mut List) },
+                        walker_fn,
+                        context),
+                    NodeTag_T_RangeTblEntry => RangeTblEntry::traverse(&mut unsafe { std::ptr::read(self as *mut Node as *mut RangeTblEntry) },
+                        walker_fn,
+                        context),
+                    #node_traverse_body
+                    _ => {}, // any types with no explicit traverse method defined will be skipped.
+                }
+            }
+        }
+        impl std::fmt::Display for Node {
+            fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+                match self.type_ {
+                    #node_display_body
+                    _ => write!(f, "[unknown type {}]", self.type_),
+                }
+            }
+        }
+        impl pg_sys::PgNode for RangeTblEntry {
+            fn traverse<T>(&mut self, walker_fn: fn(*mut Node, &mut T) -> (), context: &mut T) {
+                #rte_traversal
+            }
+        }
+        impl std::fmt::Display for RangeTblEntry {
+            fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+                write!(f, "{}", self.display_node() )
+            }
+        }
+    });
 
     Ok(pgnode_impls)
 }
@@ -417,12 +934,12 @@ fn impl_pg_node(
 fn dfs_find_nodes<'graph>(
     node: &'graph StructDescriptor<'graph>,
     graph: &'graph StructGraph<'graph>,
-    node_set: &mut HashSet<StructDescriptor<'graph>>,
+    node_set: &mut HashMap<String, StructDescriptor<'graph>>,
 ) {
-    node_set.insert(node.clone());
+    node_set.insert(node.struct_.ident.to_string(), node.clone());
 
     for child in node.children(graph) {
-        if node_set.contains(child) {
+        if node_set.contains_key(&child.struct_.ident.to_string()) {
             continue;
         }
         dfs_find_nodes(child, graph, node_set);
