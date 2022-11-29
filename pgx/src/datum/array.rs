@@ -9,6 +9,7 @@ Use of this source code is governed by the MIT license that can be found in the 
 
 use crate::array::RawArray;
 use crate::layout::*;
+use crate::slice::PallocSlice;
 use crate::{pg_sys, FromDatum, IntoDatum, PgMemoryContexts};
 use bitvec::slice::BitSlice;
 use core::ptr::NonNull;
@@ -17,7 +18,7 @@ use pgx_utils::sql_entity_graph::metadata::{
 };
 use serde::Serializer;
 use std::marker::PhantomData;
-use std::{mem, ptr, slice};
+use std::{mem, ptr};
 
 /** An array of some type (eg. `TEXT[]`, `int[]`)
 
@@ -53,12 +54,11 @@ fn with_vec(elems: Array<String>) {
 ```
 */
 pub struct Array<'a, T: FromDatum> {
-    ptr: NonNull<pg_sys::varlena>,
     raw: Option<RawArray>,
     nelems: usize,
     // Remove this field if/when we figure out how to stop using pg_sys::deconstruct_array
-    datum_palloc: Option<NonNull<pg_sys::Datum>>,
-    elem_slice: &'a [pg_sys::Datum],
+    datum_slice: Option<PallocSlice<pg_sys::Datum>>,
+    needs_pfree: bool,
     null_slice: NullKind<'a>,
     elem_layout: Layout,
     _marker: PhantomData<T>,
@@ -99,22 +99,13 @@ impl<'a, T: FromDatum + serde::Serialize> serde::Serialize for Array<'a, T> {
 
 impl<'a, T: FromDatum> Drop for Array<'a, T> {
     fn drop(&mut self) {
-        if let Array { raw, datum_palloc: Some(data), elem_slice, .. } = self {
-            // If Drop has arrived here, it means that this Array is backed by an allocation or two
-            // If so, the first one is guaranteed, and was created by calling pg_sys::deconstruct_array
-            // This is just a slice, dropping it doesn't "do" anything, but out of an abundance of caution:
-            mem::drop(elem_slice);
-            // Now there shouldn't be any other references to that slice, so this can be deallocated:
-            unsafe { pg_sys::pfree(data.as_ptr().cast()) };
-
-            // Detoasting the varlena may have allocated: the toasted varlena cloned as a detoasted ArrayType
-            // Checking for pointer equivalence is the only way we can truly tell
-            let raw = raw.take().map(|r| r.into_ptr());
-            if let Some(raw) = raw {
+        // First drop the slice that references the RawArray
+        let slice = mem::take(&mut self.datum_slice);
+        mem::drop(slice);
+        if self.needs_pfree {
+            if let Some(raw) = self.raw.take().map(|r| r.into_ptr()) {
                 // SAFETY: if pgx detoasted a clone of this varlena, pfree the clone
-                if raw.cast() != self.ptr {
-                    unsafe { pg_sys::pfree(raw.as_ptr().cast()) }
-                }
+                unsafe { pg_sys::pfree(raw.as_ptr().cast()) }
             }
         }
     }
@@ -166,6 +157,10 @@ impl<'a, T: FromDatum> Array<'a, T> {
 
         // Check our RawArray len impl for correctness.
         assert_eq!(nelems, len);
+
+        // Detoasting the varlena may have allocated a fresh ArrayType.
+        // Check pointer equivalence, then pfree the palloc later if it's a new one.
+        let needs_pfree = ptr.as_ptr().cast() != array;
         let mut raw = unsafe { RawArray::from_ptr(NonNull::new_unchecked(array)) };
 
         let null_slice = raw
@@ -177,23 +172,22 @@ impl<'a, T: FromDatum> Array<'a, T> {
         // But pgx doesn't actually need [bool] if NullKind's handling of BitSlices is correct.
         // So, assert correctness of the NullKind implementation and cleanup.
         // SAFETY: The pointer we got should be correctly constructed for slice validity.
-        let pallocd_null_slice = unsafe { slice::from_raw_parts(nulls, nelems) };
+        let pallocd_null_slice =
+            unsafe { PallocSlice::from_raw_parts(NonNull::new(nulls).unwrap(), nelems) };
         #[cfg(debug_assertions)]
         for i in 0..nelems {
-            assert_eq!(null_slice.get(i).unwrap(), pallocd_null_slice[i]);
+            assert!(null_slice.get(i).unwrap().eq(unsafe { pallocd_null_slice.get_unchecked(i) }));
         }
 
-        // Throw away the slice we made.
-        mem::drop(pallocd_null_slice);
-        // SAFETY: We made it, we can break it. Or Postgres can, at least.
-        unsafe { pg_sys::pfree(nulls.cast()) };
+        // SAFETY: This was just handed over as a palloc, so of course we can do this.
+        let datum_slice =
+            Some(unsafe { PallocSlice::from_raw_parts(NonNull::new(elements).unwrap(), nelems) });
 
         Array {
-            ptr,
+            needs_pfree,
             raw: Some(raw),
             nelems,
-            datum_palloc: NonNull::new(elements),
-            elem_slice: /* SAFETY: &[Datum] from palloc'd [Datum] */ unsafe { slice::from_raw_parts(elements, nelems) },
+            datum_slice,
             null_slice,
             elem_layout,
             _marker: PhantomData,
@@ -269,7 +263,7 @@ impl<'a, T: FromDatum> Array<'a, T> {
         } else {
             Some(unsafe {
                 T::from_polymorphic_datum(
-                    self.elem_slice[i],
+                    *(self.datum_slice.as_ref()?.get(i)?),
                     self.null_slice.get(i)?,
                     self.raw.as_ref().map(|r| r.oid()).unwrap_or_default(),
                 )
