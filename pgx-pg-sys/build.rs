@@ -447,6 +447,7 @@ fn impl_pg_node(
         || std::env::var("CARGO_FEATURE_PG12").is_ok()
     {
         quote! {
+            impl pg_sys::seal::Sealed for List {}
             impl pg_sys::PgNode for List {
                 fn traverse<T>(&mut self, walker_fn: fn(*mut Node, &mut T) -> (), context: &mut T) {
                     if self.type_ != NodeTag_T_List || self.length == 0 { return; }
@@ -486,6 +487,7 @@ fn impl_pg_node(
         }
     } else {
         quote! {
+            impl pg_sys::seal::Sealed for List {}
             impl pg_sys::PgNode for List {
                 fn traverse<T>(&mut self, walker_fn: fn(*mut Node, &mut T) -> (), context: &mut T) {
                     if self.type_ != NodeTag_T_List { return; }
@@ -785,6 +787,7 @@ fn impl_pg_node(
 
         if node_set.contains_key(&struct_name.to_string()) {
             pgnode_impls.extend(quote! {
+                impl pg_sys::seal::Sealed for #struct_name {}
                 impl pg_sys::PgNode for #struct_name {
                     #traversal_function
                 }
@@ -893,6 +896,7 @@ fn impl_pg_node(
     pgnode_impls.extend(quote! {
         #list_fns
 
+        impl pg_sys::seal::Sealed for Node {}
         impl pg_sys::PgNode for Node {
             fn traverse<T>(&mut self, walker_fn: fn(*mut Node, &mut T) -> (), context: &mut T) {
                 match self.type_ {
@@ -915,6 +919,7 @@ fn impl_pg_node(
                 }
             }
         }
+        impl pg_sys::seal::Sealed for RangeTblEntry {}
         impl pg_sys::PgNode for RangeTblEntry {
             fn traverse<T>(&mut self, walker_fn: fn(*mut Node, &mut T) -> (), context: &mut T) {
                 #rte_traversal
