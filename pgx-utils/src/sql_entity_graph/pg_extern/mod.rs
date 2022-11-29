@@ -306,6 +306,7 @@ impl PgExtern {
                     metadata: pgx::utils::sql_entity_graph::metadata::FunctionMetadata::entity(&metadata),
                     fn_args: vec![#(#inputs_iter),*],
                     fn_return: #returns,
+                    #[allow(clippy::or_fun_call)]
                     schema: None #( .unwrap_or_else(|| Some(#schema_iter)) )*,
                     file: file!(),
                     line: line!(),
