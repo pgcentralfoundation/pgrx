@@ -16,6 +16,7 @@ use syn::spanned::Spanned;
 use syn::Token;
 
 use super::metadata::FunctionMetadataTypeEntity;
+use super::TyId;
 
 /// A type, optionally with an overriding composite type name
 #[derive(Debug, Clone)]
@@ -223,7 +224,7 @@ impl UsedType {
         syn::parse_quote! {
             ::pgx::utils::sql_entity_graph::UsedTypeEntity {
                 ty_source: #resolved_ty_string.into(),
-                ty_id: core::any::TypeId::of::<#resolved_ty>(),
+                ty_id: core::any::TypeId::of::<#resolved_ty>().into(),
                 full_path: core::any::type_name::<#resolved_ty>().into(),
                 module_path: {
                     let ty_name = core::any::type_name::<#resolved_ty>();
@@ -246,10 +247,10 @@ impl UsedType {
     }
 }
 
-#[derive(Debug, Clone, Hash, PartialEq, Eq, PartialOrd, Ord)]
+#[derive(Debug, Clone, Hash, PartialEq, Eq, PartialOrd, Ord, serde::Serialize, serde::Deserialize)]
 pub struct UsedTypeEntity {
     pub ty_source: String,
-    pub ty_id: core::any::TypeId,
+    pub ty_id: TyId,
     pub full_path: String,
     pub module_path: String,
     pub composite_type: Option<String>,

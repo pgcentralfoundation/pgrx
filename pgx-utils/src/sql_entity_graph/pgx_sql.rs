@@ -20,7 +20,6 @@ use eyre::eyre;
 use petgraph::dot::Dot;
 use petgraph::graph::NodeIndex;
 use petgraph::stable_graph::StableGraph;
-use std::any::TypeId;
 use std::fmt::Debug;
 use std::path::Path;
 use tracing::instrument;
@@ -39,7 +38,7 @@ use crate::sql_entity_graph::postgres_ord::entity::PostgresOrdEntity;
 use crate::sql_entity_graph::postgres_type::entity::PostgresTypeEntity;
 use crate::sql_entity_graph::schema::entity::SchemaEntity;
 use crate::sql_entity_graph::to_sql::ToSql;
-use crate::sql_entity_graph::{SqlGraphEntity, SqlGraphIdentifier};
+use crate::sql_entity_graph::{SqlGraphEntity, SqlGraphIdentifier, TyId};
 
 use super::{PgExternReturnEntity, PgExternReturnEntityIteratedItem};
 
@@ -1563,7 +1562,7 @@ fn make_type_or_enum_connection(
     kind: &str,
     index: NodeIndex,
     rust_identifier: &str,
-    ty_id: &TypeId,
+    ty_id: &TyId,
     types: &FastHashMap<PostgresTypeEntity, NodeIndex>,
     enums: &FastHashMap<PostgresEnumEntity, NodeIndex>,
 ) -> bool {

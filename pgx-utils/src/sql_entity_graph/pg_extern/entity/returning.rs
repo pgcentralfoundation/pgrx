@@ -16,7 +16,7 @@ to the `pgx` framework and very subject to change between versions. While you ma
 */
 use crate::sql_entity_graph::UsedTypeEntity;
 
-#[derive(Debug, Clone, Hash, PartialEq, Eq, PartialOrd, Ord)]
+#[derive(Debug, Clone, Hash, PartialEq, Eq, PartialOrd, Ord, serde::Serialize, serde::Deserialize)]
 pub enum PgExternReturnEntity {
     None,
     Type {
@@ -33,7 +33,7 @@ pub enum PgExternReturnEntity {
     Trigger,
 }
 
-#[derive(Debug, Clone, Hash, PartialEq, Eq, PartialOrd, Ord)]
+#[derive(Debug, Clone, Hash, PartialEq, Eq, PartialOrd, Ord, serde::Serialize, serde::Deserialize)]
 pub struct PgExternReturnEntityIteratedItem {
     pub ty: UsedTypeEntity,
     pub name: Option<String>,

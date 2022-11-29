@@ -123,7 +123,7 @@ impl ToTokens for PostgresHash {
                     line: line!(),
                     full_path: core::any::type_name::<#name>().into(),
                     module_path: module_path!().into(),
-                    id: TypeId::of::<#name>(),
+                    id: TypeId::of::<#name>().into(),
                     to_sql_config: #to_sql_config,
                 };
                 ::pgx::utils::sql_entity_graph::SqlGraphEntity::Hash(submission)

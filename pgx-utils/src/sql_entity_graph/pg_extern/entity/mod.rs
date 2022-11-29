@@ -32,7 +32,7 @@ use crate::ExternArgs;
 use eyre::{eyre, WrapErr};
 
 /// The output of a [`PgExtern`](crate::sql_entity_graph::pg_extern::PgExtern) from `quote::ToTokens::to_tokens`.
-#[derive(Debug, Clone, Eq, Ord, PartialEq, PartialOrd, Hash)]
+#[derive(Debug, Clone, Eq, Ord, PartialEq, PartialOrd, Hash, serde::Serialize, serde::Deserialize)]
 pub struct PgExternEntity {
     pub name: String,
     pub unaliased_name: String,

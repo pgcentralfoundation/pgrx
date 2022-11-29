@@ -24,7 +24,7 @@ use crate::sql_entity_graph::{SqlGraphEntity, SqlGraphIdentifier};
 use std::fmt::Display;
 
 /// The output of a [`ExtensionSql`](crate::sql_entity_graph::ExtensionSql) from `quote::ToTokens::to_tokens`.
-#[derive(Debug, Clone, Hash, PartialEq, Eq, PartialOrd, Ord)]
+#[derive(Debug, Clone, Hash, PartialEq, Eq, PartialOrd, Ord, serde::Serialize, serde::Deserialize)]
 pub struct ExtensionSqlEntity {
     pub module_path: String,
     pub full_path: String,
@@ -120,7 +120,7 @@ impl ToSql for ExtensionSqlEntity {
     }
 }
 
-#[derive(Debug, Clone, Hash, PartialEq, Eq, Ord, PartialOrd)]
+#[derive(Debug, Clone, Hash, PartialEq, Eq, Ord, PartialOrd, serde::Serialize, serde::Deserialize)]
 pub struct SqlDeclaredEntityData {
     sql: String,
     name: String,
@@ -134,7 +134,7 @@ pub struct SqlDeclaredEntityData {
     varlena: String,
     pg_box: Vec<String>,
 }
-#[derive(Debug, Clone, Hash, PartialEq, Eq, Ord, PartialOrd)]
+#[derive(Debug, Clone, Hash, PartialEq, Eq, Ord, PartialOrd, serde::Serialize, serde::Deserialize)]
 pub enum SqlDeclaredEntity {
     Type(SqlDeclaredEntityData),
     Enum(SqlDeclaredEntityData),

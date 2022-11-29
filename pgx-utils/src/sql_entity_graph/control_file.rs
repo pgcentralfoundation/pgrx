@@ -15,8 +15,8 @@ to the `pgx` framework and very subject to change between versions. While you ma
 
 */
 use super::{SqlGraphEntity, SqlGraphIdentifier, ToSql};
-use core::convert::TryFrom;
 use crate::FastHashMap;
+use core::convert::TryFrom;
 use tracing_error::SpanTrace;
 
 /// The parsed contents of a `.control` file.
@@ -30,7 +30,7 @@ use tracing_error::SpanTrace;
 /// # Ok(())
 /// # }
 /// ```
-#[derive(Debug, Clone, Hash, PartialOrd, Ord, PartialEq, Eq)]
+#[derive(Debug, Clone, Hash, PartialOrd, Ord, PartialEq, Eq, serde::Serialize, serde::Deserialize)]
 pub struct ControlFile {
     pub comment: String,
     pub default_version: String,

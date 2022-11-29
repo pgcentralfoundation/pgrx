@@ -18,7 +18,7 @@ use quote::{quote, ToTokens};
 use std::fmt::Display;
 use syn::parse::{Parse, ParseStream};
 
-#[derive(Debug, Clone, Hash, PartialEq, Eq, PartialOrd, Ord)]
+#[derive(Debug, Clone, Hash, PartialEq, Eq, PartialOrd, Ord, serde::Serialize, serde::Deserialize)]
 pub enum PositioningRef {
     FullPath(String),
     Name(String),

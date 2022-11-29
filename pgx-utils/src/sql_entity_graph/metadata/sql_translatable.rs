@@ -11,7 +11,18 @@ use std::error::Error;
 use super::return_variant::ReturnsError;
 use super::{FunctionMetadataTypeEntity, Returns};
 
-#[derive(Clone, Copy, Debug, Hash, Ord, PartialOrd, PartialEq, Eq)]
+#[derive(
+    Clone,
+    Copy,
+    Debug,
+    Hash,
+    Ord,
+    PartialOrd,
+    PartialEq,
+    Eq,
+    serde::Serialize,
+    serde::Deserialize
+)]
 pub enum ArgumentError {
     SetOf,
     Table,
@@ -43,7 +54,7 @@ impl std::fmt::Display for ArgumentError {
 }
 
 /// Describes ways that Rust types are mapped into SQL
-#[derive(Clone, Debug, Hash, Eq, PartialEq, Ord, PartialOrd)]
+#[derive(Clone, Debug, Hash, Eq, PartialEq, Ord, PartialOrd, serde::Serialize, serde::Deserialize)]
 pub enum SqlMapping {
     /// Explicit mappings provided by PGX
     As(String),

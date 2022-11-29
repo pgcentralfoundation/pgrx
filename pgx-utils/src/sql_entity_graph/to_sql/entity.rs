@@ -32,9 +32,10 @@ use crate::sql_entity_graph::SqlGraphEntity;
 ///
 /// When `callback` has a value, the corresponding `ToSql` implementation should invoke the
 /// callback instead of performing their default behavior.
-#[derive(Default, Clone)]
+#[derive(Default, Clone, serde::Serialize, serde::Deserialize)]
 pub struct ToSqlConfigEntity {
     pub enabled: bool,
+    #[serde(skip)] // FIXME DONOTLAND
     pub callback: Option<ToSqlFn>,
     pub content: Option<String>,
 }

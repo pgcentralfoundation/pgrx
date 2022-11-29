@@ -10,7 +10,7 @@ use crate::sql_entity_graph::{
     PgxSql, SqlGraphEntity, SqlGraphIdentifier, ToSql, ToSqlConfigEntity,
 };
 
-#[derive(Debug, Clone, Hash, PartialEq, Eq, PartialOrd, Ord)]
+#[derive(Debug, Clone, Hash, PartialEq, Eq, PartialOrd, Ord, serde::Serialize, serde::Deserialize)]
 pub struct PgTriggerEntity {
     pub function_name: String,
     pub to_sql_config: ToSqlConfigEntity,

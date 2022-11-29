@@ -20,23 +20,23 @@ use crate::sql_entity_graph::metadata::SqlMapping;
 use crate::sql_entity_graph::pgx_sql::PgxSql;
 use crate::sql_entity_graph::to_sql::entity::ToSqlConfigEntity;
 use crate::sql_entity_graph::to_sql::ToSql;
-use crate::sql_entity_graph::{SqlGraphEntity, SqlGraphIdentifier, UsedTypeEntity};
-use core::any::TypeId;
+use crate::sql_entity_graph::{SqlGraphEntity, SqlGraphIdentifier, TyId, UsedTypeEntity};
+
 use eyre::{eyre, WrapErr};
 
-#[derive(Debug, Clone, Hash, PartialEq, Eq, PartialOrd, Ord)]
+#[derive(Debug, Clone, Hash, PartialEq, Eq, PartialOrd, Ord, serde::Serialize, serde::Deserialize)]
 pub struct AggregateTypeEntity {
     pub used_ty: UsedTypeEntity,
     pub name: Option<String>,
 }
 
-#[derive(Debug, Clone, Hash, PartialEq, Eq, PartialOrd, Ord)]
+#[derive(Debug, Clone, Hash, PartialEq, Eq, PartialOrd, Ord, serde::Serialize, serde::Deserialize)]
 pub struct PgAggregateEntity {
     pub full_path: String,
     pub module_path: String,
     pub file: String,
     pub line: u32,
-    pub ty_id: TypeId,
+    pub ty_id: TyId,
 
     pub name: String,
 

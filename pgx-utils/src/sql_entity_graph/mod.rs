@@ -30,6 +30,7 @@ pub(crate) mod postgres_ord;
 pub(crate) mod postgres_type;
 pub(crate) mod schema;
 pub(crate) mod to_sql;
+pub(crate) mod tyid;
 pub(crate) mod used_type;
 
 pub use aggregate::entity::{AggregateTypeEntity, PgAggregateEntity};
@@ -62,6 +63,7 @@ pub use schema::entity::SchemaEntity;
 pub use schema::Schema;
 pub use to_sql::entity::ToSqlConfigEntity;
 pub use to_sql::{ToSql, ToSqlConfig};
+pub use tyid::TyId;
 pub use used_type::{UsedType, UsedTypeEntity};
 
 pub use crate::ExternArgs;
@@ -87,7 +89,7 @@ pub trait SqlGraphIdentifier {
 }
 
 /// An entity corresponding to some SQL required by the extension.
-#[derive(Debug, Clone, Hash, PartialEq, Eq, PartialOrd, Ord)]
+#[derive(Debug, Clone, Hash, PartialEq, Eq, PartialOrd, Ord, serde::Serialize, serde::Deserialize)]
 pub enum SqlGraphEntity {
     ExtensionRoot(ControlFile),
     Schema(SchemaEntity),

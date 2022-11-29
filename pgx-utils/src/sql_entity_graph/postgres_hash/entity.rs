@@ -17,17 +17,17 @@ to the `pgx` framework and very subject to change between versions. While you ma
 use crate::sql_entity_graph::pgx_sql::PgxSql;
 use crate::sql_entity_graph::to_sql::entity::ToSqlConfigEntity;
 use crate::sql_entity_graph::to_sql::ToSql;
-use crate::sql_entity_graph::{SqlGraphEntity, SqlGraphIdentifier};
+use crate::sql_entity_graph::{SqlGraphEntity, SqlGraphIdentifier, TyId};
 
 /// The output of a [`PostgresHash`](crate::sql_entity_graph::postgres_hash::PostgresHash) from `quote::ToTokens::to_tokens`.
-#[derive(Debug, Clone, Hash, PartialEq, Eq, PartialOrd, Ord)]
+#[derive(Debug, Clone, Hash, PartialEq, Eq, PartialOrd, Ord, serde::Serialize, serde::Deserialize)]
 pub struct PostgresHashEntity {
     pub name: String,
     pub file: String,
     pub line: u32,
     pub full_path: String,
     pub module_path: String,
-    pub id: core::any::TypeId,
+    pub id: TyId,
     pub to_sql_config: ToSqlConfigEntity,
 }
 

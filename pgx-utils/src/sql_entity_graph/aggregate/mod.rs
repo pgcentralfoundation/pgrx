@@ -626,7 +626,7 @@ impl PgAggregate {
                     line: line!(),
                     name: #name.into(),
                     ordered_set: #const_ordered_set,
-                    ty_id: ::core::any::TypeId::of::<#target_ident>(),
+                    ty_id: ::core::any::TypeId::of::<#target_ident>().into(),
                     args: #type_args_iter,
                     direct_args: None #( .unwrap_or(Some(#type_order_by_args_iter)) )*,
                     stype: #type_stype,

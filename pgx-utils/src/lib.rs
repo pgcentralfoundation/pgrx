@@ -24,7 +24,7 @@ pub mod __reexports {
     pub use eyre;
 }
 
-#[derive(Debug, Hash, Eq, PartialEq, Clone, PartialOrd, Ord)]
+#[derive(Debug, Hash, Eq, PartialEq, Clone, PartialOrd, Ord, serde::Serialize, serde::Deserialize)]
 pub enum ExternArgs {
     CreateOrReplace,
     Immutable,

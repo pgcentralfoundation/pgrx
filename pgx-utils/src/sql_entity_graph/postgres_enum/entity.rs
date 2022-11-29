@@ -18,11 +18,12 @@ use crate::sql_entity_graph::mapping::RustSqlMapping;
 use crate::sql_entity_graph::pgx_sql::PgxSql;
 use crate::sql_entity_graph::to_sql::entity::ToSqlConfigEntity;
 use crate::sql_entity_graph::to_sql::ToSql;
+use crate::sql_entity_graph::TyId;
 use crate::sql_entity_graph::{SqlGraphEntity, SqlGraphIdentifier};
 use std::collections::BTreeSet;
 
 /// The output of a [`PostgresEnum`](crate::sql_entity_graph::postgres_enum::PostgresEnum) from `quote::ToTokens::to_tokens`.
-#[derive(Debug, Clone, PartialEq, Eq, Hash, Ord, PartialOrd)]
+#[derive(Debug, Clone, PartialEq, Eq, Hash, Ord, PartialOrd, serde::Serialize, serde::Deserialize)]
 pub struct PostgresEnumEntity {
     pub name: String,
     pub file: String,
@@ -35,7 +36,7 @@ pub struct PostgresEnumEntity {
 }
 
 impl PostgresEnumEntity {
-    pub fn id_matches(&self, candidate: &core::any::TypeId) -> bool {
+    pub fn id_matches(&self, candidate: &TyId) -> bool {
         self.mappings.iter().any(|tester| *candidate == tester.id)
     }
 }

@@ -9,14 +9,14 @@ to the `pgx` framework and very subject to change between versions. While you ma
 */
 use super::{ArgumentError, Returns, ReturnsError, SqlMapping};
 
-#[derive(Clone, Debug, Hash, Eq, PartialEq, Ord, PartialOrd)]
+#[derive(Clone, Debug, Hash, Eq, PartialEq, Ord, PartialOrd, serde::Serialize, serde::Deserialize)]
 pub struct FunctionMetadataEntity {
     pub arguments: Vec<FunctionMetadataTypeEntity>,
     pub retval: Option<FunctionMetadataTypeEntity>,
     pub path: String,
 }
 
-#[derive(Clone, Debug, Hash, Eq, PartialEq, Ord, PartialOrd)]
+#[derive(Clone, Debug, Hash, Eq, PartialEq, Ord, PartialOrd, serde::Serialize, serde::Deserialize)]
 pub struct FunctionMetadataTypeEntity {
     pub type_name: String,
     pub argument_sql: Result<SqlMapping, ArgumentError>,

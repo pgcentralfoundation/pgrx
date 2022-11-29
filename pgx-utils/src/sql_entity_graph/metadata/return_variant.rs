@@ -13,14 +13,25 @@ use super::sql_translatable::SqlMapping;
 /// Describes the RETURNS of CREATE FUNCTION ... RETURNS ...
 /// See the PostgreSQL documentation for [CREATE FUNCTION]
 /// [CREATE FUNCTION]: https://www.postgresql.org/docs/current/sql-createfunction.html
-#[derive(Clone, Debug, Hash, Eq, PartialEq, Ord, PartialOrd)]
+#[derive(Clone, Debug, Hash, Eq, PartialEq, Ord, PartialOrd, serde::Serialize, serde::Deserialize)]
 pub enum Returns {
     One(SqlMapping),
     SetOf(SqlMapping),
     Table(Vec<SqlMapping>),
 }
 
-#[derive(Clone, Copy, Debug, Hash, Ord, PartialOrd, PartialEq, Eq)]
+#[derive(
+    Clone,
+    Copy,
+    Debug,
+    Hash,
+    Ord,
+    PartialOrd,
+    PartialEq,
+    Eq,
+    serde::Serialize,
+    serde::Deserialize
+)]
 pub enum ReturnsError {
     NestedSetOf,
     NestedTable,

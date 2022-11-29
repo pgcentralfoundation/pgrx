@@ -19,7 +19,7 @@ use crate::sql_entity_graph::to_sql::ToSql;
 use crate::sql_entity_graph::{SqlGraphEntity, SqlGraphIdentifier};
 
 /// The output of a [`Schema`](crate::sql_entity_graph::schema::Schema) from `quote::ToTokens::to_tokens`.
-#[derive(Debug, Clone, Hash, PartialEq, Eq, Ord, PartialOrd)]
+#[derive(Debug, Clone, Hash, PartialEq, Eq, Ord, PartialOrd, serde::Serialize, serde::Deserialize)]
 pub struct SchemaEntity {
     pub module_path: String,
     pub name: String,

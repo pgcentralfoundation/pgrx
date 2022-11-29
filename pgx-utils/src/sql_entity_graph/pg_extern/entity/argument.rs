@@ -17,7 +17,7 @@ to the `pgx` framework and very subject to change between versions. While you ma
 use crate::sql_entity_graph::{SqlGraphIdentifier, UsedTypeEntity};
 
 /// The output of a [`PgExternArgument`](crate::sql_entity_graph::PgExternArgument) from `quote::ToTokens::to_tokens`.
-#[derive(Debug, Clone, Hash, PartialEq, Eq, PartialOrd, Ord)]
+#[derive(Debug, Clone, Hash, PartialEq, Eq, PartialOrd, Ord, serde::Serialize, serde::Deserialize)]
 pub struct PgExternArgumentEntity {
     pub pattern: String,
     pub used_ty: UsedTypeEntity,
