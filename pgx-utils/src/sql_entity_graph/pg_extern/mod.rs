@@ -306,12 +306,15 @@ impl PgExtern {
                     metadata: pgx::utils::sql_entity_graph::metadata::FunctionMetadata::entity(&metadata),
                     fn_args: vec![#(#inputs_iter),*],
                     fn_return: #returns,
-                    schema: None #( .unwrap_or(Some(#schema_iter)) )*,
+                    #[allow(clippy::or_fun_call)]
+                    schema: None #( .unwrap_or_else(|| Some(#schema_iter)) )*,
                     file: file!(),
                     line: line!(),
                     extern_attrs: vec![#extern_attrs],
-                    search_path: None #( .unwrap_or(Some(vec![#search_path])) )*,
-                    operator: None #( .unwrap_or(Some(#operator)) )*,
+                    #[allow(clippy::or_fun_call)]
+                    search_path: None #( .unwrap_or_else(|| Some(vec![#search_path])) )*,
+                    #[allow(clippy::or_fun_call)]
+                    operator: None #( .unwrap_or_else(|| Some(#operator)) )*,
                     to_sql_config: #to_sql_config,
                 };
                 ::pgx::utils::sql_entity_graph::SqlGraphEntity::Function(submission)
@@ -621,7 +624,7 @@ impl PgExtern {
                                 let datum = pgx::heap_tuple_get_datum(heap_tuple);
                                 // SAFETY: what is an srf if it does not return?
                                 unsafe { pgx::srf_return_next(#fcinfo_ident, &mut funcctx) };
-                                pgx::pg_sys::Datum::from(datum)
+                                datum
                             },
                             None => {
                                 // leak the iterator here too, even tho we're done, b/c our MemoryContextCallback
