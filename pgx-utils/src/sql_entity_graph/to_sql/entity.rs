@@ -36,14 +36,14 @@ use crate::sql_entity_graph::SqlGraphEntity;
 pub struct ToSqlConfigEntity {
     pub enabled: bool,
     pub callback: Option<ToSqlFn>,
-    pub content: Option<&'static str>,
+    pub content: Option<String>,
 }
 impl ToSqlConfigEntity {
     /// Helper used to implement traits (`Eq`, `Ord`, etc) despite `ToSqlFn` not
     /// having an implementation for them.
     #[inline]
     fn fields(&self) -> (bool, Option<&str>, Option<usize>) {
-        (self.enabled, self.content, self.callback.map(|f| f as usize))
+        (self.enabled, self.content.as_deref(), self.callback.map(|f| f as usize))
     }
 
     /// Given a SqlGraphEntity, this function converts it to SQL based on the current configuration.
@@ -71,7 +71,7 @@ impl ToSqlConfigEntity {
             )));
         }
 
-        if let Some(content) = self.content {
+        if let Some(content) = self.content.as_ref() {
             let module_pathname = context.get_module_pathname();
 
             let content = content.replace("@MODULE_PATHNAME@", &module_pathname);

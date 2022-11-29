@@ -27,18 +27,18 @@ use eyre::{eyre, WrapErr};
 #[derive(Debug, Clone, Hash, PartialEq, Eq, PartialOrd, Ord)]
 pub struct AggregateTypeEntity {
     pub used_ty: UsedTypeEntity,
-    pub name: Option<&'static str>,
+    pub name: Option<String>,
 }
 
 #[derive(Debug, Clone, Hash, PartialEq, Eq, PartialOrd, Ord)]
 pub struct PgAggregateEntity {
-    pub full_path: &'static str,
-    pub module_path: &'static str,
-    pub file: &'static str,
+    pub full_path: String,
+    pub module_path: String,
+    pub file: String,
     pub line: u32,
     pub ty_id: TypeId,
 
-    pub name: &'static str,
+    pub name: String,
 
     /// If the aggregate is an ordered set aggregate.
     ///
@@ -63,12 +63,12 @@ pub struct PgAggregateEntity {
     /// The `SFUNC` parameter for [`CREATE AGGREGATE`](https://www.postgresql.org/docs/current/sql-createaggregate.html)
     ///
     /// Corresponds to `state` in [`pgx::aggregate::Aggregate`].
-    pub sfunc: &'static str,
+    pub sfunc: String,
 
     /// The `FINALFUNC` parameter for [`CREATE AGGREGATE`](https://www.postgresql.org/docs/current/sql-createaggregate.html)
     ///
     /// Corresponds to `finalize` in [`pgx::aggregate::Aggregate`].
-    pub finalfunc: Option<&'static str>,
+    pub finalfunc: Option<String>,
 
     /// The `FINALFUNC_MODIFY` parameter for [`CREATE AGGREGATE`](https://www.postgresql.org/docs/current/sql-createaggregate.html)
     ///
@@ -78,32 +78,32 @@ pub struct PgAggregateEntity {
     /// The `COMBINEFUNC` parameter for [`CREATE AGGREGATE`](https://www.postgresql.org/docs/current/sql-createaggregate.html)
     ///
     /// Corresponds to `combine` in [`pgx::aggregate::Aggregate`].
-    pub combinefunc: Option<&'static str>,
+    pub combinefunc: Option<String>,
 
     /// The `SERIALFUNC` parameter for [`CREATE AGGREGATE`](https://www.postgresql.org/docs/current/sql-createaggregate.html)
     ///
     /// Corresponds to `serial` in [`pgx::aggregate::Aggregate`].
-    pub serialfunc: Option<&'static str>,
+    pub serialfunc: Option<String>,
 
     /// The `DESERIALFUNC` parameter for [`CREATE AGGREGATE`](https://www.postgresql.org/docs/current/sql-createaggregate.html)
     ///
     /// Corresponds to `deserial` in [`pgx::aggregate::Aggregate`].
-    pub deserialfunc: Option<&'static str>,
+    pub deserialfunc: Option<String>,
 
     /// The `INITCOND` parameter for [`CREATE AGGREGATE`](https://www.postgresql.org/docs/current/sql-createaggregate.html)
     ///
     /// Corresponds to `INITIAL_CONDITION` in [`pgx::aggregate::Aggregate`].
-    pub initcond: Option<&'static str>,
+    pub initcond: Option<String>,
 
     /// The `MSFUNC` parameter for [`CREATE AGGREGATE`](https://www.postgresql.org/docs/current/sql-createaggregate.html)
     ///
     /// Corresponds to `moving_state` in [`pgx::aggregate::Aggregate`].
-    pub msfunc: Option<&'static str>,
+    pub msfunc: Option<String>,
 
     /// The `MINVFUNC` parameter for [`CREATE AGGREGATE`](https://www.postgresql.org/docs/current/sql-createaggregate.html)
     ///
     /// Corresponds to `moving_state_inverse` in [`pgx::aggregate::Aggregate`].
-    pub minvfunc: Option<&'static str>,
+    pub minvfunc: Option<String>,
 
     /// The `MSTYPE` parameter for [`CREATE AGGREGATE`](https://www.postgresql.org/docs/current/sql-createaggregate.html)
     ///
@@ -113,11 +113,11 @@ pub struct PgAggregateEntity {
     // The `MSSPACE` parameter for [`CREATE AGGREGATE`](https://www.postgresql.org/docs/current/sql-createaggregate.html)
     //
     // TODO: Currently unused.
-    // pub msspace: &'static str,
+    // pub msspace: String,
     /// The `MFINALFUNC` parameter for [`CREATE AGGREGATE`](https://www.postgresql.org/docs/current/sql-createaggregate.html)
     ///
     /// Corresponds to `moving_state_finalize` in [`pgx::aggregate::Aggregate`].
-    pub mfinalfunc: Option<&'static str>,
+    pub mfinalfunc: Option<String>,
 
     /// The `MFINALFUNC_MODIFY` parameter for [`CREATE AGGREGATE`](https://www.postgresql.org/docs/current/sql-createaggregate.html)
     ///
@@ -127,12 +127,12 @@ pub struct PgAggregateEntity {
     /// The `MINITCOND` parameter for [`CREATE AGGREGATE`](https://www.postgresql.org/docs/current/sql-createaggregate.html)
     ///
     /// Corresponds to `MOVING_INITIAL_CONDITION` in [`pgx::aggregate::Aggregate`].
-    pub minitcond: Option<&'static str>,
+    pub minitcond: Option<String>,
 
     /// The `SORTOP` parameter for [`CREATE AGGREGATE`](https://www.postgresql.org/docs/current/sql-createaggregate.html)
     ///
     /// Corresponds to `SORT_OPERATOR` in [`pgx::aggregate::Aggregate`].
-    pub sortop: Option<&'static str>,
+    pub sortop: Option<String>,
 
     /// The `PARALLEL` parameter for [`CREATE AGGREGATE`](https://www.postgresql.org/docs/current/sql-createaggregate.html)
     ///
@@ -159,8 +159,8 @@ impl SqlGraphIdentifier for PgAggregateEntity {
     fn rust_identifier(&self) -> String {
         self.full_path.to_string()
     }
-    fn file(&self) -> Option<&'static str> {
-        Some(self.file)
+    fn file(&self) -> Option<&str> {
+        Some(&self.file)
     }
     fn line(&self) -> Option<u32> {
         Some(self.line)
@@ -174,55 +174,55 @@ impl ToSql for PgAggregateEntity {
         let mut optional_attributes = Vec::new();
         let schema = context.schema_prefix_for(&self_index);
 
-        if let Some(value) = self.finalfunc {
+        if let Some(value) = self.finalfunc.as_ref() {
             optional_attributes.push((
                 format!("\tFINALFUNC = {}\"{}\"", schema, value),
                 format!("/* {}::final */", self.full_path),
             ));
         }
-        if let Some(value) = self.finalfunc_modify {
+        if let Some(value) = self.finalfunc_modify.as_ref() {
             optional_attributes.push((
                 format!("\tFINALFUNC_MODIFY = {}", value.to_sql(context)?),
                 format!("/* {}::FINALIZE_MODIFY */", self.full_path),
             ));
         }
-        if let Some(value) = self.combinefunc {
+        if let Some(value) = self.combinefunc.as_ref() {
             optional_attributes.push((
                 format!("\tCOMBINEFUNC = {}\"{}\"", schema, value),
                 format!("/* {}::combine */", self.full_path),
             ));
         }
-        if let Some(value) = self.serialfunc {
+        if let Some(value) = self.serialfunc.as_ref() {
             optional_attributes.push((
                 format!("\tSERIALFUNC = {}\"{}\"", schema, value),
                 format!("/* {}::serial */", self.full_path),
             ));
         }
-        if let Some(value) = self.deserialfunc {
+        if let Some(value) = self.deserialfunc.as_ref() {
             optional_attributes.push((
                 format!("\tDESERIALFUNC ={} \"{}\"", schema, value),
                 format!("/* {}::deserial */", self.full_path),
             ));
         }
-        if let Some(value) = self.initcond {
+        if let Some(value) = self.initcond.as_ref() {
             optional_attributes.push((
                 format!("\tINITCOND = '{}'", value),
                 format!("/* {}::INITIAL_CONDITION */", self.full_path),
             ));
         }
-        if let Some(value) = self.msfunc {
+        if let Some(value) = self.msfunc.as_ref() {
             optional_attributes.push((
                 format!("\tMSFUNC = {}\"{}\"", schema, value),
                 format!("/* {}::moving_state */", self.full_path),
             ));
         }
-        if let Some(value) = self.minvfunc {
+        if let Some(value) = self.minvfunc.as_ref() {
             optional_attributes.push((
                 format!("\tMINVFUNC = {}\"{}\"", schema, value),
                 format!("/* {}::moving_state_inverse */", self.full_path),
             ));
         }
-        if let Some(value) = self.mfinalfunc {
+        if let Some(value) = self.mfinalfunc.as_ref() {
             optional_attributes.push((
                 format!("\tMFINALFUNC = {}\"{}\"", schema, value),
                 format!("/* {}::moving_state_finalize */", self.full_path),
@@ -234,13 +234,13 @@ impl ToSql for PgAggregateEntity {
                 format!("/* {}::MOVING_FINALIZE_MODIFY */", self.full_path),
             ));
         }
-        if let Some(value) = self.minitcond {
+        if let Some(value) = self.minitcond.as_ref() {
             optional_attributes.push((
                 format!("\tMINITCOND = '{}'", value),
                 format!("/* {}::MOVING_INITIAL_CONDITION */", self.full_path),
             ));
         }
-        if let Some(value) = self.sortop {
+        if let Some(value) = self.sortop.as_ref() {
             optional_attributes.push((
                 format!("\tSORTOP = \"{}\"", value),
                 format!("/* {}::SORT_OPERATOR */", self.full_path),
@@ -264,13 +264,14 @@ impl ToSql for PgAggregateEntity {
                 Ok(SqlMapping::As(ref argument_sql)) => Ok(argument_sql.to_string()),
                 Ok(SqlMapping::Composite { array_brackets }) => used_ty
                     .composite_type
+                    .as_ref()
                     .map(|v| if array_brackets { format!("{v}[]") } else { format!("{v}") })
                     .ok_or_else(|| {
                         eyre!("Macro expansion time suggested a composite_type!() in return")
                     }),
                 Ok(SqlMapping::Source { array_brackets }) => {
                     let sql = context
-                        .source_only_to_sql_type(used_ty.ty_source)
+                        .source_only_to_sql_type(&used_ty.ty_source)
                         .map(|v| if array_brackets { format!("{v}[]") } else { format!("{v}") })
                         .ok_or_else(|| {
                             eyre!("Macro expansion time suggested a source only mapping in return")
@@ -280,7 +281,7 @@ impl ToSql for PgAggregateEntity {
                 Ok(SqlMapping::Skip) => {
                     Err(eyre!("Cannot use skipped SQL translatable type as aggregate const type"))
                 }
-                Err(err) => match context.source_only_to_sql_type(used_ty.ty_source) {
+                Err(err) => match context.source_only_to_sql_type(&used_ty.ty_source) {
                     Some(source_only_mapping) => Ok(source_only_mapping.to_string()),
                     None => return Err(err).wrap_err("While mapping argument"),
                 },
@@ -361,6 +362,7 @@ impl ToSql for PgAggregateEntity {
                                 }) => {
                                     arg.used_ty
                                         .composite_type
+                                        .as_ref()
                                         .map(|v| {
                                             if array_brackets {
                                                 format!("{v}[]")
@@ -378,7 +380,7 @@ impl ToSql for PgAggregateEntity {
                                     array_brackets,
                                 }) => {
                                     let sql = context
-                                        .source_only_to_sql_type(arg.used_ty.ty_source)
+                                        .source_only_to_sql_type(&arg.used_ty.ty_source)
                                         .map(|v| {
                                             if array_brackets {
                                                 format!("{v}[]")
@@ -395,7 +397,7 @@ impl ToSql for PgAggregateEntity {
                                 }
                                 Ok(SqlMapping::Skip) => return Err(eyre!("Got a skipped SQL translatable type in aggregate args, this is not permitted")),
                                 Err(err) => {
-                                    match context.source_only_to_sql_type(arg.used_ty.ty_source) {
+                                    match context.source_only_to_sql_type(&arg.used_ty.ty_source) {
                                         Some(source_only_mapping) => {
                                             source_only_mapping.to_string()
                                         }
@@ -406,7 +408,7 @@ impl ToSql for PgAggregateEntity {
                            variadic = if arg.used_ty.variadic { "VARIADIC " } else { "" },
                            maybe_comma = if needs_comma { ", " } else { " " },
                            full_path = arg.used_ty.full_path,
-                           name = if let Some(name) = arg.name {
+                           name = if let Some(name) = arg.name.as_ref() {
                                format!(r#""{}" "#, name)
                            } else { "".to_string() },
                     );
@@ -437,7 +439,7 @@ impl ToSql for PgAggregateEntity {
                         schema_prefix = context.schema_prefix_for(&graph_index),
                         // First try to match on [`TypeId`] since it's most reliable.
                         sql_type = map_ty(&arg.used_ty).wrap_err("Mapping direct arg type")?,
-                        maybe_name = if let Some(name) = arg.name {
+                        maybe_name = if let Some(name) = arg.name.as_ref() {
                             "\"".to_string() + name + "\" "
                         } else {
                             "".to_string()

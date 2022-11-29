@@ -299,18 +299,18 @@ impl PgExtern {
                 type FunctionPointer = #unsafety fn(#( #input_types ),*) #return_type;
                 let metadata: FunctionPointer = #ident;
                 let submission = ::pgx::utils::sql_entity_graph::PgExternEntity {
-                    name: #name,
-                    unaliased_name: stringify!(#ident),
-                    module_path: core::module_path!(),
-                    full_path: concat!(core::module_path!(), "::", stringify!(#ident)),
+                    name: #name.into(),
+                    unaliased_name: stringify!(#ident).into(),
+                    module_path: core::module_path!().into(),
+                    full_path: concat!(core::module_path!(), "::", stringify!(#ident)).into(),
                     metadata: pgx::utils::sql_entity_graph::metadata::FunctionMetadata::entity(&metadata),
                     fn_args: vec![#(#inputs_iter),*],
                     fn_return: #returns,
-                    schema: None #( .unwrap_or(Some(#schema_iter)) )*,
-                    file: file!(),
+                    schema: None #( .unwrap_or(Some(#schema_iter.into())) )*,
+                    file: file!().into(),
                     line: line!(),
                     extern_attrs: vec![#extern_attrs],
-                    search_path: None #( .unwrap_or(Some(vec![#search_path])) )*,
+                    search_path: None #( .unwrap_or(Some(vec![#search_path.into()])) )*,
                     operator: None #( .unwrap_or(Some(#operator)) )*,
                     to_sql_config: #to_sql_config,
                 };

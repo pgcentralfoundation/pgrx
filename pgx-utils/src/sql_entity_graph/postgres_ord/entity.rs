@@ -22,11 +22,11 @@ use crate::sql_entity_graph::{SqlGraphEntity, SqlGraphIdentifier};
 /// The output of a [`PostgresOrd`](crate::sql_entity_graph::postgres_ord::PostgresOrd) from `quote::ToTokens::to_tokens`.
 #[derive(Debug, Clone, Hash, PartialEq, Eq, Ord, PartialOrd)]
 pub struct PostgresOrdEntity {
-    pub name: &'static str,
-    pub file: &'static str,
+    pub name: String,
+    pub file: String,
     pub line: u32,
-    pub full_path: &'static str,
-    pub module_path: &'static str,
+    pub full_path: String,
+    pub module_path: String,
     pub id: core::any::TypeId,
     pub to_sql_config: ToSqlConfigEntity,
 }
@@ -71,8 +71,8 @@ impl SqlGraphIdentifier for PostgresOrdEntity {
         self.full_path.to_string()
     }
 
-    fn file(&self) -> Option<&'static str> {
-        Some(self.file)
+    fn file(&self) -> Option<&str> {
+        Some(&self.file)
     }
 
     fn line(&self) -> Option<u32> {

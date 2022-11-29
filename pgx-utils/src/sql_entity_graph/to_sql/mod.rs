@@ -160,7 +160,7 @@ impl ToTokens for ToSqlConfig {
                 ::pgx::utils::sql_entity_graph::ToSqlConfigEntity {
                     enabled: #enabled,
                     callback: None,
-                    content: Some(#sql),
+                    content: Some(#sql.to_string()),
                 }
             });
             return;

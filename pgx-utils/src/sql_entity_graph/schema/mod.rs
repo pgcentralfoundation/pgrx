@@ -83,11 +83,11 @@ impl ToTokens for Schema {
                     use alloc::vec::Vec;
                     use alloc::vec;
                     let submission = pgx::utils::sql_entity_graph::SchemaEntity {
-                            module_path: module_path!(),
-                            name: stringify!(#ident),
-                            file: file!(),
-                            line: line!(),
-                        };
+                        module_path: module_path!().into(),
+                        name: stringify!(#ident).into(),
+                        file: file!().into(),
+                        line: line!(),
+                    };
                     ::pgx::utils::sql_entity_graph::SqlGraphEntity::Schema(submission)
                 }
         });

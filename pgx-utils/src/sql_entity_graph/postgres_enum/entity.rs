@@ -24,13 +24,13 @@ use std::collections::BTreeSet;
 /// The output of a [`PostgresEnum`](crate::sql_entity_graph::postgres_enum::PostgresEnum) from `quote::ToTokens::to_tokens`.
 #[derive(Debug, Clone, PartialEq, Eq, Hash, Ord, PartialOrd)]
 pub struct PostgresEnumEntity {
-    pub name: &'static str,
-    pub file: &'static str,
+    pub name: String,
+    pub file: String,
     pub line: u32,
-    pub full_path: &'static str,
-    pub module_path: &'static str,
+    pub full_path: String,
+    pub module_path: String,
     pub mappings: BTreeSet<RustSqlMapping>,
-    pub variants: Vec<&'static str>,
+    pub variants: Vec<String>,
     pub to_sql_config: ToSqlConfigEntity,
 }
 
@@ -54,8 +54,8 @@ impl SqlGraphIdentifier for PostgresEnumEntity {
         self.full_path.to_string()
     }
 
-    fn file(&self) -> Option<&'static str> {
-        Some(self.file)
+    fn file(&self) -> Option<&str> {
+        Some(&self.file)
     }
 
     fn line(&self) -> Option<u32> {

@@ -25,15 +25,15 @@ use std::collections::BTreeSet;
 /// The output of a [`PostgresType`](crate::sql_entity_graph::postgres_type::PostgresType) from `quote::ToTokens::to_tokens`.
 #[derive(Debug, Clone, PartialEq, Eq, Hash, Ord, PartialOrd)]
 pub struct PostgresTypeEntity {
-    pub name: &'static str,
-    pub file: &'static str,
+    pub name: String,
+    pub file: String,
     pub line: u32,
-    pub full_path: &'static str,
-    pub module_path: &'static str,
+    pub full_path: String,
+    pub module_path: String,
     pub mappings: BTreeSet<RustSqlMapping>,
-    pub in_fn: &'static str,
+    pub in_fn: String,
     pub in_fn_module_path: String,
-    pub out_fn: &'static str,
+    pub out_fn: String,
     pub out_fn_module_path: String,
     pub to_sql_config: ToSqlConfigEntity,
 }
@@ -58,8 +58,8 @@ impl SqlGraphIdentifier for PostgresTypeEntity {
         self.full_path.to_string()
     }
 
-    fn file(&self) -> Option<&'static str> {
-        Some(self.file)
+    fn file(&self) -> Option<&str> {
+        Some(&self.file)
     }
 
     fn line(&self) -> Option<u32> {

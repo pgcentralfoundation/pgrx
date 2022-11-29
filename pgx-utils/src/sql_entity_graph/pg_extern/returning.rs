@@ -357,7 +357,7 @@ impl ToTokens for Returning {
                         quote! {
                             ::pgx::utils::sql_entity_graph::PgExternReturnEntityIteratedItem {
                                 ty: #used_ty_entity_tokens,
-                                name: None #( .unwrap_or(Some(stringify!(#name_iter))) )*,
+                                name: None #( .unwrap_or(Some(stringify!(#name_iter).into())) )*,
                             }
                         }
                     })

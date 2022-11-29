@@ -72,11 +72,11 @@ impl PgTrigger {
                 use alloc::vec::Vec;
                 use alloc::vec;
                 let submission = ::pgx::utils::sql_entity_graph::PgTriggerEntity {
-                    function_name: #function_name,
-                    file: file!(),
+                    function_name: #function_name.into(),
+                    file: file!().into(),
                     line: line!(),
-                    full_path: concat!(module_path!(), "::", stringify!(#func_sig_ident)),
-                    module_path: module_path!(),
+                    full_path: concat!(module_path!(), "::", stringify!(#func_sig_ident)).into(),
+                    module_path: module_path!().into(),
                     to_sql_config: #to_sql_config,
                 };
                 ::pgx::utils::sql_entity_graph::SqlGraphEntity::Trigger(submission)

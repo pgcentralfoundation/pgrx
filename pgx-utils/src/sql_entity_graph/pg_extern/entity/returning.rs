@@ -36,5 +36,5 @@ pub enum PgExternReturnEntity {
 #[derive(Debug, Clone, Hash, PartialEq, Eq, PartialOrd, Ord)]
 pub struct PgExternReturnEntityIteratedItem {
     pub ty: UsedTypeEntity,
-    pub name: Option<&'static str>,
+    pub name: Option<String>,
 }

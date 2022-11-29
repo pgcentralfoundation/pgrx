@@ -19,7 +19,7 @@ use crate::sql_entity_graph::{SqlGraphIdentifier, UsedTypeEntity};
 /// The output of a [`PgExternArgument`](crate::sql_entity_graph::PgExternArgument) from `quote::ToTokens::to_tokens`.
 #[derive(Debug, Clone, Hash, PartialEq, Eq, PartialOrd, Ord)]
 pub struct PgExternArgumentEntity {
-    pub pattern: &'static str,
+    pub pattern: String,
     pub used_ty: UsedTypeEntity,
 }
 
@@ -31,7 +31,7 @@ impl SqlGraphIdentifier for PgExternArgumentEntity {
         self.used_ty.full_path.to_string()
     }
 
-    fn file(&self) -> Option<&'static str> {
+    fn file(&self) -> Option<&str> {
         None
     }
 

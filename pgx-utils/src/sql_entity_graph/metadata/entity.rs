@@ -13,12 +13,12 @@ use super::{ArgumentError, Returns, ReturnsError, SqlMapping};
 pub struct FunctionMetadataEntity {
     pub arguments: Vec<FunctionMetadataTypeEntity>,
     pub retval: Option<FunctionMetadataTypeEntity>,
-    pub path: &'static str,
+    pub path: String,
 }
 
 #[derive(Clone, Debug, Hash, Eq, PartialEq, Ord, PartialOrd)]
 pub struct FunctionMetadataTypeEntity {
-    pub type_name: &'static str,
+    pub type_name: String,
     pub argument_sql: Result<SqlMapping, ArgumentError>,
     pub return_sql: Result<Returns, ReturnsError>,
     pub variadic: bool,

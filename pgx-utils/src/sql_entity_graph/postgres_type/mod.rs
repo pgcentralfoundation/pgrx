@@ -190,20 +190,20 @@ impl ToTokens for PostgresType {
                     stringify!(#name).to_string()
                 );
                 let submission = ::pgx::utils::sql_entity_graph::PostgresTypeEntity {
-                    name: stringify!(#name),
-                    file: file!(),
+                    name: stringify!(#name).into(),
+                    file: file!().into(),
                     line: line!(),
-                    module_path: module_path!(),
-                    full_path: core::any::type_name::<#name #static_ty_generics>(),
+                    module_path: module_path!().into(),
+                    full_path: core::any::type_name::<#name #static_ty_generics>().into(),
                     mappings: mappings.into_iter().collect(),
-                    in_fn: stringify!(#in_fn),
+                    in_fn: stringify!(#in_fn).into(),
                     in_fn_module_path: {
                         let in_fn = stringify!(#in_fn);
                         let mut path_items: Vec<_> = in_fn.split("::").collect();
                         let _ = path_items.pop(); // Drop the one we don't want.
                         path_items.join("::")
                     },
-                    out_fn: stringify!(#out_fn),
+                    out_fn: stringify!(#out_fn).into(),
                     out_fn_module_path: {
                         let out_fn = stringify!(#out_fn);
                         let mut path_items: Vec<_> = out_fn.split("::").collect();

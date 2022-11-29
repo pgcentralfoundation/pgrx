@@ -12,12 +12,12 @@ use crate::sql_entity_graph::{
 
 #[derive(Debug, Clone, Hash, PartialEq, Eq, PartialOrd, Ord)]
 pub struct PgTriggerEntity {
-    pub function_name: &'static str,
+    pub function_name: String,
     pub to_sql_config: ToSqlConfigEntity,
-    pub file: &'static str,
+    pub file: String,
     pub line: u32,
-    pub module_path: &'static str,
-    pub full_path: &'static str,
+    pub module_path: String,
+    pub full_path: String,
 }
 
 impl PgTriggerEntity {
@@ -67,11 +67,11 @@ impl SqlGraphIdentifier for PgTriggerEntity {
         format!("trigger fn {}", self.full_path)
     }
     fn rust_identifier(&self) -> String {
-        self.full_path.to_string()
+        self.full_path.clone()
     }
 
-    fn file(&self) -> Option<&'static str> {
-        Some(self.file)
+    fn file(&self) -> Option<&str> {
+        Some(&self.file)
     }
 
     fn line(&self) -> Option<u32> {

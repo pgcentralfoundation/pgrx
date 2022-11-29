@@ -156,13 +156,13 @@ impl ToTokens for PostgresEnum {
                 ::pgx::datum::WithVarlenaTypeIds::<#name #static_ty_generics>::register_varlena_with_refs(&mut mappings, stringify!(#name).to_string());
 
                 let submission = ::pgx::utils::sql_entity_graph::PostgresEnumEntity {
-                    name: stringify!(#name),
-                    file: file!(),
+                    name: stringify!(#name).into(),
+                    file: file!().into(),
                     line: line!(),
-                    module_path: module_path!(),
-                    full_path: core::any::type_name::<#name #static_ty_generics>(),
+                    module_path: module_path!().into(),
+                    full_path: core::any::type_name::<#name #static_ty_generics>().into(),
                     mappings: mappings.into_iter().collect(),
-                    variants: vec![ #(  stringify!(#variants)  ),* ],
+                    variants: vec![ #(  stringify!(#variants).into()  ),* ],
                     to_sql_config: #to_sql_config,
                 };
                 ::pgx::utils::sql_entity_graph::SqlGraphEntity::Enum(submission)

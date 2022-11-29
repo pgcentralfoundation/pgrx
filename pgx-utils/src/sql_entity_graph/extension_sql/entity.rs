@@ -26,12 +26,12 @@ use std::fmt::Display;
 /// The output of a [`ExtensionSql`](crate::sql_entity_graph::ExtensionSql) from `quote::ToTokens::to_tokens`.
 #[derive(Debug, Clone, Hash, PartialEq, Eq, PartialOrd, Ord)]
 pub struct ExtensionSqlEntity {
-    pub module_path: &'static str,
-    pub full_path: &'static str,
-    pub sql: &'static str,
-    pub file: &'static str,
+    pub module_path: String,
+    pub full_path: String,
+    pub sql: String,
+    pub file: String,
     pub line: u32,
-    pub name: &'static str,
+    pub name: String,
     pub bootstrap: bool,
     pub finalize: bool,
     pub requires: Vec<PositioningRef>,
@@ -58,8 +58,8 @@ impl SqlGraphIdentifier for ExtensionSqlEntity {
         self.name.to_string()
     }
 
-    fn file(&self) -> Option<&'static str> {
-        Some(self.file)
+    fn file(&self) -> Option<&str> {
+        Some(&self.file)
     }
 
     fn line(&self) -> Option<u32> {

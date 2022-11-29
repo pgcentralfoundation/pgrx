@@ -118,11 +118,11 @@ impl ToTokens for PostgresHash {
                 use alloc::vec::Vec;
                 use alloc::vec;
                 let submission = ::pgx::utils::sql_entity_graph::PostgresHashEntity {
-                    name: stringify!(#name),
-                    file: file!(),
+                    name: stringify!(#name).into(),
+                    file: file!().into(),
                     line: line!(),
-                    full_path: core::any::type_name::<#name>(),
-                    module_path: module_path!(),
+                    full_path: core::any::type_name::<#name>().into(),
+                    module_path: module_path!().into(),
                     id: TypeId::of::<#name>(),
                     to_sql_config: #to_sql_config,
                 };

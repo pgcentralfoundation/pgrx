@@ -21,9 +21,9 @@ use crate::sql_entity_graph::{SqlGraphEntity, SqlGraphIdentifier};
 /// The output of a [`Schema`](crate::sql_entity_graph::schema::Schema) from `quote::ToTokens::to_tokens`.
 #[derive(Debug, Clone, Hash, PartialEq, Eq, Ord, PartialOrd)]
 pub struct SchemaEntity {
-    pub module_path: &'static str,
-    pub name: &'static str,
-    pub file: &'static str,
+    pub module_path: String,
+    pub name: String,
+    pub file: String,
     pub line: u32,
 }
 
@@ -41,8 +41,8 @@ impl SqlGraphIdentifier for SchemaEntity {
         self.module_path.to_string()
     }
 
-    fn file(&self) -> Option<&'static str> {
-        Some(self.file)
+    fn file(&self) -> Option<&str> {
+        Some(&self.file)
     }
 
     fn line(&self) -> Option<u32> {

@@ -110,12 +110,12 @@ impl ToTokens for ExtensionSqlFile {
                 use alloc::vec::Vec;
                 use alloc::vec;
                 let submission = ::pgx::utils::sql_entity_graph::ExtensionSqlEntity {
-                    sql: include_str!(#path),
-                    module_path: module_path!(),
-                    full_path: concat!(file!(), ':', line!()),
-                    file: file!(),
+                    sql: include_str!(#path).into(),
+                    module_path: module_path!().into(),
+                    full_path: concat!(file!(), ':', line!()).into(),
+                    file: file!().into(),
                     line: line!(),
-                    name: #name,
+                    name: #name.into(),
                     bootstrap: #bootstrap,
                     finalize: #finalize,
                     requires: vec![#(#requires_iter),*],
@@ -215,12 +215,12 @@ impl ToTokens for ExtensionSql {
                 use alloc::vec::Vec;
                 use alloc::vec;
                 let submission = ::pgx::utils::sql_entity_graph::ExtensionSqlEntity {
-                    sql: #sql,
-                    module_path: module_path!(),
-                    full_path: concat!(file!(), ':', line!()),
-                    file: file!(),
+                    sql: #sql.into(),
+                    module_path: module_path!().into(),
+                    full_path: concat!(file!(), ':', line!()).into(),
+                    file: file!().into(),
                     line: line!(),
-                    name: #name,
+                    name: #name.into(),
                     bootstrap: #bootstrap,
                     finalize: #finalize,
                     requires: vec![#(#requires_iter),*],

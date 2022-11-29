@@ -80,8 +80,8 @@ It cannot be made private or sealed due to details of the structure of the PGX f
 Nonetheless, if you are not confident the translation is valid: do not implement this trait.
 */
 pub unsafe trait SqlTranslatable {
-    fn type_name() -> &'static str {
-        core::any::type_name::<Self>()
+    fn type_name() -> String {
+        core::any::type_name::<Self>().into()
     }
     fn argument_sql() -> Result<SqlMapping, ArgumentError>;
     fn return_sql() -> Result<Returns, ReturnsError>;
@@ -153,7 +153,7 @@ where
     T: SqlTranslatable,
 {
     fn argument_sql() -> Result<SqlMapping, ArgumentError> {
-        match T::type_name() {
+        match T::type_name().as_str() {
             id if id == u8::type_name() => Ok(SqlMapping::As(format!("bytea"))),
             _ => match T::argument_sql() {
                 Ok(SqlMapping::As(val)) => Ok(SqlMapping::As(format!("{val}[]"))),

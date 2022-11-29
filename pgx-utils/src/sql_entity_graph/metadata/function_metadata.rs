@@ -27,7 +27,7 @@ assert_eq!(
 ```
  */
 pub trait FunctionMetadata<Inputs, Output> {
-    fn path(&self) -> &'static str {
+    fn path(&self) -> &str {
         core::any::type_name::<Self>()
     }
     fn entity(&self) -> FunctionMetadataEntity;
@@ -44,7 +44,7 @@ where
                 let marker: PhantomData<Output> = PhantomData;
                 Some(marker.entity())
             },
-            path: self.path(),
+            path: self.path().into(),
         }
     }
 }
@@ -60,20 +60,20 @@ where
                 let marker: PhantomData<Output> = PhantomData;
                 Some(marker.entity())
             },
-            path: self.path(),
+            path: self.path().into(),
         }
     }
 }
 
 impl FunctionMetadata<(), ()> for fn() {
     fn entity(&self) -> FunctionMetadataEntity {
-        FunctionMetadataEntity { arguments: vec![], retval: None, path: self.path() }
+        FunctionMetadataEntity { arguments: vec![], retval: None, path: self.path().into() }
     }
 }
 
 impl FunctionMetadata<(), ()> for unsafe fn() {
     fn entity(&self) -> FunctionMetadataEntity {
-        FunctionMetadataEntity { arguments: vec![], retval: None, path: self.path() }
+        FunctionMetadataEntity { arguments: vec![], retval: None, path: self.path().into() }
     }
 }
 seq_macro::seq!(I in 0..=32 {
@@ -100,7 +100,7 @@ seq_macro::seq!(I in 0..=32 {
                             let marker: PhantomData<Output> = PhantomData;
                             Some(marker.entity())
                         },
-                        path: self.path(),
+                        path: self.path().into(),
                     }
                 }
             }
@@ -126,7 +126,7 @@ seq_macro::seq!(I in 0..=32 {
                             let marker: PhantomData<Output> = PhantomData;
                             Some(marker.entity())
                         },
-                        path: self.path(),
+                        path: self.path().into(),
                     }
                 }
             }
@@ -148,7 +148,7 @@ seq_macro::seq!(I in 0..=32 {
                     FunctionMetadataEntity {
                         arguments,
                         retval: None,
-                        path: self.path(),
+                        path: self.path().into(),
                     }
                 }
             }
@@ -170,7 +170,7 @@ seq_macro::seq!(I in 0..=32 {
                     FunctionMetadataEntity {
                         arguments,
                         retval: None,
-                        path: self.path(),
+                        path: self.path().into(),
                     }
                 }
             }

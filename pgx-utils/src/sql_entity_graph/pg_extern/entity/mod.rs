@@ -34,18 +34,18 @@ use eyre::{eyre, WrapErr};
 /// The output of a [`PgExtern`](crate::sql_entity_graph::pg_extern::PgExtern) from `quote::ToTokens::to_tokens`.
 #[derive(Debug, Clone, Eq, Ord, PartialEq, PartialOrd, Hash)]
 pub struct PgExternEntity {
-    pub name: &'static str,
-    pub unaliased_name: &'static str,
-    pub module_path: &'static str,
-    pub full_path: &'static str,
+    pub name: String,
+    pub unaliased_name: String,
+    pub module_path: String,
+    pub full_path: String,
     pub metadata: crate::sql_entity_graph::metadata::FunctionMetadataEntity,
     pub fn_args: Vec<PgExternArgumentEntity>,
     pub fn_return: PgExternReturnEntity,
-    pub schema: Option<&'static str>,
-    pub file: &'static str,
+    pub schema: Option<String>,
+    pub file: String,
     pub line: u32,
     pub extern_attrs: Vec<ExternArgs>,
-    pub search_path: Option<Vec<&'static str>>,
+    pub search_path: Option<Vec<String>>,
     pub operator: Option<PgOperatorEntity>,
     pub to_sql_config: ToSqlConfigEntity,
 }
@@ -64,8 +64,8 @@ impl SqlGraphIdentifier for PgExternEntity {
         self.full_path.to_string()
     }
 
-    fn file(&self) -> Option<&'static str> {
-        Some(self.file)
+    fn file(&self) -> Option<&str> {
+        Some(&self.file)
     }
 
     fn line(&self) -> Option<u32> {
@@ -114,6 +114,7 @@ impl ToSql for PgExternEntity {
             or_replace = if extern_attrs.contains(&ExternArgs::CreateOrReplace) { "OR REPLACE" } else { "" },
             schema = self
                 .schema
+                .as_ref()
                 .map(|schema| format!("{}.", schema))
                 .unwrap_or_else(|| context.schema_prefix_for(&self_index)),
             name = self.name,
@@ -134,7 +135,7 @@ impl ToSql for PgExternEntity {
                             SqlGraphEntity::Type(ty) => ty.id_matches(&arg.used_ty.ty_id),
                             SqlGraphEntity::Enum(en) => en.id_matches(&arg.used_ty.ty_id),
                             SqlGraphEntity::BuiltinType(defined) => {
-                                defined == arg.used_ty.full_path
+                                defined == arg.used_ty.full_path.as_str()
                             }
                             _ => false,
                         })
@@ -150,7 +151,7 @@ impl ToSql for PgExternEntity {
                                                 schema_prefix = context.schema_prefix_for(&graph_index),
                                                 // First try to match on [`TypeId`] since it's most reliable.
                                                 sql_type = argument_sql,
-                                                default = if let Some(def) = arg.used_ty.default { format!(" DEFAULT {}", def) } else { String::from("") },
+                                                default = if let Some(def) = arg.used_ty.default.as_ref() { format!(" DEFAULT {}", def) } else { String::from("") },
                                                 variadic = if metadata_argument.variadic { "VARIADIC " } else { "" },
                                                 maybe_comma = if needs_comma { ", " } else { " " },
                                                 type_name = metadata_argument.type_name,
@@ -163,6 +164,7 @@ impl ToSql for PgExternEntity {
                             let sql = self.fn_args[idx]
                                 .used_ty
                                 .composite_type
+                                .as_ref()
                                 .map(|v| {
                                     if array_brackets {
                                         format!("{v}[]")
@@ -182,7 +184,7 @@ impl ToSql for PgExternEntity {
                                 schema_prefix = context.schema_prefix_for(&graph_index),
                                 // First try to match on [`TypeId`] since it's most reliable.
                                 sql_type = sql,
-                                default = if let Some(def) = arg.used_ty.default { format!(" DEFAULT {}", def) } else { String::from("") },
+                                default = if let Some(def) = arg.used_ty.default.as_ref() { format!(" DEFAULT {}", def) } else { String::from("") },
                                 variadic = if metadata_argument.variadic { "VARIADIC " } else { "" },
                                 maybe_comma = if needs_comma { ", " } else { " " },
                                 type_name = metadata_argument.type_name,
@@ -193,7 +195,7 @@ impl ToSql for PgExternEntity {
                             array_brackets,
                         }) => {
                             let sql = context
-                                .source_only_to_sql_type(arg.used_ty.ty_source)
+                                .source_only_to_sql_type(&arg.used_ty.ty_source)
                                 .map(|v| {
                                     if array_brackets {
                                         format!("{v}[]")
@@ -213,7 +215,7 @@ impl ToSql for PgExternEntity {
                                 schema_prefix = context.schema_prefix_for(&graph_index),
                                 // First try to match on [`TypeId`] since it's most reliable.
                                 sql_type = sql,
-                                default = if let Some(def) = arg.used_ty.default { format!(" DEFAULT {}", def) } else { String::from("") },
+                                default = if let Some(def) = arg.used_ty.default.as_ref() { format!(" DEFAULT {}", def) } else { String::from("") },
                                 variadic = if metadata_argument.variadic { "VARIADIC " } else { "" },
                                 maybe_comma = if needs_comma { ", " } else { " " },
                                 type_name = metadata_argument.type_name,
@@ -222,7 +224,7 @@ impl ToSql for PgExternEntity {
                         }
                         Ok(SqlMapping::Skip) => (),
                         Err(err) => {
-                            match context.source_only_to_sql_type(arg.used_ty.ty_source) {
+                            match context.source_only_to_sql_type(&arg.used_ty.ty_source) {
                                 Some(source_only_mapping) => {
                                     let buf = format!("\
                                             \t\"{pattern}\" {variadic}{schema_prefix}{sql_type}{default}{maybe_comma}/* {type_name} */\
@@ -231,7 +233,7 @@ impl ToSql for PgExternEntity {
                                             schema_prefix = context.schema_prefix_for(&graph_index),
                                             // First try to match on [`TypeId`] since it's most reliable.
                                             sql_type = source_only_mapping,
-                                            default = if let Some(def) = arg.used_ty.default { format!(" DEFAULT {}", def) } else { String::from("") },
+                                            default = if let Some(def) = arg.used_ty.default.as_ref() { format!(" DEFAULT {}", def) } else { String::from("") },
                                             variadic = if metadata_argument.variadic { "VARIADIC " } else { "" },
                                             maybe_comma = if needs_comma { ", " } else { " " },
                                             type_name = metadata_argument.type_name,
@@ -256,28 +258,28 @@ impl ToSql for PgExternEntity {
                         .find(|neighbor| match &context.graph[*neighbor] {
                             SqlGraphEntity::Type(neighbor_ty) => neighbor_ty.id_matches(&ty.ty_id),
                             SqlGraphEntity::Enum(neighbor_en) => neighbor_en.id_matches(&ty.ty_id),
-                            SqlGraphEntity::BuiltinType(defined) => &*defined == ty.full_path,
+                            SqlGraphEntity::BuiltinType(defined) => &*defined == &ty.full_path,
                             _ => false,
                         })
                         .ok_or_else(|| eyre!("Could not find return type in graph."))?;
                     let metadata_retval = self.metadata.retval.clone().ok_or_else(|| eyre!("Macro expansion time and SQL resolution time had differing opinions about the return value existing"))?;
                     let metadata_retval_sql = match metadata_retval.return_sql {
                         Ok(Returns::One(SqlMapping::As(ref sql))) => sql.clone(),
-                        Ok(Returns::One(SqlMapping::Composite { array_brackets })) => ty.composite_type.unwrap().to_string()
+                        Ok(Returns::One(SqlMapping::Composite { array_brackets })) => ty.composite_type.as_ref().unwrap().clone()
                         + if array_brackets {
                             "[]"
                         } else {
                             ""
                         },
                         Ok(Returns::SetOf(SqlMapping::Source { array_brackets })) =>
-                            context.source_only_to_sql_type(ty.ty_source).unwrap().to_string() + if array_brackets {
+                            context.source_only_to_sql_type(&ty.ty_source).unwrap().to_string() + if array_brackets {
                                 "[]"
                             } else {
                                 ""
                             },
                         Ok(other) => return Err(eyre!("Got non-plain mapped/composite return variant SQL in what macro-expansion thought was a type, got: {other:?}")),
                         Err(err) => {
-                            match context.source_only_to_sql_type(ty.ty_source) {
+                            match context.source_only_to_sql_type(&ty.ty_source) {
                                 Some(source_only_mapping) => source_only_mapping,
                                 None => return Err(err).wrap_err("Error mapping return SQL")
                             }
@@ -297,7 +299,7 @@ impl ToSql for PgExternEntity {
                         .find(|neighbor| match &context.graph[*neighbor] {
                             SqlGraphEntity::Type(neighbor_ty) => neighbor_ty.id_matches(&ty.ty_id),
                             SqlGraphEntity::Enum(neighbor_en) => neighbor_en.id_matches(&ty.ty_id),
-                            SqlGraphEntity::BuiltinType(defined) => defined == ty.full_path,
+                            SqlGraphEntity::BuiltinType(defined) => defined == &ty.full_path,
                             _ => false,
                         })
                         .ok_or_else(|| eyre!("Could not find return type in graph."))?;
@@ -305,13 +307,13 @@ impl ToSql for PgExternEntity {
                     let metadata_retval_sql = match metadata_retval.return_sql {
                             Ok(Returns::SetOf(SqlMapping::As(ref sql))) => sql.clone(),
                             Ok(Returns::SetOf(SqlMapping::Composite { array_brackets })) =>
-                                ty.composite_type.unwrap().to_string() + if array_brackets {
+                                ty.composite_type.as_deref().unwrap().to_string() + if array_brackets {
                                     "[]"
                                 } else {
                                     ""
                                 },
                             Ok(Returns::SetOf(SqlMapping::Source { array_brackets })) =>
-                                context.source_only_to_sql_type(ty.ty_source).unwrap().to_string() + if array_brackets {
+                                context.source_only_to_sql_type(&ty.ty_source).unwrap().to_string() + if array_brackets {
                                     "[]"
                                 } else {
                                     ""
@@ -339,15 +341,15 @@ impl ToSql for PgExternEntity {
                                     let sql = match variant {
                                         SqlMapping::As(sql) => sql.clone(),
                                         SqlMapping::Composite { array_brackets } => {
-                                            let composite = table_items[idx].ty.composite_type.unwrap().to_string();
-                                            composite  + if *array_brackets {
+                                            let composite = table_items[idx].ty.composite_type.as_deref().unwrap().to_string();
+                                            composite + if *array_brackets {
                                                 "[]"
                                             } else {
                                                 ""
                                             }
                                         },
                                         SqlMapping::Source { array_brackets } =>
-                                            context.source_only_to_sql_type(table_items[idx].ty.ty_source).unwrap() + if *array_brackets {
+                                            context.source_only_to_sql_type(&table_items[idx].ty.ty_source).unwrap() + if *array_brackets {
                                                 "[]"
                                             } else {
                                                 ""
@@ -376,14 +378,14 @@ impl ToSql for PgExternEntity {
                                     SqlGraphEntity::Enum(neightbor_en) => {
                                         neightbor_en.id_matches(&ty.ty_id)
                                     }
-                                    SqlGraphEntity::BuiltinType(defined) => defined == ty.ty_source,
+                                    SqlGraphEntity::BuiltinType(defined) => defined == &ty.ty_source,
                                     _ => false,
                                 });
 
                         let needs_comma = idx < (table_items.len() - 1);
                         let item = format!(
                                 "\n\t{col_name} {schema_prefix}{ty_resolved}{needs_comma} /* {ty_name} */",
-                                col_name = col_name.expect("An iterator of tuples should have `named!()` macro declarations."),
+                                col_name = col_name.as_ref().expect("An iterator of tuples should have `named!()` macro declarations."),
                                 schema_prefix = if let Some(graph_index) = graph_index {
                                     context.schema_prefix_for(&graph_index)
                                 } else { "".into() },
@@ -461,16 +463,16 @@ impl ToSql for PgExternEntity {
 
         let rendered = if let Some(op) = &self.operator {
             let mut optionals = vec![];
-            if let Some(it) = op.commutator {
+            if let Some(it) = op.commutator.as_ref() {
                 optionals.push(format!("\tCOMMUTATOR = {}", it));
             };
-            if let Some(it) = op.negator {
+            if let Some(it) = op.negator.as_ref() {
                 optionals.push(format!("\tNEGATOR = {}", it));
             };
-            if let Some(it) = op.restrict {
+            if let Some(it) = op.restrict.as_ref() {
                 optionals.push(format!("\tRESTRICT = {}", it));
             };
-            if let Some(it) = op.join {
+            if let Some(it) = op.join.as_ref() {
                 optionals.push(format!("\tJOIN = {}", it));
             };
             if op.hashes {
@@ -504,24 +506,24 @@ impl ToSql for PgExternEntity {
                 Ok(SqlMapping::As(ref sql)) => sql.clone(),
                 Ok(SqlMapping::Composite { array_brackets }) => {
                     if array_brackets {
-                        let composite_type = self.fn_args[0].used_ty.composite_type
+                        let composite_type = self.fn_args[0].used_ty.composite_type.as_ref()
                             .ok_or(eyre!("Found a composite type but macro expansion time did not reveal a name, use `pgx::composite_type!()`"))?;
                         format!("{composite_type}[]")
                     } else {
-                        self.fn_args[0].used_ty.composite_type
+                        self.fn_args[0].used_ty.composite_type.as_ref()
                             .ok_or(eyre!("Found a composite type but macro expansion time did not reveal a name, use `pgx::composite_type!()`"))?.to_string()
                     }
                 }
                 Ok(SqlMapping::Source { array_brackets }) => {
                     if array_brackets {
                         let composite_type = context
-                            .source_only_to_sql_type(self.fn_args[0].used_ty.ty_source)
+                            .source_only_to_sql_type(&self.fn_args[0].used_ty.ty_source)
                             .ok_or(eyre!(
                                 "Found a source only mapping but no source mapping exists for this"
                             ))?;
                         format!("{composite_type}[]")
                     } else {
-                        context.source_only_to_sql_type(self.fn_args[0].used_ty.ty_source)
+                        context.source_only_to_sql_type(&self.fn_args[0].used_ty.ty_source)
                         .ok_or(eyre!("Found a composite type but macro expansion time did not reveal a name, use `pgx::composite_type!()`"))?.to_string()
                     }
                 }
@@ -557,24 +559,24 @@ impl ToSql for PgExternEntity {
                 Ok(SqlMapping::As(ref sql)) => sql.clone(),
                 Ok(SqlMapping::Composite { array_brackets }) => {
                     if array_brackets {
-                        let composite_type = self.fn_args[1].used_ty.composite_type
+                        let composite_type = self.fn_args[1].used_ty.composite_type.as_ref()
                             .ok_or(eyre!("Found a composite type but macro expansion time did not reveal a name, use `pgx::composite_type!()`"))?;
                         format!("{composite_type}[]")
                     } else {
-                        self.fn_args[0].used_ty.composite_type
+                        self.fn_args[0].used_ty.composite_type.as_ref()
                             .ok_or(eyre!("Found a composite type but macro expansion time did not reveal a name, use `pgx::composite_type!()`"))?.to_string()
                     }
                 }
                 Ok(SqlMapping::Source { array_brackets }) => {
                     if array_brackets {
                         let composite_type = context
-                            .source_only_to_sql_type(self.fn_args[1].used_ty.ty_source)
+                            .source_only_to_sql_type(&self.fn_args[1].used_ty.ty_source)
                             .ok_or(eyre!(
                                 "Found a source only mapping but no source mapping exists for this"
                             ))?;
                         format!("{composite_type}[]")
                     } else {
-                        context.source_only_to_sql_type(self.fn_args[1].used_ty.ty_source)
+                        context.source_only_to_sql_type(&self.fn_args[1].used_ty.ty_source)
                         .ok_or(eyre!("Found a composite type but macro expansion time did not reveal a name, use `pgx::composite_type!()`"))?.to_string()
                     }
                 }
@@ -596,7 +598,7 @@ impl ToSql for PgExternEntity {
                                                         {optionals}\
                                                     );\
                                                     ",
-                                                    opname = op.opname.unwrap(),
+                                                    opname = op.opname.as_deref().unwrap(),
                                                     file = self.file,
                                                     line = self.line,
                                                     name = self.name,

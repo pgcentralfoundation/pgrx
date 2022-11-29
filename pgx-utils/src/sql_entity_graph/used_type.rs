@@ -222,18 +222,18 @@ impl UsedType {
 
         syn::parse_quote! {
             ::pgx::utils::sql_entity_graph::UsedTypeEntity {
-                ty_source: #resolved_ty_string,
+                ty_source: #resolved_ty_string.into(),
                 ty_id: core::any::TypeId::of::<#resolved_ty>(),
-                full_path: core::any::type_name::<#resolved_ty>(),
+                full_path: core::any::type_name::<#resolved_ty>().into(),
                 module_path: {
                     let ty_name = core::any::type_name::<#resolved_ty>();
                     let mut path_items: Vec<_> = ty_name.split("::").collect();
                     let _ = path_items.pop(); // Drop the one we don't want.
                     path_items.join("::")
                 },
-                composite_type: None #( .unwrap_or(Some(#composite_type_iter)) )*,
+                composite_type: None #( .unwrap_or(Some(#composite_type_iter.into())) )*,
                 variadic: #variadic,
-                default:  None #( .unwrap_or(Some(#default)) )*,
+                default:  None #( .unwrap_or(Some(#default.into())) )*,
                 /// Set via the type being an `Option`.
                 optional: #optional,
                 metadata: {
@@ -248,13 +248,13 @@ impl UsedType {
 
 #[derive(Debug, Clone, Hash, PartialEq, Eq, PartialOrd, Ord)]
 pub struct UsedTypeEntity {
-    pub ty_source: &'static str,
+    pub ty_source: String,
     pub ty_id: core::any::TypeId,
-    pub full_path: &'static str,
+    pub full_path: String,
     pub module_path: String,
-    pub composite_type: Option<&'static str>,
+    pub composite_type: Option<String>,
     pub variadic: bool,
-    pub default: Option<&'static str>,
+    pub default: Option<String>,
     /// Set via the type being an `Option`.
     pub optional: bool,
     pub metadata: FunctionMetadataTypeEntity,

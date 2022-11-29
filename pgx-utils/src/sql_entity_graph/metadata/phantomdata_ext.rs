@@ -17,7 +17,7 @@ An extension trait for [`PhantomData`][core::marker::PhantomData] offering SQL g
 Since we don't actually want to construct values during SQL generation, we use a [`PhantomData`][core::marker::PhantomData].
  */
 pub trait PhantomDataExt {
-    fn type_name(&self) -> &'static str;
+    fn type_name(&self) -> String;
     fn argument_sql(&self) -> Result<SqlMapping, ArgumentError>;
     fn return_sql(&self) -> Result<Returns, ReturnsError>;
     fn variadic(&self) -> bool;
@@ -29,7 +29,7 @@ impl<T> PhantomDataExt for PhantomData<T>
 where
     T: SqlTranslatable,
 {
-    fn type_name(&self) -> &'static str {
+    fn type_name(&self) -> String {
         T::type_name()
     }
     fn argument_sql(&self) -> Result<SqlMapping, ArgumentError> {

@@ -95,7 +95,7 @@ impl AggregateType {
         parse_quote! {
             ::pgx::utils::sql_entity_graph::AggregateTypeEntity {
                 used_ty: #used_ty_entity_tokens,
-                name: None #( .unwrap_or(Some(#name)) )*,
+                name: None #( .unwrap_or(Some(#name.into())) )*,
             }
         }
     }

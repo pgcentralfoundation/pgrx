@@ -81,7 +81,7 @@ pub trait SqlGraphIdentifier {
     /// or some combination of [`std::file`] and [`std::line`].
     fn rust_identifier(&self) -> String;
 
-    fn file(&self) -> Option<&'static str>;
+    fn file(&self) -> Option<&str>;
 
     fn line(&self) -> Option<u32>;
 }
@@ -153,7 +153,7 @@ impl SqlGraphIdentifier for SqlGraphEntity {
         }
     }
 
-    fn file(&self) -> Option<&'static str> {
+    fn file(&self) -> Option<&str> {
         match self {
             SqlGraphEntity::Schema(item) => item.file(),
             SqlGraphEntity::CustomSql(item) => item.file(),
