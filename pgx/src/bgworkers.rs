@@ -9,7 +9,7 @@ Use of this source code is governed by the MIT license that can be found in the 
 
 //! Safely create Postgres Background Workers, including with full SPI support
 //!
-//! See: [https://www.postgresql.org/docs/12/bgworker.html](https://www.postgresql.org/docs/12/bgworker.html)
+//! See: [https://www.postgresql.org/docs/current/bgworker.html](https://www.postgresql.org/docs/current/bgworker.html)
 use crate::pg_sys;
 use pgx_pg_sys::PgTryBuilder;
 use std::convert::TryInto;

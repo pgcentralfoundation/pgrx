@@ -190,7 +190,7 @@ impl<T: 'static + ?Sized> WithTypeIds for T {
     const OPTION_VARLENA_ID: Lazy<Option<TypeId>> = Lazy::new(|| None);
 }
 
-/// A type which can have it's [`core::any::TypeId`]s registered for Rust to SQL mapping.
+/// A type which can have its [`core::any::TypeId`]s registered for Rust to SQL mapping.
 ///
 /// An example use of this trait:
 ///
@@ -339,7 +339,7 @@ impl<T: 'static> WithSizedTypeIds<T> {
     }
 }
 
-/// A [`Array`] compatible type which can have it's [`core::any::TypeId`]s registered for Rust to SQL mapping.
+/// An [`Array`] compatible type which can have its [`core::any::TypeId`]s registered for Rust to SQL mapping.
 ///
 /// An example use of this trait:
 ///
@@ -431,7 +431,7 @@ impl<T: FromDatum + 'static> WithArrayTypeIds<T> {
     }
 }
 
-/// A [`PgVarlena`] compatible type which can have it's [`core::any::TypeId`]s registered for Rust to SQL mapping.
+/// A [`PgVarlena`] compatible type which can have its [`core::any::TypeId`]s registered for Rust to SQL mapping.
 ///
 /// An example use of this trait:
 ///

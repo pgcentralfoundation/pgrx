@@ -1,6 +1,5 @@
 /*!
 Code for interfacing with the layout in memory (and on disk?) of various data types within Postgres.
-Prefer to minimize exposing the contents of this module to public callers of the pgx library:
 This is not a mature module yet so prefer to avoid exposing the contents to public callers of pgx,
 as this is error-prone stuff to tamper with. It is easy to corrupt the database if an error is made.
 Yes, even though its main block of code duplicates htup::DatumWithTypeInfo.
@@ -17,12 +16,18 @@ use core::mem;
 
 /// Postgres type information, corresponds to part of a row in pg_type
 /// This layout describes T, not &T, even if passbyval: false, which would mean the datum array is effectively &[&T]
-#[derive(Debug, Clone)]
+#[derive(Clone, Copy, Debug)]
 pub(crate) struct Layout {
     // We could add more fields to this if we are curious enough, as the function we call pulls an entire row
-    pub align: Align,    // typalign
-    pub size: Size,      // typlen
-    pub passbyval: bool, // typbyval
+    pub align: Align, // typalign
+    pub size: Size,   // typlen
+    pub pass: PassBy, // typbyval
+}
+
+#[derive(Clone, Copy, Debug, PartialEq)]
+pub(crate) enum PassBy {
+    Ref,
+    Value,
 }
 
 impl Layout {
@@ -41,13 +46,27 @@ impl Layout {
         Layout {
             align: Align::try_from(typalign).unwrap(),
             size: Size::try_from(typlen).unwrap(),
-            passbyval,
+            pass: if passbyval { PassBy::Value } else { PassBy::Ref },
+        }
+    }
+
+    // Attempt to discern if a given Postgres and Rust layout are "matching" in some sense
+    // Some(usize) if they seem to agree on one, None if they do not
+    pub(crate) fn size_matches<T>(&self) -> Option<usize> {
+        const DATUM_SIZE: usize = mem::size_of::<pg_sys::Datum>();
+        match (self.pass, mem::size_of::<T>(), self.size.try_as_usize()) {
+            (PassBy::Value, rs @ (1 | 2 | 4 | 8), Some(pg @ (1 | 2 | 4 | 8))) if rs == pg => {
+                Some(rs)
+            }
+            (PassBy::Value, _, _) => None,
+            (PassBy::Ref, DATUM_SIZE, _) => Some(DATUM_SIZE),
+            (PassBy::Ref, _, _) => None,
         }
     }
 }
 
 #[repr(usize)]
-#[derive(Debug, Clone, PartialEq)]
+#[derive(Clone, Copy, Debug, PartialEq)]
 pub(crate) enum Align {
     Byte = mem::align_of::<u8>(),
     Short = mem::align_of::<libc::c_short>(),
@@ -80,7 +99,7 @@ impl Align {
     }
 }
 
-#[derive(Debug, Clone, PartialEq)]
+#[derive(Clone, Copy, Debug, PartialEq)]
 pub(crate) enum Size {
     CStr,
     Varlena,
