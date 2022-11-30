@@ -144,6 +144,9 @@ impl<'a, T: FromDatum> Array<'a, T> {
     /// Note that Array may have caused Postgres to allocate to unbox the datum,
     /// and this can hypothetically cause a memory leak if so.
     pub fn into_array_type(self) -> *const pg_sys::ArrayType {
+        // may be worth replacing this function when Toast<T> matures enough
+        // to be used as a public type with a fn(self) -> Toast<RawArray>
+
         let Array { raw, datum_slice, .. } = self;
         let _ = datum_slice;
         // Wrap the Toast<RawArray> to prevent it from deallocating itself
