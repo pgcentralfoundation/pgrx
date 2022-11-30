@@ -72,38 +72,6 @@ pub trait IntoDatum {
     fn is_compatible_with(other: pg_sys::Oid) -> bool {
         Self::type_oid() == other
     }
-
-    /// Is a Datum of this type pass by value or pass by reference?
-    ///
-    /// We provide a hardcoded list of known Postgres types that are pass by value,
-    /// but you are free to implement this yourself for custom types.
-    #[inline]
-    fn is_pass_by_value() -> bool
-    where
-        Self: 'static,
-    {
-        let my_type = std::any::TypeId::of::<Self>();
-        my_type == std::any::TypeId::of::<i8>()
-            || my_type == std::any::TypeId::of::<i16>()
-            || my_type == std::any::TypeId::of::<i32>()
-            || my_type == std::any::TypeId::of::<i64>()
-            || my_type == std::any::TypeId::of::<u8>()
-            || my_type == std::any::TypeId::of::<u16>()
-            || my_type == std::any::TypeId::of::<u32>()
-            || my_type == std::any::TypeId::of::<u64>()
-            || my_type == std::any::TypeId::of::<f32>()
-            || my_type == std::any::TypeId::of::<f64>()
-            || my_type == std::any::TypeId::of::<bool>()
-            || my_type == std::any::TypeId::of::<()>()
-            || my_type == std::any::TypeId::of::<crate::Time>()
-            || my_type == std::any::TypeId::of::<crate::TimeWithTimeZone>()
-            || my_type == std::any::TypeId::of::<crate::Timestamp>()
-            || my_type == std::any::TypeId::of::<crate::TimestampWithTimeZone>()
-            || my_type == std::any::TypeId::of::<crate::Date>()
-            || my_type == std::any::TypeId::of::<PgOid>()
-            || my_type == std::any::TypeId::of::<pg_sys::Datum>()
-            || my_type == std::any::TypeId::of::<Option<pg_sys::Datum>>()
-    }
 }
 
 /// for supporting NULL as the None value of an Option<T>
