@@ -92,14 +92,14 @@ use std::ptr::NonNull;
 /// }
 /// ```
 #[repr(transparent)]
-pub struct PgBox<T, AllocatedBy: WhoAllocated<T> = AllocatedByPostgres> {
+pub struct PgBox<T, AllocatedBy: WhoAllocated = AllocatedByPostgres> {
     ptr: Option<NonNull<T>>,
     __marker: PhantomData<AllocatedBy>,
 }
 
 /// A trait to track if the contents of a [PgBox] were allocated by Rust or Postgres.
-pub trait WhoAllocated<T> {
-    fn free(ptr: *mut T);
+pub trait WhoAllocated {
+    fn free(ptr: *mut std::os::raw::c_void);
 }
 
 /// Indicates the [PgBox] contents were allocated by Postgres.  This is also PgBox' default
@@ -109,16 +109,16 @@ pub struct AllocatedByPostgres;
 /// Indicates the [PgBox] contents were allocated by Rust.
 pub struct AllocatedByRust;
 
-impl<T> WhoAllocated<T> for AllocatedByPostgres {
+impl WhoAllocated for AllocatedByPostgres {
     /// Doesn't do anything
-    fn free(_ptr: *mut T) {}
+    fn free(_ptr: *mut std::os::raw::c_void) {}
 }
-impl<T> WhoAllocated<T> for AllocatedByRust {
+impl WhoAllocated for AllocatedByRust {
     /// Uses [pg_sys::pfree] to free the specified pointer
     #[inline]
-    fn free(ptr: *mut T) {
+    fn free(ptr: *mut std::os::raw::c_void) {
         unsafe {
-            pg_sys::pfree(ptr as *mut _);
+            pg_sys::pfree(ptr.cast());
         }
     }
 }
@@ -193,7 +193,7 @@ impl<T> PgBox<T, AllocatedByRust> {
     }
 }
 
-impl<T, AllocatedBy: WhoAllocated<T>> PgBox<T, AllocatedBy> {
+impl<T, AllocatedBy: WhoAllocated> PgBox<T, AllocatedBy> {
     /// Box a pointer that was allocated within Rust
     ///
     /// When this `PgBox<T>` is dropped, the boxed memory is freed.  Since Rust
@@ -373,7 +373,7 @@ impl<T, AllocatedBy: WhoAllocated<T>> PgBox<T, AllocatedBy> {
     }
 }
 
-impl<T, AllocatedBy: WhoAllocated<T>> Deref for PgBox<T, AllocatedBy> {
+impl<T, AllocatedBy: WhoAllocated> Deref for PgBox<T, AllocatedBy> {
     type Target = T;
 
     #[track_caller]
@@ -385,7 +385,7 @@ impl<T, AllocatedBy: WhoAllocated<T>> Deref for PgBox<T, AllocatedBy> {
     }
 }
 
-impl<T, AllocatedBy: WhoAllocated<T>> DerefMut for PgBox<T, AllocatedBy> {
+impl<T, AllocatedBy: WhoAllocated> DerefMut for PgBox<T, AllocatedBy> {
     #[track_caller]
     fn deref_mut(&mut self) -> &mut T {
         match self.ptr.as_mut() {
@@ -395,10 +395,10 @@ impl<T, AllocatedBy: WhoAllocated<T>> DerefMut for PgBox<T, AllocatedBy> {
     }
 }
 
-impl<T, AllocatedBy: WhoAllocated<T>> Drop for PgBox<T, AllocatedBy> {
+impl<T, AllocatedBy: WhoAllocated> Drop for PgBox<T, AllocatedBy> {
     fn drop(&mut self) {
         if let Some(ptr) = self.ptr {
-            AllocatedBy::free(ptr.as_ptr());
+            AllocatedBy::free(ptr.as_ptr().cast());
         }
     }
 }

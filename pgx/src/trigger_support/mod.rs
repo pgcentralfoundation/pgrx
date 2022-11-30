@@ -17,7 +17,7 @@ use pgx::{pg_trigger, pg_sys, heap_tuple::{PgHeapTuple, PgHeapTupleError}, WhoAl
 
 #[pg_trigger]
 fn trigger_example(trigger: &PgTrigger) -> Result<
-    PgHeapTuple<'_, impl WhoAllocated<pg_sys::HeapTupleData>>,
+    PgHeapTuple<'_, impl WhoAllocated>,
     PgHeapTupleError,
 > {
     Ok(unsafe { trigger.current() }.expect("No current HeapTuple"))
@@ -66,7 +66,7 @@ This can also be done via the [`extension_sql`][crate::extension_sql] attribute:
 #
 # #[pg_trigger]
 # fn trigger_example(trigger: &PgTrigger) -> Result<
-#    PgHeapTuple<'_, impl WhoAllocated<pg_sys::HeapTupleData>>,
+#    PgHeapTuple<'_, impl WhoAllocated>,
 #    PgHeapTupleError,
 # > {
 #     Ok(unsafe { trigger.current() }.expect("No current HeapTuple"))
@@ -138,7 +138,7 @@ enum CustomTriggerError {
 
 #[pg_trigger]
 fn example_custom_error(trigger: &PgTrigger) -> Result<
-    PgHeapTuple<'_, impl WhoAllocated<pg_sys::HeapTupleData>>,
+    PgHeapTuple<'_, impl WhoAllocated>,
     CustomTriggerError,
 > {
     unsafe { trigger.current() }.ok_or(CustomTriggerError::NoCurrentHeapTuple)
@@ -191,7 +191,7 @@ use pgx::{pg_trigger, pg_sys, heap_tuple::{PgHeapTuple, PgHeapTupleError}, WhoAl
 
 #[pg_trigger]
 fn trigger_safe(trigger: &PgTrigger) -> Result<
-    PgHeapTuple<'_, impl WhoAllocated<pg_sys::HeapTupleData>>,
+    PgHeapTuple<'_, impl WhoAllocated>,
     PgTriggerError,
 > {
     let trigger_safe = unsafe { trigger.to_safe() }?;
