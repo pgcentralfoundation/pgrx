@@ -104,7 +104,35 @@ impl TryFrom<libc::c_int> for SpiError {
 
 pub struct Spi;
 
-pub struct SpiClient<'a>(PhantomData<&'a ()>);
+// TODO: should `'conn` be invariant?
+pub struct SpiClient<'conn>(PhantomData<&'conn SpiConnection>);
+
+/// a struct to manage our SPI connection lifetime
+struct SpiConnection(PhantomData<*mut ()>);
+
+impl SpiConnection {
+    /// Connect to Postgres' SPI system
+    fn connect() -> Self {
+        // connect to SPI
+        Spi::check_status(unsafe { pg_sys::SPI_connect() });
+        SpiConnection(PhantomData)
+    }
+}
+
+impl Drop for SpiConnection {
+    /// when SpiConnection is dropped, we make sure to disconnect from SPI
+    fn drop(&mut self) {
+        // disconnect from SPI
+        Spi::check_status(unsafe { pg_sys::SPI_finish() });
+    }
+}
+
+impl SpiConnection {
+    /// Return a client that with a lifetime scoped to this connection.
+    fn client(&self) -> SpiClient<'_> {
+        SpiClient(PhantomData)
+    }
+}
 
 #[derive(Debug)]
 pub struct SpiTupleTable {
@@ -250,36 +278,17 @@ impl Spi {
     /// use pgx::*;
     /// Spi::connect(|client| Ok(Some(client)));
     /// ```
-    pub fn connect<R, F: FnOnce(SpiClient) -> std::result::Result<Option<R>, SpiError>>(
+    pub fn connect<R, F: FnOnce(SpiClient<'_>) -> std::result::Result<Option<R>, SpiError>>(
         f: F,
     ) -> Option<R> {
-        /// a struct to manage our SPI connection lifetime
-        struct SpiConnection;
-        impl SpiConnection {
-            /// Connect to Postgres' SPI system
-            fn connect() -> Self {
-                // connect to SPI
-                Spi::check_status(unsafe { pg_sys::SPI_connect() });
-                SpiConnection
-            }
-        }
-
-        impl Drop for SpiConnection {
-            /// when SpiConnection is dropped, we make sure to disconnect from SPI
-            fn drop(&mut self) {
-                // disconnect from SPI
-                Spi::check_status(unsafe { pg_sys::SPI_finish() });
-            }
-        }
-
         // connect to SPI
-        let _connection = SpiConnection::connect();
+        let connection = SpiConnection::connect();
 
         // run the provided closure within the memory context that SPI_connect()
         // just put us un.  We'll disconnect from SPI when the closure is finished.
         // If there's a panic or elog(ERROR), we don't care about also disconnecting from
         // SPI b/c Postgres will do that for us automatically
-        f(SpiClient(PhantomData)).unwrap()
+        f(connection.client()).unwrap()
     }
 
     pub fn check_status(status_code: i32) -> SpiOk {
@@ -310,7 +319,7 @@ impl<'a> SpiClient<'a> {
         // TODO:  can we detect if the command counter (or something?) has incremented and if yes
         //        then we set read_only=false, else we can set it to true?
         //        Is this even a good idea?
-        SpiClient::execute(query, false, limit, args)
+        self.execute(query, false, limit, args)
     }
 
     /// perform any query (including utility statements) that modify the database in some way
@@ -320,10 +329,11 @@ impl<'a> SpiClient<'a> {
         limit: Option<i64>,
         args: Option<Vec<(PgOid, Option<pg_sys::Datum>)>>,
     ) -> SpiTupleTable {
-        SpiClient::execute(query, false, limit, args)
+        self.execute(query, false, limit, args)
     }
 
     fn execute(
+        &self,
         query: &str,
         read_only: bool,
         limit: Option<i64>,
