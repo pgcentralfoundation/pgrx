@@ -13,6 +13,7 @@ use crate::{pg_sys, FromDatum, IntoDatum, Json, PgMemoryContexts, PgOid};
 use std::collections::HashMap;
 use std::ffi::CStr;
 use std::fmt::Debug;
+use std::marker::PhantomData;
 use std::mem;
 use std::ops::{Index, IndexMut};
 
@@ -103,7 +104,7 @@ impl TryFrom<libc::c_int> for SpiError {
 
 pub struct Spi;
 
-pub struct SpiClient(());
+pub struct SpiClient<'a>(PhantomData<&'a ()>);
 
 #[derive(Debug)]
 pub struct SpiTupleTable {
@@ -232,7 +233,7 @@ impl Spi {
     }
 
     /// execute SPI commands via the provided `SpiClient`
-    pub fn execute<F: FnOnce(&SpiClient) + std::panic::UnwindSafe>(f: F) {
+    pub fn execute<F: FnOnce(SpiClient) + std::panic::UnwindSafe>(f: F) {
         Spi::connect(|client| {
             f(client);
             Ok(Some(()))
@@ -241,7 +242,15 @@ impl Spi {
 
     /// execute SPI commands via the provided `SpiClient` and return a value from SPI which is
     /// automatically copied into the `CurrentMemoryContext` at the time of this function call
-    pub fn connect<R, F: FnOnce(&SpiClient) -> std::result::Result<Option<R>, SpiError>>(
+    ///
+    /// Note that `SpiClient` is scoped to the connection lifetime and the following code will
+    /// not compile:
+    ///
+    /// ```rust,compile_fail
+    /// use pgx::*;
+    /// Spi::connect(|client| Ok(Some(client)));
+    /// ```
+    pub fn connect<R, F: FnOnce(SpiClient) -> std::result::Result<Option<R>, SpiError>>(
         f: F,
     ) -> Option<R> {
         /// a struct to manage our SPI connection lifetime
@@ -270,7 +279,7 @@ impl Spi {
         // just put us un.  We'll disconnect from SPI when the closure is finished.
         // If there's a panic or elog(ERROR), we don't care about also disconnecting from
         // SPI b/c Postgres will do that for us automatically
-        f(&SpiClient(())).unwrap()
+        f(SpiClient(PhantomData)).unwrap()
     }
 
     pub fn check_status(status_code: i32) -> SpiOk {
@@ -282,7 +291,7 @@ impl Spi {
     }
 }
 
-impl SpiClient {
+impl<'a> SpiClient<'a> {
     /// perform a SELECT statement
     pub fn select(
         &self,
