@@ -111,7 +111,7 @@ impl TryFrom<libc::c_int> for SpiError {
 }
 
 #[derive(thiserror::Error, Debug)]
-pub enum Error<E: Debug = anyhow::Error> {
+pub enum Error<E: Debug = ()> {
     #[error("SPI error: {0:?}")]
     SpiError(#[from] SpiError),
     #[error("Datum error: {0}")]
