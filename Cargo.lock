@@ -1468,6 +1468,7 @@ dependencies = [
 name = "pgx"
 version = "0.6.1"
 dependencies = [
+ "anyhow",
  "atomic-traits",
  "bitflags",
  "bitvec",

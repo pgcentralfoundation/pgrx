@@ -65,6 +65,7 @@ pub extern "C" fn bgworker_return_value(arg: pg_sys::Datum) {
             )
         })
         .unwrap()
+        .unwrap()
     } else {
         0
     };
@@ -108,6 +109,7 @@ mod tests {
             124,
             Spi::get_one::<i32>("SELECT v FROM tests.bgworker_test;")
                 .expect("no return value from the worker")
+                .unwrap()
         );
     }
 
@@ -159,6 +161,7 @@ mod tests {
             123,
             Spi::get_one::<i32>("SELECT v FROM tests.bgworker_test_return;")
                 .expect("no return value from the worker")
+                .unwrap()
         );
     }
 }

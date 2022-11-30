@@ -58,7 +58,8 @@ mod tests {
                 ('{\"item\":\"Foo\"}'::OrderedThing), \
                 ('{\"item\":\"Bar\"}'::OrderedThing))\
                 items(i);",
-        );
+        )
+        .unwrap();
 
         assert_eq!(
             items,

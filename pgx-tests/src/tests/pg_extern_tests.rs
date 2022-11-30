@@ -46,13 +46,14 @@ mod tests {
         let result = Spi::get_one::<bool>(
             "SELECT provolatile = 'i' FROM pg_proc WHERE proname = 'is_immutable'",
         )
-        .expect("failed to get SPI result");
+        .expect("failed to get SPI result")
+        .unwrap();
         assert!(result)
     }
 
     // Ensures `@MODULE_PATHNAME@` and `@FUNCTION_NAME@` are handled.
     #[pg_extern(sql = r#"
-        CREATE FUNCTION tests."overridden_sql_with_fn_name"() RETURNS void
+        CREATE FUNCTION tests."overridden_sql_with_fn_name"() RETURNS boolean
         STRICT
         LANGUAGE c /* Rust */
         AS '@MODULE_PATHNAME@', '@FUNCTION_NAME@';
@@ -64,7 +65,8 @@ mod tests {
     #[pg_test]
     fn test_overridden_sql_with_fn_name() {
         let result = Spi::get_one::<bool>(r#"SELECT tests."overridden_sql_with_fn_name"()"#)
-            .expect("failed to get SPI result");
+            .expect("failed to get SPI result")
+            .unwrap();
         assert!(result)
     }
 
@@ -97,12 +99,14 @@ mod tests {
     #[pg_test]
     fn test_create_or_replace() {
         let replace_result = Spi::get_one::<bool>(r#"SELECT tests."create_or_replace_method"()"#)
-            .expect("failed to get SPI result");
+            .expect("failed to get SPI result")
+            .unwrap();
         assert!(replace_result);
 
         let create_result =
             Spi::get_one::<i32>(r#"SELECT tests."create_or_replace_method_other"()"#)
-                .expect("failed to get SPI result");
+                .expect("failed to get SPI result")
+                .unwrap();
         assert_eq!(create_result, 42);
     }
 
@@ -115,7 +119,8 @@ mod tests {
     fn test_anyele_type() {
         let interval_type =
             Spi::get_one::<i32>(r#"SELECT tests."anyele_type"('5 hours'::interval)"#)
-                .expect("failed to get SPI result");
+                .expect("failed to get SPI result")
+                .unwrap();
         assert_eq!(interval_type as u32, pg_sys::INTERVALOID);
     }
 
@@ -127,7 +132,8 @@ mod tests {
     #[pg_test]
     fn test_name() {
         let result = Spi::get_one::<bool>(r#"SELECT tests."custom_name"()"#)
-            .expect("failed to get SPI result");
+            .expect("failed to get SPI result")
+            .unwrap();
         assert!(result);
     }
 }

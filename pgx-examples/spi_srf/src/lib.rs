@@ -45,23 +45,19 @@ fn calculate_human_years() -> TableIterator<
     */
     let query = "SELECT * FROM spi_srf.dog_daycare;";
 
-    let mut results = Vec::new();
-
-    Spi::connect(|client| {
-        let mut tup_table: SpiTupleTable = client.select(query, None, None);
-
-        while let Some(row) = tup_table.next() {
+    let results = Spi::connect(|client| {
+        let tup_table: SpiTupleTable = client.select(query, None, None);
+        Ok::<_, pgx::spi::Error>(tup_table.map(|row| {
             let dog_name: String = row["dog_name"].value().unwrap();
             let dog_age: i32 = row["dog_age"].value().unwrap();
             let dog_breed: String = row["dog_breed"].value().unwrap();
             let human_age: i32 = dog_age * 7;
-            results.push((dog_name, dog_age, dog_breed, human_age));
-        }
+            (dog_name, dog_age, dog_breed, human_age)
+        }))
+    })
+    .unwrap();
 
-        Ok(Some(()))
-    });
-
-    TableIterator::new(results.into_iter())
+    TableIterator::new(results)
 }
 
 #[pg_extern]
@@ -83,23 +79,17 @@ fn filter_by_breed(
     let query = "SELECT * FROM spi_srf.dog_daycare WHERE dog_breed = $1;";
     let args = vec![(PgBuiltInOids::TEXTOID.oid(), breed.into_datum())];
 
-    let mut results = Vec::new();
+    let results =
+        Spi::connect(|client| {
+            let tup_table: SpiTupleTable = client.select(query, None, Some(args));
 
-    Spi::connect(|client| {
-        let mut tup_table: SpiTupleTable = client.select(query, None, Some(args));
+            Ok::<_, pgx::spi::Error>(tup_table.map(|row| {
+                (row["dog_name"].value(), row["dog_age"].value(), row["dog_breed"].value())
+            }))
+        })
+        .unwrap();
 
-        while let Some(row) = tup_table.next() {
-            results.push((
-                row["dog_name"].value(),
-                row["dog_age"].value(),
-                row["dog_breed"].value(),
-            ));
-        }
-
-        Ok(Some(()))
-    });
-
-    TableIterator::new(results.into_iter())
+    TableIterator::new(results)
 }
 
 #[cfg(any(test, feature = "pg_test"))]

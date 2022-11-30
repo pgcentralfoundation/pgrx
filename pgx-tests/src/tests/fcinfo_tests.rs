@@ -249,13 +249,15 @@ mod tests {
 
     #[pg_test]
     unsafe fn test_takes_i8() {
-        let result = Spi::get_one::<i8>("SELECT takes_i8('a');").expect("SPI result was NULL");
+        let result =
+            Spi::get_one::<i8>("SELECT takes_i8('a');").unwrap().expect("SPI result was NULL");
         assert_eq!(result, 'a' as i8);
     }
 
     #[pg_test]
     unsafe fn test_takes_char() {
-        let result = Spi::get_one::<char>("SELECT takes_char('🚨');").expect("SPI result was NULL");
+        let result =
+            Spi::get_one::<char>("SELECT takes_char('🚨');").unwrap().expect("SPI result was NULL");
         assert_eq!(result, '🚨');
     }
 
@@ -312,13 +314,13 @@ mod tests {
 
     #[pg_test]
     fn test_returns_void() {
-        let result = Spi::get_one::<()>("SELECT returns_void();");
+        let result = Spi::get_one::<()>("SELECT returns_void();").unwrap();
         assert_eq!(result, None)
     }
 
     #[pg_test]
     fn test_returns_tuple() {
-        let result = Spi::get_two::<i32, String>("SELECT * FROM returns_tuple();");
+        let result = Spi::get_two::<i32, String>("SELECT * FROM returns_tuple();").unwrap();
         assert_eq!((Some(42), Some("pgx".into())), result)
     }
 
@@ -328,13 +330,15 @@ mod tests {
     fn test_same_name() {
         assert_eq!("test", same_name("test"));
     }
+
     #[pg_test]
     fn test_null_strict_type() {
-        assert_eq!(None, Spi::get_one::<NullStrict>("SELECT null::NullStrict"));
+        assert_eq!(None, Spi::get_one::<NullStrict>("SELECT null::NullStrict").unwrap());
     }
+
     #[pg_test]
     #[should_panic(expected = "An error message")]
     fn test_null_error_type() {
-        assert_eq!(None, Spi::get_one::<NullError>("SELECT null::NullError"));
+        assert_eq!(None, Spi::get_one::<NullError>("SELECT null::NullError").unwrap());
     }
 }

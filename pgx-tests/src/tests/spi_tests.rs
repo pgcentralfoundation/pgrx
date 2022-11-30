@@ -38,43 +38,46 @@ mod tests {
     #[pg_test]
     fn test_spi_returns_primitive() {
         let rc = Spi::connect(|client| {
-            Ok(client.select("SELECT 42", None, None).first().get_datum::<i32>(1))
+            client.select("SELECT 42", None, None).first().get_datum::<i32>(1)
         });
 
-        assert_eq!(42, rc.expect("SPI failed to return proper value"))
+        assert_eq!(42, rc.expect("SPI failed to return proper value").unwrap())
     }
 
     #[pg_test]
     fn test_spi_returns_str() {
         let rc = Spi::connect(|client| {
-            Ok(client.select("SELECT 'this is a test'", None, None).first().get_datum::<&str>(1))
+            client.select("SELECT 'this is a test'", None, None).first().get_datum::<&str>(1)
         });
 
-        assert_eq!("this is a test", rc.expect("SPI failed to return proper value"))
+        assert_eq!("this is a test", rc.expect("SPI failed to return proper value").unwrap())
     }
 
     #[pg_test]
     fn test_spi_returns_string() {
         let rc = Spi::connect(|client| {
-            Ok(client.select("SELECT 'this is a test'", None, None).first().get_datum::<String>(1))
+            client.select("SELECT 'this is a test'", None, None).first().get_datum::<String>(1)
         });
 
-        assert_eq!("this is a test", rc.expect("SPI failed to return proper value"))
+        assert_eq!("this is a test", rc.expect("SPI failed to return proper value").unwrap())
     }
 
     #[pg_test]
     fn test_spi_get_one() {
         Spi::execute(|client| {
             let i = client.select("SELECT 42::bigint", None, None).first().get_one::<i64>();
-            assert_eq!(42, i.unwrap());
+            assert_eq!(42, i.unwrap().unwrap());
         });
     }
 
     #[pg_test]
     fn test_spi_get_two() {
         Spi::execute(|client| {
-            let (i, s) =
-                client.select("SELECT 42, 'test'", None, None).first().get_two::<i64, &str>();
+            let (i, s) = client
+                .select("SELECT 42, 'test'", None, None)
+                .first()
+                .get_two::<i64, &str>()
+                .unwrap();
 
             assert_eq!(42, i.unwrap());
             assert_eq!("test", s.unwrap());
@@ -87,7 +90,8 @@ mod tests {
             let (i, s, b) = client
                 .select("SELECT 42, 'test', true", None, None)
                 .first()
-                .get_three::<i64, &str, bool>();
+                .get_three::<i64, &str, bool>()
+                .unwrap();
 
             assert_eq!(42, i.unwrap());
             assert_eq!("test", s.unwrap());
@@ -98,7 +102,8 @@ mod tests {
     #[pg_test]
     fn test_spi_get_two_with_failure() {
         Spi::execute(|client| {
-            let (i, s) = client.select("SELECT 42", None, None).first().get_two::<i64, &str>();
+            let (i, s) =
+                client.select("SELECT 42", None, None).first().get_two::<i64, &str>().unwrap();
 
             assert_eq!(42, i.unwrap());
             assert!(s.is_none());
@@ -111,7 +116,8 @@ mod tests {
             let (i, s, b) = client
                 .select("SELECT 42, 'test'", None, None)
                 .first()
-                .get_three::<i64, &str, bool>();
+                .get_three::<i64, &str, bool>()
+                .unwrap();
 
             assert_eq!(42, i.unwrap());
             assert_eq!("test", s.unwrap());
@@ -121,7 +127,7 @@ mod tests {
 
     #[pg_test]
     fn test_spi_select_zero_rows() {
-        assert!(Spi::get_one::<i32>("SELECT 1 LIMIT 0").is_none());
+        assert!(Spi::get_one::<i32>("SELECT 1 LIMIT 0").unwrap().is_none());
     }
 
     #[pg_test]
@@ -183,7 +189,8 @@ mod tests {
         let result = Spi::get_one_with_args::<i32>(
             "INSERT INTO tests.null_test VALUES ($1) RETURNING 1",
             vec![(PgBuiltInOids::UUIDOID.oid(), None)],
-        );
+        )
+        .unwrap();
         assert_eq!(result, Some(1));
     }
 
@@ -223,6 +230,7 @@ mod tests {
             assert_eq!(sum_all(cursor.fetch(3)), 1 + 2 + 3);
             Ok(Some(cursor.detach_into_name()))
         })
+        .unwrap()
         .unwrap();
 
         fn sum_all(table: pgx::SpiTupleTable) -> i32 {
@@ -285,7 +293,7 @@ mod tests {
     #[pg_test]
     fn test_connect_return_anything() {
         struct T;
-        assert!(matches!(Spi::connect(|_| Ok(Some(T))).unwrap(), T));
+        assert!(matches!(Spi::connect(|_| Ok::<_, pgx::spi::Error>(Some(T))).unwrap().unwrap(), T));
     }
 
     #[pg_test]
@@ -320,5 +328,18 @@ mod tests {
             assert!(a.get_heap_tuple().is_none());
             assert!(a.get_datum::<i32>(1).is_none());
         });
+    }
+
+    fn test_spi_unwind_safe() {
+        struct T;
+        assert!(matches!(Spi::connect(|_| Ok::<_, pgx::spi::Error>(Some(T))).unwrap().unwrap(), T));
+    }
+
+    #[pg_test]
+    fn test_error_propagation() {
+        #[derive(Debug)]
+        struct Error;
+        let result = Spi::connect(|_| Err::<(), _>(pgx::spi::Error::Other(Error)));
+        assert!(matches!(result, Err(pgx::spi::Error::Other(Error))))
     }
 }

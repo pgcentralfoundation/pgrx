@@ -79,7 +79,7 @@ mod tests {
 
     #[pg_test(error = "panic in walker")]
     fn test_panic_in_extern_c_fn() {
-        Spi::get_one::<()>("SELECT crash()");
+        Spi::get_one::<()>("SELECT crash()").unwrap();
     }
 
     #[pg_test]

@@ -318,6 +318,16 @@ impl<'a, AllocatedBy: WhoAllocated> IntoDatum for PgHeapTuple<'a, AllocatedBy> {
     fn composite_type_oid(&self) -> Option<Oid> {
         Some(self.tupdesc.oid())
     }
+
+    fn is_compatible_with(other: pg_sys::Oid) -> bool {
+        fn is_composite(oid: pg_sys::Oid) -> bool {
+            unsafe {
+                let entry = pg_sys::lookup_type_cache(oid, pg_sys::TYPECACHE_TUPDESC as _);
+                (*entry).typtype == pg_sys::RELKIND_COMPOSITE_TYPE as i8
+            }
+        }
+        Self::type_oid() == other || is_composite(other)
+    }
 }
 
 impl<'a, AllocatedBy: WhoAllocated> PgHeapTuple<'a, AllocatedBy> {

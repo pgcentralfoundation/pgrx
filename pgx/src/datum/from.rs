@@ -123,6 +123,26 @@ pub trait FromDatum {
             Ok(FromDatum::from_polymorphic_datum(datum, is_null, type_oid))
         }
     }
+
+    /// A version of `try_from_datum` that switches to the given context to convert from Datum
+    #[inline]
+    unsafe fn try_from_datum_in_memory_context(
+        memory_context: PgMemoryContexts,
+        datum: pg_sys::Datum,
+        is_null: bool,
+        type_oid: pg_sys::Oid,
+    ) -> Result<Option<Self>, TryFromDatumError>
+    where
+        Self: Sized + IntoDatum + 'static,
+    {
+        if !Self::is_compatible_with(type_oid) {
+            Err(TryFromDatumError::IncompatibleTypes)
+        } else if !is_null && datum.is_null() && !Self::is_pass_by_value() {
+            Err(TryFromDatumError::NullDatumPointer)
+        } else {
+            Ok(FromDatum::from_datum_in_memory_context(memory_context, datum, is_null, type_oid))
+        }
+    }
 }
 
 /// for pg_sys::Datum

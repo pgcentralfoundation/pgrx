@@ -61,4 +61,5 @@ serde = { version = "1.0.149", features = [ "derive" ] } # impls on pub types
 serde_cbor = "0.11.2" # derive(PostgresType)
 serde_json = "1.0.89" # everything JSON
 time = { version = "0.3.17", features = ["formatting", "parsing", "alloc", "macros"], optional = true }
+anyhow = "1.0.66"
 
