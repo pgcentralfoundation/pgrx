@@ -176,7 +176,8 @@ mod tests {
     #[pg_test]
     fn test_accept_date_now() {
         let result = Spi::get_one::<bool>("SELECT accept_date(now()::date) = now()::date;")
-            .expect("failed to get SPI result");
+            .expect("failed to get SPI result")
+            .unwrap();
         assert!(result)
     }
 
@@ -184,7 +185,8 @@ mod tests {
     fn test_accept_date_yesterday() {
         let result =
             Spi::get_one::<bool>("SELECT accept_date('yesterday'::date) = 'yesterday'::date;")
-                .expect("failed to get SPI result");
+                .expect("failed to get SPI result")
+                .unwrap();
         assert!(result)
     }
 
@@ -192,7 +194,8 @@ mod tests {
     fn test_accept_date_tomorrow() {
         let result =
             Spi::get_one::<bool>("SELECT accept_date('tomorrow'::date) = 'tomorrow'::date;")
-                .expect("failed to get SPI result");
+                .expect("failed to get SPI result")
+                .unwrap();
         assert!(result)
     }
 
@@ -200,7 +203,8 @@ mod tests {
     fn test_accept_date_neg_infinity() {
         let result =
             Spi::get_one::<bool>("SELECT accept_date('-infinity'::date) = '-infinity'::date;")
-                .expect("failed to get SPI result");
+                .expect("failed to get SPI result")
+                .unwrap();
         assert!(result)
     }
 
@@ -208,7 +212,8 @@ mod tests {
     fn test_accept_date_infinity() {
         let result =
             Spi::get_one::<bool>("SELECT accept_date('infinity'::date) = 'infinity'::date;")
-                .expect("failed to get SPI result");
+                .expect("failed to get SPI result")
+                .unwrap();
         assert!(result)
     }
 
@@ -216,7 +221,8 @@ mod tests {
     fn test_accept_date_large_date() {
         let result =
             Spi::get_one::<bool>("SELECT accept_date('10001-01-01'::date) = '10001-01-01'::date;")
-                .expect("failed to get SPI result");
+                .expect("failed to get SPI result")
+                .unwrap();
         assert!(result)
     }
 
@@ -224,7 +230,8 @@ mod tests {
     fn test_accept_date_random() {
         let result =
             Spi::get_one::<bool>("SELECT accept_date('1823-03-28'::date) = '1823-03-28'::date;")
-                .expect("failed to get SPI result");
+                .expect("failed to get SPI result")
+                .unwrap();
         assert!(result)
     }
 
@@ -233,7 +240,8 @@ mod tests {
         let result = Spi::get_one::<bool>(
             "SELECT accept_date_round_trip('10001-01-01'::date) = '10001-01-01'::date;",
         )
-        .expect("failed to get SPI result");
+        .expect("failed to get SPI result")
+        .unwrap();
         assert!(result)
     }
 
@@ -242,14 +250,16 @@ mod tests {
         let result = Spi::get_one::<bool>(
             "SELECT accept_date_round_trip('1823-03-28'::date) = '1823-03-28'::date;",
         )
-        .expect("failed to get SPI result");
+        .expect("failed to get SPI result")
+        .unwrap();
         assert!(result)
     }
 
     #[pg_test]
     fn test_accept_time_now() {
         let result = Spi::get_one::<bool>("SELECT accept_time(now()::time) = now()::time;")
-            .expect("failed to get SPI result");
+            .expect("failed to get SPI result")
+            .unwrap();
         assert!(result)
     }
 
@@ -265,7 +275,8 @@ mod tests {
                 + 'allballs'::time
             );",
         )
-        .expect("failed to get SPI result");
+        .expect("failed to get SPI result")
+        .unwrap();
 
         assert_eq!(result, Time::ALLBALLS)
     }
@@ -275,7 +286,8 @@ mod tests {
         let result = Spi::get_one::<bool>(
             "SELECT accept_time('yesterday'::timestamp::time) = 'yesterday'::timestamp::time;",
         )
-        .expect("failed to get SPI result");
+        .expect("failed to get SPI result")
+        .unwrap();
         assert!(result)
     }
 
@@ -284,7 +296,8 @@ mod tests {
         let result = Spi::get_one::<bool>(
             "SELECT accept_time('tomorrow'::timestamp::time) = 'tomorrow'::timestamp::time;",
         )
-        .expect("failed to get SPI result");
+        .expect("failed to get SPI result")
+        .unwrap();
         assert!(result)
     }
 
@@ -293,7 +306,8 @@ mod tests {
         let result = Spi::get_one::<bool>(
             "SELECT accept_time('1823-03-28 7:54:03 am'::time) = '1823-03-28 7:54:03 am'::time;",
         )
-        .expect("failed to get SPI result");
+        .expect("failed to get SPI result")
+        .unwrap();
         assert!(result)
     }
 
@@ -301,28 +315,31 @@ mod tests {
     fn test_accept_timestamp() {
         let result =
             Spi::get_one::<bool>("SELECT accept_timestamp(now()::timestamp) = now()::timestamp;")
-                .expect("failed to get SPI result");
+                .expect("failed to get SPI result")
+                .unwrap();
         assert!(result)
     }
 
     #[pg_test]
     fn test_accept_timestamp_with_time_zone() {
         let result = Spi::get_one::<bool>("SELECT accept_timestamp_with_time_zone(now()) = now();")
-            .expect("failed to get SPI result");
+            .expect("failed to get SPI result")
+            .unwrap();
         assert!(result)
     }
 
     #[pg_test]
     fn test_accept_timestamp_with_time_zone_not_utc() {
         let result = Spi::get_one::<bool>("SELECT accept_timestamp_with_time_zone('1990-01-23 03:45:00-07') = '1990-01-23 03:45:00-07'::timestamp with time zone;")
-            .expect("failed to get SPI result");
+            .expect("failed to get SPI result").unwrap();
         assert!(result)
     }
 
     #[pg_test]
     fn test_return_3pm_mountain_time() {
         let result = Spi::get_one::<TimestampWithTimeZone>("SELECT return_3pm_mountain_time();")
-            .expect("failed to get SPI result");
+            .expect("failed to get SPI result")
+            .unwrap();
 
         let offset: time::OffsetDateTime = result.try_into().unwrap();
 
@@ -334,7 +351,8 @@ mod tests {
         let ts = Spi::get_one::<TimestampWithTimeZone>(
             "SELECT '2020-02-18 14:08 -07'::timestamp with time zone",
         )
-        .expect("failed to get SPI result");
+        .expect("failed to get SPI result")
+        .unwrap();
 
         let datetime: time::PrimitiveDateTime = ts.try_into().unwrap();
 
@@ -344,7 +362,8 @@ mod tests {
     #[pg_test]
     fn test_is_timestamp_utc() {
         let ts = Spi::get_one::<Timestamp>("SELECT '2020-02-18 14:08'::timestamp")
-            .expect("failed to get SPI result");
+            .expect("failed to get SPI result")
+            .unwrap();
         let datetime: time::PrimitiveDateTime = ts.try_into().unwrap();
         assert_eq!(datetime.hour(), 14);
     }
@@ -354,7 +373,8 @@ mod tests {
         let result = Spi::get_one::<i64>(
             "SELECT timestamptz_to_i64('2000-01-01 00:01:00.0000000+00'::timestamptz)",
         )
-        .expect("failed to get SPI result");
+        .expect("failed to get SPI result")
+        .unwrap();
 
         assert_eq!(result, Duration::from_secs(60).as_micros() as i64);
     }
@@ -364,7 +384,8 @@ mod tests {
         let result = Spi::get_one::<bool>(
             "SELECT accept_timestamp_with_time_zone_offset_round_trip(now()) = now()",
         )
-        .expect("failed to get SPI result");
+        .expect("failed to get SPI result")
+        .unwrap();
 
         assert!(result);
     }
@@ -374,7 +395,8 @@ mod tests {
         let result = Spi::get_one::<bool>(
             "SELECT accept_timestamp_with_time_zone_datetime_round_trip(now()) = now()",
         )
-        .expect("failed to get SPI result");
+        .expect("failed to get SPI result")
+        .unwrap();
 
         assert!(result);
     }
@@ -422,22 +444,24 @@ mod tests {
     fn test_timestamp_with_timezone_infinity() {
         let result =
             Spi::get_one::<bool>("SELECT accept_timestamp_with_time_zone('-infinity') = TIMESTAMP WITH TIME ZONE '-infinity';")
-                .expect("failed to get SPI result");
+                .expect("failed to get SPI result").unwrap();
         assert!(result);
 
         let result =
             Spi::get_one::<bool>("SELECT accept_timestamp_with_time_zone('infinity') = TIMESTAMP WITH TIME ZONE 'infinity';")
-                .expect("failed to get SPI result");
+                .expect("failed to get SPI result").unwrap();
         assert!(result);
 
         let tstz =
             Spi::get_one::<TimestampWithTimeZone>("SELECT TIMESTAMP WITH TIME ZONE'infinity'")
-                .expect("failed to get SPI result");
+                .expect("failed to get SPI result")
+                .unwrap();
         assert!(tstz.is_infinity());
 
         let tstz =
             Spi::get_one::<TimestampWithTimeZone>("SELECT TIMESTAMP WITH TIME ZONE'-infinity'")
-                .expect("failed to get SPI result");
+                .expect("failed to get SPI result")
+                .unwrap();
         assert!(tstz.is_neg_infinity());
     }
 
@@ -445,20 +469,24 @@ mod tests {
     fn test_timestamp_infinity() {
         let result =
             Spi::get_one::<bool>("SELECT accept_timestamp('-infinity') = '-infinity'::timestamp;")
-                .expect("failed to get SPI result");
+                .expect("failed to get SPI result")
+                .unwrap();
         assert!(result);
 
         let result =
             Spi::get_one::<bool>("SELECT accept_timestamp('infinity') = 'infinity'::timestamp;")
-                .expect("failed to get SPI result");
+                .expect("failed to get SPI result")
+                .unwrap();
         assert!(result);
 
         let ts = Spi::get_one::<Timestamp>("SELECT 'infinity'::timestamp")
-            .expect("failed to get SPI result");
+            .expect("failed to get SPI result")
+            .unwrap();
         assert!(ts.is_infinity());
 
         let ts = Spi::get_one::<Timestamp>("SELECT '-infinity'::timestamp")
-            .expect("failed to get SPI result");
+            .expect("failed to get SPI result")
+            .unwrap();
         assert!(ts.is_neg_infinity());
     }
 }

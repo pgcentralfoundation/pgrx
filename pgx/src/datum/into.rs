@@ -156,6 +156,10 @@ impl IntoDatum for i16 {
     fn type_oid() -> u32 {
         pg_sys::INT2OID
     }
+
+    fn is_compatible_with(other: pg_sys::Oid) -> bool {
+        Self::type_oid() == other || i8::type_oid() == other
+    }
 }
 
 /// for integer
@@ -167,6 +171,10 @@ impl IntoDatum for i32 {
 
     fn type_oid() -> u32 {
         pg_sys::INT4OID
+    }
+
+    fn is_compatible_with(other: pg_sys::Oid) -> bool {
+        Self::type_oid() == other || i8::type_oid() == other || i16::type_oid() == other
     }
 }
 
@@ -180,6 +188,13 @@ impl IntoDatum for u32 {
     fn type_oid() -> u32 {
         pg_sys::OIDOID
     }
+
+    fn is_compatible_with(other: pg_sys::Oid) -> bool {
+        Self::type_oid() == other
+            || i8::type_oid() == other
+            || i16::type_oid() == other
+            || i32::type_oid() == other
+    }
 }
 
 /// for bigint
@@ -191,6 +206,14 @@ impl IntoDatum for i64 {
 
     fn type_oid() -> u32 {
         pg_sys::INT8OID
+    }
+
+    fn is_compatible_with(other: pg_sys::Oid) -> bool {
+        Self::type_oid() == other
+            || i8::type_oid() == other
+            || i16::type_oid() == other
+            || i32::type_oid() == other
+            || i64::type_oid() == other
     }
 }
 
@@ -367,7 +390,7 @@ impl IntoDatum for () {
     }
 
     fn type_oid() -> u32 {
-        pg_sys::BOOLOID
+        pg_sys::VOIDOID
     }
 }
 

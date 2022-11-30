@@ -177,28 +177,28 @@ mod tests {
 
     #[pg_test]
     fn test_sum_array_i32() {
-        let sum = Spi::get_one::<i32>("SELECT sum_array(ARRAY[1,2,3]::integer[])");
+        let sum = Spi::get_one::<i32>("SELECT sum_array(ARRAY[1,2,3]::integer[])").unwrap();
         assert!(sum.is_some());
         assert_eq!(sum.unwrap(), 6);
     }
 
     #[pg_test]
     fn test_sum_array_i64() {
-        let sum = Spi::get_one::<i64>("SELECT sum_array(ARRAY[1,2,3]::bigint[])");
+        let sum = Spi::get_one::<i64>("SELECT sum_array(ARRAY[1,2,3]::bigint[])").unwrap();
         assert!(sum.is_some());
         assert_eq!(sum.unwrap(), 6);
     }
 
     #[pg_test]
     fn test_sum_array_i32_sliced() {
-        let sum = Spi::get_one::<i32>("SELECT sum_array_sliced(ARRAY[1,2,3]::integer[])");
+        let sum = Spi::get_one::<i32>("SELECT sum_array_sliced(ARRAY[1,2,3]::integer[])").unwrap();
         assert!(sum.is_some());
         assert_eq!(sum.unwrap(), 6);
     }
 
     #[pg_test]
     fn test_sum_array_i64_sliced() {
-        let sum = Spi::get_one::<i64>("SELECT sum_array_sliced(ARRAY[1,2,3]::bigint[])");
+        let sum = Spi::get_one::<i64>("SELECT sum_array_sliced(ARRAY[1,2,3]::bigint[])").unwrap();
         assert!(sum.is_some());
         assert_eq!(sum.unwrap(), 6);
     }
@@ -207,33 +207,35 @@ mod tests {
     fn test_sum_array_i32_overflow() {
         Spi::get_one::<i64>(
             "SELECT sum_array(a) FROM (SELECT array_agg(s) a FROM generate_series(1, 1000000) s) x;",
-        );
+        ).unwrap();
     }
 
     #[pg_test]
     fn test_count_true() {
-        let cnt = Spi::get_one::<i32>("SELECT count_true(ARRAY[true, true, false, true])");
+        let cnt = Spi::get_one::<i32>("SELECT count_true(ARRAY[true, true, false, true])").unwrap();
         assert!(cnt.is_some());
         assert_eq!(cnt.unwrap(), 3);
     }
 
     #[pg_test]
     fn test_count_true_sliced() {
-        let cnt = Spi::get_one::<i32>("SELECT count_true_sliced(ARRAY[true, true, false, true])");
+        let cnt = Spi::get_one::<i32>("SELECT count_true_sliced(ARRAY[true, true, false, true])")
+            .unwrap();
         assert!(cnt.is_some());
         assert_eq!(cnt.unwrap(), 3);
     }
 
     #[pg_test]
     fn test_count_nulls() {
-        let cnt = Spi::get_one::<i32>("SELECT count_nulls(ARRAY[NULL, 1, 2, NULL]::integer[])");
+        let cnt =
+            Spi::get_one::<i32>("SELECT count_nulls(ARRAY[NULL, 1, 2, NULL]::integer[])").unwrap();
         assert!(cnt.is_some());
         assert_eq!(cnt.unwrap(), 2);
     }
 
     #[pg_test]
     fn test_optional_array() {
-        let sum = Spi::get_one::<f32>("SELECT optional_array_arg(ARRAY[1,2,3]::real[])");
+        let sum = Spi::get_one::<f32>("SELECT optional_array_arg(ARRAY[1,2,3]::real[])").unwrap();
         assert!(sum.is_some());
         assert_eq!(sum.unwrap(), 6f32);
     }
@@ -248,21 +250,24 @@ mod tests {
         let json = Spi::get_one::<Json>(
             "SELECT serde_serialize_array(ARRAY['one', null, 'two', 'three'])",
         )
-        .expect("returned json was null");
+        .expect("returned json was null")
+        .unwrap();
         assert_eq!(json.0, json! {{"values": ["one", null, "two", "three"]}});
     }
 
     #[pg_test]
     fn test_optional_array_with_default() {
         let sum = Spi::get_one::<i32>("SELECT optional_array_with_default(ARRAY[1,2,3])")
-            .expect("failed to get SPI result");
+            .expect("failed to get SPI result")
+            .unwrap();
         assert_eq!(sum, 6);
     }
 
     #[pg_test]
     fn test_serde_serialize_array_i32() {
         let json = Spi::get_one::<Json>("SELECT serde_serialize_array_i32(ARRAY[1,2,3,null, 4])")
-            .expect("returned json was null");
+            .expect("returned json was null")
+            .unwrap();
         assert_eq!(json.0, json! {{"values": [1,2,3,null,4]}});
     }
 
@@ -275,14 +280,16 @@ mod tests {
     #[pg_test]
     fn test_return_text_array() {
         let rc = Spi::get_one::<bool>("SELECT ARRAY['a', 'b', 'c', 'd'] = return_text_array();")
-            .expect("failed to get SPI result");
+            .expect("failed to get SPI result")
+            .unwrap();
         assert!(rc)
     }
 
     #[pg_test]
     fn test_return_zero_length_vec() {
         let rc = Spi::get_one::<bool>("SELECT ARRAY[]::integer[] = return_zero_length_vec();")
-            .expect("failed to get SPI result");
+            .expect("failed to get SPI result")
+            .unwrap();
         assert!(rc)
     }
 
@@ -290,7 +297,7 @@ mod tests {
     fn test_slice_to_array() {
         let owned_vec = vec![Some(1), Some(2), Some(3), None, Some(4)];
         let json = Spi::connect(|client| {
-            let json = client
+            client
                 .select(
                     "SELECT serde_serialize_array_i32($1)",
                     None,
@@ -301,17 +308,17 @@ mod tests {
                 )
                 .first()
                 .get_one::<Json>()
-                .expect("returned json was null");
-            Ok(Some(json))
         })
-        .expect("Failed to return json even though it's right there ^^");
+        .expect("Failed to return json even though it's right there ^^")
+        .unwrap();
         assert_eq!(json.0, json! {{"values": [1, 2, 3, null, 4]}});
     }
 
     #[pg_test]
     fn test_arr_data_ptr() {
         let len = Spi::get_one::<i32>("SELECT get_arr_nelems('{1,2,3,4,5}'::int[])")
-            .expect("failed to get SPI result");
+            .expect("failed to get SPI result")
+            .unwrap();
 
         assert_eq!(len, 5);
     }
@@ -319,7 +326,8 @@ mod tests {
     #[pg_test]
     fn test_get_arr_data_ptr_nth_elem() {
         let nth = Spi::get_one::<i32>("SELECT get_arr_data_ptr_nth_elem('{1,2,3,4,5}'::int[], 2)")
-            .expect("failed to get SPI result");
+            .expect("failed to get SPI result")
+            .unwrap();
 
         assert_eq!(nth, 3);
     }
@@ -329,13 +337,15 @@ mod tests {
         let bitmap_str = Spi::get_one::<String>(
             "SELECT display_get_arr_nullbitmap(ARRAY[1,NULL,3,NULL,5]::int[])",
         )
-        .expect("failed to get SPI result");
+        .expect("failed to get SPI result")
+        .unwrap();
 
         assert_eq!(bitmap_str, "0b00010101");
 
         let bitmap_str =
             Spi::get_one::<String>("SELECT display_get_arr_nullbitmap(ARRAY[1,2,3,4,5]::int[])")
-                .expect("failed to get SPI result");
+                .expect("failed to get SPI result")
+                .unwrap();
 
         assert_eq!(bitmap_str, "");
     }
@@ -343,20 +353,24 @@ mod tests {
     #[pg_test]
     fn test_get_arr_ndim() {
         let ndim = Spi::get_one::<i32>("SELECT get_arr_ndim(ARRAY[1,2,3,4,5]::int[])")
-            .expect("failed to get SPI result");
+            .expect("failed to get SPI result")
+            .unwrap();
 
         assert_eq!(ndim, 1);
 
         let ndim = Spi::get_one::<i32>("SELECT get_arr_ndim('{{1,2,3},{4,5,6}}'::int[])")
-            .expect("failed to get SPI result");
+            .expect("failed to get SPI result")
+            .unwrap();
 
         assert_eq!(ndim, 2);
     }
 
     #[pg_test]
     fn test_arr_to_vec() {
-        let result = Spi::get_one::<Vec<i32>>("SELECT arr_mapped_vec(ARRAY[3,2,2,1]::integer[])");
-        let other = Spi::get_one::<Vec<i32>>("SELECT arr_into_vec(ARRAY[3,2,2,1]::integer[])");
+        let result =
+            Spi::get_one::<Vec<i32>>("SELECT arr_mapped_vec(ARRAY[3,2,2,1]::integer[])").unwrap();
+        let other =
+            Spi::get_one::<Vec<i32>>("SELECT arr_into_vec(ARRAY[3,2,2,1]::integer[])").unwrap();
         // One should be equivalent to the canonical form.
         assert_eq!(result, Some(vec![3, 2, 2, 1]));
         // And they should be equal to each other.
@@ -365,7 +379,8 @@ mod tests {
 
     #[pg_test]
     fn test_arr_sort_uniq() {
-        let result = Spi::get_one::<Vec<i32>>("SELECT arr_sort_uniq(ARRAY[3,2,2,1]::integer[])");
+        let result =
+            Spi::get_one::<Vec<i32>>("SELECT arr_sort_uniq(ARRAY[3,2,2,1]::integer[])").unwrap();
         assert_eq!(result, Some(vec![1, 2, 3]));
     }
 
@@ -373,7 +388,8 @@ mod tests {
     #[should_panic]
     fn test_arr_sort_uniq_with_null() {
         let _result =
-            Spi::get_one::<Vec<i32>>("SELECT arr_sort_uniq(ARRAY[3,2,NULL,2,1]::integer[])");
+            Spi::get_one::<Vec<i32>>("SELECT arr_sort_uniq(ARRAY[3,2,NULL,2,1]::integer[])")
+                .unwrap();
         // No assert because we're testing for the panic.
     }
 }

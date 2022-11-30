@@ -263,7 +263,8 @@ mod tests {
             SELECT create_dog('Nami', 0)
         ",
         )
-        .expect("SQL select failed");
+        .expect("SQL select failed")
+        .unwrap();
         assert_eq!(retval.get_by_name::<&str>("name").unwrap().unwrap(), "Nami");
         assert_eq!(retval.get_by_name::<i32>("scritches").unwrap().unwrap(), 0);
     }
@@ -275,7 +276,8 @@ mod tests {
             SELECT scritch_dog(ROW('Nami', 1)::Dog)
         ",
         )
-        .expect("SQL select failed");
+        .expect("SQL select failed")
+        .unwrap();
         assert_eq!(retval.get_by_name::<&str>("name").unwrap().unwrap(), "Nami");
         assert_eq!(retval.get_by_name::<i32>("scritches").unwrap().unwrap(), 1);
     }
@@ -287,7 +289,8 @@ mod tests {
             SELECT make_friendship(ROW('Nami', 0)::Dog, ROW('Sally', 0)::Cat)
         ",
         )
-        .expect("SQL select failed");
+        .expect("SQL select failed")
+        .unwrap();
         let dog: PgHeapTuple<AllocatedByRust> = friendship.get_by_name("dog").unwrap().unwrap();
         assert_eq!(dog.get_by_name::<&str>("name").unwrap().unwrap(), "Nami");
 
@@ -300,14 +303,16 @@ mod tests {
         let retval = Spi::get_one::<i32>(
             "SELECT (scritchcollector(value)).scritches FROM UNNEST(ARRAY [1,2,3]) as value;",
         )
-        .expect("SQL select failed");
+        .expect("SQL select failed")
+        .unwrap();
         assert_eq!(retval, 6);
     }
 
     #[pg_test]
     fn test_dog_add_operator() {
         let retval = Spi::get_one::<i32>("SELECT (ROW('Nami', 0)::Dog + 1).scritches;")
-            .expect("SQL select failed");
+            .expect("SQL select failed")
+            .unwrap();
         assert_eq!(retval, 1);
     }
 }

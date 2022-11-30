@@ -92,16 +92,17 @@ mod tests {
 
             let mut expect = 0;
             while table.next().is_some() {
-                let value = table.get_one::<i32>().expect("value was NULL");
+                let value = table.get_one::<i32>().unwrap().expect("value was NULL");
 
                 expect += 1;
                 assert_eq!(value, expect);
             }
 
-            Ok(Some(expect))
-        });
+            Ok::<_, pgx::spi::Error>(expect)
+        })
+        .unwrap();
 
-        assert_eq!(cnt.unwrap(), 10)
+        assert_eq!(cnt, 10)
     }
 
     #[pg_test]
@@ -111,7 +112,7 @@ mod tests {
 
             let mut expect = 0;
             while table.next().is_some() {
-                let (idx, value) = table.get_two::<i32, &str>();
+                let (idx, value) = table.get_two::<i32, &str>()?;
                 let idx = idx.expect("idx was null");
                 let value = value.expect("value was null");
 
@@ -125,10 +126,11 @@ mod tests {
                 }
             }
 
-            Ok(Some(expect))
-        });
+            Ok::<_, pgx::spi::Error>(expect)
+        })
+        .unwrap();
 
-        assert_eq!(cnt.unwrap(), 3)
+        assert_eq!(cnt, 3)
     }
 
     #[pg_test]
@@ -136,10 +138,11 @@ mod tests {
         let cnt = Spi::connect(|client| {
             let table = client.select("SELECT * from return_some_iterator();", None, None);
 
-            Ok(Some(table.len() as i64))
-        });
+            Ok::<_, pgx::spi::Error>(table.len() as i64)
+        })
+        .unwrap();
 
-        assert_eq!(cnt, Some(3))
+        assert_eq!(cnt, 3)
     }
 
     #[pg_test]
@@ -147,10 +150,11 @@ mod tests {
         let cnt = Spi::connect(|client| {
             let table = client.select("SELECT * from return_none_iterator();", None, None);
 
-            Ok(Some(table.len() as i64))
-        });
+            Ok::<_, pgx::spi::Error>(table.len() as i64)
+        })
+        .unwrap();
 
-        assert_eq!(cnt, Some(0))
+        assert_eq!(cnt, 0)
     }
 
     #[pg_test]
@@ -158,10 +162,11 @@ mod tests {
         let cnt = Spi::connect(|client| {
             let table = client.select("SELECT * from return_some_setof_iterator();", None, None);
 
-            Ok(Some(table.len() as i64))
-        });
+            Ok::<_, pgx::spi::Error>(table.len() as i64)
+        })
+        .unwrap();
 
-        assert_eq!(cnt, Some(3))
+        assert_eq!(cnt, 3)
     }
 
     #[pg_test]
@@ -169,10 +174,11 @@ mod tests {
         let cnt = Spi::connect(|client| {
             let table = client.select("SELECT * from return_none_setof_iterator();", None, None);
 
-            Ok(Some(table.len() as i64))
-        });
+            Ok::<_, pgx::spi::Error>(table.len() as i64)
+        })
+        .unwrap();
 
-        assert_eq!(cnt, Some(0))
+        assert_eq!(cnt, 0)
     }
 
     #[pg_test]
@@ -188,9 +194,9 @@ mod tests {
                 None,
             );
 
-            Ok(Some(table.len() as i64))
-        });
-        assert_eq!(cnt, Some(1000000))
+            Ok::<_, pgx::spi::Error>(table.len() as i64)
+        }).unwrap();
+        assert_eq!(cnt, 1000000)
     }
 
     #[pg_test]
@@ -206,8 +212,8 @@ mod tests {
                 None,
             );
 
-            Ok(Some(table.len() as i64))
-        });
-        assert_eq!(cnt, Some(1000000))
+            Ok::<_, pgx::spi::Error>(table.len() as i64)
+        }).unwrap();
+        assert_eq!(cnt, 1000000)
     }
 }

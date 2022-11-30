@@ -40,7 +40,8 @@ mod tests {
         let rc = Spi::get_one::<bool>(
             "SELECT tests.take_and_return_inet('192.168.0.1') = '192.168.0.1'::inet;",
         )
-        .expect("failed to get SPI result");
+        .expect("failed to get SPI result")
+        .unwrap();
         assert!(rc)
     }
 }

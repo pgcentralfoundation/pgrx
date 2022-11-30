@@ -153,7 +153,8 @@ mod tests {
     fn aggregate_demo_sum() {
         let retval =
             Spi::get_one::<i32>("SELECT demo_sum(value) FROM UNNEST(ARRAY [1, 1, 2]) as value;")
-                .expect("SQL select failed");
+                .expect("SQL select failed")
+                .unwrap();
         assert_eq!(retval, 4);
 
         // Moving-aggregate mode
@@ -166,7 +167,8 @@ mod tests {
             ) as results;
         ",
         )
-        .expect("SQL select failed");
+        .expect("SQL select failed")
+        .unwrap();
         assert_eq!(retval, vec![1, 21, 320, 4300]);
     }
 
@@ -175,7 +177,8 @@ mod tests {
         let retval = Spi::get_one::<i32>(
             "SELECT DemoUnique(value) FROM UNNEST(ARRAY ['a', 'a', 'b']) as value;",
         )
-        .expect("SQL select failed");
+        .expect("SQL select failed")
+        .unwrap();
         assert_eq!(retval, 2);
     }
 
@@ -184,12 +187,12 @@ mod tests {
         // Example from https://www.postgresql.org/docs/current/xaggr.html#XAGGR-ORDERED-SET-AGGREGATES
         let retval = Spi::get_one::<i32>(
             "SELECT DemoPercentileDisc(0.5) WITHIN GROUP (ORDER BY income) FROM UNNEST(ARRAY [6000, 70000, 500]) as income;"
-        ).expect("SQL select failed");
+        ).expect("SQL select failed").unwrap();
         assert_eq!(retval, 6000);
 
         let retval = Spi::get_one::<i32>(
             "SELECT DemoPercentileDisc(0.05) WITHIN GROUP (ORDER BY income) FROM UNNEST(ARRAY [5, 100000000, 6000, 70000, 500]) as income;"
-        ).expect("SQL select failed");
+        ).expect("SQL select failed").unwrap();
         assert_eq!(retval, 5);
     }
 }

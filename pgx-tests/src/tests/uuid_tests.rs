@@ -39,7 +39,7 @@ mod tests {
     #[pg_test]
     fn test_display_uuid() {
         let result = Spi::get_one::<bool>("SELECT display_uuid('123e4567-e89b-12d3-a456-426614174000'::uuid) = '123e4567-e89b-12d3-a456-426614174000';")
-            .expect("failed to get SPI result");
+            .expect("failed to get SPI result").unwrap();
         assert!(result);
 
         let uuid = Uuid::from_bytes(super::TEST_UUID_V4);
@@ -57,7 +57,7 @@ mod tests {
     #[pg_test]
     fn test_accept_uuid() {
         let result = Spi::get_one::<bool>("SELECT accept_uuid('123e4567-e89b-12d3-a456-426614174000'::uuid) = '123e4567-e89b-12d3-a456-426614174000'::uuid;")
-            .expect("failed to get SPI result");
+            .expect("failed to get SPI result").unwrap();
         assert!(result)
     }
 
@@ -66,6 +66,7 @@ mod tests {
         let result = Spi::get_one::<bool>(
             "SELECT return_uuid() = '123e4567-e89b-12d3-a456-426614174000'::uuid;",
         )
+        .unwrap()
         .expect("SPI result was null");
         assert!(result)
     }
@@ -73,6 +74,7 @@ mod tests {
     #[pg_test]
     fn test_parse_uuid_v4() {
         let uuid = Spi::get_one::<Uuid>("SELECT '123e4567-e89b-12d3-a456-426614174000'::uuid;")
+            .unwrap()
             .expect("SPI result was null");
         assert_eq!(uuid, Uuid::from_bytes(super::TEST_UUID_V4))
     }

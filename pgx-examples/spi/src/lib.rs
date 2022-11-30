@@ -42,21 +42,19 @@ fn spi_return_query(
     #[cfg(feature = "pg15")]
     let query = "SELECT oid, relname::text || '-pg15' FROM pg_class";
 
-    let mut results = Vec::new();
-    Spi::connect(|client| {
-        client
-            .select(query, None, None)
-            .map(|row| (row["oid"].value(), row[2].value()))
-            .for_each(|tuple| results.push(tuple));
-        Ok(Some(()))
-    });
+    let results = Spi::connect(|client| {
+        Ok::<_, pgx::spi::Error>(
+            client.select(query, None, None).map(|row| (row["oid"].value(), row[2].value())),
+        )
+    })
+    .unwrap();
 
-    TableIterator::new(results.into_iter())
+    TableIterator::new(results)
 }
 
 #[pg_extern(immutable, parallel_safe)]
 fn spi_query_random_id() -> Option<i64> {
-    Spi::get_one("SELECT id FROM spi.spi_example ORDER BY random() LIMIT 1")
+    Spi::get_one("SELECT id FROM spi.spi_example ORDER BY random() LIMIT 1").unwrap()
 }
 
 #[pg_extern]
@@ -65,6 +63,7 @@ fn spi_query_title(title: &str) -> Option<i64> {
         "SELECT id FROM spi.spi_example WHERE title = $1;",
         vec![(PgBuiltInOids::TEXTOID.oid(), title.into_datum())],
     )
+    .unwrap()
 }
 
 #[pg_extern]
@@ -78,7 +77,7 @@ fn spi_query_by_id(id: i64) -> Option<String> {
             )
             .first();
 
-        Ok(Some(tuptable.get_two::<i64, String>()))
+        tuptable.get_two::<i64, String>()
     })
     .unwrap();
 
@@ -95,6 +94,7 @@ fn spi_insert_title(title: &str) -> i64 {
         "INSERT INTO spi.spi_example(title) VALUES ($1) RETURNING id",
         vec![(PgBuiltInOids::TEXTOID.oid(), title.into_datum())],
     )
+    .unwrap()
     .expect("INSERT into spi_example returned NULL")
 }
 
@@ -105,7 +105,8 @@ fn spi_insert_title2(
     let tuple = Spi::get_two_with_args(
         "INSERT INTO spi.spi_example(title) VALUES ($1) RETURNING id, title",
         vec![(PgBuiltInOids::TEXTOID.oid(), title.into_datum())],
-    );
+    )
+    .unwrap();
 
     TableIterator::once(tuple)
 }
@@ -132,8 +133,9 @@ mod tests {
 
     #[pg_test]
     fn test_spi_query_by_id_via_spi() {
-        let result =
-            Spi::get_one::<&str>("SELECT spi.spi_query_by_id(1)").expect("SPI result was NULL");
+        let result = Spi::get_one::<&str>("SELECT spi.spi_query_by_id(1)")
+            .unwrap()
+            .expect("SPI result was NULL");
 
         assert_eq!("This is a test", result)
     }

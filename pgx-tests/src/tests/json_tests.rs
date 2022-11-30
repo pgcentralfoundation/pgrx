@@ -29,7 +29,7 @@ mod tests {
 
         let json = Spi::get_one::<Json>(
             r#"  SELECT '{"username": "blahblahblah", "first_name": "Blah", "last_name": "McBlahFace"}'::json;  "#,
-        );
+        ).unwrap();
 
         assert!(json.is_some());
         let user: User =
@@ -52,7 +52,7 @@ mod tests {
 
         let json = Spi::get_one::<JsonB>(
             r#"  SELECT '{"username": "blahblahblah", "first_name": "Blah", "last_name": "McBlahFace"}'::jsonb;  "#,
-        );
+        ).unwrap();
 
         assert!(json.is_some());
         let user: User =

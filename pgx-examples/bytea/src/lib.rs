@@ -44,6 +44,7 @@ mod tests {
     #[pg_test]
     fn test_gzip_text() {
         let result = Spi::get_one::<String>("SELECT gunzip_as_text(gzip('hi there'));")
+            .unwrap()
             .expect("SPI result was null");
         assert_eq!(result, "hi there");
     }
@@ -51,6 +52,7 @@ mod tests {
     #[pg_test]
     fn test_gzip_bytes() {
         let result = Spi::get_one::<&[u8]>("SELECT gunzip(gzip('hi there'::bytea));")
+            .unwrap()
             .expect("SPI result was null");
         assert_eq!(result, b"hi there");
     }
