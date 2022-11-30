@@ -10,15 +10,17 @@ Use of this source code is governed by the MIT license that can be found in the 
 use crate::array::RawArray;
 use crate::layout::*;
 use crate::slice::PallocSlice;
+use crate::toast::Toast;
 use crate::{pg_sys, FromDatum, IntoDatum, PgMemoryContexts};
 use bitvec::slice::BitSlice;
+use core::ops::DerefMut;
 use core::ptr::NonNull;
 use pgrx_sql_entity_graph::metadata::{
     ArgumentError, Returns, ReturnsError, SqlMapping, SqlTranslatable,
 };
 use serde::Serializer;
 use std::marker::PhantomData;
-use std::{mem, ptr};
+use std::mem;
 
 /** An array of some type (eg. `TEXT[]`, `int[]`)
 
@@ -54,13 +56,13 @@ fn with_vec(elems: Array<String>) {
 ```
 */
 pub struct Array<'a, T: FromDatum> {
-    raw: Option<RawArray>,
     nelems: usize,
     // Remove this field if/when we figure out how to stop using pg_sys::deconstruct_array
     datum_slice: Option<PallocSlice<pg_sys::Datum>>,
-    needs_pfree: bool,
     null_slice: NullKind<'a>,
     elem_layout: Layout,
+    // Rust drops in FIFO order, drop this last
+    raw: Toast<RawArray>,
     _marker: PhantomData<T>,
 }
 
@@ -97,40 +99,13 @@ impl<'a, T: FromDatum + serde::Serialize> serde::Serialize for Array<'a, T> {
     }
 }
 
-impl<'a, T: FromDatum> Drop for Array<'a, T> {
-    fn drop(&mut self) {
-        // First drop the slice that references the RawArray
-        let slice = mem::take(&mut self.datum_slice);
-        mem::drop(slice);
-        if self.needs_pfree {
-            if let Some(raw) = self.raw.take().map(|r| r.into_ptr()) {
-                // SAFETY: if pgrx detoasted a clone of this varlena, pfree the clone
-                unsafe { pg_sys::pfree(raw.as_ptr().cast()) }
-            }
-        }
-    }
-}
-
 #[deny(unsafe_op_in_unsafe_fn)]
 impl<'a, T: FromDatum> Array<'a, T> {
     /// # Safety
     ///
     /// This function requires that the RawArray was obtained in a properly-constructed form
     /// (probably from Postgres).
-    unsafe fn deconstruct_from(
-        ptr: NonNull<pg_sys::varlena>,
-        raw: RawArray,
-        elem_layout: Layout,
-    ) -> Array<'a, T> {
-        let oid = raw.oid();
-        let len = raw.len();
-        let array = raw.into_ptr().as_ptr();
-
-        // outvals for deconstruct_array
-        let mut elements = ptr::null_mut();
-        let mut nulls = ptr::null_mut();
-        let mut nelems = 0;
-
+    unsafe fn deconstruct_from(mut raw: Toast<RawArray>) -> Array<'a, T> {
         /*
         FIXME(jubilee): This way of getting array buffers causes problems for any Drop impl,
         and clashes with assumptions of Array being a "zero-copy", lifetime-bound array,
@@ -140,28 +115,7 @@ impl<'a, T: FromDatum> Array<'a, T> {
         SAFETY: We have already asserted the validity of the RawArray, so
         this only makes mistakes if we mix things up and pass Postgres the wrong data.
         */
-        unsafe {
-            pg_sys::deconstruct_array(
-                array,
-                oid,
-                elem_layout.size.as_typlen().into(),
-                matches!(elem_layout.pass, PassBy::Value),
-                elem_layout.align.as_typalign(),
-                &mut elements,
-                &mut nulls,
-                &mut nelems,
-            )
-        };
-
-        let nelems = nelems as usize;
-
-        // Check our RawArray len impl for correctness.
-        assert_eq!(nelems, len);
-
-        // Detoasting the varlena may have allocated a fresh ArrayType.
-        // Check pointer equivalence, then pfree the palloc later if it's a new one.
-        let needs_pfree = ptr.as_ptr().cast() != array;
-        let mut raw = unsafe { RawArray::from_ptr(NonNull::new_unchecked(array)) };
+        let (elem_layout, elements, nulls, nelems) = unsafe { raw.deconstruct() };
 
         let null_slice = raw
             .nulls_bitslice()
@@ -183,21 +137,20 @@ impl<'a, T: FromDatum> Array<'a, T> {
         let datum_slice =
             Some(unsafe { PallocSlice::from_raw_parts(NonNull::new(elements).unwrap(), nelems) });
 
-        Array {
-            needs_pfree,
-            raw: Some(raw),
-            nelems,
-            datum_slice,
-            null_slice,
-            elem_layout,
-            _marker: PhantomData,
-        }
+        Array { raw, nelems, datum_slice, null_slice, elem_layout, _marker: PhantomData }
     }
 
-    pub fn into_array_type(mut self) -> *const pg_sys::ArrayType {
-        let ptr = mem::take(&mut self.raw).map(|raw| raw.into_ptr().as_ptr() as _);
-        mem::forget(self);
-        ptr.unwrap_or(ptr::null())
+    /// Rips out the underlying pg_sys::ArrayType pointer.
+    /// Note that Array may have caused Postgres to allocate to unbox the datum,
+    /// and this can hypothetically cause a memory leak if so.
+    pub fn into_array_type(self) -> *const pg_sys::ArrayType {
+        let Array { raw, datum_slice, .. } = self;
+        let _ = datum_slice;
+        // Wrap the Toast<RawArray> to prevent it from deallocating itself
+        let mut raw = core::mem::ManuallyDrop::new(raw);
+        let ptr = raw.deref_mut().deref_mut() as *mut RawArray;
+        // SAFETY: Leaks are safe if they aren't use-after-frees!
+        unsafe { ptr.read() }.into_ptr().as_ptr() as _
     }
 
     // # Panics
@@ -215,13 +168,11 @@ impl<'a, T: FromDatum> Array<'a, T> {
         if self.null_slice.any() {
             panic!("null detected: can't expose potentially uninit data as a slice!")
         }
-        match (self.elem_layout.size_matches::<T>(), self.raw.as_ref()) {
+        match self.elem_layout.size_matches::<T>() {
             // SAFETY: Rust slice layout matches Postgres data layout and this array is "owned"
             #[allow(unreachable_patterns)] // happens on 32-bit when DATUM_SIZE = 4
-            (Some(1 | 2 | 4 | DATUM_SIZE), Some(raw)) => unsafe {
-                raw.assume_init_data_slice::<T>()
-            },
-            (_, _) => panic!("no correctly-sized slice exists"),
+            Some(1 | 2 | 4 | DATUM_SIZE) => unsafe { self.raw.assume_init_data_slice::<T>() },
+            _ => panic!("no correctly-sized slice exists"),
         }
     }
 
@@ -234,14 +185,9 @@ impl<'a, T: FromDatum> Array<'a, T> {
     ///
     /// This function will panic when called if the array contains any SQL NULL values.
     pub fn iter_deny_null(&self) -> ArrayTypedIterator<'_, T> {
-        if let Some(at) = &self.raw {
-            // SAFETY: if Some, then the ArrayType is from Postgres
-            if unsafe { at.any_nulls() } {
-                panic!("array contains NULL");
-            }
-        } else {
-            panic!("array is NULL");
-        };
+        if unsafe { self.raw.any_nulls() } {
+            panic!("array contains NULL");
+        }
 
         ArrayTypedIterator { array: self, curr: 0 }
     }
@@ -266,7 +212,7 @@ impl<'a, T: FromDatum> Array<'a, T> {
                 T::from_polymorphic_datum(
                     *(self.datum_slice.as_ref()?.get(i)?),
                     self.null_slice.get(i)?,
-                    self.raw.as_ref().map(|r| r.oid()).unwrap_or_default(),
+                    self.raw.oid(),
                 )
             })
         }
@@ -462,13 +408,8 @@ impl<'a, T: FromDatum> FromDatum for Array<'a, T> {
             None
         } else {
             let ptr = NonNull::new(datum.cast_mut_ptr())?;
-            let array = pg_sys::pg_detoast_datum(datum.cast_mut_ptr()) as *mut pg_sys::ArrayType;
-            let raw =
-                RawArray::from_ptr(NonNull::new(array).expect("detoast returned null ArrayType*"));
-            let oid = raw.oid();
-            let layout = Layout::lookup_oid(oid);
-
-            Some(Array::deconstruct_from(ptr, raw, layout))
+            let raw = RawArray::detoast_from_varlena(ptr);
+            Some(Array::deconstruct_from(raw))
         }
     }
 }

@@ -1,9 +1,10 @@
 use crate::datum::{Array, FromDatum};
 use crate::pg_sys;
+use crate::layout::{Layout, PassBy};
 use crate::toast::{Toast, Toasty};
 use bitvec::prelude::*;
 use bitvec::ptr::{bitslice_from_raw_parts_mut, BitPtr, BitPtrError, Mut};
-use core::ptr::{slice_from_raw_parts_mut, NonNull};
+use core::ptr::{self, slice_from_raw_parts_mut, NonNull};
 use core::slice;
 
 #[allow(non_snake_case)]
@@ -223,15 +224,37 @@ impl RawArray {
     pub(crate) unsafe fn detoast_from_varlena(stale: NonNull<pg_sys::varlena>) -> Toast<RawArray> {
         // SAFETY: Validity asserted by the caller.
         unsafe {
-            let toast = NonNull::new(
-                pg_sys::pg_detoast_datum(stale.as_ptr().cast())
-            )
-            .unwrap();
+            let toast = NonNull::new(pg_sys::pg_detoast_datum(stale.as_ptr().cast())).unwrap();
             if stale == toast {
                 Toast::Stale(RawArray::from_ptr(toast.cast()))
             } else {
                 Toast::Fresh(RawArray::from_ptr(toast.cast()))
             }
+        }
+    }
+
+    pub(crate) unsafe fn deconstruct(&mut self) -> (Layout, *mut pg_sys::Datum, *mut bool, usize) {
+        let oid = self.oid();
+        let array = self.ptr.as_ptr();
+        let elem_layout = Layout::lookup_oid(oid);
+        // outvals for deconstruct_array
+        let mut elements = ptr::null_mut();
+        let mut nulls = ptr::null_mut();
+        let mut nelems = 0;
+
+        unsafe {
+            pg_sys::deconstruct_array(
+                array,
+                oid,
+                elem_layout.size.as_typlen().into(),
+                matches!(elem_layout.pass, PassBy::Value),
+                elem_layout.align.as_typalign(),
+                &mut elements,
+                &mut nulls,
+                &mut nelems,
+            );
+
+            (elem_layout, elements, nulls, nelems as usize)
         }
     }
 
