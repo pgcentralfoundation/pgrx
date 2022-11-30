@@ -179,37 +179,34 @@ pub struct SpiHeapTupleData {
 }
 
 impl Spi {
-    pub fn get_one<A: FromDatum + IntoDatum + 'static>(query: &str) -> Result<Option<A>, Error> {
+    pub fn get_one<A: FromDatum + IntoDatum>(query: &str) -> Result<Option<A>, Error> {
         Spi::connect(|client| client.select(query, Some(1), None).first().get_one())
     }
 
-    pub fn get_two<A: FromDatum + IntoDatum + 'static, B: FromDatum + IntoDatum + 'static>(
+    pub fn get_two<A: FromDatum + IntoDatum, B: FromDatum + IntoDatum>(
         query: &str,
     ) -> Result<(Option<A>, Option<B>), Error> {
         Spi::connect(|client| client.select(query, Some(1), None).first().get_two::<A, B>())
     }
 
     pub fn get_three<
-        A: FromDatum + IntoDatum + 'static,
-        B: FromDatum + IntoDatum + 'static,
-        C: FromDatum + IntoDatum + 'static,
+        A: FromDatum + IntoDatum,
+        B: FromDatum + IntoDatum,
+        C: FromDatum + IntoDatum,
     >(
         query: &str,
     ) -> Result<(Option<A>, Option<B>, Option<C>), Error> {
         Spi::connect(|client| client.select(query, Some(1), None).first().get_three::<A, B, C>())
     }
 
-    pub fn get_one_with_args<A: FromDatum + IntoDatum + 'static>(
+    pub fn get_one_with_args<A: FromDatum + IntoDatum>(
         query: &str,
         args: Vec<(PgOid, Option<pg_sys::Datum>)>,
     ) -> Result<Option<A>, Error> {
         Spi::connect(|client| client.select(query, Some(1), Some(args)).first().get_one())
     }
 
-    pub fn get_two_with_args<
-        A: FromDatum + IntoDatum + 'static,
-        B: FromDatum + IntoDatum + 'static,
-    >(
+    pub fn get_two_with_args<A: FromDatum + IntoDatum, B: FromDatum + IntoDatum>(
         query: &str,
         args: Vec<(PgOid, Option<pg_sys::Datum>)>,
     ) -> Result<(Option<A>, Option<B>), Error> {
@@ -217,9 +214,9 @@ impl Spi {
     }
 
     pub fn get_three_with_args<
-        A: FromDatum + IntoDatum + 'static,
-        B: FromDatum + IntoDatum + 'static,
-        C: FromDatum + IntoDatum + 'static,
+        A: FromDatum + IntoDatum,
+        B: FromDatum + IntoDatum,
+        C: FromDatum + IntoDatum,
     >(
         query: &str,
         args: Vec<(PgOid, Option<pg_sys::Datum>)>,
@@ -605,11 +602,11 @@ impl SpiTupleTable {
         self.len() == 0
     }
 
-    pub fn get_one<A: FromDatum + IntoDatum + 'static>(&self) -> Result<Option<A>, Error> {
+    pub fn get_one<A: FromDatum + IntoDatum>(&self) -> Result<Option<A>, Error> {
         self.get_datum(1)
     }
 
-    pub fn get_two<A: FromDatum + IntoDatum + 'static, B: FromDatum + IntoDatum + 'static>(
+    pub fn get_two<A: FromDatum + IntoDatum, B: FromDatum + IntoDatum>(
         &self,
     ) -> Result<(Option<A>, Option<B>), Error> {
         let a = self.get_datum::<A>(1)?;
@@ -618,9 +615,9 @@ impl SpiTupleTable {
     }
 
     pub fn get_three<
-        A: FromDatum + IntoDatum + 'static,
-        B: FromDatum + IntoDatum + 'static,
-        C: FromDatum + IntoDatum + 'static,
+        A: FromDatum + IntoDatum,
+        B: FromDatum + IntoDatum,
+        C: FromDatum + IntoDatum,
     >(
         &self,
     ) -> Result<(Option<A>, Option<B>, Option<C>), Error> {
@@ -650,10 +647,7 @@ impl SpiTupleTable {
         }
     }
 
-    pub fn get_datum<T: FromDatum + IntoDatum + 'static>(
-        &self,
-        ordinal: i32,
-    ) -> Result<Option<T>, Error> {
+    pub fn get_datum<T: FromDatum + IntoDatum>(&self, ordinal: i32) -> Result<Option<T>, Error> {
         if self.current < 0 {
             return Err(Error::InvalidPosition);
         }

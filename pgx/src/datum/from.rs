@@ -113,12 +113,10 @@ pub trait FromDatum {
         type_oid: pg_sys::Oid,
     ) -> Result<Option<Self>, TryFromDatumError>
     where
-        Self: Sized + IntoDatum + 'static,
+        Self: Sized + IntoDatum,
     {
         if !Self::is_compatible_with(type_oid) {
             Err(TryFromDatumError::IncompatibleTypes)
-        } else if !is_null && datum.is_null() && !Self::is_pass_by_value() {
-            Err(TryFromDatumError::NullDatumPointer)
         } else {
             Ok(FromDatum::from_polymorphic_datum(datum, is_null, type_oid))
         }
@@ -133,12 +131,10 @@ pub trait FromDatum {
         type_oid: pg_sys::Oid,
     ) -> Result<Option<Self>, TryFromDatumError>
     where
-        Self: Sized + IntoDatum + 'static,
+        Self: Sized + IntoDatum,
     {
         if !Self::is_compatible_with(type_oid) {
             Err(TryFromDatumError::IncompatibleTypes)
-        } else if !is_null && datum.is_null() && !Self::is_pass_by_value() {
-            Err(TryFromDatumError::NullDatumPointer)
         } else {
             Ok(FromDatum::from_datum_in_memory_context(memory_context, datum, is_null, type_oid))
         }
