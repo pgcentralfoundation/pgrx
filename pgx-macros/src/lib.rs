@@ -520,17 +520,17 @@ Like in PostgreSQL, it's possible to return tables using iterators and the `name
 ```rust,ignore
 use pgx::*;
 #[pg_extern]
-fn floop() -> impl Iterator<Item = (name!(a, i32), name!(b, i32))> {
-    None.into_iter() // Help type inference...
+fn floop<'a>() -> TableIterator<'a, (name!(a, i32), name!(b, i32))> {
+    TableIterator::new(None.into_iter())
 }
 
 #[pg_extern]
-fn singlular_floop() -> (name!(a, i32), name!(b, i32)) {
+fn singular_floop() -> (name!(a, i32), name!(b, i32)) {
     todo!()
 }
 ```
 
-The `name!()` macro may only be used in return position inside the `Item` of an `impl Iterator`.
+The `name!()` macro may only be used in return position inside the `T` of a `TableIterator<'a, T>`.
 
 It accepts 2 arguments:
 
