@@ -92,7 +92,7 @@ mod tests {
                 .flat_map(|tup| tup.by_ordinal(1).ok().and_then(|ord| ord.value::<String>()))
                 .collect::<Vec<String>>();
 
-            Ok::<_, pgx::spi::Error>(buf)
+            Ok::<_, ()>(buf)
         });
 
         assert_eq!(

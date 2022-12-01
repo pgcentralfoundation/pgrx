@@ -47,7 +47,7 @@ fn calculate_human_years() -> TableIterator<
 
     let results = Spi::connect(|client| {
         let tup_table: SpiTupleTable = client.select(query, None, None);
-        Ok::<_, pgx::spi::Error>(tup_table.map(|row| {
+        Ok::<_, ()>(tup_table.map(|row| {
             let dog_name: String = row["dog_name"].value().unwrap();
             let dog_age: i32 = row["dog_age"].value().unwrap();
             let dog_breed: String = row["dog_breed"].value().unwrap();
@@ -83,7 +83,7 @@ fn filter_by_breed(
         Spi::connect(|client| {
             let tup_table: SpiTupleTable = client.select(query, None, Some(args));
 
-            Ok::<_, pgx::spi::Error>(tup_table.map(|row| {
+            Ok::<_, ()>(tup_table.map(|row| {
                 (row["dog_name"].value(), row["dog_age"].value(), row["dog_breed"].value())
             }))
         })

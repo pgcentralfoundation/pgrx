@@ -111,7 +111,7 @@ impl TryFrom<libc::c_int> for SpiError {
 }
 
 #[derive(thiserror::Error, Debug)]
-pub enum Error<E: Debug = ()> {
+pub enum Error {
     #[error("SPI error: {0:?}")]
     SpiError(#[from] SpiError),
     #[error("Datum error: {0}")]
@@ -122,8 +122,6 @@ pub enum Error<E: Debug = ()> {
     InvalidIndex(i32),
     #[error("TupDesc is NULL")]
     TupDescIsNull,
-    #[error(transparent)]
-    Other(E),
 }
 
 pub struct Spi;
@@ -270,7 +268,7 @@ impl Spi {
     pub fn execute<F: FnOnce(SpiClient) + std::panic::UnwindSafe>(f: F) {
         Spi::connect(|client| {
             f(client);
-            Ok::<_, Error>(())
+            Ok::<_, ()>(())
         })
         .unwrap();
     }
@@ -285,12 +283,7 @@ impl Spi {
     /// use pgx::*;
     /// Spi::connect(|client| Ok(Some(client)));
     /// ```
-    pub fn connect<R, E: Into<Error<O>>, O: Debug, F: FnOnce(SpiClient<'_>) -> Result<R, E>>(
-        f: F,
-    ) -> Result<R, Error<O>>
-    where
-        Error<O>: From<E>,
-    {
+    pub fn connect<R, E, F: FnOnce(SpiClient<'_>) -> Result<R, E>>(f: F) -> Result<R, E> {
         // connect to SPI
         let connection = SpiConnection::connect();
 
