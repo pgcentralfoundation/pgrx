@@ -1,17 +1,19 @@
-```shellscript
-$ export NEW_VERSION=0.6.0-alpha.2
-$ git checkout develop
-$ git pull
-$ git checkout -b ${NEW_VERSION}-prep
-
-$ ./upgrade-deps.sh
-$ git diff     # sanity check changes
-$ git commit -am "upgrade dependencies"
-
-$ ./update-versions.sh ${NEW_VERSION}
-$ git diff     # sanity check changes
-$ git commit -am "update version to ${NEW_VERSION}"
-$ git push -u origin ${NEW_VERSION}-prep
+```shell
+export NEW_VERSION=""
+git switch develop
+git fetch origin
+git diff origin/develop | if [ "$0" = "" ]; then
+    echo "git diff found local changes on develop branch, cannot cut release."
+elif [ "$NEW_VERSION" = "" ]; then
+    echo "No version set. Are you just copying and pasting this without checking?"
+else
+    git pull origin develop --ff-only
+    git switch -c prepare-"${NEW_VERSION}"
+    ./update-versions.sh "${NEW_VERSION}"
+    git diff # sanity check the diffs
+    git commit -a -m "update version to ${NEW_VERSION}"
+    git push --set-upstream origin prepare-"${NEW_VERSION}"
+fi
 ```
 
 > go make a PR to `develop` on GitHub
@@ -26,18 +28,18 @@ $ git push -u origin ${NEW_VERSION}-prep
 
 > do a squash merge into develop
 
-```shellscript
-$ git checkout develop
-$ git pull
-$ git checkout master
-$ git pull
-$ git merge develop
-$ git push
+```shell
+git switch develop
+git pull origin develop --ff-only
+git switch master
+git pull origin master --ff-only
+git merge develop
+git push origin master
 ```
 
-> create the actual release on GitHub, tagging the `master` branch with ${NEW_VERSION}, using the release notes you made in your PR
+> create the actual release on GitHub, tagging the `master` branch with "${NEW_VERSION}", using the release notes you made in your PR
 
 
-```shellscript
-$ ./publish.sh
+```shell
+./publish.sh
 ```

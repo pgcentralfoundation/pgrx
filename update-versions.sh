@@ -64,8 +64,8 @@ cargo run --bin pgx-version-updater \
   ${VERBOSE:+--show-diff} \
   ${VERBOSE:+--verbose}
 
-echo "Generating/updating lockfile"
-cargo generate-lockfile
+echo "Upgrading dependency versions"
+./upgrade-deps.sh
 
 echo "Generating bindings -- this may take a few moments"
 PGX_PG_SYS_GENERATE_BINDINGS_FOR_RELEASE=1 cargo test --no-run $CARGO_QUIET_FLAG --workspace --no-default-features --features "pg14"

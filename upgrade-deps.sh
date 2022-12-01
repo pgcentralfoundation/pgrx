@@ -20,6 +20,7 @@ for folder in pgx-examples/*; do
         cargo update
         cargo upgrade
         cargo generate-lockfile
+        cargo check
         cd -
     fi
 done
