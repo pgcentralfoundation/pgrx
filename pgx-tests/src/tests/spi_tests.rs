@@ -215,21 +215,21 @@ mod tests {
     #[pg_test]
     fn test_connect_return_anything() {
         struct T;
-        assert!(matches!(Spi::connect(|_| Ok::<_, pgx::spi::Error>(Some(T))).unwrap().unwrap(), T));
+        assert!(matches!(Spi::connect(|_| Ok::<_, ()>(Some(T))).unwrap().unwrap(), T));
     }
 
     #[pg_test]
     fn test_spi_unwind_safe() {
         struct T;
-        assert!(matches!(Spi::connect(|_| Ok::<_, pgx::spi::Error>(Some(T))).unwrap().unwrap(), T));
+        assert!(matches!(Spi::connect(|_| Ok::<_, ()>(Some(T))).unwrap().unwrap(), T));
     }
 
     #[pg_test]
     fn test_error_propagation() {
         #[derive(Debug)]
         struct Error;
-        let result = Spi::connect(|_| Err::<(), _>(pgx::spi::Error::Other(Error)));
-        assert!(matches!(result, Err(pgx::spi::Error::Other(Error))))
+        let result = Spi::connect(|_| Err::<(), _>(Error));
+        assert!(matches!(result, Err(Error)))
     }
 
     #[pg_test]

@@ -43,7 +43,7 @@ fn spi_return_query(
     let query = "SELECT oid, relname::text || '-pg15' FROM pg_class";
 
     let results = Spi::connect(|client| {
-        Ok::<_, pgx::spi::Error>(
+        Ok::<_, ()>(
             client.select(query, None, None).map(|row| (row["oid"].value(), row[2].value())),
         )
     })
