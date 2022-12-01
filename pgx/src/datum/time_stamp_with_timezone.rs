@@ -15,8 +15,6 @@ use serde::Deserialize;
 use std::convert::TryFrom;
 use std::ffi::CStr;
 
-pub(crate) const USECS_PER_SEC: i64 = 1_000_000;
-
 #[cfg(feature = "time-crate")]
 mod with_time_crate {
     use super::*;
