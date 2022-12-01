@@ -631,8 +631,7 @@ mod tests {
             SELECT gets_name_field(ROW('Nami', 0)::Dog)
         ",
         )
-        .expect("SQL select failed")
-        .unwrap();
+        .expect("SQL select failed");
         assert_eq!(retval, "Nami");
     }
 
@@ -643,8 +642,7 @@ mod tests {
             SELECT gets_name_field_default()
         ",
         )
-        .expect("SQL select failed")
-        .unwrap();
+        .expect("SQL select failed");
         assert_eq!(retval, "Nami");
     }
 
@@ -655,8 +653,7 @@ mod tests {
             SELECT gets_name_field_strict(ROW('Nami', 0)::Dog)
         ",
         )
-        .expect("SQL select failed")
-        .unwrap();
+        .expect("SQL select failed");
         assert_eq!(retval, "Nami");
     }
 
@@ -667,8 +664,7 @@ mod tests {
             SELECT gets_name_field_variadic(ROW('Nami', 1)::Dog, ROW('Brandy', 1)::Dog)
         ",
         )
-        .expect("SQL select failed")
-        .unwrap();
+        .expect("SQL select failed");
         assert_eq!(retval, vec!["Nami".to_string(), "Brandy".to_string()]);
     }
 
@@ -680,8 +676,7 @@ mod tests {
             SELECT gets_name_field_as_slice(ROW('Nami', 1)::Dog, ROW('Brandy', 1)::Dog)
         ",
         )
-        .expect("SQL select failed")
-        .unwrap();
+        .expect("SQL select failed");
         assert_eq!(retval, vec!["Nami".to_string(), "Brandy".to_string()]);
     }
 
@@ -692,8 +687,7 @@ mod tests {
             SELECT sum_scritches_for_names(ARRAY[ROW('Nami', 1), ROW('Brandy', 42)]::Dog[])
         ",
         )
-        .expect("SQL select failed")
-        .unwrap();
+        .expect("SQL select failed");
         assert_eq!(retval, 43);
     }
 
@@ -704,8 +698,7 @@ mod tests {
             SELECT sum_scritches_for_names_default()
         ",
         )
-        .expect("SQL select failed")
-        .unwrap();
+        .expect("SQL select failed");
         assert_eq!(retval, 0);
     }
 
@@ -716,8 +709,7 @@ mod tests {
             SELECT sum_scritches_for_names_strict(ARRAY[ROW('Nami', 1), ROW('Brandy', 42)]::Dog[])
         ",
         )
-        .expect("SQL select failed")
-        .unwrap();
+        .expect("SQL select failed");
         assert_eq!(retval, 43);
     }
 
@@ -728,8 +720,7 @@ mod tests {
             SELECT sum_scritches_for_names_strict(ARRAY[ROW('Nami', 1), ROW('Brandy', 42)]::Dog[])
         ",
         )
-        .expect("SQL select failed")
-        .unwrap();
+        .expect("SQL select failed");
         assert_eq!(retval, 43);
     }
 
@@ -740,8 +731,7 @@ mod tests {
             SELECT sum_scritches_for_names_default_optional_items()
         ",
         )
-        .expect("SQL select failed")
-        .unwrap();
+        .expect("SQL select failed");
         assert_eq!(retval, 0);
     }
 
@@ -749,7 +739,7 @@ mod tests {
     fn test_sum_scritches_for_names_optional_items() {
         let retval = Spi::get_one::<i32>("
             SELECT sum_scritches_for_names_optional_items(ARRAY[ROW('Nami', 1), ROW('Brandy', 42)]::Dog[])
-        ").expect("SQL select failed").unwrap();
+        ").expect("SQL select failed");
         assert_eq!(retval, 43);
     }
 
@@ -760,8 +750,7 @@ mod tests {
             SELECT sum_scritches_for_names_array(ARRAY[ROW('Nami', 1), ROW('Brandy', 42)]::Dog[])
         ",
         )
-        .expect("SQL select failed")
-        .unwrap();
+        .expect("SQL select failed");
         assert_eq!(retval, 43);
     }
 
@@ -772,8 +761,7 @@ mod tests {
             SELECT sum_scritches_for_names_array_default()
         ",
         )
-        .expect("SQL select failed")
-        .unwrap();
+        .expect("SQL select failed");
         assert_eq!(retval, 0);
     }
 
@@ -781,7 +769,7 @@ mod tests {
     fn test_sum_scritches_for_names_array_strict() {
         let retval = Spi::get_one::<i32>("
             SELECT sum_scritches_for_names_array_strict(ARRAY[ROW('Nami', 1), ROW('Brandy', 42)]::Dog[])
-        ").expect("SQL select failed").unwrap();
+        ").expect("SQL select failed");
         assert_eq!(retval, 43);
     }
 
@@ -792,8 +780,7 @@ mod tests {
             SELECT create_dog('Nami', 1)
         ",
         )
-        .expect("SQL select failed")
-        .unwrap();
+        .expect("SQL select failed");
         assert_eq!(retval.get_by_name("name").unwrap(), Some("Nami"));
         assert_eq!(retval.get_by_name("scritches").unwrap(), Some(1));
     }
@@ -805,8 +792,7 @@ mod tests {
             SELECT scritch(ROW('Nami', 2)::Dog)
         ",
         )
-        .expect("SQL select failed")
-        .unwrap();
+        .expect("SQL select failed");
         assert_eq!(retval.get_by_name("name").unwrap(), Some("Nami"));
         assert_eq!(retval.get_by_name("scritches").unwrap(), Some(2));
     }
@@ -818,8 +804,7 @@ mod tests {
             SELECT scritch_strict(ROW('Nami', 2)::Dog)
         ",
         )
-        .expect("SQL select failed")
-        .unwrap();
+        .expect("SQL select failed");
         assert_eq!(retval.get_by_name("name").unwrap(), Some("Nami"));
         assert_eq!(retval.get_by_name("scritches").unwrap(), Some(2));
     }
@@ -935,8 +920,7 @@ mod tests {
             SELECT ROW('Nami', 2)::Dog
         ",
         )
-        .expect("SQL select failed")
-        .unwrap();
+        .expect("SQL select failed");
         // Non-composite types are incompatible:
         assert!(Spi::get_one::<PgHeapTuple<'_, AllocatedByRust>>(
             "

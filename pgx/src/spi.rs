@@ -115,8 +115,10 @@ pub enum Error<E: Debug = ()> {
     SpiError(#[from] SpiError),
     #[error("Datum error: {0}")]
     DatumError(#[from] TryFromDatumError),
-    #[error("SpiTupleTable positioned before start")]
+    #[error("SpiTupleTable positioned before start or after the end")]
     InvalidPosition,
+    #[error("Invalid index ({0})")]
+    InvalidIndex(i32),
     #[error("TupDesc is NULL")]
     TupDescIsNull,
     #[error(transparent)]
@@ -178,13 +180,13 @@ pub struct SpiHeapTupleData {
 }
 
 impl Spi {
-    pub fn get_one<A: FromDatum + IntoDatum>(query: &str) -> Result<Option<A>, Error> {
+    pub fn get_one<A: FromDatum + IntoDatum>(query: &str) -> Result<A, Error> {
         Spi::connect(|client| client.select(query, Some(1), None).first().get_one())
     }
 
     pub fn get_two<A: FromDatum + IntoDatum, B: FromDatum + IntoDatum>(
         query: &str,
-    ) -> Result<(Option<A>, Option<B>), Error> {
+    ) -> Result<(A, B), Error> {
         Spi::connect(|client| client.select(query, Some(1), None).first().get_two::<A, B>())
     }
 
@@ -194,21 +196,21 @@ impl Spi {
         C: FromDatum + IntoDatum,
     >(
         query: &str,
-    ) -> Result<(Option<A>, Option<B>, Option<C>), Error> {
+    ) -> Result<(A, B, C), Error> {
         Spi::connect(|client| client.select(query, Some(1), None).first().get_three::<A, B, C>())
     }
 
     pub fn get_one_with_args<A: FromDatum + IntoDatum>(
         query: &str,
         args: Vec<(PgOid, Option<pg_sys::Datum>)>,
-    ) -> Result<Option<A>, Error> {
+    ) -> Result<A, Error> {
         Spi::connect(|client| client.select(query, Some(1), Some(args)).first().get_one())
     }
 
     pub fn get_two_with_args<A: FromDatum + IntoDatum, B: FromDatum + IntoDatum>(
         query: &str,
         args: Vec<(PgOid, Option<pg_sys::Datum>)>,
-    ) -> Result<(Option<A>, Option<B>), Error> {
+    ) -> Result<(A, B), Error> {
         Spi::connect(|client| client.select(query, Some(1), Some(args)).first().get_two::<A, B>())
     }
 
@@ -219,7 +221,7 @@ impl Spi {
     >(
         query: &str,
         args: Vec<(PgOid, Option<pg_sys::Datum>)>,
-    ) -> Result<(Option<A>, Option<B>, Option<C>), Error> {
+    ) -> Result<(A, B, C), Error> {
         Spi::connect(|client| {
             client.select(query, Some(1), Some(args)).first().get_three::<A, B, C>()
         })
@@ -260,7 +262,6 @@ impl Spi {
                 client.update(&format!("EXPLAIN (format json) {}", query), None, args).first();
             table.get_one::<Json>()
         })
-        .unwrap()
         .unwrap()
     }
 
@@ -425,13 +426,13 @@ impl SpiTupleTable {
         self.len() == 0
     }
 
-    pub fn get_one<A: FromDatum + IntoDatum>(&self) -> Result<Option<A>, Error> {
+    pub fn get_one<A: FromDatum + IntoDatum>(&self) -> Result<A, Error> {
         self.get_datum(1)
     }
 
     pub fn get_two<A: FromDatum + IntoDatum, B: FromDatum + IntoDatum>(
         &self,
-    ) -> Result<(Option<A>, Option<B>), Error> {
+    ) -> Result<(A, B), Error> {
         let a = self.get_datum::<A>(1)?;
         let b = self.get_datum::<B>(2)?;
         Ok((a, b))
@@ -443,7 +444,7 @@ impl SpiTupleTable {
         C: FromDatum + IntoDatum,
     >(
         &self,
-    ) -> Result<(Option<A>, Option<B>, Option<C>), Error> {
+    ) -> Result<(A, B, C), Error> {
         let a = self.get_datum::<A>(1)?;
         let b = self.get_datum::<B>(2)?;
         let c = self.get_datum::<C>(3)?;
@@ -470,38 +471,33 @@ impl SpiTupleTable {
         }
     }
 
-    pub fn get_datum<T: FromDatum + IntoDatum>(&self, ordinal: i32) -> Result<Option<T>, Error> {
-        if self.current < 0 {
+    pub fn get_datum<T: FromDatum + IntoDatum>(&self, ordinal: i32) -> Result<T, Error> {
+        if self.current < 0 || self.current as u64 >= unsafe { pg_sys::SPI_processed } {
             return Err(Error::InvalidPosition);
         }
-        if self.current as u64 >= unsafe { pg_sys::SPI_processed } {
-            Ok(None)
-        } else {
-            match self.tupdesc {
-                Some(tupdesc) => unsafe {
-                    let natts = (*tupdesc).natts;
+        match self.tupdesc {
+            Some(tupdesc) => unsafe {
+                let natts = (*tupdesc).natts;
 
-                    if ordinal < 1 || ordinal > natts {
-                        Ok(None)
-                    } else {
-                        let heap_tuple = std::slice::from_raw_parts((*self.table).vals, self.size)
-                            [self.current as usize];
-                        let mut is_null = false;
-                        let datum =
-                            pg_sys::SPI_getbinval(heap_tuple, tupdesc, ordinal, &mut is_null);
+                if ordinal < 1 || ordinal > natts {
+                    return Err(Error::InvalidIndex(ordinal));
+                } else {
+                    let heap_tuple = std::slice::from_raw_parts((*self.table).vals, self.size)
+                        [self.current as usize];
+                    let mut is_null = false;
+                    let datum = pg_sys::SPI_getbinval(heap_tuple, tupdesc, ordinal, &mut is_null);
 
-                        Ok(T::try_from_datum_in_memory_context(
-                            PgMemoryContexts::CurrentMemoryContext
-                                .parent()
-                                .expect("parent memory context is absent"),
-                            datum,
-                            is_null,
-                            pg_sys::SPI_gettypeid(tupdesc, ordinal),
-                        )?)
-                    }
-                },
-                None => Err(Error::TupDescIsNull),
-            }
+                    Ok(T::try_from_datum_in_memory_context(
+                        PgMemoryContexts::CurrentMemoryContext
+                            .parent()
+                            .expect("parent memory context is absent"),
+                        datum,
+                        is_null,
+                        pg_sys::SPI_gettypeid(tupdesc, ordinal),
+                    )?)
+                }
+            },
+            None => Err(Error::TupDescIsNull),
         }
     }
 

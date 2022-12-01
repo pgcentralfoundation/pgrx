@@ -81,11 +81,9 @@ fn spi_query_by_id(id: i64) -> Option<String> {
     })
     .unwrap();
 
-    if returned_id.is_some() {
-        info!("id={}", returned_id.unwrap());
-    }
+    info!("id={}", returned_id);
 
-    title
+    Some(title)
 }
 
 #[pg_extern]
@@ -95,7 +93,6 @@ fn spi_insert_title(title: &str) -> i64 {
         vec![(PgBuiltInOids::TEXTOID.oid(), title.into_datum())],
     )
     .unwrap()
-    .expect("INSERT into spi_example returned NULL")
 }
 
 #[pg_extern]
@@ -133,9 +130,7 @@ mod tests {
 
     #[pg_test]
     fn test_spi_query_by_id_via_spi() {
-        let result = Spi::get_one::<&str>("SELECT spi.spi_query_by_id(1)")
-            .unwrap()
-            .expect("SPI result was NULL");
+        let result = Spi::get_one::<&str>("SELECT spi.spi_query_by_id(1)").unwrap();
 
         assert_eq!("This is a test", result)
     }

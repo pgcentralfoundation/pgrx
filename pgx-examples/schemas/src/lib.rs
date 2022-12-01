@@ -74,9 +74,7 @@ mod tests {
     fn test_hello_default_schema() {
         assert_eq!(
             "Hello from the schema where you installed this extension",
-            Spi::get_one::<&str>("SELECT hello_default_schema()")
-                .unwrap()
-                .expect("SPI result was NULL")
+            Spi::get_one::<&str>("SELECT hello_default_schema()").unwrap()
         );
     }
 
@@ -86,10 +84,7 @@ mod tests {
             "test",
             // we don't need to qualify "MyType" because whatever schema it was created in
             // is applied to the "search_path" of this test function
-            Spi::get_one::<MyType>("SELECT '\"test\"'::MyType")
-                .unwrap()
-                .expect("SPI result was NULL")
-                .0
+            Spi::get_one::<MyType>("SELECT '\"test\"'::MyType").unwrap().0
         );
     }
 
@@ -98,9 +93,7 @@ mod tests {
         assert_eq!(
             "Hello from some_schema",
             // "hello_some_schema()" is in "some_schema", so it needs to be qualified
-            Spi::get_one::<&str>("SELECT some_schema.hello_some_schema()")
-                .unwrap()
-                .expect("SPI result was NULL")
+            Spi::get_one::<&str>("SELECT some_schema.hello_some_schema()").unwrap()
         );
     }
 
@@ -115,7 +108,6 @@ mod tests {
                     .first()
                     .get_one::<MySomeSchemaType>()
                     .unwrap()
-                    .expect("SPI result was NULL")
                     .0
             );
         });
@@ -125,10 +117,7 @@ mod tests {
     fn test_my_pg_catalog_type() {
         assert_eq!(
             String::from("test"),
-            Spi::get_one::<MyPgCatalogType>("SELECT '\"test\"'::MyPgCatalogType")
-                .unwrap()
-                .expect("SPI result was NULL")
-                .0
+            Spi::get_one::<MyPgCatalogType>("SELECT '\"test\"'::MyPgCatalogType").unwrap().0
         )
     }
 
@@ -136,7 +125,7 @@ mod tests {
     fn test_hello_public() {
         assert_eq!(
             "Hello from the public schema",
-            Spi::get_one::<&str>("SELECT hello_public()").unwrap().expect("SPI result was NULL")
+            Spi::get_one::<&str>("SELECT hello_public()").unwrap()
         )
     }
 }

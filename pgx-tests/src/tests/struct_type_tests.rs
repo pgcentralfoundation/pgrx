@@ -94,9 +94,6 @@ mod tests {
                 .get_one::<PgBox<Complex>>()
                 .unwrap();
 
-            assert!(complex.is_some());
-
-            let complex = complex.unwrap();
             assert_eq!(&complex.x, &1.1);
             assert_eq!(&complex.y, &2.2);
         })
@@ -106,8 +103,7 @@ mod tests {
     fn test_complex_out() {
         let string_val = Spi::get_one::<&str>("SELECT complex_out('1.1,2.2')::text").unwrap();
 
-        assert!(string_val.is_some());
-        assert_eq!(string_val.unwrap(), "1.1, 2.2");
+        assert_eq!(string_val, "1.1, 2.2");
     }
 
     #[pg_test]
@@ -119,8 +115,6 @@ mod tests {
                 .get_one::<PgBox<Complex>>()
                 .unwrap();
 
-            assert!(complex.is_some());
-            let complex = complex.unwrap();
             assert_eq!(&complex.x, &1.1);
             assert_eq!(&complex.y, &2.2);
         });
@@ -134,8 +128,6 @@ mod tests {
                 SELECT value FROM complex_test ORDER BY id;", None, None).first().get_one::<PgBox<Complex>>()
         }).unwrap();
 
-        assert!(complex.is_some());
-        let complex = complex.unwrap();
         assert_eq!(&complex.x, &1.0);
         assert_eq!(&complex.y, &2.01);
     }

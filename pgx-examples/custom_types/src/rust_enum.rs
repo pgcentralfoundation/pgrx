@@ -29,7 +29,7 @@ mod tests {
 
         assert!(matches!(
             val,
-            Some(SomeEnum::String(s)) if s == "hello world"
+            SomeEnum::String(s) if s == "hello world"
         ));
 
         let val =
@@ -37,7 +37,7 @@ mod tests {
 
         assert!(matches!(
             val,
-            Some(SomeEnum::Struct{a: 1, s }) if s == "hello world"
+            SomeEnum::Struct{a: 1, s } if s == "hello world"
         ));
     }
 }

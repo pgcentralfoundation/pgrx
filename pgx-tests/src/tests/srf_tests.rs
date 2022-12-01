@@ -92,7 +92,7 @@ mod tests {
 
             let mut expect = 0;
             while table.next().is_some() {
-                let value = table.get_one::<i32>().unwrap().expect("value was NULL");
+                let value = table.get_one::<i32>()?;
 
                 expect += 1;
                 assert_eq!(value, expect);
@@ -113,8 +113,6 @@ mod tests {
             let mut expect = 0;
             while table.next().is_some() {
                 let (idx, value) = table.get_two::<i32, &str>()?;
-                let idx = idx.expect("idx was null");
-                let value = value.expect("value was null");
 
                 expect += 1;
                 assert_eq!(idx, expect);

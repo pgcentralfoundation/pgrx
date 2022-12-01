@@ -41,7 +41,7 @@ mod tests {
             client.select("SELECT 42", None, None).first().get_datum::<i32>(1)
         });
 
-        assert_eq!(42, rc.expect("SPI failed to return proper value").unwrap())
+        assert_eq!(42, rc.expect("SPI failed to return proper value"))
     }
 
     #[pg_test]
@@ -50,7 +50,7 @@ mod tests {
             client.select("SELECT 'this is a test'", None, None).first().get_datum::<&str>(1)
         });
 
-        assert_eq!("this is a test", rc.expect("SPI failed to return proper value").unwrap())
+        assert_eq!("this is a test", rc.expect("SPI failed to return proper value"))
     }
 
     #[pg_test]
@@ -59,14 +59,14 @@ mod tests {
             client.select("SELECT 'this is a test'", None, None).first().get_datum::<String>(1)
         });
 
-        assert_eq!("this is a test", rc.expect("SPI failed to return proper value").unwrap())
+        assert_eq!("this is a test", rc.expect("SPI failed to return proper value"))
     }
 
     #[pg_test]
     fn test_spi_get_one() {
         Spi::execute(|client| {
             let i = client.select("SELECT 42::bigint", None, None).first().get_one::<i64>();
-            assert_eq!(42, i.unwrap().unwrap());
+            assert_eq!(42, i.unwrap());
         });
     }
 
@@ -79,8 +79,8 @@ mod tests {
                 .get_two::<i64, &str>()
                 .unwrap();
 
-            assert_eq!(42, i.unwrap());
-            assert_eq!("test", s.unwrap());
+            assert_eq!(42, i);
+            assert_eq!("test", s);
         });
     }
 
@@ -93,41 +93,33 @@ mod tests {
                 .get_three::<i64, &str, bool>()
                 .unwrap();
 
-            assert_eq!(42, i.unwrap());
-            assert_eq!("test", s.unwrap());
-            assert_eq!(true, b.unwrap());
+            assert_eq!(42, i);
+            assert_eq!("test", s);
+            assert_eq!(true, b);
         });
     }
 
     #[pg_test]
     fn test_spi_get_two_with_failure() {
         Spi::execute(|client| {
-            let (i, s) =
-                client.select("SELECT 42", None, None).first().get_two::<i64, &str>().unwrap();
-
-            assert_eq!(42, i.unwrap());
-            assert!(s.is_none());
+            assert!(client.select("SELECT 42", None, None).first().get_two::<i64, &str>().is_err());
         });
     }
 
     #[pg_test]
     fn test_spi_get_three_failure() {
         Spi::execute(|client| {
-            let (i, s, b) = client
+            assert!(client
                 .select("SELECT 42, 'test'", None, None)
                 .first()
                 .get_three::<i64, &str, bool>()
-                .unwrap();
-
-            assert_eq!(42, i.unwrap());
-            assert_eq!("test", s.unwrap());
-            assert!(b.is_none());
+                .is_err());
         });
     }
 
     #[pg_test]
     fn test_spi_select_zero_rows() {
-        assert!(Spi::get_one::<i32>("SELECT 1 LIMIT 0").unwrap().is_none());
+        assert!(Spi::get_one::<i32>("SELECT 1 LIMIT 0").is_err());
     }
 
     #[pg_test]
@@ -186,12 +178,14 @@ mod tests {
         Spi::execute(|client| {
             client.update("CREATE TABLE tests.null_test (id uuid)", None, None);
         });
-        let result = Spi::get_one_with_args::<i32>(
-            "INSERT INTO tests.null_test VALUES ($1) RETURNING 1",
-            vec![(PgBuiltInOids::UUIDOID.oid(), None)],
-        )
-        .unwrap();
-        assert_eq!(result, Some(1));
+        assert_eq!(
+            Spi::get_one_with_args::<i32>(
+                "INSERT INTO tests.null_test VALUES ($1) RETURNING 1",
+                vec![(PgBuiltInOids::UUIDOID.oid(), None)],
+            )
+            .unwrap(),
+            1
+        );
     }
 
     #[pg_test]
@@ -236,5 +230,10 @@ mod tests {
         struct Error;
         let result = Spi::connect(|_| Err::<(), _>(pgx::spi::Error::Other(Error)));
         assert!(matches!(result, Err(pgx::spi::Error::Other(Error))))
+    }
+
+    #[pg_test]
+    fn test_option() {
+        assert!(Spi::get_one::<Option<i32>>("SELECT NULL::integer").unwrap().is_none());
     }
 }

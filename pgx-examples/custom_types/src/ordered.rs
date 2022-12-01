@@ -68,12 +68,12 @@ mod tests {
 
         assert_eq!(
             items,
-            Some(vec![
+            vec![
                 OrderedThing { item: "Foo".to_string() },
                 OrderedThing { item: "Bar".to_string() },
                 OrderedThing { item: "bar".to_string() },
                 OrderedThing { item: "foo".to_string() },
-            ])
+            ]
         )
     }
 }

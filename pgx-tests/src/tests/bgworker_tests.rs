@@ -65,7 +65,6 @@ pub extern "C" fn bgworker_return_value(arg: pg_sys::Datum) {
             )
         })
         .unwrap()
-        .unwrap()
     } else {
         0
     };
@@ -105,12 +104,7 @@ mod tests {
         let handle = worker.terminate();
         handle.wait_for_shutdown().expect("aborted shutdown");
 
-        assert_eq!(
-            124,
-            Spi::get_one::<i32>("SELECT v FROM tests.bgworker_test;")
-                .expect("no return value from the worker")
-                .unwrap()
-        );
+        assert_eq!(124, Spi::get_one::<i32>("SELECT v FROM tests.bgworker_test;").unwrap());
     }
 
     #[pg_test]
@@ -157,11 +151,6 @@ mod tests {
         let handle = worker.terminate();
         handle.wait_for_shutdown().expect("aborted shutdown");
 
-        assert_eq!(
-            123,
-            Spi::get_one::<i32>("SELECT v FROM tests.bgworker_test_return;")
-                .expect("no return value from the worker")
-                .unwrap()
-        );
+        assert_eq!(123, Spi::get_one::<i32>("SELECT v FROM tests.bgworker_test_return;").unwrap());
     }
 }

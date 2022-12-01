@@ -137,8 +137,7 @@ mod tests {
         );
 
         let retval = Spi::get_one::<&str>("SELECT species FROM tests.before_insert_field_update;")
-            .expect("SQL select failed")
-            .unwrap();
+            .expect("SQL select failed");
         assert_eq!(retval, "Bear");
     }
 
@@ -183,8 +182,7 @@ mod tests {
         );
 
         let retval = Spi::get_one::<&str>("SELECT booper FROM tests.before_insert_add_field;")
-            .expect("SQL select failed")
-            .unwrap();
+            .expect("SQL select failed");
         assert_eq!(retval, "Swooper");
     }
 
@@ -238,8 +236,7 @@ mod tests {
         );
 
         let retval = Spi::get_one::<&str>("SELECT title FROM tests.before_update_skip;")
-            .expect("SQL select failed")
-            .unwrap();
+            .expect("SQL select failed");
         assert_eq!(retval, "Fox");
     }
 
@@ -336,15 +333,15 @@ mod tests {
         let trigger_op =
             Spi::get_one::<&str>("SELECT trigger_op FROM tests.before_insert_trigger_metadata;")
                 .unwrap();
-        let trigger_relid = Spi::get_one::<pg_sys::Oid>(
+        let trigger_relid = Spi::get_one::<Option<pg_sys::Oid>>(
             "SELECT trigger_relid FROM tests.before_insert_trigger_metadata;",
         )
         .unwrap();
-        let trigger_old_transition_table_name = Spi::get_one::<&str>(
+        let trigger_old_transition_table_name = Spi::get_one::<Option<&str>>(
             "SELECT trigger_old_transition_table_name FROM tests.before_insert_trigger_metadata;",
         )
         .unwrap();
-        let trigger_new_transition_table_name = Spi::get_one::<&str>(
+        let trigger_new_transition_table_name = Spi::get_one::<Option<&str>>(
             "SELECT trigger_new_transition_table_name FROM tests.before_insert_trigger_metadata;",
         )
         .unwrap();
@@ -361,17 +358,17 @@ mod tests {
         )
         .unwrap();
 
-        assert_eq!(marker, Some("Fox"));
-        assert_eq!(trigger_name, Some("insert_trigger_metadata"));
-        assert_eq!(trigger_when, Some("BEFORE"));
-        assert_eq!(trigger_level, Some("ROW"));
-        assert_eq!(trigger_op, Some("INSERT"));
+        assert_eq!(marker, "Fox");
+        assert_eq!(trigger_name, "insert_trigger_metadata");
+        assert_eq!(trigger_when, "BEFORE");
+        assert_eq!(trigger_level, "ROW");
+        assert_eq!(trigger_op, "INSERT");
         assert!(trigger_relid.is_some());
         assert_eq!(trigger_old_transition_table_name, None);
         assert_eq!(trigger_new_transition_table_name, None);
-        assert_eq!(trigger_table_name, Some("before_insert_trigger_metadata"));
-        assert_eq!(trigger_table_schema, Some("tests"));
-        assert_eq!(trigger_extra_args, Some(vec!["Bears".to_string(), "Dogs".to_string()]));
+        assert_eq!(trigger_table_name, "before_insert_trigger_metadata");
+        assert_eq!(trigger_table_schema, "tests");
+        assert_eq!(trigger_extra_args, vec!["Bears".to_string(), "Dogs".to_string()]);
     }
 
     #[pg_trigger]
@@ -468,14 +465,14 @@ mod tests {
             "SELECT trigger_op FROM tests.before_insert_trigger_metadata_safe;",
         )
         .unwrap();
-        let trigger_relid = Spi::get_one::<pg_sys::Oid>(
+        let trigger_relid = Spi::get_one::<Option<pg_sys::Oid>>(
             "SELECT trigger_relid FROM tests.before_insert_trigger_metadata_safe;",
         )
         .unwrap();
-        let trigger_old_transition_table_name = Spi::get_one::<&str>(
+        let trigger_old_transition_table_name = Spi::get_one::<Option<&str>>(
             "SELECT trigger_old_transition_table_name FROM tests.before_insert_trigger_metadata_safe;",
         ).unwrap();
-        let trigger_new_transition_table_name = Spi::get_one::<&str>(
+        let trigger_new_transition_table_name = Spi::get_one::<Option<&str>>(
             "SELECT trigger_new_transition_table_name FROM tests.before_insert_trigger_metadata_safe;",
         ).unwrap();
         let trigger_table_name = Spi::get_one::<&str>(
@@ -491,17 +488,17 @@ mod tests {
         )
         .unwrap();
 
-        assert_eq!(marker, Some("Fox"));
-        assert_eq!(trigger_name, Some("insert_trigger_metadata_safe"));
-        assert_eq!(trigger_when, Some("BEFORE"));
-        assert_eq!(trigger_level, Some("ROW"));
-        assert_eq!(trigger_op, Some("INSERT"));
+        assert_eq!(marker, "Fox");
+        assert_eq!(trigger_name, "insert_trigger_metadata_safe");
+        assert_eq!(trigger_when, "BEFORE");
+        assert_eq!(trigger_level, "ROW");
+        assert_eq!(trigger_op, "INSERT");
         assert!(trigger_relid.is_some());
         assert_eq!(trigger_old_transition_table_name, None);
         assert_eq!(trigger_new_transition_table_name, None);
-        assert_eq!(trigger_table_name, Some("before_insert_trigger_metadata_safe"));
-        assert_eq!(trigger_table_schema, Some("tests"));
-        assert_eq!(trigger_extra_args, Some(vec!["Bears".to_string(), "Dogs".to_string()]));
+        assert_eq!(trigger_table_name, "before_insert_trigger_metadata_safe");
+        assert_eq!(trigger_table_schema, "tests");
+        assert_eq!(trigger_extra_args, vec!["Bears".to_string(), "Dogs".to_string()]);
     }
 
     #[pg_trigger(sql = r#"
@@ -544,8 +541,7 @@ mod tests {
         );
 
         let retval = Spi::get_one::<&str>("SELECT species FROM tests.has_sql_option_set;")
-            .expect("SQL select failed")
-            .unwrap();
+            .expect("SQL select failed");
         assert_eq!(retval, "Fox");
     }
 
@@ -581,8 +577,7 @@ mod tests {
         );
 
         let retval = Spi::get_one::<&str>("SELECT species FROM tests.has_noop_postgres;")
-            .expect("SQL select failed")
-            .unwrap();
+            .expect("SQL select failed");
         assert_eq!(retval, "Fox");
     }
 
@@ -618,8 +613,7 @@ mod tests {
         );
 
         let retval = Spi::get_one::<&str>("SELECT species FROM tests.has_noop_rust;")
-            .expect("SQL select failed")
-            .unwrap();
+            .expect("SQL select failed");
         assert_eq!(retval, "Fox");
     }
 }
