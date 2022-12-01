@@ -8,7 +8,7 @@ Use of this source code is governed by the MIT license that can be found in the 
 */
 use pgx::cstr_core::CStr;
 use pgx::prelude::*;
-use pgx::{InOutFuncs, PgVarlena, PgVarlenaInOutFuncs, StringInfo};
+use pgx::{InOutFuncs, PgVarlena, PgVarlenaInOutFuncs, SendRecvFuncs, StringInfo};
 use serde::{Deserialize, Serialize};
 use std::str::FromStr;
 
@@ -152,15 +152,32 @@ pub enum JsonEnumType {
     E2 { b: f32 },
 }
 
+#[derive(PostgresType, Serialize, Deserialize, Debug, PartialEq)]
+#[sendrecvfuncs]
+pub struct BinaryEncodedType(Vec<u8>);
+
+impl SendRecvFuncs for BinaryEncodedType {
+    fn send(&self) -> Vec<u8> {
+        self.0.clone()
+    }
+
+    fn recv(buffer: &[u8]) -> Self {
+        Self(buffer.to_vec())
+    }
+}
+
 #[cfg(any(test, feature = "pg_test"))]
 #[pgx::pg_schema]
 mod tests {
     #[allow(unused_imports)]
     use crate as pgx_tests;
+    use postgres::types::private::BytesMut;
+    use postgres::types::{FromSql, IsNull, ToSql, Type};
+    use std::error::Error;
 
     use crate::tests::postgres_type_tests::{
-        CustomTextFormatSerializedEnumType, CustomTextFormatSerializedType, JsonEnumType, JsonType,
-        VarlenaEnumType, VarlenaType,
+        BinaryEncodedType, CustomTextFormatSerializedEnumType, CustomTextFormatSerializedType,
+        JsonEnumType, JsonType, VarlenaEnumType, VarlenaType,
     };
     use pgx::prelude::*;
     use pgx::PgVarlena;
@@ -245,5 +262,49 @@ mod tests {
             Spi::get_one::<JsonEnumType>(r#"SELECT '{"type": "E1", "a": 1.0}'::JsonEnumType"#)
                 .expect("SPI returned NULL");
         assert!(matches!(result, JsonEnumType::E1 { a } if a == 1.0));
+    }
+
+    #[pg_test]
+    fn test_binary_encoded_type() {
+        impl ToSql for BinaryEncodedType {
+            fn to_sql(
+                &self,
+                _ty: &Type,
+                out: &mut BytesMut,
+            ) -> Result<IsNull, Box<dyn Error + Sync + Send>>
+            where
+                Self: Sized,
+            {
+                use bytes::BufMut;
+                out.put_slice(self.0.as_slice());
+                Ok(IsNull::No)
+            }
+
+            fn accepts(_ty: &Type) -> bool
+            where
+                Self: Sized,
+            {
+                true
+            }
+
+            postgres::types::to_sql_checked!();
+        }
+
+        impl<'a> FromSql<'a> for BinaryEncodedType {
+            fn from_sql(_ty: &Type, raw: &'a [u8]) -> Result<Self, Box<dyn Error + Sync + Send>> {
+                Ok(Self(raw.to_vec()))
+            }
+
+            fn accepts(_ty: &Type) -> bool {
+                true
+            }
+        }
+
+        // postgres client uses binary types so we can use it to test this functionality
+        let (mut client, _) = pgx_tests::client().unwrap();
+        let val = BinaryEncodedType(vec![0, 1, 2]);
+        let result = client.query("SELECT $1::BinaryEncodedType", &[&val]).unwrap();
+        let val1: BinaryEncodedType = result[0].get(0);
+        assert_eq!(val, val1);
     }
 }

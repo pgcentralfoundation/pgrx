@@ -681,9 +681,13 @@ Optionally accepts the following attributes:
 
 * `inoutfuncs(some_in_fn, some_out_fn)`: Define custom in/out functions for the type.
 * `pgvarlena_inoutfuncs(some_in_fn, some_out_fn)`: Define custom in/out functions for the `PgVarlena` of this type.
+* `sendrecvfuncs`: Define binary send/receive functions for the type.
 * `sql`: Same arguments as [`#[pgx(sql = ..)]`](macro@pgx).
 */
-#[proc_macro_derive(PostgresType, attributes(inoutfuncs, pgvarlena_inoutfuncs, requires, pgx))]
+#[proc_macro_derive(
+    PostgresType,
+    attributes(inoutfuncs, pgvarlena_inoutfuncs, sendrecvfuncs, requires, pgx)
+)]
 pub fn postgres_type(input: TokenStream) -> TokenStream {
     let ast = parse_macro_input!(input as syn::DeriveInput);
 
@@ -696,6 +700,8 @@ fn impl_postgres_type(ast: DeriveInput) -> proc_macro2::TokenStream {
     let has_lifetimes = generics.lifetimes().next();
     let funcname_in = Ident::new(&format!("{}_in", name).to_lowercase(), name.span());
     let funcname_out = Ident::new(&format!("{}_out", name).to_lowercase(), name.span());
+    let funcname_send = Ident::new(&format!("{}_send", name).to_lowercase(), name.span());
+    let funcname_recv = Ident::new(&format!("{}_recv", name).to_lowercase(), name.span());
     let mut args = parse_postgres_type_args(&ast.attrs);
     let mut stream = proc_macro2::TokenStream::new();
 
@@ -710,7 +716,9 @@ fn impl_postgres_type(ast: DeriveInput) -> proc_macro2::TokenStream {
         _ => panic!("#[derive(PostgresType)] can only be applied to structs or enums"),
     }
 
-    if args.is_empty() {
+    if !args.contains(&PostgresTypeAttribute::InOutFuncs)
+        && !args.contains(&PostgresTypeAttribute::PgVarlenaInOutFuncs)
+    {
         // assume the user wants us to implement the InOutFuncs
         args.insert(PostgresTypeAttribute::Default);
     }
@@ -803,7 +811,34 @@ fn impl_postgres_type(ast: DeriveInput) -> proc_macro2::TokenStream {
         });
     }
 
-    let sql_graph_entity_item = PostgresType::from_derive_input(ast).unwrap();
+    if args.contains(&PostgresTypeAttribute::SendReceiveFuncs) {
+        stream.extend(quote! {
+            #[doc(hidden)]
+            #[pg_extern(immutable,parallel_safe,strict)]
+            pub fn #funcname_recv #generics(input: ::pgx::Internal) -> #name #generics {
+                let mut buffer0 = unsafe {
+                    input
+                    .get_mut::<::pgx::pg_sys::StringInfoData>()
+                    .expect("Can't retrieve StringInfo pointer")
+                };
+                let mut buffer = StringInfo::from_pg(buffer0 as *mut _).expect("failed to construct StringInfo");
+                let slice = buffer.read(..).expect("failure reading StringInfo");
+                ::pgx::SendRecvFuncs::recv(slice)
+            }
+
+            #[doc(hidden)]
+            #[pg_extern(immutable,parallel_safe,strict)]
+            pub fn #funcname_send #generics(input: #name #generics) -> Vec<u8> {
+                ::pgx::SendRecvFuncs::send(&input)
+            }
+        });
+    }
+
+    let sql_graph_entity_item = PostgresType::from_derive_input(
+        ast,
+        args.contains(&PostgresTypeAttribute::SendReceiveFuncs),
+    )
+    .unwrap();
     sql_graph_entity_item.to_tokens(&mut stream);
 
     stream
@@ -895,6 +930,7 @@ fn impl_guc_enum(ast: DeriveInput) -> proc_macro2::TokenStream {
 enum PostgresTypeAttribute {
     InOutFuncs,
     PgVarlenaInOutFuncs,
+    SendReceiveFuncs,
     Default,
 }
 
@@ -911,6 +947,9 @@ fn parse_postgres_type_args(attributes: &[Attribute]) -> HashSet<PostgresTypeAtt
 
             "pgvarlena_inoutfuncs" => {
                 categorized_attributes.insert(PostgresTypeAttribute::PgVarlenaInOutFuncs);
+            }
+            "sendrecvfuncs" => {
+                categorized_attributes.insert(PostgresTypeAttribute::SendReceiveFuncs);
             }
 
             _ => {

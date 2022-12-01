@@ -37,6 +37,10 @@ pub struct PostgresTypeEntity {
     pub in_fn_module_path: String,
     pub out_fn: &'static str,
     pub out_fn_module_path: String,
+    pub send_fn: Option<&'static str>,
+    pub send_fn_module_path: String,
+    pub recv_fn: Option<&'static str>,
+    pub recv_fn_module_path: String,
     pub to_sql_config: ToSqlConfigEntity,
 }
 
@@ -101,7 +105,11 @@ impl ToSql for PostgresTypeEntity {
         // - CREATE TYPE;
         // - CREATE FUNCTION _in;
         // - CREATE FUNCTION _out;
+        // - CREATE FUNCTION _send; (optional)
+        // - CREATE FUNCTION _recv; (optional)
         // - CREATE TYPE (...);
+
+        let mut functions = String::new();
 
         let in_fn_module_path = if !item.in_fn_module_path.is_empty() {
             item.in_fn_module_path.clone()
@@ -132,6 +140,8 @@ impl ToSql for PostgresTypeEntity {
         tracing::trace!(in_fn = ?in_fn_path, "Found matching `in_fn`");
         let in_fn_sql = in_fn.to_sql(context)?;
         tracing::trace!(%in_fn_sql);
+        functions.push_str(in_fn_sql.as_str());
+        functions.push('\n');
 
         let out_fn_module_path = if !item.out_fn_module_path.is_empty() {
             item.out_fn_module_path.clone()
@@ -162,6 +172,8 @@ impl ToSql for PostgresTypeEntity {
         tracing::trace!(out_fn = ?out_fn_path, "Found matching `out_fn`");
         let out_fn_sql = out_fn.to_sql(context)?;
         tracing::trace!(%out_fn_sql);
+        functions.push_str(out_fn_sql.as_str());
+        functions.push('\n');
 
         let shell_type = format!(
             "\n\
@@ -177,7 +189,104 @@ impl ToSql for PostgresTypeEntity {
         );
         tracing::trace!(sql = %shell_type);
 
-        let materialized_type = format!("\n\
+        let full_path = item.full_path;
+        let file = item.file;
+        let line = item.line;
+        let schema = context.schema_prefix_for(&self_index);
+        let name = item.name;
+        let schema_prefix_in_fn = context.schema_prefix_for(&in_fn_graph_index);
+        let in_fn = item.in_fn;
+        let in_fn_path = in_fn_path;
+        let schema_prefix_out_fn = context.schema_prefix_for(&out_fn_graph_index);
+        let out_fn = item.out_fn;
+        let out_fn_path = out_fn_path;
+
+        let materialized_type = match (item.send_fn, item.recv_fn) {
+            (Some(send_fn), Some(recv_fn)) => {
+                let send_fn_module_path = if !item.send_fn_module_path.is_empty() {
+                    item.send_fn_module_path.clone()
+                } else {
+                    item.module_path.to_string() // Presume a local
+                };
+                let send_fn_path = format!(
+                    "{module_path}{maybe_colons}{send_fn}",
+                    module_path = send_fn_module_path,
+                    maybe_colons = if !send_fn_module_path.is_empty() { "::" } else { "" },
+                );
+                let (_, _index) = context
+                    .externs
+                    .iter()
+                    .find(|(k, _v)| (**k).full_path == send_fn_path.as_str())
+                    .ok_or_else(|| eyre::eyre!("Did not find `send_fn: {}`.", send_fn_path))?;
+                let (send_fn_graph_index, send_fn) = context
+                    .graph
+                    .neighbors_undirected(self_index)
+                    .find_map(|neighbor| match &context.graph[neighbor] {
+                        SqlGraphEntity::Function(func) if func.full_path == send_fn_path => {
+                            Some((neighbor, func))
+                        }
+                        _ => None,
+                    })
+                    .ok_or_else(|| eyre!("Could not find send_fn graph entity."))?;
+                tracing::trace!(send_fn = ?send_fn_path, "Found matching `send_fn`");
+                let send_fn_sql = send_fn.to_sql(context)?;
+                tracing::trace!(%send_fn_sql);
+                functions.push_str(send_fn_sql.as_str());
+                functions.push('\n');
+
+                let recv_fn_module_path = if !item.recv_fn_module_path.is_empty() {
+                    item.recv_fn_module_path.clone()
+                } else {
+                    item.module_path.to_string() // Presume a local
+                };
+                let recv_fn_path = format!(
+                    "{module_path}{maybe_colons}{recv_fn}",
+                    module_path = recv_fn_module_path,
+                    maybe_colons = if !recv_fn_module_path.is_empty() { "::" } else { "" },
+                );
+                let (_, _index) = context
+                    .externs
+                    .iter()
+                    .find(|(k, _v)| (**k).full_path == recv_fn_path.as_str())
+                    .ok_or_else(|| eyre::eyre!("Did not find `recv_fn: {}`.", recv_fn_path))?;
+                let (recv_fn_graph_index, recv_fn) = context
+                    .graph
+                    .neighbors_undirected(self_index)
+                    .find_map(|neighbor| match &context.graph[neighbor] {
+                        SqlGraphEntity::Function(func) if func.full_path == recv_fn_path => {
+                            Some((neighbor, func))
+                        }
+                        _ => None,
+                    })
+                    .ok_or_else(|| eyre!("Could not find recv_fn graph entity."))?;
+                tracing::trace!(recv_fn = ?recv_fn_path, "Found matching `recv_fn`");
+                let recv_fn_sql = recv_fn.to_sql(context)?;
+                tracing::trace!(%recv_fn_sql);
+                functions.push_str(recv_fn_sql.as_str());
+                functions.push('\n');
+
+                let schema_prefix_send_fn = context.schema_prefix_for(&send_fn_graph_index);
+                let send_fn = item.send_fn.unwrap();
+                let send_fn_path = send_fn_path;
+                let schema_prefix_recv_fn = context.schema_prefix_for(&recv_fn_graph_index);
+                let recv_fn = item.recv_fn.unwrap();
+                let recv_fn_path = recv_fn_path;
+                format!("\n\
+                                -- {file}:{line}\n\
+                                -- {full_path}\n\
+                                CREATE TYPE {schema}{name} (\n\
+                                    \tINTERNALLENGTH = variable,\n\
+                                    \tINPUT = {schema_prefix_in_fn}{in_fn}, /* {in_fn_path} */\n\
+                                    \tOUTPUT = {schema_prefix_out_fn}{out_fn}, /* {out_fn_path} */\n\
+                                    \tSEND = {schema_prefix_send_fn}{send_fn}, /* {send_fn_path} */\n\
+                                    \tRECEIVE = {schema_prefix_recv_fn}{recv_fn}, /* {recv_fn_path} */\n\
+                                    \tSTORAGE = extended\n\
+                                );\
+                            "
+                )
+            }
+            _ => {
+                format!("\n\
                                 -- {file}:{line}\n\
                                 -- {full_path}\n\
                                 CREATE TYPE {schema}{name} (\n\
@@ -186,21 +295,13 @@ impl ToSql for PostgresTypeEntity {
                                     \tOUTPUT = {schema_prefix_out_fn}{out_fn}, /* {out_fn_path} */\n\
                                     \tSTORAGE = extended\n\
                                 );\
-                            ",
-                                        full_path = item.full_path,
-                                        file = item.file,
-                                        line = item.line,
-                                        schema = context.schema_prefix_for(&self_index),
-                                        name = item.name,
-                                        schema_prefix_in_fn = context.schema_prefix_for(&in_fn_graph_index),
-                                        in_fn = item.in_fn,
-                                        in_fn_path = in_fn_path,
-                                        schema_prefix_out_fn = context.schema_prefix_for(&out_fn_graph_index),
-                                        out_fn = item.out_fn,
-                                        out_fn_path = out_fn_path,
-        );
+                            "
+                )
+            }
+        };
+
         tracing::trace!(sql = %materialized_type);
 
-        Ok(shell_type + "\n" + &in_fn_sql + "\n" + &out_fn_sql + "\n" + &materialized_type)
+        Ok(shell_type + "\n" + &functions + &materialized_type)
     }
 }

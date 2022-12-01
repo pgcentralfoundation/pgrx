@@ -1519,6 +1519,7 @@ dependencies = [
 name = "pgx-tests"
 version = "0.6.0"
 dependencies = [
+ "bytes",
  "eyre",
  "libc",
  "once_cell",
