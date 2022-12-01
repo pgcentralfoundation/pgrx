@@ -165,11 +165,6 @@ pub trait PgNode: seal::Sealed {
         // this is only implemented for things known to be "Nodes"
         unsafe { display_node_impl(NonNull::from(self).cast()) }
     }
-
-    /// Traverse the object graph, calling the callback at any `Node`s found as children of this object.
-    fn traverse<T>(&mut self, _walker_fn: fn(*mut Node, &mut T) -> (), _context: &mut T) {
-        // Do nothing by default, but override for structs that need it.
-    }
 }
 
 mod seal {
