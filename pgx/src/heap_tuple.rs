@@ -437,12 +437,13 @@ impl<'a, AllocatedBy: WhoAllocated> PgHeapTuple<'a, AllocatedBy> {
                     if datum.is_none() {
                         return Ok(None);
                     }
-                    match T::type_oid() {
+                    (match T::type_oid() {
                         record @ pg_sys::RECORDOID => {
                             T::try_from_datum(datum.unwrap(), false, record)
                         }
                         _ => T::try_from_datum(datum.unwrap(), false, att.type_oid().value()),
-                    }
+                    })
+                    .map(Some)
                 }
             }
         }
