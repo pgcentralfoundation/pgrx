@@ -115,7 +115,7 @@ pub enum Error<E: Debug = ()> {
     SpiError(#[from] SpiError),
     #[error("Datum error: {0}")]
     DatumError(#[from] TryFromDatumError),
-    #[error("SpiTupleTable positioned before start or after the end")]
+    #[error("SpiTupleTable positioned before the start or after the end")]
     InvalidPosition,
     #[error("Invalid index ({0})")]
     InvalidIndex(i32),
