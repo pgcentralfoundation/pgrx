@@ -18,7 +18,7 @@ pg_test = []
 [dependencies]
 pgx = { path = "../../pgx", default-features = false }
 maplit = "1.0.2"
-serde = "1.0.147"
+serde = "1.0.148"
 
 [dev-dependencies]
 pgx-tests = { path = "../../pgx-tests" }
