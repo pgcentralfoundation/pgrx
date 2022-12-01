@@ -245,7 +245,7 @@ fn generate_bindings(
         .wrap_err_with(|| format!("bindgen failed for pg{}", major_version))?;
 
     let oids = extract_oids(&bindgen_output);
-    let rewritten_items = rewrite_items(&bindgen_output, &oids, is_for_release)
+    let rewritten_items = rewrite_items(&bindgen_output, &oids, major_version, is_for_release)
         .wrap_err_with(|| format!("failed to rewrite items for pg{}", major_version))?;
     let oids = format_builtin_oid_impl(oids);
 
@@ -338,11 +338,12 @@ fn write_rs_file(
 fn rewrite_items(
     file: &syn::File,
     oids: &BTreeMap<syn::Ident, Box<syn::Expr>>,
+    major_version: u16,
     is_for_release: bool,
 ) -> eyre::Result<proc_macro2::TokenStream> {
     let items_vec = rewrite_oid_consts(&file.items, oids);
     let mut items = apply_pg_guard(&items_vec)?;
-    let pgnode_impls = impl_pg_node(&items_vec, is_for_release)?;
+    let pgnode_impls = impl_pg_node(&items_vec, major_version, is_for_release)?;
 
     // append the pgnodes to the set of items
     items.extend(pgnode_impls);
@@ -449,6 +450,7 @@ fn walk_field_definition(field_name: proc_macro2::TokenStream) -> proc_macro2::T
 /// Implement our `PgNode` marker trait for `pg_sys::Node` and its "subclasses"
 fn impl_pg_node(
     items: &Vec<syn::Item>,
+    major_version: u16,
     is_for_release: bool,
 ) -> eyre::Result<proc_macro2::TokenStream> {
     let mut pgnode_impls = proc_macro2::TokenStream::new();
@@ -519,11 +521,9 @@ fn impl_pg_node(
 
     let mut join_fields_traverse = proc_macro2::TokenStream::new();
     join_fields_traverse.extend(
-        if std::env::var("CARGO_FEATURE_PG11").is_ok()
-            || std::env::var("CARGO_FEATURE_PG12").is_ok()
-        {
+        if major_version == 11 || major_version == 12 {
             vec![]
-        } else if std::env::var("CARGO_FEATURE_PG13").is_ok() {
+        } else if major_version == 13 {
             vec![quote! { joinleftcols }, quote! { joinrightcols }]
         } else {
             vec![quote! { joinleftcols }, quote! { joinrightcols }, quote! { join_using_alias }]
@@ -543,7 +543,7 @@ fn impl_pg_node(
         })
         .collect::<HashSet<String>>();
 
-    let rtekind_result_handling = if std::env::var("CARGO_FEATURE_PG11").is_ok() {
+    let rtekind_result_handling = if major_version == 11 {
         quote! {}
     } else {
         quote! {
@@ -555,9 +555,7 @@ fn impl_pg_node(
 
     let walk_item = walk_field_definition(quote! { item });
     // Older Postgres' List is linked.
-    let list_fns = if std::env::var("CARGO_FEATURE_PG11").is_ok()
-        || std::env::var("CARGO_FEATURE_PG12").is_ok()
-    {
+    let list_fns = if major_version == 11 || major_version == 12 {
         quote! {
             impl pg_sys::PgNode for List {
                 fn traverse<T>(&mut self, walker_fn: fn(*mut Node, &mut T) -> (), context: &mut T) {
@@ -632,10 +630,10 @@ fn impl_pg_node(
         n: Option<proc_macro2::TokenStream>,
     }
     let mut array_fields: HashMap<(&'static str, &'static str), ArrayBoundsInfo> = HashMap::new();
-    let mut in_versions = |versions: &[u8],
+    let mut in_versions = |versions: &[u16],
                            matchable: (&'static str, &'static str),
                            n: Option<proc_macro2::TokenStream>| {
-        if versions.iter().any(|v| std::env::var(format!("CARGO_FEATURE_PG{}", v)).is_ok()) {
+        if versions.contains(&major_version) {
             array_fields.insert(matchable, ArrayBoundsInfo { n: n });
         }
     };
@@ -885,8 +883,7 @@ fn impl_pg_node(
         }
         // impl the PgNode trait for all nodes
         let traversal_function = if traverse_elements.is_empty() {
-            quote! {
-            }
+            quote! {}
         } else {
             let traversal = proc_macro2::TokenStream::from_iter(traverse_elements.into_iter());
             quote! {
