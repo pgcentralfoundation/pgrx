@@ -9,20 +9,24 @@ Use of this source code is governed by the MIT license that can be found in the 
 
 extern crate proc_macro;
 
-mod operators;
-use operators::{impl_postgres_eq, impl_postgres_hash, impl_postgres_ord};
-
-use pgx_utils::rewriter::*;
-use pgx_utils::sql_entity_graph::{
-    ExtensionSql, ExtensionSqlFile, PgAggregate, PgExtern, PostgresEnum, PostgresType, Schema,
-};
-use pgx_utils::*;
 use proc_macro::TokenStream;
+use std::collections::HashSet;
+
 use proc_macro2::Ident;
 use quote::{quote, ToTokens};
-use std::collections::HashSet;
 use syn::spanned::Spanned;
 use syn::{parse_macro_input, Attribute, Data, DeriveInput, Item, ItemImpl};
+
+use operators::{impl_postgres_eq, impl_postgres_hash, impl_postgres_ord};
+use pgx_sql_entity_graph::{
+    parse_extern_attributes, ExtensionSql, ExtensionSqlFile, ExternArgs, PgAggregate, PgExtern,
+    PostgresEnum, PostgresType, Schema,
+};
+
+use crate::rewriter::PgGuardRewriter;
+
+mod operators;
+mod rewriter;
 
 /// Declare a function as `#[pg_guard]` to indicate that it is called from a Postgres `extern "C"`
 /// function so that Rust `panic!()`s (and Postgres `elog(ERROR)`s) will be properly handled by `pgx`
@@ -39,12 +43,7 @@ pub fn pg_guard(_attr: TokenStream, item: TokenStream) -> TokenStream {
         Item::ForeignMod(block) => rewriter.extern_block(block).into(),
 
         // process top-level functions
-        Item::Fn(func) => rewriter
-            .item_fn_without_rewrite(func)
-            .unwrap_or_else(|e| {
-                panic!("Invalid #[pg_guard] function: {e}");
-            })
-            .into(),
+        Item::Fn(func) => rewriter.item_fn_without_rewrite(func).into(),
         _ => {
             panic!("#[pg_guard] can only be applied to extern \"C\" blocks and top-level functions")
         }
@@ -1054,7 +1053,7 @@ Review the `pgx::trigger_support::PgTrigger` documentation for use.
 #[proc_macro_attribute]
 pub fn pg_trigger(attrs: TokenStream, input: TokenStream) -> TokenStream {
     fn wrapped(attrs: TokenStream, input: TokenStream) -> Result<TokenStream, syn::Error> {
-        use pgx_utils::sql_entity_graph::{PgTrigger, PgTriggerAttribute};
+        use pgx_sql_entity_graph::{PgTrigger, PgTriggerAttribute};
         use syn::parse::Parser;
         use syn::punctuated::Punctuated;
         use syn::Token;

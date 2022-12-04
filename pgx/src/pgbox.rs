@@ -10,7 +10,7 @@ Use of this source code is governed by the MIT license that can be found in the 
 /// Similar to Rust's `Box<T>` type, `PgBox<T>` also represents heap-allocated memory.
 use crate::{pg_sys, PgMemoryContexts};
 //use std::fmt::{Debug, Error, Formatter};
-use pgx_utils::sql_entity_graph::metadata::{
+use pgx_sql_entity_graph::metadata::{
     ArgumentError, Returns, ReturnsError, SqlMapping, SqlTranslatable,
 };
 use std::marker::PhantomData;

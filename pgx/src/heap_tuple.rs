@@ -6,7 +6,7 @@ use crate::{
     heap_getattr_raw, pg_sys, AllocatedByPostgres, AllocatedByRust, FromDatum, IntoDatum, PgBox,
     PgMemoryContexts, PgTupleDesc, TriggerTuple, TryFromDatumError, WhoAllocated,
 };
-use pgx_utils::sql_entity_graph::metadata::{
+use pgx_sql_entity_graph::metadata::{
     ArgumentError, Returns, ReturnsError, SqlMapping, SqlTranslatable,
 };
 use std::num::NonZeroUsize;

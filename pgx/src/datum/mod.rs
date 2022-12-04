@@ -56,7 +56,7 @@ pub use tuples::*;
 pub use varlena::*;
 
 use crate::PgBox;
-use pgx_utils::sql_entity_graph::RustSqlMapping;
+use pgx_sql_entity_graph::RustSqlMapping;
 
 /// A tagging trait to indicate a user type is also meant to be used by Postgres
 /// Implemented automatically by `#[derive(PostgresType)]`
