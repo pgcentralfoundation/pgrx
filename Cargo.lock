@@ -1453,7 +1453,6 @@ dependencies = [
  "pgx-macros",
  "pgx-pg-sys",
  "pgx-sql-entity-graph",
- "quote",
  "seahash",
  "seq-macro",
  "serde",
@@ -1475,7 +1474,6 @@ dependencies = [
  "quote",
  "serde",
  "syn",
- "unescape",
 ]
 
 [[package]]
@@ -1500,7 +1498,6 @@ dependencies = [
  "eyre",
  "libc",
  "memoffset 0.6.5",
- "once_cell",
  "pgx-macros",
  "pgx-pg-config",
  "pgx-sql-entity-graph",
@@ -1524,7 +1521,6 @@ dependencies = [
  "petgraph",
  "proc-macro2",
  "quote",
- "regex",
  "seq-macro",
  "syn",
  "syntect",
