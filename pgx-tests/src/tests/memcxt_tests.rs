@@ -67,4 +67,14 @@ mod tests {
         .execute();
         assert_ne!(unsafe { pg_sys::CurrentMemoryContext }, ctx_sys);
     }
+
+    #[pg_test]
+    fn test_current_owned_memory_context_drop() {
+        let ctx = PgMemoryContexts::new("test");
+        let ctx_sys = ctx.value();
+        let parent = unsafe { (*ctx_sys).parent };
+        ctx.set_as_current();
+        drop(ctx);
+        assert_eq!(unsafe { pg_sys::CurrentMemoryContext }, parent);
+    }
 }

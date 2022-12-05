@@ -179,6 +179,11 @@ pub struct OwnedMemoryContext(pg_sys::MemoryContext);
 impl Drop for OwnedMemoryContext {
     fn drop(&mut self) {
         unsafe {
+            // In order to prevent crashes, if we're trying to drop
+            // a context that is current, switch to its parent, and then drop it
+            if pg_sys::CurrentMemoryContext == self.0 {
+                pg_sys::CurrentMemoryContext = (*self.0).parent;
+            }
             pg_sys::MemoryContextDelete(self.0);
         }
     }
