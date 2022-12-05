@@ -16,9 +16,10 @@ to the `pgx` framework and very subject to change between versions. While you ma
 */
 pub mod entity;
 
-use crate::ToSqlConfig;
+use crate::enrich::{ToEntityGraphTokens, ToRustCodeTokens};
+use crate::{CodeEnrichment, ToSqlConfig};
 use proc_macro2::{Span, TokenStream as TokenStream2};
-use quote::{quote, ToTokens, TokenStreamExt};
+use quote::quote;
 use syn::parse::{Parse, ParseStream};
 use syn::punctuated::Punctuated;
 use syn::{DeriveInput, Generics, Ident, ItemEnum, Token};
@@ -35,7 +36,8 @@ use syn::{DeriveInput, Generics, Ident, ItemEnum, Token};
 /// use pgx_sql_entity_graph::PostgresEnum;
 ///
 /// # fn main() -> eyre::Result<()> {
-/// let parsed: PostgresEnum = parse_quote! {
+/// use pgx_sql_entity_graph::CodeEnrichment;
+/// let parsed: CodeEnrichment<PostgresEnum> = parse_quote! {
 ///     #[derive(PostgresEnum)]
 ///     enum Demo {
 ///         Example,
@@ -59,15 +61,17 @@ impl PostgresEnum {
         generics: Generics,
         variants: Punctuated<syn::Variant, Token![,]>,
         to_sql_config: ToSqlConfig,
-    ) -> Result<Self, syn::Error> {
+    ) -> Result<CodeEnrichment<Self>, syn::Error> {
         if !to_sql_config.overrides_default() {
             crate::ident_is_acceptable_to_postgres(&name)?;
         }
 
-        Ok(Self { name, generics, variants, to_sql_config })
+        Ok(CodeEnrichment(Self { name, generics, variants, to_sql_config }))
     }
 
-    pub fn from_derive_input(derive_input: DeriveInput) -> Result<Self, syn::Error> {
+    pub fn from_derive_input(
+        derive_input: DeriveInput,
+    ) -> Result<CodeEnrichment<Self>, syn::Error> {
         let to_sql_config =
             ToSqlConfig::from_attributes(derive_input.attrs.as_slice())?.unwrap_or_default();
         let data_enum = match derive_input.data {
@@ -80,17 +84,8 @@ impl PostgresEnum {
     }
 }
 
-impl Parse for PostgresEnum {
-    fn parse(input: ParseStream) -> Result<Self, syn::Error> {
-        let parsed: ItemEnum = input.parse()?;
-        let to_sql_config =
-            ToSqlConfig::from_attributes(parsed.attrs.as_slice())?.unwrap_or_default();
-        Self::new(parsed.ident, parsed.generics, parsed.variants, to_sql_config)
-    }
-}
-
-impl ToTokens for PostgresEnum {
-    fn to_tokens(&self, tokens: &mut TokenStream2) {
+impl ToEntityGraphTokens for PostgresEnum {
+    fn to_entity_graph_tokens(&self) -> TokenStream2 {
         // It's important we remap all lifetimes we spot to `'static` so they can be used during inventory submission.
         let name = self.name.clone();
         let mut static_generics = self.generics.clone();
@@ -131,7 +126,7 @@ impl ToTokens for PostgresEnum {
 
         let to_sql_config = &self.to_sql_config;
 
-        let inv = quote! {
+        quote! {
             unsafe impl #staticless_impl_generics pgx::pgx_sql_entity_graph::metadata::SqlTranslatable for #name #static_ty_generics #static_where_clauses {
                 fn argument_sql() -> core::result::Result<pgx::pgx_sql_entity_graph::metadata::SqlMapping, pgx::pgx_sql_entity_graph::metadata::ArgumentError> {
                     Ok(pgx::pgx_sql_entity_graph::metadata::SqlMapping::As(String::from(stringify!(#name))))
@@ -167,7 +162,17 @@ impl ToTokens for PostgresEnum {
                 };
                 pgx::pgx_sql_entity_graph::SqlGraphEntity::Enum(submission)
             }
-        };
-        tokens.append_all(inv);
+        }
+    }
+}
+
+impl ToRustCodeTokens for PostgresEnum {}
+
+impl Parse for CodeEnrichment<PostgresEnum> {
+    fn parse(input: ParseStream) -> Result<Self, syn::Error> {
+        let parsed: ItemEnum = input.parse()?;
+        let to_sql_config =
+            ToSqlConfig::from_attributes(parsed.attrs.as_slice())?.unwrap_or_default();
+        PostgresEnum::new(parsed.ident, parsed.generics, parsed.variants, to_sql_config)
     }
 }

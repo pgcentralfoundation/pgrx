@@ -54,6 +54,7 @@ mod tests {
     use crate::ordered::OrderedThing;
     use pgx::prelude::*;
 
+    #[cfg(not(feature = "no-schema-generation"))]
     #[pg_test]
     fn test_ordering_via_spi() {
         let items = Spi::get_one::<Vec<OrderedThing>>(

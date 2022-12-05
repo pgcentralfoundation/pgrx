@@ -19,6 +19,7 @@ pub mod entity;
 
 use crate::positioning_ref::PositioningRef;
 
+use crate::enrich::{CodeEnrichment, ToEntityGraphTokens, ToRustCodeTokens};
 use proc_macro2::{Ident, Span, TokenStream as TokenStream2};
 use quote::{quote, ToTokens, TokenStreamExt};
 use syn::parse::{Parse, ParseStream};
@@ -37,11 +38,12 @@ use syn::{LitStr, Token};
 /// use pgx_sql_entity_graph::ExtensionSqlFile;
 ///
 /// # fn main() -> eyre::Result<()> {
+/// use pgx_sql_entity_graph::CodeEnrichment;
 /// let parsed: Macro = parse_quote! {
 ///     extension_sql_file!("sql/example.sql", name = "example", bootstrap)
 /// };
 /// let inner_tokens = parsed.tokens;
-/// let inner: ExtensionSqlFile = parse_quote! {
+/// let inner: CodeEnrichment<ExtensionSqlFile> = parse_quote! {
 ///     #inner_tokens
 /// };
 /// let sql_graph_entity_tokens = inner.to_token_stream();
@@ -54,17 +56,8 @@ pub struct ExtensionSqlFile {
     pub attrs: Punctuated<ExtensionSqlAttribute, Token![,]>,
 }
 
-impl Parse for ExtensionSqlFile {
-    fn parse(input: ParseStream) -> Result<Self, syn::Error> {
-        let path = input.parse()?;
-        let _after_sql_comma: Option<Token![,]> = input.parse()?;
-        let attrs = input.parse_terminated(ExtensionSqlAttribute::parse)?;
-        Ok(Self { path, attrs })
-    }
-}
-
-impl ToTokens for ExtensionSqlFile {
-    fn to_tokens(&self, tokens: &mut TokenStream2) {
+impl ToEntityGraphTokens for ExtensionSqlFile {
+    fn to_entity_graph_tokens(&self) -> TokenStream2 {
         let path = &self.path;
         let mut name = None;
         let mut bootstrap = false;
@@ -102,7 +95,7 @@ impl ToTokens for ExtensionSqlFile {
         let creates_iter = creates.iter();
         let sql_graph_entity_fn_name =
             syn::Ident::new(&format!("__pgx_internals_sql_{}", name.clone()), Span::call_site());
-        let inv = quote! {
+        quote! {
             #[no_mangle]
             #[doc(hidden)]
             pub extern "Rust" fn  #sql_graph_entity_fn_name() -> pgx::pgx_sql_entity_graph::SqlGraphEntity {
@@ -123,8 +116,18 @@ impl ToTokens for ExtensionSqlFile {
                 };
                 pgx::pgx_sql_entity_graph::SqlGraphEntity::CustomSql(submission)
             }
-        };
-        tokens.append_all(inv);
+        }
+    }
+}
+
+impl ToRustCodeTokens for ExtensionSqlFile {}
+
+impl Parse for CodeEnrichment<ExtensionSqlFile> {
+    fn parse(input: ParseStream) -> Result<Self, syn::Error> {
+        let path = input.parse()?;
+        let _after_sql_comma: Option<Token![,]> = input.parse()?;
+        let attrs = input.parse_terminated(ExtensionSqlAttribute::parse)?;
+        Ok(CodeEnrichment(ExtensionSqlFile { path, attrs }))
     }
 }
 
@@ -140,11 +143,12 @@ impl ToTokens for ExtensionSqlFile {
 /// use pgx_sql_entity_graph::ExtensionSql;
 ///
 /// # fn main() -> eyre::Result<()> {
+/// use pgx_sql_entity_graph::CodeEnrichment;
 /// let parsed: Macro = parse_quote! {
 ///     extension_sql!("-- Example content", name = "example", bootstrap)
 /// };
 /// let inner_tokens = parsed.tokens;
-/// let inner: ExtensionSql = parse_quote! {
+/// let inner: CodeEnrichment<ExtensionSql> = parse_quote! {
 ///     #inner_tokens
 /// };
 /// let sql_graph_entity_tokens = inner.to_token_stream();
@@ -158,28 +162,8 @@ pub struct ExtensionSql {
     pub attrs: Punctuated<ExtensionSqlAttribute, Token![,]>,
 }
 
-impl Parse for ExtensionSql {
-    fn parse(input: ParseStream) -> Result<Self, syn::Error> {
-        let sql = input.parse()?;
-        let _after_sql_comma: Option<Token![,]> = input.parse()?;
-        let attrs = input.parse_terminated(ExtensionSqlAttribute::parse)?;
-        let mut name = None;
-        for attr in &attrs {
-            match attr {
-                ExtensionSqlAttribute::Name(found_name) => {
-                    name = Some(found_name.clone());
-                }
-                _ => (),
-            }
-        }
-        let name =
-            name.ok_or_else(|| syn::Error::new(input.span(), "expected `name` to be set"))?;
-        Ok(Self { sql, attrs, name })
-    }
-}
-
-impl ToTokens for ExtensionSql {
-    fn to_tokens(&self, tokens: &mut TokenStream2) {
+impl ToEntityGraphTokens for ExtensionSql {
+    fn to_entity_graph_tokens(&self) -> TokenStream2 {
         let sql = &self.sql;
         let mut bootstrap = false;
         let mut finalize = false;
@@ -208,7 +192,7 @@ impl ToTokens for ExtensionSql {
 
         let sql_graph_entity_fn_name =
             syn::Ident::new(&format!("__pgx_internals_sql_{}", name.value()), Span::call_site());
-        let inv = quote! {
+        quote! {
             #[no_mangle]
             pub extern "Rust" fn  #sql_graph_entity_fn_name() -> pgx::pgx_sql_entity_graph::SqlGraphEntity {
                 extern crate alloc;
@@ -228,8 +212,35 @@ impl ToTokens for ExtensionSql {
                 };
                 pgx::pgx_sql_entity_graph::SqlGraphEntity::CustomSql(submission)
             }
-        };
-        tokens.append_all(inv);
+        }
+    }
+}
+
+impl ToRustCodeTokens for ExtensionSql {}
+
+impl Parse for CodeEnrichment<ExtensionSql> {
+    fn parse(input: ParseStream) -> Result<Self, syn::Error> {
+        let sql = input.parse()?;
+        let _after_sql_comma: Option<Token![,]> = input.parse()?;
+        let attrs = input.parse_terminated(ExtensionSqlAttribute::parse)?;
+        let mut name = None;
+        for attr in &attrs {
+            match attr {
+                ExtensionSqlAttribute::Name(found_name) => {
+                    name = Some(found_name.clone());
+                }
+                _ => (),
+            }
+        }
+        let name =
+            name.ok_or_else(|| syn::Error::new(input.span(), "expected `name` to be set"))?;
+        Ok(CodeEnrichment(ExtensionSql { sql, attrs, name }))
+    }
+}
+
+impl ToTokens for ExtensionSql {
+    fn to_tokens(&self, tokens: &mut TokenStream2) {
+        tokens.append_all(self.to_entity_graph_tokens())
     }
 }
 
@@ -282,6 +293,29 @@ pub enum SqlDeclared {
     Function(String),
 }
 
+impl ToEntityGraphTokens for SqlDeclared {
+    fn to_entity_graph_tokens(&self) -> TokenStream2 {
+        let (variant, identifier) = match &self {
+            SqlDeclared::Type(val) => ("Type", val),
+            SqlDeclared::Enum(val) => ("Enum", val),
+            SqlDeclared::Function(val) => ("Function", val),
+        };
+        let identifier_split = identifier.split("::").collect::<Vec<_>>();
+        let identifier = if identifier_split.len() == 1 {
+            let identifier_infer =
+                Ident::new(identifier_split.last().unwrap(), proc_macro2::Span::call_site());
+            quote! { concat!(module_path!(), "::", stringify!(#identifier_infer)) }
+        } else {
+            quote! { stringify!(#identifier) }
+        };
+        quote! {
+            pgx::pgx_sql_entity_graph::SqlDeclaredEntity::build(#variant, #identifier).unwrap()
+        }
+    }
+}
+
+impl ToRustCodeTokens for SqlDeclared {}
+
 impl Parse for SqlDeclared {
     fn parse(input: ParseStream) -> syn::Result<Self> {
         let variant: Ident = input.parse()?;
@@ -310,22 +344,6 @@ impl Parse for SqlDeclared {
 
 impl ToTokens for SqlDeclared {
     fn to_tokens(&self, tokens: &mut TokenStream2) {
-        let (variant, identifier) = match &self {
-            SqlDeclared::Type(val) => ("Type", val),
-            SqlDeclared::Enum(val) => ("Enum", val),
-            SqlDeclared::Function(val) => ("Function", val),
-        };
-        let identifier_split = identifier.split("::").collect::<Vec<_>>();
-        let identifier = if identifier_split.len() == 1 {
-            let identifier_infer =
-                Ident::new(identifier_split.last().unwrap(), proc_macro2::Span::call_site());
-            quote! { concat!(module_path!(), "::", stringify!(#identifier_infer)) }
-        } else {
-            quote! { stringify!(#identifier) }
-        };
-        let inv = quote! {
-            pgx::pgx_sql_entity_graph::SqlDeclaredEntity::build(#variant, #identifier).unwrap()
-        };
-        tokens.append_all(inv);
+        tokens.append_all(self.to_entity_graph_tokens())
     }
 }

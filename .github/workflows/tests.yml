@@ -155,6 +155,9 @@ jobs:
     - name: Run custom_types example tests
       run: cargo test --package custom_types --features "pg$PG_VER" --no-default-features
 
+    - name: Run custom_types without schema generation example tests
+      run: cargo test --package custom_types --features "pg$PG_VER no-schema-generation" --no-default-features
+
     - name: Run custom_sql example tests
       run: cargo test --package custom_sql --features "pg$PG_VER" --no-default-features
 

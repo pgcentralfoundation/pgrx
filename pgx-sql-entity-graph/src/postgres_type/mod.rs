@@ -16,12 +16,13 @@ to the `pgx` framework and very subject to change between versions. While you ma
 */
 pub mod entity;
 
+use crate::enrich::{ToEntityGraphTokens, ToRustCodeTokens};
 use proc_macro2::{Ident, Span, TokenStream as TokenStream2};
-use quote::{quote, ToTokens, TokenStreamExt};
+use quote::quote;
 use syn::parse::{Parse, ParseStream};
 use syn::{DeriveInput, Generics, ItemStruct};
 
-use crate::ToSqlConfig;
+use crate::{CodeEnrichment, ToSqlConfig};
 
 /// A parsed `#[derive(PostgresType)]` item.
 ///
@@ -35,7 +36,8 @@ use crate::ToSqlConfig;
 /// use pgx_sql_entity_graph::PostgresType;
 ///
 /// # fn main() -> eyre::Result<()> {
-/// let parsed: PostgresType = parse_quote! {
+/// use pgx_sql_entity_graph::CodeEnrichment;
+/// let parsed: CodeEnrichment<PostgresType> = parse_quote! {
 ///     #[derive(PostgresType)]
 ///     struct Example<'a> {
 ///         demo: &'a str,
@@ -61,14 +63,16 @@ impl PostgresType {
         in_fn: Ident,
         out_fn: Ident,
         to_sql_config: ToSqlConfig,
-    ) -> Result<Self, syn::Error> {
+    ) -> Result<CodeEnrichment<Self>, syn::Error> {
         if !to_sql_config.overrides_default() {
             crate::ident_is_acceptable_to_postgres(&name)?;
         }
-        Ok(Self { generics, name, in_fn, out_fn, to_sql_config })
+        Ok(CodeEnrichment(Self { generics, name, in_fn, out_fn, to_sql_config }))
     }
 
-    pub fn from_derive_input(derive_input: DeriveInput) -> Result<Self, syn::Error> {
+    pub fn from_derive_input(
+        derive_input: DeriveInput,
+    ) -> Result<CodeEnrichment<Self>, syn::Error> {
         match derive_input.data {
             syn::Data::Struct(_) | syn::Data::Enum(_) => {}
             syn::Data::Union(_) => {
@@ -95,21 +99,8 @@ impl PostgresType {
     }
 }
 
-impl Parse for PostgresType {
-    fn parse(input: ParseStream) -> Result<Self, syn::Error> {
-        let parsed: ItemStruct = input.parse()?;
-        let to_sql_config =
-            ToSqlConfig::from_attributes(parsed.attrs.as_slice())?.unwrap_or_default();
-        let funcname_in =
-            Ident::new(&format!("{}_in", parsed.ident).to_lowercase(), parsed.ident.span());
-        let funcname_out =
-            Ident::new(&format!("{}_out", parsed.ident).to_lowercase(), parsed.ident.span());
-        Self::new(parsed.ident, parsed.generics, funcname_in, funcname_out, to_sql_config)
-    }
-}
-
-impl ToTokens for PostgresType {
-    fn to_tokens(&self, tokens: &mut TokenStream2) {
+impl ToEntityGraphTokens for PostgresType {
+    fn to_entity_graph_tokens(&self) -> TokenStream2 {
         let name = &self.name;
         let mut static_generics = self.generics.clone();
         static_generics.params = static_generics
@@ -151,7 +142,7 @@ impl ToTokens for PostgresType {
 
         let to_sql_config = &self.to_sql_config;
 
-        let inv = quote! {
+        quote! {
             unsafe impl #staticless_impl_generics pgx::pgx_sql_entity_graph::metadata::SqlTranslatable for #name #static_ty_generics #static_where_clauses {
                 fn argument_sql() -> core::result::Result<pgx::pgx_sql_entity_graph::metadata::SqlMapping, pgx::pgx_sql_entity_graph::metadata::ArgumentError> {
                     Ok(pgx::pgx_sql_entity_graph::metadata::SqlMapping::As(String::from(stringify!(#name))))
@@ -214,7 +205,21 @@ impl ToTokens for PostgresType {
                 };
                 pgx::pgx_sql_entity_graph::SqlGraphEntity::Type(submission)
             }
-        };
-        tokens.append_all(inv);
+        }
+    }
+}
+
+impl ToRustCodeTokens for PostgresType {}
+
+impl Parse for CodeEnrichment<PostgresType> {
+    fn parse(input: ParseStream) -> Result<Self, syn::Error> {
+        let parsed: ItemStruct = input.parse()?;
+        let to_sql_config =
+            ToSqlConfig::from_attributes(parsed.attrs.as_slice())?.unwrap_or_default();
+        let funcname_in =
+            Ident::new(&format!("{}_in", parsed.ident).to_lowercase(), parsed.ident.span());
+        let funcname_out =
+            Ident::new(&format!("{}_out", parsed.ident).to_lowercase(), parsed.ident.span());
+        PostgresType::new(parsed.ident, parsed.generics, funcname_in, funcname_out, to_sql_config)
     }
 }

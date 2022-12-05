@@ -25,6 +25,7 @@ pg13 = [ "pgx-pg-sys/pg13" ]
 pg14 = [ "pgx-pg-sys/pg14" ]
 pg15 = [ "pgx-pg-sys/pg15" ]
 time-crate = ["dep:time"]
+no-schema-generation = ["pgx-macros/no-schema-generation", "pgx-sql-entity-graph/no-schema-generation"]
 
 [package.metadata.docs.rs]
 features = ["pg14"]

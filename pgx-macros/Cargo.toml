@@ -17,6 +17,9 @@ proc-macro = true
 # Enable `#[cfg(docsrs)]` (https://docs.rs/about/builds#cross-compiling)
 rustc-args = ["--cfg", "docsrs"]
 
+[features]
+no-schema-generation = ["pgx-sql-entity-graph/no-schema-generation"]
+
 [dependencies]
 pgx-sql-entity-graph = { path = "../pgx-sql-entity-graph", version = "=0.6.0" }
 proc-macro2 = "1.0.47"

@@ -21,6 +21,7 @@ pg13 = [ "pgx/pg13" ]
 pg14 = [ "pgx/pg14" ]
 pg15 = [ "pgx/pg15" ]
 pg_test = [ ]
+no-schema-generation = [ "pgx/no-schema-generation", "pgx-macros/no-schema-generation" ]
 
 [package.metadata.docs.rs]
 features = ["pg14"]

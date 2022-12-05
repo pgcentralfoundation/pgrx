@@ -19,6 +19,7 @@ pub use aggregate::{
     AggregateType, AggregateTypeList, FinalizeModify, ParallelOption, PgAggregate,
 };
 pub use control_file::ControlFile;
+pub use enrich::CodeEnrichment;
 pub use extension_sql::entity::{ExtensionSqlEntity, SqlDeclaredEntity};
 pub use extension_sql::{ExtensionSql, ExtensionSqlFile, SqlDeclared};
 pub use extern_args::{parse_extern_attributes, ExternArgs};
@@ -49,6 +50,7 @@ pub use used_type::{UsedType, UsedTypeEntity};
 
 pub(crate) mod aggregate;
 pub(crate) mod control_file;
+pub(crate) mod enrich;
 pub(crate) mod extension_sql;
 pub(crate) mod extern_args;
 pub mod lifetimes;
