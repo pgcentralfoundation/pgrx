@@ -54,7 +54,7 @@ impl ToTokens for SearchPath {
     }
 }
 
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct SearchPathList {
     fields: Punctuated<SearchPath, Token![,]>,
 }
