@@ -27,7 +27,7 @@ While conceptually similar to a [`Vec<T>`][std::vec::Vec], arrays are lazy.
 Using a [`Vec<T>`][std::vec::Vec] here means each element of the passed array will be eagerly fetched and converted into a Rust type:
 
 ```rust,no_run
-use pgx::*;
+use pgx::prelude::*;
 
 #[pg_extern]
 fn with_vec(elems: Vec<String>) {
@@ -41,7 +41,7 @@ fn with_vec(elems: Vec<String>) {
 Using an array, elements are only fetched and converted into a Rust type on demand:
 
 ```rust,no_run
-use pgx::*;
+use pgx::prelude::*;
 
 #[pg_extern]
 fn with_vec(elems: Array<String>) {

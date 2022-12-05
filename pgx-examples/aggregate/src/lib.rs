@@ -145,7 +145,7 @@ impl Default for IntegerAvgState {
 #[pg_schema]
 mod tests {
     use crate::IntegerAvgState;
-    use pgx::*;
+    use pgx::prelude::*;
 
     #[pg_test]
     fn test_integer_avg_state() {
