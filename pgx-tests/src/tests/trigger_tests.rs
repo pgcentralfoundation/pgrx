@@ -29,16 +29,14 @@ mod tests {
         #[pg_trigger]
         fn signature_standard(
             trigger: &pgx::PgTrigger,
-        ) -> Result<PgHeapTuple<'_, impl WhoAllocated<pgx::pg_sys::HeapTupleData>>, PgHeapTupleError>
-        {
+        ) -> Result<PgHeapTuple<'_, impl WhoAllocated>, PgHeapTupleError> {
             Ok(trigger.current().unwrap().into_owned())
         }
 
         #[pg_trigger]
         fn signature_explicit_lifetimes<'a>(
             trigger: &'a pgx::PgTrigger,
-        ) -> Result<PgHeapTuple<'a, impl WhoAllocated<pgx::pg_sys::HeapTupleData>>, PgHeapTupleError>
-        {
+        ) -> Result<PgHeapTuple<'a, impl WhoAllocated>, PgHeapTupleError> {
             Ok(trigger.current().unwrap().into_owned())
         }
 
@@ -62,10 +60,7 @@ mod tests {
         #[pg_trigger]
         fn signature_aliased_argument<'a>(
             trigger: AliasedBorrowedPgTrigger<'a>,
-        ) -> Result<
-            PgHeapTuple<'a, impl WhoAllocated<pgx::pg_sys::HeapTupleData>>,
-            core::str::Utf8Error,
-        > {
+        ) -> Result<PgHeapTuple<'a, impl WhoAllocated>, core::str::Utf8Error> {
             Ok(trigger.current().unwrap().into_owned())
         }
 
@@ -99,7 +94,7 @@ mod tests {
     #[pg_trigger]
     fn field_species_fox_to_bear(
         trigger: &pgx::PgTrigger,
-    ) -> Result<PgHeapTuple<'_, impl WhoAllocated<pgx::pg_sys::HeapTupleData>>, TriggerError> {
+    ) -> Result<PgHeapTuple<'_, impl WhoAllocated>, TriggerError> {
         let current = trigger.current().ok_or(TriggerError::NullCurrent)?;
         let mut current = current.into_owned();
 
@@ -144,7 +139,7 @@ mod tests {
     #[pg_trigger]
     fn add_field_boopers(
         trigger: &pgx::PgTrigger,
-    ) -> Result<PgHeapTuple<'_, impl WhoAllocated<pgx::pg_sys::HeapTupleData>>, TriggerError> {
+    ) -> Result<PgHeapTuple<'_, impl WhoAllocated>, TriggerError> {
         let current = trigger.current().ok_or(TriggerError::NullCurrent)?;
         let mut current = current.into_owned();
 
@@ -189,7 +184,7 @@ mod tests {
     #[pg_trigger]
     fn intercept_bears(
         trigger: &pgx::PgTrigger,
-    ) -> Result<PgHeapTuple<'_, impl WhoAllocated<pgx::pg_sys::HeapTupleData>>, TriggerError> {
+    ) -> Result<PgHeapTuple<'_, impl WhoAllocated>, TriggerError> {
         let new = trigger.new().ok_or(TriggerError::NullCurrent)?;
 
         for index in 1..(new.len() + 1) {
@@ -243,7 +238,7 @@ mod tests {
     #[pg_trigger]
     fn inserts_trigger_metadata(
         trigger: &pgx::PgTrigger,
-    ) -> Result<PgHeapTuple<'_, impl WhoAllocated<pgx::pg_sys::HeapTupleData>>, TriggerError> {
+    ) -> Result<PgHeapTuple<'_, impl WhoAllocated>, TriggerError> {
         let current = trigger.current().ok_or(TriggerError::NullCurrent)?;
         let mut current = current.into_owned();
 
@@ -363,7 +358,7 @@ mod tests {
     #[pg_trigger]
     fn inserts_trigger_metadata_safe(
         trigger: &pgx::PgTrigger,
-    ) -> Result<PgHeapTuple<'_, impl WhoAllocated<pgx::pg_sys::HeapTupleData>>, TriggerError> {
+    ) -> Result<PgHeapTuple<'_, impl WhoAllocated>, TriggerError> {
         let pgx::PgTriggerSafe {
             name,
             new: _new,
@@ -489,7 +484,7 @@ mod tests {
     "#)]
     fn has_sql_option_set(
         trigger: &pgx::PgTrigger,
-    ) -> Result<PgHeapTuple<'_, impl WhoAllocated<pgx::pg_sys::HeapTupleData>>, TriggerError> {
+    ) -> Result<PgHeapTuple<'_, impl WhoAllocated>, TriggerError> {
         let current = trigger.current().ok_or(TriggerError::NullCurrent)?;
         let current = current.into_owned();
 

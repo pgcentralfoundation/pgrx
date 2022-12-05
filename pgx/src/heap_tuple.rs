@@ -33,7 +33,7 @@ pub enum PgHeapTupleError {
 /// allocated by Postgres, it is not mutable until [`PgHeapTuple::into_owned`] is called.
 ///
 /// [`PgHeapTuple`]s also describe composite types as defined by [`pgx::composite_type!()`][crate::composite_type].
-pub struct PgHeapTuple<'a, AllocatedBy: WhoAllocated<pg_sys::HeapTupleData>> {
+pub struct PgHeapTuple<'a, AllocatedBy: WhoAllocated> {
     tuple: PgBox<pg_sys::HeapTupleData, AllocatedBy>,
     tupdesc: PgTupleDesc<'a>,
 }
@@ -304,9 +304,7 @@ impl<'a> PgHeapTuple<'a, AllocatedByRust> {
     }
 }
 
-impl<'a, AllocatedBy: WhoAllocated<pg_sys::HeapTupleData>> IntoDatum
-    for PgHeapTuple<'a, AllocatedBy>
-{
+impl<'a, AllocatedBy: WhoAllocated> IntoDatum for PgHeapTuple<'a, AllocatedBy> {
     // Delegate to `into_composite_datum()` as this will normally be used with composite types.
     // See `into_trigger_datum()` if using as a trigger.
     fn into_datum(self) -> Option<pg_sys::Datum> {
@@ -322,7 +320,7 @@ impl<'a, AllocatedBy: WhoAllocated<pg_sys::HeapTupleData>> IntoDatum
     }
 }
 
-impl<'a, AllocatedBy: WhoAllocated<pg_sys::HeapTupleData>> PgHeapTuple<'a, AllocatedBy> {
+impl<'a, AllocatedBy: WhoAllocated> PgHeapTuple<'a, AllocatedBy> {
     /// Consume this [`PgHeapTuple`] and return a composite Datum representation, containing the tuple
     /// data and the corresponding tuple descriptor information.
     pub fn into_composite_datum(self) -> Option<pg_sys::Datum> {

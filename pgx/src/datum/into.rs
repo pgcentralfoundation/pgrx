@@ -372,7 +372,7 @@ impl IntoDatum for () {
 }
 
 /// for user types
-impl<T, AllocatedBy: WhoAllocated<T>> IntoDatum for PgBox<T, AllocatedBy> {
+impl<T, AllocatedBy: WhoAllocated> IntoDatum for PgBox<T, AllocatedBy> {
     #[inline]
     fn into_datum(self) -> Option<pg_sys::Datum> {
         if self.is_null() {

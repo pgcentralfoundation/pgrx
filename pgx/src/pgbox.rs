@@ -92,14 +92,21 @@ use std::ptr::NonNull;
 /// }
 /// ```
 #[repr(transparent)]
-pub struct PgBox<T, AllocatedBy: WhoAllocated<T> = AllocatedByPostgres> {
+pub struct PgBox<T, AllocatedBy: WhoAllocated = AllocatedByPostgres> {
     ptr: Option<NonNull<T>>,
     __marker: PhantomData<AllocatedBy>,
 }
 
 /// A trait to track if the contents of a [PgBox] were allocated by Rust or Postgres.
-pub trait WhoAllocated<T> {
-    fn free(ptr: *mut T);
+pub trait WhoAllocated {
+    /// Implementations can decide if they want to [`pg_sys::pfree`] the specified pointer
+    /// or not.  As such, the specified pointer must be a valid, [`pg_sys::palloc`]'d pointer.
+    ///
+    /// # Safety
+    ///
+    /// This function is unsafe as it cannot determine if the specified pointer is valid and was
+    /// allocated by Postgres.
+    unsafe fn maybe_pfree(ptr: *mut std::os::raw::c_void);
 }
 
 /// Indicates the [PgBox] contents were allocated by Postgres.  This is also PgBox' default
@@ -109,17 +116,15 @@ pub struct AllocatedByPostgres;
 /// Indicates the [PgBox] contents were allocated by Rust.
 pub struct AllocatedByRust;
 
-impl<T> WhoAllocated<T> for AllocatedByPostgres {
+impl WhoAllocated for AllocatedByPostgres {
     /// Doesn't do anything
-    fn free(_ptr: *mut T) {}
+    unsafe fn maybe_pfree(_ptr: *mut std::os::raw::c_void) {}
 }
-impl<T> WhoAllocated<T> for AllocatedByRust {
+impl WhoAllocated for AllocatedByRust {
     /// Uses [pg_sys::pfree] to free the specified pointer
     #[inline]
-    fn free(ptr: *mut T) {
-        unsafe {
-            pg_sys::pfree(ptr as *mut _);
-        }
+    unsafe fn maybe_pfree(ptr: *mut std::os::raw::c_void) {
+        pg_sys::pfree(ptr.cast());
     }
 }
 
@@ -164,7 +169,7 @@ impl<T> PgBox<T, AllocatedByRust> {
     let drained = ptr.drain(..).collect::<Vec<_>>();
     assert_eq!(drained, vec![1, 2, 3])
     ```
-    */
+     */
     pub fn new(val: T) -> PgBox<T, AllocatedByRust> {
         let ptr = Self::alloc0();
         unsafe { core::ptr::write(ptr.as_ptr(), val) };
@@ -185,7 +190,7 @@ impl<T> PgBox<T, AllocatedByRust> {
     let ptr: PgBox<i32, AllocatedByRust> = PgBox::new_in_context(5, PgMemoryContexts::CurrentMemoryContext);
     assert_eq!(*ptr, 5);
     ```
-    */
+     */
     pub fn new_in_context(val: T, memory_context: PgMemoryContexts) -> PgBox<T, AllocatedByRust> {
         let ptr = Self::alloc0_in_context(memory_context);
         unsafe { core::ptr::write(ptr.as_ptr(), val) };
@@ -193,7 +198,7 @@ impl<T> PgBox<T, AllocatedByRust> {
     }
 }
 
-impl<T, AllocatedBy: WhoAllocated<T>> PgBox<T, AllocatedBy> {
+impl<T, AllocatedBy: WhoAllocated> PgBox<T, AllocatedBy> {
     /// Box a pointer that was allocated within Rust
     ///
     /// When this `PgBox<T>` is dropped, the boxed memory is freed.  Since Rust
@@ -322,8 +327,8 @@ impl<T, AllocatedBy: WhoAllocated<T>> PgBox<T, AllocatedBy> {
 
     /// Box nothing
     #[inline]
-    pub fn null() -> PgBox<T, AllocatedByPostgres> {
-        PgBox::<T, AllocatedByPostgres> { ptr: None, __marker: PhantomData }
+    pub fn null() -> PgBox<T, AllocatedBy> {
+        PgBox::<T, AllocatedBy> { ptr: None, __marker: PhantomData }
     }
 
     /// Are we boxing a NULL?
@@ -373,7 +378,7 @@ impl<T, AllocatedBy: WhoAllocated<T>> PgBox<T, AllocatedBy> {
     }
 }
 
-impl<T, AllocatedBy: WhoAllocated<T>> Deref for PgBox<T, AllocatedBy> {
+impl<T, AllocatedBy: WhoAllocated> Deref for PgBox<T, AllocatedBy> {
     type Target = T;
 
     #[track_caller]
@@ -385,7 +390,7 @@ impl<T, AllocatedBy: WhoAllocated<T>> Deref for PgBox<T, AllocatedBy> {
     }
 }
 
-impl<T, AllocatedBy: WhoAllocated<T>> DerefMut for PgBox<T, AllocatedBy> {
+impl<T, AllocatedBy: WhoAllocated> DerefMut for PgBox<T, AllocatedBy> {
     #[track_caller]
     fn deref_mut(&mut self) -> &mut T {
         match self.ptr.as_mut() {
@@ -395,10 +400,13 @@ impl<T, AllocatedBy: WhoAllocated<T>> DerefMut for PgBox<T, AllocatedBy> {
     }
 }
 
-impl<T, AllocatedBy: WhoAllocated<T>> Drop for PgBox<T, AllocatedBy> {
+impl<T, AllocatedBy: WhoAllocated> Drop for PgBox<T, AllocatedBy> {
     fn drop(&mut self) {
         if let Some(ptr) = self.ptr {
-            AllocatedBy::free(ptr.as_ptr());
+            unsafe {
+                // SAFETY:  we know ptr is a valid, non-null, Postgres allocated pointer
+                AllocatedBy::maybe_pfree(ptr.as_ptr().cast());
+            }
         }
     }
 }
