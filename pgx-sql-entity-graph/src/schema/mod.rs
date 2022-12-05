@@ -83,17 +83,17 @@ impl Schema {
         quote! {
             #[no_mangle]
             #[doc(hidden)]
-            pub extern "Rust" fn  #sql_graph_entity_fn_name() -> __pgx__codegen__private__::SqlGraphEntity {
+            pub extern "Rust" fn  #sql_graph_entity_fn_name() -> ::pgx::__codegen__private__::SqlGraphEntity {
                 extern crate alloc;
                 use alloc::vec::Vec;
                 use alloc::vec;
-                let submission = __pgx__codegen__private__::SchemaEntity {
+                let submission = ::pgx::__codegen__private__::SchemaEntity {
                         module_path: module_path!(),
                         name: stringify!(#ident),
                         file: file!(),
                         line: line!(),
                     };
-                __pgx__codegen__private__::SqlGraphEntity::Schema(submission)
+                ::pgx::__codegen__private__::SqlGraphEntity::Schema(submission)
             }
         }
     }

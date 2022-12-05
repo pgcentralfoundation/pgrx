@@ -2,12 +2,6 @@
 pub use ::pgx_macros::*; // yes, we really do want to re-export every macro that pgx_macros provides
 pub use ::pgx_pg_sys as pg_sys;
 
-// Used strictly by our code generation from pgx-macros and pgx-sql-entity-graph.  This is not meant for you
-#[path = "prelude/codegen.rs"]
-#[allow(non_snake_case)]
-#[doc(hidden)]
-pub mod __pgx__codegen__private__;
-
 // Can't make an extension without this
 pub use crate::pg_module_magic;
 

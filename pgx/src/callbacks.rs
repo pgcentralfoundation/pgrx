@@ -9,6 +9,7 @@ Use of this source code is governed by the MIT license that can be found in the 
 
 //! Provides safe wrappers around Postgres' "Transaction" and "Sub Transaction" hook system
 
+use crate as pgx; // for #[pg_guard] support from within ourself
 use crate::pg_sys;
 use crate::prelude::*;
 use std::cell::RefCell;

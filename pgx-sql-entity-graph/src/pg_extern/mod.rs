@@ -296,18 +296,18 @@ impl PgExtern {
         quote_spanned! { self.func.sig.span() =>
             #[no_mangle]
             #[doc(hidden)]
-            pub extern "Rust" fn  #sql_graph_entity_fn_name() -> __pgx__codegen__private__::SqlGraphEntity {
+            pub extern "Rust" fn  #sql_graph_entity_fn_name() -> ::pgx::__codegen__private__::SqlGraphEntity {
                 extern crate alloc;
                 #[allow(unused_imports)]
                 use alloc::{vec, vec::Vec};
                 type FunctionPointer = #unsafety fn(#( #input_types ),*) #return_type;
                 let metadata: FunctionPointer = #ident;
-                let submission = __pgx__codegen__private__::PgExternEntity {
+                let submission = ::pgx::__codegen__private__::PgExternEntity {
                     name: #name,
                     unaliased_name: stringify!(#ident),
                     module_path: core::module_path!(),
                     full_path: concat!(core::module_path!(), "::", stringify!(#ident)),
-                    metadata: __pgx__codegen__private__::FunctionMetadata::entity(&metadata),
+                    metadata: ::pgx::__codegen__private__::FunctionMetadata::entity(&metadata),
                     fn_args: vec![#(#inputs_iter),*],
                     fn_return: #returns,
                     #[allow(clippy::or_fun_call)]
@@ -321,7 +321,7 @@ impl PgExtern {
                     operator: None #( .unwrap_or_else(|| Some(#operator)) )*,
                     to_sql_config: #to_sql_config,
                 };
-                __pgx__codegen__private__::SqlGraphEntity::Function(submission)
+                ::pgx::__codegen__private__::SqlGraphEntity::Function(submission)
             }
         }
     }
@@ -334,8 +334,8 @@ impl PgExtern {
         quote_spanned! { self.func.sig.span() =>
             #[no_mangle]
             #[doc(hidden)]
-            pub extern "C" fn #finfo_name() -> &'static __pgx__codegen__private__::Pg_finfo_record {
-                const V1_API: __pgx__codegen__private__::Pg_finfo_record = __pgx__codegen__private__::Pg_finfo_record { api_version: 1 };
+            pub extern "C" fn #finfo_name() -> &'static ::pgx::__codegen__private__::Pg_finfo_record {
+                const V1_API: ::pgx::__codegen__private__::Pg_finfo_record = ::pgx::__codegen__private__::Pg_finfo_record { api_version: 1 };
                 &V1_API
             }
         }
@@ -362,26 +362,26 @@ impl PgExtern {
             let resolved_ty = &arg.used_ty.resolved_ty;
             if arg.used_ty.resolved_ty.to_token_stream().to_string() == quote!(pgx::pg_sys::FunctionCallInfo).to_token_stream().to_string()
                 || arg.used_ty.resolved_ty.to_token_stream().to_string() == quote!(pg_sys::FunctionCallInfo).to_token_stream().to_string()
-                || arg.used_ty.resolved_ty.to_token_stream().to_string() == quote!(__pgx__codegen__private__::FunctionCallInfo).to_token_stream().to_string()
+                || arg.used_ty.resolved_ty.to_token_stream().to_string() == quote!(::pgx::__codegen__private__::FunctionCallInfo).to_token_stream().to_string()
             {
                 quote_spanned! {pat.span()=>
                     let #pat = #fcinfo_ident;
                 }
             } else if arg.used_ty.resolved_ty.to_token_stream().to_string() == quote!(()).to_token_stream().to_string() {
                 quote_spanned! {pat.span()=>
-                    debug_assert!(__pgx__codegen__private__::pg_getarg::<()>(#fcinfo_ident, #idx).is_none(), "A `()` argument should always recieve `NULL`");
+                    debug_assert!(::pgx::__codegen__private__::pg_getarg::<()>(#fcinfo_ident, #idx).is_none(), "A `()` argument should always recieve `NULL`");
                     let #pat = ();
                 }
             } else {
                 match (is_raw, &arg.used_ty.optional) {
                     (true, None) | (true, Some(_)) => quote_spanned! { pat.span() =>
-                        let #pat = __pgx__codegen__private__::pg_getarg_datum_raw(#fcinfo_ident, #idx) as #resolved_ty;
+                        let #pat = ::pgx::__codegen__private__::pg_getarg_datum_raw(#fcinfo_ident, #idx) as #resolved_ty;
                     },
                     (false, None) => quote_spanned! { pat.span() =>
-                        let #pat = __pgx__codegen__private__::pg_getarg::<#resolved_ty>(#fcinfo_ident, #idx).unwrap_or_else(|| panic!("{} is null", stringify!{#pat}));
+                        let #pat = ::pgx::__codegen__private__::pg_getarg::<#resolved_ty>(#fcinfo_ident, #idx).unwrap_or_else(|| panic!("{} is null", stringify!{#pat}));
                     },
                     (false, Some(inner)) => quote_spanned! { pat.span() =>
-                        let #pat = __pgx__codegen__private__::pg_getarg::<#inner>(#fcinfo_ident, #idx);
+                        let #pat = ::pgx::__codegen__private__::pg_getarg::<#inner>(#fcinfo_ident, #idx);
                     },
                 }
             }
@@ -392,7 +392,7 @@ impl PgExtern {
                     #[no_mangle]
                     #[doc(hidden)]
                     #[pg_guard]
-                    pub unsafe extern "C" fn #func_name_wrapper #func_generics(#fcinfo_ident: __pgx__codegen__private__::FunctionCallInfo) {
+                    pub unsafe extern "C" fn #func_name_wrapper #func_generics(#fcinfo_ident: ::pgx::__codegen__private__::FunctionCallInfo) {
                         #(
                             #arg_fetches
                         )*
@@ -405,11 +405,12 @@ impl PgExtern {
                 let result_ident = syn::Ident::new("result", self.func.sig.span());
                 let retval_transform = if retval_ty.resolved_ty == syn::parse_quote!(()) {
                     quote_spanned! { self.func.sig.output.span() =>
-                       __pgx__codegen__private__::pg_return_void()
+                       ::pgx::__codegen__private__::pg_return_void()
                     }
                 } else if retval_ty.resolved_ty == syn::parse_quote!(pg_sys::Datum)
                     || retval_ty.resolved_ty == syn::parse_quote!(pgx::pg_sys::Datum)
-                    || retval_ty.resolved_ty == syn::parse_quote!(__pgx__codegen__private__::Datum)
+                    || retval_ty.resolved_ty
+                        == syn::parse_quote!(::pgx::__codegen__private__::Datum)
                 {
                     quote_spanned! { self.func.sig.output.span() =>
                        #result_ident
@@ -418,14 +419,14 @@ impl PgExtern {
                     quote_spanned! { self.func.sig.output.span() =>
                         match #result_ident {
                             Some(result) => {
-                                __pgx__codegen__private__::IntoDatum::into_datum(result).unwrap_or_else(|| panic!("returned Option<T> was NULL"))
+                                ::pgx::__codegen__private__::IntoDatum::into_datum(result).unwrap_or_else(|| panic!("returned Option<T> was NULL"))
                             },
-                            None => __pgx__codegen__private__::pg_return_null(#fcinfo_ident)
+                            None => ::pgx::__codegen__private__::pg_return_null(#fcinfo_ident)
                         }
                     }
                 } else {
                     quote_spanned! { self.func.sig.output.span() =>
-                        __pgx__codegen__private__::IntoDatum::into_datum(#result_ident).unwrap_or_else(|| panic!("returned Datum was NULL"))
+                        ::pgx::__codegen__private__::IntoDatum::into_datum(#result_ident).unwrap_or_else(|| panic!("returned Datum was NULL"))
                     }
                 };
 
@@ -433,7 +434,7 @@ impl PgExtern {
                     #[no_mangle]
                     #[doc(hidden)]
                     #[pg_guard]
-                    pub unsafe extern "C" fn #func_name_wrapper #func_generics(#fcinfo_ident: __pgx__codegen__private__::FunctionCallInfo) -> __pgx__codegen__private__::Datum {
+                    pub unsafe extern "C" fn #func_name_wrapper #func_generics(#fcinfo_ident: ::pgx::__codegen__private__::FunctionCallInfo) -> ::pgx::__codegen__private__::Datum {
                         #(
                             #arg_fetches
                         )*
@@ -464,39 +465,39 @@ impl PgExtern {
                     #[doc(hidden)]
                     #[pg_guard]
                     #[warn(unsafe_op_in_unsafe_fn)]
-                    pub unsafe extern "C" fn #func_name_wrapper #func_generics(#fcinfo_ident: __pgx__codegen__private__::FunctionCallInfo) -> __pgx__codegen__private__::Datum {
+                    pub unsafe extern "C" fn #func_name_wrapper #func_generics(#fcinfo_ident: ::pgx::__codegen__private__::FunctionCallInfo) -> ::pgx::__codegen__private__::Datum {
                         struct IteratorHolder<'__pgx_internal_lifetime, T: std::panic::UnwindSafe + std::panic::RefUnwindSafe> {
                             iter: *mut SetOfIterator<'__pgx_internal_lifetime, T>,
                         }
 
-                        let mut funcctx: __pgx__codegen__private__::PgBox<__pgx__codegen__private__::FuncCallContext>;
-                        let mut iterator_holder: __pgx__codegen__private__::PgBox<IteratorHolder<#retval_ty_resolved>>;
+                        let mut funcctx: ::pgx::__codegen__private__::PgBox<::pgx::__codegen__private__::FuncCallContext>;
+                        let mut iterator_holder: ::pgx::__codegen__private__::PgBox<IteratorHolder<#retval_ty_resolved>>;
 
                         unsafe {
-                            if __pgx__codegen__private__::srf_is_first_call(#fcinfo_ident) {
-                                funcctx = __pgx__codegen__private__::srf_first_call_init(#fcinfo_ident);
-                                funcctx.user_fctx = __pgx__codegen__private__::PgMemoryContexts::For(funcctx.multi_call_memory_ctx).palloc_struct::<IteratorHolder<#retval_ty_resolved>>() as *mut ::core::ffi::c_void;
-                                iterator_holder = __pgx__codegen__private__::PgBox::from_pg(funcctx.user_fctx as *mut IteratorHolder<#retval_ty_resolved>);
+                            if ::pgx::__codegen__private__::srf_is_first_call(#fcinfo_ident) {
+                                funcctx = ::pgx::__codegen__private__::srf_first_call_init(#fcinfo_ident);
+                                funcctx.user_fctx = ::pgx::__codegen__private__::PgMemoryContexts::For(funcctx.multi_call_memory_ctx).palloc_struct::<IteratorHolder<#retval_ty_resolved>>() as *mut ::core::ffi::c_void;
+                                iterator_holder = ::pgx::__codegen__private__::PgBox::from_pg(funcctx.user_fctx as *mut IteratorHolder<#retval_ty_resolved>);
 
                                 // function arguments need to be "fetched" while in the function call's
                                 // multi-call-memory-context to ensure that any detoasted datums will
                                 // live long enough for the SRF to use them over each call
-                                let #result_ident = match __pgx__codegen__private__::PgMemoryContexts::For(funcctx.multi_call_memory_ctx).switch_to(|_| {
+                                let #result_ident = match ::pgx::__codegen__private__::PgMemoryContexts::For(funcctx.multi_call_memory_ctx).switch_to(|_| {
                                     #( #arg_fetches )*
                                     #result_handler
                                 }) {
                                     Some(result) => result,
                                     None => {
-                                        __pgx__codegen__private__::srf_return_done(#fcinfo_ident, &mut funcctx);
-                                        return __pgx__codegen__private__::pg_return_null(#fcinfo_ident)
+                                        ::pgx::__codegen__private__::srf_return_done(#fcinfo_ident, &mut funcctx);
+                                        return ::pgx::__codegen__private__::pg_return_null(#fcinfo_ident)
                                     }
                                 };
 
-                                iterator_holder.iter = __pgx__codegen__private__::PgMemoryContexts::For(funcctx.multi_call_memory_ctx).leak_trivial_alloc(result);
+                                iterator_holder.iter = ::pgx::__codegen__private__::PgMemoryContexts::For(funcctx.multi_call_memory_ctx).leak_trivial_alloc(result);
                             }
 
-                            funcctx = __pgx__codegen__private__::srf_per_call_setup(#fcinfo_ident);
-                            iterator_holder = __pgx__codegen__private__::PgBox::from_pg(funcctx.user_fctx as *mut IteratorHolder<#retval_ty_resolved>);
+                            funcctx = ::pgx::__codegen__private__::srf_per_call_setup(#fcinfo_ident);
+                            iterator_holder = ::pgx::__codegen__private__::PgBox::from_pg(funcctx.user_fctx as *mut IteratorHolder<#retval_ty_resolved>);
                         }
 
                         // SAFETY: should have been set up correctly on this or previous call
@@ -508,10 +509,10 @@ impl PgExtern {
                                 Box::leak(iter);
 
                                 // SAFETY: what is an srf if it does not return?
-                                unsafe { __pgx__codegen__private__::srf_return_next(#fcinfo_ident, &mut funcctx) };
-                                match __pgx__codegen__private__::IntoDatum::into_datum(result) {
+                                unsafe { ::pgx::__codegen__private__::srf_return_next(#fcinfo_ident, &mut funcctx) };
+                                match ::pgx::__codegen__private__::IntoDatum::into_datum(result) {
                                     Some(datum) => datum,
-                                    None => __pgx__codegen__private__::pg_return_null(#fcinfo_ident),
+                                    None => ::pgx::__codegen__private__::pg_return_null(#fcinfo_ident),
                                 }
                             },
                             None => {
@@ -520,8 +521,8 @@ impl PgExtern {
                                 Box::leak(iter);
 
                                 // SAFETY: seem to be finished
-                                unsafe { __pgx__codegen__private__::srf_return_done(#fcinfo_ident, &mut funcctx) };
-                                __pgx__codegen__private__::pg_return_null(#fcinfo_ident)
+                                unsafe { ::pgx::__codegen__private__::srf_return_done(#fcinfo_ident, &mut funcctx) };
+                                ::pgx::__codegen__private__::pg_return_null(#fcinfo_ident)
                             },
                         }
                     }
@@ -536,11 +537,11 @@ impl PgExtern {
                 let retval_tuple_indexes = (0..retval_tys.len()).map(syn::Index::from);
                 let retval_tuple_len = retval_tuple_indexes.len();
                 let create_heap_tuple = quote! {
-                    let mut datums: [__pgx__codegen__private__::Datum; #retval_tuple_len] = [__pgx__codegen__private__::Datum::from(0); #retval_tuple_len];
+                    let mut datums: [::pgx::__codegen__private__::Datum; #retval_tuple_len] = [::pgx::__codegen__private__::Datum::from(0); #retval_tuple_len];
                     let mut nulls: [bool; #retval_tuple_len] = [false; #retval_tuple_len];
 
                     #(
-                        let datum = __pgx__codegen__private__::IntoDatum::into_datum(result.#retval_tuple_indexes);
+                        let datum = ::pgx::__codegen__private__::IntoDatum::into_datum(result.#retval_tuple_indexes);
                         match datum {
                             Some(datum) => { datums[#retval_tuple_indexes] = datum.into(); },
                             None => { nulls[#retval_tuple_indexes] = true; }
@@ -548,7 +549,7 @@ impl PgExtern {
                     )*
 
                     // SAFETY: just went to considerable trouble to make sure these are well-formed for a tuple
-                    let heap_tuple = unsafe { __pgx__codegen__private__::heap_form_tuple(#funcctx_ident.tuple_desc, datums.as_mut_ptr(), nulls.as_mut_ptr()) };
+                    let heap_tuple = unsafe { ::pgx::__codegen__private__::heap_form_tuple(#funcctx_ident.tuple_desc, datums.as_mut_ptr(), nulls.as_mut_ptr()) };
                 };
 
                 let result_handler = if optional {
@@ -567,49 +568,49 @@ impl PgExtern {
                     #[doc(hidden)]
                     #[pg_guard]
                     #[warn(unsafe_op_in_unsafe_fn)]
-                    pub unsafe extern "C" fn #func_name_wrapper #func_generics(#fcinfo_ident: __pgx__codegen__private__::FunctionCallInfo) -> __pgx__codegen__private__::Datum {
+                    pub unsafe extern "C" fn #func_name_wrapper #func_generics(#fcinfo_ident: ::pgx::__codegen__private__::FunctionCallInfo) -> ::pgx::__codegen__private__::Datum {
                         struct IteratorHolder<'__pgx_internal_lifetime, T: std::panic::UnwindSafe + std::panic::RefUnwindSafe> {
-                            iter: *mut __pgx__codegen__private__::TableIterator<'__pgx_internal_lifetime, T>,
+                            iter: *mut ::pgx::__codegen__private__::TableIterator<'__pgx_internal_lifetime, T>,
                         }
 
-                        let mut funcctx: __pgx__codegen__private__::PgBox<__pgx__codegen__private__::FuncCallContext>;
-                        let mut iterator_holder: __pgx__codegen__private__::PgBox<IteratorHolder<#retval_tys_tuple>>;
+                        let mut funcctx: ::pgx::__codegen__private__::PgBox<::pgx::__codegen__private__::FuncCallContext>;
+                        let mut iterator_holder: ::pgx::__codegen__private__::PgBox<IteratorHolder<#retval_tys_tuple>>;
 
                         unsafe {
-                            if __pgx__codegen__private__::srf_is_first_call(#fcinfo_ident) {
-                                funcctx = __pgx__codegen__private__::srf_first_call_init(#fcinfo_ident);
-                                funcctx.user_fctx = __pgx__codegen__private__::PgMemoryContexts::For(funcctx.multi_call_memory_ctx).palloc_struct::<IteratorHolder<#retval_tys_tuple>>() as *mut ::core::ffi::c_void;
-                                funcctx.tuple_desc = __pgx__codegen__private__::PgMemoryContexts::For(funcctx.multi_call_memory_ctx).switch_to(|_| {
-                                    let mut tupdesc: *mut __pgx__codegen__private__::TupleDescData = std::ptr::null_mut();
+                            if ::pgx::__codegen__private__::srf_is_first_call(#fcinfo_ident) {
+                                funcctx = ::pgx::__codegen__private__::srf_first_call_init(#fcinfo_ident);
+                                funcctx.user_fctx = ::pgx::__codegen__private__::PgMemoryContexts::For(funcctx.multi_call_memory_ctx).palloc_struct::<IteratorHolder<#retval_tys_tuple>>() as *mut ::core::ffi::c_void;
+                                funcctx.tuple_desc = ::pgx::__codegen__private__::PgMemoryContexts::For(funcctx.multi_call_memory_ctx).switch_to(|_| {
+                                    let mut tupdesc: *mut ::pgx::__codegen__private__::TupleDescData = std::ptr::null_mut();
 
                                     /* Build a tuple descriptor for our result type */
-                                    if __pgx__codegen__private__::get_call_result_type(#fcinfo_ident, std::ptr::null_mut(), &mut tupdesc) != __pgx__codegen__private__::TypeFuncClass_TYPEFUNC_COMPOSITE {
-                                        __pgx__codegen__private__::error!("return type must be a row type");
+                                    if ::pgx::__codegen__private__::get_call_result_type(#fcinfo_ident, std::ptr::null_mut(), &mut tupdesc) != ::pgx::__codegen__private__::TypeFuncClass_TYPEFUNC_COMPOSITE {
+                                        ::pgx::__codegen__private__::error!("return type must be a row type");
                                     }
 
-                                    __pgx__codegen__private__::BlessTupleDesc(tupdesc)
+                                    ::pgx::__codegen__private__::BlessTupleDesc(tupdesc)
                                 });
-                                iterator_holder = __pgx__codegen__private__::PgBox::from_pg(funcctx.user_fctx as *mut IteratorHolder<#retval_tys_tuple>);
+                                iterator_holder = ::pgx::__codegen__private__::PgBox::from_pg(funcctx.user_fctx as *mut IteratorHolder<#retval_tys_tuple>);
 
                                 // function arguments need to be "fetched" while in the function call's
                                 // multi-call-memory-context to ensure that any detoasted datums will
                                 // live long enough for the SRF to use them over each call
-                                let #result_ident = match __pgx__codegen__private__::PgMemoryContexts::For(funcctx.multi_call_memory_ctx).switch_to(|_| {
+                                let #result_ident = match ::pgx::__codegen__private__::PgMemoryContexts::For(funcctx.multi_call_memory_ctx).switch_to(|_| {
                                     #( #arg_fetches )*
                                     #result_handler
                                 }) {
                                     Some(result) => result,
                                     None => {
-                                        __pgx__codegen__private__::srf_return_done(#fcinfo_ident, &mut funcctx);
-                                        return __pgx__codegen__private__::pg_return_null(#fcinfo_ident)
+                                        ::pgx::__codegen__private__::srf_return_done(#fcinfo_ident, &mut funcctx);
+                                        return ::pgx::__codegen__private__::pg_return_null(#fcinfo_ident)
                                     }
                                 };
 
-                                iterator_holder.iter = __pgx__codegen__private__::PgMemoryContexts::For(funcctx.multi_call_memory_ctx).leak_and_drop_on_delete(result);
+                                iterator_holder.iter = ::pgx::__codegen__private__::PgMemoryContexts::For(funcctx.multi_call_memory_ctx).leak_and_drop_on_delete(result);
                             }
 
-                            funcctx = __pgx__codegen__private__::srf_per_call_setup(#fcinfo_ident);
-                            iterator_holder = __pgx__codegen__private__::PgBox::from_pg(funcctx.user_fctx as *mut IteratorHolder<#retval_tys_tuple>);
+                            funcctx = ::pgx::__codegen__private__::srf_per_call_setup(#fcinfo_ident);
+                            iterator_holder = ::pgx::__codegen__private__::PgBox::from_pg(funcctx.user_fctx as *mut IteratorHolder<#retval_tys_tuple>);
                         }
 
                         // SAFETY: should have been set up correctly on this or previous call
@@ -622,9 +623,9 @@ impl PgExtern {
 
                                 #create_heap_tuple
 
-                                let datum = __pgx__codegen__private__::heap_tuple_get_datum(heap_tuple);
+                                let datum = ::pgx::__codegen__private__::heap_tuple_get_datum(heap_tuple);
                                 // SAFETY: what is an srf if it does not return?
-                                unsafe { __pgx__codegen__private__::srf_return_next(#fcinfo_ident, &mut funcctx) };
+                                unsafe { ::pgx::__codegen__private__::srf_return_next(#fcinfo_ident, &mut funcctx) };
                                 datum
                             },
                             None => {
@@ -633,8 +634,8 @@ impl PgExtern {
                                 Box::leak(iter);
 
                                 // SAFETY: seem to be finished
-                                unsafe { __pgx__codegen__private__::srf_return_done(#fcinfo_ident, &mut funcctx) };
-                                __pgx__codegen__private__::pg_return_null(#fcinfo_ident)
+                                unsafe { ::pgx::__codegen__private__::srf_return_done(#fcinfo_ident, &mut funcctx) };
+                                ::pgx::__codegen__private__::pg_return_null(#fcinfo_ident)
                             },
                         }
                     }

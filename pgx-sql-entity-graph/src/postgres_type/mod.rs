@@ -143,44 +143,44 @@ impl ToEntityGraphTokens for PostgresType {
         let to_sql_config = &self.to_sql_config;
 
         quote! {
-            unsafe impl #staticless_impl_generics __pgx__codegen__private__::SqlTranslatable for #name #static_ty_generics #static_where_clauses {
-                fn argument_sql() -> core::result::Result<__pgx__codegen__private__::SqlMapping, __pgx__codegen__private__::ArgumentError> {
-                    Ok(__pgx__codegen__private__::SqlMapping::As(String::from(stringify!(#name))))
+            unsafe impl #staticless_impl_generics ::pgx::__codegen__private__::SqlTranslatable for #name #static_ty_generics #static_where_clauses {
+                fn argument_sql() -> core::result::Result<::pgx::__codegen__private__::SqlMapping, ::pgx::__codegen__private__::ArgumentError> {
+                    Ok(::pgx::__codegen__private__::SqlMapping::As(String::from(stringify!(#name))))
                 }
 
-                fn return_sql() -> core::result::Result<__pgx__codegen__private__::Returns, __pgx__codegen__private__::ReturnsError> {
-                    Ok(__pgx__codegen__private__::Returns::One(__pgx__codegen__private__::SqlMapping::As(String::from(stringify!(#name)))))
+                fn return_sql() -> core::result::Result<::pgx::__codegen__private__::Returns, ::pgx::__codegen__private__::ReturnsError> {
+                    Ok(::pgx::__codegen__private__::Returns::One(::pgx::__codegen__private__::SqlMapping::As(String::from(stringify!(#name)))))
                 }
             }
 
 
             #[no_mangle]
             #[doc(hidden)]
-            pub extern "Rust" fn  #sql_graph_entity_fn_name() -> __pgx__codegen__private__::SqlGraphEntity {
+            pub extern "Rust" fn  #sql_graph_entity_fn_name() -> ::pgx::__codegen__private__::SqlGraphEntity {
                 extern crate alloc;
                 use alloc::vec::Vec;
                 use alloc::vec;
                 use alloc::string::{String, ToString};
-                use __pgx__codegen__private__::WithTypeIds;
+                use ::pgx::__codegen__private__::WithTypeIds;
 
                 let mut mappings = Default::default();
-                <#name #static_ty_generics as __pgx__codegen__private__::WithTypeIds>::register_with_refs(
+                <#name #static_ty_generics as ::pgx::__codegen__private__::WithTypeIds>::register_with_refs(
                     &mut mappings,
                     stringify!(#name).to_string()
                 );
-                __pgx__codegen__private__::WithSizedTypeIds::<#name #static_ty_generics>::register_sized_with_refs(
+                ::pgx::__codegen__private__::WithSizedTypeIds::<#name #static_ty_generics>::register_sized_with_refs(
                     &mut mappings,
                     stringify!(#name).to_string()
                 );
-                __pgx__codegen__private__::WithArrayTypeIds::<#name #static_ty_generics>::register_array_with_refs(
+                ::pgx::__codegen__private__::WithArrayTypeIds::<#name #static_ty_generics>::register_array_with_refs(
                     &mut mappings,
                     stringify!(#name).to_string()
                 );
-                __pgx__codegen__private__::WithVarlenaTypeIds::<#name #static_ty_generics>::register_varlena_with_refs(
+                ::pgx::__codegen__private__::WithVarlenaTypeIds::<#name #static_ty_generics>::register_varlena_with_refs(
                     &mut mappings,
                     stringify!(#name).to_string()
                 );
-                let submission = __pgx__codegen__private__::PostgresTypeEntity {
+                let submission = ::pgx::__codegen__private__::PostgresTypeEntity {
                     name: stringify!(#name),
                     file: file!(),
                     line: line!(),
@@ -203,7 +203,7 @@ impl ToEntityGraphTokens for PostgresType {
                     },
                     to_sql_config: #to_sql_config,
                 };
-                __pgx__codegen__private__::SqlGraphEntity::Type(submission)
+                ::pgx::__codegen__private__::SqlGraphEntity::Type(submission)
             }
         }
     }
