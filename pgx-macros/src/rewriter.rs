@@ -13,10 +13,11 @@ use proc_macro2::Ident;
 use quote::{quote, quote_spanned};
 use std::ops::Deref;
 use std::str::FromStr;
+use syn::punctuated::Punctuated;
 use syn::spanned::Spanned;
 use syn::{
-    FnArg, ForeignItem, ForeignItemFn, ItemFn, ItemForeignMod, Pat, ReturnType, Signature,
-    Visibility,
+    FnArg, ForeignItem, ForeignItemFn, GenericParam, ItemFn, ItemForeignMod, Pat, ReturnType,
+    Signature, Token, Visibility,
 };
 
 pub struct PgGuardRewriter();
@@ -43,6 +44,8 @@ impl PgGuardRewriter {
         let sig = func.sig.clone();
         let vis = func.vis.clone();
         let attrs = func.attrs.clone();
+
+        let generics = func.sig.generics.clone();
 
         // but for the inner function (the one we're wrapping) we don't need any kind of
         // abi classification
@@ -72,6 +75,21 @@ impl PgGuardRewriter {
             quote! {}
         };
 
+        let body = if generics.params.is_empty() {
+            quote! { #func_name(#arg_list) }
+        } else {
+            let ty = generics
+                .params
+                .into_iter()
+                .filter_map(|p| match p {
+                    GenericParam::Type(ty) => Some(ty.ident),
+                    GenericParam::Const(c) => Some(c.ident),
+                    GenericParam::Lifetime(_) => None,
+                })
+                .collect::<Punctuated<_, Token![,]>>();
+            quote! { #func_name::<#ty>(#arg_list) }
+        };
+
         quote_spanned! {func.span()=>
             #prolog
             #(#attrs)*
@@ -81,7 +99,7 @@ impl PgGuardRewriter {
 
                 #[allow(unused_unsafe)]
                 unsafe {
-                    pg_sys::panic::pgx_extern_c_guard( || #func_name(#arg_list) )
+                    pg_sys::panic::pgx_extern_c_guard( || #body )
                 }
             }
         }

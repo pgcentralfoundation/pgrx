@@ -31,6 +31,7 @@ mod memcxt_tests;
 mod name_tests;
 mod numeric_tests;
 mod pg_extern_tests;
+mod pg_guard_tests;
 mod pg_try_tests;
 mod pgbox_tests;
 mod postgres_type_tests;
