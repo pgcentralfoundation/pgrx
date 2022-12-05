@@ -81,7 +81,7 @@ impl PgGuardRewriter {
 
                 #[allow(unused_unsafe)]
                 unsafe {
-                    __pgx__codegen__private__::pgx_extern_c_guard( || #func_name(#arg_list) )
+                    pgx::__codegen__private__::pgx_extern_c_guard( || #func_name(#arg_list) )
                 }
             }
         }

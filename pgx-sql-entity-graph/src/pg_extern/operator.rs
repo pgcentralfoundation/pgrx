@@ -44,7 +44,7 @@ impl ToTokens for PgOperator {
         let hashes = self.hashes;
         let merges = self.merges;
         let quoted = quote! {
-            __pgx__codegen__private__::PgOperatorEntity {
+            ::pgx::__codegen__private__::PgOperatorEntity {
                 opname: None #( .unwrap_or(Some(#opname)) )*,
                 commutator: None #( .unwrap_or(Some(#commutator)) )*,
                 negator: None #( .unwrap_or(Some(#negator)) )*,

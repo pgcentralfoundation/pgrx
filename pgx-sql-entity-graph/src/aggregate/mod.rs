@@ -288,10 +288,10 @@ impl PgAggregate {
             pg_externs.push(parse_quote! {
                 #[allow(non_snake_case, clippy::too_many_arguments)]
                 #pg_extern_attr
-                fn #fn_name(this: #type_state_without_self, #(#args_with_names),*, fcinfo: __pgx__codegen__private__::FunctionCallInfo) -> #type_state_without_self {
-                    <#target_path as __pgx__codegen__private__::Aggregate>::in_memory_context(
+                fn #fn_name(this: #type_state_without_self, #(#args_with_names),*, fcinfo: ::pgx::__codegen__private__::FunctionCallInfo) -> #type_state_without_self {
+                    <#target_path as ::pgx::__codegen__private__::Aggregate>::in_memory_context(
                         fcinfo,
-                        move |_context| <#target_path as __pgx__codegen__private__::Aggregate>::state(this, (#(#arg_names),*), fcinfo)
+                        move |_context| <#target_path as ::pgx::__codegen__private__::Aggregate>::state(this, (#(#arg_names),*), fcinfo)
                     )
                 }
             });
@@ -311,17 +311,17 @@ impl PgAggregate {
             pg_externs.push(parse_quote! {
                 #[allow(non_snake_case, clippy::too_many_arguments)]
                 #pg_extern_attr
-                fn #fn_name(this: #type_state_without_self, v: #type_state_without_self, fcinfo: __pgx__codegen__private__::FunctionCallInfo) -> #type_state_without_self {
-                    <#target_path as __pgx__codegen__private__::Aggregate>::in_memory_context(
+                fn #fn_name(this: #type_state_without_self, v: #type_state_without_self, fcinfo: ::pgx::__codegen__private__::FunctionCallInfo) -> #type_state_without_self {
+                    <#target_path as ::pgx::__codegen__private__::Aggregate>::in_memory_context(
                         fcinfo,
-                        move |_context| <#target_path as __pgx__codegen__private__::Aggregate>::combine(this, v, fcinfo)
+                        move |_context| <#target_path as ::pgx::__codegen__private__::Aggregate>::combine(this, v, fcinfo)
                     )
                 }
             });
             Some(fn_name)
         } else {
             item_impl.items.push(parse_quote! {
-                fn combine(current: #type_state_without_self, _other: #type_state_without_self, _fcinfo: __pgx__codegen__private__::FunctionCallInfo) -> #type_state_without_self {
+                fn combine(current: #type_state_without_self, _other: #type_state_without_self, _fcinfo: ::pgx::__codegen__private__::FunctionCallInfo) -> #type_state_without_self {
                     unimplemented!("Call to combine on an aggregate which does not support it.")
                 }
             });
@@ -340,10 +340,10 @@ impl PgAggregate {
                 pg_externs.push(parse_quote! {
                     #[allow(non_snake_case, clippy::too_many_arguments)]
                     #pg_extern_attr
-                    fn #fn_name(this: #type_state_without_self, #(#direct_args_with_names),*, fcinfo: __pgx__codegen__private__::FunctionCallInfo) -> #type_finalize {
-                        <#target_path as __pgx__codegen__private__::Aggregate>::in_memory_context(
+                    fn #fn_name(this: #type_state_without_self, #(#direct_args_with_names),*, fcinfo: ::pgx::__codegen__private__::FunctionCallInfo) -> #type_finalize {
+                        <#target_path as ::pgx::__codegen__private__::Aggregate>::in_memory_context(
                             fcinfo,
-                            move |_context| <#target_path as __pgx__codegen__private__::Aggregate>::finalize(this, (#(#direct_arg_names),*), fcinfo)
+                            move |_context| <#target_path as ::pgx::__codegen__private__::Aggregate>::finalize(this, (#(#direct_arg_names),*), fcinfo)
                         )
                     }
                 });
@@ -351,10 +351,10 @@ impl PgAggregate {
                 pg_externs.push(parse_quote! {
                     #[allow(non_snake_case, clippy::too_many_arguments)]
                     #pg_extern_attr
-                    fn #fn_name(this: #type_state_without_self, fcinfo: __pgx__codegen__private__::FunctionCallInfo) -> #type_finalize {
-                        <#target_path as __pgx__codegen__private__::Aggregate>::in_memory_context(
+                    fn #fn_name(this: #type_state_without_self, fcinfo: ::pgx::__codegen__private__::FunctionCallInfo) -> #type_finalize {
+                        <#target_path as ::pgx::__codegen__private__::Aggregate>::in_memory_context(
                             fcinfo,
-                            move |_context| <#target_path as __pgx__codegen__private__::Aggregate>::finalize(this, (), fcinfo)
+                            move |_context| <#target_path as ::pgx::__codegen__private__::Aggregate>::finalize(this, (), fcinfo)
                         )
                     }
                 });
@@ -362,7 +362,7 @@ impl PgAggregate {
             Some(fn_name)
         } else {
             item_impl.items.push(parse_quote! {
-                fn finalize(current: Self::State, direct_args: Self::OrderedSetArgs, _fcinfo: __pgx__codegen__private__::FunctionCallInfo) -> #type_finalize {
+                fn finalize(current: Self::State, direct_args: Self::OrderedSetArgs, _fcinfo: ::pgx::__codegen__private__::FunctionCallInfo) -> #type_finalize {
                     unimplemented!("Call to finalize on an aggregate which does not support it.")
                 }
             });
@@ -377,17 +377,17 @@ impl PgAggregate {
             pg_externs.push(parse_quote! {
                 #[allow(non_snake_case, clippy::too_many_arguments)]
                 #pg_extern_attr
-                fn #fn_name(this: #type_state_without_self, fcinfo: __pgx__codegen__private__::FunctionCallInfo) -> Vec<u8> {
-                    <#target_path as __pgx__codegen__private__::Aggregate>::in_memory_context(
+                fn #fn_name(this: #type_state_without_self, fcinfo: ::pgx::__codegen__private__::FunctionCallInfo) -> Vec<u8> {
+                    <#target_path as ::pgx::__codegen__private__::Aggregate>::in_memory_context(
                         fcinfo,
-                        move |_context| <#target_path as __pgx__codegen__private__::Aggregate>::serial(this, fcinfo)
+                        move |_context| <#target_path as ::pgx::__codegen__private__::Aggregate>::serial(this, fcinfo)
                     )
                 }
             });
             Some(fn_name)
         } else {
             item_impl.items.push(parse_quote! {
-                fn serial(current: #type_state_without_self, _fcinfo: __pgx__codegen__private__::FunctionCallInfo) -> Vec<u8> {
+                fn serial(current: #type_state_without_self, _fcinfo: ::pgx::__codegen__private__::FunctionCallInfo) -> Vec<u8> {
                     unimplemented!("Call to serial on an aggregate which does not support it.")
                 }
             });
@@ -404,17 +404,17 @@ impl PgAggregate {
             pg_externs.push(parse_quote! {
                 #[allow(non_snake_case, clippy::too_many_arguments)]
                 #pg_extern_attr
-                fn #fn_name(this: #type_state_without_self, buf: Vec<u8>, internal: __pgx__codegen__private__::PgBox<#type_state_without_self>, fcinfo: __pgx__codegen__private__::FunctionCallInfo) -> __pgx__codegen__private__::PgBox<#type_state_without_self> {
-                    <#target_path as __pgx__codegen__private__::Aggregate>::in_memory_context(
+                fn #fn_name(this: #type_state_without_self, buf: Vec<u8>, internal: ::pgx::__codegen__private__::PgBox<#type_state_without_self>, fcinfo: ::pgx::__codegen__private__::FunctionCallInfo) -> ::pgx::__codegen__private__::PgBox<#type_state_without_self> {
+                    <#target_path as ::pgx::__codegen__private__::Aggregate>::in_memory_context(
                         fcinfo,
-                        move |_context| <#target_path as __pgx__codegen__private__::Aggregate>::deserial(this, buf, internal, fcinfo)
+                        move |_context| <#target_path as ::pgx::__codegen__private__::Aggregate>::deserial(this, buf, internal, fcinfo)
                     )
                 }
             });
             Some(fn_name)
         } else {
             item_impl.items.push(parse_quote! {
-                fn deserial(current: #type_state_without_self, _buf: Vec<u8>, _internal: __pgx__codegen__private__::PgBox<#type_state_without_self>, _fcinfo: __pgx__codegen__private__::FunctionCallInfo) -> __pgx__codegen__private__::PgBox<#type_state_without_self> {
+                fn deserial(current: #type_state_without_self, _buf: Vec<u8>, _internal: ::pgx::__codegen__private__::PgBox<#type_state_without_self>, _fcinfo: ::pgx::__codegen__private__::FunctionCallInfo) -> ::pgx::__codegen__private__::PgBox<#type_state_without_self> {
                     unimplemented!("Call to deserial on an aggregate which does not support it.")
                 }
             });
@@ -435,11 +435,11 @@ impl PgAggregate {
                 fn #fn_name(
                     mstate: #type_moving_state,
                     #(#args_with_names),*,
-                    fcinfo: __pgx__codegen__private__::FunctionCallInfo,
+                    fcinfo: ::pgx::__codegen__private__::FunctionCallInfo,
                 ) -> #type_moving_state {
-                    <#target_path as __pgx__codegen__private__::Aggregate>::in_memory_context(
+                    <#target_path as ::pgx::__codegen__private__::Aggregate>::in_memory_context(
                         fcinfo,
-                        move |_context| <#target_path as __pgx__codegen__private__::Aggregate>::moving_state(mstate, (#(#arg_names),*), fcinfo)
+                        move |_context| <#target_path as ::pgx::__codegen__private__::Aggregate>::moving_state(mstate, (#(#arg_names),*), fcinfo)
                     )
                 }
             });
@@ -447,10 +447,10 @@ impl PgAggregate {
         } else {
             item_impl.items.push(parse_quote! {
                 fn moving_state(
-                    _mstate: <#target_path as __pgx__codegen__private__::Aggregate>::MovingState,
+                    _mstate: <#target_path as ::pgx::__codegen__private__::Aggregate>::MovingState,
                     _v: Self::Args,
-                    _fcinfo: __pgx__codegen__private__::FunctionCallInfo,
-                ) -> <#target_path as __pgx__codegen__private__::Aggregate>::MovingState {
+                    _fcinfo: ::pgx::__codegen__private__::FunctionCallInfo,
+                ) -> <#target_path as ::pgx::__codegen__private__::Aggregate>::MovingState {
                     unimplemented!("Call to moving_state on an aggregate which does not support it.")
                 }
             });
@@ -471,11 +471,11 @@ impl PgAggregate {
                 fn #fn_name(
                     mstate: #type_moving_state,
                     #(#args_with_names),*,
-                    fcinfo: __pgx__codegen__private__::FunctionCallInfo,
+                    fcinfo: ::pgx::__codegen__private__::FunctionCallInfo,
                 ) -> #type_moving_state {
-                    <#target_path as __pgx__codegen__private__::Aggregate>::in_memory_context(
+                    <#target_path as ::pgx::__codegen__private__::Aggregate>::in_memory_context(
                         fcinfo,
-                        move |_context| <#target_path as __pgx__codegen__private__::Aggregate>::moving_state_inverse(mstate, (#(#arg_names),*), fcinfo)
+                        move |_context| <#target_path as ::pgx::__codegen__private__::Aggregate>::moving_state_inverse(mstate, (#(#arg_names),*), fcinfo)
                     )
                 }
             });
@@ -485,7 +485,7 @@ impl PgAggregate {
                 fn moving_state_inverse(
                     _mstate: #type_moving_state,
                     _v: Self::Args,
-                    _fcinfo: __pgx__codegen__private__::FunctionCallInfo,
+                    _fcinfo: ::pgx::__codegen__private__::FunctionCallInfo,
                 ) -> #type_moving_state {
                     unimplemented!("Call to moving_state on an aggregate which does not support it.")
                 }
@@ -506,17 +506,17 @@ impl PgAggregate {
             pg_externs.push(parse_quote! {
                 #[allow(non_snake_case, clippy::too_many_arguments)]
                 #pg_extern_attr
-                fn #fn_name(mstate: #type_moving_state, #(#direct_args_with_names),* #maybe_comma fcinfo: __pgx__codegen__private__::FunctionCallInfo) -> #type_finalize {
-                    <#target_path as __pgx__codegen__private__::Aggregate>::in_memory_context(
+                fn #fn_name(mstate: #type_moving_state, #(#direct_args_with_names),* #maybe_comma fcinfo: ::pgx::__codegen__private__::FunctionCallInfo) -> #type_finalize {
+                    <#target_path as ::pgx::__codegen__private__::Aggregate>::in_memory_context(
                         fcinfo,
-                        move |_context| <#target_path as __pgx__codegen__private__::Aggregate>::moving_finalize(mstate, (#(#direct_arg_names),*), fcinfo)
+                        move |_context| <#target_path as ::pgx::__codegen__private__::Aggregate>::moving_finalize(mstate, (#(#direct_arg_names),*), fcinfo)
                     )
                 }
             });
             Some(fn_name)
         } else {
             item_impl.items.push(parse_quote! {
-                fn moving_finalize(_mstate: Self::MovingState, direct_args: Self::OrderedSetArgs, _fcinfo: __pgx__codegen__private__::FunctionCallInfo) -> Self::Finalize {
+                fn moving_finalize(_mstate: Self::MovingState, direct_args: Self::OrderedSetArgs, _fcinfo: ::pgx::__codegen__private__::FunctionCallInfo) -> Self::Finalize {
                     unimplemented!("Call to moving_finalize on an aggregate which does not support it.")
                 }
             });
@@ -623,8 +623,8 @@ impl ToEntityGraphTokens for PgAggregate {
         quote! {
             #[no_mangle]
             #[doc(hidden)]
-            pub extern "Rust" fn #sql_graph_entity_fn_name() -> __pgx__codegen__private__::SqlGraphEntity {
-                let submission = __pgx__codegen__private__::PgAggregateEntity {
+            pub extern "Rust" fn #sql_graph_entity_fn_name() -> ::pgx::__codegen__private__::SqlGraphEntity {
+                let submission = ::pgx::__codegen__private__::PgAggregateEntity {
                     full_path: ::core::any::type_name::<#target_ident>(),
                     module_path: module_path!(),
                     file: file!(),
@@ -653,7 +653,7 @@ impl ToEntityGraphTokens for PgAggregate {
                     hypothetical: #hypothetical,
                     to_sql_config: #to_sql_config,
                 };
-                __pgx__codegen__private__::SqlGraphEntity::Aggregate(submission)
+                ::pgx::__codegen__private__::SqlGraphEntity::Aggregate(submission)
             }
         }
     }
@@ -742,10 +742,10 @@ fn pg_extern_attr(item: &ImplItemMethod) -> syn::Attribute {
     }
     match found {
         Some(args) => parse_quote! {
-            #[__pgx__codegen__private__::pg_extern #args]
+            #[::pgx::__codegen__private__::pg_extern #args]
         },
         None => parse_quote! {
-            #[__pgx__codegen__private__::pg_extern]
+            #[::pgx::__codegen__private__::pg_extern]
         },
     }
 }

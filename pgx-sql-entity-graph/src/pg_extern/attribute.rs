@@ -45,39 +45,43 @@ pub enum Attribute {
 impl Attribute {
     pub(crate) fn to_sql_entity_graph_tokens(&self) -> TokenStream2 {
         match self {
-            Attribute::Immutable => quote! { __pgx__codegen__private__::ExternArgs::Immutable },
-            Attribute::Strict => quote! { __pgx__codegen__private__::ExternArgs::Strict },
-            Attribute::Stable => quote! { __pgx__codegen__private__::ExternArgs::Stable },
-            Attribute::Volatile => quote! { __pgx__codegen__private__::ExternArgs::Volatile },
-            Attribute::Raw => quote! { __pgx__codegen__private__::ExternArgs::Raw },
-            Attribute::NoGuard => quote! { __pgx__codegen__private__::ExternArgs::NoGuard },
+            Attribute::Immutable => {
+                quote! { ::pgx::__codegen__private__::ExternArgs::Immutable }
+            }
+            Attribute::Strict => quote! { ::pgx::__codegen__private__::ExternArgs::Strict },
+            Attribute::Stable => quote! { ::pgx::__codegen__private__::ExternArgs::Stable },
+            Attribute::Volatile => {
+                quote! { ::pgx::__codegen__private__::ExternArgs::Volatile }
+            }
+            Attribute::Raw => quote! { ::pgx::__codegen__private__::ExternArgs::Raw },
+            Attribute::NoGuard => quote! { ::pgx::__codegen__private__::ExternArgs::NoGuard },
             Attribute::CreateOrReplace => {
-                quote! { __pgx__codegen__private__::ExternArgs::CreateOrReplace }
+                quote! { ::pgx::__codegen__private__::ExternArgs::CreateOrReplace }
             }
             Attribute::ParallelSafe => {
-                quote! { __pgx__codegen__private__::ExternArgs::ParallelSafe }
+                quote! { ::pgx::__codegen__private__::ExternArgs::ParallelSafe }
             }
             Attribute::ParallelUnsafe => {
-                quote! { __pgx__codegen__private__::ExternArgs::ParallelUnsafe }
+                quote! { ::pgx::__codegen__private__::ExternArgs::ParallelUnsafe }
             }
             Attribute::ParallelRestricted => {
-                quote! { __pgx__codegen__private__::ExternArgs::ParallelRestricted }
+                quote! { ::pgx::__codegen__private__::ExternArgs::ParallelRestricted }
             }
             Attribute::Error(s) => {
-                quote! { __pgx__codegen__private__::ExternArgs::Error(String::from(#s)) }
+                quote! { ::pgx::__codegen__private__::ExternArgs::Error(String::from(#s)) }
             }
             Attribute::Schema(s) => {
-                quote! { __pgx__codegen__private__::ExternArgs::Schema(String::from(#s)) }
+                quote! { ::pgx::__codegen__private__::ExternArgs::Schema(String::from(#s)) }
             }
             Attribute::Name(s) => {
-                quote! { __pgx__codegen__private__::ExternArgs::Name(String::from(#s)) }
+                quote! { ::pgx::__codegen__private__::ExternArgs::Name(String::from(#s)) }
             }
             Attribute::Cost(s) => {
-                quote! { __pgx__codegen__private__::ExternArgs::Cost(format!("{}", #s)) }
+                quote! { ::pgx::__codegen__private__::ExternArgs::Cost(format!("{}", #s)) }
             }
             Attribute::Requires(items) => {
                 let items_iter = items.iter().map(|x| x.to_token_stream()).collect::<Vec<_>>();
-                quote! { __pgx__codegen__private__::ExternArgs::Requires(vec![#(#items_iter),*],) }
+                quote! { ::pgx::__codegen__private__::ExternArgs::Requires(vec![#(#items_iter),*],) }
             }
             // This attribute is handled separately
             Attribute::Sql(_) => {
