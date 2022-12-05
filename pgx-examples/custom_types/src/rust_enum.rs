@@ -23,6 +23,7 @@ mod tests {
     use crate::rust_enum::SomeEnum;
     use pgx::prelude::*;
 
+    #[cfg(not(feature = "no-schema-generation"))]
     #[pg_test]
     fn test_some_enum() {
         let val = Spi::get_one::<SomeEnum>(r#"SELECT '"hello world"'::SomeEnum"#);
