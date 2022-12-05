@@ -16,9 +16,8 @@ to the `pgx` framework and very subject to change between versions. While you ma
 */
 pub mod entity;
 
-use proc_macro2::{Span, TokenStream as TokenStream2};
+use proc_macro2::TokenStream as TokenStream2;
 use quote::{quote, ToTokens, TokenStreamExt};
-use std::hash::{Hash, Hasher};
 use syn::parse::{Parse, ParseStream};
 use syn::ItemMod;
 
@@ -46,59 +45,88 @@ pub struct Schema {
     pub module: ItemMod,
 }
 
-impl Parse for Schema {
-    fn parse(input: ParseStream) -> Result<Self, syn::Error> {
-        let module: ItemMod = input.parse()?;
-        crate::ident_is_acceptable_to_postgres(&module.ident)?;
-        Ok(Self { module })
+impl Schema {
+    /*
+       It's necessary for `Schema` to handle the full `impl ToTokens` generation itself as the sql
+       entity graph code has to be inside the same `mod {}` that the `#[pg_schema]` macro is
+       attached to.
+
+       To facilitate that, we feature flag the `.entity_tokens()` function here to be a no-op if
+       the `no-schema-generation` feature flag is turned on
+    */
+
+    #[cfg(feature = "no-schema-generation")]
+    fn entity_tokens(&self) -> TokenStream2 {
+        quote! {}
+    }
+
+    #[cfg(not(feature = "no-schema-generation"))]
+    fn entity_tokens(&self) -> TokenStream2 {
+        let ident = &self.module.ident;
+        let postfix = {
+            use std::hash::{Hash, Hasher};
+
+            let (_content_brace, content_items) =
+                &self.module.content.as_ref().expect("Can only support `mod {}` right now.");
+
+            // A hack until https://github.com/rust-lang/rust/issues/54725 is fixed.
+            let mut hasher = std::collections::hash_map::DefaultHasher::new();
+            content_items.hash(&mut hasher);
+            hasher.finish()
+            // End of hack
+        };
+
+        let sql_graph_entity_fn_name = syn::Ident::new(
+            &format!("__pgx_internals_schema_{}_{}", ident, postfix),
+            proc_macro2::Span::call_site(),
+        );
+        quote! {
+            #[no_mangle]
+            #[doc(hidden)]
+            pub extern "Rust" fn  #sql_graph_entity_fn_name() -> pgx::pgx_sql_entity_graph::SqlGraphEntity {
+                extern crate alloc;
+                use alloc::vec::Vec;
+                use alloc::vec;
+                let submission = pgx::pgx_sql_entity_graph::SchemaEntity {
+                        module_path: module_path!(),
+                        name: stringify!(#ident),
+                        file: file!(),
+                        line: line!(),
+                    };
+                pgx::pgx_sql_entity_graph::SqlGraphEntity::Schema(submission)
+            }
+        }
     }
 }
 
+// We can't use the `CodeEnrichment` infrastructure, so we implement [`ToTokens`] directly
 impl ToTokens for Schema {
     fn to_tokens(&self, tokens: &mut TokenStream2) {
         let attrs = &self.module.attrs;
         let vis = &self.module.vis;
         let mod_token = &self.module.mod_token;
         let ident = &self.module.ident;
+        let graph_tokens = self.entity_tokens(); // NB:  this could be an empty TokenStream if `no-schema-generation` is turned on
 
         let (_content_brace, content_items) =
             &self.module.content.as_ref().expect("Can only support `mod {}` right now.");
 
-        // A hack until https://github.com/rust-lang/rust/issues/54725 is fixed.
-        let mut hasher = std::collections::hash_map::DefaultHasher::new();
-        content_items.hash(&mut hasher);
-        let postfix = hasher.finish();
-        // End of hack
-
-        let mut updated_content = content_items.clone();
-        let sql_graph_entity_fn_name = syn::Ident::new(
-            &format!("__pgx_internals_schema_{}_{}", ident, postfix),
-            Span::call_site(),
-        );
-        updated_content.push(syn::parse_quote! {
-                #[no_mangle]
-                #[doc(hidden)]
-                pub extern "Rust" fn  #sql_graph_entity_fn_name() -> pgx::pgx_sql_entity_graph::SqlGraphEntity {
-                    extern crate alloc;
-                    use alloc::vec::Vec;
-                    use alloc::vec;
-                    let submission = pgx::pgx_sql_entity_graph::SchemaEntity {
-                            module_path: module_path!(),
-                            name: stringify!(#ident),
-                            file: file!(),
-                            line: line!(),
-                        };
-                    pgx::pgx_sql_entity_graph::SqlGraphEntity::Schema(submission)
-                }
-        });
-        let _semi = &self.module.semi;
-
-        let inv = quote! {
+        let code = quote! {
             #(#attrs)*
             #vis #mod_token #ident {
-                #(#updated_content)*
+                #(#content_items)*
+                #graph_tokens
             }
         };
-        tokens.append_all(inv);
+
+        tokens.append_all(code)
+    }
+}
+
+impl Parse for Schema {
+    fn parse(input: ParseStream) -> Result<Self, syn::Error> {
+        let module: ItemMod = input.parse()?;
+        crate::ident_is_acceptable_to_postgres(&module.ident)?;
+        Ok(Self { module })
     }
 }

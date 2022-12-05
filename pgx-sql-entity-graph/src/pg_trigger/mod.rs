@@ -9,10 +9,11 @@ to the `pgx` framework and very subject to change between versions. While you ma
 pub mod attribute;
 pub mod entity;
 
-use crate::ToSqlConfig;
+use crate::enrich::{ToEntityGraphTokens, ToRustCodeTokens};
+use crate::{CodeEnrichment, ToSqlConfig};
 use attribute::PgTriggerAttribute;
 use proc_macro2::{Span, TokenStream as TokenStream2};
-use quote::{quote, ToTokens, TokenStreamExt};
+use quote::quote;
 use syn::{ItemFn, Token};
 
 #[derive(Debug, Clone)]
@@ -25,7 +26,7 @@ impl PgTrigger {
     pub fn new(
         func: ItemFn,
         attributes: syn::punctuated::Punctuated<PgTriggerAttribute, Token![,]>,
-    ) -> Result<Self, syn::Error> {
+    ) -> Result<CodeEnrichment<Self>, syn::Error> {
         if attributes.len() > 1 {
             return Err(syn::Error::new(
                 Span::call_site(),
@@ -51,38 +52,7 @@ impl PgTrigger {
             crate::ident_is_acceptable_to_postgres(&func.sig.ident)?;
         }
 
-        Ok(Self { func, to_sql_config })
-    }
-
-    pub fn entity_tokens(&self) -> Result<ItemFn, syn::Error> {
-        let sql_graph_entity_fn_name = syn::Ident::new(
-            &format!("__pgx_internals_trigger_{}", self.func.sig.ident.to_string()),
-            self.func.sig.ident.span(),
-        );
-        let func_sig_ident = &self.func.sig.ident;
-        let function_name = func_sig_ident.to_string();
-        let to_sql_config = &self.to_sql_config;
-
-        let tokens = quote! {
-            #[no_mangle]
-            #[doc(hidden)]
-            pub extern "Rust" fn #sql_graph_entity_fn_name() -> pgx::pgx_sql_entity_graph::SqlGraphEntity {
-                use core::any::TypeId;
-                extern crate alloc;
-                use alloc::vec::Vec;
-                use alloc::vec;
-                let submission = pgx::pgx_sql_entity_graph::PgTriggerEntity {
-                    function_name: #function_name,
-                    file: file!(),
-                    line: line!(),
-                    full_path: concat!(module_path!(), "::", stringify!(#func_sig_ident)),
-                    module_path: module_path!(),
-                    to_sql_config: #to_sql_config,
-                };
-                pgx::pgx_sql_entity_graph::SqlGraphEntity::Trigger(submission)
-            }
-        };
-        syn::parse2(tokens)
+        Ok(CodeEnrichment(PgTrigger { func, to_sql_config }))
     }
 
     pub fn wrapper_tokens(&self) -> Result<ItemFn, syn::Error> {
@@ -130,22 +100,48 @@ impl PgTrigger {
     }
 }
 
-impl ToTokens for PgTrigger {
-    fn to_tokens(&self, tokens: &mut TokenStream2) {
-        let entity_func = self.entity_tokens().expect("Generating entity function for trigger");
+impl ToEntityGraphTokens for PgTrigger {
+    fn to_entity_graph_tokens(&self) -> TokenStream2 {
+        let sql_graph_entity_fn_name = syn::Ident::new(
+            &format!("__pgx_internals_trigger_{}", self.func.sig.ident.to_string()),
+            self.func.sig.ident.span(),
+        );
+        let func_sig_ident = &self.func.sig.ident;
+        let function_name = func_sig_ident.to_string();
+        let to_sql_config = &self.to_sql_config;
+
+        quote! {
+            #[no_mangle]
+            #[doc(hidden)]
+            pub extern "Rust" fn #sql_graph_entity_fn_name() -> pgx::pgx_sql_entity_graph::SqlGraphEntity {
+                use core::any::TypeId;
+                extern crate alloc;
+                use alloc::vec::Vec;
+                use alloc::vec;
+                let submission = pgx::pgx_sql_entity_graph::PgTriggerEntity {
+                    function_name: #function_name,
+                    file: file!(),
+                    line: line!(),
+                    full_path: concat!(module_path!(), "::", stringify!(#func_sig_ident)),
+                    module_path: module_path!(),
+                    to_sql_config: #to_sql_config,
+                };
+                pgx::pgx_sql_entity_graph::SqlGraphEntity::Trigger(submission)
+            }
+        }
+    }
+}
+
+impl ToRustCodeTokens for PgTrigger {
+    fn to_rust_code_tokens(&self) -> TokenStream2 {
         let wrapper_func = self.wrapper_tokens().expect("Generating wrappper function for trigger");
         let finfo_func = self.finfo_tokens().expect("Generating finfo function for trigger");
         let func = &self.func;
 
-        let items = quote! {
+        quote! {
             #func
-
             #wrapper_func
-
             #finfo_func
-
-            #entity_func
-        };
-        tokens.append_all(items);
+        }
     }
 }
