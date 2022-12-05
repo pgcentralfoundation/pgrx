@@ -63,6 +63,7 @@ pub mod shmem;
 pub mod spi;
 pub mod spinlock;
 pub mod stringinfo;
+pub mod subxact;
 pub mod trigger_support;
 pub mod tupdesc;
 pub mod varlena;

@@ -36,3 +36,6 @@ pub use crate::pg_sys::{
     check_for_interrupts, debug1, debug2, debug3, debug4, debug5, ereport, error, function_name,
     info, log, notice, warning, FATAL, PANIC,
 };
+
+// Sub-transactions
+pub use crate::subxact::*;
