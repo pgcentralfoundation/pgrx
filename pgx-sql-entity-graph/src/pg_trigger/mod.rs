@@ -63,18 +63,18 @@ impl PgTrigger {
         );
         let tokens = quote! {
             #[no_mangle]
-            #[pgx::pg_guard]
-            extern "C" fn #extern_func_ident(fcinfo: ::pgx::pg_sys::FunctionCallInfo) -> ::pgx::pg_sys::Datum {
-                let maybe_pg_trigger = unsafe { ::pgx::trigger_support::PgTrigger::from_fcinfo(fcinfo) };
+            #[__pgx__codegen__private__::pg_guard]
+            extern "C" fn #extern_func_ident(fcinfo: __pgx__codegen__private__::FunctionCallInfo) -> __pgx__codegen__private__::Datum {
+                let maybe_pg_trigger = unsafe { __pgx__codegen__private__::PgTrigger::from_fcinfo(fcinfo) };
                 let pg_trigger = maybe_pg_trigger.expect("PgTrigger::from_fcinfo failed");
                 let trigger_fn_result: Result<
-                    ::pgx::heap_tuple::PgHeapTuple<'_, _>,
+                    __pgx__codegen__private__::PgHeapTuple<'_, _>,
                     _,
                 > = #function_ident(&pg_trigger);
 
                 let trigger_retval = trigger_fn_result.expect("Trigger function panic");
                 match trigger_retval.into_trigger_datum() {
-                    None => ::pgx::pg_return_null(fcinfo),
+                    None => __pgx__codegen__private__::pg_return_null(fcinfo),
                     Some(datum) => datum,
                 }
             }
@@ -91,8 +91,8 @@ impl PgTrigger {
         let tokens = quote! {
             #[no_mangle]
             #[doc(hidden)]
-            pub extern "C" fn #finfo_name() -> &'static ::pgx::pg_sys::Pg_finfo_record {
-                const V1_API: ::pgx::pg_sys::Pg_finfo_record = ::pgx::pg_sys::Pg_finfo_record { api_version: 1 };
+            pub extern "C" fn #finfo_name() -> &'static __pgx__codegen__private__::Pg_finfo_record {
+                const V1_API: __pgx__codegen__private__::Pg_finfo_record = __pgx__codegen__private__::Pg_finfo_record { api_version: 1 };
                 &V1_API
             }
         };
@@ -113,12 +113,12 @@ impl ToEntityGraphTokens for PgTrigger {
         quote! {
             #[no_mangle]
             #[doc(hidden)]
-            pub extern "Rust" fn #sql_graph_entity_fn_name() -> pgx::pgx_sql_entity_graph::SqlGraphEntity {
+            pub extern "Rust" fn #sql_graph_entity_fn_name() -> __pgx__codegen__private__::SqlGraphEntity {
                 use core::any::TypeId;
                 extern crate alloc;
                 use alloc::vec::Vec;
                 use alloc::vec;
-                let submission = pgx::pgx_sql_entity_graph::PgTriggerEntity {
+                let submission = __pgx__codegen__private__::PgTriggerEntity {
                     function_name: #function_name,
                     file: file!(),
                     line: line!(),
@@ -126,7 +126,7 @@ impl ToEntityGraphTokens for PgTrigger {
                     module_path: module_path!(),
                     to_sql_config: #to_sql_config,
                 };
-                pgx::pgx_sql_entity_graph::SqlGraphEntity::Trigger(submission)
+                __pgx__codegen__private__::SqlGraphEntity::Trigger(submission)
             }
         }
     }

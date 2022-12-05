@@ -3,7 +3,7 @@
 mod tests {
     #[allow(unused_imports)]
     use crate as pgx_tests;
-    use pgx::*;
+    use pgx::prelude::*;
 
     fn from_helper<T: FromDatum + IntoDatum>(d: pg_sys::Datum) -> Option<T> {
         unsafe { T::from_polymorphic_datum(d, false, pg_sys::InvalidOid) }

@@ -11,7 +11,7 @@ Use of this source code is governed by the MIT license that can be found in the 
 //! ## Example
 //!
 //! ```rust
-//! use pgx::*;
+//! use pgx::prelude::*;
 //!
 //! // Convert the input string to lowercase and return
 //! #[pg_extern]

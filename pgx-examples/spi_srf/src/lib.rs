@@ -106,7 +106,7 @@ fn filter_by_breed(
 #[pg_schema]
 mod tests {
     use crate::calculate_human_years;
-    use pgx::*;
+    use pgx::prelude::*;
 
     #[pg_test]
     fn test_calculate_human_years() {
