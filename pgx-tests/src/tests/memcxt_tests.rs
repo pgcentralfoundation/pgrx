@@ -52,4 +52,19 @@ mod tests {
         assert!(PgMemoryContexts::TopMemoryContext.parent().is_none());
         assert!(PgMemoryContexts::CurrentMemoryContext.parent().is_some());
     }
+
+    #[pg_test]
+    fn switch_to_should_switch_back_on_panic() {
+        let mut ctx = PgMemoryContexts::new("test");
+        let ctx_sys = ctx.value();
+        PgTryBuilder::new(move || {
+            ctx.switch_to(|_| {
+                assert_eq!(unsafe { pg_sys::CurrentMemoryContext }, ctx_sys);
+                panic!();
+            });
+        })
+        .catch_others(|_| {})
+        .execute();
+        assert_ne!(unsafe { pg_sys::CurrentMemoryContext }, ctx_sys);
+    }
 }

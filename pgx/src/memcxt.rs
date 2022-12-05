@@ -19,6 +19,7 @@ use crate::pg_sys::AsPgCStr;
 use crate::{pg_sys, PgBox};
 use core::panic::{RefUnwindSafe, UnwindSafe};
 use core::ptr;
+use pgx_pg_sys::PgTryBuilder;
 use std::fmt::Debug;
 
 /// A shorter type name for a `*const std::os::raw::c_void`
@@ -421,12 +422,14 @@ impl PgMemoryContexts {
             pg_sys::CurrentMemoryContext = context;
         }
 
-        let result = f(&mut PgMemoryContexts::For(context));
-
-        // restore our understanding of the current memory context
-        unsafe {
-            pg_sys::CurrentMemoryContext = prev_context;
-        }
+        let result = PgTryBuilder::new(|| f(&mut PgMemoryContexts::For(context)))
+            .finally(|| {
+                // restore our understanding of the current memory context
+                unsafe {
+                    pg_sys::CurrentMemoryContext = prev_context;
+                }
+            })
+            .execute();
 
         result
     }
