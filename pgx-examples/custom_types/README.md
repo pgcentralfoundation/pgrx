@@ -38,7 +38,7 @@ as CBOR for its on-disk representation, and as JSON for its textual representati
 Additionally, such a type's usage through functions is considered to be an owned value.
 
 ```rust
-use pgx::*;
+use pgx::prelude::*;
 use serde::{Serialize, Deserialize};
 
 #[derive(Serialize, Deserialize, PostgresType)]

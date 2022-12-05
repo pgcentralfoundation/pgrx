@@ -34,9 +34,8 @@ use std::ptr::NonNull;
 /// This example allocates a simple Postgres structure, modifies it, and returns it back to Postgres:
 ///
 /// ```rust,no_run
-/// use pgx::*;
+/// use pgx::prelude::*;
 ///
-/// #[pg_guard]
 /// pub fn do_something() -> pg_sys::ItemPointer {
 ///     // postgres-allocate an ItemPointerData structure
 ///     let mut tid = PgBox::<pg_sys::ItemPointerData>::alloc();
@@ -53,9 +52,8 @@ use std::ptr::NonNull;
 /// dropped:
 ///
 /// ```rust,no_run
-/// use pgx::*;
+/// use pgx::prelude::*;
 ///
-/// #[pg_guard]
 /// pub fn do_something()  {
 ///     // postgres-allocate an ItemPointerData structure
 ///     let mut tid = PgBox::<pg_sys::ItemPointerData>::alloc();
@@ -71,9 +69,8 @@ use std::ptr::NonNull;
 /// but it can't be freed on Drop since you don't own it -- Postgres does:
 ///
 /// ```rust,no_run
-/// use pgx::*;
+/// use pgx::prelude::*;
 ///
-/// #[pg_guard]
 /// pub fn do_something()  {
 ///     // open a relation and project it as a pg_sys::Relation
 ///     let relid: pg_sys::Oid = 42;

@@ -32,7 +32,8 @@ pub unsafe trait PGXSharedMemory {}
 /// # Example
 ///
 /// ```rust,no_run
-/// use pgx::*;
+/// use pgx::prelude::*;
+/// use pgx::{PgAtomic, PgLwLock, pg_shmem_init, PgSharedMemoryInitialization};
 ///
 /// // primitive types must be protected behind a `PgLwLock`
 /// static PRIMITIVE: PgLwLock<i32> = PgLwLock::new();

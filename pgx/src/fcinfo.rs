@@ -258,8 +258,10 @@ pub unsafe fn pg_func_extra<ReturnType, DefaultValue: FnOnce() -> ReturnType>(
 ///
 /// ## Examples
 /// ```rust
-/// use pgx::*;
 /// use std::ffi::CString;
+///
+/// use pgx::prelude::*;
+/// use pgx::direct_function_call;
 ///
 /// fn some_func() {
 ///     let result = unsafe {
@@ -287,7 +289,8 @@ pub unsafe fn direct_function_call<R: FromDatum>(
 /// ## Example
 ///
 /// ```rust,no_run
-/// use pgx::*;
+/// use pgx::prelude::*;
+/// use pgx::direct_pg_extern_function_call;
 ///
 /// #[pg_extern]
 /// fn add_numbers(a: i32, b: i32) -> i32 {

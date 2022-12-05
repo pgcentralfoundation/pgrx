@@ -51,10 +51,10 @@ impl ToTokens for PositioningRef {
     fn to_tokens(&self, tokens: &mut proc_macro2::TokenStream) {
         let toks = match self {
             PositioningRef::FullPath(item) => quote! {
-                pgx::pgx_sql_entity_graph::PositioningRef::FullPath(String::from(#item))
+                __pgx__codegen__private__::PositioningRef::FullPath(String::from(#item))
             },
             PositioningRef::Name(item) => quote! {
-                pgx::pgx_sql_entity_graph::PositioningRef::Name(String::from(#item))
+                __pgx__codegen__private__::PositioningRef::Name(String::from(#item))
             },
         };
         toks.to_tokens(tokens);
