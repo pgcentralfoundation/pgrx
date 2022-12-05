@@ -3,16 +3,6 @@ name: will-it-blend
 on:
   schedule:
     - cron:  '* 8 * * *'
-  # TEMP TEMP TEMP
-  push:
-    branches:
-      - master
-      - develop
-  pull_request:
-    branches:
-      - master
-      - develop
-  # TEMP TEMP TEMP
 
 jobs:
   check:
