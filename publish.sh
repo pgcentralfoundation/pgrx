@@ -12,7 +12,7 @@ DIR=`pwd`
 set -x
 
 cd $DIR/pgx-pg-config && cargo publish && sleep 30
-cd $DIR/pgx-utils && cargo publish && sleep 30
+cd $DIR/pgx-sql-entity-graph && cargo publish && sleep 30
 cd $DIR/pgx-macros && cargo publish && sleep 30
 cd $DIR/pgx-pg-sys && cargo publish --no-verify && sleep 30
 cd $DIR/pgx && cargo publish --no-verify && sleep 30

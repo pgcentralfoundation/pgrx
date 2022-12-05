@@ -134,7 +134,6 @@ version = "0.0.0"
 dependencies = [
  "pgx",
  "pgx-tests",
- "rand",
 ]
 
 [[package]]
@@ -262,7 +261,7 @@ dependencies = [
  "once_cell",
  "owo-colors",
  "pgx-pg-config",
- "pgx-utils",
+ "pgx-sql-entity-graph",
  "prettyplease",
  "proc-macro2",
  "quote",
@@ -1351,7 +1350,6 @@ dependencies = [
 name = "operators"
 version = "0.1.0"
 dependencies = [
- "maplit",
  "pgx",
  "pgx-tests",
  "serde",
@@ -1449,14 +1447,12 @@ dependencies = [
  "bitflags",
  "bitvec",
  "cstr_core",
- "eyre",
  "heapless",
  "libc",
  "once_cell",
  "pgx-macros",
  "pgx-pg-sys",
- "pgx-utils",
- "quote",
+ "pgx-sql-entity-graph",
  "seahash",
  "seq-macro",
  "serde",
@@ -1473,12 +1469,11 @@ dependencies = [
 name = "pgx-macros"
 version = "0.6.0"
 dependencies = [
- "pgx-utils",
+ "pgx-sql-entity-graph",
  "proc-macro2",
  "quote",
  "serde",
  "syn",
- "unescape",
 ]
 
 [[package]]
@@ -1503,16 +1498,36 @@ dependencies = [
  "eyre",
  "libc",
  "memoffset 0.6.5",
- "once_cell",
  "pgx-macros",
  "pgx-pg-config",
- "pgx-utils",
+ "pgx-sql-entity-graph",
  "proc-macro2",
  "quote",
  "rayon",
  "shlex",
  "sptr",
  "syn",
+]
+
+[[package]]
+name = "pgx-sql-entity-graph"
+version = "0.6.0"
+dependencies = [
+ "atty",
+ "convert_case",
+ "cstr_core",
+ "eyre",
+ "owo-colors",
+ "petgraph",
+ "proc-macro2",
+ "quote",
+ "seq-macro",
+ "syn",
+ "syntect",
+ "tracing",
+ "tracing-error",
+ "tracing-subscriber",
+ "unescape",
 ]
 
 [[package]]
@@ -1526,38 +1541,12 @@ dependencies = [
  "pgx",
  "pgx-macros",
  "pgx-pg-config",
- "pgx-utils",
  "postgres",
  "regex",
  "serde",
  "serde_json",
  "thiserror",
  "time",
-]
-
-[[package]]
-name = "pgx-utils"
-version = "0.6.0"
-dependencies = [
- "atty",
- "convert_case",
- "cstr_core",
- "eyre",
- "owo-colors",
- "petgraph",
- "proc-macro2",
- "quote",
- "regex",
- "seq-macro",
- "serde",
- "serde_derive",
- "serde_json",
- "syn",
- "syntect",
- "tracing",
- "tracing-error",
- "tracing-subscriber",
- "unescape",
 ]
 
 [[package]]
@@ -2244,9 +2233,9 @@ dependencies = [
 
 [[package]]
 name = "syn"
-version = "1.0.104"
+version = "1.0.105"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "4ae548ec36cf198c0ef7710d3c230987c2d6d7bd98ad6edc0274462724c585ce"
+checksum = "60b9b43d45702de4c839cb9b51d9f529c5dd26a4aff255b42b1ebc03e88ee908"
 dependencies = [
  "proc-macro2",
  "quote",

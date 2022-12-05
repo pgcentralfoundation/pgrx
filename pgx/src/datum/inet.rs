@@ -10,7 +10,7 @@ Use of this source code is governed by the MIT license that can be found in the 
 use crate::{direct_function_call, direct_function_call_as_datum, pg_sys, FromDatum, IntoDatum};
 use pgx_pg_sys::errcodes::PgSqlErrorCode;
 use pgx_pg_sys::PgTryBuilder;
-use pgx_utils::sql_entity_graph::metadata::{
+use pgx_sql_entity_graph::metadata::{
     ArgumentError, Returns, ReturnsError, SqlMapping, SqlTranslatable,
 };
 use serde::de::{Error, Visitor};

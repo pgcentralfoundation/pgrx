@@ -132,7 +132,7 @@ jobs:
           --package pgx-macros \
           --package pgx-pg-sys \
           --package pgx-tests \
-          --package pgx-utils
+          --package pgx-sql-entity-graph
 
     - name: Run aggregate example tests
       run: cargo test --package aggregate --features "pg$PG_VER" --no-default-features
@@ -417,7 +417,7 @@ jobs:
           --package pgx-macros \
           --package pgx-pg-sys \
           --package pgx-tests \
-          --package pgx-utils
+          --package pgx-sql-entity-graph
 
     - name: Stop sccache server
       run: sccache --stop-server || true

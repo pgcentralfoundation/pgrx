@@ -11,7 +11,7 @@ use crate::{
     direct_function_call, direct_function_call_as_datum, pg_sys, vardata_any, varsize_any_exhdr,
     void_mut_ptr, FromDatum, IntoDatum,
 };
-use pgx_utils::sql_entity_graph::metadata::{
+use pgx_sql_entity_graph::metadata::{
     ArgumentError, Returns, ReturnsError, SqlMapping, SqlTranslatable,
 };
 use serde::{Serialize, Serializer};

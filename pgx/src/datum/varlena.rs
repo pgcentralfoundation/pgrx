@@ -14,7 +14,7 @@ use crate::{
     StringInfo,
 };
 use pgx_pg_sys::varlena;
-use pgx_utils::sql_entity_graph::metadata::{
+use pgx_sql_entity_graph::metadata::{
     ArgumentError, Returns, ReturnsError, SqlMapping, SqlTranslatable,
 };
 use serde::{Deserialize, Serialize};

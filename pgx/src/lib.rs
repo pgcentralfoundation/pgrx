@@ -117,12 +117,13 @@ pub use pg_sys::{
     check_for_interrupts, debug1, debug2, debug3, debug4, debug5, ereport, error, function_name,
     info, log, notice, warning, FATAL, PANIC,
 };
-pub use pgx_utils as utils;
+#[doc(hidden)]
+pub use pgx_sql_entity_graph;
 
 pub use cstr_core;
 
 use once_cell::sync::Lazy;
-use pgx_utils::sql_entity_graph::RustSourceOnlySqlMapping;
+use pgx_sql_entity_graph::RustSourceOnlySqlMapping;
 use std::collections::HashSet;
 
 macro_rules! map_source_only {
@@ -298,8 +299,8 @@ macro_rules! pg_sql_graph_magic {
         #[no_mangle]
         #[doc(hidden)]
         #[rustfmt::skip] // explict extern "Rust" is more clear here
-        pub extern "Rust" fn __pgx_sql_mappings() -> ::pgx::utils::sql_entity_graph::RustToSqlMapping {
-            ::pgx::utils::sql_entity_graph::RustToSqlMapping {
+        pub extern "Rust" fn __pgx_sql_mappings() -> $crate::pgx_sql_entity_graph::RustToSqlMapping {
+            $crate::pgx_sql_entity_graph::RustToSqlMapping {
                 rust_source_to_sql: ::pgx::DEFAULT_RUST_SOURCE_TO_SQL.clone(),
             }
         }
@@ -310,9 +311,8 @@ macro_rules! pg_sql_graph_magic {
         #[rustfmt::skip] // explict extern "Rust" is more clear here
         pub extern "Rust" fn __pgx_marker(
             _: (),
-        ) -> ::pgx::utils::__reexports::eyre::Result<::pgx::utils::sql_entity_graph::ControlFile> {
+        ) -> $crate::pgx_sql_entity_graph::ControlFile {
             use ::core::convert::TryFrom;
-            use ::pgx::utils::__reexports::eyre::WrapErr;
             let package_version = env!("CARGO_PKG_VERSION");
             let context = include_str!(concat!(
                 env!("CARGO_MANIFEST_DIR"),
@@ -323,9 +323,9 @@ macro_rules! pg_sql_graph_magic {
             .replace("@CARGO_VERSION@", package_version);
 
             let control_file =
-                ::pgx::utils::sql_entity_graph::ControlFile::try_from(context.as_str())
-                    .wrap_err_with(|| "Could not parse control file, is it valid?")?;
-            Ok(control_file)
+                $crate::pgx_sql_entity_graph::ControlFile::try_from(context.as_str())
+                    .expect("Could not parse control file, is it valid?");
+            control_file
         }
     };
 }

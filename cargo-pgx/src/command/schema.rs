@@ -17,7 +17,6 @@ use object::Object;
 use once_cell::sync::OnceCell;
 use owo_colors::OwoColorize;
 use pgx_pg_config::{get_target_dir, PgConfig, Pgx};
-use pgx_utils::sql_entity_graph::{ControlFile, PgxSql, SqlGraphEntity};
 use std::collections::HashSet;
 use std::hash::{Hash, Hasher};
 use std::path::{Path, PathBuf};
@@ -424,24 +423,24 @@ pub(crate) fn generate_schema(
             .wrap_err_with(|| format!("Couldn't libload {}", lib_so.display()))?;
 
         let sql_mappings_symbol: libloading::os::unix::Symbol<
-            unsafe extern "Rust" fn() -> ::pgx_utils::sql_entity_graph::RustToSqlMapping,
+            unsafe extern "Rust" fn() -> pgx_sql_entity_graph::RustToSqlMapping,
         > = lib
             .get("__pgx_sql_mappings".as_bytes())
             .expect(&format!("Couldn't call __pgx_sql_mappings"));
         sql_mapping = sql_mappings_symbol();
 
         let symbol: libloading::os::unix::Symbol<
-            unsafe extern "Rust" fn() -> eyre::Result<ControlFile>,
+            unsafe extern "Rust" fn() -> eyre::Result<pgx_sql_entity_graph::ControlFile>,
         > = lib
             .get("__pgx_marker".as_bytes())
             .expect(&format!("Couldn't call __pgx_marker"));
-        let control_file_entity = SqlGraphEntity::ExtensionRoot(
+        let control_file_entity = pgx_sql_entity_graph::SqlGraphEntity::ExtensionRoot(
             symbol().expect("Failed to get control file information"),
         );
         entities.push(control_file_entity);
 
         for symbol_to_call in fns_to_call {
-            let symbol: libloading::os::unix::Symbol<unsafe extern "Rust" fn() -> SqlGraphEntity> =
+            let symbol: libloading::os::unix::Symbol<unsafe extern "Rust" fn() -> pgx_sql_entity_graph::SqlGraphEntity> =
                 lib.get(symbol_to_call.as_bytes())
                     .expect(&format!("Couldn't call {:#?}", symbol_to_call));
             let entity = symbol();
@@ -449,9 +448,13 @@ pub(crate) fn generate_schema(
         }
     };
 
-    let pgx_sql =
-        PgxSql::build(sql_mapping, entities.into_iter(), package_name.to_string(), versioned_so)
-            .wrap_err("SQL generation error")?;
+    let pgx_sql = pgx_sql_entity_graph::PgxSql::build(
+        sql_mapping,
+        entities.into_iter(),
+        package_name.to_string(),
+        versioned_so,
+    )
+    .wrap_err("SQL generation error")?;
 
     if let Some(out_path) = path {
         let out_path = out_path.as_ref();

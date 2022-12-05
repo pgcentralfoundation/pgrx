@@ -6,7 +6,7 @@ All rights reserved.
 
 Use of this source code is governed by the MIT license that can be found in the LICENSE file.
 */
-use pgx_utils::sql_entity_graph::{PostgresHash, PostgresOrd};
+use pgx_sql_entity_graph::{PostgresHash, PostgresOrd};
 
 use proc_macro2::Ident;
 use quote::{quote, ToTokens};
