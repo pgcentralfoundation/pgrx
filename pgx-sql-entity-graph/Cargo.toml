@@ -12,6 +12,7 @@ edition = "2021"
 
 [features]
 syntax-highlighting = ["dep:syntect", "dep:owo-colors", "dep:atty"]
+no-schema-generation = []
 
 [dependencies]
 seq-macro = "0.3"

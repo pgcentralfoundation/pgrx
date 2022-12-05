@@ -31,10 +31,13 @@ use attribute::Attribute;
 use operator::{PgxOperatorAttributeWithIdent, PgxOperatorOpName};
 use search_path::SearchPathList;
 
+use crate::enrich::CodeEnrichment;
+use crate::enrich::ToEntityGraphTokens;
+use crate::enrich::ToRustCodeTokens;
 use crate::lifetimes::staticize_lifetimes;
 use eyre::WrapErr;
 use proc_macro2::{Ident, Span, TokenStream as TokenStream2};
-use quote::{quote, quote_spanned, ToTokens, TokenStreamExt};
+use quote::{quote, quote_spanned, ToTokens};
 use syn::parse::{Parse, ParseStream, Parser};
 use syn::punctuated::Punctuated;
 use syn::spanned::Spanned;
@@ -56,7 +59,8 @@ use super::UsedType;
 /// use pgx_sql_entity_graph::PgExtern;
 ///
 /// # fn main() -> eyre::Result<()> {
-/// let parsed: PgExtern = parse_quote! {
+/// use pgx_sql_entity_graph::CodeEnrichment;
+/// let parsed: CodeEnrichment<PgExtern> = parse_quote! {
 ///     fn example(x: Option<str>) -> Option<&'a str> {
 ///         unimplemented!()
 ///     }
@@ -73,7 +77,7 @@ pub struct PgExtern {
 }
 
 impl PgExtern {
-    pub fn new(attr: TokenStream2, item: TokenStream2) -> Result<Self, syn::Error> {
+    pub fn new(attr: TokenStream2, item: TokenStream2) -> Result<CodeEnrichment<Self>, syn::Error> {
         let mut attrs = Vec::new();
         let mut to_sql_config: Option<ToSqlConfig> = None;
 
@@ -106,7 +110,7 @@ impl PgExtern {
             crate::ident_is_acceptable_to_postgres(&func.sig.ident)?;
         }
 
-        Ok(Self { attrs, func, to_sql_config })
+        Ok(CodeEnrichment(Self { attrs, func, to_sql_config }))
     }
 
     fn name(&self) -> String {
@@ -438,10 +442,7 @@ impl PgExtern {
                     }
                 }
             }
-            Returning::SetOf {
-                ty: retval_ty,
-                optional,
-            } => {
+            Returning::SetOf { ty: retval_ty, optional } => {
                 let result_ident = syn::Ident::new("result", self.func.sig.span());
                 let retval_ty_resolved = retval_ty.original_ty;
                 let result_handler = if optional {
@@ -523,10 +524,7 @@ impl PgExtern {
                     }
                 }
             }
-            Returning::Iterated {
-                tys: retval_tys,
-                optional,
-            } => {
+            Returning::Iterated { tys: retval_tys, optional } => {
                 let result_ident = syn::Ident::new("result", self.func.sig.span());
                 let funcctx_ident = syn::Ident::new("funcctx", self.func.sig.span());
                 let retval_tys_resolved = retval_tys.iter().map(|v| &v.used_ty.resolved_ty);
@@ -639,78 +637,39 @@ impl PgExtern {
                     }
                 }
             }
-            // /// We don't actually do this since triggers have their own cool kids zone
-            // Returning::Trigger => {
-            //     quote_spanned! { self.func.sig.span() =>
-            //         #[no_mangle]
-            //         #[doc(hidden)]
-            //         #[pg_guard]
-            //         pub unsafe extern "C" fn #func_name_wrapper #func_generics(#fcinfo_ident: ::pgx::pg_sys::FunctionCallInfo) -> ::pgx::pg_sys::Datum {
-            //             let maybe_pg_trigger = unsafe { ::pgx::trigger_support::PgTrigger::from_fcinfo(#fcinfo_ident) };
-            //             let pg_trigger = maybe_pg_trigger.expect("PgTrigger::from_fcinfo failed");
-            //             let trigger_fn_result: Result<
-            //                 ::pgx::heap_tuple::PgHeapTuple<'_, _>,
-            //                 _,
-            //             > = #func_name(&pg_trigger);
-
-            //             let trigger_retval = trigger_fn_result.expect("Trigger function panic");
-            //             match trigger_retval.into_trigger_datum() {
-            //                 None => ::pgx::pg_return_null(fcinfo),
-            //                 Some(datum) => datum,
-            //             }
-            //         }
-            //     }
-            // },
         }
     }
 }
 
-impl ToTokens for PgExtern {
-    fn to_tokens(&self, tokens: &mut TokenStream2) {
-        let original_func = &self.func;
-        let wrapper_func = self.wrapper_func();
-        let entity_func = self.entity_tokens();
-        let finfo_tokens = self.finfo_tokens();
-
-        let expansion = quote_spanned! { self.func.sig.span() =>
-            #original_func
-
-            #wrapper_func
-
-            #entity_func
-
-            #finfo_tokens
-        };
-        tokens.append_all(expansion);
+impl ToEntityGraphTokens for PgExtern {
+    fn to_entity_graph_tokens(&self) -> TokenStream2 {
+        self.entity_tokens()
     }
 }
 
-impl Parse for PgExtern {
+impl ToRustCodeTokens for PgExtern {
+    fn to_rust_code_tokens(&self) -> TokenStream2 {
+        let original_func = &self.func;
+        let wrapper_func = self.wrapper_func();
+        let finfo_tokens = self.finfo_tokens();
+
+        quote_spanned! { self.func.sig.span() =>
+            #original_func
+            #wrapper_func
+            #finfo_tokens
+        }
+    }
+}
+
+impl Parse for CodeEnrichment<PgExtern> {
     fn parse(input: ParseStream) -> Result<Self, syn::Error> {
         let mut attrs = Vec::new();
-        let mut to_sql_config: Option<ToSqlConfig> = None;
 
         let parser = Punctuated::<Attribute, Token![,]>::parse_terminated;
         let punctuated_attrs = input.call(parser).ok().unwrap_or_default();
         for pair in punctuated_attrs.into_pairs() {
-            match pair.into_value() {
-                Attribute::Sql(config) => {
-                    to_sql_config.get_or_insert(config);
-                }
-                attr => {
-                    attrs.push(attr);
-                }
-            }
+            attrs.push(pair.into_value())
         }
-
-        let to_sql_config = to_sql_config.unwrap_or_default();
-
-        let func: syn::ItemFn = input.parse()?;
-
-        if !to_sql_config.overrides_default() {
-            crate::ident_is_acceptable_to_postgres(&func.sig.ident)?;
-        }
-
-        Ok(Self { attrs, func, to_sql_config })
+        PgExtern::new(quote! {#(#attrs)*}, input.parse()?)
     }
 }

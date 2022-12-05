@@ -22,9 +22,12 @@ mod options;
 pub use aggregate_type::{AggregateType, AggregateTypeList};
 pub use options::{FinalizeModify, ParallelOption};
 
+use crate::enrich::CodeEnrichment;
+use crate::enrich::ToEntityGraphTokens;
+use crate::enrich::ToRustCodeTokens;
 use convert_case::{Case, Casing};
 use proc_macro2::{Ident, Span, TokenStream as TokenStream2};
-use quote::{quote, ToTokens, TokenStreamExt};
+use quote::quote;
 use syn::parse::{Parse, ParseStream};
 use syn::spanned::Spanned;
 use syn::{
@@ -103,7 +106,7 @@ pub struct PgAggregate {
 }
 
 impl PgAggregate {
-    pub fn new(mut item_impl: ItemImpl) -> Result<Self, syn::Error> {
+    pub fn new(mut item_impl: ItemImpl) -> Result<CodeEnrichment<Self>, syn::Error> {
         let to_sql_config =
             ToSqlConfig::from_attributes(item_impl.attrs.as_slice())?.unwrap_or_default();
         let target_path = get_target_path(&item_impl)?;
@@ -520,7 +523,7 @@ impl PgAggregate {
             None
         };
 
-        Ok(Self {
+        Ok(CodeEnrichment(Self {
             item_impl,
             pg_externs,
             name,
@@ -574,10 +577,12 @@ impl PgAggregate {
                 false
             },
             to_sql_config,
-        })
+        }))
     }
+}
 
-    fn entity_tokens(&self) -> ItemFn {
+impl ToEntityGraphTokens for PgAggregate {
+    fn to_entity_graph_tokens(&self) -> TokenStream2 {
         let target_path = get_target_path(&self.item_impl)
             .expect("Expected constructed PgAggregate to have target path.");
         let target_ident = get_target_ident(&target_path)
@@ -615,7 +620,7 @@ impl PgAggregate {
         let fn_moving_finalize_iter = self.fn_moving_finalize.iter();
         let to_sql_config = &self.to_sql_config;
 
-        let entity_item_fn: ItemFn = parse_quote! {
+        quote! {
             #[no_mangle]
             #[doc(hidden)]
             pub extern "Rust" fn #sql_graph_entity_fn_name() -> pgx::pgx_sql_entity_graph::SqlGraphEntity {
@@ -650,30 +655,24 @@ impl PgAggregate {
                 };
                 pgx::pgx_sql_entity_graph::SqlGraphEntity::Aggregate(submission)
             }
-        };
-        entity_item_fn
+        }
     }
 }
 
-impl Parse for PgAggregate {
-    fn parse(input: ParseStream) -> Result<Self, syn::Error> {
-        Self::new(input.parse()?)
-    }
-}
-
-impl ToTokens for PgAggregate {
-    fn to_tokens(&self, tokens: &mut TokenStream2) {
-        let entity_fn = self.entity_tokens();
+impl ToRustCodeTokens for PgAggregate {
+    fn to_rust_code_tokens(&self) -> TokenStream2 {
         let impl_item = &self.item_impl;
         let pg_externs = self.pg_externs.iter();
-        let inv = quote! {
+        quote! {
             #impl_item
-
             #(#pg_externs)*
+        }
+    }
+}
 
-            #entity_fn
-        };
-        tokens.append_all(inv);
+impl Parse for CodeEnrichment<PgAggregate> {
+    fn parse(input: ParseStream) -> Result<Self, syn::Error> {
+        PgAggregate::new(input.parse()?)
     }
 }
 
@@ -890,6 +889,7 @@ fn get_pgx_attr_macro(attr_name: impl AsRef<str>, ty: &syn::Type) -> Option<Toke
 mod tests {
     use super::PgAggregate;
     use eyre::Result;
+    use quote::ToTokens;
     use syn::{parse_quote, ItemImpl};
 
     #[test]
@@ -911,12 +911,12 @@ mod tests {
         assert!(agg.is_ok());
         // It should create 1 extern, the state.
         let agg = agg.unwrap();
-        assert_eq!(agg.pg_externs.len(), 1);
+        assert_eq!(agg.0.pg_externs.len(), 1);
         // That extern should be named specifically:
-        let extern_fn = &agg.pg_externs[0];
+        let extern_fn = &agg.0.pg_externs[0];
         assert_eq!(extern_fn.sig.ident.to_string(), "demo_agg_state");
         // It should be possible to generate entity tokens.
-        let _ = agg.entity_tokens();
+        let _ = agg.to_token_stream();
         Ok(())
     }
 
@@ -977,12 +977,12 @@ mod tests {
         assert!(agg.is_ok());
         // It should create 8 externs!
         let agg = agg.unwrap();
-        assert_eq!(agg.pg_externs.len(), 8);
+        assert_eq!(agg.0.pg_externs.len(), 8);
         // That extern should be named specifically:
-        let extern_fn = &agg.pg_externs[0];
+        let extern_fn = &agg.0.pg_externs[0];
         assert_eq!(extern_fn.sig.ident.to_string(), "demo_agg_state");
         // It should be possible to generate entity tokens.
-        let _ = agg.entity_tokens();
+        let _ = agg.to_token_stream();
         Ok(())
     }
 

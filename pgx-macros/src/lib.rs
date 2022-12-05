@@ -19,8 +19,8 @@ use syn::{parse_macro_input, Attribute, Data, DeriveInput, Item, ItemImpl};
 
 use operators::{impl_postgres_eq, impl_postgres_hash, impl_postgres_ord};
 use pgx_sql_entity_graph::{
-    parse_extern_attributes, ExtensionSql, ExtensionSqlFile, ExternArgs, PgAggregate, PgExtern,
-    PostgresEnum, PostgresType, Schema,
+    parse_extern_attributes, CodeEnrichment, ExtensionSql, ExtensionSqlFile, ExternArgs,
+    PgAggregate, PgExtern, PostgresEnum, PostgresType, Schema,
 };
 
 use crate::rewriter::PgGuardRewriter;
@@ -220,9 +220,21 @@ File modules (like `mod name;`) aren't able to be supported due to [`rust/#54725
 
 */
 #[proc_macro_attribute]
-pub fn pg_schema(_attr: TokenStream, item: TokenStream) -> TokenStream {
-    let pgx_schema = parse_macro_input!(item as Schema);
-    pgx_schema.to_token_stream().into()
+pub fn pg_schema(_attr: TokenStream, input: TokenStream) -> TokenStream {
+    fn wrapped(input: TokenStream) -> Result<TokenStream, syn::Error> {
+        let pgx_schema: Schema = syn::parse(input)?;
+        Ok(pgx_schema.to_token_stream().into())
+    }
+
+    match wrapped(input) {
+        Ok(tokens) => tokens,
+        Err(e) => {
+            let msg = e.to_string();
+            TokenStream::from(quote! {
+              compile_error!(#msg);
+            })
+        }
+    }
 }
 
 /**
@@ -353,7 +365,7 @@ extension_sql!(r#"\
 #[proc_macro]
 pub fn extension_sql(input: TokenStream) -> TokenStream {
     fn wrapped(input: TokenStream) -> Result<TokenStream, syn::Error> {
-        let ext_sql: ExtensionSql = syn::parse(input)?;
+        let ext_sql: CodeEnrichment<ExtensionSql> = syn::parse(input)?;
         Ok(ext_sql.to_token_stream().into())
     }
 
@@ -398,7 +410,7 @@ For all other options, and examples of them, see [`macro@extension_sql`].
 #[proc_macro]
 pub fn extension_sql_file(input: TokenStream) -> TokenStream {
     fn wrapped(input: TokenStream) -> Result<TokenStream, syn::Error> {
-        let ext_sql: ExtensionSqlFile = syn::parse(input)?;
+        let ext_sql: CodeEnrichment<ExtensionSqlFile> = syn::parse(input)?;
         Ok(ext_sql.to_token_stream().into())
     }
 
