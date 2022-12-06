@@ -7,7 +7,7 @@ mod pgx_modqual_tests {
     // empty.  This way, if pgx emits any code that uses `pgx::path::to::Thing` instead of `::pgx::path::to::Thing`
     // we'll fail to compile
     mod pgx {
-        // the code #[pg_guard] emits isn't qualified with `::ppgx`
+        // the code #[pg_guard] emits isn't qualified with `::pgx`
         // This is intentional by pgx, so need to account for it
         pub mod pg_sys {
             pub mod submodules {
