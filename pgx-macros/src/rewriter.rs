@@ -47,6 +47,16 @@ impl PgGuardRewriter {
 
         let generics = func.sig.generics.clone();
 
+        if attrs.iter().any(|attr| attr.path.is_ident("no_mangle"))
+            && generics.params.iter().any(|p| match p {
+                GenericParam::Type(_) => true,
+                GenericParam::Lifetime(_) => false,
+                GenericParam::Const(_) => true,
+            })
+        {
+            panic!("#[pg_guard] for function with generic parameters must not be combined with #[no_mangle]");
+        }
+
         // but for the inner function (the one we're wrapping) we don't need any kind of
         // abi classification
         func.sig.abi = None;
