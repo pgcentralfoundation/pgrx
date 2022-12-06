@@ -32,12 +32,6 @@ extern crate core;
 // expose our various derive macros
 pub use pgx_macros::*;
 
-// Used strictly by our code generation from pgx-macros and pgx-sql-entity-graph.  This is not meant for you
-#[path = "codegen.rs"]
-#[allow(non_snake_case)]
-#[doc(hidden)]
-pub mod __codegen__private__;
-
 /// The PGX prelude includes necessary imports to make extensions work.
 pub mod prelude;
 

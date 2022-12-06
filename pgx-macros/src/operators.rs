@@ -161,7 +161,7 @@ pub fn hash(type_name: &Ident) -> proc_macro2::TokenStream {
         #[allow(non_snake_case)]
         #[pg_extern(immutable, parallel_safe)]
         fn #pg_name(value: #type_name) -> i32 {
-            ::pgx::__codegen__private__::pgx_seahash(&value) as i32
+            ::pgx::misc::pgx_seahash(&value) as i32
         }
     }
 }
