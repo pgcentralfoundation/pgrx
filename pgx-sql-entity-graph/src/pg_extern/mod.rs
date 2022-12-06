@@ -391,7 +391,7 @@ impl PgExtern {
             Returning::None => quote_spanned! { self.func.sig.span() =>
                     #[no_mangle]
                     #[doc(hidden)]
-                    #[pg_guard]
+                    #[::pgx::pgx_macros::pg_guard]
                     pub unsafe extern "C" fn #func_name_wrapper #func_generics(#fcinfo_ident: ::pgx::pg_sys::FunctionCallInfo) {
                         #(
                             #arg_fetches
@@ -432,7 +432,7 @@ impl PgExtern {
                 quote_spanned! { self.func.sig.span() =>
                     #[no_mangle]
                     #[doc(hidden)]
-                    #[pg_guard]
+                    #[::pgx::pgx_macros::pg_guard]
                     pub unsafe extern "C" fn #func_name_wrapper #func_generics(#fcinfo_ident: ::pgx::pg_sys::FunctionCallInfo) -> ::pgx::pg_sys::Datum {
                         #(
                             #arg_fetches
@@ -462,11 +462,11 @@ impl PgExtern {
                 quote_spanned! { self.func.sig.span() =>
                     #[no_mangle]
                     #[doc(hidden)]
-                    #[pg_guard]
+                    #[::pgx::pgx_macros::pg_guard]
                     #[warn(unsafe_op_in_unsafe_fn)]
                     pub unsafe extern "C" fn #func_name_wrapper #func_generics(#fcinfo_ident: ::pgx::pg_sys::FunctionCallInfo) -> ::pgx::pg_sys::Datum {
                         struct IteratorHolder<'__pgx_internal_lifetime, T: std::panic::UnwindSafe + std::panic::RefUnwindSafe> {
-                            iter: *mut SetOfIterator<'__pgx_internal_lifetime, T>,
+                            iter: *mut ::pgx::iter::SetOfIterator<'__pgx_internal_lifetime, T>,
                         }
 
                         let mut funcctx: ::pgx::pgbox::PgBox<::pgx::pg_sys::FuncCallContext>;
@@ -565,7 +565,7 @@ impl PgExtern {
                 quote_spanned! { self.func.sig.span() =>
                     #[no_mangle]
                     #[doc(hidden)]
-                    #[pg_guard]
+                    #[::pgx::pgx_macros::pg_guard]
                     #[warn(unsafe_op_in_unsafe_fn)]
                     pub unsafe extern "C" fn #func_name_wrapper #func_generics(#fcinfo_ident: ::pgx::pg_sys::FunctionCallInfo) -> ::pgx::pg_sys::Datum {
                         struct IteratorHolder<'__pgx_internal_lifetime, T: std::panic::UnwindSafe + std::panic::RefUnwindSafe> {

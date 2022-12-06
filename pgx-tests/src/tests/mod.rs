@@ -34,6 +34,7 @@ mod pg_extern_tests;
 mod pg_guard_tests;
 mod pg_try_tests;
 mod pgbox_tests;
+mod pgx_module_qualification;
 mod postgres_type_tests;
 mod range_tests;
 mod schema_tests;

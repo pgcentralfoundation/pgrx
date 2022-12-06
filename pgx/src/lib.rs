@@ -22,7 +22,6 @@ Use of this source code is governed by the MIT license that can be found in the 
 //! ```
 #![allow(clippy::missing_safety_doc)]
 #![allow(clippy::cast_ptr_alignment)]
-extern crate pgx_macros;
 
 #[macro_use]
 extern crate bitflags;
@@ -30,6 +29,7 @@ extern crate alloc;
 extern crate core;
 
 // expose our various derive macros
+pub use pgx_macros;
 pub use pgx_macros::*;
 
 /// The PGX prelude includes necessary imports to make extensions work.
