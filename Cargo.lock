@@ -1511,7 +1511,7 @@ dependencies = [
 
 [[package]]
 name = "pgx-sql-entity-graph"
-version = "0.6.0"
+version = "0.6.1"
 dependencies = [
  "atty",
  "convert_case",
@@ -1550,34 +1550,6 @@ dependencies = [
 ]
 
 [[package]]
-<<<<<<< HEAD
-=======
-name = "pgx-utils"
-version = "0.6.1"
-dependencies = [
- "atty",
- "convert_case",
- "cstr_core",
- "eyre",
- "owo-colors",
- "petgraph",
- "proc-macro2",
- "quote",
- "regex",
- "seq-macro",
- "serde",
- "serde_derive",
- "serde_json",
- "syn",
- "syntect",
- "tracing",
- "tracing-error",
- "tracing-subscriber",
- "unescape",
-]
-
-[[package]]
->>>>>>> master
 name = "pgx-version-updater"
 version = "0.1.1"
 dependencies = [
