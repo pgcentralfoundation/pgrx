@@ -183,7 +183,7 @@ impl Drop for OwnedMemoryContext {
         unsafe {
             // In order to prevent crashes, if we're trying to drop
             // a context that is current, switch to its predecessor, and then drop it
-            if pg_sys::CurrentMemoryContext == self.owned {
+            if ptr::eq(pg_sys::CurrentMemoryContext, self.owned) {
                 pg_sys::CurrentMemoryContext = self.previous;
             }
             pg_sys::MemoryContextDelete(self.owned);
