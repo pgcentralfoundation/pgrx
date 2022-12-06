@@ -26,7 +26,7 @@ fn hello_default_schema() -> &'static str {
 /// will be created in a Postgres schema of the same name
 #[pg_schema]
 mod some_schema {
-    use pgx::*;
+    use pgx::prelude::*;
     use serde::{Deserialize, Serialize};
 
     #[derive(PostgresType, Serialize, Deserialize)]
@@ -43,7 +43,7 @@ mod some_schema {
 /// requires that the extension be created by a super-user
 #[pg_schema]
 mod pg_catalog {
-    use pgx::*;
+    use pgx::prelude::*;
     use serde::{Deserialize, Serialize};
 
     #[derive(PostgresType, Serialize, Deserialize)]

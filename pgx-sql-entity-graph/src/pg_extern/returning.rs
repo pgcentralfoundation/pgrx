@@ -323,39 +323,33 @@ impl ToTokens for Returning {
     fn to_tokens(&self, tokens: &mut TokenStream2) {
         let quoted = match self {
             Returning::None => quote! {
-                pgx::pgx_sql_entity_graph::PgExternReturnEntity::None
+                ::pgx::pgx_sql_entity_graph::PgExternReturnEntity::None
             },
             Returning::Type(used_ty) => {
                 let used_ty_entity_tokens = used_ty.entity_tokens();
                 quote! {
-                    pgx::pgx_sql_entity_graph::PgExternReturnEntity::Type {
+                    ::pgx::pgx_sql_entity_graph::PgExternReturnEntity::Type {
                         ty: #used_ty_entity_tokens,
                     }
                 }
             }
-            Returning::SetOf {
-                ty: used_ty,
-                optional,
-            } => {
+            Returning::SetOf { ty: used_ty, optional } => {
                 let used_ty_entity_tokens = used_ty.entity_tokens();
                 quote! {
-                    pgx::pgx_sql_entity_graph::PgExternReturnEntity::SetOf {
+                    ::pgx::pgx_sql_entity_graph::PgExternReturnEntity::SetOf {
                         ty: #used_ty_entity_tokens,
                         optional: #optional,
                     }
                 }
             }
-            Returning::Iterated {
-                tys: items,
-                optional,
-            } => {
+            Returning::Iterated { tys: items, optional } => {
                 let quoted_items = items
                     .iter()
                     .map(|ReturningIteratedItem { used_ty, name }| {
                         let name_iter = name.iter();
                         let used_ty_entity_tokens = used_ty.entity_tokens();
                         quote! {
-                            pgx::pgx_sql_entity_graph::PgExternReturnEntityIteratedItem {
+                            ::pgx::pgx_sql_entity_graph::PgExternReturnEntityIteratedItem {
                                 ty: #used_ty_entity_tokens,
                                 name: None #( .unwrap_or(Some(stringify!(#name_iter))) )*,
                             }
@@ -363,7 +357,7 @@ impl ToTokens for Returning {
                     })
                     .collect::<Vec<_>>();
                 quote! {
-                    pgx::pgx_sql_entity_graph::PgExternReturnEntity::Iterated {
+                    ::pgx::pgx_sql_entity_graph::PgExternReturnEntity::Iterated {
                         tys: vec![
                             #(#quoted_items),*
                         ],
@@ -371,10 +365,6 @@ impl ToTokens for Returning {
                     }
                 }
             }
-            // // Triggers have their own cool kids zone
-            // Returning::Trigger => quote! {
-            //     pgx::pgx_sql_entity_graph::PgExternReturnEntity::Trigger
-            // },
         };
         tokens.append_all(quoted);
     }

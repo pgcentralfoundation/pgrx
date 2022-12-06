@@ -281,9 +281,9 @@ impl PgMemoryContexts {
     /// ## Examples
     ///
     /// ```rust,no_run
-    /// use pgx::*;
+    /// use pgx::prelude::*;
+    /// use pgx::PgMemoryContexts;
     ///
-    /// #[pg_guard]
     /// pub fn do_something() -> pg_sys::ItemPointer {
     ///     PgMemoryContexts::TopTransactionContext.switch_to(|context| {
     ///         // allocate a new ItemPointerData, but inside the TopTransactionContext

@@ -109,7 +109,8 @@ impl PgGuardRewriter {
 
                 #[allow(unused_unsafe)]
                 unsafe {
-                    pg_sys::panic::pgx_extern_c_guard( || #body )
+                    // NB: this is purposely not spelled `::pgx` as pgx itself uses #[pg_guard]
+                    pgx::pg_sys::submodules::panic::pgx_extern_c_guard( || #body )
                 }
             }
         }

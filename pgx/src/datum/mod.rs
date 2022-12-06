@@ -67,10 +67,7 @@ pub trait PostgresType {}
 /// An example use of this trait:
 ///
 /// ```rust
-/// use pgx::{
-///     datum::{WithTypeIds, WithSizedTypeIds, WithArrayTypeIds, WithVarlenaTypeIds, PgVarlena},
-///     Array, PostgresType, StringInfo, JsonInOutFuncs, pg_extern, pg_sys, IntoDatum, pg_guard,
-/// };
+/// use pgx::prelude::*;
 /// use serde::{Serialize, Deserialize};
 ///
 /// #[derive(Debug, Clone, Copy, Serialize, Deserialize, PostgresType)]
@@ -78,7 +75,7 @@ pub trait PostgresType {}
 ///
 /// let mut mappings = Default::default();
 /// let treat_string = stringify!(Treat).to_string();
-/// <Treat<'static> as WithTypeIds>::register_with_refs(&mut mappings, treat_string.clone());
+/// <Treat<'static> as pgx::datum::WithTypeIds>::register_with_refs(&mut mappings, treat_string.clone());
 ///
 /// assert!(mappings.iter().any(|x| x.id == core::any::TypeId::of::<Treat<'static>>()));
 /// ```
@@ -195,10 +192,7 @@ impl<T: 'static + ?Sized> WithTypeIds for T {
 /// An example use of this trait:
 ///
 /// ```rust
-/// use pgx::{
-///     datum::{WithTypeIds, WithSizedTypeIds, WithArrayTypeIds, WithVarlenaTypeIds, PgVarlena},
-///     Array, PostgresType, StringInfo, JsonInOutFuncs, pg_extern, pg_sys, IntoDatum, pg_guard,
-/// };
+/// use pgx::prelude::*;
 /// use serde::{Serialize, Deserialize};
 ///
 /// #[derive(Debug, Clone, Copy, Serialize, Deserialize, PostgresType)]
@@ -344,10 +338,7 @@ impl<T: 'static> WithSizedTypeIds<T> {
 /// An example use of this trait:
 ///
 /// ```rust
-/// use pgx::{
-///     datum::{WithTypeIds, WithSizedTypeIds, WithArrayTypeIds, WithVarlenaTypeIds, PgVarlena},
-///     Array, PostgresType, StringInfo, JsonInOutFuncs, pg_extern, pg_sys, FromDatum, IntoDatum, pg_guard,
-/// };
+/// use pgx::prelude::*;
 /// use serde::{Serialize, Deserialize};
 ///
 /// #[derive(Debug, Clone, Serialize, Deserialize, PostgresType)]
@@ -436,10 +427,7 @@ impl<T: FromDatum + 'static> WithArrayTypeIds<T> {
 /// An example use of this trait:
 ///
 /// ```rust
-/// use pgx::{
-///     datum::{WithTypeIds, WithSizedTypeIds, WithArrayTypeIds, WithVarlenaTypeIds, PgVarlena},
-///     Array, PostgresType, StringInfo, JsonInOutFuncs, pg_extern, pg_sys, IntoDatum, pg_guard,
-/// };
+/// use pgx::prelude::*;
 /// use serde::{Serialize, Deserialize};
 ///
 /// #[derive(Debug, Clone, Copy, Serialize, Deserialize, PostgresType)]

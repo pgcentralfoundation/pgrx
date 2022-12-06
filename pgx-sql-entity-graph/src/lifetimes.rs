@@ -81,7 +81,7 @@ pub fn staticize_lifetimes(value: &mut syn::Type) {
 
                                 // rewrite the name!() macro's type so that it has a static lifetime, if any
                                 staticize_lifetimes(&mut ty);
-                                type_macro.mac = syn::parse_quote! {name!(#ident, #ty)};
+                                type_macro.mac = syn::parse_quote! {::pgx::name!(#ident, #ty)};
                             }
                         }
                     }

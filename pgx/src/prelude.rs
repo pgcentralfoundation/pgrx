@@ -1,9 +1,9 @@
 // From "external" crates:
-pub use ::pgx_macros::{
-    extension_sql, extension_sql_file, pg_aggregate, pg_extern, pg_guard, pg_schema, pg_test,
-    pg_trigger, search_path, PostgresEnum, PostgresType,
-};
+pub use ::pgx_macros::*; // yes, we really do want to re-export every macro that pgx_macros provides
 pub use ::pgx_pg_sys as pg_sys;
+
+// Can't make an extension without this
+pub use crate::pg_module_magic;
 
 // Necessary local macros:
 pub use crate::{default, name};
@@ -11,15 +11,26 @@ pub use crate::{default, name};
 // Needed for variant RETURNS
 pub use crate::iter::{SetOfIterator, TableIterator};
 
-// Needed for complex returns.
-pub use crate::heap_tuple::PgHeapTuple;
-pub use crate::pgbox::PgBox;
+// Needed for complex returns and Triggers
+pub use crate::heap_tuple::{PgHeapTuple, PgHeapTupleError};
+pub use crate::pgbox::{AllocatedByPostgres, AllocatedByRust, PgBox, WhoAllocated};
 
 // These could be factored into a temporal type module that could be easily imported for code which works with them.
 // However, reexporting them seems fine for now.
 pub use crate::datum::{
-    AnyNumeric, Date, Numeric, Time, TimeWithTimeZone, Timestamp, TimestampWithTimeZone,
+    AnyNumeric, Array, Date, FromDatum, IntoDatum, Numeric, PgVarlena, PostgresType, Range,
+    RangeData, RangeSubType, Time, TimeWithTimeZone, Timestamp, TimestampWithTimeZone,
+    VariadicArray,
 };
+pub use crate::inoutfuncs::{InOutFuncs, JsonInOutFuncs, PgVarlenaInOutFuncs};
+
+// Trigger support
+pub use crate::trigger_support::{
+    PgTrigger, PgTriggerError, PgTriggerLevel, PgTriggerOperation, PgTriggerWhen,
+};
+
+// Aggregate support
+pub use crate::aggregate::{Aggregate, FinalizeModify, ParallelOption};
 
 pub use crate::pg_sys::oids::PgOid;
 pub use crate::pg_sys::pg_try::PgTryBuilder;

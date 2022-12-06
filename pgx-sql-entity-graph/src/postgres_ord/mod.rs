@@ -105,12 +105,12 @@ impl ToEntityGraphTokens for PostgresOrd {
         quote! {
             #[no_mangle]
             #[doc(hidden)]
-            pub extern "Rust" fn  #sql_graph_entity_fn_name() -> pgx::pgx_sql_entity_graph::SqlGraphEntity {
+            pub extern "Rust" fn  #sql_graph_entity_fn_name() -> ::pgx::pgx_sql_entity_graph::SqlGraphEntity {
                 use core::any::TypeId;
                 extern crate alloc;
                 use alloc::vec::Vec;
                 use alloc::vec;
-                let submission = pgx::pgx_sql_entity_graph::PostgresOrdEntity {
+                let submission = ::pgx::pgx_sql_entity_graph::PostgresOrdEntity {
                     name: stringify!(#name),
                     file: file!(),
                     line: line!(),
@@ -119,7 +119,7 @@ impl ToEntityGraphTokens for PostgresOrd {
                     id: TypeId::of::<#name>(),
                     to_sql_config: #to_sql_config,
                 };
-                pgx::pgx_sql_entity_graph::SqlGraphEntity::Ord(submission)
+                ::pgx::pgx_sql_entity_graph::SqlGraphEntity::Ord(submission)
             }
         }
     }

@@ -1,12 +1,6 @@
-use pgx::{
-    commutator, hashes, join, merges, negator, opname, pg_extern, pg_guard, pg_operator, pg_sys,
-    restrict, PostgresEq, PostgresOrd, PostgresType,
-};
+use pgx::prelude::*;
 use serde::{Deserialize, Serialize};
 use std::cmp::Ordering;
-
-#[cfg(any(test, feature = "pg_test"))]
-use pgx::pg_schema;
 
 // Demonstrates that Postgres-defined ordering works.
 #[derive(

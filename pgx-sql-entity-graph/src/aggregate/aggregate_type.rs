@@ -93,7 +93,7 @@ impl AggregateType {
         let used_ty_entity_tokens = self.used_ty.entity_tokens();
         let name = self.name.iter();
         parse_quote! {
-            pgx::pgx_sql_entity_graph::AggregateTypeEntity {
+            ::pgx::pgx_sql_entity_graph::AggregateTypeEntity {
                 used_ty: #used_ty_entity_tokens,
                 name: None #( .unwrap_or(Some(#name)) )*,
             }

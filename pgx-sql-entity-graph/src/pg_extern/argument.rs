@@ -62,7 +62,7 @@ impl PgExternArgument {
         let used_ty_entity = self.used_ty.entity_tokens();
 
         let quoted = quote! {
-            pgx::pgx_sql_entity_graph::PgExternArgumentEntity {
+            ::pgx::pgx_sql_entity_graph::PgExternArgumentEntity {
                 pattern: stringify!(#pat),
                 used_ty: #used_ty_entity,
             }

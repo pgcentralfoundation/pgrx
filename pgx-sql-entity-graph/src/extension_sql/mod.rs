@@ -98,11 +98,11 @@ impl ToEntityGraphTokens for ExtensionSqlFile {
         quote! {
             #[no_mangle]
             #[doc(hidden)]
-            pub extern "Rust" fn  #sql_graph_entity_fn_name() -> pgx::pgx_sql_entity_graph::SqlGraphEntity {
+            pub extern "Rust" fn  #sql_graph_entity_fn_name() -> ::pgx::pgx_sql_entity_graph::SqlGraphEntity {
                 extern crate alloc;
                 use alloc::vec::Vec;
                 use alloc::vec;
-                let submission = pgx::pgx_sql_entity_graph::ExtensionSqlEntity {
+                let submission = ::pgx::pgx_sql_entity_graph::ExtensionSqlEntity {
                     sql: include_str!(#path),
                     module_path: module_path!(),
                     full_path: concat!(file!(), ':', line!()),
@@ -114,7 +114,7 @@ impl ToEntityGraphTokens for ExtensionSqlFile {
                     requires: vec![#(#requires_iter),*],
                     creates: vec![#(#creates_iter),*],
                 };
-                pgx::pgx_sql_entity_graph::SqlGraphEntity::CustomSql(submission)
+                ::pgx::pgx_sql_entity_graph::SqlGraphEntity::CustomSql(submission)
             }
         }
     }
@@ -194,11 +194,11 @@ impl ToEntityGraphTokens for ExtensionSql {
             syn::Ident::new(&format!("__pgx_internals_sql_{}", name.value()), Span::call_site());
         quote! {
             #[no_mangle]
-            pub extern "Rust" fn  #sql_graph_entity_fn_name() -> pgx::pgx_sql_entity_graph::SqlGraphEntity {
+            pub extern "Rust" fn  #sql_graph_entity_fn_name() -> ::pgx::pgx_sql_entity_graph::SqlGraphEntity {
                 extern crate alloc;
                 use alloc::vec::Vec;
                 use alloc::vec;
-                let submission = pgx::pgx_sql_entity_graph::ExtensionSqlEntity {
+                let submission = ::pgx::pgx_sql_entity_graph::ExtensionSqlEntity {
                     sql: #sql,
                     module_path: module_path!(),
                     full_path: concat!(file!(), ':', line!()),
@@ -210,7 +210,7 @@ impl ToEntityGraphTokens for ExtensionSql {
                     requires: vec![#(#requires_iter),*],
                     creates: vec![#(#creates_iter),*],
                 };
-                pgx::pgx_sql_entity_graph::SqlGraphEntity::CustomSql(submission)
+                ::pgx::pgx_sql_entity_graph::SqlGraphEntity::CustomSql(submission)
             }
         }
     }
@@ -309,7 +309,7 @@ impl ToEntityGraphTokens for SqlDeclared {
             quote! { stringify!(#identifier) }
         };
         quote! {
-            pgx::pgx_sql_entity_graph::SqlDeclaredEntity::build(#variant, #identifier).unwrap()
+            ::pgx::pgx_sql_entity_graph::SqlDeclaredEntity::build(#variant, #identifier).unwrap()
         }
     }
 }

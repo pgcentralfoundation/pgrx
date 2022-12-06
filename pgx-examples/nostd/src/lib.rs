@@ -11,7 +11,7 @@ Use of this source code is governed by the MIT license that can be found in the 
 #![no_std]
 extern crate alloc;
 
-use pgx::*;
+use pgx::prelude::*;
 use serde::{Deserialize, Serialize};
 
 use alloc::string::String;

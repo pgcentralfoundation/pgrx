@@ -123,7 +123,7 @@ CREATE TABLE foo ();
 #[pg_schema]
 mod tests {
     use crate::spi_query_by_id;
-    use pgx::*;
+    use pgx::prelude::*;
 
     #[pg_test]
     fn test_spi_query_by_id_direct() {

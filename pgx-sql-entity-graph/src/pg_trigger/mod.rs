@@ -63,7 +63,7 @@ impl PgTrigger {
         );
         let tokens = quote! {
             #[no_mangle]
-            #[pgx::pg_guard]
+            #[::pgx::pg_guard]
             extern "C" fn #extern_func_ident(fcinfo: ::pgx::pg_sys::FunctionCallInfo) -> ::pgx::pg_sys::Datum {
                 let maybe_pg_trigger = unsafe { ::pgx::trigger_support::PgTrigger::from_fcinfo(fcinfo) };
                 let pg_trigger = maybe_pg_trigger.expect("PgTrigger::from_fcinfo failed");
@@ -74,7 +74,7 @@ impl PgTrigger {
 
                 let trigger_retval = trigger_fn_result.expect("Trigger function panic");
                 match trigger_retval.into_trigger_datum() {
-                    None => ::pgx::pg_return_null(fcinfo),
+                    None => ::pgx::fcinfo::pg_return_null(fcinfo),
                     Some(datum) => datum,
                 }
             }
@@ -113,12 +113,12 @@ impl ToEntityGraphTokens for PgTrigger {
         quote! {
             #[no_mangle]
             #[doc(hidden)]
-            pub extern "Rust" fn #sql_graph_entity_fn_name() -> pgx::pgx_sql_entity_graph::SqlGraphEntity {
+            pub extern "Rust" fn #sql_graph_entity_fn_name() -> ::pgx::pgx_sql_entity_graph::SqlGraphEntity {
                 use core::any::TypeId;
                 extern crate alloc;
                 use alloc::vec::Vec;
                 use alloc::vec;
-                let submission = pgx::pgx_sql_entity_graph::PgTriggerEntity {
+                let submission = ::pgx::pgx_sql_entity_graph::PgTriggerEntity {
                     function_name: #function_name,
                     file: file!(),
                     line: line!(),
@@ -126,7 +126,7 @@ impl ToEntityGraphTokens for PgTrigger {
                     module_path: module_path!(),
                     to_sql_config: #to_sql_config,
                 };
-                pgx::pgx_sql_entity_graph::SqlGraphEntity::Trigger(submission)
+                ::pgx::pgx_sql_entity_graph::SqlGraphEntity::Trigger(submission)
             }
         }
     }
