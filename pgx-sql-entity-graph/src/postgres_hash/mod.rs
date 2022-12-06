@@ -104,12 +104,12 @@ impl ToEntityGraphTokens for PostgresHash {
         quote! {
             #[no_mangle]
             #[doc(hidden)]
-            pub extern "Rust" fn  #sql_graph_entity_fn_name() -> ::pgx::__codegen__private__::SqlGraphEntity {
+            pub extern "Rust" fn  #sql_graph_entity_fn_name() -> ::pgx::pgx_sql_entity_graph::SqlGraphEntity {
                 use core::any::TypeId;
                 extern crate alloc;
                 use alloc::vec::Vec;
                 use alloc::vec;
-                let submission = ::pgx::__codegen__private__::PostgresHashEntity {
+                let submission = ::pgx::pgx_sql_entity_graph::PostgresHashEntity {
                     name: stringify!(#name),
                     file: file!(),
                     line: line!(),
@@ -118,7 +118,7 @@ impl ToEntityGraphTokens for PostgresHash {
                     id: TypeId::of::<#name>(),
                     to_sql_config: #to_sql_config,
                 };
-                ::pgx::__codegen__private__::SqlGraphEntity::Hash(submission)
+                ::pgx::pgx_sql_entity_graph::SqlGraphEntity::Hash(submission)
             }
         }
     }
