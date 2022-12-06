@@ -97,7 +97,10 @@ impl CommandExecute for Run {
             None => get_property(&package_manifest_path, "extname")?
                 .ok_or(eyre!("could not determine extension name"))?,
         };
-        let profile = CargoProfile::from_flags(self.release, self.profile.as_deref())?;
+        let profile = CargoProfile::from_flags(
+            self.profile.as_deref(),
+            self.release.then_some(CargoProfile::Release).unwrap_or(CargoProfile::Dev),
+        )?;
 
         run(
             pg_config,
