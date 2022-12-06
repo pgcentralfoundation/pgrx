@@ -117,7 +117,10 @@ impl CommandExecute for Schema {
         let features =
             crate::manifest::features_for_version(self.features, &package_manifest, &pg_version);
 
-        let profile = CargoProfile::from_flags(self.release, self.profile.as_deref())?;
+        let profile = CargoProfile::from_flags(
+            self.profile.as_deref(),
+            self.release.then_some(CargoProfile::Release).unwrap_or(CargoProfile::Dev),
+        )?;
 
         generate_schema(
             &pg_config,

@@ -69,7 +69,7 @@ impl UsedType {
                 match archetype.ident.to_string().as_str() {
                     "variadic" => {
                         let ty: syn::Type = syn::parse2(mac.tokens.clone())?;
-                        syn::parse_quote! { ::pgx::VariadicArray<'static, #ty>}
+                        syn::parse_quote! { ::pgx::datum::VariadicArray<'static, #ty>}
                     }
                     _ => syn::Type::Macro(macro_pat),
                 }
@@ -95,7 +95,7 @@ impl UsedType {
                     "composite_type" => {
                         let composite_type = Some(handle_composite_type_macro(&mac)?);
                         let ty = syn::parse_quote! {
-                            ::pgx::heap_tuple::PgHeapTuple<'static, ::pgx::AllocatedByRust>
+                            ::pgx::heap_tuple::PgHeapTuple<'static, ::pgx::pgbox::AllocatedByRust>
                         };
                         (ty, composite_type)
                     }
@@ -221,7 +221,7 @@ impl UsedType {
         let default = (&self.default).iter();
 
         syn::parse_quote! {
-            pgx::pgx_sql_entity_graph::UsedTypeEntity {
+            ::pgx::pgx_sql_entity_graph::UsedTypeEntity {
                 ty_source: #resolved_ty_string,
                 ty_id: core::any::TypeId::of::<#resolved_ty>(),
                 full_path: core::any::type_name::<#resolved_ty>(),
@@ -237,7 +237,7 @@ impl UsedType {
                 /// Set via the type being an `Option`.
                 optional: #optional,
                 metadata: {
-                    use pgx::pgx_sql_entity_graph::metadata::PhantomDataExt;
+                    use ::pgx::pgx_sql_entity_graph::metadata::PhantomDataExt;
                     let marker: core::marker::PhantomData<#resolved_ty> = core::marker::PhantomData;
                     marker.entity()
                 },
@@ -282,7 +282,7 @@ fn resolve_vec_inner(
                         "composite_type" => {
                             let sql = Some(handle_composite_type_macro(mac)?);
                             let ty = syn::parse_quote! {
-                                Vec<::pgx::heap_tuple::PgHeapTuple<'static, ::pgx::AllocatedByRust>>
+                                Vec<::pgx::heap_tuple::PgHeapTuple<'static, ::pgx::pgbox::AllocatedByRust>>
                             };
                             Ok((ty, sql))
                         }
@@ -344,7 +344,7 @@ fn resolve_variadic_array_inner(
                             "composite_type" => {
                                 let sql = Some(handle_composite_type_macro(mac)?);
                                 let ty = syn::parse_quote! {
-                                    ::pgx::VariadicArray<'static, ::pgx::heap_tuple::PgHeapTuple<'static, ::pgx::AllocatedByRust>>
+                                    ::pgx::datum::VariadicArray<'static, ::pgx::heap_tuple::PgHeapTuple<'static, ::pgx::pgbox::AllocatedByRust>>
                                 };
                                 Ok((ty, sql))
                             }
@@ -360,7 +360,7 @@ fn resolve_variadic_array_inner(
                             "Option" => {
                                 let (inner_ty, expr) = resolve_option_inner(arg_type_path)?;
                                 let wrapped_ty = syn::parse_quote! {
-                                    ::pgx::VariadicArray<'static, #inner_ty>
+                                    ::pgx::datum::VariadicArray<'static, #inner_ty>
                                 };
                                 Ok((wrapped_ty, expr))
                             }
@@ -406,7 +406,7 @@ fn resolve_array_inner(
                             "composite_type" => {
                                 let sql = Some(handle_composite_type_macro(mac)?);
                                 let ty = syn::parse_quote! {
-                                    ::pgx::Array<'static, ::pgx::heap_tuple::PgHeapTuple<'static, ::pgx::AllocatedByRust>>
+                                    ::pgx::datum::Array<'static, ::pgx::heap_tuple::PgHeapTuple<'static, ::pgx::pgbox::AllocatedByRust>>
                                 };
                                 Ok((ty, sql))
                             }
@@ -422,7 +422,7 @@ fn resolve_array_inner(
                             "Option" => {
                                 let (inner_ty, expr) = resolve_option_inner(arg_type_path)?;
                                 let wrapped_ty = syn::parse_quote! {
-                                    ::pgx::Array<'static, #inner_ty>
+                                    ::pgx::datum::Array<'static, #inner_ty>
                                 };
                                 Ok((wrapped_ty, expr))
                             }
@@ -459,7 +459,7 @@ fn resolve_option_inner(
                             "composite_type" => {
                                 let sql = Some(handle_composite_type_macro(mac)?);
                                 let ty = syn::parse_quote! {
-                                    Option<::pgx::heap_tuple::PgHeapTuple<'static, ::pgx::AllocatedByRust>>
+                                    Option<::pgx::heap_tuple::PgHeapTuple<'static, ::pgx::pgbox::AllocatedByRust>>
                                 };
                                 Ok((ty, sql))
                             },

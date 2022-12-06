@@ -22,7 +22,7 @@ the trait itself has several items, only a few are required, the macro will fill
 # Minimal Example
 
 ```rust
-use pgx::*;
+use pgx::prelude::*;
 use serde::{Serialize, Deserialize};
 
 // pgx::pg_module_magic!(); // Uncomment this outside of docs!
@@ -82,7 +82,7 @@ Sometimes aggregates need to handle multiple arguments. The
 [`Aggregate::Args`](Aggregate::Args) associated type can be a tuple:
 
 ```rust
-# use pgx::*;
+# use pgx::prelude::*;
 # use serde::{Serialize, Deserialize};
 #
 # #[derive(Copy, Clone, Default, PostgresType, Serialize, Deserialize)]
@@ -127,7 +127,7 @@ CREATE AGGREGATE DemoSum (
 The [`name!(ident, Type)`][macro@crate::name] macro can be used to set the name of an argument:
 
 ```rust
-# use pgx::*;
+# use pgx::prelude::*;
 # use serde::{Serialize, Deserialize};
 #
 # #[derive(Copy, Clone, Default, PostgresType, Serialize, Deserialize)]
@@ -174,7 +174,7 @@ Functions inside the `impl` may use the [`#[pgx]`](macro@crate::pgx) attribute. 
 accepts the same parameters as [`#[pg_extern]`][macro@pgx-macros::pg_extern].
 
 ```rust
-# use pgx::*;
+# use pgx::prelude::*;
 # use serde::{Serialize, Deserialize};
 #
 # #[derive(Copy, Clone, Default, PostgresType, Serialize, Deserialize)]
@@ -216,7 +216,7 @@ AS 'MODULE_PATHNAME', 'demo_sum_state_wrapper';
 Sometimes it's useful to have aggregates share state, or use some other type for state.
 
 ```rust
-# use pgx::*;
+# use pgx::prelude::*;
 # use serde::{Serialize, Deserialize};
 #
 #[derive(Copy, Clone, Default, PostgresType, Serialize, Deserialize)]

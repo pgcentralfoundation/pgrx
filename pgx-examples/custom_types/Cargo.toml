@@ -19,7 +19,7 @@ no-schema-generation = [ "pgx/no-schema-generation", "pgx-tests/no-schema-genera
 [dependencies]
 pgx = { path = "../../pgx", default-features = false }
 maplit = "1.0.2"
-serde = "1.0.148"
+serde = "1.0.149"
 
 [dev-dependencies]
 pgx-tests = { path = "../../pgx-tests" }

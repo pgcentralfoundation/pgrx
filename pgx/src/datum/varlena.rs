@@ -56,7 +56,7 @@ impl Clone for PallocdVarlena {
 /// ```rust
 /// use std::str::FromStr;
 ///
-/// use crate::pgx::*;
+/// use pgx::prelude::*;
 ///
 /// #[derive(Copy, Clone, PostgresType)]
 /// #[pgvarlena_inoutfuncs]
@@ -79,7 +79,7 @@ impl Clone for PallocdVarlena {
 ///         result
 ///     }
 ///
-///     fn output(&self, buffer: &mut StringInfo) {
+///     fn output(&self, buffer: &mut pgx::StringInfo) {
 ///         buffer.push_str(&format!("{},{},{}", self.a, self.b, self.c));
 ///     }
 /// }
@@ -111,7 +111,8 @@ where
     /// ## Example
     ///
     /// ```rust,no_run
-    /// use pgx::PgVarlena;
+    /// use pgx::prelude::*;
+    ///
     /// #[derive(Copy, Clone)]
     /// struct MyType {
     ///    a: f32,

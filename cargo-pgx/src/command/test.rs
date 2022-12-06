@@ -65,7 +65,10 @@ impl CommandExecute for Test {
             None => crate::manifest::default_pg_version(&package_manifest)
                 .ok_or(eyre!("No provided `pg$VERSION` flag."))?,
         };
-        let profile = CargoProfile::from_flags(self.release, self.profile.as_deref())?;
+        let profile = CargoProfile::from_flags(
+            self.profile.as_deref(),
+            self.release.then_some(CargoProfile::Release).unwrap_or(CargoProfile::Dev),
+        )?;
 
         for pg_config in pgx.iter(PgConfigSelector::new(&pg_version)) {
             let mut testname = self.testname.clone();

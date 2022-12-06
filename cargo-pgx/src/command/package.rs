@@ -66,7 +66,11 @@ impl CommandExecute for Package {
 
         let features =
             crate::manifest::features_for_version(self.features, &package_manifest, &pg_version);
-        let profile = CargoProfile::from_flags(!self.debug, self.profile.as_deref())?;
+        let profile = CargoProfile::from_flags(
+            self.profile.as_deref(),
+            // NB:  `cargo pgx package` defaults to "--release" whereas all other commands default to "debug"
+            self.debug.then_some(CargoProfile::Dev).unwrap_or(CargoProfile::Release),
+        )?;
         let out_dir = if let Some(out_dir) = self.out_dir {
             out_dir
         } else {
