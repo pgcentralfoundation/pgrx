@@ -70,11 +70,12 @@ mod tests {
 
     #[pg_test]
     fn test_current_owned_memory_context_drop() {
-        let ctx = PgMemoryContexts::new("test");
-        let ctx_sys = ctx.value();
-        let parent = unsafe { (*ctx_sys).parent };
+        let mut ctx = PgMemoryContexts::new("test");
+        let mut another_ctx = PgMemoryContexts::new("another");
+        another_ctx.set_as_current();
         ctx.set_as_current();
+        assert_eq!(unsafe { pg_sys::CurrentMemoryContext }, ctx.value());
         drop(ctx);
-        assert_eq!(unsafe { pg_sys::CurrentMemoryContext }, parent);
+        assert_eq!(unsafe { pg_sys::CurrentMemoryContext }, another_ctx.value());
     }
 }
