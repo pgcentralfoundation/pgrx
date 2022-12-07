@@ -451,7 +451,8 @@ impl<'a> SpiClient<'a> {
     /// Find a cursor in transaction by name
     ///
     /// A cursor for a query can be opened using [`SpiClient::open_cursor`].
-    /// Cursor name can be retrieved via [`SpiCursor::into_name`].
+    /// Cursor are automatically closed on drop unless [`SpiCursor::detach_into_name`] is used.
+    /// Returned name can be used with this method to retrieve the open cursor.
     ///
     /// See [`SpiCursor`] docs for usage details.
     pub fn find_cursor(&mut self, name: &str) -> SpiCursor {
@@ -465,15 +466,18 @@ impl<'a> SpiClient<'a> {
     }
 }
 
+type CursorName = String;
+
 /// An SPI Cursor from a query
 ///
 /// Represents a Postgres cursor (internally, a portal), allowing to retrieve result rows a few
 /// at a time. Moreover, a cursor can be left open within a transaction, and accessed in
 /// multiple independent Spi sessions within the transaction.
 ///
-/// A cursor can be created via [`SpiClient::open_cursor()`] from a query; a cursor left open (i.e.
-/// not [`Self::close()`]d) can be turned into a cursor name via [`Self::into_name()`] and later
-/// retrieved by name (in the same transaction) via [`SpiClient::find_cursor()`].
+/// A cursor can be created via [`SpiClient::open_cursor()`] from a query.
+/// Cursors are automatically closed on drop, unless explicitly left open using
+/// [`Self::detach_into_name()`], which returns the cursor name; cursors left open can be retrieved
+/// by name (in the same transaction) via [`SpiClient::find_cursor()`].
 ///
 /// # Important notes about memory usage
 /// Result sets ([`SpiTupleTable`]s) returned by [`SpiCursor::fetch()`] will not be freed until
@@ -503,7 +507,7 @@ impl<'a> SpiClient<'a> {
 /// let cursor_name = Spi::connect(|mut client| {
 ///     let mut cursor = client.open_cursor("SELECT * FROM generate_series(1, 5)", None);
 ///     assert_eq!(Some(1u32), cursor.fetch(1).get_one());
-///     Ok(Some(cursor.into_name())) // <-- cursor gets dropped here
+///     Ok(Some(cursor.detach_into_name())) // <-- cursor gets dropped here
 ///     // <--- first SpiTupleTable gets freed by Spi::connect at this point
 /// }).unwrap();
 /// Spi::connect(|mut client| {
@@ -547,21 +551,23 @@ impl SpiCursor<'_> {
     /// The actual Postgres cursor is kept alive for the duration of the transaction.
     /// This allows to fetch it in a later SPI session within the same transaction
     /// using [`SpiClient::find_cursor()`]
-    pub fn into_name(self) -> String {
-        unsafe { std::ffi::CStr::from_ptr((*self.ptr).name) }
-            .to_str()
-            .expect("non-utf8 cursor name")
-            .to_string()
+    pub fn detach_into_name(self) -> CursorName {
+        unsafe {
+            let name = (*self.ptr).name;
+            std::mem::forget(self);
+            std::ffi::CStr::from_ptr(name)
+        }
+        .to_str()
+        .expect("non-utf8 cursor name")
+        .to_string()
     }
+}
 
-    /// Close the cursor, releasing its resources
-    ///
-    /// All cursors are closed automatically at the end of a transaction.
-    /// Avoid closing the cursor if planning to retrieve it in a later Spi session within the same
-    /// transaction using [`SpiClient::find_cursor()`].
-    pub fn close(mut self) {
-        let ptr = std::mem::replace(&mut self.ptr, std::ptr::null_mut());
-        unsafe { pg_sys::SPI_cursor_close(ptr) }
+impl Drop for SpiCursor<'_> {
+    fn drop(&mut self) {
+        unsafe {
+            pg_sys::SPI_cursor_close(self.ptr);
+        }
     }
 }
 

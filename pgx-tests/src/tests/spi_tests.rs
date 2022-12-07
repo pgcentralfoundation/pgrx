@@ -221,7 +221,7 @@ mod tests {
             );
             let mut cursor = client.open_cursor("SELECT * FROM tests.cursor_table", None);
             assert_eq!(sum_all(cursor.fetch(3)), 1 + 2 + 3);
-            Ok(Some(cursor.into_name()))
+            Ok(Some(cursor.detach_into_name()))
         })
         .unwrap();
 
@@ -232,6 +232,7 @@ mod tests {
             let mut cursor = client.find_cursor(&cursor_name);
             assert_eq!(sum_all(cursor.fetch(3)), 4 + 5 + 6);
             assert_eq!(sum_all(cursor.fetch(3)), 7 + 8 + 9);
+            cursor.detach_into_name();
             Ok(None::<()>)
         });
 
@@ -246,15 +247,6 @@ mod tests {
     fn test_cursor_failure() {
         Spi::execute(|mut client| {
             client.open_cursor("THIS IS NOT SQL", None);
-        });
-    }
-
-    #[pg_test]
-    fn test_cursor_close() {
-        Spi::connect(|mut client| {
-            let cursor = client.open_cursor("SELECT 1", None);
-            cursor.close();
-            Ok(None::<()>)
         });
     }
 
