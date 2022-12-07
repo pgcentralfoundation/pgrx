@@ -1,4 +1,5 @@
 #![deny(clippy::needless_borrow)] // unnecessary borrows can impair inference
+#![deny(clippy::manual_flatten)] // avoid rightwards drift
 #![allow(clippy::redundant_closure)] // extra closures are easier to refactor
 #![allow(clippy::iter_nth_zero)] // can be easier to refactor
 #![allow(clippy::perf)] // not a priority here
@@ -325,18 +326,16 @@ fn update_files(args: &UpdateFilesArgs) {
             // from the diff output above will produce irrelevant information, so we
             // will skip it.
             let mut diff_output = String::new();
-            for output_line in child_output.stdout.lines().skip(2) {
-                if let Ok(line) = output_line {
-                    match line.chars().nth(0) {
-                        Some('-') => {
-                            diff_output.push_str(format!("\n            {}", line.red()).as_str())
-                        }
-                        Some('+') => {
-                            diff_output.push_str(format!("\n            {}", line.green()).as_str())
-                        }
-                        Some(_) => diff_output.push_str(format!("\n           {line}").as_str()),
-                        _ => {}
+            for line in child_output.stdout.lines().skip(2).flatten() {
+                match line.chars().nth(0) {
+                    Some('-') => {
+                        diff_output.push_str(format!("\n            {}", line.red()).as_str())
                     }
+                    Some('+') => {
+                        diff_output.push_str(format!("\n            {}", line.green()).as_str())
+                    }
+                    Some(_) => diff_output.push_str(format!("\n           {line}").as_str()),
+                    _ => {}
                 }
             }
 
