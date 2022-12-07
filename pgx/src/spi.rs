@@ -16,6 +16,7 @@ use std::fmt::Debug;
 use std::marker::PhantomData;
 use std::mem;
 use std::ops::{Index, IndexMut};
+use std::ptr::NonNull;
 
 /// These match the Postgres `#define`d constants prefixed `SPI_OK_*` that you can find in `pg_sys`.
 #[derive(Debug, PartialEq)]
@@ -433,7 +434,7 @@ impl<'a> SpiClient<'a> {
             }
         }
 
-        let ptr = unsafe {
+        let ptr = NonNull::new(unsafe {
             pg_sys::SPI_cursor_open_with_args(
                 std::ptr::null_mut(), // let postgres assign a name
                 src.as_ptr(),
@@ -444,7 +445,8 @@ impl<'a> SpiClient<'a> {
                 false,
                 0,
             )
-        };
+        })
+        .expect("Portal ptr was null");
         SpiCursor { ptr, _phantom: PhantomData }
     }
 
@@ -458,10 +460,8 @@ impl<'a> SpiClient<'a> {
     pub fn find_cursor(&mut self, name: &str) -> SpiCursor {
         use pgx_pg_sys::AsPgCStr;
 
-        let ptr = unsafe { pg_sys::SPI_cursor_find(name.as_pg_cstr()) };
-        if ptr.is_null() {
-            panic!("cursor named \"{}\" not found", name);
-        }
+        let ptr = NonNull::new(unsafe { pg_sys::SPI_cursor_find(name.as_pg_cstr()) })
+            .unwrap_or_else(|| panic!("cursor named \"{}\" not found", name));
         SpiCursor { ptr, _phantom: PhantomData }
     }
 }
@@ -520,7 +520,7 @@ type CursorName = String;
 /// });
 /// ```
 pub struct SpiCursor<'client> {
-    ptr: pg_sys::Portal,
+    ptr: NonNull<pg_sys::PortalData>,
     _phantom: PhantomData<&'client SpiClient<'client>>,
 }
 
@@ -532,7 +532,7 @@ impl SpiCursor<'_> {
         unsafe {
             pg_sys::SPI_tuptable = std::ptr::null_mut();
         }
-        unsafe { pg_sys::SPI_cursor_fetch(self.ptr, true, count) }
+        unsafe { pg_sys::SPI_cursor_fetch(self.ptr.as_mut(), true, count) }
         SpiTupleTable {
             status_code: SpiOk::Fetch,
             table: unsafe { pg_sys::SPI_tuptable },
@@ -553,7 +553,9 @@ impl SpiCursor<'_> {
     /// using [`SpiClient::find_cursor()`]
     pub fn detach_into_name(self) -> CursorName {
         unsafe {
-            let name = (*self.ptr).name;
+            let name = self.ptr.as_ref().name;
+            // Forget self, as to avoid closing the cursor in `drop`
+            // No risk leaking rust memory, as Self is just a thin wrapper around a NonNull ptr
             std::mem::forget(self);
             std::ffi::CStr::from_ptr(name)
         }
@@ -566,7 +568,7 @@ impl SpiCursor<'_> {
 impl Drop for SpiCursor<'_> {
     fn drop(&mut self) {
         unsafe {
-            pg_sys::SPI_cursor_close(self.ptr);
+            pg_sys::SPI_cursor_close(self.ptr.as_mut());
         }
     }
 }
