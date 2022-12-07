@@ -168,6 +168,7 @@ where
             },
         }
     }
+
     fn return_sql() -> Result<Returns, ReturnsError> {
         match T::type_name() {
             id if id == u8::type_name() => Ok(Returns::One(SqlMapping::As(format!("bytea")))),

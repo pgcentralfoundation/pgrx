@@ -186,7 +186,7 @@ impl ToEntityGraphTokens for PostgresType {
                     line: line!(),
                     module_path: module_path!(),
                     full_path: core::any::type_name::<#name #static_ty_generics>(),
-                    mappings,
+                    mappings: mappings.into_iter().collect(),
                     in_fn: stringify!(#in_fn),
                     in_fn_module_path: {
                         let in_fn = stringify!(#in_fn);
