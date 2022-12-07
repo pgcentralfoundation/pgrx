@@ -428,7 +428,7 @@ fn parse_new_version(current_version_specifier: &str, new_version: &str) -> Stri
         Some(_) => {
             if let Some(version_pos) = current_version_specifier.find(|c: char| c.is_numeric()) {
                 result.push_str(&current_version_specifier[..version_pos]);
-                result.push_str(&new_version.clone());
+                result.push_str(new_version);
             } else {
                 panic!(
                     "Could not find an actual version in specifier: '{}'",
