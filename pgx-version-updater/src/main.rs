@@ -1,5 +1,6 @@
 #![deny(clippy::needless_borrow)] // unnecessary borrows can impair inference
 #![deny(clippy::manual_flatten)] // avoid rightwards drift
+#![deny(clippy::redundant_static_lifetimes)] // avoid unnecessary lifetime annotations
 #![allow(clippy::redundant_closure)] // extra closures are easier to refactor
 #![allow(clippy::iter_nth_zero)] // can be easier to refactor
 #![allow(clippy::perf)] // not a priority here
@@ -72,7 +73,7 @@ struct UpdateFilesArgs {
 }
 
 // List of directories to ignore while Walkdir'ing. Add more here as necessary.
-const IGNORE_DIRS: &'static [&'static str] = &[".git", "target"];
+const IGNORE_DIRS: &[&str] = &[".git", "target"];
 
 fn main() {
     let cli = Cli::parse();
