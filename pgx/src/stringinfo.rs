@@ -158,10 +158,16 @@ impl<AllocatedBy: WhoAllocated> StringInfo<AllocatedBy> {
     }
 
     /// Push the bytes behind a raw pointer of a given length onto the end
+    ///
+    /// # Safety
+    ///
+    /// This function is unsafe as we cannot ensure the specified `ptr` and `len` arguments
+    /// are what you say that are and otherwise in agreement
     #[inline]
     pub unsafe fn push_raw(&mut self, ptr: *const std::os::raw::c_char, len: i32) {
         unsafe {
             // SAFETY:  self.inner will always be a valid StringInfoData pointer
+            // and the caller gets to decide if `ptr` and `len` line up
             pg_sys::appendBinaryStringInfo(self.inner.as_ptr(), ptr, len)
         }
     }
