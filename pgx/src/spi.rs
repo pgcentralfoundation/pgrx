@@ -517,7 +517,7 @@ impl<'a> SpiClient<'a> {
 /// ```
 pub struct SpiCursor<'client> {
     ptr: pg_sys::Portal,
-    _phantom: PhantomData<&'client SpiClient>
+    _phantom: PhantomData<&'client SpiClient>,
 }
 
 impl SpiCursor<'_> {
