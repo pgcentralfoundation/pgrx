@@ -181,12 +181,60 @@ pub struct OwnedMemoryContext {
 
 impl Drop for OwnedMemoryContext {
     fn drop(&mut self) {
-        unsafe {
-            // In order to prevent crashes, if we're trying to drop
-            // a context that is current, switch to its predecessor, and then drop it
-            if ptr::eq(pg_sys::CurrentMemoryContext, self.owned) {
-                pg_sys::CurrentMemoryContext = self.previous;
+        extern "C" {
+            pub fn pgx_MemoryContextIsValid(context: pg_sys::MemoryContext) -> bool;
+        }
+
+        unsafe fn switch_context(
+            cxt: pg_sys::MemoryContext,
+            previous: pg_sys::MemoryContext,
+        ) -> bool {
+            if ptr::eq(pg_sys::CurrentMemoryContext, cxt) {
+                // If the previous context is no longer valid, switch to TopMemoryContext
+                pg_sys::CurrentMemoryContext = if pgx_MemoryContextIsValid(previous) {
+                    previous
+                } else {
+                    pg_sys::TopMemoryContext
+                };
+                true
+            } else {
+                false
             }
+        }
+
+        unsafe fn switch_children(
+            cxt: pg_sys::MemoryContext,
+            previous: pg_sys::MemoryContext,
+        ) -> bool {
+            let mut child = (*cxt).firstchild;
+            while !child.is_null() {
+                if switch_context(child, previous) {
+                    return true;
+                }
+                if switch_children(child, previous) {
+                    return true;
+                }
+                child = (*child).nextchild;
+            }
+            return false;
+        }
+
+        unsafe {
+            // In order to prevent failing Postgres assumption and assertion, if we're trying to drop
+            // a context that is current, switch to its predecessor, and then drop it.
+            if !switch_context(self.owned, self.previous) {
+                // In a complicated scenario, a parent context may get dropped while one of its
+                // (direct or indirect) children is current. Since memory
+                // context deletion involves deletion of all of its children, Postgres will fail an assertion
+                // or (when assertions are disabled) will leave with an invalid current context, which is not
+                // great either.
+                //
+                // So, in order to avoid this, we scan through children to see if any of them are current, and switch
+                // them to the previous context of this context and proceed with the deletion.
+                switch_children(self.owned, self.previous);
+            }
+
+            // Now, proceed with the deletion
             pg_sys::MemoryContextDelete(self.owned);
         }
     }
@@ -200,7 +248,7 @@ impl PgMemoryContexts {
             previous,
             owned: unsafe {
                 pg_sys::AllocSetContextCreateExtended(
-                    PgMemoryContexts::CurrentMemoryContext.value(),
+                    previous,
                     name.as_pg_cstr(),
                     pg_sys::ALLOCSET_DEFAULT_MINSIZE as usize,
                     pg_sys::ALLOCSET_DEFAULT_INITSIZE as usize,
@@ -240,7 +288,11 @@ impl PgMemoryContexts {
 
             match self {
                 PgMemoryContexts::Owned(mc) => {
-                    mc.previous = old_context;
+                    // If the context is set as current while it's already current,
+                    // don't update `previous` as it'll self-reference instead.
+                    if old_context != mc.owned {
+                        mc.previous = old_context;
+                    }
                 }
                 _ => {}
             }

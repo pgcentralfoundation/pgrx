@@ -78,4 +78,39 @@ mod tests {
         drop(ctx);
         assert_eq!(unsafe { pg_sys::CurrentMemoryContext }, another_ctx.value());
     }
+
+    #[pg_test]
+    fn test_current_owned_memory_context_drop_handle_children() {
+        let mut ctx = PgMemoryContexts::new("test");
+        let ctx_parent = ctx.parent().unwrap().value();
+        ctx.set_as_current();
+        let mut ctx1 = PgMemoryContexts::new("test1");
+        ctx1.set_as_current();
+        let mut ctx2 = PgMemoryContexts::new("test2");
+        ctx2.set_as_current();
+        drop(ctx); // drop the parent of ctx1
+        assert_eq!(unsafe { pg_sys::CurrentMemoryContext }, ctx_parent);
+    }
+
+    #[pg_test]
+    fn test_current_owned_memory_context_drop_handle_sibling_children() {
+        let mut ctx = PgMemoryContexts::new("test");
+        let ctx_parent = ctx.parent().unwrap().value();
+        ctx.set_as_current();
+        let mut _ctx1 = PgMemoryContexts::new("test1");
+        let mut ctx2 = PgMemoryContexts::new("test2");
+        ctx2.set_as_current();
+        drop(ctx); // drop the parent of _ctx1 and ctx2
+        assert_eq!(unsafe { pg_sys::CurrentMemoryContext }, ctx_parent);
+    }
+
+    #[pg_test]
+    fn test_current_owned_memory_context_drop_when_set_current_twice() {
+        let ctx_parent = PgMemoryContexts::CurrentMemoryContext.value();
+        let mut ctx = PgMemoryContexts::new("test");
+        ctx.set_as_current();
+        ctx.set_as_current();
+        drop(ctx);
+        assert_eq!(unsafe { pg_sys::CurrentMemoryContext }, ctx_parent);
+    }
 }

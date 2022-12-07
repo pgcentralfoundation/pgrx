@@ -33,6 +33,11 @@ MemoryContext pgx_GetMemoryContextChunk(void *ptr) {
     return GetMemoryChunkContext(ptr);
 }
 
+PGDLLEXPORT bool pgx_MemoryContextIsValid(MemoryContext context);
+bool pgx_MemoryContextIsValid(MemoryContext context) {
+    return MemoryContextIsValid(context);
+}
+
 PGDLLEXPORT void pgx_elog(int32 level, char *message);
 void pgx_elog(int32 level, char *message) {
     elog(level, "%s", message);
