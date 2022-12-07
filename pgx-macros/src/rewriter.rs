@@ -37,7 +37,10 @@ impl PgGuardRewriter {
         stream
     }
 
-    pub fn item_fn_without_rewrite(&self, mut func: ItemFn) -> proc_macro2::TokenStream {
+    pub fn item_fn_without_rewrite(
+        &self,
+        mut func: ItemFn,
+    ) -> syn::Result<proc_macro2::TokenStream> {
         // remember the original visibility and signature classifications as we want
         // to use those for the outer function
         let input_func_name = func.sig.ident.to_string();
@@ -68,7 +71,7 @@ impl PgGuardRewriter {
         func.sig.ident =
             Ident::new(&format!("{}_inner", func.sig.ident.to_string()), func.sig.ident.span());
 
-        let arg_list = PgGuardRewriter::build_arg_list(&sig, false);
+        let arg_list = PgGuardRewriter::build_arg_list(&sig, false)?;
         let func_name = PgGuardRewriter::build_func_name(&func.sig);
 
         let prolog = if input_func_name == "__pgx_private_shmem_hook"
@@ -100,7 +103,7 @@ impl PgGuardRewriter {
             quote! { #func_name::<#ty>(#arg_list) }
         };
 
-        quote_spanned! {func.span()=>
+        Ok(quote_spanned! {func.span()=>
             #prolog
             #(#attrs)*
             #vis #sig {
@@ -113,19 +116,23 @@ impl PgGuardRewriter {
                     pgx::pg_sys::submodules::panic::pgx_extern_c_guard( || #body )
                 }
             }
-        }
+        })
     }
 
-    pub fn foreign_item(&self, item: ForeignItem, abi: &syn::Abi) -> proc_macro2::TokenStream {
+    pub fn foreign_item(
+        &self,
+        item: ForeignItem,
+        abi: &syn::Abi,
+    ) -> syn::Result<proc_macro2::TokenStream> {
         match item {
             ForeignItem::Fn(func) => {
                 if func.sig.variadic.is_some() {
-                    return quote! { #abi { #func } };
+                    return Ok(quote! { #abi { #func } });
                 }
 
                 self.foreign_item_fn(&func, abi)
             }
-            _ => quote! { #abi { #item } },
+            _ => Ok(quote! { #abi { #item } }),
         }
     }
 
@@ -133,13 +140,13 @@ impl PgGuardRewriter {
         &self,
         func: &ForeignItemFn,
         abi: &syn::Abi,
-    ) -> proc_macro2::TokenStream {
+    ) -> syn::Result<proc_macro2::TokenStream> {
         let func_name = PgGuardRewriter::build_func_name(&func.sig);
-        let arg_list = PgGuardRewriter::rename_arg_list(&func.sig);
-        let arg_list_with_types = PgGuardRewriter::rename_arg_list_with_types(&func.sig);
+        let arg_list = PgGuardRewriter::rename_arg_list(&func.sig)?;
+        let arg_list_with_types = PgGuardRewriter::rename_arg_list_with_types(&func.sig)?;
         let return_type = PgGuardRewriter::get_return_type(&func.sig);
 
-        quote! {
+        Ok(quote! {
             #[track_caller]
             pub unsafe fn #func_name ( #arg_list_with_types ) #return_type {
                 crate::ffi::pg_guard_ffi_boundary(move || {
@@ -147,7 +154,7 @@ impl PgGuardRewriter {
                     #func_name(#arg_list)
                 })
             }
-        }
+        })
     }
 
     pub fn build_func_name(sig: &Signature) -> Ident {
@@ -155,7 +162,10 @@ impl PgGuardRewriter {
     }
 
     #[allow(clippy::cmp_owned)]
-    pub fn build_arg_list(sig: &Signature, suffix_arg_name: bool) -> proc_macro2::TokenStream {
+    pub fn build_arg_list(
+        sig: &Signature,
+        suffix_arg_name: bool,
+    ) -> syn::Result<proc_macro2::TokenStream> {
         let mut arg_list = proc_macro2::TokenStream::new();
 
         for arg in &sig.inputs {
@@ -169,22 +179,23 @@ impl PgGuardRewriter {
                             arg_list.extend(quote! { #ident, });
                         }
                     } else {
-                        panic!(
-                            "Unknown argument pattern in `#[pg_guard]` function: `{:?}`",
-                            ty.pat
-                        );
+                        return Err(syn::Error::new(
+                            ty.pat.span(),
+                            "Unknown argument pattern in `#[pg_guard]` function",
+                        ));
                     }
                 }
-                FnArg::Receiver(_) => panic!(
-                    "#[pg_guard] doesn't support external functions with 'self' as the argument"
-                ),
+                a @ FnArg::Receiver(_) => return Err(syn::Error::new(
+                    a.span(),
+                    "#[pg_guard] doesn't support external functions with 'self' as the argument",
+                )),
             }
         }
 
-        arg_list
+        Ok(arg_list)
     }
 
-    pub fn rename_arg_list(sig: &Signature) -> proc_macro2::TokenStream {
+    pub fn rename_arg_list(sig: &Signature) -> syn::Result<proc_macro2::TokenStream> {
         let mut arg_list = proc_macro2::TokenStream::new();
 
         for arg in &sig.inputs {
@@ -195,22 +206,23 @@ impl PgGuardRewriter {
                         let name = Ident::new(&format!("arg_{}", ident.ident), ident.ident.span());
                         arg_list.extend(quote! { #name, });
                     } else {
-                        panic!(
-                            "Unknown argument pattern in `#[pg_guard]` function: `{:?}`",
-                            ty.pat,
-                        );
+                        return Err(syn::Error::new(
+                            ty.pat.span(),
+                            "Unknown argument pattern in `#[pg_guard]` function",
+                        ));
                     }
                 }
-                FnArg::Receiver(_) => panic!(
-                    "#[pg_guard] doesn't support external functions with 'self' as the argument"
-                ),
+                a @ FnArg::Receiver(_) => return Err(syn::Error::new(
+                    a.span(),
+                    "#[pg_guard] doesn't support external functions with 'self' as the argument",
+                )),
             }
         }
 
-        arg_list
+        Ok(arg_list)
     }
 
-    pub fn rename_arg_list_with_types(sig: &Signature) -> proc_macro2::TokenStream {
+    pub fn rename_arg_list_with_types(sig: &Signature) -> syn::Result<proc_macro2::TokenStream> {
         let mut arg_list = proc_macro2::TokenStream::new();
 
         for arg in &sig.inputs {
@@ -223,19 +235,20 @@ impl PgGuardRewriter {
                                 .unwrap();
                         arg_list.extend(quote! { #arg, });
                     } else {
-                        panic!(
-                            "Unknown argument pattern in `#[pg_guard]` function: `{:?}`",
-                            ty.pat,
-                        );
+                        return Err(syn::Error::new(
+                            ty.pat.span(),
+                            "Unknown argument pattern in `#[pg_guard]` function",
+                        ));
                     }
                 }
-                FnArg::Receiver(_) => panic!(
-                    "#[pg_guard] doesn't support external functions with 'self' as the argument"
-                ),
+                a @ FnArg::Receiver(_) => return Err(syn::Error::new(
+                    a.span(),
+                    "#[pg_guard] doesn't support external functions with 'self' as the argument",
+                )),
             }
         }
 
-        arg_list
+        Ok(arg_list)
     }
 
     pub fn get_return_type(sig: &Signature) -> ReturnType {
