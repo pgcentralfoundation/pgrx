@@ -445,7 +445,7 @@ impl<'a> SpiClient<'a> {
                 0,
             )
         };
-        SpiCursor { ptr }
+        SpiCursor { ptr, _phantom: PhantomData }
     }
 
     /// Find a cursor in transaction by name
@@ -461,7 +461,7 @@ impl<'a> SpiClient<'a> {
         if ptr.is_null() {
             panic!("cursor named \"{}\" not found", name);
         }
-        SpiCursor { ptr }
+        SpiCursor { ptr, _phantom: PhantomData }
     }
 }
 
@@ -515,11 +515,12 @@ impl<'a> SpiClient<'a> {
 ///     // <--- second SpiTupleTable gets freed by Spi::connect at this point
 /// });
 /// ```
-pub struct SpiCursor {
+pub struct SpiCursor<'client> {
     ptr: pg_sys::Portal,
+    _phantom: PhantomData<&'client SpiClient>
 }
 
-impl SpiCursor {
+impl SpiCursor<'_> {
     /// Fetch up to `count` rows from the cursor, moving forward
     ///
     /// If `fetch` runs off the end of the available rows, an empty [`SpiTupleTable`] is returned.
