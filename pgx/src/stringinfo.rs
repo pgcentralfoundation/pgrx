@@ -10,7 +10,8 @@ Use of this source code is governed by the MIT license that can be found in the 
 //! A safe wrapper around Postgres `StringInfo` structure
 #![allow(dead_code, non_snake_case)]
 
-use crate::{pg_sys, void_mut_ptr, AllocatedByPostgres, AllocatedByRust, PgBox, WhoAllocated};
+use crate::{pg_sys, AllocatedByPostgres, AllocatedByRust, PgBox, WhoAllocated};
+use core::fmt::{Display, Formatter};
 use core::str::Utf8Error;
 use std::io::Error;
 
@@ -59,12 +60,12 @@ impl<AllocatedBy: WhoAllocated> std::io::Write for StringInfo<AllocatedBy> {
     }
 }
 
-impl<AllocatedBy: WhoAllocated> ToString for StringInfo<AllocatedBy> {
+impl<AllocatedBy: WhoAllocated> Display for StringInfo<AllocatedBy> {
     /// Convert this [`StringInfo`] into a Rust string.  This uses [`String::from_utf8_lossy`] as
     /// it's fine for a Postgres [`StringInfo`] to contain null bytes and also not even be proper
     /// UTF8.
-    fn to_string(&self) -> String {
-        String::from_utf8_lossy(self.as_bytes()).to_string()
+    fn fmt(&self, f: &mut Formatter<'_>) -> core::fmt::Result {
+        f.write_str(&String::from_utf8_lossy(self.as_bytes()))
     }
 }
 
@@ -158,10 +159,10 @@ impl<AllocatedBy: WhoAllocated> StringInfo<AllocatedBy> {
 
     /// Push the bytes behind a raw pointer of a given length onto the end
     #[inline]
-    pub unsafe fn push_raw(&mut self, ptr: void_mut_ptr, len: i32) {
+    pub unsafe fn push_raw(&mut self, ptr: *const std::os::raw::c_char, len: i32) {
         unsafe {
             // SAFETY:  self.inner will always be a valid StringInfoData pointer
-            pg_sys::appendBinaryStringInfo(self.inner.as_ptr(), ptr as _, len)
+            pg_sys::appendBinaryStringInfo(self.inner.as_ptr(), ptr, len)
         }
     }
 
