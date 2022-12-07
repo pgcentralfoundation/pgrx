@@ -1,4 +1,7 @@
 #![deny(clippy::needless_borrow)] // unnecessary borrows can impair inference
+#![allow(clippy::redundant_closure)] // extra closures are easier to refactor
+#![allow(clippy::iter_nth_zero)] // can be easier to refactor
+#![allow(clippy::perf)] // not a priority here
 use clap::{Args, Parser, Subcommand};
 use owo_colors::OwoColorize;
 use std::collections::HashSet;
