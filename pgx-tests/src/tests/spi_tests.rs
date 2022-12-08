@@ -198,7 +198,7 @@ mod tests {
                 None,
                 None,
             );
-            let mut portal = client.open_cursor("SELECT * FROM tests.cursor_table", None);
+            let mut portal = client.open_cursor("SELECT * FROM tests.cursor_table", None).unwrap();
 
             fn sum_all(table: pgx::SpiTupleTable) -> i32 {
                 table.map(|r| r.by_ordinal(1).unwrap().value::<i32>().unwrap()).sum()
@@ -220,9 +220,9 @@ mod tests {
                 None,
                 None,
             );
-            let mut cursor = client.open_cursor("SELECT * FROM tests.cursor_table", None);
+            let mut cursor = client.open_cursor("SELECT * FROM tests.cursor_table", None)?;
             assert_eq!(sum_all(cursor.fetch(3)), 1 + 2 + 3);
-            Ok(Some(cursor.detach_into_name()))
+            Ok::<_, pgx::spi::Error>(cursor.detach_into_name())
         })
         .unwrap()
         .unwrap();
@@ -235,29 +235,26 @@ mod tests {
             assert_eq!(sum_all(cursor.fetch(3)), 4 + 5 + 6);
             assert_eq!(sum_all(cursor.fetch(3)), 7 + 8 + 9);
             cursor.detach_into_name();
-            Ok(None::<()>)
-        });
+            Ok::<_, pgx::spi::Error>(())
+        })
+        .unwrap();
 
         Spi::connect(|client| {
             let mut cursor = client.find_cursor(&cursor_name);
             assert_eq!(sum_all(cursor.fetch(3)), 10);
-            Ok(None::<()>)
-        });
+            Ok::<_, pgx::spi::Error>(())
+        })
+        .unwrap();
     }
 
     #[pg_test(error = "syntax error at or near \"THIS\"")]
     fn test_cursor_failure() {
-        Spi::execute(|client| {
-            client.open_cursor("THIS IS NOT SQL", None);
-        });
+        Spi::connect(|client| client.open_cursor("THIS IS NOT SQL", None).map(|_| ())).unwrap();
     }
 
-    #[pg_test(error = "cursor named \"NOT A CURSOR\" not found")]
+    #[pg_test(error = "cursor: CursorNotFound(\"NOT A CURSOR\")")]
     fn test_cursor_not_found() {
-        Spi::connect(|client| {
-            client.find_cursor("NOT A CURSOR");
-            Ok(None::<()>)
-        });
+        Spi::connect(|client| client.find_cursor("NOT A CURSOR").map(|_| ())).expect("cursor");
     }
 
     #[pg_test]
