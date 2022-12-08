@@ -120,6 +120,10 @@ pub enum Error {
     InvalidPosition,
     #[error("Invalid index ({0})")]
     InvalidIndex(i32),
+    #[error("Cursor named {0} not found")]
+    CursorNotFound(String),
+    #[error("Portal ptr is NULL")]
+    PortalIsNull,
     #[error("TupDesc is NULL")]
     TupDescIsNull,
 }
@@ -409,7 +413,7 @@ impl<'a> SpiClient<'a> {
         &mut self,
         query: &str,
         args: Option<Vec<(PgOid, Option<pg_sys::Datum>)>>,
-    ) -> SpiCursor {
+    ) -> Result<SpiCursor, Error> {
         let src = std::ffi::CString::new(query).expect("query contained a null byte");
         let args = args.unwrap_or(vec![]);
 
@@ -448,8 +452,8 @@ impl<'a> SpiClient<'a> {
                 0,
             )
         })
-        .expect("Portal ptr was null");
-        SpiCursor { ptr, _phantom: PhantomData }
+        .ok_or(Error::PortalIsNull)?;
+        Ok(SpiCursor { ptr, _phantom: PhantomData })
     }
 
     /// Find a cursor in transaction by name
@@ -459,12 +463,12 @@ impl<'a> SpiClient<'a> {
     /// Returned name can be used with this method to retrieve the open cursor.
     ///
     /// See [`SpiCursor`] docs for usage details.
-    pub fn find_cursor(&mut self, name: &str) -> SpiCursor {
+    pub fn find_cursor(&mut self, name: &str) -> Result<SpiCursor, Error> {
         use pgx_pg_sys::AsPgCStr;
 
         let ptr = NonNull::new(unsafe { pg_sys::SPI_cursor_find(name.as_pg_cstr()) })
-            .unwrap_or_else(|| panic!("cursor named \"{}\" not found", name));
-        SpiCursor { ptr, _phantom: PhantomData }
+            .ok_or(Error::CursorNotFound(name.to_string()))?;
+        Ok(SpiCursor { ptr, _phantom: PhantomData })
     }
 }
 
@@ -494,32 +498,32 @@ type CursorName = String;
 /// ```rust,no_run
 /// use pgx::Spi;
 /// Spi::connect(|mut client| {
-///     let mut cursor = client.open_cursor("SELECT * FROM generate_series(1, 5)", None);
-///     assert_eq!(Some(1u32), cursor.fetch(1).get_one());
-///     assert_eq!(Some(2u32), cursor.fetch(2).get_one());
-///     assert_eq!(Some(3u32), cursor.fetch(3).get_one());
-///     Ok(None::<()>)
+///     let mut cursor = client.open_cursor("SELECT * FROM generate_series(1, 5)", None)?;
+///     assert_eq!(1u32, cursor.fetch(1).get_one::<u32>()?);
+///     assert_eq!(2u32, cursor.fetch(2).get_one::<u32>()?);
+///     assert_eq!(3u32, cursor.fetch(3).get_one::<u32>()?);
+///     Ok::<_, pgx::spi::Error>(())
 ///     // <--- all three SpiTupleTable get freed by Spi::connect at this point
-/// });
+/// }).unwrap();
 /// ```
 ///
 /// ## Cursor by name
 /// ```rust,no_run
 /// use pgx::Spi;
 /// let cursor_name = Spi::connect(|mut client| {
-///     let mut cursor = client.open_cursor("SELECT * FROM generate_series(1, 5)", None);
-///     assert_eq!(Some(1u32), cursor.fetch(1).get_one());
-///     Ok(Some(cursor.detach_into_name())) // <-- cursor gets dropped here
+///     let mut cursor = client.open_cursor("SELECT * FROM generate_series(1, 5)", None)?;
+///     assert_eq!(1u32, cursor.fetch(1).get_one::<u32>()?);
+///     Ok::<_, pgx::spi::Error>(cursor.detach_into_name()) // <-- cursor gets dropped here
 ///     // <--- first SpiTupleTable gets freed by Spi::connect at this point
 /// }).unwrap();
 /// Spi::connect(|mut client| {
-///     let mut cursor = client.find_cursor(&cursor_name);
-///     assert_eq!(Some(2u32), cursor.fetch(1).get_one());
+///     let mut cursor = client.find_cursor(&cursor_name)?;
+///     assert_eq!(2u32, cursor.fetch(1).get_one::<u32>()?);
 ///     drop(cursor); // <-- cursor gets dropped here
 ///     // ... more code ...
-///     Ok(None::<()>)
+///     Ok::<_, pgx::spi::Error>(())
 ///     // <--- second SpiTupleTable gets freed by Spi::connect at this point
-/// });
+/// }).unwrap();
 /// ```
 pub struct SpiCursor<'client> {
     ptr: NonNull<pg_sys::PortalData>,
