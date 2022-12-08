@@ -188,6 +188,77 @@ mod tests {
     }
 
     #[pg_test]
+    fn test_cursor() {
+        Spi::execute(|mut client| {
+            client.update("CREATE TABLE tests.cursor_table (id int)", None, None);
+            client.update(
+                "INSERT INTO tests.cursor_table (id) \
+            SELECT i FROM generate_series(1, 10) AS t(i)",
+                None,
+                None,
+            );
+            let mut portal = client.open_cursor("SELECT * FROM tests.cursor_table", None);
+
+            fn sum_all(table: pgx::SpiTupleTable) -> i32 {
+                table.map(|r| r.by_ordinal(1).unwrap().value::<i32>().unwrap()).sum()
+            }
+            assert_eq!(sum_all(portal.fetch(3)), 1 + 2 + 3);
+            assert_eq!(sum_all(portal.fetch(3)), 4 + 5 + 6);
+            assert_eq!(sum_all(portal.fetch(3)), 7 + 8 + 9);
+            assert_eq!(sum_all(portal.fetch(3)), 10);
+        });
+    }
+
+    #[pg_test]
+    fn test_cursor_by_name() {
+        let cursor_name = Spi::connect(|mut client| {
+            client.update("CREATE TABLE tests.cursor_table (id int)", None, None);
+            client.update(
+                "INSERT INTO tests.cursor_table (id) \
+            SELECT i FROM generate_series(1, 10) AS t(i)",
+                None,
+                None,
+            );
+            let mut cursor = client.open_cursor("SELECT * FROM tests.cursor_table", None);
+            assert_eq!(sum_all(cursor.fetch(3)), 1 + 2 + 3);
+            Ok(Some(cursor.detach_into_name()))
+        })
+        .unwrap();
+
+        fn sum_all(table: pgx::SpiTupleTable) -> i32 {
+            table.map(|r| r.by_ordinal(1).unwrap().value::<i32>().unwrap()).sum()
+        }
+        Spi::connect(|mut client| {
+            let mut cursor = client.find_cursor(&cursor_name);
+            assert_eq!(sum_all(cursor.fetch(3)), 4 + 5 + 6);
+            assert_eq!(sum_all(cursor.fetch(3)), 7 + 8 + 9);
+            cursor.detach_into_name();
+            Ok(None::<()>)
+        });
+
+        Spi::connect(|mut client| {
+            let mut cursor = client.find_cursor(&cursor_name);
+            assert_eq!(sum_all(cursor.fetch(3)), 10);
+            Ok(None::<()>)
+        });
+    }
+
+    #[pg_test(error = "syntax error at or near \"THIS\"")]
+    fn test_cursor_failure() {
+        Spi::execute(|mut client| {
+            client.open_cursor("THIS IS NOT SQL", None);
+        });
+    }
+
+    #[pg_test(error = "cursor named \"NOT A CURSOR\" not found")]
+    fn test_cursor_not_found() {
+        Spi::connect(|mut client| {
+            client.find_cursor("NOT A CURSOR");
+            Ok(None::<()>)
+        });
+    }
+
+    #[pg_test]
     fn test_columns() {
         use pgx::{PgBuiltInOids, PgOid};
         Spi::execute(|client| {

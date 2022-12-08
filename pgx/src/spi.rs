@@ -16,6 +16,7 @@ use std::fmt::Debug;
 use std::marker::PhantomData;
 use std::mem;
 use std::ops::{Index, IndexMut};
+use std::ptr::NonNull;
 
 /// These match the Postgres `#define`d constants prefixed `SPI_OK_*` that you can find in `pg_sys`.
 #[derive(Debug, PartialEq)]
@@ -394,6 +395,182 @@ impl<'a> SpiClient<'a> {
                 Some(unsafe { (*pg_sys::SPI_tuptable).tupdesc })
             },
             current: -1,
+        }
+    }
+
+    /// Set up a cursor that will execute the specified query
+    ///
+    /// Rows may be then fetched using [`SpiCursor::fetch`].
+    ///
+    /// See [`SpiCursor`] docs for usage details.
+    pub fn open_cursor(
+        &mut self,
+        query: &str,
+        args: Option<Vec<(PgOid, Option<pg_sys::Datum>)>>,
+    ) -> SpiCursor {
+        let src = std::ffi::CString::new(query).expect("query contained a null byte");
+        let args = args.unwrap_or(vec![]);
+
+        let nargs = args.len();
+        let mut argtypes = vec![];
+        let mut datums = vec![];
+        let mut nulls = vec![];
+
+        for (argtype, datum) in args {
+            argtypes.push(argtype.value());
+
+            match datum {
+                Some(datum) => {
+                    // ' ' here means that the datum is not null
+                    datums.push(datum);
+                    nulls.push(' ' as std::os::raw::c_char);
+                }
+
+                None => {
+                    // 'n' here means that the datum is null
+                    datums.push(pg_sys::Datum::from(0usize));
+                    nulls.push('n' as std::os::raw::c_char);
+                }
+            }
+        }
+
+        let ptr = NonNull::new(unsafe {
+            pg_sys::SPI_cursor_open_with_args(
+                std::ptr::null_mut(), // let postgres assign a name
+                src.as_ptr(),
+                nargs as i32,
+                argtypes.as_mut_ptr(),
+                datums.as_mut_ptr(),
+                nulls.as_ptr(),
+                false,
+                0,
+            )
+        })
+        .expect("Portal ptr was null");
+        SpiCursor { ptr, _phantom: PhantomData }
+    }
+
+    /// Find a cursor in transaction by name
+    ///
+    /// A cursor for a query can be opened using [`SpiClient::open_cursor`].
+    /// Cursor are automatically closed on drop unless [`SpiCursor::detach_into_name`] is used.
+    /// Returned name can be used with this method to retrieve the open cursor.
+    ///
+    /// See [`SpiCursor`] docs for usage details.
+    pub fn find_cursor(&mut self, name: &str) -> SpiCursor {
+        use pgx_pg_sys::AsPgCStr;
+
+        let ptr = NonNull::new(unsafe { pg_sys::SPI_cursor_find(name.as_pg_cstr()) })
+            .unwrap_or_else(|| panic!("cursor named \"{}\" not found", name));
+        SpiCursor { ptr, _phantom: PhantomData }
+    }
+}
+
+type CursorName = String;
+
+/// An SPI Cursor from a query
+///
+/// Represents a Postgres cursor (internally, a portal), allowing to retrieve result rows a few
+/// at a time. Moreover, a cursor can be left open within a transaction, and accessed in
+/// multiple independent Spi sessions within the transaction.
+///
+/// A cursor can be created via [`SpiClient::open_cursor()`] from a query.
+/// Cursors are automatically closed on drop, unless explicitly left open using
+/// [`Self::detach_into_name()`], which returns the cursor name; cursors left open can be retrieved
+/// by name (in the same transaction) via [`SpiClient::find_cursor()`].
+///
+/// # Important notes about memory usage
+/// Result sets ([`SpiTupleTable`]s) returned by [`SpiCursor::fetch()`] will not be freed until
+/// the current Spi session is complete;
+/// this is a Pgx limitation that might get lifted in the future.
+///
+/// In the meantime, if you're using cursors to limit memory usage, make sure to use
+/// multiple separate Spi sessions, retrieving the cursor by name.
+///
+/// # Examples
+/// ## Simple cursor
+/// ```rust,no_run
+/// use pgx::Spi;
+/// Spi::connect(|mut client| {
+///     let mut cursor = client.open_cursor("SELECT * FROM generate_series(1, 5)", None);
+///     assert_eq!(Some(1u32), cursor.fetch(1).get_one());
+///     assert_eq!(Some(2u32), cursor.fetch(2).get_one());
+///     assert_eq!(Some(3u32), cursor.fetch(3).get_one());
+///     Ok(None::<()>)
+///     // <--- all three SpiTupleTable get freed by Spi::connect at this point
+/// });
+/// ```
+///
+/// ## Cursor by name
+/// ```rust,no_run
+/// use pgx::Spi;
+/// let cursor_name = Spi::connect(|mut client| {
+///     let mut cursor = client.open_cursor("SELECT * FROM generate_series(1, 5)", None);
+///     assert_eq!(Some(1u32), cursor.fetch(1).get_one());
+///     Ok(Some(cursor.detach_into_name())) // <-- cursor gets dropped here
+///     // <--- first SpiTupleTable gets freed by Spi::connect at this point
+/// }).unwrap();
+/// Spi::connect(|mut client| {
+///     let mut cursor = client.find_cursor(&cursor_name);
+///     assert_eq!(Some(2u32), cursor.fetch(1).get_one());
+///     drop(cursor); // <-- cursor gets dropped here
+///     // ... more code ...
+///     Ok(None::<()>)
+///     // <--- second SpiTupleTable gets freed by Spi::connect at this point
+/// });
+/// ```
+pub struct SpiCursor<'client> {
+    ptr: NonNull<pg_sys::PortalData>,
+    _phantom: PhantomData<&'client SpiClient<'client>>,
+}
+
+impl SpiCursor<'_> {
+    /// Fetch up to `count` rows from the cursor, moving forward
+    ///
+    /// If `fetch` runs off the end of the available rows, an empty [`SpiTupleTable`] is returned.
+    pub fn fetch(&mut self, count: i64) -> SpiTupleTable {
+        unsafe {
+            pg_sys::SPI_tuptable = std::ptr::null_mut();
+        }
+        // SAFETY: SPI functions to create/find cursors fail via elog, so self.ptr is valid if we successfully set it
+        unsafe { pg_sys::SPI_cursor_fetch(self.ptr.as_mut(), true, count) }
+        SpiTupleTable {
+            status_code: SpiOk::Fetch,
+            table: unsafe { pg_sys::SPI_tuptable },
+            size: unsafe { pg_sys::SPI_processed as usize },
+            tupdesc: if unsafe { pg_sys::SPI_tuptable }.is_null() {
+                None
+            } else {
+                Some(unsafe { (*pg_sys::SPI_tuptable).tupdesc })
+            },
+            current: -1,
+        }
+    }
+
+    /// Consume the cursor, returning its name
+    ///
+    /// The actual Postgres cursor is kept alive for the duration of the transaction.
+    /// This allows to fetch it in a later SPI session within the same transaction
+    /// using [`SpiClient::find_cursor()`]
+    pub fn detach_into_name(self) -> CursorName {
+        // SAFETY: SPI functions to create/find cursors fail via elog, so self.ptr is valid if we successfully set it
+        let cursor_ptr = unsafe { self.ptr.as_ref() };
+        // Forget self, as to avoid closing the cursor in `drop`
+        // No risk leaking rust memory, as Self is just a thin wrapper around a NonNull ptr
+        std::mem::forget(self);
+        // SAFETY: name is a null-terminated, valid string pointer from postgres
+        unsafe { std::ffi::CStr::from_ptr(cursor_ptr.name) }
+            .to_str()
+            .expect("non-utf8 cursor name")
+            .to_string()
+    }
+}
+
+impl Drop for SpiCursor<'_> {
+    fn drop(&mut self) {
+        // SAFETY: SPI functions to create/find cursors fail via elog, so self.ptr is valid if we successfully set it
+        unsafe {
+            pg_sys::SPI_cursor_close(self.ptr.as_mut());
         }
     }
 }
