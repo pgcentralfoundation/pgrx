@@ -10,7 +10,6 @@ Use of this source code is governed by the MIT license that can be found in the 
 use bindgen::callbacks::{DeriveTrait, ImplementsTrait, MacroParsingBehavior};
 use eyre::{eyre, WrapErr};
 use pgx_pg_config::{prefix_path, PgConfig, PgConfigSelector, Pgx, SUPPORTED_MAJOR_VERSIONS};
-use pgx_utils::rewriter::PgGuardRewriter;
 use quote::{quote, ToTokens};
 use rayon::prelude::*;
 use std::collections::{HashMap, HashSet};
@@ -812,13 +811,10 @@ fn apply_pg_guard(items: &Vec<syn::Item>) -> eyre::Result<proc_macro2::TokenStre
                 let abi = &block.abi;
                 for item in &block.items {
                     match item {
-                        ForeignItem::Fn(func) => {
-                            // Ignore other functions -- this will often be
-                            // variadic functions that we can't safely wrap.
-                            if let Ok(tokens) = PgGuardRewriter::new().foreign_item_fn(func, abi) {
-                                out.extend(tokens);
-                            }
-                        }
+                        ForeignItem::Fn(func) => out.extend(quote! {
+                            #[pgx_macros::pg_guard]
+                            #abi { #func }
+                        }),
                         other => out.extend(quote! { #abi { #other } }),
                     }
                 }

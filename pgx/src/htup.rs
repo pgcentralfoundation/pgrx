@@ -94,10 +94,7 @@ extern "C" {
 ///
 /// `attno` is 1-based
 #[inline]
-pub fn heap_getattr<
-    T: FromDatum,
-    AllocatedBy: WhoAllocated<T> + WhoAllocated<pg_sys::HeapTupleData>,
->(
+pub fn heap_getattr<T: FromDatum, AllocatedBy: WhoAllocated>(
     tuple: &PgBox<pg_sys::HeapTupleData, AllocatedBy>,
     attno: NonZeroUsize,
     tupdesc: &PgTupleDesc,

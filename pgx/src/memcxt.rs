@@ -19,6 +19,7 @@ use crate::pg_sys::AsPgCStr;
 use crate::{pg_sys, PgBox};
 use core::panic::{RefUnwindSafe, UnwindSafe};
 use core::ptr;
+use pgx_pg_sys::PgTryBuilder;
 use std::fmt::Debug;
 
 /// A shorter type name for a `*const std::os::raw::c_void`
@@ -173,12 +174,20 @@ pub enum PgMemoryContexts {
 
 /// A `pg_sys::MemoryContext` that is owned by `PgMemoryContexts::Owned`
 #[derive(Debug)]
-pub struct OwnedMemoryContext(pg_sys::MemoryContext);
+pub struct OwnedMemoryContext {
+    owned: pg_sys::MemoryContext,
+    previous: pg_sys::MemoryContext,
+}
 
 impl Drop for OwnedMemoryContext {
     fn drop(&mut self) {
         unsafe {
-            pg_sys::MemoryContextDelete(self.0);
+            // In order to prevent crashes, if we're trying to drop
+            // a context that is current, switch to its predecessor, and then drop it
+            if ptr::eq(pg_sys::CurrentMemoryContext, self.owned) {
+                pg_sys::CurrentMemoryContext = self.previous;
+            }
+            pg_sys::MemoryContextDelete(self.owned);
         }
     }
 }
@@ -186,15 +195,19 @@ impl Drop for OwnedMemoryContext {
 impl PgMemoryContexts {
     /// Create a new `PgMemoryContext::Owned`
     pub fn new(name: &str) -> PgMemoryContexts {
-        PgMemoryContexts::Owned(OwnedMemoryContext(unsafe {
-            pg_sys::AllocSetContextCreateExtended(
-                PgMemoryContexts::CurrentMemoryContext.value(),
-                name.as_pg_cstr(),
-                pg_sys::ALLOCSET_DEFAULT_MINSIZE as usize,
-                pg_sys::ALLOCSET_DEFAULT_INITSIZE as usize,
-                pg_sys::ALLOCSET_DEFAULT_MAXSIZE as usize,
-            )
-        }))
+        let previous = PgMemoryContexts::CurrentMemoryContext.value();
+        PgMemoryContexts::Owned(OwnedMemoryContext {
+            previous,
+            owned: unsafe {
+                pg_sys::AllocSetContextCreateExtended(
+                    PgMemoryContexts::CurrentMemoryContext.value(),
+                    name.as_pg_cstr(),
+                    pg_sys::ALLOCSET_DEFAULT_MINSIZE as usize,
+                    pg_sys::ALLOCSET_DEFAULT_INITSIZE as usize,
+                    pg_sys::ALLOCSET_DEFAULT_MAXSIZE as usize,
+                )
+            },
+        })
     }
 
     /// Retrieve the underlying Postgres `*mut MemoryContextData`
@@ -212,7 +225,7 @@ impl PgMemoryContexts {
             PgMemoryContexts::TopTransactionContext => unsafe { pg_sys::TopTransactionContext },
             PgMemoryContexts::CurTransactionContext => unsafe { pg_sys::CurTransactionContext },
             PgMemoryContexts::For(mc) => *mc,
-            PgMemoryContexts::Owned(mc) => mc.0,
+            PgMemoryContexts::Owned(mc) => mc.owned,
             PgMemoryContexts::Of(ptr) => PgMemoryContexts::get_context_for_pointer(*ptr),
             PgMemoryContexts::Transient { .. } => {
                 panic!("cannot use value() to retrieve a Transient PgMemoryContext")
@@ -221,9 +234,16 @@ impl PgMemoryContexts {
     }
 
     /// Set this MemoryContext as the `CurrentMemoryContext, returning whatever `CurrentMemoryContext` is
-    pub fn set_as_current(&self) -> PgMemoryContexts {
+    pub fn set_as_current(&mut self) -> PgMemoryContexts {
         unsafe {
             let old_context = pg_sys::CurrentMemoryContext;
+
+            match self {
+                PgMemoryContexts::Owned(mc) => {
+                    mc.previous = old_context;
+                }
+                _ => {}
+            }
 
             pg_sys::CurrentMemoryContext = self.value();
 
@@ -261,9 +281,9 @@ impl PgMemoryContexts {
     /// ## Examples
     ///
     /// ```rust,no_run
-    /// use pgx::*;
+    /// use pgx::prelude::*;
+    /// use pgx::PgMemoryContexts;
     ///
-    /// #[pg_guard]
     /// pub fn do_something() -> pg_sys::ItemPointer {
     ///     PgMemoryContexts::TopTransactionContext.switch_to(|context| {
     ///         // allocate a new ItemPointerData, but inside the TopTransactionContext
@@ -421,12 +441,14 @@ impl PgMemoryContexts {
             pg_sys::CurrentMemoryContext = context;
         }
 
-        let result = f(&mut PgMemoryContexts::For(context));
-
-        // restore our understanding of the current memory context
-        unsafe {
-            pg_sys::CurrentMemoryContext = prev_context;
-        }
+        let result = PgTryBuilder::new(|| f(&mut PgMemoryContexts::For(context)))
+            .finally(|| {
+                // restore our understanding of the current memory context
+                unsafe {
+                    pg_sys::CurrentMemoryContext = prev_context;
+                }
+            })
+            .execute();
 
         result
     }

@@ -14,11 +14,13 @@ mod hstore_clone;
 mod ordered;
 mod rust_enum;
 
+use pgx::prelude::*;
+
 pgx::pg_module_magic!();
 
 #[cfg(test)]
-#[pgx::pg_schema]
 pub mod pg_test {
+
     pub fn setup(_options: Vec<&str>) {
         // perform one-off initialization when the pg_test framework starts
     }

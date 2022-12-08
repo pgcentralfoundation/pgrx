@@ -26,7 +26,7 @@ enum TriggerError {
 #[pg_trigger]
 fn trigger_example(
     trigger: &pgx::PgTrigger,
-) -> Result<PgHeapTuple<'_, impl WhoAllocated<pgx::pg_sys::HeapTupleData>>, TriggerError> {
+) -> Result<PgHeapTuple<'_, impl WhoAllocated>, TriggerError> {
     let old = trigger.current().ok_or(TriggerError::NullOld)?;
 
     let mut current = old.into_owned();

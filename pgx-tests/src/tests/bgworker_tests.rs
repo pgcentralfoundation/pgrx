@@ -88,7 +88,7 @@ mod tests {
 
     use pgx::bgworkers::*;
     use pgx::prelude::*;
-    use pgx::{pg_guard, pg_sys, IntoDatum};
+    use pgx::{pg_sys, IntoDatum};
 
     #[pg_test]
     fn test_dynamic_bgworker() {

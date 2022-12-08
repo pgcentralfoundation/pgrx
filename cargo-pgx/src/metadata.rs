@@ -31,7 +31,7 @@ pub fn validate(metadata: &Metadata) -> eyre::Result<()> {
 
     let pgx_packages = metadata.packages.iter().filter(|package| {
         package.name == "pgx"
-            || package.name == "pgx-utils"
+            || package.name == "pgx-sql-entity-graph"
             || package.name == "pgx-macros"
             || package.name == "pgx-tests"
     });

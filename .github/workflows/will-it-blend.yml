@@ -27,6 +27,7 @@ jobs:
           sudo apt-get install -y wget gnupg
           sudo apt-get remove -y postgresql*
           sudo bash -c 'echo deb http://apt.postgresql.org/pub/repos/apt/ focal-pgdg main >> /etc/apt/sources.list.d/pgdg.list'
+          wget --quiet -O - https://www.postgresql.org/media/keys/ACCC4CF8.asc | sudo apt-key add -
           sudo apt update
 
       # Just install PG along with likely necessary build tools

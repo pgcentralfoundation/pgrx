@@ -10,8 +10,8 @@ use pgx::prelude::*;
 
 #[pgx::pg_schema]
 mod test_schema {
+    use pgx::pgx_sql_entity_graph::{PgxSql, SqlGraphEntity};
     use pgx::prelude::*;
-    use pgx::utils::sql_entity_graph::{PgxSql, SqlGraphEntity};
     use serde::{Deserialize, Serialize};
 
     #[pg_extern]
