@@ -532,6 +532,7 @@ impl SpiCursor<'_> {
         unsafe {
             pg_sys::SPI_tuptable = std::ptr::null_mut();
         }
+        // SAFETY: SPI functions to create/find cursors fail via elog, so self.ptr is valid if we successfully set it
         unsafe { pg_sys::SPI_cursor_fetch(self.ptr.as_mut(), true, count) }
         SpiTupleTable {
             status_code: SpiOk::Fetch,
@@ -552,21 +553,22 @@ impl SpiCursor<'_> {
     /// This allows to fetch it in a later SPI session within the same transaction
     /// using [`SpiClient::find_cursor()`]
     pub fn detach_into_name(self) -> CursorName {
-        unsafe {
-            let name = self.ptr.as_ref().name;
-            // Forget self, as to avoid closing the cursor in `drop`
-            // No risk leaking rust memory, as Self is just a thin wrapper around a NonNull ptr
-            std::mem::forget(self);
-            std::ffi::CStr::from_ptr(name)
-        }
-        .to_str()
-        .expect("non-utf8 cursor name")
-        .to_string()
+        // SAFETY: SPI functions to create/find cursors fail via elog, so self.ptr is valid if we successfully set it
+        let cursor_ptr = unsafe { self.ptr.as_ref() };
+        // Forget self, as to avoid closing the cursor in `drop`
+        // No risk leaking rust memory, as Self is just a thin wrapper around a NonNull ptr
+        std::mem::forget(self);
+        // SAFETY: name is a null-terminated, valid string pointer from postgres
+        unsafe { std::ffi::CStr::from_ptr(cursor_ptr.name) }
+            .to_str()
+            .expect("non-utf8 cursor name")
+            .to_string()
     }
 }
 
 impl Drop for SpiCursor<'_> {
     fn drop(&mut self) {
+        // SAFETY: SPI functions to create/find cursors fail via elog, so self.ptr is valid if we successfully set it
         unsafe {
             pg_sys::SPI_cursor_close(self.ptr.as_mut());
         }
