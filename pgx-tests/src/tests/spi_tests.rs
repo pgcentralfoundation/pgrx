@@ -298,4 +298,28 @@ mod tests {
             Ok(Some(()))
         });
     }
+
+    #[pg_test]
+    fn test_open_multiple_tuptables() {
+        Spi::execute(|client| {
+            let a = client.select("SELECT 1", None, None).first();
+            let _b = client.select("SELECT 1 WHERE 'f'", None, None);
+            assert!(!a.is_empty());
+            assert_eq!(1, a.len());
+            assert!(a.get_heap_tuple().is_some());
+            assert_eq!(Some(1), a.get_datum(1));
+        });
+    }
+
+    #[pg_test]
+    fn test_open_multiple_tuptables_rev() {
+        Spi::execute(|client| {
+            let a = client.select("SELECT 1 WHERE 'f'", None, None).first();
+            let _b = client.select("SELECT 1", None, None);
+            assert!(a.is_empty());
+            assert_eq!(0, a.len());
+            assert!(a.get_heap_tuple().is_none());
+            assert!(a.get_datum::<i32>(1).is_none());
+        });
+    }
 }

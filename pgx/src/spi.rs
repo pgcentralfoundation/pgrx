@@ -617,7 +617,7 @@ impl SpiTupleTable {
         if self.current < 0 {
             panic!("SpiTupleTable positioned before start")
         }
-        if self.current as u64 >= unsafe { pg_sys::SPI_processed } {
+        if self.current as usize >= self.size {
             None
         } else {
             match self.tupdesc {
@@ -637,7 +637,7 @@ impl SpiTupleTable {
         if self.current < 0 {
             panic!("SpiTupleTable positioned before start")
         }
-        if self.current as u64 >= unsafe { pg_sys::SPI_processed } {
+        if self.current as usize >= self.size {
             None
         } else {
             match self.tupdesc {
