@@ -465,11 +465,8 @@ impl ToSql for PgAggregateEntity {
                 String::default()
             },
             maybe_order_by = if self.ordered_set { "\tORDER BY" } else { "" },
-            optional_attributes = if optional_attributes.len() == 0 {
-                String::from("\n")
-            } else {
-                String::from("\n")
-            } + &optional_attributes_string
+            optional_attributes = String::from("\n")
+                + &optional_attributes_string
                 + if optional_attributes.len() == 0 { "" } else { "\n" },
         );
         tracing::trace!(%sql);
