@@ -12,7 +12,7 @@ use std::ops::{Mul, Sub};
 use crate::datum::time::USECS_PER_SEC;
 use crate::{direct_function_call, pg_sys, FromDatum, IntoDatum, PgBox};
 use pg_sys::{DAYS_PER_MONTH, SECS_PER_DAY};
-use pgx_utils::sql_entity_graph::metadata::{
+use pgx_sql_entity_graph::metadata::{
     ArgumentError, Returns, ReturnsError, SqlMapping, SqlTranslatable,
 };
 
