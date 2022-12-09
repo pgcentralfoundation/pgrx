@@ -1,8 +1,5 @@
 #![deny(unsafe_op_in_unsafe_fn)]
 
-use crate::panic::{CaughtError, ErrorReport, ErrorReportLocation, ErrorReportWithLevel};
-use std::ffi::CStr;
-
 /**
 Given a closure that is assumed to be a wrapped Postgres `extern "C"` function, [pg_guard_ffi_boundary]
 works with the Postgres and C runtimes to create a "barrier" that allows Rust to catch Postgres errors
@@ -61,6 +58,10 @@ pub(crate) unsafe fn pg_guard_ffi_boundary<T, F: FnOnce() -> T>(f: F) -> T {
 unsafe fn pg_guard_ffi_boundary_impl<T, F: FnOnce() -> T>(f: F) -> T {
     //! This is the version that uses sigsetjmp and all that, for "normal" Rust/PGX interfaces.
     use crate as pg_sys;
+
+    // just use these here to avoid compilation warnings when #[cfg(feature = "postgrestd")] is on
+    use crate::panic::{CaughtError, ErrorReport, ErrorReportLocation, ErrorReportWithLevel};
+    use std::ffi::CStr;
 
     // The next code is definitely thread-unsafe (it manipulates statics in an
     // unsynchronized manner), so we may as well check here.
