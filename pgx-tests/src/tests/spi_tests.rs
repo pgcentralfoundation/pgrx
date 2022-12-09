@@ -190,7 +190,7 @@ mod tests {
 
     #[pg_test]
     fn test_cursor() {
-        Spi::execute(|mut client| {
+        Spi::execute(|client| {
             client.update("CREATE TABLE tests.cursor_table (id int)", None, None);
             client.update(
                 "INSERT INTO tests.cursor_table (id) \
@@ -212,7 +212,7 @@ mod tests {
 
     #[pg_test]
     fn test_cursor_by_name() {
-        let cursor_name = Spi::connect(|mut client| {
+        let cursor_name = Spi::connect(|client| {
             client.update("CREATE TABLE tests.cursor_table (id int)", None, None);
             client.update(
                 "INSERT INTO tests.cursor_table (id) \
@@ -229,7 +229,7 @@ mod tests {
         fn sum_all(table: pgx::SpiTupleTable) -> i32 {
             table.map(|r| r.by_ordinal(1).unwrap().value::<i32>().unwrap()).sum()
         }
-        Spi::connect(|mut client| {
+        Spi::connect(|client| {
             let mut cursor = client.find_cursor(&cursor_name)?;
             assert_eq!(sum_all(cursor.fetch(3)), 4 + 5 + 6);
             assert_eq!(sum_all(cursor.fetch(3)), 7 + 8 + 9);
@@ -238,7 +238,7 @@ mod tests {
         })
         .unwrap();
 
-        Spi::connect(|mut client| {
+        Spi::connect(|client| {
             let mut cursor = client.find_cursor(&cursor_name)?;
             assert_eq!(sum_all(cursor.fetch(3)), 10);
             Ok::<_, pgx::spi::Error>(())
@@ -248,12 +248,12 @@ mod tests {
 
     #[pg_test(error = "syntax error at or near \"THIS\"")]
     fn test_cursor_failure() {
-        Spi::connect(|mut client| client.open_cursor("THIS IS NOT SQL", None).map(|_| ())).unwrap();
+        Spi::connect(|client| client.open_cursor("THIS IS NOT SQL", None).map(|_| ())).unwrap();
     }
 
     #[pg_test(error = "cursor: CursorNotFound(\"NOT A CURSOR\")")]
     fn test_cursor_not_found() {
-        Spi::connect(|mut client| client.find_cursor("NOT A CURSOR").map(|_| ())).expect("cursor");
+        Spi::connect(|client| client.find_cursor("NOT A CURSOR").map(|_| ())).expect("cursor");
     }
 
     #[pg_test]
@@ -287,12 +287,6 @@ mod tests {
     }
 
     #[pg_test]
-    fn test_spi_unwind_safe() {
-        struct T;
-        assert!(matches!(Spi::connect(|_| Ok::<_, ()>(Some(T))).unwrap().unwrap(), T));
-    }
-
-    #[pg_test]
     fn test_error_propagation() {
         #[derive(Debug)]
         struct Error;
@@ -303,6 +297,16 @@ mod tests {
     #[pg_test]
     fn test_option() {
         assert!(Spi::get_one::<Option<i32>>("SELECT NULL::integer").unwrap().is_none());
+    }
+
+    #[pg_test]
+    fn test_spi_non_mut() {
+        // Ensures update and cursor APIs do not need mutable reference to SpiClient
+        Spi::execute(|client| {
+            client.update("SELECT 1", None, None);
+            let cursor = client.open_cursor("SELECT 1", None).unwrap().detach_into_name();
+            client.find_cursor(&cursor).unwrap();
+        });
     }
 
     #[pg_test]

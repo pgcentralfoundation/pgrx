@@ -410,7 +410,7 @@ impl<'a> SpiClient<'a> {
     ///
     /// See [`SpiCursor`] docs for usage details.
     pub fn open_cursor(
-        &mut self,
+        &self,
         query: &str,
         args: Option<Vec<(PgOid, Option<pg_sys::Datum>)>>,
     ) -> Result<SpiCursor, Error> {
@@ -463,7 +463,7 @@ impl<'a> SpiClient<'a> {
     /// Returned name can be used with this method to retrieve the open cursor.
     ///
     /// See [`SpiCursor`] docs for usage details.
-    pub fn find_cursor(&mut self, name: &str) -> Result<SpiCursor, Error> {
+    pub fn find_cursor(&self, name: &str) -> Result<SpiCursor, Error> {
         use pgx_pg_sys::AsPgCStr;
 
         let ptr = NonNull::new(unsafe { pg_sys::SPI_cursor_find(name.as_pg_cstr()) })
