@@ -8,7 +8,7 @@ Use of this source code is governed by the MIT license that can be found in the 
 */
 
 use crate::{pg_sys, FromDatum, FromTimeError, IntoDatum, TimestampWithTimeZone};
-use pgx_utils::sql_entity_graph::metadata::{
+use pgx_sql_entity_graph::metadata::{
     ArgumentError, Returns, ReturnsError, SqlMapping, SqlTranslatable,
 };
 use serde::Deserialize;

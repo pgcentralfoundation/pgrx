@@ -13,11 +13,11 @@ A "no-op" trigger that gets the current [`PgHeapTuple`][crate::PgHeapTuple],
 panicking (into a PostgreSQL error) if it doesn't exist:
 
 ```rust,no_run
-use pgx::{pg_trigger, pg_sys, heap_tuple::{PgHeapTuple, PgHeapTupleError}, WhoAllocated, PgTrigger};
+use pgx::prelude::*;
 
 #[pg_trigger]
 fn trigger_example(trigger: &PgTrigger) -> Result<
-    PgHeapTuple<'_, impl WhoAllocated<pg_sys::HeapTupleData>>,
+    PgHeapTuple<'_, impl WhoAllocated>,
     PgHeapTupleError,
 > {
     Ok(unsafe { trigger.current() }.expect("No current HeapTuple"))
@@ -62,11 +62,11 @@ INSERT INTO test (title, description, payload)
 This can also be done via the [`extension_sql`][crate::extension_sql] attribute:
 
 ```rust,no_run
-# use pgx::{pg_trigger, pg_sys, heap_tuple::{PgHeapTuple, PgHeapTupleError}, WhoAllocated, PgTrigger};
+# use pgx::prelude::*;
 #
 # #[pg_trigger]
 # fn trigger_example(trigger: &PgTrigger) -> Result<
-#    PgHeapTuple<'_, impl WhoAllocated<pg_sys::HeapTupleData>>,
+#    PgHeapTuple<'_, impl WhoAllocated>,
 #    PgHeapTupleError,
 # > {
 #     Ok(unsafe { trigger.current() }.expect("No current HeapTuple"))
@@ -98,7 +98,7 @@ or [`AllocatedByPostgres`][crate::AllocatedByPostgres]. In most cases, it can be
 When it can't, the function definition permits for it to be specified:
 
 ```rust,no_run
-use pgx::{pg_trigger, pg_sys, heap_tuple::{PgHeapTuple, PgHeapTupleError}, WhoAllocated, AllocatedByRust, AllocatedByPostgres, PgTrigger};
+use pgx::prelude::*;
 
 #[pg_trigger]
 fn example_allocated_by_rust(trigger: &PgTrigger) -> Result<
@@ -126,7 +126,7 @@ become PostgreSQL errors.
 
 
 ```rust,no_run
-use pgx::{pg_trigger, pg_sys, heap_tuple::{PgHeapTuple, PgHeapTupleError}, WhoAllocated, PgTrigger};
+use pgx::prelude::*;
 
 #[derive(thiserror::Error, Debug)]
 enum CustomTriggerError {
@@ -138,7 +138,7 @@ enum CustomTriggerError {
 
 #[pg_trigger]
 fn example_custom_error(trigger: &PgTrigger) -> Result<
-    PgHeapTuple<'_, impl WhoAllocated<pg_sys::HeapTupleData>>,
+    PgHeapTuple<'_, impl WhoAllocated>,
     CustomTriggerError,
 > {
     unsafe { trigger.current() }.ok_or(CustomTriggerError::NoCurrentHeapTuple)
@@ -150,7 +150,7 @@ fn example_custom_error(trigger: &PgTrigger) -> Result<
 Triggers are free to use lifetimes to hone their code, the generated wrapper is as generous as possible.
 
 ```rust,no_run
-use pgx::{pg_trigger, pg_sys, heap_tuple::{PgHeapTuple, PgHeapTupleError}, WhoAllocated, AllocatedByRust, PgTrigger};
+use pgx::prelude::*;
 
 #[derive(thiserror::Error, Debug)]
 enum CustomTriggerError<'a> {
@@ -187,11 +187,11 @@ In cases where a safe API is desired, the [`PgTriggerSafe`] structure can be ret
 from [`PgTrigger::to_safe`].
 
 ```rust,no_run
-use pgx::{pg_trigger, pg_sys, heap_tuple::{PgHeapTuple, PgHeapTupleError}, WhoAllocated, PgTrigger, PgTriggerError};
+use pgx::prelude::*;
 
 #[pg_trigger]
 fn trigger_safe(trigger: &PgTrigger) -> Result<
-    PgHeapTuple<'_, impl WhoAllocated<pg_sys::HeapTupleData>>,
+    PgHeapTuple<'_, impl WhoAllocated>,
     PgTriggerError,
 > {
     let trigger_safe = unsafe { trigger.to_safe() }?;

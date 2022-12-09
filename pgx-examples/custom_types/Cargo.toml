@@ -14,11 +14,12 @@ pg13 = ["pgx/pg13", "pgx-tests/pg13" ]
 pg14 = ["pgx/pg14", "pgx-tests/pg14" ]
 pg15 = ["pgx/pg15", "pgx-tests/pg15" ]
 pg_test = []
+no-schema-generation = [ "pgx/no-schema-generation", "pgx-tests/no-schema-generation" ]
 
 [dependencies]
 pgx = { path = "../../pgx", default-features = false }
 maplit = "1.0.2"
-serde = "1.0.147"
+serde = "1.0.149"
 
 [dev-dependencies]
 pgx-tests = { path = "../../pgx-tests" }

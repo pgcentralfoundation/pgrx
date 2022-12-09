@@ -1,6 +1,6 @@
 [package]
 name = "pgx"
-version = "0.6.0-alpha.2"
+version = "0.6.1"
 authors = ["ZomboDB, LLC <zombodb@gmail.com>"]
 license = "MIT"
 description = "pgx:  A Rust framework for creating Postgres extensions"
@@ -25,6 +25,7 @@ pg13 = [ "pgx-pg-sys/pg13" ]
 pg14 = [ "pgx-pg-sys/pg14" ]
 pg15 = [ "pgx-pg-sys/pg15" ]
 time-crate = ["dep:time"]
+no-schema-generation = ["pgx-macros/no-schema-generation", "pgx-sql-entity-graph/no-schema-generation"]
 
 [package.metadata.docs.rs]
 features = ["pg14"]
@@ -33,18 +34,16 @@ no-default-features = true
 rustc-args = ["--cfg", "docsrs"]
 
 [dependencies]
-pgx-macros = { path = "../pgx-macros/", version = "=0.6.0-alpha.2" }
-pgx-pg-sys = { path = "../pgx-pg-sys", version = "=0.6.0-alpha.2" }
-pgx-utils = { path = "../pgx-utils/", version = "=0.6.0-alpha.2" }
+pgx-macros = { path = "../pgx-macros", version = "=0.6.1" }
+pgx-pg-sys = { path = "../pgx-pg-sys", version = "=0.6.1" }
+pgx-sql-entity-graph = { path = "../pgx-sql-entity-graph", version = "=0.6.1" }
 
 # used to internally impl things
 once_cell = "1.16.0" # polyfill until std::lazy::OnceCell stabilizes
-quote = "1.0.21" # necessary for pgx's SQL generation
 seq-macro = "0.3" # impls loops in macros
 uuid = { version = "1.2.2", features = [ "v4" ] } # PgLwLock and shmem
 
 # error handling and logging
-eyre = "0.6.8"
 thiserror = "1.0"
 tracing = "0.1.37"
 tracing-error = "0.2.0"
@@ -55,10 +54,10 @@ bitflags = "1.3.2" # BackgroundWorker
 bitvec = "1.0" # processing array nullbitmaps
 cstr_core = "0.2.6" # no std compat
 heapless = "0.7.16" # shmem and PgLwLock
-libc = "0.2.137" # FFI type compat
+libc = "0.2.138" # FFI type compat
 seahash = "4.1.0" # derive(PostgresHash)
-serde = { version = "1.0.147", features = [ "derive" ] } # impls on pub types
+serde = { version = "1.0.149", features = [ "derive" ] } # impls on pub types
 serde_cbor = "0.11.2" # derive(PostgresType)
-serde_json = "1.0.88" # everything JSON
+serde_json = "1.0.89" # everything JSON
 time = { version = "0.3.17", features = ["formatting", "parsing", "alloc", "macros"], optional = true }
 

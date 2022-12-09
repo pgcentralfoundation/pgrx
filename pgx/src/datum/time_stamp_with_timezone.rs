@@ -8,13 +8,14 @@ Use of this source code is governed by the MIT license that can be found in the 
 */
 
 use crate::{pg_sys, FromDatum, IntoDatum};
-use pgx_utils::sql_entity_graph::metadata::{
+use pgx_sql_entity_graph::metadata::{
     ArgumentError, Returns, ReturnsError, SqlMapping, SqlTranslatable,
 };
 use serde::Deserialize;
 use std::convert::TryFrom;
 use std::ffi::CStr;
 
+#[allow(dead_code)] // such is cfg life
 pub(crate) const USECS_PER_SEC: i64 = 1_000_000;
 
 #[cfg(feature = "time-crate")]

@@ -132,7 +132,7 @@ jobs:
           --package pgx-macros \
           --package pgx-pg-sys \
           --package pgx-tests \
-          --package pgx-utils
+          --package pgx-sql-entity-graph
 
     - name: Run aggregate example tests
       run: cargo test --package aggregate --features "pg$PG_VER" --no-default-features
@@ -154,6 +154,9 @@ jobs:
 
     - name: Run custom_types example tests
       run: cargo test --package custom_types --features "pg$PG_VER" --no-default-features
+
+    - name: Run custom_types without schema generation example tests
+      run: cargo test --package custom_types --features "pg$PG_VER no-schema-generation" --no-default-features
 
     - name: Run custom_sql example tests
       run: cargo test --package custom_sql --features "pg$PG_VER" --no-default-features
@@ -417,7 +420,7 @@ jobs:
           --package pgx-macros \
           --package pgx-pg-sys \
           --package pgx-tests \
-          --package pgx-utils
+          --package pgx-sql-entity-graph
 
     - name: Stop sccache server
       run: sccache --stop-server || true

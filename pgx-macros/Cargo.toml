@@ -1,6 +1,6 @@
 [package]
 name = "pgx-macros"
-version = "0.6.0-alpha.2"
+version = "0.6.1"
 authors = ["ZomboDB, LLC <zombodb@gmail.com>"]
 license = "MIT"
 description = "Proc Macros for 'pgx'"
@@ -17,12 +17,14 @@ proc-macro = true
 # Enable `#[cfg(docsrs)]` (https://docs.rs/about/builds#cross-compiling)
 rustc-args = ["--cfg", "docsrs"]
 
+[features]
+no-schema-generation = ["pgx-sql-entity-graph/no-schema-generation"]
+
 [dependencies]
-pgx-utils = { path = "../pgx-utils", version = "=0.6.0-alpha.2" }
+pgx-sql-entity-graph = { path = "../pgx-sql-entity-graph", version = "=0.6.1" }
 proc-macro2 = "1.0.47"
 quote = "1.0.21"
-syn = { version = "1.0.103", features = [ "extra-traits", "full", "fold", "parsing" ] }
-unescape = "0.1.0"
+syn = { version = "1.0.104", features = [ "extra-traits", "full", "fold", "parsing" ] }
 
 [dev-dependencies]
-serde = { version = "1.0.147", features = ["derive"] }
+serde = { version = "1.0.148", features = ["derive"] } # for Documentation examples

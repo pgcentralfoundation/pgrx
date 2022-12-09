@@ -101755,2370 +101755,2765 @@ pub struct SMgrRelationData {
 pub struct RowSecurityDesc {
     pub _address: u8,
 }
+impl pg_sys::seal::Sealed for A_ArrayExpr {}
 impl pg_sys::PgNode for A_ArrayExpr {}
 impl std::fmt::Display for A_ArrayExpr {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         write!(f, "{}", self.display_node())
     }
 }
+impl pg_sys::seal::Sealed for A_Const {}
 impl pg_sys::PgNode for A_Const {}
 impl std::fmt::Display for A_Const {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         write!(f, "{}", self.display_node())
     }
 }
+impl pg_sys::seal::Sealed for A_Expr {}
 impl pg_sys::PgNode for A_Expr {}
 impl std::fmt::Display for A_Expr {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         write!(f, "{}", self.display_node())
     }
 }
+impl pg_sys::seal::Sealed for A_Indices {}
 impl pg_sys::PgNode for A_Indices {}
 impl std::fmt::Display for A_Indices {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         write!(f, "{}", self.display_node())
     }
 }
+impl pg_sys::seal::Sealed for A_Indirection {}
 impl pg_sys::PgNode for A_Indirection {}
 impl std::fmt::Display for A_Indirection {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         write!(f, "{}", self.display_node())
     }
 }
+impl pg_sys::seal::Sealed for A_Star {}
 impl pg_sys::PgNode for A_Star {}
 impl std::fmt::Display for A_Star {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         write!(f, "{}", self.display_node())
     }
 }
+impl pg_sys::seal::Sealed for AccessPriv {}
 impl pg_sys::PgNode for AccessPriv {}
 impl std::fmt::Display for AccessPriv {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         write!(f, "{}", self.display_node())
     }
 }
+impl pg_sys::seal::Sealed for Agg {}
 impl pg_sys::PgNode for Agg {}
 impl std::fmt::Display for Agg {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         write!(f, "{}", self.display_node())
     }
 }
+impl pg_sys::seal::Sealed for AggPath {}
 impl pg_sys::PgNode for AggPath {}
 impl std::fmt::Display for AggPath {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         write!(f, "{}", self.display_node())
     }
 }
+impl pg_sys::seal::Sealed for AggState {}
 impl pg_sys::PgNode for AggState {}
 impl std::fmt::Display for AggState {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         write!(f, "{}", self.display_node())
     }
 }
+impl pg_sys::seal::Sealed for Aggref {}
 impl pg_sys::PgNode for Aggref {}
 impl std::fmt::Display for Aggref {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         write!(f, "{}", self.display_node())
     }
 }
+impl pg_sys::seal::Sealed for AggrefExprState {}
 impl pg_sys::PgNode for AggrefExprState {}
 impl std::fmt::Display for AggrefExprState {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         write!(f, "{}", self.display_node())
     }
 }
+impl pg_sys::seal::Sealed for Alias {}
 impl pg_sys::PgNode for Alias {}
 impl std::fmt::Display for Alias {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         write!(f, "{}", self.display_node())
     }
 }
+impl pg_sys::seal::Sealed for AlterCollationStmt {}
 impl pg_sys::PgNode for AlterCollationStmt {}
 impl std::fmt::Display for AlterCollationStmt {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         write!(f, "{}", self.display_node())
     }
 }
+impl pg_sys::seal::Sealed for AlterDatabaseSetStmt {}
 impl pg_sys::PgNode for AlterDatabaseSetStmt {}
 impl std::fmt::Display for AlterDatabaseSetStmt {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         write!(f, "{}", self.display_node())
     }
 }
+impl pg_sys::seal::Sealed for AlterDatabaseStmt {}
 impl pg_sys::PgNode for AlterDatabaseStmt {}
 impl std::fmt::Display for AlterDatabaseStmt {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         write!(f, "{}", self.display_node())
     }
 }
+impl pg_sys::seal::Sealed for AlterDefaultPrivilegesStmt {}
 impl pg_sys::PgNode for AlterDefaultPrivilegesStmt {}
 impl std::fmt::Display for AlterDefaultPrivilegesStmt {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         write!(f, "{}", self.display_node())
     }
 }
+impl pg_sys::seal::Sealed for AlterDomainStmt {}
 impl pg_sys::PgNode for AlterDomainStmt {}
 impl std::fmt::Display for AlterDomainStmt {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         write!(f, "{}", self.display_node())
     }
 }
+impl pg_sys::seal::Sealed for AlterEnumStmt {}
 impl pg_sys::PgNode for AlterEnumStmt {}
 impl std::fmt::Display for AlterEnumStmt {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         write!(f, "{}", self.display_node())
     }
 }
+impl pg_sys::seal::Sealed for AlterEventTrigStmt {}
 impl pg_sys::PgNode for AlterEventTrigStmt {}
 impl std::fmt::Display for AlterEventTrigStmt {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         write!(f, "{}", self.display_node())
     }
 }
+impl pg_sys::seal::Sealed for AlterExtensionContentsStmt {}
 impl pg_sys::PgNode for AlterExtensionContentsStmt {}
 impl std::fmt::Display for AlterExtensionContentsStmt {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         write!(f, "{}", self.display_node())
     }
 }
+impl pg_sys::seal::Sealed for AlterExtensionStmt {}
 impl pg_sys::PgNode for AlterExtensionStmt {}
 impl std::fmt::Display for AlterExtensionStmt {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         write!(f, "{}", self.display_node())
     }
 }
+impl pg_sys::seal::Sealed for AlterFdwStmt {}
 impl pg_sys::PgNode for AlterFdwStmt {}
 impl std::fmt::Display for AlterFdwStmt {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         write!(f, "{}", self.display_node())
     }
 }
+impl pg_sys::seal::Sealed for AlterForeignServerStmt {}
 impl pg_sys::PgNode for AlterForeignServerStmt {}
 impl std::fmt::Display for AlterForeignServerStmt {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         write!(f, "{}", self.display_node())
     }
 }
+impl pg_sys::seal::Sealed for AlterFunctionStmt {}
 impl pg_sys::PgNode for AlterFunctionStmt {}
 impl std::fmt::Display for AlterFunctionStmt {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         write!(f, "{}", self.display_node())
     }
 }
+impl pg_sys::seal::Sealed for AlterObjectDependsStmt {}
 impl pg_sys::PgNode for AlterObjectDependsStmt {}
 impl std::fmt::Display for AlterObjectDependsStmt {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         write!(f, "{}", self.display_node())
     }
 }
+impl pg_sys::seal::Sealed for AlterObjectSchemaStmt {}
 impl pg_sys::PgNode for AlterObjectSchemaStmt {}
 impl std::fmt::Display for AlterObjectSchemaStmt {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         write!(f, "{}", self.display_node())
     }
 }
+impl pg_sys::seal::Sealed for AlterOpFamilyStmt {}
 impl pg_sys::PgNode for AlterOpFamilyStmt {}
 impl std::fmt::Display for AlterOpFamilyStmt {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         write!(f, "{}", self.display_node())
     }
 }
+impl pg_sys::seal::Sealed for AlterOperatorStmt {}
 impl pg_sys::PgNode for AlterOperatorStmt {}
 impl std::fmt::Display for AlterOperatorStmt {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         write!(f, "{}", self.display_node())
     }
 }
+impl pg_sys::seal::Sealed for AlterOwnerStmt {}
 impl pg_sys::PgNode for AlterOwnerStmt {}
 impl std::fmt::Display for AlterOwnerStmt {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         write!(f, "{}", self.display_node())
     }
 }
+impl pg_sys::seal::Sealed for AlterPolicyStmt {}
 impl pg_sys::PgNode for AlterPolicyStmt {}
 impl std::fmt::Display for AlterPolicyStmt {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         write!(f, "{}", self.display_node())
     }
 }
+impl pg_sys::seal::Sealed for AlterPublicationStmt {}
 impl pg_sys::PgNode for AlterPublicationStmt {}
 impl std::fmt::Display for AlterPublicationStmt {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         write!(f, "{}", self.display_node())
     }
 }
+impl pg_sys::seal::Sealed for AlterRoleSetStmt {}
 impl pg_sys::PgNode for AlterRoleSetStmt {}
 impl std::fmt::Display for AlterRoleSetStmt {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         write!(f, "{}", self.display_node())
     }
 }
+impl pg_sys::seal::Sealed for AlterRoleStmt {}
 impl pg_sys::PgNode for AlterRoleStmt {}
 impl std::fmt::Display for AlterRoleStmt {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         write!(f, "{}", self.display_node())
     }
 }
+impl pg_sys::seal::Sealed for AlterSeqStmt {}
 impl pg_sys::PgNode for AlterSeqStmt {}
 impl std::fmt::Display for AlterSeqStmt {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         write!(f, "{}", self.display_node())
     }
 }
+impl pg_sys::seal::Sealed for AlterSubscriptionStmt {}
 impl pg_sys::PgNode for AlterSubscriptionStmt {}
 impl std::fmt::Display for AlterSubscriptionStmt {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         write!(f, "{}", self.display_node())
     }
 }
+impl pg_sys::seal::Sealed for AlterSystemStmt {}
 impl pg_sys::PgNode for AlterSystemStmt {}
 impl std::fmt::Display for AlterSystemStmt {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         write!(f, "{}", self.display_node())
     }
 }
+impl pg_sys::seal::Sealed for AlterTSConfigurationStmt {}
 impl pg_sys::PgNode for AlterTSConfigurationStmt {}
 impl std::fmt::Display for AlterTSConfigurationStmt {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         write!(f, "{}", self.display_node())
     }
 }
+impl pg_sys::seal::Sealed for AlterTSDictionaryStmt {}
 impl pg_sys::PgNode for AlterTSDictionaryStmt {}
 impl std::fmt::Display for AlterTSDictionaryStmt {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         write!(f, "{}", self.display_node())
     }
 }
+impl pg_sys::seal::Sealed for AlterTableCmd {}
 impl pg_sys::PgNode for AlterTableCmd {}
 impl std::fmt::Display for AlterTableCmd {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         write!(f, "{}", self.display_node())
     }
 }
+impl pg_sys::seal::Sealed for AlterTableMoveAllStmt {}
 impl pg_sys::PgNode for AlterTableMoveAllStmt {}
 impl std::fmt::Display for AlterTableMoveAllStmt {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         write!(f, "{}", self.display_node())
     }
 }
+impl pg_sys::seal::Sealed for AlterTableSpaceOptionsStmt {}
 impl pg_sys::PgNode for AlterTableSpaceOptionsStmt {}
 impl std::fmt::Display for AlterTableSpaceOptionsStmt {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         write!(f, "{}", self.display_node())
     }
 }
+impl pg_sys::seal::Sealed for AlterTableStmt {}
 impl pg_sys::PgNode for AlterTableStmt {}
 impl std::fmt::Display for AlterTableStmt {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         write!(f, "{}", self.display_node())
     }
 }
+impl pg_sys::seal::Sealed for AlterUserMappingStmt {}
 impl pg_sys::PgNode for AlterUserMappingStmt {}
 impl std::fmt::Display for AlterUserMappingStmt {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         write!(f, "{}", self.display_node())
     }
 }
+impl pg_sys::seal::Sealed for AlternativeSubPlan {}
 impl pg_sys::PgNode for AlternativeSubPlan {}
 impl std::fmt::Display for AlternativeSubPlan {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         write!(f, "{}", self.display_node())
     }
 }
+impl pg_sys::seal::Sealed for AlternativeSubPlanState {}
 impl pg_sys::PgNode for AlternativeSubPlanState {}
 impl std::fmt::Display for AlternativeSubPlanState {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         write!(f, "{}", self.display_node())
     }
 }
+impl pg_sys::seal::Sealed for Append {}
 impl pg_sys::PgNode for Append {}
 impl std::fmt::Display for Append {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         write!(f, "{}", self.display_node())
     }
 }
+impl pg_sys::seal::Sealed for AppendPath {}
 impl pg_sys::PgNode for AppendPath {}
 impl std::fmt::Display for AppendPath {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         write!(f, "{}", self.display_node())
     }
 }
+impl pg_sys::seal::Sealed for AppendRelInfo {}
 impl pg_sys::PgNode for AppendRelInfo {}
 impl std::fmt::Display for AppendRelInfo {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         write!(f, "{}", self.display_node())
     }
 }
+impl pg_sys::seal::Sealed for AppendState {}
 impl pg_sys::PgNode for AppendState {}
 impl std::fmt::Display for AppendState {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         write!(f, "{}", self.display_node())
     }
 }
+impl pg_sys::seal::Sealed for ArrayCoerceExpr {}
 impl pg_sys::PgNode for ArrayCoerceExpr {}
 impl std::fmt::Display for ArrayCoerceExpr {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         write!(f, "{}", self.display_node())
     }
 }
+impl pg_sys::seal::Sealed for ArrayExpr {}
 impl pg_sys::PgNode for ArrayExpr {}
 impl std::fmt::Display for ArrayExpr {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         write!(f, "{}", self.display_node())
     }
 }
+impl pg_sys::seal::Sealed for ArrayRef {}
 impl pg_sys::PgNode for ArrayRef {}
 impl std::fmt::Display for ArrayRef {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         write!(f, "{}", self.display_node())
     }
 }
+impl pg_sys::seal::Sealed for BaseBackupCmd {}
 impl pg_sys::PgNode for BaseBackupCmd {}
 impl std::fmt::Display for BaseBackupCmd {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         write!(f, "{}", self.display_node())
     }
 }
+impl pg_sys::seal::Sealed for BitmapAnd {}
 impl pg_sys::PgNode for BitmapAnd {}
 impl std::fmt::Display for BitmapAnd {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         write!(f, "{}", self.display_node())
     }
 }
+impl pg_sys::seal::Sealed for BitmapAndPath {}
 impl pg_sys::PgNode for BitmapAndPath {}
 impl std::fmt::Display for BitmapAndPath {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         write!(f, "{}", self.display_node())
     }
 }
+impl pg_sys::seal::Sealed for BitmapAndState {}
 impl pg_sys::PgNode for BitmapAndState {}
 impl std::fmt::Display for BitmapAndState {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         write!(f, "{}", self.display_node())
     }
 }
+impl pg_sys::seal::Sealed for BitmapHeapPath {}
 impl pg_sys::PgNode for BitmapHeapPath {}
 impl std::fmt::Display for BitmapHeapPath {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         write!(f, "{}", self.display_node())
     }
 }
+impl pg_sys::seal::Sealed for BitmapHeapScan {}
 impl pg_sys::PgNode for BitmapHeapScan {}
 impl std::fmt::Display for BitmapHeapScan {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         write!(f, "{}", self.display_node())
     }
 }
+impl pg_sys::seal::Sealed for BitmapHeapScanState {}
 impl pg_sys::PgNode for BitmapHeapScanState {}
 impl std::fmt::Display for BitmapHeapScanState {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         write!(f, "{}", self.display_node())
     }
 }
+impl pg_sys::seal::Sealed for BitmapIndexScan {}
 impl pg_sys::PgNode for BitmapIndexScan {}
 impl std::fmt::Display for BitmapIndexScan {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         write!(f, "{}", self.display_node())
     }
 }
+impl pg_sys::seal::Sealed for BitmapIndexScanState {}
 impl pg_sys::PgNode for BitmapIndexScanState {}
 impl std::fmt::Display for BitmapIndexScanState {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         write!(f, "{}", self.display_node())
     }
 }
+impl pg_sys::seal::Sealed for BitmapOr {}
 impl pg_sys::PgNode for BitmapOr {}
 impl std::fmt::Display for BitmapOr {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         write!(f, "{}", self.display_node())
     }
 }
+impl pg_sys::seal::Sealed for BitmapOrPath {}
 impl pg_sys::PgNode for BitmapOrPath {}
 impl std::fmt::Display for BitmapOrPath {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         write!(f, "{}", self.display_node())
     }
 }
+impl pg_sys::seal::Sealed for BitmapOrState {}
 impl pg_sys::PgNode for BitmapOrState {}
 impl std::fmt::Display for BitmapOrState {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         write!(f, "{}", self.display_node())
     }
 }
+impl pg_sys::seal::Sealed for BoolExpr {}
 impl pg_sys::PgNode for BoolExpr {}
 impl std::fmt::Display for BoolExpr {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         write!(f, "{}", self.display_node())
     }
 }
+impl pg_sys::seal::Sealed for BooleanTest {}
 impl pg_sys::PgNode for BooleanTest {}
 impl std::fmt::Display for BooleanTest {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         write!(f, "{}", self.display_node())
     }
 }
+impl pg_sys::seal::Sealed for CallContext {}
 impl pg_sys::PgNode for CallContext {}
 impl std::fmt::Display for CallContext {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         write!(f, "{}", self.display_node())
     }
 }
+impl pg_sys::seal::Sealed for CallStmt {}
 impl pg_sys::PgNode for CallStmt {}
 impl std::fmt::Display for CallStmt {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         write!(f, "{}", self.display_node())
     }
 }
+impl pg_sys::seal::Sealed for CaseExpr {}
 impl pg_sys::PgNode for CaseExpr {}
 impl std::fmt::Display for CaseExpr {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         write!(f, "{}", self.display_node())
     }
 }
+impl pg_sys::seal::Sealed for CaseTestExpr {}
 impl pg_sys::PgNode for CaseTestExpr {}
 impl std::fmt::Display for CaseTestExpr {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         write!(f, "{}", self.display_node())
     }
 }
+impl pg_sys::seal::Sealed for CaseWhen {}
 impl pg_sys::PgNode for CaseWhen {}
 impl std::fmt::Display for CaseWhen {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         write!(f, "{}", self.display_node())
     }
 }
+impl pg_sys::seal::Sealed for CheckPointStmt {}
 impl pg_sys::PgNode for CheckPointStmt {}
 impl std::fmt::Display for CheckPointStmt {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         write!(f, "{}", self.display_node())
     }
 }
+impl pg_sys::seal::Sealed for ClosePortalStmt {}
 impl pg_sys::PgNode for ClosePortalStmt {}
 impl std::fmt::Display for ClosePortalStmt {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         write!(f, "{}", self.display_node())
     }
 }
+impl pg_sys::seal::Sealed for ClusterStmt {}
 impl pg_sys::PgNode for ClusterStmt {}
 impl std::fmt::Display for ClusterStmt {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         write!(f, "{}", self.display_node())
     }
 }
+impl pg_sys::seal::Sealed for CoalesceExpr {}
 impl pg_sys::PgNode for CoalesceExpr {}
 impl std::fmt::Display for CoalesceExpr {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         write!(f, "{}", self.display_node())
     }
 }
+impl pg_sys::seal::Sealed for CoerceToDomain {}
 impl pg_sys::PgNode for CoerceToDomain {}
 impl std::fmt::Display for CoerceToDomain {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         write!(f, "{}", self.display_node())
     }
 }
+impl pg_sys::seal::Sealed for CoerceToDomainValue {}
 impl pg_sys::PgNode for CoerceToDomainValue {}
 impl std::fmt::Display for CoerceToDomainValue {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         write!(f, "{}", self.display_node())
     }
 }
+impl pg_sys::seal::Sealed for CoerceViaIO {}
 impl pg_sys::PgNode for CoerceViaIO {}
 impl std::fmt::Display for CoerceViaIO {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         write!(f, "{}", self.display_node())
     }
 }
+impl pg_sys::seal::Sealed for CollateClause {}
 impl pg_sys::PgNode for CollateClause {}
 impl std::fmt::Display for CollateClause {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         write!(f, "{}", self.display_node())
     }
 }
+impl pg_sys::seal::Sealed for CollateExpr {}
 impl pg_sys::PgNode for CollateExpr {}
 impl std::fmt::Display for CollateExpr {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         write!(f, "{}", self.display_node())
     }
 }
+impl pg_sys::seal::Sealed for ColumnDef {}
 impl pg_sys::PgNode for ColumnDef {}
 impl std::fmt::Display for ColumnDef {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         write!(f, "{}", self.display_node())
     }
 }
+impl pg_sys::seal::Sealed for ColumnRef {}
 impl pg_sys::PgNode for ColumnRef {}
 impl std::fmt::Display for ColumnRef {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         write!(f, "{}", self.display_node())
     }
 }
+impl pg_sys::seal::Sealed for CommentStmt {}
 impl pg_sys::PgNode for CommentStmt {}
 impl std::fmt::Display for CommentStmt {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         write!(f, "{}", self.display_node())
     }
 }
+impl pg_sys::seal::Sealed for CommonTableExpr {}
 impl pg_sys::PgNode for CommonTableExpr {}
 impl std::fmt::Display for CommonTableExpr {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         write!(f, "{}", self.display_node())
     }
 }
+impl pg_sys::seal::Sealed for CompositeTypeStmt {}
 impl pg_sys::PgNode for CompositeTypeStmt {}
 impl std::fmt::Display for CompositeTypeStmt {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         write!(f, "{}", self.display_node())
     }
 }
+impl pg_sys::seal::Sealed for Const {}
 impl pg_sys::PgNode for Const {}
 impl std::fmt::Display for Const {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         write!(f, "{}", self.display_node())
     }
 }
+impl pg_sys::seal::Sealed for Constraint {}
 impl pg_sys::PgNode for Constraint {}
 impl std::fmt::Display for Constraint {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         write!(f, "{}", self.display_node())
     }
 }
+impl pg_sys::seal::Sealed for ConstraintsSetStmt {}
 impl pg_sys::PgNode for ConstraintsSetStmt {}
 impl std::fmt::Display for ConstraintsSetStmt {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         write!(f, "{}", self.display_node())
     }
 }
+impl pg_sys::seal::Sealed for ConvertRowtypeExpr {}
 impl pg_sys::PgNode for ConvertRowtypeExpr {}
 impl std::fmt::Display for ConvertRowtypeExpr {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         write!(f, "{}", self.display_node())
     }
 }
+impl pg_sys::seal::Sealed for CopyStmt {}
 impl pg_sys::PgNode for CopyStmt {}
 impl std::fmt::Display for CopyStmt {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         write!(f, "{}", self.display_node())
     }
 }
+impl pg_sys::seal::Sealed for CreateAmStmt {}
 impl pg_sys::PgNode for CreateAmStmt {}
 impl std::fmt::Display for CreateAmStmt {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         write!(f, "{}", self.display_node())
     }
 }
+impl pg_sys::seal::Sealed for CreateCastStmt {}
 impl pg_sys::PgNode for CreateCastStmt {}
 impl std::fmt::Display for CreateCastStmt {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         write!(f, "{}", self.display_node())
     }
 }
+impl pg_sys::seal::Sealed for CreateConversionStmt {}
 impl pg_sys::PgNode for CreateConversionStmt {}
 impl std::fmt::Display for CreateConversionStmt {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         write!(f, "{}", self.display_node())
     }
 }
+impl pg_sys::seal::Sealed for CreateDomainStmt {}
 impl pg_sys::PgNode for CreateDomainStmt {}
 impl std::fmt::Display for CreateDomainStmt {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         write!(f, "{}", self.display_node())
     }
 }
+impl pg_sys::seal::Sealed for CreateEnumStmt {}
 impl pg_sys::PgNode for CreateEnumStmt {}
 impl std::fmt::Display for CreateEnumStmt {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         write!(f, "{}", self.display_node())
     }
 }
+impl pg_sys::seal::Sealed for CreateEventTrigStmt {}
 impl pg_sys::PgNode for CreateEventTrigStmt {}
 impl std::fmt::Display for CreateEventTrigStmt {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         write!(f, "{}", self.display_node())
     }
 }
+impl pg_sys::seal::Sealed for CreateExtensionStmt {}
 impl pg_sys::PgNode for CreateExtensionStmt {}
 impl std::fmt::Display for CreateExtensionStmt {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         write!(f, "{}", self.display_node())
     }
 }
+impl pg_sys::seal::Sealed for CreateFdwStmt {}
 impl pg_sys::PgNode for CreateFdwStmt {}
 impl std::fmt::Display for CreateFdwStmt {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         write!(f, "{}", self.display_node())
     }
 }
+impl pg_sys::seal::Sealed for CreateForeignServerStmt {}
 impl pg_sys::PgNode for CreateForeignServerStmt {}
 impl std::fmt::Display for CreateForeignServerStmt {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         write!(f, "{}", self.display_node())
     }
 }
+impl pg_sys::seal::Sealed for CreateForeignTableStmt {}
 impl pg_sys::PgNode for CreateForeignTableStmt {}
 impl std::fmt::Display for CreateForeignTableStmt {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         write!(f, "{}", self.display_node())
     }
 }
+impl pg_sys::seal::Sealed for CreateFunctionStmt {}
 impl pg_sys::PgNode for CreateFunctionStmt {}
 impl std::fmt::Display for CreateFunctionStmt {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         write!(f, "{}", self.display_node())
     }
 }
+impl pg_sys::seal::Sealed for CreateOpClassItem {}
 impl pg_sys::PgNode for CreateOpClassItem {}
 impl std::fmt::Display for CreateOpClassItem {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         write!(f, "{}", self.display_node())
     }
 }
+impl pg_sys::seal::Sealed for CreateOpClassStmt {}
 impl pg_sys::PgNode for CreateOpClassStmt {}
 impl std::fmt::Display for CreateOpClassStmt {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         write!(f, "{}", self.display_node())
     }
 }
+impl pg_sys::seal::Sealed for CreateOpFamilyStmt {}
 impl pg_sys::PgNode for CreateOpFamilyStmt {}
 impl std::fmt::Display for CreateOpFamilyStmt {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         write!(f, "{}", self.display_node())
     }
 }
+impl pg_sys::seal::Sealed for CreatePLangStmt {}
 impl pg_sys::PgNode for CreatePLangStmt {}
 impl std::fmt::Display for CreatePLangStmt {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         write!(f, "{}", self.display_node())
     }
 }
+impl pg_sys::seal::Sealed for CreatePolicyStmt {}
 impl pg_sys::PgNode for CreatePolicyStmt {}
 impl std::fmt::Display for CreatePolicyStmt {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         write!(f, "{}", self.display_node())
     }
 }
+impl pg_sys::seal::Sealed for CreatePublicationStmt {}
 impl pg_sys::PgNode for CreatePublicationStmt {}
 impl std::fmt::Display for CreatePublicationStmt {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         write!(f, "{}", self.display_node())
     }
 }
+impl pg_sys::seal::Sealed for CreateRangeStmt {}
 impl pg_sys::PgNode for CreateRangeStmt {}
 impl std::fmt::Display for CreateRangeStmt {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         write!(f, "{}", self.display_node())
     }
 }
+impl pg_sys::seal::Sealed for CreateReplicationSlotCmd {}
 impl pg_sys::PgNode for CreateReplicationSlotCmd {}
 impl std::fmt::Display for CreateReplicationSlotCmd {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         write!(f, "{}", self.display_node())
     }
 }
+impl pg_sys::seal::Sealed for CreateRoleStmt {}
 impl pg_sys::PgNode for CreateRoleStmt {}
 impl std::fmt::Display for CreateRoleStmt {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         write!(f, "{}", self.display_node())
     }
 }
+impl pg_sys::seal::Sealed for CreateSchemaStmt {}
 impl pg_sys::PgNode for CreateSchemaStmt {}
 impl std::fmt::Display for CreateSchemaStmt {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         write!(f, "{}", self.display_node())
     }
 }
+impl pg_sys::seal::Sealed for CreateSeqStmt {}
 impl pg_sys::PgNode for CreateSeqStmt {}
 impl std::fmt::Display for CreateSeqStmt {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         write!(f, "{}", self.display_node())
     }
 }
+impl pg_sys::seal::Sealed for CreateStatsStmt {}
 impl pg_sys::PgNode for CreateStatsStmt {}
 impl std::fmt::Display for CreateStatsStmt {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         write!(f, "{}", self.display_node())
     }
 }
+impl pg_sys::seal::Sealed for CreateStmt {}
 impl pg_sys::PgNode for CreateStmt {}
 impl std::fmt::Display for CreateStmt {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         write!(f, "{}", self.display_node())
     }
 }
+impl pg_sys::seal::Sealed for CreateSubscriptionStmt {}
 impl pg_sys::PgNode for CreateSubscriptionStmt {}
 impl std::fmt::Display for CreateSubscriptionStmt {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         write!(f, "{}", self.display_node())
     }
 }
+impl pg_sys::seal::Sealed for CreateTableAsStmt {}
 impl pg_sys::PgNode for CreateTableAsStmt {}
 impl std::fmt::Display for CreateTableAsStmt {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         write!(f, "{}", self.display_node())
     }
 }
+impl pg_sys::seal::Sealed for CreateTableSpaceStmt {}
 impl pg_sys::PgNode for CreateTableSpaceStmt {}
 impl std::fmt::Display for CreateTableSpaceStmt {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         write!(f, "{}", self.display_node())
     }
 }
+impl pg_sys::seal::Sealed for CreateTransformStmt {}
 impl pg_sys::PgNode for CreateTransformStmt {}
 impl std::fmt::Display for CreateTransformStmt {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         write!(f, "{}", self.display_node())
     }
 }
+impl pg_sys::seal::Sealed for CreateTrigStmt {}
 impl pg_sys::PgNode for CreateTrigStmt {}
 impl std::fmt::Display for CreateTrigStmt {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         write!(f, "{}", self.display_node())
     }
 }
+impl pg_sys::seal::Sealed for CreateUserMappingStmt {}
 impl pg_sys::PgNode for CreateUserMappingStmt {}
 impl std::fmt::Display for CreateUserMappingStmt {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         write!(f, "{}", self.display_node())
     }
 }
+impl pg_sys::seal::Sealed for CreatedbStmt {}
 impl pg_sys::PgNode for CreatedbStmt {}
 impl std::fmt::Display for CreatedbStmt {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         write!(f, "{}", self.display_node())
     }
 }
+impl pg_sys::seal::Sealed for CteScan {}
 impl pg_sys::PgNode for CteScan {}
 impl std::fmt::Display for CteScan {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         write!(f, "{}", self.display_node())
     }
 }
+impl pg_sys::seal::Sealed for CteScanState {}
 impl pg_sys::PgNode for CteScanState {}
 impl std::fmt::Display for CteScanState {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         write!(f, "{}", self.display_node())
     }
 }
+impl pg_sys::seal::Sealed for CurrentOfExpr {}
 impl pg_sys::PgNode for CurrentOfExpr {}
 impl std::fmt::Display for CurrentOfExpr {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         write!(f, "{}", self.display_node())
     }
 }
+impl pg_sys::seal::Sealed for CustomPath {}
 impl pg_sys::PgNode for CustomPath {}
 impl std::fmt::Display for CustomPath {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         write!(f, "{}", self.display_node())
     }
 }
+impl pg_sys::seal::Sealed for CustomScan {}
 impl pg_sys::PgNode for CustomScan {}
 impl std::fmt::Display for CustomScan {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         write!(f, "{}", self.display_node())
     }
 }
+impl pg_sys::seal::Sealed for CustomScanState {}
 impl pg_sys::PgNode for CustomScanState {}
 impl std::fmt::Display for CustomScanState {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         write!(f, "{}", self.display_node())
     }
 }
+impl pg_sys::seal::Sealed for DeallocateStmt {}
 impl pg_sys::PgNode for DeallocateStmt {}
 impl std::fmt::Display for DeallocateStmt {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         write!(f, "{}", self.display_node())
     }
 }
+impl pg_sys::seal::Sealed for DeclareCursorStmt {}
 impl pg_sys::PgNode for DeclareCursorStmt {}
 impl std::fmt::Display for DeclareCursorStmt {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         write!(f, "{}", self.display_node())
     }
 }
+impl pg_sys::seal::Sealed for DefElem {}
 impl pg_sys::PgNode for DefElem {}
 impl std::fmt::Display for DefElem {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         write!(f, "{}", self.display_node())
     }
 }
+impl pg_sys::seal::Sealed for DefineStmt {}
 impl pg_sys::PgNode for DefineStmt {}
 impl std::fmt::Display for DefineStmt {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         write!(f, "{}", self.display_node())
     }
 }
+impl pg_sys::seal::Sealed for DeleteStmt {}
 impl pg_sys::PgNode for DeleteStmt {}
 impl std::fmt::Display for DeleteStmt {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         write!(f, "{}", self.display_node())
     }
 }
+impl pg_sys::seal::Sealed for DiscardStmt {}
 impl pg_sys::PgNode for DiscardStmt {}
 impl std::fmt::Display for DiscardStmt {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         write!(f, "{}", self.display_node())
     }
 }
+impl pg_sys::seal::Sealed for DoStmt {}
 impl pg_sys::PgNode for DoStmt {}
 impl std::fmt::Display for DoStmt {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         write!(f, "{}", self.display_node())
     }
 }
+impl pg_sys::seal::Sealed for DomainConstraintState {}
 impl pg_sys::PgNode for DomainConstraintState {}
 impl std::fmt::Display for DomainConstraintState {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         write!(f, "{}", self.display_node())
     }
 }
+impl pg_sys::seal::Sealed for DropOwnedStmt {}
 impl pg_sys::PgNode for DropOwnedStmt {}
 impl std::fmt::Display for DropOwnedStmt {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         write!(f, "{}", self.display_node())
     }
 }
+impl pg_sys::seal::Sealed for DropReplicationSlotCmd {}
 impl pg_sys::PgNode for DropReplicationSlotCmd {}
 impl std::fmt::Display for DropReplicationSlotCmd {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         write!(f, "{}", self.display_node())
     }
 }
+impl pg_sys::seal::Sealed for DropRoleStmt {}
 impl pg_sys::PgNode for DropRoleStmt {}
 impl std::fmt::Display for DropRoleStmt {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         write!(f, "{}", self.display_node())
     }
 }
+impl pg_sys::seal::Sealed for DropStmt {}
 impl pg_sys::PgNode for DropStmt {}
 impl std::fmt::Display for DropStmt {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         write!(f, "{}", self.display_node())
     }
 }
+impl pg_sys::seal::Sealed for DropSubscriptionStmt {}
 impl pg_sys::PgNode for DropSubscriptionStmt {}
 impl std::fmt::Display for DropSubscriptionStmt {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         write!(f, "{}", self.display_node())
     }
 }
+impl pg_sys::seal::Sealed for DropTableSpaceStmt {}
 impl pg_sys::PgNode for DropTableSpaceStmt {}
 impl std::fmt::Display for DropTableSpaceStmt {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         write!(f, "{}", self.display_node())
     }
 }
+impl pg_sys::seal::Sealed for DropUserMappingStmt {}
 impl pg_sys::PgNode for DropUserMappingStmt {}
 impl std::fmt::Display for DropUserMappingStmt {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         write!(f, "{}", self.display_node())
     }
 }
+impl pg_sys::seal::Sealed for DropdbStmt {}
 impl pg_sys::PgNode for DropdbStmt {}
 impl std::fmt::Display for DropdbStmt {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         write!(f, "{}", self.display_node())
     }
 }
+impl pg_sys::seal::Sealed for EState {}
 impl pg_sys::PgNode for EState {}
 impl std::fmt::Display for EState {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         write!(f, "{}", self.display_node())
     }
 }
+impl pg_sys::seal::Sealed for EquivalenceClass {}
 impl pg_sys::PgNode for EquivalenceClass {}
 impl std::fmt::Display for EquivalenceClass {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         write!(f, "{}", self.display_node())
     }
 }
+impl pg_sys::seal::Sealed for EquivalenceMember {}
 impl pg_sys::PgNode for EquivalenceMember {}
 impl std::fmt::Display for EquivalenceMember {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         write!(f, "{}", self.display_node())
     }
 }
+impl pg_sys::seal::Sealed for EventTriggerData {}
 impl pg_sys::PgNode for EventTriggerData {}
 impl std::fmt::Display for EventTriggerData {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         write!(f, "{}", self.display_node())
     }
 }
+impl pg_sys::seal::Sealed for ExecuteStmt {}
 impl pg_sys::PgNode for ExecuteStmt {}
 impl std::fmt::Display for ExecuteStmt {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         write!(f, "{}", self.display_node())
     }
 }
+impl pg_sys::seal::Sealed for ExplainStmt {}
 impl pg_sys::PgNode for ExplainStmt {}
 impl std::fmt::Display for ExplainStmt {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         write!(f, "{}", self.display_node())
     }
 }
+impl pg_sys::seal::Sealed for Expr {}
 impl pg_sys::PgNode for Expr {}
 impl std::fmt::Display for Expr {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         write!(f, "{}", self.display_node())
     }
 }
+impl pg_sys::seal::Sealed for ExprContext {}
 impl pg_sys::PgNode for ExprContext {}
 impl std::fmt::Display for ExprContext {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         write!(f, "{}", self.display_node())
     }
 }
+impl pg_sys::seal::Sealed for ExprState {}
 impl pg_sys::PgNode for ExprState {}
 impl std::fmt::Display for ExprState {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         write!(f, "{}", self.display_node())
     }
 }
+impl pg_sys::seal::Sealed for ExtensibleNode {}
 impl pg_sys::PgNode for ExtensibleNode {}
 impl std::fmt::Display for ExtensibleNode {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         write!(f, "{}", self.display_node())
     }
 }
+impl pg_sys::seal::Sealed for FdwRoutine {}
 impl pg_sys::PgNode for FdwRoutine {}
 impl std::fmt::Display for FdwRoutine {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         write!(f, "{}", self.display_node())
     }
 }
+impl pg_sys::seal::Sealed for FetchStmt {}
 impl pg_sys::PgNode for FetchStmt {}
 impl std::fmt::Display for FetchStmt {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         write!(f, "{}", self.display_node())
     }
 }
+impl pg_sys::seal::Sealed for FieldSelect {}
 impl pg_sys::PgNode for FieldSelect {}
 impl std::fmt::Display for FieldSelect {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         write!(f, "{}", self.display_node())
     }
 }
+impl pg_sys::seal::Sealed for FieldStore {}
 impl pg_sys::PgNode for FieldStore {}
 impl std::fmt::Display for FieldStore {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         write!(f, "{}", self.display_node())
     }
 }
+impl pg_sys::seal::Sealed for ForeignKeyCacheInfo {}
 impl pg_sys::PgNode for ForeignKeyCacheInfo {}
 impl std::fmt::Display for ForeignKeyCacheInfo {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         write!(f, "{}", self.display_node())
     }
 }
+impl pg_sys::seal::Sealed for ForeignKeyOptInfo {}
 impl pg_sys::PgNode for ForeignKeyOptInfo {}
 impl std::fmt::Display for ForeignKeyOptInfo {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         write!(f, "{}", self.display_node())
     }
 }
+impl pg_sys::seal::Sealed for ForeignPath {}
 impl pg_sys::PgNode for ForeignPath {}
 impl std::fmt::Display for ForeignPath {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         write!(f, "{}", self.display_node())
     }
 }
+impl pg_sys::seal::Sealed for ForeignScan {}
 impl pg_sys::PgNode for ForeignScan {}
 impl std::fmt::Display for ForeignScan {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         write!(f, "{}", self.display_node())
     }
 }
+impl pg_sys::seal::Sealed for ForeignScanState {}
 impl pg_sys::PgNode for ForeignScanState {}
 impl std::fmt::Display for ForeignScanState {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         write!(f, "{}", self.display_node())
     }
 }
+impl pg_sys::seal::Sealed for FromExpr {}
 impl pg_sys::PgNode for FromExpr {}
 impl std::fmt::Display for FromExpr {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         write!(f, "{}", self.display_node())
     }
 }
+impl pg_sys::seal::Sealed for FuncCall {}
 impl pg_sys::PgNode for FuncCall {}
 impl std::fmt::Display for FuncCall {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         write!(f, "{}", self.display_node())
     }
 }
+impl pg_sys::seal::Sealed for FuncExpr {}
 impl pg_sys::PgNode for FuncExpr {}
 impl std::fmt::Display for FuncExpr {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         write!(f, "{}", self.display_node())
     }
 }
+impl pg_sys::seal::Sealed for FunctionParameter {}
 impl pg_sys::PgNode for FunctionParameter {}
 impl std::fmt::Display for FunctionParameter {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         write!(f, "{}", self.display_node())
     }
 }
+impl pg_sys::seal::Sealed for FunctionScan {}
 impl pg_sys::PgNode for FunctionScan {}
 impl std::fmt::Display for FunctionScan {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         write!(f, "{}", self.display_node())
     }
 }
+impl pg_sys::seal::Sealed for FunctionScanState {}
 impl pg_sys::PgNode for FunctionScanState {}
 impl std::fmt::Display for FunctionScanState {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         write!(f, "{}", self.display_node())
     }
 }
+impl pg_sys::seal::Sealed for Gather {}
 impl pg_sys::PgNode for Gather {}
 impl std::fmt::Display for Gather {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         write!(f, "{}", self.display_node())
     }
 }
+impl pg_sys::seal::Sealed for GatherMerge {}
 impl pg_sys::PgNode for GatherMerge {}
 impl std::fmt::Display for GatherMerge {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         write!(f, "{}", self.display_node())
     }
 }
+impl pg_sys::seal::Sealed for GatherMergePath {}
 impl pg_sys::PgNode for GatherMergePath {}
 impl std::fmt::Display for GatherMergePath {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         write!(f, "{}", self.display_node())
     }
 }
+impl pg_sys::seal::Sealed for GatherMergeState {}
 impl pg_sys::PgNode for GatherMergeState {}
 impl std::fmt::Display for GatherMergeState {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         write!(f, "{}", self.display_node())
     }
 }
+impl pg_sys::seal::Sealed for GatherPath {}
 impl pg_sys::PgNode for GatherPath {}
 impl std::fmt::Display for GatherPath {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         write!(f, "{}", self.display_node())
     }
 }
+impl pg_sys::seal::Sealed for GatherState {}
 impl pg_sys::PgNode for GatherState {}
 impl std::fmt::Display for GatherState {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         write!(f, "{}", self.display_node())
     }
 }
+impl pg_sys::seal::Sealed for GrantRoleStmt {}
 impl pg_sys::PgNode for GrantRoleStmt {}
 impl std::fmt::Display for GrantRoleStmt {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         write!(f, "{}", self.display_node())
     }
 }
+impl pg_sys::seal::Sealed for GrantStmt {}
 impl pg_sys::PgNode for GrantStmt {}
 impl std::fmt::Display for GrantStmt {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         write!(f, "{}", self.display_node())
     }
 }
+impl pg_sys::seal::Sealed for Group {}
 impl pg_sys::PgNode for Group {}
 impl std::fmt::Display for Group {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         write!(f, "{}", self.display_node())
     }
 }
+impl pg_sys::seal::Sealed for GroupPath {}
 impl pg_sys::PgNode for GroupPath {}
 impl std::fmt::Display for GroupPath {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         write!(f, "{}", self.display_node())
     }
 }
+impl pg_sys::seal::Sealed for GroupState {}
 impl pg_sys::PgNode for GroupState {}
 impl std::fmt::Display for GroupState {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         write!(f, "{}", self.display_node())
     }
 }
+impl pg_sys::seal::Sealed for GroupingFunc {}
 impl pg_sys::PgNode for GroupingFunc {}
 impl std::fmt::Display for GroupingFunc {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         write!(f, "{}", self.display_node())
     }
 }
+impl pg_sys::seal::Sealed for GroupingSet {}
 impl pg_sys::PgNode for GroupingSet {}
 impl std::fmt::Display for GroupingSet {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         write!(f, "{}", self.display_node())
     }
 }
+impl pg_sys::seal::Sealed for GroupingSetData {}
 impl pg_sys::PgNode for GroupingSetData {}
 impl std::fmt::Display for GroupingSetData {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         write!(f, "{}", self.display_node())
     }
 }
+impl pg_sys::seal::Sealed for GroupingSetsPath {}
 impl pg_sys::PgNode for GroupingSetsPath {}
 impl std::fmt::Display for GroupingSetsPath {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         write!(f, "{}", self.display_node())
     }
 }
+impl pg_sys::seal::Sealed for Hash {}
 impl pg_sys::PgNode for Hash {}
 impl std::fmt::Display for Hash {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         write!(f, "{}", self.display_node())
     }
 }
+impl pg_sys::seal::Sealed for HashJoin {}
 impl pg_sys::PgNode for HashJoin {}
 impl std::fmt::Display for HashJoin {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         write!(f, "{}", self.display_node())
     }
 }
+impl pg_sys::seal::Sealed for HashJoinState {}
 impl pg_sys::PgNode for HashJoinState {}
 impl std::fmt::Display for HashJoinState {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         write!(f, "{}", self.display_node())
     }
 }
+impl pg_sys::seal::Sealed for HashPath {}
 impl pg_sys::PgNode for HashPath {}
 impl std::fmt::Display for HashPath {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         write!(f, "{}", self.display_node())
     }
 }
+impl pg_sys::seal::Sealed for HashState {}
 impl pg_sys::PgNode for HashState {}
 impl std::fmt::Display for HashState {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         write!(f, "{}", self.display_node())
     }
 }
+impl pg_sys::seal::Sealed for IdentifySystemCmd {}
 impl pg_sys::PgNode for IdentifySystemCmd {}
 impl std::fmt::Display for IdentifySystemCmd {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         write!(f, "{}", self.display_node())
     }
 }
+impl pg_sys::seal::Sealed for ImportForeignSchemaStmt {}
 impl pg_sys::PgNode for ImportForeignSchemaStmt {}
 impl std::fmt::Display for ImportForeignSchemaStmt {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         write!(f, "{}", self.display_node())
     }
 }
+impl pg_sys::seal::Sealed for IndexAmRoutine {}
 impl pg_sys::PgNode for IndexAmRoutine {}
 impl std::fmt::Display for IndexAmRoutine {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         write!(f, "{}", self.display_node())
     }
 }
+impl pg_sys::seal::Sealed for IndexElem {}
 impl pg_sys::PgNode for IndexElem {}
 impl std::fmt::Display for IndexElem {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         write!(f, "{}", self.display_node())
     }
 }
+impl pg_sys::seal::Sealed for IndexInfo {}
 impl pg_sys::PgNode for IndexInfo {}
 impl std::fmt::Display for IndexInfo {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         write!(f, "{}", self.display_node())
     }
 }
+impl pg_sys::seal::Sealed for IndexOnlyScan {}
 impl pg_sys::PgNode for IndexOnlyScan {}
 impl std::fmt::Display for IndexOnlyScan {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         write!(f, "{}", self.display_node())
     }
 }
+impl pg_sys::seal::Sealed for IndexOnlyScanState {}
 impl pg_sys::PgNode for IndexOnlyScanState {}
 impl std::fmt::Display for IndexOnlyScanState {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         write!(f, "{}", self.display_node())
     }
 }
+impl pg_sys::seal::Sealed for IndexOptInfo {}
 impl pg_sys::PgNode for IndexOptInfo {}
 impl std::fmt::Display for IndexOptInfo {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         write!(f, "{}", self.display_node())
     }
 }
+impl pg_sys::seal::Sealed for IndexPath {}
 impl pg_sys::PgNode for IndexPath {}
 impl std::fmt::Display for IndexPath {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         write!(f, "{}", self.display_node())
     }
 }
+impl pg_sys::seal::Sealed for IndexScan {}
 impl pg_sys::PgNode for IndexScan {}
 impl std::fmt::Display for IndexScan {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         write!(f, "{}", self.display_node())
     }
 }
+impl pg_sys::seal::Sealed for IndexScanState {}
 impl pg_sys::PgNode for IndexScanState {}
 impl std::fmt::Display for IndexScanState {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         write!(f, "{}", self.display_node())
     }
 }
+impl pg_sys::seal::Sealed for IndexStmt {}
 impl pg_sys::PgNode for IndexStmt {}
 impl std::fmt::Display for IndexStmt {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         write!(f, "{}", self.display_node())
     }
 }
+impl pg_sys::seal::Sealed for InferClause {}
 impl pg_sys::PgNode for InferClause {}
 impl std::fmt::Display for InferClause {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         write!(f, "{}", self.display_node())
     }
 }
+impl pg_sys::seal::Sealed for InferenceElem {}
 impl pg_sys::PgNode for InferenceElem {}
 impl std::fmt::Display for InferenceElem {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         write!(f, "{}", self.display_node())
     }
 }
+impl pg_sys::seal::Sealed for InlineCodeBlock {}
 impl pg_sys::PgNode for InlineCodeBlock {}
 impl std::fmt::Display for InlineCodeBlock {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         write!(f, "{}", self.display_node())
     }
 }
+impl pg_sys::seal::Sealed for InsertStmt {}
 impl pg_sys::PgNode for InsertStmt {}
 impl std::fmt::Display for InsertStmt {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         write!(f, "{}", self.display_node())
     }
 }
+impl pg_sys::seal::Sealed for IntoClause {}
 impl pg_sys::PgNode for IntoClause {}
 impl std::fmt::Display for IntoClause {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         write!(f, "{}", self.display_node())
     }
 }
+impl pg_sys::seal::Sealed for Join {}
 impl pg_sys::PgNode for Join {}
 impl std::fmt::Display for Join {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         write!(f, "{}", self.display_node())
     }
 }
+impl pg_sys::seal::Sealed for JoinExpr {}
 impl pg_sys::PgNode for JoinExpr {}
 impl std::fmt::Display for JoinExpr {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         write!(f, "{}", self.display_node())
     }
 }
+impl pg_sys::seal::Sealed for JoinPath {}
 impl pg_sys::PgNode for JoinPath {}
 impl std::fmt::Display for JoinPath {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         write!(f, "{}", self.display_node())
     }
 }
+impl pg_sys::seal::Sealed for JoinState {}
 impl pg_sys::PgNode for JoinState {}
 impl std::fmt::Display for JoinState {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         write!(f, "{}", self.display_node())
     }
 }
+impl pg_sys::seal::Sealed for JunkFilter {}
 impl pg_sys::PgNode for JunkFilter {}
 impl std::fmt::Display for JunkFilter {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         write!(f, "{}", self.display_node())
     }
 }
+impl pg_sys::seal::Sealed for Limit {}
 impl pg_sys::PgNode for Limit {}
 impl std::fmt::Display for Limit {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         write!(f, "{}", self.display_node())
     }
 }
+impl pg_sys::seal::Sealed for LimitPath {}
 impl pg_sys::PgNode for LimitPath {}
 impl std::fmt::Display for LimitPath {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         write!(f, "{}", self.display_node())
     }
 }
+impl pg_sys::seal::Sealed for LimitState {}
 impl pg_sys::PgNode for LimitState {}
 impl std::fmt::Display for LimitState {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         write!(f, "{}", self.display_node())
     }
 }
+impl pg_sys::seal::Sealed for List {}
 impl pg_sys::PgNode for List {}
 impl std::fmt::Display for List {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         write!(f, "{}", self.display_node())
     }
 }
+impl pg_sys::seal::Sealed for ListenStmt {}
 impl pg_sys::PgNode for ListenStmt {}
 impl std::fmt::Display for ListenStmt {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         write!(f, "{}", self.display_node())
     }
 }
+impl pg_sys::seal::Sealed for LoadStmt {}
 impl pg_sys::PgNode for LoadStmt {}
 impl std::fmt::Display for LoadStmt {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         write!(f, "{}", self.display_node())
     }
 }
+impl pg_sys::seal::Sealed for LockRows {}
 impl pg_sys::PgNode for LockRows {}
 impl std::fmt::Display for LockRows {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         write!(f, "{}", self.display_node())
     }
 }
+impl pg_sys::seal::Sealed for LockRowsPath {}
 impl pg_sys::PgNode for LockRowsPath {}
 impl std::fmt::Display for LockRowsPath {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         write!(f, "{}", self.display_node())
     }
 }
+impl pg_sys::seal::Sealed for LockRowsState {}
 impl pg_sys::PgNode for LockRowsState {}
 impl std::fmt::Display for LockRowsState {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         write!(f, "{}", self.display_node())
     }
 }
+impl pg_sys::seal::Sealed for LockStmt {}
 impl pg_sys::PgNode for LockStmt {}
 impl std::fmt::Display for LockStmt {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         write!(f, "{}", self.display_node())
     }
 }
+impl pg_sys::seal::Sealed for LockingClause {}
 impl pg_sys::PgNode for LockingClause {}
 impl std::fmt::Display for LockingClause {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         write!(f, "{}", self.display_node())
     }
 }
+impl pg_sys::seal::Sealed for Material {}
 impl pg_sys::PgNode for Material {}
 impl std::fmt::Display for Material {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         write!(f, "{}", self.display_node())
     }
 }
+impl pg_sys::seal::Sealed for MaterialPath {}
 impl pg_sys::PgNode for MaterialPath {}
 impl std::fmt::Display for MaterialPath {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         write!(f, "{}", self.display_node())
     }
 }
+impl pg_sys::seal::Sealed for MaterialState {}
 impl pg_sys::PgNode for MaterialState {}
 impl std::fmt::Display for MaterialState {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         write!(f, "{}", self.display_node())
     }
 }
+impl pg_sys::seal::Sealed for MemoryContextData {}
 impl pg_sys::PgNode for MemoryContextData {}
 impl std::fmt::Display for MemoryContextData {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         write!(f, "{}", self.display_node())
     }
 }
+impl pg_sys::seal::Sealed for MergeAppend {}
 impl pg_sys::PgNode for MergeAppend {}
 impl std::fmt::Display for MergeAppend {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         write!(f, "{}", self.display_node())
     }
 }
+impl pg_sys::seal::Sealed for MergeAppendPath {}
 impl pg_sys::PgNode for MergeAppendPath {}
 impl std::fmt::Display for MergeAppendPath {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         write!(f, "{}", self.display_node())
     }
 }
+impl pg_sys::seal::Sealed for MergeAppendState {}
 impl pg_sys::PgNode for MergeAppendState {}
 impl std::fmt::Display for MergeAppendState {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         write!(f, "{}", self.display_node())
     }
 }
+impl pg_sys::seal::Sealed for MergeJoin {}
 impl pg_sys::PgNode for MergeJoin {}
 impl std::fmt::Display for MergeJoin {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         write!(f, "{}", self.display_node())
     }
 }
+impl pg_sys::seal::Sealed for MergeJoinState {}
 impl pg_sys::PgNode for MergeJoinState {}
 impl std::fmt::Display for MergeJoinState {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         write!(f, "{}", self.display_node())
     }
 }
+impl pg_sys::seal::Sealed for MergePath {}
 impl pg_sys::PgNode for MergePath {}
 impl std::fmt::Display for MergePath {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         write!(f, "{}", self.display_node())
     }
 }
+impl pg_sys::seal::Sealed for MinMaxAggInfo {}
 impl pg_sys::PgNode for MinMaxAggInfo {}
 impl std::fmt::Display for MinMaxAggInfo {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         write!(f, "{}", self.display_node())
     }
 }
+impl pg_sys::seal::Sealed for MinMaxAggPath {}
 impl pg_sys::PgNode for MinMaxAggPath {}
 impl std::fmt::Display for MinMaxAggPath {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         write!(f, "{}", self.display_node())
     }
 }
+impl pg_sys::seal::Sealed for MinMaxExpr {}
 impl pg_sys::PgNode for MinMaxExpr {}
 impl std::fmt::Display for MinMaxExpr {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         write!(f, "{}", self.display_node())
     }
 }
+impl pg_sys::seal::Sealed for ModifyTable {}
 impl pg_sys::PgNode for ModifyTable {}
 impl std::fmt::Display for ModifyTable {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         write!(f, "{}", self.display_node())
     }
 }
+impl pg_sys::seal::Sealed for ModifyTablePath {}
 impl pg_sys::PgNode for ModifyTablePath {}
 impl std::fmt::Display for ModifyTablePath {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         write!(f, "{}", self.display_node())
     }
 }
+impl pg_sys::seal::Sealed for ModifyTableState {}
 impl pg_sys::PgNode for ModifyTableState {}
 impl std::fmt::Display for ModifyTableState {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         write!(f, "{}", self.display_node())
     }
 }
+impl pg_sys::seal::Sealed for MultiAssignRef {}
 impl pg_sys::PgNode for MultiAssignRef {}
 impl std::fmt::Display for MultiAssignRef {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         write!(f, "{}", self.display_node())
     }
 }
+impl pg_sys::seal::Sealed for NamedArgExpr {}
 impl pg_sys::PgNode for NamedArgExpr {}
 impl std::fmt::Display for NamedArgExpr {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         write!(f, "{}", self.display_node())
     }
 }
+impl pg_sys::seal::Sealed for NamedTuplestoreScan {}
 impl pg_sys::PgNode for NamedTuplestoreScan {}
 impl std::fmt::Display for NamedTuplestoreScan {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         write!(f, "{}", self.display_node())
     }
 }
+impl pg_sys::seal::Sealed for NamedTuplestoreScanState {}
 impl pg_sys::PgNode for NamedTuplestoreScanState {}
 impl std::fmt::Display for NamedTuplestoreScanState {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         write!(f, "{}", self.display_node())
     }
 }
+impl pg_sys::seal::Sealed for NestLoop {}
 impl pg_sys::PgNode for NestLoop {}
 impl std::fmt::Display for NestLoop {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         write!(f, "{}", self.display_node())
     }
 }
+impl pg_sys::seal::Sealed for NestLoopParam {}
 impl pg_sys::PgNode for NestLoopParam {}
 impl std::fmt::Display for NestLoopParam {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         write!(f, "{}", self.display_node())
     }
 }
+impl pg_sys::seal::Sealed for NestLoopState {}
 impl pg_sys::PgNode for NestLoopState {}
 impl std::fmt::Display for NestLoopState {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         write!(f, "{}", self.display_node())
     }
 }
+impl pg_sys::seal::Sealed for NextValueExpr {}
 impl pg_sys::PgNode for NextValueExpr {}
 impl std::fmt::Display for NextValueExpr {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         write!(f, "{}", self.display_node())
     }
 }
+impl pg_sys::seal::Sealed for Node {}
 impl pg_sys::PgNode for Node {}
 impl std::fmt::Display for Node {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         write!(f, "{}", self.display_node())
     }
 }
+impl pg_sys::seal::Sealed for NotifyStmt {}
 impl pg_sys::PgNode for NotifyStmt {}
 impl std::fmt::Display for NotifyStmt {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         write!(f, "{}", self.display_node())
     }
 }
+impl pg_sys::seal::Sealed for NullTest {}
 impl pg_sys::PgNode for NullTest {}
 impl std::fmt::Display for NullTest {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         write!(f, "{}", self.display_node())
     }
 }
+impl pg_sys::seal::Sealed for ObjectWithArgs {}
 impl pg_sys::PgNode for ObjectWithArgs {}
 impl std::fmt::Display for ObjectWithArgs {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         write!(f, "{}", self.display_node())
     }
 }
+impl pg_sys::seal::Sealed for OnConflictClause {}
 impl pg_sys::PgNode for OnConflictClause {}
 impl std::fmt::Display for OnConflictClause {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         write!(f, "{}", self.display_node())
     }
 }
+impl pg_sys::seal::Sealed for OnConflictExpr {}
 impl pg_sys::PgNode for OnConflictExpr {}
 impl std::fmt::Display for OnConflictExpr {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         write!(f, "{}", self.display_node())
     }
 }
+impl pg_sys::seal::Sealed for OnConflictSetState {}
 impl pg_sys::PgNode for OnConflictSetState {}
 impl std::fmt::Display for OnConflictSetState {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         write!(f, "{}", self.display_node())
     }
 }
+impl pg_sys::seal::Sealed for OpExpr {}
 impl pg_sys::PgNode for OpExpr {}
 impl std::fmt::Display for OpExpr {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         write!(f, "{}", self.display_node())
     }
 }
+impl pg_sys::seal::Sealed for Param {}
 impl pg_sys::PgNode for Param {}
 impl std::fmt::Display for Param {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         write!(f, "{}", self.display_node())
     }
 }
+impl pg_sys::seal::Sealed for ParamPathInfo {}
 impl pg_sys::PgNode for ParamPathInfo {}
 impl std::fmt::Display for ParamPathInfo {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         write!(f, "{}", self.display_node())
     }
 }
+impl pg_sys::seal::Sealed for ParamRef {}
 impl pg_sys::PgNode for ParamRef {}
 impl std::fmt::Display for ParamRef {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         write!(f, "{}", self.display_node())
     }
 }
+impl pg_sys::seal::Sealed for PartitionBoundSpec {}
 impl pg_sys::PgNode for PartitionBoundSpec {}
 impl std::fmt::Display for PartitionBoundSpec {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         write!(f, "{}", self.display_node())
     }
 }
+impl pg_sys::seal::Sealed for PartitionCmd {}
 impl pg_sys::PgNode for PartitionCmd {}
 impl std::fmt::Display for PartitionCmd {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         write!(f, "{}", self.display_node())
     }
 }
+impl pg_sys::seal::Sealed for PartitionElem {}
 impl pg_sys::PgNode for PartitionElem {}
 impl std::fmt::Display for PartitionElem {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         write!(f, "{}", self.display_node())
     }
 }
+impl pg_sys::seal::Sealed for PartitionPruneInfo {}
 impl pg_sys::PgNode for PartitionPruneInfo {}
 impl std::fmt::Display for PartitionPruneInfo {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         write!(f, "{}", self.display_node())
     }
 }
+impl pg_sys::seal::Sealed for PartitionPruneStep {}
 impl pg_sys::PgNode for PartitionPruneStep {}
 impl std::fmt::Display for PartitionPruneStep {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         write!(f, "{}", self.display_node())
     }
 }
+impl pg_sys::seal::Sealed for PartitionPruneStepCombine {}
 impl pg_sys::PgNode for PartitionPruneStepCombine {}
 impl std::fmt::Display for PartitionPruneStepCombine {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         write!(f, "{}", self.display_node())
     }
 }
+impl pg_sys::seal::Sealed for PartitionPruneStepOp {}
 impl pg_sys::PgNode for PartitionPruneStepOp {}
 impl std::fmt::Display for PartitionPruneStepOp {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         write!(f, "{}", self.display_node())
     }
 }
+impl pg_sys::seal::Sealed for PartitionRangeDatum {}
 impl pg_sys::PgNode for PartitionRangeDatum {}
 impl std::fmt::Display for PartitionRangeDatum {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         write!(f, "{}", self.display_node())
     }
 }
+impl pg_sys::seal::Sealed for PartitionSpec {}
 impl pg_sys::PgNode for PartitionSpec {}
 impl std::fmt::Display for PartitionSpec {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         write!(f, "{}", self.display_node())
     }
 }
+impl pg_sys::seal::Sealed for PartitionedRelPruneInfo {}
 impl pg_sys::PgNode for PartitionedRelPruneInfo {}
 impl std::fmt::Display for PartitionedRelPruneInfo {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         write!(f, "{}", self.display_node())
     }
 }
+impl pg_sys::seal::Sealed for Path {}
 impl pg_sys::PgNode for Path {}
 impl std::fmt::Display for Path {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         write!(f, "{}", self.display_node())
     }
 }
+impl pg_sys::seal::Sealed for PathKey {}
 impl pg_sys::PgNode for PathKey {}
 impl std::fmt::Display for PathKey {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         write!(f, "{}", self.display_node())
     }
 }
+impl pg_sys::seal::Sealed for PathTarget {}
 impl pg_sys::PgNode for PathTarget {}
 impl std::fmt::Display for PathTarget {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         write!(f, "{}", self.display_node())
     }
 }
+impl pg_sys::seal::Sealed for PlaceHolderInfo {}
 impl pg_sys::PgNode for PlaceHolderInfo {}
 impl std::fmt::Display for PlaceHolderInfo {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         write!(f, "{}", self.display_node())
     }
 }
+impl pg_sys::seal::Sealed for PlaceHolderVar {}
 impl pg_sys::PgNode for PlaceHolderVar {}
 impl std::fmt::Display for PlaceHolderVar {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         write!(f, "{}", self.display_node())
     }
 }
+impl pg_sys::seal::Sealed for Plan {}
 impl pg_sys::PgNode for Plan {}
 impl std::fmt::Display for Plan {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         write!(f, "{}", self.display_node())
     }
 }
+impl pg_sys::seal::Sealed for PlanInvalItem {}
 impl pg_sys::PgNode for PlanInvalItem {}
 impl std::fmt::Display for PlanInvalItem {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         write!(f, "{}", self.display_node())
     }
 }
+impl pg_sys::seal::Sealed for PlanRowMark {}
 impl pg_sys::PgNode for PlanRowMark {}
 impl std::fmt::Display for PlanRowMark {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         write!(f, "{}", self.display_node())
     }
 }
+impl pg_sys::seal::Sealed for PlanState {}
 impl pg_sys::PgNode for PlanState {}
 impl std::fmt::Display for PlanState {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         write!(f, "{}", self.display_node())
     }
 }
+impl pg_sys::seal::Sealed for PlannedStmt {}
 impl pg_sys::PgNode for PlannedStmt {}
 impl std::fmt::Display for PlannedStmt {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         write!(f, "{}", self.display_node())
     }
 }
+impl pg_sys::seal::Sealed for PlannerGlobal {}
 impl pg_sys::PgNode for PlannerGlobal {}
 impl std::fmt::Display for PlannerGlobal {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         write!(f, "{}", self.display_node())
     }
 }
+impl pg_sys::seal::Sealed for PlannerInfo {}
 impl pg_sys::PgNode for PlannerInfo {}
 impl std::fmt::Display for PlannerInfo {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         write!(f, "{}", self.display_node())
     }
 }
+impl pg_sys::seal::Sealed for PlannerParamItem {}
 impl pg_sys::PgNode for PlannerParamItem {}
 impl std::fmt::Display for PlannerParamItem {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         write!(f, "{}", self.display_node())
     }
 }
+impl pg_sys::seal::Sealed for PrepareStmt {}
 impl pg_sys::PgNode for PrepareStmt {}
 impl std::fmt::Display for PrepareStmt {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         write!(f, "{}", self.display_node())
     }
 }
+impl pg_sys::seal::Sealed for ProjectSet {}
 impl pg_sys::PgNode for ProjectSet {}
 impl std::fmt::Display for ProjectSet {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         write!(f, "{}", self.display_node())
     }
 }
+impl pg_sys::seal::Sealed for ProjectSetPath {}
 impl pg_sys::PgNode for ProjectSetPath {}
 impl std::fmt::Display for ProjectSetPath {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         write!(f, "{}", self.display_node())
     }
 }
+impl pg_sys::seal::Sealed for ProjectSetState {}
 impl pg_sys::PgNode for ProjectSetState {}
 impl std::fmt::Display for ProjectSetState {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         write!(f, "{}", self.display_node())
     }
 }
+impl pg_sys::seal::Sealed for ProjectionInfo {}
 impl pg_sys::PgNode for ProjectionInfo {}
 impl std::fmt::Display for ProjectionInfo {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         write!(f, "{}", self.display_node())
     }
 }
+impl pg_sys::seal::Sealed for ProjectionPath {}
 impl pg_sys::PgNode for ProjectionPath {}
 impl std::fmt::Display for ProjectionPath {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         write!(f, "{}", self.display_node())
     }
 }
+impl pg_sys::seal::Sealed for Query {}
 impl pg_sys::PgNode for Query {}
 impl std::fmt::Display for Query {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         write!(f, "{}", self.display_node())
     }
 }
+impl pg_sys::seal::Sealed for RangeFunction {}
 impl pg_sys::PgNode for RangeFunction {}
 impl std::fmt::Display for RangeFunction {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         write!(f, "{}", self.display_node())
     }
 }
+impl pg_sys::seal::Sealed for RangeSubselect {}
 impl pg_sys::PgNode for RangeSubselect {}
 impl std::fmt::Display for RangeSubselect {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         write!(f, "{}", self.display_node())
     }
 }
+impl pg_sys::seal::Sealed for RangeTableFunc {}
 impl pg_sys::PgNode for RangeTableFunc {}
 impl std::fmt::Display for RangeTableFunc {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         write!(f, "{}", self.display_node())
     }
 }
+impl pg_sys::seal::Sealed for RangeTableFuncCol {}
 impl pg_sys::PgNode for RangeTableFuncCol {}
 impl std::fmt::Display for RangeTableFuncCol {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         write!(f, "{}", self.display_node())
     }
 }
+impl pg_sys::seal::Sealed for RangeTableSample {}
 impl pg_sys::PgNode for RangeTableSample {}
 impl std::fmt::Display for RangeTableSample {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         write!(f, "{}", self.display_node())
     }
 }
+impl pg_sys::seal::Sealed for RangeTblEntry {}
 impl pg_sys::PgNode for RangeTblEntry {}
 impl std::fmt::Display for RangeTblEntry {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         write!(f, "{}", self.display_node())
     }
 }
+impl pg_sys::seal::Sealed for RangeTblFunction {}
 impl pg_sys::PgNode for RangeTblFunction {}
 impl std::fmt::Display for RangeTblFunction {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         write!(f, "{}", self.display_node())
     }
 }
+impl pg_sys::seal::Sealed for RangeTblRef {}
 impl pg_sys::PgNode for RangeTblRef {}
 impl std::fmt::Display for RangeTblRef {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         write!(f, "{}", self.display_node())
     }
 }
+impl pg_sys::seal::Sealed for RangeVar {}
 impl pg_sys::PgNode for RangeVar {}
 impl std::fmt::Display for RangeVar {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         write!(f, "{}", self.display_node())
     }
 }
+impl pg_sys::seal::Sealed for RawStmt {}
 impl pg_sys::PgNode for RawStmt {}
 impl std::fmt::Display for RawStmt {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         write!(f, "{}", self.display_node())
     }
 }
+impl pg_sys::seal::Sealed for ReassignOwnedStmt {}
 impl pg_sys::PgNode for ReassignOwnedStmt {}
 impl std::fmt::Display for ReassignOwnedStmt {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         write!(f, "{}", self.display_node())
     }
 }
+impl pg_sys::seal::Sealed for RecursiveUnion {}
 impl pg_sys::PgNode for RecursiveUnion {}
 impl std::fmt::Display for RecursiveUnion {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         write!(f, "{}", self.display_node())
     }
 }
+impl pg_sys::seal::Sealed for RecursiveUnionPath {}
 impl pg_sys::PgNode for RecursiveUnionPath {}
 impl std::fmt::Display for RecursiveUnionPath {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         write!(f, "{}", self.display_node())
     }
 }
+impl pg_sys::seal::Sealed for RecursiveUnionState {}
 impl pg_sys::PgNode for RecursiveUnionState {}
 impl std::fmt::Display for RecursiveUnionState {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         write!(f, "{}", self.display_node())
     }
 }
+impl pg_sys::seal::Sealed for RefreshMatViewStmt {}
 impl pg_sys::PgNode for RefreshMatViewStmt {}
 impl std::fmt::Display for RefreshMatViewStmt {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         write!(f, "{}", self.display_node())
     }
 }
+impl pg_sys::seal::Sealed for ReindexStmt {}
 impl pg_sys::PgNode for ReindexStmt {}
 impl std::fmt::Display for ReindexStmt {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         write!(f, "{}", self.display_node())
     }
 }
+impl pg_sys::seal::Sealed for RelOptInfo {}
 impl pg_sys::PgNode for RelOptInfo {}
 impl std::fmt::Display for RelOptInfo {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         write!(f, "{}", self.display_node())
     }
 }
+impl pg_sys::seal::Sealed for RelabelType {}
 impl pg_sys::PgNode for RelabelType {}
 impl std::fmt::Display for RelabelType {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         write!(f, "{}", self.display_node())
     }
 }
+impl pg_sys::seal::Sealed for RenameStmt {}
 impl pg_sys::PgNode for RenameStmt {}
 impl std::fmt::Display for RenameStmt {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         write!(f, "{}", self.display_node())
     }
 }
+impl pg_sys::seal::Sealed for ReplicaIdentityStmt {}
 impl pg_sys::PgNode for ReplicaIdentityStmt {}
 impl std::fmt::Display for ReplicaIdentityStmt {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         write!(f, "{}", self.display_node())
     }
 }
+impl pg_sys::seal::Sealed for ResTarget {}
 impl pg_sys::PgNode for ResTarget {}
 impl std::fmt::Display for ResTarget {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         write!(f, "{}", self.display_node())
     }
 }
+impl pg_sys::seal::Sealed for RestrictInfo {}
 impl pg_sys::PgNode for RestrictInfo {}
 impl std::fmt::Display for RestrictInfo {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         write!(f, "{}", self.display_node())
     }
 }
+impl pg_sys::seal::Sealed for Result {}
 impl pg_sys::PgNode for Result {}
 impl std::fmt::Display for Result {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         write!(f, "{}", self.display_node())
     }
 }
+impl pg_sys::seal::Sealed for ResultPath {}
 impl pg_sys::PgNode for ResultPath {}
 impl std::fmt::Display for ResultPath {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         write!(f, "{}", self.display_node())
     }
 }
+impl pg_sys::seal::Sealed for ResultRelInfo {}
 impl pg_sys::PgNode for ResultRelInfo {}
 impl std::fmt::Display for ResultRelInfo {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         write!(f, "{}", self.display_node())
     }
 }
+impl pg_sys::seal::Sealed for ResultState {}
 impl pg_sys::PgNode for ResultState {}
 impl std::fmt::Display for ResultState {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         write!(f, "{}", self.display_node())
     }
 }
+impl pg_sys::seal::Sealed for ReturnSetInfo {}
 impl pg_sys::PgNode for ReturnSetInfo {}
 impl std::fmt::Display for ReturnSetInfo {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         write!(f, "{}", self.display_node())
     }
 }
+impl pg_sys::seal::Sealed for RoleSpec {}
 impl pg_sys::PgNode for RoleSpec {}
 impl std::fmt::Display for RoleSpec {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         write!(f, "{}", self.display_node())
     }
 }
+impl pg_sys::seal::Sealed for RollupData {}
 impl pg_sys::PgNode for RollupData {}
 impl std::fmt::Display for RollupData {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         write!(f, "{}", self.display_node())
     }
 }
+impl pg_sys::seal::Sealed for RowCompareExpr {}
 impl pg_sys::PgNode for RowCompareExpr {}
 impl std::fmt::Display for RowCompareExpr {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         write!(f, "{}", self.display_node())
     }
 }
+impl pg_sys::seal::Sealed for RowExpr {}
 impl pg_sys::PgNode for RowExpr {}
 impl std::fmt::Display for RowExpr {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         write!(f, "{}", self.display_node())
     }
 }
+impl pg_sys::seal::Sealed for RowMarkClause {}
 impl pg_sys::PgNode for RowMarkClause {}
 impl std::fmt::Display for RowMarkClause {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         write!(f, "{}", self.display_node())
     }
 }
+impl pg_sys::seal::Sealed for RuleStmt {}
 impl pg_sys::PgNode for RuleStmt {}
 impl std::fmt::Display for RuleStmt {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         write!(f, "{}", self.display_node())
     }
 }
+impl pg_sys::seal::Sealed for SQLCmd {}
 impl pg_sys::PgNode for SQLCmd {}
 impl std::fmt::Display for SQLCmd {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         write!(f, "{}", self.display_node())
     }
 }
+impl pg_sys::seal::Sealed for SQLValueFunction {}
 impl pg_sys::PgNode for SQLValueFunction {}
 impl std::fmt::Display for SQLValueFunction {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         write!(f, "{}", self.display_node())
     }
 }
+impl pg_sys::seal::Sealed for SampleScan {}
 impl pg_sys::PgNode for SampleScan {}
 impl std::fmt::Display for SampleScan {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         write!(f, "{}", self.display_node())
     }
 }
+impl pg_sys::seal::Sealed for SampleScanState {}
 impl pg_sys::PgNode for SampleScanState {}
 impl std::fmt::Display for SampleScanState {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         write!(f, "{}", self.display_node())
     }
 }
+impl pg_sys::seal::Sealed for ScalarArrayOpExpr {}
 impl pg_sys::PgNode for ScalarArrayOpExpr {}
 impl std::fmt::Display for ScalarArrayOpExpr {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         write!(f, "{}", self.display_node())
     }
 }
+impl pg_sys::seal::Sealed for Scan {}
 impl pg_sys::PgNode for Scan {}
 impl std::fmt::Display for Scan {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         write!(f, "{}", self.display_node())
     }
 }
+impl pg_sys::seal::Sealed for ScanState {}
 impl pg_sys::PgNode for ScanState {}
 impl std::fmt::Display for ScanState {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         write!(f, "{}", self.display_node())
     }
 }
+impl pg_sys::seal::Sealed for SecLabelStmt {}
 impl pg_sys::PgNode for SecLabelStmt {}
 impl std::fmt::Display for SecLabelStmt {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         write!(f, "{}", self.display_node())
     }
 }
+impl pg_sys::seal::Sealed for SelectStmt {}
 impl pg_sys::PgNode for SelectStmt {}
 impl std::fmt::Display for SelectStmt {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         write!(f, "{}", self.display_node())
     }
 }
+impl pg_sys::seal::Sealed for SeqScanState {}
 impl pg_sys::PgNode for SeqScanState {}
 impl std::fmt::Display for SeqScanState {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         write!(f, "{}", self.display_node())
     }
 }
+impl pg_sys::seal::Sealed for SetExprState {}
 impl pg_sys::PgNode for SetExprState {}
 impl std::fmt::Display for SetExprState {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         write!(f, "{}", self.display_node())
     }
 }
+impl pg_sys::seal::Sealed for SetOp {}
 impl pg_sys::PgNode for SetOp {}
 impl std::fmt::Display for SetOp {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         write!(f, "{}", self.display_node())
     }
 }
+impl pg_sys::seal::Sealed for SetOpPath {}
 impl pg_sys::PgNode for SetOpPath {}
 impl std::fmt::Display for SetOpPath {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         write!(f, "{}", self.display_node())
     }
 }
+impl pg_sys::seal::Sealed for SetOpState {}
 impl pg_sys::PgNode for SetOpState {}
 impl std::fmt::Display for SetOpState {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         write!(f, "{}", self.display_node())
     }
 }
+impl pg_sys::seal::Sealed for SetOperationStmt {}
 impl pg_sys::PgNode for SetOperationStmt {}
 impl std::fmt::Display for SetOperationStmt {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         write!(f, "{}", self.display_node())
     }
 }
+impl pg_sys::seal::Sealed for SetToDefault {}
 impl pg_sys::PgNode for SetToDefault {}
 impl std::fmt::Display for SetToDefault {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         write!(f, "{}", self.display_node())
     }
 }
+impl pg_sys::seal::Sealed for Sort {}
 impl pg_sys::PgNode for Sort {}
 impl std::fmt::Display for Sort {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         write!(f, "{}", self.display_node())
     }
 }
+impl pg_sys::seal::Sealed for SortBy {}
 impl pg_sys::PgNode for SortBy {}
 impl std::fmt::Display for SortBy {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         write!(f, "{}", self.display_node())
     }
 }
+impl pg_sys::seal::Sealed for SortGroupClause {}
 impl pg_sys::PgNode for SortGroupClause {}
 impl std::fmt::Display for SortGroupClause {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         write!(f, "{}", self.display_node())
     }
 }
+impl pg_sys::seal::Sealed for SortPath {}
 impl pg_sys::PgNode for SortPath {}
 impl std::fmt::Display for SortPath {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         write!(f, "{}", self.display_node())
     }
 }
+impl pg_sys::seal::Sealed for SortState {}
 impl pg_sys::PgNode for SortState {}
 impl std::fmt::Display for SortState {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         write!(f, "{}", self.display_node())
     }
 }
+impl pg_sys::seal::Sealed for SpecialJoinInfo {}
 impl pg_sys::PgNode for SpecialJoinInfo {}
 impl std::fmt::Display for SpecialJoinInfo {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         write!(f, "{}", self.display_node())
     }
 }
+impl pg_sys::seal::Sealed for StartReplicationCmd {}
 impl pg_sys::PgNode for StartReplicationCmd {}
 impl std::fmt::Display for StartReplicationCmd {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         write!(f, "{}", self.display_node())
     }
 }
+impl pg_sys::seal::Sealed for StatisticExtInfo {}
 impl pg_sys::PgNode for StatisticExtInfo {}
 impl std::fmt::Display for StatisticExtInfo {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         write!(f, "{}", self.display_node())
     }
 }
+impl pg_sys::seal::Sealed for SubLink {}
 impl pg_sys::PgNode for SubLink {}
 impl std::fmt::Display for SubLink {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         write!(f, "{}", self.display_node())
     }
 }
+impl pg_sys::seal::Sealed for SubPlan {}
 impl pg_sys::PgNode for SubPlan {}
 impl std::fmt::Display for SubPlan {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         write!(f, "{}", self.display_node())
     }
 }
+impl pg_sys::seal::Sealed for SubPlanState {}
 impl pg_sys::PgNode for SubPlanState {}
 impl std::fmt::Display for SubPlanState {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         write!(f, "{}", self.display_node())
     }
 }
+impl pg_sys::seal::Sealed for SubqueryScan {}
 impl pg_sys::PgNode for SubqueryScan {}
 impl std::fmt::Display for SubqueryScan {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         write!(f, "{}", self.display_node())
     }
 }
+impl pg_sys::seal::Sealed for SubqueryScanPath {}
 impl pg_sys::PgNode for SubqueryScanPath {}
 impl std::fmt::Display for SubqueryScanPath {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         write!(f, "{}", self.display_node())
     }
 }
+impl pg_sys::seal::Sealed for SubqueryScanState {}
 impl pg_sys::PgNode for SubqueryScanState {}
 impl std::fmt::Display for SubqueryScanState {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         write!(f, "{}", self.display_node())
     }
 }
+impl pg_sys::seal::Sealed for TableFunc {}
 impl pg_sys::PgNode for TableFunc {}
 impl std::fmt::Display for TableFunc {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         write!(f, "{}", self.display_node())
     }
 }
+impl pg_sys::seal::Sealed for TableFuncScan {}
 impl pg_sys::PgNode for TableFuncScan {}
 impl std::fmt::Display for TableFuncScan {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         write!(f, "{}", self.display_node())
     }
 }
+impl pg_sys::seal::Sealed for TableFuncScanState {}
 impl pg_sys::PgNode for TableFuncScanState {}
 impl std::fmt::Display for TableFuncScanState {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         write!(f, "{}", self.display_node())
     }
 }
+impl pg_sys::seal::Sealed for TableLikeClause {}
 impl pg_sys::PgNode for TableLikeClause {}
 impl std::fmt::Display for TableLikeClause {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         write!(f, "{}", self.display_node())
     }
 }
+impl pg_sys::seal::Sealed for TableSampleClause {}
 impl pg_sys::PgNode for TableSampleClause {}
 impl std::fmt::Display for TableSampleClause {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         write!(f, "{}", self.display_node())
     }
 }
+impl pg_sys::seal::Sealed for TargetEntry {}
 impl pg_sys::PgNode for TargetEntry {}
 impl std::fmt::Display for TargetEntry {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         write!(f, "{}", self.display_node())
     }
 }
+impl pg_sys::seal::Sealed for TidPath {}
 impl pg_sys::PgNode for TidPath {}
 impl std::fmt::Display for TidPath {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         write!(f, "{}", self.display_node())
     }
 }
+impl pg_sys::seal::Sealed for TidScan {}
 impl pg_sys::PgNode for TidScan {}
 impl std::fmt::Display for TidScan {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         write!(f, "{}", self.display_node())
     }
 }
+impl pg_sys::seal::Sealed for TidScanState {}
 impl pg_sys::PgNode for TidScanState {}
 impl std::fmt::Display for TidScanState {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         write!(f, "{}", self.display_node())
     }
 }
+impl pg_sys::seal::Sealed for TimeLineHistoryCmd {}
 impl pg_sys::PgNode for TimeLineHistoryCmd {}
 impl std::fmt::Display for TimeLineHistoryCmd {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         write!(f, "{}", self.display_node())
     }
 }
+impl pg_sys::seal::Sealed for TransactionStmt {}
 impl pg_sys::PgNode for TransactionStmt {}
 impl std::fmt::Display for TransactionStmt {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         write!(f, "{}", self.display_node())
     }
 }
+impl pg_sys::seal::Sealed for TriggerData {}
 impl pg_sys::PgNode for TriggerData {}
 impl std::fmt::Display for TriggerData {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         write!(f, "{}", self.display_node())
     }
 }
+impl pg_sys::seal::Sealed for TriggerTransition {}
 impl pg_sys::PgNode for TriggerTransition {}
 impl std::fmt::Display for TriggerTransition {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         write!(f, "{}", self.display_node())
     }
 }
+impl pg_sys::seal::Sealed for TruncateStmt {}
 impl pg_sys::PgNode for TruncateStmt {}
 impl std::fmt::Display for TruncateStmt {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         write!(f, "{}", self.display_node())
     }
 }
+impl pg_sys::seal::Sealed for TupleTableSlot {}
 impl pg_sys::PgNode for TupleTableSlot {}
 impl std::fmt::Display for TupleTableSlot {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         write!(f, "{}", self.display_node())
     }
 }
+impl pg_sys::seal::Sealed for TypeCast {}
 impl pg_sys::PgNode for TypeCast {}
 impl std::fmt::Display for TypeCast {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         write!(f, "{}", self.display_node())
     }
 }
+impl pg_sys::seal::Sealed for TypeName {}
 impl pg_sys::PgNode for TypeName {}
 impl std::fmt::Display for TypeName {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         write!(f, "{}", self.display_node())
     }
 }
+impl pg_sys::seal::Sealed for Unique {}
 impl pg_sys::PgNode for Unique {}
 impl std::fmt::Display for Unique {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         write!(f, "{}", self.display_node())
     }
 }
+impl pg_sys::seal::Sealed for UniquePath {}
 impl pg_sys::PgNode for UniquePath {}
 impl std::fmt::Display for UniquePath {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         write!(f, "{}", self.display_node())
     }
 }
+impl pg_sys::seal::Sealed for UniqueState {}
 impl pg_sys::PgNode for UniqueState {}
 impl std::fmt::Display for UniqueState {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         write!(f, "{}", self.display_node())
     }
 }
+impl pg_sys::seal::Sealed for UnlistenStmt {}
 impl pg_sys::PgNode for UnlistenStmt {}
 impl std::fmt::Display for UnlistenStmt {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         write!(f, "{}", self.display_node())
     }
 }
+impl pg_sys::seal::Sealed for UpdateStmt {}
 impl pg_sys::PgNode for UpdateStmt {}
 impl std::fmt::Display for UpdateStmt {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         write!(f, "{}", self.display_node())
     }
 }
+impl pg_sys::seal::Sealed for UpperUniquePath {}
 impl pg_sys::PgNode for UpperUniquePath {}
 impl std::fmt::Display for UpperUniquePath {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         write!(f, "{}", self.display_node())
     }
 }
+impl pg_sys::seal::Sealed for VacuumRelation {}
 impl pg_sys::PgNode for VacuumRelation {}
 impl std::fmt::Display for VacuumRelation {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         write!(f, "{}", self.display_node())
     }
 }
+impl pg_sys::seal::Sealed for VacuumStmt {}
 impl pg_sys::PgNode for VacuumStmt {}
 impl std::fmt::Display for VacuumStmt {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         write!(f, "{}", self.display_node())
     }
 }
+impl pg_sys::seal::Sealed for Value {}
 impl pg_sys::PgNode for Value {}
 impl std::fmt::Display for Value {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         write!(f, "{}", self.display_node())
     }
 }
+impl pg_sys::seal::Sealed for ValuesScan {}
 impl pg_sys::PgNode for ValuesScan {}
 impl std::fmt::Display for ValuesScan {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         write!(f, "{}", self.display_node())
     }
 }
+impl pg_sys::seal::Sealed for ValuesScanState {}
 impl pg_sys::PgNode for ValuesScanState {}
 impl std::fmt::Display for ValuesScanState {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         write!(f, "{}", self.display_node())
     }
 }
+impl pg_sys::seal::Sealed for Var {}
 impl pg_sys::PgNode for Var {}
 impl std::fmt::Display for Var {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         write!(f, "{}", self.display_node())
     }
 }
+impl pg_sys::seal::Sealed for VariableSetStmt {}
 impl pg_sys::PgNode for VariableSetStmt {}
 impl std::fmt::Display for VariableSetStmt {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         write!(f, "{}", self.display_node())
     }
 }
+impl pg_sys::seal::Sealed for VariableShowStmt {}
 impl pg_sys::PgNode for VariableShowStmt {}
 impl std::fmt::Display for VariableShowStmt {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         write!(f, "{}", self.display_node())
     }
 }
+impl pg_sys::seal::Sealed for ViewStmt {}
 impl pg_sys::PgNode for ViewStmt {}
 impl std::fmt::Display for ViewStmt {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         write!(f, "{}", self.display_node())
     }
 }
+impl pg_sys::seal::Sealed for WindowAgg {}
 impl pg_sys::PgNode for WindowAgg {}
 impl std::fmt::Display for WindowAgg {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         write!(f, "{}", self.display_node())
     }
 }
+impl pg_sys::seal::Sealed for WindowAggPath {}
 impl pg_sys::PgNode for WindowAggPath {}
 impl std::fmt::Display for WindowAggPath {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         write!(f, "{}", self.display_node())
     }
 }
+impl pg_sys::seal::Sealed for WindowAggState {}
 impl pg_sys::PgNode for WindowAggState {}
 impl std::fmt::Display for WindowAggState {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         write!(f, "{}", self.display_node())
     }
 }
+impl pg_sys::seal::Sealed for WindowClause {}
 impl pg_sys::PgNode for WindowClause {}
 impl std::fmt::Display for WindowClause {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         write!(f, "{}", self.display_node())
     }
 }
+impl pg_sys::seal::Sealed for WindowDef {}
 impl pg_sys::PgNode for WindowDef {}
 impl std::fmt::Display for WindowDef {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         write!(f, "{}", self.display_node())
     }
 }
+impl pg_sys::seal::Sealed for WindowFunc {}
 impl pg_sys::PgNode for WindowFunc {}
 impl std::fmt::Display for WindowFunc {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         write!(f, "{}", self.display_node())
     }
 }
+impl pg_sys::seal::Sealed for WindowFuncExprState {}
 impl pg_sys::PgNode for WindowFuncExprState {}
 impl std::fmt::Display for WindowFuncExprState {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         write!(f, "{}", self.display_node())
     }
 }
+impl pg_sys::seal::Sealed for WithCheckOption {}
 impl pg_sys::PgNode for WithCheckOption {}
 impl std::fmt::Display for WithCheckOption {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         write!(f, "{}", self.display_node())
     }
 }
+impl pg_sys::seal::Sealed for WithClause {}
 impl pg_sys::PgNode for WithClause {}
 impl std::fmt::Display for WithClause {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         write!(f, "{}", self.display_node())
     }
 }
+impl pg_sys::seal::Sealed for WorkTableScan {}
 impl pg_sys::PgNode for WorkTableScan {}
 impl std::fmt::Display for WorkTableScan {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         write!(f, "{}", self.display_node())
     }
 }
+impl pg_sys::seal::Sealed for WorkTableScanState {}
 impl pg_sys::PgNode for WorkTableScanState {}
 impl std::fmt::Display for WorkTableScanState {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         write!(f, "{}", self.display_node())
     }
 }
+impl pg_sys::seal::Sealed for XmlExpr {}
 impl pg_sys::PgNode for XmlExpr {}
 impl std::fmt::Display for XmlExpr {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         write!(f, "{}", self.display_node())
     }
 }
+impl pg_sys::seal::Sealed for XmlSerialize {}
 impl pg_sys::PgNode for XmlSerialize {}
 impl std::fmt::Display for XmlSerialize {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {

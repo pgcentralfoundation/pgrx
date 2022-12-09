@@ -21,19 +21,15 @@ pub enum CargoProfile {
 }
 
 impl CargoProfile {
-    pub fn from_flags(release: bool, profile: Option<&str>) -> eyre::Result<Self> {
-        match (profile, release) {
-            (Some(profile), true) => {
-                eyre::bail!("conflicting usage of --profile={:?} and --release", profile);
-            }
+    pub fn from_flags(profile: Option<&str>, default: CargoProfile) -> eyre::Result<Self> {
+        match profile {
             // Cargo treats `--profile release` the same as `--release`.
-            (Some("release"), false) => Ok(Self::Release),
+            Some("release") => Ok(Self::Release),
             // Cargo has two names for the debug profile, due to legacy
             // reasons...
-            (Some("debug"), false) | (Some("dev"), false) => Ok(Self::Dev),
-            (Some(profile), false) => Ok(Self::Profile(profile.into())),
-            (None, true) => Ok(Self::Release),
-            (None, false) => Ok(Self::Dev),
+            Some("debug") | Some("dev") => Ok(Self::Dev),
+            Some(profile) => Ok(Self::Profile(profile.into())),
+            None => Ok(default),
         }
     }
 
