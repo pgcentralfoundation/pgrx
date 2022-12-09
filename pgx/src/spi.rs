@@ -629,7 +629,7 @@ impl SpiTupleTable {
         if self.current < 0 {
             panic!("SpiTupleTable positioned before start")
         }
-        if self.current as u64 >= unsafe { pg_sys::SPI_processed } {
+        if self.current as usize >= self.size {
             None
         } else {
             match self.tupdesc {
@@ -646,7 +646,7 @@ impl SpiTupleTable {
     }
 
     pub fn get_datum<T: FromDatum + IntoDatum>(&self, ordinal: i32) -> Result<T, Error> {
-        if self.current < 0 || self.current as u64 >= unsafe { pg_sys::SPI_processed } {
+        if self.current < 0 || self.current as usize >= self.size {
             return Err(Error::InvalidPosition);
         }
         match self.tupdesc {

@@ -15,7 +15,7 @@ STATIC_LIB_NAME = lib${MODULE_big}.a
 
 
 ${STATIC_LIB_NAME}: pgx-cshim.o
-	ar crv $@ pgx-cshim.o
+	$(AR) crv $@ pgx-cshim.o
 
 all: ${STATIC_LIB_NAME}
 
