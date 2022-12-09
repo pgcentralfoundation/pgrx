@@ -289,15 +289,12 @@ mod tests {
     }
 
     #[pg_test]
-    fn test_spi_unwind_safe() {
-        Spi::connect(|client| {
-            PgTryBuilder::new(|| {
-                client.update("SELECT 1", None, None);
-                let cursor = client.open_cursor("SELECT 1", None).detach_into_name();
-                client.find_cursor(&cursor);
-            })
-            .execute();
-            Ok(Some(()))
+    fn test_spi_non_mut() {
+        // Ensures update and cursor APIs do not need mutable reference to SpiClient
+        Spi::execute(|client| {
+            client.update("SELECT 1", None, None);
+            let cursor = client.open_cursor("SELECT 1", None).detach_into_name();
+            client.find_cursor(&cursor);
         });
     }
 }
