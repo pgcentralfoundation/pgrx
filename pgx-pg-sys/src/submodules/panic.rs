@@ -395,6 +395,11 @@ fn do_ereport(ereport: ErrorReportWithLevel) {
     const PERCENT_S: &CStr = unsafe { CStr::from_bytes_with_nul_unchecked(b"%s\0") };
     const DOMAIN: *const ::std::os::raw::c_char = std::ptr::null_mut();
 
+    // the following code is definitely thread-unsafe -- not-the-main-thread can't be creating Postgres
+    // ereports.  Our secret `extern "C"` definitions aren't wrapped by #[pg_guard] so we need to 
+    // manually do the active thread check
+    crate::thread_check::check_active_thread();
+    
     //
     // only declare these functions here.  They're explicitly excluded from bindings generation in 
     // `build.rs` and we'd prefer pgx users not have access to them at all
