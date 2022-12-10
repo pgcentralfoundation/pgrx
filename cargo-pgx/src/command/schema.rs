@@ -444,7 +444,7 @@ pub(crate) fn generate_schema(
 
         for symbol_to_call in fns_to_call {
             let symbol: libloading::os::unix::Symbol<unsafe extern "Rust" fn() -> pgx_sql_entity_graph::SqlGraphEntity> =
-                lib.get(symbol_to_call.as_bytes()).unwrap_or_else(|e|
+                lib.get(symbol_to_call.as_bytes()).unwrap_or_else(|_|
                     panic!("Couldn't call {:#?}", symbol_to_call));
             let entity = symbol();
             entities.push(entity);
