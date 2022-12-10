@@ -289,7 +289,21 @@ mod all_versions {
         pub fn pgx_list_nth_int(list: *mut super::List, nth: i32) -> i32;
         pub fn pgx_list_nth_oid(list: *mut super::List, nth: i32) -> super::Oid;
         pub fn pgx_list_nth_cell(list: *mut super::List, nth: i32) -> *mut super::ListCell;
-        pub fn pgx_GETSTRUCT(tuple: pg_sys::HeapTuple) -> *mut std::os::raw::c_char;
+    }
+
+    /// Given a valid HeapTuple pointer, return address of the user data
+    ///
+    /// # Safety
+    ///
+    /// This function cannot determine if the `tuple` argument is really a non-null pointer to a [`HeapTuple`].
+    pub unsafe fn GETSTRUCT(tuple: crate::HeapTuple) -> *mut std::os::raw::c_char {
+        // #define GETSTRUCT(TUP) ((char *) ((TUP)->t_data) + (TUP)->t_data->t_hoff)
+        tuple
+            .as_mut()
+            .unwrap_unchecked()
+            .t_data
+            .cast::<std::os::raw::c_char>()
+            .add(tuple.as_ref().unwrap_unchecked().t_data.as_ref().unwrap_unchecked().t_hoff as _)
     }
 
     #[inline]
@@ -464,12 +478,27 @@ mod all_versions {
         buffer < 0
     }
 
+    /// Retrieve the "user data" of the specified [`HeapTuple`] as a specific type. Typically this
+    /// will be a struct that represents a Postgres system catalog, such as [`FormData_pg_class`].
+    ///
+    /// # Returns
+    ///
+    /// A pointer to the [`HeapTuple`]'s "user data", cast as a mutable pointer to `T`.  If the
+    /// specified `htup` pointer is null, the null pointer is returned.
+    ///
+    /// # Safety
+    ///
+    /// This function cannot verify that the specified `htup` points to a valid [`HeapTuple`] nor
+    /// that if it does, that its bytes are bitwise compatible with `T`.
     #[inline]
-    pub fn heap_tuple_get_struct<T>(htup: super::HeapTuple) -> *mut T {
+    pub unsafe fn heap_tuple_get_struct<T>(htup: super::HeapTuple) -> *mut T {
         if htup.is_null() {
-            0 as *mut T
+            std::ptr::null_mut()
         } else {
-            unsafe { pgx_GETSTRUCT(htup) as *mut T }
+            unsafe {
+                // SAFETY:  The caller has told us `htop` is a valid HeapTuple
+                GETSTRUCT(htup).cast()
+            }
         }
     }
 

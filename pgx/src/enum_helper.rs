@@ -9,7 +9,7 @@ Use of this source code is governed by the MIT license that can be found in the 
 
 //! Helper functions for working with Postgres `enum` types
 
-use crate::pg_sys::pgx_GETSTRUCT;
+use crate::pg_sys::GETSTRUCT;
 use crate::{ereport, pg_sys, PgLogLevel, PgSqlErrorCode};
 
 pub fn lookup_enum_by_oid(enumval: pg_sys::Oid) -> (String, pg_sys::Oid, f32) {
@@ -30,7 +30,7 @@ pub fn lookup_enum_by_oid(enumval: pg_sys::Oid) -> (String, pg_sys::Oid, f32) {
         );
     }
 
-    let en = unsafe { pgx_GETSTRUCT(tup) } as pg_sys::Form_pg_enum;
+    let en = unsafe { GETSTRUCT(tup) } as pg_sys::Form_pg_enum;
     let en = unsafe { en.as_ref() }.unwrap();
     let result = (
         unsafe {
@@ -81,18 +81,41 @@ pub fn lookup_enum_by_label(typname: &str, label: &str) -> pg_sys::Datum {
     }
 }
 
-#[cfg(any(feature = "pg11"))]
+#[cfg(feature = "pg11")]
 unsafe fn extract_enum_oid(tup: *mut pg_sys::HeapTupleData) -> pg_sys::Oid {
-    extern "C" {
-        fn pgx_HeapTupleHeaderGetOid(htup_header: pg_sys::HeapTupleHeader) -> pg_sys::Oid;
-    }
+    // #define HeapTupleHeaderGetOid(tup) \
+    // ( \
+    //         ((tup)->t_infomask & HEAP_HASOID) ? \
+    //                 *((Oid *) ((char *)(tup) + (tup)->t_hoff - sizeof(Oid))) \
+    //         : \
+    //                 InvalidOid \
+    // )
 
-    pgx_HeapTupleHeaderGetOid(tup.as_ref().unwrap().t_data)
+    unsafe {
+        // SAFETY:  The caller has assured us that `tup` is a valid HeapTupleData pointer and as such
+        // we can correctly assume that its `t_data` member will be properly allocated
+        let t_data = tup.as_ref().unwrap_unchecked().t_data;
+        let header = t_data.as_ref().unwrap_unchecked();
+        if (header.t_infomask & pg_sys::HEAP_HASOID as u16) != 0 {
+            let oid_ptr = (t_data.cast::<std::os::raw::c_char>().add(header.t_hoff as _))
+                .sub(std::mem::size_of::<pg_sys::Oid>())
+                .cast::<pg_sys::Oid>();
+
+            // SAFETY:  `oid_ptr`, based on our port of Postgres' `HeapTupleDataGetOid` macro just
+            // above is pointing to the tuple's `Oid`, so derefing is okay
+            *oid_ptr
+        } else {
+            pg_sys::InvalidOid
+        }
+    }
 }
 
 #[cfg(any(feature = "pg12", feature = "pg13", feature = "pg14", feature = "pg15"))]
 unsafe fn extract_enum_oid(tup: *mut pg_sys::HeapTupleData) -> pg_sys::Oid {
-    let en = pgx_GETSTRUCT(tup) as pg_sys::Form_pg_enum;
+    let en = {
+        // SAFETY:  the caller has assured us that `tup` is a valid HeapTupleData pointer
+        GETSTRUCT(tup) as pg_sys::Form_pg_enum
+    };
     let en = en.as_ref().unwrap();
     en.oid
 }

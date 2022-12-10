@@ -73,18 +73,6 @@ ListCell *pgx_list_nth_cell(List *list, int nth) {
     return list_nth_cell(list, nth);
 }
 
-#if IS_PG_11
-PGDLLEXPORT Oid pgx_HeapTupleHeaderGetOid(HeapTupleHeader htup_header);
-Oid pgx_HeapTupleHeaderGetOid(HeapTupleHeader htup_header) {
-    return HeapTupleHeaderGetOid(htup_header);
-}
-#endif
-
-PGDLLEXPORT char *pgx_GETSTRUCT(HeapTuple tuple);
-char *pgx_GETSTRUCT(HeapTuple tuple) {
-    return GETSTRUCT(tuple);
-}
-
 PGDLLEXPORT void pgx_SpinLockInit(volatile slock_t *lock);
 void pgx_SpinLockInit(volatile slock_t *lock) {
     SpinLockInit(lock);
