@@ -320,7 +320,7 @@ pub(crate) fn generate_schema(
 
     let so_extension = if cfg!(target_os = "macos") { ".dylib" } else { ".so" };
 
-    lib_so.push(&format!("lib{}{}", package_name.replace("-", "_"), so_extension));
+    lib_so.push(&format!("lib{}{}", package_name.replace('-', "_"), so_extension));
 
     let lib_so_data = std::fs::read(&lib_so).wrap_err("couldn't read extension shared object")?;
     let lib_so_obj_file =
@@ -359,7 +359,7 @@ pub(crate) fn generate_schema(
     for func in &fns_to_call {
         if func.starts_with("__pgx_internals_schema_") {
             let schema = func
-                .split("_")
+                .split('_')
                 .skip(5)
                 .next()
                 .expect("Schema extern name was not of expected format");
@@ -429,14 +429,14 @@ pub(crate) fn generate_schema(
             unsafe extern "Rust" fn() -> pgx_sql_entity_graph::RustToSqlMapping,
         > = lib
             .get("__pgx_sql_mappings".as_bytes())
-            .expect(&format!("Couldn't call __pgx_sql_mappings"));
+            .expect("Couldn't call __pgx_sql_mappings");
         sql_mapping = sql_mappings_symbol();
 
         let symbol: libloading::os::unix::Symbol<
             unsafe extern "Rust" fn() -> eyre::Result<pgx_sql_entity_graph::ControlFile>,
         > = lib
             .get("__pgx_marker".as_bytes())
-            .expect(&format!("Couldn't call __pgx_marker"));
+            .expect("Couldn't call __pgx_marker");
         let control_file_entity = pgx_sql_entity_graph::SqlGraphEntity::ExtensionRoot(
             symbol().expect("Failed to get control file information"),
         );
@@ -444,8 +444,8 @@ pub(crate) fn generate_schema(
 
         for symbol_to_call in fns_to_call {
             let symbol: libloading::os::unix::Symbol<unsafe extern "Rust" fn() -> pgx_sql_entity_graph::SqlGraphEntity> =
-                lib.get(symbol_to_call.as_bytes())
-                    .expect(&format!("Couldn't call {:#?}", symbol_to_call));
+                lib.get(symbol_to_call.as_bytes()).unwrap_or_else(|e|
+                    panic!("Couldn't call {:#?}", symbol_to_call));
             let entity = symbol();
             entities.push(entity);
         }
@@ -555,7 +555,7 @@ fn create_stub(
     so_rustc_invocation.stderr(Stdio::inherit());
 
     if let Some(rustc_flags_str) = std::env::var("RUSTFLAGS").ok() {
-        let rustc_flags = rustc_flags_str.split(" ").collect::<Vec<_>>();
+        let rustc_flags = rustc_flags_str.split(' ').collect::<Vec<_>>();
         so_rustc_invocation.args(rustc_flags);
     }
 
