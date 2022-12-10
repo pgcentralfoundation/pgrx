@@ -1,23 +1,104 @@
 use crate::datum::{Array, FromDatum};
-use crate::pg_sys::{self, bits8, ArrayType};
+use crate::pg_sys;
 use bitvec::prelude::*;
 use bitvec::ptr::{bitslice_from_raw_parts_mut, BitPtr, BitPtrError, Mut};
 use core::ptr::{slice_from_raw_parts_mut, NonNull};
 use core::slice;
 
-extern "C" {
-    /// # Safety
-    /// Does a field access, but doesn't deref out of bounds of ArrayType
-    fn pgx_ARR_DATA_PTR(arrayType: *mut ArrayType) -> *mut u8;
-    /// # Safety
-    /// Does a field access, but doesn't deref out of bounds of ArrayType
-    fn pgx_ARR_DIMS(arrayType: *mut ArrayType) -> *mut libc::c_int;
-    /// # Safety
-    /// Must only be used on a "valid" (Postgres-constructed) ArrayType
-    fn pgx_ARR_NELEMS(arrayType: *mut ArrayType) -> i32;
-    /// # Safety
-    /// Does a field access, but doesn't deref out of bounds of ArrayType
-    fn pgx_ARR_NULLBITMAP(arrayType: *mut ArrayType) -> *mut bits8;
+#[allow(non_snake_case)]
+#[inline(always)]
+const unsafe fn TYPEALIGN(alignval: usize, len: usize) -> usize {
+    // #define TYPEALIGN(ALIGNVAL,LEN)  \
+    // (((uintptr_t) (LEN) + ((ALIGNVAL) - 1)) & ~((uintptr_t) ((ALIGNVAL) - 1)))
+    ((len) + ((alignval) - 1)) & !((alignval) - 1)
+}
+
+#[allow(non_snake_case)]
+#[inline(always)]
+const unsafe fn MAXALIGN(len: usize) -> usize {
+    // #define MAXALIGN(LEN) TYPEALIGN(MAXIMUM_ALIGNOF, (LEN))
+    TYPEALIGN(pg_sys::MAXIMUM_ALIGNOF as _, len)
+}
+
+#[allow(non_snake_case)]
+#[inline(always)]
+unsafe fn ARR_NDIM(a: *mut pg_sys::ArrayType) -> usize {
+    // #define ARR_NDIM(a)				((a)->ndim)
+    a.as_ref().unwrap_unchecked().ndim as usize
+}
+
+#[allow(non_snake_case)]
+#[inline(always)]
+unsafe fn ARR_HASNULL(a: *mut pg_sys::ArrayType) -> bool {
+    // #define ARR_HASNULL(a)			((a)->dataoffset != 0)
+    a.as_ref().unwrap_unchecked().dataoffset != 0
+}
+
+#[allow(non_snake_case)]
+#[inline(always)]
+const unsafe fn ARR_DIMS(a: *mut pg_sys::ArrayType) -> *mut i32 {
+    // #define ARR_DIMS(a) \
+    // ((int *) (((char *) (a)) + sizeof(ArrayType)))
+
+    a.cast::<u8>().add(std::mem::size_of::<pg_sys::ArrayType>()).cast::<i32>()
+}
+
+#[allow(non_snake_case)]
+#[inline(always)]
+unsafe fn ARR_NELEMS(a: *mut pg_sys::ArrayType) -> usize {
+    pg_sys::ArrayGetNItems(a.as_ref().unwrap_unchecked().ndim, ARR_DIMS(a)) as usize
+}
+
+#[allow(non_snake_case)]
+#[inline(always)]
+unsafe fn ARR_NULLBITMAP(a: *mut pg_sys::ArrayType) -> *mut pg_sys::bits8 {
+    // #define ARR_NULLBITMAP(a) \
+    // (ARR_HASNULL(a) ? \
+    // (bits8 *) (((char *) (a)) + sizeof(ArrayType) + 2 * sizeof(int) * ARR_NDIM(a)) \
+    // : (bits8 *) NULL)
+    //
+
+    if ARR_HASNULL(a) {
+        a.cast::<u8>().add(
+            std::mem::size_of::<pg_sys::ArrayType>() + 2 * std::mem::size_of::<i32>() * ARR_NDIM(a),
+        )
+    } else {
+        std::ptr::null_mut()
+    }
+}
+
+/// The total array header size (in bytes) for an array with the specified
+/// number of dimensions and total number of items.
+#[allow(non_snake_case)]
+#[inline(always)]
+const unsafe fn ARR_OVERHEAD_NONNULLS(ndims: usize) -> usize {
+    // #define ARR_OVERHEAD_NONULLS(ndims) \
+    // MAXALIGN(sizeof(ArrayType) + 2 * sizeof(int) * (ndims))
+
+    MAXALIGN(std::mem::size_of::<pg_sys::ArrayType>() + 2 * std::mem::size_of::<i32>() * ndims)
+}
+
+#[allow(non_snake_case)]
+#[inline(always)]
+unsafe fn ARR_DATA_OFFSET(a: *mut pg_sys::ArrayType) -> usize {
+    // #define ARR_DATA_OFFSET(a) \
+    // (ARR_HASNULL(a) ? (a)->dataoffset : ARR_OVERHEAD_NONULLS(ARR_NDIM(a)))
+
+    if ARR_HASNULL(a) {
+        a.as_ref().unwrap_unchecked().dataoffset as _
+    } else {
+        ARR_OVERHEAD_NONNULLS(ARR_NDIM(a))
+    }
+}
+
+/// Returns a pointer to the actual array data.
+#[allow(non_snake_case)]
+#[inline(always)]
+unsafe fn ARR_DATA_PTR(a: *mut pg_sys::ArrayType) -> *mut u8 {
+    // #define ARR_DATA_PTR(a) \
+    // (((char *) (a)) + ARR_DATA_OFFSET(a))
+
+    a.cast::<u8>().add(ARR_DATA_OFFSET(a))
 }
 
 /**
@@ -51,11 +132,11 @@ PGX currently only intentionally supports 64-bit machines,
 and while support for ILP32 or I64LP128 C data models may become possible,
 PGX will **not** support 16-bit machines in any practical case, even though Rust does.
 
-[nonnull]: core::ptr::NonNull
+[nonnull]: NonNull
 */
 #[derive(Debug)]
 pub struct RawArray {
-    ptr: NonNull<ArrayType>,
+    ptr: NonNull<pg_sys::ArrayType>,
     len: usize,
 }
 
@@ -80,9 +161,9 @@ impl RawArray {
 
     [the std documentation]: core::ptr#safety
     */
-    pub unsafe fn from_ptr(ptr: NonNull<ArrayType>) -> RawArray {
+    pub unsafe fn from_ptr(ptr: NonNull<pg_sys::ArrayType>) -> RawArray {
         // SAFETY: Validity asserted by the caller.
-        let len = unsafe { pgx_ARR_NELEMS(ptr.as_ptr()) } as usize;
+        let len = unsafe { ARR_NELEMS(ptr.as_ptr()) } as usize;
         RawArray { ptr, len }
     }
 
@@ -92,13 +173,13 @@ impl RawArray {
     pub unsafe fn from_array<T: FromDatum>(arr: Array<T>) -> Option<RawArray> {
         let array_type = arr.into_array_type() as *mut _;
         // SAFETY: Validity asserted by the caller.
-        let len = unsafe { pgx_ARR_NELEMS(array_type) } as usize;
+        let len = unsafe { ARR_NELEMS(array_type) } as usize;
         Some(RawArray { ptr: NonNull::new(array_type)?, len })
     }
 
     /// Returns the inner raw pointer to the ArrayType.
     #[inline]
-    pub fn into_ptr(self) -> NonNull<ArrayType> {
+    pub fn into_ptr(self) -> NonNull<pg_sys::ArrayType> {
         self.ptr
     }
 
@@ -139,7 +220,7 @@ impl RawArray {
         */
         unsafe {
             let ndim = self.ndim() as usize;
-            slice::from_raw_parts(pgx_ARR_DIMS(self.ptr.as_ptr()), ndim)
+            slice::from_raw_parts(ARR_DIMS(self.ptr.as_ptr()), ndim)
         }
     }
 
@@ -182,7 +263,7 @@ impl RawArray {
     fn nulls_mut_ptr(&mut self) -> *mut u8 {
         // SAFETY: This isn't public for a reason: it's a maybe-null *mut BitSlice, which is easy to misuse.
         // Obtaining it, however, is perfectly safe.
-        unsafe { pgx_ARR_NULLBITMAP(self.ptr.as_ptr()) }
+        unsafe { ARR_NULLBITMAP(self.ptr.as_ptr()) }
     }
 
     #[inline]
@@ -289,7 +370,7 @@ impl RawArray {
     However, it should be noted that a len 0 slice may not be read via raw pointers.
 
     [MaybeUninit]: core::mem::MaybeUninit
-    [nonnull]: core::ptr::NonNull
+    [nonnull]: NonNull
     [ARR_DATA_PTR]: <https://git.postgresql.org/gitweb/?p=postgresql.git;a=blob;f=src/include/utils/array.h;h=4ae6c3be2f8b57afa38c19af2779f67c782e4efc;hb=278273ccbad27a8834dfdf11895da9cd91de4114#l315>
     */
     pub fn data<T>(&mut self) -> NonNull<[T]> {
@@ -310,7 +391,7 @@ impl RawArray {
         */
         unsafe {
             NonNull::new_unchecked(slice_from_raw_parts_mut(
-                pgx_ARR_DATA_PTR(self.ptr.as_ptr()).cast(),
+                ARR_DATA_PTR(self.ptr.as_ptr()).cast(),
                 self.len,
             ))
         }
@@ -322,7 +403,7 @@ impl RawArray {
         // SAFETY: Assertion made by caller
         unsafe {
             &*NonNull::new_unchecked(slice_from_raw_parts_mut(
-                pgx_ARR_DATA_PTR(self.ptr.as_ptr()).cast(),
+                ARR_DATA_PTR(self.ptr.as_ptr()).cast(),
                 self.len,
             ))
             .as_ptr()

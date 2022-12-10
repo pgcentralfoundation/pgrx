@@ -95,36 +95,6 @@ char *pgx_GETSTRUCT(HeapTuple tuple) {
     return GETSTRUCT(tuple);
 }
 
-PGDLLEXPORT char *pgx_ARR_DATA_PTR(ArrayType *arr);
-char *pgx_ARR_DATA_PTR(ArrayType *arr) {
-    return ARR_DATA_PTR(arr);
-}
-
-PGDLLEXPORT int pgx_ARR_NELEMS(ArrayType *arr);
-int pgx_ARR_NELEMS(ArrayType *arr) {
-    return ArrayGetNItems(arr->ndim, ARR_DIMS(arr));
-}
-
-PGDLLEXPORT bits8 *pgx_ARR_NULLBITMAP(ArrayType *arr);
-bits8 *pgx_ARR_NULLBITMAP(ArrayType *arr) {
-    return ARR_NULLBITMAP(arr);
-}
-
-PGDLLEXPORT int pgx_ARR_NDIM(ArrayType *arr);
-int pgx_ARR_NDIM(ArrayType *arr) {
-    return ARR_NDIM(arr);
-}
-
-PGDLLEXPORT bool pgx_ARR_HASNULL(ArrayType *arr);
-bool pgx_ARR_HASNULL(ArrayType *arr) {
-    return ARR_HASNULL(arr);
-}
-
-PGDLLEXPORT int *pgx_ARR_DIMS(ArrayType *arr);
-int *pgx_ARR_DIMS(ArrayType *arr){
-    return ARR_DIMS(arr);
-}
-
 PGDLLEXPORT void pgx_SpinLockInit(volatile slock_t *lock);
 void pgx_SpinLockInit(volatile slock_t *lock) {
     SpinLockInit(lock);
