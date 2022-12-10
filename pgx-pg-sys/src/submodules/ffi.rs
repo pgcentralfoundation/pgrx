@@ -14,13 +14,15 @@ Wrapping the FFI into Postgres enables
 But only the first of these is considered paramount.
 
 At all times PGX reserves the right to choose an implementation that achieves memory safety.
-Currently, this function is only used by PGX's generated Postgres bindings.
-It is not (yet) intended (or even necessary) for normal user code.
+Currently, this function is used to protect **every** bindgen-generated Postgres `extern "C"` function.
+
+Generally, the only time *you'll* need to use this function is when calling a Postgres-provided
+function pointer.
 
 # Safety
 
-This function should not be called from any thread but the main thread if such ever may throw an exception,
-on account of the postmaster ultimately being a single-threaded runtime.
+Postgres is a single-threaded runtime.  As such, [`pg_guard_ffi_boundary`] should **only** be called
+from the main thread.  In fact, [`pg_guard_ffi_boundary`] will detect this and immediately panic.
 
 More generally, Rust cannot guarantee destructors are always run, PGX is written in Rust code, and
 the implementation of `pg_guard_ffi_boundary` relies on help from Postgres, the OS, and the C runtime;
@@ -38,7 +40,7 @@ If you are manipulating transient "pure Rust" data, however, it is unlikely this
 
 # Implementation Note
 
-The main implementation uses`sigsetjmp`, [`pg_sys::error_context_stack`], and [`pg_sys::PG_exception_stack`].
+The main implementation uses `sigsetjmp`, [`pg_sys::error_context_stack`], and [`pg_sys::PG_exception_stack`].
 which, when Postgres enters its exception handling in `elog.c`, will prompt a `siglongjmp` back to it.
 
 This caught error is then converted into a Rust `panic!()` and propagated up the stack, ultimately
@@ -47,7 +49,7 @@ being converted into a transaction-aborting Postgres `ERROR` by PGX.
 **/
 #[inline(always)]
 #[track_caller]
-pub(crate) unsafe fn pg_guard_ffi_boundary<T, F: FnOnce() -> T>(f: F) -> T {
+pub unsafe fn pg_guard_ffi_boundary<T, F: FnOnce() -> T>(f: F) -> T {
     // SAFETY: Caller promises not to call us from anything but the main thread.
     unsafe { pg_guard_ffi_boundary_impl(f) }
 }
