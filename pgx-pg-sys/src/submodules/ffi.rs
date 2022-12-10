@@ -117,6 +117,9 @@ unsafe fn pg_guard_ffi_boundary_impl<T, F: FnOnce() -> T>(f: F) -> T {
             let detail = errdata.detail.is_null().then(|| None).unwrap_or_else(|| {
                 Some(CStr::from_ptr(errdata.detail).to_string_lossy().to_string())
             });
+            let hint = errdata.hint.is_null().then(|| None).unwrap_or_else(|| {
+                Some(CStr::from_ptr(errdata.hint).to_string_lossy().to_string())
+            });
             let funcname = errdata.funcname.is_null().then(|| None).unwrap_or_else(|| {
                 Some(CStr::from_ptr(errdata.funcname).to_string_lossy().to_string())
             });
@@ -140,6 +143,7 @@ unsafe fn pg_guard_ffi_boundary_impl<T, F: FnOnce() -> T>(f: F) -> T {
                     sqlerrcode,
                     message,
                     detail,
+                    hint,
                     location: ErrorReportLocation { file, funcname, line, col: 0 },
                 },
             }))
