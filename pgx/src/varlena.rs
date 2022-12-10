@@ -11,20 +11,34 @@ Use of this source code is governed by the MIT license that can be found in the 
 
 use crate::{pg_sys, PgBox};
 
-pub unsafe fn set_varsize(ptr: *mut pg_sys::varlena, len: i32) {
-    extern "C" {
-        fn pgx_SET_VARSIZE(ptr: *mut pg_sys::varlena, len: i32);
-    }
+#[inline(always)]
+pub unsafe fn set_varsize_4b(ptr: *mut pg_sys::varlena, len: i32) {
+    // #define SET_VARSIZE_4B(PTR,len) \
+    // 	(((varattrib_4b *) (PTR))->va_4byte.va_header = (((uint32) (len)) << 2))
 
-    pgx_SET_VARSIZE(ptr, len)
+    ptr.cast::<pg_sys::varattrib_4b>().as_mut().unwrap_unchecked().va_4byte.as_mut().va_header =
+        (len as u32) << 2;
 }
 
-pub unsafe fn set_varsize_short(ptr: *mut pg_sys::varlena, len: i32) {
-    extern "C" {
-        fn pgx_SET_VARSIZE_SHORT(ptr: *mut pg_sys::varlena, len: i32);
-    }
+#[inline(always)]
+pub unsafe fn set_varsize(ptr: *mut pg_sys::varlena, len: i32) {
+    // #define SET_VARSIZE(PTR, len)				SET_VARSIZE_4B(PTR, len)
+    set_varsize_4b(ptr, len)
+}
 
-    pgx_SET_VARSIZE_SHORT(ptr, len)
+#[inline(always)]
+pub unsafe fn set_varsize_1b(ptr: *mut pg_sys::varlena, len: i32) {
+    // #define SET_VARSIZE_1B(PTR,len) \
+    // 	(((varattrib_1b *) (PTR))->va_header = (((uint8) (len)) << 1) | 0x01)
+
+    ptr.cast::<pg_sys::varattrib_1b>().as_mut().unwrap_unchecked().va_header =
+        ((len as u8) << 1) | 0x01
+}
+
+#[inline(always)]
+pub unsafe fn set_varsize_short(ptr: *mut pg_sys::varlena, len: i32) {
+    //    #define SET_VARSIZE_SHORT(PTR, len)			SET_VARSIZE_1B(PTR, len)
+    set_varsize_1b(ptr, len)
 }
 
 /// ```c
