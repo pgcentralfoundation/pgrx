@@ -12,11 +12,8 @@ Use of this source code is governed by the MIT license that can be found in the 
 //! Primitive types can never be null, so we do a direct
 //! cast of the primitive type to pg_sys::Datum
 
-use crate::{
-    pg_sys, rust_byte_slice_to_bytea, rust_regtypein, rust_str_to_text_p, PgBox, PgOid,
-    WhoAllocated,
-};
-use pgx_pg_sys::Oid;
+use crate::{pg_sys, rust_regtypein, PgBox, PgOid, WhoAllocated};
+use pgx_pg_sys::{Datum, Oid};
 
 /// Convert a Rust type into a `pg_sys::Datum`.
 ///
@@ -236,12 +233,7 @@ impl IntoDatum for PgOid {
 impl<'a> IntoDatum for &'a str {
     #[inline]
     fn into_datum(self) -> Option<pg_sys::Datum> {
-        let varlena = rust_str_to_text_p(&self);
-        if varlena.is_null() {
-            None
-        } else {
-            Some(varlena.into_pg().into())
-        }
+        self.as_bytes().into_datum()
     }
 
     fn type_oid() -> u32 {
@@ -333,11 +325,31 @@ impl<'a> IntoDatum for &'a crate::cstr_core::CStr {
 impl<'a> IntoDatum for &'a [u8] {
     #[inline]
     fn into_datum(self) -> Option<pg_sys::Datum> {
-        let varlena = rust_byte_slice_to_bytea(&self);
-        if varlena.is_null() {
-            None
-        } else {
-            Some(varlena.into_pg().into())
+        let len = pg_sys::VARHDRSZ + self.len();
+        unsafe {
+            // SAFETY:  palloc gives us a valid pointer if if there's not enough memory it'll raise an error
+            let varlena = pg_sys::palloc(len) as *mut pg_sys::varlena;
+
+            // SAFETY: `varlena` can properly cast into a `varattrib_4b` and all of what it contains is properly
+            // allocated thanks to our call to `palloc` above
+            let varattrib_4b = varlena
+                .cast::<pg_sys::varattrib_4b>()
+                .as_mut()
+                .unwrap_unchecked()
+                .va_4byte
+                .as_mut();
+            varattrib_4b.va_header = <usize as TryInto<u32>>::try_into(len)
+                .expect("Rust string too large for a Postgres varlena datum")
+                << 2u32;
+
+            // SAFETY: src and dest pointers are valid and are exactly `self.len()` bytes long
+            std::ptr::copy_nonoverlapping(
+                self.as_ptr().cast(),
+                varattrib_4b.va_data.as_mut_ptr(),
+                self.len(),
+            );
+
+            Some(Datum::from(varlena))
         }
     }
 
