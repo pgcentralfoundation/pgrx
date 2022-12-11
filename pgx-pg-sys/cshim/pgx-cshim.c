@@ -27,12 +27,6 @@ Use of this source code is governed by the MIT license that can be found in the 
 #include "utils/array.h"
 #include "storage/spin.h"
 
-
-PGDLLEXPORT MemoryContext pgx_GetMemoryContextChunk(void *ptr);
-MemoryContext pgx_GetMemoryContextChunk(void *ptr) {
-    return GetMemoryChunkContext(ptr);
-}
-
 PGDLLEXPORT Datum pgx_heap_getattr(HeapTupleData *tuple, int attnum, TupleDesc tupdesc, bool *isnull);
 Datum pgx_heap_getattr(HeapTupleData *tuple, int attnum, TupleDesc tupdesc, bool *isnull) {
     return heap_getattr(tuple, attnum, tupdesc, isnull);
