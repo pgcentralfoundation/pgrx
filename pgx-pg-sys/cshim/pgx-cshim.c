@@ -27,21 +27,6 @@ Use of this source code is governed by the MIT license that can be found in the 
 #include "utils/array.h"
 #include "storage/spin.h"
 
-PGDLLEXPORT Datum pgx_heap_getattr(HeapTupleData *tuple, int attnum, TupleDesc tupdesc, bool *isnull);
-Datum pgx_heap_getattr(HeapTupleData *tuple, int attnum, TupleDesc tupdesc, bool *isnull) {
-    return heap_getattr(tuple, attnum, tupdesc, isnull);
-}
-
-PGDLLEXPORT TransactionId pgx_HeapTupleHeaderGetXmin(HeapTupleHeader htup_header);
-TransactionId pgx_HeapTupleHeaderGetXmin(HeapTupleHeader htup_header) {
-    return HeapTupleHeaderGetXmin(htup_header);
-}
-
-PGDLLEXPORT CommandId pgx_HeapTupleHeaderGetRawCommandId(HeapTupleHeader htup_header);
-CommandId pgx_HeapTupleHeaderGetRawCommandId(HeapTupleHeader htup_header) {
-    return HeapTupleHeaderGetRawCommandId(htup_header);
-}
-
 PGDLLEXPORT RangeTblEntry *pgx_planner_rt_fetch(Index index, PlannerInfo *plannerInfo);
 RangeTblEntry *pgx_planner_rt_fetch(Index index, PlannerInfo *root) {
     return planner_rt_fetch(index, root);

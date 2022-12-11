@@ -12,6 +12,7 @@ pub mod datum;
 pub mod elog;
 pub mod errcodes;
 pub mod ffi;
+pub mod htup;
 pub mod oids;
 pub mod panic;
 pub mod pg_try;
