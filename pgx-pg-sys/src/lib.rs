@@ -267,6 +267,8 @@ mod all_versions {
     use memoffset::*;
     use std::str::FromStr;
 
+    pub use crate::submodules::htup::*;
+
     /// this comes from `postgres_ext.h`
     pub const InvalidOid: super::Oid = 0;
     pub const InvalidOffsetNumber: super::OffsetNumber = 0;
@@ -363,74 +365,6 @@ mod all_versions {
         range_table: *mut super::List,
     ) -> *mut super::RangeTblEntry {
         pgx_list_nth(range_table, index as i32 - 1) as *mut super::RangeTblEntry
-    }
-
-    #[inline]
-    pub fn HeapTupleHeaderGetXmin(
-        htup_header: super::HeapTupleHeader,
-    ) -> Option<super::TransactionId> {
-        extern "C" {
-            pub fn pgx_HeapTupleHeaderGetXmin(
-                htup_header: super::HeapTupleHeader,
-            ) -> super::TransactionId;
-        }
-
-        if htup_header.is_null() {
-            None
-        } else {
-            Some(unsafe { pgx_HeapTupleHeaderGetXmin(htup_header) })
-        }
-    }
-
-    #[inline]
-    pub fn HeapTupleHeaderGetRawCommandId(
-        htup_header: super::HeapTupleHeader,
-    ) -> Option<super::CommandId> {
-        extern "C" {
-            pub fn pgx_HeapTupleHeaderGetRawCommandId(
-                htup_header: super::HeapTupleHeader,
-            ) -> super::CommandId;
-        }
-
-        if htup_header.is_null() {
-            None
-        } else {
-            Some(unsafe { pgx_HeapTupleHeaderGetRawCommandId(htup_header) })
-        }
-    }
-
-    /// #define HeapTupleHeaderIsHeapOnly(tup) \
-    ///    ( \
-    ///       ((tup)->t_infomask2 & HEAP_ONLY_TUPLE) != 0 \
-    ///    )
-    #[inline]
-    pub unsafe fn HeapTupleHeaderIsHeapOnly(htup_header: super::HeapTupleHeader) -> bool {
-        ((*htup_header).t_infomask2 & crate::HEAP_ONLY_TUPLE as u16) != 0
-    }
-
-    /// #define HeapTupleHeaderIsHotUpdated(tup) \
-    /// ( \
-    ///      ((tup)->t_infomask2 & HEAP_HOT_UPDATED) != 0 && \
-    ///      ((tup)->t_infomask & HEAP_XMAX_INVALID) == 0 && \
-    ///      !HeapTupleHeaderXminInvalid(tup) \
-    /// )
-    #[inline]
-    pub unsafe fn HeapTupleHeaderIsHotUpdated(htup_header: super::HeapTupleHeader) -> bool {
-        (*htup_header).t_infomask2 & crate::HEAP_HOT_UPDATED as u16 != 0
-            && (*htup_header).t_infomask & crate::HEAP_XMAX_INVALID as u16 == 0
-            && !HeapTupleHeaderXminInvalid(htup_header)
-    }
-
-    /// #define HeapTupleHeaderXminInvalid(tup) \
-    /// ( \
-    ///   ((tup)->t_infomask & (HEAP_XMIN_COMMITTED|HEAP_XMIN_INVALID)) == \
-    ///      HEAP_XMIN_INVALID \
-    /// )
-    #[inline]
-    pub unsafe fn HeapTupleHeaderXminInvalid(htup_header: super::HeapTupleHeader) -> bool {
-        (*htup_header).t_infomask
-            & (crate::HEAP_XMIN_COMMITTED as u16 | crate::HEAP_XMIN_INVALID as u16)
-            == crate::HEAP_XMIN_INVALID as u16
     }
 
     /// #define BufferGetPage(buffer) ((Page)BufferGetBlock(buffer))
