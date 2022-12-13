@@ -21,8 +21,34 @@ function pointer.
 
 # Safety
 
-Postgres is a single-threaded runtime.  As such, [`pg_guard_ffi_boundary`] should **only** be called
-from the main thread.  In fact, [`pg_guard_ffi_boundary`] will detect this and immediately panic.
+It is undefined behavior if the function passed to `pg_guard_ffi_boundary` have objects with
+destructors on the stack when postgres raises an `ERROR`. For example, the following is
+both a resource leak, and undefined behavior (as it needs to be a [trivially-deallocated
+stack frame]):
+
+```rust,ignore
+// This is UB!
+pgx::pg_sys::ffi::pg_guard_ffi_boundary(|| {
+    let data = vec![1, 2, 3, 4, 5];
+    // call FFI function that raises an ERROR
+});
+```
+Instead, you should write it like
+```rust,ignore
+let data = vec![1, 2, 3, 4, 5];
+pgx::pg_sys::ffi::pg_guard_ffi_boundary(|| {
+    // call FFI function that raises an ERROR
+});
+```
+
+Further, it is undefined behavior if the function passed into `pg_guard_ffi_boundary` panics. It
+is recommended that you keepthe body of the `pg_guard_ffi_boundary` closure very small -- ideally
+*only* containing a call to some C function, rather than containing any logic or variables of its
+own.
+
+Furthermore, Postgres is a single-threaded runtime.  As such, [`pg_guard_ffi_boundary`] should
+**only** be called from the main thread.  In fact, [`pg_guard_ffi_boundary`] will detect this
+and immediately panic.
 
 More generally, Rust cannot guarantee destructors are always run, PGX is written in Rust code, and
 the implementation of `pg_guard_ffi_boundary` relies on help from Postgres, the OS, and the C runtime;
@@ -46,6 +72,7 @@ which, when Postgres enters its exception handling in `elog.c`, will prompt a `s
 This caught error is then converted into a Rust `panic!()` and propagated up the stack, ultimately
 being converted into a transaction-aborting Postgres `ERROR` by PGX.
 
+[trivially-deallocated stack frame]: https://github.com/rust-lang/rfcs/blob/master/text/2945-c-unwind-abi.md#plain-old-frames
 **/
 #[inline(always)]
 #[track_caller]
