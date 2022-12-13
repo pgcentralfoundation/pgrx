@@ -158,21 +158,21 @@ pub trait SubTransactionExt {
     ///
     /// In most common cases, it'll be equal to `Self`. However, in some cases
     /// it may be desirable to use a different type to achieve certain goals.
-    type T: SubTransactionExt;
+    type Parent: SubTransactionExt;
 
     /// Consume `self` and execute a closure with a sub-transaction
     ///
     /// If further use of the given sub-transaction is necessary, it must
     /// be returned by the closure alongside with its intended result. Otherwise,
     /// the sub-transaction be released when dropped.
-    fn sub_transaction<F: FnOnce(SubTransaction<Self::T>) -> R, R>(self, f: F) -> R
+    fn sub_transaction<F: FnOnce(SubTransaction<Self::Parent>) -> R, R>(self, f: F) -> R
     where
         Self: Sized;
 }
 
 impl<'a> SubTransactionExt for SpiClient<'a> {
-    type T = Self;
-    fn sub_transaction<F: FnOnce(SubTransaction<Self::T>) -> R, R>(self, f: F) -> R
+    type Parent = Self;
+    fn sub_transaction<F: FnOnce(SubTransaction<Self::Parent>) -> R, R>(self, f: F) -> R
     where
         Self: Sized,
     {
@@ -181,8 +181,8 @@ impl<'a> SubTransactionExt for SpiClient<'a> {
 }
 
 impl<Parent: SubTransactionExt> SubTransactionExt for SubTransaction<Parent> {
-    type T = Self;
-    fn sub_transaction<F: FnOnce(SubTransaction<Self::T>) -> R, R>(self, f: F) -> R
+    type Parent = Self;
+    fn sub_transaction<F: FnOnce(SubTransaction<Self::Parent>) -> R, R>(self, f: F) -> R
     where
         Self: Sized,
     {
