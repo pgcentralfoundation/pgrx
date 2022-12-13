@@ -141,6 +141,7 @@ pub trait Query {
 
     fn execute(
         self,
+        client: &SpiClient,
         read_only: bool,
         limit: Option<i64>,
         arguments: Self::Arguments,
@@ -159,11 +160,12 @@ impl<'a> Query for &'a String {
 
     fn execute(
         self,
+        client: &SpiClient,
         read_only: bool,
         limit: Option<i64>,
         arguments: Self::Arguments,
     ) -> Self::Result {
-        self.as_str().execute(read_only, limit, arguments)
+        self.as_str().execute(client, read_only, limit, arguments)
     }
 
     fn open_cursor<'c: 'cc, 'cc>(
@@ -181,6 +183,7 @@ impl<'a> Query for &'a str {
 
     fn execute(
         self,
+        _client: &SpiClient,
         read_only: bool,
         limit: Option<i64>,
         arguments: Self::Arguments,
@@ -476,7 +479,7 @@ impl<'a> SpiClient<'a> {
         limit: Option<i64>,
         args: Q::Arguments,
     ) -> Q::Result {
-        query.execute(read_only, limit, args)
+        query.execute(&self, read_only, limit, args)
     }
 
     fn prepare_tuple_table(status_code: i32) -> SpiTupleTable {
@@ -665,11 +668,12 @@ impl<'a> Query for &'a OwnedPreparedStatement {
 
     fn execute(
         self,
+        client: &SpiClient,
         read_only: bool,
         limit: Option<i64>,
         arguments: Self::Arguments,
     ) -> Self::Result {
-        (&self.0).execute(read_only, limit, arguments)
+        (&self.0).execute(client, read_only, limit, arguments)
     }
 
     fn open_cursor<'c: 'cc, 'cc>(
@@ -687,11 +691,12 @@ impl Query for OwnedPreparedStatement {
 
     fn execute(
         self,
+        client: &SpiClient,
         read_only: bool,
         limit: Option<i64>,
         arguments: Self::Arguments,
     ) -> Self::Result {
-        (&self.0).execute(read_only, limit, arguments)
+        (&self.0).execute(client, read_only, limit, arguments)
     }
 
     fn open_cursor<'c: 'cc, 'cc>(
@@ -721,6 +726,7 @@ impl<'a: 'b, 'b> Query for &'b PreparedStatement<'a> {
 
     fn execute(
         self,
+        _client: &SpiClient,
         read_only: bool,
         limit: Option<i64>,
         arguments: Self::Arguments,
@@ -813,11 +819,12 @@ impl<'a> Query for PreparedStatement<'a> {
 
     fn execute(
         self,
+        client: &SpiClient,
         read_only: bool,
         limit: Option<i64>,
         arguments: Self::Arguments,
     ) -> Self::Result {
-        (&self).execute(read_only, limit, arguments)
+        (&self).execute(client, read_only, limit, arguments)
     }
 
     fn open_cursor<'c: 'cc, 'cc>(
