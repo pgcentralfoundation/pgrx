@@ -10,24 +10,19 @@ Use of this source code is governed by the MIT license that can be found in the 
 //! A safe wrapper around Postgres `StringInfo` structure
 #![allow(dead_code, non_snake_case)]
 
-use crate::{pg_sys, void_mut_ptr};
+use crate::{pg_sys, AllocatedByPostgres, AllocatedByRust, PgBox, WhoAllocated};
+use core::fmt::{Display, Formatter};
+use core::str::Utf8Error;
 use std::io::Error;
 
 /// StringInfoData holds information about an extensible string that is allocated by Postgres'
 /// memory system, but generally follows Rust's drop semantics
-pub struct StringInfo {
-    sid: pg_sys::StringInfo,
-    needs_pfree: bool,
+pub struct StringInfo<AllocatedBy: WhoAllocated = AllocatedByRust> {
+    inner: PgBox<pg_sys::StringInfoData, AllocatedBy>,
 }
 
-impl From<StringInfo> for pg_sys::StringInfo {
-    fn from(val: StringInfo) -> Self {
-        val.sid
-    }
-}
-
-impl From<StringInfo> for &'static std::ffi::CStr {
-    fn from(val: StringInfo) -> Self {
+impl<AllocatedBy: WhoAllocated> From<StringInfo<AllocatedBy>> for &'static std::ffi::CStr {
+    fn from(val: StringInfo<AllocatedBy>) -> Self {
         let len = val.len();
         let ptr = val.into_char_ptr();
 
@@ -40,8 +35,8 @@ impl From<StringInfo> for &'static std::ffi::CStr {
     }
 }
 
-impl From<StringInfo> for &'static crate::cstr_core::CStr {
-    fn from(val: StringInfo) -> Self {
+impl<AllocatedBy: WhoAllocated> From<StringInfo<AllocatedBy>> for &'static crate::cstr_core::CStr {
+    fn from(val: StringInfo<AllocatedBy>) -> Self {
         let len = val.len();
         let ptr = val.into_char_ptr();
 
@@ -54,7 +49,7 @@ impl From<StringInfo> for &'static crate::cstr_core::CStr {
     }
 }
 
-impl std::io::Write for StringInfo {
+impl<AllocatedBy: WhoAllocated> std::io::Write for StringInfo<AllocatedBy> {
     fn write(&mut self, buf: &[u8]) -> Result<usize, Error> {
         self.push_bytes(buf);
         Ok(buf.len())
@@ -65,51 +60,64 @@ impl std::io::Write for StringInfo {
     }
 }
 
-impl ToString for StringInfo {
-    fn to_string(&self) -> String {
-        unsafe { std::str::from_utf8_unchecked(self.as_bytes()).to_owned() }
+impl<AllocatedBy: WhoAllocated> Display for StringInfo<AllocatedBy> {
+    /// Convert this [`StringInfo`] into a Rust string.  This uses [`String::from_utf8_lossy`] as
+    /// it's fine for a Postgres [`StringInfo`] to contain null bytes and also not even be proper
+    /// UTF8.
+    fn fmt(&self, f: &mut Formatter<'_>) -> core::fmt::Result {
+        f.write_str(&String::from_utf8_lossy(self.as_bytes()))
     }
 }
 
-impl StringInfo {
-    /// Construct a new `StringInfo` of its default size, allocated by Postgres in `CurrentMemoryContext`
+impl StringInfo<AllocatedByRust> {
+    /// Construct a new `StringInfo` of its default size, allocated in `CurrentMemoryContext`
     ///
-    /// Unless `.into_pg()` or `.into_char_ptr()` are called, memory management of
-    /// this `StringInfo` follow Rust's drop semantics.
+    /// Note that Postgres can only represent up to 1 gigabyte of data in a `StringInfo`
     pub fn new() -> Self {
-        StringInfo { sid: unsafe { pg_sys::makeStringInfo() }, needs_pfree: true }
+        StringInfo {
+            inner: unsafe {
+                // SAFETY: makeStringInfo() always returns a valid StringInfoData pointer.  It'll
+                // ereport if it can't
+                PgBox::<_, AllocatedByRust>::from_rust(pg_sys::makeStringInfo())
+            },
+        }
     }
 
     /// Construct a new `StringInfo`, allocated by Postgres in `CurrentMemoryContext`, ensuring it
     /// has a capacity of the specified `len`.
     ///
     /// Note that Postgres can only represent up to 1 gigabyte of data in a `StringInfo`
-    ///
-    /// Unless `.into_pg()` or `.into_char_ptr()` are called, memory management of
-    /// this `StringInfo` follow Rust's drop semantics.
-    pub fn with_capacity(len: usize) -> Self {
+    pub fn with_capacity(len: i32) -> Self {
         let mut si = StringInfo::default();
         si.enlarge(len);
         si
     }
+}
 
+impl StringInfo<AllocatedByPostgres> {
     /// Construct a `StringInfo` from a Postgres-allocated `pg_sys::StringInfo`.
     ///
     /// The backing `pg_sys::StringInfo` structure will be freed whenever the memory context in which
     /// it was originally allocated is reset.
-    pub fn from_pg(sid: pg_sys::StringInfo) -> Option<Self> {
+    ///
+    /// # Safety
+    ///
+    /// This function is unsafe as it cannot confirm the provided [`pg_sys::StringInfo`] pointer is
+    /// valid
+    pub unsafe fn from_pg(sid: pg_sys::StringInfo) -> Option<Self> {
         if sid.is_null() {
             None
         } else {
-            Some(StringInfo { sid, needs_pfree: false })
+            Some(StringInfo { inner: PgBox::from_pg(sid) })
         }
     }
+}
 
+impl<AllocatedBy: WhoAllocated> StringInfo<AllocatedBy> {
     /// What is the length, excluding the trailing null byte
     #[inline]
     pub fn len(&self) -> usize {
-        // safe:  self.sid will never be null
-        unsafe { &mut *self.sid }.len as usize
+        self.inner.len as _
     }
 
     /// Do we have any characters?
@@ -131,26 +139,36 @@ impl StringInfo {
         self.push_bytes(s.as_bytes())
     }
 
-    /// Push arbitrary bytes onto the end.  Any byte sequence is allowed, include those with
+    /// Push arbitrary bytes onto the end.  Any byte sequence is allowed, including those with
     /// embedded NULLs
+    ///
+    /// # Panics
+    ///
+    /// This function will panic if the length of bytes is larger than an `i32`
     #[inline]
     pub fn push_bytes(&mut self, bytes: &[u8]) {
-        // safe:  self.sid will never be null
         unsafe {
+            // SAFETY:  self.inner will always be valid
             pg_sys::appendBinaryStringInfo(
-                self.sid,
-                bytes.as_ptr() as *const std::os::raw::c_char,
-                bytes.len() as i32,
+                self.inner.as_ptr(),
+                bytes.as_ptr() as _,
+                bytes.len().try_into().expect("len of bytes doesn't fit in an i32"),
             )
         }
     }
 
     /// Push the bytes behind a raw pointer of a given length onto the end
+    ///
+    /// # Safety
+    ///
+    /// This function is unsafe as we cannot ensure the specified `ptr` and `len` arguments
+    /// are what you say that are and otherwise in agreement
     #[inline]
-    pub fn push_raw(&mut self, ptr: void_mut_ptr, len: usize) {
-        // safe:  self.sid will never be null
+    pub unsafe fn push_raw(&mut self, ptr: *const std::os::raw::c_char, len: i32) {
         unsafe {
-            pg_sys::appendBinaryStringInfo(self.sid, ptr as *const std::os::raw::c_char, len as i32)
+            // SAFETY:  self.inner will always be a valid StringInfoData pointer
+            // and the caller gets to decide if `ptr` and `len` line up
+            pg_sys::appendBinaryStringInfo(self.inner.as_ptr(), ptr, len)
         }
     }
 
@@ -158,83 +176,102 @@ impl StringInfo {
     /// previously-allocated memory
     #[inline]
     pub fn reset(&mut self) {
-        // safe:  self.sid will never be null
-        unsafe { pg_sys::resetStringInfo(self.sid) }
+        unsafe {
+            // SAFETY:  self.inner will always be a valid StringInfoData pointer
+            pg_sys::resetStringInfo(self.inner.as_ptr())
+        }
     }
 
     /// Ensure that this `StringInfo` is at least `needed` bytes long
     #[inline]
-    pub fn enlarge(&mut self, needed: usize) {
-        // safe:  self.sid will never be null
-        unsafe { pg_sys::enlargeStringInfo(self.sid, needed as i32) }
+    pub fn enlarge(&mut self, needed: i32) {
+        unsafe {
+            // SAFETY:  self.inner will always be a valid StringInfoData pointer
+            pg_sys::enlargeStringInfo(self.inner.as_ptr(), needed)
+        }
     }
 
-    /// A pointer representation
+    /// A `&str` representation.
+    ///
+    /// # Errors
+    ///
+    /// If the contained bytes aren't valid UTF8, a [UTF8Error] is returned.  Postgres StringInfo
+    /// is allowed to contain non-UTF8 byte sequences, so this is a real possibility.
     #[inline]
-    pub fn as_ptr(&self) -> *mut std::os::raw::c_char {
-        // safe:  self.sid will never be null
-        unsafe { (*self.sid).data }
+    pub fn as_str(&self) -> Result<&str, Utf8Error> {
+        std::str::from_utf8(self.as_bytes())
+    }
+
+    /// A pointer to the backing bytes
+    #[inline]
+    pub fn as_ptr(&self) -> *const std::os::raw::c_char {
+        self.inner.data
+    }
+
+    /// A mutable pointer to the backing bytes
+    #[inline]
+    pub fn as_mut_ptr(&self) -> *mut std::os::raw::c_char {
+        self.inner.data
     }
 
     /// A `&[u8]` byte slice representation
     #[inline]
     pub fn as_bytes(&self) -> &[u8] {
-        // safe:  self.sid will never be null
         unsafe {
-            if (*self.sid).data.is_null() {
-                return &[];
-            }
-
-            std::slice::from_raw_parts((*self.sid).data as *const u8, self.len())
+            // SAFETY:  self.inner will always be a valid StringInfoData pointer, and Postgres will
+            // never have self.inner.data be invalid
+            std::slice::from_raw_parts(self.inner.data as *const u8, self.len())
         }
     }
 
     /// A mutable `&[u8]` byte slice representation
     #[inline]
     pub fn as_bytes_mut(&mut self) -> &mut [u8] {
-        // safe:  self.sid will never be null
         unsafe {
-            if (*self.sid).data.is_null() {
-                return &mut [];
-            }
-
-            std::slice::from_raw_parts_mut((*self.sid).data as *mut u8, self.len())
+            // SAFETY:  self.inner will always be a valid StringInfoData
+            // pointer, and Postgres will never have self.inner.data be invalid
+            std::slice::from_raw_parts_mut(self.inner.data as *mut u8, self.len())
         }
     }
 
     /// Convert this `StringInfo` into one that is wholly owned and now managed by Postgres
     #[inline]
     pub fn into_pg(mut self) -> *mut pg_sys::StringInfoData {
-        self.needs_pfree = false;
-        self.sid
+        // NB:  We are replacing self.inner with a PgBox containing the null pointer.  However,
+        // `self` will be dropped as soon as this function ends and we account for this case in our
+        // drop implementation
+        let inner = std::mem::replace(&mut self.inner, PgBox::<_, AllocatedBy>::null());
+        inner.into_pg()
     }
 
     /// Convert this `StringInfo` into a `"char *"` that is wholly owned and now managed by Postgres
     #[inline]
-    pub fn into_char_ptr(mut self) -> *const std::os::raw::c_char {
-        self.needs_pfree = false;
-        // safe:  self.sid will never be null
+    pub fn into_char_ptr(self) -> *const std::os::raw::c_char {
+        // in case we're AllocatedByRust, we don't want drop to free `self.inner.data` now that we've
+        // consumed `self` and are returning a raw pointer to some memory we allocated, so we "round-trip"
+        // to ensure Rust thinks we're now `AllocatedByPostgres`, which has an empty drop impl
+        let sid_ptr = self.into_pg();
         unsafe {
-            let ptr = (*self.sid).data;
-            (&mut *self.sid).data = std::ptr::null_mut();
-            ptr as *const std::os::raw::c_char
+            // SAFETY: we just made the StringInfoData pointer so we know it's valid and properly
+            // initialized throughout
+            sid_ptr.as_ref().unwrap_unchecked().data
         }
     }
 }
 
-impl Default for StringInfo {
+impl Default for StringInfo<AllocatedByRust> {
     fn default() -> Self {
         Self::new()
     }
 }
 
-impl From<String> for StringInfo {
+impl From<String> for StringInfo<AllocatedByRust> {
     fn from(s: String) -> Self {
         StringInfo::from(s.as_str())
     }
 }
 
-impl From<&str> for StringInfo {
+impl From<&str> for StringInfo<AllocatedByRust> {
     fn from(s: &str) -> Self {
         let mut rc = StringInfo::new();
         rc.push_str(s);
@@ -242,7 +279,7 @@ impl From<&str> for StringInfo {
     }
 }
 
-impl From<Vec<u8>> for StringInfo {
+impl From<Vec<u8>> for StringInfo<AllocatedByRust> {
     fn from(v: Vec<u8>) -> Self {
         let mut rc = StringInfo::new();
         rc.push_bytes(v.as_slice());
@@ -250,7 +287,7 @@ impl From<Vec<u8>> for StringInfo {
     }
 }
 
-impl From<&[u8]> for StringInfo {
+impl From<&[u8]> for StringInfo<AllocatedByRust> {
     fn from(v: &[u8]) -> Self {
         let mut rc = StringInfo::new();
         rc.push_bytes(v);
@@ -258,17 +295,16 @@ impl From<&[u8]> for StringInfo {
     }
 }
 
-impl Drop for StringInfo {
+impl<AllocatedBy: WhoAllocated> Drop for StringInfo<AllocatedBy> {
     fn drop(&mut self) {
-        // we only pfree our internal pointers if we weren't constructed from a/// mut pg_sys::StringInfo
-        // given to us from Postgres
-        if self.needs_pfree {
-            // safe:  self.sid will never be null
-            unsafe {
-                if !(*self.sid).data.is_null() {
-                    pg_sys::pfree((*self.sid).data as void_mut_ptr);
-                }
-                pg_sys::pfree(self.sid as void_mut_ptr);
+        unsafe {
+            // SAFETY:  self.inner could represent the null pointer, but if it doesn't, then it's
+            // one we can use as self.inner.data will always be allocated if self.inner is.
+            //
+            // It's also prescribed by Postgres that to fully deallocate a StringInfo pointer, the
+            // owner is responsible for freeing its .data member... and that's us
+            if !self.inner.is_null() {
+                AllocatedBy::maybe_pfree(self.inner.data.cast())
             }
         }
     }
