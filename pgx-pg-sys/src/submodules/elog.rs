@@ -406,7 +406,7 @@ macro_rules! ereport {
 
     ($loglevel:expr, $errcode:expr, $message:expr, $detail:expr) => {
         $crate::panic::ErrorReport::new($errcode, $message, $crate::function_name!())
-            .detail($detail)
+            .set_detail($detail)
             .report($loglevel);
     };
 }

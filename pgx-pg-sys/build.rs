@@ -583,6 +583,13 @@ fn run_bindgen(pg_config: &PgConfig, include_h: &PathBuf) -> eyre::Result<syn::F
         .blocklist_function("(?:query|expression)_tree_walker")
         .blocklist_function(".*(?:set|long)jmp")
         .blocklist_function("pg_re_throw")
+        .blocklist_function("errstart")
+        .blocklist_function("errcode")
+        .blocklist_function("errmsg")
+        .blocklist_function("errdetail")
+        .blocklist_function("errcontext_msg")
+        .blocklist_function("errhint")
+        .blocklist_function("errfinish")
         .blocklist_item("CONFIGURE_ARGS") // configuration during build is hopefully irrelevant
         .blocklist_item("_*(?:HAVE|have)_.*") // header tracking metadata
         .blocklist_item("_[A-Z_]+_H") // more header metadata
