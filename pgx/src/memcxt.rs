@@ -185,7 +185,11 @@ impl Drop for OwnedMemoryContext {
             pub fn pgx_MemoryContextIsValid(context: pg_sys::MemoryContext) -> bool;
         }
 
-        unsafe fn switch_context(
+        // Detects if the context needs to be switched (if the context itself or a child
+        // of it is current)
+        //
+        // Returns a context to switch to.
+        unsafe fn context_to_switch_to(
             cxt: pg_sys::MemoryContext,
             previous: pg_sys::MemoryContext,
         ) -> Option<pg_sys::MemoryContext> {
@@ -208,7 +212,7 @@ impl Drop for OwnedMemoryContext {
                 // them to the previous context of this context and proceed with the deletion.
                 let mut child = (*cxt).firstchild;
                 while !child.is_null() {
-                    if let Some(switch_to) = switch_context(child, previous) {
+                    if let Some(switch_to) = context_to_switch_to(child, previous) {
                         return Some(switch_to);
                     }
                     child = (*child).nextchild;
@@ -220,7 +224,7 @@ impl Drop for OwnedMemoryContext {
         unsafe {
             // In order to prevent failing Postgres assumption and assertion, if we're trying to drop
             // a context that is current (or a child of it is current), switch to its predecessor, and then drop it.
-            if let Some(switch_to) = switch_context(self.owned, self.previous) {
+            if let Some(switch_to) = context_to_switch_to(self.owned, self.previous) {
                 pg_sys::CurrentMemoryContext = switch_to;
             }
 
