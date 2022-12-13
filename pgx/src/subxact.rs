@@ -1,5 +1,5 @@
 use crate::{pg_sys, PgMemoryContexts, SpiClient};
-use std::fmt::{Debug, Formatter};
+use std::fmt::Debug;
 use std::ops::Deref;
 
 /// Sub-transaction
@@ -9,6 +9,7 @@ use std::ops::Deref;
 ///
 /// Unless rolled back or committed explicitly, it'll commit if `COMMIT` generic parameter is `true`
 /// (default) or roll back if it is `false`.
+#[derive(Debug)]
 pub struct SubTransaction<Parent: SubTransactionExt, const COMMIT: bool = true> {
     memory_context: pg_sys::MemoryContext,
     resource_owner: pg_sys::ResourceOwner,
@@ -19,12 +20,6 @@ pub struct SubTransaction<Parent: SubTransactionExt, const COMMIT: bool = true> 
     // on the drop of the original value.
     should_release: bool,
     parent: Option<Parent>,
-}
-
-impl<Parent: SubTransactionExt, const COMMIT: bool> Debug for SubTransaction<Parent, COMMIT> {
-    fn fmt(&self, f: &mut Formatter<'_>) -> std::fmt::Result {
-        f.write_str(std::any::type_name::<Self>())
-    }
 }
 
 impl<Parent: SubTransactionExt, const COMMIT: bool> SubTransaction<Parent, COMMIT> {
