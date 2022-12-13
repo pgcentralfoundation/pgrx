@@ -34,7 +34,8 @@ impl Clone for PallocdVarlena {
         // SAFETY:  we know that `self.ptr` is valid as the only way we could have gotten one
         // is internally via Postgres
         let ptr = unsafe {
-            PgMemoryContexts::Of(self.ptr as void_mut_ptr)
+            PgMemoryContexts::of(self.ptr as void_mut_ptr)
+                .expect("could not determine owning memory context")
                 .copy_ptr_into(self.ptr as void_mut_ptr, len) as *mut pg_sys::varlena
         };
 

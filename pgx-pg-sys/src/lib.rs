@@ -307,6 +307,103 @@ mod all_versions {
         (*tuple).t_data.cast::<std::os::raw::c_char>().add((*(*tuple).t_data).t_hoff as _)
     }
 
+    //
+    // TODO: [`TYPEALIGN`] and [`MAXALIGN`] are also part of PR #948 and when that's all merged,
+    //       their uses should be switched to these
+    //
+
+    #[allow(non_snake_case)]
+    #[inline(always)]
+    pub const unsafe fn TYPEALIGN(alignval: usize, len: usize) -> usize {
+        // #define TYPEALIGN(ALIGNVAL,LEN)  \
+        // (((uintptr_t) (LEN) + ((ALIGNVAL) - 1)) & ~((uintptr_t) ((ALIGNVAL) - 1)))
+        ((len) + ((alignval) - 1)) & !((alignval) - 1)
+    }
+
+    #[allow(non_snake_case)]
+    #[inline(always)]
+    pub const unsafe fn MAXALIGN(len: usize) -> usize {
+        // #define MAXALIGN(LEN) TYPEALIGN(MAXIMUM_ALIGNOF, (LEN))
+        TYPEALIGN(pg_sys::MAXIMUM_ALIGNOF as _, len)
+    }
+
+    ///  Given a currently-allocated chunk of Postgres allocated memory, determine the context
+    ///  it belongs to.
+    ///
+    /// All chunks allocated by any memory context manager are required to be
+    /// preceded by the corresponding MemoryContext stored, without padding, in the
+    /// preceding sizeof(void*) bytes.  A currently-allocated chunk must contain a
+    /// backpointer to its owning context.  The backpointer is used by pfree() and
+    /// repalloc() to find the context to call.
+    ///
+    /// # Safety
+    ///
+    /// The specified `pointer` **must** be one allocated by Postgres (via [`palloc`] and friends).
+    ///
+    ///
+    /// # Panics
+    ///
+    /// This function will panic if `pointer` is null, if it's not properly aligned, or if the memory
+    /// it points do doesn't have the a header that looks like a memory context pointer
+    #[allow(non_snake_case)]
+    pub unsafe fn GetMemoryContextChunk(
+        pointer: *mut std::os::raw::c_void,
+    ) -> pg_sys::MemoryContext {
+        /*
+         * Try to detect bogus pointers handed to us, poorly though we can.
+         * Presumably, a pointer that isn't MAXALIGNED isn't pointing at an
+         * allocated chunk.
+         */
+        assert!(!pointer.is_null());
+        assert_eq!(pointer, MAXALIGN(pointer as usize) as *mut ::std::os::raw::c_void);
+
+        /*
+         * OK, it's probably safe to look at the context.
+         */
+        // 	context = *(MemoryContext *) (((char *) pointer) - sizeof(void *));
+        let context = unsafe {
+            // SAFETY: the caller has assured us that `pointer` points to palloc'd memory, which
+            // means it'll have this header before it
+            *(pointer
+                .cast::<::std::os::raw::c_char>()
+                .sub(std::mem::size_of::<*mut ::std::os::raw::c_void>())
+                .cast())
+        };
+
+        assert!(MemoryContextIsValid(context));
+
+        context
+    }
+
+    /// Returns true if memory context is valid, as Postgres determines such a thing.
+    ///
+    /// # Safety
+    ///
+    /// Caller must determine that the specified `context` pointer, if it's probably a [`MemoryContextData`]
+    /// pointer, really is.  This function is a best effort, not a guarantee.
+    ///
+    /// # Implementation Note
+    ///
+    /// If Postgres adds more memory context types in the future, we need to do that here too.
+    #[allow(non_snake_case)]
+    #[inline(always)]
+    pub unsafe fn MemoryContextIsValid(context: *mut crate::MemoryContextData) -> bool {
+        // #define MemoryContextIsValid(context) \
+        // 	((context) != NULL && \
+        // 	 (IsA((context), AllocSetContext) || \
+        // 	  IsA((context), SlabContext) || \
+        // 	  IsA((context), GenerationContext)))
+
+        !context.is_null()
+            && unsafe {
+                // SAFETY:  we just determined that context isn't null, so it's safe to `.as_ref()`
+                // and `.unwrap_unchecked()`
+                (*context).type_ == crate::NodeTag_T_AllocSetContext
+                    || (*context).type_ == crate::NodeTag_T_SlabContext
+                    || (*context).type_ == crate::NodeTag_T_GenerationContext
+            }
+    }
+
     #[inline]
     pub fn VARHDRSZ_EXTERNAL() -> usize {
         offset_of!(super::varattrib_1b_e, va_data)

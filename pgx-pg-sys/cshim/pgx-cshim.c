@@ -27,12 +27,6 @@ Use of this source code is governed by the MIT license that can be found in the 
 #include "utils/array.h"
 #include "storage/spin.h"
 
-
-PGDLLEXPORT MemoryContext pgx_GetMemoryContextChunk(void *ptr);
-MemoryContext pgx_GetMemoryContextChunk(void *ptr) {
-    return GetMemoryChunkContext(ptr);
-}
-
 PGDLLEXPORT void pgx_elog(int32 level, char *message);
 void pgx_elog(int32 level, char *message) {
     elog(level, "%s", message);
