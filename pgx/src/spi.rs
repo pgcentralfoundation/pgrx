@@ -145,6 +145,8 @@ pub trait Query {
         limit: Option<i64>,
         arguments: Self::Arguments,
     ) -> Self::Result;
+
+    fn open_cursor<'c>(self, args: Self::Arguments) -> SpiCursor<'c>;
 }
 
 impl<'a> Query for &'a String {
@@ -158,6 +160,10 @@ impl<'a> Query for &'a String {
         arguments: Self::Arguments,
     ) -> Self::Result {
         self.as_str().execute(read_only, limit, arguments)
+    }
+
+    fn open_cursor<'c>(self, args: Self::Arguments) -> SpiCursor<'c> {
+        self.as_str().open_cursor(args)
     }
 }
 
@@ -217,6 +223,49 @@ impl<'a> Query for &'a str {
         };
 
         SpiClient::prepare_tuple_table(status_code)
+    }
+
+    fn open_cursor<'c>(self, args: Self::Arguments) -> SpiCursor<'c> {
+        let src = std::ffi::CString::new(self).expect("query contained a null byte");
+        let args = args.unwrap_or_default();
+
+        let nargs = args.len();
+        let mut argtypes = vec![];
+        let mut datums = vec![];
+        let mut nulls = vec![];
+
+        for (argtype, datum) in args {
+            argtypes.push(argtype.value());
+
+            match datum {
+                Some(datum) => {
+                    // ' ' here means that the datum is not null
+                    datums.push(datum);
+                    nulls.push(' ' as std::os::raw::c_char);
+                }
+
+                None => {
+                    // 'n' here means that the datum is null
+                    datums.push(pg_sys::Datum::from(0usize));
+                    nulls.push('n' as std::os::raw::c_char);
+                }
+            }
+        }
+
+        let ptr = NonNull::new(unsafe {
+            pg_sys::SPI_cursor_open_with_args(
+                std::ptr::null_mut(), // let postgres assign a name
+                src.as_ptr(),
+                nargs as i32,
+                argtypes.as_mut_ptr(),
+                datums.as_mut_ptr(),
+                nulls.as_ptr(),
+                false,
+                0,
+            )
+        })
+        .expect("Portal ptr was null");
+        SpiCursor { ptr, _phantom: PhantomData }
     }
 }
 
@@ -437,51 +486,8 @@ impl<'a> SpiClient<'a> {
     /// Rows may be then fetched using [`SpiCursor::fetch`].
     ///
     /// See [`SpiCursor`] docs for usage details.
-    pub fn open_cursor(
-        &self,
-        query: &str,
-        args: Option<Vec<(PgOid, Option<pg_sys::Datum>)>>,
-    ) -> SpiCursor {
-        let src = std::ffi::CString::new(query).expect("query contained a null byte");
-        let args = args.unwrap_or_default();
-
-        let nargs = args.len();
-        let mut argtypes = vec![];
-        let mut datums = vec![];
-        let mut nulls = vec![];
-
-        for (argtype, datum) in args {
-            argtypes.push(argtype.value());
-
-            match datum {
-                Some(datum) => {
-                    // ' ' here means that the datum is not null
-                    datums.push(datum);
-                    nulls.push(' ' as std::os::raw::c_char);
-                }
-
-                None => {
-                    // 'n' here means that the datum is null
-                    datums.push(pg_sys::Datum::from(0usize));
-                    nulls.push('n' as std::os::raw::c_char);
-                }
-            }
-        }
-
-        let ptr = NonNull::new(unsafe {
-            pg_sys::SPI_cursor_open_with_args(
-                std::ptr::null_mut(), // let postgres assign a name
-                src.as_ptr(),
-                nargs as i32,
-                argtypes.as_mut_ptr(),
-                datums.as_mut_ptr(),
-                nulls.as_ptr(),
-                false,
-                0,
-            )
-        })
-        .expect("Portal ptr was null");
-        SpiCursor { ptr, _phantom: PhantomData }
+    pub fn open_cursor<Q: Query>(&self, query: Q, args: Q::Arguments) -> SpiCursor<'a> {
+        query.open_cursor::<'a>(args)
     }
 
     /// Find a cursor in transaction by name
@@ -653,6 +659,10 @@ impl<'a> Query for &'a OwnedPreparedStatement {
     ) -> Self::Result {
         (&self.0).execute(read_only, limit, arguments)
     }
+
+    fn open_cursor<'c>(self, args: Self::Arguments) -> SpiCursor<'c> {
+        (&self.0).open_cursor(args)
+    }
 }
 
 impl Query for OwnedPreparedStatement {
@@ -666,6 +676,10 @@ impl Query for OwnedPreparedStatement {
         arguments: Self::Arguments,
     ) -> Self::Result {
         (&self.0).execute(read_only, limit, arguments)
+    }
+
+    fn open_cursor<'a>(self, args: Self::Arguments) -> SpiCursor<'a> {
+        (&self.0).open_cursor(args)
     }
 }
 
@@ -732,6 +746,41 @@ impl<'a: 'b, 'b> Query for &'b PreparedStatement<'a> {
 
         Ok(SpiClient::prepare_tuple_table(status_code))
     }
+
+    fn open_cursor<'c>(self, args: Self::Arguments) -> SpiCursor<'c> {
+        let args = args.unwrap_or_default();
+
+        let mut datums = vec![];
+        let mut nulls = vec![];
+
+        for datum in args {
+            match datum {
+                Some(datum) => {
+                    // ' ' here means that the datum is not null
+                    datums.push(datum);
+                    nulls.push(' ' as std::os::raw::c_char);
+                }
+
+                None => {
+                    // 'n' here means that the datum is null
+                    datums.push(pg_sys::Datum::from(0usize));
+                    nulls.push('n' as std::os::raw::c_char);
+                }
+            }
+        }
+
+        let ptr = NonNull::new(unsafe {
+            pg_sys::SPI_cursor_open(
+                std::ptr::null_mut(), // let postgres assign a name
+                self.plan,
+                datums.as_mut_ptr(),
+                nulls.as_ptr(),
+                false,
+            )
+        })
+        .expect("Portal ptr was null");
+        SpiCursor { ptr, _phantom: PhantomData }
+    }
 }
 
 impl<'a> Query for PreparedStatement<'a> {
@@ -745,6 +794,10 @@ impl<'a> Query for PreparedStatement<'a> {
         arguments: Self::Arguments,
     ) -> Self::Result {
         (&self).execute(read_only, limit, arguments)
+    }
+
+    fn open_cursor<'c>(self, args: Self::Arguments) -> SpiCursor<'c> {
+        (&self).open_cursor(args)
     }
 }
 

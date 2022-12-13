@@ -211,6 +211,29 @@ mod tests {
     }
 
     #[pg_test]
+    fn test_cursor_prepared_statement() {
+        Spi::execute(|client| {
+            client.update("CREATE TABLE tests.cursor_table (id int)", None, None);
+            client.update(
+                "INSERT INTO tests.cursor_table (id) \
+            SELECT i FROM generate_series(1, 10) AS t(i)",
+                None,
+                None,
+            );
+            let prepared = client.prepare("SELECT * FROM tests.cursor_table", None);
+            let mut portal = client.open_cursor(&prepared, None);
+
+            fn sum_all(table: pgx::SpiTupleTable) -> i32 {
+                table.map(|r| r.by_ordinal(1).unwrap().value::<i32>().unwrap()).sum()
+            }
+            assert_eq!(sum_all(portal.fetch(3)), 1 + 2 + 3);
+            assert_eq!(sum_all(portal.fetch(3)), 4 + 5 + 6);
+            assert_eq!(sum_all(portal.fetch(3)), 7 + 8 + 9);
+            assert_eq!(sum_all(portal.fetch(3)), 10);
+        });
+    }
+
+    #[pg_test]
     fn test_cursor_by_name() {
         let cursor_name = Spi::connect(|client| {
             client.update("CREATE TABLE tests.cursor_table (id int)", None, None);
