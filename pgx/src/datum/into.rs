@@ -323,11 +323,14 @@ impl<'a> IntoDatum for &'a crate::cstr_core::CStr {
 
 /// for bytea
 impl<'a> IntoDatum for &'a [u8] {
+    /// # Panics
+    ///
+    /// This function will panic if the string being converted to a datum is longer than a `u32`.
     #[inline]
     fn into_datum(self) -> Option<pg_sys::Datum> {
         let len = pg_sys::VARHDRSZ + self.len();
         unsafe {
-            // SAFETY:  palloc gives us a valid pointer if if there's not enough memory it'll raise an error
+            // SAFETY:  palloc gives us a valid pointer and if there's not enough memory it'll raise an error
             let varlena = pg_sys::palloc(len) as *mut pg_sys::varlena;
 
             // SAFETY: `varlena` can properly cast into a `varattrib_4b` and all of what it contains is properly
@@ -338,11 +341,17 @@ impl<'a> IntoDatum for &'a [u8] {
                 .unwrap_unchecked()
                 .va_4byte
                 .as_mut();
+
+            // This is the same as Postgres' `#define SET_VARSIZE_4B` (which have over in
+            // `pgx/src/varlena.rs`), however we're asserting that the input string isn't too big
+            // for a Postgres varlena, since it's limited to 32bits -- in reality it's about half
+            // that length, but this is good enough
             varattrib_4b.va_header = <usize as TryInto<u32>>::try_into(len)
                 .expect("Rust string too large for a Postgres varlena datum")
                 << 2u32;
 
-            // SAFETY: src and dest pointers are valid and are exactly `self.len()` bytes long
+            // SAFETY: src and dest pointers are valid, exactly `self.len()` bytes long,
+            // and the `dest` was freshly allocated, thus non-overlapping
             std::ptr::copy_nonoverlapping(
                 self.as_ptr().cast(),
                 varattrib_4b.va_data.as_mut_ptr(),
