@@ -329,7 +329,7 @@ mod tests {
             let prepared =
                 client.prepare("SELECT $1", Some(vec![PgOid::BuiltIn(PgBuiltInOids::INT4OID)]));
             Ok(client
-                .execute_prepared_statement(&prepared, false, None, Some(vec![42.into_datum()]))
+                .select(&prepared, None, Some(vec![42.into_datum()]))
                 .unwrap()
                 .first()
                 .get_datum::<i32>(1))
@@ -344,7 +344,7 @@ mod tests {
         let err = Spi::connect(|client| {
             let prepared =
                 client.prepare("SELECT $1", Some(vec![PgOid::BuiltIn(PgBuiltInOids::INT4OID)]));
-            Ok(Some(client.execute_prepared_statement(&prepared, false, None, None)))
+            Ok(Some(client.select(&prepared, None, None)))
         })
         .unwrap()
         .unwrap_err();
@@ -367,7 +367,7 @@ mod tests {
         .unwrap();
         let rc = Spi::connect(|client| {
             Ok(client
-                .execute_prepared_statement(&prepared, false, None, Some(vec![42.into_datum()]))
+                .select(&prepared, None, Some(vec![42.into_datum()]))
                 .unwrap()
                 .first()
                 .get_datum::<i32>(1))

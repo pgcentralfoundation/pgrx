@@ -135,6 +135,91 @@ impl SpiConnection {
     }
 }
 
+pub trait Query {
+    type Arguments;
+    type Result;
+
+    fn execute(
+        self,
+        read_only: bool,
+        limit: Option<i64>,
+        arguments: Self::Arguments,
+    ) -> Self::Result;
+}
+
+impl<'a> Query for &'a String {
+    type Arguments = Option<Vec<(PgOid, Option<pg_sys::Datum>)>>;
+    type Result = SpiTupleTable;
+
+    fn execute(
+        self,
+        read_only: bool,
+        limit: Option<i64>,
+        arguments: Self::Arguments,
+    ) -> Self::Result {
+        self.as_str().execute(read_only, limit, arguments)
+    }
+}
+
+impl<'a> Query for &'a str {
+    type Arguments = Option<Vec<(PgOid, Option<pg_sys::Datum>)>>;
+    type Result = SpiTupleTable;
+
+    fn execute(
+        self,
+        read_only: bool,
+        limit: Option<i64>,
+        arguments: Self::Arguments,
+    ) -> Self::Result {
+        unsafe {
+            pg_sys::SPI_tuptable = std::ptr::null_mut();
+        }
+
+        let src = std::ffi::CString::new(self).expect("query contained a null byte");
+        let status_code = match arguments {
+            Some(args) => {
+                let nargs = args.len();
+                let mut argtypes = vec![];
+                let mut datums = vec![];
+                let mut nulls = vec![];
+
+                for (argtype, datum) in args {
+                    argtypes.push(argtype.value());
+
+                    match datum {
+                        Some(datum) => {
+                            // ' ' here means that the datum is not null
+                            datums.push(datum);
+                            nulls.push(' ' as std::os::raw::c_char);
+                        }
+
+                        None => {
+                            // 'n' here means that the datum is null
+                            datums.push(pg_sys::Datum::from(0usize));
+                            nulls.push('n' as std::os::raw::c_char);
+                        }
+                    }
+                }
+
+                unsafe {
+                    pg_sys::SPI_execute_with_args(
+                        src.as_ptr(),
+                        nargs as i32,
+                        argtypes.as_mut_ptr(),
+                        datums.as_mut_ptr(),
+                        nulls.as_ptr(),
+                        read_only,
+                        limit.unwrap_or(0),
+                    )
+                }
+            }
+            None => unsafe { pg_sys::SPI_execute(src.as_ptr(), read_only, limit.unwrap_or(0)) },
+        };
+
+        SpiClient::prepare_tuple_table(status_code)
+    }
+}
+
 #[derive(Debug)]
 pub struct SpiTupleTable {
     #[allow(dead_code)]
@@ -303,12 +388,7 @@ impl Spi {
 
 impl<'a> SpiClient<'a> {
     /// perform a SELECT statement
-    pub fn select(
-        &self,
-        query: &str,
-        limit: Option<i64>,
-        args: Option<Vec<(PgOid, Option<pg_sys::Datum>)>>,
-    ) -> SpiTupleTable {
+    pub fn select<Q: Query>(&self, query: Q, limit: Option<i64>, args: Q::Arguments) -> Q::Result {
         // Postgres docs say:
         //
         //    It is generally unwise to mix read-only and read-write commands within a single function
@@ -324,118 +404,18 @@ impl<'a> SpiClient<'a> {
     }
 
     /// perform any query (including utility statements) that modify the database in some way
-    pub fn update(
-        &self,
-        query: &str,
-        limit: Option<i64>,
-        args: Option<Vec<(PgOid, Option<pg_sys::Datum>)>>,
-    ) -> SpiTupleTable {
+    pub fn update<Q: Query>(&self, query: Q, limit: Option<i64>, args: Q::Arguments) -> Q::Result {
         self.execute(query, false, limit, args)
     }
 
-    fn execute(
+    fn execute<Q: Query>(
         &self,
-        query: &str,
+        query: Q,
         read_only: bool,
         limit: Option<i64>,
-        args: Option<Vec<(PgOid, Option<pg_sys::Datum>)>>,
-    ) -> SpiTupleTable {
-        unsafe {
-            pg_sys::SPI_tuptable = std::ptr::null_mut();
-        }
-
-        let src = std::ffi::CString::new(query).expect("query contained a null byte");
-        let status_code = match args {
-            Some(args) => {
-                let nargs = args.len();
-                let mut argtypes = vec![];
-                let mut datums = vec![];
-                let mut nulls = vec![];
-
-                for (argtype, datum) in args {
-                    argtypes.push(argtype.value());
-
-                    match datum {
-                        Some(datum) => {
-                            // ' ' here means that the datum is not null
-                            datums.push(datum);
-                            nulls.push(' ' as std::os::raw::c_char);
-                        }
-
-                        None => {
-                            // 'n' here means that the datum is null
-                            datums.push(pg_sys::Datum::from(0usize));
-                            nulls.push('n' as std::os::raw::c_char);
-                        }
-                    }
-                }
-
-                unsafe {
-                    pg_sys::SPI_execute_with_args(
-                        src.as_ptr(),
-                        nargs as i32,
-                        argtypes.as_mut_ptr(),
-                        datums.as_mut_ptr(),
-                        nulls.as_ptr(),
-                        read_only,
-                        limit.unwrap_or(0),
-                    )
-                }
-            }
-            None => unsafe { pg_sys::SPI_execute(src.as_ptr(), read_only, limit.unwrap_or(0)) },
-        };
-
-        Self::prepare_tuple_table(status_code)
-    }
-
-    /// Executes a prepared statement
-    pub fn execute_prepared_statement(
-        &self,
-        prepared_statement: &PreparedStatement,
-        read_only: bool,
-        limit: Option<i64>,
-        args: Option<Vec<Option<pg_sys::Datum>>>,
-    ) -> Result<SpiTupleTable, PreparedStatementError> {
-        unsafe {
-            pg_sys::SPI_tuptable = std::ptr::null_mut();
-        }
-        let args = args.unwrap_or_default();
-        let mut datums = vec![];
-        let mut nulls = vec![];
-        let nargs = args.len();
-        let expected = unsafe { pg_sys::SPI_getargcount(prepared_statement.plan) } as usize;
-
-        if nargs != expected {
-            return Err(PreparedStatementError::ArgumentCountMismatch { expected, got: nargs });
-        }
-
-        for datum in args {
-            match datum {
-                Some(datum) => {
-                    // ' ' here means that the datum is not null
-                    datums.push(datum);
-                    nulls.push(' ' as std::os::raw::c_char);
-                }
-
-                None => {
-                    // 'n' here means that the datum is null
-                    datums.push(pg_sys::Datum::from(0usize));
-                    nulls.push('n' as std::os::raw::c_char);
-                }
-            }
-        }
-
-        let status_code = unsafe {
-            pg_sys::SPI_execute_plan(
-                prepared_statement.plan,
-                datums.as_mut_ptr(),
-                nulls.as_mut_ptr(),
-                read_only,
-                limit.unwrap_or(0),
-            )
-        };
-
-        Ok(Self::prepare_tuple_table(status_code))
+        args: Q::Arguments,
+    ) -> Q::Result {
+        query.execute(read_only, limit, args)
     }
 
     fn prepare_tuple_table(status_code: i32) -> SpiTupleTable {
@@ -661,6 +641,34 @@ impl Drop for OwnedPreparedStatement {
     }
 }
 
+impl<'a> Query for &'a OwnedPreparedStatement {
+    type Arguments = Option<Vec<Option<pg_sys::Datum>>>;
+    type Result = Result<SpiTupleTable, PreparedStatementError>;
+
+    fn execute(
+        self,
+        read_only: bool,
+        limit: Option<i64>,
+        arguments: Self::Arguments,
+    ) -> Self::Result {
+        (&self.0).execute(read_only, limit, arguments)
+    }
+}
+
+impl Query for OwnedPreparedStatement {
+    type Arguments = Option<Vec<Option<pg_sys::Datum>>>;
+    type Result = Result<SpiTupleTable, PreparedStatementError>;
+
+    fn execute(
+        self,
+        read_only: bool,
+        limit: Option<i64>,
+        arguments: Self::Arguments,
+    ) -> Self::Result {
+        (&self.0).execute(read_only, limit, arguments)
+    }
+}
+
 impl<'a> PreparedStatement<'a> {
     /// Converts prepared statement into an owner prepared statement
     ///
@@ -670,6 +678,73 @@ impl<'a> PreparedStatement<'a> {
             pg_sys::SPI_keepplan(self.plan);
         }
         OwnedPreparedStatement(PreparedStatement { phantom: PhantomData, plan: self.plan })
+    }
+}
+
+impl<'a: 'b, 'b> Query for &'b PreparedStatement<'a> {
+    type Arguments = Option<Vec<Option<pg_sys::Datum>>>;
+    type Result = Result<SpiTupleTable, PreparedStatementError>;
+
+    fn execute(
+        self,
+        read_only: bool,
+        limit: Option<i64>,
+        arguments: Self::Arguments,
+    ) -> Self::Result {
+        unsafe {
+            pg_sys::SPI_tuptable = std::ptr::null_mut();
+        }
+        let args = arguments.unwrap_or_default();
+        let mut datums = vec![];
+        let mut nulls = vec![];
+        let nargs = args.len();
+        let expected = unsafe { pg_sys::SPI_getargcount(self.plan) } as usize;
+
+        if nargs != expected {
+            return Err(PreparedStatementError::ArgumentCountMismatch { expected, got: nargs });
+        }
+
+        for datum in args {
+            match datum {
+                Some(datum) => {
+                    // ' ' here means that the datum is not null
+                    datums.push(datum);
+                    nulls.push(' ' as std::os::raw::c_char);
+                }
+
+                None => {
+                    // 'n' here means that the datum is null
+                    datums.push(pg_sys::Datum::from(0usize));
+                    nulls.push('n' as std::os::raw::c_char);
+                }
+            }
+        }
+
+        let status_code = unsafe {
+            pg_sys::SPI_execute_plan(
+                self.plan,
+                datums.as_mut_ptr(),
+                nulls.as_mut_ptr(),
+                read_only,
+                limit.unwrap_or(0),
+            )
+        };
+
+        Ok(SpiClient::prepare_tuple_table(status_code))
+    }
+}
+
+impl<'a> Query for PreparedStatement<'a> {
+    type Arguments = Option<Vec<Option<pg_sys::Datum>>>;
+    type Result = Result<SpiTupleTable, PreparedStatementError>;
+
+    fn execute(
+        self,
+        read_only: bool,
+        limit: Option<i64>,
+        arguments: Self::Arguments,
+    ) -> Self::Result {
+        (&self).execute(read_only, limit, arguments)
     }
 }
 
