@@ -135,10 +135,16 @@ impl SpiConnection {
     }
 }
 
+/// A generalized interface to what constitutes a query
+///
+/// Its primary purpose is to abstract away differences between
+/// one-off statements and prepared statements, but it can potentially
+/// be implemented for other types, provided they can be converted into a query.
 pub trait Query {
     type Arguments;
     type Result;
 
+    /// Execute a query given a client and other arguments
     fn execute(
         self,
         client: &SpiClient,
@@ -147,6 +153,7 @@ pub trait Query {
         arguments: Self::Arguments,
     ) -> Self::Result;
 
+    /// Open a cursor for the query
     fn open_cursor<'c: 'cc, 'cc>(
         self,
         client: &'cc SpiClient<'c>,
