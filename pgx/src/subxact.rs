@@ -30,7 +30,7 @@ impl<Parent: SubTransactionExt, const COMMIT: bool> SubTransaction<Parent, COMMI
         // Remember resource owner before starting the sub-transaction
         let resource_owner = unsafe { pg_sys::CurrentResourceOwner };
         unsafe {
-            pg_sys::BeginInternalSubTransaction(std::ptr::null());
+            pg_sys::BeginInternalSubTransaction(std::ptr::null() /* [no] transaction name */);
         }
         // Switch to the outer memory context so that all allocations remain
         // there instead of the sub-transaction's context
