@@ -146,7 +146,11 @@ pub trait Query {
         arguments: Self::Arguments,
     ) -> Self::Result;
 
-    fn open_cursor<'c>(self, args: Self::Arguments) -> SpiCursor<'c>;
+    fn open_cursor<'c: 'cc, 'cc>(
+        self,
+        client: &'cc SpiClient<'c>,
+        args: Self::Arguments,
+    ) -> SpiCursor<'c>;
 }
 
 impl<'a> Query for &'a String {
@@ -162,8 +166,12 @@ impl<'a> Query for &'a String {
         self.as_str().execute(read_only, limit, arguments)
     }
 
-    fn open_cursor<'c>(self, args: Self::Arguments) -> SpiCursor<'c> {
-        self.as_str().open_cursor(args)
+    fn open_cursor<'c: 'cc, 'cc>(
+        self,
+        client: &'cc SpiClient<'c>,
+        args: Self::Arguments,
+    ) -> SpiCursor<'c> {
+        self.as_str().open_cursor(client, args)
     }
 }
 
@@ -225,7 +233,11 @@ impl<'a> Query for &'a str {
         SpiClient::prepare_tuple_table(status_code)
     }
 
-    fn open_cursor<'c>(self, args: Self::Arguments) -> SpiCursor<'c> {
+    fn open_cursor<'c: 'cc, 'cc>(
+        self,
+        _client: &'cc SpiClient<'c>,
+        args: Self::Arguments,
+    ) -> SpiCursor<'c> {
         let src = std::ffi::CString::new(self).expect("query contained a null byte");
         let args = args.unwrap_or_default();
 
@@ -487,7 +499,7 @@ impl<'a> SpiClient<'a> {
     ///
     /// See [`SpiCursor`] docs for usage details.
     pub fn open_cursor<Q: Query>(&self, query: Q, args: Q::Arguments) -> SpiCursor<'a> {
-        query.open_cursor::<'a>(args)
+        query.open_cursor(&self, args)
     }
 
     /// Find a cursor in transaction by name
@@ -660,8 +672,12 @@ impl<'a> Query for &'a OwnedPreparedStatement {
         (&self.0).execute(read_only, limit, arguments)
     }
 
-    fn open_cursor<'c>(self, args: Self::Arguments) -> SpiCursor<'c> {
-        (&self.0).open_cursor(args)
+    fn open_cursor<'c: 'cc, 'cc>(
+        self,
+        client: &'cc SpiClient<'c>,
+        args: Self::Arguments,
+    ) -> SpiCursor<'c> {
+        (&self.0).open_cursor(client, args)
     }
 }
 
@@ -678,8 +694,12 @@ impl Query for OwnedPreparedStatement {
         (&self.0).execute(read_only, limit, arguments)
     }
 
-    fn open_cursor<'a>(self, args: Self::Arguments) -> SpiCursor<'a> {
-        (&self.0).open_cursor(args)
+    fn open_cursor<'c: 'cc, 'cc>(
+        self,
+        client: &'cc SpiClient<'c>,
+        args: Self::Arguments,
+    ) -> SpiCursor<'c> {
+        (&self.0).open_cursor(client, args)
     }
 }
 
@@ -747,7 +767,11 @@ impl<'a: 'b, 'b> Query for &'b PreparedStatement<'a> {
         Ok(SpiClient::prepare_tuple_table(status_code))
     }
 
-    fn open_cursor<'c>(self, args: Self::Arguments) -> SpiCursor<'c> {
+    fn open_cursor<'c: 'cc, 'cc>(
+        self,
+        _client: &'cc SpiClient<'c>,
+        args: Self::Arguments,
+    ) -> SpiCursor<'c> {
         let args = args.unwrap_or_default();
 
         let mut datums = vec![];
@@ -796,8 +820,12 @@ impl<'a> Query for PreparedStatement<'a> {
         (&self).execute(read_only, limit, arguments)
     }
 
-    fn open_cursor<'c>(self, args: Self::Arguments) -> SpiCursor<'c> {
-        (&self).open_cursor(args)
+    fn open_cursor<'c: 'cc, 'cc>(
+        self,
+        client: &'cc SpiClient<'c>,
+        args: Self::Arguments,
+    ) -> SpiCursor<'c> {
+        (&self).open_cursor(client, args)
     }
 }
 
