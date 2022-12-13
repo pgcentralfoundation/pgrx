@@ -7,48 +7,83 @@ use core::slice;
 
 #[allow(non_snake_case)]
 #[inline(always)]
-const unsafe fn TYPEALIGN(alignval: usize, len: usize) -> usize {
+const fn TYPEALIGN(alignval: usize, len: usize) -> usize {
     // #define TYPEALIGN(ALIGNVAL,LEN)  \
     // (((uintptr_t) (LEN) + ((ALIGNVAL) - 1)) & ~((uintptr_t) ((ALIGNVAL) - 1)))
-    ((len) + ((alignval) - 1)) & !((alignval) - 1)
+    (len + (alignval - 1)) & !(alignval - 1)
 }
 
 #[allow(non_snake_case)]
 #[inline(always)]
-const unsafe fn MAXALIGN(len: usize) -> usize {
+const fn MAXALIGN(len: usize) -> usize {
     // #define MAXALIGN(LEN) TYPEALIGN(MAXIMUM_ALIGNOF, (LEN))
     TYPEALIGN(pg_sys::MAXIMUM_ALIGNOF as _, len)
 }
 
+/// # Safety
+/// Does a field access, but doesn't deref out of bounds of ArrayType
 #[allow(non_snake_case)]
 #[inline(always)]
 unsafe fn ARR_NDIM(a: *mut pg_sys::ArrayType) -> usize {
     // #define ARR_NDIM(a)				((a)->ndim)
-    a.as_ref().unwrap_unchecked().ndim as usize
+
+    unsafe {
+        // SAFETY:  caller has asserted that `a` is a properly allocated ArrayType pointer
+        (*a).ndim as usize
+    }
 }
 
+/// # Safety
+/// Does a field access, but doesn't deref out of bounds of ArrayType
 #[allow(non_snake_case)]
 #[inline(always)]
 unsafe fn ARR_HASNULL(a: *mut pg_sys::ArrayType) -> bool {
     // #define ARR_HASNULL(a)			((a)->dataoffset != 0)
-    a.as_ref().unwrap_unchecked().dataoffset != 0
+
+    unsafe {
+        // SAFETY:  caller has asserted that `a` is a properly allocated ArrayType pointer
+        (*a).dataoffset != 0
+    }
 }
 
+/// # Safety
+/// Does a field access, but doesn't deref out of bounds of ArrayType
+///
+/// [`pg_sys::ArrayType`] is typically allocated past its size, and its somewhere in that region
+/// that the returned pointer points, so don't attempt to `pfree` it.
 #[allow(non_snake_case)]
 #[inline(always)]
 const unsafe fn ARR_DIMS(a: *mut pg_sys::ArrayType) -> *mut i32 {
     // #define ARR_DIMS(a) \
     // ((int *) (((char *) (a)) + sizeof(ArrayType)))
 
-    a.cast::<u8>().add(std::mem::size_of::<pg_sys::ArrayType>()).cast::<i32>()
+    unsafe {
+        // SAFETY:  caller has asserted that `a` is a properly allocated ArrayType pointer
+        a.cast::<u8>().add(std::mem::size_of::<pg_sys::ArrayType>()).cast::<i32>()
+    }
 }
 
+/// # Safety
+/// Does a field access and deref but not out of bounds of ArrayType.  The caller asserts that
+/// `a` is a properly allocated [`pg_sys::ArrayType`]
 #[allow(non_snake_case)]
 #[inline(always)]
 unsafe fn ARR_NELEMS(a: *mut pg_sys::ArrayType) -> usize {
-    pg_sys::ArrayGetNItems(a.as_ref().unwrap_unchecked().ndim, ARR_DIMS(a)) as usize
+    unsafe {
+        // SAFETY:  caller has asserted that `a` is a properly allocated ArrayType pointer
+        pg_sys::ArrayGetNItems((*a).ndim, ARR_DIMS(a)) as usize
+    }
 }
 
+/// Returns the "null bitmap" of the specified array.  If there isn't one (the array contains no nulls)
+/// then the null pointer is returned.
+///
+/// # Safety
+/// Does a field access, but doesn't deref out of bounds of ArrayType.  The caller asserts that
+/// `a` is a properly allocated [`pg_sys::ArrayType`]
+///
+/// [`pg_sys::ArrayType`] is typically allocated past its size, and its somewhere in that region
+/// that the returned pointer points, so don't attempt to `pfree` it.
 #[allow(non_snake_case)]
 #[inline(always)]
 unsafe fn ARR_NULLBITMAP(a: *mut pg_sys::ArrayType) -> *mut pg_sys::bits8 {
@@ -58,12 +93,16 @@ unsafe fn ARR_NULLBITMAP(a: *mut pg_sys::ArrayType) -> *mut pg_sys::bits8 {
     // : (bits8 *) NULL)
     //
 
-    if ARR_HASNULL(a) {
-        a.cast::<u8>().add(
-            std::mem::size_of::<pg_sys::ArrayType>() + 2 * std::mem::size_of::<i32>() * ARR_NDIM(a),
-        )
-    } else {
-        std::ptr::null_mut()
+    unsafe {
+        // SAFETY:  caller has asserted that `a` is a properly allocated ArrayType pointer
+        if ARR_HASNULL(a) {
+            a.cast::<u8>().add(
+                std::mem::size_of::<pg_sys::ArrayType>()
+                    + 2 * std::mem::size_of::<i32>() * ARR_NDIM(a),
+            )
+        } else {
+            std::ptr::null_mut()
+        }
     }
 }
 
@@ -71,34 +110,47 @@ unsafe fn ARR_NULLBITMAP(a: *mut pg_sys::ArrayType) -> *mut pg_sys::bits8 {
 /// number of dimensions and total number of items.
 #[allow(non_snake_case)]
 #[inline(always)]
-const unsafe fn ARR_OVERHEAD_NONNULLS(ndims: usize) -> usize {
+const fn ARR_OVERHEAD_NONULLS(ndims: usize) -> usize {
     // #define ARR_OVERHEAD_NONULLS(ndims) \
     // MAXALIGN(sizeof(ArrayType) + 2 * sizeof(int) * (ndims))
 
     MAXALIGN(std::mem::size_of::<pg_sys::ArrayType>() + 2 * std::mem::size_of::<i32>() * ndims)
 }
 
+/// # Safety
+/// Does a field access, but doesn't deref out of bounds of ArrayType.  The caller asserts that
+/// `a` is a properly allocated [`pg_sys::ArrayType`]
 #[allow(non_snake_case)]
 #[inline(always)]
 unsafe fn ARR_DATA_OFFSET(a: *mut pg_sys::ArrayType) -> usize {
     // #define ARR_DATA_OFFSET(a) \
     // (ARR_HASNULL(a) ? (a)->dataoffset : ARR_OVERHEAD_NONULLS(ARR_NDIM(a)))
 
-    if ARR_HASNULL(a) {
-        a.as_ref().unwrap_unchecked().dataoffset as _
-    } else {
-        ARR_OVERHEAD_NONNULLS(ARR_NDIM(a))
+    unsafe {
+        // SAFETY:  caller has asserted that `a` is a properly allocated ArrayType pointer
+        if ARR_HASNULL(a) {
+            (*a).dataoffset as _
+        } else {
+            ARR_OVERHEAD_NONULLS(ARR_NDIM(a))
+        }
     }
 }
 
 /// Returns a pointer to the actual array data.
+///
+/// # Safety
+/// Does a field access, but doesn't deref out of bounds of ArrayType.  The caller asserts that
+/// `a` is a properly allocated [`pg_sys::ArrayType`]
+///
+/// [`pg_sys::ArrayType`] is typically allocated past its size, and its somewhere in that region
+/// that the returned pointer points, so don't attempt to `pfree` it.
 #[allow(non_snake_case)]
 #[inline(always)]
 unsafe fn ARR_DATA_PTR(a: *mut pg_sys::ArrayType) -> *mut u8 {
     // #define ARR_DATA_PTR(a) \
     // (((char *) (a)) + ARR_DATA_OFFSET(a))
 
-    a.cast::<u8>().add(ARR_DATA_OFFSET(a))
+    unsafe { a.cast::<u8>().add(ARR_DATA_OFFSET(a)) }
 }
 
 /**
