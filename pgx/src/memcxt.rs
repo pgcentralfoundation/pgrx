@@ -190,37 +190,14 @@ impl Drop for OwnedMemoryContext {
             previous: pg_sys::MemoryContext,
         ) -> Option<pg_sys::MemoryContext> {
             if ptr::eq(pg_sys::CurrentMemoryContext, cxt) {
-                // If the previous context is no longer valid, switch to TopMemoryContext
                 Some(if pgx_MemoryContextIsValid(previous) {
+                    // If the previous context is valid, switch to it
                     previous
                 } else {
+                    // If the previous context is no longer valid, switch to TopMemoryContext
                     pg_sys::TopMemoryContext
                 })
             } else {
-                None
-            }
-        }
-
-        unsafe fn switch_children(
-            cxt: pg_sys::MemoryContext,
-            previous: pg_sys::MemoryContext,
-        ) -> Option<pg_sys::MemoryContext> {
-            let mut child = (*cxt).firstchild;
-            while !child.is_null() {
-                match switch_context(child, previous).or_else(|| switch_children(child, previous)) {
-                    Some(switch_to) => return Some(switch_to),
-                    None => {
-                        child = (*child).nextchild;
-                    }
-                }
-            }
-            None
-        }
-
-        unsafe {
-            // In order to prevent failing Postgres assumption and assertion, if we're trying to drop
-            // a context that is current, switch to its predecessor, and then drop it.
-            if let Some(switch_to) = switch_context(self.owned, self.previous)
                 // In a complicated scenario, a parent context may get dropped while one of its
                 // (direct or indirect) children is current. Since memory
                 // context deletion involves deletion of all of its children, Postgres will fail an assertion
@@ -229,8 +206,21 @@ impl Drop for OwnedMemoryContext {
                 //
                 // So, in order to avoid this, we scan through children to see if any of them are current, and switch
                 // them to the previous context of this context and proceed with the deletion.
-                .or_else(|| switch_children(self.owned, self.previous))
-            {
+                let mut child = (*cxt).firstchild;
+                while !child.is_null() {
+                    if let Some(switch_to) = switch_context(child, previous) {
+                        return Some(switch_to);
+                    }
+                    child = (*child).nextchild;
+                }
+                None
+            }
+        }
+
+        unsafe {
+            // In order to prevent failing Postgres assumption and assertion, if we're trying to drop
+            // a context that is current (or a child of it is current), switch to its predecessor, and then drop it.
+            if let Some(switch_to) = switch_context(self.owned, self.previous) {
                 pg_sys::CurrentMemoryContext = switch_to;
             }
 
