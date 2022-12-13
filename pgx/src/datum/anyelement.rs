@@ -8,7 +8,7 @@ Use of this source code is governed by the MIT license that can be found in the 
 */
 
 use crate::{pg_sys, FromDatum, IntoDatum};
-use pgx_utils::sql_entity_graph::metadata::{
+use pgx_sql_entity_graph::metadata::{
     ArgumentError, Returns, ReturnsError, SqlMapping, SqlTranslatable,
 };
 
@@ -34,9 +34,15 @@ impl AnyElement {
         self.typoid
     }
 
+    /// Convert this element into a specific type.
+    ///
+    /// # Safety
+    ///
+    /// This function is unsafe as it cannot guarantee that the underlying datum can be represented
+    /// as `T`.  This is your responsibility
     #[inline]
-    pub fn into<T: FromDatum>(&self) -> Option<T> {
-        unsafe { T::from_polymorphic_datum(self.datum(), false, self.oid()) }
+    pub unsafe fn into<T: FromDatum>(&self) -> Option<T> {
+        T::from_polymorphic_datum(self.datum(), false, self.oid())
     }
 }
 

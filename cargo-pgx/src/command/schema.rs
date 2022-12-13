@@ -17,7 +17,6 @@ use object::Object;
 use once_cell::sync::OnceCell;
 use owo_colors::OwoColorize;
 use pgx_pg_config::{get_target_dir, PgConfig, Pgx};
-use pgx_utils::sql_entity_graph::{ControlFile, PgxSql, SqlGraphEntity};
 use std::collections::HashSet;
 use std::hash::{Hash, Hasher};
 use std::path::{Path, PathBuf};
@@ -118,7 +117,10 @@ impl CommandExecute for Schema {
         let features =
             crate::manifest::features_for_version(self.features, &package_manifest, &pg_version);
 
-        let profile = CargoProfile::from_flags(self.release, self.profile.as_deref())?;
+        let profile = CargoProfile::from_flags(
+            self.profile.as_deref(),
+            self.release.then_some(CargoProfile::Release).unwrap_or(CargoProfile::Dev),
+        )?;
 
         generate_schema(
             &pg_config,
@@ -318,7 +320,7 @@ pub(crate) fn generate_schema(
 
     let so_extension = if cfg!(target_os = "macos") { ".dylib" } else { ".so" };
 
-    lib_so.push(&format!("lib{}{}", package_name.replace("-", "_"), so_extension));
+    lib_so.push(&format!("lib{}{}", package_name.replace('-', "_"), so_extension));
 
     let lib_so_data = std::fs::read(&lib_so).wrap_err("couldn't read extension shared object")?;
     let lib_so_obj_file =
@@ -357,7 +359,7 @@ pub(crate) fn generate_schema(
     for func in &fns_to_call {
         if func.starts_with("__pgx_internals_schema_") {
             let schema = func
-                .split("_")
+                .split('_')
                 .skip(5)
                 .next()
                 .expect("Schema extern name was not of expected format");
@@ -424,34 +426,38 @@ pub(crate) fn generate_schema(
             .wrap_err_with(|| format!("Couldn't libload {}", lib_so.display()))?;
 
         let sql_mappings_symbol: libloading::os::unix::Symbol<
-            unsafe extern "Rust" fn() -> ::pgx_utils::sql_entity_graph::RustToSqlMapping,
+            unsafe extern "Rust" fn() -> pgx_sql_entity_graph::RustToSqlMapping,
         > = lib
             .get("__pgx_sql_mappings".as_bytes())
-            .expect(&format!("Couldn't call __pgx_sql_mappings"));
+            .expect("Couldn't call __pgx_sql_mappings");
         sql_mapping = sql_mappings_symbol();
 
         let symbol: libloading::os::unix::Symbol<
-            unsafe extern "Rust" fn() -> eyre::Result<ControlFile>,
+            unsafe extern "Rust" fn() -> eyre::Result<pgx_sql_entity_graph::ControlFile>,
         > = lib
             .get("__pgx_marker".as_bytes())
-            .expect(&format!("Couldn't call __pgx_marker"));
-        let control_file_entity = SqlGraphEntity::ExtensionRoot(
+            .expect("Couldn't call __pgx_marker");
+        let control_file_entity = pgx_sql_entity_graph::SqlGraphEntity::ExtensionRoot(
             symbol().expect("Failed to get control file information"),
         );
         entities.push(control_file_entity);
 
         for symbol_to_call in fns_to_call {
-            let symbol: libloading::os::unix::Symbol<unsafe extern "Rust" fn() -> SqlGraphEntity> =
-                lib.get(symbol_to_call.as_bytes())
-                    .expect(&format!("Couldn't call {:#?}", symbol_to_call));
+            let symbol: libloading::os::unix::Symbol<unsafe extern "Rust" fn() -> pgx_sql_entity_graph::SqlGraphEntity> =
+                lib.get(symbol_to_call.as_bytes()).unwrap_or_else(|_|
+                    panic!("Couldn't call {:#?}", symbol_to_call));
             let entity = symbol();
             entities.push(entity);
         }
     };
 
-    let pgx_sql =
-        PgxSql::build(sql_mapping, entities.into_iter(), package_name.to_string(), versioned_so)
-            .wrap_err("SQL generation error")?;
+    let pgx_sql = pgx_sql_entity_graph::PgxSql::build(
+        sql_mapping,
+        entities.into_iter(),
+        package_name.to_string(),
+        versioned_so,
+    )
+    .wrap_err("SQL generation error")?;
 
     if let Some(out_path) = path {
         let out_path = out_path.as_ref();
@@ -549,7 +555,7 @@ fn create_stub(
     so_rustc_invocation.stderr(Stdio::inherit());
 
     if let Some(rustc_flags_str) = std::env::var("RUSTFLAGS").ok() {
-        let rustc_flags = rustc_flags_str.split(" ").collect::<Vec<_>>();
+        let rustc_flags = rustc_flags_str.split(' ').collect::<Vec<_>>();
         so_rustc_invocation.args(rustc_flags);
     }
 

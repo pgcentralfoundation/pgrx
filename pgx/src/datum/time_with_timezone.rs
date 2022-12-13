@@ -9,7 +9,7 @@ Use of this source code is governed by the MIT license that can be found in the 
 
 use crate::datum::time::{Time, USECS_PER_DAY};
 use crate::{pg_sys, FromDatum, IntoDatum, PgBox};
-use pgx_utils::sql_entity_graph::metadata::{
+use pgx_sql_entity_graph::metadata::{
     ArgumentError, Returns, ReturnsError, SqlMapping, SqlTranslatable,
 };
 

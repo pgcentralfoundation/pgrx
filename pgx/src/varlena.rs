@@ -11,20 +11,46 @@ Use of this source code is governed by the MIT license that can be found in the 
 
 use crate::{pg_sys, PgBox};
 
-pub unsafe fn set_varsize(ptr: *mut pg_sys::varlena, len: i32) {
-    extern "C" {
-        fn pgx_SET_VARSIZE(ptr: *mut pg_sys::varlena, len: i32);
-    }
+/// # Safety
+///
+/// The caller asserts the specified `ptr` really is a non-null, palloc'd [`pg_sys::varlena`] pointer
+#[inline(always)]
+pub unsafe fn set_varsize_4b(ptr: *mut pg_sys::varlena, len: i32) {
+    // #define SET_VARSIZE_4B(PTR,len) \
+    // 	(((varattrib_4b *) (PTR))->va_4byte.va_header = (((uint32) (len)) << 2))
 
-    pgx_SET_VARSIZE(ptr, len)
+    // SAFETY:  A varlena can be safely cast to a varattrib_4b
+    (*ptr.cast::<pg_sys::varattrib_4b>()).va_4byte.as_mut().va_header = (len as u32) << 2;
 }
 
-pub unsafe fn set_varsize_short(ptr: *mut pg_sys::varlena, len: i32) {
-    extern "C" {
-        fn pgx_SET_VARSIZE_SHORT(ptr: *mut pg_sys::varlena, len: i32);
-    }
+/// # Safety
+///
+/// The caller asserts the specified `ptr` really is a non-null, palloc'd [`pg_sys::varlena`] pointer
+#[inline(always)]
+pub unsafe fn set_varsize(ptr: *mut pg_sys::varlena, len: i32) {
+    // #define SET_VARSIZE(PTR, len)				SET_VARSIZE_4B(PTR, len)
+    set_varsize_4b(ptr, len)
+}
 
-    pgx_SET_VARSIZE_SHORT(ptr, len)
+/// # Safety
+///
+/// The caller asserts the specified `ptr` really is a non-null, palloc'd [`pg_sys::varlena`] pointer
+#[inline(always)]
+pub unsafe fn set_varsize_1b(ptr: *mut pg_sys::varlena, len: i32) {
+    // #define SET_VARSIZE_1B(PTR,len) \
+    // 	(((varattrib_1b *) (PTR))->va_header = (((uint8) (len)) << 1) | 0x01)
+
+    // SAFETY:  A varlena can be safely cast to a varattrib_1b
+    (*ptr.cast::<pg_sys::varattrib_1b>()).va_header = ((len as u8) << 1) | 0x01
+}
+
+/// # Safety
+///
+/// The caller asserts the specified `ptr` really is a non-null, palloc'd [`pg_sys::varlena`] pointer
+#[inline(always)]
+pub unsafe fn set_varsize_short(ptr: *mut pg_sys::varlena, len: i32) {
+    //    #define SET_VARSIZE_SHORT(PTR, len)			SET_VARSIZE_1B(PTR, len)
+    set_varsize_1b(ptr, len)
 }
 
 /// ```c

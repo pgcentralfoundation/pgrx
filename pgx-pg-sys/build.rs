@@ -10,9 +10,7 @@ Use of this source code is governed by the MIT license that can be found in the 
 use bindgen::callbacks::{DeriveTrait, ImplementsTrait, MacroParsingBehavior};
 use eyre::{eyre, WrapErr};
 use pgx_pg_config::{prefix_path, PgConfig, PgConfigSelector, Pgx, SUPPORTED_MAJOR_VERSIONS};
-use pgx_utils::rewriter::PgGuardRewriter;
 use quote::{quote, ToTokens};
-use rayon::prelude::*;
 use std::collections::{HashMap, HashSet};
 use std::path::PathBuf;
 use std::process::{Command, Output};
@@ -156,12 +154,24 @@ fn main() -> eyre::Result<()> {
         let specific = pgx.get(&found)?;
         vec![specific]
     };
-
-    pg_configs
-        .par_iter()
-        .map(|pg_config| generate_bindings(pg_config, &build_paths, is_for_release))
-        .collect::<eyre::Result<Vec<_>>>()?;
-
+    std::thread::scope(|scope| {
+        // This is pretty much either always 1 (normally) or 5 (for releases),
+        // but in the future if we ever have way more, we should consider
+        // chunking `pg_configs` based on `thread::available_parallelism()`.
+        let threads = pg_configs
+            .iter()
+            .map(|pg_config| {
+                scope.spawn(|| generate_bindings(pg_config, &build_paths, is_for_release))
+            })
+            .collect::<Vec<_>>();
+        // Most of the rest of this is just for better error handling --
+        // `thread::scope` already joins the threads for us before it returns.
+        let results = threads
+            .into_iter()
+            .map(|thread| thread.join().expect("thread panicked while generating bindings"))
+            .collect::<Vec<eyre::Result<_>>>();
+        results.into_iter().try_for_each(|r| r)
+    })?;
     // compile the cshim for each binding
     for pg_config in pg_configs {
         build_shim(&build_paths.shim_src, &build_paths.shim_dst, &pg_config)?;
@@ -573,6 +583,13 @@ fn run_bindgen(pg_config: &PgConfig, include_h: &PathBuf) -> eyre::Result<syn::F
         .blocklist_function("(?:query|expression)_tree_walker")
         .blocklist_function(".*(?:set|long)jmp")
         .blocklist_function("pg_re_throw")
+        .blocklist_function("errstart")
+        .blocklist_function("errcode")
+        .blocklist_function("errmsg")
+        .blocklist_function("errdetail")
+        .blocklist_function("errcontext_msg")
+        .blocklist_function("errhint")
+        .blocklist_function("errfinish")
         .blocklist_item("CONFIGURE_ARGS") // configuration during build is hopefully irrelevant
         .blocklist_item("_*(?:HAVE|have)_.*") // header tracking metadata
         .blocklist_item("_[A-Z_]+_H") // more header metadata
@@ -812,13 +829,10 @@ fn apply_pg_guard(items: &Vec<syn::Item>) -> eyre::Result<proc_macro2::TokenStre
                 let abi = &block.abi;
                 for item in &block.items {
                     match item {
-                        ForeignItem::Fn(func) => {
-                            // Ignore other functions -- this will often be
-                            // variadic functions that we can't safely wrap.
-                            if let Ok(tokens) = PgGuardRewriter::new().foreign_item_fn(func, abi) {
-                                out.extend(tokens);
-                            }
-                        }
+                        ForeignItem::Fn(func) => out.extend(quote! {
+                            #[pgx_macros::pg_guard]
+                            #abi { #func }
+                        }),
                         other => out.extend(quote! { #abi { #other } }),
                     }
                 }

@@ -1,8 +1,5 @@
 #![deny(unsafe_op_in_unsafe_fn)]
 
-use crate::panic::{CaughtError, ErrorReport, ErrorReportLocation, ErrorReportWithLevel};
-use std::ffi::CStr;
-
 /**
 Given a closure that is assumed to be a wrapped Postgres `extern "C"` function, [pg_guard_ffi_boundary]
 works with the Postgres and C runtimes to create a "barrier" that allows Rust to catch Postgres errors
@@ -17,13 +14,41 @@ Wrapping the FFI into Postgres enables
 But only the first of these is considered paramount.
 
 At all times PGX reserves the right to choose an implementation that achieves memory safety.
-Currently, this function is only used by PGX's generated Postgres bindings.
-It is not (yet) intended (or even necessary) for normal user code.
+Currently, this function is used to protect **every** bindgen-generated Postgres `extern "C"` function.
+
+Generally, the only time *you'll* need to use this function is when calling a Postgres-provided
+function pointer.
 
 # Safety
 
-This function should not be called from any thread but the main thread if such ever may throw an exception,
-on account of the postmaster ultimately being a single-threaded runtime.
+It is undefined behavior if the function passed to `pg_guard_ffi_boundary` have objects with
+destructors on the stack when postgres raises an `ERROR`. For example, the following is
+both a resource leak, and undefined behavior (as it needs to be a [trivially-deallocated
+stack frame]):
+
+```rust,ignore
+// This is UB!
+pgx::pg_sys::ffi::pg_guard_ffi_boundary(|| {
+    let data = vec![1, 2, 3, 4, 5];
+    // call FFI function that raises an ERROR
+});
+```
+Instead, you should write it like
+```rust,ignore
+let data = vec![1, 2, 3, 4, 5];
+pgx::pg_sys::ffi::pg_guard_ffi_boundary(|| {
+    // call FFI function that raises an ERROR
+});
+```
+
+Further, it is undefined behavior if the function passed into `pg_guard_ffi_boundary` panics. It
+is recommended that you keepthe body of the `pg_guard_ffi_boundary` closure very small -- ideally
+*only* containing a call to some C function, rather than containing any logic or variables of its
+own.
+
+Furthermore, Postgres is a single-threaded runtime.  As such, [`pg_guard_ffi_boundary`] should
+**only** be called from the main thread.  In fact, [`pg_guard_ffi_boundary`] will detect this
+and immediately panic.
 
 More generally, Rust cannot guarantee destructors are always run, PGX is written in Rust code, and
 the implementation of `pg_guard_ffi_boundary` relies on help from Postgres, the OS, and the C runtime;
@@ -41,16 +66,17 @@ If you are manipulating transient "pure Rust" data, however, it is unlikely this
 
 # Implementation Note
 
-The main implementation uses`sigsetjmp`, [`pg_sys::error_context_stack`], and [`pg_sys::PG_exception_stack`].
+The main implementation uses `sigsetjmp`, [`pg_sys::error_context_stack`], and [`pg_sys::PG_exception_stack`].
 which, when Postgres enters its exception handling in `elog.c`, will prompt a `siglongjmp` back to it.
 
 This caught error is then converted into a Rust `panic!()` and propagated up the stack, ultimately
 being converted into a transaction-aborting Postgres `ERROR` by PGX.
 
+[trivially-deallocated stack frame]: https://github.com/rust-lang/rfcs/blob/master/text/2945-c-unwind-abi.md#plain-old-frames
 **/
 #[inline(always)]
 #[track_caller]
-pub(crate) unsafe fn pg_guard_ffi_boundary<T, F: FnOnce() -> T>(f: F) -> T {
+pub unsafe fn pg_guard_ffi_boundary<T, F: FnOnce() -> T>(f: F) -> T {
     // SAFETY: Caller promises not to call us from anything but the main thread.
     unsafe { pg_guard_ffi_boundary_impl(f) }
 }
@@ -61,6 +87,10 @@ pub(crate) unsafe fn pg_guard_ffi_boundary<T, F: FnOnce() -> T>(f: F) -> T {
 unsafe fn pg_guard_ffi_boundary_impl<T, F: FnOnce() -> T>(f: F) -> T {
     //! This is the version that uses sigsetjmp and all that, for "normal" Rust/PGX interfaces.
     use crate as pg_sys;
+
+    // just use these here to avoid compilation warnings when #[cfg(feature = "postgrestd")] is on
+    use crate::panic::{CaughtError, ErrorReport, ErrorReportLocation, ErrorReportWithLevel};
+    use std::ffi::CStr;
 
     // The next code is definitely thread-unsafe (it manipulates statics in an
     // unsynchronized manner), so we may as well check here.
@@ -114,6 +144,9 @@ unsafe fn pg_guard_ffi_boundary_impl<T, F: FnOnce() -> T>(f: F) -> T {
             let detail = errdata.detail.is_null().then(|| None).unwrap_or_else(|| {
                 Some(CStr::from_ptr(errdata.detail).to_string_lossy().to_string())
             });
+            let hint = errdata.hint.is_null().then(|| None).unwrap_or_else(|| {
+                Some(CStr::from_ptr(errdata.hint).to_string_lossy().to_string())
+            });
             let funcname = errdata.funcname.is_null().then(|| None).unwrap_or_else(|| {
                 Some(CStr::from_ptr(errdata.funcname).to_string_lossy().to_string())
             });
@@ -137,6 +170,7 @@ unsafe fn pg_guard_ffi_boundary_impl<T, F: FnOnce() -> T>(f: F) -> T {
                     sqlerrcode,
                     message,
                     detail,
+                    hint,
                     location: ErrorReportLocation { file, funcname, line, col: 0 },
                 },
             }))

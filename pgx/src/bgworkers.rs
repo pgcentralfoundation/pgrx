@@ -174,6 +174,7 @@ impl BackgroundWorker {
     /// You likely always want to do this:
     ///
     /// ```rust,no_run
+    /// use pgx::prelude::*;
     /// use pgx::bgworkers::{BackgroundWorker, SignalWakeFlags};
     /// BackgroundWorker::attach_signal_handlers(SignalWakeFlags::SIGHUP | SignalWakeFlags::SIGTERM);
     /// ```
@@ -349,8 +350,8 @@ impl TerminatingDynamicBackgroundWorker {
 /// ## Example
 ///
 /// ```rust,no_run
+/// use pgx::prelude::*;
 /// use pgx::bgworkers::BackgroundWorkerBuilder;
-/// use pgx::*;
 ///
 /// #[pg_guard]
 /// pub extern "C" fn _PG_init() {
@@ -465,7 +466,7 @@ impl BackgroundWorkerBuilder {
     /// ## Example
     ///
     /// ```rust,no_run
-    /// use pgx::*;
+    /// use pgx::prelude::*;
     ///
     /// #[pg_guard]
     /// pub extern "C" fn background_worker_main(_arg: pg_sys::Datum) {
@@ -497,8 +498,9 @@ impl BackgroundWorkerBuilder {
     /// You you use `pgx`'s `IntoDatum` trait to make the conversion into a datum easy:
     ///
     /// ```rust,no_run
+    /// use pgx::prelude::*;
     /// use pgx::bgworkers::BackgroundWorkerBuilder;
-    /// use pgx::IntoDatum;
+    ///
     /// BackgroundWorkerBuilder::new("Example")
     ///     .set_function("background_worker_main")
     ///     .set_library("example")

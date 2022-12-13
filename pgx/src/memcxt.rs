@@ -19,7 +19,9 @@ use crate::pg_sys::AsPgCStr;
 use crate::{pg_sys, PgBox};
 use core::panic::{RefUnwindSafe, UnwindSafe};
 use core::ptr;
+use pgx_pg_sys::PgTryBuilder;
 use std::fmt::Debug;
+use std::ptr::NonNull;
 
 /// A shorter type name for a `*const std::os::raw::c_void`
 #[allow(non_camel_case_types)]
@@ -156,7 +158,7 @@ pub enum PgMemoryContexts {
     /// It's incredibly important that the specified pointer be one actually allocated by
     /// Postgres' memory management system.  Otherwise, it's undefined behavior and will
     /// **absolutely** crash Postgres
-    Of(void_ptr),
+    Of(OwnerMemoryContext),
 
     /// Create a temporary MemoryContext for use with `::switch_to()`.  It gets deleted as soon
     /// as `::switch_to()` exits.
@@ -173,28 +175,73 @@ pub enum PgMemoryContexts {
 
 /// A `pg_sys::MemoryContext` that is owned by `PgMemoryContexts::Owned`
 #[derive(Debug)]
-pub struct OwnedMemoryContext(pg_sys::MemoryContext);
+pub struct OwnedMemoryContext {
+    owned: pg_sys::MemoryContext,
+    previous: pg_sys::MemoryContext,
+}
 
 impl Drop for OwnedMemoryContext {
     fn drop(&mut self) {
         unsafe {
-            pg_sys::MemoryContextDelete(self.0);
+            // In order to prevent crashes, if we're trying to drop
+            // a context that is current, switch to its predecessor, and then drop it
+            if ptr::eq(pg_sys::CurrentMemoryContext, self.owned) {
+                pg_sys::CurrentMemoryContext = self.previous;
+            }
+            pg_sys::MemoryContextDelete(self.owned);
         }
     }
+}
+
+/// A `pg_sys::MemoryContext` that allocated a specific pointer
+#[derive(Debug, Clone, Copy)]
+pub struct OwnerMemoryContext {
+    memcxt: NonNull<pg_sys::MemoryContextData>,
 }
 
 impl PgMemoryContexts {
     /// Create a new `PgMemoryContext::Owned`
     pub fn new(name: &str) -> PgMemoryContexts {
-        PgMemoryContexts::Owned(OwnedMemoryContext(unsafe {
-            pg_sys::AllocSetContextCreateExtended(
-                PgMemoryContexts::CurrentMemoryContext.value(),
-                name.as_pg_cstr(),
-                pg_sys::ALLOCSET_DEFAULT_MINSIZE as usize,
-                pg_sys::ALLOCSET_DEFAULT_INITSIZE as usize,
-                pg_sys::ALLOCSET_DEFAULT_MAXSIZE as usize,
-            )
-        }))
+        let previous = PgMemoryContexts::CurrentMemoryContext.value();
+        PgMemoryContexts::Owned(OwnedMemoryContext {
+            previous,
+            owned: unsafe {
+                pg_sys::AllocSetContextCreateExtended(
+                    PgMemoryContexts::CurrentMemoryContext.value(),
+                    name.as_pg_cstr(),
+                    pg_sys::ALLOCSET_DEFAULT_MINSIZE as usize,
+                    pg_sys::ALLOCSET_DEFAULT_INITSIZE as usize,
+                    pg_sys::ALLOCSET_DEFAULT_MAXSIZE as usize,
+                )
+            },
+        })
+    }
+
+    /// Create a [`PgMemoryContexts::Of`] variant that wraps the [`pg_sys::MemoryContext`] that owns
+    /// the specified pointer.
+    ///
+    /// Note that the specified pointer **must** be allocated by Postgres, via [`pg_sys::palloc`] or
+    /// similar functions.
+    ///
+    /// Returns [`Option::None`] if the specified pointer is null.
+    ///
+    /// # Safety
+    ///
+    /// This function is incredibly unsafe.  If the specified pointer is not one originally allocated
+    /// by Postgres, there is absolutely no telling what will be returned.
+    ///
+    /// Furthermore, users of this function's return value have no choice but to assume the returned
+    /// [`PgMemoryContexts::Of`] variant represents a legitimate [`pg_sys::MemoryContext`].
+    pub unsafe fn of(ptr: void_mut_ptr) -> Option<PgMemoryContexts> {
+        let parent = unsafe {
+            // (un)SAFETY: the caller assumes responsibility for ensuring the provided pointer is
+            // going to be accepted by Postgres `GetMemoryContextChunk`.  Postgres will ERROR
+            // if its invariants aren't met, but who really knows when the ptr could have come
+            // come from anywhere
+            pg_sys::GetMemoryContextChunk(ptr)
+        };
+        let memcxt = NonNull::new(parent)?;
+        Some(PgMemoryContexts::Of(OwnerMemoryContext { memcxt }))
     }
 
     /// Retrieve the underlying Postgres `*mut MemoryContextData`
@@ -212,8 +259,8 @@ impl PgMemoryContexts {
             PgMemoryContexts::TopTransactionContext => unsafe { pg_sys::TopTransactionContext },
             PgMemoryContexts::CurTransactionContext => unsafe { pg_sys::CurTransactionContext },
             PgMemoryContexts::For(mc) => *mc,
-            PgMemoryContexts::Owned(mc) => mc.0,
-            PgMemoryContexts::Of(ptr) => PgMemoryContexts::get_context_for_pointer(*ptr),
+            PgMemoryContexts::Owned(mc) => mc.owned,
+            PgMemoryContexts::Of(owner) => owner.memcxt.as_ptr(),
             PgMemoryContexts::Transient { .. } => {
                 panic!("cannot use value() to retrieve a Transient PgMemoryContext")
             }
@@ -221,9 +268,20 @@ impl PgMemoryContexts {
     }
 
     /// Set this MemoryContext as the `CurrentMemoryContext, returning whatever `CurrentMemoryContext` is
-    pub fn set_as_current(&self) -> PgMemoryContexts {
+    pub fn set_as_current(&mut self) -> PgMemoryContexts {
         unsafe {
             let old_context = pg_sys::CurrentMemoryContext;
+
+            match self {
+                PgMemoryContexts::Owned(mc) => {
+                    // If the context is set as current while it's already current,
+                    // don't update `previous` as it'll self-reference instead.
+                    if old_context != mc.owned {
+                        mc.previous = old_context;
+                    }
+                }
+                _ => {}
+            }
 
             pg_sys::CurrentMemoryContext = self.value();
 
@@ -261,9 +319,9 @@ impl PgMemoryContexts {
     /// ## Examples
     ///
     /// ```rust,no_run
-    /// use pgx::*;
+    /// use pgx::prelude::*;
+    /// use pgx::PgMemoryContexts;
     ///
-    /// #[pg_guard]
     /// pub fn do_something() -> pg_sys::ItemPointer {
     ///     PgMemoryContexts::TopTransactionContext.switch_to(|context| {
     ///         // allocate a new ItemPointerData, but inside the TopTransactionContext
@@ -421,12 +479,14 @@ impl PgMemoryContexts {
             pg_sys::CurrentMemoryContext = context;
         }
 
-        let result = f(&mut PgMemoryContexts::For(context));
-
-        // restore our understanding of the current memory context
-        unsafe {
-            pg_sys::CurrentMemoryContext = prev_context;
-        }
+        let result = PgTryBuilder::new(|| f(&mut PgMemoryContexts::For(context)))
+            .finally(|| {
+                // restore our understanding of the current memory context
+                unsafe {
+                    pg_sys::CurrentMemoryContext = prev_context;
+                }
+            })
+            .execute();
 
         result
     }
@@ -483,68 +543,5 @@ impl PgMemoryContexts {
             }
             _ => unguarded_exec_in_context(self.value(), f),
         }
-    }
-
-    ///
-    /// GetMemoryChunkContext
-    ///    Given a currently-allocated chunk, determine the context
-    ///         it belongs to.
-    ///
-    /// All chunks allocated by any memory context manager are required to be
-    /// preceded by the corresponding MemoryContext stored, without padding, in the
-    /// preceding sizeof(void*) bytes.  A currently-allocated chunk must contain a
-    /// backpointer to its owning context.  The backpointer is used by pfree() and
-    /// repalloc() to find the context to call.
-    ///
-    fn get_context_for_pointer(ptr: void_ptr) -> pg_sys::MemoryContext {
-        extern "C" {
-            pub fn pgx_GetMemoryContextChunk(pointer: void_ptr) -> pg_sys::MemoryContext;
-        }
-        unsafe { pgx_GetMemoryContextChunk(ptr) }
-
-        //
-        // the below causes PG to crash b/c it mis-calculates where the MemoryContext address is
-        //
-        // I have likely either screwed up max_align()/type_align() or the pointer math at the
-        // bottom of the function
-        //
-
-        //        // #define MAXALIGN(LEN)                  TYPEALIGN(MAXIMUM_ALIGNOF, (LEN))
-        //        #[inline]
-        //        fn max_align(len: void_ptr) -> void_ptr {
-        //            // #define TYPEALIGN(ALIGNVAL,LEN)  \
-        //            //      (((uintptr_t) (LEN) + ((ALIGNVAL) - 1)) & ~((uintptr_t) ((ALIGNVAL) - 1)))
-        //            #[inline]
-        //            fn type_align(
-        //                alignval: u32,
-        //                len: void_ptr,
-        //            ) -> void_ptr {
-        //                (((len as usize) + ((alignval) - 1) as usize) & !(((alignval) - 1) as usize))
-        //                    as void_ptr
-        //            }
-        //            type_align(pg_sys::MAXIMUM_ALIGNOF, len)
-        //        }
-        //
-        //        let context;
-        //
-        //        /*
-        //         * Try to detect bogus pointers handed to us, poorly though we can.
-        //         * Presumably, a pointer that isn't MAXALIGNED isn't pointing at an
-        //         * allocated chunk.
-        //         */
-        //        assert!(!ptr.is_null());
-        //        assert_eq!(
-        //            ptr as void_ptr,
-        //            max_align(ptr) as void_ptr
-        //        );
-        //
-        //        /*
-        //         * OK, it's probably safe to look at the context.
-        //         */
-        //        //            context = *(MemoryContext *) (((char *) pointer) - sizeof(void *));
-        //        context = (((ptr as *const std::os::raw::c_char) as usize)
-        //            - std::mem::size_of::<void_ptr>())
-        //            as pg_sys::MemoryContext;
-        //        context
     }
 }

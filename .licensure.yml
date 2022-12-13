@@ -3,7 +3,7 @@ excludes:
   - Cargo.toml
   - Cargo.lock
   - LICENSE
-  - pgx-utils/assets/ansi.tmTheme
+  - pgx-sql-entity-graph/assets/ansi.tmTheme
   - ".envrc"
   - ".gitignore"
   - "flake\\..*"

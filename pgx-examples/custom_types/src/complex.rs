@@ -59,6 +59,7 @@ mod tests {
     use maplit::*;
     use pgx::prelude::*;
 
+    #[cfg(not(feature = "no-schema-generation"))]
     #[pg_test]
     fn test_known_animals_via_spi() {
         let animals = Spi::get_one::<Animals>("SELECT known_animals();");

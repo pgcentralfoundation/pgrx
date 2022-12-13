@@ -14,7 +14,7 @@ use crate::{
     StringInfo,
 };
 use pgx_pg_sys::varlena;
-use pgx_utils::sql_entity_graph::metadata::{
+use pgx_sql_entity_graph::metadata::{
     ArgumentError, Returns, ReturnsError, SqlMapping, SqlTranslatable,
 };
 use serde::{Deserialize, Serialize};
@@ -34,7 +34,8 @@ impl Clone for PallocdVarlena {
         // SAFETY:  we know that `self.ptr` is valid as the only way we could have gotten one
         // is internally via Postgres
         let ptr = unsafe {
-            PgMemoryContexts::Of(self.ptr as void_mut_ptr)
+            PgMemoryContexts::of(self.ptr as void_mut_ptr)
+                .expect("could not determine owning memory context")
                 .copy_ptr_into(self.ptr as void_mut_ptr, len) as *mut pg_sys::varlena
         };
 
@@ -56,7 +57,7 @@ impl Clone for PallocdVarlena {
 /// ```rust
 /// use std::str::FromStr;
 ///
-/// use crate::pgx::*;
+/// use pgx::prelude::*;
 ///
 /// #[derive(Copy, Clone, PostgresType)]
 /// #[pgvarlena_inoutfuncs]
@@ -79,7 +80,7 @@ impl Clone for PallocdVarlena {
 ///         result
 ///     }
 ///
-///     fn output(&self, buffer: &mut StringInfo) {
+///     fn output(&self, buffer: &mut pgx::StringInfo) {
 ///         buffer.push_str(&format!("{},{},{}", self.a, self.b, self.c));
 ///     }
 /// }
@@ -111,7 +112,8 @@ where
     /// ## Example
     ///
     /// ```rust,no_run
-    /// use pgx::PgVarlena;
+    /// use pgx::prelude::*;
+    ///
     /// #[derive(Copy, Clone)]
     /// struct MyType {
     ///    a: f32,

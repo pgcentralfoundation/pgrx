@@ -1,4 +1,4 @@
-use pgx::*;
+use pgx::prelude::*;
 
 pg_module_magic!();
 

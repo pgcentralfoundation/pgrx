@@ -7,11 +7,11 @@ All rights reserved.
 Use of this source code is governed by the MIT license that can be found in the LICENSE file.
 */
 
-use pgx::prelude::*;
-use pgx::stringinfo::StringInfo;
-use pgx::utils::sql_entity_graph::metadata::{
+use pgx::pgx_sql_entity_graph::metadata::{
     ArgumentError, Returns, ReturnsError, SqlMapping, SqlTranslatable,
 };
+use pgx::prelude::*;
+use pgx::stringinfo::StringInfo;
 use pgx::AllocatedByRust;
 
 use crate::get_named_capture;

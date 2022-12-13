@@ -267,6 +267,8 @@ mod all_versions {
     use memoffset::*;
     use std::str::FromStr;
 
+    pub use crate::submodules::htup::*;
+
     /// this comes from `postgres_ext.h`
     pub const InvalidOid: super::Oid = 0;
     pub const InvalidOffsetNumber: super::OffsetNumber = 0;
@@ -289,7 +291,117 @@ mod all_versions {
         pub fn pgx_list_nth_int(list: *mut super::List, nth: i32) -> i32;
         pub fn pgx_list_nth_oid(list: *mut super::List, nth: i32) -> super::Oid;
         pub fn pgx_list_nth_cell(list: *mut super::List, nth: i32) -> *mut super::ListCell;
-        pub fn pgx_GETSTRUCT(tuple: pg_sys::HeapTuple) -> *mut std::os::raw::c_char;
+    }
+
+    /// Given a valid HeapTuple pointer, return address of the user data
+    ///
+    /// # Safety
+    ///
+    /// This function cannot determine if the `tuple` argument is really a non-null pointer to a [`HeapTuple`].
+    #[inline(always)]
+    pub unsafe fn GETSTRUCT(tuple: crate::HeapTuple) -> *mut std::os::raw::c_char {
+        // #define GETSTRUCT(TUP) ((char *) ((TUP)->t_data) + (TUP)->t_data->t_hoff)
+
+        // SAFETY:  The caller has asserted `tuple` is a valid HeapTuple and is properly aligned
+        // Additionally, t_data.t_hoff is an a u8, so it'll fit inside a usize
+        (*tuple).t_data.cast::<std::os::raw::c_char>().add((*(*tuple).t_data).t_hoff as _)
+    }
+
+    //
+    // TODO: [`TYPEALIGN`] and [`MAXALIGN`] are also part of PR #948 and when that's all merged,
+    //       their uses should be switched to these
+    //
+
+    #[allow(non_snake_case)]
+    #[inline(always)]
+    pub const unsafe fn TYPEALIGN(alignval: usize, len: usize) -> usize {
+        // #define TYPEALIGN(ALIGNVAL,LEN)  \
+        // (((uintptr_t) (LEN) + ((ALIGNVAL) - 1)) & ~((uintptr_t) ((ALIGNVAL) - 1)))
+        ((len) + ((alignval) - 1)) & !((alignval) - 1)
+    }
+
+    #[allow(non_snake_case)]
+    #[inline(always)]
+    pub const unsafe fn MAXALIGN(len: usize) -> usize {
+        // #define MAXALIGN(LEN) TYPEALIGN(MAXIMUM_ALIGNOF, (LEN))
+        TYPEALIGN(pg_sys::MAXIMUM_ALIGNOF as _, len)
+    }
+
+    ///  Given a currently-allocated chunk of Postgres allocated memory, determine the context
+    ///  it belongs to.
+    ///
+    /// All chunks allocated by any memory context manager are required to be
+    /// preceded by the corresponding MemoryContext stored, without padding, in the
+    /// preceding sizeof(void*) bytes.  A currently-allocated chunk must contain a
+    /// backpointer to its owning context.  The backpointer is used by pfree() and
+    /// repalloc() to find the context to call.
+    ///
+    /// # Safety
+    ///
+    /// The specified `pointer` **must** be one allocated by Postgres (via [`palloc`] and friends).
+    ///
+    ///
+    /// # Panics
+    ///
+    /// This function will panic if `pointer` is null, if it's not properly aligned, or if the memory
+    /// it points do doesn't have the a header that looks like a memory context pointer
+    #[allow(non_snake_case)]
+    pub unsafe fn GetMemoryContextChunk(
+        pointer: *mut std::os::raw::c_void,
+    ) -> pg_sys::MemoryContext {
+        /*
+         * Try to detect bogus pointers handed to us, poorly though we can.
+         * Presumably, a pointer that isn't MAXALIGNED isn't pointing at an
+         * allocated chunk.
+         */
+        assert!(!pointer.is_null());
+        assert_eq!(pointer, MAXALIGN(pointer as usize) as *mut ::std::os::raw::c_void);
+
+        /*
+         * OK, it's probably safe to look at the context.
+         */
+        // 	context = *(MemoryContext *) (((char *) pointer) - sizeof(void *));
+        let context = unsafe {
+            // SAFETY: the caller has assured us that `pointer` points to palloc'd memory, which
+            // means it'll have this header before it
+            *(pointer
+                .cast::<::std::os::raw::c_char>()
+                .sub(std::mem::size_of::<*mut ::std::os::raw::c_void>())
+                .cast())
+        };
+
+        assert!(MemoryContextIsValid(context));
+
+        context
+    }
+
+    /// Returns true if memory context is valid, as Postgres determines such a thing.
+    ///
+    /// # Safety
+    ///
+    /// Caller must determine that the specified `context` pointer, if it's probably a [`MemoryContextData`]
+    /// pointer, really is.  This function is a best effort, not a guarantee.
+    ///
+    /// # Implementation Note
+    ///
+    /// If Postgres adds more memory context types in the future, we need to do that here too.
+    #[allow(non_snake_case)]
+    #[inline(always)]
+    pub unsafe fn MemoryContextIsValid(context: *mut crate::MemoryContextData) -> bool {
+        // #define MemoryContextIsValid(context) \
+        // 	((context) != NULL && \
+        // 	 (IsA((context), AllocSetContext) || \
+        // 	  IsA((context), SlabContext) || \
+        // 	  IsA((context), GenerationContext)))
+
+        !context.is_null()
+            && unsafe {
+                // SAFETY:  we just determined that context isn't null, so it's safe to `.as_ref()`
+                // and `.unwrap_unchecked()`
+                (*context).type_ == crate::NodeTag_T_AllocSetContext
+                    || (*context).type_ == crate::NodeTag_T_SlabContext
+                    || (*context).type_ == crate::NodeTag_T_GenerationContext
+            }
     }
 
     #[inline]
@@ -365,74 +477,6 @@ mod all_versions {
         pgx_list_nth(range_table, index as i32 - 1) as *mut super::RangeTblEntry
     }
 
-    #[inline]
-    pub fn HeapTupleHeaderGetXmin(
-        htup_header: super::HeapTupleHeader,
-    ) -> Option<super::TransactionId> {
-        extern "C" {
-            pub fn pgx_HeapTupleHeaderGetXmin(
-                htup_header: super::HeapTupleHeader,
-            ) -> super::TransactionId;
-        }
-
-        if htup_header.is_null() {
-            None
-        } else {
-            Some(unsafe { pgx_HeapTupleHeaderGetXmin(htup_header) })
-        }
-    }
-
-    #[inline]
-    pub fn HeapTupleHeaderGetRawCommandId(
-        htup_header: super::HeapTupleHeader,
-    ) -> Option<super::CommandId> {
-        extern "C" {
-            pub fn pgx_HeapTupleHeaderGetRawCommandId(
-                htup_header: super::HeapTupleHeader,
-            ) -> super::CommandId;
-        }
-
-        if htup_header.is_null() {
-            None
-        } else {
-            Some(unsafe { pgx_HeapTupleHeaderGetRawCommandId(htup_header) })
-        }
-    }
-
-    /// #define HeapTupleHeaderIsHeapOnly(tup) \
-    ///    ( \
-    ///       ((tup)->t_infomask2 & HEAP_ONLY_TUPLE) != 0 \
-    ///    )
-    #[inline]
-    pub unsafe fn HeapTupleHeaderIsHeapOnly(htup_header: super::HeapTupleHeader) -> bool {
-        ((*htup_header).t_infomask2 & crate::HEAP_ONLY_TUPLE as u16) != 0
-    }
-
-    /// #define HeapTupleHeaderIsHotUpdated(tup) \
-    /// ( \
-    ///      ((tup)->t_infomask2 & HEAP_HOT_UPDATED) != 0 && \
-    ///      ((tup)->t_infomask & HEAP_XMAX_INVALID) == 0 && \
-    ///      !HeapTupleHeaderXminInvalid(tup) \
-    /// )
-    #[inline]
-    pub unsafe fn HeapTupleHeaderIsHotUpdated(htup_header: super::HeapTupleHeader) -> bool {
-        (*htup_header).t_infomask2 & crate::HEAP_HOT_UPDATED as u16 != 0
-            && (*htup_header).t_infomask & crate::HEAP_XMAX_INVALID as u16 == 0
-            && !HeapTupleHeaderXminInvalid(htup_header)
-    }
-
-    /// #define HeapTupleHeaderXminInvalid(tup) \
-    /// ( \
-    ///   ((tup)->t_infomask & (HEAP_XMIN_COMMITTED|HEAP_XMIN_INVALID)) == \
-    ///      HEAP_XMIN_INVALID \
-    /// )
-    #[inline]
-    pub unsafe fn HeapTupleHeaderXminInvalid(htup_header: super::HeapTupleHeader) -> bool {
-        (*htup_header).t_infomask
-            & (crate::HEAP_XMIN_COMMITTED as u16 | crate::HEAP_XMIN_INVALID as u16)
-            == crate::HEAP_XMIN_INVALID as u16
-    }
-
     /// #define BufferGetPage(buffer) ((Page)BufferGetBlock(buffer))
     #[inline]
     pub unsafe fn BufferGetPage(buffer: crate::Buffer) -> crate::Page {
@@ -464,12 +508,27 @@ mod all_versions {
         buffer < 0
     }
 
+    /// Retrieve the "user data" of the specified [`HeapTuple`] as a specific type. Typically this
+    /// will be a struct that represents a Postgres system catalog, such as [`FormData_pg_class`].
+    ///
+    /// # Returns
+    ///
+    /// A pointer to the [`HeapTuple`]'s "user data", cast as a mutable pointer to `T`.  If the
+    /// specified `htup` pointer is null, the null pointer is returned.
+    ///
+    /// # Safety
+    ///
+    /// This function cannot verify that the specified `htup` points to a valid [`HeapTuple`] nor
+    /// that if it does, that its bytes are bitwise compatible with `T`.
     #[inline]
-    pub fn heap_tuple_get_struct<T>(htup: super::HeapTuple) -> *mut T {
+    pub unsafe fn heap_tuple_get_struct<T>(htup: super::HeapTuple) -> *mut T {
         if htup.is_null() {
-            0 as *mut T
+            std::ptr::null_mut()
         } else {
-            unsafe { pgx_GETSTRUCT(htup) as *mut T }
+            unsafe {
+                // SAFETY:  The caller has told us `htop` is a valid HeapTuple
+                GETSTRUCT(htup).cast()
+            }
         }
     }
 
