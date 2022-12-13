@@ -94,10 +94,10 @@ unsafe fn extract_enum_oid(tup: *mut pg_sys::HeapTupleData) -> pg_sys::Oid {
     unsafe {
         // SAFETY:  The caller has assured us that `tup` is a valid HeapTupleData pointer and as such
         // we can correctly assume that its `t_data` member will be properly allocated
-        let t_data = tup.as_ref().unwrap_unchecked().t_data;
-        let header = t_data.as_ref().unwrap_unchecked();
-        if (header.t_infomask & pg_sys::HEAP_HASOID as u16) != 0 {
-            let oid_ptr = (t_data.cast::<std::os::raw::c_char>().add(header.t_hoff as _))
+        let t_data = (*tup).t_data;
+        let header = t_data;
+        if ((*header).t_infomask & pg_sys::HEAP_HASOID as u16) != 0 {
+            let oid_ptr = (t_data.cast::<std::os::raw::c_char>().add((*header).t_hoff as _))
                 .sub(std::mem::size_of::<pg_sys::Oid>())
                 .cast::<pg_sys::Oid>();
 
