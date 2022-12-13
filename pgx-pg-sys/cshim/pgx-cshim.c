@@ -129,14 +129,19 @@ void pgx_ereport(const int level, int code, char *message, char *detail, char *f
 #endif  /* IS_PG_11 || IS_PG_12 */
 }
 
-PGDLLEXPORT void pgx_SET_VARSIZE(struct varlena *ptr, int size);
-void pgx_SET_VARSIZE(struct varlena *ptr, int size) {
-    SET_VARSIZE(ptr, size);
+PGDLLEXPORT Datum pgx_heap_getattr(HeapTupleData *tuple, int attnum, TupleDesc tupdesc, bool *isnull);
+Datum pgx_heap_getattr(HeapTupleData *tuple, int attnum, TupleDesc tupdesc, bool *isnull) {
+    return heap_getattr(tuple, attnum, tupdesc, isnull);
 }
 
-PGDLLEXPORT void pgx_SET_VARSIZE_SHORT(struct varlena *ptr, int size);
-void pgx_SET_VARSIZE_SHORT(struct varlena *ptr, int size) {
-    SET_VARSIZE_SHORT(ptr, size);
+PGDLLEXPORT TransactionId pgx_HeapTupleHeaderGetXmin(HeapTupleHeader htup_header);
+TransactionId pgx_HeapTupleHeaderGetXmin(HeapTupleHeader htup_header) {
+    return HeapTupleHeaderGetXmin(htup_header);
+}
+
+PGDLLEXPORT CommandId pgx_HeapTupleHeaderGetRawCommandId(HeapTupleHeader htup_header);
+CommandId pgx_HeapTupleHeaderGetRawCommandId(HeapTupleHeader htup_header) {
+    return HeapTupleHeaderGetRawCommandId(htup_header);
 }
 
 PGDLLEXPORT RangeTblEntry *pgx_planner_rt_fetch(Index index, PlannerInfo *plannerInfo);
