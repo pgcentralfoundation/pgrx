@@ -298,14 +298,13 @@ mod all_versions {
     /// # Safety
     ///
     /// This function cannot determine if the `tuple` argument is really a non-null pointer to a [`HeapTuple`].
+    #[inline(always)]
     pub unsafe fn GETSTRUCT(tuple: crate::HeapTuple) -> *mut std::os::raw::c_char {
         // #define GETSTRUCT(TUP) ((char *) ((TUP)->t_data) + (TUP)->t_data->t_hoff)
-        tuple
-            .as_mut()
-            .unwrap_unchecked()
-            .t_data
-            .cast::<std::os::raw::c_char>()
-            .add(tuple.as_ref().unwrap_unchecked().t_data.as_ref().unwrap_unchecked().t_hoff as _)
+
+        // SAFETY:  The caller has asserted `tuple` is a valid HeapTuple and is properly aligned
+        // Additionally, t_data.t_hoff is an a u8, so it'll fit inside a usize
+        (*tuple).t_data.cast::<std::os::raw::c_char>().add((*(*tuple).t_data).t_hoff as _)
     }
 
     #[inline]
