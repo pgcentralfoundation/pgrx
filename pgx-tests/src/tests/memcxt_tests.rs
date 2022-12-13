@@ -78,4 +78,14 @@ mod tests {
         drop(ctx);
         assert_eq!(unsafe { pg_sys::CurrentMemoryContext }, another_ctx.value());
     }
+
+    #[pg_test]
+    fn test_current_owned_memory_context_drop_when_set_current_twice() {
+        let ctx_parent = PgMemoryContexts::CurrentMemoryContext.value();
+        let mut ctx = PgMemoryContexts::new("test");
+        ctx.set_as_current();
+        ctx.set_as_current();
+        drop(ctx);
+        assert_eq!(unsafe { pg_sys::CurrentMemoryContext }, ctx_parent);
+    }
 }

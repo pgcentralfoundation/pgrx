@@ -240,7 +240,11 @@ impl PgMemoryContexts {
 
             match self {
                 PgMemoryContexts::Owned(mc) => {
-                    mc.previous = old_context;
+                    // If the context is set as current while it's already current,
+                    // don't update `previous` as it'll self-reference instead.
+                    if old_context != mc.owned {
+                        mc.previous = old_context;
+                    }
                 }
                 _ => {}
             }
