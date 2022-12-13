@@ -52,11 +52,6 @@ impl<Parent: SubTransactionExt, const COMMIT: bool> SubTransaction<Parent, COMMI
         self.parent.take().unwrap()
     }
 
-    /// Returns the memory context this transaction is in
-    pub fn memory_context(&self) -> PgMemoryContexts {
-        PgMemoryContexts::For(self.memory_context)
-    }
-
     fn internal_rollback(&self) {
         unsafe {
             pg_sys::RollbackAndReleaseCurrentSubTransaction();
