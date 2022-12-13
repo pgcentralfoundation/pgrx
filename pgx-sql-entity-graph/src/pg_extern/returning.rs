@@ -41,12 +41,15 @@ pub enum Returning {
 impl Returning {
     fn parse_type_macro(type_macro: &mut syn::TypeMacro) -> Result<Returning, syn::Error> {
         let mac = &type_macro.mac;
-        let archetype = mac.path.segments.last().unwrap();
-        match archetype.ident.to_string().as_str() {
-            "composite_type" => {
+        let opt_archetype = mac.path.segments.last().map(|archetype| archetype.ident.to_string());
+        match opt_archetype.as_deref() {
+            Some("composite_type") => {
                 Ok(Returning::Type(UsedType::new(syn::Type::Macro(type_macro.clone()))?))
             }
-            _ => unimplemented!("Don't support anything other than `composite_type!()`"),
+            _ => Err(syn::Error::new(
+                type_macro.span(),
+                "type macros other than `composite_type!` are not yet implemented",
+            )),
         }
     }
 }
@@ -78,20 +81,21 @@ impl TryFrom<&syn::ReturnType> for Returning {
                         }
                         if saw_option_ident || saw_setof_iterator || saw_table_iterator {
                             let option_inner_path = if saw_option_ident {
-                                match &mut path.segments.last_mut().unwrap().arguments {
-                                    syn::PathArguments::AngleBracketed(args) => {
-                                        match args.args.last_mut().unwrap() {
-                                            syn::GenericArgument::Type(syn::Type::Path(syn::TypePath { qself: _, path })) => path.clone(),
-                                            syn::GenericArgument::Type(_) => {
+                                match path.segments.last_mut().map(|s| &mut s.arguments) {
+                                    Some(syn::PathArguments::AngleBracketed(args)) => {
+                                        let args_span = args.span();
+                                        match args.args.last_mut() {
+                                            Some(syn::GenericArgument::Type(syn::Type::Path(syn::TypePath { qself: _, path }))) => path.clone(),
+                                            Some(syn::GenericArgument::Type(_)) => {
                                                 let used_ty = UsedType::new(syn::Type::Path(typepath.clone()))?;
                                                 return Ok(Returning::Type(used_ty))
                                             },
                                             other => {
                                                 return Err(syn::Error::new(
-                                                    other.span(),
+                                                    other.as_ref().map(|s| s.span()).unwrap_or(args_span),
                                                     &format!(
-                                                    "Got unexpected generic argument for Option inner: {other:?}"
-                                                ),
+                                                        "Got unexpected generic argument for Option inner: {other:?}"
+                                                    ),
                                                 ))
                                             }
                                         }
@@ -100,8 +104,8 @@ impl TryFrom<&syn::ReturnType> for Returning {
                                         return Err(syn::Error::new(
                                             other.span(),
                                             &format!(
-                                        "Got unexpected path argument for Option inner: {other:?}"
-                                    ),
+                                                "Got unexpected path argument for Option inner: {other:?}"
+                                            ),
                                         ))
                                     }
                                 }
@@ -118,42 +122,43 @@ impl TryFrom<&syn::ReturnType> for Returning {
                                 };
                             }
                             if saw_setof_iterator {
-                                let last_path_segment = option_inner_path.segments.last().unwrap();
-                                let (used_ty, optional) = match &last_path_segment.arguments {
-                                    syn::PathArguments::AngleBracketed(args) => {
+                                let last_path_segment = option_inner_path.segments.last();
+                                let (used_ty, optional) = match &last_path_segment.map(|ps| &ps.arguments) {
+                                    Some(syn::PathArguments::AngleBracketed(args)) => {
                                         match args.args.last().unwrap() {
-                                        syn::GenericArgument::Type(ty) => {
-                                            match &ty {
-                                                syn::Type::Path(path) => {
-                                                    (UsedType::new(syn::Type::Path(path.clone()))?, saw_option_ident)
-                                                }
-                                                syn::Type::Macro(type_macro) => {
-                                                    (UsedType::new(syn::Type::Macro(type_macro.clone()),)?, saw_option_ident)
-                                                },
-                                                reference @ syn::Type::Reference(_) => {
-                                                    (UsedType::new((*reference).clone(),)?, saw_option_ident)
-                                                },
-                                                ty => {
-                                                    unimplemented!("SetOf Iterator must have an item, got: {ty:?}")
+                                            syn::GenericArgument::Type(ty) => {
+                                                match &ty {
+                                                    syn::Type::Path(path) => {
+                                                        (UsedType::new(syn::Type::Path(path.clone()))?, saw_option_ident)
+                                                    }
+                                                    syn::Type::Macro(type_macro) => {
+                                                        (UsedType::new(syn::Type::Macro(type_macro.clone()),)?, saw_option_ident)
+                                                    },
+                                                    reference @ syn::Type::Reference(_) => {
+                                                        (UsedType::new((*reference).clone(),)?, saw_option_ident)
+                                                    },
+                                                    ty => return Err(syn::Error::new(
+                                                        ty.span(),
+                                                        "SetOf Iterator must have an item",
+                                                    )),
                                                 }
                                             }
+                                            other => {
+                                                return Err(syn::Error::new(
+                                                    other.span(),
+                                                    &format!(
+                                                        "Got unexpected generic argument for SetOfIterator: {other:?}"
+                                                    ),
+                                                ))
+                                            }
                                         }
-                                        other => {
-                                            return Err(syn::Error::new(
-                                                other.span(),
-                                                &format!(
-                                                    "Got unexpected generic argument for SetOfIterator: {other:?}"
-                                                ),
-                                            ))
-                                        }
-                                    }
                                     }
                                     other => {
                                         return Err(syn::Error::new(
-                                            other.span(),
+                                            other.map(|s| s.span()).unwrap_or_else(proc_macro2::Span::call_site),
                                             &format!(
-                                        "Got unexpected path argument for SetOfIterator: {other:?}"
-                                    ),
+                                                "Got unexpected path argument for SetOfIterator: {other:?}"
+                                            ),
                                         ))
                                     }
                                 };
@@ -169,8 +174,8 @@ impl TryFrom<&syn::ReturnType> for Returning {
                                                         return Err(syn::Error::new(
                                                             other.span(),
                                                             &format!(
-                                                            "Got unexpected generic argument for Option inner: {other:?}"
-                                                        ),
+                                                                "Got unexpected generic argument for Option inner: {other:?}"
+                                                            ),
                                                         ))
                                                     }
                                                 }
@@ -179,8 +184,8 @@ impl TryFrom<&syn::ReturnType> for Returning {
                                                 return Err(syn::Error::new(
                                                     other.span(),
                                                     &format!(
-                                                    "Got unexpected path argument for Option inner: {other:?}"
-                                                ),
+                                                        "Got unexpected path argument for Option inner: {other:?}"
+                                                    ),
                                                 ))
                                             }
                                         };
@@ -257,7 +262,10 @@ impl TryFrom<&syn::ReturnType> for Returning {
                                                             iterated_items.push(iterated_item);
                                                         }
                                                         ty => {
-                                                            unimplemented!("Table Iterator must have an item, got: {ty:?}")
+                                                            return Err(syn::Error::new(
+                                                                ty.span(),
+                                                                "Table Iterator must have an item",
+                                                            ));
                                                         }
                                                     };
                                                 }

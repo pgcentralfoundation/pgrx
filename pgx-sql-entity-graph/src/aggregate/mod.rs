@@ -80,6 +80,7 @@ const ARG_NAMES: [&str; 32] = [
 pub struct PgAggregate {
     item_impl: ItemImpl,
     name: Expr,
+    target_ident: Ident,
     pg_externs: Vec<ItemFn>,
     // Note these should not be considered *writable*, they're snapshots from construction.
     type_args: AggregateTypeList,
@@ -134,15 +135,23 @@ impl PgAggregate {
         }
 
         let name = match get_impl_const_by_name(&item_impl_snapshot, "NAME") {
-            Some(item_const) => match item_const.expr {
+            Some(item_const) => match &item_const.expr {
                 syn::Expr::Lit(ref expr) => {
-                    if let syn::Lit::Str(_) = expr.lit {
+                    if let syn::Lit::Str(_) = &expr.lit {
                         item_const.expr.clone()
                     } else {
-                        panic!("`NAME` must be a `&'static str` for Aggregate implementations.")
+                        return Err(syn::Error::new(
+                            expr.span(),
+                            "`NAME` must be a `&'static str` for Aggregate implementations.",
+                        ));
                     }
                 }
-                _ => panic!("`NAME` must be a `&'static str` for Aggregate implementations."),
+                e => {
+                    return Err(syn::Error::new(
+                        e.span(),
+                        "`NAME` must be a `&'static str` for Aggregate implementations.",
+                    ));
+                }
             },
             None => {
                 item_impl.items.push(parse_quote! {
@@ -525,6 +534,7 @@ impl PgAggregate {
 
         Ok(CodeEnrichment(Self {
             item_impl,
+            target_ident,
             pg_externs,
             name,
             type_args: type_args_value,
@@ -544,17 +554,20 @@ impl PgAggregate {
                 &item_impl_snapshot,
                 "INITIAL_CONDITION",
             )
-            .and_then(get_const_litstr),
+            .and_then(|e| get_const_litstr(e).transpose())
+            .transpose()?,
             const_ordered_set: get_impl_const_by_name(&item_impl_snapshot, "ORDERED_SET")
                 .and_then(get_const_litbool)
                 .unwrap_or(false),
             const_sort_operator: get_impl_const_by_name(&item_impl_snapshot, "SORT_OPERATOR")
-                .and_then(get_const_litstr),
+                .and_then(|e| get_const_litstr(e).transpose())
+                .transpose()?,
             const_moving_intial_condition: get_impl_const_by_name(
                 &item_impl_snapshot,
                 "MOVING_INITIAL_CONDITION",
             )
-            .and_then(get_const_litstr),
+            .and_then(|e| get_const_litstr(e).transpose())
+            .transpose()?,
             fn_state: fn_state_name,
             fn_finalize: fn_finalize_name,
             fn_combine: fn_combine_name,
@@ -583,10 +596,7 @@ impl PgAggregate {
 
 impl ToEntityGraphTokens for PgAggregate {
     fn to_entity_graph_tokens(&self) -> TokenStream2 {
-        let target_path = get_target_path(&self.item_impl)
-            .expect("Expected constructed PgAggregate to have target path.");
-        let target_ident = get_target_ident(&target_path)
-            .expect("Expected constructed PgAggregate to have target ident.");
+        let target_ident = &self.target_ident;
         let snake_case_target_ident =
             Ident::new(&target_ident.to_string().to_case(Case::Snake), target_ident.span());
         let sql_graph_entity_fn_name = syn::Ident::new(
@@ -808,29 +818,32 @@ fn get_const_litbool<'a>(item: &'a ImplItemConst) -> Option<bool> {
     }
 }
 
-fn get_const_litstr<'a>(item: &'a ImplItemConst) -> Option<String> {
+fn get_const_litstr<'a>(item: &'a ImplItemConst) -> syn::Result<Option<String>> {
     match &item.expr {
         syn::Expr::Lit(expr_lit) => match &expr_lit.lit {
-            syn::Lit::Str(lit) => Some(lit.value()),
-            _ => None,
+            syn::Lit::Str(lit) => Ok(Some(lit.value())),
+            _ => Ok(None),
         },
         syn::Expr::Call(expr_call) => match &*expr_call.func {
             syn::Expr::Path(expr_path) => {
-                if expr_path.path.segments.last()?.ident.to_string() == "Some" {
-                    match expr_call.args.first()? {
-                        syn::Expr::Lit(expr_lit) => match &expr_lit.lit {
-                            syn::Lit::Str(lit) => Some(lit.value()),
-                            _ => None,
+                let Some(last) = expr_path.path.segments.last() else {
+                    return Ok(None);
+                };
+                if last.ident.to_string() == "Some" {
+                    match expr_call.args.first() {
+                        Some(syn::Expr::Lit(expr_lit)) => match &expr_lit.lit {
+                            syn::Lit::Str(lit) => Ok(Some(lit.value())),
+                            _ => Ok(None),
                         },
-                        _ => None,
+                        _ => Ok(None),
                     }
                 } else {
-                    None
+                    Ok(None)
                 }
             }
-            _ => None,
+            _ => Ok(None),
         },
-        _ => panic!("Got {:?}", item.expr),
+        ex => Err(syn::Error::new(ex.span(), "")),
     }
 }
 

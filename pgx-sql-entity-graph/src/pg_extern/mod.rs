@@ -35,7 +35,6 @@ use crate::enrich::CodeEnrichment;
 use crate::enrich::ToEntityGraphTokens;
 use crate::enrich::ToRustCodeTokens;
 use crate::lifetimes::staticize_lifetimes;
-use eyre::WrapErr;
 use proc_macro2::{Ident, Span, TokenStream as TokenStream2};
 use quote::{quote, quote_spanned, ToTokens};
 use syn::parse::{Parse, ParseStream, Parser};
@@ -74,6 +73,11 @@ pub struct PgExtern {
     attrs: Vec<Attribute>,
     func: syn::ItemFn,
     to_sql_config: ToSqlConfig,
+    operator: Option<PgOperator>,
+    search_path: Option<SearchPathList>,
+    inputs: Vec<PgExternArgument>,
+    input_types: Vec<syn::Type>,
+    returns: Returning,
 }
 
 impl PgExtern {
@@ -109,8 +113,42 @@ impl PgExtern {
         if !to_sql_config.overrides_default() {
             crate::ident_is_acceptable_to_postgres(&func.sig.ident)?;
         }
+        let operator = Self::operator(&func)?;
+        let search_path = Self::search_path(&func)?;
+        let inputs = Self::inputs(&func)?;
+        let input_types = Self::input_types(&func)?;
+        let returns = Returning::try_from(&func.sig.output)?;
+        Ok(CodeEnrichment(Self {
+            attrs,
+            func,
+            to_sql_config,
+            operator,
+            search_path,
+            inputs,
+            input_types,
+            returns,
+        }))
+    }
 
-        Ok(CodeEnrichment(Self { attrs, func, to_sql_config }))
+    fn input_types(func: &syn::ItemFn) -> syn::Result<Vec<syn::Type>> {
+        func.sig
+            .inputs
+            .iter()
+            .filter_map(|v| -> Option<syn::Result<syn::Type>> {
+                match v {
+                    syn::FnArg::Receiver(_) => None,
+                    syn::FnArg::Typed(pat_ty) => {
+                        let static_ty = pat_ty.ty.clone();
+                        let mut static_ty = match UsedType::new(*static_ty) {
+                            Ok(v) => v.resolved_ty,
+                            Err(e) => return Some(Err(e)),
+                        };
+                        staticize_lifetimes(&mut static_ty);
+                        Some(Ok(static_ty))
+                    }
+                }
+            })
+            .collect()
     }
 
     fn name(&self) -> String {
@@ -167,34 +205,29 @@ impl PgExtern {
         retval.map(|s| syn::LitStr::new(s.as_ref(), span.unwrap()))
     }
 
-    fn operator(&self) -> Option<PgOperator> {
+    fn operator(func: &syn::ItemFn) -> syn::Result<Option<PgOperator>> {
         let mut skel = Option::<PgOperator>::default();
-        for attr in &self.func.attrs {
+        for attr in &func.attrs {
             let last_segment = attr.path.segments.last().unwrap();
             match last_segment.ident.to_string().as_str() {
                 "opname" => {
-                    let attr: PgxOperatorOpName = syn::parse2(attr.tokens.clone())
-                        .expect(&format!("Unable to parse {:?}", &attr.tokens));
+                    let attr: PgxOperatorOpName = syn::parse2(attr.tokens.clone())?;
                     skel.get_or_insert_with(Default::default).opname.get_or_insert(attr);
                 }
                 "commutator" => {
-                    let attr: PgxOperatorAttributeWithIdent = syn::parse2(attr.tokens.clone())
-                        .expect(&format!("Unable to parse {:?}", &attr.tokens));
+                    let attr: PgxOperatorAttributeWithIdent = syn::parse2(attr.tokens.clone())?;
                     skel.get_or_insert_with(Default::default).commutator.get_or_insert(attr);
                 }
                 "negator" => {
-                    let attr: PgxOperatorAttributeWithIdent = syn::parse2(attr.tokens.clone())
-                        .expect(&format!("Unable to parse {:?}", &attr.tokens));
+                    let attr: PgxOperatorAttributeWithIdent = syn::parse2(attr.tokens.clone())?;
                     skel.get_or_insert_with(Default::default).negator.get_or_insert(attr);
                 }
                 "join" => {
-                    let attr: PgxOperatorAttributeWithIdent = syn::parse2(attr.tokens.clone())
-                        .expect(&format!("Unable to parse {:?}", &attr.tokens));
+                    let attr: PgxOperatorAttributeWithIdent = syn::parse2(attr.tokens.clone())?;
                     skel.get_or_insert_with(Default::default).join.get_or_insert(attr);
                 }
                 "restrict" => {
-                    let attr: PgxOperatorAttributeWithIdent = syn::parse2(attr.tokens.clone())
-                        .expect(&format!("Unable to parse {:?}", &attr.tokens));
+                    let attr: PgxOperatorAttributeWithIdent = syn::parse2(attr.tokens.clone())?;
                     skel.get_or_insert_with(Default::default).restrict.get_or_insert(attr);
                 }
                 "hashes" => {
@@ -206,12 +239,11 @@ impl PgExtern {
                 _ => (),
             }
         }
-        skel
+        Ok(skel)
     }
 
-    fn search_path(&self) -> Option<SearchPathList> {
-        self.func
-            .attrs
+    fn search_path(func: &syn::ItemFn) -> syn::Result<Option<SearchPathList>> {
+        func.attrs
             .iter()
             .find(|f| {
                 f.path
@@ -220,21 +252,17 @@ impl PgExtern {
                     .map(|f| f.ident == Ident::new("search_path", Span::call_site()))
                     .unwrap_or_default()
             })
-            .and_then(|attr| Some(attr.parse_args::<SearchPathList>().unwrap()))
+            .map(|attr| attr.parse_args::<SearchPathList>())
+            .transpose()
     }
 
-    fn inputs(&self) -> eyre::Result<Vec<PgExternArgument>> {
+    fn inputs(func: &syn::ItemFn) -> syn::Result<Vec<PgExternArgument>> {
         let mut args = Vec::default();
-        for input in &self.func.sig.inputs {
-            let arg = PgExternArgument::build(input.clone())
-                .wrap_err_with(|| format!("Could not map {:?}", input))?;
+        for input in &func.sig.inputs {
+            let arg = PgExternArgument::build(input.clone())?;
             args.push(arg);
         }
         Ok(args)
-    }
-
-    fn returns(&self) -> Result<Returning, syn::Error> {
-        Returning::try_from(&self.func.sig.output)
     }
 
     fn entity_tokens(&self) -> TokenStream2 {
@@ -248,29 +276,13 @@ impl PgExtern {
             .iter()
             .map(|attr| attr.to_sql_entity_graph_tokens())
             .collect::<Punctuated<_, Token![,]>>();
-        let search_path = self.search_path().into_iter();
-        let inputs = self.inputs().unwrap();
+        let search_path = self.search_path.clone().into_iter();
+        let inputs = &self.inputs;
         let inputs_iter = inputs.iter().map(|v| v.entity_tokens());
 
-        let input_types = self.func.sig.inputs.iter().filter_map(|v| match v {
-            syn::FnArg::Receiver(_) => None,
-            syn::FnArg::Typed(pat_ty) => {
-                let static_ty = pat_ty.ty.clone();
-                let mut static_ty = UsedType::new(*static_ty).unwrap().resolved_ty;
-                staticize_lifetimes(&mut static_ty);
-                Some(static_ty)
-            }
-        });
+        let input_types = self.input_types.iter().cloned();
 
-        let returns = match self.returns() {
-            Ok(returns) => returns,
-            Err(e) => {
-                let msg = e.to_string();
-                return quote! {
-                    std::compile_error!(#msg);
-                };
-            }
-        };
+        let returns = &self.returns;
 
         let return_type = match &self.func.sig.output {
             syn::ReturnType::Default => None,
@@ -281,7 +293,7 @@ impl PgExtern {
             }
         };
 
-        let operator = self.operator().into_iter();
+        let operator = self.operator.clone().into_iter();
         let to_sql_config = match self.overridden() {
             None => self.to_sql_config.clone(),
             Some(content) => {
@@ -352,7 +364,7 @@ impl PgExtern {
         // We use a `_` prefix to make functions with no args more satisfied during linting.
         let fcinfo_ident = syn::Ident::new("_fcinfo", self.func.sig.ident.span());
 
-        let args = self.inputs().unwrap();
+        let args = &self.inputs;
         let arg_pats = args
             .iter()
             .map(|v| syn::Ident::new(&format!("{}_", &v.pat), self.func.sig.span()))
@@ -387,19 +399,19 @@ impl PgExtern {
             }
         });
 
-        match self.returns().unwrap() {
+        match &self.returns {
             Returning::None => quote_spanned! { self.func.sig.span() =>
-                    #[no_mangle]
-                    #[doc(hidden)]
-                    #[::pgx::pgx_macros::pg_guard]
-                    pub unsafe extern "C" fn #func_name_wrapper #func_generics(#fcinfo_ident: ::pgx::pg_sys::FunctionCallInfo) {
-                        #(
-                            #arg_fetches
-                        )*
+                  #[no_mangle]
+                  #[doc(hidden)]
+                  #[::pgx::pgx_macros::pg_guard]
+                  pub unsafe extern "C" fn #func_name_wrapper #func_generics(#fcinfo_ident: ::pgx::pg_sys::FunctionCallInfo) {
+                      #(
+                          #arg_fetches
+                      )*
 
-                        #[allow(unused_unsafe)] // unwrapped fn might be unsafe
-                        unsafe { #func_name(#(#arg_pats),*) }
-                    }
+                    #[allow(unused_unsafe)] // unwrapped fn might be unsafe
+                    unsafe { #func_name(#(#arg_pats),*) }
+                }
             },
             Returning::Type(retval_ty) => {
                 let result_ident = syn::Ident::new("result", self.func.sig.span());
@@ -447,8 +459,8 @@ impl PgExtern {
             }
             Returning::SetOf { ty: retval_ty, optional } => {
                 let result_ident = syn::Ident::new("result", self.func.sig.span());
-                let retval_ty_resolved = retval_ty.original_ty;
-                let result_handler = if optional {
+                let retval_ty_resolved = &retval_ty.original_ty;
+                let result_handler = if *optional {
                     // don't need unsafe annotations because of the larger unsafe block coming up
                     quote_spanned! { self.func.sig.span() =>
                         #func_name(#(#arg_pats),*)
@@ -551,7 +563,7 @@ impl PgExtern {
                     let heap_tuple = unsafe { ::pgx::pg_sys::heap_form_tuple(#funcctx_ident.tuple_desc, datums.as_mut_ptr(), nulls.as_mut_ptr()) };
                 };
 
-                let result_handler = if optional {
+                let result_handler = if *optional {
                     // don't need unsafe annotations because of the larger unsafe block coming up
                     quote_spanned! { self.func.sig.span() =>
                         #func_name(#(#arg_pats),*)

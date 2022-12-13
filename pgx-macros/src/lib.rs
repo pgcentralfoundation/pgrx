@@ -37,17 +37,19 @@ pub fn pg_guard(_attr: TokenStream, item: TokenStream) -> TokenStream {
 
     let rewriter = PgGuardRewriter::new();
 
-    match ast {
+    let res = match ast {
         // this is for processing the members of extern "C" { } blocks
         // functions inside the block get wrapped as public, top-level unsafe functions that are not "extern"
-        Item::ForeignMod(block) => rewriter.extern_block(block).into(),
+        Item::ForeignMod(block) => Ok(rewriter.extern_block(block)),
 
         // process top-level functions
-        Item::Fn(func) => rewriter.item_fn_without_rewrite(func).into(),
-        _ => {
-            panic!("#[pg_guard] can only be applied to extern \"C\" blocks and top-level functions")
-        }
-    }
+        Item::Fn(func) => rewriter.item_fn_without_rewrite(func),
+        unknown => Err(syn::Error::new(
+            unknown.span(),
+            "#[pg_guard] can only be applied to extern \"C\" blocks and top-level functions",
+        )),
+    };
+    res.unwrap_or_else(|e| e.into_compile_error()).into()
 }
 
 /// `#[pg_test]` functions are test functions (akin to `#[test]`), but they run in-process inside
@@ -130,7 +132,14 @@ pub fn pg_test(attr: TokenStream, item: TokenStream) -> TokenStream {
             });
         }
 
-        _ => panic!("#[pg_test] can only be applied to top-level functions"),
+        thing => {
+            return syn::Error::new(
+                thing.span(),
+                "#[pg_test] can only be applied to top-level functions",
+            )
+            .to_compile_error()
+            .into()
+        }
     }
 
     stream.into()
@@ -605,19 +614,24 @@ enum DogNames {
 pub fn postgres_enum(input: TokenStream) -> TokenStream {
     let ast = parse_macro_input!(input as syn::DeriveInput);
 
-    impl_postgres_enum(ast).into()
+    impl_postgres_enum(ast).unwrap_or_else(|e| e.to_compile_error()).into()
 }
 
-fn impl_postgres_enum(ast: DeriveInput) -> proc_macro2::TokenStream {
+fn impl_postgres_enum(ast: DeriveInput) -> syn::Result<proc_macro2::TokenStream> {
     let mut stream = proc_macro2::TokenStream::new();
     let sql_graph_entity_ast = ast.clone();
-    let enum_ident = ast.ident;
+    let enum_ident = &ast.ident;
     let enum_name = enum_ident.to_string();
 
     // validate that we're only operating on an enum
     let enum_data = match ast.data {
         Data::Enum(e) => e,
-        _ => panic!("#[derive(PostgresEnum)] can only be applied to enums"),
+        _ => {
+            return Err(syn::Error::new(
+                ast.span(),
+                "#[derive(PostgresEnum)] can only be applied to enums",
+            ))
+        }
     };
 
     let mut from_datum = proc_macro2::TokenStream::new();
@@ -663,10 +677,10 @@ fn impl_postgres_enum(ast: DeriveInput) -> proc_macro2::TokenStream {
         }
     });
 
-    let sql_graph_entity_item = PostgresEnum::from_derive_input(sql_graph_entity_ast).unwrap();
+    let sql_graph_entity_item = PostgresEnum::from_derive_input(sql_graph_entity_ast)?;
     sql_graph_entity_item.to_tokens(&mut stream);
 
-    stream
+    Ok(stream)
 }
 
 /**
@@ -698,10 +712,10 @@ Optionally accepts the following attributes:
 pub fn postgres_type(input: TokenStream) -> TokenStream {
     let ast = parse_macro_input!(input as syn::DeriveInput);
 
-    impl_postgres_type(ast).into()
+    impl_postgres_type(ast).unwrap_or_else(|e| e.to_compile_error()).into()
 }
 
-fn impl_postgres_type(ast: DeriveInput) -> proc_macro2::TokenStream {
+fn impl_postgres_type(ast: DeriveInput) -> syn::Result<proc_macro2::TokenStream> {
     let name = &ast.ident;
     let generics = &ast.generics;
     let has_lifetimes = generics.lifetimes().next();
@@ -718,7 +732,12 @@ fn impl_postgres_type(ast: DeriveInput) -> proc_macro2::TokenStream {
             // it will result in compile-time error of conflicting implementation
             // of traits (IntoDatum, inout, etc.)
         }
-        _ => panic!("#[derive(PostgresType)] can only be applied to structs or enums"),
+        _ => {
+            return Err(syn::Error::new(
+                ast.span(),
+                "#[derive(PostgresType)] can only be applied to structs or enums",
+            ))
+        }
     }
 
     if args.is_empty() {
@@ -814,26 +833,31 @@ fn impl_postgres_type(ast: DeriveInput) -> proc_macro2::TokenStream {
         });
     }
 
-    let sql_graph_entity_item = PostgresType::from_derive_input(ast).unwrap();
+    let sql_graph_entity_item = PostgresType::from_derive_input(ast)?;
     sql_graph_entity_item.to_tokens(&mut stream);
 
-    stream
+    Ok(stream)
 }
 
 #[proc_macro_derive(PostgresGucEnum, attributes(hidden))]
 pub fn postgres_guc_enum(input: TokenStream) -> TokenStream {
     let ast = parse_macro_input!(input as syn::DeriveInput);
 
-    impl_guc_enum(ast).into()
+    impl_guc_enum(ast).unwrap_or_else(|e| e.to_compile_error()).into()
 }
 
-fn impl_guc_enum(ast: DeriveInput) -> proc_macro2::TokenStream {
+fn impl_guc_enum(ast: DeriveInput) -> syn::Result<proc_macro2::TokenStream> {
     let mut stream = proc_macro2::TokenStream::new();
 
     // validate that we're only operating on an enum
     let enum_data = match ast.data {
         Data::Enum(e) => e,
-        _ => panic!("#[derive(PostgresGucEnum)] can only be applied to enums"),
+        _ => {
+            return Err(syn::Error::new(
+                ast.span(),
+                "#[derive(PostgresGucEnum)] can only be applied to enums",
+            ))
+        }
     };
     let enum_name = ast.ident;
     let enum_len = enum_data.variants.len();
@@ -899,7 +923,7 @@ fn impl_guc_enum(ast: DeriveInput) -> proc_macro2::TokenStream {
         }
     });
 
-    stream
+    Ok(stream)
 }
 
 #[derive(Debug, Hash, Ord, PartialOrd, Eq, PartialEq)]

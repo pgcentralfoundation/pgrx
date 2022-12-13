@@ -1,3 +1,9 @@
+#![deny(clippy::needless_borrow)] // unnecessary borrows can impair inference
+#![deny(clippy::manual_flatten)] // avoid rightwards drift
+#![deny(clippy::redundant_static_lifetimes)] // avoid unnecessary lifetime annotations
+#![allow(clippy::redundant_closure)] // extra closures are easier to refactor
+#![allow(clippy::iter_nth_zero)] // can be easier to refactor
+#![allow(clippy::perf)] // not a priority here
 use clap::{Args, Parser, Subcommand};
 use owo_colors::OwoColorize;
 use std::collections::HashSet;
@@ -67,7 +73,7 @@ struct UpdateFilesArgs {
 }
 
 // List of directories to ignore while Walkdir'ing. Add more here as necessary.
-const IGNORE_DIRS: &'static [&'static str] = &[".git", "target"];
+const IGNORE_DIRS: &[&str] = &[".git", "target"];
 
 fn main() {
     let cli = Cli::parse();
@@ -90,7 +96,7 @@ fn query_toml(query_args: &QueryCargoVersionArgs) {
     // the root of a PGX checkout directory
     let filepath = match &query_args.file_path {
         Some(path) => {
-            fullpath(&path).expect(format!("Could not get full path for file: {}", path).as_str())
+            fullpath(path).expect(format!("Could not get full path for file: {}", path).as_str())
         }
         None => {
             let mut current_dir = env::current_dir().expect("Could not get current_dir!");
@@ -135,7 +141,7 @@ fn update_files(args: &UpdateFilesArgs) {
     let mut exclude_version_files = HashSet::new();
     for file in &args.exclude_from_version_change {
         exclude_version_files.insert(
-            fullpath(&file).expect(format!("Could not get full path for file: {}", file).as_str()),
+            fullpath(file).expect(format!("Could not get full path for file: {}", file).as_str()),
         );
     }
 
@@ -184,7 +190,7 @@ fn update_files(args: &UpdateFilesArgs) {
     // Loop through all files that are included for dependency updates via CLI params
     for file in &args.include_for_dep_updates {
         let filepath =
-            fullpath(&file).expect(format!("Could not get full path for file {}", file).as_str());
+            fullpath(file).expect(format!("Could not get full path for file {}", file).as_str());
 
         let mut output = format!(
             "{} Cargo.toml file at {} for processing",
@@ -261,10 +267,7 @@ fn update_files(args: &UpdateFilesArgs) {
 
         let update_package_version = |item: &mut Item| {
             if let Some(current_version_specifier) = item.as_str() {
-                *item = value(parse_new_version(
-                    current_version_specifier,
-                    &args.update_version.as_str(),
-                ))
+                *item = value(parse_new_version(current_version_specifier, &args.update_version))
             }
         };
 
@@ -324,18 +327,16 @@ fn update_files(args: &UpdateFilesArgs) {
             // from the diff output above will produce irrelevant information, so we
             // will skip it.
             let mut diff_output = String::new();
-            for output_line in child_output.stdout.lines().skip(2) {
-                if let Ok(line) = output_line {
-                    match line.chars().nth(0) {
-                        Some('-') => {
-                            diff_output.push_str(format!("\n            {}", line.red()).as_str())
-                        }
-                        Some('+') => {
-                            diff_output.push_str(format!("\n            {}", line.green()).as_str())
-                        }
-                        Some(_) => diff_output.push_str(format!("\n           {line}").as_str()),
-                        _ => {}
+            for line in child_output.stdout.lines().skip(2).flatten() {
+                match line.chars().nth(0) {
+                    Some('-') => {
+                        diff_output.push_str(format!("\n            {}", line.red()).as_str())
                     }
+                    Some('+') => {
+                        diff_output.push_str(format!("\n            {}", line.green()).as_str())
+                    }
+                    Some(_) => diff_output.push_str(format!("\n           {line}").as_str()),
+                    _ => {}
                 }
             }
 
@@ -428,7 +429,7 @@ fn parse_new_version(current_version_specifier: &str, new_version: &str) -> Stri
         Some(_) => {
             if let Some(version_pos) = current_version_specifier.find(|c: char| c.is_numeric()) {
                 result.push_str(&current_version_specifier[..version_pos]);
-                result.push_str(&new_version.clone());
+                result.push_str(new_version);
             } else {
                 panic!(
                     "Could not find an actual version in specifier: '{}'",
@@ -447,7 +448,7 @@ fn parse_new_version(current_version_specifier: &str, new_version: &str) -> Stri
 fn extract_package_name<P: AsRef<Path>>(filepath: P) -> Option<String> {
     let filepath = filepath.as_ref();
 
-    let data = fs::read_to_string(&filepath)
+    let data = fs::read_to_string(filepath)
         .expect(format!("Unable to open file at {}", &filepath.display()).as_str());
 
     let doc = data.parse::<Document>().expect(

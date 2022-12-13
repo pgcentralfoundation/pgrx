@@ -101,7 +101,7 @@ pub(crate) fn install_extension(
     base_directory: Option<PathBuf>,
     features: &clap_cargo::Features,
 ) -> eyre::Result<()> {
-    let base_directory = base_directory.unwrap_or("/".into());
+    let base_directory = base_directory.unwrap_or_else(|| PathBuf::from("/"));
     tracing::Span::current()
         .record("base_directory", &tracing::field::display(&base_directory.display()));
 
@@ -393,7 +393,7 @@ pub(crate) fn get_version(manifest_path: impl AsRef<Path>) -> eyre::Result<Strin
                     .wrap_err("Couldn't parse manifest")?;
 
                 let version = manifest.package.ok_or(eyre!("no `[package]` section found"))?.version;
-                Ok(version.to_string())
+                Ok(version)
             } else {
                 Ok(v)
             }
