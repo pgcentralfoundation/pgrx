@@ -12,6 +12,10 @@ use std::ops::Deref;
 #[derive(Debug)]
 pub struct SubTransaction<Parent: SubTransactionExt, const COMMIT: bool = true> {
     memory_context: pg_sys::MemoryContext,
+    // Resource ownership before the transaction
+    //
+    // Based on information from src/backend/utils/resowner/README
+    // as well as practical use of it in src/pl/plpython/plpy_spi.c
     resource_owner: pg_sys::ResourceOwner,
     // Should the transaction be released, or was it already committed or rolled back?
     //
