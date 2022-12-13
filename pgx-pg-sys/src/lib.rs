@@ -398,11 +398,9 @@ mod all_versions {
             && unsafe {
                 // SAFETY:  we just determined that context isn't null, so it's safe to `.as_ref()`
                 // and `.unwrap_unchecked()`
-                let context = context.as_ref().unwrap_unchecked();
-
-                context.type_ == crate::NodeTag_T_AllocSetContext
-                    || context.type_ == crate::NodeTag_T_SlabContext
-                    || context.type_ == crate::NodeTag_T_GenerationContext
+                (*context).type_ == crate::NodeTag_T_AllocSetContext
+                    || (*context).type_ == crate::NodeTag_T_SlabContext
+                    || (*context).type_ == crate::NodeTag_T_GenerationContext
             }
     }
 
