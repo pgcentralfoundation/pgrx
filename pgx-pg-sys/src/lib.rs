@@ -454,8 +454,8 @@ mod all_versions {
     #[cfg(not(feature = "no-cshim"))]
     #[pg_guard]
     extern "C" {
-        #[link_name = "planner_rt_fetch"]
-        pub fn pgx_planner_rt_fetch(
+        #[link_name = "pgx_planner_rt_fetch"]
+        pub fn planner_rt_fetch(
             index: super::Index,
             root: *mut super::PlannerInfo,
         ) -> *mut super::RangeTblEntry;
