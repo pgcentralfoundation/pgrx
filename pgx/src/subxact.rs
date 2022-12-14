@@ -100,7 +100,9 @@ impl ReleaseOnDrop for NoOpOnDrop {}
 /// (default) or roll back if it is `RollbackOnDrop`.
 #[derive(Debug)]
 pub struct SubTransaction<Parent: SubTransactionExt, Release: ReleaseOnDrop = CommitOnDrop> {
+    // Transaction release mechanism (commit, drop)
     release: Release,
+    // Transaction parent
     parent: Parent,
 }
 
