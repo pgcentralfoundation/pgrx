@@ -13,7 +13,7 @@ use pgx::prelude::*;
 // will crash postgres.  If things are correct it'll simply raise an ERROR saying "panic in walker".
 #[pg_extern]
 fn crash() {
-    #[cfg(not(feature = "no-cshim"))]
+    #[cfg(feature = "cshim")]
     {
         use pgx::PgList;
         unsafe {
@@ -28,7 +28,7 @@ fn crash() {
         }
     }
 
-    #[cfg(feature = "no-cshim")]
+    #[cfg(not(feature = "cshim"))]
     {
         walker();
     }

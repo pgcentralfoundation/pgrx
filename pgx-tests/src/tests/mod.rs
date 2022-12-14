@@ -21,7 +21,7 @@ mod enum_type_tests;
 mod fcinfo_tests;
 mod guc_tests;
 mod heap_tuple;
-#[cfg(not(feature = "no-cshim"))]
+#[cfg(feature = "cshim")]
 mod hooks_tests;
 mod inet_tests;
 mod internal_tests;

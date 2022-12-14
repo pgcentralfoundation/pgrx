@@ -2,7 +2,7 @@
 #   docker build --build-arg PG_MAJOR_VER=14 -f .github/docker/Dockerfile.debian\:bullseye -t pgx-debian .
 #
 # Example of how to run this container with tests after building the image:
-#   docker run pgx-debian cargo test --no-default-features --features pg14 --locked
+#   docker run pgx-debian cargo test --no-default-features --features "pg14" --locked
 #
 # Note that "PG_MAJOR_VER" build arg in the build step must match the
 # "--features pgXX" in the run step

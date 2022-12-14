@@ -186,7 +186,7 @@ impl PgRelation {
     }
 
     /// Return an iterator of indices, as `PgRelation`s, attached to this relation
-    #[cfg(not(feature = "no-cshim"))]
+    #[cfg(feature = "cshim")]
     pub fn indices(
         &self,
         lockmode: pg_sys::LOCKMODE,

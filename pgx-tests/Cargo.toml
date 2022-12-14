@@ -14,14 +14,14 @@ edition = "2021"
 crate-type = [ "cdylib", "lib" ]
 
 [features]
-default = [ ]
+default = [ "cshim" ]
 pg11 = [ "pgx/pg11" ]
 pg12 = [ "pgx/pg12" ]
 pg13 = [ "pgx/pg13" ]
 pg14 = [ "pgx/pg14" ]
 pg15 = [ "pgx/pg15" ]
 pg_test = [ ]
-no-cshim = [ "pgx/no-cshim" ]
+cshim = [ "pgx/cshim" ]
 no-schema-generation = [ "pgx/no-schema-generation", "pgx-macros/no-schema-generation" ]
 
 [package.metadata.docs.rs]

@@ -285,7 +285,7 @@ mod all_versions {
     pub const FirstNormalTransactionId: super::TransactionId = 3 as super::TransactionId;
     pub const MaxTransactionId: super::TransactionId = 0xFFFF_FFFF as super::TransactionId;
 
-    #[cfg(not(feature = "no-cshim"))]
+    #[cfg(feature = "cshim")]
     #[pgx_macros::pg_guard]
     extern "C" {
         pub fn pgx_list_nth(list: *mut super::List, nth: i32) -> *mut std::os::raw::c_void;
@@ -451,7 +451,7 @@ mod all_versions {
         super::get_element_type(typoid) != InvalidOid
     }
 
-    #[cfg(not(feature = "no-cshim"))]
+    #[cfg(feature = "cshim")]
     #[pg_guard]
     extern "C" {
         #[link_name = "pgx_planner_rt_fetch"]
@@ -465,7 +465,7 @@ mod all_versions {
     /// #define rt_fetch(rangetable_index, rangetable) \
     ///     ((RangeTblEntry *) list_nth(rangetable, (rangetable_index)-1))
     /// ```
-    #[cfg(not(feature = "no-cshim"))]
+    #[cfg(feature = "cshim")]
     #[inline]
     pub unsafe fn rt_fetch(
         index: super::Index,
@@ -552,7 +552,7 @@ mod all_versions {
         ) -> bool;
     }
 
-    #[cfg(not(feature = "no-cshim"))]
+    #[cfg(feature = "cshim")]
     #[pgx_macros::pg_guard]
     extern "C" {
         #[link_name = "pgx_SpinLockInit"]
