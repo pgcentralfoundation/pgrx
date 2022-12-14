@@ -18,27 +18,13 @@ use crate::pgx_sql::PgxSql;
 use crate::to_sql::ToSql;
 use crate::{SqlGraphEntity, SqlGraphIdentifier};
 
-use std::cmp::Ordering;
-
 /// The output of a [`Schema`](crate::schema::Schema) from `quote::ToTokens::to_tokens`.
-#[derive(Debug, Clone, Hash, PartialEq, Eq)]
+#[derive(Debug, Clone, Hash, PartialEq, Eq, Ord, PartialOrd)]
 pub struct SchemaEntity {
     pub module_path: &'static str,
     pub name: &'static str,
     pub file: &'static str,
     pub line: u32,
-}
-
-impl Ord for SchemaEntity {
-    fn cmp(&self, other: &Self) -> Ordering {
-        self.file.cmp(other.file).then_with(|| self.file.cmp(other.file))
-    }
-}
-
-impl PartialOrd for SchemaEntity {
-    fn partial_cmp(&self, other: &Self) -> Option<Ordering> {
-        Some(self.cmp(other))
-    }
 }
 
 impl From<SchemaEntity> for SqlGraphEntity {
@@ -69,9 +55,9 @@ impl ToSql for SchemaEntity {
     fn to_sql(&self, _context: &PgxSql) -> eyre::Result<String> {
         let sql = format!(
             "\n\
-                    -- {file}:{line}\n\
-                    CREATE SCHEMA IF NOT EXISTS {name}; /* {module_path} */\
-                ",
+                -- {file}:{line}\n\
+                CREATE SCHEMA IF NOT EXISTS {name}; /* {module_path} */\
+            ",
             name = self.name,
             file = self.file,
             line = self.line,

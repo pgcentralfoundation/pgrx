@@ -18,10 +18,9 @@ use crate::pgx_sql::PgxSql;
 use crate::to_sql::entity::ToSqlConfigEntity;
 use crate::to_sql::ToSql;
 use crate::{SqlGraphEntity, SqlGraphIdentifier};
-use std::cmp::Ordering;
 
 /// The output of a [`PostgresHash`](crate::postgres_hash::PostgresHash) from `quote::ToTokens::to_tokens`.
-#[derive(Debug, Clone, Hash, PartialEq, Eq)]
+#[derive(Debug, Clone, Hash, PartialEq, Eq, Ord, PartialOrd)]
 pub struct PostgresHashEntity {
     pub name: &'static str,
     pub file: &'static str,
@@ -35,18 +34,6 @@ pub struct PostgresHashEntity {
 impl PostgresHashEntity {
     pub(crate) fn fn_name(&self) -> String {
         format!("{}_hash", self.name.to_lowercase())
-    }
-}
-
-impl Ord for PostgresHashEntity {
-    fn cmp(&self, other: &Self) -> Ordering {
-        self.file.cmp(other.file).then_with(|| self.file.cmp(other.file))
-    }
-}
-
-impl PartialOrd for PostgresHashEntity {
-    fn partial_cmp(&self, other: &Self) -> Option<Ordering> {
-        Some(self.cmp(other))
     }
 }
 
