@@ -387,7 +387,7 @@ pub(crate) fn generate_schema(
     let mut entities = Vec::default();
     let sql_mapping;
 
-    #[rustfmt::skip] // explict extern "Rust" is more clear here
+    #[rustfmt::skip] // explicit extern "Rust" is more clear here
     unsafe {
         // SAFETY: Calls foreign functions with the correct type signatures.
         // Assumes that repr(Rust) enums are represented the same in this crate as in the external

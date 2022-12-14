@@ -530,7 +530,7 @@ fn this_dog_name_or_your_favorite_dog_name(
 ```
 
 Composite types are very **runtime failure** heavy, as opposed to using PostgreSQL types `pgx` has
-a builtin compatable type for, or a [`#[derive(pgx::PostgresType)`][crate::PostgresType] type. Those options
+a builtin compatible type for, or a [`#[derive(pgx::PostgresType)`][crate::PostgresType] type. Those options
  can have their shape and API reasoned about at build time.
 
 This runtime failure model is because the shape and layout, or even the name of the type could change during

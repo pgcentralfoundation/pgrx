@@ -44,7 +44,7 @@ pub fn get_c_locale_flags() -> &'static [&'static str] {
 // These methods were originally in `pgx-utils`, but in an effort to consolidate
 // dependencies, the decision was made to package them into wherever made the
 // most sense. In this case, it made the most sense to put them into this
-// pgx-pg-config crate. That doesnt mean they can't be moved at a later date.
+// pgx-pg-config crate. That doesn't mean they can't be moved at a later date.
 mod path_methods;
 pub use path_methods::{get_target_dir, prefix_path};
 

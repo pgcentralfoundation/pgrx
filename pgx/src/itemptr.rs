@@ -13,7 +13,7 @@ use crate::{pg_sys, AllocatedByRust, PgBox};
 
 /// ## Safety
 ///
-/// This function s unsafe becuase it does not check that the specified ItemPointerData pointer
+/// This function s unsafe because it does not check that the specified ItemPointerData pointer
 /// might be null
 #[inline]
 pub unsafe fn item_pointer_get_block_number(
@@ -25,7 +25,7 @@ pub unsafe fn item_pointer_get_block_number(
 
 /// ## Safety
 ///
-/// This function s unsafe becuase it does not check that the specified ItemPointerData pointer
+/// This function s unsafe because it does not check that the specified ItemPointerData pointer
 /// might be null
 #[inline]
 pub unsafe fn item_pointer_get_offset_number(

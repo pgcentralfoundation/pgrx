@@ -252,7 +252,7 @@ impl<T, AllocatedBy: WhoAllocated> PgBox<T, AllocatedBy> {
     }
 
     /// Allocate enough memory for the type'd struct, within the specified Postgres MemoryContext.
-    /// The allocated memory is uninitalized.
+    /// The allocated memory is uninitialized.
     ///
     /// When this object is dropped the backing memory will be pfree'd,
     /// unless it is instead turned `into_pg()`, at which point it will be freeded

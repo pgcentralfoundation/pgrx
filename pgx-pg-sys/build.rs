@@ -711,7 +711,7 @@ fn extra_bindgen_clang_args(pg_config: &PgConfig) -> eyre::Result<Vec<String>> {
                 if std::path::Path::new(&pair[1]).exists() {
                     out.extend(pair.into_iter().cloned());
                 } else {
-                    // The SDK path doesnt exist. Emit a warning, which they'll
+                    // The SDK path doesn't exist. Emit a warning, which they'll
                     // see if the build ends up failing (it may not fail in all
                     // cases, so we don't panic here).
                     //

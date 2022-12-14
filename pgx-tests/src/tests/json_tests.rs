@@ -32,8 +32,8 @@ mod tests {
         );
 
         assert!(json.is_some());
-        let user: User =
-            serde_json::from_value(json.unwrap().0).expect("failed to parse json reponse from SPI");
+        let user: User = serde_json::from_value(json.unwrap().0)
+            .expect("failed to parse json response from SPI");
         assert_eq!(user.username, "blahblahblah");
         assert_eq!(user.first_name, "Blah");
         assert_eq!(user.last_name, "McBlahFace");
@@ -55,8 +55,8 @@ mod tests {
         );
 
         assert!(json.is_some());
-        let user: User =
-            serde_json::from_value(json.unwrap().0).expect("failed to parse json reponse from SPI");
+        let user: User = serde_json::from_value(json.unwrap().0)
+            .expect("failed to parse json response from SPI");
         assert_eq!(user.username, "blahblahblah");
         assert_eq!(user.first_name, "Blah");
         assert_eq!(user.last_name, "McBlahFace");
