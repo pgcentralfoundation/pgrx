@@ -57,7 +57,7 @@ mod tests {
         Spi::execute(|c| {
             c.update("CREATE TABLE a (v INTEGER)", None, None);
             // The type below is explicit to ensure it's commit on drop by default
-            c.sub_transaction(|xact: SubTransaction<SpiClient, true>| {
+            c.sub_transaction(|xact: SubTransaction<SpiClient, CommitOnDrop>| {
                 xact.update("INSERT INTO a VALUES (0)", None, None);
                 // Dropped explicitly for illustration purposes
                 drop(xact);
@@ -81,7 +81,7 @@ mod tests {
         Spi::execute(|c| {
             c.update("CREATE TABLE a (v INTEGER)", None, None);
             // The type below is explicit to ensure it's commit on drop by default
-            c.sub_transaction(|xact: SubTransaction<SpiClient, true>| {
+            c.sub_transaction(|xact: SubTransaction<SpiClient, CommitOnDrop>| {
                 xact.update("INSERT INTO a VALUES (0)", None, None);
                 let xact = xact.rollback_on_drop();
                 // Dropped explicitly for illustration purposes
