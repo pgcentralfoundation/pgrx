@@ -55,7 +55,7 @@ ARG CARGO_LOCKED_OPTION='--locked'
 ENV CARGO_LOCKED_OPTION=${CARGO_LOCKED_OPTION}
 
 # Install cargo-pgx from source copied into this container
-RUN cargo install --path cargo-pgx/ ${CARGO_LOCKED_OPTION}
+RUN echo "Running cargo install --path cargo-pgx/ $CARGO_LOCKED_OPTION" && cargo install --path cargo-pgx/ $CARGO_LOCKED_OPTION
 
 # This seems strange, but by this point $PG_MAJOR_VER is blank and
 # $PG_MAJOR is always set to the correct version. I think it's something built

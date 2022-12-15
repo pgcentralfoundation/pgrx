@@ -8,7 +8,7 @@ PG_MAJOR_VER=$1
 DOCKERFILE_ID=$2
 
 echo "Building docker container for PGX using Postgres version $PG_MAJOR_VER in container $DOCKERFILE_ID"
-echo "Cargo lock flag set to: $CARGO_LOCKED_OPTION"
+echo "Cargo lock flag set to: '$CARGO_LOCKED_OPTION'"
 
 docker build \
   --build-arg PG_MAJOR_VER=$PG_MAJOR_VER \
