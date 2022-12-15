@@ -20,7 +20,7 @@ echo "Building docker container for PGX using Postgres version $PG_MAJOR_VER in 
 echo "Cargo lock flag set to: '$CARGO_LOCKED_OPTION'"
 
 docker build \
-  --build-arg PG_MAJOR_VER=$PG_MAJOR_VER \
+  --build-arg PG_MAJOR_VER="$PG_MAJOR_VER" \
   --build-arg CARGO_LOCKED_OPTION="$CARGO_LOCKED_OPTION" \
   -t pgx \
   -f ".github/docker/Dockerfile.$DOCKERFILE_ID" \
@@ -31,5 +31,5 @@ echo "Running PGX test suite using Postgres version $PG_MAJOR_VER in container $
 docker run pgx \
   cargo test \
   --no-default-features \
-  --features pg$PG_MAJOR_VER \
+  --features "pg$PG_MAJOR_VER" \
   "$CARGO_LOCKED_OPTION"
