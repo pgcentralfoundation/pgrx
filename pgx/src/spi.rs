@@ -106,7 +106,22 @@ impl TryFrom<libc::c_int> for SpiError {
 pub struct Spi;
 
 // TODO: should `'conn` be invariant?
-pub struct SpiClient<'conn>(PhantomData<&'conn SpiConnection>);
+pub struct SpiClient<'conn> {
+    phantom: PhantomData<&'conn SpiConnection>,
+    // This field indicates whether queries be readonly. Unless any `update` has been used
+    // `readonly` will be `true`.
+    // Postgres docs say:
+    //
+    //    It is generally unwise to mix read-only and read-write commands within a single function
+    //    using SPI; that could result in very confusing behavior, since the read-only queries
+    //    would not see the results of any database updates done by the read-write queries.
+    //
+    // TODO:  Alternatively, we can detect if the command counter (or something?) has incremented and if yes
+    //        then we set read_only=false, else we can set it to true.
+    //        However, we would still need to remember the previous value, which will be larger than the boolean.
+    //        So, unless somebody will send commands to Postgres bypassing this SPI API, this flag seems sufficient.
+    readonly: bool,
+}
 
 /// a struct to manage our SPI connection lifetime
 struct SpiConnection(PhantomData<*mut ()>);
@@ -131,7 +146,7 @@ impl Drop for SpiConnection {
 impl SpiConnection {
     /// Return a client that with a lifetime scoped to this connection.
     fn client(&self) -> SpiClient<'_> {
-        SpiClient(PhantomData)
+        SpiClient { phantom: PhantomData, readonly: true }
     }
 }
 
@@ -159,8 +174,8 @@ pub struct SpiHeapTupleData {
 
 impl Spi {
     pub fn get_one<A: FromDatum + IntoDatum>(query: &str) -> Option<A> {
-        Spi::connect(|client| {
-            let result = client.select(query, Some(1), None).first().get_one();
+        Spi::connect(|mut client| {
+            let result = client.update(query, Some(1), None).first().get_one();
             Ok(result)
         })
     }
@@ -168,8 +183,8 @@ impl Spi {
     pub fn get_two<A: FromDatum + IntoDatum, B: FromDatum + IntoDatum>(
         query: &str,
     ) -> (Option<A>, Option<B>) {
-        Spi::connect(|client| {
-            let (a, b) = client.select(query, Some(1), None).first().get_two::<A, B>();
+        Spi::connect(|mut client| {
+            let (a, b) = client.update(query, Some(1), None).first().get_two::<A, B>();
             Ok(Some((a, b)))
         })
         .unwrap()
@@ -182,8 +197,8 @@ impl Spi {
     >(
         query: &str,
     ) -> (Option<A>, Option<B>, Option<C>) {
-        Spi::connect(|client| {
-            let (a, b, c) = client.select(query, Some(1), None).first().get_three::<A, B, C>();
+        Spi::connect(|mut client| {
+            let (a, b, c) = client.update(query, Some(1), None).first().get_three::<A, B, C>();
             Ok(Some((a, b, c)))
         })
         .unwrap()
@@ -193,15 +208,15 @@ impl Spi {
         query: &str,
         args: Vec<(PgOid, Option<pg_sys::Datum>)>,
     ) -> Option<A> {
-        Spi::connect(|client| Ok(client.select(query, Some(1), Some(args)).first().get_one()))
+        Spi::connect(|mut client| Ok(client.update(query, Some(1), Some(args)).first().get_one()))
     }
 
     pub fn get_two_with_args<A: FromDatum + IntoDatum, B: FromDatum + IntoDatum>(
         query: &str,
         args: Vec<(PgOid, Option<pg_sys::Datum>)>,
     ) -> (Option<A>, Option<B>) {
-        Spi::connect(|client| {
-            let (a, b) = client.select(query, Some(1), Some(args)).first().get_two::<A, B>();
+        Spi::connect(|mut client| {
+            let (a, b) = client.update(query, Some(1), Some(args)).first().get_two::<A, B>();
             Ok(Some((a, b)))
         })
         .unwrap()
@@ -215,9 +230,9 @@ impl Spi {
         query: &str,
         args: Vec<(PgOid, Option<pg_sys::Datum>)>,
     ) -> (Option<A>, Option<B>, Option<C>) {
-        Spi::connect(|client| {
+        Spi::connect(|mut client| {
             let (a, b, c) =
-                client.select(query, Some(1), Some(args)).first().get_three::<A, B, C>();
+                client.update(query, Some(1), Some(args)).first().get_three::<A, B, C>();
             Ok(Some((a, b, c)))
         })
         .unwrap()
@@ -238,7 +253,7 @@ impl Spi {
     ///
     /// The statement runs in read/write mode
     pub fn run_with_args(query: &str, args: Option<Vec<(PgOid, Option<pg_sys::Datum>)>>) {
-        Spi::execute(|client| {
+        Spi::execute(|mut client| {
             client.update(query, None, args);
         })
     }
@@ -253,7 +268,7 @@ impl Spi {
         query: &str,
         args: Option<Vec<(PgOid, Option<pg_sys::Datum>)>>,
     ) -> Json {
-        Spi::connect(|client| {
+        Spi::connect(|mut client| {
             let table =
                 client.update(&format!("EXPLAIN (format json) {}", query), None, args).first();
             Ok(Some(table.get_one::<Json>().expect("failed to get json EXPLAIN result")))
@@ -309,28 +324,18 @@ impl<'a> SpiClient<'a> {
         limit: Option<i64>,
         args: Option<Vec<(PgOid, Option<pg_sys::Datum>)>>,
     ) -> SpiTupleTable {
-        // Postgres docs say:
-        //
-        //    It is generally unwise to mix read-only and read-write commands within a single function
-        //    using SPI; that could result in very confusing behavior, since the read-only queries
-        //    would not see the results of any database updates done by the read-write queries.
-        //
-        // As such, we don't actually set read-only to true here
-
-        // TODO:  can we detect if the command counter (or something?) has incremented and if yes
-        //        then we set read_only=false, else we can set it to true?
-        //        Is this even a good idea?
-        self.execute(query, false, limit, args)
+        self.execute(query, self.readonly, limit, args)
     }
 
     /// perform any query (including utility statements) that modify the database in some way
     pub fn update(
-        &self,
+        &mut self,
         query: &str,
         limit: Option<i64>,
         args: Option<Vec<(PgOid, Option<pg_sys::Datum>)>>,
     ) -> SpiTupleTable {
-        self.execute(query, false, limit, args)
+        self.readonly = false;
+        self.execute(query, self.readonly, limit, args)
     }
 
     fn execute(

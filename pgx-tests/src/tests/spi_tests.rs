@@ -177,7 +177,7 @@ mod tests {
 
     #[pg_test]
     fn test_inserting_null() {
-        Spi::execute(|client| {
+        Spi::execute(|mut client| {
             client.update("CREATE TABLE tests.null_test (id uuid)", None, None);
         });
         let result = Spi::get_one_with_args::<i32>(
@@ -189,7 +189,7 @@ mod tests {
 
     #[pg_test]
     fn test_cursor() {
-        Spi::execute(|client| {
+        Spi::execute(|mut client| {
             client.update("CREATE TABLE tests.cursor_table (id int)", None, None);
             client.update(
                 "INSERT INTO tests.cursor_table (id) \
@@ -211,7 +211,7 @@ mod tests {
 
     #[pg_test]
     fn test_cursor_by_name() {
-        let cursor_name = Spi::connect(|client| {
+        let cursor_name = Spi::connect(|mut client| {
             client.update("CREATE TABLE tests.cursor_table (id int)", None, None);
             client.update(
                 "INSERT INTO tests.cursor_table (id) \
@@ -275,7 +275,7 @@ mod tests {
             assert_eq!(res.column_name(2).unwrap(), "b");
         });
 
-        Spi::execute(|client| {
+        Spi::execute(|mut client| {
             let res = client.update("SET TIME ZONE 'PST8PDT'", None, None);
 
             assert_eq!(0, res.columns());
@@ -291,7 +291,7 @@ mod tests {
     #[pg_test]
     fn test_spi_non_mut() {
         // Ensures update and cursor APIs do not need mutable reference to SpiClient
-        Spi::execute(|client| {
+        Spi::execute(|mut client| {
             client.update("SELECT 1", None, None);
             let cursor = client.open_cursor("SELECT 1", None).detach_into_name();
             client.find_cursor(&cursor);
