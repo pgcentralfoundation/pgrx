@@ -8,12 +8,13 @@ Use of this source code is governed by the MIT license that can be found in the 
 */
 
 use crate::command::get::{find_control_file, get_property};
+use crate::manifest::{display_version_info, PgVersionSource};
 use crate::profile::CargoProfile;
 use crate::CommandExecute;
 use cargo_toml::Manifest;
 use eyre::{eyre, WrapErr};
 use owo_colors::OwoColorize;
-use pgx_pg_config::{get_target_dir, PgConfig};
+use pgx_pg_config::{get_target_dir, PgConfig, Pgx};
 use std::io::BufReader;
 use std::path::{Path, PathBuf};
 use std::process::{Command, Stdio};
@@ -48,7 +49,7 @@ pub(crate) struct Install {
 
 impl CommandExecute for Install {
     #[tracing::instrument(level = "error", skip(self))]
-    fn execute(self) -> eyre::Result<()> {
+    fn execute(mut self) -> eyre::Result<()> {
         let metadata = crate::metadata::metadata(&self.features, self.manifest_path.as_ref())
             .wrap_err("couldn't get cargo metadata")?;
         crate::metadata::validate(&metadata)?;
@@ -68,8 +69,13 @@ impl CommandExecute for Install {
             self.release.then_some(CargoProfile::Release).unwrap_or(CargoProfile::Dev),
         )?;
 
-        let features =
-            crate::manifest::features_for_version(self.features, &package_manifest, &pg_version);
+        crate::manifest::modify_features_for_version(
+            &Pgx::from_config()?,
+            Some(&mut self.features),
+            &package_manifest,
+            &PgVersionSource::SystemPath(pg_version),
+            self.test,
+        );
 
         install_extension(
             self.manifest_path.as_ref(),
@@ -79,7 +85,7 @@ impl CommandExecute for Install {
             &profile,
             self.test,
             None,
-            &features,
+            &self.features,
         )
     }
 }
@@ -101,6 +107,7 @@ pub(crate) fn install_extension(
     base_directory: Option<PathBuf>,
     features: &clap_cargo::Features,
 ) -> eyre::Result<()> {
+    display_version_info(pg_config, &PgVersionSource::SystemPath(pg_config.label()?.into()));
     let base_directory = base_directory.unwrap_or_else(|| PathBuf::from("/"));
     tracing::Span::current()
         .record("base_directory", &tracing::field::display(&base_directory.display()));
