@@ -4,6 +4,8 @@
 #   ./.github/docker/run-docker.sh 14 debian:bullseye
 #   ./.github/docker/run-docker.sh 12 fedora:36
 
+set -x
+
 PG_MAJOR_VER=$1
 DOCKERFILE_ID=$2
 
