@@ -34,3 +34,6 @@ members = [
 
 [profile.dev.build-override]
 opt-level = 3
+
+[workspace.metadata.local-install]
+cargo-pgx = { path = "cargo-pgx" }
