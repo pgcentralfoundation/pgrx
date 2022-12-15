@@ -4,16 +4,6 @@ on:
   schedule:
     - cron: '0 7 * * *'
   workflow_dispatch:
-  # TEMP TEMP TEMP
-  push:
-    branches:
-      - master
-      - develop
-  pull_request:
-    branches:
-      - master
-      - develop
-  # TEMP TEMP TEMP
 
 env:
   # NB: Don't modify `RUSTFLAGS` here, since it would override the ones
