@@ -781,7 +781,8 @@ fn impl_postgres_type(ast: DeriveInput) -> syn::Result<proc_macro2::TokenStream>
         de.bounds = bounds;
         lt_generics.params.insert(0, GenericParam::Lifetime(de));
         stream.extend(quote! {
-            impl #lt_generics ::pgx::datum::Serializer<'de> for #name #generics { }
+            impl #generics ::pgx::datum::Serializer for #name #generics { }
+            impl #lt_generics ::pgx::datum::Deserializer<'de> for #name #generics { }
         });
     }
 

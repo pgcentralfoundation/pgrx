@@ -8,7 +8,7 @@ Use of this source code is governed by the MIT license that can be found in the 
 */
 use core::ffi::CStr;
 use pgx::prelude::*;
-use pgx::{InOutFuncs, PgVarlena, PgVarlenaInOutFuncs, Serializer, StringInfo};
+use pgx::{Deserializer, InOutFuncs, PgVarlena, PgVarlenaInOutFuncs, Serializer, StringInfo};
 use serde::{Deserialize, Serialize};
 use std::io::Write;
 use std::str::FromStr;
@@ -157,34 +157,18 @@ pub enum JsonEnumType {
 #[custom_serializer]
 pub struct CustomSerialized;
 
-impl<'de> Serializer<'de> for CustomSerialized {
+impl Serializer for CustomSerialized {
     fn to_writer<W: Write>(&self, mut writer: W) {
         writer.write(&[1]).expect("can't write");
     }
+}
 
+impl<'de> Deserializer<'de> for CustomSerialized {
     fn from_slice(slice: &'de [u8]) -> Self {
         if slice != &[1] {
             panic!("wrong type")
         } else {
             CustomSerialized
-        }
-    }
-}
-
-#[derive(Serialize, Deserialize, PostgresType)]
-#[custom_serializer]
-pub struct AnotherCustomSerialized;
-
-impl<'de> Serializer<'de> for AnotherCustomSerialized {
-    fn to_writer<W: Write>(&self, mut writer: W) {
-        writer.write(&[0]).expect("can't write");
-    }
-
-    fn from_slice(slice: &'de [u8]) -> Self {
-        if slice != &[0] {
-            panic!("wrong type")
-        } else {
-            AnotherCustomSerialized
         }
     }
 }
@@ -196,8 +180,8 @@ mod tests {
     use crate as pgx_tests;
 
     use crate::tests::postgres_type_tests::{
-        AnotherCustomSerialized, CustomSerialized, CustomTextFormatSerializedEnumType,
-        CustomTextFormatSerializedType, JsonEnumType, JsonType, VarlenaEnumType, VarlenaType,
+        CustomSerialized, CustomTextFormatSerializedEnumType, CustomTextFormatSerializedType,
+        JsonEnumType, JsonType, VarlenaEnumType, VarlenaType,
     };
     use pgx::prelude::*;
     use pgx::PgVarlena;
@@ -295,16 +279,6 @@ mod tests {
     fn custom_serializer() {
         let s = CustomSerialized;
         let _ = Spi::get_one_with_args::<CustomSerialized>(
-            r#"SELECT $1"#,
-            vec![(PgOid::Custom(CustomSerialized::type_oid()), s.into_datum())],
-        )
-        .unwrap();
-    }
-
-    #[pg_test(error = "wrong type")]
-    fn custom_serializer_wrong_type() {
-        let s = CustomSerialized;
-        let _ = Spi::get_one_with_args::<AnotherCustomSerialized>(
             r#"SELECT $1"#,
             vec![(PgOid::Custom(CustomSerialized::type_oid()), s.into_datum())],
         )

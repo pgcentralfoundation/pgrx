@@ -65,10 +65,10 @@ use pgx_sql_entity_graph::RustSqlMapping;
 /// Implemented automatically by `#[derive(PostgresType)]`
 pub trait PostgresType {}
 
-/// Serializing to and from datum
+/// Serializing to datum
 ///
 /// Default implementation uses CBOR and Varlena
-pub trait Serializer<'de>: Serialize + Deserialize<'de> {
+pub trait Serializer: Serialize {
     /// Serializes the value to Datum
     ///
     /// Default implementation wraps the output of `Self::to_writer` into a Varlena
@@ -93,7 +93,12 @@ pub trait Serializer<'de>: Serialize + Deserialize<'de> {
     fn to_writer<W: std::io::Write>(&self, writer: W) {
         serde_cbor::to_writer(writer, &self).expect("failed to encode as CBOR");
     }
+}
 
+/// Deserializing from datum
+///
+/// Default implementation uses CBOR and Varlena
+pub trait Deserializer<'de>: Deserialize<'de> {
     /// Deserializes datum into a value
     ///
     /// Default implementation assumes datum to be a varlena and uses `Self::from_slice`
@@ -121,7 +126,7 @@ pub trait Serializer<'de>: Serialize + Deserialize<'de> {
                 let input = datum.cast_mut_ptr();
                 // this gets the varlena Datum copied into this memory context
                 let varlena = pg_sys::pg_detoast_datum_copy(input as *mut pg_sys::varlena);
-                <Self as Serializer<'de>>::deserialize(varlena.into())
+                <Self as Deserializer<'de>>::deserialize(varlena.into())
             })
         }
     }
@@ -134,9 +139,9 @@ pub trait Serializer<'de>: Serialize + Deserialize<'de> {
     }
 }
 
-impl<'de, T> IntoDatum for T
+impl<T> IntoDatum for T
 where
-    T: PostgresType + Serializer<'de>,
+    T: PostgresType + Serializer,
 {
     fn into_datum(self) -> Option<pg_sys::Datum> {
         Some(Serializer::serialize(&self))
@@ -149,7 +154,7 @@ where
 
 impl<'de, T> FromDatum for T
 where
-    T: PostgresType + Serializer<'de>,
+    T: PostgresType + Deserializer<'de>,
 {
     unsafe fn from_polymorphic_datum(
         datum: pg_sys::Datum,
@@ -159,7 +164,7 @@ where
         if is_null {
             None
         } else {
-            Some(<T as Serializer>::deserialize(datum))
+            Some(<T as Deserializer>::deserialize(datum))
         }
     }
 
