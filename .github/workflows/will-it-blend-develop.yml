@@ -58,7 +58,7 @@ jobs:
         run: |
           export PG_MAJOR_VER=$(echo ${{ matrix.pg_version}} | cut -c3-)
           echo "PG_MAJOR_VER=$PG_MAJOR_VER" >> $GITHUB_ENV
-          echo "CARGO_LOCKED_OPTION='--locked'" >> $GITHUB_ENV
+          echo "CARGO_LOCKED_OPTION=--locked" >> $GITHUB_ENV
 
       - name: Run PGX tests for Postgres ${{ matrix.pg_version }} using container ${{ matrix.container }}
         shell: bash
@@ -93,7 +93,7 @@ jobs:
         run: |
           export PG_MAJOR_VER=$(echo ${{ matrix.pg_version}} | cut -c3-)
           echo "PG_MAJOR_VER=$PG_MAJOR_VER" >> $GITHUB_ENV
-          echo "CARGO_LOCKED_OPTION=''" >> $GITHUB_ENV
+          echo "CARGO_LOCKED_OPTION=" >> $GITHUB_ENV
 
       - name: Run PGX tests for Postgres ${{ matrix.pg_version }} using container ${{ matrix.container }}
         shell: bash
