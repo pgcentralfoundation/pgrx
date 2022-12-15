@@ -413,6 +413,28 @@ impl<'a> SpiClient<'a> {
         query: &str,
         args: Option<Vec<(PgOid, Option<pg_sys::Datum>)>>,
     ) -> SpiCursor {
+        self.open_cursor_impl(query, args)
+    }
+
+    /// Set up a cursor that will execute the specified update (mutating) query
+    ///
+    /// Rows may be then fetched using [`SpiCursor::fetch`].
+    ///
+    /// See [`SpiCursor`] docs for usage details.
+    pub fn open_cursor_mut(
+        &mut self,
+        query: &str,
+        args: Option<Vec<(PgOid, Option<pg_sys::Datum>)>>,
+    ) -> SpiCursor {
+        self.readonly = false;
+        self.open_cursor_impl(query, args)
+    }
+
+    fn open_cursor_impl(
+        &self,
+        query: &str,
+        args: Option<Vec<(PgOid, Option<pg_sys::Datum>)>>,
+    ) -> SpiCursor {
         let src = std::ffi::CString::new(query).expect("query contained a null byte");
         let args = args.unwrap_or_default();
 
@@ -447,7 +469,7 @@ impl<'a> SpiClient<'a> {
                 argtypes.as_mut_ptr(),
                 datums.as_mut_ptr(),
                 nulls.as_ptr(),
-                false,
+                self.readonly,
                 0,
             )
         })
