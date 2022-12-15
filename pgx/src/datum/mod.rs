@@ -65,6 +65,9 @@ use pgx_sql_entity_graph::RustSqlMapping;
 /// Implemented automatically by `#[derive(PostgresType)]`
 pub trait PostgresType {}
 
+/// Serializing to and from datum
+///
+/// Default implementation uses CBOR and Varlena
 pub trait Serializer<'de>: Serialize + Deserialize<'de> {
     /// Serializes the value to Datum
     ///
