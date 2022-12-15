@@ -9,15 +9,12 @@ Use of this source code is governed by the MIT license that can be found in the 
 //! Wrapper for Postgres 'varlena' type, over Rust types of a fixed size (ie, `impl Copy`)
 use crate::pg_sys::{VARATT_SHORT_MAX, VARHDRSZ_SHORT};
 use crate::{
-    pg_sys, rust_regtypein, set_varsize, set_varsize_short, vardata_any, varsize_any,
-    varsize_any_exhdr, void_mut_ptr, FromDatum, IntoDatum, PgMemoryContexts, PostgresType,
-    StringInfo,
+    pg_sys, rust_regtypein, set_varsize, set_varsize_short, vardata_any, varsize_any, void_mut_ptr,
+    FromDatum, IntoDatum, PgMemoryContexts,
 };
-use pgx_pg_sys::varlena;
 use pgx_sql_entity_graph::metadata::{
     ArgumentError, Returns, ReturnsError, SqlMapping, SqlTranslatable,
 };
-use serde::{Deserialize, Serialize};
 use std::borrow::Cow;
 use std::marker::PhantomData;
 use std::ops::{Deref, DerefMut};
@@ -333,123 +330,6 @@ where
             })
         }
     }
-}
-
-impl<T> IntoDatum for T
-where
-    T: PostgresType + Serialize,
-{
-    fn into_datum(self) -> Option<pg_sys::Datum> {
-        Some(cbor_encode(&self).into())
-    }
-
-    fn type_oid() -> pg_sys::Oid {
-        crate::rust_regtypein::<T>()
-    }
-}
-
-impl<'de, T> FromDatum for T
-where
-    T: PostgresType + Deserialize<'de>,
-{
-    unsafe fn from_polymorphic_datum(
-        datum: pg_sys::Datum,
-        is_null: bool,
-        _typoid: pg_sys::Oid,
-    ) -> Option<Self> {
-        if is_null {
-            None
-        } else {
-            cbor_decode(datum.cast_mut_ptr())
-        }
-    }
-
-    unsafe fn from_datum_in_memory_context(
-        memory_context: PgMemoryContexts,
-        datum: pg_sys::Datum,
-        is_null: bool,
-        _typoid: pg_sys::Oid,
-    ) -> Option<Self> {
-        if is_null {
-            None
-        } else {
-            cbor_decode_into_context(memory_context, datum.cast_mut_ptr())
-        }
-    }
-}
-
-fn cbor_encode<T>(input: T) -> *const pg_sys::varlena
-where
-    T: Serialize,
-{
-    let mut serialized = StringInfo::new();
-
-    serialized.push_bytes(&[0u8; pg_sys::VARHDRSZ]); // reserve space for the header
-    serde_cbor::to_writer(&mut serialized, &input).expect("failed to encode as CBOR");
-
-    let size = serialized.len() as usize;
-    let varlena = serialized.into_char_ptr();
-    unsafe {
-        set_varsize(varlena as *mut pg_sys::varlena, size as i32);
-    }
-
-    varlena as *const pg_sys::varlena
-}
-
-pub unsafe fn cbor_decode<'de, T>(input: *mut pg_sys::varlena) -> T
-where
-    T: Deserialize<'de>,
-{
-    let varlena = pg_sys::pg_detoast_datum_packed(input as *mut pg_sys::varlena);
-    let len = varsize_any_exhdr(varlena);
-    let data = vardata_any(varlena);
-    let slice = std::slice::from_raw_parts(data as *const u8, len);
-    serde_cbor::from_slice(slice).expect("failed to decode CBOR")
-}
-
-pub unsafe fn cbor_decode_into_context<'de, T>(
-    mut memory_context: PgMemoryContexts,
-    input: *mut pg_sys::varlena,
-) -> T
-where
-    T: Deserialize<'de>,
-{
-    memory_context.switch_to(|_| {
-        // this gets the varlena Datum copied into this memory context
-        let varlena = pg_sys::pg_detoast_datum_copy(input as *mut pg_sys::varlena);
-        cbor_decode(varlena)
-    })
-}
-
-#[allow(dead_code)]
-fn json_encode<T>(input: T) -> *const varlena
-where
-    T: Serialize,
-{
-    let mut serialized = StringInfo::new();
-
-    serialized.push_bytes(&[0u8; pg_sys::VARHDRSZ]); // reserve space for the header
-    serde_json::to_writer(&mut serialized, &input).expect("failed to encode as JSON");
-
-    let size = serialized.len() as usize;
-    let varlena = serialized.into_char_ptr();
-    unsafe {
-        set_varsize(varlena as *mut pg_sys::varlena, size as i32);
-    }
-
-    varlena as *const pg_sys::varlena
-}
-
-#[allow(dead_code)]
-unsafe fn json_decode<'de, T>(input: *mut pg_sys::varlena) -> T
-where
-    T: Deserialize<'de>,
-{
-    let varlena = pg_sys::pg_detoast_datum_packed(input as *mut pg_sys::varlena);
-    let len = varsize_any_exhdr(varlena);
-    let data = vardata_any(varlena);
-    let slice = std::slice::from_raw_parts(data as *const u8, len);
-    serde_json::from_slice(slice).expect("failed to decode JSON")
 }
 
 unsafe impl<T> SqlTranslatable for PgVarlena<T>

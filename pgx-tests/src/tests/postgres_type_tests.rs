@@ -8,8 +8,9 @@ Use of this source code is governed by the MIT license that can be found in the 
 */
 use core::ffi::CStr;
 use pgx::prelude::*;
-use pgx::{InOutFuncs, PgVarlena, PgVarlenaInOutFuncs, StringInfo};
+use pgx::{InOutFuncs, PgVarlena, PgVarlenaInOutFuncs, Serializer, StringInfo};
 use serde::{Deserialize, Serialize};
+use std::io::Write;
 use std::str::FromStr;
 
 #[derive(Copy, Clone, PostgresType)]
@@ -152,6 +153,42 @@ pub enum JsonEnumType {
     E2 { b: f32 },
 }
 
+#[derive(Serialize, Deserialize, PostgresType)]
+#[custom_serializer]
+pub struct CustomSerialized;
+
+impl<'de> Serializer<'de> for CustomSerialized {
+    fn to_writer<W: Write>(&self, mut writer: W) {
+        writer.write(&[1]).expect("can't write");
+    }
+
+    fn from_slice(slice: &'de [u8]) -> Self {
+        if slice != &[1] {
+            panic!("wrong type")
+        } else {
+            CustomSerialized
+        }
+    }
+}
+
+#[derive(Serialize, Deserialize, PostgresType)]
+#[custom_serializer]
+pub struct AnotherCustomSerialized;
+
+impl<'de> Serializer<'de> for AnotherCustomSerialized {
+    fn to_writer<W: Write>(&self, mut writer: W) {
+        writer.write(&[0]).expect("can't write");
+    }
+
+    fn from_slice(slice: &'de [u8]) -> Self {
+        if slice != &[0] {
+            panic!("wrong type")
+        } else {
+            AnotherCustomSerialized
+        }
+    }
+}
+
 #[cfg(any(test, feature = "pg_test"))]
 #[pgx::pg_schema]
 mod tests {
@@ -159,8 +196,8 @@ mod tests {
     use crate as pgx_tests;
 
     use crate::tests::postgres_type_tests::{
-        CustomTextFormatSerializedEnumType, CustomTextFormatSerializedType, JsonEnumType, JsonType,
-        VarlenaEnumType, VarlenaType,
+        AnotherCustomSerialized, CustomSerialized, CustomTextFormatSerializedEnumType,
+        CustomTextFormatSerializedType, JsonEnumType, JsonType, VarlenaEnumType, VarlenaType,
     };
     use pgx::prelude::*;
     use pgx::PgVarlena;
@@ -252,5 +289,25 @@ mod tests {
                 .unwrap();
         assert!(matches!(result, JsonEnumType::E1 { a } if a == 1.0));
         Ok(())
+    }
+
+    #[pg_test]
+    fn custom_serializer() {
+        let s = CustomSerialized;
+        let _ = Spi::get_one_with_args::<CustomSerialized>(
+            r#"SELECT $1"#,
+            vec![(PgOid::Custom(CustomSerialized::type_oid()), s.into_datum())],
+        )
+        .unwrap();
+    }
+
+    #[pg_test(error = "wrong type")]
+    fn custom_serializer_wrong_type() {
+        let s = CustomSerialized;
+        let _ = Spi::get_one_with_args::<AnotherCustomSerialized>(
+            r#"SELECT $1"#,
+            vec![(PgOid::Custom(CustomSerialized::type_oid()), s.into_datum())],
+        )
+        .unwrap();
     }
 }

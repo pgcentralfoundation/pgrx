@@ -14,8 +14,12 @@ use std::collections::HashSet;
 
 use proc_macro2::Ident;
 use quote::{quote, ToTokens};
+use syn::punctuated::Punctuated;
 use syn::spanned::Spanned;
-use syn::{parse_macro_input, Attribute, Data, DeriveInput, Item, ItemImpl};
+use syn::{
+    parse_macro_input, Attribute, Data, DeriveInput, GenericParam, Item, ItemImpl, Lifetime,
+    LifetimeDef, Token,
+};
 
 use operators::{impl_postgres_eq, impl_postgres_hash, impl_postgres_ord};
 use pgx_sql_entity_graph::{
@@ -706,9 +710,13 @@ Optionally accepts the following attributes:
 
 * `inoutfuncs(some_in_fn, some_out_fn)`: Define custom in/out functions for the type.
 * `pgvarlena_inoutfuncs(some_in_fn, some_out_fn)`: Define custom in/out functions for the `PgVarlena` of this type.
+* `custom_serializer`: Define your own implementation of `pgx::datum::Serializer` trait (only for `Serialize/Deserialize`-implementing types)
 * `sql`: Same arguments as [`#[pgx(sql = ..)]`](macro@pgx).
 */
-#[proc_macro_derive(PostgresType, attributes(inoutfuncs, pgvarlena_inoutfuncs, requires, pgx))]
+#[proc_macro_derive(
+    PostgresType,
+    attributes(inoutfuncs, pgvarlena_inoutfuncs, requires, pgx, custom_serializer)
+)]
 pub fn postgres_type(input: TokenStream) -> TokenStream {
     let ast = parse_macro_input!(input as syn::DeriveInput);
 
@@ -740,7 +748,8 @@ fn impl_postgres_type(ast: DeriveInput) -> syn::Result<proc_macro2::TokenStream>
         }
     }
 
-    if args.is_empty() {
+    // If no in/out parameters are defined
+    if args.iter().filter(|a| a != &&PostgresTypeAttribute::CustomSerializer).next().is_none() {
         // assume the user wants us to implement the InOutFuncs
         args.insert(PostgresTypeAttribute::Default);
     }
@@ -754,6 +763,27 @@ fn impl_postgres_type(ast: DeriveInput) -> syn::Result<proc_macro2::TokenStream>
     stream.extend(quote! {
         impl #generics ::pgx::PostgresType for #name #generics { }
     });
+
+    if !args.contains(&PostgresTypeAttribute::PgVarlenaInOutFuncs)
+        && !args.contains(&PostgresTypeAttribute::CustomSerializer)
+    {
+        let mut lt_generics = generics.clone();
+        let mut de = LifetimeDef::new(Lifetime::new("'de", generics.span()));
+        let bounds = generics
+            .params
+            .iter()
+            .filter_map(|p| match p {
+                GenericParam::Type(_) => None,
+                GenericParam::Const(_) => None,
+                GenericParam::Lifetime(lt) => Some(lt.clone().lifetime),
+            })
+            .collect::<Punctuated<Lifetime, Token![+]>>();
+        de.bounds = bounds;
+        lt_generics.params.insert(0, GenericParam::Lifetime(de));
+        stream.extend(quote! {
+            impl #lt_generics ::pgx::datum::Serializer<'de> for #name #generics { }
+        });
+    }
 
     // and if we don't have custom inout/funcs, we use the JsonInOutFuncs trait
     // which implements _in and _out #[pg_extern] functions that just return the type itself
@@ -931,6 +961,7 @@ enum PostgresTypeAttribute {
     InOutFuncs,
     PgVarlenaInOutFuncs,
     Default,
+    CustomSerializer,
 }
 
 fn parse_postgres_type_args(attributes: &[Attribute]) -> HashSet<PostgresTypeAttribute> {
@@ -946,6 +977,10 @@ fn parse_postgres_type_args(attributes: &[Attribute]) -> HashSet<PostgresTypeAtt
 
             "pgvarlena_inoutfuncs" => {
                 categorized_attributes.insert(PostgresTypeAttribute::PgVarlenaInOutFuncs);
+            }
+
+            "custom_serializer" => {
+                categorized_attributes.insert(PostgresTypeAttribute::CustomSerializer);
             }
 
             _ => {
@@ -1091,8 +1126,6 @@ pub fn pg_trigger(attrs: TokenStream, input: TokenStream) -> TokenStream {
     fn wrapped(attrs: TokenStream, input: TokenStream) -> Result<TokenStream, syn::Error> {
         use pgx_sql_entity_graph::{PgTrigger, PgTriggerAttribute};
         use syn::parse::Parser;
-        use syn::punctuated::Punctuated;
-        use syn::Token;
 
         let attributes =
             Punctuated::<PgTriggerAttribute, Token![,]>::parse_terminated.parse(attrs)?;
