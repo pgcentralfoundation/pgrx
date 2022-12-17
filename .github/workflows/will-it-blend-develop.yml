@@ -46,6 +46,41 @@ jobs:
         run: |
           export PG_MAJOR_VER=$(echo ${{ matrix.pg_version}} | cut -c3-)
           echo "PG_MAJOR_VER=$PG_MAJOR_VER" >> $GITHUB_ENV
+          echo "CARGO_LOCKED_OPTION=--locked" >> $GITHUB_ENV
+
+      - name: Run PGX tests for Postgres ${{ matrix.pg_version }} using container ${{ matrix.container }}
+        shell: bash
+        run: ./.github/docker/run-docker.sh "$PG_MAJOR_VER" ${{ matrix.container }}
+
+  cargo_unlocked_tests:
+    name: Cargo unlocked tests
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false # We want all of them to run, even if one fails
+      matrix:
+        pg_version: ["pg11", "pg12", "pg13", "pg14", "pg15"]
+        container: ["debian:bullseye"]
+    steps:
+      # See above for logic details here
+      - name: Set up correct branch environment variable
+        run: |
+          if [ $GITHUB_EVENT_NAME == "schedule" ]; then
+            echo "Running via schedule, so using branch develop"
+            echo "NIGHTLY_BUILD_REF=develop" >> $GITHUB_ENV
+          else
+            echo "Not running via schedule, so using branch $GITHUB_HEAD_REF"
+            echo "NIGHTLY_BUILD_REF=$GITHUB_HEAD_REF" >> $GITHUB_ENV
+          fi
+
+      - uses: actions/checkout@v3
+        with:
+          ref: ${{ env.NIGHTLY_BUILD_REF }}
+
+      - name: Set up environment variables
+        run: |
+          export PG_MAJOR_VER=$(echo ${{ matrix.pg_version}} | cut -c3-)
+          echo "PG_MAJOR_VER=$PG_MAJOR_VER" >> $GITHUB_ENV
+          echo "CARGO_LOCKED_OPTION=" >> $GITHUB_ENV
 
       - name: Run PGX tests for Postgres ${{ matrix.pg_version }} using container ${{ matrix.container }}
         shell: bash
