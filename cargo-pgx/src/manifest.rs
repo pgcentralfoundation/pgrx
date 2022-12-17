@@ -85,7 +85,7 @@ pub(crate) fn modify_features_for_version(
                     default_features
                         .iter()
                         // only include default features that aren't known pgXX version features
-                        .filter(|flag| pgx.get(flag).ok().is_none())
+                        .filter(|flag| !pgx.is_feature_flag(flag))
                         .cloned(),
                 );
             }

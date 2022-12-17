@@ -413,6 +413,17 @@ impl Pgx {
         Err(eyre!("Postgres `{}` is not managed by pgx", label))
     }
 
+    /// Returns true if the specified `label` represents a Postgres version number feature flag,
+    /// such as `pg14` or `pg15`
+    pub fn is_feature_flag(&self, label: &str) -> bool {
+        for v in SUPPORTED_MAJOR_VERSIONS {
+            if label == &format!("pg{}", v) {
+                return true;
+            }
+        }
+        false
+    }
+
     pub fn home() -> Result<PathBuf, std::io::Error> {
         std::env::var("PGX_HOME").map_or_else(
             |_| {
