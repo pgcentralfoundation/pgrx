@@ -62,4 +62,4 @@ RUN echo "Running cargo install --path cargo-pgx/ $CARGO_LOCKED_OPTION" && cargo
 # into the postgres:XX-alpine3.16 images, so it was easier to go with the grain
 RUN cargo pgx init --pg$PG_MAJOR=$(which pg_config)
 
-CMD ["cargo", "test", "--no-default-features", "--features", "pg${PG_MAJOR_VER}", "${CARGO_LOCKED_OPTION}"]
+CMD ["cargo", "test", "--no-default-features", "--features", "pg${PG_MAJOR_VER} cshim", "${CARGO_LOCKED_OPTION}"]

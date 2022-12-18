@@ -66,4 +66,4 @@ RUN echo "Running cargo install --path cargo-pgx/ $CARGO_LOCKED_OPTION" && cargo
 # Initialize cargo pgx so that we can run the tests
 RUN cargo pgx init --pg$PG_MAJOR_VER=$(which pg_config)
 
-CMD ["cargo", "test", "--no-default-features", "--features", "pg${PG_MAJOR_VER}", "${CARGO_LOCKED_OPTION}"]
+CMD ["cargo", "test", "--no-default-features", "--features", "pg${PG_MAJOR_VER} cshim", "${CARGO_LOCKED_OPTION}"]
