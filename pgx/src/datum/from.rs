@@ -120,7 +120,7 @@ pub trait FromDatum {
             Err(TryFromDatumError::IncompatibleTypes)
         } else {
             Ok(FromDatum::from_polymorphic_datum(datum, is_null, type_oid)
-                .expect("should not be NULL"))
+                .ok_or(TryFromDatumError::NullDatumPointer)?)
         }
     }
 
@@ -139,7 +139,7 @@ pub trait FromDatum {
             Err(TryFromDatumError::IncompatibleTypes)
         } else {
             Ok(FromDatum::from_datum_in_memory_context(memory_context, datum, is_null, type_oid)
-                .expect("should not be NULL"))
+                .ok_or(TryFromDatumError::NullDatumPointer)?)
         }
     }
 }
