@@ -26,10 +26,10 @@ docker build \
   -f ".github/docker/Dockerfile.$DOCKERFILE_ID" \
   .
 
-echo "Running PGX test suite using Postgres version $PG_MAJOR_VER in container $DOCKERFILE_ID"
+echo "Running PGX test suite using Postgres version $PG_MAJOR_VER in container $DOCKERFILE_ID with 'cshim'"
 
 docker run pgx \
   cargo test \
   --no-default-features \
-  --features "pg$PG_MAJOR_VER" \
+  --features "pg$PG_MAJOR_VER cshim" \
   "$CARGO_LOCKED_OPTION"

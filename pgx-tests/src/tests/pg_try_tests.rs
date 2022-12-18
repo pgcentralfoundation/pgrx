@@ -8,24 +8,38 @@ Use of this source code is governed by the MIT license that can be found in the 
 */
 
 use pgx::prelude::*;
-use pgx::PgList;
 
 // if our Postgres ERROR and Rust panic!() handling is incorrect, this little bit of useless code
 // will crash postgres.  If things are correct it'll simply raise an ERROR saying "panic in walker".
 #[pg_extern]
 fn crash() {
-    unsafe {
-        let mut node = PgList::<pg_sys::Node>::new();
-        node.push(PgList::<pg_sys::Node>::new().into_pg() as *mut pg_sys::Node);
+    #[cfg(feature = "cshim")]
+    {
+        use pgx::PgList;
+        unsafe {
+            let mut node = PgList::<pg_sys::Node>::new();
+            node.push(PgList::<pg_sys::Node>::new().into_pg() as *mut pg_sys::Node);
 
-        pg_sys::raw_expression_tree_walker(
-            node.into_pg() as *mut pg_sys::Node,
-            Some(walker),
-            std::ptr::null_mut(),
-        );
+            pg_sys::raw_expression_tree_walker(
+                node.into_pg() as *mut pg_sys::Node,
+                Some(walker),
+                std::ptr::null_mut(),
+            );
+        }
+    }
+
+    #[cfg(not(feature = "cshim"))]
+    {
+        walker();
     }
 }
 
+#[cfg(not(feature = "cshim"))]
+fn walker() -> bool {
+    panic!("panic in walker");
+}
+
+#[cfg(feature = "cshim")]
 #[pg_guard]
 extern "C" fn walker() -> bool {
     panic!("panic in walker");
@@ -93,6 +107,7 @@ mod tests {
     fn test_pg_try_execute_with_crash_ignore() {
         PgTryBuilder::new(|| super::crash())
             .catch_when(PgSqlErrorCode::ERRCODE_INTERNAL_ERROR, |_| ())
+            .catch_others(|e| panic!("{:?}", e))
             .execute();
     }
 

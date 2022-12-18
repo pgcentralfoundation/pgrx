@@ -89,6 +89,9 @@ fn main() -> eyre::Result<()> {
         }
     }
 
+    let compile_cshim =
+        std::env::var("CARGO_FEATURE_CSHIM").unwrap_or_else(|_| "0".to_string()) == "1";
+
     let is_for_release =
         std::env::var("PGX_PG_SYS_GENERATE_BINDINGS_FOR_RELEASE").unwrap_or("0".to_string()) == "1";
     println!("cargo:rerun-if-env-changed=PGX_PG_SYS_GENERATE_BINDINGS_FOR_RELEASE");
@@ -172,9 +175,12 @@ fn main() -> eyre::Result<()> {
             .collect::<Vec<eyre::Result<_>>>();
         results.into_iter().try_for_each(|r| r)
     })?;
-    // compile the cshim for each binding
-    for pg_config in pg_configs {
-        build_shim(&build_paths.shim_src, &build_paths.shim_dst, &pg_config)?;
+
+    if compile_cshim {
+        // compile the cshim for each binding
+        for pg_config in pg_configs {
+            build_shim(&build_paths.shim_src, &build_paths.shim_dst, &pg_config)?;
+        }
     }
 
     Ok(())
