@@ -21,9 +21,10 @@ mod tests {
     }
 
     #[pg_test]
-    fn test_return_bytes() {
-        let bytes = Spi::get_one::<&[u8]>("SELECT tests.return_bytes();").unwrap();
-        assert_eq!(bytes, b"bytes")
+    fn test_return_bytes() -> Result<(), pgx::spi::Error> {
+        let bytes = Spi::get_one::<&[u8]>("SELECT tests.return_bytes();")?.unwrap();
+        assert_eq!(bytes, b"bytes");
+        Ok(())
     }
 
     #[pg_extern]
@@ -32,10 +33,11 @@ mod tests {
     }
 
     #[pg_test]
-    fn test_return_bytes_slice() {
+    fn test_return_bytes_slice() -> Result<(), pgx::spi::Error> {
         let slice =
-            Spi::get_one::<&[u8]>("SELECT tests.return_bytes_slice('abcdefg'::bytea);").unwrap();
-        assert_eq!(slice, b"bcd")
+            Spi::get_one::<&[u8]>("SELECT tests.return_bytes_slice('abcdefg'::bytea);")?.unwrap();
+        assert_eq!(slice, b"bcd");
+        Ok(())
     }
 
     #[pg_extern]
@@ -44,9 +46,10 @@ mod tests {
     }
 
     #[pg_test]
-    fn test_return_vec_bytes() {
-        let vec = Spi::get_one::<Vec<u8>>("SELECT tests.return_vec_bytes();").unwrap();
-        assert_eq!(vec.as_slice(), b"bytes")
+    fn test_return_vec_bytes() -> Result<(), pgx::spi::Error> {
+        let vec = Spi::get_one::<Vec<u8>>("SELECT tests.return_vec_bytes();")?.unwrap();
+        assert_eq!(vec.as_slice(), b"bytes");
+        Ok(())
     }
 
     #[pg_extern]
@@ -55,9 +58,10 @@ mod tests {
     }
 
     #[pg_test]
-    fn test_return_vec_subvec() {
+    fn test_return_vec_subvec() -> Result<(), pgx::spi::Error> {
         let vec =
-            Spi::get_one::<Vec<u8>>("SELECT tests.return_vec_subvec('abcdefg'::bytea);").unwrap();
-        assert_eq!(vec.as_slice(), b"bcd")
+            Spi::get_one::<Vec<u8>>("SELECT tests.return_vec_subvec('abcdefg'::bytea);")?.unwrap();
+        assert_eq!(vec.as_slice(), b"bcd");
+        Ok(())
     }
 }

@@ -64,6 +64,7 @@ pub extern "C" fn bgworker_return_value(arg: pg_sys::Datum) {
                 vec![(PgOid::BuiltIn(PgBuiltInOids::INT4OID), arg.into_datum())],
             )
         })
+        .expect("SPI failed")
         .unwrap()
     } else {
         0
@@ -91,7 +92,7 @@ mod tests {
     use pgx::{pg_sys, IntoDatum};
 
     #[pg_test]
-    fn test_dynamic_bgworker() {
+    fn test_dynamic_bgworker() -> Result<(), pgx::spi::Error> {
         let worker = BackgroundWorkerBuilder::new("dynamic_bgworker")
             .set_library("pgx_tests")
             .set_function("bgworker")
@@ -104,7 +105,8 @@ mod tests {
         let handle = worker.terminate();
         handle.wait_for_shutdown().expect("aborted shutdown");
 
-        assert_eq!(124, Spi::get_one::<i32>("SELECT v FROM tests.bgworker_test;").unwrap());
+        assert_eq!(124, Spi::get_one::<i32>("SELECT v FROM tests.bgworker_test;")?.unwrap());
+        Ok(())
     }
 
     #[pg_test]
@@ -138,7 +140,7 @@ mod tests {
     }
 
     #[pg_test]
-    fn test_background_worker_transaction_return() {
+    fn test_background_worker_transaction_return() -> Result<(), pgx::spi::Error> {
         let worker = BackgroundWorkerBuilder::new("dynamic_bgworker")
             .set_library("pgx_tests")
             .set_function("bgworker_return_value")
@@ -151,6 +153,7 @@ mod tests {
         let handle = worker.terminate();
         handle.wait_for_shutdown().expect("aborted shutdown");
 
-        assert_eq!(123, Spi::get_one::<i32>("SELECT v FROM tests.bgworker_test_return;").unwrap());
+        assert_eq!(123, Spi::get_one::<i32>("SELECT v FROM tests.bgworker_test_return;")?.unwrap());
+        Ok(())
     }
 }

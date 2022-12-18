@@ -452,6 +452,31 @@ impl PgExtern {
                             None => ::pgx::fcinfo::pg_return_null(#fcinfo_ident)
                         }
                     }
+                }
+                // these exist for purposes of `#[pg_test]` function being able to
+                // return a pgx::spi::Error.
+                //
+                // TODO:  There's gotta be a better way to figure this out
+                else if retval_ty.resolved_ty
+                    == syn::parse_quote!(std::result::Result<(), pgx::spi::Error>)
+                    || retval_ty.resolved_ty
+                        == syn::parse_quote!(result::Result<(), pgx::spi::Error>)
+                    || retval_ty.resolved_ty == syn::parse_quote!(Result<(), pgx::spi::Error>)
+                    || retval_ty.resolved_ty
+                        == syn::parse_quote!(std::result::Result<(), spi::Error>)
+                    || retval_ty.resolved_ty == syn::parse_quote!(std::result::Result<(), Error>)
+                    || retval_ty.resolved_ty == syn::parse_quote!(result::Result<(), spi::Error>)
+                    || retval_ty.resolved_ty == syn::parse_quote!(result::Result<(), Error>)
+                    || retval_ty.resolved_ty == syn::parse_quote!(Result<(), spi::Error>)
+                    || retval_ty.resolved_ty == syn::parse_quote!(Result<(), Error>)
+                    || retval_ty.resolved_ty == syn::parse_quote!(Result<()>)
+                {
+                    quote_spanned! {
+                        self.func.sig.output.span() => {
+                            let _ = #result_ident.unwrap_or_else(|e| std::panic::panic_any(e));
+                            return ::pgx::fcinfo::pg_return_void();
+                        }
+                    }
                 } else {
                     quote_spanned! { self.func.sig.output.span() =>
                         ::pgx::datum::IntoDatum::into_datum(#result_ident).unwrap_or_else(|| panic!("returned Datum was NULL"))

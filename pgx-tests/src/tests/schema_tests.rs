@@ -105,62 +105,68 @@ mod tests {
     }
 
     #[pg_test]
-    fn elided_extern_is_elided() {
+    fn elided_extern_is_elided() -> Result<(), pgx::spi::Error> {
         // Validate that a function we know exists, exists
         let result: bool = Spi::get_one(
             "SELECT exists(SELECT 1 FROM pg_proc WHERE proname = 'func_in_diff_schema');",
-        )
+        )?
         .unwrap();
         assert_eq!(result, true);
 
         // Validate that the function we expect not to exist, doesn't
         let result: bool = Spi::get_one(
             "SELECT exists(SELECT 1 FROM pg_proc WHERE proname = 'func_elided_from_schema');",
-        )
+        )?
         .unwrap();
         assert_eq!(result, false);
+        Ok(())
     }
 
     #[pg_test]
-    fn elided_type_is_elided() {
+    fn elided_type_is_elided() -> Result<(), pgx::spi::Error> {
         // Validate that a type we know exists, exists
         let result: bool =
-            Spi::get_one("SELECT exists(SELECT 1 FROM pg_type WHERE typname = 'testtype');")
+            Spi::get_one("SELECT exists(SELECT 1 FROM pg_type WHERE typname = 'testtype');")?
                 .unwrap();
         assert_eq!(result, true);
 
         // Validate that the type we expect not to exist, doesn't
         let result: bool =
-            Spi::get_one("SELECT exists(SELECT 1 FROM pg_type WHERE typname = 'elidedtype');")
+            Spi::get_one("SELECT exists(SELECT 1 FROM pg_type WHERE typname = 'elidedtype');")?
                 .unwrap();
         assert_eq!(result, false);
+        Ok(())
     }
 
     #[pg_test]
-    fn custom_to_sql_extern() {
+    fn custom_to_sql_extern() -> Result<(), pgx::spi::Error> {
         // Validate that the function we generated has the modifications we expect
-        let result: bool = Spi::get_one("SELECT exists(SELECT 1 FROM pg_proc WHERE proname = 'func_generated_with_custom_name');").unwrap();
+        let result: bool = Spi::get_one("SELECT exists(SELECT 1 FROM pg_proc WHERE proname = 'func_generated_with_custom_name');")?.unwrap();
         assert_eq!(result, true);
 
         Spi::run("SELECT test_schema.func_generated_with_custom_name();");
+        Ok(())
     }
 
     #[pg_test]
-    fn custom_to_sql_type() {
+    fn custom_to_sql_type() -> Result<(), pgx::spi::Error> {
         // Validate that the type we generated has the expected modifications
-        let result: bool =
-            Spi::get_one("SELECT exists(SELECT 1 FROM pg_type WHERE typname = 'customothertype');")
-                .unwrap();
+        let result: bool = Spi::get_one(
+            "SELECT exists(SELECT 1 FROM pg_type WHERE typname = 'customothertype');",
+        )?
+        .unwrap();
         assert_eq!(result, true);
+        Ok(())
     }
 
     #[pg_test]
-    fn custom_handwritten_to_sql_type() {
+    fn custom_handwritten_to_sql_type() -> Result<(), pgx::spi::Error> {
         // Validate that the SQL we provided was used
         let result: bool = Spi::get_one(
             "SELECT exists(SELECT 1 FROM pg_type WHERE typname = 'manuallyrenderedtype');",
-        )
+        )?
         .unwrap();
         assert_eq!(result, true);
+        Ok(())
     }
 }

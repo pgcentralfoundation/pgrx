@@ -45,19 +45,21 @@ fn calculate_human_years() -> TableIterator<
     */
     let query = "SELECT * FROM spi_srf.dog_daycare;";
 
-    let results = Spi::connect(|client| {
-        let tup_table: SpiTupleTable = client.select(query, None, None);
-        Ok::<_, ()>(tup_table.map(|row| {
+    Spi::connect(|client| {
+        let mut results = Vec::new();
+        let mut tup_table: SpiTupleTable = client.select(query, None, None);
+
+        while let Some(row) = tup_table.next() {
             let dog_name: String = row["dog_name"].value().unwrap();
             let dog_age: i32 = row["dog_age"].value().unwrap();
             let dog_breed: String = row["dog_breed"].value().unwrap();
             let human_age: i32 = dog_age * 7;
-            (dog_name, dog_age, dog_breed, human_age)
-        }))
-    })
-    .unwrap();
+            results.push((dog_name, dog_age, dog_breed, human_age));
+        }
 
-    TableIterator::new(results)
+        Ok::<_, pgx::spi::Error>(TableIterator::new(results.into_iter()))
+    })
+    .unwrap()
 }
 
 #[pg_extern]

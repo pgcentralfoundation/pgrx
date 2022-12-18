@@ -213,15 +213,17 @@ mod tests {
     }
 
     #[pg_test]
-    unsafe fn test_takes_i8() {
-        let result = Spi::get_one::<i8>("SELECT takes_i8('a');").unwrap();
+    unsafe fn test_takes_i8() -> Result<(), pgx::spi::Error> {
+        let result = Spi::get_one::<i8>("SELECT takes_i8('a');")?.unwrap();
         assert_eq!(result, 'a' as i8);
+        Ok(())
     }
 
     #[pg_test]
-    unsafe fn test_takes_char() {
-        let result = Spi::get_one::<char>("SELECT takes_char('🚨');").unwrap();
+    unsafe fn test_takes_char() -> Result<(), pgx::spi::Error> {
+        let result = Spi::get_one::<char>("SELECT takes_char('🚨');")?.unwrap();
         assert_eq!(result, '🚨');
+        Ok(())
     }
 
     #[pg_test]
@@ -276,15 +278,17 @@ mod tests {
     }
 
     #[pg_test]
-    fn test_returns_void() {
-        let result = Spi::get_one::<()>("SELECT returns_void();").unwrap();
-        assert_eq!(result, ())
+    fn test_returns_void() -> Result<(), pgx::spi::Error> {
+        let result = Spi::get_one::<()>("SELECT returns_void();")?.unwrap();
+        assert_eq!(result, ());
+        Ok(())
     }
 
     #[pg_test]
-    fn test_returns_tuple() {
-        let result = Spi::get_two::<i32, String>("SELECT * FROM returns_tuple();").unwrap();
-        assert_eq!((42, "pgx".into()), result)
+    fn test_returns_tuple() -> Result<(), pgx::spi::Error> {
+        let result = Spi::get_two::<i32, String>("SELECT * FROM returns_tuple();")?;
+        assert_eq!((Some(42), Some("pgx".into())), result);
+        Ok(())
     }
 
     /// ensures that we can have a `#[pg_extern]` function with an argument that

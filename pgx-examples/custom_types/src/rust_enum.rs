@@ -25,20 +25,21 @@ mod tests {
 
     #[cfg(not(feature = "no-schema-generation"))]
     #[pg_test]
-    fn test_some_enum() {
-        let val = Spi::get_one::<SomeEnum>(r#"SELECT '"hello world"'::SomeEnum"#).unwrap();
+    fn test_some_enum() -> Result<(), pgx::spi::Error> {
+        let val = Spi::get_one::<SomeEnum>(r#"SELECT '"hello world"'::SomeEnum"#)?.unwrap();
 
         assert!(matches!(
             val,
             SomeEnum::String(s) if s == "hello world"
         ));
 
-        let val =
-            Spi::get_one::<SomeEnum>(r#"SELECT '{"a": 1, "s": "hello world"}'::SomeEnum"#).unwrap();
+        let val = Spi::get_one::<SomeEnum>(r#"SELECT '{"a": 1, "s": "hello world"}'::SomeEnum"#)?
+            .unwrap();
 
         assert!(matches!(
             val,
             SomeEnum::Struct{a: 1, s } if s == "hello world"
         ));
+        Ok(())
     }
 }

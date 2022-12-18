@@ -95,7 +95,7 @@ mod tests {
                 let value = table.get_one::<i32>()?;
 
                 expect += 1;
-                assert_eq!(value, expect);
+                assert_eq!(value, Some(expect));
             }
 
             Ok::<_, pgx::spi::Error>(expect)
@@ -115,12 +115,12 @@ mod tests {
                 let (idx, value) = table.get_two::<i32, &str>()?;
 
                 expect += 1;
-                assert_eq!(idx, expect);
+                assert_eq!(idx, Some(expect));
                 match idx {
-                    1 => assert_eq!("a", value),
-                    2 => assert_eq!("b", value),
-                    3 => assert_eq!("c", value),
-                    _ => panic!("unexpected idx={}", idx),
+                    Some(1) => assert_eq!(Some("a"), value),
+                    Some(2) => assert_eq!(Some("b"), value),
+                    Some(3) => assert_eq!(Some("c"), value),
+                    _ => panic!("unexpected idx={:?}", idx),
                 }
             }
 

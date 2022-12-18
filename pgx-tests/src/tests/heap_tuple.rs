@@ -625,188 +625,205 @@ mod tests {
     use std::num::NonZeroUsize;
 
     #[pg_test]
-    fn test_gets_name_field() {
+    fn test_gets_name_field() -> Result<(), pgx::spi::Error> {
         let retval = Spi::get_one::<&str>(
             "
             SELECT gets_name_field(ROW('Nami', 0)::Dog)
         ",
-        )
+        )?
         .expect("SQL select failed");
         assert_eq!(retval, "Nami");
+        Ok(())
     }
 
     #[pg_test]
-    fn test_gets_name_field_default() {
+    fn test_gets_name_field_default() -> Result<(), pgx::spi::Error> {
         let retval = Spi::get_one::<&str>(
             "
             SELECT gets_name_field_default()
         ",
-        )
+        )?
         .expect("SQL select failed");
         assert_eq!(retval, "Nami");
+        Ok(())
     }
 
     #[pg_test]
-    fn test_gets_name_field_strict() {
+    fn test_gets_name_field_strict() -> Result<(), pgx::spi::Error> {
         let retval = Spi::get_one::<&str>(
             "
             SELECT gets_name_field_strict(ROW('Nami', 0)::Dog)
         ",
-        )
+        )?
         .expect("SQL select failed");
         assert_eq!(retval, "Nami");
+        Ok(())
     }
 
     #[pg_test]
-    fn test_gets_name_field_variadic() {
+    fn test_gets_name_field_variadic() -> Result<(), pgx::spi::Error> {
         let retval = Spi::get_one::<Vec<String>>(
             "
             SELECT gets_name_field_variadic(ROW('Nami', 1)::Dog, ROW('Brandy', 1)::Dog)
         ",
-        )
+        )?
         .expect("SQL select failed");
         assert_eq!(retval, vec!["Nami".to_string(), "Brandy".to_string()]);
+        Ok(())
     }
 
     #[pg_test]
     #[should_panic]
-    fn test_gets_name_field_as_slice() {
+    fn test_gets_name_field_as_slice() -> Result<(), pgx::spi::Error> {
         let retval = Spi::get_one::<Vec<String>>(
             "
             SELECT gets_name_field_as_slice(ROW('Nami', 1)::Dog, ROW('Brandy', 1)::Dog)
         ",
-        )
+        )?
         .expect("SQL select failed");
         assert_eq!(retval, vec!["Nami".to_string(), "Brandy".to_string()]);
+        Ok(())
     }
 
     #[pg_test]
-    fn test_sum_scritches_for_names() {
+    fn test_sum_scritches_for_names() -> Result<(), pgx::spi::Error> {
         let retval = Spi::get_one::<i32>(
             "
             SELECT sum_scritches_for_names(ARRAY[ROW('Nami', 1), ROW('Brandy', 42)]::Dog[])
         ",
-        )
+        )?
         .expect("SQL select failed");
         assert_eq!(retval, 43);
+        Ok(())
     }
 
     #[pg_test]
-    fn test_sum_scritches_for_names_default() {
+    fn test_sum_scritches_for_names_default() -> Result<(), pgx::spi::Error> {
         let retval = Spi::get_one::<i32>(
             "
             SELECT sum_scritches_for_names_default()
         ",
-        )
+        )?
         .expect("SQL select failed");
         assert_eq!(retval, 0);
+        Ok(())
     }
 
     #[pg_test]
-    fn test_sum_scritches_for_names_strict() {
+    fn test_sum_scritches_for_names_strict() -> Result<(), pgx::spi::Error> {
         let retval = Spi::get_one::<i32>(
             "
             SELECT sum_scritches_for_names_strict(ARRAY[ROW('Nami', 1), ROW('Brandy', 42)]::Dog[])
         ",
-        )
+        )?
         .expect("SQL select failed");
         assert_eq!(retval, 43);
+        Ok(())
     }
 
     #[pg_test]
-    fn test_sum_scritches_for_names_strict_optional_items() {
+    fn test_sum_scritches_for_names_strict_optional_items() -> Result<(), pgx::spi::Error> {
         let retval = Spi::get_one::<i32>(
             "
             SELECT sum_scritches_for_names_strict(ARRAY[ROW('Nami', 1), ROW('Brandy', 42)]::Dog[])
         ",
-        )
+        )?
         .expect("SQL select failed");
         assert_eq!(retval, 43);
+        Ok(())
     }
 
     #[pg_test]
-    fn test_sum_scritches_for_names_default_optional_items() {
+    fn test_sum_scritches_for_names_default_optional_items() -> Result<(), pgx::spi::Error> {
         let retval = Spi::get_one::<i32>(
             "
             SELECT sum_scritches_for_names_default_optional_items()
         ",
-        )
+        )?
         .expect("SQL select failed");
         assert_eq!(retval, 0);
+        Ok(())
     }
 
     #[pg_test]
-    fn test_sum_scritches_for_names_optional_items() {
+    fn test_sum_scritches_for_names_optional_items() -> Result<(), pgx::spi::Error> {
         let retval = Spi::get_one::<i32>("
             SELECT sum_scritches_for_names_optional_items(ARRAY[ROW('Nami', 1), ROW('Brandy', 42)]::Dog[])
-        ").expect("SQL select failed");
+        ")?.expect("SQL select failed");
         assert_eq!(retval, 43);
+        Ok(())
     }
 
     #[pg_test]
-    fn test_sum_scritches_for_names_array() {
+    fn test_sum_scritches_for_names_array() -> Result<(), pgx::spi::Error> {
         let retval = Spi::get_one::<i32>(
             "
             SELECT sum_scritches_for_names_array(ARRAY[ROW('Nami', 1), ROW('Brandy', 42)]::Dog[])
         ",
-        )
+        )?
         .expect("SQL select failed");
         assert_eq!(retval, 43);
+        Ok(())
     }
 
     #[pg_test]
-    fn test_sum_scritches_for_names_array_default() {
+    fn test_sum_scritches_for_names_array_default() -> Result<(), pgx::spi::Error> {
         let retval = Spi::get_one::<i32>(
             "
             SELECT sum_scritches_for_names_array_default()
         ",
-        )
+        )?
         .expect("SQL select failed");
         assert_eq!(retval, 0);
+        Ok(())
     }
 
     #[pg_test]
-    fn test_sum_scritches_for_names_array_strict() {
+    fn test_sum_scritches_for_names_array_strict() -> Result<(), pgx::spi::Error> {
         let retval = Spi::get_one::<i32>("
             SELECT sum_scritches_for_names_array_strict(ARRAY[ROW('Nami', 1), ROW('Brandy', 42)]::Dog[])
-        ").expect("SQL select failed");
+        ")?.expect("SQL select failed");
         assert_eq!(retval, 43);
+        Ok(())
     }
 
     #[pg_test]
-    fn test_create_dog() {
+    fn test_create_dog() -> Result<(), pgx::spi::Error> {
         let retval = Spi::get_one::<PgHeapTuple<'_, AllocatedByRust>>(
             "
             SELECT create_dog('Nami', 1)
         ",
-        )
+        )?
         .expect("SQL select failed");
         assert_eq!(retval.get_by_name("name").unwrap(), Some("Nami"));
         assert_eq!(retval.get_by_name("scritches").unwrap(), Some(1));
+        Ok(())
     }
 
     #[pg_test]
-    fn test_scritch() {
+    fn test_scritch() -> Result<(), pgx::spi::Error> {
         let retval = Spi::get_one::<PgHeapTuple<'_, AllocatedByRust>>(
             "
             SELECT scritch(ROW('Nami', 2)::Dog)
         ",
-        )
+        )?
         .expect("SQL select failed");
         assert_eq!(retval.get_by_name("name").unwrap(), Some("Nami"));
         assert_eq!(retval.get_by_name("scritches").unwrap(), Some(2));
+        Ok(())
     }
 
     #[pg_test]
-    fn test_scritch_strict() {
+    fn test_scritch_strict() -> Result<(), pgx::spi::Error> {
         let retval = Spi::get_one::<PgHeapTuple<'_, AllocatedByRust>>(
             "
             SELECT scritch_strict(ROW('Nami', 2)::Dog)
         ",
-        )
+        )?
         .expect("SQL select failed");
         assert_eq!(retval.get_by_name("name").unwrap(), Some("Nami"));
         assert_eq!(retval.get_by_name("scritches").unwrap(), Some(2));
+        Ok(())
     }
 
     #[pg_test]
@@ -914,12 +931,12 @@ mod tests {
     }
 
     #[pg_test]
-    fn test_compatibility() {
+    fn test_compatibility() -> Result<(), pgx::spi::Error> {
         Spi::get_one::<PgHeapTuple<'_, AllocatedByRust>>(
             "
             SELECT ROW('Nami', 2)::Dog
         ",
-        )
+        )?
         .expect("SQL select failed");
         // Non-composite types are incompatible:
         assert!(Spi::get_one::<PgHeapTuple<'_, AllocatedByRust>>(
@@ -928,5 +945,6 @@ mod tests {
         ",
         )
         .is_err());
+        Ok(())
     }
 }

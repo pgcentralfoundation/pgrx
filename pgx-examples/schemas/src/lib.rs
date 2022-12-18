@@ -71,30 +71,33 @@ mod tests {
     use pgx::prelude::*;
 
     #[pg_test]
-    fn test_hello_default_schema() {
+    fn test_hello_default_schema() -> Result<(), pgx::spi::Error> {
         assert_eq!(
             "Hello from the schema where you installed this extension",
-            Spi::get_one::<&str>("SELECT hello_default_schema()").unwrap()
+            Spi::get_one::<&str>("SELECT hello_default_schema()")?.unwrap()
         );
+        Ok(())
     }
 
     #[pg_test]
-    fn test_my_type() {
+    fn test_my_type() -> Result<(), pgx::spi::Error> {
         assert_eq!(
             "test",
             // we don't need to qualify "MyType" because whatever schema it was created in
             // is applied to the "search_path" of this test function
-            Spi::get_one::<MyType>("SELECT '\"test\"'::MyType").unwrap().0
+            Spi::get_one::<MyType>("SELECT '\"test\"'::MyType")?.unwrap().0
         );
+        Ok(())
     }
 
     #[pg_test]
-    fn test_hello_some_schema() {
+    fn test_hello_some_schema() -> Result<(), pgx::spi::Error> {
         assert_eq!(
             "Hello from some_schema",
             // "hello_some_schema()" is in "some_schema", so it needs to be qualified
-            Spi::get_one::<&str>("SELECT some_schema.hello_some_schema()").unwrap()
+            Spi::get_one::<&str>("SELECT some_schema.hello_some_schema()")?.unwrap()
         );
+        Ok(())
     }
 
     #[pg_test]
@@ -107,6 +110,7 @@ mod tests {
                 c.select("SELECT '\"test\"'::MySomeSchemaType", None, None)
                     .first()
                     .get_one::<MySomeSchemaType>()
+                    .expect("get_one::<MySomeSchemaType>() failed")
                     .unwrap()
                     .0
             );
@@ -114,19 +118,21 @@ mod tests {
     }
 
     #[pg_test]
-    fn test_my_pg_catalog_type() {
+    fn test_my_pg_catalog_type() -> Result<(), pgx::spi::Error> {
         assert_eq!(
             String::from("test"),
-            Spi::get_one::<MyPgCatalogType>("SELECT '\"test\"'::MyPgCatalogType").unwrap().0
-        )
+            Spi::get_one::<MyPgCatalogType>("SELECT '\"test\"'::MyPgCatalogType")?.unwrap().0
+        );
+        Ok(())
     }
 
     #[pg_test]
-    fn test_hello_public() {
+    fn test_hello_public() -> Result<(), pgx::spi::Error> {
         assert_eq!(
             "Hello from the public schema",
-            Spi::get_one::<&str>("SELECT hello_public()").unwrap()
-        )
+            Spi::get_one::<&str>("SELECT hello_public()")?.unwrap()
+        );
+        Ok(())
     }
 }
 

@@ -27,11 +27,12 @@ mod tests {
     use pgx::prelude::*;
 
     #[pg_test]
-    fn test_func_with_variadic_array_args() {
+    fn test_func_with_variadic_array_args() -> Result<(), pgx::spi::Error> {
         let result = Spi::get_one::<String>(
             "SELECT test.func_with_variadic_array_args('test', 'a', 'b', 'c');",
-        )
-        .expect("didn't get SPI result");
+        )?
+        .expect("SPI returned null");
         assert_eq!(result, String::from("a"));
+        Ok(())
     }
 }

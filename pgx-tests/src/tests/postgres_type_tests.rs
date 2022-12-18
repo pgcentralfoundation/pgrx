@@ -166,86 +166,97 @@ mod tests {
     use pgx::PgVarlena;
 
     #[pg_test]
-    fn test_mytype() {
+    fn test_mytype() -> Result<(), pgx::spi::Error> {
         let result =
-            Spi::get_one::<PgVarlena<VarlenaType>>("SELECT '1.0,2.0,3'::VarlenaType").unwrap();
+            Spi::get_one::<PgVarlena<VarlenaType>>("SELECT '1.0,2.0,3'::VarlenaType")?.unwrap();
         assert_eq!(result.a, 1.0);
         assert_eq!(result.b, 2.0);
         assert_eq!(result.c, 3);
+        Ok(())
     }
 
     #[pg_test]
-    fn test_my_enum_type() {
+    fn test_my_enum_type() -> Result<(), pgx::spi::Error> {
         let result =
-            Spi::get_one::<PgVarlena<VarlenaEnumType>>("SELECT 'B'::VarlenaEnumType").unwrap();
+            Spi::get_one::<PgVarlena<VarlenaEnumType>>("SELECT 'B'::VarlenaEnumType")?.unwrap();
         assert!(matches!(*result, VarlenaEnumType::B));
+        Ok(())
     }
 
     #[pg_test]
-    fn test_call_with_value() {
+    fn test_call_with_value() -> Result<(), pgx::spi::Error> {
         let result = Spi::get_one::<String>(
             "SELECT fn_takes_option('1.0,2.0,3'::CustomTextFormatSerializedType);",
-        )
+        )?
         .unwrap();
         assert_eq!("1,2,3", result);
+        Ok(())
     }
 
     #[pg_test]
-    fn test_call_with_null() {
-        let result = Spi::get_one::<String>("SELECT fn_takes_option(NULL);").unwrap();
+    fn test_call_with_null() -> Result<(), pgx::spi::Error> {
+        let result = Spi::get_one::<String>("SELECT fn_takes_option(NULL);")?.unwrap();
         assert_eq!(String::from("nothing"), result);
+        Ok(())
     }
 
     #[pg_test]
-    fn test_serializedtype() {
+    fn test_serializedtype() -> Result<(), pgx::spi::Error> {
         let result = Spi::get_one::<CustomTextFormatSerializedType>(
             "SELECT '1.0,2.0,3'::CustomTextFormatSerializedType",
-        )
+        )?
         .unwrap();
         assert_eq!(result.a, 1.0);
         assert_eq!(result.b, 2.0);
         assert_eq!(result.c, 3);
+        Ok(())
     }
 
     #[pg_test]
-    fn test_call_with_enum_value() {
+    fn test_call_with_enum_value() -> Result<(), pgx::spi::Error> {
         let result = Spi::get_one::<String>(
             "SELECT fn_takes_option_enum('A'::CustomTextFormatSerializedEnumType);",
-        )
+        )?
         .unwrap();
         assert_eq!("A", result);
+        Ok(())
     }
 
     #[pg_test]
-    fn test_call_with_enum_null() {
-        let result = Spi::get_one::<String>("SELECT fn_takes_option_enum(NULL);").unwrap();
+    fn test_call_with_enum_null() -> Result<(), pgx::spi::Error> {
+        let result = Spi::get_one::<String>("SELECT fn_takes_option_enum(NULL);")?.unwrap();
         assert_eq!(String::from("nothing"), result);
+        Ok(())
     }
 
     #[pg_test]
-    fn test_serialized_enum_type() {
+    fn test_serialized_enum_type() -> Result<(), pgx::spi::Error> {
         let result = Spi::get_one::<CustomTextFormatSerializedEnumType>(
             "SELECT 'B'::CustomTextFormatSerializedEnumType",
-        )
+        )?
         .unwrap();
 
         assert!(matches!(result, CustomTextFormatSerializedEnumType::B));
+        Ok(())
     }
 
     #[pg_test]
-    fn test_jsontype() {
+    fn test_jsontype() -> Result<(), pgx::spi::Error> {
         let result =
-            Spi::get_one::<JsonType>(r#"SELECT '{"a": 1.0, "b": 2.0, "c": 3}'::JsonType"#).unwrap();
+            Spi::get_one::<JsonType>(r#"SELECT '{"a": 1.0, "b": 2.0, "c": 3}'::JsonType"#)?
+                .unwrap();
         assert_eq!(result.a, 1.0);
         assert_eq!(result.b, 2.0);
         assert_eq!(result.c, 3);
+        Ok(())
     }
 
     #[pg_test]
-    fn test_json_enum_type() {
+    fn test_json_enum_type() -> Result<(), pgx::spi::Error> {
         let result =
-            Spi::get_one::<JsonEnumType>(r#"SELECT '{"type": "E1", "a": 1.0}'::JsonEnumType"#)
+            Spi::get_one::<JsonEnumType>(r#"SELECT '{"type": "E1", "a": 1.0}'::JsonEnumType"#)?
                 .unwrap();
         assert!(matches!(result, JsonEnumType::E1 { a } if a == 1.0));
+        Ok(())
     }
 }

@@ -37,9 +37,9 @@ mod tests {
     use pgx::Uuid;
 
     #[pg_test]
-    fn test_display_uuid() {
+    fn test_display_uuid() -> Result<(), pgx::spi::Error> {
         let result = Spi::get_one::<bool>("SELECT display_uuid('123e4567-e89b-12d3-a456-426614174000'::uuid) = '123e4567-e89b-12d3-a456-426614174000';")
-            .expect("failed to get SPI result");
+            ?.expect("failed to get SPI result");
         assert!(result);
 
         let uuid = Uuid::from_bytes(super::TEST_UUID_V4);
@@ -52,28 +52,32 @@ mod tests {
         // Uppercase hex formatting
         assert_eq!(format!("{:-X}", uuid), "123E4567-E89B-12D3-A456-426614174000");
         assert_eq!(format!("{:X}", uuid), "123E4567E89B12D3A456426614174000");
+        Ok(())
     }
 
     #[pg_test]
-    fn test_accept_uuid() {
+    fn test_accept_uuid() -> Result<(), pgx::spi::Error> {
         let result = Spi::get_one::<bool>("SELECT accept_uuid('123e4567-e89b-12d3-a456-426614174000'::uuid) = '123e4567-e89b-12d3-a456-426614174000'::uuid;")
-            .expect("failed to get SPI result");
-        assert!(result)
+            ?.expect("failed to get SPI result");
+        assert!(result);
+        Ok(())
     }
 
     #[pg_test]
-    fn test_return_uuid() {
+    fn test_return_uuid() -> Result<(), pgx::spi::Error> {
         let result = Spi::get_one::<bool>(
             "SELECT return_uuid() = '123e4567-e89b-12d3-a456-426614174000'::uuid;",
-        )
+        )?
         .unwrap();
-        assert!(result)
+        assert!(result);
+        Ok(())
     }
 
     #[pg_test]
-    fn test_parse_uuid_v4() {
+    fn test_parse_uuid_v4() -> Result<(), pgx::spi::Error> {
         let uuid =
-            Spi::get_one::<Uuid>("SELECT '123e4567-e89b-12d3-a456-426614174000'::uuid;").unwrap();
-        assert_eq!(uuid, Uuid::from_bytes(super::TEST_UUID_V4))
+            Spi::get_one::<Uuid>("SELECT '123e4567-e89b-12d3-a456-426614174000'::uuid;")?.unwrap();
+        assert_eq!(uuid, Uuid::from_bytes(super::TEST_UUID_V4));
+        Ok(())
     }
 }

@@ -39,37 +39,42 @@ mod tests {
     fn make_idea_happy() {}
 
     #[pg_test]
-    fn test_negative_default_argument() {
-        let result = Spi::get_one::<i32>("SELECT negative_default_argument();")
+    fn test_negative_default_argument() -> Result<(), pgx::spi::Error> {
+        let result = Spi::get_one::<i32>("SELECT negative_default_argument();")?
             .expect("didn't get SPI result");
         assert_eq!(result, -1);
+        Ok(())
     }
 
     #[pg_test]
-    fn test_default_argument() {
+    fn test_default_argument() -> Result<(), pgx::spi::Error> {
         let result =
-            Spi::get_one::<i32>("SELECT default_argument();").expect("didn't get SPI result");
+            Spi::get_one::<i32>("SELECT default_argument();")?.expect("didn't get SPI result");
         assert_eq!(result, 99);
+        Ok(())
     }
 
     #[pg_test]
-    fn test_default_argument_specified() {
+    fn test_default_argument_specified() -> Result<(), pgx::spi::Error> {
         let result =
-            Spi::get_one::<i32>("SELECT default_argument(2);").expect("didn't get SPI result");
+            Spi::get_one::<i32>("SELECT default_argument(2);")?.expect("didn't get SPI result");
         assert_eq!(result, 2);
+        Ok(())
     }
 
     #[pg_test]
-    fn test_option_default_argument() {
-        let result = Spi::get_one::<&str>("SELECT option_default_argument();")
+    fn test_option_default_argument() -> Result<(), pgx::spi::Error> {
+        let result = Spi::get_one::<&str>("SELECT option_default_argument();")?
             .expect("didn't get SPI result");
         assert_eq!(result, "got default of null");
+        Ok(())
     }
 
     #[pg_test]
-    fn test_option_default_argument_specified() {
-        let result = Spi::get_one::<&str>("SELECT option_default_argument('test');")
+    fn test_option_default_argument_specified() -> Result<(), pgx::spi::Error> {
+        let result = Spi::get_one::<&str>("SELECT option_default_argument('test');")?
             .expect("didn't get SPI result");
         assert_eq!(result, "test");
+        Ok(())
     }
 }

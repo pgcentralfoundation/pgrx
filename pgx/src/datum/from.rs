@@ -13,7 +13,6 @@ use crate::{
     pg_sys, text_to_rust_str_unchecked, varlena_to_byte_slice, AllocatedByPostgres, IntoDatum,
     PgBox, PgMemoryContexts,
 };
-use pgx_pg_sys::{Datum, Oid};
 use std::ffi::CStr;
 use std::num::NonZeroUsize;
 
@@ -101,8 +100,8 @@ pub trait FromDatum {
     }
 
     /// `try_from_datum` is a convenience wrapper around `FromDatum::from_datum` that returns a
-    /// a `Result` instead of an `Option`.  It's intended to be used in situations where
-    /// the caller needs to know whether the type conversion succeeded or failed.
+    /// a `Result` around an `Option`, as a Datum can be null.  It's intended to be used in
+    /// situations where the caller needs to know whether the type conversion succeeded or failed.
     ///
     /// ## Safety
     ///
@@ -112,15 +111,14 @@ pub trait FromDatum {
         datum: pg_sys::Datum,
         is_null: bool,
         type_oid: pg_sys::Oid,
-    ) -> Result<Self, TryFromDatumError>
+    ) -> Result<Option<Self>, TryFromDatumError>
     where
         Self: Sized + IntoDatum,
     {
         if !Self::is_compatible_with(type_oid) {
             Err(TryFromDatumError::IncompatibleTypes)
         } else {
-            Ok(FromDatum::from_polymorphic_datum(datum, is_null, type_oid)
-                .expect("should not be NULL"))
+            Ok(FromDatum::from_polymorphic_datum(datum, is_null, type_oid))
         }
     }
 
@@ -131,15 +129,14 @@ pub trait FromDatum {
         datum: pg_sys::Datum,
         is_null: bool,
         type_oid: pg_sys::Oid,
-    ) -> Result<Self, TryFromDatumError>
+    ) -> Result<Option<Self>, TryFromDatumError>
     where
         Self: Sized + IntoDatum,
     {
         if !Self::is_compatible_with(type_oid) {
             Err(TryFromDatumError::IncompatibleTypes)
         } else {
-            Ok(FromDatum::from_datum_in_memory_context(memory_context, datum, is_null, type_oid)
-                .expect("should not be NULL"))
+            Ok(FromDatum::from_datum_in_memory_context(memory_context, datum, is_null, type_oid))
         }
     }
 }
@@ -502,12 +499,16 @@ impl<T> FromDatum for Option<T>
 where
     T: FromDatum,
 {
-    unsafe fn from_polymorphic_datum(datum: Datum, is_null: bool, typoid: Oid) -> Option<Self>
+    unsafe fn from_polymorphic_datum(
+        datum: pg_sys::Datum,
+        is_null: bool,
+        typoid: pg_sys::Oid,
+    ) -> Option<Self>
     where
         Self: Sized,
     {
         if is_null {
-            Some(None)
+            None
         } else {
             Some(T::from_polymorphic_datum(datum, is_null, typoid))
         }

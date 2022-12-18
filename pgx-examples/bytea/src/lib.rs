@@ -42,15 +42,17 @@ mod tests {
     use pgx::prelude::*;
 
     #[pg_test]
-    fn test_gzip_text() {
-        let result = Spi::get_one::<String>("SELECT gunzip_as_text(gzip('hi there'));").unwrap();
+    fn test_gzip_text() -> Result<(), pgx::spi::Error> {
+        let result = Spi::get_one::<String>("SELECT gunzip_as_text(gzip('hi there'));")?.unwrap();
         assert_eq!(result, "hi there");
+        Ok(())
     }
 
     #[pg_test]
-    fn test_gzip_bytes() {
-        let result = Spi::get_one::<&[u8]>("SELECT gunzip(gzip('hi there'::bytea));").unwrap();
+    fn test_gzip_bytes() -> Result<(), pgx::spi::Error> {
+        let result = Spi::get_one::<&[u8]>("SELECT gunzip(gzip('hi there'::bytea));")?.unwrap();
         assert_eq!(result, b"hi there");
+        Ok(())
     }
 }
 

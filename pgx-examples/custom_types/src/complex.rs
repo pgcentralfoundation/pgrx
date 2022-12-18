@@ -61,8 +61,8 @@ mod tests {
 
     #[cfg(not(feature = "no-schema-generation"))]
     #[pg_test]
-    fn test_known_animals_via_spi() {
-        let animals = Spi::get_one::<Animals>("SELECT known_animals();").unwrap();
+    fn test_known_animals_via_spi() -> Result<(), pgx::spi::Error> {
+        let animals = Spi::get_one::<Animals>("SELECT known_animals();")?.unwrap();
 
         assert_eq!(animals, known_animals());
 
@@ -72,6 +72,7 @@ mod tests {
                 names: vec!["Sally".into(), "Brandy".into(), "anchovy".into()],
                 age_lookup: hashmap! { 5 => "Sally".into(), 4 => "Brandy".into(), 3=> "anchovy".into()},
             }
-        )
+        );
+        Ok(())
     }
 }

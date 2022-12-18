@@ -183,13 +183,13 @@ pub struct SpiHeapTupleData {
 }
 
 impl Spi {
-    pub fn get_one<A: FromDatum + IntoDatum>(query: &str) -> Result<A, Error> {
+    pub fn get_one<A: FromDatum + IntoDatum>(query: &str) -> Result<Option<A>, Error> {
         Spi::connect(|client| client.select(query, Some(1), None).first().get_one())
     }
 
     pub fn get_two<A: FromDatum + IntoDatum, B: FromDatum + IntoDatum>(
         query: &str,
-    ) -> Result<(A, B), Error> {
+    ) -> Result<(Option<A>, Option<B>), Error> {
         Spi::connect(|client| client.select(query, Some(1), None).first().get_two::<A, B>())
     }
 
@@ -199,21 +199,21 @@ impl Spi {
         C: FromDatum + IntoDatum,
     >(
         query: &str,
-    ) -> Result<(A, B, C), Error> {
+    ) -> Result<(Option<A>, Option<B>, Option<C>), Error> {
         Spi::connect(|client| client.select(query, Some(1), None).first().get_three::<A, B, C>())
     }
 
     pub fn get_one_with_args<A: FromDatum + IntoDatum>(
         query: &str,
         args: Vec<(PgOid, Option<pg_sys::Datum>)>,
-    ) -> Result<A, Error> {
+    ) -> Result<Option<A>, Error> {
         Spi::connect(|client| client.select(query, Some(1), Some(args)).first().get_one())
     }
 
     pub fn get_two_with_args<A: FromDatum + IntoDatum, B: FromDatum + IntoDatum>(
         query: &str,
         args: Vec<(PgOid, Option<pg_sys::Datum>)>,
-    ) -> Result<(A, B), Error> {
+    ) -> Result<(Option<A>, Option<B>), Error> {
         Spi::connect(|client| client.select(query, Some(1), Some(args)).first().get_two::<A, B>())
     }
 
@@ -224,7 +224,7 @@ impl Spi {
     >(
         query: &str,
         args: Vec<(PgOid, Option<pg_sys::Datum>)>,
-    ) -> Result<(A, B, C), Error> {
+    ) -> Result<(Option<A>, Option<B>, Option<C>), Error> {
         Spi::connect(|client| {
             client.select(query, Some(1), Some(args)).first().get_three::<A, B, C>()
         })
@@ -251,7 +251,7 @@ impl Spi {
     }
 
     /// explain a query, returning its result in json form
-    pub fn explain(query: &str) -> Json {
+    pub fn explain(query: &str) -> Result<Json, Error> {
         Spi::explain_with_args(query, None)
     }
 
@@ -259,13 +259,13 @@ impl Spi {
     pub fn explain_with_args(
         query: &str,
         args: Option<Vec<(PgOid, Option<pg_sys::Datum>)>>,
-    ) -> Json {
-        Spi::connect(|client| {
+    ) -> Result<Json, Error> {
+        Ok(Spi::connect(|client| {
             let table =
                 client.update(&format!("EXPLAIN (format json) {}", query), None, args).first();
             table.get_one::<Json>()
-        })
-        .unwrap()
+        })?
+        .unwrap())
     }
 
     /// execute SPI commands via the provided `SpiClient`
@@ -499,9 +499,9 @@ type CursorName = String;
 /// use pgx::Spi;
 /// Spi::connect(|mut client| {
 ///     let mut cursor = client.open_cursor("SELECT * FROM generate_series(1, 5)", None)?;
-///     assert_eq!(1u32, cursor.fetch(1).get_one::<u32>()?);
-///     assert_eq!(2u32, cursor.fetch(2).get_one::<u32>()?);
-///     assert_eq!(3u32, cursor.fetch(3).get_one::<u32>()?);
+///     assert_eq!(Some(1u32), cursor.fetch(1).get_one::<u32>()?);
+///     assert_eq!(Some(2u32), cursor.fetch(2).get_one::<u32>()?);
+///     assert_eq!(Some(3u32), cursor.fetch(3).get_one::<u32>()?);
 ///     Ok::<_, pgx::spi::Error>(())
 ///     // <--- all three SpiTupleTable get freed by Spi::connect at this point
 /// }).unwrap();
@@ -512,13 +512,13 @@ type CursorName = String;
 /// use pgx::Spi;
 /// let cursor_name = Spi::connect(|mut client| {
 ///     let mut cursor = client.open_cursor("SELECT * FROM generate_series(1, 5)", None)?;
-///     assert_eq!(1u32, cursor.fetch(1).get_one::<u32>()?);
+///     assert_eq!(Some(1u32), cursor.fetch(1).get_one::<u32>()?);
 ///     Ok::<_, pgx::spi::Error>(cursor.detach_into_name()) // <-- cursor gets dropped here
 ///     // <--- first SpiTupleTable gets freed by Spi::connect at this point
 /// }).unwrap();
 /// Spi::connect(|mut client| {
 ///     let mut cursor = client.find_cursor(&cursor_name)?;
-///     assert_eq!(2u32, cursor.fetch(1).get_one::<u32>()?);
+///     assert_eq!(Some(2u32), cursor.fetch(1).get_one::<u32>()?);
 ///     drop(cursor); // <-- cursor gets dropped here
 ///     // ... more code ...
 ///     Ok::<_, pgx::spi::Error>(())
@@ -600,13 +600,13 @@ impl SpiTupleTable {
         self.len() == 0
     }
 
-    pub fn get_one<A: FromDatum + IntoDatum>(&self) -> Result<A, Error> {
+    pub fn get_one<A: FromDatum + IntoDatum>(&self) -> Result<Option<A>, Error> {
         self.get_datum(1)
     }
 
     pub fn get_two<A: FromDatum + IntoDatum, B: FromDatum + IntoDatum>(
         &self,
-    ) -> Result<(A, B), Error> {
+    ) -> Result<(Option<A>, Option<B>), Error> {
         let a = self.get_datum::<A>(1)?;
         let b = self.get_datum::<B>(2)?;
         Ok((a, b))
@@ -618,7 +618,7 @@ impl SpiTupleTable {
         C: FromDatum + IntoDatum,
     >(
         &self,
-    ) -> Result<(A, B, C), Error> {
+    ) -> Result<(Option<A>, Option<B>, Option<C>), Error> {
         let a = self.get_datum::<A>(1)?;
         let b = self.get_datum::<B>(2)?;
         let c = self.get_datum::<C>(3)?;
@@ -645,8 +645,8 @@ impl SpiTupleTable {
         }
     }
 
-    pub fn get_datum<T: FromDatum + IntoDatum>(&self, ordinal: i32) -> Result<T, Error> {
-        if self.current < 0 || self.current as u64 >= unsafe { pg_sys::SPI_processed } {
+    pub fn get_datum<T: FromDatum + IntoDatum>(&self, ordinal: i32) -> Result<Option<T>, Error> {
+        if self.current < 0 || self.current as usize >= self.size {
             return Err(Error::InvalidPosition);
         }
         match self.tupdesc {
