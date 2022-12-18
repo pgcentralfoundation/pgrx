@@ -381,7 +381,7 @@ impl PgExtern {
                 }
             } else if arg.used_ty.resolved_ty.to_token_stream().to_string() == quote!(()).to_token_stream().to_string() {
                 quote_spanned! {pat.span()=>
-                    debug_assert!(::pgx::fcinfo::pg_getarg::<()>(#fcinfo_ident, #idx).is_none(), "A `()` argument should always recieve `NULL`");
+                    debug_assert!(::pgx::fcinfo::pg_getarg::<()>(#fcinfo_ident, #idx).is_none(), "A `()` argument should always receive `NULL`");
                     let #pat = ();
                 }
             } else {

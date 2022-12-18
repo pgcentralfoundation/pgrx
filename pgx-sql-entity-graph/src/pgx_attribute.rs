@@ -18,7 +18,7 @@ use syn::parse::{Parse, ParseStream};
 use syn::punctuated::Punctuated;
 use syn::{parenthesized, token, Token};
 
-/// This struct is intented to represent the contents of the `#[pgx]` attribute when parsed.
+/// This struct is intended to represent the contents of the `#[pgx]` attribute when parsed.
 ///
 /// The intended usage is to parse an `Attribute`, then use `attr.parse_args::<PgxAttribute>()?` to
 /// parse the contents of the attribute into this struct.

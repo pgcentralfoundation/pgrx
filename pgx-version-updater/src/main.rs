@@ -123,7 +123,7 @@ fn query_toml(query_args: &QueryCargoVersionArgs) {
 fn update_files(args: &UpdateFilesArgs) {
     let current_dir = env::current_dir().expect("Could not get current directory!");
 
-    // Contains a set of package names (e.g. "pgx", "pgx-pg-sys") that wil be used
+    // Contains a set of package names (e.g. "pgx", "pgx-pg-sys") that will be used
     // to search for updatable dependencies later on
     let mut updatable_package_names = HashSet::new();
 

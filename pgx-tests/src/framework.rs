@@ -43,8 +43,8 @@ static TEST_MUTEX: Lazy<Mutex<SetupState>> = Lazy::new(|| {
 });
 
 // The goal of this closure is to allow "wrapping" of anything that might issue
-// an SQL simple_quuery or query using either a postgres::Client or
-// postgres::Transction and capture the output. The use of this wrapper is
+// an SQL simple_query or query using either a postgres::Client or
+// postgres::Transaction and capture the output. The use of this wrapper is
 // completely optional, but it might help narrow down some errors later on.
 fn query_wrapper<F, T>(
     query: Option<String>,

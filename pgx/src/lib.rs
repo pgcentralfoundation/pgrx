@@ -284,7 +284,7 @@ macro_rules! pg_magic_func {
     };
 }
 
-/// Create neccessary extension-local internal marker for use with SQL generation.
+/// Create necessary extension-local internal marker for use with SQL generation.
 ///
 /// <div class="example-wrap" style="display:inline-block">
 /// <pre class="ignore" style="white-space:normal;font:inherit;">
@@ -298,7 +298,7 @@ macro_rules! pg_sql_graph_magic {
     () => {
         #[no_mangle]
         #[doc(hidden)]
-        #[rustfmt::skip] // explict extern "Rust" is more clear here
+        #[rustfmt::skip] // explicit extern "Rust" is more clear here
         pub extern "Rust" fn __pgx_sql_mappings() -> $crate::pgx_sql_entity_graph::RustToSqlMapping {
             $crate::pgx_sql_entity_graph::RustToSqlMapping {
                 rust_source_to_sql: ::pgx::DEFAULT_RUST_SOURCE_TO_SQL.clone(),
@@ -308,7 +308,7 @@ macro_rules! pg_sql_graph_magic {
         // A marker which must exist in the root of the extension.
         #[no_mangle]
         #[doc(hidden)]
-        #[rustfmt::skip] // explict extern "Rust" is more clear here
+        #[rustfmt::skip] // explicit extern "Rust" is more clear here
         pub extern "Rust" fn __pgx_marker(
             _: (),
         ) -> $crate::pgx_sql_entity_graph::ControlFile {

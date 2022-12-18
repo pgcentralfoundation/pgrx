@@ -541,7 +541,7 @@ where
         }
 
         if state.is_null() {
-            // shoudln't happen
+            // shouldn't happen
             None
         } else {
             Some(unsafe {
@@ -588,7 +588,7 @@ where
         }
 
         if state.is_null() {
-            // shoudln't happen
+            // shouldn't happen
             None
         } else {
             Some(unsafe {
