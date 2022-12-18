@@ -106,8 +106,8 @@ naersk.lib."${targetPlatform.system}".buildPackage rec {
   CARGO_BUILD_INCREMENTAL = "false";
   RUST_BACKTRACE = "full";
 
-  cargoBuildOptions = default: default ++ [ "--no-default-features" "--features \"pg${pgxPostgresMajor} ${builtins.toString cshim additionalFeatures}\"" ];
-  cargoTestOptions = default: default ++ [ "--no-default-features" "--features \"pg_test pg${pgxPostgresMajor} ${builtins.toString cshim additionalFeatures}\"" ];
+  cargoBuildOptions = default: default ++ [ "--no-default-features" "--features \"pg${pgxPostgresMajor} ${builtins.toString additionalFeatures}\"" ];
+  cargoTestOptions = default: default ++ [ "--no-default-features" "--features \"pg_test pg${pgxPostgresMajor} ${builtins.toString additionalFeatures}\"" ];
   doDoc = false;
   copyLibs = false;
   copyBins = false;

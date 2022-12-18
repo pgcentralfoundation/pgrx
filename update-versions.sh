@@ -68,6 +68,6 @@ echo "Upgrading dependency versions"
 ./upgrade-deps.sh
 
 echo "Generating bindings -- this may take a few moments"
-PGX_PG_SYS_GENERATE_BINDINGS_FOR_RELEASE=1 cargo test --no-run $CARGO_QUIET_FLAG --workspace --no-default-features --features "pg14 cshim"
+PGX_PG_SYS_GENERATE_BINDINGS_FOR_RELEASE=1 cargo test --no-run $CARGO_QUIET_FLAG --workspace --no-default-features --features "pg14"
 
 echo "Done!"
