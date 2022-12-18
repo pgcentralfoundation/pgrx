@@ -8,7 +8,7 @@ Use of this source code is governed by the MIT license that can be found in the 
 */
 
 use crate::command::install::install_extension;
-use crate::manifest::PgVersionSource;
+use crate::manifest::{display_version_info, PgVersionSource};
 use crate::CommandExecute;
 use crate::{command::get::get_property, profile::CargoProfile};
 use cargo_toml::Manifest;
@@ -69,7 +69,7 @@ impl CommandExecute for Package {
             &Pgx::from_config()?,
             Some(&mut self.features),
             &package_manifest,
-            &PgVersionSource::SystemPath(pg_version),
+            &PgVersionSource::PgConfig(pg_version),
             false,
         );
         let profile = CargoProfile::from_flags(
@@ -114,6 +114,7 @@ pub(crate) fn package_extension(
         std::fs::create_dir_all(&out_dir)?;
     }
 
+    display_version_info(pg_config, &PgVersionSource::PgConfig(pg_config.label()?.into()));
     install_extension(
         user_manifest_path,
         user_package,

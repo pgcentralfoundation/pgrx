@@ -73,10 +73,11 @@ impl CommandExecute for Install {
             &Pgx::from_config()?,
             Some(&mut self.features),
             &package_manifest,
-            &PgVersionSource::SystemPath(pg_version),
+            &PgVersionSource::PgConfig(pg_version),
             self.test,
         );
 
+        display_version_info(&pg_config, &PgVersionSource::PgConfig(pg_config.label()?.into()));
         install_extension(
             self.manifest_path.as_ref(),
             self.package.as_ref(),
@@ -107,7 +108,6 @@ pub(crate) fn install_extension(
     base_directory: Option<PathBuf>,
     features: &clap_cargo::Features,
 ) -> eyre::Result<()> {
-    display_version_info(pg_config, &PgVersionSource::SystemPath(pg_config.label()?.into()));
     let base_directory = base_directory.unwrap_or_else(|| PathBuf::from("/"));
     tracing::Span::current()
         .record("base_directory", &tracing::field::display(&base_directory.display()));

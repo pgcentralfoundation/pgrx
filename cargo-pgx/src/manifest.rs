@@ -15,19 +15,19 @@ use std::path::PathBuf;
 
 #[derive(Debug, Clone)]
 pub(crate) enum PgVersionSource {
-    UserSpecified(String),
+    CliArgument(String),
     FeatureFlag(String),
     DefaultFeature(String),
-    SystemPath(String),
+    PgConfig(String),
 }
 
 impl From<PgVersionSource> for String {
     fn from(v: PgVersionSource) -> Self {
         match v {
-            PgVersionSource::UserSpecified(s) => s,
+            PgVersionSource::CliArgument(s) => s,
             PgVersionSource::FeatureFlag(s) => s,
             PgVersionSource::DefaultFeature(s) => s,
-            PgVersionSource::SystemPath(s) => s,
+            PgVersionSource::PgConfig(s) => s,
         }
     }
 }
@@ -35,10 +35,10 @@ impl From<PgVersionSource> for String {
 impl PgVersionSource {
     fn label(&self) -> &String {
         match self {
-            PgVersionSource::UserSpecified(s) => s,
+            PgVersionSource::CliArgument(s) => s,
             PgVersionSource::FeatureFlag(s) => s,
             PgVersionSource::DefaultFeature(s) => s,
-            PgVersionSource::SystemPath(s) => s,
+            PgVersionSource::PgConfig(s) => s,
         }
     }
 }
@@ -128,12 +128,12 @@ pub(crate) fn pg_config_and_version<'a>(
         'outer: loop {
             if let Some(pg_version) = specified_pg_version {
                 // the user gave us an explicit Postgres version to use, so we will
-                break 'outer Some(PgVersionSource::UserSpecified(pg_version));
+                break 'outer Some(PgVersionSource::CliArgument(pg_version));
             } else if let Some(features) = user_features.as_ref() {
                 // the user did not give us an explicit Postgres version, so see if there's one in the set
                 // of `--feature` flags they gave us
                 for flag in &features.features {
-                    if pgx.get(&flag).ok().is_some() {
+                    if pgx.is_feature_flag(flag) {
                         // use the first feature flag that is a Postgres version we support
                         break 'outer Some(PgVersionSource::FeatureFlag(flag.clone()));
                     }
@@ -146,7 +146,7 @@ pub(crate) fn pg_config_and_version<'a>(
                 if !features.no_default_features {
                     if let Some(default_features) = manifest.features.get("default") {
                         for flag in default_features {
-                            if pgx.get(flag).ok().is_some() {
+                            if pgx.is_feature_flag(flag) {
                                 break 'outer Some(PgVersionSource::DefaultFeature(flag.clone()));
                             }
                         }
@@ -156,7 +156,7 @@ pub(crate) fn pg_config_and_version<'a>(
                 // lets check the manifest for a default feature
                 if let Some(default_features) = manifest.features.get("default") {
                     for flag in default_features {
-                        if pgx.get(flag).ok().is_some() {
+                        if pgx.is_feature_flag(flag) {
                             break 'outer Some(PgVersionSource::DefaultFeature(flag.clone()));
                         }
                     }
