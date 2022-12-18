@@ -415,7 +415,7 @@ impl<'a> SpiClient<'a> {
         args: Option<Vec<(PgOid, Option<pg_sys::Datum>)>>,
     ) -> Result<SpiCursor, Error> {
         let src = std::ffi::CString::new(query).expect("query contained a null byte");
-        let args = args.unwrap_or(vec![]);
+        let args = args.unwrap_or_default();
 
         let nargs = args.len();
         let mut argtypes = vec![];

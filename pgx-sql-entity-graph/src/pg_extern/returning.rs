@@ -34,7 +34,7 @@ pub enum Returning {
     Type(UsedType),
     SetOf { ty: UsedType, optional: bool },
     Iterated { tys: Vec<ReturningIteratedItem>, optional: bool },
-    // /// Technically we don't ever create this, singe triggers have their own macro.
+    // /// Technically we don't ever create this, single triggers have their own macro.
     // Trigger,
 }
 

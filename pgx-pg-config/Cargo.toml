@@ -15,6 +15,7 @@ edition = "2021"
 [dependencies]
 dirs = "4.0.0"
 eyre = "0.6.8"
+pathsearch = "0.2.0"
 owo-colors = "3.5.0"
 serde = { version = "1.0.149", features = [ "derive" ] }
 serde_derive = "1.0.149"

@@ -32,7 +32,7 @@ use core::any::TypeId;
 /// ```
 #[derive(Debug, Clone, Hash, PartialEq, Eq, PartialOrd, Ord)]
 pub struct RustSqlMapping {
-    // This is the **resolved** type, not the raw source. This means a Type Aliase of `type Foo = u32` would appear as `u32`.
+    // This is the **resolved** type, not the raw source. This means a Type Alias of `type Foo = u32` would appear as `u32`.
     pub rust: String,
     pub sql: String,
     pub id: TypeId,

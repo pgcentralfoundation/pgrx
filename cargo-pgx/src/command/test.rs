@@ -7,17 +7,17 @@ All rights reserved.
 Use of this source code is governed by the MIT license that can be found in the LICENSE file.
 */
 
-use cargo_toml::Manifest;
-use eyre::{eyre, WrapErr};
+use eyre::Context;
 use pgx_pg_config::{get_target_dir, PgConfig, PgConfigSelector, Pgx};
 use std::path::{Path, PathBuf};
 use std::process::{Command, Stdio};
 
+use crate::manifest::{get_package_manifest, pg_config_and_version};
 use crate::profile::CargoProfile;
 use crate::CommandExecute;
 
 /// Run the test suite for this crate
-#[derive(clap::Args, Debug)]
+#[derive(clap::Args, Debug, Clone)]
 #[clap(author)]
 pub(crate) struct Test {
     /// Do you want to run against Postgres `pg11`, `pg12`, `pg13`, `pg14`, `pg15`, or `all`?
@@ -49,64 +49,51 @@ pub(crate) struct Test {
 impl CommandExecute for Test {
     #[tracing::instrument(level = "error", skip(self))]
     fn execute(self) -> eyre::Result<()> {
-        let pgx = Pgx::from_config()?;
-
-        let metadata = crate::metadata::metadata(&self.features, self.manifest_path.as_ref())
-            .wrap_err("couldn't get cargo metadata")?;
-        crate::metadata::validate(&metadata)?;
-        let package_manifest_path =
-            crate::manifest::manifest_path(&metadata, self.package.as_ref())
-                .wrap_err("Couldn't get manifest path")?;
-        let package_manifest =
-            Manifest::from_path(&package_manifest_path).wrap_err("Couldn't parse manifest")?;
-
-        let pg_version = match self.pg_version {
-            Some(ref s) => s.clone(),
-            None => crate::manifest::default_pg_version(&package_manifest)
-                .ok_or(eyre!("No provided `pg$VERSION` flag."))?,
-        };
-        let profile = CargoProfile::from_flags(
-            self.profile.as_deref(),
-            self.release.then_some(CargoProfile::Release).unwrap_or(CargoProfile::Dev),
-        )?;
-
-        for pg_config in pgx.iter(PgConfigSelector::new(&pg_version)) {
-            let mut testname = self.testname.clone();
-            let pg_config = match pg_config {
-                Err(error) => {
-                    tracing::debug!(
-                        invalid_pg_version = %pg_version,
-                        error = %error,
-                        "Got invalid `pg$VERSION` flag, assuming it is a testname"
-                    );
-                    testname = Some(pg_version.clone());
-                    pgx.get(
-                        &crate::manifest::default_pg_version(&package_manifest)
-                            .ok_or(eyre!("No provided `pg$VERSION` flag."))?,
-                    )?
-                }
-                Ok(config) => config,
-            };
-            let pg_version = format!("pg{}", pg_config.major_version()?);
-
-            let features = crate::manifest::features_for_version(
-                self.features.clone(),
+        #[tracing::instrument(level = "error", skip(me))]
+        fn perform(me: Test, pgx: &Pgx) -> eyre::Result<()> {
+            let mut features = me.features.clone();
+            let (package_manifest, _package_manifest_path) =
+                get_package_manifest(&me.features, me.package.as_ref(), me.manifest_path.as_ref())?;
+            let (pg_config, _pg_version) = pg_config_and_version(
+                &pgx,
                 &package_manifest,
-                &pg_version,
-            );
+                me.pg_version.clone(),
+                Some(&mut features),
+                true,
+            )?;
+
+            let profile = CargoProfile::from_flags(
+                me.profile.as_deref(),
+                me.release.then_some(CargoProfile::Release).unwrap_or(CargoProfile::Dev),
+            )?;
 
             test_extension(
                 pg_config,
-                self.manifest_path.as_ref(),
-                self.package.as_ref(),
+                me.manifest_path.as_ref(),
+                me.package.as_ref(),
                 &profile,
-                self.no_schema,
+                me.no_schema,
                 &features,
-                testname.clone(),
-            )?
+                me.testname,
+            )?;
+
+            Ok(())
         }
 
-        Ok(())
+        let pgx = Pgx::from_config()?;
+        if self.pg_version == Some("all".to_string()) {
+            // run the tests for **all** the Postgres versions we know about
+            for v in pgx.iter(PgConfigSelector::All) {
+                let mut versioned_test = self.clone();
+                versioned_test.pg_version = Some(v?.label()?);
+                perform(versioned_test, &pgx)?;
+            }
+
+            Ok(())
+        } else {
+            // attempt to run the test for the Postgres version `run_test()` will figure out
+            perform(self, &pgx)
+        }
     }
 }
 

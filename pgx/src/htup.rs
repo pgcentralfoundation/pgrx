@@ -71,16 +71,6 @@ pub unsafe fn heap_tuple_header_get_typmod(htup_header: pg_sys::HeapTupleHeader)
     htup_header.as_ref().unwrap().t_choice.t_datum.datum_typmod
 }
 
-extern "C" {
-    fn pgx_heap_getattr(
-        tuple: *const pg_sys::HeapTupleData,
-        attnum: u32,
-        tupdesc: pg_sys::TupleDesc,
-        isnull: *mut bool,
-    ) -> pg_sys::Datum;
-
-}
-
 /// Extract an attribute of a heap tuple and return it as Rust type.
 /// This works for either system or user attributes.  The given `attnum`
 /// is properly range-checked.
@@ -101,7 +91,7 @@ pub fn heap_getattr<T: FromDatum, AllocatedBy: WhoAllocated>(
 ) -> Option<T> {
     let mut is_null = false;
     let datum = unsafe {
-        pgx_heap_getattr(tuple.as_ptr(), attno.get() as u32, tupdesc.as_ptr(), &mut is_null)
+        pg_sys::heap_getattr(tuple.as_ptr(), attno.get() as _, tupdesc.as_ptr(), &mut is_null)
     };
     let typoid = tupdesc.get(attno.get() - 1).expect("no attribute").type_oid();
 
@@ -130,12 +120,12 @@ pub fn heap_getattr<T: FromDatum, AllocatedBy: WhoAllocated>(
 /// This function is unsafe as it cannot validate that the provided pointers are valid.
 #[inline]
 pub unsafe fn heap_getattr_raw(
-    tuple: *const pg_sys::HeapTupleData,
+    tuple: *mut pg_sys::HeapTupleData,
     attno: NonZeroUsize,
     tupdesc: pg_sys::TupleDesc,
 ) -> Option<pg_sys::Datum> {
     let mut is_null = false;
-    let datum = pgx_heap_getattr(tuple, attno.get() as u32, tupdesc, &mut is_null);
+    let datum = pg_sys::heap_getattr(tuple, attno.get() as _, tupdesc, &mut is_null);
     if is_null {
         None
     } else {
@@ -164,13 +154,14 @@ impl DatumWithTypeInfo {
 #[inline]
 pub fn heap_getattr_datum_ex(
     tuple: &PgBox<pg_sys::HeapTupleData>,
-    attno: usize,
+    attno: NonZeroUsize,
     tupdesc: &PgTupleDesc,
 ) -> DatumWithTypeInfo {
     let mut is_null = false;
-    let datum =
-        unsafe { pgx_heap_getattr(tuple.as_ptr(), attno as u32, tupdesc.as_ptr(), &mut is_null) };
-    let typoid = tupdesc.get(attno - 1).expect("no attribute").type_oid();
+    let datum = unsafe {
+        pg_sys::heap_getattr(tuple.as_ptr(), attno.get() as _, tupdesc.as_ptr(), &mut is_null)
+    };
+    let typoid = tupdesc.get(attno.get() - 1).expect("no attribute").type_oid();
 
     let mut typlen = 0;
     let mut typbyval = false;

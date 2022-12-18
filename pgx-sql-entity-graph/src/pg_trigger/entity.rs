@@ -7,11 +7,8 @@ to the `pgx` framework and very subject to change between versions. While you ma
 
 */
 use crate::{PgxSql, SqlGraphEntity, SqlGraphIdentifier, ToSql, ToSqlConfigEntity};
-use core::cmp::{Eq, Ord, Ordering, PartialEq, PartialOrd};
-use core::fmt::Debug;
-use core::hash::Hash;
 
-#[derive(Debug, Clone, Hash, PartialEq, Eq)]
+#[derive(Debug, Clone, Hash, PartialEq, Eq, PartialOrd, Ord)]
 pub struct PgTriggerEntity {
     pub function_name: &'static str,
     pub to_sql_config: ToSqlConfigEntity,
@@ -24,18 +21,6 @@ pub struct PgTriggerEntity {
 impl PgTriggerEntity {
     fn wrapper_function_name(&self) -> String {
         self.function_name.to_string() + "_wrapper"
-    }
-}
-
-impl Ord for PgTriggerEntity {
-    fn cmp(&self, other: &Self) -> Ordering {
-        self.full_path.cmp(other.full_path)
-    }
-}
-
-impl PartialOrd for PgTriggerEntity {
-    fn partial_cmp(&self, other: &Self) -> Option<Ordering> {
-        Some(self.cmp(other))
     }
 }
 
@@ -62,8 +47,7 @@ impl ToSql for PgTriggerEntity {
             CREATE FUNCTION {schema}\"{function_name}\"()\n\
                 \tRETURNS TRIGGER\n\
                 \tLANGUAGE c\n\
-                \tAS 'MODULE_PATHNAME', '{wrapper_function_name}';\
-        ",
+                \tAS 'MODULE_PATHNAME', '{wrapper_function_name}';",
             schema = schema,
             file = self.file,
             line = self.line,

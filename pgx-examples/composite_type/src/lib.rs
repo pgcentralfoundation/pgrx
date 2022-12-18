@@ -145,7 +145,7 @@ fn make_friendship(
 }
 
 /*
-Create sum the scritches recieved by dogs, roughly the equivalent of:
+Create sum the scritches received by dogs, roughly the equivalent of:
 
 ```sql
 CREATE FUNCTION sum_scritches_state(state integer, new Dog)
@@ -183,7 +183,7 @@ impl Aggregate for SumScritches {
 }
 
 /*
-Create sum the scritches recieved by dogs, roughly the equivalent of:
+Create sum the scritches received by dogs, roughly the equivalent of:
 
 ```sql
 CREATE FUNCTION scritch_collector_state(state Dog, new integer)

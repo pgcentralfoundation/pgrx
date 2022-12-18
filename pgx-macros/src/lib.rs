@@ -251,7 +251,7 @@ Declare SQL to be included in generated extension script.
 
 Accepts a String literal, a `name` attribute, and optionally others:
 
-* `name = "item"`: Set the unique identifer to `"item"` for use in `requires` declarations.
+* `name = "item"`: Set the unique identifier to `"item"` for use in `requires` declarations.
 * `requires = [item, item_two]`: References to other `name`s or Rust items which this SQL should be present after.
 * `creates = [ Type(submod::Cust), Enum(Pre), Function(defined)]`: Communicates that this SQL block creates certain entities.
   Please note it **does not** create matching Rust types.
@@ -299,7 +299,7 @@ extension_sql!(
 );
 ```
 
-To declare the SQL dependant, or a dependency of, other items:
+To declare the SQL dependent, or a dependency of, other items:
 
 ```rust,ignore
 use pgx_macros::extension_sql;
@@ -410,7 +410,7 @@ use pgx_macros::extension_sql_file;
 
 extension_sql_file!(
     "../static/demo.sql",
-    name = "singlular",
+    name = "singular",
 );
 ```
 
@@ -692,7 +692,7 @@ use pgx::*;
 use serde::{Deserialize, Serialize};
 #[derive(Debug, Serialize, Deserialize, PostgresType)]
 struct Dog {
-    treats_recieved: i64,
+    treats_received: i64,
     pets_gotten: i64,
 }
 
@@ -1030,7 +1030,7 @@ pub fn postgres_hash(input: TokenStream) -> TokenStream {
 }
 
 /**
-Declare a `pgx::Aggregate` implentation on a type as able to used by Postgres as an aggregate.
+Declare a `pgx::Aggregate` implementation on a type as able to used by Postgres as an aggregate.
 
 Functions inside the `impl` may use the [`#[pgx]`](macro@pgx) attribute.
 */
