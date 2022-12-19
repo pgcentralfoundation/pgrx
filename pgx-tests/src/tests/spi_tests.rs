@@ -231,27 +231,29 @@ mod tests {
                 None,
                 None,
             );
-            let mut cursor = client.open_cursor("SELECT * FROM tests.cursor_table", None)?;
-            assert_eq!(sum_all(cursor.fetch(3)), 1 + 2 + 3);
-            Ok::<_, pgx::spi::Error>(cursor.detach_into_name())
+            client.open_cursor("SELECT * FROM tests.cursor_table", None).map(|mut cursor| {
+                assert_eq!(sum_all(cursor.fetch(3)), 1 + 2 + 3);
+                cursor.detach_into_name()
+            })
         })?;
 
         fn sum_all(table: pgx::SpiTupleTable) -> i32 {
             table.map(|r| r.by_ordinal(1).unwrap().value::<i32>().unwrap()).sum()
         }
         Spi::connect(|client| {
-            let mut cursor = client.find_cursor(&cursor_name)?;
-            assert_eq!(sum_all(cursor.fetch(3)), 4 + 5 + 6);
-            assert_eq!(sum_all(cursor.fetch(3)), 7 + 8 + 9);
-            cursor.detach_into_name();
-            Ok::<_, pgx::spi::Error>(())
+            client.find_cursor(&cursor_name).map(|mut cursor| {
+                assert_eq!(sum_all(cursor.fetch(3)), 4 + 5 + 6);
+                assert_eq!(sum_all(cursor.fetch(3)), 7 + 8 + 9);
+                cursor.detach_into_name();
+            })
         })?;
 
         Spi::connect(|client| {
-            let mut cursor = client.find_cursor(&cursor_name)?;
-            assert_eq!(sum_all(cursor.fetch(3)), 10);
-            Ok::<_, pgx::spi::Error>(())
-        })
+            client.find_cursor(&cursor_name).map(|mut cursor| {
+                assert_eq!(sum_all(cursor.fetch(3)), 10);
+            })
+        })?;
+        Ok(())
     }
 
     #[pg_test(error = "syntax error at or near \"THIS\"")]
@@ -300,8 +302,7 @@ mod tests {
         Spi::connect(|client| {
             client.update("SELECT 1", None, None);
             let cursor = client.open_cursor("SELECT 1", None)?.detach_into_name();
-            client.find_cursor(&cursor)?;
-            Ok::<_, pgx::spi::Error>(())
+            client.find_cursor(&cursor).map(|_| ())
         })
     }
 

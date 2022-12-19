@@ -260,21 +260,19 @@ impl Spi {
         query: &str,
         args: Option<Vec<(PgOid, Option<pg_sys::Datum>)>>,
     ) -> Result<Json, Error> {
-        Ok(Spi::connect(|client| {
+        Spi::connect(|client| {
             let table =
                 client.update(&format!("EXPLAIN (format json) {}", query), None, args).first();
-            table.get_one::<Json>()
-        })?
-        .unwrap())
+            Ok(table.get_one::<Json>()?.unwrap())
+        })
     }
 
     /// execute SPI commands via the provided `SpiClient`
     pub fn execute<F: FnOnce(SpiClient) + std::panic::UnwindSafe>(f: F) {
-        Spi::connect(|client| {
+        let _ = Spi::connect(|client| {
             f(client);
             Ok::<_, ()>(())
-        })
-        .unwrap();
+        });
     }
 
     /// execute SPI commands via the provided `SpiClient` and return a value from SPI which is
@@ -287,7 +285,7 @@ impl Spi {
     /// use pgx::*;
     /// Spi::connect(|client| Ok(Some(client)));
     /// ```
-    pub fn connect<R, E, F: FnOnce(SpiClient<'_>) -> Result<R, E>>(f: F) -> Result<R, E> {
+    pub fn connect<R, F: FnOnce(SpiClient<'_>) -> R>(f: F) -> R {
         // connect to SPI
         let connection = SpiConnection::connect();
 
@@ -295,7 +293,7 @@ impl Spi {
         // just put us un.  We'll disconnect from SPI when the closure is finished.
         // If there's a panic or elog(ERROR), we don't care about also disconnecting from
         // SPI b/c Postgres will do that for us automatically
-        Ok(f(connection.client())?)
+        f(connection.client())
     }
 
     pub fn check_status(status_code: i32) -> SpiOk {

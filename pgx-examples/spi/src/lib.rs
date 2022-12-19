@@ -43,11 +43,8 @@ fn spi_return_query(
     let query = "SELECT oid, relname::text || '-pg15' FROM pg_class";
 
     let results = Spi::connect(|client| {
-        Ok::<_, ()>(
-            client.select(query, None, None).map(|row| (row["oid"].value(), row[2].value())),
-        )
-    })
-    .unwrap();
+        client.select(query, None, None).map(|row| (row["oid"].value(), row[2].value()))
+    });
 
     TableIterator::new(results)
 }
@@ -105,12 +102,8 @@ fn spi_insert_title2(
 }
 
 #[pg_extern]
-fn spi_echo(value: Option<String>) -> Result<Option<String>, spi::Error> {
-    let result = Spi::get_one_with_args(
-        "SELECT $1",
-        vec![(PgOid::from(pg_sys::TEXTOID), value.into_datum())],
-    );
-    result
+fn spi_echo(value: Option<String>) -> std::result::Result<Option<String>, spi::Error> {
+    Spi::get_one_with_args("SELECT $1", vec![(PgOid::from(pg_sys::TEXTOID), value.into_datum())])
 }
 
 extension_sql!(

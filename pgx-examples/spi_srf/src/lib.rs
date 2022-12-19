@@ -57,9 +57,8 @@ fn calculate_human_years() -> TableIterator<
             results.push((dog_name, dog_age, dog_breed, human_age));
         }
 
-        Ok::<_, pgx::spi::Error>(TableIterator::new(results.into_iter()))
+        TableIterator::new(results.into_iter())
     })
-    .unwrap()
 }
 
 #[pg_extern]
@@ -81,17 +80,14 @@ fn filter_by_breed(
     let query = "SELECT * FROM spi_srf.dog_daycare WHERE dog_breed = $1;";
     let args = vec![(PgBuiltInOids::TEXTOID.oid(), breed.into_datum())];
 
-    let results =
-        Spi::connect(|client| {
-            let tup_table: SpiTupleTable = client.select(query, None, Some(args));
+    Spi::connect(|client| {
+        let tup_table: SpiTupleTable = client.select(query, None, Some(args));
 
-            Ok::<_, ()>(tup_table.map(|row| {
-                (row["dog_name"].value(), row["dog_age"].value(), row["dog_breed"].value())
-            }))
-        })
-        .unwrap();
-
-    TableIterator::new(results)
+        let filtered = tup_table
+            .map(|row| (row["dog_name"].value(), row["dog_age"].value(), row["dog_breed"].value()))
+            .collect::<Vec<_>>();
+        TableIterator::new(filtered.into_iter())
+    })
 }
 
 #[cfg(any(test, feature = "pg_test"))]
