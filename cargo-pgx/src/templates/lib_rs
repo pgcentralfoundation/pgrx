@@ -19,10 +19,10 @@ mod tests {{
 
 }}
 
+/// This module is required by `cargo pgx test` invocations. 
+/// It must be visible at the root of your extension crate.
 #[cfg(test)]
 pub mod pg_test {{
-    // a public `pg_test` module with both `setup` and `postgresql_conf_options` function
-    // is required for `cargo pgx test` work properly
 
     pub fn setup(_options: Vec<&str>) {{
         // perform one-off initialization when the pg_test framework starts
