@@ -136,9 +136,8 @@ mod tests {
         let cnt = Spi::connect(|client| {
             let table = client.select("SELECT * from return_some_iterator();", None, None);
 
-            Ok::<_, ()>(table.len() as i64)
-        })
-        .unwrap();
+            table.len() as i64
+        });
 
         assert_eq!(cnt, 3)
     }
@@ -148,9 +147,8 @@ mod tests {
         let cnt = Spi::connect(|client| {
             let table = client.select("SELECT * from return_none_iterator();", None, None);
 
-            Ok::<_, ()>(table.len() as i64)
-        })
-        .unwrap();
+            table.len() as i64
+        });
 
         assert_eq!(cnt, 0)
     }
@@ -160,9 +158,8 @@ mod tests {
         let cnt = Spi::connect(|client| {
             let table = client.select("SELECT * from return_some_setof_iterator();", None, None);
 
-            Ok::<_, ()>(table.len() as i64)
-        })
-        .unwrap();
+            table.len() as i64
+        });
 
         assert_eq!(cnt, 3)
     }
@@ -172,9 +169,8 @@ mod tests {
         let cnt = Spi::connect(|client| {
             let table = client.select("SELECT * from return_none_setof_iterator();", None, None);
 
-            Ok::<_, ()>(table.len() as i64)
-        })
-        .unwrap();
+            table.len() as i64
+        });
 
         assert_eq!(cnt, 0)
     }
@@ -192,8 +188,8 @@ mod tests {
                 None,
             );
 
-            Ok::<_, ()>(table.len() as i64)
-        }).unwrap();
+            table.len() as i64
+        });
         assert_eq!(cnt, 1000000)
     }
 
@@ -210,8 +206,8 @@ mod tests {
                 None,
             );
 
-            Ok::<_, ()>(table.len() as i64)
-        }).unwrap();
+            table.len() as i64
+        });
         assert_eq!(cnt, 1000000)
     }
 }
