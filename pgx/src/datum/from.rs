@@ -22,9 +22,6 @@ pub enum TryFromDatumError {
     #[error("The specified type of the Datum is not compatible with the desired Rust type.")]
     IncompatibleTypes,
 
-    #[error("We were asked to convert a Datum that is NULL (but flagged as \"not null\")")]
-    NullDatumPointer,
-
     #[error("The specified attribute number `{0}` is not present")]
     NoSuchAttributeNumber(NonZeroUsize),
 
