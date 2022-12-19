@@ -426,7 +426,7 @@ impl PgExtern {
                             self.func.sig.output.span() =>
                                 match #result_ident {
                                     // we panic if it's Result::Err
-                                    Err(e) => std::panic::panic_any(e),
+                                    Err(e) => panic!("{}", e),
 
                                     // and we return the possibly NULL datum
                                     Ok(value) => match ::pgx::datum::IntoDatum::into_datum(value) {
@@ -441,7 +441,7 @@ impl PgExtern {
                             self.func.sig.output.span() =>
                                 match #result_ident {
                                     // we panic if it's Result:Err
-                                    Err(e) => std::panic::panic_any(e),
+                                    Err(e) => panic!("{}", e),
 
                                     // and we return the datum, unless it's null then we raise a panic
                                     Ok(value) => ::pgx::datum::IntoDatum::into_datum(value).unwrap_or_else(|| panic!("returned Datum was NULL")),
