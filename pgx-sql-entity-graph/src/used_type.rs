@@ -27,8 +27,10 @@ pub struct UsedType {
     /// Set via `VariadicArray` or `variadic!()`
     pub variadic: bool,
     pub default: Option<String>,
-    /// Set via the type being an `Option`.
+    /// Set via the type being an `Option` or a `Result<Option<T>>`.
     pub optional: Option<syn::Type>,
+    /// Set via the type being a `Result<T>`
+    pub result: bool,
 }
 
 impl UsedType {
@@ -131,8 +133,8 @@ impl UsedType {
             original => (original, None),
         };
 
-        // In this  step, we go look at the resolved type and determine if it is a variadic, optional, etc.
-        let (resolved_ty, variadic, optional) = match resolved_ty {
+        // In this  step, we go look at the resolved type and determine if it is a variadic, optional, result, etc.
+        let (resolved_ty, variadic, optional, result) = match resolved_ty {
             syn::Type::Path(type_path) => {
                 let path = &type_path.path;
                 let last_segment = path.segments.last().ok_or(syn::Error::new(
@@ -141,6 +143,68 @@ impl UsedType {
                 ))?;
                 let ident_string = last_segment.ident.to_string();
                 match ident_string.as_str() {
+                    "Result" => {
+                        match &last_segment.arguments {
+                            syn::PathArguments::AngleBracketed(angle_bracketed) => {
+                                match angle_bracketed.args.first().ok_or(syn::Error::new(
+                                    angle_bracketed.span(),
+                                    "No inner arg for Result<T, E> found",
+                                ))? {
+                                    syn::GenericArgument::Type(inner_ty) => {
+                                        match inner_ty {
+                                            // Result<$Type<T>>
+                                            syn::Type::Path(ref inner_type_path) => {
+                                                let path = &inner_type_path.path;
+                                                let last_segment =
+                                                    path.segments.last().ok_or(syn::Error::new(
+                                                        path.span(),
+                                                        "No last segment found while scanning path",
+                                                    ))?;
+                                                let ident_string = last_segment.ident.to_string();
+                                                match ident_string.as_str() {
+                                                    "VariadicArray" => (
+                                                        syn::Type::Path(type_path.clone()),
+                                                        true,
+                                                        Some(inner_ty.clone()),
+                                                        false,
+                                                    ),
+                                                    "Option" => (
+                                                        syn::Type::Path(type_path.clone()),
+                                                        false,
+                                                        Some(inner_ty.clone()),
+                                                        true,
+                                                    ),
+                                                    _ => (
+                                                        syn::Type::Path(type_path.clone()),
+                                                        false,
+                                                        None,
+                                                        true,
+                                                    ),
+                                                }
+                                            }
+                                            // Result<T>
+                                            _ => (
+                                                syn::Type::Path(type_path.clone()),
+                                                false,
+                                                None,
+                                                true,
+                                            ),
+                                        }
+                                    }
+                                    _ => {
+                                        return Err(syn::Error::new(
+                                            type_path.span().clone(),
+                                            "Unexpected Item found inside `Result` (expected Type)",
+                                        ))
+                                    }
+                                }
+                            }
+                            _ => return Err(syn::Error::new(
+                                type_path.span().clone(),
+                                "Unexpected Item found inside `Result` (expected Angle Brackets)",
+                            )),
+                        }
+                    }
                     "Option" => {
                         // Option<VariadicArray<T>>
                         match &last_segment.arguments {
@@ -166,11 +230,13 @@ impl UsedType {
                                                         syn::Type::Path(type_path.clone()),
                                                         true,
                                                         Some(inner_ty.clone()),
+                                                        false,
                                                     ),
                                                     _ => (
                                                         syn::Type::Path(type_path.clone()),
                                                         false,
                                                         Some(inner_ty.clone()),
+                                                        false,
                                                     ),
                                                 }
                                             }
@@ -179,6 +245,7 @@ impl UsedType {
                                                 syn::Type::Path(type_path.clone()),
                                                 false,
                                                 Some(inner_ty.clone()),
+                                                false,
                                             ),
                                         }
                                     }
@@ -199,15 +266,15 @@ impl UsedType {
                         }
                     }
                     // VariadicArray<T>
-                    "VariadicArray" => (syn::Type::Path(type_path), true, None),
+                    "VariadicArray" => (syn::Type::Path(type_path), true, None, false),
                     // T
-                    _ => (syn::Type::Path(type_path), false, None),
+                    _ => (syn::Type::Path(type_path), false, None, false),
                 }
             }
-            original => (original, false, None),
+            original => (original, false, None, false),
         };
 
-        Ok(Self { original_ty, resolved_ty, optional, variadic, default, composite_type })
+        Ok(Self { original_ty, resolved_ty, optional, result, variadic, default, composite_type })
     }
 
     pub fn entity_tokens(&self) -> syn::Expr {

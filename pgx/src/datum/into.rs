@@ -380,11 +380,12 @@ impl IntoDatum for Vec<u8> {
     }
 }
 
-/// for NULL -- always converts to `None`
+/// for VOID
 impl IntoDatum for () {
     #[inline]
     fn into_datum(self) -> Option<pg_sys::Datum> {
-        None
+        // VOID isn't very useful, but Postgres represents it as a non-null Datum with a zero value
+        Some(Datum::from(0))
     }
 
     fn type_oid() -> u32 {
