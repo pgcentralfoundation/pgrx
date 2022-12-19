@@ -7,6 +7,7 @@ to the `pgx` framework and very subject to change between versions. While you ma
 
 */
 use std::error::Error;
+use std::fmt::Display;
 
 use super::return_variant::ReturnsError;
 use super::{FunctionMetadataTypeEntity, Returns};
@@ -18,6 +19,7 @@ pub enum ArgumentError {
     BareU8,
     SkipInArray,
     Datum,
+    NotValidAsArgument(&'static str),
 }
 
 impl std::fmt::Display for ArgumentError {
@@ -37,6 +39,9 @@ impl std::fmt::Display for ArgumentError {
             }
             ArgumentError::Datum => {
                 write!(f, "A Datum as an argument means that `sql = \"...\"` must be set in the declaration")
+            }
+            ArgumentError::NotValidAsArgument(type_name) => {
+                write!(f, "`{}` is not able to be used as a function argument", type_name)
             }
         }
     }
@@ -102,6 +107,19 @@ pub unsafe trait SqlTranslatable {
     }
 }
 
+unsafe impl<E> SqlTranslatable for Result<(), E>
+where
+    E: Display,
+{
+    fn argument_sql() -> Result<SqlMapping, ArgumentError> {
+        Err(ArgumentError::NotValidAsArgument("()"))
+    }
+
+    fn return_sql() -> Result<Returns, ReturnsError> {
+        Ok(Returns::One(SqlMapping::literal("VOID")))
+    }
+}
+
 unsafe impl<T> SqlTranslatable for Option<T>
 where
     T: SqlTranslatable,
@@ -135,7 +153,7 @@ where
 unsafe impl<T, E> SqlTranslatable for Result<T, E>
 where
     T: SqlTranslatable,
-    E: std::error::Error + 'static,
+    E: Display,
 {
     fn argument_sql() -> Result<SqlMapping, ArgumentError> {
         T::argument_sql()
