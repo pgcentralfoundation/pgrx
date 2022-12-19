@@ -347,6 +347,6 @@ mod tests {
 
     #[pg_test]
     fn test_option() {
-        assert!(Spi::get_one::<Option<i32>>("SELECT NULL::integer").unwrap().is_none());
+        assert!(Spi::get_one::<i32>("SELECT NULL::integer").unwrap().is_none());
     }
 }

@@ -491,23 +491,3 @@ impl<T> FromDatum for PgBox<T, AllocatedByPostgres> {
         })
     }
 }
-
-impl<T> FromDatum for Option<T>
-where
-    T: FromDatum,
-{
-    unsafe fn from_polymorphic_datum(
-        datum: pg_sys::Datum,
-        is_null: bool,
-        typoid: pg_sys::Oid,
-    ) -> Option<Self>
-    where
-        Self: Sized,
-    {
-        if is_null {
-            None
-        } else {
-            Some(T::from_polymorphic_datum(datum, is_null, typoid))
-        }
-    }
-}

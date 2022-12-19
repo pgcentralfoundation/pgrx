@@ -332,14 +332,13 @@ mod tests {
         let trigger_op =
             Spi::get_one::<&str>("SELECT trigger_op FROM tests.before_insert_trigger_metadata;")?
                 .unwrap();
-        let trigger_relid = Spi::get_one::<Option<pg_sys::Oid>>(
+        let trigger_relid = Spi::get_one::<pg_sys::Oid>(
             "SELECT trigger_relid FROM tests.before_insert_trigger_metadata;",
-        )?
-        .unwrap();
-        let trigger_old_transition_table_name = Spi::get_one::<Option<&str>>(
+        )?;
+        let trigger_old_transition_table_name = Spi::get_one::<&str>(
             "SELECT trigger_old_transition_table_name FROM tests.before_insert_trigger_metadata;",
         )?;
-        let trigger_new_transition_table_name = Spi::get_one::<Option<&str>>(
+        let trigger_new_transition_table_name = Spi::get_one::<&str>(
             "SELECT trigger_new_transition_table_name FROM tests.before_insert_trigger_metadata;",
         )?;
         let trigger_table_name = Spi::get_one::<&str>(
@@ -463,14 +462,13 @@ mod tests {
             "SELECT trigger_op FROM tests.before_insert_trigger_metadata_safe;",
         )?
         .unwrap();
-        let trigger_relid = Spi::get_one::<Option<pg_sys::Oid>>(
+        let trigger_relid = Spi::get_one::<pg_sys::Oid>(
             "SELECT trigger_relid FROM tests.before_insert_trigger_metadata_safe;",
-        )?
-        .unwrap();
-        let trigger_old_transition_table_name = Spi::get_one::<Option<&str>>(
+        )?;
+        let trigger_old_transition_table_name = Spi::get_one::<&str>(
             "SELECT trigger_old_transition_table_name FROM tests.before_insert_trigger_metadata_safe;",
         )?;
-        let trigger_new_transition_table_name = Spi::get_one::<Option<&str>>(
+        let trigger_new_transition_table_name = Spi::get_one::<&str>(
             "SELECT trigger_new_transition_table_name FROM tests.before_insert_trigger_metadata_safe;",
         )?;
         let trigger_table_name = Spi::get_one::<&str>(

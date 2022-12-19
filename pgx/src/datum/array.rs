@@ -492,6 +492,22 @@ impl<T: FromDatum> FromDatum for Vec<T> {
     }
 }
 
+impl<T: FromDatum> FromDatum for Vec<Option<T>> {
+    #[inline]
+    unsafe fn from_polymorphic_datum(
+        datum: pg_sys::Datum,
+        is_null: bool,
+        typoid: pg_sys::Oid,
+    ) -> Option<Vec<Option<T>>> {
+        if is_null || datum.is_null() {
+            None
+        } else {
+            let array = Array::<T>::from_polymorphic_datum(datum, is_null, typoid).unwrap();
+            Some(array.iter().collect::<Vec<_>>())
+        }
+    }
+}
+
 impl<T> IntoDatum for Vec<T>
 where
     T: IntoDatum,
