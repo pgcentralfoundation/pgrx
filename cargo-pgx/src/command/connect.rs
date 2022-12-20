@@ -10,8 +10,9 @@ Use of this source code is governed by the MIT license that can be found in the 
 use crate::command::get::get_property;
 use crate::command::run::exec_psql;
 use crate::command::start::start_postgres;
+use crate::manifest::{get_package_manifest, pg_config_and_version};
 use crate::CommandExecute;
-use cargo_toml::Manifest;
+use clap_cargo::Features;
 use eyre::{eyre, WrapErr};
 use owo_colors::OwoColorize;
 use pgx_pg_config::{createdb, PgConfig, Pgx};
@@ -28,7 +29,7 @@ pub(crate) struct Connect {
     #[clap(env = "DBNAME")]
     dbname: Option<String>,
     #[clap(from_global, action = ArgAction::Count)]
-    verbose: usize,
+    verbose: u8,
     /// Package to determine default `pg_version` with (see `cargo help pkgid`)
     #[clap(long, short)]
     package: Option<String>,
@@ -45,46 +46,26 @@ impl CommandExecute for Connect {
     fn execute(mut self) -> eyre::Result<()> {
         let pgx = Pgx::from_config()?;
 
-        let pg_version = match self.pg_version {
-            Some(pg_version) => match pgx.get(&pg_version) {
-                Ok(_) => pg_version,
-                Err(err) => {
-                    if self.dbname.is_some() {
-                        return Err(err);
-                    }
-                    // It's actually the dbname! We should infer from the manifest.
-                    self.dbname = Some(pg_version);
+        let (package_manifest, package_manifest_path) = get_package_manifest(
+            &Features::default(),
+            self.package.as_ref(),
+            self.manifest_path.as_ref(),
+        )?;
+        let (pg_config, _pg_version) = match pg_config_and_version(
+            &pgx,
+            &package_manifest,
+            self.pg_version.clone(),
+            None,
+            true,
+        ) {
+            Ok(values) => values,
+            Err(_) => {
+                // the pg_version was likely a database name
+                self.dbname = self.pg_version.clone();
 
-                    let metadata =
-                        crate::metadata::metadata(&Default::default(), self.manifest_path.as_ref())
-                            .wrap_err("couldn't get cargo metadata")?;
-                    crate::metadata::validate(&metadata)?;
-                    let package_manifest_path =
-                        crate::manifest::manifest_path(&metadata, self.package.as_ref())
-                            .wrap_err("Couldn't get manifest path")?;
-                    let package_manifest = Manifest::from_path(&package_manifest_path)
-                        .wrap_err("Couldn't parse manifest")?;
-
-                    let default_pg_version = crate::manifest::default_pg_version(&package_manifest)
-                        .ok_or(eyre!("no provided `pg$VERSION` flag."))?;
-                    default_pg_version
-                }
-            },
-            None => {
-                // We should infer from the manifest.
-                let metadata =
-                    crate::metadata::metadata(&Default::default(), self.manifest_path.as_ref())
-                        .wrap_err("couldn't get cargo metadata")?;
-                crate::metadata::validate(&metadata)?;
-                let package_manifest_path =
-                    crate::manifest::manifest_path(&metadata, self.package.as_ref())
-                        .wrap_err("Couldn't get manifest path")?;
-                let package_manifest = Manifest::from_path(&package_manifest_path)
-                    .wrap_err("Couldn't parse manifest")?;
-
-                let default_pg_version = crate::manifest::default_pg_version(&package_manifest)
-                    .ok_or(eyre!("no provided `pg$VERSION` flag."))?;
-                default_pg_version
+                // try again, this time failing if necessary
+                self.pg_version = None;
+                pg_config_and_version(&pgx, &package_manifest, self.pg_version, None, true)?
             }
         };
 
@@ -92,21 +73,13 @@ impl CommandExecute for Connect {
             Some(dbname) => dbname,
             None => {
                 // We should infer from package
-                let metadata =
-                    crate::metadata::metadata(&Default::default(), self.manifest_path.as_ref())
-                        .wrap_err("couldn't get cargo metadata")?;
-                crate::metadata::validate(&metadata)?;
-                let package_manifest_path =
-                    crate::manifest::manifest_path(&metadata, self.package.as_ref())
-                        .wrap_err("Couldn't get manifest path")?;
-
                 get_property(&package_manifest_path, "extname")
                     .wrap_err("could not determine extension name")?
                     .ok_or(eyre!("extname not found in control file"))?
             }
         };
 
-        connect_psql(Pgx::from_config()?.get(&pg_version)?, &dbname, self.pgcli)
+        connect_psql(pg_config, &dbname, self.pgcli)
     }
 }
 

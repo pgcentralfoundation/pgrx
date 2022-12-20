@@ -19,43 +19,23 @@ use crate::pgx_sql::PgxSql;
 use crate::to_sql::entity::ToSqlConfigEntity;
 use crate::to_sql::ToSql;
 use crate::{SqlGraphEntity, SqlGraphIdentifier};
+use std::collections::BTreeSet;
 
 use eyre::eyre;
-use std::cmp::Ordering;
-use std::hash::{Hash, Hasher};
-
 /// The output of a [`PostgresType`](crate::postgres_type::PostgresType) from `quote::ToTokens::to_tokens`.
-#[derive(Debug, Clone, PartialEq, Eq)]
+#[derive(Debug, Clone, Hash, PartialEq, Eq, PartialOrd, Ord)]
 pub struct PostgresTypeEntity {
     pub name: &'static str,
     pub file: &'static str,
     pub line: u32,
     pub full_path: &'static str,
     pub module_path: &'static str,
-    pub mappings: std::collections::HashSet<RustSqlMapping>,
+    pub mappings: BTreeSet<RustSqlMapping>,
     pub in_fn: &'static str,
     pub in_fn_module_path: String,
     pub out_fn: &'static str,
     pub out_fn_module_path: String,
     pub to_sql_config: ToSqlConfigEntity,
-}
-
-impl Hash for PostgresTypeEntity {
-    fn hash<H: Hasher>(&self, state: &mut H) {
-        self.full_path.hash(state);
-    }
-}
-
-impl Ord for PostgresTypeEntity {
-    fn cmp(&self, other: &Self) -> Ordering {
-        self.file.cmp(other.file).then_with(|| self.file.cmp(other.file))
-    }
-}
-
-impl PartialOrd for PostgresTypeEntity {
-    fn partial_cmp(&self, other: &Self) -> Option<Ordering> {
-        Some(self.cmp(other))
-    }
 }
 
 impl PostgresTypeEntity {
@@ -165,10 +145,10 @@ impl ToSql for PostgresTypeEntity {
 
         let shell_type = format!(
             "\n\
-                                -- {file}:{line}\n\
-                                -- {full_path}\n\
-                                CREATE TYPE {schema}{name};\
-                            ",
+                -- {file}:{line}\n\
+                -- {full_path}\n\
+                CREATE TYPE {schema}{name};\
+            ",
             schema = context.schema_prefix_for(&self_index),
             full_path = item.full_path,
             file = item.file,
@@ -177,28 +157,29 @@ impl ToSql for PostgresTypeEntity {
         );
         tracing::trace!(sql = %shell_type);
 
-        let materialized_type = format!("\n\
-                                -- {file}:{line}\n\
-                                -- {full_path}\n\
-                                CREATE TYPE {schema}{name} (\n\
-                                    \tINTERNALLENGTH = variable,\n\
-                                    \tINPUT = {schema_prefix_in_fn}{in_fn}, /* {in_fn_path} */\n\
-                                    \tOUTPUT = {schema_prefix_out_fn}{out_fn}, /* {out_fn_path} */\n\
-                                    \tSTORAGE = extended\n\
-                                );\
-                            ",
-                                        full_path = item.full_path,
-                                        file = item.file,
-                                        line = item.line,
-                                        schema = context.schema_prefix_for(&self_index),
-                                        name = item.name,
-                                        schema_prefix_in_fn = context.schema_prefix_for(&in_fn_graph_index),
-                                        in_fn = item.in_fn,
-                                        in_fn_path = in_fn_path,
-                                        schema_prefix_out_fn = context.schema_prefix_for(&out_fn_graph_index),
-                                        out_fn = item.out_fn,
-                                        out_fn_path = out_fn_path,
-        );
+        let materialized_type = format! {
+            "\n\
+                -- {file}:{line}\n\
+                -- {full_path}\n\
+                CREATE TYPE {schema}{name} (\n\
+                    \tINTERNALLENGTH = variable,\n\
+                    \tINPUT = {schema_prefix_in_fn}{in_fn}, /* {in_fn_path} */\n\
+                    \tOUTPUT = {schema_prefix_out_fn}{out_fn}, /* {out_fn_path} */\n\
+                    \tSTORAGE = extended\n\
+                );\
+            ",
+            full_path = item.full_path,
+            file = item.file,
+            line = item.line,
+            schema = context.schema_prefix_for(&self_index),
+            name = item.name,
+            schema_prefix_in_fn = context.schema_prefix_for(&in_fn_graph_index),
+            in_fn = item.in_fn,
+            in_fn_path = in_fn_path,
+            schema_prefix_out_fn = context.schema_prefix_for(&out_fn_graph_index),
+            out_fn = item.out_fn,
+            out_fn_path = out_fn_path,
+        };
         tracing::trace!(sql = %materialized_type);
 
         Ok(shell_type + "\n" + &in_fn_sql + "\n" + &out_fn_sql + "\n" + &materialized_type)

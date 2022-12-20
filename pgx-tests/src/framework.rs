@@ -7,6 +7,7 @@ All rights reserved.
 Use of this source code is governed by the MIT license that can be found in the LICENSE file.
 */
 
+use std::collections::HashSet;
 use std::process::{Command, Stdio};
 
 use eyre::{eyre, WrapErr};
@@ -20,6 +21,7 @@ use std::fmt::Write as _;
 use std::io::{BufRead, BufReader, Write};
 use std::path::PathBuf;
 use std::sync::{Arc, Mutex};
+use sysinfo::{Pid, ProcessExt, System, SystemExt};
 
 mod shutdown;
 pub use shutdown::add_shutdown_hook;
@@ -41,8 +43,8 @@ static TEST_MUTEX: Lazy<Mutex<SetupState>> = Lazy::new(|| {
 });
 
 // The goal of this closure is to allow "wrapping" of anything that might issue
-// an SQL simple_quuery or query using either a postgres::Client or
-// postgres::Transction and capture the output. The use of this wrapper is
+// an SQL simple_query or query using either a postgres::Client or
+// postgres::Transaction and capture the output. The use of this wrapper is
 // completely optional, but it might help narrow down some errors later on.
 fn query_wrapper<F, T>(
     query: Option<String>,
@@ -283,10 +285,13 @@ fn install_extension() -> eyre::Result<()> {
     eprintln!("installing extension");
     let profile = std::env::var("PGX_BUILD_PROFILE").unwrap_or("debug".into());
     let no_schema = std::env::var("PGX_NO_SCHEMA").unwrap_or("false".into()) == "true";
-    let mut features = std::env::var("PGX_FEATURES").unwrap_or("".to_string());
-    if !features.contains("pg_test") {
-        features += " pg_test";
-    }
+    let mut features = std::env::var("PGX_FEATURES")
+        .unwrap_or("".to_string())
+        .split_ascii_whitespace()
+        .map(|s| s.to_string())
+        .collect::<HashSet<_>>();
+    features.insert("pg_test".into());
+
     let no_default_features =
         std::env::var("PGX_NO_DEFAULT_FEATURES").unwrap_or("false".to_string()) == "true";
     let all_features = std::env::var("PGX_ALL_FEATURES").unwrap_or("false".to_string()) == "true";
@@ -294,6 +299,10 @@ fn install_extension() -> eyre::Result<()> {
     let pg_version = format!("pg{}", pg_sys::get_pg_major_version_string());
     let pgx = Pgx::from_config()?;
     let pg_config = pgx.get(&pg_version)?;
+    let cargo_test_args = get_cargo_test_features()?;
+    println!("detected cargo args: {:?}", cargo_test_args);
+
+    features.extend(cargo_test_args.features.iter().cloned());
 
     let mut command = Command::new("cargo");
     command
@@ -315,16 +324,16 @@ fn install_extension() -> eyre::Result<()> {
         command.env("RUST_LOG", rust_log);
     }
 
-    if !features.trim().is_empty() {
+    if !features.is_empty() {
         command.arg("--features");
-        command.arg(features);
+        command.arg(features.into_iter().collect::<Vec<_>>().join(" "));
     }
 
-    if no_default_features {
+    if no_default_features || cargo_test_args.no_default_features {
         command.arg("--no-default-features");
     }
 
-    if all_features {
+    if all_features || cargo_test_args.all_features {
         command.arg("--all-features");
     }
 
@@ -623,4 +632,66 @@ pub fn get_named_capture(
         Some(cap) => Some(cap[name].to_string()),
         None => None,
     }
+}
+
+fn get_cargo_test_features() -> eyre::Result<clap_cargo::Features> {
+    let mut features = clap_cargo::Features::default();
+    let cargo_user_args = get_cargo_args();
+    let mut iter = cargo_user_args.iter();
+    while let Some(part) = iter.next() {
+        match part.as_str() {
+            "--no-default-features" => features.no_default_features = true,
+            "--features" => {
+                let configured_features = iter.next().ok_or(eyre!(
+                    "no `--features` specified in the cargo argument list: {:?}",
+                    cargo_user_args
+                ))?;
+                features.features =
+                    configured_features.split_ascii_whitespace().map(|s| s.to_string()).collect();
+            }
+            "--all-features" => features.all_features = true,
+            _ => {}
+        }
+    }
+
+    Ok(features)
+}
+
+fn get_cargo_args() -> Vec<String> {
+    // setup the sysinfo crate's "System"
+    let mut system = System::new_all();
+    system.refresh_all();
+
+    // starting with our process, look for the full set of arguments for the top-most "cargo" command
+    // in our process tree.
+    //
+    // it's possible we've been called by:
+    //  - the user from the command-line via `cargo test ...`
+    //  - `cargo pgx test ...`
+    //  - `cargo test ...`
+    //  - some other combination with a `cargo ...` in the middle, perhaps
+    //
+    // we're interested in the first arguments the **user** gave to cargo, so `framework.rs`
+    // can later figure out which set of features to pass to `cargo pgx`
+    let mut pid = Pid::from(std::process::id() as usize);
+    while let Some(process) = system.process(pid) {
+        // only if it's "cargo"...
+        if process.exe().ends_with("cargo") {
+            // ... and only if it's "cargo test"...
+            if process.cmd().iter().any(|arg| arg == "test")
+                && !process.cmd().iter().any(|arg| arg == "pgx")
+            {
+                // ... do we want its args
+                return process.cmd().iter().cloned().collect();
+            }
+        }
+
+        // and we want to keep going to find the top-most "cargo" process in our tree
+        match process.parent() {
+            Some(parent_pid) => pid = parent_pid,
+            None => break,
+        }
+    }
+
+    Vec::new()
 }

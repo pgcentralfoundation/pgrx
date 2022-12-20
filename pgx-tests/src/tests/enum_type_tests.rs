@@ -37,8 +37,7 @@ mod tests {
 
     #[pg_test]
     fn test_foo_enum() {
-        let result =
-            Spi::get_one::<Foo>("SELECT take_foo_enum('One');").expect("failed to get SPI result");
-        assert_eq!(Foo::Three, result);
+        let result = Spi::get_one::<Foo>("SELECT take_foo_enum('One');");
+        assert_eq!(Ok(Some(Foo::Three)), result);
     }
 }

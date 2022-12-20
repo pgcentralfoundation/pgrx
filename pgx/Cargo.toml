@@ -16,9 +16,10 @@ edition = "2021"
 crate-type = [ "rlib" ]
 
 [features]
-default = [ ]
-plrust = ["postgrestd"]
+default = [ "cshim" ]
+plrust = [ "postgrestd" ]
 postgrestd = ["pgx-pg-sys/postgrestd"]
+cshim = [ "pgx-pg-sys/cshim" ]
 pg11 = [ "pgx-pg-sys/pg11" ]
 pg12 = [ "pgx-pg-sys/pg12" ]
 pg13 = [ "pgx-pg-sys/pg13" ]
@@ -28,7 +29,7 @@ time-crate = ["dep:time"]
 no-schema-generation = ["pgx-macros/no-schema-generation", "pgx-sql-entity-graph/no-schema-generation"]
 
 [package.metadata.docs.rs]
-features = ["pg14"]
+features = ["pg14", "cshim"]
 no-default-features = true
 # Enable `#[cfg(docsrs)]` (https://docs.rs/about/builds#cross-compiling)
 rustc-args = ["--cfg", "docsrs"]

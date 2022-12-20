@@ -9,8 +9,7 @@ Use of this source code is governed by the MIT license that can be found in the 
 
 //! Provides a safe wrapper around Postgres' `pg_sys::RelationData` struct
 use crate::{
-    direct_function_call, name_data_to_str, pg_sys, FromDatum, IntoDatum, PgBox, PgList,
-    PgTupleDesc,
+    direct_function_call, name_data_to_str, pg_sys, FromDatum, IntoDatum, PgBox, PgTupleDesc,
 };
 use pgx_sql_entity_graph::metadata::{
     ArgumentError, Returns, ReturnsError, SqlMapping, SqlTranslatable,
@@ -187,10 +186,12 @@ impl PgRelation {
     }
 
     /// Return an iterator of indices, as `PgRelation`s, attached to this relation
+    #[cfg(feature = "cshim")]
     pub fn indices(
         &self,
         lockmode: pg_sys::LOCKMODE,
     ) -> impl std::iter::Iterator<Item = PgRelation> {
+        use crate::PgList;
         // SAFETY: we know self.boxed is a valid pointer as we created it
         let list = unsafe {
             PgList::<pg_sys::Oid>::from_pg(pg_sys::RelationGetIndexList(self.boxed.as_ptr()))

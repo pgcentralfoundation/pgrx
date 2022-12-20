@@ -91,23 +91,20 @@ mod tests {
             let complex = client
                 .select("SELECT '1.1,2.2'::complex;", None, None)
                 .first()
-                .get_one::<PgBox<Complex>>();
+                .get_one::<PgBox<Complex>>()
+                .expect("SPI failed")
+                .unwrap();
 
-            assert!(complex.is_some());
-
-            let complex = complex.unwrap();
             assert_eq!(&complex.x, &1.1);
             assert_eq!(&complex.y, &2.2);
-            Ok(Some(()))
-        });
+        })
     }
 
     #[pg_test]
     fn test_complex_out() {
         let string_val = Spi::get_one::<&str>("SELECT complex_out('1.1,2.2')::text");
 
-        assert!(string_val.is_some());
-        assert_eq!(string_val.unwrap(), "1.1, 2.2");
+        assert_eq!(string_val, Ok(Some("1.1, 2.2")));
     }
 
     #[pg_test]
@@ -116,27 +113,25 @@ mod tests {
             let complex = client
                 .select("SELECT '1.1, 2.2'::complex;", None, None)
                 .first()
-                .get_one::<PgBox<Complex>>();
+                .get_one::<PgBox<Complex>>()
+                .expect("SPI failed")
+                .unwrap();
 
-            assert!(complex.is_some());
-            let complex = complex.unwrap();
             assert_eq!(&complex.x, &1.1);
             assert_eq!(&complex.y, &2.2);
-            Ok(Some(()))
         });
     }
 
     #[pg_test]
-    fn test_complex_storage_and_retrieval() {
+    fn test_complex_storage_and_retrieval() -> Result<(), pgx::spi::Error> {
         let complex = Spi::connect(|client| {
-            Ok(client.update(
+            client.update(
                 "CREATE TABLE complex_test AS SELECT s as id, (s || '.0, 2.0' || s)::complex as value FROM generate_series(1, 1000) s;\
-                SELECT value FROM complex_test ORDER BY id;", None, None).first().get_one::<PgBox<Complex>>())
-        });
+                SELECT value FROM complex_test ORDER BY id;", None, None).first().get_one::<PgBox<Complex>>()
+        })?.expect("datum was null");
 
-        assert!(complex.is_some());
-        let complex = complex.unwrap();
         assert_eq!(&complex.x, &1.0);
         assert_eq!(&complex.y, &2.01);
+        Ok(())
     }
 }

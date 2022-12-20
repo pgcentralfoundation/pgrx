@@ -30,14 +30,14 @@ mod tests {
 
         assert!(matches!(
             val,
-            Some(SomeEnum::String(s)) if s == "hello world"
+            Ok(Some(SomeEnum::String(s))) if s == "hello world"
         ));
 
         let val = Spi::get_one::<SomeEnum>(r#"SELECT '{"a": 1, "s": "hello world"}'::SomeEnum"#);
 
         assert!(matches!(
             val,
-            Some(SomeEnum::Struct{a: 1, s }) if s == "hello world"
+            Ok(Some(SomeEnum::Struct{a: 1, s })) if s == "hello world"
         ));
     }
 }

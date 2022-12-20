@@ -126,13 +126,24 @@ jobs:
     - name: Run base-level tests
       run: |
         cargo test \
-          --features "pg$PG_VER" --no-default-features \
+          --features "pg$PG_VER" \
           --package cargo-pgx \
           --package pgx \
           --package pgx-macros \
           --package pgx-pg-sys \
-          --package pgx-tests \
           --package pgx-sql-entity-graph
+
+    - name: Run pgx-tests with cshim enabled
+      run: |
+        cargo test \
+          --features "pg$PG_VER cshim" \
+          --package pgx-tests
+
+    - name: Run pgx-tests with cshim disabled
+      run: |
+        cargo test \
+          --features "pg$PG_VER" \
+          --package pgx-tests
 
     - name: Run aggregate example tests
       run: cargo test --package aggregate --features "pg$PG_VER" --no-default-features

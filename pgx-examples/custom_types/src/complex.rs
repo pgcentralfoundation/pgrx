@@ -64,14 +64,14 @@ mod tests {
     fn test_known_animals_via_spi() {
         let animals = Spi::get_one::<Animals>("SELECT known_animals();");
 
-        assert_eq!(animals, Some(known_animals()));
+        assert_eq!(animals, Ok(Some(known_animals())));
 
         assert_eq!(
             animals,
-            Some(Animals {
+            Ok(Some(Animals {
                 names: vec!["Sally".into(), "Brandy".into(), "anchovy".into()],
                 age_lookup: hashmap! { 5 => "Sally".into(), 4 => "Brandy".into(), 3=> "anchovy".into()},
-            })
-        )
+            }))
+        );
     }
 }

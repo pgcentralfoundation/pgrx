@@ -46,21 +46,25 @@ pub mod fcinfo;
 pub mod ffi;
 pub mod guc;
 pub mod heap_tuple;
+#[cfg(feature = "cshim")]
 pub mod hooks;
 pub mod htup;
 pub mod inoutfuncs;
 pub mod itemptr;
 pub mod iter;
+#[cfg(feature = "cshim")]
 pub mod list;
 pub mod lwlock;
 pub mod memcxt;
 pub mod misc;
+#[cfg(feature = "cshim")]
 pub mod namespace;
 pub mod nodes;
 pub mod pgbox;
 pub mod rel;
 pub mod shmem;
 pub mod spi;
+#[cfg(feature = "cshim")]
 pub mod spinlock;
 pub mod stringinfo;
 pub mod trigger_support;
@@ -83,13 +87,16 @@ pub use datum::*;
 pub use enum_helper::*;
 pub use fcinfo::*;
 pub use guc::*;
+#[cfg(feature = "cshim")]
 pub use hooks::*;
 pub use htup::*;
 pub use inoutfuncs::*;
 pub use itemptr::*;
+#[cfg(feature = "cshim")]
 pub use list::*;
 pub use lwlock::*;
 pub use memcxt::*;
+#[cfg(feature = "cshim")]
 pub use namespace::*;
 pub use nodes::*;
 pub use pgbox::*;
@@ -284,7 +291,7 @@ macro_rules! pg_magic_func {
     };
 }
 
-/// Create neccessary extension-local internal marker for use with SQL generation.
+/// Create necessary extension-local internal marker for use with SQL generation.
 ///
 /// <div class="example-wrap" style="display:inline-block">
 /// <pre class="ignore" style="white-space:normal;font:inherit;">
@@ -298,7 +305,7 @@ macro_rules! pg_sql_graph_magic {
     () => {
         #[no_mangle]
         #[doc(hidden)]
-        #[rustfmt::skip] // explict extern "Rust" is more clear here
+        #[rustfmt::skip] // explicit extern "Rust" is more clear here
         pub extern "Rust" fn __pgx_sql_mappings() -> $crate::pgx_sql_entity_graph::RustToSqlMapping {
             $crate::pgx_sql_entity_graph::RustToSqlMapping {
                 rust_source_to_sql: ::pgx::DEFAULT_RUST_SOURCE_TO_SQL.clone(),
@@ -308,7 +315,7 @@ macro_rules! pg_sql_graph_magic {
         // A marker which must exist in the root of the extension.
         #[no_mangle]
         #[doc(hidden)]
-        #[rustfmt::skip] // explict extern "Rust" is more clear here
+        #[rustfmt::skip] // explicit extern "Rust" is more clear here
         pub extern "Rust" fn __pgx_marker(
             _: (),
         ) -> $crate::pgx_sql_entity_graph::ControlFile {

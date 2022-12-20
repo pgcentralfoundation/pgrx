@@ -30,10 +30,9 @@ use crate::ExternArgs;
 use crate::{SqlGraphEntity, SqlGraphIdentifier};
 
 use eyre::{eyre, WrapErr};
-use std::cmp::Ordering;
 
 /// The output of a [`PgExtern`](crate::pg_extern::PgExtern) from `quote::ToTokens::to_tokens`.
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, Hash, PartialEq, Eq, PartialOrd, Ord)]
 pub struct PgExternEntity {
     pub name: &'static str,
     pub unaliased_name: &'static str,
@@ -49,32 +48,6 @@ pub struct PgExternEntity {
     pub search_path: Option<Vec<&'static str>>,
     pub operator: Option<PgOperatorEntity>,
     pub to_sql_config: ToSqlConfigEntity,
-}
-
-impl std::hash::Hash for PgExternEntity {
-    fn hash<H: std::hash::Hasher>(&self, state: &mut H) {
-        self.full_path.hash(state);
-    }
-}
-
-impl PartialEq for PgExternEntity {
-    fn eq(&self, other: &Self) -> bool {
-        self.full_path.eq(other.full_path)
-    }
-}
-
-impl Eq for PgExternEntity {}
-
-impl Ord for PgExternEntity {
-    fn cmp(&self, other: &Self) -> Ordering {
-        self.full_path.cmp(&other.full_path)
-    }
-}
-
-impl PartialOrd for PgExternEntity {
-    fn partial_cmp(&self, other: &Self) -> Option<Ordering> {
-        Some(self.cmp(other))
-    }
 }
 
 impl From<PgExternEntity> for SqlGraphEntity {
@@ -132,13 +105,14 @@ impl ToSql for PgExternEntity {
 
         let fn_sql = format!(
             "\
-                                CREATE {or_replace} FUNCTION {schema}\"{name}\"({arguments}) {returns}\n\
-                                {extern_attrs}\
-                                {search_path}\
-                                LANGUAGE c /* Rust */\n\
-                                AS '{module_pathname}', '{unaliased_name}_wrapper';\
-                            ",
-            or_replace = if extern_attrs.contains(&ExternArgs::CreateOrReplace) { "OR REPLACE" } else { "" },
+                CREATE {or_replace} FUNCTION {schema}\"{name}\"({arguments}) {returns}\n\
+                {extern_attrs}\
+                {search_path}\
+                LANGUAGE c /* Rust */\n\
+                AS '{module_pathname}', '{unaliased_name}_wrapper';\
+            ",
+            or_replace =
+                if extern_attrs.contains(&ExternArgs::CreateOrReplace) { "OR REPLACE" } else { "" },
             schema = self
                 .schema
                 .map(|schema| format!("{}.", schema))
@@ -184,24 +158,23 @@ impl ToSql for PgExternEntity {
                                         );
                             args.push(buf);
                         }
-                        Ok(SqlMapping::Composite {
-                            array_brackets,
-                        }) => {
-                            let sql = self.fn_args[idx]
-                                .used_ty
-                                .composite_type
-                                .map(|v| {
-                                    if array_brackets {
-                                        format!("{v}[]")
-                                    } else {
-                                        format!("{v}")
-                                    }
-                                })
-                                .ok_or_else(|| {
-                                    eyre!(
+                        Ok(SqlMapping::Composite { array_brackets }) => {
+                            let sql =
+                                self.fn_args[idx]
+                                    .used_ty
+                                    .composite_type
+                                    .map(|v| {
+                                        if array_brackets {
+                                            format!("{v}[]")
+                                        } else {
+                                            format!("{v}")
+                                        }
+                                    })
+                                    .ok_or_else(|| {
+                                        eyre!(
                                     "Macro expansion time suggested a composite_type!() in return"
                                 )
-                                })?;
+                                    })?;
                             let buf = format!("\
                                 \t\"{pattern}\" {variadic}{schema_prefix}{sql_type}{default}{maybe_comma}/* {type_name} */\
                             ",
@@ -216,23 +189,22 @@ impl ToSql for PgExternEntity {
                         );
                             args.push(buf);
                         }
-                        Ok(SqlMapping::Source {
-                            array_brackets,
-                        }) => {
-                            let sql = context
-                                .source_only_to_sql_type(arg.used_ty.ty_source)
-                                .map(|v| {
-                                    if array_brackets {
-                                        format!("{v}[]")
-                                    } else {
-                                        format!("{v}")
-                                    }
-                                })
-                                .ok_or_else(|| {
-                                    eyre!(
+                        Ok(SqlMapping::Source { array_brackets }) => {
+                            let sql =
+                                context
+                                    .source_only_to_sql_type(arg.used_ty.ty_source)
+                                    .map(|v| {
+                                        if array_brackets {
+                                            format!("{v}[]")
+                                        } else {
+                                            format!("{v}")
+                                        }
+                                    })
+                                    .ok_or_else(|| {
+                                        eyre!(
                                     "Macro expansion time suggested a source only mapping in return"
                                 )
-                                })?;
+                                    })?;
                             let buf = format!("\
                                 \t\"{pattern}\" {variadic}{schema_prefix}{sql_type}{default}{maybe_comma}/* {type_name} */\
                             ",
@@ -353,10 +325,7 @@ impl ToSql for PgExternEntity {
                         full_path = ty.full_path
                     )
                 }
-                PgExternReturnEntity::Iterated {
-                    tys: table_items,
-                    optional: _,
-                } => {
+                PgExternReturnEntity::Iterated { tys: table_items, optional: _ } => {
                     let mut items = String::new();
                     let metadata_retval = self.metadata.retval.clone().ok_or_else(|| eyre!("Macro expansion time and SQL resolution time had differing opinions about the return value existing"))?;
                     let metadata_retval_sqls = match metadata_retval.return_sql {
@@ -393,10 +362,8 @@ impl ToSql for PgExternEntity {
                         table_items.iter().enumerate()
                     {
                         let graph_index =
-                            context
-                                .graph
-                                .neighbors_undirected(self_index)
-                                .find(|neighbor| match &context.graph[*neighbor] {
+                            context.graph.neighbors_undirected(self_index).find(|neighbor| {
+                                match &context.graph[*neighbor] {
                                     SqlGraphEntity::Type(neightbor_ty) => {
                                         neightbor_ty.id_matches(&ty.ty_id)
                                     }
@@ -405,7 +372,8 @@ impl ToSql for PgExternEntity {
                                     }
                                     SqlGraphEntity::BuiltinType(defined) => defined == ty.ty_source,
                                     _ => false,
-                                });
+                                }
+                            });
 
                         let needs_comma = idx < (table_items.len() - 1);
                         let item = format!(
@@ -469,10 +437,7 @@ impl ToSql for PgExternEntity {
                     .collect::<Vec<_>>();
                 if !requires_attrs.is_empty() {
                     format!(
-                        "\
-                       -- requires:\n\
-                        {}\n\
-                    ",
+                        "-- requires:\n{}\n",
                         requires_attrs
                             .iter()
                             .map(|i| format!("--   {}", i))
