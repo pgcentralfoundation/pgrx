@@ -708,8 +708,10 @@ impl<'a> PreparedStatement<'a> {
     /// Converts prepared statement into an owned prepared statement
     ///
     /// These statements have static lifetime and are freed only when dropped
-    pub fn keep(&self) -> OwnedPreparedStatement {
-        // SAFETY: self.plan is initialized in `SpiClient::prepare`
+    pub fn keep(self) -> OwnedPreparedStatement {
+        // SAFETY: self.plan is initialized in `SpiClient::prepare` and `PreparedStatement`
+        // is consumed. If it wasn't consumed, a subsequent call to `keep` would trigger
+        // an SPI_ERROR_ARGUMENT as per `SPI_keepplan` implementation.
         unsafe {
             pg_sys::SPI_keepplan(self.plan);
         }
