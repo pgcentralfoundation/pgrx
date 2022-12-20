@@ -36,12 +36,10 @@ mod tests {
     }
 
     #[pg_test]
-    fn test_take_and_return_inet() -> Result<(), pgx::spi::Error> {
+    fn test_take_and_return_inet() {
         let rc = Spi::get_one::<bool>(
             "SELECT tests.take_and_return_inet('192.168.0.1') = '192.168.0.1'::inet;",
-        )?
-        .expect("failed to get SPI result");
-        assert!(rc);
-        Ok(())
+        );
+        assert_eq!(rc, Ok(Some(true)));
     }
 }

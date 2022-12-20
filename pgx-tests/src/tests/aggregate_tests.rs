@@ -150,11 +150,10 @@ mod tests {
     use pgx::prelude::*;
 
     #[pg_test]
-    fn aggregate_demo_sum() -> Result<(), pgx::spi::Error> {
+    fn aggregate_demo_sum() {
         let retval =
-            Spi::get_one::<i32>("SELECT demo_sum(value) FROM UNNEST(ARRAY [1, 1, 2]) as value;")?
-                .expect("SQL select failed");
-        assert_eq!(retval, 4);
+            Spi::get_one::<i32>("SELECT demo_sum(value) FROM UNNEST(ARRAY [1, 1, 2]) as value;");
+        assert_eq!(retval, Ok(Some(4)));
 
         // Moving-aggregate mode
         let retval = Spi::get_one::<Vec<i32>>(
@@ -165,34 +164,29 @@ mod tests {
                 ) as calculated FROM UNNEST(ARRAY [1, 20, 300, 4000]) as value
             ) as results;
         ",
-        )?
-        .expect("SQL select failed");
-        assert_eq!(retval, vec![1, 21, 320, 4300]);
-        Ok(())
+        );
+        assert_eq!(retval, Ok(Some(vec![1, 21, 320, 4300])));
     }
 
     #[pg_test]
-    fn aggregate_demo_unique() -> Result<(), pgx::spi::Error> {
+    fn aggregate_demo_unique() {
         let retval = Spi::get_one::<i32>(
             "SELECT DemoUnique(value) FROM UNNEST(ARRAY ['a', 'a', 'b']) as value;",
-        )?
-        .expect("SQL select failed");
-        assert_eq!(retval, 2);
-        Ok(())
+        );
+        assert_eq!(retval, Ok(Some(2)));
     }
 
     #[pg_test]
-    fn aggregate_demo_percentile_disc() -> Result<(), pgx::spi::Error> {
+    fn aggregate_demo_percentile_disc() {
         // Example from https://www.postgresql.org/docs/current/xaggr.html#XAGGR-ORDERED-SET-AGGREGATES
         let retval = Spi::get_one::<i32>(
             "SELECT DemoPercentileDisc(0.5) WITHIN GROUP (ORDER BY income) FROM UNNEST(ARRAY [6000, 70000, 500]) as income;"
-        )?.expect("SQL select failed");
-        assert_eq!(retval, 6000);
+        );
+        assert_eq!(retval, Ok(Some(6000)));
 
         let retval = Spi::get_one::<i32>(
             "SELECT DemoPercentileDisc(0.05) WITHIN GROUP (ORDER BY income) FROM UNNEST(ARRAY [5, 100000000, 6000, 70000, 500]) as income;"
-        )?.expect("SQL select failed");
-        assert_eq!(retval, 5);
-        Ok(())
+        );
+        assert_eq!(retval, Ok(Some(5)));
     }
 }

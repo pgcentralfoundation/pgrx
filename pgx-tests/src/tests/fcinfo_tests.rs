@@ -249,17 +249,15 @@ mod tests {
     }
 
     #[pg_test]
-    unsafe fn test_takes_i8() -> Result<(), pgx::spi::Error> {
-        let result = Spi::get_one::<i8>("SELECT takes_i8('a');")?.unwrap();
-        assert_eq!(result, 'a' as i8);
-        Ok(())
+    unsafe fn test_takes_i8() {
+        let result = Spi::get_one::<i8>("SELECT takes_i8('a');");
+        assert_eq!(result, Ok(Some('a' as i8)));
     }
 
     #[pg_test]
-    unsafe fn test_takes_char() -> Result<(), pgx::spi::Error> {
-        let result = Spi::get_one::<char>("SELECT takes_char('🚨');")?.unwrap();
-        assert_eq!(result, '🚨');
-        Ok(())
+    unsafe fn test_takes_char() {
+        let result = Spi::get_one::<char>("SELECT takes_char('🚨');");
+        assert_eq!(result, Ok(Some('🚨')));
     }
 
     #[pg_test]
@@ -314,17 +312,15 @@ mod tests {
     }
 
     #[pg_test]
-    fn test_returns_void() -> Result<(), pgx::spi::Error> {
-        let result = Spi::get_one::<()>("SELECT returns_void();")?.unwrap();
-        assert_eq!(result, ());
-        Ok(())
+    fn test_returns_void() {
+        let result = Spi::get_one::<()>("SELECT returns_void();");
+        assert_eq!(result, Ok(Some(())));
     }
 
     #[pg_test]
-    fn test_returns_tuple() -> Result<(), pgx::spi::Error> {
-        let result = Spi::get_two::<i32, String>("SELECT * FROM returns_tuple();")?;
-        assert_eq!((Some(42), Some("pgx".into())), result);
-        Ok(())
+    fn test_returns_tuple() {
+        let result = Spi::get_two::<i32, String>("SELECT * FROM returns_tuple();");
+        assert_eq!(Ok((Some(42), Some("pgx".into()))), result);
     }
 
     /// ensures that we can have a `#[pg_extern]` function with an argument that
@@ -335,15 +331,13 @@ mod tests {
     }
 
     #[pg_test]
-    fn test_null_strict_type() -> Result<(), pgx::spi::Error> {
-        assert_eq!(None, Spi::get_one::<NullStrict>("SELECT null::NullStrict")?);
-        Ok(())
+    fn test_null_strict_type() {
+        assert_eq!(Ok(None), Spi::get_one::<NullStrict>("SELECT null::NullStrict"));
     }
 
     #[pg_test]
     #[should_panic(expected = "An error message")]
-    fn test_null_error_type() -> Result<(), pgx::spi::Error> {
-        assert_eq!(None, Spi::get_one::<NullError>("SELECT null::NullError")?);
-        Ok(())
+    fn test_null_error_type() {
+        Spi::get_one::<NullError>("SELECT null::NullError").unwrap();
     }
 }

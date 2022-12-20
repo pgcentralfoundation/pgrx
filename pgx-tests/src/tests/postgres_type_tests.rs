@@ -184,20 +184,17 @@ mod tests {
     }
 
     #[pg_test]
-    fn test_call_with_value() -> Result<(), pgx::spi::Error> {
+    fn test_call_with_value() {
         let result = Spi::get_one::<String>(
             "SELECT fn_takes_option('1.0,2.0,3'::CustomTextFormatSerializedType);",
-        )?
-        .unwrap();
-        assert_eq!("1,2,3", result);
-        Ok(())
+        );
+        assert_eq!(Ok(Some("1,2,3".into())), result);
     }
 
     #[pg_test]
-    fn test_call_with_null() -> Result<(), pgx::spi::Error> {
-        let result = Spi::get_one::<String>("SELECT fn_takes_option(NULL);")?.unwrap();
-        assert_eq!(String::from("nothing"), result);
-        Ok(())
+    fn test_call_with_null() {
+        let result = Spi::get_one::<String>("SELECT fn_takes_option(NULL);");
+        assert_eq!(Ok(Some("nothing".into())), result);
     }
 
     #[pg_test]
@@ -213,20 +210,17 @@ mod tests {
     }
 
     #[pg_test]
-    fn test_call_with_enum_value() -> Result<(), pgx::spi::Error> {
+    fn test_call_with_enum_value() {
         let result = Spi::get_one::<String>(
             "SELECT fn_takes_option_enum('A'::CustomTextFormatSerializedEnumType);",
-        )?
-        .unwrap();
-        assert_eq!("A", result);
-        Ok(())
+        );
+        assert_eq!(Ok(Some("A".into())), result);
     }
 
     #[pg_test]
-    fn test_call_with_enum_null() -> Result<(), pgx::spi::Error> {
-        let result = Spi::get_one::<String>("SELECT fn_takes_option_enum(NULL);")?.unwrap();
-        assert_eq!(String::from("nothing"), result);
-        Ok(())
+    fn test_call_with_enum_null() {
+        let result = Spi::get_one::<String>("SELECT fn_takes_option_enum(NULL);");
+        assert_eq!(Ok(Some("nothing".into())), result);
     }
 
     #[pg_test]

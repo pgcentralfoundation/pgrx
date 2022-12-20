@@ -108,7 +108,7 @@ mod tests {
     }
 
     #[pg_test]
-    fn before_insert_field_update() -> Result<(), pgx::spi::Error> {
+    fn before_insert_field_update() {
         Spi::run(
             r#"
             CREATE TABLE tests.before_insert_field_update (species TEXT)
@@ -131,10 +131,8 @@ mod tests {
         "#,
         );
 
-        let retval = Spi::get_one::<&str>("SELECT species FROM tests.before_insert_field_update;")?
-            .expect("SQL select failed");
-        assert_eq!(retval, "Bear");
-        Ok(())
+        let retval = Spi::get_one::<&str>("SELECT species FROM tests.before_insert_field_update;");
+        assert_eq!(retval, Ok(Some("Bear")));
     }
 
     #[pg_trigger]
@@ -154,7 +152,7 @@ mod tests {
     }
 
     #[pg_test]
-    fn before_insert_add_field() -> Result<(), pgx::spi::Error> {
+    fn before_insert_add_field() {
         Spi::run(
             r#"
             CREATE TABLE tests.before_insert_add_field (name TEXT, booper TEXT)
@@ -177,10 +175,8 @@ mod tests {
         "#,
         );
 
-        let retval = Spi::get_one::<&str>("SELECT booper FROM tests.before_insert_add_field;")?
-            .expect("SQL select failed");
-        assert_eq!(retval, "Swooper");
-        Ok(())
+        let retval = Spi::get_one::<&str>("SELECT booper FROM tests.before_insert_add_field;");
+        assert_eq!(retval, Ok(Some("Swooper")));
     }
 
     #[pg_trigger]
@@ -203,7 +199,7 @@ mod tests {
     }
 
     #[pg_test]
-    fn before_update_skip() -> Result<(), pgx::spi::Error> {
+    fn before_update_skip() {
         Spi::run(
             r#"
             CREATE TABLE tests.before_update_skip (title TEXT)
@@ -232,10 +228,8 @@ mod tests {
         "#,
         );
 
-        let retval = Spi::get_one::<&str>("SELECT title FROM tests.before_update_skip;")?
-            .expect("SQL select failed");
-        assert_eq!(retval, "Fox");
-        Ok(())
+        let retval = Spi::get_one::<&str>("SELECT title FROM tests.before_update_skip;");
+        assert_eq!(retval, Ok(Some("Fox")));
     }
 
     #[pg_trigger]
@@ -514,7 +508,7 @@ mod tests {
     }
 
     #[pg_test]
-    fn before_insert_has_sql_option_set() -> Result<(), pgx::spi::Error> {
+    fn before_insert_has_sql_option_set() {
         Spi::run(
             r#"
             CREATE TABLE tests.has_sql_option_set (species TEXT)
@@ -537,10 +531,8 @@ mod tests {
         "#,
         );
 
-        let retval = Spi::get_one::<&str>("SELECT species FROM tests.has_sql_option_set;")?
-            .expect("SQL select failed");
-        assert_eq!(retval, "Fox");
-        Ok(())
+        let retval = Spi::get_one::<&str>("SELECT species FROM tests.has_sql_option_set;");
+        assert_eq!(retval, Ok(Some("Fox")));
     }
 
     #[pg_trigger]
@@ -551,7 +543,7 @@ mod tests {
     }
 
     #[pg_test]
-    fn before_insert_noop_postgres() -> Result<(), pgx::spi::Error> {
+    fn before_insert_noop_postgres() {
         Spi::run(
             r#"
             CREATE TABLE tests.has_noop_postgres (species TEXT)
@@ -574,10 +566,8 @@ mod tests {
         "#,
         );
 
-        let retval = Spi::get_one::<&str>("SELECT species FROM tests.has_noop_postgres;")?
-            .expect("SQL select failed");
-        assert_eq!(retval, "Fox");
-        Ok(())
+        let retval = Spi::get_one::<&str>("SELECT species FROM tests.has_noop_postgres;");
+        assert_eq!(retval, Ok(Some("Fox")));
     }
 
     #[pg_trigger]
@@ -588,7 +578,7 @@ mod tests {
     }
 
     #[pg_test]
-    fn before_insert_noop_rust() -> Result<(), pgx::spi::Error> {
+    fn before_insert_noop_rust() {
         Spi::run(
             r#"
             CREATE TABLE tests.has_noop_rust (species TEXT)
@@ -611,9 +601,7 @@ mod tests {
         "#,
         );
 
-        let retval = Spi::get_one::<&str>("SELECT species FROM tests.has_noop_rust;")?
-            .expect("SQL select failed");
-        assert_eq!(retval, "Fox");
-        Ok(())
+        let retval = Spi::get_one::<&str>("SELECT species FROM tests.has_noop_rust;");
+        assert_eq!(retval, Ok(Some("Fox")));
     }
 }

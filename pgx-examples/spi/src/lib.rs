@@ -122,17 +122,15 @@ mod tests {
     use pgx::prelude::*;
 
     #[pg_test]
-    fn test_spi_query_by_id_direct() -> Result<(), pgx::spi::Error> {
-        assert_eq!(Some("This is a test".to_string()), spi_query_by_id(1)?);
-        Ok(())
+    fn test_spi_query_by_id_direct() {
+        assert_eq!(Ok(Some("This is a test".to_string())), spi_query_by_id(1));
     }
 
     #[pg_test]
-    fn test_spi_query_by_id_via_spi() -> Result<(), pgx::spi::Error> {
-        let result = Spi::get_one::<&str>("SELECT spi.spi_query_by_id(1)")?.unwrap();
+    fn test_spi_query_by_id_via_spi() {
+        let result = Spi::get_one::<&str>("SELECT spi.spi_query_by_id(1)");
 
-        assert_eq!("This is a test", result);
-        Ok(())
+        assert_eq!(Ok(Some("This is a test")), result);
     }
 }
 

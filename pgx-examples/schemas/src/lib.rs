@@ -71,12 +71,11 @@ mod tests {
     use pgx::prelude::*;
 
     #[pg_test]
-    fn test_hello_default_schema() -> Result<(), pgx::spi::Error> {
+    fn test_hello_default_schema() {
         assert_eq!(
-            "Hello from the schema where you installed this extension",
-            Spi::get_one::<&str>("SELECT hello_default_schema()")?.unwrap()
+            Ok(Some("Hello from the schema where you installed this extension")),
+            Spi::get_one::<&str>("SELECT hello_default_schema()")
         );
-        Ok(())
     }
 
     #[pg_test]
@@ -91,13 +90,12 @@ mod tests {
     }
 
     #[pg_test]
-    fn test_hello_some_schema() -> Result<(), pgx::spi::Error> {
+    fn test_hello_some_schema() {
         assert_eq!(
-            "Hello from some_schema",
+            Ok(Some("Hello from some_schema")),
             // "hello_some_schema()" is in "some_schema", so it needs to be qualified
-            Spi::get_one::<&str>("SELECT some_schema.hello_some_schema()")?.unwrap()
+            Spi::get_one::<&str>("SELECT some_schema.hello_some_schema()")
         );
-        Ok(())
     }
 
     #[pg_test]
@@ -127,12 +125,11 @@ mod tests {
     }
 
     #[pg_test]
-    fn test_hello_public() -> Result<(), pgx::spi::Error> {
+    fn test_hello_public() {
         assert_eq!(
-            "Hello from the public schema",
-            Spi::get_one::<&str>("SELECT hello_public()")?.unwrap()
+            Ok(Some("Hello from the public schema")),
+            Spi::get_one::<&str>("SELECT hello_public()")
         );
-        Ok(())
     }
 }
 

@@ -29,7 +29,7 @@ mod tests {
     #[pg_test]
     fn test_anyarray_arg() -> std::result::Result<(), pgx::spi::Error> {
         let json = Spi::get_one::<Json>("SELECT anyarray_arg(ARRAY[1::integer,2,3]::integer[]);")?
-            .expect("failed to get SPI result");
+            .expect("datum was null");
         assert_eq!(json.0, json! {[1,2,3]});
         Ok(())
     }

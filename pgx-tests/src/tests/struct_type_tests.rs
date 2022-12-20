@@ -101,11 +101,10 @@ mod tests {
     }
 
     #[pg_test]
-    fn test_complex_out() -> Result<(), pgx::spi::Error> {
-        let string_val = Spi::get_one::<&str>("SELECT complex_out('1.1,2.2')::text")?.unwrap();
+    fn test_complex_out() {
+        let string_val = Spi::get_one::<&str>("SELECT complex_out('1.1,2.2')::text");
 
-        assert_eq!(string_val, "1.1, 2.2");
-        Ok(())
+        assert_eq!(string_val, Ok(Some("1.1, 2.2")));
     }
 
     #[pg_test]

@@ -42,13 +42,11 @@ mod tests {
     fn is_immutable() {}
 
     #[pg_test]
-    fn test_immutable() -> Result<(), pgx::spi::Error> {
+    fn test_immutable() {
         let result = Spi::get_one::<bool>(
             "SELECT provolatile = 'i' FROM pg_proc WHERE proname = 'is_immutable'",
-        )?
-        .expect("failed to get SPI result");
-        assert!(result);
-        Ok(())
+        );
+        assert_eq!(result, Ok(Some(true)));
     }
 
     // Ensures `@MODULE_PATHNAME@` and `@FUNCTION_NAME@` are handled.
@@ -63,11 +61,9 @@ mod tests {
     }
 
     #[pg_test]
-    fn test_overridden_sql_with_fn_name() -> Result<(), pgx::spi::Error> {
-        let result = Spi::get_one::<bool>(r#"SELECT tests."overridden_sql_with_fn_name"()"#)?
-            .expect("failed to get SPI result");
-        assert!(result);
-        Ok(())
+    fn test_overridden_sql_with_fn_name() {
+        let result = Spi::get_one::<bool>(r#"SELECT tests."overridden_sql_with_fn_name"()"#);
+        assert_eq!(result, Ok(Some(true)));
     }
 
     // Manually define the function first here. Note that it returns false
@@ -97,16 +93,13 @@ mod tests {
     }
 
     #[pg_test]
-    fn test_create_or_replace() -> Result<(), pgx::spi::Error> {
-        let replace_result = Spi::get_one::<bool>(r#"SELECT tests."create_or_replace_method"()"#)?
-            .expect("failed to get SPI result");
-        assert!(replace_result);
+    fn test_create_or_replace() {
+        let replace_result = Spi::get_one::<bool>(r#"SELECT tests."create_or_replace_method"()"#);
+        assert_eq!(replace_result, Ok(Some(true)));
 
         let create_result =
-            Spi::get_one::<i32>(r#"SELECT tests."create_or_replace_method_other"()"#)?
-                .expect("failed to get SPI result");
-        assert_eq!(create_result, 42);
-        Ok(())
+            Spi::get_one::<i32>(r#"SELECT tests."create_or_replace_method_other"()"#);
+        assert_eq!(create_result, Ok(Some(42)));
     }
 
     #[pg_extern]
@@ -115,12 +108,10 @@ mod tests {
     }
 
     #[pg_test]
-    fn test_anyele_type() -> Result<(), pgx::spi::Error> {
+    fn test_anyele_type() {
         let interval_type =
-            Spi::get_one::<i32>(r#"SELECT tests."anyele_type"('5 hours'::interval)"#)?
-                .expect("failed to get SPI result");
-        assert_eq!(interval_type as u32, pg_sys::INTERVALOID);
-        Ok(())
+            Spi::get_one::<i32>(r#"SELECT tests."anyele_type"('5 hours'::interval)"#);
+        assert_eq!(interval_type, Ok(Some(pg_sys::INTERVALOID as _)));
     }
 
     #[pg_extern(name = "custom_name")]
@@ -129,10 +120,8 @@ mod tests {
     }
 
     #[pg_test]
-    fn test_name() -> Result<(), pgx::spi::Error> {
-        let result = Spi::get_one::<bool>(r#"SELECT tests."custom_name"()"#)?
-            .expect("failed to get SPI result");
-        assert!(result);
-        Ok(())
+    fn test_name() {
+        let result = Spi::get_one::<bool>(r#"SELECT tests."custom_name"()"#);
+        assert_eq!(result, Ok(Some(true)));
     }
 }

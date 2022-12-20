@@ -121,11 +121,9 @@ pub mod tests {
 
     #[pg_test]
     #[search_path(@extschema@)]
-    fn test_vec_of_customtype() -> Result<(), pgx::spi::Error> {
+    fn test_vec_of_customtype()  {
         let customvec =
-            Spi::get_one::<Vec<SomeStruct>>("SELECT arrays.return_vec_of_customtype();")?
-                .expect("SQL select failed");
-        assert_eq!(customvec, vec![SomeStruct {}]);
-        Ok(())
+            Spi::get_one::<Vec<SomeStruct>>("SELECT arrays.return_vec_of_customtype();");
+        assert_eq!(customvec, Ok(Some(vec![SomeStruct {}])));
     }
 }

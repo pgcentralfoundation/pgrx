@@ -92,7 +92,7 @@ mod tests {
     use pgx::{pg_sys, IntoDatum};
 
     #[pg_test]
-    fn test_dynamic_bgworker() -> Result<(), pgx::spi::Error> {
+    fn test_dynamic_bgworker() {
         let worker = BackgroundWorkerBuilder::new("dynamic_bgworker")
             .set_library("pgx_tests")
             .set_function("bgworker")
@@ -105,8 +105,7 @@ mod tests {
         let handle = worker.terminate();
         handle.wait_for_shutdown().expect("aborted shutdown");
 
-        assert_eq!(124, Spi::get_one::<i32>("SELECT v FROM tests.bgworker_test;")?.unwrap());
-        Ok(())
+        assert_eq!(Ok(Some(124)), Spi::get_one::<i32>("SELECT v FROM tests.bgworker_test;"));
     }
 
     #[pg_test]
@@ -140,7 +139,7 @@ mod tests {
     }
 
     #[pg_test]
-    fn test_background_worker_transaction_return() -> Result<(), pgx::spi::Error> {
+    fn test_background_worker_transaction_return() {
         let worker = BackgroundWorkerBuilder::new("dynamic_bgworker")
             .set_library("pgx_tests")
             .set_function("bgworker_return_value")
@@ -153,7 +152,6 @@ mod tests {
         let handle = worker.terminate();
         handle.wait_for_shutdown().expect("aborted shutdown");
 
-        assert_eq!(123, Spi::get_one::<i32>("SELECT v FROM tests.bgworker_test_return;")?.unwrap());
-        Ok(())
+        assert_eq!(Ok(Some(123)), Spi::get_one::<i32>("SELECT v FROM tests.bgworker_test_return;"));
     }
 }

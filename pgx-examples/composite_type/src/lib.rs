@@ -299,21 +299,17 @@ mod tests {
     }
 
     #[pg_test]
-    fn test_scritch_collector() -> Result<(), pgx::spi::Error> {
+    fn test_scritch_collector() {
         let retval = Spi::get_one::<i32>(
             "SELECT (scritchcollector(value)).scritches FROM UNNEST(ARRAY [1,2,3]) as value;",
-        )?
-        .expect("SQL select failed");
-        assert_eq!(retval, 6);
-        Ok(())
+        );
+        assert_eq!(retval, Ok(Some(6)));
     }
 
     #[pg_test]
-    fn test_dog_add_operator() -> Result<(), pgx::spi::Error> {
-        let retval = Spi::get_one::<i32>("SELECT (ROW('Nami', 0)::Dog + 1).scritches;")?
-            .expect("SQL select failed");
-        assert_eq!(retval, 1);
-        Ok(())
+    fn test_dog_add_operator() {
+        let retval = Spi::get_one::<i32>("SELECT (ROW('Nami', 0)::Dog + 1).scritches;");
+        assert_eq!(retval, Ok(Some(1)));
     }
 }
 
