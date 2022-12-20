@@ -70,4 +70,13 @@ mod tests {
     fn test_return_eyre_result_error() {
         Spi::get_one::<i32>("SELECT tests.return_eyre_result_error()").expect("SPI returned NULL");
     }
+
+    #[pg_test(error = "got proper sql errorcode")]
+    fn test_proper_sql_errcode() -> Option<i32> {
+        PgTryBuilder::new(|| Spi::get_one::<i32>("SELECT tests.return_eyre_result_error()"))
+            .catch_when(PgSqlErrorCode::ERRCODE_DATA_EXCEPTION, |_| {
+                panic!("got proper sql errorcode")
+            })
+            .execute()
+    }
 }

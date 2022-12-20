@@ -424,28 +424,16 @@ impl PgExtern {
                         // returning `Result<Option<T>>`
                         quote_spanned! {
                             self.func.sig.output.span() =>
-                                match #result_ident {
-                                    // we panic if it's Result::Err
-                                    Err(e) => panic!("{}", e),
-
-                                    // and we return the possibly NULL datum
-                                    Ok(value) => match ::pgx::datum::IntoDatum::into_datum(value) {
-                                        Some(datum) => datum,
-                                        None => ::pgx::fcinfo::pg_return_null(#fcinfo_ident),
-                                    }
+                                match ::pgx::datum::IntoDatum::into_datum(#result_ident) {
+                                    Some(datum) => datum,
+                                    None => ::pgx::fcinfo::pg_return_null(#fcinfo_ident),
                                 }
                         }
                     } else {
                         // returning Result<T>
                         quote_spanned! {
                             self.func.sig.output.span() =>
-                                match #result_ident {
-                                    // we panic if it's Result:Err
-                                    Err(e) => panic!("{}", e),
-
-                                    // and we return the datum, unless it's null then we raise a panic
-                                    Ok(value) => ::pgx::datum::IntoDatum::into_datum(value).unwrap_or_else(|| panic!("returned Datum was NULL")),
-                                }
+                                ::pgx::datum::IntoDatum::into_datum(#result_ident).unwrap_or_else(|| panic!("returned Datum was NULL"))
                         }
                     }
                 } else if retval_ty.resolved_ty == syn::parse_quote!(pg_sys::Datum)
