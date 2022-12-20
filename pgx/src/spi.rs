@@ -303,7 +303,7 @@ impl<'a> Query for &'a str {
             )
         })
         .ok_or(Error::PortalIsNull)?;
-        Ok(SpiCursor { ptr, _phantom: PhantomData })
+        Ok(SpiCursor { ptr, __marker: PhantomData })
     }
 }
 
@@ -546,7 +546,7 @@ impl<'a> SpiClient<'a> {
 
         let ptr = NonNull::new(unsafe { pg_sys::SPI_cursor_find(name.as_pg_cstr()) })
             .ok_or(Error::CursorNotFound(name.to_string()))?;
-        Ok(SpiCursor { ptr, _phantom: PhantomData })
+        Ok(SpiCursor { ptr, __marker: PhantomData })
     }
 }
 
@@ -605,7 +605,7 @@ type CursorName = String;
 /// ```
 pub struct SpiCursor<'client> {
     ptr: NonNull<pg_sys::PortalData>,
-    _phantom: PhantomData<&'client SpiClient<'client>>,
+    __marker: PhantomData<&'client SpiClient<'client>>,
 }
 
 impl SpiCursor<'_> {
@@ -803,7 +803,7 @@ impl<'a: 'b, 'b> Query for &'b PreparedStatement<'a> {
             )
         })
         .ok_or(Error::PortalIsNull)?;
-        Ok(SpiCursor { ptr, _phantom: PhantomData })
+        Ok(SpiCursor { ptr, __marker: PhantomData })
     }
 }
 
