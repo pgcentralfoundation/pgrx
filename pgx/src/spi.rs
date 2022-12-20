@@ -245,7 +245,7 @@ impl Spi {
     ///
     /// The statement runs in read/write mode
     pub fn run_with_args(query: &str, args: Option<Vec<(PgOid, Option<pg_sys::Datum>)>>) {
-        Spi::execute(|client| {
+        Spi::connect(|client| {
             client.update(query, None, args);
         })
     }
@@ -267,23 +267,35 @@ impl Spi {
         })
     }
 
-    /// execute SPI commands via the provided `SpiClient`
-    pub fn execute<F: FnOnce(SpiClient) + std::panic::UnwindSafe>(f: F) {
-        let _ = Spi::connect(|client| {
-            f(client);
-            Ok::<_, ()>(())
-        });
-    }
-
-    /// execute SPI commands via the provided `SpiClient` and return a value from SPI which is
-    /// automatically copied into the `CurrentMemoryContext` at the time of this function call
+    /// Execute SPI commands via the provided `SpiClient`.  
     ///
-    /// Note that `SpiClient` is scoped to the connection lifetime and the following code will
-    /// not compile:
+    /// While inside the provided closure, code executes under a short-lived "SPI Memory Context",
+    /// and Postgres will completely free that context when this function is finished.
+    ///
+    /// pgx' SPI API endeavors to return Datum values from functions like `::get_one()` that are
+    /// automatically copied into the into the `CurrentMemoryContext` at the time of this
+    /// function call.
+    ///
+    /// # Examples
+    ///
+    /// ```rust,no_run
+    /// use pgx::prelude::*;
+    /// use pgx::spi;
+    /// # fn foo() -> Result<String, spi::Error> {
+    /// let name:&str = Spi::connect(|client| {
+    ///     client.select("SELECT 'Bob'", None, None).first().get_one()
+    /// })?.unwrap();
+    /// assert_eq!(name, "Bob");
+    /// # return Ok(name.into())
+    /// # }
+    /// ```
+    ///
+    /// Note that `SpiClient` is scoped to the connection lifetime and cannot be returned.  The
+    /// following code will not compile:
     ///
     /// ```rust,compile_fail
-    /// use pgx::*;
-    /// Spi::connect(|client| Ok(Some(client)));
+    /// use pgx::prelude::*;
+    /// let cant_return_client = Spi::connect(|client| client);
     /// ```
     pub fn connect<R, F: FnOnce(SpiClient<'_>) -> R>(f: F) -> R {
         // connect to SPI

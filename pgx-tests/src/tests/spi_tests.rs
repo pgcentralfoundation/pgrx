@@ -18,18 +18,18 @@ mod tests {
 
     #[pg_test(error = "syntax error at or near \"THIS\"")]
     fn test_spi_failure() {
-        Spi::execute(|client| {
+        Spi::connect(|client| {
             client.select("THIS IS NOT A VALID QUERY", None, None);
         });
     }
 
     #[pg_test]
     fn test_spi_can_nest() {
-        Spi::execute(|_| {
-            Spi::execute(|_| {
-                Spi::execute(|_| {
-                    Spi::execute(|_| {
-                        Spi::execute(|_| {});
+        Spi::connect(|_| {
+            Spi::connect(|_| {
+                Spi::connect(|_| {
+                    Spi::connect(|_| {
+                        Spi::connect(|_| {});
                     });
                 });
             });
@@ -68,7 +68,7 @@ mod tests {
 
     #[pg_test]
     fn test_spi_get_one() {
-        Spi::execute(|client| {
+        Spi::connect(|client| {
             let i = client
                 .select("SELECT 42::bigint", None, None)
                 .first()
@@ -80,7 +80,7 @@ mod tests {
 
     #[pg_test]
     fn test_spi_get_two() {
-        Spi::execute(|client| {
+        Spi::connect(|client| {
             let (i, s) = client
                 .select("SELECT 42, 'test'", None, None)
                 .first()
@@ -94,7 +94,7 @@ mod tests {
 
     #[pg_test]
     fn test_spi_get_three() {
-        Spi::execute(|client| {
+        Spi::connect(|client| {
             let (i, s, b) = client
                 .select("SELECT 42, 'test', true", None, None)
                 .first()
@@ -109,14 +109,14 @@ mod tests {
 
     #[pg_test]
     fn test_spi_get_two_with_failure() {
-        Spi::execute(|client| {
+        Spi::connect(|client| {
             assert!(client.select("SELECT 42", None, None).first().get_two::<i64, &str>().is_err());
         });
     }
 
     #[pg_test]
     fn test_spi_get_three_failure() {
-        Spi::execute(|client| {
+        Spi::connect(|client| {
             assert!(client
                 .select("SELECT 42, 'test'", None, None)
                 .first()
@@ -185,7 +185,7 @@ mod tests {
 
     #[pg_test]
     fn test_inserting_null() -> Result<(), pgx::spi::Error> {
-        Spi::execute(|client| {
+        Spi::connect(|client| {
             client.update("CREATE TABLE tests.null_test (id uuid)", None, None);
         });
         assert_eq!(
@@ -201,7 +201,7 @@ mod tests {
 
     #[pg_test]
     fn test_cursor() {
-        Spi::execute(|client| {
+        Spi::connect(|client| {
             client.update("CREATE TABLE tests.cursor_table (id int)", None, None);
             client.update(
                 "INSERT INTO tests.cursor_table (id) \
@@ -269,7 +269,7 @@ mod tests {
     #[pg_test]
     fn test_columns() {
         use pgx::{PgBuiltInOids, PgOid};
-        Spi::execute(|client| {
+        Spi::connect(|client| {
             let res = client.select("SELECT 42 AS a, 'test' AS b", None, None);
 
             assert_eq!(2, res.columns());
@@ -283,7 +283,7 @@ mod tests {
             assert_eq!(res.column_name(2).unwrap(), "b");
         });
 
-        Spi::execute(|client| {
+        Spi::connect(|client| {
             let res = client.update("SET TIME ZONE 'PST8PDT'", None, None);
 
             assert_eq!(0, res.columns());
@@ -310,7 +310,7 @@ mod tests {
     fn test_open_multiple_tuptables() {
         // Regression test to ensure a new `SpiTupTable` instance does not override the
         // effective length of an already open one due to misuse of Spi statics
-        Spi::execute(|client| {
+        Spi::connect(|client| {
             let a = client.select("SELECT 1", None, None).first();
             let _b = client.select("SELECT 1 WHERE 'f'", None, None);
             assert!(!a.is_empty());
@@ -325,7 +325,7 @@ mod tests {
         // Regression test to ensure a new `SpiTupTable` instance does not override the
         // effective length of an already open one.
         // Same as `test_open_multiple_tuptables`, but with the second tuptable being empty
-        Spi::execute(|client| {
+        Spi::connect(|client| {
             let a = client.select("SELECT 1 WHERE 'f'", None, None).first();
             let _b = client.select("SELECT 1", None, None);
             assert!(a.is_empty());

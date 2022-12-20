@@ -87,7 +87,7 @@ mod tests {
 
     #[pg_test]
     fn test_complex_in() {
-        Spi::execute(|client| {
+        Spi::connect(|client| {
             let complex = client
                 .select("SELECT '1.1,2.2'::complex;", None, None)
                 .first()
@@ -109,7 +109,7 @@ mod tests {
 
     #[pg_test]
     fn test_complex_from_text() {
-        Spi::execute(|client| {
+        Spi::connect(|client| {
             let complex = client
                 .select("SELECT '1.1, 2.2'::complex;", None, None)
                 .first()
