@@ -419,6 +419,23 @@ impl PgExtern {
                     quote_spanned! { self.func.sig.output.span() =>
                        ::pgx::fcinfo::pg_return_void()
                     }
+                } else if retval_ty.result {
+                    if retval_ty.optional.is_some() {
+                        // returning `Result<Option<T>>`
+                        quote_spanned! {
+                            self.func.sig.output.span() =>
+                                match ::pgx::datum::IntoDatum::into_datum(#result_ident) {
+                                    Some(datum) => datum,
+                                    None => ::pgx::fcinfo::pg_return_null(#fcinfo_ident),
+                                }
+                        }
+                    } else {
+                        // returning Result<T>
+                        quote_spanned! {
+                            self.func.sig.output.span() =>
+                                ::pgx::datum::IntoDatum::into_datum(#result_ident).unwrap_or_else(|| panic!("returned Datum was NULL"))
+                        }
+                    }
                 } else if retval_ty.resolved_ty == syn::parse_quote!(pg_sys::Datum)
                     || retval_ty.resolved_ty == syn::parse_quote!(pgx::pg_sys::Datum)
                     || retval_ty.resolved_ty == syn::parse_quote!(::pgx::pg_sys::Datum)

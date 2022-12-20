@@ -13,7 +13,9 @@ Use of this source code is governed by the MIT license that can be found in the 
 //! cast of the primitive type to pg_sys::Datum
 
 use crate::{pg_sys, rust_regtypein, PgBox, PgOid, WhoAllocated};
-use pgx_pg_sys::{Datum, Oid};
+use core::fmt::Display;
+use pgx_pg_sys::errcodes::PgSqlErrorCode;
+use pgx_pg_sys::{ereport, Datum, Oid};
 
 /// Convert a Rust type into a `pg_sys::Datum`.
 ///
@@ -116,6 +118,33 @@ where
     }
 
     fn type_oid() -> u32 {
+        T::type_oid()
+    }
+}
+
+impl<T, E> IntoDatum for Result<T, E>
+where
+    T: IntoDatum,
+    E: Display,
+{
+    /// Returns The `Option<pg_sys::Datum>` representation of this Result's `Ok` variant.
+    ///
+    /// ## Panics
+    ///
+    /// If this Result represents an error, then that error is raised as a Postgres ERROR, using
+    /// the [`PgSqlErrorCode::ERRCODE_DATA_EXCEPTION`] error code
+    #[inline]
+    fn into_datum(self) -> Option<Datum> {
+        match self {
+            Ok(v) => v.into_datum(),
+            Err(e) => {
+                ereport!(ERROR, PgSqlErrorCode::ERRCODE_DATA_EXCEPTION, &format!("{}", e));
+            }
+        }
+    }
+
+    #[inline]
+    fn type_oid() -> pg_sys::Oid {
         T::type_oid()
     }
 }
@@ -380,15 +409,16 @@ impl IntoDatum for Vec<u8> {
     }
 }
 
-/// for NULL -- always converts to `None`
+/// for VOID
 impl IntoDatum for () {
     #[inline]
     fn into_datum(self) -> Option<pg_sys::Datum> {
-        None
+        // VOID isn't very useful, but Postgres represents it as a non-null Datum with a zero value
+        Some(Datum::from(0))
     }
 
     fn type_oid() -> u32 {
-        pg_sys::BOOLOID
+        pg_sys::VOIDOID
     }
 }
 
