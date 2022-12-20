@@ -5,7 +5,7 @@
 //! panicking if we're called from a different thread.
 //!
 //! This is called from the current crate from inside the setjmp shim, as that
-//! code is *definitely* unsound to call in the presense of multiple threads.
+//! code is *definitely* unsound to call in the presence of multiple threads.
 //!
 //! This is somewhat heavyhanded, and should be called from fewer places in the
 //! future...
@@ -63,7 +63,7 @@ fn nonzero_thread_id() -> NonZeroUsize {
     // our use) improved by using a pointer to the thread control block, which
     // can avoid going through `__tls_get_addr`.
     //
-    // Sadly, doing that would require some fiddley platform-specific inline
+    // Sadly, doing that would require some fiddly platform-specific inline
     // assembly, which is enough of a pain that it's not worth bothering with
     // for now. That said, in the future if this becomes a performance issue,
     // that'd be a good fix.

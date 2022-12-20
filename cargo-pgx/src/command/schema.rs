@@ -23,6 +23,7 @@ use std::path::{Path, PathBuf};
 use std::process::{Command, Stdio};
 // Since we support extensions with `#[no_std]`
 extern crate alloc;
+use crate::manifest::{get_package_manifest, pg_config_and_version};
 use alloc::vec::Vec;
 
 // An apparent bug in `glibc` 2.17 prevents us from safely dropping this
@@ -74,16 +75,7 @@ pub(crate) struct Schema {
 
 impl CommandExecute for Schema {
     #[tracing::instrument(level = "error", skip(self))]
-    fn execute(self) -> eyre::Result<()> {
-        let metadata = crate::metadata::metadata(&self.features, self.manifest_path.as_ref())
-            .wrap_err("couldn't get cargo metadata")?;
-        crate::metadata::validate(&metadata)?;
-        let package_manifest_path =
-            crate::manifest::manifest_path(&metadata, self.package.as_ref())
-                .wrap_err("Couldn't get manifest path")?;
-        let package_manifest =
-            Manifest::from_path(&package_manifest_path).wrap_err("Couldn't parse manifest")?;
-
+    fn execute(mut self) -> eyre::Result<()> {
         let log_level = if let Ok(log_level) = std::env::var("RUST_LOG") {
             Some(log_level)
         } else {
@@ -95,27 +87,19 @@ impl CommandExecute for Schema {
             }
         };
 
-        let (pg_config, pg_version) = match self.pg_config {
-            None => match self.pg_version {
-                None => {
-                    let pg_version = match self.pg_version {
-                        Some(s) => s,
-                        None => crate::manifest::default_pg_version(&package_manifest)
-                            .ok_or(eyre!("No provided `pg$VERSION` flag."))?,
-                    };
-                    (Pgx::from_config()?.get(&pg_version)?.clone(), pg_version)
-                }
-                Some(pgver) => (Pgx::from_config()?.get(&pgver)?.clone(), pgver),
-            },
-            Some(config) => {
-                let pg_config = PgConfig::new_with_defaults(PathBuf::from(config));
-                let pg_version = format!("pg{}", pg_config.major_version()?);
-                (pg_config, pg_version)
-            }
-        };
-
-        let features =
-            crate::manifest::features_for_version(self.features, &package_manifest, &pg_version);
+        let pgx = Pgx::from_config()?;
+        let (package_manifest, package_manifest_path) = get_package_manifest(
+            &self.features,
+            self.package.as_ref(),
+            self.manifest_path.as_ref(),
+        )?;
+        let (pg_config, _pg_version) = pg_config_and_version(
+            &pgx,
+            &package_manifest,
+            self.pg_version.clone(),
+            Some(&mut self.features),
+            true,
+        )?;
 
         let profile = CargoProfile::from_flags(
             self.profile.as_deref(),
@@ -129,7 +113,7 @@ impl CommandExecute for Schema {
             package_manifest_path,
             &profile,
             self.test,
-            &features,
+            &self.features,
             self.out.as_ref(),
             self.dot,
             log_level,
@@ -403,7 +387,7 @@ pub(crate) fn generate_schema(
     let mut entities = Vec::default();
     let sql_mapping;
 
-    #[rustfmt::skip] // explict extern "Rust" is more clear here
+    #[rustfmt::skip] // explicit extern "Rust" is more clear here
     unsafe {
         // SAFETY: Calls foreign functions with the correct type signatures.
         // Assumes that repr(Rust) enums are represented the same in this crate as in the external

@@ -318,6 +318,16 @@ impl<'a, AllocatedBy: WhoAllocated> IntoDatum for PgHeapTuple<'a, AllocatedBy> {
     fn composite_type_oid(&self) -> Option<Oid> {
         Some(self.tupdesc.oid())
     }
+
+    fn is_compatible_with(other: pg_sys::Oid) -> bool {
+        fn is_composite(oid: pg_sys::Oid) -> bool {
+            unsafe {
+                let entry = pg_sys::lookup_type_cache(oid, pg_sys::TYPECACHE_TUPDESC as _);
+                (*entry).typtype == pg_sys::RELKIND_COMPOSITE_TYPE as i8
+            }
+        }
+        Self::type_oid() == other || is_composite(other)
+    }
 }
 
 impl<'a, AllocatedBy: WhoAllocated> PgHeapTuple<'a, AllocatedBy> {
@@ -530,7 +540,7 @@ fn this_dog_name_or_your_favorite_dog_name(
 ```
 
 Composite types are very **runtime failure** heavy, as opposed to using PostgreSQL types `pgx` has
-a builtin compatable type for, or a [`#[derive(pgx::PostgresType)`][crate::PostgresType] type. Those options
+a builtin compatible type for, or a [`#[derive(pgx::PostgresType)`][crate::PostgresType] type. Those options
  can have their shape and API reasoned about at build time.
 
 This runtime failure model is because the shape and layout, or even the name of the type could change during

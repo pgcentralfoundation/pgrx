@@ -183,7 +183,7 @@ So, why else should we do this other than fun?
 
 ## For more than fun
 
-* **Resolving types is hard to DIY:** Mapping the text of some function definition to some matching SQL type is pretty easy when you are maping `i32` to `integer`, but it starts to break down when you're mapping things like `Array<Floofer>` to `Floofer[]`. `Array` is from `pgx::datum::Array`, and we'd need to start reading into `use` statements if we were parsing code... and also what about macros (which may create `#[pg_extern]`s)? *...Oops! We're a compiler!*
+* **Resolving types is hard to DIY:** Mapping the text of some function definition to some matching SQL type is pretty easy when you are mapping `i32` to `integer`, but it starts to break down when you're mapping things like `Array<Floofer>` to `Floofer[]`. `Array` is from `pgx::datum::Array`, and we'd need to start reading into `use` statements if we were parsing code... and also what about macros (which may create `#[pg_extern]`s)? *...Oops! We're a compiler!*
 * **We can enrich our data:** Instead of scanning code, in proc macros we have opportunities to enrich our data using things like `core::any::TypeId`, or building up accurate Rust to SQL type maps.
 * **We don't need to care about dead files:** Mysterious errors might occur if users had Rust files holding conflicting definitions, but one file not being in the source tree.
 * **We can handle feature flags and release/debug**: While we can scan and detect features, using the build process to ensure we only work with live code means we get feature flag support, as well as release/debug mode support for free!
@@ -197,7 +197,7 @@ Here's some fun ideas we pondered (and, in some cases, tried):
 * **Make the macros output fragments to `$OUTDIR`:** We could output metadata, such a JSON files to some `$OUT_DIR` instead, and have `cargo pgx schema` read them, but that doesn't give us the last pass where we can call `core::any::TypeId`, etc.
 * **Use `rust-analyzer` to inspect:** This would work fine, but we couldn't depend on it directly since it's not on [crates.io](https://crates.io/). We'd need to use the command line interface, and the way we thought of seemed reasonable without depending on more external tools.
 * **Using [`inventory`](https://github.com/dtolnay/inventory)** we could sprinkle `inventory::submit! { T::new(/* ... */) }` calls around our codebase, and then at runtime call a `inventory::iter::<T>`. 
-  + **This worked very well**, but Rust 1.54 re-enabled incremental compliation and broke the functionality. Now, the inventory objects could end up in a different object file and some could be missed. We could 'fix' this by using `codegen-units = 1` but it was not satisfying or ideal.
+  + **This worked very well**, but Rust 1.54 re-enabled incremental compilation and broke the functionality. Now, the inventory objects could end up in a different object file and some could be missed. We could 'fix' this by using `codegen-units = 1` but it was not satisfying or ideal.
 * **Expose a C function in the library, and call it:** This would totally work except we can't load the extension `.so` without also having the postgres headers around, and that's *... Oof!* We don't really want to make `cargo-pgx` depend on specific PostgreSQL headers.
 
 **But wait!** It turns out, that can work! We can have the binary re-export the functions and be very careful with what we use!
@@ -221,7 +221,7 @@ Roughly, we're slipping into the build process this way:
                  ▲                   ▲                       ▲
                  │                   │                       │
 ┌────────────────┴─────┐  ┌──────────┴────────┐ ┌────────────┴────────────┐
-│Parse definitions.    │  │Re-export internal │ │Binary recieves list,    │
+│Parse definitions.    │  │Re-export internal │ │Binary receives list,    │
 │                      │  │functions to binary│ │dynamically loads itself,│
 │Create __pgx_internal │  │via dynamic-list   │ │creates dependency graph,│
 │metadata functions    │  │                   │ │outputs SQL              │

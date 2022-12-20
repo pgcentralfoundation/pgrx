@@ -35,26 +35,23 @@ mod tests {
 
     #[pg_test]
     fn test_return_an_i32_numeric() {
-        let result = Spi::get_one::<bool>("SELECT 32::numeric = tests.return_an_i32_numeric();")
-            .expect("failed to get SPI result");
-        assert!(result);
+        let result = Spi::get_one::<bool>("SELECT 32::numeric = tests.return_an_i32_numeric();");
+        assert_eq!(result, Ok(Some(true)));
     }
 
     #[pg_test]
     fn test_return_a_f64_numeric() {
         let result =
-            Spi::get_one::<bool>("SELECT 64.64646464::numeric = tests.return_a_f64_numeric();")
-                .expect("failed to get SPI result");
-        assert!(result);
+            Spi::get_one::<bool>("SELECT 64.64646464::numeric = tests.return_a_f64_numeric();");
+        assert_eq!(result, Ok(Some(true)));
     }
 
     #[pg_test]
     fn test_return_a_u64_numeric() {
         let result = Spi::get_one::<bool>(
             "SELECT 18446744073709551615::numeric = tests.return_a_u64_numeric();",
-        )
-        .expect("failed to get SPI result");
-        assert!(result);
+        );
+        assert_eq!(result, Ok(Some(true)));
     }
 
     #[pg_test]

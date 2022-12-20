@@ -9,9 +9,9 @@ Use of this source code is governed by the MIT license that can be found in the 
 
 use crate::command::init::initdb;
 use crate::command::status::status_postgres;
+use crate::manifest::{get_package_manifest, pg_config_and_version};
 use crate::CommandExecute;
-use cargo_toml::Manifest;
-use eyre::{eyre, WrapErr};
+use eyre::eyre;
 use owo_colors::OwoColorize;
 use pgx_pg_config::{PgConfig, PgConfigSelector, Pgx};
 use std::os::unix::process::CommandExt;
@@ -19,7 +19,7 @@ use std::path::PathBuf;
 use std::process::Stdio;
 
 /// Start a pgx-managed Postgres instance
-#[derive(clap::Args, Debug)]
+#[derive(clap::Args, Debug, Clone)]
 #[clap(author)]
 pub(crate) struct Start {
     /// The Postgres version to start (`pg11`, `pg12`, `pg13`, `pg14`, `pg15`, or `all`)
@@ -38,32 +38,29 @@ pub(crate) struct Start {
 impl CommandExecute for Start {
     #[tracing::instrument(level = "error", skip(self))]
     fn execute(self) -> eyre::Result<()> {
-        let pgx = Pgx::from_config()?;
+        fn perform(me: Start, pgx: &Pgx) -> eyre::Result<()> {
+            let (package_manifest, _) = get_package_manifest(
+                &clap_cargo::Features::default(),
+                me.package.as_ref(),
+                me.manifest_path,
+            )?;
+            let (pg_config, _) =
+                pg_config_and_version(&pgx, &package_manifest, me.pg_version, None, false)?;
 
-        let pg_version = match self.pg_version {
-            Some(s) => s,
-            None => {
-                let metadata =
-                    crate::metadata::metadata(&Default::default(), self.manifest_path.as_ref())
-                        .wrap_err("couldn't get cargo metadata")?;
-                crate::metadata::validate(&metadata)?;
-                let package_manifest_path =
-                    crate::manifest::manifest_path(&metadata, self.package.as_ref())
-                        .wrap_err("Couldn't get manifest path")?;
-                let package_manifest = Manifest::from_path(&package_manifest_path)
-                    .wrap_err("Couldn't parse manifest")?;
-
-                crate::manifest::default_pg_version(&package_manifest)
-                    .ok_or(eyre!("no provided `pg$VERSION` flag."))?
-            }
-        };
-
-        for pg_config in pgx.iter(PgConfigSelector::new(&pg_version)) {
-            let pg_config = pg_config?;
-            start_postgres(pg_config)?
+            start_postgres(pg_config)
         }
 
-        Ok(())
+        let pgx = Pgx::from_config()?;
+        if self.pg_version == Some("all".into()) {
+            for v in pgx.iter(PgConfigSelector::All) {
+                let mut versioned_start = self.clone();
+                versioned_start.pg_version = Some(v?.label()?);
+                perform(versioned_start, &pgx)?;
+            }
+            Ok(())
+        } else {
+            perform(self, &pgx)
+        }
     }
 }
 

@@ -29,7 +29,7 @@ use crate::{direct_function_call, pg_sys, varsize, PgMemoryContexts};
 /// if the (P, S) is the same on both sides of the operator converts the result to an [`AnyNumeric`].
 /// It is [`AnyNumeric`] that also supports the various "Assign" (ie, [`AddAssign`]) traits.
 ///
-/// [`Numeric`] is well-suited for a `#[pg_extern]` return type, moreso than a function argument.
+/// [`Numeric`] is well-suited for a `#[pg_extern]` return type, more so than a function argument.
 /// Use [`AnyNumeric`] for those.
 #[derive(Debug, Clone)]
 #[repr(transparent)]

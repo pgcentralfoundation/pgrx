@@ -48,12 +48,18 @@ ENV USER=rust
 RUN curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | bash -s -- -y
 ENV PATH="/home/rust/.cargo/bin:${PATH}"
 
+# By default, we always want to use '--locked'. However, there are some circumstances
+# where we might want to try it unlocked. In those one-off scenarios, the image
+# can be built by docker with: --build-arg CARGO_LOCKED_OPTION=''
+ARG CARGO_LOCKED_OPTION='--locked'
+ENV CARGO_LOCKED_OPTION=${CARGO_LOCKED_OPTION}
+
 # Install cargo-pgx from source copied into this container
-RUN cargo install --path cargo-pgx/ --locked
+RUN echo "Running cargo install --path cargo-pgx/ $CARGO_LOCKED_OPTION" && cargo install --path cargo-pgx/ $CARGO_LOCKED_OPTION
 
 # This seems strange, but by this point $PG_MAJOR_VER is blank and
 # $PG_MAJOR is always set to the correct version. I think it's something built
 # into the postgres:XX-alpine3.16 images, so it was easier to go with the grain
 RUN cargo pgx init --pg$PG_MAJOR=$(which pg_config)
 
-CMD ["cargo", "test", "--no-default-features", "--features", "pg${PG_MAJOR_VER}"]
+CMD ["cargo", "test", "--no-default-features", "--features", "pg${PG_MAJOR_VER} cshim", "${CARGO_LOCKED_OPTION}"]

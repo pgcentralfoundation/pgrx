@@ -13,7 +13,9 @@ Use of this source code is governed by the MIT license that can be found in the 
 //! cast of the primitive type to pg_sys::Datum
 
 use crate::{pg_sys, rust_regtypein, PgBox, PgOid, WhoAllocated};
-use pgx_pg_sys::{Datum, Oid};
+use core::fmt::Display;
+use pgx_pg_sys::errcodes::PgSqlErrorCode;
+use pgx_pg_sys::{ereport, Datum, Oid};
 
 /// Convert a Rust type into a `pg_sys::Datum`.
 ///
@@ -69,38 +71,6 @@ pub trait IntoDatum {
     fn is_compatible_with(other: pg_sys::Oid) -> bool {
         Self::type_oid() == other
     }
-
-    /// Is a Datum of this type pass by value or pass by reference?
-    ///
-    /// We provide a hardcoded list of known Postgres types that are pass by value,
-    /// but you are free to implement this yourself for custom types.
-    #[inline]
-    fn is_pass_by_value() -> bool
-    where
-        Self: 'static,
-    {
-        let my_type = std::any::TypeId::of::<Self>();
-        my_type == std::any::TypeId::of::<i8>()
-            || my_type == std::any::TypeId::of::<i16>()
-            || my_type == std::any::TypeId::of::<i32>()
-            || my_type == std::any::TypeId::of::<i64>()
-            || my_type == std::any::TypeId::of::<u8>()
-            || my_type == std::any::TypeId::of::<u16>()
-            || my_type == std::any::TypeId::of::<u32>()
-            || my_type == std::any::TypeId::of::<u64>()
-            || my_type == std::any::TypeId::of::<f32>()
-            || my_type == std::any::TypeId::of::<f64>()
-            || my_type == std::any::TypeId::of::<bool>()
-            || my_type == std::any::TypeId::of::<()>()
-            || my_type == std::any::TypeId::of::<crate::Time>()
-            || my_type == std::any::TypeId::of::<crate::TimeWithTimeZone>()
-            || my_type == std::any::TypeId::of::<crate::Timestamp>()
-            || my_type == std::any::TypeId::of::<crate::TimestampWithTimeZone>()
-            || my_type == std::any::TypeId::of::<crate::Date>()
-            || my_type == std::any::TypeId::of::<PgOid>()
-            || my_type == std::any::TypeId::of::<pg_sys::Datum>()
-            || my_type == std::any::TypeId::of::<Option<pg_sys::Datum>>()
-    }
 }
 
 /// for supporting NULL as the None value of an Option<T>
@@ -116,6 +86,33 @@ where
     }
 
     fn type_oid() -> u32 {
+        T::type_oid()
+    }
+}
+
+impl<T, E> IntoDatum for Result<T, E>
+where
+    T: IntoDatum,
+    E: Display,
+{
+    /// Returns The `Option<pg_sys::Datum>` representation of this Result's `Ok` variant.
+    ///
+    /// ## Panics
+    ///
+    /// If this Result represents an error, then that error is raised as a Postgres ERROR, using
+    /// the [`PgSqlErrorCode::ERRCODE_DATA_EXCEPTION`] error code
+    #[inline]
+    fn into_datum(self) -> Option<Datum> {
+        match self {
+            Ok(v) => v.into_datum(),
+            Err(e) => {
+                ereport!(ERROR, PgSqlErrorCode::ERRCODE_DATA_EXCEPTION, &format!("{}", e));
+            }
+        }
+    }
+
+    #[inline]
+    fn type_oid() -> pg_sys::Oid {
         T::type_oid()
     }
 }
@@ -153,6 +150,10 @@ impl IntoDatum for i16 {
     fn type_oid() -> u32 {
         pg_sys::INT2OID
     }
+
+    fn is_compatible_with(other: pg_sys::Oid) -> bool {
+        Self::type_oid() == other || i8::type_oid() == other
+    }
 }
 
 /// for integer
@@ -164,6 +165,10 @@ impl IntoDatum for i32 {
 
     fn type_oid() -> u32 {
         pg_sys::INT4OID
+    }
+
+    fn is_compatible_with(other: pg_sys::Oid) -> bool {
+        Self::type_oid() == other || i8::type_oid() == other || i16::type_oid() == other
     }
 }
 
@@ -177,6 +182,13 @@ impl IntoDatum for u32 {
     fn type_oid() -> u32 {
         pg_sys::OIDOID
     }
+
+    fn is_compatible_with(other: pg_sys::Oid) -> bool {
+        Self::type_oid() == other
+            || i8::type_oid() == other
+            || i16::type_oid() == other
+            || i32::type_oid() == other
+    }
 }
 
 /// for bigint
@@ -188,6 +200,14 @@ impl IntoDatum for i64 {
 
     fn type_oid() -> u32 {
         pg_sys::INT8OID
+    }
+
+    fn is_compatible_with(other: pg_sys::Oid) -> bool {
+        Self::type_oid() == other
+            || i8::type_oid() == other
+            || i16::type_oid() == other
+            || i32::type_oid() == other
+            || i64::type_oid() == other
     }
 }
 
@@ -380,15 +400,16 @@ impl IntoDatum for Vec<u8> {
     }
 }
 
-/// for NULL -- always converts to `None`
+/// for VOID
 impl IntoDatum for () {
     #[inline]
     fn into_datum(self) -> Option<pg_sys::Datum> {
-        None
+        // VOID isn't very useful, but Postgres represents it as a non-null Datum with a zero value
+        Some(Datum::from(0))
     }
 
     fn type_oid() -> u32 {
-        pg_sys::BOOLOID
+        pg_sys::VOIDOID
     }
 }
 

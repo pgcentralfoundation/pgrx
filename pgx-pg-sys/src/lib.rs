@@ -285,6 +285,7 @@ mod all_versions {
     pub const FirstNormalTransactionId: super::TransactionId = 3 as super::TransactionId;
     pub const MaxTransactionId: super::TransactionId = 0xFFFF_FFFF as super::TransactionId;
 
+    #[cfg(feature = "cshim")]
     #[pgx_macros::pg_guard]
     extern "C" {
         pub fn pgx_list_nth(list: *mut super::List, nth: i32) -> *mut std::os::raw::c_void;
@@ -450,25 +451,21 @@ mod all_versions {
         super::get_element_type(typoid) != InvalidOid
     }
 
-    #[inline]
-    pub unsafe fn planner_rt_fetch(
-        index: super::Index,
-        root: *mut super::PlannerInfo,
-    ) -> *mut super::RangeTblEntry {
-        extern "C" {
-            pub fn pgx_planner_rt_fetch(
-                index: super::Index,
-                root: *mut super::PlannerInfo,
-            ) -> *mut super::RangeTblEntry;
-        }
-
-        pgx_planner_rt_fetch(index, root)
+    #[cfg(feature = "cshim")]
+    #[pg_guard]
+    extern "C" {
+        #[link_name = "pgx_planner_rt_fetch"]
+        pub fn planner_rt_fetch(
+            index: super::Index,
+            root: *mut super::PlannerInfo,
+        ) -> *mut super::RangeTblEntry;
     }
 
     /// ```c
     /// #define rt_fetch(rangetable_index, rangetable) \
     ///     ((RangeTblEntry *) list_nth(rangetable, (rangetable_index)-1))
     /// ```
+    #[cfg(feature = "cshim")]
     #[inline]
     pub unsafe fn rt_fetch(
         index: super::Index,
@@ -555,6 +552,7 @@ mod all_versions {
         ) -> bool;
     }
 
+    #[cfg(feature = "cshim")]
     #[pgx_macros::pg_guard]
     extern "C" {
         #[link_name = "pgx_SpinLockInit"]
