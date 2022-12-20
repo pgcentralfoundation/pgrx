@@ -413,4 +413,20 @@ mod tests {
     fn test_option() {
         assert!(Spi::get_one::<i32>("SELECT NULL::integer").unwrap().is_none());
     }
+
+    #[pg_test(error = "CREATE TABLE is not allowed in a non-volatile function")]
+    fn test_readwrite_in_readonly() {
+        // This is supposed to run in read-only
+        Spi::connect(|client| client.select("CREATE TABLE a ()", None, None));
+    }
+
+    #[pg_test]
+    fn test_readwrite_in_select_readwrite() {
+        Spi::connect(|mut client| {
+            // This is supposed to switch connection to read-write and run it there
+            client.update("CREATE TABLE a (id INT)", None, None);
+            // This is supposed to run in read-write
+            client.select("INSERT INTO a VALUES (1)", None, None);
+        });
+    }
 }
