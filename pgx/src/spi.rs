@@ -736,7 +736,7 @@ impl Query for OwnedPreparedStatement {
 }
 
 impl<'a> PreparedStatement<'a> {
-    /// Converts prepared statement into an owner prepared statement
+    /// Converts prepared statement into an owned prepared statement
     ///
     /// These statements have static lifetime and are freed only when dropped
     pub fn keep(&self) -> OwnedPreparedStatement {
