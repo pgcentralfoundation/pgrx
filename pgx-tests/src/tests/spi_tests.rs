@@ -12,6 +12,7 @@ Use of this source code is governed by the MIT license that can be found in the 
 mod tests {
     #[allow(unused_imports)]
     use crate as pgx_tests;
+    use pgx::IntoDatum;
 
     use pgx::prelude::*;
     use pgx::spi;
@@ -222,6 +223,30 @@ mod tests {
     }
 
     #[pg_test]
+    fn test_cursor_prepared_statement() -> Result<(), pgx::spi::Error> {
+        Spi::connect(|client| {
+            client.update("CREATE TABLE tests.cursor_table (id int)", None, None);
+            client.update(
+                "INSERT INTO tests.cursor_table (id) \
+            SELECT i FROM generate_series(1, 10) AS t(i)",
+                None,
+                None,
+            );
+            let prepared = client.prepare("SELECT * FROM tests.cursor_table", None);
+            let mut portal = client.open_cursor(&prepared, None)?;
+
+            fn sum_all(table: pgx::SpiTupleTable) -> i32 {
+                table.map(|r| r.by_ordinal(1).unwrap().value::<i32>().unwrap()).sum()
+            }
+            assert_eq!(sum_all(portal.fetch(3)), 1 + 2 + 3);
+            assert_eq!(sum_all(portal.fetch(3)), 4 + 5 + 6);
+            assert_eq!(sum_all(portal.fetch(3)), 7 + 8 + 9);
+            assert_eq!(sum_all(portal.fetch(3)), 10);
+            Ok(())
+        })
+    }
+
+    #[pg_test]
     fn test_cursor_by_name() -> Result<(), pgx::spi::Error> {
         let cursor_name = Spi::connect(|client| {
             client.update("CREATE TABLE tests.cursor_table (id int)", None, None);
@@ -336,17 +361,52 @@ mod tests {
     }
 
     #[pg_test]
-    fn test_spi_unwind_safe() {
-        struct T;
-        assert!(matches!(Spi::connect(|_| Ok::<_, ()>(Some(T))).unwrap().unwrap(), T));
+    fn test_prepared_statement() -> Result<(), spi::Error> {
+        let rc = Spi::connect(|client| {
+            let prepared =
+                client.prepare("SELECT $1", Some(vec![PgOid::BuiltIn(PgBuiltInOids::INT4OID)]));
+            client
+                .select(&prepared, None, Some(vec![42.into_datum()]))
+                .unwrap()
+                .first()
+                .get_datum::<i32>(1)
+        })?;
+
+        assert_eq!(42, rc.expect("SPI failed to return proper value"));
+        Ok(())
     }
 
     #[pg_test]
-    fn test_error_propagation() {
-        #[derive(Debug)]
-        struct Error;
-        let result = Spi::connect(|_| Err::<(), _>(Error));
-        assert!(matches!(result, Err(Error)))
+    fn test_prepared_statement_argument_mismatch() {
+        use pgx::PreparedStatementError;
+        let err = Spi::connect(|client| {
+            let prepared =
+                client.prepare("SELECT $1", Some(vec![PgOid::BuiltIn(PgBuiltInOids::INT4OID)]));
+            client.select(&prepared, None, None)
+        })
+        .unwrap_err();
+
+        assert!(matches!(
+            err,
+            PreparedStatementError::ArgumentCountMismatch { expected: 1, got: 0 }
+        ));
+    }
+
+    #[pg_test]
+    fn test_owned_prepared_statement() {
+        let prepared = Spi::connect(|client| {
+            client.prepare("SELECT $1", Some(vec![PgOid::BuiltIn(PgBuiltInOids::INT4OID)])).keep()
+        });
+        let rc = Spi::connect(|client| {
+            client
+                .select(&prepared, None, Some(vec![42.into_datum()]))
+                .unwrap()
+                .first()
+                .get_datum::<i32>(1)
+        })
+        .unwrap();
+
+        assert_eq!(42, rc.expect("SPI failed to return proper value"))
     }
 
     #[pg_test]
