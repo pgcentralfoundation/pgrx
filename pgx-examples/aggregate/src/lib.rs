@@ -157,14 +157,14 @@ mod tests {
     }
 
     #[pg_test]
-    fn test_integer_avg_state_sql(){
+    fn test_integer_avg_state_sql() {
         Spi::run("CREATE TABLE demo_table (value INTEGER);");
         Spi::run("INSERT INTO demo_table (value) VALUES (1), (2), (3);");
         let retval = Spi::get_one::<i32>("SELECT DEMOAVG(value) FROM demo_table;");
         assert_eq!(retval, Ok(Some(2)));
     }
     #[pg_test]
-    fn test_integer_avg_with_null()  {
+    fn test_integer_avg_with_null() {
         Spi::run("CREATE TABLE demo_table (value INTEGER);");
         Spi::run("INSERT INTO demo_table (value) VALUES (1), (NULL), (3);");
         let retval = Spi::get_one::<i32>("SELECT DEMOAVG(value) FROM demo_table;");
