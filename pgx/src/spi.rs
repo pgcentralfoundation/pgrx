@@ -583,22 +583,13 @@ impl SpiCursor<'_> {
     ///
     /// If `fetch` runs off the end of the available rows, an empty [`SpiTupleTable`] is returned.
     pub fn fetch(&mut self, count: i64) -> SpiTupleTable {
+        // SAFETY: no concurrent access
         unsafe {
             pg_sys::SPI_tuptable = std::ptr::null_mut();
         }
         // SAFETY: SPI functions to create/find cursors fail via elog, so self.ptr is valid if we successfully set it
         unsafe { pg_sys::SPI_cursor_fetch(self.ptr.as_mut(), true, count) }
-        SpiTupleTable {
-            status_code: SpiOk::Fetch,
-            table: unsafe { pg_sys::SPI_tuptable },
-            size: unsafe { pg_sys::SPI_processed as usize },
-            tupdesc: if unsafe { pg_sys::SPI_tuptable }.is_null() {
-                None
-            } else {
-                Some(unsafe { (*pg_sys::SPI_tuptable).tupdesc })
-            },
-            current: -1,
-        }
+        SpiClient::prepare_tuple_table(SpiOk::Fetch as i32)
     }
 
     /// Consume the cursor, returning its name
