@@ -50,7 +50,7 @@ mod tests {
 
     #[cfg(not(feature = "no-schema-generation"))]
     #[pg_test]
-    fn test_ordering_via_spi() -> Result<(), pgx::spi::Error> {
+    fn test_ordering_via_spi() {
         let items = Spi::get_one::<Vec<OrderedThing>>(
             "SELECT array_agg(i ORDER BY i) FROM (VALUES \
                 ('{\"item\":\"foo\"}'::OrderedThing), \
@@ -58,18 +58,16 @@ mod tests {
                 ('{\"item\":\"Foo\"}'::OrderedThing), \
                 ('{\"item\":\"Bar\"}'::OrderedThing))\
                 items(i);",
-        )?
-        .unwrap();
+        );
 
         assert_eq!(
             items,
-            vec![
+            Ok(Some(vec![
                 OrderedThing { item: "Foo".to_string() },
                 OrderedThing { item: "Bar".to_string() },
                 OrderedThing { item: "bar".to_string() },
                 OrderedThing { item: "foo".to_string() },
-            ]
+            ]))
         );
-        Ok(())
     }
 }

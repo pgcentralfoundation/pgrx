@@ -240,7 +240,7 @@ mod tests {
         let json = Spi::get_one::<Json>(
             "SELECT serde_serialize_array(ARRAY['one', null, 'two', 'three'])",
         )?
-        .unwrap();
+        .expect("returned json was null");
         assert_eq!(json.0, json! {{"values": ["one", null, "two", "three"]}});
         Ok(())
     }
@@ -254,16 +254,14 @@ mod tests {
     #[pg_test]
     fn test_serde_serialize_array_i32() -> Result<(), pgx::spi::Error> {
         let json = Spi::get_one::<Json>("SELECT serde_serialize_array_i32(ARRAY[1,2,3,null, 4])")?
-            .expect("datum was null");
+            .expect("returned json was null");
         assert_eq!(json.0, json! {{"values": [1,2,3,null,4]}});
         Ok(())
     }
 
     #[pg_test(error = "array contains NULL")]
-    fn test_serde_serialize_array_i32_deny_null() -> Result<(), pgx::spi::Error> {
-        Spi::get_one::<Json>("SELECT serde_serialize_array_i32_deny_null(ARRAY[1,2,3,null, 4])")?
-            .expect("datum was null");
-        Ok(())
+    fn test_serde_serialize_array_i32_deny_null() -> Result<Option<Json>, pgx::spi::Error> {
+        Spi::get_one::<Json>("SELECT serde_serialize_array_i32_deny_null(ARRAY[1,2,3,null, 4])")
     }
 
     #[pg_test]

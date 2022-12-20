@@ -84,7 +84,7 @@ mod tests {
             "test",
             // we don't need to qualify "MyType" because whatever schema it was created in
             // is applied to the "search_path" of this test function
-            Spi::get_one::<MyType>("SELECT '\"test\"'::MyType")?.unwrap().0
+            Spi::get_one::<MyType>("SELECT '\"test\"'::MyType")?.expect("datum was null").0
         );
         Ok(())
     }
@@ -119,7 +119,9 @@ mod tests {
     fn test_my_pg_catalog_type() -> Result<(), pgx::spi::Error> {
         assert_eq!(
             String::from("test"),
-            Spi::get_one::<MyPgCatalogType>("SELECT '\"test\"'::MyPgCatalogType")?.unwrap().0
+            Spi::get_one::<MyPgCatalogType>("SELECT '\"test\"'::MyPgCatalogType")?
+                .expect("datum was null")
+                .0
         );
         Ok(())
     }

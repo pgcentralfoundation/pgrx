@@ -101,11 +101,6 @@ fn spi_insert_title2(
     TableIterator::once(tuple)
 }
 
-#[pg_extern]
-fn spi_echo(value: Option<String>) -> std::result::Result<Option<String>, spi::Error> {
-    Spi::get_one_with_args("SELECT $1", vec![(PgOid::from(pg_sys::TEXTOID), value.into_datum())])
-}
-
 extension_sql!(
     r#"
 
