@@ -87,16 +87,14 @@ mod tests {
     #[pg_test]
     fn test_ordering() {
         let buf = Spi::connect(|client| {
-            let buf = client
+            client
                 .select("SELECT * FROM extension_sql", None, None)
                 .flat_map(|tup| tup.by_ordinal(1).ok().and_then(|ord| ord.value::<String>()))
-                .collect::<Vec<String>>();
-
-            Ok(Some(buf))
+                .collect::<Vec<String>>()
         });
 
         assert_eq!(
-            buf.unwrap(),
+            buf,
             vec![
                 String::from("bootstrap"),
                 String::from("single_raw"),

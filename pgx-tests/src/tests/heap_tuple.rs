@@ -630,9 +630,8 @@ mod tests {
             "
             SELECT gets_name_field(ROW('Nami', 0)::Dog)
         ",
-        )
-        .expect("SQL select failed");
-        assert_eq!(retval, "Nami");
+        );
+        assert_eq!(retval, Ok(Some("Nami")));
     }
 
     #[pg_test]
@@ -641,9 +640,8 @@ mod tests {
             "
             SELECT gets_name_field_default()
         ",
-        )
-        .expect("SQL select failed");
-        assert_eq!(retval, "Nami");
+        );
+        assert_eq!(retval, Ok(Some("Nami")));
     }
 
     #[pg_test]
@@ -652,9 +650,8 @@ mod tests {
             "
             SELECT gets_name_field_strict(ROW('Nami', 0)::Dog)
         ",
-        )
-        .expect("SQL select failed");
-        assert_eq!(retval, "Nami");
+        );
+        assert_eq!(retval, Ok(Some("Nami")));
     }
 
     #[pg_test]
@@ -663,9 +660,8 @@ mod tests {
             "
             SELECT gets_name_field_variadic(ROW('Nami', 1)::Dog, ROW('Brandy', 1)::Dog)
         ",
-        )
-        .expect("SQL select failed");
-        assert_eq!(retval, vec!["Nami".to_string(), "Brandy".to_string()]);
+        );
+        assert_eq!(retval, Ok(Some(vec!["Nami".to_string(), "Brandy".to_string()])));
     }
 
     #[pg_test]
@@ -675,9 +671,8 @@ mod tests {
             "
             SELECT gets_name_field_as_slice(ROW('Nami', 1)::Dog, ROW('Brandy', 1)::Dog)
         ",
-        )
-        .expect("SQL select failed");
-        assert_eq!(retval, vec!["Nami".to_string(), "Brandy".to_string()]);
+        );
+        assert_eq!(retval, Ok(Some(vec!["Nami".to_string(), "Brandy".to_string()])));
     }
 
     #[pg_test]
@@ -686,9 +681,8 @@ mod tests {
             "
             SELECT sum_scritches_for_names(ARRAY[ROW('Nami', 1), ROW('Brandy', 42)]::Dog[])
         ",
-        )
-        .expect("SQL select failed");
-        assert_eq!(retval, 43);
+        );
+        assert_eq!(retval, Ok(Some(43)));
     }
 
     #[pg_test]
@@ -697,9 +691,8 @@ mod tests {
             "
             SELECT sum_scritches_for_names_default()
         ",
-        )
-        .expect("SQL select failed");
-        assert_eq!(retval, 0);
+        );
+        assert_eq!(retval, Ok(Some(0)));
     }
 
     #[pg_test]
@@ -708,9 +701,8 @@ mod tests {
             "
             SELECT sum_scritches_for_names_strict(ARRAY[ROW('Nami', 1), ROW('Brandy', 42)]::Dog[])
         ",
-        )
-        .expect("SQL select failed");
-        assert_eq!(retval, 43);
+        );
+        assert_eq!(retval, Ok(Some(43)));
     }
 
     #[pg_test]
@@ -719,9 +711,8 @@ mod tests {
             "
             SELECT sum_scritches_for_names_strict(ARRAY[ROW('Nami', 1), ROW('Brandy', 42)]::Dog[])
         ",
-        )
-        .expect("SQL select failed");
-        assert_eq!(retval, 43);
+        );
+        assert_eq!(retval, Ok(Some(43)));
     }
 
     #[pg_test]
@@ -730,17 +721,16 @@ mod tests {
             "
             SELECT sum_scritches_for_names_default_optional_items()
         ",
-        )
-        .expect("SQL select failed");
-        assert_eq!(retval, 0);
+        );
+        assert_eq!(retval, Ok(Some(0)));
     }
 
     #[pg_test]
     fn test_sum_scritches_for_names_optional_items() {
         let retval = Spi::get_one::<i32>("
             SELECT sum_scritches_for_names_optional_items(ARRAY[ROW('Nami', 1), ROW('Brandy', 42)]::Dog[])
-        ").expect("SQL select failed");
-        assert_eq!(retval, 43);
+        ");
+        assert_eq!(retval, Ok(Some(43)));
     }
 
     #[pg_test]
@@ -749,9 +739,8 @@ mod tests {
             "
             SELECT sum_scritches_for_names_array(ARRAY[ROW('Nami', 1), ROW('Brandy', 42)]::Dog[])
         ",
-        )
-        .expect("SQL select failed");
-        assert_eq!(retval, 43);
+        );
+        assert_eq!(retval, Ok(Some(43)));
     }
 
     #[pg_test]
@@ -760,53 +749,55 @@ mod tests {
             "
             SELECT sum_scritches_for_names_array_default()
         ",
-        )
-        .expect("SQL select failed");
-        assert_eq!(retval, 0);
+        );
+        assert_eq!(retval, Ok(Some(0)));
     }
 
     #[pg_test]
     fn test_sum_scritches_for_names_array_strict() {
         let retval = Spi::get_one::<i32>("
             SELECT sum_scritches_for_names_array_strict(ARRAY[ROW('Nami', 1), ROW('Brandy', 42)]::Dog[])
-        ").expect("SQL select failed");
-        assert_eq!(retval, 43);
+        ");
+        assert_eq!(retval, Ok(Some(43)));
     }
 
     #[pg_test]
-    fn test_create_dog() {
+    fn test_create_dog() -> Result<(), pgx::spi::Error> {
         let retval = Spi::get_one::<PgHeapTuple<'_, AllocatedByRust>>(
             "
             SELECT create_dog('Nami', 1)
         ",
-        )
-        .expect("SQL select failed");
+        )?
+        .expect("datum was null");
         assert_eq!(retval.get_by_name("name").unwrap(), Some("Nami"));
         assert_eq!(retval.get_by_name("scritches").unwrap(), Some(1));
+        Ok(())
     }
 
     #[pg_test]
-    fn test_scritch() {
+    fn test_scritch() -> Result<(), pgx::spi::Error> {
         let retval = Spi::get_one::<PgHeapTuple<'_, AllocatedByRust>>(
             "
             SELECT scritch(ROW('Nami', 2)::Dog)
         ",
-        )
-        .expect("SQL select failed");
+        )?
+        .expect("datum was null");
         assert_eq!(retval.get_by_name("name").unwrap(), Some("Nami"));
         assert_eq!(retval.get_by_name("scritches").unwrap(), Some(2));
+        Ok(())
     }
 
     #[pg_test]
-    fn test_scritch_strict() {
+    fn test_scritch_strict() -> Result<(), pgx::spi::Error> {
         let retval = Spi::get_one::<PgHeapTuple<'_, AllocatedByRust>>(
             "
             SELECT scritch_strict(ROW('Nami', 2)::Dog)
         ",
-        )
-        .expect("SQL select failed");
+        )?
+        .expect("datum was null");
         assert_eq!(retval.get_by_name("name").unwrap(), Some("Nami"));
         assert_eq!(retval.get_by_name("scritches").unwrap(), Some(2));
+        Ok(())
     }
 
     #[pg_test]
@@ -911,5 +902,20 @@ mod tests {
             heap_tuple.get_by_name::<String>("age"),
             Err(TryFromDatumError::IncompatibleTypes),
         );
+    }
+
+    #[pg_test]
+    fn test_compatibility() {
+        Spi::get_one::<PgHeapTuple<'_, AllocatedByRust>>("SELECT ROW('Nami', 2)::Dog")
+            .expect("failed to get a Dog");
+
+        // Non-composite types are incompatible:
+        let not_a_dog = Spi::get_one::<PgHeapTuple<'_, AllocatedByRust>>("SELECT 1");
+        match not_a_dog {
+            Ok(_dog) => panic!("got a Dog when we shouldn't have"),
+            Err(e) => {
+                assert_eq!(e, pgx::spi::Error::DatumError(TryFromDatumError::IncompatibleTypes))
+            }
+        }
     }
 }

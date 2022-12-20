@@ -257,58 +257,59 @@ mod tests {
     use pgx::AllocatedByRust;
 
     #[pg_test]
-    fn test_create_dog() {
+    fn test_create_dog() -> Result<(), pgx::spi::Error> {
         let retval = Spi::get_one::<PgHeapTuple<AllocatedByRust>>(
             "\
             SELECT create_dog('Nami', 0)
         ",
-        )
+        )?
         .expect("SQL select failed");
-        assert_eq!(retval.get_by_name::<&str>("name").unwrap().unwrap(), "Nami");
-        assert_eq!(retval.get_by_name::<i32>("scritches").unwrap().unwrap(), 0);
+        assert_eq!(retval.get_by_name::<&str>("name")?.unwrap(), "Nami");
+        assert_eq!(retval.get_by_name::<i32>("scritches")?.unwrap(), 0);
+        Ok(())
     }
 
     #[pg_test]
-    fn test_scritch_dog() {
+    fn test_scritch_dog() -> Result<(), pgx::spi::Error> {
         let retval = Spi::get_one::<PgHeapTuple<AllocatedByRust>>(
             "\
             SELECT scritch_dog(ROW('Nami', 1)::Dog)
         ",
-        )
+        )?
         .expect("SQL select failed");
-        assert_eq!(retval.get_by_name::<&str>("name").unwrap().unwrap(), "Nami");
-        assert_eq!(retval.get_by_name::<i32>("scritches").unwrap().unwrap(), 1);
+        assert_eq!(retval.get_by_name::<&str>("name")?.unwrap(), "Nami");
+        assert_eq!(retval.get_by_name::<i32>("scritches")?.unwrap(), 1);
+        Ok(())
     }
 
     #[pg_test]
-    fn test_make_friendship() {
+    fn test_make_friendship() -> Result<(), pgx::spi::Error> {
         let friendship = Spi::get_one::<PgHeapTuple<AllocatedByRust>>(
             "\
             SELECT make_friendship(ROW('Nami', 0)::Dog, ROW('Sally', 0)::Cat)
         ",
-        )
+        )?
         .expect("SQL select failed");
-        let dog: PgHeapTuple<AllocatedByRust> = friendship.get_by_name("dog").unwrap().unwrap();
-        assert_eq!(dog.get_by_name::<&str>("name").unwrap().unwrap(), "Nami");
+        let dog: PgHeapTuple<AllocatedByRust> = friendship.get_by_name("dog")?.unwrap();
+        assert_eq!(dog.get_by_name::<&str>("name")?.unwrap(), "Nami");
 
-        let cat: PgHeapTuple<AllocatedByRust> = friendship.get_by_name("cat").unwrap().unwrap();
-        assert_eq!(cat.get_by_name::<&str>("name").unwrap().unwrap(), "Sally");
+        let cat: PgHeapTuple<AllocatedByRust> = friendship.get_by_name("cat")?.unwrap();
+        assert_eq!(cat.get_by_name::<&str>("name")?.unwrap(), "Sally");
+        Ok(())
     }
 
     #[pg_test]
     fn test_scritch_collector() {
         let retval = Spi::get_one::<i32>(
             "SELECT (scritchcollector(value)).scritches FROM UNNEST(ARRAY [1,2,3]) as value;",
-        )
-        .expect("SQL select failed");
-        assert_eq!(retval, 6);
+        );
+        assert_eq!(retval, Ok(Some(6)));
     }
 
     #[pg_test]
     fn test_dog_add_operator() {
-        let retval = Spi::get_one::<i32>("SELECT (ROW('Nami', 0)::Dog + 1).scritches;")
-            .expect("SQL select failed");
-        assert_eq!(retval, 1);
+        let retval = Spi::get_one::<i32>("SELECT (ROW('Nami', 0)::Dog + 1).scritches;");
+        assert_eq!(retval, Ok(Some(1)));
     }
 }
 

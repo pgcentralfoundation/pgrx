@@ -65,7 +65,7 @@ pub extern "C" fn background_worker_main(arg: pg_sys::Datum) {
 
         // within a transaction, execute an SQL statement, and log its results
         BackgroundWorker::transaction(|| {
-            Spi::execute(|client| {
+            Spi::connect(|client| {
                 let tuple_table = client.select(
                     "SELECT 'Hi', id, ''||a FROM (SELECT id, 42 from generate_series(1,10) id) a ",
                     None,

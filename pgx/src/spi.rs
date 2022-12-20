@@ -9,7 +9,8 @@ Use of this source code is governed by the MIT license that can be found in the 
 
 //! Safe access to Postgres' *Server Programming Interface* (SPI).
 
-use crate::{pg_sys, FromDatum, IntoDatum, Json, PgMemoryContexts, PgOid};
+use crate::{pg_sys, FromDatum, IntoDatum, Json, PgMemoryContexts, PgOid, TryFromDatumError};
+use core::fmt::Formatter;
 use std::collections::HashMap;
 use std::ffi::CStr;
 use std::fmt::Debug;
@@ -47,7 +48,7 @@ pub enum SpiOk {
 /// These match the Postgres `#define`d constants prefixed `SPI_ERROR_*` that you can find in `pg_sys`.
 /// It is hypothetically possible for a Postgres-defined status code to be `0`, AKA `NULL`, however,
 /// this should not usually occur in Rust code paths. If it does happen, please report such bugs to the pgx repo.
-#[derive(Debug, PartialEq)]
+#[derive(thiserror::Error, Debug, PartialEq)]
 #[repr(i32)]
 pub enum SpiError {
     Connect = -1,
@@ -64,6 +65,12 @@ pub enum SpiError {
     TypUnknown = -11,
     RelDuplicate = -12,
     RelNotFound = -13,
+}
+
+impl std::fmt::Display for SpiError {
+    fn fmt(&self, f: &mut Formatter<'_>) -> core::fmt::Result {
+        f.write_fmt(format_args!("{:?}", self))
+    }
 }
 
 #[derive(Debug)]
@@ -101,6 +108,24 @@ impl TryFrom<libc::c_int> for SpiError {
             Err(Err(unknown)) => Err(Err(unknown)),
         }
     }
+}
+
+#[derive(thiserror::Error, Debug, PartialEq)]
+pub enum Error {
+    #[error("SPI error: {0:?}")]
+    SpiError(#[from] SpiError),
+    #[error("Datum error: {0}")]
+    DatumError(#[from] TryFromDatumError),
+    #[error("SpiTupleTable positioned before the start or after the end")]
+    InvalidPosition,
+    #[error("Invalid index ({0})")]
+    InvalidIndex(i32),
+    #[error("Cursor named {0} not found")]
+    CursorNotFound(String),
+    #[error("Portal ptr is NULL")]
+    PortalIsNull,
+    #[error("TupDesc is NULL")]
+    TupDescIsNull,
 }
 
 pub struct Spi;
@@ -158,21 +183,14 @@ pub struct SpiHeapTupleData {
 }
 
 impl Spi {
-    pub fn get_one<A: FromDatum + IntoDatum>(query: &str) -> Option<A> {
-        Spi::connect(|client| {
-            let result = client.select(query, Some(1), None).first().get_one();
-            Ok(result)
-        })
+    pub fn get_one<A: FromDatum + IntoDatum>(query: &str) -> Result<Option<A>, Error> {
+        Spi::connect(|client| client.select(query, Some(1), None).first().get_one())
     }
 
     pub fn get_two<A: FromDatum + IntoDatum, B: FromDatum + IntoDatum>(
         query: &str,
-    ) -> (Option<A>, Option<B>) {
-        Spi::connect(|client| {
-            let (a, b) = client.select(query, Some(1), None).first().get_two::<A, B>();
-            Ok(Some((a, b)))
-        })
-        .unwrap()
+    ) -> Result<(Option<A>, Option<B>), Error> {
+        Spi::connect(|client| client.select(query, Some(1), None).first().get_two::<A, B>())
     }
 
     pub fn get_three<
@@ -181,30 +199,22 @@ impl Spi {
         C: FromDatum + IntoDatum,
     >(
         query: &str,
-    ) -> (Option<A>, Option<B>, Option<C>) {
-        Spi::connect(|client| {
-            let (a, b, c) = client.select(query, Some(1), None).first().get_three::<A, B, C>();
-            Ok(Some((a, b, c)))
-        })
-        .unwrap()
+    ) -> Result<(Option<A>, Option<B>, Option<C>), Error> {
+        Spi::connect(|client| client.select(query, Some(1), None).first().get_three::<A, B, C>())
     }
 
     pub fn get_one_with_args<A: FromDatum + IntoDatum>(
         query: &str,
         args: Vec<(PgOid, Option<pg_sys::Datum>)>,
-    ) -> Option<A> {
-        Spi::connect(|client| Ok(client.select(query, Some(1), Some(args)).first().get_one()))
+    ) -> Result<Option<A>, Error> {
+        Spi::connect(|client| client.select(query, Some(1), Some(args)).first().get_one())
     }
 
     pub fn get_two_with_args<A: FromDatum + IntoDatum, B: FromDatum + IntoDatum>(
         query: &str,
         args: Vec<(PgOid, Option<pg_sys::Datum>)>,
-    ) -> (Option<A>, Option<B>) {
-        Spi::connect(|client| {
-            let (a, b) = client.select(query, Some(1), Some(args)).first().get_two::<A, B>();
-            Ok(Some((a, b)))
-        })
-        .unwrap()
+    ) -> Result<(Option<A>, Option<B>), Error> {
+        Spi::connect(|client| client.select(query, Some(1), Some(args)).first().get_two::<A, B>())
     }
 
     pub fn get_three_with_args<
@@ -214,13 +224,10 @@ impl Spi {
     >(
         query: &str,
         args: Vec<(PgOid, Option<pg_sys::Datum>)>,
-    ) -> (Option<A>, Option<B>, Option<C>) {
+    ) -> Result<(Option<A>, Option<B>, Option<C>), Error> {
         Spi::connect(|client| {
-            let (a, b, c) =
-                client.select(query, Some(1), Some(args)).first().get_three::<A, B, C>();
-            Ok(Some((a, b, c)))
+            client.select(query, Some(1), Some(args)).first().get_three::<A, B, C>()
         })
-        .unwrap()
     }
 
     /// just run an arbitrary SQL statement.
@@ -238,13 +245,13 @@ impl Spi {
     ///
     /// The statement runs in read/write mode
     pub fn run_with_args(query: &str, args: Option<Vec<(PgOid, Option<pg_sys::Datum>)>>) {
-        Spi::execute(|client| {
+        Spi::connect(|client| {
             client.update(query, None, args);
         })
     }
 
     /// explain a query, returning its result in json form
-    pub fn explain(query: &str) -> Json {
+    pub fn explain(query: &str) -> Result<Json, Error> {
         Spi::explain_with_args(query, None)
     }
 
@@ -252,36 +259,45 @@ impl Spi {
     pub fn explain_with_args(
         query: &str,
         args: Option<Vec<(PgOid, Option<pg_sys::Datum>)>>,
-    ) -> Json {
+    ) -> Result<Json, Error> {
         Spi::connect(|client| {
             let table =
                 client.update(&format!("EXPLAIN (format json) {}", query), None, args).first();
-            Ok(Some(table.get_one::<Json>().expect("failed to get json EXPLAIN result")))
+            Ok(table.get_one::<Json>()?.unwrap())
         })
-        .unwrap()
     }
 
-    /// execute SPI commands via the provided `SpiClient`
-    pub fn execute<F: FnOnce(SpiClient) + std::panic::UnwindSafe>(f: F) {
-        Spi::connect(|client| {
-            f(client);
-            Ok(Some(()))
-        });
-    }
-
-    /// execute SPI commands via the provided `SpiClient` and return a value from SPI which is
-    /// automatically copied into the `CurrentMemoryContext` at the time of this function call
+    /// Execute SPI commands via the provided `SpiClient`.  
     ///
-    /// Note that `SpiClient` is scoped to the connection lifetime and the following code will
-    /// not compile:
+    /// While inside the provided closure, code executes under a short-lived "SPI Memory Context",
+    /// and Postgres will completely free that context when this function is finished.
+    ///
+    /// pgx' SPI API endeavors to return Datum values from functions like `::get_one()` that are
+    /// automatically copied into the into the `CurrentMemoryContext` at the time of this
+    /// function call.
+    ///
+    /// # Examples
+    ///
+    /// ```rust,no_run
+    /// use pgx::prelude::*;
+    /// use pgx::spi;
+    /// # fn foo() -> Result<String, spi::Error> {
+    /// let name:&str = Spi::connect(|client| {
+    ///     client.select("SELECT 'Bob'", None, None).first().get_one()
+    /// })?.unwrap();
+    /// assert_eq!(name, "Bob");
+    /// # return Ok(name.into())
+    /// # }
+    /// ```
+    ///
+    /// Note that `SpiClient` is scoped to the connection lifetime and cannot be returned.  The
+    /// following code will not compile:
     ///
     /// ```rust,compile_fail
-    /// use pgx::*;
-    /// Spi::connect(|client| Ok(Some(client)));
+    /// use pgx::prelude::*;
+    /// let cant_return_client = Spi::connect(|client| client);
     /// ```
-    pub fn connect<R, F: FnOnce(SpiClient<'_>) -> std::result::Result<Option<R>, SpiError>>(
-        f: F,
-    ) -> Option<R> {
+    pub fn connect<R, F: FnOnce(SpiClient<'_>) -> R>(f: F) -> R {
         // connect to SPI
         let connection = SpiConnection::connect();
 
@@ -289,7 +305,7 @@ impl Spi {
         // just put us un.  We'll disconnect from SPI when the closure is finished.
         // If there's a panic or elog(ERROR), we don't care about also disconnecting from
         // SPI b/c Postgres will do that for us automatically
-        f(connection.client()).unwrap()
+        f(connection.client())
     }
 
     pub fn check_status(status_code: i32) -> SpiOk {
@@ -407,7 +423,7 @@ impl<'a> SpiClient<'a> {
         &self,
         query: &str,
         args: Option<Vec<(PgOid, Option<pg_sys::Datum>)>>,
-    ) -> SpiCursor {
+    ) -> Result<SpiCursor, Error> {
         let src = std::ffi::CString::new(query).expect("query contained a null byte");
         let args = args.unwrap_or_default();
 
@@ -446,8 +462,8 @@ impl<'a> SpiClient<'a> {
                 0,
             )
         })
-        .expect("Portal ptr was null");
-        SpiCursor { ptr, _phantom: PhantomData }
+        .ok_or(Error::PortalIsNull)?;
+        Ok(SpiCursor { ptr, _phantom: PhantomData })
     }
 
     /// Find a cursor in transaction by name
@@ -457,12 +473,12 @@ impl<'a> SpiClient<'a> {
     /// Returned name can be used with this method to retrieve the open cursor.
     ///
     /// See [`SpiCursor`] docs for usage details.
-    pub fn find_cursor(&self, name: &str) -> SpiCursor {
+    pub fn find_cursor(&self, name: &str) -> Result<SpiCursor, Error> {
         use pgx_pg_sys::AsPgCStr;
 
         let ptr = NonNull::new(unsafe { pg_sys::SPI_cursor_find(name.as_pg_cstr()) })
-            .unwrap_or_else(|| panic!("cursor named \"{}\" not found", name));
-        SpiCursor { ptr, _phantom: PhantomData }
+            .ok_or(Error::CursorNotFound(name.to_string()))?;
+        Ok(SpiCursor { ptr, _phantom: PhantomData })
     }
 }
 
@@ -492,32 +508,32 @@ type CursorName = String;
 /// ```rust,no_run
 /// use pgx::Spi;
 /// Spi::connect(|mut client| {
-///     let mut cursor = client.open_cursor("SELECT * FROM generate_series(1, 5)", None);
-///     assert_eq!(Some(1u32), cursor.fetch(1).get_one());
-///     assert_eq!(Some(2u32), cursor.fetch(2).get_one());
-///     assert_eq!(Some(3u32), cursor.fetch(3).get_one());
-///     Ok(None::<()>)
+///     let mut cursor = client.open_cursor("SELECT * FROM generate_series(1, 5)", None)?;
+///     assert_eq!(Some(1u32), cursor.fetch(1).get_one::<u32>()?);
+///     assert_eq!(Some(2u32), cursor.fetch(2).get_one::<u32>()?);
+///     assert_eq!(Some(3u32), cursor.fetch(3).get_one::<u32>()?);
+///     Ok::<_, pgx::spi::Error>(())
 ///     // <--- all three SpiTupleTable get freed by Spi::connect at this point
-/// });
+/// }).unwrap();
 /// ```
 ///
 /// ## Cursor by name
 /// ```rust,no_run
 /// use pgx::Spi;
 /// let cursor_name = Spi::connect(|mut client| {
-///     let mut cursor = client.open_cursor("SELECT * FROM generate_series(1, 5)", None);
-///     assert_eq!(Some(1u32), cursor.fetch(1).get_one());
-///     Ok(Some(cursor.detach_into_name())) // <-- cursor gets dropped here
+///     let mut cursor = client.open_cursor("SELECT * FROM generate_series(1, 5)", None)?;
+///     assert_eq!(Some(1u32), cursor.fetch(1).get_one::<u32>()?);
+///     Ok::<_, pgx::spi::Error>(cursor.detach_into_name()) // <-- cursor gets dropped here
 ///     // <--- first SpiTupleTable gets freed by Spi::connect at this point
 /// }).unwrap();
 /// Spi::connect(|mut client| {
-///     let mut cursor = client.find_cursor(&cursor_name);
-///     assert_eq!(Some(2u32), cursor.fetch(1).get_one());
+///     let mut cursor = client.find_cursor(&cursor_name)?;
+///     assert_eq!(Some(2u32), cursor.fetch(1).get_one::<u32>()?);
 ///     drop(cursor); // <-- cursor gets dropped here
 ///     // ... more code ...
-///     Ok(None::<()>)
+///     Ok::<_, pgx::spi::Error>(())
 ///     // <--- second SpiTupleTable gets freed by Spi::connect at this point
-/// });
+/// }).unwrap();
 /// ```
 pub struct SpiCursor<'client> {
     ptr: NonNull<pg_sys::PortalData>,
@@ -594,23 +610,29 @@ impl SpiTupleTable {
         self.len() == 0
     }
 
-    pub fn get_one<A: FromDatum>(&self) -> Option<A> {
+    pub fn get_one<A: FromDatum + IntoDatum>(&self) -> Result<Option<A>, Error> {
         self.get_datum(1)
     }
 
-    pub fn get_two<A: FromDatum, B: FromDatum>(&self) -> (Option<A>, Option<B>) {
-        let a = self.get_datum::<A>(1);
-        let b = self.get_datum::<B>(2);
-        (a, b)
+    pub fn get_two<A: FromDatum + IntoDatum, B: FromDatum + IntoDatum>(
+        &self,
+    ) -> Result<(Option<A>, Option<B>), Error> {
+        let a = self.get_datum::<A>(1)?;
+        let b = self.get_datum::<B>(2)?;
+        Ok((a, b))
     }
 
-    pub fn get_three<A: FromDatum, B: FromDatum, C: FromDatum>(
+    pub fn get_three<
+        A: FromDatum + IntoDatum,
+        B: FromDatum + IntoDatum,
+        C: FromDatum + IntoDatum,
+    >(
         &self,
-    ) -> (Option<A>, Option<B>, Option<C>) {
-        let a = self.get_datum::<A>(1);
-        let b = self.get_datum::<B>(2);
-        let c = self.get_datum::<C>(3);
-        (a, b, c)
+    ) -> Result<(Option<A>, Option<B>, Option<C>), Error> {
+        let a = self.get_datum::<A>(1)?;
+        let b = self.get_datum::<B>(2)?;
+        let c = self.get_datum::<C>(3)?;
+        Ok((a, b, c))
     }
 
     pub fn get_heap_tuple(&self) -> Option<SpiHeapTupleData> {
@@ -633,38 +655,33 @@ impl SpiTupleTable {
         }
     }
 
-    pub fn get_datum<T: FromDatum>(&self, ordinal: i32) -> Option<T> {
-        if self.current < 0 {
-            panic!("SpiTupleTable positioned before start")
+    pub fn get_datum<T: FromDatum + IntoDatum>(&self, ordinal: i32) -> Result<Option<T>, Error> {
+        if self.current < 0 || self.current as usize >= self.size {
+            return Err(Error::InvalidPosition);
         }
-        if self.current as usize >= self.size {
-            None
-        } else {
-            match self.tupdesc {
-                Some(tupdesc) => unsafe {
-                    let natts = (*tupdesc).natts;
+        match self.tupdesc {
+            Some(tupdesc) => unsafe {
+                let natts = (*tupdesc).natts;
 
-                    if ordinal < 1 || ordinal > natts {
-                        None
-                    } else {
-                        let heap_tuple = std::slice::from_raw_parts((*self.table).vals, self.size)
-                            [self.current as usize];
-                        let mut is_null = false;
-                        let datum =
-                            pg_sys::SPI_getbinval(heap_tuple, tupdesc, ordinal, &mut is_null);
+                if ordinal < 1 || ordinal > natts {
+                    return Err(Error::InvalidIndex(ordinal));
+                } else {
+                    let heap_tuple = std::slice::from_raw_parts((*self.table).vals, self.size)
+                        [self.current as usize];
+                    let mut is_null = false;
+                    let datum = pg_sys::SPI_getbinval(heap_tuple, tupdesc, ordinal, &mut is_null);
 
-                        T::from_datum_in_memory_context(
-                            PgMemoryContexts::CurrentMemoryContext
-                                .parent()
-                                .expect("parent memory context is absent"),
-                            datum,
-                            is_null,
-                            pg_sys::SPI_gettypeid(tupdesc, ordinal),
-                        )
-                    }
-                },
-                None => panic!("TupDesc is NULL"),
-            }
+                    Ok(T::try_from_datum_in_memory_context(
+                        PgMemoryContexts::CurrentMemoryContext
+                            .parent()
+                            .expect("parent memory context is absent"),
+                        datum,
+                        is_null,
+                        pg_sys::SPI_gettypeid(tupdesc, ordinal),
+                    )?)
+                }
+            },
+            None => Err(Error::TupDescIsNull),
         }
     }
 

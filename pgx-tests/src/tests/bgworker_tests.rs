@@ -25,7 +25,7 @@ pub extern "C" fn bgworker(arg: pg_sys::Datum) {
     if arg > 0 {
         BackgroundWorker::transaction(|| {
             Spi::run("CREATE TABLE tests.bgworker_test (v INTEGER);");
-            Spi::execute(|client| {
+            Spi::connect(|client| {
                 client.update(
                     "INSERT INTO tests.bgworker_test VALUES ($1);",
                     None,
@@ -64,13 +64,14 @@ pub extern "C" fn bgworker_return_value(arg: pg_sys::Datum) {
                 vec![(PgOid::BuiltIn(PgBuiltInOids::INT4OID), arg.into_datum())],
             )
         })
+        .expect("SPI failed")
         .unwrap()
     } else {
         0
     };
     while BackgroundWorker::wait_latch(Some(Duration::from_millis(100))) {}
     BackgroundWorker::transaction(|| {
-        Spi::execute(|c| {
+        Spi::connect(|c| {
             c.update(
                 "INSERT INTO tests.bgworker_test_return VALUES ($1)",
                 None,
@@ -104,11 +105,7 @@ mod tests {
         let handle = worker.terminate();
         handle.wait_for_shutdown().expect("aborted shutdown");
 
-        assert_eq!(
-            124,
-            Spi::get_one::<i32>("SELECT v FROM tests.bgworker_test;")
-                .expect("no return value from the worker")
-        );
+        assert_eq!(Ok(Some(124)), Spi::get_one::<i32>("SELECT v FROM tests.bgworker_test;"));
     }
 
     #[pg_test]
@@ -155,10 +152,6 @@ mod tests {
         let handle = worker.terminate();
         handle.wait_for_shutdown().expect("aborted shutdown");
 
-        assert_eq!(
-            123,
-            Spi::get_one::<i32>("SELECT v FROM tests.bgworker_test_return;")
-                .expect("no return value from the worker")
-        );
+        assert_eq!(Ok(Some(123)), Spi::get_one::<i32>("SELECT v FROM tests.bgworker_test_return;"));
     }
 }

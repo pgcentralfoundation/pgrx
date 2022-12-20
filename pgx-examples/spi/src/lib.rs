@@ -7,7 +7,7 @@ All rights reserved.
 Use of this source code is governed by the MIT license that can be found in the LICENSE file.
 */
 use pgx::prelude::*;
-use pgx::{info, IntoDatum};
+use pgx::{info, spi, IntoDatum};
 
 pgx::pg_module_magic!();
 
@@ -42,25 +42,20 @@ fn spi_return_query(
     #[cfg(feature = "pg15")]
     let query = "SELECT oid, relname::text || '-pg15' FROM pg_class";
 
-    let mut results = Vec::new();
-    Spi::connect(|client| {
-        client
-            .select(query, None, None)
-            .map(|row| (row["oid"].value(), row[2].value()))
-            .for_each(|tuple| results.push(tuple));
-        Ok(Some(()))
+    let results = Spi::connect(|client| {
+        client.select(query, None, None).map(|row| (row["oid"].value(), row[2].value()))
     });
 
-    TableIterator::new(results.into_iter())
+    TableIterator::new(results)
 }
 
 #[pg_extern(immutable, parallel_safe)]
-fn spi_query_random_id() -> Option<i64> {
+fn spi_query_random_id() -> Result<Option<i64>, pgx::spi::Error> {
     Spi::get_one("SELECT id FROM spi.spi_example ORDER BY random() LIMIT 1")
 }
 
 #[pg_extern]
-fn spi_query_title(title: &str) -> Option<i64> {
+fn spi_query_title(title: &str) -> Result<Option<i64>, pgx::spi::Error> {
     Spi::get_one_with_args(
         "SELECT id FROM spi.spi_example WHERE title = $1;",
         vec![(PgBuiltInOids::TEXTOID.oid(), title.into_datum())],
@@ -68,7 +63,7 @@ fn spi_query_title(title: &str) -> Option<i64> {
 }
 
 #[pg_extern]
-fn spi_query_by_id(id: i64) -> Option<String> {
+fn spi_query_by_id(id: i64) -> Result<Option<String>, spi::Error> {
     let (returned_id, title) = Spi::connect(|client| {
         let tuptable = client
             .select(
@@ -78,24 +73,19 @@ fn spi_query_by_id(id: i64) -> Option<String> {
             )
             .first();
 
-        Ok(Some(tuptable.get_two::<i64, String>()))
-    })
-    .unwrap();
+        tuptable.get_two::<i64, String>()
+    })?;
 
-    if returned_id.is_some() {
-        info!("id={}", returned_id.unwrap());
-    }
-
-    title
+    info!("id={:?}", returned_id);
+    Ok(title)
 }
 
 #[pg_extern]
-fn spi_insert_title(title: &str) -> i64 {
+fn spi_insert_title(title: &str) -> Result<Option<i64>, spi::Error> {
     Spi::get_one_with_args(
         "INSERT INTO spi.spi_example(title) VALUES ($1) RETURNING id",
         vec![(PgBuiltInOids::TEXTOID.oid(), title.into_datum())],
     )
-    .expect("INSERT into spi_example returned NULL")
 }
 
 #[pg_extern]
@@ -105,7 +95,8 @@ fn spi_insert_title2(
     let tuple = Spi::get_two_with_args(
         "INSERT INTO spi.spi_example(title) VALUES ($1) RETURNING id, title",
         vec![(PgBuiltInOids::TEXTOID.oid(), title.into_datum())],
-    );
+    )
+    .unwrap();
 
     TableIterator::once(tuple)
 }
@@ -127,15 +118,14 @@ mod tests {
 
     #[pg_test]
     fn test_spi_query_by_id_direct() {
-        assert_eq!(Some("This is a test".to_string()), spi_query_by_id(1))
+        assert_eq!(Ok(Some("This is a test".to_string())), spi_query_by_id(1));
     }
 
     #[pg_test]
     fn test_spi_query_by_id_via_spi() {
-        let result =
-            Spi::get_one::<&str>("SELECT spi.spi_query_by_id(1)").expect("SPI result was NULL");
+        let result = Spi::get_one::<&str>("SELECT spi.spi_query_by_id(1)");
 
-        assert_eq!("This is a test", result)
+        assert_eq!(Ok(Some("This is a test")), result);
     }
 }
 

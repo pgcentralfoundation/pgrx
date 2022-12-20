@@ -48,12 +48,12 @@ mod tests {
 
     #[pg_test]
     fn test_return_some_optional_result() {
-        assert_eq!(Some(42), Spi::get_one::<i32>("SELECT tests.return_some_optional_result()"));
+        assert_eq!(Ok(Some(42)), Spi::get_one::<i32>("SELECT tests.return_some_optional_result()"));
     }
 
     #[pg_test]
     fn test_return_none_optional_result() {
-        assert_eq!(None, Spi::get_one::<i32>("SELECT tests.return_none_optional_result()"));
+        assert_eq!(Ok(None), Spi::get_one::<i32>("SELECT tests.return_none_optional_result()"));
     }
 
     #[pg_test(error = "error!")]
@@ -72,7 +72,7 @@ mod tests {
     }
 
     #[pg_test(error = "got proper sql errorcode")]
-    fn test_proper_sql_errcode() -> Option<i32> {
+    fn test_proper_sql_errcode() -> Result<Option<i32>, pgx::spi::Error> {
         PgTryBuilder::new(|| Spi::get_one::<i32>("SELECT tests.return_eyre_result_error()"))
             .catch_when(PgSqlErrorCode::ERRCODE_DATA_EXCEPTION, |_| {
                 panic!("got proper sql errorcode")

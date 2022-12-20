@@ -503,12 +503,7 @@ impl<T: FromDatum> FromDatum for Vec<Option<T>> {
             None
         } else {
             let array = Array::<T>::from_polymorphic_datum(datum, is_null, typoid).unwrap();
-            let mut v = Vec::with_capacity(array.len());
-
-            for element in array.iter() {
-                v.push(element)
-            }
-            Some(v)
+            Some(array.iter().collect::<Vec<_>>())
         }
     }
 }
