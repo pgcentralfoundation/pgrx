@@ -307,17 +307,16 @@ mod tests {
     }
 
     #[pg_test]
-    fn test_open_multiple_tuptables() -> Result<(), pgx::spi::Error> {
+    fn test_open_multiple_tuptables() {
         // Regression test to ensure a new `SpiTupTable` instance does not override the
         // effective length of an already open one due to misuse of Spi statics
-        Spi::connect(|client| {
+        Spi::execute(|client| {
             let a = client.select("SELECT 1", None, None).first();
             let _b = client.select("SELECT 1 WHERE 'f'", None, None);
             assert!(!a.is_empty());
             assert_eq!(1, a.len());
             assert!(a.get_heap_tuple().is_some());
-            assert_eq!(Some(1), a.get_datum::<i32>(1)?);
-            Ok(())
+            assert_eq!(Ok(Some(1)), a.get_datum::<i32>(1));
         })
     }
 
