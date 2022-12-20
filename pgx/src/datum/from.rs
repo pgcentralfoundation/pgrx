@@ -446,6 +446,7 @@ impl FromDatum for Vec<u8> {
     }
 }
 
+/// for VOID -- always converts to `Some(())`, even if the "is_null" argument is true
 impl FromDatum for () {
     #[inline]
     unsafe fn from_polymorphic_datum(
