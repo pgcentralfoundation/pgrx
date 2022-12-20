@@ -12,6 +12,16 @@ mod tests {
     }
 
     #[pg_extern]
+    fn return_some_optional_result() -> Result<Option<i32>, Infallible> {
+        Ok(Some(42))
+    }
+
+    #[pg_extern]
+    fn return_none_optional_result() -> Result<Option<i32>, Infallible> {
+        Ok(None)
+    }
+
+    #[pg_extern]
     fn return_some_error() -> Result<i32, Box<dyn std::error::Error>> {
         Err("error!".into())
     }
@@ -34,6 +44,16 @@ mod tests {
     #[pg_test]
     fn test_return_result() {
         Spi::get_one::<i32>("SELECT tests.return_result()").expect("SPI returned NULL");
+    }
+
+    #[pg_test]
+    fn test_return_some_optional_result() {
+        assert_eq!(Some(42), Spi::get_one::<i32>("SELECT tests.return_some_optional_result()"));
+    }
+
+    #[pg_test]
+    fn test_return_none_optional_result() {
+        assert_eq!(None, Spi::get_one::<i32>("SELECT tests.return_none_optional_result()"));
     }
 
     #[pg_test(error = "error!")]
