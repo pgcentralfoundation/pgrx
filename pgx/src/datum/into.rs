@@ -418,7 +418,7 @@ impl IntoDatum for () {
     }
 
     fn type_oid() -> u32 {
-        pg_sys::BOOLOID
+        pg_sys::VOIDOID
     }
 }
 
