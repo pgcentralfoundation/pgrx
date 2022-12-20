@@ -227,6 +227,7 @@ impl<'a> Query for &'a str {
         limit: Option<i64>,
         arguments: Self::Arguments,
     ) -> Self::Result {
+        // SAFETY: no concurrent access
         unsafe {
             pg_sys::SPI_tuptable = std::ptr::null_mut();
         }
@@ -240,6 +241,7 @@ impl<'a> Query for &'a str {
                 let (mut datums, nulls): (Vec<_>, Vec<_>) =
                     data.into_iter().map(prepare_datum).unzip();
 
+                // SAFETY: arguments are prepared above
                 unsafe {
                     pg_sys::SPI_execute_with_args(
                         src.as_ptr(),
@@ -252,6 +254,7 @@ impl<'a> Query for &'a str {
                     )
                 }
             }
+            // SAFETY: arguments are prepared above
             None => unsafe { pg_sys::SPI_execute(src.as_ptr(), read_only, limit.unwrap_or(0)) },
         };
 
@@ -271,6 +274,7 @@ impl<'a> Query for &'a str {
         let mut argtypes = types.into_iter().map(PgOid::value).collect::<Vec<_>>();
         let (mut datums, nulls): (Vec<_>, Vec<_>) = data.into_iter().map(prepare_datum).unzip();
 
+        // SAFETY: arguments are prepared above
         let ptr = NonNull::new(unsafe {
             pg_sys::SPI_cursor_open_with_args(
                 std::ptr::null_mut(), // let postgres assign a name
@@ -480,8 +484,10 @@ impl<'a> SpiClient<'a> {
     fn prepare_tuple_table(status_code: i32) -> SpiTupleTable {
         SpiTupleTable {
             status_code: Spi::check_status(status_code),
+            // SAFETY: no concurrent access
             table: unsafe { pg_sys::SPI_tuptable },
             size: unsafe { pg_sys::SPI_processed as usize },
+            // SAFETY: no concurrent access
             tupdesc: if unsafe { pg_sys::SPI_tuptable }.is_null() {
                 None
             } else {
@@ -703,6 +709,7 @@ impl<'a> PreparedStatement<'a> {
     ///
     /// These statements have static lifetime and are freed only when dropped
     pub fn keep(&self) -> OwnedPreparedStatement {
+        // SAFETY: self.plan is initialized in `SpiClient::prepare`
         unsafe {
             pg_sys::SPI_keepplan(self.plan);
         }
@@ -721,6 +728,7 @@ impl<'a: 'b, 'b> Query for &'b PreparedStatement<'a> {
         limit: Option<i64>,
         arguments: Self::Arguments,
     ) -> Self::Result {
+        // SAFETY: no concurrent access
         unsafe {
             pg_sys::SPI_tuptable = std::ptr::null_mut();
         }
@@ -735,6 +743,7 @@ impl<'a: 'b, 'b> Query for &'b PreparedStatement<'a> {
 
         let (mut datums, mut nulls): (Vec<_>, Vec<_>) = args.into_iter().map(prepare_datum).unzip();
 
+        // SAFETY: all arguments are prepared above
         let status_code = unsafe {
             pg_sys::SPI_execute_plan(
                 self.plan,
@@ -757,6 +766,7 @@ impl<'a: 'b, 'b> Query for &'b PreparedStatement<'a> {
 
         let (mut datums, nulls): (Vec<_>, Vec<_>) = args.into_iter().map(prepare_datum).unzip();
 
+        // SAFETY: all arguments are prepared above
         let ptr = NonNull::new(unsafe {
             pg_sys::SPI_cursor_open(
                 std::ptr::null_mut(), // let postgres assign a name
@@ -801,6 +811,7 @@ impl<'a> SpiClient<'a> {
         let args = args.unwrap_or_default();
         let nargs = args.len();
 
+        // SAFETY: all arguments are prepared above
         let plan = unsafe {
             pg_sys::SPI_prepare(
                 src.as_ptr(),
