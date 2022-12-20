@@ -88,7 +88,7 @@ impl Display for ErrorReport {
         if let Some(detail) = &self.detail {
             write!(f, "\nDETAIL: {}", detail)?;
         }
-        write!(f, "{}", self.location)
+        write!(f, "\nLOCATION: {}", self.location)
     }
 }
 
