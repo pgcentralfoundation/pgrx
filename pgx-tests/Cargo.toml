@@ -48,6 +48,9 @@ time = "0.3.17"
 eyre = "0.6.8"
 thiserror = "1.0"
 
+[dev-dependencies]
+eyre = "0.6.8"  # testing functions that return `eyre::Result`
+
 [dependencies.pgx]
 path = "../pgx"
 default-features = false

@@ -38,6 +38,7 @@ mod pgbox_tests;
 mod pgx_module_qualification;
 mod postgres_type_tests;
 mod range_tests;
+mod result_tests;
 mod schema_tests;
 mod shmem_tests;
 mod spi_tests;
