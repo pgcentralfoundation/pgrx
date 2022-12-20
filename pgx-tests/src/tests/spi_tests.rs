@@ -307,27 +307,32 @@ mod tests {
     }
 
     #[pg_test]
-    fn test_open_multiple_tuptables() {
-        Spi::execute(|client| {
+    fn test_open_multiple_tuptables() -> Result<(), pgx::spi::Error> {
+        // Regression test to ensure a new `SpiTupTable` instance does not override the
+        // effective length of an already open one due to misuse of Spi statics
+        Spi::connect(|client| {
             let a = client.select("SELECT 1", None, None).first();
             let _b = client.select("SELECT 1 WHERE 'f'", None, None);
             assert!(!a.is_empty());
             assert_eq!(1, a.len());
             assert!(a.get_heap_tuple().is_some());
-            assert_eq!(1, a.get_datum::<i32>(1).expect("a.get_datum::<i32>(1) failed").unwrap());
-        });
+            assert_eq!(Some(1), a.get_datum::<i32>(1)?);
+            Ok(())
+        })
     }
 
     #[pg_test]
-    #[ignore = "come back to this test"]
     fn test_open_multiple_tuptables_rev() {
+        // Regression test to ensure a new `SpiTupTable` instance does not override the
+        // effective length of an already open one.
+        // Same as `test_open_multiple_tuptables`, but with the second tuptable being empty
         Spi::execute(|client| {
             let a = client.select("SELECT 1 WHERE 'f'", None, None).first();
             let _b = client.select("SELECT 1", None, None);
             assert!(a.is_empty());
             assert_eq!(0, a.len());
             assert!(a.get_heap_tuple().is_none());
-            assert!(a.get_datum::<i32>(1).expect("a.get_datum::<i32>(1) failed").is_none());
+            assert_eq!(Err(pgx::spi::Error::InvalidPosition), a.get_datum::<i32>(1));
         });
     }
 

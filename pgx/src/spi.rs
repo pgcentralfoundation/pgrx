@@ -110,7 +110,7 @@ impl TryFrom<libc::c_int> for SpiError {
     }
 }
 
-#[derive(thiserror::Error, Debug)]
+#[derive(thiserror::Error, Debug, PartialEq)]
 pub enum Error {
     #[error("SPI error: {0:?}")]
     SpiError(#[from] SpiError),
