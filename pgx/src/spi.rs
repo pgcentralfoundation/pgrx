@@ -209,6 +209,13 @@ impl<'a> Query for &'a String {
     }
 }
 
+fn prepare_datum(datum: Option<pg_sys::Datum>) -> (pg_sys::Datum, std::os::raw::c_char) {
+    match datum {
+        Some(datum) => (datum, ' ' as std::os::raw::c_char),
+        None => (pg_sys::Datum::from(0usize), 'n' as std::os::raw::c_char),
+    }
+}
+
 impl<'a> Query for &'a str {
     type Arguments = Option<Vec<(PgOid, Option<pg_sys::Datum>)>>;
     type Result = SpiTupleTable;
@@ -228,27 +235,10 @@ impl<'a> Query for &'a str {
         let status_code = match arguments {
             Some(args) => {
                 let nargs = args.len();
-                let mut argtypes = vec![];
-                let mut datums = vec![];
-                let mut nulls = vec![];
-
-                for (argtype, datum) in args {
-                    argtypes.push(argtype.value());
-
-                    match datum {
-                        Some(datum) => {
-                            // ' ' here means that the datum is not null
-                            datums.push(datum);
-                            nulls.push(' ' as std::os::raw::c_char);
-                        }
-
-                        None => {
-                            // 'n' here means that the datum is null
-                            datums.push(pg_sys::Datum::from(0usize));
-                            nulls.push('n' as std::os::raw::c_char);
-                        }
-                    }
-                }
+                let (types, data): (Vec<_>, Vec<_>) = args.into_iter().unzip();
+                let mut argtypes = types.into_iter().map(PgOid::value).collect::<Vec<_>>();
+                let (mut datums, nulls): (Vec<_>, Vec<_>) =
+                    data.into_iter().map(prepare_datum).unzip();
 
                 unsafe {
                     pg_sys::SPI_execute_with_args(
@@ -277,27 +267,9 @@ impl<'a> Query for &'a str {
         let args = args.unwrap_or_default();
 
         let nargs = args.len();
-        let mut argtypes = vec![];
-        let mut datums = vec![];
-        let mut nulls = vec![];
-
-        for (argtype, datum) in args {
-            argtypes.push(argtype.value());
-
-            match datum {
-                Some(datum) => {
-                    // ' ' here means that the datum is not null
-                    datums.push(datum);
-                    nulls.push(' ' as std::os::raw::c_char);
-                }
-
-                None => {
-                    // 'n' here means that the datum is null
-                    datums.push(pg_sys::Datum::from(0usize));
-                    nulls.push('n' as std::os::raw::c_char);
-                }
-            }
-        }
+        let (types, data): (Vec<_>, Vec<_>) = args.into_iter().unzip();
+        let mut argtypes = types.into_iter().map(PgOid::value).collect::<Vec<_>>();
+        let (mut datums, nulls): (Vec<_>, Vec<_>) = data.into_iter().map(prepare_datum).unzip();
 
         let ptr = NonNull::new(unsafe {
             pg_sys::SPI_cursor_open_with_args(
@@ -762,30 +734,15 @@ impl<'a: 'b, 'b> Query for &'b PreparedStatement<'a> {
             pg_sys::SPI_tuptable = std::ptr::null_mut();
         }
         let args = arguments.unwrap_or_default();
-        let mut datums = vec![];
-        let mut nulls = vec![];
         let nargs = args.len();
+
         let expected = unsafe { pg_sys::SPI_getargcount(self.plan) } as usize;
 
         if nargs != expected {
             return Err(PreparedStatementError::ArgumentCountMismatch { expected, got: nargs });
         }
 
-        for datum in args {
-            match datum {
-                Some(datum) => {
-                    // ' ' here means that the datum is not null
-                    datums.push(datum);
-                    nulls.push(' ' as std::os::raw::c_char);
-                }
-
-                None => {
-                    // 'n' here means that the datum is null
-                    datums.push(pg_sys::Datum::from(0usize));
-                    nulls.push('n' as std::os::raw::c_char);
-                }
-            }
-        }
+        let (mut datums, mut nulls): (Vec<_>, Vec<_>) = args.into_iter().map(prepare_datum).unzip();
 
         let status_code = unsafe {
             pg_sys::SPI_execute_plan(
@@ -807,24 +764,7 @@ impl<'a: 'b, 'b> Query for &'b PreparedStatement<'a> {
     ) -> Result<SpiCursor<'c>, Error> {
         let args = args.unwrap_or_default();
 
-        let mut datums = vec![];
-        let mut nulls = vec![];
-
-        for datum in args {
-            match datum {
-                Some(datum) => {
-                    // ' ' here means that the datum is not null
-                    datums.push(datum);
-                    nulls.push(' ' as std::os::raw::c_char);
-                }
-
-                None => {
-                    // 'n' here means that the datum is null
-                    datums.push(pg_sys::Datum::from(0usize));
-                    nulls.push('n' as std::os::raw::c_char);
-                }
-            }
-        }
+        let (mut datums, nulls): (Vec<_>, Vec<_>) = args.into_iter().map(prepare_datum).unzip();
 
         let ptr = NonNull::new(unsafe {
             pg_sys::SPI_cursor_open(
