@@ -6,6 +6,7 @@ A trait denoting a type can possibly be mapped to an SQL type
 to the `pgx` framework and very subject to change between versions. While you may use this, please do it with caution.
 
 */
+use std::any::Any;
 use std::error::Error;
 use std::fmt::Display;
 
@@ -109,7 +110,7 @@ pub unsafe trait SqlTranslatable {
 
 unsafe impl<E> SqlTranslatable for Result<(), E>
 where
-    E: Display,
+    E: Any + Display,
 {
     fn argument_sql() -> Result<SqlMapping, ArgumentError> {
         Err(ArgumentError::NotValidAsArgument("()"))
@@ -153,7 +154,7 @@ where
 unsafe impl<T, E> SqlTranslatable for Result<T, E>
 where
     T: SqlTranslatable,
-    E: Display,
+    E: Any + Display,
 {
     fn argument_sql() -> Result<SqlMapping, ArgumentError> {
         T::argument_sql()

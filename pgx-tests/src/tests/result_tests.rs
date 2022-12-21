@@ -3,6 +3,7 @@
 mod tests {
     #[allow(unused_imports)]
     use crate as pgx_tests;
+    use pgx::pg_sys::panic::ErrorReport;
     use pgx::prelude::*;
     use std::convert::Infallible;
 
@@ -34,6 +35,15 @@ mod tests {
     #[pg_extern]
     fn return_eyre_result_error() -> eyre::Result<i32> {
         Err(eyre::eyre!("error!"))
+    }
+
+    #[pg_extern]
+    fn return_error_report() -> Result<(), ErrorReport> {
+        Err(ErrorReport::new(
+            PgSqlErrorCode::ERRCODE_NO_DATA,
+            "raised custom ereport",
+            function_name!(),
+        ))
     }
 
     #[pg_test(error = "No such file or directory (os error 2)")]
@@ -78,5 +88,21 @@ mod tests {
                 panic!("got proper sql errorcode")
             })
             .execute()
+    }
+
+    #[pg_test(error = "got proper sql errorcode")]
+    fn test_proper_sql_errcode_from_error_report() -> Result<Option<i32>, pgx::spi::Error> {
+        PgTryBuilder::new(|| Spi::get_one::<i32>("SELECT tests.return_error_report()"))
+            .catch_when(PgSqlErrorCode::ERRCODE_NO_DATA, |_| panic!("got proper sql errorcode"))
+            .execute()
+    }
+
+    #[pg_test(error = "raised custom ereport")]
+    fn test_custom_ereport() -> Result<(), ErrorReport> {
+        Err(ErrorReport::new(
+            PgSqlErrorCode::ERRCODE_NO_DATA,
+            "raised custom ereport",
+            function_name!(),
+        ))
     }
 }

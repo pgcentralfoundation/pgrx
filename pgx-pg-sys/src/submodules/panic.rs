@@ -79,6 +79,19 @@ pub struct ErrorReport {
     pub(crate) location: ErrorReportLocation,
 }
 
+impl Display for ErrorReport {
+    fn fmt(&self, f: &mut Formatter<'_>) -> std::fmt::Result {
+        write!(f, "{}: {}", self.sqlerrcode, self.message)?;
+        if let Some(hint) = &self.hint {
+            write!(f, "\nHINT: {}", hint)?;
+        }
+        if let Some(detail) = &self.detail {
+            write!(f, "\nDETAIL: {}", detail)?;
+        }
+        write!(f, "\nLOCATION: {}", self.location)
+    }
+}
+
 #[derive(Clone, Debug)]
 pub struct ErrorReportWithLevel {
     pub(crate) level: PgLogLevel,

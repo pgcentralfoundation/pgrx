@@ -14,8 +14,10 @@ Use of this source code is governed by the MIT license that can be found in the 
 
 use crate::{pg_sys, rust_regtypein, PgBox, PgOid, WhoAllocated};
 use core::fmt::Display;
+use pgx_pg_sys::elog::PgLogLevel;
 use pgx_pg_sys::errcodes::PgSqlErrorCode;
 use pgx_pg_sys::{ereport, Datum, Oid};
+use std::any::Any;
 
 /// Convert a Rust type into a `pg_sys::Datum`.
 ///
@@ -93,20 +95,31 @@ where
 impl<T, E> IntoDatum for Result<T, E>
 where
     T: IntoDatum,
-    E: Display,
+    E: Any + Display,
 {
     /// Returns The `Option<pg_sys::Datum>` representation of this Result's `Ok` variant.
     ///
     /// ## Panics
     ///
     /// If this Result represents an error, then that error is raised as a Postgres ERROR, using
-    /// the [`PgSqlErrorCode::ERRCODE_DATA_EXCEPTION`] error code
+    /// the [`PgSqlErrorCode::ERRCODE_DATA_EXCEPTION`] error code.
+    ///
+    /// If we detect that the `Err()` variant contains `[pg_sys::panic::ErrorReport]`, then we
+    /// directly raise that as the error.  This enables users to set a specific "sql error code"
+    /// for a returned error, along with providing the HINT and DETAIL lines of the error.
     #[inline]
     fn into_datum(self) -> Option<Datum> {
         match self {
             Ok(v) => v.into_datum(),
             Err(e) => {
-                ereport!(ERROR, PgSqlErrorCode::ERRCODE_DATA_EXCEPTION, &format!("{}", e));
+                let any: Box<&dyn Any> = Box::new(&e);
+                if any.downcast_ref::<pg_sys::panic::ErrorReport>().is_some() {
+                    let any: Box<dyn Any> = Box::new(e);
+                    any.downcast::<pg_sys::panic::ErrorReport>().unwrap().report(PgLogLevel::ERROR);
+                    unreachable!();
+                } else {
+                    ereport!(ERROR, PgSqlErrorCode::ERRCODE_DATA_EXCEPTION, &format!("{}", e));
+                }
             }
         }
     }
