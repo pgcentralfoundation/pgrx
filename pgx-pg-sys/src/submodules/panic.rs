@@ -22,6 +22,42 @@ use crate::elog::PgLogLevel;
 use crate::errcodes::PgSqlErrorCode;
 use crate::{pfree, AsPgCStr, MemoryContextSwitchTo};
 
+/// Indicates that something can be reported as a Postgres ERROR, if that's what it might represent.
+pub trait ErrorReportable {
+    type Inner;
+
+    /// Raise a Postgres ERROR if appropriate, otherwise return a value
+    fn report(self) -> Self::Inner;
+}
+
+impl<T, E> ErrorReportable for Result<T, E>
+where
+    E: Any + Display,
+{
+    type Inner = T;
+
+    /// If this [`Result`] represents the `Ok` variant, that value is returned.
+    ///
+    /// If this [`Result`] represents the `Err` variant, raise it as an error.  If it happens to
+    /// be an [`ErrorReport`], then that is specifically raised.  Otherwise it's just a general
+    /// [`ereport!`] as a [`PgLogLevel::ERROR`].
+    fn report(self) -> Self::Inner {
+        match self {
+            Ok(value) => value,
+            Err(e) => {
+                let any: Box<&dyn Any> = Box::new(&e);
+                if any.downcast_ref::<ErrorReport>().is_some() {
+                    let any: Box<dyn Any> = Box::new(e);
+                    any.downcast::<ErrorReport>().unwrap().report(PgLogLevel::ERROR);
+                    unreachable!();
+                } else {
+                    ereport!(ERROR, PgSqlErrorCode::ERRCODE_DATA_EXCEPTION, &format!("{}", e));
+                }
+            }
+        }
+    }
+}
+
 #[derive(Clone, Debug)]
 pub struct ErrorReportLocation {
     pub(crate) file: String,

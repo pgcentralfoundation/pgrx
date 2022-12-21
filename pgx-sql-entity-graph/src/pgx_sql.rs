@@ -832,7 +832,7 @@ fn initialize_externs(
                     });
                 }
             }
-            PgExternReturnEntity::Iterated { tys: iterated_returns, optional: _ } => {
+            PgExternReturnEntity::Iterated { tys: iterated_returns, optional: _, result: _ } => {
                 for PgExternReturnEntityIteratedItem { ty: return_ty_entity, .. } in
                     iterated_returns
                 {
@@ -1025,7 +1025,7 @@ fn connect_externs(
                     }
                 }
             }
-            PgExternReturnEntity::Iterated { tys: iterated_returns, optional: _ } => {
+            PgExternReturnEntity::Iterated { tys: iterated_returns, optional: _, result: _ } => {
                 for PgExternReturnEntityIteratedItem { ty: type_entity, .. } in iterated_returns {
                     let mut found = false;
                     for (ty_item, &ty_index) in types {

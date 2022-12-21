@@ -14,9 +14,8 @@ Use of this source code is governed by the MIT license that can be found in the 
 
 use crate::{pg_sys, rust_regtypein, PgBox, PgOid, WhoAllocated};
 use core::fmt::Display;
-use pgx_pg_sys::elog::PgLogLevel;
-use pgx_pg_sys::errcodes::PgSqlErrorCode;
-use pgx_pg_sys::{ereport, Datum, Oid};
+use pgx_pg_sys::panic::ErrorReportable;
+use pgx_pg_sys::{Datum, Oid};
 use std::any::Any;
 
 /// Convert a Rust type into a `pg_sys::Datum`.
@@ -109,19 +108,7 @@ where
     /// for a returned error, along with providing the HINT and DETAIL lines of the error.
     #[inline]
     fn into_datum(self) -> Option<Datum> {
-        match self {
-            Ok(v) => v.into_datum(),
-            Err(e) => {
-                let any: Box<&dyn Any> = Box::new(&e);
-                if any.downcast_ref::<pg_sys::panic::ErrorReport>().is_some() {
-                    let any: Box<dyn Any> = Box::new(e);
-                    any.downcast::<pg_sys::panic::ErrorReport>().unwrap().report(PgLogLevel::ERROR);
-                    unreachable!();
-                } else {
-                    ereport!(ERROR, PgSqlErrorCode::ERRCODE_DATA_EXCEPTION, &format!("{}", e));
-                }
-            }
-        }
+        self.report().into_datum()
     }
 
     #[inline]

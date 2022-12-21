@@ -46,6 +46,28 @@ mod tests {
         ))
     }
 
+    #[pg_extern]
+    fn return_result_table_iterator(
+    ) -> Result<TableIterator<'static, (name!(a, i32), name!(b, i32))>, pgx::spi::Error> {
+        Ok(TableIterator::new(std::iter::once((1, 2))))
+    }
+
+    #[pg_extern]
+    fn return_result_table_iterator_error(
+    ) -> Result<TableIterator<'static, (name!(a, i32), name!(b, i32))>, pgx::spi::Error> {
+        Err(pgx::spi::Error::InvalidPosition)
+    }
+
+    #[pg_extern]
+    fn return_result_set_of() -> Result<SetOfIterator<'static, i32>, pgx::spi::Error> {
+        Ok(SetOfIterator::new(std::iter::once(1)))
+    }
+
+    #[pg_extern]
+    fn return_result_set_of_error() -> Result<SetOfIterator<'static, i32>, pgx::spi::Error> {
+        Err(pgx::spi::Error::InvalidPosition)
+    }
+
     #[pg_test(error = "No such file or directory (os error 2)")]
     fn test_return_io_error() -> Result<(), std::io::Error> {
         std::fs::read("/tmp/i-sure-hope-this-doest-exist.pgx-tests::test_result_result").map(|_| ())
@@ -104,5 +126,25 @@ mod tests {
             "raised custom ereport",
             function_name!(),
         ))
+    }
+
+    #[pg_test]
+    fn test_return_result_table_iterator() {
+        Spi::run("SELECT * FROM tests.return_result_table_iterator()")
+    }
+
+    #[pg_test(error = "SpiTupleTable positioned before the start or after the end")]
+    fn test_return_result_table_iterator_error() {
+        Spi::run("SELECT * FROM tests.return_result_table_iterator_error()")
+    }
+
+    #[pg_test]
+    fn test_return_result_set_of() {
+        Spi::run("SELECT * FROM tests.return_result_set_of()")
+    }
+
+    #[pg_test(error = "SpiTupleTable positioned before the start or after the end")]
+    fn test_return_result_set_of_error() {
+        Spi::run("SELECT * FROM tests.return_result_set_of_error()")
     }
 }
