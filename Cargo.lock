@@ -1537,6 +1537,7 @@ dependencies = [
  "petgraph",
  "proc-macro2",
  "quote",
+ "regex",
  "seq-macro",
  "syn",
  "syntect",

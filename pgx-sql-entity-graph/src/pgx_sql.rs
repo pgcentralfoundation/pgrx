@@ -465,7 +465,23 @@ impl PgxSql {
     }
 
     pub fn source_only_to_sql_type(&self, ty_source: &str) -> Option<String> {
-        self.source_mappings.get(ty_source).map(|f| f.sql.clone())
+        // HACK for `Result<T, E>` -- we replace the `E` with an underscore
+        // specifically, this is the cases where we need to use the `map_source_only!()` macro to
+        // create a Rust type to SQL type mapping.  As of this writing that's only for the `pg_sys::Oid`
+        // type, but we'll do our best to generalize this.
+        //
+        // What we want to do is rewrite any kind of `Result<T,E>` pattern into `Result<T,_>`, which
+        // is how the `map_source_only!()` macro does it.
+        let pattern = regex::Regex::new("Result<(.*),\\s*.*?>").expect("invalid regex pattern");
+        let ty_source = match pattern.captures(ty_source) {
+            Some(captures) => {
+                let rust_type = captures.get(1).unwrap();
+                format!("Result<{},_>", rust_type.as_str())
+            }
+            None => ty_source.to_string(),
+        };
+
+        self.source_mappings.get(&ty_source).map(|f| f.sql.clone())
     }
 
     pub fn get_module_pathname(&self) -> String {
