@@ -289,7 +289,7 @@ impl ToSql for PgExternEntity {
                         full_path = ty.full_path
                     )
                 }
-                PgExternReturnEntity::SetOf { ty, optional: _ } => {
+                PgExternReturnEntity::SetOf { ty, optional: _, result: _ } => {
                     let graph_index = context
                         .graph
                         .neighbors_undirected(self_index)
@@ -325,7 +325,7 @@ impl ToSql for PgExternEntity {
                         full_path = ty.full_path
                     )
                 }
-                PgExternReturnEntity::Iterated { tys: table_items, optional: _ } => {
+                PgExternReturnEntity::Iterated { tys: table_items, optional: _, result: _ } => {
                     let mut items = String::new();
                     let metadata_retval = self.metadata.retval.clone().ok_or_else(|| eyre!("Macro expansion time and SQL resolution time had differing opinions about the return value existing"))?;
                     let metadata_retval_sqls = match metadata_retval.return_sql {

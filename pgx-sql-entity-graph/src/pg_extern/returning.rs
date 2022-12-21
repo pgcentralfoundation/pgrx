@@ -32,8 +32,8 @@ pub struct ReturningIteratedItem {
 pub enum Returning {
     None,
     Type(UsedType),
-    SetOf { ty: UsedType, optional: bool },
-    Iterated { tys: Vec<ReturningIteratedItem>, optional: bool },
+    SetOf { ty: UsedType, optional: bool, result: bool },
+    Iterated { tys: Vec<ReturningIteratedItem>, optional: bool, result: bool },
     // /// Technically we don't ever create this, single triggers have their own macro.
     // Trigger,
 }
@@ -67,6 +67,7 @@ impl TryFrom<&syn::ReturnType> for Returning {
                     syn::Type::Path(mut typepath) => {
                         let path = &mut typepath.path;
                         let mut saw_option_ident = false;
+                        let mut saw_result_ident = false;
                         let mut saw_setof_iterator = false;
                         let mut saw_table_iterator = false;
 
@@ -74,17 +75,22 @@ impl TryFrom<&syn::ReturnType> for Returning {
                             let ident_string = segment.ident.to_string();
                             match ident_string.as_str() {
                                 "Option" => saw_option_ident = true,
+                                "Result" => saw_result_ident = true,
                                 "SetOfIterator" => saw_setof_iterator = true,
                                 "TableIterator" => saw_table_iterator = true,
                                 _ => (),
                             };
                         }
-                        if saw_option_ident || saw_setof_iterator || saw_table_iterator {
-                            let option_inner_path = if saw_option_ident {
+                        if saw_option_ident
+                            || saw_result_ident
+                            || saw_setof_iterator
+                            || saw_table_iterator
+                        {
+                            let option_inner_path = if saw_option_ident || saw_result_ident {
                                 match path.segments.last_mut().map(|s| &mut s.arguments) {
                                     Some(syn::PathArguments::AngleBracketed(args)) => {
                                         let args_span = args.span();
-                                        match args.args.last_mut() {
+                                        match args.args.first_mut() {
                                             Some(syn::GenericArgument::Type(syn::Type::Path(syn::TypePath { qself: _, path }))) => path.clone(),
                                             Some(syn::GenericArgument::Type(_)) => {
                                                 let used_ty = UsedType::new(syn::Type::Path(typepath.clone()))?;
@@ -121,6 +127,7 @@ impl TryFrom<&syn::ReturnType> for Returning {
                                     _ => (),
                                 };
                             }
+
                             if saw_setof_iterator {
                                 let last_path_segment = option_inner_path.segments.last();
                                 let (used_ty, optional) = match &last_path_segment.map(|ps| &ps.arguments) {
@@ -162,19 +169,23 @@ impl TryFrom<&syn::ReturnType> for Returning {
                                         ))
                                     }
                                 };
-                                Ok(Returning::SetOf { ty: used_ty, optional })
+                                Ok(Returning::SetOf {
+                                    ty: used_ty,
+                                    optional,
+                                    result: saw_result_ident,
+                                })
                             } else if saw_table_iterator {
-                                let iterator_path = if saw_option_ident {
+                                let iterator_path = if saw_option_ident || saw_result_ident {
                                     let inner_path =
-                                        match &mut path.segments.last_mut().unwrap().arguments {
+                                        match &mut path.segments.first_mut().unwrap().arguments {
                                             syn::PathArguments::AngleBracketed(args) => {
-                                                match args.args.last_mut().unwrap() {
+                                                match args.args.first_mut().unwrap() {
                                                     syn::GenericArgument::Type(syn::Type::Path(syn::TypePath { qself: _, path })) => path,
                                                     other => {
                                                         return Err(syn::Error::new(
                                                             other.span(),
                                                             &format!(
-                                                                "Got unexpected generic argument for Option inner: {other:?}"
+                                                                "Got unexpected generic argument for Option/Result inner: {other:?}"
                                                             ),
                                                         ))
                                                     }
@@ -184,7 +195,7 @@ impl TryFrom<&syn::ReturnType> for Returning {
                                                 return Err(syn::Error::new(
                                                     other.span(),
                                                     &format!(
-                                                        "Got unexpected path argument for Option inner: {other:?}"
+                                                        "Got unexpected path argument for Option/Result inner: {other:?}"
                                                     ),
                                                 ))
                                             }
@@ -291,6 +302,7 @@ impl TryFrom<&syn::ReturnType> for Returning {
                                 Ok(Returning::Iterated {
                                     tys: iterated_items,
                                     optional: saw_option_ident,
+                                    result: saw_result_ident,
                                 })
                             } else {
                                 let used_ty = UsedType::new(syn::Type::Path(typepath.clone()))?;
@@ -341,16 +353,17 @@ impl ToTokens for Returning {
                     }
                 }
             }
-            Returning::SetOf { ty: used_ty, optional } => {
+            Returning::SetOf { ty: used_ty, optional, result } => {
                 let used_ty_entity_tokens = used_ty.entity_tokens();
                 quote! {
                     ::pgx::pgx_sql_entity_graph::PgExternReturnEntity::SetOf {
                         ty: #used_ty_entity_tokens,
                         optional: #optional,
+                        result: #result
                     }
                 }
             }
-            Returning::Iterated { tys: items, optional } => {
+            Returning::Iterated { tys: items, optional, result } => {
                 let quoted_items = items
                     .iter()
                     .map(|ReturningIteratedItem { used_ty, name }| {
@@ -370,6 +383,7 @@ impl ToTokens for Returning {
                             #(#quoted_items),*
                         ],
                         optional: #optional,
+                        result: #result
                     }
                 }
             }

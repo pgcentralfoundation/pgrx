@@ -474,13 +474,18 @@ impl PgExtern {
                     }
                 }
             }
-            Returning::SetOf { ty: retval_ty, optional } => {
+            Returning::SetOf { ty: retval_ty, optional, result } => {
                 let result_ident = syn::Ident::new("result", self.func.sig.span());
                 let retval_ty_resolved = &retval_ty.original_ty;
                 let result_handler = if *optional {
                     // don't need unsafe annotations because of the larger unsafe block coming up
                     quote_spanned! { self.func.sig.span() =>
                         #func_name(#(#arg_pats),*)
+                    }
+                } else if *result {
+                    quote_spanned! { self.func.sig.span() =>
+                        use pgx::pg_sys::panic::ErrorReportable;
+                        Some(#func_name(#(#arg_pats),*).report())
                     }
                 } else {
                     quote_spanned! { self.func.sig.span() =>
@@ -556,7 +561,7 @@ impl PgExtern {
                     }
                 }
             }
-            Returning::Iterated { tys: retval_tys, optional } => {
+            Returning::Iterated { tys: retval_tys, optional, result } => {
                 let result_ident = syn::Ident::new("result", self.func.sig.span());
                 let funcctx_ident = syn::Ident::new("funcctx", self.func.sig.span());
                 let retval_tys_resolved = retval_tys.iter().map(|v| &v.used_ty.resolved_ty);
@@ -584,6 +589,13 @@ impl PgExtern {
                     // don't need unsafe annotations because of the larger unsafe block coming up
                     quote_spanned! { self.func.sig.span() =>
                         #func_name(#(#arg_pats),*)
+                    }
+                } else if *result {
+                    quote_spanned! { self.func.sig.span() =>
+                        {
+                            use ::pgx::pg_sys::panic::ErrorReportable;
+                            Some(#func_name(#(#arg_pats),*).report())
+                        }
                     }
                 } else {
                     quote_spanned! { self.func.sig.span() =>
