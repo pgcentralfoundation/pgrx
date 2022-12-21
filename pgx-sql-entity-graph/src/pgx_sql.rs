@@ -472,7 +472,7 @@ impl PgxSql {
         //
         // What we want to do is rewrite any kind of `Result<T,E>` pattern into `Result<T,_>`, which
         // is how the `map_source_only!()` macro does it.
-        let pattern = regex::Regex::new("Result<(.*?),\\s*.*?>").expect("invalid regex pattern");
+        let pattern = regex::Regex::new("Result<(.*),\\s*.*?>").expect("invalid regex pattern");
         let ty_source = match pattern.captures(ty_source) {
             Some(captures) => {
                 let rust_type = captures.get(1).unwrap();
