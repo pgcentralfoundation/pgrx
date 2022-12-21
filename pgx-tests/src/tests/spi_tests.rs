@@ -186,7 +186,7 @@ mod tests {
 
     #[pg_test]
     fn test_inserting_null() -> Result<(), pgx::spi::Error> {
-        Spi::connect(|client| {
+        Spi::connect(|mut client| {
             client.update("CREATE TABLE tests.null_test (id uuid)", None, None);
         });
         assert_eq!(
@@ -202,7 +202,7 @@ mod tests {
 
     #[pg_test]
     fn test_cursor() {
-        Spi::connect(|client| {
+        Spi::connect(|mut client| {
             client.update("CREATE TABLE tests.cursor_table (id int)", None, None);
             client.update(
                 "INSERT INTO tests.cursor_table (id) \
@@ -224,7 +224,7 @@ mod tests {
 
     #[pg_test]
     fn test_cursor_prepared_statement() -> Result<(), pgx::spi::Error> {
-        Spi::connect(|client| {
+        Spi::connect(|mut client| {
             client.update("CREATE TABLE tests.cursor_table (id int)", None, None);
             client.update(
                 "INSERT INTO tests.cursor_table (id) \
@@ -248,7 +248,7 @@ mod tests {
 
     #[pg_test]
     fn test_cursor_by_name() -> Result<(), pgx::spi::Error> {
-        let cursor_name = Spi::connect(|client| {
+        let cursor_name = Spi::connect(|mut client| {
             client.update("CREATE TABLE tests.cursor_table (id int)", None, None);
             client.update(
                 "INSERT INTO tests.cursor_table (id) \
@@ -308,7 +308,7 @@ mod tests {
             assert_eq!(res.column_name(2).unwrap(), "b");
         });
 
-        Spi::connect(|client| {
+        Spi::connect(|mut client| {
             let res = client.update("SET TIME ZONE 'PST8PDT'", None, None);
 
             assert_eq!(0, res.columns());
@@ -324,7 +324,7 @@ mod tests {
     #[pg_test]
     fn test_spi_non_mut() -> Result<(), pgx::spi::Error> {
         // Ensures update and cursor APIs do not need mutable reference to SpiClient
-        Spi::connect(|client| {
+        Spi::connect(|mut client| {
             client.update("SELECT 1", None, None);
             let cursor = client.open_cursor("SELECT 1", None)?.detach_into_name();
             client.find_cursor(&cursor).map(|_| ())
@@ -412,5 +412,21 @@ mod tests {
     #[pg_test]
     fn test_option() {
         assert!(Spi::get_one::<i32>("SELECT NULL::integer").unwrap().is_none());
+    }
+
+    #[pg_test(error = "CREATE TABLE is not allowed in a non-volatile function")]
+    fn test_readwrite_in_readonly() {
+        // This is supposed to run in read-only
+        Spi::connect(|client| client.select("CREATE TABLE a ()", None, None));
+    }
+
+    #[pg_test]
+    fn test_readwrite_in_select_readwrite() {
+        Spi::connect(|mut client| {
+            // This is supposed to switch connection to read-write and run it there
+            client.update("CREATE TABLE a (id INT)", None, None);
+            // This is supposed to run in read-write
+            client.select("INSERT INTO a VALUES (1)", None, None);
+        });
     }
 }

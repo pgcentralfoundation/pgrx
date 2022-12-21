@@ -100,7 +100,7 @@ mod tests {
 
     #[pg_test]
     fn test_my_some_schema_type() {
-        Spi::connect(|c| {
+        Spi::connect(|mut c| {
             // "MySomeSchemaType" is in 'some_schema', so it needs to be discoverable
             c.update("SET search_path TO some_schema,public", None, None);
             assert_eq!(

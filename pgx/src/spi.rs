@@ -131,7 +131,22 @@ pub enum Error {
 pub struct Spi;
 
 // TODO: should `'conn` be invariant?
-pub struct SpiClient<'conn>(PhantomData<&'conn SpiConnection>);
+pub struct SpiClient<'conn> {
+    phantom: PhantomData<&'conn SpiConnection>,
+    // This field indicates whether queries be readonly. Unless any `update` has been used
+    // `readonly` will be `true`.
+    // Postgres docs say:
+    //
+    //    It is generally unwise to mix read-only and read-write commands within a single function
+    //    using SPI; that could result in very confusing behavior, since the read-only queries
+    //    would not see the results of any database updates done by the read-write queries.
+    //
+    // TODO:  Alternatively, we can detect if the command counter (or something?) has incremented and if yes
+    //        then we set read_only=false, else we can set it to true.
+    //        However, we would still need to remember the previous value, which will be larger than the boolean.
+    //        So, unless somebody will send commands to Postgres bypassing this SPI API, this flag seems sufficient.
+    readonly: bool,
+}
 
 /// a struct to manage our SPI connection lifetime
 struct SpiConnection(PhantomData<*mut ()>);
@@ -156,7 +171,7 @@ impl Drop for SpiConnection {
 impl SpiConnection {
     /// Return a client that with a lifetime scoped to this connection.
     fn client(&self) -> SpiClient<'_> {
-        SpiClient(PhantomData)
+        SpiClient { phantom: PhantomData, readonly: true }
     }
 }
 
@@ -173,7 +188,6 @@ pub trait Query {
     fn execute(
         self,
         client: &SpiClient,
-        read_only: bool,
         limit: Option<i64>,
         arguments: Self::Arguments,
     ) -> Self::Result;
@@ -193,11 +207,10 @@ impl<'a> Query for &'a String {
     fn execute(
         self,
         client: &SpiClient,
-        read_only: bool,
         limit: Option<i64>,
         arguments: Self::Arguments,
     ) -> Self::Result {
-        self.as_str().execute(client, read_only, limit, arguments)
+        self.as_str().execute(client, limit, arguments)
     }
 
     fn open_cursor<'c: 'cc, 'cc>(
@@ -222,8 +235,7 @@ impl<'a> Query for &'a str {
 
     fn execute(
         self,
-        _client: &SpiClient,
-        read_only: bool,
+        client: &SpiClient,
         limit: Option<i64>,
         arguments: Self::Arguments,
     ) -> Self::Result {
@@ -249,13 +261,15 @@ impl<'a> Query for &'a str {
                         argtypes.as_mut_ptr(),
                         datums.as_mut_ptr(),
                         nulls.as_ptr(),
-                        read_only,
+                        client.readonly,
                         limit.unwrap_or(0),
                     )
                 }
             }
             // SAFETY: arguments are prepared above
-            None => unsafe { pg_sys::SPI_execute(src.as_ptr(), read_only, limit.unwrap_or(0)) },
+            None => unsafe {
+                pg_sys::SPI_execute(src.as_ptr(), client.readonly, limit.unwrap_or(0))
+            },
         };
 
         SpiClient::prepare_tuple_table(status_code)
@@ -263,7 +277,7 @@ impl<'a> Query for &'a str {
 
     fn open_cursor<'c: 'cc, 'cc>(
         self,
-        _client: &'cc SpiClient<'c>,
+        client: &'cc SpiClient<'c>,
         args: Self::Arguments,
     ) -> Result<SpiCursor<'c>, Error> {
         let src = std::ffi::CString::new(self).expect("query contained a null byte");
@@ -283,12 +297,12 @@ impl<'a> Query for &'a str {
                 argtypes.as_mut_ptr(),
                 datums.as_mut_ptr(),
                 nulls.as_ptr(),
-                false,
+                client.readonly,
                 0,
             )
         })
         .ok_or(Error::PortalIsNull)?;
-        Ok(SpiCursor { ptr, _phantom: PhantomData })
+        Ok(SpiCursor { ptr, __marker: PhantomData })
     }
 }
 
@@ -316,13 +330,13 @@ pub struct SpiHeapTupleData {
 
 impl Spi {
     pub fn get_one<A: FromDatum + IntoDatum>(query: &str) -> Result<Option<A>, Error> {
-        Spi::connect(|client| client.select(query, Some(1), None).first().get_one())
+        Spi::connect(|mut client| client.update(query, Some(1), None).first().get_one())
     }
 
     pub fn get_two<A: FromDatum + IntoDatum, B: FromDatum + IntoDatum>(
         query: &str,
     ) -> Result<(Option<A>, Option<B>), Error> {
-        Spi::connect(|client| client.select(query, Some(1), None).first().get_two::<A, B>())
+        Spi::connect(|mut client| client.update(query, Some(1), None).first().get_two::<A, B>())
     }
 
     pub fn get_three<
@@ -332,21 +346,25 @@ impl Spi {
     >(
         query: &str,
     ) -> Result<(Option<A>, Option<B>, Option<C>), Error> {
-        Spi::connect(|client| client.select(query, Some(1), None).first().get_three::<A, B, C>())
+        Spi::connect(|mut client| {
+            client.update(query, Some(1), None).first().get_three::<A, B, C>()
+        })
     }
 
     pub fn get_one_with_args<A: FromDatum + IntoDatum>(
         query: &str,
         args: Vec<(PgOid, Option<pg_sys::Datum>)>,
     ) -> Result<Option<A>, Error> {
-        Spi::connect(|client| client.select(query, Some(1), Some(args)).first().get_one())
+        Spi::connect(|mut client| client.update(query, Some(1), Some(args)).first().get_one())
     }
 
     pub fn get_two_with_args<A: FromDatum + IntoDatum, B: FromDatum + IntoDatum>(
         query: &str,
         args: Vec<(PgOid, Option<pg_sys::Datum>)>,
     ) -> Result<(Option<A>, Option<B>), Error> {
-        Spi::connect(|client| client.select(query, Some(1), Some(args)).first().get_two::<A, B>())
+        Spi::connect(|mut client| {
+            client.update(query, Some(1), Some(args)).first().get_two::<A, B>()
+        })
     }
 
     pub fn get_three_with_args<
@@ -357,8 +375,8 @@ impl Spi {
         query: &str,
         args: Vec<(PgOid, Option<pg_sys::Datum>)>,
     ) -> Result<(Option<A>, Option<B>, Option<C>), Error> {
-        Spi::connect(|client| {
-            client.select(query, Some(1), Some(args)).first().get_three::<A, B, C>()
+        Spi::connect(|mut client| {
+            client.update(query, Some(1), Some(args)).first().get_three::<A, B, C>()
         })
     }
 
@@ -377,7 +395,7 @@ impl Spi {
     ///
     /// The statement runs in read/write mode
     pub fn run_with_args(query: &str, args: Option<Vec<(PgOid, Option<pg_sys::Datum>)>>) {
-        Spi::connect(|client| {
+        Spi::connect(|mut client| {
             client.update(query, None, args);
         })
     }
@@ -392,7 +410,7 @@ impl Spi {
         query: &str,
         args: Option<Vec<(PgOid, Option<pg_sys::Datum>)>>,
     ) -> Result<Json, Error> {
-        Spi::connect(|client| {
+        Spi::connect(|mut client| {
             let table =
                 client.update(&format!("EXPLAIN (format json) {}", query), None, args).first();
             Ok(table.get_one::<Json>()?.unwrap())
@@ -452,33 +470,22 @@ impl Spi {
 impl<'a> SpiClient<'a> {
     /// perform a SELECT statement
     pub fn select<Q: Query>(&self, query: Q, limit: Option<i64>, args: Q::Arguments) -> Q::Result {
-        // Postgres docs say:
-        //
-        //    It is generally unwise to mix read-only and read-write commands within a single function
-        //    using SPI; that could result in very confusing behavior, since the read-only queries
-        //    would not see the results of any database updates done by the read-write queries.
-        //
-        // As such, we don't actually set read-only to true here
-
-        // TODO:  can we detect if the command counter (or something?) has incremented and if yes
-        //        then we set read_only=false, else we can set it to true?
-        //        Is this even a good idea?
-        self.execute(query, false, limit, args)
+        self.execute(query, limit, args)
     }
 
     /// perform any query (including utility statements) that modify the database in some way
-    pub fn update<Q: Query>(&self, query: Q, limit: Option<i64>, args: Q::Arguments) -> Q::Result {
-        self.execute(query, false, limit, args)
-    }
-
-    fn execute<Q: Query>(
-        &self,
+    pub fn update<Q: Query>(
+        &mut self,
         query: Q,
-        read_only: bool,
         limit: Option<i64>,
         args: Q::Arguments,
     ) -> Q::Result {
-        query.execute(&self, read_only, limit, args)
+        self.readonly = false;
+        self.execute(query, limit, args)
+    }
+
+    fn execute<Q: Query>(&self, query: Q, limit: Option<i64>, args: Q::Arguments) -> Q::Result {
+        query.execute(&self, limit, args)
     }
 
     fn prepare_tuple_table(status_code: i32) -> SpiTupleTable {
@@ -502,11 +509,21 @@ impl<'a> SpiClient<'a> {
     /// Rows may be then fetched using [`SpiCursor::fetch`].
     ///
     /// See [`SpiCursor`] docs for usage details.
-    pub fn open_cursor<Q: Query>(
-        &self,
+    pub fn open_cursor<Q: Query>(&self, query: Q, args: Q::Arguments) -> Result<SpiCursor, Error> {
+        query.open_cursor(&self, args)
+    }
+
+    /// Set up a cursor that will execute the specified update (mutating) query
+    ///
+    /// Rows may be then fetched using [`SpiCursor::fetch`].
+    ///
+    /// See [`SpiCursor`] docs for usage details.
+    pub fn open_cursor_mut<Q: Query>(
+        &mut self,
         query: Q,
         args: Q::Arguments,
-    ) -> Result<SpiCursor<'a>, Error> {
+    ) -> Result<SpiCursor, Error> {
+        self.readonly = false;
         query.open_cursor(&self, args)
     }
 
@@ -522,7 +539,7 @@ impl<'a> SpiClient<'a> {
 
         let ptr = NonNull::new(unsafe { pg_sys::SPI_cursor_find(name.as_pg_cstr()) })
             .ok_or(Error::CursorNotFound(name.to_string()))?;
-        Ok(SpiCursor { ptr, _phantom: PhantomData })
+        Ok(SpiCursor { ptr, __marker: PhantomData })
     }
 }
 
@@ -581,7 +598,7 @@ type CursorName = String;
 /// ```
 pub struct SpiCursor<'client> {
     ptr: NonNull<pg_sys::PortalData>,
-    _phantom: PhantomData<&'client SpiClient<'client>>,
+    __marker: PhantomData<&'client SpiClient<'client>>,
 }
 
 impl SpiCursor<'_> {
@@ -665,11 +682,10 @@ impl<'a> Query for &'a OwnedPreparedStatement {
     fn execute(
         self,
         client: &SpiClient,
-        read_only: bool,
         limit: Option<i64>,
         arguments: Self::Arguments,
     ) -> Self::Result {
-        (&self.0).execute(client, read_only, limit, arguments)
+        (&self.0).execute(client, limit, arguments)
     }
 
     fn open_cursor<'c: 'cc, 'cc>(
@@ -688,11 +704,10 @@ impl Query for OwnedPreparedStatement {
     fn execute(
         self,
         client: &SpiClient,
-        read_only: bool,
         limit: Option<i64>,
         arguments: Self::Arguments,
     ) -> Self::Result {
-        (&self.0).execute(client, read_only, limit, arguments)
+        (&self.0).execute(client, limit, arguments)
     }
 
     fn open_cursor<'c: 'cc, 'cc>(
@@ -725,8 +740,7 @@ impl<'a: 'b, 'b> Query for &'b PreparedStatement<'a> {
 
     fn execute(
         self,
-        _client: &SpiClient,
-        read_only: bool,
+        client: &SpiClient,
         limit: Option<i64>,
         arguments: Self::Arguments,
     ) -> Self::Result {
@@ -751,7 +765,7 @@ impl<'a: 'b, 'b> Query for &'b PreparedStatement<'a> {
                 self.plan,
                 datums.as_mut_ptr(),
                 nulls.as_mut_ptr(),
-                read_only,
+                client.readonly,
                 limit.unwrap_or(0),
             )
         };
@@ -761,7 +775,7 @@ impl<'a: 'b, 'b> Query for &'b PreparedStatement<'a> {
 
     fn open_cursor<'c: 'cc, 'cc>(
         self,
-        _client: &'cc SpiClient<'c>,
+        client: &'cc SpiClient<'c>,
         args: Self::Arguments,
     ) -> Result<SpiCursor<'c>, Error> {
         let args = args.unwrap_or_default();
@@ -775,11 +789,11 @@ impl<'a: 'b, 'b> Query for &'b PreparedStatement<'a> {
                 self.plan,
                 datums.as_mut_ptr(),
                 nulls.as_ptr(),
-                false,
+                client.readonly,
             )
         })
         .ok_or(Error::PortalIsNull)?;
-        Ok(SpiCursor { ptr, _phantom: PhantomData })
+        Ok(SpiCursor { ptr, __marker: PhantomData })
     }
 }
 
@@ -790,11 +804,10 @@ impl<'a> Query for PreparedStatement<'a> {
     fn execute(
         self,
         client: &SpiClient,
-        read_only: bool,
         limit: Option<i64>,
         arguments: Self::Arguments,
     ) -> Self::Result {
-        (&self).execute(client, read_only, limit, arguments)
+        (&self).execute(client, limit, arguments)
     }
 
     fn open_cursor<'c: 'cc, 'cc>(
