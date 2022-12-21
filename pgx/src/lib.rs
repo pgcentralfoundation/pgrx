@@ -151,6 +151,22 @@ macro_rules! map_source_only {
             ty
         );
 
+        let ty = stringify!(Result<$rust, _>).to_string().replace(" ", "");
+        assert_eq!(
+            $map.insert(RustSourceOnlySqlMapping::new(ty.clone(), $sql.to_string(),)),
+            true,
+            "Cannot map {} twice",
+            ty
+        );
+
+        let ty = stringify!(Result<Option<$rust>, _>).to_string().replace(" ", "");
+        assert_eq!(
+            $map.insert(RustSourceOnlySqlMapping::new(ty.clone(), $sql.to_string(),)),
+            true,
+            "Cannot map {} twice",
+            ty
+        );
+
         let ty = stringify!(Vec<$rust>).to_string().replace(" ", "");
         assert_eq!(
             $map.insert(RustSourceOnlySqlMapping::new(ty.clone(), format!("{}[]", $sql),)),
