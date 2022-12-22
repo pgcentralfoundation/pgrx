@@ -252,6 +252,9 @@ impl<'a> Query for &'a str {
     type Arguments = Option<Vec<(PgOid, Option<pg_sys::Datum>)>>;
     type Result = Result<SpiTupleTable>;
 
+    /// # Panics
+    ///
+    /// This function will panic if somehow the specified query contains a null byte.
     fn execute(
         self,
         client: &SpiClient,
@@ -639,6 +642,10 @@ impl SpiCursor<'_> {
     /// The actual Postgres cursor is kept alive for the duration of the transaction.
     /// This allows to fetch it in a later SPI session within the same transaction
     /// using [`SpiClient::find_cursor()`]
+    ///
+    /// # Panics
+    ///
+    /// This function will panic if the cursor's name contains a null byte.
     pub fn detach_into_name(self) -> CursorName {
         // SAFETY: SPI functions to create/find cursors fail via elog, so self.ptr is valid if we successfully set it
         let cursor_ptr = unsafe { self.ptr.as_ref() };
@@ -954,7 +961,12 @@ impl SpiTupleTable {
     /// # Errors
     ///
     /// If the specified ordinal is out of bounds a [`Error::SpiError(SpiError::NoAttribute)`] is returned
-    /// If we have no backing tuple descriptor a [`Error::TupDescIsNull`] is returned
+    /// If we have no backing tuple table a [`Error::NoTupleTable`] is returned
+    ///
+    /// # Panics
+    ///
+    /// This function will panic there is no parent MemoryContext.  This is an incredibly unlikely
+    /// situation.
     pub fn get<T: IntoDatum + FromDatum>(&self, ordinal: usize) -> Result<Option<T>> {
         let (_, tupdesc) = self.get_spi_tuptable()?;
         let datum = self.get_datum_by_ordinal(ordinal)?;
@@ -982,7 +994,7 @@ impl SpiTupleTable {
     /// # Errors
     ///
     /// If the specified name is invalid a [`Error::SpiError(SpiError::NoAttribute)`] is returned
-    /// If we have no backing tuple descriptor a [`Error::TupDescIsNull`] is returned
+    /// If we have no backing tuple table a [`Error::NoTupleTable`] is returned
     pub fn get_by_name<T: IntoDatum + FromDatum, S: AsRef<str>>(
         &self,
         name: S,
@@ -997,7 +1009,7 @@ impl SpiTupleTable {
     /// # Errors
     ///
     /// If the specified ordinal is out of bounds a [`Error::SpiError(SpiError::NoAttribute)`] is returned
-    /// If we have no backing tuple descriptor a [`Error::TupDescIsNull`] is returned
+    /// If we have no backing tuple table a [`Error::NoTupleTable`] is returned
     pub fn get_datum_by_ordinal(&self, ordinal: usize) -> Result<Option<pg_sys::Datum>> {
         self.check_ordinal_bounds(ordinal)?;
 
@@ -1024,7 +1036,7 @@ impl SpiTupleTable {
     /// # Errors
     ///
     /// If the specified name is invalid a [`Error::SpiError(SpiError::NoAttribute)`] is returned
-    /// If we have no backing tuple descriptor a [`Error::TupDescIsNull`] is returned
+    /// If we have no backing tuple table a [`Error::NoTupleTable`] is returned
     pub fn get_datum_by_name<S: AsRef<str>>(&self, name: S) -> Result<Option<pg_sys::Datum>> {
         self.get_datum_by_ordinal(self.column_ordinal(name)?)
     }
@@ -1065,7 +1077,12 @@ impl SpiTupleTable {
     /// # Errors
     ///
     /// Returns [`Error::SpiError(SpiError::NoAttribute)`] if the specified ordinal value is out of bounds
-    /// Returns [`Error::TupDescIsNull`] if we don't have a backing tuple descriptor
+    /// If we have no backing tuple table a [`Error::NoTupleTable`] is returned
+    ///
+    /// # Panics
+    ///
+    /// This function will panic if the column name at the specified ordinal position is not also
+    /// a valid UTF8 string.
     pub fn column_name(&self, ordinal: usize) -> Result<String> {
         self.check_ordinal_bounds(ordinal)?;
         let (_, tupdesc) = self.get_spi_tuptable()?;
@@ -1089,7 +1106,11 @@ impl SpiTupleTable {
     /// # Errors
     ///
     /// Returns [`Error::SpiError(SpiError::NoAttribute)`] if the specified column name isn't found
-    /// Returns [`Error::TupDescIsNull`] if we don't have a backing tuple descriptor
+    /// If we have no backing tuple table a [`Error::NoTupleTable`] is returned
+    ///
+    /// # Panics
+    ///
+    /// This function will panic if somehow the specified name contains a null byte.
     pub fn column_ordinal<S: AsRef<str>>(&self, name: S) -> Result<usize> {
         let (_, tupdesc) = self.get_spi_tuptable()?;
         unsafe {
@@ -1184,6 +1205,10 @@ impl SpiHeapTupleData {
     /// # Errors
     ///
     /// If the specified name isn't valid a [`SpiError::NoAttribute`] is returned
+    ///
+    /// # Panics
+    ///
+    /// This function will panic if somehow the specified name contains a null byte.
     pub fn get_datum_by_name<S: AsRef<str>>(
         &self,
         name: S,
@@ -1223,6 +1248,10 @@ impl SpiHeapTupleData {
     /// # Errors
     ///
     /// If the specified name isn't valid a [`SpiError::NoAttribute`] is returned
+    ///
+    /// # Panics
+    ///
+    /// This function will panic if somehow the specified name contains a null byte.
     pub fn set_by_name<T: IntoDatum>(
         &mut self,
         name: &str,
