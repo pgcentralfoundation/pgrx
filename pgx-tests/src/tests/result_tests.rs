@@ -129,22 +129,22 @@ mod tests {
     }
 
     #[pg_test]
-    fn test_return_result_table_iterator() {
+    fn test_return_result_table_iterator() -> Result<(), spi::Error> {
         Spi::run("SELECT * FROM tests.return_result_table_iterator()")
     }
 
     #[pg_test(error = "SpiTupleTable positioned before the start or after the end")]
-    fn test_return_result_table_iterator_error() {
+    fn test_return_result_table_iterator_error() -> Result<(), spi::Error> {
         Spi::run("SELECT * FROM tests.return_result_table_iterator_error()")
     }
 
     #[pg_test]
-    fn test_return_result_set_of() {
+    fn test_return_result_set_of() -> Result<(), spi::Error> {
         Spi::run("SELECT * FROM tests.return_result_set_of()")
     }
 
     #[pg_test(error = "SpiTupleTable positioned before the start or after the end")]
-    fn test_return_result_set_of_error() {
+    fn test_return_result_set_of_error() -> Result<(), spi::Error> {
         Spi::run("SELECT * FROM tests.return_result_set_of_error()")
     }
 }

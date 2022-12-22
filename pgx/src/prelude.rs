@@ -38,6 +38,7 @@ pub use crate::pg_sys::utils::name_data_to_str;
 pub use crate::pg_sys::PgBuiltInOids;
 
 // It's a database, gotta query it somehow.
+pub use crate::spi;
 pub use crate::spi::Spi;
 
 // Logging and Error support

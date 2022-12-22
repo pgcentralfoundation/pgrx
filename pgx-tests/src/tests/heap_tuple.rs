@@ -802,7 +802,7 @@ mod tests {
 
     #[pg_test]
     fn test_new_composite_type() {
-        Spi::run("CREATE TYPE DogWithAge AS (name text, age int);");
+        Spi::run("CREATE TYPE DogWithAge AS (name text, age int);").expect("SPI failed");
         let mut heap_tuple = PgHeapTuple::new_composite_type("DogWithAge").unwrap();
 
         assert_eq!(heap_tuple.get_by_name::<String>("name").unwrap(), None);
@@ -832,7 +832,7 @@ mod tests {
 
     #[pg_test]
     fn test_missing_field() {
-        Spi::run("CREATE TYPE DogWithAge AS (name text, age int);");
+        Spi::run("CREATE TYPE DogWithAge AS (name text, age int);").expect("SPI failed");
         let mut heap_tuple = PgHeapTuple::new_composite_type("DogWithAge").unwrap();
 
         const NON_EXISTING_ATTRIBUTE: &str = "DEFINITELY_NOT_EXISTING";
@@ -849,7 +849,7 @@ mod tests {
 
     #[pg_test]
     fn test_missing_number() {
-        Spi::run("CREATE TYPE DogWithAge AS (name text, age int);");
+        Spi::run("CREATE TYPE DogWithAge AS (name text, age int);").expect("SPI failed");
         let mut heap_tuple = PgHeapTuple::new_composite_type("DogWithAge").unwrap();
 
         const NON_EXISTING_ATTRIBUTE: NonZeroUsize = unsafe { NonZeroUsize::new_unchecked(9001) };
@@ -866,7 +866,7 @@ mod tests {
 
     #[pg_test]
     fn test_wrong_type_assumed() {
-        Spi::run("CREATE TYPE DogWithAge AS (name text, age int);");
+        Spi::run("CREATE TYPE DogWithAge AS (name text, age int);").expect("SPI failed");
         let mut heap_tuple = PgHeapTuple::new_composite_type("DogWithAge").unwrap();
 
         // These are **deliberately** the wrong types.

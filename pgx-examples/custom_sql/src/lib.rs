@@ -85,13 +85,17 @@ mod tests {
     use pgx::prelude::*;
 
     #[pg_test]
-    fn test_ordering() {
+    fn test_ordering() -> Result<(), spi::Error> {
         let buf = Spi::connect(|client| {
-            client
-                .select("SELECT * FROM extension_sql", None, None)
-                .flat_map(|tup| tup.by_ordinal(1).ok().and_then(|ord| ord.value::<String>()))
-                .collect::<Vec<String>>()
-        });
+            Ok(client
+                .select("SELECT * FROM extension_sql", None, None)?
+                .flat_map(|tup| {
+                    tup.get_datum_by_ordinal(1)
+                        .ok()
+                        .and_then(|ord| ord.value::<String>().ok().unwrap())
+                })
+                .collect::<Vec<String>>())
+        })?;
 
         assert_eq!(
             buf,
@@ -103,7 +107,8 @@ mod tests {
                 String::from("multiple"),
                 String::from("finalizer")
             ]
-        )
+        );
+        Ok(())
     }
 }
 

@@ -7,12 +7,12 @@ All rights reserved.
 Use of this source code is governed by the MIT license that can be found in the LICENSE file.
 */
 use pgx::prelude::*;
-use pgx::{IntoDatum, SpiTupleTable};
+use pgx::IntoDatum;
 
 pgx::pg_module_magic!();
 
 extension_sql!(
-    r#"   
+    r#"
 
 CREATE TABLE dog_daycare (
     dog_name varchar(256),
@@ -34,9 +34,17 @@ INSERT INTO dog_daycare(dog_name, dog_age, dog_breed) VALUES ('Moomba', 15, 'Lab
 );
 
 #[pg_extern]
-fn calculate_human_years() -> TableIterator<
-    'static,
-    (name!(dog_name, String), name!(dog_age, i32), name!(dog_breed, String), name!(human_age, i32)),
+fn calculate_human_years() -> Result<
+    TableIterator<
+        'static,
+        (
+            name!(dog_name, Result<Option<String>, pgx::spi::Error>),
+            name!(dog_age, i32),
+            name!(dog_breed, Result<Option<String>, pgx::spi::Error>),
+            name!(human_age, i32),
+        ),
+    >,
+    spi::Error,
 > {
     /*
         This function is a simple example of using SPI to return a set of rows
@@ -47,30 +55,33 @@ fn calculate_human_years() -> TableIterator<
 
     Spi::connect(|client| {
         let mut results = Vec::new();
-        let mut tup_table: SpiTupleTable = client.select(query, None, None);
+        let mut tup_table = client.select(query, None, None)?;
 
         while let Some(row) = tup_table.next() {
-            let dog_name: String = row["dog_name"].value().unwrap();
-            let dog_age: i32 = row["dog_age"].value().unwrap();
-            let dog_breed: String = row["dog_breed"].value().unwrap();
-            let human_age: i32 = dog_age * 7;
+            let dog_name = row["dog_name"].value::<String>();
+            let dog_age = row["dog_age"].value::<i32>()?.expect("dog_age was null");
+            let dog_breed = row["dog_breed"].value::<String>();
+            let human_age = dog_age * 7;
             results.push((dog_name, dog_age, dog_breed, human_age));
         }
 
-        TableIterator::new(results.into_iter())
+        Ok(TableIterator::new(results.into_iter()))
     })
 }
 
 #[pg_extern]
 fn filter_by_breed(
     breed: &str,
-) -> TableIterator<
-    'static,
-    (
-        name!(dog_name, Option<String>),
-        name!(dog_age, Option<i32>),
-        name!(dog_breed, Option<String>),
-    ),
+) -> Result<
+    TableIterator<
+        'static,
+        (
+            name!(dog_name, Result<Option<String>, pgx::spi::Error>),
+            name!(dog_age, Result<Option<i32>, pgx::spi::Error>),
+            name!(dog_breed, Result<Option<String>, pgx::spi::Error>),
+        ),
+    >,
+    spi::Error,
 > {
     /*
         This function is a simple example of using SPI to return a set of rows
@@ -81,12 +92,12 @@ fn filter_by_breed(
     let args = vec![(PgBuiltInOids::TEXTOID.oid(), breed.into_datum())];
 
     Spi::connect(|client| {
-        let tup_table: SpiTupleTable = client.select(query, None, Some(args));
+        let tup_table = client.select(query, None, Some(args))?;
 
         let filtered = tup_table
             .map(|row| (row["dog_name"].value(), row["dog_age"].value(), row["dog_breed"].value()))
             .collect::<Vec<_>>();
-        TableIterator::new(filtered.into_iter())
+        Ok(TableIterator::new(filtered.into_iter()))
     })
 }
 
@@ -96,22 +107,25 @@ mod tests {
     use crate::calculate_human_years;
     use pgx::prelude::*;
 
+    #[rustfmt::skip]
     #[pg_test]
-    fn test_calculate_human_years() {
-        let mut results: Vec<(String, i32, String, i32)> = Vec::new();
+    fn test_calculate_human_years() -> Result<(), pgx::spi::Error> {
+        let mut results: Vec<(Result<Option<String>, _>, i32, Result<Option<String>, _>, i32)> =
+            Vec::new();
 
-        results.push(("Fido".to_string(), 3, "Labrador".to_string(), 21));
-        results.push(("Spot".to_string(), 5, "Poodle".to_string(), 35));
-        results.push(("Rover".to_string(), 7, "Golden Retriever".to_string(), 49));
-        results.push(("Snoopy".to_string(), 9, "Beagle".to_string(), 63));
-        results.push(("Lassie".to_string(), 11, "Collie".to_string(), 77));
-        results.push(("Scooby".to_string(), 13, "Great Dane".to_string(), 91));
-        results.push(("Moomba".to_string(), 15, "Labrador".to_string(), 105));
-        let func_results = calculate_human_years();
+        results.push((Ok(Some("Fido".to_string())), 3, Ok(Some("Labrador".to_string())), 21));
+        results.push((Ok(Some("Spot".to_string())), 5, Ok(Some("Poodle".to_string())), 35));
+        results.push((Ok(Some("Rover".to_string())), 7, Ok(Some("Golden Retriever".to_string())), 49));
+        results.push((Ok(Some("Snoopy".to_string())), 9, Ok(Some("Beagle".to_string())), 63));
+        results.push((Ok(Some("Lassie".to_string())), 11, Ok(Some("Collie".to_string())), 77));
+        results.push((Ok(Some("Scooby".to_string())), 13, Ok(Some("Great Dane".to_string())), 91));
+        results.push((Ok(Some("Moomba".to_string())), 15, Ok(Some("Labrador".to_string())), 105));
+        let func_results = calculate_human_years()?;
 
         for (expected, actual) in results.iter().zip(func_results) {
             assert_eq!(expected, &actual);
         }
+        Ok(())
     }
 }
 

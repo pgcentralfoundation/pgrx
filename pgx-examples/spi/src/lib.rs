@@ -29,8 +29,16 @@ INSERT INTO spi_example (title) VALUES ('I like pudding');
 );
 
 #[pg_extern]
-fn spi_return_query(
-) -> TableIterator<'static, (name!(oid, Option<pg_sys::Oid>), name!(name, Option<String>))> {
+fn spi_return_query() -> Result<
+    TableIterator<
+        'static,
+        (
+            name!(oid, Result<Option<pg_sys::Oid>, pgx::spi::Error>),
+            name!(name, Result<Option<String>, pgx::spi::Error>),
+        ),
+    >,
+    spi::Error,
+> {
     #[cfg(feature = "pg11")]
     let query = "SELECT oid, relname::text || '-pg11' FROM pg_class";
     #[cfg(feature = "pg12")]
@@ -43,10 +51,10 @@ fn spi_return_query(
     let query = "SELECT oid, relname::text || '-pg15' FROM pg_class";
 
     let results = Spi::connect(|client| {
-        client.select(query, None, None).map(|row| (row["oid"].value(), row[2].value()))
-    });
+        Ok(client.select(query, None, None)?.map(|row| (row["oid"].value(), row[2].value())))
+    })?;
 
-    TableIterator::new(results)
+    Ok(TableIterator::new(results))
 }
 
 #[pg_extern(immutable, parallel_safe)]
@@ -70,7 +78,7 @@ fn spi_query_by_id(id: i64) -> Result<Option<String>, spi::Error> {
                 "SELECT id, title FROM spi.spi_example WHERE id = $1",
                 None,
                 Some(vec![(PgBuiltInOids::INT8OID.oid(), id.into_datum())]),
-            )
+            )?
             .first();
 
         tuptable.get_two::<i64, String>()
