@@ -8,6 +8,7 @@ Use of this source code is governed by the MIT license that can be found in the 
 */
 
 use std::ops::{Mul, Sub};
+use std::ptr::NonNull;
 
 use crate::datum::time::USECS_PER_SEC;
 use crate::{direct_function_call, pg_sys, FromDatum, IntoDatum, PgBox};
@@ -26,7 +27,7 @@ const MONTH_DURATION: time::Duration = time::Duration::days(DAYS_PER_MONTH as i6
 /// subtraction, this storage method works well in most cases...
 #[derive(Debug)]
 #[repr(transparent)]
-pub struct Interval(pg_sys::Interval);
+pub struct Interval(NonNull<pg_sys::Interval>);
 
 impl Interval {
     /// This function takes `months`/`days`/`usecs` as input to convert directly to the internal PG storage struct `pg_sys::Interval`
@@ -40,43 +41,35 @@ impl Interval {
         interval.day = days;
         interval.month = months;
         interval.time = usecs;
-        Ok(Interval(*interval))
+        let ptr = interval.into_pg();
+        let non_null = NonNull::new(ptr).expect("pointer is null");
+        Ok(Interval::from_ptr(non_null))
+    }
+
+    pub fn from_ptr(ptr: NonNull<pg_sys::Interval>) -> Self {
+        Interval(ptr)
+    }
+
+    pub fn as_ptr(&self) -> NonNull<pg_sys::Interval> {
+        self.0
     }
 
     /// Total number of months before/after 2000-01-01
     pub fn months(&self) -> i32 {
-        self.0.month
+        // SAFETY: Validity asserted on construction
+        unsafe { (*self.0.as_ptr()).month }
     }
 
     /// Total number of days before/after the `months()` offset (sign must match `months`)
     pub fn days(&self) -> i32 {
-        self.0.day
+        // SAFETY: Validity asserted on construction
+        unsafe { (*self.0.as_ptr()).day }
     }
 
     /// Total number of usecs before/after the `days()` offset (sign must match `months`/`days`)
     pub fn usecs(&self) -> i64 {
-        self.0.time
-    }
-}
-
-impl TryFrom<pg_sys::Datum> for Interval {
-    type Error = &'static str;
-    fn try_from(datum: pg_sys::Datum) -> Result<Self, Self::Error> {
-        if datum.is_null() {
-            return Err("NULL datum");
-        }
-        Ok(Interval(unsafe { *datum.cast_mut_ptr::<pg_sys::Interval>() }))
-    }
-}
-
-impl IntoDatum for Interval {
-    fn into_datum(mut self) -> Option<pg_sys::Datum> {
-        let interval = &mut self.0;
-        // assume interval was allocated by PgBox
-        Some(pg_sys::Datum::from(interval as *mut _))
-    }
-    fn type_oid() -> pg_sys::Oid {
-        pg_sys::INTERVALOID
+        // SAFETY: Validity asserted on construction
+        unsafe { (*self.0.as_ptr()).time }
     }
 }
 
@@ -84,7 +77,7 @@ impl FromDatum for Interval {
     unsafe fn from_polymorphic_datum(
         datum: pg_sys::Datum,
         is_null: bool,
-        _: pg_sys::Oid,
+        _typoid: pg_sys::Oid,
     ) -> Option<Self>
     where
         Self: Sized,
@@ -92,8 +85,20 @@ impl FromDatum for Interval {
         if is_null {
             None
         } else {
-            Some(datum.try_into().ok()?)
+            let ptr = datum.cast_mut_ptr::<pg_sys::Interval>();
+            let non_null = NonNull::new(ptr).expect("ptr was null");
+            Some(Interval(non_null))
         }
+    }
+}
+
+impl IntoDatum for Interval {
+    fn into_datum(self) -> Option<pg_sys::Datum> {
+        let interval = self.0.as_ptr();
+        Some(interval.into())
+    }
+    fn type_oid() -> pg_sys::Oid {
+        pg_sys::INTERVALOID
     }
 }
 
@@ -124,24 +129,27 @@ impl TryFrom<time::Duration> for Interval {
 #[cfg(feature = "time-crate")]
 impl From<Interval> for time::Duration {
     fn from(interval: Interval) -> time::Duration {
-        let interval = interval.0; // internal interval
-        let sec = interval.time / USECS_PER_SEC as i64;
-        let fsec = ((interval.time - (sec * USECS_PER_SEC as i64)) * 1000) as i32; // convert usec to nsec
+        // SAFETY: Validity of interval's ptr asserted on construction
+        unsafe {
+            let interval = *interval.0.as_ptr(); // internal interval
+            let sec = interval.time / USECS_PER_SEC as i64;
+            let fsec = ((interval.time - (sec * USECS_PER_SEC as i64)) * 1000) as i32; // convert usec to nsec
 
-        let mut duration = time::Duration::new(sec, fsec);
+            let mut duration = time::Duration::new(sec, fsec);
 
-        if interval.month != 0 {
-            duration = duration.saturating_add(MONTH_DURATION.mul(interval.month));
+            if interval.month != 0 {
+                duration = duration.saturating_add(MONTH_DURATION.mul(interval.month));
+            }
+
+            if interval.day != 0 {
+                duration = duration.saturating_add(time::Duration::new(
+                    (interval.day * SECS_PER_DAY as i32) as i64,
+                    0,
+                ));
+            }
+
+            duration
         }
-
-        if interval.day != 0 {
-            duration = duration.saturating_add(time::Duration::new(
-                (interval.day * SECS_PER_DAY as i32) as i64,
-                0,
-            ));
-        }
-
-        duration
     }
 }
 
@@ -150,8 +158,9 @@ impl serde::Serialize for Interval {
     where
         S: serde::Serializer,
     {
-        let interval = &self.0;
         unsafe {
+            // SAFETY: Validity of ptr asserted on construction
+            let interval = self.0.as_ptr();
             let cstr = direct_function_call::<&std::ffi::CStr>(
                 pg_sys::interval_out,
                 vec![Some(pg_sys::Datum::from(interval as *const _))],
