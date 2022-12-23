@@ -193,7 +193,7 @@ mod tests {
         Ok(())
     }
 
-    fn sum_all(table: pgx::SpiTupleTable) -> i32 {
+    fn sum_all(table: pgx::spi::SpiTupleTable) -> i32 {
         table
             .map(|r| r.get_datum_by_ordinal(1)?.value::<i32>())
             .map(|r| r.expect("failed to get ordinal #1").expect("ordinal #1 was null"))

@@ -102,7 +102,7 @@ pub use nodes::*;
 pub use pgbox::*;
 pub use rel::*;
 pub use shmem::*;
-pub use spi::*;
+pub use spi::Spi; // only Spi.  We don't want the top-level namespace polluted with spi::Result and spi::Error
 pub use stringinfo::*;
 pub use trigger_support::*;
 pub use tupdesc::*;

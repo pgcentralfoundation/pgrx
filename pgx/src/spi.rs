@@ -502,11 +502,11 @@ impl Spi {
     }
 
     #[track_caller]
-    pub fn check_status(status_code: i32) -> std::result::Result<SpiOk, SpiError> {
+    pub fn check_status(status_code: i32) -> std::result::Result<SpiOk, Error> {
         match SpiOk::try_from(status_code) {
             Ok(ok) => Ok(ok),
             Err(Err(UnknownVariant)) => panic!("unrecognized SPI status code: {status_code}"),
-            Err(Ok(code)) => Err(code),
+            Err(Ok(code)) => Err(Error::SpiError(code)),
         }
     }
 }
@@ -532,7 +532,7 @@ impl<'a> SpiClient<'a> {
         query.execute(&self, limit, args)
     }
 
-    fn prepare_tuple_table(status_code: i32) -> std::result::Result<SpiTupleTable, SpiError> {
+    fn prepare_tuple_table(status_code: i32) -> std::result::Result<SpiTupleTable, Error> {
         Ok(SpiTupleTable {
             status_code: Spi::check_status(status_code)?,
             // SAFETY: no concurrent access
@@ -649,14 +649,14 @@ impl SpiCursor<'_> {
     /// Fetch up to `count` rows from the cursor, moving forward
     ///
     /// If `fetch` runs off the end of the available rows, an empty [`SpiTupleTable`] is returned.
-    pub fn fetch(&mut self, count: i64) -> std::result::Result<SpiTupleTable, SpiError> {
+    pub fn fetch(&mut self, count: i64) -> std::result::Result<SpiTupleTable, Error> {
         // SAFETY: no concurrent access
         unsafe {
             pg_sys::SPI_tuptable = std::ptr::null_mut();
         }
         // SAFETY: SPI functions to create/find cursors fail via elog, so self.ptr is valid if we successfully set it
         unsafe { pg_sys::SPI_cursor_fetch(self.ptr.as_mut(), true, count) }
-        SpiClient::prepare_tuple_table(SpiOk::Fetch as i32)
+        Ok(SpiClient::prepare_tuple_table(SpiOk::Fetch as i32)?)
     }
 
     /// Consume the cursor, returning its name
@@ -1188,9 +1188,7 @@ impl SpiHeapTupleData {
     /// Returns a [`Error::DatumError`] if the desired Rust type is incompatible
     /// with the underlying Datum
     pub fn get<T: IntoDatum + FromDatum>(&self, ordinal: usize) -> Result<Option<T>> {
-        self.get_datum_by_ordinal(ordinal)
-            .map(|entry| entry.value())
-            .map_err(|e| Error::SpiError(e))?
+        self.get_datum_by_ordinal(ordinal).map(|entry| entry.value())?
     }
 
     /// Get a typed value from this HeapTuple by its name in the resultset.
@@ -1203,9 +1201,7 @@ impl SpiHeapTupleData {
         &self,
         name: S,
     ) -> Result<Option<T>> {
-        self.get_datum_by_name(name.as_ref())
-            .map(|entry| entry.value())
-            .map_err(|e| Error::SpiError(e))?
+        self.get_datum_by_name(name.as_ref()).map(|entry| entry.value())?
     }
 
     /// Get a raw Datum from this HeapTuple by its ordinal position.
@@ -1214,19 +1210,19 @@ impl SpiHeapTupleData {
     ///
     /// # Errors
     ///
-    /// If the specified ordinal is out of bounds a [`SpiError::NoAttribute`] is returned
+    /// If the specified ordinal is out of bounds a [`Error::SpiError(SpiError::NoAttribute)`] is returned
     pub fn get_datum_by_ordinal(
         &self,
         ordinal: usize,
-    ) -> std::result::Result<&SpiHeapTupleDataEntry, SpiError> {
-        self.entries.get(&ordinal).ok_or_else(|| SpiError::NoAttribute)
+    ) -> std::result::Result<&SpiHeapTupleDataEntry, Error> {
+        self.entries.get(&ordinal).ok_or_else(|| Error::SpiError(SpiError::NoAttribute))
     }
 
     /// Get a raw Datum from this HeapTuple by its field name.
     ///
     /// # Errors
     ///
-    /// If the specified name isn't valid a [`SpiError::NoAttribute`] is returned
+    /// If the specified name isn't valid a [`Error::SpiError(SpiError::NoAttribute)`] is returned
     ///
     /// # Panics
     ///
@@ -1234,13 +1230,13 @@ impl SpiHeapTupleData {
     pub fn get_datum_by_name<S: AsRef<str>>(
         &self,
         name: S,
-    ) -> std::result::Result<&SpiHeapTupleDataEntry, SpiError> {
+    ) -> std::result::Result<&SpiHeapTupleDataEntry, Error> {
         unsafe {
             let name_cstr = CString::new(name.as_ref()).expect("name contained a null byte");
             let fnumber = pg_sys::SPI_fnumber(self.tupdesc.as_ptr(), name_cstr.as_ptr());
 
             if fnumber == pg_sys::SPI_ERROR_NOATTRIBUTE {
-                Err(SpiError::NoAttribute)
+                Err(Error::SpiError(SpiError::NoAttribute))
             } else {
                 self.get_datum_by_ordinal(fnumber as usize)
             }
@@ -1256,7 +1252,7 @@ impl SpiHeapTupleData {
         &mut self,
         ordinal: usize,
         datum: T,
-    ) -> std::result::Result<(), SpiError> {
+    ) -> std::result::Result<(), Error> {
         self.check_ordinal_bounds(ordinal)?;
         self.entries.insert(
             ordinal,
@@ -1269,7 +1265,7 @@ impl SpiHeapTupleData {
     ///
     /// # Errors
     ///
-    /// If the specified name isn't valid a [`SpiError::NoAttribute`] is returned
+    /// If the specified name isn't valid a [`Error::SpiError(SpiError::NoAttribute)`] is returned
     ///
     /// # Panics
     ///
@@ -1278,12 +1274,12 @@ impl SpiHeapTupleData {
         &mut self,
         name: &str,
         datum: T,
-    ) -> std::result::Result<(), SpiError> {
+    ) -> std::result::Result<(), Error> {
         unsafe {
             let name_cstr = CString::new(name).expect("name contained a null byte");
             let fnumber = pg_sys::SPI_fnumber(self.tupdesc.as_ptr(), name_cstr.as_ptr());
             if fnumber == pg_sys::SPI_ERROR_NOATTRIBUTE {
-                Err(SpiError::NoAttribute)
+                Err(Error::SpiError(SpiError::NoAttribute))
             } else {
                 self.set_by_ordinal(fnumber as usize, datum)
             }
@@ -1300,9 +1296,9 @@ impl SpiHeapTupleData {
 
     /// is the specified ordinal valid for the underlying tuple descriptor?
     #[inline]
-    fn check_ordinal_bounds(&self, ordinal: usize) -> std::result::Result<(), SpiError> {
+    fn check_ordinal_bounds(&self, ordinal: usize) -> std::result::Result<(), Error> {
         if ordinal < 1 || ordinal > self.columns() {
-            Err(SpiError::NoAttribute)
+            Err(Error::SpiError(SpiError::NoAttribute))
         } else {
             Ok(())
         }
