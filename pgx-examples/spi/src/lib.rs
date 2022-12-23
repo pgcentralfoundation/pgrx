@@ -50,11 +50,10 @@ fn spi_return_query() -> Result<
     #[cfg(feature = "pg15")]
     let query = "SELECT oid, relname::text || '-pg15' FROM pg_class";
 
-    let results = Spi::connect(|client| {
+    Spi::connect(|client| {
         Ok(client.select(query, None, None)?.map(|row| (row["oid"].value(), row[2].value())))
-    })?;
-
-    Ok(TableIterator::new(results))
+    })
+    .map(|results| TableIterator::new(results))
 }
 
 #[pg_extern(immutable, parallel_safe)]

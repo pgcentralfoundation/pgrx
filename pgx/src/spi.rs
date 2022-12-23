@@ -432,11 +432,13 @@ impl Spi {
         query: &str,
         args: Option<Vec<(PgOid, Option<pg_sys::Datum>)>>,
     ) -> Result<Json> {
-        Spi::connect(|mut client| {
-            let table =
-                client.update(&format!("EXPLAIN (format json) {}", query), None, args)?.first();
-            Ok(table.get_one::<Json>()?.unwrap())
-        })
+        Ok(Spi::connect(|mut client| {
+            client
+                .update(&format!("EXPLAIN (format json) {}", query), None, args)?
+                .first()
+                .get_one::<Json>()
+        })?
+        .unwrap())
     }
 
     /// Execute SPI commands via the provided `SpiClient`.
@@ -468,9 +470,29 @@ impl Spi {
     /// use pgx::prelude::*;
     /// let cant_return_client = Spi::connect(|client| client);
     /// ```
-    pub fn connect<R, F: FnOnce(SpiClient<'_>) -> Result<R>>(f: F) -> Result<R> {
+    ///
+    /// # Panics
+    ///
+    /// This function will panic if for some reason it's unable to "connect" to Postgres' SPI
+    /// system.  At the time of this writing, that's actually impossible as the underlying function
+    /// ([`pg_sys::SPI_connect()`]) **always** returns a successful response.
+    pub fn connect<R, F: FnOnce(SpiClient<'_>) -> R>(f: F) -> R {
         // connect to SPI
-        let connection = SpiConnection::connect()?;
+        //
+        // Postgres documents (https://www.postgresql.org/docs/current/spi-spi-connect.html) that
+        // `pg_sys::SPI_connect()` can return `pg_sys::SPI_ERROR_CONNECT`, but in fact, if you
+        // trace through the code back to (at least) pg11, it does not.  SPI_connect() always returns
+        // `pg_sys::SPI_OK_CONNECT` (or it'll raise an error).
+        //
+        // So we make that an exceptional condition here and explicitly expect `SpiConnect::connect()`
+        // to always succeed.
+        //
+        // The primary driver for this is not that we think we're smarter than Postgres, it's that
+        // otherwise this function would need to return a `Result<R, spi::Error>` and that's a
+        // fucking nightmare for users to deal with.  There's ample discussion around coming to
+        // this decision at https://github.com/tcdi/pgx/pull/977
+        let connection =
+            SpiConnection::connect().expect("SPI_connect indicated an unexpected failure");
 
         // run the provided closure within the memory context that SPI_connect()
         // just put us un.  We'll disconnect from SPI when the closure is finished.
@@ -605,7 +627,7 @@ type CursorName = String;
 /// let cursor_name = Spi::connect(|mut client| {
 ///     let mut cursor = client.open_cursor("SELECT * FROM generate_series(1, 5)", None);
 ///     assert_eq!(Ok(Some(1u32)), cursor.fetch(1)?.get_one::<u32>());
-///     Ok(cursor.detach_into_name()) // <-- cursor gets dropped here
+///     Ok::<_, spi::Error>(cursor.detach_into_name()) // <-- cursor gets dropped here
 ///     // <--- first SpiTupleTable gets freed by Spi::connect at this point
 /// })?;
 /// Spi::connect(|mut client| {

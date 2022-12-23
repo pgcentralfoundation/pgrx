@@ -59,7 +59,7 @@ mod tests {
     }
 
     #[pg_test]
-    fn test_spi_get_one() -> spi::Result<()> {
+    fn test_spi_get_one() -> Result<(), spi::Error> {
         Spi::connect(|client| {
             let i = client.select("SELECT 42::bigint", None, None)?.first().get_one::<i64>()?;
             assert_eq!(Some(42), i);
@@ -95,7 +95,7 @@ mod tests {
     }
 
     #[pg_test]
-    fn test_spi_get_two_with_failure() {
+    fn test_spi_get_two_with_failure() -> Result<(), spi::Error> {
         Spi::connect(|client| {
             assert!(client
                 .select("SELECT 42", None, None)?
@@ -104,11 +104,10 @@ mod tests {
                 .is_err());
             Ok(())
         })
-        .ok();
     }
 
     #[pg_test]
-    fn test_spi_get_three_failure() {
+    fn test_spi_get_three_failure() -> Result<(), spi::Error> {
         Spi::connect(|client| {
             assert!(client
                 .select("SELECT 42, 'test'", None, None)?
@@ -117,7 +116,6 @@ mod tests {
                 .is_err());
             Ok(())
         })
-        .ok();
     }
 
     #[pg_test]
@@ -255,7 +253,7 @@ mod tests {
             )?;
             let mut cursor = client.open_cursor("SELECT * FROM tests.cursor_table", None);
             assert_eq!(sum_all(cursor.fetch(3)?), 1 + 2 + 3);
-            Ok(cursor.detach_into_name())
+            Ok::<_, spi::Error>(cursor.detach_into_name())
         })?;
 
         Spi::connect(|client| {
@@ -263,13 +261,13 @@ mod tests {
             assert_eq!(sum_all(cursor.fetch(3)?), 4 + 5 + 6);
             assert_eq!(sum_all(cursor.fetch(3)?), 7 + 8 + 9);
             cursor.detach_into_name();
-            Ok(())
+            Ok::<_, spi::Error>(())
         })?;
 
         Spi::connect(|client| {
             let mut cursor = client.find_cursor(&cursor_name)?;
             assert_eq!(sum_all(cursor.fetch(3)?), 10);
-            Ok(())
+            Ok::<_, spi::Error>(())
         })?;
         Ok(())
     }
@@ -278,9 +276,7 @@ mod tests {
     fn test_cursor_failure() {
         Spi::connect(|client| {
             client.open_cursor("THIS IS NOT SQL", None);
-            Ok(())
         })
-        .ok();
     }
 
     #[pg_test(error = "cursor: CursorNotFound(\"NOT A CURSOR\")")]
@@ -298,7 +294,7 @@ mod tests {
             assert_eq!(res.column_type_oid(2).unwrap(), PgOid::BuiltIn(PgBuiltInOids::TEXTOID));
             assert_eq!(res.column_name(1).unwrap(), "a");
             assert_eq!(res.column_name(2).unwrap(), "b");
-            Ok(())
+            Ok::<_, spi::Error>(())
         })?;
 
         Spi::connect(|mut client| {
@@ -312,7 +308,7 @@ mod tests {
     #[pg_test]
     fn test_connect_return_anything() {
         struct T;
-        assert!(matches!(Spi::connect(|_| Ok(Some(T))).unwrap().unwrap(), T));
+        assert!(matches!(Spi::connect(|_| Ok::<_, spi::Error>(Some(T))).unwrap().unwrap(), T));
     }
 
     #[pg_test]
@@ -386,9 +382,11 @@ mod tests {
     #[pg_test]
     fn test_owned_prepared_statement() -> Result<(), spi::Error> {
         let prepared = Spi::connect(|client| {
-            Ok(client
-                .prepare("SELECT $1", Some(vec![PgOid::BuiltIn(PgBuiltInOids::INT4OID)]))?
-                .keep())
+            Ok::<_, spi::Error>(
+                client
+                    .prepare("SELECT $1", Some(vec![PgOid::BuiltIn(PgBuiltInOids::INT4OID)]))?
+                    .keep(),
+            )
         })?;
         let rc = Spi::connect(|client| {
             client.select(&prepared, None, Some(vec![42.into_datum()]))?.first().get::<i32>(1)
