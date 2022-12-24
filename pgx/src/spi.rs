@@ -26,7 +26,7 @@ pub type Result<T> = std::result::Result<T, Error>;
 #[derive(Debug, PartialEq)]
 #[repr(i32)]
 #[non_exhaustive]
-pub enum SpiOk {
+pub enum SpiOkCodes {
     Connect = 1,
     Finish = 2,
     Fetch = 3,
@@ -53,7 +53,7 @@ pub enum SpiOk {
 /// this should not usually occur in Rust code paths. If it does happen, please report such bugs to the pgx repo.
 #[derive(thiserror::Error, Debug, PartialEq)]
 #[repr(i32)]
-pub enum SpiError {
+pub enum SpiErrorCodes {
     Connect = -1,
     Copy = -2,
     OpUnknown = -3,
@@ -70,7 +70,7 @@ pub enum SpiError {
     RelNotFound = -13,
 }
 
-impl std::fmt::Display for SpiError {
+impl std::fmt::Display for SpiErrorCodes {
     fn fmt(&self, f: &mut Formatter<'_>) -> core::fmt::Result {
         f.write_fmt(format_args!("{:?}", self))
     }
@@ -79,33 +79,33 @@ impl std::fmt::Display for SpiError {
 #[derive(Debug)]
 pub struct UnknownVariant;
 
-impl TryFrom<libc::c_int> for SpiOk {
+impl TryFrom<libc::c_int> for SpiOkCodes {
     // Yes, this gives us nested results.
-    type Error = std::result::Result<SpiError, UnknownVariant>;
+    type Error = std::result::Result<SpiErrorCodes, UnknownVariant>;
 
-    fn try_from(code: libc::c_int) -> std::result::Result<SpiOk, Self::Error> {
+    fn try_from(code: libc::c_int) -> std::result::Result<SpiOkCodes, Self::Error> {
         // Cast to assure that we're obeying repr rules even on platforms where c_ints are not 4 bytes wide,
         // as we don't support any but we may wish to in the future.
         match code as i32 {
             err @ -13..=-1 => Err(Ok(
                 // SAFETY: These values are described in SpiError, thus they are inbounds for transmute
-                unsafe { mem::transmute::<i32, SpiError>(err) },
+                unsafe { mem::transmute::<i32, SpiErrorCodes>(err) },
             )),
             ok @ 1..=18 => Ok(
                 //SAFETY: These values are described in SpiOk, thus they are inbounds for transmute
-                unsafe { mem::transmute::<i32, SpiOk>(ok) },
+                unsafe { mem::transmute::<i32, SpiOkCodes>(ok) },
             ),
             _unknown => Err(Err(UnknownVariant)),
         }
     }
 }
 
-impl TryFrom<libc::c_int> for SpiError {
+impl TryFrom<libc::c_int> for SpiErrorCodes {
     // Yes, this gives us nested results.
-    type Error = std::result::Result<SpiOk, UnknownVariant>;
+    type Error = std::result::Result<SpiOkCodes, UnknownVariant>;
 
-    fn try_from(code: libc::c_int) -> std::result::Result<SpiError, Self::Error> {
-        match SpiOk::try_from(code) {
+    fn try_from(code: libc::c_int) -> std::result::Result<SpiErrorCodes, Self::Error> {
+        match SpiOkCodes::try_from(code) {
             Ok(ok) => Err(Ok(ok)),
             Err(Ok(err)) => Ok(err),
             Err(Err(unknown)) => Err(Err(unknown)),
@@ -116,9 +116,9 @@ impl TryFrom<libc::c_int> for SpiError {
 /// Set of possible errors `pgx` might return while working with Postgres SPI
 #[derive(thiserror::Error, Debug, PartialEq)]
 pub enum Error {
-    /// An underlying [`SpiError`] given to us by Postgres
+    /// An underlying [`SpiErrorCodes`] given to us by Postgres
     #[error("SPI error: {0:?}")]
-    SpiError(#[from] SpiError),
+    SpiError(#[from] SpiErrorCodes),
 
     /// Some kind of problem understanding how to convert a Datum
     #[error("Datum error: {0}")]
@@ -331,7 +331,7 @@ impl<'a> Query for &'a str {
 #[derive(Debug)]
 pub struct SpiTupleTable {
     #[allow(dead_code)]
-    status_code: SpiOk,
+    status_code: SpiOkCodes,
     table: Option<*mut pg_sys::SPITupleTable>,
     size: usize,
     current: isize,
@@ -502,8 +502,8 @@ impl Spi {
     }
 
     #[track_caller]
-    pub fn check_status(status_code: i32) -> std::result::Result<SpiOk, Error> {
-        match SpiOk::try_from(status_code) {
+    pub fn check_status(status_code: i32) -> std::result::Result<SpiOkCodes, Error> {
+        match SpiOkCodes::try_from(status_code) {
             Ok(ok) => Ok(ok),
             Err(Err(UnknownVariant)) => panic!("unrecognized SPI status code: {status_code}"),
             Err(Ok(code)) => Err(Error::SpiError(code)),
@@ -656,7 +656,7 @@ impl SpiCursor<'_> {
         }
         // SAFETY: SPI functions to create/find cursors fail via elog, so self.ptr is valid if we successfully set it
         unsafe { pg_sys::SPI_cursor_fetch(self.ptr.as_mut(), true, count) }
-        Ok(SpiClient::prepare_tuple_table(SpiOk::Fetch as i32)?)
+        Ok(SpiClient::prepare_tuple_table(SpiOkCodes::Fetch as i32)?)
     }
 
     /// Consume the cursor, returning its name
@@ -1074,7 +1074,7 @@ impl SpiTupleTable {
     #[inline]
     fn check_ordinal_bounds(&self, ordinal: usize) -> Result<()> {
         if ordinal < 1 || ordinal > self.columns()? {
-            Err(Error::SpiError(SpiError::NoAttribute))
+            Err(Error::SpiError(SpiErrorCodes::NoAttribute))
         } else {
             Ok(())
         }
@@ -1140,7 +1140,7 @@ impl SpiTupleTable {
             let fnumber = pg_sys::SPI_fnumber(tupdesc, name_cstr.as_ptr());
 
             if fnumber == pg_sys::SPI_ERROR_NOATTRIBUTE {
-                Err(Error::SpiError(SpiError::NoAttribute))
+                Err(Error::SpiError(SpiErrorCodes::NoAttribute))
             } else {
                 Ok(fnumber as usize)
             }
@@ -1215,7 +1215,7 @@ impl SpiHeapTupleData {
         &self,
         ordinal: usize,
     ) -> std::result::Result<&SpiHeapTupleDataEntry, Error> {
-        self.entries.get(&ordinal).ok_or_else(|| Error::SpiError(SpiError::NoAttribute))
+        self.entries.get(&ordinal).ok_or_else(|| Error::SpiError(SpiErrorCodes::NoAttribute))
     }
 
     /// Get a raw Datum from this HeapTuple by its field name.
@@ -1236,7 +1236,7 @@ impl SpiHeapTupleData {
             let fnumber = pg_sys::SPI_fnumber(self.tupdesc.as_ptr(), name_cstr.as_ptr());
 
             if fnumber == pg_sys::SPI_ERROR_NOATTRIBUTE {
-                Err(Error::SpiError(SpiError::NoAttribute))
+                Err(Error::SpiError(SpiErrorCodes::NoAttribute))
             } else {
                 self.get_datum_by_ordinal(fnumber as usize)
             }
@@ -1247,7 +1247,7 @@ impl SpiHeapTupleData {
     ///
     /// # Errors
     ///
-    /// If the specified ordinal is out of bounds a [`SpiError::NoAttribute`] is returned
+    /// If the specified ordinal is out of bounds a [`SpiErrorCodes::NoAttribute`] is returned
     pub fn set_by_ordinal<T: IntoDatum>(
         &mut self,
         ordinal: usize,
@@ -1279,7 +1279,7 @@ impl SpiHeapTupleData {
             let name_cstr = CString::new(name).expect("name contained a null byte");
             let fnumber = pg_sys::SPI_fnumber(self.tupdesc.as_ptr(), name_cstr.as_ptr());
             if fnumber == pg_sys::SPI_ERROR_NOATTRIBUTE {
-                Err(Error::SpiError(SpiError::NoAttribute))
+                Err(Error::SpiError(SpiErrorCodes::NoAttribute))
             } else {
                 self.set_by_ordinal(fnumber as usize, datum)
             }
@@ -1298,7 +1298,7 @@ impl SpiHeapTupleData {
     #[inline]
     fn check_ordinal_bounds(&self, ordinal: usize) -> std::result::Result<(), Error> {
         if ordinal < 1 || ordinal > self.columns() {
-            Err(Error::SpiError(SpiError::NoAttribute))
+            Err(Error::SpiError(SpiErrorCodes::NoAttribute))
         } else {
             Ok(())
         }
