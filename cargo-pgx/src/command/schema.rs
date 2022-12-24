@@ -7,7 +7,7 @@ All rights reserved.
 Use of this source code is governed by the MIT license that can be found in the LICENSE file.
 */
 use crate::command::get::{find_control_file, get_property};
-use crate::command::install::format_display_path;
+use crate::command::install::{build_extension, format_display_path};
 use crate::pgx_pg_sys_stub::PgxPgSysStub;
 use crate::profile::CargoProfile;
 use crate::CommandExecute;
@@ -23,8 +23,11 @@ use std::path::{Path, PathBuf};
 use std::process::{Command, Stdio};
 // Since we support extensions with `#[no_std]`
 extern crate alloc;
+use crate::command::cross_options::CrossBuildArgs;
 use crate::manifest::{get_package_manifest, pg_config_and_version};
 use alloc::vec::Vec;
+use std::env;
+use std::ffi::OsString;
 
 // An apparent bug in `glibc` 2.17 prevents us from safely dropping this
 // otherwise users find issues such as https://github.com/tcdi/pgx/issues/572
@@ -112,6 +115,7 @@ impl CommandExecute for Schema {
             self.package.as_ref(),
             package_manifest_path,
             &profile,
+            &CrossBuildArgs::default(),
             self.test,
             &self.features,
             self.out.as_ref(),
@@ -183,6 +187,7 @@ pub(crate) fn generate_schema(
     user_package: Option<&String>,
     package_manifest_path: impl AsRef<Path>,
     profile: &CargoProfile,
+    cross_args: &CrossBuildArgs,
     is_test: bool,
     features: &clap_cargo::Features,
     path: Option<impl AsRef<std::path::Path>>,
@@ -230,12 +235,16 @@ pub(crate) fn generate_schema(
             command.arg(user_package);
         }
 
-        if let Some(user_manifest_path) = user_manifest_path {
+        if let Some(ref user_manifest_path) = user_manifest_path {
             command.arg("--manifest-path");
             command.arg(user_manifest_path.as_ref());
         }
 
         command.args(profile.cargo_args());
+
+        if cross_args.is_cross_compiling() {
+            command.env("RUSTFLAGS", env::var_os("HOST_RUSTFLAGS").unwrap_or(OsString::new()));
+        }
 
         if let Some(log_level) = &log_level {
             command.env("RUST_LOG", log_level);
@@ -297,7 +306,8 @@ pub(crate) fn generate_schema(
     // The next action may take a few seconds, we'd like the user to know we're thinking.
     eprintln!("{} SQL entities", " Discovering".bold().green(),);
 
-    let postmaster_stub_built = create_stub(&postmaster_path, &postmaster_stub_dir)?;
+    let postmaster_stub_built =
+        create_stub(&postmaster_path, &postmaster_stub_dir, cross_args.is_cross_compiling())?;
 
     // Inspect the symbol table for a list of `__pgx_internals` we should have the generator call
     let mut lib_so = target_dir_with_profile.clone();
@@ -305,6 +315,17 @@ pub(crate) fn generate_schema(
     let so_extension = if cfg!(target_os = "macos") { ".dylib" } else { ".so" };
 
     lib_so.push(&format!("lib{}{}", package_name.replace('-', "_"), so_extension));
+
+    if cross_args.is_cross_compiling() && !lib_so.try_exists()? {
+        eprintln!("Native plugin doesn't exist, building");
+        build_extension(
+            &user_manifest_path,
+            user_package,
+            profile,
+            features,
+            &cross_args.to_host_build(),
+        )?;
+    }
 
     let lib_so_data = std::fs::read(&lib_so).wrap_err("couldn't read extension shared object")?;
     let lib_so_obj_file =
@@ -480,6 +501,7 @@ pub(crate) fn generate_schema(
 fn create_stub(
     postmaster_path: impl AsRef<Path>,
     postmaster_stub_dir: impl AsRef<Path>,
+    cross_build: bool,
 ) -> eyre::Result<PathBuf> {
     let postmaster_path = postmaster_path.as_ref();
     let postmaster_stub_dir = postmaster_stub_dir.as_ref();
@@ -538,7 +560,9 @@ fn create_stub(
     let mut so_rustc_invocation = Command::new("rustc");
     so_rustc_invocation.stderr(Stdio::inherit());
 
-    if let Some(rustc_flags_str) = std::env::var("RUSTFLAGS").ok() {
+    let rustflags_var_name = if cross_build { "RUSTFLAGS" } else { "HOST_RUSTFLAG" };
+
+    if let Some(rustc_flags_str) = std::env::var(rustflags_var_name).ok() {
         let rustc_flags = rustc_flags_str.split(' ').collect::<Vec<_>>();
         so_rustc_invocation.args(rustc_flags);
     }

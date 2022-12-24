@@ -92,6 +92,7 @@ impl CommandExecute for Package {
             &pg_config,
             out_dir,
             &profile,
+            &self.cross_args,
             self.test,
             &self.features,
         )
@@ -110,6 +111,7 @@ pub(crate) fn package_extension(
     pg_config: &PgConfig,
     out_dir: PathBuf,
     profile: &CargoProfile,
+    cross_args: &CrossBuildArgs,
     is_test: bool,
     features: &clap_cargo::Features,
 ) -> eyre::Result<()> {
@@ -124,6 +126,7 @@ pub(crate) fn package_extension(
         &package_manifest_path,
         pg_config,
         profile,
+        cross_args,
         is_test,
         Some(out_dir),
         features,
