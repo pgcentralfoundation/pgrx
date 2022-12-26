@@ -210,4 +210,24 @@ mod tests {
         });
         assert_eq!(cnt, Ok(1000000))
     }
+
+    #[pg_test(error = "column \"cause_an_error\" does not exist")]
+    pub fn spi_in_iterator(
+    ) -> TableIterator<'static, (name!(id, i32), name!(relname, Result<Option<String>, spi::Error>))>
+    {
+        let oids = vec![1213, 1214, 1232, 1233, 1247, 1249, 1255];
+
+        TableIterator::new(oids.into_iter().map(|oid| {
+            (oid, Spi::get_one(&format!("SELECT CAUSE_AN_ERROR FROM pg_class WHERE oid = {oid}")))
+        }))
+    }
+
+    #[pg_test(error = "column \"cause_an_error\" does not exist")]
+    pub fn spi_in_setof() -> SetOfIterator<'static, Result<Option<String>, spi::Error>> {
+        let oids = vec![1213, 1214, 1232, 1233, 1247, 1249, 1255];
+
+        SetOfIterator::new(oids.into_iter().map(|oid| {
+            Spi::get_one(&format!("SELECT CAUSE_AN_ERROR FROM pg_class WHERE oid = {oid}"))
+        }))
+    }
 }

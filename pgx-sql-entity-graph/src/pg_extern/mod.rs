@@ -499,8 +499,9 @@ impl PgExtern {
                     #[::pgx::pgx_macros::pg_guard]
                     #[warn(unsafe_op_in_unsafe_fn)]
                     pub unsafe extern "C" fn #func_name_wrapper #func_generics(#fcinfo_ident: ::pgx::pg_sys::FunctionCallInfo) -> ::pgx::pg_sys::Datum {
+                        use core::ptr::NonNull;
                         struct IteratorHolder<'__pgx_internal_lifetime, T: std::panic::UnwindSafe + std::panic::RefUnwindSafe> {
-                            iter: *mut ::pgx::iter::SetOfIterator<'__pgx_internal_lifetime, T>,
+                            iter: NonNull<::pgx::iter::SetOfIterator<'__pgx_internal_lifetime, T>>,
                         }
 
                         let mut funcctx: ::pgx::pgbox::PgBox<::pgx::pg_sys::FuncCallContext>;
@@ -526,7 +527,7 @@ impl PgExtern {
                                     }
                                 };
 
-                                iterator_holder.iter = ::pgx::memcxt::PgMemoryContexts::For(funcctx.multi_call_memory_ctx).leak_trivial_alloc(result);
+                                iterator_holder.iter = NonNull::new_unchecked(::pgx::memcxt::PgMemoryContexts::For(funcctx.multi_call_memory_ctx).leak_trivial_alloc(result));
                             }
 
                             funcctx = ::pgx::fcinfo::srf_per_call_setup(#fcinfo_ident);
@@ -534,13 +535,9 @@ impl PgExtern {
                         }
 
                         // SAFETY: should have been set up correctly on this or previous call
-                        let mut iter = unsafe { Box::from_raw(iterator_holder.iter) };
+                        let iter = unsafe { iterator_holder.iter.as_mut() };
                         match iter.next() {
                             Some(result) => {
-                                // we need to leak the boxed iterator so that it's not freed by Rust and we can
-                                // continue to use it
-                                Box::leak(iter);
-
                                 // SAFETY: what is an srf if it does not return?
                                 unsafe { ::pgx::fcinfo::srf_return_next(#fcinfo_ident, &mut funcctx) };
                                 match ::pgx::datum::IntoDatum::into_datum(result) {
@@ -549,10 +546,6 @@ impl PgExtern {
                                 }
                             },
                             None => {
-                                // leak the iterator here too, even tho we're done, b/c our MemoryContextCallback
-                                // function is going to properly drop it for us
-                                Box::leak(iter);
-
                                 // SAFETY: seem to be finished
                                 unsafe { ::pgx::fcinfo::srf_return_done(#fcinfo_ident, &mut funcctx) };
                                 ::pgx::fcinfo::pg_return_null(#fcinfo_ident)
@@ -609,8 +602,9 @@ impl PgExtern {
                     #[::pgx::pgx_macros::pg_guard]
                     #[warn(unsafe_op_in_unsafe_fn)]
                     pub unsafe extern "C" fn #func_name_wrapper #func_generics(#fcinfo_ident: ::pgx::pg_sys::FunctionCallInfo) -> ::pgx::pg_sys::Datum {
+                        use core::ptr::NonNull;
                         struct IteratorHolder<'__pgx_internal_lifetime, T: std::panic::UnwindSafe + std::panic::RefUnwindSafe> {
-                            iter: *mut ::pgx::iter::TableIterator<'__pgx_internal_lifetime, T>,
+                            iter: NonNull<::pgx::iter::TableIterator<'__pgx_internal_lifetime, T>>,
                         }
 
                         let mut funcctx: ::pgx::pgbox::PgBox<::pgx::pg_sys::FuncCallContext>;
@@ -646,7 +640,7 @@ impl PgExtern {
                                     }
                                 };
 
-                                iterator_holder.iter = ::pgx::memcxt::PgMemoryContexts::For(funcctx.multi_call_memory_ctx).leak_and_drop_on_delete(result);
+                                iterator_holder.iter = NonNull::new_unchecked(::pgx::memcxt::PgMemoryContexts::For(funcctx.multi_call_memory_ctx).leak_and_drop_on_delete(result));
                             }
 
                             funcctx = ::pgx::fcinfo::srf_per_call_setup(#fcinfo_ident);
@@ -654,13 +648,9 @@ impl PgExtern {
                         }
 
                         // SAFETY: should have been set up correctly on this or previous call
-                        let mut iter = unsafe { Box::from_raw(iterator_holder.iter) };
+                        let iter = unsafe { iterator_holder.iter.as_mut() };
                         match iter.next() {
                             Some(result) => {
-                                // we need to leak the boxed iterator so that it's not freed by rust and we can
-                                // continue to use it
-                                Box::leak(iter);
-
                                 #create_heap_tuple
 
                                 let datum = ::pgx::htup::heap_tuple_get_datum(heap_tuple);
@@ -669,10 +659,6 @@ impl PgExtern {
                                 datum
                             },
                             None => {
-                                // leak the iterator here too, even tho we're done, b/c our MemoryContextCallback
-                                // function is going to properly drop it for us
-                                Box::leak(iter);
-
                                 // SAFETY: seem to be finished
                                 unsafe { ::pgx::fcinfo::srf_return_done(#fcinfo_ident, &mut funcctx) };
                                 ::pgx::fcinfo::pg_return_null(#fcinfo_ident)
