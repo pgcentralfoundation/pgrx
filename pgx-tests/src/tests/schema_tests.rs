@@ -91,17 +91,17 @@ mod tests {
 
     #[pg_test]
     fn test_in_different_schema() {
-        Spi::run("SELECT test_schema.func_in_diff_schema();");
+        Spi::run("SELECT test_schema.func_in_diff_schema();").expect("SPI failed");
     }
 
     #[pg_test]
     fn test_in_different_schema2() {
-        Spi::run("SELECT test_schema.func_in_diff_schema2();");
+        Spi::run("SELECT test_schema.func_in_diff_schema2();").expect("SPI failed");
     }
 
     #[pg_test]
     fn test_type_in_different_schema() {
-        Spi::run("SELECT type_in_diff_schema();");
+        Spi::run("SELECT type_in_diff_schema();").expect("SPI failed");
     }
 
     #[pg_test]
@@ -140,7 +140,7 @@ mod tests {
         let result = Spi::get_one::<bool>("SELECT exists(SELECT 1 FROM pg_proc WHERE proname = 'func_generated_with_custom_name');");
         assert_eq!(result, Ok(Some(true)));
 
-        Spi::run("SELECT test_schema.func_generated_with_custom_name();");
+        Spi::run("SELECT test_schema.func_generated_with_custom_name();").expect("SPI failed");
     }
 
     #[pg_test]

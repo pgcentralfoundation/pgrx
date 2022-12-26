@@ -88,7 +88,7 @@ mod tests {
     fn test_generate_series() {
         let cnt = Spi::connect(|client| {
             let mut table =
-                client.select("SELECT * FROM example_generate_series(1, 10)", None, None);
+                client.select("SELECT * FROM example_generate_series(1, 10)", None, None)?;
 
             let mut expect = 0;
             while table.next().is_some() {
@@ -98,7 +98,7 @@ mod tests {
                 assert_eq!(value, Some(expect));
             }
 
-            Ok::<_, pgx::spi::Error>(expect)
+            Ok::<_, spi::Error>(expect)
         })
         .unwrap();
 
@@ -108,7 +108,7 @@ mod tests {
     #[pg_test]
     fn test_composite_set() {
         let cnt = Spi::connect(|client| {
-            let mut table = client.select("SELECT * FROM example_composite_set()", None, None);
+            let mut table = client.select("SELECT * FROM example_composite_set()", None, None)?;
 
             let mut expect = 0;
             while table.next().is_some() {
@@ -124,7 +124,7 @@ mod tests {
                 }
             }
 
-            Ok::<_, pgx::spi::Error>(expect)
+            Ok::<_, spi::Error>(expect)
         })
         .unwrap();
 
@@ -134,80 +134,80 @@ mod tests {
     #[pg_test]
     fn test_return_some_iterator() {
         let cnt = Spi::connect(|client| {
-            let table = client.select("SELECT * from return_some_iterator();", None, None);
+            let table = client.select("SELECT * from return_some_iterator();", None, None)?;
 
-            table.len() as i64
+            Ok::<_, spi::Error>(table.len() as i64)
         });
 
-        assert_eq!(cnt, 3)
+        assert_eq!(cnt, Ok(3))
     }
 
     #[pg_test]
     fn test_return_none_iterator() {
         let cnt = Spi::connect(|client| {
-            let table = client.select("SELECT * from return_none_iterator();", None, None);
+            let table = client.select("SELECT * from return_none_iterator();", None, None)?;
 
-            table.len() as i64
+            Ok::<_, spi::Error>(table.len() as i64)
         });
 
-        assert_eq!(cnt, 0)
+        assert_eq!(cnt, Ok(0))
     }
 
     #[pg_test]
     fn test_return_some_setof_iterator() {
         let cnt = Spi::connect(|client| {
-            let table = client.select("SELECT * from return_some_setof_iterator();", None, None);
+            let table = client.select("SELECT * from return_some_setof_iterator();", None, None)?;
 
-            table.len() as i64
+            Ok::<_, spi::Error>(table.len() as i64)
         });
 
-        assert_eq!(cnt, 3)
+        assert_eq!(cnt, Ok(3))
     }
 
     #[pg_test]
     fn test_return_none_setof_iterator() {
         let cnt = Spi::connect(|client| {
-            let table = client.select("SELECT * from return_none_setof_iterator();", None, None);
+            let table = client.select("SELECT * from return_none_setof_iterator();", None, None)?;
 
-            table.len() as i64
+            Ok::<_, spi::Error>(table.len() as i64)
         });
 
-        assert_eq!(cnt, 0)
+        assert_eq!(cnt, Ok(0))
     }
 
     #[pg_test]
     fn test_srf_setof_datum_detoasting_with_borrow() {
         let cnt = Spi::connect(|mut client| {
             // build up a table with one large column that Postgres will be forced to TOAST
-            client.update("CREATE TABLE test_srf_datum_detoasting AS SELECT array_to_string(array_agg(g),' ') s FROM (SELECT 'a' g FROM generate_series(1, 1000000)) x;", None, None);
+            client.update("CREATE TABLE test_srf_datum_detoasting AS SELECT array_to_string(array_agg(g),' ') s FROM (SELECT 'a' g FROM generate_series(1, 1000000)) x;", None, None)?;
 
             // and make sure we can use the DETOASTED value with our SRF function
             let table = client.select(
                 "SELECT split_set_with_borrow(s, ' ') FROM test_srf_datum_detoasting",
                 None,
                 None,
-            );
+            )?;
 
-            table.len() as i64
+            Ok::<_, spi::Error>(table.len() as i64)
         });
-        assert_eq!(cnt, 1000000)
+        assert_eq!(cnt, Ok(1000000))
     }
 
     #[pg_test]
     fn test_srf_table_datum_detoasting_with_borrow() {
         let cnt = Spi::connect(|mut client| {
             // build up a table with one large column that Postgres will be forced to TOAST
-            client.update("CREATE TABLE test_srf_datum_detoasting AS SELECT array_to_string(array_agg(g),' ') s FROM (SELECT 'a' g FROM generate_series(1, 1000000)) x;", None, None);
+            client.update("CREATE TABLE test_srf_datum_detoasting AS SELECT array_to_string(array_agg(g),' ') s FROM (SELECT 'a' g FROM generate_series(1, 1000000)) x;", None, None)?;
 
             // and make sure we can use the DETOASTED value with our SRF function
             let table = client.select(
                 "SELECT split_table_with_borrow(s, ' ') FROM test_srf_datum_detoasting",
                 None,
                 None,
-            );
+            )?;
 
-            table.len() as i64
+            Ok::<_, spi::Error>(table.len() as i64)
         });
-        assert_eq!(cnt, 1000000)
+        assert_eq!(cnt, Ok(1000000))
     }
 }

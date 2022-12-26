@@ -18,112 +18,104 @@ mod tests {
     use pgx::spi;
 
     #[pg_test(error = "syntax error at or near \"THIS\"")]
-    fn test_spi_failure() {
-        Spi::connect(|client| {
-            client.select("THIS IS NOT A VALID QUERY", None, None);
-        });
+    fn test_spi_failure() -> Result<(), spi::Error> {
+        Spi::connect(|client| client.select("THIS IS NOT A VALID QUERY", None, None)).map(|_| ())
     }
 
     #[pg_test]
-    fn test_spi_can_nest() {
+    fn test_spi_can_nest() -> Result<(), spi::Error> {
         Spi::connect(|_| {
-            Spi::connect(|_| {
-                Spi::connect(|_| {
-                    Spi::connect(|_| {
-                        Spi::connect(|_| {});
-                    });
-                });
-            });
-        });
+            Spi::connect(|_| Spi::connect(|_| Spi::connect(|_| Spi::connect(|_| Ok(())))))
+        })
     }
 
     #[pg_test]
     fn test_spi_returns_primitive() -> Result<(), spi::Error> {
-        let rc = Spi::connect(|client| {
-            client.select("SELECT 42", None, None).first().get_datum::<i32>(1)
-        })?;
+        let rc =
+            Spi::connect(|client| client.select("SELECT 42", None, None)?.first().get::<i32>(1))?;
 
-        assert_eq!(42, rc.expect("SPI failed to return proper value"));
+        assert_eq!(Some(42), rc);
         Ok(())
     }
 
     #[pg_test]
     fn test_spi_returns_str() -> Result<(), spi::Error> {
         let rc = Spi::connect(|client| {
-            client.select("SELECT 'this is a test'", None, None).first().get_datum::<&str>(1)
+            client.select("SELECT 'this is a test'", None, None)?.first().get::<&str>(1)
         })?;
 
-        assert_eq!("this is a test", rc.expect("SPI failed to return proper value"));
+        assert_eq!(Some("this is a test"), rc);
         Ok(())
     }
 
     #[pg_test]
     fn test_spi_returns_string() -> Result<(), spi::Error> {
         let rc = Spi::connect(|client| {
-            client.select("SELECT 'this is a test'", None, None).first().get_datum::<String>(1)
+            client.select("SELECT 'this is a test'", None, None)?.first().get::<&str>(1)
         })?;
 
-        assert_eq!("this is a test", rc.expect("SPI failed to return proper value"));
+        assert_eq!(Some("this is a test"), rc);
         Ok(())
     }
 
     #[pg_test]
-    fn test_spi_get_one() {
+    fn test_spi_get_one() -> Result<(), spi::Error> {
         Spi::connect(|client| {
-            let i = client
-                .select("SELECT 42::bigint", None, None)
-                .first()
-                .get_one::<i64>()
-                .expect("SPI failed");
+            let i = client.select("SELECT 42::bigint", None, None)?.first().get_one::<i64>()?;
             assert_eq!(Some(42), i);
-        });
+            Ok(())
+        })
     }
 
     #[pg_test]
-    fn test_spi_get_two() {
+    fn test_spi_get_two() -> Result<(), spi::Error> {
         Spi::connect(|client| {
-            let (i, s) = client
-                .select("SELECT 42, 'test'", None, None)
-                .first()
-                .get_two::<i64, &str>()
-                .expect("SPI failed");
+            let (i, s) =
+                client.select("SELECT 42, 'test'", None, None)?.first().get_two::<i64, &str>()?;
 
             assert_eq!(Some(42), i);
             assert_eq!(Some("test"), s);
-        });
+            Ok(())
+        })
     }
 
     #[pg_test]
-    fn test_spi_get_three() {
+    fn test_spi_get_three() -> Result<(), spi::Error> {
         Spi::connect(|client| {
             let (i, s, b) = client
-                .select("SELECT 42, 'test', true", None, None)
+                .select("SELECT 42, 'test', true", None, None)?
                 .first()
-                .get_three::<i64, &str, bool>()
-                .expect("SPI failed");
+                .get_three::<i64, &str, bool>()?;
 
             assert_eq!(Some(42), i);
             assert_eq!(Some("test"), s);
             assert_eq!(Some(true), b);
-        });
+            Ok(())
+        })
     }
 
     #[pg_test]
-    fn test_spi_get_two_with_failure() {
-        Spi::connect(|client| {
-            assert!(client.select("SELECT 42", None, None).first().get_two::<i64, &str>().is_err());
-        });
-    }
-
-    #[pg_test]
-    fn test_spi_get_three_failure() {
+    fn test_spi_get_two_with_failure() -> Result<(), spi::Error> {
         Spi::connect(|client| {
             assert!(client
-                .select("SELECT 42, 'test'", None, None)
+                .select("SELECT 42", None, None)?
+                .first()
+                .get_two::<i64, &str>()
+                .is_err());
+            Ok(())
+        })
+    }
+
+    #[pg_test]
+    fn test_spi_get_three_failure() -> Result<(), spi::Error> {
+        Spi::connect(|client| {
+            assert!(client
+                .select("SELECT 42, 'test'", None, None)?
                 .first()
                 .get_three::<i64, &str, bool>()
                 .is_err());
-        });
+            Ok(())
+        })
     }
 
     #[pg_test]
@@ -133,7 +125,7 @@ mod tests {
 
     #[pg_test]
     fn test_spi_run() {
-        Spi::run("SELECT 1")
+        assert!(Spi::run("SELECT 1").is_ok());
     }
 
     #[pg_test]
@@ -141,13 +133,14 @@ mod tests {
         let i = 1 as i32;
         let j = 2 as i64;
 
-        Spi::run_with_args(
+        assert!(Spi::run_with_args(
             "SELECT $1 + $2 = 3",
             Some(vec![
                 (PgBuiltInOids::INT4OID.oid(), Some(i.into())),
                 (PgBuiltInOids::INT8OID.oid(), Some(j.into())),
             ]),
         )
+        .is_ok());
     }
 
     #[pg_test]
@@ -181,14 +174,14 @@ mod tests {
 
     #[pg_test(error = "did a panic")]
     fn test_panic_via_spi() {
-        Spi::run("SELECT tests.do_panic();");
+        Spi::run("SELECT tests.do_panic();").expect("SPI failed");
     }
 
     #[pg_test]
     fn test_inserting_null() -> Result<(), pgx::spi::Error> {
         Spi::connect(|mut client| {
-            client.update("CREATE TABLE tests.null_test (id uuid)", None, None);
-        });
+            client.update("CREATE TABLE tests.null_test (id uuid)", None, None)
+        })?;
         assert_eq!(
             Spi::get_one_with_args::<i32>(
                 "INSERT INTO tests.null_test VALUES ($1) RETURNING 1",
@@ -200,48 +193,50 @@ mod tests {
         Ok(())
     }
 
+    fn sum_all(table: pgx::spi::SpiTupleTable) -> i32 {
+        table
+            .map(|r| r.get_datum_by_ordinal(1)?.value::<i32>())
+            .map(|r| r.expect("failed to get ordinal #1").expect("ordinal #1 was null"))
+            .sum()
+    }
+
     #[pg_test]
-    fn test_cursor() {
+    fn test_cursor() -> Result<(), spi::Error> {
         Spi::connect(|mut client| {
-            client.update("CREATE TABLE tests.cursor_table (id int)", None, None);
+            client.update("CREATE TABLE tests.cursor_table (id int)", None, None)?;
             client.update(
                 "INSERT INTO tests.cursor_table (id) \
             SELECT i FROM generate_series(1, 10) AS t(i)",
                 None,
                 None,
-            );
-            let mut portal = client.open_cursor("SELECT * FROM tests.cursor_table", None).unwrap();
+            )?;
+            let mut portal = client.open_cursor("SELECT * FROM tests.cursor_table", None);
 
-            fn sum_all(table: pgx::SpiTupleTable) -> i32 {
-                table.map(|r| r.by_ordinal(1).unwrap().value::<i32>().unwrap()).sum()
-            }
-            assert_eq!(sum_all(portal.fetch(3)), 1 + 2 + 3);
-            assert_eq!(sum_all(portal.fetch(3)), 4 + 5 + 6);
-            assert_eq!(sum_all(portal.fetch(3)), 7 + 8 + 9);
-            assert_eq!(sum_all(portal.fetch(3)), 10);
-        });
+            assert_eq!(sum_all(portal.fetch(3)?), 1 + 2 + 3);
+            assert_eq!(sum_all(portal.fetch(3)?), 4 + 5 + 6);
+            assert_eq!(sum_all(portal.fetch(3)?), 7 + 8 + 9);
+            assert_eq!(sum_all(portal.fetch(3)?), 10);
+            Ok(())
+        })
     }
 
     #[pg_test]
     fn test_cursor_prepared_statement() -> Result<(), pgx::spi::Error> {
         Spi::connect(|mut client| {
-            client.update("CREATE TABLE tests.cursor_table (id int)", None, None);
+            client.update("CREATE TABLE tests.cursor_table (id int)", None, None)?;
             client.update(
                 "INSERT INTO tests.cursor_table (id) \
             SELECT i FROM generate_series(1, 10) AS t(i)",
                 None,
                 None,
-            );
-            let prepared = client.prepare("SELECT * FROM tests.cursor_table", None);
-            let mut portal = client.open_cursor(&prepared, None)?;
+            )?;
+            let prepared = client.prepare("SELECT * FROM tests.cursor_table", None)?;
+            let mut portal = client.open_cursor(&prepared, None);
 
-            fn sum_all(table: pgx::SpiTupleTable) -> i32 {
-                table.map(|r| r.by_ordinal(1).unwrap().value::<i32>().unwrap()).sum()
-            }
-            assert_eq!(sum_all(portal.fetch(3)), 1 + 2 + 3);
-            assert_eq!(sum_all(portal.fetch(3)), 4 + 5 + 6);
-            assert_eq!(sum_all(portal.fetch(3)), 7 + 8 + 9);
-            assert_eq!(sum_all(portal.fetch(3)), 10);
+            assert_eq!(sum_all(portal.fetch(3)?), 1 + 2 + 3);
+            assert_eq!(sum_all(portal.fetch(3)?), 4 + 5 + 6);
+            assert_eq!(sum_all(portal.fetch(3)?), 7 + 8 + 9);
+            assert_eq!(sum_all(portal.fetch(3)?), 10);
             Ok(())
         })
     }
@@ -249,41 +244,39 @@ mod tests {
     #[pg_test]
     fn test_cursor_by_name() -> Result<(), pgx::spi::Error> {
         let cursor_name = Spi::connect(|mut client| {
-            client.update("CREATE TABLE tests.cursor_table (id int)", None, None);
+            client.update("CREATE TABLE tests.cursor_table (id int)", None, None)?;
             client.update(
                 "INSERT INTO tests.cursor_table (id) \
             SELECT i FROM generate_series(1, 10) AS t(i)",
                 None,
                 None,
-            );
-            client.open_cursor("SELECT * FROM tests.cursor_table", None).map(|mut cursor| {
-                assert_eq!(sum_all(cursor.fetch(3)), 1 + 2 + 3);
-                cursor.detach_into_name()
-            })
-        })?;
-
-        fn sum_all(table: pgx::SpiTupleTable) -> i32 {
-            table.map(|r| r.by_ordinal(1).unwrap().value::<i32>().unwrap()).sum()
-        }
-        Spi::connect(|client| {
-            client.find_cursor(&cursor_name).map(|mut cursor| {
-                assert_eq!(sum_all(cursor.fetch(3)), 4 + 5 + 6);
-                assert_eq!(sum_all(cursor.fetch(3)), 7 + 8 + 9);
-                cursor.detach_into_name();
-            })
+            )?;
+            let mut cursor = client.open_cursor("SELECT * FROM tests.cursor_table", None);
+            assert_eq!(sum_all(cursor.fetch(3)?), 1 + 2 + 3);
+            Ok::<_, spi::Error>(cursor.detach_into_name())
         })?;
 
         Spi::connect(|client| {
-            client.find_cursor(&cursor_name).map(|mut cursor| {
-                assert_eq!(sum_all(cursor.fetch(3)), 10);
-            })
+            let mut cursor = client.find_cursor(&cursor_name)?;
+            assert_eq!(sum_all(cursor.fetch(3)?), 4 + 5 + 6);
+            assert_eq!(sum_all(cursor.fetch(3)?), 7 + 8 + 9);
+            cursor.detach_into_name();
+            Ok::<_, spi::Error>(())
+        })?;
+
+        Spi::connect(|client| {
+            let mut cursor = client.find_cursor(&cursor_name)?;
+            assert_eq!(sum_all(cursor.fetch(3)?), 10);
+            Ok::<_, spi::Error>(())
         })?;
         Ok(())
     }
 
     #[pg_test(error = "syntax error at or near \"THIS\"")]
     fn test_cursor_failure() {
-        Spi::connect(|client| client.open_cursor("THIS IS NOT SQL", None).map(|_| ())).unwrap();
+        Spi::connect(|client| {
+            client.open_cursor("THIS IS NOT SQL", None);
+        })
     }
 
     #[pg_test(error = "cursor: CursorNotFound(\"NOT A CURSOR\")")]
@@ -292,84 +285,79 @@ mod tests {
     }
 
     #[pg_test]
-    fn test_columns() {
-        use pgx::{PgBuiltInOids, PgOid};
+    fn test_columns() -> Result<(), spi::Error> {
         Spi::connect(|client| {
-            let res = client.select("SELECT 42 AS a, 'test' AS b", None, None);
+            let res = client.select("SELECT 42 AS a, 'test' AS b", None, None)?;
 
-            assert_eq!(2, res.columns());
-
+            assert_eq!(Ok(2), res.columns());
             assert_eq!(res.column_type_oid(1).unwrap(), PgOid::BuiltIn(PgBuiltInOids::INT4OID));
-
             assert_eq!(res.column_type_oid(2).unwrap(), PgOid::BuiltIn(PgBuiltInOids::TEXTOID));
-
             assert_eq!(res.column_name(1).unwrap(), "a");
-
             assert_eq!(res.column_name(2).unwrap(), "b");
-        });
+            Ok::<_, spi::Error>(())
+        })?;
 
         Spi::connect(|mut client| {
-            let res = client.update("SET TIME ZONE 'PST8PDT'", None, None);
+            let res = client.update("SET TIME ZONE 'PST8PDT'", None, None)?;
 
-            assert_eq!(0, res.columns());
-        });
+            assert_eq!(Err(spi::Error::NoTupleTable), res.columns());
+            Ok(())
+        })
     }
 
     #[pg_test]
     fn test_connect_return_anything() {
         struct T;
-        assert!(matches!(Spi::connect(|_| Ok::<_, ()>(Some(T))).unwrap().unwrap(), T));
+        assert!(matches!(Spi::connect(|_| Ok::<_, spi::Error>(Some(T))).unwrap().unwrap(), T));
     }
 
     #[pg_test]
     fn test_spi_non_mut() -> Result<(), pgx::spi::Error> {
         // Ensures update and cursor APIs do not need mutable reference to SpiClient
         Spi::connect(|mut client| {
-            client.update("SELECT 1", None, None);
-            let cursor = client.open_cursor("SELECT 1", None)?.detach_into_name();
+            client.update("SELECT 1", None, None).expect("SPI failed");
+            let cursor = client.open_cursor("SELECT 1", None).detach_into_name();
             client.find_cursor(&cursor).map(|_| ())
         })
     }
 
     #[pg_test]
-    fn test_open_multiple_tuptables() {
+    fn test_open_multiple_tuptables() -> Result<(), spi::Error> {
         // Regression test to ensure a new `SpiTupTable` instance does not override the
         // effective length of an already open one due to misuse of Spi statics
         Spi::connect(|client| {
-            let a = client.select("SELECT 1", None, None).first();
-            let _b = client.select("SELECT 1 WHERE 'f'", None, None);
+            let a = client.select("SELECT 1", None, None)?.first();
+            let _b = client.select("SELECT 1 WHERE 'f'", None, None)?;
             assert!(!a.is_empty());
             assert_eq!(1, a.len());
-            assert!(a.get_heap_tuple().is_some());
-            assert_eq!(Ok(Some(1)), a.get_datum::<i32>(1));
+            assert!(a.get_heap_tuple().is_ok());
+            assert_eq!(Ok(Some(1)), a.get::<i32>(1));
+            Ok(())
         })
     }
 
     #[pg_test]
-    fn test_open_multiple_tuptables_rev() {
+    fn test_open_multiple_tuptables_rev() -> Result<(), spi::Error> {
         // Regression test to ensure a new `SpiTupTable` instance does not override the
         // effective length of an already open one.
         // Same as `test_open_multiple_tuptables`, but with the second tuptable being empty
         Spi::connect(|client| {
-            let a = client.select("SELECT 1 WHERE 'f'", None, None).first();
-            let _b = client.select("SELECT 1", None, None);
+            let a = client.select("SELECT 1 WHERE 'f'", None, None)?.first();
+            let _b = client.select("SELECT 1", None, None)?;
             assert!(a.is_empty());
             assert_eq!(0, a.len());
-            assert!(a.get_heap_tuple().is_none());
-            assert_eq!(Err(pgx::spi::Error::InvalidPosition), a.get_datum::<i32>(1));
-        });
+            assert!(a.get_heap_tuple().is_ok());
+            assert_eq!(Err(pgx::spi::Error::InvalidPosition), a.get::<i32>(1));
+            Ok(())
+        })
     }
 
     #[pg_test]
     fn test_prepared_statement() -> Result<(), spi::Error> {
         let rc = Spi::connect(|client| {
             let prepared =
-                client.prepare("SELECT $1", Some(vec![PgOid::BuiltIn(PgBuiltInOids::INT4OID)]));
-            client
-                .select(&prepared, None, Some(vec![42.into_datum()]))
-                .unwrap()
-                .first()
-                .get_datum::<i32>(1)
+                client.prepare("SELECT $1", Some(vec![PgOid::BuiltIn(PgBuiltInOids::INT4OID)]))?;
+            client.select(&prepared, None, Some(vec![42.into_datum()]))?.first().get::<i32>(1)
         })?;
 
         assert_eq!(42, rc.expect("SPI failed to return proper value"));
@@ -378,35 +366,34 @@ mod tests {
 
     #[pg_test]
     fn test_prepared_statement_argument_mismatch() {
-        use pgx::PreparedStatementError;
         let err = Spi::connect(|client| {
             let prepared =
-                client.prepare("SELECT $1", Some(vec![PgOid::BuiltIn(PgBuiltInOids::INT4OID)]));
+                client.prepare("SELECT $1", Some(vec![PgOid::BuiltIn(PgBuiltInOids::INT4OID)]))?;
             client.select(&prepared, None, None)
         })
         .unwrap_err();
 
         assert!(matches!(
             err,
-            PreparedStatementError::ArgumentCountMismatch { expected: 1, got: 0 }
+            spi::Error::PreparedStatementArgumentMismatch { expected: 1, got: 0 }
         ));
     }
 
     #[pg_test]
-    fn test_owned_prepared_statement() {
+    fn test_owned_prepared_statement() -> Result<(), spi::Error> {
         let prepared = Spi::connect(|client| {
-            client.prepare("SELECT $1", Some(vec![PgOid::BuiltIn(PgBuiltInOids::INT4OID)])).keep()
-        });
+            Ok::<_, spi::Error>(
+                client
+                    .prepare("SELECT $1", Some(vec![PgOid::BuiltIn(PgBuiltInOids::INT4OID)]))?
+                    .keep(),
+            )
+        })?;
         let rc = Spi::connect(|client| {
-            client
-                .select(&prepared, None, Some(vec![42.into_datum()]))
-                .unwrap()
-                .first()
-                .get_datum::<i32>(1)
-        })
-        .unwrap();
+            client.select(&prepared, None, Some(vec![42.into_datum()]))?.first().get::<i32>(1)
+        })?;
 
-        assert_eq!(42, rc.expect("SPI failed to return proper value"))
+        assert_eq!(Some(42), rc);
+        Ok(())
     }
 
     #[pg_test]
@@ -415,18 +402,19 @@ mod tests {
     }
 
     #[pg_test(error = "CREATE TABLE is not allowed in a non-volatile function")]
-    fn test_readwrite_in_readonly() {
+    fn test_readwrite_in_readonly() -> Result<(), spi::Error> {
         // This is supposed to run in read-only
-        Spi::connect(|client| client.select("CREATE TABLE a ()", None, None));
+        Spi::connect(|client| client.select("CREATE TABLE a ()", None, None)).map(|_| ())
     }
 
     #[pg_test]
-    fn test_readwrite_in_select_readwrite() {
+    fn test_readwrite_in_select_readwrite() -> Result<(), spi::Error> {
         Spi::connect(|mut client| {
             // This is supposed to switch connection to read-write and run it there
-            client.update("CREATE TABLE a (id INT)", None, None);
+            client.update("CREATE TABLE a (id INT)", None, None)?;
             // This is supposed to run in read-write
-            client.select("INSERT INTO a VALUES (1)", None, None);
-        });
+            client.select("INSERT INTO a VALUES (1)", None, None)?;
+            Ok(())
+        })
     }
 }

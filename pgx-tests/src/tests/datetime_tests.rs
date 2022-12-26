@@ -377,7 +377,7 @@ mod tests {
         .unwrap();
 
         // prevents PG's timestamp serialization from imposing the local servers time zone
-        Spi::run("SET TIME ZONE 'UTC'");
+        Spi::run("SET TIME ZONE 'UTC'").expect("SPI failed");
         let json = json!({ "time stamp with timezone test": time_stamp_with_timezone });
 
         // but we serialize timestamps at UTC
@@ -387,7 +387,7 @@ mod tests {
     #[pg_test]
     fn test_timestamp_serialization() {
         // prevents PG's timestamp serialization from imposing the local servers time zone
-        Spi::run("SET TIME ZONE 'UTC'");
+        Spi::run("SET TIME ZONE 'UTC'").expect("SPI failed");
 
         let datetime = PrimitiveDateTime::new(
             time::Date::from_calendar_date(2020, time::Month::try_from(1).unwrap(), 1).unwrap(),

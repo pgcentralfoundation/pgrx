@@ -86,17 +86,17 @@ mod tests {
     use pgx::prelude::*;
 
     #[pg_test]
-    fn test_complex_in() {
+    fn test_complex_in() -> Result<(), pgx::spi::Error> {
         Spi::connect(|client| {
             let complex = client
-                .select("SELECT '1.1,2.2'::complex;", None, None)
+                .select("SELECT '1.1,2.2'::complex;", None, None)?
                 .first()
-                .get_one::<PgBox<Complex>>()
-                .expect("SPI failed")
-                .unwrap();
+                .get_one::<PgBox<Complex>>()?
+                .expect("datum was null");
 
             assert_eq!(&complex.x, &1.1);
             assert_eq!(&complex.y, &2.2);
+            Ok(())
         })
     }
 
@@ -108,18 +108,18 @@ mod tests {
     }
 
     #[pg_test]
-    fn test_complex_from_text() {
+    fn test_complex_from_text() -> Result<(), pgx::spi::Error> {
         Spi::connect(|client| {
             let complex = client
-                .select("SELECT '1.1, 2.2'::complex;", None, None)
+                .select("SELECT '1.1, 2.2'::complex;", None, None)?
                 .first()
-                .get_one::<PgBox<Complex>>()
-                .expect("SPI failed")
-                .unwrap();
+                .get_one::<PgBox<Complex>>()?
+                .expect("datum was null");
 
             assert_eq!(&complex.x, &1.1);
             assert_eq!(&complex.y, &2.2);
-        });
+            Ok(())
+        })
     }
 
     #[pg_test]
@@ -127,7 +127,7 @@ mod tests {
         let complex = Spi::connect(|mut client| {
             client.update(
                 "CREATE TABLE complex_test AS SELECT s as id, (s || '.0, 2.0' || s)::complex as value FROM generate_series(1, 1000) s;\
-                SELECT value FROM complex_test ORDER BY id;", None, None).first().get_one::<PgBox<Complex>>()
+                SELECT value FROM complex_test ORDER BY id;", None, None)?.first().get_one::<PgBox<Complex>>()
         })?.expect("datum was null");
 
         assert_eq!(&complex.x, &1.0);
