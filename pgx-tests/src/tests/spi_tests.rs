@@ -417,4 +417,46 @@ mod tests {
             Ok(())
         })
     }
+
+    #[pg_test]
+    fn test_spi_select_sees_update() -> spi::Result<()> {
+        let with_select = Spi::connect(|mut client| {
+            client.update("CREATE TABLE asd(id int)", None, None)?;
+            client.update("INSERT INTO asd(id) VALUES (1)", None, None)?;
+            client.select("SELECT COUNT(*) FROM asd", None, None)?.first().get_one::<i64>()
+        })?;
+        let with_get_one = Spi::get_one::<i64>("SELECT COUNT(*) FROM asd")?;
+
+        assert_eq!(with_select, with_get_one);
+        Ok(())
+    }
+
+    #[pg_test]
+    fn test_spi_select_sees_run() -> spi::Result<()> {
+        Spi::run("CREATE TABLE asd(id int)")?;
+        Spi::run("INSERT INTO asd(id) VALUES (1)")?;
+        let with_select = Spi::connect(|client| {
+            client.select("SELECT COUNT(*) FROM asd", None, None)?.first().get_one::<i64>()
+        })?;
+        let with_get_one = Spi::get_one::<i64>("SELECT COUNT(*) FROM asd")?;
+
+        assert_eq!(with_select, with_get_one);
+        Ok(())
+    }
+
+    #[pg_test]
+    fn test_spi_select_sees_update_in_other_session() -> spi::Result<()> {
+        Spi::connect::<spi::Result<()>, _>(|mut client| {
+            client.update("CREATE TABLE asd(id int)", None, None)?;
+            client.update("INSERT INTO asd(id) VALUES (1)", None, None)?;
+            Ok(())
+        })?;
+        let with_select = Spi::connect(|client| {
+            client.select("SELECT COUNT(*) FROM asd", None, None)?.first().get_one::<i64>()
+        })?;
+        let with_get_one = Spi::get_one::<i64>("SELECT COUNT(*) FROM asd")?;
+
+        assert_eq!(with_select, with_get_one);
+        Ok(())
+    }
 }
