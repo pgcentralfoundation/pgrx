@@ -161,6 +161,20 @@ pub struct SpiClient<'conn> {
     __marker: PhantomData<&'conn SpiConnection>,
 }
 
+impl<'conn> Drop for SpiClient<'conn> {
+    fn drop(&mut self) {
+        if self.readonly == false {
+            // Assume the user actually modified the database during this SpiClient's lifetime
+            // and push a new snapshot with an updated CommandId.  This ensures that subsequent
+            // `readonly == true` SpiClients will see the changes made by this one
+            unsafe {
+                pg_sys::PushCopiedSnapshot(pg_sys::GetActiveSnapshot());
+                pg_sys::UpdateActiveSnapshotCommandId();
+            }
+        }
+    }
+}
+
 /// a struct to manage our SPI connection lifetime
 struct SpiConnection(PhantomData<*mut ()>);
 
