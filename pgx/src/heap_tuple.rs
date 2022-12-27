@@ -271,7 +271,7 @@ impl<'a> PgHeapTuple<'a, AllocatedByRust> {
                     let is_compatible_composite_types =
                         type_oid == pg_sys::RECORDOID && composite_type_oid == Some(att.atttypid);
                     if !is_compatible_composite_types && !T::is_compatible_with(att.atttypid) {
-                        return Err(TryFromDatumError::IncompatibleTypes);
+                        return Err(TryFromDatumError::IncompatibleTypes { preferred: att.atttypid, got: type_oid });
                     }
                 }
             }

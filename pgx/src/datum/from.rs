@@ -19,8 +19,11 @@ use std::num::NonZeroUsize;
 /// If converting a Datum to a Rust type fails, this is the set of possible reasons why.
 #[derive(thiserror::Error, Debug, Clone, PartialEq, Eq)]
 pub enum TryFromDatumError {
-    #[error("The specified type of the Datum is not compatible with the desired Rust type.")]
-    IncompatibleTypes,
+    #[error("The specified type of the Datum (oid {got}) is not compatible with the desired Rust type (preferred oid {preferred})")]
+    IncompatibleTypes {
+        preferred: pg_sys::Oid,
+        got: pg_sys::Oid,
+    },
 
     #[error("The specified attribute number `{0}` is not present")]
     NoSuchAttributeNumber(NonZeroUsize),
@@ -113,7 +116,7 @@ pub trait FromDatum {
         Self: Sized + IntoDatum,
     {
         if !Self::is_compatible_with(type_oid) {
-            Err(TryFromDatumError::IncompatibleTypes)
+            Err(TryFromDatumError::IncompatibleTypes { preferred: Self::type_oid(), got: type_oid})
         } else {
             Ok(FromDatum::from_polymorphic_datum(datum, is_null, type_oid))
         }
@@ -131,7 +134,7 @@ pub trait FromDatum {
         Self: Sized + IntoDatum,
     {
         if !Self::is_compatible_with(type_oid) {
-            Err(TryFromDatumError::IncompatibleTypes)
+            Err(TryFromDatumError::IncompatibleTypes { preferred: Self::type_oid(), got: type_oid})
         } else {
             Ok(FromDatum::from_datum_in_memory_context(memory_context, datum, is_null, type_oid))
         }
