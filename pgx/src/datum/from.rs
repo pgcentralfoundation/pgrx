@@ -20,11 +20,7 @@ use std::num::NonZeroUsize;
 #[derive(thiserror::Error, Debug, Clone, PartialEq, Eq)]
 pub enum TryFromDatumError {
     #[error("The specified type of the Datum (oid {rust_oid}) is not compatible with the desired Rust type ({rust_type}, primary oid {rust_oid})")]
-    IncompatibleTypes {
-        rust_type: &'static str,
-        rust_oid: pg_sys::Oid,
-        datum_oid: pg_sys::Oid,
-    },
+    IncompatibleTypes { rust_type: &'static str, rust_oid: pg_sys::Oid, datum_oid: pg_sys::Oid },
 
     #[error("The specified attribute number `{0}` is not present")]
     NoSuchAttributeNumber(NonZeroUsize),
@@ -120,7 +116,8 @@ pub trait FromDatum {
             Err(TryFromDatumError::IncompatibleTypes {
                 rust_type: std::any::type_name::<Self>(),
                 rust_oid: Self::type_oid(),
-                datum_oid: type_oid})
+                datum_oid: type_oid,
+            })
         } else {
             Ok(FromDatum::from_polymorphic_datum(datum, is_null, type_oid))
         }
@@ -141,7 +138,8 @@ pub trait FromDatum {
             Err(TryFromDatumError::IncompatibleTypes {
                 rust_type: std::any::type_name::<Self>(),
                 rust_oid: Self::type_oid(),
-                datum_oid: type_oid})
+                datum_oid: type_oid,
+            })
         } else {
             Ok(FromDatum::from_datum_in_memory_context(memory_context, datum, is_null, type_oid))
         }

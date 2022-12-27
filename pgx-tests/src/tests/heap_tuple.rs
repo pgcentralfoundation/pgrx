@@ -914,7 +914,10 @@ mod tests {
         match not_a_dog {
             Ok(_dog) => panic!("got a Dog when we shouldn't have"),
             Err(e) => {
-                assert!(matches!(e, pgx::spi::Error::DatumError(TryFromDatumError::IncompatibleTypes { .. })))
+                assert!(matches!(
+                    e,
+                    pgx::spi::Error::DatumError(TryFromDatumError::IncompatibleTypes { .. })
+                ))
             }
         }
     }

@@ -274,7 +274,8 @@ impl<'a> PgHeapTuple<'a, AllocatedByRust> {
                         return Err(TryFromDatumError::IncompatibleTypes {
                             rust_type: std::any::type_name::<T>(),
                             rust_oid: att.atttypid,
-                            datum_oid: type_oid });
+                            datum_oid: type_oid,
+                        });
                     }
                 }
             }
