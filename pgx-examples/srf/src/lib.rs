@@ -17,6 +17,17 @@ fn generate_series(start: i64, finish: i64, step: default!(i64, 1)) -> SetOfIter
 }
 
 #[pg_extern]
+fn generate_series_table(
+    start: i64,
+    finish: i64,
+    step: default!(i64, 1),
+) -> TableIterator<'static, (name!(id, i64), name!(val, i64))> {
+    TableIterator::new(
+        (start..=finish).step_by(step as usize).enumerate().map(|(idx, val)| (idx as _, val)),
+    )
+}
+
+#[pg_extern]
 fn random_values(num_rows: i32) -> TableIterator<'static, (name!(index, i32), name!(value, f64))> {
     TableIterator::new((1..=num_rows).map(|i| (i, rand::random::<f64>())))
 }

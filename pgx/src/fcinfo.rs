@@ -404,47 +404,37 @@ pub unsafe fn direct_pg_extern_function_call_as_datum(
 
 #[inline]
 pub unsafe fn srf_is_first_call(fcinfo: pg_sys::FunctionCallInfo) -> bool {
-    let fcinfo = PgBox::from_pg(fcinfo);
-    let flinfo = PgBox::from_pg(fcinfo.flinfo);
-
-    flinfo.fn_extra.is_null()
+    (*(*fcinfo).flinfo).fn_extra.is_null()
 }
 
 #[inline]
 pub unsafe fn srf_first_call_init(
     fcinfo: pg_sys::FunctionCallInfo,
-) -> PgBox<pg_sys::FuncCallContext> {
-    let funcctx = pg_sys::init_MultiFuncCall(fcinfo);
-    PgBox::from_pg(funcctx)
+) -> *mut pg_sys::FuncCallContext {
+    pg_sys::init_MultiFuncCall(fcinfo)
 }
 
 #[inline]
-pub unsafe fn srf_per_call_setup(
-    fcinfo: pg_sys::FunctionCallInfo,
-) -> PgBox<pg_sys::FuncCallContext> {
-    let funcctx = pg_sys::per_MultiFuncCall(fcinfo);
-    PgBox::from_pg(funcctx)
+pub unsafe fn srf_per_call_setup(fcinfo: pg_sys::FunctionCallInfo) -> *mut pg_sys::FuncCallContext {
+    pg_sys::per_MultiFuncCall(fcinfo)
 }
 
 #[inline]
 pub unsafe fn srf_return_next(
     fcinfo: pg_sys::FunctionCallInfo,
-    funcctx: &mut PgBox<pg_sys::FuncCallContext>,
+    funcctx: *mut pg_sys::FuncCallContext,
 ) {
-    funcctx.call_cntr += 1;
-
-    let fcinfo = PgBox::from_pg(fcinfo);
-    let mut rsi = PgBox::from_pg(fcinfo.resultinfo as *mut pg_sys::ReturnSetInfo);
-    rsi.isDone = pg_sys::ExprDoneCond_ExprMultipleResult;
+    (*funcctx).call_cntr += 1;
+    (*((*fcinfo).resultinfo as *mut pg_sys::ReturnSetInfo)).isDone =
+        pg_sys::ExprDoneCond_ExprMultipleResult;
 }
 
 #[inline]
 pub unsafe fn srf_return_done(
     fcinfo: pg_sys::FunctionCallInfo,
-    funcctx: &mut PgBox<pg_sys::FuncCallContext>,
+    funcctx: *mut pg_sys::FuncCallContext,
 ) {
-    pg_sys::end_MultiFuncCall(fcinfo, funcctx.as_ptr());
-    let fcinfo = PgBox::from_pg(fcinfo);
-    let mut rsi = PgBox::from_pg(fcinfo.resultinfo as *mut pg_sys::ReturnSetInfo);
-    rsi.isDone = pg_sys::ExprDoneCond_ExprEndResult;
+    pg_sys::end_MultiFuncCall(fcinfo, funcctx);
+    (*((*fcinfo).resultinfo as *mut pg_sys::ReturnSetInfo)).isDone =
+        pg_sys::ExprDoneCond_ExprEndResult;
 }

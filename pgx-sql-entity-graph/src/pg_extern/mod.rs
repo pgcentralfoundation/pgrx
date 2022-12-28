@@ -474,9 +474,7 @@ impl PgExtern {
                     }
                 }
             }
-            Returning::SetOf { ty: retval_ty, optional, result } => {
-                let result_ident = syn::Ident::new("result", self.func.sig.span());
-                let retval_ty_resolved = &retval_ty.original_ty;
+            Returning::SetOf { ty: _retval_ty, optional, result } => {
                 let result_handler = if *optional {
                     // don't need unsafe annotations because of the larger unsafe block coming up
                     quote_spanned! { self.func.sig.span() =>
@@ -499,85 +497,19 @@ impl PgExtern {
                     #[::pgx::pgx_macros::pg_guard]
                     #[warn(unsafe_op_in_unsafe_fn)]
                     pub unsafe extern "C" fn #func_name_wrapper #func_generics(#fcinfo_ident: ::pgx::pg_sys::FunctionCallInfo) -> ::pgx::pg_sys::Datum {
-                        use core::ptr::NonNull;
-                        struct IteratorHolder<'__pgx_internal_lifetime, T: std::panic::UnwindSafe + std::panic::RefUnwindSafe> {
-                            iter: NonNull<::pgx::iter::SetOfIterator<'__pgx_internal_lifetime, T>>,
-                        }
-
-                        let mut funcctx: ::pgx::pgbox::PgBox<::pgx::pg_sys::FuncCallContext>;
-                        let mut iterator_holder: ::pgx::pgbox::PgBox<IteratorHolder<#retval_ty_resolved>>;
-
                         unsafe {
-                            if ::pgx::fcinfo::srf_is_first_call(#fcinfo_ident) {
-                                funcctx = ::pgx::fcinfo::srf_first_call_init(#fcinfo_ident);
-                                funcctx.user_fctx = ::pgx::memcxt::PgMemoryContexts::For(funcctx.multi_call_memory_ctx).palloc_struct::<IteratorHolder<#retval_ty_resolved>>() as *mut ::core::ffi::c_void;
-                                iterator_holder = ::pgx::pgbox::PgBox::from_pg(funcctx.user_fctx as *mut IteratorHolder<#retval_ty_resolved>);
-
-                                // function arguments need to be "fetched" while in the function call's
-                                // multi-call-memory-context to ensure that any detoasted datums will
-                                // live long enough for the SRF to use them over each call
-                                let #result_ident = match ::pgx::memcxt::PgMemoryContexts::For(funcctx.multi_call_memory_ctx).switch_to(|_| {
-                                    #( #arg_fetches )*
-                                    #result_handler
-                                }) {
-                                    Some(result) => result,
-                                    None => {
-                                        ::pgx::fcinfo::srf_return_done(#fcinfo_ident, &mut funcctx);
-                                        return ::pgx::fcinfo::pg_return_null(#fcinfo_ident)
-                                    }
-                                };
-
-                                iterator_holder.iter = NonNull::new_unchecked(::pgx::memcxt::PgMemoryContexts::For(funcctx.multi_call_memory_ctx).leak_trivial_alloc(result));
-                            }
-
-                            funcctx = ::pgx::fcinfo::srf_per_call_setup(#fcinfo_ident);
-                            iterator_holder = ::pgx::pgbox::PgBox::from_pg(funcctx.user_fctx as *mut IteratorHolder<#retval_ty_resolved>);
-                        }
-
-                        // SAFETY: should have been set up correctly on this or previous call
-                        let iter = unsafe { iterator_holder.iter.as_mut() };
-                        match iter.next() {
-                            Some(result) => {
-                                // SAFETY: what is an srf if it does not return?
-                                unsafe { ::pgx::fcinfo::srf_return_next(#fcinfo_ident, &mut funcctx) };
-                                match ::pgx::datum::IntoDatum::into_datum(result) {
-                                    Some(datum) => datum,
-                                    None => ::pgx::fcinfo::pg_return_null(#fcinfo_ident),
-                                }
-                            },
-                            None => {
-                                // SAFETY: seem to be finished
-                                unsafe { ::pgx::fcinfo::srf_return_done(#fcinfo_ident, &mut funcctx) };
-                                ::pgx::fcinfo::pg_return_null(#fcinfo_ident)
-                            },
+                            // SAFETY: the caller has asserted that `fcinfo` is a valid FunctionCallInfo pointer, allocated by Postgres
+                            // with all its fields properly setup.  Unless the user is calling this wrapper function directly, this
+                            // will always be the case
+                            ::pgx::iter::SetOfIterator::srf_next(#fcinfo_ident, || {
+                                #( #arg_fetches )*
+                                #result_handler
+                            })
                         }
                     }
                 }
             }
-            Returning::Iterated { tys: retval_tys, optional, result } => {
-                let result_ident = syn::Ident::new("result", self.func.sig.span());
-                let funcctx_ident = syn::Ident::new("funcctx", self.func.sig.span());
-                let retval_tys_resolved = retval_tys.iter().map(|v| &v.used_ty.resolved_ty);
-                let retval_tys_tuple = quote! { (#(#retval_tys_resolved,)*) };
-
-                let retval_tuple_indexes = (0..retval_tys.len()).map(syn::Index::from);
-                let retval_tuple_len = retval_tuple_indexes.len();
-                let create_heap_tuple = quote! {
-                    let mut datums: [::pgx::pg_sys::Datum; #retval_tuple_len] = [::pgx::pg_sys::Datum::from(0); #retval_tuple_len];
-                    let mut nulls: [bool; #retval_tuple_len] = [false; #retval_tuple_len];
-
-                    #(
-                        let datum = ::pgx::datum::IntoDatum::into_datum(result.#retval_tuple_indexes);
-                        match datum {
-                            Some(datum) => { datums[#retval_tuple_indexes] = datum.into(); },
-                            None => { nulls[#retval_tuple_indexes] = true; }
-                        }
-                    )*
-
-                    // SAFETY: just went to considerable trouble to make sure these are well-formed for a tuple
-                    let heap_tuple = unsafe { ::pgx::pg_sys::heap_form_tuple(#funcctx_ident.tuple_desc, datums.as_mut_ptr(), nulls.as_mut_ptr()) };
-                };
-
+            Returning::Iterated { tys: _retval_tys, optional, result } => {
                 let result_handler = if *optional {
                     // don't need unsafe annotations because of the larger unsafe block coming up
                     quote_spanned! { self.func.sig.span() =>
@@ -602,67 +534,14 @@ impl PgExtern {
                     #[::pgx::pgx_macros::pg_guard]
                     #[warn(unsafe_op_in_unsafe_fn)]
                     pub unsafe extern "C" fn #func_name_wrapper #func_generics(#fcinfo_ident: ::pgx::pg_sys::FunctionCallInfo) -> ::pgx::pg_sys::Datum {
-                        use core::ptr::NonNull;
-                        struct IteratorHolder<'__pgx_internal_lifetime, T: std::panic::UnwindSafe + std::panic::RefUnwindSafe> {
-                            iter: NonNull<::pgx::iter::TableIterator<'__pgx_internal_lifetime, T>>,
-                        }
-
-                        let mut funcctx: ::pgx::pgbox::PgBox<::pgx::pg_sys::FuncCallContext>;
-                        let mut iterator_holder: ::pgx::pgbox::PgBox<IteratorHolder<#retval_tys_tuple>>;
-
                         unsafe {
-                            if ::pgx::fcinfo::srf_is_first_call(#fcinfo_ident) {
-                                funcctx = ::pgx::fcinfo::srf_first_call_init(#fcinfo_ident);
-                                funcctx.user_fctx = ::pgx::memcxt::PgMemoryContexts::For(funcctx.multi_call_memory_ctx).palloc_struct::<IteratorHolder<#retval_tys_tuple>>() as *mut ::core::ffi::c_void;
-                                funcctx.tuple_desc = ::pgx::memcxt::PgMemoryContexts::For(funcctx.multi_call_memory_ctx).switch_to(|_| {
-                                    let mut tupdesc: *mut ::pgx::pg_sys::TupleDescData = std::ptr::null_mut();
-
-                                    /* Build a tuple descriptor for our result type */
-                                    if ::pgx::pg_sys::get_call_result_type(#fcinfo_ident, std::ptr::null_mut(), &mut tupdesc) != ::pgx::pg_sys::TypeFuncClass_TYPEFUNC_COMPOSITE {
-                                        ::pgx::pg_sys::error!("return type must be a row type");
-                                    }
-
-                                    ::pgx::pg_sys::BlessTupleDesc(tupdesc)
-                                });
-                                iterator_holder = ::pgx::pgbox::PgBox::from_pg(funcctx.user_fctx as *mut IteratorHolder<#retval_tys_tuple>);
-
-                                // function arguments need to be "fetched" while in the function call's
-                                // multi-call-memory-context to ensure that any detoasted datums will
-                                // live long enough for the SRF to use them over each call
-                                let #result_ident = match ::pgx::memcxt::PgMemoryContexts::For(funcctx.multi_call_memory_ctx).switch_to(|_| {
-                                    #( #arg_fetches )*
-                                    #result_handler
-                                }) {
-                                    Some(result) => result,
-                                    None => {
-                                        ::pgx::fcinfo::srf_return_done(#fcinfo_ident, &mut funcctx);
-                                        return ::pgx::fcinfo::pg_return_null(#fcinfo_ident)
-                                    }
-                                };
-
-                                iterator_holder.iter = NonNull::new_unchecked(::pgx::memcxt::PgMemoryContexts::For(funcctx.multi_call_memory_ctx).leak_and_drop_on_delete(result));
-                            }
-
-                            funcctx = ::pgx::fcinfo::srf_per_call_setup(#fcinfo_ident);
-                            iterator_holder = ::pgx::pgbox::PgBox::from_pg(funcctx.user_fctx as *mut IteratorHolder<#retval_tys_tuple>);
-                        }
-
-                        // SAFETY: should have been set up correctly on this or previous call
-                        let iter = unsafe { iterator_holder.iter.as_mut() };
-                        match iter.next() {
-                            Some(result) => {
-                                #create_heap_tuple
-
-                                let datum = ::pgx::htup::heap_tuple_get_datum(heap_tuple);
-                                // SAFETY: what is an srf if it does not return?
-                                unsafe { ::pgx::fcinfo::srf_return_next(#fcinfo_ident, &mut funcctx) };
-                                datum
-                            },
-                            None => {
-                                // SAFETY: seem to be finished
-                                unsafe { ::pgx::fcinfo::srf_return_done(#fcinfo_ident, &mut funcctx) };
-                                ::pgx::fcinfo::pg_return_null(#fcinfo_ident)
-                            },
+                            // SAFETY: the caller has asserted that `fcinfo` is a valid FunctionCallInfo pointer, allocated by Postgres
+                            // with all its fields properly setup.  Unless the user is calling this wrapper function directly, this
+                            // will always be the case
+                            ::pgx::iter::TableIterator::srf_next(#fcinfo_ident, || {
+                                #( #arg_fetches )*
+                                #result_handler
+                            })
                         }
                     }
                 }
