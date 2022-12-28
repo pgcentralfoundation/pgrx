@@ -1,3 +1,5 @@
+#![doc(hidden)]
+//! Helper implementations for returning sets and tables from `#[pg_extern]`-style functions
 use crate::iter::{SetOfIterator, TableIterator};
 use crate::{
     pg_return_null, pg_sys, srf_first_call_init, srf_is_first_call, srf_per_call_setup,
