@@ -940,13 +940,11 @@ mod tests {
 
     #[pg_test]
     fn test_tuple_desc_clone() {
-        Spi::connect(|client| {
+        let result = Spi::connect(|client| {
             let query = "select * from generate_lots_of_dogs()";
-            let table = client.select(query, None, None);
-
-            assert_eq!(table.len(), 10_000);
-
-            Ok(Some(()))
+            client.select(query, None, None)
         });
+        let table = result.expect("unable to select table result");
+        assert_eq!(table.len(), 10_000);
     }
 }
