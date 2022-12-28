@@ -17,9 +17,7 @@ Use of this source code is governed by the MIT license that can be found in the 
 //!
 use crate::pg_sys::AsPgCStr;
 use crate::{pg_sys, PgBox};
-use core::panic::{RefUnwindSafe, UnwindSafe};
 use core::ptr;
-use pgx_pg_sys::PgTryBuilder;
 use std::fmt::Debug;
 use std::ptr::NonNull;
 
@@ -326,17 +324,14 @@ impl PgMemoryContexts {
     ///     PgMemoryContexts::TopTransactionContext.switch_to(|context| {
     ///         // allocate a new ItemPointerData, but inside the TopTransactionContext
     ///         let tid = PgBox::<pg_sys::ItemPointerData>::alloc();
-    ///         
+    ///
     ///         // do something with the tid and then return it.
     ///         // Note that it stays allocated here in the TopTransactionContext
     ///         tid.into_pg()
     ///     })
     /// }
     /// ```
-    pub fn switch_to<R, F: FnOnce(&mut PgMemoryContexts) -> R + UnwindSafe + RefUnwindSafe>(
-        &mut self,
-        f: F,
-    ) -> R {
+    pub fn switch_to<R, F: FnOnce(&mut PgMemoryContexts) -> R>(&mut self, f: F) -> R {
         match self {
             PgMemoryContexts::Transient {
                 parent,
@@ -467,7 +462,7 @@ impl PgMemoryContexts {
     }
 
     /// helper function
-    fn exec_in_context<R, F: FnOnce(&mut PgMemoryContexts) -> R + UnwindSafe + RefUnwindSafe>(
+    fn exec_in_context<R, F: FnOnce(&mut PgMemoryContexts) -> R>(
         context: pg_sys::MemoryContext,
         f: F,
     ) -> R {
@@ -479,14 +474,11 @@ impl PgMemoryContexts {
             pg_sys::CurrentMemoryContext = context;
         }
 
-        let result = PgTryBuilder::new(|| f(&mut PgMemoryContexts::For(context)))
-            .finally(|| {
-                // restore our understanding of the current memory context
-                unsafe {
-                    pg_sys::CurrentMemoryContext = prev_context;
-                }
-            })
-            .execute();
+        let result = f(&mut PgMemoryContexts::For(context));
+        // restore our understanding of the current memory context
+        unsafe {
+            pg_sys::CurrentMemoryContext = prev_context;
+        }
 
         result
     }
