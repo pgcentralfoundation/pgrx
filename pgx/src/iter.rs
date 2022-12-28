@@ -77,7 +77,7 @@ where
 /// Support for a `TABLE (...)` from an SQL function.
 ///
 /// [`TableIterator`] is typically used as the return type of a `#[pg_extern]`-style function,
-/// indication that the function returns a table of named rows and columns.  [`TableIterator`] is
+/// indicating that the function returns a table of named rows and columns.  [`TableIterator`] is
 /// generic over `T`, but that `T` must be a Rust tuple containing one or more elements.  They
 /// must also be "named" using pgx' [`name!`] macro.  See the examples below.
 ///
