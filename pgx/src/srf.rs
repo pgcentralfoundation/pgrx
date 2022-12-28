@@ -9,7 +9,7 @@ use crate::{
 impl<'a, T: IntoDatum> SetOfIterator<'a, T> {
     #[doc(hidden)]
     pub unsafe fn srf_next<F: FnOnce() -> Option<SetOfIterator<'a, T>>>(
-        fcinfo: *mut pg_sys::FunctionCallInfoBaseData,
+        fcinfo: pg_sys::FunctionCallInfo,
         first_call_func: F,
     ) -> pg_sys::Datum {
         if srf_is_first_call(fcinfo) {
