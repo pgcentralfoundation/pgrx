@@ -1,9 +1,8 @@
+use std::iter::once;
+
 use pgx_sql_entity_graph::metadata::{
     ArgumentError, Returns, ReturnsError, SqlMapping, SqlTranslatable,
 };
-use std::iter::once;
-
-use crate::{pg_sys, IntoDatum};
 
 pub struct SetOfIterator<'a, T> {
     iter: Box<dyn Iterator<Item = T> + 'a>,
@@ -21,6 +20,7 @@ impl<'a, T> SetOfIterator<'a, T> {
 impl<'a, T> Iterator for SetOfIterator<'a, T> {
     type Item = T;
 
+    #[inline]
     fn next(&mut self) -> Option<Self::Item> {
         self.iter.next()
     }
@@ -66,21 +66,9 @@ impl<'a, T> TableIterator<'a, T> {
 impl<'a, T> Iterator for TableIterator<'a, T> {
     type Item = T;
 
+    #[inline]
     fn next(&mut self) -> Option<Self::Item> {
         self.iter.next()
-    }
-}
-
-impl<'a, T> IntoDatum for TableIterator<'a, T>
-where
-    T: SqlTranslatable,
-{
-    fn into_datum(self) -> Option<pg_sys::Datum> {
-        todo!()
-    }
-
-    fn type_oid() -> pg_sys::Oid {
-        todo!()
     }
 }
 
@@ -90,7 +78,7 @@ seq_macro::seq!(I in 0..=32 {
             unsafe impl<'a, #(Input~N,)*> SqlTranslatable for TableIterator<'a, (#(Input~N,)*)>
             where
                 #(
-                    Input~N: SqlTranslatable + 'static,
+                    Input~N: SqlTranslatable + 'a,
                 )*
             {
                 fn argument_sql() -> Result<SqlMapping, ArgumentError> {
