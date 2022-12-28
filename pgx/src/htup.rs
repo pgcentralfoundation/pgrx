@@ -181,7 +181,7 @@ pub trait IntoHeapTuple {
     ///
     /// # Safety
     ///
-    /// This function is unsafe as it cannot guarantee the specific `tupdesc` is valid.
+    /// This function is unsafe as it cannot guarantee the specified `tupdesc` is valid.
     unsafe fn into_heap_tuple(
         self,
         tupdesc: *mut pg_sys::TupleDescData,
