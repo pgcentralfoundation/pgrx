@@ -51,15 +51,16 @@ impl<'a, T> TableIterator<'a, T> {
     pub fn new<I>(iter: I) -> Self
     where
         I: Iterator<Item = T> + 'a,
+        T: 'a,
     {
         Self { iter: Box::new(iter) }
     }
 
-    pub fn once(value: T) -> TableIterator<'a, T>
+    pub fn once(value: T) -> Self
     where
         T: 'a,
     {
-        Self { iter: Box::new(once(value)) }
+        Self::new(once(value))
     }
 }
 
