@@ -243,6 +243,23 @@ impl<'a> Deref for PgTupleDesc<'a> {
     }
 }
 
+impl<'a> Clone for PgTupleDesc<'a> {
+    fn clone(&self) -> Self {
+        let tupdesc = self.tupdesc.as_ref().expect("PgTupleDesc.tupdesc was None");
+        // SAFETY: We assume the previous tupdesc is valid and
+        // pg_sys::CreateTupleDescCopyConstr gives us a fresh copy with reference counters set to -1 (disabled).
+        // This will force the pfree() approach upon drop
+        let tupdesc =
+            unsafe { PgBox::from_pg(pg_sys::CreateTupleDescCopyConstr(tupdesc.as_ptr())) };
+        Self {
+            tupdesc: Some(tupdesc),
+            parent: self.parent.clone(),
+            need_release: false,
+            need_pfree: true,
+        }
+    }
+}
+
 impl<'a> Drop for PgTupleDesc<'a> {
     fn drop(&mut self) {
         if self.tupdesc.is_some() {

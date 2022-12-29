@@ -611,6 +611,25 @@ mod sql_generator_tests {
             unimplemented!("Just a SQL generation test")
         }
     }
+
+    #[pg_extern]
+    fn generate_lots_of_dogs() -> SetOfIterator<'static, pgx::composite_type!("Dog")> {
+        let tuple_desc =
+            pgx::PgTupleDesc::for_composite_type("Dog").expect("Coudln't find TestType");
+
+        let tuples: Vec<PgHeapTuple<'_, AllocatedByRust>> = (0..10_000)
+            .into_iter()
+            .map(move |i| {
+                let datums: Vec<Option<pg_sys::Datum>> =
+                    vec!["good boy".into_datum(), i.into_datum()];
+
+                PgHeapTuple::from_datums(tuple_desc.clone(), datums)
+                    .expect("couldn't get heap tuple")
+            })
+            .collect();
+
+        SetOfIterator::new(tuples)
+    }
 }
 
 #[cfg(any(test, feature = "pg_test"))]
@@ -917,5 +936,15 @@ mod tests {
                 assert_eq!(e, pgx::spi::Error::DatumError(TryFromDatumError::IncompatibleTypes))
             }
         }
+    }
+
+    #[pg_test]
+    fn test_tuple_desc_clone() {
+        let result = Spi::connect(|client| {
+            let query = "select * from generate_lots_of_dogs()";
+            client.select(query, None, None)
+        });
+        let table = result.expect("unable to select table result");
+        assert_eq!(table.len(), 10_000);
     }
 }
