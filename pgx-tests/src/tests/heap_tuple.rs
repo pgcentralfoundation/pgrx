@@ -899,28 +899,28 @@ mod tests {
         );
 
         // These are **deliberately** the wrong types.
-        assert_eq!(
+        assert!(matches!(
             heap_tuple.set_by_name("name", 1_i32),
-            Err(TryFromDatumError::IncompatibleTypes),
-        );
-        assert_eq!(
+            Err(TryFromDatumError::IncompatibleTypes { .. })
+        ));
+        assert!(matches!(
             heap_tuple.set_by_name("age", "Brandy"),
-            Err(TryFromDatumError::IncompatibleTypes),
-        );
+            Err(TryFromDatumError::IncompatibleTypes { .. }),
+        ));
 
         // Now set them properly, to test that we get errors when they're set...
         heap_tuple.set_by_name("name", "Brandy".to_string()).unwrap();
         heap_tuple.set_by_name("age", 42).unwrap();
 
         // These are **deliberately** the wrong types.
-        assert_eq!(
+        assert!(matches!(
             heap_tuple.get_by_name::<i32>("name"),
-            Err(TryFromDatumError::IncompatibleTypes),
-        );
-        assert_eq!(
+            Err(TryFromDatumError::IncompatibleTypes { .. }),
+        ));
+        assert!(matches!(
             heap_tuple.get_by_name::<String>("age"),
-            Err(TryFromDatumError::IncompatibleTypes),
-        );
+            Err(TryFromDatumError::IncompatibleTypes { .. }),
+        ));
     }
 
     #[pg_test]
@@ -933,7 +933,10 @@ mod tests {
         match not_a_dog {
             Ok(_dog) => panic!("got a Dog when we shouldn't have"),
             Err(e) => {
-                assert_eq!(e, pgx::spi::Error::DatumError(TryFromDatumError::IncompatibleTypes))
+                assert!(matches!(
+                    e,
+                    pgx::spi::Error::DatumError(TryFromDatumError::IncompatibleTypes { .. })
+                ))
             }
         }
     }

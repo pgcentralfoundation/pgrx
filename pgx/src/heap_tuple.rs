@@ -1,6 +1,7 @@
 //! Provides a safe interface to Postgres `HeapTuple` objects.
 //!
 //! [`PgHeapTuple`]s also describe composite types as defined by [`pgx::composite_type!()`][crate::composite_type].
+use crate::datum::lookup_type_name;
 use crate::pg_sys::{Datum, Oid};
 use crate::{
     heap_getattr_raw, pg_sys, AllocatedByPostgres, AllocatedByRust, FromDatum, IntoDatum, PgBox,
@@ -271,7 +272,12 @@ impl<'a> PgHeapTuple<'a, AllocatedByRust> {
                     let is_compatible_composite_types =
                         type_oid == pg_sys::RECORDOID && composite_type_oid == Some(att.atttypid);
                     if !is_compatible_composite_types && !T::is_compatible_with(att.atttypid) {
-                        return Err(TryFromDatumError::IncompatibleTypes);
+                        return Err(TryFromDatumError::IncompatibleTypes {
+                            rust_type: std::any::type_name::<T>(),
+                            rust_oid: att.atttypid,
+                            datum_type: lookup_type_name(type_oid),
+                            datum_oid: type_oid,
+                        });
                     }
                 }
             }

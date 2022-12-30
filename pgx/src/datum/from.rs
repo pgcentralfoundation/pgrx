@@ -19,8 +19,13 @@ use std::num::NonZeroUsize;
 /// If converting a Datum to a Rust type fails, this is the set of possible reasons why.
 #[derive(thiserror::Error, Debug, Clone, PartialEq, Eq)]
 pub enum TryFromDatumError {
-    #[error("The specified type of the Datum is not compatible with the desired Rust type.")]
-    IncompatibleTypes,
+    #[error("Postgres type {datum_type} (oid={datum_oid}) is not compatible with the Rust type {rust_type} (oid={rust_oid})")]
+    IncompatibleTypes {
+        rust_type: &'static str,
+        rust_oid: pg_sys::Oid,
+        datum_type: String,
+        datum_oid: pg_sys::Oid,
+    },
 
     #[error("The specified attribute number `{0}` is not present")]
     NoSuchAttributeNumber(NonZeroUsize),
@@ -113,7 +118,12 @@ pub trait FromDatum {
         Self: Sized + IntoDatum,
     {
         if !Self::is_compatible_with(type_oid) {
-            Err(TryFromDatumError::IncompatibleTypes)
+            Err(TryFromDatumError::IncompatibleTypes {
+                rust_type: std::any::type_name::<Self>(),
+                rust_oid: Self::type_oid(),
+                datum_type: lookup_type_name(type_oid),
+                datum_oid: type_oid,
+            })
         } else {
             Ok(FromDatum::from_polymorphic_datum(datum, is_null, type_oid))
         }
@@ -131,10 +141,28 @@ pub trait FromDatum {
         Self: Sized + IntoDatum,
     {
         if !Self::is_compatible_with(type_oid) {
-            Err(TryFromDatumError::IncompatibleTypes)
+            Err(TryFromDatumError::IncompatibleTypes {
+                rust_type: std::any::type_name::<Self>(),
+                rust_oid: Self::type_oid(),
+                datum_type: lookup_type_name(type_oid),
+                datum_oid: type_oid,
+            })
         } else {
             Ok(FromDatum::from_datum_in_memory_context(memory_context, datum, is_null, type_oid))
         }
+    }
+}
+
+/// Retrieves a Postgres type name given its Oid
+pub(crate) fn lookup_type_name(oid: pg_sys::Oid) -> String {
+    unsafe {
+        // SAFETY: nothing to concern ourselves with other than just calling into Postgres FFI
+        // and Postgres will raise an ERROR if we pass it an invalid Oid, so it'll never return a null
+        let cstr_name = pg_sys::format_type_extended(oid, -1, 0);
+        let cstr = CStr::from_ptr(cstr_name);
+        let typname = cstr.to_string_lossy().to_string();
+        pg_sys::pfree(cstr_name as _); // don't leak the palloc'd cstr_name
+        typname
     }
 }
 
