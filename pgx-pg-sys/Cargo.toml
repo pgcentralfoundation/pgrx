@@ -11,7 +11,7 @@ readme = "README.md"
 edition = "2021"
 
 [features]
-default = [ "cshim" ]
+default = [ ]
 pg11 = [ ]
 pg12 = [ ]
 pg13 = [ ]
