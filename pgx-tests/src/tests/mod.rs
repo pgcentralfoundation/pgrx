@@ -19,8 +19,10 @@ mod default_arg_value_tests;
 mod derive_pgtype_lifetimes;
 mod enum_type_tests;
 mod fcinfo_tests;
+mod from_into_datum_tests;
 mod guc_tests;
 mod heap_tuple;
+#[cfg(feature = "cshim")]
 mod hooks_tests;
 mod inet_tests;
 mod internal_tests;
@@ -37,6 +39,7 @@ mod pgbox_tests;
 mod pgx_module_qualification;
 mod postgres_type_tests;
 mod range_tests;
+mod result_tests;
 mod schema_tests;
 mod shmem_tests;
 mod spi_tests;

@@ -11,6 +11,7 @@ Use of this source code is governed by the MIT license that can be found in the 
 
 use std::any::Any;
 use std::cell::Cell;
+use std::ffi::CStr;
 use std::fmt::{Display, Formatter};
 use std::hint::unreachable_unchecked;
 use std::panic::{
@@ -20,6 +21,42 @@ use std::panic::{
 use crate::elog::PgLogLevel;
 use crate::errcodes::PgSqlErrorCode;
 use crate::{pfree, AsPgCStr, MemoryContextSwitchTo};
+
+/// Indicates that something can be reported as a Postgres ERROR, if that's what it might represent.
+pub trait ErrorReportable {
+    type Inner;
+
+    /// Raise a Postgres ERROR if appropriate, otherwise return a value
+    fn report(self) -> Self::Inner;
+}
+
+impl<T, E> ErrorReportable for Result<T, E>
+where
+    E: Any + Display,
+{
+    type Inner = T;
+
+    /// If this [`Result`] represents the `Ok` variant, that value is returned.
+    ///
+    /// If this [`Result`] represents the `Err` variant, raise it as an error.  If it happens to
+    /// be an [`ErrorReport`], then that is specifically raised.  Otherwise it's just a general
+    /// [`ereport!`] as a [`PgLogLevel::ERROR`].
+    fn report(self) -> Self::Inner {
+        match self {
+            Ok(value) => value,
+            Err(e) => {
+                let any: Box<&dyn Any> = Box::new(&e);
+                if any.downcast_ref::<ErrorReport>().is_some() {
+                    let any: Box<dyn Any> = Box::new(e);
+                    any.downcast::<ErrorReport>().unwrap().report(PgLogLevel::ERROR);
+                    unreachable!();
+                } else {
+                    ereport!(ERROR, PgSqlErrorCode::ERRCODE_DATA_EXCEPTION, &format!("{}", e));
+                }
+            }
+        }
+    }
+}
 
 #[derive(Clone, Debug)]
 pub struct ErrorReportLocation {
@@ -73,8 +110,22 @@ impl From<&PanicInfo<'_>> for ErrorReportLocation {
 pub struct ErrorReport {
     pub(crate) sqlerrcode: PgSqlErrorCode,
     pub(crate) message: String,
+    pub(crate) hint: Option<String>,
     pub(crate) detail: Option<String>,
     pub(crate) location: ErrorReportLocation,
+}
+
+impl Display for ErrorReport {
+    fn fmt(&self, f: &mut Formatter<'_>) -> std::fmt::Result {
+        write!(f, "{}: {}", self.sqlerrcode, self.message)?;
+        if let Some(hint) = &self.hint {
+            write!(f, "\nHINT: {}", hint)?;
+        }
+        if let Some(detail) = &self.detail {
+            write!(f, "\nDETAIL: {}", detail)?;
+        }
+        write!(f, "\nLOCATION: {}", self.location)
+    }
 }
 
 #[derive(Clone, Debug)]
@@ -96,13 +147,50 @@ impl ErrorReportWithLevel {
         }
     }
 
+    /// Returns the logging level of this error report
+    pub fn level(&self) -> PgLogLevel {
+        self.level
+    }
+
+    /// Returns the sql error code of this error report
+    pub fn sql_error_code(&self) -> PgSqlErrorCode {
+        self.inner.sqlerrcode
+    }
+
     /// Returns the error message of this error report
     pub fn message(&self) -> &str {
         self.inner.message()
     }
 
-    fn context_message(&self) -> String {
-        self.inner.location.to_string()
+    /// Returns the detail line of this error report, if there is one
+    pub fn detail(&self) -> Option<&str> {
+        self.inner.detail()
+    }
+
+    /// Returns the hint line of this error report, if there is one
+    pub fn hint(&self) -> Option<&str> {
+        self.inner.hint()
+    }
+
+    /// Returns the name of the source file that generated this error report
+    pub fn file(&self) -> &str {
+        &self.inner.location.file
+    }
+
+    /// Returns the line number of the source file that generated this error report
+    pub fn line_number(&self) -> u32 {
+        self.inner.location.line
+    }
+
+    /// Returns the name of the function that generated this error report, if we were able to figure it out
+    pub fn function_name(&self) -> Option<&str> {
+        self.inner.location.funcname.as_ref().map(|s| s.as_str())
+    }
+
+    /// Returns the context message of this error report, if any
+    fn context_message(&self) -> Option<String> {
+        // NB:  holding this here for future use
+        None
     }
 }
 
@@ -120,7 +208,7 @@ impl ErrorReport {
         let mut location: ErrorReportLocation = Location::caller().into();
         location.funcname = Some(funcname.to_string());
 
-        Self { sqlerrcode, message: message.into(), detail: None, location }
+        Self { sqlerrcode, message: message.into(), hint: None, detail: None, location }
     }
 
     /// Create a [PgErrorReport] which can be raised via Rust's [std::panic::panic_any()] or as
@@ -132,18 +220,34 @@ impl ErrorReport {
         message: S,
         location: ErrorReportLocation,
     ) -> Self {
-        Self { sqlerrcode, message: message.into(), detail: None, location }
+        Self { sqlerrcode, message: message.into(), hint: None, detail: None, location }
     }
 
     /// Set the `detail` property, whose default is `None`
-    pub fn detail<S: Into<String>>(mut self, detail: S) -> Self {
+    pub fn set_detail<S: Into<String>>(mut self, detail: S) -> Self {
         self.detail = Some(detail.into());
+        self
+    }
+
+    /// Set the `hint` property, whose default is `None`
+    pub fn set_hint<S: Into<String>>(mut self, hint: S) -> Self {
+        self.hint = Some(hint.into());
         self
     }
 
     /// Returns the error message of this error report
     pub fn message(&self) -> &str {
         &self.message
+    }
+
+    /// Returns the detail message of this error report
+    pub fn detail(&self) -> Option<&str> {
+        self.detail.as_ref().map(|s| s.as_str())
+    }
+
+    /// Returns the hint message of this error report
+    pub fn hint(&self) -> Option<&str> {
+        self.hint.as_ref().map(|s| s.as_str())
     }
 
     /// Report this [PgErrorReport], which will ultimately be reported by Postgres at the specified [PgLogLevel]
@@ -326,77 +430,164 @@ pub(crate) fn downcast_panic_payload(e: Box<dyn Any + Send>) -> CaughtError {
     }
 }
 
+/// This is a (as faithful as possible) Rust unrolling of Postgres' `#define ereport(...)` macro.
+///
+/// Different implementations are provided for different postgres version ranges to ensure
+/// best performance. Care is taken to avoid work if `errstart` signals we can finish early.
+///
+/// We localize the definition of the various `err*()` functions involved in reporting a Postgres
+/// error (and purposely exclude them from `build.rs`) to ensure users can't get into trouble
+/// trying to roll their own error handling.
 fn do_ereport(ereport: ErrorReportWithLevel) {
-    // The next code is definitely thread-unsafe -- not-the-main-thread can't be creating Postgres
-    // ereports and our secret `extern "C"` definition isn't wrapped by #[pg_guard], so we need
-    // to manually do the active thread check
+    // SAFETY:  we are providing a null-terminated byte string
+    const PERCENT_S: &CStr = unsafe { CStr::from_bytes_with_nul_unchecked(b"%s\0") };
+    const DOMAIN: *const ::std::os::raw::c_char = std::ptr::null_mut();
+
+    // the following code is definitely thread-unsafe -- not-the-main-thread can't be creating Postgres
+    // ereports.  Our secret `extern "C"` definitions aren't wrapped by #[pg_guard] so we need to
+    // manually do the active thread check
     crate::thread_check::check_active_thread();
 
-    // we define this here to make it difficult for not only pgx, but pgx users
-    // to find and directly call this function.  They'd have to do the same as
-    // this, and that seems like more work than a normal programmer would want to do
+    //
+    // only declare these functions here.  They're explicitly excluded from bindings generation in
+    // `build.rs` and we'd prefer pgx users not have access to them at all
+    //
+
     extern "C" {
-        fn pgx_ereport(
-            level: i32,
-            sqlerrcode: i32,
-            message: *const std::os::raw::c_char,
-            detail: *const std::os::raw::c_char,
-            funcname: *const std::os::raw::c_char,
-            file: *const std::os::raw::c_char,
-            lineno: i32,
-            contexts: *const std::os::raw::c_char,
-        );
+        fn errcode(sqlerrcode: ::std::os::raw::c_int) -> ::std::os::raw::c_int;
+        fn errmsg(fmt: *const ::std::os::raw::c_char, ...) -> ::std::os::raw::c_int;
+        fn errdetail(fmt: *const ::std::os::raw::c_char, ...) -> ::std::os::raw::c_int;
+        fn errhint(fmt: *const ::std::os::raw::c_char, ...) -> ::std::os::raw::c_int;
+        fn errcontext_msg(fmt: *const ::std::os::raw::c_char, ...) -> ::std::os::raw::c_int;
     }
 
-    unsafe {
-        // because of the calls to `.as_pg_cstr()`, which allocate using `palloc0()`,
-        // we need to be in the `ErrorContext` when we allocate those
-        //
-        // specifically, the problem here is `self.inner.location.file & .funcname`.  At the C level,
-        // Postgres expects these to be static const char *, created at compile time, rather
-        // than something allocated from a MemoryContext.  Our version of ereport (pgx_ereport)
-        // accepts a user-provided string for them, so we can report function/file/line information
-        // from rust code.
-        //
-        // We just go ahead and allocate all the strings we need in the `ErrorContext` for convenience
-        //
-        // NB:  It's not necessary for pgx to add a CONTEXT message to the ereport as pgx doesn't
-        // (currently) have any more context than funcname/file:line:col info, which we already
-        // store in the LOCATION slot.  If in the future pgx learns how to build a backtrace (and
-        // it might be interesting for it to do that for level >=ERROR messages), the context slot
-        // is where that information should go.
-        let old_cxt = MemoryContextSwitchTo(crate::ErrorContext);
-        let level = ereport.level as _;
-        let sqlerrcode = ereport.inner.sqlerrcode as _;
-        let contexts = std::ptr::null_mut();
-        let funcname = (&ereport.inner.location.funcname).as_pg_cstr();
-        let file = ereport.inner.location.file.as_str().as_pg_cstr();
-        let message = (&ereport.inner.message).as_pg_cstr();
-        let detail = ereport.inner.detail.as_ref().as_pg_cstr();
-        let line = ereport.inner.location.line as _;
-        MemoryContextSwitchTo(old_cxt);
+    /// do_ereport impl for postgres 13 and later
+    /// In this case, we only allocate file, lineno and funcname if `errstart` returns true
+    #[inline(always)]
+    #[rustfmt::skip]    // my opinion wins
+    #[cfg(any(feature = "pg13", feature = "pg14", feature = "pg15"))]
+    fn do_ereport_impl(ereport: ErrorReportWithLevel) {
 
-        // before calling `pgx_ereport` it's imperative we drop everything Rust-allocated we possibly can.
-        // `pgx_ereport` very well might `longjmp` to somewhere else, either in pgx or Postgres, and
-        // we'd rather not be leaking memory during error handling
-        drop(ereport);
-
-        // there's a good chance this will `longjump` us out of here
-        pgx_ereport(level, sqlerrcode, message, detail, funcname, file, line, contexts);
-
-        if crate::ERROR <= level as _ {
-            // SAFETY:  this is true because if we're being reported as an ERROR or greater,
-            // we'll never return from the above call to `pgx_ereport()`
-            unreachable_unchecked()
+        extern "C" {
+            fn errstart(elevel: ::std::os::raw::c_int, domain: *const ::std::os::raw::c_char) -> bool;
+            fn errfinish(filename: *const ::std::os::raw::c_char, lineno: ::std::os::raw::c_int, funcname: *const ::std::os::raw::c_char);
         }
 
-        // if pgx_ereport() returned control (user didn't report a message at a level >=ERROR)
-        // then lets not leak our fucname & file pointers
-        if !file.is_null() {
-            pfree(file.cast())
-        }
-        if !funcname.is_null() {
-            pfree(funcname.cast())
+        let level = ereport.level();
+        unsafe {
+            if errstart(level as _, DOMAIN) {
+
+                let sqlerrcode = ereport.sql_error_code();
+                let message = ereport.message().as_pg_cstr();
+                let detail = ereport.detail().as_pg_cstr();
+                let hint = ereport.hint().as_pg_cstr();
+                let context = ereport.context_message().as_pg_cstr();
+                let lineno = ereport.line_number();
+
+                // SAFETY:  We know that `crate::ErrorContext` is a valid memory context pointer and one
+                // that Postgres will clean up for us in the event of an ERROR, and we know it'll live long
+                // enough for Postgres to use `file` and `funcname`, which it expects to be `const char *`s
+
+                let prev_cxt = MemoryContextSwitchTo(crate::ErrorContext);
+                let file = ereport.file().as_pg_cstr();
+                let funcname = ereport.function_name().as_pg_cstr();
+                MemoryContextSwitchTo(prev_cxt);
+
+                // do not leak the Rust `ErrorReportWithLocation` instance
+                drop(ereport);
+
+                // SAFETY
+                //
+                // The following functions are all FFI into Postgres, so they're inherently unsafe.
+                //
+                // The various pointers used as arguments to these functions might have been allocated above
+                // or they might be the null pointer, so we guard against that possibility for each usage.
+                errcode(sqlerrcode as _);
+                if !message.is_null() { errmsg(PERCENT_S.as_ptr(), message);         pfree(message.cast()); }
+                if !detail.is_null()  { errdetail(PERCENT_S.as_ptr(), detail);       pfree(detail.cast());  }
+                if !hint.is_null()    { errhint(PERCENT_S.as_ptr(), hint);           pfree(hint.cast());    }
+                if !context.is_null() { errcontext_msg(PERCENT_S.as_ptr(), context); pfree(context.cast()); }
+
+                errfinish(file, lineno as _, funcname);
+
+                if level >= PgLogLevel::ERROR {
+                    // SAFETY:  `crate::errstart() is guaranteed to have returned true if >=ERROR and
+                    // `crate::errfinish()` is guaranteed to not have not returned at all if >= ERROR, which
+                    // means we won't either
+                    unreachable_unchecked()
+                } else {
+                    // if it wasn't an ERROR we need to free up the things that Postgres wouldn't have
+                    if !file.is_null()     { pfree(file.cast());     }
+                    if !funcname.is_null() { pfree(funcname.cast()); }
+                }
+            }
         }
     }
+
+    /// do_ereport impl for postgres up to 12
+    /// In this case, `errstart` takes file, lineno and funcname, which need special handling
+    /// to be freed in case level < ERROR
+    #[inline(always)]
+    #[rustfmt::skip]    // my opinion wins
+    #[cfg(any(feature = "pg11", feature = "pg12"))]
+    fn do_ereport_impl(ereport: ErrorReportWithLevel) {
+
+        extern "C" {
+            fn errstart(elevel: ::std::os::raw::c_int, filename: *const ::std::os::raw::c_char, lineno: ::std::os::raw::c_int, funcname: *const ::std::os::raw::c_char, domain: *const ::std::os::raw::c_char) -> bool;
+            fn errfinish(dummy: ::std::os::raw::c_int, ...);
+        }
+
+        unsafe {
+            // SAFETY:  We know that `crate::ErrorContext` is a valid memory context pointer and one
+            // that Postgres will clean up for us in the event of an ERROR, and we know it'll live long
+            // enough for Postgres to use `file` and `funcname`, which it expects to be `const char *`s
+
+            let prev_cxt = MemoryContextSwitchTo(crate::ErrorContext);
+            let file = ereport.file().as_pg_cstr();
+            let lineno = ereport.line_number();
+            let funcname = ereport.function_name().as_pg_cstr();
+            MemoryContextSwitchTo(prev_cxt);
+
+            let level = ereport.level();
+            if errstart(level as _, file, lineno as _, funcname, DOMAIN) {
+
+                let sqlerrcode = ereport.sql_error_code();
+                let message = ereport.message().as_pg_cstr();
+                let detail = ereport.detail().as_pg_cstr();
+                let hint = ereport.hint().as_pg_cstr();
+                let context = ereport.context_message().as_pg_cstr();
+
+
+                // do not leak the Rust `ErrorReportWithLocation` instance
+                drop(ereport);
+
+                // SAFETY
+                //
+                // The following functions are all FFI into Postgres, so they're inherently unsafe.
+                //
+                // The various pointers used as arguments to these functions might have been allocated above
+                // or they might be the null pointer, so we guard against that possibility for each usage.
+                errcode(sqlerrcode as _);
+                if !message.is_null() { errmsg(PERCENT_S.as_ptr(), message);         pfree(message.cast()); }
+                if !detail.is_null()  { errdetail(PERCENT_S.as_ptr(), detail);       pfree(detail.cast());  }
+                if !hint.is_null()    { errhint(PERCENT_S.as_ptr(), hint);           pfree(hint.cast());    }
+                if !context.is_null() { errcontext_msg(PERCENT_S.as_ptr(), context); pfree(context.cast()); }
+
+                errfinish(0);
+            }
+
+            if level >= PgLogLevel::ERROR {
+                // SAFETY:  `crate::errstart() is guaranteed to have returned true if >=ERROR and
+                // `crate::errfinish()` is guaranteed to not have not returned at all if >= ERROR, which
+                // means we won't either
+                unreachable_unchecked()
+            } else {
+                // if it wasn't an ERROR we need to free up the things that Postgres wouldn't have
+                if !file.is_null()     { pfree(file.cast());     }
+                if !funcname.is_null() { pfree(funcname.cast()); }
+            }
+        }
+    }
+
+    do_ereport_impl(ereport)
 }

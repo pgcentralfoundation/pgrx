@@ -910,7 +910,7 @@ SELECT demo_sum(value) OVER (
 
 I had a lot of fun implementing the aggregate support for [`pgx`][pgx], and hope you have just as much fun using it! If you have questions, open up an [issue][pgx-issues].
 
-Moving-aggregate mode is pretty new to me, and I'm still learning about it! If you have any good resources I'd love to recieve them from you!
+Moving-aggregate mode is pretty new to me, and I'm still learning about it! If you have any good resources I'd love to receive them from you!
 
 If you're looking for more materials about aggregates, the TimescaleDB folks wrote about aggregates and how they impacted their hyperfunctions in [this article][timescaledb-article-aggregation]. Also, My pal [Tim McNamara][timclicks] wrote about how to implement harmonic and geometric means as aggregates in [this article][timclicks-article-aggregates].
 

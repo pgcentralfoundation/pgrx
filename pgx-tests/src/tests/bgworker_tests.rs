@@ -24,21 +24,21 @@ pub extern "C" fn bgworker(arg: pg_sys::Datum) {
 
     if arg > 0 {
         BackgroundWorker::transaction(|| {
-            Spi::run("CREATE TABLE tests.bgworker_test (v INTEGER);");
-            Spi::execute(|client| {
+            Spi::run("CREATE TABLE tests.bgworker_test (v INTEGER);")?;
+            Spi::connect(|mut client| {
                 client.update(
                     "INSERT INTO tests.bgworker_test VALUES ($1);",
                     None,
                     Some(vec![(PgOid::BuiltIn(PgBuiltInOids::INT4OID), arg.into_datum())]),
-                );
-            });
-        });
+                )
+            })
+        })
+        .expect("bgworker transaction failed");
     }
     while BackgroundWorker::wait_latch(Some(Duration::from_millis(100))) {}
     if arg > 0 {
-        BackgroundWorker::transaction(|| {
-            Spi::run("UPDATE tests.bgworker_test SET v = v + 1;");
-        });
+        BackgroundWorker::transaction(|| Spi::run("UPDATE tests.bgworker_test SET v = v + 1;"))
+            .expect("bgworker transaction failed")
     }
 }
 
@@ -58,26 +58,28 @@ pub extern "C" fn bgworker_return_value(arg: pg_sys::Datum) {
 
     let val = if arg > 0 {
         BackgroundWorker::transaction(|| {
-            Spi::run("CREATE TABLE tests.bgworker_test_return (v INTEGER);");
+            Spi::run("CREATE TABLE tests.bgworker_test_return (v INTEGER);")?;
             Spi::get_one_with_args::<i32>(
                 "SELECT $1",
                 vec![(PgOid::BuiltIn(PgBuiltInOids::INT4OID), arg.into_datum())],
             )
         })
+        .expect("bgworker transaction failed")
         .unwrap()
     } else {
         0
     };
     while BackgroundWorker::wait_latch(Some(Duration::from_millis(100))) {}
     BackgroundWorker::transaction(|| {
-        Spi::execute(|c| {
+        Spi::connect(|mut c| {
             c.update(
                 "INSERT INTO tests.bgworker_test_return VALUES ($1)",
                 None,
                 Some(vec![(PgOid::BuiltIn(PgBuiltInOids::INT4OID), val.into_datum())]),
-            );
+            )
         })
     })
+    .expect("bgworker transaction failed");
 }
 
 #[cfg(any(test, feature = "pg_test"))]
@@ -104,11 +106,7 @@ mod tests {
         let handle = worker.terminate();
         handle.wait_for_shutdown().expect("aborted shutdown");
 
-        assert_eq!(
-            124,
-            Spi::get_one::<i32>("SELECT v FROM tests.bgworker_test;")
-                .expect("no return value from the worker")
-        );
+        assert_eq!(Ok(Some(124)), Spi::get_one::<i32>("SELECT v FROM tests.bgworker_test;"));
     }
 
     #[pg_test]
@@ -155,10 +153,6 @@ mod tests {
         let handle = worker.terminate();
         handle.wait_for_shutdown().expect("aborted shutdown");
 
-        assert_eq!(
-            123,
-            Spi::get_one::<i32>("SELECT v FROM tests.bgworker_test_return;")
-                .expect("no return value from the worker")
-        );
+        assert_eq!(Ok(Some(123)), Spi::get_one::<i32>("SELECT v FROM tests.bgworker_test_return;"));
     }
 }

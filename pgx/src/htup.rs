@@ -9,6 +9,7 @@ Use of this source code is governed by the MIT license that can be found in the 
 
 //! Utility functions for working with [`pg_sys::HeapTuple`][crate::pg_sys::HeapTuple] and [`pg_sys::HeapTupleHeader`][crate::pg_sys::HeapTupleHeader] structs
 use crate::*;
+use seq_macro::seq;
 use std::num::NonZeroUsize;
 
 /// Given a `pg_sys::Datum` representing a composite row type, return a boxed `HeapTupleData`,
@@ -71,16 +72,6 @@ pub unsafe fn heap_tuple_header_get_typmod(htup_header: pg_sys::HeapTupleHeader)
     htup_header.as_ref().unwrap().t_choice.t_datum.datum_typmod
 }
 
-extern "C" {
-    fn pgx_heap_getattr(
-        tuple: *const pg_sys::HeapTupleData,
-        attnum: u32,
-        tupdesc: pg_sys::TupleDesc,
-        isnull: *mut bool,
-    ) -> pg_sys::Datum;
-
-}
-
 /// Extract an attribute of a heap tuple and return it as Rust type.
 /// This works for either system or user attributes.  The given `attnum`
 /// is properly range-checked.
@@ -101,7 +92,7 @@ pub fn heap_getattr<T: FromDatum, AllocatedBy: WhoAllocated>(
 ) -> Option<T> {
     let mut is_null = false;
     let datum = unsafe {
-        pgx_heap_getattr(tuple.as_ptr(), attno.get() as u32, tupdesc.as_ptr(), &mut is_null)
+        pg_sys::heap_getattr(tuple.as_ptr(), attno.get() as _, tupdesc.as_ptr(), &mut is_null)
     };
     let typoid = tupdesc.get(attno.get() - 1).expect("no attribute").type_oid();
 
@@ -130,12 +121,12 @@ pub fn heap_getattr<T: FromDatum, AllocatedBy: WhoAllocated>(
 /// This function is unsafe as it cannot validate that the provided pointers are valid.
 #[inline]
 pub unsafe fn heap_getattr_raw(
-    tuple: *const pg_sys::HeapTupleData,
+    tuple: *mut pg_sys::HeapTupleData,
     attno: NonZeroUsize,
     tupdesc: pg_sys::TupleDesc,
 ) -> Option<pg_sys::Datum> {
     let mut is_null = false;
-    let datum = pgx_heap_getattr(tuple, attno.get() as u32, tupdesc, &mut is_null);
+    let datum = pg_sys::heap_getattr(tuple, attno.get() as _, tupdesc, &mut is_null);
     if is_null {
         None
     } else {
@@ -164,13 +155,14 @@ impl DatumWithTypeInfo {
 #[inline]
 pub fn heap_getattr_datum_ex(
     tuple: &PgBox<pg_sys::HeapTupleData>,
-    attno: usize,
+    attno: NonZeroUsize,
     tupdesc: &PgTupleDesc,
 ) -> DatumWithTypeInfo {
     let mut is_null = false;
-    let datum =
-        unsafe { pgx_heap_getattr(tuple.as_ptr(), attno as u32, tupdesc.as_ptr(), &mut is_null) };
-    let typoid = tupdesc.get(attno - 1).expect("no attribute").type_oid();
+    let datum = unsafe {
+        pg_sys::heap_getattr(tuple.as_ptr(), attno.get() as _, tupdesc.as_ptr(), &mut is_null)
+    };
+    let typoid = tupdesc.get(attno.get() - 1).expect("no attribute").type_oid();
 
     let mut typlen = 0;
     let mut typbyval = false;
@@ -182,3 +174,43 @@ pub fn heap_getattr_datum_ex(
 
     DatumWithTypeInfo { datum, is_null, typoid, typlen, typbyval }
 }
+
+/// Implemented for Rust tuples that can be represented as a Postgres [`pg_sys::HeapTupleData`].
+pub trait IntoHeapTuple {
+    /// Convert `Self` into a `pg_sys::HeapTupleData`, returning a pointer to it.
+    ///
+    /// # Safety
+    ///
+    /// This function is unsafe as it cannot guarantee the specified `tupdesc` is valid.
+    unsafe fn into_heap_tuple(
+        self,
+        tupdesc: *mut pg_sys::TupleDescData,
+    ) -> *mut pg_sys::HeapTupleData;
+}
+
+seq!(I in 0..32 {
+    #(
+        seq!(N in 0..I {
+            impl<#(T~N: IntoDatum,)*> IntoHeapTuple for (#(T~N,)*) {
+                unsafe fn into_heap_tuple(self, tupdesc: pg_sys::TupleDesc) -> *mut pg_sys::HeapTupleData {
+                    let mut datums = [pg_sys::Datum::from(0); I];
+                    let mut nulls = [false; I];
+
+                    #(
+                        match self.N.into_datum() {
+                            Some(datum) => datums[N] = datum,
+                            None => nulls[N] = true,
+                        }
+                    )*
+
+                    unsafe {
+                        // SAFETY:  Caller has asserted that `tupdesc` is valid, and we just went
+                        // through a little bit of effort to setup properly sized arrays for
+                        // `datums` and `nulls`
+                        pg_sys::heap_form_tuple(tupdesc, datums.as_mut_ptr(), nulls.as_mut_ptr())
+                    }
+                }
+            }
+        });
+    )*
+});

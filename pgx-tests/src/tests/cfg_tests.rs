@@ -25,7 +25,7 @@ mod tests {
     use pgx::prelude::*;
 
     #[pg_test]
-    fn test_cfg_exists() {
-        Spi::run("SELECT func_test_cfg();");
+    fn test_cfg_exists() -> Result<(), spi::Error> {
+        Spi::run("SELECT func_test_cfg();")
     }
 }

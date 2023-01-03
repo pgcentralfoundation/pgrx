@@ -19,11 +19,13 @@ use std::num::NonZeroUsize;
 /// If converting a Datum to a Rust type fails, this is the set of possible reasons why.
 #[derive(thiserror::Error, Debug, Clone, PartialEq, Eq)]
 pub enum TryFromDatumError {
-    #[error("The specified type of the Datum is not compatible with the desired Rust type.")]
-    IncompatibleTypes,
-
-    #[error("We were asked to convert a Datum that is NULL (but flagged as \"not null\")")]
-    NullDatumPointer,
+    #[error("Postgres type {datum_type} (oid={datum_oid}) is not compatible with the Rust type {rust_type} (oid={rust_oid})")]
+    IncompatibleTypes {
+        rust_type: &'static str,
+        rust_oid: pg_sys::Oid,
+        datum_type: String,
+        datum_oid: pg_sys::Oid,
+    },
 
     #[error("The specified attribute number `{0}` is not present")]
     NoSuchAttributeNumber(NonZeroUsize),
@@ -100,8 +102,8 @@ pub trait FromDatum {
     }
 
     /// `try_from_datum` is a convenience wrapper around `FromDatum::from_datum` that returns a
-    /// a `Result` instead of an `Option`.  It's intended to be used in situations where
-    /// the caller needs to know whether the type conversion succeeded or failed.
+    /// a `Result` around an `Option`, as a Datum can be null.  It's intended to be used in
+    /// situations where the caller needs to know whether the type conversion succeeded or failed.
     ///
     /// ## Safety
     ///
@@ -113,15 +115,54 @@ pub trait FromDatum {
         type_oid: pg_sys::Oid,
     ) -> Result<Option<Self>, TryFromDatumError>
     where
-        Self: Sized + IntoDatum + 'static,
+        Self: Sized + IntoDatum,
     {
         if !Self::is_compatible_with(type_oid) {
-            Err(TryFromDatumError::IncompatibleTypes)
-        } else if !is_null && datum.is_null() && !Self::is_pass_by_value() {
-            Err(TryFromDatumError::NullDatumPointer)
+            Err(TryFromDatumError::IncompatibleTypes {
+                rust_type: std::any::type_name::<Self>(),
+                rust_oid: Self::type_oid(),
+                datum_type: lookup_type_name(type_oid),
+                datum_oid: type_oid,
+            })
         } else {
             Ok(FromDatum::from_polymorphic_datum(datum, is_null, type_oid))
         }
+    }
+
+    /// A version of `try_from_datum` that switches to the given context to convert from Datum
+    #[inline]
+    unsafe fn try_from_datum_in_memory_context(
+        memory_context: PgMemoryContexts,
+        datum: pg_sys::Datum,
+        is_null: bool,
+        type_oid: pg_sys::Oid,
+    ) -> Result<Option<Self>, TryFromDatumError>
+    where
+        Self: Sized + IntoDatum,
+    {
+        if !Self::is_compatible_with(type_oid) {
+            Err(TryFromDatumError::IncompatibleTypes {
+                rust_type: std::any::type_name::<Self>(),
+                rust_oid: Self::type_oid(),
+                datum_type: lookup_type_name(type_oid),
+                datum_oid: type_oid,
+            })
+        } else {
+            Ok(FromDatum::from_datum_in_memory_context(memory_context, datum, is_null, type_oid))
+        }
+    }
+}
+
+/// Retrieves a Postgres type name given its Oid
+pub(crate) fn lookup_type_name(oid: pg_sys::Oid) -> String {
+    unsafe {
+        // SAFETY: nothing to concern ourselves with other than just calling into Postgres FFI
+        // and Postgres will raise an ERROR if we pass it an invalid Oid, so it'll never return a null
+        let cstr_name = pg_sys::format_type_extended(oid, -1, 0);
+        let cstr = CStr::from_ptr(cstr_name);
+        let typname = cstr.to_string_lossy().to_string();
+        pg_sys::pfree(cstr_name as _); // don't leak the palloc'd cstr_name
+        typname
     }
 }
 
@@ -433,7 +474,7 @@ impl FromDatum for Vec<u8> {
     }
 }
 
-/// for NULL -- always converts to a `None`, even if the is_null argument is false
+/// for VOID -- always converts to `Some(())`, even if the "is_null" argument is true
 impl FromDatum for () {
     #[inline]
     unsafe fn from_polymorphic_datum(
@@ -441,7 +482,7 @@ impl FromDatum for () {
         _is_null: bool,
         _: pg_sys::Oid,
     ) -> Option<()> {
-        None
+        Some(())
     }
 }
 

@@ -1,6 +1,7 @@
 //! Provides a safe interface to Postgres `HeapTuple` objects.
 //!
 //! [`PgHeapTuple`]s also describe composite types as defined by [`pgx::composite_type!()`][crate::composite_type].
+use crate::datum::lookup_type_name;
 use crate::pg_sys::{Datum, Oid};
 use crate::{
     heap_getattr_raw, pg_sys, AllocatedByPostgres, AllocatedByRust, FromDatum, IntoDatum, PgBox,
@@ -271,7 +272,12 @@ impl<'a> PgHeapTuple<'a, AllocatedByRust> {
                     let is_compatible_composite_types =
                         type_oid == pg_sys::RECORDOID && composite_type_oid == Some(att.atttypid);
                     if !is_compatible_composite_types && !T::is_compatible_with(att.atttypid) {
-                        return Err(TryFromDatumError::IncompatibleTypes);
+                        return Err(TryFromDatumError::IncompatibleTypes {
+                            rust_type: std::any::type_name::<T>(),
+                            rust_oid: att.atttypid,
+                            datum_type: lookup_type_name(type_oid),
+                            datum_oid: type_oid,
+                        });
                     }
                 }
             }
@@ -317,6 +323,16 @@ impl<'a, AllocatedBy: WhoAllocated> IntoDatum for PgHeapTuple<'a, AllocatedBy> {
 
     fn composite_type_oid(&self) -> Option<Oid> {
         Some(self.tupdesc.oid())
+    }
+
+    fn is_compatible_with(other: pg_sys::Oid) -> bool {
+        fn is_composite(oid: pg_sys::Oid) -> bool {
+            unsafe {
+                let entry = pg_sys::lookup_type_cache(oid, pg_sys::TYPECACHE_TUPDESC as _);
+                (*entry).typtype == pg_sys::RELKIND_COMPOSITE_TYPE as i8
+            }
+        }
+        Self::type_oid() == other || is_composite(other)
     }
 }
 
@@ -530,7 +546,7 @@ fn this_dog_name_or_your_favorite_dog_name(
 ```
 
 Composite types are very **runtime failure** heavy, as opposed to using PostgreSQL types `pgx` has
-a builtin compatable type for, or a [`#[derive(pgx::PostgresType)`][crate::PostgresType] type. Those options
+a builtin compatible type for, or a [`#[derive(pgx::PostgresType)`][crate::PostgresType] type. Those options
  can have their shape and API reasoned about at build time.
 
 This runtime failure model is because the shape and layout, or even the name of the type could change during

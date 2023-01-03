@@ -278,6 +278,22 @@ Providing wrappers for Postgres' internals is not a straightforward task, and co
 to take quite a bit of time.  `pgx` is generally ready for use now, and it will continue to be developed as
 time goes on.  Your feedback about what you'd like to be able to do with `pgx` is greatly appreciated.
 
+## Hacking
+
+If you're hacking on `pgx` and want to ensure your test will run correctly, you need to have the current
+implementation of `cargo-pgx` (from the revision you're working on) in your `PATH`.
+
+An easy way would be to install [cargo-local-install](https://github.com/MaulingMonkey/cargo-local-install):
+
+```shell
+cargo install cargo-local-install
+```
+
+and then run `cargo local-install` to install `cargo-pgx` as specified in top-level's Cargo.toml.
+
+Don't forget to prepend `/path/to/pgx/bin` to your `PATH`!
+
+This approach can also be used in extensions to ensure a matching version of `cargo-pgx` is used.
 
 ## License
 

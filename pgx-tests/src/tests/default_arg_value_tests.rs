@@ -40,36 +40,31 @@ mod tests {
 
     #[pg_test]
     fn test_negative_default_argument() {
-        let result = Spi::get_one::<i32>("SELECT negative_default_argument();")
-            .expect("didn't get SPI result");
-        assert_eq!(result, -1);
+        let result = Spi::get_one::<i32>("SELECT negative_default_argument();");
+        assert_eq!(result, Ok(Some(-1)));
     }
 
     #[pg_test]
     fn test_default_argument() {
-        let result =
-            Spi::get_one::<i32>("SELECT default_argument();").expect("didn't get SPI result");
-        assert_eq!(result, 99);
+        let result = Spi::get_one::<i32>("SELECT default_argument();");
+        assert_eq!(result, Ok(Some(99)));
     }
 
     #[pg_test]
     fn test_default_argument_specified() {
-        let result =
-            Spi::get_one::<i32>("SELECT default_argument(2);").expect("didn't get SPI result");
-        assert_eq!(result, 2);
+        let result = Spi::get_one::<i32>("SELECT default_argument(2);");
+        assert_eq!(result, Ok(Some(2)));
     }
 
     #[pg_test]
     fn test_option_default_argument() {
-        let result = Spi::get_one::<&str>("SELECT option_default_argument();")
-            .expect("didn't get SPI result");
-        assert_eq!(result, "got default of null");
+        let result = Spi::get_one::<&str>("SELECT option_default_argument();");
+        assert_eq!(result, Ok(Some("got default of null")));
     }
 
     #[pg_test]
     fn test_option_default_argument_specified() {
-        let result = Spi::get_one::<&str>("SELECT option_default_argument('test');")
-            .expect("didn't get SPI result");
-        assert_eq!(result, "test");
+        let result = Spi::get_one::<&str>("SELECT option_default_argument('test');");
+        assert_eq!(result, Ok(Some("test")));
     }
 }

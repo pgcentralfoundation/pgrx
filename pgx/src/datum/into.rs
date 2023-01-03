@@ -12,11 +12,11 @@ Use of this source code is governed by the MIT license that can be found in the 
 //! Primitive types can never be null, so we do a direct
 //! cast of the primitive type to pg_sys::Datum
 
-use crate::{
-    pg_sys, rust_byte_slice_to_bytea, rust_regtypein, rust_str_to_text_p, PgBox, PgOid,
-    WhoAllocated,
-};
-use pgx_pg_sys::Oid;
+use crate::{pg_sys, rust_regtypein, PgBox, PgOid, WhoAllocated};
+use core::fmt::Display;
+use pgx_pg_sys::panic::ErrorReportable;
+use pgx_pg_sys::{Datum, Oid};
+use std::any::Any;
 
 /// Convert a Rust type into a `pg_sys::Datum`.
 ///
@@ -72,38 +72,6 @@ pub trait IntoDatum {
     fn is_compatible_with(other: pg_sys::Oid) -> bool {
         Self::type_oid() == other
     }
-
-    /// Is a Datum of this type pass by value or pass by reference?
-    ///
-    /// We provide a hardcoded list of known Postgres types that are pass by value,
-    /// but you are free to implement this yourself for custom types.
-    #[inline]
-    fn is_pass_by_value() -> bool
-    where
-        Self: 'static,
-    {
-        let my_type = std::any::TypeId::of::<Self>();
-        my_type == std::any::TypeId::of::<i8>()
-            || my_type == std::any::TypeId::of::<i16>()
-            || my_type == std::any::TypeId::of::<i32>()
-            || my_type == std::any::TypeId::of::<i64>()
-            || my_type == std::any::TypeId::of::<u8>()
-            || my_type == std::any::TypeId::of::<u16>()
-            || my_type == std::any::TypeId::of::<u32>()
-            || my_type == std::any::TypeId::of::<u64>()
-            || my_type == std::any::TypeId::of::<f32>()
-            || my_type == std::any::TypeId::of::<f64>()
-            || my_type == std::any::TypeId::of::<bool>()
-            || my_type == std::any::TypeId::of::<()>()
-            || my_type == std::any::TypeId::of::<crate::Time>()
-            || my_type == std::any::TypeId::of::<crate::TimeWithTimeZone>()
-            || my_type == std::any::TypeId::of::<crate::Timestamp>()
-            || my_type == std::any::TypeId::of::<crate::TimestampWithTimeZone>()
-            || my_type == std::any::TypeId::of::<crate::Date>()
-            || my_type == std::any::TypeId::of::<PgOid>()
-            || my_type == std::any::TypeId::of::<pg_sys::Datum>()
-            || my_type == std::any::TypeId::of::<Option<pg_sys::Datum>>()
-    }
 }
 
 /// for supporting NULL as the None value of an Option<T>
@@ -119,6 +87,32 @@ where
     }
 
     fn type_oid() -> u32 {
+        T::type_oid()
+    }
+}
+
+impl<T, E> IntoDatum for Result<T, E>
+where
+    T: IntoDatum,
+    E: Any + Display,
+{
+    /// Returns The `Option<pg_sys::Datum>` representation of this Result's `Ok` variant.
+    ///
+    /// ## Panics
+    ///
+    /// If this Result represents an error, then that error is raised as a Postgres ERROR, using
+    /// the [`PgSqlErrorCode::ERRCODE_DATA_EXCEPTION`] error code.
+    ///
+    /// If we detect that the `Err()` variant contains `[pg_sys::panic::ErrorReport]`, then we
+    /// directly raise that as the error.  This enables users to set a specific "sql error code"
+    /// for a returned error, along with providing the HINT and DETAIL lines of the error.
+    #[inline]
+    fn into_datum(self) -> Option<Datum> {
+        self.report().into_datum()
+    }
+
+    #[inline]
+    fn type_oid() -> pg_sys::Oid {
         T::type_oid()
     }
 }
@@ -156,6 +150,10 @@ impl IntoDatum for i16 {
     fn type_oid() -> u32 {
         pg_sys::INT2OID
     }
+
+    fn is_compatible_with(other: pg_sys::Oid) -> bool {
+        Self::type_oid() == other || i8::type_oid() == other
+    }
 }
 
 /// for integer
@@ -167,6 +165,10 @@ impl IntoDatum for i32 {
 
     fn type_oid() -> u32 {
         pg_sys::INT4OID
+    }
+
+    fn is_compatible_with(other: pg_sys::Oid) -> bool {
+        Self::type_oid() == other || i8::type_oid() == other || i16::type_oid() == other
     }
 }
 
@@ -180,6 +182,13 @@ impl IntoDatum for u32 {
     fn type_oid() -> u32 {
         pg_sys::OIDOID
     }
+
+    fn is_compatible_with(other: pg_sys::Oid) -> bool {
+        Self::type_oid() == other
+            || i8::type_oid() == other
+            || i16::type_oid() == other
+            || i32::type_oid() == other
+    }
 }
 
 /// for bigint
@@ -191,6 +200,14 @@ impl IntoDatum for i64 {
 
     fn type_oid() -> u32 {
         pg_sys::INT8OID
+    }
+
+    fn is_compatible_with(other: pg_sys::Oid) -> bool {
+        Self::type_oid() == other
+            || i8::type_oid() == other
+            || i16::type_oid() == other
+            || i32::type_oid() == other
+            || i64::type_oid() == other
     }
 }
 
@@ -236,12 +253,7 @@ impl IntoDatum for PgOid {
 impl<'a> IntoDatum for &'a str {
     #[inline]
     fn into_datum(self) -> Option<pg_sys::Datum> {
-        let varlena = rust_str_to_text_p(&self);
-        if varlena.is_null() {
-            None
-        } else {
-            Some(varlena.into_pg().into())
-        }
+        self.as_bytes().into_datum()
     }
 
     fn type_oid() -> u32 {
@@ -331,13 +343,42 @@ impl<'a> IntoDatum for &'a crate::cstr_core::CStr {
 
 /// for bytea
 impl<'a> IntoDatum for &'a [u8] {
+    /// # Panics
+    ///
+    /// This function will panic if the string being converted to a datum is longer than a `u32`.
     #[inline]
     fn into_datum(self) -> Option<pg_sys::Datum> {
-        let varlena = rust_byte_slice_to_bytea(&self);
-        if varlena.is_null() {
-            None
-        } else {
-            Some(varlena.into_pg().into())
+        let len = pg_sys::VARHDRSZ + self.len();
+        unsafe {
+            // SAFETY:  palloc gives us a valid pointer and if there's not enough memory it'll raise an error
+            let varlena = pg_sys::palloc(len) as *mut pg_sys::varlena;
+
+            // SAFETY: `varlena` can properly cast into a `varattrib_4b` and all of what it contains is properly
+            // allocated thanks to our call to `palloc` above
+            let varattrib_4b = varlena
+                .cast::<pg_sys::varattrib_4b>()
+                .as_mut()
+                .unwrap_unchecked()
+                .va_4byte
+                .as_mut();
+
+            // This is the same as Postgres' `#define SET_VARSIZE_4B` (which have over in
+            // `pgx/src/varlena.rs`), however we're asserting that the input string isn't too big
+            // for a Postgres varlena, since it's limited to 32bits -- in reality it's about half
+            // that length, but this is good enough
+            varattrib_4b.va_header = <usize as TryInto<u32>>::try_into(len)
+                .expect("Rust string too large for a Postgres varlena datum")
+                << 2u32;
+
+            // SAFETY: src and dest pointers are valid, exactly `self.len()` bytes long,
+            // and the `dest` was freshly allocated, thus non-overlapping
+            std::ptr::copy_nonoverlapping(
+                self.as_ptr().cast(),
+                varattrib_4b.va_data.as_mut_ptr(),
+                self.len(),
+            );
+
+            Some(Datum::from(varlena))
         }
     }
 
@@ -359,15 +400,16 @@ impl IntoDatum for Vec<u8> {
     }
 }
 
-/// for NULL -- always converts to `None`
+/// for VOID
 impl IntoDatum for () {
     #[inline]
     fn into_datum(self) -> Option<pg_sys::Datum> {
-        None
+        // VOID isn't very useful, but Postgres represents it as a non-null Datum with a zero value
+        Some(Datum::from(0))
     }
 
     fn type_oid() -> u32 {
-        pg_sys::BOOLOID
+        pg_sys::VOIDOID
     }
 }
 

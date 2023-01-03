@@ -1,5 +1,5 @@
 # Example of how to build this container (ran from pgx checkout directory):
-#   docker build --build-arg PG_MAJOR_VER=14 -f .github/docker/Dockerfile.alpine\:3.16 -t pgx-amazonlinux2 .
+#   docker build --build-arg PG_MAJOR_VER=14 -f .github/docker/Dockerfile.amazon\:2 -t pgx-amazonlinux2 .
 #
 # Example of how to run this container with tests after building the image:
 #   docker run pgx-amazonlinux2 cargo test --no-default-features --features pg14 --locked
@@ -75,9 +75,20 @@ ENV USER=rust
 
 RUN curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | bash -s -- -y
 ENV PATH="/home/rust/.cargo/bin:${PATH}"
-RUN cargo install --path cargo-pgx/ --locked
+
+# By default, we always want to use '--locked'. However, there are some circumstances
+# where we might want to try it unlocked. In those one-off scenarios, the image
+# can be built by docker with: --build-arg CARGO_LOCKED_OPTION=''
+ARG CARGO_LOCKED_OPTION='--locked'
+ENV CARGO_LOCKED_OPTION=${CARGO_LOCKED_OPTION}
+
+# Install cargo-pgx from source copied into this container
+RUN echo "Running cargo install --path cargo-pgx/ $CARGO_LOCKED_OPTION" && cargo install --path cargo-pgx/ $CARGO_LOCKED_OPTION
+
+# Initialize cargo pgx so that we can run the tests
 RUN cargo pgx init --pg$PG_MAJOR_VER=$(which pg_config)
-CMD ["cargo", "test", "--no-default-features", "--features", "pg${PG_MAJOR_VER}"]
+
+CMD ["cargo", "test", "--no-default-features", "--features", "pg${PG_MAJOR_VER} cshim", "${CARGO_LOCKED_OPTION}"]
 
 # === Previous "amazon-linux-extras" steps, kept for historical purposes ===
 # RUN amazon-linux-extras enable postgresql$PG_MAJOR_VER

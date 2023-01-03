@@ -157,7 +157,7 @@ impl ToEntityGraphTokens for PostgresEnum {
                     line: line!(),
                     module_path: module_path!(),
                     full_path: core::any::type_name::<#name #static_ty_generics>(),
-                    mappings,
+                    mappings: mappings.into_iter().collect(),
                     variants: vec![ #(  stringify!(#variants)  ),* ],
                     to_sql_config: #to_sql_config,
                 };

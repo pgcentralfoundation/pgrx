@@ -22,16 +22,15 @@ use crate::to_sql::entity::ToSqlConfigEntity;
 use crate::to_sql::ToSql;
 use crate::{SqlGraphEntity, SqlGraphIdentifier, UsedTypeEntity};
 use core::any::TypeId;
-use core::cmp::Ordering;
 use eyre::{eyre, WrapErr};
 
-#[derive(Debug, Clone, Hash, PartialEq, Eq)]
+#[derive(Debug, Clone, Hash, PartialEq, Eq, PartialOrd, Ord)]
 pub struct AggregateTypeEntity {
     pub used_ty: UsedTypeEntity,
     pub name: Option<&'static str>,
 }
 
-#[derive(Debug, Clone, Hash, PartialEq, Eq)]
+#[derive(Debug, Clone, Hash, PartialEq, Eq, PartialOrd, Ord)]
 pub struct PgAggregateEntity {
     pub full_path: &'static str,
     pub module_path: &'static str,
@@ -145,18 +144,6 @@ pub struct PgAggregateEntity {
     /// Corresponds to `hypothetical` in [`pgx::aggregate::Aggregate`].
     pub hypothetical: bool,
     pub to_sql_config: ToSqlConfigEntity,
-}
-
-impl Ord for PgAggregateEntity {
-    fn cmp(&self, other: &Self) -> Ordering {
-        self.file.cmp(other.full_path).then_with(|| self.file.cmp(other.full_path))
-    }
-}
-
-impl PartialOrd for PgAggregateEntity {
-    fn partial_cmp(&self, other: &Self) -> Option<Ordering> {
-        Some(self.cmp(other))
-    }
 }
 
 impl From<PgAggregateEntity> for SqlGraphEntity {
