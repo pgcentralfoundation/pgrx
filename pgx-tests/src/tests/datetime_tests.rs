@@ -458,28 +458,28 @@ mod tests {
     fn test_accept_interval_random() {
         let result = Spi::get_one::<bool>("SELECT accept_interval(interval'1 year 2 months 3 days 4 hours 5 minutes 6 seconds') = interval'1 year 2 months 3 days 4 hours 5 minutes 6 seconds';")
             .expect("failed to get SPI result");
-        assert!(result)
+        assert_eq!(result, Some(true));
     }
 
     #[pg_test]
     fn test_accept_interval_neg_random() {
         let result = Spi::get_one::<bool>("SELECT accept_interval(interval'1 year 2 months 3 days 4 hours 5 minutes 6 seconds ago') = interval'1 year 2 months 3 days 4 hours 5 minutes 6 seconds ago';")
             .expect("failed to get SPI result");
-        assert!(result)
+        assert_eq!(result, Some(true));
     }
 
     #[pg_test]
     fn test_accept_interval_round_trip_random() {
         let result = Spi::get_one::<bool>("SELECT accept_interval_round_trip(interval'1 year 2 months 3 days 4 hours 5 minutes 6 seconds') = interval'1 year 2 months 3 days 4 hours 5 minutes 6 seconds';")
             .expect("failed to get SPI result");
-        assert!(result)
+        assert_eq!(result, Some(true));
     }
 
     #[pg_test]
     fn test_accept_interval_round_trip_neg_random() {
         let result = Spi::get_one::<bool>("SELECT accept_interval_round_trip(interval'1 year 2 months 3 days 4 hours 5 minutes 6 seconds ago') = interval'1 year 2 months 3 days 4 hours 5 minutes 6 seconds ago';")
             .expect("failed to get SPI result");
-        assert!(result)
+        assert_eq!(result, Some(true));
     }
 
     #[pg_test]
