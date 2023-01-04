@@ -9,7 +9,10 @@ Use of this source code is governed by the MIT license that can be found in the 
 
 //! Safe access to Postgres' *Server Programming Interface* (SPI).
 
-use crate::{pg_sys, FromDatum, IntoDatum, Json, PgMemoryContexts, PgOid, TryFromDatumError};
+use crate::{
+    pg_sys, register_xact_callback, FromDatum, IntoDatum, Json, PgMemoryContexts, PgOid,
+    PgXactCallbackEvent, TryFromDatumError,
+};
 use core::fmt::Formatter;
 use pgx_pg_sys::panic::ErrorReportable;
 use std::collections::HashMap;
@@ -19,6 +22,7 @@ use std::marker::PhantomData;
 use std::mem;
 use std::ops::{Deref, Index};
 use std::ptr::NonNull;
+use std::sync::atomic::{AtomicBool, Ordering};
 
 pub type Result<T> = std::result::Result<T, Error>;
 
@@ -143,36 +147,43 @@ pub enum Error {
 
 pub struct Spi;
 
-// TODO: should `'conn` be invariant?
-pub struct SpiClient<'conn> {
-    // This field indicates whether queries be readonly. Unless any `update` has been used
-    // `readonly` will be `true`.
-    // Postgres docs say:
-    //
-    //    It is generally unwise to mix read-only and read-write commands within a single function
-    //    using SPI; that could result in very confusing behavior, since the read-only queries
-    //    would not see the results of any database updates done by the read-write queries.
-    //
-    // TODO:  Alternatively, we can detect if the command counter (or something?) has incremented and if yes
-    //        then we set read_only=false, else we can set it to true.
-    //        However, we would still need to remember the previous value, which will be larger than the boolean.
-    //        So, unless somebody will send commands to Postgres bypassing this SPI API, this flag seems sufficient.
-    readonly: bool,
-    __marker: PhantomData<&'conn SpiConnection>,
-}
+static MUTABLE_MODE: AtomicBool = AtomicBool::new(false);
+impl Spi {
+    #[inline]
+    fn is_read_only() -> bool {
+        MUTABLE_MODE.load(Ordering::Relaxed) == false
+    }
 
-impl<'conn> Drop for SpiClient<'conn> {
-    fn drop(&mut self) {
-        if self.readonly == false {
-            // Assume the user actually modified the database during this SpiClient's lifetime
-            // and push a new snapshot with an updated CommandId.  This ensures that subsequent
-            // `readonly == true` SpiClients will see the changes made by this one
-            unsafe {
-                pg_sys::PushCopiedSnapshot(pg_sys::GetActiveSnapshot());
-                pg_sys::UpdateActiveSnapshotCommandId();
-            }
+    #[inline]
+    fn clear_mutable() {
+        MUTABLE_MODE.store(false, Ordering::Relaxed)
+    }
+
+    /// Postgres docs say:
+    ///
+    /// ```text
+    ///    It is generally unwise to mix read-only and read-write commands within a single function
+    ///    using SPI; that could result in very confusing behavior, since the read-only queries
+    ///    would not see the results of any database updates done by the read-write queries.
+    ///```
+    ///
+    /// We extend this to mean "within a single transaction".  We set the static `MUTABLE_MODE`
+    /// here, and register callbacks for both transaction COMMIT and ABORT to clear it, if it's
+    /// the first time in.  This way, once Spi has entered "mutable mode", it stays that way until
+    /// the current transaction is finished.
+    fn mark_mutable() {
+        if Spi::is_read_only() {
+            register_xact_callback(PgXactCallbackEvent::Commit, || Spi::clear_mutable());
+            register_xact_callback(PgXactCallbackEvent::Abort, || Spi::clear_mutable());
+
+            MUTABLE_MODE.store(true, Ordering::Relaxed)
         }
     }
+}
+
+// TODO: should `'conn` be invariant?
+pub struct SpiClient<'conn> {
+    __marker: PhantomData<&'conn SpiConnection>,
 }
 
 /// a struct to manage our SPI connection lifetime
@@ -204,7 +215,7 @@ impl Drop for SpiConnection {
 impl SpiConnection {
     /// Return a client that with a lifetime scoped to this connection.
     fn client(&self) -> SpiClient<'_> {
-        SpiClient { __marker: PhantomData, readonly: true }
+        SpiClient { __marker: PhantomData }
     }
 }
 
@@ -271,7 +282,7 @@ impl<'a> Query for &'a str {
     /// This function will panic if somehow the specified query contains a null byte.
     fn execute(
         self,
-        client: &SpiClient,
+        _client: &SpiClient,
         limit: Option<i64>,
         arguments: Self::Arguments,
     ) -> Self::Result {
@@ -297,14 +308,14 @@ impl<'a> Query for &'a str {
                         argtypes.as_mut_ptr(),
                         datums.as_mut_ptr(),
                         nulls.as_ptr(),
-                        client.readonly,
+                        Spi::is_read_only(),
                         limit.unwrap_or(0),
                     )
                 }
             }
             // SAFETY: arguments are prepared above
             None => unsafe {
-                pg_sys::SPI_execute(src.as_ptr(), client.readonly, limit.unwrap_or(0))
+                pg_sys::SPI_execute(src.as_ptr(), Spi::is_read_only(), limit.unwrap_or(0))
             },
         };
 
@@ -313,7 +324,7 @@ impl<'a> Query for &'a str {
 
     fn open_cursor<'c: 'cc, 'cc>(
         self,
-        client: &'cc SpiClient<'c>,
+        _client: &'cc SpiClient<'c>,
         args: Self::Arguments,
     ) -> SpiCursor<'c> {
         let src = CString::new(self).expect("query contained a null byte");
@@ -334,7 +345,7 @@ impl<'a> Query for &'a str {
                 argtypes.as_mut_ptr(),
                 datums.as_mut_ptr(),
                 nulls.as_ptr(),
-                client.readonly,
+                Spi::is_read_only(),
                 0,
             ))
         };
@@ -538,7 +549,7 @@ impl<'a> SpiClient<'a> {
         limit: Option<i64>,
         args: Q::Arguments,
     ) -> Q::Result {
-        self.readonly = false;
+        Spi::mark_mutable();
         self.execute(query, limit, args)
     }
 
@@ -577,7 +588,7 @@ impl<'a> SpiClient<'a> {
     ///
     /// See [`SpiCursor`] docs for usage details.
     pub fn open_cursor_mut<Q: Query>(&mut self, query: Q, args: Q::Arguments) -> SpiCursor {
-        self.readonly = false;
+        Spi::mark_mutable();
         query.open_cursor(&self, args)
     }
 
@@ -795,7 +806,7 @@ impl<'a: 'b, 'b> Query for &'b PreparedStatement<'a> {
 
     fn execute(
         self,
-        client: &SpiClient,
+        _client: &SpiClient,
         limit: Option<i64>,
         arguments: Self::Arguments,
     ) -> Self::Result {
@@ -820,7 +831,7 @@ impl<'a: 'b, 'b> Query for &'b PreparedStatement<'a> {
                 self.plan.as_ptr(),
                 datums.as_mut_ptr(),
                 nulls.as_mut_ptr(),
-                client.readonly,
+                Spi::is_read_only(),
                 limit.unwrap_or(0),
             )
         };
@@ -830,7 +841,7 @@ impl<'a: 'b, 'b> Query for &'b PreparedStatement<'a> {
 
     fn open_cursor<'c: 'cc, 'cc>(
         self,
-        client: &'cc SpiClient<'c>,
+        _client: &'cc SpiClient<'c>,
         args: Self::Arguments,
     ) -> SpiCursor<'c> {
         let args = args.unwrap_or_default();
@@ -845,7 +856,7 @@ impl<'a: 'b, 'b> Query for &'b PreparedStatement<'a> {
                 self.plan.as_ptr(),
                 datums.as_mut_ptr(),
                 nulls.as_ptr(),
-                client.readonly,
+                Spi::is_read_only(),
             ))
         };
         SpiCursor { ptr, __marker: PhantomData }
