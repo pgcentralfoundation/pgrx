@@ -102,7 +102,7 @@ cargo install --locked cargo-pgx
 cargo pgx init
 ```
 
-The `init` command downloads PostgreSQL versions v10 through v15 compiles them to `~/.pgx/`, and runs `initdb`. It's also possible to use an existing (user-writable) PostgreSQL install, or install a subset of versions, see the [`README.md` of `cargo-pgx` for details](cargo-pgx/README.md#first-time-initialization).
+The `init` command downloads currently supported PostgreSQL versions, compiles them to `~/.pgx/`, and runs `initdb`. It's also possible to use an existing (user-writable) PostgreSQL install, or install a subset of versions, see the [`README.md` of `cargo-pgx` for details](cargo-pgx/README.md#first-time-initialization).
 
 ```bash
 cargo pgx new my_extension
