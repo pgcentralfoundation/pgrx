@@ -74,7 +74,7 @@ impl PgTrigger {
 
                 let trigger_retval = trigger_fn_result.expect("Trigger function panic");
                 match trigger_retval.into_trigger_datum() {
-                    None => ::pgx::fcinfo::pg_return_null(fcinfo),
+                    None => unsafe { ::pgx::fcinfo::pg_return_null(fcinfo) },
                     Some(datum) => datum,
                 }
             }
