@@ -323,7 +323,13 @@ impl PgMemoryContexts {
     }
 
     /// Returns parent memory context if any
-    pub fn parent(&self) -> Option<PgMemoryContexts> {
+    ///
+    /// # Safety
+    ///
+    /// This function is unsafe because we cannot ensure that any of the [`PgMemoryContexts`] variants,
+    /// specifically those with payloads, actually represent valid Postgres [`pg_sys::MemoryContextData`]
+    /// pointers.
+    pub unsafe fn parent(&self) -> Option<PgMemoryContexts> {
         // SAFETY: We do this instead of simply plucking the .parent field ourselves
         // mostly to let Postgres check the context validity if --enable-cassert is on
         let parent = unsafe { pg_sys::MemoryContextGetParent(self.value()) };

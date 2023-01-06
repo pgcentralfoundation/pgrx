@@ -51,8 +51,11 @@ mod tests {
 
     #[pg_test]
     fn parent() {
-        assert!(PgMemoryContexts::TopMemoryContext.parent().is_none());
-        assert!(PgMemoryContexts::CurrentMemoryContext.parent().is_some());
+        unsafe {
+            // SAFETY:  We know these two PgMemoryContext variants are valid b/c pgx sets them up for us
+            assert!(PgMemoryContexts::TopMemoryContext.parent().is_none());
+            assert!(PgMemoryContexts::CurrentMemoryContext.parent().is_some());
+        }
     }
 
     #[pg_test]
