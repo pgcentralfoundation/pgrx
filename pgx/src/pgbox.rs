@@ -289,15 +289,24 @@ impl<T, AllocatedBy: WhoAllocated> PgBox<T, AllocatedBy> {
     ///
     /// This function is unsafe as we cannot ensure that the MemoryContext used to allocate will
     /// live as long as Rust's borrow checker expects it to.
+    ///
+    /// It is also the caller's responsibility to ensure the `node_tag` is the correct value for
+    /// the [`pg_sys::PgNode`] type `T: pg_sys::PgNode` being used here.
     #[inline]
-    pub unsafe fn alloc_node(node_tag: pg_sys::NodeTag) -> PgBox<T, AllocatedByRust> {
-        let node = PgBox::<T>::alloc0();
-        let ptr = node.as_ptr();
-
+    pub unsafe fn alloc_node(node_tag: pg_sys::NodeTag) -> PgBox<T, AllocatedByRust>
+    where
+        T: pg_sys::PgNode,
+    {
         unsafe {
-            (ptr as *mut _ as *mut pg_sys::Node).as_mut().unwrap().type_ = node_tag;
+            // SAFETY:  Postgres "Node" types are okay to be zeroed memory and is typically the pattern
+            let node = PgBox::<T>::alloc0();
+            let ptr = node.as_ptr();
+
+            // SAFETY:  we just allocated `node` and the trait bound on `T` ensures that it'll have
+            // the `type_` field
+            (ptr as *mut _ as *mut pg_sys::Node).as_mut().unwrap_unchecked().type_ = node_tag;
+            node
         }
-        node
     }
 
     /// Box nothing

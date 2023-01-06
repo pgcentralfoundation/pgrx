@@ -159,6 +159,16 @@ pub use internal::pg15::*;
 /// A trait applied to all Postgres `pg_sys::Node` types and subtypes
 pub trait PgNode: seal::Sealed {
     /// Format this node
+    ///
+    /// # Safety
+    ///
+    /// While pgx controls the types for which [`PgNode`] is implemented and only pgx can implement
+    /// [`PgNode`] it cannot control the members of those types and a user could assign any pointer
+    /// type member to something invalid that Postgres wouldn't understand.
+    ///
+    /// Because this function is used by `impl Display` we purposely don't mark it `unsafe`.  The
+    /// assumption here, which might be a bad one, is that only intentional misuse would actually
+    /// cause undefined behavior.
     #[inline]
     fn display_node(&self) -> std::string::String {
         // SAFETY: The trait is pub but this impl is private, and
