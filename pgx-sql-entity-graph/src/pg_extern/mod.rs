@@ -495,7 +495,6 @@ impl PgExtern {
                     #[no_mangle]
                     #[doc(hidden)]
                     #[::pgx::pgx_macros::pg_guard]
-                    #[warn(unsafe_op_in_unsafe_fn)]
                     pub unsafe extern "C" fn #func_name_wrapper #func_generics(#fcinfo_ident: ::pgx::pg_sys::FunctionCallInfo) -> ::pgx::pg_sys::Datum {
                         #[allow(unused_unsafe)]
                         unsafe {
@@ -533,7 +532,6 @@ impl PgExtern {
                     #[no_mangle]
                     #[doc(hidden)]
                     #[::pgx::pgx_macros::pg_guard]
-                    #[warn(unsafe_op_in_unsafe_fn)]
                     pub unsafe extern "C" fn #func_name_wrapper #func_generics(#fcinfo_ident: ::pgx::pg_sys::FunctionCallInfo) -> ::pgx::pg_sys::Datum {
                         #[allow(unused_unsafe)]
                         unsafe {
