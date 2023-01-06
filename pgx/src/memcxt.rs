@@ -589,7 +589,7 @@ impl PgMemoryContexts {
     pub fn leak_trivial_alloc<T>(&mut self, v: T) -> *mut T {
         #[cfg(feature = "postgrestd")]
         {
-            self.unguarded_switch_to(|_cx| Box::leak(Box::new(v)))
+            Box::leak(Box::new(v))
         }
         #[cfg(not(feature = "postgrestd"))]
         {
