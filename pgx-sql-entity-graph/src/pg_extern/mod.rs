@@ -381,19 +381,19 @@ impl PgExtern {
                 }
             } else if arg.used_ty.resolved_ty.to_token_stream().to_string() == quote!(()).to_token_stream().to_string() {
                 quote_spanned! {pat.span()=>
-                    debug_assert!(::pgx::fcinfo::pg_getarg::<()>(#fcinfo_ident, #idx).is_none(), "A `()` argument should always receive `NULL`");
+                    debug_assert!(unsafe { ::pgx::fcinfo::pg_getarg::<()>(#fcinfo_ident, #idx).is_none() }, "A `()` argument should always receive `NULL`");
                     let #pat = ();
                 }
             } else {
                 match (is_raw, &arg.used_ty.optional) {
                     (true, None) | (true, Some(_)) => quote_spanned! { pat.span() =>
-                        let #pat = ::pgx::fcinfo::pg_getarg_datum_raw(#fcinfo_ident, #idx) as #resolved_ty;
+                        let #pat = unsafe { ::pgx::fcinfo::pg_getarg_datum_raw(#fcinfo_ident, #idx) as #resolved_ty };
                     },
                     (false, None) => quote_spanned! { pat.span() =>
-                        let #pat = ::pgx::fcinfo::pg_getarg::<#resolved_ty>(#fcinfo_ident, #idx).unwrap_or_else(|| panic!("{} is null", stringify!{#pat}));
+                        let #pat = unsafe { ::pgx::fcinfo::pg_getarg::<#resolved_ty>(#fcinfo_ident, #idx).unwrap_or_else(|| panic!("{} is null", stringify!{#pat})) };
                     },
                     (false, Some(inner)) => quote_spanned! { pat.span() =>
-                        let #pat = ::pgx::fcinfo::pg_getarg::<#inner>(#fcinfo_ident, #idx);
+                        let #pat = unsafe { ::pgx::fcinfo::pg_getarg::<#inner>(#fcinfo_ident, #idx) };
                     },
                 }
             }
@@ -417,7 +417,7 @@ impl PgExtern {
                 let result_ident = syn::Ident::new("result", self.func.sig.span());
                 let retval_transform = if retval_ty.resolved_ty == syn::parse_quote!(()) {
                     quote_spanned! { self.func.sig.output.span() =>
-                       ::pgx::fcinfo::pg_return_void()
+                       unsafe { ::pgx::fcinfo::pg_return_void() }
                     }
                 } else if retval_ty.result {
                     if retval_ty.optional.is_some() {
@@ -426,7 +426,7 @@ impl PgExtern {
                             self.func.sig.output.span() =>
                                 match ::pgx::datum::IntoDatum::into_datum(#result_ident) {
                                     Some(datum) => datum,
-                                    None => ::pgx::fcinfo::pg_return_null(#fcinfo_ident),
+                                    None => unsafe { ::pgx::fcinfo::pg_return_null(#fcinfo_ident) },
                                 }
                         }
                     } else {
@@ -449,7 +449,7 @@ impl PgExtern {
                             Some(result) => {
                                 ::pgx::datum::IntoDatum::into_datum(result).unwrap_or_else(|| panic!("returned Option<T> was NULL"))
                             },
-                            None => ::pgx::fcinfo::pg_return_null(#fcinfo_ident)
+                            None => unsafe { ::pgx::fcinfo::pg_return_null(#fcinfo_ident) }
                         }
                     }
                 } else {
@@ -495,8 +495,8 @@ impl PgExtern {
                     #[no_mangle]
                     #[doc(hidden)]
                     #[::pgx::pgx_macros::pg_guard]
-                    #[warn(unsafe_op_in_unsafe_fn)]
                     pub unsafe extern "C" fn #func_name_wrapper #func_generics(#fcinfo_ident: ::pgx::pg_sys::FunctionCallInfo) -> ::pgx::pg_sys::Datum {
+                        #[allow(unused_unsafe)]
                         unsafe {
                             // SAFETY: the caller has asserted that `fcinfo` is a valid FunctionCallInfo pointer, allocated by Postgres
                             // with all its fields properly setup.  Unless the user is calling this wrapper function directly, this
@@ -532,8 +532,8 @@ impl PgExtern {
                     #[no_mangle]
                     #[doc(hidden)]
                     #[::pgx::pgx_macros::pg_guard]
-                    #[warn(unsafe_op_in_unsafe_fn)]
                     pub unsafe extern "C" fn #func_name_wrapper #func_generics(#fcinfo_ident: ::pgx::pg_sys::FunctionCallInfo) -> ::pgx::pg_sys::Datum {
+                        #[allow(unused_unsafe)]
                         unsafe {
                             // SAFETY: the caller has asserted that `fcinfo` is a valid FunctionCallInfo pointer, allocated by Postgres
                             // with all its fields properly setup.  Unless the user is calling this wrapper function directly, this
