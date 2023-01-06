@@ -292,7 +292,7 @@ impl PgMemoryContexts {
     ///
     /// # Safety
     ///
-    /// This function is unsafe as it can lead easy lead to use-after-free of Postgres allocated
+    /// This function is unsafe as it can easily lead to use-after-free of Postgres allocated
     /// memory:
     ///
     /// ```rust,no_run
