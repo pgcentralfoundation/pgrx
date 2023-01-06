@@ -24,7 +24,7 @@ pub fn composite_row_type_make_tuple(
 ) -> PgBox<pg_sys::HeapTupleData, AllocatedByRust> {
     let htup_header =
         unsafe { pg_sys::pg_detoast_datum_packed(row.cast_mut_ptr()) } as pg_sys::HeapTupleHeader;
-    let mut tuple = PgBox::<pg_sys::HeapTupleData>::alloc0();
+    let mut tuple = unsafe { PgBox::<pg_sys::HeapTupleData>::alloc0() };
 
     tuple.t_len = heap_tuple_header_get_datum_length(htup_header) as u32;
     tuple.t_data = htup_header;

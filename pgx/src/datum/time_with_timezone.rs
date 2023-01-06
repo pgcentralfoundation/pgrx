@@ -47,7 +47,7 @@ impl FromDatum for TimeWithTimeZone {
 impl IntoDatum for TimeWithTimeZone {
     #[inline]
     fn into_datum(self) -> Option<pg_sys::Datum> {
-        let mut timetz = PgBox::<pg_sys::TimeTzADT>::alloc();
+        let mut timetz = unsafe { PgBox::<pg_sys::TimeTzADT>::alloc() };
         timetz.zone = self.tz_secs;
         timetz.time = self.t.0 as i64;
 
