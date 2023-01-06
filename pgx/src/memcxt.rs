@@ -15,8 +15,8 @@ Use of this source code is governed by the MIT license that can be found in the 
 //! An enum-based interface (`PgMemoryContexts`) around Postgres' various `MemoryContext`s provides
 //! simple accessibility to working with MemoryContexts in a compiler-checked manner
 //!
+use crate::pg_sys;
 use crate::pg_sys::AsPgCStr;
-use crate::{pg_sys, PgBox};
 use core::ptr;
 use std::fmt::Debug;
 use std::ptr::NonNull;
@@ -287,16 +287,49 @@ impl PgMemoryContexts {
         }
     }
 
-    /// Release all space allocated within a context and delete all its descendant contexts (but not
-    /// the context itself).
-    pub fn reset(&mut self) {
+    /// Release all space allocated within a context (ie, free the memory) and delete all its
+    /// descendant contexts (but not the context itself).
+    ///
+    /// # Safety
+    ///
+    /// This function is unsafe as it can easily lead to use-after-free of Postgres allocated
+    /// memory:
+    ///
+    /// ```rust,no_run
+    /// use pgx::memcxt::PgMemoryContexts;
+    /// struct Thing(Option<String>);
+    /// let mut thing = unsafe {
+    ///     // SAFETY:  CurrentMemoryContext is always valid and Thing can be allocated as a zero'd struct
+    ///     PgMemoryContexts::CurrentMemoryContext.palloc0_struct::<Thing>()
+    /// };
+    /// let mut thing = unsafe {
+    ///     // SAFETY:  We just allocated it, so it must be a valid Thing
+    ///     thing.as_mut().unwrap()
+    /// };
+    /// thing.0 = Some("hello, world".into());
+    ///
+    /// unsafe {
+    ///     // SAFETY:  We promise not to use anything allocated by CurrentMemoryContext prior to
+    ///     // this call to reset(), specifically `thing`.
+    ///     PgMemoryContexts::CurrentMemoryContext.reset();
+    /// }
+    ///
+    /// assert_eq!(thing.0, Some("hello, world".into()))  // we lied! UAF happens here
+    /// ```
+    pub unsafe fn reset(&mut self) {
         unsafe {
             pg_sys::MemoryContextReset(self.value());
         }
     }
 
     /// Returns parent memory context if any
-    pub fn parent(&self) -> Option<PgMemoryContexts> {
+    ///
+    /// # Safety
+    ///
+    /// This function is unsafe because we cannot ensure that any of the [`PgMemoryContexts`] variants,
+    /// specifically those with payloads, actually represent valid Postgres [`pg_sys::MemoryContextData`]
+    /// pointers.
+    pub unsafe fn parent(&self) -> Option<PgMemoryContexts> {
         // SAFETY: We do this instead of simply plucking the .parent field ourselves
         // mostly to let Postgres check the context validity if --enable-cassert is on
         let parent = unsafe { pg_sys::MemoryContextGetParent(self.value()) };
@@ -321,6 +354,8 @@ impl PgMemoryContexts {
     /// use pgx::PgMemoryContexts;
     ///
     /// pub fn do_something() -> pg_sys::ItemPointer {
+    ///     unsafe {
+    ///     // SAFETY:  We know for a fact that `PgMemoryContexts::TopTransactionContext` is always valid
     ///     PgMemoryContexts::TopTransactionContext.switch_to(|context| {
     ///         // allocate a new ItemPointerData, but inside the TopTransactionContext
     ///         let tid = PgBox::<pg_sys::ItemPointerData>::alloc();
@@ -329,9 +364,19 @@ impl PgMemoryContexts {
     ///         // Note that it stays allocated here in the TopTransactionContext
     ///         tid.into_pg()
     ///     })
+    ///     }
     /// }
     /// ```
-    pub fn switch_to<R, F: FnOnce(&mut PgMemoryContexts) -> R>(&mut self, f: F) -> R {
+    ///
+    /// # Safety
+    ///
+    /// This function is unsafe because we cannot ensure that any of the [`PgMemoryContexts`] variants,
+    /// specifically those with payloads, actually represent valid Postgres [`pg_sys::MemoryContextData`]
+    /// pointers.
+    ///
+    /// We also cannot ensure that the result of this function will stay allocated as long as Rust's
+    /// borrow checker thinks it will.
+    pub unsafe fn switch_to<R, F: FnOnce(&mut PgMemoryContexts) -> R>(&mut self, f: F) -> R {
         match self {
             PgMemoryContexts::Transient {
                 parent,
@@ -369,15 +414,39 @@ impl PgMemoryContexts {
     ///
     /// ```rust,no_run
     /// use pgx::PgMemoryContexts;
-    /// let copy = PgMemoryContexts::CurrentMemoryContext.pstrdup("make a copy of this");
+    /// // SAFETY:  `CurrentMemoryContext` is always valid, and we promise not to use `copy` after
+    /// // `CurrentMemoryContext` has been free'd.
+    /// let copy = unsafe { PgMemoryContexts::CurrentMemoryContext.pstrdup("make a copy of this") };
     /// ```
-    pub fn pstrdup(&self, s: &str) -> *mut std::os::raw::c_char {
+    ///
+    /// # Safety
+    ///
+    /// This function is unsafe because we cannot ensure that any of the [`PgMemoryContexts`] variants,
+    /// specifically those with payloads, actually represent valid Postgres [`pg_sys::MemoryContextData`]
+    /// pointers.
+    ///
+    /// We also cannot ensure that the result of this function will stay allocated as long as Rust's
+    /// borrow checker thinks it will.
+    pub unsafe fn pstrdup(&self, s: &str) -> *mut std::os::raw::c_char {
         let cstring = std::ffi::CString::new(s).unwrap();
         unsafe { pg_sys::MemoryContextStrdup(self.value(), cstring.as_ptr()) }
     }
 
     /// Copies `len` bytes, starting at `src` into this memory context and
     /// returns a raw `*mut T` pointer to the newly allocated location
+    ///
+    /// # Panics
+    ///
+    /// This function will panic if `src` is a null pointer.
+    ///
+    /// # Safety
+    ///
+    /// This function is unsafe because we cannot ensure that any of the [`PgMemoryContexts`] variants,
+    /// specifically those with payloads, actually represent valid Postgres [`pg_sys::MemoryContextData`]
+    /// pointers.
+    ///
+    /// We also cannot ensure that the result of this function will stay allocated as long as Rust's
+    /// borrow checker thinks it will.
     #[warn(unsafe_op_in_unsafe_fn)]
     pub unsafe fn copy_ptr_into<T>(&mut self, src: *mut T, len: usize) -> *mut T {
         if src.is_null() {
@@ -394,37 +463,102 @@ impl PgMemoryContexts {
     }
 
     /// Allocate memory in this context, which will be free'd whenever Postgres deletes this MemoryContext
-    pub fn palloc(&mut self, len: usize) -> *mut std::os::raw::c_void {
+    ///
+    /// # Safety
+    ///
+    /// This function is unsafe because we cannot ensure that any of the [`PgMemoryContexts`] variants,
+    /// specifically those with payloads, actually represent valid Postgres [`pg_sys::MemoryContextData`]
+    /// pointers.
+    ///
+    /// We also cannot ensure that the result of this function will stay allocated as long as Rust's
+    /// borrow checker thinks it will.
+    pub unsafe fn palloc(&mut self, len: usize) -> *mut std::os::raw::c_void {
         unsafe { pg_sys::MemoryContextAlloc(self.value(), len) }
     }
 
-    pub fn palloc_struct<T>(&mut self) -> *mut T {
-        self.palloc(std::mem::size_of::<T>()) as *mut T
+    /// Allocate a struct in this memory context, returning a pointer to it.  The memory will be
+    /// uninitialized and will be freed whenever Postgres deletes this MemoryContext.
+    ///
+    /// # Safety
+    ///
+    /// This function is unsafe because we cannot ensure that any of the [`PgMemoryContexts`] variants,
+    /// specifically those with payloads, actually represent valid Postgres [`pg_sys::MemoryContextData`]
+    /// pointers.
+    ///
+    /// We also cannot ensure that the result of this function will stay allocated as long as Rust's
+    /// borrow checker thinks it will.
+    pub unsafe fn palloc_struct<T>(&mut self) -> *mut T {
+        unsafe { self.palloc(std::mem::size_of::<T>()) as *mut T }
     }
 
-    pub fn palloc0_struct<T>(&mut self) -> *mut T {
-        self.palloc0(std::mem::size_of::<T>()) as *mut T
+    /// Allocate a struct in this memory context, returning a pointer to it.  The memory will be
+    /// zeroed and will be freed whenever Postgres deletes this MemoryContext.
+    ///
+    /// # Safety
+    ///
+    /// This function is unsafe because we cannot ensure that any of the [`PgMemoryContexts`] variants,
+    /// specifically those with payloads, actually represent valid Postgres [`pg_sys::MemoryContextData`]
+    /// pointers.
+    ///
+    /// We also cannot ensure that the result of this function will stay allocated as long as Rust's
+    /// borrow checker thinks it will.
+    pub unsafe fn palloc0_struct<T>(&mut self) -> *mut T {
+        unsafe { self.palloc0(std::mem::size_of::<T>()) as *mut T }
     }
 
     /// Allocate a slice in this context, which will be free'd whenever Postgres deletes this MemoryContext
-    pub fn palloc_slice<'a, T>(&mut self, len: usize) -> &'a mut [T] {
-        let buffer = self.palloc(std::mem::size_of::<T>() * len) as *mut T;
-        unsafe { std::slice::from_raw_parts_mut(buffer, len) }
+    ///
+    /// # Safety
+    ///
+    /// This function is unsafe because we cannot ensure that any of the [`PgMemoryContexts`] variants,
+    /// specifically those with payloads, actually represent valid Postgres [`pg_sys::MemoryContextData`]
+    /// pointers.
+    ///
+    /// We also cannot ensure that the result of this function will stay allocated as long as Rust's
+    /// borrow checker thinks it will.
+    pub unsafe fn palloc_slice<'a, T>(&mut self, len: usize) -> &'a mut [T] {
+        unsafe {
+            let buffer = self.palloc(std::mem::size_of::<T>() * len) as *mut T;
+            std::slice::from_raw_parts_mut(buffer, len)
+        }
     }
 
     /// Allocate a slice in this context, where the memory is zero'd, which will be free'd whenever Postgres deletes this MemoryContext
-    pub fn palloc0_slice<'a, T>(&mut self, len: usize) -> &'a mut [T] {
-        let buffer = self.palloc0(std::mem::size_of::<T>() * len) as *mut T;
-        unsafe { std::slice::from_raw_parts_mut(buffer, len) }
+    ///
+    /// # Safety
+    ///
+    /// This function is unsafe because we cannot ensure that any of the [`PgMemoryContexts`] variants,
+    /// specifically those with payloads, actually represent valid Postgres [`pg_sys::MemoryContextData`]
+    /// pointers.
+    ///
+    /// We also cannot ensure that the result of this function will stay allocated as long as Rust's
+    /// borrow checker thinks it will.
+    pub unsafe fn palloc0_slice<'a, T>(&mut self, len: usize) -> &'a mut [T] {
+        unsafe {
+            let buffer = self.palloc0(std::mem::size_of::<T>() * len) as *mut T;
+            std::slice::from_raw_parts_mut(buffer, len)
+        }
     }
 
     /// Allocate memory in this context, which will be free'd whenever Postgres deletes this MemoryContext
     ///
     /// The allocated memory is zero'd
-    pub fn palloc0(&mut self, len: usize) -> *mut std::os::raw::c_void {
+    ///
+    /// # Safety
+    ///
+    /// This function is unsafe because we cannot ensure that any of the [`PgMemoryContexts`] variants,
+    /// specifically those with payloads, actually represent valid Postgres [`pg_sys::MemoryContextData`]
+    /// pointers.
+    ///
+    /// We also cannot ensure that the result of this function will stay allocated as long as Rust's
+    /// borrow checker thinks it will.
+    pub unsafe fn palloc0(&mut self, len: usize) -> *mut std::os::raw::c_void {
         unsafe { pg_sys::MemoryContextAllocZero(self.value(), len) }
     }
 
+    /// Consumes an instance of `T` and leaks it.  Whenever Postgres deletes
+    /// this MemoryContext, the original instance of `T` will be resurrected and its `impl Drop`
+    /// will be called.
     pub fn leak_and_drop_on_delete<T>(&mut self, v: T) -> *mut T {
         unsafe extern "C" fn drop_on_delete<T>(ptr: void_mut_ptr) {
             let boxed = Box::from_raw(ptr as *mut T);
@@ -432,13 +566,15 @@ impl PgMemoryContexts {
         }
 
         let leaked_ptr = Box::leak(Box::new(v));
-        // SAFETY:  we know the result of `self.palloc_struct()` is a valid pointer
-        let mut memcxt_callback =
-            unsafe { PgBox::from_pg(self.palloc_struct::<pg_sys::MemoryContextCallback>()) };
-        memcxt_callback.func = Some(drop_on_delete::<T>);
-        memcxt_callback.arg = leaked_ptr as *mut T as void_mut_ptr;
         unsafe {
-            pg_sys::MemoryContextRegisterResetCallback(self.value(), memcxt_callback.into_pg());
+            // SAFETY:  we know the result of `self.palloc_struct()` is a valid pointer and its
+            // okay that it's uninitialized because its fields are just pointers and we set them
+            // immediately after
+            let callback = self.palloc_struct::<pg_sys::MemoryContextCallback>();
+            (*callback).func = Some(drop_on_delete::<T>);
+            (*callback).arg = leaked_ptr as *mut T as void_mut_ptr;
+
+            pg_sys::MemoryContextRegisterResetCallback(self.value(), callback);
         }
         leaked_ptr
     }
@@ -481,59 +617,5 @@ impl PgMemoryContexts {
         }
 
         result
-    }
-
-    pub fn unguarded_switch_to<R, F: FnOnce(&mut PgMemoryContexts) -> R>(&mut self, f: F) -> R {
-        fn unguarded_exec_in_context<R, F: FnOnce(&mut PgMemoryContexts) -> R>(
-            context: pg_sys::MemoryContext,
-            f: F,
-        ) -> R {
-            let prev_context;
-
-            // mimic what palloc.h does for switching memory contexts
-            unsafe {
-                prev_context = pg_sys::CurrentMemoryContext;
-                pg_sys::CurrentMemoryContext = context;
-            }
-
-            let result = f(&mut PgMemoryContexts::For(context));
-
-            // restore our understanding of the current memory context
-            unsafe {
-                pg_sys::CurrentMemoryContext = prev_context;
-            }
-
-            result
-        }
-
-        match self {
-            PgMemoryContexts::Transient {
-                parent,
-                name,
-                min_context_size,
-                initial_block_size,
-                max_block_size,
-            } => {
-                let context: pg_sys::MemoryContext = unsafe {
-                    let name = std::ffi::CString::new(*name).unwrap();
-                    pg_sys::AllocSetContextCreateExtended(
-                        *parent,
-                        name.into_raw(),
-                        *min_context_size as usize,
-                        *initial_block_size as usize,
-                        *max_block_size as usize,
-                    )
-                };
-
-                let result = unguarded_exec_in_context(context, f);
-
-                unsafe {
-                    pg_sys::MemoryContextDelete(context);
-                }
-
-                result
-            }
-            _ => unguarded_exec_in_context(self.value(), f),
-        }
     }
 }

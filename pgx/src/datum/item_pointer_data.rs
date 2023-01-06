@@ -35,8 +35,10 @@ impl IntoDatum for pg_sys::ItemPointerData {
     #[inline]
     fn into_datum(self) -> Option<pg_sys::Datum> {
         let tid = self;
-        let tid_ptr =
-            PgMemoryContexts::CurrentMemoryContext.palloc_struct::<pg_sys::ItemPointerData>();
+        let tid_ptr = unsafe {
+            // SAFETY:  CurrentMemoryContext is always valid
+            PgMemoryContexts::CurrentMemoryContext.palloc_struct::<pg_sys::ItemPointerData>()
+        };
         let (blockno, offno) = item_pointer_get_both(tid);
 
         item_pointer_set_all(unsafe { &mut *tid_ptr }, blockno, offno);

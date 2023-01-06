@@ -32,34 +32,39 @@ mod tests {
     fn test_leak_and_drop() {
         let did_drop = Arc::new(AtomicBool::new(false));
 
-        PgMemoryContexts::Transient {
-            parent: PgMemoryContexts::CurrentMemoryContext.value(),
-            name: "test",
-            min_context_size: 4096,
-            initial_block_size: 4096,
-            max_block_size: 4096,
+        unsafe {
+            PgMemoryContexts::Transient {
+                parent: PgMemoryContexts::CurrentMemoryContext.value(),
+                name: "test",
+                min_context_size: 4096,
+                initial_block_size: 4096,
+                max_block_size: 4096,
+            }
+            .switch_to(|context| {
+                let test_object = TestObject { did_drop: did_drop.clone() };
+                context.leak_and_drop_on_delete(test_object);
+            });
         }
-        .switch_to(|context| {
-            let test_object = TestObject { did_drop: did_drop.clone() };
-            context.leak_and_drop_on_delete(test_object);
-        });
 
         assert!(did_drop.load(Ordering::SeqCst))
     }
 
     #[pg_test]
     fn parent() {
-        assert!(PgMemoryContexts::TopMemoryContext.parent().is_none());
-        assert!(PgMemoryContexts::CurrentMemoryContext.parent().is_some());
+        unsafe {
+            // SAFETY:  We know these two PgMemoryContext variants are valid b/c pgx sets them up for us
+            assert!(PgMemoryContexts::TopMemoryContext.parent().is_none());
+            assert!(PgMemoryContexts::CurrentMemoryContext.parent().is_some());
+        }
     }
 
     #[pg_test]
     fn switch_to_should_switch_back_on_panic() {
         let mut ctx = PgMemoryContexts::new("test");
         let ctx_sys = ctx.value();
-        PgTryBuilder::new(move || {
+        PgTryBuilder::new(move || unsafe {
             ctx.switch_to(|_| {
-                assert_eq!(unsafe { pg_sys::CurrentMemoryContext }, ctx_sys);
+                assert_eq!(pg_sys::CurrentMemoryContext, ctx_sys);
                 panic!();
             });
         })

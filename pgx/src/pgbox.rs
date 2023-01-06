@@ -38,7 +38,7 @@ use std::ptr::NonNull;
 ///
 /// pub fn do_something() -> pg_sys::ItemPointer {
 ///     // postgres-allocate an ItemPointerData structure
-///     let mut tid = PgBox::<pg_sys::ItemPointerData>::alloc();
+///     let mut tid = unsafe { PgBox::<pg_sys::ItemPointerData>::alloc() };
 ///
 ///     // set its position to 42
 ///     tid.ip_posid = 42;
@@ -56,7 +56,7 @@ use std::ptr::NonNull;
 ///
 /// pub fn do_something()  {
 ///     // postgres-allocate an ItemPointerData structure
-///     let mut tid = PgBox::<pg_sys::ItemPointerData>::alloc();
+///     let mut tid = unsafe { PgBox::<pg_sys::ItemPointerData>::alloc() };
 ///
 ///     // set its position to 42
 ///     tid.ip_posid = 42;
@@ -118,7 +118,7 @@ impl WhoAllocated for AllocatedByPostgres {
     unsafe fn maybe_pfree(_ptr: *mut std::os::raw::c_void) {}
 }
 impl WhoAllocated for AllocatedByRust {
-    /// Uses [pg_sys::pfree] to free the specified pointer
+    /// Uses [`pg_sys::pfree`] to free the specified pointer
     #[inline]
     unsafe fn maybe_pfree(ptr: *mut std::os::raw::c_void) {
         pg_sys::pfree(ptr.cast());
@@ -126,72 +126,13 @@ impl WhoAllocated for AllocatedByRust {
 }
 
 impl<T> PgBox<T, AllocatedByPostgres> {
-    /// Box a pointer that cames from Postgres.
+    /// Box a pointer that comes from Postgres.
     ///
     /// When this `PgBox<T>` is dropped, the boxed memory is **not** freed.  Since Postgres
     /// allocated it, Postgres is responsible for freeing it.
     #[inline]
     pub unsafe fn from_pg(ptr: *mut T) -> PgBox<T, AllocatedByPostgres> {
         PgBox::<T, AllocatedByPostgres> { ptr: NonNull::new(ptr), __marker: PhantomData }
-    }
-}
-
-impl<T> PgBox<T, AllocatedByRust> {
-    /**
-    Allocates memory in PostgreSQL and then places `val` into it.
-
-    This value is managed by Rust, so gets dropped via normal [`Drop`][std::ops::Drop]
-    semantics.
-
-    If you need to give the boxed pointer to Postgres, call [`.into_pg()`][PgBox::into_pg].
-
-    ```rust,no_run
-    use pgx::{PgBox, AllocatedByRust};
-
-    let ptr: PgBox<i32, AllocatedByRust> = PgBox::new(5);
-    assert_eq!(*ptr, 5);
-
-    let mut ptr: PgBox<Vec<i32>, AllocatedByRust> = PgBox::new(vec![]);
-    assert_eq!(*ptr, Vec::<i32>::default());
-
-    ptr.push(1);
-    assert_eq!(*ptr, vec![1]);
-
-    ptr.push(2);
-    assert_eq!(*ptr, vec![1, 2]);
-
-    ptr.push(3);
-    assert_eq!(*ptr, vec![1, 2, 3]);
-
-    let drained = ptr.drain(..).collect::<Vec<_>>();
-    assert_eq!(drained, vec![1, 2, 3])
-    ```
-     */
-    pub fn new(val: T) -> PgBox<T, AllocatedByRust> {
-        let ptr = Self::alloc0();
-        unsafe { core::ptr::write(ptr.as_ptr(), val) };
-        ptr
-    }
-
-    /**
-    Allocates memory in PostgreSQL and then places `val` into it.
-
-    This value is managed by Rust, so gets dropped via normal [`Drop`][std::ops::Drop]
-    semantics.
-
-    If you need to give the boxed pointer to Postgres, call [`.into_pg()`][PgBox::into_pg].
-
-    ```rust,no_run
-    use pgx::{PgBox, PgMemoryContexts, AllocatedByRust};
-
-    let ptr: PgBox<i32, AllocatedByRust> = PgBox::new_in_context(5, PgMemoryContexts::CurrentMemoryContext);
-    assert_eq!(*ptr, 5);
-    ```
-     */
-    pub fn new_in_context(val: T, memory_context: PgMemoryContexts) -> PgBox<T, AllocatedByRust> {
-        let ptr = Self::alloc0_in_context(memory_context);
-        unsafe { core::ptr::write(ptr.as_ptr(), val) };
-        ptr
     }
 }
 
@@ -217,10 +158,18 @@ impl<T, AllocatedBy: WhoAllocated> PgBox<T, AllocatedBy> {
     /// ## Examples
     /// ```rust,no_run
     /// use pgx::{PgBox, pg_sys};
-    /// let ctid = PgBox::<pg_sys::ItemPointerData>::alloc();
+    /// let ctid = unsafe { PgBox::<pg_sys::ItemPointerData>::alloc() };
     /// ```
+    ///
+    /// # Safety
+    ///
+    /// This function is unsafe as we cannot ensure that the MemoryContext used to allocate will
+    /// live as long as Rust's borrow checker expects it to.
+    ///
+    /// It is also unsafe because the allocated `T` will be uninitialized and that may or may not
+    /// be a valid state for `T`.
     #[inline]
-    pub fn alloc() -> PgBox<T, AllocatedByRust> {
+    pub unsafe fn alloc() -> PgBox<T, AllocatedByRust> {
         PgBox::<T, AllocatedByRust> {
             ptr: Some(unsafe {
                 NonNull::new_unchecked(pg_sys::palloc(std::mem::size_of::<T>()) as *mut T)
@@ -239,10 +188,18 @@ impl<T, AllocatedBy: WhoAllocated> PgBox<T, AllocatedBy> {
     /// ## Examples
     /// ```rust,no_run
     /// use pgx::{PgBox, pg_sys};
-    /// let ctid = PgBox::<pg_sys::ItemPointerData>::alloc0();
+    /// let ctid = unsafe { PgBox::<pg_sys::ItemPointerData>::alloc0() };
     /// ```
+    ///
+    /// # Safety
+    ///
+    /// This function is unsafe as we cannot ensure that the MemoryContext used to allocate will
+    /// live as long as Rust's borrow checker expects it to.
+    ///
+    /// It is also unsafe because the allocated `T`'s memory will be zerod and that may or may not
+    /// be a valid state for `T`.
     #[inline]
-    pub fn alloc0() -> PgBox<T, AllocatedByRust> {
+    pub unsafe fn alloc0() -> PgBox<T, AllocatedByRust> {
         PgBox::<T, AllocatedByRust> {
             ptr: Some(unsafe {
                 NonNull::new_unchecked(pg_sys::palloc0(std::mem::size_of::<T>()) as *mut T)
@@ -261,10 +218,18 @@ impl<T, AllocatedBy: WhoAllocated> PgBox<T, AllocatedBy> {
     /// ## Examples
     /// ```rust,no_run
     /// use pgx::{PgBox, pg_sys, PgMemoryContexts};
-    /// let ctid = PgBox::<pg_sys::ItemPointerData>::alloc_in_context(PgMemoryContexts::TopTransactionContext);
+    /// let ctid = unsafe { PgBox::<pg_sys::ItemPointerData>::alloc_in_context(PgMemoryContexts::TopTransactionContext) };
     /// ```
+    ///
+    /// # Safety
+    ///
+    /// This function is unsafe as we cannot ensure that the MemoryContext used to allocate will
+    /// live as long as Rust's borrow checker expects it to.
+    ///
+    /// It is also unsafe because the allocated `T` will be uninitialized and that may or may not
+    /// be a valid state for `T`.
     #[inline]
-    pub fn alloc_in_context(memory_context: PgMemoryContexts) -> PgBox<T, AllocatedByRust> {
+    pub unsafe fn alloc_in_context(memory_context: PgMemoryContexts) -> PgBox<T, AllocatedByRust> {
         PgBox::<T, AllocatedByRust> {
             ptr: Some(unsafe {
                 NonNull::new_unchecked(pg_sys::MemoryContextAlloc(
@@ -286,10 +251,18 @@ impl<T, AllocatedBy: WhoAllocated> PgBox<T, AllocatedBy> {
     /// ## Examples
     /// ```rust,no_run
     /// use pgx::{PgBox, pg_sys, PgMemoryContexts};
-    /// let ctid = PgBox::<pg_sys::ItemPointerData>::alloc0_in_context(PgMemoryContexts::TopTransactionContext);
+    /// let ctid = unsafe { PgBox::<pg_sys::ItemPointerData>::alloc0_in_context(PgMemoryContexts::TopTransactionContext) };
     /// ```
+    ///
+    /// # Safety
+    ///
+    /// This function is unsafe as we cannot ensure that the MemoryContext used to allocate will
+    /// live as long as Rust's borrow checker expects it to.
+    ///
+    /// It is also unsafe because the allocated `T`'s memory will be zeroed and that may or may not
+    /// be a valid state for `T`.
     #[inline]
-    pub fn alloc0_in_context(memory_context: PgMemoryContexts) -> PgBox<T, AllocatedByRust> {
+    pub unsafe fn alloc0_in_context(memory_context: PgMemoryContexts) -> PgBox<T, AllocatedByRust> {
         PgBox::<T, AllocatedByRust> {
             ptr: Some(unsafe {
                 NonNull::new_unchecked(pg_sys::MemoryContextAllocZero(
@@ -309,17 +282,31 @@ impl<T, AllocatedBy: WhoAllocated> PgBox<T, AllocatedBy> {
     /// ## Examples
     /// ```rust,no_run
     /// use pgx::{PgBox, pg_sys};
-    /// let create_trigger_statement = PgBox::<pg_sys::CreateTrigStmt>::alloc_node(pg_sys::NodeTag_T_CreateTrigStmt);
+    /// let create_trigger_statement = unsafe { PgBox::<pg_sys::CreateTrigStmt>::alloc_node(pg_sys::NodeTag_T_CreateTrigStmt) };
     /// ```
+    ///
+    /// # Safety
+    ///
+    /// This function is unsafe as we cannot ensure that the MemoryContext used to allocate will
+    /// live as long as Rust's borrow checker expects it to.
+    ///
+    /// It is also the caller's responsibility to ensure the `node_tag` is the correct value for
+    /// the [`pg_sys::PgNode`] type `T: pg_sys::PgNode` being used here.
     #[inline]
-    pub fn alloc_node(node_tag: pg_sys::NodeTag) -> PgBox<T, AllocatedByRust> {
-        let node = PgBox::<T>::alloc0();
-        let ptr = node.as_ptr();
-
+    pub unsafe fn alloc_node(node_tag: pg_sys::NodeTag) -> PgBox<T, AllocatedByRust>
+    where
+        T: pg_sys::PgNode,
+    {
         unsafe {
-            (ptr as *mut _ as *mut pg_sys::Node).as_mut().unwrap().type_ = node_tag;
+            // SAFETY:  Postgres "Node" types are okay to be zeroed memory and is typically the pattern
+            let node = PgBox::<T>::alloc0();
+            let ptr = node.as_ptr();
+
+            // SAFETY:  we just allocated `node` and the trait bound on `T` ensures that it'll have
+            // the `type_` field
+            (ptr as *mut _ as *mut pg_sys::Node).as_mut().unwrap_unchecked().type_ = node_tag;
+            node
         }
-        node
     }
 
     /// Box nothing
@@ -369,6 +356,11 @@ impl<T, AllocatedBy: WhoAllocated> PgBox<T, AllocatedBy> {
     }
 
     /// Execute a closure with a mutable, `PgBox`'d form of the specified `ptr`
+    ///
+    /// # Safety
+    ///
+    /// This function is unsafe as we cannot ensure that `ptr` is a valid pointer that can be
+    /// wrapped with [`PgBox`].
     #[inline]
     pub unsafe fn with<F: FnOnce(&mut PgBox<T>)>(ptr: *mut T, func: F) {
         func(&mut PgBox::from_pg(ptr))
