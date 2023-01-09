@@ -156,6 +156,16 @@ pub use internal::pg14::*;
 #[cfg(feature = "pg15")]
 pub use internal::pg15::*;
 
+pub enum AccessPath {
+    ListElement(usize),
+    ArrayElement(usize),
+    Field(&'static str),
+}
+pub struct PointerPath {
+    access: AccessPath,
+    ancestor: *mut Node,
+}
+
 /// A trait applied to all Postgres `pg_sys::Node` types and subtypes
 pub trait PgNode: seal::Sealed {
     /// Format this node
@@ -176,8 +186,15 @@ pub trait PgNode: seal::Sealed {
         unsafe { display_node_impl(NonNull::from(self).cast()) }
     }
 
-    /// Traverse the object graph, calling the callback at any `Node`s found as children of this object.
-    fn traverse<T>(&mut self, _walker_fn: fn(*mut Node, &mut T) -> (), _context: &mut T) {
+    /// Traverse the object graph, calling the callback at any `Node`s found as children of this
+    /// object. The closure will be called twice for each Node: once with information about the
+    /// ancestor of this node before recursing into any children of this node, and once with None
+    /// after any child `Node`s. This allows you to build a stack of ancestors if you like, or
+    /// merely take note of the immediate ancestor if you like.
+    fn traverse<F>(&mut self, mut _walker_fn: &mut F) -> ()
+    where
+        F: FnMut(Option<PointerPath>, *mut Node),
+    {
         // Do nothing by default, but override for structs that need it.
     }
 }

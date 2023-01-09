@@ -2,12 +2,11 @@
 Use of this source code is governed by the MIT license that can be found in the LICENSE file.
 */
 use pg_sys::{
-    Const, Node, NodeTag_T_Const, ParamListInfoData, PgNode, PlannedStmt, Query, QueryDesc,
-    RangeTblEntry, FLOAT4OID, FLOAT8OID, NUMERICOID,
+    Const, Node, NodeTag_T_Const, ParamListInfoData, PgNode, PlannedStmt, PointerPath, Query,
+    QueryDesc, RangeTblEntry, FLOAT4OID, FLOAT8OID, NUMERICOID,
 };
 use pgx::{
-    cstr_core::c_char, error, hooks::PgHooks, prelude::*, warning, FromDatum,
-    HookResult, PgList,
+    cstr_core::c_char, error, hooks::PgHooks, prelude::*, warning, FromDatum, HookResult, PgList,
 };
 
 pub struct ExampleHook {}
@@ -26,56 +25,51 @@ impl PgHooks for ExampleHook {
         ) -> HookResult<*mut PlannedStmt>,
     ) -> HookResult<*mut PlannedStmt> {
         let planned_stmt = prev_hook(parse, query_string, cursor_options, bound_params);
-        struct Args {
-            has_pi_approximation: bool,
-        }
-        let mut arg = Args { has_pi_approximation: false };
-        fn pi_finder(node: *mut Node, context: &mut Args) -> () {
-            unsafe {
-                if node.is_null() {
+        let mut has_pi_approximation = false;
+        let mut pi_finder = |_parent: Option<PointerPath>, node: *mut Node| unsafe {
+            if node.is_null() {
+                return;
+            }
+
+            if (*node).type_ == NodeTag_T_Const {
+                let constant = *(node as *mut Const);
+
+                let floatval: Option<f64> = match constant.consttype {
+                    FLOAT4OID => f32::from_polymorphic_datum(
+                        constant.constvalue,
+                        constant.constisnull,
+                        constant.consttype,
+                    )
+                    .map(|v| v as f64),
+                    FLOAT8OID => f64::from_polymorphic_datum(
+                        constant.constvalue,
+                        constant.constisnull,
+                        constant.consttype,
+                    ),
+                    NUMERICOID => AnyNumeric::from_polymorphic_datum(
+                        constant.constvalue,
+                        constant.constisnull,
+                        constant.consttype,
+                    )
+                    .and_then(|s| format!("{}", s).parse().ok()),
+                    _ => None,
+                };
+
+                if floatval.is_none() {
                     return;
                 }
-
-                if (*node).type_ == NodeTag_T_Const {
-                    let constant = *(node as *mut Const);
-
-                    let floatval: Option<f64> = match constant.consttype {
-                        FLOAT4OID => f32::from_polymorphic_datum(
-                            constant.constvalue,
-                            constant.constisnull,
-                            constant.consttype,
-                        )
-                        .map(|v| v as f64),
-                        FLOAT8OID => f64::from_polymorphic_datum(
-                            constant.constvalue,
-                            constant.constisnull,
-                            constant.consttype,
-                        ),
-                        NUMERICOID => AnyNumeric::from_polymorphic_datum(
-                            constant.constvalue,
-                            constant.constisnull,
-                            constant.consttype,
-                        )
-                        .and_then(|s| format!("{}", s).parse().ok()),
-                        _ => None,
-                    };
-
-                    if floatval.is_none() {
-                        return;
-                    }
-                    let floatval = floatval.unwrap();
-                    if 3.14 <= floatval && floatval < 3.142 && floatval != std::f64::consts::PI {
-                        context.has_pi_approximation = true;
-                        error!("Found a bad approximation for pi!");
-                    }
+                let floatval = floatval.unwrap();
+                if 3.14 <= floatval && floatval < 3.142 && floatval != std::f64::consts::PI {
+                    has_pi_approximation = true;
+                    error!("Found a bad approximation for pi!");
                 }
             }
-        }
+        };
         warning!("Traversing planned statement {:?}", planned_stmt.inner);
 
-        unsafe { (*planned_stmt.inner).traverse(pi_finder, &mut arg) };
+        unsafe { (*planned_stmt.inner).traverse(&mut pi_finder) };
 
-        if arg.has_pi_approximation {
+        if has_pi_approximation {
             error!("Found a bad approximation for pi!",);
         }
         planned_stmt
@@ -143,30 +137,30 @@ mod tests {
             register_hook(&mut HOOK);
         }
         warning!("Registered hook!");
-        assert_eq!(Ok(1), Spi::run("SELECT 1 where 3.141 < 4 group by 1 order by 1;"));
+        assert_eq!(Ok(()), Spi::run("SELECT 1 where 3.141 < 4 group by 1 order by 1;"));
     }
     #[pg_test(error = "Found a bad approximation for pi!")]
-    fn in_targetlist() {
+    fn in_targetlist() -> std::result::Result<(), pgx::spi::Error> {
         static mut HOOK: ExampleHook = ExampleHook {};
         unsafe {
             register_hook(&mut HOOK);
         }
-        Spi::run("SELECT 3.141;");
+        Spi::run("SELECT 3.141;")
     }
     #[pg_test(error = "Found a bad approximation for pi!")]
-    fn in_with_clause() {
+    fn in_with_clause() -> std::result::Result<(), pgx::spi::Error> {
         static mut HOOK: ExampleHook = ExampleHook {};
         unsafe {
             register_hook(&mut HOOK);
         }
-        Spi::run("with surprise as (SELECT 3.141 as x) select 1 = 2, x from surprise;");
+        Spi::run("with surprise as (SELECT 3.141 as x) select 1 = 2, x from surprise;")
     }
     #[pg_test(error = "Found a bad approximation for pi!")]
-    fn in_having_clause() {
+    fn in_having_clause() -> std::result::Result<(), pgx::spi::Error> {
         static mut HOOK: ExampleHook = ExampleHook {};
         unsafe {
             register_hook(&mut HOOK);
         }
-        Spi::run("select count(num) as x FROM generate_series(1, 6) num group by num % 3 having count(*) = 3.141;");
+        Spi::run("select count(num) as x FROM generate_series(1, 6) num group by num % 3 having count(*) = 3.141;")
     }
 }
