@@ -20,7 +20,7 @@ where
     }
 
     fn type_oid() -> pg_sys::Oid {
-        0
+        pg_sys::Oid::INVALID
     }
 }
 
@@ -36,7 +36,7 @@ where
     }
 
     fn type_oid() -> pg_sys::Oid {
-        0
+        pg_sys::Oid::INVALID
     }
 }
 

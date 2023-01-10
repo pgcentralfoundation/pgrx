@@ -653,7 +653,7 @@ fn impl_postgres_enum(ast: DeriveInput) -> syn::Result<proc_macro2::TokenStream>
                     None
                 } else {
                     // GREPME: non-primitive cast u64 as Oid
-                    let (name, _, _) = ::pgx::enum_helper::lookup_enum_by_oid(datum.value() as ::pgx::pg_sys::Oid);
+                    let (name, _, _) = ::pgx::enum_helper::lookup_enum_by_oid(unsafe { ::pgx::pg_sys::Oid::from_datum(datum, is_null)? } );
                     match name.as_str() {
                         #from_datum
                         _ => panic!("invalid enum value: {}", name)

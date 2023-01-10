@@ -56,7 +56,7 @@ fn get_relation_name(oid: pg_sys::Oid) -> String {
     })
     .catch_when(PgSqlErrorCode::ERRCODE_INTERNAL_ERROR, |_error| {
         // so in the case the oid isn't a valid relation, just return a generic string
-        format!("<{oid} is not a relation>")
+        format!("<{oid:?} is not a relation>")
     })
     .execute()
 }

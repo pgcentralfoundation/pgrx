@@ -25,6 +25,6 @@ mod tests {
             )
         };
         assert!(result.is_err());
-        assert_eq!("Postgres type boolean (oid=16) is not compatible with the Rust type alloc::string::String (oid=25)", result.unwrap_err().to_string());
+        assert_eq!("Postgres type boolean `Oid(16)` is not compatible with the Rust type alloc::string::String `Oid(25)`", result.unwrap_err().to_string());
     }
 }

@@ -32,7 +32,7 @@ impl IntoDatum for Date {
     fn into_datum(self) -> Option<pg_sys::Datum> {
         Some(pg_sys::Datum::from(self.0))
     }
-    fn type_oid() -> u32 {
+    fn type_oid() -> pg_sys::Oid {
         pg_sys::DATEOID
     }
 }

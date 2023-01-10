@@ -86,7 +86,7 @@ where
         }
     }
 
-    fn type_oid() -> u32 {
+    fn type_oid() -> pg_sys::Oid {
         T::type_oid()
     }
 }
@@ -124,7 +124,7 @@ impl IntoDatum for bool {
         Some(pg_sys::Datum::from(if self { 1 } else { 0 }))
     }
 
-    fn type_oid() -> u32 {
+    fn type_oid() -> pg_sys::Oid {
         pg_sys::BOOLOID
     }
 }
@@ -135,7 +135,7 @@ impl IntoDatum for i8 {
         Some(pg_sys::Datum::from(self))
     }
 
-    fn type_oid() -> u32 {
+    fn type_oid() -> pg_sys::Oid {
         pg_sys::CHAROID
     }
 }
@@ -147,7 +147,7 @@ impl IntoDatum for i16 {
         Some(pg_sys::Datum::from(self))
     }
 
-    fn type_oid() -> u32 {
+    fn type_oid() -> pg_sys::Oid {
         pg_sys::INT2OID
     }
 
@@ -163,7 +163,7 @@ impl IntoDatum for i32 {
         Some(pg_sys::Datum::from(self))
     }
 
-    fn type_oid() -> u32 {
+    fn type_oid() -> pg_sys::Oid {
         pg_sys::INT4OID
     }
 
@@ -179,7 +179,7 @@ impl IntoDatum for u32 {
         Some(pg_sys::Datum::from(self))
     }
 
-    fn type_oid() -> u32 {
+    fn type_oid() -> pg_sys::Oid {
         pg_sys::OIDOID
     }
 
@@ -198,7 +198,7 @@ impl IntoDatum for i64 {
         Some(pg_sys::Datum::from(self))
     }
 
-    fn type_oid() -> u32 {
+    fn type_oid() -> pg_sys::Oid {
         pg_sys::INT8OID
     }
 
@@ -218,7 +218,7 @@ impl IntoDatum for f32 {
         Some(self.to_bits().into())
     }
 
-    fn type_oid() -> u32 {
+    fn type_oid() -> pg_sys::Oid {
         pg_sys::FLOAT4OID
     }
 }
@@ -230,8 +230,24 @@ impl IntoDatum for f64 {
         Some(self.to_bits().into())
     }
 
-    fn type_oid() -> u32 {
+    fn type_oid() -> pg_sys::Oid {
         pg_sys::FLOAT8OID
+    }
+}
+
+impl IntoDatum for pg_sys::Oid {
+    #[inline]
+    fn into_datum(self) -> Option<pg_sys::Datum> {
+        if self == pg_sys::Oid::INVALID {
+            None
+        } else {
+            Some(pg_sys::Datum::from(self.as_u32()))
+        }
+    }
+
+    #[inline]
+    fn type_oid() -> pg_sys::Oid {
+        pg_sys::OIDOID
     }
 }
 
@@ -239,12 +255,12 @@ impl IntoDatum for PgOid {
     #[inline]
     fn into_datum(self) -> Option<pg_sys::Datum> {
         match self {
-            PgOid::InvalidOid => None,
+            PgOid::Invalid => None,
             oid => Some(oid.value().into()),
         }
     }
 
-    fn type_oid() -> u32 {
+    fn type_oid() -> pg_sys::Oid {
         pg_sys::OIDOID
     }
 }
@@ -256,7 +272,7 @@ impl<'a> IntoDatum for &'a str {
         self.as_bytes().into_datum()
     }
 
-    fn type_oid() -> u32 {
+    fn type_oid() -> pg_sys::Oid {
         pg_sys::TEXTOID
     }
 
@@ -272,7 +288,7 @@ impl IntoDatum for String {
         self.as_str().into_datum()
     }
 
-    fn type_oid() -> u32 {
+    fn type_oid() -> pg_sys::Oid {
         pg_sys::TEXTOID
     }
 
@@ -288,7 +304,7 @@ impl IntoDatum for &String {
         self.as_str().into_datum()
     }
 
-    fn type_oid() -> u32 {
+    fn type_oid() -> pg_sys::Oid {
         pg_sys::TEXTOID
     }
 
@@ -304,7 +320,7 @@ impl IntoDatum for char {
         self.to_string().into_datum()
     }
 
-    fn type_oid() -> u32 {
+    fn type_oid() -> pg_sys::Oid {
         pg_sys::VARCHAROID
     }
 
@@ -325,7 +341,18 @@ impl<'a> IntoDatum for &'a std::ffi::CStr {
         Some(self.as_ptr().into())
     }
 
-    fn type_oid() -> u32 {
+    fn type_oid() -> pg_sys::Oid {
+        pg_sys::CSTRINGOID
+    }
+}
+
+impl IntoDatum for std::ffi::CString {
+    #[inline]
+    fn into_datum(self) -> Option<pg_sys::Datum> {
+        Some(self.as_ptr().into())
+    }
+
+    fn type_oid() -> pg_sys::Oid {
         pg_sys::CSTRINGOID
     }
 }
@@ -336,7 +363,7 @@ impl<'a> IntoDatum for &'a crate::cstr_core::CStr {
         Some(self.as_ptr().into())
     }
 
-    fn type_oid() -> u32 {
+    fn type_oid() -> pg_sys::Oid {
         pg_sys::CSTRINGOID
     }
 }
@@ -383,7 +410,7 @@ impl<'a> IntoDatum for &'a [u8] {
     }
 
     #[inline]
-    fn type_oid() -> u32 {
+    fn type_oid() -> pg_sys::Oid {
         pg_sys::BYTEAOID
     }
 }
@@ -395,7 +422,7 @@ impl IntoDatum for Vec<u8> {
     }
 
     #[inline]
-    fn type_oid() -> u32 {
+    fn type_oid() -> pg_sys::Oid {
         pg_sys::BYTEAOID
     }
 }
@@ -408,7 +435,7 @@ impl IntoDatum for () {
         Some(Datum::from(0))
     }
 
-    fn type_oid() -> u32 {
+    fn type_oid() -> pg_sys::Oid {
         pg_sys::VOIDOID
     }
 }

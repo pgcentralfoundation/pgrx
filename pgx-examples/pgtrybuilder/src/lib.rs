@@ -42,7 +42,7 @@ fn get_relation_name(oid: pg_sys::Oid) -> String {
     })
     // in this case just return a generic string
     .catch_when(PgSqlErrorCode::ERRCODE_INTERNAL_ERROR, |_cause| {
-        format!("<{oid} is not a relation>")
+        format!("<{oid:?} is not a relation>")
 
         // NB:  It's probably not a "good idea" to catch an ERRCODE_INTERNAL_ERROR and ignore it
         // like we are here, but for demonstration purposes, this will suffice
