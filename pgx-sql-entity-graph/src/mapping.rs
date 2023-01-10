@@ -60,7 +60,7 @@ impl RustSqlMapping {
 ///     String::from("int"),
 /// );
 /// ```
-#[derive(Debug, Clone, Hash, PartialEq, Eq, PartialOrd, Ord)]
+#[derive(Debug, Default, Clone, Hash, PartialEq, Eq, PartialOrd, Ord)]
 pub struct RustSourceOnlySqlMapping {
     pub rust: String,
     pub sql: String,
