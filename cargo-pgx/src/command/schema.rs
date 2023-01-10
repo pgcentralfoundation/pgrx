@@ -428,7 +428,6 @@ pub(crate) fn generate_schema(
     };
 
     let pgx_sql = pgx_sql_entity_graph::PgxSql::build(
-        pgx_sql_entity_graph::RustToSqlMapping::default(),
         entities.into_iter(),
         package_name.to_string(),
         versioned_so,

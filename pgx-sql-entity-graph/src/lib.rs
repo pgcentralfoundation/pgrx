@@ -23,7 +23,7 @@ pub use enrich::CodeEnrichment;
 pub use extension_sql::entity::{ExtensionSqlEntity, SqlDeclaredEntity};
 pub use extension_sql::{ExtensionSql, ExtensionSqlFile, SqlDeclared};
 pub use extern_args::{parse_extern_attributes, ExternArgs};
-pub use mapping::{RustSourceOnlySqlMapping, RustSqlMapping};
+pub use mapping::RustSqlMapping;
 pub use pg_extern::entity::{
     PgExternArgumentEntity, PgExternEntity, PgExternReturnEntity, PgExternReturnEntityIteratedItem,
     PgOperatorEntity,
@@ -32,7 +32,7 @@ pub use pg_extern::{NameMacro, PgExtern, PgExternArgument, PgOperator};
 pub use pg_trigger::attribute::PgTriggerAttribute;
 pub use pg_trigger::entity::PgTriggerEntity;
 pub use pg_trigger::PgTrigger;
-pub use pgx_sql::{PgxSql, RustToSqlMapping};
+pub use pgx_sql::PgxSql;
 pub use positioning_ref::PositioningRef;
 pub use postgres_enum::entity::PostgresEnumEntity;
 pub use postgres_enum::PostgresEnum;
