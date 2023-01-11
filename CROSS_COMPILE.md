@@ -1,5 +1,7 @@
 # Cross compiling `pgx`
 
+*Warning: this guide is still a work in progress!*
+
 ## Caveats
 
 Note that guide is fairly preliminary and does not cover many cases, most notably:
@@ -25,7 +27,7 @@ Of the mainstream distributions (that is, excluding things like NixOS which prob
 
 2. The cross compilation sysroot is the same as the normal sysroot -- they're both `/`.
 
-3. Many tools in the Rust ecosystem (the `bindgen` and `cc` crates) know where everything is located out of the box.
+3. Many tools in the Rust ecosystem (the `bindgen` and `cc` crates) know where many things are located, out of the box.
 
 And a few other aspects which are less critical (if you get the tools on Debian 11, then you know they'll run on any machine has a Debian 11 install -- no need to worry about glibc versions, for example).
 
@@ -59,6 +61,12 @@ On the steps on Debian-family are as follows:
     - *`target=x86_64 `*: `cargo build --target=x86_64-unknown-linux-gnu --release`.
 
 This will produce a `.so` in `./target/<target>/release/lib$yourext.so`, which you can use.
+
+> *TODO: this seems like it is not quite complete -- we may need things like this (when targetting `aarch64` from `x86_64`)? Needs some slightly further investigation for _why_, though, since most of this should be auto-detected (notably the target and isystem paths...)*
+>
+> ```sh
+> export BINDGEN_EXTRA_CLANG_ARGS_aarch64-unknown-linux-gnu="-target aarch64-unknown-linux-gnu -isystem /usr/aarch64-linux-gnu/include/ -ccc-gcc-name aarch64-linux-gnu-gcc"
+> ```
 
 # Other Distributions
 
