@@ -88,7 +88,7 @@ jobs:
 
         echo 'CARGO_TARGET_AARCH64_UNKNOWN_LINUX_GNU_LINKER=aarch64-linux-gnu-gcc' >> $GITHUB_ENV
         # HACK: this isn't how we'll want to solve this, but see if this is enough.
-        echo 'BINDGEN_EXTRA_CLANG_ARGS_aarch64-unknown-linux-gnu="-isystem /usr/aarch64-linux-gnu/include"'
+        echo 'BINDGEN_EXTRA_CLANG_ARGS_aarch64-unknown-linux-gnu="-isystem /usr/aarch64-linux-gnu/include"' >> $GITHUB_ENV
 
         echo ""
 
@@ -141,6 +141,13 @@ jobs:
           --package pgx-macros \
           --package pgx-pg-sys \
           --package pgx-sql-entity-graph
+
+    - name: Check that cross-compiled pgx-tests can build
+      run: |
+        cargo build --tests \
+          --features "pg$PG_VER" \
+          --package pgx-tests \
+          --target aarch64-unknown-linux-gnu
 
     - name: Run pgx-tests with cshim enabled
       run: |
@@ -219,13 +226,6 @@ jobs:
 
     - name: Run versioned_so example tests
       run: cargo test --package versioned_so --features "pg$PG_VER" --no-default-features
-
-    - name: Check that cross-compiled pgx-tests can build
-      run: |
-        cargo build --tests \
-          --features "pg$PG_VER" \
-          --package pgx-tests \
-          --target aarch64-unknown-linux-gnu
 
     # Attempt to make the cache payload slightly smaller.
     - name: Clean up built PGX files
