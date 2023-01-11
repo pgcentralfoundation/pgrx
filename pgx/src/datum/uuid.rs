@@ -34,7 +34,7 @@ impl IntoDatum for Uuid {
     }
 
     #[inline]
-    fn type_oid() -> u32 {
+    fn type_oid() -> pg_sys::Oid {
         pg_sys::UUIDOID
     }
 }

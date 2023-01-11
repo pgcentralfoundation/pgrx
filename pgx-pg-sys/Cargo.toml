@@ -32,6 +32,7 @@ rustdoc-args = ["--cfg", "docsrs"]
 memoffset = "0.6.5"
 pgx-macros = { path = "../pgx-macros/", version = "=0.6.1" }
 pgx-sql-entity-graph = { path = "../pgx-sql-entity-graph/", version = "=0.6.1" }
+serde = { version = "1.0.149", features = [ "derive" ] } # impls on pub types
 # polyfill until #![feature(strict_provenance)] stabilizes
 sptr = "0.3"
 libc = "0.2"

@@ -1521,6 +1521,7 @@ dependencies = [
  "pgx-sql-entity-graph",
  "proc-macro2",
  "quote",
+ "serde",
  "shlex",
  "sptr",
  "syn",

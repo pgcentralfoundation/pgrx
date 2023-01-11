@@ -280,7 +280,7 @@ mod all_versions {
     pub use crate::submodules::htup::*;
 
     /// this comes from `postgres_ext.h`
-    pub const InvalidOid: super::Oid = 0;
+    pub const InvalidOid: crate::Oid = crate::Oid::INVALID;
     pub const InvalidOffsetNumber: super::OffsetNumber = 0;
     pub const FirstOffsetNumber: super::OffsetNumber = 1;
     pub const MaxOffsetNumber: super::OffsetNumber =

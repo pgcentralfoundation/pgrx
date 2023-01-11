@@ -29,7 +29,6 @@ use crate::aggregate::entity::PgAggregateEntity;
 use crate::control_file::ControlFile;
 use crate::extension_sql::entity::{ExtensionSqlEntity, SqlDeclaredEntity};
 use crate::extension_sql::SqlDeclared;
-use crate::mapping::RustSourceOnlySqlMapping;
 use crate::pg_extern::entity::PgExternEntity;
 use crate::pg_trigger::entity::PgTriggerEntity;
 use crate::positioning_ref::PositioningRef;
@@ -50,11 +49,6 @@ pub enum SqlGraphRelationship {
     RequiredByReturn,
 }
 
-#[derive(Debug, Clone)]
-pub struct RustToSqlMapping {
-    pub rust_source_to_sql: std::collections::HashSet<RustSourceOnlySqlMapping>,
-}
-
 /// A generator for SQL.
 ///
 /// Consumes a base mapping of types (typically `pgx::DEFAULT_TYPEID_SQL_MAPPING`), a
@@ -68,7 +62,6 @@ pub struct RustToSqlMapping {
 /// out of entities collected during a `pgx::pg_module_magic!()` call in a library.
 #[derive(Debug, Clone)]
 pub struct PgxSql {
-    pub source_mappings: HashMap<String, RustSourceOnlySqlMapping>,
     pub control: ControlFile,
     pub graph: StableGraph<SqlGraphEntity, SqlGraphRelationship>,
     pub graph_root: NodeIndex,
@@ -89,15 +82,12 @@ pub struct PgxSql {
 }
 
 impl PgxSql {
-    #[instrument(level = "error", skip(sql_mappings, entities,))]
+    #[instrument(level = "error", skip(entities,))]
     pub fn build(
-        sql_mappings: RustToSqlMapping,
         entities: impl Iterator<Item = SqlGraphEntity>,
         extension_name: String,
         versioned_so: bool,
     ) -> eyre::Result<Self> {
-        let RustToSqlMapping { rust_source_to_sql: source_mappings } = sql_mappings;
-
         let mut graph = StableGraph::new();
 
         let mut entities = entities.collect::<Vec<_>>();
@@ -240,7 +230,6 @@ impl PgxSql {
         connect_triggers(&mut graph, &mapped_triggers, &mapped_schemas);
 
         let this = Self {
-            source_mappings: source_mappings.into_iter().map(|x| (x.rust.clone(), x)).collect(),
             control: control,
             schemas: mapped_schemas,
             extension_sqls: mapped_extension_sqls,
@@ -464,24 +453,10 @@ impl PgxSql {
         })
     }
 
-    pub fn source_only_to_sql_type(&self, ty_source: &str) -> Option<String> {
-        // HACK for `Result<T, E>` -- we replace the `E` with an underscore
-        // specifically, this is the cases where we need to use the `map_source_only!()` macro to
-        // create a Rust type to SQL type mapping.  As of this writing that's only for the `pg_sys::Oid`
-        // type, but we'll do our best to generalize this.
-        //
-        // What we want to do is rewrite any kind of `Result<T,E>` pattern into `Result<T,_>`, which
-        // is how the `map_source_only!()` macro does it.
-        let pattern = regex::Regex::new("Result<(.*),\\s*.*?>").expect("invalid regex pattern");
-        let ty_source = match pattern.captures(ty_source) {
-            Some(captures) => {
-                let rust_type = captures.get(1).unwrap();
-                format!("Result<{},_>", rust_type.as_str())
-            }
-            None => ty_source.to_string(),
-        };
-
-        self.source_mappings.get(&ty_source).map(|f| f.sql.clone())
+    pub fn source_only_to_sql_type(&self, _ty_source: &str) -> Option<String> {
+        // HACK for `Result<T, E>`
+        // ...well, actually, nothing!
+        None
     }
 
     pub fn get_module_pathname(&self) -> String {

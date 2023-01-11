@@ -126,7 +126,7 @@ impl IntoDatum for Json {
         string.into_datum()
     }
 
-    fn type_oid() -> u32 {
+    fn type_oid() -> pg_sys::Oid {
         pg_sys::JSONOID
     }
 }
@@ -143,7 +143,7 @@ impl IntoDatum for JsonB {
         }
     }
 
-    fn type_oid() -> u32 {
+    fn type_oid() -> pg_sys::Oid {
         pg_sys::JSONBOID
     }
 }
@@ -154,7 +154,7 @@ impl IntoDatum for JsonString {
         self.0.as_str().into_datum()
     }
 
-    fn type_oid() -> u32 {
+    fn type_oid() -> pg_sys::Oid {
         pg_sys::JSONOID
     }
 }

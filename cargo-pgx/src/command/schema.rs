@@ -385,7 +385,6 @@ pub(crate) fn generate_schema(
 
     tracing::debug!("Collecting {} SQL entities", fns_to_call.len());
     let mut entities = Vec::default();
-    let sql_mapping;
 
     #[rustfmt::skip] // explicit extern "Rust" is more clear here
     unsafe {
@@ -409,13 +408,6 @@ pub(crate) fn generate_schema(
             })
             .wrap_err_with(|| format!("Couldn't libload {}", lib_so.display()))?;
 
-        let sql_mappings_symbol: libloading::os::unix::Symbol<
-            unsafe extern "Rust" fn() -> pgx_sql_entity_graph::RustToSqlMapping,
-        > = lib
-            .get("__pgx_sql_mappings".as_bytes())
-            .expect("Couldn't call __pgx_sql_mappings");
-        sql_mapping = sql_mappings_symbol();
-
         let symbol: libloading::os::unix::Symbol<
             unsafe extern "Rust" fn() -> eyre::Result<pgx_sql_entity_graph::ControlFile>,
         > = lib
@@ -436,7 +428,6 @@ pub(crate) fn generate_schema(
     };
 
     let pgx_sql = pgx_sql_entity_graph::PgxSql::build(
-        sql_mapping,
         entities.into_iter(),
         package_name.to_string(),
         versioned_so,
