@@ -130,70 +130,6 @@ pub use pgx_sql_entity_graph;
 
 pub use cstr_core;
 
-use once_cell::sync::Lazy;
-use pgx_sql_entity_graph::RustSourceOnlySqlMapping;
-use std::collections::HashSet;
-
-macro_rules! map_source_only {
-    ($map:ident, $rust:ty, $sql:expr) => {{
-        let ty = stringify!($rust).to_string().replace(" ", "");
-        assert_eq!(
-            $map.insert(RustSourceOnlySqlMapping::new(ty.clone(), $sql.to_string(),)),
-            true,
-            "Cannot map {} twice",
-            ty
-        );
-
-        let ty = stringify!(Option<$rust>).to_string().replace(" ", "");
-        assert_eq!(
-            $map.insert(RustSourceOnlySqlMapping::new(ty.clone(), $sql.to_string(),)),
-            true,
-            "Cannot map {} twice",
-            ty
-        );
-
-        let ty = stringify!(Result<$rust, _>).to_string().replace(" ", "");
-        assert_eq!(
-            $map.insert(RustSourceOnlySqlMapping::new(ty.clone(), $sql.to_string(),)),
-            true,
-            "Cannot map {} twice",
-            ty
-        );
-
-        let ty = stringify!(Result<Option<$rust>, _>).to_string().replace(" ", "");
-        assert_eq!(
-            $map.insert(RustSourceOnlySqlMapping::new(ty.clone(), $sql.to_string(),)),
-            true,
-            "Cannot map {} twice",
-            ty
-        );
-
-        let ty = stringify!(Vec<$rust>).to_string().replace(" ", "");
-        assert_eq!(
-            $map.insert(RustSourceOnlySqlMapping::new(ty.clone(), format!("{}[]", $sql),)),
-            true,
-            "Cannot map {} twice",
-            ty
-        );
-
-        let ty = stringify!(Array<$rust>).to_string().replace(" ", "");
-        assert_eq!(
-            $map.insert(RustSourceOnlySqlMapping::new(ty.clone(), format!("{}[]", $sql),)),
-            true,
-            "Cannot map {} twice",
-            ty
-        );
-    }};
-}
-
-pub static DEFAULT_RUST_SOURCE_TO_SQL: Lazy<HashSet<RustSourceOnlySqlMapping>> = Lazy::new(|| {
-    let mut m = HashSet::new();
-
-    map_source_only!(m, pg_sys::Oid, "Oid");
-
-    m
-});
-
 /// A macro for marking a library compatible with [`pgx`][crate].
 ///
 /// <div class="example-wrap" style="display:inline-block">
@@ -320,15 +256,6 @@ macro_rules! pg_magic_func {
 #[macro_export]
 macro_rules! pg_sql_graph_magic {
     () => {
-        #[no_mangle]
-        #[doc(hidden)]
-        #[rustfmt::skip] // explicit extern "Rust" is more clear here
-        pub extern "Rust" fn __pgx_sql_mappings() -> $crate::pgx_sql_entity_graph::RustToSqlMapping {
-            $crate::pgx_sql_entity_graph::RustToSqlMapping {
-                rust_source_to_sql: ::pgx::DEFAULT_RUST_SOURCE_TO_SQL.clone(),
-            }
-        }
-
         // A marker which must exist in the root of the extension.
         #[no_mangle]
         #[doc(hidden)]

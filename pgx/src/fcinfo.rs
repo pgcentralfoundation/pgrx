@@ -439,7 +439,7 @@ pub unsafe fn pg_func_extra<ReturnType, DefaultValue: FnOnce() -> ReturnType>(
 ///         )
 ///     };
 ///     let oid = result.expect("failed to lookup oid for pg_class");
-///     assert_eq!(oid, 1259);  // your value could be different, maybe
+///     assert_eq!(oid, pg_sys::RelationRelationId); // your value could be different, maybe
 /// }
 /// ```
 pub unsafe fn direct_function_call<R: FromDatum>(

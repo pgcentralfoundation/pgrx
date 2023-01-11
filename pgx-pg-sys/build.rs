@@ -11,10 +11,12 @@ use bindgen::callbacks::{DeriveTrait, ImplementsTrait, MacroParsingBehavior};
 use eyre::{eyre, WrapErr};
 use pgx_pg_config::{prefix_path, PgConfig, PgConfigSelector, Pgx, SUPPORTED_MAJOR_VERSIONS};
 use quote::{quote, ToTokens};
-use std::collections::{HashMap, HashSet};
+use std::collections::{BTreeMap, HashMap, HashSet};
 use std::path::PathBuf;
 use std::process::{Command, Output};
-use syn::{ForeignItem, Item};
+use syn::{ForeignItem, Item, ItemConst};
+
+const BLOCKLISTED_TYPES: [&str; 3] = ["Datum", "NullableDatum", "Oid"];
 
 #[derive(Debug)]
 struct PgxOverrides(HashSet<String>);
@@ -64,7 +66,7 @@ impl bindgen::callbacks::ParseCallbacks for PgxOverrides {
         name: &str,
         derive_trait: DeriveTrait,
     ) -> Option<ImplementsTrait> {
-        if name != "Datum" && name != "NullableDatum" {
+        if !BLOCKLISTED_TYPES.contains(&name) {
             return None;
         }
 
@@ -200,8 +202,9 @@ fn generate_bindings(
         .wrap_err_with(|| format!("bindgen failed for pg{}", major_version))?;
 
     let oids = extract_oids(&bindgen_output);
-    let rewritten_items = rewrite_items(&bindgen_output, is_for_release)
+    let rewritten_items = rewrite_items(&bindgen_output, &oids, is_for_release)
         .wrap_err_with(|| format!("failed to rewrite items for pg{}", major_version))?;
+    let oids = format_builtin_oid_impl(oids);
 
     let dest_dirs = if std::env::var("PGX_PG_SYS_GENERATE_BINDINGS_FOR_RELEASE")
         .unwrap_or("false".into())
@@ -221,7 +224,7 @@ fn generate_bindings(
                 use crate as pg_sys;
                 #[cfg(any(feature = "pg12", feature = "pg13", feature = "pg14", feature = "pg15"))]
                 use crate::NullableDatum;
-                use crate::{PgNode, Datum};
+                use crate::{Datum, Oid, PgNode};
             },
         )
         .wrap_err_with(|| {
@@ -288,9 +291,14 @@ fn write_rs_file(
 
 /// Given a token stream representing a file, apply a series of transformations to munge
 /// the bindgen generated code with some postgres specific enhancements
-fn rewrite_items(file: &syn::File, is_for_release: bool) -> eyre::Result<proc_macro2::TokenStream> {
-    let mut items = apply_pg_guard(&file.items)?;
-    let pgnode_impls = impl_pg_node(&file.items, is_for_release)?;
+fn rewrite_items(
+    file: &syn::File,
+    oids: &BTreeMap<syn::Ident, Box<syn::Expr>>,
+    is_for_release: bool,
+) -> eyre::Result<proc_macro2::TokenStream> {
+    let items_vec = rewrite_oid_consts(&file.items, oids);
+    let mut items = apply_pg_guard(&items_vec)?;
+    let pgnode_impls = impl_pg_node(&items_vec, is_for_release)?;
 
     // append the pgnodes to the set of items
     items.extend(pgnode_impls);
@@ -301,37 +309,73 @@ fn rewrite_items(file: &syn::File, is_for_release: bool) -> eyre::Result<proc_ma
 /// Find all the constants that represent Postgres type OID values.
 ///
 /// These are constants of type `u32` whose name ends in the string "OID"
-fn extract_oids(code: &syn::File) -> proc_macro2::TokenStream {
-    let mut enum_variants = proc_macro2::TokenStream::new();
-    let mut from_impl = proc_macro2::TokenStream::new();
+fn extract_oids(code: &syn::File) -> BTreeMap<syn::Ident, Box<syn::Expr>> {
+    let mut oids = BTreeMap::new(); // we would like to have a nice sorted set
     for item in &code.items {
         match item {
-            Item::Const(c) => {
-                let ident = &c.ident;
+            Item::Const(ItemConst { ident, ty, expr, .. }) => {
+                // Retype as strings for easy comparison
                 let name = ident.to_string();
-                let ty = &c.ty;
-                let ty = quote! {#ty}.to_string();
+                let ty_str = ty.to_token_stream().to_string();
 
-                if ty == "u32" && name.ends_with("OID") && name != "HEAP_HASOID" {
-                    enum_variants.extend(quote! {#ident = crate::#ident as isize, });
-                    from_impl.extend(quote! {crate::#ident => Some(crate::PgBuiltInOids::#ident), })
+                // This heuristic identifies "OIDs"
+                // We're going to warp the const declarations to be our newtype Oid
+                if ty_str == "u32"
+                    && (name.ends_with("OID") | name.ends_with("RelationId"))
+                    && name != "HEAP_HASOID"
+                {
+                    oids.insert(ident.clone(), expr.clone());
                 }
             }
             _ => {}
         }
     }
+    oids
+}
+
+fn rewrite_oid_consts(
+    items: &Vec<syn::Item>,
+    oids: &BTreeMap<syn::Ident, Box<syn::Expr>>,
+) -> Vec<syn::Item> {
+    items
+        .into_iter()
+        .map(|item| match item {
+            Item::Const(ItemConst { ident, ty, expr, .. })
+                if ty.to_token_stream().to_string() == "u32" && oids.get(ident) == Some(expr) =>
+            {
+                syn::parse2(quote! { pub const #ident : Oid = Oid(#expr); }).unwrap()
+            }
+            item => item.clone(),
+        })
+        .collect()
+}
+
+fn format_builtin_oid_impl<'a>(
+    oids: BTreeMap<syn::Ident, Box<syn::Expr>>,
+) -> proc_macro2::TokenStream {
+    let enum_variants: proc_macro2::TokenStream;
+    let from_impl: proc_macro2::TokenStream;
+    (enum_variants, from_impl) = oids
+        .iter()
+        .map(|(ident, expr)| {
+            (quote! { #ident = #expr, }, quote! { #expr => Ok(BuiltinOid::#ident), })
+        })
+        .unzip();
 
     quote! {
+        use crate::{NotBuiltinOid};
+
         #[derive(Copy, Clone, Eq, PartialEq, Hash, Ord, PartialOrd, Debug)]
-        pub enum PgBuiltInOids {
+        pub enum BuiltinOid {
             #enum_variants
         }
 
-        impl PgBuiltInOids {
-            pub fn from(oid: crate::Oid) -> Option<PgBuiltInOids> {
-                match oid {
+        impl BuiltinOid {
+            pub const fn from_u32(uint: u32) -> Result<BuiltinOid, NotBuiltinOid> {
+                match uint {
+                    0 => Err(NotBuiltinOid::Invalid),
                     #from_impl
-                    _ => None,
+                    _ => Err(NotBuiltinOid::Ambiguous),
                 }
             }
         }
@@ -585,6 +629,7 @@ fn run_bindgen(pg_config: &PgConfig, include_h: &PathBuf) -> eyre::Result<syn::F
         .clang_args(&extra_bindgen_clang_args(pg_config)?)
         .parse_callbacks(Box::new(PgxOverrides::default()))
         .blocklist_type("(Nullable)?Datum") // manually wrapping datum types for correctness
+        .blocklist_type("Oid") // "Oid" is not just any u32
         .blocklist_function("varsize_any") // pgx converts the VARSIZE_ANY macro, so we don't want to also have this function, which is in heaptuple.c
         .blocklist_function("(?:query|expression)_tree_walker")
         .blocklist_function(".*(?:set|long)jmp")

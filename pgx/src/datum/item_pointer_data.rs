@@ -16,7 +16,7 @@ impl FromDatum for pg_sys::ItemPointerData {
     unsafe fn from_polymorphic_datum(
         datum: pg_sys::Datum,
         is_null: bool,
-        _typoid: u32,
+        _typoid: pg_sys::Oid,
     ) -> Option<pg_sys::ItemPointerData> {
         if is_null {
             None
@@ -46,7 +46,7 @@ impl IntoDatum for pg_sys::ItemPointerData {
         Some(tid_ptr.into())
     }
 
-    fn type_oid() -> u32 {
+    fn type_oid() -> pg_sys::Oid {
         pg_sys::TIDOID
     }
 }

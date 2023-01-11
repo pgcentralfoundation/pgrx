@@ -454,7 +454,7 @@ impl<'a, T: FromDatum> FromDatum for Array<'a, T> {
     unsafe fn from_polymorphic_datum(
         datum: pg_sys::Datum,
         is_null: bool,
-        _typoid: u32,
+        _typoid: pg_sys::Oid,
     ) -> Option<Array<'a, T>> {
         if is_null {
             None
@@ -545,7 +545,7 @@ where
         }
     }
 
-    fn type_oid() -> u32 {
+    fn type_oid() -> pg_sys::Oid {
         unsafe { pg_sys::get_array_type(T::type_oid()) }
     }
 
@@ -592,7 +592,7 @@ where
         }
     }
 
-    fn type_oid() -> u32 {
+    fn type_oid() -> pg_sys::Oid {
         unsafe { pg_sys::get_array_type(T::type_oid()) }
     }
 
