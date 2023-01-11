@@ -257,7 +257,7 @@ macro_rules! pg_magic_func {
 macro_rules! pg_sql_graph_magic {
     () => {
         // A marker which must exist in the root of the extension.
-        #[no_mangle]
+#[no_mangle]
         #[doc(hidden)]
         #[rustfmt::skip] // explicit extern "Rust" is more clear here
         pub extern "Rust" fn __pgx_marker(
