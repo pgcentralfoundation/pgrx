@@ -9,12 +9,17 @@ Use of this source code is governed by the MIT license that can be found in the 
 
 use bindgen::callbacks::{DeriveTrait, ImplementsTrait, MacroParsingBehavior};
 use eyre::{eyre, WrapErr};
+use once_cell::sync::Lazy;
 use pgx_pg_config::{prefix_path, PgConfig, PgConfigSelector, Pgx, SUPPORTED_MAJOR_VERSIONS};
 use quote::{quote, ToTokens};
-use std::collections::{HashMap, HashSet};
+use std::collections::{BTreeSet, HashMap, HashSet};
 use std::path::PathBuf;
 use std::process::{Command, Output};
 use syn::{ForeignItem, Item};
+
+mod build {
+    pub(super) mod sym_blocklist;
+}
 
 #[derive(Debug)]
 struct PgxOverrides(HashSet<String>);
@@ -827,6 +832,21 @@ fn run_command(mut command: &mut Command, version: &str) -> eyre::Result<Output>
     Ok(rc)
 }
 
+// Plausibly it would be better to generate a regex to pass to bindgen for this,
+// but this is less error-prone for now.
+static BLOCKLISTED: Lazy<BTreeSet<&'static str>> =
+    Lazy::new(|| build::sym_blocklist::SYMBOLS.iter().copied().collect::<BTreeSet<&str>>());
+fn is_blocklisted_item(item: &ForeignItem) -> bool {
+    let sym_name = match item {
+        ForeignItem::Fn(f) => &f.sig.ident,
+        // We don't *need* to filter statics too (only functions), but it
+        // doesn't hurt.
+        ForeignItem::Static(s) => &s.ident,
+        _ => return false,
+    };
+    BLOCKLISTED.contains(sym_name.to_string().as_str())
+}
+
 fn apply_pg_guard(items: &Vec<syn::Item>) -> eyre::Result<proc_macro2::TokenStream> {
     let mut out = proc_macro2::TokenStream::new();
     for item in items {
@@ -834,11 +854,16 @@ fn apply_pg_guard(items: &Vec<syn::Item>) -> eyre::Result<proc_macro2::TokenStre
             Item::ForeignMod(block) => {
                 let abi = &block.abi;
                 for item in &block.items {
+                    if is_blocklisted_item(item) {
+                        continue;
+                    }
                     match item {
-                        ForeignItem::Fn(func) => out.extend(quote! {
-                            #[pgx_macros::pg_guard]
-                            #abi { #func }
-                        }),
+                        ForeignItem::Fn(func) => {
+                            out.extend(quote! {
+                                #[pgx_macros::pg_guard]
+                                #abi { #func }
+                            });
+                        }
                         other => out.extend(quote! { #abi { #other } }),
                     }
                 }

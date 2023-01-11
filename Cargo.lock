@@ -1515,6 +1515,7 @@ dependencies = [
  "eyre",
  "libc",
  "memoffset 0.6.5",
+ "once_cell",
  "pgx-macros",
  "pgx-pg-config",
  "pgx-sql-entity-graph",
