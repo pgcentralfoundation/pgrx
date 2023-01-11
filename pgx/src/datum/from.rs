@@ -19,7 +19,7 @@ use std::num::NonZeroUsize;
 /// If converting a Datum to a Rust type fails, this is the set of possible reasons why.
 #[derive(thiserror::Error, Debug, Clone, PartialEq, Eq)]
 pub enum TryFromDatumError {
-    #[error("Postgres type {datum_type} `{datum_oid:?}` is not compatible with the Rust type {rust_type} `{rust_oid:?}`")]
+    #[error("Postgres type {datum_type} {datum_oid} is not compatible with the Rust type {rust_type} {rust_oid}")]
     IncompatibleTypes {
         rust_type: &'static str,
         rust_oid: pg_sys::Oid,
