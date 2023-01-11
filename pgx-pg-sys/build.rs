@@ -115,9 +115,12 @@ fn main() -> eyre::Result<()> {
     println!("cargo:rerun-if-changed={}", Pgx::config_toml()?.display().to_string(),);
     println!("cargo:rerun-if-changed=include");
     println!("cargo:rerun-if-changed=cshim");
+    emit_missing_rerun_if_env_changed();
 
-    let pg_configs = if std::env::var("PGX_PG_SYS_GENERATE_BINDINGS_FOR_RELEASE")
-        .unwrap_or("false".into())
+    let pg_configs: Vec<(u16, &PgConfig)> = if std::env::var(
+        "PGX_PG_SYS_GENERATE_BINDINGS_FOR_RELEASE",
+    )
+    .unwrap_or("false".into())
         == "1"
     {
         pgx.iter(PgConfigSelector::All)
@@ -125,7 +128,7 @@ fn main() -> eyre::Result<()> {
             .map(|c| (c.major_version().expect("invalid major version"), c))
             .filter_map(|t| {
                 if SUPPORTED_MAJOR_VERSIONS.contains(&t.0) {
-                    Some(t.1)
+                    Some(t)
                 } else {
                     println!(
                         "cargo:warning={} contains a configuration for pg{}, which pgx does not support.",
@@ -140,16 +143,16 @@ fn main() -> eyre::Result<()> {
             .collect()
     } else {
         let mut found = None;
-        for version in SUPPORTED_MAJOR_VERSIONS {
+        for &version in SUPPORTED_MAJOR_VERSIONS {
             if let Err(_) = std::env::var(&format!("CARGO_FEATURE_PG{}", version)) {
                 continue;
             }
             if found.is_some() {
                 return Err(eyre!("Multiple `pg$VERSION` features found, `--no-default-features` may be required."));
             }
-            found = Some(format!("pg{}", version));
+            found = Some((version, format!("pg{}", version)));
         }
-        let found = found.ok_or_else(|| {
+        let (found_ver, found_feat) = found.ok_or_else(|| {
             eyre!(
                 "Did not find `pg$VERSION` feature. `pgx-pg-sys` requires one of {} to be set",
                 SUPPORTED_MAJOR_VERSIONS
@@ -159,8 +162,8 @@ fn main() -> eyre::Result<()> {
                     .join(", ")
             )
         })?;
-        let specific = pgx.get(&found)?;
-        vec![specific]
+        let specific = pgx.get(&found_feat)?;
+        vec![(found_ver, specific)]
     };
     std::thread::scope(|scope| {
         // This is pretty much either always 1 (normally) or 5 (for releases),
@@ -168,8 +171,10 @@ fn main() -> eyre::Result<()> {
         // chunking `pg_configs` based on `thread::available_parallelism()`.
         let threads = pg_configs
             .iter()
-            .map(|pg_config| {
-                scope.spawn(|| generate_bindings(pg_config, &build_paths, is_for_release))
+            .map(|(pg_major_ver, pg_config)| {
+                scope.spawn(|| {
+                    generate_bindings(*pg_major_ver, pg_config, &build_paths, is_for_release)
+                })
             })
             .collect::<Vec<_>>();
         // Most of the rest of this is just for better error handling --
@@ -183,7 +188,7 @@ fn main() -> eyre::Result<()> {
 
     if compile_cshim {
         // compile the cshim for each binding
-        for pg_config in pg_configs {
+        for (_version, pg_config) in pg_configs {
             build_shim(&build_paths.shim_src, &build_paths.shim_dst, &pg_config)?;
         }
     }
@@ -191,17 +196,38 @@ fn main() -> eyre::Result<()> {
     Ok(())
 }
 
+fn emit_missing_rerun_if_env_changed() {
+    // `pgx-pg-config` doesn't emit one for this.
+    println!("cargo:rerun-if-env-changed=PGX_PG_CONFIG_PATH");
+    // Bindgen's behavior depends on these vars, but it doesn't emit them
+    // directly because the output would cause issue with `bindgen-cli`. Do it
+    // on bindgen's behalf.
+    println!("cargo:rerun-if-env-changed=LLVM_CONFIG_PATH");
+    println!("cargo:rerun-if-env-changed=LIBCLANG_PATH");
+    println!("cargo:rerun-if-env-changed=LIBCLANG_STATIC_PATH");
+    // Follows the logic bindgen uses here, more or less.
+    // https://github.com/rust-lang/rust-bindgen/blob/e6dd2c636/bindgen/lib.rs#L2918
+    println!("cargo:rerun-if-env-changed=BINDGEN_EXTRA_CLANG_ARGS");
+    if let Ok(target) = std::env::var("TARGET") {
+        println!("cargo:rerun-if-env-changed=BINDGEN_EXTRA_CLANG_ARGS_{target}");
+        println!(
+            "cargo:rerun-if-env-changed=BINDGEN_EXTRA_CLANG_ARGS_{}",
+            target.replace('-', "_"),
+        );
+    }
+}
+
 fn generate_bindings(
+    major_version: u16,
     pg_config: &PgConfig,
     build_paths: &BuildPaths,
     is_for_release: bool,
 ) -> eyre::Result<()> {
-    let major_version = pg_config.major_version().wrap_err("could not determine major version")?;
     let mut include_h = build_paths.manifest_dir.clone();
     include_h.push("include");
     include_h.push(format!("pg{}.h", major_version));
 
-    let bindgen_output = run_bindgen(&pg_config, &include_h)
+    let bindgen_output = run_bindgen(major_version, &pg_config, &include_h)
         .wrap_err_with(|| format!("bindgen failed for pg{}", major_version))?;
 
     let oids = extract_oids(&bindgen_output);
@@ -580,14 +606,17 @@ struct StructDescriptor<'a> {
 
 /// Given a specific postgres version, `run_bindgen` generates bindings for the given
 /// postgres version and returns them as a token stream.
-fn run_bindgen(pg_config: &PgConfig, include_h: &PathBuf) -> eyre::Result<syn::File> {
-    let major_version = pg_config.major_version()?;
-    eprintln!("Generating bindings for pg{}", major_version);
-    let includedir_server = pg_config.includedir_server()?;
+fn run_bindgen(
+    major_version: u16,
+    pg_config: &PgConfig,
+    include_h: &PathBuf,
+) -> eyre::Result<syn::File> {
+    eprintln!("Generating bindings for pg{major_version}");
     let bindings = bindgen::Builder::default()
         .header(include_h.display().to_string())
-        .clang_arg(&format!("-I{}", includedir_server.display()))
         .clang_args(&extra_bindgen_clang_args(pg_config)?)
+        .clang_args(pg_target_include_flags(major_version, pg_config)?)
+        .detect_include_paths(target_env_tracked("PGX_BINDGEN_NO_DETECT_INCLUDES").is_none())
         .parse_callbacks(Box::new(PgxOverrides::default()))
         .blocklist_type("(Nullable)?Datum") // manually wrapping datum types for correctness
         .blocklist_function("varsize_any") // pgx converts the VARSIZE_ANY macro, so we don't want to also have this function, which is in heaptuple.c
@@ -633,6 +662,32 @@ fn run_bindgen(pg_config: &PgConfig, include_h: &PathBuf) -> eyre::Result<syn::F
         .unwrap_or_else(|e| panic!("Unable to generate bindings for pg{}: {:?}", major_version, e));
 
     syn::parse_file(bindings.to_string().as_str()).map_err(|e| From::from(e))
+}
+
+fn env_tracked(s: &str) -> Option<String> {
+    println!("cargo:rerun-if-env-changed={s}");
+    std::env::var(s).ok()
+}
+
+fn target_env_tracked(s: &str) -> Option<String> {
+    let target = std::env::var("TARGET").unwrap();
+    env_tracked(&format!("{s}_{target}")).or_else(|| env_tracked(s))
+}
+
+/// Returns `Err` if `pg_config` errored, `None` if we should
+fn pg_target_include_flags(pg_version: u16, pg_config: &PgConfig) -> eyre::Result<Option<String>> {
+    let var = "PGX_INCLUDEDIR_SERVER";
+    let value =
+        target_env_tracked(&format!("{var}_PG{pg_version}")).or_else(|| target_env_tracked(var));
+    match value {
+        // No configured value: ask `pg_config`.
+        None => Ok(Some(format!("-I{}", pg_config.includedir_server()?.display()))),
+        // Configured to empty string: assume bindgen is getting it some other
+        // way, pass nothing.
+        Some(overridden) if overridden.is_empty() => Ok(None),
+        // Configured to non-empty string: pass to bindgen
+        Some(overridden) => Ok(Some(format!("-I{overridden}"))),
+    }
 }
 
 fn build_shim(shim_src: &PathBuf, shim_dst: &PathBuf, pg_config: &PgConfig) -> eyre::Result<()> {
