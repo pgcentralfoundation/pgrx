@@ -351,10 +351,7 @@ fn extract_oids(code: &syn::File) -> BTreeMap<syn::Ident, Box<syn::Expr>> {
 
                 // This heuristic identifies "OIDs"
                 // We're going to warp the const declarations to be our newtype Oid
-                if ty_str == "u32"
-                    && (name.ends_with("OID") | name.ends_with("RelationId"))
-                    && name != "HEAP_HASOID"
-                {
+                if ty_str == "u32" && is_builtin_oid(&name) {
                     oids.insert(ident.clone(), expr.clone());
                 }
             }
@@ -362,6 +359,18 @@ fn extract_oids(code: &syn::File) -> BTreeMap<syn::Ident, Box<syn::Expr>> {
         }
     }
     oids
+}
+
+fn is_builtin_oid(name: &str) -> bool {
+    if name.ends_with("OID") && name != "HEAP_HASOID" {
+        true
+    } else if name.ends_with("RelationId") {
+        true
+    } else if name == "TemplateDbOid" {
+        true
+    } else {
+        false
+    }
 }
 
 fn rewrite_oid_consts(

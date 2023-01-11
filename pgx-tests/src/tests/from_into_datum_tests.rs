@@ -21,10 +21,10 @@ mod tests {
             String::try_from_datum(
                 pg_sys::Datum::from(false),
                 true,
-                pg_sys::PgBuiltInOids::BOOLOID.value(),
+                pg_sys::BuiltinOid::BOOLOID.value(),
             )
         };
         assert!(result.is_err());
-        assert_eq!("Postgres type boolean `Oid(16)` is not compatible with the Rust type alloc::string::String `Oid(25)`", result.unwrap_err().to_string());
+        assert_eq!("Postgres type boolean oid={#16, builtin: BOOLOID} is not compatible with the Rust type alloc::string::String oid={#25, builtin: TEXTOID}", result.unwrap_err().to_string());
     }
 }
