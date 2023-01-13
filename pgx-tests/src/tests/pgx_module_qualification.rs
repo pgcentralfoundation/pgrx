@@ -84,6 +84,20 @@ mod pgx_modqual_tests {
         todo!()
     }
 
+    #[pg_extern]
+    fn foo_result_set(
+    ) -> std::result::Result<::pgx::iter::SetOfIterator<'static, i64>, Box<dyn std::error::Error>>
+    {
+        todo!()
+    }
+
+    #[pg_extern]
+    fn foo_result_option_set(
+    ) -> std::result::Result<::pgx::iter::SetOfIterator<'static, i64>, Box<dyn std::error::Error>>
+    {
+        todo!()
+    }
+
     #[pg_operator]
     #[opname(=<>=)]
     fn fake_foo_operator(_a: PgxModuleQualificationTest, _b: PgxModuleQualificationTest) -> bool {
