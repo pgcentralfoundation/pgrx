@@ -483,12 +483,12 @@ impl PgExtern {
                 } else if *result {
                     if *optional {
                         quote_spanned! { self.func.sig.span() =>
-                            use pgx::pg_sys::panic::ErrorReportable;
+                            use ::pgx::pg_sys::panic::ErrorReportable;
                             #func_name(#(#arg_pats),*).report()
                         }
                     } else {
                         quote_spanned! { self.func.sig.span() =>
-                            use pgx::pg_sys::panic::ErrorReportable;
+                            use ::pgx::pg_sys::panic::ErrorReportable;
                             Some(#func_name(#(#arg_pats),*).report())
                         }
                     }
