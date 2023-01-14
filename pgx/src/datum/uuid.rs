@@ -24,14 +24,17 @@ pub struct Uuid(UuidBytes);
 impl IntoDatum for Uuid {
     #[inline]
     fn into_datum(self) -> Option<pg_sys::Datum> {
-        let ptr = PgMemoryContexts::CurrentMemoryContext.palloc_slice::<u8>(UUID_BYTES_LEN);
+        let ptr = unsafe {
+            // SAFETY:  CurrentMemoryContext is always valid
+            PgMemoryContexts::CurrentMemoryContext.palloc_slice::<u8>(UUID_BYTES_LEN)
+        };
         ptr.clone_from_slice(&self.0);
 
         Some(ptr.as_ptr().into())
     }
 
     #[inline]
-    fn type_oid() -> u32 {
+    fn type_oid() -> pg_sys::Oid {
         pg_sys::UUIDOID
     }
 }

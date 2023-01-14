@@ -167,7 +167,8 @@ mod tests {
     #[allow(unused_imports)]
     use crate as pgx_tests;
 
-    use crate::tests::fcinfo_tests::{same_name, NullError, NullStrict};
+    use super::{NullError, NullStrict};
+    use crate::tests::fcinfo_tests::same_name;
     use pgx::prelude::*;
     use pgx::{direct_pg_extern_function_call, IntoDatum};
 
@@ -249,14 +250,14 @@ mod tests {
 
     #[pg_test]
     unsafe fn test_takes_i8() {
-        let result = Spi::get_one::<i8>("SELECT takes_i8('a');").expect("SPI result was NULL");
-        assert_eq!(result, 'a' as i8);
+        let result = Spi::get_one::<i8>("SELECT takes_i8('a');");
+        assert_eq!(result, Ok(Some('a' as i8)));
     }
 
     #[pg_test]
     unsafe fn test_takes_char() {
-        let result = Spi::get_one::<char>("SELECT takes_char('🚨');").expect("SPI result was NULL");
-        assert_eq!(result, '🚨');
+        let result = Spi::get_one::<char>("SELECT takes_char('🚨');");
+        assert_eq!(result, Ok(Some('🚨')));
     }
 
     #[pg_test]
@@ -313,13 +314,13 @@ mod tests {
     #[pg_test]
     fn test_returns_void() {
         let result = Spi::get_one::<()>("SELECT returns_void();");
-        assert_eq!(result, None)
+        assert_eq!(result, Ok(Some(())));
     }
 
     #[pg_test]
     fn test_returns_tuple() {
         let result = Spi::get_two::<i32, String>("SELECT * FROM returns_tuple();");
-        assert_eq!((Some(42), Some("pgx".into())), result)
+        assert_eq!(Ok((Some(42), Some("pgx".into()))), result);
     }
 
     /// ensures that we can have a `#[pg_extern]` function with an argument that
@@ -328,13 +329,15 @@ mod tests {
     fn test_same_name() {
         assert_eq!("test", same_name("test"));
     }
+
     #[pg_test]
     fn test_null_strict_type() {
-        assert_eq!(None, Spi::get_one::<NullStrict>("SELECT null::NullStrict"));
+        assert_eq!(Ok(None), Spi::get_one::<NullStrict>("SELECT null::NullStrict"));
     }
+
     #[pg_test]
     #[should_panic(expected = "An error message")]
     fn test_null_error_type() {
-        assert_eq!(None, Spi::get_one::<NullError>("SELECT null::NullError"));
+        Spi::get_one::<NullError>("SELECT null::NullError").unwrap();
     }
 }

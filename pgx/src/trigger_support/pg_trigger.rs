@@ -75,7 +75,7 @@ impl PgTrigger {
     // Derived from `pgx_pg_sys::TriggerData.tg_newtuple` and `pgx_pg_sys::TriggerData.tg_newslot.tts_tupleDescriptor`
     pub fn new(&self) -> Option<PgHeapTuple<'_, AllocatedByPostgres>> {
         // Safety: Given that we have a known good `FunctionCallInfo`, which PostgreSQL has checked is indeed a trigger,
-        // containing a known good `TriggerData` which also contains a known good `Trigger`... and the user aggreed to
+        // containing a known good `TriggerData` which also contains a known good `Trigger`... and the user agreed to
         // our `unsafe` constructor safety rules, we choose to trust this is indeed a valid pointer offered to us by
         // PostgreSQL, and that it trusts it.
         unsafe { PgHeapTuple::from_trigger_data(&*self.trigger_data, TriggerTuple::New) }
@@ -84,7 +84,7 @@ impl PgTrigger {
     // Derived from `pgx_pg_sys::TriggerData.tg_trigtuple` and `pgx_pg_sys::TriggerData.tg_trigslot.tts_tupleDescriptor`
     pub fn current(&self) -> Option<PgHeapTuple<'_, AllocatedByPostgres>> {
         // Safety: Given that we have a known good `FunctionCallInfo`, which PostgreSQL has checked is indeed a trigger,
-        // containing a known good `TriggerData` which also contains a known good `Trigger`... and the user aggreed to
+        // containing a known good `TriggerData` which also contains a known good `Trigger`... and the user agreed to
         // our `unsafe` constructor safety rules, we choose to trust this is indeed a valid pointer offered to us by
         // PostgreSQL, and that it trusts it.
         unsafe { PgHeapTuple::from_trigger_data(&*self.trigger_data, TriggerTuple::Current) }
@@ -93,7 +93,7 @@ impl PgTrigger {
     pub fn name(&self) -> Result<&str, PgTriggerError> {
         let name_ptr = self.trigger.tgname as *mut c_char;
         // Safety: Given that we have a known good `FunctionCallInfo`, which PostgreSQL has checked is indeed a trigger,
-        // containing a known good `TriggerData` which also contains a known good `Trigger`... and the user aggreed to
+        // containing a known good `TriggerData` which also contains a known good `Trigger`... and the user agreed to
         // our `unsafe` constructor safety rules, we choose to trust this is indeed a valid pointer offered to us by
         // PostgreSQL, and that it trusts it.
         let name_cstr = unsafe { cstr_core::CStr::from_ptr(name_ptr) };
@@ -133,7 +133,7 @@ impl PgTrigger {
         let tgoldtable = self.trigger.tgoldtable;
         if !tgoldtable.is_null() {
             // Safety: Given that we have a known good `FunctionCallInfo`, which PostgreSQL has checked is indeed a trigger,
-            // containing a known good `TriggerData` which also contains a known good `Trigger`... and the user aggreed to
+            // containing a known good `TriggerData` which also contains a known good `Trigger`... and the user agreed to
             // our `unsafe` constructor safety rules, we choose to trust this is indeed a valid pointer offered to us by
             // PostgreSQL, and that it trusts it.
             let table_name_cstr = unsafe { cstr_core::CStr::from_ptr(tgoldtable) };
@@ -149,7 +149,7 @@ impl PgTrigger {
         let tgnewtable = self.trigger.tgnewtable;
         if !tgnewtable.is_null() {
             // Safety: Given that we have a known good `FunctionCallInfo`, which PostgreSQL has checked is indeed a trigger,
-            // containing a known good `TriggerData` which also contains a known good `Trigger`... and the user aggreed to
+            // containing a known good `TriggerData` which also contains a known good `Trigger`... and the user agreed to
             // our `unsafe` constructor safety rules, we choose to trust this is indeed a valid pointer offered to us by
             // PostgreSQL, and that it trusts it.
             let table_name_cstr = unsafe { cstr_core::CStr::from_ptr(tgnewtable) };
@@ -210,7 +210,7 @@ impl PgTrigger {
         let tgargs = self.trigger.tgargs;
         let tgnargs = self.trigger.tgnargs;
         // Safety: Given that we have a known good `FunctionCallInfo`, which PostgreSQL has checked is indeed a trigger,
-        // containing a known good `TriggerData` which also contains a known good `Trigger`... and the user aggreed to
+        // containing a known good `TriggerData` which also contains a known good `Trigger`... and the user agreed to
         // our `unsafe` constructor safety rules, we choose to trust this is indeed a valid pointer offered to us by
         // PostgreSQL, and that it trusts it.
         let slice: &[*mut c_char] =
@@ -219,7 +219,7 @@ impl PgTrigger {
             .into_iter()
             .map(|v| {
                 // Safety: Given that we have a known good `FunctionCallInfo`, which PostgreSQL has checked is indeed a trigger,
-                // containing a known good `TriggerData` which also contains a known good `Trigger`... and the user aggreed to
+                // containing a known good `TriggerData` which also contains a known good `Trigger`... and the user agreed to
                 // our `unsafe` constructor safety rules, we choose to trust this is indeed a valid pointer offered to us by
                 // PostgreSQL, and that it trusts it.
                 unsafe { cstr_core::CStr::from_ptr(*v) }.to_str().map(ToString::to_string)
@@ -228,22 +228,22 @@ impl PgTrigger {
         Ok(args)
     }
 
-    /// A reference to the underlaying [`RelationData`][pgx_pg_sys::RelationData]
+    /// A reference to the underlying [`RelationData`][pgx_pg_sys::RelationData]
     pub fn relation_data(&self) -> &pgx_pg_sys::RelationData {
         self.relation_data.borrow()
     }
 
-    /// A reference to the underlaying [`Trigger`][pgx_pg_sys::Trigger]
+    /// A reference to the underlying [`Trigger`][pgx_pg_sys::Trigger]
     pub fn trigger(&self) -> &pgx_pg_sys::Trigger {
         self.trigger.borrow()
     }
 
-    /// A reference to the underlaying [`TriggerData`][pgx_pg_sys::TriggerData]
+    /// A reference to the underlying [`TriggerData`][pgx_pg_sys::TriggerData]
     pub fn trigger_data(&self) -> &pgx_pg_sys::TriggerData {
         self.trigger_data.borrow()
     }
 
-    /// A reference to the underlaying fcinfo
+    /// A reference to the underlying fcinfo
     pub fn fcinfo(&self) -> &pg_sys::FunctionCallInfo {
         self.fcinfo.borrow()
     }

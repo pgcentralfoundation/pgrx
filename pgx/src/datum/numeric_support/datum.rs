@@ -62,7 +62,7 @@ impl<const P: u32, const S: u32> IntoDatum for Numeric<P, S> {
     }
 
     #[inline]
-    fn type_oid() -> u32 {
+    fn type_oid() -> pg_sys::Oid {
         pg_sys::NUMERICOID
     }
 }

@@ -129,9 +129,8 @@ pub struct PgLwLockShareGuard<'a, T> {
 
 impl<T> Drop for PgLwLockShareGuard<'_, T> {
     fn drop(&mut self) {
-        unsafe {
-            pg_sys::LWLockRelease(self.lock);
-        }
+        // SAFETY: self.lock is always valid
+        unsafe { release_unless_elog_unwinding(self.lock) }
     }
 }
 
@@ -164,8 +163,22 @@ impl<T> DerefMut for PgLwLockExclusiveGuard<'_, T> {
 
 impl<T> Drop for PgLwLockExclusiveGuard<'_, T> {
     fn drop(&mut self) {
-        unsafe {
-            pg_sys::LWLockRelease(self.lock);
-        }
+        // SAFETY: self.lock is always valid
+        unsafe { release_unless_elog_unwinding(self.lock) }
+    }
+}
+
+/// Releases the given lock, unless we are unwinding due to an `error` in postgres code
+///
+/// `elog(ERROR)` from postgres code resets `pg_sys::InterruptHoldoffCount` to zero, and
+/// `LWLockRelease` fails an assertion if called in this case.
+/// If we detect this condition, we skip releasing the lock; all lwlocks will be released
+/// on (sub)transaction abort anyway.
+///
+/// SAFETY: the given lock must be valid
+unsafe fn release_unless_elog_unwinding(lock: *mut pg_sys::LWLock) {
+    // SAFETY: mut static access is ok from a single (main) thread.
+    if pg_sys::InterruptHoldoffCount > 0 {
+        pg_sys::LWLockRelease(lock);
     }
 }

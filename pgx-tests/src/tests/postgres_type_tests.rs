@@ -166,19 +166,21 @@ mod tests {
     use pgx::PgVarlena;
 
     #[pg_test]
-    fn test_mytype() {
-        let result = Spi::get_one::<PgVarlena<VarlenaType>>("SELECT '1.0,2.0,3'::VarlenaType")
-            .expect("SPI returned NULL");
+    fn test_mytype() -> Result<(), pgx::spi::Error> {
+        let result =
+            Spi::get_one::<PgVarlena<VarlenaType>>("SELECT '1.0,2.0,3'::VarlenaType")?.unwrap();
         assert_eq!(result.a, 1.0);
         assert_eq!(result.b, 2.0);
         assert_eq!(result.c, 3);
+        Ok(())
     }
 
     #[pg_test]
-    fn test_my_enum_type() {
-        let result = Spi::get_one::<PgVarlena<VarlenaEnumType>>("SELECT 'B'::VarlenaEnumType")
-            .expect("SPI returned NULL");
+    fn test_my_enum_type() -> Result<(), pgx::spi::Error> {
+        let result =
+            Spi::get_one::<PgVarlena<VarlenaEnumType>>("SELECT 'B'::VarlenaEnumType")?.unwrap();
         assert!(matches!(*result, VarlenaEnumType::B));
+        Ok(())
     }
 
     #[pg_test]
@@ -186,24 +188,25 @@ mod tests {
         let result = Spi::get_one::<String>(
             "SELECT fn_takes_option('1.0,2.0,3'::CustomTextFormatSerializedType);",
         );
-        assert_eq!("1,2,3", result.unwrap());
+        assert_eq!(Ok(Some("1,2,3".into())), result);
     }
 
     #[pg_test]
     fn test_call_with_null() {
         let result = Spi::get_one::<String>("SELECT fn_takes_option(NULL);");
-        assert_eq!(Some(String::from("nothing")), result);
+        assert_eq!(Ok(Some("nothing".into())), result);
     }
 
     #[pg_test]
-    fn test_serializedtype() {
+    fn test_serializedtype() -> Result<(), pgx::spi::Error> {
         let result = Spi::get_one::<CustomTextFormatSerializedType>(
             "SELECT '1.0,2.0,3'::CustomTextFormatSerializedType",
-        )
-        .expect("SPI returned NULL");
+        )?
+        .unwrap();
         assert_eq!(result.a, 1.0);
         assert_eq!(result.b, 2.0);
         assert_eq!(result.c, 3);
+        Ok(())
     }
 
     #[pg_test]
@@ -211,39 +214,43 @@ mod tests {
         let result = Spi::get_one::<String>(
             "SELECT fn_takes_option_enum('A'::CustomTextFormatSerializedEnumType);",
         );
-        assert_eq!("A", result.unwrap());
+        assert_eq!(Ok(Some("A".into())), result);
     }
 
     #[pg_test]
     fn test_call_with_enum_null() {
         let result = Spi::get_one::<String>("SELECT fn_takes_option_enum(NULL);");
-        assert_eq!(Some(String::from("nothing")), result);
+        assert_eq!(Ok(Some("nothing".into())), result);
     }
 
     #[pg_test]
-    fn test_serialized_enum_type() {
+    fn test_serialized_enum_type() -> Result<(), pgx::spi::Error> {
         let result = Spi::get_one::<CustomTextFormatSerializedEnumType>(
             "SELECT 'B'::CustomTextFormatSerializedEnumType",
-        )
-        .expect("SPI returned NULL");
+        )?
+        .unwrap();
 
         assert!(matches!(result, CustomTextFormatSerializedEnumType::B));
+        Ok(())
     }
 
     #[pg_test]
-    fn test_jsontype() {
-        let result = Spi::get_one::<JsonType>(r#"SELECT '{"a": 1.0, "b": 2.0, "c": 3}'::JsonType"#)
-            .expect("SPI returned NULL");
+    fn test_jsontype() -> Result<(), pgx::spi::Error> {
+        let result =
+            Spi::get_one::<JsonType>(r#"SELECT '{"a": 1.0, "b": 2.0, "c": 3}'::JsonType"#)?
+                .unwrap();
         assert_eq!(result.a, 1.0);
         assert_eq!(result.b, 2.0);
         assert_eq!(result.c, 3);
+        Ok(())
     }
 
     #[pg_test]
-    fn test_json_enum_type() {
+    fn test_json_enum_type() -> Result<(), pgx::spi::Error> {
         let result =
-            Spi::get_one::<JsonEnumType>(r#"SELECT '{"type": "E1", "a": 1.0}'::JsonEnumType"#)
-                .expect("SPI returned NULL");
+            Spi::get_one::<JsonEnumType>(r#"SELECT '{"type": "E1", "a": 1.0}'::JsonEnumType"#)?
+                .unwrap();
         assert!(matches!(result, JsonEnumType::E1 { a } if a == 1.0));
+        Ok(())
     }
 }

@@ -26,7 +26,7 @@ pub fn get_target_dir() -> eyre::Result<PathBuf> {
     }
 
     let json: JsonValue =
-        serde_json::from_slice(&output.stdout).wrap_err("Invalid `cargo metada` response")?;
+        serde_json::from_slice(&output.stdout).wrap_err("Invalid `cargo metadata` response")?;
     let target_dir = json.get("target_directory");
     match target_dir {
         Some(JsonValue::String(target_dir)) => Ok(target_dir.into()),

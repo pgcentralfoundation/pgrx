@@ -115,8 +115,9 @@ impl<'a> PgTupleDesc<'a> {
     ///
     /// ```rust,no_run
     /// use pgx::{pg_sys, PgTupleDesc};
-    /// let typid = 42 as pg_sys::Oid;  // a valid pg_type "oid" value
-    /// let typmod = 0; // it's corresponding typemod value
+    /// # let example_pg_type_oid = |i| { unsafe { pg_sys::Oid::from_u32_unchecked(i) } };
+    /// let typid = example_pg_type_oid(42); // a valid pg_type Oid
+    /// let typmod = 0; // its corresponding typemod value
     /// let tupdesc = unsafe { PgTupleDesc::from_pg_is_copy(pg_sys::lookup_rowtype_tupdesc_copy(typid, typmod)) };
     ///
     /// // assert the tuple descriptor has 12 attributes
@@ -174,7 +175,7 @@ impl<'a> PgTupleDesc<'a> {
     */
     pub fn for_composite_type(name: &str) -> Option<PgTupleDesc<'a>> {
         unsafe {
-            let mut typoid = 0;
+            let mut typoid = pg_sys::Oid::INVALID;
             let mut typmod = 0;
             pg_sys::parseTypeString(name.as_pg_cstr(), &mut typoid, &mut typmod, true);
 
@@ -240,6 +241,23 @@ impl<'a> Deref for PgTupleDesc<'a> {
 
     fn deref(&self) -> &Self::Target {
         self.tupdesc.as_ref().unwrap()
+    }
+}
+
+impl<'a> Clone for PgTupleDesc<'a> {
+    fn clone(&self) -> Self {
+        let tupdesc = self.tupdesc.as_ref().expect("PgTupleDesc.tupdesc was None");
+        // SAFETY: We assume the previous tupdesc is valid and
+        // pg_sys::CreateTupleDescCopyConstr gives us a fresh copy with reference counters set to -1 (disabled).
+        // This will force the pfree() approach upon drop
+        let tupdesc =
+            unsafe { PgBox::from_pg(pg_sys::CreateTupleDescCopyConstr(tupdesc.as_ptr())) };
+        Self {
+            tupdesc: Some(tupdesc),
+            parent: self.parent.clone(),
+            need_release: false,
+            need_pfree: true,
+        }
     }
 }
 

@@ -46,22 +46,27 @@ pub mod fcinfo;
 pub mod ffi;
 pub mod guc;
 pub mod heap_tuple;
+#[cfg(feature = "cshim")]
 pub mod hooks;
 pub mod htup;
 pub mod inoutfuncs;
 pub mod itemptr;
 pub mod iter;
+#[cfg(feature = "cshim")]
 pub mod list;
 pub mod lwlock;
 pub mod memcxt;
 pub mod misc;
+#[cfg(feature = "cshim")]
 pub mod namespace;
 pub mod nodes;
 pub mod pgbox;
 pub mod rel;
 pub mod shmem;
 pub mod spi;
+#[cfg(feature = "cshim")]
 pub mod spinlock;
+pub mod srf;
 pub mod stringinfo;
 pub mod subxact;
 pub mod trigger_support;
@@ -84,19 +89,22 @@ pub use datum::*;
 pub use enum_helper::*;
 pub use fcinfo::*;
 pub use guc::*;
+#[cfg(feature = "cshim")]
 pub use hooks::*;
 pub use htup::*;
 pub use inoutfuncs::*;
 pub use itemptr::*;
+#[cfg(feature = "cshim")]
 pub use list::*;
 pub use lwlock::*;
 pub use memcxt::*;
+#[cfg(feature = "cshim")]
 pub use namespace::*;
 pub use nodes::*;
 pub use pgbox::*;
 pub use rel::*;
 pub use shmem::*;
-pub use spi::*;
+pub use spi::Spi; // only Spi.  We don't want the top-level namespace polluted with spi::Result and spi::Error
 pub use stringinfo::*;
 pub use trigger_support::*;
 pub use tupdesc::*;
@@ -122,54 +130,6 @@ pub use pg_sys::{
 pub use pgx_sql_entity_graph;
 
 pub use cstr_core;
-
-use once_cell::sync::Lazy;
-use pgx_sql_entity_graph::RustSourceOnlySqlMapping;
-use std::collections::HashSet;
-
-macro_rules! map_source_only {
-    ($map:ident, $rust:ty, $sql:expr) => {{
-        let ty = stringify!($rust).to_string().replace(" ", "");
-        assert_eq!(
-            $map.insert(RustSourceOnlySqlMapping::new(ty.clone(), $sql.to_string(),)),
-            true,
-            "Cannot map {} twice",
-            ty
-        );
-
-        let ty = stringify!(Option<$rust>).to_string().replace(" ", "");
-        assert_eq!(
-            $map.insert(RustSourceOnlySqlMapping::new(ty.clone(), $sql.to_string(),)),
-            true,
-            "Cannot map {} twice",
-            ty
-        );
-
-        let ty = stringify!(Vec<$rust>).to_string().replace(" ", "");
-        assert_eq!(
-            $map.insert(RustSourceOnlySqlMapping::new(ty.clone(), format!("{}[]", $sql),)),
-            true,
-            "Cannot map {} twice",
-            ty
-        );
-
-        let ty = stringify!(Array<$rust>).to_string().replace(" ", "");
-        assert_eq!(
-            $map.insert(RustSourceOnlySqlMapping::new(ty.clone(), format!("{}[]", $sql),)),
-            true,
-            "Cannot map {} twice",
-            ty
-        );
-    }};
-}
-
-pub static DEFAULT_RUST_SOURCE_TO_SQL: Lazy<HashSet<RustSourceOnlySqlMapping>> = Lazy::new(|| {
-    let mut m = HashSet::new();
-
-    map_source_only!(m, pg_sys::Oid, "Oid");
-
-    m
-});
 
 /// A macro for marking a library compatible with [`pgx`][crate].
 ///
@@ -285,7 +245,7 @@ macro_rules! pg_magic_func {
     };
 }
 
-/// Create neccessary extension-local internal marker for use with SQL generation.
+/// Create necessary extension-local internal marker for use with SQL generation.
 ///
 /// <div class="example-wrap" style="display:inline-block">
 /// <pre class="ignore" style="white-space:normal;font:inherit;">
@@ -297,19 +257,10 @@ macro_rules! pg_magic_func {
 #[macro_export]
 macro_rules! pg_sql_graph_magic {
     () => {
-        #[no_mangle]
-        #[doc(hidden)]
-        #[rustfmt::skip] // explict extern "Rust" is more clear here
-        pub extern "Rust" fn __pgx_sql_mappings() -> $crate::pgx_sql_entity_graph::RustToSqlMapping {
-            $crate::pgx_sql_entity_graph::RustToSqlMapping {
-                rust_source_to_sql: ::pgx::DEFAULT_RUST_SOURCE_TO_SQL.clone(),
-            }
-        }
-
         // A marker which must exist in the root of the extension.
-        #[no_mangle]
+#[no_mangle]
         #[doc(hidden)]
-        #[rustfmt::skip] // explict extern "Rust" is more clear here
+        #[rustfmt::skip] // explicit extern "Rust" is more clear here
         pub extern "Rust" fn __pgx_marker(
             _: (),
         ) -> $crate::pgx_sql_entity_graph::ControlFile {

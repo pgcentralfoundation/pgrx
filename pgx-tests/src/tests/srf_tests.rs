@@ -88,126 +88,146 @@ mod tests {
     fn test_generate_series() {
         let cnt = Spi::connect(|client| {
             let mut table =
-                client.select("SELECT * FROM example_generate_series(1, 10)", None, None);
+                client.select("SELECT * FROM example_generate_series(1, 10)", None, None)?;
 
             let mut expect = 0;
             while table.next().is_some() {
-                let value = table.get_one::<i32>().expect("value was NULL");
+                let value = table.get_one::<i32>()?;
 
                 expect += 1;
-                assert_eq!(value, expect);
+                assert_eq!(value, Some(expect));
             }
 
-            Ok(Some(expect))
-        });
+            Ok::<_, spi::Error>(expect)
+        })
+        .unwrap();
 
-        assert_eq!(cnt.unwrap(), 10)
+        assert_eq!(cnt, 10)
     }
 
     #[pg_test]
     fn test_composite_set() {
         let cnt = Spi::connect(|client| {
-            let mut table = client.select("SELECT * FROM example_composite_set()", None, None);
+            let mut table = client.select("SELECT * FROM example_composite_set()", None, None)?;
 
             let mut expect = 0;
             while table.next().is_some() {
-                let (idx, value) = table.get_two::<i32, &str>();
-                let idx = idx.expect("idx was null");
-                let value = value.expect("value was null");
+                let (idx, value) = table.get_two::<i32, &str>()?;
 
                 expect += 1;
-                assert_eq!(idx, expect);
+                assert_eq!(idx, Some(expect));
                 match idx {
-                    1 => assert_eq!("a", value),
-                    2 => assert_eq!("b", value),
-                    3 => assert_eq!("c", value),
-                    _ => panic!("unexpected idx={}", idx),
+                    Some(1) => assert_eq!(Some("a"), value),
+                    Some(2) => assert_eq!(Some("b"), value),
+                    Some(3) => assert_eq!(Some("c"), value),
+                    _ => panic!("unexpected idx={:?}", idx),
                 }
             }
 
-            Ok(Some(expect))
-        });
+            Ok::<_, spi::Error>(expect)
+        })
+        .unwrap();
 
-        assert_eq!(cnt.unwrap(), 3)
+        assert_eq!(cnt, 3)
     }
 
     #[pg_test]
     fn test_return_some_iterator() {
         let cnt = Spi::connect(|client| {
-            let table = client.select("SELECT * from return_some_iterator();", None, None);
+            let table = client.select("SELECT * from return_some_iterator();", None, None)?;
 
-            Ok(Some(table.len() as i64))
+            Ok::<_, spi::Error>(table.len() as i64)
         });
 
-        assert_eq!(cnt, Some(3))
+        assert_eq!(cnt, Ok(3))
     }
 
     #[pg_test]
     fn test_return_none_iterator() {
         let cnt = Spi::connect(|client| {
-            let table = client.select("SELECT * from return_none_iterator();", None, None);
+            let table = client.select("SELECT * from return_none_iterator();", None, None)?;
 
-            Ok(Some(table.len() as i64))
+            Ok::<_, spi::Error>(table.len() as i64)
         });
 
-        assert_eq!(cnt, Some(0))
+        assert_eq!(cnt, Ok(0))
     }
 
     #[pg_test]
     fn test_return_some_setof_iterator() {
         let cnt = Spi::connect(|client| {
-            let table = client.select("SELECT * from return_some_setof_iterator();", None, None);
+            let table = client.select("SELECT * from return_some_setof_iterator();", None, None)?;
 
-            Ok(Some(table.len() as i64))
+            Ok::<_, spi::Error>(table.len() as i64)
         });
 
-        assert_eq!(cnt, Some(3))
+        assert_eq!(cnt, Ok(3))
     }
 
     #[pg_test]
     fn test_return_none_setof_iterator() {
         let cnt = Spi::connect(|client| {
-            let table = client.select("SELECT * from return_none_setof_iterator();", None, None);
+            let table = client.select("SELECT * from return_none_setof_iterator();", None, None)?;
 
-            Ok(Some(table.len() as i64))
+            Ok::<_, spi::Error>(table.len() as i64)
         });
 
-        assert_eq!(cnt, Some(0))
+        assert_eq!(cnt, Ok(0))
     }
 
     #[pg_test]
     fn test_srf_setof_datum_detoasting_with_borrow() {
-        let cnt = Spi::connect(|client| {
+        let cnt = Spi::connect(|mut client| {
             // build up a table with one large column that Postgres will be forced to TOAST
-            client.update("CREATE TABLE test_srf_datum_detoasting AS SELECT array_to_string(array_agg(g),' ') s FROM (SELECT 'a' g FROM generate_series(1, 1000000)) x;", None, None);
+            client.update("CREATE TABLE test_srf_datum_detoasting AS SELECT array_to_string(array_agg(g),' ') s FROM (SELECT 'a' g FROM generate_series(1, 1000000)) x;", None, None)?;
 
             // and make sure we can use the DETOASTED value with our SRF function
             let table = client.select(
                 "SELECT split_set_with_borrow(s, ' ') FROM test_srf_datum_detoasting",
                 None,
                 None,
-            );
+            )?;
 
-            Ok(Some(table.len() as i64))
+            Ok::<_, spi::Error>(table.len() as i64)
         });
-        assert_eq!(cnt, Some(1000000))
+        assert_eq!(cnt, Ok(1000000))
     }
 
     #[pg_test]
     fn test_srf_table_datum_detoasting_with_borrow() {
-        let cnt = Spi::connect(|client| {
+        let cnt = Spi::connect(|mut client| {
             // build up a table with one large column that Postgres will be forced to TOAST
-            client.update("CREATE TABLE test_srf_datum_detoasting AS SELECT array_to_string(array_agg(g),' ') s FROM (SELECT 'a' g FROM generate_series(1, 1000000)) x;", None, None);
+            client.update("CREATE TABLE test_srf_datum_detoasting AS SELECT array_to_string(array_agg(g),' ') s FROM (SELECT 'a' g FROM generate_series(1, 1000000)) x;", None, None)?;
 
             // and make sure we can use the DETOASTED value with our SRF function
             let table = client.select(
                 "SELECT split_table_with_borrow(s, ' ') FROM test_srf_datum_detoasting",
                 None,
                 None,
-            );
+            )?;
 
-            Ok(Some(table.len() as i64))
+            Ok::<_, spi::Error>(table.len() as i64)
         });
-        assert_eq!(cnt, Some(1000000))
+        assert_eq!(cnt, Ok(1000000))
+    }
+
+    #[pg_test(error = "column \"cause_an_error\" does not exist")]
+    pub fn spi_in_iterator(
+    ) -> TableIterator<'static, (name!(id, i32), name!(relname, Result<Option<String>, spi::Error>))>
+    {
+        let oids = vec![1213, 1214, 1232, 1233, 1247, 1249, 1255];
+
+        TableIterator::new(oids.into_iter().map(|oid| {
+            (oid, Spi::get_one(&format!("SELECT CAUSE_AN_ERROR FROM pg_class WHERE oid = {oid}")))
+        }))
+    }
+
+    #[pg_test(error = "column \"cause_an_error\" does not exist")]
+    pub fn spi_in_setof() -> SetOfIterator<'static, Result<Option<String>, spi::Error>> {
+        let oids = vec![1213, 1214, 1232, 1233, 1247, 1249, 1255];
+
+        SetOfIterator::new(oids.into_iter().map(|oid| {
+            Spi::get_one(&format!("SELECT CAUSE_AN_ERROR FROM pg_class WHERE oid = {oid}"))
+        }))
     }
 }

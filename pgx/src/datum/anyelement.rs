@@ -77,7 +77,7 @@ impl IntoDatum for AnyElement {
         Some(self.datum)
     }
 
-    fn type_oid() -> u32 {
+    fn type_oid() -> pg_sys::Oid {
         pg_sys::ANYELEMENTOID
     }
 }

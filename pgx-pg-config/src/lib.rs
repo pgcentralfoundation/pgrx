@@ -44,11 +44,11 @@ pub fn get_c_locale_flags() -> &'static [&'static str] {
 // These methods were originally in `pgx-utils`, but in an effort to consolidate
 // dependencies, the decision was made to package them into wherever made the
 // most sense. In this case, it made the most sense to put them into this
-// pgx-pg-config crate. That doesnt mean they can't be moved at a later date.
+// pgx-pg-config crate. That doesn't mean they can't be moved at a later date.
 mod path_methods;
 pub use path_methods::{get_target_dir, prefix_path};
 
-#[derive(Clone)]
+#[derive(Clone, Debug)]
 pub struct PgVersion {
     major: u16,
     minor: u16,
@@ -67,7 +67,7 @@ impl Display for PgVersion {
     }
 }
 
-#[derive(Clone)]
+#[derive(Clone, Debug)]
 pub struct PgConfig {
     version: Option<PgVersion>,
     pg_config: Option<PathBuf>,
@@ -119,7 +119,9 @@ impl PgConfig {
     }
 
     pub fn from_path() -> Self {
-        Self::new_with_defaults("pg_config".into())
+        let path =
+            pathsearch::find_executable_in_path("pg_config").unwrap_or_else(|| "pg_config".into());
+        Self::new_with_defaults(path)
     }
 
     pub fn is_real(&self) -> bool {
@@ -285,15 +287,16 @@ impl PgConfig {
         match Command::new(&pg_config).arg(arg).output() {
             Ok(output) => Ok(String::from_utf8(output.stdout).unwrap().trim().to_string()),
             Err(e) => match e.kind() {
-                ErrorKind::NotFound => {
-                    Err(e).wrap_err_with(|| format!("Unable to find `{}`", "pg_config".yellow()))
-                }
+                ErrorKind::NotFound => Err(e).wrap_err_with(|| {
+                    format!("Unable to find `{}` on the system $PATH", "pg_config".yellow())
+                }),
                 _ => Err(e.into()),
             },
         }
     }
 }
 
+#[derive(Debug)]
 pub struct Pgx {
     pg_configs: Vec<PgConfig>,
     base_port: u16,
@@ -408,6 +411,17 @@ impl Pgx {
             }
         }
         Err(eyre!("Postgres `{}` is not managed by pgx", label))
+    }
+
+    /// Returns true if the specified `label` represents a Postgres version number feature flag,
+    /// such as `pg14` or `pg15`
+    pub fn is_feature_flag(&self, label: &str) -> bool {
+        for v in SUPPORTED_MAJOR_VERSIONS {
+            if label == &format!("pg{}", v) {
+                return true;
+            }
+        }
+        false
     }
 
     pub fn home() -> Result<PathBuf, std::io::Error> {

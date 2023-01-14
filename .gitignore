@@ -9,3 +9,4 @@ target/
 cmake*/
 .direnv
 pgx-examples/*/target
+/bin

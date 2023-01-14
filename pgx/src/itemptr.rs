@@ -13,7 +13,7 @@ use crate::{pg_sys, AllocatedByRust, PgBox};
 
 /// ## Safety
 ///
-/// This function s unsafe becuase it does not check that the specified ItemPointerData pointer
+/// This function s unsafe because it does not check that the specified ItemPointerData pointer
 /// might be null
 #[inline]
 pub unsafe fn item_pointer_get_block_number(
@@ -25,7 +25,7 @@ pub unsafe fn item_pointer_get_block_number(
 
 /// ## Safety
 ///
-/// This function s unsafe becuase it does not check that the specified ItemPointerData pointer
+/// This function s unsafe because it does not check that the specified ItemPointerData pointer
 /// might be null
 #[inline]
 pub unsafe fn item_pointer_get_offset_number(
@@ -121,7 +121,7 @@ pub fn new_item_pointer(
     blockno: pg_sys::BlockNumber,
     offno: pg_sys::OffsetNumber,
 ) -> PgBox<pg_sys::ItemPointerData, AllocatedByRust> {
-    let mut tid = PgBox::<pg_sys::ItemPointerData>::alloc();
+    let mut tid = unsafe { PgBox::<pg_sys::ItemPointerData>::alloc() };
     tid.ip_blkid.bi_hi = (blockno >> 16) as u16;
     tid.ip_blkid.bi_lo = (blockno & 0xffff) as u16;
     tid.ip_posid = offno;

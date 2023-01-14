@@ -454,7 +454,7 @@ impl<'a, T: FromDatum> FromDatum for Array<'a, T> {
     unsafe fn from_polymorphic_datum(
         datum: pg_sys::Datum,
         is_null: bool,
-        _typoid: u32,
+        _typoid: pg_sys::Oid,
     ) -> Option<Array<'a, T>> {
         if is_null {
             None
@@ -503,12 +503,7 @@ impl<T: FromDatum> FromDatum for Vec<Option<T>> {
             None
         } else {
             let array = Array::<T>::from_polymorphic_datum(datum, is_null, typoid).unwrap();
-            let mut v = Vec::with_capacity(array.len());
-
-            for element in array.iter() {
-                v.push(element)
-            }
-            Some(v)
+            Some(array.iter().collect::<Vec<_>>())
         }
     }
 }
@@ -541,7 +536,7 @@ where
         }
 
         if state.is_null() {
-            // shoudln't happen
+            // shouldn't happen
             None
         } else {
             Some(unsafe {
@@ -550,7 +545,7 @@ where
         }
     }
 
-    fn type_oid() -> u32 {
+    fn type_oid() -> pg_sys::Oid {
         unsafe { pg_sys::get_array_type(T::type_oid()) }
     }
 
@@ -588,7 +583,7 @@ where
         }
 
         if state.is_null() {
-            // shoudln't happen
+            // shouldn't happen
             None
         } else {
             Some(unsafe {
@@ -597,7 +592,7 @@ where
         }
     }
 
-    fn type_oid() -> u32 {
+    fn type_oid() -> pg_sys::Oid {
         unsafe { pg_sys::get_array_type(T::type_oid()) }
     }
 

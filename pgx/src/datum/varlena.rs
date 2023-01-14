@@ -303,7 +303,7 @@ where
     unsafe fn from_polymorphic_datum(
         datum: pg_sys::Datum,
         is_null: bool,
-        _typoid: u32,
+        _typoid: pg_sys::Oid,
     ) -> Option<Self> {
         if is_null {
             None
@@ -316,7 +316,7 @@ where
         mut memory_context: PgMemoryContexts,
         datum: pg_sys::Datum,
         is_null: bool,
-        _typoid: u32,
+        _typoid: pg_sys::Oid,
     ) -> Option<Self> {
         if is_null {
             None
@@ -343,7 +343,7 @@ where
         Some(cbor_encode(&self).into())
     }
 
-    fn type_oid() -> u32 {
+    fn type_oid() -> pg_sys::Oid {
         crate::rust_regtypein::<T>()
     }
 }
@@ -355,7 +355,7 @@ where
     unsafe fn from_polymorphic_datum(
         datum: pg_sys::Datum,
         is_null: bool,
-        _typoid: u32,
+        _typoid: pg_sys::Oid,
     ) -> Option<Self> {
         if is_null {
             None
@@ -368,7 +368,7 @@ where
         memory_context: PgMemoryContexts,
         datum: pg_sys::Datum,
         is_null: bool,
-        _typoid: u32,
+        _typoid: pg_sys::Oid,
     ) -> Option<Self> {
         if is_null {
             None
@@ -384,7 +384,7 @@ where
 {
     let mut serialized = StringInfo::new();
 
-    serialized.push_bytes(&[0u8; pg_sys::VARHDRSZ]); // reserve space fo the header
+    serialized.push_bytes(&[0u8; pg_sys::VARHDRSZ]); // reserve space for the header
     serde_cbor::to_writer(&mut serialized, &input).expect("failed to encode as CBOR");
 
     let size = serialized.len() as usize;
@@ -428,7 +428,7 @@ where
 {
     let mut serialized = StringInfo::new();
 
-    serialized.push_bytes(&[0u8; pg_sys::VARHDRSZ]); // reserve space fo the header
+    serialized.push_bytes(&[0u8; pg_sys::VARHDRSZ]); // reserve space for the header
     serde_json::to_writer(&mut serialized, &input).expect("failed to encode as JSON");
 
     let size = serialized.len() as usize;

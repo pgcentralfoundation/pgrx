@@ -53,7 +53,7 @@ statement are:
 
 ```rust
 /* required */
-#[opname( <operater symbol name> )]
+#[opname( <operator symbol name> )]
 
 /* these are optional */
 #[negator( <operator symbol name> )]

@@ -8,9 +8,40 @@ Use of this source code is governed by the MIT license that can be found in the 
 */
 use cargo_metadata::Metadata;
 use cargo_toml::Manifest;
-use eyre::eyre;
-use pgx_pg_config::SUPPORTED_MAJOR_VERSIONS;
+use clap_cargo::Features;
+use eyre::{eyre, Context};
+use pgx_pg_config::{PgConfig, Pgx};
 use std::path::PathBuf;
+
+#[derive(Debug, Clone)]
+pub(crate) enum PgVersionSource {
+    CliArgument(String),
+    FeatureFlag(String),
+    DefaultFeature(String),
+    PgConfig(String),
+}
+
+impl From<PgVersionSource> for String {
+    fn from(v: PgVersionSource) -> Self {
+        match v {
+            PgVersionSource::CliArgument(s) => s,
+            PgVersionSource::FeatureFlag(s) => s,
+            PgVersionSource::DefaultFeature(s) => s,
+            PgVersionSource::PgConfig(s) => s,
+        }
+    }
+}
+
+impl PgVersionSource {
+    fn label(&self) -> &String {
+        match self {
+            PgVersionSource::CliArgument(s) => s,
+            PgVersionSource::FeatureFlag(s) => s,
+            PgVersionSource::DefaultFeature(s) => s,
+            PgVersionSource::PgConfig(s) => s,
+        }
+    }
+}
 
 #[tracing::instrument(skip_all)]
 pub(crate) fn manifest_path(
@@ -35,51 +66,148 @@ pub(crate) fn manifest_path(
     Ok(manifest_path)
 }
 
-pub(crate) fn default_pg_version(manifest: &Manifest) -> Option<String> {
-    let default_features = manifest.features.get("default")?;
-    for default_feature in default_features {
-        for major_version in SUPPORTED_MAJOR_VERSIONS {
-            let potential_feature = format!("pg{}", major_version);
-            if *default_feature == format!("pg{}", major_version) {
-                return Some(potential_feature);
+pub(crate) fn modify_features_for_version(
+    pgx: &Pgx,
+    features: Option<&mut Features>,
+    manifest: &Manifest,
+    pg_version: &PgVersionSource,
+    test: bool,
+) {
+    if let Some(features) = features {
+        if let Some(default_features) = manifest.features.get("default") {
+            if !features.no_default_features {
+                // if the user didn't specify `--no-default-features`, which would otherwise indicate
+                // they think they know what they're doing, we need to build an explicit set of features
+                // to use and turn on `--no-default-features`
+
+                features.no_default_features = true;
+                features.features.extend(
+                    default_features
+                        .iter()
+                        // only include default features that aren't known pgXX version features
+                        .filter(|flag| !pgx.is_feature_flag(flag))
+                        .cloned(),
+                );
             }
+        }
+
+        // if we know we're running from the `pgx-tests/src/framework.rs`, remove any user-specified features
+        // that aren't valid for the manifest
+        if test {
+            features.features.retain(|flag| {
+                if manifest.features.contains_key(flag) {
+                    true
+                } else {
+                    use owo_colors::OwoColorize;
+                    println!(
+                        "{} feature `{}`",
+                        "    Ignoring".bold().yellow(),
+                        flag.bold().white()
+                    );
+                    false
+                }
+            });
+        }
+
+        // no matter what, we need the postgres version we determined to be included in the
+        // set of features to compile with
+        if !features.features.contains(pg_version.label()) {
+            features.features.push(pg_version.label().clone());
         }
     }
-    None
 }
 
-pub(crate) fn features_for_version(
-    mut features: clap_cargo::Features,
+pub(crate) fn pg_config_and_version<'a>(
+    pgx: &'a Pgx,
     manifest: &Manifest,
-    pg_version: &String,
-) -> clap_cargo::Features {
-    let default_features = manifest.features.get("default");
+    specified_pg_version: Option<String>,
+    user_features: Option<&mut Features>,
+    verbose: bool,
+) -> eyre::Result<(&'a PgConfig, PgVersionSource)> {
+    let pg_version = {
+        'outer: loop {
+            if let Some(pg_version) = specified_pg_version {
+                // the user gave us an explicit Postgres version to use, so we will
+                break 'outer Some(PgVersionSource::CliArgument(pg_version));
+            } else if let Some(features) = user_features.as_ref() {
+                // the user did not give us an explicit Postgres version, so see if there's one in the set
+                // of `--feature` flags they gave us
+                for flag in &features.features {
+                    if pgx.is_feature_flag(flag) {
+                        // use the first feature flag that is a Postgres version we support
+                        break 'outer Some(PgVersionSource::FeatureFlag(flag.clone()));
+                    }
+                }
 
-    match default_features {
-        Some(default_features) => {
-            if default_features.contains(&pg_version) {
-                return features;
-            }
-            let default_features = default_features
-                .iter()
-                .filter(|default_feature| {
-                    for supported_major in SUPPORTED_MAJOR_VERSIONS {
-                        if **default_feature == format!("pg{}", supported_major) {
-                            return false;
+                // user didn't give us a feature flag that is a Postgres version
+
+                // if they didn't ask for `--no-default-features` lets see if we have a default
+                // postgres version feature specified in the manifest
+                if !features.no_default_features {
+                    if let Some(default_features) = manifest.features.get("default") {
+                        for flag in default_features {
+                            if pgx.is_feature_flag(flag) {
+                                break 'outer Some(PgVersionSource::DefaultFeature(flag.clone()));
+                            }
                         }
                     }
-                    true
-                })
-                .cloned()
-                .collect::<Vec<_>>();
-            features.no_default_features = true;
-            features.features.extend(default_features);
-            if features.features.iter().all(|f| f != pg_version) {
-                features.features.push(pg_version.clone());
+                }
+            } else {
+                // lets check the manifest for a default feature
+                if let Some(default_features) = manifest.features.get("default") {
+                    for flag in default_features {
+                        if pgx.is_feature_flag(flag) {
+                            break 'outer Some(PgVersionSource::DefaultFeature(flag.clone()));
+                        }
+                    }
+                }
             }
+
+            // we cannot determine the Postgres version the user wants to use
+            break 'outer None;
         }
-        None => (),
     };
 
-    features
+    match pg_version {
+        Some(pg_version) => {
+            // we have determined a Postgres version
+
+            modify_features_for_version(pgx, user_features, manifest, &pg_version, false);
+            let pg_config = pgx.get(&pg_version.label())?;
+
+            if verbose {
+                display_version_info(pg_config, &pg_version);
+            }
+
+            Ok((pg_config, pg_version))
+        }
+        None => Err(eyre!("Could not determine which Postgres version feature flag to use")),
+    }
+}
+
+pub(crate) fn display_version_info(pg_config: &PgConfig, pg_version: &PgVersionSource) {
+    use owo_colors::OwoColorize;
+    eprintln!(
+        "{} {:?} and `pg_config` from {}",
+        "       Using".bold().green(),
+        pg_version.bold().white(),
+        pg_config.path().unwrap().display().cyan()
+    );
+}
+
+pub(crate) fn get_package_manifest(
+    features: &Features,
+    package_nane: Option<&String>,
+    manifest_path: Option<impl AsRef<std::path::Path>>,
+) -> eyre::Result<(Manifest, PathBuf)> {
+    let metadata = crate::metadata::metadata(&features, manifest_path.as_ref())
+        .wrap_err("couldn't get cargo metadata")?;
+    crate::metadata::validate(&metadata)?;
+    let package_manifest_path = crate::manifest::manifest_path(&metadata, package_nane)
+        .wrap_err("Couldn't get manifest path")?;
+
+    Ok((
+        Manifest::from_path(&package_manifest_path).wrap_err("Couldn't parse manifest")?,
+        package_manifest_path,
+    ))
 }

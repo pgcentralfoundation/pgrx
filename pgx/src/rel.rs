@@ -9,8 +9,7 @@ Use of this source code is governed by the MIT license that can be found in the 
 
 //! Provides a safe wrapper around Postgres' `pg_sys::RelationData` struct
 use crate::{
-    direct_function_call, name_data_to_str, pg_sys, FromDatum, IntoDatum, PgBox, PgList,
-    PgTupleDesc,
+    direct_function_call, name_data_to_str, pg_sys, FromDatum, IntoDatum, PgBox, PgTupleDesc,
 };
 use pgx_sql_entity_graph::metadata::{
     ArgumentError, Returns, ReturnsError, SqlMapping, SqlTranslatable,
@@ -61,7 +60,7 @@ impl PgRelation {
         let rel = pg_sys::RelationIdGetRelation(oid);
         if rel.is_null() {
             // relation was recently deleted
-            panic!("Cannot open relation with oid={}", oid);
+            panic!("Cannot open relation with oid={:?}", oid);
         }
 
         PgRelation { boxed: PgBox::from_pg(rel), need_close: true, lockmode: None }
@@ -187,10 +186,12 @@ impl PgRelation {
     }
 
     /// Return an iterator of indices, as `PgRelation`s, attached to this relation
+    #[cfg(feature = "cshim")]
     pub fn indices(
         &self,
         lockmode: pg_sys::LOCKMODE,
     ) -> impl std::iter::Iterator<Item = PgRelation> {
+        use crate::PgList;
         // SAFETY: we know self.boxed is a valid pointer as we created it
         let list = unsafe {
             PgList::<pg_sys::Oid>::from_pg(pg_sys::RelationGetIndexList(self.boxed.as_ptr()))
@@ -209,7 +210,8 @@ impl PgRelation {
     ///
     /// ```rust,no_run
     /// use pgx::{PgRelation, pg_sys};
-    /// let oid = 42;   // a valid pg_class "oid" value
+    /// # let example_pg_class_oid = |i| { unsafe { pg_sys::Oid::from_u32_unchecked(i) } };
+    /// let oid = example_pg_class_oid(42); // a valid pg_class "oid" value
     /// let relation = unsafe { PgRelation::from_pg(pg_sys::RelationIdGetRelation(oid) ) };
     /// let tupdesc = relation.tuple_desc();
     ///
@@ -303,13 +305,13 @@ impl FromDatum for PgRelation {
     unsafe fn from_polymorphic_datum(
         datum: pg_sys::Datum,
         is_null: bool,
-        _typoid: u32,
+        _typoid: pg_sys::Oid,
     ) -> Option<PgRelation> {
         if is_null {
             None
         } else {
             Some(PgRelation::with_lock(
-                datum.value() as _,
+                unsafe { pg_sys::Oid::from_u32_unchecked(u32::try_from(datum.value()).ok()?) },
                 pg_sys::AccessShareLock as pg_sys::LOCKMODE,
             ))
         }
@@ -321,7 +323,7 @@ impl IntoDatum for PgRelation {
         Some(pg_sys::Datum::from(self.oid()))
     }
 
-    fn type_oid() -> u32 {
+    fn type_oid() -> pg_sys::Oid {
         pg_sys::REGCLASSOID
     }
 }

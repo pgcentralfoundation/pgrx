@@ -159,6 +159,16 @@ pub use internal::pg15::*;
 /// A trait applied to all Postgres `pg_sys::Node` types and subtypes
 pub trait PgNode: seal::Sealed {
     /// Format this node
+    ///
+    /// # Safety
+    ///
+    /// While pgx controls the types for which [`PgNode`] is implemented and only pgx can implement
+    /// [`PgNode`] it cannot control the members of those types and a user could assign any pointer
+    /// type member to something invalid that Postgres wouldn't understand.
+    ///
+    /// Because this function is used by `impl Display` we purposely don't mark it `unsafe`.  The
+    /// assumption here, which might be a bad one, is that only intentional misuse would actually
+    /// cause undefined behavior.
     #[inline]
     fn display_node(&self) -> std::string::String {
         // SAFETY: The trait is pub but this impl is private, and
@@ -270,7 +280,7 @@ mod all_versions {
     pub use crate::submodules::htup::*;
 
     /// this comes from `postgres_ext.h`
-    pub const InvalidOid: super::Oid = 0;
+    pub const InvalidOid: crate::Oid = crate::Oid::INVALID;
     pub const InvalidOffsetNumber: super::OffsetNumber = 0;
     pub const FirstOffsetNumber: super::OffsetNumber = 1;
     pub const MaxOffsetNumber: super::OffsetNumber =
@@ -285,6 +295,7 @@ mod all_versions {
     pub const FirstNormalTransactionId: super::TransactionId = 3 as super::TransactionId;
     pub const MaxTransactionId: super::TransactionId = 0xFFFF_FFFF as super::TransactionId;
 
+    #[cfg(feature = "cshim")]
     #[pgx_macros::pg_guard]
     extern "C" {
         pub fn pgx_list_nth(list: *mut super::List, nth: i32) -> *mut std::os::raw::c_void;
@@ -450,25 +461,21 @@ mod all_versions {
         super::get_element_type(typoid) != InvalidOid
     }
 
-    #[inline]
-    pub unsafe fn planner_rt_fetch(
-        index: super::Index,
-        root: *mut super::PlannerInfo,
-    ) -> *mut super::RangeTblEntry {
-        extern "C" {
-            pub fn pgx_planner_rt_fetch(
-                index: super::Index,
-                root: *mut super::PlannerInfo,
-            ) -> *mut super::RangeTblEntry;
-        }
-
-        pgx_planner_rt_fetch(index, root)
+    #[cfg(feature = "cshim")]
+    #[pg_guard]
+    extern "C" {
+        #[link_name = "pgx_planner_rt_fetch"]
+        pub fn planner_rt_fetch(
+            index: super::Index,
+            root: *mut super::PlannerInfo,
+        ) -> *mut super::RangeTblEntry;
     }
 
     /// ```c
     /// #define rt_fetch(rangetable_index, rangetable) \
     ///     ((RangeTblEntry *) list_nth(rangetable, (rangetable_index)-1))
     /// ```
+    #[cfg(feature = "cshim")]
     #[inline]
     pub unsafe fn rt_fetch(
         index: super::Index,
@@ -555,6 +562,7 @@ mod all_versions {
         ) -> bool;
     }
 
+    #[cfg(feature = "cshim")]
     #[pgx_macros::pg_guard]
     extern "C" {
         #[link_name = "pgx_SpinLockInit"]

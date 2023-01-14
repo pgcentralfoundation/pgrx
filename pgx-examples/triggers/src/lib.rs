@@ -61,10 +61,10 @@ mod tests {
     use pgx::prelude::*;
 
     #[pg_test]
-    fn test_insert() {
+    fn test_insert() -> Result<(), spi::Error> {
         Spi::run(
             r#"INSERT INTO test (title, description, payload) VALUES ('a different title', 'a different description', '{"key": "value"}')"#,
-        );
+        )
     }
 }
 

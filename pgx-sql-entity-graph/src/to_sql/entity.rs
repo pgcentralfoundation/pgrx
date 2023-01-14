@@ -39,6 +39,12 @@ pub struct ToSqlConfigEntity {
     pub content: Option<&'static str>,
 }
 impl ToSqlConfigEntity {
+    /// Helper used to implement traits (`Eq`, `Ord`, etc) despite `ToSqlFn` not
+    /// having an implementation for them.
+    #[inline]
+    fn fields(&self) -> (bool, Option<&str>, Option<usize>) {
+        (self.enabled, self.content, self.callback.map(|f| f as usize))
+    }
     /// Given a SqlGraphEntity, this function converts it to SQL based on the current configuration.
     ///
     /// If the config overrides the default behavior (i.e. using the `ToSql` trait), then `Some(eyre::Result)`
@@ -106,27 +112,34 @@ impl ToSqlConfigEntity {
     }
 }
 
+impl std::cmp::PartialOrd for ToSqlConfigEntity {
+    fn partial_cmp(&self, other: &Self) -> Option<std::cmp::Ordering> {
+        Some(self.cmp(&other))
+    }
+}
+impl std::cmp::Ord for ToSqlConfigEntity {
+    fn cmp(&self, other: &Self) -> std::cmp::Ordering {
+        self.fields().cmp(&other.fields())
+    }
+}
 impl std::cmp::PartialEq for ToSqlConfigEntity {
     fn eq(&self, other: &Self) -> bool {
-        (self.enabled, self.content, self.callback.map(|f| f as usize))
-            == (other.enabled, other.content, other.callback.map(|f| f as usize))
+        self.fields() == other.fields()
     }
 }
 impl std::cmp::Eq for ToSqlConfigEntity {}
 impl std::hash::Hash for ToSqlConfigEntity {
     fn hash<H: std::hash::Hasher>(&self, state: &mut H) {
-        self.enabled.hash(state);
-        self.callback.map(|cb| cb as usize).hash(state);
-        self.content.hash(state);
+        self.fields().hash(state);
     }
 }
 impl std::fmt::Debug for ToSqlConfigEntity {
     fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
-        let callback = self.callback.map(|cb| cb as usize);
+        let (enabled, content, callback) = self.fields();
         f.debug_struct("ToSqlConfigEntity")
-            .field("enabled", &self.enabled)
-            .field("callback", &format_args!("{:?}", &callback))
-            .field("content", &self.content)
+            .field("enabled", &enabled)
+            .field("callback", &callback)
+            .field("content", &content)
             .finish()
     }
 }

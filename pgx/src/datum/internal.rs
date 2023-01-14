@@ -23,7 +23,7 @@ use pgx_sql_entity_graph::metadata::{
 ///
 /// ## Implementation Notes
 ///
-/// [Internal] is a wrapper around an `Option<pg_sys::Datum>`, which when retreived via
+/// [Internal] is a wrapper around an `Option<pg_sys::Datum>`, which when retrieved via
 /// `::get/get_mut()` is cast to a pointer of `T`, returning the respective reference.
 ///
 /// ## Safety

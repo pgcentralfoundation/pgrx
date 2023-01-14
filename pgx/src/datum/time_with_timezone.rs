@@ -28,7 +28,7 @@ impl FromDatum for TimeWithTimeZone {
     unsafe fn from_polymorphic_datum(
         datum: pg_sys::Datum,
         is_null: bool,
-        typoid: u32,
+        typoid: pg_sys::Oid,
     ) -> Option<TimeWithTimeZone> {
         if is_null {
             None
@@ -47,14 +47,14 @@ impl FromDatum for TimeWithTimeZone {
 impl IntoDatum for TimeWithTimeZone {
     #[inline]
     fn into_datum(self) -> Option<pg_sys::Datum> {
-        let mut timetz = PgBox::<pg_sys::TimeTzADT>::alloc();
+        let mut timetz = unsafe { PgBox::<pg_sys::TimeTzADT>::alloc() };
         timetz.zone = self.tz_secs;
         timetz.time = self.t.0 as i64;
 
         Some(timetz.into_pg().into())
     }
 
-    fn type_oid() -> u32 {
+    fn type_oid() -> pg_sys::Oid {
         pg_sys::TIMETZOID
     }
 }

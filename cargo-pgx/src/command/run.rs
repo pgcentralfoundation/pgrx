@@ -11,15 +11,16 @@ use crate::command::get::get_property;
 use crate::command::install::install_extension;
 use crate::command::start::start_postgres;
 use crate::command::stop::stop_postgres;
+use crate::manifest::{get_package_manifest, pg_config_and_version};
 use crate::profile::CargoProfile;
 use crate::CommandExecute;
-use cargo_toml::Manifest;
-use eyre::{eyre, WrapErr};
+use eyre::eyre;
 use owo_colors::OwoColorize;
 use pgx_pg_config::{createdb, PgConfig, Pgx};
 use std::os::unix::process::CommandExt;
 use std::path::Path;
 use std::process::Command;
+
 /// Compile/install extension to a pgx-managed Postgres instance and start psql
 #[derive(clap::Args, Debug)]
 #[clap(author)]
@@ -53,44 +54,19 @@ pub(crate) struct Run {
 impl CommandExecute for Run {
     #[tracing::instrument(level = "error", skip(self))]
     fn execute(mut self) -> eyre::Result<()> {
-        let metadata = crate::metadata::metadata(&self.features, self.manifest_path.as_ref())
-            .wrap_err("couldn't get cargo metadata")?;
-        crate::metadata::validate(&metadata)?;
-        let package_manifest_path =
-            crate::manifest::manifest_path(&metadata, self.package.as_ref())
-                .wrap_err("Couldn't get manifest path")?;
-        let package_manifest =
-            Manifest::from_path(&package_manifest_path).wrap_err("Couldn't parse manifest")?;
-
         let pgx = Pgx::from_config()?;
-
-        let (pg_config, pg_version) = match self.pg_version {
-            Some(pg_version) => {
-                match pgx.get(&pg_version) {
-                    Ok(pg_config) => (pg_config, pg_version),
-                    Err(err) => {
-                        if self.dbname.is_some() {
-                            return Err(err);
-                        }
-                        // It's actually the dbname! We should infer from the manifest.
-                        self.dbname = Some(pg_version);
-                        let default_pg_version =
-                            crate::manifest::default_pg_version(&package_manifest)
-                                .ok_or(eyre!("No provided `pg$VERSION` flag."))?;
-                        (pgx.get(&default_pg_version)?, default_pg_version)
-                    }
-                }
-            }
-            None => {
-                // We should infer from the manifest.
-                let default_pg_version = crate::manifest::default_pg_version(&package_manifest)
-                    .ok_or(eyre!("No provided `pg$VERSION` flag."))?;
-                (pgx.get(&default_pg_version)?, default_pg_version)
-            }
-        };
-
-        let features =
-            crate::manifest::features_for_version(self.features, &package_manifest, &pg_version);
+        let (package_manifest, package_manifest_path) = get_package_manifest(
+            &self.features,
+            self.package.as_ref(),
+            self.manifest_path.as_ref(),
+        )?;
+        let (pg_config, _pg_version) = pg_config_and_version(
+            &pgx,
+            &package_manifest,
+            self.pg_version.clone(),
+            Some(&mut self.features),
+            true,
+        )?;
 
         let dbname = match self.dbname {
             Some(dbname) => dbname,
@@ -110,7 +86,7 @@ impl CommandExecute for Run {
             &dbname,
             &profile,
             self.pgcli,
-            &features,
+            &self.features,
         )
     }
 }
