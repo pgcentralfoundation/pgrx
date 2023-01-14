@@ -270,7 +270,7 @@ pub(crate) fn build_extension(
     }
 
     fn apply_sysroot(command: &mut Command, sysroot: &Option<PathBuf>) -> eyre::Result<()> {
-        if let Some(sysroot) = &sysroot {
+        if let Some(sysroot) = sysroot {
             let sysroot_str = sysroot.to_str().ok_or(eyre!("sysroot is not valid utf-8"))?;
             let sysroot_arg = format!("--sysroot={sysroot_str}");
             command.env("BINDGEN_EXTRA_CLANG_ARGS", &sysroot_arg);
