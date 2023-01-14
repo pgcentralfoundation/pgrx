@@ -23,22 +23,24 @@ impl CrossBuildArgs {
     }
 
     pub(crate) fn to_build(&self) -> CrossBuild {
-        match self.is_cross_compiling() {
-            true => CrossBuild::Target {
+        if self.is_cross_compiling() {
+            CrossBuild::Target {
                 target: self.target.clone().unwrap(),
                 sysroot: self.sysroot.clone(),
-            },
-            false => CrossBuild::None,
+            }
+        } else {
+            CrossBuild::None
         }
     }
 
     pub(crate) fn to_host_build(&self) -> CrossBuild {
-        match self.is_cross_compiling() {
-            true => CrossBuild::Host {
+        if self.is_cross_compiling() {
+            CrossBuild::Host {
                 sysroot: self.host_sysroot.clone(),
                 pg_config: self.host_pg_config.clone(),
-            },
-            false => CrossBuild::None,
+            }
+        } else {
+            CrossBuild::None
         }
     }
 }

@@ -100,8 +100,8 @@ impl CommandExecute for Package {
 }
 
 #[tracing::instrument(level = "error", skip_all, fields(
-    pg_version = % pg_config.version() ?,
-    profile = ? profile,
+    pg_version = %pg_config.version()?,
+    profile = ?profile,
     test = is_test,
 ))]
 pub(crate) fn package_extension(

@@ -235,7 +235,7 @@ pub(crate) fn generate_schema(
             command.arg(user_package);
         }
 
-        if let Some(ref user_manifest_path) = user_manifest_path {
+        if let Some(user_manifest_path) = &user_manifest_path {
             command.arg("--manifest-path");
             command.arg(user_manifest_path.as_ref());
         }
@@ -560,7 +560,7 @@ fn create_stub(
     let mut so_rustc_invocation = Command::new("rustc");
     so_rustc_invocation.stderr(Stdio::inherit());
 
-    let rustflags_var_name = if cross_build { "RUSTFLAGS" } else { "HOST_RUSTFLAG" };
+    let rustflags_var_name = if cross_build { "RUSTFLAGS" } else { "HOST_RUSTFLAGS" };
 
     if let Some(rustc_flags_str) = std::env::var(rustflags_var_name).ok() {
         let rustc_flags = rustc_flags_str.split(' ').collect::<Vec<_>>();

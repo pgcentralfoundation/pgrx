@@ -270,7 +270,7 @@ pub(crate) fn build_extension(
     }
 
     fn apply_sysroot(command: &mut Command, sysroot: &Option<PathBuf>) -> eyre::Result<()> {
-        if let Some(ref sysroot) = sysroot {
+        if let Some(sysroot) = &sysroot {
             let sysroot_str = sysroot.to_str().ok_or(eyre!("sysroot is not valid utf-8"))?;
             let sysroot_arg = format!("--sysroot={sysroot_str}");
             command.env("BINDGEN_EXTRA_CLANG_ARGS", &sysroot_arg);
@@ -290,7 +290,7 @@ pub(crate) fn build_extension(
         CrossBuild::Host { pg_config, .. } => {
             if let Some(ref host_pg_config) = pg_config {
                 command.env("PGX_PG_CONFIG_PATH", host_pg_config);
-                command.env("PF_CONFIG", host_pg_config);
+                command.env("PG_CONFIG", host_pg_config);
             }
         }
     }
@@ -305,7 +305,7 @@ pub(crate) fn build_extension(
             apply_sysroot(&mut command, &sysroot)?;
         }
         CrossBuild::Host { sysroot, .. } => {
-            let var_names = vec!["CC", "LD", "CFLAGS", "LDFLAGS"];
+            let var_names = vec!["CC", "LD", "CFLAGS", "LDFLAGS", "AR"];
             for var in var_names {
                 let host_v = "HOST_".to_owned() + var;
                 if let Some(value) = std::env::var_os(host_v) {
