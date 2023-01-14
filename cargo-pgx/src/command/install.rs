@@ -311,6 +311,9 @@ pub(crate) fn build_extension(
                 if let Some(value) = std::env::var_os(host_v) {
                     command.env(var, value);
                 }
+                else {
+                    command.env_remove(var);
+                }
             }
 
             apply_sysroot(&mut command, &sysroot)?;
