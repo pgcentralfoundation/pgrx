@@ -305,7 +305,7 @@ pub(crate) fn build_extension(
             apply_sysroot(&mut command, &sysroot)?;
         }
         Some(CrossBuild::Host { sysroot, .. }) => {
-            let var_names = vec!["CC", "LD", "CFLAGS", "LDFLAGS", "AR"];
+            let var_names = vec!["CC", "LD", "CFLAGS", "LDFLAGS", "AR", "RUSTFLAGS"];
             for var in var_names {
                 let host_v = "HOST_".to_owned() + var;
                 if let Some(value) = std::env::var_os(host_v) {
