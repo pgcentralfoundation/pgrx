@@ -14,28 +14,32 @@ mod tests {
     use crate as pgx_tests;
 
     use pgx::prelude::*;
-    use pgx::SpiClient;
+    use pgx::spi::SpiClient;
 
     #[pg_test]
     fn test_subxact_smoketest() {
-        Spi::execute(|c| {
-            c.update("CREATE TABLE a (v INTEGER)", None, None);
-            let c = c.sub_transaction(|xact| {
-                xact.update("INSERT INTO a VALUES (0)", None, None);
+        Spi::connect(|mut c| {
+            c.update("CREATE TABLE a (v INTEGER)", None, None).unwrap();
+            let c = c.sub_transaction(|mut xact| {
+                xact.update("INSERT INTO a VALUES (0)", None, None).unwrap();
                 assert_eq!(
                     0,
                     xact.select("SELECT v FROM a", Some(1), None)
+                        .unwrap()
                         .first()
-                        .get_datum::<i32>(1)
+                        .get::<i64>(1)
+                        .unwrap()
                         .unwrap()
                 );
-                let xact = xact.sub_transaction(|xact| {
-                    xact.update("INSERT INTO a VALUES (1)", None, None);
+                let xact = xact.sub_transaction(|mut xact| {
+                    xact.update("INSERT INTO a VALUES (1)", None, None).unwrap();
                     assert_eq!(
                         2,
                         xact.select("SELECT COUNT(*) FROM a", Some(1), None)
+                            .unwrap()
                             .first()
-                            .get_datum::<i32>(1)
+                            .get::<i64>(1)
+                            .unwrap()
                             .unwrap()
                     );
                     xact.rollback()
@@ -45,8 +49,10 @@ mod tests {
             assert_eq!(
                 0,
                 c.select("SELECT COUNT(*) FROM a", Some(1), None)
+                    .unwrap()
                     .first()
-                    .get_datum::<i32>(1)
+                    .get::<i64>(1)
+                    .unwrap()
                     .unwrap()
             );
         })
@@ -54,22 +60,24 @@ mod tests {
 
     #[pg_test]
     fn test_commit_on_drop() {
-        Spi::execute(|c| {
-            c.update("CREATE TABLE a (v INTEGER)", None, None);
+        Spi::connect(|mut c| {
+            c.update("CREATE TABLE a (v INTEGER)", None, None).unwrap();
             // The type below is explicit to ensure it's commit on drop by default
-            c.sub_transaction(|xact: SubTransaction<SpiClient, CommitOnDrop>| {
-                xact.update("INSERT INTO a VALUES (0)", None, None);
+            c.sub_transaction(|mut xact: SubTransaction<SpiClient, CommitOnDrop>| {
+                xact.update("INSERT INTO a VALUES (0)", None, None).unwrap();
                 // Dropped explicitly for illustration purposes
                 drop(xact);
             });
             // Create a new client to check the state
-            Spi::execute(|c| {
+            Spi::connect(|c| {
                 // The above insert should have been committed
                 assert_eq!(
                     1,
                     c.select("SELECT COUNT(*) FROM a", Some(1), None)
+                        .unwrap()
                         .first()
-                        .get_datum::<i32>(1)
+                        .get::<i64>(1)
+                        .unwrap()
                         .unwrap()
                 );
             });
@@ -78,23 +86,25 @@ mod tests {
 
     #[pg_test]
     fn test_rollback_on_drop() {
-        Spi::execute(|c| {
-            c.update("CREATE TABLE a (v INTEGER)", None, None);
+        Spi::connect(|mut c| {
+            c.update("CREATE TABLE a (v INTEGER)", None, None).unwrap();
             // The type below is explicit to ensure it's commit on drop by default
-            c.sub_transaction(|xact: SubTransaction<SpiClient, CommitOnDrop>| {
-                xact.update("INSERT INTO a VALUES (0)", None, None);
+            c.sub_transaction(|mut xact: SubTransaction<SpiClient, CommitOnDrop>| {
+                xact.update("INSERT INTO a VALUES (0)", None, None).unwrap();
                 let xact = xact.rollback_on_drop();
                 // Dropped explicitly for illustration purposes
                 drop(xact);
             });
             // Create a new client to check the state
-            Spi::execute(|c| {
+            Spi::connect(|c| {
                 // The above insert should NOT have been committed
                 assert_eq!(
                     0,
                     c.select("SELECT COUNT(*) FROM a", Some(1), None)
+                        .unwrap()
                         .first()
-                        .get_datum::<i32>(1)
+                        .get::<i64>(1)
+                        .unwrap()
                         .unwrap()
                 );
             });

@@ -1,6 +1,6 @@
-use crate::{pg_sys, PgMemoryContexts, SpiClient};
+use crate::{pg_sys, spi::SpiClient, PgMemoryContexts};
 use std::fmt::Debug;
-use std::ops::Deref;
+use std::ops::{Deref, DerefMut};
 
 /// Releases a sub-transaction on Drop
 pub trait ReleaseOnDrop {}
@@ -190,6 +190,12 @@ impl<'conn, Release: ReleaseOnDrop> Deref for SubTransaction<SpiClient<'conn>, R
     }
 }
 
+impl<'conn, Release: ReleaseOnDrop> DerefMut for SubTransaction<SpiClient<'conn>, Release> {
+    fn deref_mut(&mut self) -> &mut Self::Target {
+        &mut self.parent
+    }
+}
+
 // This allows a SubTransaction of a SubTransaction to be de-referenced to SpiClient
 impl<Parent: SubTransactionExt, Release: ReleaseOnDrop> Deref
     for SubTransaction<SubTransaction<Parent>, Release>
@@ -198,6 +204,14 @@ impl<Parent: SubTransactionExt, Release: ReleaseOnDrop> Deref
 
     fn deref(&self) -> &Self::Target {
         &self.parent.parent
+    }
+}
+
+impl<Parent: SubTransactionExt, Release: ReleaseOnDrop> DerefMut
+    for SubTransaction<SubTransaction<Parent>, Release>
+{
+    fn deref_mut(&mut self) -> &mut Self::Target {
+        &mut self.parent.parent
     }
 }
 
