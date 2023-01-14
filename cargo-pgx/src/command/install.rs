@@ -310,8 +310,7 @@ pub(crate) fn build_extension(
                 let host_v = "HOST_".to_owned() + var;
                 if let Some(value) = std::env::var_os(host_v) {
                     command.env(var, value);
-                }
-                else {
+                } else {
                     command.env_remove(var);
                 }
             }
