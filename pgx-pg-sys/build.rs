@@ -10,7 +10,7 @@ Use of this source code is governed by the MIT license that can be found in the 
 use bindgen::callbacks::{DeriveTrait, ImplementsTrait, MacroParsingBehavior};
 use eyre::{eyre, WrapErr};
 use once_cell::sync::Lazy;
-use pgx_pg_config::{prefix_path, PgConfig, PgConfigSelector, Pgx, SUPPORTED_MAJOR_VERSIONS};
+use pgx_pg_config::{PgConfig, PgConfigSelector, Pgx, SUPPORTED_MAJOR_VERSIONS};
 use quote::{quote, ToTokens};
 use std::collections::{BTreeMap, BTreeSet, HashMap, HashSet};
 use std::path::PathBuf;
