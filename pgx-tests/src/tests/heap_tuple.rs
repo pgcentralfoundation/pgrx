@@ -611,6 +611,25 @@ mod sql_generator_tests {
             unimplemented!("Just a SQL generation test")
         }
     }
+
+    #[pg_extern]
+    fn generate_lots_of_dogs() -> SetOfIterator<'static, pgx::composite_type!("Dog")> {
+        let tuple_desc =
+            pgx::PgTupleDesc::for_composite_type("Dog").expect("Coudln't find TestType");
+
+        let tuples: Vec<PgHeapTuple<'_, AllocatedByRust>> = (0..10_000)
+            .into_iter()
+            .map(move |i| {
+                let datums: Vec<Option<pg_sys::Datum>> =
+                    vec!["good boy".into_datum(), i.into_datum()];
+
+                PgHeapTuple::from_datums(tuple_desc.clone(), datums)
+                    .expect("couldn't get heap tuple")
+            })
+            .collect();
+
+        SetOfIterator::new(tuples)
+    }
 }
 
 #[cfg(any(test, feature = "pg_test"))]
@@ -802,7 +821,7 @@ mod tests {
 
     #[pg_test]
     fn test_new_composite_type() {
-        Spi::run("CREATE TYPE DogWithAge AS (name text, age int);");
+        Spi::run("CREATE TYPE DogWithAge AS (name text, age int);").expect("SPI failed");
         let mut heap_tuple = PgHeapTuple::new_composite_type("DogWithAge").unwrap();
 
         assert_eq!(heap_tuple.get_by_name::<String>("name").unwrap(), None);
@@ -832,7 +851,7 @@ mod tests {
 
     #[pg_test]
     fn test_missing_field() {
-        Spi::run("CREATE TYPE DogWithAge AS (name text, age int);");
+        Spi::run("CREATE TYPE DogWithAge AS (name text, age int);").expect("SPI failed");
         let mut heap_tuple = PgHeapTuple::new_composite_type("DogWithAge").unwrap();
 
         const NON_EXISTING_ATTRIBUTE: &str = "DEFINITELY_NOT_EXISTING";
@@ -849,7 +868,7 @@ mod tests {
 
     #[pg_test]
     fn test_missing_number() {
-        Spi::run("CREATE TYPE DogWithAge AS (name text, age int);");
+        Spi::run("CREATE TYPE DogWithAge AS (name text, age int);").expect("SPI failed");
         let mut heap_tuple = PgHeapTuple::new_composite_type("DogWithAge").unwrap();
 
         const NON_EXISTING_ATTRIBUTE: NonZeroUsize = unsafe { NonZeroUsize::new_unchecked(9001) };
@@ -866,7 +885,7 @@ mod tests {
 
     #[pg_test]
     fn test_wrong_type_assumed() {
-        Spi::run("CREATE TYPE DogWithAge AS (name text, age int);");
+        Spi::run("CREATE TYPE DogWithAge AS (name text, age int);").expect("SPI failed");
         let mut heap_tuple = PgHeapTuple::new_composite_type("DogWithAge").unwrap();
 
         // These are **deliberately** the wrong types.
@@ -880,28 +899,28 @@ mod tests {
         );
 
         // These are **deliberately** the wrong types.
-        assert_eq!(
+        assert!(matches!(
             heap_tuple.set_by_name("name", 1_i32),
-            Err(TryFromDatumError::IncompatibleTypes),
-        );
-        assert_eq!(
+            Err(TryFromDatumError::IncompatibleTypes { .. })
+        ));
+        assert!(matches!(
             heap_tuple.set_by_name("age", "Brandy"),
-            Err(TryFromDatumError::IncompatibleTypes),
-        );
+            Err(TryFromDatumError::IncompatibleTypes { .. }),
+        ));
 
         // Now set them properly, to test that we get errors when they're set...
         heap_tuple.set_by_name("name", "Brandy".to_string()).unwrap();
         heap_tuple.set_by_name("age", 42).unwrap();
 
         // These are **deliberately** the wrong types.
-        assert_eq!(
+        assert!(matches!(
             heap_tuple.get_by_name::<i32>("name"),
-            Err(TryFromDatumError::IncompatibleTypes),
-        );
-        assert_eq!(
+            Err(TryFromDatumError::IncompatibleTypes { .. }),
+        ));
+        assert!(matches!(
             heap_tuple.get_by_name::<String>("age"),
-            Err(TryFromDatumError::IncompatibleTypes),
-        );
+            Err(TryFromDatumError::IncompatibleTypes { .. }),
+        ));
     }
 
     #[pg_test]
@@ -914,8 +933,21 @@ mod tests {
         match not_a_dog {
             Ok(_dog) => panic!("got a Dog when we shouldn't have"),
             Err(e) => {
-                assert_eq!(e, pgx::spi::Error::DatumError(TryFromDatumError::IncompatibleTypes))
+                assert!(matches!(
+                    e,
+                    pgx::spi::Error::DatumError(TryFromDatumError::IncompatibleTypes { .. })
+                ))
             }
         }
+    }
+
+    #[pg_test]
+    fn test_tuple_desc_clone() {
+        let result = Spi::connect(|client| {
+            let query = "select * from generate_lots_of_dogs()";
+            client.select(query, None, None)
+        });
+        let table = result.expect("unable to select table result");
+        assert_eq!(table.len(), 10_000);
     }
 }

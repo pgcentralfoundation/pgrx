@@ -9,12 +9,19 @@ Use of this source code is governed by the MIT license that can be found in the 
 
 use bindgen::callbacks::{DeriveTrait, ImplementsTrait, MacroParsingBehavior};
 use eyre::{eyre, WrapErr};
+use once_cell::sync::Lazy;
 use pgx_pg_config::{prefix_path, PgConfig, PgConfigSelector, Pgx, SUPPORTED_MAJOR_VERSIONS};
 use quote::{quote, ToTokens};
-use std::collections::{HashMap, HashSet};
+use std::collections::{BTreeMap, BTreeSet, HashMap, HashSet};
 use std::path::PathBuf;
 use std::process::{Command, Output};
-use syn::{ForeignItem, Item};
+use syn::{ForeignItem, Item, ItemConst};
+
+const BLOCKLISTED_TYPES: [&str; 3] = ["Datum", "NullableDatum", "Oid"];
+
+mod build {
+    pub(super) mod sym_blocklist;
+}
 
 #[derive(Debug)]
 struct PgxOverrides(HashSet<String>);
@@ -64,7 +71,7 @@ impl bindgen::callbacks::ParseCallbacks for PgxOverrides {
         name: &str,
         derive_trait: DeriveTrait,
     ) -> Option<ImplementsTrait> {
-        if name != "Datum" && name != "NullableDatum" {
+        if !BLOCKLISTED_TYPES.contains(&name) {
             return None;
         }
 
@@ -110,9 +117,12 @@ fn main() -> eyre::Result<()> {
     println!("cargo:rerun-if-changed={}", Pgx::config_toml()?.display().to_string(),);
     println!("cargo:rerun-if-changed=include");
     println!("cargo:rerun-if-changed=cshim");
+    emit_missing_rerun_if_env_changed();
 
-    let pg_configs = if std::env::var("PGX_PG_SYS_GENERATE_BINDINGS_FOR_RELEASE")
-        .unwrap_or("false".into())
+    let pg_configs: Vec<(u16, &PgConfig)> = if std::env::var(
+        "PGX_PG_SYS_GENERATE_BINDINGS_FOR_RELEASE",
+    )
+    .unwrap_or("false".into())
         == "1"
     {
         pgx.iter(PgConfigSelector::All)
@@ -120,7 +130,7 @@ fn main() -> eyre::Result<()> {
             .map(|c| (c.major_version().expect("invalid major version"), c))
             .filter_map(|t| {
                 if SUPPORTED_MAJOR_VERSIONS.contains(&t.0) {
-                    Some(t.1)
+                    Some(t)
                 } else {
                     println!(
                         "cargo:warning={} contains a configuration for pg{}, which pgx does not support.",
@@ -135,16 +145,16 @@ fn main() -> eyre::Result<()> {
             .collect()
     } else {
         let mut found = None;
-        for version in SUPPORTED_MAJOR_VERSIONS {
+        for &version in SUPPORTED_MAJOR_VERSIONS {
             if let Err(_) = std::env::var(&format!("CARGO_FEATURE_PG{}", version)) {
                 continue;
             }
             if found.is_some() {
                 return Err(eyre!("Multiple `pg$VERSION` features found, `--no-default-features` may be required."));
             }
-            found = Some(format!("pg{}", version));
+            found = Some((version, format!("pg{}", version)));
         }
-        let found = found.ok_or_else(|| {
+        let (found_ver, found_feat) = found.ok_or_else(|| {
             eyre!(
                 "Did not find `pg$VERSION` feature. `pgx-pg-sys` requires one of {} to be set",
                 SUPPORTED_MAJOR_VERSIONS
@@ -154,8 +164,8 @@ fn main() -> eyre::Result<()> {
                     .join(", ")
             )
         })?;
-        let specific = pgx.get(&found)?;
-        vec![specific]
+        let specific = pgx.get(&found_feat)?;
+        vec![(found_ver, specific)]
     };
     std::thread::scope(|scope| {
         // This is pretty much either always 1 (normally) or 5 (for releases),
@@ -163,8 +173,10 @@ fn main() -> eyre::Result<()> {
         // chunking `pg_configs` based on `thread::available_parallelism()`.
         let threads = pg_configs
             .iter()
-            .map(|pg_config| {
-                scope.spawn(|| generate_bindings(pg_config, &build_paths, is_for_release))
+            .map(|(pg_major_ver, pg_config)| {
+                scope.spawn(|| {
+                    generate_bindings(*pg_major_ver, pg_config, &build_paths, is_for_release)
+                })
             })
             .collect::<Vec<_>>();
         // Most of the rest of this is just for better error handling --
@@ -178,7 +190,7 @@ fn main() -> eyre::Result<()> {
 
     if compile_cshim {
         // compile the cshim for each binding
-        for pg_config in pg_configs {
+        for (_version, pg_config) in pg_configs {
             build_shim(&build_paths.shim_src, &build_paths.shim_dst, &pg_config)?;
         }
     }
@@ -186,22 +198,44 @@ fn main() -> eyre::Result<()> {
     Ok(())
 }
 
+fn emit_missing_rerun_if_env_changed() {
+    // `pgx-pg-config` doesn't emit one for this.
+    println!("cargo:rerun-if-env-changed=PGX_PG_CONFIG_PATH");
+    // Bindgen's behavior depends on these vars, but it doesn't emit them
+    // directly because the output would cause issue with `bindgen-cli`. Do it
+    // on bindgen's behalf.
+    println!("cargo:rerun-if-env-changed=LLVM_CONFIG_PATH");
+    println!("cargo:rerun-if-env-changed=LIBCLANG_PATH");
+    println!("cargo:rerun-if-env-changed=LIBCLANG_STATIC_PATH");
+    // Follows the logic bindgen uses here, more or less.
+    // https://github.com/rust-lang/rust-bindgen/blob/e6dd2c636/bindgen/lib.rs#L2918
+    println!("cargo:rerun-if-env-changed=BINDGEN_EXTRA_CLANG_ARGS");
+    if let Ok(target) = std::env::var("TARGET") {
+        println!("cargo:rerun-if-env-changed=BINDGEN_EXTRA_CLANG_ARGS_{target}");
+        println!(
+            "cargo:rerun-if-env-changed=BINDGEN_EXTRA_CLANG_ARGS_{}",
+            target.replace('-', "_"),
+        );
+    }
+}
+
 fn generate_bindings(
+    major_version: u16,
     pg_config: &PgConfig,
     build_paths: &BuildPaths,
     is_for_release: bool,
 ) -> eyre::Result<()> {
-    let major_version = pg_config.major_version().wrap_err("could not determine major version")?;
     let mut include_h = build_paths.manifest_dir.clone();
     include_h.push("include");
     include_h.push(format!("pg{}.h", major_version));
 
-    let bindgen_output = run_bindgen(&pg_config, &include_h)
+    let bindgen_output = run_bindgen(major_version, &pg_config, &include_h)
         .wrap_err_with(|| format!("bindgen failed for pg{}", major_version))?;
 
     let oids = extract_oids(&bindgen_output);
-    let rewritten_items = rewrite_items(&bindgen_output, is_for_release)
+    let rewritten_items = rewrite_items(&bindgen_output, &oids, is_for_release)
         .wrap_err_with(|| format!("failed to rewrite items for pg{}", major_version))?;
+    let oids = format_builtin_oid_impl(oids);
 
     let dest_dirs = if std::env::var("PGX_PG_SYS_GENERATE_BINDINGS_FOR_RELEASE")
         .unwrap_or("false".into())
@@ -221,7 +255,7 @@ fn generate_bindings(
                 use crate as pg_sys;
                 #[cfg(any(feature = "pg12", feature = "pg13", feature = "pg14", feature = "pg15"))]
                 use crate::NullableDatum;
-                use crate::{PgNode, Datum};
+                use crate::{Datum, Oid, PgNode};
             },
         )
         .wrap_err_with(|| {
@@ -288,9 +322,14 @@ fn write_rs_file(
 
 /// Given a token stream representing a file, apply a series of transformations to munge
 /// the bindgen generated code with some postgres specific enhancements
-fn rewrite_items(file: &syn::File, is_for_release: bool) -> eyre::Result<proc_macro2::TokenStream> {
-    let mut items = apply_pg_guard(&file.items)?;
-    let pgnode_impls = impl_pg_node(&file.items, is_for_release)?;
+fn rewrite_items(
+    file: &syn::File,
+    oids: &BTreeMap<syn::Ident, Box<syn::Expr>>,
+    is_for_release: bool,
+) -> eyre::Result<proc_macro2::TokenStream> {
+    let items_vec = rewrite_oid_consts(&file.items, oids);
+    let mut items = apply_pg_guard(&items_vec)?;
+    let pgnode_impls = impl_pg_node(&items_vec, is_for_release)?;
 
     // append the pgnodes to the set of items
     items.extend(pgnode_impls);
@@ -301,37 +340,82 @@ fn rewrite_items(file: &syn::File, is_for_release: bool) -> eyre::Result<proc_ma
 /// Find all the constants that represent Postgres type OID values.
 ///
 /// These are constants of type `u32` whose name ends in the string "OID"
-fn extract_oids(code: &syn::File) -> proc_macro2::TokenStream {
-    let mut enum_variants = proc_macro2::TokenStream::new();
-    let mut from_impl = proc_macro2::TokenStream::new();
+fn extract_oids(code: &syn::File) -> BTreeMap<syn::Ident, Box<syn::Expr>> {
+    let mut oids = BTreeMap::new(); // we would like to have a nice sorted set
     for item in &code.items {
         match item {
-            Item::Const(c) => {
-                let ident = &c.ident;
+            Item::Const(ItemConst { ident, ty, expr, .. }) => {
+                // Retype as strings for easy comparison
                 let name = ident.to_string();
-                let ty = &c.ty;
-                let ty = quote! {#ty}.to_string();
+                let ty_str = ty.to_token_stream().to_string();
 
-                if ty == "u32" && name.ends_with("OID") && name != "HEAP_HASOID" {
-                    enum_variants.extend(quote! {#ident = crate::#ident as isize, });
-                    from_impl.extend(quote! {crate::#ident => Some(crate::PgBuiltInOids::#ident), })
+                // This heuristic identifies "OIDs"
+                // We're going to warp the const declarations to be our newtype Oid
+                if ty_str == "u32" && is_builtin_oid(&name) {
+                    oids.insert(ident.clone(), expr.clone());
                 }
             }
             _ => {}
         }
     }
+    oids
+}
+
+fn is_builtin_oid(name: &str) -> bool {
+    if name.ends_with("OID") && name != "HEAP_HASOID" {
+        true
+    } else if name.ends_with("RelationId") {
+        true
+    } else if name == "TemplateDbOid" {
+        true
+    } else {
+        false
+    }
+}
+
+fn rewrite_oid_consts(
+    items: &Vec<syn::Item>,
+    oids: &BTreeMap<syn::Ident, Box<syn::Expr>>,
+) -> Vec<syn::Item> {
+    items
+        .into_iter()
+        .map(|item| match item {
+            Item::Const(ItemConst { ident, ty, expr, .. })
+                if ty.to_token_stream().to_string() == "u32" && oids.get(ident) == Some(expr) =>
+            {
+                syn::parse2(quote! { pub const #ident : Oid = Oid(#expr); }).unwrap()
+            }
+            item => item.clone(),
+        })
+        .collect()
+}
+
+fn format_builtin_oid_impl<'a>(
+    oids: BTreeMap<syn::Ident, Box<syn::Expr>>,
+) -> proc_macro2::TokenStream {
+    let enum_variants: proc_macro2::TokenStream;
+    let from_impl: proc_macro2::TokenStream;
+    (enum_variants, from_impl) = oids
+        .iter()
+        .map(|(ident, expr)| {
+            (quote! { #ident = #expr, }, quote! { #expr => Ok(BuiltinOid::#ident), })
+        })
+        .unzip();
 
     quote! {
+        use crate::{NotBuiltinOid};
+
         #[derive(Copy, Clone, Eq, PartialEq, Hash, Ord, PartialOrd, Debug)]
-        pub enum PgBuiltInOids {
+        pub enum BuiltinOid {
             #enum_variants
         }
 
-        impl PgBuiltInOids {
-            pub fn from(oid: crate::Oid) -> Option<PgBuiltInOids> {
-                match oid {
+        impl BuiltinOid {
+            pub const fn from_u32(uint: u32) -> Result<BuiltinOid, NotBuiltinOid> {
+                match uint {
+                    0 => Err(NotBuiltinOid::Invalid),
                     #from_impl
-                    _ => None,
+                    _ => Err(NotBuiltinOid::Ambiguous),
                 }
             }
         }
@@ -575,16 +659,20 @@ struct StructDescriptor<'a> {
 
 /// Given a specific postgres version, `run_bindgen` generates bindings for the given
 /// postgres version and returns them as a token stream.
-fn run_bindgen(pg_config: &PgConfig, include_h: &PathBuf) -> eyre::Result<syn::File> {
-    let major_version = pg_config.major_version()?;
-    eprintln!("Generating bindings for pg{}", major_version);
-    let includedir_server = pg_config.includedir_server()?;
+fn run_bindgen(
+    major_version: u16,
+    pg_config: &PgConfig,
+    include_h: &PathBuf,
+) -> eyre::Result<syn::File> {
+    eprintln!("Generating bindings for pg{major_version}");
     let bindings = bindgen::Builder::default()
         .header(include_h.display().to_string())
-        .clang_arg(&format!("-I{}", includedir_server.display()))
         .clang_args(&extra_bindgen_clang_args(pg_config)?)
+        .clang_args(pg_target_include_flags(major_version, pg_config)?)
+        .detect_include_paths(target_env_tracked("PGX_BINDGEN_NO_DETECT_INCLUDES").is_none())
         .parse_callbacks(Box::new(PgxOverrides::default()))
         .blocklist_type("(Nullable)?Datum") // manually wrapping datum types for correctness
+        .blocklist_type("Oid") // "Oid" is not just any u32
         .blocklist_function("varsize_any") // pgx converts the VARSIZE_ANY macro, so we don't want to also have this function, which is in heaptuple.c
         .blocklist_function("(?:query|expression)_tree_walker")
         .blocklist_function(".*(?:set|long)jmp")
@@ -628,6 +716,32 @@ fn run_bindgen(pg_config: &PgConfig, include_h: &PathBuf) -> eyre::Result<syn::F
         .unwrap_or_else(|e| panic!("Unable to generate bindings for pg{}: {:?}", major_version, e));
 
     syn::parse_file(bindings.to_string().as_str()).map_err(|e| From::from(e))
+}
+
+fn env_tracked(s: &str) -> Option<String> {
+    println!("cargo:rerun-if-env-changed={s}");
+    std::env::var(s).ok()
+}
+
+fn target_env_tracked(s: &str) -> Option<String> {
+    let target = std::env::var("TARGET").unwrap();
+    env_tracked(&format!("{s}_{target}")).or_else(|| env_tracked(s))
+}
+
+/// Returns `Err` if `pg_config` errored, `None` if we should
+fn pg_target_include_flags(pg_version: u16, pg_config: &PgConfig) -> eyre::Result<Option<String>> {
+    let var = "PGX_INCLUDEDIR_SERVER";
+    let value =
+        target_env_tracked(&format!("{var}_PG{pg_version}")).or_else(|| target_env_tracked(var));
+    match value {
+        // No configured value: ask `pg_config`.
+        None => Ok(Some(format!("-I{}", pg_config.includedir_server()?.display()))),
+        // Configured to empty string: assume bindgen is getting it some other
+        // way, pass nothing.
+        Some(overridden) if overridden.is_empty() => Ok(None),
+        // Configured to non-empty string: pass to bindgen
+        Some(overridden) => Ok(Some(format!("-I{overridden}"))),
+    }
 }
 
 fn build_shim(shim_src: &PathBuf, shim_dst: &PathBuf, pg_config: &PgConfig) -> eyre::Result<()> {
@@ -824,6 +938,21 @@ fn run_command(mut command: &mut Command, version: &str) -> eyre::Result<Output>
     Ok(rc)
 }
 
+// Plausibly it would be better to generate a regex to pass to bindgen for this,
+// but this is less error-prone for now.
+static BLOCKLISTED: Lazy<BTreeSet<&'static str>> =
+    Lazy::new(|| build::sym_blocklist::SYMBOLS.iter().copied().collect::<BTreeSet<&str>>());
+fn is_blocklisted_item(item: &ForeignItem) -> bool {
+    let sym_name = match item {
+        ForeignItem::Fn(f) => &f.sig.ident,
+        // We don't *need* to filter statics too (only functions), but it
+        // doesn't hurt.
+        ForeignItem::Static(s) => &s.ident,
+        _ => return false,
+    };
+    BLOCKLISTED.contains(sym_name.to_string().as_str())
+}
+
 fn apply_pg_guard(items: &Vec<syn::Item>) -> eyre::Result<proc_macro2::TokenStream> {
     let mut out = proc_macro2::TokenStream::new();
     for item in items {
@@ -831,11 +960,16 @@ fn apply_pg_guard(items: &Vec<syn::Item>) -> eyre::Result<proc_macro2::TokenStre
             Item::ForeignMod(block) => {
                 let abi = &block.abi;
                 for item in &block.items {
+                    if is_blocklisted_item(item) {
+                        continue;
+                    }
                     match item {
-                        ForeignItem::Fn(func) => out.extend(quote! {
-                            #[pgx_macros::pg_guard]
-                            #abi { #func }
-                        }),
+                        ForeignItem::Fn(func) => {
+                            out.extend(quote! {
+                                #[pgx_macros::pg_guard]
+                                #abi { #func }
+                            });
+                        }
                         other => out.extend(quote! { #abi { #other } }),
                     }
                 }

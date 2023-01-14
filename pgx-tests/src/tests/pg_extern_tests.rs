@@ -103,15 +103,15 @@ mod tests {
     }
 
     #[pg_extern]
-    fn anyele_type(x: pgx::AnyElement) -> i32 {
-        x.oid() as i32
+    fn anyele_type(x: pgx::AnyElement) -> pg_sys::Oid {
+        x.oid()
     }
 
     #[pg_test]
     fn test_anyele_type() {
         let interval_type =
-            Spi::get_one::<i32>(r#"SELECT tests."anyele_type"('5 hours'::interval)"#);
-        assert_eq!(interval_type, Ok(Some(pg_sys::INTERVALOID as _)));
+            Spi::get_one::<pg_sys::Oid>(r#"SELECT tests."anyele_type"('5 hours'::interval)"#);
+        assert_eq!(interval_type, Ok(Some(pg_sys::INTERVALOID)));
     }
 
     #[pg_extern(name = "custom_name")]

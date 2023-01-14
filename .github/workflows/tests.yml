@@ -81,6 +81,15 @@ jobs:
           pkg-config \
           postgresql-$PG_VER \
           postgresql-server-dev-$PG_VER
+
+        echo "----- Set up cross compilation -----"
+        sudo apt-get install -y crossbuild-essential-arm64
+        rustup target add aarch64-unknown-linux-gnu
+
+        echo 'CARGO_TARGET_AARCH64_UNKNOWN_LINUX_GNU_LINKER=aarch64-linux-gnu-gcc' >> $GITHUB_ENV
+        # TODO: not all of these should be needed, but for now it's likely fine.
+        echo 'BINDGEN_EXTRA_CLANG_ARGS_aarch64-unknown-linux-gnu=-target aarch64-unknown-linux-gnu -isystem /usr/aarch64-linux-gnu/include/ -ccc-gcc-name aarch64-linux-gnu-gcc' >> $GITHUB_ENV
+
         echo ""
 
         echo "----- Set up Postgres permissions -----"
@@ -132,6 +141,13 @@ jobs:
           --package pgx-macros \
           --package pgx-pg-sys \
           --package pgx-sql-entity-graph
+
+    - name: Check that cross-compiled pgx-tests can build
+      run: |
+        cargo build --tests \
+          --features "pg$PG_VER" \
+          --package pgx-tests \
+          --target aarch64-unknown-linux-gnu
 
     - name: Run pgx-tests with cshim enabled
       run: |

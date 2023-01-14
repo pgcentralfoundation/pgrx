@@ -1,3 +1,4 @@
+#![forbid(unsafe_op_in_unsafe_fn)]
 //! If this test compiles, and assuming it includes a usage of all the things pgx generates code for
 //! then we know that pgx has ::fully::qualified::all::its::pgx::symbols
 
@@ -49,6 +50,19 @@ mod pgx_modqual_tests {
     fn foo() {}
 
     #[pg_extern]
+    fn foo_i32() -> i32 {
+        42
+    }
+
+    #[pg_extern]
+    fn foo_two_args_return_void(_a: i32, _b: String) {}
+
+    #[pg_extern]
+    fn foo_return_null() -> Option<i32> {
+        None
+    }
+
+    #[pg_extern]
     fn foo_composite() -> ::pgx::composite_type!("Foo") {
         todo!()
     }
@@ -67,6 +81,20 @@ mod pgx_modqual_tests {
 
     #[pg_extern]
     fn foo_set() -> ::pgx::iter::SetOfIterator<'static, i64> {
+        todo!()
+    }
+
+    #[pg_extern]
+    fn foo_result_set(
+    ) -> std::result::Result<::pgx::iter::SetOfIterator<'static, i64>, Box<dyn std::error::Error>>
+    {
+        todo!()
+    }
+
+    #[pg_extern]
+    fn foo_result_option_set(
+    ) -> std::result::Result<::pgx::iter::SetOfIterator<'static, i64>, Box<dyn std::error::Error>>
+    {
         todo!()
     }
 

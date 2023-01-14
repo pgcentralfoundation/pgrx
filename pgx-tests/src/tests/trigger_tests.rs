@@ -113,7 +113,8 @@ mod tests {
             r#"
             CREATE TABLE tests.before_insert_field_update (species TEXT)
         "#,
-        );
+        )
+        .expect("SPI failed");
 
         Spi::run(
             r#"
@@ -122,14 +123,16 @@ mod tests {
                 FOR EACH ROW
                 EXECUTE PROCEDURE tests.field_species_fox_to_bear()
         "#,
-        );
+        )
+        .expect("SPI failed");
 
         Spi::run(
             r#"
             INSERT INTO tests.before_insert_field_update (species)
                 VALUES ('Fox')
         "#,
-        );
+        )
+        .expect("SPI failed");
 
         let retval = Spi::get_one::<&str>("SELECT species FROM tests.before_insert_field_update;");
         assert_eq!(retval, Ok(Some("Bear")));
@@ -157,7 +160,8 @@ mod tests {
             r#"
             CREATE TABLE tests.before_insert_add_field (name TEXT, booper TEXT)
         "#,
-        );
+        )
+        .expect("SPI failed");
 
         Spi::run(
             r#"
@@ -166,14 +170,16 @@ mod tests {
                 FOR EACH ROW
                 EXECUTE PROCEDURE tests.add_field_boopers()
         "#,
-        );
+        )
+        .expect("SPI failed");
 
         Spi::run(
             r#"
             INSERT INTO tests.before_insert_add_field (name)
                 VALUES ('Nami')
         "#,
-        );
+        )
+        .expect("SPI failed");
 
         let retval = Spi::get_one::<&str>("SELECT booper FROM tests.before_insert_add_field;");
         assert_eq!(retval, Ok(Some("Swooper")));
@@ -204,7 +210,8 @@ mod tests {
             r#"
             CREATE TABLE tests.before_update_skip (title TEXT)
         "#,
-        );
+        )
+        .expect("SPI failed");
 
         Spi::run(
             r#"
@@ -213,20 +220,24 @@ mod tests {
                 FOR EACH ROW
                 EXECUTE PROCEDURE tests.intercept_bears()
         "#,
-        );
+        )
+        .expect("SPI failed");
 
         Spi::run(
             r#"
             INSERT INTO tests.before_update_skip (title)
                 VALUES ('Fox')
         "#,
-        );
+        )
+        .expect("SPI failed");
+
         Spi::run(
             r#"
             UPDATE tests.before_update_skip SET title = 'Bear'
                 WHERE title = 'Fox'
         "#,
-        );
+        )
+        .expect("SPI failed");
 
         let retval = Spi::get_one::<&str>("SELECT title FROM tests.before_update_skip;");
         assert_eq!(retval, Ok(Some("Fox")));
@@ -292,7 +303,8 @@ mod tests {
                 trigger_extra_args TEXT[]
             )
         "#,
-        );
+        )
+        .expect("SPI failed");
 
         Spi::run(
             r#"
@@ -301,14 +313,16 @@ mod tests {
                 FOR EACH ROW
                 EXECUTE PROCEDURE tests.inserts_trigger_metadata('Bears', 'Dogs')
         "#,
-        );
+        )
+        .expect("SPI failed");
 
         Spi::run(
             r#"
             INSERT INTO tests.before_insert_trigger_metadata (marker)
                 VALUES ('Fox')
         "#,
-        );
+        )
+        .expect("SPI failed");
 
         let marker =
             Spi::get_one::<&str>("SELECT marker FROM tests.before_insert_trigger_metadata;")?
@@ -419,7 +433,8 @@ mod tests {
                 trigger_extra_args TEXT[]
             )
         "#,
-        );
+        )
+        .expect("SPI failed");
 
         Spi::run(
             r#"
@@ -428,14 +443,16 @@ mod tests {
                 FOR EACH ROW
                 EXECUTE PROCEDURE tests.inserts_trigger_metadata_safe('Bears', 'Dogs')
         "#,
-        );
+        )
+        .expect("SPI failed");
 
         Spi::run(
             r#"
             INSERT INTO tests.before_insert_trigger_metadata_safe (marker)
                 VALUES ('Fox')
         "#,
-        );
+        )
+        .expect("SPI failed");
 
         let marker =
             Spi::get_one::<&str>("SELECT marker FROM tests.before_insert_trigger_metadata_safe;")?
@@ -513,7 +530,8 @@ mod tests {
             r#"
             CREATE TABLE tests.has_sql_option_set (species TEXT)
         "#,
-        );
+        )
+        .expect("SPI failed");
 
         Spi::run(
             r#"
@@ -522,14 +540,16 @@ mod tests {
                 FOR EACH ROW
                 EXECUTE PROCEDURE tests.has_sql_option_set_and_respects_it()
         "#,
-        );
+        )
+        .expect("SPI failed");
 
         Spi::run(
             r#"
             INSERT INTO tests.has_sql_option_set (species)
                 VALUES ('Fox')
         "#,
-        );
+        )
+        .expect("SPI failed");
 
         let retval = Spi::get_one::<&str>("SELECT species FROM tests.has_sql_option_set;");
         assert_eq!(retval, Ok(Some("Fox")));
@@ -548,7 +568,8 @@ mod tests {
             r#"
             CREATE TABLE tests.has_noop_postgres (species TEXT)
         "#,
-        );
+        )
+        .expect("SPI failed");
 
         Spi::run(
             r#"
@@ -557,14 +578,16 @@ mod tests {
                 FOR EACH ROW
                 EXECUTE PROCEDURE tests.noop_postgres()
         "#,
-        );
+        )
+        .expect("SPI failed");
 
         Spi::run(
             r#"
             INSERT INTO tests.has_noop_postgres (species)
                 VALUES ('Fox')
         "#,
-        );
+        )
+        .expect("SPI failed");
 
         let retval = Spi::get_one::<&str>("SELECT species FROM tests.has_noop_postgres;");
         assert_eq!(retval, Ok(Some("Fox")));
@@ -583,7 +606,8 @@ mod tests {
             r#"
             CREATE TABLE tests.has_noop_rust (species TEXT)
         "#,
-        );
+        )
+        .expect("SPI failed");
 
         Spi::run(
             r#"
@@ -592,14 +616,16 @@ mod tests {
                 FOR EACH ROW
                 EXECUTE PROCEDURE tests.noop_rust()
         "#,
-        );
+        )
+        .expect("SPI failed");
 
         Spi::run(
             r#"
             INSERT INTO tests.has_noop_rust (species)
                 VALUES ('Fox')
         "#,
-        );
+        )
+        .expect("SPI failed");
 
         let retval = Spi::get_one::<&str>("SELECT species FROM tests.has_noop_rust;");
         assert_eq!(retval, Ok(Some("Fox")));

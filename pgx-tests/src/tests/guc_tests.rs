@@ -28,10 +28,10 @@ mod tests {
         );
         assert_eq!(GUC.get(), true);
 
-        Spi::run("SET test.bool TO false;");
+        Spi::run("SET test.bool TO false;").expect("SPI failed");
         assert_eq!(GUC.get(), false);
 
-        Spi::run("SET test.bool TO true;");
+        Spi::run("SET test.bool TO true;").expect("SPI failed");
         assert_eq!(GUC.get(), true);
     }
 
@@ -49,10 +49,10 @@ mod tests {
         );
         assert_eq!(GUC.get(), 42);
 
-        Spi::run("SET test.int = -1");
+        Spi::run("SET test.int = -1").expect("SPI failed");
         assert_eq!(GUC.get(), -1);
 
-        Spi::run("SET test.int = 12");
+        Spi::run("SET test.int = 12").expect("SPI failed");
         assert_eq!(GUC.get(), 12);
     }
 
@@ -70,13 +70,13 @@ mod tests {
         );
         assert_eq!(GUC.get(), 42.42);
 
-        Spi::run("SET test.float = -1");
+        Spi::run("SET test.float = -1").expect("SPI failed");
         assert_eq!(GUC.get(), -1.0);
 
-        Spi::run("SET test.float = 12");
+        Spi::run("SET test.float = 12").expect("SPI failed");
         assert_eq!(GUC.get(), 12.0);
 
-        Spi::run("SET test.float = 3.333");
+        Spi::run("SET test.float = 3.333").expect("SPI failed");
         assert_eq!(GUC.get(), 3.333);
     }
 
@@ -93,10 +93,10 @@ mod tests {
         assert!(GUC.get().is_some());
         assert_eq!(GUC.get().unwrap(), "this is a test");
 
-        Spi::run("SET test.string = 'foo'");
+        Spi::run("SET test.string = 'foo'").expect("SPI failed");
         assert_eq!(GUC.get().unwrap(), "foo");
 
-        Spi::run("SET test.string = DEFAULT");
+        Spi::run("SET test.string = DEFAULT").expect("SPI failed");
         assert_eq!(GUC.get().unwrap(), "this is a test");
     }
 
@@ -112,10 +112,10 @@ mod tests {
         );
         assert!(GUC.get().is_none());
 
-        Spi::run("SET test.string = 'foo'");
+        Spi::run("SET test.string = 'foo'").expect("SPI failed");
         assert_eq!(GUC.get().unwrap(), "foo");
 
-        Spi::run("SET test.string = DEFAULT");
+        Spi::run("SET test.string = DEFAULT").expect("SPI failed");
         assert!(GUC.get().is_none());
     }
 
@@ -137,10 +137,10 @@ mod tests {
         );
         assert_eq!(GUC.get(), TestEnum::Two);
 
-        Spi::run("SET test.enum = 'One'");
+        Spi::run("SET test.enum = 'One'").expect("SPI failed");
         assert_eq!(GUC.get(), TestEnum::One);
 
-        Spi::run("SET test.enum = 'three'");
+        Spi::run("SET test.enum = 'three'").expect("SPI failed");
         assert_eq!(GUC.get(), TestEnum::Three);
     }
 }

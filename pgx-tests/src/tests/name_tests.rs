@@ -21,6 +21,6 @@ mod tests {
 
     #[pg_test]
     fn renamed_func() {
-        Spi::run("SELECT renamed_func();");
+        Spi::run("SELECT renamed_func();").expect("SPI failed");
     }
 }

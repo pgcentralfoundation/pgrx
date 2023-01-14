@@ -19,6 +19,7 @@ mod default_arg_value_tests;
 mod derive_pgtype_lifetimes;
 mod enum_type_tests;
 mod fcinfo_tests;
+mod from_into_datum_tests;
 mod guc_tests;
 mod heap_tuple;
 #[cfg(feature = "cshim")]

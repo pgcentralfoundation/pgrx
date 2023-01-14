@@ -231,8 +231,8 @@ mod tests {
     }
 
     #[pg_test(error = "array contains NULL")]
-    fn test_array_deny_nulls() {
-        Spi::run("SELECT iterate_array_with_deny_null(ARRAY[1,2,3, NULL]::int[])");
+    fn test_array_deny_nulls() -> Result<(), spi::Error> {
+        Spi::run("SELECT iterate_array_with_deny_null(ARRAY[1,2,3, NULL]::int[])")
     }
 
     #[pg_test]
@@ -288,7 +288,7 @@ mod tests {
                         PgBuiltInOids::INT4ARRAYOID.oid(),
                         owned_vec.as_slice().into_datum(),
                     )]),
-                )
+                )?
                 .first()
                 .get_one::<Json>()
         })?

@@ -93,7 +93,7 @@ impl FromDatum for Inet {
     unsafe fn from_polymorphic_datum(
         datum: pg_sys::Datum,
         is_null: bool,
-        _typoid: u32,
+        _typoid: pg_sys::Oid,
     ) -> Option<Inet> {
         if is_null {
             None
@@ -114,7 +114,7 @@ impl IntoDatum for Inet {
         }
     }
 
-    fn type_oid() -> u32 {
+    fn type_oid() -> pg_sys::Oid {
         pg_sys::INETOID
     }
 }

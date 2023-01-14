@@ -19,8 +19,13 @@ use std::num::NonZeroUsize;
 /// If converting a Datum to a Rust type fails, this is the set of possible reasons why.
 #[derive(thiserror::Error, Debug, Clone, PartialEq, Eq)]
 pub enum TryFromDatumError {
-    #[error("The specified type of the Datum is not compatible with the desired Rust type.")]
-    IncompatibleTypes,
+    #[error("Postgres type {datum_type} {datum_oid} is not compatible with the Rust type {rust_type} {rust_oid}")]
+    IncompatibleTypes {
+        rust_type: &'static str,
+        rust_oid: pg_sys::Oid,
+        datum_type: String,
+        datum_oid: pg_sys::Oid,
+    },
 
     #[error("The specified attribute number `{0}` is not present")]
     NoSuchAttributeNumber(NonZeroUsize),
@@ -113,7 +118,12 @@ pub trait FromDatum {
         Self: Sized + IntoDatum,
     {
         if !Self::is_compatible_with(type_oid) {
-            Err(TryFromDatumError::IncompatibleTypes)
+            Err(TryFromDatumError::IncompatibleTypes {
+                rust_type: std::any::type_name::<Self>(),
+                rust_oid: Self::type_oid(),
+                datum_type: lookup_type_name(type_oid),
+                datum_oid: type_oid,
+            })
         } else {
             Ok(FromDatum::from_polymorphic_datum(datum, is_null, type_oid))
         }
@@ -131,10 +141,28 @@ pub trait FromDatum {
         Self: Sized + IntoDatum,
     {
         if !Self::is_compatible_with(type_oid) {
-            Err(TryFromDatumError::IncompatibleTypes)
+            Err(TryFromDatumError::IncompatibleTypes {
+                rust_type: std::any::type_name::<Self>(),
+                rust_oid: Self::type_oid(),
+                datum_type: lookup_type_name(type_oid),
+                datum_oid: type_oid,
+            })
         } else {
             Ok(FromDatum::from_datum_in_memory_context(memory_context, datum, is_null, type_oid))
         }
+    }
+}
+
+/// Retrieves a Postgres type name given its Oid
+pub(crate) fn lookup_type_name(oid: pg_sys::Oid) -> String {
+    unsafe {
+        // SAFETY: nothing to concern ourselves with other than just calling into Postgres FFI
+        // and Postgres will raise an ERROR if we pass it an invalid Oid, so it'll never return a null
+        let cstr_name = pg_sys::format_type_extended(oid, -1, 0);
+        let cstr = CStr::from_ptr(cstr_name);
+        let typname = cstr.to_string_lossy().to_string();
+        pg_sys::pfree(cstr_name as _); // don't leak the palloc'd cstr_name
+        typname
     }
 }
 
@@ -150,6 +178,25 @@ impl FromDatum for pg_sys::Datum {
             None
         } else {
             Some(datum)
+        }
+    }
+}
+
+impl FromDatum for pg_sys::Oid {
+    #[inline]
+    unsafe fn from_polymorphic_datum(
+        datum: pg_sys::Datum,
+        is_null: bool,
+        _: pg_sys::Oid,
+    ) -> Option<pg_sys::Oid> {
+        if is_null {
+            None
+        } else {
+            datum
+                .value()
+                .try_into()
+                .ok()
+                .map(|uint| unsafe { pg_sys::Oid::from_u32_unchecked(uint) })
         }
     }
 }
@@ -302,7 +349,7 @@ impl<'a> FromDatum for &'a str {
         mut memory_context: PgMemoryContexts,
         datum: pg_sys::Datum,
         is_null: bool,
-        _typoid: u32,
+        _typoid: pg_sys::Oid,
     ) -> Option<Self>
     where
         Self: Sized,
@@ -387,7 +434,7 @@ impl<'a> FromDatum for &'a [u8] {
     unsafe fn from_polymorphic_datum(
         datum: pg_sys::Datum,
         is_null: bool,
-        _typoid: u32,
+        _typoid: pg_sys::Oid,
     ) -> Option<&'a [u8]> {
         if is_null || datum.is_null() {
             None
@@ -401,7 +448,7 @@ impl<'a> FromDatum for &'a [u8] {
         mut memory_context: PgMemoryContexts,
         datum: pg_sys::Datum,
         is_null: bool,
-        _typoid: u32,
+        _typoid: pg_sys::Oid,
     ) -> Option<Self>
     where
         Self: Sized,
@@ -428,7 +475,7 @@ impl FromDatum for Vec<u8> {
     unsafe fn from_polymorphic_datum(
         datum: pg_sys::Datum,
         is_null: bool,
-        typoid: u32,
+        typoid: pg_sys::Oid,
     ) -> Option<Vec<u8>> {
         if is_null || datum.is_null() {
             None
@@ -477,7 +524,7 @@ impl<T> FromDatum for PgBox<T, AllocatedByPostgres> {
         mut memory_context: PgMemoryContexts,
         datum: pg_sys::Datum,
         is_null: bool,
-        _typoid: u32,
+        _typoid: pg_sys::Oid,
     ) -> Option<Self>
     where
         Self: Sized,

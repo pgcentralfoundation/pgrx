@@ -99,20 +99,21 @@ mod tests {
     }
 
     #[pg_test]
-    fn test_my_some_schema_type() {
+    fn test_my_some_schema_type() -> Result<(), spi::Error> {
         Spi::connect(|mut c| {
             // "MySomeSchemaType" is in 'some_schema', so it needs to be discoverable
-            c.update("SET search_path TO some_schema,public", None, None);
+            c.update("SET search_path TO some_schema,public", None, None)?;
             assert_eq!(
                 String::from("test"),
-                c.select("SELECT '\"test\"'::MySomeSchemaType", None, None)
+                c.select("SELECT '\"test\"'::MySomeSchemaType", None, None)?
                     .first()
                     .get_one::<MySomeSchemaType>()
                     .expect("get_one::<MySomeSchemaType>() failed")
                     .unwrap()
                     .0
             );
-        });
+            Ok(())
+        })
     }
 
     #[pg_test]

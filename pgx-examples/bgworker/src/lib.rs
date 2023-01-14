@@ -64,21 +64,23 @@ pub extern "C" fn background_worker_main(arg: pg_sys::Datum) {
         }
 
         // within a transaction, execute an SQL statement, and log its results
-        BackgroundWorker::transaction(|| {
+        let result: Result<(), pgx::spi::Error> = BackgroundWorker::transaction(|| {
             Spi::connect(|client| {
                 let tuple_table = client.select(
                     "SELECT 'Hi', id, ''||a FROM (SELECT id, 42 from generate_series(1,10) id) a ",
                     None,
                     None,
-                );
-                tuple_table.for_each(|tuple| {
-                    let a = tuple.by_ordinal(1).unwrap().value::<String>().unwrap();
-                    let b = tuple.by_ordinal(2).unwrap().value::<i32>().unwrap();
-                    let c = tuple.by_ordinal(3).unwrap().value::<String>().unwrap();
-                    log!("from bgworker: ({}, {}, {})", a, b, c);
-                });
-            });
+                )?;
+                for tuple in tuple_table {
+                    let a = tuple.get_datum_by_ordinal(1)?.value::<String>()?;
+                    let b = tuple.get_datum_by_ordinal(2)?.value::<i32>()?;
+                    let c = tuple.get_datum_by_ordinal(3)?.value::<String>()?;
+                    log!("from bgworker: ({:?}, {:?}, {:?})", a, b, c);
+                }
+                Ok(())
+            })
         });
+        result.unwrap_or_else(|e| panic!("got an error: {}", e))
     }
 
     log!("Goodbye from inside the {} BGWorker! ", BackgroundWorker::get_name());

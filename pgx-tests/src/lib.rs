@@ -23,6 +23,6 @@ pub mod pg_test {
     }
 
     pub fn postgresql_conf_options() -> Vec<&'static str> {
-        vec![]
+        vec!["shared_preload_libraries='pgx_tests'"]
     }
 }

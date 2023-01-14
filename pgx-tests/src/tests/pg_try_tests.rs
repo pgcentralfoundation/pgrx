@@ -56,7 +56,7 @@ fn get_relation_name(oid: pg_sys::Oid) -> String {
     })
     .catch_when(PgSqlErrorCode::ERRCODE_INTERNAL_ERROR, |_error| {
         // so in the case the oid isn't a valid relation, just return a generic string
-        format!("<{oid} is not a relation>")
+        format!("<{oid:?} is not a relation>")
     })
     .execute()
 }
@@ -74,7 +74,8 @@ mod tests {
     // see: c5cd61d7bfdfb5236ef0f8b98f433b35a2444346
     #[pg_test]
     fn test_we_dont_blow_out_errdata_stack_size() {
-        Spi::run("SELECT get_relation_name(x) FROM generate_series(1, 1000) x");
+        Spi::run("SELECT get_relation_name(x) FROM generate_series(1, 1000) x")
+            .expect("SPI failed");
     }
 
     #[pg_test(error = "panic in walker")]
