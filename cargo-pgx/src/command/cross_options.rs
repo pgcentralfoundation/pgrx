@@ -22,32 +22,31 @@ impl CrossBuildArgs {
         self.target.is_some()
     }
 
-    pub(crate) fn to_build(&self) -> CrossBuild {
+    pub(crate) fn to_build(&self) -> Option<CrossBuild> {
         if self.is_cross_compiling() {
-            CrossBuild::Target {
+            Some(CrossBuild::Target {
                 target: self.target.clone().unwrap(),
                 sysroot: self.sysroot.clone(),
-            }
+            })
         } else {
-            CrossBuild::None
+            None
         }
     }
 
-    pub(crate) fn to_host_build(&self) -> CrossBuild {
+    pub(crate) fn to_host_build(&self) -> Option<CrossBuild> {
         if self.is_cross_compiling() {
-            CrossBuild::Host {
+            Some(CrossBuild::Host {
                 sysroot: self.host_sysroot.clone(),
                 pg_config: self.host_pg_config.clone(),
-            }
+            })
         } else {
-            CrossBuild::None
+            None
         }
     }
 }
 
 #[derive(Debug)]
 pub(crate) enum CrossBuild {
-    None,
     Target { target: String, sysroot: Option<PathBuf> },
     Host { sysroot: Option<PathBuf>, pg_config: Option<PathBuf> },
 }

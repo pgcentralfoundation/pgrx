@@ -237,7 +237,7 @@ pub(crate) fn build_extension(
     user_package: Option<&String>,
     profile: &CargoProfile,
     features: &clap_cargo::Features,
-    cross_options: &CrossBuild,
+    cross_options: &Option<CrossBuild>,
 ) -> eyre::Result<std::process::Output> {
     let flags = std::env::var("PGX_BUILD_FLAGS").unwrap_or_default();
 
@@ -282,12 +282,12 @@ pub(crate) fn build_extension(
 
     // set PG_CONFIG
     match cross_options {
-        CrossBuild::None | CrossBuild::Target { .. } => {
+        None | Some(CrossBuild::Target { .. }) => {
             if let Some(pg_config) = std::env::var_os("PGX_PG_CONFIG_PATH") {
                 command.env("PG_CONFIG", pg_config);
             }
         }
-        CrossBuild::Host { pg_config, .. } => {
+        Some(CrossBuild::Host { pg_config, .. }) => {
             if let Some(ref host_pg_config) = pg_config {
                 command.env("PGX_PG_CONFIG_PATH", host_pg_config);
                 command.env("PG_CONFIG", host_pg_config);
@@ -297,14 +297,14 @@ pub(crate) fn build_extension(
 
     // sysroot and target handling
     match cross_options {
-        CrossBuild::None => {}
-        CrossBuild::Target { target, sysroot } => {
+        None => {}
+        Some(CrossBuild::Target { target, sysroot }) => {
             command.arg("--target");
             command.arg(target);
 
             apply_sysroot(&mut command, &sysroot)?;
         }
-        CrossBuild::Host { sysroot, .. } => {
+        Some(CrossBuild::Host { sysroot, .. }) => {
             let var_names = vec!["CC", "LD", "CFLAGS", "LDFLAGS", "AR"];
             for var in var_names {
                 let host_v = "HOST_".to_owned() + var;
