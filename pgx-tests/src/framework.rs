@@ -646,8 +646,10 @@ fn get_cargo_test_features() -> eyre::Result<clap_cargo::Features> {
                     "no `--features` specified in the cargo argument list: {:?}",
                     cargo_user_args
                 ))?;
-                features.features =
-                    configured_features.split_ascii_whitespace().map(|s| s.to_string()).collect();
+                features.features = configured_features
+                    .split(|c: char| c.is_ascii_whitespace() || c == ',')
+                    .map(|s| s.to_string())
+                    .collect();
             }
             "--all-features" => features.all_features = true,
             _ => {}
