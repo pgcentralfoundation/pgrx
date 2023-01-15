@@ -20,7 +20,7 @@ use quote::{quote, ToTokens, TokenStreamExt};
 use std::convert::TryFrom;
 use syn::parse::{Parse, ParseStream};
 use syn::spanned::Spanned;
-use syn::Token;
+use syn::{GenericArgument, PathArguments, Token, Type};
 
 #[derive(Debug, Clone)]
 pub struct ReturningIteratedItem {
@@ -119,13 +119,34 @@ impl TryFrom<&syn::ReturnType> for Returning {
                                 path.clone()
                             };
 
-                            for segment in &option_inner_path.segments {
-                                let ident_string = segment.ident.to_string();
-                                match ident_string.as_str() {
-                                    "SetOfIterator" => saw_setof_iterator = true,
-                                    "TableIterator" => saw_table_iterator = true,
-                                    _ => (),
-                                };
+                            let mut segments = option_inner_path.segments.clone();
+                            'outer: loop {
+                                for segment in &segments {
+                                    let ident_string = segment.ident.to_string();
+                                    match ident_string.as_str() {
+                                        "Option" => match &segment.arguments {
+                                            PathArguments::AngleBracketed(bracketed) => {
+                                                match bracketed.args.first().unwrap() {
+                                                    GenericArgument::Type(ty) => match ty {
+                                                        Type::Path(this_path) => {
+                                                            segments =
+                                                                this_path.path.segments.clone();
+                                                            saw_option_ident = true;
+                                                            continue 'outer;
+                                                        }
+                                                        _ => continue,
+                                                    },
+                                                    _ => continue,
+                                                };
+                                            }
+                                            _ => continue,
+                                        },
+                                        "SetOfIterator" => saw_setof_iterator = true,
+                                        "TableIterator" => saw_table_iterator = true,
+                                        _ => (),
+                                    };
+                                }
+                                break;
                             }
 
                             if saw_setof_iterator {
