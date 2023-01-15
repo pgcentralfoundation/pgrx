@@ -662,17 +662,19 @@ fn get_bindings(
     pg_config: &PgConfig,
     include_h: &PathBuf,
 ) -> eyre::Result<syn::File> {
-    let bindings =
-        if let Some(path) = target_env_tracked(&format!("PGX_RAW_BINDINGS_PG{major_version}")) {
-            std::fs::read_to_string(&path)
-                .wrap_err_with(|| format!("failed to read raw bindings from {path:?}"))?
-        } else {
-            let bindings = run_bindgen(major_version, pg_config, include_h)?;
-            if let Some(path) = env_tracked("PGX_PG_SYS_EXTRA_OUTPUT_PATH") {
-                std::fs::write(&path, &bindings)?;
-            }
-            bindings
-        };
+    let bindings = if let Some(info_dir) =
+        target_env_tracked(&format!("PGX_TARGET_INFO_PATH_PG{major_version}"))
+    {
+        let bindings_file = format!("{info_dir}/pg{major_version}_raw_bindings.rs");
+        std::fs::read_to_string(&bindings_file)
+            .wrap_err_with(|| format!("failed to read raw bindings from {bindings_file}"))?
+    } else {
+        let bindings = run_bindgen(major_version, pg_config, include_h)?;
+        if let Some(path) = env_tracked("PGX_PG_SYS_EXTRA_OUTPUT_PATH") {
+            std::fs::write(&path, &bindings)?;
+        }
+        bindings
+    };
     syn::parse_file(bindings.as_str()).wrap_err_with(|| "failed to parse generated bindings")
 }
 
