@@ -39,6 +39,7 @@ enum CargoPgxSubCommands {
     Connect(super::connect::Connect),
     Test(super::test::Test),
     Get(super::get::Get),
+    Cross(super::cross::Cross),
 }
 
 impl CommandExecute for CargoPgxSubCommands {
@@ -58,6 +59,7 @@ impl CommandExecute for CargoPgxSubCommands {
             Connect(c) => c.execute(),
             Test(c) => c.execute(),
             Get(c) => c.execute(),
+            Cross(c) => c.execute(),
         }
     }
 }

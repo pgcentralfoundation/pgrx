@@ -8,6 +8,7 @@ Use of this source code is governed by the MIT license that can be found in the 
 */
 
 pub(crate) mod connect;
+pub(crate) mod cross;
 pub(crate) mod get;
 pub(crate) mod init;
 pub(crate) mod install;
