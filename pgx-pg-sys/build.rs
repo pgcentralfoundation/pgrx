@@ -229,7 +229,7 @@ fn generate_bindings(
     include_h.push("include");
     include_h.push(format!("pg{}.h", major_version));
 
-    let bindgen_output = run_bindgen(major_version, &pg_config, &include_h)
+    let bindgen_output = get_bindings(major_version, &pg_config, &include_h)
         .wrap_err_with(|| format!("bindgen failed for pg{}", major_version))?;
 
     let oids = extract_oids(&bindgen_output);
@@ -657,13 +657,32 @@ struct StructDescriptor<'a> {
     children: Vec<usize>,
 }
 
+fn get_bindings(
+    major_version: u16,
+    pg_config: &PgConfig,
+    include_h: &PathBuf,
+) -> eyre::Result<syn::File> {
+    let bindings =
+        if let Some(path) = target_env_tracked(&format!("PGX_RAW_BINDINGS_PG{major_version}")) {
+            std::fs::read_to_string(&path)
+                .wrap_err_with(|| format!("failed to read raw bindings from {path:?}"))?
+        } else {
+            let bindings = run_bindgen(major_version, pg_config, include_h)?;
+            if let Some(path) = env_tracked("PGX_PG_SYS_EXTRA_OUTPUT_PATH") {
+                std::fs::write(&path, &bindings)?;
+            }
+            bindings
+        };
+    syn::parse_file(bindings.as_str()).wrap_err_with(|| "failed to parse generated bindings")
+}
+
 /// Given a specific postgres version, `run_bindgen` generates bindings for the given
 /// postgres version and returns them as a token stream.
 fn run_bindgen(
     major_version: u16,
     pg_config: &PgConfig,
     include_h: &PathBuf,
-) -> eyre::Result<syn::File> {
+) -> eyre::Result<String> {
     eprintln!("Generating bindings for pg{major_version}");
     let bindings = bindgen::Builder::default()
         .header(include_h.display().to_string())
@@ -713,9 +732,9 @@ fn run_bindgen(
         .derive_partialord(false)
         .layout_tests(false)
         .generate()
-        .unwrap_or_else(|e| panic!("Unable to generate bindings for pg{}: {:?}", major_version, e));
+        .wrap_err_with(|| format!("Unable to generate bindings for pg{}", major_version))?;
 
-    syn::parse_file(bindings.to_string().as_str()).map_err(|e| From::from(e))
+    Ok(bindings.to_string())
 }
 
 fn env_tracked(s: &str) -> Option<String> {
