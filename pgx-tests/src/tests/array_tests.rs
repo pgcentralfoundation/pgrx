@@ -165,6 +165,31 @@ fn arr_sort_uniq(arr: Array<i32>) -> Vec<i32> {
     v
 }
 
+#[pg_extern]
+fn create_int_array(len: i32) -> IntArray {
+    let mut array_datum = IntArray::new_array_with_len(len as usize);
+    let data_slice = array_datum.into_mut_slice();
+    for (i, el) in data_slice.iter_mut().enumerate() {
+        *el = i as i32 + 1
+    }
+    array_datum
+}
+
+#[pg_extern]
+fn create_bigint_array(len: i32) -> IntArray<i64> {
+    let mut array_datum = IntArray::<i64>::new_array_with_len(len as usize);
+    let data_slice = array_datum.into_mut_slice();
+    for (i, el) in data_slice.iter_mut().enumerate() {
+        *el = i as i64 + 1
+    }
+    array_datum
+}
+
+#[pg_extern]
+fn create_empty_int_array() -> IntArray<i32> {
+    IntArray::<i32>::new_empty_array()
+}
+
 #[cfg(any(test, feature = "pg_test"))]
 #[pgx::pg_schema]
 mod tests {
@@ -360,5 +385,35 @@ mod tests {
     #[should_panic]
     fn test_arr_sort_uniq_with_null() -> Result<(), pgx::spi::Error> {
         Spi::get_one::<Vec<i32>>("SELECT arr_sort_uniq(ARRAY[3,2,NULL,2,1]::integer[])").map(|_| ())
+    }
+
+    #[pg_test]
+    fn test_create_int_array() {
+        let sql = r#"
+        SELECT create_int_array(5)
+        "#;
+
+        let result = Spi::get_one::<Vec<i32>>(sql).expect("problem!");
+        assert_eq!(result, Some(vec![1, 2, 3, 4, 5]));
+    }
+
+    #[pg_test]
+    fn test_create_bigint_array() {
+        let sql = r#"
+        SELECT create_bigint_array(5)
+        "#;
+
+        let result = Spi::get_one::<Vec<i64>>(sql).expect("problem!");
+        assert_eq!(result, Some(vec![1i64, 2, 3, 4, 5]));
+    }
+
+    #[pg_test]
+    fn test_create_empty_int_array() {
+        let sql = r#"
+        SELECT create_empty_int_array()
+        "#;
+
+        let result = Spi::get_one::<Vec<i32>>(sql).expect("problem!");
+        assert_eq!(result, Some(vec![]));
     }
 }

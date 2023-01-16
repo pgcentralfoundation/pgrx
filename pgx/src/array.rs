@@ -53,7 +53,7 @@ unsafe fn ARR_HASNULL(a: *mut pg_sys::ArrayType) -> bool {
 /// that the returned pointer points, so don't attempt to `pfree` it.
 #[allow(non_snake_case)]
 #[inline(always)]
-const unsafe fn ARR_DIMS(a: *mut pg_sys::ArrayType) -> *mut i32 {
+pub(crate) const unsafe fn ARR_DIMS(a: *mut pg_sys::ArrayType) -> *mut i32 {
     // #define ARR_DIMS(a) \
     // ((int *) (((char *) (a)) + sizeof(ArrayType)))
 
@@ -110,7 +110,7 @@ unsafe fn ARR_NULLBITMAP(a: *mut pg_sys::ArrayType) -> *mut pg_sys::bits8 {
 /// number of dimensions and total number of items.
 #[allow(non_snake_case)]
 #[inline(always)]
-const fn ARR_OVERHEAD_NONULLS(ndims: usize) -> usize {
+pub(crate) const fn ARR_OVERHEAD_NONULLS(ndims: usize) -> usize {
     // #define ARR_OVERHEAD_NONULLS(ndims) \
     // MAXALIGN(sizeof(ArrayType) + 2 * sizeof(int) * (ndims))
 
@@ -146,11 +146,24 @@ unsafe fn ARR_DATA_OFFSET(a: *mut pg_sys::ArrayType) -> usize {
 /// that the returned pointer points, so don't attempt to `pfree` it.
 #[allow(non_snake_case)]
 #[inline(always)]
-unsafe fn ARR_DATA_PTR(a: *mut pg_sys::ArrayType) -> *mut u8 {
+pub(crate) unsafe fn ARR_DATA_PTR(a: *mut pg_sys::ArrayType) -> *mut u8 {
     // #define ARR_DATA_PTR(a) \
     // (((char *) (a)) + ARR_DATA_OFFSET(a))
 
     unsafe { a.cast::<u8>().add(ARR_DATA_OFFSET(a)) }
+}
+
+/// Returns a pointer to an array of array lower bounds.
+/// # Safety
+/// Does a field access, but doesn't deref out of bounds of ArrayType.  The caller asserts that
+/// `a` is a properly allocated [`pg_sys::ArrayType`]
+#[allow(non_snake_case)]
+#[inline(always)]
+pub(crate) unsafe fn ARR_LBOUND(a: *mut pg_sys::ArrayType) -> *mut i32 {
+    a.cast::<u8>()
+        .add(std::mem::size_of::<pg_sys::ArrayType>())
+        .add(std::mem::size_of::<i32>() * ((*a).ndim as usize))
+        .cast::<i32>()
 }
 
 /**
@@ -235,6 +248,12 @@ impl RawArray {
         self.ptr
     }
 
+    /// Returns the inner raw pointer to the ArrayType.
+    #[inline]
+    pub fn as_ptr(&self) -> NonNull<pg_sys::ArrayType> {
+        self.ptr
+    }
+
     /// Get the number of dimensions.
     /// Will be in 0..=[pg_sys::MAXDIM].
     #[inline]
@@ -306,7 +325,7 @@ impl RawArray {
     [ARR_HASNULL]: <https://git.postgresql.org/gitweb/?p=postgresql.git;a=blob;f=src/include/utils/array.h;h=4ae6c3be2f8b57afa38c19af2779f67c782e4efc;hb=278273ccbad27a8834dfdf11895da9cd91de4114#l284>
     */
     #[allow(unused)]
-    fn nullable(&self) -> bool {
+    pub(crate) fn nullable(&self) -> bool {
         self.data_offset() != 0
     }
 
