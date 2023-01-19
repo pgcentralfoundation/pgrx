@@ -50,4 +50,4 @@ pub use crate::pg_sys::{
 };
 
 // Sub-transactions
-pub use crate::subxact::*;
+pub use crate::subxact::{SubTransaction, SubTransactionExt};

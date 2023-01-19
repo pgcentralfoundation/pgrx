@@ -15,6 +15,7 @@ mod tests {
 
     use pgx::prelude::*;
     use pgx::spi::SpiClient;
+    use pgx::subxact::CommitOnDrop;
 
     #[pg_test]
     fn test_subxact_smoketest() {
