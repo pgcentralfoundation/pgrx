@@ -351,6 +351,14 @@ impl<'a, AllocatedBy: WhoAllocated> PgHeapTuple<'a, AllocatedBy> {
         self.tuple.into_datum()
     }
 
+    /// Consumes this [`PgHeapTuple`], returning a pointer to a [`pg_sys::HeapTupleData`] that can
+    /// be passed to a Postgres FFI function.  It'll be freed whenever Postgres frees the `MemoryContext`
+    /// in which it was allocated.
+    #[inline]
+    pub fn into_pg(self) -> *mut pg_sys::HeapTupleData {
+        self.tuple.into_pg()
+    }
+
     /// Returns the number of attributes in this [`PgHeapTuple`].
     #[inline]
     pub fn len(&self) -> usize {
