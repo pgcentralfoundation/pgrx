@@ -27,7 +27,9 @@ mod build {
 struct PgxOverrides(HashSet<String>);
 
 fn is_nightly() -> bool {
-    let rustc = std::env::var_os("RUSTC").map(PathBuf::from).unwrap_or_else(|| "rustc".into());
+    let rustc = std::env::var_os("RUSTC")
+        .map(PathBuf::from)
+        .unwrap_or_else(|| "rustc".into());
     let output = match std::process::Command::new(rustc).arg("--verbose").output() {
         Ok(out) if out.status.success() => String::from_utf8_lossy(&out.stdout).trim().to_owned(),
         _ => return false,
@@ -114,7 +116,10 @@ fn main() -> eyre::Result<()> {
 
     let pgx = Pgx::from_config()?;
 
-    println!("cargo:rerun-if-changed={}", Pgx::config_toml()?.display().to_string(),);
+    println!(
+        "cargo:rerun-if-changed={}",
+        Pgx::config_toml()?.display().to_string(),
+    );
     println!("cargo:rerun-if-changed=include");
     println!("cargo:rerun-if-changed=cshim");
     emit_missing_rerun_if_env_changed();
@@ -164,8 +169,19 @@ fn main() -> eyre::Result<()> {
                     .join(", ")
             )
         })?;
-        let specific = pgx.get(&found_feat)?;
-        vec![(found_ver, specific)]
+
+        if PgConfig::is_in_environment() {
+            let pg_config = PgConfig::from_env()?;
+            let major_version = pg_config.major_version()?;
+
+            if major_version != found_ver {
+                panic!("Feature flag `pg{found_ver}` does not match version from the environment-described PgConfig (`{major_version}`)")
+            }
+            vec![(major_version, pg_config)]
+        } else {
+            let specific = pgx.get(&found_feat)?;
+            vec![(found_ver, specific)]
+        }
     };
     std::thread::scope(|scope| {
         // This is pretty much either always 1 (normally) or 5 (for releases),
@@ -183,7 +199,11 @@ fn main() -> eyre::Result<()> {
         // `thread::scope` already joins the threads for us before it returns.
         let results = threads
             .into_iter()
-            .map(|thread| thread.join().expect("thread panicked while generating bindings"))
+            .map(|thread| {
+                thread
+                    .join()
+                    .expect("thread panicked while generating bindings")
+            })
             .collect::<Vec<eyre::Result<_>>>();
         results.into_iter().try_for_each(|r| r)
     })?;
@@ -297,7 +317,9 @@ struct BuildPaths {
 impl BuildPaths {
     fn from_env() -> Self {
         // Cargo guarantees these are provided, so unwrap is fine.
-        let manifest_dir = std::env::var_os("CARGO_MANIFEST_DIR").map(PathBuf::from).unwrap();
+        let manifest_dir = std::env::var_os("CARGO_MANIFEST_DIR")
+            .map(PathBuf::from)
+            .unwrap();
         let out_dir = std::env::var_os("OUT_DIR").map(PathBuf::from).unwrap();
         Self {
             src_dir: manifest_dir.join("src"),
@@ -345,7 +367,9 @@ fn extract_oids(code: &syn::File) -> BTreeMap<syn::Ident, Box<syn::Expr>> {
     let mut oids = BTreeMap::new(); // we would like to have a nice sorted set
     for item in &code.items {
         match item {
-            Item::Const(ItemConst { ident, ty, expr, .. }) => {
+            Item::Const(ItemConst {
+                ident, ty, expr, ..
+            }) => {
                 // Retype as strings for easy comparison
                 let name = ident.to_string();
                 let ty_str = ty.to_token_stream().to_string();
@@ -381,9 +405,9 @@ fn rewrite_oid_consts(
     items
         .into_iter()
         .map(|item| match item {
-            Item::Const(ItemConst { ident, ty, expr, .. })
-                if ty.to_token_stream().to_string() == "u32" && oids.get(ident) == Some(expr) =>
-            {
+            Item::Const(ItemConst {
+                ident, ty, expr, ..
+            }) if ty.to_token_stream().to_string() == "u32" && oids.get(ident) == Some(expr) => {
                 syn::parse2(quote! { pub const #ident : Oid = Oid(#expr); }).unwrap()
             }
             item => item.clone(),
@@ -399,7 +423,10 @@ fn format_builtin_oid_impl<'a>(
     (enum_variants, from_impl) = oids
         .iter()
         .map(|(ident, expr)| {
-            (quote! { #ident = #expr, }, quote! { #expr => Ok(BuiltinOid::#ident), })
+            (
+                quote! { #ident = #expr, },
+                quote! { #expr => Ok(BuiltinOid::#ident), },
+            )
         })
         .unzip();
 
@@ -613,14 +640,22 @@ impl<'a> From<&'a [syn::Item]> for StructGraph<'a> {
             }
         }
 
-        StructGraph { name_tab, item_offset_tab, descriptors }
+        StructGraph {
+            name_tab,
+            item_offset_tab,
+            descriptors,
+        }
     }
 }
 
 impl<'a> StructDescriptor<'a> {
     /// children returns an iterator over the children of this node in the graph
     fn children(&'a self, graph: &'a StructGraph) -> StructDescriptorChildren {
-        StructDescriptorChildren { offset: 0, descriptor: self, graph }
+        StructDescriptorChildren {
+            offset: 0,
+            descriptor: self,
+            graph,
+        }
     }
 }
 
@@ -757,7 +792,10 @@ fn pg_target_include_flags(pg_version: u16, pg_config: &PgConfig) -> eyre::Resul
         target_env_tracked(&format!("{var}_PG{pg_version}")).or_else(|| target_env_tracked(var));
     match value {
         // No configured value: ask `pg_config`.
-        None => Ok(Some(format!("-I{}", pg_config.includedir_server()?.display()))),
+        None => Ok(Some(format!(
+            "-I{}",
+            pg_config.includedir_server()?.display()
+        ))),
         // Configured to empty string: assume bindgen is getting it some other
         // way, pass nothing.
         Some(overridden) if overridden.is_empty() => Ok(None),
@@ -957,7 +995,10 @@ fn run_command(mut command: &mut Command, version: &str) -> eyre::Result<Output>
             dbg.push_str(&format!("[{}] [stderr] {}\n", version, line));
         }
     }
-    dbg.push_str(&format!("[{}] /----------------------------------------\n", version));
+    dbg.push_str(&format!(
+        "[{}] /----------------------------------------\n",
+        version
+    ));
 
     eprintln!("{}", dbg);
     Ok(rc)
@@ -965,8 +1006,12 @@ fn run_command(mut command: &mut Command, version: &str) -> eyre::Result<Output>
 
 // Plausibly it would be better to generate a regex to pass to bindgen for this,
 // but this is less error-prone for now.
-static BLOCKLISTED: Lazy<BTreeSet<&'static str>> =
-    Lazy::new(|| build::sym_blocklist::SYMBOLS.iter().copied().collect::<BTreeSet<&str>>());
+static BLOCKLISTED: Lazy<BTreeSet<&'static str>> = Lazy::new(|| {
+    build::sym_blocklist::SYMBOLS
+        .iter()
+        .copied()
+        .collect::<BTreeSet<&str>>()
+});
 fn is_blocklisted_item(item: &ForeignItem) -> bool {
     let sym_name = match item {
         ForeignItem::Fn(f) => &f.sig.ident,
@@ -1009,7 +1054,10 @@ fn apply_pg_guard(items: &Vec<syn::Item>) -> eyre::Result<proc_macro2::TokenStre
 }
 
 fn rust_fmt(path: &PathBuf) -> eyre::Result<()> {
-    let out = run_command(Command::new("rustfmt").arg(path).current_dir("."), "[bindings_diff]");
+    let out = run_command(
+        Command::new("rustfmt").arg(path).current_dir("."),
+        "[bindings_diff]",
+    );
     match out {
         Ok(_) => Ok(()),
         Err(e)

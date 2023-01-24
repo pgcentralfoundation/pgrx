@@ -138,9 +138,9 @@ impl PgConfig {
     ///
     /// It also requires that the `PGX_PG_CONFIG_AS_ENV` variable be set to some value that isn't
     /// the string `"false"`.
-    pub fn from_env() -> Option<Self> {
+    pub fn from_env() -> eyre::Result<Self> {
         if !Self::is_in_environment() {
-            None
+            Err(eyre::eyre!("`PgConfig` not described in the environment"))
         } else {
             const PREFIX: &str = "PGX_PG_CONFIG_";
 
@@ -153,7 +153,7 @@ impl PgConfig {
                 }
             }
 
-            Some(Self {
+            Ok(Self {
                 version: None,
                 pg_config: None,
                 known_props: Some(known_props),
@@ -466,8 +466,7 @@ impl Pgx {
     ) -> impl std::iter::Iterator<Item = eyre::Result<PgConfig>> {
         match (which, PgConfig::is_in_environment()) {
             (PgConfigSelector::All, true) | (PgConfigSelector::Environment, _) => {
-                vec![PgConfig::from_env().ok_or(eyre!("PGX_PG_CONFIG_AS_ENV not found"))]
-                    .into_iter()
+                vec![PgConfig::from_env()].into_iter()
             }
 
             (PgConfigSelector::All, _) => {
@@ -677,7 +676,7 @@ fn parse_version() {
 fn from_empty_env() -> eyre::Result<()> {
     // without "PGX_PG_CONFIG_AS_ENV" we can't get one of these
     let pg_config = PgConfig::from_env();
-    assert!(pg_config.is_none());
+    assert!(pg_config.is_err());
 
     // but now we can
     std::env::set_var("PGX_PG_CONFIG_AS_ENV", "true");
@@ -685,7 +684,7 @@ fn from_empty_env() -> eyre::Result<()> {
     std::env::set_var("PGX_PG_CONFIG_INCLUDEDIR-SERVER", "/path/to/server/headers");
     std::env::set_var("PGX_PG_CONFIG_CPPFLAGS", "some cpp flags");
 
-    let pg_config = PgConfig::from_env().expect("failed to make a PgConfig from the environment");
+    let pg_config = PgConfig::from_env().unwrap();
     assert_eq!(pg_config.major_version()?, 15, "Major version should match");
     assert_eq!(pg_config.minor_version()?, 1, "Minor version should match");
     assert_eq!(
