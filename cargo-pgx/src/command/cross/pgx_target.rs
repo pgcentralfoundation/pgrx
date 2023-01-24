@@ -48,13 +48,27 @@ pub(crate) struct PgxTarget {
     /// provided `pg_config` is not that version.
     #[arg(long, short = 'P', value_parser)]
     pub pg_version: Option<u16>,
+
+    /// Scratch directory to use to build the temporary crate. Defaults to a
+    /// temporary directory, and shouldn't usually need to be specified. This
+    /// directory should not already exist.
+    #[arg(long, value_parser)]
+    pub scratch_dir: Option<PathBuf>,
 }
 
 impl CommandExecute for PgxTarget {
     fn execute(self) -> eyre::Result<()> {
-        let temp = tempfile::tempdir()?;
-        make_target_info(&self, temp.path())?;
-        temp.close()?;
+        let mut temp: Option<tempfile::TempDir> = None;
+        let temp_path = if let Some(scratch) = &self.scratch_dir {
+            &**scratch
+        } else {
+            temp = Some(tempfile::tempdir()?);
+            temp.as_ref().unwrap().path()
+        };
+        make_target_info(&self, temp_path)?;
+        if let Some(temp) = temp {
+            temp.close()?;
+        }
         Ok(())
     }
 }
