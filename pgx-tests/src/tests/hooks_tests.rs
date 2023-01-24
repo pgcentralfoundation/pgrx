@@ -25,6 +25,16 @@ mod tests {
             events: u32,
         }
         impl PgHooks for TestHook {
+            /// Hook before the logs are being processed by PostgreSQL itself
+            fn emit_log(
+                &mut self,
+                mut error_data: PgBox<pg_sys::ErrorData>,
+                prev_hook: fn(error_data: PgBox<pg_sys::ErrorData>) -> HookResult<()>,
+            ) -> HookResult<()> {
+                self.events += 1;
+                prev_hook(error_data)
+            }
+
             fn executor_start(
                 &mut self,
                 query_desc: PgBox<QueryDesc>,
@@ -110,8 +120,10 @@ mod tests {
 
         static mut HOOK: TestHook = TestHook { events: 0 };
         pgx::hooks::register_hook(&mut HOOK);
-        Spi::run("SELECT 1");
-        assert_eq!(7, HOOK.events);
+        // To trigger the emit_log hook, we need something to log.
+        // We therefore ensure the select statement will be logged.
+        Spi::run("SET local log_statement to 'all'; SELECT 1");
+        assert_eq!(8, HOOK.events);
 
         // TODO:  it'd be nice to also test that .commit() and .abort() also get called
         //    but I don't see how to do that since we're running *inside* a transaction here
