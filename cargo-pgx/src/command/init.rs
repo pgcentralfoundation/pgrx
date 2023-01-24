@@ -57,7 +57,7 @@ pub(crate) struct Init {
     /// If installed locally, the path to PG14's `pgconfig` tool, or `download` to have pgx download/compile/install it
     #[clap(env = "PG14_PG_CONFIG", long)]
     pg14: Option<String>,
-    /// If installed locally, the path to PG14's `pgconfig` tool, or `download` to have pgx download/compile/install it
+    /// If installed locally, the path to PG15's `pgconfig` tool, or `download` to have pgx download/compile/install it
     #[clap(env = "PG15_PG_CONFIG", long)]
     pg15: Option<String>,
     #[clap(from_global, action = ArgAction::Count)]
