@@ -68,7 +68,7 @@ impl CommandExecute for Test {
             )?;
 
             test_extension(
-                pg_config,
+                &pg_config,
                 me.manifest_path.as_ref(),
                 me.package.as_ref(),
                 &profile,

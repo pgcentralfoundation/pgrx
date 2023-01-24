@@ -45,7 +45,7 @@ impl CommandExecute for Stop {
             let (pg_config, _) =
                 pg_config_and_version(&pgx, &package_manifest, me.pg_version, None, false)?;
 
-            stop_postgres(pg_config)
+            stop_postgres(&pg_config)
         }
 
         let pgx = Pgx::from_config()?;
