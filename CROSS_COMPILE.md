@@ -102,8 +102,8 @@ On the steps on Debian-family are as follows:
 1. Set up everything you'd need to perform non-cross builds.
 
 2. Install a Rust toolchain for the target:
-    - *`target=aarch64`*: `rustup toolchain add aarch64-unknown-linux-gnu`.
-    - *`target=x86_64`*: `rustup toolchain add x86_64-unknown-linux-gnu`.
+    - *`target=aarch64`*: `rustup target add aarch64-unknown-linux-gnu`.
+    - *`target=x86_64`*: `rustup target add x86_64-unknown-linux-gnu`.
 
 3. Install the `crossbuild-essential-<arch>` package for the architecture you are targetting
     - *`target=aarch64`*: `sudo apt install crossbuild-essential-arm64`.
@@ -141,8 +141,8 @@ The first few steps are the same as under debian.
 1. Set up everything you'd need to perform non-cross builds.
 
 2. Install a Rust toolchain for the target:
-    - *`target=aarch64`*: `rustup toolchain add aarch64-unknown-linux-gnu`.
-    - *`target=x86_64`*: `rustup toolchain add x86_64-unknown-linux-gnu`.
+    - *`target=aarch64`*: `rustup target add aarch64-unknown-linux-gnu`.
+    - *`target=x86_64`*: `rustup target add x86_64-unknown-linux-gnu`.
 
 After this you need a cross compilation toolchain, which can be challenging.
 
