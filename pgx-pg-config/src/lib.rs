@@ -10,7 +10,7 @@ Use of this source code is governed by the MIT license that can be found in the 
 use eyre::{eyre, WrapErr};
 use owo_colors::OwoColorize;
 use serde_derive::{Deserialize, Serialize};
-use std::collections::HashMap;
+use std::collections::{BTreeMap, HashMap};
 use std::ffi::OsString;
 use std::fmt::{self, Display, Formatter};
 use std::io::ErrorKind;
@@ -71,6 +71,7 @@ impl Display for PgVersion {
 pub struct PgConfig {
     version: Option<PgVersion>,
     pg_config: Option<PathBuf>,
+    known_props: Option<BTreeMap<String, String>>,
     base_port: u16,
     base_testing_port: u16,
 }
@@ -92,6 +93,7 @@ impl Default for PgConfig {
         PgConfig {
             version: None,
             pg_config: None,
+            known_props: None,
             base_port: BASE_POSTGRES_PORT_NO,
             base_testing_port: BASE_POSTGRES_TESTING_PORT_NO,
         }
@@ -106,13 +108,20 @@ impl From<PgVersion> for PgConfig {
 
 impl PgConfig {
     pub fn new(pg_config: PathBuf, base_port: u16, base_testing_port: u16) -> Self {
-        PgConfig { version: None, pg_config: Some(pg_config), base_port, base_testing_port }
+        PgConfig {
+            version: None,
+            pg_config: Some(pg_config),
+            known_props: None,
+            base_port,
+            base_testing_port,
+        }
     }
 
     pub fn new_with_defaults(pg_config: PathBuf) -> Self {
         PgConfig {
             version: None,
             pg_config: Some(pg_config),
+            known_props: None,
             base_port: BASE_POSTGRES_PORT_NO,
             base_testing_port: BASE_POSTGRES_TESTING_PORT_NO,
         }
@@ -122,6 +131,43 @@ impl PgConfig {
         let path =
             pathsearch::find_executable_in_path("pg_config").unwrap_or_else(|| "pg_config".into());
         Self::new_with_defaults(path)
+    }
+
+    /// Construct a new [`PgConfig`] from the set of environment variables that are prefixed with
+    /// `PGX_PG_CONFIG_`.
+    ///
+    /// It also requires that the `PGX_PG_CONFIG_AS_ENV` variable be set to some value that isn't
+    /// the string `"false"`.
+    pub fn from_env() -> Option<Self> {
+        if !Self::is_in_environment() {
+            None
+        } else {
+            const PREFIX: &str = "PGX_PG_CONFIG_";
+
+            let mut known_props = BTreeMap::new();
+            for (k, v) in std::env::vars() {
+                if k.starts_with(PREFIX) {
+                    // reformat the key to look like an argument option to `pg_config`
+                    let prop = format!("--{}", k.trim_start_matches(PREFIX).to_lowercase());
+                    known_props.insert(prop, v);
+                }
+            }
+
+            Some(Self {
+                version: None,
+                pg_config: None,
+                known_props: Some(known_props),
+                base_port: 0,
+                base_testing_port: 0,
+            })
+        }
+    }
+
+    pub fn is_in_environment() -> bool {
+        match std::env::var("PGX_PG_CONFIG_AS_ENV") {
+            Ok(value) => value == "true",
+            _ => false,
+        }
     }
 
     pub fn is_real(&self) -> bool {
@@ -280,18 +326,37 @@ impl PgConfig {
     }
 
     fn run(&self, arg: &str) -> eyre::Result<String> {
-        let pg_config = self.pg_config.clone().unwrap_or_else(|| {
-            std::env::var("PG_CONFIG").unwrap_or_else(|_| "pg_config".to_string()).into()
-        });
+        if self.known_props.is_some() {
+            // we have some known properties, so use them.  We'll return an `ErrorKind::InvalidData`
+            // if the caller asks for a property we don't have
+            Ok(self
+                .known_props
+                .as_ref()
+                .unwrap()
+                .get(arg)
+                .ok_or_else(|| {
+                    std::io::Error::new(
+                        ErrorKind::InvalidData,
+                        format!("`PgConfig` has no known property named {arg}"),
+                    )
+                })
+                .cloned()?)
+        } else {
+            // we don't have any known properties, so fall through to asking the `pg_config`
+            // that's either in the environment or on the PATH
+            let pg_config = self.pg_config.clone().unwrap_or_else(|| {
+                std::env::var("PG_CONFIG").unwrap_or_else(|_| "pg_config".to_string()).into()
+            });
 
-        match Command::new(&pg_config).arg(arg).output() {
-            Ok(output) => Ok(String::from_utf8(output.stdout).unwrap().trim().to_string()),
-            Err(e) => match e.kind() {
-                ErrorKind::NotFound => Err(e).wrap_err_with(|| {
-                    format!("Unable to find `{}` on the system $PATH", "pg_config".yellow())
-                }),
-                _ => Err(e.into()),
-            },
+            match Command::new(&pg_config).arg(arg).output() {
+                Ok(output) => Ok(String::from_utf8(output.stdout).unwrap().trim().to_string()),
+                Err(e) => match e.kind() {
+                    ErrorKind::NotFound => Err(e).wrap_err_with(|| {
+                        format!("Unable to find `{}` on the system $PATH", "pg_config".yellow())
+                    }),
+                    _ => Err(e.into()),
+                },
+            }
         }
     }
 }
@@ -325,6 +390,7 @@ struct ConfigToml {
 pub enum PgConfigSelector<'a> {
     All,
     Specific(&'a str),
+    Environment,
 }
 
 impl<'a> PgConfigSelector<'a> {
@@ -385,12 +451,26 @@ impl Pgx {
         self.pg_configs.push(pg_config);
     }
 
+    /// Returns an iterator of all "configured" `PgConfig`s we know about.
+    ///
+    /// If the `which` argument is [`PgConfigSelector::All`] **and** the environment variable
+    /// `PGX_PG_CONFIG_AS_ENV` is set to a value that isn't `"false"`then this function will return
+    /// a one-element iterator that represents that single "pg_config".
+    ///
+    /// Otherwise, we'll follow the rules of [`PgConfigSelector::All`] being everything in `$PGX_HOME/config.toml`,
+    /// [`PgConfigSelector::Specific`] being that specific version from `$PGX_HOME/config.toml`, and
+    /// [`PgConfigSelector::Environment`] being the one described in the environment.
     pub fn iter(
         &self,
         which: PgConfigSelector,
-    ) -> impl std::iter::Iterator<Item = eyre::Result<&PgConfig>> {
-        match which {
-            PgConfigSelector::All => {
+    ) -> impl std::iter::Iterator<Item = eyre::Result<PgConfig>> {
+        match (which, PgConfig::is_in_environment()) {
+            (PgConfigSelector::All, true) | (PgConfigSelector::Environment, _) => {
+                vec![PgConfig::from_env().ok_or(eyre!("PGX_PG_CONFIG_AS_ENV not found"))]
+                    .into_iter()
+            }
+
+            (PgConfigSelector::All, _) => {
                 let mut configs = self.pg_configs.iter().collect::<Vec<_>>();
                 configs.sort_by(|a, b| {
                     a.major_version()
@@ -398,16 +478,16 @@ impl Pgx {
                         .cmp(&b.major_version().expect("no major version"))
                 });
 
-                configs.into_iter().map(|c| Ok(c)).collect::<Vec<_>>().into_iter()
+                configs.into_iter().map(|c| Ok(c.clone())).collect::<Vec<_>>().into_iter()
             }
-            PgConfigSelector::Specific(label) => vec![self.get(label)].into_iter(),
+            (PgConfigSelector::Specific(label), _) => vec![self.get(label)].into_iter(),
         }
     }
 
-    pub fn get(&self, label: &str) -> eyre::Result<&PgConfig> {
+    pub fn get(&self, label: &str) -> eyre::Result<PgConfig> {
         for pg_config in self.pg_configs.iter() {
             if pg_config.label()? == label {
-                return Ok(pg_config);
+                return Ok(pg_config.clone());
             }
         }
         Err(eyre!("Postgres `{}` is not managed by pgx", label))
@@ -577,7 +657,7 @@ fn parse_version() {
     for (s, major_expected, minor_expected) in versions {
         let (major, minor) =
             PgConfig::parse_version_str(s).expect("Unable to parse version string");
-        assert_eq!(major, major_expected, "Major varsion should match");
+        assert_eq!(major, major_expected, "Major version should match");
         assert_eq!(minor, minor_expected, "Minor version should match");
     }
 
@@ -591,4 +671,31 @@ fn parse_version() {
         PgConfig::parse_version_str("PostgresSQL 12.f").expect_err("Parsed invalid version string");
     let _ =
         PgConfig::parse_version_str("PostgresSQL .53").expect_err("Parsed invalid version string");
+}
+
+#[test]
+fn from_empty_env() -> eyre::Result<()> {
+    // without "PGX_PG_CONFIG_AS_ENV" we can't get one of these
+    let pg_config = PgConfig::from_env();
+    assert!(pg_config.is_none());
+
+    // but now we can
+    std::env::set_var("PGX_PG_CONFIG_AS_ENV", "true");
+    std::env::set_var("PGX_PG_CONFIG_VERSION", "PostgresSQL 15.1");
+    std::env::set_var("PGX_PG_CONFIG_INCLUDEDIR-SERVER", "/path/to/server/headers");
+    std::env::set_var("PGX_PG_CONFIG_CPPFLAGS", "some cpp flags");
+
+    let pg_config = PgConfig::from_env().expect("failed to make a PgConfig from the environment");
+    assert_eq!(pg_config.major_version()?, 15, "Major version should match");
+    assert_eq!(pg_config.minor_version()?, 1, "Minor version should match");
+    assert_eq!(
+        pg_config.includedir_server()?,
+        PathBuf::from("/path/to/server/headers"),
+        "includdir_server should match"
+    );
+    assert_eq!(pg_config.cppflags()?, OsString::from("some cpp flags"), "cppflags should match");
+
+    // we didn't set this one in our environment
+    assert!(pg_config.sharedir().is_err());
+    Ok(())
 }

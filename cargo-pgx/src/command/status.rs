@@ -44,7 +44,7 @@ impl CommandExecute for Status {
 
         for pg_config in pgx.iter(PgConfigSelector::new(&pg_version)) {
             let pg_config = pg_config?;
-            if status_postgres(pg_config)? {
+            if status_postgres(&pg_config)? {
                 println!("Postgres v{} is {}", pg_config.major_version()?, "running".bold().green())
             } else {
                 println!("Postgres v{} is {}", pg_config.major_version()?, "stopped".bold().red())

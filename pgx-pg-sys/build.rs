@@ -119,7 +119,7 @@ fn main() -> eyre::Result<()> {
     println!("cargo:rerun-if-changed=cshim");
     emit_missing_rerun_if_env_changed();
 
-    let pg_configs: Vec<(u16, &PgConfig)> = if std::env::var(
+    let pg_configs: Vec<(u16, PgConfig)> = if std::env::var(
         "PGX_PG_SYS_GENERATE_BINDINGS_FOR_RELEASE",
     )
     .unwrap_or("false".into())
@@ -201,6 +201,7 @@ fn main() -> eyre::Result<()> {
 fn emit_missing_rerun_if_env_changed() {
     // `pgx-pg-config` doesn't emit one for this.
     println!("cargo:rerun-if-env-changed=PGX_PG_CONFIG_PATH");
+    println!("cargo:rerun-if-env-changed=PGX_PG_CONFIG_AS_ENV");
     // Bindgen's behavior depends on these vars, but it doesn't emit them
     // directly because the output would cause issue with `bindgen-cli`. Do it
     // on bindgen's behalf.
