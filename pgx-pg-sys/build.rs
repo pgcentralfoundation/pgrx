@@ -164,8 +164,18 @@ fn main() -> eyre::Result<()> {
                     .join(", ")
             )
         })?;
-        let specific = pgx.get(&found_feat)?;
-        vec![(found_ver, specific)]
+
+        if let Ok(pg_config) = PgConfig::from_env() {
+            let major_version = pg_config.major_version()?;
+
+            if major_version != found_ver {
+                panic!("Feature flag `pg{found_ver}` does not match version from the environment-described PgConfig (`{major_version}`)")
+            }
+            vec![(major_version, pg_config)]
+        } else {
+            let specific = pgx.get(&found_feat)?;
+            vec![(found_ver, specific)]
+        }
     };
     std::thread::scope(|scope| {
         // This is pretty much either always 1 (normally) or 5 (for releases),
