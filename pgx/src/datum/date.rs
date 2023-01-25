@@ -90,7 +90,9 @@ impl Date {
 
     #[inline]
     pub fn to_posix_time(&self) -> libc::time_t {
-        libc::time_t::from(self.to_unix_epoch_days()) * libc::time_t::from(pg_sys::SECS_PER_DAY)
+        let secs_per_day: libc::time_t =
+            pg_sys::SECS_PER_DAY.try_into().expect("couldn't fit time into time_t");
+        libc::time_t::from(self.to_unix_epoch_days()) * secs_per_day
     }
 }
 
