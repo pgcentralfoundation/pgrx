@@ -36729,6 +36729,28 @@ extern "C" {
 extern "C" {
     pub fn anl_get_next_S(t: f64, n: ::std::os::raw::c_int, stateptr: *mut f64) -> f64;
 }
+#[repr(C)]
+#[derive(Debug, Copy, Clone)]
+pub struct ConfigData {
+    pub name: *mut ::std::os::raw::c_char,
+    pub setting: *mut ::std::os::raw::c_char,
+}
+impl Default for ConfigData {
+    fn default() -> Self {
+        let mut s = ::std::mem::MaybeUninit::<Self>::uninit();
+        unsafe {
+            ::std::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
+            s.assume_init()
+        }
+    }
+}
+#[pgx_macros::pg_guard]
+extern "C" {
+    pub fn get_configdata(
+        my_exec_path: *const ::std::os::raw::c_char,
+        configdata_len: *mut usize,
+    ) -> *mut ConfigData;
+}
 pub const RawParseMode_RAW_PARSE_DEFAULT: RawParseMode = 0;
 pub const RawParseMode_RAW_PARSE_TYPE_NAME: RawParseMode = 1;
 pub const RawParseMode_RAW_PARSE_PLPGSQL_EXPR: RawParseMode = 2;
