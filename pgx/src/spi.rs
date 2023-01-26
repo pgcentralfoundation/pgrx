@@ -232,7 +232,7 @@ pub trait Query {
     fn execute(
         self,
         client: &SpiClient,
-        limit: Option<i64>,
+        limit: Option<libc::c_long>,
         arguments: Self::Arguments,
     ) -> Self::Result;
 
@@ -251,7 +251,7 @@ impl<'a> Query for &'a String {
     fn execute(
         self,
         client: &SpiClient,
-        limit: Option<i64>,
+        limit: Option<libc::c_long>,
         arguments: Self::Arguments,
     ) -> Self::Result {
         self.as_str().execute(client, limit, arguments)
@@ -283,7 +283,7 @@ impl<'a> Query for &'a str {
     fn execute(
         self,
         _client: &SpiClient,
-        limit: Option<i64>,
+        limit: Option<libc::c_long>,
         arguments: Self::Arguments,
     ) -> Self::Result {
         // SAFETY: no concurrent access
@@ -538,7 +538,12 @@ impl Spi {
 
 impl<'a> SpiClient<'a> {
     /// perform a SELECT statement
-    pub fn select<Q: Query>(&self, query: Q, limit: Option<i64>, args: Q::Arguments) -> Q::Result {
+    pub fn select<Q: Query>(
+        &self,
+        query: Q,
+        limit: Option<libc::c_long>,
+        args: Q::Arguments,
+    ) -> Q::Result {
         self.execute(query, limit, args)
     }
 
@@ -546,14 +551,19 @@ impl<'a> SpiClient<'a> {
     pub fn update<Q: Query>(
         &mut self,
         query: Q,
-        limit: Option<i64>,
+        limit: Option<libc::c_long>,
         args: Q::Arguments,
     ) -> Q::Result {
         Spi::mark_mutable();
         self.execute(query, limit, args)
     }
 
-    fn execute<Q: Query>(&self, query: Q, limit: Option<i64>, args: Q::Arguments) -> Q::Result {
+    fn execute<Q: Query>(
+        &self,
+        query: Q,
+        limit: Option<libc::c_long>,
+        args: Q::Arguments,
+    ) -> Q::Result {
         query.execute(&self, limit, args)
     }
 
@@ -674,7 +684,7 @@ impl SpiCursor<'_> {
     /// Fetch up to `count` rows from the cursor, moving forward
     ///
     /// If `fetch` runs off the end of the available rows, an empty [`SpiTupleTable`] is returned.
-    pub fn fetch(&mut self, count: i64) -> std::result::Result<SpiTupleTable, Error> {
+    pub fn fetch(&mut self, count: libc::c_long) -> std::result::Result<SpiTupleTable, Error> {
         // SAFETY: no concurrent access
         unsafe {
             pg_sys::SPI_tuptable = std::ptr::null_mut();
@@ -748,7 +758,7 @@ impl<'a> Query for &'a OwnedPreparedStatement {
     fn execute(
         self,
         client: &SpiClient,
-        limit: Option<i64>,
+        limit: Option<libc::c_long>,
         arguments: Self::Arguments,
     ) -> Self::Result {
         (&self.0).execute(client, limit, arguments)
@@ -770,7 +780,7 @@ impl Query for OwnedPreparedStatement {
     fn execute(
         self,
         client: &SpiClient,
-        limit: Option<i64>,
+        limit: Option<libc::c_long>,
         arguments: Self::Arguments,
     ) -> Self::Result {
         (&self.0).execute(client, limit, arguments)
@@ -807,7 +817,7 @@ impl<'a: 'b, 'b> Query for &'b PreparedStatement<'a> {
     fn execute(
         self,
         _client: &SpiClient,
-        limit: Option<i64>,
+        limit: Option<libc::c_long>,
         arguments: Self::Arguments,
     ) -> Self::Result {
         // SAFETY: no concurrent access
@@ -870,7 +880,7 @@ impl<'a> Query for PreparedStatement<'a> {
     fn execute(
         self,
         client: &SpiClient,
-        limit: Option<i64>,
+        limit: Option<libc::c_long>,
         arguments: Self::Arguments,
     ) -> Self::Result {
         (&self).execute(client, limit, arguments)

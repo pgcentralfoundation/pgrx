@@ -196,3 +196,48 @@ impl From<NullableDatum> for Option<Datum> {
         Some(Datum::try_from(nd).ok()?)
     }
 }
+
+#[cfg(test)]
+mod test {
+    use super::*;
+
+    #[test]
+    fn roundtrip_integers() {
+        #[cfg(target_pointer_width = "64")]
+        mod types {
+            pub type UnsignedInt = u64;
+            pub type SignedInt = i64;
+        }
+        #[cfg(target_pointer_width = "32")]
+        mod types {
+            // 64-bit integers would be truncated on 32 bit platforms
+            pub type UnsignedInt = u32;
+            pub type SignedInt = i32;
+        }
+        use types::*;
+
+        let val: SignedInt = 123456;
+        let datum = Datum::from(val);
+        assert_eq!(datum.value() as SignedInt, val);
+
+        let val: isize = 123456;
+        let datum = Datum::from(val);
+        assert_eq!(datum.value() as isize, val);
+
+        let val: SignedInt = -123456;
+        let datum = Datum::from(val);
+        assert_eq!(datum.value() as SignedInt, val);
+
+        let val: isize = -123456;
+        let datum = Datum::from(val);
+        assert_eq!(datum.value() as isize, val);
+
+        let val: UnsignedInt = 123456;
+        let datum = Datum::from(val);
+        assert_eq!(datum.value() as UnsignedInt, val);
+
+        let val: usize = 123456;
+        let datum = Datum::from(val);
+        assert_eq!(datum.value() as usize, val);
+    }
+}
