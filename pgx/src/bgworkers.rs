@@ -591,7 +591,7 @@ impl<'a> Into<pg_sys::BackgroundWorker> for &'a BackgroundWorkerBuilder {
     }
 }
 
-fn wait_latch(timeout: i64, wakeup_flags: WLflags) -> i32 {
+fn wait_latch(timeout: libc::c_long, wakeup_flags: WLflags) -> i32 {
     unsafe {
         let latch = pg_sys::WaitLatch(
             pg_sys::MyLatch,

@@ -200,7 +200,7 @@ macro_rules! pg_magic_func {
                 indexmaxkeys: pgx::pg_sys::INDEX_MAX_KEYS as i32,
                 namedatalen: pgx::pg_sys::NAMEDATALEN as i32,
                 float4byval: pgx::pg_sys::USE_FLOAT4_BYVAL as i32,
-                float8byval: pgx::pg_sys::USE_FLOAT8_BYVAL as i32,
+                float8byval: cfg!(target_pointer_width = "64") as i32,
             };
 
             #[cfg(any(feature = "pg13", feature = "pg14"))]
@@ -210,7 +210,7 @@ macro_rules! pg_magic_func {
                 funcmaxargs: pgx::pg_sys::FUNC_MAX_ARGS as i32,
                 indexmaxkeys: pgx::pg_sys::INDEX_MAX_KEYS as i32,
                 namedatalen: pgx::pg_sys::NAMEDATALEN as i32,
-                float8byval: pgx::pg_sys::USE_FLOAT8_BYVAL as i32,
+                float8byval: cfg!(target_pointer_width = "64") as i32,
             };
 
             #[cfg(any(feature = "pg15"))]
@@ -220,7 +220,7 @@ macro_rules! pg_magic_func {
                 funcmaxargs: pgx::pg_sys::FUNC_MAX_ARGS as i32,
                 indexmaxkeys: pgx::pg_sys::INDEX_MAX_KEYS as i32,
                 namedatalen: pgx::pg_sys::NAMEDATALEN as i32,
-                float8byval: pgx::pg_sys::USE_FLOAT8_BYVAL as i32,
+                float8byval: cfg!(target_pointer_width = "64") as i32,
                 abi_extra: {
                     // array::from_fn isn't const yet, boohoo, so const-copy a bstr
                     let magic = b"PostgreSQL";
