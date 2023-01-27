@@ -79,7 +79,7 @@ impl CommandExecute for Connect {
             }
         };
 
-        connect_psql(pg_config, &dbname, self.pgcli)
+        connect_psql(&pg_config, &dbname, self.pgcli)
     }
 }
 

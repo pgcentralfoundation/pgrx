@@ -65,13 +65,12 @@ impl Layout {
     }
 }
 
-#[repr(usize)]
 #[derive(Clone, Copy, Debug, PartialEq)]
 pub(crate) enum Align {
-    Byte = mem::align_of::<u8>(),
-    Short = mem::align_of::<libc::c_short>(),
-    Int = mem::align_of::<libc::c_int>(),
-    Double = mem::align_of::<f64>(),
+    Byte,
+    Short,
+    Int,
+    Double,
 }
 
 impl TryFrom<libc::c_char> for Align {

@@ -217,6 +217,7 @@ impl<'a, T: FromDatum> Array<'a, T> {
         }
         match (self.elem_layout.size_matches::<T>(), self.raw.as_ref()) {
             // SAFETY: Rust slice layout matches Postgres data layout and this array is "owned"
+            #[allow(unreachable_patterns)] // happens on 32-bit when DATUM_SIZE = 4
             (Some(1 | 2 | 4 | DATUM_SIZE), Some(raw)) => unsafe {
                 raw.assume_init_data_slice::<T>()
             },
@@ -454,7 +455,7 @@ impl<'a, T: FromDatum> FromDatum for Array<'a, T> {
     unsafe fn from_polymorphic_datum(
         datum: pg_sys::Datum,
         is_null: bool,
-        _typoid: u32,
+        _typoid: pg_sys::Oid,
     ) -> Option<Array<'a, T>> {
         if is_null {
             None
@@ -545,7 +546,7 @@ where
         }
     }
 
-    fn type_oid() -> u32 {
+    fn type_oid() -> pg_sys::Oid {
         unsafe { pg_sys::get_array_type(T::type_oid()) }
     }
 
@@ -592,7 +593,7 @@ where
         }
     }
 
-    fn type_oid() -> u32 {
+    fn type_oid() -> pg_sys::Oid {
         unsafe { pg_sys::get_array_type(T::type_oid()) }
     }
 

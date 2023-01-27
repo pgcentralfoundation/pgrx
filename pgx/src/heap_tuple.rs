@@ -90,7 +90,7 @@ impl<'a> PgHeapTuple<'a, AllocatedByPostgres> {
 
     /// Creates a new [PgHeapTuple] from one of the two (`Current` or `New`) trigger tuples.  The returned
     /// [PgHeapTuple] will be considered by have been allocated by Postgres and is not mutable until
-    /// [PgHeapTuple::into_owned] is called.  
+    /// [PgHeapTuple::into_owned] is called.
     ///
     /// ## Safety
     ///
@@ -329,7 +329,7 @@ impl<'a, AllocatedBy: WhoAllocated> IntoDatum for PgHeapTuple<'a, AllocatedBy> {
         fn is_composite(oid: pg_sys::Oid) -> bool {
             unsafe {
                 let entry = pg_sys::lookup_type_cache(oid, pg_sys::TYPECACHE_TUPDESC as _);
-                (*entry).typtype == pg_sys::RELKIND_COMPOSITE_TYPE as i8
+                (*entry).typtype as i8 == pg_sys::RELKIND_COMPOSITE_TYPE as i8
             }
         }
         Self::type_oid() == other || is_composite(other)
@@ -351,6 +351,14 @@ impl<'a, AllocatedBy: WhoAllocated> PgHeapTuple<'a, AllocatedBy> {
         self.tuple.into_datum()
     }
 
+    /// Consumes this [`PgHeapTuple`], returning a pointer to a [`pg_sys::HeapTupleData`] that can
+    /// be passed to a Postgres FFI function.  It'll be freed whenever Postgres frees the `MemoryContext`
+    /// in which it was allocated.
+    #[inline]
+    pub fn into_pg(self) -> *mut pg_sys::HeapTupleData {
+        self.tuple.into_pg()
+    }
+
     /// Returns the number of attributes in this [`PgHeapTuple`].
     #[inline]
     pub fn len(&self) -> usize {
@@ -366,7 +374,7 @@ impl<'a, AllocatedBy: WhoAllocated> PgHeapTuple<'a, AllocatedBy> {
         self.tupdesc.iter().enumerate().map(|(i, att)| (NonZeroUsize::new(i + 1).unwrap(), att))
     }
 
-    /// Get the attribute information for the specified attribute number.  
+    /// Get the attribute information for the specified attribute number.
     ///
     /// Returns `None` if the attribute number is out of bounds.
     #[inline]
