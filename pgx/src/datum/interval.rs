@@ -37,7 +37,8 @@ impl Interval {
         days: i32,
         usecs: i64,
     ) -> Result<Self, IntervalConversionError> {
-        let mut interval = PgBox::<pg_sys::Interval>::alloc();
+        // SAFETY: `pg_sys::Interval` will be uninitialized, set all fields
+        let mut interval = unsafe { PgBox::<pg_sys::Interval>::alloc() };
         interval.day = days;
         interval.month = months;
         interval.time = usecs;
