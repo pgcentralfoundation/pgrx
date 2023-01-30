@@ -188,7 +188,7 @@ Postgres Type | Rust Type (as `Option<T>`)
 `box` | `pgx::pg_sys::BOX`
 `point` | `pgx::pgx_sys::Point`
 `tid` | `pgx::pg_sys::ItemPointerData`
-`cstring` | `&std::ffi::CStr`
+`cstring` | `&core::ffi::CStr`
 `inet` | `pgx::Inet(String)` -- TODO: needs better support
 `numeric` | `pgx::Numeric<P, S> or pgx::AnyNumeric`
 `void` | `()`

@@ -14,7 +14,7 @@ use crate::{direct_function_call, pg_sys, IntoDatum};
 /// Returns the `oid` of the specified type name.  Will panic if Postgres can't find the type
 pub fn regtypein(type_name: &str) -> pg_sys::Oid {
     let cstr =
-        std::ffi::CString::new(type_name).expect("specified type_name has embedded NULL byte");
+        alloc::ffi::CString::new(type_name).expect("specified type_name has embedded NULL byte");
     unsafe {
         direct_function_call::<pg_sys::Oid>(pg_sys::regtypein, vec![cstr.as_c_str().into_datum()])
             .expect("type lookup returned NULL")

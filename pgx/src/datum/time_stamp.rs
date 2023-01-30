@@ -12,7 +12,7 @@ use pgx_sql_entity_graph::metadata::{
     ArgumentError, Returns, ReturnsError, SqlMapping, SqlTranslatable,
 };
 use serde::Deserialize;
-use std::ffi::CStr;
+use core::ffi::CStr;
 
 #[derive(Clone, Debug, PartialEq, Eq, PartialOrd, Ord, Deserialize)]
 #[repr(transparent)]

@@ -128,8 +128,6 @@ pub use pg_sys::{
 #[doc(hidden)]
 pub use pgx_sql_entity_graph;
 
-pub use cstr_core;
-
 /// A macro for marking a library compatible with [`pgx`][crate].
 ///
 /// <div class="example-wrap" style="display:inline-block">

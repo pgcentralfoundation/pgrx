@@ -31,7 +31,7 @@ pub unsafe fn node_to_string<'a>(nodeptr: *mut pg_sys::Node) -> Option<&'a str> 
             None
         } else {
             Some(
-                std::ffi::CStr::from_ptr(string)
+                core::ffi::CStr::from_ptr(string)
                     .to_str()
                     .expect("unable to convert Node into a &str"),
             )

@@ -8,7 +8,7 @@ Use of this source code is governed by the MIT license that can be found in the 
 */
 
 use core::fmt::{Debug, Display, Formatter};
-use std::ffi::CStr;
+use core::ffi::CStr;
 use std::fmt;
 
 use crate::numeric_support::convert::from_primitive_helper;

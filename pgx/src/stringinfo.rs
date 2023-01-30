@@ -21,27 +21,13 @@ pub struct StringInfo<AllocatedBy: WhoAllocated = AllocatedByRust> {
     inner: PgBox<pg_sys::StringInfoData, AllocatedBy>,
 }
 
-impl<AllocatedBy: WhoAllocated> From<StringInfo<AllocatedBy>> for &'static std::ffi::CStr {
+impl<AllocatedBy: WhoAllocated> From<StringInfo<AllocatedBy>> for &'static core::ffi::CStr {
     fn from(val: StringInfo<AllocatedBy>) -> Self {
         let len = val.len();
         let ptr = val.into_char_ptr();
 
         unsafe {
-            std::ffi::CStr::from_bytes_with_nul_unchecked(std::slice::from_raw_parts(
-                ptr as *const u8,
-                (len + 1) as usize, // +1 to get the trailing null byte
-            ))
-        }
-    }
-}
-
-impl<AllocatedBy: WhoAllocated> From<StringInfo<AllocatedBy>> for &'static crate::cstr_core::CStr {
-    fn from(val: StringInfo<AllocatedBy>) -> Self {
-        let len = val.len();
-        let ptr = val.into_char_ptr();
-
-        unsafe {
-            crate::cstr_core::CStr::from_bytes_with_nul_unchecked(std::slice::from_raw_parts(
+            core::ffi::CStr::from_bytes_with_nul_unchecked(std::slice::from_raw_parts(
                 ptr as *const u8,
                 (len + 1) as usize, // +1 to get the trailing null byte
             ))

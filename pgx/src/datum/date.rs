@@ -12,7 +12,7 @@ use core::num::TryFromIntError;
 use pgx_sql_entity_graph::metadata::{
     ArgumentError, Returns, ReturnsError, SqlMapping, SqlTranslatable,
 };
-use std::ffi::CStr;
+use core::ffi::CStr;
 
 pub const POSTGRES_EPOCH_JDATE: i32 = pg_sys::POSTGRES_EPOCH_JDATE as i32;
 pub const UNIX_EPOCH_JDATE: i32 = pg_sys::UNIX_EPOCH_JDATE as i32;

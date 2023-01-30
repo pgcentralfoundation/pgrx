@@ -86,7 +86,7 @@ struct MyType {
 impl PgVarlenaInOutFuncs for MyType {
 
     // parse the provided CStr into a `PgVarlena<MyType>`
-    fn input(input: &std::ffi::CStr) -> PgVarlena<Self> {
+    fn input(input: &core::ffi::CStr) -> PgVarlena<Self> {
         let mut iter = input.to_str().unwrap().split(',');
         let (a, b, c) = (iter.next(), iter.next(), iter.next());
 

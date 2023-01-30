@@ -167,7 +167,7 @@ impl PgRelation {
 
     /// What is the name of the namespace in which this relation is located?
     pub fn namespace(&self) -> &str {
-        unsafe { std::ffi::CStr::from_ptr(pg_sys::get_namespace_name(self.namespace_oid())) }
+        unsafe { core::ffi::CStr::from_ptr(pg_sys::get_namespace_name(self.namespace_oid())) }
             .to_str()
             .expect("unable to convert namespace name to UTF8")
     }
