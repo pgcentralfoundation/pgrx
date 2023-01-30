@@ -28,8 +28,8 @@ std::compile_error!("exactly one one feature must be provided (pg11, pg12, pg13,
 
 pub mod submodules;
 
-use core::ptr::NonNull;
 use core::ffi::CStr;
+use core::ptr::NonNull;
 use std::os::raw::c_char;
 
 // for convenience we pull up everything submodules exposes

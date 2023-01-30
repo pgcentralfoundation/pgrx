@@ -189,8 +189,8 @@ impl PgSharedMem {
     /// Must be run from the shared memory init hook, use for rust atomics behind `PgAtomic`
     pub fn shmem_init_atomic<T: atomic_traits::Atomic + Default>(atomic: &PgAtomic<T>) {
         unsafe {
-            let shm_name =
-                alloc::ffi::CString::new(Uuid::new_v4().to_string()).expect("CString::new() failed");
+            let shm_name = alloc::ffi::CString::new(Uuid::new_v4().to_string())
+                .expect("CString::new() failed");
 
             let addin_shmem_init_lock: *mut pg_sys::LWLock =
                 &mut (*pg_sys::MainLWLockArray.add(21)).lock;
