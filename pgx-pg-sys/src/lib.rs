@@ -40,39 +40,24 @@ pub use submodules::*;
 //
 
 // feature gate each pg version module
-#[cfg(all(feature = "pg11", not(docsrs)))]
-mod pg11 {
-    include!(concat!(env!("OUT_DIR"), "/pg11.rs"));
-}
-#[cfg(all(feature = "pg11", docsrs))]
+#[cfg(feature = "pg11")]
+#[cfg_attr(not(docsrs), path = concat!(env!("OUT_DIR"), "/pg11.rs"))]
 mod pg11;
 
-#[cfg(all(feature = "pg12", not(docsrs)))]
-mod pg12 {
-    include!(concat!(env!("OUT_DIR"), "/pg12.rs"));
-}
-#[cfg(all(feature = "pg12", docsrs))]
+#[cfg(feature = "pg12")]
+#[cfg_attr(not(docsrs), path = concat!(env!("OUT_DIR"), "/pg12.rs"))]
 mod pg12;
 
-#[cfg(all(feature = "pg13", not(docsrs)))]
-mod pg13 {
-    include!(concat!(env!("OUT_DIR"), "/pg13.rs"));
-}
-#[cfg(all(feature = "pg13", docsrs))]
+#[cfg(feature = "pg13")]
+#[cfg_attr(not(docsrs), path = concat!(env!("OUT_DIR"), "/pg13.rs"))]
 mod pg13;
 
-#[cfg(all(feature = "pg14", not(docsrs)))]
-mod pg14 {
-    include!(concat!(env!("OUT_DIR"), "/pg14.rs"));
-}
-#[cfg(all(feature = "pg14", docsrs))]
+#[cfg(feature = "pg14")]
+#[cfg_attr(not(docsrs), path = concat!(env!("OUT_DIR"), "/pg14.rs"))]
 mod pg14;
 
-#[cfg(all(feature = "pg15", not(docsrs)))]
-mod pg15 {
-    include!(concat!(env!("OUT_DIR"), "/pg15.rs"));
-}
-#[cfg(all(feature = "pg15", docsrs))]
+#[cfg(feature = "pg15")]
+#[cfg_attr(not(docsrs), path = concat!(env!("OUT_DIR"), "/pg15.rs"))]
 mod pg15;
 
 // export each module publicly
@@ -88,39 +73,24 @@ pub use pg14::*;
 pub use pg15::*;
 
 // feature gate each pg-specific oid module
-#[cfg(all(feature = "pg11", not(docsrs)))]
-mod pg11_oids {
-    include!(concat!(env!("OUT_DIR"), "/pg11_oids.rs"));
-}
-#[cfg(all(feature = "pg11", docsrs))]
-mod pg11;
+#[cfg(feature = "pg11")]
+#[cfg_attr(not(docsrs), path = concat!(env!("OUT_DIR"), "/pg11_oids.rs"))]
+mod pg11_oids;
 
-#[cfg(all(feature = "pg12", not(docsrs)))]
-mod pg12_oids {
-    include!(concat!(env!("OUT_DIR"), "/pg12_oids.rs"));
-}
-#[cfg(all(feature = "pg12", docsrs))]
+#[cfg(feature = "pg12")]
+#[cfg_attr(not(docsrs), path = concat!(env!("OUT_DIR"), "/pg12_oids.rs"))]
 mod pg12_oids;
 
-#[cfg(all(feature = "pg13", not(docsrs)))]
-mod pg13_oids {
-    include!(concat!(env!("OUT_DIR"), "/pg13_oids.rs"));
-}
-#[cfg(all(feature = "pg13", docsrs))]
+#[cfg(feature = "pg13")]
+#[cfg_attr(not(docsrs), path = concat!(env!("OUT_DIR"), "/pg13_oids.rs"))]
 mod pg13_oids;
 
-#[cfg(all(feature = "pg14", not(docsrs)))]
-mod pg14_oids {
-    include!(concat!(env!("OUT_DIR"), "/pg14_oids.rs"));
-}
-#[cfg(all(feature = "pg14", docsrs))]
+#[cfg(feature = "pg14")]
+#[cfg_attr(not(docsrs), path = concat!(env!("OUT_DIR"), "/pg14_oids.rs"))]
 mod pg14_oids;
 
-#[cfg(all(feature = "pg15", not(docsrs)))]
-mod pg15_oids {
-    include!(concat!(env!("OUT_DIR"), "/pg15_oids.rs"));
-}
-#[cfg(all(feature = "pg15", docsrs))]
+#[cfg(feature = "pg15")]
+#[cfg_attr(not(docsrs), path = concat!(env!("OUT_DIR"), "/pg15_oids.rs"))]
 mod pg15_oids;
 
 // export that module publicly
