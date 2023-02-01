@@ -113,7 +113,7 @@ pub trait PgHooks {
     fn process_utility_hook(
         &mut self,
         pstmt: PgBox<pg_sys::PlannedStmt>,
-        query_string: &std::ffi::CStr,
+        query_string: &core::ffi::CStr,
         read_only_tree: Option<bool>,
         context: pg_sys::ProcessUtilityContext,
         params: PgBox<pg_sys::ParamListInfoData>,
@@ -122,7 +122,7 @@ pub trait PgHooks {
         completion_tag: *mut pg_sys::QueryCompletion,
         prev_hook: fn(
             pstmt: PgBox<pg_sys::PlannedStmt>,
-            query_string: &std::ffi::CStr,
+            query_string: &core::ffi::CStr,
             read_only_tree: Option<bool>,
             context: pg_sys::ProcessUtilityContext,
             params: PgBox<pg_sys::ParamListInfoData>,
@@ -344,7 +344,7 @@ unsafe extern "C" fn pgx_process_utility(
 ) {
     fn prev(
         pstmt: PgBox<pg_sys::PlannedStmt>,
-        query_string: &std::ffi::CStr,
+        query_string: &core::ffi::CStr,
         _read_only_tree: Option<bool>,
         context: pg_sys::ProcessUtilityContext,
         params: PgBox<pg_sys::ParamListInfoData>,
@@ -368,7 +368,7 @@ unsafe extern "C" fn pgx_process_utility(
     let hook = &mut HOOKS.as_mut().unwrap().current_hook;
     hook.process_utility_hook(
         PgBox::from_pg(pstmt),
-        std::ffi::CStr::from_ptr(query_string),
+        core::ffi::CStr::from_ptr(query_string),
         None,
         context,
         PgBox::from_pg(params),
@@ -393,7 +393,7 @@ unsafe extern "C" fn pgx_process_utility(
 ) {
     fn prev(
         pstmt: PgBox<pg_sys::PlannedStmt>,
-        query_string: &std::ffi::CStr,
+        query_string: &core::ffi::CStr,
         read_only_tree: Option<bool>,
         context: pg_sys::ProcessUtilityContext,
         params: PgBox<pg_sys::ParamListInfoData>,
@@ -418,7 +418,7 @@ unsafe extern "C" fn pgx_process_utility(
     let hook = &mut HOOKS.as_mut().unwrap().current_hook;
     hook.process_utility_hook(
         PgBox::from_pg(pstmt),
-        std::ffi::CStr::from_ptr(query_string),
+        core::ffi::CStr::from_ptr(query_string),
         Some(read_only_tree),
         context,
         PgBox::from_pg(params),

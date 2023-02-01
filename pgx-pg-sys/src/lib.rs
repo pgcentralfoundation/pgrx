@@ -28,8 +28,8 @@ std::compile_error!("exactly one one feature must be provided (pg11, pg12, pg13,
 
 pub mod submodules;
 
+use core::ffi::CStr;
 use core::ptr::NonNull;
-use std::ffi::CStr;
 use std::os::raw::c_char;
 
 // for convenience we pull up everything submodules exposes
@@ -427,7 +427,7 @@ mod all_versions {
 
     #[inline]
     pub fn get_pg_major_version_string() -> &'static str {
-        let mver = std::ffi::CStr::from_bytes_with_nul(super::PG_MAJORVERSION).unwrap();
+        let mver = core::ffi::CStr::from_bytes_with_nul(super::PG_MAJORVERSION).unwrap();
         mver.to_str().unwrap()
     }
 
@@ -438,13 +438,13 @@ mod all_versions {
 
     #[inline]
     pub fn get_pg_version_string() -> &'static str {
-        let ver = std::ffi::CStr::from_bytes_with_nul(super::PG_VERSION_STR).unwrap();
+        let ver = core::ffi::CStr::from_bytes_with_nul(super::PG_VERSION_STR).unwrap();
         ver.to_str().unwrap()
     }
 
     #[inline]
     pub fn get_pg_major_minor_version_string() -> &'static str {
-        let mver = std::ffi::CStr::from_bytes_with_nul(super::PG_VERSION).unwrap();
+        let mver = core::ffi::CStr::from_bytes_with_nul(super::PG_VERSION).unwrap();
         mver.to_str().unwrap()
     }
 

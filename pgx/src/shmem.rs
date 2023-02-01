@@ -153,7 +153,7 @@ impl PgSharedMem {
     /// Must be run from PG_init, use for types which are guarded by a LWLock
     pub fn pg_init_locked<T: Default + PGXSharedMemory>(lock: &PgLwLock<T>) {
         unsafe {
-            let lock = std::ffi::CString::new(lock.get_name()).expect("CString::new failed");
+            let lock = alloc::ffi::CString::new(lock.get_name()).expect("CString::new failed");
             pg_sys::RequestAddinShmemSpace(std::mem::size_of::<T>());
             pg_sys::RequestNamedLWLockTranche(lock.as_ptr(), 1);
         }
@@ -170,7 +170,7 @@ impl PgSharedMem {
     pub fn shmem_init_locked<T: Default + PGXSharedMemory>(lock: &PgLwLock<T>) {
         let mut found = false;
         unsafe {
-            let shm_name = std::ffi::CString::new(lock.get_name()).expect("CString::new failed");
+            let shm_name = alloc::ffi::CString::new(lock.get_name()).expect("CString::new failed");
             let addin_shmem_init_lock: *mut pg_sys::LWLock =
                 &mut (*pg_sys::MainLWLockArray.add(21)).lock;
             pg_sys::LWLockAcquire(addin_shmem_init_lock, pg_sys::LWLockMode_LW_EXCLUSIVE);
@@ -189,8 +189,8 @@ impl PgSharedMem {
     /// Must be run from the shared memory init hook, use for rust atomics behind `PgAtomic`
     pub fn shmem_init_atomic<T: atomic_traits::Atomic + Default>(atomic: &PgAtomic<T>) {
         unsafe {
-            let shm_name =
-                std::ffi::CString::new(Uuid::new_v4().to_string()).expect("CString::new() failed");
+            let shm_name = alloc::ffi::CString::new(Uuid::new_v4().to_string())
+                .expect("CString::new() failed");
 
             let addin_shmem_init_lock: *mut pg_sys::LWLock =
                 &mut (*pg_sys::MainLWLockArray.add(21)).lock;

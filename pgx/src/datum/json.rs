@@ -63,7 +63,7 @@ impl FromDatum for JsonB {
             let varlena = datum.cast_mut_ptr();
             let detoasted = pg_sys::pg_detoast_datum_packed(varlena);
 
-            let cstr = direct_function_call::<&std::ffi::CStr>(
+            let cstr = direct_function_call::<&core::ffi::CStr>(
                 pg_sys::jsonb_out,
                 vec![Some(detoasted.into())],
             )
@@ -136,7 +136,7 @@ impl IntoDatum for JsonB {
     fn into_datum(self) -> Option<pg_sys::Datum> {
         let string = serde_json::to_string(&self.0).expect("failed to serialize JsonB value");
         let cstring =
-            std::ffi::CString::new(string).expect("string version of jsonb is not valid UTF8");
+            alloc::ffi::CString::new(string).expect("string version of jsonb is not valid UTF8");
 
         unsafe {
             direct_function_call_as_datum(pg_sys::jsonb_in, vec![Some(cstring.as_ptr().into())])

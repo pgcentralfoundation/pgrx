@@ -364,14 +364,14 @@ pub unsafe fn pg_getarg_type(fcinfo: pg_sys::FunctionCallInfo, num: usize) -> pg
 /// [`pg_sys::FunctionCallInfo`] pointer.  This is your responsibility.
 ///
 /// It is also your responsibility to ensure that the argument Datum is pointing to a valid
-/// [`std::ffi::CStr`].
+/// [`core::ffi::CStr`].
 #[inline]
 pub unsafe fn pg_getarg_cstr<'a>(
     fcinfo: pg_sys::FunctionCallInfo,
     num: usize,
-) -> Option<&'a std::ffi::CStr> {
+) -> Option<&'a core::ffi::CStr> {
     match pg_getarg_pointer(fcinfo, num) {
-        Some(ptr) => Some(unsafe { std::ffi::CStr::from_ptr(ptr) }),
+        Some(ptr) => Some(unsafe { core::ffi::CStr::from_ptr(ptr) }),
         None => None,
     }
 }
