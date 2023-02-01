@@ -1,6 +1,6 @@
 //! Conversion implementations for from a thing into [AnyNumeric]
+use core::ffi::CStr;
 use core::str::FromStr;
-use std::ffi::CStr;
 
 use pg_sys::AsPgCStr;
 

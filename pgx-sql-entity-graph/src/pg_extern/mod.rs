@@ -475,15 +475,22 @@ impl PgExtern {
                 }
             }
             Returning::SetOf { ty: _retval_ty, optional, result } => {
-                let result_handler = if *optional {
+                let result_handler = if *optional && !*result {
                     // don't need unsafe annotations because of the larger unsafe block coming up
                     quote_spanned! { self.func.sig.span() =>
                         #func_name(#(#arg_pats),*)
                     }
                 } else if *result {
-                    quote_spanned! { self.func.sig.span() =>
-                        use ::pgx::pg_sys::panic::ErrorReportable;
-                        Some(#func_name(#(#arg_pats),*).report())
+                    if *optional {
+                        quote_spanned! { self.func.sig.span() =>
+                            use ::pgx::pg_sys::panic::ErrorReportable;
+                            #func_name(#(#arg_pats),*).report()
+                        }
+                    } else {
+                        quote_spanned! { self.func.sig.span() =>
+                            use ::pgx::pg_sys::panic::ErrorReportable;
+                            Some(#func_name(#(#arg_pats),*).report())
+                        }
                     }
                 } else {
                     quote_spanned! { self.func.sig.span() =>

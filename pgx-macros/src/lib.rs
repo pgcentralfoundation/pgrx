@@ -348,12 +348,12 @@ extension_sql!(r#"\
 );
 
 #[pg_extern(immutable)]
-fn complex_in(input: &pgx::cstr_core::CStr) -> PgBox<Complex> {
+fn complex_in(input: &core::ffi::CStr) -> PgBox<Complex> {
     todo!()
 }
 
 #[pg_extern(immutable)]
-fn complex_out(complex: PgBox<Complex>) -> &'static pgx::cstr_core::CStr {
+fn complex_out(complex: PgBox<Complex>) -> &'static core::ffi::CStr {
     todo!()
 }
 
@@ -769,7 +769,7 @@ fn impl_postgres_type(ast: DeriveInput) -> syn::Result<proc_macro2::TokenStream>
 
             #[doc(hidden)]
             #[::pgx::pgx_macros::pg_extern(immutable,parallel_safe)]
-            pub fn #funcname_in #generics(input: Option<&#lifetime ::pgx::cstr_core::CStr>) -> Option<#name #generics> {
+            pub fn #funcname_in #generics(input: Option<&#lifetime ::core::ffi::CStr>) -> Option<#name #generics> {
                 input.map_or_else(|| {
                     for m in <#name as ::pgx::inoutfuncs::JsonInOutFuncs>::NULL_ERROR_MESSAGE {
                         ::pgx::pg_sys::error!("{}", m);
@@ -780,7 +780,7 @@ fn impl_postgres_type(ast: DeriveInput) -> syn::Result<proc_macro2::TokenStream>
 
             #[doc(hidden)]
             #[::pgx::pgx_macros::pg_extern(immutable,parallel_safe)]
-            pub fn #funcname_out #generics(input: #name #generics) -> &#lifetime ::pgx::cstr_core::CStr {
+            pub fn #funcname_out #generics(input: #name #generics) -> &#lifetime ::core::ffi::CStr {
                 let mut buffer = ::pgx::stringinfo::StringInfo::new();
                 ::pgx::inoutfuncs::JsonInOutFuncs::output(&input, &mut buffer);
                 buffer.into()
@@ -792,7 +792,7 @@ fn impl_postgres_type(ast: DeriveInput) -> syn::Result<proc_macro2::TokenStream>
         stream.extend(quote! {
             #[doc(hidden)]
             #[::pgx::pgx_macros::pg_extern(immutable,parallel_safe)]
-            pub fn #funcname_in #generics(input: Option<&#lifetime ::pgx::cstr_core::CStr>) -> Option<#name #generics> {
+            pub fn #funcname_in #generics(input: Option<&#lifetime ::core::ffi::CStr>) -> Option<#name #generics> {
                 input.map_or_else(|| {
                     for m in <#name as ::pgx::inoutfuncs::InOutFuncs>::NULL_ERROR_MESSAGE {
                         ::pgx::pg_sys::error!("{}", m);
@@ -803,7 +803,7 @@ fn impl_postgres_type(ast: DeriveInput) -> syn::Result<proc_macro2::TokenStream>
 
             #[doc(hidden)]
             #[::pgx::pgx_macros::pg_extern(immutable,parallel_safe)]
-            pub fn #funcname_out #generics(input: #name #generics) -> &#lifetime ::pgx::cstr_core::CStr {
+            pub fn #funcname_out #generics(input: #name #generics) -> &#lifetime ::core::ffi::CStr {
                 let mut buffer = ::pgx::stringinfo::StringInfo::new();
                 ::pgx::inoutfuncs::InOutFuncs::output(&input, &mut buffer);
                 buffer.into()
@@ -814,7 +814,7 @@ fn impl_postgres_type(ast: DeriveInput) -> syn::Result<proc_macro2::TokenStream>
         stream.extend(quote! {
             #[doc(hidden)]
             #[::pgx::pgx_macros::pg_extern(immutable,parallel_safe)]
-            pub fn #funcname_in #generics(input: Option<&#lifetime ::pgx::cstr_core::CStr>) -> Option<::pgx::datum::PgVarlena<#name #generics>> {
+            pub fn #funcname_in #generics(input: Option<&#lifetime ::core::ffi::CStr>) -> Option<::pgx::datum::PgVarlena<#name #generics>> {
                 input.map_or_else(|| {
                     for m in <#name as ::pgx::inoutfuncs::PgVarlenaInOutFuncs>::NULL_ERROR_MESSAGE {
                         ::pgx::pg_sys::error!("{}", m);
@@ -825,7 +825,7 @@ fn impl_postgres_type(ast: DeriveInput) -> syn::Result<proc_macro2::TokenStream>
 
             #[doc(hidden)]
             #[::pgx::pgx_macros::pg_extern(immutable,parallel_safe)]
-            pub fn #funcname_out #generics(input: ::pgx::datum::PgVarlena<#name #generics>) -> &#lifetime ::pgx::cstr_core::CStr {
+            pub fn #funcname_out #generics(input: ::pgx::datum::PgVarlena<#name #generics>) -> &#lifetime ::core::ffi::CStr {
                 let mut buffer = ::pgx::stringinfo::StringInfo::new();
                 ::pgx::inoutfuncs::PgVarlenaInOutFuncs::output(&*input, &mut buffer);
                 buffer.into()

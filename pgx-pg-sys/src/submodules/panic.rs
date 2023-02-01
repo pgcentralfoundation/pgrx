@@ -9,9 +9,9 @@ Use of this source code is governed by the MIT license that can be found in the 
 #![deny(unsafe_op_in_unsafe_fn)]
 #![allow(non_snake_case)]
 
+use core::ffi::CStr;
 use std::any::Any;
 use std::cell::Cell;
-use std::ffi::CStr;
 use std::fmt::{Display, Formatter};
 use std::hint::unreachable_unchecked;
 use std::panic::{

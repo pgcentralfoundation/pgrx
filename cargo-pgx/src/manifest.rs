@@ -123,7 +123,7 @@ pub(crate) fn pg_config_and_version<'a>(
     specified_pg_version: Option<String>,
     user_features: Option<&mut Features>,
     verbose: bool,
-) -> eyre::Result<(&'a PgConfig, PgVersionSource)> {
+) -> eyre::Result<(PgConfig, PgVersionSource)> {
     let pg_version = {
         'outer: loop {
             if let Some(pg_version) = specified_pg_version {
@@ -176,7 +176,7 @@ pub(crate) fn pg_config_and_version<'a>(
             let pg_config = pgx.get(&pg_version.label())?;
 
             if verbose {
-                display_version_info(pg_config, &pg_version);
+                display_version_info(&pg_config, &pg_version);
             }
 
             Ok((pg_config, pg_version))

@@ -217,6 +217,7 @@ impl<'a, T: FromDatum> Array<'a, T> {
         }
         match (self.elem_layout.size_matches::<T>(), self.raw.as_ref()) {
             // SAFETY: Rust slice layout matches Postgres data layout and this array is "owned"
+            #[allow(unreachable_patterns)] // happens on 32-bit when DATUM_SIZE = 4
             (Some(1 | 2 | 4 | DATUM_SIZE), Some(raw)) => unsafe {
                 raw.assume_init_data_slice::<T>()
             },

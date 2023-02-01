@@ -80,7 +80,7 @@ impl CommandExecute for Run {
         )?;
 
         run(
-            pg_config,
+            &pg_config,
             self.manifest_path.as_ref(),
             self.package.as_ref(),
             package_manifest_path,

@@ -64,6 +64,23 @@ fn return_none_setof_iterator() -> Option<SetOfIterator<'static, i32>> {
 }
 
 #[pg_extern]
+fn return_none_result_setof_iterator(
+) -> Result<Option<SetOfIterator<'static, String>>, Box<dyn std::error::Error>> {
+    Ok(None)
+}
+
+// TODO:  We don't yet support returning Result<Option<TableIterator>> because the code generator
+//        is inscrutable. But when we do, this function will help ensure it works
+//
+// #[pg_extern]
+// fn return_none_result_tableiterator_iterator() -> Result<
+//     Option<TableIterator<'static, (name!(idx, i32), name!(some_value, &'static str))>>,
+//     Box<dyn std::error::Error>,
+// > {
+//     Ok(None)
+// }
+
+#[pg_extern]
 fn split_set_with_borrow<'a>(input: &'a str, pattern: &'a str) -> SetOfIterator<'a, &'a str> {
     SetOfIterator::new(input.split_terminator(pattern))
 }

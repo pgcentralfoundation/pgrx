@@ -42,6 +42,15 @@ impl<T> Deref for HookResult<T> {
 }
 
 pub trait PgHooks {
+    /// Hook before the logs are being processed by PostgreSQL itself
+    fn emit_log(
+        &mut self,
+        error_data: PgBox<pg_sys::ErrorData>,
+        prev_hook: fn(error_data: PgBox<pg_sys::ErrorData>) -> HookResult<()>,
+    ) -> HookResult<()> {
+        prev_hook(error_data)
+    }
+
     /// Hook for plugins to get control in ExecutorStart()
     fn executor_start(
         &mut self,
@@ -104,7 +113,7 @@ pub trait PgHooks {
     fn process_utility_hook(
         &mut self,
         pstmt: PgBox<pg_sys::PlannedStmt>,
-        query_string: &std::ffi::CStr,
+        query_string: &core::ffi::CStr,
         read_only_tree: Option<bool>,
         context: pg_sys::ProcessUtilityContext,
         params: PgBox<pg_sys::ParamListInfoData>,
@@ -113,7 +122,7 @@ pub trait PgHooks {
         completion_tag: *mut pg_sys::QueryCompletion,
         prev_hook: fn(
             pstmt: PgBox<pg_sys::PlannedStmt>,
-            query_string: &std::ffi::CStr,
+            query_string: &core::ffi::CStr,
             read_only_tree: Option<bool>,
             context: pg_sys::ProcessUtilityContext,
             params: PgBox<pg_sys::ParamListInfoData>,
@@ -174,6 +183,7 @@ pub trait PgHooks {
 
 struct Hooks {
     current_hook: Box<&'static mut (dyn PgHooks)>,
+    prev_emit_log_hook: pg_sys::emit_log_hook_type,
     prev_executor_start_hook: pg_sys::ExecutorStart_hook_type,
     prev_executor_run_hook: pg_sys::ExecutorRun_hook_type,
     prev_executor_finish_hook: pg_sys::ExecutorFinish_hook_type,
@@ -216,6 +226,7 @@ pub unsafe fn register_hook(hook: &'static mut (dyn PgHooks)) {
             .or(Some(pgx_standard_planner_wrapper)),
         prev_post_parse_analyze_hook: pg_sys::post_parse_analyze_hook
             .replace(pgx_post_parse_analyze),
+        prev_emit_log_hook: pg_sys::emit_log_hook.replace(pgx_emit_log),
     });
 
     #[pg_guard]
@@ -333,7 +344,7 @@ unsafe extern "C" fn pgx_process_utility(
 ) {
     fn prev(
         pstmt: PgBox<pg_sys::PlannedStmt>,
-        query_string: &std::ffi::CStr,
+        query_string: &core::ffi::CStr,
         _read_only_tree: Option<bool>,
         context: pg_sys::ProcessUtilityContext,
         params: PgBox<pg_sys::ParamListInfoData>,
@@ -357,7 +368,7 @@ unsafe extern "C" fn pgx_process_utility(
     let hook = &mut HOOKS.as_mut().unwrap().current_hook;
     hook.process_utility_hook(
         PgBox::from_pg(pstmt),
-        std::ffi::CStr::from_ptr(query_string),
+        core::ffi::CStr::from_ptr(query_string),
         None,
         context,
         PgBox::from_pg(params),
@@ -382,7 +393,7 @@ unsafe extern "C" fn pgx_process_utility(
 ) {
     fn prev(
         pstmt: PgBox<pg_sys::PlannedStmt>,
-        query_string: &std::ffi::CStr,
+        query_string: &core::ffi::CStr,
         read_only_tree: Option<bool>,
         context: pg_sys::ProcessUtilityContext,
         params: PgBox<pg_sys::ParamListInfoData>,
@@ -407,7 +418,7 @@ unsafe extern "C" fn pgx_process_utility(
     let hook = &mut HOOKS.as_mut().unwrap().current_hook;
     hook.process_utility_hook(
         PgBox::from_pg(pstmt),
-        std::ffi::CStr::from_ptr(query_string),
+        core::ffi::CStr::from_ptr(query_string),
         Some(read_only_tree),
         context,
         PgBox::from_pg(params),
@@ -538,6 +549,21 @@ unsafe extern "C" fn pgx_post_parse_analyze(
         prev,
     )
     .inner
+}
+
+#[pg_guard]
+unsafe extern "C" fn pgx_emit_log(error_data: *mut pg_sys::ErrorData) {
+    fn prev(error_data: PgBox<pg_sys::ErrorData>) -> HookResult<()> {
+        HookResult::new(unsafe {
+            match HOOKS.as_mut().unwrap().prev_emit_log_hook.as_ref() {
+                None => (),
+                Some(f) => (f)(error_data.as_ptr()),
+            }
+        })
+    }
+
+    let hook = &mut HOOKS.as_mut().unwrap().current_hook;
+    hook.emit_log(PgBox::from_pg(error_data), prev).inner
 }
 
 #[pg_guard]

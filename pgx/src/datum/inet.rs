@@ -8,6 +8,7 @@ Use of this source code is governed by the MIT license that can be found in the 
 */
 
 use crate::{direct_function_call, direct_function_call_as_datum, pg_sys, FromDatum, IntoDatum};
+use core::ffi::CStr;
 use pgx_pg_sys::errcodes::PgSqlErrorCode;
 use pgx_pg_sys::PgTryBuilder;
 use pgx_sql_entity_graph::metadata::{
@@ -15,7 +16,6 @@ use pgx_sql_entity_graph::metadata::{
 };
 use serde::de::{Error, Visitor};
 use serde::{Deserialize, Deserializer, Serialize, Serializer};
-use std::ffi::CStr;
 use std::fmt;
 use std::ops::Deref;
 
@@ -108,7 +108,7 @@ impl FromDatum for Inet {
 
 impl IntoDatum for Inet {
     fn into_datum(self) -> Option<pg_sys::Datum> {
-        let cstr = std::ffi::CString::new(self.0).expect("failed to convert inet into CString");
+        let cstr = alloc::ffi::CString::new(self.0).expect("failed to convert inet into CString");
         unsafe {
             direct_function_call_as_datum(pg_sys::inet_in, vec![cstr.as_c_str().into_datum()])
         }

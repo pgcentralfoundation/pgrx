@@ -386,7 +386,7 @@ impl PgMemoryContexts {
                 max_block_size,
             } => {
                 let context: pg_sys::MemoryContext = unsafe {
-                    let name = std::ffi::CString::new(*name).unwrap();
+                    let name = alloc::ffi::CString::new(*name).unwrap();
                     pg_sys::AllocSetContextCreateExtended(
                         *parent,
                         name.into_raw(),
@@ -428,7 +428,7 @@ impl PgMemoryContexts {
     /// We also cannot ensure that the result of this function will stay allocated as long as Rust's
     /// borrow checker thinks it will.
     pub unsafe fn pstrdup(&self, s: &str) -> *mut std::os::raw::c_char {
-        let cstring = std::ffi::CString::new(s).unwrap();
+        let cstring = alloc::ffi::CString::new(s).unwrap();
         unsafe { pg_sys::MemoryContextStrdup(self.value(), cstring.as_ptr()) }
     }
 

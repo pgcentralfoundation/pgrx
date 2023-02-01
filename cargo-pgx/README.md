@@ -150,7 +150,7 @@ OPTIONS:
                          have pgx download/compile/install it [env: PG13_PG_CONFIG=]
         --pg14 <PG14>    If installed locally, the path to PG14's `pgconfig` tool, or `download` to
                          have pgx download/compile/install it [env: PG14_PG_CONFIG=]
-        --pg15 <PG15>    If installed locally, the path to PG14's `pgconfig` tool, or `download` to
+        --pg15 <PG15>    If installed locally, the path to PG15's `pgconfig` tool, or `download` to
                          have pgx download/compile/install it [env: PG15_PG_CONFIG=]
     -v, --verbose        Enable info logs, -vv for debug, -vvv for trace
     -V, --version        Print version information
@@ -197,32 +197,32 @@ OPTIONS:
 
 ```shell script
 $ cargo pgx status all
-Postgres v10 is stopped
 Postgres v11 is stopped
 Postgres v12 is stopped
 Postgres v13 is stopped
 Postgres v14 is stopped
+Postgres v15 is stopped
 
 $ cargo pgx start all
-    Starting Postgres v10 on port 28810
     Starting Postgres v11 on port 28811
     Starting Postgres v12 on port 28812
     Starting Postgres v13 on port 28813
     Starting Postgres v14 on port 28814
+    Starting Postgres v15 on port 28815
 
 $ cargo pgx status all
-Postgres v10 is running
 Postgres v11 is running
 Postgres v12 is running
 Postgres v13 is running
 Postgres v14 is running
+Postgres v15 is running
 
 $ cargo pgx stop all
-    Stopping Postgres v10
     Stopping Postgres v11
     Stopping Postgres v12
     Stopping Postgres v13
     Stopping Postgres v14
+    Stopping Postgres v15
 ```
 
 `cargo pgx` has three commands for managing each Postgres installation: `start`, `stop`, and `status`. Additionally, `cargo pgx run` (see below) will automatically start its target Postgres instance if not already running.

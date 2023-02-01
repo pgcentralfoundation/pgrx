@@ -90,7 +90,7 @@ unsafe fn pg_guard_ffi_boundary_impl<T, F: FnOnce() -> T>(f: F) -> T {
 
     // just use these here to avoid compilation warnings when #[cfg(feature = "postgrestd")] is on
     use crate::panic::{CaughtError, ErrorReport, ErrorReportLocation, ErrorReportWithLevel};
-    use std::ffi::CStr;
+    use core::ffi::CStr;
 
     // The next code is definitely thread-unsafe (it manipulates statics in an
     // unsynchronized manner), so we may as well check here.

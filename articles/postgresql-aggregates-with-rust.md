@@ -426,7 +426,7 @@ CREATE TYPE DemoSum;
 -- src/lib.rs:6
 -- exploring_aggregates::demosum_in
 CREATE OR REPLACE FUNCTION "demosum_in"(
-	"input" cstring /* &cstr_core::CStr */
+	"input" cstring /* &std::ffi::CStr */
 ) RETURNS DemoSum /* exploring_aggregates::DemoSum */
 IMMUTABLE PARALLEL SAFE STRICT
 LANGUAGE c /* Rust */
@@ -436,7 +436,7 @@ AS 'MODULE_PATHNAME', 'demosum_in_wrapper';
 -- exploring_aggregates::demosum_out
 CREATE OR REPLACE FUNCTION "demosum_out"(
 	"input" DemoSum /* exploring_aggregates::DemoSum */
-) RETURNS cstring /* &cstr_core::CStr */
+) RETURNS cstring /* &std::ffi::CStr */
 IMMUTABLE PARALLEL SAFE STRICT
 LANGUAGE c /* Rust */
 AS 'MODULE_PATHNAME', 'demosum_out_wrapper';

@@ -119,7 +119,7 @@ fn main() -> eyre::Result<()> {
     println!("cargo:rerun-if-changed=cshim");
     emit_missing_rerun_if_env_changed();
 
-    let pg_configs: Vec<(u16, &PgConfig)> = if std::env::var(
+    let pg_configs: Vec<(u16, PgConfig)> = if std::env::var(
         "PGX_PG_SYS_GENERATE_BINDINGS_FOR_RELEASE",
     )
     .unwrap_or("false".into())
@@ -164,8 +164,18 @@ fn main() -> eyre::Result<()> {
                     .join(", ")
             )
         })?;
-        let specific = pgx.get(&found_feat)?;
-        vec![(found_ver, specific)]
+
+        if let Ok(pg_config) = PgConfig::from_env() {
+            let major_version = pg_config.major_version()?;
+
+            if major_version != found_ver {
+                panic!("Feature flag `pg{found_ver}` does not match version from the environment-described PgConfig (`{major_version}`)")
+            }
+            vec![(major_version, pg_config)]
+        } else {
+            let specific = pgx.get(&found_feat)?;
+            vec![(found_ver, specific)]
+        }
     };
     std::thread::scope(|scope| {
         // This is pretty much either always 1 (normally) or 5 (for releases),
@@ -201,6 +211,7 @@ fn main() -> eyre::Result<()> {
 fn emit_missing_rerun_if_env_changed() {
     // `pgx-pg-config` doesn't emit one for this.
     println!("cargo:rerun-if-env-changed=PGX_PG_CONFIG_PATH");
+    println!("cargo:rerun-if-env-changed=PGX_PG_CONFIG_AS_ENV");
     // Bindgen's behavior depends on these vars, but it doesn't emit them
     // directly because the output would cause issue with `bindgen-cli`. Do it
     // on bindgen's behalf.
@@ -229,7 +240,7 @@ fn generate_bindings(
     include_h.push("include");
     include_h.push(format!("pg{}.h", major_version));
 
-    let bindgen_output = run_bindgen(major_version, &pg_config, &include_h)
+    let bindgen_output = get_bindings(major_version, &pg_config, &include_h)
         .wrap_err_with(|| format!("bindgen failed for pg{}", major_version))?;
 
     let oids = extract_oids(&bindgen_output);
@@ -657,13 +668,34 @@ struct StructDescriptor<'a> {
     children: Vec<usize>,
 }
 
+fn get_bindings(
+    major_version: u16,
+    pg_config: &PgConfig,
+    include_h: &PathBuf,
+) -> eyre::Result<syn::File> {
+    let bindings = if let Some(info_dir) =
+        target_env_tracked(&format!("PGX_TARGET_INFO_PATH_PG{major_version}"))
+    {
+        let bindings_file = format!("{info_dir}/pg{major_version}_raw_bindings.rs");
+        std::fs::read_to_string(&bindings_file)
+            .wrap_err_with(|| format!("failed to read raw bindings from {bindings_file}"))?
+    } else {
+        let bindings = run_bindgen(major_version, pg_config, include_h)?;
+        if let Some(path) = env_tracked("PGX_PG_SYS_EXTRA_OUTPUT_PATH") {
+            std::fs::write(&path, &bindings)?;
+        }
+        bindings
+    };
+    syn::parse_file(bindings.as_str()).wrap_err_with(|| "failed to parse generated bindings")
+}
+
 /// Given a specific postgres version, `run_bindgen` generates bindings for the given
 /// postgres version and returns them as a token stream.
 fn run_bindgen(
     major_version: u16,
     pg_config: &PgConfig,
     include_h: &PathBuf,
-) -> eyre::Result<syn::File> {
+) -> eyre::Result<String> {
     eprintln!("Generating bindings for pg{major_version}");
     let bindings = bindgen::Builder::default()
         .header(include_h.display().to_string())
@@ -713,9 +745,9 @@ fn run_bindgen(
         .derive_partialord(false)
         .layout_tests(false)
         .generate()
-        .unwrap_or_else(|e| panic!("Unable to generate bindings for pg{}: {:?}", major_version, e));
+        .wrap_err_with(|| format!("Unable to generate bindings for pg{}", major_version))?;
 
-    syn::parse_file(bindings.to_string().as_str()).map_err(|e| From::from(e))
+    Ok(bindings.to_string())
 }
 
 fn env_tracked(s: &str) -> Option<String> {

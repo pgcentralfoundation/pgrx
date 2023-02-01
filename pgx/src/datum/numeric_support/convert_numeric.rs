@@ -1,6 +1,6 @@
 //! Conversion implementations for converting from a thing into [`Numeric<P, S>`]
+use core::ffi::CStr;
 use core::str::FromStr;
-use std::ffi::CStr;
 
 use pgx_pg_sys::AsPgCStr;
 

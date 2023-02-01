@@ -68,7 +68,7 @@ impl Clone for PallocdVarlena {
 /// }
 ///
 /// impl PgVarlenaInOutFuncs for MyType {
-///     fn input(input: &pgx::cstr_core::CStr) -> PgVarlena<Self> {
+///     fn input(input: &core::ffi::CStr) -> PgVarlena<Self> {
 ///         let mut iter = input.to_str().unwrap().split(',');
 ///         let (a, b, c) = (iter.next(), iter.next(), iter.next());
 ///

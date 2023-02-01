@@ -52,6 +52,7 @@ Use of this source code is governed by the MIT license that can be found in the 
 #include "commands/tablecmds.h"
 #include "commands/trigger.h"
 #include "commands/vacuum.h"
+#include "common/config_info.h"
 #include "executor/executor.h"
 #include "executor/spi.h"
 #include "foreign/fdwapi.h"
