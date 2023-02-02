@@ -459,4 +459,11 @@ mod tests {
         assert_eq!(with_select, with_get_one);
         Ok(())
     }
+
+    #[pg_test]
+    fn spi_can_read_domain_types() -> spi::Result<Option<String>> {
+        Spi::run("CREATE DOMAIN my_text_type TEXT")?;
+        Spi::get_one::<String>("SELECT 'hello'::my_text_type")
+
+    }
 }

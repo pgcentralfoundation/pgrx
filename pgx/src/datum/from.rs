@@ -117,7 +117,7 @@ pub trait FromDatum {
     where
         Self: Sized + IntoDatum,
     {
-        if !Self::is_compatible_with(type_oid) {
+        if !is_output_compatible::<Self>(type_oid) {
             Err(TryFromDatumError::IncompatibleTypes {
                 rust_type: std::any::type_name::<Self>(),
                 rust_oid: Self::type_oid(),
@@ -140,7 +140,7 @@ pub trait FromDatum {
     where
         Self: Sized + IntoDatum,
     {
-        if !Self::is_compatible_with(type_oid) {
+        if !is_output_compatible::<Self>(type_oid) {
             Err(TryFromDatumError::IncompatibleTypes {
                 rust_type: std::any::type_name::<Self>(),
                 rust_oid: Self::type_oid(),
@@ -151,6 +151,17 @@ pub trait FromDatum {
             Ok(FromDatum::from_datum_in_memory_context(memory_context, datum, is_null, type_oid))
         }
     }
+}
+
+fn is_output_compatible<T: IntoDatum>(type_oid: pg_sys::Oid) -> bool {
+    if T::is_compatible_with(type_oid) {
+        return true;
+    }
+    let base_type_oid = unsafe {
+        (*pg_sys::lookup_type_cache(type_oid, pg_sys::TYPECACHE_DOMAIN_BASE_INFO as i32)).domainBaseType
+    };
+    base_type_oid != pg_sys::InvalidOid
+        && T::is_compatible_with(base_type_oid)
 }
 
 /// Retrieves a Postgres type name given its Oid
