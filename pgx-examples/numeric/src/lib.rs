@@ -28,6 +28,22 @@ fn math() -> Numeric<10, 3> {
     n %= 19;
     n += 99.42;
 
+    let mut n: AnyNumeric = n * 42;
+    n = n / 42;
+    n = n + 42;
+    n = n - 42;
+    n = n * 42.0f32;
+    n = n / 42.0f32;
+    n = n + 42.0f32;
+    n = n - 42.0f32;
+    n = n * 42.0f64;
+    n = n / 42.0f64;
+    n = n + 42.0f64;
+    n = n - 42.0f64;
+
+    n = n / AnyNumeric::from(42);
+    n = n / Numeric::<1000, 33>::try_from(42).unwrap();
+
     n.rescale().unwrap()
 }
 
