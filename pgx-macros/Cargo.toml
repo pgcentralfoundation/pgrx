@@ -1,6 +1,6 @@
 [package]
 name = "pgx-macros"
-version = "0.7.0"
+version = "0.7.1"
 authors = ["ZomboDB, LLC <zombodb@gmail.com>"]
 license = "MIT"
 description = "Proc Macros for 'pgx'"
@@ -21,7 +21,7 @@ rustc-args = ["--cfg", "docsrs"]
 no-schema-generation = ["pgx-sql-entity-graph/no-schema-generation"]
 
 [dependencies]
-pgx-sql-entity-graph = { path = "../pgx-sql-entity-graph", version = "=0.7.0" }
+pgx-sql-entity-graph = { path = "../pgx-sql-entity-graph", version = "=0.7.1" }
 proc-macro2 = "1.0.50"
 quote = "1.0.23"
 syn = { version = "1.0.107", features = [ "extra-traits", "full", "fold", "parsing" ] }
