@@ -222,6 +222,7 @@ anynumeric_assign_op_from_float!(RemAssign, rem_assign, f64, %);
 
 macro_rules! primitive_math_op {
     ($opname:ident, $primitive:ty, $trait_fnname:ident, $pg_func:ident) => {
+        /// [`AnyNumeric`] on the left, rust primitive on the right.  Results in an [`AnyNumeric`]
         impl $opname<$primitive> for AnyNumeric {
             type Output = AnyNumeric;
 
@@ -234,6 +235,20 @@ macro_rules! primitive_math_op {
             }
         }
 
+        /// Rust primitive on the left, [`AnyNumeric`] on the right.  Results in an [`AnyNumeric`]
+        impl $opname<AnyNumeric> for $primitive {
+            type Output = AnyNumeric;
+
+            #[inline]
+            fn $trait_fnname(self, rhs: AnyNumeric) -> Self::Output {
+                call_numeric_func(
+                    pg_sys::$pg_func,
+                    vec![AnyNumeric::try_from(self).unwrap().as_datum(), rhs.as_datum()],
+                )
+            }
+        }
+
+        /// [`Numeric`] on the left, rust primitive on the right.  Results in an [`AnyNumeric`]
         impl<const P: u32, const S: u32> $opname<$primitive> for Numeric<P, S> {
             type Output = AnyNumeric;
 
@@ -242,6 +257,19 @@ macro_rules! primitive_math_op {
                 call_numeric_func(
                     pg_sys::$pg_func,
                     vec![self.as_datum(), AnyNumeric::try_from(rhs).unwrap().as_datum()],
+                )
+            }
+        }
+
+        /// Rust primitive on the left, [`Numeric`] on the right.  Results in an [`AnyNumeric`]
+        impl<const P: u32, const S: u32> $opname<Numeric<P, S>> for $primitive {
+            type Output = AnyNumeric;
+
+            #[inline]
+            fn $trait_fnname(self, rhs: Numeric<P, S>) -> Self::Output {
+                call_numeric_func(
+                    pg_sys::$pg_func,
+                    vec![rhs.as_datum(), AnyNumeric::try_from(self).unwrap().as_datum()],
                 )
             }
         }
