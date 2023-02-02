@@ -24,6 +24,16 @@ macro_rules! anynumeric_math_op {
                 call_numeric_func(pg_sys::$pg_func, vec![self.as_datum(), rhs.as_datum()])
             }
         }
+
+        /// [`AnyNumeric`] on the left, [`Numeric`] on the right.  Results in a new [`AnyNumeric`]
+        impl<const P: u32, const S: u32> $opname<AnyNumeric> for Numeric<P, S> {
+            type Output = AnyNumeric;
+
+            #[inline]
+            fn $trait_fnname(self, rhs: AnyNumeric) -> Self::Output {
+                call_numeric_func(pg_sys::$pg_func, vec![self.as_datum(), rhs.as_datum()])
+            }
+        }
     };
 }
 
@@ -35,10 +45,20 @@ anynumeric_math_op!(Rem, rem, numeric_mod);
 
 macro_rules! numeric_math_op {
     ($opname:ident, $trait_fnname:ident, $pg_func:ident) => {
-        /// Doing this operation on two [`Numeric<P, S>`] instances results in a new [`AnyNumeric`].
+        /// Doing this operation on two [`Numeric`] instances results in a new [`AnyNumeric`].
         impl<const P: u32, const S: u32, const Q: u32, const T: u32> $opname<Numeric<Q, T>>
             for Numeric<P, S>
         {
+            type Output = AnyNumeric;
+
+            #[inline]
+            fn $trait_fnname(self, rhs: Numeric<Q, T>) -> Self::Output {
+                call_numeric_func(pg_sys::$pg_func, vec![self.as_datum(), rhs.as_datum()])
+            }
+        }
+
+        /// [`Numeric`] on the left, [`AnyNumeric`] on the right.  Results in a new [`AnyNumeric`]
+        impl<const Q: u32, const T: u32> $opname<Numeric<Q, T>> for AnyNumeric {
             type Output = AnyNumeric;
 
             #[inline]
@@ -199,3 +219,134 @@ anynumeric_assign_op_from_float!(SubAssign, sub_assign, f64, -);
 anynumeric_assign_op_from_float!(MulAssign, mul_assign, f64, *);
 anynumeric_assign_op_from_float!(DivAssign, div_assign, f64, /);
 anynumeric_assign_op_from_float!(RemAssign, rem_assign, f64, %);
+
+macro_rules! primitive_math_op {
+    ($opname:ident, $primitive:ty, $trait_fnname:ident, $pg_func:ident) => {
+        /// [`AnyNumeric`] on the left, rust primitive on the right.  Results in an [`AnyNumeric`]
+        impl $opname<$primitive> for AnyNumeric {
+            type Output = AnyNumeric;
+
+            #[inline]
+            fn $trait_fnname(self, rhs: $primitive) -> Self::Output {
+                call_numeric_func(
+                    pg_sys::$pg_func,
+                    vec![self.as_datum(), AnyNumeric::try_from(rhs).unwrap().as_datum()],
+                )
+            }
+        }
+
+        /// Rust primitive on the left, [`AnyNumeric`] on the right.  Results in an [`AnyNumeric`]
+        impl $opname<AnyNumeric> for $primitive {
+            type Output = AnyNumeric;
+
+            #[inline]
+            fn $trait_fnname(self, rhs: AnyNumeric) -> Self::Output {
+                call_numeric_func(
+                    pg_sys::$pg_func,
+                    vec![AnyNumeric::try_from(self).unwrap().as_datum(), rhs.as_datum()],
+                )
+            }
+        }
+
+        /// [`Numeric`] on the left, rust primitive on the right.  Results in an [`AnyNumeric`]
+        impl<const P: u32, const S: u32> $opname<$primitive> for Numeric<P, S> {
+            type Output = AnyNumeric;
+
+            #[inline]
+            fn $trait_fnname(self, rhs: $primitive) -> Self::Output {
+                call_numeric_func(
+                    pg_sys::$pg_func,
+                    vec![self.as_datum(), AnyNumeric::try_from(rhs).unwrap().as_datum()],
+                )
+            }
+        }
+
+        /// Rust primitive on the left, [`Numeric`] on the right.  Results in an [`AnyNumeric`]
+        impl<const P: u32, const S: u32> $opname<Numeric<P, S>> for $primitive {
+            type Output = AnyNumeric;
+
+            #[inline]
+            fn $trait_fnname(self, rhs: Numeric<P, S>) -> Self::Output {
+                call_numeric_func(
+                    pg_sys::$pg_func,
+                    vec![rhs.as_datum(), AnyNumeric::try_from(self).unwrap().as_datum()],
+                )
+            }
+        }
+    };
+}
+
+primitive_math_op!(Add, u8, add, numeric_add);
+primitive_math_op!(Add, u16, add, numeric_add);
+primitive_math_op!(Add, u32, add, numeric_add);
+primitive_math_op!(Add, u64, add, numeric_add);
+primitive_math_op!(Add, u128, add, numeric_add);
+primitive_math_op!(Add, usize, add, numeric_add);
+primitive_math_op!(Add, i8, add, numeric_add);
+primitive_math_op!(Add, i16, add, numeric_add);
+primitive_math_op!(Add, i32, add, numeric_add);
+primitive_math_op!(Add, i64, add, numeric_add);
+primitive_math_op!(Add, i128, add, numeric_add);
+primitive_math_op!(Add, isize, add, numeric_add);
+primitive_math_op!(Add, f32, add, numeric_add);
+primitive_math_op!(Add, f64, add, numeric_add);
+
+primitive_math_op!(Sub, u8, sub, numeric_sub);
+primitive_math_op!(Sub, u16, sub, numeric_sub);
+primitive_math_op!(Sub, u32, sub, numeric_sub);
+primitive_math_op!(Sub, u64, sub, numeric_sub);
+primitive_math_op!(Sub, u128, sub, numeric_sub);
+primitive_math_op!(Sub, usize, sub, numeric_sub);
+primitive_math_op!(Sub, i8, sub, numeric_sub);
+primitive_math_op!(Sub, i16, sub, numeric_sub);
+primitive_math_op!(Sub, i32, sub, numeric_sub);
+primitive_math_op!(Sub, i64, sub, numeric_sub);
+primitive_math_op!(Sub, i128, sub, numeric_sub);
+primitive_math_op!(Sub, isize, sub, numeric_sub);
+primitive_math_op!(Sub, f32, sub, numeric_sub);
+primitive_math_op!(Sub, f64, sub, numeric_sub);
+
+primitive_math_op!(Mul, u8, mul, numeric_mul);
+primitive_math_op!(Mul, u16, mul, numeric_mul);
+primitive_math_op!(Mul, u32, mul, numeric_mul);
+primitive_math_op!(Mul, u64, mul, numeric_mul);
+primitive_math_op!(Mul, u128, mul, numeric_mul);
+primitive_math_op!(Mul, usize, mul, numeric_mul);
+primitive_math_op!(Mul, i8, mul, numeric_mul);
+primitive_math_op!(Mul, i16, mul, numeric_mul);
+primitive_math_op!(Mul, i32, mul, numeric_mul);
+primitive_math_op!(Mul, i64, mul, numeric_mul);
+primitive_math_op!(Mul, i128, mul, numeric_mul);
+primitive_math_op!(Mul, isize, mul, numeric_mul);
+primitive_math_op!(Mul, f32, mul, numeric_mul);
+primitive_math_op!(Mul, f64, mul, numeric_mul);
+
+primitive_math_op!(Div, u8, div, numeric_div);
+primitive_math_op!(Div, u16, div, numeric_div);
+primitive_math_op!(Div, u32, div, numeric_div);
+primitive_math_op!(Div, u64, div, numeric_div);
+primitive_math_op!(Div, u128, div, numeric_div);
+primitive_math_op!(Div, usize, div, numeric_div);
+primitive_math_op!(Div, i8, div, numeric_div);
+primitive_math_op!(Div, i16, div, numeric_div);
+primitive_math_op!(Div, i32, div, numeric_div);
+primitive_math_op!(Div, i64, div, numeric_div);
+primitive_math_op!(Div, i128, div, numeric_div);
+primitive_math_op!(Div, isize, div, numeric_div);
+primitive_math_op!(Div, f32, div, numeric_div);
+primitive_math_op!(Div, f64, div, numeric_div);
+
+primitive_math_op!(Rem, u8, rem, numeric_mod);
+primitive_math_op!(Rem, u16, rem, numeric_mod);
+primitive_math_op!(Rem, u32, rem, numeric_mod);
+primitive_math_op!(Rem, u64, rem, numeric_mod);
+primitive_math_op!(Rem, u128, rem, numeric_mod);
+primitive_math_op!(Rem, usize, rem, numeric_mod);
+primitive_math_op!(Rem, i8, rem, numeric_mod);
+primitive_math_op!(Rem, i16, rem, numeric_mod);
+primitive_math_op!(Rem, i32, rem, numeric_mod);
+primitive_math_op!(Rem, i64, rem, numeric_mod);
+primitive_math_op!(Rem, i128, rem, numeric_mod);
+primitive_math_op!(Rem, isize, rem, numeric_mod);
+primitive_math_op!(Rem, f32, rem, numeric_mod);
+primitive_math_op!(Rem, f64, rem, numeric_mod);
