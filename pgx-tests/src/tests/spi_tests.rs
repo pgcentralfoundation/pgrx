@@ -464,7 +464,6 @@ mod tests {
     fn spi_can_read_domain_types() -> spi::Result<Option<String>> {
         Spi::run("CREATE DOMAIN my_text_type TEXT")?;
         Spi::get_one::<String>("SELECT 'hello'::my_text_type")
-
     }
 
     #[pg_test]
@@ -472,6 +471,5 @@ mod tests {
         Spi::run("CREATE DOMAIN my_text_type TEXT")?;
         Spi::run("CREATE DOMAIN my_other_text_type my_text_type")?;
         Spi::get_one::<String>("SELECT 'hello'::my_other_text_type")
-
     }
 }

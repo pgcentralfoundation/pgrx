@@ -159,7 +159,8 @@ fn is_output_compatible<T: IntoDatum>(mut type_oid: pg_sys::Oid) -> bool {
             return true;
         }
         type_oid = unsafe {
-            (*pg_sys::lookup_type_cache(type_oid, pg_sys::TYPECACHE_DOMAIN_BASE_INFO as i32)).domainBaseType
+            (*pg_sys::lookup_type_cache(type_oid, pg_sys::TYPECACHE_DOMAIN_BASE_INFO as i32))
+                .domainBaseType
         };
         if type_oid == pg_sys::InvalidOid {
             return false;
