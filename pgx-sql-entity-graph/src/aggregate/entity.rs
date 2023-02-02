@@ -288,6 +288,21 @@ impl ToSql for PgAggregateEntity {
         };
 
         let stype_sql = map_ty(&self.stype.used_ty).wrap_err("Mapping state type")?;
+        let mut stype_schema = String::from("");
+        for (ty_item, ty_index) in context.types.iter() {
+            if ty_item.id_matches(&self.stype.used_ty.ty_id) {
+                stype_schema = context.schema_prefix_for(ty_index);
+                break;
+            }
+        }
+        if String::is_empty(&stype_schema) {
+            for (ty_item, ty_index) in context.enums.iter() {
+                if ty_item.id_matches(&self.stype.used_ty.ty_id) {
+                    stype_schema = context.schema_prefix_for(ty_index);
+                    break;
+                }
+            }
+        }
 
         if let Some(value) = &self.mstype {
             let mstype_sql = map_ty(&value).wrap_err("Mapping moving state type")?;
@@ -316,7 +331,7 @@ impl ToSql for PgAggregateEntity {
                 CREATE AGGREGATE {schema}{name} ({direct_args}{maybe_order_by}{args})\n\
                 (\n\
                     \tSFUNC = {schema}\"{sfunc}\", /* {full_path}::state */\n\
-                    \tSTYPE = {schema}{stype}{maybe_comma_after_stype} /* {stype_full_path} */\
+                    \tSTYPE = {stype_schema}{stype}{maybe_comma_after_stype} /* {stype_full_path} */\
                     {optional_attributes}\
                 );\
             ",
@@ -326,6 +341,7 @@ impl ToSql for PgAggregateEntity {
             file = self.file,
             line = self.line,
             sfunc = self.sfunc,
+            stype_schema = stype_schema,
             stype = stype_sql,
             stype_full_path = self.stype.used_ty.full_path,
             maybe_comma_after_stype = if optional_attributes.len() == 0 { "" } else { "," },
