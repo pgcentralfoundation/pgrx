@@ -153,15 +153,18 @@ pub trait FromDatum {
     }
 }
 
-fn is_output_compatible<T: IntoDatum>(type_oid: pg_sys::Oid) -> bool {
-    if T::is_compatible_with(type_oid) {
-        return true;
+fn is_output_compatible<T: IntoDatum>(mut type_oid: pg_sys::Oid) -> bool {
+    loop {
+        if T::is_compatible_with(type_oid) {
+            return true;
+        }
+        type_oid = unsafe {
+            (*pg_sys::lookup_type_cache(type_oid, pg_sys::TYPECACHE_DOMAIN_BASE_INFO as i32)).domainBaseType
+        };
+        if type_oid == pg_sys::InvalidOid {
+            return false;
+        }
     }
-    let base_type_oid = unsafe {
-        (*pg_sys::lookup_type_cache(type_oid, pg_sys::TYPECACHE_DOMAIN_BASE_INFO as i32)).domainBaseType
-    };
-    base_type_oid != pg_sys::InvalidOid
-        && T::is_compatible_with(base_type_oid)
 }
 
 /// Retrieves a Postgres type name given its Oid
