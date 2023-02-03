@@ -248,7 +248,7 @@ As of Postgres v15, forks are allowed to specify they use a different ABI than c
 Since pgx makes countless assumptions about Postgres' internal ABI it is not possible for it to 
 guarantee that a compiled pgx extension will probably execute within such a Postgres fork.  You,
 dear compiler runner, can make this guarantee for yourself by specifying the `unsafe-postgres` 
-feature flag.  Otherwise, a pgx extension will fail to compile with an error simiar to:
+feature flag.  Otherwise, a pgx extension will fail to compile with an error similar to:
 
 ```
 error: Unrecognized Postgres ABI.  Perhaps you need `--features unsafe-postgres`?
