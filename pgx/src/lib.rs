@@ -135,11 +135,24 @@ pub use pgx_sql_entity_graph;
 // Unless the compiling user explicitly told us that they're aware of this via `--features unsafe-postgres`.
 #[cfg(all(feature = "pg15", not(feature = "unsafe-postgres")))]
 const _: () = {
-    if crate::pg_sys::FMGR_ABI_EXTRA.iter().zip(b"PostgreSQL\0".iter()).all(|(a, b)| a == b) {
-        compile_error!(
-            "Unrecognized Postgres ABI.  Perhaps you need `--features unsafe-postgres`?"
-        );
+    // to appease `const`
+    const fn same_slice(a: &[u8], b: &[u8]) -> bool {
+        if a.len() != b.len() {
+            return false;
+        }
+        let mut i = 0;
+        while i < a.len() {
+            if a[i] != b[i] {
+                return false;
+            }
+            i += 1;
+        }
+        true
     }
+    assert!(
+        same_slice(pg_sys::FMGR_ABI_EXTRA, b"PostgreSQL\0"),
+        "Unsupported Postgres ABI. Perhaps you need `--features unsafe-postgres`?",
+    );
 };
 
 /// A macro for marking a library compatible with [`pgx`][crate].

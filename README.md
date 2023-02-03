@@ -251,13 +251,15 @@ dear compiler runner, can make this guarantee for yourself by specifying the `un
 feature flag.  Otherwise, a pgx extension will fail to compile with an error similar to:
 
 ```
-error: Unrecognized Postgres ABI.  Perhaps you need `--features unsafe-postgres`?
-   --> pgx/src/lib.rs:139:9
+error[E0080]: evaluation of constant value failed
+   --> pgx/src/lib.rs:151:5
     |
-139 | /         compile_error!(
-140 | |             "Unrecognized Postgres ABI.  Perhaps you need `--features unsafe-postgres`?"
-141 | |         );
-    | |_________^
+151 | /     assert!(
+152 | |         same_slice(pg_sys::FMGR_ABI_EXTRA, b"xPostgreSQL\0"),
+153 | |         "Unsupported Postgres ABI. Perhaps you need `--features unsafe-postgres`?",
+154 | |     );
+    | |_____^ the evaluated program panicked at 'Unsupported Postgres ABI. Perhaps you need `--features unsafe-postgres`?', pgx/src/lib.rs:151:5
+    |
 ```
 
 ### Experimental Features
