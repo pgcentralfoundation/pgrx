@@ -56,7 +56,7 @@ jobs:
         echo ""
 
         echo "----- Remove old postgres -----"
-        sudo apt remove -y postgres*
+        sudo apt remove -y '^postgres.*' '^libpq.*'
         echo ""
 
         echo "----- Set up PostgreSQL Apt repository -----"
@@ -289,7 +289,7 @@ jobs:
         echo ""
 
         echo "----- Remove existing installations of postgres -----"
-        sudo apt remove -y postgres*
+        sudo apt remove -y '^postgres.*' '^libpq.*'
         echo ""
 
         echo "----- Install system dependencies -----"
