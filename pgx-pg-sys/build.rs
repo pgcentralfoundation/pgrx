@@ -10,7 +10,7 @@ Use of this source code is governed by the MIT license that can be found in the 
 use bindgen::callbacks::{DeriveTrait, ImplementsTrait, MacroParsingBehavior};
 use eyre::{eyre, WrapErr};
 use once_cell::sync::Lazy;
-use pgx_pg_config::{PgConfig, PgConfigSelector, Pgx, SUPPORTED_MAJOR_VERSIONS};
+use pgx_pg_config::{prefix_path, PgConfig, PgConfigSelector, Pgx, SUPPORTED_MAJOR_VERSIONS};
 use quote::{quote, ToTokens};
 use std::collections::{BTreeMap, BTreeSet, HashMap, HashSet};
 use std::path::PathBuf;
@@ -801,8 +801,10 @@ fn build_shim_for_version(
     shim_dst: &PathBuf,
     pg_config: &PgConfig,
 ) -> eyre::Result<()> {
+    let path_env = prefix_path(pg_config.parent_path());
     let major_version = pg_config.major_version()?;
 
+    eprintln!("PATH for build_shim={}", path_env);
     eprintln!("shim_src={}", shim_src.display());
     eprintln!("shim_dst={}", shim_dst.display());
 
@@ -830,6 +832,7 @@ fn build_shim_for_version(
             .arg("clean")
             .arg(&format!("libpgx-cshim-{}.a", major_version))
             .env("PG_TARGET_VERSION", format!("{}", major_version))
+            .env("PATH", path_env)
             .current_dir(shim_dst),
         &format!("shim for PG v{}", major_version),
     )?;
