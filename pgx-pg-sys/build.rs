@@ -831,6 +831,7 @@ fn build_shim_for_version(
         Command::new(make)
             .arg("clean")
             .arg(&format!("libpgx-cshim-{}.a", major_version))
+            .args(pg_config.path().map(|p| format!("PG_CONFIG={}", p.display())))
             .env("PG_TARGET_VERSION", format!("{}", major_version))
             .env("PATH", path_env)
             .current_dir(shim_dst),
