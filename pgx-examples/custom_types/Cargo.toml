@@ -27,7 +27,6 @@ pgx-tests = { path = "../../pgx-tests" }
 # uncomment these if compiling outside of 'pgx'
 # [profile.dev]
 # panic = "unwind"
-# lto = "thin"
 
 # [profile.release]
 # panic = "unwind"
