@@ -581,6 +581,7 @@ impl<'a> SpiClient<'a> {
             #[cfg(any(feature = "pg11", feature = "pg12"))]
             size: unsafe { pg_sys::SPI_processed as usize },
             #[cfg(not(any(feature = "pg11", feature = "pg12")))]
+            // SAFETY: no concurrent access
             size: unsafe {
                 if pg_sys::SPI_tuptable.is_null() {
                     pg_sys::SPI_processed as usize
