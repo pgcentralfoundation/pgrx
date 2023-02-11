@@ -676,7 +676,8 @@ fn get_cargo_args() -> Vec<String> {
     // can later figure out which set of features to pass to `cargo pgx`
     let mut pid = Pid::from(std::process::id() as usize);
     while let Some(process) = system.process(pid) {
-        // only if it's "cargo"...
+        // only if it's "cargo"... (This works for now, but just because `cargo`
+        // is at the end of the path. How *should* this handle `CARGO`?)
         if process.exe().ends_with("cargo") {
             // ... and only if it's "cargo test"...
             if process.cmd().iter().any(|arg| arg == "test")
@@ -700,15 +701,18 @@ fn get_cargo_args() -> Vec<String> {
 // TODO: this would be a good place to insert a check invoking to see if
 // `cargo-pgx` is a crate in the local workspace, and use it instead.
 fn cargo_pgx() -> std::process::Command {
-    let var_path = |s: &str| std::env::var_os(s).map(PathBuf::from);
-    // Use `CARGO_PGX`, then `cargo-pgx` if it is on the path, then `$CARGO pgx`
+    fn var_path(s: &str) -> Option<PathBuf> {
+        std::env::var_os(s).map(PathBuf::from)
+    }
+    // Use `CARGO_PGX` (set by `cargo-pgx` on first run), then fall back to
+    // `cargo-pgx` if it is on the path, then `$CARGO pgx`
     let cargo_pgx = var_path("CARGO_PGX")
         .or_else(|| find_on_path("cargo-pgx"))
         .or_else(|| var_path("CARGO"))
-        .or_else(|| "cargo");
+        .unwrap_or_else(|| "cargo".into());
     let mut cmd = std::process::Command::new(cargo_pgx);
     cmd.arg("pgx");
-    Ok(cmd)
+    cmd
 }
 
 fn find_on_path(program: &str) -> Option<PathBuf> {

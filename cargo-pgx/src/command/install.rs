@@ -17,7 +17,7 @@ use owo_colors::OwoColorize;
 use pgx_pg_config::{get_target_dir, PgConfig, Pgx};
 use std::io::BufReader;
 use std::path::{Path, PathBuf};
-use std::process::{Command, Stdio};
+use std::process::Stdio;
 
 /// Install the extension from the current crate to the Postgres specified by whatever `pg_config` is currently on your $PATH
 #[derive(clap::Args, Debug)]

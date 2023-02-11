@@ -20,7 +20,7 @@ use pgx_pg_config::{get_target_dir, PgConfig, Pgx};
 use std::collections::HashSet;
 use std::hash::{Hash, Hasher};
 use std::path::{Path, PathBuf};
-use std::process::{Command, Stdio};
+use std::process::Stdio;
 // Since we support extensions with `#[no_std]`
 extern crate alloc;
 use crate::manifest::{get_package_manifest, pg_config_and_version};

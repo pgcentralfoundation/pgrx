@@ -10,7 +10,7 @@ Use of this source code is governed by the MIT license that can be found in the 
 use eyre::Context;
 use pgx_pg_config::{get_target_dir, PgConfig, PgConfigSelector, Pgx};
 use std::path::{Path, PathBuf};
-use std::process::{Command, Stdio};
+use std::process::Stdio;
 
 use crate::manifest::{get_package_manifest, pg_config_and_version};
 use crate::profile::CargoProfile;
