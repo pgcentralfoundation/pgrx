@@ -84,7 +84,7 @@ impl Date {
     }
 
     #[inline]
-    fn to_unix_epoch_days(&self) -> i32 {
+    pub fn to_unix_epoch_days(&self) -> i32 {
         self.0 + POSTGRES_EPOCH_JDATE - UNIX_EPOCH_JDATE
     }
 
