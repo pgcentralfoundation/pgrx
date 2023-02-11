@@ -231,7 +231,7 @@ pub(crate) fn build_extension(
 ) -> eyre::Result<std::process::Output> {
     let flags = std::env::var("PGX_BUILD_FLAGS").unwrap_or_default();
 
-    let mut command = Command::new("cargo");
+    let mut command = crate::env::cargo();
     command.arg("build");
 
     if let Some(user_manifest_path) = user_manifest_path {

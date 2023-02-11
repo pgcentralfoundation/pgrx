@@ -14,6 +14,7 @@ mod manifest;
 mod metadata;
 mod pgx_pg_sys_stub;
 
+pub(crate) mod env;
 pub(crate) mod profile;
 
 use atty::Stream;
@@ -59,6 +60,7 @@ impl CommandExecute for CargoSubcommands {
 }
 
 fn main() -> color_eyre::Result<()> {
+    env::initialize();
     color_eyre::config::HookBuilder::default()
         .theme(if !atty::is(Stream::Stderr) {
             color_eyre::config::Theme::new()

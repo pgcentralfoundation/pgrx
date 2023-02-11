@@ -304,9 +304,8 @@ fn install_extension() -> eyre::Result<()> {
 
     features.extend(cargo_test_args.features.iter().cloned());
 
-    let mut command = Command::new("cargo");
+    let mut command = cargo_pgx();
     command
-        .arg("pgx")
         .arg("install")
         .arg("--test")
         .arg("--pg-config")
@@ -696,4 +695,26 @@ fn get_cargo_args() -> Vec<String> {
     }
 
     Vec::new()
+}
+
+// TODO: this would be a good place to insert a check invoking to see if
+// `cargo-pgx` is a crate in the local workspace, and use it instead.
+fn cargo_pgx() -> std::process::Command {
+    let var_path = |s: &str| std::env::var_os(s).map(PathBuf::from);
+    // Use `CARGO_PGX`, then `cargo-pgx` if it is on the path, then `$CARGO pgx`
+    let cargo_pgx = var_path("CARGO_PGX")
+        .or_else(|| find_on_path("cargo-pgx"))
+        .or_else(|| var_path("CARGO"))
+        .or_else(|| "cargo");
+    let mut cmd = std::process::Command::new(cargo_pgx);
+    cmd.arg("pgx");
+    Ok(cmd)
+}
+
+fn find_on_path(program: &str) -> Option<PathBuf> {
+    assert!(!program.contains('/'));
+    // Technically we should check `libc::confstr(libc::_CS_PATH)`
+    // when `PATH` is unset...
+    let paths = std::env::var_os("PATH")?;
+    std::env::split_paths(&paths).map(|p| p.join(program)).find(|abs| abs.exists())
 }
