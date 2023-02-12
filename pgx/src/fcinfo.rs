@@ -54,7 +54,7 @@ macro_rules! default {
 pub struct NULL;
 
 /// A macro for providing SQL names for the returned fields for functions that return a Rust tuple,
-/// especially those that return a `std::iter::Iterator<Item=(f1, f2, f3)>`
+/// especially those that return a [`TableIterator`][crate::iter::TableIterator].
 ///
 /// ## Examples
 ///
