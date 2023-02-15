@@ -7,7 +7,7 @@ All rights reserved.
 Use of this source code is governed by the MIT license that can be found in the LICENSE file.
 */
 
-use crate::{direct_function_call_as_datum, pg_sys, FromDatum, IntoDatum};
+use crate::{pg_sys, FromDatum, IntoDatum, PgBox};
 
 impl FromDatum for pg_sys::BOX {
     unsafe fn from_polymorphic_datum(
@@ -28,13 +28,11 @@ impl FromDatum for pg_sys::BOX {
 }
 
 impl IntoDatum for pg_sys::BOX {
-    fn into_datum(mut self) -> Option<pg_sys::Datum> {
-        let the_box = &mut self;
+    fn into_datum(self) -> Option<pg_sys::Datum> {
         unsafe {
-            direct_function_call_as_datum(
-                pg_sys::box_out,
-                vec![Some(pg_sys::Datum::from(the_box as *mut pg_sys::BOX))],
-            )
+            let boxed = PgBox::<pg_sys::BOX>::alloc0();
+            std::ptr::copy(&self, boxed.as_ptr(), std::mem::size_of::<pg_sys::BOX>());
+            boxed.into_datum()
         }
     }
 
@@ -62,13 +60,11 @@ impl FromDatum for pg_sys::Point {
 }
 
 impl IntoDatum for pg_sys::Point {
-    fn into_datum(mut self) -> Option<pg_sys::Datum> {
-        let point = &mut self;
+    fn into_datum(self) -> Option<pg_sys::Datum> {
         unsafe {
-            direct_function_call_as_datum(
-                pg_sys::point_out,
-                vec![Some(pg_sys::Datum::from(point as *mut _))],
-            )
+            let boxed = PgBox::<pg_sys::Point>::alloc0();
+            std::ptr::copy(&self, boxed.as_ptr(), std::mem::size_of::<pg_sys::Point>());
+            boxed.into_datum()
         }
     }
 
