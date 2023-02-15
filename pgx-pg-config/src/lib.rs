@@ -32,7 +32,11 @@ pub fn get_c_locale_flags() -> &'static [&'static str] {
     #[cfg(not(target_os = "macos"))]
     {
         match Command::new("locale").arg("-a").output() {
-            Ok(cmd) if String::from_utf8_lossy(&cmd.stdout).lines().any(|l| l == "C.UTF-8") => {
+            Ok(cmd)
+                if String::from_utf8_lossy(&cmd.stdout)
+                    .lines()
+                    .any(|l| l == "C.UTF-8" || l == "C.utf8") =>
+            {
                 &["--locale=C.UTF-8"]
             }
             // fallback to C if we can't list locales or don't have C.UTF-8
