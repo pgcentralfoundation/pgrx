@@ -158,6 +158,10 @@ pub use internal::pg15::*;
 
 /// A trait applied to all Postgres `pg_sys::Node` types and subtypes
 pub trait PgNode: seal::Sealed {
+    /// The [`NodeTag`] for this node. If it is `None` then it doesn't have a corresponding
+    /// [`NodeTag`].
+    const NODE_TAG: Option<NodeTag>;
+
     /// Format this node
     ///
     /// # Safety
@@ -265,6 +269,66 @@ impl AsPgCStr for &Option<std::string::String> {
         match self {
             Some(s) => s.as_pg_cstr(),
             None => std::ptr::null_mut(),
+        }
+    }
+}
+
+pub trait PgNodeCast<T> {
+    fn cast_from(pg_node: T) -> Self
+    where
+        Self: Sized;
+}
+
+pub trait PgNodeTryCast<T> {
+    fn try_cast_from(pg_node: T) -> Option<Self>
+    where
+        Self: Sized;
+}
+
+impl<A: PgNode, B: PgNode> PgNodeCast<&A> for &B {
+    fn cast_from(pg_node: &A) -> Self {
+        Self::try_cast_from(pg_node).unwrap()
+    }
+}
+
+impl<A: PgNode, B: PgNode> PgNodeTryCast<&A> for &B {
+    fn try_cast_from(pg_node: &A) -> Option<Self> {
+        unsafe {
+            let node = std::mem::transmute::<_, &Node>(pg_node);
+            match B::NODE_TAG {
+                Some(tag) => {
+                    if node.type_ == tag {
+                        Some(std::mem::transmute::<_, &B>(node))
+                    } else {
+                        None
+                    }
+                }
+                None => None,
+            }
+        }
+    }
+}
+
+impl<A: PgNode, B: PgNode> PgNodeCast<&mut A> for &mut B {
+    fn cast_from(pg_node: &mut A) -> Self {
+        Self::try_cast_from(pg_node).unwrap()
+    }
+}
+
+impl<A: PgNode, B: PgNode> PgNodeTryCast<&mut A> for &mut B {
+    fn try_cast_from(pg_node: &mut A) -> Option<Self> {
+        unsafe {
+            let node = std::mem::transmute::<_, &mut Node>(pg_node);
+            match B::NODE_TAG {
+                Some(tag) => {
+                    if node.type_ == tag {
+                        Some(std::mem::transmute::<_, &mut B>(node))
+                    } else {
+                        None
+                    }
+                }
+                None => None,
+            }
         }
     }
 }

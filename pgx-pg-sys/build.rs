@@ -502,14 +502,39 @@ fn impl_pg_node(
         Box::new(node_set.into_iter())
     };
 
+    // Though these structs looks like a node, they don't seem to have a corresponding [`NodeTag`].
+    // Also for `Node`, it doesn't have a node tag.
+    let block_list = [
+        "Node",
+        "MemoryContextData",
+        "JoinPath",
+        "Expr",
+        "HeapTupleTableSlot",
+        "VirtualTupleTableSlot",
+        "PartitionPruneStep",
+        "BufferHeapTupleTableSlot",
+        "MinimalTupleTableSlot",
+    ]
+    .into_iter()
+    .collect::<HashSet<_>>();
+
     // now we can finally iterate the Nodes and emit out Display impl
     for node_struct in nodes {
         let struct_name = &node_struct.struct_.ident;
 
+        let node_tag = if !block_list.contains(struct_name.to_string().as_str()) {
+            let node_tag = quote::format_ident!("NodeTag_T_{}", struct_name);
+            quote! { Some(pg_sys::#node_tag) }
+        } else {
+            quote! { None }
+        };
+
         // impl the PgNode trait for all nodes
         pgnode_impls.extend(quote! {
             impl pg_sys::seal::Sealed for #struct_name {}
-            impl pg_sys::PgNode for #struct_name {}
+            impl pg_sys::PgNode for #struct_name {
+                const NODE_TAG: Option<NodeTag> = #node_tag;
+            }
         });
 
         // impl Rust's Display trait for all nodes
