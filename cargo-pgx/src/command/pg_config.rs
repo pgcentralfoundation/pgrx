@@ -8,8 +8,6 @@ Use of this source code is governed by the MIT license that can be found in the 
 */
 
 use crate::CommandExecute;
-// use pgx_pg_config::{PgConfig as pgCfg};
-use std::path::PathBuf;
 
 /// Interact with the pg_config that pgx is using for various postgres installations
 #[derive(clap::Args, Debug, Clone)]
@@ -20,22 +18,15 @@ pub(crate) struct PgConfig {
     pg_version: Option<String>,
     #[clap(from_global, action = ArgAction::Count)]
     verbose: u8,
-    /// Package to determine default `pg_version` with (see `cargo help pkgid`)
-    #[clap(long, short)]
-    package: Option<String>,
-    /// Path to Cargo.toml
-    #[clap(long, value_parser)]
-    manifest_path: Option<PathBuf>,
 }
 
 impl CommandExecute for PgConfig {
     #[tracing::instrument(level = "error", skip(self))]
     fn execute(self) -> eyre::Result<()> {
-        // get PGX_HOME from env
-        // read/parse {PGX_HOME}/config.toml
-        // select config based on self.pg_version
-        // print out the full path to the pg_config
-        println!("pg_version: {:?}", self.pg_version);
+        // 1. get PGX_HOME from env
+        // 2. read/parse {PGX_HOME}/config.toml
+        // 3. select config based on self.pg_version
+        // 4. print out the full path to the pg_config
         Ok(())
     }
 }
