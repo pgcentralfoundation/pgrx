@@ -33,14 +33,9 @@ where
     /// This function is safe, but requires that
     /// - datum is not null
     /// - datum represents a PG RangeType datum
-    ///
-    /// or it will `panic!()`
     #[inline]
-    fn from_pg(datum: pg_sys::Datum) -> Self {
-        unsafe {
-            Self::from_polymorphic_datum(datum, false, T::range_type_oid())
-                .expect("Unable to convert datum to RangeType")
-        }
+    unsafe fn from_pg(datum: pg_sys::Datum) -> Option<Self> {
+        unsafe { Self::from_polymorphic_datum(datum, false, T::range_type_oid()) }
     }
 }
 impl<T> TryFrom<pg_sys::Datum> for Range<T>
@@ -53,7 +48,10 @@ where
         if datum.is_null() {
             Err(RangeConversionError::NullDatum)
         } else {
-            Ok(Self::from_pg(datum))
+            match unsafe { Self::from_pg(datum) } {
+                Some(range) => Ok(range),
+                None => Err(RangeConversionError::InvalidDatum),
+            }
         }
     }
 }
@@ -271,7 +269,9 @@ where
             // *RangeType into Datum
             range_type.into()
         };
-        Range::<T>::from_pg(datum)
+
+        // SAFETY: We expect PG returned us a valid datum, pointing to *mut pg_sys::RangeType
+        unsafe { Range::<T>::from_pg(datum) }.expect("Invalid RangeType Datum")
     }
 }
 
@@ -333,6 +333,8 @@ unsafe impl RangeSubType for TimestampWithTimeZone {
 pub enum RangeConversionError {
     #[error("Datum was null, unable to convert to RangeType")]
     NullDatum,
+    #[error("Datum was not a valid pg_sys::RangeType, unable to convert to RangeType")]
+    InvalidDatum,
 }
 
 unsafe impl SqlTranslatable for Range<i32> {
