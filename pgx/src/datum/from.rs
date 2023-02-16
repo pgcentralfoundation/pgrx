@@ -154,10 +154,7 @@ pub trait FromDatum {
 }
 
 fn is_binary_coercible<T: IntoDatum>(type_oid: pg_sys::Oid) -> bool {
-    if T::is_compatible_with(type_oid) {
-        return true;
-    }
-    unsafe { pg_sys::IsBinaryCoercible(type_oid, T::type_oid()) }
+    T::is_compatible_with(type_oid) || unsafe { pg_sys::IsBinaryCoercible(type_oid, T::type_oid()) }
 }
 
 /// Retrieves a Postgres type name given its Oid
