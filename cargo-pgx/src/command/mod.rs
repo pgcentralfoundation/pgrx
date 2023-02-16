@@ -22,3 +22,4 @@ pub(crate) mod status;
 pub(crate) mod stop;
 pub(crate) mod test;
 pub(crate) mod version;
+pub(crate) mod pg_config;
