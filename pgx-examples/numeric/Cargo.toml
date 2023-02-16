@@ -25,7 +25,6 @@ pgx-tests = { path = "../../pgx-tests" }
 
 #[profile.dev]
 #panic = "unwind"
-#lto = "thin"
 #
 #[profile.release]
 #panic = "unwind"
