@@ -433,10 +433,8 @@ fn get_pg_installdir(pgdir: &PathBuf) -> PathBuf {
 }
 
 fn is_root_user() -> bool {
-    match env::var("USER") {
-        Ok(val) => val == "root",
-        Err(_) => false,
-    }
+    use nix::unistd::Uid;
+    Uid::effective().is_root()
 }
 
 pub(crate) fn initdb(bindir: &PathBuf, datadir: &PathBuf) -> eyre::Result<()> {
