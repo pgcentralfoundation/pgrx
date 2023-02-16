@@ -242,6 +242,26 @@ this feature is now considered deprecated in favor of a lower-overhead interop.
 You may still request implementations of `TryFrom<time::Type> for pgx::MatchingType`
 and `From<time::Type> for pgx::MatchingType` by enabling the `"time-crate"` feature.
 
+### "unsafe-postgres": Allow compilation for Postgres forks that have a different ABI
+
+As of Postgres v15, forks are allowed to specify they use a different ABI than canonical Postgres.
+Since pgx makes countless assumptions about Postgres' internal ABI it is not possible for it to 
+guarantee that a compiled pgx extension will probably execute within such a Postgres fork.  You,
+dear compiler runner, can make this guarantee for yourself by specifying the `unsafe-postgres` 
+feature flag.  Otherwise, a pgx extension will fail to compile with an error similar to:
+
+```
+error[E0080]: evaluation of constant value failed
+   --> pgx/src/lib.rs:151:5
+    |
+151 | /     assert!(
+152 | |         same_slice(pg_sys::FMGR_ABI_EXTRA, b"xPostgreSQL\0"),
+153 | |         "Unsupported Postgres ABI. Perhaps you need `--features unsafe-postgres`?",
+154 | |     );
+    | |_____^ the evaluated program panicked at 'Unsupported Postgres ABI. Perhaps you need `--features unsafe-postgres`?', pgx/src/lib.rs:151:5
+    |
+```
+
 ### Experimental Features
 
 Adding `pgx = { version = "0.5.0", features = ["postgrestd"] }` to your Cargo.toml

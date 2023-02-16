@@ -27,6 +27,7 @@ pg14 = [ "pgx-pg-sys/pg14" ]
 pg15 = [ "pgx-pg-sys/pg15" ]
 time-crate = ["dep:time"]
 no-schema-generation = ["pgx-macros/no-schema-generation", "pgx-sql-entity-graph/no-schema-generation"]
+unsafe-postgres = []     # when trying to compile against something that looks like Postgres but claims to be diffent
 
 [package.metadata.docs.rs]
 features = ["pg14", "cshim"]

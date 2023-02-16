@@ -128,6 +128,33 @@ pub use pg_sys::{
 #[doc(hidden)]
 pub use pgx_sql_entity_graph;
 
+// Postgres v15 has the concept of an ABI "name".  The default is `b"PostgreSQL\0"` and this is the
+// ABI that pgx extensions expect to be running under.  We will refuse to compile if it is detected
+// that we're trying to be built against some other kind of "postgres" that has its own ABI name.
+//
+// Unless the compiling user explicitly told us that they're aware of this via `--features unsafe-postgres`.
+#[cfg(all(feature = "pg15", not(feature = "unsafe-postgres")))]
+const _: () = {
+    // to appease `const`
+    const fn same_slice(a: &[u8], b: &[u8]) -> bool {
+        if a.len() != b.len() {
+            return false;
+        }
+        let mut i = 0;
+        while i < a.len() {
+            if a[i] != b[i] {
+                return false;
+            }
+            i += 1;
+        }
+        true
+    }
+    assert!(
+        same_slice(pg_sys::FMGR_ABI_EXTRA, b"PostgreSQL\0"),
+        "Unsupported Postgres ABI. Perhaps you need `--features unsafe-postgres`?",
+    );
+};
+
 /// A macro for marking a library compatible with [`pgx`][crate].
 ///
 /// <div class="example-wrap" style="display:inline-block">
@@ -220,8 +247,9 @@ macro_rules! pg_magic_func {
                 namedatalen: pgx::pg_sys::NAMEDATALEN as i32,
                 float8byval: cfg!(target_pointer_width = "64") as i32,
                 abi_extra: {
-                    // array::from_fn isn't const yet, boohoo, so const-copy a bstr
-                    let magic = b"PostgreSQL";
+                    // we'll use what the bindings tell us, but if it ain't "PostgreSQL" then we'll
+                    // raise a compilation error unless the `unsafe-postgres` feature is set
+                    let magic = pgx::pg_sys::FMGR_ABI_EXTRA;
                     let mut abi = [0 as ::pgx::ffi::c_char; 32];
                     let mut i = 0;
                     while i < magic.len() {
