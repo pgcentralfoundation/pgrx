@@ -472,4 +472,10 @@ mod tests {
         Spi::run("CREATE DOMAIN my_other_text_type my_text_type")?;
         Spi::get_one::<String>("SELECT 'hello'::my_other_text_type")
     }
+
+    #[pg_test]
+    fn spi_can_read_binary_coercible_types() -> spi::Result<Option<pgx::Inet>> {
+        // cidr is binary coercible to inet
+        Spi::get_one::<pgx::Inet>("select '10.0.0.1/32'::cidr")
+    }
 }
