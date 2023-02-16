@@ -142,6 +142,50 @@ impl Aggregate for DemoPercentileDisc {
     }
 }
 
+#[pgx::pg_schema]
+mod demo_schema {
+    use pgx::PostgresType;
+    use serde::{Deserialize, Serialize};
+
+    #[derive(Copy, Clone, PostgresType, Serialize, Deserialize)]
+    pub struct DemoState {
+        pub sum: i32,
+    }
+}
+#[derive(Copy, Clone, Default, Debug, PostgresType, Serialize, Deserialize)]
+pub struct DemoCustomState;
+
+// demonstrate we can properly support an STYPE with a pg_schema
+#[pg_aggregate]
+impl Aggregate for DemoCustomState {
+    const NAME: &'static str = "demo_sum_state";
+    type Args = i32;
+    type State = Option<demo_schema::DemoState>;
+    type Finalize = i32;
+
+    fn state(
+        current: Self::State,
+        arg: Self::Args,
+        _fcinfo: pg_sys::FunctionCallInfo,
+    ) -> Self::State {
+        match current {
+            Some(demo_state) => Some(demo_schema::DemoState { sum: demo_state.sum + arg }),
+            None => Some(demo_schema::DemoState { sum: arg }),
+        }
+    }
+
+    fn finalize(
+        current: Self::State,
+        _direct_args: Self::OrderedSetArgs,
+        _fcinfo: pg_sys::FunctionCallInfo,
+    ) -> Self::Finalize {
+        match current {
+            Some(demo_state) => demo_state.sum,
+            None => 0,
+        }
+    }
+}
+
 #[cfg(any(test, feature = "pg_test"))]
 #[pgx::pg_schema]
 mod tests {
@@ -188,5 +232,13 @@ mod tests {
             "SELECT DemoPercentileDisc(0.05) WITHIN GROUP (ORDER BY income) FROM UNNEST(ARRAY [5, 100000000, 6000, 70000, 500]) as income;"
         );
         assert_eq!(retval, Ok(Some(5)));
+    }
+
+    #[pg_test]
+    fn aggregate_demo_custom_state() {
+        let retval = Spi::get_one::<i32>(
+            "SELECT demo_sum_state(value) FROM UNNEST(ARRAY [1, 1, 2]) as value;",
+        );
+        assert_eq!(retval, Ok(Some(4)));
     }
 }
