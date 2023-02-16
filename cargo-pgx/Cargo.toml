@@ -49,6 +49,7 @@ tracing-subscriber = { version = "0.3.16", features = [ "env-filter" ] }
 flate2 = { version = "1.0.25", default-features = false, features = ["rust_backend"] }
 tar = { version = "0.4.38", default-features = false }
 tempfile = "3.3.0"
+nix = { version = "0.26", default-features = false, features = ["user"] }
 
 [features]
 default = ["ureq/native-tls"]
