@@ -17,6 +17,7 @@ use std::hint::unreachable_unchecked;
 use std::panic::{
     catch_unwind, panic_any, resume_unwind, Location, PanicInfo, RefUnwindSafe, UnwindSafe,
 };
+use std::sync::Arc;
 
 use crate::elog::PgLogLevel;
 use crate::errcodes::PgSqlErrorCode;
@@ -64,11 +65,18 @@ pub struct ErrorReportLocation {
     pub(crate) funcname: Option<String>,
     pub(crate) line: u32,
     pub(crate) col: u32,
+    pub(crate) backtrace: Option<Arc<std::backtrace::Backtrace>>,
 }
 
 impl Default for ErrorReportLocation {
     fn default() -> Self {
-        Self { file: std::string::String::from("<unknown>"), funcname: None, line: 0, col: 0 }
+        Self {
+            file: std::string::String::from("<unknown>"),
+            funcname: None,
+            line: 0,
+            col: 0,
+            backtrace: None,
+        }
     }
 }
 
@@ -77,13 +85,21 @@ impl Display for ErrorReportLocation {
         match &self.funcname {
             Some(funcname) => {
                 // mimic's Postgres' output for this, but includes a column number
-                write!(f, "{}, {}:{}:{}", funcname, self.file, self.line, self.col)
+                write!(f, "{}, {}:{}:{}", funcname, self.file, self.line, self.col)?;
             }
 
             None => {
-                write!(f, "{}:{}:{}", self.file, self.line, self.col)
+                write!(f, "{}:{}:{}", self.file, self.line, self.col)?;
             }
         }
+
+        if let Some(backtrace) = &self.backtrace {
+            if backtrace.status() == std::backtrace::BacktraceStatus::Captured {
+                write!(f, "\n{}", backtrace)?;
+            }
+        }
+
+        Ok(())
     }
 }
 
@@ -94,6 +110,7 @@ impl From<&Location<'_>> for ErrorReportLocation {
             funcname: None,
             line: location.line(),
             col: location.column(),
+            backtrace: None,
         }
     }
 }
@@ -182,6 +199,11 @@ impl ErrorReportWithLevel {
         self.inner.location.line
     }
 
+    /// Returns the backtrace when the error is reported
+    pub fn backtrace(&self) -> Option<&std::backtrace::Backtrace> {
+        self.inner.location.backtrace.as_ref().map(|b| b.as_ref())
+    }
+
     /// Returns the name of the function that generated this error report, if we were able to figure it out
     pub fn function_name(&self) -> Option<&str> {
         self.inner.location.funcname.as_ref().map(|s| s.as_str())
@@ -258,7 +280,7 @@ impl ErrorReport {
     }
 }
 
-thread_local! { static PANIC_LOCATION: Cell<Option<ErrorReportLocation >> = const { Cell::new(None) }}
+thread_local! { static PANIC_LOCATION: Cell<Option<ErrorReportLocation>> = const { Cell::new(None) }}
 
 fn take_panic_location() -> ErrorReportLocation {
     PANIC_LOCATION.with(|p| p.take().unwrap_or_default())
@@ -266,7 +288,13 @@ fn take_panic_location() -> ErrorReportLocation {
 
 pub fn register_pg_guard_panic_hook() {
     std::panic::set_hook(Box::new(|info| {
-        PANIC_LOCATION.with(|thread_local| thread_local.replace(Some(info.into())));
+        PANIC_LOCATION.with(|thread_local| {
+            thread_local.replace({
+                let mut info: ErrorReportLocation = info.into();
+                info.backtrace = Some(Arc::new(std::backtrace::Backtrace::capture()));
+                Some(info)
+            })
+        });
     }))
 }
 
@@ -479,7 +507,15 @@ fn do_ereport(ereport: ErrorReportWithLevel) {
 
                 let sqlerrcode = ereport.sql_error_code();
                 let message = ereport.message().as_pg_cstr();
-                let detail = ereport.detail().as_pg_cstr();
+                let backtrace = ereport.backtrace();
+                let detail = ereport.detail();
+                let detail = match (detail, backtrace) {
+                    (Some(d), Some(bt)) if bt.status() == std::backtrace::BacktraceStatus::Captured => format!("{}\n{}", d, bt),
+                    (Some(d), _) => d.to_string(),
+                    (None, Some(bt)) if bt.status() == std::backtrace::BacktraceStatus::Captured => format!("\n{}", bt),
+                    (None, _) => String::new(),
+                };
+                let detail = detail.as_pg_cstr();
                 let hint = ereport.hint().as_pg_cstr();
                 let context = ereport.context_message().as_pg_cstr();
                 let lineno = ereport.line_number();
