@@ -69,11 +69,11 @@ impl Display for PgVersion {
 
 #[derive(Clone, Debug)]
 pub struct PgConfig {
-    version: Option<PgVersion>,
-    pg_config: Option<PathBuf>,
-    known_props: Option<BTreeMap<String, String>>,
-    base_port: u16,
-    base_testing_port: u16,
+    pub version: Option<PgVersion>,
+    pub pg_config: Option<PathBuf>,
+    pub known_props: Option<BTreeMap<String, String>>,
+    pub base_port: u16,
+    pub base_testing_port: u16,
 }
 
 impl Display for PgConfig {
@@ -212,7 +212,7 @@ impl PgConfig {
         return Ok((major, minor));
     }
 
-    fn get_version(&self) -> eyre::Result<(u16, u16)> {
+    pub fn get_version(&self) -> eyre::Result<(u16, u16)> {
         let version_string = self.run("--version")?;
         Self::parse_version_str(&version_string)
     }
@@ -363,7 +363,7 @@ impl PgConfig {
 
 #[derive(Debug)]
 pub struct Pgx {
-    pg_configs: Vec<PgConfig>,
+    pub pg_configs: Vec<PgConfig>,
     base_port: u16,
     base_testing_port: u16,
 }

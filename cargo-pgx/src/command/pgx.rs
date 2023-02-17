@@ -40,7 +40,7 @@ enum CargoPgxSubCommands {
     Test(super::test::Test),
     Get(super::get::Get),
     Cross(super::cross::Cross),
-    PgConfig(super::pg_config::PgConfig),
+    Config(super::config::PgConfig),
 }
 
 impl CommandExecute for CargoPgxSubCommands {
@@ -61,7 +61,7 @@ impl CommandExecute for CargoPgxSubCommands {
             Test(c) => c.execute(),
             Get(c) => c.execute(),
             Cross(c) => c.execute(),
-            PgConfig(c) => c.execute(),
+            Config(c) => c.execute(),
         }
     }
 }
