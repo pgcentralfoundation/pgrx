@@ -30,18 +30,18 @@ const MONTH_DURATION: time::Duration = time::Duration::days(DAYS_PER_MONTH as i6
 pub struct Interval(NonNull<pg_sys::Interval>);
 
 impl Interval {
-    /// This function takes `months`/`days`/`usecs` as input to convert directly to the internal PG storage struct `pg_sys::Interval`
+    /// This function takes `months`/`days`/`microseconds` as input to convert directly to the internal PG storage struct `pg_sys::Interval`
     /// - the sign of all units must be all matching in the positive or all matching in the negative direction
-    pub fn try_from_months_days_usecs(
+    pub fn try_from_months_days_micros(
         months: i32,
         days: i32,
-        usecs: i64,
+        micros: i64,
     ) -> Result<Self, IntervalConversionError> {
         // SAFETY: `pg_sys::Interval` will be uninitialized, set all fields
         let mut interval = unsafe { PgBox::<pg_sys::Interval>::alloc() };
         interval.day = days;
         interval.month = months;
-        interval.time = usecs;
+        interval.time = micros;
         let ptr = interval.into_pg();
         let non_null = NonNull::new(ptr).expect("pointer is null");
         Ok(Interval::from_ptr(non_null))
@@ -67,8 +67,8 @@ impl Interval {
         unsafe { (*self.0.as_ptr()).day }
     }
 
-    /// Total number of usecs before/after the `days()` offset (sign must match `months`/`days`)
-    pub fn usecs(&self) -> i64 {
+    /// Total number of microseconds before/after the `days()` offset (sign must match `months`/`days`)
+    pub fn micros(&self) -> i64 {
         // SAFETY: Validity asserted on construction
         unsafe { (*self.0.as_ptr()).time }
     }
@@ -120,7 +120,7 @@ impl TryFrom<time::Duration> for Interval {
 
             let time = d.whole_microseconds() as i64;
 
-            Interval::try_from_months_days_usecs(month, 0, time)
+            Interval::try_from_months_days_micros(month, 0, time)
         } else {
             Err(IntervalConversionError::DurationMonthsOutOfBounds)
         }
@@ -134,7 +134,7 @@ impl From<Interval> for time::Duration {
         unsafe {
             let interval = *interval.0.as_ptr(); // internal interval
             let sec = interval.time / USECS_PER_SEC as i64;
-            let fsec = ((interval.time - (sec * USECS_PER_SEC as i64)) * 1000) as i32; // convert usec to nsec
+            let fsec = ((interval.time - (sec * USECS_PER_SEC as i64)) * 1000) as i32; // convert microseconds to nanonseconds
 
             let mut duration = time::Duration::new(sec, fsec);
 

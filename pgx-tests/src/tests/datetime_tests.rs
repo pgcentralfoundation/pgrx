@@ -484,7 +484,7 @@ mod tests {
 
     #[pg_test]
     fn test_interval_serialization() {
-        let interval = Interval::try_from_months_days_usecs(3, 4, 5_000_000).unwrap();
+        let interval = Interval::try_from_months_days_micros(3, 4, 5_000_000).unwrap();
         let json = json!({ "interval test": interval });
 
         assert_eq!(json!({"interval test":"3 mons 4 days 00:00:05"}), json);
