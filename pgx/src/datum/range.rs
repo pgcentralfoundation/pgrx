@@ -16,7 +16,7 @@ use pgx_sql_entity_graph::metadata::{
 };
 use std::ops::{Deref, RangeFrom, RangeInclusive, RangeTo, RangeToInclusive};
 
-/// A Postgres range bound can be one of these types
+/// A Postgres Range's "lower" or "upper" value
 #[derive(Debug, Clone, Hash, Eq, PartialEq)]
 pub enum RangeBound<T> {
     Infinite,
