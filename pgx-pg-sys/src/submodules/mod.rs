@@ -17,7 +17,6 @@ pub mod oids;
 pub mod panic;
 pub mod pg_try;
 pub mod polyfill;
-pub mod range;
 pub(crate) mod thread_check;
 pub mod tupdesc;
 
