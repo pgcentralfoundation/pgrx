@@ -22,6 +22,7 @@ members = [
     "pgx-examples/numeric",
     "pgx-examples/pgtrybuilder",
     "pgx-examples/operators",
+    "pgx-examples/range",
     "pgx-examples/schemas",
     "pgx-examples/shmem",
     "pgx-examples/spi",
