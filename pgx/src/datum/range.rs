@@ -14,7 +14,7 @@ use crate::{
 use pgx_sql_entity_graph::metadata::{
     ArgumentError, Returns, ReturnsError, SqlMapping, SqlTranslatable,
 };
-use std::ops::{Deref, RangeFrom, RangeInclusive, RangeTo, RangeToInclusive};
+use std::ops::{Deref, DerefMut, RangeFrom, RangeInclusive, RangeTo, RangeToInclusive};
 
 /// A Postgres Range's "lower" or "upper" value
 #[derive(Debug, Clone, Hash, Eq, PartialEq)]
@@ -113,8 +113,21 @@ where
 
 /// A safe deconstruction of a Postgres `pg_sys::RangeType` struct.
 ///
-/// Unlike Rust ranges, a Postgres range is capable of being "empty", and as such, expect the
-/// various getter methods on [`Range`] to return `Option<RangeBound<T>>`.
+/// In spirit, Postgres ranges are not dissimilar from Rust ranges, however they are represented
+/// quite differently.  You'll use a [`RangeBound`] for the lower and upper bounds of a Postgres
+/// [`Range`].
+///
+/// Unlike Rust, Postgres also has the concept of an "empty" range.  Such ranges are constructed via
+/// the [`Range::empty()`] function.  As such, expect the various direct accessor methods on [`Range`]
+/// to return `Option<&RangeBound<T>>` or `Option<(RangeBound<T>, RangeBound<T>)>`.
+///
+/// pgx provides [`From`] implementations for Rust's built-in range types for easy conversion into
+/// a Postgres range.  For example:
+///
+/// ```rust,no_run
+/// use pgx::Range;
+/// let r: Range<i32> = (1..10).into();
+/// ```
 #[derive(Debug, Clone, Hash, Eq, PartialEq)]
 pub struct Range<T: RangeSubType> {
     inner: Option<(RangeBound<T>, RangeBound<T>)>,
@@ -124,7 +137,7 @@ impl<T> Range<T>
 where
     T: RangeSubType,
 {
-    /// Create a new [`Range`] with bounds.
+    /// Builds a new [`Range`] with bounds.
     ///
     /// # Examples
     ///
@@ -193,6 +206,45 @@ where
             _ => false,
         }
     }
+
+    /// Consumes `self` and returns the internal representation, which can be easily mapped or
+    /// unwrapped.
+    ///
+    /// A return value of [`Option::None`] indicates that this range represents the "empty" range.
+    #[inline]
+    pub fn into_inner(self) -> Option<(RangeBound<T>, RangeBound<T>)> {
+        self.inner
+    }
+
+    /// Takes the bounds out of this [`Range`] and converts self to represent the "empty" range.
+    ///
+    /// A return value of [`Option::None`] indicates that this range already represents the "empty" range.
+    #[inline]
+    pub fn take(&mut self) -> Option<(RangeBound<T>, RangeBound<T>)> {
+        self.inner.take()
+    }
+
+    /// Consumes `self` and returns the contained [`RangeBound`]s.
+    ///
+    /// # Panics
+    ///
+    /// This function panics if this [`Range`] represents an "empty" range.
+    #[inline]
+    #[track_caller]
+    pub fn unwrap(self) -> (RangeBound<T>, RangeBound<T>) {
+        self.inner.unwrap()
+    }
+
+    /// Replace the bounds of this [`Range`], returning the old bounds.  
+    ///
+    /// An [`Option::None`] will replace this with the "empty" range.
+    #[inline]
+    pub fn replace(
+        &mut self,
+        new: Option<(RangeBound<T>, RangeBound<T>)>,
+    ) -> Option<(RangeBound<T>, RangeBound<T>)> {
+        std::mem::replace(&mut self.inner, new)
+    }
 }
 
 impl<T> Deref for Range<T>
@@ -204,6 +256,16 @@ where
     #[inline]
     fn deref(&self) -> &Self::Target {
         &self.inner
+    }
+}
+
+impl<T> DerefMut for Range<T>
+where
+    T: RangeSubType,
+{
+    #[inline]
+    fn deref_mut(&mut self) -> &mut Self::Target {
+        &mut self.inner
     }
 }
 
