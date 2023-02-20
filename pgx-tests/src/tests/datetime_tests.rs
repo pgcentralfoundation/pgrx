@@ -100,6 +100,17 @@ fn timestamptz_to_i64(tstz: pg_sys::TimestampTz) -> i64 {
     tstz
 }
 
+#[pg_extern]
+fn accept_interval(interval: Interval) -> Interval {
+    interval
+}
+
+#[pg_extern]
+fn accept_interval_round_trip(interval: Interval) -> Interval {
+    let duration: time::Duration = interval.into();
+    duration.try_into().expect("Error converting Duration to PgInterval")
+}
+
 #[cfg(any(test, feature = "pg_test"))]
 #[pgx::pg_schema]
 mod tests {
@@ -441,5 +452,64 @@ mod tests {
             Spi::get_one::<Timestamp>("SELECT '-infinity'::timestamp")?.expect("datum was null");
         assert!(ts.is_neg_infinity());
         Ok(())
+    }
+
+    #[pg_test]
+    fn test_accept_interval_random() {
+        let result = Spi::get_one::<bool>("SELECT accept_interval(interval'1 year 2 months 3 days 4 hours 5 minutes 6 seconds') = interval'1 year 2 months 3 days 4 hours 5 minutes 6 seconds';")
+            .expect("failed to get SPI result");
+        assert_eq!(result, Some(true));
+    }
+
+    #[pg_test]
+    fn test_accept_interval_neg_random() {
+        let result = Spi::get_one::<bool>("SELECT accept_interval(interval'1 year 2 months 3 days 4 hours 5 minutes 6 seconds ago') = interval'1 year 2 months 3 days 4 hours 5 minutes 6 seconds ago';")
+            .expect("failed to get SPI result");
+        assert_eq!(result, Some(true));
+    }
+
+    #[pg_test]
+    fn test_accept_interval_round_trip_random() {
+        let result = Spi::get_one::<bool>("SELECT accept_interval_round_trip(interval'1 year 2 months 3 days 4 hours 5 minutes 6 seconds') = interval'1 year 2 months 3 days 4 hours 5 minutes 6 seconds';")
+            .expect("failed to get SPI result");
+        assert_eq!(result, Some(true));
+    }
+
+    #[pg_test]
+    fn test_accept_interval_round_trip_neg_random() {
+        let result = Spi::get_one::<bool>("SELECT accept_interval_round_trip(interval'1 year 2 months 3 days 4 hours 5 minutes 6 seconds ago') = interval'1 year 2 months 3 days 4 hours 5 minutes 6 seconds ago';")
+            .expect("failed to get SPI result");
+        assert_eq!(result, Some(true));
+    }
+
+    #[pg_test]
+    fn test_interval_serialization() {
+        let interval = Interval::try_from_months_days_micros(3, 4, 5_000_000).unwrap();
+        let json = json!({ "interval test": interval });
+
+        assert_eq!(json!({"interval test":"3 mons 4 days 00:00:05"}), json);
+    }
+
+    #[pg_test]
+    fn test_duration_to_interval_err() {
+        use pgx::IntervalConversionError;
+        // normal limit of i32::MAX months
+        let duration = time::Duration::days(pg_sys::DAYS_PER_MONTH as i64 * i32::MAX as i64);
+
+        let result = TryInto::<Interval>::try_into(duration);
+        match result {
+            Ok(_) => (),
+            _ => panic!("failed duration -> interval conversion"),
+        };
+
+        // one month too many, expect error
+        let duration =
+            time::Duration::days(pg_sys::DAYS_PER_MONTH as i64 * (i32::MAX as i64 + 1i64));
+
+        let result = TryInto::<Interval>::try_into(duration);
+        match result {
+            Err(IntervalConversionError::DurationMonthsOutOfBounds) => (),
+            _ => panic!("invalid duration -> interval conversion succeeded"),
+        };
     }
 }

@@ -17,9 +17,10 @@ pub use crate::pgbox::{AllocatedByPostgres, AllocatedByRust, PgBox, WhoAllocated
 
 // These could be factored into a temporal type module that could be easily imported for code which works with them.
 // However, reexporting them seems fine for now.
+
 pub use crate::datum::{
-    AnyNumeric, Array, Date, FromDatum, IntoDatum, Numeric, PgVarlena, PostgresType, Range,
-    RangeData, RangeSubType, Time, TimeWithTimeZone, Timestamp, TimestampWithTimeZone,
+    AnyNumeric, Array, Date, FromDatum, Interval, IntoDatum, Numeric, PgVarlena, PostgresType,
+    Range, RangeData, RangeSubType, Time, TimeWithTimeZone, Timestamp, TimestampWithTimeZone,
     VariadicArray,
 };
 pub use crate::inoutfuncs::{InOutFuncs, JsonInOutFuncs, PgVarlenaInOutFuncs};
