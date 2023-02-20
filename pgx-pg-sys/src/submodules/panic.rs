@@ -17,7 +17,6 @@ use std::hint::unreachable_unchecked;
 use std::panic::{
     catch_unwind, panic_any, resume_unwind, Location, PanicInfo, RefUnwindSafe, UnwindSafe,
 };
-use std::sync::Arc;
 
 use crate::elog::PgLogLevel;
 use crate::errcodes::PgSqlErrorCode;
@@ -59,13 +58,13 @@ where
     }
 }
 
-#[derive(Clone, Debug)]
+#[derive(Debug)]
 pub struct ErrorReportLocation {
     pub(crate) file: String,
     pub(crate) funcname: Option<String>,
     pub(crate) line: u32,
     pub(crate) col: u32,
-    pub(crate) backtrace: Option<Arc<std::backtrace::Backtrace>>,
+    pub(crate) backtrace: Option<std::backtrace::Backtrace>,
 }
 
 impl Default for ErrorReportLocation {
@@ -123,7 +122,7 @@ impl From<&PanicInfo<'_>> for ErrorReportLocation {
 
 /// Represents the set of information necessary for pgx to promote a Rust `panic!()` to a Postgres
 /// `ERROR` (or any [`PgLogLevel`] level)
-#[derive(Clone, Debug)]
+#[derive(Debug)]
 pub struct ErrorReport {
     pub(crate) sqlerrcode: PgSqlErrorCode,
     pub(crate) message: String,
@@ -145,7 +144,7 @@ impl Display for ErrorReport {
     }
 }
 
-#[derive(Clone, Debug)]
+#[derive(Debug)]
 pub struct ErrorReportWithLevel {
     pub(crate) level: PgLogLevel,
     pub(crate) inner: ErrorReport,
@@ -201,7 +200,7 @@ impl ErrorReportWithLevel {
 
     /// Returns the backtrace when the error is reported
     pub fn backtrace(&self) -> Option<&std::backtrace::Backtrace> {
-        self.inner.location.backtrace.as_ref().map(|b| b.as_ref())
+        self.inner.location.backtrace.as_ref()
     }
 
     /// Returns the name of the function that generated this error report, if we were able to figure it out
@@ -291,7 +290,7 @@ pub fn register_pg_guard_panic_hook() {
         PANIC_LOCATION.with(|thread_local| {
             thread_local.replace({
                 let mut info: ErrorReportLocation = info.into();
-                info.backtrace = Some(Arc::new(std::backtrace::Backtrace::capture()));
+                info.backtrace = Some(std::backtrace::Backtrace::capture());
                 Some(info)
             })
         });
@@ -322,7 +321,7 @@ impl CaughtError {
     }
 }
 
-#[derive(Debug, Clone)]
+#[derive(Debug)]
 enum GuardAction<R> {
     Return(R),
     ReThrow,
