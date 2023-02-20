@@ -183,6 +183,19 @@ impl ErrorReportWithLevel {
         self.inner.detail()
     }
 
+    pub fn detail_with_backtrace(&self) -> String {
+        match (self.detail(), self.backtrace()) {
+            (Some(d), Some(bt)) if bt.status() == std::backtrace::BacktraceStatus::Captured => {
+                format!("{}\n{}", d, bt)
+            }
+            (Some(d), _) => d.to_string(),
+            (None, Some(bt)) if bt.status() == std::backtrace::BacktraceStatus::Captured => {
+                format!("\n{}", bt)
+            }
+            (None, _) => String::new(),
+        }
+    }
+
     /// Returns the hint line of this error report, if there is one
     pub fn hint(&self) -> Option<&str> {
         self.inner.hint()
@@ -506,15 +519,7 @@ fn do_ereport(ereport: ErrorReportWithLevel) {
 
                 let sqlerrcode = ereport.sql_error_code();
                 let message = ereport.message().as_pg_cstr();
-                let backtrace = ereport.backtrace();
-                let detail = ereport.detail();
-                let detail = match (detail, backtrace) {
-                    (Some(d), Some(bt)) if bt.status() == std::backtrace::BacktraceStatus::Captured => format!("{}\n{}", d, bt),
-                    (Some(d), _) => d.to_string(),
-                    (None, Some(bt)) if bt.status() == std::backtrace::BacktraceStatus::Captured => format!("\n{}", bt),
-                    (None, _) => String::new(),
-                };
-                let detail = detail.as_pg_cstr();
+                let detail = ereport.detail_with_backtrace().as_pg_cstr();
                 let hint = ereport.hint().as_pg_cstr();
                 let context = ereport.context_message().as_pg_cstr();
                 let lineno = ereport.line_number();
@@ -588,7 +593,7 @@ fn do_ereport(ereport: ErrorReportWithLevel) {
 
                 let sqlerrcode = ereport.sql_error_code();
                 let message = ereport.message().as_pg_cstr();
-                let detail = ereport.detail().as_pg_cstr();
+                let detail = ereport.detail_with_backtrace().as_pg_cstr();
                 let hint = ereport.hint().as_pg_cstr();
                 let context = ereport.context_message().as_pg_cstr();
 
