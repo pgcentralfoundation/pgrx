@@ -28,6 +28,18 @@ impl<T> RangeBound<T>
 where
     T: RangeSubType,
 {
+    /// Returns a reference to this [`RangeBound`]'s underlying value.
+    ///
+    /// If this [`RangeBound`] is [`RangeBound::Infinite`], then `None` is returned, otherwise
+    /// `Some(&T)`
+    #[inline]
+    pub fn get(&self) -> Option<&T> {
+        match self {
+            RangeBound::Infinite => None,
+            RangeBound::Inclusive(v) | RangeBound::Exclusive(v) => Some(v),
+        }
+    }
+
     /// Convert this pgx [`RangeBound`] into the equivalent Postgres [`pg_sys::RangeBound`].
     ///
     /// Note that the `lower` property is always set to false as a [`RangeBound`] doesn't know the
