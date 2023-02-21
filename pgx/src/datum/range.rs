@@ -11,6 +11,7 @@ Use of this source code is governed by the MIT license that can be found in the 
 use crate::{
     pg_sys, AnyNumeric, Date, FromDatum, IntoDatum, Numeric, Timestamp, TimestampWithTimeZone,
 };
+use core::fmt::{Display, Formatter};
 use pgx_sql_entity_graph::metadata::{
     ArgumentError, Returns, ReturnsError, SqlMapping, SqlTranslatable,
 };
@@ -40,11 +41,29 @@ where
         }
     }
 
+    /// Returns true if this [`RangeBound`] represents the `Infinite` variant
+    #[inline]
+    pub fn is_infinite(&self) -> bool {
+        matches!(self, RangeBound::Infinite)
+    }
+
+    /// Returns true if this [`RangeBound`] represents the `Inclusive` variant
+    #[inline]
+    pub fn is_inclusive(&self) -> bool {
+        matches!(self, RangeBound::Inclusive(_))
+    }
+
+    /// Returns true if this [`RangeBound`] represents the `Exclusive` variant
+    #[inline]
+    pub fn is_exclusive(&self) -> bool {
+        matches!(self, RangeBound::Exclusive(_))
+    }
+
     /// Convert this pgx [`RangeBound`] into the equivalent Postgres [`pg_sys::RangeBound`].
     ///
     /// Note that the `lower` property is always set to false as a [`RangeBound`] doesn't know the
     /// end on which it's placed.
-    pub fn into_pg(self) -> pg_sys::RangeBound {
+    fn into_pg(self) -> pg_sys::RangeBound {
         match self {
             RangeBound::Infinite => pg_sys::RangeBound {
                 val: pg_sys::Datum::from(0),
@@ -83,16 +102,6 @@ where
             // SAFETY: caller has asserted that `val` is a proper Datum for `T`
             unsafe { RangeBound::Exclusive(T::from_datum(range_bound.val, false).unwrap()) }
         }
-    }
-}
-
-impl<T> From<&RangeBound<T>> for RangeBound<T>
-where
-    T: RangeSubType,
-{
-    #[inline]
-    fn from(value: &RangeBound<T>) -> Self {
-        Clone::clone(value)
     }
 }
 
@@ -143,6 +152,30 @@ where
 #[derive(Debug, Clone, Hash, Eq, PartialEq)]
 pub struct Range<T: RangeSubType> {
     inner: Option<(RangeBound<T>, RangeBound<T>)>,
+}
+
+impl<T> Display for Range<T>
+where
+    T: RangeSubType + Display,
+{
+    /// Follows Postgres' format for displaying ranges
+    #[rustfmt::skip]
+    fn fmt(&self, f: &mut Formatter<'_>) -> core::fmt::Result {
+        match self.as_ref() {
+            None => write!(f, "empty"),
+            Some((RangeBound::Infinite, RangeBound::Infinite)) => write!(f, "(,)"),
+            Some((RangeBound::Infinite, RangeBound::Inclusive(v))) => write!(f, "(,{}]", v),
+            Some((RangeBound::Infinite, RangeBound::Exclusive(v))) => write!(f, "(,{})", v),
+
+            Some((RangeBound::Inclusive(v), RangeBound::Infinite)) => write!(f, "[{},)", v),
+            Some((RangeBound::Inclusive(l), RangeBound::Inclusive(u))) => write!(f, "[{},{}]", l, u),
+            Some((RangeBound::Inclusive(l), RangeBound::Exclusive(u))) => write!(f, "[{},{})", l, u),
+
+            Some((RangeBound::Exclusive(v), RangeBound::Infinite)) => write!(f, "({},)", v),
+            Some((RangeBound::Exclusive(l), RangeBound::Inclusive(u))) => write!(f, "({},{}]", l, u),
+            Some((RangeBound::Exclusive(l), RangeBound::Exclusive(u))) => write!(f, "({},{})", l, u),
+        }
+    }
 }
 
 impl<T> Range<T>
@@ -234,17 +267,6 @@ where
     #[inline]
     pub fn take(&mut self) -> Option<(RangeBound<T>, RangeBound<T>)> {
         self.inner.take()
-    }
-
-    /// Consumes `self` and returns the contained [`RangeBound`]s.
-    ///
-    /// # Panics
-    ///
-    /// This function panics if this [`Range`] represents an "empty" range.
-    #[inline]
-    #[track_caller]
-    pub fn unwrap(self) -> (RangeBound<T>, RangeBound<T>) {
-        self.inner.unwrap()
     }
 
     /// Replace the bounds of this [`Range`], returning the old bounds.  

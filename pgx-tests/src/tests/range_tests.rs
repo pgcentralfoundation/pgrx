@@ -8,7 +8,6 @@ Use of this source code is governed by the MIT license that can be found in the 
 */
 
 use pgx::prelude::*;
-use pgx::RangeBound;
 
 #[pg_extern]
 fn accept_range_i32(range: Range<i32>) -> Range<i32> {
@@ -53,7 +52,7 @@ where
 {
     match range.as_ref() {
         None => Range::empty(),
-        Some((l, u)) => Range::new(l, u),
+        Some((l, u)) => Range::new(l.clone(), u.clone()),
     }
 }
 
