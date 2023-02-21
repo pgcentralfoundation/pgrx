@@ -9,10 +9,12 @@ Use of this source code is governed by the MIT license that can be found in the 
 
 use crate::{pg_sys, FromDatum, IntoDatum};
 use core::ffi::CStr;
+use core::fmt::{Display, Formatter};
 use core::num::TryFromIntError;
 use pgx_sql_entity_graph::metadata::{
     ArgumentError, Returns, ReturnsError, SqlMapping, SqlTranslatable,
 };
+use std::error::Error;
 
 pub const POSTGRES_EPOCH_JDATE: i32 = pg_sys::POSTGRES_EPOCH_JDATE as i32;
 pub const UNIX_EPOCH_JDATE: i32 = pg_sys::UNIX_EPOCH_JDATE as i32;
@@ -98,24 +100,42 @@ impl Date {
 }
 
 #[cfg(feature = "time-crate")]
-impl From<time::Date> for Date {
-    #[inline]
-    fn from(date: time::Date) -> Self {
-        Date::from_pg_epoch_days(date.to_julian_day() - POSTGRES_EPOCH_JDATE)
-    }
-}
+mod with_time_crate {
+    use crate::{Date, POSTGRES_EPOCH_JDATE};
+    use core::fmt::{Display, Formatter};
+    use std::error::Error;
 
-#[cfg(feature = "time-crate")]
-impl TryFrom<Date> for time::Date {
-    type Error = i32;
-    fn try_from(date: Date) -> Result<time::Date, Self::Error> {
-        const INNER_RANGE_BEGIN: i32 = time::Date::MIN.to_julian_day();
-        const INNER_RANGE_END: i32 = time::Date::MAX.to_julian_day();
-        match date.0 {
-            INNER_RANGE_BEGIN..=INNER_RANGE_END => {
-                time::Date::from_julian_day(date.0 + POSTGRES_EPOCH_JDATE).or_else(|_e| Err(date.0))
+    #[derive(Debug, PartialEq, Clone)]
+    #[non_exhaustive]
+    pub struct TryFromDateError(pub Date);
+
+    impl Display for TryFromDateError {
+        fn fmt(&self, f: &mut Formatter<'_>) -> core::fmt::Result {
+            write!(f, "`{}` is not compatible with `time::Date`", self.0 .0)
+        }
+    }
+
+    impl Error for TryFromDateError {}
+
+    impl From<time::Date> for Date {
+        #[inline]
+        fn from(date: time::Date) -> Self {
+            Date::from_pg_epoch_days(date.to_julian_day() - POSTGRES_EPOCH_JDATE)
+        }
+    }
+
+    impl TryFrom<Date> for time::Date {
+        type Error = TryFromDateError;
+        fn try_from(date: Date) -> Result<time::Date, Self::Error> {
+            const INNER_RANGE_BEGIN: i32 = time::Date::MIN.to_julian_day();
+            const INNER_RANGE_END: i32 = time::Date::MAX.to_julian_day();
+            match date.0 {
+                INNER_RANGE_BEGIN..=INNER_RANGE_END => {
+                    time::Date::from_julian_day(date.0 + POSTGRES_EPOCH_JDATE)
+                        .or_else(|_e| Err(TryFromDateError(date)))
+                }
+                _ => Err(TryFromDateError(date)),
             }
-            v => Err(v),
         }
     }
 }
