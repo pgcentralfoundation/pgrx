@@ -20,7 +20,7 @@ fn accept_date(d: Date) -> Date {
 fn accept_date_round_trip(d: Date) -> Date {
     match TryInto::<time::Date>::try_into(d) {
         Ok(date) => date.into(),
-        Err(pg_epoch_days) => Date::from_pg_epoch_days(pg_epoch_days),
+        Err(pg_epoch_days) => Date::from_pg_epoch_days(pg_epoch_days.as_i32()),
     }
 }
 

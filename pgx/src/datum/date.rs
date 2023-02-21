@@ -107,6 +107,18 @@ mod with_time_crate {
     #[non_exhaustive]
     pub struct TryFromDateError(pub Date);
 
+    impl TryFromDateError {
+        #[inline]
+        pub fn into_inner(self) -> Date {
+            self.0
+        }
+
+        #[inline]
+        pub fn as_i32(&self) -> i32 {
+            self.0 .0
+        }
+    }
+
     impl Display for TryFromDateError {
         fn fmt(&self, f: &mut Formatter<'_>) -> core::fmt::Result {
             write!(f, "`{}` is not compatible with `time::Date`", self.0 .0)
