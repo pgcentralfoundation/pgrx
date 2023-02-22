@@ -43,43 +43,16 @@ fn range_round_trip_values<T>(range: Range<T>) -> Range<T>
 where
     T: FromDatum + IntoDatum + RangeSubType,
 {
-    let range_data: RangeData<T> = range.into();
-    if range_data.is_empty {
-        RangeData::<T>::empty_range_data().into()
-    } else {
-        let range_data = RangeData::<T>::from_range_values(
-            range_data.lower_val(),
-            range_data.upper_val(),
-            range_data.lower.inclusive,
-            range_data.upper.inclusive,
-        );
-        range_data.into()
-    }
+    range
 }
 
 fn range_round_trip_bounds<T>(range: Range<T>) -> Range<T>
 where
     T: FromDatum + IntoDatum + RangeSubType,
 {
-    let range_data: RangeData<T> = range.into();
-    if range_data.is_empty {
-        RangeData::<T>::empty_range_data().into()
-    } else {
-        let mut lower_bound = pg_sys::RangeBound::default();
-        lower_bound.lower = true;
-        lower_bound.inclusive = range_data.lower.inclusive;
-        lower_bound.infinite = range_data.lower.infinite;
-        lower_bound.val = range_data.lower.val.clone();
-
-        let mut upper_bound = pg_sys::RangeBound::default();
-        upper_bound.lower = false;
-        upper_bound.inclusive = range_data.upper.inclusive;
-        upper_bound.infinite = range_data.upper.infinite;
-        upper_bound.val = range_data.upper.val.clone();
-
-        let range_data = RangeData::<T>::from_range_bounds(lower_bound, upper_bound);
-
-        range_data.into()
+    match range.as_ref() {
+        None => Range::empty(),
+        Some((l, u)) => Range::new(l.clone(), u.clone()),
     }
 }
 

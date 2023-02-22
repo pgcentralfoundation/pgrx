@@ -20,7 +20,7 @@ pub use crate::pgbox::{AllocatedByPostgres, AllocatedByRust, PgBox, WhoAllocated
 
 pub use crate::datum::{
     AnyNumeric, Array, Date, FromDatum, Interval, IntoDatum, Numeric, PgVarlena, PostgresType,
-    Range, RangeData, RangeSubType, Time, TimeWithTimeZone, Timestamp, TimestampWithTimeZone,
+    Range, RangeBound, RangeSubType, Time, TimeWithTimeZone, Timestamp, TimestampWithTimeZone,
     VariadicArray,
 };
 pub use crate::inoutfuncs::{InOutFuncs, JsonInOutFuncs, PgVarlenaInOutFuncs};

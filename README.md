@@ -163,39 +163,45 @@ cargo pgx init
 
 ### Mapping of Postgres types to Rust
 
-Postgres Type | Rust Type (as `Option<T>`)
---------------|-----------
-`bytea` | `Vec<u8>` or `&[u8]` (zero-copy)
-`text` | `String` or `&str` (zero-copy)
-`varchar` | `String` or `&str` (zero-copy) or `char`
-`"char"` | `i8`
-`smallint` | `i16`
-`integer` | `i32`
-`bigint` | `i64`
-`oid` | `u32`
-`real` | `f32`
-`double precision` | `f64`
-`bool` | `bool`
-`json` | `pgx::Json(serde_json::Value)`
-`jsonb` | `pgx::JsonB(serde_json::Value)`
-`date` | `pgx::Date`
-`time` | `pgx::Time`
-`timestamp` | `pgx::Timestamp`
-`time with time zone` | `pgx::TimeWithTimeZone`
-`timestamp with time zone` | `pgx::TimestampWithTimeZone`
-`anyarray` | `pgx::AnyArray`
-`anyelement` | `pgx::AnyElement`
-`box` | `pgx::pg_sys::BOX`
-`point` | `pgx::pgx_sys::Point`
-`tid` | `pgx::pg_sys::ItemPointerData`
-`cstring` | `&core::ffi::CStr`
-`inet` | `pgx::Inet(String)` -- TODO: needs better support
-`numeric` | `pgx::Numeric<P, S> or pgx::AnyNumeric`
-`void` | `()`
-`ARRAY[]::<type>` | `Vec<Option<T>>` or `pgx::Array<T>` (zero-copy)
-`NULL` | `Option::None`
-`internal` | `pgx::PgBox<T>` where `T` is any Rust/Postgres struct
-`uuid` | `pgx::Uuid([u8; 16])`
+| Postgres Type              | Rust Type (as `Option<T>`)                            |
+|----------------------------|-------------------------------------------------------|
+| `bytea`                    | `Vec<u8>` or `&[u8]` (zero-copy)                      |
+| `text`                     | `String` or `&str` (zero-copy)                        |
+| `varchar`                  | `String` or `&str` (zero-copy) or `char`              |
+| `"char"`                   | `i8`                                                  |
+| `smallint`                 | `i16`                                                 |
+| `integer`                  | `i32`                                                 |
+| `bigint`                   | `i64`                                                 |
+| `oid`                      | `u32`                                                 |
+| `real`                     | `f32`                                                 |
+| `double precision`         | `f64`                                                 |
+| `bool`                     | `bool`                                                |
+| `json`                     | `pgx::Json(serde_json::Value)`                        |
+| `jsonb`                    | `pgx::JsonB(serde_json::Value)`                       |
+| `date`                     | `pgx::Date`                                           |
+| `time`                     | `pgx::Time`                                           |
+| `timestamp`                | `pgx::Timestamp`                                      |
+| `time with time zone`      | `pgx::TimeWithTimeZone`                               |
+| `timestamp with time zone` | `pgx::TimestampWithTimeZone`                          |
+| `anyarray`                 | `pgx::AnyArray`                                       |
+| `anyelement`               | `pgx::AnyElement`                                     |
+| `box`                      | `pgx::pg_sys::BOX`                                    |
+| `point`                    | `pgx::pgx_sys::Point`                                 |
+| `tid`                      | `pgx::pg_sys::ItemPointerData`                        |
+| `cstring`                  | `&core::ffi::CStr`                                    |
+| `inet`                     | `pgx::Inet(String)` -- TODO: needs better support     |
+| `numeric`                  | `pgx::Numeric<P, S> or pgx::AnyNumeric`               |
+| `void`                     | `()`                                                  |
+| `ARRAY[]::<type>`          | `Vec<Option<T>>` or `pgx::Array<T>` (zero-copy)       |
+| `int4range`                | `pgx::Range<i32>`                                     |
+| `int8range`                | `pgx::Range<i64>`                                     |
+| `numrange`                 | `pgx::Range<Numeric<P, S>>` or `pgx::Range<AnyRange>` |
+| `daterange`                | `pgx::Range<pgx::Date>`                               |
+| `tsrange`                  | `pgx::Range<pgx::Timestamp>`                          |
+| `tstzrange`                | `pgx::Range<pgx::TimestampWithTimeZone>`              |
+| `NULL`                     | `Option::None`                                        |
+| `internal`                 | `pgx::PgBox<T>` where `T` is any Rust/Postgres struct |
+| `uuid`                     | `pgx::Uuid([u8; 16])`                                 |
 
 There are also `IntoDatum` and `FromDatum` traits for implementing additional type conversions,
 along with `#[derive(PostgresType)]` and `#[derive(PostgresEnum)]` for automatic conversion of

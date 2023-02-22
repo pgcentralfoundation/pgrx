@@ -203,6 +203,9 @@ jobs:
     - name: Run operators example tests
       run: cargo test --package operators --features "pg$PG_VER" --no-default-features
 
+    - name: Run range example tests
+      run: cargo test --package range --features "pg$PG_VER" --no-default-features
+
     - name: Run schemas example tests
       run: cargo test --package schemas --features "pg$PG_VER" --no-default-features
 
