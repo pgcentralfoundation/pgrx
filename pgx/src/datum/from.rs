@@ -117,7 +117,7 @@ pub trait FromDatum {
     where
         Self: Sized + IntoDatum,
     {
-        if !Self::is_compatible_with(type_oid) {
+        if !is_binary_coercible::<Self>(type_oid) {
             Err(TryFromDatumError::IncompatibleTypes {
                 rust_type: std::any::type_name::<Self>(),
                 rust_oid: Self::type_oid(),
@@ -140,7 +140,7 @@ pub trait FromDatum {
     where
         Self: Sized + IntoDatum,
     {
-        if !Self::is_compatible_with(type_oid) {
+        if !is_binary_coercible::<Self>(type_oid) {
             Err(TryFromDatumError::IncompatibleTypes {
                 rust_type: std::any::type_name::<Self>(),
                 rust_oid: Self::type_oid(),
@@ -151,6 +151,10 @@ pub trait FromDatum {
             Ok(FromDatum::from_datum_in_memory_context(memory_context, datum, is_null, type_oid))
         }
     }
+}
+
+fn is_binary_coercible<T: IntoDatum>(type_oid: pg_sys::Oid) -> bool {
+    T::is_compatible_with(type_oid) || unsafe { pg_sys::IsBinaryCoercible(type_oid, T::type_oid()) }
 }
 
 /// Retrieves a Postgres type name given its Oid

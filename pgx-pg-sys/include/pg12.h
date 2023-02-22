@@ -82,6 +82,7 @@ Use of this source code is governed by the MIT license that can be found in the 
 #include "parser/parse_func.h"
 #include "parser/parse_oper.h"
 #include "parser/parse_type.h"
+#include "parser/parse_coerce.h"
 #include "parser/parser.h"
 #include "parser/parsetree.h"
 #include "postmaster/bgworker.h"
