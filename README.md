@@ -268,30 +268,6 @@ error[E0080]: evaluation of constant value failed
     |
 ```
 
-### Experimental Features
-
-Adding `pgx = { version = "0.5.0", features = ["postgrestd"] }` to your Cargo.toml
-will enable a **highly** experimental variant of `pgx` designed for integration with `postgrestd`,
-a modified Rust standard library that executes the Rust runtime atop the Postgres runtime,
-instead of using the operating system's ordinary C runtime.
-This reduces the programmatic and performance impedance between Rust and Postgres.
-This feature is neither complete, nor is it completely enabled just by enabling the feature,
-as it requires additional code not in this crate in the form of the modified sysroot.
-
-Because the `postgrestd` feature is designed around control over `std`,
-some of `pgx`'s insulating guard code around the C FFI with Postgres is disabled.
-Combined with its "pre-alpha" stage, you should assume this feature can enable undefined behavior,
-even if you know what you are doing. Especially if you know exactly what you're doing, in fact,
-as that almost certainly means you are developing this feature,
-and further extending both runtimes in ways neither initially had imagined.
-If you absolutely must enable this feature, you may wish to discuss it first on [Discord].
-
-Adding `pgx = { version = "0.5.0", features = ["plrust"] }` to your Cargo.toml
-will enable an even more experimental variant of the above with special carve-outs
-specifically for usage with `PL/Rust`. This feature may not last long,
-as it is likely that code may move into a separate crate.
-
-As a reminder: "THE SOFTWARE IS PROVIDED 'AS IS', WITHOUT WARRANTY OF ANY KIND..."
 
 ## Contributing
 

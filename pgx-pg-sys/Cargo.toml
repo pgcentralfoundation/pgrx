@@ -17,7 +17,6 @@ pg12 = [ ]
 pg13 = [ ]
 pg14 = [ ]
 pg15 = [ ]
-postgrestd = [ ]
 cshim = [ ]
 
 [package.metadata.docs.rs]
