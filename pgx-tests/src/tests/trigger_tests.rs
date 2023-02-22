@@ -273,10 +273,10 @@ mod tests {
         current
             .set_by_name("trigger_new_transition_table_name", trigger_new_transition_table_name)?;
 
-        let trigger_table_name = unsafe { trigger.table_name()? };
+        let trigger_table_name = trigger.table_name()?;
         current.set_by_name("trigger_table_name", trigger_table_name)?;
 
-        let trigger_table_schema = unsafe { trigger.table_schema()? };
+        let trigger_table_schema = trigger.table_schema()?;
         current.set_by_name("trigger_table_schema", trigger_table_schema)?;
 
         let trigger_extra_args = trigger.extra_args()?;
@@ -380,37 +380,24 @@ mod tests {
     fn inserts_trigger_metadata_safe(
         trigger: &pgx::PgTrigger,
     ) -> Result<PgHeapTuple<'_, impl WhoAllocated>, TriggerError> {
-        let pgx::PgTriggerSafe {
-            name,
-            new: _new,
-            current,
-            event: _event,
-            when,
-            level,
-            op,
-            relid,
-            old_transition_table_name,
-            new_transition_table_name,
-            relation: _relation,
-            table_name,
-            table_schema,
-            extra_args,
-        } = unsafe { trigger.to_safe()? };
+        let mut current_owned = trigger.current().ok_or(TriggerError::NullCurrent)?.into_owned();
 
-        let mut current_owned = current.ok_or(TriggerError::NullCurrent)?.into_owned();
-
-        current_owned.set_by_name("trigger_name", name)?;
-        current_owned.set_by_name("trigger_when", when.to_string())?;
-        current_owned.set_by_name("trigger_level", level.to_string())?;
-        current_owned.set_by_name("trigger_op", op.to_string())?;
-        current_owned.set_by_name("trigger_relid", relid)?;
-        current_owned
-            .set_by_name("trigger_old_transition_table_name", old_transition_table_name)?;
-        current_owned
-            .set_by_name("trigger_new_transition_table_name", new_transition_table_name)?;
-        current_owned.set_by_name("trigger_table_name", table_name)?;
-        current_owned.set_by_name("trigger_table_schema", table_schema)?;
-        current_owned.set_by_name("trigger_extra_args", extra_args)?;
+        current_owned.set_by_name("trigger_name", trigger.name()?)?;
+        current_owned.set_by_name("trigger_when", trigger.when()?.to_string())?;
+        current_owned.set_by_name("trigger_level", trigger.level().to_string())?;
+        current_owned.set_by_name("trigger_op", trigger.op()?.to_string())?;
+        current_owned.set_by_name("trigger_relid", trigger.relid()?)?;
+        current_owned.set_by_name(
+            "trigger_old_transition_table_name",
+            trigger.old_transition_table_name()?,
+        )?;
+        current_owned.set_by_name(
+            "trigger_new_transition_table_name",
+            trigger.new_transition_table_name()?,
+        )?;
+        current_owned.set_by_name("trigger_table_name", trigger.relation()?.name())?;
+        current_owned.set_by_name("trigger_table_schema", trigger.relation()?.namespace())?;
+        current_owned.set_by_name("trigger_extra_args", trigger.extra_args()?)?;
 
         Ok(current_owned)
     }

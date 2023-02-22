@@ -176,27 +176,6 @@ fn example_lifetimes<'a, 'b>(trigger: &'a PgTrigger) -> Result<
 Unsafe [`pgx::pg_sys::FunctionCallInfo`][crate::pg_sys::FunctionCallInfo] and
 [`pgx::pg_sys::TriggerData`][crate::pg_sys::TriggerData] (include its contained
 [`pgx::pg_sys::Trigger`][crate::pg_sys::Trigger]) accessors are available..
-
-
-# Getting safe data all at once
-
-Many [`PgTrigger`][PgTrigger] functions are `unsafe` as they dereference pointers inside the
-[`TriggerData`][crate::pg_sys::TriggerData] contained by the [`PgTrigger`][PgTrigger].
-
-In cases where a safe API is desired, the [`PgTriggerSafe`] structure can be retrieved
-from [`PgTrigger::to_safe`].
-
-```rust,no_run
-use pgx::prelude::*;
-
-#[pg_trigger]
-fn trigger_safe(trigger: &PgTrigger) -> Result<
-    PgHeapTuple<'_, impl WhoAllocated>,
-    PgTriggerError,
-> {
-    let trigger_safe = unsafe { trigger.to_safe() }?;
-    Ok(trigger_safe.current.expect("No current HeapTuple"))
-}
 ```
 
  */
@@ -205,7 +184,6 @@ mod pg_trigger;
 mod pg_trigger_error;
 mod pg_trigger_level;
 mod pg_trigger_option;
-mod pg_trigger_safe;
 mod pg_trigger_when;
 mod trigger_tuple;
 
@@ -213,15 +191,65 @@ pub use pg_trigger::PgTrigger;
 pub use pg_trigger_error::PgTriggerError;
 pub use pg_trigger_level::PgTriggerLevel;
 pub use pg_trigger_option::PgTriggerOperation;
-pub use pg_trigger_safe::PgTriggerSafe;
 pub use pg_trigger_when::PgTriggerWhen;
 pub use trigger_tuple::TriggerTuple;
 
 use crate::{is_a, pg_sys};
 
-/// A newtype'd wrapper around a `pg_sys::TriggerData.tg_event` to prevent accidental misuse
-#[derive(Debug)]
+/// Represents the event that fired a trigger.
+///
+/// It is a newtype wrapper around a `pg_sys::TriggerData.tg_event` to prevent accidental misuse and
+/// provides helper methods for determining how the event was raised.
+#[derive(Debug, Copy, Clone)]
+#[repr(transparent)]
 pub struct TriggerEvent(u32);
+
+impl TriggerEvent {
+    #[inline]
+    pub fn fired_by_insert(&self) -> bool {
+        trigger_fired_by_insert(self.0)
+    }
+
+    #[inline]
+    pub fn fired_by_delete(&self) -> bool {
+        trigger_fired_by_delete(self.0)
+    }
+
+    #[inline]
+    pub fn fired_by_update(&self) -> bool {
+        trigger_fired_by_update(self.0)
+    }
+
+    #[inline]
+    pub fn fired_by_truncate(&self) -> bool {
+        trigger_fired_by_truncate(self.0)
+    }
+
+    #[inline]
+    pub fn fired_for_row(&self) -> bool {
+        trigger_fired_for_row(self.0)
+    }
+
+    #[inline]
+    pub fn fired_for_statement(&self) -> bool {
+        trigger_fired_for_statement(self.0)
+    }
+
+    #[inline]
+    pub fn fired_before(&self) -> bool {
+        trigger_fired_before(self.0)
+    }
+
+    #[inline]
+    pub fn fired_after(&self) -> bool {
+        trigger_fired_after(self.0)
+    }
+
+    #[inline]
+    pub fn fired_instead(&self) -> bool {
+        trigger_fired_instead(self.0)
+    }
+}
 
 #[inline]
 pub unsafe fn called_as_trigger(fcinfo: pg_sys::FunctionCallInfo) -> bool {
