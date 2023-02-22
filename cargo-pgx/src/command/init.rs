@@ -18,7 +18,6 @@ use pgx_pg_config::{
 use rayon::prelude::*;
 
 use std::collections::HashMap;
-use std::env;
 use std::fs::File;
 use std::io::{Read, Write};
 use std::path::PathBuf;
