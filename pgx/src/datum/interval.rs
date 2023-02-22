@@ -7,12 +7,14 @@ All rights reserved.
 Use of this source code is governed by the MIT license that can be found in the LICENSE file.
 */
 
-use std::ops::{Mul, Sub};
 use std::ptr::NonNull;
 
-use crate::datum::time::USECS_PER_SEC;
+#[cfg(feature = "time-crate")]
+use crate::{
+    datum::time::USECS_PER_SEC,
+    pg_sys::{DAYS_PER_MONTH, SECS_PER_DAY},
+};
 use crate::{direct_function_call, pg_sys, FromDatum, IntoDatum, PgBox};
-use pg_sys::{DAYS_PER_MONTH, SECS_PER_DAY};
 use pgx_sql_entity_graph::metadata::{
     ArgumentError, Returns, ReturnsError, SqlMapping, SqlTranslatable,
 };
@@ -115,7 +117,7 @@ impl TryFrom<time::Duration> for Interval {
 
             if time::Duration::abs(d) >= MONTH_DURATION {
                 month = total_months as i32;
-                d = d.sub(MONTH_DURATION.mul(month));
+                d = d - MONTH_DURATION * month;
             }
 
             let time = d.whole_microseconds() as i64;
@@ -139,7 +141,7 @@ impl From<Interval> for time::Duration {
             let mut duration = time::Duration::new(sec, fsec);
 
             if interval.month != 0 {
-                duration = duration.saturating_add(MONTH_DURATION.mul(interval.month));
+                duration = duration.saturating_add(MONTH_DURATION * interval.month);
             }
 
             if interval.day != 0 {
