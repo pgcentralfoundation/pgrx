@@ -17,8 +17,6 @@ crate-type = [ "rlib" ]
 
 [features]
 default = [ "cshim" ]
-plrust = [ "postgrestd" ]
-postgrestd = ["pgx-pg-sys/postgrestd"]
 cshim = [ "pgx-pg-sys/cshim" ]
 pg11 = [ "pgx-pg-sys/pg11" ]
 pg12 = [ "pgx-pg-sys/pg12" ]
