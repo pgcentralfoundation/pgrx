@@ -98,6 +98,9 @@ impl Date {
 }
 
 #[cfg(feature = "time-crate")]
+pub use with_time_crate::TryFromDateError;
+
+#[cfg(feature = "time-crate")]
 mod with_time_crate {
     use crate::{Date, POSTGRES_EPOCH_JDATE};
     use core::fmt::{Display, Formatter};
