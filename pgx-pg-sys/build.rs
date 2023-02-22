@@ -27,6 +27,9 @@ mod build {
 struct PgxOverrides(HashSet<String>);
 
 fn is_nightly() -> bool {
+    if std::env::var_os("CARGO_CFG_PLRUSTC").is_some() {
+        return false;
+    }
     let rustc = std::env::var_os("RUSTC").map(PathBuf::from).unwrap_or_else(|| "rustc".into());
     let output = match std::process::Command::new(rustc).arg("--verbose").output() {
         Ok(out) if out.status.success() => String::from_utf8_lossy(&out.stdout).trim().to_owned(),
@@ -826,13 +829,15 @@ fn build_shim_for_version(
         .unwrap();
     }
 
-    let make = option_env!("MAKE").unwrap_or("make").to_string();
+    let make = std::env::var("MAKE").unwrap_or_else(|_| "make".to_string());
     let rc = run_command(
         Command::new(make)
             .arg("clean")
             .arg(&format!("libpgx-cshim-{}.a", major_version))
             .env("PG_TARGET_VERSION", format!("{}", major_version))
             .env("PATH", path_env)
+            .env_remove("TARGET")
+            .env_remove("HOST")
             .current_dir(shim_dst),
         &format!("shim for PG v{}", major_version),
     )?;
@@ -940,10 +945,8 @@ fn run_command(mut command: &mut Command, version: &str) -> eyre::Result<Output>
         .env_remove("MFLAGS")
         .env_remove("DYLD_FALLBACK_LIBRARY_PATH")
         .env_remove("OPT_LEVEL")
-        .env_remove("TARGET")
         .env_remove("PROFILE")
         .env_remove("OUT_DIR")
-        .env_remove("HOST")
         .env_remove("NUM_JOBS");
 
     eprintln!("[{}] {:?}", version, command);
@@ -1019,7 +1022,10 @@ fn apply_pg_guard(items: &Vec<syn::Item>) -> eyre::Result<proc_macro2::TokenStre
 }
 
 fn rust_fmt(path: &PathBuf) -> eyre::Result<()> {
-    let out = run_command(Command::new("rustfmt").arg(path).current_dir("."), "[bindings_diff]");
+    // We shouldn't hit this path in a case where we care about it, but... just
+    // in case we probably should respect RUSTFMT.
+    let rustfmt = std::env::var_os("RUSTFMT").unwrap_or_else(|| "rustfmt".into());
+    let out = run_command(Command::new(rustfmt).arg(path).current_dir("."), "[bindings_diff]");
     match out {
         Ok(_) => Ok(()),
         Err(e)

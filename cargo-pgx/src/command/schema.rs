@@ -20,7 +20,7 @@ use pgx_pg_config::{get_target_dir, PgConfig, Pgx};
 use std::collections::HashSet;
 use std::hash::{Hash, Hasher};
 use std::path::{Path, PathBuf};
-use std::process::{Command, Stdio};
+use std::process::Stdio;
 // Since we support extensions with `#[no_std]`
 extern crate alloc;
 use crate::manifest::{get_package_manifest, pg_config_and_version};
@@ -215,7 +215,7 @@ pub(crate) fn generate_schema(
 
     // First, build the SQL generator so we can get a look at the symbol table
     if !skip_build {
-        let mut command = Command::new("cargo");
+        let mut command = crate::env::cargo();
         command.stderr(Stdio::inherit());
         command.stdout(Stdio::inherit());
         if is_test {
@@ -526,7 +526,7 @@ fn create_stub(
     tracing::debug!("Creating stub of appropriate PostgreSQL symbols");
     PgxPgSysStub::from_symbols(&symbols_to_stub)?.write_to_file(&postmaster_stub_file)?;
 
-    let mut so_rustc_invocation = Command::new("rustc");
+    let mut so_rustc_invocation = crate::env::rustc();
     so_rustc_invocation.stderr(Stdio::inherit());
 
     if let Some(rustc_flags_str) = std::env::var("RUSTFLAGS").ok() {

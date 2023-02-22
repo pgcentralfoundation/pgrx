@@ -10,7 +10,7 @@ Use of this source code is governed by the MIT license that can be found in the 
 use eyre::Context;
 use pgx_pg_config::{get_target_dir, PgConfig, PgConfigSelector, Pgx};
 use std::path::{Path, PathBuf};
-use std::process::{Command, Stdio};
+use std::process::Stdio;
 
 use crate::manifest::{get_package_manifest, pg_config_and_version};
 use crate::profile::CargoProfile;
@@ -116,7 +116,7 @@ pub fn test_extension(
     }
     let target_dir = get_target_dir()?;
 
-    let mut command = Command::new("cargo");
+    let mut command = crate::env::cargo();
 
     let no_default_features_arg = features.no_default_features;
     let mut features_arg = features.features.join(" ");

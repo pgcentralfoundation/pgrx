@@ -17,7 +17,8 @@ pub fn prefix_path<P: Into<PathBuf>>(dir: P) -> String {
 
 // Originally part of `pgx-utils`
 pub fn get_target_dir() -> eyre::Result<PathBuf> {
-    let mut command = Command::new("cargo");
+    let cargo = std::env::var_os("CARGO").unwrap_or_else(|| "cargo".into());
+    let mut command = Command::new(cargo);
     command.arg("metadata").arg("--format-version=1").arg("--no-deps");
     let output =
         command.output().wrap_err("Unable to get target directory from `cargo metadata`")?;
