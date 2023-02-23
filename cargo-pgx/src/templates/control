@@ -2,4 +2,4 @@ comment = '{name}:  Created by pgx'
 default_version = '@CARGO_VERSION@'
 module_pathname = '$libdir/{name}'
 relocatable = false
-superuser = false
+superuser = true
