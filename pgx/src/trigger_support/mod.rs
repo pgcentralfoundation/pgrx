@@ -16,11 +16,11 @@ panicking (into a PostgreSQL error) if it doesn't exist:
 use pgx::prelude::*;
 
 #[pg_trigger]
-fn trigger_example(trigger: &PgTrigger) -> Result<
-    PgHeapTuple<'_, impl WhoAllocated>,
+fn trigger_example<'a>(trigger: &'a PgTrigger<'a>) -> Result<
+    Option<PgHeapTuple<'a, impl WhoAllocated>>,
     PgHeapTupleError,
 > {
-    Ok(unsafe { trigger.current() }.expect("No current HeapTuple"))
+    Ok(Some(trigger.current().expect("No current HeapTuple")))
 }
 ```
 
@@ -65,11 +65,11 @@ This can also be done via the [`extension_sql`][crate::extension_sql] attribute:
 # use pgx::prelude::*;
 #
 # #[pg_trigger]
-# fn trigger_example(trigger: &PgTrigger) -> Result<
-#    PgHeapTuple<'_, impl WhoAllocated>,
+# fn trigger_example<'a>(trigger: &'a PgTrigger<'a>) -> Result<
+#    Option<PgHeapTuple<'a, impl WhoAllocated>>,
 #    PgHeapTupleError,
 # > {
-#     Ok(unsafe { trigger.current() }.expect("No current HeapTuple"))
+#    Ok(Some(trigger.current().expect("No current HeapTuple")))
 # }
 #
 pgx::extension_sql!(
@@ -101,21 +101,21 @@ When it can't, the function definition permits for it to be specified:
 use pgx::prelude::*;
 
 #[pg_trigger]
-fn example_allocated_by_rust(trigger: &PgTrigger) -> Result<
-    PgHeapTuple<'_, AllocatedByRust>,
-    PgHeapTupleError,
-> {
-    let current = unsafe { trigger.current() }.expect("No current HeapTuple");
-    Ok(current.into_owned())
+fn example_allocated_by_rust<'a>(trigger: &'a PgTrigger<'a>) -> Result<
+#    Option<PgHeapTuple<'a, AllocatedByRust>>,
+#    PgHeapTupleError,
+# > {
+    let current = trigger.current().expect("No current HeapTuple");
+    Ok(Some(current.into_owned()))
 }
 
 #[pg_trigger]
-fn example_allocated_by_postgres(trigger: &PgTrigger) -> Result<
-    PgHeapTuple<'_, AllocatedByPostgres>,
-    PgHeapTupleError,
-> {
-    let current = unsafe { trigger.current() }.expect("No current HeapTuple");
-    Ok(current)
+fn example_allocated_by_postgres<'a>(trigger: &'a PgTrigger<'a>) -> Result<
+#    Option<PgHeapTuple<'a, AllocatedByPostgres>>,
+#    PgHeapTupleError,
+# > {
+    let current = trigger.current().expect("No current HeapTuple");
+    Ok(Some(current))
 }
 ```
 
@@ -137,11 +137,11 @@ enum CustomTriggerError {
 }
 
 #[pg_trigger]
-fn example_custom_error(trigger: &PgTrigger) -> Result<
-    PgHeapTuple<'_, impl WhoAllocated>,
-    CustomTriggerError,
-> {
-    unsafe { trigger.current() }.ok_or(CustomTriggerError::NoCurrentHeapTuple)
+fn example_custom_error<'a>(trigger: &'a PgTrigger<'a>) -> Result<
+#    Option<PgHeapTuple<'a, impl WhoAllocated>>,
+#    CustomTriggerError,
+# > {
+    trigger.current().map(|t| Some(t)).ok_or(CustomTriggerError::NoCurrentHeapTuple)
 }
 ```
 
@@ -163,8 +163,8 @@ enum CustomTriggerError<'a> {
 }
 
 #[pg_trigger]
-fn example_lifetimes<'a, 'b>(trigger: &'a PgTrigger) -> Result<
-    PgHeapTuple<'a, AllocatedByRust>,
+fn example_lifetimes<'a, 'b>(trigger: &'a PgTrigger<'a>) -> Result<
+    Option<PgHeapTuple<'a, AllocatedByRust>>,
     CustomTriggerError<'b>,
 > {
     return Err(CustomTriggerError::SomeStr("Oopsie"))

@@ -1,12 +1,11 @@
 use crate::heap_tuple::PgHeapTuple;
 use crate::pg_sys;
-use crate::pgbox::{AllocatedByPostgres, PgBox};
+use crate::pgbox::AllocatedByPostgres;
 use crate::rel::PgRelation;
 use crate::trigger_support::{
     called_as_trigger, PgTriggerError, PgTriggerLevel, PgTriggerOperation, PgTriggerWhen,
     TriggerEvent, TriggerTuple,
 };
-use std::borrow::Borrow;
 use std::ffi::c_char;
 
 /**
@@ -16,14 +15,12 @@ A safe structure providing the an API similar to the constants provided in a PL/
 
 Usage examples exist in the module level docs.
 */
-pub struct PgTrigger {
-    trigger: pg_sys::Trigger,
-    trigger_data: PgBox<pgx_pg_sys::TriggerData>,
-    relation_data: pg_sys::RelationData,
-    fcinfo: pg_sys::FunctionCallInfo,
+pub struct PgTrigger<'a> {
+    trigger: &'a pg_sys::Trigger,
+    trigger_data: &'a pgx_pg_sys::TriggerData,
 }
 
-impl PgTrigger {
+impl<'a> PgTrigger<'a> {
     /// Construct a new [`PgTrigger`] from a [`FunctionCallInfo`][pg_sys::FunctionCallInfo]
     ///
     /// Generally this would be automatically done for the user in a [`#[pg_trigger]`][crate::pg_trigger].
@@ -53,34 +50,19 @@ impl PgTrigger {
     /// surrounding Postgres state is correct for the usage context, and as such, allows us to provide
     /// a safe API to the internal trigger data.
     #[doc(hidden)]
-    pub unsafe fn from_fcinfo(fcinfo: pg_sys::FunctionCallInfo) -> Result<Self, PgTriggerError> {
-        if fcinfo.is_null() {
-            return Err(PgTriggerError::NullFunctionCallInfo);
-        }
-        if !called_as_trigger(fcinfo) {
+    pub unsafe fn from_fcinfo(
+        fcinfo: &'a pg_sys::FunctionCallInfoBaseData,
+    ) -> Result<Self, PgTriggerError> {
+        if !called_as_trigger(fcinfo as *const _ as *mut _) {
             return Err(PgTriggerError::NotTrigger);
         }
-        let fcinfo_data = &*fcinfo;
 
-        if fcinfo_data.context.is_null() {
-            return Err(PgTriggerError::NullTriggerData);
-        }
-        let trigger_data: PgBox<pg_sys::TriggerData> =
-            PgBox::from_pg(fcinfo_data.context as *mut pg_sys::TriggerData);
+        let trigger_data = (fcinfo.context as *mut pg_sys::TriggerData)
+            .as_ref()
+            .ok_or(PgTriggerError::NullTriggerData)?;
+        let trigger = trigger_data.tg_trigger.as_ref().ok_or(PgTriggerError::NullTrigger)?;
 
-        let trigger_ptr = trigger_data.tg_trigger;
-        if trigger_ptr.is_null() {
-            return Err(PgTriggerError::NullTrigger);
-        }
-        let trigger = *trigger_ptr;
-
-        let relation_data_ptr = trigger_data.tg_relation;
-        if relation_data_ptr.is_null() {
-            return Err(PgTriggerError::NullRelation);
-        }
-        let relation_data = *relation_data_ptr;
-
-        Ok(Self { relation_data, trigger, trigger_data, fcinfo })
+        Ok(Self { trigger, trigger_data })
     }
 
     /// Returns the new database row for INSERT/UPDATE operations in row-level triggers.
@@ -157,7 +139,7 @@ impl PgTrigger {
     /// the object ID of the table that caused the trigger invocation
     // Derived from `pgx_pg_sys::TriggerData.tg_relation.rd_id`
     pub fn relid(&self) -> Result<pg_sys::Oid, PgTriggerError> {
-        Ok(self.relation_data.rd_id)
+        Ok(self.relation()?.oid())
     }
 
     /// The name of the old transition table of this trigger invocation
@@ -195,32 +177,21 @@ impl PgTrigger {
     }
 
     /// The `PgRelation` corresponding to the trigger.
-    ///
-    /// # Panics
-    ///
-    /// If the relation was recently deleted, this function will panic.
     pub fn relation(&self) -> Result<crate::PgRelation, PgTriggerError> {
-        // SAFETY:  the creator of this PgTrigger has asserted that the provided "fcinfo" struct
-        // contains proper trigger data, and that would include the fact that the relation already
-        // has at least a share lock created by Postgres
-        unsafe { Ok(PgRelation::open(self.relation_data.rd_id)) }
+        // SAFETY:  The creator of this PgTrigger asserted they used a correctly initialized
+        // "fcinfo" structures that represent a trigger and that Postgres was in the proper
+        // state to call a trigger.  This includes that the relation is already open with at
+        // least an AccessShareLock
+        unsafe { Ok(PgRelation::from_pg(self.trigger_data.tg_relation)) }
     }
 
     /// The name of the schema of the table that caused the trigger invocation
-    ///
-    /// # Panics
-    ///
-    /// If the relation was recently deleted, this function will panic.
     pub fn table_name(&self) -> Result<String, PgTriggerError> {
         let relation = self.relation()?;
         Ok(relation.name().to_string())
     }
 
     /// The name of the schema of the table that caused the trigger invocation
-    ///
-    /// # Panics
-    ///
-    /// If the relation was recently deleted, this function will panic.
     pub fn table_schema(&self) -> Result<String, PgTriggerError> {
         let relation = self.relation()?;
         Ok(relation.namespace().to_string())
@@ -250,23 +221,13 @@ impl PgTrigger {
         Ok(args)
     }
 
-    /// A reference to the underlying [`RelationData`][pgx_pg_sys::RelationData]
-    pub fn relation_data(&self) -> &pgx_pg_sys::RelationData {
-        self.relation_data.borrow()
-    }
-
     /// A reference to the underlying [`Trigger`][pgx_pg_sys::Trigger]
-    pub fn trigger(&self) -> &pgx_pg_sys::Trigger {
-        self.trigger.borrow()
+    pub fn trigger(&self) -> &'a pgx_pg_sys::Trigger {
+        self.trigger
     }
 
     /// A reference to the underlying [`TriggerData`][pgx_pg_sys::TriggerData]
-    pub fn trigger_data(&self) -> &pgx_pg_sys::TriggerData {
-        self.trigger_data.borrow()
-    }
-
-    /// A reference to the underlying fcinfo
-    pub fn fcinfo(&self) -> &pg_sys::FunctionCallInfo {
-        self.fcinfo.borrow()
+    pub fn trigger_data(&self) -> &'a pgx_pg_sys::TriggerData {
+        self.trigger_data
     }
 }

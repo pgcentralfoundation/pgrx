@@ -65,17 +65,27 @@ impl PgTrigger {
             #[no_mangle]
             #[::pgx::pgx_macros::pg_guard]
             unsafe extern "C" fn #extern_func_ident(fcinfo: ::pgx::pg_sys::FunctionCallInfo) -> ::pgx::pg_sys::Datum {
-                let maybe_pg_trigger = unsafe { ::pgx::trigger_support::PgTrigger::from_fcinfo(fcinfo) };
+                let fcinfo_ref = unsafe {
+                    // SAFETY:  The caller should be Postgres in this case and it will give us a valid "fcinfo" pointer
+                    fcinfo.as_ref().expect("fcinfo was NULL from Postgres")
+                };
+                let maybe_pg_trigger = unsafe { ::pgx::trigger_support::PgTrigger::from_fcinfo(fcinfo_ref) };
                 let pg_trigger = maybe_pg_trigger.expect("PgTrigger::from_fcinfo failed");
                 let trigger_fn_result: Result<
-                    ::pgx::heap_tuple::PgHeapTuple<'_, _>,
+                    Option<::pgx::heap_tuple::PgHeapTuple<'_, _>>,
                     _,
                 > = #function_ident(&pg_trigger);
 
+
+                // The trigger "protocol" allows a function to return the null pointer, but NOT to
+                // set the isnull result flag.  This is why we return `Datum::from(0)` in the None cases
                 let trigger_retval = trigger_fn_result.expect("Trigger function panic");
-                match trigger_retval.into_trigger_datum() {
-                    None => unsafe { ::pgx::fcinfo::pg_return_null(fcinfo) },
-                    Some(datum) => datum,
+                match trigger_retval {
+                    None => unsafe { ::pgx::pg_sys::Datum::from(0) },
+                    Some(trigger_retval) => match trigger_retval.into_trigger_datum() {
+                        None => unsafe { ::pgx::pg_sys::Datum::from(0) },
+                        Some(datum) => datum,
+                    }
                 }
             }
 
