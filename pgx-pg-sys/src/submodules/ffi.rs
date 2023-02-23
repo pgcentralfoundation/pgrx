@@ -169,7 +169,7 @@ unsafe fn pg_guard_ffi_boundary_impl<T, F: FnOnce() -> T>(f: F) -> T {
                     message,
                     detail,
                     hint,
-                    location: ErrorReportLocation { file, funcname, line, col: 0 },
+                    location: ErrorReportLocation { file, funcname, line, col: 0, backtrace: None },
                 },
             }))
         }

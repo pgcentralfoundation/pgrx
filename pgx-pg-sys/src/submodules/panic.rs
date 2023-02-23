@@ -58,17 +58,24 @@ where
     }
 }
 
-#[derive(Clone, Debug)]
+#[derive(Debug)]
 pub struct ErrorReportLocation {
     pub(crate) file: String,
     pub(crate) funcname: Option<String>,
     pub(crate) line: u32,
     pub(crate) col: u32,
+    pub(crate) backtrace: Option<std::backtrace::Backtrace>,
 }
 
 impl Default for ErrorReportLocation {
     fn default() -> Self {
-        Self { file: std::string::String::from("<unknown>"), funcname: None, line: 0, col: 0 }
+        Self {
+            file: std::string::String::from("<unknown>"),
+            funcname: None,
+            line: 0,
+            col: 0,
+            backtrace: None,
+        }
     }
 }
 
@@ -77,13 +84,21 @@ impl Display for ErrorReportLocation {
         match &self.funcname {
             Some(funcname) => {
                 // mimic's Postgres' output for this, but includes a column number
-                write!(f, "{}, {}:{}:{}", funcname, self.file, self.line, self.col)
+                write!(f, "{}, {}:{}:{}", funcname, self.file, self.line, self.col)?;
             }
 
             None => {
-                write!(f, "{}:{}:{}", self.file, self.line, self.col)
+                write!(f, "{}:{}:{}", self.file, self.line, self.col)?;
             }
         }
+
+        if let Some(backtrace) = &self.backtrace {
+            if backtrace.status() == std::backtrace::BacktraceStatus::Captured {
+                write!(f, "\n{}", backtrace)?;
+            }
+        }
+
+        Ok(())
     }
 }
 
@@ -94,6 +109,7 @@ impl From<&Location<'_>> for ErrorReportLocation {
             funcname: None,
             line: location.line(),
             col: location.column(),
+            backtrace: None,
         }
     }
 }
@@ -106,7 +122,7 @@ impl From<&PanicInfo<'_>> for ErrorReportLocation {
 
 /// Represents the set of information necessary for pgx to promote a Rust `panic!()` to a Postgres
 /// `ERROR` (or any [`PgLogLevel`] level)
-#[derive(Clone, Debug)]
+#[derive(Debug)]
 pub struct ErrorReport {
     pub(crate) sqlerrcode: PgSqlErrorCode,
     pub(crate) message: String,
@@ -128,7 +144,7 @@ impl Display for ErrorReport {
     }
 }
 
-#[derive(Clone, Debug)]
+#[derive(Debug)]
 pub struct ErrorReportWithLevel {
     pub(crate) level: PgLogLevel,
     pub(crate) inner: ErrorReport,
@@ -167,6 +183,20 @@ impl ErrorReportWithLevel {
         self.inner.detail()
     }
 
+    /// Get the detail line with backtrace. If backtrace is not available, it will just return the detail.
+    pub fn detail_with_backtrace(&self) -> String {
+        match (self.detail(), self.backtrace()) {
+            (Some(d), Some(bt)) if bt.status() == std::backtrace::BacktraceStatus::Captured => {
+                format!("{}\n{}", d, bt)
+            }
+            (Some(d), _) => d.to_string(),
+            (None, Some(bt)) if bt.status() == std::backtrace::BacktraceStatus::Captured => {
+                format!("\n{}", bt)
+            }
+            (None, _) => String::new(),
+        }
+    }
+
     /// Returns the hint line of this error report, if there is one
     pub fn hint(&self) -> Option<&str> {
         self.inner.hint()
@@ -180,6 +210,11 @@ impl ErrorReportWithLevel {
     /// Returns the line number of the source file that generated this error report
     pub fn line_number(&self) -> u32 {
         self.inner.location.line
+    }
+
+    /// Returns the backtrace when the error is reported
+    pub fn backtrace(&self) -> Option<&std::backtrace::Backtrace> {
+        self.inner.location.backtrace.as_ref()
     }
 
     /// Returns the name of the function that generated this error report, if we were able to figure it out
@@ -258,7 +293,7 @@ impl ErrorReport {
     }
 }
 
-thread_local! { static PANIC_LOCATION: Cell<Option<ErrorReportLocation >> = const { Cell::new(None) }}
+thread_local! { static PANIC_LOCATION: Cell<Option<ErrorReportLocation>> = const { Cell::new(None) }}
 
 fn take_panic_location() -> ErrorReportLocation {
     PANIC_LOCATION.with(|p| p.take().unwrap_or_default())
@@ -266,7 +301,13 @@ fn take_panic_location() -> ErrorReportLocation {
 
 pub fn register_pg_guard_panic_hook() {
     std::panic::set_hook(Box::new(|info| {
-        PANIC_LOCATION.with(|thread_local| thread_local.replace(Some(info.into())));
+        PANIC_LOCATION.with(|thread_local| {
+            thread_local.replace({
+                let mut info: ErrorReportLocation = info.into();
+                info.backtrace = Some(std::backtrace::Backtrace::capture());
+                Some(info)
+            })
+        });
     }))
 }
 
@@ -294,7 +335,7 @@ impl CaughtError {
     }
 }
 
-#[derive(Debug, Clone)]
+#[derive(Debug)]
 enum GuardAction<R> {
     Return(R),
     ReThrow,
@@ -479,7 +520,7 @@ fn do_ereport(ereport: ErrorReportWithLevel) {
 
                 let sqlerrcode = ereport.sql_error_code();
                 let message = ereport.message().as_pg_cstr();
-                let detail = ereport.detail().as_pg_cstr();
+                let detail = ereport.detail_with_backtrace().as_pg_cstr();
                 let hint = ereport.hint().as_pg_cstr();
                 let context = ereport.context_message().as_pg_cstr();
                 let lineno = ereport.line_number();
@@ -553,7 +594,7 @@ fn do_ereport(ereport: ErrorReportWithLevel) {
 
                 let sqlerrcode = ereport.sql_error_code();
                 let message = ereport.message().as_pg_cstr();
-                let detail = ereport.detail().as_pg_cstr();
+                let detail = ereport.detail_with_backtrace().as_pg_cstr();
                 let hint = ereport.hint().as_pg_cstr();
                 let context = ereport.context_message().as_pg_cstr();
 
