@@ -112,10 +112,10 @@ mod pgx_modqual_tests {
     mod foo_schema {}
 
     #[pg_trigger]
-    fn foo_trigger(
-        _trigger: &::pgx::PgTrigger,
+    fn foo_trigger<'a>(
+        _trigger: &'a ::pgx::PgTrigger<'a>,
     ) -> Result<
-        ::pgx::heap_tuple::PgHeapTuple<'_, ::pgx::pgbox::AllocatedByPostgres>,
+        Option<::pgx::heap_tuple::PgHeapTuple<'a, ::pgx::pgbox::AllocatedByPostgres>>,
         Box<dyn std::any::Any>,
     > {
         todo!()

@@ -4,8 +4,10 @@
 use crate::datum::lookup_type_name;
 use crate::pg_sys::{Datum, Oid};
 use crate::{
-    heap_getattr_raw, pg_sys, AllocatedByPostgres, AllocatedByRust, FromDatum, IntoDatum, PgBox,
-    PgMemoryContexts, PgTupleDesc, TriggerTuple, TryFromDatumError, WhoAllocated,
+    heap_getattr_raw, pg_sys, trigger_fired_by_delete, trigger_fired_by_insert,
+    trigger_fired_by_update, trigger_fired_for_statement, AllocatedByPostgres, AllocatedByRust,
+    FromDatum, IntoDatum, PgBox, PgMemoryContexts, PgTupleDesc, TriggerTuple, TryFromDatumError,
+    WhoAllocated,
 };
 use pgx_sql_entity_graph::metadata::{
     ArgumentError, Returns, ReturnsError, SqlMapping, SqlTranslatable,
@@ -88,31 +90,73 @@ impl<'a> PgHeapTuple<'a, AllocatedByPostgres> {
         Self { tuple: PgBox::from_pg(heap_tuple), tupdesc }
     }
 
-    /// Creates a new [PgHeapTuple] from one of the two (`Current` or `New`) trigger tuples.  The returned
+    /// Creates a new [PgHeapTuple] identified by the `which_tuple` trigger tuple.  The returned
     /// [PgHeapTuple] will be considered by have been allocated by Postgres and is not mutable until
     /// [PgHeapTuple::into_owned] is called.
+    ///
+    /// pgx also invents the concept of a "current" ([`TriggerTuple::Current`]) tuple, which is either
+    /// the new row being inserted or the row being updated (not the new version) or deleted.
+    ///
+    /// Asking for a [`TriggerTuple`] that isn't compatible with how the trigger was fired causes
+    /// this function to return `None`.  Specifically this means `None` is always returned for
+    /// statement-level triggers.
     ///
     /// ## Safety
     ///
     /// This function is unsafe as we cannot guarantee that any pointers in the `trigger_data`
-    /// argument are valid.
+    /// argument are valid or that it's being used in the context of a firing trigger, which necessitates
+    /// Postgres internal state be correct for executing a trigger.
     pub unsafe fn from_trigger_data(
         trigger_data: &'a pg_sys::TriggerData,
         which_tuple: TriggerTuple,
     ) -> Option<PgHeapTuple<'a, AllocatedByPostgres>> {
-        let tupdesc =
-            PgTupleDesc::from_pg_unchecked(trigger_data.tg_relation.as_ref().unwrap().rd_att);
-
-        let tuple = match which_tuple {
-            TriggerTuple::Current => trigger_data.tg_trigtuple,
-            TriggerTuple::New => trigger_data.tg_newtuple,
-        };
-
-        if tuple.is_null() {
+        if trigger_fired_for_statement(trigger_data.tg_event) {
+            // there is no HeapTuple for a statement-level trigger as such triggers aren't run
+            // per-row
             return None;
         }
 
-        Some(PgHeapTuple::from_heap_tuple(tupdesc, tuple))
+        let tuple = match which_tuple {
+            TriggerTuple::New => {
+                if trigger_fired_by_insert(trigger_data.tg_event) {
+                    trigger_data.tg_trigtuple
+                } else if trigger_fired_by_update(trigger_data.tg_event) {
+                    trigger_data.tg_newtuple
+                } else {
+                    return None;
+                }
+            }
+            TriggerTuple::Old => {
+                if trigger_fired_by_update(trigger_data.tg_event)
+                    || trigger_fired_by_delete(trigger_data.tg_event)
+                {
+                    trigger_data.tg_trigtuple
+                } else {
+                    return None;
+                }
+            }
+        };
+
+        // at this point we should not be trying to return a NULL trigger tuple.  We should have
+        // done that above as an early return.
+        //
+        // We assert that `tuple` is not null here because we want to ensure that our logic above
+        // is correct and somehow aren't about to dereference a null pointer which might have come
+        // from incorrect assignment from the `trigger_data.tg_trigtuple/tg_newtuple` fields above.
+        //
+        // IOW, we are double-checking that we're using those fields correctly
+        assert_eq!(tuple.is_null(), false, "encountered unexpected NULL trigger tuple");
+
+        unsafe {
+            // SAFETY:  The caller has asserted that `trigger_data` is valid, and that means its
+            // `tg_relation` member must be too
+            let tupdesc = PgTupleDesc::from_pg_unchecked((*trigger_data.tg_relation).rd_att);
+
+            // SAFETY:  We just created the `tupdesc` and determined which tuple to use and have asserted
+            // that that tuple is not NULL
+            let pg_heap_tuple = PgHeapTuple::from_heap_tuple(tupdesc, tuple);
+            Some(pg_heap_tuple)
+        }
     }
 
     /// Consumes a `[PgHeapTuple]` considered to be allocated by Postgres and transforms it into one

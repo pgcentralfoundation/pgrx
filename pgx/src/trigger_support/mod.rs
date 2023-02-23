@@ -16,11 +16,11 @@ panicking (into a PostgreSQL error) if it doesn't exist:
 use pgx::prelude::*;
 
 #[pg_trigger]
-fn trigger_example(trigger: &PgTrigger) -> Result<
-    PgHeapTuple<'_, impl WhoAllocated>,
+fn trigger_example<'a>(trigger: &'a PgTrigger<'a>) -> Result<
+    Option<PgHeapTuple<'a, impl WhoAllocated>>,
     PgHeapTupleError,
 > {
-    Ok(unsafe { trigger.current() }.expect("No current HeapTuple"))
+    Ok(Some(trigger.old().expect("No current HeapTuple")))
 }
 ```
 
@@ -65,11 +65,11 @@ This can also be done via the [`extension_sql`][crate::extension_sql] attribute:
 # use pgx::prelude::*;
 #
 # #[pg_trigger]
-# fn trigger_example(trigger: &PgTrigger) -> Result<
-#    PgHeapTuple<'_, impl WhoAllocated>,
+# fn trigger_example<'a>(trigger: &'a PgTrigger<'a>) -> Result<
+#    Option<PgHeapTuple<'a, impl WhoAllocated>>,
 #    PgHeapTupleError,
 # > {
-#     Ok(unsafe { trigger.current() }.expect("No current HeapTuple"))
+#    Ok(Some(trigger.old().expect("No current HeapTuple")))
 # }
 #
 pgx::extension_sql!(
@@ -80,7 +80,7 @@ CREATE TABLE test (
     description text,
     payload jsonb
 );
-
+*
 CREATE TRIGGER test_trigger BEFORE INSERT ON test FOR EACH ROW EXECUTE PROCEDURE trigger_example();
 INSERT INTO test (title, description, payload) VALUES ('Fox', 'a description', '{"key": "value"}');
 "#,
@@ -101,21 +101,21 @@ When it can't, the function definition permits for it to be specified:
 use pgx::prelude::*;
 
 #[pg_trigger]
-fn example_allocated_by_rust(trigger: &PgTrigger) -> Result<
-    PgHeapTuple<'_, AllocatedByRust>,
+fn example_allocated_by_rust<'a>(trigger: &'a PgTrigger<'a>) -> Result<
+    Option<PgHeapTuple<'a, AllocatedByRust>>,
     PgHeapTupleError,
 > {
-    let current = unsafe { trigger.current() }.expect("No current HeapTuple");
-    Ok(current.into_owned())
+    let current = trigger.old().expect("No current HeapTuple");
+    Ok(Some(current.into_owned()))
 }
 
 #[pg_trigger]
-fn example_allocated_by_postgres(trigger: &PgTrigger) -> Result<
-    PgHeapTuple<'_, AllocatedByPostgres>,
+fn example_allocated_by_postgres<'a>(trigger: &'a PgTrigger<'a>) -> Result<
+    Option<PgHeapTuple<'a, AllocatedByPostgres>>,
     PgHeapTupleError,
 > {
-    let current = unsafe { trigger.current() }.expect("No current HeapTuple");
-    Ok(current)
+    let current = trigger.old().expect("No current HeapTuple");
+    Ok(Some(current))
 }
 ```
 
@@ -137,11 +137,11 @@ enum CustomTriggerError {
 }
 
 #[pg_trigger]
-fn example_custom_error(trigger: &PgTrigger) -> Result<
-    PgHeapTuple<'_, impl WhoAllocated>,
+fn example_custom_error<'a>(trigger: &'a PgTrigger<'a>) -> Result<
+    Option<PgHeapTuple<'a, impl WhoAllocated>>,
     CustomTriggerError,
 > {
-    unsafe { trigger.current() }.ok_or(CustomTriggerError::NoCurrentHeapTuple)
+    trigger.old().map(|t| Some(t)).ok_or(CustomTriggerError::NoCurrentHeapTuple)
 }
 ```
 
@@ -163,8 +163,8 @@ enum CustomTriggerError<'a> {
 }
 
 #[pg_trigger]
-fn example_lifetimes<'a, 'b>(trigger: &'a PgTrigger) -> Result<
-    PgHeapTuple<'a, AllocatedByRust>,
+fn example_lifetimes<'a, 'b>(trigger: &'a PgTrigger<'a>) -> Result<
+    Option<PgHeapTuple<'a, AllocatedByRust>>,
     CustomTriggerError<'b>,
 > {
     return Err(CustomTriggerError::SomeStr("Oopsie"))
@@ -176,27 +176,6 @@ fn example_lifetimes<'a, 'b>(trigger: &'a PgTrigger) -> Result<
 Unsafe [`pgx::pg_sys::FunctionCallInfo`][crate::pg_sys::FunctionCallInfo] and
 [`pgx::pg_sys::TriggerData`][crate::pg_sys::TriggerData] (include its contained
 [`pgx::pg_sys::Trigger`][crate::pg_sys::Trigger]) accessors are available..
-
-
-# Getting safe data all at once
-
-Many [`PgTrigger`][PgTrigger] functions are `unsafe` as they dereference pointers inside the
-[`TriggerData`][crate::pg_sys::TriggerData] contained by the [`PgTrigger`][PgTrigger].
-
-In cases where a safe API is desired, the [`PgTriggerSafe`] structure can be retrieved
-from [`PgTrigger::to_safe`].
-
-```rust,no_run
-use pgx::prelude::*;
-
-#[pg_trigger]
-fn trigger_safe(trigger: &PgTrigger) -> Result<
-    PgHeapTuple<'_, impl WhoAllocated>,
-    PgTriggerError,
-> {
-    let trigger_safe = unsafe { trigger.to_safe() }?;
-    Ok(trigger_safe.current.expect("No current HeapTuple"))
-}
 ```
 
  */
@@ -205,7 +184,6 @@ mod pg_trigger;
 mod pg_trigger_error;
 mod pg_trigger_level;
 mod pg_trigger_option;
-mod pg_trigger_safe;
 mod pg_trigger_when;
 mod trigger_tuple;
 
@@ -213,15 +191,65 @@ pub use pg_trigger::PgTrigger;
 pub use pg_trigger_error::PgTriggerError;
 pub use pg_trigger_level::PgTriggerLevel;
 pub use pg_trigger_option::PgTriggerOperation;
-pub use pg_trigger_safe::PgTriggerSafe;
 pub use pg_trigger_when::PgTriggerWhen;
 pub use trigger_tuple::TriggerTuple;
 
 use crate::{is_a, pg_sys};
 
-/// A newtype'd wrapper around a `pg_sys::TriggerData.tg_event` to prevent accidental misuse
-#[derive(Debug)]
+/// Represents the event that fired a trigger.
+///
+/// It is a newtype wrapper around a `pg_sys::TriggerData.tg_event` to prevent accidental misuse and
+/// provides helper methods for determining how the event was raised.
+#[derive(Debug, Copy, Clone)]
+#[repr(transparent)]
 pub struct TriggerEvent(u32);
+
+impl TriggerEvent {
+    #[inline]
+    pub fn fired_by_insert(&self) -> bool {
+        trigger_fired_by_insert(self.0)
+    }
+
+    #[inline]
+    pub fn fired_by_delete(&self) -> bool {
+        trigger_fired_by_delete(self.0)
+    }
+
+    #[inline]
+    pub fn fired_by_update(&self) -> bool {
+        trigger_fired_by_update(self.0)
+    }
+
+    #[inline]
+    pub fn fired_by_truncate(&self) -> bool {
+        trigger_fired_by_truncate(self.0)
+    }
+
+    #[inline]
+    pub fn fired_for_row(&self) -> bool {
+        trigger_fired_for_row(self.0)
+    }
+
+    #[inline]
+    pub fn fired_for_statement(&self) -> bool {
+        trigger_fired_for_statement(self.0)
+    }
+
+    #[inline]
+    pub fn fired_before(&self) -> bool {
+        trigger_fired_before(self.0)
+    }
+
+    #[inline]
+    pub fn fired_after(&self) -> bool {
+        trigger_fired_after(self.0)
+    }
+
+    #[inline]
+    pub fn fired_instead(&self) -> bool {
+        trigger_fired_instead(self.0)
+    }
+}
 
 #[inline]
 pub unsafe fn called_as_trigger(fcinfo: pg_sys::FunctionCallInfo) -> bool {
