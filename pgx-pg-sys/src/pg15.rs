@@ -43799,6 +43799,185 @@ extern "C" {
         missing_ok: bool,
     );
 }
+pub type TYPCATEGORY = ::std::os::raw::c_char;
+pub const CoercionPathType_COERCION_PATH_NONE: CoercionPathType = 0;
+pub const CoercionPathType_COERCION_PATH_FUNC: CoercionPathType = 1;
+pub const CoercionPathType_COERCION_PATH_RELABELTYPE: CoercionPathType = 2;
+pub const CoercionPathType_COERCION_PATH_ARRAYCOERCE: CoercionPathType = 3;
+pub const CoercionPathType_COERCION_PATH_COERCEVIAIO: CoercionPathType = 4;
+pub type CoercionPathType = ::std::os::raw::c_uint;
+#[pgx_macros::pg_guard]
+extern "C" {
+    pub fn IsBinaryCoercible(srctype: Oid, targettype: Oid) -> bool;
+}
+#[pgx_macros::pg_guard]
+extern "C" {
+    pub fn IsPreferredType(category: TYPCATEGORY, type_: Oid) -> bool;
+}
+#[pgx_macros::pg_guard]
+extern "C" {
+    pub fn TypeCategory(type_: Oid) -> TYPCATEGORY;
+}
+#[pgx_macros::pg_guard]
+extern "C" {
+    pub fn coerce_to_target_type(
+        pstate: *mut ParseState,
+        expr: *mut Node,
+        exprtype: Oid,
+        targettype: Oid,
+        targettypmod: int32,
+        ccontext: CoercionContext,
+        cformat: CoercionForm,
+        location: ::std::os::raw::c_int,
+    ) -> *mut Node;
+}
+#[pgx_macros::pg_guard]
+extern "C" {
+    pub fn can_coerce_type(
+        nargs: ::std::os::raw::c_int,
+        input_typeids: *const Oid,
+        target_typeids: *const Oid,
+        ccontext: CoercionContext,
+    ) -> bool;
+}
+#[pgx_macros::pg_guard]
+extern "C" {
+    pub fn coerce_type(
+        pstate: *mut ParseState,
+        node: *mut Node,
+        inputTypeId: Oid,
+        targetTypeId: Oid,
+        targetTypeMod: int32,
+        ccontext: CoercionContext,
+        cformat: CoercionForm,
+        location: ::std::os::raw::c_int,
+    ) -> *mut Node;
+}
+#[pgx_macros::pg_guard]
+extern "C" {
+    pub fn coerce_to_domain(
+        arg: *mut Node,
+        baseTypeId: Oid,
+        baseTypeMod: int32,
+        typeId: Oid,
+        ccontext: CoercionContext,
+        cformat: CoercionForm,
+        location: ::std::os::raw::c_int,
+        hideInputCoercion: bool,
+    ) -> *mut Node;
+}
+#[pgx_macros::pg_guard]
+extern "C" {
+    pub fn coerce_to_boolean(
+        pstate: *mut ParseState,
+        node: *mut Node,
+        constructName: *const ::std::os::raw::c_char,
+    ) -> *mut Node;
+}
+#[pgx_macros::pg_guard]
+extern "C" {
+    pub fn coerce_to_specific_type(
+        pstate: *mut ParseState,
+        node: *mut Node,
+        targetTypeId: Oid,
+        constructName: *const ::std::os::raw::c_char,
+    ) -> *mut Node;
+}
+#[pgx_macros::pg_guard]
+extern "C" {
+    pub fn coerce_to_specific_type_typmod(
+        pstate: *mut ParseState,
+        node: *mut Node,
+        targetTypeId: Oid,
+        targetTypmod: int32,
+        constructName: *const ::std::os::raw::c_char,
+    ) -> *mut Node;
+}
+#[pgx_macros::pg_guard]
+extern "C" {
+    pub fn parser_coercion_errposition(
+        pstate: *mut ParseState,
+        coerce_location: ::std::os::raw::c_int,
+        input_expr: *mut Node,
+    ) -> ::std::os::raw::c_int;
+}
+#[pgx_macros::pg_guard]
+extern "C" {
+    pub fn select_common_type(
+        pstate: *mut ParseState,
+        exprs: *mut List,
+        context: *const ::std::os::raw::c_char,
+        which_expr: *mut *mut Node,
+    ) -> Oid;
+}
+#[pgx_macros::pg_guard]
+extern "C" {
+    pub fn coerce_to_common_type(
+        pstate: *mut ParseState,
+        node: *mut Node,
+        targetTypeId: Oid,
+        context: *const ::std::os::raw::c_char,
+    ) -> *mut Node;
+}
+#[pgx_macros::pg_guard]
+extern "C" {
+    pub fn verify_common_type(common_type: Oid, exprs: *mut List) -> bool;
+}
+#[pgx_macros::pg_guard]
+extern "C" {
+    pub fn select_common_typmod(
+        pstate: *mut ParseState,
+        exprs: *mut List,
+        common_type: Oid,
+    ) -> int32;
+}
+#[pgx_macros::pg_guard]
+extern "C" {
+    pub fn check_generic_type_consistency(
+        actual_arg_types: *const Oid,
+        declared_arg_types: *const Oid,
+        nargs: ::std::os::raw::c_int,
+    ) -> bool;
+}
+#[pgx_macros::pg_guard]
+extern "C" {
+    pub fn enforce_generic_type_consistency(
+        actual_arg_types: *const Oid,
+        declared_arg_types: *mut Oid,
+        nargs: ::std::os::raw::c_int,
+        rettype: Oid,
+        allow_poly: bool,
+    ) -> Oid;
+}
+#[pgx_macros::pg_guard]
+extern "C" {
+    pub fn check_valid_polymorphic_signature(
+        ret_type: Oid,
+        declared_arg_types: *const Oid,
+        nargs: ::std::os::raw::c_int,
+    ) -> *mut ::std::os::raw::c_char;
+}
+#[pgx_macros::pg_guard]
+extern "C" {
+    pub fn check_valid_internal_signature(
+        ret_type: Oid,
+        declared_arg_types: *const Oid,
+        nargs: ::std::os::raw::c_int,
+    ) -> *mut ::std::os::raw::c_char;
+}
+#[pgx_macros::pg_guard]
+extern "C" {
+    pub fn find_coercion_pathway(
+        targetTypeId: Oid,
+        sourceTypeId: Oid,
+        ccontext: CoercionContext,
+        funcid: *mut Oid,
+    ) -> CoercionPathType;
+}
+#[pgx_macros::pg_guard]
+extern "C" {
+    pub fn find_typmod_coercion_function(typeId: Oid, funcid: *mut Oid) -> CoercionPathType;
+}
 #[pgx_macros::pg_guard]
 extern "C" {
     pub fn get_rte_attribute_name(
