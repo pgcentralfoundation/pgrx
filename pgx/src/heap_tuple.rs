@@ -137,9 +137,15 @@ impl<'a> PgHeapTuple<'a, AllocatedByPostgres> {
             }
         };
 
-        // at this point we should not be trying to return a NULL trigger tuple.
-        // We should have done that above as an early return
-        assert!(!tuple.is_null());
+        // at this point we should not be trying to return a NULL trigger tuple.  We should have
+        // done that above as an early return.
+        //
+        // We assert that `tuple` is not null here because we want to ensure that our logic above
+        // is correct and somehow aren't about to dereference a null pointer which might have come
+        // from incorrect assignment from the `trigger_data.tg_trigtuple/tg_newtuple` fields above.
+        //
+        // IOW, we are double-checking that we're using those fields correctly
+        assert_eq!(tuple.is_null(), false, "encountered unexpected NULL trigger tuple");
 
         unsafe {
             // SAFETY:  The caller has asserted that `trigger_data` is valid, and that means its
