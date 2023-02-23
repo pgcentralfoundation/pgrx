@@ -27,7 +27,7 @@ enum TriggerError {
 fn trigger_example<'a>(
     trigger: &'a pgx::PgTrigger<'a>,
 ) -> Result<Option<PgHeapTuple<'a, impl WhoAllocated>>, TriggerError> {
-    let old = trigger.current().ok_or(TriggerError::NullOld)?;
+    let old = trigger.old().ok_or(TriggerError::NullOld)?;
 
     let mut current = old.into_owned();
     let col_name = "title";

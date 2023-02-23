@@ -6,8 +6,4 @@ pub enum TriggerTuple {
 
     /// Represents the old database row for UPDATE/DELETE operations in row-level triggers.
     Old,
-
-    /// Represents the old database row for UPDATE/DELETE operations or the new database row for
-    /// INSERT operations in row-level triggers.
-    Current,
 }

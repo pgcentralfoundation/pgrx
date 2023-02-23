@@ -117,7 +117,6 @@ impl<'a> PgHeapTuple<'a, AllocatedByPostgres> {
         }
 
         let tuple = match which_tuple {
-            TriggerTuple::Current => trigger_data.tg_trigtuple,
             TriggerTuple::New => {
                 if trigger_fired_by_insert(trigger_data.tg_event) {
                     trigger_data.tg_trigtuple

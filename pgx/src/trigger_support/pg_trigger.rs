@@ -91,18 +91,6 @@ impl<'a> PgTrigger<'a> {
         unsafe { PgHeapTuple::from_trigger_data(&*self.trigger_data, TriggerTuple::Old) }
     }
 
-    /// Returns the old database row for UPDATE/DELETE operations or the new database row for INSERT operations in row-level triggers.
-    ///
-    /// Returns `None` in statement-level triggers.
-    // Derived from `pgx_pg_sys::TriggerData.tg_trigtuple` or `pgx_pg_sys::TriggerData.tg_newtuple` and `pgx_pg_sys::TriggerData.tg_trigslot.tts_tupleDescriptor`
-    pub fn current(&self) -> Option<PgHeapTuple<'_, AllocatedByPostgres>> {
-        // Safety: Given that we have a known good `FunctionCallInfo`, which PostgreSQL has checked is indeed a trigger,
-        // containing a known good `TriggerData` which also contains a known good `Trigger`... and the user agreed to
-        // our `unsafe` constructor safety rules, we choose to trust this is indeed a valid pointer offered to us by
-        // PostgreSQL, and that it trusts it.
-        unsafe { PgHeapTuple::from_trigger_data(&*self.trigger_data, TriggerTuple::Current) }
-    }
-
     /// Variable that contains the name of the trigger actually fired
     pub fn name(&self) -> Result<&str, PgTriggerError> {
         let name_ptr = self.trigger.tgname as *mut c_char;
