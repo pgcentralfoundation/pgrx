@@ -13,16 +13,16 @@ A "no-op" trigger that gets the current [`PgHeapTuple`][crate::PgHeapTuple],
 panicking (into a PostgreSQL error) if it doesn't exist:
 
 ```rust,no_run
-* use pgx::prelude::*;
-*
-* #[pg_trigger]
-* fn trigger_example<'a>(trigger: &'a PgTrigger<'a>) -> Result<
-*     Option<PgHeapTuple<'a, impl WhoAllocated>>,
-*     PgHeapTupleError,
-* > {
-*     Ok(Some(trigger.old().expect("No current HeapTuple")))
-* }
-* ```
+use pgx::prelude::*;
+
+#[pg_trigger]
+fn trigger_example<'a>(trigger: &'a PgTrigger<'a>) -> Result<
+    Option<PgHeapTuple<'a, impl WhoAllocated>>,
+    PgHeapTupleError,
+> {
+    Ok(Some(trigger.old().expect("No current HeapTuple")))
+}
+```
 
 Trigger functions only accept one argument, a [`PgTrigger`], and they return a [`Result`][std::result::Result] containing
 either a [`PgHeapTuple`][crate::PgHeapTuple] or any error that implements [`impl std::error::Error`][std::error::Error].
@@ -62,32 +62,32 @@ INSERT INTO test (title, description, payload)
 This can also be done via the [`extension_sql`][crate::extension_sql] attribute:
 
 ```rust,no_run
-* # use pgx::prelude::*;
-* #
-* # #[pg_trigger]
-* # fn trigger_example<'a>(trigger: &'a PgTrigger<'a>) -> Result<
-* #    Option<PgHeapTuple<'a, impl WhoAllocated>>,
-* #    PgHeapTupleError,
-* # > {
-* #    Ok(Some(trigger.old().expect("No current HeapTuple")))
-* # }
-* #
-* pgx::extension_sql!(
-*     r#"
-* CREATE TABLE test (
-*     id serial8 NOT NULL PRIMARY KEY,
-*     title varchar(50),
-*     description text,
-*     payload jsonb
-* );
+# use pgx::prelude::*;
+#
+# #[pg_trigger]
+# fn trigger_example<'a>(trigger: &'a PgTrigger<'a>) -> Result<
+#    Option<PgHeapTuple<'a, impl WhoAllocated>>,
+#    PgHeapTupleError,
+# > {
+#    Ok(Some(trigger.old().expect("No current HeapTuple")))
+# }
+#
+pgx::extension_sql!(
+    r#"
+CREATE TABLE test (
+    id serial8 NOT NULL PRIMARY KEY,
+    title varchar(50),
+    description text,
+    payload jsonb
+);
 *
-* CREATE TRIGGER test_trigger BEFORE INSERT ON test FOR EACH ROW EXECUTE PROCEDURE trigger_example();
-* INSERT INTO test (title, description, payload) VALUES ('Fox', 'a description', '{"key": "value"}');
-* "#,
-*     name = "create_trigger",
-*     requires = [ trigger_example ]
-* );
-* ```
+CREATE TRIGGER test_trigger BEFORE INSERT ON test FOR EACH ROW EXECUTE PROCEDURE trigger_example();
+INSERT INTO test (title, description, payload) VALUES ('Fox', 'a description', '{"key": "value"}');
+"#,
+    name = "create_trigger",
+    requires = [ trigger_example ]
+);
+```
 
 # Working with [`WhoAllocated`][crate::WhoAllocated]
 
@@ -98,26 +98,26 @@ or [`AllocatedByPostgres`][crate::AllocatedByPostgres]. In most cases, it can be
 When it can't, the function definition permits for it to be specified:
 
 ```rust,no_run
-* use pgx::prelude::*;
-*
-* #[pg_trigger]
-* fn example_allocated_by_rust<'a>(trigger: &'a PgTrigger<'a>) -> Result<
-* #    Option<PgHeapTuple<'a, AllocatedByRust>>,
-* #    PgHeapTupleError,
-* # > {
-*     let current = trigger.old().expect("No current HeapTuple");
-*     Ok(Some(current.into_owned()))
-* }
-*
-* #[pg_trigger]
-* fn example_allocated_by_postgres<'a>(trigger: &'a PgTrigger<'a>) -> Result<
-* #    Option<PgHeapTuple<'a, AllocatedByPostgres>>,
-* #    PgHeapTupleError,
-* # > {
-*     let current = trigger.old().expect("No current HeapTuple");
-*     Ok(Some(current))
-* }
-* ```
+use pgx::prelude::*;
+
+#[pg_trigger]
+fn example_allocated_by_rust<'a>(trigger: &'a PgTrigger<'a>) -> Result<
+    Option<PgHeapTuple<'a, AllocatedByRust>>,
+    PgHeapTupleError,
+> {
+    let current = trigger.old().expect("No current HeapTuple");
+    Ok(Some(current.into_owned()))
+}
+
+#[pg_trigger]
+fn example_allocated_by_postgres<'a>(trigger: &'a PgTrigger<'a>) -> Result<
+    Option<PgHeapTuple<'a, AllocatedByPostgres>>,
+    PgHeapTupleError,
+> {
+    let current = trigger.old().expect("No current HeapTuple");
+    Ok(Some(current))
+}
+```
 
 # Error Handling
 
@@ -126,24 +126,24 @@ become PostgreSQL errors.
 
 
 ```rust,no_run
-* use pgx::prelude::*;
-*
-* #[derive(thiserror::Error, Debug)]
-* enum CustomTriggerError {
-*     #[error("No current HeapTuple")]
-*     NoCurrentHeapTuple,
-*     #[error("pgx::PgHeapTupleError: {0}")]
-*     PgHeapTuple(PgHeapTupleError),
-* }
-*
-* #[pg_trigger]
-* fn example_custom_error<'a>(trigger: &'a PgTrigger<'a>) -> Result<
-* #    Option<PgHeapTuple<'a, impl WhoAllocated>>,
-* #    CustomTriggerError,
-* # > {
-*     trigger.old().map(|t| Some(t)).ok_or(CustomTriggerError::NoCurrentHeapTuple)
-* }
-* ```
+use pgx::prelude::*;
+
+#[derive(thiserror::Error, Debug)]
+enum CustomTriggerError {
+    #[error("No current HeapTuple")]
+    NoCurrentHeapTuple,
+    #[error("pgx::PgHeapTupleError: {0}")]
+    PgHeapTuple(PgHeapTupleError),
+}
+
+#[pg_trigger]
+fn example_custom_error<'a>(trigger: &'a PgTrigger<'a>) -> Result<
+    Option<PgHeapTuple<'a, impl WhoAllocated>>,
+    CustomTriggerError,
+> {
+    trigger.old().map(|t| Some(t)).ok_or(CustomTriggerError::NoCurrentHeapTuple)
+}
+```
 
 # Lifetimes
 

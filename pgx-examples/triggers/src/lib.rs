@@ -13,8 +13,8 @@ pgx::pg_module_magic!();
 
 #[derive(thiserror::Error, Debug)]
 enum TriggerError {
-    #[error("Null OLD found")]
-    NullOld,
+    #[error("Null Trigger Tuple found")]
+    NullTriggerTuple,
     #[error("PgHeapTuple error: {0}")]
     PgHeapTuple(#[from] pgx::heap_tuple::PgHeapTupleError),
     #[error("TryFromDatumError error: {0}")]
@@ -27,16 +27,14 @@ enum TriggerError {
 fn trigger_example<'a>(
     trigger: &'a pgx::PgTrigger<'a>,
 ) -> Result<Option<PgHeapTuple<'a, impl WhoAllocated>>, TriggerError> {
-    let old = trigger.old().ok_or(TriggerError::NullOld)?;
-
-    let mut current = old.into_owned();
+    let mut new = trigger.new().ok_or(TriggerError::NullTriggerTuple)?.into_owned();
     let col_name = "title";
 
-    if current.get_by_name(col_name)? == Some("Fox") {
-        current.set_by_name(col_name, "Bear")?;
+    if new.get_by_name(col_name)? == Some("Fox") {
+        new.set_by_name(col_name, "Bear")?;
     }
 
-    Ok(Some(current))
+    Ok(Some(new))
 }
 
 extension_sql!(
