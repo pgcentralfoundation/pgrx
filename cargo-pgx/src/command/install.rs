@@ -11,7 +11,7 @@ use crate::command::get::{find_control_file, get_property};
 use crate::manifest::{display_version_info, PgVersionSource};
 use crate::profile::CargoProfile;
 use crate::CommandExecute;
-use cargo_toml::Manifest;
+use cargo_toml::{Inheritable, Manifest};
 use eyre::{eyre, WrapErr};
 use owo_colors::OwoColorize;
 use pgx_pg_config::{get_target_dir, PgConfig, Pgx};
@@ -400,6 +400,9 @@ pub(crate) fn get_version(manifest_path: impl AsRef<Path>) -> eyre::Result<Strin
                     .wrap_err("Couldn't parse manifest")?;
 
                 let version = manifest.package.ok_or(eyre!("no `[package]` section found"))?.version;
+                let Inheritable::Set(version) = version else {
+                    eyre::bail!("workspace-inherited packversions are not currently supported");
+                };
                 Ok(version)
             } else {
                 Ok(v)
