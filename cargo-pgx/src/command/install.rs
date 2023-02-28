@@ -401,7 +401,7 @@ pub(crate) fn get_version(manifest_path: impl AsRef<Path>) -> eyre::Result<Strin
 
                 let version = manifest.package.ok_or(eyre!("no `[package]` section found"))?.version;
                 let Inheritable::Set(version) = version else {
-                    eyre::bail!("workspace-inherited packversions are not currently supported");
+                    eyre::bail!("workspace-inherited package versions are not currently supported");
                 };
                 Ok(version)
             } else {
