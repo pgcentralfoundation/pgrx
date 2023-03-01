@@ -401,6 +401,12 @@ pub(crate) fn get_version(manifest_path: impl AsRef<Path>) -> eyre::Result<Strin
 
                 let version = manifest.package.ok_or(eyre!("no `[package]` section found"))?.version;
                 let Inheritable::Set(version) = version else {
+                    // This should be impossible to hit, since we use
+                    // `Manifest::from_path`, which calls `complete_from_path`,
+                    // which is documented as resolving these. That said, I
+                    // haven't tested it, and it's not clear how much it
+                    // actually matters either way, so we just emit an error
+                    // rather than doing something like `unreachable!()`.
                     eyre::bail!("workspace-inherited package versions are not currently supported");
                 };
                 Ok(version)
