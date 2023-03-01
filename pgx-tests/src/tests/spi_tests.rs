@@ -478,4 +478,34 @@ mod tests {
         // cidr is binary coercible to inet
         Spi::get_one::<pgx::Inet>("select '10.0.0.1/32'::cidr")
     }
+
+    #[pg_test]
+    fn test_quote_identifier() {
+        assert_eq!("unquoted", spi::quote_identifier("unquoted"));
+        assert_eq!(r#""actually-quoted""#, spi::quote_identifier("actually-quoted"));
+        assert_eq!(r#""quoted-string""#, spi::quote_identifier(String::from("quoted-string")));
+    }
+
+    #[pg_test]
+    fn test_quote_qualified_identifier() {
+        assert_eq!(
+            r#"unquoted."actually-quoted""#,
+            spi::quote_qualified_identifier("unquoted", "actually-quoted")
+        );
+        assert_eq!(
+            r#""actually-quoted".unquoted"#,
+            spi::quote_qualified_identifier("actually-quoted", "unquoted")
+        );
+        assert_eq!(
+            r#""actually-quoted1"."actually-quoted2""#,
+            spi::quote_qualified_identifier("actually-quoted1", "actually-quoted2")
+        );
+    }
+
+    #[pg_test]
+    fn test_quote_literal() {
+        assert_eq!("'quoted'", spi::quote_literal("quoted"));
+        assert_eq!("'quoted-with-''quotes'''", spi::quote_literal("quoted-with-'quotes'"));
+        assert_eq!("'quoted-string'", spi::quote_literal(String::from("quoted-string")));
+    }
 }
