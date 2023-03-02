@@ -19,7 +19,7 @@ use walkdir::{DirEntry, WalkDir};
 #[clap(author, version, about, long_about = None)]
 #[clap(propagate_version = true)]
 struct Cli {
-    #[clap(subcommand)]
+    #[command(subcommand)]
     command: Commands,
 }
 
@@ -35,7 +35,7 @@ enum Commands {
 #[derive(Args, Debug, Clone)]
 struct QueryCargoVersionArgs {
     /// Optionally specify path to pgx-version-updater Cargo.toml. Without specifying this, it assumes being ran from the root of a PGX checkout directory
-    #[clap(short, long, required = false)]
+    #[arg(short, long, required = false)]
     file_path: Option<String>,
 }
 
@@ -46,29 +46,29 @@ struct UpdateFilesArgs {
     /// Additional Cargo.toml file to include for processing that can't be detected automatically
     ///
     /// Add multiple values using --include /path/foo/Cargo.toml --include /path/bar/Cargo.toml
-    #[clap(short, long)]
+    #[arg(short, long)]
     include_for_dep_updates: Vec<String>,
 
     /// Exclude Cargo.toml files from [package] version updates
     ///
     /// Add multiple values using --exclude /path/foo/Cargo.toml --exclude /path/bar/Cargo.toml
-    #[clap(short, long)]
+    #[arg(short, long)]
     exclude_from_version_change: Vec<String>,
 
     /// Version to be used in all updates
-    #[clap(short, long, required = true)]
+    #[arg(short, long, required = true)]
     update_version: String,
 
     /// Do not make any changes to files
-    #[clap(short, long)]
+    #[arg(short, long)]
     dry_run: bool,
 
     /// Output diff between existing file and changes to be made
-    #[clap(short, long)]
+    #[arg(short, long)]
     show_diff: bool,
 
     /// Be verbose in output
-    #[clap(short, long)]
+    #[arg(short, long)]
     verbose: bool,
 }
 

@@ -11,7 +11,7 @@ use crate::command::get::{find_control_file, get_property};
 use crate::manifest::{display_version_info, PgVersionSource};
 use crate::profile::CargoProfile;
 use crate::CommandExecute;
-use cargo_toml::Manifest;
+use cargo_toml::{Inheritable, Manifest};
 use eyre::{eyre, WrapErr};
 use owo_colors::OwoColorize;
 use pgx_pg_config::{get_target_dir, PgConfig, Pgx};
@@ -400,6 +400,15 @@ pub(crate) fn get_version(manifest_path: impl AsRef<Path>) -> eyre::Result<Strin
                     .wrap_err("Couldn't parse manifest")?;
 
                 let version = manifest.package.ok_or(eyre!("no `[package]` section found"))?.version;
+                let Inheritable::Set(version) = version else {
+                    // This should be impossible to hit, since we use
+                    // `Manifest::from_path`, which calls `complete_from_path`,
+                    // which is documented as resolving these. That said, I
+                    // haven't tested it, and it's not clear how much it
+                    // actually matters either way, so we just emit an error
+                    // rather than doing something like `unreachable!()`.
+                    eyre::bail!("workspace-inherited package versions are not currently supported");
+                };
                 Ok(version)
             } else {
                 Ok(v)
