@@ -24,9 +24,8 @@ mod rss {
         pub(super) fn new(supported_major_versions: &[u16]) -> eyre::Result<Vec<PgVersion>> {
             static VERSIONS_RSS_URL: &str = "https://www.postgresql.org/versions.rss";
 
-            let http_client = if let Some((host, port)) = for_url_str(VERSIONS_RSS_URL).host_port()
-            {
-                AgentBuilder::new().proxy(Proxy::new(format!("https://{host}:{port}"))?).build()
+            let http_client = if let Some(proxy_url) = for_url_str(VERSIONS_RSS_URL).to_string() {
+                AgentBuilder::new().proxy(Proxy::new(proxy_url)?).build()
             } else {
                 Agent::new()
             };

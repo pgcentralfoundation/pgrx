@@ -194,10 +194,10 @@ fn download_postgres(pg_config: &PgConfig, pgx_home: &PathBuf) -> eyre::Result<P
     );
     let url = pg_config.url().expect("no url for pg_config").as_str();
     tracing::debug!(url = %url, "Fetching");
-    let http_client = if let Some((host, port)) =
-        for_url_str(pg_config.url().expect("no url for pg_config")).host_port()
+    let http_client = if let Some(proxy_url) =
+        for_url_str(pg_config.url().expect("no url for pg_config")).to_string()
     {
-        AgentBuilder::new().proxy(Proxy::new(format!("https://{host}:{port}"))?).build()
+        AgentBuilder::new().proxy(Proxy::new(proxy_url)?).build()
     } else {
         Agent::new()
     };
