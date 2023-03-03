@@ -80,6 +80,48 @@ impl std::fmt::Display for SpiErrorCodes {
     }
 }
 
+/// A safe wrapper around [`pg_sys::quote_identifier`]. Returns a properly quoted identifier. For
+/// instance for a column or table name such as `"my-table-name"`
+pub fn quote_identifier<StringLike: AsRef<str>>(ident: StringLike) -> String {
+    let ident_cstr = CString::new(ident.as_ref()).unwrap();
+    // SAFETY: quote_identifier expects a null terminated string and returns one.
+    let quoted_cstr = unsafe {
+        let quoted_ptr = pg_sys::quote_identifier(ident_cstr.as_ptr());
+        CStr::from_ptr(quoted_ptr)
+    };
+    quoted_cstr.to_str().unwrap().to_string()
+}
+
+/// A safe wrapper around [`pg_sys::quote_qualified_identifier`]. Returns a properly quoted name of
+/// the following format qualifier.ident. A common usecase is to qualify a table_name for example
+/// `"my schema"."my table"`
+pub fn quote_qualified_identifier<StringLike: AsRef<str>>(
+    qualifier: StringLike,
+    ident: StringLike,
+) -> String {
+    let qualifier_cstr = CString::new(qualifier.as_ref()).unwrap();
+    let ident_cstr = CString::new(ident.as_ref()).unwrap();
+    // SAFETY: quote_qualified_identifier expects null terminated strings and returns one.
+    let quoted_cstr = unsafe {
+        let quoted_ptr =
+            pg_sys::quote_qualified_identifier(qualifier_cstr.as_ptr(), ident_cstr.as_ptr());
+        CStr::from_ptr(quoted_ptr)
+    };
+    quoted_cstr.to_str().unwrap().to_string()
+}
+
+/// A safe wrapper around [`pg_sys::quote_literal_cstr`]. Returns a properly quoted literal such as
+/// a `TEXT` literal like `'my string with spaces'`.
+pub fn quote_literal<StringLike: AsRef<str>>(literal: StringLike) -> String {
+    let literal_cstr = CString::new(literal.as_ref()).unwrap();
+    // SAFETY: quote_literal_cstr expects a null terminated string and returns one.
+    let quoted_cstr = unsafe {
+        let quoted_ptr = pg_sys::quote_literal_cstr(literal_cstr.as_ptr());
+        CStr::from_ptr(quoted_ptr)
+    };
+    quoted_cstr.to_str().unwrap().to_string()
+}
+
 #[derive(Debug)]
 pub struct UnknownVariant;
 
