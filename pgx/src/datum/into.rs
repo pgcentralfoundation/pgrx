@@ -331,14 +331,26 @@ impl IntoDatum for char {
 }
 
 /// for cstring
-///
-/// ## Safety
-///
-/// The `&CStr` better be allocated by Postgres
 impl<'a> IntoDatum for &'a core::ffi::CStr {
+    /// The [`core::ffi::CStr`] is copied to `palloc`'d memory.  That memory will either be freed by
+    /// Postgres when [`pg_sys::CurrentMemoryContext`] is reset, or when the function you passed the
+    /// returned Datum to decides to free it.
     #[inline]
     fn into_datum(self) -> Option<pg_sys::Datum> {
-        Some(self.as_ptr().into())
+        unsafe {
+            // SAFETY:  A `CStr` has already been validated to be a non-null pointer to a null-terminated
+            // "char *", and it won't ever overlap with a newly palloc'd block of memory.  Using
+            // `to_bytes_with_nul()` ensures that we'll never try to palloc zero bytes -- it'll at
+            // least always be 1 byte to hold the null terminator for the empty string.
+            //
+            // This is akin to Postgres' `pg_sys::pstrdup` or even `pg_sys::pnstrdup` functions, but
+            // doing the copy ourselves allows us to elide the "strlen" or "strnlen" operations those
+            // functions need to do; the byte slice returned from `to_bytes_with_nul` knows its length.
+            let bytes = self.to_bytes_with_nul();
+            let copy = pg_sys::palloc(bytes.len()).cast();
+            core::ptr::copy_nonoverlapping(bytes.as_ptr(), copy, bytes.len());
+            Some(copy.into())
+        }
     }
 
     fn type_oid() -> pg_sys::Oid {
@@ -347,9 +359,12 @@ impl<'a> IntoDatum for &'a core::ffi::CStr {
 }
 
 impl IntoDatum for alloc::ffi::CString {
+    /// The [`core::ffi::CString`] is copied to `palloc`'d memory.  That memory will either be freed by
+    /// Postgres when [`pg_sys::CurrentMemoryContext`] is reset, or when the function you passed the
+    /// returned Datum to decides to free it.
     #[inline]
     fn into_datum(self) -> Option<pg_sys::Datum> {
-        Some(self.as_ptr().into())
+        self.as_c_str().into_datum()
     }
 
     fn type_oid() -> pg_sys::Oid {
