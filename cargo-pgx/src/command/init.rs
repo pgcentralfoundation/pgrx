@@ -319,6 +319,7 @@ fn make_postgres(pg_config: &PgConfig, pgdir: &PathBuf) -> eyre::Result<()> {
     command
         .arg("-j")
         .arg(num_cpus.to_string())
+        .arg("world-bin")
         .stdout(std::process::Stdio::piped())
         .stderr(std::process::Stdio::piped())
         .stdin(std::process::Stdio::null())
@@ -357,7 +358,7 @@ fn make_install_postgres(version: &PgConfig, pgdir: &PathBuf) -> eyre::Result<Pg
     let mut command = std::process::Command::new("make");
 
     command
-        .arg("install")
+        .arg("install-world-bin")
         .stdout(std::process::Stdio::piped())
         .stderr(std::process::Stdio::piped())
         .stdin(std::process::Stdio::null())
