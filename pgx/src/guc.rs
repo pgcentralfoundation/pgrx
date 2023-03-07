@@ -9,10 +9,11 @@ Use of this source code is governed by the MIT license that can be found in the 
 
 //! Provides a safe interface into Postgres' Configuration System (GUC)
 use crate::{pg_sys, PgMemoryContexts};
-pub use ::pgx_macros::PostgresGucEnum;
 use core::ffi::CStr;
+pub use pgx_macros::PostgresGucEnum;
 use std::cell::Cell;
 
+/// Defines at what level this GUC can be set
 pub enum GucContext {
     /// cannot be set by the user at all, but only through
     /// internal processes ("server_version" is an example).  These are GUC
@@ -51,6 +52,57 @@ pub enum GucContext {
     Userset = pg_sys::GucContext_PGC_USERSET as isize,
 }
 
+bitflags! {
+    #[derive(Default)]
+    /// Flags to control special behaviour for the GUC that these are set on. See their
+    /// descriptions below for their behaviour.
+    pub struct GucFlags: i32 {
+        /// Exclude from SHOW ALL
+        const NO_SHOW_ALL = pg_sys::GUC_NO_SHOW_ALL as i32;
+        /// Exclude from RESET ALL
+        const NO_RESET_ALL = pg_sys::GUC_NO_RESET_ALL as i32;
+        /// Auto-report changes to client
+        const REPORT = pg_sys::GUC_REPORT as i32;
+        /// Can't set in postgresql.conf
+        const DISALLOW_IN_FILE = pg_sys::GUC_DISALLOW_IN_FILE as i32;
+        /// Placeholder for custom variable
+        const CUSTOM_PLACEHOLDER = pg_sys::GUC_CUSTOM_PLACEHOLDER as i32;
+        /// Show only to superuser
+        const SUPERUSER_ONLY = pg_sys::GUC_SUPERUSER_ONLY as i32;
+        /// Limit string to `NAMEDATALEN-1`
+        const IS_NAME = pg_sys::GUC_IS_NAME as i32;
+        /// Can't set if security restricted
+        const NOT_WHILE_SEC_REST = pg_sys::GUC_NOT_WHILE_SEC_REST as i32;
+        /// Can't set in `PG_AUTOCONF_FILENAME`
+        const DISALLOW_IN_AUTO_FILE = pg_sys::GUC_DISALLOW_IN_AUTO_FILE as i32;
+        /// Value is in kilobytes
+        const UNIT_KB = pg_sys::GUC_UNIT_KB as i32;
+        /// Value is in blocks
+        const UNIT_BLOCKS = pg_sys::GUC_UNIT_BLOCKS as i32;
+        /// Value is in xlog blocks
+        const UNIT_XBLOCKS = pg_sys::GUC_UNIT_XBLOCKS as i32;
+        /// Value is in megabytes
+        const UNIT_MB = pg_sys::GUC_UNIT_MB as i32;
+        /// Value is in bytes
+        const UNIT_BYTE = pg_sys::GUC_UNIT_BYTE as i32;
+        /// Value is in milliseconds
+        const UNIT_MS = pg_sys::GUC_UNIT_MS as i32;
+        /// Value is in seconds
+        const UNIT_S = pg_sys::GUC_UNIT_S as i32;
+        /// Value is in minutes
+        const UNIT_MIN = pg_sys::GUC_UNIT_MIN as i32;
+        /// Include in `EXPLAIN` output
+        #[cfg(not(feature = "pg11"))]
+        const EXPLAIN = pg_sys::GUC_EXPLAIN as i32;
+        #[cfg(feature = "pg15")]
+        /// `RUNTIME_COMPUTED` is intended for runtime-computed GUCs that are only available via
+        /// `postgres -C` if the server is not running
+        const RUNTIME_COMPUTED = pg_sys::GUC_RUNTIME_COMPUTED as i32;
+    }
+}
+
+/// A trait that can be derived using [`PostgresGucEnum`] on enums, such that they can be
+/// usad as a GUC.
 pub trait GucEnum<T>
 where
     T: Copy,
@@ -60,6 +112,7 @@ where
     unsafe fn config_matrix(&self) -> *const pg_sys::config_enum_entry;
 }
 
+/// A safe wrapper around a global variable that can be edited through a GUC
 pub struct GucSetting<T> {
     value: Cell<T>,
     char_p: Cell<*mut std::os::raw::c_char>,
@@ -144,6 +197,7 @@ where
     }
 }
 
+/// A struct that has associated functions to register new GUCs
 pub struct GucRegistry {}
 impl GucRegistry {
     pub fn define_bool_guc(
@@ -152,6 +206,7 @@ impl GucRegistry {
         long_description: &str,
         setting: &GucSetting<bool>,
         context: GucContext,
+        flags: GucFlags,
     ) {
         unsafe {
             pg_sys::DefineCustomBoolVariable(
@@ -161,7 +216,7 @@ impl GucRegistry {
                 setting.as_ptr(),
                 setting.get(),
                 context as isize as u32,
-                0,
+                flags.bits(),
                 None,
                 None,
                 None,
@@ -177,6 +232,7 @@ impl GucRegistry {
         min_value: i32,
         max_value: i32,
         context: GucContext,
+        flags: GucFlags,
     ) {
         unsafe {
             pg_sys::DefineCustomIntVariable(
@@ -188,7 +244,7 @@ impl GucRegistry {
                 min_value,
                 max_value,
                 context as isize as u32,
-                0,
+                flags.bits(),
                 None,
                 None,
                 None,
@@ -202,6 +258,7 @@ impl GucRegistry {
         long_description: &str,
         setting: &GucSetting<Option<&'static str>>,
         context: GucContext,
+        flags: GucFlags,
     ) {
         unsafe {
             let boot_value = match setting.value.get() {
@@ -216,7 +273,7 @@ impl GucRegistry {
                 setting.as_ptr(),
                 boot_value,
                 context as isize as u32,
-                0,
+                flags.bits(),
                 None,
                 None,
                 None,
@@ -232,6 +289,7 @@ impl GucRegistry {
         min_value: f64,
         max_value: f64,
         context: GucContext,
+        flags: GucFlags,
     ) {
         unsafe {
             pg_sys::DefineCustomRealVariable(
@@ -243,7 +301,7 @@ impl GucRegistry {
                 min_value,
                 max_value,
                 context as isize as u32,
-                0,
+                flags.bits(),
                 None,
                 None,
                 None,
@@ -257,6 +315,7 @@ impl GucRegistry {
         long_description: &str,
         setting: &GucSetting<T>,
         context: GucContext,
+        flags: GucFlags,
     ) where
         T: GucEnum<T> + Copy,
     {
@@ -269,7 +328,7 @@ impl GucRegistry {
                 setting.value.get().to_ordinal(),
                 setting.value.get().config_matrix(),
                 context as isize as u32,
-                0,
+                flags.bits(),
                 None,
                 None,
                 None,

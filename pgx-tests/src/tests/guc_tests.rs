@@ -25,6 +25,7 @@ mod tests {
             "test bool gucs",
             &GUC,
             GucContext::Userset,
+            GucFlags::default(),
         );
         assert_eq!(GUC.get(), true);
 
@@ -46,6 +47,7 @@ mod tests {
             -1,
             42,
             GucContext::Userset,
+            GucFlags::default(),
         );
         assert_eq!(GUC.get(), 42);
 
@@ -54,6 +56,25 @@ mod tests {
 
         Spi::run("SET test.int = 12").expect("SPI failed");
         assert_eq!(GUC.get(), 12);
+    }
+
+    #[pg_test]
+    fn test_mb_guc() {
+        static GUC: GucSetting<i32> = GucSetting::new(42);
+        GucRegistry::define_int_guc(
+            "test.megabytes",
+            "test megabytes guc",
+            "test megabytes guc",
+            &GUC,
+            -1,
+            42000,
+            GucContext::Userset,
+            GucFlags::UNIT_MB,
+        );
+        assert_eq!(GUC.get(), 42);
+
+        Spi::run("SET test.megabytes = '1GB'").expect("SPI failed");
+        assert_eq!(GUC.get(), 1024);
     }
 
     #[pg_test]
@@ -67,6 +88,7 @@ mod tests {
             -1.0f64,
             43.0f64,
             GucContext::Userset,
+            GucFlags::default(),
         );
         assert_eq!(GUC.get(), 42.42);
 
@@ -89,6 +111,7 @@ mod tests {
             "test string guc",
             &GUC,
             GucContext::Userset,
+            GucFlags::default(),
         );
         assert!(GUC.get().is_some());
         assert_eq!(GUC.get().unwrap(), "this is a test");
@@ -109,6 +132,7 @@ mod tests {
             "test string guc",
             &GUC,
             GucContext::Userset,
+            GucFlags::default(),
         );
         assert!(GUC.get().is_none());
 
@@ -134,6 +158,7 @@ mod tests {
             "test enum guc",
             &GUC,
             GucContext::Userset,
+            GucFlags::default(),
         );
         assert_eq!(GUC.get(), TestEnum::Two);
 
