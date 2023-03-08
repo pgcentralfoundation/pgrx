@@ -184,7 +184,7 @@ mod tests {
         JsonEnumType, JsonType, VarlenaEnumType, VarlenaType,
     };
     use pgx::prelude::*;
-    use pgx::PgVarlena;
+    use pgx::{varsize_any_exhdr, PgVarlena};
 
     #[pg_test]
     fn test_mytype() -> Result<(), pgx::spi::Error> {
@@ -277,6 +277,18 @@ mod tests {
 
     #[pg_test]
     fn custom_serializer() {
+        let datum = CustomSerialized.into_datum().unwrap();
+        // Ensure we actually get our custom format, not the default CBOR
+        unsafe {
+            let input = datum.cast_mut_ptr();
+            let varlena = pg_sys::pg_detoast_datum_packed(input as *mut pg_sys::varlena);
+            let len = varsize_any_exhdr(varlena);
+            assert_eq!(len, 1);
+        }
+    }
+
+    #[pg_test]
+    fn custom_serializer_end_to_end() {
         let s = CustomSerialized;
         let _ = Spi::get_one_with_args::<CustomSerialized>(
             r#"SELECT $1"#,
