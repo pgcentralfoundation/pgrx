@@ -101,7 +101,7 @@ $ cargo pgx init
 
 `cargo pgx init` is required to be run once to properly configure the `pgx` development environment.
 
-As shown by the screenshot above, it downloads the latest versions of Postgres v11, v12, v13, v14, v15, configures them, compiles them, and installs them to `~/.pgx/`. Other `pgx` commands such as `run` and `test` will fully manage and otherwise use these Postgres installations for you.
+As shown by the screenshot above, it downloads the latest versions of Postgres v11, v12, v13, v14, v15, configures them, compiles them, and installs them to `~/.pgx/`, including all [`contrib`](https://www.postgresql.org/docs/current/contrib.html) extensions and tools included with Postgres. Other `pgx` commands such as `run` and `test` will fully manage and otherwise use these Postgres installations for you.
 
 `pgx` is designed to support multiple Postgres versions in such a way that during development, you'll know if you're trying to use a Postgres API that isn't common across all versions. It's also designed to make testing your extension against these versions easy. This is why it requires you to have all fully compiled and installed versions of Postgres during development.
 
