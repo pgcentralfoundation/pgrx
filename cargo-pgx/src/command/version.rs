@@ -10,13 +10,13 @@ pub(crate) fn pgx_default(supported_major_versions: &[u16]) -> eyre::Result<Pgx>
 }
 
 mod rss {
-    use env_proxy::for_url_str;
     use eyre::WrapErr;
     use owo_colors::OwoColorize;
     use pgx_pg_config::PgVersion;
     use serde_derive::Deserialize;
-    use ureq::{Agent, AgentBuilder, Proxy};
     use url::Url;
+
+    use crate::command::build_agent_for_url;
 
     pub(super) struct PostgreSQLVersionRss;
 
@@ -24,13 +24,7 @@ mod rss {
         pub(super) fn new(supported_major_versions: &[u16]) -> eyre::Result<Vec<PgVersion>> {
             static VERSIONS_RSS_URL: &str = "https://www.postgresql.org/versions.rss";
 
-            let http_client = if let Some((host, port)) = for_url_str(VERSIONS_RSS_URL).host_port()
-            {
-                AgentBuilder::new().proxy(Proxy::new(format!("https://{host}:{port}"))?).build()
-            } else {
-                Agent::new()
-            };
-
+            let http_client = build_agent_for_url(VERSIONS_RSS_URL)?;
             let response = http_client
                 .get(VERSIONS_RSS_URL)
                 .call()
