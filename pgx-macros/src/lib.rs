@@ -839,6 +839,7 @@ fn impl_postgres_type(ast: DeriveInput) -> syn::Result<proc_macro2::TokenStream>
     Ok(stream)
 }
 
+/// Derives the `GucEnum` trait, so that normal Rust enums can be used as a GUC.
 #[proc_macro_derive(PostgresGucEnum, attributes(hidden))]
 pub fn postgres_guc_enum(input: TokenStream) -> TokenStream {
     let ast = parse_macro_input!(input as syn::DeriveInput);
