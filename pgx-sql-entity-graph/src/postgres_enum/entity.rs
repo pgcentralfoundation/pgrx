@@ -64,7 +64,6 @@ impl SqlGraphIdentifier for PostgresEnumEntity {
 }
 
 impl ToSql for PostgresEnumEntity {
-    #[tracing::instrument(level = "debug", err, skip(self, context), fields(identifier = %self.rust_identifier()))]
     fn to_sql(&self, context: &PgxSql) -> eyre::Result<String> {
         let self_index = context.enums[self];
         let sql = format!(
@@ -88,7 +87,6 @@ impl ToSql for PostgresEnumEntity {
                 .join(",\n")
                 + "\n",
         );
-        tracing::trace!(%sql);
         Ok(sql)
     }
 }

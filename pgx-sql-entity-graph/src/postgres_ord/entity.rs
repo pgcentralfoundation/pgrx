@@ -81,7 +81,6 @@ impl SqlGraphIdentifier for PostgresOrdEntity {
 }
 
 impl ToSql for PostgresOrdEntity {
-    #[tracing::instrument(level = "debug", err, skip(self, _context), fields(identifier = %self.rust_identifier()))]
     fn to_sql(&self, _context: &PgxSql) -> eyre::Result<String> {
         let sql = format!("\n\
                             -- {file}:{line}\n\
@@ -101,7 +100,6 @@ impl ToSql for PostgresOrdEntity {
                           line = self.line,
                           cmp_fn_name = self.cmp_fn_name(),
         );
-        tracing::trace!(%sql);
         Ok(sql)
     }
 }
