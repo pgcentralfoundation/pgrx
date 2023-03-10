@@ -17,7 +17,6 @@ to the `pgx` framework and very subject to change between versions. While you ma
 use super::{SqlGraphEntity, SqlGraphIdentifier, ToSql};
 use core::convert::TryFrom;
 use std::collections::HashMap;
-use tracing_error::SpanTrace;
 
 /// The parsed contents of a `.control` file.
 ///
@@ -51,7 +50,6 @@ impl ControlFile {
     /// # Ok(())
     /// # }
     /// ```
-    #[tracing::instrument(level = "error")]
     pub fn from_str(input: &str) -> Result<Self, ControlFileError> {
         let mut temp = HashMap::new();
         for line in input.lines() {
@@ -71,27 +69,21 @@ impl ControlFile {
         Ok(ControlFile {
             comment: temp
                 .get("comment")
-                .ok_or(ControlFileError::MissingField {
-                    field: "comment",
-                    context: SpanTrace::capture(),
-                })?
+                .ok_or(ControlFileError::MissingField { field: "comment" })?
                 .to_string(),
             default_version: temp
                 .get("default_version")
-                .ok_or(ControlFileError::MissingField {
-                    field: "default_version",
-                    context: SpanTrace::capture(),
-                })?
+                .ok_or(ControlFileError::MissingField { field: "default_version" })?
                 .to_string(),
             module_pathname: temp.get("module_pathname").map(|v| v.to_string()),
-            relocatable: temp.get("relocatable").ok_or(ControlFileError::MissingField {
-                field: "relocatable",
-                context: SpanTrace::capture(),
-            })? == &"true",
-            superuser: temp.get("superuser").ok_or(ControlFileError::MissingField {
-                field: "superuser",
-                context: SpanTrace::capture(),
-            })? == &"true",
+            relocatable: temp
+                .get("relocatable")
+                .ok_or(ControlFileError::MissingField { field: "relocatable" })?
+                == &"true",
+            superuser: temp
+                .get("superuser")
+                .ok_or(ControlFileError::MissingField { field: "superuser" })?
+                == &"true",
             schema: temp.get("schema").map(|v| v.to_string()),
         })
     }
@@ -106,15 +98,14 @@ impl From<ControlFile> for SqlGraphEntity {
 /// An error met while parsing a `.control` file.
 #[derive(Debug, Clone)]
 pub enum ControlFileError {
-    MissingField { field: &'static str, context: SpanTrace },
+    MissingField { field: &'static str },
 }
 
 impl std::fmt::Display for ControlFileError {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         match self {
-            ControlFileError::MissingField { field, context } => {
+            ControlFileError::MissingField { field } => {
                 write!(f, "Missing field in control file! Please add `{}`.", field)?;
-                context.fmt(f)?;
             }
         };
         Ok(())
@@ -132,7 +123,6 @@ impl TryFrom<&str> for ControlFile {
 }
 
 impl ToSql for ControlFile {
-    #[tracing::instrument(level = "debug", err, skip(self, _context))]
     fn to_sql(&self, _context: &super::PgxSql) -> eyre::Result<String> {
         let sql = format!(
             "\
@@ -143,7 +133,6 @@ impl ToSql for ControlFile {
             */\
         "
         );
-        tracing::trace!(%sql);
         Ok(sql)
     }
 }

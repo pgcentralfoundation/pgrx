@@ -1482,13 +1482,9 @@ dependencies = [
  "petgraph",
  "proc-macro2",
  "quote",
- "regex",
  "seq-macro",
  "syn",
  "syntect",
- "tracing",
- "tracing-error",
- "tracing-subscriber",
  "unescape",
 ]
 

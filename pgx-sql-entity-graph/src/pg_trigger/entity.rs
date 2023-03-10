@@ -31,11 +31,6 @@ impl From<PgTriggerEntity> for SqlGraphEntity {
 }
 
 impl ToSql for PgTriggerEntity {
-    #[tracing::instrument(
-        level = "error",
-        skip(self, context),
-        fields(identifier = %self.rust_identifier()),
-    )]
     fn to_sql(&self, context: &PgxSql) -> eyre::Result<String> {
         let self_index = context.triggers[self];
         let schema = context.schema_prefix_for(&self_index);

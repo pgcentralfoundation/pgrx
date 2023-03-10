@@ -68,7 +68,6 @@ impl SqlGraphIdentifier for ExtensionSqlEntity {
 }
 
 impl ToSql for ExtensionSqlEntity {
-    #[tracing::instrument(level = "debug", skip(self, _context), fields(identifier = self.full_path))]
     fn to_sql(&self, _context: &PgxSql) -> eyre::Result<String> {
         let sql = format!(
             "\n\
@@ -115,7 +114,6 @@ impl ToSql for ExtensionSqlEntity {
             finalize = if self.finalize { "-- finalize\n" } else { "" },
             sql = self.sql,
         );
-        tracing::trace!(%sql);
         Ok(sql)
     }
 }
