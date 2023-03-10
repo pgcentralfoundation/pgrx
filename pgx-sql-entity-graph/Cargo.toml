@@ -15,7 +15,6 @@ syntax-highlighting = ["dep:syntect", "dep:owo-colors", "dep:atty"]
 no-schema-generation = []
 
 [dependencies]
-seq-macro = "0.3"
 convert_case = "0.6.0"
 eyre = "0.6.8"
 petgraph = "0.6.3"
