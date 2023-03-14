@@ -12,11 +12,11 @@ use eyre::{eyre, WrapErr};
 use once_cell::sync::Lazy;
 use pgx_pg_config::{prefix_path, PgConfig, PgConfigSelector, Pgx, SUPPORTED_MAJOR_VERSIONS};
 use proc_macro2::Span;
-use quote::{quote, ToTokens, format_ident};
+use quote::{format_ident, quote, ToTokens};
 use std::collections::{BTreeMap, BTreeSet, HashMap, HashSet};
 use std::path::PathBuf;
 use std::process::{Command, Output};
-use syn::{ForeignItem, Item, ItemConst, Type, Ident};
+use syn::{ForeignItem, Ident, Item, ItemConst, Type};
 
 const BLOCKLISTED_TYPES: [&str; 3] = ["Datum", "NullableDatum", "Oid"];
 
