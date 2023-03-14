@@ -1082,7 +1082,7 @@ fn impl_pg_node(
                 rtekind_result_handling,
                 quote! {
                     _ => {
-                        unsafe { pre_format_elog_string(ERROR as i32, format!("unrecognized RTE kind: {}", self.rtekind).as_ptr() as *const i8); }
+                        unsafe { pre_format_elog_string(ERROR as i32, format!("unrecognized RTE kind: {}", self.rtekind).as_ptr().cast()); }
                     }
                 },
             ]),
