@@ -1,13 +1,12 @@
 /*
 Use of this source code is governed by the MIT license that can be found in the LICENSE file.
 */
+use core::ffi::c_char;
 use pg_sys::{
     Const, Node, NodeTag_T_Const, ParamListInfoData, PgNode, PlannedStmt, PointerPath, Query,
     QueryDesc, RangeTblEntry, FLOAT4OID, FLOAT8OID, NUMERICOID,
 };
-use pgx::{
-    cstr_core::c_char, error, hooks::PgHooks, prelude::*, warning, FromDatum, HookResult, PgList,
-};
+use pgx::{error, hooks::PgHooks, prelude::*, warning, FromDatum, HookResult, PgList};
 
 pub struct ExampleHook {}
 impl PgHooks for ExampleHook {
