@@ -9,5 +9,5 @@ description = "Standalone tool to update PGX Cargo.toml versions and dependencie
 [dependencies]
 clap = { version = "4.1.8", features = [ "env", "derive" ] }
 owo-colors = "3.5.0"
-toml_edit = { version = "0.19.4" }
+toml_edit = { version = "0.19.6" }
 walkdir = "2"
