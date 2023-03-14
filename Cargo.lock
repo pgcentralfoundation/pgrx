@@ -256,7 +256,7 @@ dependencies = [
 
 [[package]]
 name = "cargo-pgx"
-version = "0.7.3"
+version = "0.7.4"
 dependencies = [
  "atty",
  "cargo_metadata",
@@ -1402,7 +1402,7 @@ dependencies = [
 
 [[package]]
 name = "pgx"
-version = "0.7.3"
+version = "0.7.4"
 dependencies = [
  "atomic-traits",
  "bitflags",
@@ -1427,7 +1427,7 @@ dependencies = [
 
 [[package]]
 name = "pgx-macros"
-version = "0.7.3"
+version = "0.7.4"
 dependencies = [
  "pgx-sql-entity-graph",
  "proc-macro2",
@@ -1438,7 +1438,7 @@ dependencies = [
 
 [[package]]
 name = "pgx-pg-config"
-version = "0.7.3"
+version = "0.7.4"
 dependencies = [
  "dirs",
  "eyre",
@@ -1453,7 +1453,7 @@ dependencies = [
 
 [[package]]
 name = "pgx-pg-sys"
-version = "0.7.3"
+version = "0.7.4"
 dependencies = [
  "bindgen",
  "eyre",
@@ -1473,7 +1473,7 @@ dependencies = [
 
 [[package]]
 name = "pgx-sql-entity-graph"
-version = "0.7.3"
+version = "0.7.4"
 dependencies = [
  "atty",
  "convert_case",
@@ -1489,7 +1489,7 @@ dependencies = [
 
 [[package]]
 name = "pgx-tests"
-version = "0.7.3"
+version = "0.7.4"
 dependencies = [
  "clap-cargo",
  "eyre",

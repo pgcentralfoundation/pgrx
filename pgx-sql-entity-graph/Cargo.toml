@@ -1,6 +1,6 @@
 [package]
 name = "pgx-sql-entity-graph"
-version = "0.7.3"
+version = "0.7.4"
 authors = ["ZomboDB, LLC <zombodb@gmail.com>"]
 license = "MIT"
 description = "Sql Entity Graph for `pgx`"
