@@ -168,6 +168,7 @@ impl SqlGraphIdentifier for PgAggregateEntity {
 }
 
 impl ToSql for PgAggregateEntity {
+    #[tracing::instrument(level = "debug", err, skip(self, context), fields(identifier = %self.rust_identifier()))]
     fn to_sql(&self, context: &PgxSql) -> eyre::Result<String> {
         let self_index = context.aggregates[self];
         let mut optional_attributes = Vec::new();
@@ -471,6 +472,7 @@ impl ToSql for PgAggregateEntity {
                 + &optional_attributes_string
                 + if optional_attributes.len() == 0 { "" } else { "\n" },
         );
+        tracing::trace!(%sql);
         Ok(sql)
     }
 }

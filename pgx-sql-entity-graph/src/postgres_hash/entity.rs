@@ -61,6 +61,7 @@ impl SqlGraphIdentifier for PostgresHashEntity {
 }
 
 impl ToSql for PostgresHashEntity {
+    #[tracing::instrument(level = "debug", err, skip(self, _context), fields(identifier = %self.rust_identifier()))]
     fn to_sql(&self, _context: &PgxSql) -> eyre::Result<String> {
         let sql = format!("\n\
                             -- {file}:{line}\n\
@@ -76,6 +77,7 @@ impl ToSql for PostgresHashEntity {
                           line = self.line,
                           fn_name = self.fn_name(),
         );
+        tracing::trace!(%sql);
         Ok(sql)
     }
 }
