@@ -68,7 +68,6 @@ impl SqlGraphIdentifier for PostgresTypeEntity {
 }
 
 impl ToSql for PostgresTypeEntity {
-    #[tracing::instrument(level = "debug", err, skip(self, context), fields(identifier = %self.rust_identifier()))]
     fn to_sql(&self, context: &PgxSql) -> eyre::Result<String> {
         let self_index = context.types[self];
         let item_node = &context.graph[self_index];
@@ -109,9 +108,7 @@ impl ToSql for PostgresTypeEntity {
                 _ => None,
             })
             .ok_or_else(|| eyre!("Could not find in_fn graph entity."))?;
-        tracing::trace!(in_fn = ?in_fn_path, "Found matching `in_fn`");
         let in_fn_sql = in_fn.to_sql(context)?;
-        tracing::trace!(%in_fn_sql);
 
         let out_fn_module_path = if !item.out_fn_module_path.is_empty() {
             item.out_fn_module_path.clone()
@@ -139,9 +136,7 @@ impl ToSql for PostgresTypeEntity {
                 _ => None,
             })
             .ok_or_else(|| eyre!("Could not find out_fn graph entity."))?;
-        tracing::trace!(out_fn = ?out_fn_path, "Found matching `out_fn`");
         let out_fn_sql = out_fn.to_sql(context)?;
-        tracing::trace!(%out_fn_sql);
 
         let shell_type = format!(
             "\n\
@@ -155,7 +150,6 @@ impl ToSql for PostgresTypeEntity {
             line = item.line,
             name = item.name,
         );
-        tracing::trace!(sql = %shell_type);
 
         let materialized_type = format! {
             "\n\
@@ -180,7 +174,6 @@ impl ToSql for PostgresTypeEntity {
             out_fn = item.out_fn,
             out_fn_path = out_fn_path,
         };
-        tracing::trace!(sql = %materialized_type);
 
         Ok(shell_type + "\n" + &in_fn_sql + "\n" + &out_fn_sql + "\n" + &materialized_type)
     }

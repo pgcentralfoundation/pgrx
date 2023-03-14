@@ -15,18 +15,13 @@ syntax-highlighting = ["dep:syntect", "dep:owo-colors", "dep:atty"]
 no-schema-generation = []
 
 [dependencies]
-seq-macro = "0.3"
 convert_case = "0.6.0"
 eyre = "0.6.8"
 petgraph = "0.6.3"
 proc-macro2 = { version = "1.0.51", features = [ "span-locations" ] }
 quote = "1.0.23"
-regex = "1.7.1"
 syn = { version = "1.0.109", features = [ "extra-traits", "full", "fold", "parsing" ] }
 unescape = "0.1.0"
-tracing = "0.1.37"
-tracing-error = "0.2.0"
-tracing-subscriber = { version = "0.3.16", features = [ "env-filter" ] }
 
 # colorized sql output
 atty = { version = "0.2.14", optional = true }

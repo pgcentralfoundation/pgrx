@@ -74,11 +74,6 @@ impl SqlGraphIdentifier for PgExternEntity {
 }
 
 impl ToSql for PgExternEntity {
-    #[tracing::instrument(
-        level = "error",
-        skip(self, context),
-        fields(identifier = %self.rust_identifier()),
-    )]
     fn to_sql(&self, context: &PgxSql) -> eyre::Result<String> {
         let self_index = context.externs[self];
         let mut extern_attrs = self.extern_attrs.clone();
@@ -449,7 +444,6 @@ impl ToSql for PgExternEntity {
                 }
             },
         );
-        tracing::trace!(sql = %ext_sql);
 
         let rendered = if let Some(op) = &self.operator {
             let mut optionals = vec![];
@@ -602,7 +596,6 @@ impl ToSql for PgExternEntity {
                                                     maybe_comma = if optionals.len() >= 1 { "," } else { "" },
                                                     optionals = if !optionals.is_empty() { optionals.join(",\n") + "\n" } else { "".to_string() },
                                             );
-            tracing::trace!(sql = %operator_sql);
             ext_sql + &operator_sql
         } else {
             ext_sql

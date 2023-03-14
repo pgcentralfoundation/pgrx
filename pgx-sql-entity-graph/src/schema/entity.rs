@@ -51,7 +51,6 @@ impl SqlGraphIdentifier for SchemaEntity {
 }
 
 impl ToSql for SchemaEntity {
-    #[tracing::instrument(level = "debug", err, skip(self, _context), fields(identifier = %self.rust_identifier()))]
     fn to_sql(&self, _context: &PgxSql) -> eyre::Result<String> {
         let sql = format!(
             "\n\
@@ -63,7 +62,6 @@ impl ToSql for SchemaEntity {
             line = self.line,
             module_path = self.module_path,
         );
-        tracing::trace!(%sql);
         Ok(sql)
     }
 }
