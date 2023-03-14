@@ -12,12 +12,13 @@ Use of this source code is governed by the MIT license that can be found in the 
 use crate as pgx; // for #[pg_guard] support from within ourself
 use crate::pg_sys;
 use crate::prelude::*;
+use enum_map::{Enum, EnumMap};
 use std::cell::RefCell;
 use std::collections::HashMap;
 use std::rc::Rc;
 
 /// Postgres Transaction (Xact) Callback Events
-#[derive(Hash, Eq, PartialEq, Clone, Debug)]
+#[derive(Hash, Eq, PartialEq, Clone, Copy, Debug, Enum)]
 pub enum PgXactCallbackEvent {
     /// Fired when a transaction is aborted.  It is mutually exclusive with `PgXactCallbackEvent::Commit`
     ///
@@ -105,7 +106,8 @@ struct XactCallbackWrapper(
 );
 
 /// Shorthand for the type representing the map of callbacks
-type CallbackMap = HashMap<PgXactCallbackEvent, Vec<Rc<RefCell<Option<XactCallbackWrapper>>>>>;
+type CallbackMap =
+    EnumMap<PgXactCallbackEvent, Option<Vec<Rc<RefCell<Option<XactCallbackWrapper>>>>>>;
 
 /// Register a closure to be called during one of the `PgXactCallbackEvent` events.  Multiple
 /// closures can be registered per event (one at a time), and they are called in the order in which
@@ -176,12 +178,12 @@ where
             | PgXactCallbackEvent::Abort
             | PgXactCallbackEvent::ParallelCommit
             | PgXactCallbackEvent::ParallelAbort => XACT_HOOKS
-                .replace(HashMap::new())
-                .expect("XACT_HOOKS was None during Commit/Abort")
-                .remove(&which_event),
+                .replace(CallbackMap::default())
+                .expect("XACT_HOOKS was None during Commit/Abort")[which_event]
+                .take(),
 
             // not in a transaction-end event, so just borrow our map
-            _ => XACT_HOOKS.as_mut().expect("XACT_HOOKS was None").remove(&which_event),
+            _ => XACT_HOOKS.as_mut().expect("XACT_HOOKS was None")[which_event].take(),
         };
 
         // if we have a vec of hooks for this event they're consumed here and executed
@@ -206,7 +208,7 @@ where
             // if this is our first time here since the Postgres backend started, XACT_HOOKS will be None
             if XACT_HOOKS.is_none() {
                 // so lets swap it out with a new HashMap, which will live for the duration of the backend
-                XACT_HOOKS.replace(HashMap::new());
+                XACT_HOOKS.replace(Default::default());
 
                 // and register our single callback function (internally defined above)
                 pg_sys::RegisterXactCallback(Some(callback), std::ptr::null_mut());
@@ -224,7 +226,7 @@ where
     let wrapped_func = Rc::new(RefCell::new(Some(XactCallbackWrapper(Box::new(f)))));
 
     // find (or create) the map Entry for the specified event and add our wrapped hook to it
-    let entry = hooks.entry(which_event).or_default();
+    let entry = hooks[which_event].get_or_insert_with(Default::default);
     entry.push(Rc::clone(&wrapped_func));
 
     // give the user the ability to unregister
