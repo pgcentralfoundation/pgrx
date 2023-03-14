@@ -184,16 +184,16 @@ impl ErrorReportWithLevel {
     }
 
     /// Get the detail line with backtrace. If backtrace is not available, it will just return the detail.
-    pub fn detail_with_backtrace(&self) -> String {
+    pub fn detail_with_backtrace(&self) -> Option<String> {
         match (self.detail(), self.backtrace()) {
             (Some(d), Some(bt)) if bt.status() == std::backtrace::BacktraceStatus::Captured => {
-                format!("{}\n{}", d, bt)
+                Some(format!("{}\n{}", d, bt))
             }
-            (Some(d), _) => d.to_string(),
+            (Some(d), _) => Some(d.to_string()),
             (None, Some(bt)) if bt.status() == std::backtrace::BacktraceStatus::Captured => {
-                format!("\n{}", bt)
+                Some(format!("\n{}", bt))
             }
-            (None, _) => String::new(),
+            (None, _) => None,
         }
     }
 
