@@ -42,6 +42,7 @@ pgx-sql-entity-graph = { path = "../pgx-sql-entity-graph", version = "=0.7.4" }
 once_cell = "1.17.1" # polyfill until std::lazy::OnceCell stabilizes
 seq-macro = "0.3" # impls loops in macros
 uuid = { version = "1.3.0", features = [ "v4" ] } # PgLwLock and shmem
+enum-map = "2.4.2"
 
 # error handling and logging
 thiserror = "1.0"

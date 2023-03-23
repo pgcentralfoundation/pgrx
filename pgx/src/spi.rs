@@ -15,7 +15,6 @@ use crate::{
 };
 use core::fmt::Formatter;
 use pgx_pg_sys::panic::ErrorReportable;
-use std::collections::HashMap;
 use std::ffi::{CStr, CString};
 use std::fmt::Debug;
 use std::marker::PhantomData;
@@ -413,7 +412,8 @@ pub struct SpiHeapTupleDataEntry {
 /// Represents the set of `pg_sys::Datum`s in a `pg_sys::HeapTuple`
 pub struct SpiHeapTupleData {
     tupdesc: NonNull<pg_sys::TupleDescData>,
-    entries: HashMap<usize, SpiHeapTupleDataEntry>,
+    // offset by 1!
+    entries: Vec<SpiHeapTupleDataEntry>,
 }
 
 impl Spi {
@@ -1247,16 +1247,17 @@ impl SpiHeapTupleData {
         htup: *mut pg_sys::HeapTupleData,
     ) -> Result<Option<Self>> {
         let tupdesc = NonNull::new(tupdesc).ok_or(Error::NoTupleTable)?;
-        let mut data = SpiHeapTupleData { tupdesc, entries: HashMap::default() };
+        let mut data = SpiHeapTupleData { tupdesc, entries: Vec::new() };
         let tupdesc = tupdesc.as_ptr();
 
         unsafe {
             // SAFETY:  we know tupdesc is not null
-            for i in 1..=tupdesc.as_ref().unwrap().natts {
+            let natts = (*tupdesc).natts;
+            data.entries.reserve(usize::try_from(natts as usize).unwrap_or_default());
+            for i in 1..=natts {
                 let mut is_null = false;
                 let datum = pg_sys::SPI_getbinval(htup, tupdesc, i, &mut is_null);
-
-                data.entries.entry(i as usize).or_insert_with(|| SpiHeapTupleDataEntry {
+                data.entries.push(SpiHeapTupleDataEntry {
                     datum: if is_null { None } else { Some(datum) },
                     type_oid: pg_sys::SPI_gettypeid(tupdesc, i),
                 });
@@ -1302,7 +1303,9 @@ impl SpiHeapTupleData {
         &self,
         ordinal: usize,
     ) -> std::result::Result<&SpiHeapTupleDataEntry, Error> {
-        self.entries.get(&ordinal).ok_or_else(|| Error::SpiError(SpiErrorCodes::NoAttribute))
+        // Wrapping because `self.entries.get(...)` will bounds check.
+        let index = ordinal.wrapping_sub(1);
+        self.entries.get(index).ok_or_else(|| Error::SpiError(SpiErrorCodes::NoAttribute))
     }
 
     /// Get a raw Datum from this HeapTuple by its field name.
@@ -1341,10 +1344,8 @@ impl SpiHeapTupleData {
         datum: T,
     ) -> std::result::Result<(), Error> {
         self.check_ordinal_bounds(ordinal)?;
-        self.entries.insert(
-            ordinal,
-            SpiHeapTupleDataEntry { datum: datum.into_datum(), type_oid: T::type_oid() },
-        );
+        self.entries[ordinal - 1] =
+            SpiHeapTupleDataEntry { datum: datum.into_datum(), type_oid: T::type_oid() };
         Ok(())
     }
 
