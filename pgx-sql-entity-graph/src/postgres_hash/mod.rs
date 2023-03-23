@@ -104,6 +104,7 @@ impl ToEntityGraphTokens for PostgresHash {
         quote! {
             #[no_mangle]
             #[doc(hidden)]
+            #[allow(unknown_lints, clippy::no_mangle_with_rust_abi)]
             pub extern "Rust" fn  #sql_graph_entity_fn_name() -> ::pgx::pgx_sql_entity_graph::SqlGraphEntity {
                 use core::any::TypeId;
                 extern crate alloc;
