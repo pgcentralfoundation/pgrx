@@ -210,7 +210,7 @@ impl<'a, T: FromDatum> Array<'a, T> {
         even `unsafe fn as_slice(&self) -> &[T]` is not sound for all `&[T]`\n\
         if you are sure your usage is sound, consider RawArray"
     )]
-    pub fn as_slice(&self) -> &[T] {
+    pub unsafe fn as_slice(&self) -> &[T] {
         const DATUM_SIZE: usize = mem::size_of::<pg_sys::Datum>();
         if self.null_slice.any() {
             panic!("null detected: can't expose potentially uninit data as a slice!")
@@ -300,7 +300,7 @@ impl<'a, T: FromDatum> VariadicArray<'a, T> {
         if you are sure your usage is sound, consider RawArray"
     )]
     #[allow(deprecated)]
-    pub fn as_slice(&self) -> &[T] {
+    pub unsafe fn as_slice(&self) -> &[T] {
         self.0.as_slice()
     }
 

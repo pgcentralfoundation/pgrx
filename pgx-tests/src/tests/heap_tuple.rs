@@ -128,7 +128,7 @@ mod arguments {
             let dogs: pgx::VariadicArray<PgHeapTuple<AllocatedByRust>> = dogs;
 
             let mut names = Vec::with_capacity(dogs.len());
-            for dog in dogs.as_slice() {
+            for dog in unsafe { dogs.as_slice() } {
                 let name = dog.get_by_name("name").unwrap().unwrap();
                 names.push(name);
             }
