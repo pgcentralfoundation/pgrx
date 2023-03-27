@@ -101,7 +101,7 @@ impl serde::Serialize for TimeWithTimeZone {
         let cstr: Option<&core::ffi::CStr> = unsafe {
             crate::direct_function_call(
                 pg_sys::timetz_out,
-                vec![Some(pg_sys::Datum::from(self as *const Self))],
+                &[Some(pg_sys::Datum::from(self as *const Self))],
             )
         };
         serializer.serialize_str(cstr.and_then(|c| c.to_str().ok()).unwrap())

@@ -12,7 +12,7 @@ use pgrx::{direct_function_call, AnyArray, IntoDatum, Json};
 
 #[pg_extern]
 fn anyarray_arg(array: AnyArray) -> Json {
-    unsafe { direct_function_call::<Json>(pg_sys::array_to_json, vec![array.into_datum()]) }
+    unsafe { direct_function_call::<Json>(pg_sys::array_to_json, &[array.into_datum()]) }
         .expect("conversion to json returned null")
 }
 

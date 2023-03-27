@@ -166,7 +166,7 @@ impl serde::Serialize for Interval {
             let interval = self.0.as_ptr();
             let cstr = direct_function_call::<&std::ffi::CStr>(
                 pg_sys::interval_out,
-                vec![Some(pg_sys::Datum::from(interval as *const _))],
+                &[Some(pg_sys::Datum::from(interval as *const _))],
             )
             .expect("failed to convert interval to a cstring");
 

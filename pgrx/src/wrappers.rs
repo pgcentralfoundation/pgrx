@@ -16,7 +16,7 @@ pub fn regtypein(type_name: &str) -> pg_sys::Oid {
     let cstr =
         alloc::ffi::CString::new(type_name).expect("specified type_name has embedded NULL byte");
     unsafe {
-        direct_function_call::<pg_sys::Oid>(pg_sys::regtypein, vec![cstr.as_c_str().into_datum()])
+        direct_function_call::<pg_sys::Oid>(pg_sys::regtypein, &[cstr.as_c_str().into_datum()])
             .expect("type lookup returned NULL")
     }
 }

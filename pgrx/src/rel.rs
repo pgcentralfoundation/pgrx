@@ -111,7 +111,7 @@ impl PgRelation {
     ///
     /// As such, this function is unsafe as we cannot guarantee that this requirement is true.
     pub unsafe fn open_with_name(relname: &str) -> std::result::Result<Self, &'static str> {
-        match direct_function_call::<pg_sys::Oid>(pg_sys::to_regclass, vec![relname.into_datum()]) {
+        match direct_function_call::<pg_sys::Oid>(pg_sys::to_regclass, &[relname.into_datum()]) {
             Some(oid) => Ok(PgRelation::open(oid)),
             None => Err("no such relation"),
         }
@@ -128,10 +128,8 @@ impl PgRelation {
     /// dropped.
     pub fn open_with_name_and_share_lock(relname: &str) -> std::result::Result<Self, &'static str> {
         unsafe {
-            match direct_function_call::<pg_sys::Oid>(
-                pg_sys::to_regclass,
-                vec![relname.into_datum()],
-            ) {
+            match direct_function_call::<pg_sys::Oid>(pg_sys::to_regclass, &[relname.into_datum()])
+            {
                 Some(oid) => {
                     Ok(PgRelation::with_lock(oid, pg_sys::AccessShareLock as pg_sys::LOCKMODE))
                 }

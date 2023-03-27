@@ -65,7 +65,7 @@ impl FromDatum for JsonB {
 
             let cstr = direct_function_call::<&core::ffi::CStr>(
                 pg_sys::jsonb_out,
-                vec![Some(detoasted.into())],
+                &[Some(detoasted.into())],
             )
             .expect("failed to convert jsonb to a cstring");
 
@@ -138,9 +138,7 @@ impl IntoDatum for JsonB {
         let cstring =
             alloc::ffi::CString::new(string).expect("string version of jsonb is not valid UTF8");
 
-        unsafe {
-            direct_function_call_as_datum(pg_sys::jsonb_in, vec![Some(cstring.as_ptr().into())])
-        }
+        unsafe { direct_function_call_as_datum(pg_sys::jsonb_in, &[Some(cstring.as_ptr().into())]) }
     }
 
     fn type_oid() -> pg_sys::Oid {

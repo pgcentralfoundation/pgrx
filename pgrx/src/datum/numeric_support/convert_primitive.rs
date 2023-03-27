@@ -108,7 +108,7 @@ fn to_primitive_helper<T: FromDatum>(
     let datum = value.as_datum();
     PgTryBuilder::new(|| unsafe {
         // SAFETY: if 'func' returns, it won't be NULL
-        Ok(direct_function_call::<T>(func, vec![datum]).unwrap_unchecked())
+        Ok(direct_function_call::<T>(func, &[datum]).unwrap_unchecked())
     })
     .catch_when(PgSqlErrorCode::ERRCODE_NUMERIC_VALUE_OUT_OF_RANGE, |e| {
         if let CaughtError::PostgresError(ref ereport) = e {
