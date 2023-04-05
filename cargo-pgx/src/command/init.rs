@@ -129,8 +129,7 @@ impl CommandExecute for Init {
                         })?;
                         pgx.push(PgConfig::from(PgVersion { major, minor, url:
                         Url::parse(
-                            &format!("https://ftp.postgresql.org/pub/source/v{major}.{minor}/postgresql-{major}.{minor}.tar.bz2",
-                                     major = major, minor = minor))?
+                            &format!("https://ftp.postgresql.org/pub/source/v{major}.{minor}/postgresql-{major}.{minor}.tar.bz2"))?
                         }));
                         default_pgx = Some(pgx);
                     }
