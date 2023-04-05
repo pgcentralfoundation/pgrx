@@ -10,6 +10,7 @@ Use of this source code is governed by the MIT license that can be found in the 
 //! Helper functions to work with Postgres `varlena *` structures
 
 use crate::{pg_sys, PgBox};
+use core::{slice, str};
 
 /// # Safety
 ///
@@ -311,11 +312,26 @@ pub unsafe fn varlena_size(t: *const pg_sys::varlena) -> usize {
 /// Note also that this function is zero-copy and the underlying Rust &str is backed by Postgres-allocated
 /// memory.  As such, the return value will become invalid the moment Postgres frees the varlena
 #[inline]
+pub unsafe fn text_to_rust_str<'a>(
+    varlena: *const pg_sys::varlena,
+) -> Result<&'a str, str::Utf8Error> {
+    let len = varsize_any_exhdr(varlena);
+    let data = vardata_any(varlena);
+
+    str::from_utf8(slice::from_raw_parts(data as *mut u8, len))
+}
+
+/// Convert a Postgres `varlena *` (or `text *`) into a Rust `&str`.
+///
+/// ## Safety
+///
+/// As `text_to_rust_str` but with the additional safety contract that the data is UTF-8.
+#[inline]
 pub unsafe fn text_to_rust_str_unchecked<'a>(varlena: *const pg_sys::varlena) -> &'a str {
     let len = varsize_any_exhdr(varlena);
     let data = vardata_any(varlena);
 
-    std::str::from_utf8_unchecked(std::slice::from_raw_parts(data as *mut u8, len))
+    str::from_utf8_unchecked(slice::from_raw_parts(data as *mut u8, len))
 }
 
 /// Convert a Postgres `varlena *` (or `byte *`) into a Rust `&[u8]`.

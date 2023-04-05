@@ -9,9 +9,9 @@ Use of this source code is governed by the MIT license that can be found in the 
 
 //! for converting a pg_sys::Datum and a corresponding "is_null" bool into a typed Option
 
+use crate::varlena;
 use crate::{
-    pg_sys, text_to_rust_str_unchecked, varlena_to_byte_slice, AllocatedByPostgres, IntoDatum,
-    PgBox, PgMemoryContexts,
+    pg_sys, varlena_to_byte_slice, AllocatedByPostgres, IntoDatum, PgBox, PgMemoryContexts,
 };
 use core::ffi::CStr;
 use std::num::NonZeroUsize;
@@ -345,7 +345,21 @@ impl<'a> FromDatum for &'a str {
             None
         } else {
             let varlena = pg_sys::pg_detoast_datum_packed(datum.cast_mut_ptr());
-            Some(text_to_rust_str_unchecked(varlena))
+
+            // Postgres supports non-UTF-8 character sets. Rust supports them... less.
+            // There are a lot of options for how to proceed in response.
+            // This could return None, but Rust programmers may assume UTF-8,
+            // so panics align more with informing programmers of wrong assumptions.
+            // PGX could check database settings and use those as a source of truth,
+            // but that may impose FFI overhead AND give false negatives, especially
+            // if a DB uses charsets that overlap with UTF-8 and all data that flows
+            // through Rust is UTF-8. Maybe as an optimization?
+            //
+            // Let's start with the minimum for correctness, though.
+            Some(
+                varlena::text_to_rust_str(varlena)
+                    .expect("datums converted to &str should be valid UTF-8"),
+            )
         }
     }
 
@@ -369,7 +383,10 @@ impl<'a> FromDatum for &'a str {
                 let varlena = pg_sys::pg_detoast_datum_packed(detoasted);
 
                 // and now we return it as a &str
-                Some(text_to_rust_str_unchecked(varlena))
+                Some(
+                    varlena::text_to_rust_str(varlena)
+                        .expect("datums converted to &str should be valid UTF-8"),
+                )
             })
         }
     }
