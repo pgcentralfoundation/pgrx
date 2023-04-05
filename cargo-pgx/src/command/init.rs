@@ -127,10 +127,10 @@ impl CommandExecute for Init {
                         let mut pgx = pgx_filtered_default(SUPPORTED_MAJOR_VERSIONS, |version| {
                             version.major != major
                         })?;
-                        pgx.push(PgConfig::from(PgVersion { major, minor, url:
+                        pgx.push(PgConfig::from(PgVersion::new(major, minor,
                         Url::parse(
                             &format!("https://ftp.postgresql.org/pub/source/v{major}.{minor}/postgresql-{major}.{minor}.tar.bz2"))?
-                        }));
+                        )));
                         default_pgx = Some(pgx);
                     }
                     default_pgx
