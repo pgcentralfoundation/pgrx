@@ -121,8 +121,8 @@ impl CommandExecute for Init {
                         .wrap_err_with(|| format!("{} is not a known Postgres version", pgver))?
                         .clone()
                 } else if pg_config_path.starts_with(&format!("download={major}")) {
-                    let release = pg_config_path.split("=").collect::<Vec<&str>>().pop().unwrap();
-                    let minor = release.split(".").collect::<Vec<&str>>().pop().unwrap().parse()?;
+                    let release = pg_config_path.split("=").last().unwrap();
+                    let minor = release.split(".").last().unwrap().parse()?;
                     if default_pgx.is_none() {
                         let mut pgx = pgx_filtered_default(SUPPORTED_MAJOR_VERSIONS, |version| {
                             version.major != major
