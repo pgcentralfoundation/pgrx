@@ -13,6 +13,7 @@ use ureq::{Agent, AgentBuilder, Proxy};
 pub(crate) mod connect;
 pub(crate) mod cross;
 pub(crate) mod get;
+pub(crate) mod info;
 pub(crate) mod init;
 pub(crate) mod install;
 pub(crate) mod new;
