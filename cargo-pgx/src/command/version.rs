@@ -1,9 +1,22 @@
-use pgx_pg_config::{PgConfig, Pgx};
+use pgx_pg_config::{PgConfig, PgVersion, Pgx};
 
 pub(crate) fn pgx_default(supported_major_versions: &[u16]) -> eyre::Result<Pgx> {
     let mut pgx = Pgx::default();
     rss::PostgreSQLVersionRss::new(supported_major_versions)?
         .into_iter()
+        .for_each(|version| pgx.push(PgConfig::from(version)));
+
+    Ok(pgx)
+}
+
+pub(crate) fn pgx_filtered_default<F: Fn(&PgVersion) -> bool>(
+    supported_major_versions: &[u16],
+    filter: F,
+) -> eyre::Result<Pgx> {
+    let mut pgx = Pgx::default();
+    rss::PostgreSQLVersionRss::new(supported_major_versions)?
+        .into_iter()
+        .filter(filter)
         .for_each(|version| pgx.push(PgConfig::from(version)));
 
     Ok(pgx)

@@ -54,9 +54,9 @@ pub use path_methods::{get_target_dir, prefix_path};
 
 #[derive(Clone, Debug)]
 pub struct PgVersion {
-    major: u16,
-    minor: u16,
-    url: Url,
+    pub major: u16,
+    pub minor: u16,
+    pub url: Url,
 }
 
 impl PgVersion {

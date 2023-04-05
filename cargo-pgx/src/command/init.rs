@@ -8,12 +8,13 @@ Use of this source code is governed by the MIT license that can be found in the 
 */
 
 use crate::command::stop::stop_postgres;
-use crate::command::version::pgx_default;
+use crate::command::version::{pgx_default, pgx_filtered_default};
 use crate::CommandExecute;
 use eyre::{eyre, WrapErr};
 use owo_colors::OwoColorize;
 use pgx_pg_config::{
-    get_c_locale_flags, prefix_path, PgConfig, PgConfigSelector, Pgx, SUPPORTED_MAJOR_VERSIONS,
+    get_c_locale_flags, prefix_path, PgConfig, PgConfigSelector, PgVersion, Pgx,
+    SUPPORTED_MAJOR_VERSIONS,
 };
 use rayon::prelude::*;
 
@@ -24,6 +25,7 @@ use std::path::PathBuf;
 use std::process::Stdio;
 
 use std::sync::{Arc, Mutex};
+use url::Url;
 
 static PROCESS_ENV_DENYLIST: &'static [&'static str] = &[
     "DEBUG",
@@ -45,18 +47,28 @@ static PROCESS_ENV_DENYLIST: &'static [&'static str] = &[
 #[clap(author)]
 pub(crate) struct Init {
     /// If installed locally, the path to PG11's `pgconfig` tool, or `download` to have pgx download/compile/install it
+    ///
+    /// If you want a specific version to be downloaded, use download=11.x
     #[clap(env = "PG11_PG_CONFIG", long)]
     pg11: Option<String>,
     /// If installed locally, the path to PG12's `pgconfig` tool, or `download` to have pgx download/compile/install it
+    ///
+    /// If you want a specific version to be downloaded, use download=12.x
     #[clap(env = "PG12_PG_CONFIG", long)]
     pg12: Option<String>,
     /// If installed locally, the path to PG13's `pgconfig` tool, or `download` to have pgx download/compile/install it
+    ///
+    /// If you want a specific version to be downloaded, use download=13.x
     #[clap(env = "PG13_PG_CONFIG", long)]
     pg13: Option<String>,
     /// If installed locally, the path to PG14's `pgconfig` tool, or `download` to have pgx download/compile/install it
+    ///
+    /// If you want a specific version to be downloaded, use download=14.x
     #[clap(env = "PG14_PG_CONFIG", long)]
     pg14: Option<String>,
     /// If installed locally, the path to PG15's `pgconfig` tool, or `download` to have pgx download/compile/install it
+    ///
+    /// If you want a specific version to be downloaded, use download=15.x
     #[clap(env = "PG15_PG_CONFIG", long)]
     pg15: Option<String>,
     #[clap(from_global, action = ArgAction::Count)]
@@ -97,6 +109,7 @@ impl CommandExecute for Init {
             let mut pgx = Pgx::default();
 
             for (pgver, pg_config_path) in versions {
+                let major: u16 = pgver.strip_prefix("pg").expect("pg prefix").parse()?;
                 let config = if pg_config_path == "download" {
                     if default_pgx.is_none() {
                         default_pgx = Some(pgx_default(SUPPORTED_MAJOR_VERSIONS)?);
@@ -107,6 +120,31 @@ impl CommandExecute for Init {
                         .get(&pgver)
                         .wrap_err_with(|| format!("{} is not a known Postgres version", pgver))?
                         .clone()
+                } else if pg_config_path.starts_with(&format!("download={major}")) {
+                    let release = pg_config_path.split("=").collect::<Vec<&str>>().pop().unwrap();
+                    let minor = release.split(".").collect::<Vec<&str>>().pop().unwrap().parse()?;
+                    if default_pgx.is_none() {
+                        let mut pgx = pgx_filtered_default(SUPPORTED_MAJOR_VERSIONS, |version| {
+                            version.major != major
+                        })?;
+                        pgx.push(PgConfig::from(PgVersion { major, minor, url:
+                        Url::parse(
+                            &format!("https://ftp.postgresql.org/pub/source/v{major}.{minor}/postgresql-{major}.{minor}.tar.bz2",
+                                     major = major, minor = minor))?
+                        }));
+                        default_pgx = Some(pgx);
+                    }
+                    default_pgx
+                        .as_ref()
+                        .unwrap() // We just set this
+                        .get(&pgver)
+                        .wrap_err_with(|| format!("{} is not a known Postgres version", pgver))?
+                        .clone()
+                } else if pg_config_path.starts_with("download=") {
+                    let release = pg_config_path.split("=").collect::<Vec<&str>>().pop().unwrap();
+                    return Err(eyre::Error::msg(format!(
+                        "Invalid release {release} for major version {major}"
+                    )));
                 } else {
                     PgConfig::new_with_defaults(pg_config_path.into())
                 };
