@@ -140,7 +140,7 @@ impl CommandExecute for Init {
                         .wrap_err_with(|| format!("{} is not a known Postgres version", pgver))?
                         .clone()
                 } else if pg_config_path.starts_with("download=") {
-                    let release = pg_config_path.split("=").collect::<Vec<&str>>().pop().unwrap();
+                    let release = pg_config_path.split("=").last().unwrap();
                     return Err(eyre::Error::msg(format!(
                         "Invalid release {release} for major version {major}"
                     )));
