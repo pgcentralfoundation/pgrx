@@ -333,7 +333,11 @@ impl FromDatum for f64 {
     }
 }
 
-/// for text, varchar
+/// For Postgres text and varchar
+///
+/// Note that while these conversions are inherently unsafe, they still enforce
+/// UTF-8 correctness, so they may panic if you use PGX with a database
+/// that has non-UTF-8 data. The details of this are subject to change.
 impl<'a> FromDatum for &'a str {
     #[inline]
     unsafe fn from_polymorphic_datum(
@@ -392,9 +396,13 @@ impl<'a> FromDatum for &'a str {
     }
 }
 
-/// for text, varchar, or any `pg_sys::varlena`-based type
+/// For Postgres text, varchar, or any `pg_sys::varlena`-based type
 ///
 /// This returns a **copy**, allocated and managed by Rust, of the underlying `varlena` Datum
+///
+/// Note that while these conversions are inherently unsafe, they still enforce
+/// UTF-8 correctness, so they may panic if you use PGX with a database
+/// that has non-UTF-8 data. The details of this are subject to change.
 impl FromDatum for String {
     #[inline]
     unsafe fn from_polymorphic_datum(
