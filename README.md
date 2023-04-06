@@ -217,7 +217,7 @@ details of how it does UTF-8 validation in the future, as all functions for
 doing so are, in any case, fundamentally `unsafe`. For best results, always use
 PGX with UTF-8, and set database encodings explicitly upon database creation,
 as the default Postgres server encoding, `SQL_ASCII`, will guarantee neither
-ASCII nor UTF-8 (as Postgres accepts and ignores non-ASCII bytes).
+ASCII nor UTF-8 (as Postgres will then accept but ignore non-ASCII bytes).
 
 ## Digging Deeper
 
