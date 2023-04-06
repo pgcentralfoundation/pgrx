@@ -139,6 +139,7 @@ impl ToEntityGraphTokens for PostgresEnum {
 
             #[no_mangle]
             #[doc(hidden)]
+            #[allow(unknown_lints, clippy::no_mangle_with_rust_abi)]
             pub extern "Rust" fn  #sql_graph_entity_fn_name() -> ::pgx::pgx_sql_entity_graph::SqlGraphEntity {
                 extern crate alloc;
                 use alloc::vec::Vec;
