@@ -262,15 +262,22 @@ As it relates to any Postgres thing (calling a function, allocated memory, anyth
 none!**  Postgres itself is purposely not thread safe and neither is pgx.
 
 It's difficult (right now) to ask the Rust compiler to ensure code is not using pgx from a thread.  We have been 
-discussing some ideas.  Until then, there's one simple rule:
+discussing some ideas.  One method of enforcing thread safety is via using `!Send` types that can only be constructed
+from a single thread.  However, this can be unnecessarily punishing, as this approach must enforce that a type is
+only constructed on one thread, which can interfere even with constructing and using it from a single thread.  As-is,
+currently, `pgx` allows things like `direct_function_call`, so that calling a function in Postgres is simply, well,
+calling a function.  Making that impossible is probably an unviable ergonomics regression for the simpler case
+of a Postgres extension that doesn't attempt to do multithreading.
 
-- Do **not** use anything from the `pgx` crate or any Postgres allocated memory from a thread
+Until then, there's one simple rule:
+
+- Do **not** use anything from the `pgx` crate, or any Postgres allocated memory, from a thread
 
 You might be really smart and think you can sneak by doing something, but you're probably wrong.  Even if you're right,
 there's no help from the Rust compiler here, which means you're wrong.
 
-pgx does (rather, it's about to #777) detect if a Postgres `extern "C"` function is called from a thread that isn't the 
-main thread and go ahead and `panic!()`, but even this isn't a fool-proof guard and is only a runtime check.
+pgx does attempt to detect if a Postgres `extern "C"` function is called from a thread that isn't the main thread
+and it will `panic!()` if not, but this is only a runtime check. It is not something that is inherently foolproof.
 
 That said, it is okay for a pgx extension to use threads as long as they follow that one simple rule.  For example,
 there's no reason why an extension can't import `rayon` and parallel sort a Vec or take advantage of its amazing
