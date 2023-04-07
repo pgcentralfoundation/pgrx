@@ -31,6 +31,8 @@ pub enum Attribute {
     Raw,
     NoGuard,
     CreateOrReplace,
+    SecurityDefiner,
+    SecurityInvoker,
     ParallelSafe,
     ParallelUnsafe,
     ParallelRestricted,
@@ -57,6 +59,12 @@ impl Attribute {
             Attribute::NoGuard => quote! { ::pgx::pgx_sql_entity_graph::ExternArgs::NoGuard },
             Attribute::CreateOrReplace => {
                 quote! { ::pgx::pgx_sql_entity_graph::ExternArgs::CreateOrReplace }
+            }
+            Attribute::SecurityDefiner => {
+                quote! { ::pgx::pgx_sql_entity_graph::ExternArgs::SecurityDefiner}
+            }
+            Attribute::SecurityInvoker => {
+                quote! { ::pgx::pgx_sql_entity_graph::ExternArgs::SecurityInvoker}
             }
             Attribute::ParallelSafe => {
                 quote! { ::pgx::pgx_sql_entity_graph::ExternArgs::ParallelSafe }
@@ -101,6 +109,12 @@ impl ToTokens for Attribute {
             Attribute::Raw => quote! { raw },
             Attribute::NoGuard => quote! { no_guard },
             Attribute::CreateOrReplace => quote! { create_or_replace },
+            Attribute::SecurityDefiner => {
+                quote! {security_definer}
+            }
+            Attribute::SecurityInvoker => {
+                quote! {security_invoker}
+            }
             Attribute::ParallelSafe => {
                 quote! { parallel_safe }
             }
@@ -146,6 +160,8 @@ impl Parse for Attribute {
             "raw" => Self::Raw,
             "no_guard" => Self::NoGuard,
             "create_or_replace" => Self::CreateOrReplace,
+            "security_definer" => Self::SecurityDefiner,
+            "security_invoker" => Self::SecurityInvoker,
             "parallel_safe" => Self::ParallelSafe,
             "parallel_unsafe" => Self::ParallelUnsafe,
             "parallel_restricted" => Self::ParallelRestricted,
