@@ -28,6 +28,7 @@ extern crate bitflags;
 extern crate alloc;
 extern crate core;
 
+use once_cell::sync::Lazy;
 // expose our various derive macros
 pub use pgx_macros;
 pub use pgx_macros::*;
@@ -307,6 +308,38 @@ macro_rules! pg_sql_graph_magic {
     };
 }
 
+pub(crate) static UTF8DATABASE: Lazy<Utf8Compat> = Lazy::new(|| {
+    let encoding_int = unsafe { pgx_pg_sys::GetDatabaseEncoding() };
+    match encoding_int as core::ffi::c_uint {
+        pg_sys::pg_enc_PG_UTF8 => Utf8Compat::Yes,
+        // The 0 encoding. It... may be UTF-8
+        pg_sys::pg_enc_PG_SQL_ASCII => Utf8Compat::Maybe,
+        // Modifies ASCII, should never be seen: PG doesn't support it as server encoding
+        pg_sys::pg_enc_PG_SJIS | pg_sys::pg_enc_PG_SHIFT_JIS_2004
+        // Not specified as an ASCII extension, also not a server encoding
+        | pg_sys::pg_enc_PG_BIG5
+        // Wild vendor differences are possible, also not a server encoding
+        | pg_sys::pg_enc_PG_JOHAB => Utf8Compat::No,
+        // Other Postgres encodings either extend US-ASCII or CP437 (which includes US-ASCII)
+        // There may be a subtlety that requires us to revisit this later
+        1..=41=> Utf8Compat::Ascii,
+        // Unfamiliar encoding? Run UTF-8 validation like normal and hope for the best
+        _ => Utf8Compat::Maybe,
+    }
+});
+
+#[derive(Debug, Clone, Copy)]
+pub(crate) enum Utf8Compat {
+    /// It's UTF-8, so... obviously
+    Yes,
+    /// This is what is assumed about "SQL_ASCII"
+    Maybe,
+    /// An "extended ASCII" encoding, so we're fine if we only touch ASCII
+    Ascii,
+    /// An encoding that modifies or does not specify it extends US-ASCII
+    No,
+}
+
 /// Initialize the extension with Postgres
 ///
 /// Sets up panic handling with [`register_pg_guard_panic_hook()`] to ensure that a crash within
@@ -319,4 +352,12 @@ macro_rules! pg_sql_graph_magic {
 #[allow(unused)]
 pub fn initialize() {
     pg_sys::panic::register_pg_guard_panic_hook();
+    match Lazy::force(&UTF8DATABASE) {
+        Utf8Compat::Maybe => notice!("database encoding is not validated as UTF-8"),
+        Utf8Compat::Ascii => {
+            warning!("database encoding is not UTF-8, extension will accept ASCII only")
+        }
+        Utf8Compat::No => unreachable!("unsupported database encoding encountered"),
+        Utf8Compat::Yes => (), // perfect, no notes!
+    }
 }
