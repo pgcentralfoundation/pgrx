@@ -49,6 +49,28 @@ mod tests {
         assert_eq!(result, Ok(Some(true)));
     }
 
+    #[pg_extern(security_invoker)]
+    fn is_invoker() {}
+
+    #[pg_test]
+    fn test_security_invoker() {
+        let result = Spi::get_one::<bool>(
+            "SELECT prosecdef = 'f' FROM pg_proc WHERE proname = 'is_invoker'",
+        );
+        assert_eq!(result, Ok(Some(true)));
+    }
+
+    #[pg_extern(security_definer)]
+    fn is_definer() {}
+
+    #[pg_test]
+    fn test_security_definer() {
+        let result = Spi::get_one::<bool>(
+            "SELECT prosecdef = 't' FROM pg_proc WHERE proname = 'is_definer'",
+        );
+        assert_eq!(result, Ok(Some(true)));
+    }
+
     // Ensures `@MODULE_PATHNAME@` and `@FUNCTION_NAME@` are handled.
     #[pg_extern(sql = r#"
         CREATE FUNCTION tests."overridden_sql_with_fn_name"() RETURNS boolean
