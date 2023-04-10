@@ -549,6 +549,14 @@ dependencies = [
 ]
 
 [[package]]
+name = "custom_libname"
+version = "0.1.0"
+dependencies = [
+ "pgrx",
+ "pgrx-tests",
+]
+
+[[package]]
 name = "custom_sql"
 version = "0.0.0"
 dependencies = [

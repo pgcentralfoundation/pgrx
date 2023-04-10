@@ -353,7 +353,9 @@ pub(crate) fn find_library_file(
     manifest: &cargo_toml::Manifest,
     build_command_messages: &Vec<cargo_metadata::Message>,
 ) -> eyre::Result<PathBuf> {
-    let crate_name = if let Some(ref package) = manifest.package {
+    let library_name = if let Some(name) = manifest.lib.as_ref().and_then(|product| product.name.as_ref()) {
+        &name
+    } else if let Some(ref package) = manifest.package {
         &package.name
     } else {
         return Err(eyre!("Could not get crate name from manifest."));
@@ -363,7 +365,7 @@ pub(crate) fn find_library_file(
     for message in build_command_messages {
         match message {
             cargo_metadata::Message::CompilerArtifact(artifact) => {
-                if artifact.target.name != *crate_name {
+                if artifact.target.name != *library_name {
                     continue;
                 }
                 for filename in &artifact.filenames {

@@ -15,6 +15,7 @@ members = [
     "pgrx-examples/bgworker",
     "pgrx-examples/bytea",
     "pgrx-examples/composite_type",
+    "pgrx-examples/custom_libname",
     "pgrx-examples/custom_types",
     "pgrx-examples/custom_sql",
     "pgrx-examples/errors",
