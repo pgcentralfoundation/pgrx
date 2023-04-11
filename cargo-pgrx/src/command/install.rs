@@ -353,13 +353,17 @@ pub(crate) fn find_library_file(
     manifest: &cargo_toml::Manifest,
     build_command_messages: &Vec<cargo_metadata::Message>,
 ) -> eyre::Result<PathBuf> {
-    let library_name = if let Some(name) = manifest.lib.as_ref().and_then(|product| product.name.as_ref()) {
-        &name
-    } else if let Some(ref package) = manifest.package {
-        &package.name
-    } else {
-        return Err(eyre!("Could not get crate name from manifest."));
-    };
+    // Target library can be set on name field on [lib],
+    // but defaults to crate name if not specified.
+    // https://doc.rust-lang.org/cargo/reference/cargo-targets.html#the-name-field
+    let library_name =
+        if let Some(name) = manifest.lib.as_ref().and_then(|product| product.name.as_ref()) {
+            &name
+        } else if let Some(ref package) = manifest.package {
+            &package.name
+        } else {
+            return Err(eyre!("Could not get crate name from manifest."));
+        };
 
     let mut library_file = None;
     for message in build_command_messages {
