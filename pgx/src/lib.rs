@@ -350,11 +350,4 @@ pub(crate) enum Utf8Compat {
 #[allow(unused)]
 pub fn initialize() {
     pg_sys::panic::register_pg_guard_panic_hook();
-    match Lazy::force(&UTF8DATABASE) {
-        Utf8Compat::Maybe => notice!("database encoding is not validated as UTF-8"),
-        Utf8Compat::Ascii => {
-            warning!("database encoding is not UTF-8, extension will accept ASCII only")
-        }
-        Utf8Compat::Yes => (), // perfect, no notes!
-    }
 }

@@ -396,7 +396,7 @@ unsafe fn convert_varlena_to_str_memoized<'a>(varlena: *const pg_sys::varlena) -
             if bytes.is_ascii() {
                 core::str::from_utf8_unchecked(bytes)
             } else {
-                panic!("datums converted to &str should be valid UTF-8")
+                panic!("datums converted to &str should be valid UTF-8, database encoding is only UTF-8 compatible for ASCII")
             }
         }
     }
