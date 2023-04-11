@@ -399,8 +399,6 @@ unsafe fn convert_varlena_to_str_memoized<'a>(varlena: *const pg_sys::varlena) -
                 panic!("datums converted to &str should be valid UTF-8")
             }
         }
-        // Already checked for at start, and should never happen anyways?
-        crate::Utf8Compat::No => core::hint::unreachable_unchecked(),
     }
 }
 
