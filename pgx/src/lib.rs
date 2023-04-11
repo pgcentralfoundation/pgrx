@@ -28,6 +28,7 @@ extern crate bitflags;
 extern crate alloc;
 extern crate core;
 
+use once_cell::sync::Lazy;
 // expose our various derive macros
 pub use pgx_macros;
 pub use pgx_macros::*;
@@ -305,6 +306,36 @@ macro_rules! pg_sql_graph_magic {
             control_file
         }
     };
+}
+
+pub(crate) static UTF8DATABASE: Lazy<Utf8Compat> = Lazy::new(|| {
+    let encoding_int = unsafe { pgx_pg_sys::GetDatabaseEncoding() };
+    match encoding_int as core::ffi::c_uint {
+        pg_sys::pg_enc_PG_UTF8 => Utf8Compat::Yes,
+        // The 0 encoding. It... may be UTF-8
+        pg_sys::pg_enc_PG_SQL_ASCII => Utf8Compat::Maybe,
+        // Modifies ASCII, and should never be seen as PG doesn't support it as server encoding
+        pg_sys::pg_enc_PG_SJIS | pg_sys::pg_enc_PG_SHIFT_JIS_2004
+        // Not specified as an ASCII extension, also not a server encoding
+        | pg_sys::pg_enc_PG_BIG5
+        // Wild vendor differences including non-ASCII are possible, also not a server encoding
+        | pg_sys::pg_enc_PG_JOHAB => unreachable!("impossible? unsupported non-ASCII-compatible database encoding is not a server encoding"),
+        // Other Postgres encodings either extend US-ASCII or CP437 (which includes US-ASCII)
+        // There may be a subtlety that requires us to revisit this later
+        1..=41=> Utf8Compat::Ascii,
+        // Unfamiliar encoding? Run UTF-8 validation like normal and hope for the best
+        _ => Utf8Compat::Maybe,
+    }
+});
+
+#[derive(Debug, Clone, Copy)]
+pub(crate) enum Utf8Compat {
+    /// It's UTF-8, so... obviously
+    Yes,
+    /// This is what is assumed about "SQL_ASCII"
+    Maybe,
+    /// An "extended ASCII" encoding, so we're fine if we only touch ASCII
+    Ascii,
 }
 
 /// Initialize the extension with Postgres

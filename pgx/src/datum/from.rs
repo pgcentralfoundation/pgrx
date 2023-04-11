@@ -9,9 +9,8 @@ Use of this source code is governed by the MIT license that can be found in the 
 
 //! for converting a pg_sys::Datum and a corresponding "is_null" bool into a typed Option
 
-use crate::varlena;
 use crate::{
-    pg_sys, varlena_to_byte_slice, AllocatedByPostgres, IntoDatum, PgBox, PgMemoryContexts,
+    pg_sys, varlena, varlena_to_byte_slice, AllocatedByPostgres, IntoDatum, PgBox, PgMemoryContexts,
 };
 use core::ffi::CStr;
 use std::num::NonZeroUsize;
@@ -354,16 +353,8 @@ impl<'a> FromDatum for &'a str {
             // There are a lot of options for how to proceed in response.
             // This could return None, but Rust programmers may assume UTF-8,
             // so panics align more with informing programmers of wrong assumptions.
-            // PGX could check database settings and use those as a source of truth,
-            // but that may impose FFI overhead AND give false negatives, especially
-            // if a DB uses charsets that overlap with UTF-8 and all data that flows
-            // through Rust is UTF-8. Maybe as an optimization?
-            //
-            // Let's start with the minimum for correctness, though.
-            Some(
-                varlena::text_to_rust_str(varlena)
-                    .expect("datums converted to &str should be valid UTF-8"),
-            )
+            // In order to reduce optimization loss here, let's call into a memoized function.
+            Some(convert_varlena_to_str_memoized(varlena))
         }
     }
 
@@ -387,11 +378,26 @@ impl<'a> FromDatum for &'a str {
                 let varlena = pg_sys::pg_detoast_datum_packed(detoasted);
 
                 // and now we return it as a &str
-                Some(
-                    varlena::text_to_rust_str(varlena)
-                        .expect("datums converted to &str should be valid UTF-8"),
-                )
+                Some(convert_varlena_to_str_memoized(varlena))
             })
+        }
+    }
+}
+
+// This is not marked inline on purpose, to allow it to be in a single code section
+// which is then branch-predicted on every time by the CPU.
+unsafe fn convert_varlena_to_str_memoized<'a>(varlena: *const pg_sys::varlena) -> &'a str {
+    match *crate::UTF8DATABASE {
+        crate::Utf8Compat::Yes => varlena::text_to_rust_str_unchecked(varlena),
+        crate::Utf8Compat::Maybe => varlena::text_to_rust_str(varlena)
+            .expect("datums converted to &str should be valid UTF-8"),
+        crate::Utf8Compat::Ascii => {
+            let bytes = varlena_to_byte_slice(varlena);
+            if bytes.is_ascii() {
+                core::str::from_utf8_unchecked(bytes)
+            } else {
+                panic!("datums converted to &str should be valid UTF-8, database encoding is only UTF-8 compatible for ASCII")
+            }
         }
     }
 }
