@@ -193,11 +193,14 @@ pub(crate) fn generate_schema(
     check_rust_version()?;
     let manifest = Manifest::from_path(&package_manifest_path)?;
     let (control_file, _extname) = find_control_file(&package_manifest_path)?;
-    let package_name = &manifest
-        .package
-        .as_ref()
-        .ok_or_else(|| eyre!("Could not find crate name in Cargo.toml."))?
-        .name;
+    let package_name =
+        if let Some(name) = &manifest.lib.as_ref().and_then(|product| product.name.as_ref()) {
+            &name
+        } else if let Some(ref package) = &manifest.package {
+            &package.name
+        } else {
+            return Err(eyre!("Could not find crate name from manifest."));
+        };
 
     if get_property(&package_manifest_path, "relocatable")? != Some("false".into()) {
         return Err(eyre!(
