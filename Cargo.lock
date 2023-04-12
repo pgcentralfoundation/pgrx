@@ -1460,6 +1460,7 @@ dependencies = [
 name = "pgrx-pg-config"
 version = "0.7.4"
 dependencies = [
+ "cargo_toml",
  "dirs",
  "eyre",
  "owo-colors",
@@ -2150,14 +2151,6 @@ dependencies = [
 ]
 
 [[package]]
-name = "spi_srf"
-version = "0.0.0"
-dependencies = [
- "pgrx",
- "pgrx-tests",
-]
-
-[[package]]
 name = "spin"
 version = "0.5.2"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -2682,6 +2675,14 @@ name = "version_check"
 version = "0.9.4"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "49874b5167b65d7193b8aba1567f5c7d93d001cafc34600cee003eda787e483f"
+
+[[package]]
+name = "versioned_custom_libname_so"
+version = "0.0.0"
+dependencies = [
+ "pgrx",
+ "pgrx-tests",
+]
 
 [[package]]
 name = "versioned_so"

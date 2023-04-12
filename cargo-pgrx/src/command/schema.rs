@@ -16,7 +16,7 @@ use eyre::{eyre, WrapErr};
 use object::Object;
 use once_cell::sync::OnceCell;
 use owo_colors::OwoColorize;
-use pgrx_pg_config::{get_target_dir, PgConfig, Pgrx};
+use pgrx_pg_config::{cargo::PgrxManifestExt, get_target_dir, PgConfig, Pgrx};
 use std::collections::HashSet;
 use std::hash::{Hash, Hasher};
 use std::path::{Path, PathBuf};
@@ -193,14 +193,7 @@ pub(crate) fn generate_schema(
     check_rust_version()?;
     let manifest = Manifest::from_path(&package_manifest_path)?;
     let (control_file, _extname) = find_control_file(&package_manifest_path)?;
-    let package_name =
-        if let Some(name) = &manifest.lib.as_ref().and_then(|product| product.name.as_ref()) {
-            &name
-        } else if let Some(ref package) = &manifest.package {
-            &package.name
-        } else {
-            return Err(eyre!("Could not find crate name from manifest."));
-        };
+    let library_name = manifest.lib_name()?;
 
     if get_property(&package_manifest_path, "relocatable")? != Some("false".into()) {
         return Err(eyre!(
@@ -307,7 +300,7 @@ pub(crate) fn generate_schema(
 
     let so_extension = if cfg!(target_os = "macos") { ".dylib" } else { ".so" };
 
-    lib_so.push(&format!("lib{}{}", package_name.replace('-', "_"), so_extension));
+    lib_so.push(&format!("lib{}{}", library_name.replace('-', "_"), so_extension));
 
     let lib_so_data = std::fs::read(&lib_so).wrap_err("couldn't read extension shared object")?;
     let lib_so_obj_file =
@@ -432,7 +425,7 @@ pub(crate) fn generate_schema(
 
     let pgrx_sql = pgrx_sql_entity_graph::PgrxSql::build(
         entities.into_iter(),
-        package_name.to_string(),
+        library_name.to_string(),
         versioned_so,
     )
     .wrap_err("SQL generation error")?;

@@ -14,7 +14,7 @@ use crate::CommandExecute;
 use cargo_toml::{Inheritable, Manifest};
 use eyre::{eyre, WrapErr};
 use owo_colors::OwoColorize;
-use pgrx_pg_config::{get_target_dir, PgConfig, Pgrx};
+use pgrx_pg_config::{cargo::PgrxManifestExt, get_target_dir, PgConfig, Pgrx};
 use std::io::BufReader;
 use std::path::{Path, PathBuf};
 use std::process::Stdio;
@@ -353,17 +353,7 @@ pub(crate) fn find_library_file(
     manifest: &cargo_toml::Manifest,
     build_command_messages: &Vec<cargo_metadata::Message>,
 ) -> eyre::Result<PathBuf> {
-    // Target library can be set on name field on [lib],
-    // but defaults to crate name if not specified.
-    // https://doc.rust-lang.org/cargo/reference/cargo-targets.html#the-name-field
-    let library_name =
-        if let Some(name) = manifest.lib.as_ref().and_then(|product| product.name.as_ref()) {
-            &name
-        } else if let Some(ref package) = manifest.package {
-            &package.name
-        } else {
-            return Err(eyre!("Could not get crate name from manifest."));
-        };
+    let library_name = manifest.lib_name()?;
 
     let mut library_file = None;
     for message in build_command_messages {
