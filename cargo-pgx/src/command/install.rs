@@ -7,6 +7,7 @@ All rights reserved.
 Use of this source code is governed by the MIT license that can be found in the LICENSE file.
 */
 
+use crate::command::cross_options::{CrossBuild, CrossBuildArgs};
 use crate::command::get::{find_control_file, get_property};
 use crate::manifest::{display_version_info, PgVersionSource};
 use crate::profile::CargoProfile;
@@ -84,6 +85,7 @@ impl CommandExecute for Install {
             package_manifest_path,
             &pg_config,
             &profile,
+            &CrossBuildArgs::default(),
             self.test,
             None,
             &self.features,
@@ -104,6 +106,7 @@ pub(crate) fn install_extension(
     package_manifest_path: impl AsRef<Path>,
     pg_config: &PgConfig,
     profile: &CargoProfile,
+    cross_args: &CrossBuildArgs,
     is_test: bool,
     base_directory: Option<PathBuf>,
     features: &clap_cargo::Features,
@@ -124,8 +127,13 @@ pub(crate) fn install_extension(
 
     let versioned_so = get_property(&package_manifest_path, "module_pathname")?.is_none();
 
-    let build_command_output =
-        build_extension(user_manifest_path.as_ref(), user_package, &profile, &features)?;
+    let build_command_output = build_extension(
+        &user_manifest_path.as_ref(),
+        user_package,
+        &profile,
+        &features,
+        &cross_args.to_build(),
+    )?;
     let build_command_bytes = build_command_output.stdout;
     let build_command_reader = BufReader::new(build_command_bytes.as_slice());
     let build_command_stream = cargo_metadata::Message::parse_stream(build_command_reader);
@@ -179,6 +187,7 @@ pub(crate) fn install_extension(
         &package_manifest_path,
         pg_config,
         profile,
+        cross_args,
         is_test,
         features,
         &extdir,
@@ -224,10 +233,11 @@ fn copy_file(
 }
 
 pub(crate) fn build_extension(
-    user_manifest_path: Option<impl AsRef<Path>>,
+    user_manifest_path: &Option<impl AsRef<Path>>,
     user_package: Option<&String>,
     profile: &CargoProfile,
     features: &clap_cargo::Features,
+    cross_options: &Option<CrossBuild>,
 ) -> eyre::Result<std::process::Output> {
     let flags = std::env::var("PGX_BUILD_FLAGS").unwrap_or_default();
 
@@ -257,6 +267,56 @@ pub(crate) fn build_extension(
 
     if features.all_features {
         command.arg("--all-features");
+    }
+
+    fn apply_sysroot(command: &mut Command, sysroot: &Option<PathBuf>) -> eyre::Result<()> {
+        if let Some(sysroot) = sysroot {
+            let sysroot_str = sysroot.to_str().ok_or(eyre!("sysroot is not valid utf-8"))?;
+            let sysroot_arg = format!("--sysroot={sysroot_str}");
+            command.env("BINDGEN_EXTRA_CLANG_ARGS", &sysroot_arg);
+            command.env("PG_CFLAGS", &sysroot_arg);
+        }
+
+        Ok(())
+    }
+
+    // set PG_CONFIG
+    match cross_options {
+        None | Some(CrossBuild::Target { .. }) => {
+            if let Some(pg_config) = std::env::var_os("PGX_PG_CONFIG_PATH") {
+                command.env("PG_CONFIG", pg_config);
+            }
+        }
+        Some(CrossBuild::Host { pg_config, .. }) => {
+            if let Some(ref host_pg_config) = pg_config {
+                command.env("PGX_PG_CONFIG_PATH", host_pg_config);
+                command.env("PG_CONFIG", host_pg_config);
+            }
+        }
+    }
+
+    // sysroot and target handling
+    match cross_options {
+        None => {}
+        Some(CrossBuild::Target { target, sysroot }) => {
+            command.arg("--target");
+            command.arg(target);
+
+            apply_sysroot(&mut command, &sysroot)?;
+        }
+        Some(CrossBuild::Host { sysroot, .. }) => {
+            let var_names = vec!["CC", "LD", "CFLAGS", "LDFLAGS", "AR", "RUSTFLAGS"];
+            for var in var_names {
+                let host_v = "HOST_".to_owned() + var;
+                if let Some(value) = std::env::var_os(host_v) {
+                    command.env(var, value);
+                } else {
+                    command.env_remove(var);
+                }
+            }
+
+            apply_sysroot(&mut command, &sysroot)?;
+        }
     }
 
     command.arg("--message-format=json-render-diagnostics");
@@ -300,6 +360,7 @@ fn copy_sql_files(
     package_manifest_path: impl AsRef<Path>,
     pg_config: &PgConfig,
     profile: &CargoProfile,
+    cross_args: &CrossBuildArgs,
     is_test: bool,
     features: &clap_cargo::Features,
     extdir: &PathBuf,
@@ -315,6 +376,7 @@ fn copy_sql_files(
         user_package,
         &package_manifest_path,
         profile,
+        cross_args,
         is_test,
         features,
         Some(&dest),

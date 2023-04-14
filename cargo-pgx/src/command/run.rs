@@ -7,6 +7,7 @@ All rights reserved.
 Use of this source code is governed by the MIT license that can be found in the LICENSE file.
 */
 
+use crate::command::cross_options::CrossBuildArgs;
 use crate::command::get::get_property;
 use crate::command::install::install_extension;
 use crate::command::start::start_postgres;
@@ -116,6 +117,7 @@ pub(crate) fn run(
         package_manifest_path,
         pg_config,
         profile,
+        &CrossBuildArgs::default(),
         false,
         None,
         features,

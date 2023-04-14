@@ -7,6 +7,7 @@ All rights reserved.
 Use of this source code is governed by the MIT license that can be found in the LICENSE file.
 */
 
+use crate::command::cross_options::CrossBuildArgs;
 use crate::command::install::install_extension;
 use crate::manifest::{display_version_info, PgVersionSource};
 use crate::CommandExecute;
@@ -32,6 +33,8 @@ pub(crate) struct Package {
     /// Specific profile to use (conflicts with `--debug`)
     #[clap(long)]
     profile: Option<String>,
+    #[command(flatten)]
+    cross_args: CrossBuildArgs,
     /// Build in test mode (for `cargo pgx test`)
     #[clap(long)]
     test: bool,
@@ -89,6 +92,7 @@ impl CommandExecute for Package {
             &pg_config,
             out_dir,
             &profile,
+            &self.cross_args,
             self.test,
             &self.features,
         )
@@ -107,6 +111,7 @@ pub(crate) fn package_extension(
     pg_config: &PgConfig,
     out_dir: PathBuf,
     profile: &CargoProfile,
+    cross_args: &CrossBuildArgs,
     is_test: bool,
     features: &clap_cargo::Features,
 ) -> eyre::Result<()> {
@@ -121,6 +126,7 @@ pub(crate) fn package_extension(
         &package_manifest_path,
         pg_config,
         profile,
+        cross_args,
         is_test,
         Some(out_dir),
         features,
