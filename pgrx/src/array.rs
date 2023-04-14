@@ -1,6 +1,6 @@
 use crate::datum::{Array, FromDatum};
+use crate::layout::{Layout, PassBy, Size};
 use crate::pg_sys;
-use crate::layout::{Layout, PassBy};
 use crate::toast::{Toast, Toasty};
 use bitvec::prelude::*;
 use bitvec::ptr::{bitslice_from_raw_parts_mut, BitPtr, BitPtrError, Mut};
@@ -486,6 +486,10 @@ impl RawArray {
                 self.len,
             ))
         }
+    }
+
+    pub(crate) fn byte_ptr(&self) -> *mut u8 {
+        unsafe { ARR_DATA_PTR(self.ptr.as_ptr()) }
     }
 
     /// # Safety

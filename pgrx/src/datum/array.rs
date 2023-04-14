@@ -9,6 +9,7 @@ Use of this source code is governed by the MIT license that can be found in the 
 
 use crate::array::RawArray;
 use crate::layout::*;
+use crate::varlena;
 use crate::slice::PallocSlice;
 use crate::toast::Toast;
 use crate::{pg_sys, FromDatum, IntoDatum, PgMemoryContexts};
@@ -218,6 +219,66 @@ impl<'a, T: FromDatum> Array<'a, T> {
                     self.raw.oid(),
                 )
             })
+        }
+    }
+
+    /// Walk to an index in the array from a byte offset
+    /// This function exists to help with memoizing the array's offsets
+    ///
+    /// # Safety
+    /// Implies reading
+    // #[inline]
+    // unsafe fn f(&self, i: usize, bytes: usize) -> *mut u8 {
+
+    // Here, we walk to a particular index, but start from a particular starting offset.
+    // todo!()
+    // }
+
+    /// # Safety
+    /// Implies reading
+    #[inline]
+    unsafe fn walk_index(&self, idx: usize) -> Option<T> {
+        let zero = self.raw.byte_ptr();
+        let at_byte = zero; // when memoize: unsafe { zero.add(bytes) };
+        let is_null = self.null_slice.get(idx)?;
+        if is_null {
+            return None;
+        }
+        let walk_strat = self.elem_layout.size;
+        match walk_strat {
+            Size::Fixed(n) => {
+                let full_offset = n as usize * idx;
+                let at_byte = unsafe { at_byte.add(full_offset) };
+                match self.elem_layout.pass {
+                    PassBy::Value => Some(unsafe { at_byte.cast::<T>().read() }),
+                    PassBy::Ref => {
+                        let datum = pg_sys::Datum::from(at_byte);
+                        unsafe { T::from_polymorphic_datum(datum, is_null, self.raw.oid()) }
+                    }
+                }
+            }
+            Size::Varlena => {
+                unsafe {
+                    let mut at_byte = at_byte;
+                    for _ in 0..idx {
+                        let offset = varlena::varsize_any(at_byte.cast());
+                        at_byte = at_byte.add(offset);
+                    }
+                    let datum = pg_sys::Datum::from(at_byte);
+                    T::from_polymorphic_datum(datum, is_null, self.raw.oid())
+                }
+            }
+            Size::CStr => {
+                let mut at_char = at_byte.cast();
+                unsafe {
+                    for _ in 0..idx {
+                        let strlen = core::ffi::CStr::from_ptr(at_char).to_bytes().len();
+                        at_char = at_char.add(strlen + 2);
+                    }
+                    let datum = pg_sys::Datum::from(at_char);
+                    T::from_polymorphic_datum(datum, is_null, self.raw.oid())
+                }
+            }
         }
     }
 }
