@@ -233,10 +233,9 @@ impl RawArray {
         }
     }
 
-    pub(crate) unsafe fn deconstruct(&mut self) -> (Layout, *mut pg_sys::Datum, *mut bool, usize) {
+    pub(crate) unsafe fn deconstruct(&mut self, layout: Layout) -> (*mut pg_sys::Datum, *mut bool) {
         let oid = self.oid();
         let array = self.ptr.as_ptr();
-        let elem_layout = Layout::lookup_oid(oid);
         // outvals for deconstruct_array
         let mut elements = ptr::null_mut();
         let mut nulls = ptr::null_mut();
@@ -246,15 +245,15 @@ impl RawArray {
             pg_sys::deconstruct_array(
                 array,
                 oid,
-                elem_layout.size.as_typlen().into(),
-                matches!(elem_layout.pass, PassBy::Value),
-                elem_layout.align.as_typalign(),
+                layout.size.as_typlen().into(),
+                matches!(layout.pass, PassBy::Value),
+                layout.align.as_typalign(),
                 &mut elements,
                 &mut nulls,
                 &mut nelems,
             );
 
-            (elem_layout, elements, nulls, nelems as usize)
+            (elements, nulls)
         }
     }
 
