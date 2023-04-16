@@ -292,6 +292,9 @@ impl<'a, T: FromDatum> Array<'a, T> {
                 unsafe {
                     for _ in 0..idx {
                         let varsize = varlena::varsize_any(at_byte.cast());
+                        // this DOES NOT match Postgres realignment code in form
+                        // I suspect it matches in function, but theirs is micro-optimized
+                        // so we probably need a battery of tests for this
                         let align_mask = varsize & (align - 1);
                         let align_offset = if align_mask != 0 { align - align_mask } else { 0 };
                         at_byte = at_byte.add(varsize + align_offset);
