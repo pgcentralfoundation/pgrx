@@ -59,7 +59,6 @@ fn with_vec(elems: Array<String>) {
 pub struct Array<'a, T: FromDatum> {
     nelems: usize,
     // Remove this field if/when we figure out how to stop using pg_sys::deconstruct_array
-    elem_slice: ElemSlice<T>,
     null_slice: NullKind<'a>,
     elem_layout: Layout,
     // Rust drops in FIFO order, drop this last
@@ -136,41 +135,7 @@ impl<'a, T: FromDatum> Array<'a, T> {
             .nulls_bitslice()
             .map(|nonnull| NullKind::Bits(unsafe { &*nonnull.as_ptr() }))
             .unwrap_or(NullKind::Strict(nelems));
-        if let (NullKind::Strict(_), Layout { size: Size::Fixed(_), pass: PassBy::Value, .. }) =
-            (&null_slice, elem_layout)
-        {
-            let elem_slice = ElemSlice::Bare(raw.data());
-            Array { raw, nelems, elem_slice, null_slice, elem_layout, _marker: PhantomData }
-        } else {
-            /*
-            FIXME(jubilee): This way of getting array buffers causes problems for any Drop impl,
-            and clashes with assumptions of Array being a "zero-copy", lifetime-bound array.
-            It also risks leaking memory, as deconstruct_array calls palloc.
-
-            SAFETY: We have already asserted the validity of the RawArray, so
-            this only makes mistakes if we mix things up and pass Postgres the wrong data.
-            */
-            let (elements, nulls) = unsafe { raw.deconstruct(elem_layout) };
-            // The array was just deconstructed, which allocates twice: effectively [Datum] and [bool].
-            // But pgx doesn't actually need [bool] if NullKind's handling of BitSlices is correct.
-            // So, assert correctness of the NullKind implementation and cleanup.
-            // SAFETY: The pointer we got should be correctly constructed for slice validity.
-            let pallocd_null_slice =
-                unsafe { PallocSlice::from_raw_parts(NonNull::new(nulls).unwrap(), nelems) };
-            #[cfg(debug_assertions)]
-            for i in 0..nelems {
-                assert!(null_slice
-                    .get(i)
-                    .unwrap()
-                    .eq(unsafe { pallocd_null_slice.get_unchecked(i) }));
-            }
-
-            // SAFETY: This was just handed over as a palloc, so of course we can do this.
-            let elem_slice = ElemSlice::Datum(unsafe {
-                PallocSlice::from_raw_parts(NonNull::new(elements).unwrap(), nelems)
-            });
-            Array { raw, nelems, elem_slice, null_slice, elem_layout, _marker: PhantomData }
-        }
+        Array { raw, nelems, null_slice, elem_layout, _marker: PhantomData }
     }
 
     /// Rips out the underlying pg_sys::ArrayType pointer.
@@ -180,8 +145,7 @@ impl<'a, T: FromDatum> Array<'a, T> {
         // may be worth replacing this function when Toast<T> matures enough
         // to be used as a public type with a fn(self) -> Toast<RawArray>
 
-        let Array { raw, elem_slice, .. } = self;
-        let _ = elem_slice;
+        let Array { raw, .. } = self;
         // Wrap the Toast<RawArray> to prevent it from deallocating itself
         let mut raw = core::mem::ManuallyDrop::new(raw);
         let ptr = raw.deref_mut().deref_mut() as *mut RawArray;
