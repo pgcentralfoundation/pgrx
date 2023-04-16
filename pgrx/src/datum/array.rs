@@ -89,6 +89,14 @@ impl NullKind<'_> {
             Self::Strict(_) => false,
         }
     }
+
+    // counts nulls until the i-th bit, non-inclusive
+    fn count_nulls_until(&self, i: usize) -> usize {
+        match self {
+            Self::Bits(b1) => BitSlice::split_at(b1, core::cmp::min(i, b1.len())).0.count_zeros(),
+            Self::Strict(_) => 0,
+        }
+    }
 }
 
 enum ElemSlice<T: FromDatum> {
@@ -236,7 +244,7 @@ impl<'a, T: FromDatum> Array<'a, T> {
         if i >= self.nelems {
             None
         } else {
-            Some(unsafe { self.elem_slice.get(i, self.null_slice.get(i)?, self.raw.oid()) })
+            Some(unsafe { self.walk_index(i) })
         }
     }
 
@@ -262,6 +270,8 @@ impl<'a, T: FromDatum> Array<'a, T> {
         if is_null {
             return None;
         }
+        let nulls = self.null_slice.count_nulls_until(idx); // nulls < idx
+        let idx = idx - nulls;
         let walk_strat = self.elem_layout.size;
         match walk_strat {
             Size::Fixed(n) => {
@@ -282,9 +292,9 @@ impl<'a, T: FromDatum> Array<'a, T> {
                 unsafe {
                     for _ in 0..idx {
                         let varsize = varlena::varsize_any(at_byte.cast());
-                        let align_off = varsize & (align - 1);
-                        at_byte = at_byte
-                            .add(varsize + if align_off != 0 { align - align_off } else { 0 });
+                        let align_mask = varsize & (align - 1);
+                        let align_offset = if align_mask != 0 { align - align_mask } else { 0 };
+                        at_byte = at_byte.add(varsize + align_offset);
                     }
                     let datum = pg_sys::Datum::from(at_byte);
                     T::from_polymorphic_datum(datum, is_null, self.raw.oid())
