@@ -1,4 +1,4 @@
-# Cross compiling `pgx` (on Linux)
+# Cross compiling `pgrx` (on Linux)
 
 *Warning: this guide is still a work in progress!*
 
@@ -6,9 +6,9 @@
 
 Note that guide is fairly preliminary and does not cover many cases, most notably:
 
-1. This does not (yet) cover cross compiling with `cargo pgx` (planned). Note that this means this documentation may only be useful to a small set of users.
+1. This does not (yet) cover cross compiling with `cargo pgrx` (planned). Note that this means this documentation may only be useful to a small set of users.
 
-2. Cross-compiling the `cshim` is not (yet?) supported. You should ensure that the `pgx/cshim` cargo feature is disabled when you perform the cross-build.
+2. Cross-compiling the `cshim` is not (yet?) supported. You should ensure that the `pgrx/cshim` cargo feature is disabled when you perform the cross-build.
 
 3. This guide is assuming that you are cross compiling between `x86_64-unknown-linux-gnu` and `aarch64-unknown-linux-gnu` (either direction works).
 
@@ -30,7 +30,7 @@ An additional caveat (one that is unrelated to the document's completeness) is t
 ## Getting PostgreSQL headers for the target
 [getting-headers]: #getting-postgresql-headers-for-the-target
 
-To generate the bindings for `pgx-pg-sys` we need the PostgreSQL headers. Unfortunately, a few of these headers get generated when Postgres is compiled and contain non-portable information, which means that we can't just use the headers for the version of postgres you have installed. You need to get the server headers from a build PostgreSQL done for the cross-compile target. The version of PostgreSQL *must* match.
+To generate the bindings for `pgrx-pg-sys` we need the PostgreSQL headers. Unfortunately, a few of these headers get generated when Postgres is compiled and contain non-portable information, which means that we can't just use the headers for the version of postgres you have installed. You need to get the server headers from a build PostgreSQL done for the cross-compile target. The version of PostgreSQL *must* match.
 
 *Caveat: It is _critically important_ that you ensure the headers you get are for the correct version of Postgres. Failure to do so will _probably not_ be detected at build time, and will almost certainly result in an extension that fails _terribly_ at runtime. Do not mess this up!*
 
@@ -38,7 +38,7 @@ To minimize the chance for compatibility issues: The headers should be produced 
 
 [^distro]: Comments on PostgreSQL's mailing list [indicate](https://www.postgresql.org/message-id/1556.1486012839%40sss.pgh.pa.us) that they consider it fine if there are ABI differences between extensions built on (for example) Debian versus RHEL. In reality this seems unlikely as long as things like kernel and glibc versions are compatible (but don't blame me if that isn't true), but either way, it's an indication that you should go out of your way to ensure *everything* on the build machine and cross-compilation environment is *as similar as possible* to what it will be in the location where the extension will ultimately get installed.
 
-One additional warning is that while currently `pgx` doesn't emit bindings for headers which include (transitively or otherwise) headers provided by third-party dependencies, those do exist (PostgreSQL has headers which transitively include in headers from ICU, and from LLVM's C API). At the moment we don't need them, but future versions of PG could change that, so be aware. If those headers become necessary, it's very likely that the failure would be at compile time rather than runtime, so this is *mostly* something that doesn't need to be handled yet (but might be necessary when dealing with patched versions of postgres).
+One additional warning is that while currently `pgrx` doesn't emit bindings for headers which include (transitively or otherwise) headers provided by third-party dependencies, those do exist (PostgreSQL has headers which transitively include in headers from ICU, and from LLVM's C API). At the moment we don't need them, but future versions of PG could change that, so be aware. If those headers become necessary, it's very likely that the failure would be at compile time rather than runtime, so this is *mostly* something that doesn't need to be handled yet (but might be necessary when dealing with patched versions of postgres).
 
 ### Where to get the headers
 [get-headers-options]: #where-to-get-the-headers

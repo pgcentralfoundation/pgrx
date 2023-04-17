@@ -16,19 +16,19 @@ set -x
 PG_MAJOR_VER=$1
 DOCKERFILE_ID=$2
 
-echo "Building docker container for PGX using Postgres version $PG_MAJOR_VER in container $DOCKERFILE_ID"
+echo "Building docker container for PGRX using Postgres version $PG_MAJOR_VER in container $DOCKERFILE_ID"
 echo "Cargo lock flag set to: '$CARGO_LOCKED_OPTION'"
 
 docker build \
   --build-arg PG_MAJOR_VER="$PG_MAJOR_VER" \
   --build-arg CARGO_LOCKED_OPTION="$CARGO_LOCKED_OPTION" \
-  -t pgx \
+  -t pgrx \
   -f ".github/docker/Dockerfile.$DOCKERFILE_ID" \
   .
 
-echo "Running PGX test suite using Postgres version $PG_MAJOR_VER in container $DOCKERFILE_ID with 'cshim'"
+echo "Running PGRX test suite using Postgres version $PG_MAJOR_VER in container $DOCKERFILE_ID with 'cshim'"
 
-docker run pgx \
+docker run pgrx \
   cargo test \
   --no-default-features \
   --features "pg$PG_MAJOR_VER cshim" \

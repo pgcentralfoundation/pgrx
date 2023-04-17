@@ -1,1 +1,0 @@
-Some examples of using SPI (Server Programming Interface) and SRF with pgx.

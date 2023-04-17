@@ -27,8 +27,8 @@ checksum = "aae1277d39aeec15cb388266ecc24b11c80469deae6067e17a1a7aa9e5c1f234"
 name = "aggregate"
 version = "0.0.0"
 dependencies = [
- "pgx",
- "pgx-tests",
+ "pgrx",
+ "pgrx-tests",
  "serde",
 ]
 
@@ -51,8 +51,8 @@ checksum = "224afbd727c3d6e4b90103ece64b8d1b67fbb1973b1046c2281eed3f3803f800"
 name = "arrays"
 version = "0.1.0"
 dependencies = [
- "pgx",
- "pgx-tests",
+ "pgrx",
+ "pgrx-tests",
  "serde",
 ]
 
@@ -122,8 +122,8 @@ dependencies = [
 name = "bad_ideas"
 version = "0.0.0"
 dependencies = [
- "pgx",
- "pgx-tests",
+ "pgrx",
+ "pgrx-tests",
  "rand",
  "ureq",
 ]
@@ -144,8 +144,8 @@ checksum = "a4a4ddaa51a5bc52a6948f74c06d20aaaddb71924eab79b8c97a8c556e942d6a"
 name = "bgworker"
 version = "0.0.0"
 dependencies = [
- "pgx",
- "pgx-tests",
+ "pgrx",
+ "pgrx-tests",
 ]
 
 [[package]]
@@ -229,8 +229,8 @@ name = "bytea"
 version = "0.1.0"
 dependencies = [
  "libflate",
- "pgx",
- "pgx-tests",
+ "pgrx",
+ "pgrx-tests",
 ]
 
 [[package]]
@@ -255,7 +255,7 @@ dependencies = [
 ]
 
 [[package]]
-name = "cargo-pgx"
+name = "cargo-pgrx"
 version = "0.7.4"
 dependencies = [
  "atty",
@@ -274,8 +274,8 @@ dependencies = [
  "object",
  "once_cell",
  "owo-colors",
- "pgx-pg-config",
- "pgx-sql-entity-graph",
+ "pgrx-pg-config",
+ "pgrx-sql-entity-graph",
  "prettyplease",
  "proc-macro2",
  "quote",
@@ -441,8 +441,8 @@ dependencies = [
 name = "composite_type"
 version = "0.0.0"
 dependencies = [
- "pgx",
- "pgx-tests",
+ "pgrx",
+ "pgrx-tests",
  "serde",
 ]
 
@@ -552,8 +552,8 @@ dependencies = [
 name = "custom_sql"
 version = "0.0.0"
 dependencies = [
- "pgx",
- "pgx-tests",
+ "pgrx",
+ "pgrx-tests",
  "serde",
 ]
 
@@ -562,8 +562,8 @@ name = "custom_types"
 version = "0.1.0"
 dependencies = [
  "maplit",
- "pgx",
- "pgx-tests",
+ "pgrx",
+ "pgrx-tests",
  "serde",
 ]
 
@@ -665,8 +665,8 @@ dependencies = [
 name = "errors"
 version = "0.1.0"
 dependencies = [
- "pgx",
- "pgx-tests",
+ "pgrx",
+ "pgrx-tests",
 ]
 
 [[package]]
@@ -1213,8 +1213,8 @@ dependencies = [
 name = "nostd"
 version = "0.0.0"
 dependencies = [
- "pgx",
- "pgx-tests",
+ "pgrx",
+ "pgrx-tests",
  "serde",
 ]
 
@@ -1251,8 +1251,8 @@ dependencies = [
 name = "numeric"
 version = "0.0.0"
 dependencies = [
- "pgx",
- "pgx-tests",
+ "pgrx",
+ "pgrx-tests",
  "rand",
 ]
 
@@ -1320,8 +1320,8 @@ dependencies = [
 name = "operators"
 version = "0.1.0"
 dependencies = [
- "pgx",
- "pgx-tests",
+ "pgrx",
+ "pgrx-tests",
  "serde",
 ]
 
@@ -1412,15 +1412,7 @@ dependencies = [
 ]
 
 [[package]]
-name = "pgtrybuilder"
-version = "0.1.0"
-dependencies = [
- "pgx",
- "pgx-tests",
-]
-
-[[package]]
-name = "pgx"
+name = "pgrx"
 version = "0.7.4"
 dependencies = [
  "atomic-traits",
@@ -1430,9 +1422,9 @@ dependencies = [
  "heapless",
  "libc",
  "once_cell",
- "pgx-macros",
- "pgx-pg-sys",
- "pgx-sql-entity-graph",
+ "pgrx-macros",
+ "pgrx-pg-sys",
+ "pgrx-sql-entity-graph",
  "seahash",
  "seq-macro",
  "serde",
@@ -1446,10 +1438,10 @@ dependencies = [
 ]
 
 [[package]]
-name = "pgx-macros"
+name = "pgrx-macros"
 version = "0.7.4"
 dependencies = [
- "pgx-sql-entity-graph",
+ "pgrx-sql-entity-graph",
  "proc-macro2",
  "quote",
  "serde",
@@ -1457,7 +1449,7 @@ dependencies = [
 ]
 
 [[package]]
-name = "pgx-pg-config"
+name = "pgrx-pg-config"
 version = "0.7.4"
 dependencies = [
  "dirs",
@@ -1472,7 +1464,7 @@ dependencies = [
 ]
 
 [[package]]
-name = "pgx-pg-sys"
+name = "pgrx-pg-sys"
 version = "0.7.4"
 dependencies = [
  "bindgen",
@@ -1480,9 +1472,9 @@ dependencies = [
  "libc",
  "memoffset",
  "once_cell",
- "pgx-macros",
- "pgx-pg-config",
- "pgx-sql-entity-graph",
+ "pgrx-macros",
+ "pgrx-pg-config",
+ "pgrx-sql-entity-graph",
  "proc-macro2",
  "quote",
  "serde",
@@ -1492,7 +1484,7 @@ dependencies = [
 ]
 
 [[package]]
-name = "pgx-sql-entity-graph"
+name = "pgrx-sql-entity-graph"
 version = "0.7.4"
 dependencies = [
  "atty",
@@ -1508,7 +1500,7 @@ dependencies = [
 ]
 
 [[package]]
-name = "pgx-tests"
+name = "pgrx-tests"
 version = "0.7.4"
 dependencies = [
  "clap-cargo",
@@ -1516,9 +1508,9 @@ dependencies = [
  "libc",
  "once_cell",
  "owo-colors",
- "pgx",
- "pgx-macros",
- "pgx-pg-config",
+ "pgrx",
+ "pgrx-macros",
+ "pgrx-pg-config",
  "postgres",
  "regex",
  "serde",
@@ -1529,13 +1521,21 @@ dependencies = [
 ]
 
 [[package]]
-name = "pgx-version-updater"
+name = "pgrx-version-updater"
 version = "0.1.1"
 dependencies = [
  "clap",
  "owo-colors",
  "toml_edit",
  "walkdir",
+]
+
+[[package]]
+name = "pgtrybuilder"
+version = "0.1.0"
+dependencies = [
+ "pgrx",
+ "pgrx-tests",
 ]
 
 [[package]]
@@ -1738,8 +1738,8 @@ dependencies = [
 name = "range"
 version = "0.1.0"
 dependencies = [
- "pgx",
- "pgx-tests",
+ "pgrx",
+ "pgrx-tests",
 ]
 
 [[package]]
@@ -1921,8 +1921,8 @@ dependencies = [
 name = "schemas"
 version = "0.0.0"
 dependencies = [
- "pgx",
- "pgx-tests",
+ "pgrx",
+ "pgrx-tests",
  "serde",
 ]
 
@@ -2097,8 +2097,8 @@ name = "shmem"
 version = "0.1.0"
 dependencies = [
  "heapless",
- "pgx",
- "pgx-tests",
+ "pgrx",
+ "pgrx-tests",
  "serde",
 ]
 
@@ -2137,16 +2137,16 @@ dependencies = [
 name = "spi"
 version = "0.0.0"
 dependencies = [
- "pgx",
- "pgx-tests",
+ "pgrx",
+ "pgrx-tests",
 ]
 
 [[package]]
 name = "spi_srf"
 version = "0.0.0"
 dependencies = [
- "pgx",
- "pgx-tests",
+ "pgrx",
+ "pgrx-tests",
 ]
 
 [[package]]
@@ -2174,8 +2174,8 @@ checksum = "3b9b39299b249ad65f3b7e96443bad61c02ca5cd3589f46cb6d610a0fd6c0d6a"
 name = "srf"
 version = "0.1.0"
 dependencies = [
- "pgx",
- "pgx-tests",
+ "pgrx",
+ "pgrx-tests",
  "rand",
 ]
 
@@ -2205,8 +2205,8 @@ dependencies = [
 name = "strings"
 version = "0.1.0"
 dependencies = [
- "pgx",
- "pgx-tests",
+ "pgrx",
+ "pgrx-tests",
 ]
 
 [[package]]
@@ -2564,8 +2564,8 @@ dependencies = [
 name = "triggers"
 version = "0.0.0"
 dependencies = [
- "pgx",
- "pgx-tests",
+ "pgrx",
+ "pgrx-tests",
  "thiserror",
 ]
 
@@ -2679,8 +2679,8 @@ checksum = "49874b5167b65d7193b8aba1567f5c7d93d001cafc34600cee003eda787e483f"
 name = "versioned_so"
 version = "0.0.0"
 dependencies = [
- "pgx",
- "pgx-tests",
+ "pgrx",
+ "pgrx-tests",
 ]
 
 [[package]]

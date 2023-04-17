@@ -6,9 +6,9 @@ All rights reserved.
 
 Use of this source code is governed by the MIT license that can be found in the LICENSE file.
 */
-use pgx::prelude::*;
+use pgrx::prelude::*;
 
-pgx::pg_module_magic!();
+pgrx::pg_module_magic!();
 
 #[pg_extern]
 fn hello() -> &'static str {
@@ -18,7 +18,7 @@ fn hello() -> &'static str {
 #[cfg(any(test, feature = "pg_test"))]
 #[pg_schema]
 mod tests {
-    use pgx::prelude::*;
+    use pgrx::prelude::*;
 
     #[pg_test]
     fn test_hello() {
@@ -29,7 +29,7 @@ mod tests {
 #[cfg(test)]
 pub mod pg_test {
     use once_cell::sync::Lazy;
-    use pgx_utils::pg_config::Pgx;
+    use pgrx_utils::pg_config::Pgrx;
     use tempfile::tempdir;
 
     static WORK_DIR: Lazy<String> = Lazy::new(|| {
@@ -37,9 +37,9 @@ pub mod pg_test {
         format!("plrust.work_dir='{}'", work_dir.path().display())
     });
     static PG_CONFIG: Lazy<String> = Lazy::new(|| {
-        let pgx_config = Pgx::from_config().unwrap();
-        let version = format!("pg{}", pgx::pg_sys::get_pg_major_version_num());
-        let pg_config = pgx_config.get(&version).unwrap();
+        let pgrx_config = Pgrx::from_config().unwrap();
+        let version = format!("pg{}", pgrx::pg_sys::get_pg_major_version_num());
+        let pg_config = pgrx_config.get(&version).unwrap();
         let path = pg_config.path().unwrap();
         format!("plrust.pg_config='{}'", path.as_path().display())
     });

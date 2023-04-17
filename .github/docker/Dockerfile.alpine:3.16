@@ -1,8 +1,8 @@
-# Example of how to build this container (ran from pgx checkout directory):
-#   docker build --build-arg PG_MAJOR_VER=14 -f .github/docker/Dockerfile.alpine\:3.16 -t pgx-alpine .
+# Example of how to build this container (ran from pgrx checkout directory):
+#   docker build --build-arg PG_MAJOR_VER=14 -f .github/docker/Dockerfile.alpine\:3.16 -t pgrx-alpine .
 #
 # Example of how to run this container with tests after building the image:
-#   docker run pgx-alpine cargo test --no-default-features --features pg14 --locked
+#   docker run pgrx-alpine cargo test --no-default-features --features pg14 --locked
 #
 # Note that "PG_MAJOR_VER" build arg in the build step must match the
 # "--features pgXX" in the run step
@@ -34,7 +34,7 @@ RUN chmod a+rwx `$(which pg_config) --pkglibdir` \
   `$(which pg_config) --sharedir`/extension \
   /var/run/postgresql/
 
-# Running pgx and tests require a non-root user
+# Running pgrx and tests require a non-root user
 RUN adduser -s /bin/bash -D rust
 WORKDIR /checkout
 RUN chown -R rust:rust /checkout
@@ -54,12 +54,12 @@ ENV PATH="/home/rust/.cargo/bin:${PATH}"
 ARG CARGO_LOCKED_OPTION='--locked'
 ENV CARGO_LOCKED_OPTION=${CARGO_LOCKED_OPTION}
 
-# Install cargo-pgx from source copied into this container
-RUN echo "Running cargo install --path cargo-pgx/ $CARGO_LOCKED_OPTION" && cargo install --path cargo-pgx/ $CARGO_LOCKED_OPTION
+# Install cargo-pgrx from source copied into this container
+RUN echo "Running cargo install --path cargo-pgrx/ $CARGO_LOCKED_OPTION" && cargo install --path cargo-pgrx/ $CARGO_LOCKED_OPTION
 
 # This seems strange, but by this point $PG_MAJOR_VER is blank and
 # $PG_MAJOR is always set to the correct version. I think it's something built
 # into the postgres:XX-alpine3.16 images, so it was easier to go with the grain
-RUN cargo pgx init --pg$PG_MAJOR=$(which pg_config)
+RUN cargo pgrx init --pg$PG_MAJOR=$(which pg_config)
 
 CMD ["cargo", "test", "--no-default-features", "--features", "pg${PG_MAJOR_VER} cshim", "${CARGO_LOCKED_OPTION}"]

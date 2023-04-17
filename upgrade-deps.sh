@@ -14,7 +14,7 @@ cargo upgrade
 cargo generate-lockfile
 
 # examples are their own independent crates, so we have to do them individually.
-for folder in pgx-examples/*; do
+for folder in pgrx-examples/*; do
     if [ -d "$folder" ]; then
         cd $folder
         cargo update

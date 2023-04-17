@@ -5,7 +5,7 @@ Reaching for something like `SUM(vals)` or `AVG(vals)` is a common habit when us
 
 How do they work? What makes them different than a function? How do we make one? What kinds of other uses exist?
 
-We'll explore creating some basic ones using SQL, then create an extension that defines aggregates in Rust using [`pgx`][pgx] 0.3.0's new aggregate support.
+We'll explore creating some basic ones using SQL, then create an extension that defines aggregates in Rust using [`pgrx`][pgrx] 0.3.0's new aggregate support.
 
 <!-- more -->
 
@@ -186,58 +186,58 @@ Aggregates have several more optional fields, such as a `PARALLEL`. Their signat
 
 > **Reminder:** You can also create functions with [`pl/pgsql`][postgresql-plpgsql], [`c`][postgresql-xfunc-c], [pl/Python][postgresql-plpython], or even in the experimental [`pl/Rust`][plrust].
 
-Extensions can, of course, create aggregates too. Next, let's explore how to do that with Rust using [`pgx`][pgx] 0.3.0's Aggregate support.
+Extensions can, of course, create aggregates too. Next, let's explore how to do that with Rust using [`pgrx`][pgrx] 0.3.0's Aggregate support.
 
-# Familiarizing with `pgx`
+# Familiarizing with `pgrx`
 
-[`pgx`][pgx] is a suite of crates that provide everything required to build, test, and package extensions for PostgreSQL versions 11 through 15 using pure Rust.
+[`pgrx`][pgrx] is a suite of crates that provide everything required to build, test, and package extensions for PostgreSQL versions 11 through 15 using pure Rust.
 
 It includes:
 
-* `cargo-pgx`: A `cargo` plugin that provides commands like `cargo pgx package` and `cargo pgx test`,
-* `pgx`: A crate providing macros, high level abstractions (such as SPI), and low level generated bindings for PostgreSQL.
-* `pgx-tests`: A crate providing a test framework for running tests inside PostgreSQL.
+* `cargo-pgrx`: A `cargo` plugin that provides commands like `cargo pgrx package` and `cargo pgrx test`,
+* `pgrx`: A crate providing macros, high level abstractions (such as SPI), and low level generated bindings for PostgreSQL.
+* `pgrx-tests`: A crate providing a test framework for running tests inside PostgreSQL.
 
-**Note:** `pgx` does not currently offer Windows support, but works great in [WSL2][wsl].
+**Note:** `pgrx` does not currently offer Windows support, but works great in [WSL2][wsl].
 
 If a Rust toolchain is not already installed, please follow the instructions on [rustup.rs][rustup-rs].
 
-You'll also [need to make sure you have some development libraries][pgx-system-requirements] like `zlib` and `libclang`, as 
-`cargo pgx init` will, by default, build it's own development PostgreSQL installs. Usually it's possible to
+You'll also [need to make sure you have some development libraries][pgrx-system-requirements] like `zlib` and `libclang`, as 
+`cargo pgrx init` will, by default, build it's own development PostgreSQL installs. Usually it's possible to
 figure out if something is missing from error messages and then discover the required package for the system.
 
-Install `cargo-pgx` then initialize its development PostgreSQL installations (used for `cargo pgx test` and `cargo pgx run`):
+Install `cargo-pgrx` then initialize its development PostgreSQL installations (used for `cargo pgrx test` and `cargo pgrx run`):
 
 ```bash
-$ cargo install --locked cargo-pgx
-$ cargo pgx init
+$ cargo install --locked cargo-pgrx
+$ cargo pgrx init
 # ...
 ```
 
 We can create a new extension with:
 
 ```bash
-$ cargo pgx new exploring_aggregates
+$ cargo pgrx new exploring_aggregates
 $ cd exploring_aggregates
 ```
 
 Then run it:
 
 ```bash
-$ cargo pgx run
+$ cargo pgrx run
 # ...
 building extension with features ``
 "cargo" "build"
     Finished dev [unoptimized + debuginfo] target(s) in 0.06s
 
 installing extension
-     Copying control file to `/home/ana/.pgx/13.5/pgx-install/share/postgresql/extension/exploring_aggregates.control`
-     Copying shared library to `/home/ana/.pgx/13.5/pgx-install/lib/postgresql/exploring_aggregates.so`
+     Copying control file to `/home/ana/.pgrx/13.5/pgrx-install/share/postgresql/extension/exploring_aggregates.control`
+     Copying shared library to `/home/ana/.pgrx/13.5/pgrx-install/lib/postgresql/exploring_aggregates.so`
  Discovering SQL entities
   Discovered 1 SQL entities: 0 schemas (0 unique), 1 functions, 0 types, 0 enums, 0 sqls, 0 ords, 0 hashes
 running SQL generator
-"/home/ana/git/samples/exploring_aggregates/target/debug/sql-generator" "--sql" "/home/ana/.pgx/13.5/pgx-install/share/postgresql/extension/exploring_aggregates--0.0.0.sql"
-     Copying extension schema file to `/home/ana/.pgx/13.5/pgx-install/share/postgresql/extension/exploring_aggregates--0.0.0.sql`
+"/home/ana/git/samples/exploring_aggregates/target/debug/sql-generator" "--sql" "/home/ana/.pgrx/13.5/pgrx-install/share/postgresql/extension/exploring_aggregates--0.0.0.sql"
+     Copying extension schema file to `/home/ana/.pgrx/13.5/pgrx-install/share/postgresql/extension/exploring_aggregates--0.0.0.sql`
     Finished installing exploring_aggregates
     Starting Postgres v13 on port 28813
      Creating database exploring_aggregates
@@ -250,7 +250,7 @@ exploring_aggregates=#
 Observing the start of the `src/lib.rs` file, we can see the `pg_module_magic!()` and a function `hello_exploring_aggregates`:
 
 ```rust
-use pgx::*;
+use pgrx::*;
 
 pg_module_magic!();
 
@@ -283,7 +283,7 @@ SELECT hello_exploring_aggregates();
 Next, let's run the tests:
 
 ```bash
-$ cargo pgx test
+$ cargo pgrx test
 "cargo" "test" "--features" " pg_test"
     Finished test [unoptimized + debuginfo] target(s) in 0.08s
      Running unittests (target/debug/deps/exploring_aggregates-4783beb51375d29c)
@@ -294,13 +294,13 @@ building extension with features ` pg_test`
     Finished dev [unoptimized + debuginfo] target(s) in 0.41s
 
 installing extension
-     Copying control file to `/home/ana/.pgx/13.5/pgx-install/share/postgresql/extension/exploring_aggregates.control`
-     Copying shared library to `/home/ana/.pgx/13.5/pgx-install/lib/postgresql/exploring_aggregates.so`
+     Copying control file to `/home/ana/.pgrx/13.5/pgrx-install/share/postgresql/extension/exploring_aggregates.control`
+     Copying shared library to `/home/ana/.pgrx/13.5/pgrx-install/lib/postgresql/exploring_aggregates.so`
  Discovering SQL entities
   Discovered 3 SQL entities: 1 schemas (1 unique), 2 functions, 0 types, 0 enums, 0 sqls, 0 ords, 0 hashes, 0 aggregates
 running SQL generator
-"/home/ana/git/samples/exploring_aggregates/target/debug/sql-generator" "--sql" "/home/ana/.pgx/13.5/pgx-install/share/postgresql/extension/exploring_aggregates--0.0.0.sql"
-     Copying extension schema file to `/home/ana/.pgx/13.5/pgx-install/share/postgresql/extension/exploring_aggregates--0.0.0.sql`
+"/home/ana/git/samples/exploring_aggregates/target/debug/sql-generator" "--sql" "/home/ana/.pgrx/13.5/pgrx-install/share/postgresql/extension/exploring_aggregates--0.0.0.sql"
+     Copying extension schema file to `/home/ana/.pgrx/13.5/pgrx-install/share/postgresql/extension/exploring_aggregates--0.0.0.sql`
     Finished installing exploring_aggregates
 test tests::pg_test_hello_exploring_aggregates ... ok
 
@@ -324,7 +324,7 @@ test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; fini
 We can also inspect the SQL the extension generates:
 
 ```bash
-$ cargo pgx schema
+$ cargo pgrx schema
     Building SQL generator with features ``
 "cargo" "build" "--bin" "sql-generator"
     Finished dev [unoptimized + debuginfo] target(s) in 0.06s
@@ -338,7 +338,7 @@ This creates `sql/exploring_aggregates-0.0.0.sql`:
 
 ```sql
 /* 
-This file is auto generated by pgx.
+This file is auto generated by pgrx.
 
 The ordering of items is not stable, it is driven by a dependency graph.
 */
@@ -354,7 +354,7 @@ AS 'MODULE_PATHNAME', 'hello_exploring_aggregates_wrapper';
 Finally we can create a package for the `pg_config` version installed on the system, this is done in release mode, so it takes a few minutes:
 
 ```bash
-$ cargo pgx package
+$ cargo pgrx package
 building extension with features ``
 "cargo" "build" "--release"
     Finished release [optimized] target(s) in 0.07s
@@ -368,24 +368,24 @@ running SQL generator
     Finished installing exploring_aggregates
 ```
 
-Let's make some aggregates with `pgx` now!
+Let's make some aggregates with `pgrx` now!
 
-# Aggregates with [`pgx`][pgx]
+# Aggregates with [`pgrx`][pgrx]
 
-While designing the aggregate support for [`pgx`][pgx] 0.3.0 we wanted to try to make things feel idiomatic and natural from the Rust side,
+While designing the aggregate support for [`pgrx`][pgrx] 0.3.0 we wanted to try to make things feel idiomatic and natural from the Rust side,
 but it should be flexible enough for any use.
 
-Aggregates in `pgx` are defined by creating a type (this doesn't necessarily need to be the state type), then using the [`#[pg_aggregate]`][pgx-pg_aggregate]
-procedural macro on an [`pgx::Aggregate`][pgx-aggregate-aggregate] implementation for that type.
+Aggregates in `pgrx` are defined by creating a type (this doesn't necessarily need to be the state type), then using the [`#[pg_aggregate]`][pgrx-pg_aggregate]
+procedural macro on an [`pgrx::Aggregate`][pgrx-aggregate-aggregate] implementation for that type.
 
-The [`pgx::Aggregate`][pgx-aggregate-aggregate] trait has quite a few items (`fn`s, `const`s, `type`s) that you can implement, but the procedural macro can fill in
-stubs for all non-essential items. The state type (the implementation target by default) must have a [`#[derive(PostgresType)]`][pgx-postgrestype] declaration,
+The [`pgrx::Aggregate`][pgrx-aggregate-aggregate] trait has quite a few items (`fn`s, `const`s, `type`s) that you can implement, but the procedural macro can fill in
+stubs for all non-essential items. The state type (the implementation target by default) must have a [`#[derive(PostgresType)]`][pgrx-postgrestype] declaration,
 or be a type PostgreSQL already knows about.
 
-Here's the simplest aggregate you can make with `pgx`:
+Here's the simplest aggregate you can make with `pgrx`:
 
 ```rust
-use pgx::*;
+use pgrx::*;
 use serde::{Serialize, Deserialize};
 
 pg_module_magic!();
@@ -410,11 +410,11 @@ impl Aggregate for DemoSum {
 }
 ```
 
-We can review the generated SQL (generated via `cargo pgx schema`):
+We can review the generated SQL (generated via `cargo pgrx schema`):
 
 ```sql
 /* 
-This file is auto generated by pgx.
+This file is auto generated by pgrx.
 
 The ordering of items is not stable, it is driven by a dependency graph.
 */
@@ -472,23 +472,23 @@ CREATE AGGREGATE DemoSum (
 );
 ```
 
-We can test it out with `cargo pgx run`:
+We can test it out with `cargo pgrx run`:
 
 ```bash
-$ cargo pgx run
+$ cargo pgrx run
     Stopping Postgres v13
 building extension with features ``
 "cargo" "build"
     Finished dev [unoptimized + debuginfo] target(s) in 0.06s
 
 installing extension
-     Copying control file to `/home/ana/.pgx/13.5/pgx-install/share/postgresql/extension/exploring_aggregates.control`
-     Copying shared library to `/home/ana/.pgx/13.5/pgx-install/lib/postgresql/exploring_aggregates.so`
+     Copying control file to `/home/ana/.pgrx/13.5/pgrx-install/share/postgresql/extension/exploring_aggregates.control`
+     Copying shared library to `/home/ana/.pgrx/13.5/pgrx-install/lib/postgresql/exploring_aggregates.so`
  Discovering SQL entities
   Discovered 5 SQL entities: 0 schemas (0 unique), 3 functions, 1 types, 0 enums, 0 sqls, 0 ords, 0 hashes, 1 aggregates
 running SQL generator
-"/home/ana/git/samples/exploring_aggregates/target/debug/sql-generator" "--sql" "/home/ana/.pgx/13.5/pgx-install/share/postgresql/extension/exploring_aggregates--0.0.0.sql"
-     Copying extension schema file to `/home/ana/.pgx/13.5/pgx-install/share/postgresql/extension/exploring_aggregates--0.0.0.sql`
+"/home/ana/git/samples/exploring_aggregates/target/debug/sql-generator" "--sql" "/home/ana/.pgrx/13.5/pgrx-install/share/postgresql/extension/exploring_aggregates--0.0.0.sql"
+     Copying extension schema file to `/home/ana/.pgrx/13.5/pgrx-install/share/postgresql/extension/exploring_aggregates--0.0.0.sql`
     Finished installing exploring_aggregates
     Starting Postgres v13 on port 28813
     Re-using existing database exploring_aggregates
@@ -513,9 +513,9 @@ SELECT DemoSum(value) FROM generate_series(0, 4000) as value;
 
 Pretty cool!
 
-...But we don't want that silly `{"count": ... }` stuff, just the number! We can resolve this by changing the [`State`][pgx-aggregate-aggregate-state] type, or by adding a [`finalize`][pgx-aggregate-aggregate-finalize] (which maps to `ffunc`) as we saw in the previous section.
+...But we don't want that silly `{"count": ... }` stuff, just the number! We can resolve this by changing the [`State`][pgrx-aggregate-aggregate-state] type, or by adding a [`finalize`][pgrx-aggregate-aggregate-finalize] (which maps to `ffunc`) as we saw in the previous section.
 
-Let's change the [`State`][pgx-aggregate-aggregate-state] this time:
+Let's change the [`State`][pgrx-aggregate-aggregate-state] this time:
 
 ```rust
 #[derive(Copy, Clone, Default, Debug)]
@@ -548,7 +548,7 @@ SELECT DemoSum(value) FROM generate_series(0, 4000) as value;
 -- (1 row)
 ```
 
-This is a fine reimplementation of `SUM` so far, but as we saw previously we need a [`combine`][pgx-aggregate-aggregate-combine] (mapping to `combinefunc`) to support partial aggregation:
+This is a fine reimplementation of `SUM` so far, but as we saw previously we need a [`combine`][pgrx-aggregate-aggregate-combine] (mapping to `combinefunc`) to support partial aggregation:
 
 ```rust
 #[pg_aggregate]
@@ -565,14 +565,14 @@ impl Aggregate for DemoSum {
 }
 ```
 
-We can also change the name of the generated aggregate, or set the [`PARALLEL`][pgx-aggregate-aggregate-parallel] settings, for example:
+We can also change the name of the generated aggregate, or set the [`PARALLEL`][pgrx-aggregate-aggregate-parallel] settings, for example:
 
 ```rust
 #[pg_aggregate]
 impl Aggregate for DemoSum {
     // ...
     const NAME: &'static str = "demo_sum";
-    const PARALLEL: Option<ParallelOption> = Some(pgx::aggregate::ParallelOption::Unsafe);
+    const PARALLEL: Option<ParallelOption> = Some(pgrx::aggregate::ParallelOption::Unsafe);
     // ...
 }
 ```
@@ -596,14 +596,14 @@ CREATE AGGREGATE demo_sum (
 
 ## Rust state types
 
-It's possible to use a non-SQL (say, [`HashSet<String>`][std::collections::HashSet]) type as a state by using [`Internal`][pgx::datum::Internal].
+It's possible to use a non-SQL (say, [`HashSet<String>`][std::collections::HashSet]) type as a state by using [`Internal`][pgrx::datum::Internal].
 
 > When using this strategy, **a `finalize` function must be provided.**
 
 Here's a unique string counter aggregate that uses a `HashSet`:
 
 ```rust
-use pgx::*;
+use pgrx::*;
 use std::collections::HashSet;
 
 pg_module_magic!();
@@ -671,7 +671,7 @@ PostgreSQL also supports what are called [*Ordered-Set Aggregates*][postgresql-o
 
 > PostgreSQL does *not* order inputs behind the scenes!
 
-Let's create a simple `percentile_disc` reimplementation to get an idea of how to make one with `pgx`. You'll notice we add [`ORDERED_SET = true`][pgx::aggregate::Aggregate::ORDERED_SET] and set an (optional) [`OrderedSetArgs`][pgx::aggregate::Aggregate::OrderedSetArgs], which determines the direct arguments.
+Let's create a simple `percentile_disc` reimplementation to get an idea of how to make one with `pgrx`. You'll notice we add [`ORDERED_SET = true`][pgrx::aggregate::Aggregate::ORDERED_SET] and set an (optional) [`OrderedSetArgs`][pgrx::aggregate::Aggregate::OrderedSetArgs], which determines the direct arguments.
 
 ```rust
 #[derive(Copy, Clone, Default, Debug)]
@@ -723,7 +723,7 @@ CREATE AGGREGATE DemoPercentileDisc (
 )
 (
 	SFUNC = "demo_percentile_disc_state", /* exploring_aggregates::DemoPercentileDisc::state */
-	STYPE = internal, /* pgx::datum::internal::Internal */
+	STYPE = internal, /* pgrx::datum::internal::Internal */
 	FINALFUNC = "demo_percentile_disc_finalize" /* exploring_aggregates::DemoPercentileDisc::final */
 );
 ```
@@ -750,7 +750,7 @@ Aggregates can also support [*moving-aggregate mode*][postgresql-moving-aggregat
 
 This allows for some optimization if you are using aggregates as window functions. The documentation explains that this is because PostgreSQL doesn't need to recalculate the aggregate each time the frame starting point moves.
 
-Moving-aggregate mode has it's own [`moving_state`][pgx::aggregate::Aggregate::moving_state] function as well as an [`moving_state_inverse`][pgx::aggregate::Aggregate::moving_state_inverse] function for removing inputs. Because moving-aggregate mode may require some additional tracking on the part of the aggregate, there is also a [`MovingState`][pgx::aggregate::Aggregate::MovingState] associated type as well as a [`moving_state_finalize`][pgx::aggregate::Aggregate::moving_state_finalize] function for any specialized final computation.
+Moving-aggregate mode has it's own [`moving_state`][pgrx::aggregate::Aggregate::moving_state] function as well as an [`moving_state_inverse`][pgrx::aggregate::Aggregate::moving_state_inverse] function for removing inputs. Because moving-aggregate mode may require some additional tracking on the part of the aggregate, there is also a [`MovingState`][pgrx::aggregate::Aggregate::MovingState] associated type as well as a [`moving_state_finalize`][pgrx::aggregate::Aggregate::moving_state_finalize] function for any specialized final computation.
 
 Let's take our sum example above and add moving-aggregate mode support to it:
 
@@ -761,7 +761,7 @@ pub struct DemoSum;
 #[pg_aggregate]
 impl Aggregate for DemoSum {
     const NAME: &'static str = "demo_sum";
-    const PARALLEL: Option<ParallelOption> = Some(pgx::aggregate::ParallelOption::Unsafe);
+    const PARALLEL: Option<ParallelOption> = Some(pgrx::aggregate::ParallelOption::Unsafe);
     const INITIAL_CONDITION: Option<&'static str> = Some(r#"0"#);
     const MOVING_INITIAL_CONDITION: Option<&'static str> = Some(r#"0"#);
 
@@ -774,7 +774,7 @@ impl Aggregate for DemoSum {
         arg: Self::Args,
         _fcinfo: pg_sys::FunctionCallInfo,
     ) -> Self::State {
-        pgx::log!("state({}, {})", current, arg);
+        pgrx::log!("state({}, {})", current, arg);
         current += arg;
         current
     }
@@ -784,7 +784,7 @@ impl Aggregate for DemoSum {
         arg: Self::Args,
         _fcinfo: pg_sys::FunctionCallInfo,
     ) -> Self::MovingState {
-        pgx::log!("moving_state({}, {})", current, arg);
+        pgrx::log!("moving_state({}, {})", current, arg);
         current += arg;
         current
     }
@@ -794,7 +794,7 @@ impl Aggregate for DemoSum {
         arg: Self::Args,
         _fcinfo: pg_sys::FunctionCallInfo,
     ) -> Self::MovingState {
-        pgx::log!("moving_state_inverse({}, {})", current, arg);
+        pgrx::log!("moving_state_inverse({}, {})", current, arg);
         current -= arg;
         current
     }
@@ -804,7 +804,7 @@ impl Aggregate for DemoSum {
         second: Self::State,
         _fcinfo: pg_sys::FunctionCallInfo,
     ) -> Self::State {
-        pgx::log!("combine({}, {})", first, second);
+        pgrx::log!("combine({}, {})", first, second);
         first += second;
         first
     }
@@ -908,29 +908,29 @@ SELECT demo_sum(value) OVER (
 
 # Wrapping up
 
-I had a lot of fun implementing the aggregate support for [`pgx`][pgx], and hope you have just as much fun using it! If you have questions, open up an [issue][pgx-issues].
+I had a lot of fun implementing the aggregate support for [`pgrx`][pgrx], and hope you have just as much fun using it! If you have questions, open up an [issue][pgrx-issues].
 
 Moving-aggregate mode is pretty new to me, and I'm still learning about it! If you have any good resources I'd love to receive them from you!
 
 If you're looking for more materials about aggregates, the TimescaleDB folks wrote about aggregates and how they impacted their hyperfunctions in [this article][timescaledb-article-aggregation]. Also, My pal [Tim McNamara][timclicks] wrote about how to implement harmonic and geometric means as aggregates in [this article][timclicks-article-aggregates].
 
-[pgx]: https://github.com/zombodb/pgx
-[pgx-issues]: https://github.com/zombodb/pgx/issues
-[pgx-aggregate-aggregate]: https://docs.rs/pgx/0.3.0/pgx/aggregate/trait.Aggregate.html
-[pgx-aggregate-aggregate-finalize]: https://docs.rs/pgx/0.3.0/pgx/aggregate/trait.Aggregate.html#tymethod.finalize
-[pgx-aggregate-aggregate-state]: https://docs.rs/pgx/0.3.0/pgx/aggregate/trait.Aggregate.html#associatedtype.State
-[pgx-aggregate-aggregate-combine]: https://docs.rs/pgx/0.3.0/pgx/aggregate/trait.Aggregate.html#tymethod.combine
-[pgx-aggregate-aggregate-parallel]: https://docs.rs/pgx/0.3.0/pgx/aggregate/trait.Aggregate.html#associatedconstant.PARALLEL
-[pgx::aggregate::Aggregate::ORDERED_SET]: https://docs.rs/pgx/0.3.0/pgx/aggregate/trait.Aggregate.html#associatedconstant.ORDERED_SET
-[pgx::aggregate::Aggregate::OrderedSetArgs]: https://docs.rs/pgx/0.3.0/pgx/aggregate/trait.Aggregate.html#associatedtype.OrderedSetArgs
-[pgx::aggregate::Aggregate::moving_state]: https://docs.rs/pgx/0.3.0/pgx/aggregate/trait.Aggregate.html#tymethod.moving_state
-[pgx::aggregate::Aggregate::moving_state_inverse]: https://docs.rs/pgx/0.3.0/pgx/aggregate/trait.Aggregate.html#tymethod.moving_state_inverse
-[pgx::aggregate::Aggregate::MovingState]: https://docs.rs/pgx/0.3.0/pgx/aggregate/trait.Aggregate.html#associatedtype.MovingState
-[pgx::aggregate::Aggregate::moving_state_finalize]: https://docs.rs/pgx/0.3.0/pgx/aggregate/trait.Aggregate.html#tymethod.moving_finalize
-[pgx::datum::Internal]: https://docs.rs/pgx/0.3.0/pgx/datum/struct.Internal.html
-[pgx-pg_aggregate]: https://docs.rs/pgx/0.3.0/pgx/attr.pg_aggregate.html
-[pgx-postgrestype]: https://docs.rs/pgx/0.3.0/pgx/derive.PostgresType.html
-[pgx-system-requirements]: https://github.com/zombodb/pgx#system-requirements
+[pgrx]: https://github.com/zombodb/pgrx
+[pgrx-issues]: https://github.com/zombodb/pgrx/issues
+[pgrx-aggregate-aggregate]: https://docs.rs/pgrx/0.3.0/pgrx/aggregate/trait.Aggregate.html
+[pgrx-aggregate-aggregate-finalize]: https://docs.rs/pgrx/0.3.0/pgrx/aggregate/trait.Aggregate.html#tymethod.finalize
+[pgrx-aggregate-aggregate-state]: https://docs.rs/pgrx/0.3.0/pgrx/aggregate/trait.Aggregate.html#associatedtype.State
+[pgrx-aggregate-aggregate-combine]: https://docs.rs/pgrx/0.3.0/pgrx/aggregate/trait.Aggregate.html#tymethod.combine
+[pgrx-aggregate-aggregate-parallel]: https://docs.rs/pgrx/0.3.0/pgrx/aggregate/trait.Aggregate.html#associatedconstant.PARALLEL
+[pgrx::aggregate::Aggregate::ORDERED_SET]: https://docs.rs/pgrx/0.3.0/pgrx/aggregate/trait.Aggregate.html#associatedconstant.ORDERED_SET
+[pgrx::aggregate::Aggregate::OrderedSetArgs]: https://docs.rs/pgrx/0.3.0/pgrx/aggregate/trait.Aggregate.html#associatedtype.OrderedSetArgs
+[pgrx::aggregate::Aggregate::moving_state]: https://docs.rs/pgrx/0.3.0/pgrx/aggregate/trait.Aggregate.html#tymethod.moving_state
+[pgrx::aggregate::Aggregate::moving_state_inverse]: https://docs.rs/pgrx/0.3.0/pgrx/aggregate/trait.Aggregate.html#tymethod.moving_state_inverse
+[pgrx::aggregate::Aggregate::MovingState]: https://docs.rs/pgrx/0.3.0/pgrx/aggregate/trait.Aggregate.html#associatedtype.MovingState
+[pgrx::aggregate::Aggregate::moving_state_finalize]: https://docs.rs/pgrx/0.3.0/pgrx/aggregate/trait.Aggregate.html#tymethod.moving_finalize
+[pgrx::datum::Internal]: https://docs.rs/pgrx/0.3.0/pgrx/datum/struct.Internal.html
+[pgrx-pg_aggregate]: https://docs.rs/pgrx/0.3.0/pgrx/attr.pg_aggregate.html
+[pgrx-postgrestype]: https://docs.rs/pgrx/0.3.0/pgrx/derive.PostgresType.html
+[pgrx-system-requirements]: https://github.com/zombodb/pgrx#system-requirements
 [plrust]: https://github.com/zombodb/plrust
 [rustup-rs]: https://rustup.rs/
 [wsl]: https://docs.microsoft.com/en-us/windows/wsl/install

@@ -11,10 +11,10 @@
 DIR=`pwd`
 set -x
 
-cd $DIR/pgx-pg-config && cargo publish
-cd $DIR/pgx-sql-entity-graph && cargo publish
-cd $DIR/pgx-macros && cargo publish
-cd $DIR/pgx-pg-sys && cargo publish --no-verify
-cd $DIR/pgx && cargo publish --no-verify
-cd $DIR/pgx-tests && cargo publish --no-verify
-cd $DIR/cargo-pgx && cargo publish # cargo-pgx last so the templates are correct
+cd $DIR/pgrx-pg-config && cargo publish
+cd $DIR/pgrx-sql-entity-graph && cargo publish
+cd $DIR/pgrx-macros && cargo publish
+cd $DIR/pgrx-pg-sys && cargo publish --no-verify
+cd $DIR/pgrx && cargo publish --no-verify
+cd $DIR/pgrx-tests && cargo publish --no-verify
+cd $DIR/cargo-pgrx && cargo publish # cargo-pgrx last so the templates are correct

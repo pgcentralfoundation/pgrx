@@ -1,4 +1,4 @@
-name: Run PGX tests
+name: Run PGRX tests
 
 on:
   push:
@@ -18,8 +18,8 @@ env:
   # CARGO_LOG: cargo::core::compiler::fingerprint=info # Uncomment this to output compiler fingerprint info
 
 jobs:
-  pgx_tests:
-    name: pgx-tests & examples
+  pgrx_tests:
+    name: pgrx-tests & examples
     runs-on: ${{ matrix.os }}
     if: "!contains(github.event.head_commit.message, 'nogha')"
     env:
@@ -111,14 +111,14 @@ jobs:
         path: |
           ~/.cargo/registry
           ~/.cargo/git
-        key: pgx-tests-cargo-${{ runner.os }}-${{ hashFiles('**/Cargo.lock', '.github/workflows/tests.yml') }}
+        key: pgrx-tests-cargo-${{ runner.os }}-${{ hashFiles('**/Cargo.lock', '.github/workflows/tests.yml') }}
 
     - name: Cache sccache directory
       uses: actions/cache@v3
       continue-on-error: false
       with:
         path: /home/runner/.cache/sccache
-        key: pgx-tests-sccache-${{ runner.os }}-${{ hashFiles('**/Cargo.lock', '.github/workflows/tests.yml') }}
+        key: pgrx-tests-sccache-${{ runner.os }}-${{ hashFiles('**/Cargo.lock', '.github/workflows/tests.yml') }}
 
     - name: Start sccache server
       run: sccache --start-server
@@ -126,40 +126,40 @@ jobs:
     - name: Print sccache stats (before run)
       run: sccache --show-stats
 
-    - name: Install cargo-pgx
-      run: cargo install --path cargo-pgx/ --debug --force
+    - name: Install cargo-pgrx
+      run: cargo install --path cargo-pgrx/ --debug --force
 
-    - name: Run 'cargo pgx init' against system-level ${{ matrix.version }}
-      run: cargo pgx init --pg$PG_VER /usr/lib/postgresql/$PG_VER/bin/pg_config
+    - name: Run 'cargo pgrx init' against system-level ${{ matrix.version }}
+      run: cargo pgrx init --pg$PG_VER /usr/lib/postgresql/$PG_VER/bin/pg_config
 
     - name: Run base-level tests
       run: |
         cargo test \
           --features "pg$PG_VER" \
-          --package cargo-pgx \
-          --package pgx \
-          --package pgx-macros \
-          --package pgx-pg-sys \
-          --package pgx-sql-entity-graph
+          --package cargo-pgrx \
+          --package pgrx \
+          --package pgrx-macros \
+          --package pgrx-pg-sys \
+          --package pgrx-sql-entity-graph
 
-    - name: Check that cross-compiled pgx-tests can build
+    - name: Check that cross-compiled pgrx-tests can build
       run: |
         cargo build --tests \
           --features "pg$PG_VER" \
-          --package pgx-tests \
+          --package pgrx-tests \
           --target aarch64-unknown-linux-gnu
 
-    - name: Run pgx-tests with cshim enabled
+    - name: Run pgrx-tests with cshim enabled
       run: |
         cargo test \
           --features "pg$PG_VER cshim" \
-          --package pgx-tests
+          --package pgrx-tests
 
-    - name: Run pgx-tests with cshim disabled
+    - name: Run pgrx-tests with cshim disabled
       run: |
         cargo test \
           --features "pg$PG_VER" \
-          --package pgx-tests
+          --package pgrx-tests
 
     - name: Run aggregate example tests
       run: cargo test --package aggregate --features "pg$PG_VER" --no-default-features
@@ -231,7 +231,7 @@ jobs:
       run: cargo test --package versioned_so --features "pg$PG_VER" --no-default-features
 
     # Attempt to make the cache payload slightly smaller.
-    - name: Clean up built PGX files
+    - name: Clean up built PGRX files
       run: |
         cd target/debug/deps/
         for built_file in $(find * -type f -executable -print | grep -v "\.so$"); do
@@ -248,8 +248,8 @@ jobs:
     - name: Stop sccache server
       run: sccache --stop-server || true
 
-  cargo_pgx_init:
-    name: cargo pgx init
+  cargo_pgrx_init:
+    name: cargo pgrx init
     runs-on: ${{ matrix.os }}
     if: "!contains(github.event.head_commit.message, 'nogha')"
     env:
@@ -325,14 +325,14 @@ jobs:
         path: |
           ~/.cargo/registry
           ~/.cargo/git
-        key: pgx-cargo_init_tests-cargo-${{ runner.os }}-${{ hashFiles('**/Cargo.lock', '.github/workflows/tests.yml') }}
+        key: pgrx-cargo_init_tests-cargo-${{ runner.os }}-${{ hashFiles('**/Cargo.lock', '.github/workflows/tests.yml') }}
 
     - name: Cache sccache directory
       uses: actions/cache@v3
       continue-on-error: false
       with:
         path: /home/runner/.cache/sccache
-        key: pgx-cargo_init_tests-sccache-${{ runner.os }}-${{ hashFiles('**/Cargo.lock', '.github/workflows/tests.yml') }}
+        key: pgrx-cargo_init_tests-sccache-${{ runner.os }}-${{ hashFiles('**/Cargo.lock', '.github/workflows/tests.yml') }}
 
     - name: Start sccache server
       run: sccache --start-server
@@ -343,28 +343,28 @@ jobs:
     - name: Run rustfmt
       run: cargo fmt --all -- --check
 
-    - name: Install cargo-pgx
-      run: cargo install --path cargo-pgx/ --debug --force
+    - name: Install cargo-pgrx
+      run: cargo install --path cargo-pgrx/ --debug --force
 
-    - name: Run 'cargo pgx init' for ${{ matrix.version }}
-      run: cargo pgx init --pg$PG_VER download
+    - name: Run 'cargo pgrx init' for ${{ matrix.version }}
+      run: cargo pgrx init --pg$PG_VER download
 
     - name: create new sample extension
-      run: cd /tmp/ && cargo pgx new sample
+      run: cd /tmp/ && cargo pgrx new sample
 
-    # hack Cargo.toml to use this version of pgx from github
+    # hack Cargo.toml to use this version of pgrx from github
     - name: hack Cargo.toml
       run: |
        echo "[patch.crates-io]" >> /tmp/sample/Cargo.toml
-       echo "pgx        = { path = \"${GITHUB_WORKSPACE}/pgx\"        }" >> /tmp/sample/Cargo.toml
-       echo "pgx-macros = { path = \"${GITHUB_WORKSPACE}/pgx-macros\" }" >> /tmp/sample/Cargo.toml
-       echo "pgx-tests  = { path = \"${GITHUB_WORKSPACE}/pgx-tests\"  }" >> /tmp/sample/Cargo.toml
+       echo "pgrx        = { path = \"${GITHUB_WORKSPACE}/pgrx\"        }" >> /tmp/sample/Cargo.toml
+       echo "pgrx-macros = { path = \"${GITHUB_WORKSPACE}/pgrx-macros\" }" >> /tmp/sample/Cargo.toml
+       echo "pgrx-tests  = { path = \"${GITHUB_WORKSPACE}/pgrx-tests\"  }" >> /tmp/sample/Cargo.toml
 
     - name: show Cargo.toml
       run: cat /tmp/sample/Cargo.toml
 
     - name: Test sample for ${{ matrix.version }}
-      run: cd /tmp/sample && cargo pgx test pg$PG_VER
+      run: cd /tmp/sample && cargo pgrx test pg$PG_VER
 
     - name: Stop sccache server
       run: sccache --stop-server || true
@@ -416,7 +416,7 @@ jobs:
       continue-on-error: false
       with:
         path: /Users/runner/Library/Caches/Mozilla.sccache
-        key: pgx-sccache-macos-11-${{ hashFiles('**/Cargo.lock', '.github/workflows/tests.yml') }}
+        key: pgrx-sccache-macos-11-${{ hashFiles('**/Cargo.lock', '.github/workflows/tests.yml') }}
 
     - name: Start sccache server
       run: sccache --start-server
@@ -430,27 +430,27 @@ jobs:
         path: |
           ~/.cargo/registry
           ~/.cargo/git
-        key: pgx-macos-11-tests-${{ hashFiles('**/Cargo.lock', '.github/workflows/tests.yml') }}
+        key: pgrx-macos-11-tests-${{ hashFiles('**/Cargo.lock', '.github/workflows/tests.yml') }}
 
-    - name: Install cargo-pgx
-      run: cargo install --path cargo-pgx/ --debug --force
+    - name: Install cargo-pgrx
+      run: cargo install --path cargo-pgrx/ --debug --force
 
-    - name: Run 'cargo pgx init'
+    - name: Run 'cargo pgrx init'
       run: |
         set -x
-        cargo pgx init --pg$PG_VER $(which pg_config)
+        cargo pgrx init --pg$PG_VER $(which pg_config)
 
     - name: Run base-level tests
       run: |
         set -x
         cargo test \
           --features "pg$PG_VER" --no-default-features \
-          --package cargo-pgx \
-          --package pgx \
-          --package pgx-macros \
-          --package pgx-pg-sys \
-          --package pgx-tests \
-          --package pgx-sql-entity-graph
+          --package cargo-pgrx \
+          --package pgrx \
+          --package pgrx-macros \
+          --package pgrx-pg-sys \
+          --package pgrx-tests \
+          --package pgrx-sql-entity-graph
 
     - name: Stop sccache server
       run: sccache --stop-server || true
