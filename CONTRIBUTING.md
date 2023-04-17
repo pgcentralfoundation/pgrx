@@ -6,20 +6,20 @@ System Requirements:
 
 If you want to be ready to open a PR, you will want to run
 ```bash
-git clone --branch develop "https://github.com/tcdi/pgx"
-cd pgx
+git clone --branch develop "https://github.com/tcdi/pgrx"
+cd pgrx
 ```
 That will put you in a cloned repository with the *develop* branch opened,
 which is the one you will be opening pull requests against in most cases.
 
 After cloning the repository, mostly you can use similar flows as in the README.
-However, if there are any differences in `cargo pgx` since the last release, then
+However, if there are any differences in `cargo pgrx` since the last release, then
 the first and most drastic difference in the developer environment vs. the user environment is that you will have to run
 ```bash
-cargo install cargo-pgx --path ./cargo-pgx \
+cargo install cargo-pgrx --path ./cargo-pgrx \
     --force \
     --locked # This forces usage of the repo's lockfile
-cargo pgx init # This might take a while. Consider getting a drink.
+cargo pgrx init # This might take a while. Consider getting a drink.
 ```
 
 ## Pull Requests (PRs)
@@ -27,9 +27,9 @@ cargo pgx init # This might take a while. Consider getting a drink.
 - Pull requests for new code or bugfixes should be submitted against develop
 - All pull requests against develop will be squashed on merge
 - Tests are *expected* to pass before merging
-- PGX tests PRs on rustfmt so please run `cargo fmt` before you submit
+- PGRX tests PRs on rustfmt so please run `cargo fmt` before you submit
 - Diffs in Cargo.lock should be checked in
-- HOWEVER, diffs in the bindgen in `pgx-pg-sys/src/pg*.rs` should **not** be checked in (this is a release task)
+- HOWEVER, diffs in the bindgen in `pgrx-pg-sys/src/pg*.rs` should **not** be checked in (this is a release task)
 
 ### Adding Dependencies
 
@@ -57,19 +57,19 @@ bitflags = "1.3.2" # BackgroundWorker
 bitvec = "1.0" # processing array nullbitmaps
 ```
 
-You do not need exceptional justification notes in your PR to justify a new dependency as your code will, in most cases, self-evidently justify the use of the dependency. PGX uses the normal Rust approach of using dependencies based on their ability to improve correctness and make features possible. It does not reimplement things already available in the Rust ecosystem unless the addition is trivial (do not add custom derives to save 5~10 lines of code in one site) or the ecosystem crates are not compatible with Postgres (unfortunately common for Postgres data types).
+You do not need exceptional justification notes in your PR to justify a new dependency as your code will, in most cases, self-evidently justify the use of the dependency. PGRX uses the normal Rust approach of using dependencies based on their ability to improve correctness and make features possible. It does not reimplement things already available in the Rust ecosystem unless the addition is trivial (do not add custom derives to save 5~10 lines of code in one site) or the ecosystem crates are not compatible with Postgres (unfortunately common for Postgres data types).
 
 ## Releases
 
-On a new PGX release, *develop* will be merged to *master* via merge commit.
+On a new PGRX release, *develop* will be merged to *master* via merge commit.
 <!-- it's somewhat ambiguous whether we do this for stable or also "release candidate" releases -->
 
 ### Release Candidates AKA Betas
-PGX prefers using `x.y.z-{alpha,beta}.n` format for naming release candidates,
+PGRX prefers using `x.y.z-{alpha,beta}.n` format for naming release candidates,
 starting at `alpha.0` if the new release candidate does not seem "feature complete",
 or at `beta.0` if it is not expected to need new feature work. Remember that `beta` will supersede `alpha` in versions for users who don't pin a version.
 
-Publishing PGX is somewhat fraught, as all the crates really are intended to be published together as a single unit. There's no way to do a "dry run" of publishing multiple crates. Thus, it may be a good idea, when going from `m.n.o` to `m.n.p`, to preferentially publish `m.n.p-beta.0` instead of `m.n.p`, even if you are reasonably confident that **nothing** will happen.
+Publishing PGRX is somewhat fraught, as all the crates really are intended to be published together as a single unit. There's no way to do a "dry run" of publishing multiple crates. Thus, it may be a good idea, when going from `m.n.o` to `m.n.p`, to preferentially publish `m.n.p-beta.0` instead of `m.n.p`, even if you are reasonably confident that **nothing** will happen.
 
 ### Checklist
 Do this *in order*:
@@ -77,12 +77,12 @@ Do this *in order*:
 - [ ] Assign an appropriate value to `NEW_RELEASE_VERSION`
 - [ ] Draft release notes for `${NEW_RELEASE_VERSION}`
 - [ ] Run `./update-versions.sh "${NEW_RELEASE_VERSION}"`
-    - This will update the visible bindings of `pgx-pg-sys/src/pg*.rs`
-    - The visible bindings are for reference, [docs][pgx@docs.rs], and tools
+    - This will update the visible bindings of `pgrx-pg-sys/src/pg*.rs`
+    - The visible bindings are for reference, [docs][pgrx@docs.rs], and tools
     - Actual users of the library rebuild the bindings from scratch
 - [ ] Run `./upgrade-deps.sh`
 - [ ] Push the resulting diffs to *develop*
-- [ ] Run `./publish.sh` to push the new version to [pgx@crates.io]
+- [ ] Run `./publish.sh` to push the new version to [pgrx@crates.io]
     - If there was an error during publishing:
     - [ ] fix the error source
     - [ ] push any resulting diffs to *develop*
@@ -98,10 +98,10 @@ Do this *in order*:
 
 ## Licensing
 
-You agree that all code you submit in pull requests to https://github.com/tcdi/pgx/pulls
+You agree that all code you submit in pull requests to https://github.com/tcdi/pgrx/pulls
 is offered according to the MIT License, thus may be freely relicensed and sublicensed,
 and that you are satisfied with the existing copyright notice as of opening your PR.
 
 [crates.io]: https://crates.io
-[pgx@crates.io]: https://crates.io/crates/pgxa
-[pgx@docs.rs]: https://docs.rs/pgx/latest/pgx
+[pgrx@crates.io]: https://crates.io/crates/pgrxa
+[pgrx@docs.rs]: https://docs.rs/pgrx/latest/pgrx

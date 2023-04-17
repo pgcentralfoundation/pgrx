@@ -1,7 +1,7 @@
-# Safety of `pgx`
+# Safety of `pgrx`
 
-Documentation for invariants that `pgx` relies on for the soundness of its Rust interface,
-or ways that `pgx` compensates for assumed non-invariants, or just notes about
+Documentation for invariants that `pgrx` relies on for the soundness of its Rust interface,
+or ways that `pgrx` compensates for assumed non-invariants, or just notes about
 the quirks of Postgres that have been discovered.
 
 Specific functions will have their safety conditions documented on them,

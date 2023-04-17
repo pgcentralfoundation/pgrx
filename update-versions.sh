@@ -9,7 +9,7 @@
 # the LICENSE file.
 
 # requires:
-# * pgx-version-updater (no intervention required -- built on demand from this project)
+# * pgrx-version-updater (no intervention required -- built on demand from this project)
 #
 # To run this with more output, set environment variable VERBOSE to either 1 or true. E.g.
 #   $ VERBOSE=1 ./update-versions.sh 1.6.0
@@ -33,30 +33,30 @@ else
 fi
 
 # INCLUDE_FOR_DEP_UPDATES specifies an array of relative paths that point to Cargo
-# TOML files that are not automatically found by the pgx-version-updater tool but
-# still have PGX dependencies that require updating.
+# TOML files that are not automatically found by the pgrx-version-updater tool but
+# still have PGRX dependencies that require updating.
 INCLUDE_FOR_DEP_UPDATES=(
-  'cargo-pgx/src/templates/cargo_toml'
+  'cargo-pgrx/src/templates/cargo_toml'
   'nix/templates/default/Cargo.toml'
 )
 
 # EXCLUDE_FROM_VERSION_BUMP specifies an array of relative paths that point to
 # Cargo TOML files that should be *excluded* from package version bumps. Also used
-# below to include all pgx-example Cargo TOML files since they do not get their
+# below to include all pgrx-example Cargo TOML files since they do not get their
 # versions bumped at release time.
 EXCLUDE_FROM_VERSION_BUMP=(
-  'cargo-pgx/src/templates/cargo_toml'
+  'cargo-pgrx/src/templates/cargo_toml'
   'nix/templates/default/Cargo.toml'
-  'pgx-version-updater/Cargo.toml'
+  'pgrx-version-updater/Cargo.toml'
 )
 
-# Exclude all pgx-examples Cargo.toml files from version bumping
-for file in pgx-examples/**/Cargo.toml; do
+# Exclude all pgrx-examples Cargo.toml files from version bumping
+for file in pgrx-examples/**/Cargo.toml; do
   EXCLUDE_FROM_VERSION_BUMP+=("$file")
 done
 
 # shellcheck disable=SC2086,SC2068
-cargo run --bin pgx-version-updater \
+cargo run --bin pgrx-version-updater \
   update-files \
   --update-version "$VERSION" \
   ${INCLUDE_FOR_DEP_UPDATES[@]/#/-i } \
@@ -68,6 +68,6 @@ echo "Upgrading dependency versions"
 ./upgrade-deps.sh
 
 echo "Generating bindings -- this may take a few moments"
-PGX_PG_SYS_GENERATE_BINDINGS_FOR_RELEASE=1 cargo test --no-run $CARGO_QUIET_FLAG --workspace --no-default-features --features "pg14"
+PGRX_PG_SYS_GENERATE_BINDINGS_FOR_RELEASE=1 cargo test --no-run $CARGO_QUIET_FLAG --workspace --no-default-features --features "pg14"
 
 echo "Done!"

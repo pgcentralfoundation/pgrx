@@ -2,7 +2,7 @@
 , naersk
 , stdenv
 , clangStdenv
-, cargo-pgx
+, cargo-pgrx
 , hostPlatform
 , targetPlatform
 , pkg-config
@@ -22,23 +22,23 @@
 let
   maybeReleaseFlag = if release == true then "--release" else "";
   maybeDebugFlag = if release == true then "" else "--debug";
-  pgxPostgresMajor = builtins.head (lib.splitString "." targetPostgres.version);
+  pgrxPostgresMajor = builtins.head (lib.splitString "." targetPostgres.version);
   cargoToml = (builtins.fromTOML (builtins.readFile "${source}/Cargo.toml"));
   preBuildAndTest = ''
-    export PGX_HOME=$(mktemp -d)
-    mkdir -p $PGX_HOME/${pgxPostgresMajor}
+    export PGRX_HOME=$(mktemp -d)
+    mkdir -p $PGRX_HOME/${pgrxPostgresMajor}
 
-    cp -r -L ${targetPostgres}/. $PGX_HOME/${pgxPostgresMajor}/
-    chmod -R ugo+w $PGX_HOME/${pgxPostgresMajor}
-    cp -r -L ${targetPostgres.lib}/lib/. $PGX_HOME/${pgxPostgresMajor}/lib/
+    cp -r -L ${targetPostgres}/. $PGRX_HOME/${pgrxPostgresMajor}/
+    chmod -R ugo+w $PGRX_HOME/${pgrxPostgresMajor}
+    cp -r -L ${targetPostgres.lib}/lib/. $PGRX_HOME/${pgrxPostgresMajor}/lib/
 
-    ${cargo-pgx}/bin/cargo-pgx pgx init \
-      --pg${pgxPostgresMajor} $PGX_HOME/${pgxPostgresMajor}/bin/pg_config \
+    ${cargo-pgrx}/bin/cargo-pgrx pgrx init \
+      --pg${pgrxPostgresMajor} $PGRX_HOME/${pgrxPostgresMajor}/bin/pg_config \
 
     # This is primarily for Mac or other Nix systems that don't use the nixbld user.
     export USER=$(whoami)
-    export PGDATA=$PGX_HOME/data-${pgxPostgresMajor}/
-    export NIX_PGLIBDIR=$PGX_HOME/${pgxPostgresMajor}/lib
+    export PGDATA=$PGRX_HOME/data-${pgrxPostgresMajor}/
+    export NIX_PGLIBDIR=$PGRX_HOME/${pgrxPostgresMajor}/lib
 
     echo "unix_socket_directories = '$(mktemp -d)'" > $PGDATA/postgresql.conf 
     ${targetPostgres}/bin/pg_ctl start
@@ -62,23 +62,23 @@ in
 
 naersk.lib."${targetPlatform.system}".buildPackage rec {
   inherit release doCheck;
-  name = "${cargoToml.package.name}-pg${pgxPostgresMajor}";
+  name = "${cargoToml.package.name}-pg${pgrxPostgresMajor}";
   version = cargoToml.package.version;
 
   src = gitignoreSource source;
 
-  inputsFrom = [ targetPostgres cargo-pgx ];
+  inputsFrom = [ targetPostgres cargo-pgrx ];
 
   LIBCLANG_PATH = "${llvmPackages.libclang.lib}/lib";
   buildInputs = [
     rust-bin.stable.latest.default
-    cargo-pgx
+    cargo-pgrx
     pkg-config
     libiconv
     targetPostgres
   ];
   checkInputs = [
-    cargo-pgx
+    cargo-pgrx
     rust-bin.stable.latest.default
   ];
 
@@ -88,26 +88,26 @@ naersk.lib."${targetPlatform.system}".buildPackage rec {
   postBuild = ''
     if [ -f "${cargoToml.package.name}.control" ]; then
       export NIX_PGLIBDIR=${targetPostgres.out}/share/postgresql/extension/
-      ${cargo-pgx}/bin/cargo-pgx pgx package --pg-config ${targetPostgres}/bin/pg_config ${maybeDebugFlag} --features "${builtins.toString additionalFeatures}" --out-dir $out
-      export NIX_PGLIBDIR=$PGX_HOME/${pgxPostgresMajor}/lib
+      ${cargo-pgrx}/bin/cargo-pgrx pgrx package --pg-config ${targetPostgres}/bin/pg_config ${maybeDebugFlag} --features "${builtins.toString additionalFeatures}" --out-dir $out
+      export NIX_PGLIBDIR=$PGRX_HOME/${pgrxPostgresMajor}/lib
     fi
   '';
   # Certain extremely slow machines (Github actions...) don't clean up their socket properly.
   preFixup = ''
     if [ -f "${cargoToml.package.name}.control" ]; then
-      ${cargo-pgx}/bin/cargo-pgx pgx stop all
+      ${cargo-pgrx}/bin/cargo-pgrx pgrx stop all
 
       mv -v $out/${targetPostgres.out}/* $out
       rm -rfv $out/nix
     fi
   '';
 
-  PGX_PG_SYS_SKIP_BINDING_REWRITE = "1";
+  PGRX_PG_SYS_SKIP_BINDING_REWRITE = "1";
   CARGO_BUILD_INCREMENTAL = "false";
   RUST_BACKTRACE = "full";
 
-  cargoBuildOptions = default: default ++ [ "--no-default-features" "--features \"pg${pgxPostgresMajor} ${builtins.toString additionalFeatures}\"" ];
-  cargoTestOptions = default: default ++ [ "--no-default-features" "--features \"pg_test pg${pgxPostgresMajor} ${builtins.toString additionalFeatures}\"" ];
+  cargoBuildOptions = default: default ++ [ "--no-default-features" "--features \"pg${pgrxPostgresMajor} ${builtins.toString additionalFeatures}\"" ];
+  cargoTestOptions = default: default ++ [ "--no-default-features" "--features \"pg_test pg${pgrxPostgresMajor} ${builtins.toString additionalFeatures}\"" ];
   doDoc = false;
   copyLibs = false;
   copyBins = false;

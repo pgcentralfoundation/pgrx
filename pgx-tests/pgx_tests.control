@@ -1,5 +1,0 @@
-comment = 'tests:  Created by pgx'
-default_version = '1.0'
-module_pathname = '$libdir/pgx_tests'
-relocatable = false
-superuser = false

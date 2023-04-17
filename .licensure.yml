@@ -3,14 +3,14 @@ excludes:
   - Cargo.toml
   - Cargo.lock
   - LICENSE
-  - pgx-sql-entity-graph/assets/ansi.tmTheme
+  - pgrx-sql-entity-graph/assets/ansi.tmTheme
   - ".envrc"
   - ".gitignore"
   - "flake\\..*"
   - "logo.*"
   - ".github/**/*"
   - ".cargo/config"
-  - "cargo-pgx/src/templates/*"
+  - "cargo-pgrx/src/templates/*"
   - ".*\\.control"
   - ".*\\.md"
   - ".*\\.nix"
