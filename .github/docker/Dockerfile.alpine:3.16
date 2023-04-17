@@ -5,7 +5,7 @@
 #   docker run pgrx-alpine cargo test --no-default-features --features pg14 --locked
 #
 # Note that "PG_MAJOR_VER" build arg in the build step must match the
-# "--features pgrxX" in the run step
+# "--features pgXX" in the run step
 
 ARG PG_MAJOR_VER
 # Use Postgres' official alpine version, it's just easier that way

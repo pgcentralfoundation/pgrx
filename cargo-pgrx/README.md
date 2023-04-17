@@ -118,7 +118,7 @@ For any version you specify, `cargo pgrx init` will forego downloading/compiling
 
 However, if the "path to pg_config" is the literal string `download`, then `pgrx` will download and compile that version of Postgres for you.
 
-When the various `--pgrxX` options are specified, these are the **only** versions of Postgres that `pgrx` will manage for you.
+When the various `--pgXX` options are specified, these are the **only** versions of Postgres that `pgrx` will manage for you.
 
 You'll also want to make sure you have the "postgresql-server-dev" package installed for each version you want to manage yourself.
 
@@ -280,9 +280,9 @@ strings=# select strings.to_lowercase('PGRX');
 
 `cargo pgrx run <pg11 | pg12 | pg13 | pg14 | pg15>` is the primary interface into compiling and interactively testing/using your extension during development.
 
-The very first time you execute `cargo pgrx run pgrxX`, it needs to compile not only your extension, but pgrx itself, along with all its dependencies. Depending on your computer, this could take a bit of time (`pgrx` is nearly 200k lines of Rust when counting the generated bindings for Postgres). Afterwards, however (as seen in the above screenshot), it's fairly fast.
+The very first time you execute `cargo pgrx run pgXX`, it needs to compile not only your extension, but pgrx itself, along with all its dependencies. Depending on your computer, this could take a bit of time (`pgrx` is nearly 200k lines of Rust when counting the generated bindings for Postgres). Afterwards, however (as seen in the above screenshot), it's fairly fast.
 
-`cargo pgrx run` compiles your extension, installs it to the specified Postgres installation as described by its `pg_config` tool, starts that Postgres instance using the same process as `cargo pgrx start pgrxX`, and drops you into a `psql` shell connected to a database, by default, named after your extension. From there, it's up to you to create your extension and use it.
+`cargo pgrx run` compiles your extension, installs it to the specified Postgres installation as described by its `pg_config` tool, starts that Postgres instance using the same process as `cargo pgrx start pgXX`, and drops you into a `psql` shell connected to a database, by default, named after your extension. From there, it's up to you to create your extension and use it.
 
 This is also the stage where `pgrx` automatically generates the SQL schema for your extension via the `sql-generator` binary.
 
@@ -630,7 +630,7 @@ OPTIONS:
 
         --out-dir <OUT_DIR>
             The directory to output the package (default is
-            `./target/[debug|release]/extname-pgrxX/`)
+            `./target/[debug|release]/extname-pgXX/`)
 
     -p, --package <PACKAGE>
             Package to build (see `cargo help pkgid`)

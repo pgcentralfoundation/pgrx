@@ -38,7 +38,7 @@ pub(crate) struct Package {
     /// The `pg_config` path (default is first in $PATH)
     #[clap(long, short = 'c', value_parser)]
     pg_config: Option<PathBuf>,
-    /// The directory to output the package (default is `./target/[debug|release]/extname-pgrxX/`)
+    /// The directory to output the package (default is `./target/[debug|release]/extname-pgXX/`)
     #[clap(long, value_parser)]
     out_dir: Option<PathBuf>,
     #[clap(flatten)]

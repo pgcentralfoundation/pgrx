@@ -125,7 +125,7 @@ unsafe impl SqlTranslatable for Oid {
     }
 }
 
-// Actually implemented inside pgrxX_oids.rs
+// Actually implemented inside pgXX_oids.rs
 pub type PgBuiltInOids = BuiltinOid;
 
 pub enum NotBuiltinOid {
