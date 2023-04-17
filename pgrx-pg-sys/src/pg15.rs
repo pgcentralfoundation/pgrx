@@ -164,7 +164,7 @@ pub const ALIGNOF_LONG: u32 = 8;
 pub const ALIGNOF_PG_INT128_TYPE: u32 = 16;
 pub const ALIGNOF_SHORT: u32 = 2;
 pub const BLCKSZ: u32 = 8192;
-pub const CONFIGURE_ARGS : & [u8 ; 106usize] = b" '--prefix=/home/zombodb/.pgrx/15.1/pgrx-install' '--with-pgport=28815' '--enable-debug' '--enable-cassert'\0" ;
+pub const CONFIGURE_ARGS : & [u8 ; 108usize] = b" '--prefix=/home/zombodb/.pgrx/15.2/pgrx-install' '--with-pgport=28815' '--enable-debug' '--enable-cassert'\0" ;
 pub const DEF_PGPORT: u32 = 28815;
 pub const DEF_PGPORT_STR: &[u8; 6usize] = b"28815\0";
 pub const DLSUFFIX: &[u8; 4usize] = b".so\0";
@@ -316,18 +316,18 @@ pub const MAXIMUM_ALIGNOF: u32 = 8;
 pub const MEMSET_LOOP_LIMIT: u32 = 1024;
 pub const PACKAGE_BUGREPORT: &[u8; 32usize] = b"pgsql-bugs@lists.postgresql.org\0";
 pub const PACKAGE_NAME: &[u8; 11usize] = b"PostgreSQL\0";
-pub const PACKAGE_STRING: &[u8; 16usize] = b"PostgreSQL 15.1\0";
+pub const PACKAGE_STRING: &[u8; 16usize] = b"PostgreSQL 15.2\0";
 pub const PACKAGE_TARNAME: &[u8; 11usize] = b"postgresql\0";
 pub const PACKAGE_URL: &[u8; 28usize] = b"https://www.postgresql.org/\0";
-pub const PACKAGE_VERSION: &[u8; 5usize] = b"15.1\0";
+pub const PACKAGE_VERSION: &[u8; 5usize] = b"15.2\0";
 pub const PG_KRB_SRVNAM: &[u8; 9usize] = b"postgres\0";
 pub const PG_MAJORVERSION: &[u8; 3usize] = b"15\0";
 pub const PG_MAJORVERSION_NUM: u32 = 15;
-pub const PG_MINORVERSION_NUM: u32 = 1;
+pub const PG_MINORVERSION_NUM: u32 = 2;
 pub const PG_USE_STDBOOL: u32 = 1;
-pub const PG_VERSION: &[u8; 5usize] = b"15.1\0";
-pub const PG_VERSION_NUM: u32 = 150001;
-pub const PG_VERSION_STR : & [u8 ; 102usize] = b"PostgreSQL 15.1 on x86_64-pc-linux-gnu, compiled by gcc (Ubuntu 11.3.0-1ubuntu1~22.04) 11.3.0, 64-bit\0" ;
+pub const PG_VERSION: &[u8; 5usize] = b"15.2\0";
+pub const PG_VERSION_NUM: u32 = 150002;
+pub const PG_VERSION_STR : & [u8 ; 102usize] = b"PostgreSQL 15.2 on x86_64-pc-linux-gnu, compiled by gcc (Ubuntu 11.3.0-1ubuntu1~22.04) 11.3.0, 64-bit\0" ;
 pub const RELSEG_SIZE: u32 = 131072;
 pub const SIZEOF_BOOL: u32 = 1;
 pub const SIZEOF_LONG: u32 = 8;
@@ -739,6 +739,7 @@ pub const LC_MEASUREMENT_MASK: u32 = 2048;
 pub const LC_IDENTIFICATION_MASK: u32 = 4096;
 pub const LC_ALL_MASK: u32 = 8127;
 pub const HAVE_PG_ATTRIBUTE_NORETURN: u32 = 1;
+pub const HAVE_PRAGMA_GCC_SYSTEM_HEADER: u32 = 1;
 pub const true_: u32 = 1;
 pub const false_: u32 = 0;
 pub const __bool_true_false_are_defined: u32 = 1;
@@ -767,7 +768,7 @@ pub const PG_BINARY_R: &[u8; 2usize] = b"r\0";
 pub const PG_BINARY_W: &[u8; 2usize] = b"w\0";
 pub const _CTYPE_H: u32 = 1;
 pub const PGINVALID_SOCKET: i32 = -1;
-pub const PG_BACKEND_VERSIONSTR: &[u8; 28usize] = b"postgres (PostgreSQL) 15.1\n\0";
+pub const PG_BACKEND_VERSIONSTR: &[u8; 28usize] = b"postgres (PostgreSQL) 15.2\n\0";
 pub const EXE: &[u8; 1usize] = b"\0";
 pub const DEVNULL: &[u8; 10usize] = b"/dev/null\0";
 pub const USE_REPL_SNPRINTF: u32 = 1;
@@ -2314,6 +2315,7 @@ pub const XACT_SERIALIZABLE: u32 = 3;
 pub const XACT_FLAGS_ACCESSEDTEMPNAMESPACE: u32 = 1;
 pub const XACT_FLAGS_ACQUIREDACCESSEXCLUSIVELOCK: u32 = 2;
 pub const XACT_FLAGS_NEEDIMMEDIATECOMMIT: u32 = 4;
+pub const XACT_FLAGS_PIPELINING: u32 = 8;
 pub const XLOG_XACT_COMMIT: u32 = 0;
 pub const XLOG_XACT_PREPARE: u32 = 16;
 pub const XLOG_XACT_ABORT: u32 = 32;
@@ -17963,6 +17965,21 @@ impl Default for ResultRelInfo {
 }
 #[repr(C)]
 #[derive(Debug, Copy, Clone)]
+pub struct ResultRelInfoExtra {
+    pub rinfo: *mut ResultRelInfo,
+    pub ri_extraUpdatedCols: *mut Bitmapset,
+}
+impl Default for ResultRelInfoExtra {
+    fn default() -> Self {
+        let mut s = ::std::mem::MaybeUninit::<Self>::uninit();
+        unsafe {
+            ::std::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
+            s.assume_init()
+        }
+    }
+}
+#[repr(C)]
+#[derive(Debug, Copy, Clone)]
 pub struct AsyncRequest {
     pub requestor: *mut PlanState,
     pub requestee: *mut PlanState,
@@ -18019,6 +18036,9 @@ pub struct EState {
     pub es_jit_flags: ::std::os::raw::c_int,
     pub es_jit: *mut JitContext,
     pub es_jit_worker_instr: *mut JitInstrumentation,
+    pub es_insert_pending_result_relations: *mut List,
+    pub es_insert_pending_modifytables: *mut List,
+    pub es_resultrelinfo_extra: *mut List,
 }
 impl Default for EState {
     fn default() -> Self {
@@ -35494,7 +35514,7 @@ pub struct PGPROC {
     pub xmin: TransactionId,
     pub lxid: LocalTransactionId,
     pub pid: ::std::os::raw::c_int,
-    pub pgrxactoff: ::std::os::raw::c_int,
+    pub pgxactoff: ::std::os::raw::c_int,
     pub pgprocno: ::std::os::raw::c_int,
     pub backendId: BackendId,
     pub databaseId: Oid,
@@ -45117,6 +45137,7 @@ extern "C" {
         rel: Relation,
         oldtuple: *mut TupleTableSlot,
         binary: bool,
+        columns: *mut Bitmapset,
     );
 }
 #[pgrx_macros::pg_guard]
@@ -45956,10 +45977,6 @@ extern "C" {
 #[pgrx_macros::pg_guard]
 extern "C" {
     pub fn build_column_default(rel: Relation, attrno: ::std::os::raw::c_int) -> *mut Node;
-}
-#[pgrx_macros::pg_guard]
-extern "C" {
-    pub fn fill_extraUpdatedCols(target_rte: *mut RangeTblEntry, target_relation: Relation);
 }
 #[pgrx_macros::pg_guard]
 extern "C" {
@@ -46962,6 +46979,10 @@ extern "C" {
 #[pgrx_macros::pg_guard]
 extern "C" {
     pub fn ExpireOldKnownAssignedTransactionIds(xid: TransactionId);
+}
+#[pgrx_macros::pg_guard]
+extern "C" {
+    pub fn KnownAssignedTransactionIdsIdleMaintenance();
 }
 #[pgrx_macros::pg_guard]
 extern "C" {

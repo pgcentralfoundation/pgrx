@@ -11,7 +11,7 @@ Use of this source code is governed by the MIT license that can be found in the 
 
 use crate::{
     pg_sys, register_xact_callback, FromDatum, IntoDatum, Json, PgMemoryContexts, PgOid,
-    PgrxactCallbackEvent, TryFromDatumError,
+    PgXactCallbackEvent, TryFromDatumError,
 };
 use core::fmt::Formatter;
 use pgrx_pg_sys::panic::ErrorReportable;
@@ -215,8 +215,8 @@ impl Spi {
     /// the current transaction is finished.
     fn mark_mutable() {
         if Spi::is_read_only() {
-            register_xact_callback(PgrxactCallbackEvent::Commit, || Spi::clear_mutable());
-            register_xact_callback(PgrxactCallbackEvent::Abort, || Spi::clear_mutable());
+            register_xact_callback(PgXactCallbackEvent::Commit, || Spi::clear_mutable());
+            register_xact_callback(PgXactCallbackEvent::Abort, || Spi::clear_mutable());
 
             MUTABLE_MODE.store(true, Ordering::Relaxed)
         }
