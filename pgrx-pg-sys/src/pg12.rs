@@ -312,15 +312,15 @@ pub const MAXIMUM_ALIGNOF: u32 = 8;
 pub const MEMSET_LOOP_LIMIT: u32 = 1024;
 pub const PACKAGE_BUGREPORT: &[u8; 32usize] = b"pgsql-bugs@lists.postgresql.org\0";
 pub const PACKAGE_NAME: &[u8; 11usize] = b"PostgreSQL\0";
-pub const PACKAGE_STRING: &[u8; 17usize] = b"PostgreSQL 12.13\0";
+pub const PACKAGE_STRING: &[u8; 17usize] = b"PostgreSQL 12.14\0";
 pub const PACKAGE_TARNAME: &[u8; 11usize] = b"postgresql\0";
 pub const PACKAGE_URL: &[u8; 1usize] = b"\0";
-pub const PACKAGE_VERSION: &[u8; 6usize] = b"12.13\0";
+pub const PACKAGE_VERSION: &[u8; 6usize] = b"12.14\0";
 pub const PG_KRB_SRVNAM: &[u8; 9usize] = b"postgres\0";
 pub const PG_MAJORVERSION: &[u8; 3usize] = b"12\0";
-pub const PG_VERSION: &[u8; 6usize] = b"12.13\0";
-pub const PG_VERSION_NUM: u32 = 120013;
-pub const PG_VERSION_STR : & [u8 ; 103usize] = b"PostgreSQL 12.13 on x86_64-pc-linux-gnu, compiled by gcc (Ubuntu 11.3.0-1ubuntu1~22.04) 11.3.0, 64-bit\0" ;
+pub const PG_VERSION: &[u8; 6usize] = b"12.14\0";
+pub const PG_VERSION_NUM: u32 = 120014;
+pub const PG_VERSION_STR : & [u8 ; 103usize] = b"PostgreSQL 12.14 on x86_64-pc-linux-gnu, compiled by gcc (Ubuntu 11.3.0-1ubuntu1~22.04) 11.3.0, 64-bit\0" ;
 pub const RELSEG_SIZE: u32 = 131072;
 pub const SIZEOF_BOOL: u32 = 1;
 pub const SIZEOF_LONG: u32 = 8;
@@ -733,6 +733,7 @@ pub const LC_MEASUREMENT_MASK: u32 = 2048;
 pub const LC_IDENTIFICATION_MASK: u32 = 4096;
 pub const LC_ALL_MASK: u32 = 8127;
 pub const HAVE_PG_ATTRIBUTE_NORETURN: u32 = 1;
+pub const HAVE_PRAGMA_GCC_SYSTEM_HEADER: u32 = 1;
 pub const true_: u32 = 1;
 pub const false_: u32 = 0;
 pub const __bool_true_false_are_defined: u32 = 1;
@@ -1171,7 +1172,7 @@ pub const NI_DGRAM: u32 = 16;
 pub const _PWD_H: u32 = 1;
 pub const NSS_BUFLEN_PASSWD: u32 = 1024;
 pub const PGINVALID_SOCKET: i32 = -1;
-pub const PG_BACKEND_VERSIONSTR: &[u8; 29usize] = b"postgres (PostgreSQL) 12.13\n\0";
+pub const PG_BACKEND_VERSIONSTR: &[u8; 29usize] = b"postgres (PostgreSQL) 12.14\n\0";
 pub const EXE: &[u8; 1usize] = b"\0";
 pub const DEVNULL: &[u8; 10usize] = b"/dev/null\0";
 pub const USE_REPL_SNPRINTF: u32 = 1;
@@ -2346,6 +2347,7 @@ pub const XACT_SERIALIZABLE: u32 = 3;
 pub const XACT_FLAGS_ACCESSEDTEMPNAMESPACE: u32 = 1;
 pub const XACT_FLAGS_ACQUIREDACCESSEXCLUSIVELOCK: u32 = 2;
 pub const XACT_FLAGS_NEEDIMMEDIATECOMMIT: u32 = 4;
+pub const XACT_FLAGS_PIPELINING: u32 = 8;
 pub const XLOG_XACT_COMMIT: u32 = 0;
 pub const XLOG_XACT_PREPARE: u32 = 16;
 pub const XLOG_XACT_ABORT: u32 = 32;
@@ -22966,11 +22968,11 @@ extern "C" {
     pub static mut MyProc: *mut PGPROC;
 }
 extern "C" {
-    pub static mut MyPgrxact: *mut PGRXACT;
+    pub static mut MyPgXact: *mut PGXACT;
 }
 #[repr(C)]
 #[derive(Debug, Default, Copy, Clone)]
-pub struct PGRXACT {
+pub struct PGXACT {
     pub xid: TransactionId,
     pub xmin: TransactionId,
     pub vacuumFlags: uint8,
@@ -22982,7 +22984,7 @@ pub struct PGRXACT {
 #[derive(Debug, Copy, Clone)]
 pub struct PROC_HDR {
     pub allProcs: *mut PGPROC,
-    pub allPgrxact: *mut PGRXACT,
+    pub allPgXact: *mut PGXACT,
     pub allProcCount: uint32,
     pub freeProcs: *mut PGPROC,
     pub autovacFreeProcs: *mut PGPROC,
@@ -27877,6 +27879,135 @@ impl Default for RuleLock {
 }
 #[repr(C)]
 #[derive(Debug, Copy, Clone)]
+pub struct SMgrRelationData {
+    pub smgr_rnode: RelFileNodeBackend,
+    pub smgr_owner: *mut *mut SMgrRelationData,
+    pub smgr_targblock: BlockNumber,
+    pub smgr_fsm_nblocks: BlockNumber,
+    pub smgr_vm_nblocks: BlockNumber,
+    pub smgr_which: ::std::os::raw::c_int,
+    pub md_num_open_segs: [::std::os::raw::c_int; 4usize],
+    pub md_seg_fds: [*mut _MdfdVec; 4usize],
+    pub node: dlist_node,
+}
+impl Default for SMgrRelationData {
+    fn default() -> Self {
+        let mut s = ::std::mem::MaybeUninit::<Self>::uninit();
+        unsafe {
+            ::std::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
+            s.assume_init()
+        }
+    }
+}
+pub type SMgrRelation = *mut SMgrRelationData;
+#[pgrx_macros::pg_guard]
+extern "C" {
+    pub fn smgrinit();
+}
+#[pgrx_macros::pg_guard]
+extern "C" {
+    pub fn smgropen(rnode: RelFileNode, backend: BackendId) -> SMgrRelation;
+}
+#[pgrx_macros::pg_guard]
+extern "C" {
+    pub fn smgrexists(reln: SMgrRelation, forknum: ForkNumber) -> bool;
+}
+#[pgrx_macros::pg_guard]
+extern "C" {
+    pub fn smgrsetowner(owner: *mut SMgrRelation, reln: SMgrRelation);
+}
+#[pgrx_macros::pg_guard]
+extern "C" {
+    pub fn smgrclearowner(owner: *mut SMgrRelation, reln: SMgrRelation);
+}
+#[pgrx_macros::pg_guard]
+extern "C" {
+    pub fn smgrclose(reln: SMgrRelation);
+}
+#[pgrx_macros::pg_guard]
+extern "C" {
+    pub fn smgrcloseall();
+}
+#[pgrx_macros::pg_guard]
+extern "C" {
+    pub fn smgrclosenode(rnode: RelFileNodeBackend);
+}
+#[pgrx_macros::pg_guard]
+extern "C" {
+    pub fn smgrcreate(reln: SMgrRelation, forknum: ForkNumber, isRedo: bool);
+}
+#[pgrx_macros::pg_guard]
+extern "C" {
+    pub fn smgrdounlink(reln: SMgrRelation, isRedo: bool);
+}
+#[pgrx_macros::pg_guard]
+extern "C" {
+    pub fn smgrdounlinkall(rels: *mut SMgrRelation, nrels: ::std::os::raw::c_int, isRedo: bool);
+}
+#[pgrx_macros::pg_guard]
+extern "C" {
+    pub fn smgrdounlinkfork(reln: SMgrRelation, forknum: ForkNumber, isRedo: bool);
+}
+#[pgrx_macros::pg_guard]
+extern "C" {
+    pub fn smgrextend(
+        reln: SMgrRelation,
+        forknum: ForkNumber,
+        blocknum: BlockNumber,
+        buffer: *mut ::std::os::raw::c_char,
+        skipFsync: bool,
+    );
+}
+#[pgrx_macros::pg_guard]
+extern "C" {
+    pub fn smgrprefetch(reln: SMgrRelation, forknum: ForkNumber, blocknum: BlockNumber);
+}
+#[pgrx_macros::pg_guard]
+extern "C" {
+    pub fn smgrread(
+        reln: SMgrRelation,
+        forknum: ForkNumber,
+        blocknum: BlockNumber,
+        buffer: *mut ::std::os::raw::c_char,
+    );
+}
+#[pgrx_macros::pg_guard]
+extern "C" {
+    pub fn smgrwrite(
+        reln: SMgrRelation,
+        forknum: ForkNumber,
+        blocknum: BlockNumber,
+        buffer: *mut ::std::os::raw::c_char,
+        skipFsync: bool,
+    );
+}
+#[pgrx_macros::pg_guard]
+extern "C" {
+    pub fn smgrwriteback(
+        reln: SMgrRelation,
+        forknum: ForkNumber,
+        blocknum: BlockNumber,
+        nblocks: BlockNumber,
+    );
+}
+#[pgrx_macros::pg_guard]
+extern "C" {
+    pub fn smgrnblocks(reln: SMgrRelation, forknum: ForkNumber) -> BlockNumber;
+}
+#[pgrx_macros::pg_guard]
+extern "C" {
+    pub fn smgrtruncate(reln: SMgrRelation, forknum: ForkNumber, nblocks: BlockNumber);
+}
+#[pgrx_macros::pg_guard]
+extern "C" {
+    pub fn smgrimmedsync(reln: SMgrRelation, forknum: ForkNumber);
+}
+#[pgrx_macros::pg_guard]
+extern "C" {
+    pub fn AtEOXact_SMgr();
+}
+#[repr(C)]
+#[derive(Debug, Copy, Clone)]
 pub struct LockRelId {
     pub relId: Oid,
     pub dbId: Oid,
@@ -27909,7 +28040,7 @@ pub type LockInfo = *mut LockInfoData;
 #[derive(Debug, Copy, Clone)]
 pub struct RelationData {
     pub rd_node: RelFileNode,
-    pub rd_smgr: *mut SMgrRelationData,
+    pub rd_smgr: SMgrRelation,
     pub rd_refcnt: ::std::os::raw::c_int,
     pub rd_backend: BackendId,
     pub rd_islocaltemp: bool,
@@ -42842,6 +42973,10 @@ extern "C" {
 }
 #[pgrx_macros::pg_guard]
 extern "C" {
+    pub fn KnownAssignedTransactionIdsIdleMaintenance();
+}
+#[pgrx_macros::pg_guard]
+extern "C" {
     pub fn GetMaxSnapshotXidCount() -> ::std::os::raw::c_int;
 }
 #[pgrx_macros::pg_guard]
@@ -56509,7 +56644,7 @@ pub struct ResourceOwnerData {
 }
 #[repr(C)]
 #[derive(Debug, Default, Copy, Clone)]
-pub struct SMgrRelationData {
+pub struct _MdfdVec {
     pub _address: u8,
 }
 #[repr(C)]
