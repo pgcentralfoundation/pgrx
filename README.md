@@ -4,7 +4,7 @@
 
 > Build Postgres Extensions with Rust!
 
-![cargo test --all](https://github.com/zombodb/pgrx/workflows/cargo%20test%20--all/badge.svg)
+![cargo test --all](https://github.com/tcdi/pgrx/workflows/cargo%20test%20--all/badge.svg)
 [![crates.io badge](https://img.shields.io/crates/v/pgrx.svg)](https://crates.io/crates/pgrx)
 [![docs.rs badge](https://docs.rs/pgrx/badge.svg)](https://docs.rs/pgrx)
 [![Twitter Follow](https://img.shields.io/twitter/follow/zombodb.svg?style=flat)](https://twitter.com/zombodb)

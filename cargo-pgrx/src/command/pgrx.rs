@@ -71,7 +71,7 @@ fn check_for_sql_generator_binary() -> eyre::Result<()> {
         println!("{}", "\
             Found `pgrx` 0.2-0.3 series SQL generation while using `cargo-pgrx` 0.4 series.
             
-We've updated our SQL generation method, it's much faster! Please follow the upgrading steps listed in https://github.com/zombodb/pgrx/releases/tag/v0.4.0.
+We've updated our SQL generation method, it's much faster! Please follow the upgrading steps listed in https://github.com/tcdi/pgrx/releases/tag/v0.4.0.
 
 Already done that? You didn't delete `src/bin/sql-generator.rs` yet, so you're still seeing this message.\
         ".red().bold());
