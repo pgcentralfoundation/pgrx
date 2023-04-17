@@ -22,5 +22,5 @@ all: ${STATIC_LIB_NAME}
 EXTRA_CLEAN += ${STATIC_LIB_NAME}
 
 PG_CONFIG = pg_config
-PGRXS := $(shell $(PG_CONFIG) --pgrxs)
-include $(PGRXS)
+PGXS := $(shell $(PG_CONFIG) --pgxs)
+include $(PGXS)
