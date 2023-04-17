@@ -102,8 +102,9 @@ fn main() -> eyre::Result<()> {
     let compile_cshim =
         std::env::var("CARGO_FEATURE_CSHIM").unwrap_or_else(|_| "0".to_string()) == "1";
 
-    let is_for_release =
-        std::env::var("PGRX_PG_SYS_GENERATE_BINDINGS_FOR_RELEASE").unwrap_or("0".to_string()) == "1";
+    let is_for_release = std::env::var("PGRX_PG_SYS_GENERATE_BINDINGS_FOR_RELEASE")
+        .unwrap_or("0".to_string())
+        == "1";
     println!("cargo:rerun-if-env-changed=PGRX_PG_SYS_GENERATE_BINDINGS_FOR_RELEASE");
 
     // Do nightly detection to suppress silly warnings.

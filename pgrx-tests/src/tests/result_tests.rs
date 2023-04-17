@@ -70,7 +70,8 @@ mod tests {
 
     #[pg_test(error = "No such file or directory (os error 2)")]
     fn test_return_io_error() -> Result<(), std::io::Error> {
-        std::fs::read("/tmp/i-sure-hope-this-doest-exist.pgrx-tests::test_result_result").map(|_| ())
+        std::fs::read("/tmp/i-sure-hope-this-doest-exist.pgrx-tests::test_result_result")
+            .map(|_| ())
     }
 
     #[pg_test]

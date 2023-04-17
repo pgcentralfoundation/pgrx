@@ -493,7 +493,8 @@ mod sql_generator_tests {
 
     #[allow(unused_parens)]
     #[pg_extern]
-    fn return_table_single() -> TableIterator<'static, (name!(dog, pgrx::composite_type!("Dog")),)> {
+    fn return_table_single() -> TableIterator<'static, (name!(dog, pgrx::composite_type!("Dog")),)>
+    {
         let mut tuple = PgHeapTuple::new_composite_type("Dog").unwrap();
 
         tuple.set_by_name("scritches", 0).unwrap();

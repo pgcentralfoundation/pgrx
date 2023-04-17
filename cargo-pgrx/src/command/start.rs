@@ -97,7 +97,11 @@ pub(crate) fn start_postgres(pg_config: &PgConfig) -> eyre::Result<()> {
             .stdout(Stdio::piped())
             .stderr(Stdio::piped())
             .arg("start")
-            .arg(format!("-o -i -p {} -c unix_socket_directories={}", port, Pgrx::home()?.display()))
+            .arg(format!(
+                "-o -i -p {} -c unix_socket_directories={}",
+                port,
+                Pgrx::home()?.display()
+            ))
             .arg("-D")
             .arg(&datadir)
             .arg("-l")
