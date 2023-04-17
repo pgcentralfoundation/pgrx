@@ -309,7 +309,7 @@ macro_rules! pg_sql_graph_magic {
 }
 
 pub(crate) static UTF8DATABASE: Lazy<Utf8Compat> = Lazy::new(|| {
-    let encoding_int = unsafe { pgx_pg_sys::GetDatabaseEncoding() };
+    let encoding_int = unsafe { pgrx_pg_sys::GetDatabaseEncoding() };
     match encoding_int as core::ffi::c_uint {
         pg_sys::pg_enc_PG_UTF8 => Utf8Compat::Yes,
         // The 0 encoding. It... may be UTF-8

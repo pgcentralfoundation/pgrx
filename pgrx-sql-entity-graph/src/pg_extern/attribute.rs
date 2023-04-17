@@ -61,10 +61,10 @@ impl Attribute {
                 quote! { ::pgrx::pgrx_sql_entity_graph::ExternArgs::CreateOrReplace }
             }
             Attribute::SecurityDefiner => {
-                quote! { ::pgx::pgx_sql_entity_graph::ExternArgs::SecurityDefiner}
+                quote! { ::pgrx::pgrx_sql_entity_graph::ExternArgs::SecurityDefiner}
             }
             Attribute::SecurityInvoker => {
-                quote! { ::pgx::pgx_sql_entity_graph::ExternArgs::SecurityInvoker}
+                quote! { ::pgrx::pgrx_sql_entity_graph::ExternArgs::SecurityInvoker}
             }
             Attribute::ParallelSafe => {
                 quote! { ::pgrx::pgrx_sql_entity_graph::ExternArgs::ParallelSafe }
