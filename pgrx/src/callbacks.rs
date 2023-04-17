@@ -18,7 +18,7 @@ use std::rc::Rc;
 
 /// Postgres Transaction (Xact) Callback Events
 #[derive(Hash, Eq, PartialEq, Clone, Debug)]
-pub enum PgrxactCallbackEvent {
+pub enum PgXactCallbackEvent {
     /// Fired when a transaction is aborted.  It is mutually exclusive with `PgrxactCallbackEvent::Commit`
     ///
     /// ## Safety
@@ -55,19 +55,19 @@ pub enum PgrxactCallbackEvent {
     PrePrepare,
 }
 
-impl PgrxactCallbackEvent {
+impl PgXactCallbackEvent {
     fn translate_pg_event(pg_event: pg_sys::XactEvent) -> Self {
         match pg_event {
-            pg_sys::XactEvent_XACT_EVENT_ABORT => PgrxactCallbackEvent::Abort,
-            pg_sys::XactEvent_XACT_EVENT_COMMIT => PgrxactCallbackEvent::Commit,
-            pg_sys::XactEvent_XACT_EVENT_PARALLEL_ABORT => PgrxactCallbackEvent::ParallelAbort,
-            pg_sys::XactEvent_XACT_EVENT_PARALLEL_COMMIT => PgrxactCallbackEvent::ParallelCommit,
+            pg_sys::XactEvent_XACT_EVENT_ABORT => PgXactCallbackEvent::Abort,
+            pg_sys::XactEvent_XACT_EVENT_COMMIT => PgXactCallbackEvent::Commit,
+            pg_sys::XactEvent_XACT_EVENT_PARALLEL_ABORT => PgXactCallbackEvent::ParallelAbort,
+            pg_sys::XactEvent_XACT_EVENT_PARALLEL_COMMIT => PgXactCallbackEvent::ParallelCommit,
             pg_sys::XactEvent_XACT_EVENT_PARALLEL_PRE_COMMIT => {
-                PgrxactCallbackEvent::ParallelPreCommit
+                PgXactCallbackEvent::ParallelPreCommit
             }
-            pg_sys::XactEvent_XACT_EVENT_PREPARE => PgrxactCallbackEvent::Prepare,
-            pg_sys::XactEvent_XACT_EVENT_PRE_COMMIT => PgrxactCallbackEvent::PreCommit,
-            pg_sys::XactEvent_XACT_EVENT_PRE_PREPARE => PgrxactCallbackEvent::PrePrepare,
+            pg_sys::XactEvent_XACT_EVENT_PREPARE => PgXactCallbackEvent::Prepare,
+            pg_sys::XactEvent_XACT_EVENT_PRE_COMMIT => PgXactCallbackEvent::PreCommit,
+            pg_sys::XactEvent_XACT_EVENT_PRE_PREPARE => PgXactCallbackEvent::PrePrepare,
             unknown => panic!("Unrecognized XactEvent: {}", unknown),
         }
     }
@@ -86,7 +86,7 @@ impl XactCallbackReceipt {
     /// ```rust,no_run
     /// use pgrx::*;
     ///
-    /// let receipt = register_xact_callback(PgrxactCallbackEvent::Commit, || info!("called after commit"));
+    /// let receipt = register_xact_callback(PgXactCallbackEvent::Commit, || info!("called after commit"));
     ///
     /// let no_longer_necessary = true;
     ///
@@ -105,7 +105,7 @@ struct XactCallbackWrapper(
 );
 
 /// Shorthand for the type representing the map of callbacks
-type CallbackMap = HashMap<PgrxactCallbackEvent, Vec<Rc<RefCell<Option<XactCallbackWrapper>>>>>;
+type CallbackMap = HashMap<PgXactCallbackEvent, Vec<Rc<RefCell<Option<XactCallbackWrapper>>>>>;
 
 /// Register a closure to be called during one of the `PgrxactCallbackEvent` events.  Multiple
 /// closures can be registered per event (one at a time), and they are called in the order in which
@@ -122,10 +122,10 @@ type CallbackMap = HashMap<PgrxactCallbackEvent, Vec<Rc<RefCell<Option<XactCallb
 /// ```rust,no_run
 /// use pgrx::*;
 ///
-/// register_xact_callback(PgrxactCallbackEvent::PreCommit, || info!("pre-commit #1"));
-/// register_xact_callback(PgrxactCallbackEvent::PreCommit, || info!("pre-commit #2"));
-/// register_xact_callback(PgrxactCallbackEvent::PreCommit, || info!("pre-commit #3"));
-/// register_xact_callback(PgrxactCallbackEvent::Commit, || info!("called after commit"));
+/// register_xact_callback(PgXactCallbackEvent::PreCommit, || info!("pre-commit #1"));
+/// register_xact_callback(PgXactCallbackEvent::PreCommit, || info!("pre-commit #2"));
+/// register_xact_callback(PgXactCallbackEvent::PreCommit, || info!("pre-commit #3"));
+/// register_xact_callback(PgXactCallbackEvent::Commit, || info!("called after commit"));
 /// ```
 ///
 /// Register an event, do some work, and then decide the callback isn't actually necessary anymore:
@@ -135,7 +135,7 @@ type CallbackMap = HashMap<PgrxactCallbackEvent, Vec<Rc<RefCell<Option<XactCallb
 ///
 /// // ... do some initialization work ...
 ///
-/// let receipt = register_xact_callback(PgrxactCallbackEvent::Abort, || { /* do cleanup if xact aborts */});
+/// let receipt = register_xact_callback(PgXactCallbackEvent::Abort, || { /* do cleanup if xact aborts */});
 ///
 /// // ... do work that might abort the transaction ...
 ///
@@ -153,7 +153,7 @@ type CallbackMap = HashMap<PgrxactCallbackEvent, Vec<Rc<RefCell<Option<XactCallb
 ///
 /// At transaction end, the callback occurs post-commit or post-abort, so the callback
 /// functions can only do noncritical cleanup.
-pub fn register_xact_callback<F>(which_event: PgrxactCallbackEvent, f: F) -> XactCallbackReceipt
+pub fn register_xact_callback<F>(which_event: PgXactCallbackEvent, f: F) -> XactCallbackReceipt
 where
     F: FnOnce() + std::panic::UnwindSafe + std::panic::RefUnwindSafe + 'static,
 {
@@ -163,7 +163,7 @@ where
     // internal function that we register as an XactCallback
     #[pg_guard]
     unsafe extern "C" fn callback(event: pg_sys::XactEvent, _arg: *mut ::std::os::raw::c_void) {
-        let which_event = PgrxactCallbackEvent::translate_pg_event(event);
+        let which_event = PgXactCallbackEvent::translate_pg_event(event);
 
         let hooks = match which_event {
             // pgrx's XactCallbacks are per-transaction, so when the transaction is over
@@ -172,10 +172,10 @@ where
             // these hooks again.
             //
             // Note that we still run any hooks that are registered for these events in this xact
-            PgrxactCallbackEvent::Commit
-            | PgrxactCallbackEvent::Abort
-            | PgrxactCallbackEvent::ParallelCommit
-            | PgrxactCallbackEvent::ParallelAbort => XACT_HOOKS
+            PgXactCallbackEvent::Commit
+            | PgXactCallbackEvent::Abort
+            | PgXactCallbackEvent::ParallelCommit
+            | PgXactCallbackEvent::ParallelAbort => XACT_HOOKS
                 .replace(HashMap::new())
                 .expect("XACT_HOOKS was None during Commit/Abort")
                 .remove(&which_event),
@@ -353,11 +353,11 @@ where
                 // register transaction callbacks so we can clear our hooks when the transaction ends
                 // this is necessary b/c it's possible for the user to register sub transaction callbacks
                 // within a transaction but a subtransaction never actually occurs
-                register_xact_callback(PgrxactCallbackEvent::Commit, || {
+                register_xact_callback(PgXactCallbackEvent::Commit, || {
                     // reset SUB_HOOKS to None on outer transaction COMMIT
                     SUB_HOOKS.take();
                 });
-                register_xact_callback(PgrxactCallbackEvent::Abort, || {
+                register_xact_callback(PgXactCallbackEvent::Abort, || {
                     // reset SUB_HOOKS to None on outer transaction ABORT
                     SUB_HOOKS.take();
                 });

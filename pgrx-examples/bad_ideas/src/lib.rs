@@ -7,7 +7,7 @@ All rights reserved.
 Use of this source code is governed by the MIT license that can be found in the LICENSE file.
 */
 use pgrx::prelude::*;
-use pgrx::{check_for_interrupts, info, register_xact_callback, PgRelation, PgrxactCallbackEvent};
+use pgrx::{check_for_interrupts, info, register_xact_callback, PgRelation, PgXactCallbackEvent};
 use std::fs::File;
 use std::io::Write;
 use std::process::Command;
@@ -62,7 +62,7 @@ fn loop_forever() {
 
 #[pg_extern]
 fn random_abort() {
-    register_xact_callback(PgrxactCallbackEvent::PreCommit, || {
+    register_xact_callback(PgXactCallbackEvent::PreCommit, || {
         info!("in xact callback pre-commit");
 
         if rand::random::<bool>() {
