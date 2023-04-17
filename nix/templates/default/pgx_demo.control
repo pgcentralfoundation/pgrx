@@ -1,5 +1,0 @@
-comment = 'pgx_demo:  Created by pgx'
-default_version = '@CARGO_VERSION@'
-module_pathname = '$libdir/pgx_demo'
-relocatable = false
-superuser = false

@@ -1,6 +1,0 @@
-comment = 'errors:  Created by pgx'
-default_version = '@CARGO_VERSION@'
-module_pathname = '$libdir/errors'
-relocatable = false
-superuser = false
-schema = errors

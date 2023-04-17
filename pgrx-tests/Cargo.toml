@@ -1,0 +1,58 @@
+[package]
+name = "pgrx-tests"
+version = "0.7.4"
+authors = ["ZomboDB, LLC <zombodb@gmail.com>"]
+license = "MIT"
+description = "Test framework for 'pgrx'-based Postgres extensions"
+homepage = "https://github.com/tcdi/pgrx"
+repository = "https://github.com/tcdi/pgrx"
+documentation = "https://docs.rs/pgrx-tests"
+readme = "README.md"
+edition = "2021"
+
+[lib]
+crate-type = [ "cdylib", "lib" ]
+
+[features]
+default = [ ]
+pg11 = [ "pgrx/pg11" ]
+pg12 = [ "pgrx/pg12" ]
+pg13 = [ "pgrx/pg13" ]
+pg14 = [ "pgrx/pg14" ]
+pg15 = [ "pgrx/pg15" ]
+pg_test = [ ]
+cshim = [ "pgrx/cshim" ]
+no-schema-generation = [ "pgrx/no-schema-generation", "pgrx-macros/no-schema-generation" ]
+
+[package.metadata.docs.rs]
+features = ["pg14"]
+no-default-features = true
+targets = ["x86_64-unknown-linux-gnu"]
+# Enable `#[cfg(docsrs)]` (https://docs.rs/about/builds#cross-compiling)
+rustc-args = ["--cfg", "docsrs"]
+rustdoc-args = ["--cfg", "docsrs"]
+
+[dependencies]
+clap-cargo = "0.10.0"
+owo-colors = "3.5.0"
+once_cell = "1.17.1"
+libc = "0.2.140"
+pgrx-macros = { path = "../pgrx-macros", version = "=0.7.4" }
+pgrx-pg-config = { path = "../pgrx-pg-config", version = "=0.7.4" }
+postgres = "0.19.4"
+regex = "1.7.1"
+serde = "1.0.156"
+serde_json = "1.0.94"
+sysinfo = "0.28.2"
+time = "0.3.20"
+eyre = "0.6.8"
+thiserror = "1.0"
+
+[dev-dependencies]
+eyre = "0.6.8"  # testing functions that return `eyre::Result`
+
+[dependencies.pgrx]
+path = "../pgrx"
+default-features = false
+features = [ "time-crate" ] # testing purposes
+version = "=0.7.4"

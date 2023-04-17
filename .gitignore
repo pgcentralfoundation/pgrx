@@ -8,5 +8,5 @@ target/
 *.a
 cmake*/
 .direnv
-pgx-examples/*/target
+pgrx-examples/*/target
 /bin

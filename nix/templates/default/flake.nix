@@ -1,5 +1,5 @@
 {
-  description = "A PostgreSQL extension built by pgx.";
+  description = "A PostgreSQL extension built by pgrx.";
 
   inputs = {
     nixpkgs.url = "nixpkgs";
@@ -9,27 +9,27 @@
     naersk.inputs.nixpkgs.follows = "nixpkgs";
     gitignore.url = "github:hercules-ci/gitignore.nix";
     gitignore.inputs.nixpkgs.follows = "nixpkgs";
-    pgx.url = "github:tcdi/pgx";
-    pgx.inputs.nixpkgs.follows = "nixpkgs";
-    pgx.inputs.naersk.follows = "naersk";
+    pgrx.url = "github:tcdi/pgrx";
+    pgrx.inputs.nixpkgs.follows = "nixpkgs";
+    pgrx.inputs.naersk.follows = "naersk";
   };
 
-  outputs = { self, nixpkgs, rust-overlay, naersk, gitignore, pgx }:
+  outputs = { self, nixpkgs, rust-overlay, naersk, gitignore, pgrx }:
     let
       cargoToml = (builtins.fromTOML (builtins.readFile ./Cargo.toml));
     in
     {
-      inherit (pgx) devShell;
+      inherit (pgrx) devShell;
 
-      defaultPackage = pgx.lib.forAllSystems (system:
+      defaultPackage = pgrx.lib.forAllSystems (system:
         let
-          pkgs = pgx.lib.nixpkgsWithOverlays { inherit system nixpkgs; extraOverlays = [ self.overlay ]; };
+          pkgs = pgrx.lib.nixpkgsWithOverlays { inherit system nixpkgs; extraOverlays = [ self.overlay ]; };
         in
         pkgs."${cargoToml.package.name}");
 
-      packages = pgx.lib.forAllSystems (system:
+      packages = pgrx.lib.forAllSystems (system:
         let
-          pkgs = pgx.lib.nixpkgsWithOverlays { inherit system nixpkgs; extraOverlays = [ self.overlay ]; };
+          pkgs = pgrx.lib.nixpkgsWithOverlays { inherit system nixpkgs; extraOverlays = [ self.overlay ]; };
         in
         (nixpkgs.lib.foldl'
           (x: y: x // y)
@@ -41,19 +41,19 @@
                 "${cargoToml.package.name}_${versionString}" = pkgs."${cargoToml.package.name}_${versionString}";
                 "${cargoToml.package.name}_${versionString}_debug" = pkgs."${cargoToml.package.name}_${versionString}_debug";
               })
-            pgx.lib.supportedPostgresVersions)
+            pgrx.lib.supportedPostgresVersions)
         ));
 
       overlay = final: prev: {
-        "${cargoToml.package.name}" = pgx.lib.buildPgxExtension {
+        "${cargoToml.package.name}" = pgrx.lib.buildPgrxExtension {
           pkgs = final;
           source = ./.;
-          pgxPostgresVersion = 11;
+          pgrxPostgresVersion = 11;
         };
-        "${cargoToml.package.name}_debug" = pgx.lib.buildPgxExtension {
+        "${cargoToml.package.name}_debug" = pgrx.lib.buildPgrxExtension {
           pkgs = final;
           source = ./.;
-          pgxPostgresVersion = 11;
+          pgrxPostgresVersion = 11;
           release = false;
         };
       } // (nixpkgs.lib.foldl'
@@ -63,19 +63,19 @@
           (version:
             let versionString = builtins.toString version; in
             {
-              "${cargoToml.package.name}_${versionString}" = pgx.lib.buildPgxExtension {
+              "${cargoToml.package.name}_${versionString}" = pgrx.lib.buildPgrxExtension {
                 pkgs = final;
                 source = ./.;
-                pgxPostgresVersion = version;
+                pgrxPostgresVersion = version;
               };
-              "${cargoToml.package.name}_${versionString}_debug" = pgx.lib.buildPgxExtension {
+              "${cargoToml.package.name}_${versionString}_debug" = pgrx.lib.buildPgrxExtension {
                 pkgs = final;
                 source = ./.;
-                pgxPostgresVersion = version;
+                pgrxPostgresVersion = version;
                 release = false;
               };
             })
-          pgx.lib.supportedPostgresVersions)
+          pgrx.lib.supportedPostgresVersions)
       );
 
       nixosModule = { config, pkgs, lib, ... }:
@@ -88,16 +88,16 @@
             services.postgresql."${cargoToml.package.name}".enable = mkEnableOption "Enable ${cargoToml.package.name}.";
           };
           config = mkIf cfg.enable {
-            nixpkgs.overlays = [ self.overlay pgx.overlay ];
+            nixpkgs.overlays = [ self.overlay pgrx.overlay ];
             services.postgresql.extraPlugins = with pkgs; [
               "${cargoToml.package.name}"
             ];
           };
         };
 
-      checks = pgx.lib.forAllSystems (system:
+      checks = pgrx.lib.forAllSystems (system:
         let
-          pkgs = pgx.lib.nixpkgsWithOverlays { inherit system nixpkgs; extraOverlays = [ self.overlay ]; };
+          pkgs = pgrx.lib.nixpkgsWithOverlays { inherit system nixpkgs; extraOverlays = [ self.overlay ]; };
         in
         {
           format = pkgs.runCommand "check-format"

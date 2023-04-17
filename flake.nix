@@ -39,7 +39,7 @@
     {
       lib = {
         inherit supportedSystems forAllSystems nixpkgsWithOverlays;
-        buildPgxExtension =
+        buildPgrxExtension =
           { pkgs
           , source
           , targetPostgres
@@ -50,23 +50,23 @@
             inherit (gitignore.lib) gitignoreSource;
           };
       };
-      defaultPackage = forAllSystems (system: (nixpkgsWithOverlays { inherit system nixpkgs; }).cargo-pgx);
+      defaultPackage = forAllSystems (system: (nixpkgsWithOverlays { inherit system nixpkgs; }).cargo-pgrx);
 
       packages = forAllSystems (system:
         let
           pkgs = nixpkgsWithOverlays { inherit system nixpkgs; };
         in
         {
-          inherit (pkgs) cargo-pgx;
+          inherit (pkgs) cargo-pgrx;
         });
 
       overlay = final: prev: {
-        cargo-pgx = final.callPackage ./cargo-pgx {
+        cargo-pgrx = final.callPackage ./cargo-pgrx {
           inherit fenixToolchain;
           inherit naersk;
           gitignoreSource = gitignore.lib.gitignoreSource;
         };
-        cargo-pgx_debug = final.callPackage ./cargo-pgx {
+        cargo-pgrx_debug = final.callPackage ./cargo-pgrx {
           inherit fenixToolchain;
           inherit naersk;
           release = false;
@@ -89,14 +89,14 @@
           buildInputs = with pkgs; [
             rustfmt
             nixpkgs-fmt
-            cargo-pgx
+            cargo-pgrx
             rust-toolchain
             postgresql
             libiconv
             pkg-config
           ];
           LIBCLANG_PATH = "${pkgs.llvmPackages.libclang.lib}/lib";
-          PGX_PG_SYS_SKIP_BINDING_REWRITE = "1";
+          PGRX_PG_SYS_SKIP_BINDING_REWRITE = "1";
           BINDGEN_EXTRA_CLANG_ARGS = [
             ''-I"${pkgs.llvmPackages.libclang.lib}/lib/clang/${pkgs.llvmPackages.libclang.version}/include"''
           ] ++ (if pkgs.stdenv.isLinux then [
@@ -117,14 +117,14 @@
             ${pkgs.nixpkgs-fmt}/bin/nixpkgs-fmt --check ${./.}
             touch $out # it worked!
           '';
-          pkgs-cargo-pgx = pkgs.cargo-pgx_debug.out;
+          pkgs-cargo-pgrx = pkgs.cargo-pgrx_debug.out;
         });
 
       defaultTemplate = self.templates.default;
       templates = {
         default = {
           path = ./nix/templates/default;
-          description = "A basic PGX extension";
+          description = "A basic PGRX extension";
         };
       };
     };

@@ -1,7 +1,7 @@
 # Forging SQL from Rust
 <!-- Written 2021-09-20 -->
 
-PostgreSQL offers an extension interface, and it's my belief that Rust is a fantastic language to write extensions for it. [Eric Ridge](https://twitter.com/zombodb) thought so too, and started [`pgx`](https://github.com/zombodb/pgx) awhile back. I've been working with him to improve the toolkit, and wanted to share about one of our latest hacks: improving the generation of extension SQL code to interface with Rust.
+PostgreSQL offers an extension interface, and it's my belief that Rust is a fantastic language to write extensions for it. [Eric Ridge](https://twitter.com/zombodb) thought so too, and started [`pgrx`](https://github.com/zombodb/pgrx) awhile back. I've been working with him to improve the toolkit, and wanted to share about one of our latest hacks: improving the generation of extension SQL code to interface with Rust.
 
 This post is more on the advanced side, as it assumes knowledge of both Rust and PostgreSQL. We'll approach topics like foreign functions, dynamic linking, procedural macros, and linkers.
 
@@ -9,7 +9,7 @@ This post is more on the advanced side, as it assumes knowledge of both Rust and
 
 # Understanding the problem
 
-`pgx` based PostgreSQL extensions ship as the following:
+`pgrx` based PostgreSQL extensions ship as the following:
 
 ```bash
 $ tree plrust
@@ -21,7 +21,7 @@ plrust
 
 These [extension objects]((https://www.postgresql.org/docs/current/extend-extensions.html#id-1.8.3.20.11)) include a `*.control` file which the user defines, a `*.so` cdylib that contains the compiled code, and `*.sql` which PostgreSQL loads the extension SQL entities from. We'll talk about generating this SQL today!
 
-These `sql` files must be generated from data within the Rust code. The SQL generator `pgx` provides needs to:
+These `sql` files must be generated from data within the Rust code. The SQL generator `pgrx` provides needs to:
 
 - Create enums defined by `#[derive(PostgresEnum)]` marked enum.
   ```rust
@@ -171,7 +171,7 @@ These `sql` files must be generated from data within the Rust code. The SQL gene
   	FUNCTION 1 Thing_cmp(Thing, Thing);
   ```
 
-An earlier version of `cargo-pgx` had `cargo-pgx pgx schema` command that would read your Rust files and generate SQL corresponding to them.
+An earlier version of `cargo-pgrx` had `cargo-pgrx pgrx schema` command that would read your Rust files and generate SQL corresponding to them.
 
 **This worked okay!** But gosh, it's not fun to do that, and there are a lot of complications such as trying to resolve types!
 
@@ -183,7 +183,7 @@ So, why else should we do this other than fun?
 
 ## For more than fun
 
-* **Resolving types is hard to DIY:** Mapping the text of some function definition to some matching SQL type is pretty easy when you are mapping `i32` to `integer`, but it starts to break down when you're mapping things like `Array<Floofer>` to `Floofer[]`. `Array` is from `pgx::datum::Array`, and we'd need to start reading into `use` statements if we were parsing code... and also what about macros (which may create `#[pg_extern]`s)? *...Oops! We're a compiler!*
+* **Resolving types is hard to DIY:** Mapping the text of some function definition to some matching SQL type is pretty easy when you are mapping `i32` to `integer`, but it starts to break down when you're mapping things like `Array<Floofer>` to `Floofer[]`. `Array` is from `pgrx::datum::Array`, and we'd need to start reading into `use` statements if we were parsing code... and also what about macros (which may create `#[pg_extern]`s)? *...Oops! We're a compiler!*
 * **We can enrich our data:** Instead of scanning code, in proc macros we have opportunities to enrich our data using things like `core::any::TypeId`, or building up accurate Rust to SQL type maps.
 * **We don't need to care about dead files:** Mysterious errors might occur if users had Rust files holding conflicting definitions, but one file not being in the source tree.
 * **We can handle feature flags and release/debug**: While we can scan and detect features, using the build process to ensure we only work with live code means we get feature flag support, as well as release/debug mode support for free!
@@ -194,11 +194,11 @@ So, why else should we do this other than fun?
 Here's some fun ideas we pondered (and, in some cases, tried):
 
 * **Create it with `build.rs`:** We'd be right back to code parsing like before! The `build.rs` of a crate is invoked before macro expansion or any type resolution, so same problems, too!
-* **Make the macros output fragments to `$OUTDIR`:** We could output metadata, such a JSON files to some `$OUT_DIR` instead, and have `cargo pgx schema` read them, but that doesn't give us the last pass where we can call `core::any::TypeId`, etc.
+* **Make the macros output fragments to `$OUTDIR`:** We could output metadata, such a JSON files to some `$OUT_DIR` instead, and have `cargo pgrx schema` read them, but that doesn't give us the last pass where we can call `core::any::TypeId`, etc.
 * **Use `rust-analyzer` to inspect:** This would work fine, but we couldn't depend on it directly since it's not on [crates.io](https://crates.io/). We'd need to use the command line interface, and the way we thought of seemed reasonable without depending on more external tools.
 * **Using [`inventory`](https://github.com/dtolnay/inventory)** we could sprinkle `inventory::submit! { T::new(/* ... */) }` calls around our codebase, and then at runtime call a `inventory::iter::<T>`. 
   + **This worked very well**, but Rust 1.54 re-enabled incremental compilation and broke the functionality. Now, the inventory objects could end up in a different object file and some could be missed. We could 'fix' this by using `codegen-units = 1` but it was not satisfying or ideal.
-* **Expose a C function in the library, and call it:** This would totally work except we can't load the extension `.so` without also having the postgres headers around, and that's *... Oof!* We don't really want to make `cargo-pgx` depend on specific PostgreSQL headers.
+* **Expose a C function in the library, and call it:** This would totally work except we can't load the extension `.so` without also having the postgres headers around, and that's *... Oof!* We don't really want to make `cargo-pgrx` depend on specific PostgreSQL headers.
 
 **But wait!** It turns out, that can work! We can have the binary re-export the functions and be very careful with what we use!
 
@@ -206,14 +206,14 @@ Here's some fun ideas we pondered (and, in some cases, tried):
 
 ## The (longish) short of it
 
-We're going to produce a binary during the build. We'll have macros output some foreign functions, then the binary will re-export and call them to build up a structure representing our extension. `cargo-pgx pgx schema`'s job will be to orcestrate that.
+We're going to produce a binary during the build. We'll have macros output some foreign functions, then the binary will re-export and call them to build up a structure representing our extension. `cargo-pgrx pgrx schema`'s job will be to orcestrate that.
 
 Roughly, we're slipping into the build process this way:
 
 ```
                             ┌────────────────────────┐
-                            │cargo pgx discovers     │
-                            │__pgx_internal functions│
+                            │cargo pgrx discovers     │
+                            │__pgrx_internal functions│
                             └───────────────────┬────┘
                                                 │
                                                 ▼
@@ -223,7 +223,7 @@ Roughly, we're slipping into the build process this way:
 ┌────────────────┴─────┐  ┌──────────┴────────┐ ┌────────────┴────────────┐
 │Parse definitions.    │  │Re-export internal │ │Binary receives list,    │
 │                      │  │functions to binary│ │dynamically loads itself,│
-│Create __pgx_internal │  │via dynamic-list   │ │creates dependency graph,│
+│Create __pgrx_internal │  │via dynamic-list   │ │creates dependency graph,│
 │metadata functions    │  │                   │ │outputs SQL              │
 └──────────────────────┘  └───────────────────┘ └─────────────────────────┘
 ```
@@ -231,13 +231,13 @@ Roughly, we're slipping into the build process this way:
 During the proc macro expansion process, we can append the [`proc_macro2::TokenStream`](https://docs.rs/proc-macro2/1.0.28/proc_macro2/struct.TokenStream.html) with some metadata functions. For example:
 
 ```rust
-#[derive(pgx::PostgresType)]
+#[derive(pgrx::PostgresType)]
 struct Floof { boof: usize }
 
 // We should extend the TokenStream with something like
 #[no_mangle]
-pub extern "C" fn __pgx_internals_type_Floof()
--> pgx::datum::inventory::SqlGraphEntity {
+pub extern "C" fn __pgrx_internals_type_Floof()
+-> pgrx::datum::inventory::SqlGraphEntity {
     todo!()
 }
 ```
@@ -252,8 +252,8 @@ pub fn floof_from_boof(boof: usize) -> Floof {
 
 // We should extend the TokenStream with something like
 #[no_mangle]
-pub extern "C" fn __pgx_internals_fn_floof_from_boof()
--> pgx::datum::inventory::SqlGraphEntity {
+pub extern "C" fn __pgrx_internals_fn_floof_from_boof()
+-> pgrx::datum::inventory::SqlGraphEntity {
     todo!()
 }
 ```
@@ -263,28 +263,28 @@ Then, in our `sql-generator` binary, we need to re-export them! We can do this b
 ```toml
 # ...
 [target.x86_64-unknown-linux-gnu]
-linker = "./.cargo/pgx-linker-script.sh"
+linker = "./.cargo/pgrx-linker-script.sh"
 # ...
 ```
 
 > **Note:** We can't use `rustflags` here since it can't handle environment variables or relative paths.
 
-In `.cargo/pgx-linker-script.sh`:
+In `.cargo/pgrx-linker-script.sh`:
 
 ```bash
 #! /usr/bin/env bash
-# Auto-generated by pgx. You may edit this, or delete it to have a new one created.
+# Auto-generated by pgrx. You may edit this, or delete it to have a new one created.
 
 if [[ $CARGO_BIN_NAME == "sql-generator" ]]; then
     UNAME=$(uname)
     if [[ $UNAME == "Darwin" ]]; then
-	TEMP=$(mktemp pgx-XXX)
-        echo "*_pgx_internals_*" > ${TEMP}
+	TEMP=$(mktemp pgrx-XXX)
+        echo "*_pgrx_internals_*" > ${TEMP}
         gcc -exported_symbols_list ${TEMP} $@
         rm -rf ${TEMP}
     else
-        TEMP=$(mktemp pgx-XXX)
-        echo "{ __pgx_internals_*; };" > ${TEMP}
+        TEMP=$(mktemp pgrx-XXX)
+        echo "{ __pgrx_internals_*; };" > ${TEMP}
         gcc -Wl,-dynamic-list=${TEMP} $@
         rm -rf ${TEMP}
     fi
@@ -309,7 +309,7 @@ lto = "thin"
 lto = "fat"
 ```
 
-Since these functions all have a particular naming scheme, we can scan for them in `cargo pgx schema` like so:
+Since these functions all have a particular naming scheme, we can scan for them in `cargo pgrx schema` like so:
 
 ```rust
 let dsym_path = sql_gen_path.resolve_dsym();
@@ -323,7 +323,7 @@ for object in archive.objects() {
             SymbolIterator::Elf(iter) => {
                 for symbol in iter {
                     if let Some(name) = symbol.name {
-                        if name.starts_with("__pgx_internals") {
+                        if name.starts_with("__pgrx_internals") {
                             fns_to_call.push(name);
                         }
                     }
@@ -343,7 +343,7 @@ This list gets passed into the binary, which dynamically loads the code using so
 ```rust
 let mut entities = Vec::default();
 // We *must* use this or the extension might not link in.
-let control_file = __pgx_marker()?;
+let control_file = __pgrx_marker()?;
 entities.push(SqlGraphEntity::ExtensionRoot(control_file));
 unsafe {
     let lib = libloading::os::unix::Library::this();
@@ -357,20 +357,20 @@ unsafe {
 };
 ```
 
-Then the outputs of that get passed to our `PgxSql` structure, something like:
+Then the outputs of that get passed to our `PgrxSql` structure, something like:
 
 ```rust
-let pgx_sql = PgxSql::build(
-    pgx::DEFAULT_TYPEID_SQL_MAPPING.clone().into_iter(),         
-    pgx::DEFAULT_SOURCE_ONLY_SQL_MAPPING.clone().into_iter(),
+let pgrx_sql = PgrxSql::build(
+    pgrx::DEFAULT_TYPEID_SQL_MAPPING.clone().into_iter(),         
+    pgrx::DEFAULT_SOURCE_ONLY_SQL_MAPPING.clone().into_iter(),
     entities.into_iter()
 ).unwrap();
 
 tracing::info!(path = %path, "Writing SQL");
-pgx_sql.to_file(path)?;
+pgrx_sql.to_file(path)?;
 if let Some(dot_path) = dot {
     tracing::info!(dot = %dot_path, "Writing Graphviz DOT");
-    pgx_sql.to_dot(dot_path)?;
+    pgrx_sql.to_dot(dot_path)?;
 }
 ```
 
@@ -445,7 +445,7 @@ Created via [`TypeId::of<T>()`](https://doc.rust-lang.org/std/any/struct.TypeId.
   ```
   We can use this to determine two types are indeed the same, even if we don't have an instance of the type itself.
   
-  During the macro expansion phase, we can write out `TypeId::of<#ty>()` for each used type `pgx` interacts with (including 'known' types and user types.)
+  During the macro expansion phase, we can write out `TypeId::of<#ty>()` for each used type `pgrx` interacts with (including 'known' types and user types.)
   
   Later in the build phase these calls exist as `TypeId::of<MyType>()`, then during the binary phase, these `TypeId`s get evaluated and registered into a mapping, so they can be queried.
 
@@ -465,7 +465,7 @@ Unlike `TypeId`s, which result in the same ID at in any part of the code, `type_
 So, `type_name` is only somewhat useful, but it's our best tool for inspecting the names of the types we're working with. We can't *depend* on it, but we can use it to infer things, leave human-friendly documentation, or provide our own diagnostics.
 
 ```rust
-#[derive(pgx::PostgresType)]
+#[derive(pgrx::PostgresType)]
 struct Floof { boof: usize }
 ```
 
@@ -473,24 +473,24 @@ The above gets parsed and new tokens are quasi-quoted atop this template like th
 
 ```rust
 #[no_mangle]
-pub extern "C" fn  #inventory_fn_name() -> pgx::datum::inventory::SqlGraphEntity {
+pub extern "C" fn  #inventory_fn_name() -> pgrx::datum::inventory::SqlGraphEntity {
     let mut mappings = Default::default();
-    <#name #ty_generics as pgx::datum::WithTypeIds>::register_with_refs(
+    <#name #ty_generics as pgrx::datum::WithTypeIds>::register_with_refs(
         &mut mappings,
         stringify!(#name).to_string()
     );
-    pgx::datum::WithSizedTypeIds::<#name #ty_generics>::register_sized_with_refs(
+    pgrx::datum::WithSizedTypeIds::<#name #ty_generics>::register_sized_with_refs(
         &mut mappings,
         stringify!(#name).to_string()
     );
     // ...
-    let submission = pgx::inventory::InventoryPostgresType {
+    let submission = pgrx::inventory::InventoryPostgresType {
         name: stringify!(#name),
         full_path: core::any::type_name::<#name #ty_generics>(),
         mappings,
         // ...
     };
-    pgx::datum::inventory::SqlGraphEntity::Type(submission)
+    pgrx::datum::inventory::SqlGraphEntity::Type(submission)
 }
 ```
 
@@ -498,24 +498,24 @@ The proc macro passes will make it into:
 
 ```rust
 #[no_mangle]
-pub extern "C" fn  __pgx_internals_type_Floof() -> pgx::datum::inventory::SqlGraphEntity {
+pub extern "C" fn  __pgrx_internals_type_Floof() -> pgrx::datum::inventory::SqlGraphEntity {
     let mut mappings = Default::default();
-    <Floof as pgx::datum::WithTypeIds>::register_with_refs(
+    <Floof as pgrx::datum::WithTypeIds>::register_with_refs(
         &mut mappings,
         stringify!(Floof).to_string()
     );
-    pgx::datum::WithSizedTypeIds::<Floof>::register_sized_with_refs(
+    pgrx::datum::WithSizedTypeIds::<Floof>::register_sized_with_refs(
         &mut mappings,
         stringify!(Floof).to_string()
     );
     // ...
-    let submission = pgx::inventory::InventoryPostgresType {
+    let submission = pgrx::inventory::InventoryPostgresType {
         name: stringify!(Floof),
         full_path: core::any::type_name::<Floof>(),
         mappings,
         // ...
     };
-    pgx::datum::inventory::SqlGraphEntity::Type(submission)
+    pgrx::datum::inventory::SqlGraphEntity::Type(submission)
 }
 ```
 
@@ -523,7 +523,7 @@ Next, let's talk about how the `TypeId` mapping is constructed!
 
 ## Mapping Rust types to SQL
 
-We can build a `TypeId` mapping of every type `pgx` itself has builtin support. For example, we could do:
+We can build a `TypeId` mapping of every type `pgrx` itself has builtin support. For example, we could do:
 
 ```rust
 let mut mapping = HashMap::new();
@@ -536,15 +536,15 @@ mapping.insert(TypeId::of<T>(), RustSqlMapping {
 
 This works fine, until we get to extension defined types. They're a bit different!
 
-Since `#[pg_extern]` decorated functions can use not only some custom type `T`, but also other types like `PgBox<T>`, `Option<T>`, `Vec<T>`, or `pgx::datum::Array<T>` we want to also create mappings for those. So we also need `TypeId`s for those... if they exist.
+Since `#[pg_extern]` decorated functions can use not only some custom type `T`, but also other types like `PgBox<T>`, `Option<T>`, `Vec<T>`, or `pgrx::datum::Array<T>` we want to also create mappings for those. So we also need `TypeId`s for those... if they exist.
 
-Types such as `Vec<T>` require a type to be `Sized`, `pgx::datum::Array<T>` requires a type to implement `IntoDatum`. These are complications, since we can't *always* do something like that unless `MyType` implements those. Unfortunately, Rust doesn't really give us the power in macros to do something like what the [`impls`](https://github.com/nvzqz/impls) crate does in macros, so we can't do something like:
+Types such as `Vec<T>` require a type to be `Sized`, `pgrx::datum::Array<T>` requires a type to implement `IntoDatum`. These are complications, since we can't *always* do something like that unless `MyType` implements those. Unfortunately, Rust doesn't really give us the power in macros to do something like what the [`impls`](https://github.com/nvzqz/impls) crate does in macros, so we can't do something like:
 
 ```rust
 // This doesn't work
 syn::parse_quote! {
     #[no_mangle]
-    pub extern "C" fn  #inventory_fn_name() -> pgx::datum::inventory::SqlGraphEntity {
+    pub extern "C" fn  #inventory_fn_name() -> pgrx::datum::inventory::SqlGraphEntity {
         let mut mappings = Default::default();
         #hypothetical_if_some_type_impls_sized_block {
             mapping.insert(TypeId::of<Vec<#name>>(), RustSqlMapping {
@@ -595,7 +595,7 @@ impl<T: 'static> WithSizedTypeIds<T> {
 
 Now we can do `WithSizedTypeIds::<T>::VEC_ID` for any `T` to get the `TypeId` for `Vec<T>`, and only get `Some(item)` if that type is indeed sized.
 
-Using this strategy, we can have our `__pgx_internals` functions build up a mapping of `TypeId`s and what SQL they map to.
+Using this strategy, we can have our `__pgrx_internals` functions build up a mapping of `TypeId`s and what SQL they map to.
 
 ## Our pet graph
 
@@ -631,7 +631,7 @@ We need to go and build an edge reflecting that the function `known_animals` req
 
 Building up the graph is a two step process, first we populate it with all the `SqlGraphEntity` we found. 
 
-This process involves adding the entity, as well doing things like ensuring the return value has a node in the graph even if it's not defined by the user. Something like `&str`, a builtin value `pgx` knows how to make into SQL and back.
+This process involves adding the entity, as well doing things like ensuring the return value has a node in the graph even if it's not defined by the user. Something like `&str`, a builtin value `pgrx` knows how to make into SQL and back.
 
 ```rust
 fn initialize_externs(
@@ -813,7 +813,7 @@ In order to generate SQL for an entity, define a `ToSql` trait which our `SqlGra
 
 ```rust
 pub trait ToSql {
-    fn to_sql(&self, context: &PgxSql) -> eyre::Result<String>;
+    fn to_sql(&self, context: &PgrxSql) -> eyre::Result<String>;
 }
 
 /// An entity corresponding to some SQL required by the extension.
@@ -830,7 +830,7 @@ impl ToSql for SqlGraphEntity {
         skip(self, context),
         fields(identifier = %self.rust_identifier())
     )]
-    fn to_sql(&self, context: &super::PgxSql) -> eyre::Result<String> {
+    fn to_sql(&self, context: &super::PgrxSql) -> eyre::Result<String> {
         match self {
             SqlGraphEntity::Schema(item) => {
                 if item.name != "public" && item.name != "pg_catalog" {
@@ -856,7 +856,7 @@ impl ToSql for InventoryPostgresEnum {
         skip(self, context),
         fields(identifier = %self.rust_identifier())
     )]
-    fn to_sql(&self, context: &super::PgxSql) -> eyre::Result<String> {
+    fn to_sql(&self, context: &super::PgrxSql) -> eyre::Result<String> {
         let self_index = context.enums[self];
         let sql = format!(
             "\n\
@@ -892,6 +892,6 @@ Other implementations, such as on functions, are a bit more complicated. These f
 
 # Closing thoughts
 
-With the toolkit `pgx` provides, users of Rust are able to develop PostgreSQL extensions using familiar tooling and workflows. There's still a lot of things we'd love to refine and add to the toolkit, but we think you can start using it, like we do in production at TCDI. We think it's even fun to use.
+With the toolkit `pgrx` provides, users of Rust are able to develop PostgreSQL extensions using familiar tooling and workflows. There's still a lot of things we'd love to refine and add to the toolkit, but we think you can start using it, like we do in production at TCDI. We think it's even fun to use.
 
 Thanks to [**@dtolnay**](https://github.com/dtolnay) for making many of the crates discussed here, as well as being such a kind and wise person to exist in the orbit of. Also to [Eric Ridge](https://github.com/eeeebbbbrrrr) for all the PostgreSQL knowledge, and [TCDI](https://www.tcdi.com/) for employing me to work on this exceptionally fun stuff!

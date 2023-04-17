@@ -1,0 +1,30 @@
+[package]
+name = "pgrx-macros"
+version = "0.7.4"
+authors = ["ZomboDB, LLC <zombodb@gmail.com>"]
+license = "MIT"
+description = "Proc Macros for 'pgrx'"
+homepage = "https://github.com/tcdi/pgrx"
+repository = "https://github.com/tcdi/pgrx"
+documentation = "https://docs.rs/pgrx-macros"
+readme = "README.md"
+edition = "2021"
+
+[lib]
+proc-macro = true
+
+[package.metadata.docs.rs]
+# Enable `#[cfg(docsrs)]` (https://docs.rs/about/builds#cross-compiling)
+rustc-args = ["--cfg", "docsrs"]
+
+[features]
+no-schema-generation = ["pgrx-sql-entity-graph/no-schema-generation"]
+
+[dependencies]
+pgrx-sql-entity-graph = { path = "../pgrx-sql-entity-graph", version = "=0.7.4" }
+proc-macro2 = "1.0.52"
+quote = "1.0.26"
+syn = { version = "1.0.109", features = [ "extra-traits", "full", "fold", "parsing" ] }
+
+[dev-dependencies]
+serde = { version = "1.0.156", features = ["derive"] } # for Documentation examples
