@@ -37,7 +37,7 @@ static PROCESS_ENV_DENYLIST: &'static [&'static str] = &[
     "OUT_DIR",
     "HOST",
     "NUM_JOBS",
-    "LIBRARY_PATH", // see https://github.com/zombodb/pgrx/issues/16
+    "LIBRARY_PATH", // see https://github.com/tcdi/pgrx/issues/16
 ];
 
 /// Initialize pgrx development environment for the first time

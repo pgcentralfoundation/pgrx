@@ -99,7 +99,7 @@ fn same_name(same_name: &str) -> &str {
     same_name
 }
 
-// Tests for regression of https://github.com/zombodb/pgrx/issues/432
+// Tests for regression of https://github.com/tcdi/pgrx/issues/432
 #[pg_extern]
 fn fcinfo_renamed_one_arg(
     _x: PgBox<pg_sys::IndexAmRoutine>,
