@@ -64,7 +64,6 @@ impl CommandExecute for Stop {
 
 #[tracing::instrument(level = "error", skip_all, fields(pg_version = %pg_config.version()?))]
 pub(crate) fn stop_postgres(pg_config: &PgConfig) -> eyre::Result<()> {
-    Pgrx::home()?;
     let datadir = pg_config.data_dir()?;
     let bindir = pg_config.bin_dir()?;
 
