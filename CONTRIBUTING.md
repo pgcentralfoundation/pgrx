@@ -103,5 +103,5 @@ is offered according to the MIT License, thus may be freely relicensed and subli
 and that you are satisfied with the existing copyright notice as of opening your PR.
 
 [crates.io]: https://crates.io
-[pgrx@crates.io]: https://crates.io/crates/pgrxa
+[pgrx@crates.io]: https://crates.io/crates/pgrx
 [pgrx@docs.rs]: https://docs.rs/pgrx/latest/pgrx
