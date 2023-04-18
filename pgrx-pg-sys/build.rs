@@ -114,8 +114,6 @@ fn main() -> eyre::Result<()> {
 
     eprintln!("build_paths={build_paths:?}");
 
-    let pgrx = Pgrx::from_config()?;
-
     emit_rerun_if_changed();
 
     let pg_configs: Vec<(u16, PgConfig)> = if env_tracked(
@@ -124,7 +122,7 @@ fn main() -> eyre::Result<()> {
     .unwrap_or("false".into())
         == "1"
     {
-        pgrx.iter(PgConfigSelector::All)
+        Pgrx::from_config()?.iter(PgConfigSelector::All)
             .map(|r| r.expect("invalid pg_config"))
             .map(|c| (c.major_version().expect("invalid major version"), c))
             .filter_map(|t| {
@@ -172,7 +170,7 @@ fn main() -> eyre::Result<()> {
             }
             vec![(major_version, pg_config)]
         } else {
-            let specific = pgrx.get(&found_feat)?;
+            let specific = Pgrx::from_config()?.get(&found_feat)?;
             vec![(found_ver, specific)]
         }
     };
