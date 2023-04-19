@@ -16,6 +16,7 @@ use crate::{pg_sys, FromDatum, IntoDatum, PgMemoryContexts};
 use bitvec::slice::BitSlice;
 use core::ops::DerefMut;
 use core::ptr::NonNull;
+use once_cell::sync::OnceCell;
 use pgrx_sql_entity_graph::metadata::{
     ArgumentError, Returns, ReturnsError, SqlMapping, SqlTranslatable,
 };
@@ -61,6 +62,7 @@ pub struct Array<'a, T: FromDatum> {
     // Remove this field if/when we figure out how to stop using pg_sys::deconstruct_array
     null_slice: NullKind<'a>,
     elem_layout: Layout,
+    datum_slice: OnceCell<PallocSlice<pg_sys::Datum>>,
     // Rust drops in FIFO order, drop this last
     raw: Toast<RawArray>,
     _marker: PhantomData<T>,
@@ -135,7 +137,15 @@ impl<'a, T: FromDatum> Array<'a, T> {
             .nulls_bitslice()
             .map(|nonnull| NullKind::Bits(unsafe { &*nonnull.as_ptr() }))
             .unwrap_or(NullKind::Strict(nelems));
-        Array { raw, nelems, null_slice, elem_layout, _marker: PhantomData }
+        let datum_slice = OnceCell::new();
+        #[cfg(debug_assertions)]
+        let Ok(()) = datum_slice.set(unsafe {
+            let (datums, _bools) = raw.deconstruct(elem_layout);
+            PallocSlice::from_raw_parts(NonNull::new(datums).unwrap(), nelems)
+        }) else {
+            panic!("oh no, the debug code exploded!")
+        };
+        Array { raw, nelems, datum_slice, null_slice, elem_layout, _marker: PhantomData }
     }
 
     /// Rips out the underlying pg_sys::ArrayType pointer.
@@ -234,17 +244,20 @@ impl<'a, T: FromDatum> Array<'a, T> {
         if is_null {
             return None;
         }
-        let nulls = self.null_slice.count_nulls_until(idx); // nulls < idx
-        let idx = idx - nulls;
         let walk_strat = self.elem_layout.size;
         match walk_strat {
             Size::Fixed(n) => {
-                let full_offset = n as usize * idx;
-                let at_byte = unsafe { at_byte.add(full_offset) };
+                let nulls = self.null_slice.count_nulls_until(idx); // nulls < idx
+                let offset = n as usize * (idx - nulls);
+                let at_byte = unsafe { at_byte.add(offset) };
                 match self.elem_layout.pass {
                     PassBy::Value => Some(unsafe { at_byte.cast::<T>().read() }),
                     PassBy::Ref => {
                         let datum = pg_sys::Datum::from(at_byte);
+                        assert_eq!(
+                            Some(datum),
+                            self.datum_slice.get().and_then(|s| unsafe { s.get(idx) }).copied()
+                        );
                         unsafe { T::from_polymorphic_datum(datum, is_null, self.raw.oid()) }
                     }
                 }
@@ -253,30 +266,47 @@ impl<'a, T: FromDatum> Array<'a, T> {
                 // In this branch, we have to be mindful of alignment.
                 let mut at_byte = at_byte;
                 let align = self.elem_layout.align.as_usize();
-                unsafe {
-                    for _ in 0..idx {
-                        let varsize = varlena::varsize_any(at_byte.cast());
-                        // this DOES NOT match Postgres realignment code in form
-                        // I suspect it matches in function, but theirs is micro-optimized
-                        // so we probably need a battery of tests for this
-                        let align_mask = varsize & (align - 1);
-                        let align_offset = if align_mask != 0 { align - align_mask } else { 0 };
-                        at_byte = at_byte.add(varsize + align_offset);
+                for i in 0..idx {
+                    match self.null_slice.get(i) {
+                        None => panic!("array overindexing was supposed to be caught earlier!"),
+                        Some(true) => continue,
+                        Some(false) => {
+                            debug_assert_eq!(
+                                Some(pg_sys::Datum::from(at_byte)),
+                                self.datum_slice.get().and_then(|s| unsafe { s.get(i) }).copied()
+                            );
+                            let varsize = unsafe { varlena::varsize_any(at_byte.cast()) };
+                            // the Postgres realignment code may seem different in form,
+                            // but it's the same, in function, just micro-optimized
+                            let align_mask = varsize & (align - 1);
+                            let align_offset = if align_mask != 0 { align - align_mask } else { 0 };
+                            at_byte = unsafe { at_byte.add(varsize + align_offset) };
+                        }
                     }
-                    let datum = pg_sys::Datum::from(at_byte);
-                    T::from_polymorphic_datum(datum, is_null, self.raw.oid())
                 }
+                let datum = pg_sys::Datum::from(at_byte);
+                unsafe { T::from_polymorphic_datum(datum, is_null, self.raw.oid()) }
             }
             Size::CStr => {
                 let mut at_char = at_byte.cast();
-                unsafe {
-                    for _ in 0..idx {
-                        let strlen = core::ffi::CStr::from_ptr(at_char).to_bytes().len();
-                        at_char = at_char.add(strlen + 2);
+                for i in 0..idx {
+                    match self.null_slice.get(i) {
+                        None => panic!("array overindexing was supposed to be caught earlier!"),
+                        Some(true) => continue,
+                        Some(false) => {
+                            let strlen =
+                                unsafe { core::ffi::CStr::from_ptr(at_char).to_bytes().len() };
+                            at_char = unsafe { at_char.add(strlen + 2) };
+                            let _datum = pg_sys::Datum::from(at_char);
+                            assert_eq!(
+                                Some(_datum),
+                                self.datum_slice.get().and_then(|s| unsafe { s.get(i) }).copied()
+                            );
+                        }
                     }
-                    let datum = pg_sys::Datum::from(at_char);
-                    T::from_polymorphic_datum(datum, is_null, self.raw.oid())
                 }
+                let datum = pg_sys::Datum::from(at_char);
+                unsafe { T::from_polymorphic_datum(datum, is_null, self.raw.oid()) }
             }
         }
     }
