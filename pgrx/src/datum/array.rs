@@ -434,10 +434,7 @@ impl<'a, T: FromDatum> Iterator for ArrayIntoIterator<'a, T> {
         }
     }
 
-    fn count(self) -> usize
-    where
-        Self: Sized,
-    {
+    fn count(self) -> usize {
         // TODO: This code is dangerously under-exercised in the test suite.
         self.array.nelems - self.curr
     }
