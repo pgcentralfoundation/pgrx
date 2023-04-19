@@ -97,6 +97,7 @@ impl Align {
         }
     }
 
+    #[cfg(debug_assertions)]
     pub(crate) fn as_typalign(self) -> libc::c_char {
         (match self {
             Align::Byte => TYPALIGN_CHAR,
@@ -127,6 +128,7 @@ impl TryFrom<i16> for Size {
 }
 
 impl Size {
+    #[cfg(debug_assertions)]
     pub(crate) fn as_typlen(&self) -> i16 {
         match self {
             Self::CStr => -2,

@@ -1,10 +1,9 @@
 use crate::datum::{Array, FromDatum};
-use crate::layout::{Layout, PassBy, Size};
 use crate::pg_sys;
 use crate::toast::{Toast, Toasty};
 use bitvec::prelude::*;
 use bitvec::ptr::{bitslice_from_raw_parts_mut, BitPtr, BitPtrError, Mut};
-use core::ptr::{self, slice_from_raw_parts_mut, NonNull};
+use core::ptr::{slice_from_raw_parts_mut, NonNull};
 use core::slice;
 
 #[allow(non_snake_case)]
@@ -233,12 +232,16 @@ impl RawArray {
         }
     }
 
-    pub(crate) unsafe fn deconstruct(&mut self, layout: Layout) -> (*mut pg_sys::Datum, *mut bool) {
+    #[cfg(debug_assertions)]
+    pub(crate) unsafe fn deconstruct(
+        &mut self,
+        layout: crate::layout::Layout,
+    ) -> (*mut pg_sys::Datum, *mut bool) {
         let oid = self.oid();
         let array = self.ptr.as_ptr();
         // outvals for deconstruct_array
-        let mut elements = ptr::null_mut();
-        let mut nulls = ptr::null_mut();
+        let mut elements = core::ptr::null_mut();
+        let mut nulls = core::ptr::null_mut();
         let mut nelems = 0;
 
         unsafe {
@@ -246,7 +249,7 @@ impl RawArray {
                 array,
                 oid,
                 layout.size.as_typlen().into(),
-                matches!(layout.pass, PassBy::Value),
+                matches!(layout.pass, crate::layout::PassBy::Value),
                 layout.align.as_typalign(),
                 &mut elements,
                 &mut nulls,
