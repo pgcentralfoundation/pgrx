@@ -14,7 +14,9 @@ use eyre::{eyre, WrapErr};
 use once_cell::sync::Lazy;
 use owo_colors::OwoColorize;
 use pgrx::prelude::*;
-use pgrx_pg_config::{cargo::PgrxManifestExt, createdb, get_c_locale_flags, get_target_dir, PgConfig, Pgrx};
+use pgrx_pg_config::{
+    cargo::PgrxManifestExt, createdb, get_c_locale_flags, get_target_dir, PgConfig, Pgrx,
+};
 use postgres::error::DbError;
 use std::collections::HashMap;
 use std::fmt::Write as _;
