@@ -10,6 +10,7 @@ Use of this source code is governed by the MIT license that can be found in the 
 mod complex;
 mod fixed_size;
 mod generic_enum;
+mod hexint;
 mod hstore_clone;
 mod ordered;
 mod rust_enum;
