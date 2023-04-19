@@ -2151,6 +2151,14 @@ dependencies = [
 ]
 
 [[package]]
+name = "spi_srf"
+version = "0.0.0"
+dependencies = [
+ "pgrx",
+ "pgrx-tests",
+]
+
+[[package]]
 name = "spin"
 version = "0.5.2"
 source = "registry+https://github.com/rust-lang/crates.io-index"

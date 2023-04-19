@@ -32,6 +32,7 @@ members = [
     "pgrx-examples/triggers",
     "pgrx-examples/versioned_custom_libname_so",
     "pgrx-examples/versioned_so",
+    "pgrx-examples/spi_srf",
 ]
 
 [profile.dev.build-override]
