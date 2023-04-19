@@ -127,7 +127,7 @@ pub(crate) fn init_pgrx(pgrx: &Pgrx, init: &Init) -> eyre::Result<()> {
             PgrxHomeError::NoHomeDirectory => return Err(e.into()),
             PgrxHomeError::IoError(e) => return Err(e.into()),
             PgrxHomeError::MissingPgrxHome(path) => {
-                // $PGX_HOME doesn't exist, but that's okay as `cargo pgrx init` is the right time
+                // $PGRX_HOME doesn't exist, but that's okay as `cargo pgrx init` is the right time
                 // to try and create it
                 println!("{} PGRX_HOME at `{}`", "     Creating".bold().green(), path.display());
                 std::fs::create_dir_all(&path)?;
