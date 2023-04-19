@@ -490,7 +490,7 @@ impl RawArray {
         }
     }
 
-    pub(crate) fn byte_ptr(&self) -> *mut u8 {
+    pub(crate) fn data_ptr(&self) -> *mut u8 {
         unsafe { ARR_DATA_PTR(self.ptr.as_ptr()) }
     }
 

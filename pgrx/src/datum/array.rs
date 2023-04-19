@@ -169,7 +169,7 @@ impl<'a, T: FromDatum> Array<'a, T> {
 
     /// Return an Iterator of Option<T> over the contained Datums.
     pub fn iter(&self) -> ArrayIterator<'_, T> {
-        let ptr = self.raw.byte_ptr();
+        let ptr = self.raw.data_ptr();
         ArrayIterator { array: self, curr: 0, ptr }
     }
 
@@ -202,7 +202,7 @@ impl<'a, T: FromDatum> Array<'a, T> {
             return Some(None);
         }
 
-        let mut at_byte = self.raw.byte_ptr();
+        let mut at_byte = self.raw.data_ptr();
         for i in 0..index {
             match self.null_slice.get(i) {
                 // SAFETY: Assured via earlier check that guarantees index is in-bounds
@@ -224,8 +224,12 @@ impl<'a, T: FromDatum> Array<'a, T> {
         Some(unsafe { self.bring_it_back_now(at_byte, index, is_null) })
     }
 
+    /// Extracts an element from a Postgres Array's data buffer
+    ///
+    /// # Safety
+    /// This assumes the pointer is to a valid element of that type.
     #[inline]
-    unsafe fn bring_it_back_now(&self, ptr: *mut u8, index: usize, is_null: bool) -> Option<T> {
+    unsafe fn bring_it_back_now(&self, ptr: *mut u8, _index: usize, is_null: bool) -> Option<T> {
         if is_null {
             return None;
         }
@@ -237,7 +241,7 @@ impl<'a, T: FromDatum> Array<'a, T> {
                 #[cfg(debug_assertions)]
                 assert_eq!(
                     Some(datum),
-                    self._datum_slice.get().and_then(|s| unsafe { s.get(index) }).copied()
+                    self._datum_slice.get().and_then(|s| unsafe { s.get(_index) }).copied()
                 );
                 unsafe { T::from_polymorphic_datum(datum, is_null, self.raw.oid()) }
             }
@@ -245,12 +249,26 @@ impl<'a, T: FromDatum> Array<'a, T> {
     }
 }
 
+/// Walk the data of a Postgres Array, "hopping" according to element layout.
+///
+/// # Safety
+/// For the varlena/cstring layout, data in the buffer is read.
+/// In either case, pointer arithmetic is done, with the usual implications,
+/// e.g. the pointer must be <= a "one past the end" pointer
+/// This means this function must be invoked with the correct layout, and
+/// either the array's `data_ptr` or a correctly offset pointer into it.
+///
+/// Null elements will NOT be present in a Postgres Array's data buffer!
+/// Do not cumulatively invoke this more than `len - null_count`!
+/// Doing so will result in reading uninitialized data, which is UB!
 #[inline]
 unsafe fn one_hop_this_time(ptr: *mut u8, layout: Layout) -> *mut u8 {
     unsafe {
         match layout {
             Layout { size: Size::Fixed(n), .. } => ptr.add(n.into()),
             Layout { size: Size::Varlena, align, .. } => {
+                // SAFETY: This uses the varsize_any function to be safe,
+                // and the caller was informed of pointer requirements.
                 let varsize = varlena::varsize_any(ptr.cast());
 
                 // the Postgres realignment code may seem different in form,
@@ -259,12 +277,15 @@ unsafe fn one_hop_this_time(ptr: *mut u8, layout: Layout) -> *mut u8 {
                 let align_mask = varsize & (align - 1);
                 let align_offset = if align_mask != 0 { align - align_mask } else { 0 };
 
+                // SAFETY: ptr stops at 1-past-end of the array's varlena
                 ptr.add(varsize + align_offset)
             }
             Layout { size: Size::CStr, .. } => {
                 // TODO: this code is dangerously under-exercised in the test suite
+                // SAFETY: The caller was informed of pointer requirements.
                 let strlen = CStr::from_ptr(ptr.cast()).to_bytes().len();
 
+                // SAFETY: ptr stops at 1-past-end of the array's varlena
                 ptr.add(strlen + 2)
             }
         }
@@ -397,7 +418,7 @@ impl<'a, T: FromDatum> IntoIterator for Array<'a, T> {
     type IntoIter = ArrayIntoIterator<'a, T>;
 
     fn into_iter(self) -> Self::IntoIter {
-        let ptr = self.raw.byte_ptr();
+        let ptr = self.raw.data_ptr();
         ArrayIntoIterator { array: self, curr: 0, ptr }
     }
 }
@@ -407,7 +428,7 @@ impl<'a, T: FromDatum> IntoIterator for VariadicArray<'a, T> {
     type IntoIter = ArrayIntoIterator<'a, T>;
 
     fn into_iter(self) -> Self::IntoIter {
-        let ptr = self.0.raw.byte_ptr();
+        let ptr = self.0.raw.data_ptr();
         ArrayIntoIterator { array: self.0, curr: 0, ptr }
     }
 }
