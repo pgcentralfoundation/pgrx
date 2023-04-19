@@ -9,6 +9,21 @@ use std::ffi::CStr;
 use std::fmt::{Display, Formatter};
 
 /// A `BIGINT`-style type that is always represented as hexadecimal.
+///
+/// # Examples
+///
+/// ```sql
+/// custom_types=# SELECT
+///     42::hexint,
+///     '0xdeadbeef'::hexint,
+///     '0Xdeadbeef'::hexint::bigint,
+///     2147483647::hexint,
+///     9223372036854775807::hexint,
+///     '0xbadc0ffee'::hexint::numeric;
+///  hexint |   hexint   |    int8    |   hexint   |       hexint       |   numeric   
+/// --------+------------+------------+------------+--------------------+-------------
+///  0x2a   | 0xdeadbeef | 3735928559 | 0x7fffffff | 0x7fffffffffffffff | 50159747054
+/// ```
 #[repr(transparent)]
 #[derive(
     Copy,
