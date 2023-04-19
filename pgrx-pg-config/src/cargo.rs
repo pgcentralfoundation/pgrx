@@ -30,7 +30,7 @@ impl PgrxManifestExt for Manifest {
                 // haven't tested it, and it's not clear how much it
                 // actually matters either way, so we just emit an error
                 // rather than doing something like `unreachable!()`.
-                cargo_toml::Inheritable::Inherited { workspace } => {
+                cargo_toml::Inheritable::Inherited { workspace: _ } => {
                     Err(eyre!("Workspace-inherited package version are not currently supported."))
                 }
             },

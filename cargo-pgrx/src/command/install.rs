@@ -11,7 +11,7 @@ use crate::command::get::{find_control_file, get_property};
 use crate::manifest::{display_version_info, PgVersionSource};
 use crate::profile::CargoProfile;
 use crate::CommandExecute;
-use cargo_toml::{Inheritable, Manifest};
+use cargo_toml::Manifest;
 use eyre::{eyre, WrapErr};
 use owo_colors::OwoColorize;
 use pgrx_pg_config::{cargo::PgrxManifestExt, get_target_dir, PgConfig, Pgrx};
