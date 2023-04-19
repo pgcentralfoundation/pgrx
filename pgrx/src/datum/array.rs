@@ -169,7 +169,8 @@ impl<'a, T: FromDatum> Array<'a, T> {
 
     /// Return an Iterator of Option<T> over the contained Datums.
     pub fn iter(&self) -> ArrayIterator<'_, T> {
-        ArrayIterator { array: self, curr: 0 }
+        let ptr = self.raw.byte_ptr();
+        ArrayIterator { array: self, curr: 0, ptr }
     }
 
     /// Return an Iterator of the contained Datums (converted to Rust types).
@@ -371,6 +372,7 @@ impl<'a, T: FromDatum + serde::Serialize> serde::Serialize for ArrayTypedIterato
 pub struct ArrayIterator<'a, T: 'a + FromDatum> {
     array: &'a Array<'a, T>,
     curr: usize,
+    ptr: *mut u8,
 }
 
 impl<'a, T: FromDatum> Iterator for ArrayIterator<'a, T> {
@@ -378,11 +380,15 @@ impl<'a, T: FromDatum> Iterator for ArrayIterator<'a, T> {
 
     #[inline]
     fn next(&mut self) -> Option<Self::Item> {
-        if self.curr >= self.array.nelems {
+        let Self { array, curr, ptr } = self;
+        if *curr >= array.nelems {
             None
         } else {
-            let element = self.array.get(self.curr).unwrap();
-            self.curr += 1;
+            let element = unsafe { array.bring_it_back_now(*ptr, *curr) };
+            *curr += 1;
+            if let Some(false) = array.null_slice.get(*curr) {
+                *ptr = unsafe { one_hop_this_time(*ptr, array.elem_layout) };
+            }
             Some(element)
         }
     }
@@ -391,6 +397,7 @@ impl<'a, T: FromDatum> Iterator for ArrayIterator<'a, T> {
 pub struct ArrayIntoIterator<'a, T: FromDatum> {
     array: Array<'a, T>,
     curr: usize,
+    ptr: *mut u8,
 }
 
 impl<'a, T: FromDatum> IntoIterator for Array<'a, T> {
@@ -398,7 +405,8 @@ impl<'a, T: FromDatum> IntoIterator for Array<'a, T> {
     type IntoIter = ArrayIntoIterator<'a, T>;
 
     fn into_iter(self) -> Self::IntoIter {
-        ArrayIntoIterator { array: self, curr: 0 }
+        let ptr = self.raw.byte_ptr();
+        ArrayIntoIterator { array: self, curr: 0, ptr }
     }
 }
 
@@ -407,7 +415,8 @@ impl<'a, T: FromDatum> IntoIterator for VariadicArray<'a, T> {
     type IntoIter = ArrayIntoIterator<'a, T>;
 
     fn into_iter(self) -> Self::IntoIter {
-        ArrayIntoIterator { array: self.0, curr: 0 }
+        let ptr = self.0.raw.byte_ptr();
+        ArrayIntoIterator { array: self.0, curr: 0, ptr }
     }
 }
 
@@ -416,11 +425,16 @@ impl<'a, T: FromDatum> Iterator for ArrayIntoIterator<'a, T> {
 
     #[inline]
     fn next(&mut self) -> Option<Self::Item> {
-        if self.curr >= self.array.nelems {
+        // Note: this code is dangerously under-exercised in the test suite
+        let Self { array, curr, ptr } = self;
+        if *curr >= array.nelems {
             None
         } else {
-            let element = self.array.get(self.curr).unwrap();
-            self.curr += 1;
+            let element = unsafe { array.bring_it_back_now(*ptr, *curr) };
+            *curr += 1;
+            if let Some(false) = array.null_slice.get(*curr) {
+                *ptr = unsafe { one_hop_this_time(*ptr, array.elem_layout) };
+            }
             Some(element)
         }
     }
