@@ -21,7 +21,7 @@ macro_rules! anynumeric_math_op {
 
             #[inline]
             fn $trait_fnname(self, rhs: AnyNumeric) -> Self::Output {
-                call_numeric_func(pg_sys::$pg_func, vec![self.as_datum(), rhs.as_datum()])
+                call_numeric_func(pg_sys::$pg_func, &[self.as_datum(), rhs.as_datum()])
             }
         }
 
@@ -31,7 +31,7 @@ macro_rules! anynumeric_math_op {
 
             #[inline]
             fn $trait_fnname(self, rhs: AnyNumeric) -> Self::Output {
-                call_numeric_func(pg_sys::$pg_func, vec![self.as_datum(), rhs.as_datum()])
+                call_numeric_func(pg_sys::$pg_func, &[self.as_datum(), rhs.as_datum()])
             }
         }
     };
@@ -53,7 +53,7 @@ macro_rules! numeric_math_op {
 
             #[inline]
             fn $trait_fnname(self, rhs: Numeric<Q, T>) -> Self::Output {
-                call_numeric_func(pg_sys::$pg_func, vec![self.as_datum(), rhs.as_datum()])
+                call_numeric_func(pg_sys::$pg_func, &[self.as_datum(), rhs.as_datum()])
             }
         }
 
@@ -63,7 +63,7 @@ macro_rules! numeric_math_op {
 
             #[inline]
             fn $trait_fnname(self, rhs: Numeric<Q, T>) -> Self::Output {
-                call_numeric_func(pg_sys::$pg_func, vec![self.as_datum(), rhs.as_datum()])
+                call_numeric_func(pg_sys::$pg_func, &[self.as_datum(), rhs.as_datum()])
             }
         }
     };
@@ -80,7 +80,7 @@ impl Neg for AnyNumeric {
 
     #[inline]
     fn neg(self) -> Self::Output {
-        call_numeric_func(pg_sys::numeric_uminus, vec![self.as_datum()])
+        call_numeric_func(pg_sys::numeric_uminus, &[self.as_datum()])
     }
 }
 
@@ -89,7 +89,7 @@ impl<const P: u32, const S: u32> Neg for Numeric<P, S> {
 
     #[inline]
     fn neg(self) -> Self::Output {
-        Numeric(call_numeric_func(pg_sys::numeric_uminus, vec![self.as_datum()]))
+        Numeric(call_numeric_func(pg_sys::numeric_uminus, &[self.as_datum()]))
     }
 }
 
@@ -97,7 +97,7 @@ macro_rules! anynumeric_assign_op_from_anynumeric {
     ($opname:ident, $trait_fname:ident, $pg_func:ident) => {
         impl $opname<AnyNumeric> for AnyNumeric {
             fn $trait_fname(&mut self, rhs: AnyNumeric) {
-                *self = call_numeric_func(pg_sys::$pg_func, vec![self.as_datum(), rhs.as_datum()]);
+                *self = call_numeric_func(pg_sys::$pg_func, &[self.as_datum(), rhs.as_datum()]);
             }
         }
     };
@@ -230,7 +230,7 @@ macro_rules! primitive_math_op {
             fn $trait_fnname(self, rhs: $primitive) -> Self::Output {
                 call_numeric_func(
                     pg_sys::$pg_func,
-                    vec![self.as_datum(), AnyNumeric::try_from(rhs).unwrap().as_datum()],
+                    &[self.as_datum(), AnyNumeric::try_from(rhs).unwrap().as_datum()],
                 )
             }
         }
@@ -243,7 +243,7 @@ macro_rules! primitive_math_op {
             fn $trait_fnname(self, rhs: AnyNumeric) -> Self::Output {
                 call_numeric_func(
                     pg_sys::$pg_func,
-                    vec![AnyNumeric::try_from(self).unwrap().as_datum(), rhs.as_datum()],
+                    &[AnyNumeric::try_from(self).unwrap().as_datum(), rhs.as_datum()],
                 )
             }
         }
@@ -256,7 +256,7 @@ macro_rules! primitive_math_op {
             fn $trait_fnname(self, rhs: $primitive) -> Self::Output {
                 call_numeric_func(
                     pg_sys::$pg_func,
-                    vec![self.as_datum(), AnyNumeric::try_from(rhs).unwrap().as_datum()],
+                    &[self.as_datum(), AnyNumeric::try_from(rhs).unwrap().as_datum()],
                 )
             }
         }
@@ -269,7 +269,7 @@ macro_rules! primitive_math_op {
             fn $trait_fnname(self, rhs: Numeric<P, S>) -> Self::Output {
                 call_numeric_func(
                     pg_sys::$pg_func,
-                    vec![rhs.as_datum(), AnyNumeric::try_from(self).unwrap().as_datum()],
+                    &[rhs.as_datum(), AnyNumeric::try_from(self).unwrap().as_datum()],
                 )
             }
         }

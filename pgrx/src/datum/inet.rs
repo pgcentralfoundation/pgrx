@@ -98,7 +98,7 @@ impl FromDatum for Inet {
         if is_null {
             None
         } else {
-            let cstr = direct_function_call::<&CStr>(pg_sys::inet_out, vec![Some(datum)]);
+            let cstr = direct_function_call::<&CStr>(pg_sys::inet_out, &[Some(datum)]);
             Some(Inet(
                 cstr.unwrap().to_str().expect("unable to convert &cstr inet into &str").to_owned(),
             ))
@@ -109,9 +109,7 @@ impl FromDatum for Inet {
 impl IntoDatum for Inet {
     fn into_datum(self) -> Option<pg_sys::Datum> {
         let cstr = alloc::ffi::CString::new(self.0).expect("failed to convert inet into CString");
-        unsafe {
-            direct_function_call_as_datum(pg_sys::inet_in, vec![cstr.as_c_str().into_datum()])
-        }
+        unsafe { direct_function_call_as_datum(pg_sys::inet_in, &[cstr.as_c_str().into_datum()]) }
     }
 
     fn type_oid() -> pg_sys::Oid {

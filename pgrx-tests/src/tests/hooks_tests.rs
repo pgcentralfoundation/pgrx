@@ -28,7 +28,7 @@ mod tests {
             /// Hook before the logs are being processed by PostgreSQL itself
             fn emit_log(
                 &mut self,
-                mut error_data: PgBox<pg_sys::ErrorData>,
+                error_data: PgBox<pg_sys::ErrorData>,
                 prev_hook: fn(error_data: PgBox<pg_sys::ErrorData>) -> HookResult<()>,
             ) -> HookResult<()> {
                 self.events += 1;
@@ -122,7 +122,7 @@ mod tests {
         pgrx::hooks::register_hook(&mut HOOK);
         // To trigger the emit_log hook, we need something to log.
         // We therefore ensure the select statement will be logged.
-        Spi::run("SET local log_statement to 'all'; SELECT 1");
+        Spi::run("SET local log_statement to 'all'; SELECT 1").expect("SPI failed");
         assert_eq!(8, HOOK.events);
 
         // TODO:  it'd be nice to also test that .commit() and .abort() also get called

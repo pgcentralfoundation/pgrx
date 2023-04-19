@@ -18,7 +18,7 @@ pg_test = []
 [dependencies]
 heapless = "0.7.16"
 pgrx = { path = "../../pgrx", default-features = false }
-serde = { version = "1.0.156", features = [ "derive" ] }
+serde = { version = "1.0.160", features = [ "derive" ] }
 
 [dev-dependencies]
 pgrx-tests = { path = "../../pgrx-tests" }

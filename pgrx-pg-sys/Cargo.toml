@@ -31,7 +31,7 @@ rustdoc-args = ["--cfg", "docsrs"]
 memoffset = "0.8.0"
 pgrx-macros = { path = "../pgrx-macros/", version = "=0.7.4" }
 pgrx-sql-entity-graph = { path = "../pgrx-sql-entity-graph/", version = "=0.7.4" }
-serde = { version = "1.0.156", features = [ "derive" ] } # impls on pub types
+serde = { version = "1.0.160", features = [ "derive" ] } # impls on pub types
 # polyfill until #![feature(strict_provenance)] stabilizes
 sptr = "0.3"
 libc = "0.2"
@@ -39,7 +39,7 @@ libc = "0.2"
 [build-dependencies]
 bindgen = { version = "0.60.1", default-features = false, features = ["runtime"] }
 pgrx-pg-config= { path = "../pgrx-pg-config/", version = "=0.7.4" }
-proc-macro2 = "1.0.52"
+proc-macro2 = "1.0.56"
 quote = "1.0.26"
 syn = { version = "1.0.109", features = [ "extra-traits", "full", "fold", "parsing" ] }
 eyre = "0.6.8"

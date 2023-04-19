@@ -21,7 +21,7 @@ macro_rules! anynumeric_from_signed {
         impl From<$ty> for AnyNumeric {
             #[inline]
             fn from(value: $ty) -> Self {
-                call_numeric_func(pg_sys::$func, vec![(value as $as_).into_datum()])
+                call_numeric_func(pg_sys::$func, &[(value as $as_).into_datum()])
             }
         }
     };
@@ -74,7 +74,7 @@ macro_rules! anynumeric_from_float {
                     }
                 }
 
-                Ok(call_numeric_func(pg_sys::$func, vec![value.into_datum()]))
+                Ok(call_numeric_func(pg_sys::$func, &[value.into_datum()]))
             }
         }
     };

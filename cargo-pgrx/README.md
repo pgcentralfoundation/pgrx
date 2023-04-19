@@ -20,33 +20,31 @@ As new versions of `pgrx` are released, you'll want to make sure you run this co
 
 ```shell script
 $ cargo pgrx --help
-cargo-pgrx 0.5.0
-ZomboDB, LLC <zombodb@gmail.com>
 Cargo subcommand for 'pgrx' to make Postgres extension development easy
 
-USAGE:
-    cargo pgrx [OPTIONS] <SUBCOMMAND>
+Usage: cargo pgrx [OPTIONS] <COMMAND>
 
-OPTIONS:
-    -h, --help       Print help information
-    -v, --verbose    Enable info logs, -vv for debug, -vvv for trace
-    -V, --version    Print version information
+Commands:
+  init     Initialize pgrx development environment for the first time
+  info     Provides information about pgrx-managed development environment
+  start    Start a pgrx-managed Postgres instance
+  stop     Stop a pgrx-managed Postgres instance
+  status   Is a pgrx-managed Postgres instance running?
+  new      Create a new extension crate
+  install  Install the extension from the current crate to the Postgres specified by whatever `pg_config` is currently on your $PATH
+  package  Create an installation package directory
+  schema   Generate extension schema files
+  run      Compile/install extension to a pgrx-managed Postgres instance and start psql
+  connect  Connect, via psql, to a Postgres instance
+  test     Run the test suite for this crate
+  get      Get a property from the extension control file
+  cross    Cargo subcommand for 'pgrx' to make Postgres extension development easy
+  help     Print this message or the help of the given subcommand(s)
 
-SUBCOMMANDS:
-    connect    Connect, via psql, to a Postgres instance
-    get        Get a property from the extension control file
-    help       Print this message or the help of the given subcommand(s)
-    init       Initialize pgrx development environment for the first time
-    install    Install the extension from the current crate to the Postgres specified by
-                   whatever `pg_config` is currently on your $PATH
-    new        Create a new extension crate
-    package    Create an installation package directory
-    run        Compile/install extension to a pgrx-managed Postgres instance and start psql
-    schema     Generate extension schema files
-    start      Start a pgrx-managed Postgres instance
-    status     Is a pgrx-managed Postgres instance running?
-    stop       Stop a pgrx-managed Postgres instance
-    test       Run the test suite for this crate
+Options:
+  -v, --verbose...  Enable info logs, -vv for debug, -vvv for trace
+  -h, --help        Print help
+  -V, --version     Print version
 ```
 
 ## Environment Variables
@@ -712,6 +710,29 @@ OPTIONS:
     -V, --version
             Print version information
 ```
+
+## Information about pgx-managed development environment
+
+```
+$ cargo pgx info --help
+Provides information about pgx-managed development environment
+
+Usage: cargo pgx info [OPTIONS] <COMMAND>
+
+Commands:
+  path       Print path to a base version of Postgres build
+  pg-config  Print path to pg_config for a base version of Postgres
+  version    Print specific version for a base Postgres version
+  help       Print this message or the help of the given subcommand(s)
+
+Options:
+  -v, --verbose...  Enable info logs, -vv for debug, -vvv for trace
+  -h, --help        Print help
+  -V, --version     Print version
+```
+
+`cargo pgx info` helps retrieving information about pgx-managed development
+environment (such as managed Postgres installations)
 
 ## EXPERIMENTAL: Versioned shared-object support
 
