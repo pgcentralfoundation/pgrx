@@ -70,7 +70,7 @@ impl IntoDatum for HexInt {
 }
 
 /// Input function for `HexInt`.  Parses any valid "radix(16)" text string, with or without a leading
-/// `0x` (or `0X`) into a `HexInt` type.  Parse errors are return and handled by pgrx
+/// `0x` (or `0X`) into a `HexInt` type.  Parse errors are returned and handled by pgrx
 ///
 /// `requires = [ "shell_type" ]` indicates that the CREATE FUNCTION SQL for this function must happen
 /// *after* the SQL for the "shell_type" block.
@@ -121,6 +121,10 @@ fn numeric_to_hexint(bigint: AnyNumeric) -> Result<HexInt, Box<dyn Error>> {
     Ok(HexInt { value: bigint.try_into()? })
 }
 
+//
+// handwritten sql
+//
+
 /// creates the `hexint` shell type, which is essentially a type placeholder so that the
 /// input and output functions can be created
 extension_sql!(
@@ -158,3 +162,25 @@ CREATE CAST (numeric AS hexint) WITH FUNCTION numeric_to_hexint AS IMPLICIT;
     name = "casts",
     requires = [hexint_to_int, int_to_hexint, hexint_to_numeric, numeric_to_hexint]
 );
+
+#[cfg(any(test, feature = "pg_test"))]
+#[pg_schema]
+mod tests {
+    use crate::hexint::HexInt;
+    use pgrx::prelude::*;
+    use std::error::Error;
+
+    #[pg_test]
+    fn test_hexint_input_func() -> Result<(), Box<dyn Error>> {
+        let value = Spi::get_one::<HexInt>("SELECT '0x2a'::hexint")?;
+        assert_eq!(value, Some(HexInt { value: 0x2a }));
+        Ok(())
+    }
+
+    #[pg_test]
+    fn test_hexint_output_func() -> Result<(), Box<dyn Error>> {
+        let value = Spi::get_one::<String>("SELECT 42::hexint::text")?;
+        assert_eq!(value, Some("0x2a".into()));
+        Ok(())
+    }
+}
