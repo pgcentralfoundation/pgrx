@@ -81,7 +81,7 @@ impl NullKind<'_> {
     fn get(&self, index: usize) -> Option<bool> {
         match self {
             Self::Bits(b1) => b1.get(index).map(|b| !b),
-            Self::Strict(len) => index.le(len).then(|| false),
+            Self::Strict(len) => index.lt(len).then(|| false),
         }
     }
 
@@ -196,26 +196,17 @@ impl<'a, T: FromDatum> Array<'a, T> {
 
     #[allow(clippy::option_option)]
     #[inline]
-    pub fn get(&self, i: usize) -> Option<Option<T>> {
-        if i >= self.nelems {
-            None
-        } else {
-            Some(unsafe { self.walk_index(i) })
-        }
-    }
-
-    /// # Safety
-    /// Implies reading
-    #[inline]
-    unsafe fn walk_index(&self, index: usize) -> Option<T> {
-        let mut at_byte = self.raw.byte_ptr();
+    pub fn get(&self, index: usize) -> Option<Option<T>> {
         let is_null = self.null_slice.get(index)?;
         if is_null {
-            return None;
+            return Some(None);
         }
+
+        let mut at_byte = self.raw.byte_ptr();
         for i in 0..index {
             match self.null_slice.get(i) {
-                None => panic!("array overindexing was supposed to be caught earlier!"),
+                // SAFETY: Assured via earlier check that guarantees index is in-bounds
+                None => unsafe { core::hint::unreachable_unchecked() },
                 Some(true) => continue,
                 Some(false) => {
                     #[cfg(debug_assertions)]
@@ -229,15 +220,16 @@ impl<'a, T: FromDatum> Array<'a, T> {
                 }
             }
         }
-        unsafe { self.bring_it_back_now(at_byte, index) }
+
+        Some(unsafe { self.bring_it_back_now(at_byte, index, is_null) })
     }
 
     #[inline]
-    unsafe fn bring_it_back_now(&self, ptr: *mut u8, index: usize) -> Option<T> {
-        let is_null = self.null_slice.get(index)?;
+    unsafe fn bring_it_back_now(&self, ptr: *mut u8, index: usize, is_null: bool) -> Option<T> {
         if is_null {
             return None;
         }
+
         match self.elem_layout.pass {
             PassBy::Value => Some(unsafe { ptr.cast::<T>().read() }),
             PassBy::Ref => {
@@ -260,16 +252,19 @@ unsafe fn one_hop_this_time(ptr: *mut u8, layout: Layout) -> *mut u8 {
             Layout { size: Size::Fixed(n), .. } => ptr.add(n.into()),
             Layout { size: Size::Varlena, align, .. } => {
                 let varsize = varlena::varsize_any(ptr.cast());
-                let align = align.as_usize();
+
                 // the Postgres realignment code may seem different in form,
-                // but it's the same, in function, just micro-optimized
+                // but it's the same in function, just micro-optimized
+                let align = align.as_usize();
                 let align_mask = varsize & (align - 1);
                 let align_offset = if align_mask != 0 { align - align_mask } else { 0 };
+
                 ptr.add(varsize + align_offset)
             }
             Layout { size: Size::CStr, .. } => {
                 // TODO: this code is dangerously under-exercised in the test suite
                 let strlen = CStr::from_ptr(ptr.cast()).to_bytes().len();
+
                 ptr.add(strlen + 2)
             }
         }
@@ -381,16 +376,13 @@ impl<'a, T: FromDatum> Iterator for ArrayIterator<'a, T> {
     #[inline]
     fn next(&mut self) -> Option<Self::Item> {
         let Self { array, curr, ptr } = self;
-        if *curr >= array.nelems {
-            None
-        } else {
-            let element = unsafe { array.bring_it_back_now(*ptr, *curr) };
-            *curr += 1;
-            if let Some(false) = array.null_slice.get(*curr) {
-                *ptr = unsafe { one_hop_this_time(*ptr, array.elem_layout) };
-            }
-            Some(element)
+        let is_null = array.null_slice.get(*curr)?;
+        let element = unsafe { array.bring_it_back_now(*ptr, *curr, is_null) };
+        *curr += 1;
+        if let Some(false) = array.null_slice.get(*curr) {
+            *ptr = unsafe { one_hop_this_time(*ptr, array.elem_layout) };
         }
+        Some(element)
     }
 }
 
@@ -425,18 +417,14 @@ impl<'a, T: FromDatum> Iterator for ArrayIntoIterator<'a, T> {
 
     #[inline]
     fn next(&mut self) -> Option<Self::Item> {
-        // Note: this code is dangerously under-exercised in the test suite
         let Self { array, curr, ptr } = self;
-        if *curr >= array.nelems {
-            None
-        } else {
-            let element = unsafe { array.bring_it_back_now(*ptr, *curr) };
-            *curr += 1;
-            if let Some(false) = array.null_slice.get(*curr) {
-                *ptr = unsafe { one_hop_this_time(*ptr, array.elem_layout) };
-            }
-            Some(element)
+        let is_null = array.null_slice.get(*curr)?;
+        let element = unsafe { array.bring_it_back_now(*ptr, *curr, is_null) };
+        *curr += 1;
+        if let Some(false) = array.null_slice.get(*curr) {
+            *ptr = unsafe { one_hop_this_time(*ptr, array.elem_layout) };
         }
+        Some(element)
     }
 
     fn size_hint(&self) -> (usize, Option<usize>) {
