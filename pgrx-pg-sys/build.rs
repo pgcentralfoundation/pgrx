@@ -118,9 +118,7 @@ fn main() -> eyre::Result<()> {
 
     let pg_configs: Vec<(u16, PgConfig)> = if env_tracked(
         "PGRX_PG_SYS_GENERATE_BINDINGS_FOR_RELEASE",
-    )
-    .unwrap_or("false".into())
-        == "1"
+    ).as_ref() == Some("1")
     {
         Pgrx::from_config()?.iter(PgConfigSelector::All)
             .map(|r| r.expect("invalid pg_config"))
