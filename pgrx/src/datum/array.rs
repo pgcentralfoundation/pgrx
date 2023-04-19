@@ -69,9 +69,6 @@ pub struct Array<'a, T: FromDatum> {
     _marker: PhantomData<T>,
 }
 
-// FIXME: When Array::over gets removed, this enum can probably be dropped
-// since we won't be entertaining ArrayTypes which don't use bitslices anymore.
-// However, we could also use a static resolution? Hard to say what's best.
 enum NullKind<'a> {
     Bits(&'a BitSlice<u8>),
     Strict(usize),
@@ -181,7 +178,7 @@ impl<'a, T: FromDatum> Array<'a, T> {
     ///
     /// This function will panic when called if the array contains any SQL NULL values.
     pub fn iter_deny_null(&self) -> ArrayTypedIterator<'_, T> {
-        if unsafe { self.raw.any_nulls() } {
+        if self.null_slice.any() {
             panic!("array contains NULL");
         }
 
