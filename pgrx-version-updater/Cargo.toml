@@ -7,7 +7,7 @@ license = "MIT"
 description = "Standalone tool to update PGRX Cargo.toml versions and dependencies in preparation for a release."
 
 [dependencies]
-clap = { version = "4.1.8", features = [ "env", "derive" ] }
+clap = { version = "4.2.4", features = [ "env", "derive" ] }
 owo-colors = "3.5.0"
-toml_edit = { version = "0.19.6" }
+toml_edit = { version = "0.19.8" }
 walkdir = "2"

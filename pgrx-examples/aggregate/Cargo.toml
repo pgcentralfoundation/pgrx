@@ -18,7 +18,7 @@ bob = []
 
 [dependencies]
 pgrx = { path = "../../pgrx", default-features = false }
-serde = "1.0.156"
+serde = "1.0.160"
 
 [dev-dependencies]
 pgrx-tests = { path = "../../pgrx-tests" }
