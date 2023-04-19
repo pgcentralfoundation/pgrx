@@ -99,11 +99,10 @@ fn main() -> eyre::Result<()> {
         }
     }
 
-    let compile_cshim =
-        env_tracked("CARGO_FEATURE_CSHIM").unwrap_or_else(|| "0".to_string()) == "1";
+    let compile_cshim = env_tracked("CARGO_FEATURE_CSHIM").as_deref() == Some("1");
 
     let is_for_release =
-        env_tracked("PGRX_PG_SYS_GENERATE_BINDINGS_FOR_RELEASE").unwrap_or("0".to_string()) == "1";
+        env_tracked("PGRX_PG_SYS_GENERATE_BINDINGS_FOR_RELEASE").as_deref() == Some("1");
 
     // Do nightly detection to suppress silly warnings.
     if is_nightly() {
@@ -118,7 +117,9 @@ fn main() -> eyre::Result<()> {
 
     let pg_configs: Vec<(u16, PgConfig)> = if env_tracked(
         "PGRX_PG_SYS_GENERATE_BINDINGS_FOR_RELEASE",
-    ).as_ref() == Some("1")
+    )
+    .as_deref()
+        == Some("1")
     {
         Pgrx::from_config()?.iter(PgConfigSelector::All)
             .map(|r| r.expect("invalid pg_config"))
@@ -253,12 +254,12 @@ fn generate_bindings(
         .wrap_err_with(|| format!("failed to rewrite items for pg{}", major_version))?;
     let oids = format_builtin_oid_impl(oids);
 
-    let dest_dirs = if env_tracked("PGRX_PG_SYS_GENERATE_BINDINGS_FOR_RELEASE").as_ref() == Some("1")
-    {
-        vec![build_paths.out_dir.clone(), build_paths.src_dir.clone()]
-    } else {
-        vec![build_paths.out_dir.clone()]
-    };
+    let dest_dirs =
+        if env_tracked("PGRX_PG_SYS_GENERATE_BINDINGS_FOR_RELEASE").as_deref() == Some("1") {
+            vec![build_paths.out_dir.clone(), build_paths.src_dir.clone()]
+        } else {
+            vec![build_paths.out_dir.clone()]
+        };
     for dest_dir in dest_dirs {
         let mut bindings_file = dest_dir.clone();
         bindings_file.push(&format!("pg{}.rs", major_version));
