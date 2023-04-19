@@ -140,8 +140,8 @@ fn numeric_to_hexint(bigint: AnyNumeric) -> Result<HexInt, Box<dyn Error>> {
 // handwritten sql
 //
 
-/// creates the `hexint` shell type, which is essentially a type placeholder so that the
-/// input and output functions can be created
+// creates the `hexint` shell type, which is essentially a type placeholder so that the
+// input and output functions can be created
 extension_sql!(
     r#"
 CREATE TYPE hexint; -- shell type
@@ -150,7 +150,7 @@ CREATE TYPE hexint; -- shell type
     bootstrap // declare this extension_sql block as the "bootstrap" block so that it happens first in sql generation
 );
 
-/// create the actual type, specifying the input and output functions
+// create the actual type, specifying the input and output functions
 extension_sql!(
     r#"
 CREATE TYPE hexint (
@@ -164,7 +164,7 @@ CREATE TYPE hexint (
     requires = ["shell_type", hexint_in, hexint_out], // so that we won't be created until the shell type and input and output functions have
 );
 
-/// some convenient casts
+// some convenient casts
 extension_sql!(
     r#"
 CREATE CAST (bigint AS hexint) WITHOUT FUNCTION AS IMPLICIT;
@@ -178,6 +178,7 @@ CREATE CAST (numeric AS hexint) WITH FUNCTION numeric_to_hexint AS IMPLICIT;
     requires = [hexint_to_int, int_to_hexint, hexint_to_numeric, numeric_to_hexint]
 );
 
+#[cfg(not(feature = "no-schema-generation"))]
 #[cfg(any(test, feature = "pg_test"))]
 #[pg_schema]
 mod tests {
