@@ -849,6 +849,7 @@ fn connect_externs(
 ) -> eyre::Result<()> {
     for (item, &index) in externs {
         let mut found_schema_declaration = false;
+        let mut has_explicit_requires = false;
         for extern_attr in &item.extern_attrs {
             match extern_attr {
                 crate::ExternArgs::Requires(requirements) => {
@@ -863,6 +864,7 @@ fn connect_externs(
                             triggers,
                         ) {
                             graph.add_edge(*target, index, SqlGraphRelationship::RequiredBy);
+                            has_explicit_requires = true;
                         } else {
                             return Err(eyre!("Could not find `requires` target: {:?}", requires));
                         }
@@ -933,7 +935,9 @@ fn connect_externs(
                     if let Some(_) = ext_item.has_sql_declared_entity(&SqlDeclared::Type(
                         arg.used_ty.full_path.to_string(),
                     )) {
-                        graph.add_edge(*ext_index, index, SqlGraphRelationship::RequiredByArg);
+                        if !has_explicit_requires {
+                            graph.add_edge(*ext_index, index, SqlGraphRelationship::RequiredByArg);
+                        }
                     } else if let Some(_) = ext_item.has_sql_declared_entity(&SqlDeclared::Enum(
                         arg.used_ty.full_path.to_string(),
                     )) {
