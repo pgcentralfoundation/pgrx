@@ -424,18 +424,27 @@ impl<'a, T: FromDatum> Iterator for ArrayIntoIterator<'a, T> {
     }
 
     fn size_hint(&self) -> (usize, Option<usize>) {
-        (0, Some(self.array.nelems))
+        // If asking for size, it's not clear if they want "actual size"
+        // or "size minus nulls"? Let's lower bound on 0 if nulls exist.
+        let left = self.array.nelems - self.curr;
+        if let NullKind::Strict(_) = self.array.null_slice {
+            (left, Some(left))
+        } else {
+            (0, Some(left))
+        }
     }
 
     fn count(self) -> usize
     where
         Self: Sized,
     {
-        self.array.nelems
+        // TODO: This code is dangerously under-exercised in the test suite.
+        self.array.nelems - self.curr
     }
 
     fn nth(&mut self, n: usize) -> Option<Self::Item> {
-        self.array.get(n)
+        // TODO: This code is dangerously under-exercised in the test suite.
+        self.array.get(self.curr + n)
     }
 }
 
