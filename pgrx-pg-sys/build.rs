@@ -88,12 +88,12 @@ impl bindgen::callbacks::ParseCallbacks for PgrxOverrides {
 }
 
 fn main() -> eyre::Result<()> {
-    if env_tracked("DOCS_RS").unwrap_or("false".into()) == "1" {
+    if env_tracked("DOCS_RS").as_deref() == Some("1") {
         return Ok(());
     }
 
     // dump the environment for debugging if asked
-    if env_tracked("PGRX_BUILD_VERBOSE").unwrap_or_else(|| "false".to_string()) == "true" {
+    if env_tracked("PGRX_BUILD_VERBOSE").as_deref() == Some("true") {
         for (k, v) in std::env::vars() {
             eprintln!("{}={}", k, v);
         }
@@ -852,7 +852,7 @@ fn build_shim_for_version(
 
 fn extra_bindgen_clang_args(pg_config: &PgConfig) -> eyre::Result<Vec<String>> {
     let mut out = vec![];
-    if env_tracked("CARGO_CFG_TARGET_OS").unwrap_or_default() == "macos" {
+    if env_tracked("CARGO_CFG_TARGET_OS").as_deref() == Some("macos") {
         // On macOS, find the `-isysroot` arg out of the c preprocessor flags,
         // to handle the case where bindgen uses a libclang isn't provided by
         // the system.
