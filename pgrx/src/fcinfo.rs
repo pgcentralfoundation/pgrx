@@ -435,7 +435,7 @@ pub unsafe fn pg_func_extra<ReturnType, DefaultValue: FnOnce() -> ReturnType>(
 ///     let result = unsafe {
 ///         direct_function_call::<pg_sys::Oid>(
 ///             pg_sys::regclassin,
-///             vec![ CString::new("pg_class").unwrap().as_c_str().into_datum()]
+///             &[CString::new("pg_class").unwrap().as_c_str().into_datum()]
 ///         )
 ///     };
 ///     let oid = result.expect("failed to lookup oid for pg_class");
@@ -444,7 +444,8 @@ pub unsafe fn pg_func_extra<ReturnType, DefaultValue: FnOnce() -> ReturnType>(
 /// ```
 pub unsafe fn direct_function_call<R: FromDatum>(
     func: unsafe fn(pg_sys::FunctionCallInfo) -> pg_sys::Datum,
-    args: Vec<Option<pg_sys::Datum>>,
+    // TODO: this could take an iterator, but it would break turbofish :(
+    args: &[Option<pg_sys::Datum>],
 ) -> Option<R> {
     direct_function_call_as_datum(func, args).map_or(None, |d| R::from_datum(d, false))
 }
@@ -467,7 +468,7 @@ pub unsafe fn direct_function_call<R: FromDatum>(
 ///
 /// /* NOTE:  _wrapper suffix! */
 /// let result = unsafe {
-///     direct_pg_extern_function_call::<i32>(add_numbers_wrapper, vec![1_i32.into_datum(), 2_i32.into_datum()])
+///     direct_pg_extern_function_call::<i32>(add_numbers_wrapper, &[1_i32.into_datum(), 2_i32.into_datum()])
 /// };
 /// let sum = result.expect("add_numbers_wrapper returned NULL");
 /// assert_eq!(3, sum);
@@ -478,7 +479,7 @@ pub unsafe fn direct_function_call<R: FromDatum>(
 /// This function is unsafe as the function you're calling is also unsafe
 pub unsafe fn direct_pg_extern_function_call<R: FromDatum>(
     func: unsafe extern "C" fn(pg_sys::FunctionCallInfo) -> pg_sys::Datum,
-    args: Vec<Option<pg_sys::Datum>>,
+    args: &[Option<pg_sys::Datum>],
 ) -> Option<R> {
     direct_pg_extern_function_call_as_datum(func, args).map_or(None, |d| R::from_datum(d, false))
 }
@@ -491,7 +492,7 @@ pub unsafe fn direct_pg_extern_function_call<R: FromDatum>(
 /// This function is unsafe as the function you're calling is also unsafe
 pub unsafe fn direct_function_call_as_datum(
     func: unsafe fn(pg_sys::FunctionCallInfo) -> pg_sys::Datum,
-    args: Vec<Option<pg_sys::Datum>>,
+    args: &[Option<pg_sys::Datum>],
 ) -> Option<pg_sys::Datum> {
     direct_function_call_as_datum_internal(|fcinfo| func(fcinfo), args)
 }
@@ -499,7 +500,7 @@ pub unsafe fn direct_function_call_as_datum(
 #[cfg(feature = "pg11")]
 unsafe fn direct_function_call_as_datum_internal(
     func: impl FnOnce(pg_sys::FunctionCallInfo) -> pg_sys::Datum,
-    args: Vec<Option<pg_sys::Datum>>,
+    args: &[Option<pg_sys::Datum>],
 ) -> Option<pg_sys::Datum> {
     let fcinfo_ptr = pg_sys::palloc(std::mem::size_of::<pg_sys::FunctionCallInfoData>())
         .cast::<pg_sys::FunctionCallInfoData>();
@@ -512,7 +513,7 @@ unsafe fn direct_function_call_as_datum_internal(
     fcinfo.isnull = false;
     fcinfo.nargs = args.len() as _;
 
-    for (i, arg) in args.into_iter().enumerate() {
+    for (i, &arg) in args.into_iter().enumerate() {
         fcinfo.argnull[i] = arg.is_none();
         fcinfo.arg[i] = arg.unwrap_or(pg_sys::Datum::from(0));
     }
@@ -527,12 +528,12 @@ unsafe fn direct_function_call_as_datum_internal(
 #[cfg(not(feature = "pg11"))]
 unsafe fn direct_function_call_as_datum_internal(
     func: impl FnOnce(pg_sys::FunctionCallInfo) -> pg_sys::Datum,
-    args: Vec<Option<pg_sys::Datum>>,
+    args: &[Option<pg_sys::Datum>],
 ) -> Option<pg_sys::Datum> {
-    let nargs = args.len();
+    let nargs: i16 = args.len().try_into().expect("too many args passed to function");
     let fcinfo_ptr = pg_sys::palloc(
         std::mem::size_of::<pg_sys::FunctionCallInfoBaseData>()
-            + std::mem::size_of::<pg_sys::NullableDatum>() * nargs,
+            + std::mem::size_of::<pg_sys::NullableDatum>() * args.len(),
     )
     .cast::<pg_sys::FunctionCallInfoBaseData>();
 
@@ -542,10 +543,10 @@ unsafe fn direct_function_call_as_datum_internal(
     fcinfo.resultinfo = std::ptr::null_mut();
     fcinfo.fncollation = pg_sys::InvalidOid;
     fcinfo.isnull = false;
-    fcinfo.nargs = nargs as _;
+    fcinfo.nargs = nargs;
 
-    let arg_slice = fcinfo.args.as_mut_slice(nargs);
-    for (i, arg) in args.into_iter().enumerate() {
+    let arg_slice = fcinfo.args.as_mut_slice(args.len());
+    for (i, &arg) in args.into_iter().enumerate() {
         arg_slice[i].isnull = arg.is_none();
         arg_slice[i].value = arg.unwrap_or(pg_sys::Datum::from(0));
     }
@@ -565,7 +566,7 @@ unsafe fn direct_function_call_as_datum_internal(
 /// This function is unsafe as the function you're calling is also unsafe
 pub unsafe fn direct_pg_extern_function_call_as_datum(
     func: unsafe extern "C" fn(pg_sys::FunctionCallInfo) -> pg_sys::Datum,
-    args: Vec<Option<pg_sys::Datum>>,
+    args: &[Option<pg_sys::Datum>],
 ) -> Option<pg_sys::Datum> {
     direct_function_call_as_datum_internal(|fcinfo| func(fcinfo), args)
 }

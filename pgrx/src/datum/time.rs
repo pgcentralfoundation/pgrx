@@ -112,9 +112,8 @@ impl serde::Serialize for Time {
     where
         S: serde::Serializer,
     {
-        let cstr: Option<&core::ffi::CStr> = unsafe {
-            crate::direct_function_call(pg_sys::time_out, vec![self.clone().into_datum()])
-        };
+        let cstr: Option<&core::ffi::CStr> =
+            unsafe { crate::direct_function_call(pg_sys::time_out, &[self.clone().into_datum()]) };
         serializer.serialize_str(cstr.and_then(|c| c.to_str().ok()).unwrap())
     }
 }

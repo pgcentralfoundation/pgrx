@@ -21,11 +21,11 @@ pub(crate) fn from_primitive_helper<I: IntoDatum, const P: u32, const S: u32>(
             debug_assert_eq!(I::type_oid(), pg_sys::CSTRINGOID);
             direct_function_call(
                 pg_sys::numeric_in,
-                vec![datum, pg_sys::InvalidOid.into_datum(), make_typmod(P, S).into_datum()],
+                &[datum, pg_sys::InvalidOid.into_datum(), make_typmod(P, S).into_datum()],
             )
         } else if func == pg_sys::numeric {
             debug_assert_eq!(I::type_oid(), pg_sys::NUMERICOID);
-            direct_function_call(pg_sys::numeric, vec![datum, make_typmod(P, S).into_datum()])
+            direct_function_call(pg_sys::numeric, &[datum, make_typmod(P, S).into_datum()])
         } else {
             debug_assert!(
                 func == pg_sys::float4_numeric
@@ -35,13 +35,13 @@ pub(crate) fn from_primitive_helper<I: IntoDatum, const P: u32, const S: u32>(
                     || func == pg_sys::int8_numeric
             );
             // use the user-provided `func` to make a Numeric from some primitive type
-            let numeric_datum = direct_function_call_as_datum(func, vec![datum]);
+            let numeric_datum = direct_function_call_as_datum(func, &[datum]);
 
             if P != 0 || S != 0 {
                 // and if it has a precision or a scale, try to coerce it into those constraints
                 direct_function_call(
                     pg_sys::numeric,
-                    vec![numeric_datum, make_typmod(P, S).into_datum()],
+                    &[numeric_datum, make_typmod(P, S).into_datum()],
                 )
             } else {
                 numeric_datum

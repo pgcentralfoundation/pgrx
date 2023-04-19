@@ -68,7 +68,7 @@ impl Drop for AnyNumeric {
 impl Display for AnyNumeric {
     fn fmt(&self, fmt: &mut Formatter<'_>) -> fmt::Result {
         let numeric_out = unsafe {
-            direct_function_call::<&CStr>(pg_sys::numeric_out, vec![self.as_datum()]).unwrap()
+            direct_function_call::<&CStr>(pg_sys::numeric_out, &[self.as_datum()]).unwrap()
         };
         let s = numeric_out.to_str().expect("numeric_out is not a valid UTF8 string");
         fmt.pad(s)
@@ -130,42 +130,41 @@ impl AnyNumeric {
 
     /// The absolute value of this [`AnyNumeric`]
     pub fn abs(&self) -> Self {
-        unsafe { direct_function_call(pg_sys::numeric_abs, vec![self.as_datum()]).unwrap() }
+        unsafe { direct_function_call(pg_sys::numeric_abs, &[self.as_datum()]).unwrap() }
     }
 
     /// Compute the logarithm of this [`AnyNumeric`] in the given base
     pub fn log(&self, base: AnyNumeric) -> Self {
         unsafe {
-            direct_function_call(pg_sys::numeric_log, vec![self.as_datum(), base.as_datum()])
-                .unwrap()
+            direct_function_call(pg_sys::numeric_log, &[self.as_datum(), base.as_datum()]).unwrap()
         }
     }
 
     /// Raise `e` to the power of `x`
     pub fn exp(x: &AnyNumeric) -> Self {
-        unsafe { direct_function_call(pg_sys::numeric_exp, vec![x.as_datum()]).unwrap() }
+        unsafe { direct_function_call(pg_sys::numeric_exp, &[x.as_datum()]).unwrap() }
     }
 
     /// Compute the square root of this [`AnyNumeric`]
     pub fn sqrt(&self) -> Self {
-        unsafe { direct_function_call(pg_sys::numeric_sqrt, vec![self.as_datum()]).unwrap() }
+        unsafe { direct_function_call(pg_sys::numeric_sqrt, &[self.as_datum()]).unwrap() }
     }
 
     /// Return the smallest integer greater than or equal to this [`AnyNumeric`]
     pub fn ceil(&self) -> Self {
-        unsafe { direct_function_call(pg_sys::numeric_ceil, vec![self.as_datum()]).unwrap() }
+        unsafe { direct_function_call(pg_sys::numeric_ceil, &[self.as_datum()]).unwrap() }
     }
 
     /// Return the largest integer equal to or less than this [`AnyNumeric`]
     pub fn floor(&self) -> Self {
-        unsafe { direct_function_call(pg_sys::numeric_floor, vec![self.as_datum()]).unwrap() }
+        unsafe { direct_function_call(pg_sys::numeric_floor, &[self.as_datum()]).unwrap() }
     }
 
     /// Calculate the greatest common divisor of this an another [`AnyNumeric`]
     #[cfg(not(any(feature = "pg11", feature = "pg12")))]
     pub fn gcd(&self, n: &AnyNumeric) -> AnyNumeric {
         unsafe {
-            direct_function_call(pg_sys::numeric_gcd, vec![self.as_datum(), n.as_datum()]).unwrap()
+            direct_function_call(pg_sys::numeric_gcd, &[self.as_datum(), n.as_datum()]).unwrap()
         }
     }
 
