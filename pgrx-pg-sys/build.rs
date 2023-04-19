@@ -253,9 +253,7 @@ fn generate_bindings(
         .wrap_err_with(|| format!("failed to rewrite items for pg{}", major_version))?;
     let oids = format_builtin_oid_impl(oids);
 
-    let dest_dirs = if env_tracked("PGRX_PG_SYS_GENERATE_BINDINGS_FOR_RELEASE")
-        .unwrap_or("false".into())
-        == "1"
+    let dest_dirs = if env_tracked("PGRX_PG_SYS_GENERATE_BINDINGS_FOR_RELEASE").as_ref() == Some("1")
     {
         vec![build_paths.out_dir.clone(), build_paths.src_dir.clone()]
     } else {
