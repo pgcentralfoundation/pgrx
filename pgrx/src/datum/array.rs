@@ -209,8 +209,7 @@ impl<'a, T: FromDatum> Array<'a, T> {
         let mut at_byte = self.raw.data_ptr();
         for i in 0..index {
             match self.null_slice.get(i) {
-                // SAFETY: Assured via earlier check that guarantees index is in-bounds
-                None => unsafe { core::hint::unreachable_unchecked() },
+                None => unreachable!("array was exceeded while walking to known non-null index???"),
                 // Skip nulls: the data buffer has no placeholders for them!
                 Some(true) => continue,
                 Some(false) => {
