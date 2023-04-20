@@ -200,7 +200,7 @@ impl<'a, T: FromDatum> Array<'a, T> {
     #[allow(clippy::option_option)]
     #[inline]
     pub fn get(&self, index: usize) -> Option<Option<T>> {
-        let is_null = self.null_slice.get(index)?;
+        let Some(is_null) = self.null_slice.get(index) else { return None };
         if is_null {
             return Some(None);
         }
@@ -410,7 +410,7 @@ impl<'a, T: FromDatum> Iterator for ArrayIterator<'a, T> {
     #[inline]
     fn next(&mut self) -> Option<Self::Item> {
         let Self { array, curr, ptr } = self;
-        let is_null = array.null_slice.get(*curr)?;
+        let Some(is_null) = array.null_slice.get(*curr) else { return None };
         let element = unsafe { array.bring_it_back_now(*ptr, *curr, is_null) };
         *curr += 1;
         if let Some(false) = array.null_slice.get(*curr) {
@@ -452,7 +452,7 @@ impl<'a, T: FromDatum> Iterator for ArrayIntoIterator<'a, T> {
     #[inline]
     fn next(&mut self) -> Option<Self::Item> {
         let Self { array, curr, ptr } = self;
-        let is_null = array.null_slice.get(*curr)?;
+        let Some(is_null) = array.null_slice.get(*curr) else { return None };
         let element = unsafe { array.bring_it_back_now(*ptr, *curr, is_null) };
         *curr += 1;
         if let Some(false) = array.null_slice.get(*curr) {
@@ -499,7 +499,7 @@ impl<'a, T: FromDatum> FromDatum for Array<'a, T> {
         if is_null {
             None
         } else {
-            let ptr = NonNull::new(datum.cast_mut_ptr())?;
+            let Some(ptr) = NonNull::new(datum.cast_mut_ptr()) else { return None };
             let raw = RawArray::detoast_from_varlena(ptr);
             Some(Array::deconstruct_from(raw))
         }
