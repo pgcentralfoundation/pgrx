@@ -253,15 +253,19 @@ mod tests {
 
     #[pg_test]
     fn test_serde_serialize_array_i32() -> Result<(), pgrx::spi::Error> {
-        let json = Spi::get_one::<Json>("SELECT serde_serialize_array_i32(ARRAY[1,2,3,null, 4])")?
-            .expect("returned json was null");
-        assert_eq!(json.0, json! {{"values": [1,2,3,null,4]}});
+        let json = Spi::get_one::<Json>(
+            "SELECT serde_serialize_array_i32(ARRAY[1, null, 2, 3, null, 4, 5])",
+        )?
+        .expect("returned json was null");
+        assert_eq!(json.0, json! {{"values": [1,null,2,3,null,4, 5]}});
         Ok(())
     }
 
     #[pg_test(error = "array contains NULL")]
     fn test_serde_serialize_array_i32_deny_null() -> Result<Option<Json>, pgrx::spi::Error> {
-        Spi::get_one::<Json>("SELECT serde_serialize_array_i32_deny_null(ARRAY[1,2,3,null, 4])")
+        Spi::get_one::<Json>(
+            "SELECT serde_serialize_array_i32_deny_null(ARRAY[1, 2, 3, null, 4, 5])",
+        )
     }
 
     #[pg_test]
@@ -278,7 +282,7 @@ mod tests {
 
     #[pg_test]
     fn test_slice_to_array() -> Result<(), pgrx::spi::Error> {
-        let owned_vec = vec![Some(1), Some(2), Some(3), None, Some(4)];
+        let owned_vec = vec![Some(1), None, Some(2), Some(3), None, Some(4), Some(5)];
         let json = Spi::connect(|client| {
             client
                 .select(
@@ -293,7 +297,7 @@ mod tests {
                 .get_one::<Json>()
         })?
         .expect("Failed to return json even though it's right there ^^");
-        assert_eq!(json.0, json! {{"values": [1, 2, 3, null, 4]}});
+        assert_eq!(json.0, json! {{"values": [1, null, 2, 3, null, 4, 5]}});
         Ok(())
     }
 

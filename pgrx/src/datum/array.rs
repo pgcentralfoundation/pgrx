@@ -10,15 +10,20 @@ Use of this source code is governed by the MIT license that can be found in the 
 use crate::array::RawArray;
 use crate::layout::*;
 use crate::slice::PallocSlice;
+use crate::toast::Toast;
+use crate::varlena;
 use crate::{pg_sys, FromDatum, IntoDatum, PgMemoryContexts};
 use bitvec::slice::BitSlice;
+use core::ffi::CStr;
+use core::ops::DerefMut;
 use core::ptr::NonNull;
+use once_cell::sync::OnceCell;
 use pgrx_sql_entity_graph::metadata::{
     ArgumentError, Returns, ReturnsError, SqlMapping, SqlTranslatable,
 };
 use serde::Serializer;
 use std::marker::PhantomData;
-use std::{mem, ptr};
+use std::mem;
 
 /** An array of some type (eg. `TEXT[]`, `int[]`)
 
@@ -54,19 +59,16 @@ fn with_vec(elems: Array<String>) {
 ```
 */
 pub struct Array<'a, T: FromDatum> {
-    raw: Option<RawArray>,
     nelems: usize,
     // Remove this field if/when we figure out how to stop using pg_sys::deconstruct_array
-    datum_slice: Option<PallocSlice<pg_sys::Datum>>,
-    needs_pfree: bool,
     null_slice: NullKind<'a>,
     elem_layout: Layout,
+    _datum_slice: OnceCell<PallocSlice<pg_sys::Datum>>,
+    // Rust drops in FIFO order, drop this last
+    raw: Toast<RawArray>,
     _marker: PhantomData<T>,
 }
 
-// FIXME: When Array::over gets removed, this enum can probably be dropped
-// since we won't be entertaining ArrayTypes which don't use bitslices anymore.
-// However, we could also use a static resolution? Hard to say what's best.
 enum NullKind<'a> {
     Bits(&'a BitSlice<u8>),
     Strict(usize),
@@ -75,13 +77,17 @@ enum NullKind<'a> {
 impl NullKind<'_> {
     fn get(&self, index: usize) -> Option<bool> {
         match self {
+            // Note this flips the bit:
+            // Postgres nullbitmaps are 1 for "valid" and 0 for "null"
             Self::Bits(b1) => b1.get(index).map(|b| !b),
-            Self::Strict(len) => index.le(len).then(|| false),
+            Self::Strict(len) => index.lt(len).then(|| false),
         }
     }
 
     fn any(&self) -> bool {
         match self {
+            // Note the reversed polarity:
+            // Postgres nullbitmaps are 1 for "valid" and 0 for "null"
             Self::Bits(b1) => !b1.all(),
             Self::Strict(_) => false,
         }
@@ -97,107 +103,57 @@ impl<'a, T: FromDatum + serde::Serialize> serde::Serialize for Array<'a, T> {
     }
 }
 
-impl<'a, T: FromDatum> Drop for Array<'a, T> {
-    fn drop(&mut self) {
-        // First drop the slice that references the RawArray
-        let slice = mem::take(&mut self.datum_slice);
-        mem::drop(slice);
-        if self.needs_pfree {
-            if let Some(raw) = self.raw.take().map(|r| r.into_ptr()) {
-                // SAFETY: if pgrx detoasted a clone of this varlena, pfree the clone
-                unsafe { pg_sys::pfree(raw.as_ptr().cast()) }
-            }
-        }
-    }
-}
-
 #[deny(unsafe_op_in_unsafe_fn)]
 impl<'a, T: FromDatum> Array<'a, T> {
     /// # Safety
     ///
     /// This function requires that the RawArray was obtained in a properly-constructed form
     /// (probably from Postgres).
-    unsafe fn deconstruct_from(
-        ptr: NonNull<pg_sys::varlena>,
-        raw: RawArray,
-        elem_layout: Layout,
-    ) -> Array<'a, T> {
+    unsafe fn deconstruct_from(mut raw: Toast<RawArray>) -> Array<'a, T> {
         let oid = raw.oid();
-        let len = raw.len();
-        let array = raw.into_ptr().as_ptr();
-
-        // outvals for deconstruct_array
-        let mut elements = ptr::null_mut();
-        let mut nulls = ptr::null_mut();
-        let mut nelems = 0;
-
-        /*
-        FIXME(jubilee): This way of getting array buffers causes problems for any Drop impl,
-        and clashes with assumptions of Array being a "zero-copy", lifetime-bound array,
-        some of which are implicitly embedded in other methods (e.g. Array::over).
-        It also risks leaking memory, as deconstruct_array calls palloc.
-
-        SAFETY: We have already asserted the validity of the RawArray, so
-        this only makes mistakes if we mix things up and pass Postgres the wrong data.
-        */
-        unsafe {
-            pg_sys::deconstruct_array(
-                array,
-                oid,
-                elem_layout.size.as_typlen().into(),
-                matches!(elem_layout.pass, PassBy::Value),
-                elem_layout.align.as_typalign(),
-                &mut elements,
-                &mut nulls,
-                &mut nelems,
-            )
-        };
-
-        let nelems = nelems as usize;
-
-        // Check our RawArray len impl for correctness.
-        assert_eq!(nelems, len);
-
-        // Detoasting the varlena may have allocated a fresh ArrayType.
-        // Check pointer equivalence, then pfree the palloc later if it's a new one.
-        let needs_pfree = ptr.as_ptr().cast() != array;
-        let mut raw = unsafe { RawArray::from_ptr(NonNull::new_unchecked(array)) };
-
+        let elem_layout = Layout::lookup_oid(oid);
+        let nelems = raw.len();
         let null_slice = raw
             .nulls_bitslice()
             .map(|nonnull| NullKind::Bits(unsafe { &*nonnull.as_ptr() }))
             .unwrap_or(NullKind::Strict(nelems));
+        let _datum_slice = OnceCell::new();
 
-        // The array was just deconstructed, which allocates twice: effectively [Datum] and [bool].
-        // But pgrx doesn't actually need [bool] if NullKind's handling of BitSlices is correct.
-        // So, assert correctness of the NullKind implementation and cleanup.
-        // SAFETY: The pointer we got should be correctly constructed for slice validity.
-        let pallocd_null_slice =
-            unsafe { PallocSlice::from_raw_parts(NonNull::new(nulls).unwrap(), nelems) };
         #[cfg(debug_assertions)]
-        for i in 0..nelems {
-            assert!(null_slice.get(i).unwrap().eq(unsafe { pallocd_null_slice.get_unchecked(i) }));
+        let Ok(()) = _datum_slice.set(unsafe {
+            let (datums, bools) = raw.deconstruct(elem_layout);
+            // Don't need this.
+            pg_sys::pfree(bools.cast());
+            PallocSlice::from_raw_parts(NonNull::new(datums).unwrap(), nelems)
+        }) else {
+            panic!("oh no, the debug code exploded!")
+        };
+
+        // The array-walking code assumes this is always the case, is it?
+        if let Layout { size: Size::Fixed(n), align, .. } = elem_layout {
+            let n: usize = n.into();
+            assert!(
+                n % (align.as_usize()) == 0,
+                "typlen does NOT include padding for fixed-width layouts!"
+            );
         }
 
-        // SAFETY: This was just handed over as a palloc, so of course we can do this.
-        let datum_slice =
-            Some(unsafe { PallocSlice::from_raw_parts(NonNull::new(elements).unwrap(), nelems) });
-
-        Array {
-            needs_pfree,
-            raw: Some(raw),
-            nelems,
-            datum_slice,
-            null_slice,
-            elem_layout,
-            _marker: PhantomData,
-        }
+        Array { raw, nelems, _datum_slice, null_slice, elem_layout, _marker: PhantomData }
     }
 
-    pub fn into_array_type(mut self) -> *const pg_sys::ArrayType {
-        let ptr = mem::take(&mut self.raw).map(|raw| raw.into_ptr().as_ptr() as _);
-        mem::forget(self);
-        ptr.unwrap_or(ptr::null())
+    /// Rips out the underlying `pg_sys::ArrayType` pointer.
+    /// Note that Array may have caused Postgres to allocate to unbox the datum,
+    /// and this can hypothetically cause a memory leak if so.
+    pub fn into_array_type(self) -> *const pg_sys::ArrayType {
+        // may be worth replacing this function when Toast<T> matures enough
+        // to be used as a public type with a fn(self) -> Toast<RawArray>
+
+        let Array { raw, .. } = self;
+        // Wrap the Toast<RawArray> to prevent it from deallocating itself
+        let mut raw = core::mem::ManuallyDrop::new(raw);
+        let ptr = raw.deref_mut().deref_mut() as *mut RawArray;
+        // SAFETY: Leaks are safe if they aren't use-after-frees!
+        unsafe { ptr.read() }.into_ptr().as_ptr() as _
     }
 
     // # Panics
@@ -215,35 +171,31 @@ impl<'a, T: FromDatum> Array<'a, T> {
         if self.null_slice.any() {
             panic!("null detected: can't expose potentially uninit data as a slice!")
         }
-        match (self.elem_layout.size_matches::<T>(), self.raw.as_ref()) {
+        match self.elem_layout.size_matches::<T>() {
             // SAFETY: Rust slice layout matches Postgres data layout and this array is "owned"
             #[allow(unreachable_patterns)] // happens on 32-bit when DATUM_SIZE = 4
-            (Some(1 | 2 | 4 | DATUM_SIZE), Some(raw)) => unsafe {
-                raw.assume_init_data_slice::<T>()
-            },
-            (_, _) => panic!("no correctly-sized slice exists"),
+            Some(1 | 2 | 4 | DATUM_SIZE) => unsafe { self.raw.assume_init_data_slice::<T>() },
+            _ => panic!("no correctly-sized slice exists"),
         }
     }
 
-    /// Return an Iterator of Option<T> over the contained Datums.
+    /// Return an iterator of `Option<T>`.
     pub fn iter(&self) -> ArrayIterator<'_, T> {
-        ArrayIterator { array: self, curr: 0 }
+        let ptr = self.raw.data_ptr();
+        ArrayIterator { array: self, curr: 0, ptr }
     }
 
-    /// Return an Iterator of the contained Datums (converted to Rust types).
+    /// Return an iterator over the Array's elements.
     ///
+    /// # Panics
     /// This function will panic when called if the array contains any SQL NULL values.
     pub fn iter_deny_null(&self) -> ArrayTypedIterator<'_, T> {
-        if let Some(at) = &self.raw {
-            // SAFETY: if Some, then the ArrayType is from Postgres
-            if unsafe { at.any_nulls() } {
-                panic!("array contains NULL");
-            }
-        } else {
-            panic!("array is NULL");
-        };
+        if self.null_slice.any() {
+            panic!("array contains NULL");
+        }
 
-        ArrayTypedIterator { array: self, curr: 0 }
+        let ptr = self.raw.data_ptr();
+        ArrayTypedIterator { array: self, curr: 0, ptr }
     }
 
     #[inline]
@@ -258,17 +210,111 @@ impl<'a, T: FromDatum> Array<'a, T> {
 
     #[allow(clippy::option_option)]
     #[inline]
-    pub fn get(&self, i: usize) -> Option<Option<T>> {
-        if i >= self.nelems {
-            None
-        } else {
-            Some(unsafe {
-                T::from_polymorphic_datum(
-                    *(self.datum_slice.as_ref()?.get(i)?),
-                    self.null_slice.get(i)?,
-                    self.raw.as_ref().map(|r| r.oid()).unwrap_or_default(),
-                )
-            })
+    pub fn get(&self, index: usize) -> Option<Option<T>> {
+        let Some(is_null) = self.null_slice.get(index) else { return None };
+        if is_null {
+            return Some(None);
+        }
+
+        // This pointer is what's walked over the entire array's data buffer.
+        // If the array has varlena or cstr elements, we can't index into the array.
+        // If the elements are fixed size, we could, but we do not exploit that optimization yet
+        // as it would significantly complicate the code and impact debugging it.
+        // Such improvements should wait until a later version (today's: 0.7.4, preparing 0.8.0).
+        let mut at_byte = self.raw.data_ptr();
+        for i in 0..index {
+            match self.null_slice.get(i) {
+                None => unreachable!("array was exceeded while walking to known non-null index???"),
+                // Skip nulls: the data buffer has no placeholders for them!
+                Some(true) => continue,
+                Some(false) => {
+                    #[cfg(debug_assertions)]
+                    if let PassBy::Ref = self.elem_layout.pass {
+                        assert_eq!(
+                            Some(pg_sys::Datum::from(at_byte)),
+                            self._datum_slice.get().and_then(|s| unsafe { s.get(i) }).copied()
+                        );
+                    }
+                    // SAFETY: Note this entire function has to be correct,
+                    // not just this one call, for this to be correct!
+                    at_byte = unsafe { self.one_hop_this_time(at_byte, self.elem_layout) };
+                }
+            }
+        }
+
+        // If this has gotten this far, it is known to be non-null,
+        // all the null values in the array up to this index were skipped,
+        // and the only offsets were via our hopping function.
+        Some(unsafe { self.bring_it_back_now(at_byte, index, is_null) })
+    }
+
+    /// Extracts an element from a Postgres Array's data buffer
+    ///
+    /// # Safety
+    /// This assumes the pointer is to a valid element of that type.
+    #[inline]
+    unsafe fn bring_it_back_now(&self, ptr: *const u8, _index: usize, is_null: bool) -> Option<T> {
+        if is_null {
+            return None;
+        }
+
+        match self.elem_layout.pass {
+            PassBy::Value => Some(unsafe { ptr.cast::<T>().read() }),
+            PassBy::Ref => {
+                let datum = pg_sys::Datum::from(ptr);
+                #[cfg(debug_assertions)]
+                assert_eq!(
+                    Some(datum),
+                    self._datum_slice.get().and_then(|s| unsafe { s.get(_index) }).copied()
+                );
+                unsafe { T::from_polymorphic_datum(datum, is_null, self.raw.oid()) }
+            }
+        }
+    }
+
+    /// Walk the data of a Postgres Array, "hopping" according to element layout.
+    ///
+    /// # Safety
+    /// For the varlena/cstring layout, data in the buffer is read.
+    /// In either case, pointer arithmetic is done, with the usual implications,
+    /// e.g. the pointer must be <= a "one past the end" pointer
+    /// This means this function must be invoked with the correct layout, and
+    /// either the array's `data_ptr` or a correctly offset pointer into it.
+    ///
+    /// Null elements will NOT be present in a Postgres Array's data buffer!
+    /// Do not cumulatively invoke this more than `len - null_count`!
+    /// Doing so will result in reading uninitialized data, which is UB!
+    #[inline]
+    unsafe fn one_hop_this_time(&self, ptr: *const u8, layout: Layout) -> *const u8 {
+        unsafe {
+            let offset = match layout {
+                Layout { size: Size::Fixed(n), .. } => n.into(),
+                Layout { size: Size::Varlena, align, .. } => {
+                    // SAFETY: This uses the varsize_any function to be safe,
+                    // and the caller was informed of pointer requirements.
+                    let varsize = varlena::varsize_any(ptr.cast());
+
+                    // the Postgres realignment code may seem different in form,
+                    // but it's the same in function, just micro-optimized
+                    let align = align.as_usize();
+                    let align_mask = varsize & (align - 1);
+                    let align_offset = if align_mask != 0 { align - align_mask } else { 0 };
+
+                    varsize + align_offset
+                }
+                Layout { size: Size::CStr, .. } => {
+                    // TODO: this code is dangerously under-exercised in the test suite
+                    // SAFETY: The caller was informed of pointer requirements.
+                    let strlen = CStr::from_ptr(ptr.cast()).to_bytes().len();
+
+                    // Skip over the null and into the next cstr!
+                    strlen + 2
+                }
+            };
+
+            // SAFETY: ptr stops at 1-past-end of the array's varlena
+            debug_assert!(ptr.wrapping_add(offset) <= self.raw.end_ptr());
+            ptr.add(offset)
         }
     }
 }
@@ -309,8 +355,9 @@ impl<'a, T: FromDatum> VariadicArray<'a, T> {
         self.0.iter()
     }
 
-    /// Return an Iterator of the contained Datums (converted to Rust types).
+    /// Return an iterator over the Array's elements.
     ///
+    /// # Panics
     /// This function will panic when called if the array contains any SQL NULL values.
     pub fn iter_deny_null(&self) -> ArrayTypedIterator<'_, T> {
         self.0.iter_deny_null()
@@ -336,6 +383,7 @@ impl<'a, T: FromDatum> VariadicArray<'a, T> {
 pub struct ArrayTypedIterator<'a, T: 'a + FromDatum> {
     array: &'a Array<'a, T>,
     curr: usize,
+    ptr: *const u8,
 }
 
 impl<'a, T: FromDatum> Iterator for ArrayTypedIterator<'a, T> {
@@ -343,16 +391,16 @@ impl<'a, T: FromDatum> Iterator for ArrayTypedIterator<'a, T> {
 
     #[inline]
     fn next(&mut self) -> Option<Self::Item> {
-        if self.curr >= self.array.nelems {
+        let Self { array, curr, ptr } = self;
+        if *curr >= array.nelems {
             None
         } else {
-            let element = self
-                .array
-                .get(self.curr)
-                .expect("array index out of bounds")
-                .expect("array element was unexpectedly NULL during iteration");
-            self.curr += 1;
-            Some(element)
+            // SAFETY: The constructor for this type instantly panics if any nulls are present!
+            // Thus as an invariant, this will never have to reckon with the nullbitmap.
+            let element = unsafe { array.bring_it_back_now(*ptr, *curr, false) };
+            *curr += 1;
+            *ptr = unsafe { array.one_hop_this_time(*ptr, array.elem_layout) };
+            element
         }
     }
 }
@@ -369,6 +417,7 @@ impl<'a, T: FromDatum + serde::Serialize> serde::Serialize for ArrayTypedIterato
 pub struct ArrayIterator<'a, T: 'a + FromDatum> {
     array: &'a Array<'a, T>,
     curr: usize,
+    ptr: *const u8,
 }
 
 impl<'a, T: FromDatum> Iterator for ArrayIterator<'a, T> {
@@ -376,19 +425,21 @@ impl<'a, T: FromDatum> Iterator for ArrayIterator<'a, T> {
 
     #[inline]
     fn next(&mut self) -> Option<Self::Item> {
-        if self.curr >= self.array.nelems {
-            None
-        } else {
-            let element = self.array.get(self.curr).unwrap();
-            self.curr += 1;
-            Some(element)
+        let Self { array, curr, ptr } = self;
+        let Some(is_null) = array.null_slice.get(*curr) else { return None };
+        let element = unsafe { array.bring_it_back_now(*ptr, *curr, is_null) };
+        *curr += 1;
+        if let Some(false) = array.null_slice.get(*curr) {
+            *ptr = unsafe { array.one_hop_this_time(*ptr, array.elem_layout) };
         }
+        Some(element)
     }
 }
 
 pub struct ArrayIntoIterator<'a, T: FromDatum> {
     array: Array<'a, T>,
     curr: usize,
+    ptr: *const u8,
 }
 
 impl<'a, T: FromDatum> IntoIterator for Array<'a, T> {
@@ -396,7 +447,8 @@ impl<'a, T: FromDatum> IntoIterator for Array<'a, T> {
     type IntoIter = ArrayIntoIterator<'a, T>;
 
     fn into_iter(self) -> Self::IntoIter {
-        ArrayIntoIterator { array: self, curr: 0 }
+        let ptr = self.raw.data_ptr();
+        ArrayIntoIterator { array: self, curr: 0, ptr }
     }
 }
 
@@ -405,7 +457,8 @@ impl<'a, T: FromDatum> IntoIterator for VariadicArray<'a, T> {
     type IntoIter = ArrayIntoIterator<'a, T>;
 
     fn into_iter(self) -> Self::IntoIter {
-        ArrayIntoIterator { array: self.0, curr: 0 }
+        let ptr = self.0.raw.data_ptr();
+        ArrayIntoIterator { array: self.0, curr: 0, ptr }
     }
 }
 
@@ -414,13 +467,14 @@ impl<'a, T: FromDatum> Iterator for ArrayIntoIterator<'a, T> {
 
     #[inline]
     fn next(&mut self) -> Option<Self::Item> {
-        if self.curr >= self.array.nelems {
-            None
-        } else {
-            let element = self.array.get(self.curr).unwrap();
-            self.curr += 1;
-            Some(element)
+        let Self { array, curr, ptr } = self;
+        let Some(is_null) = array.null_slice.get(*curr) else { return None };
+        let element = unsafe { array.bring_it_back_now(*ptr, *curr, is_null) };
+        *curr += 1;
+        if let Some(false) = array.null_slice.get(*curr) {
+            *ptr = unsafe { array.one_hop_this_time(*ptr, array.elem_layout) };
         }
+        Some(element)
     }
 
     fn size_hint(&self) -> (usize, Option<usize>) {
@@ -461,14 +515,9 @@ impl<'a, T: FromDatum> FromDatum for Array<'a, T> {
         if is_null {
             None
         } else {
-            let ptr = NonNull::new(datum.cast_mut_ptr())?;
-            let array = pg_sys::pg_detoast_datum(datum.cast_mut_ptr()) as *mut pg_sys::ArrayType;
-            let raw =
-                RawArray::from_ptr(NonNull::new(array).expect("detoast returned null ArrayType*"));
-            let oid = raw.oid();
-            let layout = Layout::lookup_oid(oid);
-
-            Some(Array::deconstruct_from(ptr, raw, layout))
+            let Some(ptr) = NonNull::new(datum.cast_mut_ptr()) else { return None };
+            let raw = RawArray::detoast_from_varlena(ptr);
+            Some(Array::deconstruct_from(raw))
         }
     }
 }

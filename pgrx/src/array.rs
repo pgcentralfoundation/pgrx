@@ -1,5 +1,6 @@
 use crate::datum::{Array, FromDatum};
 use crate::pg_sys;
+use crate::toast::{Toast, Toasty};
 use bitvec::prelude::*;
 use bitvec::ptr::{bitslice_from_raw_parts_mut, BitPtr, BitPtrError, Mut};
 use core::ptr::{slice_from_raw_parts_mut, NonNull};
@@ -217,6 +218,47 @@ impl RawArray {
         // SAFETY: Validity asserted by the caller.
         let len = unsafe { ARR_NELEMS(ptr.as_ptr()) } as usize;
         RawArray { ptr, len }
+    }
+
+    pub(crate) unsafe fn detoast_from_varlena(stale: NonNull<pg_sys::varlena>) -> Toast<RawArray> {
+        // SAFETY: Validity asserted by the caller.
+        unsafe {
+            let toast = NonNull::new(pg_sys::pg_detoast_datum(stale.as_ptr().cast())).unwrap();
+            if stale == toast {
+                Toast::Stale(RawArray::from_ptr(toast.cast()))
+            } else {
+                Toast::Fresh(RawArray::from_ptr(toast.cast()))
+            }
+        }
+    }
+
+    #[cfg(debug_assertions)]
+    pub(crate) unsafe fn deconstruct(
+        &mut self,
+        layout: crate::layout::Layout,
+    ) -> (*mut pg_sys::Datum, *mut bool) {
+        let oid = self.oid();
+        let array = self.ptr.as_ptr();
+
+        // outvals for deconstruct_array
+        let mut elements = core::ptr::null_mut();
+        let mut nulls = core::ptr::null_mut();
+        let mut nelems = 0;
+
+        unsafe {
+            pg_sys::deconstruct_array(
+                array,
+                oid,
+                layout.size.as_typlen().into(),
+                matches!(layout.pass, crate::layout::PassBy::Value),
+                layout.align.as_typalign(),
+                &mut elements,
+                &mut nulls,
+                &mut nelems,
+            );
+
+            (elements, nulls)
+        }
     }
 
     /// # Safety
@@ -449,6 +491,10 @@ impl RawArray {
         }
     }
 
+    pub(crate) fn data_ptr(&self) -> *const u8 {
+        unsafe { ARR_DATA_PTR(self.ptr.as_ptr()) }
+    }
+
     /// # Safety
     /// See the entire thing just above. You're now instantly asserting validity for the slice.
     pub(crate) unsafe fn assume_init_data_slice<T>(&self) -> &[T] {
@@ -460,5 +506,21 @@ impl RawArray {
             ))
             .as_ptr()
         }
+    }
+
+    /// "one past the end" pointer for the entire array's bytes
+    pub(crate) fn end_ptr(&self) -> *const u8 {
+        let ptr = self.ptr.as_ptr().cast::<u8>();
+        ptr.wrapping_add(unsafe { crate::varlena::varsize_any(ptr.cast()) })
+    }
+}
+
+impl Toasty for RawArray {
+    fn detoast(self) -> Toast<RawArray> {
+        unsafe { RawArray::detoast_from_varlena(self.into_ptr().cast()) }
+    }
+
+    unsafe fn drop_toast(&mut self) {
+        unsafe { pg_sys::pfree(self.ptr.as_ptr().cast()) }
     }
 }

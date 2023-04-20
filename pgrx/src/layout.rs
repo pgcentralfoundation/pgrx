@@ -88,7 +88,17 @@ impl TryFrom<libc::c_char> for Align {
 }
 
 impl Align {
-    pub(crate) fn as_typalign(&self) -> libc::c_char {
+    pub(crate) fn as_usize(self) -> usize {
+        match self {
+            Align::Byte => mem::align_of::<libc::c_char>(),
+            Align::Short => mem::align_of::<libc::c_short>(),
+            Align::Int => mem::align_of::<libc::c_int>(),
+            Align::Double => mem::align_of::<libc::c_double>(),
+        }
+    }
+
+    #[cfg(debug_assertions)]
+    pub(crate) fn as_typalign(self) -> libc::c_char {
         (match self {
             Align::Byte => TYPALIGN_CHAR,
             Align::Short => TYPALIGN_SHORT,
@@ -118,6 +128,7 @@ impl TryFrom<i16> for Size {
 }
 
 impl Size {
+    #[cfg(debug_assertions)]
     pub(crate) fn as_typlen(&self) -> i16 {
         match self {
             Self::CStr => -2,

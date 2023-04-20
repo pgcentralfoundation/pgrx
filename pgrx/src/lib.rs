@@ -81,6 +81,7 @@ pub use once_cell;
 /// Not ready for public exposure.
 mod layout;
 mod slice;
+mod toast;
 
 pub use aggregate::*;
 pub use atomics::*;
