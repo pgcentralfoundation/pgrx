@@ -13,7 +13,8 @@ use crate::CommandExecute;
 use eyre::{eyre, WrapErr};
 use owo_colors::OwoColorize;
 use pgrx_pg_config::{
-    get_c_locale_flags, prefix_path, PgConfig, PgConfigSelector, Pgrx, SUPPORTED_MAJOR_VERSIONS,
+    get_c_locale_flags, prefix_path, PgConfig, PgConfigSelector, Pgrx, PgrxHomeError,
+    SUPPORTED_MAJOR_VERSIONS,
 };
 use rayon::prelude::*;
 
@@ -118,9 +119,22 @@ impl CommandExecute for Init {
     }
 }
 
-#[tracing::instrument(skip_all, fields(pgrx_home = %Pgrx::home()?.display()))]
+#[tracing::instrument(skip_all)]
 pub(crate) fn init_pgrx(pgrx: &Pgrx, init: &Init) -> eyre::Result<()> {
-    let dir = Pgrx::home()?;
+    let pgrx_home = match Pgrx::home() {
+        Ok(path) => path,
+        Err(e) => match e {
+            PgrxHomeError::NoHomeDirectory => return Err(e.into()),
+            PgrxHomeError::IoError(e) => return Err(e.into()),
+            PgrxHomeError::MissingPgrxHome(path) => {
+                // $PGRX_HOME doesn't exist, but that's okay as `cargo pgrx init` is the right time
+                // to try and create it
+                println!("{} PGRX_HOME at `{}`", "     Creating".bold().green(), path.display());
+                std::fs::create_dir_all(&path)?;
+                path
+            }
+        },
+    };
 
     let output_configs = Arc::new(Mutex::new(Vec::new()));
 
@@ -137,7 +151,7 @@ pub(crate) fn init_pgrx(pgrx: &Pgrx, init: &Init) -> eyre::Result<()> {
             let mut pg_config = pg_config.clone();
             stop_postgres(&pg_config).ok(); // no need to fail on errors trying to stop postgres while initializing
             if !pg_config.is_real() {
-                pg_config = match download_postgres(&pg_config, &dir) {
+                pg_config = match download_postgres(&pg_config, &pgrx_home) {
                     Ok(pg_config) => pg_config,
                     Err(e) => return Err(eyre!(e)),
                 }

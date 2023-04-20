@@ -11,8 +11,9 @@ use eyre::{eyre, WrapErr};
 use owo_colors::OwoColorize;
 use serde_derive::{Deserialize, Serialize};
 use std::collections::{BTreeMap, HashMap};
+use std::error::Error;
 use std::ffi::OsString;
-use std::fmt::{self, Display, Formatter};
+use std::fmt::{self, Debug, Display, Formatter};
 use std::io::ErrorKind;
 use std::path::{Path, PathBuf};
 use std::process::{Command, Stdio};
@@ -407,6 +408,45 @@ impl<'a> PgConfigSelector<'a> {
     }
 }
 
+#[derive(Debug)]
+pub enum PgrxHomeError {
+    NoHomeDirectory,
+    MissingPgrxHome(PathBuf),
+    IoError(std::io::Error),
+}
+
+impl From<std::io::Error> for PgrxHomeError {
+    fn from(value: std::io::Error) -> Self {
+        PgrxHomeError::IoError(value)
+    }
+}
+
+impl From<PgrxHomeError> for std::io::Error {
+    fn from(value: PgrxHomeError) -> Self {
+        match value {
+            PgrxHomeError::NoHomeDirectory => {
+                std::io::Error::new(ErrorKind::NotFound, value.to_string())
+            }
+            PgrxHomeError::MissingPgrxHome(_) => {
+                std::io::Error::new(ErrorKind::NotFound, value.to_string())
+            }
+            PgrxHomeError::IoError(e) => e,
+        }
+    }
+}
+
+impl Display for PgrxHomeError {
+    fn fmt(&self, f: &mut Formatter<'_>) -> fmt::Result {
+        match self {
+            PgrxHomeError::NoHomeDirectory => write!(f, "You don't seem to have a home directory"),
+            PgrxHomeError::MissingPgrxHome(_) => write!(f, "$PGRX_HOME does not exist"),
+            PgrxHomeError::IoError(e) => write!(f, "{e}"),
+        }
+    }
+}
+
+impl Error for PgrxHomeError {}
+
 impl Pgrx {
     pub fn new(base_port: u16, base_testing_port: u16) -> Self {
         Pgrx { pg_configs: vec![], base_port, base_testing_port }
@@ -507,32 +547,25 @@ impl Pgrx {
         false
     }
 
-    pub fn home() -> Result<PathBuf, std::io::Error> {
-        std::env::var("PGRX_HOME").map_or_else(
+    pub fn home() -> Result<PathBuf, PgrxHomeError> {
+        let pgrx_home = std::env::var("PGRX_HOME").map_or_else(
             |_| {
-                let mut dir = match dirs::home_dir() {
-                    Some(dir) => dir,
-                    None => {
-                        return Err(std::io::Error::new(
-                            ErrorKind::NotFound,
-                            "You don't seem to have a home directory",
-                        ));
-                    }
+                let mut pgrx_home = match dirs::home_dir() {
+                    Some(home) => home,
+                    None => return Err(PgrxHomeError::NoHomeDirectory),
                 };
-                dir.push(".pgrx");
-                if !dir.exists() {
-                    if let Err(e) = std::fs::create_dir_all(&dir) {
-                        return Err(std::io::Error::new(
-                            ErrorKind::InvalidInput,
-                            format!("could not create PGRX_HOME at `{}`: {:?}", dir.display(), e),
-                        ));
-                    }
-                }
 
-                Ok(dir)
+                pgrx_home.push(".pgrx");
+                Ok(pgrx_home)
             },
             |v| Ok(v.into()),
-        )
+        )?;
+
+        if pgrx_home.exists() {
+            Ok(pgrx_home)
+        } else {
+            Err(PgrxHomeError::MissingPgrxHome(pgrx_home))
+        }
     }
 
     /// Get the postmaster stub directory

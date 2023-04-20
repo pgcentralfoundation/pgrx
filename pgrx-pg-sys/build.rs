@@ -27,10 +27,10 @@ mod build {
 struct PgrxOverrides(HashSet<String>);
 
 fn is_nightly() -> bool {
-    if std::env::var_os("CARGO_CFG_PLRUSTC").is_some() {
+    if env_tracked("CARGO_CFG_PLRUSTC").is_some() {
         return false;
     }
-    let rustc = std::env::var_os("RUSTC").map(PathBuf::from).unwrap_or_else(|| "rustc".into());
+    let rustc = env_tracked("RUSTC").map(PathBuf::from).unwrap_or_else(|| "rustc".into());
     let output = match std::process::Command::new(rustc).arg("--verbose").output() {
         Ok(out) if out.status.success() => String::from_utf8_lossy(&out.stdout).trim().to_owned(),
         _ => return false,
@@ -88,24 +88,21 @@ impl bindgen::callbacks::ParseCallbacks for PgrxOverrides {
 }
 
 fn main() -> eyre::Result<()> {
-    if std::env::var("DOCS_RS").unwrap_or("false".into()) == "1" {
+    if env_tracked("DOCS_RS").as_deref() == Some("1") {
         return Ok(());
     }
 
     // dump the environment for debugging if asked
-    if std::env::var("PGRX_BUILD_VERBOSE").unwrap_or("false".to_string()) == "true" {
+    if env_tracked("PGRX_BUILD_VERBOSE").as_deref() == Some("true") {
         for (k, v) in std::env::vars() {
             eprintln!("{}={}", k, v);
         }
     }
 
-    let compile_cshim =
-        std::env::var("CARGO_FEATURE_CSHIM").unwrap_or_else(|_| "0".to_string()) == "1";
+    let compile_cshim = env_tracked("CARGO_FEATURE_CSHIM").as_deref() == Some("1");
 
-    let is_for_release = std::env::var("PGRX_PG_SYS_GENERATE_BINDINGS_FOR_RELEASE")
-        .unwrap_or("0".to_string())
-        == "1";
-    println!("cargo:rerun-if-env-changed=PGRX_PG_SYS_GENERATE_BINDINGS_FOR_RELEASE");
+    let is_for_release =
+        env_tracked("PGRX_PG_SYS_GENERATE_BINDINGS_FOR_RELEASE").as_deref() == Some("1");
 
     // Do nightly detection to suppress silly warnings.
     if is_nightly() {
@@ -116,20 +113,15 @@ fn main() -> eyre::Result<()> {
 
     eprintln!("build_paths={build_paths:?}");
 
-    let pgrx = Pgrx::from_config()?;
+    emit_rerun_if_changed();
 
-    println!("cargo:rerun-if-changed={}", Pgrx::config_toml()?.display().to_string(),);
-    println!("cargo:rerun-if-changed=include");
-    println!("cargo:rerun-if-changed=cshim");
-    emit_missing_rerun_if_env_changed();
-
-    let pg_configs: Vec<(u16, PgConfig)> = if std::env::var(
+    let pg_configs: Vec<(u16, PgConfig)> = if env_tracked(
         "PGRX_PG_SYS_GENERATE_BINDINGS_FOR_RELEASE",
     )
-    .unwrap_or("false".into())
-        == "1"
+    .as_deref()
+        == Some("1")
     {
-        pgrx.iter(PgConfigSelector::All)
+        Pgrx::from_config()?.iter(PgConfigSelector::All)
             .map(|r| r.expect("invalid pg_config"))
             .map(|c| (c.major_version().expect("invalid major version"), c))
             .filter_map(|t| {
@@ -150,7 +142,7 @@ fn main() -> eyre::Result<()> {
     } else {
         let mut found = None;
         for &version in SUPPORTED_MAJOR_VERSIONS {
-            if let Err(_) = std::env::var(&format!("CARGO_FEATURE_PG{}", version)) {
+            if env_tracked(&format!("CARGO_FEATURE_PG{}", version)).is_none() {
                 continue;
             }
             if found.is_some() {
@@ -177,7 +169,7 @@ fn main() -> eyre::Result<()> {
             }
             vec![(major_version, pg_config)]
         } else {
-            let specific = pgrx.get(&found_feat)?;
+            let specific = Pgrx::from_config()?.get(&found_feat)?;
             vec![(found_ver, specific)]
         }
     };
@@ -212,7 +204,7 @@ fn main() -> eyre::Result<()> {
     Ok(())
 }
 
-fn emit_missing_rerun_if_env_changed() {
+fn emit_rerun_if_changed() {
     // `pgrx-pg-config` doesn't emit one for this.
     println!("cargo:rerun-if-env-changed=PGRX_PG_CONFIG_PATH");
     println!("cargo:rerun-if-env-changed=PGRX_PG_CONFIG_AS_ENV");
@@ -225,12 +217,22 @@ fn emit_missing_rerun_if_env_changed() {
     // Follows the logic bindgen uses here, more or less.
     // https://github.com/rust-lang/rust-bindgen/blob/e6dd2c636/bindgen/lib.rs#L2918
     println!("cargo:rerun-if-env-changed=BINDGEN_EXTRA_CLANG_ARGS");
-    if let Ok(target) = std::env::var("TARGET") {
+    if let Some(target) = env_tracked("TARGET") {
         println!("cargo:rerun-if-env-changed=BINDGEN_EXTRA_CLANG_ARGS_{target}");
         println!(
             "cargo:rerun-if-env-changed=BINDGEN_EXTRA_CLANG_ARGS_{}",
             target.replace('-', "_"),
         );
+    }
+
+    // don't want to get stuck always generating bindings
+    println!("cargo:rerun-if-env-changed=PGRX_PG_SYS_GENERATE_BINDINGS_FOR_RELEASE");
+
+    println!("cargo:rerun-if-changed=include");
+    println!("cargo:rerun-if-changed=cshim");
+
+    if let Ok(pgrx_config) = Pgrx::config_toml() {
+        println!("cargo:rerun-if-changed={}", pgrx_config.display().to_string());
     }
 }
 
@@ -252,14 +254,12 @@ fn generate_bindings(
         .wrap_err_with(|| format!("failed to rewrite items for pg{}", major_version))?;
     let oids = format_builtin_oid_impl(oids);
 
-    let dest_dirs = if std::env::var("PGRX_PG_SYS_GENERATE_BINDINGS_FOR_RELEASE")
-        .unwrap_or("false".into())
-        == "1"
-    {
-        vec![build_paths.out_dir.clone(), build_paths.src_dir.clone()]
-    } else {
-        vec![build_paths.out_dir.clone()]
-    };
+    let dest_dirs =
+        if env_tracked("PGRX_PG_SYS_GENERATE_BINDINGS_FOR_RELEASE").as_deref() == Some("1") {
+            vec![build_paths.out_dir.clone(), build_paths.src_dir.clone()]
+        } else {
+            vec![build_paths.out_dir.clone()]
+        };
     for dest_dir in dest_dirs {
         let mut bindings_file = dest_dir.clone();
         bindings_file.push(&format!("pg{}.rs", major_version));
@@ -311,8 +311,8 @@ struct BuildPaths {
 impl BuildPaths {
     fn from_env() -> Self {
         // Cargo guarantees these are provided, so unwrap is fine.
-        let manifest_dir = std::env::var_os("CARGO_MANIFEST_DIR").map(PathBuf::from).unwrap();
-        let out_dir = std::env::var_os("OUT_DIR").map(PathBuf::from).unwrap();
+        let manifest_dir = env_tracked("CARGO_MANIFEST_DIR").map(PathBuf::from).unwrap();
+        let out_dir = env_tracked("OUT_DIR").map(PathBuf::from).unwrap();
         Self {
             src_dir: manifest_dir.join("src"),
             shim_src: manifest_dir.join("cshim"),
@@ -760,7 +760,7 @@ fn env_tracked(s: &str) -> Option<String> {
 }
 
 fn target_env_tracked(s: &str) -> Option<String> {
-    let target = std::env::var("TARGET").unwrap();
+    let target = env_tracked("TARGET").unwrap();
     env_tracked(&format!("{s}_{target}")).or_else(|| env_tracked(s))
 }
 
@@ -792,7 +792,7 @@ fn build_shim(shim_src: &PathBuf, shim_dst: &PathBuf, pg_config: &PgConfig) -> e
 
     // no matter what, tell rustc to link to the library that was built for the feature we're currently building
     let envvar_name = format!("CARGO_FEATURE_PG{}", major_version);
-    if std::env::var(envvar_name).is_ok() {
+    if env_tracked(&envvar_name).is_some() {
         println!("cargo:rustc-link-search={}", shim_dst.display());
         println!("cargo:rustc-link-lib=static=pgrx-cshim-{}", major_version);
     }
@@ -830,7 +830,7 @@ fn build_shim_for_version(
         .unwrap();
     }
 
-    let make = std::env::var("MAKE").unwrap_or_else(|_| "make".to_string());
+    let make = env_tracked("MAKE").unwrap_or_else(|| "make".to_string());
     let rc = run_command(
         Command::new(make)
             .arg("clean")
@@ -852,7 +852,7 @@ fn build_shim_for_version(
 
 fn extra_bindgen_clang_args(pg_config: &PgConfig) -> eyre::Result<Vec<String>> {
     let mut out = vec![];
-    if std::env::var("CARGO_CFG_TARGET_OS").unwrap_or_default() == "macos" {
+    if env_tracked("CARGO_CFG_TARGET_OS").as_deref() == Some("macos") {
         // On macOS, find the `-isysroot` arg out of the c preprocessor flags,
         // to handle the case where bindgen uses a libclang isn't provided by
         // the system.
@@ -1025,7 +1025,7 @@ fn apply_pg_guard(items: &Vec<syn::Item>) -> eyre::Result<proc_macro2::TokenStre
 fn rust_fmt(path: &PathBuf) -> eyre::Result<()> {
     // We shouldn't hit this path in a case where we care about it, but... just
     // in case we probably should respect RUSTFMT.
-    let rustfmt = std::env::var_os("RUSTFMT").unwrap_or_else(|| "rustfmt".into());
+    let rustfmt = env_tracked("RUSTFMT").unwrap_or_else(|| "rustfmt".into());
     let out = run_command(Command::new(rustfmt).arg(path).current_dir("."), "[bindings_diff]");
     match out {
         Ok(_) => Ok(()),
