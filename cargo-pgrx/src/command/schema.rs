@@ -193,7 +193,6 @@ pub(crate) fn generate_schema(
     check_rust_version()?;
     let manifest = Manifest::from_path(&package_manifest_path)?;
     let (control_file, _extname) = find_control_file(&package_manifest_path)?;
-    let library_name = manifest.lib_name()?;
 
     if get_property(&package_manifest_path, "relocatable")? != Some("false".into()) {
         return Err(eyre!(
@@ -298,9 +297,7 @@ pub(crate) fn generate_schema(
     // Inspect the symbol table for a list of `__pgrx_internals` we should have the generator call
     let mut lib_so = target_dir_with_profile.clone();
 
-    let so_extension = if cfg!(target_os = "macos") { ".dylib" } else { ".so" };
-
-    lib_so.push(&format!("lib{}{}", library_name.replace('-', "_"), so_extension));
+    lib_so.push(manifest.lib_filename()?);
 
     let lib_so_data = std::fs::read(&lib_so).wrap_err("couldn't read extension shared object")?;
     let lib_so_obj_file =
@@ -425,7 +422,7 @@ pub(crate) fn generate_schema(
 
     let pgrx_sql = pgrx_sql_entity_graph::PgrxSql::build(
         entities.into_iter(),
-        library_name.to_string(),
+        manifest.lib_name()?,
         versioned_so,
     )
     .wrap_err("SQL generation error")?;

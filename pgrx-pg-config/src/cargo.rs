@@ -13,14 +13,28 @@ pub trait PgrxManifestExt {
     /// Package version
     fn package_version(&self) -> eyre::Result<String>;
 
-    /// Resolved string for target library name, returning name field on [lib] if set,
-    /// and default to crate name if not specified.
+    /// Resolved string for target library name, either its lib.name,
+    /// or package name with hyphens replaced with underscore.
     /// https://doc.rust-lang.org/cargo/reference/cargo-targets.html#the-name-field
     fn lib_name(&self) -> eyre::Result<String>;
+
+    /// Resolved string for target artifact name, used for matching on
+    /// `cargo_metadata::message::Artifact`.
+    fn target_name(&self) -> eyre::Result<String>;
+
+    /// Resolved string for target library name extension filename
+    fn lib_filename(&self) -> eyre::Result<String>;
 }
 
 impl PgrxManifestExt for Manifest {
     fn package_name(&self) -> eyre::Result<String> {
+        match &self.package {
+            Some(package) => Ok(package.name.to_owned()),
+            None => Err(eyre!("Could not get [package] from manifest.")),
+        }
+    }
+
+    fn package_version(&self) -> eyre::Result<String> {
         match &self.package {
             Some(package) => match &package.version {
                 cargo_toml::Inheritable::Set(version) => Ok(version.to_owned()),
@@ -38,24 +52,36 @@ impl PgrxManifestExt for Manifest {
         }
     }
 
-    fn package_version(&self) -> eyre::Result<String> {
+    fn lib_name(&self) -> eyre::Result<String> {
         match &self.package {
-            Some(package) => Ok(package.name.to_owned()),
-            None => Err(eyre!("Could not get [package] from manifest.")),
+            Some(_) => match &self.lib {
+                Some(lib) => match &lib.name {
+                    // `cargo_manifest` auto fills lib.name with package.name;
+                    // hyphen replaced with underscore if crate type is lib.
+                    // So we will always have a lib.name for lib crates.
+                    Some(lib_name) => Ok(lib_name.to_owned()),
+                    None => Err(eyre!("Could not get [lib] name from manifest.")),
+                },
+                None => Err(eyre!("Could not get [lib] name from manifest.")),
+            },
+            None => Err(eyre!("Could not get [lib] name from manifest.")),
         }
     }
 
-    fn lib_name(&self) -> eyre::Result<String> {
-        match &self.package {
-            Some(package) => match &self.lib {
-                Some(lib) => match &lib.name {
-                    Some(lib_name) => Ok(lib_name.to_owned()),
-                    None => Ok(package.name.to_owned()),
-                },
-                None => Ok(package.name.to_owned()),
-            },
-            None => Err(eyre!("Could not get lib name from manifest.")),
+    fn target_name(&self) -> eyre::Result<String> {
+        let package = self.package_name()?;
+        let lib = self.lib_name()?;
+        if package.replace('-', "_") == lib {
+            Ok(package)
+        } else {
+            Ok(lib)
         }
+    }
+
+    fn lib_filename(&self) -> eyre::Result<String> {
+        let lib_name = &self.lib_name()?;
+        let so_extension = if cfg!(target_os = "macos") { "dylib" } else { "so" };
+        Ok(format!("lib{}.{}", lib_name.replace('-', "_"), so_extension))
     }
 }
 

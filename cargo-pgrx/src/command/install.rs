@@ -353,13 +353,13 @@ pub(crate) fn find_library_file(
     manifest: &cargo_toml::Manifest,
     build_command_messages: &Vec<cargo_metadata::Message>,
 ) -> eyre::Result<PathBuf> {
-    let library_name = manifest.lib_name()?;
+    let target_name = manifest.target_name()?;
 
     let mut library_file = None;
     for message in build_command_messages {
         match message {
             cargo_metadata::Message::CompilerArtifact(artifact) => {
-                if artifact.target.name != *library_name {
+                if artifact.target.name != *target_name {
                     continue;
                 }
                 for filename in &artifact.filenames {
