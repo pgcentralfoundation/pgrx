@@ -129,6 +129,15 @@ impl<'a, T: FromDatum> Array<'a, T> {
             panic!("oh no, the debug code exploded!")
         };
 
+        // The array-walking code assumes this is always the case, is it?
+        if let Layout { size: Size::Fixed(n), align, .. } = elem_layout {
+            let n: usize = n.into();
+            assert!(
+                n % (align.as_usize()) == 0,
+                "typlen does NOT include padding for fixed-width layouts!"
+            );
+        }
+
         Array { raw, nelems, _datum_slice, null_slice, elem_layout, _marker: PhantomData }
     }
 
