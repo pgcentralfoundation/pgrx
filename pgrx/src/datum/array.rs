@@ -438,11 +438,6 @@ impl<'a, T: FromDatum> Iterator for ArrayIntoIterator<'a, T> {
         // TODO: This code is dangerously under-exercised in the test suite.
         self.array.nelems - self.curr
     }
-
-    fn nth(&mut self, n: usize) -> Option<Self::Item> {
-        // TODO: This code is dangerously under-exercised in the test suite.
-        self.array.get(self.curr + n)
-    }
 }
 
 impl<'a, T: FromDatum> FromDatum for VariadicArray<'a, T> {
