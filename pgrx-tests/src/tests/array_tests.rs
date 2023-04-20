@@ -253,16 +253,19 @@ mod tests {
 
     #[pg_test]
     fn test_serde_serialize_array_i32() -> Result<(), pgrx::spi::Error> {
-        let json =
-            Spi::get_one::<Json>("SELECT serde_serialize_array_i32(ARRAY[1,null,2,3,null, 4, 5])")?
-                .expect("returned json was null");
+        let json = Spi::get_one::<Json>(
+            "SELECT serde_serialize_array_i32(ARRAY[1, null, 2, 3, null, 4, 5])",
+        )?
+        .expect("returned json was null");
         assert_eq!(json.0, json! {{"values": [1,null,2,3,null,4, 5]}});
         Ok(())
     }
 
     #[pg_test(error = "array contains NULL")]
     fn test_serde_serialize_array_i32_deny_null() -> Result<Option<Json>, pgrx::spi::Error> {
-        Spi::get_one::<Json>("SELECT serde_serialize_array_i32_deny_null(ARRAY[1,2,3,null, 4, 5])")
+        Spi::get_one::<Json>(
+            "SELECT serde_serialize_array_i32_deny_null(ARRAY[1, 2, 3, null, 4, 5])",
+        )
     }
 
     #[pg_test]
