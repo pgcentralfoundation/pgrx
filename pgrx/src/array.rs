@@ -239,6 +239,7 @@ impl RawArray {
     ) -> (*mut pg_sys::Datum, *mut bool) {
         let oid = self.oid();
         let array = self.ptr.as_ptr();
+
         // outvals for deconstruct_array
         let mut elements = core::ptr::null_mut();
         let mut nulls = core::ptr::null_mut();
@@ -490,7 +491,7 @@ impl RawArray {
         }
     }
 
-    pub(crate) fn data_ptr(&self) -> *mut u8 {
+    pub(crate) fn data_ptr(&self) -> *const u8 {
         unsafe { ARR_DATA_PTR(self.ptr.as_ptr()) }
     }
 
@@ -505,6 +506,12 @@ impl RawArray {
             ))
             .as_ptr()
         }
+    }
+
+    /// "one past the end" pointer for the entire array's bytes
+    pub(crate) fn end_ptr(&self) -> *const u8 {
+        let ptr = self.ptr.as_ptr().cast::<u8>();
+        ptr.wrapping_add(unsafe { crate::varlena::varsize_any(ptr.cast()) })
     }
 }
 

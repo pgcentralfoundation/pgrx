@@ -222,7 +222,7 @@ impl<'a, T: FromDatum> Array<'a, T> {
                     }
                     // SAFETY: Note this entire function has to be correct,
                     // not just this one call, for this to be correct!
-                    at_byte = unsafe { one_hop_this_time(at_byte, self.elem_layout) };
+                    at_byte = unsafe { self.one_hop_this_time(at_byte, self.elem_layout) };
                 }
             }
         }
@@ -238,7 +238,7 @@ impl<'a, T: FromDatum> Array<'a, T> {
     /// # Safety
     /// This assumes the pointer is to a valid element of that type.
     #[inline]
-    unsafe fn bring_it_back_now(&self, ptr: *mut u8, _index: usize, is_null: bool) -> Option<T> {
+    unsafe fn bring_it_back_now(&self, ptr: *const u8, _index: usize, is_null: bool) -> Option<T> {
         if is_null {
             return None;
         }
@@ -256,47 +256,50 @@ impl<'a, T: FromDatum> Array<'a, T> {
             }
         }
     }
-}
 
-/// Walk the data of a Postgres Array, "hopping" according to element layout.
-///
-/// # Safety
-/// For the varlena/cstring layout, data in the buffer is read.
-/// In either case, pointer arithmetic is done, with the usual implications,
-/// e.g. the pointer must be <= a "one past the end" pointer
-/// This means this function must be invoked with the correct layout, and
-/// either the array's `data_ptr` or a correctly offset pointer into it.
-///
-/// Null elements will NOT be present in a Postgres Array's data buffer!
-/// Do not cumulatively invoke this more than `len - null_count`!
-/// Doing so will result in reading uninitialized data, which is UB!
-#[inline]
-unsafe fn one_hop_this_time(ptr: *mut u8, layout: Layout) -> *mut u8 {
-    unsafe {
-        match layout {
-            Layout { size: Size::Fixed(n), .. } => ptr.add(n.into()),
-            Layout { size: Size::Varlena, align, .. } => {
-                // SAFETY: This uses the varsize_any function to be safe,
-                // and the caller was informed of pointer requirements.
-                let varsize = varlena::varsize_any(ptr.cast());
+    /// Walk the data of a Postgres Array, "hopping" according to element layout.
+    ///
+    /// # Safety
+    /// For the varlena/cstring layout, data in the buffer is read.
+    /// In either case, pointer arithmetic is done, with the usual implications,
+    /// e.g. the pointer must be <= a "one past the end" pointer
+    /// This means this function must be invoked with the correct layout, and
+    /// either the array's `data_ptr` or a correctly offset pointer into it.
+    ///
+    /// Null elements will NOT be present in a Postgres Array's data buffer!
+    /// Do not cumulatively invoke this more than `len - null_count`!
+    /// Doing so will result in reading uninitialized data, which is UB!
+    #[inline]
+    unsafe fn one_hop_this_time(&self, ptr: *const u8, layout: Layout) -> *const u8 {
+        unsafe {
+            let offset = match layout {
+                Layout { size: Size::Fixed(n), .. } => n.into(),
+                Layout { size: Size::Varlena, align, .. } => {
+                    // SAFETY: This uses the varsize_any function to be safe,
+                    // and the caller was informed of pointer requirements.
+                    let varsize = varlena::varsize_any(ptr.cast());
 
-                // the Postgres realignment code may seem different in form,
-                // but it's the same in function, just micro-optimized
-                let align = align.as_usize();
-                let align_mask = varsize & (align - 1);
-                let align_offset = if align_mask != 0 { align - align_mask } else { 0 };
+                    // the Postgres realignment code may seem different in form,
+                    // but it's the same in function, just micro-optimized
+                    let align = align.as_usize();
+                    let align_mask = varsize & (align - 1);
+                    let align_offset = if align_mask != 0 { align - align_mask } else { 0 };
 
-                // SAFETY: ptr stops at 1-past-end of the array's varlena
-                ptr.add(varsize + align_offset)
-            }
-            Layout { size: Size::CStr, .. } => {
-                // TODO: this code is dangerously under-exercised in the test suite
-                // SAFETY: The caller was informed of pointer requirements.
-                let strlen = CStr::from_ptr(ptr.cast()).to_bytes().len();
+                    varsize + align_offset
+                }
+                Layout { size: Size::CStr, .. } => {
+                    // TODO: this code is dangerously under-exercised in the test suite
+                    // SAFETY: The caller was informed of pointer requirements.
+                    let strlen = CStr::from_ptr(ptr.cast()).to_bytes().len();
 
-                // SAFETY: ptr stops at 1-past-end of the array's varlena
-                ptr.add(strlen + 2)
-            }
+                    // Skip over the null and into the next cstr!
+                    strlen + 2
+                }
+            };
+
+            // SAFETY: ptr stops at 1-past-end of the array's varlena
+            debug_assert!(ptr.wrapping_add(offset) <= self.raw.end_ptr());
+            ptr.add(offset)
         }
     }
 }
@@ -397,7 +400,7 @@ impl<'a, T: FromDatum + serde::Serialize> serde::Serialize for ArrayTypedIterato
 pub struct ArrayIterator<'a, T: 'a + FromDatum> {
     array: &'a Array<'a, T>,
     curr: usize,
-    ptr: *mut u8,
+    ptr: *const u8,
 }
 
 impl<'a, T: FromDatum> Iterator for ArrayIterator<'a, T> {
@@ -410,7 +413,7 @@ impl<'a, T: FromDatum> Iterator for ArrayIterator<'a, T> {
         let element = unsafe { array.bring_it_back_now(*ptr, *curr, is_null) };
         *curr += 1;
         if let Some(false) = array.null_slice.get(*curr) {
-            *ptr = unsafe { one_hop_this_time(*ptr, array.elem_layout) };
+            *ptr = unsafe { array.one_hop_this_time(*ptr, array.elem_layout) };
         }
         Some(element)
     }
@@ -419,7 +422,7 @@ impl<'a, T: FromDatum> Iterator for ArrayIterator<'a, T> {
 pub struct ArrayIntoIterator<'a, T: FromDatum> {
     array: Array<'a, T>,
     curr: usize,
-    ptr: *mut u8,
+    ptr: *const u8,
 }
 
 impl<'a, T: FromDatum> IntoIterator for Array<'a, T> {
@@ -452,7 +455,7 @@ impl<'a, T: FromDatum> Iterator for ArrayIntoIterator<'a, T> {
         let element = unsafe { array.bring_it_back_now(*ptr, *curr, is_null) };
         *curr += 1;
         if let Some(false) = array.null_slice.get(*curr) {
-            *ptr = unsafe { one_hop_this_time(*ptr, array.elem_layout) };
+            *ptr = unsafe { array.one_hop_this_time(*ptr, array.elem_layout) };
         }
         Some(element)
     }
