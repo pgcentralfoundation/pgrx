@@ -80,6 +80,8 @@ enum NullKind<'a> {
 impl NullKind<'_> {
     fn get(&self, index: usize) -> Option<bool> {
         match self {
+            // Note this flips the bit:
+            // Postgres nullbitmaps are 1 for "valid" and 0 for "null"
             Self::Bits(b1) => b1.get(index).map(|b| !b),
             Self::Strict(len) => index.lt(len).then(|| false),
         }
@@ -87,6 +89,8 @@ impl NullKind<'_> {
 
     fn any(&self) -> bool {
         match self {
+            // Note the reversed polarity:
+            // Postgres nullbitmaps are 1 for "valid" and 0 for "null"
             Self::Bits(b1) => !b1.all(),
             Self::Strict(_) => false,
         }
@@ -129,7 +133,7 @@ impl<'a, T: FromDatum> Array<'a, T> {
         Array { raw, nelems, _datum_slice, null_slice, elem_layout, _marker: PhantomData }
     }
 
-    /// Rips out the underlying pg_sys::ArrayType pointer.
+    /// Rips out the underlying `pg_sys::ArrayType` pointer.
     /// Note that Array may have caused Postgres to allocate to unbox the datum,
     /// and this can hypothetically cause a memory leak if so.
     pub fn into_array_type(self) -> *const pg_sys::ArrayType {
@@ -167,7 +171,7 @@ impl<'a, T: FromDatum> Array<'a, T> {
         }
     }
 
-    /// Return an Iterator of Option<T> over the contained Datums.
+    /// Return an iterator of `Option<T>`.
     pub fn iter(&self) -> ArrayIterator<'_, T> {
         let ptr = self.raw.data_ptr();
         ArrayIterator { array: self, curr: 0, ptr }
@@ -207,6 +211,7 @@ impl<'a, T: FromDatum> Array<'a, T> {
             match self.null_slice.get(i) {
                 // SAFETY: Assured via earlier check that guarantees index is in-bounds
                 None => unsafe { core::hint::unreachable_unchecked() },
+                // Skip nulls: the data buffer has no placeholders for them!
                 Some(true) => continue,
                 Some(false) => {
                     #[cfg(debug_assertions)]
@@ -216,11 +221,16 @@ impl<'a, T: FromDatum> Array<'a, T> {
                             self._datum_slice.get().and_then(|s| unsafe { s.get(i) }).copied()
                         );
                     }
+                    // SAFETY: Note this entire function has to be correct,
+                    // not just this one call, for this to be correct!
                     at_byte = unsafe { one_hop_this_time(at_byte, self.elem_layout) };
                 }
             }
         }
 
+        // If this has gotten this far, it is known to be non-null,
+        // all the null values in the array up to this index were skipped,
+        // and the only offsets were via our hopping function.
         Some(unsafe { self.bring_it_back_now(at_byte, index, is_null) })
     }
 
