@@ -11,14 +11,14 @@ where
 pub(crate) trait Toasty: Sized {
     fn detoast(self) -> Toast<Self>;
     /// Why does it always land butter-side down?
-    fn drop_toast(&mut self);
+    unsafe fn drop_toast(&mut self);
 }
 
 impl<T: Toasty> Drop for Toast<T> {
     fn drop(&mut self) {
         match self {
             Toast::Stale(_) => {}
-            Toast::Fresh(t) => t.drop_toast(),
+            Toast::Fresh(t) => unsafe { t.drop_toast() },
         }
     }
 }

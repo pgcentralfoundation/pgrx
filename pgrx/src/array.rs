@@ -520,7 +520,7 @@ impl Toasty for RawArray {
         unsafe { RawArray::detoast_from_varlena(self.into_ptr().cast()) }
     }
 
-    fn drop_toast(&mut self) {
+    unsafe fn drop_toast(&mut self) {
         unsafe { pg_sys::pfree(self.ptr.as_ptr().cast()) }
     }
 }
