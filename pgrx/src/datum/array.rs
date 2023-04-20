@@ -121,7 +121,9 @@ impl<'a, T: FromDatum> Array<'a, T> {
 
         #[cfg(debug_assertions)]
         let Ok(()) = _datum_slice.set(unsafe {
-            let (datums, _bools) = raw.deconstruct(elem_layout);
+            let (datums, bools) = raw.deconstruct(elem_layout);
+            // Don't need this.
+            pg_sys::pfree(bools.cast());
             PallocSlice::from_raw_parts(NonNull::new(datums).unwrap(), nelems)
         }) else {
             panic!("oh no, the debug code exploded!")
