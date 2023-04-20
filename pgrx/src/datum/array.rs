@@ -174,15 +174,17 @@ impl<'a, T: FromDatum> Array<'a, T> {
         ArrayIterator { array: self, curr: 0, ptr }
     }
 
-    /// Return an Iterator of the contained Datums (converted to Rust types).
+    /// Return an iterator over the Array's elements.
     ///
+    /// # Panics
     /// This function will panic when called if the array contains any SQL NULL values.
     pub fn iter_deny_null(&self) -> ArrayTypedIterator<'_, T> {
         if self.null_slice.any() {
             panic!("array contains NULL");
         }
 
-        ArrayTypedIterator { array: self, curr: 0 }
+        let ptr = self.raw.data_ptr();
+        ArrayTypedIterator { array: self, curr: 0, ptr }
     }
 
     #[inline]
@@ -337,8 +339,9 @@ impl<'a, T: FromDatum> VariadicArray<'a, T> {
         self.0.iter()
     }
 
-    /// Return an Iterator of the contained Datums (converted to Rust types).
+    /// Return an iterator over the Array's elements.
     ///
+    /// # Panics
     /// This function will panic when called if the array contains any SQL NULL values.
     pub fn iter_deny_null(&self) -> ArrayTypedIterator<'_, T> {
         self.0.iter_deny_null()
@@ -364,6 +367,7 @@ impl<'a, T: FromDatum> VariadicArray<'a, T> {
 pub struct ArrayTypedIterator<'a, T: 'a + FromDatum> {
     array: &'a Array<'a, T>,
     curr: usize,
+    ptr: *const u8,
 }
 
 impl<'a, T: FromDatum> Iterator for ArrayTypedIterator<'a, T> {
@@ -371,16 +375,16 @@ impl<'a, T: FromDatum> Iterator for ArrayTypedIterator<'a, T> {
 
     #[inline]
     fn next(&mut self) -> Option<Self::Item> {
-        if self.curr >= self.array.nelems {
+        let Self { array, curr, ptr } = self;
+        if *curr >= array.nelems {
             None
         } else {
-            let element = self
-                .array
-                .get(self.curr)
-                .expect("array index out of bounds")
-                .expect("array element was unexpectedly NULL during iteration");
-            self.curr += 1;
-            Some(element)
+            // SAFETY: The constructor for this type instantly panics if any nulls are present!
+            // Thus as an invariant, this will never have to reckon with the nullbitmap.
+            let element = unsafe { array.bring_it_back_now(*ptr, *curr, false) };
+            *curr += 1;
+            *ptr = unsafe { array.one_hop_this_time(*ptr, array.elem_layout) };
+            element
         }
     }
 }
