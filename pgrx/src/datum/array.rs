@@ -207,6 +207,11 @@ impl<'a, T: FromDatum> Array<'a, T> {
             return Some(None);
         }
 
+        // This pointer is what's walked over the entire array's data buffer.
+        // If the array has varlena or cstr elements, we can't index into the array.
+        // If the elements are fixed size, we could, but we do not exploit that optimization yet
+        // as it would significantly complicate the code and impact debugging it.
+        // Such improvements should wait until a later version (today's: 0.7.4, preparing 0.8.0).
         let mut at_byte = self.raw.data_ptr();
         for i in 0..index {
             match self.null_slice.get(i) {
