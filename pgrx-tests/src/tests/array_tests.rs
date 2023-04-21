@@ -34,27 +34,9 @@ fn sum_array_i64(values: Array<i64>) -> i64 {
     values.iter().map(|v| v.unwrap_or(0i64)).sum()
 }
 
-#[pg_extern(name = "sum_array_sliced")]
-#[allow(deprecated)]
-fn sum_array_i32_sliced(values: Array<i32>) -> i32 {
-    unsafe { values.as_slice() }.iter().sum()
-}
-
-#[pg_extern(name = "sum_array_sliced")]
-#[allow(deprecated)]
-fn sum_array_i64_sliced(values: Array<i64>) -> i64 {
-    unsafe { values.as_slice() }.iter().sum()
-}
-
 #[pg_extern]
 fn count_true(values: Array<bool>) -> i32 {
     values.iter().filter(|b| b.unwrap_or(false)).count() as i32
-}
-
-#[pg_extern]
-#[allow(deprecated)]
-fn count_true_sliced(values: Array<bool>) -> i32 {
-    unsafe { values.as_slice() }.iter().filter(|b| **b).count() as i32
 }
 
 #[pg_extern]
@@ -153,13 +135,13 @@ fn arr_mapped_vec(arr: Array<i32>) -> Vec<i32> {
 #[pg_extern]
 #[allow(deprecated)]
 fn arr_into_vec(arr: Array<i32>) -> Vec<i32> {
-    unsafe { arr.as_slice() }.to_vec()
+    arr.iter_deny_null().collect()
 }
 
 #[pg_extern]
 #[allow(deprecated)]
 fn arr_sort_uniq(arr: Array<i32>) -> Vec<i32> {
-    let mut v: Vec<i32> = unsafe { arr.as_slice() }.into();
+    let mut v: Vec<i32> = arr.iter_deny_null().collect();
     v.sort();
     v.dedup();
     v
