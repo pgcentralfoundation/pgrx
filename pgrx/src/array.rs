@@ -495,19 +495,6 @@ impl RawArray {
         unsafe { ARR_DATA_PTR(self.ptr.as_ptr()) }
     }
 
-    /// # Safety
-    /// See the entire thing just above. You're now instantly asserting validity for the slice.
-    pub(crate) unsafe fn assume_init_data_slice<T>(&self) -> &[T] {
-        // SAFETY: Assertion made by caller
-        unsafe {
-            &*NonNull::new_unchecked(slice_from_raw_parts_mut(
-                ARR_DATA_PTR(self.ptr.as_ptr()).cast(),
-                self.len,
-            ))
-            .as_ptr()
-        }
-    }
-
     /// "one past the end" pointer for the entire array's bytes
     pub(crate) fn end_ptr(&self) -> *const u8 {
         let ptr = self.ptr.as_ptr().cast::<u8>();

@@ -49,20 +49,6 @@ impl Layout {
             pass: if passbyval { PassBy::Value } else { PassBy::Ref },
         }
     }
-
-    // Attempt to discern if a given Postgres and Rust layout are "matching" in some sense
-    // Some(usize) if they seem to agree on one, None if they do not
-    pub(crate) fn size_matches<T>(&self) -> Option<usize> {
-        const DATUM_SIZE: usize = mem::size_of::<pg_sys::Datum>();
-        match (self.pass, mem::size_of::<T>(), self.size.try_as_usize()) {
-            (PassBy::Value, rs @ (1 | 2 | 4 | 8), Some(pg @ (1 | 2 | 4 | 8))) if rs == pg => {
-                Some(rs)
-            }
-            (PassBy::Value, _, _) => None,
-            (PassBy::Ref, DATUM_SIZE, _) => Some(DATUM_SIZE),
-            (PassBy::Ref, _, _) => None,
-        }
-    }
 }
 
 #[derive(Clone, Copy, Debug, PartialEq)]
@@ -134,14 +120,6 @@ impl Size {
             Self::CStr => -2,
             Self::Varlena => -1,
             Self::Fixed(v) => *v as _,
-        }
-    }
-
-    pub(crate) fn try_as_usize(&self) -> Option<usize> {
-        match self {
-            Self::CStr => None,
-            Self::Varlena => None,
-            Self::Fixed(v) => Some(*v as _),
         }
     }
 }
