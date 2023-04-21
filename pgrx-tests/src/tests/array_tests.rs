@@ -131,7 +131,7 @@ fn arr_mapped_vec(arr: Array<i32>) -> Vec<i32> {
     arr.iter().filter_map(|x| x).collect()
 }
 
-/// Naive conversion. This causes errors if Array::as_slice doesn't handle differently sized slices well.
+/// Naive conversion.
 #[pg_extern]
 #[allow(deprecated)]
 fn arr_into_vec(arr: Array<i32>) -> Vec<i32> {
@@ -169,18 +169,6 @@ mod tests {
         assert_eq!(sum, Ok(Some(6)));
     }
 
-    #[pg_test]
-    fn test_sum_array_i32_sliced() {
-        let sum = Spi::get_one::<i32>("SELECT sum_array_sliced(ARRAY[1,2,3]::integer[])");
-        assert_eq!(sum, Ok(Some(6)));
-    }
-
-    #[pg_test]
-    fn test_sum_array_i64_sliced() {
-        let sum = Spi::get_one::<i64>("SELECT sum_array_sliced(ARRAY[1,2,3]::bigint[])");
-        assert_eq!(sum, Ok(Some(6)));
-    }
-
     #[pg_test(error = "attempt to add with overflow")]
     fn test_sum_array_i32_overflow() -> Result<Option<i64>, pgrx::spi::Error> {
         Spi::get_one::<i64>(
@@ -191,12 +179,6 @@ mod tests {
     #[pg_test]
     fn test_count_true() {
         let cnt = Spi::get_one::<i32>("SELECT count_true(ARRAY[true, true, false, true])");
-        assert_eq!(cnt, Ok(Some(3)));
-    }
-
-    #[pg_test]
-    fn test_count_true_sliced() {
-        let cnt = Spi::get_one::<i32>("SELECT count_true_sliced(ARRAY[true, true, false, true])");
         assert_eq!(cnt, Ok(Some(3)));
     }
 
