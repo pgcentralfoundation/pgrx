@@ -59,7 +59,6 @@ fn with_vec(elems: Array<String>) {
 ```
 */
 pub struct Array<'a, T: FromDatum> {
-    nelems: usize,
     // Remove this field if/when we figure out how to stop using pg_sys::deconstruct_array
     null_slice: NullKind<'a>,
     elem_layout: Layout,
@@ -138,7 +137,7 @@ impl<'a, T: FromDatum> Array<'a, T> {
             );
         }
 
-        Array { raw, nelems, _datum_slice, null_slice, elem_layout, _marker: PhantomData }
+        Array { raw, _datum_slice, null_slice, elem_layout, _marker: PhantomData }
     }
 
     /// Rips out the underlying `pg_sys::ArrayType` pointer.
@@ -200,12 +199,12 @@ impl<'a, T: FromDatum> Array<'a, T> {
 
     #[inline]
     pub fn len(&self) -> usize {
-        self.nelems
+        self.raw.len()
     }
 
     #[inline]
     pub fn is_empty(&self) -> bool {
-        self.nelems == 0
+        self.raw.len() == 0
     }
 
     #[allow(clippy::option_option)]
@@ -392,7 +391,7 @@ impl<'a, T: FromDatum> Iterator for ArrayTypedIterator<'a, T> {
     #[inline]
     fn next(&mut self) -> Option<Self::Item> {
         let Self { array, curr, ptr } = self;
-        if *curr >= array.nelems {
+        if *curr >= array.raw.len() {
             None
         } else {
             // SAFETY: The constructor for this type instantly panics if any nulls are present!
@@ -480,7 +479,7 @@ impl<'a, T: FromDatum> Iterator for ArrayIntoIterator<'a, T> {
     fn size_hint(&self) -> (usize, Option<usize>) {
         // If asking for size, it's not clear if they want "actual size"
         // or "size minus nulls"? Let's lower bound on 0 if nulls exist.
-        let left = self.array.nelems - self.curr;
+        let left = self.array.raw.len() - self.curr;
         if let NullKind::Strict(_) = self.array.null_slice {
             (left, Some(left))
         } else {
@@ -490,7 +489,7 @@ impl<'a, T: FromDatum> Iterator for ArrayIntoIterator<'a, T> {
 
     fn count(self) -> usize {
         // TODO: This code is dangerously under-exercised in the test suite.
-        self.array.nelems - self.curr
+        self.array.raw.len() - self.curr
     }
 }
 
