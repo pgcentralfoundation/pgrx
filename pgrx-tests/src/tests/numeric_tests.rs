@@ -34,6 +34,14 @@ mod tests {
     }
 
     #[pg_test]
+    fn select_a_numeric() -> Result<(), Box<dyn std::error::Error>> {
+        let result = Spi::get_one::<AnyNumeric>("SELECT 42::numeric")?.expect("SPI returned null");
+        let expected: AnyNumeric = 42.into();
+        assert_eq!(expected, result);
+        Ok(())
+    }
+
+    #[pg_test]
     fn test_return_an_i32_numeric() {
         let result = Spi::get_one::<bool>("SELECT 32::numeric = tests.return_an_i32_numeric();");
         assert_eq!(result, Ok(Some(true)));
@@ -196,5 +204,24 @@ mod tests {
             v,
             vec![(1, AnyNumeric::from(1)), (2, AnyNumeric::from(2)), (3, AnyNumeric::from(3)),]
         )
+    }
+
+    #[pg_test]
+    fn test_anynumeric_sum() -> Result<(), Box<dyn std::error::Error>> {
+        let numbers = Spi::get_one::<Vec<AnyNumeric>>("SELECT ARRAY[1.0, 2.0, 3.0]::numeric[]")?
+            .expect("SPI result was null");
+        let expected: AnyNumeric = 6.into();
+        assert_eq!(expected, numbers.into_iter().sum());
+        Ok(())
+    }
+
+    #[pg_test]
+    fn test_option_anynumeric_sum() -> Result<(), Box<dyn std::error::Error>> {
+        let numbers =
+            Spi::get_one::<Vec<Option<AnyNumeric>>>("SELECT ARRAY[1.0, 2.0, 3.0]::numeric[]")?
+                .expect("SPI result was null");
+        let expected: AnyNumeric = 6.into();
+        assert_eq!(expected, numbers.into_iter().map(|n| n.unwrap_or_default()).sum());
+        Ok(())
     }
 }

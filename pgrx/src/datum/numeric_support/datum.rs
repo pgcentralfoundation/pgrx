@@ -1,4 +1,4 @@
-use crate::{pg_sys, AnyNumeric, FromDatum, IntoDatum, Numeric};
+use crate::{pg_sys, AnyNumeric, FromDatum, IntoDatum, Numeric, PgMemoryContexts};
 
 impl FromDatum for AnyNumeric {
     #[inline]
@@ -19,6 +19,26 @@ impl FromDatum for AnyNumeric {
                 datum.cast_mut_ptr::<pg_sys::NumericData>(),
             );
             Some(AnyNumeric { inner: numeric, need_pfree: is_copy })
+        }
+    }
+
+    unsafe fn from_datum_in_memory_context(
+        mut memory_context: PgMemoryContexts,
+        datum: pg_sys::Datum,
+        is_null: bool,
+        _typoid: pg_sys::Oid,
+    ) -> Option<Self>
+    where
+        Self: Sized,
+    {
+        if is_null {
+            None
+        } else {
+            memory_context.switch_to(|_| {
+                // copy the Datum into this MemoryContext and then create the AnyNumeric over that
+                let copy = pg_sys::pg_detoast_datum_copy(datum.cast_mut_ptr());
+                Some(AnyNumeric { inner: copy.cast(), need_pfree: true })
+            })
         }
     }
 }

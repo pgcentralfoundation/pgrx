@@ -10,6 +10,7 @@ Use of this source code is governed by the MIT license that can be found in the 
 use core::ffi::CStr;
 use core::fmt::{Debug, Display, Formatter};
 use std::fmt;
+use std::iter::Sum;
 
 use crate::numeric_support::convert::from_primitive_helper;
 pub use crate::numeric_support::error::Error;
@@ -84,6 +85,22 @@ impl Debug for AnyNumeric {
 impl<const P: u32, const S: u32> Display for Numeric<P, S> {
     fn fmt(&self, fmt: &mut Formatter<'_>) -> Result<(), fmt::Error> {
         write!(fmt, "{}", self.0)
+    }
+}
+
+impl Default for AnyNumeric {
+    fn default() -> Self {
+        0.into()
+    }
+}
+
+impl Sum for AnyNumeric {
+    fn sum<I: Iterator<Item = Self>>(mut iter: I) -> Self {
+        let mut sum = iter.next().unwrap_or_default();
+        for n in iter {
+            sum += n;
+        }
+        sum
     }
 }
 

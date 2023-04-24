@@ -480,6 +480,26 @@ impl<'a, T: FromDatum> FromDatum for Array<'a, T> {
             Some(Array::deconstruct_from(raw))
         }
     }
+
+    unsafe fn from_datum_in_memory_context(
+        mut memory_context: PgMemoryContexts,
+        datum: pg_sys::Datum,
+        is_null: bool,
+        typoid: pg_sys::Oid,
+    ) -> Option<Self>
+    where
+        Self: Sized,
+    {
+        if is_null {
+            None
+        } else {
+            memory_context.switch_to(|_| {
+                // copy the Datum into this MemoryContext, and then instantiate the Array wrapper
+                let copy = pg_sys::pg_detoast_datum_copy(datum.cast_mut_ptr());
+                Array::<T>::from_polymorphic_datum(pg_sys::Datum::from(copy), false, typoid)
+            })
+        }
+    }
 }
 
 impl<T: FromDatum> FromDatum for Vec<T> {
@@ -492,14 +512,22 @@ impl<T: FromDatum> FromDatum for Vec<T> {
         if is_null {
             None
         } else {
-            let array = Array::<T>::from_polymorphic_datum(datum, is_null, typoid).unwrap();
-            let mut v = Vec::with_capacity(array.len());
-
-            for element in array.iter() {
-                v.push(element.expect("array element was NULL"))
-            }
-            Some(v)
+            Array::<T>::from_polymorphic_datum(datum, is_null, typoid)
+                .map(|array| array.iter_deny_null().collect::<Vec<_>>())
         }
+    }
+
+    unsafe fn from_datum_in_memory_context(
+        memory_context: PgMemoryContexts,
+        datum: pg_sys::Datum,
+        is_null: bool,
+        typoid: pg_sys::Oid,
+    ) -> Option<Self>
+    where
+        Self: Sized,
+    {
+        Array::<T>::from_datum_in_memory_context(memory_context, datum, is_null, typoid)
+            .map(|array| array.iter_deny_null().collect::<Vec<_>>())
     }
 }
 
@@ -510,12 +538,21 @@ impl<T: FromDatum> FromDatum for Vec<Option<T>> {
         is_null: bool,
         typoid: pg_sys::Oid,
     ) -> Option<Vec<Option<T>>> {
-        if is_null || datum.is_null() {
-            None
-        } else {
-            let array = Array::<T>::from_polymorphic_datum(datum, is_null, typoid).unwrap();
-            Some(array.iter().collect::<Vec<_>>())
-        }
+        Array::<T>::from_polymorphic_datum(datum, is_null, typoid)
+            .map(|array| array.iter().collect::<Vec<_>>())
+    }
+
+    unsafe fn from_datum_in_memory_context(
+        memory_context: PgMemoryContexts,
+        datum: pg_sys::Datum,
+        is_null: bool,
+        typoid: pg_sys::Oid,
+    ) -> Option<Self>
+    where
+        Self: Sized,
+    {
+        Array::<T>::from_datum_in_memory_context(memory_context, datum, is_null, typoid)
+            .map(|array| array.iter().collect::<Vec<_>>())
     }
 }
 
