@@ -3187,6 +3187,36 @@ pub const PVC_RECURSE_WINDOWFUNCS: u32 = 8;
 pub const PVC_INCLUDE_PLACEHOLDERS: u32 = 16;
 pub const PVC_RECURSE_PLACEHOLDERS: u32 = 32;
 pub const DEFAULT_CURSOR_TUPLE_FRACTION: f64 = 0.1;
+pub const ER_MAGIC: u32 = 1384727874;
+pub const ER_FLAG_FVALUE_VALID: u32 = 1;
+pub const ER_FLAG_FVALUE_ALLOCED: u32 = 2;
+pub const ER_FLAG_DVALUES_VALID: u32 = 4;
+pub const ER_FLAG_DVALUES_ALLOCED: u32 = 8;
+pub const ER_FLAG_HAVE_EXTERNAL: u32 = 16;
+pub const ER_FLAG_TUPDESC_ALLOCED: u32 = 32;
+pub const ER_FLAG_IS_DOMAIN: u32 = 64;
+pub const ER_FLAG_IS_DUMMY: u32 = 128;
+pub const ER_FLAGS_NON_DATA: u32 = 224;
+pub const TYPECACHE_EQ_OPR: u32 = 1;
+pub const TYPECACHE_LT_OPR: u32 = 2;
+pub const TYPECACHE_GT_OPR: u32 = 4;
+pub const TYPECACHE_CMP_PROC: u32 = 8;
+pub const TYPECACHE_HASH_PROC: u32 = 16;
+pub const TYPECACHE_EQ_OPR_FINFO: u32 = 32;
+pub const TYPECACHE_CMP_PROC_FINFO: u32 = 64;
+pub const TYPECACHE_HASH_PROC_FINFO: u32 = 128;
+pub const TYPECACHE_TUPDESC: u32 = 256;
+pub const TYPECACHE_BTREE_OPFAMILY: u32 = 512;
+pub const TYPECACHE_HASH_OPFAMILY: u32 = 1024;
+pub const TYPECACHE_RANGE_INFO: u32 = 2048;
+pub const TYPECACHE_DOMAIN_BASE_INFO: u32 = 4096;
+pub const TYPECACHE_DOMAIN_CONSTR_INFO: u32 = 8192;
+pub const TYPECACHE_HASH_EXTENDED_PROC: u32 = 16384;
+pub const TYPECACHE_HASH_EXTENDED_PROC_FINFO: u32 = 32768;
+pub const PLPGSQL_XCHECK_NONE: u32 = 0;
+pub const PLPGSQL_XCHECK_SHADOWVAR: u32 = 2;
+pub const PLPGSQL_XCHECK_TOOMANYROWS: u32 = 4;
+pub const PLPGSQL_XCHECK_STRICTMULTIASSIGNMENT: u32 = 8;
 pub const RBTXN_HAS_CATALOG_CHANGES: u32 = 1;
 pub const RBTXN_IS_SUBXACT: u32 = 2;
 pub const RBTXN_IS_SERIALIZED: u32 = 4;
@@ -3289,22 +3319,6 @@ pub const DEFAULT_MATCHING_SEL: f64 = 0.01;
 pub const DEFAULT_NUM_DISTINCT: u32 = 200;
 pub const DEFAULT_UNK_SEL: f64 = 0.005;
 pub const DEFAULT_NOT_UNK_SEL: f64 = 0.995;
-pub const TYPECACHE_EQ_OPR: u32 = 1;
-pub const TYPECACHE_LT_OPR: u32 = 2;
-pub const TYPECACHE_GT_OPR: u32 = 4;
-pub const TYPECACHE_CMP_PROC: u32 = 8;
-pub const TYPECACHE_HASH_PROC: u32 = 16;
-pub const TYPECACHE_EQ_OPR_FINFO: u32 = 32;
-pub const TYPECACHE_CMP_PROC_FINFO: u32 = 64;
-pub const TYPECACHE_HASH_PROC_FINFO: u32 = 128;
-pub const TYPECACHE_TUPDESC: u32 = 256;
-pub const TYPECACHE_BTREE_OPFAMILY: u32 = 512;
-pub const TYPECACHE_HASH_OPFAMILY: u32 = 1024;
-pub const TYPECACHE_RANGE_INFO: u32 = 2048;
-pub const TYPECACHE_DOMAIN_BASE_INFO: u32 = 4096;
-pub const TYPECACHE_DOMAIN_CONSTR_INFO: u32 = 8192;
-pub const TYPECACHE_HASH_EXTENDED_PROC: u32 = 16384;
-pub const TYPECACHE_HASH_EXTENDED_PROC_FINFO: u32 = 32768;
 pub const RANGE_EMPTY: u32 = 1;
 pub const RANGE_LB_INC: u32 = 2;
 pub const RANGE_UB_INC: u32 = 4;
@@ -32017,6 +32031,96 @@ extern "C" {
         sarray_len: ::std::os::raw::c_int,
     ) -> ::std::os::raw::c_int;
 }
+pub const ObjectAccessType_OAT_POST_CREATE: ObjectAccessType = 0;
+pub const ObjectAccessType_OAT_DROP: ObjectAccessType = 1;
+pub const ObjectAccessType_OAT_POST_ALTER: ObjectAccessType = 2;
+pub const ObjectAccessType_OAT_NAMESPACE_SEARCH: ObjectAccessType = 3;
+pub const ObjectAccessType_OAT_FUNCTION_EXECUTE: ObjectAccessType = 4;
+pub const ObjectAccessType_OAT_TRUNCATE: ObjectAccessType = 5;
+pub type ObjectAccessType = ::std::os::raw::c_uint;
+#[repr(C)]
+#[derive(Debug, Default, Copy, Clone)]
+pub struct ObjectAccessPostCreate {
+    pub is_internal: bool,
+}
+#[repr(C)]
+#[derive(Debug, Default, Copy, Clone)]
+pub struct ObjectAccessDrop {
+    pub dropflags: ::std::os::raw::c_int,
+}
+#[repr(C)]
+#[derive(Debug, Copy, Clone)]
+pub struct ObjectAccessPostAlter {
+    pub auxiliary_id: Oid,
+    pub is_internal: bool,
+}
+impl Default for ObjectAccessPostAlter {
+    fn default() -> Self {
+        let mut s = ::std::mem::MaybeUninit::<Self>::uninit();
+        unsafe {
+            ::std::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
+            s.assume_init()
+        }
+    }
+}
+#[repr(C)]
+#[derive(Debug, Default, Copy, Clone)]
+pub struct ObjectAccessNamespaceSearch {
+    pub ereport_on_violation: bool,
+    pub result: bool,
+}
+pub type object_access_hook_type = ::std::option::Option<
+    unsafe extern "C" fn(
+        access: ObjectAccessType,
+        classId: Oid,
+        objectId: Oid,
+        subId: ::std::os::raw::c_int,
+        arg: *mut ::std::os::raw::c_void,
+    ),
+>;
+extern "C" {
+    pub static mut object_access_hook: object_access_hook_type;
+}
+#[pgrx_macros::pg_guard]
+extern "C" {
+    pub fn RunObjectPostCreateHook(
+        classId: Oid,
+        objectId: Oid,
+        subId: ::std::os::raw::c_int,
+        is_internal: bool,
+    );
+}
+#[pgrx_macros::pg_guard]
+extern "C" {
+    pub fn RunObjectDropHook(
+        classId: Oid,
+        objectId: Oid,
+        subId: ::std::os::raw::c_int,
+        dropflags: ::std::os::raw::c_int,
+    );
+}
+#[pgrx_macros::pg_guard]
+extern "C" {
+    pub fn RunObjectTruncateHook(objectId: Oid);
+}
+#[pgrx_macros::pg_guard]
+extern "C" {
+    pub fn RunObjectPostAlterHook(
+        classId: Oid,
+        objectId: Oid,
+        subId: ::std::os::raw::c_int,
+        auxiliaryId: Oid,
+        is_internal: bool,
+    );
+}
+#[pgrx_macros::pg_guard]
+extern "C" {
+    pub fn RunNamespaceSearchHook(objectId: Oid, ereport_on_violation: bool) -> bool;
+}
+#[pgrx_macros::pg_guard]
+extern "C" {
+    pub fn RunFunctionExecuteHook(objectId: Oid);
+}
 #[repr(C)]
 #[derive(Debug, Copy, Clone)]
 pub struct FormData_pg_authid {
@@ -34891,6 +34995,103 @@ extern "C" {
 #[pgrx_macros::pg_guard]
 extern "C" {
     pub fn RI_FKey_trigger_type(tgfoid: Oid) -> ::std::os::raw::c_int;
+}
+pub const PasswordType_PASSWORD_TYPE_PLAINTEXT: PasswordType = 0;
+pub const PasswordType_PASSWORD_TYPE_MD5: PasswordType = 1;
+pub const PasswordType_PASSWORD_TYPE_SCRAM_SHA_256: PasswordType = 2;
+pub type PasswordType = ::std::os::raw::c_uint;
+#[pgrx_macros::pg_guard]
+extern "C" {
+    pub fn get_password_type(shadow_pass: *const ::std::os::raw::c_char) -> PasswordType;
+}
+#[pgrx_macros::pg_guard]
+extern "C" {
+    pub fn encrypt_password(
+        target_type: PasswordType,
+        role: *const ::std::os::raw::c_char,
+        password: *const ::std::os::raw::c_char,
+    ) -> *mut ::std::os::raw::c_char;
+}
+#[pgrx_macros::pg_guard]
+extern "C" {
+    pub fn get_role_password(
+        role: *const ::std::os::raw::c_char,
+        logdetail: *mut *mut ::std::os::raw::c_char,
+    ) -> *mut ::std::os::raw::c_char;
+}
+#[pgrx_macros::pg_guard]
+extern "C" {
+    pub fn md5_crypt_verify(
+        role: *const ::std::os::raw::c_char,
+        shadow_pass: *const ::std::os::raw::c_char,
+        client_pass: *const ::std::os::raw::c_char,
+        md5_salt: *const ::std::os::raw::c_char,
+        md5_salt_len: ::std::os::raw::c_int,
+        logdetail: *mut *mut ::std::os::raw::c_char,
+    ) -> ::std::os::raw::c_int;
+}
+#[pgrx_macros::pg_guard]
+extern "C" {
+    pub fn plain_crypt_verify(
+        role: *const ::std::os::raw::c_char,
+        shadow_pass: *const ::std::os::raw::c_char,
+        client_pass: *const ::std::os::raw::c_char,
+        logdetail: *mut *mut ::std::os::raw::c_char,
+    ) -> ::std::os::raw::c_int;
+}
+extern "C" {
+    pub static mut Password_encryption: ::std::os::raw::c_int;
+}
+pub type check_password_hook_type = ::std::option::Option<
+    unsafe extern "C" fn(
+        username: *const ::std::os::raw::c_char,
+        shadow_pass: *const ::std::os::raw::c_char,
+        password_type: PasswordType,
+        validuntil_time: Datum,
+        validuntil_null: bool,
+    ),
+>;
+extern "C" {
+    pub static mut check_password_hook: check_password_hook_type;
+}
+#[pgrx_macros::pg_guard]
+extern "C" {
+    pub fn CreateRole(pstate: *mut ParseState, stmt: *mut CreateRoleStmt) -> Oid;
+}
+#[pgrx_macros::pg_guard]
+extern "C" {
+    pub fn AlterRole(stmt: *mut AlterRoleStmt) -> Oid;
+}
+#[pgrx_macros::pg_guard]
+extern "C" {
+    pub fn AlterRoleSet(stmt: *mut AlterRoleSetStmt) -> Oid;
+}
+#[pgrx_macros::pg_guard]
+extern "C" {
+    pub fn DropRole(stmt: *mut DropRoleStmt);
+}
+#[pgrx_macros::pg_guard]
+extern "C" {
+    pub fn GrantRole(stmt: *mut GrantRoleStmt);
+}
+#[pgrx_macros::pg_guard]
+extern "C" {
+    pub fn RenameRole(
+        oldname: *const ::std::os::raw::c_char,
+        newname: *const ::std::os::raw::c_char,
+    ) -> ObjectAddress;
+}
+#[pgrx_macros::pg_guard]
+extern "C" {
+    pub fn DropOwnedObjects(stmt: *mut DropOwnedStmt);
+}
+#[pgrx_macros::pg_guard]
+extern "C" {
+    pub fn ReassignOwnedObjects(stmt: *mut ReassignOwnedStmt);
+}
+#[pgrx_macros::pg_guard]
+extern "C" {
+    pub fn roleSpecsToIds(memberNames: *mut List) -> *mut List;
 }
 #[repr(C)]
 #[derive(Debug, Copy, Clone)]
@@ -41697,6 +41898,127 @@ extern "C" {
         live_childrels: *mut List,
     );
 }
+pub type get_relation_info_hook_type = ::std::option::Option<
+    unsafe extern "C" fn(
+        root: *mut PlannerInfo,
+        relationObjectId: Oid,
+        inhparent: bool,
+        rel: *mut RelOptInfo,
+    ),
+>;
+extern "C" {
+    pub static mut get_relation_info_hook: get_relation_info_hook_type;
+}
+#[pgrx_macros::pg_guard]
+extern "C" {
+    pub fn get_relation_info(
+        root: *mut PlannerInfo,
+        relationObjectId: Oid,
+        inhparent: bool,
+        rel: *mut RelOptInfo,
+    );
+}
+#[pgrx_macros::pg_guard]
+extern "C" {
+    pub fn infer_arbiter_indexes(root: *mut PlannerInfo) -> *mut List;
+}
+#[pgrx_macros::pg_guard]
+extern "C" {
+    pub fn estimate_rel_size(
+        rel: Relation,
+        attr_widths: *mut int32,
+        pages: *mut BlockNumber,
+        tuples: *mut f64,
+        allvisfrac: *mut f64,
+    );
+}
+#[pgrx_macros::pg_guard]
+extern "C" {
+    pub fn get_rel_data_width(rel: Relation, attr_widths: *mut int32) -> int32;
+}
+#[pgrx_macros::pg_guard]
+extern "C" {
+    pub fn get_relation_data_width(relid: Oid, attr_widths: *mut int32) -> int32;
+}
+#[pgrx_macros::pg_guard]
+extern "C" {
+    pub fn relation_excluded_by_constraints(
+        root: *mut PlannerInfo,
+        rel: *mut RelOptInfo,
+        rte: *mut RangeTblEntry,
+    ) -> bool;
+}
+#[pgrx_macros::pg_guard]
+extern "C" {
+    pub fn build_physical_tlist(root: *mut PlannerInfo, rel: *mut RelOptInfo) -> *mut List;
+}
+#[pgrx_macros::pg_guard]
+extern "C" {
+    pub fn has_unique_index(rel: *mut RelOptInfo, attno: AttrNumber) -> bool;
+}
+#[pgrx_macros::pg_guard]
+extern "C" {
+    pub fn restriction_selectivity(
+        root: *mut PlannerInfo,
+        operatorid: Oid,
+        args: *mut List,
+        inputcollid: Oid,
+        varRelid: ::std::os::raw::c_int,
+    ) -> Selectivity;
+}
+#[pgrx_macros::pg_guard]
+extern "C" {
+    pub fn join_selectivity(
+        root: *mut PlannerInfo,
+        operatorid: Oid,
+        args: *mut List,
+        inputcollid: Oid,
+        jointype: JoinType,
+        sjinfo: *mut SpecialJoinInfo,
+    ) -> Selectivity;
+}
+#[pgrx_macros::pg_guard]
+extern "C" {
+    pub fn function_selectivity(
+        root: *mut PlannerInfo,
+        funcid: Oid,
+        args: *mut List,
+        inputcollid: Oid,
+        is_join: bool,
+        varRelid: ::std::os::raw::c_int,
+        jointype: JoinType,
+        sjinfo: *mut SpecialJoinInfo,
+    ) -> Selectivity;
+}
+#[pgrx_macros::pg_guard]
+extern "C" {
+    pub fn add_function_cost(
+        root: *mut PlannerInfo,
+        funcid: Oid,
+        node: *mut Node,
+        cost: *mut QualCost,
+    );
+}
+#[pgrx_macros::pg_guard]
+extern "C" {
+    pub fn get_function_rows(root: *mut PlannerInfo, funcid: Oid, node: *mut Node) -> f64;
+}
+#[pgrx_macros::pg_guard]
+extern "C" {
+    pub fn has_row_triggers(root: *mut PlannerInfo, rti: Index, event: CmdType) -> bool;
+}
+#[pgrx_macros::pg_guard]
+extern "C" {
+    pub fn has_stored_generated_columns(root: *mut PlannerInfo, rti: Index) -> bool;
+}
+#[pgrx_macros::pg_guard]
+extern "C" {
+    pub fn get_dependent_generated_columns(
+        root: *mut PlannerInfo,
+        rti: Index,
+        target_cols: *mut Bitmapset,
+    ) -> *mut Bitmapset;
+}
 extern "C" {
     pub static mut cursor_tuple_fraction: f64;
 }
@@ -42763,6 +43085,1858 @@ extern "C" {
 extern "C" {
     pub fn get_parse_rowmark(qry: *mut Query, rtindex: Index) -> *mut RowMarkClause;
 }
+#[repr(C)]
+#[derive(Debug, Copy, Clone)]
+pub struct ExpandedRecordHeader {
+    pub hdr: ExpandedObjectHeader,
+    pub er_magic: ::std::os::raw::c_int,
+    pub flags: ::std::os::raw::c_int,
+    pub er_decltypeid: Oid,
+    pub er_typeid: Oid,
+    pub er_typmod: int32,
+    pub er_tupdesc: TupleDesc,
+    pub er_tupdesc_id: uint64,
+    pub dvalues: *mut Datum,
+    pub dnulls: *mut bool,
+    pub nfields: ::std::os::raw::c_int,
+    pub flat_size: Size,
+    pub data_len: Size,
+    pub hoff: ::std::os::raw::c_int,
+    pub hasnull: bool,
+    pub fvalue: HeapTuple,
+    pub fstartptr: *mut ::std::os::raw::c_char,
+    pub fendptr: *mut ::std::os::raw::c_char,
+    pub er_short_term_cxt: MemoryContext,
+    pub er_dummy_header: *mut ExpandedRecordHeader,
+    pub er_domaininfo: *mut ::std::os::raw::c_void,
+    pub er_mcb: MemoryContextCallback,
+}
+impl Default for ExpandedRecordHeader {
+    fn default() -> Self {
+        let mut s = ::std::mem::MaybeUninit::<Self>::uninit();
+        unsafe {
+            ::std::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
+            s.assume_init()
+        }
+    }
+}
+#[repr(C)]
+#[derive(Debug, Copy, Clone)]
+pub struct ExpandedRecordFieldInfo {
+    pub fnumber: ::std::os::raw::c_int,
+    pub ftypeid: Oid,
+    pub ftypmod: int32,
+    pub fcollation: Oid,
+}
+impl Default for ExpandedRecordFieldInfo {
+    fn default() -> Self {
+        let mut s = ::std::mem::MaybeUninit::<Self>::uninit();
+        unsafe {
+            ::std::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
+            s.assume_init()
+        }
+    }
+}
+#[pgrx_macros::pg_guard]
+extern "C" {
+    pub fn make_expanded_record_from_typeid(
+        type_id: Oid,
+        typmod: int32,
+        parentcontext: MemoryContext,
+    ) -> *mut ExpandedRecordHeader;
+}
+#[pgrx_macros::pg_guard]
+extern "C" {
+    pub fn make_expanded_record_from_tupdesc(
+        tupdesc: TupleDesc,
+        parentcontext: MemoryContext,
+    ) -> *mut ExpandedRecordHeader;
+}
+#[pgrx_macros::pg_guard]
+extern "C" {
+    pub fn make_expanded_record_from_exprecord(
+        olderh: *mut ExpandedRecordHeader,
+        parentcontext: MemoryContext,
+    ) -> *mut ExpandedRecordHeader;
+}
+#[pgrx_macros::pg_guard]
+extern "C" {
+    pub fn expanded_record_set_tuple(
+        erh: *mut ExpandedRecordHeader,
+        tuple: HeapTuple,
+        copy: bool,
+        expand_external: bool,
+    );
+}
+#[pgrx_macros::pg_guard]
+extern "C" {
+    pub fn make_expanded_record_from_datum(
+        recorddatum: Datum,
+        parentcontext: MemoryContext,
+    ) -> Datum;
+}
+#[pgrx_macros::pg_guard]
+extern "C" {
+    pub fn expanded_record_fetch_tupdesc(erh: *mut ExpandedRecordHeader) -> TupleDesc;
+}
+#[pgrx_macros::pg_guard]
+extern "C" {
+    pub fn expanded_record_get_tuple(erh: *mut ExpandedRecordHeader) -> HeapTuple;
+}
+#[pgrx_macros::pg_guard]
+extern "C" {
+    pub fn DatumGetExpandedRecord(d: Datum) -> *mut ExpandedRecordHeader;
+}
+#[pgrx_macros::pg_guard]
+extern "C" {
+    pub fn deconstruct_expanded_record(erh: *mut ExpandedRecordHeader);
+}
+#[pgrx_macros::pg_guard]
+extern "C" {
+    pub fn expanded_record_lookup_field(
+        erh: *mut ExpandedRecordHeader,
+        fieldname: *const ::std::os::raw::c_char,
+        finfo: *mut ExpandedRecordFieldInfo,
+    ) -> bool;
+}
+#[pgrx_macros::pg_guard]
+extern "C" {
+    pub fn expanded_record_fetch_field(
+        erh: *mut ExpandedRecordHeader,
+        fnumber: ::std::os::raw::c_int,
+        isnull: *mut bool,
+    ) -> Datum;
+}
+#[pgrx_macros::pg_guard]
+extern "C" {
+    pub fn expanded_record_set_field_internal(
+        erh: *mut ExpandedRecordHeader,
+        fnumber: ::std::os::raw::c_int,
+        newValue: Datum,
+        isnull: bool,
+        expand_external: bool,
+        check_constraints: bool,
+    );
+}
+#[pgrx_macros::pg_guard]
+extern "C" {
+    pub fn expanded_record_set_fields(
+        erh: *mut ExpandedRecordHeader,
+        newValues: *const Datum,
+        isnulls: *const bool,
+        expand_external: bool,
+    );
+}
+#[repr(C)]
+#[derive(Debug, Copy, Clone)]
+pub struct DomainConstraintCache {
+    _unused: [u8; 0],
+}
+#[repr(C)]
+#[derive(Debug, Copy, Clone)]
+pub struct TypeCacheEnumData {
+    _unused: [u8; 0],
+}
+#[repr(C)]
+#[derive(Debug, Copy, Clone)]
+pub struct TypeCacheEntry {
+    pub type_id: Oid,
+    pub type_id_hash: uint32,
+    pub typlen: int16,
+    pub typbyval: bool,
+    pub typalign: ::std::os::raw::c_char,
+    pub typstorage: ::std::os::raw::c_char,
+    pub typtype: ::std::os::raw::c_char,
+    pub typrelid: Oid,
+    pub typelem: Oid,
+    pub typcollation: Oid,
+    pub btree_opf: Oid,
+    pub btree_opintype: Oid,
+    pub hash_opf: Oid,
+    pub hash_opintype: Oid,
+    pub eq_opr: Oid,
+    pub lt_opr: Oid,
+    pub gt_opr: Oid,
+    pub cmp_proc: Oid,
+    pub hash_proc: Oid,
+    pub hash_extended_proc: Oid,
+    pub eq_opr_finfo: FmgrInfo,
+    pub cmp_proc_finfo: FmgrInfo,
+    pub hash_proc_finfo: FmgrInfo,
+    pub hash_extended_proc_finfo: FmgrInfo,
+    pub tupDesc: TupleDesc,
+    pub tupDesc_identifier: uint64,
+    pub rngelemtype: *mut TypeCacheEntry,
+    pub rng_collation: Oid,
+    pub rng_cmp_proc_finfo: FmgrInfo,
+    pub rng_canonical_finfo: FmgrInfo,
+    pub rng_subdiff_finfo: FmgrInfo,
+    pub domainBaseType: Oid,
+    pub domainBaseTypmod: int32,
+    pub domainData: *mut DomainConstraintCache,
+    pub flags: ::std::os::raw::c_int,
+    pub enumData: *mut TypeCacheEnumData,
+    pub nextDomain: *mut TypeCacheEntry,
+}
+impl Default for TypeCacheEntry {
+    fn default() -> Self {
+        let mut s = ::std::mem::MaybeUninit::<Self>::uninit();
+        unsafe {
+            ::std::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
+            s.assume_init()
+        }
+    }
+}
+#[repr(C)]
+#[derive(Debug, Copy, Clone)]
+pub struct DomainConstraintRef {
+    pub constraints: *mut List,
+    pub refctx: MemoryContext,
+    pub tcache: *mut TypeCacheEntry,
+    pub need_exprstate: bool,
+    pub dcc: *mut DomainConstraintCache,
+    pub callback: MemoryContextCallback,
+}
+impl Default for DomainConstraintRef {
+    fn default() -> Self {
+        let mut s = ::std::mem::MaybeUninit::<Self>::uninit();
+        unsafe {
+            ::std::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
+            s.assume_init()
+        }
+    }
+}
+#[repr(C)]
+#[derive(Debug, Copy, Clone)]
+pub struct SharedRecordTypmodRegistry {
+    _unused: [u8; 0],
+}
+#[pgrx_macros::pg_guard]
+extern "C" {
+    pub fn lookup_type_cache(type_id: Oid, flags: ::std::os::raw::c_int) -> *mut TypeCacheEntry;
+}
+#[pgrx_macros::pg_guard]
+extern "C" {
+    pub fn InitDomainConstraintRef(
+        type_id: Oid,
+        ref_: *mut DomainConstraintRef,
+        refctx: MemoryContext,
+        need_exprstate: bool,
+    );
+}
+#[pgrx_macros::pg_guard]
+extern "C" {
+    pub fn UpdateDomainConstraintRef(ref_: *mut DomainConstraintRef);
+}
+#[pgrx_macros::pg_guard]
+extern "C" {
+    pub fn DomainHasConstraints(type_id: Oid) -> bool;
+}
+#[pgrx_macros::pg_guard]
+extern "C" {
+    pub fn lookup_rowtype_tupdesc(type_id: Oid, typmod: int32) -> TupleDesc;
+}
+#[pgrx_macros::pg_guard]
+extern "C" {
+    pub fn lookup_rowtype_tupdesc_noerror(type_id: Oid, typmod: int32, noError: bool) -> TupleDesc;
+}
+#[pgrx_macros::pg_guard]
+extern "C" {
+    pub fn lookup_rowtype_tupdesc_copy(type_id: Oid, typmod: int32) -> TupleDesc;
+}
+#[pgrx_macros::pg_guard]
+extern "C" {
+    pub fn lookup_rowtype_tupdesc_domain(type_id: Oid, typmod: int32, noError: bool) -> TupleDesc;
+}
+#[pgrx_macros::pg_guard]
+extern "C" {
+    pub fn assign_record_type_typmod(tupDesc: TupleDesc);
+}
+#[pgrx_macros::pg_guard]
+extern "C" {
+    pub fn assign_record_type_identifier(type_id: Oid, typmod: int32) -> uint64;
+}
+#[pgrx_macros::pg_guard]
+extern "C" {
+    pub fn compare_values_of_enum(
+        tcache: *mut TypeCacheEntry,
+        arg1: Oid,
+        arg2: Oid,
+    ) -> ::std::os::raw::c_int;
+}
+#[pgrx_macros::pg_guard]
+extern "C" {
+    pub fn SharedRecordTypmodRegistryEstimate() -> usize;
+}
+#[pgrx_macros::pg_guard]
+extern "C" {
+    pub fn SharedRecordTypmodRegistryInit(
+        arg1: *mut SharedRecordTypmodRegistry,
+        segment: *mut dsm_segment,
+        area: *mut dsa_area,
+    );
+}
+#[pgrx_macros::pg_guard]
+extern "C" {
+    pub fn SharedRecordTypmodRegistryAttach(arg1: *mut SharedRecordTypmodRegistry);
+}
+pub const PLpgSQL_nsitem_type_PLPGSQL_NSTYPE_LABEL: PLpgSQL_nsitem_type = 0;
+pub const PLpgSQL_nsitem_type_PLPGSQL_NSTYPE_VAR: PLpgSQL_nsitem_type = 1;
+pub const PLpgSQL_nsitem_type_PLPGSQL_NSTYPE_REC: PLpgSQL_nsitem_type = 2;
+pub type PLpgSQL_nsitem_type = ::std::os::raw::c_uint;
+pub const PLpgSQL_label_type_PLPGSQL_LABEL_BLOCK: PLpgSQL_label_type = 0;
+pub const PLpgSQL_label_type_PLPGSQL_LABEL_LOOP: PLpgSQL_label_type = 1;
+pub const PLpgSQL_label_type_PLPGSQL_LABEL_OTHER: PLpgSQL_label_type = 2;
+pub type PLpgSQL_label_type = ::std::os::raw::c_uint;
+pub const PLpgSQL_datum_type_PLPGSQL_DTYPE_VAR: PLpgSQL_datum_type = 0;
+pub const PLpgSQL_datum_type_PLPGSQL_DTYPE_ROW: PLpgSQL_datum_type = 1;
+pub const PLpgSQL_datum_type_PLPGSQL_DTYPE_REC: PLpgSQL_datum_type = 2;
+pub const PLpgSQL_datum_type_PLPGSQL_DTYPE_RECFIELD: PLpgSQL_datum_type = 3;
+pub const PLpgSQL_datum_type_PLPGSQL_DTYPE_ARRAYELEM: PLpgSQL_datum_type = 4;
+pub const PLpgSQL_datum_type_PLPGSQL_DTYPE_PROMISE: PLpgSQL_datum_type = 5;
+pub type PLpgSQL_datum_type = ::std::os::raw::c_uint;
+pub const PLpgSQL_promise_type_PLPGSQL_PROMISE_NONE: PLpgSQL_promise_type = 0;
+pub const PLpgSQL_promise_type_PLPGSQL_PROMISE_TG_NAME: PLpgSQL_promise_type = 1;
+pub const PLpgSQL_promise_type_PLPGSQL_PROMISE_TG_WHEN: PLpgSQL_promise_type = 2;
+pub const PLpgSQL_promise_type_PLPGSQL_PROMISE_TG_LEVEL: PLpgSQL_promise_type = 3;
+pub const PLpgSQL_promise_type_PLPGSQL_PROMISE_TG_OP: PLpgSQL_promise_type = 4;
+pub const PLpgSQL_promise_type_PLPGSQL_PROMISE_TG_RELID: PLpgSQL_promise_type = 5;
+pub const PLpgSQL_promise_type_PLPGSQL_PROMISE_TG_TABLE_NAME: PLpgSQL_promise_type = 6;
+pub const PLpgSQL_promise_type_PLPGSQL_PROMISE_TG_TABLE_SCHEMA: PLpgSQL_promise_type = 7;
+pub const PLpgSQL_promise_type_PLPGSQL_PROMISE_TG_NARGS: PLpgSQL_promise_type = 8;
+pub const PLpgSQL_promise_type_PLPGSQL_PROMISE_TG_ARGV: PLpgSQL_promise_type = 9;
+pub const PLpgSQL_promise_type_PLPGSQL_PROMISE_TG_EVENT: PLpgSQL_promise_type = 10;
+pub const PLpgSQL_promise_type_PLPGSQL_PROMISE_TG_TAG: PLpgSQL_promise_type = 11;
+pub type PLpgSQL_promise_type = ::std::os::raw::c_uint;
+pub const PLpgSQL_type_type_PLPGSQL_TTYPE_SCALAR: PLpgSQL_type_type = 0;
+pub const PLpgSQL_type_type_PLPGSQL_TTYPE_REC: PLpgSQL_type_type = 1;
+pub const PLpgSQL_type_type_PLPGSQL_TTYPE_PSEUDO: PLpgSQL_type_type = 2;
+pub type PLpgSQL_type_type = ::std::os::raw::c_uint;
+pub const PLpgSQL_stmt_type_PLPGSQL_STMT_BLOCK: PLpgSQL_stmt_type = 0;
+pub const PLpgSQL_stmt_type_PLPGSQL_STMT_ASSIGN: PLpgSQL_stmt_type = 1;
+pub const PLpgSQL_stmt_type_PLPGSQL_STMT_IF: PLpgSQL_stmt_type = 2;
+pub const PLpgSQL_stmt_type_PLPGSQL_STMT_CASE: PLpgSQL_stmt_type = 3;
+pub const PLpgSQL_stmt_type_PLPGSQL_STMT_LOOP: PLpgSQL_stmt_type = 4;
+pub const PLpgSQL_stmt_type_PLPGSQL_STMT_WHILE: PLpgSQL_stmt_type = 5;
+pub const PLpgSQL_stmt_type_PLPGSQL_STMT_FORI: PLpgSQL_stmt_type = 6;
+pub const PLpgSQL_stmt_type_PLPGSQL_STMT_FORS: PLpgSQL_stmt_type = 7;
+pub const PLpgSQL_stmt_type_PLPGSQL_STMT_FORC: PLpgSQL_stmt_type = 8;
+pub const PLpgSQL_stmt_type_PLPGSQL_STMT_FOREACH_A: PLpgSQL_stmt_type = 9;
+pub const PLpgSQL_stmt_type_PLPGSQL_STMT_EXIT: PLpgSQL_stmt_type = 10;
+pub const PLpgSQL_stmt_type_PLPGSQL_STMT_RETURN: PLpgSQL_stmt_type = 11;
+pub const PLpgSQL_stmt_type_PLPGSQL_STMT_RETURN_NEXT: PLpgSQL_stmt_type = 12;
+pub const PLpgSQL_stmt_type_PLPGSQL_STMT_RETURN_QUERY: PLpgSQL_stmt_type = 13;
+pub const PLpgSQL_stmt_type_PLPGSQL_STMT_RAISE: PLpgSQL_stmt_type = 14;
+pub const PLpgSQL_stmt_type_PLPGSQL_STMT_ASSERT: PLpgSQL_stmt_type = 15;
+pub const PLpgSQL_stmt_type_PLPGSQL_STMT_EXECSQL: PLpgSQL_stmt_type = 16;
+pub const PLpgSQL_stmt_type_PLPGSQL_STMT_DYNEXECUTE: PLpgSQL_stmt_type = 17;
+pub const PLpgSQL_stmt_type_PLPGSQL_STMT_DYNFORS: PLpgSQL_stmt_type = 18;
+pub const PLpgSQL_stmt_type_PLPGSQL_STMT_GETDIAG: PLpgSQL_stmt_type = 19;
+pub const PLpgSQL_stmt_type_PLPGSQL_STMT_OPEN: PLpgSQL_stmt_type = 20;
+pub const PLpgSQL_stmt_type_PLPGSQL_STMT_FETCH: PLpgSQL_stmt_type = 21;
+pub const PLpgSQL_stmt_type_PLPGSQL_STMT_CLOSE: PLpgSQL_stmt_type = 22;
+pub const PLpgSQL_stmt_type_PLPGSQL_STMT_PERFORM: PLpgSQL_stmt_type = 23;
+pub const PLpgSQL_stmt_type_PLPGSQL_STMT_CALL: PLpgSQL_stmt_type = 24;
+pub const PLpgSQL_stmt_type_PLPGSQL_STMT_COMMIT: PLpgSQL_stmt_type = 25;
+pub const PLpgSQL_stmt_type_PLPGSQL_STMT_ROLLBACK: PLpgSQL_stmt_type = 26;
+pub const PLpgSQL_stmt_type_PLPGSQL_STMT_SET: PLpgSQL_stmt_type = 27;
+pub type PLpgSQL_stmt_type = ::std::os::raw::c_uint;
+pub const PLPGSQL_RC_OK: _bindgen_ty_19 = 0;
+pub const PLPGSQL_RC_EXIT: _bindgen_ty_19 = 1;
+pub const PLPGSQL_RC_RETURN: _bindgen_ty_19 = 2;
+pub const PLPGSQL_RC_CONTINUE: _bindgen_ty_19 = 3;
+pub type _bindgen_ty_19 = ::std::os::raw::c_uint;
+pub const PLpgSQL_getdiag_kind_PLPGSQL_GETDIAG_ROW_COUNT: PLpgSQL_getdiag_kind = 0;
+pub const PLpgSQL_getdiag_kind_PLPGSQL_GETDIAG_CONTEXT: PLpgSQL_getdiag_kind = 1;
+pub const PLpgSQL_getdiag_kind_PLPGSQL_GETDIAG_ERROR_CONTEXT: PLpgSQL_getdiag_kind = 2;
+pub const PLpgSQL_getdiag_kind_PLPGSQL_GETDIAG_ERROR_DETAIL: PLpgSQL_getdiag_kind = 3;
+pub const PLpgSQL_getdiag_kind_PLPGSQL_GETDIAG_ERROR_HINT: PLpgSQL_getdiag_kind = 4;
+pub const PLpgSQL_getdiag_kind_PLPGSQL_GETDIAG_RETURNED_SQLSTATE: PLpgSQL_getdiag_kind = 5;
+pub const PLpgSQL_getdiag_kind_PLPGSQL_GETDIAG_COLUMN_NAME: PLpgSQL_getdiag_kind = 6;
+pub const PLpgSQL_getdiag_kind_PLPGSQL_GETDIAG_CONSTRAINT_NAME: PLpgSQL_getdiag_kind = 7;
+pub const PLpgSQL_getdiag_kind_PLPGSQL_GETDIAG_DATATYPE_NAME: PLpgSQL_getdiag_kind = 8;
+pub const PLpgSQL_getdiag_kind_PLPGSQL_GETDIAG_MESSAGE_TEXT: PLpgSQL_getdiag_kind = 9;
+pub const PLpgSQL_getdiag_kind_PLPGSQL_GETDIAG_TABLE_NAME: PLpgSQL_getdiag_kind = 10;
+pub const PLpgSQL_getdiag_kind_PLPGSQL_GETDIAG_SCHEMA_NAME: PLpgSQL_getdiag_kind = 11;
+pub type PLpgSQL_getdiag_kind = ::std::os::raw::c_uint;
+pub const PLpgSQL_raise_option_type_PLPGSQL_RAISEOPTION_ERRCODE: PLpgSQL_raise_option_type = 0;
+pub const PLpgSQL_raise_option_type_PLPGSQL_RAISEOPTION_MESSAGE: PLpgSQL_raise_option_type = 1;
+pub const PLpgSQL_raise_option_type_PLPGSQL_RAISEOPTION_DETAIL: PLpgSQL_raise_option_type = 2;
+pub const PLpgSQL_raise_option_type_PLPGSQL_RAISEOPTION_HINT: PLpgSQL_raise_option_type = 3;
+pub const PLpgSQL_raise_option_type_PLPGSQL_RAISEOPTION_COLUMN: PLpgSQL_raise_option_type = 4;
+pub const PLpgSQL_raise_option_type_PLPGSQL_RAISEOPTION_CONSTRAINT: PLpgSQL_raise_option_type = 5;
+pub const PLpgSQL_raise_option_type_PLPGSQL_RAISEOPTION_DATATYPE: PLpgSQL_raise_option_type = 6;
+pub const PLpgSQL_raise_option_type_PLPGSQL_RAISEOPTION_TABLE: PLpgSQL_raise_option_type = 7;
+pub const PLpgSQL_raise_option_type_PLPGSQL_RAISEOPTION_SCHEMA: PLpgSQL_raise_option_type = 8;
+pub type PLpgSQL_raise_option_type = ::std::os::raw::c_uint;
+pub const PLpgSQL_resolve_option_PLPGSQL_RESOLVE_ERROR: PLpgSQL_resolve_option = 0;
+pub const PLpgSQL_resolve_option_PLPGSQL_RESOLVE_VARIABLE: PLpgSQL_resolve_option = 1;
+pub const PLpgSQL_resolve_option_PLPGSQL_RESOLVE_COLUMN: PLpgSQL_resolve_option = 2;
+pub type PLpgSQL_resolve_option = ::std::os::raw::c_uint;
+#[doc = " Node and structure definitions"]
+#[repr(C)]
+#[derive(Debug, Copy, Clone)]
+pub struct PLpgSQL_type {
+    pub typname: *mut ::std::os::raw::c_char,
+    pub typoid: Oid,
+    pub ttype: PLpgSQL_type_type,
+    pub typlen: int16,
+    pub typbyval: bool,
+    pub typtype: ::std::os::raw::c_char,
+    pub collation: Oid,
+    pub typisarray: bool,
+    pub atttypmod: int32,
+    pub origtypname: *mut TypeName,
+    pub tcache: *mut TypeCacheEntry,
+    pub tupdesc_id: uint64,
+}
+impl Default for PLpgSQL_type {
+    fn default() -> Self {
+        let mut s = ::std::mem::MaybeUninit::<Self>::uninit();
+        unsafe {
+            ::std::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
+            s.assume_init()
+        }
+    }
+}
+#[repr(C)]
+#[derive(Debug, Copy, Clone)]
+pub struct PLpgSQL_expr {
+    pub query: *mut ::std::os::raw::c_char,
+    pub plan: SPIPlanPtr,
+    pub paramnos: *mut Bitmapset,
+    pub rwparam: ::std::os::raw::c_int,
+    pub func: *mut PLpgSQL_function,
+    pub ns: *mut PLpgSQL_nsitem,
+    pub expr_simple_expr: *mut Expr,
+    pub expr_simple_type: Oid,
+    pub expr_simple_typmod: int32,
+    pub expr_simple_mutable: bool,
+    pub expr_simple_plansource: *mut CachedPlanSource,
+    pub expr_simple_plan: *mut CachedPlan,
+    pub expr_simple_plan_lxid: LocalTransactionId,
+    pub expr_simple_state: *mut ExprState,
+    pub expr_simple_in_use: bool,
+    pub expr_simple_lxid: LocalTransactionId,
+}
+impl Default for PLpgSQL_expr {
+    fn default() -> Self {
+        let mut s = ::std::mem::MaybeUninit::<Self>::uninit();
+        unsafe {
+            ::std::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
+            s.assume_init()
+        }
+    }
+}
+#[repr(C)]
+#[derive(Debug, Copy, Clone)]
+pub struct PLpgSQL_datum {
+    pub dtype: PLpgSQL_datum_type,
+    pub dno: ::std::os::raw::c_int,
+}
+impl Default for PLpgSQL_datum {
+    fn default() -> Self {
+        let mut s = ::std::mem::MaybeUninit::<Self>::uninit();
+        unsafe {
+            ::std::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
+            s.assume_init()
+        }
+    }
+}
+#[repr(C)]
+#[derive(Debug, Copy, Clone)]
+pub struct PLpgSQL_variable {
+    pub dtype: PLpgSQL_datum_type,
+    pub dno: ::std::os::raw::c_int,
+    pub refname: *mut ::std::os::raw::c_char,
+    pub lineno: ::std::os::raw::c_int,
+    pub isconst: bool,
+    pub notnull: bool,
+    pub default_val: *mut PLpgSQL_expr,
+}
+impl Default for PLpgSQL_variable {
+    fn default() -> Self {
+        let mut s = ::std::mem::MaybeUninit::<Self>::uninit();
+        unsafe {
+            ::std::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
+            s.assume_init()
+        }
+    }
+}
+#[repr(C)]
+#[derive(Debug, Copy, Clone)]
+pub struct PLpgSQL_var {
+    pub dtype: PLpgSQL_datum_type,
+    pub dno: ::std::os::raw::c_int,
+    pub refname: *mut ::std::os::raw::c_char,
+    pub lineno: ::std::os::raw::c_int,
+    pub isconst: bool,
+    pub notnull: bool,
+    pub default_val: *mut PLpgSQL_expr,
+    pub datatype: *mut PLpgSQL_type,
+    pub cursor_explicit_expr: *mut PLpgSQL_expr,
+    pub cursor_explicit_argrow: ::std::os::raw::c_int,
+    pub cursor_options: ::std::os::raw::c_int,
+    pub value: Datum,
+    pub isnull: bool,
+    pub freeval: bool,
+    pub promise: PLpgSQL_promise_type,
+}
+impl Default for PLpgSQL_var {
+    fn default() -> Self {
+        let mut s = ::std::mem::MaybeUninit::<Self>::uninit();
+        unsafe {
+            ::std::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
+            s.assume_init()
+        }
+    }
+}
+#[repr(C)]
+#[derive(Debug, Copy, Clone)]
+pub struct PLpgSQL_row {
+    pub dtype: PLpgSQL_datum_type,
+    pub dno: ::std::os::raw::c_int,
+    pub refname: *mut ::std::os::raw::c_char,
+    pub lineno: ::std::os::raw::c_int,
+    pub isconst: bool,
+    pub notnull: bool,
+    pub default_val: *mut PLpgSQL_expr,
+    pub rowtupdesc: TupleDesc,
+    pub nfields: ::std::os::raw::c_int,
+    pub fieldnames: *mut *mut ::std::os::raw::c_char,
+    pub varnos: *mut ::std::os::raw::c_int,
+}
+impl Default for PLpgSQL_row {
+    fn default() -> Self {
+        let mut s = ::std::mem::MaybeUninit::<Self>::uninit();
+        unsafe {
+            ::std::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
+            s.assume_init()
+        }
+    }
+}
+#[repr(C)]
+#[derive(Debug, Copy, Clone)]
+pub struct PLpgSQL_rec {
+    pub dtype: PLpgSQL_datum_type,
+    pub dno: ::std::os::raw::c_int,
+    pub refname: *mut ::std::os::raw::c_char,
+    pub lineno: ::std::os::raw::c_int,
+    pub isconst: bool,
+    pub notnull: bool,
+    pub default_val: *mut PLpgSQL_expr,
+    pub datatype: *mut PLpgSQL_type,
+    pub rectypeid: Oid,
+    pub firstfield: ::std::os::raw::c_int,
+    pub erh: *mut ExpandedRecordHeader,
+}
+impl Default for PLpgSQL_rec {
+    fn default() -> Self {
+        let mut s = ::std::mem::MaybeUninit::<Self>::uninit();
+        unsafe {
+            ::std::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
+            s.assume_init()
+        }
+    }
+}
+#[repr(C)]
+#[derive(Debug, Copy, Clone)]
+pub struct PLpgSQL_recfield {
+    pub dtype: PLpgSQL_datum_type,
+    pub dno: ::std::os::raw::c_int,
+    pub fieldname: *mut ::std::os::raw::c_char,
+    pub recparentno: ::std::os::raw::c_int,
+    pub nextfield: ::std::os::raw::c_int,
+    pub rectupledescid: uint64,
+    pub finfo: ExpandedRecordFieldInfo,
+}
+impl Default for PLpgSQL_recfield {
+    fn default() -> Self {
+        let mut s = ::std::mem::MaybeUninit::<Self>::uninit();
+        unsafe {
+            ::std::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
+            s.assume_init()
+        }
+    }
+}
+#[repr(C)]
+#[derive(Debug, Copy, Clone)]
+pub struct PLpgSQL_arrayelem {
+    pub dtype: PLpgSQL_datum_type,
+    pub dno: ::std::os::raw::c_int,
+    pub subscript: *mut PLpgSQL_expr,
+    pub arrayparentno: ::std::os::raw::c_int,
+    pub parenttypoid: Oid,
+    pub parenttypmod: int32,
+    pub arraytypoid: Oid,
+    pub arraytypmod: int32,
+    pub arraytyplen: int16,
+    pub elemtypoid: Oid,
+    pub elemtyplen: int16,
+    pub elemtypbyval: bool,
+    pub elemtypalign: ::std::os::raw::c_char,
+}
+impl Default for PLpgSQL_arrayelem {
+    fn default() -> Self {
+        let mut s = ::std::mem::MaybeUninit::<Self>::uninit();
+        unsafe {
+            ::std::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
+            s.assume_init()
+        }
+    }
+}
+#[repr(C)]
+#[derive(Debug)]
+pub struct PLpgSQL_nsitem {
+    pub itemtype: PLpgSQL_nsitem_type,
+    pub itemno: ::std::os::raw::c_int,
+    pub prev: *mut PLpgSQL_nsitem,
+    pub name: __IncompleteArrayField<::std::os::raw::c_char>,
+}
+impl Default for PLpgSQL_nsitem {
+    fn default() -> Self {
+        let mut s = ::std::mem::MaybeUninit::<Self>::uninit();
+        unsafe {
+            ::std::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
+            s.assume_init()
+        }
+    }
+}
+#[repr(C)]
+#[derive(Debug, Copy, Clone)]
+pub struct PLpgSQL_stmt {
+    pub cmd_type: PLpgSQL_stmt_type,
+    pub lineno: ::std::os::raw::c_int,
+    pub stmtid: ::std::os::raw::c_uint,
+}
+impl Default for PLpgSQL_stmt {
+    fn default() -> Self {
+        let mut s = ::std::mem::MaybeUninit::<Self>::uninit();
+        unsafe {
+            ::std::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
+            s.assume_init()
+        }
+    }
+}
+#[repr(C)]
+#[derive(Debug, Copy, Clone)]
+pub struct PLpgSQL_condition {
+    pub sqlerrstate: ::std::os::raw::c_int,
+    pub condname: *mut ::std::os::raw::c_char,
+    pub next: *mut PLpgSQL_condition,
+}
+impl Default for PLpgSQL_condition {
+    fn default() -> Self {
+        let mut s = ::std::mem::MaybeUninit::<Self>::uninit();
+        unsafe {
+            ::std::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
+            s.assume_init()
+        }
+    }
+}
+#[repr(C)]
+#[derive(Debug, Copy, Clone)]
+pub struct PLpgSQL_exception_block {
+    pub sqlstate_varno: ::std::os::raw::c_int,
+    pub sqlerrm_varno: ::std::os::raw::c_int,
+    pub exc_list: *mut List,
+}
+impl Default for PLpgSQL_exception_block {
+    fn default() -> Self {
+        let mut s = ::std::mem::MaybeUninit::<Self>::uninit();
+        unsafe {
+            ::std::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
+            s.assume_init()
+        }
+    }
+}
+#[repr(C)]
+#[derive(Debug, Copy, Clone)]
+pub struct PLpgSQL_exception {
+    pub lineno: ::std::os::raw::c_int,
+    pub conditions: *mut PLpgSQL_condition,
+    pub action: *mut List,
+}
+impl Default for PLpgSQL_exception {
+    fn default() -> Self {
+        let mut s = ::std::mem::MaybeUninit::<Self>::uninit();
+        unsafe {
+            ::std::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
+            s.assume_init()
+        }
+    }
+}
+#[repr(C)]
+#[derive(Debug, Copy, Clone)]
+pub struct PLpgSQL_stmt_block {
+    pub cmd_type: PLpgSQL_stmt_type,
+    pub lineno: ::std::os::raw::c_int,
+    pub stmtid: ::std::os::raw::c_uint,
+    pub label: *mut ::std::os::raw::c_char,
+    pub body: *mut List,
+    pub n_initvars: ::std::os::raw::c_int,
+    pub initvarnos: *mut ::std::os::raw::c_int,
+    pub exceptions: *mut PLpgSQL_exception_block,
+}
+impl Default for PLpgSQL_stmt_block {
+    fn default() -> Self {
+        let mut s = ::std::mem::MaybeUninit::<Self>::uninit();
+        unsafe {
+            ::std::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
+            s.assume_init()
+        }
+    }
+}
+#[repr(C)]
+#[derive(Debug, Copy, Clone)]
+pub struct PLpgSQL_stmt_assign {
+    pub cmd_type: PLpgSQL_stmt_type,
+    pub lineno: ::std::os::raw::c_int,
+    pub stmtid: ::std::os::raw::c_uint,
+    pub varno: ::std::os::raw::c_int,
+    pub expr: *mut PLpgSQL_expr,
+}
+impl Default for PLpgSQL_stmt_assign {
+    fn default() -> Self {
+        let mut s = ::std::mem::MaybeUninit::<Self>::uninit();
+        unsafe {
+            ::std::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
+            s.assume_init()
+        }
+    }
+}
+#[repr(C)]
+#[derive(Debug, Copy, Clone)]
+pub struct PLpgSQL_stmt_perform {
+    pub cmd_type: PLpgSQL_stmt_type,
+    pub lineno: ::std::os::raw::c_int,
+    pub stmtid: ::std::os::raw::c_uint,
+    pub expr: *mut PLpgSQL_expr,
+}
+impl Default for PLpgSQL_stmt_perform {
+    fn default() -> Self {
+        let mut s = ::std::mem::MaybeUninit::<Self>::uninit();
+        unsafe {
+            ::std::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
+            s.assume_init()
+        }
+    }
+}
+#[repr(C)]
+#[derive(Debug, Copy, Clone)]
+pub struct PLpgSQL_stmt_call {
+    pub cmd_type: PLpgSQL_stmt_type,
+    pub lineno: ::std::os::raw::c_int,
+    pub stmtid: ::std::os::raw::c_uint,
+    pub expr: *mut PLpgSQL_expr,
+    pub is_call: bool,
+    pub target: *mut PLpgSQL_variable,
+}
+impl Default for PLpgSQL_stmt_call {
+    fn default() -> Self {
+        let mut s = ::std::mem::MaybeUninit::<Self>::uninit();
+        unsafe {
+            ::std::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
+            s.assume_init()
+        }
+    }
+}
+#[repr(C)]
+#[derive(Debug, Copy, Clone)]
+pub struct PLpgSQL_stmt_commit {
+    pub cmd_type: PLpgSQL_stmt_type,
+    pub lineno: ::std::os::raw::c_int,
+    pub stmtid: ::std::os::raw::c_uint,
+    pub chain: bool,
+}
+impl Default for PLpgSQL_stmt_commit {
+    fn default() -> Self {
+        let mut s = ::std::mem::MaybeUninit::<Self>::uninit();
+        unsafe {
+            ::std::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
+            s.assume_init()
+        }
+    }
+}
+#[repr(C)]
+#[derive(Debug, Copy, Clone)]
+pub struct PLpgSQL_stmt_rollback {
+    pub cmd_type: PLpgSQL_stmt_type,
+    pub lineno: ::std::os::raw::c_int,
+    pub stmtid: ::std::os::raw::c_uint,
+    pub chain: bool,
+}
+impl Default for PLpgSQL_stmt_rollback {
+    fn default() -> Self {
+        let mut s = ::std::mem::MaybeUninit::<Self>::uninit();
+        unsafe {
+            ::std::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
+            s.assume_init()
+        }
+    }
+}
+#[repr(C)]
+#[derive(Debug, Copy, Clone)]
+pub struct PLpgSQL_stmt_set {
+    pub cmd_type: PLpgSQL_stmt_type,
+    pub lineno: ::std::os::raw::c_int,
+    pub stmtid: ::std::os::raw::c_uint,
+    pub expr: *mut PLpgSQL_expr,
+}
+impl Default for PLpgSQL_stmt_set {
+    fn default() -> Self {
+        let mut s = ::std::mem::MaybeUninit::<Self>::uninit();
+        unsafe {
+            ::std::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
+            s.assume_init()
+        }
+    }
+}
+#[repr(C)]
+#[derive(Debug, Copy, Clone)]
+pub struct PLpgSQL_diag_item {
+    pub kind: PLpgSQL_getdiag_kind,
+    pub target: ::std::os::raw::c_int,
+}
+impl Default for PLpgSQL_diag_item {
+    fn default() -> Self {
+        let mut s = ::std::mem::MaybeUninit::<Self>::uninit();
+        unsafe {
+            ::std::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
+            s.assume_init()
+        }
+    }
+}
+#[repr(C)]
+#[derive(Debug, Copy, Clone)]
+pub struct PLpgSQL_stmt_getdiag {
+    pub cmd_type: PLpgSQL_stmt_type,
+    pub lineno: ::std::os::raw::c_int,
+    pub stmtid: ::std::os::raw::c_uint,
+    pub is_stacked: bool,
+    pub diag_items: *mut List,
+}
+impl Default for PLpgSQL_stmt_getdiag {
+    fn default() -> Self {
+        let mut s = ::std::mem::MaybeUninit::<Self>::uninit();
+        unsafe {
+            ::std::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
+            s.assume_init()
+        }
+    }
+}
+#[repr(C)]
+#[derive(Debug, Copy, Clone)]
+pub struct PLpgSQL_stmt_if {
+    pub cmd_type: PLpgSQL_stmt_type,
+    pub lineno: ::std::os::raw::c_int,
+    pub stmtid: ::std::os::raw::c_uint,
+    pub cond: *mut PLpgSQL_expr,
+    pub then_body: *mut List,
+    pub elsif_list: *mut List,
+    pub else_body: *mut List,
+}
+impl Default for PLpgSQL_stmt_if {
+    fn default() -> Self {
+        let mut s = ::std::mem::MaybeUninit::<Self>::uninit();
+        unsafe {
+            ::std::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
+            s.assume_init()
+        }
+    }
+}
+#[repr(C)]
+#[derive(Debug, Copy, Clone)]
+pub struct PLpgSQL_if_elsif {
+    pub lineno: ::std::os::raw::c_int,
+    pub cond: *mut PLpgSQL_expr,
+    pub stmts: *mut List,
+}
+impl Default for PLpgSQL_if_elsif {
+    fn default() -> Self {
+        let mut s = ::std::mem::MaybeUninit::<Self>::uninit();
+        unsafe {
+            ::std::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
+            s.assume_init()
+        }
+    }
+}
+#[repr(C)]
+#[derive(Debug, Copy, Clone)]
+pub struct PLpgSQL_stmt_case {
+    pub cmd_type: PLpgSQL_stmt_type,
+    pub lineno: ::std::os::raw::c_int,
+    pub stmtid: ::std::os::raw::c_uint,
+    pub t_expr: *mut PLpgSQL_expr,
+    pub t_varno: ::std::os::raw::c_int,
+    pub case_when_list: *mut List,
+    pub have_else: bool,
+    pub else_stmts: *mut List,
+}
+impl Default for PLpgSQL_stmt_case {
+    fn default() -> Self {
+        let mut s = ::std::mem::MaybeUninit::<Self>::uninit();
+        unsafe {
+            ::std::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
+            s.assume_init()
+        }
+    }
+}
+#[repr(C)]
+#[derive(Debug, Copy, Clone)]
+pub struct PLpgSQL_case_when {
+    pub lineno: ::std::os::raw::c_int,
+    pub expr: *mut PLpgSQL_expr,
+    pub stmts: *mut List,
+}
+impl Default for PLpgSQL_case_when {
+    fn default() -> Self {
+        let mut s = ::std::mem::MaybeUninit::<Self>::uninit();
+        unsafe {
+            ::std::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
+            s.assume_init()
+        }
+    }
+}
+#[repr(C)]
+#[derive(Debug, Copy, Clone)]
+pub struct PLpgSQL_stmt_loop {
+    pub cmd_type: PLpgSQL_stmt_type,
+    pub lineno: ::std::os::raw::c_int,
+    pub stmtid: ::std::os::raw::c_uint,
+    pub label: *mut ::std::os::raw::c_char,
+    pub body: *mut List,
+}
+impl Default for PLpgSQL_stmt_loop {
+    fn default() -> Self {
+        let mut s = ::std::mem::MaybeUninit::<Self>::uninit();
+        unsafe {
+            ::std::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
+            s.assume_init()
+        }
+    }
+}
+#[repr(C)]
+#[derive(Debug, Copy, Clone)]
+pub struct PLpgSQL_stmt_while {
+    pub cmd_type: PLpgSQL_stmt_type,
+    pub lineno: ::std::os::raw::c_int,
+    pub stmtid: ::std::os::raw::c_uint,
+    pub label: *mut ::std::os::raw::c_char,
+    pub cond: *mut PLpgSQL_expr,
+    pub body: *mut List,
+}
+impl Default for PLpgSQL_stmt_while {
+    fn default() -> Self {
+        let mut s = ::std::mem::MaybeUninit::<Self>::uninit();
+        unsafe {
+            ::std::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
+            s.assume_init()
+        }
+    }
+}
+#[repr(C)]
+#[derive(Debug, Copy, Clone)]
+pub struct PLpgSQL_stmt_fori {
+    pub cmd_type: PLpgSQL_stmt_type,
+    pub lineno: ::std::os::raw::c_int,
+    pub stmtid: ::std::os::raw::c_uint,
+    pub label: *mut ::std::os::raw::c_char,
+    pub var: *mut PLpgSQL_var,
+    pub lower: *mut PLpgSQL_expr,
+    pub upper: *mut PLpgSQL_expr,
+    pub step: *mut PLpgSQL_expr,
+    pub reverse: ::std::os::raw::c_int,
+    pub body: *mut List,
+}
+impl Default for PLpgSQL_stmt_fori {
+    fn default() -> Self {
+        let mut s = ::std::mem::MaybeUninit::<Self>::uninit();
+        unsafe {
+            ::std::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
+            s.assume_init()
+        }
+    }
+}
+#[repr(C)]
+#[derive(Debug, Copy, Clone)]
+pub struct PLpgSQL_stmt_forq {
+    pub cmd_type: PLpgSQL_stmt_type,
+    pub lineno: ::std::os::raw::c_int,
+    pub stmtid: ::std::os::raw::c_uint,
+    pub label: *mut ::std::os::raw::c_char,
+    pub var: *mut PLpgSQL_variable,
+    pub body: *mut List,
+}
+impl Default for PLpgSQL_stmt_forq {
+    fn default() -> Self {
+        let mut s = ::std::mem::MaybeUninit::<Self>::uninit();
+        unsafe {
+            ::std::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
+            s.assume_init()
+        }
+    }
+}
+#[repr(C)]
+#[derive(Debug, Copy, Clone)]
+pub struct PLpgSQL_stmt_fors {
+    pub cmd_type: PLpgSQL_stmt_type,
+    pub lineno: ::std::os::raw::c_int,
+    pub stmtid: ::std::os::raw::c_uint,
+    pub label: *mut ::std::os::raw::c_char,
+    pub var: *mut PLpgSQL_variable,
+    pub body: *mut List,
+    pub query: *mut PLpgSQL_expr,
+}
+impl Default for PLpgSQL_stmt_fors {
+    fn default() -> Self {
+        let mut s = ::std::mem::MaybeUninit::<Self>::uninit();
+        unsafe {
+            ::std::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
+            s.assume_init()
+        }
+    }
+}
+#[repr(C)]
+#[derive(Debug, Copy, Clone)]
+pub struct PLpgSQL_stmt_forc {
+    pub cmd_type: PLpgSQL_stmt_type,
+    pub lineno: ::std::os::raw::c_int,
+    pub stmtid: ::std::os::raw::c_uint,
+    pub label: *mut ::std::os::raw::c_char,
+    pub var: *mut PLpgSQL_variable,
+    pub body: *mut List,
+    pub curvar: ::std::os::raw::c_int,
+    pub argquery: *mut PLpgSQL_expr,
+}
+impl Default for PLpgSQL_stmt_forc {
+    fn default() -> Self {
+        let mut s = ::std::mem::MaybeUninit::<Self>::uninit();
+        unsafe {
+            ::std::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
+            s.assume_init()
+        }
+    }
+}
+#[repr(C)]
+#[derive(Debug, Copy, Clone)]
+pub struct PLpgSQL_stmt_dynfors {
+    pub cmd_type: PLpgSQL_stmt_type,
+    pub lineno: ::std::os::raw::c_int,
+    pub stmtid: ::std::os::raw::c_uint,
+    pub label: *mut ::std::os::raw::c_char,
+    pub var: *mut PLpgSQL_variable,
+    pub body: *mut List,
+    pub query: *mut PLpgSQL_expr,
+    pub params: *mut List,
+}
+impl Default for PLpgSQL_stmt_dynfors {
+    fn default() -> Self {
+        let mut s = ::std::mem::MaybeUninit::<Self>::uninit();
+        unsafe {
+            ::std::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
+            s.assume_init()
+        }
+    }
+}
+#[repr(C)]
+#[derive(Debug, Copy, Clone)]
+pub struct PLpgSQL_stmt_foreach_a {
+    pub cmd_type: PLpgSQL_stmt_type,
+    pub lineno: ::std::os::raw::c_int,
+    pub stmtid: ::std::os::raw::c_uint,
+    pub label: *mut ::std::os::raw::c_char,
+    pub varno: ::std::os::raw::c_int,
+    pub slice: ::std::os::raw::c_int,
+    pub expr: *mut PLpgSQL_expr,
+    pub body: *mut List,
+}
+impl Default for PLpgSQL_stmt_foreach_a {
+    fn default() -> Self {
+        let mut s = ::std::mem::MaybeUninit::<Self>::uninit();
+        unsafe {
+            ::std::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
+            s.assume_init()
+        }
+    }
+}
+#[repr(C)]
+#[derive(Debug, Copy, Clone)]
+pub struct PLpgSQL_stmt_open {
+    pub cmd_type: PLpgSQL_stmt_type,
+    pub lineno: ::std::os::raw::c_int,
+    pub stmtid: ::std::os::raw::c_uint,
+    pub curvar: ::std::os::raw::c_int,
+    pub cursor_options: ::std::os::raw::c_int,
+    pub argquery: *mut PLpgSQL_expr,
+    pub query: *mut PLpgSQL_expr,
+    pub dynquery: *mut PLpgSQL_expr,
+    pub params: *mut List,
+}
+impl Default for PLpgSQL_stmt_open {
+    fn default() -> Self {
+        let mut s = ::std::mem::MaybeUninit::<Self>::uninit();
+        unsafe {
+            ::std::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
+            s.assume_init()
+        }
+    }
+}
+#[repr(C)]
+#[derive(Debug, Copy, Clone)]
+pub struct PLpgSQL_stmt_fetch {
+    pub cmd_type: PLpgSQL_stmt_type,
+    pub lineno: ::std::os::raw::c_int,
+    pub stmtid: ::std::os::raw::c_uint,
+    pub target: *mut PLpgSQL_variable,
+    pub curvar: ::std::os::raw::c_int,
+    pub direction: FetchDirection,
+    pub how_many: ::std::os::raw::c_long,
+    pub expr: *mut PLpgSQL_expr,
+    pub is_move: bool,
+    pub returns_multiple_rows: bool,
+}
+impl Default for PLpgSQL_stmt_fetch {
+    fn default() -> Self {
+        let mut s = ::std::mem::MaybeUninit::<Self>::uninit();
+        unsafe {
+            ::std::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
+            s.assume_init()
+        }
+    }
+}
+#[repr(C)]
+#[derive(Debug, Copy, Clone)]
+pub struct PLpgSQL_stmt_close {
+    pub cmd_type: PLpgSQL_stmt_type,
+    pub lineno: ::std::os::raw::c_int,
+    pub stmtid: ::std::os::raw::c_uint,
+    pub curvar: ::std::os::raw::c_int,
+}
+impl Default for PLpgSQL_stmt_close {
+    fn default() -> Self {
+        let mut s = ::std::mem::MaybeUninit::<Self>::uninit();
+        unsafe {
+            ::std::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
+            s.assume_init()
+        }
+    }
+}
+#[repr(C)]
+#[derive(Debug, Copy, Clone)]
+pub struct PLpgSQL_stmt_exit {
+    pub cmd_type: PLpgSQL_stmt_type,
+    pub lineno: ::std::os::raw::c_int,
+    pub stmtid: ::std::os::raw::c_uint,
+    pub is_exit: bool,
+    pub label: *mut ::std::os::raw::c_char,
+    pub cond: *mut PLpgSQL_expr,
+}
+impl Default for PLpgSQL_stmt_exit {
+    fn default() -> Self {
+        let mut s = ::std::mem::MaybeUninit::<Self>::uninit();
+        unsafe {
+            ::std::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
+            s.assume_init()
+        }
+    }
+}
+#[repr(C)]
+#[derive(Debug, Copy, Clone)]
+pub struct PLpgSQL_stmt_return {
+    pub cmd_type: PLpgSQL_stmt_type,
+    pub lineno: ::std::os::raw::c_int,
+    pub stmtid: ::std::os::raw::c_uint,
+    pub expr: *mut PLpgSQL_expr,
+    pub retvarno: ::std::os::raw::c_int,
+}
+impl Default for PLpgSQL_stmt_return {
+    fn default() -> Self {
+        let mut s = ::std::mem::MaybeUninit::<Self>::uninit();
+        unsafe {
+            ::std::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
+            s.assume_init()
+        }
+    }
+}
+#[repr(C)]
+#[derive(Debug, Copy, Clone)]
+pub struct PLpgSQL_stmt_return_next {
+    pub cmd_type: PLpgSQL_stmt_type,
+    pub lineno: ::std::os::raw::c_int,
+    pub stmtid: ::std::os::raw::c_uint,
+    pub expr: *mut PLpgSQL_expr,
+    pub retvarno: ::std::os::raw::c_int,
+}
+impl Default for PLpgSQL_stmt_return_next {
+    fn default() -> Self {
+        let mut s = ::std::mem::MaybeUninit::<Self>::uninit();
+        unsafe {
+            ::std::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
+            s.assume_init()
+        }
+    }
+}
+#[repr(C)]
+#[derive(Debug, Copy, Clone)]
+pub struct PLpgSQL_stmt_return_query {
+    pub cmd_type: PLpgSQL_stmt_type,
+    pub lineno: ::std::os::raw::c_int,
+    pub stmtid: ::std::os::raw::c_uint,
+    pub query: *mut PLpgSQL_expr,
+    pub dynquery: *mut PLpgSQL_expr,
+    pub params: *mut List,
+}
+impl Default for PLpgSQL_stmt_return_query {
+    fn default() -> Self {
+        let mut s = ::std::mem::MaybeUninit::<Self>::uninit();
+        unsafe {
+            ::std::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
+            s.assume_init()
+        }
+    }
+}
+#[repr(C)]
+#[derive(Debug, Copy, Clone)]
+pub struct PLpgSQL_stmt_raise {
+    pub cmd_type: PLpgSQL_stmt_type,
+    pub lineno: ::std::os::raw::c_int,
+    pub stmtid: ::std::os::raw::c_uint,
+    pub elog_level: ::std::os::raw::c_int,
+    pub condname: *mut ::std::os::raw::c_char,
+    pub message: *mut ::std::os::raw::c_char,
+    pub params: *mut List,
+    pub options: *mut List,
+}
+impl Default for PLpgSQL_stmt_raise {
+    fn default() -> Self {
+        let mut s = ::std::mem::MaybeUninit::<Self>::uninit();
+        unsafe {
+            ::std::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
+            s.assume_init()
+        }
+    }
+}
+#[repr(C)]
+#[derive(Debug, Copy, Clone)]
+pub struct PLpgSQL_raise_option {
+    pub opt_type: PLpgSQL_raise_option_type,
+    pub expr: *mut PLpgSQL_expr,
+}
+impl Default for PLpgSQL_raise_option {
+    fn default() -> Self {
+        let mut s = ::std::mem::MaybeUninit::<Self>::uninit();
+        unsafe {
+            ::std::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
+            s.assume_init()
+        }
+    }
+}
+#[repr(C)]
+#[derive(Debug, Copy, Clone)]
+pub struct PLpgSQL_stmt_assert {
+    pub cmd_type: PLpgSQL_stmt_type,
+    pub lineno: ::std::os::raw::c_int,
+    pub stmtid: ::std::os::raw::c_uint,
+    pub cond: *mut PLpgSQL_expr,
+    pub message: *mut PLpgSQL_expr,
+}
+impl Default for PLpgSQL_stmt_assert {
+    fn default() -> Self {
+        let mut s = ::std::mem::MaybeUninit::<Self>::uninit();
+        unsafe {
+            ::std::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
+            s.assume_init()
+        }
+    }
+}
+#[repr(C)]
+#[derive(Debug, Copy, Clone)]
+pub struct PLpgSQL_stmt_execsql {
+    pub cmd_type: PLpgSQL_stmt_type,
+    pub lineno: ::std::os::raw::c_int,
+    pub stmtid: ::std::os::raw::c_uint,
+    pub sqlstmt: *mut PLpgSQL_expr,
+    pub mod_stmt: bool,
+    pub into: bool,
+    pub strict: bool,
+    pub mod_stmt_set: bool,
+    pub target: *mut PLpgSQL_variable,
+}
+impl Default for PLpgSQL_stmt_execsql {
+    fn default() -> Self {
+        let mut s = ::std::mem::MaybeUninit::<Self>::uninit();
+        unsafe {
+            ::std::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
+            s.assume_init()
+        }
+    }
+}
+#[repr(C)]
+#[derive(Debug, Copy, Clone)]
+pub struct PLpgSQL_stmt_dynexecute {
+    pub cmd_type: PLpgSQL_stmt_type,
+    pub lineno: ::std::os::raw::c_int,
+    pub stmtid: ::std::os::raw::c_uint,
+    pub query: *mut PLpgSQL_expr,
+    pub into: bool,
+    pub strict: bool,
+    pub target: *mut PLpgSQL_variable,
+    pub params: *mut List,
+}
+impl Default for PLpgSQL_stmt_dynexecute {
+    fn default() -> Self {
+        let mut s = ::std::mem::MaybeUninit::<Self>::uninit();
+        unsafe {
+            ::std::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
+            s.assume_init()
+        }
+    }
+}
+#[repr(C)]
+#[derive(Debug, Copy, Clone)]
+pub struct PLpgSQL_func_hashkey {
+    pub funcOid: Oid,
+    pub isTrigger: bool,
+    pub isEventTrigger: bool,
+    pub trigOid: Oid,
+    pub inputCollation: Oid,
+    pub argtypes: [Oid; 100usize],
+}
+impl Default for PLpgSQL_func_hashkey {
+    fn default() -> Self {
+        let mut s = ::std::mem::MaybeUninit::<Self>::uninit();
+        unsafe {
+            ::std::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
+            s.assume_init()
+        }
+    }
+}
+pub const PLpgSQL_trigtype_PLPGSQL_DML_TRIGGER: PLpgSQL_trigtype = 0;
+pub const PLpgSQL_trigtype_PLPGSQL_EVENT_TRIGGER: PLpgSQL_trigtype = 1;
+pub const PLpgSQL_trigtype_PLPGSQL_NOT_TRIGGER: PLpgSQL_trigtype = 2;
+pub type PLpgSQL_trigtype = ::std::os::raw::c_uint;
+#[repr(C)]
+#[derive(Debug, Copy, Clone)]
+pub struct PLpgSQL_function {
+    pub fn_signature: *mut ::std::os::raw::c_char,
+    pub fn_oid: Oid,
+    pub fn_xmin: TransactionId,
+    pub fn_tid: ItemPointerData,
+    pub fn_is_trigger: PLpgSQL_trigtype,
+    pub fn_input_collation: Oid,
+    pub fn_hashkey: *mut PLpgSQL_func_hashkey,
+    pub fn_cxt: MemoryContext,
+    pub fn_rettype: Oid,
+    pub fn_rettyplen: ::std::os::raw::c_int,
+    pub fn_retbyval: bool,
+    pub fn_retistuple: bool,
+    pub fn_retisdomain: bool,
+    pub fn_retset: bool,
+    pub fn_readonly: bool,
+    pub fn_prokind: ::std::os::raw::c_char,
+    pub fn_nargs: ::std::os::raw::c_int,
+    pub fn_argvarnos: [::std::os::raw::c_int; 100usize],
+    pub out_param_varno: ::std::os::raw::c_int,
+    pub found_varno: ::std::os::raw::c_int,
+    pub new_varno: ::std::os::raw::c_int,
+    pub old_varno: ::std::os::raw::c_int,
+    pub resolve_option: PLpgSQL_resolve_option,
+    pub print_strict_params: bool,
+    pub extra_warnings: ::std::os::raw::c_int,
+    pub extra_errors: ::std::os::raw::c_int,
+    pub nstatements: ::std::os::raw::c_uint,
+    pub ndatums: ::std::os::raw::c_int,
+    pub datums: *mut *mut PLpgSQL_datum,
+    pub copiable_size: Size,
+    pub action: *mut PLpgSQL_stmt_block,
+    pub cur_estate: *mut PLpgSQL_execstate,
+    pub use_count: ::std::os::raw::c_ulong,
+}
+impl Default for PLpgSQL_function {
+    fn default() -> Self {
+        let mut s = ::std::mem::MaybeUninit::<Self>::uninit();
+        unsafe {
+            ::std::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
+            s.assume_init()
+        }
+    }
+}
+#[repr(C)]
+#[derive(Debug, Copy, Clone)]
+pub struct PLpgSQL_execstate {
+    pub func: *mut PLpgSQL_function,
+    pub trigdata: *mut TriggerData,
+    pub evtrigdata: *mut EventTriggerData,
+    pub retval: Datum,
+    pub retisnull: bool,
+    pub rettype: Oid,
+    pub fn_rettype: Oid,
+    pub retistuple: bool,
+    pub retisset: bool,
+    pub readonly_func: bool,
+    pub atomic: bool,
+    pub exitlabel: *mut ::std::os::raw::c_char,
+    pub cur_error: *mut ErrorData,
+    pub tuple_store: *mut Tuplestorestate,
+    pub tuple_store_desc: TupleDesc,
+    pub tuple_store_cxt: MemoryContext,
+    pub tuple_store_owner: ResourceOwner,
+    pub rsi: *mut ReturnSetInfo,
+    pub found_varno: ::std::os::raw::c_int,
+    pub ndatums: ::std::os::raw::c_int,
+    pub datums: *mut *mut PLpgSQL_datum,
+    pub datum_context: MemoryContext,
+    pub paramLI: ParamListInfo,
+    pub simple_eval_estate: *mut EState,
+    pub simple_eval_resowner: ResourceOwner,
+    pub cast_hash: *mut HTAB,
+    pub cast_hash_context: MemoryContext,
+    pub stmt_mcontext: MemoryContext,
+    pub stmt_mcontext_parent: MemoryContext,
+    pub eval_tuptable: *mut SPITupleTable,
+    pub eval_processed: uint64,
+    pub eval_econtext: *mut ExprContext,
+    pub err_stmt: *mut PLpgSQL_stmt,
+    pub err_text: *const ::std::os::raw::c_char,
+    pub plugin_info: *mut ::std::os::raw::c_void,
+}
+impl Default for PLpgSQL_execstate {
+    fn default() -> Self {
+        let mut s = ::std::mem::MaybeUninit::<Self>::uninit();
+        unsafe {
+            ::std::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
+            s.assume_init()
+        }
+    }
+}
+#[repr(C)]
+#[derive(Debug, Default, Copy, Clone)]
+pub struct PLpgSQL_plugin {
+    pub func_setup: ::std::option::Option<
+        unsafe extern "C" fn(estate: *mut PLpgSQL_execstate, func: *mut PLpgSQL_function),
+    >,
+    pub func_beg: ::std::option::Option<
+        unsafe extern "C" fn(estate: *mut PLpgSQL_execstate, func: *mut PLpgSQL_function),
+    >,
+    pub func_end: ::std::option::Option<
+        unsafe extern "C" fn(estate: *mut PLpgSQL_execstate, func: *mut PLpgSQL_function),
+    >,
+    pub stmt_beg: ::std::option::Option<
+        unsafe extern "C" fn(estate: *mut PLpgSQL_execstate, stmt: *mut PLpgSQL_stmt),
+    >,
+    pub stmt_end: ::std::option::Option<
+        unsafe extern "C" fn(estate: *mut PLpgSQL_execstate, stmt: *mut PLpgSQL_stmt),
+    >,
+    pub error_callback:
+        ::std::option::Option<unsafe extern "C" fn(arg: *mut ::std::os::raw::c_void)>,
+    pub assign_expr: ::std::option::Option<
+        unsafe extern "C" fn(
+            estate: *mut PLpgSQL_execstate,
+            target: *mut PLpgSQL_datum,
+            expr: *mut PLpgSQL_expr,
+        ),
+    >,
+}
+#[repr(C)]
+#[derive(Debug, Copy, Clone)]
+pub struct PLword {
+    pub ident: *mut ::std::os::raw::c_char,
+    pub quoted: bool,
+}
+impl Default for PLword {
+    fn default() -> Self {
+        let mut s = ::std::mem::MaybeUninit::<Self>::uninit();
+        unsafe {
+            ::std::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
+            s.assume_init()
+        }
+    }
+}
+#[repr(C)]
+#[derive(Debug, Copy, Clone)]
+pub struct PLcword {
+    pub idents: *mut List,
+}
+impl Default for PLcword {
+    fn default() -> Self {
+        let mut s = ::std::mem::MaybeUninit::<Self>::uninit();
+        unsafe {
+            ::std::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
+            s.assume_init()
+        }
+    }
+}
+#[repr(C)]
+#[derive(Debug, Copy, Clone)]
+pub struct PLwdatum {
+    pub datum: *mut PLpgSQL_datum,
+    pub ident: *mut ::std::os::raw::c_char,
+    pub quoted: bool,
+    pub idents: *mut List,
+}
+impl Default for PLwdatum {
+    fn default() -> Self {
+        let mut s = ::std::mem::MaybeUninit::<Self>::uninit();
+        unsafe {
+            ::std::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
+            s.assume_init()
+        }
+    }
+}
+pub const IdentifierLookup_IDENTIFIER_LOOKUP_NORMAL: IdentifierLookup = 0;
+pub const IdentifierLookup_IDENTIFIER_LOOKUP_DECLARE: IdentifierLookup = 1;
+pub const IdentifierLookup_IDENTIFIER_LOOKUP_EXPR: IdentifierLookup = 2;
+#[doc = " Global variable declarations"]
+pub type IdentifierLookup = ::std::os::raw::c_uint;
+extern "C" {
+    pub static mut plpgsql_IdentifierLookup: IdentifierLookup;
+}
+extern "C" {
+    pub static mut plpgsql_variable_conflict: ::std::os::raw::c_int;
+}
+extern "C" {
+    pub static mut plpgsql_print_strict_params: bool;
+}
+extern "C" {
+    pub static mut plpgsql_check_asserts: bool;
+}
+extern "C" {
+    pub static mut plpgsql_extra_warnings: ::std::os::raw::c_int;
+}
+extern "C" {
+    pub static mut plpgsql_extra_errors: ::std::os::raw::c_int;
+}
+extern "C" {
+    pub static mut plpgsql_check_syntax: bool;
+}
+extern "C" {
+    pub static mut plpgsql_DumpExecTree: bool;
+}
+extern "C" {
+    pub static mut plpgsql_parse_result: *mut PLpgSQL_stmt_block;
+}
+extern "C" {
+    pub static mut plpgsql_nDatums: ::std::os::raw::c_int;
+}
+extern "C" {
+    pub static mut plpgsql_Datums: *mut *mut PLpgSQL_datum;
+}
+extern "C" {
+    pub static mut plpgsql_error_funcname: *mut ::std::os::raw::c_char;
+}
+extern "C" {
+    pub static mut plpgsql_curr_compile: *mut PLpgSQL_function;
+}
+extern "C" {
+    pub static mut plpgsql_compile_tmp_cxt: MemoryContext;
+}
+extern "C" {
+    pub static mut plpgsql_plugin_ptr: *mut *mut PLpgSQL_plugin;
+}
+#[pgrx_macros::pg_guard]
+extern "C" {
+    #[doc = " Function declarations"]
+    pub fn plpgsql_compile(fcinfo: FunctionCallInfo, forValidator: bool) -> *mut PLpgSQL_function;
+}
+#[pgrx_macros::pg_guard]
+extern "C" {
+    pub fn plpgsql_compile_inline(
+        proc_source: *mut ::std::os::raw::c_char,
+    ) -> *mut PLpgSQL_function;
+}
+#[pgrx_macros::pg_guard]
+extern "C" {
+    pub fn plpgsql_parser_setup(pstate: *mut ParseState, expr: *mut PLpgSQL_expr);
+}
+#[pgrx_macros::pg_guard]
+extern "C" {
+    pub fn plpgsql_parse_word(
+        word1: *mut ::std::os::raw::c_char,
+        yytxt: *const ::std::os::raw::c_char,
+        lookup: bool,
+        wdatum: *mut PLwdatum,
+        word: *mut PLword,
+    ) -> bool;
+}
+#[pgrx_macros::pg_guard]
+extern "C" {
+    pub fn plpgsql_parse_dblword(
+        word1: *mut ::std::os::raw::c_char,
+        word2: *mut ::std::os::raw::c_char,
+        wdatum: *mut PLwdatum,
+        cword: *mut PLcword,
+    ) -> bool;
+}
+#[pgrx_macros::pg_guard]
+extern "C" {
+    pub fn plpgsql_parse_tripword(
+        word1: *mut ::std::os::raw::c_char,
+        word2: *mut ::std::os::raw::c_char,
+        word3: *mut ::std::os::raw::c_char,
+        wdatum: *mut PLwdatum,
+        cword: *mut PLcword,
+    ) -> bool;
+}
+#[pgrx_macros::pg_guard]
+extern "C" {
+    pub fn plpgsql_parse_wordtype(ident: *mut ::std::os::raw::c_char) -> *mut PLpgSQL_type;
+}
+#[pgrx_macros::pg_guard]
+extern "C" {
+    pub fn plpgsql_parse_cwordtype(idents: *mut List) -> *mut PLpgSQL_type;
+}
+#[pgrx_macros::pg_guard]
+extern "C" {
+    pub fn plpgsql_parse_wordrowtype(ident: *mut ::std::os::raw::c_char) -> *mut PLpgSQL_type;
+}
+#[pgrx_macros::pg_guard]
+extern "C" {
+    pub fn plpgsql_parse_cwordrowtype(idents: *mut List) -> *mut PLpgSQL_type;
+}
+#[pgrx_macros::pg_guard]
+extern "C" {
+    pub fn plpgsql_build_datatype(
+        typeOid: Oid,
+        typmod: int32,
+        collation: Oid,
+        origtypname: *mut TypeName,
+    ) -> *mut PLpgSQL_type;
+}
+#[pgrx_macros::pg_guard]
+extern "C" {
+    pub fn plpgsql_build_variable(
+        refname: *const ::std::os::raw::c_char,
+        lineno: ::std::os::raw::c_int,
+        dtype: *mut PLpgSQL_type,
+        add2namespace: bool,
+    ) -> *mut PLpgSQL_variable;
+}
+#[pgrx_macros::pg_guard]
+extern "C" {
+    pub fn plpgsql_build_record(
+        refname: *const ::std::os::raw::c_char,
+        lineno: ::std::os::raw::c_int,
+        dtype: *mut PLpgSQL_type,
+        rectypeid: Oid,
+        add2namespace: bool,
+    ) -> *mut PLpgSQL_rec;
+}
+#[pgrx_macros::pg_guard]
+extern "C" {
+    pub fn plpgsql_build_recfield(
+        rec: *mut PLpgSQL_rec,
+        fldname: *const ::std::os::raw::c_char,
+    ) -> *mut PLpgSQL_recfield;
+}
+#[pgrx_macros::pg_guard]
+extern "C" {
+    pub fn plpgsql_recognize_err_condition(
+        condname: *const ::std::os::raw::c_char,
+        allow_sqlstate: bool,
+    ) -> ::std::os::raw::c_int;
+}
+#[pgrx_macros::pg_guard]
+extern "C" {
+    pub fn plpgsql_parse_err_condition(
+        condname: *mut ::std::os::raw::c_char,
+    ) -> *mut PLpgSQL_condition;
+}
+#[pgrx_macros::pg_guard]
+extern "C" {
+    pub fn plpgsql_adddatum(newdatum: *mut PLpgSQL_datum);
+}
+#[pgrx_macros::pg_guard]
+extern "C" {
+    pub fn plpgsql_add_initdatums(varnos: *mut *mut ::std::os::raw::c_int)
+        -> ::std::os::raw::c_int;
+}
+#[pgrx_macros::pg_guard]
+extern "C" {
+    pub fn plpgsql_HashTableInit();
+}
+#[pgrx_macros::pg_guard]
+extern "C" {
+    pub fn _PG_init();
+}
+#[pgrx_macros::pg_guard]
+extern "C" {
+    pub fn plpgsql_exec_function(
+        func: *mut PLpgSQL_function,
+        fcinfo: FunctionCallInfo,
+        simple_eval_estate: *mut EState,
+        simple_eval_resowner: ResourceOwner,
+        atomic: bool,
+    ) -> Datum;
+}
+#[pgrx_macros::pg_guard]
+extern "C" {
+    pub fn plpgsql_exec_trigger(
+        func: *mut PLpgSQL_function,
+        trigdata: *mut TriggerData,
+    ) -> HeapTuple;
+}
+#[pgrx_macros::pg_guard]
+extern "C" {
+    pub fn plpgsql_exec_event_trigger(func: *mut PLpgSQL_function, trigdata: *mut EventTriggerData);
+}
+#[pgrx_macros::pg_guard]
+extern "C" {
+    pub fn plpgsql_xact_cb(event: XactEvent, arg: *mut ::std::os::raw::c_void);
+}
+#[pgrx_macros::pg_guard]
+extern "C" {
+    pub fn plpgsql_subxact_cb(
+        event: SubXactEvent,
+        mySubid: SubTransactionId,
+        parentSubid: SubTransactionId,
+        arg: *mut ::std::os::raw::c_void,
+    );
+}
+#[pgrx_macros::pg_guard]
+extern "C" {
+    pub fn plpgsql_exec_get_datum_type(
+        estate: *mut PLpgSQL_execstate,
+        datum: *mut PLpgSQL_datum,
+    ) -> Oid;
+}
+#[pgrx_macros::pg_guard]
+extern "C" {
+    pub fn plpgsql_exec_get_datum_type_info(
+        estate: *mut PLpgSQL_execstate,
+        datum: *mut PLpgSQL_datum,
+        typeId: *mut Oid,
+        typMod: *mut int32,
+        collation: *mut Oid,
+    );
+}
+#[pgrx_macros::pg_guard]
+extern "C" {
+    pub fn plpgsql_ns_init();
+}
+#[pgrx_macros::pg_guard]
+extern "C" {
+    pub fn plpgsql_ns_push(label: *const ::std::os::raw::c_char, label_type: PLpgSQL_label_type);
+}
+#[pgrx_macros::pg_guard]
+extern "C" {
+    pub fn plpgsql_ns_pop();
+}
+#[pgrx_macros::pg_guard]
+extern "C" {
+    pub fn plpgsql_ns_top() -> *mut PLpgSQL_nsitem;
+}
+#[pgrx_macros::pg_guard]
+extern "C" {
+    pub fn plpgsql_ns_additem(
+        itemtype: PLpgSQL_nsitem_type,
+        itemno: ::std::os::raw::c_int,
+        name: *const ::std::os::raw::c_char,
+    );
+}
+#[pgrx_macros::pg_guard]
+extern "C" {
+    pub fn plpgsql_ns_lookup(
+        ns_cur: *mut PLpgSQL_nsitem,
+        localmode: bool,
+        name1: *const ::std::os::raw::c_char,
+        name2: *const ::std::os::raw::c_char,
+        name3: *const ::std::os::raw::c_char,
+        names_used: *mut ::std::os::raw::c_int,
+    ) -> *mut PLpgSQL_nsitem;
+}
+#[pgrx_macros::pg_guard]
+extern "C" {
+    pub fn plpgsql_ns_lookup_label(
+        ns_cur: *mut PLpgSQL_nsitem,
+        name: *const ::std::os::raw::c_char,
+    ) -> *mut PLpgSQL_nsitem;
+}
+#[pgrx_macros::pg_guard]
+extern "C" {
+    pub fn plpgsql_ns_find_nearest_loop(ns_cur: *mut PLpgSQL_nsitem) -> *mut PLpgSQL_nsitem;
+}
+#[pgrx_macros::pg_guard]
+extern "C" {
+    pub fn plpgsql_stmt_typename(stmt: *mut PLpgSQL_stmt) -> *const ::std::os::raw::c_char;
+}
+#[pgrx_macros::pg_guard]
+extern "C" {
+    pub fn plpgsql_getdiag_kindname(kind: PLpgSQL_getdiag_kind) -> *const ::std::os::raw::c_char;
+}
+#[pgrx_macros::pg_guard]
+extern "C" {
+    pub fn plpgsql_free_function_memory(func: *mut PLpgSQL_function);
+}
+#[pgrx_macros::pg_guard]
+extern "C" {
+    pub fn plpgsql_dumptree(func: *mut PLpgSQL_function);
+}
+#[pgrx_macros::pg_guard]
+extern "C" {
+    pub fn plpgsql_base_yylex() -> ::std::os::raw::c_int;
+}
+#[pgrx_macros::pg_guard]
+extern "C" {
+    pub fn plpgsql_yylex() -> ::std::os::raw::c_int;
+}
+#[pgrx_macros::pg_guard]
+extern "C" {
+    pub fn plpgsql_push_back_token(token: ::std::os::raw::c_int);
+}
+#[pgrx_macros::pg_guard]
+extern "C" {
+    pub fn plpgsql_token_is_unreserved_keyword(token: ::std::os::raw::c_int) -> bool;
+}
+#[pgrx_macros::pg_guard]
+extern "C" {
+    pub fn plpgsql_append_source_text(
+        buf: StringInfo,
+        startlocation: ::std::os::raw::c_int,
+        endlocation: ::std::os::raw::c_int,
+    );
+}
+#[pgrx_macros::pg_guard]
+extern "C" {
+    pub fn plpgsql_peek() -> ::std::os::raw::c_int;
+}
+#[pgrx_macros::pg_guard]
+extern "C" {
+    pub fn plpgsql_peek2(
+        tok1_p: *mut ::std::os::raw::c_int,
+        tok2_p: *mut ::std::os::raw::c_int,
+        tok1_loc: *mut ::std::os::raw::c_int,
+        tok2_loc: *mut ::std::os::raw::c_int,
+    );
+}
+#[pgrx_macros::pg_guard]
+extern "C" {
+    pub fn plpgsql_scanner_errposition(location: ::std::os::raw::c_int) -> ::std::os::raw::c_int;
+}
+#[pgrx_macros::pg_guard]
+extern "C" {
+    pub fn plpgsql_yyerror(message: *const ::std::os::raw::c_char);
+}
+#[pgrx_macros::pg_guard]
+extern "C" {
+    pub fn plpgsql_location_to_lineno(location: ::std::os::raw::c_int) -> ::std::os::raw::c_int;
+}
+#[pgrx_macros::pg_guard]
+extern "C" {
+    pub fn plpgsql_latest_lineno() -> ::std::os::raw::c_int;
+}
+#[pgrx_macros::pg_guard]
+extern "C" {
+    pub fn plpgsql_scanner_init(str_: *const ::std::os::raw::c_char);
+}
+#[pgrx_macros::pg_guard]
+extern "C" {
+    pub fn plpgsql_scanner_finish();
+}
+#[pgrx_macros::pg_guard]
+extern "C" {
+    pub fn plpgsql_yyparse() -> ::std::os::raw::c_int;
+}
 extern "C" {
     pub static mut logical_decoding_work_mem: ::std::os::raw::c_int;
 }
@@ -43628,6 +45802,61 @@ extern "C" {
         include_triggers: bool,
         include_cols: *mut Bitmapset,
     ) -> ::std::os::raw::c_int;
+}
+#[repr(C)]
+#[derive(Debug, Copy, Clone)]
+pub struct RowSecurityPolicy {
+    pub policy_name: *mut ::std::os::raw::c_char,
+    pub polcmd: ::std::os::raw::c_char,
+    pub roles: *mut ArrayType,
+    pub permissive: bool,
+    pub qual: *mut Expr,
+    pub with_check_qual: *mut Expr,
+    pub hassublinks: bool,
+}
+impl Default for RowSecurityPolicy {
+    fn default() -> Self {
+        let mut s = ::std::mem::MaybeUninit::<Self>::uninit();
+        unsafe {
+            ::std::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
+            s.assume_init()
+        }
+    }
+}
+#[repr(C)]
+#[derive(Debug, Copy, Clone)]
+pub struct RowSecurityDesc {
+    pub rscxt: MemoryContext,
+    pub policies: *mut List,
+}
+impl Default for RowSecurityDesc {
+    fn default() -> Self {
+        let mut s = ::std::mem::MaybeUninit::<Self>::uninit();
+        unsafe {
+            ::std::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
+            s.assume_init()
+        }
+    }
+}
+pub type row_security_policy_hook_type =
+    ::std::option::Option<unsafe extern "C" fn(cmdtype: CmdType, relation: Relation) -> *mut List>;
+extern "C" {
+    pub static mut row_security_policy_hook_permissive: row_security_policy_hook_type;
+}
+extern "C" {
+    pub static mut row_security_policy_hook_restrictive: row_security_policy_hook_type;
+}
+#[pgrx_macros::pg_guard]
+extern "C" {
+    pub fn get_row_security_policies(
+        root: *mut Query,
+        rte: *mut RangeTblEntry,
+        rt_index: ::std::os::raw::c_int,
+        securityQuals: *mut *mut List,
+        withCheckOptions: *mut *mut List,
+        hasRowSecurity: *mut bool,
+        hasSubLinks: *mut bool,
+    );
 }
 extern "C" {
     pub static mut old_snapshot_threshold: ::std::os::raw::c_int;
@@ -58144,159 +60373,6 @@ extern "C" {
 }
 #[repr(C)]
 #[derive(Debug, Copy, Clone)]
-pub struct DomainConstraintCache {
-    _unused: [u8; 0],
-}
-#[repr(C)]
-#[derive(Debug, Copy, Clone)]
-pub struct TypeCacheEnumData {
-    _unused: [u8; 0],
-}
-#[repr(C)]
-#[derive(Debug, Copy, Clone)]
-pub struct TypeCacheEntry {
-    pub type_id: Oid,
-    pub type_id_hash: uint32,
-    pub typlen: int16,
-    pub typbyval: bool,
-    pub typalign: ::std::os::raw::c_char,
-    pub typstorage: ::std::os::raw::c_char,
-    pub typtype: ::std::os::raw::c_char,
-    pub typrelid: Oid,
-    pub typelem: Oid,
-    pub typcollation: Oid,
-    pub btree_opf: Oid,
-    pub btree_opintype: Oid,
-    pub hash_opf: Oid,
-    pub hash_opintype: Oid,
-    pub eq_opr: Oid,
-    pub lt_opr: Oid,
-    pub gt_opr: Oid,
-    pub cmp_proc: Oid,
-    pub hash_proc: Oid,
-    pub hash_extended_proc: Oid,
-    pub eq_opr_finfo: FmgrInfo,
-    pub cmp_proc_finfo: FmgrInfo,
-    pub hash_proc_finfo: FmgrInfo,
-    pub hash_extended_proc_finfo: FmgrInfo,
-    pub tupDesc: TupleDesc,
-    pub tupDesc_identifier: uint64,
-    pub rngelemtype: *mut TypeCacheEntry,
-    pub rng_collation: Oid,
-    pub rng_cmp_proc_finfo: FmgrInfo,
-    pub rng_canonical_finfo: FmgrInfo,
-    pub rng_subdiff_finfo: FmgrInfo,
-    pub domainBaseType: Oid,
-    pub domainBaseTypmod: int32,
-    pub domainData: *mut DomainConstraintCache,
-    pub flags: ::std::os::raw::c_int,
-    pub enumData: *mut TypeCacheEnumData,
-    pub nextDomain: *mut TypeCacheEntry,
-}
-impl Default for TypeCacheEntry {
-    fn default() -> Self {
-        let mut s = ::std::mem::MaybeUninit::<Self>::uninit();
-        unsafe {
-            ::std::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
-            s.assume_init()
-        }
-    }
-}
-#[repr(C)]
-#[derive(Debug, Copy, Clone)]
-pub struct DomainConstraintRef {
-    pub constraints: *mut List,
-    pub refctx: MemoryContext,
-    pub tcache: *mut TypeCacheEntry,
-    pub need_exprstate: bool,
-    pub dcc: *mut DomainConstraintCache,
-    pub callback: MemoryContextCallback,
-}
-impl Default for DomainConstraintRef {
-    fn default() -> Self {
-        let mut s = ::std::mem::MaybeUninit::<Self>::uninit();
-        unsafe {
-            ::std::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
-            s.assume_init()
-        }
-    }
-}
-#[repr(C)]
-#[derive(Debug, Copy, Clone)]
-pub struct SharedRecordTypmodRegistry {
-    _unused: [u8; 0],
-}
-#[pgrx_macros::pg_guard]
-extern "C" {
-    pub fn lookup_type_cache(type_id: Oid, flags: ::std::os::raw::c_int) -> *mut TypeCacheEntry;
-}
-#[pgrx_macros::pg_guard]
-extern "C" {
-    pub fn InitDomainConstraintRef(
-        type_id: Oid,
-        ref_: *mut DomainConstraintRef,
-        refctx: MemoryContext,
-        need_exprstate: bool,
-    );
-}
-#[pgrx_macros::pg_guard]
-extern "C" {
-    pub fn UpdateDomainConstraintRef(ref_: *mut DomainConstraintRef);
-}
-#[pgrx_macros::pg_guard]
-extern "C" {
-    pub fn DomainHasConstraints(type_id: Oid) -> bool;
-}
-#[pgrx_macros::pg_guard]
-extern "C" {
-    pub fn lookup_rowtype_tupdesc(type_id: Oid, typmod: int32) -> TupleDesc;
-}
-#[pgrx_macros::pg_guard]
-extern "C" {
-    pub fn lookup_rowtype_tupdesc_noerror(type_id: Oid, typmod: int32, noError: bool) -> TupleDesc;
-}
-#[pgrx_macros::pg_guard]
-extern "C" {
-    pub fn lookup_rowtype_tupdesc_copy(type_id: Oid, typmod: int32) -> TupleDesc;
-}
-#[pgrx_macros::pg_guard]
-extern "C" {
-    pub fn lookup_rowtype_tupdesc_domain(type_id: Oid, typmod: int32, noError: bool) -> TupleDesc;
-}
-#[pgrx_macros::pg_guard]
-extern "C" {
-    pub fn assign_record_type_typmod(tupDesc: TupleDesc);
-}
-#[pgrx_macros::pg_guard]
-extern "C" {
-    pub fn assign_record_type_identifier(type_id: Oid, typmod: int32) -> uint64;
-}
-#[pgrx_macros::pg_guard]
-extern "C" {
-    pub fn compare_values_of_enum(
-        tcache: *mut TypeCacheEntry,
-        arg1: Oid,
-        arg2: Oid,
-    ) -> ::std::os::raw::c_int;
-}
-#[pgrx_macros::pg_guard]
-extern "C" {
-    pub fn SharedRecordTypmodRegistryEstimate() -> usize;
-}
-#[pgrx_macros::pg_guard]
-extern "C" {
-    pub fn SharedRecordTypmodRegistryInit(
-        arg1: *mut SharedRecordTypmodRegistry,
-        segment: *mut dsm_segment,
-        area: *mut dsa_area,
-    );
-}
-#[pgrx_macros::pg_guard]
-extern "C" {
-    pub fn SharedRecordTypmodRegistryAttach(arg1: *mut SharedRecordTypmodRegistry);
-}
-#[repr(C)]
-#[derive(Debug, Copy, Clone)]
 pub struct RangeType {
     pub vl_len_: int32,
     pub rangetypid: Oid,
@@ -58579,11 +60655,6 @@ pub struct ResourceOwnerData {
 #[repr(C)]
 #[derive(Debug, Default, Copy, Clone)]
 pub struct _MdfdVec {
-    pub _address: u8,
-}
-#[repr(C)]
-#[derive(Debug, Default, Copy, Clone)]
-pub struct RowSecurityDesc {
     pub _address: u8,
 }
 #[repr(C)]

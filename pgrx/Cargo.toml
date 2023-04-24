@@ -1,6 +1,6 @@
 [package]
 name = "pgrx"
-version = "0.7.4"
+version = "0.8.0"
 authors = ["ZomboDB, LLC <zombodb@gmail.com>"]
 license = "MIT"
 description = "pgrx:  A Rust framework for creating Postgres extensions"
@@ -34,9 +34,9 @@ no-default-features = true
 rustc-args = ["--cfg", "docsrs"]
 
 [dependencies]
-pgrx-macros = { path = "../pgrx-macros", version = "=0.7.4" }
-pgrx-pg-sys = { path = "../pgrx-pg-sys", version = "=0.7.4" }
-pgrx-sql-entity-graph = { path = "../pgrx-sql-entity-graph", version = "=0.7.4" }
+pgrx-macros = { path = "../pgrx-macros", version = "=0.8.0" }
+pgrx-pg-sys = { path = "../pgrx-pg-sys", version = "=0.8.0" }
+pgrx-sql-entity-graph = { path = "../pgrx-sql-entity-graph", version = "=0.8.0" }
 
 # used to internally impl things
 once_cell = "1.17.1" # polyfill until std::lazy::OnceCell stabilizes
@@ -54,7 +54,7 @@ atomic-traits = "0.3.0" # PgAtomic and shmem init
 bitflags = "1.3.2" # BackgroundWorker
 bitvec = "1.0" # processing array nullbitmaps
 heapless = "0.7.16" # shmem and PgLwLock
-libc = "0.2.141" # FFI type compat
+libc = "0.2.142" # FFI type compat
 seahash = "4.1.0" # derive(PostgresHash)
 serde = { version = "1.0.160", features = [ "derive" ] } # impls on pub types
 serde_cbor = "0.11.2" # derive(PostgresType)
