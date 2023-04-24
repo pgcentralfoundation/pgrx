@@ -14,7 +14,9 @@ use eyre::{eyre, WrapErr};
 use once_cell::sync::Lazy;
 use owo_colors::OwoColorize;
 use pgrx::prelude::*;
-use pgrx_pg_config::{createdb, get_c_locale_flags, get_target_dir, PgConfig, Pgrx};
+use pgrx_pg_config::{
+    cargo::PgrxManifestExt, createdb, get_c_locale_flags, get_target_dir, PgConfig, Pgrx,
+};
 use postgres::error::DbError;
 use std::collections::HashMap;
 use std::fmt::Write as _;
@@ -586,7 +588,7 @@ fn dropdb() -> eyre::Result<()> {
 
 fn create_extension() -> eyre::Result<()> {
     let (mut client, _) = client()?;
-    let extension_name = get_extension_name();
+    let extension_name = get_extension_name()?;
 
     query_wrapper(
         Some(format!("CREATE EXTENSION {} CASCADE;", &extension_name)),
@@ -601,10 +603,23 @@ fn create_extension() -> eyre::Result<()> {
     Ok(())
 }
 
-fn get_extension_name() -> String {
-    std::env::var("CARGO_PKG_NAME")
-        .unwrap_or_else(|_| panic!("CARGO_PKG_NAME environment var is unset or invalid UTF-8"))
-        .replace("-", "_")
+fn get_extension_name() -> eyre::Result<String> {
+    // We could replace this with the following if cargo adds the lib name on env var on tests/runs.
+    // https://github.com/rust-lang/cargo/issues/11966
+    // std::env::var("CARGO_LIB_NAME")
+    //     .unwrap_or_else(|_| panic!("CARGO_LIB_NAME environment var is unset or invalid UTF-8"))
+    //     .replace("-", "_")
+
+    // CARGO_MANIFEST_DIRR — The directory containing the manifest of your package.
+    // https://doc.rust-lang.org/cargo/reference/environment-variables.html#environment-variables-cargo-sets-for-crates
+    let dir = std::env::var("CARGO_MANIFEST_DIR")
+        .map_err(|_| eyre!("CARGO_MANIFEST_DIR environment var is unset or invalid UTF-8"))?;
+
+    // Cargo.toml is case sensitive atm so this is ok.
+    // https://github.com/rust-lang/cargo/issues/45
+    let path = PathBuf::from(dir).join("Cargo.toml");
+    let name = pgrx_pg_config::cargo::read_manifest(path)?.lib_name()?;
+    Ok(name.replace("-", "_"))
 }
 
 fn get_pgdata_path() -> eyre::Result<PathBuf> {

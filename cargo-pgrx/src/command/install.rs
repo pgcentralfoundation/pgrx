@@ -11,10 +11,10 @@ use crate::command::get::{find_control_file, get_property};
 use crate::manifest::{display_version_info, PgVersionSource};
 use crate::profile::CargoProfile;
 use crate::CommandExecute;
-use cargo_toml::{Inheritable, Manifest};
+use cargo_toml::Manifest;
 use eyre::{eyre, WrapErr};
 use owo_colors::OwoColorize;
-use pgrx_pg_config::{get_target_dir, PgConfig, Pgrx};
+use pgrx_pg_config::{cargo::PgrxManifestExt, get_target_dir, PgConfig, Pgrx};
 use std::io::BufReader;
 use std::path::{Path, PathBuf};
 use std::process::Stdio;
@@ -353,17 +353,13 @@ pub(crate) fn find_library_file(
     manifest: &cargo_toml::Manifest,
     build_command_messages: &Vec<cargo_metadata::Message>,
 ) -> eyre::Result<PathBuf> {
-    let crate_name = if let Some(ref package) = manifest.package {
-        &package.name
-    } else {
-        return Err(eyre!("Could not get crate name from manifest."));
-    };
+    let target_name = manifest.target_name()?;
 
     let mut library_file = None;
     for message in build_command_messages {
         match message {
             cargo_metadata::Message::CompilerArtifact(artifact) => {
-                if artifact.target.name != *crate_name {
+                if artifact.target.name != *target_name {
                     continue;
                 }
                 for filename in &artifact.filenames {
@@ -398,17 +394,7 @@ pub(crate) fn get_version(manifest_path: impl AsRef<Path>) -> eyre::Result<Strin
                     .wrap_err("Couldn't get manifest path")?;
                 let manifest = Manifest::from_path(&manifest_path)
                     .wrap_err("Couldn't parse manifest")?;
-
-                let version = manifest.package.ok_or(eyre!("no `[package]` section found"))?.version;
-                let Inheritable::Set(version) = version else {
-                    // This should be impossible to hit, since we use
-                    // `Manifest::from_path`, which calls `complete_from_path`,
-                    // which is documented as resolving these. That said, I
-                    // haven't tested it, and it's not clear how much it
-                    // actually matters either way, so we just emit an error
-                    // rather than doing something like `unreachable!()`.
-                    eyre::bail!("workspace-inherited package versions are not currently supported");
-                };
+                let version = manifest.package_version()?;
                 Ok(version)
             } else {
                 Ok(v)

@@ -20,6 +20,8 @@ use std::process::{Command, Stdio};
 use std::str::FromStr;
 use url::Url;
 
+pub mod cargo;
+
 pub static BASE_POSTGRES_PORT_NO: u16 = 28800;
 pub static BASE_POSTGRES_TESTING_PORT_NO: u16 = 32200;
 

@@ -179,6 +179,9 @@ jobs:
     - name: Run composite_type example tests
       run: cargo test --package composite_type --features "pg$PG_VER" --no-default-features
 
+    - name: Run custom_libname example tests
+      run: cargo test --package custom_libname --features "pg$PG_VER" --no-default-features
+
     - name: Run custom_types example tests
       run: cargo test --package custom_types --features "pg$PG_VER" --no-default-features
 
@@ -226,6 +229,9 @@ jobs:
 
     - name: Run triggers example tests
       run: cargo test --package triggers --features "pg$PG_VER" --no-default-features
+
+    - name: Run versioned_custom_libname_so example tests
+      run: cargo test --package versioned_custom_libname_so --features "pg$PG_VER" --no-default-features
 
     - name: Run versioned_so example tests
       run: cargo test --package versioned_so --features "pg$PG_VER" --no-default-features
