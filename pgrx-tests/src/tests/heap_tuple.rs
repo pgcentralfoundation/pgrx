@@ -118,22 +118,6 @@ mod arguments {
             }
             names
         }
-
-        #[pg_extern]
-        #[allow(deprecated)]
-        fn gets_name_field_as_slice(
-            dogs: VariadicArray<pgrx::composite_type!(DOG_COMPOSITE_TYPE)>,
-        ) -> Vec<String> {
-            // Gets resolved to:
-            let dogs: pgrx::VariadicArray<PgHeapTuple<AllocatedByRust>> = dogs;
-
-            let mut names = Vec::with_capacity(dogs.len());
-            for dog in unsafe { dogs.as_slice() } {
-                let name = dog.get_by_name("name").unwrap().unwrap();
-                names.push(name);
-            }
-            names
-        }
     }
 
     mod vec {
@@ -679,17 +663,6 @@ mod tests {
         let retval = Spi::get_one::<Vec<String>>(
             "
             SELECT gets_name_field_variadic(ROW('Nami', 1)::Dog, ROW('Brandy', 1)::Dog)
-        ",
-        );
-        assert_eq!(retval, Ok(Some(vec!["Nami".to_string(), "Brandy".to_string()])));
-    }
-
-    #[pg_test]
-    #[should_panic]
-    fn test_gets_name_field_as_slice() {
-        let retval = Spi::get_one::<Vec<String>>(
-            "
-            SELECT gets_name_field_as_slice(ROW('Nami', 1)::Dog, ROW('Brandy', 1)::Dog)
         ",
         );
         assert_eq!(retval, Ok(Some(vec!["Nami".to_string(), "Brandy".to_string()])));

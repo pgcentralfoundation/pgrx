@@ -23,7 +23,6 @@ use pgrx_sql_entity_graph::metadata::{
 };
 use serde::Serializer;
 use std::marker::PhantomData;
-use std::mem;
 
 /** An array of some type (eg. `TEXT[]`, `int[]`)
 
@@ -153,29 +152,6 @@ impl<'a, T: FromDatum> Array<'a, T> {
         let ptr = raw.deref_mut().deref_mut() as *mut RawArray;
         // SAFETY: Leaks are safe if they aren't use-after-frees!
         unsafe { ptr.read() }.into_ptr().as_ptr() as _
-    }
-
-    // # Panics
-    //
-    // Panics if it detects the slightest misalignment between types,
-    // or if a valid slice contains nulls, which may be uninit data.
-    #[deprecated(
-        since = "0.5.0",
-        note = "this function cannot be safe and is not generically sound\n\
-        even `unsafe fn as_slice(&self) -> &[T]` is not sound for all `&[T]`\n\
-        if you are sure your usage is sound, consider RawArray"
-    )]
-    pub unsafe fn as_slice(&self) -> &[T] {
-        const DATUM_SIZE: usize = mem::size_of::<pg_sys::Datum>();
-        if self.null_slice.any() {
-            panic!("null detected: can't expose potentially uninit data as a slice!")
-        }
-        match self.elem_layout.size_matches::<T>() {
-            // SAFETY: Rust slice layout matches Postgres data layout and this array is "owned"
-            #[allow(unreachable_patterns)] // happens on 32-bit when DATUM_SIZE = 4
-            Some(1 | 2 | 4 | DATUM_SIZE) => unsafe { self.raw.assume_init_data_slice::<T>() },
-            _ => panic!("no correctly-sized slice exists"),
-        }
     }
 
     /// Return an iterator of `Option<T>`.
@@ -332,21 +308,6 @@ impl<'a, T: FromDatum + serde::Serialize> serde::Serialize for VariadicArray<'a,
 impl<'a, T: FromDatum> VariadicArray<'a, T> {
     pub fn into_array_type(self) -> *const pg_sys::ArrayType {
         self.0.into_array_type()
-    }
-
-    // # Panics
-    //
-    // Panics if it detects the slightest misalignment between types,
-    // or if a valid slice contains nulls, which may be uninit data.
-    #[deprecated(
-        since = "0.5.0",
-        note = "this function cannot be safe and is not generically sound\n\
-        even `unsafe fn as_slice(&self) -> &[T]` is not sound for all `&[T]`\n\
-        if you are sure your usage is sound, consider RawArray"
-    )]
-    #[allow(deprecated)]
-    pub unsafe fn as_slice(&self) -> &[T] {
-        self.0.as_slice()
     }
 
     /// Return an Iterator of Option<T> over the contained Datums.
