@@ -342,6 +342,16 @@ unsafe impl SqlTranslatable for f64 {
     }
 }
 
+extern crate alloc;
+unsafe impl SqlTranslatable for alloc::ffi::CString {
+    fn argument_sql() -> Result<SqlMapping, ArgumentError> {
+        Ok(SqlMapping::literal("cstring"))
+    }
+    fn return_sql() -> Result<Returns, ReturnsError> {
+        Ok(Returns::One(SqlMapping::literal("cstring")))
+    }
+}
+
 unsafe impl SqlTranslatable for core::ffi::CStr {
     fn argument_sql() -> Result<SqlMapping, ArgumentError> {
         Ok(SqlMapping::literal("cstring"))
@@ -351,7 +361,7 @@ unsafe impl SqlTranslatable for core::ffi::CStr {
     }
 }
 
-unsafe impl SqlTranslatable for &'static core::ffi::CStr {
+unsafe impl SqlTranslatable for &'_ core::ffi::CStr {
     fn argument_sql() -> Result<SqlMapping, ArgumentError> {
         Ok(SqlMapping::literal("cstring"))
     }
