@@ -12,7 +12,7 @@ mod tests {
     #[allow(unused_imports)]
     use crate as pgrx_tests;
     use std::error::Error;
-    use std::ffi::{CStr, CString};
+    use std::ffi::CStr;
 
     use pgrx::prelude::*;
 
