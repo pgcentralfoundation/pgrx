@@ -249,13 +249,14 @@ impl<'a, T: FromDatum> Array<'a, T> {
                 //     Some(ptr.cast::<T>().read())
                 // },
                 Size::Fixed(size) => {
-                    // read off `size` bytes from the head of `ptr` and convert that into a `usize`
+                    // copy off `size` bytes from the head of `ptr` and convert that into a `usize`
                     // using proper platform endianness, converting it into a `Datum`
                     #[inline(always)]
                     fn bytes_to_datum(ptr: *const u8, size: usize) -> Datum {
                         const USIZE_BYTE_LEN: usize = std::mem::size_of::<usize>();
+
                         // a zero-padded buffer in which we'll store bytes so we can
-                        // ultimately have a `usize` that we convert into a `Datum`
+                        // ultimately make a `usize` that we convert into a `Datum`
                         let mut buf = [0u8; USIZE_BYTE_LEN];
 
                         match size {
