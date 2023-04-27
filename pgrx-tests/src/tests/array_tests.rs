@@ -9,7 +9,9 @@ Use of this source code is governed by the MIT license that can be found in the 
 
 use pgrx::array::RawArray;
 use pgrx::prelude::*;
+use pgrx::PostgresEnum;
 use pgrx::{Array, Json};
+use serde::Serialize;
 use serde_json::*;
 
 #[pg_extern(name = "sum_array")]
@@ -147,15 +149,38 @@ fn arr_sort_uniq(arr: Array<i32>) -> Vec<i32> {
     v
 }
 
+#[derive(Debug, Eq, PartialEq, PostgresEnum, Serialize)]
+pub enum ArrayTestEnum {
+    One,
+    Two,
+    Three,
+}
+
+#[pg_extern]
+fn enum_array_roundtrip(a: Array<ArrayTestEnum>) -> Vec<Option<ArrayTestEnum>> {
+    a.into_iter().collect()
+}
+
 #[cfg(any(test, feature = "pg_test"))]
 #[pgrx::pg_schema]
 mod tests {
     #[allow(unused_imports)]
     use crate as pgrx_tests;
 
+    use crate::tests::array_tests::ArrayTestEnum;
     use pgrx::prelude::*;
     use pgrx::{IntoDatum, Json};
     use serde_json::json;
+
+    #[pg_test]
+    fn test_enum_array_roundtrip() -> spi::Result<()> {
+        let a = Spi::get_one::<Vec<Option<ArrayTestEnum>>>(
+            "SELECT enum_array_roundtrip(ARRAY['One', 'Two']::ArrayTestEnum[])",
+        )?
+        .expect("SPI result was null");
+        assert_eq!(a, vec![Some(ArrayTestEnum::One), Some(ArrayTestEnum::Two)]);
+        Ok(())
+    }
 
     #[pg_test]
     fn test_sum_array_i32() {

@@ -18,6 +18,7 @@ use core::ffi::CStr;
 use core::ops::DerefMut;
 use core::ptr::NonNull;
 use once_cell::sync::OnceCell;
+use pgrx_pg_sys::Datum;
 use pgrx_sql_entity_graph::metadata::{
     ArgumentError, Returns, ReturnsError, SqlMapping, SqlTranslatable,
 };
@@ -234,7 +235,58 @@ impl<'a, T: FromDatum> Array<'a, T> {
         }
 
         match self.elem_layout.pass {
-            PassBy::Value => Some(unsafe { ptr.cast::<T>().read() }),
+            PassBy::Value => match self.elem_layout.size {
+                //
+                // NB:  Leaving this commented out because it's not clear to me that this will be
+                // correct in every case.  This assumption got us in trouble with arrays of enums
+                // already, and I'd rather err on the side of correctness.
+                //
+                // Size::Fixed(size) if size as usize == std::mem::size_of::<T>() => unsafe {
+                //     // short-circuit if the size of the element matches the size of `T`.
+                //     // This most likely means that the element Datum actually represents the same
+                //     // type as the rust `T`
+                //
+                //     Some(ptr.cast::<T>().read())
+                // },
+                Size::Fixed(size) => {
+                    // copy off `size` bytes from the head of `ptr` and convert that into a `usize`
+                    // using proper platform endianness, converting it into a `Datum`
+                    #[inline(always)]
+                    fn bytes_to_datum(ptr: *const u8, size: usize) -> Datum {
+                        const USIZE_BYTE_LEN: usize = std::mem::size_of::<usize>();
+
+                        // a zero-padded buffer in which we'll store bytes so we can
+                        // ultimately make a `usize` that we convert into a `Datum`
+                        let mut buf = [0u8; USIZE_BYTE_LEN];
+
+                        match size {
+                            1..=USIZE_BYTE_LEN => unsafe {
+                                // copy to the end
+                                #[cfg(target_endian = "big")]
+                                let dst = (&mut buff[8 - size as usize..]).as_mut_ptr();
+
+                                // copy to the head
+                                #[cfg(target_endian = "little")]
+                                let dst = (&mut buf[0..]).as_mut_ptr();
+
+                                std::ptr::copy_nonoverlapping(ptr, dst, size as usize);
+                            },
+                            other => {
+                                panic!("unexpected fixed size array element size: {}", other)
+                            }
+                        }
+
+                        Datum::from(usize::from_ne_bytes(buf))
+                    }
+
+                    let datum = bytes_to_datum(ptr, size as usize);
+                    unsafe { T::from_polymorphic_datum(datum, false, self.raw.oid()) }
+                }
+
+                other => {
+                    panic!("unrecognized pass-by-value array element layout size: {:?}", other)
+                }
+            },
             PassBy::Ref => {
                 let datum = pg_sys::Datum::from(ptr);
                 #[cfg(debug_assertions)]
@@ -242,7 +294,7 @@ impl<'a, T: FromDatum> Array<'a, T> {
                     Some(datum),
                     self._datum_slice.get().and_then(|s| unsafe { s.get(_index) }).copied()
                 );
-                unsafe { T::from_polymorphic_datum(datum, is_null, self.raw.oid()) }
+                unsafe { T::from_polymorphic_datum(datum, false, self.raw.oid()) }
             }
         }
     }
