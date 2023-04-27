@@ -755,7 +755,33 @@ fn run_bindgen(
 }
 
 fn env_tracked(s: &str) -> Option<String> {
-    println!("cargo:rerun-if-env-changed={s}");
+    // a **sorted** list of environment variable keys that cargo might set that we don't need to track
+    // these were picked out, by hand, from: https://doc.rust-lang.org/cargo/reference/environment-variables.html
+    const CARGO_KEYS: &[&str] = &[
+        "BROWSER",
+        "DEBUG",
+        "DOCS_RS",
+        "HOST",
+        "HTTP_PROXY",
+        "HTTP_TIMEOUT",
+        "NUM_JOBS",
+        "OPT_LEVEL",
+        "OUT_DIR",
+        "PATH",
+        "PROFILE",
+        "TARGET",
+        "TERM",
+    ];
+
+    let is_cargo_key =
+        s.starts_with("CARGO") || s.starts_with("RUST") || CARGO_KEYS.binary_search(&s).is_ok();
+
+    if !is_cargo_key {
+        // if it's an envar that cargo gives us, we don't want to ask it to rerun build.rs if it changes
+        // we'll let cargo figure that out for itself, and doing so, depending on the key, seems to
+        // cause cargo to rerun build.rs every time, which is terrible
+        println!("cargo:rerun-if-env-changed={s}");
+    }
     std::env::var(s).ok()
 }
 
