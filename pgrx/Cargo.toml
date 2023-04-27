@@ -46,8 +46,6 @@ enum-map = "2.5.0"
 
 # error handling and logging
 thiserror = "1.0"
-tracing = "0.1.38"
-tracing-error = "0.2.0"
 
 # exposed in public API
 atomic-traits = "0.3.0" # PgAtomic and shmem init
