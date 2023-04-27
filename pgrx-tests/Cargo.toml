@@ -1,6 +1,6 @@
 [package]
 name = "pgrx-tests"
-version = "0.8.1"
+version = "0.8.2"
 authors = ["ZomboDB, LLC <zombodb@gmail.com>"]
 license = "MIT"
 description = "Test framework for 'pgrx'-based Postgres extensions"
@@ -37,8 +37,8 @@ clap-cargo = "0.10.0"
 owo-colors = "3.5.0"
 once_cell = "1.17.1"
 libc = "0.2.142"
-pgrx-macros = { path = "../pgrx-macros", version = "=0.8.1" }
-pgrx-pg-config = { path = "../pgrx-pg-config", version = "=0.8.1" }
+pgrx-macros = { path = "../pgrx-macros", version = "=0.8.2" }
+pgrx-pg-config = { path = "../pgrx-pg-config", version = "=0.8.2" }
 postgres = "0.19.5"
 regex = "1.8.1"
 serde = "1.0.160"
@@ -55,4 +55,4 @@ eyre = "0.6.8"  # testing functions that return `eyre::Result`
 path = "../pgrx"
 default-features = false
 features = [ "time-crate" ] # testing purposes
-version = "=0.8.1"
+version = "=0.8.2"
