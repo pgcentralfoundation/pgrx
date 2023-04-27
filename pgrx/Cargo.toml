@@ -1,6 +1,6 @@
 [package]
 name = "pgrx"
-version = "0.8.1"
+version = "0.8.2"
 authors = ["ZomboDB, LLC <zombodb@gmail.com>"]
 license = "MIT"
 description = "pgrx:  A Rust framework for creating Postgres extensions"
@@ -34,9 +34,9 @@ no-default-features = true
 rustc-args = ["--cfg", "docsrs"]
 
 [dependencies]
-pgrx-macros = { path = "../pgrx-macros", version = "=0.8.1" }
-pgrx-pg-sys = { path = "../pgrx-pg-sys", version = "=0.8.1" }
-pgrx-sql-entity-graph = { path = "../pgrx-sql-entity-graph", version = "=0.8.1" }
+pgrx-macros = { path = "../pgrx-macros", version = "=0.8.2" }
+pgrx-pg-sys = { path = "../pgrx-pg-sys", version = "=0.8.2" }
+pgrx-sql-entity-graph = { path = "../pgrx-sql-entity-graph", version = "=0.8.2" }
 
 # used to internally impl things
 once_cell = "1.17.1" # polyfill until std::lazy::OnceCell stabilizes
