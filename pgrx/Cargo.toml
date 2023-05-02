@@ -41,7 +41,7 @@ pgrx-sql-entity-graph = { path = "../pgrx-sql-entity-graph", version = "=0.8.2" 
 # used to internally impl things
 once_cell = "1.17.1" # polyfill until std::lazy::OnceCell stabilizes
 seq-macro = "0.3" # impls loops in macros
-uuid = { version = "1.3.1", features = [ "v4" ] } # PgLwLock and shmem
+uuid = { version = "1.3.2", features = [ "v4" ] } # PgLwLock and shmem
 enum-map = "2.5.0"
 
 # error handling and logging
