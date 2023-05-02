@@ -1,6 +1,6 @@
 [package]
 name = "pgrx-pg-sys"
-version = "0.8.2"
+version = "0.8.3"
 authors = ["ZomboDB, LLC <zombodb@gmail.com>"]
 license = "MIT"
 description = "Generated Rust bindings for Postgres internals, for use with 'pgrx'"
@@ -29,8 +29,8 @@ rustdoc-args = ["--cfg", "docsrs"]
 
 [dependencies]
 memoffset = "0.8.0"
-pgrx-macros = { path = "../pgrx-macros/", version = "=0.8.2" }
-pgrx-sql-entity-graph = { path = "../pgrx-sql-entity-graph/", version = "=0.8.2" }
+pgrx-macros = { path = "../pgrx-macros/", version = "=0.8.3" }
+pgrx-sql-entity-graph = { path = "../pgrx-sql-entity-graph/", version = "=0.8.3" }
 serde = { version = "1.0.160", features = [ "derive" ] } # impls on pub types
 # polyfill until #![feature(strict_provenance)] stabilizes
 sptr = "0.3"
@@ -38,7 +38,7 @@ libc = "0.2"
 
 [build-dependencies]
 bindgen = { version = "0.60.1", default-features = false, features = ["runtime"] }
-pgrx-pg-config= { path = "../pgrx-pg-config/", version = "=0.8.2" }
+pgrx-pg-config= { path = "../pgrx-pg-config/", version = "=0.8.3" }
 proc-macro2 = "1.0.56"
 quote = "1.0.26"
 syn = { version = "1.0.109", features = [ "extra-traits", "full", "fold", "parsing" ] }

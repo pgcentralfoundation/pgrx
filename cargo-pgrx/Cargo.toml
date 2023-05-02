@@ -1,6 +1,6 @@
 [package]
 name = "cargo-pgrx"
-version = "0.8.2"
+version = "0.8.3"
 authors = ["ZomboDB, LLC <zombodb@gmail.com>"]
 license = "MIT"
 description = "Cargo subcommand for 'pgrx' to make Postgres extension development easy"
@@ -23,8 +23,8 @@ semver = "1.0.17"
 owo-colors = { version = "3.5.0", features = [ "supports-colors" ] }
 env_proxy = "0.4.1"
 num_cpus = "1.15.0"
-pgrx-pg-config = { path = "../pgrx-pg-config", version = "=0.8.2" }
-pgrx-sql-entity-graph = { path = "../pgrx-sql-entity-graph", version = "=0.8.2" }
+pgrx-pg-config = { path = "../pgrx-pg-config", version = "=0.8.3" }
+pgrx-sql-entity-graph = { path = "../pgrx-sql-entity-graph", version = "=0.8.3" }
 prettyplease = "0.1.25"
 proc-macro2 = { version = "1.0.56", features = [ "span-locations" ] }
 quote = "1.0.26"
