@@ -462,7 +462,7 @@ impl ToSql for PgAggregateEntity {
                     );
                     args.push(buf);
                 }
-                "\n".to_string() + &args.join("\n,") + "\n"
+                "\n".to_string() + &args.join("\n") + "\n"
             } else {
                 String::default()
             },
