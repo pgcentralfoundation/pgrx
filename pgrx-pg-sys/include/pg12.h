@@ -14,6 +14,7 @@ Use of this source code is governed by the MIT license that can be found in the 
 
 #include "access/amapi.h"
 #include "access/genam.h"
+#include "access/generic_xlog.h"
 #include "access/gin.h"
 #include "access/gist.h"
 #include "access/heapam.h"
@@ -57,6 +58,7 @@ Use of this source code is governed by the MIT license that can be found in the 
 #include "common/config_info.h"
 #include "executor/executor.h"
 #include "executor/spi.h"
+#include "executor/tuptable.h"
 #include "foreign/fdwapi.h"
 #include "foreign/foreign.h"
 #include "mb/pg_wchar.h"
@@ -97,6 +99,7 @@ Use of this source code is governed by the MIT license that can be found in the 
 #include "storage/block.h"
 #include "storage/bufmgr.h"
 #include "storage/buffile.h"
+#include "storage/bufpage.h"
 #include "storage/ipc.h"
 #include "storage/itemptr.h"
 #include "storage/lwlock.h"
