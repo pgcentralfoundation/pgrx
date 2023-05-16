@@ -252,13 +252,6 @@ will be built into the `cargo-pgrx` subcommand and make use of https://github.co
 PGRX has optional feature flags for Rust code that do not involve configuring the version of Postgres used,
 but rather extend additional support for other kinds of Rust code. These are not included by default.
 
-### "time-crate": interop with the `time` crate
-
-`pgrx` once used direct interop with the excellent [time crate][timecrate].
-However, due to complications involving performance and accurate interop with Postgres,
-this feature is now considered deprecated in favor of a lower-overhead interop.
-You may still request implementations of `TryFrom<time::Type> for pgrx::MatchingType`
-and `From<time::Type> for pgrx::MatchingType` by enabling the `"time-crate"` feature.
 
 ### "unsafe-postgres": Allow compilation for Postgres forks that have a different ABI
 

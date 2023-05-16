@@ -82,8 +82,7 @@ fn accept_interval(interval: Interval) -> Interval {
 
 #[pg_extern]
 fn accept_interval_round_trip(interval: Interval) -> Interval {
-    let duration: time::Duration = interval.into();
-    duration.try_into().expect("Error converting Duration to PgInterval")
+    interval
 }
 
 #[cfg(any(test, feature = "pg_test"))]
@@ -92,8 +91,8 @@ mod tests {
     #[allow(unused_imports)]
     use crate as pgrx_tests;
 
-    use pgrx::get_timezone_offset;
     use pgrx::prelude::*;
+    use pgrx::{get_timezone_offset, IntervalConversionError, USECS_PER_DAY};
     use serde_json::*;
     use std::result::Result;
     use std::time::Duration;
@@ -430,7 +429,7 @@ mod tests {
 
     #[pg_test]
     fn test_interval_serialization() {
-        let interval = Interval::try_from_months_days_micros(3, 4, 5_000_000).unwrap();
+        let interval = Interval::new(3, 4, 5_000_000).unwrap();
         let json = json!({ "interval test": interval });
 
         assert_eq!(json!({"interval test":"3 mons 4 days 00:00:05"}), json);
@@ -440,7 +439,9 @@ mod tests {
     fn test_duration_to_interval_err() {
         use pgrx::IntervalConversionError;
         // normal limit of i32::MAX months
-        let duration = time::Duration::days(pg_sys::DAYS_PER_MONTH as i64 * i32::MAX as i64);
+        let duration = Duration::from_secs(
+            pg_sys::DAYS_PER_MONTH as u64 * i32::MAX as u64 * pg_sys::SECS_PER_DAY as u64,
+        );
 
         let result = TryInto::<Interval>::try_into(duration);
         match result {
@@ -449,8 +450,9 @@ mod tests {
         };
 
         // one month too many, expect error
-        let duration =
-            time::Duration::days(pg_sys::DAYS_PER_MONTH as i64 * (i32::MAX as i64 + 1i64));
+        let duration = Duration::from_secs(
+            pg_sys::DAYS_PER_MONTH as u64 * (i32::MAX as u64 + 1u64) * pg_sys::SECS_PER_DAY as u64,
+        );
 
         let result = TryInto::<Interval>::try_into(duration);
         match result {
@@ -475,5 +477,42 @@ mod tests {
             Err(PgSqlErrorCode::ERRCODE_INVALID_PARAMETER_VALUE),
             get_timezone_offset("UNKNOWN TIMEZONE")
         )
+    }
+
+    #[pg_test]
+    fn test_interval_to_duration_conversion() {
+        let i = Interval::new(42, 6, 3).unwrap();
+        let i_micros = i.total_micros();
+        let d: Duration = i.try_into().unwrap();
+
+        assert_eq!(i_micros as u128, d.as_micros())
+    }
+
+    #[pg_test]
+    fn test_negative_interval_to_duration_conversion() {
+        let i = Interval::new(-42, -6, -3).unwrap();
+        let d: Result<Duration, _> = i.try_into();
+
+        assert_eq!(d, Err(IntervalConversionError::NegativeInterval))
+    }
+
+    #[pg_test]
+    fn test_duration_to_interval_conversion() {
+        let i: Interval =
+            Spi::get_one("select '3 months 5 days 22 seconds'::interval").unwrap().unwrap();
+
+        assert_eq!(i.months(), 3);
+        assert_eq!(i.days(), 5);
+        assert_eq!(i.micros(), 22_000_000); // 22 seconds
+
+        let d = Duration::from_secs(
+            pg_sys::DAYS_PER_MONTH as u64 * 3u64 * pg_sys::SECS_PER_DAY as u64 // 3 months
+                + 5u64 * pg_sys::SECS_PER_DAY as u64 // 5 days
+                + 22u64, // 22 seconds more
+        );
+        let i: Interval = d.try_into().unwrap();
+        assert_eq!(i.months(), 3);
+        assert_eq!(i.days(), 5);
+        assert_eq!(i.micros(), 22_000_000); // 22 seconds
     }
 }

@@ -1,6 +1,6 @@
 use crate::{
-    direct_function_call, pg_sys, AnyNumeric, Date, IntoDatum, Time, TimeWithTimeZone, Timestamp,
-    TimestampWithTimeZone,
+    direct_function_call, pg_sys, AnyNumeric, Date, Interval, IntoDatum, Time, TimeWithTimeZone,
+    Timestamp, TimestampWithTimeZone,
 };
 use core::fmt::{Display, Formatter};
 use core::str::FromStr;
@@ -378,6 +378,23 @@ impl_wrappers!(
     TIMESTAMPTZ_EXTRACT,
     pg_sys::timestamptz_in,
     pg_sys::timestamptz_out
+);
+
+#[cfg(any(feature = "pg11", feature = "pg12", feature = "pg13"))]
+const INTERVAL_EXTRACT: unsafe fn(fcinfo: pg_sys::FunctionCallInfo) -> pg_sys::Datum =
+    pg_sys::interval_part;
+#[cfg(any(feature = "pg14", feature = "pg15"))]
+const INTERVAL_EXTRACT: unsafe fn(fcinfo: pg_sys::FunctionCallInfo) -> pg_sys::Datum =
+    pg_sys::extract_interval;
+
+impl_wrappers!(
+    Interval,
+    pg_sys::interval_eq,
+    pg_sys::interval_cmp,
+    pg_sys::interval_hash,
+    INTERVAL_EXTRACT,
+    pg_sys::interval_in,
+    pg_sys::interval_out
 );
 
 // ported from `v5.2/src/backend/utils/adt/date.c#3034`

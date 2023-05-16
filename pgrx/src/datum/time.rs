@@ -16,8 +16,6 @@ use pgrx_sql_entity_graph::metadata::{
 };
 use std::num::TryFromIntError;
 
-pub(crate) const USECS_PER_SEC: i64 = 1_000_000;
-
 #[derive(Debug, Clone, Copy)]
 #[repr(transparent)]
 pub struct Time(pub pg_sys::TimeADT);

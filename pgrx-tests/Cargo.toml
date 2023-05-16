@@ -44,7 +44,6 @@ regex = "1.8.1"
 serde = "1.0.160"
 serde_json = "1.0.96"
 sysinfo = "0.28.4"
-time = "0.3.20"
 eyre = "0.6.8"
 thiserror = "1.0"
 
@@ -54,5 +53,4 @@ eyre = "0.6.8"  # testing functions that return `eyre::Result`
 [dependencies.pgrx]
 path = "../pgrx"
 default-features = false
-features = [ "time-crate" ] # testing purposes
 version = "=0.8.3"
