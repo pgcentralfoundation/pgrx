@@ -7,8 +7,13 @@ All rights reserved.
 Use of this source code is governed by the MIT license that can be found in the LICENSE file.
 */
 
-use crate::{pg_sys, FromDatum, IntoDatum};
+use crate::{
+    direct_function_call, direct_function_call_as_datum, pg_sys, DateTimeParts, FromDatum,
+    HasExtractableParts, IntoDatum, Timestamp,
+};
 use core::ffi::CStr;
+use pgrx_pg_sys::errcodes::PgSqlErrorCode;
+use pgrx_pg_sys::{pg_get_timezone_offset, PgTryBuilder};
 use pgrx_sql_entity_graph::metadata::{
     ArgumentError, Returns, ReturnsError, SqlMapping, SqlTranslatable,
 };
@@ -18,56 +23,23 @@ use std::convert::TryFrom;
 #[allow(dead_code)] // such is cfg life
 pub(crate) const USECS_PER_SEC: i64 = 1_000_000;
 
-#[cfg(feature = "time-crate")]
-mod with_time_crate {
-    use super::*;
-    use std::ops::Sub;
-    use time::macros::date;
+// taken from /include/datatype/timestamp.h
+const MIN_TIMESTAMP_USEC: i64 = -211_813_488_000_000_000;
+const END_TIMESTAMP_USEC: i64 = 9_223_371_331_200_000_000 - 1; // dec by 1 to accommodate exclusive range match pattern
 
-    const PG_EPOCH_OFFSET: time::OffsetDateTime = date!(2000 - 01 - 01).midnight().assume_utc();
-    const PG_EPOCH_DATETIME: time::PrimitiveDateTime = date!(2000 - 01 - 01).midnight();
+#[derive(Debug, Copy, Clone)]
+#[repr(transparent)]
+pub struct TimestampWithTimeZone(pub pg_sys::TimestampTz);
 
-    impl TryFrom<time::OffsetDateTime> for TimestampWithTimeZone {
-        type Error = FromTimeError;
-        fn try_from(offset: time::OffsetDateTime) -> Result<Self, Self::Error> {
-            let usecs = offset.sub(PG_EPOCH_OFFSET).whole_microseconds() as i64;
-            usecs.try_into()
-        }
-    }
+impl TryFrom<pg_sys::TimestampTz> for TimestampWithTimeZone {
+    type Error = FromTimeError;
 
-    impl TryFrom<TimestampWithTimeZone> for time::PrimitiveDateTime {
-        type Error = FromTimeError;
-        fn try_from(tstz: TimestampWithTimeZone) -> Result<Self, Self::Error> {
-            match tstz {
-                TimestampWithTimeZone::NEG_INFINITY => Err(FromTimeError::NegInfinity),
-                TimestampWithTimeZone::INFINITY => Err(FromTimeError::Infinity),
-                _ => {
-                    let sec = tstz.0 / USECS_PER_SEC;
-                    let usec = tstz.0 - (sec * USECS_PER_SEC);
-                    let duration = time::Duration::new(sec, (usec as i32) * 1000);
-                    match PG_EPOCH_DATETIME.checked_add(duration) {
-                        Some(datetime) => Ok(datetime),
-                        None => Err(FromTimeError::TimeCrate),
-                    }
-                }
+    fn try_from(value: pg_sys::TimestampTz) -> Result<Self, Self::Error> {
+        match value {
+            i64::MIN | i64::MAX | MIN_TIMESTAMP_USEC..=END_TIMESTAMP_USEC => {
+                Ok(TimestampWithTimeZone(value))
             }
-        }
-    }
-
-    impl TryFrom<time::PrimitiveDateTime> for TimestampWithTimeZone {
-        type Error = FromTimeError;
-
-        fn try_from(datetime: time::PrimitiveDateTime) -> Result<Self, Self::Error> {
-            let offset = datetime.assume_utc();
-            offset.try_into()
-        }
-    }
-
-    impl TryFrom<TimestampWithTimeZone> for time::OffsetDateTime {
-        type Error = FromTimeError;
-        fn try_from(tstz: TimestampWithTimeZone) -> Result<Self, Self::Error> {
-            let datetime: time::PrimitiveDateTime = tstz.try_into()?;
-            Ok(datetime.assume_utc())
+            _ => Err(FromTimeError::MicrosOutOfBounds),
         }
     }
 }
@@ -76,49 +48,6 @@ impl TryFrom<pg_sys::Datum> for TimestampWithTimeZone {
     type Error = FromTimeError;
     fn try_from(datum: pg_sys::Datum) -> Result<Self, Self::Error> {
         (datum.value() as pg_sys::TimestampTz).try_into()
-    }
-}
-
-// taken from /include/datatype/timestamp.h
-const MIN_TIMESTAMP_USEC: i64 = -211_813_488_000_000_000;
-const END_TIMESTAMP_USEC: i64 = 9_223_371_331_200_000_000 - 1; // dec by 1 to accommodate exclusive range match pattern
-
-#[derive(Clone, Debug, PartialEq, Eq, PartialOrd, Ord, Deserialize)]
-#[repr(transparent)]
-pub struct TimestampWithTimeZone(pg_sys::TimestampTz);
-
-impl TimestampWithTimeZone {
-    pub const NEG_INFINITY: Self = TimestampWithTimeZone(i64::MIN);
-    pub const INFINITY: Self = TimestampWithTimeZone(i64::MAX);
-
-    #[inline]
-    pub fn is_infinity(&self) -> bool {
-        self == &Self::INFINITY
-    }
-
-    #[inline]
-    pub fn is_neg_infinity(&self) -> bool {
-        self == &Self::NEG_INFINITY
-    }
-}
-
-impl From<TimestampWithTimeZone> for i64 {
-    fn from(tstz: TimestampWithTimeZone) -> Self {
-        tstz.0
-    }
-}
-
-impl TryFrom<pg_sys::TimestampTz> for TimestampWithTimeZone {
-    type Error = FromTimeError;
-
-    fn try_from(value: pg_sys::TimestampTz) -> Result<Self, Self::Error> {
-        let usec = value as i64;
-        match usec {
-            i64::MIN => Ok(Self::NEG_INFINITY),
-            i64::MAX => Ok(Self::INFINITY),
-            MIN_TIMESTAMP_USEC..=END_TIMESTAMP_USEC => Ok(TimestampWithTimeZone(usec)),
-            _ => Err(FromTimeError::MicrosOutOfBounds),
-        }
     }
 }
 
@@ -145,6 +74,186 @@ impl FromDatum for TimestampWithTimeZone {
         } else {
             Some(datum.try_into().expect("Error converting timestamp with time zone datum"))
         }
+    }
+}
+
+impl TimestampWithTimeZone {
+    const NEG_INFINITY: pg_sys::TimestampTz = pg_sys::TimestampTz::MIN;
+    const INFINITY: pg_sys::TimestampTz = pg_sys::TimestampTz::MAX;
+
+    pub fn new(
+        year: i32,
+        month: u8,
+        day: u8,
+        hour: u8,
+        minute: u8,
+        second: f64,
+    ) -> Result<Self, PgSqlErrorCode> {
+        let month: i32 = month as _;
+        let day: i32 = day as _;
+        let hour: i32 = hour as _;
+        let minute: i32 = minute as _;
+
+        PgTryBuilder::new(|| unsafe {
+            Ok(direct_function_call(
+                pg_sys::make_timestamptz,
+                &[
+                    year.into_datum(),
+                    month.into_datum(),
+                    day.into_datum(),
+                    hour.into_datum(),
+                    minute.into_datum(),
+                    second.into_datum(),
+                ],
+            )
+            .unwrap())
+        })
+        .catch_when(PgSqlErrorCode::ERRCODE_DATETIME_FIELD_OVERFLOW, |_| {
+            Err(PgSqlErrorCode::ERRCODE_DATETIME_FIELD_OVERFLOW)
+        })
+        .catch_when(PgSqlErrorCode::ERRCODE_INVALID_DATETIME_FORMAT, |_| {
+            Err(PgSqlErrorCode::ERRCODE_INVALID_DATETIME_FORMAT)
+        })
+        .execute()
+    }
+
+    pub fn new_unchecked(
+        year: isize,
+        month: u8,
+        day: u8,
+        hour: u8,
+        minute: u8,
+        second: f64,
+    ) -> Self {
+        let year: i32 = year as _;
+        let month: i32 = month as _;
+        let day: i32 = day as _;
+        let hour: i32 = hour as _;
+        let minute: i32 = minute as _;
+
+        unsafe {
+            direct_function_call(
+                pg_sys::make_timestamptz,
+                &[
+                    year.into_datum(),
+                    month.into_datum(),
+                    day.into_datum(),
+                    hour.into_datum(),
+                    minute.into_datum(),
+                    second.into_datum(),
+                ],
+            )
+            .unwrap()
+        }
+    }
+
+    pub fn with_timezone<Tz: AsRef<str>>(
+        year: i32,
+        month: u8,
+        day: u8,
+        hour: u8,
+        minute: u8,
+        second: f64,
+        timezone: Tz,
+    ) -> Result<Self, PgSqlErrorCode> {
+        let month: i32 = month as _;
+        let day: i32 = day as _;
+        let hour: i32 = hour as _;
+        let minute: i32 = minute as _;
+        let timezone = timezone.as_ref().into_datum();
+
+        PgTryBuilder::new(|| unsafe {
+            Ok(direct_function_call(
+                pg_sys::make_timestamptz_at_timezone,
+                &[
+                    year.into_datum(),
+                    month.into_datum(),
+                    day.into_datum(),
+                    hour.into_datum(),
+                    minute.into_datum(),
+                    second.into_datum(),
+                    timezone,
+                ],
+            )
+            .unwrap())
+        })
+        .catch_when(PgSqlErrorCode::ERRCODE_DATETIME_FIELD_OVERFLOW, |_| {
+            Err(PgSqlErrorCode::ERRCODE_DATETIME_FIELD_OVERFLOW)
+        })
+        .catch_when(PgSqlErrorCode::ERRCODE_INVALID_DATETIME_FORMAT, |_| {
+            Err(PgSqlErrorCode::ERRCODE_INVALID_DATETIME_FORMAT)
+        })
+        .catch_when(PgSqlErrorCode::ERRCODE_INVALID_PARAMETER_VALUE, |_| {
+            Err(PgSqlErrorCode::ERRCODE_INVALID_PARAMETER_VALUE)
+        })
+        .execute()
+    }
+
+    #[inline]
+    pub fn is_infinity(&self) -> bool {
+        self.0 == Self::INFINITY
+    }
+
+    #[inline]
+    pub fn is_neg_infinity(&self) -> bool {
+        self.0 == Self::NEG_INFINITY
+    }
+
+    pub fn month(&self) -> u8 {
+        self.extract_part(DateTimeParts::Month).unwrap().try_into().unwrap()
+    }
+
+    pub fn day(&self) -> u8 {
+        self.extract_part(DateTimeParts::Day).unwrap().try_into().unwrap()
+    }
+
+    pub fn year(&self) -> i32 {
+        self.extract_part(DateTimeParts::Year).unwrap().try_into().unwrap()
+    }
+
+    pub fn hour(&self) -> u8 {
+        self.extract_part(DateTimeParts::Hour).unwrap().try_into().unwrap()
+    }
+
+    pub fn minute(&self) -> u8 {
+        self.extract_part(DateTimeParts::Minute).unwrap().try_into().unwrap()
+    }
+
+    pub fn second(&self) -> f64 {
+        self.extract_part(DateTimeParts::Second).unwrap().try_into().unwrap()
+    }
+
+    pub fn microseconds(&self) -> u32 {
+        self.extract_part(DateTimeParts::Microseconds).unwrap().try_into().unwrap()
+    }
+
+    pub fn to_hms_micro(&self) -> (u8, u8, u8, u32) {
+        (self.hour(), self.minute(), self.second() as u8, self.microseconds())
+    }
+
+    pub fn to_utc(&self) -> Timestamp {
+        self.at_timezone("UTC").unwrap()
+    }
+
+    pub fn at_timezone<Tz: AsRef<str>>(&self, timezone: Tz) -> Result<Timestamp, PgSqlErrorCode> {
+        let timezone = timezone.as_ref().into_datum();
+        PgTryBuilder::new(|| unsafe {
+            Ok(direct_function_call(
+                pg_sys::timestamptz_zone,
+                &[timezone, self.clone().into_datum()],
+            )
+            .unwrap())
+        })
+        .catch_when(PgSqlErrorCode::ERRCODE_DATETIME_FIELD_OVERFLOW, |_| {
+            Err(PgSqlErrorCode::ERRCODE_DATETIME_FIELD_OVERFLOW)
+        })
+        .catch_when(PgSqlErrorCode::ERRCODE_INVALID_DATETIME_FORMAT, |_| {
+            Err(PgSqlErrorCode::ERRCODE_INVALID_DATETIME_FORMAT)
+        })
+        .catch_when(PgSqlErrorCode::ERRCODE_INVALID_PARAMETER_VALUE, |_| {
+            Err(PgSqlErrorCode::ERRCODE_INVALID_PARAMETER_VALUE)
+        })
+        .execute()
     }
 }
 
@@ -182,8 +291,8 @@ impl serde::Serialize for TimestampWithTimeZone {
         // SAFETY: This provides a quite-generous writing pad to Postgres
         // and Postgres has promised to use far less than this.
         unsafe {
-            match self {
-                &Self::NEG_INFINITY | &Self::INFINITY => {
+            match self.0 {
+                Self::NEG_INFINITY | Self::INFINITY => {
                     pg_sys::EncodeSpecialTimestamp(self.0, buf);
                 }
                 _ => {

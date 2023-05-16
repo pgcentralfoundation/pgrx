@@ -191,16 +191,11 @@ impl TimeWithTimeZone {
         self.at_timezone("UTC").unwrap().into()
     }
 
-    pub fn at_timezone<Tz: AsRef<str> + RefUnwindSafe>(
-        &self,
-        timezone: Tz,
-    ) -> Result<Self, PgSqlErrorCode> {
+    pub fn at_timezone<Tz: AsRef<str>>(&self, timezone: Tz) -> Result<Self, PgSqlErrorCode> {
+        let timezone = timezone.as_ref().into_datum();
         PgTryBuilder::new(|| unsafe {
-            Ok(direct_function_call(
-                pg_sys::timetz_zone,
-                &[timezone.as_ref().into_datum(), self.clone().into_datum()],
-            )
-            .unwrap())
+            Ok(direct_function_call(pg_sys::timetz_zone, &[timezone, self.clone().into_datum()])
+                .unwrap())
         })
         .catch_when(PgSqlErrorCode::ERRCODE_DATETIME_FIELD_OVERFLOW, |_| {
             Err(PgSqlErrorCode::ERRCODE_DATETIME_FIELD_OVERFLOW)

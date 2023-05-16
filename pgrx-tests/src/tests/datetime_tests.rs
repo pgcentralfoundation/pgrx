@@ -9,7 +9,6 @@ Use of this source code is governed by the MIT license that can be found in the 
 
 use pgrx::prelude::*;
 use std::convert::TryFrom;
-use time::{OffsetDateTime, PrimitiveDateTime, UtcOffset};
 
 #[pg_extern]
 fn accept_date(d: Date) -> Date {
@@ -49,40 +48,20 @@ fn accept_timestamp_with_time_zone(t: TimestampWithTimeZone) -> TimestampWithTim
 #[pg_extern]
 fn accept_timestamp_with_time_zone_offset_round_trip(
     t: TimestampWithTimeZone,
-) -> Option<TimestampWithTimeZone> {
-    match TryInto::<OffsetDateTime>::try_into(t) {
-        Ok(offset) => Some(offset.try_into().unwrap()),
-        Err(_) => None,
-    }
+) -> TimestampWithTimeZone {
+    t
 }
 
 #[pg_extern]
 fn accept_timestamp_with_time_zone_datetime_round_trip(
     t: TimestampWithTimeZone,
-) -> Option<TimestampWithTimeZone> {
-    match TryInto::<PrimitiveDateTime>::try_into(t) {
-        Ok(datetime) => Some(datetime.try_into().unwrap()),
-        Err(_) => None,
-    }
+) -> TimestampWithTimeZone {
+    t
 }
 
 #[pg_extern]
 fn return_3pm_mountain_time() -> TimestampWithTimeZone {
-    let datetime = PrimitiveDateTime::new(
-        time::Date::from_calendar_date(2020, time::Month::try_from(2).unwrap(), 19).unwrap(),
-        time::Time::from_hms(15, 0, 0).unwrap(),
-    )
-    .assume_offset(UtcOffset::from_hms(-7, 0, 0).unwrap());
-
-    let three_pm: TimestampWithTimeZone = datetime.try_into().unwrap();
-
-    // this conversion will revert to UTC
-    let offset: time::OffsetDateTime = three_pm.try_into().unwrap();
-
-    // 3PM mountain time is 10PM UTC
-    assert_eq!(22, offset.hour());
-
-    datetime.try_into().unwrap()
+    TimestampWithTimeZone::with_timezone(2020, 2, 19, 15, 0, 0.0, "MST").unwrap()
 }
 
 #[pg_extern(sql = r#"
@@ -119,8 +98,6 @@ mod tests {
     use serde_json::*;
     use std::result::Result;
     use std::time::Duration;
-    use time;
-    use time::PrimitiveDateTime;
 
     #[pg_test]
     fn test_to_pg_epoch_days() {
@@ -304,12 +281,12 @@ mod tests {
 
     #[pg_test]
     fn test_return_3pm_mountain_time() -> Result<(), pgrx::spi::Error> {
-        let result = Spi::get_one::<TimestampWithTimeZone>("SELECT return_3pm_mountain_time();")?
-            .expect("datum was null");
+        let result = Spi::get_one::<TimestampWithTimeZone>(
+            "SET timezone TO 'UTC'; SELECT return_3pm_mountain_time();",
+        )?
+        .expect("datum was null");
 
-        let offset: time::OffsetDateTime = result.try_into().unwrap();
-
-        assert_eq!(22, offset.hour());
+        assert_eq!(22, result.hour());
         Ok(())
     }
 
@@ -320,9 +297,7 @@ mod tests {
         )?
         .expect("datum was null");
 
-        let datetime: time::PrimitiveDateTime = ts.try_into().unwrap();
-
-        assert_eq!(datetime.hour(), 21);
+        assert_eq!(ts.to_utc().hour(), 21);
         Ok(())
     }
 
@@ -360,19 +335,8 @@ mod tests {
 
     #[pg_test]
     fn test_timestamp_with_timezone_serialization() {
-        let time_stamp_with_timezone: TimestampWithTimeZone = PrimitiveDateTime::new(
-            time::Date::from_calendar_date(2022, time::Month::try_from(2).unwrap(), 2).unwrap(),
-            time::Time::from_hms(16, 57, 11).unwrap(),
-        )
-        .assume_offset(
-            time::UtcOffset::parse(
-                "+0200",
-                &time::format_description::parse("[offset_hour][offset_minute]").unwrap(),
-            )
-            .unwrap(),
-        )
-        .try_into()
-        .unwrap();
+        let time_stamp_with_timezone =
+            TimestampWithTimeZone::with_timezone(2022, 2, 2, 16, 57, 11.0, "CEST").unwrap();
 
         // prevents PG's timestamp serialization from imposing the local servers time zone
         Spi::run("SET TIME ZONE 'UTC'").expect("SPI failed");

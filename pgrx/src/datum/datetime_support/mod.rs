@@ -1,6 +1,6 @@
 use crate::{
     direct_function_call, pg_getarg_datum, pg_sys, AnyNumeric, Date, IntoDatum, Time,
-    TimeWithTimeZone, Timestamp,
+    TimeWithTimeZone, Timestamp, TimestampWithTimeZone,
 };
 use core::fmt::{Display, Formatter};
 use core::str::FromStr;
@@ -362,6 +362,23 @@ impl_wrappers!(
     TIMESTAMP_EXTRACT,
     pg_sys::timestamp_in,
     pg_sys::timestamp_out
+);
+
+#[cfg(any(feature = "pg11", feature = "pg12", feature = "pg13"))]
+const TIMESTAMPTZ_EXTRACT: unsafe fn(fcinfo: pg_sys::FunctionCallInfo) -> pg_sys::Datum =
+    pg_sys::timestamptz_part;
+#[cfg(any(feature = "pg14", feature = "pg15"))]
+const TIMESTAMPTZ_EXTRACT: unsafe fn(fcinfo: pg_sys::FunctionCallInfo) -> pg_sys::Datum =
+    pg_sys::extract_timestamptz;
+
+impl_wrappers!(
+    TimestampWithTimeZone,
+    pg_sys::timestamp_eq,   // yes, this is correct
+    pg_sys::timestamp_cmp,  // yes, this is correct
+    pg_sys::timestamp_hash, // yes, this is correct
+    TIMESTAMPTZ_EXTRACT,
+    pg_sys::timestamptz_in,
+    pg_sys::timestamptz_out
 );
 
 // ported from `v5.2/src/backend/utils/adt/date.c#3034`

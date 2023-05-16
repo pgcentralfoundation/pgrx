@@ -103,8 +103,8 @@ impl FromDatum for Timestamp {
 }
 
 impl Timestamp {
-    pub const NEG_INFINITY: pg_sys::Timestamp = pg_sys::Timestamp::MIN;
-    pub const INFINITY: pg_sys::Timestamp = pg_sys::Timestamp::MAX;
+    const NEG_INFINITY: pg_sys::Timestamp = pg_sys::Timestamp::MIN;
+    const INFINITY: pg_sys::Timestamp = pg_sys::Timestamp::MAX;
 
     pub fn new(
         year: i32,
