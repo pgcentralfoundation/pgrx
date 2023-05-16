@@ -8,20 +8,16 @@ Use of this source code is governed by the MIT license that can be found in the 
 */
 
 use crate::{
-    direct_function_call, direct_function_call_as_datum, pg_sys, DateTimeParts, FromDatum,
-    HasExtractableParts, IntoDatum, Timestamp,
+    direct_function_call, pg_sys, DateTimeParts, FromDatum, HasExtractableParts, IntoDatum,
+    Timestamp,
 };
 use core::ffi::CStr;
 use pgrx_pg_sys::errcodes::PgSqlErrorCode;
-use pgrx_pg_sys::{pg_get_timezone_offset, PgTryBuilder};
+use pgrx_pg_sys::PgTryBuilder;
 use pgrx_sql_entity_graph::metadata::{
     ArgumentError, Returns, ReturnsError, SqlMapping, SqlTranslatable,
 };
-use serde::Deserialize;
 use std::convert::TryFrom;
-
-#[allow(dead_code)] // such is cfg life
-pub(crate) const USECS_PER_SEC: i64 = 1_000_000;
 
 // taken from /include/datatype/timestamp.h
 const MIN_TIMESTAMP_USEC: i64 = -211_813_488_000_000_000;

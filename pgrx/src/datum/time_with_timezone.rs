@@ -14,7 +14,7 @@ use crate::{
     PgMemoryContexts,
 };
 use pgrx_pg_sys::errcodes::PgSqlErrorCode;
-use pgrx_pg_sys::{warning, AsPgCStr, PgTryBuilder};
+use pgrx_pg_sys::PgTryBuilder;
 use pgrx_sql_entity_graph::metadata::{
     ArgumentError, Returns, ReturnsError, SqlMapping, SqlTranslatable,
 };
@@ -109,7 +109,7 @@ impl TimeWithTimeZone {
         second: f64,
         timezone: Tz,
     ) -> Result<Self, PgSqlErrorCode> {
-        PgTryBuilder::new(|| unsafe {
+        PgTryBuilder::new(|| {
             let mut time = Self::new(hour, minute, second)?;
             let tzoff = crate::get_timezone_offset(timezone.as_ref())?;
 

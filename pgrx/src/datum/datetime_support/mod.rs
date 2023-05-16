@@ -1,13 +1,11 @@
 use crate::{
-    direct_function_call, pg_getarg_datum, pg_sys, AnyNumeric, Date, IntoDatum, Time,
-    TimeWithTimeZone, Timestamp, TimestampWithTimeZone,
+    direct_function_call, pg_sys, AnyNumeric, Date, IntoDatum, Time, TimeWithTimeZone, Timestamp,
+    TimestampWithTimeZone,
 };
 use core::fmt::{Display, Formatter};
 use core::str::FromStr;
-use libc::fopen64;
-use pgrx_pg_sys::elog::PgLogLevel;
 use pgrx_pg_sys::errcodes::PgSqlErrorCode;
-use pgrx_pg_sys::{ereport, pg_tz, AsPgCStr, PgTryBuilder};
+use pgrx_pg_sys::{pg_tz, PgTryBuilder};
 use std::cmp::Ordering;
 use std::hash::{Hash, Hasher};
 

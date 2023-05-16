@@ -8,8 +8,8 @@ Use of this source code is governed by the MIT license that can be found in the 
 */
 
 use crate::{
-    direct_function_call, pg_sys, Date, DateTimeParts, FromDatum, FromTimeError,
-    HasExtractableParts, IntoDatum, Time, TimestampWithTimeZone,
+    direct_function_call, pg_sys, Date, DateTimeParts, FromDatum, HasExtractableParts, IntoDatum,
+    Time, TimestampWithTimeZone,
 };
 use core::ffi::CStr;
 use pgrx_pg_sys::errcodes::PgSqlErrorCode;
@@ -49,16 +49,13 @@ impl TryFrom<TimestampWithTimeZone> for Timestamp {
     type Error = PgSqlErrorCode;
 
     fn try_from(value: TimestampWithTimeZone) -> Result<Self, Self::Error> {
-        unsafe {
-            PgTryBuilder::new(|| unsafe {
-                Ok(direct_function_call(pg_sys::timestamptz_timestamp, &[value.into_datum()])
-                    .unwrap())
-            })
-            .catch_when(PgSqlErrorCode::ERRCODE_DATETIME_FIELD_OVERFLOW, |_| {
-                Err(PgSqlErrorCode::ERRCODE_DATETIME_FIELD_OVERFLOW)
-            })
-            .execute()
-        }
+        PgTryBuilder::new(|| unsafe {
+            Ok(direct_function_call(pg_sys::timestamptz_timestamp, &[value.into_datum()]).unwrap())
+        })
+        .catch_when(PgSqlErrorCode::ERRCODE_DATETIME_FIELD_OVERFLOW, |_| {
+            Err(PgSqlErrorCode::ERRCODE_DATETIME_FIELD_OVERFLOW)
+        })
+        .execute()
     }
 }
 

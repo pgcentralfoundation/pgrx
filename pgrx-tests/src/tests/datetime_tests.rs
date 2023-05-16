@@ -8,7 +8,6 @@ Use of this source code is governed by the MIT license that can be found in the 
 */
 
 use pgrx::prelude::*;
-use std::convert::TryFrom;
 
 #[pg_extern]
 fn accept_date(d: Date) -> Date {
