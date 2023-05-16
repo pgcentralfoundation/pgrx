@@ -33,7 +33,7 @@ fn accept_time_with_time_zone(t: TimeWithTimeZone) -> TimeWithTimeZone {
 
 #[pg_extern]
 fn convert_timetz_to_time(t: TimeWithTimeZone) -> Time {
-    t.into()
+    t.to_utc().into()
 }
 
 #[pg_extern]
@@ -124,24 +124,21 @@ mod tests {
 
     #[pg_test]
     fn test_to_pg_epoch_days() {
-        let d = time::Date::from_calendar_date(2000, time::Month::January, 2).unwrap();
-        let date: Date = d.into();
+        let date = Date::new(2000, 1, 2).unwrap();
 
         assert_eq!(date.to_pg_epoch_days(), 1);
     }
 
     #[pg_test]
     fn test_to_posix_time() {
-        let d = time::Date::from_calendar_date(1970, time::Month::January, 2).unwrap();
-        let date: Date = d.into();
+        let date = Date::new(1970, 1, 2).unwrap();
 
         assert_eq!(date.to_posix_time(), 86400);
     }
 
     #[pg_test]
     fn test_to_julian_days() {
-        let d = time::Date::from_calendar_date(2000, time::Month::January, 1).unwrap();
-        let date: Date = d.into();
+        let date = Date::new(2000, 1, 1).unwrap();
 
         assert_eq!(date.to_julian_days(), pg_sys::POSTGRES_EPOCH_JDATE as i32);
     }
@@ -161,11 +158,7 @@ mod tests {
 
     #[pg_test]
     fn test_date_serialization() {
-        let date: Date =
-            time::Date::from_calendar_date(2020, time::Month::try_from(4).unwrap(), 07)
-                .unwrap()
-                .into();
-
+        let date: Date = Date::new(2020, 4, 7).unwrap();
         let json = json!({ "date test": date });
 
         assert_eq!(json!({"date test":"2020-04-07"}), json);
@@ -337,8 +330,7 @@ mod tests {
     fn test_is_timestamp_utc() -> Result<(), pgrx::spi::Error> {
         let ts = Spi::get_one::<Timestamp>("SELECT '2020-02-18 14:08'::timestamp")?
             .expect("datum was null");
-        let datetime: time::PrimitiveDateTime = ts.try_into().unwrap();
-        assert_eq!(datetime.hour(), 14);
+        assert_eq!(ts.hour(), 14);
         Ok(())
     }
 
@@ -395,11 +387,7 @@ mod tests {
         // prevents PG's timestamp serialization from imposing the local servers time zone
         Spi::run("SET TIME ZONE 'UTC'").expect("SPI failed");
 
-        let datetime = PrimitiveDateTime::new(
-            time::Date::from_calendar_date(2020, time::Month::try_from(1).unwrap(), 1).unwrap(),
-            time::Time::from_hms(12, 34, 54).unwrap(),
-        );
-        let ts: Timestamp = datetime.try_into().unwrap();
+        let ts = Timestamp::new(2020, 1, 1, 12, 34, 54.0).unwrap();
         let json = json!({ "time stamp test": ts });
 
         assert_eq!(json!({"time stamp test":"2020-01-01T12:34:54"}), json);

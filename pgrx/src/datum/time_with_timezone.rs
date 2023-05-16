@@ -113,7 +113,6 @@ impl TimeWithTimeZone {
             let mut time = Self::new(hour, minute, second)?;
             let tzoff = crate::get_timezone_offset(timezone.as_ref())?;
 
-            warning!("tzoff={tzoff}");
             time.0.zone = -tzoff;
             Ok(time)
         })
@@ -186,6 +185,10 @@ impl TimeWithTimeZone {
 
     pub fn to_hms_micro(&self) -> (u8, u8, u8, u32) {
         (self.hour(), self.minute(), self.second() as u8, self.microseconds())
+    }
+
+    pub fn to_utc(&self) -> Time {
+        self.at_timezone("UTC").unwrap().into()
     }
 
     pub fn at_timezone<Tz: AsRef<str> + RefUnwindSafe>(

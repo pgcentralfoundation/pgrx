@@ -7,101 +7,72 @@ All rights reserved.
 Use of this source code is governed by the MIT license that can be found in the LICENSE file.
 */
 
-use crate::{pg_sys, FromDatum, FromTimeError, IntoDatum, TimestampWithTimeZone};
+use crate::{
+    direct_function_call, pg_sys, Date, DateTimeParts, FromDatum, FromTimeError,
+    HasExtractableParts, IntoDatum, Time, TimestampWithTimeZone,
+};
 use core::ffi::CStr;
+use pgrx_pg_sys::errcodes::PgSqlErrorCode;
+use pgrx_pg_sys::PgTryBuilder;
 use pgrx_sql_entity_graph::metadata::{
     ArgumentError, Returns, ReturnsError, SqlMapping, SqlTranslatable,
 };
-use serde::Deserialize;
+use std::num::TryFromIntError;
 
-#[derive(Clone, Debug, PartialEq, Eq, PartialOrd, Ord, Deserialize)]
+#[derive(Debug, Copy, Clone)]
 #[repr(transparent)]
-pub struct Timestamp(pg_sys::Timestamp);
+pub struct Timestamp(pub pg_sys::Timestamp);
 
-impl Timestamp {
-    pub const NEG_INFINITY: Self = Timestamp(i64::MIN);
-    pub const INFINITY: Self = Timestamp(i64::MAX);
-
-    #[inline]
-    pub fn is_infinity(&self) -> bool {
-        self == &Self::INFINITY
-    }
-
-    #[inline]
-    pub fn is_neg_infinity(&self) -> bool {
-        self == &Self::NEG_INFINITY
-    }
-}
-
-impl From<TimestampWithTimeZone> for Timestamp {
-    fn from(tstz: TimestampWithTimeZone) -> Self {
-        Timestamp(tstz.into())
-    }
-}
-
-impl From<Timestamp> for TimestampWithTimeZone {
-    fn from(ts: Timestamp) -> Self {
-        ts.0.try_into().expect("error converting Timestamp to TimestampWithTimeZone")
+impl From<(Date, Time)> for Timestamp {
+    fn from(value: (Date, Time)) -> Self {
+        let (date, time) = value;
+        Timestamp::new(
+            date.year(),
+            date.month(),
+            date.day(),
+            time.hour(),
+            time.minute(),
+            time.second(),
+        )
+        .unwrap()
     }
 }
 
 impl From<Timestamp> for i64 {
+    #[inline]
     fn from(ts: Timestamp) -> Self {
         ts.0
     }
 }
 
-impl TryFrom<pg_sys::Timestamp> for Timestamp {
-    type Error = FromTimeError;
+impl TryFrom<TimestampWithTimeZone> for Timestamp {
+    type Error = PgSqlErrorCode;
 
-    fn try_from(value: pg_sys::Timestamp) -> Result<Self, Self::Error> {
-        TryInto::<TimestampWithTimeZone>::try_into(value).map(|tstz| tstz.into())
+    fn try_from(value: TimestampWithTimeZone) -> Result<Self, Self::Error> {
+        unsafe {
+            PgTryBuilder::new(|| unsafe {
+                Ok(direct_function_call(pg_sys::timestamptz_timestamp, &[value.into_datum()])
+                    .unwrap())
+            })
+            .catch_when(PgSqlErrorCode::ERRCODE_DATETIME_FIELD_OVERFLOW, |_| {
+                Err(PgSqlErrorCode::ERRCODE_DATETIME_FIELD_OVERFLOW)
+            })
+            .execute()
+        }
+    }
+}
+
+impl From<pg_sys::Timestamp> for Timestamp {
+    fn from(value: pgrx_pg_sys::Timestamp) -> Self {
+        Timestamp(value)
     }
 }
 
 impl TryFrom<pg_sys::Datum> for Timestamp {
-    type Error = FromTimeError;
+    type Error = TryFromIntError;
 
     fn try_from(datum: pg_sys::Datum) -> Result<Self, Self::Error> {
-        (datum.value() as pg_sys::Timestamp).try_into()
-    }
-}
-
-#[cfg(feature = "time-crate")]
-mod with_time_crate {
-    use super::*;
-
-    impl TryFrom<time::OffsetDateTime> for Timestamp {
-        type Error = FromTimeError;
-
-        fn try_from(offset: time::OffsetDateTime) -> Result<Self, Self::Error> {
-            TryInto::<TimestampWithTimeZone>::try_into(offset).map(|tstz| tstz.into())
-        }
-    }
-
-    impl TryFrom<Timestamp> for time::PrimitiveDateTime {
-        type Error = FromTimeError;
-
-        fn try_from(ts: Timestamp) -> Result<Self, Self::Error> {
-            let tstz: TimestampWithTimeZone = ts.into();
-            TryInto::<time::PrimitiveDateTime>::try_into(tstz)
-        }
-    }
-
-    impl TryFrom<time::PrimitiveDateTime> for Timestamp {
-        type Error = FromTimeError;
-
-        fn try_from(datetime: time::PrimitiveDateTime) -> Result<Self, Self::Error> {
-            TryInto::<TimestampWithTimeZone>::try_into(datetime).map(|tstz| tstz.into())
-        }
-    }
-
-    impl TryFrom<Timestamp> for time::OffsetDateTime {
-        type Error = FromTimeError;
-        fn try_from(ts: Timestamp) -> Result<Self, Self::Error> {
-            let tstz: TimestampWithTimeZone = ts.into();
-            tstz.try_into()
-        }
+        pg_sys::Timestamp::try_from(datum.value() as isize).map(|d| Timestamp(d))
     }
 }
 
@@ -131,6 +102,119 @@ impl FromDatum for Timestamp {
     }
 }
 
+impl Timestamp {
+    pub const NEG_INFINITY: pg_sys::Timestamp = pg_sys::Timestamp::MIN;
+    pub const INFINITY: pg_sys::Timestamp = pg_sys::Timestamp::MAX;
+
+    pub fn new(
+        year: i32,
+        month: u8,
+        day: u8,
+        hour: u8,
+        minute: u8,
+        second: f64,
+    ) -> Result<Self, PgSqlErrorCode> {
+        let month: i32 = month as _;
+        let day: i32 = day as _;
+        let hour: i32 = hour as _;
+        let minute: i32 = minute as _;
+
+        PgTryBuilder::new(|| unsafe {
+            Ok(direct_function_call(
+                pg_sys::make_timestamp,
+                &[
+                    year.into_datum(),
+                    month.into_datum(),
+                    day.into_datum(),
+                    hour.into_datum(),
+                    minute.into_datum(),
+                    second.into_datum(),
+                ],
+            )
+            .unwrap())
+        })
+        .catch_when(PgSqlErrorCode::ERRCODE_DATETIME_FIELD_OVERFLOW, |_| {
+            Err(PgSqlErrorCode::ERRCODE_DATETIME_FIELD_OVERFLOW)
+        })
+        .catch_when(PgSqlErrorCode::ERRCODE_INVALID_DATETIME_FORMAT, |_| {
+            Err(PgSqlErrorCode::ERRCODE_INVALID_DATETIME_FORMAT)
+        })
+        .execute()
+    }
+
+    pub fn new_unchecked(
+        year: isize,
+        month: u8,
+        day: u8,
+        hour: u8,
+        minute: u8,
+        second: f64,
+    ) -> Self {
+        let year: i32 = year as _;
+        let month: i32 = month as _;
+        let day: i32 = day as _;
+        let hour: i32 = hour as _;
+        let minute: i32 = minute as _;
+
+        unsafe {
+            direct_function_call(
+                pg_sys::make_timestamp,
+                &[
+                    year.into_datum(),
+                    month.into_datum(),
+                    day.into_datum(),
+                    hour.into_datum(),
+                    minute.into_datum(),
+                    second.into_datum(),
+                ],
+            )
+            .unwrap()
+        }
+    }
+
+    #[inline]
+    pub fn is_infinity(&self) -> bool {
+        self.0 == Self::INFINITY
+    }
+
+    #[inline]
+    pub fn is_neg_infinity(&self) -> bool {
+        self.0 == Self::NEG_INFINITY
+    }
+
+    pub fn month(&self) -> u8 {
+        self.extract_part(DateTimeParts::Month).unwrap().try_into().unwrap()
+    }
+
+    pub fn day(&self) -> u8 {
+        self.extract_part(DateTimeParts::Day).unwrap().try_into().unwrap()
+    }
+
+    pub fn year(&self) -> i32 {
+        self.extract_part(DateTimeParts::Year).unwrap().try_into().unwrap()
+    }
+
+    pub fn hour(&self) -> u8 {
+        self.extract_part(DateTimeParts::Hour).unwrap().try_into().unwrap()
+    }
+
+    pub fn minute(&self) -> u8 {
+        self.extract_part(DateTimeParts::Minute).unwrap().try_into().unwrap()
+    }
+
+    pub fn second(&self) -> f64 {
+        self.extract_part(DateTimeParts::Second).unwrap().try_into().unwrap()
+    }
+
+    pub fn microseconds(&self) -> u32 {
+        self.extract_part(DateTimeParts::Microseconds).unwrap().try_into().unwrap()
+    }
+
+    pub fn to_hms_micro(&self) -> (u8, u8, u8, u32) {
+        (self.hour(), self.minute(), self.second() as u8, self.microseconds())
+    }
+}
+
 impl serde::Serialize for Timestamp {
     fn serialize<S>(
         &self,
@@ -147,8 +231,8 @@ impl serde::Serialize for Timestamp {
         // SAFETY: This provides a quite-generous writing pad to Postgres
         // and Postgres has promised to use far less than this.
         unsafe {
-            match self {
-                &Self::NEG_INFINITY | &Self::INFINITY => {
+            match self.0 {
+                Self::NEG_INFINITY | Self::INFINITY => {
                     pg_sys::EncodeSpecialTimestamp(self.0, buf);
                 }
                 _ => {

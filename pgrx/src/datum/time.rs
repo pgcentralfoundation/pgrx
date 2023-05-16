@@ -84,9 +84,10 @@ impl Time {
     pub const ALLBALLS: Self = Time(0);
 
     pub fn new(hour: u8, minute: u8, second: f64) -> Result<Time, PgSqlErrorCode> {
+        let hour: i32 = hour as _;
+        let minute: i32 = minute as _;
+
         PgTryBuilder::new(|| unsafe {
-            let hour = hour as i32;
-            let minute = minute as i32;
             Ok(direct_function_call(
                 pg_sys::make_time,
                 &[hour.into_datum(), minute.into_datum(), second.into_datum()],
