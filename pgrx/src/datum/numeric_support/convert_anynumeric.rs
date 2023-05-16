@@ -5,7 +5,7 @@ use core::str::FromStr;
 use pg_sys::AsPgCStr;
 
 use crate::numeric_support::call_numeric_func;
-use crate::numeric_support::convert::from_primitive_helper;
+use crate::numeric_support::convert::{from_primitive_helper, FromPrimitiveFunc};
 use crate::numeric_support::error::Error;
 use crate::{pg_sys, AnyNumeric, IntoDatum, Numeric};
 
@@ -17,11 +17,11 @@ impl<const P: u32, const S: u32> From<Numeric<P, S>> for AnyNumeric {
 }
 
 macro_rules! anynumeric_from_signed {
-    ($ty:ty, $as_:ty, $func:ident) => {
+    ($ty:ty, $as_:ty, $func:path) => {
         impl From<$ty> for AnyNumeric {
             #[inline]
             fn from(value: $ty) -> Self {
-                call_numeric_func(pg_sys::$func, &[(value as $as_).into_datum()])
+                call_numeric_func($func.into(), &[(value as $as_).into_datum()])
             }
         }
     };
@@ -41,11 +41,11 @@ macro_rules! anynumeric_from_oversized_primitive {
     };
 }
 
-anynumeric_from_signed!(isize, i64, int8_numeric);
-anynumeric_from_signed!(i64, i64, int8_numeric);
-anynumeric_from_signed!(i32, i32, int4_numeric);
-anynumeric_from_signed!(i16, i16, int2_numeric);
-anynumeric_from_signed!(i8, i16, int2_numeric);
+anynumeric_from_signed!(isize, i64, FromPrimitiveFunc::Int8Numeric);
+anynumeric_from_signed!(i64, i64, FromPrimitiveFunc::Int8Numeric);
+anynumeric_from_signed!(i32, i32, FromPrimitiveFunc::Int4Numeric);
+anynumeric_from_signed!(i16, i16, FromPrimitiveFunc::Int2Numeric);
+anynumeric_from_signed!(i8, i16, FromPrimitiveFunc::Int2Numeric);
 
 anynumeric_from_oversized_primitive!(usize, i64);
 anynumeric_from_oversized_primitive!(u64, i64);
@@ -57,7 +57,7 @@ anynumeric_from_oversized_primitive!(i128, i64);
 anynumeric_from_oversized_primitive!(u128, i64);
 
 macro_rules! anynumeric_from_float {
-    ($ty:ty, $func:ident) => {
+    ($ty:ty, $func:path) => {
         impl TryFrom<$ty> for AnyNumeric {
             type Error = Error;
 
@@ -69,19 +69,18 @@ macro_rules! anynumeric_from_float {
                 #[cfg(any(feature = "pg11", feature = "pg12", feature = "pg13"))]
                 {
                     if value.is_infinite() {
-                        return from_primitive_helper::<_, 0, 0>(value, pg_sys::$func)
-                            .map(|n| n.into());
+                        return from_primitive_helper::<_, 0, 0>(value, $func).map(|n| n.into());
                     }
                 }
 
-                Ok(call_numeric_func(pg_sys::$func, &[value.into_datum()]))
+                Ok(call_numeric_func($func.into(), &[value.into_datum()]))
             }
         }
     };
 }
 
-anynumeric_from_float!(f32, float4_numeric);
-anynumeric_from_float!(f64, float8_numeric);
+anynumeric_from_float!(f32, FromPrimitiveFunc::Float4Numeric);
+anynumeric_from_float!(f64, FromPrimitiveFunc::Float8Numeric);
 
 impl TryFrom<&CStr> for AnyNumeric {
     type Error = Error;
@@ -109,8 +108,8 @@ impl FromStr for AnyNumeric {
         unsafe {
             let ptr = s.as_pg_cstr();
             let cstr = CStr::from_ptr(ptr);
-            let numeric =
-                from_primitive_helper::<_, 0, 0>(cstr, pg_sys::numeric_in).map(|n| n.into());
+            let numeric = from_primitive_helper::<_, 0, 0>(cstr, FromPrimitiveFunc::NumericIn)
+                .map(|n| n.into());
             pg_sys::pfree(ptr.cast());
             numeric
         }

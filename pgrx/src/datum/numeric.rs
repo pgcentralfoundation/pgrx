@@ -12,7 +12,7 @@ use core::fmt::{Debug, Display, Formatter};
 use std::fmt;
 use std::iter::Sum;
 
-use crate::numeric_support::convert::from_primitive_helper;
+use crate::numeric_support::convert::{from_primitive_helper, FromPrimitiveFunc};
 pub use crate::numeric_support::error::Error;
 use crate::{direct_function_call, pg_sys, varsize, PgMemoryContexts};
 
@@ -250,6 +250,6 @@ impl<const P: u32, const S: u32> Numeric<P, S> {
     pub fn rescale<const NEW_P: u32, const NEW_S: u32>(
         self,
     ) -> Result<Numeric<NEW_P, NEW_S>, Error> {
-        from_primitive_helper::<_, NEW_P, NEW_S>(self, pg_sys::numeric)
+        from_primitive_helper::<_, NEW_P, NEW_S>(self, FromPrimitiveFunc::Numeric)
     }
 }
