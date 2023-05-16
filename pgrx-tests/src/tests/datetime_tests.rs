@@ -18,10 +18,7 @@ fn accept_date(d: Date) -> Date {
 
 #[pg_extern]
 fn accept_date_round_trip(d: Date) -> Date {
-    match TryInto::<time::Date>::try_into(d) {
-        Ok(date) => date.into(),
-        Err(pg_epoch_days) => Date::from_pg_epoch_days(pg_epoch_days.as_i32()),
-    }
+    d
 }
 
 #[pg_extern]
@@ -36,7 +33,7 @@ fn accept_time_with_time_zone(t: TimeWithTimeZone) -> TimeWithTimeZone {
 
 #[pg_extern]
 fn convert_timetz_to_time(t: TimeWithTimeZone) -> Time {
-    t.to_utc().into()
+    t.into()
 }
 
 #[pg_extern]
@@ -117,6 +114,7 @@ mod tests {
     #[allow(unused_imports)]
     use crate as pgrx_tests;
 
+    use pgrx::get_timezone_offset;
     use pgrx::prelude::*;
     use serde_json::*;
     use std::result::Result;
@@ -151,13 +149,10 @@ mod tests {
     #[pg_test]
     #[allow(deprecated)]
     fn test_time_with_timezone_serialization() {
-        let time_with_timezone = TimeWithTimeZone::new(
-            time::Time::from_hms(12, 23, 34).unwrap(),
-            time::UtcOffset::from_hms(2, 0, 0).unwrap(),
-        );
+        let time_with_timezone = TimeWithTimeZone::with_timezone(12, 23, 34.0, "CEST").unwrap();
         let json = json!({ "time W/ Zone test": time_with_timezone });
 
-        let (h, ..) = time_with_timezone.to_utc().to_hms_micro();
+        let (h, ..) = time_with_timezone.at_timezone("UTC").unwrap().to_hms_micro();
         assert_eq!(10, h);
 
         // however Postgres wants to format it is fine by us
@@ -511,5 +506,23 @@ mod tests {
             Err(IntervalConversionError::DurationMonthsOutOfBounds) => (),
             _ => panic!("invalid duration -> interval conversion succeeded"),
         };
+    }
+
+    #[pg_test]
+    fn test_timezone_offset_cest() {
+        assert_eq!(Ok(7200), get_timezone_offset("CEST"))
+    }
+
+    #[pg_test]
+    fn test_timezone_offset_edt() {
+        assert_eq!(Ok(-14400), get_timezone_offset("US/Eastern"))
+    }
+
+    #[pg_test]
+    fn test_timezone_offset_unknown() {
+        assert_eq!(
+            Err(PgSqlErrorCode::ERRCODE_INVALID_PARAMETER_VALUE),
+            get_timezone_offset("UNKNOWN TIMEZONE")
+        )
     }
 }

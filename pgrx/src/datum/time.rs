@@ -7,21 +7,53 @@ All rights reserved.
 Use of this source code is governed by the MIT license that can be found in the LICENSE file.
 */
 
-use crate::{pg_sys, FromDatum, FromTimeError, IntoDatum};
+use crate::datum::datetime_support::*;
+use crate::{direct_function_call, pg_sys, FromDatum, IntoDatum, TimeWithTimeZone};
+use pgrx_pg_sys::errcodes::PgSqlErrorCode;
+use pgrx_pg_sys::PgTryBuilder;
 use pgrx_sql_entity_graph::metadata::{
     ArgumentError, Returns, ReturnsError, SqlMapping, SqlTranslatable,
 };
+use std::num::TryFromIntError;
 
-const MINS_PER_HOUR: u64 = 60;
-const SEC_PER_MIN: u64 = 60;
-pub(crate) const USECS_PER_SEC: u64 = 1_000_000;
-pub(crate) const USECS_PER_MINUTE: u64 = USECS_PER_SEC * SEC_PER_MIN;
-pub(crate) const USECS_PER_HOUR: u64 = USECS_PER_MINUTE * MINS_PER_HOUR;
-pub(crate) const USECS_PER_DAY: u64 = USECS_PER_HOUR * 24;
+pub(crate) const USECS_PER_SEC: i64 = 1_000_000;
 
-#[derive(Debug, Clone, PartialEq)]
+#[derive(Debug, Clone, Copy)]
 #[repr(transparent)]
-pub struct Time(pub u64 /* Microseconds since midnight */);
+pub struct Time(pub pg_sys::TimeADT);
+
+impl From<pg_sys::TimeADT> for Time {
+    #[inline]
+    fn from(value: pg_sys::TimeADT) -> Self {
+        Time(value)
+    }
+}
+
+impl From<Time> for pg_sys::TimeADT {
+    #[inline]
+    fn from(value: Time) -> Self {
+        value.0
+    }
+}
+
+impl From<TimeWithTimeZone> for Time {
+    #[inline]
+    fn from(value: TimeWithTimeZone) -> Self {
+        // timezone gets dropped
+        Time(value.0.time)
+    }
+}
+
+impl TryFrom<pg_sys::Datum> for Time {
+    type Error = TryFromIntError;
+
+    #[inline]
+    fn try_from(d: pg_sys::Datum) -> Result<Self, Self::Error> {
+        let t: pg_sys::TimeADT = d.value().try_into()?;
+        Ok(Time(t))
+    }
+}
+
 impl FromDatum for Time {
     #[inline]
     unsafe fn from_polymorphic_datum(
@@ -32,7 +64,7 @@ impl FromDatum for Time {
         if is_null {
             None
         } else {
-            Some(Time(datum.value() as _))
+            Some(datum.try_into().expect("Error converting time datum"))
         }
     }
 }
@@ -40,9 +72,7 @@ impl FromDatum for Time {
 impl IntoDatum for Time {
     #[inline]
     fn into_datum(self) -> Option<pg_sys::Datum> {
-        let datum = pg_sys::Datum::try_from(self.0).unwrap();
-
-        Some(datum)
+        Some(pg_sys::Datum::from(self.0))
     }
 
     fn type_oid() -> pg_sys::Oid {
@@ -53,54 +83,56 @@ impl IntoDatum for Time {
 impl Time {
     pub const ALLBALLS: Self = Time(0);
 
-    pub fn from_hms_micro(h: u8, m: u8, s: u8, micro: u32) -> Result<Time, FromTimeError> {
-        match (h, m, s, micro) {
-            (24, 0, 0, 0) => Ok(Time(u64::from(h) * USECS_PER_HOUR)),
-            (24.., _, _, _) => Err(FromTimeError::HoursOutOfBounds),
-            (_, 60.., _, _) => Err(FromTimeError::MinutesOutOfBounds),
-            (_, _, 60.., _) => Err(FromTimeError::SecondsOutOfBounds),
-            (0..=23, 0..=59, 0..=59, _) => {
-                let t = u64::from(h) * USECS_PER_HOUR
-                    + u64::from(m) * USECS_PER_MINUTE
-                    + u64::from(s) * USECS_PER_SEC
-                    + u64::from(micro);
-                if t > USECS_PER_DAY {
-                    Err(FromTimeError::MicrosOutOfBounds)
-                } else {
-                    Ok(Time(t))
-                }
-            }
+    pub fn new(hour: u8, minute: u8, second: f64) -> Result<Time, PgSqlErrorCode> {
+        PgTryBuilder::new(|| unsafe {
+            let hour = hour as i32;
+            let minute = minute as i32;
+            Ok(direct_function_call(
+                pg_sys::make_time,
+                &[hour.into_datum(), minute.into_datum(), second.into_datum()],
+            )
+            .unwrap())
+        })
+        .catch_when(PgSqlErrorCode::ERRCODE_DATETIME_FIELD_OVERFLOW, |_| {
+            Err(PgSqlErrorCode::ERRCODE_DATETIME_FIELD_OVERFLOW)
+        })
+        .catch_when(PgSqlErrorCode::ERRCODE_INVALID_DATETIME_FORMAT, |_| {
+            Err(PgSqlErrorCode::ERRCODE_INVALID_DATETIME_FORMAT)
+        })
+        .execute()
+    }
+
+    pub fn new_unchecked(hour: u8, minute: u8, second: f64) -> Time {
+        let hour: i32 = hour.try_into().expect("invalid hour");
+        let minute: i32 = minute.try_into().expect("invalid minute");
+
+        unsafe {
+            direct_function_call(
+                pg_sys::make_time,
+                &[hour.into_datum(), minute.into_datum(), second.into_datum()],
+            )
+            .unwrap()
         }
     }
 
-    /// To hours, minutes, seconds, and microseconds.
-    pub fn to_hms_micro(self) -> (u8, u8, u8, u32) {
-        let mut time = self.0;
-        let hour = time / USECS_PER_HOUR;
-        time -= hour * USECS_PER_HOUR;
-
-        let min = time / USECS_PER_MINUTE;
-        time -= min * USECS_PER_MINUTE;
-
-        let sec = time / USECS_PER_SEC;
-        time -= sec * USECS_PER_SEC;
-
-        let hour = u8::try_from(hour).unwrap();
-        let min = u8::try_from(min).unwrap();
-        let sec = u8::try_from(sec).unwrap();
-        let micro = u32::try_from(time).unwrap();
-        (hour, min, sec, micro)
+    pub fn hour(&self) -> u8 {
+        self.extract_part(DateTimeParts::Hour).unwrap().try_into().unwrap()
     }
-}
 
-#[cfg(feature = "time-crate")]
-mod with_time_crate {
-    impl TryFrom<time::Time> for crate::Time {
-        type Error = crate::FromTimeError;
-        fn try_from(t: time::Time) -> Result<crate::Time, Self::Error> {
-            let (h, m, s, micro) = t.as_hms_micro();
-            Self::from_hms_micro(h, m, s, micro)
-        }
+    pub fn minute(&self) -> u8 {
+        self.extract_part(DateTimeParts::Minute).unwrap().try_into().unwrap()
+    }
+
+    pub fn second(&self) -> f64 {
+        self.extract_part(DateTimeParts::Second).unwrap().try_into().unwrap()
+    }
+
+    pub fn microseconds(&self) -> u32 {
+        self.extract_part(DateTimeParts::Microseconds).unwrap().try_into().unwrap()
+    }
+
+    pub fn to_hms_micro(&self) -> (u8, u8, u8, u32) {
+        (self.hour(), self.minute(), self.second() as u8, self.microseconds())
     }
 }
 
@@ -112,9 +144,7 @@ impl serde::Serialize for Time {
     where
         S: serde::Serializer,
     {
-        let cstr: Option<&core::ffi::CStr> =
-            unsafe { crate::direct_function_call(pg_sys::time_out, &[self.clone().into_datum()]) };
-        serializer.serialize_str(cstr.and_then(|c| c.to_str().ok()).unwrap())
+        serializer.serialize_str(&self.to_string())
     }
 }
 
