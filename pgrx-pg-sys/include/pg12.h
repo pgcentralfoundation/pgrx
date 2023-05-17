@@ -121,6 +121,7 @@ Use of this source code is governed by the MIT license that can be found in the 
 #include "utils/geo_decls.h"
 #include "utils/guc.h"
 #include "utils/json.h"
+#include "utils/jsonapi.h"
 #include "utils/jsonb.h"
 #include "utils/lsyscache.h"
 #include "utils/memutils.h"

@@ -192,6 +192,13 @@ pub trait ToIsoString: IntoDatum + Sized + Display {
             self.to_string()
         } else {
             unsafe {
+                #[cfg(any(feature = "pg11", feature = "pg12"))]
+                let jsonb = pg_sys::JsonEncodeDateTime(
+                    std::ptr::null_mut(),
+                    self.into_datum().unwrap(),
+                    Self::type_oid(),
+                );
+                #[cfg(any(feature = "pg13", feature = "pg14", feature = "pg15"))]
                 let jsonb = pg_sys::JsonEncodeDateTime(
                     std::ptr::null_mut(),
                     self.into_datum().unwrap(),
