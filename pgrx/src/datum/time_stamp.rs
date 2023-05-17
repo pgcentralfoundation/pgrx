@@ -38,24 +38,24 @@ impl From<(Date, Time)> for Timestamp {
     }
 }
 
+impl From<Date> for Timestamp {
+    fn from(value: Date) -> Self {
+        unsafe { direct_function_call(pg_sys::date_timestamp, &[value.into_datum()]).unwrap() }
+    }
+}
+
+impl From<TimestampWithTimeZone> for Timestamp {
+    fn from(value: TimestampWithTimeZone) -> Self {
+        unsafe {
+            direct_function_call(pg_sys::timestamptz_timestamp, &[value.into_datum()]).unwrap()
+        }
+    }
+}
+
 impl From<Timestamp> for i64 {
     #[inline]
     fn from(ts: Timestamp) -> Self {
         ts.0
-    }
-}
-
-impl TryFrom<TimestampWithTimeZone> for Timestamp {
-    type Error = PgSqlErrorCode;
-
-    fn try_from(value: TimestampWithTimeZone) -> Result<Self, Self::Error> {
-        PgTryBuilder::new(|| unsafe {
-            Ok(direct_function_call(pg_sys::timestamptz_timestamp, &[value.into_datum()]).unwrap())
-        })
-        .catch_when(PgSqlErrorCode::ERRCODE_DATETIME_FIELD_OVERFLOW, |_| {
-            Err(PgSqlErrorCode::ERRCODE_DATETIME_FIELD_OVERFLOW)
-        })
-        .execute()
     }
 }
 

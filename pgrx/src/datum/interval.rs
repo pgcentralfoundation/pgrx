@@ -7,7 +7,7 @@ All rights reserved.
 Use of this source code is governed by the MIT license that can be found in the LICENSE file.
 */
 
-use crate::{direct_function_call, pg_sys, FromDatum, IntoDatum};
+use crate::{direct_function_call, pg_sys, FromDatum, IntoDatum, Time};
 use pgrx_sql_entity_graph::metadata::{
     ArgumentError, Returns, ReturnsError, SqlMapping, SqlTranslatable,
 };
@@ -227,6 +227,12 @@ impl TryFrom<std::time::Duration> for Interval {
             leftover_days.try_into().expect("bad math during Duration to Interval days"),
             leftover_microseconds.try_into().expect("bad math during Duration to Interval micros"),
         )
+    }
+}
+
+impl From<Time> for Interval {
+    fn from(value: Time) -> Self {
+        unsafe { direct_function_call(pg_sys::time_interval, &[value.into_datum()]).unwrap() }
     }
 }
 

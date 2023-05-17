@@ -8,7 +8,10 @@ Use of this source code is governed by the MIT license that can be found in the 
 */
 
 use crate::datum::datetime_support::*;
-use crate::{direct_function_call, pg_sys, FromDatum, IntoDatum, TimeWithTimeZone};
+use crate::{
+    direct_function_call, pg_sys, FromDatum, Interval, IntoDatum, TimeWithTimeZone, Timestamp,
+    TimestampWithTimeZone,
+};
 use pgrx_pg_sys::errcodes::PgSqlErrorCode;
 use pgrx_pg_sys::PgTryBuilder;
 use pgrx_sql_entity_graph::metadata::{
@@ -34,11 +37,28 @@ impl From<Time> for pg_sys::TimeADT {
     }
 }
 
-impl From<TimeWithTimeZone> for Time {
+impl From<Timestamp> for Time {
+    fn from(value: Timestamp) -> Self {
+        unsafe { direct_function_call(pg_sys::timestamp_time, &[value.into_datum()]).unwrap() }
+    }
+}
+
+impl From<TimestampWithTimeZone> for Time {
     #[inline]
+    fn from(value: TimestampWithTimeZone) -> Self {
+        unsafe { direct_function_call(pg_sys::timestamptz_time, &[value.into_datum()]).unwrap() }
+    }
+}
+
+impl From<Interval> for Time {
+    fn from(value: Interval) -> Self {
+        unsafe { direct_function_call(pg_sys::interval_time, &[value.into_datum()]).unwrap() }
+    }
+}
+
+impl From<TimeWithTimeZone> for Time {
     fn from(value: TimeWithTimeZone) -> Self {
-        // timezone gets dropped
-        Time(value.0.time)
+        unsafe { direct_function_call(pg_sys::timetz_time, &[value.into_datum()]).unwrap() }
     }
 }
 

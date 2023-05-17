@@ -11,7 +11,7 @@ use crate::datetime_support::{DateTimeParts, HasExtractableParts};
 use crate::datum::time::Time;
 use crate::{
     direct_function_call, direct_function_call_as_datum, pg_sys, FromDatum, Interval, IntoDatum,
-    PgMemoryContexts,
+    PgMemoryContexts, TimestampWithTimeZone,
 };
 use pgrx_pg_sys::errcodes::PgSqlErrorCode;
 use pgrx_pg_sys::PgTryBuilder;
@@ -49,6 +49,12 @@ impl From<(pg_sys::TimeADT, i32)> for TimeWithTimeZone {
     #[inline]
     fn from(value: (pg_sys::TimeADT, i32)) -> Self {
         TimeWithTimeZone { 0: pg_sys::TimeTzADT { time: value.0, zone: value.1 } }
+    }
+}
+
+impl From<TimestampWithTimeZone> for TimeWithTimeZone {
+    fn from(value: TimestampWithTimeZone) -> Self {
+        unsafe { direct_function_call(pg_sys::timestamptz_timetz, &[value.into_datum()]).unwrap() }
     }
 }
 

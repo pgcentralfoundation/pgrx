@@ -15,7 +15,7 @@ use pgrx_sql_entity_graph::metadata::{
 };
 
 use crate::datetime_support::{DateTimeParts, HasExtractableParts};
-use crate::{direct_function_call, pg_sys, FromDatum, IntoDatum};
+use crate::{direct_function_call, pg_sys, FromDatum, IntoDatum, Timestamp, TimestampWithTimeZone};
 
 pub const POSTGRES_EPOCH_JDATE: i32 = pg_sys::POSTGRES_EPOCH_JDATE as i32;
 pub const UNIX_EPOCH_JDATE: i32 = pg_sys::UNIX_EPOCH_JDATE as i32;
@@ -35,6 +35,18 @@ impl From<Date> for pg_sys::DateADT {
     #[inline]
     fn from(value: Date) -> Self {
         value.0
+    }
+}
+
+impl From<Timestamp> for Date {
+    fn from(value: Timestamp) -> Self {
+        unsafe { direct_function_call(pg_sys::timestamp_date, &[value.into_datum()]).unwrap() }
+    }
+}
+
+impl From<TimestampWithTimeZone> for Date {
+    fn from(value: TimestampWithTimeZone) -> Self {
+        unsafe { direct_function_call(pg_sys::timestamptz_date, &[value.into_datum()]).unwrap() }
     }
 }
 

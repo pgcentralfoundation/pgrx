@@ -8,7 +8,7 @@ Use of this source code is governed by the MIT license that can be found in the 
 */
 
 use crate::{
-    direct_function_call, pg_sys, DateTimeParts, FromDatum, HasExtractableParts, IntoDatum,
+    direct_function_call, pg_sys, Date, DateTimeParts, FromDatum, HasExtractableParts, IntoDatum,
     Timestamp,
 };
 use core::ffi::CStr;
@@ -44,6 +44,20 @@ impl TryFrom<pg_sys::Datum> for TimestampWithTimeZone {
     type Error = FromTimeError;
     fn try_from(datum: pg_sys::Datum) -> Result<Self, Self::Error> {
         (datum.value() as pg_sys::TimestampTz).try_into()
+    }
+}
+
+impl From<Date> for TimestampWithTimeZone {
+    fn from(value: Date) -> Self {
+        unsafe { direct_function_call(pg_sys::date_timestamptz, &[value.into_datum()]).unwrap() }
+    }
+}
+
+impl From<Timestamp> for TimestampWithTimeZone {
+    fn from(value: Timestamp) -> Self {
+        unsafe {
+            direct_function_call(pg_sys::timestamp_timestamptz, &[value.into_datum()]).unwrap()
+        }
     }
 }
 
