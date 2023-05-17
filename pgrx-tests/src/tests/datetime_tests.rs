@@ -129,7 +129,7 @@ mod tests {
         assert_eq!(10, h);
 
         // however Postgres wants to format it is fine by us
-        assert_eq!(json!({"time W/ Zone test":"12:23:34+02"}), json);
+        assert_eq!(json!({"time W/ Zone test":"12:23:34+02:00"}), json);
     }
 
     #[pg_test]

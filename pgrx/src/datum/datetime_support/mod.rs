@@ -8,6 +8,7 @@ use pgrx_pg_sys::errcodes::PgSqlErrorCode;
 use pgrx_pg_sys::{pg_tz, PgTryBuilder};
 use std::cmp::Ordering;
 use std::hash::{Hash, Hasher};
+use std::marker::PhantomData;
 
 mod ops;
 pub use ops::*;
@@ -184,6 +185,29 @@ pub trait HasExtractableParts: Clone + IntoDatum {
     }
 }
 
+pub trait ToIsoString: IntoDatum + Sized + Display {
+    fn to_iso_string(self) -> String {
+        if Self::type_oid() == pg_sys::INTERVALOID {
+            // `Interval` is just represented in its string form
+            self.to_string()
+        } else {
+            unsafe {
+                let jsonb = pg_sys::JsonEncodeDateTime(
+                    std::ptr::null_mut(),
+                    self.into_datum().unwrap(),
+                    Self::type_oid(),
+                    std::ptr::null(),
+                );
+                let cstr = core::ffi::CStr::from_ptr(jsonb);
+                let as_string = cstr.to_str().unwrap().to_string();
+                pg_sys::pfree(jsonb.cast());
+
+                as_string
+            }
+        }
+    }
+}
+
 macro_rules! impl_wrappers {
     ($ty:ty, $eq_fn:path, $cmp_fn:path, $hash_fn:path, $extract_fn:path, $input_fn:path, $output_fn:path) => {
         impl Eq for $ty {}
@@ -230,6 +254,8 @@ macro_rules! impl_wrappers {
             const EXTRACT_FUNCTION: unsafe fn(pg_sys::FunctionCallInfo) -> pg_sys::Datum =
                 $extract_fn;
         }
+
+        impl ToIsoString for $ty {}
 
         impl FromStr for $ty {
             type Err = PgSqlErrorCode;
@@ -467,5 +493,39 @@ pub fn get_timezone_offset<Tz: AsRef<str>>(zone: Tz) -> Result<i32, PgSqlErrorCo
             }
         }
         Ok(-tz)
+    }
+}
+
+pub(crate) struct FromStrVisitor<T>(PhantomData<T>);
+
+impl<T> FromStrVisitor<T> {
+    pub fn new() -> Self {
+        FromStrVisitor(PhantomData)
+    }
+}
+
+impl<'a, T: FromStr> serde::de::Visitor<'a> for FromStrVisitor<T> {
+    type Value = T;
+
+    fn expecting(&self, formatter: &mut alloc::fmt::Formatter) -> alloc::fmt::Result {
+        formatter.write_str("a borrowed string")
+    }
+
+    fn visit_borrowed_str<E>(self, v: &'a str) -> Result<Self::Value, E>
+    where
+        E: serde::de::Error,
+    {
+        T::from_str(v).map_err(|_| {
+            serde::de::Error::invalid_value(serde::de::Unexpected::Other("invalid value"), &self)
+        })
+    }
+
+    fn visit_borrowed_bytes<E>(self, v: &'a [u8]) -> Result<Self::Value, E>
+    where
+        E: serde::de::Error,
+    {
+        let s = std::str::from_utf8(v)
+            .map_err(|_| serde::de::Error::invalid_value(serde::de::Unexpected::Bytes(v), &self))?;
+        self.visit_borrowed_str(s)
     }
 }

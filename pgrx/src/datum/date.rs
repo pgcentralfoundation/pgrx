@@ -15,7 +15,10 @@ use pgrx_sql_entity_graph::metadata::{
 };
 
 use crate::datetime_support::{DateTimeParts, HasExtractableParts};
-use crate::{direct_function_call, pg_sys, FromDatum, IntoDatum, Timestamp, TimestampWithTimeZone};
+use crate::{
+    direct_function_call, pg_sys, FromDatum, IntoDatum, Timestamp, TimestampWithTimeZone,
+    ToIsoString,
+};
 
 pub const POSTGRES_EPOCH_JDATE: i32 = pg_sys::POSTGRES_EPOCH_JDATE as i32;
 pub const UNIX_EPOCH_JDATE: i32 = pg_sys::UNIX_EPOCH_JDATE as i32;
@@ -183,39 +186,18 @@ impl serde::Serialize for Date {
     where
         S: serde::Serializer,
     {
-        let cstr;
-        assert!(pg_sys::MAXDATELEN > 0); // free at runtime
-        const BUF_LEN: usize = pg_sys::MAXDATELEN as usize * 2;
-        let mut buffer = [0u8; BUF_LEN];
-        let buf = buffer.as_mut_slice().as_mut_ptr().cast::<libc::c_char>();
-        // SAFETY: This provides a quite-generous writing pad to Postgres
-        // and Postgres has promised to use far less than this.
-        unsafe {
-            match self.0 {
-                Self::NEG_INFINITY | Self::INFINITY => {
-                    pg_sys::EncodeSpecialDate(self.0, buf);
-                }
-                _ => {
-                    let mut pg_tm: pg_sys::pg_tm = Default::default();
-                    pg_sys::j2date(
-                        &self.0 + POSTGRES_EPOCH_JDATE,
-                        &mut pg_tm.tm_year,
-                        &mut pg_tm.tm_mon,
-                        &mut pg_tm.tm_mday,
-                    );
-                    pg_sys::EncodeDateOnly(&mut pg_tm, pg_sys::USE_XSD_DATES as i32, buf)
-                }
-            }
-            assert!(buffer[BUF_LEN - 1] == 0);
-            cstr = core::ffi::CStr::from_ptr(buf);
-        }
-
-        /* This unwrap is fine as Postgres won't ever write invalid UTF-8,
-           because Postgres only writes ASCII
-        */
         serializer
-            .serialize_str(cstr.to_str().unwrap())
-            .map_err(|e| serde::ser::Error::custom(format!("Date formatting problem: {:?}", e)))
+            .serialize_str(&self.to_iso_string())
+            .map_err(|e| serde::ser::Error::custom(format!("formatting problem: {:?}", e)))
+    }
+}
+
+impl<'de> serde::Deserialize<'de> for Date {
+    fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
+    where
+        D: serde::de::Deserializer<'de>,
+    {
+        deserializer.deserialize_str(crate::FromStrVisitor::<Self>::new())
     }
 }
 

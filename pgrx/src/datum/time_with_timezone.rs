@@ -11,7 +11,7 @@ use crate::datetime_support::{DateTimeParts, HasExtractableParts};
 use crate::datum::time::Time;
 use crate::{
     direct_function_call, direct_function_call_as_datum, pg_sys, FromDatum, Interval, IntoDatum,
-    PgMemoryContexts, TimestampWithTimeZone,
+    PgMemoryContexts, TimestampWithTimeZone, ToIsoString,
 };
 use pgrx_pg_sys::errcodes::PgSqlErrorCode;
 use pgrx_pg_sys::PgTryBuilder;
@@ -230,7 +230,18 @@ impl serde::Serialize for TimeWithTimeZone {
     where
         S: serde::Serializer,
     {
-        serializer.serialize_str(&self.to_string())
+        serializer
+            .serialize_str(&self.to_iso_string())
+            .map_err(|e| serde::ser::Error::custom(format!("formatting problem: {:?}", e)))
+    }
+}
+
+impl<'de> serde::Deserialize<'de> for TimeWithTimeZone {
+    fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
+    where
+        D: serde::de::Deserializer<'de>,
+    {
+        deserializer.deserialize_str(crate::FromStrVisitor::<Self>::new())
     }
 }
 

@@ -163,7 +163,18 @@ impl serde::Serialize for Time {
     where
         S: serde::Serializer,
     {
-        serializer.serialize_str(&self.to_string())
+        serializer
+            .serialize_str(&self.to_iso_string())
+            .map_err(|e| serde::ser::Error::custom(format!("formatting problem: {:?}", e)))
+    }
+}
+
+impl<'de> serde::Deserialize<'de> for Time {
+    fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
+    where
+        D: serde::de::Deserializer<'de>,
+    {
+        deserializer.deserialize_str(crate::FromStrVisitor::<Self>::new())
     }
 }
 

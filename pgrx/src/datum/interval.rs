@@ -7,7 +7,7 @@ All rights reserved.
 Use of this source code is governed by the MIT license that can be found in the LICENSE file.
 */
 
-use crate::{direct_function_call, pg_sys, FromDatum, IntoDatum, Time};
+use crate::{direct_function_call, pg_sys, FromDatum, IntoDatum, Time, ToIsoString};
 use pgrx_sql_entity_graph::metadata::{
     ArgumentError, Returns, ReturnsError, SqlMapping, SqlTranslatable,
 };
@@ -255,14 +255,27 @@ impl TryFrom<Interval> for std::time::Duration {
 }
 
 impl serde::Serialize for Interval {
-    fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
+    fn serialize<S>(
+        &self,
+        serializer: S,
+    ) -> std::result::Result<<S as serde::Serializer>::Ok, <S as serde::Serializer>::Error>
     where
         S: serde::Serializer,
     {
-        serializer.serialize_str(&format!("{}", self))
+        serializer
+            .serialize_str(&self.to_iso_string())
+            .map_err(|e| serde::ser::Error::custom(format!("formatting problem: {:?}", e)))
     }
 }
 
+impl<'de> serde::Deserialize<'de> for Interval {
+    fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
+    where
+        D: serde::de::Deserializer<'de>,
+    {
+        deserializer.deserialize_str(crate::FromStrVisitor::<Self>::new())
+    }
+}
 unsafe impl SqlTranslatable for Interval {
     fn argument_sql() -> Result<SqlMapping, ArgumentError> {
         Ok(SqlMapping::literal("interval"))
