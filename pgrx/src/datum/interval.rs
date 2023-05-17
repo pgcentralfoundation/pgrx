@@ -8,7 +8,6 @@ Use of this source code is governed by the MIT license that can be found in the 
 */
 
 use crate::{direct_function_call, pg_sys, FromDatum, IntoDatum};
-use pgrx_pg_sys::warning;
 use pgrx_sql_entity_graph::metadata::{
     ArgumentError, Returns, ReturnsError, SqlMapping, SqlTranslatable,
 };
@@ -42,6 +41,81 @@ impl Interval {
         Ok(Interval(pg_sys::Interval { time: micros, day: days, month: months }))
     }
 
+    pub fn from_years(years: i32) -> Self {
+        Self::from(Some(years), None, None, None, None, None, None).unwrap()
+    }
+
+    pub fn from_months(months: i32) -> Self {
+        Self::from(None, Some(months), None, None, None, None, None).unwrap()
+    }
+
+    pub fn from_weeks(weeks: i32) -> Self {
+        Self::from(None, None, Some(weeks), None, None, None, None).unwrap()
+    }
+
+    pub fn from_days(days: i32) -> Self {
+        Self::from(None, None, None, Some(days), None, None, None).unwrap()
+    }
+
+    pub fn from_hours(hours: i32) -> Self {
+        Self::from(None, None, None, None, Some(hours), None, None).unwrap()
+    }
+
+    pub fn from_minutes(minutes: i32) -> Self {
+        Self::from(None, None, None, None, None, Some(minutes), None).unwrap()
+    }
+
+    pub fn from_seconds(seconds: f64) -> Self {
+        Self::from(None, None, None, None, None, None, Some(seconds)).unwrap()
+    }
+
+    pub fn from_micros(microseconds: i64) -> Self {
+        Self::from_seconds(microseconds as f64 / 1_000_000.0)
+    }
+
+    pub fn from(
+        years: Option<i32>,
+        months: Option<i32>,
+        weeks: Option<i32>,
+        days: Option<i32>,
+        hours: Option<i32>,
+        minutes: Option<i32>,
+        seconds: Option<f64>,
+    ) -> Result<Self, IntervalConversionError> {
+        match (years.unwrap_or_default() <= 0
+            && months.unwrap_or_default() <= 0
+            && weeks.unwrap_or_default() <= 0
+            && days.unwrap_or_default() <= 0
+            && hours.unwrap_or_default() <= 0
+            && minutes.unwrap_or_default() <= 0
+            && seconds.unwrap_or_default().is_sign_negative())
+            || (years.unwrap_or_default() >= 0
+                && months.unwrap_or_default() >= 0
+                && weeks.unwrap_or_default() >= 0
+                && days.unwrap_or_default() >= 0
+                && hours.unwrap_or_default() >= 0
+                && minutes.unwrap_or_default() >= 0
+                && seconds.unwrap_or_default().is_sign_positive())
+        {
+            true => unsafe {
+                Ok(direct_function_call(
+                    pg_sys::make_interval,
+                    &[
+                        years.into_datum(),
+                        months.into_datum(),
+                        weeks.into_datum(),
+                        days.into_datum(),
+                        hours.into_datum(),
+                        minutes.into_datum(),
+                        seconds.into_datum(),
+                    ],
+                )
+                .unwrap())
+            },
+            false => Err(IntervalConversionError::MismatchedSigns),
+        }
+    }
+
     /// Total number of months before/after 2000-01-01
     #[inline]
     pub fn months(&self) -> i32 {
@@ -61,7 +135,7 @@ impl Interval {
     }
 
     #[inline]
-    pub fn total_micros(&self) -> i128 {
+    pub fn as_micros(&self) -> i128 {
         self.micros() as i128
             + self.months() as i128 * pg_sys::DAYS_PER_MONTH as i128 * USECS_PER_DAY as i128
             + self.days() as i128 * USECS_PER_DAY as i128
@@ -95,6 +169,11 @@ impl Interval {
     #[inline]
     pub fn is_negative(self) -> bool {
         self.0.month < 0 || self.0.day < 0 || self.0.time < 0
+    }
+
+    #[inline]
+    pub(crate) unsafe fn as_datum(&self) -> Option<pg_sys::Datum> {
+        Some(pg_sys::Datum::from(&self.0 as *const _))
     }
 }
 
@@ -143,7 +222,6 @@ impl TryFrom<std::time::Duration> for Interval {
             - (leftover_days * USECS_PER_DAY as u128
                 + (months * pg_sys::DAYS_PER_MONTH as u128 * USECS_PER_DAY as u128));
 
-        warning!("{}: {months} {leftover_days} {leftover_microseconds}", microseconds);
         Interval::new(
             months.try_into().map_err(|_| IntervalConversionError::DurationMonthsOutOfBounds)?,
             leftover_days.try_into().expect("bad math during Duration to Interval days"),

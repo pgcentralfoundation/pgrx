@@ -9,6 +9,9 @@ use pgrx_pg_sys::{pg_tz, PgTryBuilder};
 use std::cmp::Ordering;
 use std::hash::{Hash, Hasher};
 
+mod ops;
+pub use ops::*;
+
 #[derive(Debug, Copy, Clone, Eq, PartialEq)]
 pub enum DateTimeParts {
     /// The century
@@ -238,8 +241,15 @@ macro_rules! impl_wrappers {
                 let cstr_datum = pg_sys::Datum::from(cstr);
                 unsafe {
                     let result = PgTryBuilder::new(|| {
-                        let result =
-                            direct_function_call::<$ty>($input_fn, &[Some(cstr_datum)]).unwrap();
+                        let result = direct_function_call::<$ty>(
+                            $input_fn,
+                            &[
+                                Some(cstr_datum),
+                                pgrx_pg_sys::InvalidOid.into_datum(),
+                                (-1i32).into_datum(),
+                            ],
+                        )
+                        .unwrap();
                         Ok(result)
                     })
                     .catch_when(PgSqlErrorCode::ERRCODE_DATETIME_FIELD_OVERFLOW, |_| {

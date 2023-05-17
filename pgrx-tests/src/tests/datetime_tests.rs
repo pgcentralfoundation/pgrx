@@ -92,9 +92,10 @@ mod tests {
     use crate as pgrx_tests;
 
     use pgrx::prelude::*;
-    use pgrx::{get_timezone_offset, IntervalConversionError, USECS_PER_DAY};
+    use pgrx::{get_timezone_offset, IntervalConversionError};
     use serde_json::*;
     use std::result::Result;
+    use std::str::FromStr;
     use std::time::Duration;
 
     #[pg_test]
@@ -399,6 +400,18 @@ mod tests {
         Ok(())
     }
 
+    #[rustfmt::skip]
+    #[pg_test]
+    fn test_from_str() -> Result<(), Box<dyn std::error::Error>> {
+        assert_eq!(Time::new(12, 0, 0.0)?, Time::from_str("12:00:00")?);
+        assert_eq!(TimeWithTimeZone::with_timezone(12, 0, 0.0, "UTC")?, TimeWithTimeZone::from_str("12:00:00 UTC")?);
+        assert_eq!(Date::new(2023, 5, 13)?, Date::from_str("2023-5-13")?);
+        assert_eq!(Timestamp::new(2023, 5, 13, 4, 56, 42.0)?, Timestamp::from_str("2023-5-13 04:56:42")?);
+        assert_eq!(TimestampWithTimeZone::new(2023, 5, 13, 4, 56, 42.0)?, TimestampWithTimeZone::from_str("2023-5-13 04:56:42")?);
+        assert_eq!(Interval::from_months(1), Interval::from_str("1 month")?);
+        Ok(())
+    }
+
     #[pg_test]
     fn test_accept_interval_random() {
         let result = Spi::get_one::<bool>("SELECT accept_interval(interval'1 year 2 months 3 days 4 hours 5 minutes 6 seconds') = interval'1 year 2 months 3 days 4 hours 5 minutes 6 seconds';")
@@ -482,7 +495,7 @@ mod tests {
     #[pg_test]
     fn test_interval_to_duration_conversion() {
         let i = Interval::new(42, 6, 3).unwrap();
-        let i_micros = i.total_micros();
+        let i_micros = i.as_micros();
         let d: Duration = i.try_into().unwrap();
 
         assert_eq!(i_micros as u128, d.as_micros())
@@ -514,5 +527,49 @@ mod tests {
         assert_eq!(i.months(), 3);
         assert_eq!(i.days(), 5);
         assert_eq!(i.micros(), 22_000_000); // 22 seconds
+    }
+
+    #[pg_test]
+    fn test_interval_from_seconds() {
+        let i = Interval::from_seconds(32768.0);
+        assert_eq!("09:06:08", &i.to_string());
+
+        let i = Interval::from_str("32768 seconds");
+        assert_eq!(i, Ok(Interval::from_seconds(32768.0)))
+    }
+
+    #[pg_test]
+    fn test_interval_from_mismatched_signes() {
+        let i = Interval::from(Some(1), Some(-2), None, None, None, None, None);
+        assert_eq!(i, Err(IntervalConversionError::MismatchedSigns))
+    }
+
+    #[pg_test]
+    fn test_add_date_time() -> Result<(), Box<dyn std::error::Error>> {
+        let date = Date::new(1978, 5, 13)?;
+        let time = Time::new(13, 33, 42.0)?;
+        let ts = date + time;
+        assert_eq!(&ts.to_string(), "1978-05-13 13:33:42");
+        assert_eq!(ts, Timestamp::new(1978, 5, 13, 13, 33, 42.0)?);
+        Ok(())
+    }
+
+    #[pg_test]
+    fn test_add_time_interval() -> Result<(), Box<dyn std::error::Error>> {
+        let time = Time::new(13, 33, 42.0)?;
+        let i = Interval::from_seconds(27.0);
+        let time = time + i;
+        assert_eq!(time, Time::new(13, 34, 9.0)?);
+        Ok(())
+    }
+
+    #[pg_test]
+    fn test_add_intervals() -> Result<(), Box<dyn std::error::Error>> {
+        let b = Interval::from_months(6);
+        let c = Interval::from_days(15);
+        let a = Interval::from_micros(42);
+        let result = a + b + c;
+        assert_eq!(result, Interval::new(6, 15, 42)?);
+        Ok(())
     }
 }
