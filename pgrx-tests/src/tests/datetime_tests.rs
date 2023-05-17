@@ -539,7 +539,7 @@ mod tests {
     }
 
     #[pg_test]
-    fn test_interval_from_mismatched_signes() {
+    fn test_interval_from_mismatched_signs() {
         let i = Interval::from(Some(1), Some(-2), None, None, None, None, None);
         assert_eq!(i, Err(IntervalConversionError::MismatchedSigns))
     }
