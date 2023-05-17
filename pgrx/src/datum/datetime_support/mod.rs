@@ -162,6 +162,10 @@ impl IntoDatum for DateTimeParts {
     }
 }
 
+mod seal {
+    pub trait DateTimeType {}
+}
+
 pub trait HasExtractableParts: Clone + IntoDatum {
     const EXTRACT_FUNCTION: unsafe fn(pg_sys::FunctionCallInfo) -> pg_sys::Datum;
 
@@ -185,7 +189,7 @@ pub trait HasExtractableParts: Clone + IntoDatum {
     }
 }
 
-pub trait ToIsoString: IntoDatum + Sized + Display {
+pub trait ToIsoString: IntoDatum + Sized + Display + seal::DateTimeType {
     fn to_iso_string(self) -> String {
         if Self::type_oid() == pg_sys::INTERVALOID {
             // `Interval` is just represented in its string form
@@ -217,7 +221,10 @@ pub trait ToIsoString: IntoDatum + Sized + Display {
 
 macro_rules! impl_wrappers {
     ($ty:ty, $eq_fn:path, $cmp_fn:path, $hash_fn:path, $extract_fn:path, $input_fn:path, $output_fn:path) => {
+        impl seal::DateTimeType for $ty {}
+
         impl Eq for $ty {}
+
         impl PartialEq for $ty {
             fn eq(&self, other: &Self) -> bool {
                 unsafe {
@@ -503,15 +510,15 @@ pub fn get_timezone_offset<Tz: AsRef<str>>(zone: Tz) -> Result<i32, PgSqlErrorCo
     }
 }
 
-pub(crate) struct FromStrVisitor<T>(PhantomData<T>);
+pub(crate) struct DateTimeTypeVisitor<T>(PhantomData<T>);
 
-impl<T> FromStrVisitor<T> {
+impl<T> DateTimeTypeVisitor<T> {
     pub fn new() -> Self {
-        FromStrVisitor(PhantomData)
+        DateTimeTypeVisitor(PhantomData)
     }
 }
 
-impl<'a, T: FromStr> serde::de::Visitor<'a> for FromStrVisitor<T> {
+impl<'a, T: FromStr + seal::DateTimeType> serde::de::Visitor<'a> for DateTimeTypeVisitor<T> {
     type Value = T;
 
     fn expecting(&self, formatter: &mut alloc::fmt::Formatter) -> alloc::fmt::Result {

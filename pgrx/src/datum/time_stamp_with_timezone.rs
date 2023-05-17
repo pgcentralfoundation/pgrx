@@ -303,7 +303,7 @@ impl<'de> serde::Deserialize<'de> for TimestampWithTimeZone {
     where
         D: serde::de::Deserializer<'de>,
     {
-        deserializer.deserialize_str(crate::FromStrVisitor::<Self>::new())
+        deserializer.deserialize_str(crate::DateTimeTypeVisitor::<Self>::new())
     }
 }
 
