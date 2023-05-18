@@ -7,7 +7,7 @@ All rights reserved.
 Use of this source code is governed by the MIT license that can be found in the LICENSE file.
 */
 
-use crate::{direct_function_call, pg_sys, FromDatum, IntoDatum, Time, ToIsoString};
+use crate::{direct_function_call, pg_sys, DateTimeParts, FromDatum, IntoDatum, Time, ToIsoString};
 use pgrx_sql_entity_graph::metadata::{
     ArgumentError, Returns, ReturnsError, SqlMapping, SqlTranslatable,
 };
@@ -169,6 +169,39 @@ impl Interval {
     #[inline]
     pub fn is_negative(self) -> bool {
         self.0.month < 0 || self.0.day < 0 || self.0.time < 0
+    }
+
+    pub fn is_finite(&self) -> bool {
+        unsafe { direct_function_call(pg_sys::interval_finite, &[self.into_datum()]).unwrap() }
+    }
+
+    /// Truncate [`Interval`] to specified units
+    pub fn truncate(self, units: DateTimeParts) -> Self {
+        unsafe {
+            direct_function_call(pg_sys::interval_trunc, &[units.into_datum(), self.into_datum()])
+                .unwrap()
+        }
+    }
+
+    /// Promote groups of 30 days to numbers of months
+    pub fn justify_days(self) -> Self {
+        unsafe {
+            direct_function_call(pg_sys::interval_justify_days, &[self.into_datum()]).unwrap()
+        }
+    }
+
+    /// Promote groups of 24 hours to numbers of days
+    pub fn justify_hours(self) -> Self {
+        unsafe {
+            direct_function_call(pg_sys::interval_justify_hours, &[self.into_datum()]).unwrap()
+        }
+    }
+
+    /// Promote groups of 24 hours to numbers of days and promote groups of 30 days to numbers of months
+    pub fn justify(self) -> Self {
+        unsafe {
+            direct_function_call(pg_sys::interval_justify_interval, &[self.into_datum()]).unwrap()
+        }
     }
 
     #[inline]

@@ -176,6 +176,10 @@ impl Date {
             pg_sys::SECS_PER_DAY.try_into().expect("couldn't fit time into time_t");
         libc::time_t::from(self.to_unix_epoch_days()) * secs_per_day
     }
+
+    pub fn is_finite(&self) -> bool {
+        unsafe { direct_function_call(pg_sys::date_finite, &[self.into_datum()]).unwrap() }
+    }
 }
 
 impl serde::Serialize for Date {

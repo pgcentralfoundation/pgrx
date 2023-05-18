@@ -8,8 +8,8 @@ Use of this source code is governed by the MIT license that can be found in the 
 */
 
 use crate::{
-    direct_function_call, pg_sys, Date, DateTimeParts, FromDatum, HasExtractableParts, IntoDatum,
-    Time, TimestampWithTimeZone, ToIsoString,
+    direct_function_call, pg_sys, Date, DateTimeParts, FromDatum, HasExtractableParts, Interval,
+    IntoDatum, Time, TimestampWithTimeZone, ToIsoString,
 };
 use pgrx_pg_sys::errcodes::PgSqlErrorCode;
 use pgrx_pg_sys::PgTryBuilder;
@@ -208,6 +208,26 @@ impl Timestamp {
 
     pub fn to_hms_micro(&self) -> (u8, u8, u8, u32) {
         (self.hour(), self.minute(), self.second() as u8, self.microseconds())
+    }
+
+    pub fn is_finite(&self) -> bool {
+        unsafe { direct_function_call(pg_sys::timestamp_finite, &[self.into_datum()]).unwrap() }
+    }
+
+    /// Truncate [`Timestamp`] to specified units
+    pub fn truncate(self, units: DateTimeParts) -> Self {
+        unsafe {
+            direct_function_call(pg_sys::timestamp_trunc, &[units.into_datum(), self.into_datum()])
+                .unwrap()
+        }
+    }
+
+    /// Subtract `other` from `self`, producing a “symbolic” result that uses years and months, rather than just days
+    pub fn age(&self, other: &Timestamp) -> Interval {
+        unsafe {
+            direct_function_call(pg_sys::timestamp_age, &[self.into_datum(), other.into_datum()])
+                .unwrap()
+        }
     }
 }
 

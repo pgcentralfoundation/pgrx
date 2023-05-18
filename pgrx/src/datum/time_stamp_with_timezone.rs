@@ -8,8 +8,8 @@ Use of this source code is governed by the MIT license that can be found in the 
 */
 
 use crate::{
-    direct_function_call, pg_sys, Date, DateTimeParts, FromDatum, HasExtractableParts, IntoDatum,
-    Timestamp, ToIsoString,
+    direct_function_call, pg_sys, Date, DateTimeParts, FromDatum, HasExtractableParts, Interval,
+    IntoDatum, Timestamp, ToIsoString,
 };
 use pgrx_pg_sys::errcodes::PgSqlErrorCode;
 use pgrx_pg_sys::PgTryBuilder;
@@ -263,6 +263,43 @@ impl TimestampWithTimeZone {
             Err(PgSqlErrorCode::ERRCODE_INVALID_PARAMETER_VALUE)
         })
         .execute()
+    }
+
+    pub fn is_finite(&self) -> bool {
+        // yes, this is the correct function, despite the seemingly mismatched type name
+        unsafe { direct_function_call(pg_sys::timestamp_finite, &[self.into_datum()]).unwrap() }
+    }
+
+    /// Truncate [`TimestampWithTimeZone`] to specified units
+    pub fn truncate(self, units: DateTimeParts) -> Self {
+        unsafe {
+            direct_function_call(
+                pg_sys::timestamptz_trunc,
+                &[units.into_datum(), self.into_datum()],
+            )
+            .unwrap()
+        }
+    }
+
+    /// Truncate [`TimestampWithTimeZone`] to specified units in specified time zone
+    ///
+    /// Not available under Postgres v11
+    #[cfg(not(feature = "pg11"))]
+    pub fn truncate_with_time_zone<Tz: AsRef<str>>(self, units: DateTimeParts, zone: Tz) -> Self {
+        unsafe {
+            direct_function_call(
+                pg_sys::timestamptz_trunc_zone,
+                &[units.into_datum(), self.into_datum(), zone.as_ref().into_datum()],
+            )
+            .unwrap()
+        }
+    }
+
+    /// Subtract `other` from `self`, producing a “symbolic” result that uses years and months, rather than just days
+    pub fn age(&self, other: &TimestampWithTimeZone) -> Interval {
+        let ts_self: Timestamp = (*self).into();
+        let ts_other: Timestamp = (*other).into();
+        ts_self.age(&ts_other)
     }
 }
 

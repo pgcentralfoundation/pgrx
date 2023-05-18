@@ -1,6 +1,6 @@
 //! Exposes constructor methods for creating [`TimestampWithTimeZone`]s based on the various
 //! ways Postgres likes to interpret the "current time".
-use crate::{direct_function_call, pg_sys, Date, Timestamp, TimestampWithTimeZone};
+use crate::{direct_function_call, pg_sys, Date, IntoDatum, Timestamp, TimestampWithTimeZone};
 
 /// Current date and time (start of current transaction)
 pub fn now() -> TimestampWithTimeZone {
@@ -67,4 +67,53 @@ pub fn local_timestamp(precision: TimestampPrecision) -> Timestamp {
 /// Returns the current time as String (changes during statement execution)
 pub fn time_of_day() -> String {
     unsafe { direct_function_call(pg_sys::timeofday, &[]).unwrap() }
+}
+
+/// Convert Unix epoch (seconds since 1970-01-01 00:00:00+00) to [`TimestampWithTimeZone`]
+pub fn to_timestamp(epoch_seconds: f64) -> TimestampWithTimeZone {
+    unsafe {
+        direct_function_call(pg_sys::float8_timestamptz, &[epoch_seconds.into_datum()]).unwrap()
+    }
+}
+
+/// “bins” the input timestamp into the specified interval (the stride) aligned with a specified origin.
+///
+/// `source` is a value expression of type [`Timestamp`].
+/// `stride` is a value expression of type [`Interval`].
+///
+/// The return value is likewise of type [`Timestamp`], and it marks the beginning of the bin into
+/// which the source is placed.
+///
+/// # Notes
+///
+/// Only available on Postgres v14 and greater.
+///
+/// In the case of full units (1 minute, 1 hour, etc.), it gives the same result as the analogous
+/// `date_trunc()` function, but the difference is that [`date_bin()`] can truncate to an arbitrary
+/// interval.
+///
+/// The stride interval must be greater than zero and cannot contain units of month or larger.
+///
+/// # Examples
+///
+/// ```sql
+/// SELECT date_bin('15 minutes', TIMESTAMP '2020-02-11 15:44:17', TIMESTAMP '2001-01-01');
+/// Result: 2020-02-11 15:30:00
+///
+/// SELECT date_bin('15 minutes', TIMESTAMP '2020-02-11 15:44:17', TIMESTAMP '2001-01-01 00:02:30');
+/// Result: 2020-02-11 15:32:30
+/// ```
+#[cfg(any(features = "pg14", features = "pg15"))]
+pub fn date_bin(
+    stride: crate::datum::interval::Interval,
+    source: Timestamp,
+    origin: Timestamp,
+) -> Timestamp {
+    unsafe {
+        direct_function_call(
+            pg_sys::date_bin,
+            &[stride.into_datum(), source.into_datum(), origin.into_datum()],
+        )
+        .unwrap()
+    }
 }
