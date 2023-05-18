@@ -23,10 +23,15 @@ use std::panic::{RefUnwindSafe, UnwindSafe};
 const MIN_TIMESTAMP_USEC: i64 = -211_813_488_000_000_000;
 const END_TIMESTAMP_USEC: i64 = 9_223_371_331_200_000_000 - 1; // dec by 1 to accommodate exclusive range match pattern
 
+/// A safe wrapper around Postgres `TIMESTAMP WITH TIME ZONE` type, backed by a [`pg_sys::Timestamp`] integer value.
+///
+/// That value is `pub` so that users can directly use it to provide interfaces into other date/time
+/// crates.
 #[derive(Debug, Copy, Clone)]
 #[repr(transparent)]
 pub struct TimestampWithTimeZone(pub pg_sys::TimestampTz);
 
+/// Fallibly create a [`TimestampWithTimeZone]` from a Postgres [`pg_sys::TimestampTz`] value.
 impl TryFrom<pg_sys::TimestampTz> for TimestampWithTimeZone {
     type Error = FromTimeError;
 
@@ -91,6 +96,15 @@ impl TimestampWithTimeZone {
     const NEG_INFINITY: pg_sys::TimestampTz = pg_sys::TimestampTz::MIN;
     const INFINITY: pg_sys::TimestampTz = pg_sys::TimestampTz::MAX;
 
+    /// Construct a new [`TimestampWithTimeZone`] from its constituent parts.
+    ///
+    /// # Notes
+    ///
+    /// This function uses Postgres' "current time zone"
+    ///
+    /// # Errors
+    ///
+    /// Returns a [`DateTimeConversionError`] if any part is outside the bounds for that part
     pub fn new(
         year: i32,
         month: u8,
@@ -127,6 +141,17 @@ impl TimestampWithTimeZone {
         .execute()
     }
 
+    /// Construct a new [`TimestampWithTimeZone`] from its constituent parts.
+    ///
+    /// Elides the overhead of trapping errors for out-of-bounds parts
+    ///
+    /// # Notes
+    ///
+    /// This function uses Postgres' "current time zone"
+    ///
+    /// # Panics
+    ///
+    /// This function panics if any part is out-of-bounds
     pub fn new_unchecked(
         year: isize,
         month: u8,
@@ -157,6 +182,11 @@ impl TimestampWithTimeZone {
         }
     }
 
+    /// Construct a new [`TimestampWithTimeZone`] from its constituent parts at a specific timezone
+    ///
+    /// # Errors
+    ///
+    /// Returns a [`DateTimeConversionError`] if any part is outside the bounds for that part
     pub fn with_timezone<Tz: AsRef<str> + UnwindSafe + RefUnwindSafe>(
         year: i32,
         month: u8,
@@ -199,52 +229,80 @@ impl TimestampWithTimeZone {
         .execute()
     }
 
+    /// Construct a new [`TimestampWithTimeZone`] representing positive infinity
+    pub fn positive_infinity() -> Self {
+        Self(Self::INFINITY)
+    }
+
+    /// Construct a new [`TimestampWithTimeZone`] representing negative infinity
+    pub fn negative_infinity() -> Self {
+        Self(Self::NEG_INFINITY)
+    }
+
+    /// Does this [`TimestampWithTimeZone`] represent positive infinity?
     #[inline]
     pub fn is_infinity(&self) -> bool {
         self.0 == Self::INFINITY
     }
 
+    /// Does this [`TimestampWithTimeZone`] represent negative infinity?
     #[inline]
     pub fn is_neg_infinity(&self) -> bool {
         self.0 == Self::NEG_INFINITY
     }
 
+    /// Extract the `month`
     pub fn month(&self) -> u8 {
         self.extract_part(DateTimeParts::Month).unwrap().try_into().unwrap()
     }
 
+    /// Extract the `day`
     pub fn day(&self) -> u8 {
         self.extract_part(DateTimeParts::Day).unwrap().try_into().unwrap()
     }
 
+    /// Extract the `year`
     pub fn year(&self) -> i32 {
         self.extract_part(DateTimeParts::Year).unwrap().try_into().unwrap()
     }
 
+    /// Extract the `hour`
     pub fn hour(&self) -> u8 {
         self.extract_part(DateTimeParts::Hour).unwrap().try_into().unwrap()
     }
 
+    /// Extract the `minute`
     pub fn minute(&self) -> u8 {
         self.extract_part(DateTimeParts::Minute).unwrap().try_into().unwrap()
     }
 
+    /// Extract the `second`
     pub fn second(&self) -> f64 {
         self.extract_part(DateTimeParts::Second).unwrap().try_into().unwrap()
     }
 
+    /// Return the `microseconds` part.  This is not the time counted in microseconds, but the
+    /// fractional seconds
     pub fn microseconds(&self) -> u32 {
         self.extract_part(DateTimeParts::Microseconds).unwrap().try_into().unwrap()
     }
 
+    /// Return the `hour`, `minute`, `second`, and `microseconds` as a Rust tuple
     pub fn to_hms_micro(&self) -> (u8, u8, u8, u32) {
         (self.hour(), self.minute(), self.second() as u8, self.microseconds())
     }
 
+    /// Shift the [`Timestamp`] to the `UTC` timezone
     pub fn to_utc(&self) -> Timestamp {
         self.at_timezone("UTC").unwrap()
     }
 
+    /// Shift the [`TimestampWithTimeZone`] to the specified timezone
+    ///
+    /// # Errors
+    ///
+    /// Returns a [`DateTimeConversionError`] if the specified timezone is invalid or if for some
+    /// other reason the underlying time cannot be represented in the specified timezone
     pub fn at_timezone<Tz: AsRef<str> + UnwindSafe + RefUnwindSafe>(
         &self,
         timezone: Tz,
@@ -326,6 +384,7 @@ pub enum FromTimeError {
 }
 
 impl serde::Serialize for TimestampWithTimeZone {
+    /// Serialize this [`TimestampWithTimeZone`] in ISO form, compatible with most JSON parsers
     fn serialize<S>(
         &self,
         serializer: S,

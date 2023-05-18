@@ -1,3 +1,11 @@
+/*
+Portions Copyright 2019-2021 ZomboDB, LLC.
+Portions Copyright 2021-2022 Technology Concepts & Design, Inc. <support@tcdi.com>
+
+All rights reserved.
+
+Use of this source code is governed by the MIT license that can be found in the LICENSE file.
+*/
 use crate::{
     direct_function_call, pg_sys, AnyNumeric, Date, Interval, IntoDatum, Time, TimeWithTimeZone,
     Timestamp, TimestampWithTimeZone,
@@ -16,6 +24,7 @@ mod ops;
 pub use ctor::*;
 pub use ops::*;
 
+/// Tags to identify which "part" of a date or time-type value to extract or truncate to
 #[derive(Debug, Copy, Clone, Eq, PartialEq)]
 pub enum DateTimeParts {
     /// The century
@@ -119,6 +128,8 @@ pub enum DateTimeParts {
 }
 
 impl From<DateTimeParts> for &'static str {
+    /// Convert to Postgres' string representation of a [`DateTimePart`]
+    #[inline]
     fn from(value: DateTimeParts) -> Self {
         match value {
             DateTimeParts::Century => "century",
@@ -155,23 +166,27 @@ impl Display for DateTimeParts {
 }
 
 impl IntoDatum for DateTimeParts {
+    #[inline]
     fn into_datum(self) -> Option<pg_sys::Datum> {
         let name: &'static str = self.into();
         name.into_datum()
     }
 
+    #[inline]
     fn type_oid() -> pg_sys::Oid {
         pg_sys::TEXTOID
     }
 }
 
 mod seal {
+    #[doc(hidden)]
     pub trait DateTimeType {}
 }
 
-pub trait HasExtractableParts: Clone + IntoDatum {
+pub trait HasExtractableParts: Clone + IntoDatum + seal::DateTimeType {
     const EXTRACT_FUNCTION: unsafe fn(pg_sys::FunctionCallInfo) -> pg_sys::Datum;
 
+    /// Extract a [`DateTimeParts`] part from a date/time-like type
     fn extract_part(&self, field: DateTimeParts) -> Option<AnyNumeric> {
         unsafe {
             let field_datum = field.into_datum();
@@ -193,6 +208,12 @@ pub trait HasExtractableParts: Clone + IntoDatum {
 }
 
 pub trait ToIsoString: IntoDatum + Sized + Display + seal::DateTimeType {
+    /// Encode of this date/time-like type into JSON string in ISO format using
+    /// optionally preallocated buffer 'buf'.
+    ///
+    /// # Notes
+    ///
+    /// Types `with time zone` use the Postgres globally configured time zone in the text representation
     fn to_iso_string(self) -> String {
         if Self::type_oid() == pg_sys::INTERVALOID {
             // `Interval` is just represented in its string form
@@ -229,6 +250,7 @@ macro_rules! impl_wrappers {
         impl Eq for $ty {}
 
         impl PartialEq for $ty {
+            /// Uses the underlying Postgres "_eq()" function for this type
             fn eq(&self, other: &Self) -> bool {
                 unsafe {
                     direct_function_call($eq_fn, &[self.into_datum(), other.into_datum()]).unwrap()
@@ -237,6 +259,7 @@ macro_rules! impl_wrappers {
         }
 
         impl Ord for $ty {
+            /// Uses the underlying Postgres "_cmp()" function for this type
             fn cmp(&self, other: &Self) -> Ordering {
                 unsafe {
                     match direct_function_call::<i32>(
@@ -259,6 +282,7 @@ macro_rules! impl_wrappers {
         }
 
         impl Hash for $ty {
+            /// Uses the underlying Postgres "hash" function for this type
             fn hash<H: Hasher>(&self, state: &mut H) {
                 let hash: i32 = unsafe {
                     direct_function_call($hash_fn, &[self.clone().into_datum()]).unwrap()
@@ -295,11 +319,14 @@ macro_rules! impl_wrappers {
                         .unwrap();
                         Ok(result)
                     })
-                    .catch_when(PgSqlErrorCode::ERRCODE_DATETIME_FIELD_OVERFLOW, |_| {
-                        Err(PgSqlErrorCode::ERRCODE_DATETIME_FIELD_OVERFLOW)
+                    .catch_when(DateTimeConversionError::ERRCODE_DATETIME_FIELD_OVERFLOW, |_| {
+                        Err(PgSqlErrorCode::FieldOverflow)
                     })
                     .catch_when(PgSqlErrorCode::ERRCODE_INVALID_DATETIME_FORMAT, |_| {
-                        Err(PgSqlErrorCode::ERRCODE_INVALID_DATETIME_FORMAT)
+                        Err(DateTimeConversionError::InvalidFormat)
+                    })
+                    .catch_when(PgSqlErrorCode::ERRCODE_INVALID_PARAMETER_VALUE, |_| {
+                        Err(DateTimeConversionError::CannotParseTimezone)
                     })
                     .execute();
                     pg_sys::pfree(cstr.cast());
@@ -309,6 +336,7 @@ macro_rules! impl_wrappers {
         }
 
         impl Display for $ty {
+            /// Uses the underlying "output" function to convert this type to a String
             fn fmt(&self, f: &mut Formatter<'_>) -> core::fmt::Result {
                 let text: &core::ffi::CStr = unsafe {
                     direct_function_call($output_fn, &[self.clone().into_datum()]).unwrap()
@@ -458,7 +486,7 @@ impl_wrappers!(
 ///
 /// ## Errors
 ///
-/// Returns a `PgSqlErrorCode` if the specified timezone is unknown to Postgres
+/// Returns a [`DateTimeConversionError`] if the specified timezone is unknown to Postgres
 pub fn get_timezone_offset<Tz: AsRef<str>>(zone: Tz) -> Result<i32, DateTimeConversionError> {
     /*
      * Look up the requested timezone.  First we look in the timezone
@@ -569,4 +597,6 @@ pub enum DateTimeConversionError {
     UnknownTimezone(String),
     #[error("`{0} is not a valid timezone offset")]
     InvalidTimezoneOffset(Interval),
+    #[error("Encoded timezone string is unknown")]
+    CannotParseTimezone,
 }

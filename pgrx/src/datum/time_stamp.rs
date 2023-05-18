@@ -18,6 +18,10 @@ use pgrx_sql_entity_graph::metadata::{
 };
 use std::num::TryFromIntError;
 
+/// A safe wrapper around Postgres `TIMESTAMP WITHOUT TIME ZONE` type, backed by a [`pg_sys::Timestamp`] integer value.
+///
+/// That value is `pub` so that users can directly use it to provide interfaces into other date/time
+/// crates.
 #[derive(Debug, Copy, Clone)]
 #[repr(transparent)]
 pub struct Timestamp(pub pg_sys::Timestamp);
@@ -58,6 +62,10 @@ impl From<Timestamp> for i64 {
     }
 }
 
+/// Blindly create a [`Timestamp]` from a Postgres [`pg_sys::Timestamp`] value.
+///
+/// Note that [`pg_sys::Timestamp`] is just an `i64`, so using a random i64 could construct a time value
+/// that ultimately Postgres doesn't understand
 impl From<pg_sys::Timestamp> for Timestamp {
     fn from(value: pgrx_pg_sys::Timestamp) -> Self {
         Timestamp(value)
@@ -102,6 +110,11 @@ impl Timestamp {
     const NEG_INFINITY: pg_sys::Timestamp = pg_sys::Timestamp::MIN;
     const INFINITY: pg_sys::Timestamp = pg_sys::Timestamp::MAX;
 
+    /// Construct a new [`Timestamp`] from its constituent parts.
+    ///
+    /// # Errors
+    ///
+    /// Returns a [`DateTimeConversionError`] if any part is outside the bounds for that part
     pub fn new(
         year: i32,
         month: u8,
@@ -138,6 +151,13 @@ impl Timestamp {
         .execute()
     }
 
+    /// Construct a new [`Timestamp`] from its constituent parts.
+    ///
+    /// Elides the overhead of trapping errors for out-of-bounds parts
+    ///
+    /// # Panics
+    ///
+    /// This function panics if any part is out-of-bounds
     pub fn new_unchecked(
         year: isize,
         month: u8,
@@ -168,44 +188,65 @@ impl Timestamp {
         }
     }
 
+    /// Construct a new [`Timestamp`] representing positive infinity
+    pub fn positive_infinity() -> Self {
+        Self(Self::INFINITY)
+    }
+
+    /// Construct a new [`Timestamp`] representing negative infinity
+    pub fn negative_infinity() -> Self {
+        Self(Self::NEG_INFINITY)
+    }
+
+    /// Does this [`Timestamp`] represent positive infinity?
     #[inline]
     pub fn is_infinity(&self) -> bool {
         self.0 == Self::INFINITY
     }
 
+    /// Does this [`Timestamp`] represent negative infinity?
     #[inline]
     pub fn is_neg_infinity(&self) -> bool {
         self.0 == Self::NEG_INFINITY
     }
 
+    /// Extract the `month`
     pub fn month(&self) -> u8 {
         self.extract_part(DateTimeParts::Month).unwrap().try_into().unwrap()
     }
 
+    /// Extract the `day`
     pub fn day(&self) -> u8 {
         self.extract_part(DateTimeParts::Day).unwrap().try_into().unwrap()
     }
 
+    /// Extract the `year`
     pub fn year(&self) -> i32 {
         self.extract_part(DateTimeParts::Year).unwrap().try_into().unwrap()
     }
 
+    /// Extract the `hour`
     pub fn hour(&self) -> u8 {
         self.extract_part(DateTimeParts::Hour).unwrap().try_into().unwrap()
     }
 
+    /// Extract the `minute`
     pub fn minute(&self) -> u8 {
         self.extract_part(DateTimeParts::Minute).unwrap().try_into().unwrap()
     }
 
+    /// Extract the `second`
     pub fn second(&self) -> f64 {
         self.extract_part(DateTimeParts::Second).unwrap().try_into().unwrap()
     }
 
+    /// Return the `microseconds` part.  This is not the time counted in microseconds, but the
+    /// fractional seconds
     pub fn microseconds(&self) -> u32 {
         self.extract_part(DateTimeParts::Microseconds).unwrap().try_into().unwrap()
     }
 
+    /// Return the `hour`, `minute`, `second`, and `microseconds` as a Rust tuple
     pub fn to_hms_micro(&self) -> (u8, u8, u8, u32) {
         (self.hour(), self.minute(), self.second() as u8, self.microseconds())
     }
@@ -232,6 +273,7 @@ impl Timestamp {
 }
 
 impl serde::Serialize for Timestamp {
+    /// Serialize this [`Timestamp`] in ISO form, compatible with most JSON parsers
     fn serialize<S>(
         &self,
         serializer: S,

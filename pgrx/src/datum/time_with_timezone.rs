@@ -20,10 +20,18 @@ use pgrx_sql_entity_graph::metadata::{
 };
 use std::panic::{RefUnwindSafe, UnwindSafe};
 
+/// A safe wrapper around Postgres `TIME WITH TIME ZONE` type, backed by a [`pg_sys::TimeTzADT`] integer value.
+///
+/// That value is `pub` so that users can directly use it to provide interfaces into other date/time
+/// crates.
 #[derive(Debug, Copy, Clone)]
 #[repr(transparent)]
 pub struct TimeWithTimeZone(pub pg_sys::TimeTzADT);
 
+/// Blindly create a [`TimeWithTimeZone]` from a Postgres [`pg_sys::TimeTzADT`] value.
+///
+/// Note that the [`pg_sys::TimeTzADT`] is not validated here, so using a random i64 could construct a time value
+/// that ultimately Postgres doesn't understand
 impl From<pg_sys::TimeTzADT> for TimeWithTimeZone {
     #[inline]
     fn from(value: pg_sys::TimeTzADT) -> Self {
@@ -90,6 +98,15 @@ impl IntoDatum for TimeWithTimeZone {
 }
 
 impl TimeWithTimeZone {
+    /// Construct a new [`TimeWithTimeZone`] from its constituent parts.
+    ///
+    /// # Notes
+    ///
+    /// This function uses Postgres' "current time zone"
+    ///
+    /// # Errors
+    ///
+    /// Returns a [`DateTimeConversionError`] if any part is outside the bounds for that part
     pub fn new(hour: u8, minute: u8, second: f64) -> Result<Self, DateTimeConversionError> {
         PgTryBuilder::new(|| unsafe {
             let hour = hour as i32;
@@ -109,6 +126,35 @@ impl TimeWithTimeZone {
         .execute()
     }
 
+    /// Construct a new [`TimeWithTimeZone`] from its constituent parts.
+    ///
+    /// Elides the overhead of trapping errors for out-of-bounds parts
+    ///
+    /// # Notes
+    ///
+    /// This function uses Postgres' "current time zone"
+    ///
+    /// # Panics
+    ///
+    /// This function panics if any part is out-of-bounds
+    pub fn new_unchecked(hour: u8, minute: u8, second: f64) -> Self {
+        let hour: i32 = hour as _;
+        let minute: i32 = minute as _;
+
+        unsafe {
+            direct_function_call(
+                pg_sys::make_time,
+                &[hour.into_datum(), minute.into_datum(), second.into_datum()],
+            )
+            .unwrap()
+        }
+    }
+
+    /// Construct a new [`TimeWithTimeZone`] from its constituent parts at a specific timezone
+    ///
+    /// # Errors
+    ///
+    /// Returns a [`DateTimeConversionError`] if any part is outside the bounds for that part
     pub fn with_timezone<Tz: AsRef<str> + UnwindSafe + RefUnwindSafe>(
         hour: u8,
         minute: u8,
@@ -134,6 +180,11 @@ impl TimeWithTimeZone {
         .execute()
     }
 
+    /// Construct a new [`TimeWithTimeZone`] from its constituent parts at a specific timezone [`Interval`]
+    ///
+    /// # Errors
+    ///
+    /// Returns a [`DateTimeConversionError`] if any part is outside the bounds for that part
     pub fn with_timezone_offset(
         hour: u8,
         minute: u8,
@@ -161,42 +212,58 @@ impl TimeWithTimeZone {
         .execute()
     }
 
+    /// Extract the `hour`
     pub fn hour(&self) -> u8 {
         self.extract_part(DateTimeParts::Hour).unwrap().try_into().unwrap()
     }
 
+    /// Extract the `minute`
     pub fn minute(&self) -> u8 {
         self.extract_part(DateTimeParts::Minute).unwrap().try_into().unwrap()
     }
 
+    /// Extract the `second`
     pub fn second(&self) -> f64 {
         self.extract_part(DateTimeParts::Second).unwrap().try_into().unwrap()
     }
 
+    /// Return the `microseconds` part.  This is not the time counted in microseconds, but the
+    /// fractional seconds
     pub fn microseconds(&self) -> u32 {
         self.extract_part(DateTimeParts::Microseconds).unwrap().try_into().unwrap()
     }
 
+    /// Extract the `timezone`, measured in seconds past GMT
     pub fn timezone_offset(&self) -> i32 {
         self.extract_part(DateTimeParts::Timezone).unwrap().try_into().unwrap()
     }
 
+    /// Extract the `timezone_hour`, measured in hours past GMT
     pub fn timezone_hour(&self) -> i32 {
         self.extract_part(DateTimeParts::TimezoneHour).unwrap().try_into().unwrap()
     }
 
+    /// Extract the `timezone_minute`, measured in hours past GMT
     pub fn timezone_minute(&self) -> i32 {
         self.extract_part(DateTimeParts::TimezoneMinute).unwrap().try_into().unwrap()
     }
 
+    /// Return the `hour`, `minute`, `second`, and `microseconds` as a Rust tuple
     pub fn to_hms_micro(&self) -> (u8, u8, u8, u32) {
         (self.hour(), self.minute(), self.second() as u8, self.microseconds())
     }
 
+    /// Shift this [`TimeWithTimeZone`] to UTC
     pub fn to_utc(&self) -> Time {
         self.at_timezone("UTC").unwrap().into()
     }
 
+    /// Shift the [`TimeWithTimeZone`] to the specified timezone
+    ///
+    /// # Errors
+    ///
+    /// Returns a [`DateTimeConversionError`] if the specified timezone is invalid or if for some
+    /// other reason the underlying time cannot be represented in the specified timezone
     pub fn at_timezone<Tz: AsRef<str> + UnwindSafe + RefUnwindSafe>(
         &self,
         timezone: Tz,
@@ -229,6 +296,7 @@ impl From<Time> for TimeWithTimeZone {
 }
 
 impl serde::Serialize for TimeWithTimeZone {
+    /// Serialize this [`TimeWithTimeZone`] in ISO form, compatible with most JSON parsers
     fn serialize<S>(
         &self,
         serializer: S,

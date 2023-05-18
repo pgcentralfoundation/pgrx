@@ -23,10 +23,18 @@ use crate::{
 pub const POSTGRES_EPOCH_JDATE: i32 = pg_sys::POSTGRES_EPOCH_JDATE as i32;
 pub const UNIX_EPOCH_JDATE: i32 = pg_sys::UNIX_EPOCH_JDATE as i32;
 
+/// A safe wrapper around Postgres `DATE` type, backed by a [`pg_sys::DateADT`] integer value.
+///
+/// That value is `pub` so that users can directly use it to provide interfaces into other date/time
+/// crates.
 #[derive(Debug, Copy, Clone)]
 #[repr(transparent)]
 pub struct Date(pub pg_sys::DateADT);
 
+/// Blindly create a [`Date]` from a Postgres [`pg_sys::DateADT`] value.
+///
+/// Note that [`pg_sys::DateADT`] is just an `i32`, so using a random i32 could construct a date value
+/// that ultimately Postgres doesn't understand
 impl From<pg_sys::DateADT> for Date {
     #[inline]
     fn from(value: pg_sys::DateADT) -> Self {
@@ -90,9 +98,15 @@ impl IntoDatum for Date {
 }
 
 impl Date {
-    pub const NEG_INFINITY: pg_sys::DateADT = pg_sys::DateADT::MIN;
-    pub const INFINITY: pg_sys::DateADT = pg_sys::DateADT::MAX;
+    const NEG_INFINITY: pg_sys::DateADT = pg_sys::DateADT::MIN;
+    const INFINITY: pg_sys::DateADT = pg_sys::DateADT::MAX;
 
+    /// Construct a new [`Date`] from its constituent parts.
+    ///
+    /// # Errors
+    ///
+    /// Returns a [`DateTimeConversionError`] if any of the specified parts don't fit within
+    /// the bounds of a standard date.
     pub fn new(year: i32, month: u8, day: u8) -> Result<Self, DateTimeConversionError> {
         let month: i32 = month as _;
         let day: i32 = day as _;
@@ -113,6 +127,13 @@ impl Date {
         .execute()
     }
 
+    /// Construct a new [`Date`] from its constituent parts.
+    ///
+    /// This function elides the error trapping overhead in the event of out-of-bounds parts.
+    ///
+    /// # Panics
+    ///
+    /// This function will panic, aborting the current transaction, if any part is out-of-bounds.
     pub fn new_unchecked(year: isize, month: u8, day: u8) -> Self {
         let year: i32 = year.try_into().expect("invalid year");
         let month: i32 = month.try_into().expect("invalid month");
@@ -127,38 +148,62 @@ impl Date {
         }
     }
 
+    /// Construct a new [`Date`] representing positive infinity
+    pub fn positive_infinity() -> Self {
+        Self(Self::INFINITY)
+    }
+
+    /// Construct a new [`Date`] representing negative infinity
+    pub fn negative_infinity() -> Self {
+        Self(Self::NEG_INFINITY)
+    }
+
+    /// Create a new [`Date`] from an integer value from Postgres' epoch, in days.
+    ///
+    /// # Safety
+    ///
+    /// This function is unsafe as you must guarantee `pg_epoch_days` is valid.  You'll always
+    /// get a fully constructed [`Date`] in return, but it may not be something Postgres actually
+    /// understands.
     #[inline]
-    pub fn from_pg_epoch_days(pg_epoch_days: i32) -> Date {
+    pub unsafe fn from_pg_epoch_days(pg_epoch_days: i32) -> Date {
         Date(pg_epoch_days)
     }
 
+    /// Extract the `month`
     pub fn month(&self) -> u8 {
         self.extract_part(DateTimeParts::Month).unwrap().try_into().unwrap()
     }
 
+    /// Extract the `day`
     pub fn day(&self) -> u8 {
         self.extract_part(DateTimeParts::Day).unwrap().try_into().unwrap()
     }
 
+    /// Extract the `year`
     pub fn year(&self) -> i32 {
         self.extract_part(DateTimeParts::Year).unwrap().try_into().unwrap()
     }
 
+    /// Does this [`Date`] represent positive infinity?
     #[inline]
     pub fn is_infinity(&self) -> bool {
         self.0 == Self::INFINITY
     }
 
+    /// Does this [`Date`] represent negative infinity?
     #[inline]
     pub fn is_neg_infinity(&self) -> bool {
         self.0 == Self::NEG_INFINITY
     }
 
+    /// Return the Julian days value of this [`Date`]
     #[inline]
     pub fn to_julian_days(&self) -> i32 {
         self.0 + POSTGRES_EPOCH_JDATE
     }
 
+    /// Return the Postgres epoch days value of this [`Date`]
     #[inline]
     pub fn to_pg_epoch_days(&self) -> i32 {
         self.0
@@ -170,6 +215,7 @@ impl Date {
         self.0 + POSTGRES_EPOCH_JDATE - UNIX_EPOCH_JDATE
     }
 
+    /// Return the date as a stack-allocated [`libc::time_t`] instance
     #[inline]
     pub fn to_posix_time(&self) -> libc::time_t {
         let secs_per_day: libc::time_t =
@@ -183,6 +229,7 @@ impl Date {
 }
 
 impl serde::Serialize for Date {
+    /// Serialize this [`Date`] in ISO form, compatible with most JSON parsers
     fn serialize<S>(
         &self,
         serializer: S,

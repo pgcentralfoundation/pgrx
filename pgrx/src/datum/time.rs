@@ -19,10 +19,18 @@ use pgrx_sql_entity_graph::metadata::{
 };
 use std::num::TryFromIntError;
 
+/// A safe wrapper around Postgres `TIME` type, backed by a [`pg_sys::TimeADT`] integer value.
+///
+/// That value is `pub` so that users can directly use it to provide interfaces into other date/time
+/// crates.
 #[derive(Debug, Clone, Copy)]
 #[repr(transparent)]
 pub struct Time(pub pg_sys::TimeADT);
 
+/// Blindly create a [`Time]` from a Postgres [`pg_sys::TimeADT`] value.
+///
+/// Note that [`pg_sys::TimeADT`] is just an `i64`, so using a random i64 could construct a time value
+/// that ultimately Postgres doesn't understand
 impl From<pg_sys::TimeADT> for Time {
     #[inline]
     fn from(value: pg_sys::TimeADT) -> Self {
@@ -99,8 +107,14 @@ impl IntoDatum for Time {
 }
 
 impl Time {
+    /// `00:00:00`
     pub const ALLBALLS: Self = Time(0);
 
+    /// Construct a new [`Time`] from its constituent parts.
+    ///
+    /// # Errors
+    ///
+    /// Returns a [`DateTimeConversionError`] if any part is outside the bounds for that part
     pub fn new(hour: u8, minute: u8, second: f64) -> Result<Time, DateTimeConversionError> {
         let hour: i32 = hour as _;
         let minute: i32 = minute as _;
@@ -121,6 +135,13 @@ impl Time {
         .execute()
     }
 
+    /// Construct a new [`Time`] from its constituent parts.
+    ///
+    /// Elides the overhead of trapping errors for out-of-bounds parts
+    ///
+    /// # Panics
+    ///
+    /// This function panics if any part is out-of-bounds
     pub fn new_unchecked(hour: u8, minute: u8, second: f64) -> Time {
         let hour: i32 = hour.try_into().expect("invalid hour");
         let minute: i32 = minute.try_into().expect("invalid minute");
@@ -134,28 +155,35 @@ impl Time {
         }
     }
 
+    /// Return the `hour`
     pub fn hour(&self) -> u8 {
         self.extract_part(DateTimeParts::Hour).unwrap().try_into().unwrap()
     }
 
+    /// Return the `minute`
     pub fn minute(&self) -> u8 {
         self.extract_part(DateTimeParts::Minute).unwrap().try_into().unwrap()
     }
 
+    /// Return the `second`
     pub fn second(&self) -> f64 {
         self.extract_part(DateTimeParts::Second).unwrap().try_into().unwrap()
     }
 
+    /// Return the `microseconds` part.  This is not the time counted in microseconds, but the
+    /// fractional seconds
     pub fn microseconds(&self) -> u32 {
         self.extract_part(DateTimeParts::Microseconds).unwrap().try_into().unwrap()
     }
 
+    /// Return the `hour`, `minute`, `second`, and `microseconds` as a Rust tuple
     pub fn to_hms_micro(&self) -> (u8, u8, u8, u32) {
         (self.hour(), self.minute(), self.second() as u8, self.microseconds())
     }
 }
 
 impl serde::Serialize for Time {
+    /// Serialize this [`Time`] in ISO form, compatible with most JSON parsers
     fn serialize<S>(
         &self,
         serializer: S,
