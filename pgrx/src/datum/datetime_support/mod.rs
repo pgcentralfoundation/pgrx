@@ -299,7 +299,7 @@ macro_rules! impl_wrappers {
         impl ToIsoString for $ty {}
 
         impl FromStr for $ty {
-            type Err = PgSqlErrorCode;
+            type Err = DateTimeConversionError;
 
             /// Create this type from a string.
             fn from_str(s: &str) -> Result<Self, Self::Err> {
@@ -319,8 +319,8 @@ macro_rules! impl_wrappers {
                         .unwrap();
                         Ok(result)
                     })
-                    .catch_when(DateTimeConversionError::ERRCODE_DATETIME_FIELD_OVERFLOW, |_| {
-                        Err(PgSqlErrorCode::FieldOverflow)
+                    .catch_when(PgSqlErrorCode::ERRCODE_DATETIME_FIELD_OVERFLOW, |_| {
+                        Err(DateTimeConversionError::FieldOverflow)
                     })
                     .catch_when(PgSqlErrorCode::ERRCODE_INVALID_DATETIME_FORMAT, |_| {
                         Err(DateTimeConversionError::InvalidFormat)
