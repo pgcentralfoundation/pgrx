@@ -16,8 +16,8 @@ use pgrx_sql_entity_graph::metadata::{
 
 use crate::datetime_support::{DateTimeParts, HasExtractableParts};
 use crate::{
-    direct_function_call, pg_sys, FromDatum, IntoDatum, Timestamp, TimestampWithTimeZone,
-    ToIsoString,
+    direct_function_call, pg_sys, DateTimeConversionError, FromDatum, IntoDatum, Timestamp,
+    TimestampWithTimeZone, ToIsoString,
 };
 
 pub const POSTGRES_EPOCH_JDATE: i32 = pg_sys::POSTGRES_EPOCH_JDATE as i32;
@@ -93,7 +93,7 @@ impl Date {
     pub const NEG_INFINITY: pg_sys::DateADT = pg_sys::DateADT::MIN;
     pub const INFINITY: pg_sys::DateADT = pg_sys::DateADT::MAX;
 
-    pub fn new(year: i32, month: u8, day: u8) -> Result<Self, PgSqlErrorCode> {
+    pub fn new(year: i32, month: u8, day: u8) -> Result<Self, DateTimeConversionError> {
         let month: i32 = month as _;
         let day: i32 = day as _;
 
@@ -105,10 +105,10 @@ impl Date {
             .unwrap())
         })
         .catch_when(PgSqlErrorCode::ERRCODE_DATETIME_FIELD_OVERFLOW, |_| {
-            Err(PgSqlErrorCode::ERRCODE_DATETIME_FIELD_OVERFLOW)
+            Err(DateTimeConversionError::FieldOverflow)
         })
         .catch_when(PgSqlErrorCode::ERRCODE_INVALID_DATETIME_FORMAT, |_| {
-            Err(PgSqlErrorCode::ERRCODE_INVALID_DATETIME_FORMAT)
+            Err(DateTimeConversionError::InvalidFormat)
         })
         .execute()
     }

@@ -101,7 +101,7 @@ impl IntoDatum for Time {
 impl Time {
     pub const ALLBALLS: Self = Time(0);
 
-    pub fn new(hour: u8, minute: u8, second: f64) -> Result<Time, PgSqlErrorCode> {
+    pub fn new(hour: u8, minute: u8, second: f64) -> Result<Time, DateTimeConversionError> {
         let hour: i32 = hour as _;
         let minute: i32 = minute as _;
 
@@ -113,10 +113,10 @@ impl Time {
             .unwrap())
         })
         .catch_when(PgSqlErrorCode::ERRCODE_DATETIME_FIELD_OVERFLOW, |_| {
-            Err(PgSqlErrorCode::ERRCODE_DATETIME_FIELD_OVERFLOW)
+            Err(DateTimeConversionError::FieldOverflow)
         })
         .catch_when(PgSqlErrorCode::ERRCODE_INVALID_DATETIME_FORMAT, |_| {
-            Err(PgSqlErrorCode::ERRCODE_INVALID_DATETIME_FORMAT)
+            Err(DateTimeConversionError::InvalidFormat)
         })
         .execute()
     }

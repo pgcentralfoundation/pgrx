@@ -459,7 +459,7 @@ impl_wrappers!(
 /// ## Errors
 ///
 /// Returns a `PgSqlErrorCode` if the specified timezone is unknown to Postgres
-pub fn get_timezone_offset<Tz: AsRef<str>>(zone: Tz) -> Result<i32, PgSqlErrorCode> {
+pub fn get_timezone_offset<Tz: AsRef<str>>(zone: Tz) -> Result<i32, DateTimeConversionError> {
     /*
      * Look up the requested timezone.  First we look in the timezone
      * abbreviation table (to handle cases like "EST"), and if that fails, we
@@ -503,10 +503,10 @@ pub fn get_timezone_offset<Tz: AsRef<str>>(zone: Tz) -> Result<i32, PgSqlErrorCo
                 if pg_sys::timestamp2tm(now, &mut tz, &mut tm, &mut fsec, std::ptr::null_mut(), tzp)
                     != 0
                 {
-                    return Err(PgSqlErrorCode::ERRCODE_DATETIME_FIELD_OVERFLOW);
+                    return Err(DateTimeConversionError::FieldOverflow);
                 }
             } else {
-                return Err(PgSqlErrorCode::ERRCODE_INVALID_PARAMETER_VALUE);
+                return Err(DateTimeConversionError::UnknownTimezone(zone.as_ref().to_string()));
             }
         }
         Ok(-tz)
@@ -545,4 +545,28 @@ impl<'a, T: FromStr + seal::DateTimeType> serde::de::Visitor<'a> for DateTimeTyp
             .map_err(|_| serde::de::Error::invalid_value(serde::de::Unexpected::Bytes(v), &self))?;
         self.visit_borrowed_str(s)
     }
+}
+
+#[derive(thiserror::Error, Debug, Clone, Copy, PartialEq, Eq)]
+pub enum IntervalConversionError {
+    #[error("duration's total month count outside of valid i32::MIN..=i32::MAX range")]
+    DurationMonthsOutOfBounds,
+    #[error("Interval parts must all have the same sign")]
+    MismatchedSigns,
+    #[error("Negative Intervals cannot be converted into Durations")]
+    NegativeInterval,
+    #[error("Interval overflows Duration's u64 micros constructor")]
+    IntervalTooLarge,
+}
+
+#[derive(thiserror::Error, Debug, PartialEq, Eq)]
+pub enum DateTimeConversionError {
+    #[error("Some part of the date or time is too large")]
+    FieldOverflow,
+    #[error("THe date or time is not in the correct format")]
+    InvalidFormat,
+    #[error("`{0}` is not a known timezone")]
+    UnknownTimezone(String),
+    #[error("`{0} is not a valid timezone offset")]
+    InvalidTimezoneOffset(Interval),
 }

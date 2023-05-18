@@ -7,6 +7,7 @@ All rights reserved.
 Use of this source code is governed by the MIT license that can be found in the LICENSE file.
 */
 
+use crate::datum::datetime_support::IntervalConversionError;
 use crate::{direct_function_call, pg_sys, DateTimeParts, FromDatum, IntoDatum, Time, ToIsoString};
 use pgrx_sql_entity_graph::metadata::{
     ArgumentError, Returns, ReturnsError, SqlMapping, SqlTranslatable,
@@ -316,16 +317,4 @@ unsafe impl SqlTranslatable for Interval {
     fn return_sql() -> Result<Returns, ReturnsError> {
         Ok(Returns::One(SqlMapping::literal("interval")))
     }
-}
-
-#[derive(thiserror::Error, Debug, Clone, Copy, PartialEq, Eq)]
-pub enum IntervalConversionError {
-    #[error("duration's total month count outside of valid i32::MIN..=i32::MAX range")]
-    DurationMonthsOutOfBounds,
-    #[error("Interval parts must all have the same sign")]
-    MismatchedSigns,
-    #[error("Negative Intervals cannot be converted into Durations")]
-    NegativeInterval,
-    #[error("Interval overflows Duration's u64 micros constructor")]
-    IntervalTooLarge,
 }

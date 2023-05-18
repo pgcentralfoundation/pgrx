@@ -91,8 +91,9 @@ mod tests {
     #[allow(unused_imports)]
     use crate as pgrx_tests;
 
+    use pgrx::datum::datetime_support::IntervalConversionError;
     use pgrx::prelude::*;
-    use pgrx::{get_timezone_offset, IntervalConversionError};
+    use pgrx::{get_timezone_offset, DateTimeConversionError};
     use serde_json::*;
     use std::result::Result;
     use std::str::FromStr;
@@ -450,7 +451,7 @@ mod tests {
 
     #[pg_test]
     fn test_duration_to_interval_err() {
-        use pgrx::IntervalConversionError;
+        use pgrx::datum::datetime_support::IntervalConversionError;
         // normal limit of i32::MAX months
         let duration = Duration::from_secs(
             pg_sys::DAYS_PER_MONTH as u64 * i32::MAX as u64 * pg_sys::SECS_PER_DAY as u64,
@@ -487,7 +488,7 @@ mod tests {
     #[pg_test]
     fn test_timezone_offset_unknown() {
         assert_eq!(
-            Err(PgSqlErrorCode::ERRCODE_INVALID_PARAMETER_VALUE),
+            Err(DateTimeConversionError::UnknownTimezone(String::from("UNKNOWN TIMEZONE"))),
             get_timezone_offset("UNKNOWN TIMEZONE")
         )
     }

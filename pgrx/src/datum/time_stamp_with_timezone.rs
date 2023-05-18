@@ -8,8 +8,8 @@ Use of this source code is governed by the MIT license that can be found in the 
 */
 
 use crate::{
-    direct_function_call, pg_sys, Date, DateTimeParts, FromDatum, HasExtractableParts, Interval,
-    IntoDatum, Timestamp, ToIsoString,
+    direct_function_call, pg_sys, Date, DateTimeConversionError, DateTimeParts, FromDatum,
+    HasExtractableParts, Interval, IntoDatum, Timestamp, ToIsoString,
 };
 use pgrx_pg_sys::errcodes::PgSqlErrorCode;
 use pgrx_pg_sys::PgTryBuilder;
@@ -17,6 +17,7 @@ use pgrx_sql_entity_graph::metadata::{
     ArgumentError, Returns, ReturnsError, SqlMapping, SqlTranslatable,
 };
 use std::convert::TryFrom;
+use std::panic::{RefUnwindSafe, UnwindSafe};
 
 // taken from /include/datatype/timestamp.h
 const MIN_TIMESTAMP_USEC: i64 = -211_813_488_000_000_000;
@@ -97,7 +98,7 @@ impl TimestampWithTimeZone {
         hour: u8,
         minute: u8,
         second: f64,
-    ) -> Result<Self, PgSqlErrorCode> {
+    ) -> Result<Self, DateTimeConversionError> {
         let month: i32 = month as _;
         let day: i32 = day as _;
         let hour: i32 = hour as _;
@@ -118,10 +119,10 @@ impl TimestampWithTimeZone {
             .unwrap())
         })
         .catch_when(PgSqlErrorCode::ERRCODE_DATETIME_FIELD_OVERFLOW, |_| {
-            Err(PgSqlErrorCode::ERRCODE_DATETIME_FIELD_OVERFLOW)
+            Err(DateTimeConversionError::FieldOverflow)
         })
         .catch_when(PgSqlErrorCode::ERRCODE_INVALID_DATETIME_FORMAT, |_| {
-            Err(PgSqlErrorCode::ERRCODE_INVALID_DATETIME_FORMAT)
+            Err(DateTimeConversionError::InvalidFormat)
         })
         .execute()
     }
@@ -156,7 +157,7 @@ impl TimestampWithTimeZone {
         }
     }
 
-    pub fn with_timezone<Tz: AsRef<str>>(
+    pub fn with_timezone<Tz: AsRef<str> + UnwindSafe + RefUnwindSafe>(
         year: i32,
         month: u8,
         day: u8,
@@ -164,12 +165,12 @@ impl TimestampWithTimeZone {
         minute: u8,
         second: f64,
         timezone: Tz,
-    ) -> Result<Self, PgSqlErrorCode> {
+    ) -> Result<Self, DateTimeConversionError> {
         let month: i32 = month as _;
         let day: i32 = day as _;
         let hour: i32 = hour as _;
         let minute: i32 = minute as _;
-        let timezone = timezone.as_ref().into_datum();
+        let timezone_datum = timezone.as_ref().into_datum();
 
         PgTryBuilder::new(|| unsafe {
             Ok(direct_function_call(
@@ -181,19 +182,19 @@ impl TimestampWithTimeZone {
                     hour.into_datum(),
                     minute.into_datum(),
                     second.into_datum(),
-                    timezone,
+                    timezone_datum,
                 ],
             )
             .unwrap())
         })
         .catch_when(PgSqlErrorCode::ERRCODE_DATETIME_FIELD_OVERFLOW, |_| {
-            Err(PgSqlErrorCode::ERRCODE_DATETIME_FIELD_OVERFLOW)
+            Err(DateTimeConversionError::FieldOverflow)
         })
         .catch_when(PgSqlErrorCode::ERRCODE_INVALID_DATETIME_FORMAT, |_| {
-            Err(PgSqlErrorCode::ERRCODE_INVALID_DATETIME_FORMAT)
+            Err(DateTimeConversionError::InvalidFormat)
         })
         .catch_when(PgSqlErrorCode::ERRCODE_INVALID_PARAMETER_VALUE, |_| {
-            Err(PgSqlErrorCode::ERRCODE_INVALID_PARAMETER_VALUE)
+            Err(DateTimeConversionError::UnknownTimezone(timezone.as_ref().to_string()))
         })
         .execute()
     }
@@ -244,23 +245,26 @@ impl TimestampWithTimeZone {
         self.at_timezone("UTC").unwrap()
     }
 
-    pub fn at_timezone<Tz: AsRef<str>>(&self, timezone: Tz) -> Result<Timestamp, PgSqlErrorCode> {
-        let timezone = timezone.as_ref().into_datum();
+    pub fn at_timezone<Tz: AsRef<str> + UnwindSafe + RefUnwindSafe>(
+        &self,
+        timezone: Tz,
+    ) -> Result<Timestamp, DateTimeConversionError> {
+        let timezone_datum = timezone.as_ref().into_datum();
         PgTryBuilder::new(|| unsafe {
             Ok(direct_function_call(
                 pg_sys::timestamptz_zone,
-                &[timezone, self.clone().into_datum()],
+                &[timezone_datum, self.clone().into_datum()],
             )
             .unwrap())
         })
         .catch_when(PgSqlErrorCode::ERRCODE_DATETIME_FIELD_OVERFLOW, |_| {
-            Err(PgSqlErrorCode::ERRCODE_DATETIME_FIELD_OVERFLOW)
+            Err(DateTimeConversionError::FieldOverflow)
         })
         .catch_when(PgSqlErrorCode::ERRCODE_INVALID_DATETIME_FORMAT, |_| {
-            Err(PgSqlErrorCode::ERRCODE_INVALID_DATETIME_FORMAT)
+            Err(DateTimeConversionError::InvalidFormat)
         })
         .catch_when(PgSqlErrorCode::ERRCODE_INVALID_PARAMETER_VALUE, |_| {
-            Err(PgSqlErrorCode::ERRCODE_INVALID_PARAMETER_VALUE)
+            Err(DateTimeConversionError::UnknownTimezone(timezone.as_ref().to_string()))
         })
         .execute()
     }

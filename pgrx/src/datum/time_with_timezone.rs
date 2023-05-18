@@ -10,15 +10,15 @@ Use of this source code is governed by the MIT license that can be found in the 
 use crate::datetime_support::{DateTimeParts, HasExtractableParts};
 use crate::datum::time::Time;
 use crate::{
-    direct_function_call, direct_function_call_as_datum, pg_sys, FromDatum, Interval, IntoDatum,
-    PgMemoryContexts, TimestampWithTimeZone, ToIsoString,
+    direct_function_call, direct_function_call_as_datum, pg_sys, DateTimeConversionError,
+    FromDatum, Interval, IntoDatum, PgMemoryContexts, TimestampWithTimeZone, ToIsoString,
 };
 use pgrx_pg_sys::errcodes::PgSqlErrorCode;
 use pgrx_pg_sys::PgTryBuilder;
 use pgrx_sql_entity_graph::metadata::{
     ArgumentError, Returns, ReturnsError, SqlMapping, SqlTranslatable,
 };
-use std::panic::RefUnwindSafe;
+use std::panic::{RefUnwindSafe, UnwindSafe};
 
 #[derive(Debug, Copy, Clone)]
 #[repr(transparent)]
@@ -90,7 +90,7 @@ impl IntoDatum for TimeWithTimeZone {
 }
 
 impl TimeWithTimeZone {
-    pub fn new(hour: u8, minute: u8, second: f64) -> Result<Self, PgSqlErrorCode> {
+    pub fn new(hour: u8, minute: u8, second: f64) -> Result<Self, DateTimeConversionError> {
         PgTryBuilder::new(|| unsafe {
             let hour = hour as i32;
             let minute = minute as i32;
@@ -101,20 +101,20 @@ impl TimeWithTimeZone {
             Ok(direct_function_call(pg_sys::time_timetz, &[time]).unwrap())
         })
         .catch_when(PgSqlErrorCode::ERRCODE_DATETIME_FIELD_OVERFLOW, |_| {
-            Err(PgSqlErrorCode::ERRCODE_DATETIME_FIELD_OVERFLOW)
+            Err(DateTimeConversionError::FieldOverflow)
         })
         .catch_when(PgSqlErrorCode::ERRCODE_INVALID_DATETIME_FORMAT, |_| {
-            Err(PgSqlErrorCode::ERRCODE_INVALID_DATETIME_FORMAT)
+            Err(DateTimeConversionError::InvalidFormat)
         })
         .execute()
     }
 
-    pub fn with_timezone<Tz: AsRef<str> + RefUnwindSafe>(
+    pub fn with_timezone<Tz: AsRef<str> + UnwindSafe + RefUnwindSafe>(
         hour: u8,
         minute: u8,
         second: f64,
         timezone: Tz,
-    ) -> Result<Self, PgSqlErrorCode> {
+    ) -> Result<Self, DateTimeConversionError> {
         PgTryBuilder::new(|| {
             let mut time = Self::new(hour, minute, second)?;
             let tzoff = crate::get_timezone_offset(timezone.as_ref())?;
@@ -123,13 +123,13 @@ impl TimeWithTimeZone {
             Ok(time)
         })
         .catch_when(PgSqlErrorCode::ERRCODE_DATETIME_FIELD_OVERFLOW, |_| {
-            Err(PgSqlErrorCode::ERRCODE_DATETIME_FIELD_OVERFLOW)
+            Err(DateTimeConversionError::FieldOverflow)
         })
         .catch_when(PgSqlErrorCode::ERRCODE_INVALID_DATETIME_FORMAT, |_| {
-            Err(PgSqlErrorCode::ERRCODE_INVALID_DATETIME_FORMAT)
+            Err(DateTimeConversionError::InvalidFormat)
         })
         .catch_when(PgSqlErrorCode::ERRCODE_INVALID_PARAMETER_VALUE, |_| {
-            Err(PgSqlErrorCode::ERRCODE_INVALID_PARAMETER_VALUE)
+            Err(DateTimeConversionError::UnknownTimezone(timezone.as_ref().to_string()))
         })
         .execute()
     }
@@ -139,7 +139,7 @@ impl TimeWithTimeZone {
         minute: u8,
         second: f64,
         timezone_offset: Interval,
-    ) -> Result<Self, PgSqlErrorCode> {
+    ) -> Result<Self, DateTimeConversionError> {
         PgTryBuilder::new(|| unsafe {
             let time = Self::new(hour, minute, second)?;
 
@@ -150,13 +150,13 @@ impl TimeWithTimeZone {
             .unwrap())
         })
         .catch_when(PgSqlErrorCode::ERRCODE_DATETIME_FIELD_OVERFLOW, |_| {
-            Err(PgSqlErrorCode::ERRCODE_DATETIME_FIELD_OVERFLOW)
+            Err(DateTimeConversionError::FieldOverflow)
         })
         .catch_when(PgSqlErrorCode::ERRCODE_INVALID_DATETIME_FORMAT, |_| {
-            Err(PgSqlErrorCode::ERRCODE_INVALID_DATETIME_FORMAT)
+            Err(DateTimeConversionError::InvalidFormat)
         })
         .catch_when(PgSqlErrorCode::ERRCODE_INVALID_PARAMETER_VALUE, |_| {
-            Err(PgSqlErrorCode::ERRCODE_INVALID_PARAMETER_VALUE)
+            Err(DateTimeConversionError::InvalidTimezoneOffset(timezone_offset))
         })
         .execute()
     }
@@ -197,20 +197,26 @@ impl TimeWithTimeZone {
         self.at_timezone("UTC").unwrap().into()
     }
 
-    pub fn at_timezone<Tz: AsRef<str>>(&self, timezone: Tz) -> Result<Self, PgSqlErrorCode> {
-        let timezone = timezone.as_ref().into_datum();
+    pub fn at_timezone<Tz: AsRef<str> + UnwindSafe + RefUnwindSafe>(
+        &self,
+        timezone: Tz,
+    ) -> Result<Self, DateTimeConversionError> {
+        let timezone_datum = timezone.as_ref().into_datum();
         PgTryBuilder::new(|| unsafe {
-            Ok(direct_function_call(pg_sys::timetz_zone, &[timezone, self.clone().into_datum()])
-                .unwrap())
+            Ok(direct_function_call(
+                pg_sys::timetz_zone,
+                &[timezone_datum, self.clone().into_datum()],
+            )
+            .unwrap())
         })
         .catch_when(PgSqlErrorCode::ERRCODE_DATETIME_FIELD_OVERFLOW, |_| {
-            Err(PgSqlErrorCode::ERRCODE_DATETIME_FIELD_OVERFLOW)
+            Err(DateTimeConversionError::FieldOverflow)
         })
         .catch_when(PgSqlErrorCode::ERRCODE_INVALID_DATETIME_FORMAT, |_| {
-            Err(PgSqlErrorCode::ERRCODE_INVALID_DATETIME_FORMAT)
+            Err(DateTimeConversionError::InvalidFormat)
         })
         .catch_when(PgSqlErrorCode::ERRCODE_INVALID_PARAMETER_VALUE, |_| {
-            Err(PgSqlErrorCode::ERRCODE_INVALID_PARAMETER_VALUE)
+            Err(DateTimeConversionError::UnknownTimezone(timezone.as_ref().to_string()))
         })
         .execute()
     }

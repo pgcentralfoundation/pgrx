@@ -8,8 +8,8 @@ Use of this source code is governed by the MIT license that can be found in the 
 */
 
 use crate::{
-    direct_function_call, pg_sys, Date, DateTimeParts, FromDatum, HasExtractableParts, Interval,
-    IntoDatum, Time, TimestampWithTimeZone, ToIsoString,
+    direct_function_call, pg_sys, Date, DateTimeConversionError, DateTimeParts, FromDatum,
+    HasExtractableParts, Interval, IntoDatum, Time, TimestampWithTimeZone, ToIsoString,
 };
 use pgrx_pg_sys::errcodes::PgSqlErrorCode;
 use pgrx_pg_sys::PgTryBuilder;
@@ -109,7 +109,7 @@ impl Timestamp {
         hour: u8,
         minute: u8,
         second: f64,
-    ) -> Result<Self, PgSqlErrorCode> {
+    ) -> Result<Self, DateTimeConversionError> {
         let month: i32 = month as _;
         let day: i32 = day as _;
         let hour: i32 = hour as _;
@@ -130,10 +130,10 @@ impl Timestamp {
             .unwrap())
         })
         .catch_when(PgSqlErrorCode::ERRCODE_DATETIME_FIELD_OVERFLOW, |_| {
-            Err(PgSqlErrorCode::ERRCODE_DATETIME_FIELD_OVERFLOW)
+            Err(DateTimeConversionError::FieldOverflow)
         })
         .catch_when(PgSqlErrorCode::ERRCODE_INVALID_DATETIME_FORMAT, |_| {
-            Err(PgSqlErrorCode::ERRCODE_INVALID_DATETIME_FORMAT)
+            Err(DateTimeConversionError::InvalidFormat)
         })
         .execute()
     }
