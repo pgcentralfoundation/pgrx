@@ -10,7 +10,10 @@ use std::cmp::Ordering;
 use std::hash::{Hash, Hasher};
 use std::marker::PhantomData;
 
+mod ctor;
 mod ops;
+
+pub use ctor::*;
 pub use ops::*;
 
 #[derive(Debug, Copy, Clone, Eq, PartialEq)]
