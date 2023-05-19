@@ -191,6 +191,9 @@ jobs:
     - name: Run custom_sql example tests
       run: cargo test --package custom_sql --features "pg$PG_VER" --no-default-features
 
+    - name: Run datetime example tests
+      run: cargo test --package datetime --features "pg$PG_VER" --no-default-features
+
     - name: Run errors example tests
       run: cargo test --package errors --features "pg$PG_VER" --no-default-features
 

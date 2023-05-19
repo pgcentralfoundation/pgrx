@@ -241,6 +241,39 @@ pub trait ToIsoString: IntoDatum + Sized + Display + seal::DateTimeType {
             }
         }
     }
+
+    /// Encode of this date/time-like type into JSON string in ISO format using
+    /// optionally preallocated buffer 'buf'.
+    ///
+    /// # Notes
+    ///
+    /// This function is only available on Postgres v13 and greater
+    #[cfg(any(feature = "pg13", feature = "pg14", feature = "pg15"))]
+    fn to_iso_string_with_timezone<Tz: AsRef<str>>(
+        self,
+        timezone: Tz,
+    ) -> Result<String, DateTimeConversionError> {
+        if Self::type_oid() == pg_sys::INTERVALOID {
+            // `Interval` is just represented in its string form
+            Ok(self.to_string())
+        } else {
+            let tzoffset = -get_timezone_offset(&timezone)?;
+
+            unsafe {
+                let jsonb = pg_sys::JsonEncodeDateTime(
+                    std::ptr::null_mut(),
+                    self.into_datum().unwrap(),
+                    Self::type_oid(),
+                    &tzoffset,
+                );
+                let cstr = core::ffi::CStr::from_ptr(jsonb);
+                let as_string = cstr.to_str().unwrap().to_string();
+                pg_sys::pfree(jsonb.cast());
+
+                Ok(as_string)
+            }
+        }
+    }
 }
 
 macro_rules! impl_wrappers {

@@ -40,18 +40,19 @@ impl Add<Date> for i32 {
     }
 }
 
-impl Div for Interval {
+impl Div<f64> for Interval {
     type Output = Interval;
 
-    fn div(self, rhs: Self) -> Self::Output {
+    fn div(self, rhs: f64) -> Self::Output {
         unsafe {
-            direct_function_call(pg_sys::interval_div, &[self.as_datum(), rhs.as_datum()]).unwrap()
+            direct_function_call(pg_sys::interval_div, &[self.as_datum(), rhs.into_datum()])
+                .unwrap()
         }
     }
 }
 
-impl DivAssign for Interval {
-    fn div_assign(&mut self, rhs: Self) {
+impl DivAssign<f64> for Interval {
+    fn div_assign(&mut self, rhs: f64) {
         *self = *self / rhs
     }
 }
@@ -72,12 +73,13 @@ impl SubAssign for Interval {
     }
 }
 
-impl Mul for Interval {
+impl Mul<f64> for Interval {
     type Output = Interval;
 
-    fn mul(self, rhs: Self) -> Self::Output {
+    fn mul(self, rhs: f64) -> Self::Output {
         unsafe {
-            direct_function_call(pg_sys::interval_mul, &[self.as_datum(), rhs.as_datum()]).unwrap()
+            direct_function_call(pg_sys::interval_mul, &[self.as_datum(), rhs.into_datum()])
+                .unwrap()
         }
     }
 }
@@ -86,15 +88,12 @@ impl Mul<Interval> for f64 {
     type Output = Interval;
 
     fn mul(self, rhs: Interval) -> Self::Output {
-        unsafe {
-            direct_function_call(pg_sys::mul_d_interval, &[self.into_datum(), rhs.as_datum()])
-                .unwrap()
-        }
+        rhs * self
     }
 }
 
-impl MulAssign for Interval {
-    fn mul_assign(&mut self, rhs: Self) {
+impl MulAssign<f64> for Interval {
+    fn mul_assign(&mut self, rhs: f64) {
         *self = *self * rhs
     }
 }
@@ -293,6 +292,25 @@ impl Add<TimeWithTimeZone> for Date {
     }
 }
 
+impl Add<TimeWithTimeZone> for Interval {
+    type Output = TimeWithTimeZone;
+
+    fn add(self, rhs: TimeWithTimeZone) -> Self::Output {
+        rhs + self
+    }
+}
+
+impl Add<Interval> for TimeWithTimeZone {
+    type Output = TimeWithTimeZone;
+
+    fn add(self, rhs: Interval) -> Self::Output {
+        unsafe {
+            direct_function_call(pg_sys::timetz_pl_interval, &[self.into_datum(), rhs.as_datum()])
+                .unwrap()
+        }
+    }
+}
+
 impl Add<TimestampWithTimeZone> for Interval {
     type Output = TimestampWithTimeZone;
 
@@ -334,5 +352,16 @@ impl Add<Date> for TimeWithTimeZone {
 
     fn add(self, rhs: Date) -> Self::Output {
         rhs + self
+    }
+}
+
+impl Sub<Interval> for TimeWithTimeZone {
+    type Output = TimeWithTimeZone;
+
+    fn sub(self, rhs: Interval) -> Self::Output {
+        unsafe {
+            direct_function_call(pg_sys::timetz_mi_interval, &[self.into_datum(), rhs.as_datum()])
+                .unwrap()
+        }
     }
 }

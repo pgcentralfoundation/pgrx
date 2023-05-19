@@ -52,6 +52,27 @@ impl TryFrom<pg_sys::Datum> for TimestampWithTimeZone {
     }
 }
 
+/// Create a [`TimestampWithTimeZone`] from an existing [`Timestamp`] (which is understood to be
+/// in the "current time zone" and a timezone string.
+impl<Tz: AsRef<str> + UnwindSafe + RefUnwindSafe> TryFrom<(Timestamp, Tz)>
+    for TimestampWithTimeZone
+{
+    type Error = DateTimeConversionError;
+
+    fn try_from(value: (Timestamp, Tz)) -> Result<Self, Self::Error> {
+        let (ts, tz) = value;
+        TimestampWithTimeZone::with_timezone(
+            ts.year(),
+            ts.month(),
+            ts.day(),
+            ts.hour(),
+            ts.minute(),
+            ts.second(),
+            tz,
+        )
+    }
+}
+
 impl From<Date> for TimestampWithTimeZone {
     fn from(value: Date) -> Self {
         unsafe { direct_function_call(pg_sys::date_timestamptz, &[value.into_datum()]).unwrap() }
