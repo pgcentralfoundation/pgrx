@@ -115,7 +115,7 @@ fn random_time() -> Result<Time, DateTimeConversionError> {
     Time::new(
         rand::thread_rng().gen_range(0..23),
         rand::thread_rng().gen_range(0..59),
-        rand::thread_rng().gen_range(0..5) as f64,
+        rand::thread_rng().gen_range(0..59) as f64,
     )
 }
 
