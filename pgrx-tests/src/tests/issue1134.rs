@@ -1,3 +1,4 @@
+// If this code doesn't generate a syntax error in the generated SQL then PR #1134 is working as expected
 use pgrx::{prelude::*, Internal};
 
 pub struct Foo;
