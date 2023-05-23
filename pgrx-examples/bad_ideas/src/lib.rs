@@ -10,9 +10,46 @@ use pgrx::prelude::*;
 use pgrx::{check_for_interrupts, info, register_xact_callback, PgRelation, PgXactCallbackEvent};
 use std::fs::File;
 use std::io::Write;
+use std::panic::catch_unwind;
 use std::process::Command;
 
 pgrx::pg_module_magic!();
+
+#[pg_extern]
+fn panic(s: &str) -> bool {
+    catch_unwind(|| {
+        PANIC!("{}", s);
+    })
+    .ok();
+    true
+}
+
+#[pg_extern]
+fn fatal(s: &str) -> bool {
+    catch_unwind(|| {
+        FATAL!("{}", s);
+    })
+    .ok();
+    true
+}
+
+#[pg_extern]
+fn error(s: &str) -> bool {
+    catch_unwind(|| {
+        error!("{}", s);
+    })
+    .ok();
+    true
+}
+
+#[pg_extern]
+fn warning(s: &str) -> bool {
+    catch_unwind(|| {
+        warning!("{}", s);
+    })
+    .ok();
+    true
+}
 
 #[pg_extern]
 fn exec<'a>(

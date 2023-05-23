@@ -152,14 +152,18 @@ pub struct ErrorReportWithLevel {
 
 impl ErrorReportWithLevel {
     fn report(self) {
-        // ONLY if the log level is >=ERROR, we convert ourselves into a Rust panic and ask
-        // rust to raise us as a `panic!()`
-        //
-        // Lesser levels (INFO, WARNING, LOG, etc) will just emit a message which isn't a panic condition
-        if crate::ERROR <= self.level as _ {
-            panic_any(self)
-        } else {
-            do_ereport(self)
+        match self.level {
+            // ERRORs get converted into panics so they can perform proper stack unwinding
+            PgLogLevel::ERROR => panic_any(self),
+
+            // FATAL and PANIC are reported directly to Postgres -- they abort the process
+            PgLogLevel::FATAL | PgLogLevel::PANIC => {
+                do_ereport(self);
+                unreachable!()
+            }
+
+            // Everything else (INFO, WARN, LOG, DEBUG, etc) are reported to Postgres too but they only emit messages
+            _ => do_ereport(self),
         }
     }
 
