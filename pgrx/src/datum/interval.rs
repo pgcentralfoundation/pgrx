@@ -23,7 +23,7 @@ pub const USECS_PER_DAY: i64 = pg_sys::SECS_PER_DAY as i64 * USECS_PER_SEC;
 /// subtraction, this storage method works well in most cases...
 #[derive(Debug, Clone, Copy)]
 #[repr(transparent)]
-pub struct Interval(pub pg_sys::Interval);
+pub struct Interval(pg_sys::Interval);
 
 impl Interval {
     /// This function takes `months`/`days`/`microseconds` as input to convert directly to the internal PG storage struct `pg_sys::Interval`
@@ -208,6 +208,12 @@ impl Interval {
     #[inline]
     pub(crate) unsafe fn as_datum(&self) -> Option<pg_sys::Datum> {
         Some(pg_sys::Datum::from(&self.0 as *const _))
+    }
+
+    /// Return the backing [`pg_sys::Interval`] value.
+    #[inline]
+    pub fn into_inner(self) -> pg_sys::Interval {
+        self.0
     }
 }
 

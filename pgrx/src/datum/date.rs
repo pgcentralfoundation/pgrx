@@ -24,12 +24,9 @@ pub const POSTGRES_EPOCH_JDATE: i32 = pg_sys::POSTGRES_EPOCH_JDATE as i32;
 pub const UNIX_EPOCH_JDATE: i32 = pg_sys::UNIX_EPOCH_JDATE as i32;
 
 /// A safe wrapper around Postgres `DATE` type, backed by a [`pg_sys::DateADT`] integer value.
-///
-/// That value is `pub` so that users can directly use it to provide interfaces into other date/time
-/// crates.
 #[derive(Debug, Copy, Clone)]
 #[repr(transparent)]
-pub struct Date(pub pg_sys::DateADT);
+pub struct Date(pg_sys::DateADT);
 
 /// Blindly create a [`Date]` from a Postgres [`pg_sys::DateADT`] value.
 ///
@@ -225,6 +222,12 @@ impl Date {
 
     pub fn is_finite(&self) -> bool {
         unsafe { direct_function_call(pg_sys::date_finite, &[self.into_datum()]).unwrap() }
+    }
+
+    /// Return the backing [`pg_sy::DateADT`] value.
+    #[inline]
+    pub fn into_inner(self) -> pg_sys::DateADT {
+        self.0
     }
 }
 

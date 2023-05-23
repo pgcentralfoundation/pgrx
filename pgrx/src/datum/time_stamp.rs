@@ -24,7 +24,7 @@ use std::num::TryFromIntError;
 /// crates.
 #[derive(Debug, Copy, Clone)]
 #[repr(transparent)]
-pub struct Timestamp(pub pg_sys::Timestamp);
+pub struct Timestamp(pg_sys::Timestamp);
 
 impl From<(Date, Time)> for Timestamp {
     fn from(value: (Date, Time)) -> Self {
@@ -55,7 +55,7 @@ impl From<TimestampWithTimeZone> for Timestamp {
     }
 }
 
-impl From<Timestamp> for i64 {
+impl From<Timestamp> for pg_sys::Timestamp {
     #[inline]
     fn from(ts: Timestamp) -> Self {
         ts.0
@@ -269,6 +269,12 @@ impl Timestamp {
             direct_function_call(pg_sys::timestamp_age, &[self.into_datum(), other.into_datum()])
                 .unwrap()
         }
+    }
+
+    /// Return the backing [`pg_sys::Timestamp`] value.
+    #[inline]
+    pub fn into_inner(self) -> pg_sys::Timestamp {
+        self.0
     }
 }
 

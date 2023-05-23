@@ -25,7 +25,7 @@ use std::num::TryFromIntError;
 /// crates.
 #[derive(Debug, Clone, Copy)]
 #[repr(transparent)]
-pub struct Time(pub pg_sys::TimeADT);
+pub struct Time(pg_sys::TimeADT);
 
 /// Blindly create a [`Time]` from a Postgres [`pg_sys::TimeADT`] value.
 ///
@@ -179,6 +179,12 @@ impl Time {
     /// Return the `hour`, `minute`, `second`, and `microseconds` as a Rust tuple
     pub fn to_hms_micro(&self) -> (u8, u8, u8, u32) {
         (self.hour(), self.minute(), self.second() as u8, self.microseconds())
+    }
+
+    /// Return the backing [`pg_sys::TimeADT`] value.
+    #[inline]
+    pub fn into_inner(self) -> pg_sys::TimeADT {
+        self.0
     }
 }
 

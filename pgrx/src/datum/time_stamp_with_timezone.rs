@@ -29,7 +29,14 @@ const END_TIMESTAMP_USEC: i64 = 9_223_371_331_200_000_000 - 1; // dec by 1 to ac
 /// crates.
 #[derive(Debug, Copy, Clone)]
 #[repr(transparent)]
-pub struct TimestampWithTimeZone(pub pg_sys::TimestampTz);
+pub struct TimestampWithTimeZone(pg_sys::TimestampTz);
+
+impl From<TimestampWithTimeZone> for pg_sys::TimestampTz {
+    #[inline]
+    fn from(value: TimestampWithTimeZone) -> Self {
+        value.0
+    }
+}
 
 /// Fallibly create a [`TimestampWithTimeZone]` from a Postgres [`pg_sys::TimestampTz`] value.
 impl TryFrom<pg_sys::TimestampTz> for TimestampWithTimeZone {
@@ -383,6 +390,12 @@ impl TimestampWithTimeZone {
         let ts_self: Timestamp = (*self).into();
         let ts_other: Timestamp = (*other).into();
         ts_self.age(&ts_other)
+    }
+
+    /// Return the backing [`pg_sys::TimestampTz`] value.
+    #[inline]
+    pub fn into_inner(self) -> pg_sys::TimestampTz {
+        self.0
     }
 }
 

@@ -26,7 +26,7 @@ use std::panic::{RefUnwindSafe, UnwindSafe};
 /// crates.
 #[derive(Debug, Copy, Clone)]
 #[repr(transparent)]
-pub struct TimeWithTimeZone(pub pg_sys::TimeTzADT);
+pub struct TimeWithTimeZone(pg_sys::TimeTzADT);
 
 /// Blindly create a [`TimeWithTimeZone]` from a Postgres [`pg_sys::TimeTzADT`] value.
 ///
@@ -287,11 +287,17 @@ impl TimeWithTimeZone {
         })
         .execute()
     }
+
+    /// Return the backing [`pg_sys::TimeTzADT`] value.
+    #[inline]
+    pub fn into_inner(self) -> pg_sys::TimeTzADT {
+        self.0
+    }
 }
 
 impl From<Time> for TimeWithTimeZone {
     fn from(t: Time) -> TimeWithTimeZone {
-        TimeWithTimeZone(pg_sys::TimeTzADT { time: t.0, zone: 0 })
+        TimeWithTimeZone(pg_sys::TimeTzADT { time: t.into_inner(), zone: 0 })
     }
 }
 
