@@ -27,6 +27,7 @@ mod heap_tuple;
 mod hooks_tests;
 mod inet_tests;
 mod internal_tests;
+mod issue1134;
 mod json_tests;
 mod lifetime_tests;
 mod log_tests;
