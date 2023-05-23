@@ -103,6 +103,7 @@ Use of this source code is governed by the MIT license that can be found in the 
 #include "storage/bufpage.h"
 #include "storage/ipc.h"
 #include "storage/itemptr.h"
+#include "storage/lmgr.h"
 #include "storage/lwlock.h"
 #include "storage/procarray.h"
 #include "storage/spin.h"
