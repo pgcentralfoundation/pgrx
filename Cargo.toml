@@ -18,6 +18,7 @@ members = [
     "pgrx-examples/custom_libname",
     "pgrx-examples/custom_types",
     "pgrx-examples/custom_sql",
+    "pgrx-examples/datetime",
     "pgrx-examples/errors",
     "pgrx-examples/nostd",
     "pgrx-examples/numeric",

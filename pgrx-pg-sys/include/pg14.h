@@ -90,6 +90,7 @@ Use of this source code is governed by the MIT license that can be found in the 
 #include "parser/parse_coerce.h"
 #include "parser/parser.h"
 #include "parser/parsetree.h"
+#include "parser/scansup.h"
 #include "plpgsql.h"
 #include "postmaster/bgworker.h"
 #include "replication/logical.h"

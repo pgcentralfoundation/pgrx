@@ -7,37 +7,68 @@ All rights reserved.
 Use of this source code is governed by the MIT license that can be found in the LICENSE file.
 */
 
-use crate::{pg_sys, FromDatum, IntoDatum};
-use core::ffi::CStr;
 use core::num::TryFromIntError;
+use pgrx_pg_sys::errcodes::PgSqlErrorCode;
+use pgrx_pg_sys::PgTryBuilder;
 use pgrx_sql_entity_graph::metadata::{
     ArgumentError, Returns, ReturnsError, SqlMapping, SqlTranslatable,
+};
+
+use crate::datetime_support::{DateTimeParts, HasExtractableParts};
+use crate::{
+    direct_function_call, pg_sys, DateTimeConversionError, FromDatum, IntoDatum, Timestamp,
+    TimestampWithTimeZone, ToIsoString,
 };
 
 pub const POSTGRES_EPOCH_JDATE: i32 = pg_sys::POSTGRES_EPOCH_JDATE as i32;
 pub const UNIX_EPOCH_JDATE: i32 = pg_sys::UNIX_EPOCH_JDATE as i32;
 
-#[derive(Debug, PartialEq, Eq, PartialOrd, Ord, Clone)]
+/// A safe wrapper around Postgres `DATE` type, backed by a [`pg_sys::DateADT`] integer value.
+#[derive(Debug, Copy, Clone)]
 #[repr(transparent)]
-pub struct Date(i32);
+pub struct Date(pg_sys::DateADT);
 
-impl TryFrom<pg_sys::Datum> for Date {
-    type Error = TryFromIntError;
-    fn try_from(d: pg_sys::Datum) -> Result<Self, Self::Error> {
-        i32::try_from(d.value() as isize).map(|d| Date(d))
+/// Blindly create a [`Date]` from a Postgres [`pg_sys::DateADT`] value.
+///
+/// Note that [`pg_sys::DateADT`] is just an `i32`, so using a random i32 could construct a date value
+/// that ultimately Postgres doesn't understand
+impl From<pg_sys::DateADT> for Date {
+    #[inline]
+    fn from(value: pg_sys::DateADT) -> Self {
+        Date(value)
     }
 }
 
-impl IntoDatum for Date {
-    fn into_datum(self) -> Option<pg_sys::Datum> {
-        Some(pg_sys::Datum::from(self.0))
+impl From<Date> for pg_sys::DateADT {
+    #[inline]
+    fn from(value: Date) -> Self {
+        value.0
     }
-    fn type_oid() -> pg_sys::Oid {
-        pg_sys::DATEOID
+}
+
+impl From<Timestamp> for Date {
+    fn from(value: Timestamp) -> Self {
+        unsafe { direct_function_call(pg_sys::timestamp_date, &[value.into_datum()]).unwrap() }
+    }
+}
+
+impl From<TimestampWithTimeZone> for Date {
+    fn from(value: TimestampWithTimeZone) -> Self {
+        unsafe { direct_function_call(pg_sys::timestamptz_date, &[value.into_datum()]).unwrap() }
+    }
+}
+
+impl TryFrom<pg_sys::Datum> for Date {
+    type Error = TryFromIntError;
+
+    #[inline]
+    fn try_from(datum: pg_sys::Datum) -> Result<Self, Self::Error> {
+        pg_sys::DateADT::try_from(datum.value() as isize).map(|d| Date(d))
     }
 }
 
 impl FromDatum for Date {
+    #[inline]
     unsafe fn from_polymorphic_datum(
         datum: pg_sys::Datum,
         is_null: bool,
@@ -54,30 +85,122 @@ impl FromDatum for Date {
     }
 }
 
-impl Date {
-    pub const NEG_INFINITY: Self = Date(i32::MIN);
-    pub const INFINITY: Self = Date(i32::MAX);
+impl IntoDatum for Date {
+    fn into_datum(self) -> Option<pg_sys::Datum> {
+        Some(pg_sys::Datum::from(self.0))
+    }
+    fn type_oid() -> pg_sys::Oid {
+        pg_sys::DATEOID
+    }
+}
 
+impl Date {
+    const NEG_INFINITY: pg_sys::DateADT = pg_sys::DateADT::MIN;
+    const INFINITY: pg_sys::DateADT = pg_sys::DateADT::MAX;
+
+    /// Construct a new [`Date`] from its constituent parts.
+    ///
+    /// # Errors
+    ///
+    /// Returns a [`DateTimeConversionError`] if any of the specified parts don't fit within
+    /// the bounds of a standard date.
+    pub fn new(year: i32, month: u8, day: u8) -> Result<Self, DateTimeConversionError> {
+        let month: i32 = month as _;
+        let day: i32 = day as _;
+
+        PgTryBuilder::new(|| unsafe {
+            Ok(direct_function_call(
+                pg_sys::make_date,
+                &[year.into_datum(), month.into_datum(), day.into_datum()],
+            )
+            .unwrap())
+        })
+        .catch_when(PgSqlErrorCode::ERRCODE_DATETIME_FIELD_OVERFLOW, |_| {
+            Err(DateTimeConversionError::FieldOverflow)
+        })
+        .catch_when(PgSqlErrorCode::ERRCODE_INVALID_DATETIME_FORMAT, |_| {
+            Err(DateTimeConversionError::InvalidFormat)
+        })
+        .execute()
+    }
+
+    /// Construct a new [`Date`] from its constituent parts.
+    ///
+    /// This function elides the error trapping overhead in the event of out-of-bounds parts.
+    ///
+    /// # Panics
+    ///
+    /// This function will panic, aborting the current transaction, if any part is out-of-bounds.
+    pub fn new_unchecked(year: isize, month: u8, day: u8) -> Self {
+        let year: i32 = year.try_into().expect("invalid year");
+        let month: i32 = month.try_into().expect("invalid month");
+        let day: i32 = day.try_into().expect("invalid day");
+
+        unsafe {
+            direct_function_call(
+                pg_sys::make_date,
+                &[year.into_datum(), month.into_datum(), day.into_datum()],
+            )
+            .unwrap()
+        }
+    }
+
+    /// Construct a new [`Date`] representing positive infinity
+    pub fn positive_infinity() -> Self {
+        Self(Self::INFINITY)
+    }
+
+    /// Construct a new [`Date`] representing negative infinity
+    pub fn negative_infinity() -> Self {
+        Self(Self::NEG_INFINITY)
+    }
+
+    /// Create a new [`Date`] from an integer value from Postgres' epoch, in days.
+    ///
+    /// # Safety
+    ///
+    /// This function is unsafe as you must guarantee `pg_epoch_days` is valid.  You'll always
+    /// get a fully constructed [`Date`] in return, but it may not be something Postgres actually
+    /// understands.
     #[inline]
-    pub fn from_pg_epoch_days(pg_epoch_days: i32) -> Date {
+    pub unsafe fn from_pg_epoch_days(pg_epoch_days: i32) -> Date {
         Date(pg_epoch_days)
     }
 
+    /// Extract the `month`
+    pub fn month(&self) -> u8 {
+        self.extract_part(DateTimeParts::Month).unwrap().try_into().unwrap()
+    }
+
+    /// Extract the `day`
+    pub fn day(&self) -> u8 {
+        self.extract_part(DateTimeParts::Day).unwrap().try_into().unwrap()
+    }
+
+    /// Extract the `year`
+    pub fn year(&self) -> i32 {
+        self.extract_part(DateTimeParts::Year).unwrap().try_into().unwrap()
+    }
+
+    /// Does this [`Date`] represent positive infinity?
     #[inline]
     pub fn is_infinity(&self) -> bool {
-        self == &Self::INFINITY
+        self.0 == Self::INFINITY
     }
 
+    /// Does this [`Date`] represent negative infinity?
     #[inline]
     pub fn is_neg_infinity(&self) -> bool {
-        self == &Self::NEG_INFINITY
+        self.0 == Self::NEG_INFINITY
     }
 
+    /// Return the Julian days value of this [`Date`]
     #[inline]
     pub fn to_julian_days(&self) -> i32 {
         self.0 + POSTGRES_EPOCH_JDATE
     }
 
+    /// Return the Postgres epoch days value of this [`Date`]
     #[inline]
     pub fn to_pg_epoch_days(&self) -> i32 {
         self.0
@@ -89,71 +212,27 @@ impl Date {
         self.0 + POSTGRES_EPOCH_JDATE - UNIX_EPOCH_JDATE
     }
 
+    /// Return the date as a stack-allocated [`libc::time_t`] instance
     #[inline]
     pub fn to_posix_time(&self) -> libc::time_t {
         let secs_per_day: libc::time_t =
             pg_sys::SECS_PER_DAY.try_into().expect("couldn't fit time into time_t");
         libc::time_t::from(self.to_unix_epoch_days()) * secs_per_day
     }
-}
 
-#[cfg(feature = "time-crate")]
-pub use with_time_crate::TryFromDateError;
-
-#[cfg(feature = "time-crate")]
-mod with_time_crate {
-    use crate::{Date, POSTGRES_EPOCH_JDATE};
-    use core::fmt::{Display, Formatter};
-    use std::error::Error;
-
-    #[derive(Debug, PartialEq, Clone)]
-    #[non_exhaustive]
-    pub struct TryFromDateError(pub Date);
-
-    impl TryFromDateError {
-        #[inline]
-        pub fn into_inner(self) -> Date {
-            self.0
-        }
-
-        #[inline]
-        pub fn as_i32(&self) -> i32 {
-            self.0 .0
-        }
+    pub fn is_finite(&self) -> bool {
+        unsafe { direct_function_call(pg_sys::date_finite, &[self.into_datum()]).unwrap() }
     }
 
-    impl Display for TryFromDateError {
-        fn fmt(&self, f: &mut Formatter<'_>) -> core::fmt::Result {
-            write!(f, "`{}` is not compatible with `time::Date`", self.0 .0)
-        }
-    }
-
-    impl Error for TryFromDateError {}
-
-    impl From<time::Date> for Date {
-        #[inline]
-        fn from(date: time::Date) -> Self {
-            Date::from_pg_epoch_days(date.to_julian_day() - POSTGRES_EPOCH_JDATE)
-        }
-    }
-
-    impl TryFrom<Date> for time::Date {
-        type Error = TryFromDateError;
-        fn try_from(date: Date) -> Result<time::Date, Self::Error> {
-            const INNER_RANGE_BEGIN: i32 = time::Date::MIN.to_julian_day();
-            const INNER_RANGE_END: i32 = time::Date::MAX.to_julian_day();
-            match date.0 {
-                INNER_RANGE_BEGIN..=INNER_RANGE_END => {
-                    time::Date::from_julian_day(date.0 + POSTGRES_EPOCH_JDATE)
-                        .or_else(|_e| Err(TryFromDateError(date)))
-                }
-                _ => Err(TryFromDateError(date)),
-            }
-        }
+    /// Return the backing [`pg_sy::DateADT`] value.
+    #[inline]
+    pub fn into_inner(self) -> pg_sys::DateADT {
+        self.0
     }
 }
 
 impl serde::Serialize for Date {
+    /// Serialize this [`Date`] in ISO form, compatible with most JSON parsers
     fn serialize<S>(
         &self,
         serializer: S,
@@ -161,39 +240,18 @@ impl serde::Serialize for Date {
     where
         S: serde::Serializer,
     {
-        let cstr;
-        assert!(pg_sys::MAXDATELEN > 0); // free at runtime
-        const BUF_LEN: usize = pg_sys::MAXDATELEN as usize * 2;
-        let mut buffer = [0u8; BUF_LEN];
-        let buf = buffer.as_mut_slice().as_mut_ptr().cast::<libc::c_char>();
-        // SAFETY: This provides a quite-generous writing pad to Postgres
-        // and Postgres has promised to use far less than this.
-        unsafe {
-            match self {
-                &Self::NEG_INFINITY | &Self::INFINITY => {
-                    pg_sys::EncodeSpecialDate(self.0, buf);
-                }
-                _ => {
-                    let mut pg_tm: pg_sys::pg_tm = Default::default();
-                    pg_sys::j2date(
-                        &self.0 + POSTGRES_EPOCH_JDATE,
-                        &mut pg_tm.tm_year,
-                        &mut pg_tm.tm_mon,
-                        &mut pg_tm.tm_mday,
-                    );
-                    pg_sys::EncodeDateOnly(&mut pg_tm, pg_sys::USE_XSD_DATES as i32, buf)
-                }
-            }
-            assert!(buffer[BUF_LEN - 1] == 0);
-            cstr = CStr::from_ptr(buf);
-        }
-
-        /* This unwrap is fine as Postgres won't ever write invalid UTF-8,
-           because Postgres only writes ASCII
-        */
         serializer
-            .serialize_str(cstr.to_str().unwrap())
-            .map_err(|e| serde::ser::Error::custom(format!("Date formatting problem: {:?}", e)))
+            .serialize_str(&self.to_iso_string())
+            .map_err(|e| serde::ser::Error::custom(format!("formatting problem: {:?}", e)))
+    }
+}
+
+impl<'de> serde::Deserialize<'de> for Date {
+    fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
+    where
+        D: serde::de::Deserializer<'de>,
+    {
+        deserializer.deserialize_str(crate::DateTimeTypeVisitor::<Self>::new())
     }
 }
 

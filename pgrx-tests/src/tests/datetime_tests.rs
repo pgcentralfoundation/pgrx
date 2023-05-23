@@ -8,8 +8,6 @@ Use of this source code is governed by the MIT license that can be found in the 
 */
 
 use pgrx::prelude::*;
-use std::convert::TryFrom;
-use time::{OffsetDateTime, PrimitiveDateTime, UtcOffset};
 
 #[pg_extern]
 fn accept_date(d: Date) -> Date {
@@ -18,10 +16,7 @@ fn accept_date(d: Date) -> Date {
 
 #[pg_extern]
 fn accept_date_round_trip(d: Date) -> Date {
-    match TryInto::<time::Date>::try_into(d) {
-        Ok(date) => date.into(),
-        Err(pg_epoch_days) => Date::from_pg_epoch_days(pg_epoch_days.as_i32()),
-    }
+    d
 }
 
 #[pg_extern]
@@ -52,40 +47,20 @@ fn accept_timestamp_with_time_zone(t: TimestampWithTimeZone) -> TimestampWithTim
 #[pg_extern]
 fn accept_timestamp_with_time_zone_offset_round_trip(
     t: TimestampWithTimeZone,
-) -> Option<TimestampWithTimeZone> {
-    match TryInto::<OffsetDateTime>::try_into(t) {
-        Ok(offset) => Some(offset.try_into().unwrap()),
-        Err(_) => None,
-    }
+) -> TimestampWithTimeZone {
+    t
 }
 
 #[pg_extern]
 fn accept_timestamp_with_time_zone_datetime_round_trip(
     t: TimestampWithTimeZone,
-) -> Option<TimestampWithTimeZone> {
-    match TryInto::<PrimitiveDateTime>::try_into(t) {
-        Ok(datetime) => Some(datetime.try_into().unwrap()),
-        Err(_) => None,
-    }
+) -> TimestampWithTimeZone {
+    t
 }
 
 #[pg_extern]
 fn return_3pm_mountain_time() -> TimestampWithTimeZone {
-    let datetime = PrimitiveDateTime::new(
-        time::Date::from_calendar_date(2020, time::Month::try_from(2).unwrap(), 19).unwrap(),
-        time::Time::from_hms(15, 0, 0).unwrap(),
-    )
-    .assume_offset(UtcOffset::from_hms(-7, 0, 0).unwrap());
-
-    let three_pm: TimestampWithTimeZone = datetime.try_into().unwrap();
-
-    // this conversion will revert to UTC
-    let offset: time::OffsetDateTime = three_pm.try_into().unwrap();
-
-    // 3PM mountain time is 10PM UTC
-    assert_eq!(22, offset.hour());
-
-    datetime.try_into().unwrap()
+    TimestampWithTimeZone::with_timezone(2020, 2, 19, 15, 0, 0.0, "MST").unwrap()
 }
 
 #[pg_extern(sql = r#"
@@ -107,8 +82,7 @@ fn accept_interval(interval: Interval) -> Interval {
 
 #[pg_extern]
 fn accept_interval_round_trip(interval: Interval) -> Interval {
-    let duration: time::Duration = interval.into();
-    duration.try_into().expect("Error converting Duration to PgInterval")
+    interval
 }
 
 #[cfg(any(test, feature = "pg_test"))]
@@ -117,33 +91,31 @@ mod tests {
     #[allow(unused_imports)]
     use crate as pgrx_tests;
 
+    use pgrx::datum::datetime_support::IntervalConversionError;
     use pgrx::prelude::*;
+    use pgrx::{get_timezone_offset, DateTimeConversionError};
     use serde_json::*;
     use std::result::Result;
+    use std::str::FromStr;
     use std::time::Duration;
-    use time;
-    use time::PrimitiveDateTime;
 
     #[pg_test]
     fn test_to_pg_epoch_days() {
-        let d = time::Date::from_calendar_date(2000, time::Month::January, 2).unwrap();
-        let date: Date = d.into();
+        let date = Date::new(2000, 1, 2).unwrap();
 
         assert_eq!(date.to_pg_epoch_days(), 1);
     }
 
     #[pg_test]
     fn test_to_posix_time() {
-        let d = time::Date::from_calendar_date(1970, time::Month::January, 2).unwrap();
-        let date: Date = d.into();
+        let date = Date::new(1970, 1, 2).unwrap();
 
         assert_eq!(date.to_posix_time(), 86400);
     }
 
     #[pg_test]
     fn test_to_julian_days() {
-        let d = time::Date::from_calendar_date(2000, time::Month::January, 1).unwrap();
-        let date: Date = d.into();
+        let date = Date::new(2000, 1, 1).unwrap();
 
         assert_eq!(date.to_julian_days(), pg_sys::POSTGRES_EPOCH_JDATE as i32);
     }
@@ -151,26 +123,19 @@ mod tests {
     #[pg_test]
     #[allow(deprecated)]
     fn test_time_with_timezone_serialization() {
-        let time_with_timezone = TimeWithTimeZone::new(
-            time::Time::from_hms(12, 23, 34).unwrap(),
-            time::UtcOffset::from_hms(2, 0, 0).unwrap(),
-        );
+        let time_with_timezone = TimeWithTimeZone::with_timezone(12, 23, 34.0, "CEST").unwrap();
         let json = json!({ "time W/ Zone test": time_with_timezone });
 
-        let (h, ..) = time_with_timezone.to_utc().to_hms_micro();
+        let (h, ..) = time_with_timezone.at_timezone("UTC").unwrap().to_hms_micro();
         assert_eq!(10, h);
 
         // however Postgres wants to format it is fine by us
-        assert_eq!(json!({"time W/ Zone test":"12:23:34+02"}), json);
+        assert_eq!(json!({"time W/ Zone test":"12:23:34+02:00"}), json);
     }
 
     #[pg_test]
     fn test_date_serialization() {
-        let date: Date =
-            time::Date::from_calendar_date(2020, time::Month::try_from(4).unwrap(), 07)
-                .unwrap()
-                .into();
-
+        let date: Date = Date::new(2020, 4, 7).unwrap();
         let json = json!({ "date test": date });
 
         assert_eq!(json!({"date test":"2020-04-07"}), json);
@@ -316,12 +281,12 @@ mod tests {
 
     #[pg_test]
     fn test_return_3pm_mountain_time() -> Result<(), pgrx::spi::Error> {
-        let result = Spi::get_one::<TimestampWithTimeZone>("SELECT return_3pm_mountain_time();")?
-            .expect("datum was null");
+        let result = Spi::get_one::<TimestampWithTimeZone>(
+            "SET timezone TO 'UTC'; SELECT return_3pm_mountain_time();",
+        )?
+        .expect("datum was null");
 
-        let offset: time::OffsetDateTime = result.try_into().unwrap();
-
-        assert_eq!(22, offset.hour());
+        assert_eq!(22, result.hour());
         Ok(())
     }
 
@@ -332,9 +297,7 @@ mod tests {
         )?
         .expect("datum was null");
 
-        let datetime: time::PrimitiveDateTime = ts.try_into().unwrap();
-
-        assert_eq!(datetime.hour(), 21);
+        assert_eq!(ts.to_utc().hour(), 21);
         Ok(())
     }
 
@@ -342,8 +305,7 @@ mod tests {
     fn test_is_timestamp_utc() -> Result<(), pgrx::spi::Error> {
         let ts = Spi::get_one::<Timestamp>("SELECT '2020-02-18 14:08'::timestamp")?
             .expect("datum was null");
-        let datetime: time::PrimitiveDateTime = ts.try_into().unwrap();
-        assert_eq!(datetime.hour(), 14);
+        assert_eq!(ts.hour(), 14);
         Ok(())
     }
 
@@ -373,19 +335,8 @@ mod tests {
 
     #[pg_test]
     fn test_timestamp_with_timezone_serialization() {
-        let time_stamp_with_timezone: TimestampWithTimeZone = PrimitiveDateTime::new(
-            time::Date::from_calendar_date(2022, time::Month::try_from(2).unwrap(), 2).unwrap(),
-            time::Time::from_hms(16, 57, 11).unwrap(),
-        )
-        .assume_offset(
-            time::UtcOffset::parse(
-                "+0200",
-                &time::format_description::parse("[offset_hour][offset_minute]").unwrap(),
-            )
-            .unwrap(),
-        )
-        .try_into()
-        .unwrap();
+        let time_stamp_with_timezone =
+            TimestampWithTimeZone::with_timezone(2022, 2, 2, 16, 57, 11.0, "CEST").unwrap();
 
         // prevents PG's timestamp serialization from imposing the local servers time zone
         Spi::run("SET TIME ZONE 'UTC'").expect("SPI failed");
@@ -400,11 +351,7 @@ mod tests {
         // prevents PG's timestamp serialization from imposing the local servers time zone
         Spi::run("SET TIME ZONE 'UTC'").expect("SPI failed");
 
-        let datetime = PrimitiveDateTime::new(
-            time::Date::from_calendar_date(2020, time::Month::try_from(1).unwrap(), 1).unwrap(),
-            time::Time::from_hms(12, 34, 54).unwrap(),
-        );
-        let ts: Timestamp = datetime.try_into().unwrap();
+        let ts = Timestamp::new(2020, 1, 1, 12, 34, 54.0).unwrap();
         let json = json!({ "time stamp test": ts });
 
         assert_eq!(json!({"time stamp test":"2020-01-01T12:34:54"}), json);
@@ -454,6 +401,18 @@ mod tests {
         Ok(())
     }
 
+    #[rustfmt::skip]
+    #[pg_test]
+    fn test_from_str() -> Result<(), Box<dyn std::error::Error>> {
+        assert_eq!(Time::new(12, 0, 0.0)?, Time::from_str("12:00:00")?);
+        assert_eq!(TimeWithTimeZone::with_timezone(12, 0, 0.0, "UTC")?, TimeWithTimeZone::from_str("12:00:00 UTC")?);
+        assert_eq!(Date::new(2023, 5, 13)?, Date::from_str("2023-5-13")?);
+        assert_eq!(Timestamp::new(2023, 5, 13, 4, 56, 42.0)?, Timestamp::from_str("2023-5-13 04:56:42")?);
+        assert_eq!(TimestampWithTimeZone::new(2023, 5, 13, 4, 56, 42.0)?, TimestampWithTimeZone::from_str("2023-5-13 04:56:42")?);
+        assert_eq!(Interval::from_months(1), Interval::from_str("1 month")?);
+        Ok(())
+    }
+
     #[pg_test]
     fn test_accept_interval_random() {
         let result = Spi::get_one::<bool>("SELECT accept_interval(interval'1 year 2 months 3 days 4 hours 5 minutes 6 seconds') = interval'1 year 2 months 3 days 4 hours 5 minutes 6 seconds';")
@@ -484,7 +443,7 @@ mod tests {
 
     #[pg_test]
     fn test_interval_serialization() {
-        let interval = Interval::try_from_months_days_micros(3, 4, 5_000_000).unwrap();
+        let interval = Interval::new(3, 4, 5_000_000).unwrap();
         let json = json!({ "interval test": interval });
 
         assert_eq!(json!({"interval test":"3 mons 4 days 00:00:05"}), json);
@@ -492,9 +451,11 @@ mod tests {
 
     #[pg_test]
     fn test_duration_to_interval_err() {
-        use pgrx::IntervalConversionError;
+        use pgrx::datum::datetime_support::IntervalConversionError;
         // normal limit of i32::MAX months
-        let duration = time::Duration::days(pg_sys::DAYS_PER_MONTH as i64 * i32::MAX as i64);
+        let duration = Duration::from_secs(
+            pg_sys::DAYS_PER_MONTH as u64 * i32::MAX as u64 * pg_sys::SECS_PER_DAY as u64,
+        );
 
         let result = TryInto::<Interval>::try_into(duration);
         match result {
@@ -503,13 +464,113 @@ mod tests {
         };
 
         // one month too many, expect error
-        let duration =
-            time::Duration::days(pg_sys::DAYS_PER_MONTH as i64 * (i32::MAX as i64 + 1i64));
+        let duration = Duration::from_secs(
+            pg_sys::DAYS_PER_MONTH as u64 * (i32::MAX as u64 + 1u64) * pg_sys::SECS_PER_DAY as u64,
+        );
 
         let result = TryInto::<Interval>::try_into(duration);
         match result {
             Err(IntervalConversionError::DurationMonthsOutOfBounds) => (),
             _ => panic!("invalid duration -> interval conversion succeeded"),
         };
+    }
+
+    #[pg_test]
+    fn test_timezone_offset_cest() {
+        assert_eq!(Ok(7200), get_timezone_offset("CEST"))
+    }
+
+    #[pg_test]
+    fn test_timezone_offset_edt() {
+        assert_eq!(Ok(-14400), get_timezone_offset("US/Eastern"))
+    }
+
+    #[pg_test]
+    fn test_timezone_offset_unknown() {
+        assert_eq!(
+            Err(DateTimeConversionError::UnknownTimezone(String::from("UNKNOWN TIMEZONE"))),
+            get_timezone_offset("UNKNOWN TIMEZONE")
+        )
+    }
+
+    #[pg_test]
+    fn test_interval_to_duration_conversion() {
+        let i = Interval::new(42, 6, 3).unwrap();
+        let i_micros = i.as_micros();
+        let d: Duration = i.try_into().unwrap();
+
+        assert_eq!(i_micros as u128, d.as_micros())
+    }
+
+    #[pg_test]
+    fn test_negative_interval_to_duration_conversion() {
+        let i = Interval::new(-42, -6, -3).unwrap();
+        let d: Result<Duration, _> = i.try_into();
+
+        assert_eq!(d, Err(IntervalConversionError::NegativeInterval))
+    }
+
+    #[pg_test]
+    fn test_duration_to_interval_conversion() {
+        let i: Interval =
+            Spi::get_one("select '3 months 5 days 22 seconds'::interval").unwrap().unwrap();
+
+        assert_eq!(i.months(), 3);
+        assert_eq!(i.days(), 5);
+        assert_eq!(i.micros(), 22_000_000); // 22 seconds
+
+        let d = Duration::from_secs(
+            pg_sys::DAYS_PER_MONTH as u64 * 3u64 * pg_sys::SECS_PER_DAY as u64 // 3 months
+                + 5u64 * pg_sys::SECS_PER_DAY as u64 // 5 days
+                + 22u64, // 22 seconds more
+        );
+        let i: Interval = d.try_into().unwrap();
+        assert_eq!(i.months(), 3);
+        assert_eq!(i.days(), 5);
+        assert_eq!(i.micros(), 22_000_000); // 22 seconds
+    }
+
+    #[pg_test]
+    fn test_interval_from_seconds() {
+        let i = Interval::from_seconds(32768.0);
+        assert_eq!("09:06:08", &i.to_string());
+
+        let i = Interval::from_str("32768 seconds");
+        assert_eq!(i, Ok(Interval::from_seconds(32768.0)))
+    }
+
+    #[pg_test]
+    fn test_interval_from_mismatched_signs() {
+        let i = Interval::from(Some(1), Some(-2), None, None, None, None, None);
+        assert_eq!(i, Err(IntervalConversionError::MismatchedSigns))
+    }
+
+    #[pg_test]
+    fn test_add_date_time() -> Result<(), Box<dyn std::error::Error>> {
+        let date = Date::new(1978, 5, 13)?;
+        let time = Time::new(13, 33, 42.0)?;
+        let ts = date + time;
+        assert_eq!(&ts.to_string(), "1978-05-13 13:33:42");
+        assert_eq!(ts, Timestamp::new(1978, 5, 13, 13, 33, 42.0)?);
+        Ok(())
+    }
+
+    #[pg_test]
+    fn test_add_time_interval() -> Result<(), Box<dyn std::error::Error>> {
+        let time = Time::new(13, 33, 42.0)?;
+        let i = Interval::from_seconds(27.0);
+        let time = time + i;
+        assert_eq!(time, Time::new(13, 34, 9.0)?);
+        Ok(())
+    }
+
+    #[pg_test]
+    fn test_add_intervals() -> Result<(), Box<dyn std::error::Error>> {
+        let b = Interval::from_months(6);
+        let c = Interval::from_days(15);
+        let a = Interval::from_micros(42);
+        let result = a + b + c;
+        assert_eq!(result, Interval::new(6, 15, 42)?);
+        Ok(())
     }
 }
