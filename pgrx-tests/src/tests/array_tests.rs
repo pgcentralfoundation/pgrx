@@ -161,6 +161,27 @@ fn enum_array_roundtrip(a: Array<ArrayTestEnum>) -> Vec<Option<ArrayTestEnum>> {
     a.into_iter().collect()
 }
 
+#[pg_extern]
+fn validate_cstring_array<'a>(
+    a: Array<'a, &'a core::ffi::CStr>,
+) -> std::result::Result<bool, Box<dyn std::error::Error>> {
+    assert_eq!(
+        a.into_iter().collect::<Vec<_>>(),
+        vec![
+            Some(core::ffi::CStr::from_bytes_with_nul(b"one\0")?),
+            Some(core::ffi::CStr::from_bytes_with_nul(b"two\0")?),
+            None,
+            Some(core::ffi::CStr::from_bytes_with_nul(b"four\0")?),
+            Some(core::ffi::CStr::from_bytes_with_nul(b"five\0")?),
+            None,
+            Some(core::ffi::CStr::from_bytes_with_nul(b"seven\0")?),
+            None,
+            None
+        ]
+    );
+    Ok(true)
+}
+
 #[cfg(any(test, feature = "pg_test"))]
 #[pgrx::pg_schema]
 mod tests {
@@ -353,5 +374,12 @@ mod tests {
     #[should_panic]
     fn test_arr_sort_uniq_with_null() -> Result<(), pgrx::spi::Error> {
         Spi::get_one::<Vec<i32>>("SELECT arr_sort_uniq(ARRAY[3,2,NULL,2,1]::integer[])").map(|_| ())
+    }
+
+    #[pg_test]
+    fn test_cstring_array() -> Result<(), pgrx::spi::Error> {
+        let strings = Spi::get_one::<bool>("SELECT validate_cstring_array(ARRAY['one', 'two', NULL, 'four', 'five', NULL, 'seven', NULL, NULL]::cstring[])")?.expect("datum was NULL");
+        assert_eq!(strings, true);
+        Ok(())
     }
 }
