@@ -9,6 +9,8 @@ use crate::{
     FromDatum, IntoDatum, PgBox, PgMemoryContexts, PgTupleDesc, TriggerTuple, TryFromDatumError,
     WhoAllocated,
 };
+use pgrx_pg_sys::errcodes::PgSqlErrorCode;
+use pgrx_pg_sys::PgTryBuilder;
 use pgrx_sql_entity_graph::metadata::{
     ArgumentError, Returns, ReturnsError, SqlMapping, SqlTranslatable,
 };
@@ -22,6 +24,12 @@ pub enum PgHeapTupleError {
 
     #[error("The specified composite type, {0}, does not exist")]
     NoSuchType(String),
+
+    #[error("The specified composite type, {0}, does not exist")]
+    NoSuchTypeOid(pg_sys::Oid),
+
+    #[error("Oid `{0}` is not a composite type")]
+    NotACompositeType(pg_sys::Oid),
 }
 
 /// A [`PgHeapTuple`] is a lightweight wrapper around Postgres' [`pg_sys::HeapTuple`] object and a [`PgTupleDesc`].
@@ -199,20 +207,39 @@ impl<'a> PgHeapTuple<'a, AllocatedByRust> {
     ) -> Result<PgHeapTuple<'a, AllocatedByRust>, PgHeapTupleError> {
         let tuple_desc = PgTupleDesc::for_composite_type(type_name)
             .ok_or_else(|| PgHeapTupleError::NoSuchType(type_name.to_string()))?;
-        let natts = tuple_desc.len();
-        unsafe {
-            let datums =
-                pg_sys::palloc0(natts * std::mem::size_of::<pg_sys::Datum>()) as *mut pg_sys::Datum;
-            let mut is_null = (0..natts).map(|_| true).collect::<Vec<_>>();
 
-            let heap_tuple =
-                pg_sys::heap_form_tuple(tuple_desc.as_ptr(), datums, is_null.as_mut_ptr());
+        Self::new_composite_type_by_oid(tuple_desc.oid())
+    }
 
-            Ok(PgHeapTuple {
-                tuple: PgBox::<pg_sys::HeapTupleData, AllocatedByRust>::from_rust(heap_tuple),
-                tupdesc: tuple_desc,
-            })
-        }
+    pub fn new_composite_type_by_oid(
+        typoid: pg_sys::Oid,
+    ) -> Result<PgHeapTuple<'a, AllocatedByRust>, PgHeapTupleError> {
+        PgTryBuilder::new(|| {
+            let tuple_desc = PgTupleDesc::for_composite_type_by_oid(typoid)
+                .ok_or_else(|| PgHeapTupleError::NotACompositeType(typoid))?;
+            let natts = tuple_desc.len();
+
+            unsafe {
+                let datums = pg_sys::palloc0(natts * std::mem::size_of::<pg_sys::Datum>())
+                    as *mut pg_sys::Datum;
+                let mut is_null = vec![true; natts];
+
+                let heap_tuple =
+                    pg_sys::heap_form_tuple(tuple_desc.as_ptr(), datums, is_null.as_mut_ptr());
+
+                Ok(PgHeapTuple {
+                    tuple: PgBox::<pg_sys::HeapTupleData, AllocatedByRust>::from_rust(heap_tuple),
+                    tupdesc: tuple_desc,
+                })
+            }
+        })
+        .catch_when(PgSqlErrorCode::ERRCODE_WRONG_OBJECT_TYPE, |_| {
+            Err(PgHeapTupleError::NotACompositeType(typoid))
+        })
+        .catch_when(PgSqlErrorCode::ERRCODE_UNDEFINED_OBJECT, |_| {
+            Err(PgHeapTupleError::NoSuchTypeOid(typoid))
+        })
+        .execute()
     }
 
     /// Create a new [PgHeapTuple] from a [PgTupleDesc] from an iterator of Datums.
@@ -220,7 +247,12 @@ impl<'a> PgHeapTuple<'a, AllocatedByRust> {
     /// ## Errors
     /// - [PgHeapTupleError::IncorrectAttributeCount] if the number of items in the iterator
     /// does not match the number of attributes in the [PgTupleDesc].
-    pub fn from_datums<I: IntoIterator<Item = Option<pg_sys::Datum>>>(
+    ///
+    /// # Safety
+    ///
+    /// This function is unsafe as we cannot guarantee the provided [`pg_sys::Datum`]s are valid
+    /// as the specified [`PgTupleDesc`] might expect
+    pub unsafe fn from_datums<I: IntoIterator<Item = Option<pg_sys::Datum>>>(
         tupdesc: PgTupleDesc<'a>,
         datums: I,
     ) -> Result<PgHeapTuple<'a, AllocatedByRust>, PgHeapTupleError> {
