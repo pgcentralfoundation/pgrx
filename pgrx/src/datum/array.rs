@@ -13,6 +13,7 @@ use crate::layout::*;
 use crate::toast::Toast;
 use crate::{pg_sys, FromDatum, IntoDatum, PgMemoryContexts};
 use bitvec::slice::BitSlice;
+use core::fmt::{Debug, Formatter};
 use core::ops::DerefMut;
 use core::ptr::NonNull;
 use pgrx_sql_entity_graph::metadata::{
@@ -58,6 +59,12 @@ pub struct Array<'a, T: FromDatum> {
     slide_impl: ChaChaSlideImpl<T>,
     // Rust drops in FIFO order, drop this last
     raw: Toast<RawArray>,
+}
+
+impl<'a, T: FromDatum + Debug> Debug for Array<'a, T> {
+    fn fmt(&self, f: &mut Formatter<'_>) -> core::fmt::Result {
+        f.debug_list().entries(self.iter()).finish()
+    }
 }
 
 type ChaChaSlideImpl<T> = Box<dyn ChaChaSlide<T>>;
@@ -467,12 +474,11 @@ mod casper {
 
         #[inline]
         unsafe fn hop_size(&self, ptr: *const u8) -> usize {
-            // TODO: this code is dangerously under-exercised in the test suite
             // SAFETY: The caller was informed of pointer requirements.
             let strlen = core::ffi::CStr::from_ptr(ptr.cast()).to_bytes().len();
 
-            // Skip over the null and into the next cstr!
-            strlen + 2
+            // Skip over the null which points us to the head of the next cstr
+            strlen + 1
         }
     }
 }
