@@ -164,7 +164,7 @@ pub const ALIGNOF_LONG: u32 = 8;
 pub const ALIGNOF_PG_INT128_TYPE: u32 = 16;
 pub const ALIGNOF_SHORT: u32 = 2;
 pub const BLCKSZ: u32 = 8192;
-pub const CONFIGURE_ARGS : & [u8 ; 108usize] = b" '--prefix=/home/zombodb/.pgrx/15.2/pgrx-install' '--with-pgport=28815' '--enable-debug' '--enable-cassert'\0" ;
+pub const CONFIGURE_ARGS : & [u8 ; 108usize] = b" '--prefix=/home/zombodb/.pgrx/15.3/pgrx-install' '--with-pgport=28815' '--enable-debug' '--enable-cassert'\0" ;
 pub const DEF_PGPORT: u32 = 28815;
 pub const DEF_PGPORT_STR: &[u8; 6usize] = b"28815\0";
 pub const DLSUFFIX: &[u8; 4usize] = b".so\0";
@@ -316,18 +316,18 @@ pub const MAXIMUM_ALIGNOF: u32 = 8;
 pub const MEMSET_LOOP_LIMIT: u32 = 1024;
 pub const PACKAGE_BUGREPORT: &[u8; 32usize] = b"pgsql-bugs@lists.postgresql.org\0";
 pub const PACKAGE_NAME: &[u8; 11usize] = b"PostgreSQL\0";
-pub const PACKAGE_STRING: &[u8; 16usize] = b"PostgreSQL 15.2\0";
+pub const PACKAGE_STRING: &[u8; 16usize] = b"PostgreSQL 15.3\0";
 pub const PACKAGE_TARNAME: &[u8; 11usize] = b"postgresql\0";
 pub const PACKAGE_URL: &[u8; 28usize] = b"https://www.postgresql.org/\0";
-pub const PACKAGE_VERSION: &[u8; 5usize] = b"15.2\0";
+pub const PACKAGE_VERSION: &[u8; 5usize] = b"15.3\0";
 pub const PG_KRB_SRVNAM: &[u8; 9usize] = b"postgres\0";
 pub const PG_MAJORVERSION: &[u8; 3usize] = b"15\0";
 pub const PG_MAJORVERSION_NUM: u32 = 15;
-pub const PG_MINORVERSION_NUM: u32 = 2;
+pub const PG_MINORVERSION_NUM: u32 = 3;
 pub const PG_USE_STDBOOL: u32 = 1;
-pub const PG_VERSION: &[u8; 5usize] = b"15.2\0";
-pub const PG_VERSION_NUM: u32 = 150002;
-pub const PG_VERSION_STR : & [u8 ; 102usize] = b"PostgreSQL 15.2 on x86_64-pc-linux-gnu, compiled by gcc (Ubuntu 11.3.0-1ubuntu1~22.04) 11.3.0, 64-bit\0" ;
+pub const PG_VERSION: &[u8; 5usize] = b"15.3\0";
+pub const PG_VERSION_NUM: u32 = 150003;
+pub const PG_VERSION_STR : & [u8 ; 102usize] = b"PostgreSQL 15.3 on x86_64-pc-linux-gnu, compiled by gcc (Ubuntu 11.3.0-1ubuntu1~22.04) 11.3.0, 64-bit\0" ;
 pub const RELSEG_SIZE: u32 = 131072;
 pub const SIZEOF_BOOL: u32 = 1;
 pub const SIZEOF_LONG: u32 = 8;
@@ -768,7 +768,7 @@ pub const PG_BINARY_R: &[u8; 2usize] = b"r\0";
 pub const PG_BINARY_W: &[u8; 2usize] = b"w\0";
 pub const _CTYPE_H: u32 = 1;
 pub const PGINVALID_SOCKET: i32 = -1;
-pub const PG_BACKEND_VERSIONSTR: &[u8; 28usize] = b"postgres (PostgreSQL) 15.2\n\0";
+pub const PG_BACKEND_VERSIONSTR: &[u8; 28usize] = b"postgres (PostgreSQL) 15.3\n\0";
 pub const EXE: &[u8; 1usize] = b"\0";
 pub const DEVNULL: &[u8; 10usize] = b"/dev/null\0";
 pub const USE_REPL_SNPRINTF: u32 = 1;
@@ -34987,6 +34987,18 @@ extern "C" {
 }
 #[pgrx_macros::pg_guard]
 extern "C" {
+    pub fn EnableDisableTriggerNew2(
+        rel: Relation,
+        tgname: *const ::std::os::raw::c_char,
+        tgparent: Oid,
+        fires_when: ::std::os::raw::c_char,
+        skip_system: bool,
+        recurse: bool,
+        lockmode: LOCKMODE,
+    );
+}
+#[pgrx_macros::pg_guard]
+extern "C" {
     pub fn EnableDisableTriggerNew(
         rel: Relation,
         tgname: *const ::std::os::raw::c_char,
@@ -35084,6 +35096,19 @@ extern "C" {
 }
 #[pgrx_macros::pg_guard]
 extern "C" {
+    pub fn ExecBRDeleteTriggersNew(
+        estate: *mut EState,
+        epqstate: *mut EPQState,
+        relinfo: *mut ResultRelInfo,
+        tupleid: ItemPointer,
+        fdw_trigtuple: HeapTuple,
+        epqslot: *mut *mut TupleTableSlot,
+        tmresult: *mut TM_Result,
+        tmfd: *mut TM_FailureData,
+    ) -> bool;
+}
+#[pgrx_macros::pg_guard]
+extern "C" {
     pub fn ExecBRDeleteTriggers(
         estate: *mut EState,
         epqstate: *mut EPQState,
@@ -35123,6 +35148,19 @@ extern "C" {
         relinfo: *mut ResultRelInfo,
         transition_capture: *mut TransitionCaptureState,
     );
+}
+#[pgrx_macros::pg_guard]
+extern "C" {
+    pub fn ExecBRUpdateTriggersNew(
+        estate: *mut EState,
+        epqstate: *mut EPQState,
+        relinfo: *mut ResultRelInfo,
+        tupleid: ItemPointer,
+        fdw_trigtuple: HeapTuple,
+        newslot: *mut TupleTableSlot,
+        tmresult: *mut TM_Result,
+        tmfd: *mut TM_FailureData,
+    ) -> bool;
 }
 #[pgrx_macros::pg_guard]
 extern "C" {

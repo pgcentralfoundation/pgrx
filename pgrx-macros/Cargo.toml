@@ -1,6 +1,6 @@
 [package]
 name = "pgrx-macros"
-version = "0.8.3"
+version = "0.8.4"
 authors = ["ZomboDB, LLC <zombodb@gmail.com>"]
 license = "MIT"
 description = "Proc Macros for 'pgrx'"
@@ -21,10 +21,10 @@ rustc-args = ["--cfg", "docsrs"]
 no-schema-generation = ["pgrx-sql-entity-graph/no-schema-generation"]
 
 [dependencies]
-pgrx-sql-entity-graph = { path = "../pgrx-sql-entity-graph", version = "=0.8.3" }
-proc-macro2 = "1.0.56"
-quote = "1.0.26"
+pgrx-sql-entity-graph = { path = "../pgrx-sql-entity-graph", version = "=0.8.4" }
+proc-macro2 = "1.0.58"
+quote = "1.0.27"
 syn = { version = "1.0.109", features = [ "extra-traits", "full", "fold", "parsing" ] }
 
 [dev-dependencies]
-serde = { version = "1.0.160", features = ["derive"] } # for Documentation examples
+serde = { version = "1.0.163", features = ["derive"] } # for Documentation examples
