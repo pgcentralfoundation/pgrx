@@ -278,6 +278,7 @@ impl<'a, T: FromDatum> Array<'a, T> {
 mod casper {
     use crate::{pg_sys, varlena, Array, FromDatum};
 
+    // it's a pop-culture reference (https://en.wikipedia.org/wiki/Cha_Cha_Slide) not some fancy crypto thing you nerd
     /// Describes how to instantiate a value `T` from an [`Array`] and its backing byte array pointer.
     /// It also knows how to determine the size of an [`Array`] element value.
     pub(super) trait ChaChaSlide<T: FromDatum> {
