@@ -1,3 +1,4 @@
+#![allow(dead_code)]
 use crate::datum::{Array, FromDatum};
 use crate::pg_sys;
 use crate::toast::{Toast, Toasty};
@@ -229,6 +230,34 @@ impl RawArray {
             } else {
                 Toast::Fresh(RawArray::from_ptr(toast.cast()))
             }
+        }
+    }
+
+    pub(crate) unsafe fn deconstruct(
+        &mut self,
+        layout: crate::layout::Layout,
+    ) -> (*mut pg_sys::Datum, *mut bool) {
+        let oid = self.oid();
+        let array = self.ptr.as_ptr();
+
+        // outvals for deconstruct_array
+        let mut elements = core::ptr::null_mut();
+        let mut nulls = core::ptr::null_mut();
+        let mut nelems = 0;
+
+        unsafe {
+            pg_sys::deconstruct_array(
+                array,
+                oid,
+                layout.size.as_typlen().into(),
+                matches!(layout.pass, crate::layout::PassBy::Value),
+                layout.align.as_typalign(),
+                &mut elements,
+                &mut nulls,
+                &mut nelems,
+            );
+
+            (elements, nulls)
         }
     }
 
