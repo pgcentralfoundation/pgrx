@@ -1,4 +1,3 @@
-#![allow(dead_code)]
 use crate::datum::{Array, FromDatum};
 use crate::pg_sys;
 use crate::toast::{Toast, Toasty};
@@ -233,6 +232,7 @@ impl RawArray {
         }
     }
 
+    #[allow(dead_code)]
     pub(crate) unsafe fn deconstruct(
         &mut self,
         layout: crate::layout::Layout,
