@@ -1,3 +1,4 @@
+#![allow(dead_code)]
 use crate::prelude::*;
 use core::marker::PhantomData;
 use core::ptr;
@@ -13,7 +14,6 @@ pub struct PallocSlice<T> {
     _phantom: PhantomData<Box<[T]>>,
 }
 
-#[cfg(debug_assertions)]
 impl<T> PallocSlice<T> {
     pub unsafe fn from_raw_parts(ptr: ptr::NonNull<T>, len: usize) -> Self {
         PallocSlice {

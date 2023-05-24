@@ -232,7 +232,7 @@ impl RawArray {
         }
     }
 
-    #[cfg(debug_assertions)]
+    #[allow(dead_code)]
     pub(crate) unsafe fn deconstruct(
         &mut self,
         layout: crate::layout::Layout,
@@ -326,6 +326,7 @@ impl RawArray {
     }
 
     /// Accessor for ArrayType's elemtype.
+    #[inline]
     pub fn oid(&self) -> pg_sys::Oid {
         // SAFETY: Validity asserted on construction.
         unsafe { (*self.ptr.as_ptr()).elemtype }
@@ -491,6 +492,7 @@ impl RawArray {
         }
     }
 
+    #[inline]
     pub(crate) fn data_ptr(&self) -> *const u8 {
         unsafe { ARR_DATA_PTR(self.ptr.as_ptr()) }
     }

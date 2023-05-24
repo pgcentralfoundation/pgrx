@@ -8,22 +8,18 @@ Use of this source code is governed by the MIT license that can be found in the 
 */
 
 use crate::array::RawArray;
+use crate::datum::array::casper::ChaChaSlide;
 use crate::layout::*;
-use crate::slice::PallocSlice;
 use crate::toast::Toast;
-use crate::varlena;
 use crate::{pg_sys, FromDatum, IntoDatum, PgMemoryContexts};
 use bitvec::slice::BitSlice;
-use core::ffi::CStr;
+use core::fmt::{Debug, Formatter};
 use core::ops::DerefMut;
 use core::ptr::NonNull;
-use once_cell::sync::OnceCell;
-use pgrx_pg_sys::Datum;
 use pgrx_sql_entity_graph::metadata::{
     ArgumentError, Returns, ReturnsError, SqlMapping, SqlTranslatable,
 };
 use serde::Serializer;
-use std::marker::PhantomData;
 
 /** An array of some type (eg. `TEXT[]`, `int[]`)
 
@@ -59,14 +55,19 @@ fn with_vec(elems: Array<String>) {
 ```
 */
 pub struct Array<'a, T: FromDatum> {
-    // Remove this field if/when we figure out how to stop using pg_sys::deconstruct_array
     null_slice: NullKind<'a>,
-    elem_layout: Layout,
-    _datum_slice: OnceCell<PallocSlice<pg_sys::Datum>>,
+    slide_impl: ChaChaSlideImpl<T>,
     // Rust drops in FIFO order, drop this last
     raw: Toast<RawArray>,
-    _marker: PhantomData<T>,
 }
+
+impl<'a, T: FromDatum + Debug> Debug for Array<'a, T> {
+    fn fmt(&self, f: &mut Formatter<'_>) -> core::fmt::Result {
+        f.debug_list().entries(self.iter()).finish()
+    }
+}
+
+type ChaChaSlideImpl<T> = Box<dyn ChaChaSlide<T>>;
 
 enum NullKind<'a> {
     Bits(&'a BitSlice<u8>),
@@ -93,7 +94,7 @@ impl NullKind<'_> {
     }
 }
 
-impl<'a, T: FromDatum + serde::Serialize> serde::Serialize for Array<'a, T> {
+impl<'a, T: FromDatum + serde::Serialize + 'a> serde::Serialize for Array<'a, T> {
     fn serialize<S>(&self, serializer: S) -> Result<<S as Serializer>::Ok, <S as Serializer>::Error>
     where
         S: Serializer,
@@ -116,17 +117,6 @@ impl<'a, T: FromDatum> Array<'a, T> {
             .nulls_bitslice()
             .map(|nonnull| NullKind::Bits(unsafe { &*nonnull.as_ptr() }))
             .unwrap_or(NullKind::Strict(nelems));
-        let _datum_slice = OnceCell::new();
-
-        #[cfg(debug_assertions)]
-        let Ok(()) = _datum_slice.set(unsafe {
-            let (datums, bools) = raw.deconstruct(elem_layout);
-            // Don't need this.
-            pg_sys::pfree(bools.cast());
-            PallocSlice::from_raw_parts(NonNull::new(datums).unwrap(), nelems)
-        }) else {
-            panic!("oh no, the debug code exploded!")
-        };
 
         // The array-walking code assumes this is always the case, is it?
         if let Layout { size: Size::Fixed(n), align, .. } = elem_layout {
@@ -137,7 +127,47 @@ impl<'a, T: FromDatum> Array<'a, T> {
             );
         }
 
-        Array { raw, _datum_slice, null_slice, elem_layout, _marker: PhantomData }
+        // do a little two-step before jumping into the Cha-Cha Slide and figure out
+        // which implementation is correct for the type of element in this Array.
+        let slide_impl: ChaChaSlideImpl<T> = match elem_layout.pass {
+            PassBy::Value => match elem_layout.size {
+                // the layout size is fixed and it exactly matches the size of `T`
+                //
+                // Note that this doesn't guarantee that the elements are actually `T`s, only
+                // that they'll fit into it.  It's the caller's responsibility to make sure
+                Size::Fixed(size) if (size as usize) == std::mem::size_of::<T>() => {
+                    Box::new(casper::FixedSizeExact(size as usize))
+                }
+
+                // The layout size is some other fixed size that we know how to handle efficiently
+                Size::Fixed(size) => match size {
+                    1 => Box::new(casper::FixedSize1b),
+                    2 => Box::new(casper::FixedSize2b),
+                    4 => Box::new(casper::FixedSize4b),
+                    8 => Box::new(casper::FixedSize8b),
+                    other => Box::new(casper::FixedSizeArbitrary(other as usize)),
+                },
+                _ => {
+                    panic!("unrecognized pass-by-value array element layout: {:?}", elem_layout)
+                }
+            },
+
+            PassBy::Ref => match elem_layout.size {
+                // Array elements are varlenas, which are pass-by-reference and have a known alignment size
+                Size::Varlena => {
+                    Box::new(casper::PassByVarlena { align: elem_layout.align.as_usize() })
+                }
+
+                // Array elements are C strings, which are pass-by-reference and alignments are
+                // determined at runtime based on the length of the string
+                Size::CStr => Box::new(casper::PassByCStr),
+                _ => {
+                    panic!("unrecognized pass-by-reference array element layout: {:?}", elem_layout)
+                }
+            },
+        };
+
+        Array { raw, slide_impl, null_slice }
     }
 
     /// Rips out the underlying `pg_sys::ArrayType` pointer.
@@ -204,16 +234,9 @@ impl<'a, T: FromDatum> Array<'a, T> {
                 // Skip nulls: the data buffer has no placeholders for them!
                 Some(true) => continue,
                 Some(false) => {
-                    #[cfg(debug_assertions)]
-                    if let PassBy::Ref = self.elem_layout.pass {
-                        assert_eq!(
-                            Some(pg_sys::Datum::from(at_byte)),
-                            self._datum_slice.get().and_then(|s| unsafe { s.get(i) }).copied()
-                        );
-                    }
                     // SAFETY: Note this entire function has to be correct,
                     // not just this one call, for this to be correct!
-                    at_byte = unsafe { self.one_hop_this_time(at_byte, self.elem_layout) };
+                    at_byte = unsafe { self.one_hop_this_time(at_byte) };
                 }
             }
         }
@@ -221,7 +244,7 @@ impl<'a, T: FromDatum> Array<'a, T> {
         // If this has gotten this far, it is known to be non-null,
         // all the null values in the array up to this index were skipped,
         // and the only offsets were via our hopping function.
-        Some(unsafe { self.bring_it_back_now(at_byte, index, is_null) })
+        Some(unsafe { self.bring_it_back_now(at_byte, false) })
     }
 
     /// Extracts an element from a Postgres Array's data buffer
@@ -229,73 +252,10 @@ impl<'a, T: FromDatum> Array<'a, T> {
     /// # Safety
     /// This assumes the pointer is to a valid element of that type.
     #[inline]
-    unsafe fn bring_it_back_now(&self, ptr: *const u8, _index: usize, is_null: bool) -> Option<T> {
-        if is_null {
-            return None;
-        }
-
-        match self.elem_layout.pass {
-            PassBy::Value => match self.elem_layout.size {
-                //
-                // NB:  Leaving this commented out because it's not clear to me that this will be
-                // correct in every case.  This assumption got us in trouble with arrays of enums
-                // already, and I'd rather err on the side of correctness.
-                //
-                // Size::Fixed(size) if size as usize == std::mem::size_of::<T>() => unsafe {
-                //     // short-circuit if the size of the element matches the size of `T`.
-                //     // This most likely means that the element Datum actually represents the same
-                //     // type as the rust `T`
-                //
-                //     Some(ptr.cast::<T>().read())
-                // },
-                Size::Fixed(size) => {
-                    // copy off `size` bytes from the head of `ptr` and convert that into a `usize`
-                    // using proper platform endianness, converting it into a `Datum`
-                    #[inline(always)]
-                    fn bytes_to_datum(ptr: *const u8, size: usize) -> Datum {
-                        const USIZE_BYTE_LEN: usize = std::mem::size_of::<usize>();
-
-                        // a zero-padded buffer in which we'll store bytes so we can
-                        // ultimately make a `usize` that we convert into a `Datum`
-                        let mut buf = [0u8; USIZE_BYTE_LEN];
-
-                        match size {
-                            1..=USIZE_BYTE_LEN => unsafe {
-                                // copy to the end
-                                #[cfg(target_endian = "big")]
-                                let dst = (&mut buff[8 - size as usize..]).as_mut_ptr();
-
-                                // copy to the head
-                                #[cfg(target_endian = "little")]
-                                let dst = (&mut buf[0..]).as_mut_ptr();
-
-                                std::ptr::copy_nonoverlapping(ptr, dst, size as usize);
-                            },
-                            other => {
-                                panic!("unexpected fixed size array element size: {}", other)
-                            }
-                        }
-
-                        Datum::from(usize::from_ne_bytes(buf))
-                    }
-
-                    let datum = bytes_to_datum(ptr, size as usize);
-                    unsafe { T::from_polymorphic_datum(datum, false, self.raw.oid()) }
-                }
-
-                other => {
-                    panic!("unrecognized pass-by-value array element layout size: {:?}", other)
-                }
-            },
-            PassBy::Ref => {
-                let datum = pg_sys::Datum::from(ptr);
-                #[cfg(debug_assertions)]
-                assert_eq!(
-                    Some(datum),
-                    self._datum_slice.get().and_then(|s| unsafe { s.get(_index) }).copied()
-                );
-                unsafe { T::from_polymorphic_datum(datum, false, self.raw.oid()) }
-            }
+    unsafe fn bring_it_back_now(&self, ptr: *const u8, is_null: bool) -> Option<T> {
+        match is_null {
+            true => None,
+            false => unsafe { self.slide_impl.bring_it_back_now(self, ptr) },
         }
     }
 
@@ -312,36 +272,213 @@ impl<'a, T: FromDatum> Array<'a, T> {
     /// Do not cumulatively invoke this more than `len - null_count`!
     /// Doing so will result in reading uninitialized data, which is UB!
     #[inline]
-    unsafe fn one_hop_this_time(&self, ptr: *const u8, layout: Layout) -> *const u8 {
+    unsafe fn one_hop_this_time(&self, ptr: *const u8) -> *const u8 {
         unsafe {
-            let offset = match layout {
-                Layout { size: Size::Fixed(n), .. } => n.into(),
-                Layout { size: Size::Varlena, align, .. } => {
-                    // SAFETY: This uses the varsize_any function to be safe,
-                    // and the caller was informed of pointer requirements.
-                    let varsize = varlena::varsize_any(ptr.cast());
-
-                    // the Postgres realignment code may seem different in form,
-                    // but it's the same in function, just micro-optimized
-                    let align = align.as_usize();
-                    let align_mask = varsize & (align - 1);
-                    let align_offset = if align_mask != 0 { align - align_mask } else { 0 };
-
-                    varsize + align_offset
-                }
-                Layout { size: Size::CStr, .. } => {
-                    // TODO: this code is dangerously under-exercised in the test suite
-                    // SAFETY: The caller was informed of pointer requirements.
-                    let strlen = CStr::from_ptr(ptr.cast()).to_bytes().len();
-
-                    // Skip over the null and into the next cstr!
-                    strlen + 2
-                }
-            };
-
+            let offset = self.slide_impl.hop_size(ptr);
             // SAFETY: ptr stops at 1-past-end of the array's varlena
             debug_assert!(ptr.wrapping_add(offset) <= self.raw.end_ptr());
             ptr.add(offset)
+        }
+    }
+}
+
+mod casper {
+    use crate::{pg_sys, varlena, Array, FromDatum};
+
+    // it's a pop-culture reference (https://en.wikipedia.org/wiki/Cha_Cha_Slide) not some fancy crypto thing you nerd
+    /// Describes how to instantiate a value `T` from an [`Array`] and its backing byte array pointer.
+    /// It also knows how to determine the size of an [`Array`] element value.
+    pub(super) trait ChaChaSlide<T: FromDatum> {
+        /// Instantiate a `T` from the head of `ptr`
+        ///
+        /// # Safety
+        ///
+        /// This function is unsafe as it cannot guarantee that `ptr` points to the proper bytes
+        /// that represent a `T`, or even that it belongs to `array`.  Both of which must be true
+        unsafe fn bring_it_back_now(&self, array: &Array<T>, ptr: *const u8) -> Option<T>;
+
+        /// Determine how many bytes are used to represent `T`.  This could be fixed size or
+        /// even determined at runtime by whatever `ptr` is known to be pointing at.
+        ///
+        /// # Safety
+        ///
+        /// This function is unsafe as it cannot guarantee that `ptr` points to the bytes of a `T`,
+        /// which it must for implementations that rely on that.
+        unsafe fn hop_size(&self, ptr: *const u8) -> usize;
+    }
+
+    /// Array elements are of a known, fixed size which matches the `size_of::<T>()`.
+    pub(super) struct FixedSizeExact(pub(super) usize);
+    impl<T: FromDatum> ChaChaSlide<T> for FixedSizeExact {
+        #[inline]
+        unsafe fn bring_it_back_now(&self, _array: &Array<T>, ptr: *const u8) -> Option<T> {
+            Some(ptr.cast::<T>().read())
+        }
+
+        #[inline]
+        unsafe fn hop_size(&self, _ptr: *const u8) -> usize {
+            self.0
+        }
+    }
+
+    /// Array elements are 1 byte in size
+    pub(super) struct FixedSize1b;
+    impl<T: FromDatum> ChaChaSlide<T> for FixedSize1b {
+        #[inline]
+        unsafe fn bring_it_back_now(&self, array: &Array<T>, ptr: *const u8) -> Option<T> {
+            T::from_polymorphic_datum(
+                pg_sys::Datum::from(ptr.cast::<u8>().read()),
+                false,
+                array.raw.oid(),
+            )
+        }
+
+        #[inline]
+        unsafe fn hop_size(&self, _ptr: *const u8) -> usize {
+            1
+        }
+    }
+
+    /// Array elements are 2 bytes in size
+    pub(super) struct FixedSize2b;
+    impl<T: FromDatum> ChaChaSlide<T> for FixedSize2b {
+        #[inline]
+        unsafe fn bring_it_back_now(&self, array: &Array<T>, ptr: *const u8) -> Option<T> {
+            T::from_polymorphic_datum(
+                pg_sys::Datum::from(ptr.cast::<u16>().read()),
+                false,
+                array.raw.oid(),
+            )
+        }
+
+        #[inline]
+        unsafe fn hop_size(&self, _ptr: *const u8) -> usize {
+            2
+        }
+    }
+
+    /// Array elements are 4 bytes in size
+    pub(super) struct FixedSize4b;
+    impl<T: FromDatum> ChaChaSlide<T> for FixedSize4b {
+        #[inline]
+        unsafe fn bring_it_back_now(&self, array: &Array<T>, ptr: *const u8) -> Option<T> {
+            T::from_polymorphic_datum(
+                pg_sys::Datum::from(ptr.cast::<u32>().read()),
+                false,
+                array.raw.oid(),
+            )
+        }
+
+        #[inline]
+        unsafe fn hop_size(&self, _ptr: *const u8) -> usize {
+            4
+        }
+    }
+
+    /// Array elements are 8 bytes in size
+    pub(super) struct FixedSize8b;
+    impl<T: FromDatum> ChaChaSlide<T> for FixedSize8b {
+        #[inline]
+        unsafe fn bring_it_back_now(&self, array: &Array<T>, ptr: *const u8) -> Option<T> {
+            T::from_polymorphic_datum(
+                pg_sys::Datum::from(ptr.cast::<u64>().read()),
+                false,
+                array.raw.oid(),
+            )
+        }
+
+        #[inline]
+        unsafe fn hop_size(&self, _ptr: *const u8) -> usize {
+            8
+        }
+    }
+
+    /// Array elements are some arbitrary size
+    pub(super) struct FixedSizeArbitrary(pub(super) usize);
+    impl<T: FromDatum> ChaChaSlide<T> for FixedSizeArbitrary {
+        #[inline]
+        unsafe fn bring_it_back_now(&self, array: &Array<T>, ptr: *const u8) -> Option<T> {
+            /// Read off `size` bytes from the head of `ptr` and construct a padded Datum from those bytes
+            #[inline(always)]
+            fn bytes_to_datum(ptr: *const u8, size: usize) -> pg_sys::Datum {
+                const USIZE_BYTE_LEN: usize = std::mem::size_of::<usize>();
+
+                // a zero-padded buffer in which we'll store bytes so we can
+                // ultimately make a `usize` that we convert into a `Datum`
+                let mut buf = [0u8; USIZE_BYTE_LEN];
+
+                match size {
+                    1..=USIZE_BYTE_LEN => unsafe {
+                        // copy to the end
+                        #[cfg(target_endian = "big")]
+                        let dst = (&mut buff[USIZE_BYTE_LEN - size as usize..]).as_mut_ptr();
+
+                        // copy to the head
+                        #[cfg(target_endian = "little")]
+                        let dst = (&mut buf[0..]).as_mut_ptr();
+
+                        std::ptr::copy_nonoverlapping(ptr, dst, size as usize);
+                    },
+                    other => {
+                        panic!("unexpected fixed size array element size: {}", other)
+                    }
+                }
+
+                pg_sys::Datum::from(usize::from_ne_bytes(buf))
+            }
+            let datum = bytes_to_datum(ptr, self.0);
+            unsafe { T::from_polymorphic_datum(datum, false, array.raw.oid()) }
+        }
+
+        #[inline]
+        unsafe fn hop_size(&self, _ptr: *const u8) -> usize {
+            self.0
+        }
+    }
+
+    /// Array elements are [`pg_sys::varlena`] types, which are pass-by-reference
+    pub(super) struct PassByVarlena {
+        pub(super) align: usize,
+    }
+    impl<T: FromDatum> ChaChaSlide<T> for PassByVarlena {
+        #[inline]
+        unsafe fn bring_it_back_now(&self, array: &Array<T>, ptr: *const u8) -> Option<T> {
+            let datum = pg_sys::Datum::from(ptr);
+            unsafe { T::from_polymorphic_datum(datum, false, array.raw.oid()) }
+        }
+
+        #[inline]
+        unsafe fn hop_size(&self, ptr: *const u8) -> usize {
+            // SAFETY: This uses the varsize_any function to be safe,
+            // and the caller was informed of pointer requirements.
+            let varsize = varlena::varsize_any(ptr.cast());
+
+            // the Postgres realignment code may seem different in form,
+            // but it's the same in function, just micro-optimized
+            let align = self.align;
+            let align_mask = varsize & (align - 1);
+            let align_offset = if align_mask != 0 { align - align_mask } else { 0 };
+
+            varsize + align_offset
+        }
+    }
+
+    /// Array elements are standard C strings (`char *`), which are pass-by-reference
+    pub(super) struct PassByCStr;
+    impl<T: FromDatum> ChaChaSlide<T> for PassByCStr {
+        #[inline]
+        unsafe fn bring_it_back_now(&self, array: &Array<T>, ptr: *const u8) -> Option<T> {
+            let datum = pg_sys::Datum::from(ptr);
+            unsafe { T::from_polymorphic_datum(datum, false, array.raw.oid()) }
+        }
+
+        #[inline]
+        unsafe fn hop_size(&self, ptr: *const u8) -> usize {
+            // SAFETY: The caller was informed of pointer requirements.
+            let strlen = core::ffi::CStr::from_ptr(ptr.cast()).to_bytes().len();
+
+            // Skip over the null which points us to the head of the next cstr
+            strlen + 1
         }
     }
 }
@@ -409,9 +546,9 @@ impl<'a, T: FromDatum> Iterator for ArrayTypedIterator<'a, T> {
         } else {
             // SAFETY: The constructor for this type instantly panics if any nulls are present!
             // Thus as an invariant, this will never have to reckon with the nullbitmap.
-            let element = unsafe { array.bring_it_back_now(*ptr, *curr, false) };
+            let element = unsafe { array.bring_it_back_now(*ptr, false) };
             *curr += 1;
-            *ptr = unsafe { array.one_hop_this_time(*ptr, array.elem_layout) };
+            *ptr = unsafe { array.one_hop_this_time(*ptr) };
             element
         }
     }
@@ -439,10 +576,10 @@ impl<'a, T: FromDatum> Iterator for ArrayIterator<'a, T> {
     fn next(&mut self) -> Option<Self::Item> {
         let Self { array, curr, ptr } = self;
         let Some(is_null) = array.null_slice.get(*curr) else { return None };
-        let element = unsafe { array.bring_it_back_now(*ptr, *curr, is_null) };
+        let element = unsafe { array.bring_it_back_now(*ptr, is_null) };
         *curr += 1;
         if let Some(false) = array.null_slice.get(*curr) {
-            *ptr = unsafe { array.one_hop_this_time(*ptr, array.elem_layout) };
+            *ptr = unsafe { array.one_hop_this_time(*ptr) };
         }
         Some(element)
     }
@@ -481,10 +618,10 @@ impl<'a, T: FromDatum> Iterator for ArrayIntoIterator<'a, T> {
     fn next(&mut self) -> Option<Self::Item> {
         let Self { array, curr, ptr } = self;
         let Some(is_null) = array.null_slice.get(*curr) else { return None };
-        let element = unsafe { array.bring_it_back_now(*ptr, *curr, is_null) };
+        let element = unsafe { array.bring_it_back_now(*ptr, is_null) };
         *curr += 1;
         if let Some(false) = array.null_slice.get(*curr) {
-            *ptr = unsafe { array.one_hop_this_time(*ptr, array.elem_layout) };
+            *ptr = unsafe { array.one_hop_this_time(*ptr) };
         }
         Some(element)
     }
