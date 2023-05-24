@@ -11,6 +11,7 @@ Some may be better off extending the pgrx bindings themselves, doing their own l
 When PGRX is a bit more mature in its soundness, and we better understand what our callers expect,
 then we may want to offer more help.
 */
+#![allow(dead_code)]
 use crate::pg_sys::{self, TYPALIGN_CHAR, TYPALIGN_DOUBLE, TYPALIGN_INT, TYPALIGN_SHORT};
 use core::mem;
 
@@ -83,7 +84,6 @@ impl Align {
         }
     }
 
-    #[cfg(debug_assertions)]
     pub(crate) fn as_typalign(self) -> libc::c_char {
         (match self {
             Align::Byte => TYPALIGN_CHAR,
@@ -114,7 +114,6 @@ impl TryFrom<i16> for Size {
 }
 
 impl Size {
-    #[cfg(debug_assertions)]
     pub(crate) fn as_typlen(&self) -> i16 {
         match self {
             Self::CStr => -2,

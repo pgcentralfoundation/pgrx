@@ -232,35 +232,6 @@ impl RawArray {
         }
     }
 
-    #[cfg(debug_assertions)]
-    pub(crate) unsafe fn deconstruct(
-        &mut self,
-        layout: crate::layout::Layout,
-    ) -> (*mut pg_sys::Datum, *mut bool) {
-        let oid = self.oid();
-        let array = self.ptr.as_ptr();
-
-        // outvals for deconstruct_array
-        let mut elements = core::ptr::null_mut();
-        let mut nulls = core::ptr::null_mut();
-        let mut nelems = 0;
-
-        unsafe {
-            pg_sys::deconstruct_array(
-                array,
-                oid,
-                layout.size.as_typlen().into(),
-                matches!(layout.pass, crate::layout::PassBy::Value),
-                layout.align.as_typalign(),
-                &mut elements,
-                &mut nulls,
-                &mut nelems,
-            );
-
-            (elements, nulls)
-        }
-    }
-
     /// # Safety
     /// Array must have been made from an ArrayType pointer,
     /// or a null value, as-if [RawArray::from_ptr].
@@ -326,6 +297,7 @@ impl RawArray {
     }
 
     /// Accessor for ArrayType's elemtype.
+    #[inline]
     pub fn oid(&self) -> pg_sys::Oid {
         // SAFETY: Validity asserted on construction.
         unsafe { (*self.ptr.as_ptr()).elemtype }
@@ -491,6 +463,7 @@ impl RawArray {
         }
     }
 
+    #[inline]
     pub(crate) fn data_ptr(&self) -> *const u8 {
         unsafe { ARR_DATA_PTR(self.ptr.as_ptr()) }
     }
