@@ -16,6 +16,7 @@ use bitvec::slice::BitSlice;
 use core::fmt::{Debug, Formatter};
 use core::ops::DerefMut;
 use core::ptr::NonNull;
+use pgrx_pg_sys::{Datum, Oid};
 use pgrx_sql_entity_graph::metadata::{
     ArgumentError, Returns, ReturnsError, SqlMapping, SqlTranslatable,
 };
@@ -204,6 +205,12 @@ impl<'a, T: FromDatum> Array<'a, T> {
         ArrayTypedIterator { array: self, curr: 0, ptr }
     }
 
+    /// Returns `true` if this [`Array`] contains one or more SQL "NULL" values
+    #[inline]
+    pub fn contains_nulls(&self) -> bool {
+        self.null_slice.any()
+    }
+
     #[inline]
     pub fn len(&self) -> usize {
         self.raw.len()
@@ -279,6 +286,120 @@ impl<'a, T: FromDatum> Array<'a, T> {
             debug_assert!(ptr.wrapping_add(offset) <= self.raw.end_ptr());
             ptr.add(offset)
         }
+    }
+}
+
+#[derive(thiserror::Error, Debug, Copy, Clone, Eq, PartialEq)]
+pub enum ArrayError {
+    #[error("Array contains nulls")]
+    ArrayContainsNulls,
+}
+
+impl<'a> Array<'a, f64> {
+    /// Returns a slice of `f64`s which comprise this [`Array`].
+    ///
+    /// # Errors
+    ///
+    /// Returns a [`ArrayError::ArrayContainsNulls`] error if this [`Array`] contains one or more
+    /// SQL "NULL" values.  In this case, you'd likely want to fallback to using [`Array::iter()`].
+    pub fn as_slice(&self) -> Result<&[f64], ArrayError> {
+        if self.contains_nulls() {
+            return Err(ArrayError::ArrayContainsNulls);
+        }
+
+        let slice =
+            unsafe { std::slice::from_raw_parts(self.raw.data_ptr() as *const _, self.len()) };
+        Ok(slice)
+    }
+}
+
+impl<'a> Array<'a, f32> {
+    /// Returns a slice of `f32`s which comprise this [`Array`].
+    ///
+    /// # Errors
+    ///
+    /// Returns a [`ArrayError::ArrayContainsNulls`] error if this [`Array`] contains one or more
+    /// SQL "NULL" values.  In this case, you'd likely want to fallback to using [`Array::iter()`].
+    pub fn as_slice(&self) -> Result<&[f32], ArrayError> {
+        if self.contains_nulls() {
+            return Err(ArrayError::ArrayContainsNulls);
+        }
+
+        let slice =
+            unsafe { std::slice::from_raw_parts(self.raw.data_ptr() as *const _, self.len()) };
+        Ok(slice)
+    }
+}
+
+impl<'a> Array<'a, i64> {
+    /// Returns a slice of `i64`s which comprise this [`Array`].
+    ///
+    /// # Errors
+    ///
+    /// Returns a [`ArrayError::ArrayContainsNulls`] error if this [`Array`] contains one or more
+    /// SQL "NULL" values.  In this case, you'd likely want to fallback to using [`Array::iter()`].
+    pub fn as_slice(&self) -> Result<&[i64], ArrayError> {
+        if self.contains_nulls() {
+            return Err(ArrayError::ArrayContainsNulls);
+        }
+
+        let slice =
+            unsafe { std::slice::from_raw_parts(self.raw.data_ptr() as *const _, self.len()) };
+        Ok(slice)
+    }
+}
+
+impl<'a> Array<'a, i32> {
+    /// Returns a slice of `i32`s which comprise this [`Array`].
+    ///
+    /// # Errors
+    ///
+    /// Returns a [`ArrayError::ArrayContainsNulls`] error if this [`Array`] contains one or more
+    /// SQL "NULL" values.  In this case, you'd likely want to fallback to using [`Array::iter()`].
+    pub fn as_slice(&self) -> Result<&[i32], ArrayError> {
+        if self.contains_nulls() {
+            return Err(ArrayError::ArrayContainsNulls);
+        }
+
+        let slice =
+            unsafe { std::slice::from_raw_parts(self.raw.data_ptr() as *const _, self.len()) };
+        Ok(slice)
+    }
+}
+
+impl<'a> Array<'a, i16> {
+    /// Returns a slice of `i16`s which comprise this [`Array`].
+    ///
+    /// # Errors
+    ///
+    /// Returns a [`ArrayError::ArrayContainsNulls`] error if this [`Array`] contains one or more
+    /// SQL "NULL" values.  In this case, you'd likely want to fallback to using [`Array::iter()`].
+    pub fn as_slice(&self) -> Result<&[i16], ArrayError> {
+        if self.contains_nulls() {
+            return Err(ArrayError::ArrayContainsNulls);
+        }
+
+        let slice =
+            unsafe { std::slice::from_raw_parts(self.raw.data_ptr() as *const _, self.len()) };
+        Ok(slice)
+    }
+}
+
+impl<'a> Array<'a, i8> {
+    /// Returns a slice of `i8`s which comprise this [`Array`].
+    ///
+    /// # Errors
+    ///
+    /// Returns a [`ArrayError::ArrayContainsNulls`] error if this [`Array`] contains one or more
+    /// SQL "NULL" values.  In this case, you'd likely want to fallback to using [`Array::iter()`].
+    pub fn as_slice(&self) -> Result<&[i8], ArrayError> {
+        if self.contains_nulls() {
+            return Err(ArrayError::ArrayContainsNulls);
+        }
+
+        let slice =
+            unsafe { std::slice::from_raw_parts(self.raw.data_ptr() as *const _, self.len()) };
+        Ok(slice)
     }
 }
 
@@ -688,6 +809,20 @@ impl<'a, T: FromDatum> FromDatum for Array<'a, T> {
                 Array::<T>::from_polymorphic_datum(pg_sys::Datum::from(copy), false, typoid)
             })
         }
+    }
+}
+
+impl<T: IntoDatum + FromDatum> IntoDatum for Array<'_, T> {
+    #[inline]
+    fn into_datum(self) -> Option<Datum> {
+        let array_type = self.into_array_type();
+        let datum = Datum::from(array_type);
+        Some(datum)
+    }
+
+    #[inline]
+    fn type_oid() -> Oid {
+        T::array_type_oid()
     }
 }
 
