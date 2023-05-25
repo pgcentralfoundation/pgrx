@@ -290,9 +290,9 @@ impl<'a, T: FromDatum> Array<'a, T> {
 }
 
 #[derive(thiserror::Error, Debug, Copy, Clone, Eq, PartialEq)]
-pub enum ArrayError {
-    #[error("Array contains nulls")]
-    ArrayContainsNulls,
+pub enum ArraySliceError {
+    #[error("Cannot create a slice of an Array that contains nulls")]
+    ContainsNulls,
 }
 
 impl<'a> Array<'a, f64> {
@@ -300,16 +300,10 @@ impl<'a> Array<'a, f64> {
     ///
     /// # Errors
     ///
-    /// Returns a [`ArrayError::ArrayContainsNulls`] error if this [`Array`] contains one or more
+    /// Returns a [`ArraySliceError::ContainsNulls`] error if this [`Array`] contains one or more
     /// SQL "NULL" values.  In this case, you'd likely want to fallback to using [`Array::iter()`].
-    pub fn as_slice(&self) -> Result<&[f64], ArrayError> {
-        if self.contains_nulls() {
-            return Err(ArrayError::ArrayContainsNulls);
-        }
-
-        let slice =
-            unsafe { std::slice::from_raw_parts(self.raw.data_ptr() as *const _, self.len()) };
-        Ok(slice)
+    pub fn as_slice(&self) -> Result<&[f64], ArraySliceError> {
+        as_slice(self)
     }
 }
 
@@ -318,16 +312,10 @@ impl<'a> Array<'a, f32> {
     ///
     /// # Errors
     ///
-    /// Returns a [`ArrayError::ArrayContainsNulls`] error if this [`Array`] contains one or more
+    /// Returns a [`ArraySliceError::ContainsNulls`] error if this [`Array`] contains one or more
     /// SQL "NULL" values.  In this case, you'd likely want to fallback to using [`Array::iter()`].
-    pub fn as_slice(&self) -> Result<&[f32], ArrayError> {
-        if self.contains_nulls() {
-            return Err(ArrayError::ArrayContainsNulls);
-        }
-
-        let slice =
-            unsafe { std::slice::from_raw_parts(self.raw.data_ptr() as *const _, self.len()) };
-        Ok(slice)
+    pub fn as_slice(&self) -> Result<&[f32], ArraySliceError> {
+        as_slice(self)
     }
 }
 
@@ -336,16 +324,10 @@ impl<'a> Array<'a, i64> {
     ///
     /// # Errors
     ///
-    /// Returns a [`ArrayError::ArrayContainsNulls`] error if this [`Array`] contains one or more
+    /// Returns a [`ArraySliceError::ContainsNulls`] error if this [`Array`] contains one or more
     /// SQL "NULL" values.  In this case, you'd likely want to fallback to using [`Array::iter()`].
-    pub fn as_slice(&self) -> Result<&[i64], ArrayError> {
-        if self.contains_nulls() {
-            return Err(ArrayError::ArrayContainsNulls);
-        }
-
-        let slice =
-            unsafe { std::slice::from_raw_parts(self.raw.data_ptr() as *const _, self.len()) };
-        Ok(slice)
+    pub fn as_slice(&self) -> Result<&[i64], ArraySliceError> {
+        as_slice(self)
     }
 }
 
@@ -354,16 +336,10 @@ impl<'a> Array<'a, i32> {
     ///
     /// # Errors
     ///
-    /// Returns a [`ArrayError::ArrayContainsNulls`] error if this [`Array`] contains one or more
+    /// Returns a [`ArraySliceError::ContainsNulls`] error if this [`Array`] contains one or more
     /// SQL "NULL" values.  In this case, you'd likely want to fallback to using [`Array::iter()`].
-    pub fn as_slice(&self) -> Result<&[i32], ArrayError> {
-        if self.contains_nulls() {
-            return Err(ArrayError::ArrayContainsNulls);
-        }
-
-        let slice =
-            unsafe { std::slice::from_raw_parts(self.raw.data_ptr() as *const _, self.len()) };
-        Ok(slice)
+    pub fn as_slice(&self) -> Result<&[i32], ArraySliceError> {
+        as_slice(self)
     }
 }
 
@@ -372,16 +348,10 @@ impl<'a> Array<'a, i16> {
     ///
     /// # Errors
     ///
-    /// Returns a [`ArrayError::ArrayContainsNulls`] error if this [`Array`] contains one or more
+    /// Returns a [`ArraySliceError::ContainsNulls`] error if this [`Array`] contains one or more
     /// SQL "NULL" values.  In this case, you'd likely want to fallback to using [`Array::iter()`].
-    pub fn as_slice(&self) -> Result<&[i16], ArrayError> {
-        if self.contains_nulls() {
-            return Err(ArrayError::ArrayContainsNulls);
-        }
-
-        let slice =
-            unsafe { std::slice::from_raw_parts(self.raw.data_ptr() as *const _, self.len()) };
-        Ok(slice)
+    pub fn as_slice(&self) -> Result<&[i16], ArraySliceError> {
+        as_slice(self)
     }
 }
 
@@ -390,17 +360,22 @@ impl<'a> Array<'a, i8> {
     ///
     /// # Errors
     ///
-    /// Returns a [`ArrayError::ArrayContainsNulls`] error if this [`Array`] contains one or more
+    /// Returns a [`ArraySliceError::ContainsNulls`] error if this [`Array`] contains one or more
     /// SQL "NULL" values.  In this case, you'd likely want to fallback to using [`Array::iter()`].
-    pub fn as_slice(&self) -> Result<&[i8], ArrayError> {
-        if self.contains_nulls() {
-            return Err(ArrayError::ArrayContainsNulls);
-        }
-
-        let slice =
-            unsafe { std::slice::from_raw_parts(self.raw.data_ptr() as *const _, self.len()) };
-        Ok(slice)
+    pub fn as_slice(&self) -> Result<&[i8], ArraySliceError> {
+        as_slice(self)
     }
+}
+
+#[inline(always)]
+fn as_slice<'a, T: Sized + FromDatum>(array: &Array<'a, T>) -> Result<&'a [T], ArraySliceError> {
+    if array.contains_nulls() {
+        return Err(ArraySliceError::ContainsNulls);
+    }
+
+    let slice =
+        unsafe { std::slice::from_raw_parts(array.raw.data_ptr() as *const _, array.len()) };
+    Ok(slice)
 }
 
 mod casper {

@@ -124,12 +124,12 @@ mod vectors {
     }
 
     #[pg_extern]
-    fn sum_vector_slice(input: Array<f32>) -> Result<f32, ArrayError> {
+    fn sum_vector_slice(input: Array<f32>) -> Result<f32, ArraySliceError> {
         Ok(input.as_slice()?.iter().map(|v| *v as f32).sum())
     }
 
     #[pg_extern]
-    pub fn sum_vector_simd(values: Array<f32>) -> Result<f32, ArrayError> {
+    pub fn sum_vector_simd(values: Array<f32>) -> Result<f32, ArraySliceError> {
         // this comes directly from https://stackoverflow.com/questions/23100534/how-to-sum-the-values-in-an-array-slice-or-vec-in-rust/67191480#67191480
         // and https://www.reddit.com/r/rust/comments/13q56bp/comment/jlgq2t6/?utm_source=share&utm_medium=web2x&context=3
         //

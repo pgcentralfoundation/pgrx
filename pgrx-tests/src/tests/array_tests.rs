@@ -427,7 +427,7 @@ mod tests {
     fn test_slice_with_null() -> Result<(), Box<dyn std::error::Error>> {
         let array = Spi::get_one::<Array<i16>>("SELECT ARRAY[1, 2, 3, NULL]::smallint[]")?
             .expect("datum was null");
-        assert_eq!(array.as_slice(), Err(ArrayError::ArrayContainsNulls));
+        assert_eq!(array.as_slice(), Err(ArraySliceError::ContainsNulls));
         Ok(())
     }
 }

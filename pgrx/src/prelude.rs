@@ -19,7 +19,7 @@ pub use crate::pgbox::{AllocatedByPostgres, AllocatedByRust, PgBox, WhoAllocated
 // However, reexporting them seems fine for now.
 
 pub use crate::datum::{
-    datetime_support::*, AnyNumeric, Array, ArrayError, Date, FromDatum, Interval, IntoDatum,
+    datetime_support::*, AnyNumeric, Array, ArraySliceError, Date, FromDatum, Interval, IntoDatum,
     Numeric, PgVarlena, PostgresType, Range, RangeBound, RangeSubType, Time, TimeWithTimeZone,
     Timestamp, TimestampWithTimeZone, VariadicArray,
 };
