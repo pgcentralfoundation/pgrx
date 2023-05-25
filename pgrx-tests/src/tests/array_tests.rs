@@ -382,4 +382,52 @@ mod tests {
         assert_eq!(strings, true);
         Ok(())
     }
+
+    #[pg_test]
+    fn test_f64_slice() -> Result<(), Box<dyn std::error::Error>> {
+        let array = Spi::get_one::<Array<f64>>("SELECT ARRAY[1.0, 2.0, 3.0]::float8[]")?
+            .expect("datum was null");
+        assert_eq!(array.as_slice()?, &[1.0, 2.0, 3.0]);
+        Ok(())
+    }
+
+    #[pg_test]
+    fn test_f32_slice() -> Result<(), Box<dyn std::error::Error>> {
+        let array = Spi::get_one::<Array<f32>>("SELECT ARRAY[1.0, 2.0, 3.0]::float4[]")?
+            .expect("datum was null");
+        assert_eq!(array.as_slice()?, &[1.0, 2.0, 3.0]);
+        Ok(())
+    }
+
+    #[pg_test]
+    fn test_i64_slice() -> Result<(), Box<dyn std::error::Error>> {
+        let array =
+            Spi::get_one::<Array<i64>>("SELECT ARRAY[1, 2, 3]::bigint[]")?.expect("datum was null");
+        assert_eq!(array.as_slice()?, &[1, 2, 3]);
+        Ok(())
+    }
+
+    #[pg_test]
+    fn test_i32_slice() -> Result<(), Box<dyn std::error::Error>> {
+        let array = Spi::get_one::<Array<i32>>("SELECT ARRAY[1, 2, 3]::integer[]")?
+            .expect("datum was null");
+        assert_eq!(array.as_slice()?, &[1, 2, 3]);
+        Ok(())
+    }
+
+    #[pg_test]
+    fn test_i16_slice() -> Result<(), Box<dyn std::error::Error>> {
+        let array = Spi::get_one::<Array<i16>>("SELECT ARRAY[1, 2, 3]::smallint[]")?
+            .expect("datum was null");
+        assert_eq!(array.as_slice()?, &[1, 2, 3]);
+        Ok(())
+    }
+
+    #[pg_test]
+    fn test_slice_with_null() -> Result<(), Box<dyn std::error::Error>> {
+        let array = Spi::get_one::<Array<i16>>("SELECT ARRAY[1, 2, 3, NULL]::smallint[]")?
+            .expect("datum was null");
+        assert_eq!(array.as_slice(), Err(ArraySliceError::ContainsNulls));
+        Ok(())
+    }
 }

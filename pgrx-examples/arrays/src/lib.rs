@@ -100,8 +100,74 @@ fn return_vec_of_customtype() -> Vec<SomeStruct> {
     vec![SomeStruct {}]
 }
 
+#[pg_schema]
+mod vectors {
+    use pgrx::prelude::*;
+
+    extension_sql!(
+        r#"
+            do $$ begin raise warning 'creating sample data in the table ''vectors.data''.'; end; $$;
+            create table vectors.data as select vectors.random_vector(768) v from generate_series(1, 100000);
+    "#,
+        name = "vectors_data",
+        requires = [random_vector]
+    );
+
+    #[pg_extern]
+    fn sum_vector_array(input: Array<f32>) -> f32 {
+        input.iter_deny_null().map(|v| v as f32).sum()
+    }
+
+    #[pg_extern]
+    fn sum_vector_vec(input: Vec<f32>) -> f32 {
+        input.into_iter().map(|v| v as f32).sum()
+    }
+
+    #[pg_extern]
+    fn sum_vector_slice(input: Array<f32>) -> Result<f32, ArraySliceError> {
+        Ok(input.as_slice()?.iter().map(|v| *v as f32).sum())
+    }
+
+    #[pg_extern]
+    pub fn sum_vector_simd(values: Array<f32>) -> Result<f32, ArraySliceError> {
+        // this comes directly from https://stackoverflow.com/questions/23100534/how-to-sum-the-values-in-an-array-slice-or-vec-in-rust/67191480#67191480
+        // and https://www.reddit.com/r/rust/comments/13q56bp/comment/jlgq2t6/?utm_source=share&utm_medium=web2x&context=3
+        //
+        // the expectation here is that the compiler will autovectorize this code using SIMD
+        use std::convert::TryInto;
+
+        const LANES: usize = 16;
+
+        let values = values.as_slice()?;
+        let chunks = values.chunks_exact(LANES);
+        let remainder = chunks.remainder();
+
+        let sum = chunks.fold([0.0f32; LANES], |mut acc, chunk| {
+            let chunk: [f32; LANES] = chunk.try_into().unwrap();
+            for i in 0..LANES {
+                acc[i] += chunk[i];
+            }
+            acc
+        });
+
+        let remainder: f32 = remainder.iter().copied().sum();
+
+        let mut reduced = 0.0f32;
+        for i in 0..LANES {
+            reduced += sum[i];
+        }
+        Ok(reduced + remainder)
+    }
+
+    #[pg_extern]
+    fn random_vector(len: i32) -> Vec<f32> {
+        (0..len).map(|_| rand::random()).collect()
+    }
+}
+
 #[cfg(test)]
 pub mod pg_test {
+    use pgrx::pg_schema;
 
     pub fn setup(_options: Vec<&str>) {
         // perform one-off initialization when the pg_test framework starts
