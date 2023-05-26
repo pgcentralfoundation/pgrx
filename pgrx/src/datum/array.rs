@@ -174,6 +174,7 @@ impl<'a, T: FromDatum> Array<'a, T> {
     /// Rips out the underlying `pg_sys::ArrayType` pointer.
     /// Note that Array may have caused Postgres to allocate to unbox the datum,
     /// and this can hypothetically cause a memory leak if so.
+    #[inline]
     pub fn into_array_type(self) -> *const pg_sys::ArrayType {
         // may be worth replacing this function when Toast<T> matures enough
         // to be used as a public type with a fn(self) -> Toast<RawArray>
@@ -187,6 +188,7 @@ impl<'a, T: FromDatum> Array<'a, T> {
     }
 
     /// Return an iterator of `Option<T>`.
+    #[inline]
     pub fn iter(&self) -> ArrayIterator<'_, T> {
         let ptr = self.raw.data_ptr();
         ArrayIterator { array: self, curr: 0, ptr }
@@ -196,6 +198,7 @@ impl<'a, T: FromDatum> Array<'a, T> {
     ///
     /// # Panics
     /// This function will panic when called if the array contains any SQL NULL values.
+    #[inline]
     pub fn iter_deny_null(&self) -> ArrayTypedIterator<'_, T> {
         if self.null_slice.any() {
             panic!("array contains NULL");
@@ -302,6 +305,7 @@ impl<'a> Array<'a, f64> {
     ///
     /// Returns a [`ArraySliceError::ContainsNulls`] error if this [`Array`] contains one or more
     /// SQL "NULL" values.  In this case, you'd likely want to fallback to using [`Array::iter()`].
+    #[inline]
     pub fn as_slice(&self) -> Result<&[f64], ArraySliceError> {
         as_slice(self)
     }
@@ -314,6 +318,7 @@ impl<'a> Array<'a, f32> {
     ///
     /// Returns a [`ArraySliceError::ContainsNulls`] error if this [`Array`] contains one or more
     /// SQL "NULL" values.  In this case, you'd likely want to fallback to using [`Array::iter()`].
+    #[inline]
     pub fn as_slice(&self) -> Result<&[f32], ArraySliceError> {
         as_slice(self)
     }
@@ -326,6 +331,7 @@ impl<'a> Array<'a, i64> {
     ///
     /// Returns a [`ArraySliceError::ContainsNulls`] error if this [`Array`] contains one or more
     /// SQL "NULL" values.  In this case, you'd likely want to fallback to using [`Array::iter()`].
+    #[inline]
     pub fn as_slice(&self) -> Result<&[i64], ArraySliceError> {
         as_slice(self)
     }
@@ -338,6 +344,7 @@ impl<'a> Array<'a, i32> {
     ///
     /// Returns a [`ArraySliceError::ContainsNulls`] error if this [`Array`] contains one or more
     /// SQL "NULL" values.  In this case, you'd likely want to fallback to using [`Array::iter()`].
+    #[inline]
     pub fn as_slice(&self) -> Result<&[i32], ArraySliceError> {
         as_slice(self)
     }
@@ -350,6 +357,7 @@ impl<'a> Array<'a, i16> {
     ///
     /// Returns a [`ArraySliceError::ContainsNulls`] error if this [`Array`] contains one or more
     /// SQL "NULL" values.  In this case, you'd likely want to fallback to using [`Array::iter()`].
+    #[inline]
     pub fn as_slice(&self) -> Result<&[i16], ArraySliceError> {
         as_slice(self)
     }
@@ -362,13 +370,14 @@ impl<'a> Array<'a, i8> {
     ///
     /// Returns a [`ArraySliceError::ContainsNulls`] error if this [`Array`] contains one or more
     /// SQL "NULL" values.  In this case, you'd likely want to fallback to using [`Array::iter()`].
+    #[inline]
     pub fn as_slice(&self) -> Result<&[i8], ArraySliceError> {
         as_slice(self)
     }
 }
 
 #[inline(always)]
-fn as_slice<'a, T: Sized + FromDatum>(array: &Array<'a, T>) -> Result<&'a [T], ArraySliceError> {
+fn as_slice<'a, T: Sized + FromDatum>(array: &'a Array<'_, T>) -> Result<&'a [T], ArraySliceError> {
     if array.contains_nulls() {
         return Err(ArraySliceError::ContainsNulls);
     }
@@ -591,11 +600,13 @@ impl<'a, T: FromDatum + serde::Serialize> serde::Serialize for VariadicArray<'a,
 }
 
 impl<'a, T: FromDatum> VariadicArray<'a, T> {
+    #[inline]
     pub fn into_array_type(self) -> *const pg_sys::ArrayType {
         self.0.into_array_type()
     }
 
     /// Return an Iterator of Option<T> over the contained Datums.
+    #[inline]
     pub fn iter(&self) -> ArrayIterator<'_, T> {
         self.0.iter()
     }
@@ -604,6 +615,7 @@ impl<'a, T: FromDatum> VariadicArray<'a, T> {
     ///
     /// # Panics
     /// This function will panic when called if the array contains any SQL NULL values.
+    #[inline]
     pub fn iter_deny_null(&self) -> ArrayTypedIterator<'_, T> {
         self.0.iter_deny_null()
     }
@@ -648,7 +660,16 @@ impl<'a, T: FromDatum> Iterator for ArrayTypedIterator<'a, T> {
             element
         }
     }
+
+    #[inline]
+    fn size_hint(&self) -> (usize, Option<usize>) {
+        let len = self.array.raw.len().saturating_sub(self.curr);
+        (len, Some(len))
+    }
 }
+
+impl<'a, T: FromDatum> ExactSizeIterator for ArrayTypedIterator<'a, T> {}
+impl<'a, T: FromDatum> core::iter::FusedIterator for ArrayTypedIterator<'a, T> {}
 
 impl<'a, T: FromDatum + serde::Serialize> serde::Serialize for ArrayTypedIterator<'a, T> {
     fn serialize<S>(&self, serializer: S) -> Result<<S as Serializer>::Ok, <S as Serializer>::Error>
@@ -679,7 +700,16 @@ impl<'a, T: FromDatum> Iterator for ArrayIterator<'a, T> {
         }
         Some(element)
     }
+
+    #[inline]
+    fn size_hint(&self) -> (usize, Option<usize>) {
+        let len = self.array.raw.len().saturating_sub(self.curr);
+        (len, Some(len))
+    }
 }
+
+impl<'a, T: FromDatum> ExactSizeIterator for ArrayIterator<'a, T> {}
+impl<'a, T: FromDatum> core::iter::FusedIterator for ArrayIterator<'a, T> {}
 
 pub struct ArrayIntoIterator<'a, T: FromDatum> {
     array: Array<'a, T>,
@@ -691,6 +721,7 @@ impl<'a, T: FromDatum> IntoIterator for Array<'a, T> {
     type Item = Option<T>;
     type IntoIter = ArrayIntoIterator<'a, T>;
 
+    #[inline]
     fn into_iter(self) -> Self::IntoIter {
         let ptr = self.raw.data_ptr();
         ArrayIntoIterator { array: self, curr: 0, ptr }
@@ -701,6 +732,7 @@ impl<'a, T: FromDatum> IntoIterator for VariadicArray<'a, T> {
     type Item = Option<T>;
     type IntoIter = ArrayIntoIterator<'a, T>;
 
+    #[inline]
     fn into_iter(self) -> Self::IntoIter {
         let ptr = self.0.raw.data_ptr();
         ArrayIntoIterator { array: self.0, curr: 0, ptr }
@@ -722,22 +754,15 @@ impl<'a, T: FromDatum> Iterator for ArrayIntoIterator<'a, T> {
         Some(element)
     }
 
+    #[inline]
     fn size_hint(&self) -> (usize, Option<usize>) {
-        // If asking for size, it's not clear if they want "actual size"
-        // or "size minus nulls"? Let's lower bound on 0 if nulls exist.
-        let left = self.array.raw.len() - self.curr;
-        if let NullKind::Strict(_) = self.array.null_slice {
-            (left, Some(left))
-        } else {
-            (0, Some(left))
-        }
-    }
-
-    fn count(self) -> usize {
-        // TODO: This code is dangerously under-exercised in the test suite.
-        self.array.raw.len() - self.curr
+        let len = self.array.raw.len().saturating_sub(self.curr);
+        (len, Some(len))
     }
 }
+
+impl<'a, T: FromDatum> ExactSizeIterator for ArrayIntoIterator<'a, T> {}
+impl<'a, T: FromDatum> core::iter::FusedIterator for ArrayIntoIterator<'a, T> {}
 
 impl<'a, T: FromDatum> FromDatum for VariadicArray<'a, T> {
     #[inline]
