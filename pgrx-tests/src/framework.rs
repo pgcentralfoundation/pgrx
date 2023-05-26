@@ -23,6 +23,7 @@ use std::fmt::Write as _;
 use std::io::{BufRead, BufReader, Write};
 use std::path::PathBuf;
 use std::sync::{Arc, Mutex};
+use std::time::Duration;
 use sysinfo::{Pid, ProcessExt, System, SystemExt};
 
 mod shutdown;
@@ -451,6 +452,8 @@ fn modify_postgresql_conf(pgdata: PathBuf, postgresql_conf: Vec<&'static str>) -
 }
 
 fn start_pg(loglines: LogLines) -> eyre::Result<String> {
+    wait_for_pidfile()?;
+
     let pg_config = get_pg_config()?;
     let mut command =
         Command::new(pg_config.postmaster_path().wrap_err("unable to determine postmaster path")?);
@@ -473,6 +476,25 @@ fn start_pg(loglines: LogLines) -> eyre::Result<String> {
     let session_id = monitor_pg(command, command_str, loglines);
 
     Ok(session_id)
+}
+
+fn wait_for_pidfile() -> Result<(), eyre::Report> {
+    const MAX_PIDFILE_RETRIES: usize = 10;
+
+    let pidfile = get_pid_file()?;
+
+    let mut retries = 0;
+    while pidfile.exists() {
+        if retries > MAX_PIDFILE_RETRIES {
+            // break out and try to start postgres anyways, maybe it'll report a decent error about what's going on
+            eprintln!("`{}` has existed for ~10s.  There might be some problem with the pgrx testing Postgres instance", pidfile.display());
+            break;
+        }
+        eprintln!("`{}` still exists.  Waiting...", pidfile.display());
+        std::thread::sleep(Duration::from_secs(1));
+        retries += 1;
+    }
+    Ok(())
 }
 
 fn monitor_pg(mut command: Command, cmd_string: String, loglines: LogLines) -> String {
@@ -626,6 +648,12 @@ fn get_pgdata_path() -> eyre::Result<PathBuf> {
     let mut target_dir = get_target_dir()?;
     target_dir.push(&format!("pgrx-test-data-{}", pg_sys::get_pg_major_version_num()));
     Ok(target_dir)
+}
+
+fn get_pid_file() -> eyre::Result<PathBuf> {
+    let mut pgdata = get_pgdata_path()?;
+    pgdata.push("postmaster.pid");
+    return Ok(pgdata);
 }
 
 pub(crate) fn get_pg_dbname() -> &'static str {
