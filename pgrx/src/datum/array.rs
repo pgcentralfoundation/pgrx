@@ -669,6 +669,7 @@ impl<'a, T: FromDatum> Iterator for ArrayTypedIterator<'a, T> {
 }
 
 impl<'a, T: FromDatum> ExactSizeIterator for ArrayTypedIterator<'a, T> {}
+impl<'a, T: FromDatum> core::iter::FusedIterator for ArrayTypedIterator<'a, T> {}
 
 impl<'a, T: FromDatum + serde::Serialize> serde::Serialize for ArrayTypedIterator<'a, T> {
     fn serialize<S>(&self, serializer: S) -> Result<<S as Serializer>::Ok, <S as Serializer>::Error>
@@ -708,6 +709,7 @@ impl<'a, T: FromDatum> Iterator for ArrayIterator<'a, T> {
 }
 
 impl<'a, T: FromDatum> ExactSizeIterator for ArrayIterator<'a, T> {}
+impl<'a, T: FromDatum> core::iter::FusedIterator for ArrayIterator<'a, T> {}
 
 pub struct ArrayIntoIterator<'a, T: FromDatum> {
     array: Array<'a, T>,
@@ -760,6 +762,7 @@ impl<'a, T: FromDatum> Iterator for ArrayIntoIterator<'a, T> {
 }
 
 impl<'a, T: FromDatum> ExactSizeIterator for ArrayIntoIterator<'a, T> {}
+impl<'a, T: FromDatum> core::iter::FusedIterator for ArrayIntoIterator<'a, T> {}
 
 impl<'a, T: FromDatum> FromDatum for VariadicArray<'a, T> {
     #[inline]
