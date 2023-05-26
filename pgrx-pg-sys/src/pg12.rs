@@ -2006,20 +2006,6 @@ pub const SK_SEARCHARRAY: u32 = 32;
 pub const SK_SEARCHNULL: u32 = 64;
 pub const SK_SEARCHNOTNULL: u32 = 128;
 pub const SK_ORDER_BY: u32 = 256;
-pub const GIN_COMPARE_PROC: u32 = 1;
-pub const GIN_EXTRACTVALUE_PROC: u32 = 2;
-pub const GIN_EXTRACTQUERY_PROC: u32 = 3;
-pub const GIN_CONSISTENT_PROC: u32 = 4;
-pub const GIN_COMPARE_PARTIAL_PROC: u32 = 5;
-pub const GIN_TRICONSISTENT_PROC: u32 = 6;
-pub const GINNProcs: u32 = 6;
-pub const GIN_SEARCH_MODE_DEFAULT: u32 = 0;
-pub const GIN_SEARCH_MODE_INCLUDE_EMPTY: u32 = 1;
-pub const GIN_SEARCH_MODE_ALL: u32 = 2;
-pub const GIN_SEARCH_MODE_EVERYTHING: u32 = 3;
-pub const GIN_FALSE: u32 = 0;
-pub const GIN_TRUE: u32 = 1;
-pub const GIN_MAYBE: u32 = 2;
 pub const XLR_NORMAL_MAX_BLOCK_ID: u32 = 4;
 pub const XLR_NORMAL_RDATAS: u32 = 20;
 pub const REGBUF_FORCE_IMAGE: u32 = 1;
@@ -2051,50 +2037,20 @@ pub const TABLESPACE_MAP: &[u8; 15usize] = b"tablespace_map\0";
 pub const TABLESPACE_MAP_OLD: &[u8; 19usize] = b"tablespace_map.old\0";
 pub const PROMOTE_SIGNAL_FILE: &[u8; 8usize] = b"promote\0";
 pub const FALLBACK_PROMOTE_SIGNAL_FILE: &[u8; 17usize] = b"fallback_promote\0";
-pub const GIST_CONSISTENT_PROC: u32 = 1;
-pub const GIST_UNION_PROC: u32 = 2;
-pub const GIST_COMPRESS_PROC: u32 = 3;
-pub const GIST_DECOMPRESS_PROC: u32 = 4;
-pub const GIST_PENALTY_PROC: u32 = 5;
-pub const GIST_PICKSPLIT_PROC: u32 = 6;
-pub const GIST_EQUAL_PROC: u32 = 7;
-pub const GIST_DISTANCE_PROC: u32 = 8;
-pub const GIST_FETCH_PROC: u32 = 9;
-pub const GISTNProcs: u32 = 9;
-pub const F_LEAF: u32 = 1;
-pub const F_DELETED: u32 = 2;
-pub const F_TUPLES_DELETED: u32 = 4;
-pub const F_FOLLOW_RIGHT: u32 = 8;
-pub const F_HAS_GARBAGE: u32 = 16;
-pub const GIST_PAGE_ID: u32 = 65409;
-pub const EOH_HEADER_MAGIC: i32 = -1;
-pub const EA_MAGIC: u32 = 689375833;
-pub const PG_AUTOCONF_FILENAME: &[u8; 21usize] = b"postgresql.auto.conf\0";
-pub const GUC_QUALIFIER_SEPARATOR: u8 = 46u8;
-pub const GUC_LIST_INPUT: u32 = 1;
-pub const GUC_LIST_QUOTE: u32 = 2;
-pub const GUC_NO_SHOW_ALL: u32 = 4;
-pub const GUC_NO_RESET_ALL: u32 = 8;
-pub const GUC_REPORT: u32 = 16;
-pub const GUC_NOT_IN_SAMPLE: u32 = 32;
-pub const GUC_DISALLOW_IN_FILE: u32 = 64;
-pub const GUC_CUSTOM_PLACEHOLDER: u32 = 128;
-pub const GUC_SUPERUSER_ONLY: u32 = 256;
-pub const GUC_IS_NAME: u32 = 512;
-pub const GUC_NOT_WHILE_SEC_REST: u32 = 1024;
-pub const GUC_DISALLOW_IN_AUTO_FILE: u32 = 2048;
-pub const GUC_UNIT_KB: u32 = 4096;
-pub const GUC_UNIT_BLOCKS: u32 = 8192;
-pub const GUC_UNIT_XBLOCKS: u32 = 12288;
-pub const GUC_UNIT_MB: u32 = 16384;
-pub const GUC_UNIT_BYTE: u32 = 32768;
-pub const GUC_UNIT_MEMORY: u32 = 61440;
-pub const GUC_UNIT_MS: u32 = 65536;
-pub const GUC_UNIT_S: u32 = 131072;
-pub const GUC_UNIT_MIN: u32 = 196608;
-pub const GUC_UNIT_TIME: u32 = 983040;
-pub const GUC_EXPLAIN: u32 = 1048576;
-pub const GUC_UNIT: u32 = 1044480;
+pub const XLOG_PAGE_MAGIC: u32 = 53505;
+pub const XLP_FIRST_IS_CONTRECORD: u32 = 1;
+pub const XLP_LONG_HEADER: u32 = 2;
+pub const XLP_BKP_REMOVABLE: u32 = 4;
+pub const XLP_FIRST_IS_OVERWRITE_CONTRECORD: u32 = 8;
+pub const XLP_ALL_FLAGS: u32 = 15;
+pub const WalSegMinSize: u32 = 1048576;
+pub const WalSegMaxSize: u32 = 1073741824;
+pub const DEFAULT_MIN_WAL_SEGS: u32 = 5;
+pub const DEFAULT_MAX_WAL_SEGS: u32 = 64;
+pub const XLOGDIR: &[u8; 7usize] = b"pg_wal\0";
+pub const XLOG_CONTROL_FILE: &[u8; 18usize] = b"global/pg_control\0";
+pub const MAXFNAMELEN: u32 = 64;
+pub const XLOG_FNAME_LEN: u32 = 24;
 pub const RelationRelationId: Oid = Oid(1259);
 pub const RelationRelation_Rowtype_Id: u32 = 83;
 pub const Anum_pg_class_oid: u32 = 1;
@@ -2182,6 +2138,8 @@ pub const Anum_pg_publication_pubupdate: u32 = 6;
 pub const Anum_pg_publication_pubdelete: u32 = 7;
 pub const Anum_pg_publication_pubtruncate: u32 = 8;
 pub const Natts_pg_publication: u32 = 8;
+pub const EOH_HEADER_MAGIC: i32 = -1;
+pub const EA_MAGIC: u32 = 689375833;
 pub const ACL_ID_PUBLIC: u32 = 0;
 pub const ACL_MODECHG_ADD: u32 = 1;
 pub const ACL_MODECHG_DEL: u32 = 2;
@@ -2213,6 +2171,64 @@ pub const ACL_ALL_RIGHTS_TABLESPACE: u32 = 512;
 pub const ACL_ALL_RIGHTS_TYPE: u32 = 256;
 pub const HEAP_MIN_FILLFACTOR: u32 = 10;
 pub const HEAP_DEFAULT_FILLFACTOR: u32 = 100;
+pub const MAX_GENERIC_XLOG_PAGES: u32 = 4;
+pub const GENERIC_XLOG_FULL_IMAGE: u32 = 1;
+pub const GIN_COMPARE_PROC: u32 = 1;
+pub const GIN_EXTRACTVALUE_PROC: u32 = 2;
+pub const GIN_EXTRACTQUERY_PROC: u32 = 3;
+pub const GIN_CONSISTENT_PROC: u32 = 4;
+pub const GIN_COMPARE_PARTIAL_PROC: u32 = 5;
+pub const GIN_TRICONSISTENT_PROC: u32 = 6;
+pub const GINNProcs: u32 = 6;
+pub const GIN_SEARCH_MODE_DEFAULT: u32 = 0;
+pub const GIN_SEARCH_MODE_INCLUDE_EMPTY: u32 = 1;
+pub const GIN_SEARCH_MODE_ALL: u32 = 2;
+pub const GIN_SEARCH_MODE_EVERYTHING: u32 = 3;
+pub const GIN_FALSE: u32 = 0;
+pub const GIN_TRUE: u32 = 1;
+pub const GIN_MAYBE: u32 = 2;
+pub const GIST_CONSISTENT_PROC: u32 = 1;
+pub const GIST_UNION_PROC: u32 = 2;
+pub const GIST_COMPRESS_PROC: u32 = 3;
+pub const GIST_DECOMPRESS_PROC: u32 = 4;
+pub const GIST_PENALTY_PROC: u32 = 5;
+pub const GIST_PICKSPLIT_PROC: u32 = 6;
+pub const GIST_EQUAL_PROC: u32 = 7;
+pub const GIST_DISTANCE_PROC: u32 = 8;
+pub const GIST_FETCH_PROC: u32 = 9;
+pub const GISTNProcs: u32 = 9;
+pub const F_LEAF: u32 = 1;
+pub const F_DELETED: u32 = 2;
+pub const F_TUPLES_DELETED: u32 = 4;
+pub const F_FOLLOW_RIGHT: u32 = 8;
+pub const F_HAS_GARBAGE: u32 = 16;
+pub const GIST_PAGE_ID: u32 = 65409;
+pub const PG_AUTOCONF_FILENAME: &[u8; 21usize] = b"postgresql.auto.conf\0";
+pub const GUC_QUALIFIER_SEPARATOR: u8 = 46u8;
+pub const GUC_LIST_INPUT: u32 = 1;
+pub const GUC_LIST_QUOTE: u32 = 2;
+pub const GUC_NO_SHOW_ALL: u32 = 4;
+pub const GUC_NO_RESET_ALL: u32 = 8;
+pub const GUC_REPORT: u32 = 16;
+pub const GUC_NOT_IN_SAMPLE: u32 = 32;
+pub const GUC_DISALLOW_IN_FILE: u32 = 64;
+pub const GUC_CUSTOM_PLACEHOLDER: u32 = 128;
+pub const GUC_SUPERUSER_ONLY: u32 = 256;
+pub const GUC_IS_NAME: u32 = 512;
+pub const GUC_NOT_WHILE_SEC_REST: u32 = 1024;
+pub const GUC_DISALLOW_IN_AUTO_FILE: u32 = 2048;
+pub const GUC_UNIT_KB: u32 = 4096;
+pub const GUC_UNIT_BLOCKS: u32 = 8192;
+pub const GUC_UNIT_XBLOCKS: u32 = 12288;
+pub const GUC_UNIT_MB: u32 = 16384;
+pub const GUC_UNIT_BYTE: u32 = 32768;
+pub const GUC_UNIT_MEMORY: u32 = 61440;
+pub const GUC_UNIT_MS: u32 = 65536;
+pub const GUC_UNIT_S: u32 = 131072;
+pub const GUC_UNIT_MIN: u32 = 196608;
+pub const GUC_UNIT_TIME: u32 = 983040;
+pub const GUC_EXPLAIN: u32 = 1048576;
+pub const GUC_UNIT: u32 = 1044480;
 pub const DEFAULT_TABLE_ACCESS_METHOD: &[u8; 5usize] = b"heap\0";
 pub const TABLE_INSERT_SKIP_WAL: u32 = 1;
 pub const TABLE_INSERT_SKIP_FSM: u32 = 2;
@@ -4125,7 +4141,7 @@ extern "C" {
         errorType: *const ::std::os::raw::c_char,
         fileName: *const ::std::os::raw::c_char,
         lineNumber: ::std::os::raw::c_int,
-    );
+    ) -> !;
 }
 #[repr(C)]
 #[derive(Copy, Clone)]
@@ -6170,7 +6186,7 @@ extern "C" {
 }
 #[pgrx_macros::pg_guard]
 extern "C" {
-    pub fn ReThrowError(edata: *mut ErrorData);
+    pub fn ReThrowError(edata: *mut ErrorData) -> !;
 }
 #[pgrx_macros::pg_guard]
 extern "C" {
@@ -15547,11 +15563,7 @@ impl Default for Query {
         }
     }
 }
-#[doc = "\tSupporting data structures for Parse Trees"]
-#[doc = ""]
-#[doc = "\tMost of these node types appear in raw parsetrees output by the grammar,"]
-#[doc = "\tand get transformed to something else by the analyzer.  A few of them"]
-#[doc = "\tare used as-is in transformed querytrees."]
+#[doc = "\tSupporting data structures for Parse Trees\n\n\tMost of these node types appear in raw parsetrees output by the grammar,\n\tand get transformed to something else by the analyzer.  A few of them\n\tare used as-is in transformed querytrees."]
 #[repr(C)]
 #[derive(Debug, Copy, Clone)]
 pub struct TypeName {
@@ -16703,17 +16715,7 @@ pub const ObjectType_OBJECT_TSTEMPLATE: ObjectType = 46;
 pub const ObjectType_OBJECT_TYPE: ObjectType = 47;
 pub const ObjectType_OBJECT_USER_MAPPING: ObjectType = 48;
 pub const ObjectType_OBJECT_VIEW: ObjectType = 49;
-#[doc = "\t\tOther Statements (no optimizations required)"]
-#[doc = ""]
-#[doc = "\t\tThese are not touched by parser/analyze.c except to put them into"]
-#[doc = "\t\tthe utilityStmt field of a Query.  This is eventually passed to"]
-#[doc = "\t\tProcessUtility (by-passing rewriting and planning).  Some of the"]
-#[doc = "\t\tstatements do need attention from parse analysis, and this is"]
-#[doc = "\t\tdone by routines in parser/parse_utilcmd.c after ProcessUtility"]
-#[doc = "\t\treceives the command for execution."]
-#[doc = "\t\tDECLARE CURSOR, EXPLAIN, and CREATE TABLE AS are special cases:"]
-#[doc = "\t\tthey contain optimizable statements, which get processed normally"]
-#[doc = "\t\tby parser/analyze.c."]
+#[doc = "\t\tOther Statements (no optimizations required)\n\n\t\tThese are not touched by parser/analyze.c except to put them into\n\t\tthe utilityStmt field of a Query.  This is eventually passed to\n\t\tProcessUtility (by-passing rewriting and planning).  Some of the\n\t\tstatements do need attention from parse analysis, and this is\n\t\tdone by routines in parser/parse_utilcmd.c after ProcessUtility\n\t\treceives the command for execution.\n\t\tDECLARE CURSOR, EXPLAIN, and CREATE TABLE AS are special cases:\n\t\tthey contain optimizable statements, which get processed normally\n\t\tby parser/analyze.c."]
 pub type ObjectType = ::std::os::raw::c_uint;
 #[repr(C)]
 #[derive(Debug, Copy, Clone)]
@@ -20887,56 +20889,7 @@ extern "C" {
     pub fn pg_tzenumerate_end(dir: *mut pg_tzenum);
 }
 extern "C" {
-    #[doc = "\t  System interrupt and critical section handling"]
-    #[doc = ""]
-    #[doc = " There are two types of interrupts that a running backend needs to accept"]
-    #[doc = " without messing up its state: QueryCancel (SIGINT) and ProcDie (SIGTERM)."]
-    #[doc = " In both cases, we need to be able to clean up the current transaction"]
-    #[doc = " gracefully, so we can't respond to the interrupt instantaneously ---"]
-    #[doc = " there's no guarantee that internal data structures would be self-consistent"]
-    #[doc = " if the code is interrupted at an arbitrary instant.  Instead, the signal"]
-    #[doc = " handlers set flags that are checked periodically during execution."]
-    #[doc = ""]
-    #[doc = " The CHECK_FOR_INTERRUPTS() macro is called at strategically located spots"]
-    #[doc = " where it is normally safe to accept a cancel or die interrupt.  In some"]
-    #[doc = " cases, we invoke CHECK_FOR_INTERRUPTS() inside low-level subroutines that"]
-    #[doc = " might sometimes be called in contexts that do *not* want to allow a cancel"]
-    #[doc = " or die interrupt.  The HOLD_INTERRUPTS() and RESUME_INTERRUPTS() macros"]
-    #[doc = " allow code to ensure that no cancel or die interrupt will be accepted,"]
-    #[doc = " even if CHECK_FOR_INTERRUPTS() gets called in a subroutine.  The interrupt"]
-    #[doc = " will be held off until CHECK_FOR_INTERRUPTS() is done outside any"]
-    #[doc = " HOLD_INTERRUPTS() ... RESUME_INTERRUPTS() section."]
-    #[doc = ""]
-    #[doc = " There is also a mechanism to prevent query cancel interrupts, while still"]
-    #[doc = " allowing die interrupts: HOLD_CANCEL_INTERRUPTS() and"]
-    #[doc = " RESUME_CANCEL_INTERRUPTS()."]
-    #[doc = ""]
-    #[doc = " Note that ProcessInterrupts() has also acquired a number of tasks that"]
-    #[doc = " do not necessarily cause a query-cancel-or-die response.  Hence, it's"]
-    #[doc = " possible that it will just clear InterruptPending and return."]
-    #[doc = ""]
-    #[doc = " INTERRUPTS_PENDING_CONDITION() can be checked to see whether an"]
-    #[doc = " interrupt needs to be serviced, without trying to do so immediately."]
-    #[doc = " Some callers are also interested in INTERRUPTS_CAN_BE_PROCESSED(),"]
-    #[doc = " which tells whether ProcessInterrupts is sure to clear the interrupt."]
-    #[doc = ""]
-    #[doc = " Special mechanisms are used to let an interrupt be accepted when we are"]
-    #[doc = " waiting for a lock or when we are waiting for command input (but, of"]
-    #[doc = " course, only if the interrupt holdoff counter is zero).  See the"]
-    #[doc = " related code for details."]
-    #[doc = ""]
-    #[doc = " A lost connection is handled similarly, although the loss of connection"]
-    #[doc = " does not raise a signal, but is detected when we fail to write to the"]
-    #[doc = " socket. If there was a signal for a broken connection, we could make use of"]
-    #[doc = " it by setting ClientConnectionLost in the signal handler."]
-    #[doc = ""]
-    #[doc = " A related, but conceptually distinct, mechanism is the \"critical section\""]
-    #[doc = " mechanism.  A critical section not only holds off cancel/die interrupts,"]
-    #[doc = " but causes any ereport(ERROR) or ereport(FATAL) to become ereport(PANIC)"]
-    #[doc = " --- that is, a system-wide reset is forced.  Needless to say, only really"]
-    #[doc = " *critical* code should be marked as a critical section!\tCurrently, this"]
-    #[doc = " mechanism is only used for XLOG-related code."]
-    #[doc = ""]
+    #[doc = "\t  System interrupt and critical section handling\n\n There are two types of interrupts that a running backend needs to accept\n without messing up its state: QueryCancel (SIGINT) and ProcDie (SIGTERM).\n In both cases, we need to be able to clean up the current transaction\n gracefully, so we can't respond to the interrupt instantaneously ---\n there's no guarantee that internal data structures would be self-consistent\n if the code is interrupted at an arbitrary instant.  Instead, the signal\n handlers set flags that are checked periodically during execution.\n\n The CHECK_FOR_INTERRUPTS() macro is called at strategically located spots\n where it is normally safe to accept a cancel or die interrupt.  In some\n cases, we invoke CHECK_FOR_INTERRUPTS() inside low-level subroutines that\n might sometimes be called in contexts that do *not* want to allow a cancel\n or die interrupt.  The HOLD_INTERRUPTS() and RESUME_INTERRUPTS() macros\n allow code to ensure that no cancel or die interrupt will be accepted,\n even if CHECK_FOR_INTERRUPTS() gets called in a subroutine.  The interrupt\n will be held off until CHECK_FOR_INTERRUPTS() is done outside any\n HOLD_INTERRUPTS() ... RESUME_INTERRUPTS() section.\n\n There is also a mechanism to prevent query cancel interrupts, while still\n allowing die interrupts: HOLD_CANCEL_INTERRUPTS() and\n RESUME_CANCEL_INTERRUPTS().\n\n Note that ProcessInterrupts() has also acquired a number of tasks that\n do not necessarily cause a query-cancel-or-die response.  Hence, it's\n possible that it will just clear InterruptPending and return.\n\n INTERRUPTS_PENDING_CONDITION() can be checked to see whether an\n interrupt needs to be serviced, without trying to do so immediately.\n Some callers are also interested in INTERRUPTS_CAN_BE_PROCESSED(),\n which tells whether ProcessInterrupts is sure to clear the interrupt.\n\n Special mechanisms are used to let an interrupt be accepted when we are\n waiting for a lock or when we are waiting for command input (but, of\n course, only if the interrupt holdoff counter is zero).  See the\n related code for details.\n\n A lost connection is handled similarly, although the loss of connection\n does not raise a signal, but is detected when we fail to write to the\n socket. If there was a signal for a broken connection, we could make use of\n it by setting ClientConnectionLost in the signal handler.\n\n A related, but conceptually distinct, mechanism is the \"critical section\"\n mechanism.  A critical section not only holds off cancel/die interrupts,\n but causes any ereport(ERROR) or ereport(FATAL) to become ereport(PANIC)\n --- that is, a system-wide reset is forced.  Needless to say, only really\n *critical* code should be marked as a critical section!\tCurrently, this\n mechanism is only used for XLOG-related code.\n"]
     pub static mut InterruptPending: sig_atomic_t;
 }
 extern "C" {
@@ -21259,8 +21212,7 @@ extern "C" {
 pub const ProcessingMode_BootstrapProcessing: ProcessingMode = 0;
 pub const ProcessingMode_InitProcessing: ProcessingMode = 1;
 pub const ProcessingMode_NormalProcessing: ProcessingMode = 2;
-#[doc = "\t  pmod.h --\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t *"]
-#[doc = "\t\t\tPOSTGRES processing mode definitions.                            *"]
+#[doc = "\t  pmod.h --\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t *\n\t\t\tPOSTGRES processing mode definitions.                            *"]
 pub type ProcessingMode = ::std::os::raw::c_uint;
 extern "C" {
     pub static mut Mode: ProcessingMode;
@@ -21280,8 +21232,7 @@ extern "C" {
 }
 #[pgrx_macros::pg_guard]
 extern "C" {
-    #[doc = "\t  pinit.h --\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t *"]
-    #[doc = "\t\t\tPOSTGRES initialization and cleanup definitions.                 *"]
+    #[doc = "\t  pinit.h --\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t *\n\t\t\tPOSTGRES initialization and cleanup definitions.                 *"]
     pub fn pg_split_opts(
         argv: *mut *mut ::std::os::raw::c_char,
         argcp: *mut ::std::os::raw::c_int,
@@ -21502,7 +21453,7 @@ pub const ForkNumber_VISIBILITYMAP_FORKNUM: ForkNumber = 2;
 pub const ForkNumber_INIT_FORKNUM: ForkNumber = 3;
 pub type ForkNumber = ::std::os::raw::c_int;
 extern "C" {
-    pub static mut forkNames: [*const ::std::os::raw::c_char; 0usize];
+    pub static forkNames: [*const ::std::os::raw::c_char; 0usize];
 }
 #[pgrx_macros::pg_guard]
 extern "C" {
@@ -22139,7 +22090,7 @@ extern "C" {
     pub static mut MainLWLockArray: *mut LWLockPadded;
 }
 extern "C" {
-    pub static mut MainLWLockNames: [*const ::std::os::raw::c_char; 0usize];
+    pub static MainLWLockNames: [*const ::std::os::raw::c_char; 0usize];
 }
 #[repr(C)]
 #[derive(Debug, Copy, Clone)]
@@ -22478,7 +22429,7 @@ pub const LockTagType_LOCKTAG_ADVISORY: LockTagType = 9;
 pub const LockTagType_LOCKTAG_DATABASE_FROZEN_IDS: LockTagType = 10;
 pub type LockTagType = ::std::os::raw::c_uint;
 extern "C" {
-    pub static mut LockTagTypeNames: [*const ::std::os::raw::c_char; 0usize];
+    pub static LockTagTypeNames: [*const ::std::os::raw::c_char; 0usize];
 }
 #[repr(C)]
 #[derive(Debug, Default, Copy, Clone)]
@@ -22841,7 +22792,7 @@ extern "C" {
 }
 #[pgrx_macros::pg_guard]
 extern "C" {
-    pub fn DeadLockReport();
+    pub fn DeadLockReport() -> !;
 }
 #[pgrx_macros::pg_guard]
 extern "C" {
@@ -24863,31 +24814,6 @@ extern "C" {
 extern "C" {
     pub fn GetIndexAmRoutineByAmId(amoid: Oid, noerror: bool) -> *mut IndexAmRoutine;
 }
-#[repr(C)]
-#[derive(Debug, Default, Copy, Clone)]
-pub struct GinStatsData {
-    pub nPendingPages: BlockNumber,
-    pub nTotalPages: BlockNumber,
-    pub nEntryPages: BlockNumber,
-    pub nDataPages: BlockNumber,
-    pub nEntries: int64,
-    pub ginVersion: int32,
-}
-pub type GinTernaryValue = ::std::os::raw::c_char;
-extern "C" {
-    pub static mut GinFuzzySearchLimit: ::std::os::raw::c_int;
-}
-extern "C" {
-    pub static mut gin_pending_list_limit: ::std::os::raw::c_int;
-}
-#[pgrx_macros::pg_guard]
-extern "C" {
-    pub fn ginGetStats(index: Relation, stats: *mut GinStatsData);
-}
-#[pgrx_macros::pg_guard]
-extern "C" {
-    pub fn ginUpdateStats(index: Relation, stats: *const GinStatsData, is_build: bool);
-}
 #[pgrx_macros::pg_guard]
 extern "C" {
     pub fn XLogBeginInsert();
@@ -25162,11 +25088,6 @@ pub struct CheckpointStatsData {
 extern "C" {
     pub static mut CheckpointStats: CheckpointStatsData;
 }
-#[repr(C)]
-#[derive(Debug, Copy, Clone)]
-pub struct XLogRecData {
-    _unused: [u8; 0],
-}
 #[pgrx_macros::pg_guard]
 extern "C" {
     pub fn XLogInsertRecord(
@@ -25440,48 +25361,44 @@ extern "C" {
 extern "C" {
     pub fn get_backup_status() -> SessionBackupState;
 }
-pub type GistNSN = XLogRecPtr;
-pub type PageGistNSN = PageXLogRecPtr;
 #[repr(C)]
 #[derive(Debug, Default, Copy, Clone)]
-pub struct GISTPageOpaqueData {
-    pub nsn: PageGistNSN,
-    pub rightlink: BlockNumber,
-    pub flags: uint16,
-    pub gist_page_id: uint16,
+pub struct XLogPageHeaderData {
+    pub xlp_magic: uint16,
+    pub xlp_info: uint16,
+    pub xlp_tli: TimeLineID,
+    pub xlp_pageaddr: XLogRecPtr,
+    pub xlp_rem_len: uint32,
 }
-pub type GISTPageOpaque = *mut GISTPageOpaqueData;
+pub type XLogPageHeader = *mut XLogPageHeaderData;
+#[repr(C)]
+#[derive(Debug, Default, Copy, Clone)]
+pub struct XLogLongPageHeaderData {
+    pub std: XLogPageHeaderData,
+    pub xlp_sysid: uint64,
+    pub xlp_seg_size: uint32,
+    pub xlp_xlog_blcksz: uint32,
+}
+pub type XLogLongPageHeader = *mut XLogLongPageHeaderData;
+#[repr(C)]
+#[derive(Debug, Default, Copy, Clone)]
+pub struct xl_parameter_change {
+    pub MaxConnections: ::std::os::raw::c_int,
+    pub max_worker_processes: ::std::os::raw::c_int,
+    pub max_wal_senders: ::std::os::raw::c_int,
+    pub max_prepared_xacts: ::std::os::raw::c_int,
+    pub max_locks_per_xact: ::std::os::raw::c_int,
+    pub wal_level: ::std::os::raw::c_int,
+    pub wal_log_hints: bool,
+    pub track_commit_timestamp: bool,
+}
 #[repr(C)]
 #[derive(Debug, Copy, Clone)]
-pub struct GIST_SPLITVEC {
-    pub spl_left: *mut OffsetNumber,
-    pub spl_nleft: ::std::os::raw::c_int,
-    pub spl_ldatum: Datum,
-    pub spl_ldatum_exists: bool,
-    pub spl_right: *mut OffsetNumber,
-    pub spl_nright: ::std::os::raw::c_int,
-    pub spl_rdatum: Datum,
-    pub spl_rdatum_exists: bool,
+pub struct xl_restore_point {
+    pub rp_time: TimestampTz,
+    pub rp_name: [::std::os::raw::c_char; 64usize],
 }
-impl Default for GIST_SPLITVEC {
-    fn default() -> Self {
-        let mut s = ::std::mem::MaybeUninit::<Self>::uninit();
-        unsafe {
-            ::std::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
-            s.assume_init()
-        }
-    }
-}
-#[repr(C)]
-#[derive(Debug, Copy, Clone)]
-pub struct GISTENTRY {
-    pub key: Datum,
-    pub rel: Relation,
-    pub page: Page,
-    pub offset: OffsetNumber,
-    pub leafkey: bool,
-}
-impl Default for GISTENTRY {
+impl Default for xl_restore_point {
     fn default() -> Self {
         let mut s = ::std::mem::MaybeUninit::<Self>::uninit();
         unsafe {
@@ -25492,16 +25409,203 @@ impl Default for GISTENTRY {
 }
 #[repr(C)]
 #[derive(Debug, Default, Copy, Clone)]
-pub struct GISTDeletedPageContents {
-    pub deleteXid: FullTransactionId,
+pub struct xl_overwrite_contrecord {
+    pub overwritten_lsn: XLogRecPtr,
+    pub overwrite_time: TimestampTz,
 }
+#[repr(C)]
+#[derive(Debug, Default, Copy, Clone)]
+pub struct xl_end_of_recovery {
+    pub end_time: TimestampTz,
+    pub ThisTimeLineID: TimeLineID,
+    pub PrevTimeLineID: TimeLineID,
+}
+#[repr(C)]
+#[derive(Debug, Copy, Clone)]
+pub struct XLogRecData {
+    pub next: *mut XLogRecData,
+    pub data: *mut ::std::os::raw::c_char,
+    pub len: uint32,
+}
+impl Default for XLogRecData {
+    fn default() -> Self {
+        let mut s = ::std::mem::MaybeUninit::<Self>::uninit();
+        unsafe {
+            ::std::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
+            s.assume_init()
+        }
+    }
+}
+pub const RecoveryTargetAction_RECOVERY_TARGET_ACTION_PAUSE: RecoveryTargetAction = 0;
+pub const RecoveryTargetAction_RECOVERY_TARGET_ACTION_PROMOTE: RecoveryTargetAction = 1;
+pub const RecoveryTargetAction_RECOVERY_TARGET_ACTION_SHUTDOWN: RecoveryTargetAction = 2;
+pub type RecoveryTargetAction = ::std::os::raw::c_uint;
+#[repr(C)]
+#[derive(Debug, Copy, Clone)]
+pub struct RmgrData {
+    pub rm_name: *const ::std::os::raw::c_char,
+    pub rm_redo: ::std::option::Option<unsafe extern "C" fn(record: *mut XLogReaderState)>,
+    pub rm_desc:
+        ::std::option::Option<unsafe extern "C" fn(buf: StringInfo, record: *mut XLogReaderState)>,
+    pub rm_identify:
+        ::std::option::Option<unsafe extern "C" fn(info: uint8) -> *const ::std::os::raw::c_char>,
+    pub rm_startup: ::std::option::Option<unsafe extern "C" fn()>,
+    pub rm_cleanup: ::std::option::Option<unsafe extern "C" fn()>,
+    pub rm_mask: ::std::option::Option<
+        unsafe extern "C" fn(pagedata: *mut ::std::os::raw::c_char, blkno: BlockNumber),
+    >,
+}
+impl Default for RmgrData {
+    fn default() -> Self {
+        let mut s = ::std::mem::MaybeUninit::<Self>::uninit();
+        unsafe {
+            ::std::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
+            s.assume_init()
+        }
+    }
+}
+extern "C" {
+    pub static RmgrTable: [RmgrData; 0usize];
+}
+#[pgrx_macros::pg_guard]
+extern "C" {
+    pub fn GetLastSegSwitchData(lastSwitchLSN: *mut XLogRecPtr) -> pg_time_t;
+}
+#[pgrx_macros::pg_guard]
+extern "C" {
+    pub fn RequestXLogSwitch(mark_unimportant: bool) -> XLogRecPtr;
+}
+#[pgrx_macros::pg_guard]
+extern "C" {
+    pub fn GetOldestRestartPoint(oldrecptr: *mut XLogRecPtr, oldtli: *mut TimeLineID);
+}
+extern "C" {
+    pub static mut ArchiveRecoveryRequested: bool;
+}
+extern "C" {
+    pub static mut InArchiveRecovery: bool;
+}
+#[pgrx_macros::pg_guard]
+extern "C" {
+    pub fn RestoreArchivedFile(
+        path: *mut ::std::os::raw::c_char,
+        xlogfname: *const ::std::os::raw::c_char,
+        recovername: *const ::std::os::raw::c_char,
+        expectedSize: off_t,
+        cleanupEnabled: bool,
+    ) -> bool;
+}
+#[pgrx_macros::pg_guard]
+extern "C" {
+    pub fn ExecuteRecoveryCommand(
+        command: *const ::std::os::raw::c_char,
+        commandName: *const ::std::os::raw::c_char,
+        failOnerror: bool,
+    );
+}
+#[pgrx_macros::pg_guard]
+extern "C" {
+    pub fn KeepFileRestoredFromArchive(
+        path: *const ::std::os::raw::c_char,
+        xlogfname: *const ::std::os::raw::c_char,
+    );
+}
+#[pgrx_macros::pg_guard]
+extern "C" {
+    pub fn XLogArchiveNotify(xlog: *const ::std::os::raw::c_char);
+}
+#[pgrx_macros::pg_guard]
+extern "C" {
+    pub fn XLogArchiveNotifySeg(segno: XLogSegNo);
+}
+#[pgrx_macros::pg_guard]
+extern "C" {
+    pub fn XLogArchiveForceDone(xlog: *const ::std::os::raw::c_char);
+}
+#[pgrx_macros::pg_guard]
+extern "C" {
+    pub fn XLogArchiveCheckDone(xlog: *const ::std::os::raw::c_char) -> bool;
+}
+#[pgrx_macros::pg_guard]
+extern "C" {
+    pub fn XLogArchiveIsBusy(xlog: *const ::std::os::raw::c_char) -> bool;
+}
+#[pgrx_macros::pg_guard]
+extern "C" {
+    pub fn XLogArchiveIsReady(xlog: *const ::std::os::raw::c_char) -> bool;
+}
+#[pgrx_macros::pg_guard]
+extern "C" {
+    pub fn XLogArchiveIsReadyOrDone(xlog: *const ::std::os::raw::c_char) -> bool;
+}
+#[pgrx_macros::pg_guard]
+extern "C" {
+    pub fn XLogArchiveCleanup(xlog: *const ::std::os::raw::c_char);
+}
+#[repr(C)]
+#[derive(Debug, Copy, Clone)]
+pub struct FormData_pg_class {
+    pub oid: Oid,
+    pub relname: NameData,
+    pub relnamespace: Oid,
+    pub reltype: Oid,
+    pub reloftype: Oid,
+    pub relowner: Oid,
+    pub relam: Oid,
+    pub relfilenode: Oid,
+    pub reltablespace: Oid,
+    pub relpages: int32,
+    pub reltuples: float4,
+    pub relallvisible: int32,
+    pub reltoastrelid: Oid,
+    pub relhasindex: bool,
+    pub relisshared: bool,
+    pub relpersistence: ::std::os::raw::c_char,
+    pub relkind: ::std::os::raw::c_char,
+    pub relnatts: int16,
+    pub relchecks: int16,
+    pub relhasrules: bool,
+    pub relhastriggers: bool,
+    pub relhassubclass: bool,
+    pub relrowsecurity: bool,
+    pub relforcerowsecurity: bool,
+    pub relispopulated: bool,
+    pub relreplident: ::std::os::raw::c_char,
+    pub relispartition: bool,
+    pub relrewrite: Oid,
+    pub relfrozenxid: TransactionId,
+    pub relminmxid: TransactionId,
+}
+impl Default for FormData_pg_class {
+    fn default() -> Self {
+        let mut s = ::std::mem::MaybeUninit::<Self>::uninit();
+        unsafe {
+            ::std::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
+            s.assume_init()
+        }
+    }
+}
+pub type Form_pg_class = *mut FormData_pg_class;
 #[repr(C)]
 #[derive(Debug)]
-pub struct GistEntryVector {
-    pub n: int32,
-    pub vector: __IncompleteArrayField<GISTENTRY>,
+pub struct FormData_pg_index {
+    pub indexrelid: Oid,
+    pub indrelid: Oid,
+    pub indnatts: int16,
+    pub indnkeyatts: int16,
+    pub indisunique: bool,
+    pub indisprimary: bool,
+    pub indisexclusion: bool,
+    pub indimmediate: bool,
+    pub indisclustered: bool,
+    pub indisvalid: bool,
+    pub indcheckxmin: bool,
+    pub indisready: bool,
+    pub indislive: bool,
+    pub indisreplident: bool,
+    pub indkey: int2vector,
 }
-impl Default for GistEntryVector {
+impl Default for FormData_pg_index {
     fn default() -> Self {
         let mut s = ::std::mem::MaybeUninit::<Self>::uninit();
         unsafe {
@@ -25510,148 +25614,108 @@ impl Default for GistEntryVector {
         }
     }
 }
-#[pgrx_macros::pg_guard]
-extern "C" {
-    pub fn relation_open(relationId: Oid, lockmode: LOCKMODE) -> Relation;
-}
-#[pgrx_macros::pg_guard]
-extern "C" {
-    pub fn try_relation_open(relationId: Oid, lockmode: LOCKMODE) -> Relation;
-}
-#[pgrx_macros::pg_guard]
-extern "C" {
-    pub fn relation_openrv(relation: *const RangeVar, lockmode: LOCKMODE) -> Relation;
-}
-#[pgrx_macros::pg_guard]
-extern "C" {
-    pub fn relation_openrv_extended(
-        relation: *const RangeVar,
-        lockmode: LOCKMODE,
-        missing_ok: bool,
-    ) -> Relation;
-}
-#[pgrx_macros::pg_guard]
-extern "C" {
-    pub fn relation_close(relation: Relation, lockmode: LOCKMODE);
-}
+pub type Form_pg_index = *mut FormData_pg_index;
+pub const ParseExprKind_EXPR_KIND_NONE: ParseExprKind = 0;
+pub const ParseExprKind_EXPR_KIND_OTHER: ParseExprKind = 1;
+pub const ParseExprKind_EXPR_KIND_JOIN_ON: ParseExprKind = 2;
+pub const ParseExprKind_EXPR_KIND_JOIN_USING: ParseExprKind = 3;
+pub const ParseExprKind_EXPR_KIND_FROM_SUBSELECT: ParseExprKind = 4;
+pub const ParseExprKind_EXPR_KIND_FROM_FUNCTION: ParseExprKind = 5;
+pub const ParseExprKind_EXPR_KIND_WHERE: ParseExprKind = 6;
+pub const ParseExprKind_EXPR_KIND_HAVING: ParseExprKind = 7;
+pub const ParseExprKind_EXPR_KIND_FILTER: ParseExprKind = 8;
+pub const ParseExprKind_EXPR_KIND_WINDOW_PARTITION: ParseExprKind = 9;
+pub const ParseExprKind_EXPR_KIND_WINDOW_ORDER: ParseExprKind = 10;
+pub const ParseExprKind_EXPR_KIND_WINDOW_FRAME_RANGE: ParseExprKind = 11;
+pub const ParseExprKind_EXPR_KIND_WINDOW_FRAME_ROWS: ParseExprKind = 12;
+pub const ParseExprKind_EXPR_KIND_WINDOW_FRAME_GROUPS: ParseExprKind = 13;
+pub const ParseExprKind_EXPR_KIND_SELECT_TARGET: ParseExprKind = 14;
+pub const ParseExprKind_EXPR_KIND_INSERT_TARGET: ParseExprKind = 15;
+pub const ParseExprKind_EXPR_KIND_UPDATE_SOURCE: ParseExprKind = 16;
+pub const ParseExprKind_EXPR_KIND_UPDATE_TARGET: ParseExprKind = 17;
+pub const ParseExprKind_EXPR_KIND_GROUP_BY: ParseExprKind = 18;
+pub const ParseExprKind_EXPR_KIND_ORDER_BY: ParseExprKind = 19;
+pub const ParseExprKind_EXPR_KIND_DISTINCT_ON: ParseExprKind = 20;
+pub const ParseExprKind_EXPR_KIND_LIMIT: ParseExprKind = 21;
+pub const ParseExprKind_EXPR_KIND_OFFSET: ParseExprKind = 22;
+pub const ParseExprKind_EXPR_KIND_RETURNING: ParseExprKind = 23;
+pub const ParseExprKind_EXPR_KIND_VALUES: ParseExprKind = 24;
+pub const ParseExprKind_EXPR_KIND_VALUES_SINGLE: ParseExprKind = 25;
+pub const ParseExprKind_EXPR_KIND_CHECK_CONSTRAINT: ParseExprKind = 26;
+pub const ParseExprKind_EXPR_KIND_DOMAIN_CHECK: ParseExprKind = 27;
+pub const ParseExprKind_EXPR_KIND_COLUMN_DEFAULT: ParseExprKind = 28;
+pub const ParseExprKind_EXPR_KIND_FUNCTION_DEFAULT: ParseExprKind = 29;
+pub const ParseExprKind_EXPR_KIND_INDEX_EXPRESSION: ParseExprKind = 30;
+pub const ParseExprKind_EXPR_KIND_INDEX_PREDICATE: ParseExprKind = 31;
+pub const ParseExprKind_EXPR_KIND_ALTER_COL_TRANSFORM: ParseExprKind = 32;
+pub const ParseExprKind_EXPR_KIND_EXECUTE_PARAMETER: ParseExprKind = 33;
+pub const ParseExprKind_EXPR_KIND_TRIGGER_WHEN: ParseExprKind = 34;
+pub const ParseExprKind_EXPR_KIND_POLICY: ParseExprKind = 35;
+pub const ParseExprKind_EXPR_KIND_PARTITION_BOUND: ParseExprKind = 36;
+pub const ParseExprKind_EXPR_KIND_PARTITION_EXPRESSION: ParseExprKind = 37;
+pub const ParseExprKind_EXPR_KIND_CALL_ARGUMENT: ParseExprKind = 38;
+pub const ParseExprKind_EXPR_KIND_COPY_WHERE: ParseExprKind = 39;
+pub const ParseExprKind_EXPR_KIND_GENERATED_COLUMN: ParseExprKind = 40;
+pub type ParseExprKind = ::std::os::raw::c_uint;
+pub type PreParseColumnRefHook = ::std::option::Option<
+    unsafe extern "C" fn(pstate: *mut ParseState, cref: *mut ColumnRef) -> *mut Node,
+>;
+pub type PostParseColumnRefHook = ::std::option::Option<
+    unsafe extern "C" fn(
+        pstate: *mut ParseState,
+        cref: *mut ColumnRef,
+        var: *mut Node,
+    ) -> *mut Node,
+>;
+pub type ParseParamRefHook = ::std::option::Option<
+    unsafe extern "C" fn(pstate: *mut ParseState, pref: *mut ParamRef) -> *mut Node,
+>;
+pub type CoerceParamHook = ::std::option::Option<
+    unsafe extern "C" fn(
+        pstate: *mut ParseState,
+        param: *mut Param,
+        targetTypeId: Oid,
+        targetTypeMod: int32,
+        location: ::std::os::raw::c_int,
+    ) -> *mut Node,
+>;
 #[repr(C)]
 #[derive(Debug, Copy, Clone)]
-pub struct TableScanDescData {
-    pub rs_rd: Relation,
-    pub rs_snapshot: *mut SnapshotData,
-    pub rs_nkeys: ::std::os::raw::c_int,
-    pub rs_key: *mut ScanKeyData,
-    pub rs_flags: uint32,
-    pub rs_parallel: *mut ParallelTableScanDescData,
+pub struct ParseState {
+    pub parentParseState: *mut ParseState,
+    pub p_sourcetext: *const ::std::os::raw::c_char,
+    pub p_rtable: *mut List,
+    pub p_joinexprs: *mut List,
+    pub p_joinlist: *mut List,
+    pub p_namespace: *mut List,
+    pub p_lateral_active: bool,
+    pub p_ctenamespace: *mut List,
+    pub p_future_ctes: *mut List,
+    pub p_parent_cte: *mut CommonTableExpr,
+    pub p_target_relation: Relation,
+    pub p_target_rangetblentry: *mut RangeTblEntry,
+    pub p_is_insert: bool,
+    pub p_windowdefs: *mut List,
+    pub p_expr_kind: ParseExprKind,
+    pub p_next_resno: ::std::os::raw::c_int,
+    pub p_multiassign_exprs: *mut List,
+    pub p_locking_clause: *mut List,
+    pub p_locked_from_parent: bool,
+    pub p_resolve_unknowns: bool,
+    pub p_queryEnv: *mut QueryEnvironment,
+    pub p_hasAggs: bool,
+    pub p_hasWindowFuncs: bool,
+    pub p_hasTargetSRFs: bool,
+    pub p_hasSubLinks: bool,
+    pub p_hasModifyingCTE: bool,
+    pub p_last_srf: *mut Node,
+    pub p_pre_columnref_hook: PreParseColumnRefHook,
+    pub p_post_columnref_hook: PostParseColumnRefHook,
+    pub p_paramref_hook: ParseParamRefHook,
+    pub p_coerce_param_hook: CoerceParamHook,
+    pub p_ref_hook_state: *mut ::std::os::raw::c_void,
 }
-impl Default for TableScanDescData {
-    fn default() -> Self {
-        let mut s = ::std::mem::MaybeUninit::<Self>::uninit();
-        unsafe {
-            ::std::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
-            s.assume_init()
-        }
-    }
-}
-pub type TableScanDesc = *mut TableScanDescData;
-#[repr(C)]
-#[derive(Debug, Copy, Clone)]
-pub struct ParallelTableScanDescData {
-    pub phs_relid: Oid,
-    pub phs_syncscan: bool,
-    pub phs_snapshot_any: bool,
-    pub phs_snapshot_off: Size,
-}
-impl Default for ParallelTableScanDescData {
-    fn default() -> Self {
-        let mut s = ::std::mem::MaybeUninit::<Self>::uninit();
-        unsafe {
-            ::std::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
-            s.assume_init()
-        }
-    }
-}
-pub type ParallelTableScanDesc = *mut ParallelTableScanDescData;
-#[repr(C)]
-#[derive(Debug, Copy, Clone)]
-pub struct ParallelBlockTableScanDescData {
-    pub base: ParallelTableScanDescData,
-    pub phs_nblocks: BlockNumber,
-    pub phs_mutex: slock_t,
-    pub phs_startblock: BlockNumber,
-    pub phs_nallocated: pg_atomic_uint64,
-}
-impl Default for ParallelBlockTableScanDescData {
-    fn default() -> Self {
-        let mut s = ::std::mem::MaybeUninit::<Self>::uninit();
-        unsafe {
-            ::std::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
-            s.assume_init()
-        }
-    }
-}
-pub type ParallelBlockTableScanDesc = *mut ParallelBlockTableScanDescData;
-#[repr(C)]
-#[derive(Debug, Copy, Clone)]
-pub struct IndexFetchTableData {
-    pub rel: Relation,
-}
-impl Default for IndexFetchTableData {
-    fn default() -> Self {
-        let mut s = ::std::mem::MaybeUninit::<Self>::uninit();
-        unsafe {
-            ::std::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
-            s.assume_init()
-        }
-    }
-}
-#[repr(C)]
-#[derive(Debug, Copy, Clone)]
-pub struct IndexScanDescData {
-    pub heapRelation: Relation,
-    pub indexRelation: Relation,
-    pub xs_snapshot: *mut SnapshotData,
-    pub numberOfKeys: ::std::os::raw::c_int,
-    pub numberOfOrderBys: ::std::os::raw::c_int,
-    pub keyData: *mut ScanKeyData,
-    pub orderByData: *mut ScanKeyData,
-    pub xs_want_itup: bool,
-    pub xs_temp_snap: bool,
-    pub kill_prior_tuple: bool,
-    pub ignore_killed_tuples: bool,
-    pub xactStartedInRecovery: bool,
-    pub opaque: *mut ::std::os::raw::c_void,
-    pub xs_itup: IndexTuple,
-    pub xs_itupdesc: *mut TupleDescData,
-    pub xs_hitup: HeapTuple,
-    pub xs_hitupdesc: *mut TupleDescData,
-    pub xs_heaptid: ItemPointerData,
-    pub xs_heap_continue: bool,
-    pub xs_heapfetch: *mut IndexFetchTableData,
-    pub xs_recheck: bool,
-    pub xs_orderbyvals: *mut Datum,
-    pub xs_orderbynulls: *mut bool,
-    pub xs_recheckorderby: bool,
-    pub parallel_scan: *mut ParallelIndexScanDescData,
-}
-impl Default for IndexScanDescData {
-    fn default() -> Self {
-        let mut s = ::std::mem::MaybeUninit::<Self>::uninit();
-        unsafe {
-            ::std::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
-            s.assume_init()
-        }
-    }
-}
-#[repr(C)]
-#[derive(Debug)]
-pub struct ParallelIndexScanDescData {
-    pub ps_relid: Oid,
-    pub ps_indexid: Oid,
-    pub ps_offset: Size,
-    pub ps_snapshot_data: __IncompleteArrayField<::std::os::raw::c_char>,
-}
-impl Default for ParallelIndexScanDescData {
+impl Default for ParseState {
     fn default() -> Self {
         let mut s = ::std::mem::MaybeUninit::<Self>::uninit();
         unsafe {
@@ -25662,15 +25726,30 @@ impl Default for ParallelIndexScanDescData {
 }
 #[repr(C)]
 #[derive(Debug, Copy, Clone)]
-pub struct SysScanDescData {
-    pub heap_rel: Relation,
-    pub irel: Relation,
-    pub scan: *mut TableScanDescData,
-    pub iscan: *mut IndexScanDescData,
-    pub snapshot: *mut SnapshotData,
-    pub slot: *mut TupleTableSlot,
+pub struct ParseNamespaceItem {
+    pub p_rte: *mut RangeTblEntry,
+    pub p_rel_visible: bool,
+    pub p_cols_visible: bool,
+    pub p_lateral_only: bool,
+    pub p_lateral_ok: bool,
 }
-impl Default for SysScanDescData {
+impl Default for ParseNamespaceItem {
+    fn default() -> Self {
+        let mut s = ::std::mem::MaybeUninit::<Self>::uninit();
+        unsafe {
+            ::std::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
+            s.assume_init()
+        }
+    }
+}
+#[repr(C)]
+#[derive(Debug, Copy, Clone)]
+pub struct ParseCallbackState {
+    pub pstate: *mut ParseState,
+    pub location: ::std::os::raw::c_int,
+    pub errcallback: ErrorContextCallback,
+}
+impl Default for ParseCallbackState {
     fn default() -> Self {
         let mut s = ::std::mem::MaybeUninit::<Self>::uninit();
         unsafe {
@@ -25681,23 +25760,63 @@ impl Default for SysScanDescData {
 }
 #[pgrx_macros::pg_guard]
 extern "C" {
-    pub fn table_open(relationId: Oid, lockmode: LOCKMODE) -> Relation;
+    pub fn make_parsestate(parentParseState: *mut ParseState) -> *mut ParseState;
 }
 #[pgrx_macros::pg_guard]
 extern "C" {
-    pub fn table_openrv(relation: *const RangeVar, lockmode: LOCKMODE) -> Relation;
+    pub fn free_parsestate(pstate: *mut ParseState);
 }
 #[pgrx_macros::pg_guard]
 extern "C" {
-    pub fn table_openrv_extended(
-        relation: *const RangeVar,
-        lockmode: LOCKMODE,
-        missing_ok: bool,
-    ) -> Relation;
+    pub fn parser_errposition(
+        pstate: *mut ParseState,
+        location: ::std::os::raw::c_int,
+    ) -> ::std::os::raw::c_int;
 }
 #[pgrx_macros::pg_guard]
 extern "C" {
-    pub fn table_close(relation: Relation, lockmode: LOCKMODE);
+    pub fn setup_parser_errposition_callback(
+        pcbstate: *mut ParseCallbackState,
+        pstate: *mut ParseState,
+        location: ::std::os::raw::c_int,
+    );
+}
+#[pgrx_macros::pg_guard]
+extern "C" {
+    pub fn cancel_parser_errposition_callback(pcbstate: *mut ParseCallbackState);
+}
+#[pgrx_macros::pg_guard]
+extern "C" {
+    pub fn make_var(
+        pstate: *mut ParseState,
+        rte: *mut RangeTblEntry,
+        attrno: ::std::os::raw::c_int,
+        location: ::std::os::raw::c_int,
+    ) -> *mut Var;
+}
+#[pgrx_macros::pg_guard]
+extern "C" {
+    pub fn transformContainerType(containerType: *mut Oid, containerTypmod: *mut int32) -> Oid;
+}
+#[pgrx_macros::pg_guard]
+extern "C" {
+    pub fn transformContainerSubscripts(
+        pstate: *mut ParseState,
+        containerBase: *mut Node,
+        containerType: Oid,
+        elementType: Oid,
+        containerTypMod: int32,
+        indirection: *mut List,
+        assignFrom: *mut Node,
+    ) -> *mut SubscriptingRef;
+}
+#[pgrx_macros::pg_guard]
+extern "C" {
+    pub fn make_const(
+        pstate: *mut ParseState,
+        value: *mut Value,
+        location: ::std::os::raw::c_int,
+    ) -> *mut Const;
 }
 pub type EOM_get_flat_size_method =
     ::std::option::Option<unsafe extern "C" fn(eohptr: *mut ExpandedObjectHeader) -> Size>;
@@ -26311,867 +26430,6 @@ extern "C" {
 #[pgrx_macros::pg_guard]
 extern "C" {
     pub fn deconstruct_expanded_array(eah: *mut ExpandedArrayHeader);
-}
-pub const GucContext_PGC_INTERNAL: GucContext = 0;
-pub const GucContext_PGC_POSTMASTER: GucContext = 1;
-pub const GucContext_PGC_SIGHUP: GucContext = 2;
-pub const GucContext_PGC_SU_BACKEND: GucContext = 3;
-pub const GucContext_PGC_BACKEND: GucContext = 4;
-pub const GucContext_PGC_SUSET: GucContext = 5;
-pub const GucContext_PGC_USERSET: GucContext = 6;
-pub type GucContext = ::std::os::raw::c_uint;
-pub const GucSource_PGC_S_DEFAULT: GucSource = 0;
-pub const GucSource_PGC_S_DYNAMIC_DEFAULT: GucSource = 1;
-pub const GucSource_PGC_S_ENV_VAR: GucSource = 2;
-pub const GucSource_PGC_S_FILE: GucSource = 3;
-pub const GucSource_PGC_S_ARGV: GucSource = 4;
-pub const GucSource_PGC_S_GLOBAL: GucSource = 5;
-pub const GucSource_PGC_S_DATABASE: GucSource = 6;
-pub const GucSource_PGC_S_USER: GucSource = 7;
-pub const GucSource_PGC_S_DATABASE_USER: GucSource = 8;
-pub const GucSource_PGC_S_CLIENT: GucSource = 9;
-pub const GucSource_PGC_S_OVERRIDE: GucSource = 10;
-pub const GucSource_PGC_S_INTERACTIVE: GucSource = 11;
-pub const GucSource_PGC_S_TEST: GucSource = 12;
-pub const GucSource_PGC_S_SESSION: GucSource = 13;
-pub type GucSource = ::std::os::raw::c_uint;
-#[repr(C)]
-#[derive(Debug, Copy, Clone)]
-pub struct ConfigVariable {
-    pub name: *mut ::std::os::raw::c_char,
-    pub value: *mut ::std::os::raw::c_char,
-    pub errmsg: *mut ::std::os::raw::c_char,
-    pub filename: *mut ::std::os::raw::c_char,
-    pub sourceline: ::std::os::raw::c_int,
-    pub ignore: bool,
-    pub applied: bool,
-    pub next: *mut ConfigVariable,
-}
-impl Default for ConfigVariable {
-    fn default() -> Self {
-        let mut s = ::std::mem::MaybeUninit::<Self>::uninit();
-        unsafe {
-            ::std::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
-            s.assume_init()
-        }
-    }
-}
-#[pgrx_macros::pg_guard]
-extern "C" {
-    pub fn ParseConfigFile(
-        config_file: *const ::std::os::raw::c_char,
-        strict: bool,
-        calling_file: *const ::std::os::raw::c_char,
-        calling_lineno: ::std::os::raw::c_int,
-        depth: ::std::os::raw::c_int,
-        elevel: ::std::os::raw::c_int,
-        head_p: *mut *mut ConfigVariable,
-        tail_p: *mut *mut ConfigVariable,
-    ) -> bool;
-}
-#[pgrx_macros::pg_guard]
-extern "C" {
-    pub fn ParseConfigFp(
-        fp: *mut FILE,
-        config_file: *const ::std::os::raw::c_char,
-        depth: ::std::os::raw::c_int,
-        elevel: ::std::os::raw::c_int,
-        head_p: *mut *mut ConfigVariable,
-        tail_p: *mut *mut ConfigVariable,
-    ) -> bool;
-}
-#[pgrx_macros::pg_guard]
-extern "C" {
-    pub fn ParseConfigDirectory(
-        includedir: *const ::std::os::raw::c_char,
-        calling_file: *const ::std::os::raw::c_char,
-        calling_lineno: ::std::os::raw::c_int,
-        depth: ::std::os::raw::c_int,
-        elevel: ::std::os::raw::c_int,
-        head_p: *mut *mut ConfigVariable,
-        tail_p: *mut *mut ConfigVariable,
-    ) -> bool;
-}
-#[pgrx_macros::pg_guard]
-extern "C" {
-    pub fn FreeConfigVariables(list: *mut ConfigVariable);
-}
-#[repr(C)]
-#[derive(Debug, Copy, Clone)]
-pub struct config_enum_entry {
-    pub name: *const ::std::os::raw::c_char,
-    pub val: ::std::os::raw::c_int,
-    pub hidden: bool,
-}
-impl Default for config_enum_entry {
-    fn default() -> Self {
-        let mut s = ::std::mem::MaybeUninit::<Self>::uninit();
-        unsafe {
-            ::std::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
-            s.assume_init()
-        }
-    }
-}
-pub type GucBoolCheckHook = ::std::option::Option<
-    unsafe extern "C" fn(
-        newval: *mut bool,
-        extra: *mut *mut ::std::os::raw::c_void,
-        source: GucSource,
-    ) -> bool,
->;
-pub type GucIntCheckHook = ::std::option::Option<
-    unsafe extern "C" fn(
-        newval: *mut ::std::os::raw::c_int,
-        extra: *mut *mut ::std::os::raw::c_void,
-        source: GucSource,
-    ) -> bool,
->;
-pub type GucRealCheckHook = ::std::option::Option<
-    unsafe extern "C" fn(
-        newval: *mut f64,
-        extra: *mut *mut ::std::os::raw::c_void,
-        source: GucSource,
-    ) -> bool,
->;
-pub type GucStringCheckHook = ::std::option::Option<
-    unsafe extern "C" fn(
-        newval: *mut *mut ::std::os::raw::c_char,
-        extra: *mut *mut ::std::os::raw::c_void,
-        source: GucSource,
-    ) -> bool,
->;
-pub type GucEnumCheckHook = ::std::option::Option<
-    unsafe extern "C" fn(
-        newval: *mut ::std::os::raw::c_int,
-        extra: *mut *mut ::std::os::raw::c_void,
-        source: GucSource,
-    ) -> bool,
->;
-pub type GucBoolAssignHook =
-    ::std::option::Option<unsafe extern "C" fn(newval: bool, extra: *mut ::std::os::raw::c_void)>;
-pub type GucIntAssignHook = ::std::option::Option<
-    unsafe extern "C" fn(newval: ::std::os::raw::c_int, extra: *mut ::std::os::raw::c_void),
->;
-pub type GucRealAssignHook =
-    ::std::option::Option<unsafe extern "C" fn(newval: f64, extra: *mut ::std::os::raw::c_void)>;
-pub type GucStringAssignHook = ::std::option::Option<
-    unsafe extern "C" fn(newval: *const ::std::os::raw::c_char, extra: *mut ::std::os::raw::c_void),
->;
-pub type GucEnumAssignHook = ::std::option::Option<
-    unsafe extern "C" fn(newval: ::std::os::raw::c_int, extra: *mut ::std::os::raw::c_void),
->;
-pub type GucShowHook =
-    ::std::option::Option<unsafe extern "C" fn() -> *const ::std::os::raw::c_char>;
-pub const GucAction_GUC_ACTION_SET: GucAction = 0;
-pub const GucAction_GUC_ACTION_LOCAL: GucAction = 1;
-pub const GucAction_GUC_ACTION_SAVE: GucAction = 2;
-pub type GucAction = ::std::os::raw::c_uint;
-extern "C" {
-    pub static mut log_duration: bool;
-}
-extern "C" {
-    pub static mut Debug_print_plan: bool;
-}
-extern "C" {
-    pub static mut Debug_print_parse: bool;
-}
-extern "C" {
-    pub static mut Debug_print_rewritten: bool;
-}
-extern "C" {
-    pub static mut Debug_pretty_print: bool;
-}
-extern "C" {
-    pub static mut log_parser_stats: bool;
-}
-extern "C" {
-    pub static mut log_planner_stats: bool;
-}
-extern "C" {
-    pub static mut log_executor_stats: bool;
-}
-extern "C" {
-    pub static mut log_statement_stats: bool;
-}
-extern "C" {
-    pub static mut log_btree_build_stats: bool;
-}
-extern "C" {
-    pub static mut check_function_bodies: bool;
-}
-extern "C" {
-    pub static mut session_auth_is_superuser: bool;
-}
-extern "C" {
-    pub static mut log_min_error_statement: ::std::os::raw::c_int;
-}
-extern "C" {
-    pub static mut log_min_messages: ::std::os::raw::c_int;
-}
-extern "C" {
-    pub static mut client_min_messages: ::std::os::raw::c_int;
-}
-extern "C" {
-    pub static mut log_min_duration_statement: ::std::os::raw::c_int;
-}
-extern "C" {
-    pub static mut log_temp_files: ::std::os::raw::c_int;
-}
-extern "C" {
-    pub static mut log_xact_sample_rate: f64;
-}
-extern "C" {
-    pub static mut temp_file_limit: ::std::os::raw::c_int;
-}
-extern "C" {
-    pub static mut num_temp_buffers: ::std::os::raw::c_int;
-}
-extern "C" {
-    pub static mut cluster_name: *mut ::std::os::raw::c_char;
-}
-extern "C" {
-    pub static mut ConfigFileName: *mut ::std::os::raw::c_char;
-}
-extern "C" {
-    pub static mut HbaFileName: *mut ::std::os::raw::c_char;
-}
-extern "C" {
-    pub static mut IdentFileName: *mut ::std::os::raw::c_char;
-}
-extern "C" {
-    pub static mut external_pid_file: *mut ::std::os::raw::c_char;
-}
-extern "C" {
-    pub static mut application_name: *mut ::std::os::raw::c_char;
-}
-extern "C" {
-    pub static mut tcp_keepalives_idle: ::std::os::raw::c_int;
-}
-extern "C" {
-    pub static mut tcp_keepalives_interval: ::std::os::raw::c_int;
-}
-extern "C" {
-    pub static mut tcp_keepalives_count: ::std::os::raw::c_int;
-}
-extern "C" {
-    pub static mut tcp_user_timeout: ::std::os::raw::c_int;
-}
-extern "C" {
-    pub static mut trace_sort: bool;
-}
-#[pgrx_macros::pg_guard]
-extern "C" {
-    pub fn SetConfigOption(
-        name: *const ::std::os::raw::c_char,
-        value: *const ::std::os::raw::c_char,
-        context: GucContext,
-        source: GucSource,
-    );
-}
-#[pgrx_macros::pg_guard]
-extern "C" {
-    pub fn DefineCustomBoolVariable(
-        name: *const ::std::os::raw::c_char,
-        short_desc: *const ::std::os::raw::c_char,
-        long_desc: *const ::std::os::raw::c_char,
-        valueAddr: *mut bool,
-        bootValue: bool,
-        context: GucContext,
-        flags: ::std::os::raw::c_int,
-        check_hook: GucBoolCheckHook,
-        assign_hook: GucBoolAssignHook,
-        show_hook: GucShowHook,
-    );
-}
-#[pgrx_macros::pg_guard]
-extern "C" {
-    pub fn DefineCustomIntVariable(
-        name: *const ::std::os::raw::c_char,
-        short_desc: *const ::std::os::raw::c_char,
-        long_desc: *const ::std::os::raw::c_char,
-        valueAddr: *mut ::std::os::raw::c_int,
-        bootValue: ::std::os::raw::c_int,
-        minValue: ::std::os::raw::c_int,
-        maxValue: ::std::os::raw::c_int,
-        context: GucContext,
-        flags: ::std::os::raw::c_int,
-        check_hook: GucIntCheckHook,
-        assign_hook: GucIntAssignHook,
-        show_hook: GucShowHook,
-    );
-}
-#[pgrx_macros::pg_guard]
-extern "C" {
-    pub fn DefineCustomRealVariable(
-        name: *const ::std::os::raw::c_char,
-        short_desc: *const ::std::os::raw::c_char,
-        long_desc: *const ::std::os::raw::c_char,
-        valueAddr: *mut f64,
-        bootValue: f64,
-        minValue: f64,
-        maxValue: f64,
-        context: GucContext,
-        flags: ::std::os::raw::c_int,
-        check_hook: GucRealCheckHook,
-        assign_hook: GucRealAssignHook,
-        show_hook: GucShowHook,
-    );
-}
-#[pgrx_macros::pg_guard]
-extern "C" {
-    pub fn DefineCustomStringVariable(
-        name: *const ::std::os::raw::c_char,
-        short_desc: *const ::std::os::raw::c_char,
-        long_desc: *const ::std::os::raw::c_char,
-        valueAddr: *mut *mut ::std::os::raw::c_char,
-        bootValue: *const ::std::os::raw::c_char,
-        context: GucContext,
-        flags: ::std::os::raw::c_int,
-        check_hook: GucStringCheckHook,
-        assign_hook: GucStringAssignHook,
-        show_hook: GucShowHook,
-    );
-}
-#[pgrx_macros::pg_guard]
-extern "C" {
-    pub fn DefineCustomEnumVariable(
-        name: *const ::std::os::raw::c_char,
-        short_desc: *const ::std::os::raw::c_char,
-        long_desc: *const ::std::os::raw::c_char,
-        valueAddr: *mut ::std::os::raw::c_int,
-        bootValue: ::std::os::raw::c_int,
-        options: *const config_enum_entry,
-        context: GucContext,
-        flags: ::std::os::raw::c_int,
-        check_hook: GucEnumCheckHook,
-        assign_hook: GucEnumAssignHook,
-        show_hook: GucShowHook,
-    );
-}
-#[pgrx_macros::pg_guard]
-extern "C" {
-    pub fn EmitWarningsOnPlaceholders(className: *const ::std::os::raw::c_char);
-}
-#[pgrx_macros::pg_guard]
-extern "C" {
-    pub fn GetConfigOption(
-        name: *const ::std::os::raw::c_char,
-        missing_ok: bool,
-        restrict_privileged: bool,
-    ) -> *const ::std::os::raw::c_char;
-}
-#[pgrx_macros::pg_guard]
-extern "C" {
-    pub fn GetConfigOptionResetString(
-        name: *const ::std::os::raw::c_char,
-    ) -> *const ::std::os::raw::c_char;
-}
-#[pgrx_macros::pg_guard]
-extern "C" {
-    pub fn GetConfigOptionFlags(
-        name: *const ::std::os::raw::c_char,
-        missing_ok: bool,
-    ) -> ::std::os::raw::c_int;
-}
-#[pgrx_macros::pg_guard]
-extern "C" {
-    pub fn ProcessConfigFile(context: GucContext);
-}
-#[pgrx_macros::pg_guard]
-extern "C" {
-    pub fn InitializeGUCOptions();
-}
-#[pgrx_macros::pg_guard]
-extern "C" {
-    pub fn SelectConfigFiles(
-        userDoption: *const ::std::os::raw::c_char,
-        progname: *const ::std::os::raw::c_char,
-    ) -> bool;
-}
-#[pgrx_macros::pg_guard]
-extern "C" {
-    pub fn ResetAllOptions();
-}
-#[pgrx_macros::pg_guard]
-extern "C" {
-    pub fn AtStart_GUC();
-}
-#[pgrx_macros::pg_guard]
-extern "C" {
-    pub fn NewGUCNestLevel() -> ::std::os::raw::c_int;
-}
-#[pgrx_macros::pg_guard]
-extern "C" {
-    pub fn AtEOXact_GUC(isCommit: bool, nestLevel: ::std::os::raw::c_int);
-}
-#[pgrx_macros::pg_guard]
-extern "C" {
-    pub fn BeginReportingGUCOptions();
-}
-#[pgrx_macros::pg_guard]
-extern "C" {
-    pub fn ParseLongOption(
-        string: *const ::std::os::raw::c_char,
-        name: *mut *mut ::std::os::raw::c_char,
-        value: *mut *mut ::std::os::raw::c_char,
-    );
-}
-#[pgrx_macros::pg_guard]
-extern "C" {
-    pub fn parse_int(
-        value: *const ::std::os::raw::c_char,
-        result: *mut ::std::os::raw::c_int,
-        flags: ::std::os::raw::c_int,
-        hintmsg: *mut *const ::std::os::raw::c_char,
-    ) -> bool;
-}
-#[pgrx_macros::pg_guard]
-extern "C" {
-    pub fn parse_real(
-        value: *const ::std::os::raw::c_char,
-        result: *mut f64,
-        flags: ::std::os::raw::c_int,
-        hintmsg: *mut *const ::std::os::raw::c_char,
-    ) -> bool;
-}
-#[pgrx_macros::pg_guard]
-extern "C" {
-    pub fn set_config_option(
-        name: *const ::std::os::raw::c_char,
-        value: *const ::std::os::raw::c_char,
-        context: GucContext,
-        source: GucSource,
-        action: GucAction,
-        changeVal: bool,
-        elevel: ::std::os::raw::c_int,
-        is_reload: bool,
-    ) -> ::std::os::raw::c_int;
-}
-#[pgrx_macros::pg_guard]
-extern "C" {
-    pub fn AlterSystemSetConfigFile(setstmt: *mut AlterSystemStmt);
-}
-#[pgrx_macros::pg_guard]
-extern "C" {
-    pub fn GetConfigOptionByName(
-        name: *const ::std::os::raw::c_char,
-        varname: *mut *const ::std::os::raw::c_char,
-        missing_ok: bool,
-    ) -> *mut ::std::os::raw::c_char;
-}
-#[pgrx_macros::pg_guard]
-extern "C" {
-    pub fn GetConfigOptionByNum(
-        varnum: ::std::os::raw::c_int,
-        values: *mut *const ::std::os::raw::c_char,
-        noshow: *mut bool,
-    );
-}
-#[pgrx_macros::pg_guard]
-extern "C" {
-    pub fn GetNumConfigOptions() -> ::std::os::raw::c_int;
-}
-#[pgrx_macros::pg_guard]
-extern "C" {
-    pub fn SetPGVariable(name: *const ::std::os::raw::c_char, args: *mut List, is_local: bool);
-}
-#[pgrx_macros::pg_guard]
-extern "C" {
-    pub fn GetPGVariable(name: *const ::std::os::raw::c_char, dest: *mut DestReceiver);
-}
-#[pgrx_macros::pg_guard]
-extern "C" {
-    pub fn GetPGVariableResultDesc(name: *const ::std::os::raw::c_char) -> TupleDesc;
-}
-#[pgrx_macros::pg_guard]
-extern "C" {
-    pub fn ExecSetVariableStmt(stmt: *mut VariableSetStmt, isTopLevel: bool);
-}
-#[pgrx_macros::pg_guard]
-extern "C" {
-    pub fn ExtractSetVariableArgs(stmt: *mut VariableSetStmt) -> *mut ::std::os::raw::c_char;
-}
-#[pgrx_macros::pg_guard]
-extern "C" {
-    pub fn ProcessGUCArray(
-        array: *mut ArrayType,
-        context: GucContext,
-        source: GucSource,
-        action: GucAction,
-    );
-}
-#[pgrx_macros::pg_guard]
-extern "C" {
-    pub fn GUCArrayAdd(
-        array: *mut ArrayType,
-        name: *const ::std::os::raw::c_char,
-        value: *const ::std::os::raw::c_char,
-    ) -> *mut ArrayType;
-}
-#[pgrx_macros::pg_guard]
-extern "C" {
-    pub fn GUCArrayDelete(
-        array: *mut ArrayType,
-        name: *const ::std::os::raw::c_char,
-    ) -> *mut ArrayType;
-}
-#[pgrx_macros::pg_guard]
-extern "C" {
-    pub fn GUCArrayReset(array: *mut ArrayType) -> *mut ArrayType;
-}
-#[pgrx_macros::pg_guard]
-extern "C" {
-    pub fn EstimateGUCStateSpace() -> Size;
-}
-#[pgrx_macros::pg_guard]
-extern "C" {
-    pub fn SerializeGUCState(maxsize: Size, start_address: *mut ::std::os::raw::c_char);
-}
-#[pgrx_macros::pg_guard]
-extern "C" {
-    pub fn RestoreGUCState(gucstate: *mut ::std::os::raw::c_void);
-}
-extern "C" {
-    pub static mut GUC_check_errmsg_string: *mut ::std::os::raw::c_char;
-}
-extern "C" {
-    pub static mut GUC_check_errdetail_string: *mut ::std::os::raw::c_char;
-}
-extern "C" {
-    pub static mut GUC_check_errhint_string: *mut ::std::os::raw::c_char;
-}
-#[pgrx_macros::pg_guard]
-extern "C" {
-    pub fn GUC_check_errcode(sqlerrcode: ::std::os::raw::c_int);
-}
-#[pgrx_macros::pg_guard]
-extern "C" {
-    pub fn check_default_tablespace(
-        newval: *mut *mut ::std::os::raw::c_char,
-        extra: *mut *mut ::std::os::raw::c_void,
-        source: GucSource,
-    ) -> bool;
-}
-#[pgrx_macros::pg_guard]
-extern "C" {
-    pub fn check_temp_tablespaces(
-        newval: *mut *mut ::std::os::raw::c_char,
-        extra: *mut *mut ::std::os::raw::c_void,
-        source: GucSource,
-    ) -> bool;
-}
-#[pgrx_macros::pg_guard]
-extern "C" {
-    pub fn assign_temp_tablespaces(
-        newval: *const ::std::os::raw::c_char,
-        extra: *mut ::std::os::raw::c_void,
-    );
-}
-#[pgrx_macros::pg_guard]
-extern "C" {
-    pub fn check_search_path(
-        newval: *mut *mut ::std::os::raw::c_char,
-        extra: *mut *mut ::std::os::raw::c_void,
-        source: GucSource,
-    ) -> bool;
-}
-#[pgrx_macros::pg_guard]
-extern "C" {
-    pub fn assign_search_path(
-        newval: *const ::std::os::raw::c_char,
-        extra: *mut ::std::os::raw::c_void,
-    );
-}
-#[pgrx_macros::pg_guard]
-extern "C" {
-    pub fn check_wal_buffers(
-        newval: *mut ::std::os::raw::c_int,
-        extra: *mut *mut ::std::os::raw::c_void,
-        source: GucSource,
-    ) -> bool;
-}
-#[pgrx_macros::pg_guard]
-extern "C" {
-    pub fn assign_xlog_sync_method(
-        new_sync_method: ::std::os::raw::c_int,
-        extra: *mut ::std::os::raw::c_void,
-    );
-}
-#[repr(C)]
-#[derive(Debug, Copy, Clone)]
-pub struct FormData_pg_class {
-    pub oid: Oid,
-    pub relname: NameData,
-    pub relnamespace: Oid,
-    pub reltype: Oid,
-    pub reloftype: Oid,
-    pub relowner: Oid,
-    pub relam: Oid,
-    pub relfilenode: Oid,
-    pub reltablespace: Oid,
-    pub relpages: int32,
-    pub reltuples: float4,
-    pub relallvisible: int32,
-    pub reltoastrelid: Oid,
-    pub relhasindex: bool,
-    pub relisshared: bool,
-    pub relpersistence: ::std::os::raw::c_char,
-    pub relkind: ::std::os::raw::c_char,
-    pub relnatts: int16,
-    pub relchecks: int16,
-    pub relhasrules: bool,
-    pub relhastriggers: bool,
-    pub relhassubclass: bool,
-    pub relrowsecurity: bool,
-    pub relforcerowsecurity: bool,
-    pub relispopulated: bool,
-    pub relreplident: ::std::os::raw::c_char,
-    pub relispartition: bool,
-    pub relrewrite: Oid,
-    pub relfrozenxid: TransactionId,
-    pub relminmxid: TransactionId,
-}
-impl Default for FormData_pg_class {
-    fn default() -> Self {
-        let mut s = ::std::mem::MaybeUninit::<Self>::uninit();
-        unsafe {
-            ::std::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
-            s.assume_init()
-        }
-    }
-}
-pub type Form_pg_class = *mut FormData_pg_class;
-#[repr(C)]
-#[derive(Debug)]
-pub struct FormData_pg_index {
-    pub indexrelid: Oid,
-    pub indrelid: Oid,
-    pub indnatts: int16,
-    pub indnkeyatts: int16,
-    pub indisunique: bool,
-    pub indisprimary: bool,
-    pub indisexclusion: bool,
-    pub indimmediate: bool,
-    pub indisclustered: bool,
-    pub indisvalid: bool,
-    pub indcheckxmin: bool,
-    pub indisready: bool,
-    pub indislive: bool,
-    pub indisreplident: bool,
-    pub indkey: int2vector,
-}
-impl Default for FormData_pg_index {
-    fn default() -> Self {
-        let mut s = ::std::mem::MaybeUninit::<Self>::uninit();
-        unsafe {
-            ::std::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
-            s.assume_init()
-        }
-    }
-}
-pub type Form_pg_index = *mut FormData_pg_index;
-pub const ParseExprKind_EXPR_KIND_NONE: ParseExprKind = 0;
-pub const ParseExprKind_EXPR_KIND_OTHER: ParseExprKind = 1;
-pub const ParseExprKind_EXPR_KIND_JOIN_ON: ParseExprKind = 2;
-pub const ParseExprKind_EXPR_KIND_JOIN_USING: ParseExprKind = 3;
-pub const ParseExprKind_EXPR_KIND_FROM_SUBSELECT: ParseExprKind = 4;
-pub const ParseExprKind_EXPR_KIND_FROM_FUNCTION: ParseExprKind = 5;
-pub const ParseExprKind_EXPR_KIND_WHERE: ParseExprKind = 6;
-pub const ParseExprKind_EXPR_KIND_HAVING: ParseExprKind = 7;
-pub const ParseExprKind_EXPR_KIND_FILTER: ParseExprKind = 8;
-pub const ParseExprKind_EXPR_KIND_WINDOW_PARTITION: ParseExprKind = 9;
-pub const ParseExprKind_EXPR_KIND_WINDOW_ORDER: ParseExprKind = 10;
-pub const ParseExprKind_EXPR_KIND_WINDOW_FRAME_RANGE: ParseExprKind = 11;
-pub const ParseExprKind_EXPR_KIND_WINDOW_FRAME_ROWS: ParseExprKind = 12;
-pub const ParseExprKind_EXPR_KIND_WINDOW_FRAME_GROUPS: ParseExprKind = 13;
-pub const ParseExprKind_EXPR_KIND_SELECT_TARGET: ParseExprKind = 14;
-pub const ParseExprKind_EXPR_KIND_INSERT_TARGET: ParseExprKind = 15;
-pub const ParseExprKind_EXPR_KIND_UPDATE_SOURCE: ParseExprKind = 16;
-pub const ParseExprKind_EXPR_KIND_UPDATE_TARGET: ParseExprKind = 17;
-pub const ParseExprKind_EXPR_KIND_GROUP_BY: ParseExprKind = 18;
-pub const ParseExprKind_EXPR_KIND_ORDER_BY: ParseExprKind = 19;
-pub const ParseExprKind_EXPR_KIND_DISTINCT_ON: ParseExprKind = 20;
-pub const ParseExprKind_EXPR_KIND_LIMIT: ParseExprKind = 21;
-pub const ParseExprKind_EXPR_KIND_OFFSET: ParseExprKind = 22;
-pub const ParseExprKind_EXPR_KIND_RETURNING: ParseExprKind = 23;
-pub const ParseExprKind_EXPR_KIND_VALUES: ParseExprKind = 24;
-pub const ParseExprKind_EXPR_KIND_VALUES_SINGLE: ParseExprKind = 25;
-pub const ParseExprKind_EXPR_KIND_CHECK_CONSTRAINT: ParseExprKind = 26;
-pub const ParseExprKind_EXPR_KIND_DOMAIN_CHECK: ParseExprKind = 27;
-pub const ParseExprKind_EXPR_KIND_COLUMN_DEFAULT: ParseExprKind = 28;
-pub const ParseExprKind_EXPR_KIND_FUNCTION_DEFAULT: ParseExprKind = 29;
-pub const ParseExprKind_EXPR_KIND_INDEX_EXPRESSION: ParseExprKind = 30;
-pub const ParseExprKind_EXPR_KIND_INDEX_PREDICATE: ParseExprKind = 31;
-pub const ParseExprKind_EXPR_KIND_ALTER_COL_TRANSFORM: ParseExprKind = 32;
-pub const ParseExprKind_EXPR_KIND_EXECUTE_PARAMETER: ParseExprKind = 33;
-pub const ParseExprKind_EXPR_KIND_TRIGGER_WHEN: ParseExprKind = 34;
-pub const ParseExprKind_EXPR_KIND_POLICY: ParseExprKind = 35;
-pub const ParseExprKind_EXPR_KIND_PARTITION_BOUND: ParseExprKind = 36;
-pub const ParseExprKind_EXPR_KIND_PARTITION_EXPRESSION: ParseExprKind = 37;
-pub const ParseExprKind_EXPR_KIND_CALL_ARGUMENT: ParseExprKind = 38;
-pub const ParseExprKind_EXPR_KIND_COPY_WHERE: ParseExprKind = 39;
-pub const ParseExprKind_EXPR_KIND_GENERATED_COLUMN: ParseExprKind = 40;
-pub type ParseExprKind = ::std::os::raw::c_uint;
-pub type PreParseColumnRefHook = ::std::option::Option<
-    unsafe extern "C" fn(pstate: *mut ParseState, cref: *mut ColumnRef) -> *mut Node,
->;
-pub type PostParseColumnRefHook = ::std::option::Option<
-    unsafe extern "C" fn(
-        pstate: *mut ParseState,
-        cref: *mut ColumnRef,
-        var: *mut Node,
-    ) -> *mut Node,
->;
-pub type ParseParamRefHook = ::std::option::Option<
-    unsafe extern "C" fn(pstate: *mut ParseState, pref: *mut ParamRef) -> *mut Node,
->;
-pub type CoerceParamHook = ::std::option::Option<
-    unsafe extern "C" fn(
-        pstate: *mut ParseState,
-        param: *mut Param,
-        targetTypeId: Oid,
-        targetTypeMod: int32,
-        location: ::std::os::raw::c_int,
-    ) -> *mut Node,
->;
-#[repr(C)]
-#[derive(Debug, Copy, Clone)]
-pub struct ParseState {
-    pub parentParseState: *mut ParseState,
-    pub p_sourcetext: *const ::std::os::raw::c_char,
-    pub p_rtable: *mut List,
-    pub p_joinexprs: *mut List,
-    pub p_joinlist: *mut List,
-    pub p_namespace: *mut List,
-    pub p_lateral_active: bool,
-    pub p_ctenamespace: *mut List,
-    pub p_future_ctes: *mut List,
-    pub p_parent_cte: *mut CommonTableExpr,
-    pub p_target_relation: Relation,
-    pub p_target_rangetblentry: *mut RangeTblEntry,
-    pub p_is_insert: bool,
-    pub p_windowdefs: *mut List,
-    pub p_expr_kind: ParseExprKind,
-    pub p_next_resno: ::std::os::raw::c_int,
-    pub p_multiassign_exprs: *mut List,
-    pub p_locking_clause: *mut List,
-    pub p_locked_from_parent: bool,
-    pub p_resolve_unknowns: bool,
-    pub p_queryEnv: *mut QueryEnvironment,
-    pub p_hasAggs: bool,
-    pub p_hasWindowFuncs: bool,
-    pub p_hasTargetSRFs: bool,
-    pub p_hasSubLinks: bool,
-    pub p_hasModifyingCTE: bool,
-    pub p_last_srf: *mut Node,
-    pub p_pre_columnref_hook: PreParseColumnRefHook,
-    pub p_post_columnref_hook: PostParseColumnRefHook,
-    pub p_paramref_hook: ParseParamRefHook,
-    pub p_coerce_param_hook: CoerceParamHook,
-    pub p_ref_hook_state: *mut ::std::os::raw::c_void,
-}
-impl Default for ParseState {
-    fn default() -> Self {
-        let mut s = ::std::mem::MaybeUninit::<Self>::uninit();
-        unsafe {
-            ::std::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
-            s.assume_init()
-        }
-    }
-}
-#[repr(C)]
-#[derive(Debug, Copy, Clone)]
-pub struct ParseNamespaceItem {
-    pub p_rte: *mut RangeTblEntry,
-    pub p_rel_visible: bool,
-    pub p_cols_visible: bool,
-    pub p_lateral_only: bool,
-    pub p_lateral_ok: bool,
-}
-impl Default for ParseNamespaceItem {
-    fn default() -> Self {
-        let mut s = ::std::mem::MaybeUninit::<Self>::uninit();
-        unsafe {
-            ::std::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
-            s.assume_init()
-        }
-    }
-}
-#[repr(C)]
-#[derive(Debug, Copy, Clone)]
-pub struct ParseCallbackState {
-    pub pstate: *mut ParseState,
-    pub location: ::std::os::raw::c_int,
-    pub errcallback: ErrorContextCallback,
-}
-impl Default for ParseCallbackState {
-    fn default() -> Self {
-        let mut s = ::std::mem::MaybeUninit::<Self>::uninit();
-        unsafe {
-            ::std::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
-            s.assume_init()
-        }
-    }
-}
-#[pgrx_macros::pg_guard]
-extern "C" {
-    pub fn make_parsestate(parentParseState: *mut ParseState) -> *mut ParseState;
-}
-#[pgrx_macros::pg_guard]
-extern "C" {
-    pub fn free_parsestate(pstate: *mut ParseState);
-}
-#[pgrx_macros::pg_guard]
-extern "C" {
-    pub fn parser_errposition(
-        pstate: *mut ParseState,
-        location: ::std::os::raw::c_int,
-    ) -> ::std::os::raw::c_int;
-}
-#[pgrx_macros::pg_guard]
-extern "C" {
-    pub fn setup_parser_errposition_callback(
-        pcbstate: *mut ParseCallbackState,
-        pstate: *mut ParseState,
-        location: ::std::os::raw::c_int,
-    );
-}
-#[pgrx_macros::pg_guard]
-extern "C" {
-    pub fn cancel_parser_errposition_callback(pcbstate: *mut ParseCallbackState);
-}
-#[pgrx_macros::pg_guard]
-extern "C" {
-    pub fn make_var(
-        pstate: *mut ParseState,
-        rte: *mut RangeTblEntry,
-        attrno: ::std::os::raw::c_int,
-        location: ::std::os::raw::c_int,
-    ) -> *mut Var;
-}
-#[pgrx_macros::pg_guard]
-extern "C" {
-    pub fn transformContainerType(containerType: *mut Oid, containerTypmod: *mut int32) -> Oid;
-}
-#[pgrx_macros::pg_guard]
-extern "C" {
-    pub fn transformContainerSubscripts(
-        pstate: *mut ParseState,
-        containerBase: *mut Node,
-        containerType: Oid,
-        elementType: Oid,
-        containerTypMod: int32,
-        indirection: *mut List,
-        assignFrom: *mut Node,
-    ) -> *mut SubscriptingRef;
-}
-#[pgrx_macros::pg_guard]
-extern "C" {
-    pub fn make_const(
-        pstate: *mut ParseState,
-        value: *mut Value,
-        location: ::std::os::raw::c_int,
-    ) -> *mut Const;
 }
 #[repr(C)]
 #[derive(Debug, Copy, Clone)]
@@ -28193,6 +27451,916 @@ extern "C" {
 #[pgrx_macros::pg_guard]
 extern "C" {
     pub fn RelationGetRepsetList(rel: Relation) -> *mut List;
+}
+#[repr(C)]
+#[derive(Debug, Copy, Clone)]
+pub struct GenericXLogState {
+    _unused: [u8; 0],
+}
+#[pgrx_macros::pg_guard]
+extern "C" {
+    pub fn GenericXLogStart(relation: Relation) -> *mut GenericXLogState;
+}
+#[pgrx_macros::pg_guard]
+extern "C" {
+    pub fn GenericXLogRegisterBuffer(
+        state: *mut GenericXLogState,
+        buffer: Buffer,
+        flags: ::std::os::raw::c_int,
+    ) -> Page;
+}
+#[pgrx_macros::pg_guard]
+extern "C" {
+    pub fn GenericXLogFinish(state: *mut GenericXLogState) -> XLogRecPtr;
+}
+#[pgrx_macros::pg_guard]
+extern "C" {
+    pub fn GenericXLogAbort(state: *mut GenericXLogState);
+}
+#[pgrx_macros::pg_guard]
+extern "C" {
+    pub fn generic_redo(record: *mut XLogReaderState);
+}
+#[pgrx_macros::pg_guard]
+extern "C" {
+    pub fn generic_identify(info: uint8) -> *const ::std::os::raw::c_char;
+}
+#[pgrx_macros::pg_guard]
+extern "C" {
+    pub fn generic_desc(buf: StringInfo, record: *mut XLogReaderState);
+}
+#[pgrx_macros::pg_guard]
+extern "C" {
+    pub fn generic_mask(pagedata: *mut ::std::os::raw::c_char, blkno: BlockNumber);
+}
+#[repr(C)]
+#[derive(Debug, Default, Copy, Clone)]
+pub struct GinStatsData {
+    pub nPendingPages: BlockNumber,
+    pub nTotalPages: BlockNumber,
+    pub nEntryPages: BlockNumber,
+    pub nDataPages: BlockNumber,
+    pub nEntries: int64,
+    pub ginVersion: int32,
+}
+pub type GinTernaryValue = ::std::os::raw::c_char;
+extern "C" {
+    pub static mut GinFuzzySearchLimit: ::std::os::raw::c_int;
+}
+extern "C" {
+    pub static mut gin_pending_list_limit: ::std::os::raw::c_int;
+}
+#[pgrx_macros::pg_guard]
+extern "C" {
+    pub fn ginGetStats(index: Relation, stats: *mut GinStatsData);
+}
+#[pgrx_macros::pg_guard]
+extern "C" {
+    pub fn ginUpdateStats(index: Relation, stats: *const GinStatsData, is_build: bool);
+}
+pub type GistNSN = XLogRecPtr;
+pub type PageGistNSN = PageXLogRecPtr;
+#[repr(C)]
+#[derive(Debug, Default, Copy, Clone)]
+pub struct GISTPageOpaqueData {
+    pub nsn: PageGistNSN,
+    pub rightlink: BlockNumber,
+    pub flags: uint16,
+    pub gist_page_id: uint16,
+}
+pub type GISTPageOpaque = *mut GISTPageOpaqueData;
+#[repr(C)]
+#[derive(Debug, Copy, Clone)]
+pub struct GIST_SPLITVEC {
+    pub spl_left: *mut OffsetNumber,
+    pub spl_nleft: ::std::os::raw::c_int,
+    pub spl_ldatum: Datum,
+    pub spl_ldatum_exists: bool,
+    pub spl_right: *mut OffsetNumber,
+    pub spl_nright: ::std::os::raw::c_int,
+    pub spl_rdatum: Datum,
+    pub spl_rdatum_exists: bool,
+}
+impl Default for GIST_SPLITVEC {
+    fn default() -> Self {
+        let mut s = ::std::mem::MaybeUninit::<Self>::uninit();
+        unsafe {
+            ::std::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
+            s.assume_init()
+        }
+    }
+}
+#[repr(C)]
+#[derive(Debug, Copy, Clone)]
+pub struct GISTENTRY {
+    pub key: Datum,
+    pub rel: Relation,
+    pub page: Page,
+    pub offset: OffsetNumber,
+    pub leafkey: bool,
+}
+impl Default for GISTENTRY {
+    fn default() -> Self {
+        let mut s = ::std::mem::MaybeUninit::<Self>::uninit();
+        unsafe {
+            ::std::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
+            s.assume_init()
+        }
+    }
+}
+#[repr(C)]
+#[derive(Debug, Default, Copy, Clone)]
+pub struct GISTDeletedPageContents {
+    pub deleteXid: FullTransactionId,
+}
+#[repr(C)]
+#[derive(Debug)]
+pub struct GistEntryVector {
+    pub n: int32,
+    pub vector: __IncompleteArrayField<GISTENTRY>,
+}
+impl Default for GistEntryVector {
+    fn default() -> Self {
+        let mut s = ::std::mem::MaybeUninit::<Self>::uninit();
+        unsafe {
+            ::std::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
+            s.assume_init()
+        }
+    }
+}
+#[pgrx_macros::pg_guard]
+extern "C" {
+    pub fn relation_open(relationId: Oid, lockmode: LOCKMODE) -> Relation;
+}
+#[pgrx_macros::pg_guard]
+extern "C" {
+    pub fn try_relation_open(relationId: Oid, lockmode: LOCKMODE) -> Relation;
+}
+#[pgrx_macros::pg_guard]
+extern "C" {
+    pub fn relation_openrv(relation: *const RangeVar, lockmode: LOCKMODE) -> Relation;
+}
+#[pgrx_macros::pg_guard]
+extern "C" {
+    pub fn relation_openrv_extended(
+        relation: *const RangeVar,
+        lockmode: LOCKMODE,
+        missing_ok: bool,
+    ) -> Relation;
+}
+#[pgrx_macros::pg_guard]
+extern "C" {
+    pub fn relation_close(relation: Relation, lockmode: LOCKMODE);
+}
+#[repr(C)]
+#[derive(Debug, Copy, Clone)]
+pub struct TableScanDescData {
+    pub rs_rd: Relation,
+    pub rs_snapshot: *mut SnapshotData,
+    pub rs_nkeys: ::std::os::raw::c_int,
+    pub rs_key: *mut ScanKeyData,
+    pub rs_flags: uint32,
+    pub rs_parallel: *mut ParallelTableScanDescData,
+}
+impl Default for TableScanDescData {
+    fn default() -> Self {
+        let mut s = ::std::mem::MaybeUninit::<Self>::uninit();
+        unsafe {
+            ::std::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
+            s.assume_init()
+        }
+    }
+}
+pub type TableScanDesc = *mut TableScanDescData;
+#[repr(C)]
+#[derive(Debug, Copy, Clone)]
+pub struct ParallelTableScanDescData {
+    pub phs_relid: Oid,
+    pub phs_syncscan: bool,
+    pub phs_snapshot_any: bool,
+    pub phs_snapshot_off: Size,
+}
+impl Default for ParallelTableScanDescData {
+    fn default() -> Self {
+        let mut s = ::std::mem::MaybeUninit::<Self>::uninit();
+        unsafe {
+            ::std::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
+            s.assume_init()
+        }
+    }
+}
+pub type ParallelTableScanDesc = *mut ParallelTableScanDescData;
+#[repr(C)]
+#[derive(Debug, Copy, Clone)]
+pub struct ParallelBlockTableScanDescData {
+    pub base: ParallelTableScanDescData,
+    pub phs_nblocks: BlockNumber,
+    pub phs_mutex: slock_t,
+    pub phs_startblock: BlockNumber,
+    pub phs_nallocated: pg_atomic_uint64,
+}
+impl Default for ParallelBlockTableScanDescData {
+    fn default() -> Self {
+        let mut s = ::std::mem::MaybeUninit::<Self>::uninit();
+        unsafe {
+            ::std::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
+            s.assume_init()
+        }
+    }
+}
+pub type ParallelBlockTableScanDesc = *mut ParallelBlockTableScanDescData;
+#[repr(C)]
+#[derive(Debug, Copy, Clone)]
+pub struct IndexFetchTableData {
+    pub rel: Relation,
+}
+impl Default for IndexFetchTableData {
+    fn default() -> Self {
+        let mut s = ::std::mem::MaybeUninit::<Self>::uninit();
+        unsafe {
+            ::std::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
+            s.assume_init()
+        }
+    }
+}
+#[repr(C)]
+#[derive(Debug, Copy, Clone)]
+pub struct IndexScanDescData {
+    pub heapRelation: Relation,
+    pub indexRelation: Relation,
+    pub xs_snapshot: *mut SnapshotData,
+    pub numberOfKeys: ::std::os::raw::c_int,
+    pub numberOfOrderBys: ::std::os::raw::c_int,
+    pub keyData: *mut ScanKeyData,
+    pub orderByData: *mut ScanKeyData,
+    pub xs_want_itup: bool,
+    pub xs_temp_snap: bool,
+    pub kill_prior_tuple: bool,
+    pub ignore_killed_tuples: bool,
+    pub xactStartedInRecovery: bool,
+    pub opaque: *mut ::std::os::raw::c_void,
+    pub xs_itup: IndexTuple,
+    pub xs_itupdesc: *mut TupleDescData,
+    pub xs_hitup: HeapTuple,
+    pub xs_hitupdesc: *mut TupleDescData,
+    pub xs_heaptid: ItemPointerData,
+    pub xs_heap_continue: bool,
+    pub xs_heapfetch: *mut IndexFetchTableData,
+    pub xs_recheck: bool,
+    pub xs_orderbyvals: *mut Datum,
+    pub xs_orderbynulls: *mut bool,
+    pub xs_recheckorderby: bool,
+    pub parallel_scan: *mut ParallelIndexScanDescData,
+}
+impl Default for IndexScanDescData {
+    fn default() -> Self {
+        let mut s = ::std::mem::MaybeUninit::<Self>::uninit();
+        unsafe {
+            ::std::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
+            s.assume_init()
+        }
+    }
+}
+#[repr(C)]
+#[derive(Debug)]
+pub struct ParallelIndexScanDescData {
+    pub ps_relid: Oid,
+    pub ps_indexid: Oid,
+    pub ps_offset: Size,
+    pub ps_snapshot_data: __IncompleteArrayField<::std::os::raw::c_char>,
+}
+impl Default for ParallelIndexScanDescData {
+    fn default() -> Self {
+        let mut s = ::std::mem::MaybeUninit::<Self>::uninit();
+        unsafe {
+            ::std::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
+            s.assume_init()
+        }
+    }
+}
+#[repr(C)]
+#[derive(Debug, Copy, Clone)]
+pub struct SysScanDescData {
+    pub heap_rel: Relation,
+    pub irel: Relation,
+    pub scan: *mut TableScanDescData,
+    pub iscan: *mut IndexScanDescData,
+    pub snapshot: *mut SnapshotData,
+    pub slot: *mut TupleTableSlot,
+}
+impl Default for SysScanDescData {
+    fn default() -> Self {
+        let mut s = ::std::mem::MaybeUninit::<Self>::uninit();
+        unsafe {
+            ::std::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
+            s.assume_init()
+        }
+    }
+}
+#[pgrx_macros::pg_guard]
+extern "C" {
+    pub fn table_open(relationId: Oid, lockmode: LOCKMODE) -> Relation;
+}
+#[pgrx_macros::pg_guard]
+extern "C" {
+    pub fn table_openrv(relation: *const RangeVar, lockmode: LOCKMODE) -> Relation;
+}
+#[pgrx_macros::pg_guard]
+extern "C" {
+    pub fn table_openrv_extended(
+        relation: *const RangeVar,
+        lockmode: LOCKMODE,
+        missing_ok: bool,
+    ) -> Relation;
+}
+#[pgrx_macros::pg_guard]
+extern "C" {
+    pub fn table_close(relation: Relation, lockmode: LOCKMODE);
+}
+pub const GucContext_PGC_INTERNAL: GucContext = 0;
+pub const GucContext_PGC_POSTMASTER: GucContext = 1;
+pub const GucContext_PGC_SIGHUP: GucContext = 2;
+pub const GucContext_PGC_SU_BACKEND: GucContext = 3;
+pub const GucContext_PGC_BACKEND: GucContext = 4;
+pub const GucContext_PGC_SUSET: GucContext = 5;
+pub const GucContext_PGC_USERSET: GucContext = 6;
+pub type GucContext = ::std::os::raw::c_uint;
+pub const GucSource_PGC_S_DEFAULT: GucSource = 0;
+pub const GucSource_PGC_S_DYNAMIC_DEFAULT: GucSource = 1;
+pub const GucSource_PGC_S_ENV_VAR: GucSource = 2;
+pub const GucSource_PGC_S_FILE: GucSource = 3;
+pub const GucSource_PGC_S_ARGV: GucSource = 4;
+pub const GucSource_PGC_S_GLOBAL: GucSource = 5;
+pub const GucSource_PGC_S_DATABASE: GucSource = 6;
+pub const GucSource_PGC_S_USER: GucSource = 7;
+pub const GucSource_PGC_S_DATABASE_USER: GucSource = 8;
+pub const GucSource_PGC_S_CLIENT: GucSource = 9;
+pub const GucSource_PGC_S_OVERRIDE: GucSource = 10;
+pub const GucSource_PGC_S_INTERACTIVE: GucSource = 11;
+pub const GucSource_PGC_S_TEST: GucSource = 12;
+pub const GucSource_PGC_S_SESSION: GucSource = 13;
+pub type GucSource = ::std::os::raw::c_uint;
+#[repr(C)]
+#[derive(Debug, Copy, Clone)]
+pub struct ConfigVariable {
+    pub name: *mut ::std::os::raw::c_char,
+    pub value: *mut ::std::os::raw::c_char,
+    pub errmsg: *mut ::std::os::raw::c_char,
+    pub filename: *mut ::std::os::raw::c_char,
+    pub sourceline: ::std::os::raw::c_int,
+    pub ignore: bool,
+    pub applied: bool,
+    pub next: *mut ConfigVariable,
+}
+impl Default for ConfigVariable {
+    fn default() -> Self {
+        let mut s = ::std::mem::MaybeUninit::<Self>::uninit();
+        unsafe {
+            ::std::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
+            s.assume_init()
+        }
+    }
+}
+#[pgrx_macros::pg_guard]
+extern "C" {
+    pub fn ParseConfigFile(
+        config_file: *const ::std::os::raw::c_char,
+        strict: bool,
+        calling_file: *const ::std::os::raw::c_char,
+        calling_lineno: ::std::os::raw::c_int,
+        depth: ::std::os::raw::c_int,
+        elevel: ::std::os::raw::c_int,
+        head_p: *mut *mut ConfigVariable,
+        tail_p: *mut *mut ConfigVariable,
+    ) -> bool;
+}
+#[pgrx_macros::pg_guard]
+extern "C" {
+    pub fn ParseConfigFp(
+        fp: *mut FILE,
+        config_file: *const ::std::os::raw::c_char,
+        depth: ::std::os::raw::c_int,
+        elevel: ::std::os::raw::c_int,
+        head_p: *mut *mut ConfigVariable,
+        tail_p: *mut *mut ConfigVariable,
+    ) -> bool;
+}
+#[pgrx_macros::pg_guard]
+extern "C" {
+    pub fn ParseConfigDirectory(
+        includedir: *const ::std::os::raw::c_char,
+        calling_file: *const ::std::os::raw::c_char,
+        calling_lineno: ::std::os::raw::c_int,
+        depth: ::std::os::raw::c_int,
+        elevel: ::std::os::raw::c_int,
+        head_p: *mut *mut ConfigVariable,
+        tail_p: *mut *mut ConfigVariable,
+    ) -> bool;
+}
+#[pgrx_macros::pg_guard]
+extern "C" {
+    pub fn FreeConfigVariables(list: *mut ConfigVariable);
+}
+#[repr(C)]
+#[derive(Debug, Copy, Clone)]
+pub struct config_enum_entry {
+    pub name: *const ::std::os::raw::c_char,
+    pub val: ::std::os::raw::c_int,
+    pub hidden: bool,
+}
+impl Default for config_enum_entry {
+    fn default() -> Self {
+        let mut s = ::std::mem::MaybeUninit::<Self>::uninit();
+        unsafe {
+            ::std::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
+            s.assume_init()
+        }
+    }
+}
+pub type GucBoolCheckHook = ::std::option::Option<
+    unsafe extern "C" fn(
+        newval: *mut bool,
+        extra: *mut *mut ::std::os::raw::c_void,
+        source: GucSource,
+    ) -> bool,
+>;
+pub type GucIntCheckHook = ::std::option::Option<
+    unsafe extern "C" fn(
+        newval: *mut ::std::os::raw::c_int,
+        extra: *mut *mut ::std::os::raw::c_void,
+        source: GucSource,
+    ) -> bool,
+>;
+pub type GucRealCheckHook = ::std::option::Option<
+    unsafe extern "C" fn(
+        newval: *mut f64,
+        extra: *mut *mut ::std::os::raw::c_void,
+        source: GucSource,
+    ) -> bool,
+>;
+pub type GucStringCheckHook = ::std::option::Option<
+    unsafe extern "C" fn(
+        newval: *mut *mut ::std::os::raw::c_char,
+        extra: *mut *mut ::std::os::raw::c_void,
+        source: GucSource,
+    ) -> bool,
+>;
+pub type GucEnumCheckHook = ::std::option::Option<
+    unsafe extern "C" fn(
+        newval: *mut ::std::os::raw::c_int,
+        extra: *mut *mut ::std::os::raw::c_void,
+        source: GucSource,
+    ) -> bool,
+>;
+pub type GucBoolAssignHook =
+    ::std::option::Option<unsafe extern "C" fn(newval: bool, extra: *mut ::std::os::raw::c_void)>;
+pub type GucIntAssignHook = ::std::option::Option<
+    unsafe extern "C" fn(newval: ::std::os::raw::c_int, extra: *mut ::std::os::raw::c_void),
+>;
+pub type GucRealAssignHook =
+    ::std::option::Option<unsafe extern "C" fn(newval: f64, extra: *mut ::std::os::raw::c_void)>;
+pub type GucStringAssignHook = ::std::option::Option<
+    unsafe extern "C" fn(newval: *const ::std::os::raw::c_char, extra: *mut ::std::os::raw::c_void),
+>;
+pub type GucEnumAssignHook = ::std::option::Option<
+    unsafe extern "C" fn(newval: ::std::os::raw::c_int, extra: *mut ::std::os::raw::c_void),
+>;
+pub type GucShowHook =
+    ::std::option::Option<unsafe extern "C" fn() -> *const ::std::os::raw::c_char>;
+pub const GucAction_GUC_ACTION_SET: GucAction = 0;
+pub const GucAction_GUC_ACTION_LOCAL: GucAction = 1;
+pub const GucAction_GUC_ACTION_SAVE: GucAction = 2;
+pub type GucAction = ::std::os::raw::c_uint;
+extern "C" {
+    pub static mut log_duration: bool;
+}
+extern "C" {
+    pub static mut Debug_print_plan: bool;
+}
+extern "C" {
+    pub static mut Debug_print_parse: bool;
+}
+extern "C" {
+    pub static mut Debug_print_rewritten: bool;
+}
+extern "C" {
+    pub static mut Debug_pretty_print: bool;
+}
+extern "C" {
+    pub static mut log_parser_stats: bool;
+}
+extern "C" {
+    pub static mut log_planner_stats: bool;
+}
+extern "C" {
+    pub static mut log_executor_stats: bool;
+}
+extern "C" {
+    pub static mut log_statement_stats: bool;
+}
+extern "C" {
+    pub static mut log_btree_build_stats: bool;
+}
+extern "C" {
+    pub static mut check_function_bodies: bool;
+}
+extern "C" {
+    pub static mut session_auth_is_superuser: bool;
+}
+extern "C" {
+    pub static mut log_min_error_statement: ::std::os::raw::c_int;
+}
+extern "C" {
+    pub static mut log_min_messages: ::std::os::raw::c_int;
+}
+extern "C" {
+    pub static mut client_min_messages: ::std::os::raw::c_int;
+}
+extern "C" {
+    pub static mut log_min_duration_statement: ::std::os::raw::c_int;
+}
+extern "C" {
+    pub static mut log_temp_files: ::std::os::raw::c_int;
+}
+extern "C" {
+    pub static mut log_xact_sample_rate: f64;
+}
+extern "C" {
+    pub static mut temp_file_limit: ::std::os::raw::c_int;
+}
+extern "C" {
+    pub static mut num_temp_buffers: ::std::os::raw::c_int;
+}
+extern "C" {
+    pub static mut cluster_name: *mut ::std::os::raw::c_char;
+}
+extern "C" {
+    pub static mut ConfigFileName: *mut ::std::os::raw::c_char;
+}
+extern "C" {
+    pub static mut HbaFileName: *mut ::std::os::raw::c_char;
+}
+extern "C" {
+    pub static mut IdentFileName: *mut ::std::os::raw::c_char;
+}
+extern "C" {
+    pub static mut external_pid_file: *mut ::std::os::raw::c_char;
+}
+extern "C" {
+    pub static mut application_name: *mut ::std::os::raw::c_char;
+}
+extern "C" {
+    pub static mut tcp_keepalives_idle: ::std::os::raw::c_int;
+}
+extern "C" {
+    pub static mut tcp_keepalives_interval: ::std::os::raw::c_int;
+}
+extern "C" {
+    pub static mut tcp_keepalives_count: ::std::os::raw::c_int;
+}
+extern "C" {
+    pub static mut tcp_user_timeout: ::std::os::raw::c_int;
+}
+extern "C" {
+    pub static mut trace_sort: bool;
+}
+#[pgrx_macros::pg_guard]
+extern "C" {
+    pub fn SetConfigOption(
+        name: *const ::std::os::raw::c_char,
+        value: *const ::std::os::raw::c_char,
+        context: GucContext,
+        source: GucSource,
+    );
+}
+#[pgrx_macros::pg_guard]
+extern "C" {
+    pub fn DefineCustomBoolVariable(
+        name: *const ::std::os::raw::c_char,
+        short_desc: *const ::std::os::raw::c_char,
+        long_desc: *const ::std::os::raw::c_char,
+        valueAddr: *mut bool,
+        bootValue: bool,
+        context: GucContext,
+        flags: ::std::os::raw::c_int,
+        check_hook: GucBoolCheckHook,
+        assign_hook: GucBoolAssignHook,
+        show_hook: GucShowHook,
+    );
+}
+#[pgrx_macros::pg_guard]
+extern "C" {
+    pub fn DefineCustomIntVariable(
+        name: *const ::std::os::raw::c_char,
+        short_desc: *const ::std::os::raw::c_char,
+        long_desc: *const ::std::os::raw::c_char,
+        valueAddr: *mut ::std::os::raw::c_int,
+        bootValue: ::std::os::raw::c_int,
+        minValue: ::std::os::raw::c_int,
+        maxValue: ::std::os::raw::c_int,
+        context: GucContext,
+        flags: ::std::os::raw::c_int,
+        check_hook: GucIntCheckHook,
+        assign_hook: GucIntAssignHook,
+        show_hook: GucShowHook,
+    );
+}
+#[pgrx_macros::pg_guard]
+extern "C" {
+    pub fn DefineCustomRealVariable(
+        name: *const ::std::os::raw::c_char,
+        short_desc: *const ::std::os::raw::c_char,
+        long_desc: *const ::std::os::raw::c_char,
+        valueAddr: *mut f64,
+        bootValue: f64,
+        minValue: f64,
+        maxValue: f64,
+        context: GucContext,
+        flags: ::std::os::raw::c_int,
+        check_hook: GucRealCheckHook,
+        assign_hook: GucRealAssignHook,
+        show_hook: GucShowHook,
+    );
+}
+#[pgrx_macros::pg_guard]
+extern "C" {
+    pub fn DefineCustomStringVariable(
+        name: *const ::std::os::raw::c_char,
+        short_desc: *const ::std::os::raw::c_char,
+        long_desc: *const ::std::os::raw::c_char,
+        valueAddr: *mut *mut ::std::os::raw::c_char,
+        bootValue: *const ::std::os::raw::c_char,
+        context: GucContext,
+        flags: ::std::os::raw::c_int,
+        check_hook: GucStringCheckHook,
+        assign_hook: GucStringAssignHook,
+        show_hook: GucShowHook,
+    );
+}
+#[pgrx_macros::pg_guard]
+extern "C" {
+    pub fn DefineCustomEnumVariable(
+        name: *const ::std::os::raw::c_char,
+        short_desc: *const ::std::os::raw::c_char,
+        long_desc: *const ::std::os::raw::c_char,
+        valueAddr: *mut ::std::os::raw::c_int,
+        bootValue: ::std::os::raw::c_int,
+        options: *const config_enum_entry,
+        context: GucContext,
+        flags: ::std::os::raw::c_int,
+        check_hook: GucEnumCheckHook,
+        assign_hook: GucEnumAssignHook,
+        show_hook: GucShowHook,
+    );
+}
+#[pgrx_macros::pg_guard]
+extern "C" {
+    pub fn EmitWarningsOnPlaceholders(className: *const ::std::os::raw::c_char);
+}
+#[pgrx_macros::pg_guard]
+extern "C" {
+    pub fn GetConfigOption(
+        name: *const ::std::os::raw::c_char,
+        missing_ok: bool,
+        restrict_privileged: bool,
+    ) -> *const ::std::os::raw::c_char;
+}
+#[pgrx_macros::pg_guard]
+extern "C" {
+    pub fn GetConfigOptionResetString(
+        name: *const ::std::os::raw::c_char,
+    ) -> *const ::std::os::raw::c_char;
+}
+#[pgrx_macros::pg_guard]
+extern "C" {
+    pub fn GetConfigOptionFlags(
+        name: *const ::std::os::raw::c_char,
+        missing_ok: bool,
+    ) -> ::std::os::raw::c_int;
+}
+#[pgrx_macros::pg_guard]
+extern "C" {
+    pub fn ProcessConfigFile(context: GucContext);
+}
+#[pgrx_macros::pg_guard]
+extern "C" {
+    pub fn InitializeGUCOptions();
+}
+#[pgrx_macros::pg_guard]
+extern "C" {
+    pub fn SelectConfigFiles(
+        userDoption: *const ::std::os::raw::c_char,
+        progname: *const ::std::os::raw::c_char,
+    ) -> bool;
+}
+#[pgrx_macros::pg_guard]
+extern "C" {
+    pub fn ResetAllOptions();
+}
+#[pgrx_macros::pg_guard]
+extern "C" {
+    pub fn AtStart_GUC();
+}
+#[pgrx_macros::pg_guard]
+extern "C" {
+    pub fn NewGUCNestLevel() -> ::std::os::raw::c_int;
+}
+#[pgrx_macros::pg_guard]
+extern "C" {
+    pub fn AtEOXact_GUC(isCommit: bool, nestLevel: ::std::os::raw::c_int);
+}
+#[pgrx_macros::pg_guard]
+extern "C" {
+    pub fn BeginReportingGUCOptions();
+}
+#[pgrx_macros::pg_guard]
+extern "C" {
+    pub fn ParseLongOption(
+        string: *const ::std::os::raw::c_char,
+        name: *mut *mut ::std::os::raw::c_char,
+        value: *mut *mut ::std::os::raw::c_char,
+    );
+}
+#[pgrx_macros::pg_guard]
+extern "C" {
+    pub fn parse_int(
+        value: *const ::std::os::raw::c_char,
+        result: *mut ::std::os::raw::c_int,
+        flags: ::std::os::raw::c_int,
+        hintmsg: *mut *const ::std::os::raw::c_char,
+    ) -> bool;
+}
+#[pgrx_macros::pg_guard]
+extern "C" {
+    pub fn parse_real(
+        value: *const ::std::os::raw::c_char,
+        result: *mut f64,
+        flags: ::std::os::raw::c_int,
+        hintmsg: *mut *const ::std::os::raw::c_char,
+    ) -> bool;
+}
+#[pgrx_macros::pg_guard]
+extern "C" {
+    pub fn set_config_option(
+        name: *const ::std::os::raw::c_char,
+        value: *const ::std::os::raw::c_char,
+        context: GucContext,
+        source: GucSource,
+        action: GucAction,
+        changeVal: bool,
+        elevel: ::std::os::raw::c_int,
+        is_reload: bool,
+    ) -> ::std::os::raw::c_int;
+}
+#[pgrx_macros::pg_guard]
+extern "C" {
+    pub fn AlterSystemSetConfigFile(setstmt: *mut AlterSystemStmt);
+}
+#[pgrx_macros::pg_guard]
+extern "C" {
+    pub fn GetConfigOptionByName(
+        name: *const ::std::os::raw::c_char,
+        varname: *mut *const ::std::os::raw::c_char,
+        missing_ok: bool,
+    ) -> *mut ::std::os::raw::c_char;
+}
+#[pgrx_macros::pg_guard]
+extern "C" {
+    pub fn GetConfigOptionByNum(
+        varnum: ::std::os::raw::c_int,
+        values: *mut *const ::std::os::raw::c_char,
+        noshow: *mut bool,
+    );
+}
+#[pgrx_macros::pg_guard]
+extern "C" {
+    pub fn GetNumConfigOptions() -> ::std::os::raw::c_int;
+}
+#[pgrx_macros::pg_guard]
+extern "C" {
+    pub fn SetPGVariable(name: *const ::std::os::raw::c_char, args: *mut List, is_local: bool);
+}
+#[pgrx_macros::pg_guard]
+extern "C" {
+    pub fn GetPGVariable(name: *const ::std::os::raw::c_char, dest: *mut DestReceiver);
+}
+#[pgrx_macros::pg_guard]
+extern "C" {
+    pub fn GetPGVariableResultDesc(name: *const ::std::os::raw::c_char) -> TupleDesc;
+}
+#[pgrx_macros::pg_guard]
+extern "C" {
+    pub fn ExecSetVariableStmt(stmt: *mut VariableSetStmt, isTopLevel: bool);
+}
+#[pgrx_macros::pg_guard]
+extern "C" {
+    pub fn ExtractSetVariableArgs(stmt: *mut VariableSetStmt) -> *mut ::std::os::raw::c_char;
+}
+#[pgrx_macros::pg_guard]
+extern "C" {
+    pub fn ProcessGUCArray(
+        array: *mut ArrayType,
+        context: GucContext,
+        source: GucSource,
+        action: GucAction,
+    );
+}
+#[pgrx_macros::pg_guard]
+extern "C" {
+    pub fn GUCArrayAdd(
+        array: *mut ArrayType,
+        name: *const ::std::os::raw::c_char,
+        value: *const ::std::os::raw::c_char,
+    ) -> *mut ArrayType;
+}
+#[pgrx_macros::pg_guard]
+extern "C" {
+    pub fn GUCArrayDelete(
+        array: *mut ArrayType,
+        name: *const ::std::os::raw::c_char,
+    ) -> *mut ArrayType;
+}
+#[pgrx_macros::pg_guard]
+extern "C" {
+    pub fn GUCArrayReset(array: *mut ArrayType) -> *mut ArrayType;
+}
+#[pgrx_macros::pg_guard]
+extern "C" {
+    pub fn EstimateGUCStateSpace() -> Size;
+}
+#[pgrx_macros::pg_guard]
+extern "C" {
+    pub fn SerializeGUCState(maxsize: Size, start_address: *mut ::std::os::raw::c_char);
+}
+#[pgrx_macros::pg_guard]
+extern "C" {
+    pub fn RestoreGUCState(gucstate: *mut ::std::os::raw::c_void);
+}
+extern "C" {
+    pub static mut GUC_check_errmsg_string: *mut ::std::os::raw::c_char;
+}
+extern "C" {
+    pub static mut GUC_check_errdetail_string: *mut ::std::os::raw::c_char;
+}
+extern "C" {
+    pub static mut GUC_check_errhint_string: *mut ::std::os::raw::c_char;
+}
+#[pgrx_macros::pg_guard]
+extern "C" {
+    pub fn GUC_check_errcode(sqlerrcode: ::std::os::raw::c_int);
+}
+#[pgrx_macros::pg_guard]
+extern "C" {
+    pub fn check_default_tablespace(
+        newval: *mut *mut ::std::os::raw::c_char,
+        extra: *mut *mut ::std::os::raw::c_void,
+        source: GucSource,
+    ) -> bool;
+}
+#[pgrx_macros::pg_guard]
+extern "C" {
+    pub fn check_temp_tablespaces(
+        newval: *mut *mut ::std::os::raw::c_char,
+        extra: *mut *mut ::std::os::raw::c_void,
+        source: GucSource,
+    ) -> bool;
+}
+#[pgrx_macros::pg_guard]
+extern "C" {
+    pub fn assign_temp_tablespaces(
+        newval: *const ::std::os::raw::c_char,
+        extra: *mut ::std::os::raw::c_void,
+    );
+}
+#[pgrx_macros::pg_guard]
+extern "C" {
+    pub fn check_search_path(
+        newval: *mut *mut ::std::os::raw::c_char,
+        extra: *mut *mut ::std::os::raw::c_void,
+        source: GucSource,
+    ) -> bool;
+}
+#[pgrx_macros::pg_guard]
+extern "C" {
+    pub fn assign_search_path(
+        newval: *const ::std::os::raw::c_char,
+        extra: *mut ::std::os::raw::c_void,
+    );
+}
+#[pgrx_macros::pg_guard]
+extern "C" {
+    pub fn check_wal_buffers(
+        newval: *mut ::std::os::raw::c_int,
+        extra: *mut *mut ::std::os::raw::c_void,
+        source: GucSource,
+    ) -> bool;
+}
+#[pgrx_macros::pg_guard]
+extern "C" {
+    pub fn assign_xlog_sync_method(
+        new_sync_method: ::std::os::raw::c_int,
+        extra: *mut ::std::os::raw::c_void,
+    );
 }
 extern "C" {
     pub static mut default_table_access_method: *mut ::std::os::raw::c_char;
@@ -29652,10 +29820,10 @@ impl Default for DynamicZoneAbbrev {
     }
 }
 extern "C" {
-    pub static mut months: [*const ::std::os::raw::c_char; 0usize];
+    pub static months: [*const ::std::os::raw::c_char; 0usize];
 }
 extern "C" {
-    pub static mut days: [*const ::std::os::raw::c_char; 0usize];
+    pub static days: [*const ::std::os::raw::c_char; 0usize];
 }
 extern "C" {
     pub static mut day_tab: [[::std::os::raw::c_int; 13usize]; 2usize];
@@ -29755,7 +29923,7 @@ extern "C" {
         dterr: ::std::os::raw::c_int,
         str_: *const ::std::os::raw::c_char,
         datatype: *const ::std::os::raw::c_char,
-    );
+    ) -> !;
 }
 #[pgrx_macros::pg_guard]
 extern "C" {
@@ -36970,7 +37138,7 @@ impl Default for pg_enc2name {
     }
 }
 extern "C" {
-    pub static mut pg_enc2name_tbl: [pg_enc2name; 0usize];
+    pub static pg_enc2name_tbl: [pg_enc2name; 0usize];
 }
 #[repr(C)]
 #[derive(Debug, Copy, Clone)]
@@ -36988,7 +37156,7 @@ impl Default for pg_enc2gettext {
     }
 }
 extern "C" {
-    pub static mut pg_enc2gettext_tbl: [pg_enc2gettext; 0usize];
+    pub static pg_enc2gettext_tbl: [pg_enc2gettext; 0usize];
 }
 #[pgrx_macros::pg_guard]
 extern "C" {
@@ -37040,7 +37208,7 @@ pub struct pg_wchar_tbl {
     pub maxmblen: ::std::os::raw::c_int,
 }
 extern "C" {
-    pub static mut pg_wchar_table: [pg_wchar_tbl; 0usize];
+    pub static pg_wchar_table: [pg_wchar_tbl; 0usize];
 }
 #[repr(C)]
 #[derive(Debug, Copy, Clone)]
@@ -37454,7 +37622,7 @@ extern "C" {
         encoding: ::std::os::raw::c_int,
         mbstr: *const ::std::os::raw::c_char,
         len: ::std::os::raw::c_int,
-    );
+    ) -> !;
 }
 #[pgrx_macros::pg_guard]
 extern "C" {
@@ -37463,7 +37631,7 @@ extern "C" {
         dest_encoding: ::std::os::raw::c_int,
         mbstr: *const ::std::os::raw::c_char,
         len: ::std::os::raw::c_int,
-    );
+    ) -> !;
 }
 #[pgrx_macros::pg_guard]
 extern "C" {
@@ -41577,6 +41745,39 @@ extern "C" {
 extern "C" {
     pub fn get_parse_rowmark(qry: *mut Query, rtindex: Index) -> *mut RowMarkClause;
 }
+#[pgrx_macros::pg_guard]
+extern "C" {
+    pub fn scanstr(s: *const ::std::os::raw::c_char) -> *mut ::std::os::raw::c_char;
+}
+#[pgrx_macros::pg_guard]
+extern "C" {
+    pub fn downcase_truncate_identifier(
+        ident: *const ::std::os::raw::c_char,
+        len: ::std::os::raw::c_int,
+        warn: bool,
+    ) -> *mut ::std::os::raw::c_char;
+}
+#[pgrx_macros::pg_guard]
+extern "C" {
+    pub fn downcase_identifier(
+        ident: *const ::std::os::raw::c_char,
+        len: ::std::os::raw::c_int,
+        warn: bool,
+        truncate: bool,
+    ) -> *mut ::std::os::raw::c_char;
+}
+#[pgrx_macros::pg_guard]
+extern "C" {
+    pub fn truncate_identifier(
+        ident: *mut ::std::os::raw::c_char,
+        len: ::std::os::raw::c_int,
+        warn: bool,
+    );
+}
+#[pgrx_macros::pg_guard]
+extern "C" {
+    pub fn scanner_isspace(ch: ::std::os::raw::c_char) -> bool;
+}
 #[repr(C)]
 #[derive(Debug, Copy, Clone)]
 pub struct ExpandedRecordHeader {
@@ -43401,7 +43602,7 @@ extern "C" {
 }
 #[pgrx_macros::pg_guard]
 extern "C" {
-    pub fn plpgsql_yyerror(message: *const ::std::os::raw::c_char);
+    pub fn plpgsql_yyerror(message: *const ::std::os::raw::c_char) -> !;
 }
 #[pgrx_macros::pg_guard]
 extern "C" {
@@ -44872,7 +45073,7 @@ extern "C" {
 }
 #[pgrx_macros::pg_guard]
 extern "C" {
-    pub fn proc_exit(code: ::std::os::raw::c_int);
+    pub fn proc_exit(code: ::std::os::raw::c_int) -> !;
 }
 #[pgrx_macros::pg_guard]
 extern "C" {
@@ -44904,6 +45105,190 @@ extern "C" {
 #[pgrx_macros::pg_guard]
 extern "C" {
     pub fn CreateSharedMemoryAndSemaphores(port: ::std::os::raw::c_int);
+}
+pub const XLTW_Oper_XLTW_None: XLTW_Oper = 0;
+pub const XLTW_Oper_XLTW_Update: XLTW_Oper = 1;
+pub const XLTW_Oper_XLTW_Delete: XLTW_Oper = 2;
+pub const XLTW_Oper_XLTW_Lock: XLTW_Oper = 3;
+pub const XLTW_Oper_XLTW_LockUpdated: XLTW_Oper = 4;
+pub const XLTW_Oper_XLTW_InsertIndex: XLTW_Oper = 5;
+pub const XLTW_Oper_XLTW_InsertIndexUnique: XLTW_Oper = 6;
+pub const XLTW_Oper_XLTW_FetchUpdated: XLTW_Oper = 7;
+pub const XLTW_Oper_XLTW_RecheckExclusionConstr: XLTW_Oper = 8;
+pub type XLTW_Oper = ::std::os::raw::c_uint;
+#[pgrx_macros::pg_guard]
+extern "C" {
+    pub fn RelationInitLockInfo(relation: Relation);
+}
+#[pgrx_macros::pg_guard]
+extern "C" {
+    pub fn LockRelationOid(relid: Oid, lockmode: LOCKMODE);
+}
+#[pgrx_macros::pg_guard]
+extern "C" {
+    pub fn ConditionalLockRelationOid(relid: Oid, lockmode: LOCKMODE) -> bool;
+}
+#[pgrx_macros::pg_guard]
+extern "C" {
+    pub fn UnlockRelationId(relid: *mut LockRelId, lockmode: LOCKMODE);
+}
+#[pgrx_macros::pg_guard]
+extern "C" {
+    pub fn UnlockRelationOid(relid: Oid, lockmode: LOCKMODE);
+}
+#[pgrx_macros::pg_guard]
+extern "C" {
+    pub fn LockRelation(relation: Relation, lockmode: LOCKMODE);
+}
+#[pgrx_macros::pg_guard]
+extern "C" {
+    pub fn ConditionalLockRelation(relation: Relation, lockmode: LOCKMODE) -> bool;
+}
+#[pgrx_macros::pg_guard]
+extern "C" {
+    pub fn UnlockRelation(relation: Relation, lockmode: LOCKMODE);
+}
+#[pgrx_macros::pg_guard]
+extern "C" {
+    pub fn CheckRelationLockedByMe(
+        relation: Relation,
+        lockmode: LOCKMODE,
+        orstronger: bool,
+    ) -> bool;
+}
+#[pgrx_macros::pg_guard]
+extern "C" {
+    pub fn LockHasWaitersRelation(relation: Relation, lockmode: LOCKMODE) -> bool;
+}
+#[pgrx_macros::pg_guard]
+extern "C" {
+    pub fn LockRelationIdForSession(relid: *mut LockRelId, lockmode: LOCKMODE);
+}
+#[pgrx_macros::pg_guard]
+extern "C" {
+    pub fn UnlockRelationIdForSession(relid: *mut LockRelId, lockmode: LOCKMODE);
+}
+#[pgrx_macros::pg_guard]
+extern "C" {
+    pub fn LockRelationForExtension(relation: Relation, lockmode: LOCKMODE);
+}
+#[pgrx_macros::pg_guard]
+extern "C" {
+    pub fn UnlockRelationForExtension(relation: Relation, lockmode: LOCKMODE);
+}
+#[pgrx_macros::pg_guard]
+extern "C" {
+    pub fn ConditionalLockRelationForExtension(relation: Relation, lockmode: LOCKMODE) -> bool;
+}
+#[pgrx_macros::pg_guard]
+extern "C" {
+    pub fn RelationExtensionLockWaiterCount(relation: Relation) -> ::std::os::raw::c_int;
+}
+#[pgrx_macros::pg_guard]
+extern "C" {
+    pub fn LockDatabaseFrozenIds(lockmode: LOCKMODE);
+}
+#[pgrx_macros::pg_guard]
+extern "C" {
+    pub fn LockPage(relation: Relation, blkno: BlockNumber, lockmode: LOCKMODE);
+}
+#[pgrx_macros::pg_guard]
+extern "C" {
+    pub fn ConditionalLockPage(relation: Relation, blkno: BlockNumber, lockmode: LOCKMODE) -> bool;
+}
+#[pgrx_macros::pg_guard]
+extern "C" {
+    pub fn UnlockPage(relation: Relation, blkno: BlockNumber, lockmode: LOCKMODE);
+}
+#[pgrx_macros::pg_guard]
+extern "C" {
+    pub fn LockTuple(relation: Relation, tid: ItemPointer, lockmode: LOCKMODE);
+}
+#[pgrx_macros::pg_guard]
+extern "C" {
+    pub fn ConditionalLockTuple(relation: Relation, tid: ItemPointer, lockmode: LOCKMODE) -> bool;
+}
+#[pgrx_macros::pg_guard]
+extern "C" {
+    pub fn UnlockTuple(relation: Relation, tid: ItemPointer, lockmode: LOCKMODE);
+}
+#[pgrx_macros::pg_guard]
+extern "C" {
+    pub fn XactLockTableInsert(xid: TransactionId);
+}
+#[pgrx_macros::pg_guard]
+extern "C" {
+    pub fn XactLockTableDelete(xid: TransactionId);
+}
+#[pgrx_macros::pg_guard]
+extern "C" {
+    pub fn XactLockTableWait(xid: TransactionId, rel: Relation, ctid: ItemPointer, oper: XLTW_Oper);
+}
+#[pgrx_macros::pg_guard]
+extern "C" {
+    pub fn ConditionalXactLockTableWait(xid: TransactionId) -> bool;
+}
+#[pgrx_macros::pg_guard]
+extern "C" {
+    pub fn WaitForLockers(heaplocktag: LOCKTAG, lockmode: LOCKMODE, progress: bool);
+}
+#[pgrx_macros::pg_guard]
+extern "C" {
+    pub fn WaitForLockersMultiple(locktags: *mut List, lockmode: LOCKMODE, progress: bool);
+}
+#[pgrx_macros::pg_guard]
+extern "C" {
+    pub fn SpeculativeInsertionLockAcquire(xid: TransactionId) -> uint32;
+}
+#[pgrx_macros::pg_guard]
+extern "C" {
+    pub fn SpeculativeInsertionLockRelease(xid: TransactionId);
+}
+#[pgrx_macros::pg_guard]
+extern "C" {
+    pub fn SpeculativeInsertionWait(xid: TransactionId, token: uint32);
+}
+#[pgrx_macros::pg_guard]
+extern "C" {
+    pub fn LockDatabaseObject(classid: Oid, objid: Oid, objsubid: uint16, lockmode: LOCKMODE);
+}
+#[pgrx_macros::pg_guard]
+extern "C" {
+    pub fn UnlockDatabaseObject(classid: Oid, objid: Oid, objsubid: uint16, lockmode: LOCKMODE);
+}
+#[pgrx_macros::pg_guard]
+extern "C" {
+    pub fn LockSharedObject(classid: Oid, objid: Oid, objsubid: uint16, lockmode: LOCKMODE);
+}
+#[pgrx_macros::pg_guard]
+extern "C" {
+    pub fn UnlockSharedObject(classid: Oid, objid: Oid, objsubid: uint16, lockmode: LOCKMODE);
+}
+#[pgrx_macros::pg_guard]
+extern "C" {
+    pub fn LockSharedObjectForSession(
+        classid: Oid,
+        objid: Oid,
+        objsubid: uint16,
+        lockmode: LOCKMODE,
+    );
+}
+#[pgrx_macros::pg_guard]
+extern "C" {
+    pub fn UnlockSharedObjectForSession(
+        classid: Oid,
+        objid: Oid,
+        objsubid: uint16,
+        lockmode: LOCKMODE,
+    );
+}
+#[pgrx_macros::pg_guard]
+extern "C" {
+    pub fn DescribeLockTag(buf: StringInfo, tag: *const LOCKTAG);
+}
+#[pgrx_macros::pg_guard]
+extern "C" {
+    pub fn GetLockNameFromTagType(locktag_type: uint16) -> *const ::std::os::raw::c_char;
 }
 #[pgrx_macros::pg_guard]
 extern "C" {
@@ -45438,7 +45823,7 @@ extern "C" {
 }
 #[pgrx_macros::pg_guard]
 extern "C" {
-    pub fn quickdie(postgres_signal_arg: ::std::os::raw::c_int);
+    pub fn quickdie(postgres_signal_arg: ::std::os::raw::c_int) -> !;
 }
 #[pgrx_macros::pg_guard]
 extern "C" {
@@ -45446,7 +45831,7 @@ extern "C" {
 }
 #[pgrx_macros::pg_guard]
 extern "C" {
-    pub fn FloatExceptionHandler(postgres_signal_arg: ::std::os::raw::c_int);
+    pub fn FloatExceptionHandler(postgres_signal_arg: ::std::os::raw::c_int) -> !;
 }
 #[pgrx_macros::pg_guard]
 extern "C" {
@@ -45476,7 +45861,7 @@ extern "C" {
         argv: *mut *mut ::std::os::raw::c_char,
         dbname: *const ::std::os::raw::c_char,
         username: *const ::std::os::raw::c_char,
-    );
+    ) -> !;
 }
 #[pgrx_macros::pg_guard]
 extern "C" {
@@ -56860,15 +57245,15 @@ extern "C" {
 }
 #[pgrx_macros::pg_guard]
 extern "C" {
-    pub fn float_overflow_error();
+    pub fn float_overflow_error() -> !;
 }
 #[pgrx_macros::pg_guard]
 extern "C" {
-    pub fn float_underflow_error();
+    pub fn float_underflow_error() -> !;
 }
 #[pgrx_macros::pg_guard]
 extern "C" {
-    pub fn float_zero_divide_error();
+    pub fn float_zero_divide_error() -> !;
 }
 #[pgrx_macros::pg_guard]
 extern "C" {
@@ -57291,6 +57676,177 @@ extern "C" {
 #[pgrx_macros::pg_guard]
 extern "C" {
     pub fn JsonbTypeName(jb: *mut JsonbValue) -> *const ::std::os::raw::c_char;
+}
+pub const JsonTokenType_JSON_TOKEN_INVALID: JsonTokenType = 0;
+pub const JsonTokenType_JSON_TOKEN_STRING: JsonTokenType = 1;
+pub const JsonTokenType_JSON_TOKEN_NUMBER: JsonTokenType = 2;
+pub const JsonTokenType_JSON_TOKEN_OBJECT_START: JsonTokenType = 3;
+pub const JsonTokenType_JSON_TOKEN_OBJECT_END: JsonTokenType = 4;
+pub const JsonTokenType_JSON_TOKEN_ARRAY_START: JsonTokenType = 5;
+pub const JsonTokenType_JSON_TOKEN_ARRAY_END: JsonTokenType = 6;
+pub const JsonTokenType_JSON_TOKEN_COMMA: JsonTokenType = 7;
+pub const JsonTokenType_JSON_TOKEN_COLON: JsonTokenType = 8;
+pub const JsonTokenType_JSON_TOKEN_TRUE: JsonTokenType = 9;
+pub const JsonTokenType_JSON_TOKEN_FALSE: JsonTokenType = 10;
+pub const JsonTokenType_JSON_TOKEN_NULL: JsonTokenType = 11;
+pub const JsonTokenType_JSON_TOKEN_END: JsonTokenType = 12;
+pub type JsonTokenType = ::std::os::raw::c_uint;
+#[repr(C)]
+#[derive(Debug, Copy, Clone)]
+pub struct JsonLexContext {
+    pub input: *mut ::std::os::raw::c_char,
+    pub input_length: ::std::os::raw::c_int,
+    pub token_start: *mut ::std::os::raw::c_char,
+    pub token_terminator: *mut ::std::os::raw::c_char,
+    pub prev_token_terminator: *mut ::std::os::raw::c_char,
+    pub token_type: JsonTokenType,
+    pub lex_level: ::std::os::raw::c_int,
+    pub line_number: ::std::os::raw::c_int,
+    pub line_start: *mut ::std::os::raw::c_char,
+    pub strval: StringInfo,
+}
+impl Default for JsonLexContext {
+    fn default() -> Self {
+        let mut s = ::std::mem::MaybeUninit::<Self>::uninit();
+        unsafe {
+            ::std::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
+            s.assume_init()
+        }
+    }
+}
+pub type json_struct_action =
+    ::std::option::Option<unsafe extern "C" fn(state: *mut ::std::os::raw::c_void)>;
+pub type json_ofield_action = ::std::option::Option<
+    unsafe extern "C" fn(
+        state: *mut ::std::os::raw::c_void,
+        fname: *mut ::std::os::raw::c_char,
+        isnull: bool,
+    ),
+>;
+pub type json_aelem_action =
+    ::std::option::Option<unsafe extern "C" fn(state: *mut ::std::os::raw::c_void, isnull: bool)>;
+pub type json_scalar_action = ::std::option::Option<
+    unsafe extern "C" fn(
+        state: *mut ::std::os::raw::c_void,
+        token: *mut ::std::os::raw::c_char,
+        tokentype: JsonTokenType,
+    ),
+>;
+#[repr(C)]
+#[derive(Debug, Copy, Clone)]
+pub struct JsonSemAction {
+    pub semstate: *mut ::std::os::raw::c_void,
+    pub object_start: json_struct_action,
+    pub object_end: json_struct_action,
+    pub array_start: json_struct_action,
+    pub array_end: json_struct_action,
+    pub object_field_start: json_ofield_action,
+    pub object_field_end: json_ofield_action,
+    pub array_element_start: json_aelem_action,
+    pub array_element_end: json_aelem_action,
+    pub scalar: json_scalar_action,
+}
+impl Default for JsonSemAction {
+    fn default() -> Self {
+        let mut s = ::std::mem::MaybeUninit::<Self>::uninit();
+        unsafe {
+            ::std::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
+            s.assume_init()
+        }
+    }
+}
+#[pgrx_macros::pg_guard]
+extern "C" {
+    pub fn pg_parse_json(lex: *mut JsonLexContext, sem: *mut JsonSemAction);
+}
+#[pgrx_macros::pg_guard]
+extern "C" {
+    pub fn json_count_array_elements(lex: *mut JsonLexContext) -> ::std::os::raw::c_int;
+}
+#[pgrx_macros::pg_guard]
+extern "C" {
+    pub fn makeJsonLexContext(json: *mut text, need_escapes: bool) -> *mut JsonLexContext;
+}
+#[pgrx_macros::pg_guard]
+extern "C" {
+    pub fn makeJsonLexContextCstringLen(
+        json: *mut ::std::os::raw::c_char,
+        len: ::std::os::raw::c_int,
+        need_escapes: bool,
+    ) -> *mut JsonLexContext;
+}
+#[pgrx_macros::pg_guard]
+extern "C" {
+    pub fn IsValidJsonNumber(
+        str_: *const ::std::os::raw::c_char,
+        len: ::std::os::raw::c_int,
+    ) -> bool;
+}
+pub const JsonToIndex_jtiKey: JsonToIndex = 1;
+pub const JsonToIndex_jtiString: JsonToIndex = 2;
+pub const JsonToIndex_jtiNumeric: JsonToIndex = 4;
+pub const JsonToIndex_jtiBool: JsonToIndex = 8;
+pub const JsonToIndex_jtiAll: JsonToIndex = 15;
+pub type JsonToIndex = ::std::os::raw::c_uint;
+pub type JsonIterateStringValuesAction = ::std::option::Option<
+    unsafe extern "C" fn(
+        state: *mut ::std::os::raw::c_void,
+        elem_value: *mut ::std::os::raw::c_char,
+        elem_len: ::std::os::raw::c_int,
+    ),
+>;
+pub type JsonTransformStringValuesAction = ::std::option::Option<
+    unsafe extern "C" fn(
+        state: *mut ::std::os::raw::c_void,
+        elem_value: *mut ::std::os::raw::c_char,
+        elem_len: ::std::os::raw::c_int,
+    ) -> *mut text,
+>;
+#[pgrx_macros::pg_guard]
+extern "C" {
+    pub fn parse_jsonb_index_flags(jb: *mut Jsonb) -> uint32;
+}
+#[pgrx_macros::pg_guard]
+extern "C" {
+    pub fn iterate_jsonb_values(
+        jb: *mut Jsonb,
+        flags: uint32,
+        state: *mut ::std::os::raw::c_void,
+        action: JsonIterateStringValuesAction,
+    );
+}
+#[pgrx_macros::pg_guard]
+extern "C" {
+    pub fn iterate_json_values(
+        json: *mut text,
+        flags: uint32,
+        action_state: *mut ::std::os::raw::c_void,
+        action: JsonIterateStringValuesAction,
+    );
+}
+#[pgrx_macros::pg_guard]
+extern "C" {
+    pub fn transform_jsonb_string_values(
+        jsonb: *mut Jsonb,
+        action_state: *mut ::std::os::raw::c_void,
+        transform_action: JsonTransformStringValuesAction,
+    ) -> *mut Jsonb;
+}
+#[pgrx_macros::pg_guard]
+extern "C" {
+    pub fn transform_json_string_values(
+        json: *mut text,
+        action_state: *mut ::std::os::raw::c_void,
+        transform_action: JsonTransformStringValuesAction,
+    ) -> *mut text;
+}
+#[pgrx_macros::pg_guard]
+extern "C" {
+    pub fn JsonEncodeDateTime(
+        buf: *mut ::std::os::raw::c_char,
+        value: Datum,
+        typid: Oid,
+    ) -> *mut ::std::os::raw::c_char;
 }
 #[repr(C)]
 #[derive(Debug, Copy, Clone)]
