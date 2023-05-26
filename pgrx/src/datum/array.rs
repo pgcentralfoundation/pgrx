@@ -377,7 +377,7 @@ impl<'a> Array<'a, i8> {
 }
 
 #[inline(always)]
-fn as_slice<'a, T: Sized + FromDatum>(array: &Array<'a, T>) -> Result<&'_ [T], ArraySliceError> {
+fn as_slice<'a, T: Sized + FromDatum>(array: &'a Array<'_, T>) -> Result<&'a [T], ArraySliceError> {
     if array.contains_nulls() {
         return Err(ArraySliceError::ContainsNulls);
     }
