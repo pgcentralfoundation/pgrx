@@ -167,7 +167,6 @@ mod vectors {
 
 #[cfg(test)]
 pub mod pg_test {
-    use pgrx::pg_schema;
 
     pub fn setup(_options: Vec<&str>) {
         // perform one-off initialization when the pg_test framework starts
