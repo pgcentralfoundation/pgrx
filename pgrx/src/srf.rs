@@ -13,7 +13,7 @@ impl<'a, T: IntoDatum> SetOfIterator<'a, T> {
         first_call_func: F,
     ) -> pg_sys::Datum {
         if srf_is_first_call(fcinfo) {
-            let mut funcctx = srf_first_call_init(fcinfo);
+            let funcctx = srf_first_call_init(fcinfo);
 
             let (setof_iterator, memcxt) = PgMemoryContexts::For((*funcctx).multi_call_memory_ctx)
                 .switch_to(|_| {
