@@ -20,7 +20,7 @@ for folder in pgrx-examples/*; do
         cargo update
         cargo upgrade --incompatible --exclude syn
         cargo generate-lockfile
-        cargo check
+        cargo check || exit $?
         cd -
     fi
 done
