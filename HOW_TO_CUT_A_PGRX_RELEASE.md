@@ -1,19 +1,5 @@
 ```shell
-export NEW_VERSION=""
-git switch develop
-git fetch origin
-git diff origin/develop | if [ "$0" = "" ]; then
-    echo "git diff found local changes on develop branch, cannot cut release."
-elif [ "$NEW_VERSION" = "" ]; then
-    echo "No version set. Are you just copying and pasting this without checking?"
-else
-    git pull origin develop --ff-only
-    git switch -c "prepare-${NEW_VERSION}"
-    ./update-versions.sh "${NEW_VERSION}"
-    git diff # sanity check the diffs
-    git commit -a -m "Update version to ${NEW_VERSION}"
-    git push --set-upstream origin "prepare-${NEW_VERSION}"
-fi
+./prepare-release.sh NEW_VERSION_NUMBER
 ```
 
 - go make a PR to `develop` on GitHub
