@@ -162,6 +162,13 @@ fn enum_array_roundtrip(a: Array<ArrayTestEnum>) -> Vec<Option<ArrayTestEnum>> {
 }
 
 #[pg_extern]
+fn array_echo<'a>(a: Array<&'a str>) -> Vec<Option<&'a str>> {
+    let v = a.iter().collect();
+    drop(a);
+    v
+}
+
+#[pg_extern]
 fn validate_cstring_array<'a>(
     a: Array<'a, &'a core::ffi::CStr>,
 ) -> std::result::Result<bool, Box<dyn std::error::Error>> {
@@ -428,6 +435,22 @@ mod tests {
         let array = Spi::get_one::<Array<i16>>("SELECT ARRAY[1, 2, 3, NULL]::smallint[]")?
             .expect("datum was null");
         assert_eq!(array.as_slice(), Err(ArraySliceError::ContainsNulls));
+        Ok(())
+    }
+
+    #[pg_test]
+    fn test_leak_after_drop() -> Result<(), Box<dyn std::error::Error>> {
+        Spi::run("create table test_leak_after_drop (a text[]);")?;
+        Spi::run(
+            "insert into test_leak_after_drop (a) select array_agg(x::text) from generate_series(1, 10000) x;",
+        )?;
+        let array = Spi::get_one::<Array<&str>>("SELECT array_echo(a) FROM test_leak_after_drop")?
+            .expect("datum was null");
+        let top_5 = array.iter().take(5).collect::<Vec<_>>();
+        drop(array);
+
+        // just check the top 5 values.  Even the first will be wrong if the backing Array data is freed
+        assert_eq!(top_5, &[Some("1"), Some("2"), Some("3"), Some("4"), Some("5")]);
         Ok(())
     }
 }
