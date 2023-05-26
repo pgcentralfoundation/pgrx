@@ -738,7 +738,7 @@ fn run_bindgen(
         // Missing on some systems, despite being in their headers.
         .blocklist_function("inet_net_pton.*")
         .size_t_is_usize(true)
-        .rustfmt_bindings(false)
+        .formatter(bindgen::Formatter::None)
         .derive_debug(true)
         .derive_copy(true) // necessary to avoid __BindgenUnionField usages -- I don't understand why?
         .derive_default(true)

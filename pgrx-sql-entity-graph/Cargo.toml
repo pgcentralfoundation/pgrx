@@ -18,8 +18,8 @@ no-schema-generation = []
 convert_case = "0.6.0"
 eyre = "0.6.8"
 petgraph = "0.6.3"
-proc-macro2 = { version = "1.0.58", features = [ "span-locations" ] }
-quote = "1.0.27"
+proc-macro2 = { version = "1.0.59", features = [ "span-locations" ] }
+quote = "1.0.28"
 syn = { version = "1.0.109", features = [ "extra-traits", "full", "fold", "parsing" ] }
 unescape = "0.1.0"
 
