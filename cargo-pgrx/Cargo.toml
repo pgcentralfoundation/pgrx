@@ -25,21 +25,21 @@ env_proxy = "0.4.1"
 num_cpus = "1.15.0"
 pgrx-pg-config = { path = "../pgrx-pg-config", version = "=0.8.4" }
 pgrx-sql-entity-graph = { path = "../pgrx-sql-entity-graph", version = "=0.8.4" }
-prettyplease = "0.1.25"
-proc-macro2 = { version = "1.0.58", features = [ "span-locations" ] }
-quote = "1.0.27"
+prettyplease = "0.2.6"
+proc-macro2 = { version = "1.0.59", features = [ "span-locations" ] }
+quote = "1.0.28"
 rayon = "1.7.0"
-regex = "1.8.2"
+regex = "1.8.3"
 ureq = "2.6.2"
 url = "2.3.1"
 serde = { version = "1.0.163", features = [ "derive" ] }
 serde_derive = "1.0.163"
 serde-xml-rs = "0.6.0"
-syn = { version = "1.0.109", features = [ "extra-traits", "full", "fold", "parsing" ] }
+syn = { version = "2.0.18", features = [ "extra-traits", "full", "fold", "parsing" ] }
 unescape = "0.1.0"
 fork = "0.1.21"
-libloading = "0.7.4"
-object = "0.30.3"
+libloading = "0.8.0"
+object = "0.31.1"
 once_cell = "1.17.1"
 eyre = "0.6.8"
 color-eyre = "0.6.2"

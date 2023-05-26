@@ -48,7 +48,7 @@ thiserror = "1.0"
 
 # exposed in public API
 atomic-traits = "0.3.0" # PgAtomic and shmem init
-bitflags = "1.3.2" # BackgroundWorker
+bitflags = "2.3.1" # BackgroundWorker
 bitvec = "1.0" # processing array nullbitmaps
 heapless = "0.7.16" # shmem and PgLwLock
 libc = "0.2.144" # FFI type compat

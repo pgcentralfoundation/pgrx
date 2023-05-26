@@ -40,10 +40,10 @@ libc = "0.2.144"
 pgrx-macros = { path = "../pgrx-macros", version = "=0.8.4" }
 pgrx-pg-config = { path = "../pgrx-pg-config", version = "=0.8.4" }
 postgres = "0.19.5"
-regex = "1.8.2"
+regex = "1.8.3"
 serde = "1.0.163"
 serde_json = "1.0.96"
-sysinfo = "0.28.4"
+sysinfo = "0.29.0"
 eyre = "0.6.8"
 thiserror = "1.0"
 
