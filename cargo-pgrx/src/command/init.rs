@@ -66,6 +66,8 @@ pub(crate) struct Init {
     base_port: Option<u16>,
     #[clap(long, help = "Base testing port number")]
     base_testing_port: Option<u16>,
+    #[clap(long, help = "Additional flags to pass to the configure script")]
+    configure_flag: Vec<String>,
 }
 
 impl CommandExecute for Init {
@@ -151,7 +153,7 @@ pub(crate) fn init_pgrx(pgrx: &Pgrx, init: &Init) -> eyre::Result<()> {
             let mut pg_config = pg_config.clone();
             stop_postgres(&pg_config).ok(); // no need to fail on errors trying to stop postgres while initializing
             if !pg_config.is_real() {
-                pg_config = match download_postgres(&pg_config, &pgrx_home) {
+                pg_config = match download_postgres(&pg_config, &pgrx_home, init) {
                     Ok(pg_config) => pg_config,
                     Err(e) => return Err(eyre!(e)),
                 }
@@ -195,7 +197,11 @@ pub(crate) fn init_pgrx(pgrx: &Pgrx, init: &Init) -> eyre::Result<()> {
 }
 
 #[tracing::instrument(level = "error", skip_all, fields(pg_version = %pg_config.version()?, pgrx_home))]
-fn download_postgres(pg_config: &PgConfig, pgrx_home: &PathBuf) -> eyre::Result<PgConfig> {
+fn download_postgres(
+    pg_config: &PgConfig,
+    pgrx_home: &PathBuf,
+    init: &Init,
+) -> eyre::Result<PgConfig> {
     use crate::command::build_agent_for_url;
 
     println!(
@@ -221,7 +227,7 @@ fn download_postgres(pg_config: &PgConfig, pgrx_home: &PathBuf) -> eyre::Result<
     let mut buf = Vec::new();
     let _count = http_response.into_reader().read_to_end(&mut buf)?;
     let pgdir = untar(&buf, pgrx_home, pg_config)?;
-    configure_postgres(pg_config, &pgdir)?;
+    configure_postgres(pg_config, &pgdir, init)?;
     make_postgres(pg_config, &pgdir)?;
     make_install_postgres(pg_config, &pgdir) // returns a new PgConfig object
 }
@@ -267,7 +273,7 @@ fn untar(bytes: &[u8], pgrxdir: &PathBuf, pg_config: &PgConfig) -> eyre::Result<
     }
 }
 
-fn configure_postgres(pg_config: &PgConfig, pgdir: &PathBuf) -> eyre::Result<()> {
+fn configure_postgres(pg_config: &PgConfig, pgdir: &PathBuf, init: &Init) -> eyre::Result<()> {
     println!(
         "{} Postgres v{}.{}",
         "  Configuring".bold().green(),
@@ -282,7 +288,11 @@ fn configure_postgres(pg_config: &PgConfig, pgdir: &PathBuf) -> eyre::Result<()>
         .arg(format!("--prefix={}", get_pg_installdir(pgdir).display()))
         .arg(format!("--with-pgport={}", pg_config.port()?))
         .arg("--enable-debug")
-        .arg("--enable-cassert")
+        .arg("--enable-cassert");
+    for flag in init.configure_flag.iter() {
+        command.arg(flag);
+    }
+    command
         .stdout(std::process::Stdio::piped())
         .stderr(std::process::Stdio::piped())
         .stdin(std::process::Stdio::null())
