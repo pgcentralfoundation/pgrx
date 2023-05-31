@@ -184,7 +184,7 @@ impl<'a> PgTupleDesc<'a> {
     }
 
     /// Similar to [`PgTupleDesc::for_composite_type()`] but using the type's [`pg_sys::Oid`] instead
-    /// if its name.
+    /// of its name.
     pub fn for_composite_type_by_oid(typoid: pg_sys::Oid) -> Option<PgTupleDesc<'a>> {
         unsafe {
             if typoid == pg_sys::InvalidOid {
