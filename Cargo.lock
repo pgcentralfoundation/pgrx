@@ -314,7 +314,7 @@ dependencies = [
 
 [[package]]
 name = "cargo-pgrx"
-version = "0.9.0"
+version = "0.9.1"
 dependencies = [
  "atty",
  "cargo_metadata",
@@ -1182,12 +1182,9 @@ dependencies = [
 
 [[package]]
 name = "log"
-version = "0.4.17"
+version = "0.4.18"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "abb12e687cfb44aa40f41fc3978ef76448f9b6038cad6aef4259d3c095a2382e"
-dependencies = [
- "cfg-if",
-]
+checksum = "518ef76f2f87365916b142844c16d8fefd85039bc5699050210a7778ee1cd1de"
 
 [[package]]
 name = "maplit"
@@ -1263,14 +1260,13 @@ dependencies = [
 
 [[package]]
 name = "mio"
-version = "0.8.6"
+version = "0.8.8"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "5b9d9a46eff5b4ff64b45a9e316a6d1e0bc719ef429cbec4dc630684212bfdf9"
+checksum = "927a765cd3fc26206e66b296465fa9d3e5ab003e651c1b3c060e7956d96b19d2"
 dependencies = [
  "libc",
- "log",
  "wasi",
- "windows-sys 0.45.0",
+ "windows-sys 0.48.0",
 ]
 
 [[package]]
@@ -1382,15 +1378,15 @@ dependencies = [
 
 [[package]]
 name = "once_cell"
-version = "1.17.1"
+version = "1.17.2"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "b7e5500299e16ebb147ae15a00a942af264cf3688f47923b8fc2cd5858f23ad3"
+checksum = "9670a07f94779e00908f3e686eab508878ebb390ba6e604d3a284c00e8d0487b"
 
 [[package]]
 name = "openssl"
-version = "0.10.52"
+version = "0.10.53"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "01b8574602df80f7b85fdfc5392fa884a4e3b3f4f35402c070ab34c3d3f78d56"
+checksum = "12df40a956736488b7b44fe79fe12d4f245bb5b3f5a1f6095e499760015be392"
 dependencies = [
  "bitflags 1.3.2",
  "cfg-if",
@@ -1420,9 +1416,9 @@ checksum = "ff011a302c396a5197692431fc1948019154afc178baf7d8e37367442a4601cf"
 
 [[package]]
 name = "openssl-sys"
-version = "0.9.87"
+version = "0.9.88"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "8e17f59264b2809d77ae94f0e1ebabc434773f370d6ca667bd223ea10e06cc7e"
+checksum = "c2ce0f250f34a308dcfdbb351f511359857d4ed2134ba715a4eadd46e1ffd617"
 dependencies = [
  "cc",
  "libc",
@@ -1527,7 +1523,7 @@ dependencies = [
 
 [[package]]
 name = "pgrx"
-version = "0.9.0"
+version = "0.9.1"
 dependencies = [
  "atomic-traits",
  "bitflags 2.3.1",
@@ -1551,7 +1547,7 @@ dependencies = [
 
 [[package]]
 name = "pgrx-macros"
-version = "0.9.0"
+version = "0.9.1"
 dependencies = [
  "pgrx-sql-entity-graph",
  "proc-macro2",
@@ -1562,7 +1558,7 @@ dependencies = [
 
 [[package]]
 name = "pgrx-pg-config"
-version = "0.9.0"
+version = "0.9.1"
 dependencies = [
  "cargo_toml",
  "dirs",
@@ -1578,7 +1574,7 @@ dependencies = [
 
 [[package]]
 name = "pgrx-pg-sys"
-version = "0.9.0"
+version = "0.9.1"
 dependencies = [
  "bindgen",
  "eyre",
@@ -1598,7 +1594,7 @@ dependencies = [
 
 [[package]]
 name = "pgrx-sql-entity-graph"
-version = "0.9.0"
+version = "0.9.1"
 dependencies = [
  "atty",
  "convert_case",
@@ -1614,7 +1610,7 @@ dependencies = [
 
 [[package]]
 name = "pgrx-tests"
-version = "0.9.0"
+version = "0.9.1"
 dependencies = [
  "clap-cargo",
  "eyre",
@@ -2518,9 +2514,9 @@ checksum = "1f3ccbac311fea05f86f61904b462b55fb3df8837a366dfc601a0161d0532f20"
 
 [[package]]
 name = "tokio"
-version = "1.28.1"
+version = "1.28.2"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "0aa32867d44e6f2ce3385e89dceb990188b8bb0fb25b0cf576647a6f98ac5105"
+checksum = "94d7b1cfd2aa4011f2de74c2c4c63665e27a71006b0a192dcd2710272e73dfa2"
 dependencies = [
  "autocfg",
  "bytes",
