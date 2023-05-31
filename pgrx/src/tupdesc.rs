@@ -156,7 +156,7 @@ impl<'a> PgTupleDesc<'a> {
     ```rust,no_run
     use pgrx::{prelude::*, PgTupleDesc};
 
-    Spi::run("CREATE TYPE Dog AS (name text, age int);");
+    Spi::run("CREATE TYPE Dog AS (name text, age int);").unwrap();
     let tuple_desc = PgTupleDesc::for_composite_type("Dog").unwrap();
     let natts = tuple_desc.len();
 
@@ -179,12 +179,20 @@ impl<'a> PgTupleDesc<'a> {
             let mut typmod = 0;
             pg_sys::parseTypeString(name.as_pg_cstr(), &mut typoid, &mut typmod, true);
 
+            Self::for_composite_type_by_oid(typoid)
+        }
+    }
+
+    /// Similar to [`PgTupleDesc::for_composite_type()`] but using the type's [`pg_sys::Oid`] instead
+    /// of its name.
+    pub fn for_composite_type_by_oid(typoid: pg_sys::Oid) -> Option<PgTupleDesc<'a>> {
+        unsafe {
             if typoid == pg_sys::InvalidOid {
                 return None;
             }
 
             // It's important to make a copy of the tupledesc: https://www.postgresql.org/message-id/flat/24471.1136768659%40sss.pgh.pa.us
-            let tuple_desc = pg_sys::lookup_rowtype_tupdesc_copy(typoid, typmod);
+            let tuple_desc = pg_sys::lookup_rowtype_tupdesc_copy(typoid, -1);
 
             Some(PgTupleDesc::from_pg_copy(tuple_desc))
         }

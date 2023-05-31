@@ -600,7 +600,7 @@ mod sql_generator_tests {
     #[pg_extern]
     fn generate_lots_of_dogs() -> SetOfIterator<'static, pgrx::composite_type!("Dog")> {
         let tuple_desc =
-            pgrx::PgTupleDesc::for_composite_type("Dog").expect("Coudln't find TestType");
+            pgrx::PgTupleDesc::for_composite_type("Dog").expect("Couldn't find TestType");
 
         let tuples: Vec<PgHeapTuple<'_, AllocatedByRust>> = (0..10_000)
             .into_iter()
@@ -608,8 +608,10 @@ mod sql_generator_tests {
                 let datums: Vec<Option<pg_sys::Datum>> =
                     vec!["good boy".into_datum(), i.into_datum()];
 
-                PgHeapTuple::from_datums(tuple_desc.clone(), datums)
-                    .expect("couldn't get heap tuple")
+                unsafe {
+                    PgHeapTuple::from_datums(tuple_desc.clone(), datums)
+                        .expect("couldn't get heap tuple")
+                }
             })
             .collect();
 
