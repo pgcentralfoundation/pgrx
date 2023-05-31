@@ -118,7 +118,7 @@ However, if the "path to pg_config" is the literal string `download`, then `pgrx
 
 When the various `--pgXX` options are specified, these are the **only** versions of Postgres that `pgrx` will manage for you.
 
-You'll also want to make sure you have the "postgresql-server-dev" package installed for each version you want to manage yourself.
+You'll also want to make sure you have the "postgresql-server-dev" package installed for each version you want to manage yourself. If you need to customize the configuration of the Postgres build, you can use `--configure-flag` to pass optins to the `configure` script. For example, you could use `--configure-flag=--with-ssl=openssl` to enable SSL support or `--configure-flag=--with-libraries=/path/to/libs` to use a non-standard location for dependency libraries. This flag can be used multiple times to pass multiple configuration options.
 
 Once complete, `cargo pgrx init` also creates a configuration file (`~/.pgrx/config.toml`) that describes where to find each version's `pg_config` tool.
 
