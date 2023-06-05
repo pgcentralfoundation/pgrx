@@ -34,7 +34,7 @@ pub enum TryFromDatumError {
     NoSuchAttributeName(String),
 }
 
-/// Convert a `(pg_sys::Datum, is_null:bool` pair into a Rust type
+/// Convert a `(pg_sys::Datum, is_null:bool)` pair into a Rust type
 ///
 /// Default implementations are provided for the common Rust types.
 ///
