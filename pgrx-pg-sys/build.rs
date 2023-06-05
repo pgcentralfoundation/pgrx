@@ -31,7 +31,7 @@ fn is_nightly() -> bool {
         return false;
     }
     let rustc = env_tracked("RUSTC").map(PathBuf::from).unwrap_or_else(|| "rustc".into());
-    let output = match std::process::Command::new(rustc).arg("--verbose").output() {
+    let output = match std::process::Command::new(rustc).arg("--version").output() {
         Ok(out) if out.status.success() => String::from_utf8_lossy(&out.stdout).trim().to_owned(),
         _ => return false,
     };
