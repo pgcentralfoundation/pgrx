@@ -93,6 +93,46 @@ fn split_table_with_borrow<'a>(
     TableIterator::new(input.split_terminator(pattern).enumerate().map(|(i, s)| (i as i32, s)))
 }
 
+#[pg_extern]
+fn result_table_1<'a>() -> Result<
+    Option<::pgrx::iter::TableIterator<'a, (name!(a, Option<i32>), name!(b, Option<i32>))>>,
+    Box<dyn std::error::Error + Send + Sync + 'static>,
+> {
+    Ok(Some(TableIterator::new(vec![(Some(1), Some(2))])))
+}
+
+#[pg_extern]
+fn result_table_2<'a>() -> Result<
+    Option<pgrx::iter::TableIterator<'a, (name!(a, Option<i32>), name!(b, Option<i32>))>>,
+    Box<dyn std::error::Error + Send + Sync + 'static>,
+> {
+    Ok(Some(TableIterator::new(vec![(Some(1), Some(2))])))
+}
+
+#[pg_extern]
+fn result_table_3<'a>() -> Result<
+    Option<TableIterator<'a, (name!(a, Option<i32>), name!(b, Option<i32>))>>,
+    Box<dyn std::error::Error + Send + Sync + 'static>,
+> {
+    Ok(Some(TableIterator::new(vec![(Some(1), Some(2))])))
+}
+
+#[pg_extern]
+fn result_table_4_err<'a>() -> Result<
+    Option<TableIterator<'a, (name!(a, Option<i32>), name!(b, Option<i32>))>>,
+    Box<dyn std::error::Error + Send + Sync + 'static>,
+> {
+    Err("oh no")?
+}
+
+#[pg_extern]
+fn result_table_5_none<'a>() -> Result<
+    Option<TableIterator<'a, (name!(a, Option<i32>), name!(b, Option<i32>))>>,
+    Box<dyn std::error::Error + Send + Sync + 'static>,
+> {
+    Ok(None)
+}
+
 #[cfg(any(test, feature = "pg_test"))]
 #[pgrx::pg_schema]
 mod tests {
@@ -246,5 +286,34 @@ mod tests {
         SetOfIterator::new(oids.into_iter().map(|oid| {
             Spi::get_one(&format!("SELECT CAUSE_AN_ERROR FROM pg_class WHERE oid = {oid}"))
         }))
+    }
+
+    #[pg_test]
+    pub fn test_result_table_1() {
+        let result = Spi::get_two::<i32, i32>("SELECT * from result_table_1()");
+        assert_eq!(result, Ok((Some(1), Some(2))));
+    }
+
+    #[pg_test]
+    pub fn test_result_table_2() {
+        let result = Spi::get_two::<i32, i32>("SELECT * from result_table_2()");
+        assert_eq!(result, Ok((Some(1), Some(2))));
+    }
+
+    #[pg_test]
+    pub fn test_result_table_3() {
+        let result = Spi::get_two::<i32, i32>("SELECT * from result_table_3()");
+        assert_eq!(result, Ok((Some(1), Some(2))));
+    }
+
+    #[pg_test(error = "oh no")]
+    pub fn test_result_table_4_err() {
+        let _ = Spi::get_two::<i32, i32>("SELECT * from result_table_4_err()");
+    }
+
+    #[pg_test]
+    pub fn test_result_table_5_none() {
+        let result = Spi::get_two::<i32, i32>("SELECT * from result_table_5_none()");
+        assert_eq!(result, Err(spi::Error::InvalidPosition));
     }
 }

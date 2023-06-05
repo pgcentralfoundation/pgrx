@@ -19,6 +19,7 @@ use proc_macro2::TokenStream as TokenStream2;
 use quote::{quote, ToTokens, TokenStreamExt};
 use std::convert::TryFrom;
 use syn::parse::{Parse, ParseStream};
+use syn::punctuated::Punctuated;
 use syn::spanned::Spanned;
 use syn::{GenericArgument, PathArguments, Token, Type};
 
@@ -120,6 +121,7 @@ impl TryFrom<&syn::ReturnType> for Returning {
                             };
 
                             let mut segments = option_inner_path.segments.clone();
+                            let mut found_option = false;
                             'outer: loop {
                                 for segment in &segments {
                                     let ident_string = segment.ident.to_string();
@@ -132,6 +134,7 @@ impl TryFrom<&syn::ReturnType> for Returning {
                                                             segments =
                                                                 this_path.path.segments.clone();
                                                             saw_option_ident = true;
+                                                            found_option = true;
                                                             continue 'outer;
                                                         }
                                                         _ => continue,
@@ -142,7 +145,16 @@ impl TryFrom<&syn::ReturnType> for Returning {
                                             _ => continue,
                                         },
                                         "SetOfIterator" => saw_setof_iterator = true,
-                                        "TableIterator" => saw_table_iterator = true,
+                                        "TableIterator" => {
+                                            if found_option {
+                                                segments = Punctuated::from_iter(std::iter::once(
+                                                    segment.clone(),
+                                                ));
+                                                found_option = false;
+                                                continue 'outer;
+                                            }
+                                            saw_table_iterator = true
+                                        }
                                         _ => (),
                                     };
                                 }
@@ -196,37 +208,9 @@ impl TryFrom<&syn::ReturnType> for Returning {
                                     result: saw_result_ident,
                                 })
                             } else if saw_table_iterator {
-                                let iterator_path = if saw_option_ident || saw_result_ident {
-                                    let inner_path =
-                                        match &mut path.segments.first_mut().unwrap().arguments {
-                                            syn::PathArguments::AngleBracketed(args) => {
-                                                match args.args.first_mut().unwrap() {
-                                                    syn::GenericArgument::Type(syn::Type::Path(syn::TypePath { qself: _, path })) => path,
-                                                    other => {
-                                                        return Err(syn::Error::new(
-                                                            other.span(),
-                                                            &format!(
-                                                                "Got unexpected generic argument for Option/Result inner: {other:?}"
-                                                            ),
-                                                        ))
-                                                    }
-                                                }
-                                            },
-                                            other => {
-                                                return Err(syn::Error::new(
-                                                    other.span(),
-                                                    &format!(
-                                                        "Got unexpected path argument for Option/Result inner: {other:?}"
-                                                    ),
-                                                ))
-                                            }
-                                        };
-                                    inner_path
-                                } else {
-                                    path
-                                };
-                                let last_path_segment = iterator_path.segments.last_mut().unwrap();
+                                let last_path_segment = segments.last_mut().unwrap();
                                 let mut iterated_items = vec![];
+
                                 match &mut last_path_segment.arguments {
                                     syn::PathArguments::AngleBracketed(args) => {
                                         match args.args.last_mut().unwrap() {

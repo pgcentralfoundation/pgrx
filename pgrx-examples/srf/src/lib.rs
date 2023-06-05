@@ -33,15 +33,11 @@ fn random_values(num_rows: i32) -> TableIterator<'static, (name!(index, i32), na
 }
 
 #[pg_extern]
-fn vector_of_static_values() -> SetOfIterator<'static, &'static str> {
-    let values = vec!["Brandy", "Sally", "Anchovy"];
-    SetOfIterator::new(values.into_iter())
-}
-
-#[pg_extern]
-fn return_tuple(
-) -> TableIterator<'static, (name!(id, i32), name!(name, &'static str), name!(age, f64))> {
-    TableIterator::once((1, "Brandy", 4.5))
+fn result_table<'a>() -> Result<
+    Option<::pgrx::iter::TableIterator<'a, (name!(a, Option<i32>), name!(b, Option<i32>))>>,
+    Box<dyn std::error::Error + Send + Sync + 'static>,
+> {
+    Ok(Some(TableIterator::new(vec![(Some(1), Some(2))])))
 }
 
 #[cfg(any(test, feature = "pg_test"))]

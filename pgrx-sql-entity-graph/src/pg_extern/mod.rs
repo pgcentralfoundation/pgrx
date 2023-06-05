@@ -518,7 +518,14 @@ impl PgExtern {
                 }
             }
             Returning::Iterated { tys: _retval_tys, optional, result } => {
-                let result_handler = if *optional {
+                let result_handler = if *optional && *result {
+                    // don't need unsafe annotations because of the larger unsafe block coming up
+                    quote_spanned! { self.func.sig.span() =>
+                            use ::pgrx::pg_sys::panic::ErrorReportable;
+                            let unwrapped = #func_name(#(#arg_pats),*).report();
+                            unwrapped
+                    }
+                } else if *optional {
                     // don't need unsafe annotations because of the larger unsafe block coming up
                     quote_spanned! { self.func.sig.span() =>
                         #func_name(#(#arg_pats),*)
