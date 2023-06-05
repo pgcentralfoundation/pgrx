@@ -19,6 +19,8 @@ use pgrx_sql_entity_graph::metadata::{
 };
 use serde::{Deserialize, Serialize};
 use std::borrow::Cow;
+use std::cmp::Ordering;
+use std::hash::{Hash, Hasher};
 use std::marker::PhantomData;
 use std::ops::{Deref, DerefMut};
 
@@ -213,6 +215,47 @@ where
         if let Some(leaked) = self.leaked {
             unsafe { drop(Box::from_raw(leaked)) }
         }
+    }
+}
+
+impl<T> Eq for PgVarlena<T> where T: Eq + Copy + Sized {}
+impl<T> PartialEq for PgVarlena<T>
+where
+    T: PartialEq + Copy + Sized,
+{
+    #[inline]
+    fn eq(&self, other: &Self) -> bool {
+        self.as_ref() == other.as_ref()
+    }
+}
+
+impl<T> Ord for PgVarlena<T>
+where
+    T: Ord + Copy + Sized,
+{
+    #[inline]
+    fn cmp(&self, other: &Self) -> Ordering {
+        self.as_ref().cmp(other.as_ref())
+    }
+}
+
+impl<T> PartialOrd for PgVarlena<T>
+where
+    T: Ord + Copy + Sized,
+{
+    #[inline]
+    fn partial_cmp(&self, other: &Self) -> Option<Ordering> {
+        Some(self.as_ref().cmp(other.as_ref()))
+    }
+}
+
+impl<T> Hash for PgVarlena<T>
+where
+    T: Hash + Copy + Sized,
+{
+    #[inline]
+    fn hash<H: Hasher>(&self, state: &mut H) {
+        self.as_ref().hash(state)
     }
 }
 

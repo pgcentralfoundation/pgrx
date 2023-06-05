@@ -46,6 +46,13 @@ impl<AllocatedBy: WhoAllocated> std::io::Write for StringInfo<AllocatedBy> {
     }
 }
 
+impl<AllocatedBy: WhoAllocated> std::fmt::Write for StringInfo<AllocatedBy> {
+    fn write_str(&mut self, s: &str) -> core::fmt::Result {
+        self.push_str(s);
+        Ok(())
+    }
+}
+
 impl<AllocatedBy: WhoAllocated> Display for StringInfo<AllocatedBy> {
     /// Convert this [`StringInfo`] into a Rust string.  This uses [`String::from_utf8_lossy`] as
     /// it's fine for a Postgres [`StringInfo`] to contain null bytes and also not even be proper
