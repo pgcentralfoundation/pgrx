@@ -49,6 +49,7 @@ pub struct PgVarlenaThing {
 }
 
 impl PgVarlenaThing {
+    #[allow(dead_code)]
     pub fn new(a: u64, b: u64, c: i32, d: [u8; 5]) -> Self {
         Self { a, b, c, d }
     }
@@ -56,13 +57,7 @@ impl PgVarlenaThing {
 
 impl Display for PgVarlenaThing {
     fn fmt(&self, f: &mut Formatter<'_>) -> std::fmt::Result {
-        f.write_str(&self.a.to_string())?;
-        f.write_char(';')?;
-        f.write_str(&self.b.to_string())?;
-        f.write_char(';')?;
-        f.write_str(&self.c.to_string())?;
-        f.write_char(';')?;
-        f.write_str(&format!("{:?}", self.d))
+        write!(f, "{};{};{};{:?}", self.a, self.b, self.c, self.d)
     }
 }
 
