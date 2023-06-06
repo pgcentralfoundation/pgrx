@@ -132,25 +132,13 @@ impl<'a, T: FromDatum> Array<'a, T> {
         // which implementation is correct for the type of element in this Array.
         let slide_impl: ChaChaSlideImpl<T> = match elem_layout.pass {
             PassBy::Value => match elem_layout.size {
-                // the layout size is fixed and it exactly matches the size of `T`
-                //
-                // Note that this doesn't guarantee that the elements are actually `T`s, only
-                // that they'll fit into it.  It's the caller's responsibility to make sure
-                Size::Fixed(size)
-                    if (size as usize) == std::mem::size_of::<T>()
-                        && elem_layout.align.as_usize() >= std::mem::align_of::<T>() =>
-                {
-                    Box::new(casper::FixedSizeExact(size as usize))
-                }
+                // The layout is one that we know how to handle efficiently.
+                Size::Fixed(1) => Box::new(casper::FixedSizeByVal::<1>),
+                Size::Fixed(2) => Box::new(casper::FixedSizeByVal::<2>),
+                Size::Fixed(4) => Box::new(casper::FixedSizeByVal::<4>),
+                #[cfg(target_pointer_width = "64")]
+                Size::Fixed(8) => Box::new(casper::FixedSizeByVal::<8>),
 
-                // The layout size is some other fixed size that we know how to handle efficiently
-                Size::Fixed(size) => match size {
-                    1 => Box::new(casper::FixedSize1b),
-                    2 => Box::new(casper::FixedSize2b),
-                    4 => Box::new(casper::FixedSize4b),
-                    8 => Box::new(casper::FixedSize8b),
-                    other => Box::new(casper::FixedSizeArbitrary(other as usize)),
-                },
                 _ => {
                     panic!("unrecognized pass-by-value array element layout: {:?}", elem_layout)
                 }
@@ -304,6 +292,7 @@ pub enum ArraySliceError {
     ContainsNulls,
 }
 
+#[cfg(target_pointer_width = "64")]
 impl<'a> Array<'a, f64> {
     /// Returns a slice of `f64`s which comprise this [`Array`].
     ///
@@ -330,6 +319,7 @@ impl<'a> Array<'a, f32> {
     }
 }
 
+#[cfg(target_pointer_width = "64")]
 impl<'a> Array<'a, i64> {
     /// Returns a slice of `i64`s which comprise this [`Array`].
     ///
@@ -418,132 +408,43 @@ mod casper {
         unsafe fn hop_size(&self, ptr: *const u8) -> usize;
     }
 
-    /// Array elements are of a known, fixed size which matches the `size_of::<T>()`.
-    pub(super) struct FixedSizeExact(pub(super) usize);
-    impl<T: FromDatum> ChaChaSlide<T> for FixedSizeExact {
-        #[inline]
-        unsafe fn bring_it_back_now(&self, _array: &Array<T>, ptr: *const u8) -> Option<T> {
-            Some(ptr.cast::<T>().read())
-        }
-
-        #[inline]
-        unsafe fn hop_size(&self, _ptr: *const u8) -> usize {
-            self.0
-        }
+    #[inline(always)]
+    fn is_aligned<T>(p: *const T) -> bool {
+        (p as usize) & (core::mem::align_of::<T>() - 1) == 0
     }
 
-    /// Array elements are 1 byte in size
-    pub(super) struct FixedSize1b;
-    impl<T: FromDatum> ChaChaSlide<T> for FixedSize1b {
-        #[inline]
-        unsafe fn bring_it_back_now(&self, array: &Array<T>, ptr: *const u8) -> Option<T> {
-            T::from_polymorphic_datum(
-                pg_sys::Datum::from(ptr.cast::<u8>().read()),
-                false,
-                array.raw.oid(),
-            )
-        }
-
-        #[inline]
-        unsafe fn hop_size(&self, _ptr: *const u8) -> usize {
-            1
-        }
+    /// Safety: Equivalent to a (potentially) aligned read of `ptr`, which
+    /// should be `Copy` (ideally...).
+    #[track_caller]
+    #[inline(always)]
+    pub(super) unsafe fn byval_read<T: Copy>(ptr: *const u8) -> T {
+        let ptr = ptr.cast::<T>();
+        debug_assert!(is_aligned(ptr), "not aligned to {}: {ptr:p}", std::mem::align_of::<T>());
+        ptr.read()
     }
 
-    /// Array elements are 2 bytes in size
-    pub(super) struct FixedSize2b;
-    impl<T: FromDatum> ChaChaSlide<T> for FixedSize2b {
-        #[inline]
+    /// Fixed-size byval array elements. N should be 1, 2, 4, or 8. Note that
+    /// `T` (the rust type) may have a different size than `N`.
+    pub(super) struct FixedSizeByVal<const N: usize>;
+    impl<T: FromDatum, const N: usize> ChaChaSlide<T> for FixedSizeByVal<N> {
+        #[inline(always)]
         unsafe fn bring_it_back_now(&self, array: &Array<T>, ptr: *const u8) -> Option<T> {
-            T::from_polymorphic_datum(
-                pg_sys::Datum::from(ptr.cast::<u16>().read()),
-                false,
-                array.raw.oid(),
-            )
+            // This branch is optimized away (because `N` is constant).
+            let datum = match N {
+                // for match with `Datum`, read through that directly to
+                // preserve provenance (may not be relevant but doesn't hurt).
+                1 => pg_sys::Datum::from(byval_read::<u8>(ptr)),
+                2 => pg_sys::Datum::from(byval_read::<u16>(ptr)),
+                4 => pg_sys::Datum::from(byval_read::<u32>(ptr)),
+                8 => pg_sys::Datum::from(byval_read::<u64>(ptr)),
+                _ => unreachable!("`N` must be 1, 2, 4, or 8 (got {N})"),
+            };
+            T::from_polymorphic_datum(datum, false, array.raw.oid())
         }
 
-        #[inline]
+        #[inline(always)]
         unsafe fn hop_size(&self, _ptr: *const u8) -> usize {
-            2
-        }
-    }
-
-    /// Array elements are 4 bytes in size
-    pub(super) struct FixedSize4b;
-    impl<T: FromDatum> ChaChaSlide<T> for FixedSize4b {
-        #[inline]
-        unsafe fn bring_it_back_now(&self, array: &Array<T>, ptr: *const u8) -> Option<T> {
-            T::from_polymorphic_datum(
-                pg_sys::Datum::from(ptr.cast::<u32>().read()),
-                false,
-                array.raw.oid(),
-            )
-        }
-
-        #[inline]
-        unsafe fn hop_size(&self, _ptr: *const u8) -> usize {
-            4
-        }
-    }
-
-    /// Array elements are 8 bytes in size
-    pub(super) struct FixedSize8b;
-    impl<T: FromDatum> ChaChaSlide<T> for FixedSize8b {
-        #[inline]
-        unsafe fn bring_it_back_now(&self, array: &Array<T>, ptr: *const u8) -> Option<T> {
-            T::from_polymorphic_datum(
-                pg_sys::Datum::from(ptr.cast::<u64>().read()),
-                false,
-                array.raw.oid(),
-            )
-        }
-
-        #[inline]
-        unsafe fn hop_size(&self, _ptr: *const u8) -> usize {
-            8
-        }
-    }
-
-    /// Array elements are some arbitrary size
-    pub(super) struct FixedSizeArbitrary(pub(super) usize);
-    impl<T: FromDatum> ChaChaSlide<T> for FixedSizeArbitrary {
-        #[inline]
-        unsafe fn bring_it_back_now(&self, array: &Array<T>, ptr: *const u8) -> Option<T> {
-            /// Read off `size` bytes from the head of `ptr` and construct a padded Datum from those bytes
-            #[inline(always)]
-            fn bytes_to_datum(ptr: *const u8, size: usize) -> pg_sys::Datum {
-                const USIZE_BYTE_LEN: usize = std::mem::size_of::<usize>();
-
-                // a zero-padded buffer in which we'll store bytes so we can
-                // ultimately make a `usize` that we convert into a `Datum`
-                let mut buf = [0u8; USIZE_BYTE_LEN];
-
-                match size {
-                    1..=USIZE_BYTE_LEN => unsafe {
-                        // copy to the end
-                        #[cfg(target_endian = "big")]
-                        let dst = (&mut buff[USIZE_BYTE_LEN - size as usize..]).as_mut_ptr();
-
-                        // copy to the head
-                        #[cfg(target_endian = "little")]
-                        let dst = (&mut buf[0..]).as_mut_ptr();
-
-                        std::ptr::copy_nonoverlapping(ptr, dst, size as usize);
-                    },
-                    other => {
-                        panic!("unexpected fixed size array element size: {}", other)
-                    }
-                }
-
-                pg_sys::Datum::from(usize::from_ne_bytes(buf))
-            }
-            let datum = bytes_to_datum(ptr, self.0);
-            unsafe { T::from_polymorphic_datum(datum, false, array.raw.oid()) }
-        }
-
-        #[inline]
-        unsafe fn hop_size(&self, _ptr: *const u8) -> usize {
-            self.0
+            N
         }
     }
 
@@ -598,11 +499,13 @@ mod casper {
         pub(super) size: usize,
     }
     impl<T: FromDatum> ChaChaSlide<T> for PassByFixed {
+        #[inline]
         unsafe fn bring_it_back_now(&self, array: &Array<T>, ptr: *const u8) -> Option<T> {
             let datum = pg_sys::Datum::from(ptr);
             unsafe { T::from_polymorphic_datum(datum, false, array.raw.oid()) }
         }
 
+        #[inline]
         unsafe fn hop_size(&self, _ptr: *const u8) -> usize {
             // SAFETY: we were told our size upon construction
             let varsize = self.size;
