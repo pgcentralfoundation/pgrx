@@ -166,6 +166,7 @@ impl<'a, T: FromDatum> Array<'a, T> {
                 // determined at runtime based on the length of the string
                 Size::CStr => Box::new(casper::PassByCStr),
 
+                // Array elements are fixed sizes yet Postgres wants us to pass around by reference
                 Size::Fixed(size) => Box::new(casper::PassByFixed {
                     align: elem_layout.align.as_usize(),
                     size: size as usize,
