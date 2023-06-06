@@ -136,7 +136,10 @@ impl<'a, T: FromDatum> Array<'a, T> {
                 //
                 // Note that this doesn't guarantee that the elements are actually `T`s, only
                 // that they'll fit into it.  It's the caller's responsibility to make sure
-                Size::Fixed(size) if (size as usize) == std::mem::size_of::<T>() => {
+                Size::Fixed(size)
+                    if (size as usize) == std::mem::size_of::<T>()
+                        && elem_layout.align.as_usize() >= std::mem::align_of::<T>() =>
+                {
                     Box::new(casper::FixedSizeExact(size as usize))
                 }
 
