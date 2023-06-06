@@ -420,7 +420,7 @@ mod casper {
     pub(super) unsafe fn byval_read<T: Copy>(ptr: *const u8) -> T {
         let ptr = ptr.cast::<T>();
         debug_assert!(is_aligned(ptr), "not aligned to {}: {ptr:p}", std::mem::align_of::<T>());
-        ptr.cast::<T>().read()
+        ptr.read()
     }
 
     /// Fixed-size byval array elements. N should be 1, 2, 4, or 8. Note that
@@ -499,11 +499,13 @@ mod casper {
         pub(super) size: usize,
     }
     impl<T: FromDatum> ChaChaSlide<T> for PassByFixed {
+        #[inline]
         unsafe fn bring_it_back_now(&self, array: &Array<T>, ptr: *const u8) -> Option<T> {
             let datum = pg_sys::Datum::from(ptr);
             unsafe { T::from_polymorphic_datum(datum, false, array.raw.oid()) }
         }
 
+        #[inline]
         unsafe fn hop_size(&self, _ptr: *const u8) -> usize {
             // SAFETY: we were told our size upon construction
             let varsize = self.size;
