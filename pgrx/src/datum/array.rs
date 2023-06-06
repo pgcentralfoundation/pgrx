@@ -136,7 +136,10 @@ impl<'a, T: FromDatum> Array<'a, T> {
                 //
                 // Note that this doesn't guarantee that the elements are actually `T`s, only
                 // that they'll fit into it.  It's the caller's responsibility to make sure
-                Size::Fixed(size) if (size as usize) == std::mem::size_of::<T>() => {
+                Size::Fixed(size)
+                    if (size as usize) == std::mem::size_of::<T>()
+                        && elem_layout.align.as_usize() >= std::mem::align_of::<T>() =>
+                {
                     Box::new(casper::FixedSizeExact(size as usize))
                 }
 
@@ -162,9 +165,12 @@ impl<'a, T: FromDatum> Array<'a, T> {
                 // Array elements are C strings, which are pass-by-reference and alignments are
                 // determined at runtime based on the length of the string
                 Size::CStr => Box::new(casper::PassByCStr),
-                _ => {
-                    panic!("unrecognized pass-by-reference array element layout: {:?}", elem_layout)
-                }
+
+                // Array elements are fixed sizes yet Postgres wants us to pass around by reference
+                Size::Fixed(size) => Box::new(casper::PassByFixed {
+                    align: elem_layout.align.as_usize(),
+                    size: size as usize,
+                }),
             },
         };
 
@@ -584,6 +590,30 @@ mod casper {
 
             // Skip over the null which points us to the head of the next cstr
             strlen + 1
+        }
+    }
+
+    pub(super) struct PassByFixed {
+        pub(super) align: usize,
+        pub(super) size: usize,
+    }
+    impl<T: FromDatum> ChaChaSlide<T> for PassByFixed {
+        unsafe fn bring_it_back_now(&self, array: &Array<T>, ptr: *const u8) -> Option<T> {
+            let datum = pg_sys::Datum::from(ptr);
+            unsafe { T::from_polymorphic_datum(datum, false, array.raw.oid()) }
+        }
+
+        unsafe fn hop_size(&self, _ptr: *const u8) -> usize {
+            // SAFETY: we were told our size upon construction
+            let varsize = self.size;
+
+            // the Postgres realignment code may seem different in form,
+            // but it's the same in function, just micro-optimized
+            let align = self.align;
+            let align_mask = varsize & (align - 1);
+            let align_offset = if align_mask != 0 { align - align_mask } else { 0 };
+
+            varsize + align_offset
         }
     }
 }

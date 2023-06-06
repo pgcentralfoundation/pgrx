@@ -453,4 +453,33 @@ mod tests {
         assert_eq!(top_5, &[Some("1"), Some("2"), Some("3"), Some("4"), Some("5")]);
         Ok(())
     }
+
+    #[pg_test]
+    fn test_array_of_points() -> Result<(), Box<dyn std::error::Error>> {
+        let points: Array<pg_sys::Point> = Spi::get_one(
+            "SELECT ARRAY['(1,1)', '(2, 2)', '(3,3)', '(4,4)', NULL, '(5,5)']::point[]",
+        )?
+        .unwrap();
+        let points = points.into_iter().collect::<Vec<_>>();
+        let expected = vec![
+            Some(pg_sys::Point { x: 1.0, y: 1.0 }),
+            Some(pg_sys::Point { x: 2.0, y: 2.0 }),
+            Some(pg_sys::Point { x: 3.0, y: 3.0 }),
+            Some(pg_sys::Point { x: 4.0, y: 4.0 }),
+            None,
+            Some(pg_sys::Point { x: 5.0, y: 5.0 }),
+        ];
+
+        for (p, expected) in points.into_iter().zip(expected.into_iter()) {
+            match (p, expected) {
+                (Some(l), Some(r)) => {
+                    assert_eq!(l.x, r.x);
+                    assert_eq!(l.y, r.y);
+                }
+                (None, None) => (),
+                _ => panic!("points not equal"),
+            }
+        }
+        Ok(())
+    }
 }
