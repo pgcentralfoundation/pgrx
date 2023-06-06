@@ -600,8 +600,7 @@ mod casper {
         }
 
         unsafe fn hop_size(&self, _ptr: *const u8) -> usize {
-            // SAFETY: This uses the varsize_any function to be safe,
-            // and the caller was informed of pointer requirements.
+            // SAFETY: we were told our size upon construction
             let varsize = self.size;
 
             // the Postgres realignment code may seem different in form,
