@@ -409,7 +409,7 @@ mod casper {
     }
 
     #[inline(always)]
-    fn is_aligned<T>(p: *mut T) -> bool {
+    fn is_aligned<T>(p: *const T) -> bool {
         (p as usize) & (core::mem::align_of::<T>() - 1) == 0
     }
 
@@ -437,7 +437,7 @@ mod casper {
                 2 => pg_sys::Datum::from(byval_read::<u16>(ptr)),
                 4 => pg_sys::Datum::from(byval_read::<u32>(ptr)),
                 8 => pg_sys::Datum::from(byval_read::<u64>(ptr)),
-                n => unreachable!("must be 1, 2, 4, or 8"),
+                _ => unreachable!("`N` must be 1, 2, 4, or 8 (got {N})"),
             };
             T::from_polymorphic_datum(datum, false, array.raw.oid())
         }
