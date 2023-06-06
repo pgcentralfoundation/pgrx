@@ -52,18 +52,21 @@ pub struct Datum(*mut DatumBlob);
 impl Datum {
     /// Assume the datum is a value and extract the bits from
     /// the memory address, interpreting them as an integer.
+    #[inline]
     pub fn value(self) -> usize {
         #[allow(unstable_name_collisions)]
         self.0.addr()
     }
 
     /// True if the datum is equal to the null pointer.
+    #[inline]
     pub fn is_null(self) -> bool {
         self.0.is_null()
     }
 
     /// Assume the datum is a pointer and cast it to point to T.
     /// It is recommended to explicitly use `datum.cast_mut_ptr::<T>()`.
+    #[inline]
     pub fn cast_mut_ptr<T>(self) -> *mut T {
         #[allow(unstable_name_collisions)]
         self.0.cast()
@@ -71,6 +74,7 @@ impl Datum {
 }
 
 impl From<usize> for Datum {
+    #[inline]
     fn from(val: usize) -> Datum {
         #[allow(unstable_name_collisions)]
         Datum(NonNull::<DatumBlob>::dangling().as_ptr().with_addr(val))
@@ -78,6 +82,7 @@ impl From<usize> for Datum {
 }
 
 impl From<Datum> for usize {
+    #[inline]
     fn from(val: Datum) -> usize {
         #[allow(unstable_name_collisions)]
         val.0.addr()
@@ -85,84 +90,98 @@ impl From<Datum> for usize {
 }
 
 impl From<isize> for Datum {
+    #[inline]
     fn from(val: isize) -> Datum {
         Datum::from(val as usize)
     }
 }
 
 impl From<u8> for Datum {
+    #[inline]
     fn from(val: u8) -> Datum {
         Datum::from(usize::from(val))
     }
 }
 
 impl From<u16> for Datum {
+    #[inline]
     fn from(val: u16) -> Datum {
         Datum::from(usize::from(val))
     }
 }
 
 impl From<u32> for Datum {
+    #[inline]
     fn from(val: u32) -> Datum {
         Datum::from(val as usize)
     }
 }
 
 impl From<u64> for Datum {
+    #[inline]
     fn from(val: u64) -> Datum {
         Datum::from(val as usize)
     }
 }
 
 impl From<i8> for Datum {
+    #[inline]
     fn from(val: i8) -> Datum {
         Datum::from(isize::from(val))
     }
 }
 
 impl From<i16> for Datum {
+    #[inline]
     fn from(val: i16) -> Datum {
         Datum::from(isize::from(val))
     }
 }
 
 impl From<i32> for Datum {
+    #[inline]
     fn from(val: i32) -> Datum {
         Datum::from(val as usize)
     }
 }
 
 impl From<i64> for Datum {
+    #[inline]
     fn from(val: i64) -> Datum {
         Datum::from(val as usize)
     }
 }
 
 impl From<bool> for Datum {
+    #[inline]
     fn from(val: bool) -> Datum {
         Datum::from(val as usize)
     }
 }
 
 impl<T> From<*mut T> for Datum {
+    #[inline]
     fn from(val: *mut T) -> Datum {
         Datum(val.cast())
     }
 }
 
 impl<T> From<*const T> for Datum {
+    #[inline]
     fn from(val: *const T) -> Datum {
         Datum(val as *mut _)
     }
 }
 
 impl<T> PartialEq<*mut T> for Datum {
+    #[inline]
     fn eq(&self, other: &*mut T) -> bool {
         &self.0.cast() == other
     }
 }
 
 impl<T> PartialEq<Datum> for *mut T {
+    #[inline]
     fn eq(&self, other: &Datum) -> bool {
         self == &other.0.cast()
     }
@@ -181,6 +200,7 @@ pub struct NullableDatum {
 impl TryFrom<NullableDatum> for Datum {
     type Error = ();
 
+    #[inline]
     fn try_from(nd: NullableDatum) -> Result<Datum, ()> {
         let NullableDatum { value, isnull } = nd;
         if isnull {
@@ -192,6 +212,7 @@ impl TryFrom<NullableDatum> for Datum {
 }
 
 impl From<NullableDatum> for Option<Datum> {
+    #[inline]
     fn from(nd: NullableDatum) -> Option<Datum> {
         Some(Datum::try_from(nd).ok()?)
     }
