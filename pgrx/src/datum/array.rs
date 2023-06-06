@@ -132,7 +132,7 @@ impl<'a, T: FromDatum> Array<'a, T> {
         // which implementation is correct for the type of element in this Array.
         let slide_impl: ChaChaSlideImpl<T> = match elem_layout.pass {
             PassBy::Value => match elem_layout.size {
-                // The layout size is some other fixed size that we know how to handle efficiently
+                // The layout is one that we know how to handle efficiently.
                 Size::Fixed(1) => Box::new(casper::FixedSizeByVal::<1>),
                 Size::Fixed(2) => Box::new(casper::FixedSizeByVal::<2>),
                 Size::Fixed(4) => Box::new(casper::FixedSizeByVal::<4>),
