@@ -1,6 +1,6 @@
 [package]
 name = "pgrx-pg-config"
-version = "0.9.2"
+version = "0.9.3"
 authors = ["ZomboDB, LLC <zombodb@gmail.com>"]
 license = "MIT"
 description = "A Postgres pg_config wrapper for 'pgrx'"
