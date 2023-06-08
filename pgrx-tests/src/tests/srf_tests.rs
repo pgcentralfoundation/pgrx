@@ -133,6 +133,27 @@ fn result_table_5_none<'a>() -> Result<
     Ok(None)
 }
 
+#[pg_extern]
+fn one_col<'a>() -> TableIterator<'a, (name!(a, i32),)> {
+    TableIterator::new(std::iter::once((42,)))
+}
+
+#[pg_extern]
+fn one_col_option<'a>() -> Option<TableIterator<'a, (name!(a, i32),)>> {
+    Some(TableIterator::new(std::iter::once((42,))))
+}
+
+#[pg_extern]
+fn one_col_result<'a>() -> Result<TableIterator<'a, (name!(a, i32),)>, Box<dyn std::error::Error>> {
+    Ok(TableIterator::new(std::iter::once((42,))))
+}
+
+#[pg_extern]
+fn one_col_result_option<'a>(
+) -> Result<Option<TableIterator<'a, (name!(a, i32),)>>, Box<dyn std::error::Error>> {
+    Ok(Some(TableIterator::new(std::iter::once((42,)))))
+}
+
 #[cfg(any(test, feature = "pg_test"))]
 #[pgrx::pg_schema]
 mod tests {
@@ -315,5 +336,13 @@ mod tests {
     pub fn test_result_table_5_none() {
         let result = Spi::get_two::<i32, i32>("SELECT * from result_table_5_none()");
         assert_eq!(result, Err(spi::Error::InvalidPosition));
+    }
+
+    #[pg_test]
+    pub fn test_one_col_table() {
+        assert_eq!(Spi::get_one::<i32>("SELECT * from one_col()"), Ok(Some(42)));
+        assert_eq!(Spi::get_one::<i32>("SELECT * from one_col_option()"), Ok(Some(42)));
+        assert_eq!(Spi::get_one::<i32>("SELECT * from one_col_result()"), Ok(Some(42)));
+        assert_eq!(Spi::get_one::<i32>("SELECT * from one_col_result_option()"), Ok(Some(42)));
     }
 }

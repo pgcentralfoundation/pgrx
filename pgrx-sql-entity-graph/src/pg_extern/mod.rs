@@ -517,7 +517,7 @@ impl PgExtern {
                     }
                 }
             }
-            Returning::Iterated { tys: _retval_tys, optional, result } => {
+            Returning::Iterated { tys: retval_tys, optional, result } => {
                 let result_handler = if *optional && *result {
                     // don't need unsafe annotations because of the larger unsafe block coming up
                     quote_spanned! { self.func.sig.span() =>
@@ -543,20 +543,48 @@ impl PgExtern {
                     }
                 };
 
-                quote_spanned! { self.func.sig.span() =>
-                    #[no_mangle]
-                    #[doc(hidden)]
-                    #[::pgrx::pgrx_macros::pg_guard]
-                    pub unsafe extern "C" fn #func_name_wrapper #func_generics(#fcinfo_ident: ::pgrx::pg_sys::FunctionCallInfo) -> ::pgrx::pg_sys::Datum {
-                        #[allow(unused_unsafe)]
-                        unsafe {
-                            // SAFETY: the caller has asserted that `fcinfo` is a valid FunctionCallInfo pointer, allocated by Postgres
-                            // with all its fields properly setup.  Unless the user is calling this wrapper function directly, this
-                            // will always be the case
-                            ::pgrx::iter::TableIterator::srf_next(#fcinfo_ident, || {
-                                #( #arg_fetches )*
-                                #result_handler
-                            })
+                if retval_tys.len() == 1 {
+                    // Postgres considers functions returning a 1-field table (`RETURNS TABLE (T)`) to be
+                    // a function that `RETRUNS SETOF T`.  So we write a different wrapper implementation
+                    // that transparently transforms the `TableIterator` returned by the user into a `SetOfIterator`
+                    quote_spanned! { self.func.sig.span() =>
+                        #[no_mangle]
+                        #[doc(hidden)]
+                        #[::pgrx::pgrx_macros::pg_guard]
+                        pub unsafe extern "C" fn #func_name_wrapper #func_generics(#fcinfo_ident: ::pgrx::pg_sys::FunctionCallInfo) -> ::pgrx::pg_sys::Datum {
+                            #[allow(unused_unsafe)]
+                            unsafe {
+                                // SAFETY: the caller has asserted that `fcinfo` is a valid FunctionCallInfo pointer, allocated by Postgres
+                                // with all its fields properly setup.  Unless the user is calling this wrapper function directly, this
+                                // will always be the case
+                                ::pgrx::iter::SetOfIterator::srf_next(#fcinfo_ident, || {
+                                    #( #arg_fetches )*
+                                    let table_iterator = { #result_handler };
+
+                                    // we need to convert the 1-field `TableIterator` provided by the user
+                                    // into a SetOfIterator in order to properly handle the case of `RETURNS TABLE (T)`,
+                                    // which is a table that returns only 1 field.
+                                    table_iterator.map(|i| ::pgrx::iter::SetOfIterator::new(i.into_iter().map(|(v,)| v)))
+                                })
+                            }
+                        }
+                    }
+                } else {
+                    quote_spanned! { self.func.sig.span() =>
+                        #[no_mangle]
+                        #[doc(hidden)]
+                        #[::pgrx::pgrx_macros::pg_guard]
+                        pub unsafe extern "C" fn #func_name_wrapper #func_generics(#fcinfo_ident: ::pgrx::pg_sys::FunctionCallInfo) -> ::pgrx::pg_sys::Datum {
+                            #[allow(unused_unsafe)]
+                            unsafe {
+                                // SAFETY: the caller has asserted that `fcinfo` is a valid FunctionCallInfo pointer, allocated by Postgres
+                                // with all its fields properly setup.  Unless the user is calling this wrapper function directly, this
+                                // will always be the case
+                                ::pgrx::iter::TableIterator::srf_next(#fcinfo_ident, || {
+                                    #( #arg_fetches )*
+                                    #result_handler
+                                })
+                            }
                         }
                     }
                 }
