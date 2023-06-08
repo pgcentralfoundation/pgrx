@@ -40,6 +40,11 @@ fn result_table<'a>() -> Result<
     Ok(Some(TableIterator::new(vec![(Some(1), Some(2))])))
 }
 
+#[pg_extern]
+fn one_col<'a>() -> TableIterator<'a, (name!(a, Option<i32>),)> {
+    TableIterator::new(std::iter::once((Some(42),)))
+}
+
 #[cfg(any(test, feature = "pg_test"))]
 #[pg_schema]
 mod tests {
