@@ -1,6 +1,6 @@
 [package]
 name = "cargo-pgrx"
-version = "0.9.3"
+version = "0.9.4"
 authors = ["ZomboDB, LLC <zombodb@gmail.com>"]
 license = "MIT"
 description = "Cargo subcommand for 'pgrx' to make Postgres extension development easy"
@@ -23,17 +23,17 @@ semver = "1.0.17"
 owo-colors = { version = "3.5.0", features = [ "supports-colors" ] }
 env_proxy = "0.4.1"
 num_cpus = "1.15.0"
-pgrx-pg-config = { path = "../pgrx-pg-config", version = "=0.9.3" }
-pgrx-sql-entity-graph = { path = "../pgrx-sql-entity-graph", version = "=0.9.3" }
+pgrx-pg-config = { path = "../pgrx-pg-config", version = "=0.9.4" }
+pgrx-sql-entity-graph = { path = "../pgrx-sql-entity-graph", version = "=0.9.4" }
 prettyplease = "0.2.6"
-proc-macro2 = { version = "1.0.59", features = [ "span-locations" ] }
+proc-macro2 = { version = "1.0.60", features = [ "span-locations" ] }
 quote = "1.0.28"
 rayon = "1.7.0"
 regex = "1.8.4"
 ureq = "2.6.2"
 url = "2.4.0"
-serde = { version = "1.0.163", features = [ "derive" ] }
-serde_derive = "1.0.163"
+serde = { version = "1.0.164", features = [ "derive" ] }
+serde_derive = "1.0.164"
 serde-xml-rs = "0.6.0"
 syn = { version = "2.0.18", features = [ "extra-traits", "full", "fold", "parsing" ] }
 unescape = "0.1.0"

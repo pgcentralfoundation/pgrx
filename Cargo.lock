@@ -314,7 +314,7 @@ dependencies = [
 
 [[package]]
 name = "cargo-pgrx"
-version = "0.9.3"
+version = "0.9.4"
 dependencies = [
  "atty",
  "cargo_metadata",
@@ -1523,7 +1523,7 @@ dependencies = [
 
 [[package]]
 name = "pgrx"
-version = "0.9.3"
+version = "0.9.4"
 dependencies = [
  "atomic-traits",
  "bitflags 2.3.1",
@@ -1541,13 +1541,12 @@ dependencies = [
  "serde_cbor",
  "serde_json",
  "thiserror",
- "time",
  "uuid",
 ]
 
 [[package]]
 name = "pgrx-macros"
-version = "0.9.3"
+version = "0.9.4"
 dependencies = [
  "pgrx-sql-entity-graph",
  "proc-macro2",
@@ -1558,7 +1557,7 @@ dependencies = [
 
 [[package]]
 name = "pgrx-pg-config"
-version = "0.9.3"
+version = "0.9.4"
 dependencies = [
  "cargo_toml",
  "dirs",
@@ -1574,7 +1573,7 @@ dependencies = [
 
 [[package]]
 name = "pgrx-pg-sys"
-version = "0.9.3"
+version = "0.9.4"
 dependencies = [
  "bindgen",
  "eyre",
@@ -1594,7 +1593,7 @@ dependencies = [
 
 [[package]]
 name = "pgrx-sql-entity-graph"
-version = "0.9.3"
+version = "0.9.4"
 dependencies = [
  "atty",
  "convert_case",
@@ -1610,7 +1609,7 @@ dependencies = [
 
 [[package]]
 name = "pgrx-tests"
-version = "0.9.3"
+version = "0.9.4"
 dependencies = [
  "clap-cargo",
  "eyre",
@@ -1757,9 +1756,9 @@ dependencies = [
 
 [[package]]
 name = "proc-macro2"
-version = "1.0.59"
+version = "1.0.60"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "6aeca18b86b413c660b781aa319e4e2648a3e6f9eadc9b47e9038e6fe9f3451b"
+checksum = "dec2b086b7a862cf4de201096214fa870344cf922b2b30c167badb3af3195406"
 dependencies = [
  "unicode-ident",
 ]
@@ -2116,9 +2115,9 @@ checksum = "e6b44e8fc93a14e66336d230954dda83d18b4605ccace8fe09bc7514a71ad0bc"
 
 [[package]]
 name = "serde"
-version = "1.0.163"
+version = "1.0.164"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "2113ab51b87a539ae008b5c6c02dc020ffa39afd2d83cffcb3f4eb2722cebec2"
+checksum = "9e8c8cf938e98f769bc164923b06dce91cea1751522f46f8466461af04c9027d"
 dependencies = [
  "serde_derive",
 ]
@@ -2147,9 +2146,9 @@ dependencies = [
 
 [[package]]
 name = "serde_derive"
-version = "1.0.163"
+version = "1.0.164"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "8c805777e3930c8883389c602315a24224bcc738b63905ef87cd1420353ea93e"
+checksum = "d9735b638ccc51c28bf6914d90a2e9725b377144fc612c49a611fddd1b631d68"
 dependencies = [
  "proc-macro2",
  "quote",
@@ -2398,9 +2397,9 @@ dependencies = [
 
 [[package]]
 name = "sysinfo"
-version = "0.29.1"
+version = "0.29.2"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "c72130613601f6aad275f8bb9a1d4bf953df8e9c7891029f30e5fdc405ad07c4"
+checksum = "9557d0845b86eea8182f7b10dff120214fb6cd9fd937b6f4917714e546a38695"
 dependencies = [
  "cfg-if",
  "core-foundation-sys",
@@ -2473,9 +2472,9 @@ dependencies = [
 
 [[package]]
 name = "time"
-version = "0.3.21"
+version = "0.3.22"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "8f3403384eaacbca9923fa06940178ac13e4edb725486d70e8e15881d0c836cc"
+checksum = "ea9e1b3cf1243ae005d9e74085d4d542f3125458f3a81af210d901dcd7411efd"
 dependencies = [
  "itoa",
  "serde",
