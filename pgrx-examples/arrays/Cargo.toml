@@ -17,7 +17,7 @@ pg_test = []
 
 [dependencies]
 pgrx = { path = "../../pgrx", default-features = false }
-serde = "1.0.163"
+serde = "1.0.164"
 rand = "*"
 
 [dev-dependencies]
