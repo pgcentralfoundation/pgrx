@@ -10,12 +10,7 @@
 - do a squash merge into develop
 
 ```shell
-git switch develop
-git pull origin develop --ff-only
-git switch master
-git pull origin master --ff-only
-git merge develop
-git push origin master
+./finalize-release.sh
 ```
 
 - create the actual release on GitHub, tagging the `master` branch with "${NEW_VERSION}", using the release notes you made in your PR
