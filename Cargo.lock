@@ -314,7 +314,7 @@ dependencies = [
 
 [[package]]
 name = "cargo-pgrx"
-version = "0.9.4"
+version = "0.9.5"
 dependencies = [
  "atty",
  "cargo_metadata",
@@ -420,9 +420,9 @@ dependencies = [
 
 [[package]]
 name = "clap"
-version = "4.3.2"
+version = "4.3.3"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "401a4694d2bf92537b6867d94de48c4842089645fdcdf6c71865b175d836e9c2"
+checksum = "ca8f255e4b8027970e78db75e78831229c9815fdbfa67eb1a1b777a62e24b4a0"
 dependencies = [
  "clap_builder",
  "clap_derive",
@@ -442,9 +442,9 @@ dependencies = [
 
 [[package]]
 name = "clap_builder"
-version = "4.3.1"
+version = "4.3.3"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "72394f3339a76daf211e57d4bcb374410f3965dcc606dd0e03738c7888766980"
+checksum = "acd4f3c17c83b0ba34ffbc4f8bbd74f079413f747f84a6f89292f138057e36ab"
 dependencies = [
  "anstream",
  "anstyle",
@@ -1523,7 +1523,7 @@ dependencies = [
 
 [[package]]
 name = "pgrx"
-version = "0.9.4"
+version = "0.9.5"
 dependencies = [
  "atomic-traits",
  "bitflags 2.3.1",
@@ -1546,7 +1546,7 @@ dependencies = [
 
 [[package]]
 name = "pgrx-macros"
-version = "0.9.4"
+version = "0.9.5"
 dependencies = [
  "pgrx-sql-entity-graph",
  "proc-macro2",
@@ -1557,7 +1557,7 @@ dependencies = [
 
 [[package]]
 name = "pgrx-pg-config"
-version = "0.9.4"
+version = "0.9.5"
 dependencies = [
  "cargo_toml",
  "dirs",
@@ -1573,7 +1573,7 @@ dependencies = [
 
 [[package]]
 name = "pgrx-pg-sys"
-version = "0.9.4"
+version = "0.9.5"
 dependencies = [
  "bindgen",
  "eyre",
@@ -1593,7 +1593,7 @@ dependencies = [
 
 [[package]]
 name = "pgrx-sql-entity-graph"
-version = "0.9.4"
+version = "0.9.5"
 dependencies = [
  "atty",
  "convert_case",
@@ -1609,7 +1609,7 @@ dependencies = [
 
 [[package]]
 name = "pgrx-tests"
-version = "0.9.4"
+version = "0.9.5"
 dependencies = [
  "clap-cargo",
  "eyre",
