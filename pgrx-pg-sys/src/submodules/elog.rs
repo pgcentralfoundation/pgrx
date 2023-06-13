@@ -419,7 +419,13 @@ pub fn interrupt_pending() -> bool {
         crate::InterruptPending
     }
 
-    #[cfg(any(feature = "pg12", feature = "pg13", feature = "pg14", feature = "pg15"))]
+    #[cfg(any(
+        feature = "pg12",
+        feature = "pg13",
+        feature = "pg14",
+        feature = "pg15",
+        feature = "pg16"
+    ))]
     unsafe {
         crate::InterruptPending != 0
     }
@@ -438,7 +444,13 @@ macro_rules! check_for_interrupts {
             }
         }
 
-        #[cfg(any(feature = "pg12", feature = "pg13", feature = "pg14", feature = "pg15"))]
+        #[cfg(any(
+            feature = "pg12",
+            feature = "pg13",
+            feature = "pg14",
+            feature = "pg15",
+            feature = "pg16"
+        ))]
         #[allow(unused_unsafe)]
         unsafe {
             if $crate::InterruptPending != 0 {

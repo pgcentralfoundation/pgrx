@@ -150,7 +150,8 @@ fn main() -> eyre::Result<()> {
             if found.is_some() {
                 return Err(eyre!("Multiple `pg$VERSION` features found, `--no-default-features` may be required."));
             }
-            found = Some((pgver, format!("pg{}", pgver.major)));
+            let major = pgver.major;
+            found = Some((pgver, format!("pg{}", major)));
         }
         let (found_ver, found_feat) = found.ok_or_else(|| {
             eyre!(
@@ -166,7 +167,7 @@ fn main() -> eyre::Result<()> {
         if let Ok(pg_config) = PgConfig::from_env() {
             let major_version = pg_config.major_version()?;
 
-            if major_version != found_ver {
+            if major_version != found_ver.major {
                 panic!("Feature flag `pg{found_ver}` does not match version from the environment-described PgConfig (`{major_version}`)")
             }
             vec![(major_version, pg_config)]
@@ -270,7 +271,7 @@ fn generate_bindings(
             &bindings_file,
             quote! {
                 use crate as pg_sys;
-                #[cfg(any(feature = "pg12", feature = "pg13", feature = "pg14", feature = "pg15"))]
+                #[cfg(any(feature = "pg12", feature = "pg13", feature = "pg14", feature = "pg15", feature = "pg16"))]
                 use crate::NullableDatum;
                 use crate::{Datum, Oid, PgNode};
             },

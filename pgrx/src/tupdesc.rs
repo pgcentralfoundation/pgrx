@@ -10,8 +10,10 @@ Use of this source code is governed by the MIT license that can be found in the 
 //! Provides a safe wrapper around Postgres' `pg_sys::TupleDescData` struct
 use crate::{pg_sys, void_mut_ptr, PgBox, PgRelation};
 
-use pgrx_pg_sys::AsPgCStr;
+use pgrx_pg_sys::errcodes::PgSqlErrorCode;
+use pgrx_pg_sys::{AsPgCStr, PgTryBuilder};
 use std::ops::Deref;
+use std::panic::AssertUnwindSafe;
 
 /// This struct is passed around within the backend to describe the structure
 /// of tuples.  For tuples coming from on-disk relations, the information is
@@ -177,7 +179,24 @@ impl<'a> PgTupleDesc<'a> {
         unsafe {
             let mut typoid = pg_sys::Oid::INVALID;
             let mut typmod = 0;
+
+            #[cfg(not(feature = "pg16"))]
             pg_sys::parseTypeString(name.as_pg_cstr(), &mut typoid, &mut typmod, true);
+
+            #[cfg(feature = "pg16")]
+            if PgTryBuilder::new(AssertUnwindSafe(|| {
+                pg_sys::parseTypeString(
+                    name.as_pg_cstr(),
+                    &mut typoid,
+                    &mut typmod,
+                    std::ptr::null_mut(),
+                )
+            }))
+            .catch_when(PgSqlErrorCode::ERRCODE_UNDEFINED_OBJECT, |_| false)
+            .execute()
+            {
+                return None;
+            }
 
             Self::for_composite_type_by_oid(typoid)
         }
@@ -294,7 +313,8 @@ pub unsafe fn release_tupdesc(ptr: pg_sys::TupleDesc) {
     feature = "pg12",
     feature = "pg13",
     feature = "pg14",
-    feature = "pg15"
+    feature = "pg15",
+    feature = "pg16"
 ))]
 #[inline]
 fn tupdesc_get_attr(

@@ -1,5 +1,11 @@
 use crate as pg_sys;
-#[cfg(any(feature = "pg12", feature = "pg13", feature = "pg14", feature = "pg15"))]
+#[cfg(any(
+    feature = "pg12",
+    feature = "pg13",
+    feature = "pg14",
+    feature = "pg15",
+    feature = "pg16"
+))]
 use crate::NullableDatum;
 use crate::{Datum, Oid, PgNode};
 #[repr(C)]
@@ -321,7 +327,7 @@ pub const PG_KRB_SRVNAM: &[u8; 9usize] = b"postgres\0";
 pub const PG_MAJORVERSION: &[u8; 3usize] = b"12\0";
 pub const PG_VERSION: &[u8; 6usize] = b"12.15\0";
 pub const PG_VERSION_NUM: u32 = 120015;
-pub const PG_VERSION_STR : & [u8 ; 103usize] = b"PostgreSQL 12.15 on x86_64-pc-linux-gnu, compiled by gcc (Ubuntu 11.3.0-1ubuntu1~22.04) 11.3.0, 64-bit\0" ;
+pub const PG_VERSION_STR : & [u8 ; 105usize] = b"PostgreSQL 12.15 on x86_64-pc-linux-gnu, compiled by gcc (Ubuntu 11.3.0-1ubuntu1~22.04.1) 11.3.0, 64-bit\0" ;
 pub const RELSEG_SIZE: u32 = 131072;
 pub const SIZEOF_BOOL: u32 = 1;
 pub const SIZEOF_LONG: u32 = 8;

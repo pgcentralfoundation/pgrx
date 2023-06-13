@@ -23,6 +23,7 @@ pg12 = [ "pgrx-pg-sys/pg12" ]
 pg13 = [ "pgrx-pg-sys/pg13" ]
 pg14 = [ "pgrx-pg-sys/pg14" ]
 pg15 = [ "pgrx-pg-sys/pg15" ]
+pg16 = [ "pgrx-pg-sys/pg16" ]
 no-schema-generation = ["pgrx-macros/no-schema-generation", "pgrx-sql-entity-graph/no-schema-generation"]
 unsafe-postgres = []     # when trying to compile against something that looks like Postgres but claims to be diffent
 

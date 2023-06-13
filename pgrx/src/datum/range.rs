@@ -385,8 +385,22 @@ where
             lower_bound.lower = true;
 
             // PG will serialize these lower/upper RangeBounds to a *RangeType ptr/datum
-            let range_type =
-                pg_sys::make_range(typecache, &mut lower_bound, &mut upper_bound, is_empty);
+            let range_type = {
+                #[cfg(not(feature = "pg16"))]
+                {
+                    pg_sys::make_range(typecache, &mut lower_bound, &mut upper_bound, is_empty)
+                }
+                #[cfg(feature = "pg16")]
+                {
+                    pg_sys::make_range(
+                        typecache,
+                        &mut lower_bound,
+                        &mut upper_bound,
+                        is_empty,
+                        std::ptr::null_mut(),
+                    )
+                }
+            };
 
             // *RangeType into Datum
             Some(pg_sys::Datum::from(range_type))

@@ -195,7 +195,7 @@ pub trait HasExtractableParts: Clone + IntoDatum + seal::DateTimeType {
                 Self::EXTRACT_FUNCTION,
                 &[field_datum, self.clone().into_datum()],
             );
-            #[cfg(any(feature = "pg14", feature = "pg15"))]
+            #[cfg(any(feature = "pg14", feature = "pg15", feature = "pg16"))]
             let field_value: Option<AnyNumeric> = direct_function_call(
                 Self::EXTRACT_FUNCTION,
                 &[field_datum, self.clone().into_datum()],
@@ -226,7 +226,7 @@ pub trait ToIsoString: IntoDatum + Sized + Display + seal::DateTimeType {
                     self.into_datum().unwrap(),
                     Self::type_oid(),
                 );
-                #[cfg(any(feature = "pg13", feature = "pg14", feature = "pg15"))]
+                #[cfg(any(feature = "pg13", feature = "pg14", feature = "pg15", feature = "pg16"))]
                 let jsonb = pg_sys::JsonEncodeDateTime(
                     std::ptr::null_mut(),
                     self.into_datum().unwrap(),
@@ -248,7 +248,7 @@ pub trait ToIsoString: IntoDatum + Sized + Display + seal::DateTimeType {
     /// # Notes
     ///
     /// This function is only available on Postgres v13 and greater
-    #[cfg(any(feature = "pg13", feature = "pg14", feature = "pg15"))]
+    #[cfg(any(feature = "pg13", feature = "pg14", feature = "pg15", feature = "pg16"))]
     fn to_iso_string_with_timezone<Tz: AsRef<str>>(
         self,
         timezone: Tz,
@@ -413,7 +413,7 @@ mod pg11_13 {
     }
 }
 
-#[cfg(any(feature = "pg14", feature = "pg15"))]
+#[cfg(any(feature = "pg14", feature = "pg15", feature = "pg16"))]
 const DATE_EXTRACT: unsafe fn(fcinfo: pg_sys::FunctionCallInfo) -> pg_sys::Datum =
     pg_sys::extract_date;
 impl_wrappers!(
@@ -429,7 +429,7 @@ impl_wrappers!(
 #[cfg(any(feature = "pg11", feature = "pg12", feature = "pg13"))]
 const TIME_EXTRACT: unsafe fn(fcinfo: pg_sys::FunctionCallInfo) -> pg_sys::Datum =
     pg_sys::time_part;
-#[cfg(any(feature = "pg14", feature = "pg15"))]
+#[cfg(any(feature = "pg14", feature = "pg15", feature = "pg16"))]
 const TIME_EXTRACT: unsafe fn(fcinfo: pg_sys::FunctionCallInfo) -> pg_sys::Datum =
     pg_sys::extract_time;
 
@@ -446,7 +446,7 @@ impl_wrappers!(
 #[cfg(any(feature = "pg11", feature = "pg12", feature = "pg13"))]
 const TIMETZ_EXTRACT: unsafe fn(fcinfo: pg_sys::FunctionCallInfo) -> pg_sys::Datum =
     pg_sys::timetz_part;
-#[cfg(any(feature = "pg14", feature = "pg15"))]
+#[cfg(any(feature = "pg14", feature = "pg15", feature = "pg16"))]
 const TIMETZ_EXTRACT: unsafe fn(fcinfo: pg_sys::FunctionCallInfo) -> pg_sys::Datum =
     pg_sys::extract_timetz;
 
@@ -463,7 +463,7 @@ impl_wrappers!(
 #[cfg(any(feature = "pg11", feature = "pg12", feature = "pg13"))]
 const TIMESTAMP_EXTRACT: unsafe fn(fcinfo: pg_sys::FunctionCallInfo) -> pg_sys::Datum =
     pg_sys::timestamp_part;
-#[cfg(any(feature = "pg14", feature = "pg15"))]
+#[cfg(any(feature = "pg14", feature = "pg15", feature = "pg16"))]
 const TIMESTAMP_EXTRACT: unsafe fn(fcinfo: pg_sys::FunctionCallInfo) -> pg_sys::Datum =
     pg_sys::extract_timestamp;
 
@@ -480,7 +480,7 @@ impl_wrappers!(
 #[cfg(any(feature = "pg11", feature = "pg12", feature = "pg13"))]
 const TIMESTAMPTZ_EXTRACT: unsafe fn(fcinfo: pg_sys::FunctionCallInfo) -> pg_sys::Datum =
     pg_sys::timestamptz_part;
-#[cfg(any(feature = "pg14", feature = "pg15"))]
+#[cfg(any(feature = "pg14", feature = "pg15", feature = "pg16"))]
 const TIMESTAMPTZ_EXTRACT: unsafe fn(fcinfo: pg_sys::FunctionCallInfo) -> pg_sys::Datum =
     pg_sys::extract_timestamptz;
 
@@ -497,7 +497,7 @@ impl_wrappers!(
 #[cfg(any(feature = "pg11", feature = "pg12", feature = "pg13"))]
 const INTERVAL_EXTRACT: unsafe fn(fcinfo: pg_sys::FunctionCallInfo) -> pg_sys::Datum =
     pg_sys::interval_part;
-#[cfg(any(feature = "pg14", feature = "pg15"))]
+#[cfg(any(feature = "pg14", feature = "pg15", feature = "pg16"))]
 const INTERVAL_EXTRACT: unsafe fn(fcinfo: pg_sys::FunctionCallInfo) -> pg_sys::Datum =
     pg_sys::extract_interval;
 
@@ -540,7 +540,26 @@ pub fn get_timezone_offset<Tz: AsRef<str>>(zone: Tz) -> Result<i32, DateTimeConv
         /* DecodeTimezoneAbbrev requires lowercase input */
         lowzone =
             pg_sys::downcase_truncate_identifier(tzname.as_ptr(), zone.as_ref().len() as _, false);
-        tztype = pg_sys::DecodeTimezoneAbbrev(0, lowzone, &mut val, &mut tzp) as u32;
+
+        tztype = {
+            #[cfg(not(feature = "pg16"))]
+            {
+                pg_sys::DecodeTimezoneAbbrev(0, lowzone, &mut val, &mut tzp) as u32
+            }
+            #[cfg(feature = "pg16")]
+            {
+                let mut ftype = 0;
+                pg_sys::DecodeTimezoneAbbrev(
+                    0,
+                    lowzone,
+                    &mut ftype,
+                    &mut val,
+                    &mut tzp,
+                    std::ptr::null_mut(),
+                ) as u32
+            }
+        };
+
         pg_sys::pfree(lowzone.cast());
 
         if tztype == pg_sys::TZ || tztype == pg_sys::DTZ {

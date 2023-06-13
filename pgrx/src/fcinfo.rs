@@ -192,7 +192,13 @@ mod pg_11 {
     }
 }
 
-#[cfg(any(feature = "pg12", feature = "pg13", feature = "pg14", feature = "pg15"))]
+#[cfg(any(
+    feature = "pg12",
+    feature = "pg13",
+    feature = "pg14",
+    feature = "pg15",
+    feature = "pg16"
+))]
 mod pg_12_13_14_15 {
     use crate::{pg_sys, FromDatum};
 
@@ -321,7 +327,13 @@ mod pg_12_13_14_15 {
 #[cfg(any(feature = "pg11"))]
 pub use pg_11::*;
 
-#[cfg(any(feature = "pg12", feature = "pg13", feature = "pg14", feature = "pg15"))]
+#[cfg(any(
+    feature = "pg12",
+    feature = "pg13",
+    feature = "pg14",
+    feature = "pg15",
+    feature = "pg16"
+))]
 pub use pg_12_13_14_15::*;
 
 /// Get a numbered argument for a `PG_FUNCTION_INFO_V1` function as raw pointer to a Rust type `T`.

@@ -55,7 +55,7 @@ pub fn get_c_locale_flags() -> &'static [&'static str] {
 mod path_methods;
 pub use path_methods::{get_target_dir, prefix_path};
 
-#[derive(Copy, Clone, Debug)]
+#[derive(Copy, Clone, Debug, Eq, PartialEq)]
 pub enum PgMinorVersion {
     Latest,
     Release(u16),
@@ -781,7 +781,7 @@ fn parse_version() {
         let (major, minor) =
             PgConfig::parse_version_str(s).expect("Unable to parse version string");
         assert_eq!(major, major_expected, "Major version should match");
-        assert_eq!(minor, minor_expected, "Minor version should match");
+        assert_eq!(minor.version(), Some(minor_expected), "Minor version should match");
     }
 
     // Check some invalid version strings
@@ -810,7 +810,11 @@ fn from_empty_env() -> eyre::Result<()> {
 
     let pg_config = PgConfig::from_env().unwrap();
     assert_eq!(pg_config.major_version()?, 15, "Major version should match");
-    assert_eq!(pg_config.minor_version()?, 1, "Minor version should match");
+    assert_eq!(
+        pg_config.minor_version()?,
+        PgMinorVersion::Release(1),
+        "Minor version should match"
+    );
     assert_eq!(
         pg_config.includedir_server()?,
         PathBuf::from("/path/to/server/headers"),
