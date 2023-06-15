@@ -29,7 +29,7 @@ jobs:
 
     strategy:
       matrix:
-        version: ["postgres-11", "postgres-12", "postgres-13", "postgres-14", "postgres-15"]
+        version: ["postgres-11", "postgres-12", "postgres-13", "postgres-14", "postgres-15", "postgres-16"]
         os: ["ubuntu-20.04"]
 
     steps:
