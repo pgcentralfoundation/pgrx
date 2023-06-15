@@ -59,13 +59,6 @@ jobs:
         sudo apt remove -y '^postgres.*' '^libpq.*'
         echo ""
 
-        echo "----- Set up PostgreSQL Apt repository -----"
-        sudo apt-get install -y wget gnupg
-        sudo sh -c 'echo "deb http://apt.postgresql.org/pub/repos/apt $(lsb_release -cs)-pgdg main" > /etc/apt/sources.list.d/pgdg.list'
-        wget --quiet -O - https://www.postgresql.org/media/keys/ACCC4CF8.asc | sudo apt-key add -
-        sudo apt-get update -y -qq --fix-missing
-        echo ""
-
         echo "----- Install system dependencies and PostgreSQL version $PG_VER -----"
         sudo apt-get install -y \
           clang-10 \
@@ -103,6 +96,35 @@ jobs:
         echo "----- Get cargo version -----"
         cargo --version
         echo ""
+
+    - name: Install release version of PostgreSQL
+      if: matrix.target != 'postgres-16'
+      run: |
+        echo "----- Set up PostgreSQL Apt repository -----"
+        sudo apt-get install -y wget gnupg
+        sudo sh -c 'echo "deb http://apt.postgresql.org/pub/repos/apt $(lsb_release -cs)-pgdg main" > /etc/apt/sources.list.d/pgdg.list'
+        wget --quiet -O - https://www.postgresql.org/media/keys/ACCC4CF8.asc | sudo apt-key add -
+        sudo apt-get update -y -qq --fix-missing
+        echo ""
+
+        sudo apt-get install -y \
+          postgresql-$PG_VER \
+          postgresql-server-dev-$PG_VER
+
+
+    - name: Install develoment version of PostgreSQL
+      if: matrix.target == 'postgres-16'
+      run: |
+        echo "----- Set up PostgreSQL Apt repository -----"
+        sudo apt-get install -y wget gnupg
+        sudo sh -c 'echo "deb http://apt.postgresql.org/pub/repos/apt $(lsb_release -cs)-pgdg-snapshot main" > /etc/apt/sources.list.d/pgdg.list'
+        wget --quiet -O - https://www.postgresql.org/media/keys/ACCC4CF8.asc | sudo apt-key add -
+        sudo apt-get update -y -qq --fix-missing
+        echo ""
+
+        sudo apt-get install -y \
+          postgresql-$PG_VER \
+          postgresql-server-dev-$PG_VER
 
     - name: Cache cargo registry
       uses: actions/cache@v3
