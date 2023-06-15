@@ -71,9 +71,7 @@ jobs:
           zlib1g-dev \
           strace \
           libssl-dev \
-          pkg-config \
-          postgresql-$PG_VER \
-          postgresql-server-dev-$PG_VER
+          pkg-config
 
         echo "----- Set up cross compilation -----"
         sudo apt-get install -y crossbuild-essential-arm64
@@ -83,10 +81,7 @@ jobs:
         # TODO: not all of these should be needed, but for now it's likely fine.
         echo 'BINDGEN_EXTRA_CLANG_ARGS_aarch64-unknown-linux-gnu=-target aarch64-unknown-linux-gnu -isystem /usr/aarch64-linux-gnu/include/ -ccc-gcc-name aarch64-linux-gnu-gcc' >> $GITHUB_ENV
 
-        echo ""
-
         echo "----- Set up Postgres permissions -----"
-        sudo chmod a+rwx `/usr/lib/postgresql/$PG_VER/bin/pg_config --pkglibdir` `/usr/lib/postgresql/$PG_VER/bin/pg_config --sharedir`/extension /var/run/postgresql/
         echo ""
 
         echo "----- Print env -----"
@@ -125,6 +120,9 @@ jobs:
         sudo apt-get install -y \
           postgresql-$PG_VER \
           postgresql-server-dev-$PG_VER
+
+    - name: Set up PostgreSQL permissions
+      run: sudo chmod a+rwx `/usr/lib/postgresql/$PG_VER/bin/pg_config --pkglibdir` `/usr/lib/postgresql/$PG_VER/bin/pg_config --sharedir`/extension /var/run/postgresql/
 
     - name: Cache cargo registry
       uses: actions/cache@v3
