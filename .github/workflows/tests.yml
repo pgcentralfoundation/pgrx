@@ -73,16 +73,13 @@ jobs:
           libssl-dev \
           pkg-config
 
-        echo "----- Set up cross compilation -----"
-        sudo apt-get install -y crossbuild-essential-arm64
-        rustup target add aarch64-unknown-linux-gnu
+        # echo "----- Set up cross compilation -----"
+        # sudo apt-get install -y crossbuild-essential-arm64
+        # rustup target add aarch64-unknown-linux-gnu
 
-        echo 'CARGO_TARGET_AARCH64_UNKNOWN_LINUX_GNU_LINKER=aarch64-linux-gnu-gcc' >> $GITHUB_ENV
-        # TODO: not all of these should be needed, but for now it's likely fine.
-        echo 'BINDGEN_EXTRA_CLANG_ARGS_aarch64-unknown-linux-gnu=-target aarch64-unknown-linux-gnu -isystem /usr/aarch64-linux-gnu/include/ -ccc-gcc-name aarch64-linux-gnu-gcc' >> $GITHUB_ENV
-
-        echo "----- Set up Postgres permissions -----"
-        echo ""
+        # echo 'CARGO_TARGET_AARCH64_UNKNOWN_LINUX_GNU_LINKER=aarch64-linux-gnu-gcc' >> $GITHUB_ENV
+        # # TODO: not all of these should be needed, but for now it's likely fine.
+        # echo 'BINDGEN_EXTRA_CLANG_ARGS_aarch64-unknown-linux-gnu=-target aarch64-unknown-linux-gnu -isystem /usr/aarch64-linux-gnu/include/ -ccc-gcc-name aarch64-linux-gnu-gcc' >> $GITHUB_ENV
 
         echo "----- Print env -----"
         env
