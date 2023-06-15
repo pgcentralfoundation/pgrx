@@ -520,6 +520,50 @@ impl_wrappers!(
 /// ## Errors
 ///
 /// Returns a [`DateTimeConversionError`] if the specified timezone is unknown to Postgres
+
+#[cfg(feature = "pg16")]
+pub fn get_timezone_offset<Tz: AsRef<str>>(zone: Tz) -> Result<i32, DateTimeConversionError> {
+    let zone = zone.as_ref();
+    PgTryBuilder::new(|| {
+        unsafe {
+            let tzname = alloc::ffi::CString::new(zone).unwrap();
+            let mut tz = 0;
+            let mut val = 0;
+            let mut tzp: *mut pg_tz = 0 as _;
+
+            let tztype = pg_sys::DecodeTimezoneName(tzname.as_ptr(), &mut val, &mut tzp);
+
+            if tztype == pg_sys::TZNAME_FIXED_OFFSET as i32 {
+                /* fixed-offset abbreviation */
+                tz = -val;
+            } else if tztype == pg_sys::TZNAME_DYNTZ as i32 {
+                /* dynamic-offset abbreviation, resolve using transaction start time */
+                let now = pg_sys::GetCurrentTransactionStartTimestamp();
+                let mut isdst = 0;
+
+                tz = pg_sys::DetermineTimeZoneAbbrevOffsetTS(now, tzname.as_ptr(), tzp, &mut isdst);
+            } else {
+                /* Get the offset-from-GMT that is valid now for the zone name */
+                let now = pg_sys::GetCurrentTransactionStartTimestamp();
+                let mut tm = Default::default();
+                let mut fsec = 0;
+
+                if pg_sys::timestamp2tm(now, &mut tz, &mut tm, &mut fsec, std::ptr::null_mut(), tzp)
+                    != 0
+                {
+                    return Err(DateTimeConversionError::FieldOverflow);
+                }
+            }
+            Ok(-tz)
+        }
+    })
+    .catch_when(PgSqlErrorCode::ERRCODE_INVALID_PARAMETER_VALUE, |_| {
+        Err(DateTimeConversionError::UnknownTimezone(zone.to_string()))
+    })
+    .execute()
+}
+
+#[cfg(not(feature = "pg16"))]
 pub fn get_timezone_offset<Tz: AsRef<str>>(zone: Tz) -> Result<i32, DateTimeConversionError> {
     /*
      * Look up the requested timezone.  First we look in the timezone
@@ -573,6 +617,7 @@ pub fn get_timezone_offset<Tz: AsRef<str>>(zone: Tz) -> Result<i32, DateTimeConv
             tz = pg_sys::DetermineTimeZoneAbbrevOffsetTS(now, tzname.as_ptr(), tzp, &mut isdst);
         } else {
             /* try it as a full zone name */
+            crate::warning!("tzname={}", tzname.to_str().unwrap());
             tzp = pg_sys::pg_tzset(tzname.as_ptr());
             if !tzp.is_null() {
                 /* Get the offset-from-GMT that is valid now for the zone */

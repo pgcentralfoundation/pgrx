@@ -383,30 +383,39 @@ mod all_versions {
     pub unsafe fn GetMemoryContextChunk(
         pointer: *mut std::os::raw::c_void,
     ) -> pg_sys::MemoryContext {
-        /*
-         * Try to detect bogus pointers handed to us, poorly though we can.
-         * Presumably, a pointer that isn't MAXALIGNED isn't pointing at an
-         * allocated chunk.
-         */
-        assert!(!pointer.is_null());
-        assert_eq!(pointer, MAXALIGN(pointer as usize) as *mut ::std::os::raw::c_void);
+        // Postgres versions <16 don't export the "GetMemoryChunkContext" function.  It's a "static inline"
+        // function in `memutils.h`, so we port it to Rust right here
+        #[cfg(not(feature = "pg16"))]
+        {
+            /*
+             * Try to detect bogus pointers handed to us, poorly though we can.
+             * Presumably, a pointer that isn't MAXALIGNED isn't pointing at an
+             * allocated chunk.
+             */
+            assert!(!pointer.is_null());
+            assert_eq!(pointer, MAXALIGN(pointer as usize) as *mut ::std::os::raw::c_void);
 
-        /*
-         * OK, it's probably safe to look at the context.
-         */
-        // 	context = *(MemoryContext *) (((char *) pointer) - sizeof(void *));
-        let context = unsafe {
-            // SAFETY: the caller has assured us that `pointer` points to palloc'd memory, which
-            // means it'll have this header before it
-            *(pointer
-                .cast::<::std::os::raw::c_char>()
-                .sub(std::mem::size_of::<*mut ::std::os::raw::c_void>())
-                .cast())
-        };
+            /*
+             * OK, it's probably safe to look at the context.
+             */
+            // 	context = *(MemoryContext *) (((char *) pointer) - sizeof(void *));
+            let context = unsafe {
+                // SAFETY: the caller has assured us that `pointer` points to palloc'd memory, which
+                // means it'll have this header before it
+                *(pointer
+                    .cast::<::std::os::raw::c_char>()
+                    .sub(std::mem::size_of::<*mut ::std::os::raw::c_void>())
+                    .cast())
+            };
 
-        assert!(MemoryContextIsValid(context));
+            assert!(MemoryContextIsValid(context));
 
-        context
+            context
+        }
+
+        // Postgres 16 does **and** it's implemented different, so we'll just call it now that we can
+        #[cfg(feature = "pg16")]
+        pg_sys::GetMemoryChunkContext(pointer)
     }
 
     /// Returns true if memory context is valid, as Postgres determines such a thing.

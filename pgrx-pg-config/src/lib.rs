@@ -326,7 +326,12 @@ impl PgConfig {
 
     pub fn postmaster_path(&self) -> eyre::Result<PathBuf> {
         let mut path = self.bin_dir()?;
-        path.push("postmaster");
+
+        if self.major_version()? > 15 {
+            path.push("postgres")
+        } else {
+            path.push("postmaster");
+        }
         Ok(path)
     }
 
