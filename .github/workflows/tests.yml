@@ -90,7 +90,7 @@ jobs:
         echo ""
 
     - name: Install release version of PostgreSQL
-      if: matrix.target != 'postgres-16'
+      if: matrix.version != 'postgres-16'
       run: |
         echo "----- Set up PostgreSQL Apt repository -----"
         sudo apt-get install -y wget gnupg
@@ -105,7 +105,7 @@ jobs:
 
 
     - name: Install develoment version of PostgreSQL
-      if: matrix.target == 'postgres-16'
+      if: matrix.version == 'postgres-16'
       run: |
         echo "----- Set up PostgreSQL Apt repository -----"
         sudo apt-get install -y wget gnupg
