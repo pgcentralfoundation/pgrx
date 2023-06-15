@@ -109,7 +109,7 @@ jobs:
       run: |
         echo "----- Set up PostgreSQL Apt repository -----"
         sudo apt-get install -y wget gnupg
-        sudo sh -c 'echo "deb http://apt.postgresql.org/pub/repos/apt $(lsb_release -cs)-pgdg-snapshot main" > /etc/apt/sources.list.d/pgdg.list'
+        sudo add-apt-repository "deb https://apt.postgresql.org/pub/repos/apt/ $(lsb_release -s -c)-pgdg-snapshot main 16"
         wget --quiet -O - https://www.postgresql.org/media/keys/ACCC4CF8.asc | sudo apt-key add -
         sudo apt-get update -y -qq --fix-missing
         echo ""
