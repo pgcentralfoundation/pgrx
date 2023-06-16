@@ -59,8 +59,8 @@ jobs:
         sudo apt remove -y '^postgres.*' '^libpq.*'
         echo ""
 
-        echo "----- Install system dependencies and PostgreSQL version $PG_VER -----"
-        sudo apt-get install -y \
+        echo "----- Install system dependencies -----"
+        sudo apt-get update && apt-get install -y \
           clang-10 \
           llvm-10 \
           clang \
