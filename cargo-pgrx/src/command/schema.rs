@@ -13,7 +13,8 @@ use crate::profile::CargoProfile;
 use crate::CommandExecute;
 use cargo_toml::Manifest;
 use eyre::{eyre, WrapErr};
-use object::Object;
+use object::read::macho::{FatArch, FatHeader};
+use object::{Architecture, FileKind, Object};
 use once_cell::sync::OnceCell;
 use owo_colors::OwoColorize;
 use pgrx_pg_config::{cargo::PgrxManifestExt, get_target_dir, PgConfig, Pgrx};
@@ -25,6 +26,7 @@ use std::process::Stdio;
 extern crate alloc;
 use crate::manifest::{get_package_manifest, pg_config_and_version};
 use alloc::vec::Vec;
+use std::env;
 
 // An apparent bug in `glibc` 2.17 prevents us from safely dropping this
 // otherwise users find issues such as https://github.com/tcdi/pgrx/issues/572
@@ -301,7 +303,7 @@ pub(crate) fn generate_schema(
 
     let lib_so_data = std::fs::read(&lib_so).wrap_err("couldn't read extension shared object")?;
     let lib_so_obj_file =
-        object::File::parse(&*lib_so_data).wrap_err("couldn't parse extension shared object")?;
+        parse_object(&*lib_so_data).wrap_err("couldn't parse extension shared object")?;
     let lib_so_exports =
         lib_so_obj_file.exports().wrap_err("couldn't get exports from extension shared object")?;
 
@@ -496,7 +498,7 @@ fn create_stub(
     }
 
     let postmaster_obj_file =
-        object::File::parse(&*postmaster_bin_data).wrap_err("couldn't parse postmaster")?;
+        parse_object(&*postmaster_bin_data).wrap_err("couldn't parse postmaster")?;
     let postmaster_exports = postmaster_obj_file
         .exports()
         .wrap_err("couldn't get exports from extension shared object")?;
@@ -555,4 +557,83 @@ fn create_stub(
         .wrap_err("could not write postmaster stub hash")?;
 
     Ok(postmaster_stub_built)
+}
+
+fn parse_object(data: &[u8]) -> object::Result<object::File> {
+    let kind = object::FileKind::parse(&*data)?;
+
+    match kind {
+        FileKind::MachOFat32 => {
+            let arch = env::consts::ARCH;
+
+            match slice_arch32(&*data, arch) {
+                Some(slice) => parse_object(&*slice),
+                None => {
+                    panic!("Failed to slice architecture '{arch}' from universal binary.")
+                }
+            }
+        }
+        _ => object::File::parse(&*data),
+    }
+}
+
+fn slice_arch32<'a>(data: &'a [u8], arch: &str) -> Option<&'a [u8]> {
+    let target = match arch {
+        "x86" => Architecture::I386,
+        "x86_64" => Architecture::X86_64,
+        "arm" => Architecture::Arm,
+        "aarch64" => Architecture::Aarch64,
+        "mips" => Architecture::Mips,
+        "powerpc" => Architecture::PowerPc,
+        "powerpc64" => Architecture::PowerPc64,
+        _ => Architecture::Unknown,
+    };
+
+    let candidates = FatHeader::parse_arch32(&*data).ok()?;
+    let architecture = candidates.iter().find(|a| a.architecture() == target)?;
+
+    architecture.data(&*data).ok()
+}
+
+#[cfg(test)]
+mod tests {
+    use crate::command::schema::*;
+    use pgrx_pg_config::PgConfigSelector;
+
+    #[test]
+    fn test_parse_managed_postmasters() {
+        let pgrx = Pgrx::from_config().unwrap();
+        let mut results = pgrx
+            .iter(PgConfigSelector::All)
+            .map(|pg_config| {
+                let fixture_path = pg_config.unwrap().postmaster_path().unwrap();
+                let bin = std::fs::read(fixture_path).unwrap();
+
+                parse_object(&bin).is_ok()
+            })
+            .peekable();
+
+        assert!(results.peek().is_some());
+        assert!(results.all(|r| r));
+    }
+
+    #[test]
+    fn test_parse_universal_binary_slice() {
+        let root_path = env!("CARGO_MANIFEST_DIR");
+        let fixture_path = format!("{root_path}/tests/fixtures/macos-universal-binary");
+        let bin = std::fs::read(fixture_path).unwrap();
+
+        let slice = slice_arch32(&bin, "aarch64")
+            .expect("Failed to slice architecture 'aarch64' from universal binary.");
+        assert!(parse_object(&slice).is_ok());
+    }
+
+    #[test]
+    fn test_slice_unknown_architecture() {
+        let root_path = env!("CARGO_MANIFEST_DIR");
+        let fixture_path = format!("{root_path}/tests/fixtures/macos-universal-binary");
+        let bin = std::fs::read(fixture_path).unwrap();
+
+        assert!(slice_arch32(&bin, "foo").is_none());
+    }
 }
