@@ -22,9 +22,9 @@ Use of this source code is governed by the MIT license that can be found in the 
 #[cfg(
     any(
         // no features at all will cause problems
-        not(any(feature = "pg11", feature = "pg12", feature = "pg13", feature = "pg14", feature = "pg15")),
+        not(any(feature = "pg11", feature = "pg12", feature = "pg13", feature = "pg14", feature = "pg15", feature = "pg16")),
   ))]
-std::compile_error!("exactly one one feature must be provided (pg11, pg12, pg13, pg14, pg15)");
+std::compile_error!("exactly one feature must be provided (pg11, pg12, pg13, pg14, pg15, pg16)");
 
 pub mod submodules;
 
@@ -75,6 +75,13 @@ mod pg15 {
 #[cfg(all(feature = "pg15", docsrs))]
 mod pg15;
 
+#[cfg(all(feature = "pg16", not(docsrs)))]
+mod pg16 {
+    include!(concat!(env!("OUT_DIR"), "/pg16.rs"));
+}
+#[cfg(all(feature = "pg16", docsrs))]
+mod pg16;
+
 // export each module publicly
 #[cfg(feature = "pg11")]
 pub use pg11::*;
@@ -86,6 +93,8 @@ pub use pg13::*;
 pub use pg14::*;
 #[cfg(feature = "pg15")]
 pub use pg15::*;
+#[cfg(feature = "pg16")]
+pub use pg16::*;
 
 // feature gate each pg-specific oid module
 #[cfg(all(feature = "pg11", not(docsrs)))]
@@ -123,6 +132,13 @@ mod pg15_oids {
 #[cfg(all(feature = "pg15", docsrs))]
 mod pg15_oids;
 
+#[cfg(all(feature = "pg16", not(docsrs)))]
+mod pg16_oids {
+    include!(concat!(env!("OUT_DIR"), "/pg16_oids.rs"));
+}
+#[cfg(all(feature = "pg6", docsrs))]
+mod pg16_oids;
+
 // export that module publicly
 #[cfg(feature = "pg11")]
 pub use pg11_oids::*;
@@ -134,6 +150,8 @@ pub use pg13_oids::*;
 pub use pg14_oids::*;
 #[cfg(feature = "pg15")]
 pub use pg15_oids::*;
+#[cfg(feature = "pg16")]
+pub use pg16_oids::*;
 
 // expose things we want available for all versions
 pub use all_versions::*;
@@ -155,6 +173,9 @@ pub use internal::pg14::*;
 
 #[cfg(feature = "pg15")]
 pub use internal::pg15::*;
+
+#[cfg(feature = "pg16")]
+pub use internal::pg16::*;
 
 /// A trait applied to all Postgres `pg_sys::Node` types and subtypes
 pub trait PgNode: seal::Sealed {
@@ -360,30 +381,39 @@ mod all_versions {
     pub unsafe fn GetMemoryContextChunk(
         pointer: *mut std::os::raw::c_void,
     ) -> pg_sys::MemoryContext {
-        /*
-         * Try to detect bogus pointers handed to us, poorly though we can.
-         * Presumably, a pointer that isn't MAXALIGNED isn't pointing at an
-         * allocated chunk.
-         */
-        assert!(!pointer.is_null());
-        assert_eq!(pointer, MAXALIGN(pointer as usize) as *mut ::std::os::raw::c_void);
+        // Postgres versions <16 don't export the "GetMemoryChunkContext" function.  It's a "static inline"
+        // function in `memutils.h`, so we port it to Rust right here
+        #[cfg(not(feature = "pg16"))]
+        {
+            /*
+             * Try to detect bogus pointers handed to us, poorly though we can.
+             * Presumably, a pointer that isn't MAXALIGNED isn't pointing at an
+             * allocated chunk.
+             */
+            assert!(!pointer.is_null());
+            assert_eq!(pointer, MAXALIGN(pointer as usize) as *mut ::std::os::raw::c_void);
 
-        /*
-         * OK, it's probably safe to look at the context.
-         */
-        // 	context = *(MemoryContext *) (((char *) pointer) - sizeof(void *));
-        let context = unsafe {
-            // SAFETY: the caller has assured us that `pointer` points to palloc'd memory, which
-            // means it'll have this header before it
-            *(pointer
-                .cast::<::std::os::raw::c_char>()
-                .sub(std::mem::size_of::<*mut ::std::os::raw::c_void>())
-                .cast())
-        };
+            /*
+             * OK, it's probably safe to look at the context.
+             */
+            // 	context = *(MemoryContext *) (((char *) pointer) - sizeof(void *));
+            let context = unsafe {
+                // SAFETY: the caller has assured us that `pointer` points to palloc'd memory, which
+                // means it'll have this header before it
+                *(pointer
+                    .cast::<::std::os::raw::c_char>()
+                    .sub(std::mem::size_of::<*mut ::std::os::raw::c_void>())
+                    .cast())
+            };
 
-        assert!(MemoryContextIsValid(context));
+            assert!(MemoryContextIsValid(context));
 
-        context
+            context
+        }
+
+        // Postgres 16 does **and** it's implemented different, so we'll just call it now that we can
+        #[cfg(feature = "pg16")]
+        pg_sys::GetMemoryChunkContext(pointer)
     }
 
     /// Returns true if memory context is valid, as Postgres determines such a thing.
@@ -730,6 +760,42 @@ mod internal {
         pub use crate::pg15::AllocSetContextCreateInternal as AllocSetContextCreateExtended;
 
         pub const QTW_EXAMINE_RTES: u32 = crate::pg15::QTW_EXAMINE_RTES_BEFORE;
+
+        /// # Safety
+        ///
+        /// This function wraps Postgres' internal `IndexBuildHeapScan` method, and therefore, is
+        /// inherently unsafe
+        pub unsafe fn IndexBuildHeapScan<T>(
+            heap_relation: crate::Relation,
+            index_relation: crate::Relation,
+            index_info: *mut crate::IndexInfo,
+            build_callback: crate::IndexBuildCallback,
+            build_callback_state: *mut T,
+        ) {
+            let heap_relation_ref = heap_relation.as_ref().unwrap();
+            let table_am = heap_relation_ref.rd_tableam.as_ref().unwrap();
+
+            table_am.index_build_range_scan.unwrap()(
+                heap_relation,
+                index_relation,
+                index_info,
+                true,
+                false,
+                true,
+                0,
+                crate::InvalidBlockNumber,
+                build_callback,
+                build_callback_state as *mut std::os::raw::c_void,
+                std::ptr::null_mut(),
+            );
+        }
+    }
+
+    #[cfg(feature = "pg16")]
+    pub(crate) mod pg16 {
+        pub use crate::pg16::AllocSetContextCreateInternal as AllocSetContextCreateExtended;
+
+        pub const QTW_EXAMINE_RTES: u32 = crate::pg16::QTW_EXAMINE_RTES_BEFORE;
 
         /// # Safety
         ///

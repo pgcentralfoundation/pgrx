@@ -12,13 +12,14 @@ Use of this source code is governed by the MIT license that can be found in the 
 mod tests {
     #[allow(unused_imports)]
     use crate as pgrx_tests;
+    use std::ffi::CStr;
 
     use pgrx::guc::*;
     use pgrx::prelude::*;
 
     #[pg_test]
     fn test_bool_guc() {
-        static GUC: GucSetting<bool> = GucSetting::new(true);
+        static GUC: GucSetting<bool> = GucSetting::<bool>::new(true);
         GucRegistry::define_bool_guc(
             "test.bool",
             "test bool gucs",
@@ -38,7 +39,7 @@ mod tests {
 
     #[pg_test]
     fn test_int_guc() {
-        static GUC: GucSetting<i32> = GucSetting::new(42);
+        static GUC: GucSetting<i32> = GucSetting::<i32>::new(42);
         GucRegistry::define_int_guc(
             "test.int",
             "test int guc",
@@ -60,7 +61,7 @@ mod tests {
 
     #[pg_test]
     fn test_mb_guc() {
-        static GUC: GucSetting<i32> = GucSetting::new(42);
+        static GUC: GucSetting<i32> = GucSetting::<i32>::new(42);
         GucRegistry::define_int_guc(
             "test.megabytes",
             "test megabytes guc",
@@ -79,7 +80,7 @@ mod tests {
 
     #[pg_test]
     fn test_float_guc() {
-        static GUC: GucSetting<f64> = GucSetting::new(42.42);
+        static GUC: GucSetting<f64> = GucSetting::<f64>::new(42.42);
         GucRegistry::define_float_guc(
             "test.float",
             "test float guc",
@@ -104,7 +105,10 @@ mod tests {
 
     #[pg_test]
     fn test_string_guc() {
-        static GUC: GucSetting<Option<&'static str>> = GucSetting::new(Some("this is a test"));
+        static GUC: GucSetting<Option<&'static CStr>> =
+            GucSetting::<Option<&'static CStr>>::new(Some(unsafe {
+                CStr::from_bytes_with_nul_unchecked(b"this is a test\0")
+            }));
         GucRegistry::define_string_guc(
             "test.string",
             "test string guc",
@@ -114,18 +118,19 @@ mod tests {
             GucFlags::default(),
         );
         assert!(GUC.get().is_some());
-        assert_eq!(GUC.get().unwrap(), "this is a test");
+        assert_eq!(GUC.get().unwrap().to_str().unwrap(), "this is a test");
 
         Spi::run("SET test.string = 'foo'").expect("SPI failed");
-        assert_eq!(GUC.get().unwrap(), "foo");
+        assert_eq!(GUC.get().unwrap().to_str().unwrap(), "foo");
 
         Spi::run("SET test.string = DEFAULT").expect("SPI failed");
-        assert_eq!(GUC.get().unwrap(), "this is a test");
+        assert_eq!(GUC.get().unwrap().to_str().unwrap(), "this is a test");
     }
 
     #[pg_test]
     fn test_string_guc_null_default() {
-        static GUC: GucSetting<Option<&'static str>> = GucSetting::new(None);
+        static GUC: GucSetting<Option<&'static CStr>> =
+            GucSetting::<Option<&'static CStr>>::new(None);
         GucRegistry::define_string_guc(
             "test.string",
             "test string guc",
@@ -137,7 +142,7 @@ mod tests {
         assert!(GUC.get().is_none());
 
         Spi::run("SET test.string = 'foo'").expect("SPI failed");
-        assert_eq!(GUC.get().unwrap(), "foo");
+        assert_eq!(GUC.get().unwrap().to_str().unwrap(), "foo");
 
         Spi::run("SET test.string = DEFAULT").expect("SPI failed");
         assert!(GUC.get().is_none());
@@ -151,7 +156,7 @@ mod tests {
             Two,
             Three,
         }
-        static GUC: GucSetting<TestEnum> = GucSetting::new(TestEnum::Two);
+        static GUC: GucSetting<TestEnum> = GucSetting::<TestEnum>::new(TestEnum::Two);
         GucRegistry::define_enum_guc(
             "test.enum",
             "test enum guc",

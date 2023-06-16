@@ -130,12 +130,12 @@ pub use pg_sys::{
 #[doc(hidden)]
 pub use pgrx_sql_entity_graph;
 
-// Postgres v15 has the concept of an ABI "name".  The default is `b"PostgreSQL\0"` and this is the
+// Postgres v15+ has the concept of an ABI "name".  The default is `b"PostgreSQL\0"` and this is the
 // ABI that pgrx extensions expect to be running under.  We will refuse to compile if it is detected
 // that we're trying to be built against some other kind of "postgres" that has its own ABI name.
 //
 // Unless the compiling user explicitly told us that they're aware of this via `--features unsafe-postgres`.
-#[cfg(all(feature = "pg15", not(feature = "unsafe-postgres")))]
+#[cfg(all(any(feature = "pg15", feature = "pg16"), not(feature = "unsafe-postgres")))]
 const _: () = {
     // to appease `const`
     const fn same_slice(a: &[u8], b: &[u8]) -> bool {
@@ -240,7 +240,7 @@ macro_rules! pg_magic_func {
                 float8byval: cfg!(target_pointer_width = "64") as i32,
             };
 
-            #[cfg(any(feature = "pg15"))]
+            #[cfg(any(feature = "pg15", feature = "pg16"))]
             const MY_MAGIC: pgrx::pg_sys::Pg_magic_struct = pgrx::pg_sys::Pg_magic_struct {
                 len: size_of::<pgrx::pg_sys::Pg_magic_struct>() as i32,
                 version: pgrx::pg_sys::PG_VERSION_NUM as i32 / 100,

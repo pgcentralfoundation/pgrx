@@ -161,7 +161,7 @@ impl<AllocatedBy: WhoAllocated> StringInfo<AllocatedBy> {
         unsafe {
             // SAFETY:  self.inner will always be a valid StringInfoData pointer
             // and the caller gets to decide if `ptr` and `len` line up
-            pg_sys::appendBinaryStringInfo(self.inner.as_ptr(), ptr, len)
+            pg_sys::appendBinaryStringInfo(self.inner.as_ptr(), ptr.cast(), len)
         }
     }
 

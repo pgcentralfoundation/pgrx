@@ -1,8 +1,9 @@
-use pgrx_pg_config::{PgConfig, Pgrx};
+use pgrx_pg_config::{PgConfig, Pgrx, SUPPORTED_VERSIONS};
 
-pub(crate) fn pgrx_default(supported_major_versions: &[u16]) -> eyre::Result<Pgrx> {
+pub(crate) fn pgrx_default() -> eyre::Result<Pgrx> {
     let mut pgrx = Pgrx::default();
-    rss::PostgreSQLVersionRss::new(supported_major_versions)?
+
+    rss::PostgreSQLVersionRss::new(&SUPPORTED_VERSIONS())?
         .into_iter()
         .for_each(|version| pgrx.push(PgConfig::from(version)));
 
@@ -12,8 +13,9 @@ pub(crate) fn pgrx_default(supported_major_versions: &[u16]) -> eyre::Result<Pgr
 mod rss {
     use eyre::WrapErr;
     use owo_colors::OwoColorize;
-    use pgrx_pg_config::PgVersion;
+    use pgrx_pg_config::{PgMinorVersion, PgVersion};
     use serde_derive::Deserialize;
+    use std::collections::BTreeMap;
     use url::Url;
 
     use crate::command::build_agent_for_url;
@@ -21,7 +23,7 @@ mod rss {
     pub(super) struct PostgreSQLVersionRss;
 
     impl PostgreSQLVersionRss {
-        pub(super) fn new(supported_major_versions: &[u16]) -> eyre::Result<Vec<PgVersion>> {
+        pub(super) fn new(supported_versions: &[PgVersion]) -> eyre::Result<Vec<PgVersion>> {
             static VERSIONS_RSS_URL: &str = "https://www.postgresql.org/versions.rss";
 
             let http_client = build_agent_for_url(VERSIONS_RSS_URL)?;
@@ -35,7 +37,10 @@ mod rss {
                 Err(e) => return Err(e.into()),
             };
 
-            let mut versions = Vec::new();
+            let mut versions: BTreeMap<u16, PgVersion> = BTreeMap::from_iter(
+                supported_versions.iter().map(|pgver| (pgver.major, pgver.clone())),
+            );
+
             for item in rss.channel.item {
                 let title = item.title.trim();
                 let mut parts = title.split('.');
@@ -47,27 +52,25 @@ mod rss {
                 let major = major.unwrap().parse::<u16>().unwrap_or_default();
                 let minor = minor.unwrap().parse::<u16>().unwrap_or_default();
 
-                if supported_major_versions.contains(&major) {
-                    versions.push(
-                        PgVersion::new(
-                            major,
-                            minor,
-                            Url::parse(
+                if let Some(known_pgver) = versions.get_mut(&major) {
+                    if matches!(known_pgver.minor, PgMinorVersion::Latest) {
+                        // fill in the latest minor version number and its url
+                        known_pgver.minor = PgMinorVersion::Release(minor);
+                        known_pgver.url = Some(Url::parse(
                                 &format!("https://ftp.postgresql.org/pub/source/v{major}.{minor}/postgresql-{major}.{minor}.tar.bz2",
                                          major = major, minor = minor)
-                            ).expect("invalid url")
-                        ),
-                    )
+                            )?);
+                    }
                 }
             }
 
             println!(
                 "{} Postgres {}",
-                "  Discovered".white().bold(),
-                versions.iter().map(|ver| format!("v{ver}")).collect::<Vec<_>>().join(", ")
+                "   Discovered".white().bold(),
+                versions.iter().map(|ver| format!("v{}", ver.1)).collect::<Vec<_>>().join(", ")
             );
 
-            Ok(versions)
+            Ok(versions.into_values().collect())
         }
     }
 

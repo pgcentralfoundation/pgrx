@@ -47,7 +47,7 @@ pub unsafe trait PGRXSharedMemory {}
 ///     pg_shmem_init!(ATOMIC);
 /// }
 /// ```
-#[cfg(not(feature = "pg15"))]
+#[cfg(not(any(feature = "pg15", feature = "pg16")))]
 #[macro_export]
 macro_rules! pg_shmem_init {
     ($thing:expr) => {
@@ -71,7 +71,7 @@ macro_rules! pg_shmem_init {
     };
 }
 
-#[cfg(feature = "pg15")]
+#[cfg(any(feature = "pg15", feature = "pg16"))]
 #[macro_export]
 macro_rules! pg_shmem_init {
     ($thing:expr) => {

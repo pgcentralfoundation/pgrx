@@ -113,7 +113,13 @@ unsafe fn extract_enum_oid(tup: *mut pg_sys::HeapTupleData) -> pg_sys::Oid {
     }
 }
 
-#[cfg(any(feature = "pg12", feature = "pg13", feature = "pg14", feature = "pg15"))]
+#[cfg(any(
+    feature = "pg12",
+    feature = "pg13",
+    feature = "pg14",
+    feature = "pg15",
+    feature = "pg16"
+))]
 unsafe fn extract_enum_oid(tup: *mut pg_sys::HeapTupleData) -> pg_sys::Oid {
     let en = {
         // SAFETY:  the caller has assured us that `tup` is a valid HeapTupleData pointer

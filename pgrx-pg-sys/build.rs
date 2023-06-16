@@ -10,7 +10,9 @@ Use of this source code is governed by the MIT license that can be found in the 
 use bindgen::callbacks::{DeriveTrait, ImplementsTrait, MacroParsingBehavior};
 use eyre::{eyre, WrapErr};
 use once_cell::sync::Lazy;
-use pgrx_pg_config::{prefix_path, PgConfig, PgConfigSelector, Pgrx, SUPPORTED_MAJOR_VERSIONS};
+use pgrx_pg_config::{
+    is_supported_major_version, prefix_path, PgConfig, PgConfigSelector, Pgrx, SUPPORTED_VERSIONS,
+};
 use quote::{quote, ToTokens};
 use std::collections::{BTreeMap, BTreeSet, HashMap, HashSet};
 use std::path::PathBuf;
@@ -125,7 +127,7 @@ fn main() -> eyre::Result<()> {
             .map(|r| r.expect("invalid pg_config"))
             .map(|c| (c.major_version().expect("invalid major version"), c))
             .filter_map(|t| {
-                if SUPPORTED_MAJOR_VERSIONS.contains(&t.0) {
+                if is_supported_major_version(t.0) {
                     Some(t)
                 } else {
                     println!(
@@ -141,21 +143,22 @@ fn main() -> eyre::Result<()> {
             .collect()
     } else {
         let mut found = None;
-        for &version in SUPPORTED_MAJOR_VERSIONS {
-            if env_tracked(&format!("CARGO_FEATURE_PG{}", version)).is_none() {
+        for pgver in SUPPORTED_VERSIONS() {
+            if env_tracked(&format!("CARGO_FEATURE_PG{}", pgver.major)).is_none() {
                 continue;
             }
             if found.is_some() {
                 return Err(eyre!("Multiple `pg$VERSION` features found, `--no-default-features` may be required."));
             }
-            found = Some((version, format!("pg{}", version)));
+            let major = pgver.major;
+            found = Some((pgver, format!("pg{}", major)));
         }
         let (found_ver, found_feat) = found.ok_or_else(|| {
             eyre!(
                 "Did not find `pg$VERSION` feature. `pgrx-pg-sys` requires one of {} to be set",
-                SUPPORTED_MAJOR_VERSIONS
+                SUPPORTED_VERSIONS()
                     .iter()
-                    .map(|x| format!("`pg{}`", x))
+                    .map(|pgver| format!("`pg{}`", pgver.major))
                     .collect::<Vec<_>>()
                     .join(", ")
             )
@@ -164,13 +167,13 @@ fn main() -> eyre::Result<()> {
         if let Ok(pg_config) = PgConfig::from_env() {
             let major_version = pg_config.major_version()?;
 
-            if major_version != found_ver {
+            if major_version != found_ver.major {
                 panic!("Feature flag `pg{found_ver}` does not match version from the environment-described PgConfig (`{major_version}`)")
             }
             vec![(major_version, pg_config)]
         } else {
             let specific = Pgrx::from_config()?.get(&found_feat)?;
-            vec![(found_ver, specific)]
+            vec![(found_ver.major, specific)]
         }
     };
     std::thread::scope(|scope| {
@@ -268,7 +271,7 @@ fn generate_bindings(
             &bindings_file,
             quote! {
                 use crate as pg_sys;
-                #[cfg(any(feature = "pg12", feature = "pg13", feature = "pg14", feature = "pg15"))]
+                #[cfg(any(feature = "pg12", feature = "pg13", feature = "pg14", feature = "pg15", feature = "pg16"))]
                 use crate::NullableDatum;
                 use crate::{Datum, Oid, PgNode};
             },

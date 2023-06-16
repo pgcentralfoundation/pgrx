@@ -74,7 +74,8 @@ impl BackgroundWorker {
             feature = "pg12",
             feature = "pg13",
             feature = "pg14",
-            feature = "pg15"
+            feature = "pg15",
+            feature = "pg16"
         ))]
         const LEN: usize = 96;
 
@@ -163,7 +164,8 @@ impl BackgroundWorker {
                 feature = "pg12",
                 feature = "pg13",
                 feature = "pg14",
-                feature = "pg15"
+                feature = "pg15",
+                feature = "pg16"
             ))]
             pg_sys::BackgroundWorkerInitializeConnection(db, user, 0);
         };
@@ -569,7 +571,8 @@ impl<'a> Into<pg_sys::BackgroundWorker> for &'a BackgroundWorkerBuilder {
             feature = "pg12",
             feature = "pg13",
             feature = "pg14",
-            feature = "pg15"
+            feature = "pg15",
+            feature = "pg16"
         ))]
         let bgw = pg_sys::BackgroundWorker {
             bgw_name: RpgffiChar::from(&self.bgw_name[..]).0,
@@ -611,7 +614,8 @@ fn wait_latch(timeout: libc::c_long, wakeup_flags: WLflags) -> i32 {
     feature = "pg12",
     feature = "pg13",
     feature = "pg14",
-    feature = "pg15"
+    feature = "pg15",
+    feature = "pg16"
 ))]
 type RpgffiChar = RpgffiChar96;
 

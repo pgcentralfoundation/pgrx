@@ -14,7 +14,6 @@ use eyre::{eyre, WrapErr};
 use owo_colors::OwoColorize;
 use pgrx_pg_config::{
     get_c_locale_flags, prefix_path, PgConfig, PgConfigSelector, Pgrx, PgrxHomeError,
-    SUPPORTED_MAJOR_VERSIONS,
 };
 use rayon::prelude::*;
 
@@ -60,6 +59,9 @@ pub(crate) struct Init {
     /// If installed locally, the path to PG15's `pgconfig` tool, or `download` to have pgrx download/compile/install it
     #[clap(env = "PG15_PG_CONFIG", long)]
     pg15: Option<String>,
+    /// If installed locally, the path to PG16's `pgconfig` tool, or `download` to have pgrx download/compile/install it
+    #[clap(env = "PG16_PG_CONFIG", long)]
+    pg16: Option<String>,
     #[clap(from_global, action = ArgAction::Count)]
     verbose: u8,
     #[clap(long, help = "Base port number")]
@@ -90,10 +92,13 @@ impl CommandExecute for Init {
         if let Some(ref version) = self.pg15 {
             versions.insert("pg15", version.clone());
         }
+        if let Some(ref version) = self.pg16 {
+            versions.insert("pg16", version.clone());
+        }
 
         if versions.is_empty() {
             // no arguments specified, so we'll just install our defaults
-            init_pgrx(&pgrx_default(SUPPORTED_MAJOR_VERSIONS)?, &self)
+            init_pgrx(&pgrx_default()?, &self)
         } else {
             // user specified arguments, so we'll only install those versions of Postgres
             let mut default_pgrx = None;
@@ -102,7 +107,7 @@ impl CommandExecute for Init {
             for (pgver, pg_config_path) in versions {
                 let config = if pg_config_path == "download" {
                     if default_pgrx.is_none() {
-                        default_pgrx = Some(pgrx_default(SUPPORTED_MAJOR_VERSIONS)?);
+                        default_pgrx = Some(pgrx_default()?);
                     }
                     default_pgrx
                         .as_ref()
@@ -174,8 +179,7 @@ pub(crate) fn init_pgrx(pgrx: &Pgrx, init: &Init) -> eyre::Result<()> {
 
     output_configs.sort_by(|a, b| {
         a.major_version()
-            .ok()
-            .expect("could not determine major version")
+            .unwrap_or_else(|e| panic!("{e}:  could not determine major version for: `{:?}`", a))
             .cmp(&b.major_version().ok().expect("could not determine major version"))
     });
     for pg_config in output_configs.iter() {
@@ -205,10 +209,9 @@ fn download_postgres(
     use crate::command::build_agent_for_url;
 
     println!(
-        "{} Postgres v{}.{} from {}",
+        "{} Postgres v{} from {}",
         "  Downloading".bold().green(),
-        pg_config.major_version()?,
-        pg_config.minor_version()?,
+        pg_config.version()?,
         pg_config.url().expect("no url"),
     );
     let url = pg_config.url().expect("no url for pg_config").as_str();
@@ -234,7 +237,7 @@ fn download_postgres(
 
 fn untar(bytes: &[u8], pgrxdir: &PathBuf, pg_config: &PgConfig) -> eyre::Result<PathBuf> {
     let mut pgdir = pgrxdir.clone();
-    pgdir.push(format!("{}.{}", pg_config.major_version()?, pg_config.minor_version()?));
+    pgdir.push(&pg_config.version()?);
     if pgdir.exists() {
         // delete everything at this path if it already exists
         println!("{} {}", "     Removing".bold().green(), pgdir.display());
@@ -243,10 +246,9 @@ fn untar(bytes: &[u8], pgrxdir: &PathBuf, pg_config: &PgConfig) -> eyre::Result<
     std::fs::create_dir_all(&pgdir)?;
 
     println!(
-        "{} Postgres v{}.{} to {}",
+        "{} Postgres v{} to {}",
         "    Untarring".bold().green(),
-        pg_config.major_version()?,
-        pg_config.minor_version()?,
+        pg_config.version()?,
         pgdir.display()
     );
     let mut child = std::process::Command::new("tar")
@@ -274,12 +276,7 @@ fn untar(bytes: &[u8], pgrxdir: &PathBuf, pg_config: &PgConfig) -> eyre::Result<
 }
 
 fn configure_postgres(pg_config: &PgConfig, pgdir: &PathBuf, init: &Init) -> eyre::Result<()> {
-    println!(
-        "{} Postgres v{}.{}",
-        "  Configuring".bold().green(),
-        pg_config.major_version()?,
-        pg_config.minor_version()?
-    );
+    println!("{} Postgres v{}", "  Configuring".bold().green(), pg_config.version()?);
     let mut configure_path = pgdir.clone();
     configure_path.push("configure");
     let mut command = std::process::Command::new(configure_path);
@@ -325,12 +322,7 @@ fn configure_postgres(pg_config: &PgConfig, pgdir: &PathBuf, init: &Init) -> eyr
 
 fn make_postgres(pg_config: &PgConfig, pgdir: &PathBuf) -> eyre::Result<()> {
     let num_cpus = 1.max(num_cpus::get() / 3);
-    println!(
-        "{} Postgres v{}.{}",
-        "    Compiling".bold().green(),
-        pg_config.major_version()?,
-        pg_config.minor_version()?
-    );
+    println!("{} Postgres v{}", "    Compiling".bold().green(), pg_config.version()?);
     let mut command = std::process::Command::new("make");
 
     command
@@ -366,10 +358,9 @@ fn make_postgres(pg_config: &PgConfig, pgdir: &PathBuf) -> eyre::Result<()> {
 
 fn make_install_postgres(version: &PgConfig, pgdir: &PathBuf) -> eyre::Result<PgConfig> {
     println!(
-        "{} Postgres v{}.{} to {}",
+        "{} Postgres v{} to {}",
         "   Installing".bold().green(),
-        version.major_version()?,
-        version.minor_version()?,
+        version.version()?,
         get_pg_installdir(pgdir).display()
     );
     let mut command = std::process::Command::new("make");

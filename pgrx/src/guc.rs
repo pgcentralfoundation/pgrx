@@ -94,7 +94,7 @@ bitflags! {
         /// Include in `EXPLAIN` output
         #[cfg(not(feature = "pg11"))]
         const EXPLAIN = pg_sys::GUC_EXPLAIN as i32;
-        #[cfg(feature = "pg15")]
+        #[cfg(any(feature = "pg15", feature = "pg16"))]
         /// `RUNTIME_COMPUTED` is intended for runtime-computed GUCs that are only available via
         /// `postgres -C` if the server is not running
         const RUNTIME_COMPUTED = pg_sys::GUC_RUNTIME_COMPUTED as i32;
@@ -102,7 +102,7 @@ bitflags! {
 }
 
 /// A trait that can be derived using [`PostgresGucEnum`] on enums, such that they can be
-/// usad as a GUC.
+/// used as a GUC.
 pub trait GucEnum<T>
 where
     T: Copy,
@@ -114,72 +114,78 @@ where
 
 /// A safe wrapper around a global variable that can be edited through a GUC
 pub struct GucSetting<T> {
-    value: Cell<T>,
-    char_p: Cell<*mut std::os::raw::c_char>,
-    enum_o: Cell<i32>,
-}
-
-impl<T> GucSetting<T> {
-    pub const fn new(value: T) -> Self {
-        GucSetting {
-            value: Cell::new(value),
-            char_p: Cell::new(std::ptr::null_mut()),
-            enum_o: Cell::new(0),
-        }
-    }
+    value: Cell<usize>,
+    boot_val: T,
 }
 
 unsafe impl Sync for GucSetting<bool> {}
 impl GucSetting<bool> {
-    pub fn get(&self) -> bool {
-        self.value.get()
+    pub const fn new(value: bool) -> Self {
+        GucSetting { value: Cell::new(value as usize), boot_val: value }
     }
 
-    unsafe fn as_ptr(&self) -> *mut bool {
-        self.value.as_ptr()
+    pub fn get(&self) -> bool {
+        self.value.get() == 1
+    }
+
+    fn as_ptr(&self) -> *mut bool {
+        self.value.as_ptr() as *mut _
     }
 }
 
 unsafe impl Sync for GucSetting<i32> {}
 impl GucSetting<i32> {
-    pub fn get(&self) -> i32 {
-        self.value.get()
+    pub const fn new(value: i32) -> Self {
+        GucSetting { value: Cell::new(value as usize), boot_val: value }
     }
 
-    unsafe fn as_ptr(&self) -> *mut i32 {
-        self.value.as_ptr()
+    pub fn get(&self) -> i32 {
+        self.value.get() as i32
+    }
+
+    fn as_ptr(&self) -> *mut i32 {
+        self.value.as_ptr() as *mut _
     }
 }
 
 unsafe impl Sync for GucSetting<f64> {}
 impl GucSetting<f64> {
-    pub fn get(&self) -> f64 {
-        self.value.get()
-    }
-
-    unsafe fn as_ptr(&self) -> *mut f64 {
-        self.value.as_ptr()
-    }
-}
-
-unsafe impl Sync for GucSetting<Option<&'static str>> {}
-impl GucSetting<Option<&'static str>> {
-    pub fn get(&self) -> Option<String> {
-        let ptr = self.get_char_ptr();
-        if ptr.is_null() {
-            None
-        } else {
-            let cstr = unsafe { CStr::from_ptr(ptr) };
-            Some(cstr.to_str().unwrap().to_owned())
+    pub const fn new(value: f64) -> Self {
+        unsafe {
+            GucSetting {
+                value: Cell::new(std::mem::transmute::<f64, u64>(value) as usize),
+                boot_val: value,
+            }
         }
     }
 
-    pub fn get_char_ptr(&self) -> *mut std::os::raw::c_char {
-        unsafe { *self.char_p.as_ptr() }
+    pub fn get(&self) -> f64 {
+        f64::from_bits(self.value.get() as u64)
     }
 
-    unsafe fn as_ptr(&self) -> *mut *mut std::os::raw::c_char {
-        self.char_p.as_ptr()
+    fn as_ptr(&self) -> *mut f64 {
+        self.value.as_ptr() as *mut _
+    }
+}
+
+unsafe impl Sync for GucSetting<Option<&'static CStr>> {}
+impl GucSetting<Option<&'static CStr>> {
+    pub const fn new(value: Option<&'static CStr>) -> Self {
+        GucSetting { value: Cell::new(0), boot_val: value }
+    }
+
+    pub fn get(&self) -> Option<&CStr> {
+        unsafe {
+            if self.value.get() == 0 {
+                None
+            } else {
+                Some(CStr::from_ptr(self.value.get() as *const _))
+            }
+        }
+    }
+
+    fn as_ptr(&self) -> *mut *mut std::os::raw::c_char {
+        self.value.as_ptr() as *mut *mut std::os::raw::c_char
     }
 }
 
@@ -188,12 +194,16 @@ impl<T> GucSetting<T>
 where
     T: GucEnum<T> + Copy,
 {
+    pub const fn new(value: T) -> Self {
+        GucSetting { value: Cell::new(0), boot_val: value }
+    }
+
     pub fn get(&self) -> T {
-        T::from_ordinal(self.enum_o.get())
+        T::from_ordinal(self.value.get() as _)
     }
 
     pub fn as_ptr(&self) -> *mut i32 {
-        self.enum_o.as_ptr()
+        self.value.as_ptr() as *mut _
     }
 }
 
@@ -220,7 +230,7 @@ impl GucRegistry {
                 None,
                 None,
                 None,
-            )
+            );
         }
     }
 
@@ -256,28 +266,25 @@ impl GucRegistry {
         name: &str,
         short_description: &str,
         long_description: &str,
-        setting: &GucSetting<Option<&'static str>>,
+        setting: &GucSetting<Option<&'static CStr>>,
         context: GucContext,
         flags: GucFlags,
     ) {
         unsafe {
-            let boot_value = match setting.value.get() {
-                Some(s) => PgMemoryContexts::TopMemoryContext.pstrdup(s),
-                None => std::ptr::null_mut(),
-            };
-
+            let boot_val = setting.boot_val.map_or(std::ptr::null(), |s| s.as_ptr());
+            *setting.as_ptr() = boot_val as *mut _;
             pg_sys::DefineCustomStringVariable(
                 PgMemoryContexts::TopMemoryContext.pstrdup(name),
                 PgMemoryContexts::TopMemoryContext.pstrdup(short_description),
                 PgMemoryContexts::TopMemoryContext.pstrdup(long_description),
                 setting.as_ptr(),
-                boot_value,
+                boot_val,
                 context as isize as u32,
                 flags.bits(),
                 None,
                 None,
                 None,
-            )
+            );
         }
     }
 
@@ -297,7 +304,7 @@ impl GucRegistry {
                 PgMemoryContexts::TopMemoryContext.pstrdup(short_description),
                 PgMemoryContexts::TopMemoryContext.pstrdup(long_description),
                 setting.as_ptr(),
-                setting.get(),
+                setting.boot_val,
                 min_value,
                 max_value,
                 context as isize as u32,
@@ -305,7 +312,7 @@ impl GucRegistry {
                 None,
                 None,
                 None,
-            )
+            );
         }
     }
 
@@ -320,19 +327,21 @@ impl GucRegistry {
         T: GucEnum<T> + Copy,
     {
         unsafe {
+            let boot_val = setting.boot_val.to_ordinal();
+            (*setting.as_ptr()) = boot_val;
             pg_sys::DefineCustomEnumVariable(
                 PgMemoryContexts::TopMemoryContext.pstrdup(name),
                 PgMemoryContexts::TopMemoryContext.pstrdup(short_description),
                 PgMemoryContexts::TopMemoryContext.pstrdup(long_description),
                 setting.as_ptr(),
-                setting.value.get().to_ordinal(),
-                setting.value.get().config_matrix(),
+                boot_val,
+                setting.get().config_matrix(),
                 context as isize as u32,
                 flags.bits(),
                 None,
                 None,
                 None,
-            )
+            );
         }
     }
 }

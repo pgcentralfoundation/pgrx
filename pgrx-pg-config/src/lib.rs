@@ -55,22 +55,56 @@ pub fn get_c_locale_flags() -> &'static [&'static str] {
 mod path_methods;
 pub use path_methods::{get_target_dir, prefix_path};
 
+#[derive(Copy, Clone, Debug, Eq, PartialEq)]
+pub enum PgMinorVersion {
+    Latest,
+    Release(u16),
+    Beta(u16),
+    Rc(u16),
+}
+
+impl Display for PgMinorVersion {
+    fn fmt(&self, f: &mut Formatter<'_>) -> fmt::Result {
+        match self {
+            PgMinorVersion::Latest => write!(f, ".LATEST"),
+            PgMinorVersion::Release(v) => write!(f, ".{}", v),
+            PgMinorVersion::Beta(v) => write!(f, "beta{}", v),
+            PgMinorVersion::Rc(v) => write!(f, "rc{}", v),
+        }
+    }
+}
+
+impl PgMinorVersion {
+    fn version(&self) -> Option<u16> {
+        match self {
+            PgMinorVersion::Latest => None,
+            PgMinorVersion::Release(v) | PgMinorVersion::Beta(v) | PgMinorVersion::Rc(v) => {
+                Some(*v)
+            }
+        }
+    }
+}
+
 #[derive(Clone, Debug)]
 pub struct PgVersion {
-    major: u16,
-    minor: u16,
-    url: Url,
+    pub major: u16,
+    pub minor: PgMinorVersion,
+    pub url: Option<Url>,
 }
 
 impl PgVersion {
-    pub fn new(major: u16, minor: u16, url: Url) -> PgVersion {
+    pub const fn new(major: u16, minor: PgMinorVersion, url: Option<Url>) -> PgVersion {
         PgVersion { major, minor, url }
+    }
+
+    pub fn minor(&self) -> Option<u16> {
+        self.minor.version()
     }
 }
 
 impl Display for PgVersion {
     fn fmt(&self, f: &mut Formatter<'_>) -> fmt::Result {
-        write!(f, "{}.{}", self.major, self.minor)
+        write!(f, "{}{}", self.major, self.minor)
     }
 }
 
@@ -85,13 +119,7 @@ pub struct PgConfig {
 
 impl Display for PgConfig {
     fn fmt(&self, f: &mut Formatter<'_>) -> fmt::Result {
-        let major = self.major_version().expect("could not determine major version");
-        let minor = self.minor_version().expect("could not determine minor version");
-        let path = match self.pg_config.as_ref() {
-            Some(path) => path.display().to_string(),
-            None => self.version.as_ref().unwrap().url.to_string(),
-        };
-        write!(f, "{}.{}={}", major, minor, path)
+        write!(f, "{}", self.version().expect("failed to create version string"))
     }
 }
 
@@ -193,16 +221,32 @@ impl PgConfig {
         self.path().unwrap().parent().unwrap().to_path_buf()
     }
 
-    fn parse_version_str(version_str: &str) -> eyre::Result<(u16, u16)> {
+    fn parse_version_str(version_str: &str) -> eyre::Result<(u16, PgMinorVersion)> {
         let version_parts = version_str.split_whitespace().collect::<Vec<&str>>();
-        let version = version_parts
+        let mut version = version_parts
             .get(1)
             .ok_or_else(|| eyre!("invalid version string: {}", version_str))?
             .split('.')
             .collect::<Vec<&str>>();
-        if version.len() < 2 {
-            return Err(eyre!("invalid version string: {}", version_str));
+
+        let mut beta = false;
+        let mut rc = false;
+
+        if version.len() == 1 {
+            // it's hopefully a "beta" or "rc" release
+            let first = &version[0];
+
+            if first.contains("beta") {
+                beta = true;
+                version = first.split("beta").collect();
+            } else if first.contains("rc") {
+                rc = true;
+                version = first.split("rc").collect();
+            } else {
+                return Err(eyre!("invalid version string: {}", version_str));
+            }
         }
+
         let major = u16::from_str(version[0])
             .map_err(|e| eyre!("invalid major version number `{}`: {:?}", version[0], e))?;
         let mut minor = version[1];
@@ -216,10 +260,17 @@ impl PgConfig {
         minor = &minor[0..end_index];
         let minor = u16::from_str(minor)
             .map_err(|e| eyre!("invalid minor version number `{}`: {:?}", minor, e))?;
+        let minor = if beta {
+            PgMinorVersion::Beta(minor)
+        } else if rc {
+            PgMinorVersion::Rc(minor)
+        } else {
+            PgMinorVersion::Release(minor)
+        };
         return Ok((major, minor));
     }
 
-    fn get_version(&self) -> eyre::Result<(u16, u16)> {
+    fn get_version(&self) -> eyre::Result<(u16, PgMinorVersion)> {
         let version_string = self.run("--version")?;
         Self::parse_version_str(&version_string)
     }
@@ -231,7 +282,7 @@ impl PgConfig {
         }
     }
 
-    pub fn minor_version(&self) -> eyre::Result<u16> {
+    fn minor_version(&self) -> eyre::Result<PgMinorVersion> {
         match &self.version {
             Some(version) => Ok(version.minor),
             None => Ok(self.get_version()?.1),
@@ -239,15 +290,20 @@ impl PgConfig {
     }
 
     pub fn version(&self) -> eyre::Result<String> {
-        let major = self.major_version()?;
-        let minor = self.minor_version()?;
-        let version = format!("{}.{}", major, minor);
-        Ok(version)
+        match self.version.as_ref() {
+            Some(pgver) => Ok(pgver.to_string()),
+            None => {
+                let major = self.major_version()?;
+                let minor = self.minor_version()?;
+                let version = format!("{}{}", major, minor);
+                Ok(version)
+            }
+        }
     }
 
     pub fn url(&self) -> Option<&Url> {
         match &self.version {
-            Some(version) => Some(&version.url),
+            Some(version) => version.url.as_ref(),
             None => None,
         }
     }
@@ -270,7 +326,8 @@ impl PgConfig {
 
     pub fn postmaster_path(&self) -> eyre::Result<PathBuf> {
         let mut path = self.bin_dir()?;
-        path.push("postmaster");
+        path.push("postgres");
+
         Ok(path)
     }
 
@@ -541,8 +598,8 @@ impl Pgrx {
     /// Returns true if the specified `label` represents a Postgres version number feature flag,
     /// such as `pg14` or `pg15`
     pub fn is_feature_flag(&self, label: &str) -> bool {
-        for v in SUPPORTED_MAJOR_VERSIONS {
-            if label == &format!("pg{}", v) {
+        for pgver in SUPPORTED_VERSIONS() {
+            if label == &format!("pg{}", pgver.major) {
                 return true;
             }
         }
@@ -588,7 +645,30 @@ impl Pgrx {
     }
 }
 
-pub const SUPPORTED_MAJOR_VERSIONS: &[u16] = &[11, 12, 13, 14, 15];
+#[allow(non_snake_case)]
+pub fn SUPPORTED_VERSIONS() -> Vec<PgVersion> {
+    vec![
+        PgVersion::new(11, PgMinorVersion::Latest, None),
+        PgVersion::new(12, PgMinorVersion::Latest, None),
+        PgVersion::new(13, PgMinorVersion::Latest, None),
+        PgVersion::new(14, PgMinorVersion::Latest, None),
+        PgVersion::new(15, PgMinorVersion::Latest, None),
+        PgVersion::new(
+            16,
+            PgMinorVersion::Beta(1),
+            Some(
+                Url::parse(
+                    "https://ftp.postgresql.org/pub/source/v16beta1/postgresql-16beta1.tar.bz2",
+                )
+                .expect("invalid url for v16beta1"),
+            ),
+        ),
+    ]
+}
+
+pub fn is_supported_major_version(v: u16) -> bool {
+    SUPPORTED_VERSIONS().into_iter().any(|pgver| pgver.major == v)
+}
 
 pub fn createdb(
     pg_config: &PgConfig,
@@ -696,7 +776,7 @@ fn parse_version() {
         let (major, minor) =
             PgConfig::parse_version_str(s).expect("Unable to parse version string");
         assert_eq!(major, major_expected, "Major version should match");
-        assert_eq!(minor, minor_expected, "Minor version should match");
+        assert_eq!(minor.version(), Some(minor_expected), "Minor version should match");
     }
 
     // Check some invalid version strings
@@ -725,7 +805,11 @@ fn from_empty_env() -> eyre::Result<()> {
 
     let pg_config = PgConfig::from_env().unwrap();
     assert_eq!(pg_config.major_version()?, 15, "Major version should match");
-    assert_eq!(pg_config.minor_version()?, 1, "Minor version should match");
+    assert_eq!(
+        pg_config.minor_version()?,
+        PgMinorVersion::Release(1),
+        "Minor version should match"
+    );
     assert_eq!(
         pg_config.includedir_server()?,
         PathBuf::from("/path/to/server/headers"),

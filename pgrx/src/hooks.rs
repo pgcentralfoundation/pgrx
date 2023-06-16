@@ -20,7 +20,7 @@ use std::ops::Deref;
 // that option will always be set to None at runtime.
 pub struct JumbleState {}
 
-#[cfg(any(feature = "pg14", feature = "pg15"))]
+#[cfg(any(feature = "pg14", feature = "pg15", feature = "pg16"))]
 pub use pg_sys::JumbleState;
 
 pub struct HookResult<T> {
@@ -100,13 +100,15 @@ pub trait PgHooks {
     fn executor_check_perms(
         &mut self,
         range_table: PgList<*mut pg_sys::RangeTblEntry>,
+        rte_perm_infos: Option<*mut pg_sys::List>,
         ereport_on_violation: bool,
         prev_hook: fn(
             range_table: PgList<*mut pg_sys::RangeTblEntry>,
+            rte_perm_infos: Option<*mut pg_sys::List>,
             ereport_on_violation: bool,
         ) -> HookResult<bool>,
     ) -> HookResult<bool> {
-        prev_hook(range_table, ereport_on_violation)
+        prev_hook(range_table, rte_perm_infos, ereport_on_violation)
     }
 
     /// Hook for plugins to get control in `ProcessUtility()`
@@ -201,6 +203,16 @@ pub unsafe fn register_hook(hook: &'static mut (dyn PgHooks)) {
     if HOOKS.is_some() {
         panic!("PgHook instance already registered");
     }
+    #[cfg(not(feature = "pg16"))]
+    let prev_executor_check_perms_hook = pg_sys::ExecutorCheckPerms_hook
+        .replace(pgrx_executor_check_perms)
+        .or(Some(pgrx_standard_executor_check_perms_wrapper));
+
+    #[cfg(feature = "pg16")]
+    let prev_executor_check_perms_hook = pg_sys::ExecutorCheckPerms_hook
+        .replace(pgrx_executor_check_perms)
+        .or(Some(pgrx_standard_executor_check_perms_wrapper));
+
     HOOKS = Some(Hooks {
         current_hook: Box::new(hook),
         prev_executor_start_hook: pg_sys::ExecutorStart_hook
@@ -215,9 +227,7 @@ pub unsafe fn register_hook(hook: &'static mut (dyn PgHooks)) {
         prev_executor_end_hook: pg_sys::ExecutorEnd_hook
             .replace(pgrx_executor_end)
             .or(Some(pgrx_standard_executor_end_wrapper)),
-        prev_executor_check_perms_hook: pg_sys::ExecutorCheckPerms_hook
-            .replace(pgrx_executor_check_perms)
-            .or(Some(pgrx_standard_executor_check_perms_wrapper)),
+        prev_executor_check_perms_hook,
         prev_process_utility_hook: pg_sys::ProcessUtility_hook
             .replace(pgrx_process_utility)
             .or(Some(pgrx_standard_process_utility_wrapper)),
@@ -311,6 +321,7 @@ unsafe extern "C" fn pgrx_executor_end(query_desc: *mut pg_sys::QueryDesc) {
     hook.executor_end(PgBox::from_pg(query_desc), prev);
 }
 
+#[cfg(not(feature = "pg16"))]
 #[pg_guard]
 unsafe extern "C" fn pgrx_executor_check_perms(
     range_table: *mut pg_sys::List,
@@ -318,6 +329,7 @@ unsafe extern "C" fn pgrx_executor_check_perms(
 ) -> bool {
     fn prev(
         range_table: PgList<*mut pg_sys::RangeTblEntry>,
+        _rte_perm_infos: Option<*mut pg_sys::List>,
         ereport_on_violation: bool,
     ) -> HookResult<bool> {
         HookResult::new(unsafe {
@@ -328,7 +340,37 @@ unsafe extern "C" fn pgrx_executor_check_perms(
         })
     }
     let hook = &mut HOOKS.as_mut().unwrap().current_hook;
-    hook.executor_check_perms(PgList::from_pg(range_table), ereport_on_violation, prev).inner
+    hook.executor_check_perms(PgList::from_pg(range_table), None, ereport_on_violation, prev).inner
+}
+
+#[cfg(feature = "pg16")]
+#[pg_guard]
+unsafe extern "C" fn pgrx_executor_check_perms(
+    range_table: *mut pg_sys::List,
+    rte_perm_infos: *mut pg_sys::List,
+    ereport_on_violation: bool,
+) -> bool {
+    fn prev(
+        range_table: PgList<*mut pg_sys::RangeTblEntry>,
+        rte_perm_infos: Option<*mut pg_sys::List>,
+        ereport_on_violation: bool,
+    ) -> HookResult<bool> {
+        HookResult::new(unsafe {
+            (HOOKS.as_mut().unwrap().prev_executor_check_perms_hook.as_ref().unwrap())(
+                range_table.into_pg(),
+                rte_perm_infos.unwrap_or(std::ptr::null_mut()),
+                ereport_on_violation,
+            )
+        })
+    }
+    let hook = &mut HOOKS.as_mut().unwrap().current_hook;
+    hook.executor_check_perms(
+        PgList::from_pg(range_table),
+        Some(rte_perm_infos),
+        ereport_on_violation,
+        prev,
+    )
+    .inner
 }
 
 #[cfg(any(feature = "pg11", feature = "pg12", feature = "pg13"))]
@@ -379,7 +421,7 @@ unsafe extern "C" fn pgrx_process_utility(
     )
     .inner
 }
-#[cfg(any(feature = "pg14", feature = "pg15"))]
+#[cfg(any(feature = "pg14", feature = "pg15", feature = "pg16"))]
 #[pg_guard]
 unsafe extern "C" fn pgrx_process_utility(
     pstmt: *mut pg_sys::PlannedStmt,
@@ -440,7 +482,7 @@ unsafe extern "C" fn pgrx_planner(
     pgrx_planner_impl(parse, std::ptr::null(), cursor_options, bound_params)
 }
 
-#[cfg(any(feature = "pg13", feature = "pg14", feature = "pg15"))]
+#[cfg(any(feature = "pg13", feature = "pg14", feature = "pg15", feature = "pg16"))]
 #[pg_guard]
 unsafe extern "C" fn pgrx_planner(
     parse: *mut pg_sys::Query,
@@ -474,7 +516,7 @@ unsafe extern "C" fn pgrx_planner_impl(
                 )
             }
 
-            #[cfg(any(feature = "pg13", feature = "pg14", feature = "pg15"))]
+            #[cfg(any(feature = "pg13", feature = "pg14", feature = "pg15", feature = "pg16"))]
             {
                 (HOOKS.as_mut().unwrap().prev_planner_hook.as_ref().unwrap())(
                     parse.into_pg(),
@@ -519,7 +561,7 @@ unsafe extern "C" fn pgrx_post_parse_analyze(
     hook.post_parse_analyze(PgBox::from_pg(parse_state), PgBox::from_pg(query), None, prev).inner
 }
 
-#[cfg(any(feature = "pg14", feature = "pg15"))]
+#[cfg(any(feature = "pg14", feature = "pg15", feature = "pg16"))]
 #[pg_guard]
 unsafe extern "C" fn pgrx_post_parse_analyze(
     parse_state: *mut pg_sys::ParseState,
@@ -594,9 +636,20 @@ unsafe extern "C" fn pgrx_standard_executor_end_wrapper(query_desc: *mut pg_sys:
     pg_sys::standard_ExecutorEnd(query_desc)
 }
 
+#[cfg(not(feature = "pg16"))]
 #[pg_guard]
 unsafe extern "C" fn pgrx_standard_executor_check_perms_wrapper(
     _range_table: *mut pg_sys::List,
+    _ereport_on_violation: bool,
+) -> bool {
+    true
+}
+
+#[cfg(feature = "pg16")]
+#[pg_guard]
+unsafe extern "C" fn pgrx_standard_executor_check_perms_wrapper(
+    _range_table: *mut pg_sys::List,
+    _rte_perm_infos: *mut pg_sys::List,
     _ereport_on_violation: bool,
 ) -> bool {
     true
@@ -624,7 +677,7 @@ unsafe extern "C" fn pgrx_standard_process_utility_wrapper(
     )
 }
 
-#[cfg(any(feature = "pg14", feature = "pg15"))]
+#[cfg(any(feature = "pg14", feature = "pg15", feature = "pg16"))]
 #[pg_guard]
 unsafe extern "C" fn pgrx_standard_process_utility_wrapper(
     pstmt: *mut pg_sys::PlannedStmt,
@@ -658,7 +711,7 @@ unsafe extern "C" fn pgrx_standard_planner_wrapper(
     pg_sys::standard_planner(parse, cursor_options, bound_params)
 }
 
-#[cfg(any(feature = "pg13", feature = "pg14", feature = "pg15"))]
+#[cfg(any(feature = "pg13", feature = "pg14", feature = "pg15", feature = "pg16"))]
 #[pg_guard]
 unsafe extern "C" fn pgrx_standard_planner_wrapper(
     parse: *mut pg_sys::Query,
