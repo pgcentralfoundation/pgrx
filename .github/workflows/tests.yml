@@ -116,8 +116,6 @@ jobs:
         sudo apt-get update -y -qq --fix-missing
         echo ""
 
-        sudo apt search postgresql
-
         sudo apt-get install -y \
           postgresql-$PG_VER \
           postgresql-server-dev-$PG_VER
