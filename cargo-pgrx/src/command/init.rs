@@ -231,7 +231,7 @@ fn download_postgres(
 
 fn untar(bytes: &[u8], pgrxdir: &PathBuf, pg_config: &PgConfig) -> eyre::Result<PathBuf> {
     let mut pgdir = pgrxdir.clone();
-    pgdir.push(format!("{}", pg_config.version()?));
+    pgdir.push(&pg_config.version()?);
     if pgdir.exists() {
         // delete everything at this path if it already exists
         println!("{} {}", "     Removing".bold().green(), pgdir.display());

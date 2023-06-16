@@ -23,7 +23,7 @@ mod rss {
     pub(super) struct PostgreSQLVersionRss;
 
     impl PostgreSQLVersionRss {
-        pub(super) fn new(supported_verions: &[PgVersion]) -> eyre::Result<Vec<PgVersion>> {
+        pub(super) fn new(supported_versions: &[PgVersion]) -> eyre::Result<Vec<PgVersion>> {
             static VERSIONS_RSS_URL: &str = "https://www.postgresql.org/versions.rss";
 
             let http_client = build_agent_for_url(VERSIONS_RSS_URL)?;
@@ -38,7 +38,7 @@ mod rss {
             };
 
             let mut versions: BTreeMap<u16, PgVersion> = BTreeMap::from_iter(
-                supported_verions.iter().map(|pgver| (pgver.major, pgver.clone())),
+                supported_versions.iter().map(|pgver| (pgver.major, pgver.clone())),
             );
 
             for item in rss.channel.item {

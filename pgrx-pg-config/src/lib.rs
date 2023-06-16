@@ -241,7 +241,7 @@ impl PgConfig {
                 version = first.split("beta").collect();
             } else if first.contains("rc") {
                 rc = true;
-                version = first.split("beta").collect();
+                version = first.split("rc").collect();
             } else {
                 return Err(eyre!("invalid version string: {}", version_str));
             }
@@ -326,12 +326,8 @@ impl PgConfig {
 
     pub fn postmaster_path(&self) -> eyre::Result<PathBuf> {
         let mut path = self.bin_dir()?;
+        path.push("postgres");
 
-        if self.major_version()? > 15 {
-            path.push("postgres")
-        } else {
-            path.push("postmaster");
-        }
         Ok(path)
     }
 
@@ -671,13 +667,7 @@ pub fn SUPPORTED_VERSIONS() -> Vec<PgVersion> {
 }
 
 pub fn is_supported_major_version(v: u16) -> bool {
-    for pgver in SUPPORTED_VERSIONS() {
-        if v == pgver.major {
-            return true;
-        }
-    }
-
-    false
+    SUPPORTED_VERSIONS().into_iter().any(|pgver| pgver.major == v)
 }
 
 pub fn createdb(

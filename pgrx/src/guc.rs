@@ -185,7 +185,7 @@ impl GucSetting<Option<&'static CStr>> {
     }
 
     fn as_ptr(&self) -> *mut *mut std::os::raw::c_char {
-        self.value.as_ptr() as *mut std::os::raw::c_char as *mut _
+        self.value.as_ptr() as *mut *mut std::os::raw::c_char
     }
 }
 
