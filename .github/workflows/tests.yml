@@ -60,7 +60,7 @@ jobs:
         echo ""
 
         echo "----- Install system dependencies -----"
-        sudo apt-get update && apt-get install -y \
+        sudo apt-get update && sudo apt-get install -y \
           clang-10 \
           llvm-10 \
           clang \
