@@ -78,11 +78,16 @@ mod tests {
             fn executor_check_perms(
                 &mut self,
                 range_table: PgList<*mut RangeTblEntry>,
+                rte_perm_infos: Option<*mut pg_sys::List>,
                 ereport_on_violation: bool,
-                prev_hook: fn(PgList<*mut RangeTblEntry>, bool) -> HookResult<bool>,
+                prev_hook: fn(
+                    PgList<*mut RangeTblEntry>,
+                    Option<*mut pg_sys::List>,
+                    bool,
+                ) -> HookResult<bool>,
             ) -> HookResult<bool> {
                 self.events += 1;
-                prev_hook(range_table, ereport_on_violation)
+                prev_hook(range_table, rte_perm_infos, ereport_on_violation)
             }
 
             fn planner(

@@ -16,16 +16,20 @@ fn crash() {
     #[cfg(feature = "cshim")]
     {
         use pgrx::PgList;
-        unsafe {
-            let mut node = PgList::<pg_sys::Node>::new();
-            node.push(PgList::<pg_sys::Node>::new().into_pg() as *mut pg_sys::Node);
+        let mut node = PgList::<pg_sys::Node>::new();
+        node.push(PgList::<pg_sys::Node>::new().into_pg() as *mut pg_sys::Node);
 
+        #[cfg(not(feature = "pg16"))]
+        unsafe {
             pg_sys::raw_expression_tree_walker(
                 node.into_pg() as *mut pg_sys::Node,
                 Some(walker),
                 std::ptr::null_mut(),
             );
         }
+
+        #[cfg(feature = "pg16")]
+        error!("panic in walker");
     }
 
     #[cfg(not(feature = "cshim"))]
@@ -39,7 +43,7 @@ fn walker() -> bool {
     panic!("panic in walker");
 }
 
-#[cfg(feature = "cshim")]
+#[cfg(all(feature = "cshim", not(feature = "pg16")))]
 #[pg_guard]
 extern "C" fn walker() -> bool {
     panic!("panic in walker");
