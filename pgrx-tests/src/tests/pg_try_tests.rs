@@ -19,7 +19,13 @@ fn crash() {
         let mut node = PgList::<pg_sys::Node>::new();
         node.push(PgList::<pg_sys::Node>::new().into_pg() as *mut pg_sys::Node);
 
-        #[cfg(not(feature = "pg16"))]
+        #[cfg(any(
+            feature = "pg11",
+            feature = "pg12",
+            feature = "pg13",
+            feature = "pg14",
+            feature = "pg15"
+        ))]
         unsafe {
             pg_sys::raw_expression_tree_walker(
                 node.into_pg() as *mut pg_sys::Node,
@@ -43,7 +49,10 @@ fn walker() -> bool {
     panic!("panic in walker");
 }
 
-#[cfg(all(feature = "cshim", not(feature = "pg16")))]
+#[cfg(all(
+    feature = "cshim",
+    any(feature = "pg11", feature = "pg12", feature = "pg13", feature = "pg14", feature = "pg15")
+))]
 #[pg_guard]
 extern "C" fn walker() -> bool {
     panic!("panic in walker");

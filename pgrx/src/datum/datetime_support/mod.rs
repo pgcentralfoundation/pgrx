@@ -563,7 +563,13 @@ pub fn get_timezone_offset<Tz: AsRef<str>>(zone: Tz) -> Result<i32, DateTimeConv
     .execute()
 }
 
-#[cfg(not(feature = "pg16"))]
+#[cfg(any(
+    feature = "pg11",
+    feature = "pg12",
+    feature = "pg13",
+    feature = "pg14",
+    feature = "pg15"
+))]
 pub fn get_timezone_offset<Tz: AsRef<str>>(zone: Tz) -> Result<i32, DateTimeConversionError> {
     /*
      * Look up the requested timezone.  First we look in the timezone
@@ -586,7 +592,13 @@ pub fn get_timezone_offset<Tz: AsRef<str>>(zone: Tz) -> Result<i32, DateTimeConv
             pg_sys::downcase_truncate_identifier(tzname.as_ptr(), zone.as_ref().len() as _, false);
 
         tztype = {
-            #[cfg(not(feature = "pg16"))]
+            #[cfg(any(
+                feature = "pg11",
+                feature = "pg12",
+                feature = "pg13",
+                feature = "pg14",
+                feature = "pg15"
+            ))]
             {
                 pg_sys::DecodeTimezoneAbbrev(0, lowzone, &mut val, &mut tzp) as u32
             }
