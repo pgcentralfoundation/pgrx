@@ -63,7 +63,7 @@ impl TryFrom<pg_sys::Datum> for Date {
 
     #[inline]
     fn try_from(datum: pg_sys::Datum) -> Result<Self, Self::Error> {
-        pg_sys::DateADT::try_from(datum.value() as isize).map(|d| Date(d))
+        Ok(Date(datum.value() as pg_sys::DateADT))
     }
 }
 
