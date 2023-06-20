@@ -580,6 +580,5 @@ mod tests {
         let first = array.into_iter().next();
         assert_eq!(first, Some(Some(Date::from_str("1977-07-04")?)));
         Ok(())
-
     }
 }
