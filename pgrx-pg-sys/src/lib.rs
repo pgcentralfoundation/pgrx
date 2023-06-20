@@ -383,7 +383,13 @@ mod all_versions {
     ) -> pg_sys::MemoryContext {
         // Postgres versions <16 don't export the "GetMemoryChunkContext" function.  It's a "static inline"
         // function in `memutils.h`, so we port it to Rust right here
-        #[cfg(not(feature = "pg16"))]
+        #[cfg(any(
+            feature = "pg11",
+            feature = "pg12",
+            feature = "pg13",
+            feature = "pg14",
+            feature = "pg15"
+        ))]
         {
             /*
              * Try to detect bogus pointers handed to us, poorly though we can.

@@ -203,7 +203,13 @@ pub unsafe fn register_hook(hook: &'static mut (dyn PgHooks)) {
     if HOOKS.is_some() {
         panic!("PgHook instance already registered");
     }
-    #[cfg(not(feature = "pg16"))]
+    #[cfg(any(
+        feature = "pg11",
+        feature = "pg12",
+        feature = "pg13",
+        feature = "pg14",
+        feature = "pg15"
+    ))]
     let prev_executor_check_perms_hook = pg_sys::ExecutorCheckPerms_hook
         .replace(pgrx_executor_check_perms)
         .or(Some(pgrx_standard_executor_check_perms_wrapper));
@@ -321,7 +327,13 @@ unsafe extern "C" fn pgrx_executor_end(query_desc: *mut pg_sys::QueryDesc) {
     hook.executor_end(PgBox::from_pg(query_desc), prev);
 }
 
-#[cfg(not(feature = "pg16"))]
+#[cfg(any(
+    feature = "pg11",
+    feature = "pg12",
+    feature = "pg13",
+    feature = "pg14",
+    feature = "pg15"
+))]
 #[pg_guard]
 unsafe extern "C" fn pgrx_executor_check_perms(
     range_table: *mut pg_sys::List,
@@ -636,7 +648,13 @@ unsafe extern "C" fn pgrx_standard_executor_end_wrapper(query_desc: *mut pg_sys:
     pg_sys::standard_ExecutorEnd(query_desc)
 }
 
-#[cfg(not(feature = "pg16"))]
+#[cfg(any(
+    feature = "pg11",
+    feature = "pg12",
+    feature = "pg13",
+    feature = "pg14",
+    feature = "pg15"
+))]
 #[pg_guard]
 unsafe extern "C" fn pgrx_standard_executor_check_perms_wrapper(
     _range_table: *mut pg_sys::List,
