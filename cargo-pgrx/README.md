@@ -168,7 +168,7 @@ If you'd like to create a "background worker" instead, specify the `--bgworker` 
 
 `cargo pgrx new` does not initialize the directory as a git repo, but it does create a `.gitignore` file in case you decide to do so.
 
-> **Workspace users:** `cargo pgrx new $NAME` will create a `$NAME/.cargo/config`, you should move this into your workspace root as `.cargo./config`.
+> **Workspace users:** `cargo pgrx new $NAME` will create a `$NAME/.cargo/config.toml`, you should move this into your workspace root as `.cargo/config.toml`.
 >
 > If you don't, you may experience unnecessary rebuilds using tools like Rust-Analyzer, as it will use the wrong `rustflags` option.
 
