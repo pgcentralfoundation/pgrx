@@ -259,6 +259,7 @@ where
 {
 }
 unsafe impl<T, const N: usize> PGRXSharedMemory for heapless::Vec<T, N> {}
+unsafe impl<T, const N: usize> PGRXSharedMemory for heapless::Deque<T, N> {}
 unsafe impl<K: Eq + Hash, V: Default, S, const N: usize> PGRXSharedMemory
     for heapless::IndexMap<K, V, S, N>
 {
