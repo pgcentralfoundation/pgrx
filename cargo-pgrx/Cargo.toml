@@ -1,6 +1,6 @@
 [package]
 name = "cargo-pgrx"
-version = "0.9.6"
+version = "0.9.7"
 authors = ["ZomboDB, LLC <zombodb@gmail.com>"]
 license = "MIT"
 description = "Cargo subcommand for 'pgrx' to make Postgres extension development easy"
@@ -17,17 +17,17 @@ edition = "2021"
 atty = "0.2.14"
 cargo_metadata = "0.15.4"
 cargo_toml = "0.15.3"
-clap = { version = "4.3.5", features = [ "env", "suggestions", "cargo", "derive", "wrap_help" ] }
+clap = { version = "4.3.9", features = [ "env", "suggestions", "cargo", "derive", "wrap_help" ] }
 clap-cargo = { version = "0.10.0", features = [ "cargo_metadata" ] }
 semver = "1.0.17"
 owo-colors = { version = "3.5.0", features = [ "supports-colors" ] }
 env_proxy = "0.4.1"
-num_cpus = "1.15.0"
-pgrx-pg-config = { path = "../pgrx-pg-config", version = "=0.9.6" }
-pgrx-sql-entity-graph = { path = "../pgrx-sql-entity-graph", version = "=0.9.6" }
-prettyplease = "0.2.8"
-proc-macro2 = { version = "1.0.60", features = [ "span-locations" ] }
-quote = "1.0.28"
+num_cpus = "1.16.0"
+pgrx-pg-config = { path = "../pgrx-pg-config", version = "=0.9.7" }
+pgrx-sql-entity-graph = { path = "../pgrx-sql-entity-graph", version = "=0.9.7" }
+prettyplease = "0.2.9"
+proc-macro2 = { version = "1.0.63", features = [ "span-locations" ] }
+quote = "1.0.29"
 rayon = "1.7.0"
 regex = "1.8.4"
 ureq = "2.7.1"

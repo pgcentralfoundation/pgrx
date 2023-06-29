@@ -17,10 +17,10 @@ pg16 = ["pgrx/pg16", "pgrx-tests/pg16" ]
 pg_test = []
 
 [dependencies]
-pgrx = "=0.9.6"
+pgrx = "=0.9.7"
 
 [dev-dependencies]
-pgrx-tests = "=0.9.6"
+pgrx-tests = "=0.9.7"
 tempfile = "3.2.0"
 once_cell = "1.7.2"
 
