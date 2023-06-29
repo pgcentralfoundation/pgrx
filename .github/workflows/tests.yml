@@ -28,6 +28,7 @@ jobs:
       RUSTFLAGS: -Copt-level=0
 
     strategy:
+      fail-fast: false
       matrix:
         version: ["postgres-11", "postgres-12", "postgres-13", "postgres-14", "postgres-15", "postgres-16"]
         os: ["ubuntu-20.04"]
