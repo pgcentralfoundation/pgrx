@@ -482,4 +482,52 @@ mod tests {
         }
         Ok(())
     }
+
+    #[pg_test]
+    fn test_text_array_as_vec_string() -> Result<(), Box<dyn std::error::Error>> {
+        let a = Spi::get_one::<Array<String>>(
+            "SELECT ARRAY[NULL, NULL, NULL, NULL, 'the fifth element']::text[]",
+        )?
+        .expect("spi result was NULL")
+        .into_iter()
+        .collect::<Vec<_>>();
+        assert_eq!(a, vec![None, None, None, None, Some(String::from("the fifth element"))]);
+        Ok(())
+    }
+
+    #[pg_test]
+    fn test_text_array_iter() -> Result<(), Box<dyn std::error::Error>> {
+        let a = Spi::get_one::<Array<String>>(
+            "SELECT ARRAY[NULL, NULL, NULL, NULL, 'the fifth element']::text[]",
+        )?
+        .expect("spi result was NULL");
+
+        let mut iter = a.iter();
+
+        assert_eq!(iter.next(), Some(None));
+        assert_eq!(iter.next(), Some(None));
+        assert_eq!(iter.next(), Some(None));
+        assert_eq!(iter.next(), Some(None));
+        assert_eq!(iter.next(), Some(Some(String::from("the fifth element"))));
+        assert_eq!(iter.next(), None);
+
+        Ok(())
+    }
+
+    #[pg_test]
+    fn test_text_array_via_getter() -> Result<(), Box<dyn std::error::Error>> {
+        let a = Spi::get_one::<Array<String>>(
+            "SELECT ARRAY[NULL, NULL, NULL, NULL, 'the fifth element']::text[]",
+        )?
+        .expect("spi result was NULL");
+
+        assert_eq!(a.get(0), Some(None));
+        assert_eq!(a.get(1), Some(None));
+        assert_eq!(a.get(2), Some(None));
+        assert_eq!(a.get(3), Some(None));
+        assert_eq!(a.get(4), Some(Some(String::from("the fifth element"))));
+        assert_eq!(a.get(5), None);
+
+        Ok(())
+    }
 }

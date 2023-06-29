@@ -1,6 +1,6 @@
 [package]
 name = "pgrx-pg-config"
-version = "0.9.6"
+version = "0.9.7"
 authors = ["ZomboDB, LLC <zombodb@gmail.com>"]
 license = "MIT"
 description = "A Postgres pg_config wrapper for 'pgrx'"
@@ -20,6 +20,6 @@ owo-colors = "3.5.0"
 serde = { version = "1.0", features = [ "derive" ] }
 serde_derive = "1.0"
 serde_json = "1.0"
-toml = "0.7.4"
+toml = "0.7.5"
 url = "2.4.0"
 cargo_toml = "0.15.3"
