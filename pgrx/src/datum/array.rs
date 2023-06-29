@@ -626,9 +626,13 @@ impl<'a, T: FromDatum> Iterator for ArrayIterator<'a, T> {
     fn next(&mut self) -> Option<Self::Item> {
         let Self { array, curr, ptr } = self;
         let Some(is_null) = array.null_slice.get(*curr) else { return None };
-        let element = unsafe { array.bring_it_back_now(*ptr, is_null) };
         *curr += 1;
-        if let Some(false) = array.null_slice.get(*curr) {
+
+        let element = unsafe { array.bring_it_back_now(*ptr, is_null) };
+        if !is_null {
+            // SAFETY: This has to not move for nulls, as they occupy 0 data bytes,
+            // and it has to move only after unpacking a non-null varlena element,
+            // as the iterator starts by pointing to the first non-null element!
             *ptr = unsafe { array.one_hop_this_time(*ptr) };
         }
         Some(element)
@@ -679,9 +683,13 @@ impl<'a, T: FromDatum> Iterator for ArrayIntoIterator<'a, T> {
     fn next(&mut self) -> Option<Self::Item> {
         let Self { array, curr, ptr } = self;
         let Some(is_null) = array.null_slice.get(*curr) else { return None };
-        let element = unsafe { array.bring_it_back_now(*ptr, is_null) };
         *curr += 1;
-        if let Some(false) = array.null_slice.get(*curr) {
+
+        let element = unsafe { array.bring_it_back_now(*ptr, is_null) };
+        if !is_null {
+            // SAFETY: This has to not move for nulls, as they occupy 0 data bytes,
+            // and it has to move only after unpacking a non-null varlena element,
+            // as the iterator starts by pointing to the first non-null element!
             *ptr = unsafe { array.one_hop_this_time(*ptr) };
         }
         Some(element)
