@@ -482,4 +482,16 @@ mod tests {
         }
         Ok(())
     }
+
+    #[pg_test]
+    fn test_text_array() -> Result<(), Box<dyn std::error::Error>> {
+        let a = Spi::get_one::<Array<String>>(
+            "SELECT ARRAY[NULL, NULL, NULL, NULL, 'the fifth element']::text[]",
+        )?
+        .expect("spi result was NULL")
+        .into_iter()
+        .collect::<Vec<_>>();
+        assert_eq!(a, vec![None, None, None, None, Some(String::from("the fifth element"))]);
+        Ok(())
+    }
 }
