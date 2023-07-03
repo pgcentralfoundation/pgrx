@@ -12,17 +12,10 @@ Use of this source code is governed by the MIT license that can be found in the 
 use crate::{pg_sys, PgBox};
 use core::{slice, str};
 
-/// # Safety
-///
-/// The caller asserts the specified `ptr` really is a non-null, palloc'd [`pg_sys::varlena`] pointer
-#[inline(always)]
-pub unsafe fn set_varsize_4b(ptr: *mut pg_sys::varlena, len: i32) {
-    // #define SET_VARSIZE_4B(PTR,len) \
-    // 	(((varattrib_4b *) (PTR))->va_4byte.va_header = (((uint32) (len)) << 2))
-
-    // SAFETY:  A varlena can be safely cast to a varattrib_4b
-    (*ptr.cast::<pg_sys::varattrib_4b>()).va_4byte.as_mut().va_header = (len as u32) << 2;
-}
+#[cfg(target_endian = "big")]
+pub use varlena_bigendian::*;
+#[cfg(target_endian = "little")]
+pub use varlena_littleendian::*;
 
 /// # Safety
 ///
@@ -31,18 +24,6 @@ pub unsafe fn set_varsize_4b(ptr: *mut pg_sys::varlena, len: i32) {
 pub unsafe fn set_varsize(ptr: *mut pg_sys::varlena, len: i32) {
     // #define SET_VARSIZE(PTR, len)				SET_VARSIZE_4B(PTR, len)
     set_varsize_4b(ptr, len)
-}
-
-/// # Safety
-///
-/// The caller asserts the specified `ptr` really is a non-null, palloc'd [`pg_sys::varlena`] pointer
-#[inline(always)]
-pub unsafe fn set_varsize_1b(ptr: *mut pg_sys::varlena, len: i32) {
-    // #define SET_VARSIZE_1B(PTR,len) \
-    // 	(((varattrib_1b *) (PTR))->va_header = (((uint8) (len)) << 1) | 0x01)
-
-    // SAFETY:  A varlena can be safely cast to a varattrib_1b
-    (*ptr.cast::<pg_sys::varattrib_1b>()).va_header = ((len as u8) << 1) | 0x01
 }
 
 /// # Safety
@@ -100,30 +81,7 @@ pub unsafe fn vartag_size(tag: pg_sys::vartag_external) -> usize {
 }
 
 /// ```c
-/// #define VARSIZE_4B(PTR) \
-/// ((((varattrib_4b *) (PTR))->va_4byte.va_header >> 2) & 0x3FFFFFFF)
-/// ```
-
-#[allow(clippy::cast_ptr_alignment)]
-#[inline]
-pub unsafe fn varsize_4b(ptr: *const pg_sys::varlena) -> usize {
-    let va4b = ptr as *const pg_sys::varattrib_4b__bindgen_ty_1; // 4byte
-    (((*va4b).va_header >> 2) & 0x3FFF_FFFF) as usize
-}
-
-/// ```c
-/// #define VARSIZE_1B(PTR) \
-/// ((((varattrib_1b *) (PTR))->va_header >> 1) & 0x7F)
-/// ```
-#[inline]
-pub unsafe fn varsize_1b(ptr: *const pg_sys::varlena) -> usize {
-    let va1b = ptr as *const pg_sys::varattrib_1b;
-    (((*va1b).va_header >> 1) & 0x7F) as usize
-}
-
-/// ```c
-/// #define VARTAG_1B_E(PTR) \
-/// (((varattrib_1b_e *) (PTR))->va_tag)
+/// #define VARTAG_1B_E(PTR) (((varattrib_1b_e *) (PTR))->va_tag)
 /// ```
 #[inline]
 pub unsafe fn vartag_1b_e(ptr: *const pg_sys::varlena) -> u8 {
@@ -137,60 +95,7 @@ pub unsafe fn varsize(ptr: *const pg_sys::varlena) -> usize {
 }
 
 /// ```c
-/// #define VARATT_IS_4B(PTR) \
-/// ((((varattrib_1b *) (PTR))->va_header & 0x01) == 0x00)
-/// ```
-#[inline]
-pub unsafe fn varatt_is_4b(ptr: *const pg_sys::varlena) -> bool {
-    let va1b = ptr as *const pg_sys::varattrib_1b;
-    (*va1b).va_header & 0x01 == 0x00
-}
-
-/// ```c
-/// #define VARATT_IS_4B_U(PTR) \
-/// ((((varattrib_1b *) (PTR))->va_header & 0x03) == 0x00)
-/// ```
-
-#[allow(clippy::verbose_bit_mask)]
-#[inline]
-pub unsafe fn varatt_is_4b_u(ptr: *const pg_sys::varlena) -> bool {
-    let va1b = ptr as *const pg_sys::varattrib_1b;
-    (*va1b).va_header & 0x03 == 0x00
-}
-
-/// ```c
-/// #define VARATT_IS_4B_C(PTR) \
-/// ((((varattrib_1b *) (PTR))->va_header & 0x03) == 0x02)
-/// ```
-#[inline]
-pub unsafe fn varatt_is_b8_c(ptr: *const pg_sys::varlena) -> bool {
-    let va1b = ptr as *const pg_sys::varattrib_1b;
-    (*va1b).va_header & 0x03 == 0x02
-}
-
-/// ```c
-/// #define VARATT_IS_1B(PTR) \
-/// ((((varattrib_1b *) (PTR))->va_header & 0x01) == 0x01)
-/// ```
-#[inline]
-pub unsafe fn varatt_is_1b(ptr: *const pg_sys::varlena) -> bool {
-    let va1b = ptr as *const pg_sys::varattrib_1b;
-    (*va1b).va_header & 0x01 == 0x01
-}
-
-/// ```c
-/// #define VARATT_IS_1B_E(PTR) \
-/// ((((varattrib_1b *) (PTR))->va_header) == 0x01)
-/// ```
-#[inline]
-pub unsafe fn varatt_is_1b_e(ptr: *const pg_sys::varlena) -> bool {
-    let va1b = ptr as *const pg_sys::varattrib_1b;
-    (*va1b).va_header == 0x01
-}
-
-/// ```c
-/// #define VARATT_NOT_PAD_BYTE(PTR) \
-/// (*((uint8 *) (PTR)) != 0)
+/// #define VARATT_NOT_PAD_BYTE(PTR) (*((uint8 *) (PTR)) != 0)
 /// ```
 #[inline]
 pub unsafe fn varatt_not_pad_byte(ptr: *const pg_sys::varlena) -> bool {
@@ -373,5 +278,194 @@ pub fn rust_byte_slice_to_bytea(slice: &[u8]) -> PgBox<pg_sys::bytea> {
             slice.as_ptr() as *const std::os::raw::c_char,
             slice.len() as i32,
         ))
+    }
+}
+
+#[cfg(target_endian = "little")]
+mod varlena_littleendian {
+    use super::*;
+
+    /// # Safety
+    ///
+    /// The caller asserts the specified `ptr` really is a non-null, palloc'd [`pg_sys::varlena`] pointer
+    #[inline(always)]
+    pub unsafe fn set_varsize_4b(ptr: *mut pg_sys::varlena, len: i32) {
+        // #define SET_VARSIZE_4B(PTR,len) \
+        // 	(((varattrib_4b *) (PTR))->va_4byte.va_header = (((uint32) (len)) << 2))
+
+        // SAFETY:  A varlena can be safely cast to a varattrib_4b
+        (*ptr.cast::<pg_sys::varattrib_4b>()).va_4byte.as_mut().va_header = (len as u32) << 2;
+    }
+
+    /// # Safety
+    ///
+    /// The caller asserts the specified `ptr` really is a non-null, palloc'd [`pg_sys::varlena`] pointer
+    #[inline(always)]
+    pub unsafe fn set_varsize_1b(ptr: *mut pg_sys::varlena, len: i32) {
+        // #define SET_VARSIZE_1B(PTR,len) \
+        // 	(((varattrib_1b *) (PTR))->va_header = (((uint8) (len)) << 1) | 0x01)
+
+        // SAFETY:  A varlena can be safely cast to a varattrib_1b
+        (*ptr.cast::<pg_sys::varattrib_1b>()).va_header = ((len as u8) << 1) | 0x01
+    }
+
+    /// ```c
+    /// #define VARSIZE_4B(PTR) ((((varattrib_4b *) (PTR))->va_4byte.va_header >> 2) & 0x3FFFFFFF)
+    /// ```
+    #[allow(clippy::cast_ptr_alignment)]
+    #[inline]
+    pub unsafe fn varsize_4b(ptr: *const pg_sys::varlena) -> usize {
+        let va4b = ptr as *const pg_sys::varattrib_4b__bindgen_ty_1; // 4byte
+        (((*va4b).va_header >> 2) & 0x3FFF_FFFF) as usize
+    }
+
+    /// ```c
+    /// #define VARSIZE_1B(PTR) ((((varattrib_1b *) (PTR))->va_header >> 1) & 0x7F)
+    /// ```
+    #[inline]
+    pub unsafe fn varsize_1b(ptr: *const pg_sys::varlena) -> usize {
+        let va1b = ptr as *const pg_sys::varattrib_1b;
+        (((*va1b).va_header >> 1) & 0x7F) as usize
+    }
+
+    /// ```c
+    /// #define VARATT_IS_4B(PTR) ((((varattrib_1b *) (PTR))->va_header & 0x01) == 0x00)
+    /// ```
+    #[inline]
+    pub unsafe fn varatt_is_4b(ptr: *const pg_sys::varlena) -> bool {
+        let va1b = ptr as *const pg_sys::varattrib_1b;
+        (*va1b).va_header & 0x01 == 0x00
+    }
+
+    /// ```c
+    /// #define VARATT_IS_4B_U(PTR) ((((varattrib_1b *) (PTR))->va_header & 0x03) == 0x00)
+    /// ```
+    #[allow(clippy::verbose_bit_mask)]
+    #[inline]
+    pub unsafe fn varatt_is_4b_u(ptr: *const pg_sys::varlena) -> bool {
+        let va1b = ptr as *const pg_sys::varattrib_1b;
+        (*va1b).va_header & 0x03 == 0x00
+    }
+
+    /// ```c
+    /// #define VARATT_IS_4B_C(PTR) ((((varattrib_1b *) (PTR))->va_header & 0x03) == 0x02)
+    /// ```
+    #[inline]
+    pub unsafe fn varatt_is_4b_c(ptr: *const pg_sys::varlena) -> bool {
+        let va1b = ptr as *const pg_sys::varattrib_1b;
+        (*va1b).va_header & 0x03 == 0x02
+    }
+
+    /// ```c
+    /// #define VARATT_IS_1B(PTR) ((((varattrib_1b *) (PTR))->va_header & 0x01) == 0x01)
+    /// ```
+    #[inline]
+    pub unsafe fn varatt_is_1b(ptr: *const pg_sys::varlena) -> bool {
+        let va1b = ptr as *const pg_sys::varattrib_1b;
+        (*va1b).va_header & 0x01 == 0x01
+    }
+
+    /// ```c
+    /// #define VARATT_IS_1B_E(PTR) ((((varattrib_1b *) (PTR))->va_header) == 0x01)
+    /// ```
+    #[inline]
+    pub unsafe fn varatt_is_1b_e(ptr: *const pg_sys::varlena) -> bool {
+        let va1b = ptr as *const pg_sys::varattrib_1b;
+        (*va1b).va_header == 0x01
+    }
+}
+
+#[cfg(target_endian = "big")]
+mod varlena_bigendian {
+    use super::*;
+
+    /// # Safety
+    ///
+    /// The caller asserts the specified `ptr` really is a non-null, palloc'd [`pg_sys::varlena`] pointer
+    #[inline(always)]
+    pub unsafe fn set_varsize_4b(ptr: *mut pg_sys::varlena, len: i32) {
+        // #define SET_VARSIZE_4B(PTR,len) \
+        // 	(((varattrib_4b *) (PTR))->va_4byte.va_header = (len) & 0x3FFFFFFF)
+
+        // SAFETY:  A varlena can be safely cast to a varattrib_4b
+        (*ptr.cast::<pg_sys::varattrib_4b>()).va_4byte.as_mut().va_header =
+            (len as u32) & 0x3FFFFFFF;
+    }
+
+    /// # Safety
+    ///
+    /// The caller asserts the specified `ptr` really is a non-null, palloc'd [`pg_sys::varlena`] pointer
+    #[inline(always)]
+    pub unsafe fn set_varsize_1b(ptr: *mut pg_sys::varlena, len: i32) {
+        // #define SET_VARSIZE_1B(PTR,len) \
+        // 	(((varattrib_1b *) (PTR))->va_header = (((varattrib_1b *) (PTR))->va_header = (len) | 0x80)
+
+        // SAFETY:  A varlena can be safely cast to a varattrib_1b
+        (*ptr.cast::<pg_sys::varattrib_1b>()).va_header = (len as u8) | 0x80
+    }
+
+    /// ```c
+    /// #define VARSIZE_4B(PTR) (((varattrib_4b *) (PTR))->va_4byte.va_header & 0x3FFFFFFF)
+    /// ```
+    #[allow(clippy::cast_ptr_alignment)]
+    #[inline]
+    pub unsafe fn varsize_4b(ptr: *const pg_sys::varlena) -> usize {
+        let va4b = ptr as *const pg_sys::varattrib_4b__bindgen_ty_1; // 4byte
+        (((*va4b).va_header) & 0x3FFF_FFFF) as usize
+    }
+
+    /// ```c
+    /// #define VARSIZE_1B(PTR) ((((varattrib_1b *) (PTR))->va_header >> 1) & 0x7F)
+    /// ```
+    #[inline]
+    pub unsafe fn varsize_1b(ptr: *const pg_sys::varlena) -> usize {
+        let va1b = ptr as *const pg_sys::varattrib_1b;
+        (((*va1b).va_header >> 1) & 0x7F) as usize
+    }
+
+    /// ```c
+    /// #define VARATT_IS_4B(PTR) ((((varattrib_1b *) (PTR))->va_header & 0x80) == 0x00)
+    /// ```
+    #[inline]
+    pub unsafe fn varatt_is_4b(ptr: *const pg_sys::varlena) -> bool {
+        let va1b = ptr as *const pg_sys::varattrib_1b;
+        (*va1b).va_header & 0x80 == 0x00
+    }
+
+    /// ```c
+    /// #define VARATT_IS_4B_U(PTR) ((((varattrib_1b *) (PTR))->va_header & 0xC0) == 0x00)
+    /// ```
+    #[allow(clippy::verbose_bit_mask)]
+    #[inline]
+    pub unsafe fn varatt_is_4b_u(ptr: *const pg_sys::varlena) -> bool {
+        let va1b = ptr as *const pg_sys::varattrib_1b;
+        (*va1b).va_header & 0xC0 == 0x00
+    }
+
+    /// ```c
+    /// #define VARATT_IS_4B_C(PTR) ((((varattrib_1b *) (PTR))->va_header & 0xC0) == 0x40)
+    /// ```
+    #[inline]
+    pub unsafe fn varatt_is_4b_c(ptr: *const pg_sys::varlena) -> bool {
+        let va1b = ptr as *const pg_sys::varattrib_1b;
+        (*va1b).va_header & 0xC0 == 0x40
+    }
+
+    /// ```c
+    /// #define VARATT_IS_1B(PTR) ((((varattrib_1b *) (PTR))->va_header & 0x80) == 0x80)
+    /// ```
+    #[inline]
+    pub unsafe fn varatt_is_1b(ptr: *const pg_sys::varlena) -> bool {
+        let va1b = ptr as *const pg_sys::varattrib_1b;
+        (*va1b).va_header & 0x80 == 0x80
+    }
+
+    /// ```c
+    /// #define VARATT_IS_1B_E(PTR) ((((varattrib_1b *) (PTR))->va_header) == 0x80)
+    /// ```
+    #[inline]
+    pub unsafe fn varatt_is_1b_e(ptr: *const pg_sys::varlena) -> bool {
+        let va1b = ptr as *const pg_sys::varattrib_1b;
+        (*va1b).va_header == 0x80
     }
 }
