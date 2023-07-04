@@ -119,15 +119,6 @@ impl<'a, T: FromDatum> Array<'a, T> {
             .map(|nonnull| NullKind::Bits(unsafe { &*nonnull.as_ptr() }))
             .unwrap_or(NullKind::Strict(nelems));
 
-        // The array-walking code assumes this is always the case, is it?
-        if let Layout { size: Size::Fixed(n), align, .. } = elem_layout {
-            let n: usize = n.into();
-            assert!(
-                n % (align.as_usize()) == 0,
-                "typlen does NOT include padding for fixed-width layouts!"
-            );
-        }
-
         // do a little two-step before jumping into the Cha-Cha Slide and figure out
         // which implementation is correct for the type of element in this Array.
         let slide_impl: ChaChaSlideImpl<T> = match elem_layout.pass {
