@@ -110,7 +110,9 @@ pub(crate) fn package_extension(
     is_test: bool,
     features: &clap_cargo::Features,
 ) -> eyre::Result<()> {
-    if !out_dir.exists() {
+    let out_dir_exists =
+        out_dir.try_exists().wrap_err("failed to access out-dir while packaging extension")?;
+    if !out_dir_exists {
         std::fs::create_dir_all(&out_dir)?;
     }
 

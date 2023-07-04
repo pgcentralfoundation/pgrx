@@ -15,7 +15,8 @@ use pgrx_pg_config::{
 };
 use quote::{quote, ToTokens};
 use std::collections::{BTreeMap, BTreeSet, HashMap, HashSet};
-use std::path::PathBuf;
+use std::fs;
+use std::path::{self, PathBuf}; // disambiguate path::Path and syn::Type::Path
 use std::process::{Command, Output};
 use syn::{ForeignItem, Item, ItemConst};
 
@@ -841,22 +842,16 @@ fn build_shim_for_version(
     eprintln!("shim_src={}", shim_src.display());
     eprintln!("shim_dst={}", shim_dst.display());
 
-    std::fs::create_dir_all(shim_dst).unwrap();
+    fs::create_dir_all(shim_dst).unwrap();
 
-    if !std::path::Path::new(&format!("{}/Makefile", shim_dst.display())).exists() {
-        std::fs::copy(
-            format!("{}/Makefile", shim_src.display()),
-            format!("{}/Makefile", shim_dst.display()),
-        )
-        .unwrap();
+    let makefile_dst = path::Path::join(shim_dst, "./Makefile");
+    if !makefile_dst.try_exists()? {
+        fs::copy(path::Path::join(shim_src, "./Makefile"), makefile_dst).unwrap();
     }
 
-    if !std::path::Path::new(&format!("{}/pgrx-cshim.c", shim_dst.display())).exists() {
-        std::fs::copy(
-            format!("{}/pgrx-cshim.c", shim_src.display()),
-            format!("{}/pgrx-cshim.c", shim_dst.display()),
-        )
-        .unwrap();
+    let cshim_dst = path::Path::join(shim_dst, "./pgrx-cshim.c");
+    if !cshim_dst.try_exists()? {
+        fs::copy(path::Path::join(shim_src, "./pgrx-cshim.c"), cshim_dst).unwrap();
     }
 
     let make = env_tracked("MAKE").unwrap_or_else(|| "make".to_string());
