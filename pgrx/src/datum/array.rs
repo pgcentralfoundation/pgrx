@@ -154,11 +154,11 @@ impl<'a, T: FromDatum> Array<'a, T> {
                 // determined at runtime based on the length of the string
                 Size::CStr => Box::new(casper::PassByCStr),
 
-                // Array elements are fixed sizes yet Postgres wants us to pass around by reference
-                Size::Fixed(size) => Box::new(casper::PassByFixed {
-                    align: elem_layout.align.as_usize(),
-                    size: size as usize,
-                }),
+                // Array elements are fixed sizes yet the data is "pass-by-reference"
+                // Most commonly, this is because of elements larger than a Datum.
+                Size::Fixed(size) => {
+                    Box::new(casper::PassByFixed::from_size_and_align(size, elem_layout.align))
+                }
             },
         };
 
@@ -384,6 +384,7 @@ fn as_slice<'a, T: Sized + FromDatum>(array: &'a Array<'_, T>) -> Result<&'a [T]
 }
 
 mod casper {
+    use crate::layout::Align;
     use crate::{pg_sys, varlena, Array, FromDatum};
 
     // it's a pop-culture reference (https://en.wikipedia.org/wiki/Cha_Cha_Slide) not some fancy crypto thing you nerd
@@ -495,9 +496,19 @@ mod casper {
     }
 
     pub(super) struct PassByFixed {
-        pub(super) align: usize,
-        pub(super) size: usize,
+        pub(super) padded_size: usize,
     }
+
+    impl PassByFixed {
+        pub(super) fn from_size_and_align(size: u16, align: Align) -> Self {
+            let align = align.as_usize();
+            let size = size as usize;
+            let align_mask = size & (align - 1);
+            let align_offset = if align_mask != 0 { align - align_mask } else { 0 };
+            PassByFixed { padded_size: size + align_offset }
+        }
+    }
+
     impl<T: FromDatum> ChaChaSlide<T> for PassByFixed {
         #[inline]
         unsafe fn bring_it_back_now(&self, array: &Array<T>, ptr: *const u8) -> Option<T> {
@@ -507,16 +518,7 @@ mod casper {
 
         #[inline]
         unsafe fn hop_size(&self, _ptr: *const u8) -> usize {
-            // SAFETY: we were told our size upon construction
-            let varsize = self.size;
-
-            // the Postgres realignment code may seem different in form,
-            // but it's the same in function, just micro-optimized
-            let align = self.align;
-            let align_mask = varsize & (align - 1);
-            let align_offset = if align_mask != 0 { align - align_mask } else { 0 };
-
-            varsize + align_offset
+            self.padded_size
         }
     }
 }
