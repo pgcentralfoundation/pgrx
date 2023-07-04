@@ -1,14 +1,55 @@
+use rand::distributions::{Alphanumeric, Standard};
+use rand::Rng;
+
+use pgrx::Date;
+
+#[derive(pgrx::PostgresType, Clone, PartialEq, Eq, Debug, serde::Serialize, serde::Deserialize)]
+pub struct RandomData {
+    i: u64,
+    s: String,
+    a: Vec<Date>,
+}
+
+impl RandomData {
+    fn random() -> Self {
+        RandomData {
+            i: rand::random(),
+            s: rand::thread_rng()
+                .sample_iter(Alphanumeric)
+                .take(rand::thread_rng().gen_range(0..=1000))
+                .map(char::from)
+                .collect(),
+            a: rand::thread_rng()
+                .sample_iter(Standard)
+                .take(rand::thread_rng().gen_range(0..=1000))
+                .map(|_: u32| {
+                    Date::new(
+                        rand::thread_rng().gen_range(1..=3000),
+                        rand::thread_rng().gen_range(1..=12),
+                        rand::thread_rng().gen_range(1..=28),
+                    )
+                    .unwrap()
+                })
+                .collect(),
+        }
+    }
+}
+
 #[cfg(any(test, feature = "pg_test"))]
 #[pgrx::pg_schema]
 mod tests {
-    #[allow(unused_imports)]
-    use crate as pgrx_tests;
-    use pgrx::pg_sys::BuiltinOid;
-    use pgrx::prelude::*;
-    use pgrx::Uuid;
     use std::error::Error;
     use std::ffi::CStr;
     use std::str::FromStr;
+
+    use pgrx::pg_sys::BuiltinOid;
+    use pgrx::prelude::*;
+    use pgrx::Uuid;
+
+    #[allow(unused_imports)]
+    use crate as pgrx_tests;
+
+    use super::RandomData;
 
     macro_rules! roundtrip {
         ($fname:ident, $tname:ident, $rtype:ty, $expected:expr) => {
@@ -20,7 +61,7 @@ mod tests {
             #[pg_test]
             fn $tname() -> Result<(), Box<dyn Error>> {
                 let value: $rtype = $expected.into();
-                let expected: $rtype = $expected.into();
+                let expected: $rtype = value.clone();
                 let result: $rtype = Spi::get_one_with_args(
                     &format!("SELECT {}($1)", stringify!(tests.$fname)),
                     vec![(PgOid::from(<$rtype>::type_oid()), value.into_datum())],
@@ -89,6 +130,8 @@ mod tests {
         Uuid,
         Uuid::from_bytes([0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15])
     );
+
+    roundtrip!(rt_random_data, test_rt_random_data, RandomData, RandomData::random());
 
     // -----------
     // arrays of the above
@@ -351,6 +394,20 @@ mod tests {
             Some(Uuid::from_bytes([0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15])),
             None,
             Some(Uuid::from_bytes([0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15])),
+            None
+        ]
+    );
+
+    roundtrip!(
+        rt_array_random_data,
+        test_rt_array_random_data,
+        Vec<Option<RandomData>>,
+        vec![
+            None,
+            Some(RandomData::random()),
+            Some(RandomData::random()),
+            None,
+            Some(RandomData::random()),
             None
         ]
     );
