@@ -48,20 +48,21 @@ mod tests {
 
     #[allow(unused_imports)]
     use crate as pgrx_tests;
+    use crate::tests::struct_type_tests::Complex;
 
     use super::RandomData;
 
     macro_rules! roundtrip {
         ($fname:ident, $tname:ident, $rtype:ty, $expected:expr) => {
-            #[pg_extern]
+            #[pg_extern(requires = [ "create_complex_type" ])] // the "Complex" type comes from another crate, and we need its schema fully created before it can be used here
             fn $fname(i: $rtype) -> $rtype {
                 i
             }
 
             #[pg_test]
             fn $tname() -> Result<(), Box<dyn Error>> {
-                let value: $rtype = $expected.into();
-                let expected: $rtype = value.clone();
+                let value: $rtype = $expected;
+                let expected: $rtype = Clone::clone(&value);
                 let result: $rtype = Spi::get_one_with_args(
                     &format!("SELECT {}($1)", stringify!(tests.$fname)),
                     vec![(PgOid::from(<$rtype>::type_oid()), value.into_datum())],
@@ -132,6 +133,7 @@ mod tests {
     );
 
     roundtrip!(rt_random_data, test_rt_random_data, RandomData, RandomData::random());
+    roundtrip!(rt_complex, test_rt_complex, PgBox<Complex>, Complex::random());
 
     // -----------
     // arrays of the above
@@ -408,6 +410,20 @@ mod tests {
             Some(RandomData::random()),
             None,
             Some(RandomData::random()),
+            None
+        ]
+    );
+
+    roundtrip!(
+        rt_array_complex,
+        test_rt_array_complex,
+        Vec<Option<PgBox<Complex>>>,
+        vec![
+            None,
+            Some(Complex::random()),
+            Some(Complex::random()),
+            None,
+            Some(Complex::random()),
             None
         ]
     );
