@@ -16,11 +16,29 @@ use pgrx::AllocatedByRust;
 
 use crate::get_named_capture;
 
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 #[repr(C)]
-struct Complex {
+pub struct Complex {
     x: f64,
     y: f64,
+}
+
+impl Eq for Complex {}
+impl PartialEq for Complex {
+    fn eq(&self, other: &Self) -> bool {
+        self.x == other.x && self.y == other.y
+    }
+}
+
+impl Complex {
+    pub fn random() -> PgBox<Complex> {
+        unsafe {
+            let mut c = PgBox::<Complex>::alloc0();
+            c.x = rand::random();
+            c.y = rand::random();
+            c.into_pg_boxed()
+        }
+    }
 }
 
 extension_sql!(
