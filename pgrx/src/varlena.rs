@@ -281,7 +281,6 @@ pub fn rust_byte_slice_to_bytea(slice: &[u8]) -> PgBox<pg_sys::bytea> {
     }
 }
 
-#[cfg(target_endian = "little")]
 mod varlena_littleendian {
     use super::*;
 
@@ -375,7 +374,6 @@ mod varlena_littleendian {
     }
 }
 
-#[cfg(target_endian = "big")]
 mod varlena_bigendian {
     use super::*;
 
