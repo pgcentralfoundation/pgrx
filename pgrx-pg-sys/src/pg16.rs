@@ -170,10 +170,10 @@ pub const ALIGNOF_LONG: u32 = 8;
 pub const ALIGNOF_PG_INT128_TYPE: u32 = 16;
 pub const ALIGNOF_SHORT: u32 = 2;
 pub const BLCKSZ: u32 = 8192;
-pub const CONFIGURE_ARGS : & [u8 ; 111usize] = b" '--prefix=/home/zombodb/.pgrx/16beta1/pgrx-install' '--with-pgport=28816' '--enable-debug' '--enable-cassert'\0" ;
+pub const CONFIGURE_ARGS : & [u8 ; 111] = b" '--prefix=/home/zombodb/.pgrx/16beta2/pgrx-install' '--with-pgport=28816' '--enable-debug' '--enable-cassert'\0" ;
 pub const DEF_PGPORT: u32 = 28816;
-pub const DEF_PGPORT_STR: &[u8; 6usize] = b"28816\0";
-pub const DLSUFFIX: &[u8; 4usize] = b".so\0";
+pub const DEF_PGPORT_STR: &[u8; 6] = b"28816\0";
+pub const DLSUFFIX: &[u8; 4] = b".so\0";
 pub const ENABLE_THREAD_SAFETY: u32 = 1;
 pub const HAVE_APPEND_HISTORY: u32 = 1;
 pub const HAVE_ATOMICS: u32 = 1;
@@ -272,23 +272,23 @@ pub const HAVE__BUILTIN_TYPES_COMPATIBLE_P: u32 = 1;
 pub const HAVE__BUILTIN_UNREACHABLE: u32 = 1;
 pub const HAVE__GET_CPUID: u32 = 1;
 pub const HAVE__STATIC_ASSERT: u32 = 1;
-pub const INT64_MODIFIER: &[u8; 2usize] = b"l\0";
+pub const INT64_MODIFIER: &[u8; 2] = b"l\0";
 pub const MAXIMUM_ALIGNOF: u32 = 8;
 pub const MEMSET_LOOP_LIMIT: u32 = 1024;
-pub const PACKAGE_BUGREPORT: &[u8; 32usize] = b"pgsql-bugs@lists.postgresql.org\0";
-pub const PACKAGE_NAME: &[u8; 11usize] = b"PostgreSQL\0";
-pub const PACKAGE_STRING: &[u8; 19usize] = b"PostgreSQL 16beta1\0";
-pub const PACKAGE_TARNAME: &[u8; 11usize] = b"postgresql\0";
-pub const PACKAGE_URL: &[u8; 28usize] = b"https://www.postgresql.org/\0";
-pub const PACKAGE_VERSION: &[u8; 8usize] = b"16beta1\0";
-pub const PG_KRB_SRVNAM: &[u8; 9usize] = b"postgres\0";
-pub const PG_MAJORVERSION: &[u8; 3usize] = b"16\0";
+pub const PACKAGE_BUGREPORT: &[u8; 32] = b"pgsql-bugs@lists.postgresql.org\0";
+pub const PACKAGE_NAME: &[u8; 11] = b"PostgreSQL\0";
+pub const PACKAGE_STRING: &[u8; 19] = b"PostgreSQL 16beta2\0";
+pub const PACKAGE_TARNAME: &[u8; 11] = b"postgresql\0";
+pub const PACKAGE_URL: &[u8; 28] = b"https://www.postgresql.org/\0";
+pub const PACKAGE_VERSION: &[u8; 8] = b"16beta2\0";
+pub const PG_KRB_SRVNAM: &[u8; 9] = b"postgres\0";
+pub const PG_MAJORVERSION: &[u8; 3] = b"16\0";
 pub const PG_MAJORVERSION_NUM: u32 = 16;
 pub const PG_MINORVERSION_NUM: u32 = 0;
 pub const PG_USE_STDBOOL: u32 = 1;
-pub const PG_VERSION: &[u8; 8usize] = b"16beta1\0";
+pub const PG_VERSION: &[u8; 8] = b"16beta2\0";
 pub const PG_VERSION_NUM: u32 = 160000;
-pub const PG_VERSION_STR : & [u8 ; 107usize] = b"PostgreSQL 16beta1 on x86_64-pc-linux-gnu, compiled by gcc (Ubuntu 11.3.0-1ubuntu1~22.04.1) 11.3.0, 64-bit\0" ;
+pub const PG_VERSION_STR : & [u8 ; 107] = b"PostgreSQL 16beta2 on x86_64-pc-linux-gnu, compiled by gcc (Ubuntu 11.3.0-1ubuntu1~22.04.1) 11.3.0, 64-bit\0" ;
 pub const RELSEG_SIZE: u32 = 131072;
 pub const SIZEOF_BOOL: u32 = 1;
 pub const SIZEOF_LONG: u32 = 8;
@@ -305,7 +305,7 @@ pub const XLOG_BLCKSZ: u32 = 8192;
 pub const DEFAULT_XLOG_SEG_SIZE: u32 = 16777216;
 pub const NAMEDATALEN: u32 = 64;
 pub const FUNC_MAX_ARGS: u32 = 100;
-pub const FMGR_ABI_EXTRA: &[u8; 11usize] = b"PostgreSQL\0";
+pub const FMGR_ABI_EXTRA: &[u8; 11] = b"PostgreSQL\0";
 pub const INDEX_MAX_KEYS: u32 = 32;
 pub const PARTITION_MAX_KEYS: u32 = 32;
 pub const USE_FLOAT8_BYVAL: u32 = 1;
@@ -318,8 +318,8 @@ pub const DEFAULT_BACKEND_FLUSH_AFTER: u32 = 0;
 pub const DEFAULT_BGWRITER_FLUSH_AFTER: u32 = 64;
 pub const DEFAULT_CHECKPOINT_FLUSH_AFTER: u32 = 32;
 pub const WRITEBACK_MAX_PENDING_FLUSHES: u32 = 256;
-pub const DEFAULT_PGSOCKET_DIR: &[u8; 5usize] = b"/tmp\0";
-pub const DEFAULT_EVENT_SOURCE: &[u8; 11usize] = b"PostgreSQL\0";
+pub const DEFAULT_PGSOCKET_DIR: &[u8; 5] = b"/tmp\0";
+pub const DEFAULT_EVENT_SOURCE: &[u8; 11] = b"PostgreSQL\0";
 pub const PG_CACHE_LINE_SIZE: u32 = 128;
 pub const PG_IO_ALIGN_SIZE: u32 = 4096;
 pub const TRACE_SORT: u32 = 1;
@@ -396,7 +396,7 @@ pub const EOF: i32 = -1;
 pub const SEEK_SET: u32 = 0;
 pub const SEEK_CUR: u32 = 1;
 pub const SEEK_END: u32 = 2;
-pub const P_tmpdir: &[u8; 5usize] = b"/tmp\0";
+pub const P_tmpdir: &[u8; 5] = b"/tmp\0";
 pub const _BITS_STDIO_LIM_H: u32 = 1;
 pub const L_tmpnam: u32 = 20;
 pub const TMP_MAX: u32 = 238328;
@@ -704,8 +704,8 @@ pub const HAVE_PRAGMA_GCC_SYSTEM_HEADER: u32 = 1;
 pub const true_: u32 = 1;
 pub const false_: u32 = 0;
 pub const __bool_true_false_are_defined: u32 = 1;
-pub const INT64_FORMAT: &[u8; 4usize] = b"%ld\0";
-pub const UINT64_FORMAT: &[u8; 4usize] = b"%lu\0";
+pub const INT64_FORMAT: &[u8; 4] = b"%ld\0";
+pub const UINT64_FORMAT: &[u8; 4] = b"%lu\0";
 pub const HAVE_INT128: u32 = 1;
 pub const PG_INT8_MIN: i32 = -128;
 pub const PG_INT8_MAX: u32 = 127;
@@ -723,14 +723,14 @@ pub const STATUS_OK: u32 = 0;
 pub const STATUS_ERROR: i32 = -1;
 pub const STATUS_EOF: i32 = -2;
 pub const PG_BINARY: u32 = 0;
-pub const PG_BINARY_A: &[u8; 2usize] = b"a\0";
-pub const PG_BINARY_R: &[u8; 2usize] = b"r\0";
-pub const PG_BINARY_W: &[u8; 2usize] = b"w\0";
+pub const PG_BINARY_A: &[u8; 2] = b"a\0";
+pub const PG_BINARY_R: &[u8; 2] = b"r\0";
+pub const PG_BINARY_W: &[u8; 2] = b"w\0";
 pub const _CTYPE_H: u32 = 1;
 pub const PGINVALID_SOCKET: i32 = -1;
-pub const PG_BACKEND_VERSIONSTR: &[u8; 31usize] = b"postgres (PostgreSQL) 16beta1\n\0";
-pub const EXE: &[u8; 1usize] = b"\0";
-pub const DEVNULL: &[u8; 10usize] = b"/dev/null\0";
+pub const PG_BACKEND_VERSIONSTR: &[u8; 31] = b"postgres (PostgreSQL) 16beta2\n\0";
+pub const EXE: &[u8; 1] = b"\0";
+pub const DEVNULL: &[u8; 10] = b"/dev/null\0";
 pub const USE_REPL_SNPRINTF: u32 = 1;
 pub const PG_STRERROR_R_BUFLEN: u32 = 256;
 pub const PG_IOLBF: u32 = 1;
@@ -1322,7 +1322,7 @@ pub const TIME_UTC: u32 = 1;
 pub const PG_INSTR_CLOCK: u32 = 1;
 pub const FIELDNO_FUNCTIONCALLINFODATA_ISNULL: u32 = 4;
 pub const FIELDNO_FUNCTIONCALLINFODATA_ARGS: u32 = 6;
-pub const PG_MAGIC_FUNCTION_NAME_STRING: &[u8; 14usize] = b"Pg_magic_func\0";
+pub const PG_MAGIC_FUNCTION_NAME_STRING: &[u8; 14] = b"Pg_magic_func\0";
 pub const AGG_CONTEXT_AGGREGATE: u32 = 1;
 pub const AGG_CONTEXT_WINDOW: u32 = 2;
 pub const PARAM_FLAG_CONST: u32 = 1;
@@ -1365,7 +1365,7 @@ pub const RTPrefixStrategyNumber: u32 = 28;
 pub const RTOldBelowStrategyNumber: u32 = 29;
 pub const RTOldAboveStrategyNumber: u32 = 30;
 pub const RTMaxStrategyNumber: u32 = 30;
-pub const CATALOG_VERSION_NO: u32 = 202305211;
+pub const CATALOG_VERSION_NO: u32 = 202306141;
 pub const OIDCHARS: u32 = 10;
 pub const FORKNAMECHARS: u32 = 4;
 pub const INNER_VAR: i32 = -1;
@@ -1518,11 +1518,11 @@ pub const DSM_IMPL_SYSV: u32 = 2;
 pub const DSM_IMPL_WINDOWS: u32 = 3;
 pub const DSM_IMPL_MMAP: u32 = 4;
 pub const DEFAULT_DYNAMIC_SHARED_MEMORY_TYPE: u32 = 1;
-pub const PG_DYNSHMEM_DIR: &[u8; 12usize] = b"pg_dynshmem\0";
-pub const PG_DYNSHMEM_MMAP_FILE_PREFIX: &[u8; 6usize] = b"mmap.\0";
+pub const PG_DYNSHMEM_DIR: &[u8; 12] = b"pg_dynshmem\0";
+pub const PG_DYNSHMEM_MMAP_FILE_PREFIX: &[u8; 6] = b"mmap.\0";
 pub const DSM_CREATE_NULL_IF_MAXSEGMENTS: u32 = 1;
 pub const SIZEOF_DSA_POINTER: u32 = 8;
-pub const DSA_POINTER_FORMAT: &[u8; 7usize] = b"%016lx\0";
+pub const DSA_POINTER_FORMAT: &[u8; 7] = b"%016lx\0";
 pub const DSA_ALLOC_HUGE: u32 = 1;
 pub const DSA_ALLOC_NO_OOM: u32 = 2;
 pub const DSA_ALLOC_ZERO: u32 = 4;
@@ -1549,8 +1549,8 @@ pub const IO_DIRECT_DATA: u32 = 1;
 pub const IO_DIRECT_WAL: u32 = 2;
 pub const IO_DIRECT_WAL_INIT: u32 = 4;
 pub const PG_O_DIRECT: u32 = 0;
-pub const PG_TEMP_FILES_DIR: &[u8; 10usize] = b"pgsql_tmp\0";
-pub const PG_TEMP_FILE_PREFIX: &[u8; 10usize] = b"pgsql_tmp\0";
+pub const PG_TEMP_FILES_DIR: &[u8; 10] = b"pgsql_tmp\0";
+pub const PG_TEMP_FILE_PREFIX: &[u8; 10] = b"pgsql_tmp\0";
 pub const SHARED_TUPLESTORE_SINGLE_PASS: u32 = 1;
 pub const MAX_TIMESTAMP_PRECISION: u32 = 6;
 pub const MAX_INTERVAL_PRECISION: u32 = 6;
@@ -1577,7 +1577,7 @@ pub const POSTGRES_EPOCH_JDATE: u32 = 2451545;
 pub const DATETIME_MIN_JULIAN: u32 = 0;
 pub const DATE_END_JULIAN: u32 = 2147483494;
 pub const TIMESTAMP_END_JULIAN: u32 = 109203528;
-pub const RELCACHE_INIT_FILENAME: &[u8; 17usize] = b"pg_internal.init\0";
+pub const RELCACHE_INIT_FILENAME: &[u8; 17] = b"pg_internal.init\0";
 pub const INDEX_SIZE_MASK: u32 = 8191;
 pub const INDEX_AM_RESERVED_BIT: u32 = 8192;
 pub const INDEX_VAR_MASK: u32 = 16384;
@@ -1730,7 +1730,7 @@ pub const SECURITY_RESTRICTED_OPERATION: u32 = 2;
 pub const SECURITY_NOFORCE_RLS: u32 = 4;
 pub const MIN_XFN_CHARS: u32 = 16;
 pub const MAX_XFN_CHARS: u32 = 40;
-pub const VALID_XFN_CHARS: &[u8; 40usize] = b"0123456789ABCDEF.history.backup.partial\0";
+pub const VALID_XFN_CHARS: &[u8; 40] = b"0123456789ABCDEF.history.backup.partial\0";
 pub const PGSTAT_NUM_PROGRESS_PARAM: u32 = 20;
 pub const _SYS_SOCKET_H: u32 = 1;
 pub const __iovec_defined: u32 = 1;
@@ -2102,12 +2102,12 @@ pub const IN_LOOPBACKNET: u32 = 127;
 pub const INET_ADDRSTRLEN: u32 = 16;
 pub const INET6_ADDRSTRLEN: u32 = 46;
 pub const _RPC_NETDB_H: u32 = 1;
-pub const _PATH_HEQUIV: &[u8; 17usize] = b"/etc/hosts.equiv\0";
-pub const _PATH_HOSTS: &[u8; 11usize] = b"/etc/hosts\0";
-pub const _PATH_NETWORKS: &[u8; 14usize] = b"/etc/networks\0";
-pub const _PATH_NSSWITCH_CONF: &[u8; 19usize] = b"/etc/nsswitch.conf\0";
-pub const _PATH_PROTOCOLS: &[u8; 15usize] = b"/etc/protocols\0";
-pub const _PATH_SERVICES: &[u8; 14usize] = b"/etc/services\0";
+pub const _PATH_HEQUIV: &[u8; 17] = b"/etc/hosts.equiv\0";
+pub const _PATH_HOSTS: &[u8; 11] = b"/etc/hosts\0";
+pub const _PATH_NETWORKS: &[u8; 14] = b"/etc/networks\0";
+pub const _PATH_NSSWITCH_CONF: &[u8; 19] = b"/etc/nsswitch.conf\0";
+pub const _PATH_PROTOCOLS: &[u8; 15] = b"/etc/protocols\0";
+pub const _PATH_SERVICES: &[u8; 14] = b"/etc/services\0";
 pub const HOST_NOT_FOUND: u32 = 1;
 pub const TRY_AGAIN: u32 = 2;
 pub const NO_RECOVERY: u32 = 3;
@@ -2163,10 +2163,10 @@ pub const PG_WAIT_EXTENSION: u32 = 117440512;
 pub const PG_WAIT_IPC: u32 = 134217728;
 pub const PG_WAIT_TIMEOUT: u32 = 150994944;
 pub const PG_WAIT_IO: u32 = 167772160;
-pub const PGSTAT_STAT_PERMANENT_DIRECTORY: &[u8; 8usize] = b"pg_stat\0";
-pub const PGSTAT_STAT_PERMANENT_FILENAME: &[u8; 20usize] = b"pg_stat/pgstat.stat\0";
-pub const PGSTAT_STAT_PERMANENT_TMPFILE: &[u8; 19usize] = b"pg_stat/pgstat.tmp\0";
-pub const PG_STAT_TMP_DIR: &[u8; 12usize] = b"pg_stat_tmp\0";
+pub const PGSTAT_STAT_PERMANENT_DIRECTORY: &[u8; 8] = b"pg_stat\0";
+pub const PGSTAT_STAT_PERMANENT_FILENAME: &[u8; 20] = b"pg_stat/pgstat.stat\0";
+pub const PGSTAT_STAT_PERMANENT_TMPFILE: &[u8; 19] = b"pg_stat/pgstat.tmp\0";
+pub const PG_STAT_TMP_DIR: &[u8; 12] = b"pg_stat_tmp\0";
 pub const PGSTAT_FILE_FORMAT_ID: u32 = 27638956;
 pub const SK_ISNULL: u32 = 1;
 pub const SK_UNARY: u32 = 2;
@@ -2203,13 +2203,13 @@ pub const CHECKPOINT_CAUSE_XLOG: u32 = 128;
 pub const CHECKPOINT_CAUSE_TIME: u32 = 256;
 pub const XLOG_INCLUDE_ORIGIN: u32 = 1;
 pub const XLOG_MARK_UNIMPORTANT: u32 = 2;
-pub const RECOVERY_SIGNAL_FILE: &[u8; 16usize] = b"recovery.signal\0";
-pub const STANDBY_SIGNAL_FILE: &[u8; 15usize] = b"standby.signal\0";
-pub const BACKUP_LABEL_FILE: &[u8; 13usize] = b"backup_label\0";
-pub const BACKUP_LABEL_OLD: &[u8; 17usize] = b"backup_label.old\0";
-pub const TABLESPACE_MAP: &[u8; 15usize] = b"tablespace_map\0";
-pub const TABLESPACE_MAP_OLD: &[u8; 19usize] = b"tablespace_map.old\0";
-pub const PROMOTE_SIGNAL_FILE: &[u8; 8usize] = b"promote\0";
+pub const RECOVERY_SIGNAL_FILE: &[u8; 16] = b"recovery.signal\0";
+pub const STANDBY_SIGNAL_FILE: &[u8; 15] = b"standby.signal\0";
+pub const BACKUP_LABEL_FILE: &[u8; 13] = b"backup_label\0";
+pub const BACKUP_LABEL_OLD: &[u8; 17] = b"backup_label.old\0";
+pub const TABLESPACE_MAP: &[u8; 15] = b"tablespace_map\0";
+pub const TABLESPACE_MAP_OLD: &[u8; 19] = b"tablespace_map.old\0";
+pub const PROMOTE_SIGNAL_FILE: &[u8; 8] = b"promote\0";
 pub const RM_MAX_ID: u32 = 255;
 pub const RM_MIN_CUSTOM_ID: u32 = 128;
 pub const RM_MAX_CUSTOM_ID: u32 = 255;
@@ -2247,8 +2247,8 @@ pub const WalSegMinSize: u32 = 1048576;
 pub const WalSegMaxSize: u32 = 1073741824;
 pub const DEFAULT_MIN_WAL_SEGS: u32 = 5;
 pub const DEFAULT_MAX_WAL_SEGS: u32 = 64;
-pub const XLOGDIR: &[u8; 7usize] = b"pg_wal\0";
-pub const XLOG_CONTROL_FILE: &[u8; 18usize] = b"global/pg_control\0";
+pub const XLOGDIR: &[u8; 7] = b"pg_wal\0";
+pub const XLOG_CONTROL_FILE: &[u8; 18] = b"global/pg_control\0";
 pub const MAXFNAMELEN: u32 = 64;
 pub const XLOG_FNAME_LEN: u32 = 24;
 pub const XLR_NORMAL_MAX_BLOCK_ID: u32 = 4;
@@ -2426,7 +2426,7 @@ pub const XACT_XINFO_HAS_DROPPED_STATS: u32 = 256;
 pub const XACT_COMPLETION_APPLY_FEEDBACK: u32 = 536870912;
 pub const XACT_COMPLETION_UPDATE_RELCACHE_FILE: u32 = 1073741824;
 pub const XACT_COMPLETION_FORCE_SYNC_COMMIT: u32 = 2147483648;
-pub const DEFAULT_TABLE_ACCESS_METHOD: &[u8; 5usize] = b"heap\0";
+pub const DEFAULT_TABLE_ACCESS_METHOD: &[u8; 5] = b"heap\0";
 pub const TABLE_INSERT_SKIP_FSM: u32 = 2;
 pub const TABLE_INSERT_FROZEN: u32 = 4;
 pub const TABLE_INSERT_NO_LOGICAL: u32 = 8;
@@ -2465,7 +2465,7 @@ pub const PERFORM_DELETION_QUIETLY: u32 = 4;
 pub const PERFORM_DELETION_SKIP_ORIGINAL: u32 = 8;
 pub const PERFORM_DELETION_SKIP_EXTENSIONS: u32 = 16;
 pub const PERFORM_DELETION_CONCURRENT_LOCK: u32 = 32;
-pub const DEFAULT_INDEX_TYPE: &[u8; 6usize] = b"btree\0";
+pub const DEFAULT_INDEX_TYPE: &[u8; 6] = b"btree\0";
 pub const REINDEXOPT_VERBOSE: u32 = 1;
 pub const REINDEXOPT_REPORT_PROGRESS: u32 = 2;
 pub const REINDEXOPT_MISSING_OK: u32 = 4;
@@ -2768,7 +2768,7 @@ pub const ACL_CONNECT_CHR: u8 = 99u8;
 pub const ACL_SET_CHR: u8 = 115u8;
 pub const ACL_ALTER_SYSTEM_CHR: u8 = 65u8;
 pub const ACL_MAINTAIN_CHR: u8 = 109u8;
-pub const ACL_ALL_RIGHTS_STR: &[u8; 16usize] = b"arwdDxtXUCTcsAm\0";
+pub const ACL_ALL_RIGHTS_STR: &[u8; 16] = b"arwdDxtXUCTcsAm\0";
 pub const ACL_ALL_RIGHTS_COLUMN: u32 = 39;
 pub const ACL_ALL_RIGHTS_RELATION: u32 = 16511;
 pub const ACL_ALL_RIGHTS_SEQUENCE: u32 = 262;
@@ -2873,7 +2873,7 @@ pub const TRIGGER_DISABLED: u8 = 68u8;
 pub const RI_TRIGGER_PK: u32 = 1;
 pub const RI_TRIGGER_FK: u32 = 2;
 pub const RI_TRIGGER_NONE: u32 = 0;
-pub const PG_AUTOCONF_FILENAME: &[u8; 21usize] = b"postgresql.auto.conf\0";
+pub const PG_AUTOCONF_FILENAME: &[u8; 21] = b"postgresql.auto.conf\0";
 pub const GUC_QUALIFIER_SEPARATOR: u8 = 46u8;
 pub const GUC_LIST_INPUT: u32 = 1;
 pub const GUC_LIST_QUOTE: u32 = 2;
@@ -2997,6 +2997,7 @@ pub const VACOPT_PROCESS_TOAST: u32 = 128;
 pub const VACOPT_DISABLE_PAGE_SKIPPING: u32 = 256;
 pub const VACOPT_SKIP_DATABASE_STATS: u32 = 512;
 pub const VACOPT_ONLY_DATABASE_STATS: u32 = 1024;
+pub const VACOPT_SKIP_PRIVS: u32 = 2048;
 pub const CACHEDPLANSOURCE_MAGIC: u32 = 195726186;
 pub const CACHEDPLAN_MAGIC: u32 = 953717834;
 pub const CACHEDEXPR_MAGIC: u32 = 838275847;
@@ -3258,33 +3259,33 @@ pub const FORMAT_TYPE_ALLOW_INVALID: u32 = 2;
 pub const FORMAT_TYPE_FORCE_QUALIFY: u32 = 4;
 pub const FORMAT_TYPE_INVALID_AS_NULL: u32 = 8;
 pub const MAX_TIME_PRECISION: u32 = 6;
-pub const DAGO: &[u8; 4usize] = b"ago\0";
-pub const DCURRENT: &[u8; 8usize] = b"current\0";
-pub const EPOCH: &[u8; 6usize] = b"epoch\0";
-pub const INVALID: &[u8; 8usize] = b"invalid\0";
-pub const EARLY: &[u8; 10usize] = b"-infinity\0";
-pub const LATE: &[u8; 9usize] = b"infinity\0";
-pub const NOW: &[u8; 4usize] = b"now\0";
-pub const TODAY: &[u8; 6usize] = b"today\0";
-pub const TOMORROW: &[u8; 9usize] = b"tomorrow\0";
-pub const YESTERDAY: &[u8; 10usize] = b"yesterday\0";
-pub const ZULU: &[u8; 5usize] = b"zulu\0";
-pub const DMICROSEC: &[u8; 8usize] = b"usecond\0";
-pub const DMILLISEC: &[u8; 8usize] = b"msecond\0";
-pub const DSECOND: &[u8; 7usize] = b"second\0";
-pub const DMINUTE: &[u8; 7usize] = b"minute\0";
-pub const DHOUR: &[u8; 5usize] = b"hour\0";
-pub const DDAY: &[u8; 4usize] = b"day\0";
-pub const DWEEK: &[u8; 5usize] = b"week\0";
-pub const DMONTH: &[u8; 6usize] = b"month\0";
-pub const DQUARTER: &[u8; 8usize] = b"quarter\0";
-pub const DYEAR: &[u8; 5usize] = b"year\0";
-pub const DDECADE: &[u8; 7usize] = b"decade\0";
-pub const DCENTURY: &[u8; 8usize] = b"century\0";
-pub const DMILLENNIUM: &[u8; 11usize] = b"millennium\0";
-pub const DA_D: &[u8; 3usize] = b"ad\0";
-pub const DB_C: &[u8; 3usize] = b"bc\0";
-pub const DTIMEZONE: &[u8; 9usize] = b"timezone\0";
+pub const DAGO: &[u8; 4] = b"ago\0";
+pub const DCURRENT: &[u8; 8] = b"current\0";
+pub const EPOCH: &[u8; 6] = b"epoch\0";
+pub const INVALID: &[u8; 8] = b"invalid\0";
+pub const EARLY: &[u8; 10] = b"-infinity\0";
+pub const LATE: &[u8; 9] = b"infinity\0";
+pub const NOW: &[u8; 4] = b"now\0";
+pub const TODAY: &[u8; 6] = b"today\0";
+pub const TOMORROW: &[u8; 9] = b"tomorrow\0";
+pub const YESTERDAY: &[u8; 10] = b"yesterday\0";
+pub const ZULU: &[u8; 5] = b"zulu\0";
+pub const DMICROSEC: &[u8; 8] = b"usecond\0";
+pub const DMILLISEC: &[u8; 8] = b"msecond\0";
+pub const DSECOND: &[u8; 7] = b"second\0";
+pub const DMINUTE: &[u8; 7] = b"minute\0";
+pub const DHOUR: &[u8; 5] = b"hour\0";
+pub const DDAY: &[u8; 4] = b"day\0";
+pub const DWEEK: &[u8; 5] = b"week\0";
+pub const DMONTH: &[u8; 6] = b"month\0";
+pub const DQUARTER: &[u8; 8] = b"quarter\0";
+pub const DYEAR: &[u8; 5] = b"year\0";
+pub const DDECADE: &[u8; 7] = b"decade\0";
+pub const DCENTURY: &[u8; 8] = b"century\0";
+pub const DMILLENNIUM: &[u8; 11] = b"millennium\0";
+pub const DA_D: &[u8; 3] = b"ad\0";
+pub const DB_C: &[u8; 3] = b"bc\0";
+pub const DTIMEZONE: &[u8; 9] = b"timezone\0";
 pub const AM: u32 = 0;
 pub const PM: u32 = 1;
 pub const HR24: u32 = 2;
@@ -3416,7 +3417,7 @@ pub const DEFAULT_NUM_DISTINCT: u32 = 200;
 pub const DEFAULT_UNK_SEL: f64 = 0.005;
 pub const DEFAULT_NOT_UNK_SEL: f64 = 0.995;
 pub const SELFLAG_USED_DEFAULT: u32 = 1;
-pub const RANGE_EMPTY_LITERAL: &[u8; 6usize] = b"empty\0";
+pub const RANGE_EMPTY_LITERAL: &[u8; 6] = b"empty\0";
 pub const RANGE_EMPTY: u32 = 1;
 pub const RANGE_LB_INC: u32 = 2;
 pub const RANGE_UB_INC: u32 = 4;
@@ -18174,7 +18175,6 @@ extern "C" {
     pub fn tuplesort_begin_cluster(
         tupDesc: TupleDesc,
         indexRel: Relation,
-        heaprel: Relation,
         workMem: ::std::os::raw::c_int,
         coordinate: SortCoordinate,
         sortopt: ::std::os::raw::c_int,
@@ -35154,10 +35154,6 @@ extern "C" {
 }
 #[pgrx_macros::pg_guard]
 extern "C" {
-    pub fn has_partition_ancestor_privs(relid: Oid, userid: Oid, acl: AclMode) -> bool;
-}
-#[pgrx_macros::pg_guard]
-extern "C" {
     pub fn RangeVarCallbackOwnsRelation(
         relation: *const RangeVar,
         relId: Oid,
@@ -39662,6 +39658,7 @@ pub struct RestrictInfo {
     pub num_base_rels: ::std::os::raw::c_int,
     pub clause_relids: Relids,
     pub required_relids: Relids,
+    pub incompatible_relids: Relids,
     pub outer_relids: Relids,
     pub left_relids: Relids,
     pub right_relids: Relids,
@@ -44709,9 +44706,12 @@ extern "C" {
         root: *mut PlannerInfo,
         clause: *mut Expr,
         is_pushed_down: bool,
+        has_clone: bool,
+        is_clone: bool,
         pseudoconstant: bool,
         security_level: Index,
         required_relids: Relids,
+        incompatible_relids: Relids,
         outer_relids: Relids,
     ) -> *mut RestrictInfo;
 }
@@ -44746,14 +44746,6 @@ extern "C" {
         joinquals: *mut *mut List,
         otherquals: *mut *mut List,
     );
-}
-#[pgrx_macros::pg_guard]
-extern "C" {
-    pub fn clause_is_computable_at(
-        root: *mut PlannerInfo,
-        rinfo: *mut RestrictInfo,
-        eval_relids: Relids,
-    ) -> bool;
 }
 #[pgrx_macros::pg_guard]
 extern "C" {
