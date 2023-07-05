@@ -137,9 +137,7 @@ impl<'a, T: FromDatum> Array<'a, T> {
 
             PassBy::Ref => match elem_layout.size {
                 // Array elements are varlenas, which are pass-by-reference and have a known alignment size
-                Size::Varlena => {
-                    Box::new(casper::PassByVarlena { align: elem_layout.align.as_usize() })
-                }
+                Size::Varlena => Box::new(casper::PassByVarlena { align: elem_layout.align }),
 
                 // Array elements are C strings, which are pass-by-reference and alignments are
                 // determined at runtime based on the length of the string
@@ -147,9 +145,9 @@ impl<'a, T: FromDatum> Array<'a, T> {
 
                 // Array elements are fixed sizes yet the data is "pass-by-reference"
                 // Most commonly, this is because of elements larger than a Datum.
-                Size::Fixed(size) => {
-                    Box::new(casper::PassByFixed::from_size_and_align(size, elem_layout.align))
-                }
+                Size::Fixed(size) => Box::new(casper::PassByFixed {
+                    padded_size: elem_layout.align.pad(size.into()),
+                }),
             },
         };
 
@@ -442,7 +440,7 @@ mod casper {
 
     /// Array elements are [`pg_sys::varlena`] types, which are pass-by-reference
     pub(super) struct PassByVarlena {
-        pub(super) align: usize,
+        pub(super) align: Align,
     }
     impl<T: FromDatum> ChaChaSlide<T> for PassByVarlena {
         #[inline]
@@ -457,13 +455,8 @@ mod casper {
             // and the caller was informed of pointer requirements.
             let varsize = varlena::varsize_any(ptr.cast());
 
-            // the Postgres realignment code may seem different in form,
-            // but it's the same in function, just micro-optimized
-            let align = self.align;
-            let align_mask = varsize & (align - 1);
-            let align_offset = if align_mask != 0 { align - align_mask } else { 0 };
-
-            varsize + align_offset
+            // Now make sure this is aligned-up
+            self.align.pad(varsize)
         }
     }
 
@@ -488,16 +481,6 @@ mod casper {
 
     pub(super) struct PassByFixed {
         pub(super) padded_size: usize,
-    }
-
-    impl PassByFixed {
-        pub(super) fn from_size_and_align(size: u16, align: Align) -> Self {
-            let align = align.as_usize();
-            let size = size as usize;
-            let align_mask = size & (align - 1);
-            let align_offset = if align_mask != 0 { align - align_mask } else { 0 };
-            PassByFixed { padded_size: size + align_offset }
-        }
     }
 
     impl<T: FromDatum> ChaChaSlide<T> for PassByFixed {
