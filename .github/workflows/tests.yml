@@ -256,9 +256,6 @@ jobs:
     - name: Run versioned_custom_libname_so example tests
       run: cargo test --package versioned_custom_libname_so --features "pg$PG_VER" --no-default-features
 
-    - name: Run versioned_so example tests
-      run: cargo test --package versioned_so --features "pg$PG_VER" --no-default-features
-
     # Attempt to make the cache payload slightly smaller.
     - name: Clean up built PGRX files
       run: |
