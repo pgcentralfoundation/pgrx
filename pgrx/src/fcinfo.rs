@@ -291,8 +291,7 @@ mod pg_12_13_14_15 {
         let fcinfo = unsafe { fcinfo.as_mut() }.unwrap();
         unsafe {
             let nargs = fcinfo.nargs;
-            let len = std::mem::size_of::<pg_sys::NullableDatum>() * nargs as usize;
-            fcinfo.args.as_slice(len)[num].clone()
+            fcinfo.args.as_slice(nargs as usize)[num].clone()
         }
     }
 
