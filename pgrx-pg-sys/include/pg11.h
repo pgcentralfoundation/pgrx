@@ -48,6 +48,7 @@ Use of this source code is governed by the MIT license that can be found in the 
 #include "commands/event_trigger.h"
 #include "commands/explain.h"
 #include "commands/proclang.h"
+#include "commands/seclabel.h"
 #include "commands/tablespace.h"
 #include "commands/tablecmds.h"
 #include "commands/trigger.h"
