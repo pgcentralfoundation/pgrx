@@ -19,7 +19,6 @@ use pgrx_pg_config::{
 };
 use postgres::error::DbError;
 use std::collections::HashMap;
-use std::fmt::Write as _;
 use std::io::{BufRead, BufReader, Write};
 use std::path::PathBuf;
 use std::sync::{Arc, Mutex};
@@ -133,59 +132,36 @@ pub fn run_test(
     };
 
     if let Err(e) = result {
-        let error_as_string = format!("error in test tx: {e}");
+        let error_as_string = format!("{e}");
+        let cause = e.into_source();
+
+        let (pg_location, rust_location, message) =
+            if let Some(Some(dberror)) = cause.map(|e| e.downcast_ref::<DbError>().cloned()) {
+                let received_error_message = dberror.message();
+
+                if Some(received_error_message) == expected_error {
+                    // the error received is the one we expected, so just return if they match
+                    return Ok(());
+                }
+
+                let pg_location = dberror.file().unwrap_or("<unknown>").to_string();
+                let rust_location = dberror.where_().unwrap_or("<unknown>").to_string();
+
+                (pg_location, rust_location, received_error_message.to_string())
+            } else {
+                ("<unknown>".to_string(), "<unknown>".to_string(), format!("{error_as_string}"))
+            };
 
         let system_loglines = format_loglines(&system_session_id, &loglines);
         let session_loglines = format_loglines(&session_id, &loglines);
-
-        let cause = e.into_source();
-        if let Some(e) = cause {
-            if let Some(dberror) = e.downcast_ref::<DbError>() {
-                // we got an ERROR
-                let received_error_message: &str = dberror.message();
-
-                if let Some(expected_error_message) = expected_error {
-                    // and we expected an error, so assert what we got is what we expect
-                    assert_eq!(received_error_message, expected_error_message);
-                    Ok(())
-                } else {
-                    // we weren't expecting an error
-                    // wait a second for Postgres to get log messages written to stderr
-                    std::thread::sleep(std::time::Duration::from_millis(1000));
-
-                    let mut pg_location = String::from("Postgres location: ");
-                    pg_location.push_str(match dberror.file() {
-                        Some(file) => file,
-                        None => "<unknown>",
-                    });
-                    if let Some(ln) = dberror.line() {
-                        let _ = write!(pg_location, ":{ln}");
-                    };
-
-                    let mut rust_location = String::from("Rust location: ");
-                    rust_location.push_str(match dberror.where_() {
-                        Some(place) => place,
-                        None => "<unknown>",
-                    });
-                    // then we can panic with those messages plus those that belong to the system
-                    panic!(
-                        "\n{sys}...\n{sess}\n{e}\n{pg}\n{rs}\n\n",
-                        sys = system_loglines,
-                        sess = session_loglines,
-                        e = received_error_message.bold().red(),
-                        pg = pg_location.dimmed().white(),
-                        rs = rust_location.yellow()
-                    );
-                }
-            } else {
-                panic!("Failed downcast to DbError:\n{e}\n{system_loglines}\n{session_loglines}")
-            }
-        } else {
-            panic!(
-                "Error without deeper source cause:\n{e}\n{system_loglines}\n{session_loglines}",
-                e = error_as_string.bold().red()
-            )
-        }
+        panic!(
+            "\n\nPostgres Startup Messages:\n{system_loglines}\n\nSession Messages:\n{session_loglines}\n{message}\npostgres location: {pg_location}\nrust location: {rust_location}\n\n",
+                system_loglines = system_loglines.dimmed().white(),
+                session_loglines = session_loglines.cyan(),
+                message = message.bold().red(),
+                pg_location = pg_location.dimmed().white(),
+                rust_location = rust_location.yellow()
+        );
     } else if let Some(message) = expected_error {
         // we expected an ERROR, but didn't get one
         return Err(eyre!("Expected error: {message}"));
