@@ -427,29 +427,28 @@ jobs:
 
         mkdir -p $SCCACHE_DIR
 
-    # - name: Cache sccache directory
-    #   uses: actions/cache@v3
-    #   continue-on-error: false
-    #   with:
-    #     path: /Users/runner/Library/Caches/Mozilla.sccache
-    #     key: pgrx-sccache-macos-11-${{ hashFiles('**/Cargo.lock', '.github/workflows/tests.yml') }}
+    - name: Cache sccache directory
+      uses: actions/cache@v3
+      continue-on-error: false
+      with:
+        path: /Users/runner/Library/Caches/Mozilla.sccache
+        key: pgrx-sccache-macos-11-${{ hashFiles('**/Cargo.lock', '.github/workflows/tests.yml', '.cargo/config.toml') }}
 
-    # - name: Start sccache server
-    #   run: sccache --start-server
+    - name: Cache cargo directory
+      uses: actions/cache@v3
+      with:
+        path: |
+          ~/.cargo
+        key: pgrx-cargo-macos-11-tests-${{ hashFiles('**/Cargo.lock', '.github/workflows/tests.yml', '.cargo/config.toml') }}
 
-    # - name: Print sccache stats
-    #   run: sccache --show-stats
+    - name: Start sccache server
+      run: sccache --start-server
 
-    # - name: Cache cargo directory
-    #   uses: actions/cache@v3
-    #   with:
-    #     path: |
-    #       ~/.cargo/registry
-    #       ~/.cargo/git
-    #     key: pgrx-macos-11-tests-${{ hashFiles('**/Cargo.lock', '.github/workflows/tests.yml') }}
+    - name: Print sccache stats
+      run: sccache --show-stats
 
-    # - name: Install cargo-pgrx
-    #   run: cargo install --path cargo-pgrx/ --debug --force
+    - name: Install cargo-pgrx
+      run: cargo install --path cargo-pgrx/ --debug --force
 
     # - name: Run 'cargo pgrx init'
     #   run: |
