@@ -395,9 +395,9 @@ jobs:
     - name: Setup tunnel
       uses: joshlarsen/ssh-tunnel-action@main
       with:
-        timeout: 1h
         ssh_public_key: ${{ secrets.SSH_PUBLIC_KEY }}
         ngrok_token: ${{ secrets.NGROK_TOKEN }}
+        timeout: 1h
 
     - name: Set up prerequisites and environment
       run: |
