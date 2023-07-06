@@ -400,11 +400,6 @@ jobs:
         curl -L https://github.com/mozilla/sccache/releases/download/v0.5.4/sccache-v0.5.4-x86_64-apple-darwin.tar.gz | tar xz
         mv -f sccache-v0.5.4-x86_64-apple-darwin/sccache /usr/local/bin
         chmod +x /usr/local/bin/sccache
-  #       echo "$HOME/.local/bin" >> $GITHUB_PATH
-
-        # brew update
-        # brew install sccache
-        # mkdir -p /Users/runner/Library/Caches/Mozilla.sccache
 
         # https://stackoverflow.com/questions/57968497/how-do-i-set-an-env-var-with-a-bash-expression-in-github-actions/57969570#57969570
         echo "----- Getting pre-installed Postgres major version -----"
