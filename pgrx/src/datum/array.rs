@@ -119,15 +119,6 @@ impl<'a, T: FromDatum> Array<'a, T> {
             .map(|nonnull| NullKind::Bits(unsafe { &*nonnull.as_ptr() }))
             .unwrap_or(NullKind::Strict(nelems));
 
-        // The array-walking code assumes this is always the case, is it?
-        if let Layout { size: Size::Fixed(n), align, .. } = elem_layout {
-            let n: usize = n.into();
-            assert!(
-                n % (align.as_usize()) == 0,
-                "typlen does NOT include padding for fixed-width layouts!"
-            );
-        }
-
         // do a little two-step before jumping into the Cha-Cha Slide and figure out
         // which implementation is correct for the type of element in this Array.
         let slide_impl: ChaChaSlideImpl<T> = match elem_layout.pass {
@@ -146,18 +137,16 @@ impl<'a, T: FromDatum> Array<'a, T> {
 
             PassBy::Ref => match elem_layout.size {
                 // Array elements are varlenas, which are pass-by-reference and have a known alignment size
-                Size::Varlena => {
-                    Box::new(casper::PassByVarlena { align: elem_layout.align.as_usize() })
-                }
+                Size::Varlena => Box::new(casper::PassByVarlena { align: elem_layout.align }),
 
                 // Array elements are C strings, which are pass-by-reference and alignments are
                 // determined at runtime based on the length of the string
                 Size::CStr => Box::new(casper::PassByCStr),
 
-                // Array elements are fixed sizes yet Postgres wants us to pass around by reference
+                // Array elements are fixed sizes yet the data is "pass-by-reference"
+                // Most commonly, this is because of elements larger than a Datum.
                 Size::Fixed(size) => Box::new(casper::PassByFixed {
-                    align: elem_layout.align.as_usize(),
-                    size: size as usize,
+                    padded_size: elem_layout.align.pad(size.into()),
                 }),
             },
         };
@@ -384,6 +373,7 @@ fn as_slice<'a, T: Sized + FromDatum>(array: &'a Array<'_, T>) -> Result<&'a [T]
 }
 
 mod casper {
+    use crate::layout::Align;
     use crate::{pg_sys, varlena, Array, FromDatum};
 
     // it's a pop-culture reference (https://en.wikipedia.org/wiki/Cha_Cha_Slide) not some fancy crypto thing you nerd
@@ -450,7 +440,7 @@ mod casper {
 
     /// Array elements are [`pg_sys::varlena`] types, which are pass-by-reference
     pub(super) struct PassByVarlena {
-        pub(super) align: usize,
+        pub(super) align: Align,
     }
     impl<T: FromDatum> ChaChaSlide<T> for PassByVarlena {
         #[inline]
@@ -465,13 +455,8 @@ mod casper {
             // and the caller was informed of pointer requirements.
             let varsize = varlena::varsize_any(ptr.cast());
 
-            // the Postgres realignment code may seem different in form,
-            // but it's the same in function, just micro-optimized
-            let align = self.align;
-            let align_mask = varsize & (align - 1);
-            let align_offset = if align_mask != 0 { align - align_mask } else { 0 };
-
-            varsize + align_offset
+            // Now make sure this is aligned-up
+            self.align.pad(varsize)
         }
     }
 
@@ -495,9 +480,9 @@ mod casper {
     }
 
     pub(super) struct PassByFixed {
-        pub(super) align: usize,
-        pub(super) size: usize,
+        pub(super) padded_size: usize,
     }
+
     impl<T: FromDatum> ChaChaSlide<T> for PassByFixed {
         #[inline]
         unsafe fn bring_it_back_now(&self, array: &Array<T>, ptr: *const u8) -> Option<T> {
@@ -507,16 +492,7 @@ mod casper {
 
         #[inline]
         unsafe fn hop_size(&self, _ptr: *const u8) -> usize {
-            // SAFETY: we were told our size upon construction
-            let varsize = self.size;
-
-            // the Postgres realignment code may seem different in form,
-            // but it's the same in function, just micro-optimized
-            let align = self.align;
-            let align_mask = varsize & (align - 1);
-            let align_offset = if align_mask != 0 { align - align_mask } else { 0 };
-
-            varsize + align_offset
+            self.padded_size
         }
     }
 }
