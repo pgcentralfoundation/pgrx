@@ -114,21 +114,23 @@ pub fn run_test(
 
     let (mut client, session_id) = client()?;
 
-    let schema = "tests"; // get_extension_schema();
-    let result = match client.transaction() {
-        // run the test function in a transaction
-        Ok(mut tx) => {
-            let result = tx.simple_query(&format!("SELECT \"{schema}\".\"{sql_funcname}\"();"));
+    let result = client.transaction().map(|mut tx| {
+        let schema = "tests"; // get_extension_schema();
+        let result = tx.simple_query(&format!("SELECT \"{schema}\".\"{sql_funcname}\"();"));
 
-            if result.is_ok() {
-                // and abort the transaction when complete
-                tx.rollback().expect("test rollback didn't work");
-            }
-
-            result
+        if result.is_ok() {
+            // and abort the transaction when complete
+            tx.rollback()?;
         }
 
-        Err(e) => panic!("attempt to run test tx failed:\n{e}"),
+        result
+    });
+
+    // flatten the above result
+    let result = match result {
+        Err(e) => Err(e),
+        Ok(Err(e)) => Err(e),
+        Ok(_) => Ok(()),
     };
 
     if let Err(e) = result {
@@ -237,7 +239,7 @@ pub fn client() -> eyre::Result<(postgres::Client, String)> {
         .user(&get_pg_user())
         .dbname(&get_pg_dbname())
         .connect(postgres::NoTls)
-        .unwrap();
+        .wrap_err("Error connecting to Postgres")?;
 
     let sid_query_result = query_wrapper(
         Some("SELECT to_hex(trunc(EXTRACT(EPOCH FROM backend_start))::integer) || '.' || to_hex(pid) AS sid FROM pg_stat_activity WHERE pid = pg_backend_pid();".to_string()),
