@@ -32,6 +32,7 @@ impl Default for Pgtest {
 }
 unsafe impl PGRXSharedMemory for Pgtest {}
 
+static DEQUE: PgLwLock<heapless::Deque<Pgtest, 400>> = PgLwLock::new();
 static VEC: PgLwLock<heapless::Vec<Pgtest, 400>> = PgLwLock::new();
 static HASH: PgLwLock<heapless::FnvIndexMap<i32, i32, 4>> = PgLwLock::new();
 static STRUCT: PgLwLock<Pgtest> = PgLwLock::new();
@@ -40,6 +41,7 @@ static ATOMIC: PgAtomic<std::sync::atomic::AtomicBool> = PgAtomic::new();
 
 #[pg_guard]
 pub extern "C" fn _PG_init() {
+    pg_shmem_init!(DEQUE);
     pg_shmem_init!(VEC);
     pg_shmem_init!(HASH);
     pg_shmem_init!(STRUCT);
@@ -73,6 +75,50 @@ fn vec_push(value: Pgtest) {
 #[pg_extern]
 fn vec_pop() -> Option<Pgtest> {
     VEC.exclusive().pop()
+}
+
+#[pg_extern]
+fn deque_select() -> SetOfIterator<'static, Pgtest> {
+    SetOfIterator::new(DEQUE.share().iter().map(|i| *i).collect::<Vec<Pgtest>>().into_iter())
+}
+
+#[pg_extern]
+fn deque_count() -> i32 {
+    DEQUE.share().len() as i32
+}
+
+#[pg_extern]
+fn deque_drain() -> SetOfIterator<'static, Pgtest> {
+    let mut vec = DEQUE.exclusive();
+    let r = vec.iter().map(|i| *i).collect::<Vec<Pgtest>>();
+    vec.clear();
+    SetOfIterator::new(r.into_iter())
+}
+
+#[pg_extern]
+fn deque_push_back(value: Pgtest) {
+    DEQUE
+        .exclusive()
+        .push_back(value)
+        .unwrap_or_else(|_| warning!("Deque is full, discarding update"));
+}
+
+#[pg_extern]
+fn deque_push_front(value: Pgtest) {
+    DEQUE
+        .exclusive()
+        .push_front(value)
+        .unwrap_or_else(|_| warning!("Deque is full, discarding update"));
+}
+
+#[pg_extern]
+fn deque_pop_back() -> Option<Pgtest> {
+    DEQUE.exclusive().pop_back()
+}
+
+#[pg_extern]
+fn deque_pop_front() -> Option<Pgtest> {
+    DEQUE.exclusive().pop_front()
 }
 
 #[pg_extern]
