@@ -37,7 +37,9 @@ sptr = "0.3"
 libc = "0.2"
 
 [build-dependencies]
-bindgen = { version = "0.60.1", default-features = false, features = ["runtime"] }
+# bindgen 0.60.1 is unable to work with clang > 16
+# https://github.com/rust-lang/rust-bindgen/issues/2312
+bindgen = { version = "0.62.0", default-features = false, features = ["runtime"] }
 pgx-pg-config= { path = "../pgx-pg-config/", version = "=0.6.1" }
 pgx-utils = { path = "../pgx-utils/", version = "=0.6.1" }
 proc-macro2 = "1.0.47"
