@@ -135,6 +135,9 @@ pub fn run_test(
     if let Err(e) = result {
         let error_as_string = format!("error in test tx: {e}");
 
+        let system_loglines = format_loglines(&system_session_id, &loglines);
+        let session_loglines = format_loglines(&session_id, &loglines);
+
         let cause = e.into_source();
         if let Some(e) = cause {
             if let Some(dberror) = e.downcast_ref::<DbError>() {
@@ -167,18 +170,21 @@ pub fn run_test(
                     // then we can panic with those messages plus those that belong to the system
                     panic!(
                         "\n{sys}...\n{sess}\n{e}\n{pg}\n{rs}\n\n",
-                        sys = format_loglines(&system_session_id, &loglines),
-                        sess = format_loglines(&session_id, &loglines),
+                        sys = system_loglines,
+                        sess = session_loglines,
                         e = received_error_message.bold().red(),
                         pg = pg_location.dimmed().white(),
                         rs = rust_location.yellow()
                     );
                 }
             } else {
-                panic!("Failed downcast to DbError:\n{e}")
+                panic!("Failed downcast to DbError:\n{e}\n{system_loglines}\n{session_loglines}")
             }
         } else {
-            panic!("Error without deeper source cause:\n{e}\n", e = error_as_string.bold().red())
+            panic!(
+                "Error without deeper source cause:\n{e}\n{system_loglines}\n{session_loglines}",
+                e = error_as_string.bold().red()
+            )
         }
     } else if let Some(message) = expected_error {
         // we expected an ERROR, but didn't get one
