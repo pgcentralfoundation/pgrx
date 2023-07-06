@@ -152,10 +152,13 @@ pub fn run_test(
                 ("<unknown>".to_string(), "<unknown>".to_string(), format!("{error_as_string}"))
             };
 
+        // wait a second for Postgres to get log messages written to stderr
+        std::thread::sleep(std::time::Duration::from_millis(1000));
+
         let system_loglines = format_loglines(&system_session_id, &loglines);
         let session_loglines = format_loglines(&session_id, &loglines);
         panic!(
-            "\n\nPostgres Startup Messages:\n{system_loglines}\n\nSession Messages:\n{session_loglines}\n{message}\npostgres location: {pg_location}\nrust location: {rust_location}\n\n",
+            "\n\nPostgres Messages:\n{system_loglines}\n\nTest Function Messages:\n{session_loglines}\n{message}\npostgres location: {pg_location}\nrust location: {rust_location}\n\n",
                 system_loglines = system_loglines.dimmed().white(),
                 session_loglines = session_loglines.cyan(),
                 message = message.bold().red(),
