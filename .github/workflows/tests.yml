@@ -450,22 +450,28 @@ jobs:
     - name: Install cargo-pgrx
       run: cargo install --path cargo-pgrx/ --debug --force
 
-    # - name: Run 'cargo pgrx init'
-    #   run: |
-    #     set -x
-    #     cargo pgrx init --pg$PG_VER $(which pg_config)
+    - name: Print sccache stats
+      run: sccache --show-stats
 
-    # - name: Run base-level tests
-    #   run: |
-    #     set -x
-    #     cargo test \
-    #       --features "pg$PG_VER" --no-default-features \
-    #       --package cargo-pgrx \
-    #       --package pgrx \
-    #       --package pgrx-macros \
-    #       --package pgrx-pg-sys \
-    #       --package pgrx-tests \
-    #       --package pgrx-sql-entity-graph
+    - name: Run 'cargo pgrx init'
+      run: |
+        set -x
+        cargo pgrx init --pg$PG_VER $(which pg_config)
 
-    # - name: Stop sccache server
-    #   run: sccache --stop-server || true
+    - name: Run base-level tests
+      run: |
+        set -x
+        cargo test \
+          --features "pg$PG_VER" --no-default-features \
+          --package cargo-pgrx \
+          --package pgrx \
+          --package pgrx-macros \
+          --package pgrx-pg-sys \
+          --package pgrx-tests \
+          --package pgrx-sql-entity-graph
+
+    - name: Print sccache stats
+      run: sccache --show-stats
+
+    - name: Stop sccache server
+      run: sccache --stop-server || true
