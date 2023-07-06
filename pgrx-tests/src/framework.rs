@@ -65,42 +65,46 @@ where
     match result {
         Ok(result) => Ok(result),
         Err(e) => {
-            let dberror = e.as_db_error().unwrap();
-            let query = query.unwrap();
-            let query_message = dberror.message();
+            if let Some(dberror) = e.as_db_error() {
+                let query = query.unwrap();
+                let query_message = dberror.message();
 
-            let code = dberror.code().code();
-            let severity = dberror.severity();
+                let code = dberror.code().code();
+                let severity = dberror.severity();
 
-            let mut message = format!("{} SQLSTATE[{}]", severity, code).bold().red().to_string();
+                let mut message =
+                    format!("{} SQLSTATE[{}]", severity, code).bold().red().to_string();
 
-            message.push_str(format!(": {}", query_message.bold().white()).as_str());
-            message.push_str(format!("\nquery: {}", query.bold().white()).as_str());
-            message.push_str(
-                format!(
-                    "\nparams: {}",
-                    match query_params {
-                        Some(params) => format!("{:?}", params),
-                        None => "None".to_string(),
+                message.push_str(format!(": {}", query_message.bold().white()).as_str());
+                message.push_str(format!("\nquery: {}", query.bold().white()).as_str());
+                message.push_str(
+                    format!(
+                        "\nparams: {}",
+                        match query_params {
+                            Some(params) => format!("{:?}", params),
+                            None => "None".to_string(),
+                        }
+                    )
+                    .as_str(),
+                );
+
+                if let Ok(var) = std::env::var("RUST_BACKTRACE") {
+                    if var.eq("1") {
+                        let detail = dberror.detail().unwrap_or("None");
+                        let hint = dberror.hint().unwrap_or("None");
+                        let schema = dberror.hint().unwrap_or("None");
+                        let table = dberror.table().unwrap_or("None");
+                        let more_info = format!(
+                            "\ndetail: {detail}\nhint: {hint}\nschema: {schema}\ntable: {table}"
+                        );
+                        message.push_str(more_info.as_str());
                     }
-                )
-                .as_str(),
-            );
-
-            if let Ok(var) = std::env::var("RUST_BACKTRACE") {
-                if var.eq("1") {
-                    let detail = dberror.detail().unwrap_or("None");
-                    let hint = dberror.hint().unwrap_or("None");
-                    let schema = dberror.hint().unwrap_or("None");
-                    let table = dberror.table().unwrap_or("None");
-                    let more_info = format!(
-                        "\ndetail: {detail}\nhint: {hint}\nschema: {schema}\ntable: {table}"
-                    );
-                    message.push_str(more_info.as_str());
                 }
-            }
 
-            Err(eyre!(message))
+                Err(eyre!(message))
+            } else {
+                return Err(e).wrap_err("non-DbError");
+            }
         }
     }
 }
