@@ -392,13 +392,6 @@ jobs:
     steps:
     - uses: actions/checkout@v3
 
-    - name: Setup tunnel
-      uses: joshlarsen/ssh-tunnel-action@main
-      with:
-        ssh_public_key: ${{ secrets.SSH_PUBLIC_KEY }}
-        ngrok_token: ${{ secrets.NGROK_TOKEN }}
-        timeout: 1h
-
     - name: Set up prerequisites and environment
       run: |
         echo ""
