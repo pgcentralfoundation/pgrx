@@ -92,6 +92,13 @@ impl Align {
             Align::Double => TYPALIGN_DOUBLE,
         }) as _
     }
+
+    #[inline]
+    pub(crate) fn pad(self, size: usize) -> usize {
+        let size = size as usize;
+        let align = self.as_usize();
+        (size + (align - 1)) & !(align - 1)
+    }
 }
 
 #[derive(Clone, Copy, Debug, PartialEq)]
