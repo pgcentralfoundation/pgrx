@@ -401,6 +401,9 @@ jobs:
     if: "!contains(github.event.head_commit.message, 'nogha')"
     env:
       RUSTC_WRAPPER: sccache
+      SCCACHE_CACHE_SIZE: 20G
+      SCCACHE_DIR: /Users/runner/Library/Caches/Mozilla.sccache
+      SCCACHE_IDLE_TIMEOUT: 0
 
     strategy:
       matrix:
@@ -414,9 +417,11 @@ jobs:
         echo ""
 
         echo "----- Install sccache -----"
-        brew update
-        brew install sccache
-        mkdir -p /Users/runner/Library/Caches/Mozilla.sccache
+        curl -L https://github.com/mozilla/sccache/releases/download/v0.5.4/sccache-v0.5.4-x86_64-apple-darwin.tar.gz | tar xz
+        mv -f sccache-v0.5.4-x86_64-apple-darwin/sccache /usr/local/bin
+        chmod +x /usr/local/bin/sccache
+        mkdir -p $SCCACHE_DIR
+        sccache --version
 
         # https://stackoverflow.com/questions/57968497/how-do-i-set-an-env-var-with-a-bash-expression-in-github-actions/57969570#57969570
         echo "----- Getting pre-installed Postgres major version -----"
@@ -426,7 +431,7 @@ jobs:
 
         echo "----- Set up Postgres permissions -----"
         sudo chmod a+rwx `$(which pg_config) --pkglibdir` `$(which pg_config) --sharedir`/extension
-        ls -lath `$(which pg_config) --pkglibdir` `$(which pg_config) --sharedir`/extension
+        # ls -lath `$(which pg_config) --pkglibdir` `$(which pg_config) --sharedir`/extension
         echo ""
 
         echo "----- Output Cargo version -----"
@@ -437,12 +442,20 @@ jobs:
         env
         echo ""
 
+
     - name: Cache sccache directory
       uses: actions/cache@v3
       continue-on-error: false
       with:
         path: /Users/runner/Library/Caches/Mozilla.sccache
-        key: pgrx-sccache-macos-11-${{ hashFiles('**/Cargo.lock', '.github/workflows/tests.yml') }}
+        key: pgrx-sccache-macos-11-${{ hashFiles('**/Cargo.lock', '.github/workflows/tests.yml', '.cargo/config.toml') }}
+
+    - name: Cache cargo directory
+      uses: actions/cache@v3
+      with:
+        path: |
+          ~/.cargo
+        key: pgrx-cargo-macos-11-tests-${{ hashFiles('**/Cargo.lock', '.github/workflows/tests.yml', '.cargo/config.toml') }}
 
     - name: Start sccache server
       run: sccache --start-server
@@ -450,33 +463,22 @@ jobs:
     - name: Print sccache stats
       run: sccache --show-stats
 
-    - name: Cache cargo directory
-      uses: actions/cache@v3
-      with:
-        path: |
-          ~/.cargo/registry
-          ~/.cargo/git
-        key: pgrx-macos-11-tests-${{ hashFiles('**/Cargo.lock', '.github/workflows/tests.yml') }}
-
     - name: Install cargo-pgrx
       run: cargo install --path cargo-pgrx/ --debug --force
+
+    - name: Print sccache stats
+      run: sccache --show-stats
 
     - name: Run 'cargo pgrx init'
       run: |
         set -x
         cargo pgrx init --pg$PG_VER $(which pg_config)
 
-    - name: Run base-level tests
-      run: |
-        set -x
-        cargo test \
-          --features "pg$PG_VER" --no-default-features \
-          --package cargo-pgrx \
-          --package pgrx \
-          --package pgrx-macros \
-          --package pgrx-pg-sys \
-          --package pgrx-tests \
-          --package pgrx-sql-entity-graph
+    - name: Run tests
+      run: cargo test --all --features "pg$PG_VER pg_test cshim" --no-default-features
+
+    - name: Print sccache stats
+      run: sccache --show-stats
 
     - name: Stop sccache server
       run: sccache --stop-server || true
