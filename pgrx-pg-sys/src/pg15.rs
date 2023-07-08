@@ -1,12 +1,3 @@
-//LICENSE Portions Copyright 2019-2021 ZomboDB, LLC.
-//LICENSE
-//LICENSE Portions Copyright 2021-2023 Technology Concepts & Design, Inc.
-//LICENSE
-//LICENSE Portions Copyright 2023-2023 PgCentral Foundation, Inc. <contact@pgcentral.org>
-//LICENSE
-//LICENSE All rights reserved.
-//LICENSE
-//LICENSE Use of this source code is governed by the MIT license that can be found in the LICENSE file.
 use crate as pg_sys;
 #[cfg(any(
     feature = "pg12",
@@ -179,7 +170,8 @@ pub const ALIGNOF_LONG: u32 = 8;
 pub const ALIGNOF_PG_INT128_TYPE: u32 = 16;
 pub const ALIGNOF_SHORT: u32 = 2;
 pub const BLCKSZ: u32 = 8192;
-pub const CONFIGURE_ARGS : & [u8 ; 108] = b" '--prefix=/home/zombodb/.pgrx/15.3/pgrx-install' '--with-pgport=28815' '--enable-debug' '--enable-cassert'\0" ;
+pub const CONFIGURE_ARGS: &[u8; 72] =
+    b" '--prefix=/home/zombodb/.pgrx/15.3/pgrx-install' '--with-pgport=28815'\0";
 pub const DEF_PGPORT: u32 = 28815;
 pub const DEF_PGPORT_STR: &[u8; 6] = b"28815\0";
 pub const DLSUFFIX: &[u8; 4] = b".so\0";
@@ -350,7 +342,6 @@ pub const SIZEOF_OFF_T: u32 = 8;
 pub const SIZEOF_SIZE_T: u32 = 8;
 pub const SIZEOF_VOID_P: u32 = 8;
 pub const STDC_HEADERS: u32 = 1;
-pub const USE_ASSERT_CHECKING: u32 = 1;
 pub const USE_SSE42_CRC32C_WITH_RUNTIME_CHECK: u32 = 1;
 pub const USE_SYSV_SHARED_MEMORY: u32 = 1;
 pub const USE_UNNAMED_POSIX_SEMAPHORES: u32 = 1;
@@ -7639,10 +7630,6 @@ extern "C" {
 #[pgrx_macros::pg_guard]
 extern "C" {
     pub fn StopGeneratingPinnedObjectIds();
-}
-#[pgrx_macros::pg_guard]
-extern "C" {
-    pub fn AssertTransactionIdInAllowableRange(xid: TransactionId);
 }
 pub type Item = Pointer;
 pub type Page = Pointer;
@@ -17193,10 +17180,6 @@ extern "C" {
 }
 #[pgrx_macros::pg_guard]
 extern "C" {
-    pub fn AssertPendingSyncs_RelationCache();
-}
-#[pgrx_macros::pg_guard]
-extern "C" {
     pub fn AtEOXact_RelationCache(isCommit: bool);
 }
 #[pgrx_macros::pg_guard]
@@ -20228,7 +20211,6 @@ pub struct MemoryContextMethods {
             print_to_stderr: bool,
         ),
     >,
-    pub check: ::std::option::Option<unsafe extern "C" fn(context: MemoryContext)>,
 }
 #[repr(C)]
 #[derive(Debug, Copy, Clone)]
@@ -20342,10 +20324,6 @@ extern "C" {
 #[pgrx_macros::pg_guard]
 extern "C" {
     pub fn MemoryContextAllowInCriticalSection(context: MemoryContext, allow: bool);
-}
-#[pgrx_macros::pg_guard]
-extern "C" {
-    pub fn MemoryContextCheck(context: MemoryContext);
 }
 #[pgrx_macros::pg_guard]
 extern "C" {
@@ -30922,10 +30900,6 @@ extern "C" {
 }
 #[pgrx_macros::pg_guard]
 extern "C" {
-    pub fn GetLockMethodLocalHash() -> *mut HTAB;
-}
-#[pgrx_macros::pg_guard]
-extern "C" {
     pub fn LockHasWaiters(locktag: *const LOCKTAG, lockmode: LOCKMODE, sessionLock: bool) -> bool;
 }
 #[pgrx_macros::pg_guard]
@@ -34851,6 +34825,43 @@ extern "C" {
 #[pgrx_macros::pg_guard]
 extern "C" {
     pub fn get_language_oid(langname: *const ::std::os::raw::c_char, missing_ok: bool) -> Oid;
+}
+#[pgrx_macros::pg_guard]
+extern "C" {
+    pub fn GetSecurityLabel(
+        object: *const ObjectAddress,
+        provider: *const ::std::os::raw::c_char,
+    ) -> *mut ::std::os::raw::c_char;
+}
+#[pgrx_macros::pg_guard]
+extern "C" {
+    pub fn SetSecurityLabel(
+        object: *const ObjectAddress,
+        provider: *const ::std::os::raw::c_char,
+        label: *const ::std::os::raw::c_char,
+    );
+}
+#[pgrx_macros::pg_guard]
+extern "C" {
+    pub fn DeleteSecurityLabel(object: *const ObjectAddress);
+}
+#[pgrx_macros::pg_guard]
+extern "C" {
+    pub fn DeleteSharedSecurityLabel(objectId: Oid, classId: Oid);
+}
+#[pgrx_macros::pg_guard]
+extern "C" {
+    pub fn ExecSecLabelStmt(stmt: *mut SecLabelStmt) -> ObjectAddress;
+}
+pub type check_object_relabel_type = ::std::option::Option<
+    unsafe extern "C" fn(object: *const ObjectAddress, seclabel: *const ::std::os::raw::c_char),
+>;
+#[pgrx_macros::pg_guard]
+extern "C" {
+    pub fn register_label_provider(
+        provider: *const ::std::os::raw::c_char,
+        hook: check_object_relabel_type,
+    );
 }
 extern "C" {
     pub static mut allow_in_place_tablespaces: bool;

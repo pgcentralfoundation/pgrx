@@ -1,12 +1,3 @@
-//LICENSE Portions Copyright 2019-2021 ZomboDB, LLC.
-//LICENSE
-//LICENSE Portions Copyright 2021-2023 Technology Concepts & Design, Inc.
-//LICENSE
-//LICENSE Portions Copyright 2023-2023 PgCentral Foundation, Inc. <contact@pgcentral.org>
-//LICENSE
-//LICENSE All rights reserved.
-//LICENSE
-//LICENSE Use of this source code is governed by the MIT license that can be found in the LICENSE file.
 use crate as pg_sys;
 #[cfg(any(
     feature = "pg12",
@@ -344,7 +335,6 @@ pub const SIZEOF_OFF_T: u32 = 8;
 pub const SIZEOF_SIZE_T: u32 = 8;
 pub const SIZEOF_VOID_P: u32 = 8;
 pub const STDC_HEADERS: u32 = 1;
-pub const USE_ASSERT_CHECKING: u32 = 1;
 pub const USE_DEV_URANDOM: u32 = 1;
 pub const USE_FLOAT4_BYVAL: u32 = 1;
 pub const USE_FLOAT8_BYVAL: u32 = 1;
@@ -18999,7 +18989,6 @@ pub struct MemoryContextMethods {
             totals: *mut MemoryContextCounters,
         ),
     >,
-    pub check: ::std::option::Option<unsafe extern "C" fn(context: MemoryContext)>,
 }
 #[repr(C)]
 #[derive(Debug, Copy, Clone)]
@@ -19104,10 +19093,6 @@ extern "C" {
 #[pgrx_macros::pg_guard]
 extern "C" {
     pub fn MemoryContextAllowInCriticalSection(context: MemoryContext, allow: bool);
-}
-#[pgrx_macros::pg_guard]
-extern "C" {
-    pub fn MemoryContextCheck(context: MemoryContext);
 }
 #[pgrx_macros::pg_guard]
 extern "C" {
@@ -33130,6 +33115,43 @@ extern "C" {
 #[pgrx_macros::pg_guard]
 extern "C" {
     pub fn get_language_oid(langname: *const ::std::os::raw::c_char, missing_ok: bool) -> Oid;
+}
+#[pgrx_macros::pg_guard]
+extern "C" {
+    pub fn GetSecurityLabel(
+        object: *const ObjectAddress,
+        provider: *const ::std::os::raw::c_char,
+    ) -> *mut ::std::os::raw::c_char;
+}
+#[pgrx_macros::pg_guard]
+extern "C" {
+    pub fn SetSecurityLabel(
+        object: *const ObjectAddress,
+        provider: *const ::std::os::raw::c_char,
+        label: *const ::std::os::raw::c_char,
+    );
+}
+#[pgrx_macros::pg_guard]
+extern "C" {
+    pub fn DeleteSecurityLabel(object: *const ObjectAddress);
+}
+#[pgrx_macros::pg_guard]
+extern "C" {
+    pub fn DeleteSharedSecurityLabel(objectId: Oid, classId: Oid);
+}
+#[pgrx_macros::pg_guard]
+extern "C" {
+    pub fn ExecSecLabelStmt(stmt: *mut SecLabelStmt) -> ObjectAddress;
+}
+pub type check_object_relabel_type = ::std::option::Option<
+    unsafe extern "C" fn(object: *const ObjectAddress, seclabel: *const ::std::os::raw::c_char),
+>;
+#[pgrx_macros::pg_guard]
+extern "C" {
+    pub fn register_label_provider(
+        provider: *const ::std::os::raw::c_char,
+        hook: check_object_relabel_type,
+    );
 }
 extern "C" {
     pub static mut allow_in_place_tablespaces: bool;
