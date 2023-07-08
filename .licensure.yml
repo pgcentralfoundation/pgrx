@@ -1,6 +1,5 @@
 change_in_place: true
 excludes:
-  - Cargo.toml
   - Cargo.lock
   - LICENSE
   - pgrx-sql-entity-graph/assets/ansi.tmTheme
@@ -10,14 +9,13 @@ excludes:
   - "flake\\..*"
   - "logo.*"
   - ".github/**/*"
-  - ".cargo/config"
+  - ".cargo/config.toml"
   - "cargo-pgrx/src/templates/*"
   - "cargo-pgrx/tests/fixtures/macos-universal-binary"
   - ".*\\.control"
   - ".*\\.md"
   - ".*\\.nix"
   - ".*\\.yml"
-  - ".*\\.lock"
 licenses:
   - files: any
     ident: MIT
