@@ -44,13 +44,13 @@ comments:
       type: line 
       comment_char: "//LICENSE"
       trailing_lines: 0
-  - columns: 80
+  - columns: 120
     extension: sql
     commenter:
       type: line
       comment_char: "--LICENSE"
       trailing_lines: 0
-  - columns: 80
+  - columns: 120
     extension: any
     commenter:
       type: line
