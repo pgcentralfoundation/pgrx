@@ -23,7 +23,7 @@ licenses:
     authors:
       - name: PgCentral Foundation, Inc.
         email: contact@pgcentral.org
-    template: |
+    template: |-
       Portions Copyright 2019-2021 ZomboDB, LLC.
       
       Portions Copyright 2021-2023 Technology Concepts & Design, Inc.
