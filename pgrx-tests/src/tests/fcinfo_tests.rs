@@ -1,12 +1,12 @@
-/*
-Portions Copyright 2019-2021 ZomboDB, LLC.
-Portions Copyright 2021-2022 Technology Concepts & Design, Inc. <support@tcdi.com>
-
-All rights reserved.
-
-Use of this source code is governed by the MIT license that can be found in the LICENSE file.
-*/
-
+//LICENSE Portions Copyright 2019-2021 ZomboDB, LLC.
+//LICENSE
+//LICENSE Portions Copyright 2021-2023 Technology Concepts & Design, Inc.
+//LICENSE
+//LICENSE Portions Copyright 2023-2023 PgCentral Foundation, Inc. <contact@pgcentral.org>
+//LICENSE
+//LICENSE All rights reserved.
+//LICENSE
+//LICENSE Use of this source code is governed by the MIT license that can be found in the LICENSE file.
 use pgrx::prelude::*;
 use pgrx::{InOutFuncs, StringInfo};
 use serde::{Deserialize, Serialize};
@@ -99,7 +99,7 @@ fn same_name(same_name: &str) -> &str {
     same_name
 }
 
-// Tests for regression of https://github.com/tcdi/pgrx/issues/432
+// Tests for regression of https://github.com/pgcentralfoundation/pgrx/issues/432
 #[pg_extern]
 fn fcinfo_renamed_one_arg(
     _x: PgBox<pg_sys::IndexAmRoutine>,

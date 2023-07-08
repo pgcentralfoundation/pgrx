@@ -914,8 +914,8 @@ Moving-aggregate mode is pretty new to me, and I'm still learning about it! If y
 
 If you're looking for more materials about aggregates, the TimescaleDB folks wrote about aggregates and how they impacted their hyperfunctions in [this article][timescaledb-article-aggregation]. Also, My pal [Tim McNamara][timclicks] wrote about how to implement harmonic and geometric means as aggregates in [this article][timclicks-article-aggregates].
 
-[pgrx]: https://github.com/tcdi/pgrx
-[pgrx-issues]: https://github.com/tcdi/pgrx/issues
+[pgrx]: https://github.com/pgcentralfoundation/pgrx/
+[pgrx-issues]: https://github.com/pgcentralfoundation/pgrx/issues
 [pgrx-aggregate-aggregate]: https://docs.rs/pgrx/0.3.0/pgrx/aggregate/trait.Aggregate.html
 [pgrx-aggregate-aggregate-finalize]: https://docs.rs/pgrx/0.3.0/pgrx/aggregate/trait.Aggregate.html#tymethod.finalize
 [pgrx-aggregate-aggregate-state]: https://docs.rs/pgrx/0.3.0/pgrx/aggregate/trait.Aggregate.html#associatedtype.State

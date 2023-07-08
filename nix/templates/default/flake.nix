@@ -9,7 +9,7 @@
     naersk.inputs.nixpkgs.follows = "nixpkgs";
     gitignore.url = "github:hercules-ci/gitignore.nix";
     gitignore.inputs.nixpkgs.follows = "nixpkgs";
-    pgrx.url = "github:tcdi/pgrx";
+    pgrx.url = "github:pgcentralfoundation/pgrx";
     pgrx.inputs.nixpkgs.follows = "nixpkgs";
     pgrx.inputs.naersk.follows = "naersk";
   };
