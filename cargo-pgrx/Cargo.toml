@@ -1,7 +1,7 @@
 [package]
 name = "cargo-pgrx"
 version = "0.9.7"
-authors = ["ZomboDB, LLC <zombodb@gmail.com>"]
+authors = ["PgCentralFoundation, Inc. <contact@pgcentral.org>"]
 license = "MIT"
 description = "Cargo subcommand for 'pgrx' to make Postgres extension development easy"
 homepage = "https://github.com/tcdi/pgrx"

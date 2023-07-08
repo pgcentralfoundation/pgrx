@@ -930,8 +930,8 @@ If you're looking for more materials about aggregates, the TimescaleDB folks wro
 [pgrx::datum::Internal]: https://docs.rs/pgrx/0.3.0/pgrx/datum/struct.Internal.html
 [pgrx-pg_aggregate]: https://docs.rs/pgrx/0.3.0/pgrx/attr.pg_aggregate.html
 [pgrx-postgrestype]: https://docs.rs/pgrx/0.3.0/pgrx/derive.PostgresType.html
-[pgrx-system-requirements]: https://github.com/tcdi/pgrx#system-requirements
-[plrust]: https://github.com/zombodb/plrust
+[pgrx-system-requirements]: https://github.com/pgcentralfoundation/pgrx/#system-requirements
+[plrust]: https://github.com/tcdi/plrust
 [rustup-rs]: https://rustup.rs/
 [wsl]: https://docs.microsoft.com/en-us/windows/wsl/install
 [std::iter::Iterator]: https://doc.rust-lang.org/std/iter/trait.Iterator.html

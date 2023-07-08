@@ -2,7 +2,7 @@
 name = "pgrx-version-updater"
 version = "0.1.1"
 edition = "2021"
-authors = ["ZomboDB, LLC <zombodb@gmail.com>"]
+authors = ["PgCentralFoundation, Inc. <contact@pgcentral.org>"]
 license = "MIT"
 description = "Standalone tool to update PGRX Cargo.toml versions and dependencies in preparation for a release."
 
