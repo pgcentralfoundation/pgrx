@@ -43,10 +43,12 @@ comments:
       type: line
       comment_char: "//LICENSE"
   - extension: sql
+    trailing_lines: 0
     commenter:
       type: line
       comment_char: "--LICENSE"
   - extension: any
+    trailing_lines: 0
     commenter:
       type: line
       comment_char: "#LICENSE"
