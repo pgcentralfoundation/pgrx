@@ -16,7 +16,7 @@ excludes:
   - ".*\\.md"
   - ".*\\.nix"
   - ".*\\.yml"
-  - "*.lock"
+  - ".*\\.lock"
 licenses:
   - files: any
     ident: MIT
