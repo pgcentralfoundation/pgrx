@@ -1,3 +1,12 @@
+//LICENSE Portions Copyright 2019-2021 ZomboDB, LLC.
+//LICENSE
+//LICENSE Portions Copyright 2021-2023 Technology Concepts & Design, Inc.
+//LICENSE
+//LICENSE Portions Copyright 2023-2023 PgCentral Foundation, Inc. <contact@pgcentral.org>
+//LICENSE
+//LICENSE All rights reserved.
+//LICENSE
+//LICENSE Use of this source code is governed by the MIT license that can be found in the LICENSE file. 
 //! Utility functions for working with [`pg_sys::HeapTuple`][crate::pg_sys::HeapTuple] and [`pg_sys::HeapTupleHeader`][crate::pg_sys::HeapTupleHeader] structs
 use crate::*;
 use seq_macro::seq;
