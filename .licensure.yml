@@ -8,6 +8,7 @@ excludes:
   - ".dockerignore"
   - "flake\\..*"
   - "logo.*"
+  - "rustfmt.toml"
   - ".github/**/*"
   - ".cargo/config.toml"
   - "cargo-pgrx/src/templates/*"
