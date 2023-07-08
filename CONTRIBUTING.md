@@ -6,7 +6,7 @@ System Requirements:
 
 If you want to be ready to open a PR, you will want to run
 ```bash
-git clone --branch develop "https://github.com/tcdi/pgrx"
+git clone --branch develop "https://github.com/pgcentralfoundation/pgrx"
 cd pgrx
 ```
 That will put you in a cloned repository with the *develop* branch opened,
@@ -98,7 +98,7 @@ Do this *in order*:
 
 ## Licensing
 
-You agree that all code you submit in pull requests to https://github.com/tcdi/pgrx/pulls
+You agree that all code you submit in pull requests to https://github.com/pgcentralfoundation/pgrx/pulls
 is offered according to the MIT License, thus may be freely relicensed and sublicensed,
 and that you are satisfied with the existing copyright notice as of opening your PR.
 

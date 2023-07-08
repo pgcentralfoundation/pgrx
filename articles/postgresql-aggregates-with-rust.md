@@ -914,8 +914,8 @@ Moving-aggregate mode is pretty new to me, and I'm still learning about it! If y
 
 If you're looking for more materials about aggregates, the TimescaleDB folks wrote about aggregates and how they impacted their hyperfunctions in [this article][timescaledb-article-aggregation]. Also, My pal [Tim McNamara][timclicks] wrote about how to implement harmonic and geometric means as aggregates in [this article][timclicks-article-aggregates].
 
-[pgrx]: https://github.com/tcdi/pgrx
-[pgrx-issues]: https://github.com/tcdi/pgrx/issues
+[pgrx]: https://github.com/pgcentralfoundation/pgrx/
+[pgrx-issues]: https://github.com/pgcentralfoundation/pgrx/issues
 [pgrx-aggregate-aggregate]: https://docs.rs/pgrx/0.3.0/pgrx/aggregate/trait.Aggregate.html
 [pgrx-aggregate-aggregate-finalize]: https://docs.rs/pgrx/0.3.0/pgrx/aggregate/trait.Aggregate.html#tymethod.finalize
 [pgrx-aggregate-aggregate-state]: https://docs.rs/pgrx/0.3.0/pgrx/aggregate/trait.Aggregate.html#associatedtype.State
@@ -930,8 +930,8 @@ If you're looking for more materials about aggregates, the TimescaleDB folks wro
 [pgrx::datum::Internal]: https://docs.rs/pgrx/0.3.0/pgrx/datum/struct.Internal.html
 [pgrx-pg_aggregate]: https://docs.rs/pgrx/0.3.0/pgrx/attr.pg_aggregate.html
 [pgrx-postgrestype]: https://docs.rs/pgrx/0.3.0/pgrx/derive.PostgresType.html
-[pgrx-system-requirements]: https://github.com/tcdi/pgrx#system-requirements
-[plrust]: https://github.com/zombodb/plrust
+[pgrx-system-requirements]: https://github.com/pgcentralfoundation/pgrx/#system-requirements
+[plrust]: https://github.com/tcdi/plrust
 [rustup-rs]: https://rustup.rs/
 [wsl]: https://docs.microsoft.com/en-us/windows/wsl/install
 [std::iter::Iterator]: https://doc.rust-lang.org/std/iter/trait.Iterator.html

@@ -344,7 +344,7 @@ Perhaps a `serde::Deserialize` implementation that understands the JSONB format 
 
 ## `cargo-pgrx` is Your Friend
 
-Please see the [cargo-pgrx documentation](https://github.com/tcdi/pgrx/blob/master/cargo-pgrx/README.md)
+Please see the [cargo-pgrx documentation](https://github.com/pgcentralfoundation/pgrx/blob/master/cargo-pgrx/README.md)
 
 ## `postgrestd` Interactions
 

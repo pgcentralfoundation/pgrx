@@ -1,3 +1,12 @@
+//LICENSE Portions Copyright 2019-2021 ZomboDB, LLC.
+//LICENSE
+//LICENSE Portions Copyright 2021-2023 Technology Concepts & Design, Inc.
+//LICENSE
+//LICENSE Portions Copyright 2023-2023 PgCentral Foundation, Inc. <contact@pgcentral.org>
+//LICENSE
+//LICENSE All rights reserved.
+//LICENSE
+//LICENSE Use of this source code is governed by the MIT license that can be found in the LICENSE file.
 use core::ops::{Deref, DerefMut};
 
 pub(crate) enum Toast<T>
@@ -20,7 +29,7 @@ impl<T: Toasty> Drop for Toast<T> {
             Toast::Stale(_) => {}
             Toast::Fresh(_t) => {
                 //
-                // issue #971 (https://github.com/tcdi/pgrx/issues/971) points out a UAF with Arrays
+                // issue #971 (https://github.com/pgcentralfoundation/pgrx/issues/971) points out a UAF with Arrays
                 // of `&str`s.  This happens because ultimately we free the detoasted array.  Rather
                 // than allowing outstanding borrows to become freed, we'll just not drop the detoasted
                 // Datum pointer, which will leak that Postgres-allocated memory.

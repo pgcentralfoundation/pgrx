@@ -1,11 +1,21 @@
+#LICENSE Portions Copyright 2019-2021 ZomboDB, LLC.
+#LICENSE
+#LICENSE Portions Copyright 2021-2023 Technology Concepts & Design, Inc.
+#LICENSE
+#LICENSE Portions Copyright 2023-2023 PgCentral Foundation, Inc. <contact@pgcentral.org>
+#LICENSE
+#LICENSE All rights reserved.
+#LICENSE
+#LICENSE Use of this source code is governed by the MIT license that can be found in the LICENSE file.
+ 
 [package]
 name = "cargo-pgrx"
 version = "0.9.7"
-authors = ["ZomboDB, LLC <zombodb@gmail.com>"]
+authors = ["PgCentral Foundation, Inc. <contact@pgcentral.org>"]
 license = "MIT"
 description = "Cargo subcommand for 'pgrx' to make Postgres extension development easy"
-homepage = "https://github.com/tcdi/pgrx"
-repository = "https://github.com/tcdi/pgrx"
+homepage = "https://github.com/pgcentralfoundation/pgrx/"
+repository = "https://github.com/pgcentralfoundation/pgrx/"
 documentation = "https://docs.rs/cargo-pgrx"
 categories = ["development-tools::cargo-plugins", "command-line-utilities", "database"]
 keywords = ["database", "postgres", "postgresql", "extension"]

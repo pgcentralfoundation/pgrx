@@ -1,12 +1,12 @@
-/*
-Portions Copyright 2019-2021 ZomboDB, LLC.
-Portions Copyright 2021-2022 Technology Concepts & Design, Inc. <support@tcdi.com>
-
-All rights reserved.
-
-Use of this source code is governed by the MIT license that can be found in the LICENSE file.
-*/
-
+//LICENSE Portions Copyright 2019-2021 ZomboDB, LLC.
+//LICENSE
+//LICENSE Portions Copyright 2021-2023 Technology Concepts & Design, Inc.
+//LICENSE
+//LICENSE Portions Copyright 2023-2023 PgCentral Foundation, Inc. <contact@pgcentral.org>
+//LICENSE
+//LICENSE All rights reserved.
+//LICENSE
+//LICENSE Use of this source code is governed by the MIT license that can be found in the LICENSE file.
 //
 // we allow improper_ctypes just to eliminate these warnings:
 //      = note: `#[warn(improper_ctypes)]` on by default
@@ -837,7 +837,7 @@ mod internal {
 // Hack to fix linker errors that we get under amazonlinux2 on some PG versions
 // due to our wrappers for various system library functions. Should be fairly
 // harmless, but ideally we would not wrap these functions
-// (https://github.com/tcdi/pgrx/issues/730).
+// (https://github.com/pgcentralfoundation/pgrx/issues/730).
 #[cfg(target_os = "linux")]
 #[link(name = "resolv")]
 extern "C" {}

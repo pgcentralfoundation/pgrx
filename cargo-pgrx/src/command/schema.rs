@@ -1,11 +1,12 @@
-/*
-Portions Copyright 2019-2021 ZomboDB, LLC.
-Portions Copyright 2021-2022 Technology Concepts & Design, Inc. <support@tcdi.com>
-
-All rights reserved.
-
-Use of this source code is governed by the MIT license that can be found in the LICENSE file.
-*/
+//LICENSE Portions Copyright 2019-2021 ZomboDB, LLC.
+//LICENSE
+//LICENSE Portions Copyright 2021-2023 Technology Concepts & Design, Inc.
+//LICENSE
+//LICENSE Portions Copyright 2023-2023 PgCentral Foundation, Inc. <contact@pgcentral.org>
+//LICENSE
+//LICENSE All rights reserved.
+//LICENSE
+//LICENSE Use of this source code is governed by the MIT license that can be found in the LICENSE file.
 use crate::command::get::{find_control_file, get_property};
 use crate::command::install::format_display_path;
 use crate::pgrx_pg_sys_stub::PgrxPgSysStub;
@@ -29,11 +30,11 @@ use alloc::vec::Vec;
 use std::env;
 
 // An apparent bug in `glibc` 2.17 prevents us from safely dropping this
-// otherwise users find issues such as https://github.com/tcdi/pgrx/issues/572
+// otherwise users find issues such as https://github.com/pgcentralfoundation/pgrx/issues/572
 static POSTMASTER_LIBRARY: OnceCell<libloading::os::unix::Library> = OnceCell::new();
 
 // An apparent bug in `glibc` 2.17 prevents us from safely dropping this
-// otherwise users find issues such as https://github.com/tcdi/pgrx/issues/572
+// otherwise users find issues such as https://github.com/pgcentralfoundation/pgrx/issues/572
 static EXTENSION_LIBRARY: OnceCell<libloading::os::unix::Library> = OnceCell::new();
 
 /// Generate extension schema files

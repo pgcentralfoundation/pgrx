@@ -126,7 +126,7 @@ If a new minor Postgres version is released in the future you can simply run `ca
 
 ```shell script
 cargo-pgrx-init 0.5.0
-ZomboDB, LLC <zombodb@gmail.com>
+PgCentral Foundation, Inc. <contact@pgcentral.org>
 Initialize pgrx development environment for the first time
 
 USAGE:
@@ -175,7 +175,7 @@ If you'd like to create a "background worker" instead, specify the `--bgworker` 
 ```shell script
 $ cargo pgrx new --help
 cargo-pgrx-new 0.5.0
-ZomboDB, LLC <zombodb@gmail.com>
+PgCentral Foundation, Inc. <contact@pgcentral.org>
 Create a new extension crate
 
 USAGE:
@@ -291,7 +291,7 @@ For Postgres installations which are already on your computer, `cargo pgrx run` 
 ```shell script
 $ cargo pgrx run --help
 cargo-pgrx-run 0.5.0
-ZomboDB, LLC <zombodb@gmail.com>
+PgCentral Foundation, Inc. <contact@pgcentral.org>
 Compile/install extension to a pgrx-managed Postgres instance and start psql
 
 USAGE:
@@ -366,7 +366,7 @@ the specified version of Postgres isn't running, it'll be automatically started.
 
 ```shell script
 cargo-pgrx-connect 0.5.
-ZomboDB, LLC <zombodb@gmail.com>
+PgCentral Foundation, Inc. <contact@pgcentral.org>
 Connect, via psql, to a Postgres instance
 
 USAGE:
@@ -427,7 +427,7 @@ By default, `cargo pgrx install` builds your extension in debug mode. Specifying
 ```shell script
 $ cargo pgrx install --help
 cargo-pgrx-install 0.5.0
-ZomboDB, LLC <zombodb@gmail.com>
+PgCentral Foundation, Inc. <contact@pgcentral.org>
 Install the extension from the current crate to the Postgres specified by whatever `pg_config` is
 currently on your $PATH
 
@@ -515,7 +515,7 @@ make to the database are not preserved.
 
 ```shell script
 cargo-pgrx-test 0.5.0
-ZomboDB, LLC <zombodb@gmail.com>
+PgCentral Foundation, Inc. <contact@pgcentral.org>
 Run the test suite for this crate
 
 USAGE:
@@ -598,7 +598,7 @@ distobutions or MacOS Postgres installations.
 ```shell script
 $ cargo pgrx package --help
 cargo-pgrx-package 0.5.0
-ZomboDB, LLC <zombodb@gmail.com>
+PgCentral Foundation, Inc. <contact@pgcentral.org>
 Create an installation package directory
 
 USAGE:
@@ -654,7 +654,7 @@ If you just want to look at the full extension schema that pgrx will generate, u
 ```shell script
 $ cargo pgrx schema --help
 cargo-pgrx-schema 0.5.0
-ZomboDB, LLC <zombodb@gmail.com>
+PgCentral Foundation, Inc. <contact@pgcentral.org>
 Generate extension schema files
 
 USAGE:
@@ -849,5 +849,5 @@ If you are certain that in this case, it is fine, you may set
 and the check will be bypassed. However, note that while the check is not
 fool-proof, it tries to be fairly liberal in what it allows.
 
-See <https://github.com/tcdi/pgrx/issues/774> and <https://github.com/tcdi/pgrx/pull/873>
+See <https://github.com/pgcentralfoundation/pgrx/issues/774> and <https://github.com/pgcentralfoundation/pgrx/pull/873>
 for further information.
