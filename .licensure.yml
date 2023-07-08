@@ -26,7 +26,9 @@ licenses:
         email: contact@pgcentral.org
     template: |
       Portions Copyright 2019-2021 ZomboDB, LLC.
+
       Portions Copyright 2021-2023 Technology Concepts & Design, Inc.
+
       Portions Copyright 2023-[year] [name of author]
       
       All rights reserved.
@@ -41,14 +43,14 @@ comments:
       - sql
     commenter:
       type: block
-      start_block_char: "/*\n"
-      end_block_char: "\n*/\n"
+      start_block_char: "/*BEGIN_LICENSE\n"
+      end_block_char: "\nEND_LICENSE*/\n"
   - columns: 120
     extension: html
     commenter:
       type: block
-      start_block_char: "<!--\n"
-      end_block_char: "-->"
+      start_block_char: "<!--BEGIN_LICENSE\n"
+      end_block_char: "END_LICENSE-->"
   - columns: 80
     extension: any
     commenter:
