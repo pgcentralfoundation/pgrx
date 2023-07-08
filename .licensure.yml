@@ -40,21 +40,20 @@ comments:
       - rs
       - c
       - h
-      - sql
     commenter:
-      type: block
-      start_block_char: "/*BEGIN_LICENSE\n"
-      end_block_char: "\nEND_LICENSE*/\n"
-  - columns: 120
-    extension: html
+      type: line 
+      comment_char: "//LICENSE "
+      trailing_lines: 0
+  - columns: 80
+    extension: sql
     commenter:
-      type: block
-      start_block_char: "<!--BEGIN_LICENSE\n"
-      end_block_char: "END_LICENSE-->"
+      type: line
+      comment_char: "--LICENSE "
+      trailing_lines: 0
   - columns: 80
     extension: any
     commenter:
       type: line
-      comment_char: "#"
+      comment_char: "#LICENSE "
       trailing_lines: 0
     
