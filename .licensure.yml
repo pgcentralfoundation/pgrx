@@ -38,6 +38,7 @@ comments:
       - rs
       - c
       - h
+    trailing_lines: 0
     commenter:
       type: line
       comment_char: "//LICENSE"
