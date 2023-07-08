@@ -6,7 +6,8 @@
 //LICENSE
 //LICENSE All rights reserved.
 //LICENSE
-//LICENSE Use of this source code is governed by the MIT license that can be found in the LICENSE file. 
+//LICENSE Use of this source code is governed by the MIT license that can be found in the LICENSE file.
+ 
 fn main() {
     println!("cargo:rerun-if-changed=build.rs");
     if let Some(minor_version) = rust_minor_version() {

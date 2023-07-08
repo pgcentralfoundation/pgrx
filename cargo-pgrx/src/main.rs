@@ -6,7 +6,8 @@
 //LICENSE
 //LICENSE All rights reserved.
 //LICENSE
-//LICENSE Use of this source code is governed by the MIT license that can be found in the LICENSE file. 
+//LICENSE Use of this source code is governed by the MIT license that can be found in the LICENSE file.
+ 
 #![deny(clippy::perf)] // our compile times are awful
 #![allow(clippy::or_fun_call)] // often false positives
 

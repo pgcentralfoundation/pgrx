@@ -6,7 +6,8 @@
 #LICENSE
 #LICENSE All rights reserved.
 #LICENSE
-#LICENSE Use of this source code is governed by the MIT license that can be found in the LICENSE file. 
+#LICENSE Use of this source code is governed by the MIT license that can be found in the LICENSE file.
+ 
 [package]
 name = "custom_libname"
 version = "0.1.0"

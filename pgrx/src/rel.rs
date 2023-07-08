@@ -6,7 +6,8 @@
 //LICENSE
 //LICENSE All rights reserved.
 //LICENSE
-//LICENSE Use of this source code is governed by the MIT license that can be found in the LICENSE file. 
+//LICENSE Use of this source code is governed by the MIT license that can be found in the LICENSE file.
+ 
 //! Provides a safe wrapper around Postgres' `pg_sys::RelationData` struct
 use crate::{
     direct_function_call, name_data_to_str, pg_sys, FromDatum, IntoDatum, PgBox, PgTupleDesc,

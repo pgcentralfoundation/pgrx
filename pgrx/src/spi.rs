@@ -6,7 +6,8 @@
 //LICENSE
 //LICENSE All rights reserved.
 //LICENSE
-//LICENSE Use of this source code is governed by the MIT license that can be found in the LICENSE file. 
+//LICENSE Use of this source code is governed by the MIT license that can be found in the LICENSE file.
+ 
 //! Safe access to Postgres' *Server Programming Interface* (SPI).
 
 use crate::{pg_sys, FromDatum, IntoDatum, Json, PgMemoryContexts, PgOid, TryFromDatumError};

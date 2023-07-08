@@ -6,7 +6,8 @@
 //LICENSE
 //LICENSE All rights reserved.
 //LICENSE
-//LICENSE Use of this source code is governed by the MIT license that can be found in the LICENSE file. 
+//LICENSE Use of this source code is governed by the MIT license that can be found in the LICENSE file.
+ 
 //! Provides a safe interface to Postgres `HeapTuple` objects.
 //!
 //! [`PgHeapTuple`]s also describe composite types as defined by [`pgrx::composite_type!()`][crate::composite_type].

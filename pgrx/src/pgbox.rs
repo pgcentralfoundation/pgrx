@@ -6,7 +6,8 @@
 //LICENSE
 //LICENSE All rights reserved.
 //LICENSE
-//LICENSE Use of this source code is governed by the MIT license that can be found in the LICENSE file. 
+//LICENSE Use of this source code is governed by the MIT license that can be found in the LICENSE file.
+ 
 /// Similar to Rust's `Box<T>` type, `PgBox<T>` also represents heap-allocated memory.
 use crate::{pg_sys, PgMemoryContexts};
 //use std::fmt::{Debug, Error, Formatter};

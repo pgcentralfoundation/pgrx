@@ -6,7 +6,8 @@
 //LICENSE
 //LICENSE All rights reserved.
 //LICENSE
-//LICENSE Use of this source code is governed by the MIT license that can be found in the LICENSE file. 
+//LICENSE Use of this source code is governed by the MIT license that can be found in the LICENSE file.
+ 
 use crate::{
     bits8, getmissingattr, heap_getsysattr, nocachegetattr, CommandId, Datum,
     FormData_pg_attribute, FrozenTransactionId, HeapTupleData, HeapTupleHeaderData, TransactionId,

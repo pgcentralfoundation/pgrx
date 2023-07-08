@@ -6,7 +6,8 @@
 //LICENSE
 //LICENSE All rights reserved.
 //LICENSE
-//LICENSE Use of this source code is governed by the MIT license that can be found in the LICENSE file. 
+//LICENSE Use of this source code is governed by the MIT license that can be found in the LICENSE file.
+ 
 //! A safe wrapper around Postgres' internal [`List`][crate::pg_sys::List] structure.
 //!
 //! It functions similarly to a Rust [`Vec`][std::vec::Vec], including iterator support, but provides separate

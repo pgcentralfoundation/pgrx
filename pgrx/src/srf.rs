@@ -6,7 +6,8 @@
 //LICENSE
 //LICENSE All rights reserved.
 //LICENSE
-//LICENSE Use of this source code is governed by the MIT license that can be found in the LICENSE file. 
+//LICENSE Use of this source code is governed by the MIT license that can be found in the LICENSE file.
+ 
 #![doc(hidden)]
 //! Helper implementations for returning sets and tables from `#[pg_extern]`-style functions
 use crate::iter::{SetOfIterator, TableIterator};

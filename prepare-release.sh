@@ -7,7 +7,8 @@
 #LICENSE
 #LICENSE All rights reserved.
 #LICENSE
-#LICENSE Use of this source code is governed by the MIT license that can be found in the LICENSE file. 
+#LICENSE Use of this source code is governed by the MIT license that can be found in the LICENSE file.
+ 
 
 NEW_VERSION=$1
 if [ -z "${NEW_VERSION}" ]; then

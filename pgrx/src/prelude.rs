@@ -6,7 +6,8 @@
 //LICENSE
 //LICENSE All rights reserved.
 //LICENSE
-//LICENSE Use of this source code is governed by the MIT license that can be found in the LICENSE file. 
+//LICENSE Use of this source code is governed by the MIT license that can be found in the LICENSE file.
+ 
 // From "external" crates:
 pub use ::pgrx_macros::*; // yes, we really do want to re-export every macro that pgrx_macros provides
 pub use ::pgrx_pg_sys as pg_sys;

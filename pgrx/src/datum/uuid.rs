@@ -6,7 +6,8 @@
 //LICENSE
 //LICENSE All rights reserved.
 //LICENSE
-//LICENSE Use of this source code is governed by the MIT license that can be found in the LICENSE file. 
+//LICENSE Use of this source code is governed by the MIT license that can be found in the LICENSE file.
+ 
 use crate::{pg_sys, FromDatum, IntoDatum, PgMemoryContexts};
 use core::fmt::Write;
 use pgrx_sql_entity_graph::metadata::{

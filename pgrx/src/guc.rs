@@ -6,7 +6,8 @@
 //LICENSE
 //LICENSE All rights reserved.
 //LICENSE
-//LICENSE Use of this source code is governed by the MIT license that can be found in the LICENSE file. 
+//LICENSE Use of this source code is governed by the MIT license that can be found in the LICENSE file.
+ 
 //! Provides a safe interface into Postgres' Configuration System (GUC)
 use crate::{pg_sys, PgMemoryContexts};
 use core::ffi::CStr;

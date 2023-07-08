@@ -6,7 +6,8 @@
 //LICENSE
 //LICENSE All rights reserved.
 //LICENSE
-//LICENSE Use of this source code is governed by the MIT license that can be found in the LICENSE file. 
+//LICENSE Use of this source code is governed by the MIT license that can be found in the LICENSE file.
+ 
 #![forbid(unsafe_op_in_unsafe_fn)]
 //! If this test compiles, and assuming it includes a usage of all the things pgrx generates code for
 //! then we know that pgrx has ::fully::qualified::all::its::pgrx::symbols

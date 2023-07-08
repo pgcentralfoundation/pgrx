@@ -6,7 +6,8 @@
 //LICENSE
 //LICENSE All rights reserved.
 //LICENSE
-//LICENSE Use of this source code is governed by the MIT license that can be found in the LICENSE file. 
+//LICENSE Use of this source code is governed by the MIT license that can be found in the LICENSE file.
+ 
 use pgrx_sql_entity_graph::{PostgresHash, PostgresOrd};
 
 use crate::{parse_postgres_type_args, PostgresTypeAttribute};

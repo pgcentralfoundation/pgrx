@@ -6,7 +6,8 @@
 //LICENSE
 //LICENSE All rights reserved.
 //LICENSE
-//LICENSE Use of this source code is governed by the MIT license that can be found in the LICENSE file. 
+//LICENSE Use of this source code is governed by the MIT license that can be found in the LICENSE file.
+ 
 // If this code doesn't generate a syntax error in the generated SQL then PR #1134 is working as expected
 use pgrx::{prelude::*, Internal};
 

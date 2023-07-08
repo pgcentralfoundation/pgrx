@@ -6,7 +6,8 @@
 //LICENSE
 //LICENSE All rights reserved.
 //LICENSE
-//LICENSE Use of this source code is governed by the MIT license that can be found in the LICENSE file. 
+//LICENSE Use of this source code is governed by the MIT license that can be found in the LICENSE file.
+ 
 use crate::{
     item_pointer_get_both, item_pointer_set_all, pg_sys, FromDatum, IntoDatum, PgMemoryContexts,
 };

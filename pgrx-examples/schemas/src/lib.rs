@@ -6,7 +6,8 @@
 //LICENSE
 //LICENSE All rights reserved.
 //LICENSE
-//LICENSE Use of this source code is governed by the MIT license that can be found in the LICENSE file. 
+//LICENSE Use of this source code is governed by the MIT license that can be found in the LICENSE file.
+ 
 /// All top-level pgrx objects, **regardless** of the ".rs" file they're defined in, are created
 /// in the schema determined by `CREATE EXTENSION`.  It could be `public` (the default), or a
 /// user-specified schema. We have no idea what that is.
