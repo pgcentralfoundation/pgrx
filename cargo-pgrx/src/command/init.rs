@@ -1,12 +1,12 @@
-/*
-Portions Copyright 2019-2021 ZomboDB, LLC.
-Portions Copyright 2021-2022 Technology Concepts & Design, Inc. <support@tcdi.com>
-
-All rights reserved.
-
-Use of this source code is governed by the MIT license that can be found in the LICENSE file.
-*/
-
+//LICENSE Portions Copyright 2019-2021 ZomboDB, LLC.
+//LICENSE
+//LICENSE Portions Copyright 2021-2023 Technology Concepts & Design, Inc.
+//LICENSE
+//LICENSE Portions Copyright 2023-2023 PgCentral Foundation, Inc. <contact@pgcentral.org>
+//LICENSE
+//LICENSE All rights reserved.
+//LICENSE
+//LICENSE Use of this source code is governed by the MIT license that can be found in the LICENSE file.
 use crate::command::stop::stop_postgres;
 use crate::command::version::pgrx_default;
 use crate::CommandExecute;
@@ -37,7 +37,7 @@ static PROCESS_ENV_DENYLIST: &'static [&'static str] = &[
     "OUT_DIR",
     "HOST",
     "NUM_JOBS",
-    "LIBRARY_PATH", // see https://github.com/tcdi/pgrx/issues/16
+    "LIBRARY_PATH", // see https://github.com/pgcentralfoundation/pgrx/issues/16
 ];
 
 /// Initialize pgrx development environment for the first time

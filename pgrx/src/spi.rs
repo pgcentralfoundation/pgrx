@@ -1,12 +1,12 @@
-/*
-Portions Copyright 2019-2021 ZomboDB, LLC.
-Portions Copyright 2021-2022 Technology Concepts & Design, Inc. <support@tcdi.com>
-
-All rights reserved.
-
-Use of this source code is governed by the MIT license that can be found in the LICENSE file.
-*/
-
+//LICENSE Portions Copyright 2019-2021 ZomboDB, LLC.
+//LICENSE
+//LICENSE Portions Copyright 2021-2023 Technology Concepts & Design, Inc.
+//LICENSE
+//LICENSE Portions Copyright 2023-2023 PgCentral Foundation, Inc. <contact@pgcentral.org>
+//LICENSE
+//LICENSE All rights reserved.
+//LICENSE
+//LICENSE Use of this source code is governed by the MIT license that can be found in the LICENSE file.
 //! Safe access to Postgres' *Server Programming Interface* (SPI).
 
 use crate::{pg_sys, FromDatum, IntoDatum, Json, PgMemoryContexts, PgOid, TryFromDatumError};
@@ -571,7 +571,7 @@ impl Spi {
         // The primary driver for this is not that we think we're smarter than Postgres, it's that
         // otherwise this function would need to return a `Result<R, spi::Error>` and that's a
         // fucking nightmare for users to deal with.  There's ample discussion around coming to
-        // this decision at https://github.com/tcdi/pgrx/pull/977
+        // this decision at https://github.com/pgcentralfoundation/pgrx/pull/977
         let connection =
             SpiConnection::connect().expect("SPI_connect indicated an unexpected failure");
 
