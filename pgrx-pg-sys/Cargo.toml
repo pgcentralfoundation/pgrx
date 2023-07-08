@@ -11,7 +11,7 @@
 [package]
 name = "pgrx-pg-sys"
 version = "0.9.7"
-authors = ["PgCentralFoundation, Inc. <contact@pgcentral.org>"]
+authors = ["PgCentral Foundation, Inc. <contact@pgcentral.org>"]
 license = "MIT"
 description = "Generated Rust bindings for Postgres internals, for use with 'pgrx'"
 homepage = "https://github.com/pgcentralfoundation/pgrx/"

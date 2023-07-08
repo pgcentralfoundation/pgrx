@@ -11,7 +11,7 @@
 [package]
 name = "pgrx-sql-entity-graph"
 version = "0.9.7"
-authors = ["PgCentralFoundation, Inc. <contact@pgcentral.org>"]
+authors = ["PgCentral Foundation, Inc. <contact@pgcentral.org>"]
 license = "MIT"
 description = "Sql Entity Graph for `pgrx`"
 homepage = "https://github.com/pgcentralfoundation/pgrx/"
