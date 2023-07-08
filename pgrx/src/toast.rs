@@ -20,7 +20,7 @@ impl<T: Toasty> Drop for Toast<T> {
             Toast::Stale(_) => {}
             Toast::Fresh(_t) => {
                 //
-                // issue #971 (https://github.com/tcdi/pgrx/issues/971) points out a UAF with Arrays
+                // issue #971 (https://github.com/pgcentralfoundation/pgrx/issues/971) points out a UAF with Arrays
                 // of `&str`s.  This happens because ultimately we free the detoasted array.  Rather
                 // than allowing outstanding borrows to become freed, we'll just not drop the detoasted
                 // Datum pointer, which will leak that Postgres-allocated memory.

@@ -837,7 +837,7 @@ mod internal {
 // Hack to fix linker errors that we get under amazonlinux2 on some PG versions
 // due to our wrappers for various system library functions. Should be fairly
 // harmless, but ideally we would not wrap these functions
-// (https://github.com/tcdi/pgrx/issues/730).
+// (https://github.com/pgcentralfoundation/pgrx/issues/730).
 #[cfg(target_os = "linux")]
 #[link(name = "resolv")]
 extern "C" {}

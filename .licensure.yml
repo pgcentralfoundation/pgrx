@@ -19,16 +19,14 @@ licenses:
   - files: any
     ident: MIT
     authors:
-      - name: Technology Concepts & Design, Inc.
-        email: support@tcdi.com
+      - name: PgCentral Foundation, Inc.
+        email: contact@pgcentral.org
     template: |
       Portions Copyright 2019-2021 ZomboDB, LLC.
-      
-      Portions Copyright 2021-[year] [name of author]
-      
+      Portions Copyright 2021-2023 Technology Concepts & Design, Inc.
+      Portions Copyright 2023-[year] [name of author]
       
       All rights reserved.
-      
       
       Use of this source code is governed by the [ident] license that can be found in the LICENSE file.
 comments:

@@ -4,10 +4,10 @@
 
 > Build Postgres Extensions with Rust!
 
-![cargo test --all](https://github.com/tcdi/pgrx/workflows/cargo%20test%20--all/badge.svg)
+![cargo test --all](https://github.com/pgcentralfoundation/pgrx/workflows/cargo%20test%20--all/badge.svg)
 [![crates.io badge](https://img.shields.io/crates/v/pgrx.svg)](https://crates.io/crates/pgrx)
 [![docs.rs badge](https://docs.rs/pgrx/badge.svg)](https://docs.rs/pgrx)
-[![Twitter Follow](https://img.shields.io/twitter/follow/zombodb.svg?style=flat)](https://twitter.com/zombodb)
+[![Twitter Follow](https://img.shields.io/twitter/follow/pgrx_rs.svg?style=flat)](https://twitter.com/pgrx_rs)
 [![Discord Chat](https://img.shields.io/discord/561648697805504526.svg)][Discord]
 
 
@@ -243,8 +243,11 @@ There's probably more than are listed here, but a primary things of note are:
 
 There's a few things on our immediate TODO list
 
- - Automatic extension schema upgrade scripts, based on diffs from a previous git tag and HEAD.  Likely, this
-will be built into the `cargo-pgrx` subcommand and make use of https://github.com/zombodb/postgres-parser.
+ - Automatic extension schema upgrade scripts
+ - Improved unit testing framework
+ - Better/Safer API for Datum management
+ - Improved generated bindings organization
+ - Safely wrap more Postgres internal APIs
  - More examples -- especially around memory management and the various derive macros `#[derive(PostgresType/Enum)]`
 
 
@@ -306,7 +309,9 @@ This approach can also be used in extensions to ensure a matching version of `ca
 
 ```
 Portions Copyright 2019-2021 ZomboDB, LLC.  
-Portions Copyright 2021-2022 Technology Concepts & Design, Inc. <support@tcdi.com>. 
+Portions Copyright 2021-2023 Technology Concepts & Design, Inc.
+Portions Copyright 2023 PgCentral Foundation, Inc.
+
 All rights reserved.
 Use of this source code is governed by the MIT license that can be found in the LICENSE file.
 ```

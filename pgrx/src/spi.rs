@@ -571,7 +571,7 @@ impl Spi {
         // The primary driver for this is not that we think we're smarter than Postgres, it's that
         // otherwise this function would need to return a `Result<R, spi::Error>` and that's a
         // fucking nightmare for users to deal with.  There's ample discussion around coming to
-        // this decision at https://github.com/tcdi/pgrx/pull/977
+        // this decision at https://github.com/pgcentralfoundation/pgrx/pull/977
         let connection =
             SpiConnection::connect().expect("SPI_connect indicated an unexpected failure");
 

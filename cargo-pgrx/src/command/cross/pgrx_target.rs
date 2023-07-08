@@ -21,7 +21,7 @@ use std::{
 /// It is optional, but recommended for most cases (any case where the host and
 /// target are not identical versions of Debian).
 ///
-/// See the documentation in `CROSS_COMPILE.md` in <https://github.com/tcdi/pgrx>
+/// See the documentation in `CROSS_COMPILE.md` in <https://github.com/pgcentralfoundation/pgrx/>
 /// for specifics of this file format and how to use the resulting file. Note
 /// that this is currently unlikely to be useful on non-Linux targets, as pgrx
 /// does not yet support cross-compilation on those targets.

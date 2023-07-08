@@ -29,11 +29,11 @@ use alloc::vec::Vec;
 use std::env;
 
 // An apparent bug in `glibc` 2.17 prevents us from safely dropping this
-// otherwise users find issues such as https://github.com/tcdi/pgrx/issues/572
+// otherwise users find issues such as https://github.com/pgcentralfoundation/pgrx/issues/572
 static POSTMASTER_LIBRARY: OnceCell<libloading::os::unix::Library> = OnceCell::new();
 
 // An apparent bug in `glibc` 2.17 prevents us from safely dropping this
-// otherwise users find issues such as https://github.com/tcdi/pgrx/issues/572
+// otherwise users find issues such as https://github.com/pgcentralfoundation/pgrx/issues/572
 static EXTENSION_LIBRARY: OnceCell<libloading::os::unix::Library> = OnceCell::new();
 
 /// Generate extension schema files
