@@ -1,13 +1,3 @@
-//LICENSE Portions Copyright 2019-2021 ZomboDB, LLC.
-//LICENSE
-//LICENSE Portions Copyright 2021-2023 Technology Concepts & Design, Inc.
-//LICENSE
-//LICENSE Portions Copyright 2023-2023 PgCentral Foundation, Inc. <contact@pgcentral.org>
-//LICENSE
-//LICENSE All rights reserved.
-//LICENSE
-//LICENSE Use of this source code is governed by the MIT license that can be found in the LICENSE file.
- 
 //! Exposes constructor methods for creating [`TimestampWithTimeZone`]s based on the various
 //! ways Postgres likes to interpret the "current time".
 use crate::{direct_function_call, pg_sys, Date, IntoDatum, Timestamp, TimestampWithTimeZone};
