@@ -6,6 +6,7 @@ excludes:
   - pgrx-sql-entity-graph/assets/ansi.tmTheme
   - ".envrc"
   - ".gitignore"
+  - ".dockerignore"
   - "flake\\..*"
   - "logo.*"
   - ".github/**/*"
