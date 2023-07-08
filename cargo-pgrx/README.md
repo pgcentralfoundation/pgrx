@@ -849,5 +849,5 @@ If you are certain that in this case, it is fine, you may set
 and the check will be bypassed. However, note that while the check is not
 fool-proof, it tries to be fairly liberal in what it allows.
 
-See <https://github.com/pgcentralfoundation/pgrx/issues/774> and <https://github.com/pgcentralfoundation/pgrx/pull/873>
+See <https://github.com/tcdi/pgrx/issues/774> and <https://github.com/tcdi/pgrx/pull/873>
 for further information.
