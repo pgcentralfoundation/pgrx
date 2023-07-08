@@ -11,10 +11,12 @@ excludes:
   - ".github/**/*"
   - ".cargo/config"
   - "cargo-pgrx/src/templates/*"
+  - "cargo-pgrx/tests/fixtures/macos-universal-binary"
   - ".*\\.control"
   - ".*\\.md"
   - ".*\\.nix"
   - ".*\\.yml"
+  - "*.lock"
 licenses:
   - files: any
     ident: MIT
