@@ -8,14 +8,14 @@
 [![crates.io badge](https://img.shields.io/crates/v/pgrx.svg)](https://crates.io/crates/pgrx)
 [![docs.rs badge](https://docs.rs/pgrx/badge.svg)](https://docs.rs/pgrx)
 [![Twitter Follow](https://img.shields.io/twitter/follow/pgrx_rs.svg?style=flat)](https://twitter.com/pgrx_rs)
-[![Discord Chat](https://img.shields.io/discord/561648697805504526.svg)][Discord]
+[![Discord Chat](https://img.shields.io/discord/710918545906597938.svg)][Discord]
 
 
 `pgrx` is a framework for developing PostgreSQL extensions in Rust and strives to be as idiomatic and safe as possible.
 
 `pgrx` supports Postgres v11-v15.
 
-**Feel free to join our [Discord Server](https://discord.gg/hPb93Y9).**
+**Feel free to join our [Discord Server](https://discord.gg/PMrpdJsqcJ).**
 
 ## Key Features
 
