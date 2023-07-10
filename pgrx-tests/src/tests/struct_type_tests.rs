@@ -31,6 +31,7 @@ impl PartialEq for Complex {
 }
 
 impl Complex {
+    #[allow(dead_code)]
     pub fn random() -> PgBox<Complex> {
         unsafe {
             let mut c = PgBox::<Complex>::alloc0();
