@@ -1617,6 +1617,7 @@ dependencies = [
  "pgrx-macros",
  "pgrx-pg-config",
  "postgres",
+ "rand",
  "regex",
  "serde",
  "serde_json",
