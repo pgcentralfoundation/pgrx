@@ -10,6 +10,7 @@
 pub mod datum;
 #[macro_use]
 pub mod elog;
+pub mod cmp;
 pub mod errcodes;
 pub mod ffi;
 pub mod htup;

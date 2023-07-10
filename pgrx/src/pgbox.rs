@@ -9,6 +9,7 @@
 //LICENSE Use of this source code is governed by the MIT license that can be found in the LICENSE file.
 /// Similar to Rust's `Box<T>` type, `PgBox<T>` also represents heap-allocated memory.
 use crate::{pg_sys, PgMemoryContexts};
+use core::fmt::{Debug, Display, Formatter};
 //use std::fmt::{Debug, Error, Formatter};
 use pgrx_sql_entity_graph::metadata::{
     ArgumentError, Returns, ReturnsError, SqlMapping, SqlTranslatable,
@@ -368,15 +369,71 @@ impl<T, AllocatedBy: WhoAllocated> PgBox<T, AllocatedBy> {
     }
 }
 
+impl<T> Clone for PgBox<T, AllocatedByPostgres>
+where
+    T: Copy,
+{
+    /// Copies the wrapped `T` into [`PgMemoryContexts::CurrentMemoryContext`].
+    fn clone(&self) -> Self {
+        if self.ptr.is_none() {
+            PgBox { ptr: None, __marker: Default::default() }
+        } else {
+            unsafe {
+                // SAFETY:  We ensured that we're not copying a null pointer and the `T: Copy` bound
+                // ensures that we have a fixed-size type can essentially be memcpy'd, which is what
+                // `.copy_ptr_into()` does.
+                let copy = PgMemoryContexts::CurrentMemoryContext
+                    .copy_ptr_into(self.as_ptr(), std::mem::size_of::<T>());
+
+                PgBox::from_pg(copy)
+            }
+        }
+    }
+}
+
+impl<T, AllocatedBy: WhoAllocated> Eq for PgBox<T, AllocatedBy> where T: Eq {}
+impl<T, AllocatedBy: WhoAllocated> PartialEq for PgBox<T, AllocatedBy>
+where
+    T: PartialEq,
+{
+    fn eq(&self, other: &Self) -> bool {
+        self.as_ref() == other.as_ref()
+    }
+}
+
+impl<T, AllocatedBy: WhoAllocated> Debug for PgBox<T, AllocatedBy>
+where
+    T: Debug,
+{
+    fn fmt(&self, f: &mut Formatter<'_>) -> core::fmt::Result {
+        write!(f, "{:?}", self.as_ref())
+    }
+}
+
+impl<T, AllocatedBy: WhoAllocated> Display for PgBox<T, AllocatedBy>
+where
+    T: Display,
+{
+    fn fmt(&self, f: &mut Formatter<'_>) -> core::fmt::Result {
+        write!(f, "{}", self.as_ref())
+    }
+}
+
+impl<T, AllocatedBy: WhoAllocated> AsRef<T> for PgBox<T, AllocatedBy> {
+    fn as_ref(&self) -> &T {
+        match self.ptr.as_ref() {
+            Some(ptr) => unsafe { ptr.as_ref() },
+            None => panic!("Attempt to dereference null pointer during `AsRef::as_ref()` of PgBox"),
+        }
+    }
+}
+
 impl<T, AllocatedBy: WhoAllocated> Deref for PgBox<T, AllocatedBy> {
     type Target = T;
 
     #[track_caller]
     fn deref(&self) -> &Self::Target {
-        match self.ptr.as_ref() {
-            Some(ptr) => unsafe { ptr.as_ref() },
-            None => panic!("Attempt to dereference null pointer during Deref of PgBox"),
-        }
+        self.as_ref()
     }
 }
 

@@ -57,6 +57,7 @@ serde_json = "1.0"
 sysinfo = "0.29.4"
 eyre = "0.6.8"
 thiserror = "1.0"
+rand = "0.8.5"
 
 [dev-dependencies]
 eyre = "0.6.8"  # testing functions that return `eyre::Result`
