@@ -15,6 +15,7 @@ use cargo_toml::Manifest;
 use eyre::{eyre, WrapErr};
 use owo_colors::OwoColorize;
 use pgrx_pg_config::{cargo::PgrxManifestExt, get_target_dir, PgConfig, Pgrx};
+use std::fs;
 use std::io::BufReader;
 use std::path::{Path, PathBuf};
 use std::process::Stdio;
@@ -197,11 +198,19 @@ fn copy_file(
     do_filter: bool,
     package_manifest_path: impl AsRef<Path>,
 ) -> eyre::Result<()> {
-    if !dest.parent().unwrap().exists() {
-        std::fs::create_dir_all(dest.parent().unwrap()).wrap_err_with(|| {
-            format!("failed to create destination directory {}", dest.parent().unwrap().display())
-        })?;
-    }
+    let Some(dest_dir) = dest.parent() else {
+        // what fresh hell could ever cause such an error?
+        eyre::bail!("no directory to copy to: {}", dest.display())
+    };
+    match dest_dir.try_exists() {
+        Ok(false) => fs::create_dir_all(dest_dir).wrap_err_with(|| {
+            format!("failed to create destination directory {}", dest_dir.display())
+        })?,
+        Ok(true) => (),
+        Err(e) => Err(e).wrap_err_with(|| {
+            format!("failed to access {}, is it write-enabled?", dest_dir.display())
+        })?,
+    };
 
     println!("{} {} to {}", "     Copying".bold().green(), msg, format_display_path(&dest)?.cyan());
 

@@ -16,7 +16,7 @@ use std::error::Error;
 use std::ffi::OsString;
 use std::fmt::{self, Debug, Display, Formatter};
 use std::io::ErrorKind;
-use std::path::{Path, PathBuf};
+use std::path::PathBuf;
 use std::process::{Command, Stdio};
 use std::str::FromStr;
 use url::Url;
@@ -322,7 +322,7 @@ impl PgConfig {
     }
 
     pub fn bin_dir(&self) -> eyre::Result<PathBuf> {
-        Ok(Path::new(&self.run("--bindir")?).to_path_buf())
+        Ok(self.run("--bindir")?.into())
     }
 
     pub fn postmaster_path(&self) -> eyre::Result<PathBuf> {
@@ -523,13 +523,13 @@ impl Pgrx {
             Err(_) => {
                 // we'll get what we need from cargo-pgrx' config.toml file
                 let path = Pgrx::config_toml()?;
-                if !path.exists() {
+                if !path.try_exists()? {
                     return Err(eyre!(
                         "{} not found.  Have you run `{}` yet?",
                         path.display(),
                         "cargo pgrx init".bold().yellow()
                     ));
-                }
+                };
 
                 match toml::from_str::<ConfigToml>(&std::fs::read_to_string(&path)?) {
                     Ok(configs) => {
@@ -621,10 +621,10 @@ impl Pgrx {
             |v| Ok(v.into()),
         )?;
 
-        if pgrx_home.exists() {
-            Ok(pgrx_home)
-        } else {
-            Err(PgrxHomeError::MissingPgrxHome(pgrx_home))
+        match pgrx_home.try_exists() {
+            Ok(true) => Ok(pgrx_home),
+            Ok(false) => Err(PgrxHomeError::MissingPgrxHome(pgrx_home)),
+            Err(e) => Err(PgrxHomeError::IoError(e)),
         }
     }
 
