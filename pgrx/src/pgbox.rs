@@ -375,11 +375,18 @@ where
 {
     /// Copies the wrapped `T` into [`PgMemoryContexts::CurrentMemoryContext`].
     fn clone(&self) -> Self {
-        unsafe {
-            let copy = PgMemoryContexts::CurrentMemoryContext
-                .copy_ptr_into(self.as_ptr(), std::mem::size_of::<T>());
+        if self.ptr.is_none() {
+            PgBox { ptr: None, __marker: Default::default() }
+        } else {
+            unsafe {
+                // SAFETY:  We ensured that we're not copying a null pointer and the `T: Copy` bound
+                // ensures that we have a fixed-size type can essentially be memcpy'd, which is what
+                // `.copy_ptr_into()` does.
+                let copy = PgMemoryContexts::CurrentMemoryContext
+                    .copy_ptr_into(self.as_ptr(), std::mem::size_of::<T>());
 
-            PgBox::from_pg(copy)
+                PgBox::from_pg(copy)
+            }
         }
     }
 }
