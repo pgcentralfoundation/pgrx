@@ -164,7 +164,7 @@ pub fn run_test(
         let system_loglines = format_loglines(&system_session_id, &loglines);
         let session_loglines = format_loglines(&session_id, &loglines);
         panic!(
-            "\n\nPostgres Messages:\n{system_loglines}\n\nTest Function Messages:\n{session_loglines}\n{message}\npostgres location: {pg_location}\nrust location: {rust_location}\n\n",
+            "\n\nPostgres Messages:\n{system_loglines}\n\nTest Function Messages:\n{session_loglines}\n\nClient Error:\n{message}\npostgres location: {pg_location}\nrust location: {rust_location}\n\n",
                 system_loglines = system_loglines.dimmed().white(),
                 session_loglines = session_loglines.cyan(),
                 message = message.bold().red(),
