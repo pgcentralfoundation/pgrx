@@ -371,7 +371,7 @@ impl<T, AllocatedBy: WhoAllocated> PgBox<T, AllocatedBy> {
 
 impl<T> Clone for PgBox<T, AllocatedByPostgres>
 where
-    T: Clone,
+    T: Copy,
 {
     /// Copies the wrapped `T` into [`PgMemoryContexts::CurrentMemoryContext`].
     fn clone(&self) -> Self {
