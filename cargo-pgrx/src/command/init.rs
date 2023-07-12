@@ -321,11 +321,12 @@ fn fixup_homebrew_for_icu(configure_cmd: &mut Command) {
             $ brew install icu4c\n\
             \n\
             before retrying. Alternatively, if you are certain you do not need it \
-            you may disable ICU support during the build by invoking `cargo pgrx init` \
-            with `--configure-flags=--without-icu`, as follows:\n\
+            you may disable ICU support by invoking `cargo pgrx init` with the \
+            `--configure-flags=--without-icu` argument, as follows:\n\
             \n\
             $ cargo pgx init --configure-flag=--without-icu\n\
             \n\
+            However, this is not recommended.\
         ";
         static COMPLAINED: std::sync::Once = std::sync::Once::new();
         COMPLAINED.call_once(|| {
@@ -372,8 +373,8 @@ fn configure_postgres(pg_config: &PgConfig, pgdir: &PathBuf, init: &Init) -> eyr
     // Work around the fact that pg16 requires icu to be installed and available
     // via pkg-config, but doesn't add it to the pkg-config path. (Does a decent
     // number of checks to try to avoid causing trouble when things were
-    // actually fine)
-    if cfg!(target_os = "macos") && pg_config.major_version().unwrap_or(0) >= 16 {
+    // actually fine).
+    if cfg!(target_os = "macos") && pg_config.major_version().unwrap_or(0) == 16 {
         fixup_homebrew_for_icu(&mut command);
     }
     let command_str = format!("{:?}", command);
