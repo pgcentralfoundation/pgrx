@@ -294,8 +294,9 @@ fn fixup_homebrew_for_icu(configure_cmd: &mut Command) {
     let pkg_config = std::env::var_os("PKG_CONFIG").unwrap_or_else(|| "pkg-config".into());
     let exists_result =
         Command::new(pkg_config).arg("--exists").arg("\"icu-uc icu-i18n\"").output();
-    if !exists_result.map(|out| out.status.success()).unwrap_or_default() {
-        // Couldn't exec pkg-config, or got an error status when trying.
+    if exists_result.map(|out| out.status.success()).unwrap_or_default() {
+        // pkg-config knows where they are already, so we don't have to do
+        // anything.
         return;
     }
     // See if they use homebrew, and have `icu4c` installed.
@@ -303,12 +304,15 @@ fn fixup_homebrew_for_icu(configure_cmd: &mut Command) {
     let Ok(output) = res else {
         // They aren't a brew user (or `brew` errored for some other reason), so
         // we can't help them.
-        return ;
+        return;
     };
     let icu4c_pkgconfig_path =
         PathBuf::from(String::from_utf8_lossy(&output.stdout).trim()).join("lib").join("pkgconfig");
 
-    if !output.status.success() || !icu4c_pkgconfig_path.exists() {
+    if !output.status.success()
+        || !icu4c_pkgconfig_path.exists()
+        || !icu4c_pkgconfig_path.is_absolute()
+    {
         let msg = "\
             Homebrew seems to be in use, but the `icu4c` does not appear to be \
             installed. Without this, the build of PostgreSQL 16 may fail. You \
