@@ -21,7 +21,7 @@ This information will help us triage your report more quickly.
 If you find a vulnerability anywhere in this project, such as the source or scripts,
 then please let the maintainers know ASAP and we will fix it as a critical priority.
 
-Alternatively send an encrypted email to [Secure][mail] to start the secure disclosure process.
+Alternatively send an encrypted [email][mail] to start the secure disclosure process.
 
 [advisory]: https://github.com/pgcentralfoundation/pgrx/security/advisories/new
-[mail]: https://flowcrypt.com/me/pgcentralfoundationsecure
+[mail]: mailto:secure@example.com
