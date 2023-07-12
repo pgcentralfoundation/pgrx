@@ -4,7 +4,7 @@
 
 **Please do not report security vulnerabilities through public GitHub issues.**
 
-Instead, please open a [security advisory][advisory] which notify the maintainers. You should receive a response within 3 working days. If for some reason you do not, please follow up via email to ensure we received your original message. 
+Instead, please open a [security advisory][advisory] to notify the maintainers. You should receive a response within 3 working days. If for some reason you do not, please follow up via email to ensure we received your original message.
 
 Please include the requested information listed below (as much as you can provide) to help us better understand the nature and scope of the possible issue:
 
