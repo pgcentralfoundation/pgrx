@@ -282,17 +282,13 @@ pub trait Query<'conn> {
     /// Execute a query given a client and other arguments
     fn execute(
         self,
-        client: &SpiClient,
+        client: &SpiClient<'conn>,
         limit: Option<libc::c_long>,
         arguments: Self::Arguments,
     ) -> Self::Result;
 
     /// Open a cursor for the query
-    fn open_cursor(
-        self,
-        client: &'conn SpiClient<'conn>,
-        args: Self::Arguments,
-    ) -> SpiCursor<'conn>;
+    fn open_cursor(self, client: &SpiClient<'conn>, args: Self::Arguments) -> SpiCursor<'conn>;
 }
 
 impl<'conn> Query<'conn> for &String {
@@ -301,18 +297,14 @@ impl<'conn> Query<'conn> for &String {
 
     fn execute(
         self,
-        client: &SpiClient,
+        client: &SpiClient<'conn>,
         limit: Option<libc::c_long>,
         arguments: Self::Arguments,
     ) -> Self::Result {
         self.as_str().execute(client, limit, arguments)
     }
 
-    fn open_cursor(
-        self,
-        client: &'conn SpiClient<'conn>,
-        args: Self::Arguments,
-    ) -> SpiCursor<'conn> {
+    fn open_cursor(self, client: &SpiClient<'conn>, args: Self::Arguments) -> SpiCursor<'conn> {
         self.as_str().open_cursor(client, args)
     }
 }
@@ -333,7 +325,7 @@ impl<'conn> Query<'conn> for &str {
     /// This function will panic if somehow the specified query contains a null byte.
     fn execute(
         self,
-        _client: &SpiClient,
+        _client: &SpiClient<'conn>,
         limit: Option<libc::c_long>,
         arguments: Self::Arguments,
     ) -> Self::Result {
@@ -377,11 +369,7 @@ impl<'conn> Query<'conn> for &str {
         Ok(SpiClient::prepare_tuple_table(status_code)?)
     }
 
-    fn open_cursor(
-        self,
-        _client: &'conn SpiClient<'conn>,
-        args: Self::Arguments,
-    ) -> SpiCursor<'conn> {
+    fn open_cursor(self, _client: &SpiClient<'conn>, args: Self::Arguments) -> SpiCursor<'conn> {
         let src = CString::new(self).expect("query contained a null byte");
         let args = args.unwrap_or_default();
 
@@ -822,18 +810,14 @@ impl<'conn> Query<'conn> for &OwnedPreparedStatement {
 
     fn execute(
         self,
-        client: &SpiClient,
+        client: &SpiClient<'conn>,
         limit: Option<libc::c_long>,
         arguments: Self::Arguments,
     ) -> Self::Result {
         (&self.0).execute(client, limit, arguments)
     }
 
-    fn open_cursor(
-        self,
-        client: &'conn SpiClient<'conn>,
-        args: Self::Arguments,
-    ) -> SpiCursor<'conn> {
+    fn open_cursor(self, client: &SpiClient<'conn>, args: Self::Arguments) -> SpiCursor<'conn> {
         (&self.0).open_cursor(client, args)
     }
 }
@@ -844,18 +828,14 @@ impl<'conn> Query<'conn> for OwnedPreparedStatement {
 
     fn execute(
         self,
-        client: &SpiClient,
+        client: &SpiClient<'conn>,
         limit: Option<libc::c_long>,
         arguments: Self::Arguments,
     ) -> Self::Result {
         (&self.0).execute(client, limit, arguments)
     }
 
-    fn open_cursor(
-        self,
-        client: &'conn SpiClient<'conn>,
-        args: Self::Arguments,
-    ) -> SpiCursor<'conn> {
+    fn open_cursor(self, client: &SpiClient<'conn>, args: Self::Arguments) -> SpiCursor<'conn> {
         (&self.0).open_cursor(client, args)
     }
 }
@@ -881,7 +861,7 @@ impl<'conn: 'stmt, 'stmt> Query<'conn> for &'stmt PreparedStatement<'conn> {
 
     fn execute(
         self,
-        _client: &SpiClient,
+        _client: &SpiClient<'conn>,
         limit: Option<libc::c_long>,
         arguments: Self::Arguments,
     ) -> Self::Result {
@@ -914,11 +894,7 @@ impl<'conn: 'stmt, 'stmt> Query<'conn> for &'stmt PreparedStatement<'conn> {
         Ok(SpiClient::prepare_tuple_table(status_code)?)
     }
 
-    fn open_cursor(
-        self,
-        _client: &'conn SpiClient<'conn>,
-        args: Self::Arguments,
-    ) -> SpiCursor<'conn> {
+    fn open_cursor(self, _client: &SpiClient<'conn>, args: Self::Arguments) -> SpiCursor<'conn> {
         let args = args.unwrap_or_default();
 
         let (mut datums, nulls): (Vec<_>, Vec<_>) = args.into_iter().map(prepare_datum).unzip();
@@ -944,18 +920,14 @@ impl<'conn> Query<'conn> for PreparedStatement<'conn> {
 
     fn execute(
         self,
-        client: &SpiClient,
+        client: &SpiClient<'conn>,
         limit: Option<libc::c_long>,
         arguments: Self::Arguments,
     ) -> Self::Result {
         (&self).execute(client, limit, arguments)
     }
 
-    fn open_cursor(
-        self,
-        client: &'conn SpiClient<'conn>,
-        args: Self::Arguments,
-    ) -> SpiCursor<'conn> {
+    fn open_cursor(self, client: &SpiClient<'conn>, args: Self::Arguments) -> SpiCursor<'conn> {
         (&self).open_cursor(client, args)
     }
 }
