@@ -1266,7 +1266,7 @@ impl<'conn> SpiHeapTupleData<'conn> {
     pub fn get<T: IntoDatum + FromDatum>(&self, ordinal: usize) -> Result<Option<T>> {
         self.get_datum_by_ordinal(ordinal).map(|entry| entry.value())?
     }
-T
+
     /// Get a typed value from this HeapTuple by its name in the resultset.
     ///
     /// # Errors
