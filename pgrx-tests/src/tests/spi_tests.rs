@@ -522,37 +522,4 @@ mod tests {
         assert_eq!(Some("hello".to_string()), value);
         Ok(())
     }
-
-    // TODO:  The point of this test is to **not** compile.  How to write a test for that?
-    // #[pg_test]
-    // fn issue1209() -> Result<Option<String>, Box<dyn Error>> {
-    //     // create the cursor we actually care about
-    //     let mut res = Spi::connect(|c| {
-    //         c.open_cursor("select 'hello' from generate_series(1, 10000)", None)
-    //             .fetch(10000)
-    //             .unwrap()
-    //     });
-    //
-    //     // here we just perform some allocations to make sure that the previous cursor gets invalidated
-    //     for _ in 0..1000 {
-    //         Spi::connect(|c| c.open_cursor("select 1", None).fetch(1).unwrap());
-    //     }
-    //
-    //     // later elements are probably more likely to point to deallocated memory
-    //     for _ in 0..1000 {
-    //         res.next();
-    //     }
-    //
-    //     // segfault
-    //     Ok(res.next().unwrap().get::<String>(1)?)
-    // }
-    //
-    // #[pg_extern]
-    // fn issue1209_prepared_stmt(q: &str) -> Result<Option<String>, Box<dyn std::error::Error>> {
-    //     use pgrx::spi::Query;
-    //
-    //     let prepared = { Spi::connect(|c| c.prepare(q, None))? };
-    //
-    //     Ok(Spi::connect(|c| prepared.execute(&c, Some(1), None)?.first().get(1))?)
-    // }
 }
