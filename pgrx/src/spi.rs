@@ -265,7 +265,7 @@ impl Drop for SpiConnection {
 
 impl SpiConnection {
     /// Return a client that with a lifetime scoped to this connection.
-    fn client<'conn>(&self) -> SpiClient<'conn> {
+    fn client(&self) -> SpiClient<'_> {
         SpiClient { __marker: PhantomData }
     }
 }
