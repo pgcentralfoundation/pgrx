@@ -637,7 +637,7 @@ impl<'conn> SpiClient<'conn> {
     /// Rows may be then fetched using [`SpiCursor::fetch`].
     ///
     /// See [`SpiCursor`] docs for usage details.
-    pub fn open_cursor<Q: Query<'conn>>(&'conn self, query: Q, args: Q::Arguments) -> SpiCursor {
+    pub fn open_cursor<Q: Query<'conn>>(&self, query: Q, args: Q::Arguments) -> SpiCursor<'conn> {
         query.open_cursor(&self, args)
     }
 
@@ -647,10 +647,10 @@ impl<'conn> SpiClient<'conn> {
     ///
     /// See [`SpiCursor`] docs for usage details.
     pub fn open_cursor_mut<Q: Query<'conn>>(
-        &'conn mut self,
+        &mut self,
         query: Q,
         args: Q::Arguments,
-    ) -> SpiCursor {
+    ) -> SpiCursor<'conn> {
         Spi::mark_mutable();
         query.open_cursor(self, args)
     }
@@ -662,7 +662,7 @@ impl<'conn> SpiClient<'conn> {
     /// Returned name can be used with this method to retrieve the open cursor.
     ///
     /// See [`SpiCursor`] docs for usage details.
-    pub fn find_cursor(&self, name: &str) -> Result<SpiCursor> {
+    pub fn find_cursor(&self, name: &str) -> Result<SpiCursor<'conn>> {
         use pgrx_pg_sys::AsPgCStr;
 
         let ptr = NonNull::new(unsafe { pg_sys::SPI_cursor_find(name.as_pg_cstr()) })
