@@ -501,7 +501,7 @@ impl Spi {
         query: &str,
         args: Option<Vec<(PgOid, Option<pg_sys::Datum>)>>,
     ) -> std::result::Result<(), Error> {
-        Spi::connect(|mut client| client.update(query, None, args)).map(|_| ())
+        Spi::connect(|mut client| client.update(query, None, args).map(|_| ()))
     }
 
     /// explain a query, returning its result in json form
@@ -558,7 +558,7 @@ impl Spi {
     /// This function will panic if for some reason it's unable to "connect" to Postgres' SPI
     /// system.  At the time of this writing, that's actually impossible as the underlying function
     /// ([`pg_sys::SPI_connect()`]) **always** returns a successful response.
-    pub fn connect<'conn, R: 'conn, F: FnOnce(SpiClient<'conn>) -> R>(f: F) -> R {
+    pub fn connect<R, F: FnOnce(SpiClient<'_>) -> R>(f: F) -> R {
         // connect to SPI
         //
         // Postgres documents (https://www.postgresql.org/docs/current/spi-spi-connect.html) that
@@ -875,7 +875,7 @@ impl<'conn> PreparedStatement<'conn> {
     }
 }
 
-impl<'conn> Query<'conn> for &PreparedStatement<'conn> {
+impl<'conn: 'stmt, 'stmt> Query<'conn> for &'stmt PreparedStatement<'conn> {
     type Arguments = Option<Vec<Option<pg_sys::Datum>>>;
     type Result = Result<SpiTupleTable<'conn>>;
 
