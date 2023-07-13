@@ -13,13 +13,14 @@ mod tests {
     #[allow(unused_imports)]
     use crate as pgrx_tests;
     use pgrx::IntoDatum;
+    use std::error::Error;
 
     use pgrx::prelude::*;
     use pgrx::spi;
 
     #[pg_test(error = "syntax error at or near \"THIS\"")]
     fn test_spi_failure() -> Result<(), spi::Error> {
-        Spi::connect(|client| client.select("THIS IS NOT A VALID QUERY", None, None)).map(|_| ())
+        Spi::connect(|client| client.select("THIS IS NOT A VALID QUERY", None, None).map(|_| ()))
     }
 
     #[pg_test]
@@ -180,7 +181,7 @@ mod tests {
     #[pg_test]
     fn test_inserting_null() -> Result<(), pgrx::spi::Error> {
         Spi::connect(|mut client| {
-            client.update("CREATE TABLE tests.null_test (id uuid)", None, None)
+            client.update("CREATE TABLE tests.null_test (id uuid)", None, None).map(|_| ())
         })?;
         assert_eq!(
             Spi::get_one_with_args::<i32>(
@@ -369,7 +370,7 @@ mod tests {
         let err = Spi::connect(|client| {
             let prepared =
                 client.prepare("SELECT $1", Some(vec![PgOid::BuiltIn(PgBuiltInOids::INT4OID)]))?;
-            client.select(&prepared, None, None)
+            client.select(&prepared, None, None).map(|_| ())
         })
         .unwrap_err();
 
@@ -404,7 +405,7 @@ mod tests {
     #[pg_test(error = "CREATE TABLE is not allowed in a non-volatile function")]
     fn test_readwrite_in_readonly() -> Result<(), spi::Error> {
         // This is supposed to run in read-only
-        Spi::connect(|client| client.select("CREATE TABLE a ()", None, None)).map(|_| ())
+        Spi::connect(|client| client.select("CREATE TABLE a ()", None, None).map(|_| ()))
     }
 
     #[pg_test]
@@ -507,5 +508,18 @@ mod tests {
         assert_eq!("'quoted'", spi::quote_literal("quoted"));
         assert_eq!("'quoted-with-''quotes'''", spi::quote_literal("quoted-with-'quotes'"));
         assert_eq!("'quoted-string'", spi::quote_literal(String::from("quoted-string")));
+    }
+
+    #[pg_test]
+    fn can_return_borrowed_str() -> Result<(), Box<dyn Error>> {
+        let res = Spi::connect(|c| {
+            let mut cursor = c.open_cursor("SELECT 'hello' FROM generate_series(1, 10000)", None);
+            let table = cursor.fetch(10000)?;
+            table.into_iter().map(|row| row.get::<&str>(1)).collect::<Result<Vec<_>, _>>()
+        })?;
+
+        let value = res.first().cloned().flatten().map(|s| s.to_string());
+        assert_eq!(Some("hello".to_string()), value);
+        Ok(())
     }
 }
