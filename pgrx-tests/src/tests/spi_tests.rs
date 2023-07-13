@@ -179,7 +179,7 @@ mod tests {
     }
 
     #[pg_test]
-    fn test_inserting_null() -> Result<(), Box<dyn Error>> {
+    fn test_inserting_null() -> Result<(), pgrx::spi::Error> {
         Spi::connect(|mut client| {
             client.update("CREATE TABLE tests.null_test (id uuid)", None, None).map(|_| ())
         })?;
