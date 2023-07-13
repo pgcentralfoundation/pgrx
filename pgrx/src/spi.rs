@@ -265,7 +265,7 @@ impl Drop for SpiConnection {
 
 impl SpiConnection {
     /// Return a client that with a lifetime scoped to this connection.
-    fn client(&self) -> SpiClient<'_> {
+    fn client<'conn>(&self) -> SpiClient<'conn> {
         SpiClient { __marker: PhantomData }
     }
 }
@@ -275,7 +275,7 @@ impl SpiConnection {
 /// Its primary purpose is to abstract away differences between
 /// one-off statements and prepared statements, but it can potentially
 /// be implemented for other types, provided they can be converted into a query.
-pub trait Query {
+pub trait Query<'conn> {
     type Arguments;
     type Result;
 
@@ -288,16 +288,16 @@ pub trait Query {
     ) -> Self::Result;
 
     /// Open a cursor for the query
-    fn open_cursor<'c: 'cc, 'cc>(
+    fn open_cursor(
         self,
-        client: &'cc SpiClient<'c>,
+        client: &'conn SpiClient<'conn>,
         args: Self::Arguments,
-    ) -> SpiCursor<'c>;
+    ) -> SpiCursor<'conn>;
 }
 
-impl<'a> Query for &'a String {
+impl<'conn> Query<'conn> for &String {
     type Arguments = Option<Vec<(PgOid, Option<pg_sys::Datum>)>>;
-    type Result = Result<SpiTupleTable>;
+    type Result = Result<SpiTupleTable<'conn>>;
 
     fn execute(
         self,
@@ -308,11 +308,11 @@ impl<'a> Query for &'a String {
         self.as_str().execute(client, limit, arguments)
     }
 
-    fn open_cursor<'c: 'cc, 'cc>(
+    fn open_cursor(
         self,
-        client: &'cc SpiClient<'c>,
+        client: &'conn SpiClient<'conn>,
         args: Self::Arguments,
-    ) -> SpiCursor<'c> {
+    ) -> SpiCursor<'conn> {
         self.as_str().open_cursor(client, args)
     }
 }
@@ -324,9 +324,9 @@ fn prepare_datum(datum: Option<pg_sys::Datum>) -> (pg_sys::Datum, std::os::raw::
     }
 }
 
-impl<'a> Query for &'a str {
+impl<'conn> Query<'conn> for &str {
     type Arguments = Option<Vec<(PgOid, Option<pg_sys::Datum>)>>;
-    type Result = Result<SpiTupleTable>;
+    type Result = Result<SpiTupleTable<'conn>>;
 
     /// # Panics
     ///
@@ -377,11 +377,11 @@ impl<'a> Query for &'a str {
         Ok(SpiClient::prepare_tuple_table(status_code)?)
     }
 
-    fn open_cursor<'c: 'cc, 'cc>(
+    fn open_cursor(
         self,
-        _client: &'cc SpiClient<'c>,
+        _client: &'conn SpiClient<'conn>,
         args: Self::Arguments,
-    ) -> SpiCursor<'c> {
+    ) -> SpiCursor<'conn> {
         let src = CString::new(self).expect("query contained a null byte");
         let args = args.unwrap_or_default();
 
@@ -409,10 +409,10 @@ impl<'a> Query for &'a str {
 }
 
 #[derive(Debug)]
-pub struct SpiTupleTable {
+pub struct SpiTupleTable<'conn> {
     #[allow(dead_code)]
     status_code: SpiOkCodes,
-    table: Option<*mut pg_sys::SPITupleTable>,
+    table: Option<&'conn mut pg_sys::SPITupleTable>,
     size: usize,
     current: isize,
 }
@@ -557,7 +557,7 @@ impl Spi {
     /// This function will panic if for some reason it's unable to "connect" to Postgres' SPI
     /// system.  At the time of this writing, that's actually impossible as the underlying function
     /// ([`pg_sys::SPI_connect()`]) **always** returns a successful response.
-    pub fn connect<R, F: FnOnce(SpiClient<'_>) -> R>(f: F) -> R {
+    pub fn connect<'conn, R: 'conn, F: FnOnce(SpiClient<'conn>) -> R>(f: F) -> R {
         // connect to SPI
         //
         // Postgres documents (https://www.postgresql.org/docs/current/spi-spi-connect.html) that
@@ -592,9 +592,9 @@ impl Spi {
     }
 }
 
-impl<'a> SpiClient<'a> {
+impl<'conn> SpiClient<'conn> {
     /// perform a SELECT statement
-    pub fn select<Q: Query>(
+    pub fn select<Q: Query<'conn>>(
         &self,
         query: Q,
         limit: Option<libc::c_long>,
@@ -604,7 +604,7 @@ impl<'a> SpiClient<'a> {
     }
 
     /// perform any query (including utility statements) that modify the database in some way
-    pub fn update<Q: Query>(
+    pub fn update<Q: Query<'conn>>(
         &mut self,
         query: Q,
         limit: Option<libc::c_long>,
@@ -614,7 +614,7 @@ impl<'a> SpiClient<'a> {
         self.execute(query, limit, args)
     }
 
-    fn execute<Q: Query>(
+    fn execute<Q: Query<'conn>>(
         &self,
         query: Q,
         limit: Option<libc::c_long>,
@@ -623,17 +623,11 @@ impl<'a> SpiClient<'a> {
         query.execute(&self, limit, args)
     }
 
-    fn prepare_tuple_table(status_code: i32) -> std::result::Result<SpiTupleTable, Error> {
+    fn prepare_tuple_table(status_code: i32) -> std::result::Result<SpiTupleTable<'conn>, Error> {
         Ok(SpiTupleTable {
             status_code: Spi::check_status(status_code)?,
             // SAFETY: no concurrent access
-            table: unsafe {
-                if pg_sys::SPI_tuptable.is_null() {
-                    None
-                } else {
-                    Some(pg_sys::SPI_tuptable)
-                }
-            },
+            table: unsafe { pg_sys::SPI_tuptable.as_mut()},
             #[cfg(any(feature = "pg11", feature = "pg12"))]
             size: unsafe { pg_sys::SPI_processed as usize },
             #[cfg(not(any(feature = "pg11", feature = "pg12")))]
@@ -654,7 +648,7 @@ impl<'a> SpiClient<'a> {
     /// Rows may be then fetched using [`SpiCursor::fetch`].
     ///
     /// See [`SpiCursor`] docs for usage details.
-    pub fn open_cursor<Q: Query>(&self, query: Q, args: Q::Arguments) -> SpiCursor {
+    pub fn open_cursor<Q: Query<'conn>>(&'conn self, query: Q, args: Q::Arguments) -> SpiCursor {
         query.open_cursor(&self, args)
     }
 
@@ -663,9 +657,13 @@ impl<'a> SpiClient<'a> {
     /// Rows may be then fetched using [`SpiCursor::fetch`].
     ///
     /// See [`SpiCursor`] docs for usage details.
-    pub fn open_cursor_mut<Q: Query>(&mut self, query: Q, args: Q::Arguments) -> SpiCursor {
+    pub fn open_cursor_mut<Q: Query<'conn>>(
+        &'conn mut self,
+        query: Q,
+        args: Q::Arguments,
+    ) -> SpiCursor {
         Spi::mark_mutable();
-        query.open_cursor(&self, args)
+        query.open_cursor(self, args)
     }
 
     /// Find a cursor in transaction by name
@@ -793,9 +791,9 @@ impl Drop for SpiCursor<'_> {
 }
 
 /// Client lifetime-bound prepared statement
-pub struct PreparedStatement<'a> {
+pub struct PreparedStatement<'conn> {
     plan: NonNull<pg_sys::_SPI_plan>,
-    __marker: PhantomData<&'a ()>,
+    __marker: PhantomData<&'conn ()>,
 }
 
 /// Static lifetime-bound prepared statement
@@ -817,9 +815,9 @@ impl Drop for OwnedPreparedStatement {
     }
 }
 
-impl<'a> Query for &'a OwnedPreparedStatement {
+impl<'conn> Query<'conn> for &OwnedPreparedStatement {
     type Arguments = Option<Vec<Option<pg_sys::Datum>>>;
-    type Result = Result<SpiTupleTable>;
+    type Result = Result<SpiTupleTable<'conn>>;
 
     fn execute(
         self,
@@ -830,18 +828,18 @@ impl<'a> Query for &'a OwnedPreparedStatement {
         (&self.0).execute(client, limit, arguments)
     }
 
-    fn open_cursor<'c: 'cc, 'cc>(
+    fn open_cursor(
         self,
-        client: &'cc SpiClient<'c>,
+        client: &'conn SpiClient<'conn>,
         args: Self::Arguments,
-    ) -> SpiCursor<'c> {
+    ) -> SpiCursor<'conn> {
         (&self.0).open_cursor(client, args)
     }
 }
 
-impl Query for OwnedPreparedStatement {
+impl<'conn> Query<'conn> for OwnedPreparedStatement {
     type Arguments = Option<Vec<Option<pg_sys::Datum>>>;
-    type Result = Result<SpiTupleTable>;
+    type Result = Result<SpiTupleTable<'conn>>;
 
     fn execute(
         self,
@@ -852,16 +850,16 @@ impl Query for OwnedPreparedStatement {
         (&self.0).execute(client, limit, arguments)
     }
 
-    fn open_cursor<'c: 'cc, 'cc>(
+    fn open_cursor(
         self,
-        client: &'cc SpiClient<'c>,
+        client: &'conn SpiClient<'conn>,
         args: Self::Arguments,
-    ) -> SpiCursor<'c> {
+    ) -> SpiCursor<'conn> {
         (&self.0).open_cursor(client, args)
     }
 }
 
-impl<'a> PreparedStatement<'a> {
+impl<'conn> PreparedStatement<'conn> {
     /// Converts prepared statement into an owned prepared statement
     ///
     /// These statements have static lifetime and are freed only when dropped
@@ -876,9 +874,9 @@ impl<'a> PreparedStatement<'a> {
     }
 }
 
-impl<'a: 'b, 'b> Query for &'b PreparedStatement<'a> {
+impl<'conn> Query<'conn> for &PreparedStatement<'conn> {
     type Arguments = Option<Vec<Option<pg_sys::Datum>>>;
-    type Result = Result<SpiTupleTable>;
+    type Result = Result<SpiTupleTable<'conn>>;
 
     fn execute(
         self,
@@ -915,11 +913,11 @@ impl<'a: 'b, 'b> Query for &'b PreparedStatement<'a> {
         Ok(SpiClient::prepare_tuple_table(status_code)?)
     }
 
-    fn open_cursor<'c: 'cc, 'cc>(
+    fn open_cursor(
         self,
-        _client: &'cc SpiClient<'c>,
+        _client: &'conn SpiClient<'conn>,
         args: Self::Arguments,
-    ) -> SpiCursor<'c> {
+    ) -> SpiCursor<'conn> {
         let args = args.unwrap_or_default();
 
         let (mut datums, nulls): (Vec<_>, Vec<_>) = args.into_iter().map(prepare_datum).unzip();
@@ -939,9 +937,9 @@ impl<'a: 'b, 'b> Query for &'b PreparedStatement<'a> {
     }
 }
 
-impl<'a> Query for PreparedStatement<'a> {
+impl<'conn> Query<'conn> for PreparedStatement<'conn> {
     type Arguments = Option<Vec<Option<pg_sys::Datum>>>;
-    type Result = Result<SpiTupleTable>;
+    type Result = Result<SpiTupleTable<'conn>>;
 
     fn execute(
         self,
@@ -952,22 +950,26 @@ impl<'a> Query for PreparedStatement<'a> {
         (&self).execute(client, limit, arguments)
     }
 
-    fn open_cursor<'c: 'cc, 'cc>(
+    fn open_cursor(
         self,
-        client: &'cc SpiClient<'c>,
+        client: &'conn SpiClient<'conn>,
         args: Self::Arguments,
-    ) -> SpiCursor<'c> {
+    ) -> SpiCursor<'conn> {
         (&self).open_cursor(client, args)
     }
 }
 
-impl<'a> SpiClient<'a> {
+impl<'conn> SpiClient<'conn> {
     /// Prepares a statement that is valid for the lifetime of the client
     ///
     /// # Panics
     ///
     /// This function will panic if the supplied `query` string contained a NULL byte
-    pub fn prepare(&self, query: &str, args: Option<Vec<PgOid>>) -> Result<PreparedStatement> {
+    pub fn prepare(
+        &self,
+        query: &str,
+        args: Option<Vec<PgOid>>,
+    ) -> Result<PreparedStatement<'conn>> {
         let src = CString::new(query).expect("query contained a null byte");
         let args = args.unwrap_or_default();
         let nargs = args.len();
@@ -994,7 +996,7 @@ impl<'a> SpiClient<'a> {
     }
 }
 
-impl SpiTupleTable {
+impl<'conn> SpiTupleTable<'conn> {
     /// `SpiTupleTable`s are positioned before the start, for iteration purposes.
     ///
     /// This method moves the position to the first row.  If there are no rows, this
@@ -1048,11 +1050,9 @@ impl SpiTupleTable {
 
     #[inline(always)]
     fn get_spi_tuptable(&self) -> Result<(*mut pg_sys::SPITupleTable, *mut pg_sys::TupleDescData)> {
-        let table = *self.table.as_ref().ok_or(Error::NoTupleTable)?;
-        unsafe {
-            // SAFETY:  we just assured that `table` is not null
-            Ok((table, (*table).tupdesc))
-        }
+        let table = self.table.as_deref().ok_or(Error::NoTupleTable)?;
+        // SAFETY:  we just assured that `table` is not null
+        Ok((table as *const _ as *mut _, table.tupdesc))
     }
 
     pub fn get_heap_tuple(&self) -> Result<Option<SpiHeapTupleData>> {
@@ -1444,7 +1444,7 @@ impl Index<&str> for SpiHeapTupleData {
     }
 }
 
-impl Iterator for SpiTupleTable {
+impl<'conn> Iterator for SpiTupleTable<'conn> {
     type Item = SpiHeapTupleData;
 
     /// # Panics
