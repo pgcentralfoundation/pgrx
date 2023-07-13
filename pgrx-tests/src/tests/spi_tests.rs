@@ -509,6 +509,19 @@ mod tests {
         assert_eq!("'quoted-string'", spi::quote_literal(String::from("quoted-string")));
     }
 
+    #[pg_test]
+    fn can_return_borrowed_str() -> Result<(), Box<dyn std::error::Error>> {
+        let res = Spi::connect(|c| {
+            let mut cursor = c.open_cursor("SELECT 'hello' FROM generate_series(1, 10000)", None);
+            let table = cursor.fetch(10000)?;
+            table.into_iter().map(|row| row.get::<&str>(1)).collect::<Result<Vec<_>, _>>()
+        })?;
+
+        let value = res.first().cloned().flatten().map(|s| s.to_string());
+        assert_eq!(Some("hello".to_string()), value);
+        Ok(())
+    }
+
     // TODO:  The point of this test is to **not** compile.  How to write a test for that?
     // #[pg_test]
     // fn issue1209() -> Result<Option<String>, Box<dyn std::error::Error>> {
