@@ -13,13 +13,14 @@ mod tests {
     #[allow(unused_imports)]
     use crate as pgrx_tests;
     use pgrx::IntoDatum;
+    use std::error::Error;
 
     use pgrx::prelude::*;
     use pgrx::spi;
 
     #[pg_test(error = "syntax error at or near \"THIS\"")]
     fn test_spi_failure() -> Result<(), spi::Error> {
-        Spi::connect(|client| client.select("THIS IS NOT A VALID QUERY", None, None)).map(|_| ())
+        Spi::connect(|client| client.select("THIS IS NOT A VALID QUERY", None, None).map(|_| ()))
     }
 
     #[pg_test]
@@ -178,9 +179,9 @@ mod tests {
     }
 
     #[pg_test]
-    fn test_inserting_null() -> Result<(), pgrx::spi::Error> {
+    fn test_inserting_null() -> Result<(), Box<dyn Error>> {
         Spi::connect(|mut client| {
-            client.update("CREATE TABLE tests.null_test (id uuid)", None, None)
+            client.update("CREATE TABLE tests.null_test (id uuid)", None, None).map(|_| ())
         })?;
         assert_eq!(
             Spi::get_one_with_args::<i32>(
@@ -369,7 +370,7 @@ mod tests {
         let err = Spi::connect(|client| {
             let prepared =
                 client.prepare("SELECT $1", Some(vec![PgOid::BuiltIn(PgBuiltInOids::INT4OID)]))?;
-            client.select(&prepared, None, None)
+            client.select(&prepared, None, None).map(|_| ())
         })
         .unwrap_err();
 
@@ -404,7 +405,7 @@ mod tests {
     #[pg_test(error = "CREATE TABLE is not allowed in a non-volatile function")]
     fn test_readwrite_in_readonly() -> Result<(), spi::Error> {
         // This is supposed to run in read-only
-        Spi::connect(|client| client.select("CREATE TABLE a ()", None, None)).map(|_| ())
+        Spi::connect(|client| client.select("CREATE TABLE a ()", None, None).map(|_| ()))
     }
 
     #[pg_test]
@@ -510,7 +511,7 @@ mod tests {
     }
 
     #[pg_test]
-    fn can_return_borrowed_str() -> Result<(), Box<dyn std::error::Error>> {
+    fn can_return_borrowed_str() -> Result<(), Box<dyn Error>> {
         let res = Spi::connect(|c| {
             let mut cursor = c.open_cursor("SELECT 'hello' FROM generate_series(1, 10000)", None);
             let table = cursor.fetch(10000)?;
@@ -524,7 +525,7 @@ mod tests {
 
     // TODO:  The point of this test is to **not** compile.  How to write a test for that?
     // #[pg_test]
-    // fn issue1209() -> Result<Option<String>, Box<dyn std::error::Error>> {
+    // fn issue1209() -> Result<Option<String>, Box<dyn Error>> {
     //     // create the cursor we actually care about
     //     let mut res = Spi::connect(|c| {
     //         c.open_cursor("select 'hello' from generate_series(1, 10000)", None)
@@ -544,5 +545,12 @@ mod tests {
     //
     //     // segfault
     //     Ok(res.next().unwrap().get::<String>(1)?)
+    // }
+    //
+    // #[pg_extern]
+    // fn issue1209_prepared_stmt(q: &str) -> Result<Option<String>, Box<dyn std::error::Error>> {
+    //     let prepared = { Spi::connect(|c| c.prepare(q, None))? };
+    //
+    //     Ok(Spi::connect(|c| (&prepared).execute(&c, Some(1), None)?.first().get(1))?)
     // }
 }
