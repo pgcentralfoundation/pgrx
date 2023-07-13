@@ -1263,17 +1263,17 @@ impl<'conn> SpiHeapTupleData<'conn> {
     ///
     /// Returns a [`Error::DatumError`] if the desired Rust type is incompatible
     /// with the underlying Datum
-    pub fn get<T: IntoDatum + FromDatum + 'conn>(&self, ordinal: usize) -> Result<Option<T>> {
+    pub fn get<T: IntoDatum + FromDatum>(&self, ordinal: usize) -> Result<Option<T>> {
         self.get_datum_by_ordinal(ordinal).map(|entry| entry.value())?
     }
-
+T
     /// Get a typed value from this HeapTuple by its name in the resultset.
     ///
     /// # Errors
     ///
     /// Returns a [`Error::DatumError`] if the desired Rust type is incompatible
     /// with the underlying Datum
-    pub fn get_by_name<T: IntoDatum + FromDatum + 'conn, S: AsRef<str>>(
+    pub fn get_by_name<T: IntoDatum + FromDatum, S: AsRef<str>>(
         &self,
         name: S,
     ) -> Result<Option<T>> {
@@ -1385,7 +1385,7 @@ impl<'conn> SpiHeapTupleData<'conn> {
 }
 
 impl<'conn> SpiHeapTupleDataEntry<'conn> {
-    pub fn value<T: IntoDatum + FromDatum + 'conn>(&self) -> Result<Option<T>> {
+    pub fn value<T: IntoDatum + FromDatum>(&self) -> Result<Option<T>> {
         match self.datum.as_ref() {
             Some(datum) => unsafe {
                 T::try_from_datum_in_memory_context(
