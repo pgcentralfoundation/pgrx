@@ -7,7 +7,7 @@
 //LICENSE All rights reserved.
 //LICENSE
 //LICENSE Use of this source code is governed by the MIT license that can be found in the LICENSE file.
-use crate::{pg_sys, FromDatum, IntoDatum, PgBox};
+use crate::{pg_sys, FromDatum, IntoDatum, PgMemoryContexts};
 
 impl FromDatum for pg_sys::BOX {
     unsafe fn from_polymorphic_datum(
@@ -28,11 +28,11 @@ impl FromDatum for pg_sys::BOX {
 }
 
 impl IntoDatum for pg_sys::BOX {
-    fn into_datum(self) -> Option<pg_sys::Datum> {
+    fn into_datum(mut self) -> Option<pg_sys::Datum> {
         unsafe {
-            let boxed = PgBox::<pg_sys::BOX>::alloc0();
-            std::ptr::copy(&self, boxed.as_ptr(), std::mem::size_of::<pg_sys::BOX>());
-            boxed.into_datum()
+            let ptr = PgMemoryContexts::CurrentMemoryContext
+                .copy_ptr_into(&mut self, std::mem::size_of::<pg_sys::BOX>());
+            Some(ptr.into())
         }
     }
 
@@ -60,11 +60,11 @@ impl FromDatum for pg_sys::Point {
 }
 
 impl IntoDatum for pg_sys::Point {
-    fn into_datum(self) -> Option<pg_sys::Datum> {
+    fn into_datum(mut self) -> Option<pg_sys::Datum> {
         unsafe {
-            let boxed = PgBox::<pg_sys::Point>::alloc0();
-            std::ptr::copy(&self, boxed.as_ptr(), std::mem::size_of::<pg_sys::Point>());
-            boxed.into_datum()
+            let copy = PgMemoryContexts::CurrentMemoryContext
+                .copy_ptr_into(&mut self, std::mem::size_of::<pg_sys::Point>());
+            Some(copy.into())
         }
     }
 
