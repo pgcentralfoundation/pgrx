@@ -21,7 +21,7 @@ use std::collections::HashMap;
 use std::fs::File;
 use std::io::{Read, Write};
 use std::path::PathBuf;
-use std::process::Stdio;
+use std::process::{Command, Stdio};
 
 use std::sync::{Arc, Mutex};
 
@@ -275,6 +275,78 @@ fn untar(bytes: &[u8], pgrxdir: &PathBuf, pg_config: &PgConfig) -> eyre::Result<
     }
 }
 
+fn fixup_homebrew_for_icu(configure_cmd: &mut Command) {
+    // See if it's disabled via an argument
+    if configure_cmd.get_args().any(|a| a == "--without-icu") {
+        return;
+    }
+    // Check if the user has manually configured the vars that `./configure`
+    // understands.
+    // (ideally these vars should be read off of `configure_cmd.get_envs()`
+    // before falling back to the system env, but this is involved enough)
+    let icu_cflags = std::env::var_os("ICU_CFLAGS").is_some();
+    let icu_libs = std::env::var_os("ICU_LIBS").is_some();
+    if icu_cflags || icu_libs {
+        return;
+    }
+    // Check if pkg-config knows where they are. (note: `$PKG_CONFIG` is a var
+    // respected by `./configure`)
+    let pkg_config = std::env::var_os("PKG_CONFIG").unwrap_or_else(|| "pkg-config".into());
+    let exists_result =
+        Command::new(pkg_config).arg("--exists").arg("\"icu-uc icu-i18n\"").output();
+    if exists_result.map(|out| out.status.success()).unwrap_or_default() {
+        // pkg-config knows where they are already, so we don't have to do
+        // anything.
+        return;
+    }
+    // See if they use homebrew, and have `icu4c` installed.
+    let res = Command::new("brew").arg("--prefix").arg("icu4c").output();
+    let Ok(output) = res else {
+        // They aren't a brew user (or `brew` errored for some other reason), so
+        // we can't help them.
+        return;
+    };
+    let icu4c_pkgconfig_path =
+        PathBuf::from(String::from_utf8_lossy(&output.stdout).trim()).join("lib").join("pkgconfig");
+
+    if !output.status.success()
+        || !icu4c_pkgconfig_path.exists()
+        || !icu4c_pkgconfig_path.is_absolute()
+    {
+        let msg = "\
+            Homebrew seems to be in use, but the `icu4c` does not appear to be \
+            installed. Without this, the build of PostgreSQL 16 may fail. You \
+            may be able to fix this by installing it using:\n\
+            \n\
+            $ brew install icu4c\n\
+            \n\
+            before retrying. Alternatively, if you are certain you do not need it \
+            you may disable ICU support by invoking `cargo pgrx init` with the \
+            `--configure-flags=--without-icu` argument, as follows:\n\
+            \n\
+            $ cargo pgx init --configure-flag=--without-icu\n\
+            \n\
+            However, this is not recommended.\
+        ";
+        static COMPLAINED: std::sync::Once = std::sync::Once::new();
+        COMPLAINED.call_once(|| {
+            println!("{}: {msg}", "warning".bold().yellow());
+        });
+    }
+    // Build a new `PKG_CONFIG_PATH`, with our value at the end.
+    let mut v = vec![];
+    let old = std::env::var_os("PKG_CONFIG_PATH");
+    if let Some(old) = old.as_ref() {
+        v.extend(std::env::split_paths(old).map(|p| p.to_path_buf()));
+    }
+    v.push(icu4c_pkgconfig_path);
+    let new_var = std::env::join_paths(v).map(|s| s.to_string_lossy().to_string());
+
+    if let Ok(path) = new_var {
+        configure_cmd.env("PKG_CONFIG_PATH", path);
+    }
+}
+
 fn configure_postgres(pg_config: &PgConfig, pgdir: &PathBuf, init: &Init) -> eyre::Result<()> {
     println!("{} Postgres v{}", "  Configuring".bold().green(), pg_config.version()?);
     let mut configure_path = pgdir.clone();
@@ -298,7 +370,13 @@ fn configure_postgres(pg_config: &PgConfig, pgdir: &PathBuf, init: &Init) -> eyr
     for var in PROCESS_ENV_DENYLIST {
         command.env_remove(var);
     }
-
+    // Work around the fact that pg16 requires icu to be installed and available
+    // via pkg-config, but doesn't add it to the pkg-config path. (Does a decent
+    // number of checks to try to avoid causing trouble when things were
+    // actually fine).
+    if cfg!(target_os = "macos") && pg_config.major_version().unwrap_or(0) == 16 {
+        fixup_homebrew_for_icu(&mut command);
+    }
     let command_str = format!("{:?}", command);
     tracing::debug!(command = %command_str, "Running");
     let child = command.spawn()?;
