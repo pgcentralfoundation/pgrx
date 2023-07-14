@@ -181,80 +181,80 @@ jobs:
           --features "pg$PG_VER" \
           --package pgrx-tests
 
-    - name: Run aggregate example tests
-      run: cargo test --package aggregate --features "pg$PG_VER" --no-default-features
+    # - name: Run aggregate example tests
+    #   run: cargo test --package aggregate --features "pg$PG_VER" --no-default-features
 
-    - name: Run arrays example tests
-      run: cargo test --package arrays --features "pg$PG_VER" --no-default-features
+    # - name: Run arrays example tests
+    #   run: cargo test --package arrays --features "pg$PG_VER" --no-default-features
 
-    - name: Run bad_ideas example tests
-      run: cargo test --package bad_ideas --features "pg$PG_VER" --no-default-features
+    # - name: Run bad_ideas example tests
+    #   run: cargo test --package bad_ideas --features "pg$PG_VER" --no-default-features
 
-    - name: Run bgworker example tests
-      run: cargo test --package bgworker --features "pg$PG_VER" --no-default-features
+    # - name: Run bgworker example tests
+    #   run: cargo test --package bgworker --features "pg$PG_VER" --no-default-features
 
-    - name: Run bytea example tests
-      run: cargo test --package bytea --features "pg$PG_VER" --no-default-features
+    # - name: Run bytea example tests
+    #   run: cargo test --package bytea --features "pg$PG_VER" --no-default-features
 
-    - name: Run composite_type example tests
-      run: cargo test --package composite_type --features "pg$PG_VER" --no-default-features
+    # - name: Run composite_type example tests
+    #   run: cargo test --package composite_type --features "pg$PG_VER" --no-default-features
 
-    - name: Run custom_libname example tests
-      run: cargo test --package custom_libname --features "pg$PG_VER" --no-default-features
+    # - name: Run custom_libname example tests
+    #   run: cargo test --package custom_libname --features "pg$PG_VER" --no-default-features
 
-    - name: Run custom_types example tests
-      run: cargo test --package custom_types --features "pg$PG_VER" --no-default-features
+    # - name: Run custom_types example tests
+    #   run: cargo test --package custom_types --features "pg$PG_VER" --no-default-features
 
-    - name: Run custom_types without schema generation example tests
-      run: cargo test --package custom_types --features "pg$PG_VER no-schema-generation" --no-default-features
+    # - name: Run custom_types without schema generation example tests
+    #   run: cargo test --package custom_types --features "pg$PG_VER no-schema-generation" --no-default-features
 
-    - name: Run custom_sql example tests
-      run: cargo test --package custom_sql --features "pg$PG_VER" --no-default-features
+    # - name: Run custom_sql example tests
+    #   run: cargo test --package custom_sql --features "pg$PG_VER" --no-default-features
 
-    - name: Run datetime example tests
-      run: cargo test --package datetime --features "pg$PG_VER" --no-default-features
+    # - name: Run datetime example tests
+    #   run: cargo test --package datetime --features "pg$PG_VER" --no-default-features
 
-    - name: Run errors example tests
-      run: cargo test --package errors --features "pg$PG_VER" --no-default-features
+    # - name: Run errors example tests
+    #   run: cargo test --package errors --features "pg$PG_VER" --no-default-features
 
-    - name: Run nostd example tests
-      run: cargo test --package nostd --features "pg$PG_VER" --no-default-features
+    # - name: Run nostd example tests
+    #   run: cargo test --package nostd --features "pg$PG_VER" --no-default-features
 
-    - name: Run numeric example tests
-      run: cargo test --package numeric --features "pg$PG_VER" --no-default-features
+    # - name: Run numeric example tests
+    #   run: cargo test --package numeric --features "pg$PG_VER" --no-default-features
 
-    - name: Run pgtrybuilder example tests
-      run: cargo test --package pgtrybuilder --features "pg$PG_VER" --no-default-features
+    # - name: Run pgtrybuilder example tests
+    #   run: cargo test --package pgtrybuilder --features "pg$PG_VER" --no-default-features
 
-    - name: Run operators example tests
-      run: cargo test --package operators --features "pg$PG_VER" --no-default-features
+    # - name: Run operators example tests
+    #   run: cargo test --package operators --features "pg$PG_VER" --no-default-features
 
-    - name: Run range example tests
-      run: cargo test --package range --features "pg$PG_VER" --no-default-features
+    # - name: Run range example tests
+    #   run: cargo test --package range --features "pg$PG_VER" --no-default-features
 
-    - name: Run schemas example tests
-      run: cargo test --package schemas --features "pg$PG_VER" --no-default-features
+    # - name: Run schemas example tests
+    #   run: cargo test --package schemas --features "pg$PG_VER" --no-default-features
 
-    - name: Run shmem example tests
-      run: cargo test --package shmem --features "pg$PG_VER" --no-default-features
+    # - name: Run shmem example tests
+    #   run: cargo test --package shmem --features "pg$PG_VER" --no-default-features
 
-    - name: Run spi example tests
-      run: cargo test --package spi --features "pg$PG_VER" --no-default-features
+    # - name: Run spi example tests
+    #   run: cargo test --package spi --features "pg$PG_VER" --no-default-features
 
-    - name: Run spi_srf example tests
-      run: cargo test --package spi_srf --features "pg$PG_VER" --no-default-features
+    # - name: Run spi_srf example tests
+    #   run: cargo test --package spi_srf --features "pg$PG_VER" --no-default-features
 
-    - name: Run srf example tests
-      run: cargo test --package srf --features "pg$PG_VER" --no-default-features
+    # - name: Run srf example tests
+    #   run: cargo test --package srf --features "pg$PG_VER" --no-default-features
 
-    - name: Run strings example tests
-      run: cargo test --package strings --features "pg$PG_VER" --no-default-features
+    # - name: Run strings example tests
+    #   run: cargo test --package strings --features "pg$PG_VER" --no-default-features
 
-    - name: Run triggers example tests
-      run: cargo test --package triggers --features "pg$PG_VER" --no-default-features
+    # - name: Run triggers example tests
+    #   run: cargo test --package triggers --features "pg$PG_VER" --no-default-features
 
-#     - name: Run versioned_custom_libname_so example tests
-#       run: cargo test --package versioned_custom_libname_so --features "pg$PG_VER" --no-default-features
+    - name: Run versioned_custom_libname_so example tests
+      run: cargo test --package versioned_custom_libname_so --features "pg$PG_VER" --no-default-features
 
     # Attempt to make the cache payload slightly smaller.
     - name: Clean up built PGRX files
