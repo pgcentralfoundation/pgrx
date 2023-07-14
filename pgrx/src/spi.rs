@@ -232,8 +232,26 @@ impl Spi {
     }
 }
 
+#[derive(Debug)]
+struct DatumMemoryContext(PgMemoryContexts);
+impl Clone for DatumMemoryContext {
+    #[inline]
+    fn clone(&self) -> Self {
+        Self(PgMemoryContexts::For(self.0.value()))
+    }
+}
+
+impl DatumMemoryContext {
+    #[inline]
+    fn to_inner(&self) -> PgMemoryContexts {
+        self.clone().0
+    }
+}
+
 // TODO: should `'conn` be invariant?
+#[derive(Debug, Clone)]
 pub struct SpiClient<'conn> {
+    mcxt: DatumMemoryContext,
     __marker: PhantomData<&'conn SpiConnection>,
 }
 
@@ -265,8 +283,8 @@ impl Drop for SpiConnection {
 
 impl SpiConnection {
     /// Return a client that with a lifetime scoped to this connection.
-    fn client(&self) -> SpiClient<'_> {
-        SpiClient { __marker: PhantomData }
+    fn client(&self, mcxt: PgMemoryContexts) -> SpiClient<'_> {
+        SpiClient { mcxt: DatumMemoryContext(mcxt), __marker: PhantomData }
     }
 }
 
@@ -325,7 +343,7 @@ impl<'conn> Query<'conn> for &str {
     /// This function will panic if somehow the specified query contains a null byte.
     fn execute(
         self,
-        _client: &SpiClient<'conn>,
+        client: &SpiClient<'conn>,
         limit: Option<libc::c_long>,
         arguments: Self::Arguments,
     ) -> Self::Result {
@@ -366,10 +384,10 @@ impl<'conn> Query<'conn> for &str {
             },
         };
 
-        Ok(SpiClient::prepare_tuple_table(status_code)?)
+        Ok(client.prepare_tuple_table(status_code)?)
     }
 
-    fn open_cursor(self, _client: &SpiClient<'conn>, args: Self::Arguments) -> SpiCursor<'conn> {
+    fn open_cursor(self, client: &SpiClient<'conn>, args: Self::Arguments) -> SpiCursor<'conn> {
         let src = CString::new(self).expect("query contained a null byte");
         let args = args.unwrap_or_default();
 
@@ -392,12 +410,13 @@ impl<'conn> Query<'conn> for &str {
                 0,
             ))
         };
-        SpiCursor { ptr, __marker: PhantomData }
+        SpiCursor { client: client.clone(), ptr, __marker: PhantomData }
     }
 }
 
 #[derive(Debug)]
 pub struct SpiTupleTable<'conn> {
+    client: SpiClient<'conn>,
     #[allow(dead_code)]
     status_code: SpiOkCodes,
     table: Option<&'conn mut pg_sys::SPITupleTable>,
@@ -407,6 +426,7 @@ pub struct SpiTupleTable<'conn> {
 
 /// Represents a single `pg_sys::Datum` inside a `SpiHeapTupleData`
 pub struct SpiHeapTupleDataEntry<'conn> {
+    client: SpiClient<'conn>,
     datum: Option<pg_sys::Datum>,
     type_oid: pg_sys::Oid,
     __marker: PhantomData<&'conn ()>,
@@ -414,6 +434,7 @@ pub struct SpiHeapTupleDataEntry<'conn> {
 
 /// Represents the set of `pg_sys::Datum`s in a `pg_sys::HeapTuple`
 pub struct SpiHeapTupleData<'conn> {
+    client: SpiClient<'conn>,
     tupdesc: NonNull<pg_sys::TupleDescData>,
     // offset by 1!
     entries: Vec<SpiHeapTupleDataEntry<'conn>>,
@@ -547,6 +568,19 @@ impl Spi {
     /// system.  At the time of this writing, that's actually impossible as the underlying function
     /// ([`pg_sys::SPI_connect()`]) **always** returns a successful response.
     pub fn connect<R, F: FnOnce(SpiClient<'_>) -> R>(f: F) -> R {
+        // This is where we'll allocate Datums for return to the caller
+        //
+        // When `pg_sys::SPI_connect()` is called, Postgres creates a new MemoryContext (the "SPI Proc" context)
+        // whose parent is `TopTransactionContext`, **not** `CurrentMemoryContext`.  This is a temporary
+        // context that is free'd by `pg_sys::SPI_finish()`.  We want our API to allow returning
+        // Postgres-allocated Datums that survive the scope of this function (`f`'s closure), so such
+        // datums are allocated in this memory context instead.
+        //
+        // This is simply a direct reference to `CurrentMemoryContext`.  Postgres will eventually free
+        // allocated data whenever `CurrentMemoryContext` is reset -- typically at the end of a
+        // function call.
+        let parent_mcxt = PgMemoryContexts::For(PgMemoryContexts::CurrentMemoryContext.value());
+
         // connect to SPI
         //
         // Postgres documents (https://www.postgresql.org/docs/current/spi-spi-connect.html) that
@@ -568,7 +602,7 @@ impl Spi {
         // just put us un.  We'll disconnect from SPI when the closure is finished.
         // If there's a panic or elog(ERROR), we don't care about also disconnecting from
         // SPI b/c Postgres will do that for us automatically
-        f(connection.client())
+        f(connection.client(parent_mcxt))
     }
 
     #[track_caller]
@@ -612,8 +646,12 @@ impl<'conn> SpiClient<'conn> {
         query.execute(&self, limit, args)
     }
 
-    fn prepare_tuple_table(status_code: i32) -> std::result::Result<SpiTupleTable<'conn>, Error> {
+    fn prepare_tuple_table(
+        &self,
+        status_code: i32,
+    ) -> std::result::Result<SpiTupleTable<'conn>, Error> {
         Ok(SpiTupleTable {
+            client: self.clone(),
             status_code: Spi::check_status(status_code)?,
             // SAFETY: no concurrent access
             table: unsafe { pg_sys::SPI_tuptable.as_mut()},
@@ -667,7 +705,7 @@ impl<'conn> SpiClient<'conn> {
 
         let ptr = NonNull::new(unsafe { pg_sys::SPI_cursor_find(name.as_pg_cstr()) })
             .ok_or(Error::CursorNotFound(name.to_string()))?;
-        Ok(SpiCursor { ptr, __marker: PhantomData })
+        Ok(SpiCursor { client: self.clone(), ptr, __marker: PhantomData })
     }
 }
 
@@ -729,6 +767,7 @@ type CursorName = String;
 /// # }
 /// ```
 pub struct SpiCursor<'client> {
+    client: SpiClient<'client>,
     ptr: NonNull<pg_sys::PortalData>,
     __marker: PhantomData<&'client SpiClient<'client>>,
 }
@@ -744,7 +783,7 @@ impl SpiCursor<'_> {
         }
         // SAFETY: SPI functions to create/find cursors fail via elog, so self.ptr is valid if we successfully set it
         unsafe { pg_sys::SPI_cursor_fetch(self.ptr.as_mut(), true, count) }
-        Ok(SpiClient::prepare_tuple_table(SpiOkCodes::Fetch as i32)?)
+        Ok(self.client.prepare_tuple_table(SpiOkCodes::Fetch as i32)?)
     }
 
     /// Consume the cursor, returning its name
@@ -861,7 +900,7 @@ impl<'conn: 'stmt, 'stmt> Query<'conn> for &'stmt PreparedStatement<'conn> {
 
     fn execute(
         self,
-        _client: &SpiClient<'conn>,
+        client: &SpiClient<'conn>,
         limit: Option<libc::c_long>,
         arguments: Self::Arguments,
     ) -> Self::Result {
@@ -891,10 +930,10 @@ impl<'conn: 'stmt, 'stmt> Query<'conn> for &'stmt PreparedStatement<'conn> {
             )
         };
 
-        Ok(SpiClient::prepare_tuple_table(status_code)?)
+        Ok(client.prepare_tuple_table(status_code)?)
     }
 
-    fn open_cursor(self, _client: &SpiClient<'conn>, args: Self::Arguments) -> SpiCursor<'conn> {
+    fn open_cursor(self, client: &SpiClient<'conn>, args: Self::Arguments) -> SpiCursor<'conn> {
         let args = args.unwrap_or_default();
 
         let (mut datums, nulls): (Vec<_>, Vec<_>) = args.into_iter().map(prepare_datum).unzip();
@@ -910,7 +949,7 @@ impl<'conn: 'stmt, 'stmt> Query<'conn> for &'stmt PreparedStatement<'conn> {
                 Spi::is_xact_still_immutable(),
             ))
         };
-        SpiCursor { ptr, __marker: PhantomData }
+        SpiCursor { client: client.clone(), ptr, __marker: PhantomData }
     }
 }
 
@@ -1045,7 +1084,7 @@ impl<'conn> SpiTupleTable<'conn> {
                     std::slice::from_raw_parts((*table).vals, self.size)[self.current as usize];
 
                 // SAFETY:  we know heap_tuple is valid because we just made it
-                SpiHeapTupleData::new(tupdesc, heap_tuple)
+                SpiHeapTupleData::new(&self.client, tupdesc, heap_tuple)
             }
         }
     }
@@ -1073,9 +1112,7 @@ impl<'conn> SpiTupleTable<'conn> {
             // SAFETY:  we know the constraints around `datum` and `is_null` match because we
             // just got them from the underlying heap tuple
             Ok(T::try_from_datum_in_memory_context(
-                PgMemoryContexts::CurrentMemoryContext
-                    .parent()
-                    .expect("parent memory context is absent"),
+                self.client.mcxt.to_inner(),
                 datum,
                 is_null,
                 // SAFETY:  we know `self.tupdesc.is_some()` because an Ok return from
@@ -1229,12 +1266,13 @@ impl<'conn> SpiHeapTupleData<'conn> {
     ///
     /// This is unsafe as it cannot ensure that the provided `tupdesc` and `htup` arguments
     /// are valid, palloc'd pointers.
-    pub unsafe fn new(
+    unsafe fn new(
+        client: &SpiClient<'conn>,
         tupdesc: pg_sys::TupleDesc,
         htup: *mut pg_sys::HeapTupleData,
     ) -> Result<Option<Self>> {
         let tupdesc = NonNull::new(tupdesc).ok_or(Error::NoTupleTable)?;
-        let mut data = SpiHeapTupleData { tupdesc, entries: Vec::new() };
+        let mut data = SpiHeapTupleData { client: client.clone(), tupdesc, entries: Vec::new() };
         let tupdesc = tupdesc.as_ptr();
 
         unsafe {
@@ -1245,6 +1283,7 @@ impl<'conn> SpiHeapTupleData<'conn> {
                 let mut is_null = false;
                 let datum = pg_sys::SPI_getbinval(htup, tupdesc as _, i, &mut is_null);
                 data.entries.push(SpiHeapTupleDataEntry {
+                    client: client.clone(),
                     datum: if is_null { None } else { Some(datum) },
                     type_oid: pg_sys::SPI_gettypeid(tupdesc as _, i),
                     __marker: PhantomData,
@@ -1333,6 +1372,7 @@ impl<'conn> SpiHeapTupleData<'conn> {
     ) -> std::result::Result<(), Error> {
         self.check_ordinal_bounds(ordinal)?;
         self.entries[ordinal - 1] = SpiHeapTupleDataEntry {
+            client: self.client.clone(),
             datum: datum.into_datum(),
             type_oid: T::type_oid(),
             __marker: PhantomData,
@@ -1389,9 +1429,7 @@ impl<'conn> SpiHeapTupleDataEntry<'conn> {
         match self.datum.as_ref() {
             Some(datum) => unsafe {
                 T::try_from_datum_in_memory_context(
-                    PgMemoryContexts::CurrentMemoryContext
-                        .parent()
-                        .expect("parent memory context is absent"),
+                    self.client.mcxt.to_inner(),
                     *datum,
                     false,
                     self.type_oid,
