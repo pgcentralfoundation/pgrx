@@ -16,7 +16,7 @@ use pgrx::AllocatedByRust;
 
 use crate::get_named_capture;
 
-#[derive(Debug)]
+#[derive(Debug, Clone, Copy)]
 #[repr(C)]
 struct Complex {
     x: f64,
