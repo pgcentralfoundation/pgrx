@@ -54,7 +54,10 @@ fn spi_return_query() -> Result<
     let query = "SELECT oid, relname::text || '-pg16' FROM pg_class";
 
     Spi::connect(|client| {
-        Ok(client.select(query, None, None)?.map(|row| (row["oid"].value(), row[2].value())))
+        Ok(client
+            .select(query, None, None)?
+            .map(|row| (row["oid"].value(), row[2].value()))
+            .collect::<Vec<_>>())
     })
     .map(|results| TableIterator::new(results))
 }
@@ -109,6 +112,17 @@ fn spi_insert_title2(
     .unwrap();
 
     TableIterator::once(tuple)
+}
+
+#[pg_extern]
+fn issue1209_fixed() -> Result<Option<String>, Box<dyn std::error::Error>> {
+    let res = Spi::connect(|c| {
+        let mut cursor = c.open_cursor("SELECT 'hello' FROM generate_series(1, 10000)", None);
+        let table = cursor.fetch(10000)?;
+        table.into_iter().map(|row| row.get::<&str>(1)).collect::<Result<Vec<_>, _>>()
+    })?;
+
+    Ok(res.first().cloned().flatten().map(|s| s.to_string()))
 }
 
 extension_sql!(

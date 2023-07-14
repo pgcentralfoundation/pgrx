@@ -190,7 +190,7 @@ pub(crate) fn init_pgrx(pgrx: &Pgrx, init: &Init) -> eyre::Result<()> {
         } else {
             let datadir = pg_config.data_dir()?;
             let bindir = pg_config.bin_dir()?;
-            if !datadir.exists() {
+            if !datadir.try_exists()? {
                 initdb(&bindir, &datadir)?;
             }
         }

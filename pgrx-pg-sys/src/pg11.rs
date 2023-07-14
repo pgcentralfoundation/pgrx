@@ -327,6 +327,7 @@ pub const SIZEOF_OFF_T: u32 = 8;
 pub const SIZEOF_SIZE_T: u32 = 8;
 pub const SIZEOF_VOID_P: u32 = 8;
 pub const STDC_HEADERS: u32 = 1;
+pub const USE_ASSERT_CHECKING: u32 = 1;
 pub const USE_DEV_URANDOM: u32 = 1;
 pub const USE_FLOAT4_BYVAL: u32 = 1;
 pub const USE_FLOAT8_BYVAL: u32 = 1;
@@ -732,9 +733,9 @@ pub const LC_IDENTIFICATION_MASK: u32 = 4096;
 pub const LC_ALL_MASK: u32 = 8127;
 pub const HAVE_PG_ATTRIBUTE_NORETURN: u32 = 1;
 pub const HAVE_PRAGMA_GCC_SYSTEM_HEADER: u32 = 1;
+pub const __bool_true_false_are_defined: u32 = 1;
 pub const true_: u32 = 1;
 pub const false_: u32 = 0;
-pub const __bool_true_false_are_defined: u32 = 1;
 pub const USE_STDBOOL: u32 = 1;
 pub const INT64_FORMAT: &[u8; 4] = b"%ld\0";
 pub const UINT64_FORMAT: &[u8; 4] = b"%lu\0";
@@ -20553,6 +20554,7 @@ pub struct MemoryContextMethods {
             totals: *mut MemoryContextCounters,
         ),
     >,
+    pub check: ::std::option::Option<unsafe extern "C" fn(context: MemoryContext)>,
 }
 #[repr(C)]
 #[derive(Debug, Copy, Clone)]
@@ -20657,6 +20659,10 @@ extern "C" {
 #[pgrx_macros::pg_guard]
 extern "C" {
     pub fn MemoryContextAllowInCriticalSection(context: MemoryContext, allow: bool);
+}
+#[pgrx_macros::pg_guard]
+extern "C" {
+    pub fn MemoryContextCheck(context: MemoryContext);
 }
 #[pgrx_macros::pg_guard]
 extern "C" {

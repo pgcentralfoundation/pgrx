@@ -19,7 +19,6 @@ use pgrx_pg_config::{
 };
 use postgres::error::DbError;
 use std::collections::HashMap;
-use std::fmt::Write as _;
 use std::io::{BufRead, BufReader, Write};
 use std::path::PathBuf;
 use std::sync::{Arc, Mutex};
@@ -66,42 +65,46 @@ where
     match result {
         Ok(result) => Ok(result),
         Err(e) => {
-            let dberror = e.as_db_error().unwrap();
-            let query = query.unwrap();
-            let query_message = dberror.message();
+            if let Some(dberror) = e.as_db_error() {
+                let query = query.unwrap();
+                let query_message = dberror.message();
 
-            let code = dberror.code().code();
-            let severity = dberror.severity();
+                let code = dberror.code().code();
+                let severity = dberror.severity();
 
-            let mut message = format!("{} SQLSTATE[{}]", severity, code).bold().red().to_string();
+                let mut message =
+                    format!("{} SQLSTATE[{}]", severity, code).bold().red().to_string();
 
-            message.push_str(format!(": {}", query_message.bold().white()).as_str());
-            message.push_str(format!("\nquery: {}", query.bold().white()).as_str());
-            message.push_str(
-                format!(
-                    "\nparams: {}",
-                    match query_params {
-                        Some(params) => format!("{:?}", params),
-                        None => "None".to_string(),
+                message.push_str(format!(": {}", query_message.bold().white()).as_str());
+                message.push_str(format!("\nquery: {}", query.bold().white()).as_str());
+                message.push_str(
+                    format!(
+                        "\nparams: {}",
+                        match query_params {
+                            Some(params) => format!("{:?}", params),
+                            None => "None".to_string(),
+                        }
+                    )
+                    .as_str(),
+                );
+
+                if let Ok(var) = std::env::var("RUST_BACKTRACE") {
+                    if var.eq("1") {
+                        let detail = dberror.detail().unwrap_or("None");
+                        let hint = dberror.hint().unwrap_or("None");
+                        let schema = dberror.hint().unwrap_or("None");
+                        let table = dberror.table().unwrap_or("None");
+                        let more_info = format!(
+                            "\ndetail: {detail}\nhint: {hint}\nschema: {schema}\ntable: {table}"
+                        );
+                        message.push_str(more_info.as_str());
                     }
-                )
-                .as_str(),
-            );
-
-            if let Ok(var) = std::env::var("RUST_BACKTRACE") {
-                if var.eq("1") {
-                    let detail = dberror.detail().unwrap_or("None");
-                    let hint = dberror.hint().unwrap_or("None");
-                    let schema = dberror.hint().unwrap_or("None");
-                    let table = dberror.table().unwrap_or("None");
-                    let more_info = format!(
-                        "\ndetail: {detail}\nhint: {hint}\nschema: {schema}\ntable: {table}"
-                    );
-                    message.push_str(more_info.as_str());
                 }
-            }
 
-            Err(eyre!(message))
+                Err(eyre!(message))
+            } else {
+                return Err(e).wrap_err("non-DbError");
+            }
         }
     }
 }
@@ -115,71 +118,59 @@ pub fn run_test(
 
     let (mut client, session_id) = client()?;
 
-    let schema = "tests"; // get_extension_schema();
-    let result = match client.transaction() {
-        // run the test function in a transaction
-        Ok(mut tx) => {
-            let result = tx.simple_query(&format!("SELECT \"{schema}\".\"{sql_funcname}\"();"));
+    let result = client.transaction().map(|mut tx| {
+        let schema = "tests"; // get_extension_schema();
+        let result = tx.simple_query(&format!("SELECT \"{schema}\".\"{sql_funcname}\"();"));
 
-            if result.is_ok() {
-                // and abort the transaction when complete
-                tx.rollback().expect("test rollback didn't work");
-            }
-
-            result
+        if result.is_ok() {
+            // and abort the transaction when complete
+            tx.rollback()?;
         }
 
-        Err(e) => panic!("attempt to run test tx failed:\n{e}"),
+        result
+    });
+
+    // flatten the above result
+    let result = match result {
+        Err(e) => Err(e),
+        Ok(Err(e)) => Err(e),
+        Ok(_) => Ok(()),
     };
 
     if let Err(e) = result {
-        let error_as_string = format!("error in test tx: {e}");
-
+        let error_as_string = format!("{e}");
         let cause = e.into_source();
-        if let Some(e) = cause {
-            if let Some(dberror) = e.downcast_ref::<DbError>() {
-                // we got an ERROR
-                let received_error_message: &str = dberror.message();
 
-                if let Some(expected_error_message) = expected_error {
-                    // and we expected an error, so assert what we got is what we expect
-                    assert_eq!(received_error_message, expected_error_message);
-                    Ok(())
-                } else {
-                    // we weren't expecting an error
-                    // wait a second for Postgres to get log messages written to stderr
-                    std::thread::sleep(std::time::Duration::from_millis(1000));
+        let (pg_location, rust_location, message) =
+            if let Some(Some(dberror)) = cause.map(|e| e.downcast_ref::<DbError>().cloned()) {
+                let received_error_message = dberror.message();
 
-                    let mut pg_location = String::from("Postgres location: ");
-                    pg_location.push_str(match dberror.file() {
-                        Some(file) => file,
-                        None => "<unknown>",
-                    });
-                    if let Some(ln) = dberror.line() {
-                        let _ = write!(pg_location, ":{ln}");
-                    };
-
-                    let mut rust_location = String::from("Rust location: ");
-                    rust_location.push_str(match dberror.where_() {
-                        Some(place) => place,
-                        None => "<unknown>",
-                    });
-                    // then we can panic with those messages plus those that belong to the system
-                    panic!(
-                        "\n{sys}...\n{sess}\n{e}\n{pg}\n{rs}\n\n",
-                        sys = format_loglines(&system_session_id, &loglines),
-                        sess = format_loglines(&session_id, &loglines),
-                        e = received_error_message.bold().red(),
-                        pg = pg_location.dimmed().white(),
-                        rs = rust_location.yellow()
-                    );
+                if Some(received_error_message) == expected_error {
+                    // the error received is the one we expected, so just return if they match
+                    return Ok(());
                 }
+
+                let pg_location = dberror.file().unwrap_or("<unknown>").to_string();
+                let rust_location = dberror.where_().unwrap_or("<unknown>").to_string();
+
+                (pg_location, rust_location, received_error_message.to_string())
             } else {
-                panic!("Failed downcast to DbError:\n{e}")
-            }
-        } else {
-            panic!("Error without deeper source cause:\n{e}\n", e = error_as_string.bold().red())
-        }
+                ("<unknown>".to_string(), "<unknown>".to_string(), format!("{error_as_string}"))
+            };
+
+        // wait a second for Postgres to get log messages written to stderr
+        std::thread::sleep(std::time::Duration::from_millis(1000));
+
+        let system_loglines = format_loglines(&system_session_id, &loglines);
+        let session_loglines = format_loglines(&session_id, &loglines);
+        panic!(
+            "\n\nPostgres Messages:\n{system_loglines}\n\nTest Function Messages:\n{session_loglines}\n\nClient Error:\n{message}\npostgres location: {pg_location}\nrust location: {rust_location}\n\n",
+                system_loglines = system_loglines.dimmed().white(),
+                session_loglines = session_loglines.cyan(),
+                message = message.bold().red(),
+                pg_location = pg_location.dimmed().white(),
+                rust_location = rust_location.yellow()
+        );
     } else if let Some(message) = expected_error {
         // we expected an ERROR, but didn't get one
         return Err(eyre!("Expected error: {message}"));
@@ -252,7 +243,7 @@ pub fn client() -> eyre::Result<(postgres::Client, String)> {
         .user(&get_pg_user())
         .dbname(&get_pg_dbname())
         .connect(postgres::NoTls)
-        .unwrap();
+        .wrap_err("Error connecting to Postgres")?;
 
     let sid_query_result = query_wrapper(
         Some("SELECT to_hex(trunc(EXTRACT(EPOCH FROM backend_start))::integer) || '.' || to_hex(pid) AS sid FROM pg_stat_activity WHERE pid = pg_backend_pid();".to_string()),

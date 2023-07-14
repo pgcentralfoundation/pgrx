@@ -71,7 +71,7 @@ pub(crate) fn start_postgres(pg_config: &PgConfig) -> eyre::Result<()> {
     let bindir = pg_config.bin_dir()?;
     let port = pg_config.port()?;
 
-    if !datadir.exists() {
+    if !datadir.try_exists()? {
         initdb(&bindir, &datadir)?;
     }
 

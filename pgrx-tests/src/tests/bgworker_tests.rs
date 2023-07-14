@@ -27,11 +27,13 @@ pub extern "C" fn bgworker(arg: pg_sys::Datum) {
         BackgroundWorker::transaction(|| {
             Spi::run("CREATE TABLE tests.bgworker_test (v INTEGER);")?;
             Spi::connect(|mut client| {
-                client.update(
-                    "INSERT INTO tests.bgworker_test VALUES ($1);",
-                    None,
-                    Some(vec![(PgOid::BuiltIn(PgBuiltInOids::INT4OID), arg.into_datum())]),
-                )
+                client
+                    .update(
+                        "INSERT INTO tests.bgworker_test VALUES ($1);",
+                        None,
+                        Some(vec![(PgOid::BuiltIn(PgBuiltInOids::INT4OID), arg.into_datum())]),
+                    )
+                    .map(|_| ())
             })
         })
         .expect("bgworker transaction failed");
@@ -78,6 +80,7 @@ pub extern "C" fn bgworker_return_value(arg: pg_sys::Datum) {
                 None,
                 Some(vec![(PgOid::BuiltIn(PgBuiltInOids::INT4OID), val.into_datum())]),
             )
+            .map(|_| ())
         })
     })
     .expect("bgworker transaction failed");

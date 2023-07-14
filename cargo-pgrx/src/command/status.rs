@@ -11,7 +11,7 @@ use eyre::eyre;
 use owo_colors::OwoColorize;
 use pgrx_pg_config::{PgConfig, PgConfigSelector, Pgrx};
 use std::path::PathBuf;
-use std::process::Stdio;
+use std::process::{self, Stdio};
 
 use crate::CommandExecute;
 
@@ -58,15 +58,15 @@ impl CommandExecute for Status {
 #[tracing::instrument(level = "error", skip_all, fields(pg_version = %pg_config.version()?))]
 pub(crate) fn status_postgres(pg_config: &PgConfig) -> eyre::Result<bool> {
     let datadir = pg_config.data_dir()?;
-    let bindir = pg_config.bin_dir()?;
-
-    if !datadir.exists() {
+    if let Ok(false) = datadir.try_exists() {
         // Postgres couldn't possibly be running if there's no data directory
         // and even if it were, we'd have no way of knowing
         return Ok(false);
-    }
+    } // if Err, let the filesystem and OS handle our impending failure
 
-    let mut command = std::process::Command::new(format!("{}/pg_ctl", bindir.display()));
+    let mut pg_ctl = pg_config.bin_dir()?;
+    pg_ctl.push("pg_ctl");
+    let mut command = process::Command::new(pg_ctl);
     command.stdout(Stdio::piped()).stderr(Stdio::piped()).arg("status").arg("-D").arg(&datadir);
     let command_str = format!("{:?}", command);
     tracing::debug!(command = %command_str, "Running");
