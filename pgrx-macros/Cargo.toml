@@ -22,7 +22,7 @@ no-schema-generation = ["pgrx-sql-entity-graph/no-schema-generation"]
 
 [dependencies]
 pgrx-sql-entity-graph = { path = "../pgrx-sql-entity-graph", version = "=0.9.7" }
-proc-macro2 = "1.0.63"
+proc-macro2 = "1.0.64"
 quote = "1.0.29"
 syn = { version = "1.0.109", features = [ "extra-traits", "full", "fold", "parsing" ] }
 
