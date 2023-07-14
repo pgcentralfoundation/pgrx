@@ -170,8 +170,7 @@ pub const ALIGNOF_LONG: u32 = 8;
 pub const ALIGNOF_PG_INT128_TYPE: u32 = 16;
 pub const ALIGNOF_SHORT: u32 = 2;
 pub const BLCKSZ: u32 = 8192;
-pub const CONFIGURE_ARGS: &[u8; 72] =
-    b" '--prefix=/home/zombodb/.pgrx/15.3/pgrx-install' '--with-pgport=28815'\0";
+pub const CONFIGURE_ARGS : & [u8 ; 108] = b" '--prefix=/home/zombodb/.pgrx/15.3/pgrx-install' '--with-pgport=28815' '--enable-debug' '--enable-cassert'\0" ;
 pub const DEF_PGPORT: u32 = 28815;
 pub const DEF_PGPORT_STR: &[u8; 6] = b"28815\0";
 pub const DLSUFFIX: &[u8; 4] = b".so\0";
@@ -342,6 +341,7 @@ pub const SIZEOF_OFF_T: u32 = 8;
 pub const SIZEOF_SIZE_T: u32 = 8;
 pub const SIZEOF_VOID_P: u32 = 8;
 pub const STDC_HEADERS: u32 = 1;
+pub const USE_ASSERT_CHECKING: u32 = 1;
 pub const USE_SSE42_CRC32C_WITH_RUNTIME_CHECK: u32 = 1;
 pub const USE_SYSV_SHARED_MEMORY: u32 = 1;
 pub const USE_UNNAMED_POSIX_SEMAPHORES: u32 = 1;
@@ -746,9 +746,9 @@ pub const LC_IDENTIFICATION_MASK: u32 = 4096;
 pub const LC_ALL_MASK: u32 = 8127;
 pub const HAVE_PG_ATTRIBUTE_NORETURN: u32 = 1;
 pub const HAVE_PRAGMA_GCC_SYSTEM_HEADER: u32 = 1;
+pub const __bool_true_false_are_defined: u32 = 1;
 pub const true_: u32 = 1;
 pub const false_: u32 = 0;
-pub const __bool_true_false_are_defined: u32 = 1;
 pub const INT64_FORMAT: &[u8; 4] = b"%ld\0";
 pub const UINT64_FORMAT: &[u8; 4] = b"%lu\0";
 pub const HAVE_INT128: u32 = 1;
@@ -7630,6 +7630,10 @@ extern "C" {
 #[pgrx_macros::pg_guard]
 extern "C" {
     pub fn StopGeneratingPinnedObjectIds();
+}
+#[pgrx_macros::pg_guard]
+extern "C" {
+    pub fn AssertTransactionIdInAllowableRange(xid: TransactionId);
 }
 pub type Item = Pointer;
 pub type Page = Pointer;
@@ -17180,6 +17184,10 @@ extern "C" {
 }
 #[pgrx_macros::pg_guard]
 extern "C" {
+    pub fn AssertPendingSyncs_RelationCache();
+}
+#[pgrx_macros::pg_guard]
+extern "C" {
     pub fn AtEOXact_RelationCache(isCommit: bool);
 }
 #[pgrx_macros::pg_guard]
@@ -20211,6 +20219,7 @@ pub struct MemoryContextMethods {
             print_to_stderr: bool,
         ),
     >,
+    pub check: ::std::option::Option<unsafe extern "C" fn(context: MemoryContext)>,
 }
 #[repr(C)]
 #[derive(Debug, Copy, Clone)]
@@ -20324,6 +20333,10 @@ extern "C" {
 #[pgrx_macros::pg_guard]
 extern "C" {
     pub fn MemoryContextAllowInCriticalSection(context: MemoryContext, allow: bool);
+}
+#[pgrx_macros::pg_guard]
+extern "C" {
+    pub fn MemoryContextCheck(context: MemoryContext);
 }
 #[pgrx_macros::pg_guard]
 extern "C" {
@@ -30897,6 +30910,10 @@ extern "C" {
 #[pgrx_macros::pg_guard]
 extern "C" {
     pub fn LockHeldByMe(locktag: *const LOCKTAG, lockmode: LOCKMODE) -> bool;
+}
+#[pgrx_macros::pg_guard]
+extern "C" {
+    pub fn GetLockMethodLocalHash() -> *mut HTAB;
 }
 #[pgrx_macros::pg_guard]
 extern "C" {
