@@ -277,7 +277,6 @@ impl SpiConnection {
 /// be implemented for other types, provided they can be converted into a query.
 pub trait Query<'conn> {
     type Arguments;
-    type Result;
 
     /// Execute a query given a client and other arguments
     fn execute(
@@ -285,7 +284,7 @@ pub trait Query<'conn> {
         client: &SpiClient<'conn>,
         limit: Option<libc::c_long>,
         arguments: Self::Arguments,
-    ) -> Self::Result;
+    ) -> Result<SpiTupleTable<'conn>>;
 
     /// Open a cursor for the query
     fn open_cursor(self, client: &SpiClient<'conn>, args: Self::Arguments) -> SpiCursor<'conn>;
@@ -293,14 +292,13 @@ pub trait Query<'conn> {
 
 impl<'conn> Query<'conn> for &String {
     type Arguments = Option<Vec<(PgOid, Option<pg_sys::Datum>)>>;
-    type Result = Result<SpiTupleTable<'conn>>;
 
     fn execute(
         self,
         client: &SpiClient<'conn>,
         limit: Option<libc::c_long>,
         arguments: Self::Arguments,
-    ) -> Self::Result {
+    ) -> Result<SpiTupleTable<'conn>> {
         self.as_str().execute(client, limit, arguments)
     }
 
@@ -318,7 +316,6 @@ fn prepare_datum(datum: Option<pg_sys::Datum>) -> (pg_sys::Datum, std::os::raw::
 
 impl<'conn> Query<'conn> for &str {
     type Arguments = Option<Vec<(PgOid, Option<pg_sys::Datum>)>>;
-    type Result = Result<SpiTupleTable<'conn>>;
 
     /// # Panics
     ///
@@ -328,7 +325,7 @@ impl<'conn> Query<'conn> for &str {
         _client: &SpiClient<'conn>,
         limit: Option<libc::c_long>,
         arguments: Self::Arguments,
-    ) -> Self::Result {
+    ) -> Result<SpiTupleTable<'conn>> {
         // SAFETY: no concurrent access
         unsafe {
             pg_sys::SPI_tuptable = std::ptr::null_mut();
@@ -588,8 +585,8 @@ impl<'conn> SpiClient<'conn> {
         query: Q,
         limit: Option<libc::c_long>,
         args: Q::Arguments,
-    ) -> Q::Result {
-        self.execute(query, limit, args)
+    ) -> Result<SpiTupleTable<'conn>> {
+        query.execute(self, limit, args)
     }
 
     /// perform any query (including utility statements) that modify the database in some way
@@ -598,18 +595,9 @@ impl<'conn> SpiClient<'conn> {
         query: Q,
         limit: Option<libc::c_long>,
         args: Q::Arguments,
-    ) -> Q::Result {
+    ) -> Result<SpiTupleTable<'conn>> {
         Spi::mark_mutable();
-        self.execute(query, limit, args)
-    }
-
-    fn execute<Q: Query<'conn>>(
-        &self,
-        query: Q,
-        limit: Option<libc::c_long>,
-        args: Q::Arguments,
-    ) -> Q::Result {
-        query.execute(&self, limit, args)
+        query.execute(self, limit, args)
     }
 
     fn prepare_tuple_table(status_code: i32) -> std::result::Result<SpiTupleTable<'conn>, Error> {
@@ -806,14 +794,13 @@ impl Drop for OwnedPreparedStatement {
 
 impl<'conn> Query<'conn> for &OwnedPreparedStatement {
     type Arguments = Option<Vec<Option<pg_sys::Datum>>>;
-    type Result = Result<SpiTupleTable<'conn>>;
 
     fn execute(
         self,
         client: &SpiClient<'conn>,
         limit: Option<libc::c_long>,
         arguments: Self::Arguments,
-    ) -> Self::Result {
+    ) -> Result<SpiTupleTable<'conn>> {
         (&self.0).execute(client, limit, arguments)
     }
 
@@ -824,14 +811,13 @@ impl<'conn> Query<'conn> for &OwnedPreparedStatement {
 
 impl<'conn> Query<'conn> for OwnedPreparedStatement {
     type Arguments = Option<Vec<Option<pg_sys::Datum>>>;
-    type Result = Result<SpiTupleTable<'conn>>;
 
     fn execute(
         self,
         client: &SpiClient<'conn>,
         limit: Option<libc::c_long>,
         arguments: Self::Arguments,
-    ) -> Self::Result {
+    ) -> Result<SpiTupleTable<'conn>> {
         (&self.0).execute(client, limit, arguments)
     }
 
@@ -857,14 +843,13 @@ impl<'conn> PreparedStatement<'conn> {
 
 impl<'conn: 'stmt, 'stmt> Query<'conn> for &'stmt PreparedStatement<'conn> {
     type Arguments = Option<Vec<Option<pg_sys::Datum>>>;
-    type Result = Result<SpiTupleTable<'conn>>;
 
     fn execute(
         self,
         _client: &SpiClient<'conn>,
         limit: Option<libc::c_long>,
         arguments: Self::Arguments,
-    ) -> Self::Result {
+    ) -> Result<SpiTupleTable<'conn>> {
         // SAFETY: no concurrent access
         unsafe {
             pg_sys::SPI_tuptable = std::ptr::null_mut();
@@ -916,14 +901,13 @@ impl<'conn: 'stmt, 'stmt> Query<'conn> for &'stmt PreparedStatement<'conn> {
 
 impl<'conn> Query<'conn> for PreparedStatement<'conn> {
     type Arguments = Option<Vec<Option<pg_sys::Datum>>>;
-    type Result = Result<SpiTupleTable<'conn>>;
 
     fn execute(
         self,
         client: &SpiClient<'conn>,
         limit: Option<libc::c_long>,
         arguments: Self::Arguments,
-    ) -> Self::Result {
+    ) -> Result<SpiTupleTable<'conn>> {
         (&self).execute(client, limit, arguments)
     }
 
