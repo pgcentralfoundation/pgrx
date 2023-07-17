@@ -1,13 +1,14 @@
-use std::ffi::{CStr, CString};
-use std::fmt::Debug;
+use std::ffi::CString;
 use std::marker::PhantomData;
-use std::mem;
-use std::ops::{Deref, Index};
 use std::ptr::NonNull;
 
-use crate::spi::Result as SpiResult;
-use crate::spi::{Spi, PreparedStatement};
 use crate::pg_sys::{self, PgOid};
+use crate::spi::Query;
+use crate::spi::Result as SpiResult;
+use crate::spi::SpiCursor;
+use crate::spi::SpiError;
+use crate::spi::SpiTupleTable;
+use crate::spi::{PreparedStatement, Spi};
 
 // TODO: should `'conn` be invariant?
 pub struct SpiClient<'conn> {
@@ -51,6 +52,88 @@ impl<'conn> SpiClient<'conn> {
     }
 }
 
+impl<'conn> SpiClient<'conn> {
+    /// perform a SELECT statement
+    pub fn select<Q: Query<'conn>>(
+        &self,
+        query: Q,
+        limit: Option<libc::c_long>,
+        args: Q::Arguments,
+    ) -> SpiResult<SpiTupleTable<'conn>> {
+        query.execute(self, limit, args)
+    }
+
+    /// perform any query (including utility statements) that modify the database in some way
+    pub fn update<Q: Query<'conn>>(
+        &mut self,
+        query: Q,
+        limit: Option<libc::c_long>,
+        args: Q::Arguments,
+    ) -> SpiResult<SpiTupleTable<'conn>> {
+        Spi::mark_mutable();
+        query.execute(self, limit, args)
+    }
+
+    pub(super) fn prepare_tuple_table(
+        status_code: i32,
+    ) -> std::result::Result<SpiTupleTable<'conn>, SpiError> {
+        Ok(SpiTupleTable {
+            status_code: Spi::check_status(status_code)?,
+            // SAFETY: no concurrent access
+            table: unsafe { pg_sys::SPI_tuptable.as_mut()},
+            #[cfg(any(feature = "pg11", feature = "pg12"))]
+            size: unsafe { pg_sys::SPI_processed as usize },
+            #[cfg(not(any(feature = "pg11", feature = "pg12")))]
+            // SAFETY: no concurrent access
+            size: unsafe {
+                if pg_sys::SPI_tuptable.is_null() {
+                    pg_sys::SPI_processed as usize
+                } else {
+                    (*pg_sys::SPI_tuptable).numvals as usize
+                }
+            },
+            current: -1,
+        })
+    }
+
+    /// Set up a cursor that will execute the specified query
+    ///
+    /// Rows may be then fetched using [`SpiCursor::fetch`].
+    ///
+    /// See [`SpiCursor`] docs for usage details.
+    pub fn open_cursor<Q: Query<'conn>>(&self, query: Q, args: Q::Arguments) -> SpiCursor<'conn> {
+        query.open_cursor(&self, args)
+    }
+
+    /// Set up a cursor that will execute the specified update (mutating) query
+    ///
+    /// Rows may be then fetched using [`SpiCursor::fetch`].
+    ///
+    /// See [`SpiCursor`] docs for usage details.
+    pub fn open_cursor_mut<Q: Query<'conn>>(
+        &mut self,
+        query: Q,
+        args: Q::Arguments,
+    ) -> SpiCursor<'conn> {
+        Spi::mark_mutable();
+        query.open_cursor(self, args)
+    }
+
+    /// Find a cursor in transaction by name
+    ///
+    /// A cursor for a query can be opened using [`SpiClient::open_cursor`].
+    /// Cursor are automatically closed on drop unless [`SpiCursor::detach_into_name`] is used.
+    /// Returned name can be used with this method to retrieve the open cursor.
+    ///
+    /// See [`SpiCursor`] docs for usage details.
+    pub fn find_cursor(&self, name: &str) -> SpiResult<SpiCursor<'conn>> {
+        use pgrx_pg_sys::AsPgCStr;
+
+        let ptr = NonNull::new(unsafe { pg_sys::SPI_cursor_find(name.as_pg_cstr()) })
+            .ok_or(SpiError::CursorNotFound(name.to_string()))?;
+        Ok(SpiCursor { ptr, __marker: PhantomData })
+    }
+}
 
 /// a struct to manage our SPI connection lifetime
 pub(super) struct SpiConnection(PhantomData<*mut ()>);
