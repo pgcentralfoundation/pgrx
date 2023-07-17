@@ -160,101 +160,103 @@ jobs:
           --package pgrx \
           --package pgrx-macros \
           --package pgrx-pg-sys \
-          --package pgrx-sql-entity-graph
+          --package pgrx-sql-entity-graph \
+          --verbose
 
     - name: Check that cross-compiled pgrx-tests can build
       run: |
         cargo build --tests \
           --features "pg$PG_VER" \
           --package pgrx-tests \
-          --target aarch64-unknown-linux-gnu
+          --target aarch64-unknown-linux-gnu \
+          --verbose
 
     - name: Run pgrx-tests with cshim enabled
       run: |
         cargo test \
           --features "pg$PG_VER cshim" \
-          --package pgrx-tests
+          --package pgrx-tests --verbose --verbose
 
     - name: Run pgrx-tests with cshim disabled
       run: |
         cargo test \
           --features "pg$PG_VER" \
-          --package pgrx-tests
+          --package pgrx-tests --verbose
 
-    # - name: Run aggregate example tests
-    #   run: cargo test --package aggregate --features "pg$PG_VER" --no-default-features
+    - name: Run aggregate example tests
+      run: cargo test --package aggregate --features "pg$PG_VER" --no-default-features --verbose
 
-    # - name: Run arrays example tests
-    #   run: cargo test --package arrays --features "pg$PG_VER" --no-default-features
+    - name: Run arrays example tests
+      run: cargo test --package arrays --features "pg$PG_VER" --no-default-features --verbose
 
-    # - name: Run bad_ideas example tests
-    #   run: cargo test --package bad_ideas --features "pg$PG_VER" --no-default-features
+    - name: Run bad_ideas example tests
+      run: cargo test --package bad_ideas --features "pg$PG_VER" --no-default-features --verbose
 
-    # - name: Run bgworker example tests
-    #   run: cargo test --package bgworker --features "pg$PG_VER" --no-default-features
+    - name: Run bgworker example tests
+      run: cargo test --package bgworker --features "pg$PG_VER" --no-default-features --verbose
 
-    # - name: Run bytea example tests
-    #   run: cargo test --package bytea --features "pg$PG_VER" --no-default-features
+    - name: Run bytea example tests
+      run: cargo test --package bytea --features "pg$PG_VER" --no-default-features --verbose
 
-    # - name: Run composite_type example tests
-    #   run: cargo test --package composite_type --features "pg$PG_VER" --no-default-features
+    - name: Run composite_type example tests
+      run: cargo test --package composite_type --features "pg$PG_VER" --no-default-features --verbose
 
-    # - name: Run custom_libname example tests
-    #   run: cargo test --package custom_libname --features "pg$PG_VER" --no-default-features
+    - name: Run custom_libname example tests
+      run: cargo test --package custom_libname --features "pg$PG_VER" --no-default-features --verbose
 
-    # - name: Run custom_types example tests
-    #   run: cargo test --package custom_types --features "pg$PG_VER" --no-default-features
+    - name: Run custom_types example tests
+      run: cargo test --package custom_types --features "pg$PG_VER" --no-default-features --verbose
 
-    # - name: Run custom_types without schema generation example tests
-    #   run: cargo test --package custom_types --features "pg$PG_VER no-schema-generation" --no-default-features
+    - name: Run custom_types without schema generation example tests
+      run: cargo test --package custom_types --features "pg$PG_VER no-schema-generation" --no-default-features --verbose
 
-    # - name: Run custom_sql example tests
-    #   run: cargo test --package custom_sql --features "pg$PG_VER" --no-default-features
+    - name: Run custom_sql example tests
+      run: cargo test --package custom_sql --features "pg$PG_VER" --no-default-features --verbose
 
-    # - name: Run datetime example tests
-    #   run: cargo test --package datetime --features "pg$PG_VER" --no-default-features
+    - name: Run datetime example tests
+      run: cargo test --package datetime --features "pg$PG_VER" --no-default-features --verbose
 
-    # - name: Run errors example tests
-    #   run: cargo test --package errors --features "pg$PG_VER" --no-default-features
+    - name: Run errors example tests
+      run: cargo test --package errors --features "pg$PG_VER" --no-default-features --verbose
 
-    # - name: Run nostd example tests
-    #   run: cargo test --package nostd --features "pg$PG_VER" --no-default-features
+    - name: Run nostd example tests
+      run: cargo test --package nostd --features "pg$PG_VER" --no-default-features --verbose
 
-    # - name: Run numeric example tests
-    #   run: cargo test --package numeric --features "pg$PG_VER" --no-default-features
+    - name: Run numeric example tests
+      run: cargo test --package numeric --features "pg$PG_VER" --no-default-features --verbose
 
-    # - name: Run pgtrybuilder example tests
-    #   run: cargo test --package pgtrybuilder --features "pg$PG_VER" --no-default-features
+    - name: Run pgtrybuilder example tests
+      run: cargo test --package pgtrybuilder --features "pg$PG_VER" --no-default-features --verbose
 
-    # - name: Run operators example tests
-    #   run: cargo test --package operators --features "pg$PG_VER" --no-default-features
+    - name: Run operators example tests
+      run: cargo test --package operators --features "pg$PG_VER" --no-default-features --verbose
 
-    # - name: Run range example tests
-    #   run: cargo test --package range --features "pg$PG_VER" --no-default-features
+    - name: Run range example tests
+      run: cargo test --package range --features "pg$PG_VER" --no-default-features --verbose
 
-    # - name: Run schemas example tests
-    #   run: cargo test --package schemas --features "pg$PG_VER" --no-default-features
+    - name: Run schemas example tests
+      run: cargo test --package schemas --features "pg$PG_VER" --no-default-features --verbose
 
-    # - name: Run shmem example tests
-    #   run: cargo test --package shmem --features "pg$PG_VER" --no-default-features
+    - name: Run shmem example tests
+      run: cargo test --package shmem --features "pg$PG_VER" --no-default-features --verbose
 
-    # - name: Run spi example tests
-    #   run: cargo test --package spi --features "pg$PG_VER" --no-default-features
+    - name: Run spi example tests
+      run: cargo test --package spi --features "pg$PG_VER" --no-default-features --verbose
 
-    # - name: Run spi_srf example tests
-    #   run: cargo test --package spi_srf --features "pg$PG_VER" --no-default-features
+    - name: Run spi_srf example tests
+      run: cargo test --package spi_srf --features "pg$PG_VER" --no-default-features --verbose
 
-    # - name: Run srf example tests
-    #   run: cargo test --package srf --features "pg$PG_VER" --no-default-features
+    - name: Run srf example tests
+      run: cargo test --package srf --features "pg$PG_VER" --no-default-features --verbose
 
-    # - name: Run strings example tests
-    #   run: cargo test --package strings --features "pg$PG_VER" --no-default-features
+    - name: Run strings example tests
+      run: cargo test --package strings --features "pg$PG_VER" --no-default-features --verbose
 
-    # - name: Run triggers example tests
-    #   run: cargo test --package triggers --features "pg$PG_VER" --no-default-features
+    - name: Run triggers example tests
+      run: cargo test --package triggers --features "pg$PG_VER" --no-default-features --verbose
 
     - name: Run versioned_custom_libname_so example tests
-      run: cargo test --package versioned_custom_libname_so --features "pg$PG_VER" --no-default-features
+      run: cargo test --package versioned_custom_libname_so --features "pg$PG_VER" --no-default-features --verbose
 
     - name: Run versioned_so example tests
       run: cargo test --package versioned_so --features "pg$PG_VER" --no-default-features
@@ -478,7 +480,7 @@ jobs:
         cargo pgrx init --pg$PG_VER $(which pg_config)
 
     - name: Run tests
-      run: cargo test --all --features "pg$PG_VER pg_test cshim" --no-default-features
+      run: cargo test --all --features "pg$PG_VER pg_test cshim" --no-default-features --verbose
 
     - name: Print sccache stats
       run: sccache --show-stats
