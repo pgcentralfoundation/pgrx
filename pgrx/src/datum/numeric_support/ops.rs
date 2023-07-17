@@ -123,7 +123,7 @@ macro_rules! anynumeric_assign_op_from_primitive {
         impl $opname<$ty> for AnyNumeric {
             #[inline]
             fn $trait_fname(&mut self, rhs: $ty) {
-                *self = self.copy() $op AnyNumeric::from(rhs);
+                *self = self.clone() $op AnyNumeric::from(rhs);
             }
         }
     }
@@ -202,14 +202,14 @@ macro_rules! anynumeric_assign_op_from_float {
                 // these versions of Postgres could produce an error when unwrapping a try_from(float)
                 #[cfg(any(feature = "pg11", feature = "pg12", feature = "pg13"))]
                 {
-                    *self = self.copy() $op AnyNumeric::try_from(rhs).unwrap();
+                    *self = self.clone() $op AnyNumeric::try_from(rhs).unwrap();
                 }
 
                 // these versions won't, so we use .unwrap_unchecked()
                 #[cfg(any(feature = "pg14", feature = "pg15", feature = "pg16"))]
                 {
                     unsafe {
-                        *self = self.copy() $op AnyNumeric::try_from(rhs).unwrap_unchecked();
+                        *self = self.clone() $op AnyNumeric::try_from(rhs).unwrap_unchecked();
                     }
                 }
             }
