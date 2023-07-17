@@ -126,7 +126,8 @@ pub(crate) fn install_extension(
     let versioned_so = get_property(&package_manifest_path, "module_pathname")?.is_none();
 
     let build_command_output =
-        build_extension(user_manifest_path.as_ref(), user_package, &profile, &features)?;
+        dbg!(build_extension(user_manifest_path.as_ref(), user_package, &profile, &features))?;
+
     let build_command_bytes = build_command_output.stdout;
     let build_command_reader = BufReader::new(build_command_bytes.as_slice());
     let build_command_stream = cargo_metadata::Message::parse_stream(build_command_reader);
