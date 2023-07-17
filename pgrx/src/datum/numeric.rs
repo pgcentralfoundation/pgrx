@@ -44,7 +44,7 @@ pub struct Numeric<const P: u32, const S: u32>(pub(crate) AnyNumeric);
 #[derive(Debug, Clone)]
 pub struct AnyNumeric {
     // we represent a NUMERIC as opaque bytes -- we never inspect these ourselves, only a pointer
-    // to them (cast as a [`Datum`] are passed to Postgres
+    // to them (cast as a [`Datum`]) are passed to Postgres
     pub(crate) inner: Vec<u8>,
 }
 
@@ -118,7 +118,7 @@ impl AnyNumeric {
 
     /// Is this [`AnyNumeric`] not-a-number?
     pub fn is_nan(&self) -> bool {
-        unsafe { pg_sys::numeric_is_nan(self.as_datum().unwrap().cast_mut_ptr()) }
+        unsafe { pg_sys::numeric_is_nan(self.as_ptr() as *mut _) }
     }
 
     /// The absolute value of this [`AnyNumeric`]
@@ -167,7 +167,7 @@ impl AnyNumeric {
     /// compare equal.
     pub fn normalize(&self) -> &str {
         unsafe {
-            let s = pg_sys::numeric_normalize(self.as_datum().unwrap().cast_mut_ptr());
+            let s = pg_sys::numeric_normalize(self.as_ptr() as *mut _);
             let cstr = CStr::from_ptr(s);
             let normalized = cstr.to_str().unwrap();
             normalized
@@ -194,6 +194,11 @@ impl AnyNumeric {
     #[inline]
     pub(crate) fn as_datum(&self) -> Option<pg_sys::Datum> {
         Some(pg_sys::Datum::from(self.inner.as_ptr()))
+    }
+
+    #[inline]
+    fn as_ptr(&self) -> *const pg_sys::NumericData {
+        self.inner.as_ptr().cast()
     }
 }
 
