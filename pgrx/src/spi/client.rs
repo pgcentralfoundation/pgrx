@@ -5,7 +5,12 @@ use std::ptr::NonNull;
 use crate::pg_sys::{self, PgOid};
 use crate::spi::{PreparedStatement, Query, Spi, SpiCursor, SpiError, SpiResult, SpiTupleTable};
 
-pub struct SpiClient;
+pub struct SpiClient {
+    // We need `SpiClient` to be publicly accessible but not constructable because we rely
+    // on it being properly constructed in order for its Drop impl, which calles `pg_sys::SPI_finish()`,
+    // to work as expected
+    _priv_constructor: (),
+}
 
 impl SpiClient {
     /// Connect to Postgres' SPI system
@@ -16,7 +21,7 @@ impl SpiClient {
         // assume it could.  The truth seems to be that it never actually does.  The one user
         // of SpiConnection::connect() returns `spi::Result` anyways, so it's no big deal
         Spi::check_status(unsafe { pg_sys::SPI_connect() })?;
-        Ok(SpiClient)
+        Ok(SpiClient { _priv_constructor: () })
     }
 
     /// Prepares a statement that is valid for the lifetime of the client
