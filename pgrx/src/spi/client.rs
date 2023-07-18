@@ -3,12 +3,7 @@ use std::marker::PhantomData;
 use std::ptr::NonNull;
 
 use crate::pg_sys::{self, PgOid};
-use crate::spi::Query;
-use crate::spi::Result as SpiResult;
-use crate::spi::SpiCursor;
-use crate::spi::SpiError;
-use crate::spi::SpiTupleTable;
-use crate::spi::{PreparedStatement, Spi};
+use crate::spi::{PreparedStatement, Query, Spi, SpiCursor, SpiError, SpiResult, SpiTupleTable};
 
 // TODO: should `'conn` be invariant?
 pub struct SpiClient<'conn> {

@@ -3,13 +3,8 @@ use std::marker::PhantomData;
 use std::ops::Deref;
 use std::ptr::NonNull;
 
+use super::{Spi, SpiClient, SpiCursor, SpiError, SpiResult, SpiTupleTable};
 use crate::pg_sys::{self, PgOid};
-use crate::spi::Result as SpiResult;
-use crate::spi::{Spi, SpiCursor};
-
-use super::client::SpiClient;
-use super::tuple::SpiTupleTable;
-use super::Error;
 
 /// A generalized interface to what constitutes a query
 ///
@@ -227,7 +222,7 @@ impl<'conn: 'stmt, 'stmt> Query<'conn> for &'stmt PreparedStatement<'conn> {
         let expected = unsafe { pg_sys::SPI_getargcount(self.plan.as_ptr()) } as usize;
 
         if nargs != expected {
-            return Err(Error::PreparedStatementArgumentMismatch { expected, got: nargs });
+            return Err(SpiError::PreparedStatementArgumentMismatch { expected, got: nargs });
         }
 
         let (mut datums, mut nulls): (Vec<_>, Vec<_>) = args.into_iter().map(prepare_datum).unzip();

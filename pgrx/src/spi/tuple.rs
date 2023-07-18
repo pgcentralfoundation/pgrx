@@ -5,12 +5,11 @@ use std::ops::Index;
 use std::ptr::NonNull;
 
 use crate::memcxt::PgMemoryContexts;
+use crate::pg_sys::panic::ErrorReportable;
 use crate::pg_sys::{self, PgOid};
 use crate::prelude::*;
-use crate::spi::Result as SpiResult;
 
-use super::{Error, SpiErrorCodes, SpiOkCodes};
-use pgrx_pg_sys::panic::ErrorReportable;
+use super::{Error, SpiErrorCodes, SpiOkCodes, SpiResult};
 
 #[derive(Debug)]
 pub struct SpiTupleTable<'conn> {

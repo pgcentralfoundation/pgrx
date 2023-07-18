@@ -3,11 +3,11 @@ use std::marker::PhantomData;
 use std::ptr::NonNull;
 
 use crate::pg_sys;
-use crate::spi::SpiOkCodes;
 
-use super::client::SpiClient;
-use super::tuple::SpiTupleTable;
-use super::Error;
+use super::SpiOkCodes;
+use super::SpiClient;
+use super::SpiTupleTable;
+use super::SpiError;
 
 type CursorName = String;
 
@@ -75,7 +75,7 @@ impl SpiCursor<'_> {
     /// Fetch up to `count` rows from the cursor, moving forward
     ///
     /// If `fetch` runs off the end of the available rows, an empty [`SpiTupleTable`] is returned.
-    pub fn fetch(&mut self, count: libc::c_long) -> std::result::Result<SpiTupleTable, Error> {
+    pub fn fetch(&mut self, count: libc::c_long) -> std::result::Result<SpiTupleTable, SpiError> {
         // SAFETY: no concurrent access
         unsafe {
             pg_sys::SPI_tuptable = std::ptr::null_mut();

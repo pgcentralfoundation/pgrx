@@ -25,7 +25,8 @@ pub use cursor::SpiCursor;
 pub use query::{OwnedPreparedStatement, PreparedStatement, Query};
 pub use tuple::{SpiHeapTupleData, SpiHeapTupleDataEntry, SpiTupleTable};
 
-pub type Result<T> = std::result::Result<T, Error>;
+pub type SpiResult<T> = std::result::Result<T, SpiError>;
+pub use SpiResult as Result;
 
 /// These match the Postgres `#define`d constants prefixed `SPI_OK_*` that you can find in `pg_sys`.
 #[derive(Debug, PartialEq)]
