@@ -9,7 +9,7 @@ use crate::pg_sys::panic::ErrorReportable;
 use crate::pg_sys::{self, PgOid};
 use crate::prelude::*;
 
-use super::{Error, SpiErrorCodes, SpiOkCodes, SpiResult};
+use super::{SpiError, SpiErrorCodes, SpiOkCodes, SpiResult};
 
 #[derive(Debug)]
 pub struct SpiTupleTable<'conn> {
@@ -76,7 +76,7 @@ impl<'conn> SpiTupleTable<'conn> {
     fn get_spi_tuptable(
         &self,
     ) -> SpiResult<(*mut pg_sys::SPITupleTable, *mut pg_sys::TupleDescData)> {
-        let table = self.table.as_deref().ok_or(Error::NoTupleTable)?;
+        let table = self.table.as_deref().ok_or(SpiError::NoTupleTable)?;
         // SAFETY:  we just assured that `table` is not null
         Ok((table as *const _ as *mut _, table.tupdesc))
     }
@@ -90,7 +90,7 @@ impl<'conn> SpiTupleTable<'conn> {
             // processed with "no, we don't have one, but it's okay"
             Ok(None)
         } else if self.current < 0 || self.current as usize >= self.size {
-            Err(Error::InvalidPosition)
+            Err(SpiError::InvalidPosition)
         } else {
             let (table, tupdesc) = self.get_spi_tuptable()?;
             unsafe {
@@ -164,7 +164,7 @@ impl<'conn> SpiTupleTable<'conn> {
 
         let (table, tupdesc) = self.get_spi_tuptable()?;
         if self.current < 0 || self.current as usize >= self.size {
-            return Err(Error::InvalidPosition);
+            return Err(SpiError::InvalidPosition);
         }
         unsafe {
             let heap_tuple =
@@ -201,7 +201,7 @@ impl<'conn> SpiTupleTable<'conn> {
     #[inline]
     fn check_ordinal_bounds(&self, ordinal: usize) -> SpiResult<()> {
         if ordinal < 1 || ordinal > self.columns()? {
-            Err(Error::SpiError(SpiErrorCodes::NoAttribute))
+            Err(SpiError::SpiError(SpiErrorCodes::NoAttribute))
         } else {
             Ok(())
         }
@@ -267,7 +267,7 @@ impl<'conn> SpiTupleTable<'conn> {
             let fnumber = pg_sys::SPI_fnumber(tupdesc, name_cstr.as_ptr());
 
             if fnumber == pg_sys::SPI_ERROR_NOATTRIBUTE {
-                Err(Error::SpiError(SpiErrorCodes::NoAttribute))
+                Err(SpiError::SpiError(SpiErrorCodes::NoAttribute))
             } else {
                 Ok(fnumber as usize)
             }
@@ -323,7 +323,7 @@ impl<'conn> SpiHeapTupleData<'conn> {
         tupdesc: pg_sys::TupleDesc,
         htup: *mut pg_sys::HeapTupleData,
     ) -> SpiResult<Option<Self>> {
-        let tupdesc = NonNull::new(tupdesc).ok_or(Error::NoTupleTable)?;
+        let tupdesc = NonNull::new(tupdesc).ok_or(SpiError::NoTupleTable)?;
         let mut data = SpiHeapTupleData { tupdesc, entries: Vec::new() };
         let tupdesc = tupdesc.as_ptr();
 
@@ -380,10 +380,10 @@ impl<'conn> SpiHeapTupleData<'conn> {
     pub fn get_datum_by_ordinal(
         &self,
         ordinal: usize,
-    ) -> std::result::Result<&SpiHeapTupleDataEntry<'conn>, Error> {
+    ) -> SpiResult<&SpiHeapTupleDataEntry<'conn>> {
         // Wrapping because `self.entries.get(...)` will bounds check.
         let index = ordinal.wrapping_sub(1);
-        self.entries.get(index).ok_or_else(|| Error::SpiError(SpiErrorCodes::NoAttribute))
+        self.entries.get(index).ok_or_else(|| SpiError::SpiError(SpiErrorCodes::NoAttribute))
     }
 
     /// Get a raw Datum from this HeapTuple by its field name.
@@ -398,13 +398,13 @@ impl<'conn> SpiHeapTupleData<'conn> {
     pub fn get_datum_by_name<S: AsRef<str>>(
         &self,
         name: S,
-    ) -> std::result::Result<&SpiHeapTupleDataEntry<'conn>, Error> {
+    ) -> SpiResult<&SpiHeapTupleDataEntry<'conn>> {
         unsafe {
             let name_cstr = CString::new(name.as_ref()).expect("name contained a null byte");
             let fnumber = pg_sys::SPI_fnumber(self.tupdesc.as_ptr(), name_cstr.as_ptr());
 
             if fnumber == pg_sys::SPI_ERROR_NOATTRIBUTE {
-                Err(Error::SpiError(SpiErrorCodes::NoAttribute))
+                Err(SpiError::SpiError(SpiErrorCodes::NoAttribute))
             } else {
                 self.get_datum_by_ordinal(fnumber as usize)
             }
@@ -420,7 +420,7 @@ impl<'conn> SpiHeapTupleData<'conn> {
         &mut self,
         ordinal: usize,
         datum: T,
-    ) -> std::result::Result<(), Error> {
+    ) -> SpiResult<()> {
         self.check_ordinal_bounds(ordinal)?;
         self.entries[ordinal - 1] = SpiHeapTupleDataEntry {
             datum: datum.into_datum(),
@@ -443,12 +443,12 @@ impl<'conn> SpiHeapTupleData<'conn> {
         &mut self,
         name: &str,
         datum: T,
-    ) -> std::result::Result<(), Error> {
+    ) -> SpiResult<()> {
         unsafe {
             let name_cstr = CString::new(name).expect("name contained a null byte");
             let fnumber = pg_sys::SPI_fnumber(self.tupdesc.as_ptr(), name_cstr.as_ptr());
             if fnumber == pg_sys::SPI_ERROR_NOATTRIBUTE {
-                Err(Error::SpiError(SpiErrorCodes::NoAttribute))
+                Err(SpiError::SpiError(SpiErrorCodes::NoAttribute))
             } else {
                 self.set_by_ordinal(fnumber as usize, datum)
             }
@@ -465,9 +465,9 @@ impl<'conn> SpiHeapTupleData<'conn> {
 
     /// is the specified ordinal valid for the underlying tuple descriptor?
     #[inline]
-    fn check_ordinal_bounds(&self, ordinal: usize) -> std::result::Result<(), Error> {
+    fn check_ordinal_bounds(&self, ordinal: usize) -> SpiResult<()> {
         if ordinal < 1 || ordinal > self.columns() {
-            Err(Error::SpiError(SpiErrorCodes::NoAttribute))
+            Err(SpiError::SpiError(SpiErrorCodes::NoAttribute))
         } else {
             Ok(())
         }
@@ -486,7 +486,7 @@ impl<'conn> SpiHeapTupleDataEntry<'conn> {
                     false,
                     self.type_oid,
                 )
-                .map_err(|e| Error::DatumError(e))
+                .map_err(|e| SpiError::DatumError(e))
             },
             None => Ok(None),
         }
