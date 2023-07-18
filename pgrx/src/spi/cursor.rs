@@ -4,10 +4,7 @@ use std::ptr::NonNull;
 
 use crate::pg_sys;
 
-use super::SpiOkCodes;
-use super::SpiClient;
-use super::SpiTupleTable;
-use super::SpiError;
+use super::{SpiClient, SpiError, SpiOkCodes, SpiTupleTable};
 
 type CursorName = String;
 

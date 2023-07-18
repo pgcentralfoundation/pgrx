@@ -377,10 +377,7 @@ impl<'conn> SpiHeapTupleData<'conn> {
     /// # Errors
     ///
     /// If the specified ordinal is out of bounds a [`Error::SpiError(SpiError::NoAttribute)`] is returned
-    pub fn get_datum_by_ordinal(
-        &self,
-        ordinal: usize,
-    ) -> SpiResult<&SpiHeapTupleDataEntry<'conn>> {
+    pub fn get_datum_by_ordinal(&self, ordinal: usize) -> SpiResult<&SpiHeapTupleDataEntry<'conn>> {
         // Wrapping because `self.entries.get(...)` will bounds check.
         let index = ordinal.wrapping_sub(1);
         self.entries.get(index).ok_or_else(|| SpiError::SpiError(SpiErrorCodes::NoAttribute))
@@ -416,11 +413,7 @@ impl<'conn> SpiHeapTupleData<'conn> {
     /// # Errors
     ///
     /// If the specified ordinal is out of bounds a [`SpiErrorCodes::NoAttribute`] is returned
-    pub fn set_by_ordinal<T: IntoDatum>(
-        &mut self,
-        ordinal: usize,
-        datum: T,
-    ) -> SpiResult<()> {
+    pub fn set_by_ordinal<T: IntoDatum>(&mut self, ordinal: usize, datum: T) -> SpiResult<()> {
         self.check_ordinal_bounds(ordinal)?;
         self.entries[ordinal - 1] = SpiHeapTupleDataEntry {
             datum: datum.into_datum(),
@@ -439,11 +432,7 @@ impl<'conn> SpiHeapTupleData<'conn> {
     /// # Panics
     ///
     /// This function will panic if somehow the specified name contains a null byte.
-    pub fn set_by_name<T: IntoDatum>(
-        &mut self,
-        name: &str,
-        datum: T,
-    ) -> SpiResult<()> {
+    pub fn set_by_name<T: IntoDatum>(&mut self, name: &str, datum: T) -> SpiResult<()> {
         unsafe {
             let name_cstr = CString::new(name).expect("name contained a null byte");
             let fnumber = pg_sys::SPI_fnumber(self.tupdesc.as_ptr(), name_cstr.as_ptr());
