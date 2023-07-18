@@ -45,7 +45,7 @@ pub struct Numeric<const P: u32, const S: u32>(pub(crate) AnyNumeric);
 pub struct AnyNumeric {
     // we represent a NUMERIC as opaque bytes -- we never inspect these ourselves, only a pointer
     // to them (cast as a [`Datum`]) are passed to Postgres
-    pub(crate) inner: Vec<u8>,
+    pub(super) inner: Box<[u8]>,
 }
 
 impl Display for AnyNumeric {

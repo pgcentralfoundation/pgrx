@@ -39,17 +39,17 @@ impl FromDatum for AnyNumeric {
                 datum.cast_mut_ptr::<pg_sys::varlena>(),
             );
 
-            // copy us into a Vec<u8>
+            // copy us into a rust-owned/allocated Box<[u8]>
             let size = varsize_any(numeric);
-            let mut bytes = vec![0; size];
-            std::ptr::copy_nonoverlapping(numeric.cast::<u8>(), bytes.as_mut_ptr(), size);
+            let slice = std::slice::from_raw_parts(numeric.cast::<u8>(), size);
+            let boxed: Box<[u8]> = slice.into();
 
             // free the copy detoast might have made
             if is_copy {
                 pg_sys::pfree(numeric.cast());
             }
 
-            Some(AnyNumeric { inner: bytes })
+            Some(AnyNumeric { inner: boxed })
         }
     }
 }
