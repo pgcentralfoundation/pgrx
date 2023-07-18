@@ -7,7 +7,7 @@
 //LICENSE All rights reserved.
 //LICENSE
 //LICENSE Use of this source code is governed by the MIT license that can be found in the LICENSE file.
-use crate::{pg_sys, AnyNumeric, FromDatum, IntoDatum, Numeric, PgMemoryContexts};
+use crate::{pg_sys, varsize_any, AnyNumeric, FromDatum, IntoDatum, Numeric};
 
 impl FromDatum for AnyNumeric {
     #[inline]
@@ -22,42 +22,48 @@ impl FromDatum for AnyNumeric {
         if is_null {
             None
         } else {
-            let numeric = pg_sys::pg_detoast_datum(datum.cast_mut_ptr()) as pg_sys::Numeric;
-            let is_copy = !std::ptr::eq(
-                numeric.cast::<pg_sys::NumericData>(),
-                datum.cast_mut_ptr::<pg_sys::NumericData>(),
-            );
-            Some(AnyNumeric { inner: numeric, need_pfree: is_copy })
-        }
-    }
+            // Going back to Postgres v9.1, `pg_sys::NumericData` is really a "varlena" in disguise.
+            //
+            // We want to copy it out of the Postgres-allocated memory it's in and into something
+            // managed by Rust.
+            //
+            // First we'll detoast it and then copy the backing varlena bytes into a `Vec<u8>`.
+            // This is what we'll use later if we need to convert back into a postgres-allocated Datum
+            // or to provide a view over the bytes as a Datum.  The latter is what most of the AnyNumeric
+            // support functions use, via the `as_datum()` function.
 
-    unsafe fn from_datum_in_memory_context(
-        mut memory_context: PgMemoryContexts,
-        datum: pg_sys::Datum,
-        is_null: bool,
-        _typoid: pg_sys::Oid,
-    ) -> Option<Self>
-    where
-        Self: Sized,
-    {
-        if is_null {
-            None
-        } else {
-            memory_context.switch_to(|_| {
-                // copy the Datum into this MemoryContext and then create the AnyNumeric over that
-                let copy = pg_sys::pg_detoast_datum_copy(datum.cast_mut_ptr());
-                Some(AnyNumeric { inner: copy.cast(), need_pfree: true })
-            })
+            // detoast
+            let numeric = pg_sys::pg_detoast_datum(datum.cast_mut_ptr());
+            let is_copy = !std::ptr::eq(
+                numeric.cast::<pg_sys::varlena>(),
+                datum.cast_mut_ptr::<pg_sys::varlena>(),
+            );
+
+            // copy us into a rust-owned/allocated Box<[u8]>
+            let size = varsize_any(numeric);
+            let slice = std::slice::from_raw_parts(numeric.cast::<u8>(), size);
+            let boxed: Box<[u8]> = slice.into();
+
+            // free the copy detoast might have made
+            if is_copy {
+                pg_sys::pfree(numeric.cast());
+            }
+
+            Some(AnyNumeric { inner: boxed })
         }
     }
 }
 
 impl IntoDatum for AnyNumeric {
     #[inline]
-    fn into_datum(mut self) -> Option<pg_sys::Datum> {
-        // we're giving it to Postgres so we don't want our drop impl to free the inner pointer
-        self.need_pfree = false;
-        Some(pg_sys::Datum::from(self.inner))
+    fn into_datum(self) -> Option<pg_sys::Datum> {
+        unsafe {
+            let size = self.inner.len();
+            let src = self.inner.as_ptr();
+            let dest = pg_sys::palloc(size).cast();
+            std::ptr::copy_nonoverlapping(src, dest, size);
+            Some(pg_sys::Datum::from(dest))
+        }
     }
 
     #[inline]

@@ -14,7 +14,7 @@ use std::iter::Sum;
 
 use crate::numeric_support::convert::{from_primitive_helper, FromPrimitiveFunc};
 pub use crate::numeric_support::error::Error;
-use crate::{direct_function_call, pg_sys, varsize, PgMemoryContexts};
+use crate::{direct_function_call, pg_sys};
 
 /// A wrapper around the Postgres SQL `NUMERIC(P, S)` type.  Its `Precision` and `Scale` values
 /// are known at compile-time to assist with scale conversions and general type safety.
@@ -40,30 +40,12 @@ pub struct Numeric<const P: u32, const S: u32>(pub(crate) AnyNumeric);
 /// to represent any Rust primitive value from `i128::MIN` to `u128::MAX` and anything in between.
 ///
 /// Generally, this is the type you'll want to use as function arguments.
+///
+#[derive(Debug, Clone)]
 pub struct AnyNumeric {
-    pub(crate) inner: pg_sys::Numeric,
-    pub(crate) need_pfree: bool,
-}
-
-impl Clone for AnyNumeric {
-    /// Performs a deep clone of this [`AnyNumeric`] into the [`pg_sys::CurrentMemoryContext`].
-    fn clone(&self) -> Self {
-        unsafe {
-            let copy = PgMemoryContexts::CurrentMemoryContext
-                .copy_ptr_into(self.inner, varsize(self.inner.cast()));
-            AnyNumeric { inner: copy, need_pfree: true }
-        }
-    }
-}
-
-impl Drop for AnyNumeric {
-    fn drop(&mut self) {
-        if self.need_pfree {
-            unsafe {
-                pg_sys::pfree(self.inner.cast());
-            }
-        }
-    }
+    // we represent a NUMERIC as opaque bytes -- we never inspect these ourselves, only a pointer
+    // to them (cast as a [`Datum`]) are passed to Postgres
+    pub(super) inner: Box<[u8]>,
 }
 
 impl Display for AnyNumeric {
@@ -73,12 +55,6 @@ impl Display for AnyNumeric {
         };
         let s = numeric_out.to_str().expect("numeric_out is not a valid UTF8 string");
         fmt.pad(s)
-    }
-}
-
-impl Debug for AnyNumeric {
-    fn fmt(&self, fmt: &mut Formatter<'_>) -> fmt::Result {
-        write!(fmt, "AnyNumeric(inner: {self}, need_pfree:{})", self.need_pfree)
     }
 }
 
@@ -142,7 +118,7 @@ impl AnyNumeric {
 
     /// Is this [`AnyNumeric`] not-a-number?
     pub fn is_nan(&self) -> bool {
-        unsafe { pg_sys::numeric_is_nan(self.inner) }
+        unsafe { pg_sys::numeric_is_nan(self.as_ptr() as *mut _) }
     }
 
     /// The absolute value of this [`AnyNumeric`]
@@ -191,7 +167,7 @@ impl AnyNumeric {
     /// compare equal.
     pub fn normalize(&self) -> &str {
         unsafe {
-            let s = pg_sys::numeric_normalize(self.inner.cast());
+            let s = pg_sys::numeric_normalize(self.as_ptr() as *mut _);
             let cstr = CStr::from_ptr(s);
             let normalized = cstr.to_str().unwrap();
             normalized
@@ -217,12 +193,12 @@ impl AnyNumeric {
 
     #[inline]
     pub(crate) fn as_datum(&self) -> Option<pg_sys::Datum> {
-        Some(pg_sys::Datum::from(self.inner))
+        Some(pg_sys::Datum::from(self.inner.as_ptr()))
     }
 
     #[inline]
-    pub(crate) fn copy(&self) -> AnyNumeric {
-        AnyNumeric { inner: self.inner, need_pfree: false }
+    fn as_ptr(&self) -> *const pg_sys::NumericData {
+        self.inner.as_ptr().cast()
     }
 }
 
