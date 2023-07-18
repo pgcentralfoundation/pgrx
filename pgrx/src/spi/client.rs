@@ -50,9 +50,7 @@ impl<'conn> SpiClient<'conn> {
             __marker: PhantomData,
         })
     }
-}
 
-impl<'conn> SpiClient<'conn> {
     /// perform a SELECT statement
     pub fn select<Q: Query<'conn>>(
         &self,
