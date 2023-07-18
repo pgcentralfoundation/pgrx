@@ -297,14 +297,6 @@ impl<'conn> Iterator for SpiTupleTable<'conn> {
     fn size_hint(&self) -> (usize, Option<usize>) {
         (0, Some(self.size))
     }
-
-    #[inline]
-    fn count(self) -> usize
-    where
-        Self: Sized,
-    {
-        self.size
-    }
 }
 
 /// Represents a single `pg_sys::Datum` inside a `SpiHeapTupleData`
