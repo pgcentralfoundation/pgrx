@@ -26,7 +26,7 @@ pub extern "C" fn bgworker(arg: pg_sys::Datum) {
     if arg > 0 {
         BackgroundWorker::transaction(|| {
             Spi::run("CREATE TABLE tests.bgworker_test (v INTEGER);")?;
-            Spi::connect(|mut client| {
+            Spi::connect(|client| {
                 client
                     .update(
                         "INSERT INTO tests.bgworker_test VALUES ($1);",
@@ -74,7 +74,7 @@ pub extern "C" fn bgworker_return_value(arg: pg_sys::Datum) {
     };
     while BackgroundWorker::wait_latch(Some(Duration::from_millis(100))) {}
     BackgroundWorker::transaction(|| {
-        Spi::connect(|mut c| {
+        Spi::connect(|c| {
             c.update(
                 "INSERT INTO tests.bgworker_test_return VALUES ($1)",
                 None,

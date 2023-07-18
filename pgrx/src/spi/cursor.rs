@@ -31,7 +31,7 @@ type CursorName = String;
 /// ```rust,no_run
 /// use pgrx::prelude::*;
 /// # fn foo() -> spi::Result<()> {
-/// Spi::connect(|mut client| {
+/// Spi::connect(|client| {
 ///     let mut cursor = client.open_cursor("SELECT * FROM generate_series(1, 5)", None);
 ///     assert_eq!(Some(1u32), cursor.fetch(1)?.get_one::<u32>()?);
 ///     assert_eq!(Some(2u32), cursor.fetch(2)?.get_one::<u32>()?);
@@ -46,13 +46,13 @@ type CursorName = String;
 /// ```rust,no_run
 /// use pgrx::prelude::*;
 /// # fn foo() -> spi::Result<()> {
-/// let cursor_name = Spi::connect(|mut client| {
+/// let cursor_name = Spi::connect(|client| {
 ///     let mut cursor = client.open_cursor("SELECT * FROM generate_series(1, 5)", None);
 ///     assert_eq!(Ok(Some(1u32)), cursor.fetch(1)?.get_one::<u32>());
 ///     Ok::<_, spi::Error>(cursor.detach_into_name()) // <-- cursor gets dropped here
 ///     // <--- first SpiTupleTable gets freed by Spi::connect at this point
 /// })?;
-/// Spi::connect(|mut client| {
+/// Spi::connect(|client| {
 ///     let mut cursor = client.find_cursor(&cursor_name)?;
 ///     assert_eq!(Ok(Some(2u32)), cursor.fetch(1)?.get_one::<u32>());
 ///     drop(cursor); // <-- cursor gets dropped here

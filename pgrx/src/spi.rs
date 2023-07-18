@@ -240,13 +240,13 @@ impl Spi {
     }
 
     pub fn get_one<A: FromDatum + IntoDatum>(query: &str) -> Result<Option<A>> {
-        Spi::connect(|mut client| client.update(query, Some(1), None)?.first().get_one())
+        Spi::connect(|client| client.update(query, Some(1), None)?.first().get_one())
     }
 
     pub fn get_two<A: FromDatum + IntoDatum, B: FromDatum + IntoDatum>(
         query: &str,
     ) -> Result<(Option<A>, Option<B>)> {
-        Spi::connect(|mut client| client.update(query, Some(1), None)?.first().get_two::<A, B>())
+        Spi::connect(|client| client.update(query, Some(1), None)?.first().get_two::<A, B>())
     }
 
     pub fn get_three<
@@ -256,25 +256,21 @@ impl Spi {
     >(
         query: &str,
     ) -> Result<(Option<A>, Option<B>, Option<C>)> {
-        Spi::connect(|mut client| {
-            client.update(query, Some(1), None)?.first().get_three::<A, B, C>()
-        })
+        Spi::connect(|client| client.update(query, Some(1), None)?.first().get_three::<A, B, C>())
     }
 
     pub fn get_one_with_args<A: FromDatum + IntoDatum>(
         query: &str,
         args: Vec<(PgOid, Option<pg_sys::Datum>)>,
     ) -> Result<Option<A>> {
-        Spi::connect(|mut client| client.update(query, Some(1), Some(args))?.first().get_one())
+        Spi::connect(|client| client.update(query, Some(1), Some(args))?.first().get_one())
     }
 
     pub fn get_two_with_args<A: FromDatum + IntoDatum, B: FromDatum + IntoDatum>(
         query: &str,
         args: Vec<(PgOid, Option<pg_sys::Datum>)>,
     ) -> Result<(Option<A>, Option<B>)> {
-        Spi::connect(|mut client| {
-            client.update(query, Some(1), Some(args))?.first().get_two::<A, B>()
-        })
+        Spi::connect(|client| client.update(query, Some(1), Some(args))?.first().get_two::<A, B>())
     }
 
     pub fn get_three_with_args<
@@ -285,7 +281,7 @@ impl Spi {
         query: &str,
         args: Vec<(PgOid, Option<pg_sys::Datum>)>,
     ) -> Result<(Option<A>, Option<B>, Option<C>)> {
-        Spi::connect(|mut client| {
+        Spi::connect(|client| {
             client.update(query, Some(1), Some(args))?.first().get_three::<A, B, C>()
         })
     }
@@ -308,7 +304,7 @@ impl Spi {
         query: &str,
         args: Option<Vec<(PgOid, Option<pg_sys::Datum>)>>,
     ) -> std::result::Result<(), Error> {
-        Spi::connect(|mut client| client.update(query, None, args).map(|_| ()))
+        Spi::connect(|client| client.update(query, None, args).map(|_| ()))
     }
 
     /// explain a query, returning its result in json form
@@ -321,7 +317,7 @@ impl Spi {
         query: &str,
         args: Option<Vec<(PgOid, Option<pg_sys::Datum>)>>,
     ) -> Result<Json> {
-        Ok(Spi::connect(|mut client| {
+        Ok(Spi::connect(|client| {
             client
                 .update(&format!("EXPLAIN (format json) {}", query), None, args)?
                 .first()
