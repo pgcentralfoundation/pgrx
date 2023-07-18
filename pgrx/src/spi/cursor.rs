@@ -1,5 +1,4 @@
 use std::ffi::CStr;
-use std::marker::PhantomData;
 use std::ptr::NonNull;
 
 use crate::pg_sys;
@@ -65,7 +64,7 @@ type CursorName = String;
 /// ```
 pub struct SpiCursor<'client> {
     pub(crate) ptr: NonNull<pg_sys::PortalData>,
-    pub(crate) __marker: PhantomData<&'client SpiClient<'client>>,
+    pub(crate) client: &'client SpiClient,
 }
 
 impl SpiCursor<'_> {
@@ -79,7 +78,7 @@ impl SpiCursor<'_> {
         }
         // SAFETY: SPI functions to create/find cursors fail via elog, so self.ptr is valid if we successfully set it
         unsafe { pg_sys::SPI_cursor_fetch(self.ptr.as_mut(), true, count) }
-        Ok(SpiClient::prepare_tuple_table(SpiOkCodes::Fetch as i32)?)
+        Ok(self.client.prepare_tuple_table(SpiOkCodes::Fetch as i32)?)
     }
 
     /// Consume the cursor, returning its name

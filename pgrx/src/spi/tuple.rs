@@ -12,15 +12,15 @@ use crate::prelude::*;
 use super::{SpiError, SpiErrorCodes, SpiOkCodes, SpiResult};
 
 #[derive(Debug)]
-pub struct SpiTupleTable<'conn> {
+pub struct SpiTupleTable<'client> {
     #[allow(dead_code)]
     pub(super) status_code: SpiOkCodes,
-    pub(super) table: Option<&'conn mut pg_sys::SPITupleTable>,
+    pub(super) table: Option<&'client mut pg_sys::SPITupleTable>,
     pub(super) size: usize,
     pub(super) current: isize,
 }
 
-impl<'conn> SpiTupleTable<'conn> {
+impl<'client> SpiTupleTable<'client> {
     /// `SpiTupleTable`s are positioned before the start, for iteration purposes.
     ///
     /// This method moves the position to the first row.  If there are no rows, this
@@ -81,7 +81,7 @@ impl<'conn> SpiTupleTable<'conn> {
         Ok((table as *const _ as *mut _, table.tupdesc))
     }
 
-    pub fn get_heap_tuple(&self) -> SpiResult<Option<SpiHeapTupleData<'conn>>> {
+    pub fn get_heap_tuple(&self) -> SpiResult<Option<SpiHeapTupleData<'client>>> {
         if self.size == 0 || self.table.is_none() {
             // a query like "SELECT 1 LIMIT 0" is a valid "select"-style query that will not produce
             // a SPI_tuptable.  So are utility queries such as "CREATE INDEX" or "VACUUM".  We might
@@ -275,8 +275,8 @@ impl<'conn> SpiTupleTable<'conn> {
     }
 }
 
-impl<'conn> Iterator for SpiTupleTable<'conn> {
-    type Item = SpiHeapTupleData<'conn>;
+impl<'client> Iterator for SpiTupleTable<'client> {
+    type Item = SpiHeapTupleData<'client>;
 
     /// # Panics
     ///
@@ -299,20 +299,20 @@ impl<'conn> Iterator for SpiTupleTable<'conn> {
 }
 
 /// Represents a single `pg_sys::Datum` inside a `SpiHeapTupleData`
-pub struct SpiHeapTupleDataEntry<'conn> {
+pub struct SpiHeapTupleDataEntry<'client> {
     datum: Option<pg_sys::Datum>,
     type_oid: pg_sys::Oid,
-    __marker: PhantomData<&'conn ()>,
+    __marker: PhantomData<&'client ()>,
 }
 
 /// Represents the set of `pg_sys::Datum`s in a `pg_sys::HeapTuple`
-pub struct SpiHeapTupleData<'conn> {
+pub struct SpiHeapTupleData<'client> {
     tupdesc: NonNull<pg_sys::TupleDescData>,
     // offset by 1!
-    entries: Vec<SpiHeapTupleDataEntry<'conn>>,
+    entries: Vec<SpiHeapTupleDataEntry<'client>>,
 }
 
-impl<'conn> SpiHeapTupleData<'conn> {
+impl<'client> SpiHeapTupleData<'client> {
     /// Create a new `SpiHeapTupleData` from its constituent parts
     ///
     /// # Safety
@@ -377,7 +377,10 @@ impl<'conn> SpiHeapTupleData<'conn> {
     /// # Errors
     ///
     /// If the specified ordinal is out of bounds a [`Error::SpiError(SpiError::NoAttribute)`] is returned
-    pub fn get_datum_by_ordinal(&self, ordinal: usize) -> SpiResult<&SpiHeapTupleDataEntry<'conn>> {
+    pub fn get_datum_by_ordinal(
+        &self,
+        ordinal: usize,
+    ) -> SpiResult<&SpiHeapTupleDataEntry<'client>> {
         // Wrapping because `self.entries.get(...)` will bounds check.
         let index = ordinal.wrapping_sub(1);
         self.entries.get(index).ok_or_else(|| SpiError::SpiError(SpiErrorCodes::NoAttribute))
@@ -395,7 +398,7 @@ impl<'conn> SpiHeapTupleData<'conn> {
     pub fn get_datum_by_name<S: AsRef<str>>(
         &self,
         name: S,
-    ) -> SpiResult<&SpiHeapTupleDataEntry<'conn>> {
+    ) -> SpiResult<&SpiHeapTupleDataEntry<'client>> {
         unsafe {
             let name_cstr = CString::new(name.as_ref()).expect("name contained a null byte");
             let fnumber = pg_sys::SPI_fnumber(self.tupdesc.as_ptr(), name_cstr.as_ptr());
@@ -463,7 +466,7 @@ impl<'conn> SpiHeapTupleData<'conn> {
     }
 }
 
-impl<'conn> SpiHeapTupleDataEntry<'conn> {
+impl<'client> SpiHeapTupleDataEntry<'client> {
     pub fn value<T: IntoDatum + FromDatum>(&self) -> SpiResult<Option<T>> {
         match self.datum.as_ref() {
             Some(datum) => unsafe {
@@ -489,8 +492,8 @@ impl<'conn> SpiHeapTupleDataEntry<'conn> {
 /// Provide ordinal indexing into a `SpiHeapTupleData`.
 ///
 /// If the index is out of bounds, it will panic
-impl<'conn> Index<usize> for SpiHeapTupleData<'conn> {
-    type Output = SpiHeapTupleDataEntry<'conn>;
+impl<'client> Index<usize> for SpiHeapTupleData<'client> {
+    type Output = SpiHeapTupleDataEntry<'client>;
 
     fn index(&self, index: usize) -> &Self::Output {
         self.get_datum_by_ordinal(index).expect("invalid ordinal value")
@@ -500,8 +503,8 @@ impl<'conn> Index<usize> for SpiHeapTupleData<'conn> {
 /// Provide named indexing into a `SpiHeapTupleData`.
 ///
 /// If the field name doesn't exist, it will panic
-impl<'conn> Index<&str> for SpiHeapTupleData<'conn> {
-    type Output = SpiHeapTupleDataEntry<'conn>;
+impl<'client> Index<&str> for SpiHeapTupleData<'client> {
+    type Output = SpiHeapTupleDataEntry<'client>;
 
     fn index(&self, index: &str) -> &Self::Output {
         self.get_datum_by_name(index).expect("invalid field name")

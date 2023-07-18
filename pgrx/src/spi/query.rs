@@ -11,34 +11,34 @@ use crate::pg_sys::{self, PgOid};
 /// Its primary purpose is to abstract away differences between
 /// one-off statements and prepared statements, but it can potentially
 /// be implemented for other types, provided they can be converted into a query.
-pub trait Query<'conn> {
+pub trait Query<'client> {
     type Arguments;
 
     /// Execute a query given a client and other arguments
     fn execute(
         self,
-        client: &SpiClient<'conn>,
+        client: &'client SpiClient,
         limit: Option<libc::c_long>,
         arguments: Self::Arguments,
-    ) -> SpiResult<SpiTupleTable<'conn>>;
+    ) -> SpiResult<SpiTupleTable<'client>>;
 
     /// Open a cursor for the query
-    fn open_cursor(self, client: &SpiClient<'conn>, args: Self::Arguments) -> SpiCursor<'conn>;
+    fn open_cursor(self, client: &'client SpiClient, args: Self::Arguments) -> SpiCursor<'client>;
 }
 
-impl<'conn> Query<'conn> for &String {
+impl<'client> Query<'client> for &String {
     type Arguments = Option<Vec<(PgOid, Option<pg_sys::Datum>)>>;
 
     fn execute(
         self,
-        client: &SpiClient<'conn>,
+        client: &'client SpiClient,
         limit: Option<libc::c_long>,
         arguments: Self::Arguments,
-    ) -> SpiResult<SpiTupleTable<'conn>> {
+    ) -> SpiResult<SpiTupleTable<'client>> {
         self.as_str().execute(client, limit, arguments)
     }
 
-    fn open_cursor(self, client: &SpiClient<'conn>, args: Self::Arguments) -> SpiCursor<'conn> {
+    fn open_cursor(self, client: &'client SpiClient, args: Self::Arguments) -> SpiCursor<'client> {
         self.as_str().open_cursor(client, args)
     }
 }
@@ -50,7 +50,7 @@ fn prepare_datum(datum: Option<pg_sys::Datum>) -> (pg_sys::Datum, std::os::raw::
     }
 }
 
-impl<'conn> Query<'conn> for &str {
+impl<'client> Query<'client> for &str {
     type Arguments = Option<Vec<(PgOid, Option<pg_sys::Datum>)>>;
 
     /// # Panics
@@ -58,10 +58,10 @@ impl<'conn> Query<'conn> for &str {
     /// This function will panic if somehow the specified query contains a null byte.
     fn execute(
         self,
-        _client: &SpiClient<'conn>,
+        client: &'client SpiClient,
         limit: Option<libc::c_long>,
         arguments: Self::Arguments,
-    ) -> SpiResult<SpiTupleTable<'conn>> {
+    ) -> SpiResult<SpiTupleTable<'client>> {
         // SAFETY: no concurrent access
         unsafe {
             pg_sys::SPI_tuptable = std::ptr::null_mut();
@@ -99,10 +99,10 @@ impl<'conn> Query<'conn> for &str {
             },
         };
 
-        Ok(SpiClient::prepare_tuple_table(status_code)?)
+        Ok(client.prepare_tuple_table(status_code)?)
     }
 
-    fn open_cursor(self, _client: &SpiClient<'conn>, args: Self::Arguments) -> SpiCursor<'conn> {
+    fn open_cursor(self, client: &'client SpiClient, args: Self::Arguments) -> SpiCursor<'client> {
         let src = CString::new(self).expect("query contained a null byte");
         let args = args.unwrap_or_default();
 
@@ -125,14 +125,14 @@ impl<'conn> Query<'conn> for &str {
                 0,
             ))
         };
-        SpiCursor { ptr, __marker: PhantomData }
+        SpiCursor { ptr, client }
     }
 }
 
 /// Client lifetime-bound prepared statement
-pub struct PreparedStatement<'conn> {
+pub struct PreparedStatement<'client> {
     pub(super) plan: NonNull<pg_sys::_SPI_plan>,
-    pub(super) __marker: PhantomData<&'conn ()>,
+    pub(super) __marker: PhantomData<&'client ()>,
 }
 
 /// Static lifetime-bound prepared statement
@@ -154,41 +154,41 @@ impl Drop for OwnedPreparedStatement {
     }
 }
 
-impl<'conn> Query<'conn> for &OwnedPreparedStatement {
+impl<'client> Query<'client> for &OwnedPreparedStatement {
     type Arguments = Option<Vec<Option<pg_sys::Datum>>>;
 
     fn execute(
         self,
-        client: &SpiClient<'conn>,
+        client: &'client SpiClient,
         limit: Option<libc::c_long>,
         arguments: Self::Arguments,
-    ) -> SpiResult<SpiTupleTable<'conn>> {
+    ) -> SpiResult<SpiTupleTable<'client>> {
         (&self.0).execute(client, limit, arguments)
     }
 
-    fn open_cursor(self, client: &SpiClient<'conn>, args: Self::Arguments) -> SpiCursor<'conn> {
+    fn open_cursor(self, client: &'client SpiClient, args: Self::Arguments) -> SpiCursor<'client> {
         (&self.0).open_cursor(client, args)
     }
 }
 
-impl<'conn> Query<'conn> for OwnedPreparedStatement {
+impl<'client> Query<'client> for OwnedPreparedStatement {
     type Arguments = Option<Vec<Option<pg_sys::Datum>>>;
 
     fn execute(
         self,
-        client: &SpiClient<'conn>,
+        client: &'client SpiClient,
         limit: Option<libc::c_long>,
         arguments: Self::Arguments,
-    ) -> SpiResult<SpiTupleTable<'conn>> {
+    ) -> SpiResult<SpiTupleTable<'client>> {
         (&self.0).execute(client, limit, arguments)
     }
 
-    fn open_cursor(self, client: &SpiClient<'conn>, args: Self::Arguments) -> SpiCursor<'conn> {
+    fn open_cursor(self, client: &'client SpiClient, args: Self::Arguments) -> SpiCursor<'client> {
         (&self.0).open_cursor(client, args)
     }
 }
 
-impl<'conn> PreparedStatement<'conn> {
+impl<'client> PreparedStatement<'client> {
     /// Converts prepared statement into an owned prepared statement
     ///
     /// These statements have static lifetime and are freed only when dropped
@@ -203,15 +203,15 @@ impl<'conn> PreparedStatement<'conn> {
     }
 }
 
-impl<'conn: 'stmt, 'stmt> Query<'conn> for &'stmt PreparedStatement<'conn> {
+impl<'client: 'stmt, 'stmt> Query<'client> for &'stmt PreparedStatement<'client> {
     type Arguments = Option<Vec<Option<pg_sys::Datum>>>;
 
     fn execute(
         self,
-        _client: &SpiClient<'conn>,
+        client: &'client SpiClient,
         limit: Option<libc::c_long>,
         arguments: Self::Arguments,
-    ) -> SpiResult<SpiTupleTable<'conn>> {
+    ) -> SpiResult<SpiTupleTable<'client>> {
         // SAFETY: no concurrent access
         unsafe {
             pg_sys::SPI_tuptable = std::ptr::null_mut();
@@ -238,10 +238,10 @@ impl<'conn: 'stmt, 'stmt> Query<'conn> for &'stmt PreparedStatement<'conn> {
             )
         };
 
-        Ok(SpiClient::prepare_tuple_table(status_code)?)
+        Ok(client.prepare_tuple_table(status_code)?)
     }
 
-    fn open_cursor(self, _client: &SpiClient<'conn>, args: Self::Arguments) -> SpiCursor<'conn> {
+    fn open_cursor(self, client: &'client SpiClient, args: Self::Arguments) -> SpiCursor<'client> {
         let args = args.unwrap_or_default();
 
         let (mut datums, nulls): (Vec<_>, Vec<_>) = args.into_iter().map(prepare_datum).unzip();
@@ -257,23 +257,23 @@ impl<'conn: 'stmt, 'stmt> Query<'conn> for &'stmt PreparedStatement<'conn> {
                 Spi::is_xact_still_immutable(),
             ))
         };
-        SpiCursor { ptr, __marker: PhantomData }
+        SpiCursor { ptr, client }
     }
 }
 
-impl<'conn> Query<'conn> for PreparedStatement<'conn> {
+impl<'client> Query<'client> for PreparedStatement<'client> {
     type Arguments = Option<Vec<Option<pg_sys::Datum>>>;
 
     fn execute(
         self,
-        client: &SpiClient<'conn>,
+        client: &'client SpiClient,
         limit: Option<libc::c_long>,
         arguments: Self::Arguments,
-    ) -> SpiResult<SpiTupleTable<'conn>> {
+    ) -> SpiResult<SpiTupleTable<'client>> {
         (&self).execute(client, limit, arguments)
     }
 
-    fn open_cursor(self, client: &SpiClient<'conn>, args: Self::Arguments) -> SpiCursor<'conn> {
+    fn open_cursor(self, client: &'client SpiClient, args: Self::Arguments) -> SpiCursor<'client> {
         (&self).open_cursor(client, args)
     }
 }

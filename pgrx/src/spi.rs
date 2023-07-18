@@ -20,7 +20,6 @@ mod cursor;
 mod query;
 mod tuple;
 pub use client::SpiClient;
-use client::SpiConnection;
 pub use cursor::SpiCursor;
 pub use query::{OwnedPreparedStatement, PreparedStatement, Query};
 pub use tuple::{SpiHeapTupleData, SpiHeapTupleDataEntry, SpiTupleTable};
@@ -366,7 +365,7 @@ impl Spi {
     /// This function will panic if for some reason it's unable to "connect" to Postgres' SPI
     /// system.  At the time of this writing, that's actually impossible as the underlying function
     /// ([`pg_sys::SPI_connect()`]) **always** returns a successful response.
-    pub fn connect<R, F: FnOnce(SpiClient<'_>) -> R>(f: F) -> R {
+    pub fn connect<R, F: FnOnce(&mut SpiClient) -> R>(f: F) -> R {
         // connect to SPI
         //
         // Postgres documents (https://www.postgresql.org/docs/current/spi-spi-connect.html) that
@@ -381,14 +380,13 @@ impl Spi {
         // otherwise this function would need to return a `Result<R, spi::Error>` and that's a
         // fucking nightmare for users to deal with.  There's ample discussion around coming to
         // this decision at https://github.com/pgcentralfoundation/pgrx/pull/977
-        let connection =
-            SpiConnection::connect().expect("SPI_connect indicated an unexpected failure");
+        let mut client = SpiClient::connect().expect("SPI_connect indicated an unexpected failure");
 
         // run the provided closure within the memory context that SPI_connect()
         // just put us un.  We'll disconnect from SPI when the closure is finished.
         // If there's a panic or elog(ERROR), we don't care about also disconnecting from
         // SPI b/c Postgres will do that for us automatically
-        f(connection.client())
+        f(&mut client)
     }
 
     #[track_caller]
