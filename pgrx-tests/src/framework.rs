@@ -456,7 +456,7 @@ fn start_pg(loglines: LogLines) -> eyre::Result<String> {
             "--gen-suppressions=all",
             "--time-stamp=yes",
             "--error-markers=VALGRINDERROR-BEGIN,VALGRINDERROR-END",
-            "--log-file=target/pg-valgrind-%p.log",
+            // "--log-file=target/pg-valgrind-%p.log",
             "--trace-children=yes",
         ]);
         // Try to provide a suppressions file, we'll likely get false positives
