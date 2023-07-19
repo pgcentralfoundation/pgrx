@@ -16,6 +16,7 @@ env:
   RUST_BACKTRACE: full
   RUSTFLAGS: -Clink-arg=-Wl,-V
   CARGO_INCREMENTAL: "false"
+  SCCACHE_MAX_FRAME_LENGTH: 100000000
   # CARGO_LOG: cargo::core::compiler::fingerprint=info # Uncomment this to output compiler fingerprint info
 
 jobs:
