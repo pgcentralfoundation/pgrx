@@ -289,7 +289,7 @@ fn configure_postgres(pg_config: &PgConfig, pgdir: &PathBuf, init: &Init) -> eyr
     let mut command = std::process::Command::new(configure_path);
     // Some of these are redundant with `--enable-debug`.
     let mut existing_cppflags = std::env::var("CPPFLAGS").unwrap_or_default();
-    existing_cppflags += " -DMEMORY_CONTEXT_CHECKING=1 -DMEMORY_CONTEXT_CHECKING=1 \
+    existing_cppflags += " -DMEMORY_CONTEXT_CHECKING=1 \
         -DCLOBBER_FREED_MEMORY=1 -DRANDOMIZE_ALLOCATED_MEMORY=1 ";
     if init.valgrind {
         // `-Og` turns on light optimizations, which is useful for getting
