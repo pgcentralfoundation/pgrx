@@ -280,7 +280,6 @@ jobs:
     env:
       RUSTC_WRAPPER: sccache
       SCCACHE_DIR: /home/runner/.cache/sccache
-      RUSTFLAGS: -Copt-level=0
 
     strategy:
       matrix:
