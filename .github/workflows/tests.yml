@@ -13,7 +13,8 @@ on:
 env:
   # NB: Don't modify `RUSTFLAGS` here, since it would override the ones
   # configured by `.cargo/config.toml` on macOS.
-  RUST_BACKTRACE: 1
+  RUST_BACKTRACE: full
+  RUSTFLAGS: -Clink-arg=-Wl,-V
   CARGO_INCREMENTAL: "false"
   # CARGO_LOG: cargo::core::compiler::fingerprint=info # Uncomment this to output compiler fingerprint info
 
@@ -25,7 +26,6 @@ jobs:
     env:
       RUSTC_WRAPPER: sccache
       SCCACHE_DIR: /home/runner/.cache/sccache
-      RUSTFLAGS: -Copt-level=0
 
     strategy:
       fail-fast: false
@@ -160,7 +160,7 @@ jobs:
           --package pgrx \
           --package pgrx-macros \
           --package pgrx-pg-sys \
-          --package pgrx-sql-entity-graph
+          --package pgrx-sql-entity-graph -- --nocapture
 
     - name: Check that cross-compiled pgrx-tests can build
       run: |
@@ -301,7 +301,6 @@ jobs:
         mv -f sccache-v0.2.15-x86_64-unknown-linux-musl/sccache $HOME/.local/bin/sccache
         chmod +x $HOME/.local/bin/sccache
         echo "$HOME/.local/bin" >> $GITHUB_PATH
-        echo 'SCCACHE_CACHE_SIZE="20G"' >> $GITHUB_ENV
         mkdir -p /home/runner/.cache/sccache
         echo ""
 
