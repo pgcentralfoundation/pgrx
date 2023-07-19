@@ -107,8 +107,8 @@ mod vectors {
     extension_sql!(
         r#"
             do $$ begin raise warning 'creating sample data in the table ''vectors.data''.'; end; $$;
-            create table vectors.data as select vectors.random_vector(768) v from generate_series(1, 100000);
-    "#,
+            create table vectors.data as select vectors.random_vector(768) v from generate_series(1, 1000);
+        "#,
         name = "vectors_data",
         requires = [random_vector]
     );

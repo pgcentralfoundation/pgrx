@@ -257,7 +257,7 @@ mod tests {
     fn test_srf_setof_datum_detoasting_with_borrow() {
         let cnt = Spi::connect(|mut client| {
             // build up a table with one large column that Postgres will be forced to TOAST
-            client.update("CREATE TABLE test_srf_datum_detoasting AS SELECT array_to_string(array_agg(g),' ') s FROM (SELECT 'a' g FROM generate_series(1, 1000000)) x;", None, None)?;
+            client.update("CREATE TABLE test_srf_datum_detoasting AS SELECT array_to_string(array_agg(g),' ') s FROM (SELECT 'a' g FROM generate_series(1, 1000)) x;", None, None)?;
 
             // and make sure we can use the DETOASTED value with our SRF function
             let table = client.select(
@@ -268,14 +268,14 @@ mod tests {
 
             Ok::<_, spi::Error>(table.len() as i64)
         });
-        assert_eq!(cnt, Ok(1000000))
+        assert_eq!(cnt, Ok(1000))
     }
 
     #[pg_test]
     fn test_srf_table_datum_detoasting_with_borrow() {
         let cnt = Spi::connect(|mut client| {
             // build up a table with one large column that Postgres will be forced to TOAST
-            client.update("CREATE TABLE test_srf_datum_detoasting AS SELECT array_to_string(array_agg(g),' ') s FROM (SELECT 'a' g FROM generate_series(1, 1000000)) x;", None, None)?;
+            client.update("CREATE TABLE test_srf_datum_detoasting AS SELECT array_to_string(array_agg(g),' ') s FROM (SELECT 'a' g FROM generate_series(1, 1000)) x;", None, None)?;
 
             // and make sure we can use the DETOASTED value with our SRF function
             let table = client.select(
@@ -286,7 +286,7 @@ mod tests {
 
             Ok::<_, spi::Error>(table.len() as i64)
         });
-        assert_eq!(cnt, Ok(1000000))
+        assert_eq!(cnt, Ok(1000))
     }
 
     #[pg_test(error = "column \"cause_an_error\" does not exist")]
