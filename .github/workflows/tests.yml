@@ -266,7 +266,17 @@ jobs:
     # Attempt to make the cache payload slightly smaller.
     - name: Clean up built PGRX files
       run: |
-        rm -rf ./target
+        cd target/debug/deps/
+        for built_file in $(find * -type f -executable -print | grep -v "\.so$"); do
+          base_name=$(echo $built_file | cut -d- -f1);
+          for basefile in "$base_name".*; do
+            [ -f "$basefile" ] || continue;
+            echo "Removing $basefile"
+            rm $basefile
+          done;
+          echo "Removing $built_file"
+          rm $built_file
+        done
 
     - name: Stop sccache server
       run: sccache --stop-server || true
