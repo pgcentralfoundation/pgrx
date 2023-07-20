@@ -159,7 +159,7 @@ jobs:
           --package pgrx \
           --package pgrx-macros \
           --package pgrx-pg-sys \
-          --package pgrx-sql-entity-graph -- --nocapture
+          --package pgrx-sql-entity-graph
 
     - name: Check that cross-compiled pgrx-tests can build
       run: |
