@@ -15,6 +15,7 @@ env:
   # configured by `.cargo/config.toml` on macOS.
   RUST_BACKTRACE: 1
   CARGO_INCREMENTAL: "false"
+  SCCACHE_MAX_FRAME_LENGTH: 100000000
   # CARGO_LOG: cargo::core::compiler::fingerprint=info # Uncomment this to output compiler fingerprint info
 
 jobs:
@@ -25,7 +26,6 @@ jobs:
     env:
       RUSTC_WRAPPER: sccache
       SCCACHE_DIR: /home/runner/.cache/sccache
-      RUSTFLAGS: -Copt-level=0
 
     strategy:
       fail-fast: false
@@ -45,7 +45,6 @@ jobs:
         mv -f sccache-v0.2.15-x86_64-unknown-linux-musl/sccache $HOME/.local/bin/sccache
         chmod +x $HOME/.local/bin/sccache
         echo "$HOME/.local/bin" >> $GITHUB_PATH
-        echo 'SCCACHE_CACHE_SIZE="20G"' >> $GITHUB_ENV
         mkdir -p /home/runner/.cache/sccache
         echo ""
 
@@ -181,6 +180,11 @@ jobs:
           --features "pg$PG_VER" \
           --package pgrx-tests
 
+      # Midway cleanup?
+    - name: Clean up midway checkpoint
+      run: |
+        rm -rf ./target
+
     - name: Run aggregate example tests
       run: cargo test --package aggregate --features "pg$PG_VER" --no-default-features
 
@@ -253,8 +257,11 @@ jobs:
     - name: Run triggers example tests
       run: cargo test --package triggers --features "pg$PG_VER" --no-default-features
 
-#     - name: Run versioned_custom_libname_so example tests
-#       run: cargo test --package versioned_custom_libname_so --features "pg$PG_VER" --no-default-features
+    - name: Run versioned_custom_libname_so example tests
+      run: cargo test --package versioned_custom_libname_so --features "pg$PG_VER" --no-default-features
+
+    - name: Run versioned_so example tests
+      run: cargo test --package versioned_so --features "pg$PG_VER" --no-default-features
 
     # Attempt to make the cache payload slightly smaller.
     - name: Clean up built PGRX files
@@ -281,7 +288,6 @@ jobs:
     env:
       RUSTC_WRAPPER: sccache
       SCCACHE_DIR: /home/runner/.cache/sccache
-      RUSTFLAGS: -Copt-level=0
 
     strategy:
       matrix:
@@ -301,7 +307,6 @@ jobs:
         mv -f sccache-v0.2.15-x86_64-unknown-linux-musl/sccache $HOME/.local/bin/sccache
         chmod +x $HOME/.local/bin/sccache
         echo "$HOME/.local/bin" >> $GITHUB_PATH
-        echo 'SCCACHE_CACHE_SIZE="20G"' >> $GITHUB_ENV
         mkdir -p /home/runner/.cache/sccache
         echo ""
 
@@ -401,7 +406,6 @@ jobs:
     if: "!contains(github.event.head_commit.message, 'nogha')"
     env:
       RUSTC_WRAPPER: sccache
-      SCCACHE_CACHE_SIZE: 20G
       SCCACHE_DIR: /Users/runner/Library/Caches/Mozilla.sccache
       SCCACHE_IDLE_TIMEOUT: 0
 

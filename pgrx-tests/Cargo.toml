@@ -61,6 +61,7 @@ rand = "0.8.5"
 
 [dev-dependencies]
 eyre = "0.6.8"  # testing functions that return `eyre::Result`
+trybuild = "1"
 
 [dependencies.pgrx]
 path = "../pgrx"
