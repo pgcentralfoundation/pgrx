@@ -13,8 +13,7 @@ on:
 env:
   # NB: Don't modify `RUSTFLAGS` here, since it would override the ones
   # configured by `.cargo/config.toml` on macOS.
-  RUST_BACKTRACE: full
-  RUSTFLAGS: -Clink-arg=-Wl,-V
+  RUST_BACKTRACE: 1
   CARGO_INCREMENTAL: "false"
   SCCACHE_MAX_FRAME_LENGTH: 100000000
   # CARGO_LOG: cargo::core::compiler::fingerprint=info # Uncomment this to output compiler fingerprint info
