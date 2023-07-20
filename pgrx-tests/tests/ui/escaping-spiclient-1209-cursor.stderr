@@ -5,20 +5,20 @@ error: lifetime may not live long enough
    |                                   -- return type of closure is SpiTupleTable<'2>
    |                                   |
    |                                   has type `SpiClient<'1>`
-8  | /         c.open_cursor("select 'hello' from generate_series(1, 10000)", None)
-9  | |             .fetch(10000)
+8  | /         c.open_cursor("select 'hello world' from generate_series(1, 1000)", None)
+9  | |             .fetch(1000)
 10 | |             .unwrap()
    | |_____________________^ returning this value requires that `'1` must outlive `'2`
 
 error[E0515]: cannot return value referencing temporary value
   --> tests/ui/escaping-spiclient-1209-cursor.rs:8:9
    |
-8  |           c.open_cursor("select 'hello' from generate_series(1, 10000)", None)
-   |           ^-------------------------------------------------------------------
+8  |           c.open_cursor("select 'hello world' from generate_series(1, 1000)", None)
+   |           ^------------------------------------------------------------------------
    |           |
    |  _________temporary value created here
    | |
-9  | |             .fetch(10000)
+9  | |             .fetch(1000)
 10 | |             .unwrap()
    | |_____________________^ returns a value referencing data owned by the current function
    |
