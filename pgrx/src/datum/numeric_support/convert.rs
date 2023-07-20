@@ -14,7 +14,8 @@ use pgrx_pg_sys::PgTryBuilder;
 use crate::numeric::make_typmod;
 use crate::numeric_support::error::Error;
 use crate::{
-    direct_function_call, direct_function_call_as_datum, pg_sys, AnyNumeric, IntoDatum, Numeric,
+    direct_function_call, direct_function_call_as_datum, pg_sys, AnyNumeric, FromDatum, IntoDatum,
+    Numeric,
 };
 
 pub use super::convert_anynumeric::*;
@@ -86,9 +87,15 @@ pub(crate) fn from_primitive_helper<I: IntoDatum, const P: u32, const S: u32>(
     };
 
     PgTryBuilder::new(|| {
-        let datum = materialize_numeric_datum();
-        // we asked Postgres to create this Numeric datum for us, so it'll need to be freed at some point
-        Ok(Numeric(AnyNumeric { inner: datum.cast_mut_ptr(), need_pfree: true }))
+        unsafe {
+            let datum = materialize_numeric_datum();
+            let anynumeric = AnyNumeric::from_datum(datum, false).unwrap();
+
+            // SAFETY:  We asked Postgres to create a new NUMERIC instance, so it now needs to be freed
+            // after we've copied it into Rust memory
+            pg_sys::pfree(datum.cast_mut_ptr());
+            Ok(Numeric(anynumeric))
+        }
     })
     .catch_when(PgSqlErrorCode::ERRCODE_INVALID_TEXT_REPRESENTATION, |e| {
         if let CaughtError::PostgresError(ref ereport) = e {

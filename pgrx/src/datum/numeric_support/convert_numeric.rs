@@ -22,7 +22,7 @@ impl<const P: u32, const S: u32> TryFrom<AnyNumeric> for Numeric<P, S> {
 
     #[inline]
     fn try_from(value: AnyNumeric) -> Result<Self, Self::Error> {
-        from_primitive_helper::<_, P, S>(value.copy(), FromPrimitiveFunc::Numeric)
+        from_primitive_helper::<_, P, S>(value.clone(), FromPrimitiveFunc::Numeric)
     }
 }
 

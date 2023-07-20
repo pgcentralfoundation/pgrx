@@ -7,7 +7,7 @@
 //LICENSE All rights reserved.
 //LICENSE
 //LICENSE Use of this source code is governed by the MIT license that can be found in the LICENSE file.
-use crate::{direct_function_call_as_datum, pg_sys, AnyNumeric};
+use crate::{direct_function_call_as_datum, pg_sys, AnyNumeric, FromDatum};
 
 pub mod cmp;
 pub mod convert;
@@ -29,7 +29,11 @@ pub(super) fn call_numeric_func(
     unsafe {
         // SAFETY: this call to direct_function_call_as_datum will never return None
         let numeric_datum = direct_function_call_as_datum(func, args).unwrap_unchecked();
-        // we asked Postgres to create this numeric so it'll need to be freed eventually
-        AnyNumeric { inner: numeric_datum.cast_mut_ptr(), need_pfree: true }
+
+        // we asked Postgres to create this numeric so it'll need to be freed after we copy it
+        let anynumeric = AnyNumeric::from_datum(numeric_datum, false);
+        pg_sys::pfree(numeric_datum.cast_mut_ptr());
+
+        anynumeric.unwrap()
     }
 }
