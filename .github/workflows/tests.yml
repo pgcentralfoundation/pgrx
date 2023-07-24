@@ -31,7 +31,7 @@ jobs:
       fail-fast: false
       matrix:
         version: ["postgres-11", "postgres-12", "postgres-13", "postgres-14", "postgres-15", "postgres-16"]
-        os: ["ubuntu-20.04"]
+        os: ["PGRX"]
 
     steps:
     - uses: actions/checkout@v3
@@ -286,7 +286,7 @@ jobs:
     strategy:
       matrix:
         version: ["postgres-15"]
-        os: ["ubuntu-20.04"]
+        os: ["PGRX"]
 
     steps:
     - uses: actions/checkout@v3
