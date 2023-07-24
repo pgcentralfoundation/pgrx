@@ -1,9 +1,18 @@
 name: Will It Blend™
 
+# on:
+#   schedule:
+#     - cron: '0 7 * * *'
+#   workflow_dispatch:
 on:
-  schedule:
-    - cron: '0 7 * * *'
-  workflow_dispatch:
+  push:
+    branches:
+      - master
+      - develop
+  pull_request:
+    branches:
+      - master
+      - develop
 
 env:
   # NB: Don't modify `RUSTFLAGS` here, since it would override the ones
@@ -15,7 +24,7 @@ env:
 jobs:
   distro_tests:
     name: Distro tests
-    runs-on: ubuntu-latest
+    runs-on: PGRX
     strategy:
       fail-fast: false # We want all of them to run, even if one fails
       matrix:
@@ -54,7 +63,7 @@ jobs:
 
   cargo_unlocked_tests:
     name: Cargo unlocked tests
-    runs-on: ubuntu-latest
+    runs-on: PGRX
     strategy:
       fail-fast: false # We want all of them to run, even if one fails
       matrix:
