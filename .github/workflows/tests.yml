@@ -20,7 +20,7 @@ env:
 jobs:
   pgrx_tests:
     name: pgrx-tests & examples
-    runs-on: ${{ matrix.os }}
+    runs-on: PGRX
     if: "!contains(github.event.head_commit.message, 'nogha')"
     env:
       RUSTC_WRAPPER: sccache
@@ -31,7 +31,6 @@ jobs:
       fail-fast: false
       matrix:
         version: ["postgres-11", "postgres-12", "postgres-13", "postgres-14", "postgres-15", "postgres-16"]
-        os: ["PGRX"]
 
     steps:
     - uses: actions/checkout@v3
@@ -276,7 +275,7 @@ jobs:
 
   cargo_pgrx_init:
     name: cargo pgrx init
-    runs-on: ${{ matrix.os }}
+    runs-on: PGRX
     if: "!contains(github.event.head_commit.message, 'nogha')"
     env:
       RUSTC_WRAPPER: sccache
@@ -286,7 +285,6 @@ jobs:
     strategy:
       matrix:
         version: ["postgres-15"]
-        os: ["PGRX"]
 
     steps:
     - uses: actions/checkout@v3
