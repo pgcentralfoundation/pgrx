@@ -1,18 +1,9 @@
 name: Will It Blend™
 
-# on:
-#   schedule:
-#     - cron: '0 7 * * *'
-#   workflow_dispatch:
 on:
-  push:
-    branches:
-      - master
-      - develop
-  pull_request:
-    branches:
-      - master
-      - develop
+  schedule:
+    - cron: '0 7 * * *'
+  workflow_dispatch:
 
 env:
   # NB: Don't modify `RUSTFLAGS` here, since it would override the ones
