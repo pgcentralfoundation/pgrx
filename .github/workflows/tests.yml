@@ -61,8 +61,8 @@ jobs:
 
         echo "----- Install system dependencies -----"
         sudo apt-get update && sudo apt-get install -y \
-          clang-10 \
-          llvm-10 \
+          clang-11 \
+          llvm-11 \
           clang \
           gcc \
           make \
@@ -321,8 +321,8 @@ jobs:
 
         echo "----- Install system dependencies -----"
         sudo apt-get install -y \
-          clang-10 \
-          llvm-10 \
+          clang-11 \
+          llvm-11 \
           clang \
           gcc \
           make \
