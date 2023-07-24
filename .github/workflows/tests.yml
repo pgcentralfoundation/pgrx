@@ -179,11 +179,6 @@ jobs:
           --features "pg$PG_VER" \
           --package pgrx-tests
 
-      # Midway cleanup?
-    - name: Clean up midway checkpoint
-      run: |
-        rm -rf ./target
-
     - name: Run aggregate example tests
       run: cargo test --package aggregate --features "pg$PG_VER" --no-default-features
 
