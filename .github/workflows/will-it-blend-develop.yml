@@ -15,7 +15,7 @@ env:
 jobs:
   distro_tests:
     name: Distro tests
-    runs-on: ubuntu-latest
+    runs-on: PGRX
     strategy:
       fail-fast: false # We want all of them to run, even if one fails
       matrix:
@@ -54,7 +54,7 @@ jobs:
 
   cargo_unlocked_tests:
     name: Cargo unlocked tests
-    runs-on: ubuntu-latest
+    runs-on: PGRX
     strategy:
       fail-fast: false # We want all of them to run, even if one fails
       matrix:
