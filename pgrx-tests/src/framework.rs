@@ -446,8 +446,31 @@ fn start_pg(loglines: LogLines) -> eyre::Result<String> {
     wait_for_pidfile()?;
 
     let pg_config = get_pg_config()?;
-    let mut command =
-        Command::new(pg_config.postmaster_path().wrap_err("unable to determine postmaster path")?);
+    let postmaster_path =
+        pg_config.postmaster_path().wrap_err("unable to determine postmaster path")?;
+
+    let mut command = if use_valgrind() {
+        let mut cmd = Command::new("valgrind");
+        cmd.args([
+            "--leak-check=no",
+            "--gen-suppressions=all",
+            "--time-stamp=yes",
+            "--error-markers=VALGRINDERROR-BEGIN,VALGRINDERROR-END",
+            "--trace-children=yes",
+        ]);
+        // Try to provide a suppressions file, we'll likely get false positives
+        // if we can't, but that might be better than nothing.
+        if let Ok(path) = valgrind_suppressions_path(&pg_config) {
+            if path.exists() {
+                cmd.arg(format!("--suppressions={}", path.display()));
+            }
+        }
+
+        cmd.arg(postmaster_path);
+        cmd
+    } else {
+        Command::new(postmaster_path)
+    };
     command
         .arg("-D")
         .arg(get_pgdata_path()?.to_str().unwrap())
@@ -467,6 +490,13 @@ fn start_pg(loglines: LogLines) -> eyre::Result<String> {
     let session_id = monitor_pg(command, command_str, loglines);
 
     Ok(session_id)
+}
+
+fn valgrind_suppressions_path(pg_config: &PgConfig) -> Result<PathBuf, eyre::Report> {
+    let mut home = Pgrx::home()?;
+    home.push(pg_config.version()?);
+    home.push("src/tools/valgrind.supp");
+    Ok(home)
 }
 
 fn wait_for_pidfile() -> Result<(), eyre::Report> {
@@ -755,4 +785,8 @@ fn find_on_path(program: &str) -> Option<PathBuf> {
     // when `PATH` is unset...
     let paths = std::env::var_os("PATH")?;
     std::env::split_paths(&paths).map(|p| p.join(program)).find(|abs| abs.exists())
+}
+
+fn use_valgrind() -> bool {
+    std::env::var_os("USE_VALGRIND").is_some_and(|s| s.len() > 0)
 }

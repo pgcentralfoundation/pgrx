@@ -70,6 +70,13 @@ pub(crate) struct Init {
     base_testing_port: Option<u16>,
     #[clap(long, help = "Additional flags to pass to the configure script")]
     configure_flag: Vec<String>,
+    /// Compile PostgreSQL with the necessary flags to detect a good amount of
+    /// memory errors when run under Valgrind.
+    ///
+    /// Building PostgreSQL with these flags requires that Valgrind be
+    /// installed, but the resulting build is usable without valgrind.
+    #[clap(long)]
+    valgrind: bool,
 }
 
 impl CommandExecute for Init {
@@ -352,8 +359,23 @@ fn configure_postgres(pg_config: &PgConfig, pgdir: &PathBuf, init: &Init) -> eyr
     let mut configure_path = pgdir.clone();
     configure_path.push("configure");
     let mut command = std::process::Command::new(configure_path);
+    // Some of these are redundant with `--enable-debug`.
+    let mut existing_cppflags = std::env::var("CPPFLAGS").unwrap_or_default();
+    existing_cppflags += " -DMEMORY_CONTEXT_CHECKING=1 \
+        -DCLOBBER_FREED_MEMORY=1 -DRANDOMIZE_ALLOCATED_MEMORY=1 ";
+    if init.valgrind {
+        // `USE_VALGRIND` allows valgrind to understand PG's memory context
+        // shenanigans. It requires Valgrind be installed (since it causes
+        // `postgres` to include a valgrind header), but uses macros which
+        // expand to asm statements that ultimately do nothing when valgrind is
+        // not connected, so using valgrind is not required even if the build is
+        // performed with `-DUSE_VALGRIND`.
+        let valgrind_flags = "-DUSE_VALGRIND=1 ";
+        existing_cppflags += valgrind_flags;
+    }
 
     command
+        .env("CPPFLAGS", existing_cppflags)
         .arg(format!("--prefix={}", get_pg_installdir(pgdir).display()))
         .arg(format!("--with-pgport={}", pg_config.port()?))
         .arg("--enable-debug")
