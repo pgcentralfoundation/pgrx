@@ -364,10 +364,13 @@ fn configure_postgres(pg_config: &PgConfig, pgdir: &PathBuf, init: &Init) -> eyr
     existing_cppflags += " -DMEMORY_CONTEXT_CHECKING=1 \
         -DCLOBBER_FREED_MEMORY=1 -DRANDOMIZE_ALLOCATED_MEMORY=1 ";
     if init.valgrind {
-        // `-Og` turns on light optimizations, which is useful for getting
-        // something usable. `USE_VALGRIND` allows valgrind to understand PG's
-        // memory context shenanigans.
-        let valgrind_flags = "-DUSE_VALGRIND=1 -Og ";
+        // `USE_VALGRIND` allows valgrind to understand PG's memory context
+        // shenanigans. It requires Valgrind be installed (since it causes
+        // `postgres` to include a valgrind header), but uses macros which
+        // expand to asm statements that ultimately do nothing when valgrind is
+        // not connected, so using valgrind is not required even if the build is
+        // performed with `-DUSE_VALGRIND`.
+        let valgrind_flags = "-DUSE_VALGRIND=1 ";
         existing_cppflags += valgrind_flags;
     }
 
