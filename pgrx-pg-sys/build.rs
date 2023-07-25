@@ -318,7 +318,7 @@ impl BuildPaths {
         let manifest_dir = env_tracked("CARGO_MANIFEST_DIR").map(PathBuf::from).unwrap();
         let out_dir = env_tracked("OUT_DIR").map(PathBuf::from).unwrap();
         Self {
-            src_dir: manifest_dir.join("src"),
+            src_dir: manifest_dir.join("src/include"),
             shim_src: manifest_dir.join("cshim"),
             shim_dst: out_dir.join("cshim"),
             out_dir,
