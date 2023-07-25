@@ -107,7 +107,10 @@ impl BackgroundWorker {
         .expect("'extra' is not valid UTF8")
     }
 
-    /// Have we received a SIGUP?
+    /// Have we received a SIGHUP since previously calling this function? This resets the
+    /// internal boolean that tracks if SIGHUP was received. So when calling this twice in
+    /// in a row, the second time will always return false.
+    #[must_use = "you aren't getting the same bool back if you call this twice"]
     pub fn sighup_received() -> bool {
         unsafe {
             assert!(!pg_sys::MyBgworkerEntry.is_null(), "BackgroundWorker associated functions can only be called from a registered background worker");
@@ -116,7 +119,10 @@ impl BackgroundWorker {
         GOT_SIGHUP.swap(false, Ordering::SeqCst)
     }
 
-    /// Have we received a SIGTERM?
+    /// Have we received a SIGTERM since previously calling this function? This resets the
+    /// internal boolean that tracks if SIGTERM was received. So when calling this twice in
+    /// in a row, the second time will always return false.
+    #[must_use = "you aren't getting the same bool back if you call this twice"]
     pub fn sigterm_received() -> bool {
         unsafe {
             assert!(!pg_sys::MyBgworkerEntry.is_null(), "BackgroundWorker associated functions can only be called from a registered background worker");
@@ -125,7 +131,10 @@ impl BackgroundWorker {
         GOT_SIGTERM.swap(false, Ordering::SeqCst)
     }
 
-    /// Have we received a SIGINT?
+    /// Have we received a SIGINT since previously calling this function? This resets the
+    /// internal boolean that tracks if SIGINT was received. So when calling this twice in
+    /// in a row, the second time will always return false.
+    #[must_use = "you aren't getting the same bool back if you call this twice"]
     pub fn sigint_received() -> bool {
         unsafe {
             assert!(!pg_sys::MyBgworkerEntry.is_null(), "BackgroundWorker associated functions can only be called from a registered background worker");
@@ -134,7 +143,10 @@ impl BackgroundWorker {
         GOT_SIGINT.swap(false, Ordering::SeqCst)
     }
 
-    /// Have we received a SIGCHLD?
+    /// Have we received a SIGCHLD since previously calling this function? This resets the
+    /// internal boolean that tracks if SIGCHLD was received. So when calling this twice in
+    /// in a row, the second time will always return false.
+    #[must_use = "you aren't getting the same bool back if you call this twice"]
     pub fn sigchld_received() -> bool {
         unsafe {
             assert!(!pg_sys::MyBgworkerEntry.is_null(), "BackgroundWorker associated functions can only be called from a registered background worker");
