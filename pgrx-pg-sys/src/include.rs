@@ -65,7 +65,7 @@ mod pg11_oids {
     include!(concat!(env!("OUT_DIR"), "/pg11_oids.rs"));
 }
 #[cfg(all(feature = "pg11", docsrs))]
-mod pg11;
+mod pg11_oids;
 
 #[cfg(all(feature = "pg12", not(docsrs)))]
 mod pg12_oids {
@@ -99,7 +99,7 @@ mod pg15_oids;
 mod pg16_oids {
     include!(concat!(env!("OUT_DIR"), "/pg16_oids.rs"));
 }
-#[cfg(all(feature = "pg6", docsrs))]
+#[cfg(all(feature = "pg16", docsrs))]
 mod pg16_oids;
 
 // export that module publicly
