@@ -33,7 +33,9 @@ mod node;
 mod port;
 pub mod submodules;
 
+#[cfg(feature = "cshim")]
 pub use cshim::*;
+
 pub use cstr::AsPgCStr;
 pub use include::*;
 pub use node::PgNode;
