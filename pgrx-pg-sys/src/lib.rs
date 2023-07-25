@@ -26,130 +26,21 @@
   ))]
 std::compile_error!("exactly one feature must be provided (pg11, pg12, pg13, pg14, pg15, pg16)");
 
+mod cstr;
 mod include;
+mod node;
 pub mod submodules;
 
-use core::ffi::CStr;
-use core::ptr::NonNull;
-use std::os::raw::c_char;
-
+pub use cstr::AsPgCStr;
 pub use include::*;
+pub use node::PgNode;
 pub use submodules::*;
 
 // expose things we want available for all versions
 pub use all_versions::*;
 
-/// A trait applied to all Postgres `pg_sys::Node` types and subtypes
-pub trait PgNode: seal::Sealed {
-    /// Format this node
-    ///
-    /// # Safety
-    ///
-    /// While pgrx controls the types for which [`PgNode`] is implemented and only pgrx can implement
-    /// [`PgNode`] it cannot control the members of those types and a user could assign any pointer
-    /// type member to something invalid that Postgres wouldn't understand.
-    ///
-    /// Because this function is used by `impl Display` we purposely don't mark it `unsafe`.  The
-    /// assumption here, which might be a bad one, is that only intentional misuse would actually
-    /// cause undefined behavior.
-    #[inline]
-    fn display_node(&self) -> std::string::String {
-        // SAFETY: The trait is pub but this impl is private, and
-        // this is only implemented for things known to be "Nodes"
-        unsafe { display_node_impl(NonNull::from(self).cast()) }
-    }
-}
-
 mod seal {
     pub trait Sealed {}
-}
-
-/// implementation function for `impl Display for $NodeType`
-///
-/// # Safety
-/// Don't use this on anything that doesn't impl PgNode, or the type may be off
-#[warn(unsafe_op_in_unsafe_fn)]
-pub(crate) unsafe fn display_node_impl(node: NonNull<crate::Node>) -> std::string::String {
-    // SAFETY: It's fine to call nodeToString with non-null well-typed pointers,
-    // and pg_sys::nodeToString() returns data via palloc, which is never null
-    // as Postgres will ERROR rather than giving us a null pointer,
-    // and Postgres starts and finishes constructing StringInfos by writing '\0'
-    unsafe {
-        let node_cstr = crate::nodeToString(node.as_ptr().cast());
-
-        let result = match CStr::from_ptr(node_cstr).to_str() {
-            Ok(cstr) => cstr.to_string(),
-            Err(e) => format!("<ffi error: {:?}>", e),
-        };
-
-        crate::pfree(node_cstr.cast());
-
-        result
-    }
-}
-
-/// A trait for converting a thing into a `char *` that is allocated by Postgres' palloc
-pub trait AsPgCStr {
-    /// Consumes `self` and converts it into a Postgres-allocated `char *`
-    fn as_pg_cstr(self) -> *mut std::os::raw::c_char;
-}
-
-impl<'a> AsPgCStr for &'a str {
-    fn as_pg_cstr(self) -> *mut std::os::raw::c_char {
-        let self_bytes = self.as_bytes();
-        let pg_cstr = unsafe { crate::palloc0(self_bytes.len() + 1) as *mut std::os::raw::c_uchar };
-        let slice = unsafe { std::slice::from_raw_parts_mut(pg_cstr, self_bytes.len()) };
-        slice.copy_from_slice(self_bytes);
-        pg_cstr as *mut std::os::raw::c_char
-    }
-}
-
-impl<'a> AsPgCStr for Option<&'a str> {
-    fn as_pg_cstr(self) -> *mut c_char {
-        match self {
-            Some(s) => s.as_pg_cstr(),
-            None => std::ptr::null_mut(),
-        }
-    }
-}
-
-impl AsPgCStr for std::string::String {
-    fn as_pg_cstr(self) -> *mut std::os::raw::c_char {
-        self.as_str().as_pg_cstr()
-    }
-}
-
-impl AsPgCStr for &std::string::String {
-    fn as_pg_cstr(self) -> *mut std::os::raw::c_char {
-        self.as_str().as_pg_cstr()
-    }
-}
-
-impl AsPgCStr for Option<std::string::String> {
-    fn as_pg_cstr(self) -> *mut c_char {
-        match self {
-            Some(s) => s.as_pg_cstr(),
-            None => std::ptr::null_mut(),
-        }
-    }
-}
-
-impl AsPgCStr for Option<&std::string::String> {
-    fn as_pg_cstr(self) -> *mut c_char {
-        match self {
-            Some(s) => s.as_pg_cstr(),
-            None => std::ptr::null_mut(),
-        }
-    }
-}
-
-impl AsPgCStr for &Option<std::string::String> {
-    fn as_pg_cstr(self) -> *mut c_char {
-        match self {
-            Some(s) => s.as_pg_cstr(),
-            None => std::ptr::null_mut(),
-        }
-    }
 }
 
 /// item declarations we want to add to all versions
