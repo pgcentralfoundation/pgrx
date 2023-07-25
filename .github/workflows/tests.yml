@@ -104,7 +104,7 @@ jobs:
           postgresql-server-dev-$PG_VER
 
 
-    - name: Install develoment version of PostgreSQL
+    - name: Install development version of PostgreSQL
       if: matrix.version == 'postgres-16'
       run: |
         echo "----- Set up PostgreSQL Apt repository -----"
