@@ -22,6 +22,8 @@ use std::time::Duration;
 pub static mut PREV_SHMEM_STARTUP_HOOK: Option<unsafe extern "C" fn()> = None;
 static GOT_SIGHUP: AtomicBool = AtomicBool::new(false);
 static GOT_SIGTERM: AtomicBool = AtomicBool::new(false);
+static GOT_SIGINT: AtomicBool = AtomicBool::new(false);
+static GOT_SIGCHLD: AtomicBool = AtomicBool::new(false);
 
 bitflags! {
     struct BGWflags: i32 {
@@ -35,6 +37,8 @@ bitflags! {
     pub struct SignalWakeFlags: i32 {
         const SIGHUP = 0x1;
         const SIGTERM = 0x2;
+        const SIGINT = 0x4;
+        const SIGCHLD = 0x8;
     }
 }
 
@@ -121,6 +125,24 @@ impl BackgroundWorker {
         GOT_SIGTERM.swap(false, Ordering::SeqCst)
     }
 
+    /// Have we received a SIGINT?
+    pub fn sigint_received() -> bool {
+        unsafe {
+            assert!(!pg_sys::MyBgworkerEntry.is_null(), "BackgroundWorker associated functions can only be called from a registered background worker");
+        }
+        // toggle the bool to false, returning whatever it was
+        GOT_SIGINT.swap(false, Ordering::SeqCst)
+    }
+
+    /// Have we received a SIGCHLD?
+    pub fn sigchld_received() -> bool {
+        unsafe {
+            assert!(!pg_sys::MyBgworkerEntry.is_null(), "BackgroundWorker associated functions can only be called from a registered background worker");
+        }
+        // toggle the bool to false, returning whatever it was
+        GOT_SIGCHLD.swap(false, Ordering::SeqCst)
+    }
+
     /// Wait for the specified amount of time on the background worker's latch
     ///
     /// Returns true if we're still supposed to be alive and haven't received a SIGTERM
@@ -189,6 +211,12 @@ impl BackgroundWorker {
             if wake.contains(SignalWakeFlags::SIGTERM) {
                 pg_sys::pqsignal(pg_sys::SIGTERM as i32, Some(worker_spi_sigterm));
             }
+            if wake.contains(SignalWakeFlags::SIGINT) {
+                pg_sys::pqsignal(pg_sys::SIGINT as i32, Some(worker_spi_sigint));
+            }
+            if wake.contains(SignalWakeFlags::SIGCHLD) {
+                pg_sys::pqsignal(pg_sys::SIGCHLD as i32, Some(worker_spi_sigchld));
+            }
             pg_sys::BackgroundWorkerUnblockSignals();
         }
     }
@@ -221,6 +249,16 @@ unsafe extern "C" fn worker_spi_sighup(_signal_args: i32) {
 
 unsafe extern "C" fn worker_spi_sigterm(_signal_args: i32) {
     GOT_SIGTERM.store(true, Ordering::SeqCst);
+    pg_sys::SetLatch(pg_sys::MyLatch);
+}
+
+unsafe extern "C" fn worker_spi_sigint(_signal_args: i32) {
+    GOT_SIGINT.store(true, Ordering::SeqCst);
+    pg_sys::SetLatch(pg_sys::MyLatch);
+}
+
+unsafe extern "C" fn worker_spi_sigchld(_signal_args: i32) {
+    GOT_SIGCHLD.store(true, Ordering::SeqCst);
     pg_sys::SetLatch(pg_sys::MyLatch);
 }
 
