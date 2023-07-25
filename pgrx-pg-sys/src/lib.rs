@@ -26,11 +26,13 @@
   ))]
 std::compile_error!("exactly one feature must be provided (pg11, pg12, pg13, pg14, pg15, pg16)");
 
+mod cshim;
 mod cstr;
 mod include;
 mod node;
 pub mod submodules;
 
+pub use cshim::*;
 pub use cstr::AsPgCStr;
 pub use include::*;
 pub use node::PgNode;
@@ -68,15 +70,6 @@ mod all_versions {
     pub const FrozenTransactionId: super::TransactionId = 2 as super::TransactionId;
     pub const FirstNormalTransactionId: super::TransactionId = 3 as super::TransactionId;
     pub const MaxTransactionId: super::TransactionId = 0xFFFF_FFFF as super::TransactionId;
-
-    #[cfg(feature = "cshim")]
-    #[pgrx_macros::pg_guard]
-    extern "C" {
-        pub fn pgrx_list_nth(list: *mut super::List, nth: i32) -> *mut std::os::raw::c_void;
-        pub fn pgrx_list_nth_int(list: *mut super::List, nth: i32) -> i32;
-        pub fn pgrx_list_nth_oid(list: *mut super::List, nth: i32) -> super::Oid;
-        pub fn pgrx_list_nth_cell(list: *mut super::List, nth: i32) -> *mut super::ListCell;
-    }
 
     /// Given a valid HeapTuple pointer, return address of the user data
     ///
@@ -250,29 +243,6 @@ mod all_versions {
         super::get_element_type(typoid) != InvalidOid
     }
 
-    #[cfg(feature = "cshim")]
-    #[pg_guard]
-    extern "C" {
-        #[link_name = "pgrx_planner_rt_fetch"]
-        pub fn planner_rt_fetch(
-            index: super::Index,
-            root: *mut super::PlannerInfo,
-        ) -> *mut super::RangeTblEntry;
-    }
-
-    /// ```c
-    /// #define rt_fetch(rangetable_index, rangetable) \
-    ///     ((RangeTblEntry *) list_nth(rangetable, (rangetable_index)-1))
-    /// ```
-    #[cfg(feature = "cshim")]
-    #[inline]
-    pub unsafe fn rt_fetch(
-        index: super::Index,
-        range_table: *mut super::List,
-    ) -> *mut super::RangeTblEntry {
-        pgrx_list_nth(range_table, index as i32 - 1) as *mut super::RangeTblEntry
-    }
-
     /// #define BufferGetPage(buffer) ((Page)BufferGetBlock(buffer))
     #[inline]
     pub unsafe fn BufferGetPage(buffer: crate::Buffer) -> crate::Page {
@@ -349,19 +319,6 @@ mod all_versions {
             >,
             context: *mut ::std::os::raw::c_void,
         ) -> bool;
-    }
-
-    #[cfg(feature = "cshim")]
-    #[pgrx_macros::pg_guard]
-    extern "C" {
-        #[link_name = "pgrx_SpinLockInit"]
-        pub fn SpinLockInit(lock: *mut pg_sys::slock_t);
-        #[link_name = "pgrx_SpinLockAcquire"]
-        pub fn SpinLockAcquire(lock: *mut pg_sys::slock_t);
-        #[link_name = "pgrx_SpinLockRelease"]
-        pub fn SpinLockRelease(lock: *mut pg_sys::slock_t);
-        #[link_name = "pgrx_SpinLockFree"]
-        pub fn SpinLockFree(lock: *mut pg_sys::slock_t) -> bool;
     }
 
     #[inline(always)]
