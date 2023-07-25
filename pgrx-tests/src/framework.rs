@@ -788,5 +788,5 @@ fn find_on_path(program: &str) -> Option<PathBuf> {
 }
 
 fn use_valgrind() -> bool {
-    std::env::var_os("USE_VALGRIND").is_some()
+    std::env::var_os("USE_VALGRIND").is_some_and(|s| s.len() > 0)
 }
