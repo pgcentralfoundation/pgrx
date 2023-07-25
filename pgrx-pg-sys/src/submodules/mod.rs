@@ -38,6 +38,7 @@ pub use datum::Datum;
 ))]
 pub use datum::NullableDatum;
 
+pub use htup::*;
 pub use oids::*;
 pub use pg_try::*;
 pub use polyfill::*;
