@@ -1,5 +1,5 @@
 # Example of how to build this container (ran from pgrx checkout directory):
-#   docker build --build-arg PG_MAJOR_VER=14 -f .github/docker/Dockerfile.alpine\:3.16 -t pgrx-alpine .
+#   docker build --build-arg PG_MAJOR_VER=14 -f .github/docker/Dockerfile.alpine\:3.18 -t pgrx-alpine .
 #
 # Example of how to run this container with tests after building the image:
 #   docker run pgrx-alpine cargo test --no-default-features --features pg14 --locked
@@ -9,25 +9,26 @@
 
 ARG PG_MAJOR_VER
 # Use Postgres' official alpine version, it's just easier that way
-FROM postgres:${PG_MAJOR_VER}-alpine3.16
+FROM postgres:${PG_MAJOR_VER}-alpine3.18
 ENV PG_MAJOR_VER=${PG_MAJOR_VER}
 
 # Required for compiling Rust
 ENV RUSTFLAGS="-C target-feature=-crt-static"
 
 RUN apk add --no-cache \
-  git \
-  curl \
   bash \
-  musl-dev \
-  make \
-  gcc \
+  clang \
+  clang-dev \
+  clang-libs \
   coreutils \
-  util-linux-dev \
+  curl \
+  gcc \
+  git \
+  make \
   musl-dev \
   openssl-dev \
-  clang-libs \
-  tar
+  tar \
+  util-linux-dev
 
 # Set up permissions so that the rust user below can create extensions
 RUN chmod a+rwx `$(which pg_config) --pkglibdir` \

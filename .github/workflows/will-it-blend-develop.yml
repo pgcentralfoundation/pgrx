@@ -20,7 +20,7 @@ jobs:
       fail-fast: false # We want all of them to run, even if one fails
       matrix:
         pg_version: ["pg11", "pg12", "pg13", "pg14", "pg15"]
-        container: ["fedora:36", "debian:bullseye", "alpine:3.16", "amazon:2"]
+        container: ["fedora:36", "debian:bullseye", "alpine:3.18", "amazon:2"]
     steps:
       # If this workflow is being called from a schedule/cron job, then let's
       # force the "develop" branch. Otherwise, use whatever is passed in via

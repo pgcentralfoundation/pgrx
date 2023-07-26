@@ -1,3 +1,5 @@
+#![cfg(not(target_env = "musl"))]
+
 use trybuild::TestCases;
 
 #[test]
