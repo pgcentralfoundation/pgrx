@@ -271,14 +271,35 @@ fn untar(bytes: &[u8], pgrxdir: &PathBuf, pg_config: &PgConfig) -> eyre::Result<
         .wrap_err("failed to spawn `tar`")?;
 
     let stdin = child.stdin.as_mut().expect("failed to get `tar`'s stdin");
-    stdin.write_all(bytes)?;
-    stdin.flush()?;
+    let mut error = None;
+
+    // In order to capture and report any output from the child's stderr (in the event of an error),
+    // we need to wait until `.wait_with_output()` is called. Bailing early here via `?` or `.expect()`
+    // means only the immediate error is reported, such as "Broken Pipe". The same applies for the subsequent
+    // `.flush()` call immediately after.
+    match stdin.write_all(bytes) {
+        Ok(_) => (),
+        Err(e) => error = Some(e),
+    }
+
+    match stdin.flush() {
+        Ok(_) => (),
+        Err(e) => error = Some(e),
+    }
+
     let output = child.wait_with_output()?;
 
-    if output.status.success() {
+    if output.status.success() && error.is_none() {
         Ok(pgdir)
     } else {
-        Err(eyre!("Command error: {}", String::from_utf8(output.stderr)?))
+        // It's possible to have a "None" error from above, but the child output still reports an error.
+        // We need to handle both of those cases.
+        let command_error = eyre!("Command error: {}", String::from_utf8_lossy(&output.stderr));
+
+        match error {
+            Some(e) => Err(eyre!(e).wrap_err(command_error)),
+            None => Err(command_error),
+        }
     }
 }
 
