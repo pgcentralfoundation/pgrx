@@ -203,7 +203,7 @@ pub(crate) fn get_package_manifest(
 ) -> eyre::Result<(Manifest, PathBuf)> {
     let metadata = crate::metadata::metadata(&features, manifest_path.as_ref())
         .wrap_err("couldn't get cargo metadata")?;
-    crate::metadata::validate(&metadata)?;
+    crate::metadata::validate(manifest_path.as_ref(), &metadata)?;
     let package_manifest_path = crate::manifest::manifest_path(&metadata, package_nane)
         .wrap_err("Couldn't get manifest path")?;
 

@@ -53,7 +53,7 @@ impl CommandExecute for Install {
     fn execute(mut self) -> eyre::Result<()> {
         let metadata = crate::metadata::metadata(&self.features, self.manifest_path.as_ref())
             .wrap_err("couldn't get cargo metadata")?;
-        crate::metadata::validate(&metadata)?;
+        crate::metadata::validate(self.manifest_path.as_ref(), &metadata)?;
         let package_manifest_path =
             crate::manifest::manifest_path(&metadata, self.package.as_ref())
                 .wrap_err("Couldn't get manifest path")?;
@@ -398,7 +398,7 @@ pub(crate) fn get_version(manifest_path: impl AsRef<Path>) -> eyre::Result<Strin
             if v == "@CARGO_VERSION@" {
                 let metadata = crate::metadata::metadata(&Default::default(), Some(&manifest_path))
                     .wrap_err("couldn't get cargo metadata")?;
-                crate::metadata::validate(&metadata)?;
+                crate::metadata::validate(Some(manifest_path), &metadata)?;
                 let manifest_path = crate::manifest::manifest_path(&metadata, None)
                     .wrap_err("Couldn't get manifest path")?;
                 let manifest = Manifest::from_path(&manifest_path)
