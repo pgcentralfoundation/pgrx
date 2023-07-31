@@ -7,6 +7,25 @@
 //LICENSE All rights reserved.
 //LICENSE
 //LICENSE Use of this source code is governed by the MIT license that can be found in the LICENSE file.
+
+use pgrx::prelude::*;
+use serde::*;
+
+//
+// the ResultTestsA type and the corresponding function test issue #1076.  Should that regress
+// it's likely that `CREATE EXTENSION` will fail with:
+//
+//   ERROR SQLSTATE[42710]: type "resulttestsa" already exists
+//
+
+#[derive(Debug, Serialize, Deserialize, PostgresType)]
+pub struct ResultTestsA;
+
+#[pg_extern]
+fn result_tests_a_func() -> Result<ResultTestsA, spi::Error> {
+    Ok(ResultTestsA)
+}
+
 #[cfg(any(test, feature = "pg_test"))]
 #[pgrx::pg_schema]
 mod tests {
