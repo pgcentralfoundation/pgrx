@@ -65,7 +65,9 @@ pub fn validate(
             .collect::<Vec<_>>()
             .join(", ");
 
-        return Err(eyre!("The installed `cargo-pgrx` v{cargo_pgrx_version} is not compatible with the {mismatches} {} in `{}`.  `cargo-pgrx` and pgrx dependency versions must be identical.", 
+        return Err(eyre!("The installed `cargo-pgrx` v{cargo_pgrx_version} \
+        is not compatible with the {mismatches} {} in `{}`. `cargo-pgrx` \
+        and pgrx dependency versions must be identical.", 
             if many == 1 { "dependency" } else { "dependencies"}, 
             path.map(|p| p.as_ref().display().to_string()).unwrap_or_else(|| "./Cargo.toml".to_string()).yellow()));
     }
