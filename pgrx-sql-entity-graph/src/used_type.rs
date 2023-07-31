@@ -31,6 +31,7 @@ use super::metadata::FunctionMetadataTypeEntity;
 pub struct UsedType {
     pub original_ty: syn::Type,
     pub resolved_ty: syn::Type,
+    pub resolved_ty_inner: Option<syn::Type>,
     /// Set via `composite_type!()`
     pub composite_type: Option<CompositeTypeMacro>,
     /// Set via `VariadicArray` or `variadic!()`
@@ -283,12 +284,43 @@ impl UsedType {
             original => (original, false, None, false),
         };
 
-        Ok(Self { original_ty, resolved_ty, optional, result, variadic, default, composite_type })
+        // if the Type is like `Result<T, E>`, this finds the `T`
+        let mut resolved_ty_inner: Option<syn::Type> = None;
+        if result {
+            if let syn::Type::Path(tp) = &resolved_ty {
+                if let Some(first_segment) =
+                    tp.path.segments.first().map(|segment| Some(segment)).unwrap_or(None)
+                {
+                    if let syn::PathArguments::AngleBracketed(ab) = &first_segment.arguments {
+                        if let Some(first_arg) =
+                            ab.args.first().map(|arg| Some(arg)).unwrap_or(None)
+                        {
+                            if let syn::GenericArgument::Type(ty) = first_arg {
+                                resolved_ty_inner = Some(ty.clone());
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+        Ok(Self {
+            original_ty,
+            resolved_ty,
+            resolved_ty_inner,
+            optional,
+            result,
+            variadic,
+            default,
+            composite_type,
+        })
     }
 
     pub fn entity_tokens(&self) -> syn::Expr {
         let mut resolved_ty = self.resolved_ty.clone();
+        let mut resolved_ty_inner = self.resolved_ty_inner.clone().unwrap_or(resolved_ty.clone());
         staticize_lifetimes(&mut resolved_ty);
+        staticize_lifetimes(&mut resolved_ty_inner);
         let resolved_ty_string = resolved_ty.to_token_stream().to_string().replace(" ", "");
         let composite_type = self.composite_type.clone().map(|v| v.expr);
         let composite_type_iter = composite_type.iter();
@@ -299,7 +331,7 @@ impl UsedType {
         syn::parse_quote! {
             ::pgrx::pgrx_sql_entity_graph::UsedTypeEntity {
                 ty_source: #resolved_ty_string,
-                ty_id: core::any::TypeId::of::<#resolved_ty>(),
+                ty_id: core::any::TypeId::of::<#resolved_ty_inner>(),
                 full_path: core::any::type_name::<#resolved_ty>(),
                 module_path: {
                     let ty_name = core::any::type_name::<#resolved_ty>();
