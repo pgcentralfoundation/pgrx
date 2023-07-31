@@ -114,6 +114,12 @@ pub fn run_test(
     expected_error: Option<&str>,
     postgresql_conf: Vec<&'static str>,
 ) -> eyre::Result<()> {
+    if std::env::var_os("PGRX_TEST_SKIP").unwrap_or_default() != "" {
+        eprintln!(
+            "Skipping test {sql_funcname:?} because `PGRX_TEST_SKIP` is set in the environment",
+        );
+        return Ok(());
+    }
     let (loglines, system_session_id) = initialize_test_framework(postgresql_conf)?;
 
     let (mut client, session_id) = client()?;
