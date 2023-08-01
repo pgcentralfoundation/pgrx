@@ -1,3 +1,4 @@
+use std::collections::BTreeMap;
 //LICENSE Portions Copyright 2019-2021 ZomboDB, LLC.
 //LICENSE
 //LICENSE Portions Copyright 2021-2023 Technology Concepts & Design, Inc.
@@ -9,6 +10,7 @@
 //LICENSE Use of this source code is governed by the MIT license that can be found in the LICENSE file.
 use cargo_metadata::{Metadata, MetadataCommand};
 use eyre::eyre;
+use owo_colors::*;
 use semver::VersionReq;
 use std::path::Path;
 
@@ -26,7 +28,10 @@ pub fn metadata(
 }
 
 #[tracing::instrument(level = "error", skip_all)]
-pub fn validate(metadata: &Metadata) -> eyre::Result<()> {
+pub fn validate(
+    path: Option<impl AsRef<std::path::Path>>,
+    metadata: &Metadata,
+) -> eyre::Result<()> {
     let cargo_pgrx_version = env!("CARGO_PKG_VERSION");
     let cargo_pgrx_version_req = VersionReq::parse(&format!("~{}", cargo_pgrx_version))?;
 
@@ -37,17 +42,11 @@ pub fn validate(metadata: &Metadata) -> eyre::Result<()> {
             || package.name == "pgrx-tests"
     });
 
+    let mut mismatches = BTreeMap::new();
     for package in pgrx_packages {
         let package_semver = package.version.clone();
         if !cargo_pgrx_version_req.matches(&package_semver) {
-            return Err(eyre!(
-                r#"`{}-{}` shouldn't be used with `cargo-pgrx-{}`, please use `{} = "~{}"` in your `Cargo.toml`."#,
-                package.name,
-                package.version,
-                cargo_pgrx_version,
-                package.name,
-                cargo_pgrx_version,
-            ));
+            mismatches.insert(package.name.clone(), package.version.clone());
         } else {
             tracing::trace!(
                 "`{}-{}` is compatible with `cargo-pgrx-{}`.",
@@ -56,6 +55,25 @@ pub fn validate(metadata: &Metadata) -> eyre::Result<()> {
                 cargo_pgrx_version,
             )
         }
+    }
+
+    if !mismatches.is_empty() {
+        let many = mismatches.len();
+        let mismatches = mismatches
+            .into_iter()
+            .map(|(p, v)| format!("`{p} = {v}`"))
+            .collect::<Vec<_>>()
+            .join(", ");
+
+        return Err(eyre!(
+            "The installed `cargo-pgrx` v{cargo_pgrx_version} \
+            is not compatible with the {mismatches} {} in `{}`. `cargo-pgrx` \
+            and pgrx dependency versions must be identical.",
+            if many == 1 { "dependency" } else { "dependencies" },
+            path.map(|p| p.as_ref().display().to_string())
+                .unwrap_or_else(|| "./Cargo.toml".to_string())
+                .yellow()
+        ));
     }
 
     Ok(())
