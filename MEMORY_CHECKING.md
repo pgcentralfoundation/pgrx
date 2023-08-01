@@ -14,7 +14,7 @@ For some background see the writeup in <https://github.com/pgcentralfoundation/p
 
 ### Sanitizers
 
-Sanitizers can be enabled when building postgres, but not Postgres extensions (TODO: still figuring this out). These have a smaller runtime impact than use of valgrind, but unfortunately they also detect considerably less UB.
+Sanitizers can be enabled when building postgres, but not postgres extensions. These have a smaller runtime impact than use of valgrind, but unfortunately they also detect considerably less UB.
 
 In general, the way to do this is to set `SANITIZER_FLAGS=-fsanitize=<sanitizer>` during `cargo pgrx init`. Note that this is incompatible with running under valgrind, although the `--valgrind` flag can still be used (it would have no benefit). For example:
 
@@ -22,10 +22,10 @@ In general, the way to do this is to set `SANITIZER_FLAGS=-fsanitize=<sanitizer>
 
     Notably, unlike the rest of these, doing this for postgres will also apply to PGRX extensions (so long as they don't override the `#[global_allocator]`), since it's basically just setting up the allocator in a certain way.
 
-2. Address sanitizer: `SANITIZER_FLAGS=-fsanitize=address cargo pgrx init`. This is more situational, since it can cause false-positives if the whole world is not built with ASAN enabled. Unfortunately, doing so is not possible in our case (TODO: still figuring this out).
+2. Address sanitizer: `SANITIZER_FLAGS=-fsanitize=address cargo pgrx init`. This is more situational, since it can cause false-positives if the whole world is not built with ASAN enabled. Unfortunately, doing so is not possible in our case.
 
-3. Work on supporting other sanitizers, such as memory and UB sanitizer, is still TODO.
+3. Work on supporting other sanitizers, such as memory and UB sanitizer is blocked by our inability to build everything under sanitization. Thread sanitizer is possible, but mostly useless.
 
 ### Hardened Allocators
 
-For basic usage of electric fence or scudo, `LD_PRELOAD=libefence.so cargo test` or `LD_PRELOAD=libscudo.so cargo test` (after installing the required library). However, for more advanced usage, see the documentation in the previous section about using Scudo.
+For basic usage of electric fence or scudo, `LD_PRELOAD=libefence.so cargo test` or `LD_PRELOAD=libscudo.so cargo test` (after installing the required library). However, for more advanced usage, see the documentation in the previous section about using Scudo, which is recommended.
