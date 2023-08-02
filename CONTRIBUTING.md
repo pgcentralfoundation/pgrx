@@ -90,7 +90,6 @@ Do this *in order*:
     - [ ] try again
 
 **Your work isn't done yet** just because it's on [crates.io], you also need to:
-- [ ] Open a PR against *master* for the changes from *develop*
 - [ ] *Switch* to using **merge commits** in this PR
 - [ ] Merge
 - [ ] Publish release notes
