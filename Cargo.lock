@@ -333,7 +333,7 @@ dependencies = [
  "cargo_metadata",
  "cargo_toml",
  "clap",
- "clap-cargo",
+ "clap-cargo 0.11.0",
  "color-eyre",
  "env_proxy",
  "eyre",
@@ -377,9 +377,9 @@ dependencies = [
 
 [[package]]
 name = "cargo_metadata"
-version = "0.15.4"
+version = "0.17.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "eee4243f1f26fc7a42710e7439c149e2b10b05472f88090acce52632f231a73a"
+checksum = "e7daec1a2a2129eeba1644b220b4647ec537b0b5d4bfd6876fcc5a540056b592"
 dependencies = [
  "camino",
  "cargo-platform",
@@ -447,6 +447,16 @@ name = "clap-cargo"
 version = "0.10.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "eca953650a7350560b61db95a0ab1d9c6f7b74d146a9e08fb258b834f3cf7e2c"
+dependencies = [
+ "clap",
+ "doc-comment",
+]
+
+[[package]]
+name = "clap-cargo"
+version = "0.11.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "25122ca6ebad5f53578c26638afd9f0160426969970dc37ec6c363ff6b082ebd"
 dependencies = [
  "cargo_metadata",
  "clap",
@@ -1636,7 +1646,7 @@ dependencies = [
 name = "pgrx-tests"
 version = "0.10.0-beta.2"
 dependencies = [
- "clap-cargo",
+ "clap-cargo 0.10.0",
  "eyre",
  "libc",
  "once_cell",
