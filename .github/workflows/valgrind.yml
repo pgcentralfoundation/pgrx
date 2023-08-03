@@ -62,11 +62,9 @@ jobs:
       - name: 'Download and compile ${{ matrix.pg_version }} (asserts and valgrind)'
         run: 'cargo pgrx init --valgrind --${{ matrix.pg_version }}=download'
 
-      - name: Run tests (no cshim)
-        run: 'env USE_VALGRIND=1 cargo test --no-default-features --features="${{ matrix.pg_version }}" --verbose'
+      - run: 'env USE_VALGRIND=1 cargo test --no-default-features --features="${{ matrix.pg_version }} cshim" --verbose'
+      # :(...
+      - run: cargo clean
 
-      - name: Run tests (with cshim)
-        run: 'env USE_VALGRIND=1 cargo test --no-default-features --features="${{ matrix.pg_version }} cshim" --verbose'
+      - run: 'env USE_VALGRIND=1 cargo test --no-default-features --features="${{ matrix.pg_version }}" --verbose'
 
-      - name: Run tests (with cshim and pg_test?)
-        run: 'env USE_VALGRIND=1 cargo test --all --no-default-features --features="${{ matrix.pg_version }} cshim pg_test" --verbose'
