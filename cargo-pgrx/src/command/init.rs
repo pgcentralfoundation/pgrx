@@ -13,7 +13,7 @@ use crate::CommandExecute;
 use eyre::{eyre, WrapErr};
 use owo_colors::OwoColorize;
 use pgrx_pg_config::{
-    get_c_locale_flags, prefix_path, PgConfig, PgConfigSelector, Pgrx, PgrxHomeError,
+    get_c_locale_flags, prefix_path, PgConfig, PgConfigSelector, PgVersion, Pgrx, PgrxHomeError,
 };
 use rayon::prelude::*;
 
@@ -40,26 +40,32 @@ static PROCESS_ENV_DENYLIST: &'static [&'static str] = &[
     "LIBRARY_PATH", // see https://github.com/pgcentralfoundation/pgrx/issues/16
 ];
 
-/// Initialize pgrx development environment for the first time
+/// Initialize pgrx development environment for the first time,
 #[derive(clap::Args, Debug)]
 #[clap(author)]
 pub(crate) struct Init {
-    /// If installed locally, the path to PG11's `pgconfig` tool, or `download` to have pgrx download/compile/install it
+    /// Path to the locally installed PG11's `pg_config` tool, or specify `<version> | latest`,
+    /// e.g. `11.1` ,to download and install from source release.
     #[clap(env = "PG11_PG_CONFIG", long)]
     pg11: Option<String>,
-    /// If installed locally, the path to PG12's `pgconfig` tool, or `download` to have pgrx download/compile/install it
+    /// Path to the locally installed PG12's `pg_config` tool, or specify `<version> | latest`,
+    /// e.g. `12.1` ,to download and install from source release.
     #[clap(env = "PG12_PG_CONFIG", long)]
     pg12: Option<String>,
-    /// If installed locally, the path to PG13's `pgconfig` tool, or `download` to have pgrx download/compile/install it
+    /// Path to the locally installed PG13's `pg_config` tool, or specify `<version> | latest`,
+    /// e.g. `13.1` ,to download and install from source release.
     #[clap(env = "PG13_PG_CONFIG", long)]
     pg13: Option<String>,
-    /// If installed locally, the path to PG14's `pgconfig` tool, or `download` to have pgrx download/compile/install it
+    /// Path to the locally installed PG14's `pg_config` tool, or specify `<version> | latest`,
+    /// e.g. `14.1` ,to download and install from source release.
     #[clap(env = "PG14_PG_CONFIG", long)]
     pg14: Option<String>,
-    /// If installed locally, the path to PG15's `pgconfig` tool, or `download` to have pgrx download/compile/install it
+    /// Path to the locally installed PG15's `pg_config` tool, or specify `<version> | latest`,
+    /// e.g. `15.1` ,to download and install from source release.
     #[clap(env = "PG15_PG_CONFIG", long)]
     pg15: Option<String>,
-    /// If installed locally, the path to PG16's `pgconfig` tool, or `download` to have pgrx download/compile/install it
+    /// Path to the locally installed PG16's `pg_config` tool, or specify `<version> | latest`,
+    /// e.g. `16beta1` ,to download and install from source release.
     #[clap(env = "PG16_PG_CONFIG", long)]
     pg16: Option<String>,
     #[clap(from_global, action = ArgAction::Count)]
@@ -111,8 +117,8 @@ impl CommandExecute for Init {
             let mut default_pgrx = None;
             let mut pgrx = Pgrx::default();
 
-            for (pgver, pg_config_path) in versions {
-                let config = if pg_config_path == "download" {
+            for (pgver, ver_str) in versions {
+                let config = if ver_str == "download" || ver_str == "latest" {
                     if default_pgrx.is_none() {
                         default_pgrx = Some(pgrx_default()?);
                     }
@@ -123,7 +129,19 @@ impl CommandExecute for Init {
                         .wrap_err_with(|| format!("{} is not a known Postgres version", pgver))?
                         .clone()
                 } else {
-                    PgConfig::new_with_defaults(pg_config_path.into())
+                    let maybe_config_path: PathBuf = ver_str.as_str().into();
+                    match maybe_config_path.try_exists() {
+                        Ok(true) => PgConfig::new_with_defaults(maybe_config_path),
+                        maybe_err => ver_str
+                            .parse::<PgVersion>()
+                            .wrap_err_with(|| {
+                                maybe_err.map_or_else(
+                                    |e| e.to_string(),
+                                    |_| "path not found".to_string(),
+                                )
+                            })?
+                            .into(),
+                    }
                 };
                 pgrx.push(config);
             }
