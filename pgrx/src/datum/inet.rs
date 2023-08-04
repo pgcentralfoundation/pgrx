@@ -20,7 +20,7 @@ use std::fmt;
 use std::ops::Deref;
 
 /// An `inet` type from PostgreSQL
-#[derive(Debug, Ord, PartialOrd, Eq, PartialEq)]
+#[derive(Debug, Clone, Ord, PartialOrd, Eq, PartialEq)]
 pub struct Inet(pub String);
 
 impl Deref for Inet {
