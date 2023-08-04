@@ -109,6 +109,47 @@ impl Display for PgVersion {
     }
 }
 
+impl FromStr for PgVersion {
+    type Err = eyre::Error;
+
+    fn from_str(version: &str) -> Result<Self, Self::Err> {
+        let extract = [".", "beta", "rc"]
+            .into_iter()
+            .filter(|&rel| version.contains(rel))
+            .filter_map(|rel| {
+                version
+                    .split(rel)
+                    .map(|ver| ver.parse::<u16>())
+                    .collect::<Result<Vec<u16>, _>>()
+                    .iter()
+                    .map(|ver| if ver.len() == 2 { Some((rel, ver[0], ver[1])) } else { None })
+                    .collect::<Option<Vec<(&str, u16, u16)>>>()
+            })
+            .flatten()
+            .collect::<Vec<(&str, u16, u16)>>();
+
+        if extract.len() == 1 {
+            if let Some(&(release, major, minor)) = extract.first() {
+                let url = Some(Url::parse(
+                    &format!(
+                        "https://ftp.postgresql.org/pub/source/v{major}{release}{minor}/postgresql-{major}{release}{minor}.tar.bz2",
+                        release = release, major = major, minor = minor)
+                )?);
+                let minor = match release {
+                    "." => PgMinorVersion::Release(minor),
+                    "beta" => PgMinorVersion::Beta(minor),
+                    "rc" => PgMinorVersion::Rc(minor),
+                    _ => unreachable!(),
+                };
+
+                return Ok(Self::new(major, minor, url));
+            }
+        }
+
+        Err(eyre::eyre!("invalid version string"))
+    }
+}
+
 #[derive(Clone, Debug)]
 pub struct PgConfig {
     version: Option<PgVersion>,
@@ -820,5 +861,29 @@ fn from_empty_env() -> eyre::Result<()> {
 
     // we didn't set this one in our environment
     assert!(pg_config.sharedir().is_err());
+    Ok(())
+}
+
+#[test]
+fn parse_pgversion() -> eyre::Result<()> {
+    let valid_versions = [
+        ("14.3", 14, PgMinorVersion::Release(3)),
+        ("15rc2", 15, PgMinorVersion::Rc(2)),
+        ("16beta1", 16, PgMinorVersion::Beta(1)),
+    ];
+
+    for (version, major, minor) in valid_versions {
+        let ver = version.parse::<PgVersion>()?;
+        assert_eq!(ver.major, major, "major version should match");
+        assert_eq!(ver.minor, minor, "minor version should match");
+    }
+
+    let invalid_versions = ["13..2", "12.10.1", "foo11"];
+
+    for version in invalid_versions {
+        let ver = version.parse::<PgVersion>();
+        assert!(ver.is_err());
+    }
+
     Ok(())
 }
