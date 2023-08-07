@@ -21,9 +21,6 @@ use pgrx_sql_entity_graph::metadata::{
 use std::panic::{RefUnwindSafe, UnwindSafe};
 
 /// A safe wrapper around Postgres `TIME WITH TIME ZONE` type, backed by a [`pg_sys::TimeTzADT`] integer value.
-///
-/// That value is `pub` so that users can directly use it to provide interfaces into other date/time
-/// crates.
 #[derive(Debug, Copy, Clone)]
 #[repr(transparent)]
 pub struct TimeWithTimeZone(pg_sys::TimeTzADT);

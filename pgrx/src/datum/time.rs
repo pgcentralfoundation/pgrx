@@ -20,9 +20,6 @@ use pgrx_sql_entity_graph::metadata::{
 use std::num::TryFromIntError;
 
 /// A safe wrapper around Postgres `TIME` type, backed by a [`pg_sys::TimeADT`] integer value.
-///
-/// That value is `pub` so that users can directly use it to provide interfaces into other date/time
-/// crates.
 #[derive(Debug, Clone, Copy)]
 #[repr(transparent)]
 pub struct Time(pg_sys::TimeADT);

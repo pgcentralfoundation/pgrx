@@ -19,9 +19,6 @@ use pgrx_sql_entity_graph::metadata::{
 use std::num::TryFromIntError;
 
 /// A safe wrapper around Postgres `TIMESTAMP WITHOUT TIME ZONE` type, backed by a [`pg_sys::Timestamp`] integer value.
-///
-/// That value is `pub` so that users can directly use it to provide interfaces into other date/time
-/// crates.
 #[derive(Debug, Copy, Clone)]
 #[repr(transparent)]
 pub struct Timestamp(pg_sys::Timestamp);

@@ -24,9 +24,6 @@ const MIN_TIMESTAMP_USEC: i64 = -211_813_488_000_000_000;
 const END_TIMESTAMP_USEC: i64 = 9_223_371_331_200_000_000 - 1; // dec by 1 to accommodate exclusive range match pattern
 
 /// A safe wrapper around Postgres `TIMESTAMP WITH TIME ZONE` type, backed by a [`pg_sys::Timestamp`] integer value.
-///
-/// That value is `pub` so that users can directly use it to provide interfaces into other date/time
-/// crates.
 #[derive(Debug, Copy, Clone)]
 #[repr(transparent)]
 pub struct TimestampWithTimeZone(pg_sys::TimestampTz);
