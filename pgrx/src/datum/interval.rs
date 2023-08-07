@@ -172,8 +172,11 @@ impl Interval {
         self.0.month < 0 || self.0.day < 0 || self.0.time < 0
     }
 
+    /// Postgres defines intervals as bounded
+    #[deprecated(since = "0.10.0", note = "consider using `true`")]
     pub fn is_finite(&self) -> bool {
-        unsafe { direct_function_call(pg_sys::interval_finite, &[self.into_datum()]).unwrap() }
+        // Yes, really.
+        true
     }
 
     /// Truncate [`Interval`] to specified units

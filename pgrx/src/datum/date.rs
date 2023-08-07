@@ -227,7 +227,7 @@ impl Date {
     }
 
     pub fn is_finite(&self) -> bool {
-        unsafe { direct_function_call(pg_sys::date_finite, &[self.into_datum()]).unwrap() }
+        !matches!(self.0, pg_sys::DateADT::MIN | pg_sys::DateADT::MAX)
     }
 
     /// Return the backing [`pg_sy::DateADT`] value.

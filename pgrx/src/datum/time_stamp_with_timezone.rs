@@ -353,8 +353,7 @@ impl TimestampWithTimeZone {
     }
 
     pub fn is_finite(&self) -> bool {
-        // yes, this is the correct function, despite the seemingly mismatched type name
-        unsafe { direct_function_call(pg_sys::timestamp_finite, &[self.into_datum()]).unwrap() }
+        !matches!(self.0, pg_sys::TimestampTz::MIN | pg_sys::TimestampTz::MAX)
     }
 
     /// Truncate [`TimestampWithTimeZone`] to specified units

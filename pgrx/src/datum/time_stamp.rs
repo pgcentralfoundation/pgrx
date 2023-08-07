@@ -258,7 +258,7 @@ impl Timestamp {
     }
 
     pub fn is_finite(&self) -> bool {
-        unsafe { direct_function_call(pg_sys::timestamp_finite, &[self.into_datum()]).unwrap() }
+        !matches!(self.0, pg_sys::Timestamp::MIN | pg_sys::Timestamp::MAX)
     }
 
     /// Truncate [`Timestamp`] to specified units
