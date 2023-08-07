@@ -24,10 +24,11 @@ use std::num::TryFromIntError;
 #[repr(transparent)]
 pub struct Time(pg_sys::TimeADT);
 
-/// Blindly create a [`Time]` from a Postgres [`pg_sys::TimeADT`] value.
+/// Create a [`Time`] from a [`pg_sys::TimeADT`]
 ///
-/// Note that [`pg_sys::TimeADT`] is just an `i64`, so using a random i64 could construct a time value
-/// that ultimately Postgres doesn't understand
+/// Note that [`pg_sys::TimeADT`] is just an `i64` as a number of microseconds.
+/// This impl currently allows creating a `Time` that cannot be constructed by SQL,
+/// such as at the time 37:42, which may yield logic bugs if used.
 impl From<pg_sys::TimeADT> for Time {
     #[inline]
     fn from(value: pg_sys::TimeADT) -> Self {

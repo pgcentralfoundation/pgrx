@@ -25,10 +25,10 @@ use std::panic::{RefUnwindSafe, UnwindSafe};
 #[repr(transparent)]
 pub struct TimeWithTimeZone(pg_sys::TimeTzADT);
 
-/// Blindly create a [`TimeWithTimeZone]` from a Postgres [`pg_sys::TimeTzADT`] value.
+/// Create a [`TimeWithTimeZone`] from a [`pg_sys::TimeTzADT`]
 ///
-/// Note that the [`pg_sys::TimeTzADT`] is not validated here, so using a random i64 could construct a time value
-/// that ultimately Postgres doesn't understand
+/// This impl currently allows creating a `TimeWithTimeZone` that cannot be constructed by SQL,
+/// such as at the time 37:42 in the timezone UTC+25:00, which may yield logic bugs if used.
 impl From<pg_sys::TimeTzADT> for TimeWithTimeZone {
     #[inline]
     fn from(value: pg_sys::TimeTzADT) -> Self {
