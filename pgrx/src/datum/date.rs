@@ -28,10 +28,16 @@ pub const UNIX_EPOCH_JDATE: i32 = pg_sys::UNIX_EPOCH_JDATE as i32;
 #[repr(transparent)]
 pub struct Date(pg_sys::DateADT);
 
-/// Blindly create a [`Date]` from a Postgres [`pg_sys::DateADT`] value.
+/// Create a [`Date`] from a [`pg_sys::DateADT`]
 ///
-/// Note that [`pg_sys::DateADT`] is just an `i32`, so using a random i32 could construct a date value
-/// that ultimately Postgres doesn't understand
+/// Note that [`pg_sys::DateADT`] is an `i32` as a day offset from the "Postgres epoch".
+/// This impl currently allows producing a `Date` that cannot be made via SQL,
+/// such as a date before "Julian day zero".
+///
+/// The details of the encoding may also prove surprising, for instance:
+/// - It is not a Gregorian calendar date, but rather a Julian day
+/// - There is no "year zero", so Postgres defines the offset of -2000 years as 1 BC instead
+/// - Some values such as `i32::MIN` and `i32::MAX` have special meanings as infinities
 impl From<pg_sys::DateADT> for Date {
     #[inline]
     fn from(value: pg_sys::DateADT) -> Self {
@@ -221,7 +227,7 @@ impl Date {
     }
 
     pub fn is_finite(&self) -> bool {
-        unsafe { direct_function_call(pg_sys::date_finite, &[self.into_datum()]).unwrap() }
+        !matches!(self.0, pg_sys::DateADT::MIN | pg_sys::DateADT::MAX)
     }
 
     /// Return the backing [`pg_sy::DateADT`] value.

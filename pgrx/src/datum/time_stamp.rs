@@ -19,9 +19,6 @@ use pgrx_sql_entity_graph::metadata::{
 use std::num::TryFromIntError;
 
 /// A safe wrapper around Postgres `TIMESTAMP WITHOUT TIME ZONE` type, backed by a [`pg_sys::Timestamp`] integer value.
-///
-/// That value is `pub` so that users can directly use it to provide interfaces into other date/time
-/// crates.
 #[derive(Debug, Copy, Clone)]
 #[repr(transparent)]
 pub struct Timestamp(pg_sys::Timestamp);
@@ -62,10 +59,19 @@ impl From<Timestamp> for pg_sys::Timestamp {
     }
 }
 
-/// Blindly create a [`Timestamp]` from a Postgres [`pg_sys::Timestamp`] value.
+/// Create a [`Timestamp`] from a [`pg_sys::Timestamp`]
 ///
-/// Note that [`pg_sys::Timestamp`] is just an `i64`, so using a random i64 could construct a time value
-/// that ultimately Postgres doesn't understand
+/// Note that `pg_sys::Timestamp` is an `i64` as a microsecond offset from the "Postgres epoch".
+/// This impl currently allows producing a `Timestamp` that cannot be constructed by SQL,
+/// such as a timestamp before "Julian day zero".
+///
+/// The details of the encoding may also prove surprising, for instance:
+/// - Postgres uses Julian days to reason about time instead of the Gregorian calendar
+/// - There is no "year zero", so Postgres defines the offset of -2000 years as 1 BC instead
+/// - Some values such as `i64::MIN` and `i64::MAX` have special meanings as infinities
+/// - The way `Timestamp` translates to/from `TimestampWithTimeZone`, or rather doesn't, is "fun"
+/// - In the past `pg_sys::Timestamp`'s type has changed, so in the future this may change with it
+/// - This is likely to coincide with a change in Timestamp's precision
 impl From<pg_sys::Timestamp> for Timestamp {
     fn from(value: pgrx_pg_sys::Timestamp) -> Self {
         Timestamp(value)
@@ -252,7 +258,7 @@ impl Timestamp {
     }
 
     pub fn is_finite(&self) -> bool {
-        unsafe { direct_function_call(pg_sys::timestamp_finite, &[self.into_datum()]).unwrap() }
+        !matches!(self.0, pg_sys::Timestamp::MIN | pg_sys::Timestamp::MAX)
     }
 
     /// Truncate [`Timestamp`] to specified units
