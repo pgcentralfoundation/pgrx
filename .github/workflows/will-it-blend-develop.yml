@@ -22,25 +22,7 @@ jobs:
         pg_version: ["pg11", "pg12", "pg13", "pg14", "pg15"]
         container: ["fedora:36", "debian:bullseye", "alpine:3.18", "amazon:2"]
     steps:
-      # If this workflow is being called from a schedule/cron job, then let's
-      # force the "develop" branch. Otherwise, use whatever is passed in via
-      # GITHUB_HEAD_REF. The result of this will be used below in the
-      # actions/checkout@vX step. Note that at the time of this writing, Github
-      # Actions does not allow us to specify which branch to run a schedule from
-      # (it always runs from the default branch, which in this case is master).
-      - name: Set up correct branch environment variable
-        run: |
-          if [ $GITHUB_EVENT_NAME == "schedule" ]; then
-            echo "Running via schedule, so using branch develop"
-            echo "NIGHTLY_BUILD_REF=develop" >> $GITHUB_ENV
-          else
-            echo "Not running via schedule, so using branch $GITHUB_HEAD_REF"
-            echo "NIGHTLY_BUILD_REF=$GITHUB_HEAD_REF" >> $GITHUB_ENV
-          fi
-
       - uses: actions/checkout@v3
-        with:
-          ref: ${{ env.NIGHTLY_BUILD_REF }}
 
       - name: Set up environment variables
         run: |

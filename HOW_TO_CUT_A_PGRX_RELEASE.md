@@ -13,7 +13,7 @@
 ./finalize-release.sh
 ```
 
-- create the actual release on GitHub, tagging the `master` branch with "${NEW_VERSION}", using the release notes you made in your PR
+- create the actual release on GitHub, tagging the `develop` branch with "${NEW_VERSION}", using the release notes you made in your PR
 
 ```shell
 ./publish.sh
