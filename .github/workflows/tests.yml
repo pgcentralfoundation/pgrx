@@ -431,8 +431,11 @@ jobs:
         # ls -lath `$(which pg_config) --pkglibdir` `$(which pg_config) --sharedir`/extension
         echo ""
 
-        echo "----- Output Cargo version -----"
-        cargo --version
+        echo "----- Stable Rust ----"
+        rustup update stable
+        rustup default stable
+        rustc -vV
+        cargo -vV
         echo ""
 
         echo "----- Outputting env -----"
