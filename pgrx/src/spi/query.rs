@@ -3,6 +3,9 @@ use std::marker::PhantomData;
 use std::ops::Deref;
 use std::ptr::NonNull;
 
+use libc::c_char;
+use pg_sys::{Datum, Oid};
+
 use super::{Spi, SpiClient, SpiCursor, SpiError, SpiResult, SpiTupleTable};
 use crate::pg_sys::{self, PgOid};
 
@@ -50,6 +53,24 @@ fn prepare_datum(datum: Option<pg_sys::Datum>) -> (pg_sys::Datum, std::os::raw::
     }
 }
 
+fn args_to_datums(
+    args: Vec<(PgOid, Option<pg_sys::Datum>)>,
+) -> (Vec<Oid>, Vec<Datum>, Vec<c_char>) {
+    let mut argtypes = Vec::with_capacity(args.len());
+    let mut datums = Vec::with_capacity(args.len());
+    let mut nulls = Vec::with_capacity(args.len());
+
+    for (types, maybe_datum) in args {
+        let (datum, null) = prepare_datum(maybe_datum);
+
+        argtypes.push(types.value());
+        datums.push(datum);
+        nulls.push(null);
+    }
+
+    (argtypes, datums, nulls)
+}
+
 impl<'conn> Query<'conn> for &str {
     type Arguments = Option<Vec<(PgOid, Option<pg_sys::Datum>)>>;
 
@@ -71,10 +92,7 @@ impl<'conn> Query<'conn> for &str {
         let status_code = match arguments {
             Some(args) => {
                 let nargs = args.len();
-                let (types, data): (Vec<_>, Vec<_>) = args.into_iter().unzip();
-                let mut argtypes = types.into_iter().map(PgOid::value).collect::<Vec<_>>();
-                let (mut datums, nulls): (Vec<_>, Vec<_>) =
-                    data.into_iter().map(prepare_datum).unzip();
+                let (mut argtypes, mut datums, nulls) = args_to_datums(args);
 
                 // SAFETY: arguments are prepared above
                 unsafe {
@@ -107,9 +125,7 @@ impl<'conn> Query<'conn> for &str {
         let args = args.unwrap_or_default();
 
         let nargs = args.len();
-        let (types, data): (Vec<_>, Vec<_>) = args.into_iter().unzip();
-        let mut argtypes = types.into_iter().map(PgOid::value).collect::<Vec<_>>();
-        let (mut datums, nulls): (Vec<_>, Vec<_>) = data.into_iter().map(prepare_datum).unzip();
+        let (mut argtypes, mut datums, nulls) = args_to_datums(args);
 
         let ptr = unsafe {
             // SAFETY: arguments are prepared above and SPI_cursor_open_with_args will never return
