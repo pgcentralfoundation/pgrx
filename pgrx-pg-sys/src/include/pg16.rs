@@ -1,12 +1,3 @@
-//LICENSE Portions Copyright 2019-2021 ZomboDB, LLC.
-//LICENSE
-//LICENSE Portions Copyright 2021-2023 Technology Concepts & Design, Inc.
-//LICENSE
-//LICENSE Portions Copyright 2023-2023 PgCentral Foundation, Inc. <contact@pgcentral.org>
-//LICENSE
-//LICENSE All rights reserved.
-//LICENSE
-//LICENSE Use of this source code is governed by the MIT license that can be found in the LICENSE file.
 use crate as pg_sys;
 #[cfg(any(
     feature = "pg12",
@@ -179,7 +170,7 @@ pub const ALIGNOF_LONG: u32 = 8;
 pub const ALIGNOF_PG_INT128_TYPE: u32 = 16;
 pub const ALIGNOF_SHORT: u32 = 2;
 pub const BLCKSZ: u32 = 8192;
-pub const CONFIGURE_ARGS : & [u8 ; 111] = b" '--prefix=/home/zombodb/.pgrx/16beta2/pgrx-install' '--with-pgport=28816' '--enable-debug' '--enable-cassert'\0" ;
+pub const CONFIGURE_ARGS : & [u8 ; 208] = b" '--prefix=/home/zombodb/.pgrx/16beta3/pgrx-install' '--with-pgport=28816' '--enable-debug' '--enable-cassert' 'CPPFLAGS= -DMEMORY_CONTEXT_CHECKING=1 -DCLOBBER_FREED_MEMORY=1 -DRANDOMIZE_ALLOCATED_MEMORY=1 '\0" ;
 pub const DEF_PGPORT: u32 = 28816;
 pub const DEF_PGPORT_STR: &[u8; 6] = b"28816\0";
 pub const DLSUFFIX: &[u8; 4] = b".so\0";
@@ -286,18 +277,18 @@ pub const MAXIMUM_ALIGNOF: u32 = 8;
 pub const MEMSET_LOOP_LIMIT: u32 = 1024;
 pub const PACKAGE_BUGREPORT: &[u8; 32] = b"pgsql-bugs@lists.postgresql.org\0";
 pub const PACKAGE_NAME: &[u8; 11] = b"PostgreSQL\0";
-pub const PACKAGE_STRING: &[u8; 19] = b"PostgreSQL 16beta2\0";
+pub const PACKAGE_STRING: &[u8; 19] = b"PostgreSQL 16beta3\0";
 pub const PACKAGE_TARNAME: &[u8; 11] = b"postgresql\0";
 pub const PACKAGE_URL: &[u8; 28] = b"https://www.postgresql.org/\0";
-pub const PACKAGE_VERSION: &[u8; 8] = b"16beta2\0";
+pub const PACKAGE_VERSION: &[u8; 8] = b"16beta3\0";
 pub const PG_KRB_SRVNAM: &[u8; 9] = b"postgres\0";
 pub const PG_MAJORVERSION: &[u8; 3] = b"16\0";
 pub const PG_MAJORVERSION_NUM: u32 = 16;
 pub const PG_MINORVERSION_NUM: u32 = 0;
 pub const PG_USE_STDBOOL: u32 = 1;
-pub const PG_VERSION: &[u8; 8] = b"16beta2\0";
+pub const PG_VERSION: &[u8; 8] = b"16beta3\0";
 pub const PG_VERSION_NUM: u32 = 160000;
-pub const PG_VERSION_STR : & [u8 ; 107] = b"PostgreSQL 16beta2 on x86_64-pc-linux-gnu, compiled by gcc (Ubuntu 11.3.0-1ubuntu1~22.04.1) 11.3.0, 64-bit\0" ;
+pub const PG_VERSION_STR : & [u8 ; 105] = b"PostgreSQL 16beta3 on x86_64-pc-linux-gnu, compiled by gcc (Ubuntu 11.4.0-1ubuntu1~22.04) 11.4.0, 64-bit\0" ;
 pub const RELSEG_SIZE: u32 = 131072;
 pub const SIZEOF_BOOL: u32 = 1;
 pub const SIZEOF_LONG: u32 = 8;
@@ -710,9 +701,9 @@ pub const LC_IDENTIFICATION_MASK: u32 = 4096;
 pub const LC_ALL_MASK: u32 = 8127;
 pub const HAVE_PG_ATTRIBUTE_NORETURN: u32 = 1;
 pub const HAVE_PRAGMA_GCC_SYSTEM_HEADER: u32 = 1;
+pub const __bool_true_false_are_defined: u32 = 1;
 pub const true_: u32 = 1;
 pub const false_: u32 = 0;
-pub const __bool_true_false_are_defined: u32 = 1;
 pub const INT64_FORMAT: &[u8; 4] = b"%ld\0";
 pub const UINT64_FORMAT: &[u8; 4] = b"%lu\0";
 pub const HAVE_INT128: u32 = 1;
@@ -737,7 +728,7 @@ pub const PG_BINARY_R: &[u8; 2] = b"r\0";
 pub const PG_BINARY_W: &[u8; 2] = b"w\0";
 pub const _CTYPE_H: u32 = 1;
 pub const PGINVALID_SOCKET: i32 = -1;
-pub const PG_BACKEND_VERSIONSTR: &[u8; 31] = b"postgres (PostgreSQL) 16beta2\n\0";
+pub const PG_BACKEND_VERSIONSTR: &[u8; 31] = b"postgres (PostgreSQL) 16beta3\n\0";
 pub const EXE: &[u8; 1] = b"\0";
 pub const DEVNULL: &[u8; 10] = b"/dev/null\0";
 pub const USE_REPL_SNPRINTF: u32 = 1;
@@ -1374,7 +1365,7 @@ pub const RTPrefixStrategyNumber: u32 = 28;
 pub const RTOldBelowStrategyNumber: u32 = 29;
 pub const RTOldAboveStrategyNumber: u32 = 30;
 pub const RTMaxStrategyNumber: u32 = 30;
-pub const CATALOG_VERSION_NO: u32 = 202306141;
+pub const CATALOG_VERSION_NO: u32 = 202307071;
 pub const OIDCHARS: u32 = 10;
 pub const FORKNAMECHARS: u32 = 4;
 pub const INNER_VAR: i32 = -1;
@@ -1397,8 +1388,7 @@ pub const ACL_CREATE_TEMP: u32 = 1024;
 pub const ACL_CONNECT: u32 = 2048;
 pub const ACL_SET: u32 = 4096;
 pub const ACL_ALTER_SYSTEM: u32 = 8192;
-pub const ACL_MAINTAIN: u32 = 16384;
-pub const N_ACL_RIGHTS: u32 = 15;
+pub const N_ACL_RIGHTS: u32 = 14;
 pub const ACL_NO_RIGHTS: u32 = 0;
 pub const ACL_SELECT_FOR_UPDATE: u32 = 4;
 pub const FRAMEOPTION_NONDEFAULT: u32 = 1;
@@ -2497,6 +2487,22 @@ pub const REINDEX_REL_CHECK_CONSTRAINTS: u32 = 4;
 pub const REINDEX_REL_FORCE_INDEXES_UNLOGGED: u32 = 8;
 pub const REINDEX_REL_FORCE_INDEXES_PERMANENT: u32 = 16;
 pub const MAX_CATALOG_MULTI_INSERT_BYTES: u32 = 65535;
+pub const AccessMethodOperatorRelationId: Oid = Oid(2602);
+pub const AccessMethodStrategyIndexId: u32 = 2653;
+pub const AccessMethodOperatorIndexId: u32 = 2654;
+pub const AccessMethodOperatorOidIndexId: u32 = 2756;
+pub const Anum_pg_amop_oid: u32 = 1;
+pub const Anum_pg_amop_amopfamily: u32 = 2;
+pub const Anum_pg_amop_amoplefttype: u32 = 3;
+pub const Anum_pg_amop_amoprighttype: u32 = 4;
+pub const Anum_pg_amop_amopstrategy: u32 = 5;
+pub const Anum_pg_amop_amoppurpose: u32 = 6;
+pub const Anum_pg_amop_amopopr: u32 = 7;
+pub const Anum_pg_amop_amopmethod: u32 = 8;
+pub const Anum_pg_amop_amopsortfamily: u32 = 9;
+pub const Natts_pg_amop: u32 = 9;
+pub const AMOP_SEARCH: u8 = 115u8;
+pub const AMOP_ORDER: u8 = 111u8;
 pub const AuthIdRelationId: Oid = Oid(1260);
 pub const AuthIdRelation_Rowtype_Id: u32 = 2842;
 pub const PgAuthidToastTable: u32 = 4175;
@@ -2529,7 +2535,6 @@ pub const ROLE_PG_WRITE_SERVER_FILES: u32 = 4570;
 pub const ROLE_PG_EXECUTE_SERVER_PROGRAM: u32 = 4571;
 pub const ROLE_PG_SIGNAL_BACKEND: u32 = 4200;
 pub const ROLE_PG_CHECKPOINT: u32 = 4544;
-pub const ROLE_PG_MAINTAIN: u32 = 4549;
 pub const ROLE_PG_USE_RESERVED_CONNECTIONS: u32 = 4550;
 pub const ROLE_PG_CREATE_SUBSCRIPTION: u32 = 6304;
 pub const DatabaseRelationId: Oid = Oid(1262);
@@ -2559,6 +2564,8 @@ pub const Anum_pg_database_datcollversion: u32 = 16;
 pub const Anum_pg_database_datacl: u32 = 17;
 pub const Natts_pg_database: u32 = 17;
 pub const Template1DbOid: u32 = 1;
+pub const DATCONNLIMIT_UNLIMITED: i32 = -1;
+pub const DATCONNLIMIT_INVALID_DB: i32 = -2;
 pub const EnumRelationId: Oid = Oid(3501);
 pub const EnumOidIndexId: u32 = 3502;
 pub const EnumTypIdLabelIndexId: u32 = 3503;
@@ -2580,6 +2587,24 @@ pub const Anum_pg_extension_extversion: u32 = 6;
 pub const Anum_pg_extension_extconfig: u32 = 7;
 pub const Anum_pg_extension_extcondition: u32 = 8;
 pub const Natts_pg_extension: u32 = 8;
+pub const ForeignServerRelationId: Oid = Oid(1417);
+pub const ForeignServerOidIndexId: u32 = 113;
+pub const ForeignServerNameIndexId: u32 = 549;
+pub const Anum_pg_foreign_server_oid: u32 = 1;
+pub const Anum_pg_foreign_server_srvname: u32 = 2;
+pub const Anum_pg_foreign_server_srvowner: u32 = 3;
+pub const Anum_pg_foreign_server_srvfdw: u32 = 4;
+pub const Anum_pg_foreign_server_srvtype: u32 = 5;
+pub const Anum_pg_foreign_server_srvversion: u32 = 6;
+pub const Anum_pg_foreign_server_srvacl: u32 = 7;
+pub const Anum_pg_foreign_server_srvoptions: u32 = 8;
+pub const Natts_pg_foreign_server: u32 = 8;
+pub const ForeignTableRelationId: Oid = Oid(3118);
+pub const ForeignTableRelidIndexId: u32 = 3119;
+pub const Anum_pg_foreign_table_ftrelid: u32 = 1;
+pub const Anum_pg_foreign_table_ftserver: u32 = 2;
+pub const Anum_pg_foreign_table_ftoptions: u32 = 3;
+pub const Natts_pg_foreign_table: u32 = 3;
 pub const OperatorRelationId: Oid = Oid(2617);
 pub const OperatorOidIndexId: u32 = 2688;
 pub const OperatorNameNspIndexId: u32 = 2689;
@@ -2697,6 +2722,52 @@ pub const OID_MULTIRANGE_LEFT_MULTIRANGE_OP: u32 = 4397;
 pub const OID_RANGE_RIGHT_MULTIRANGE_OP: u32 = 4398;
 pub const OID_MULTIRANGE_RIGHT_RANGE_OP: u32 = 4399;
 pub const OID_MULTIRANGE_RIGHT_MULTIRANGE_OP: u32 = 4400;
+pub const OperatorClassRelationId: Oid = Oid(2616);
+pub const OpclassAmNameNspIndexId: u32 = 2686;
+pub const OpclassOidIndexId: u32 = 2687;
+pub const Anum_pg_opclass_oid: u32 = 1;
+pub const Anum_pg_opclass_opcmethod: u32 = 2;
+pub const Anum_pg_opclass_opcname: u32 = 3;
+pub const Anum_pg_opclass_opcnamespace: u32 = 4;
+pub const Anum_pg_opclass_opcowner: u32 = 5;
+pub const Anum_pg_opclass_opcfamily: u32 = 6;
+pub const Anum_pg_opclass_opcintype: u32 = 7;
+pub const Anum_pg_opclass_opcdefault: u32 = 8;
+pub const Anum_pg_opclass_opckeytype: u32 = 9;
+pub const Natts_pg_opclass: u32 = 9;
+pub const DATE_BTREE_OPS_OID: Oid = Oid(3122);
+pub const FLOAT8_BTREE_OPS_OID: Oid = Oid(3123);
+pub const INT2_BTREE_OPS_OID: Oid = Oid(1979);
+pub const INT4_BTREE_OPS_OID: Oid = Oid(1978);
+pub const INT8_BTREE_OPS_OID: Oid = Oid(3124);
+pub const NUMERIC_BTREE_OPS_OID: Oid = Oid(3125);
+pub const OID_BTREE_OPS_OID: Oid = Oid(1981);
+pub const TEXT_BTREE_OPS_OID: Oid = Oid(3126);
+pub const TIMESTAMPTZ_BTREE_OPS_OID: Oid = Oid(3127);
+pub const TIMESTAMP_BTREE_OPS_OID: Oid = Oid(3128);
+pub const TEXT_BTREE_PATTERN_OPS_OID: Oid = Oid(4217);
+pub const VARCHAR_BTREE_PATTERN_OPS_OID: Oid = Oid(4218);
+pub const BPCHAR_BTREE_PATTERN_OPS_OID: Oid = Oid(4219);
+pub const OperatorFamilyRelationId: Oid = Oid(2753);
+pub const OpfamilyAmNameNspIndexId: u32 = 2754;
+pub const OpfamilyOidIndexId: u32 = 2755;
+pub const Anum_pg_opfamily_oid: u32 = 1;
+pub const Anum_pg_opfamily_opfmethod: u32 = 2;
+pub const Anum_pg_opfamily_opfname: u32 = 3;
+pub const Anum_pg_opfamily_opfnamespace: u32 = 4;
+pub const Anum_pg_opfamily_opfowner: u32 = 5;
+pub const Natts_pg_opfamily: u32 = 5;
+pub const BOOL_BTREE_FAM_OID: Oid = Oid(424);
+pub const BPCHAR_BTREE_FAM_OID: Oid = Oid(426);
+pub const BYTEA_BTREE_FAM_OID: Oid = Oid(428);
+pub const NETWORK_BTREE_FAM_OID: Oid = Oid(1974);
+pub const INTEGER_BTREE_FAM_OID: Oid = Oid(1976);
+pub const OID_BTREE_FAM_OID: Oid = Oid(1989);
+pub const TEXT_BTREE_FAM_OID: Oid = Oid(1994);
+pub const TEXT_PATTERN_BTREE_FAM_OID: Oid = Oid(2095);
+pub const BPCHAR_PATTERN_BTREE_FAM_OID: Oid = Oid(2097);
+pub const BOOL_HASH_FAM_OID: Oid = Oid(2222);
+pub const TEXT_SPGIST_FAM_OID: Oid = Oid(4017);
 pub const ProcedureRelationId: Oid = Oid(1255);
 pub const ProcedureRelation_Rowtype_Id: u32 = 81;
 pub const ProcedureOidIndexId: u32 = 2690;
@@ -2776,10 +2847,9 @@ pub const ACL_CREATE_TEMP_CHR: u8 = 84u8;
 pub const ACL_CONNECT_CHR: u8 = 99u8;
 pub const ACL_SET_CHR: u8 = 115u8;
 pub const ACL_ALTER_SYSTEM_CHR: u8 = 65u8;
-pub const ACL_MAINTAIN_CHR: u8 = 109u8;
-pub const ACL_ALL_RIGHTS_STR: &[u8; 16] = b"arwdDxtXUCTcsAm\0";
+pub const ACL_ALL_RIGHTS_STR: &[u8; 15] = b"arwdDxtXUCTcsA\0";
 pub const ACL_ALL_RIGHTS_COLUMN: u32 = 39;
-pub const ACL_ALL_RIGHTS_RELATION: u32 = 16511;
+pub const ACL_ALL_RIGHTS_RELATION: u32 = 127;
 pub const ACL_ALL_RIGHTS_SEQUENCE: u32 = 262;
 pub const ACL_ALL_RIGHTS_DATABASE: u32 = 3584;
 pub const ACL_ALL_RIGHTS_FDW: u32 = 256;
@@ -3006,7 +3076,6 @@ pub const VACOPT_PROCESS_TOAST: u32 = 128;
 pub const VACOPT_DISABLE_PAGE_SKIPPING: u32 = 256;
 pub const VACOPT_SKIP_DATABASE_STATS: u32 = 512;
 pub const VACOPT_ONLY_DATABASE_STATS: u32 = 1024;
-pub const VACOPT_SKIP_PRIVS: u32 = 2048;
 pub const CACHEDPLANSOURCE_MAGIC: u32 = 195726186;
 pub const CACHEDPLAN_MAGIC: u32 = 953717834;
 pub const CACHEDEXPR_MAGIC: u32 = 838275847;
@@ -3198,6 +3267,9 @@ pub const PLPGSQL_XCHECK_NONE: u32 = 0;
 pub const PLPGSQL_XCHECK_SHADOWVAR: u32 = 2;
 pub const PLPGSQL_XCHECK_TOOMANYROWS: u32 = 4;
 pub const PLPGSQL_XCHECK_STRICTMULTIASSIGNMENT: u32 = 8;
+pub const POSTMASTER_FD_WATCH: u32 = 0;
+pub const POSTMASTER_FD_OWN: u32 = 1;
+pub const MAX_BACKENDS: u32 = 262143;
 pub const RBTXN_HAS_CATALOG_CHANGES: u32 = 1;
 pub const RBTXN_IS_SUBXACT: u32 = 2;
 pub const RBTXN_IS_SERIALIZED: u32 = 4;
@@ -3426,6 +3498,9 @@ pub const DEFAULT_NUM_DISTINCT: u32 = 200;
 pub const DEFAULT_UNK_SEL: f64 = 0.005;
 pub const DEFAULT_NOT_UNK_SEL: f64 = 0.995;
 pub const SELFLAG_USED_DEFAULT: u32 = 1;
+pub const CATCACHE_MAXKEYS: u32 = 4;
+pub const CT_MAGIC: u32 = 1462113538;
+pub const CL_MAGIC: u32 = 1383485699;
 pub const RANGE_EMPTY_LITERAL: &[u8; 6] = b"empty\0";
 pub const RANGE_EMPTY: u32 = 1;
 pub const RANGE_LB_INC: u32 = 2;
@@ -32177,6 +32252,29 @@ extern "C" {
 }
 #[repr(C)]
 #[derive(Debug, Copy, Clone)]
+pub struct FormData_pg_amop {
+    pub oid: Oid,
+    pub amopfamily: Oid,
+    pub amoplefttype: Oid,
+    pub amoprighttype: Oid,
+    pub amopstrategy: int16,
+    pub amoppurpose: ::std::os::raw::c_char,
+    pub amopopr: Oid,
+    pub amopmethod: Oid,
+    pub amopsortfamily: Oid,
+}
+impl Default for FormData_pg_amop {
+    fn default() -> Self {
+        let mut s = ::std::mem::MaybeUninit::<Self>::uninit();
+        unsafe {
+            ::std::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
+            s.assume_init()
+        }
+    }
+}
+pub type Form_pg_amop = *mut FormData_pg_amop;
+#[repr(C)]
+#[derive(Debug, Copy, Clone)]
 pub struct FormData_pg_authid {
     pub oid: Oid,
     pub rolname: NameData,
@@ -32224,6 +32322,14 @@ impl Default for FormData_pg_database {
     }
 }
 pub type Form_pg_database = *mut FormData_pg_database;
+#[pgrx_macros::pg_guard]
+extern "C" {
+    pub fn database_is_invalid_form(datform: Form_pg_database) -> bool;
+}
+#[pgrx_macros::pg_guard]
+extern "C" {
+    pub fn database_is_invalid_oid(dboid: Oid) -> bool;
+}
 #[repr(C)]
 #[derive(Debug, Copy, Clone)]
 pub struct FormData_pg_enum {
@@ -32309,6 +32415,40 @@ impl Default for FormData_pg_extension {
 pub type Form_pg_extension = *mut FormData_pg_extension;
 #[repr(C)]
 #[derive(Debug, Copy, Clone)]
+pub struct FormData_pg_foreign_server {
+    pub oid: Oid,
+    pub srvname: NameData,
+    pub srvowner: Oid,
+    pub srvfdw: Oid,
+}
+impl Default for FormData_pg_foreign_server {
+    fn default() -> Self {
+        let mut s = ::std::mem::MaybeUninit::<Self>::uninit();
+        unsafe {
+            ::std::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
+            s.assume_init()
+        }
+    }
+}
+pub type Form_pg_foreign_server = *mut FormData_pg_foreign_server;
+#[repr(C)]
+#[derive(Debug, Copy, Clone)]
+pub struct FormData_pg_foreign_table {
+    pub ftrelid: Oid,
+    pub ftserver: Oid,
+}
+impl Default for FormData_pg_foreign_table {
+    fn default() -> Self {
+        let mut s = ::std::mem::MaybeUninit::<Self>::uninit();
+        unsafe {
+            ::std::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
+            s.assume_init()
+        }
+    }
+}
+pub type Form_pg_foreign_table = *mut FormData_pg_foreign_table;
+#[repr(C)]
+#[derive(Debug, Copy, Clone)]
 pub struct FormData_pg_operator {
     pub oid: Oid,
     pub oprname: NameData,
@@ -32364,6 +32504,48 @@ extern "C" {
 extern "C" {
     pub fn OperatorUpd(baseId: Oid, commId: Oid, negId: Oid, isDelete: bool);
 }
+#[repr(C)]
+#[derive(Debug, Copy, Clone)]
+pub struct FormData_pg_opclass {
+    pub oid: Oid,
+    pub opcmethod: Oid,
+    pub opcname: NameData,
+    pub opcnamespace: Oid,
+    pub opcowner: Oid,
+    pub opcfamily: Oid,
+    pub opcintype: Oid,
+    pub opcdefault: bool,
+    pub opckeytype: Oid,
+}
+impl Default for FormData_pg_opclass {
+    fn default() -> Self {
+        let mut s = ::std::mem::MaybeUninit::<Self>::uninit();
+        unsafe {
+            ::std::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
+            s.assume_init()
+        }
+    }
+}
+pub type Form_pg_opclass = *mut FormData_pg_opclass;
+#[repr(C)]
+#[derive(Debug, Copy, Clone)]
+pub struct FormData_pg_opfamily {
+    pub oid: Oid,
+    pub opfmethod: Oid,
+    pub opfname: NameData,
+    pub opfnamespace: Oid,
+    pub opfowner: Oid,
+}
+impl Default for FormData_pg_opfamily {
+    fn default() -> Self {
+        let mut s = ::std::mem::MaybeUninit::<Self>::uninit();
+        unsafe {
+            ::std::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
+            s.assume_init()
+        }
+    }
+}
+pub type Form_pg_opfamily = *mut FormData_pg_opfamily;
 #[repr(C)]
 #[derive(Debug)]
 pub struct FormData_pg_proc {
@@ -34879,6 +35061,43 @@ extern "C" {
 extern "C" {
     pub fn get_language_oid(langname: *const ::std::os::raw::c_char, missing_ok: bool) -> Oid;
 }
+#[pgrx_macros::pg_guard]
+extern "C" {
+    pub fn GetSecurityLabel(
+        object: *const ObjectAddress,
+        provider: *const ::std::os::raw::c_char,
+    ) -> *mut ::std::os::raw::c_char;
+}
+#[pgrx_macros::pg_guard]
+extern "C" {
+    pub fn SetSecurityLabel(
+        object: *const ObjectAddress,
+        provider: *const ::std::os::raw::c_char,
+        label: *const ::std::os::raw::c_char,
+    );
+}
+#[pgrx_macros::pg_guard]
+extern "C" {
+    pub fn DeleteSecurityLabel(object: *const ObjectAddress);
+}
+#[pgrx_macros::pg_guard]
+extern "C" {
+    pub fn DeleteSharedSecurityLabel(objectId: Oid, classId: Oid);
+}
+#[pgrx_macros::pg_guard]
+extern "C" {
+    pub fn ExecSecLabelStmt(stmt: *mut SecLabelStmt) -> ObjectAddress;
+}
+pub type check_object_relabel_type = ::std::option::Option<
+    unsafe extern "C" fn(object: *const ObjectAddress, seclabel: *const ::std::os::raw::c_char),
+>;
+#[pgrx_macros::pg_guard]
+extern "C" {
+    pub fn register_label_provider(
+        provider_name: *const ::std::os::raw::c_char,
+        hook: check_object_relabel_type,
+    );
+}
 extern "C" {
     pub static mut allow_in_place_tablespaces: bool;
 }
@@ -35154,7 +35373,7 @@ extern "C" {
 }
 #[pgrx_macros::pg_guard]
 extern "C" {
-    pub fn RangeVarCallbackMaintainsTable(
+    pub fn RangeVarCallbackOwnsTable(
         relation: *const RangeVar,
         relId: Oid,
         oldRelId: Oid,
@@ -37376,11 +37595,7 @@ extern "C" {
 }
 #[pgrx_macros::pg_guard]
 extern "C" {
-    pub fn vacuum_is_permitted_for_relation(
-        relid: Oid,
-        reltuple: Form_pg_class,
-        options: bits32,
-    ) -> bool;
+    pub fn vacuum_is_relation_owner(relid: Oid, reltuple: Form_pg_class, options: bits32) -> bool;
 }
 #[pgrx_macros::pg_guard]
 extern "C" {
@@ -41579,7 +41794,11 @@ extern "C" {
 }
 #[pgrx_macros::pg_guard]
 extern "C" {
-    pub fn makeJsonValueExpr(expr: *mut Expr, format: *mut JsonFormat) -> *mut JsonValueExpr;
+    pub fn makeJsonValueExpr(
+        raw_expr: *mut Expr,
+        formatted_expr: *mut Expr,
+        format: *mut JsonFormat,
+    ) -> *mut JsonValueExpr;
 }
 #[pgrx_macros::pg_guard]
 extern "C" {
@@ -44758,6 +44977,11 @@ extern "C" {
 }
 #[pgrx_macros::pg_guard]
 extern "C" {
+    pub fn has_pseudoconstant_clauses(root: *mut PlannerInfo, restrictinfo_list: *mut List)
+        -> bool;
+}
+#[pgrx_macros::pg_guard]
+extern "C" {
     pub fn join_clause_is_movable_to(rinfo: *mut RestrictInfo, baserel: *mut RelOptInfo) -> bool;
 }
 #[pgrx_macros::pg_guard]
@@ -44901,10 +45125,7 @@ extern "C" {
 }
 #[pgrx_macros::pg_guard]
 extern "C" {
-    pub fn JumbleQuery(
-        query: *mut Query,
-        querytext: *const ::std::os::raw::c_char,
-    ) -> *mut JumbleState;
+    pub fn JumbleQuery(query: *mut Query) -> *mut JumbleState;
 }
 #[pgrx_macros::pg_guard]
 extern "C" {
@@ -47425,6 +47646,90 @@ extern "C" {
     pub fn plpgsql_yyparse() -> ::std::os::raw::c_int;
 }
 extern "C" {
+    pub static mut EnableSSL: bool;
+}
+extern "C" {
+    pub static mut SuperuserReservedConnections: ::std::os::raw::c_int;
+}
+extern "C" {
+    pub static mut ReservedConnections: ::std::os::raw::c_int;
+}
+extern "C" {
+    pub static mut PostPortNumber: ::std::os::raw::c_int;
+}
+extern "C" {
+    pub static mut Unix_socket_permissions: ::std::os::raw::c_int;
+}
+extern "C" {
+    pub static mut Unix_socket_group: *mut ::std::os::raw::c_char;
+}
+extern "C" {
+    pub static mut Unix_socket_directories: *mut ::std::os::raw::c_char;
+}
+extern "C" {
+    pub static mut ListenAddresses: *mut ::std::os::raw::c_char;
+}
+extern "C" {
+    pub static mut ClientAuthInProgress: bool;
+}
+extern "C" {
+    pub static mut PreAuthDelay: ::std::os::raw::c_int;
+}
+extern "C" {
+    pub static mut AuthenticationTimeout: ::std::os::raw::c_int;
+}
+extern "C" {
+    pub static mut Log_connections: bool;
+}
+extern "C" {
+    pub static mut log_hostname: bool;
+}
+extern "C" {
+    pub static mut enable_bonjour: bool;
+}
+extern "C" {
+    pub static mut bonjour_name: *mut ::std::os::raw::c_char;
+}
+extern "C" {
+    pub static mut restart_after_crash: bool;
+}
+extern "C" {
+    pub static mut remove_temp_files_after_crash: bool;
+}
+extern "C" {
+    pub static mut send_abort_for_crash: bool;
+}
+extern "C" {
+    pub static mut send_abort_for_kill: bool;
+}
+extern "C" {
+    pub static mut postmaster_alive_fds: [::std::os::raw::c_int; 2usize];
+}
+extern "C" {
+    pub static mut progname: *const ::std::os::raw::c_char;
+}
+#[pgrx_macros::pg_guard]
+extern "C" {
+    pub fn PostmasterMain(argc: ::std::os::raw::c_int, argv: *mut *mut ::std::os::raw::c_char)
+        -> !;
+}
+#[pgrx_macros::pg_guard]
+extern "C" {
+    pub fn ClosePostmasterPorts(am_syslogger: bool);
+}
+#[pgrx_macros::pg_guard]
+extern "C" {
+    pub fn InitProcessGlobals();
+}
+#[pgrx_macros::pg_guard]
+extern "C" {
+    pub fn MaxLivePostmasterChildren() -> ::std::os::raw::c_int;
+}
+#[pgrx_macros::pg_guard]
+extern "C" {
+    pub fn PostmasterMarkPIDForWorkerNotify(arg1: ::std::os::raw::c_int) -> bool;
+}
+extern "C" {
     pub static mut logical_decoding_work_mem: ::std::os::raw::c_int;
 }
 extern "C" {
@@ -48689,7 +48994,7 @@ extern "C" {
 }
 #[pgrx_macros::pg_guard]
 extern "C" {
-    pub fn logicalrep_message_type(action: LogicalRepMsgType) -> *mut ::std::os::raw::c_char;
+    pub fn logicalrep_message_type(action: LogicalRepMsgType) -> *const ::std::os::raw::c_char;
 }
 pub const CRSSnapshotAction_CRS_EXPORT_SNAPSHOT: CRSSnapshotAction = 0;
 pub const CRSSnapshotAction_CRS_NOEXPORT_SNAPSHOT: CRSSnapshotAction = 1;
@@ -65624,6 +65929,213 @@ extern "C" {
         varRelid: ::std::os::raw::c_int,
     ) -> Selectivity;
 }
+pub type CCHashFN = ::std::option::Option<unsafe extern "C" fn(datum: Datum) -> uint32>;
+pub type CCFastEqualFN = ::std::option::Option<unsafe extern "C" fn(a: Datum, b: Datum) -> bool>;
+#[repr(C)]
+#[derive(Debug, Copy, Clone)]
+pub struct catcache {
+    pub id: ::std::os::raw::c_int,
+    pub cc_nbuckets: ::std::os::raw::c_int,
+    pub cc_tupdesc: TupleDesc,
+    pub cc_bucket: *mut dlist_head,
+    pub cc_hashfunc: [CCHashFN; 4usize],
+    pub cc_fastequal: [CCFastEqualFN; 4usize],
+    pub cc_keyno: [::std::os::raw::c_int; 4usize],
+    pub cc_lists: dlist_head,
+    pub cc_ntup: ::std::os::raw::c_int,
+    pub cc_nkeys: ::std::os::raw::c_int,
+    pub cc_relname: *const ::std::os::raw::c_char,
+    pub cc_reloid: Oid,
+    pub cc_indexoid: Oid,
+    pub cc_relisshared: bool,
+    pub cc_next: slist_node,
+    pub cc_skey: [ScanKeyData; 4usize],
+}
+impl Default for catcache {
+    fn default() -> Self {
+        let mut s = ::std::mem::MaybeUninit::<Self>::uninit();
+        unsafe {
+            ::std::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
+            s.assume_init()
+        }
+    }
+}
+pub type CatCache = catcache;
+#[repr(C)]
+#[derive(Debug, Copy, Clone)]
+pub struct catctup {
+    pub ct_magic: ::std::os::raw::c_int,
+    pub hash_value: uint32,
+    pub keys: [Datum; 4usize],
+    pub cache_elem: dlist_node,
+    pub refcount: ::std::os::raw::c_int,
+    pub dead: bool,
+    pub negative: bool,
+    pub tuple: HeapTupleData,
+    pub c_list: *mut catclist,
+    pub my_cache: *mut CatCache,
+}
+impl Default for catctup {
+    fn default() -> Self {
+        let mut s = ::std::mem::MaybeUninit::<Self>::uninit();
+        unsafe {
+            ::std::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
+            s.assume_init()
+        }
+    }
+}
+pub type CatCTup = catctup;
+#[repr(C)]
+#[derive(Debug)]
+pub struct catclist {
+    pub cl_magic: ::std::os::raw::c_int,
+    pub hash_value: uint32,
+    pub cache_elem: dlist_node,
+    pub keys: [Datum; 4usize],
+    pub refcount: ::std::os::raw::c_int,
+    pub dead: bool,
+    pub ordered: bool,
+    pub nkeys: ::std::os::raw::c_short,
+    pub n_members: ::std::os::raw::c_int,
+    pub my_cache: *mut CatCache,
+    pub members: __IncompleteArrayField<*mut CatCTup>,
+}
+impl Default for catclist {
+    fn default() -> Self {
+        let mut s = ::std::mem::MaybeUninit::<Self>::uninit();
+        unsafe {
+            ::std::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
+            s.assume_init()
+        }
+    }
+}
+pub type CatCList = catclist;
+#[repr(C)]
+#[derive(Debug, Copy, Clone)]
+pub struct catcacheheader {
+    pub ch_caches: slist_head,
+    pub ch_ntup: ::std::os::raw::c_int,
+}
+impl Default for catcacheheader {
+    fn default() -> Self {
+        let mut s = ::std::mem::MaybeUninit::<Self>::uninit();
+        unsafe {
+            ::std::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
+            s.assume_init()
+        }
+    }
+}
+pub type CatCacheHeader = catcacheheader;
+#[pgrx_macros::pg_guard]
+extern "C" {
+    pub fn CreateCacheMemoryContext();
+}
+#[pgrx_macros::pg_guard]
+extern "C" {
+    pub fn InitCatCache(
+        id: ::std::os::raw::c_int,
+        reloid: Oid,
+        indexoid: Oid,
+        nkeys: ::std::os::raw::c_int,
+        key: *const ::std::os::raw::c_int,
+        nbuckets: ::std::os::raw::c_int,
+    ) -> *mut CatCache;
+}
+#[pgrx_macros::pg_guard]
+extern "C" {
+    pub fn InitCatCachePhase2(cache: *mut CatCache, touch_index: bool);
+}
+#[pgrx_macros::pg_guard]
+extern "C" {
+    pub fn SearchCatCache(
+        cache: *mut CatCache,
+        v1: Datum,
+        v2: Datum,
+        v3: Datum,
+        v4: Datum,
+    ) -> HeapTuple;
+}
+#[pgrx_macros::pg_guard]
+extern "C" {
+    pub fn SearchCatCache1(cache: *mut CatCache, v1: Datum) -> HeapTuple;
+}
+#[pgrx_macros::pg_guard]
+extern "C" {
+    pub fn SearchCatCache2(cache: *mut CatCache, v1: Datum, v2: Datum) -> HeapTuple;
+}
+#[pgrx_macros::pg_guard]
+extern "C" {
+    pub fn SearchCatCache3(cache: *mut CatCache, v1: Datum, v2: Datum, v3: Datum) -> HeapTuple;
+}
+#[pgrx_macros::pg_guard]
+extern "C" {
+    pub fn SearchCatCache4(
+        cache: *mut CatCache,
+        v1: Datum,
+        v2: Datum,
+        v3: Datum,
+        v4: Datum,
+    ) -> HeapTuple;
+}
+#[pgrx_macros::pg_guard]
+extern "C" {
+    pub fn ReleaseCatCache(tuple: HeapTuple);
+}
+#[pgrx_macros::pg_guard]
+extern "C" {
+    pub fn GetCatCacheHashValue(
+        cache: *mut CatCache,
+        v1: Datum,
+        v2: Datum,
+        v3: Datum,
+        v4: Datum,
+    ) -> uint32;
+}
+#[pgrx_macros::pg_guard]
+extern "C" {
+    pub fn SearchCatCacheList(
+        cache: *mut CatCache,
+        nkeys: ::std::os::raw::c_int,
+        v1: Datum,
+        v2: Datum,
+        v3: Datum,
+    ) -> *mut CatCList;
+}
+#[pgrx_macros::pg_guard]
+extern "C" {
+    pub fn ReleaseCatCacheList(list: *mut CatCList);
+}
+#[pgrx_macros::pg_guard]
+extern "C" {
+    pub fn ResetCatalogCaches();
+}
+#[pgrx_macros::pg_guard]
+extern "C" {
+    pub fn CatalogCacheFlushCatalog(catId: Oid);
+}
+#[pgrx_macros::pg_guard]
+extern "C" {
+    pub fn CatCacheInvalidate(cache: *mut CatCache, hashValue: uint32);
+}
+#[pgrx_macros::pg_guard]
+extern "C" {
+    pub fn PrepareToInvalidateCacheTuple(
+        relation: Relation,
+        tuple: HeapTuple,
+        newtuple: HeapTuple,
+        function: ::std::option::Option<
+            unsafe extern "C" fn(arg1: ::std::os::raw::c_int, arg2: uint32, arg3: Oid),
+        >,
+    );
+}
+#[pgrx_macros::pg_guard]
+extern "C" {
+    pub fn PrintCatCacheLeakWarning(tuple: HeapTuple);
+}
+#[pgrx_macros::pg_guard]
+extern "C" {
+    pub fn PrintCatCacheListLeakWarning(list: *mut CatCList);
+}
 pub const SysCacheIdentifier_AGGFNOID: SysCacheIdentifier = 0;
 pub const SysCacheIdentifier_AMNAME: SysCacheIdentifier = 1;
 pub const SysCacheIdentifier_AMOID: SysCacheIdentifier = 2;
@@ -65837,11 +66349,6 @@ extern "C" {
         key3: Datum,
         key4: Datum,
     ) -> uint32;
-}
-#[repr(C)]
-#[derive(Debug, Copy, Clone)]
-pub struct catclist {
-    _unused: [u8; 0],
 }
 #[pgrx_macros::pg_guard]
 extern "C" {

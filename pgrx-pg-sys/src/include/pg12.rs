@@ -319,15 +319,15 @@ pub const MAXIMUM_ALIGNOF: u32 = 8;
 pub const MEMSET_LOOP_LIMIT: u32 = 1024;
 pub const PACKAGE_BUGREPORT: &[u8; 32] = b"pgsql-bugs@lists.postgresql.org\0";
 pub const PACKAGE_NAME: &[u8; 11] = b"PostgreSQL\0";
-pub const PACKAGE_STRING: &[u8; 17] = b"PostgreSQL 12.15\0";
+pub const PACKAGE_STRING: &[u8; 17] = b"PostgreSQL 12.16\0";
 pub const PACKAGE_TARNAME: &[u8; 11] = b"postgresql\0";
 pub const PACKAGE_URL: &[u8; 1] = b"\0";
-pub const PACKAGE_VERSION: &[u8; 6] = b"12.15\0";
+pub const PACKAGE_VERSION: &[u8; 6] = b"12.16\0";
 pub const PG_KRB_SRVNAM: &[u8; 9] = b"postgres\0";
 pub const PG_MAJORVERSION: &[u8; 3] = b"12\0";
-pub const PG_VERSION: &[u8; 6] = b"12.15\0";
-pub const PG_VERSION_NUM: u32 = 120015;
-pub const PG_VERSION_STR : & [u8 ; 105] = b"PostgreSQL 12.15 on x86_64-pc-linux-gnu, compiled by gcc (Ubuntu 11.3.0-1ubuntu1~22.04.1) 11.3.0, 64-bit\0" ;
+pub const PG_VERSION: &[u8; 6] = b"12.16\0";
+pub const PG_VERSION_NUM: u32 = 120016;
+pub const PG_VERSION_STR : & [u8 ; 103] = b"PostgreSQL 12.16 on x86_64-pc-linux-gnu, compiled by gcc (Ubuntu 11.4.0-1ubuntu1~22.04) 11.4.0, 64-bit\0" ;
 pub const RELSEG_SIZE: u32 = 131072;
 pub const SIZEOF_BOOL: u32 = 1;
 pub const SIZEOF_LONG: u32 = 8;
@@ -1179,7 +1179,7 @@ pub const NI_DGRAM: u32 = 16;
 pub const _PWD_H: u32 = 1;
 pub const NSS_BUFLEN_PASSWD: u32 = 1024;
 pub const PGINVALID_SOCKET: i32 = -1;
-pub const PG_BACKEND_VERSIONSTR: &[u8; 29] = b"postgres (PostgreSQL) 12.15\n\0";
+pub const PG_BACKEND_VERSIONSTR: &[u8; 29] = b"postgres (PostgreSQL) 12.16\n\0";
 pub const EXE: &[u8; 1] = b"\0";
 pub const DEVNULL: &[u8; 10] = b"/dev/null\0";
 pub const USE_REPL_SNPRINTF: u32 = 1;
@@ -2586,6 +2586,8 @@ pub const Anum_pg_database_dattablespace: u32 = 13;
 pub const Anum_pg_database_datacl: u32 = 14;
 pub const Natts_pg_database: u32 = 14;
 pub const TemplateDbOid: Oid = Oid(1);
+pub const DATCONNLIMIT_UNLIMITED: i32 = -1;
+pub const DATCONNLIMIT_INVALID_DB: i32 = -2;
 pub const EnumRelationId: Oid = Oid(3501);
 pub const Anum_pg_enum_oid: u32 = 1;
 pub const Anum_pg_enum_enumtypid: u32 = 2;
@@ -31705,6 +31707,14 @@ impl Default for FormData_pg_database {
     }
 }
 pub type Form_pg_database = *mut FormData_pg_database;
+#[pgrx_macros::pg_guard]
+extern "C" {
+    pub fn database_is_invalid_form(datform: Form_pg_database) -> bool;
+}
+#[pgrx_macros::pg_guard]
+extern "C" {
+    pub fn database_is_invalid_oid(dboid: Oid) -> bool;
+}
 #[repr(C)]
 #[derive(Debug, Copy, Clone)]
 pub struct FormData_pg_enum {
@@ -41231,6 +41241,11 @@ extern "C" {
         joinquals: *mut *mut List,
         otherquals: *mut *mut List,
     );
+}
+#[pgrx_macros::pg_guard]
+extern "C" {
+    pub fn has_pseudoconstant_clauses(root: *mut PlannerInfo, restrictinfo_list: *mut List)
+        -> bool;
 }
 #[pgrx_macros::pg_guard]
 extern "C" {
