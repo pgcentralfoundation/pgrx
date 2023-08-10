@@ -885,14 +885,18 @@ fn extra_bindgen_clang_args(pg_config: &PgConfig) -> eyre::Result<Vec<String>> {
         // `pgrx-pg-config` crate is implemented, but even if it were not, the
         // problem won't be with flags we are interested in.
         let flags = shlex::split(&flags.to_string_lossy()).unwrap_or_default();
-        // Find the `-isysroot` flags -- The rest are `-I` flags that don't seem
-        // to be needed inside the code (and feel likely to cause bindgen to
-        // emit bindings for unrelated libraries)
+        // Just give clang the full flag set, since presumably that's what we're
+        // getting when we build the C shim anyway.
+        out.extend(flags.iter().cloned());
+
+        // Find the `-isysroot` flags so we can warn about them, so something
+        // reasonable shows up if/when the build fails.
+        //
+        // Eventually we should probably wrangle the sysroot for `cargo pgrx
+        // init`-installed PGs a bit more aggressively, but for now, whatever.
         for pair in flags.windows(2) {
             if pair[0] == "-isysroot" {
-                if std::path::Path::new(&pair[1]).exists() {
-                    out.extend(pair.into_iter().cloned());
-                } else {
+                if !std::path::Path::new(&pair[1]).exists() {
                     // The SDK path doesn't exist. Emit a warning, which they'll
                     // see if the build ends up failing (it may not fail in all
                     // cases, so we don't panic here).
