@@ -656,12 +656,12 @@ pub fn SUPPORTED_VERSIONS() -> Vec<PgVersion> {
         PgVersion::new(15, PgMinorVersion::Latest, None),
         PgVersion::new(
             16,
-            PgMinorVersion::Beta(2),
+            PgMinorVersion::Beta(3),
             Some(
                 Url::parse(
-                    "https://ftp.postgresql.org/pub/source/v16beta2/postgresql-16beta2.tar.bz2",
+                    "https://ftp.postgresql.org/pub/source/v16beta3/postgresql-16beta3.tar.bz2",
                 )
-                .expect("invalid url for v16beta2"),
+                .expect("invalid url for v16beta3"),
             ),
         ),
     ]
