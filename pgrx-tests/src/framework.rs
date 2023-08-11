@@ -159,7 +159,7 @@ pub fn run_test(
                 let pg_location = dberror.file().unwrap_or("<unknown>").to_string();
                 let rust_location = dberror.where_().unwrap_or("<unknown>").to_string();
 
-                (pg_location, rust_location, received_error_message.to_string())
+                (pg_location, rust_location, received_error_message.to_string() + &error_as_string)
             } else {
                 ("<unknown>".to_string(), "<unknown>".to_string(), format!("{error_as_string}"))
             };

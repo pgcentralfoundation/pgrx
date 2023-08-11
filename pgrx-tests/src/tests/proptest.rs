@@ -36,6 +36,7 @@ impl Strategy for AnyDate {
 
 #[pg_extern]
 pub fn nop_date(date: Date) -> Date {
+    eprintln!("input date: {date}");
     date
 }
 
@@ -51,9 +52,25 @@ mod tests {
     #[pg_test]
     pub fn proptest_spi_passthrough() {
         let mut proptest = TestRunner::default();
-        proptest.run(&AnyDate(), |date| {
-            // let date_text: String = pgrx::direct_function_call(pg_sys::date_out, Some(date));
+        let strat = AnyDate().prop_map(|date| Date::from(date.to_pg_epoch_days().clamp(-2451545, 2147483494 - 2451545)));
+        proptest.run(&strat, |date| {
             let spi_ret: Date = Spi::get_one_with_args("SELECT nop_date($1)", vec![(PgBuiltInOids::DATEOID.into(), date.into_datum())]).unwrap().unwrap();
+            prop_assert_eq!(date, spi_ret);
+            Ok(())
+        }).unwrap();
+    }
+
+    #[pg_test]
+    pub fn proptest_spi_text_passthrough() {
+        let mut proptest = TestRunner::default();
+        let strat = AnyDate().prop_map(|date| Date::from(date.to_pg_epoch_days().clamp(-2451545, 2147483494 - 2451545)));
+        proptest.run(&strat, |date| {
+            let datum = date.into_datum();
+            let date_cstr: &std::ffi::CStr = unsafe { pgrx::direct_function_call(pg_sys::date_out, &[datum]).unwrap() };
+            let date_text = date_cstr.to_str().unwrap().to_owned();
+            let spi_select_command = format!("SELECT nop_date({});", date_text);
+            pgrx::info!("date: {date_text}");
+            let spi_ret: Date = Spi::get_one(&spi_select_command).unwrap().unwrap();
             prop_assert_eq!(date, spi_ret);
             Ok(())
         }).unwrap();
