@@ -51,6 +51,7 @@ libc = "0.2.147"
 pgrx-macros = { path = "../pgrx-macros", version = "=0.10.0-beta.3" }
 pgrx-pg-config = { path = "../pgrx-pg-config", version = "=0.10.0-beta.3" }
 postgres = "0.19.5"
+proptest = "1"
 regex = "1.9.3"
 serde = "1.0"
 serde_json = "1.0"
