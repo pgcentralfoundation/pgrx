@@ -1,7 +1,7 @@
-use proptest::prelude::*;
 use pgrx::prelude::*;
-use prop::strategy::{ValueTree, Strategy, NewTree};
-use prop::test_runner::TestRunner;
+use proptest::prelude::*;
+use proptest::strategy::{ValueTree, Strategy, NewTree};
+use proptest::test_runner::TestRunner;
 
 // Hypothesis: We can ask Postgres to accept any i32 as a Date, print it out, pass it in via SPI, and get back the same number
 struct DateBinarySearch(prop::num::i32::BinarySearch);
@@ -33,15 +33,23 @@ impl Strategy for AnyDate {
     }
 }
 
+
+#[pg_extern]
+pub fn nop_date(date: Date) -> Date {
+    date
+}
+
 #[cfg(any(test, feature = "pg_test"))]
 #[pgrx::pg_schema]
 mod tests {
-    use super::*;
-    use prop::test_runner::TestRunner;
+    use proptest::prelude::*;
+    use pgrx::prelude::*;
+    use proptest::test_runner::TestRunner;
     use crate as pgrx_tests;
+    use crate::tests::proptest::AnyDate;
 
     #[pg_test]
-    fn proptest_spi_passthrough() {
+    pub fn proptest_spi_passthrough() {
         let mut proptest = TestRunner::default();
         proptest.run(&AnyDate(), |date| {
             // let date_text: String = pgrx::direct_function_call(pg_sys::date_out, Some(date));
@@ -52,10 +60,6 @@ mod tests {
     }
 }
 
-#[pg_extern]
-fn nop_date(date: Date) -> Date {
-    date
-}
 
 
 // struct TimeValueTree {}
