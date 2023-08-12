@@ -1,39 +1,9 @@
-use pgrx::prelude::*;
 use pg_sys::panic::CaughtError;
+use pgrx::prelude::*;
 use proptest::prelude::*;
-use proptest::strategy::{NewTree, Strategy, ValueTree};
+use proptest::strategy::Strategy;
 use proptest::test_runner::{TestCaseResult, TestError, TestRunner};
 use std::panic::AssertUnwindSafe;
-
-// Hypothesis: We can ask Postgres to accept any i32 as a Date, print it out, pass it in via SPI, and get back the same number
-struct DateBinarySearch(prop::num::i32::BinarySearch);
-
-#[derive(Debug)]
-struct AnyDate();
-
-impl ValueTree for DateBinarySearch {
-    type Value = Date;
-    fn current(&self) -> Self::Value {
-        Date::from(self.0.current())
-    }
-
-    fn simplify(&mut self) -> bool {
-        self.0.simplify()
-    }
-
-    fn complicate(&mut self) -> bool {
-        self.0.complicate()
-    }
-}
-
-impl Strategy for AnyDate {
-    type Tree = DateBinarySearch;
-    type Value = Date;
-
-    fn new_tree(&self, _runner: &mut TestRunner) -> NewTree<Self> {
-        Ok(DateBinarySearch(prop::num::i32::BinarySearch::new(i32::MAX)))
-    }
-}
 
 #[derive(Default)]
 pub struct PgTestRunner(TestRunner);
@@ -60,7 +30,6 @@ impl PgTestRunner {
 
 #[pg_extern]
 pub fn nop_date(date: Date) -> Date {
-    // pgrx::info!("date in : {date}");
     date
 }
 
@@ -70,12 +39,11 @@ mod tests {
     use super::*;
     use crate as pgrx_tests;
 
+    /// We can pass random dates directly into Postgres functions and get them back.
     #[pg_test]
     pub fn proptest_spi_passthrough() {
         let mut proptest = PgTestRunner::default();
-        let strat = AnyDate().prop_map(|date| {
-            Date::from(date.to_pg_epoch_days().clamp(-2451545, 2147483494 - 2451545))
-        });
+        let strat = prop::num::i32::ANY.prop_map_into::<Date>();
         proptest
             .run(&strat, |date| {
                 let spi_ret: Date = Spi::get_one_with_args(
@@ -90,12 +58,14 @@ mod tests {
             .unwrap();
     }
 
+    /// We can ask Postgres to accept any i32 as a Date, print it out, pass it in via SPI, and get back the same number
+    /// Fails on:
+    /// - date values between i32::MIN and -2451545
+    /// - date values between i32::MAX and (2147483494 - 2451545) - 1
     #[pg_test]
     pub fn proptest_spi_text_passthrough() {
         let mut proptest = PgTestRunner::default();
-        let strat = AnyDate().prop_map(|date| {
-            Date::from(date.to_pg_epoch_days().clamp(i32::MIN, (2147483494 - 2451545) - 1))
-        });
+        let strat = prop::num::i32::ANY.prop_map_into::<Date>();
         proptest
             .run(&strat, |date| {
                 let datum = date.into_datum();
@@ -104,7 +74,6 @@ mod tests {
                 let date_text = date_cstr.to_str().unwrap().to_owned();
                 let spi_select_command = format!("SELECT nop_date('{}')", date_text);
                 let spi_ret: Option<Date> = Spi::get_one(&spi_select_command).unwrap();
-                // pgrx::info!("date out: {spi_ret}");
                 prop_assert_eq!(date, spi_ret.unwrap());
                 Ok(())
             })
