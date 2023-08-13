@@ -14,11 +14,15 @@ mod tests {
     use super::*;
     use crate as pgrx_tests;
 
-    /// We can pass random dates directly into Postgres functions and get them back.
+    // Property tests consist of 1:
+    /// Hypothesis: We can pass random dates directly into Postgres functions and get them back.
     #[pg_test]
-    pub fn proptest_spi_passthrough() {
+    pub fn date_spi_roundtrip() {
+        // 2. Constructing the Postgres-adapted test runner
         let mut proptest = PgTestRunner::default();
+        // 3. A strategy for creating and refining values
         let strat = prop::num::i32::ANY.prop_map_into::<Date>();
+        // 4. The runner invocation
         proptest
             .run(&strat, |date| {
                 let spi_ret: Date = Spi::get_one_with_args(
@@ -27,18 +31,24 @@ mod tests {
                 )
                 .unwrap()
                 .unwrap();
+
+                // 5. A condition on which the test is accepted or rejected
                 prop_assert_eq!(date, spi_ret);
                 Ok(())
             })
             .unwrap();
     }
 
-    /// We can ask Postgres to accept any i32 as a Date, print it out, pass it in via SPI, and get back the same number
+    // Proptest's "trophy case" for pgrx includes:
+    // Demonstrating that existing infallible functions can have fallible results when their code
+    // is actually put in contact with the database
+    /// Hypothesis: We can ask Postgres to accept any i32 as a Date, then print its value,
+    /// and then get the same i32 back after passing it through SPI as a date literal
     /// Fails on:
-    /// - date values between (non-inclusive) 32::MIN and -2451545
+    /// - date values between (non-inclusive) i32::MIN and -2451545
     /// - date values between (non-inclusive) i32::MAX and (2147483494 - 2451545) - 1
     #[pg_test]
-    pub fn proptest_spi_text_passthrough() {
+    pub fn date_literal_spi_roundtrip() {
         let mut proptest = PgTestRunner::default();
         let strat = prop::num::i32::ANY.prop_map_into::<Date>();
         proptest
