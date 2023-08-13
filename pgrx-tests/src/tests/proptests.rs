@@ -1,32 +1,7 @@
-use pg_sys::panic::CaughtError;
 use pgrx::prelude::*;
 use proptest::prelude::*;
 use proptest::strategy::Strategy;
-use proptest::test_runner::{TestCaseResult, TestError, TestRunner};
-use std::panic::AssertUnwindSafe;
-
-#[derive(Default)]
-pub struct PgTestRunner(TestRunner);
-
-impl PgTestRunner {
-    pub fn run<S: Strategy>(
-        &mut self,
-        strategy: &S,
-        test: impl Fn(S::Value) -> TestCaseResult,
-    ) -> Result<(), TestError<<S as Strategy>::Value>> {
-        self.0.run(strategy, |value| {
-            PgTryBuilder::new(AssertUnwindSafe(|| test(value)))
-                .catch_others(|err| match err {
-                    CaughtError::PostgresError(err)
-                    | CaughtError::ErrorReport(err)
-                    | CaughtError::RustPanic { ereport: err, .. } => {
-                        Err(TestCaseError::Fail(err.message().to_owned().into()))
-                    }
-                })
-                .execute()
-        })
-    }
-}
+use crate::proptest::PgTestRunner;
 
 #[pg_extern]
 pub fn nop_date(date: Date) -> Date {
@@ -60,8 +35,8 @@ mod tests {
 
     /// We can ask Postgres to accept any i32 as a Date, print it out, pass it in via SPI, and get back the same number
     /// Fails on:
-    /// - date values between i32::MIN and -2451545
-    /// - date values between i32::MAX and (2147483494 - 2451545) - 1
+    /// - date values between (non-inclusive) 32::MIN and -2451545
+    /// - date values between (non-inclusive) i32::MAX and (2147483494 - 2451545) - 1
     #[pg_test]
     pub fn proptest_spi_text_passthrough() {
         let mut proptest = PgTestRunner::default();

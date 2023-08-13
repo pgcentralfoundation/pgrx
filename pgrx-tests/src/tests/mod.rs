@@ -40,7 +40,8 @@ mod pg_try_tests;
 mod pgbox_tests;
 mod pgrx_module_qualification;
 mod postgres_type_tests;
-mod proptest;
+#[cfg(feature = "proptest")]
+mod proptests;
 mod range_tests;
 mod result_tests;
 mod roundtrip_tests;
