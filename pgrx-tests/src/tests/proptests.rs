@@ -23,7 +23,7 @@ mod tests {
         // 3. A strategy for creating and refining values
         let strat = prop::num::i32::ANY.prop_map(|i| {
             Date::try_from(i).unwrap_or(unsafe {
-                Date::from_pg_epoch_days(i32::clamp(i, -2451545, 2147483494 - 2451545))
+                Date::from_pg_epoch_days(i32::clamp(i, -2451545, 2147483494 - 2451546))
             })
         });
         // 4. The runner invocation
