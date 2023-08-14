@@ -28,23 +28,6 @@ pub const UNIX_EPOCH_JDATE: i32 = pg_sys::UNIX_EPOCH_JDATE as i32;
 #[repr(transparent)]
 pub struct Date(pg_sys::DateADT);
 
-/// Create a [`Date`] from a [`pg_sys::DateADT`]
-///
-/// Note that [`pg_sys::DateADT`] is an `i32` as a day offset from the "Postgres epoch".
-/// This impl currently allows producing a `Date` that cannot be made via SQL,
-/// such as a date before "Julian day zero".
-///
-/// The details of the encoding may also prove surprising, for instance:
-/// - It is not a Gregorian calendar date, but rather a Julian day
-/// - There is no "year zero", so Postgres defines the offset of -2000 years as 1 BC instead
-/// - Some values such as `i32::MIN` and `i32::MAX` have special meanings as infinities
-impl From<pg_sys::DateADT> for Date {
-    #[inline]
-    fn from(value: pg_sys::DateADT) -> Self {
-        Date(value)
-    }
-}
-
 impl From<Date> for pg_sys::DateADT {
     #[inline]
     fn from(value: Date) -> Self {
@@ -61,6 +44,32 @@ impl From<Timestamp> for Date {
 impl From<TimestampWithTimeZone> for Date {
     fn from(value: TimestampWithTimeZone) -> Self {
         unsafe { direct_function_call(pg_sys::timestamptz_date, &[value.into_datum()]).unwrap() }
+    }
+}
+
+/// Create a [`Date`] from a [`pg_sys::DateADT`]
+///
+/// Note that [`pg_sys::DateADT`] is an `i32` as a Julian day offset from the "Postgres epoch".
+///
+/// The details of the encoding may also prove surprising, for instance:
+/// - It is not a Gregorian calendar date, but rather a Julian day
+/// - Despite having the numerical range for it, it does not support values before Julian day 0
+///   (4713 BC, January 1), nor does it support many values far into the future.
+/// - There is no "year zero" in either the Julian or the Gregorian calendars,
+///   so you may have to account for a "skip" from 1 BC to 1 AD
+/// - Some values such as `i32::MIN` and `i32::MAX` have special meanings as infinities
+impl TryFrom<pg_sys::DateADT> for Date {
+    type Error = DateTimeConversionError;
+    #[inline]
+    fn try_from(value: pg_sys::DateADT) -> Result<Self, Self::Error> {
+        if (i32::MIN+1..-2451545).contains(&value) {
+            Err(DateTimeConversionError::FieldOverflow) // but it's an underflow...
+            // actually, more annoying than that, neither overflow nor underflow are accurate
+        } else if ((2147483494 - 2451545)..i32::MAX).contains(&value) {
+            Err(DateTimeConversionError::FieldOverflow)
+        } else {
+            Ok(Date(value))
+        }
     }
 }
 
