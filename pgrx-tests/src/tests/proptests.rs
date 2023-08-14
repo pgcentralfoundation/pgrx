@@ -39,7 +39,9 @@ mod tests {
                 .unwrap()
                 .unwrap();
 
-                // 5. A condition on which the test is accepted or rejected
+                // 5. A condition on which the test is accepted or rejected:
+                //    this is easily done via `prop_assert!` and its friends,
+                //    which just early-returns a TestCaseError on failure
                 prop_assert_eq!(date, spi_ret);
                 Ok(())
             })
