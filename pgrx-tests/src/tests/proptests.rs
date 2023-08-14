@@ -50,11 +50,8 @@ mod tests {
     // initially written, used a simpler `prop_map_into` strategy.
     // This revealed that random i32s cause errors when Postgres uses `date_in` on the
     // date literal string derived from using `date_out`.
-    /// Hypothesis: We can ask Postgres to accept i32s in the Date range print its value,
-    /// and then get the same i32 back after passing it through SPI as a date literal
-    /// Fails on:
-    /// - date values between (non-inclusive) i32::MIN and -2451545
-    /// - date values between (non-inclusive) i32::MAX and (2147483494 - 2451545) - 1
+    /// Hypothesis: We can ask Postgres to accept a Date from an in-range i32, print its value,
+    /// then get the same Date back after passing it through SPI as a date literal
     #[pg_test]
     pub fn date_literal_spi_roundtrip() {
         let mut proptest = PgTestRunner::default();
