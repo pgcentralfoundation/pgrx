@@ -5,7 +5,7 @@ use proptest::strategy::Strategy;
 use proptest::test_runner::{TestCaseResult, TestError, TestRunner};
 use std::panic::AssertUnwindSafe;
 
-/** proptest's `TestRunner` adapted for `#[pg_test]`
+/** proptest's [`TestRunner`] adapted for `#[pg_test]`
 
 # Experimental
 This is an exploratory implementation in which many subtle details may be quickly changed.
@@ -18,7 +18,7 @@ means proptest accepts exceptions as test failures, but prevents them from resol
 This exposes Postgres to a risk of stack overflow. `PgTestRunner::run` solves that.
 
 For exposed functions, `PgTestRunner` transparently replaces `TestRunner`:
-- Inside closures executed by this runner, macros like `prop_assert!` work normally.
+- Inside closures executed by this runner, macros like [`prop_assert!`] work normally.
 
 This does not provide compatibility with the entire proptest API surface:
 - `proptest!` can't use `PgTestRunner` as it builds its own runners
