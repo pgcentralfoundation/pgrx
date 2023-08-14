@@ -23,7 +23,7 @@ pub struct Animals {
 fn known_animals() -> Animals {
     Animals {
         names: vec!["Sally".into(), "Brandy".into(), "anchovy".into()],
-        age_lookup: hashmap! { 5 => "Sally".into(), 4 => "Brandy".into(), 3=> "anchovy".into()},
+        age_lookup: hashmap! { 5 => "Sally".into(), 4 => "Brandy".into(), 3 => "anchovy".into()},
     }
 }
 
@@ -70,7 +70,7 @@ mod tests {
             animals,
             Ok(Some(Animals {
                 names: vec!["Sally".into(), "Brandy".into(), "anchovy".into()],
-                age_lookup: hashmap! { 5 => "Sally".into(), 4 => "Brandy".into(), 3=> "anchovy".into()},
+                age_lookup: hashmap! { 5 => "Sally".into(), 4 => "Brandy".into(), 3 => "anchovy".into()},
             }))
         );
     }
