@@ -28,7 +28,7 @@ pub struct TimeWithTimeZone(pg_sys::TimeTzADT);
 /// Create a [`TimeWithTimeZone`] from a [`pg_sys::TimeTzADT`]
 ///
 /// This impl currently allows creating a `TimeWithTimeZone` that cannot be constructed by SQL,
-/// such as at the time 37:42 in the timezone UTC+25:00, which may yield logic bugs if used.
+/// such as at the time 37:42 in the time zone UTC+25:00, which may yield logic bugs if used.
 impl From<pg_sys::TimeTzADT> for TimeWithTimeZone {
     #[inline]
     fn from(value: pg_sys::TimeTzADT) -> Self {
@@ -147,7 +147,7 @@ impl TimeWithTimeZone {
         }
     }
 
-    /// Construct a new [`TimeWithTimeZone`] from its constituent parts at a specific timezone
+    /// Construct a new [`TimeWithTimeZone`] from its constituent parts at a specific time zone
     ///
     /// # Errors
     ///
@@ -177,7 +177,7 @@ impl TimeWithTimeZone {
         .execute()
     }
 
-    /// Construct a new [`TimeWithTimeZone`] from its constituent parts at a specific timezone [`Interval`]
+    /// Construct a new [`TimeWithTimeZone`] from its constituent parts at a specific time zone [`Interval`]
     ///
     /// # Errors
     ///
@@ -255,12 +255,12 @@ impl TimeWithTimeZone {
         self.at_timezone("UTC").unwrap().into()
     }
 
-    /// Shift the [`TimeWithTimeZone`] to the specified timezone
+    /// Shift the [`TimeWithTimeZone`] to the specified time zone
     ///
     /// # Errors
     ///
-    /// Returns a [`DateTimeConversionError`] if the specified timezone is invalid or if for some
-    /// other reason the underlying time cannot be represented in the specified timezone
+    /// Returns a [`DateTimeConversionError`] if the specified time zone is invalid or if for some
+    /// other reason the underlying time cannot be represented in the specified time zone
     pub fn at_timezone<Tz: AsRef<str> + UnwindSafe + RefUnwindSafe>(
         &self,
         timezone: Tz,

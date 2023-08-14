@@ -57,7 +57,7 @@ impl TryFrom<pg_sys::Datum> for TimestampWithTimeZone {
 }
 
 /// Create a [`TimestampWithTimeZone`] from an existing [`Timestamp`] (which is understood to be
-/// in the "current time zone" and a timezone string.
+/// in the "current time zone" and a time zone string.
 impl<Tz: AsRef<str> + UnwindSafe + RefUnwindSafe> TryFrom<(Timestamp, Tz)>
     for TimestampWithTimeZone
 {
@@ -207,7 +207,7 @@ impl TimestampWithTimeZone {
         }
     }
 
-    /// Construct a new [`TimestampWithTimeZone`] from its constituent parts at a specific timezone
+    /// Construct a new [`TimestampWithTimeZone`] from its constituent parts at a specific time zone
     ///
     /// # Errors
     ///
@@ -317,17 +317,17 @@ impl TimestampWithTimeZone {
         (self.hour(), self.minute(), self.second() as u8, self.microseconds())
     }
 
-    /// Shift the [`Timestamp`] to the `UTC` timezone
+    /// Shift the [`Timestamp`] to the `UTC` time zone
     pub fn to_utc(&self) -> Timestamp {
         self.at_timezone("UTC").unwrap()
     }
 
-    /// Shift the [`TimestampWithTimeZone`] to the specified timezone
+    /// Shift the [`TimestampWithTimeZone`] to the specified time zone
     ///
     /// # Errors
     ///
-    /// Returns a [`DateTimeConversionError`] if the specified timezone is invalid or if for some
-    /// other reason the underlying time cannot be represented in the specified timezone
+    /// Returns a [`DateTimeConversionError`] if the specified time zone is invalid or if for some
+    /// other reason the underlying time cannot be represented in the specified time zone
     pub fn at_timezone<Tz: AsRef<str> + UnwindSafe + RefUnwindSafe>(
         &self,
         timezone: Tz,
