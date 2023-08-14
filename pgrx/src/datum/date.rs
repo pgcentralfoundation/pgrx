@@ -62,9 +62,9 @@ impl TryFrom<pg_sys::DateADT> for Date {
     type Error = DateTimeConversionError;
     #[inline]
     fn try_from(value: pg_sys::DateADT) -> Result<Self, Self::Error> {
-        if (i32::MIN+1..-2451545).contains(&value) {
+        if (i32::MIN + 1..-2451545).contains(&value) {
             Err(DateTimeConversionError::FieldOverflow) // but it's an underflow...
-            // actually, more annoying than that, neither overflow nor underflow are accurate
+                                                        // well, underflow isn't right either
         } else if ((2147483494 - 2451545)..i32::MAX).contains(&value) {
             Err(DateTimeConversionError::FieldOverflow)
         } else {
