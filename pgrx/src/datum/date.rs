@@ -20,6 +20,13 @@ use crate::{
     TimestampWithTimeZone, ToIsoString,
 };
 
+const DATETIME_MIN_JULIAN: i32 = pg_sys::DATETIME_MIN_JULIAN as i32;
+const DATE_END_JULIAN: i32 = pg_sys::DATE_END_JULIAN as i32;
+const JULIAN_DAY_ZERO: i32 = DATETIME_MIN_JULIAN - POSTGRES_EPOCH_JDATE;
+const LAST_JULIAN_DAY: i32 = DATE_END_JULIAN as i32 - POSTGRES_EPOCH_JDATE - 1;
+const LT_JULIAN_DAY_ZERO: i32 = JULIAN_DAY_ZERO - 1;
+const GT_LAST_JULIAN_DAY: i32 = LAST_JULIAN_DAY + 1;
+
 pub const POSTGRES_EPOCH_JDATE: i32 = pg_sys::POSTGRES_EPOCH_JDATE as i32;
 pub const UNIX_EPOCH_JDATE: i32 = pg_sys::UNIX_EPOCH_JDATE as i32;
 
@@ -62,13 +69,11 @@ impl TryFrom<pg_sys::DateADT> for Date {
     type Error = DateTimeConversionError;
     #[inline]
     fn try_from(value: pg_sys::DateADT) -> Result<Self, Self::Error> {
-        if (i32::MIN + 1..-2451545).contains(&value) {
-            Err(DateTimeConversionError::FieldOverflow) // but it's an underflow...
-                                                        // well, underflow isn't right either
-        } else if ((2147483494 - 2451545)..i32::MAX).contains(&value) {
-            Err(DateTimeConversionError::FieldOverflow)
-        } else {
-            Ok(Date(value))
+        match value {
+            i32::MIN | i32::MAX | JULIAN_DAY_ZERO..=LAST_JULIAN_DAY => Ok(Date(value)),
+            // these aren't quite overflows, semantically...
+            ..=LT_JULIAN_DAY_ZERO => Err(DateTimeConversionError::FieldOverflow),
+            GT_LAST_JULIAN_DAY.. => Err(DateTimeConversionError::FieldOverflow),
         }
     }
 }
@@ -157,6 +162,17 @@ impl Date {
                 &[year.into_datum(), month.into_datum(), day.into_datum()],
             )
             .unwrap()
+        }
+    }
+
+    /// From Date's raw encoding type (`i32`), construct a valid in-range Date by saturating to
+    /// the nearest `infinity` if out-of-bounds.
+    #[inline]
+    pub fn saturating_from_raw(date_int: pg_sys::DateADT) -> Date {
+        match date_int {
+            ..=LT_JULIAN_DAY_ZERO => Date(i32::MIN),
+            JULIAN_DAY_ZERO..=LAST_JULIAN_DAY => Date(date_int),
+            GT_LAST_JULIAN_DAY.. => Date(i32::MAX),
         }
     }
 

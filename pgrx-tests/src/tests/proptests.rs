@@ -24,11 +24,7 @@ mod tests {
         //    In some cases it actually can be replaced directly by a closure, or, in this case,
         //    it involves using a closure to `prop_map` an existing Strategy for producing
         //    "any kind of i32" into "any kind of in-range value for a Date".
-        let strat = prop::num::i32::ANY.prop_map(|i| {
-            Date::try_from(i).unwrap_or(unsafe {
-                Date::from_pg_epoch_days(i32::clamp(i, -2451545, 2147483494 - 2451546))
-            })
-        });
+        let strat = prop::num::i32::ANY.prop_map(Date::saturating_from_raw);
         // 4. The runner invocation
         proptest
             .run(&strat, |date| {
@@ -61,11 +57,7 @@ mod tests {
     #[pg_test]
     pub fn date_literal_spi_roundtrip() {
         let mut proptest = PgTestRunner::default();
-        let strat = prop::num::i32::ANY.prop_map(|i| {
-            Date::try_from(i).unwrap_or(unsafe {
-                Date::from_pg_epoch_days(i32::clamp(i, -2451545, 2147483494 - 2451546))
-            })
-        });
+        let strat = prop::num::i32::ANY.prop_map(Date::saturating_from_raw);
         proptest
             .run(&strat, |date| {
                 let datum = date.into_datum();
