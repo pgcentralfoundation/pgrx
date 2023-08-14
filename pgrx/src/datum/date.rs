@@ -70,8 +70,8 @@ impl TryFrom<pg_sys::DateADT> for Date {
         match value {
             i32::MIN | i32::MAX | JULIAN_DAY_ZERO..=LAST_JULIAN_DAY => Ok(Date(value)),
             // these aren't quite overflows, semantically...
-            ..=LT_JULIAN_DAY_ZERO => Err(DateTimeConversionError::FieldOverflow),
-            GT_LAST_JULIAN_DAY.. => Err(DateTimeConversionError::FieldOverflow),
+            ..=LT_JULIAN_DAY_ZERO => Err(DateTimeConversionError::OutOfRange),
+            GT_LAST_JULIAN_DAY.. => Err(DateTimeConversionError::OutOfRange),
         }
     }
 }
