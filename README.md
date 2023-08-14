@@ -207,17 +207,19 @@ There are also `IntoDatum` and `FromDatum` traits for implementing additional ty
 along with `#[derive(PostgresType)]` and `#[derive(PostgresEnum)]` for automatic conversion of
 custom types.
 
-Note that `text` and `varchar` are converted to `&str` or `String`, so PGX
-assumes that any Postgres database you use it with has a UTF-8-compatible
-encoding. Currently, PGX will panic if it detects this is incorrect, to inform
-you, the programmer, that you were wrong. However, it is best to not rely on
-this behavior, as UTF-8 validation can be a performance hazard, this event was
-previously assumed to simply not happen, and PGX may decide to change the
-details of how it does UTF-8 validation in the future, as all functions for
-doing so are, in any case, fundamentally `unsafe`. For best results, always use
-PGX with UTF-8, and set database encodings explicitly upon database creation,
-as the default Postgres server encoding, `SQL_ASCII`, will guarantee neither
+Note that `text` and `varchar` are converted to `&str` or `String`, so PGRX
+assumes any Postgres database you use it with has UTF-8-compatible encoding.
+Currently, PGRX will panic if it detects this is incorrect, to inform you, the
+programmer, that you were wrong. However, it is best to not rely on this
+behavior, as UTF-8 validation can be a performance hazard. This problem was
+previously assumed to simply not happen, and PGRX may decide to change the
+details of how it does UTF-8 validation checks in the future in order to
+mitigate performance hazards.
+
+The default Postgres server encoding is `SQL_ASCII`, and it guarantees neither
 ASCII nor UTF-8 (as Postgres will then accept but ignore non-ASCII bytes).
+For best results, always use PGRX with UTF-8, and set database encodings
+explicitly upon database creation.
 
 ## Digging Deeper
 
