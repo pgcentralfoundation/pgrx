@@ -186,7 +186,7 @@ cargo pgrx init
 | `anyarray`                 | `pgrx::AnyArray`                                       |
 | `anyelement`               | `pgrx::AnyElement`                                     |
 | `box`                      | `pgrx::pg_sys::BOX`                                    |
-| `point`                    | `pgrx::pgrx_sys::Point`                                 |
+| `point`                    | `pgrx::pg_sys::Point`                                 |
 | `tid`                      | `pgrx::pg_sys::ItemPointerData`                        |
 | `cstring`                  | `&core::ffi::CStr`                                    |
 | `inet`                     | `pgrx::Inet(String)` -- TODO: needs better support     |
