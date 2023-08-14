@@ -1,7 +1,6 @@
 use crate::proptest::PgTestRunner;
 use pgrx::prelude::*;
 use proptest::prelude::*;
-use proptest::strategy::Strategy;
 
 #[pg_extern]
 pub fn nop_date(date: Date) -> Date {
