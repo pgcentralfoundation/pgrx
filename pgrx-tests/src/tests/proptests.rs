@@ -47,8 +47,9 @@ mod tests {
     // Proptest's "trophy case" for pgrx includes:
     // Demonstrating that existing infallible functions can have fallible results when
     // their code is actually put in contact with the database, as this test, when
-    // initially written, used a simpler `prop_map_into` strategy until it was found
-    // random i32s cause errors
+    // initially written, used a simpler `prop_map_into` strategy.
+    // This revealed that random i32s cause errors when Postgres uses `date_in` on the
+    // date literal string derived from using `date_out`.
     /// Hypothesis: We can ask Postgres to accept i32s in the Date range print its value,
     /// and then get the same i32 back after passing it through SPI as a date literal
     /// Fails on:
