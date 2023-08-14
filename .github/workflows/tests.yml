@@ -473,7 +473,7 @@ jobs:
         cargo pgrx init --pg$PG_VER $(which pg_config)
 
     - name: Run tests
-      run: cargo test --all --features "pg$PG_VER pg_test cshim" --no-default-features
+      run: cargo test --all --features "pg$PG_VER pg_test cshim proptest" --no-default-features
 
     - name: Print sccache stats
       run: sccache --show-stats
