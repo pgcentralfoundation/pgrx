@@ -21,7 +21,7 @@ mod tests {
         // 2. Constructing the Postgres-adapted test runner
         let mut proptest = PgTestRunner::default();
         // 3. A strategy for creating and refining values
-        let strat = prop::num::i32::ANY.prop_map_into::<Date>();
+        let strat = prop::num::i32::ANY.prop_map(|i| Date::try_from(i).unwrap_or(unsafe { Date::from_pg_epoch_days(i32::clamp(i, -2451545, 2147483494 - 2451545)) }));
         // 4. The runner invocation
         proptest
             .run(&strat, |date| {
@@ -41,8 +41,9 @@ mod tests {
 
     // Proptest's "trophy case" for pgrx includes:
     // Demonstrating that existing infallible functions can have fallible results when their code
-    // is actually put in contact with the database
-    /// Hypothesis: We can ask Postgres to accept any i32 as a Date, then print its value,
+    // is actually put in contact with the database, as this test, when initially written, used
+    // a simpler `prop_map_into` strategy until it was found random i32s cause errors
+    /// Hypothesis: We can ask Postgres to accept i32s in the Date range, print its value,
     /// and then get the same i32 back after passing it through SPI as a date literal
     /// Fails on:
     /// - date values between (non-inclusive) i32::MIN and -2451545
@@ -50,7 +51,7 @@ mod tests {
     #[pg_test]
     pub fn date_literal_spi_roundtrip() {
         let mut proptest = PgTestRunner::default();
-        let strat = prop::num::i32::ANY.prop_map_into::<Date>();
+        let strat = prop::num::i32::ANY.prop_map(|i| Date::try_from(i).unwrap_or(unsafe { Date::from_pg_epoch_days(i32::clamp(i, -2451545, 2147483494 - 2451545)) }));
         proptest
             .run(&strat, |date| {
                 let datum = date.into_datum();
