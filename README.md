@@ -163,45 +163,45 @@ cargo pgrx init
 
 ### Mapping of Postgres types to Rust
 
-| Postgres Type              | Rust Type (as `Option<T>`)                            |
-|----------------------------|-------------------------------------------------------|
-| `bytea`                    | `Vec<u8>` or `&[u8]` (zero-copy)                      |
-| `text`                     | `String` or `&str` (zero-copy)                        |
-| `varchar`                  | `String` or `&str` (zero-copy) or `char`              |
-| `"char"`                   | `i8`                                                  |
-| `smallint`                 | `i16`                                                 |
-| `integer`                  | `i32`                                                 |
-| `bigint`                   | `i64`                                                 |
-| `oid`                      | `u32`                                                 |
-| `real`                     | `f32`                                                 |
-| `double precision`         | `f64`                                                 |
-| `bool`                     | `bool`                                                |
-| `json`                     | `pgrx::Json(serde_json::Value)`                        |
-| `jsonb`                    | `pgrx::JsonB(serde_json::Value)`                       |
-| `date`                     | `pgrx::Date`                                           |
-| `time`                     | `pgrx::Time`                                           |
-| `timestamp`                | `pgrx::Timestamp`                                      |
-| `time with time zone`      | `pgrx::TimeWithTimeZone`                               |
-| `timestamp with time zone` | `pgrx::TimestampWithTimeZone`                          |
-| `anyarray`                 | `pgrx::AnyArray`                                       |
-| `anyelement`               | `pgrx::AnyElement`                                     |
-| `box`                      | `pgrx::pg_sys::BOX`                                    |
-| `point`                    | `pgrx::pg_sys::Point`                                 |
-| `tid`                      | `pgrx::pg_sys::ItemPointerData`                        |
-| `cstring`                  | `&core::ffi::CStr`                                    |
-| `inet`                     | `pgrx::Inet(String)` -- TODO: needs better support     |
+| Postgres Type              | Rust Type (as `Option<T>`)                              |
+|----------------------------|---------------------------------------------------------|
+| `bytea`                    | `Vec<u8>` or `&[u8]` (zero-copy)                        |
+| `text`                     | `String` or `&str` (zero-copy)                          |
+| `varchar`                  | `String` or `&str` (zero-copy) or `char`                |
+| `"char"`                   | `i8`                                                    |
+| `smallint`                 | `i16`                                                   |
+| `integer`                  | `i32`                                                   |
+| `bigint`                   | `i64`                                                   |
+| `oid`                      | `u32`                                                   |
+| `real`                     | `f32`                                                   |
+| `double precision`         | `f64`                                                   |
+| `bool`                     | `bool`                                                  |
+| `json`                     | `pgrx::Json(serde_json::Value)`                         |
+| `jsonb`                    | `pgrx::JsonB(serde_json::Value)`                        |
+| `date`                     | `pgrx::Date`                                            |
+| `time`                     | `pgrx::Time`                                            |
+| `timestamp`                | `pgrx::Timestamp`                                       |
+| `time with time zone`      | `pgrx::TimeWithTimeZone`                                |
+| `timestamp with time zone` | `pgrx::TimestampWithTimeZone`                           |
+| `anyarray`                 | `pgrx::AnyArray`                                        |
+| `anyelement`               | `pgrx::AnyElement`                                      |
+| `box`                      | `pgrx::pg_sys::BOX`                                     |
+| `point`                    | `pgrx::pg_sys::Point`                                   |
+| `tid`                      | `pgrx::pg_sys::ItemPointerData`                         |
+| `cstring`                  | `&core::ffi::CStr`                                      |
+| `inet`                     | `pgrx::Inet(String)` -- TODO: needs better support      |
 | `numeric`                  | `pgrx::Numeric<P, S> or pgrx::AnyNumeric`               |
-| `void`                     | `()`                                                  |
-| `ARRAY[]::<type>`          | `Vec<Option<T>>` or `pgrx::Array<T>` (zero-copy)       |
-| `int4range`                | `pgrx::Range<i32>`                                     |
-| `int8range`                | `pgrx::Range<i64>`                                     |
+| `void`                     | `()`                                                    |
+| `ARRAY[]::<type>`          | `Vec<Option<T>>` or `pgrx::Array<T>` (zero-copy)        |
+| `int4range`                | `pgrx::Range<i32>`                                      |
+| `int8range`                | `pgrx::Range<i64>`                                      |
 | `numrange`                 | `pgrx::Range<Numeric<P, S>>` or `pgrx::Range<AnyRange>` |
 | `daterange`                | `pgrx::Range<pgrx::Date>`                               |
 | `tsrange`                  | `pgrx::Range<pgrx::Timestamp>`                          |
 | `tstzrange`                | `pgrx::Range<pgrx::TimestampWithTimeZone>`              |
-| `NULL`                     | `Option::None`                                        |
-| `internal`                 | `pgrx::PgBox<T>` where `T` is any Rust/Postgres struct |
-| `uuid`                     | `pgrx::Uuid([u8; 16])`                                 |
+| `NULL`                     | `Option::None`                                          |
+| `internal`                 | `pgrx::PgBox<T>` where `T` is any Rust/Postgres struct  |
+| `uuid`                     | `pgrx::Uuid([u8; 16])`                                  |
 
 There are also `IntoDatum` and `FromDatum` traits for implementing additional type conversions,
 along with `#[derive(PostgresType)]` and `#[derive(PostgresEnum)]` for automatic conversion of
