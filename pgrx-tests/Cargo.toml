@@ -24,7 +24,7 @@ edition = "2021"
 crate-type = [ "cdylib", "lib" ]
 
 [features]
-default = [ ]
+default = [ "proptest" ]
 pg11 = [ "pgrx/pg11" ]
 pg12 = [ "pgrx/pg12" ]
 pg13 = [ "pgrx/pg13" ]
