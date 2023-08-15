@@ -198,7 +198,7 @@ impl Spi {
     /// queries.  This is detected in such a way that prior mutable commands within this transaction
     /// (even those not executed via pgrx's Spi) will influence whether or not we can consider the
     /// transaction `read_only = true`.  This is what we want as the user will expect an otherwise
-    /// read only statement like SELECT to see the results of prior statements.
+    /// read-only statement like SELECT to see the results of prior statements.
     ///
     /// Postgres docs say:
     ///
