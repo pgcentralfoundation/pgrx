@@ -62,6 +62,36 @@ pub(crate) fn deriving_postgres_hash(ast: DeriveInput) -> syn::Result<proc_macro
     Ok(stream)
 }
 
+/// Derive a Postgres `=` operator from Rust `==`
+///
+/// Note this expansion applies a number of assumptions that may not be true:
+/// - PartialEq::eq is referentially transparent (immutable and parallel-safe)
+/// - PartialEq::ne must reverse PartialEq::eq (negator)
+/// - PartialEq::eq is commutative
+///
+/// Postgres swears that these are just ["optimization hints"], and they can be
+/// defined to use regular SQL or PL/pgSQL functions with spurious results.
+///
+/// However, it is entirely plausible these assumptions actually are venomous.
+/// It is deeply unlikely that we can audit the millions of lines of C code in
+/// Postgres to confirm that it avoids using these assumptions in a way that
+/// would lead to UB or unacceptable behavior from PGRX if Eq is incorrectly
+/// implemented, and we have no realistic means of guaranteeing this.
+///
+/// Further, Postgres adds a disclaimer to these "optimization hints":
+///
+/// ```text
+/// But if you provide them, you must be sure that they are right!
+/// Incorrect use of an optimization clause can result in
+/// slow queries, subtly wrong output, or other Bad Things.
+/// ```
+///
+/// In practice, most Eq impls are in fact correct, referentially transparent,
+/// and commutative. So this note could be for nothing. This signpost is left
+/// in order to guide anyone unfortunate enough to be debugging an issue that
+/// finally leads them here.
+///
+/// ["optimization hints"]: https://www.postgresql.org/docs/current/xoper-optimization.html
 pub fn derive_pg_eq(name: &Ident, path: &proc_macro2::TokenStream) -> proc_macro2::TokenStream {
     let pg_name = Ident::new(&format!("{}_eq", name).to_lowercase(), name.span());
     quote! {
@@ -83,6 +113,14 @@ pub fn derive_pg_eq(name: &Ident, path: &proc_macro2::TokenStream) -> proc_macro
     }
 }
 
+/// Derive a Postgres `<>` operator from Rust `!=`
+///
+/// Note that this expansion applies a number of assumptions that aren't necessarily true:
+/// - PartialEq::ne is referentially transparent (immutable and parallel-safe)
+/// - PartialEq::eq must reverse PartialEq::ne (negator)
+/// - PartialEq::ne is commutative
+///
+/// See `derive_pg_eq` for the implications of this assumption.
 pub fn derive_pg_ne(name: &Ident, path: &proc_macro2::TokenStream) -> proc_macro2::TokenStream {
     let pg_name = Ident::new(&format!("{}_ne", name).to_lowercase(), name.span());
     quote! {
