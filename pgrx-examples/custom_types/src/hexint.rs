@@ -208,4 +208,41 @@ mod tests {
         assert_eq!(value, Some("0x2a".into()));
         Ok(())
     }
+
+    #[pg_test]
+    fn test_hash() {
+        Spi::run(
+            "CREATE TABLE hexintext (
+                id hexint,
+                data TEXT
+            );
+            CREATE TABLE hexint_duo (
+                id hexint,
+                foo_id hexint
+            );
+            INSERT INTO hexintext DEFAULT VALUES;
+            INSERT INTO hexint_duo DEFAULT VALUES;
+            SELECT *
+            FROM hexint_duo
+            JOIN hexintext ON hexint_duo.id = hexintext.id;",
+        )
+        .unwrap();
+    }
+
+    #[pg_test]
+    fn test_commutator() {
+        Spi::run(
+            "CREATE TABLE hexintext (
+                id hexint,
+                data TEXT
+            );
+            CREATE TABLE just_hexint (
+                id hexint
+            );
+            SELECT *
+            FROM just_hexint
+            JOIN hexintext ON just_hexint.id = hexintext.id;",
+        )
+        .unwrap();
+    }
 }

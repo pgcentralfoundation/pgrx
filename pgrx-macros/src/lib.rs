@@ -17,7 +17,7 @@ use quote::{quote, ToTokens};
 use syn::spanned::Spanned;
 use syn::{parse_macro_input, Attribute, Data, DeriveInput, Item, ItemImpl};
 
-use operators::{impl_postgres_eq, impl_postgres_hash, impl_postgres_ord};
+use operators::{deriving_postgres_eq, deriving_postgres_hash, deriving_postgres_ord};
 use pgrx_sql_entity_graph::{
     parse_extern_attributes, CodeEnrichment, ExtensionSql, ExtensionSqlFile, ExternArgs,
     PgAggregate, PgExtern, PostgresEnum, PostgresType, Schema,
@@ -976,11 +976,15 @@ enum DogNames {
 Optionally accepts the following attributes:
 
 * `sql`: Same arguments as [`#[pgrx(sql = ..)]`](macro@pgrx).
+
+# No bounds?
+Unlike some derives, this does not implement a "real" Rust trait, thus
+PostgresEq cannot be used in trait bounds, nor can it be manually implemented.
 */
 #[proc_macro_derive(PostgresEq, attributes(pgrx))]
-pub fn postgres_eq(input: TokenStream) -> TokenStream {
+pub fn derive_postgres_eq(input: TokenStream) -> TokenStream {
     let ast = parse_macro_input!(input as syn::DeriveInput);
-    impl_postgres_eq(ast).unwrap_or_else(syn::Error::into_compile_error).into()
+    deriving_postgres_eq(ast).unwrap_or_else(syn::Error::into_compile_error).into()
 }
 
 /**
@@ -1002,11 +1006,15 @@ enum DogNames {
 Optionally accepts the following attributes:
 
 * `sql`: Same arguments as [`#[pgrx(sql = ..)]`](macro@pgrx).
+
+# No bounds?
+Unlike some derives, this does not implement a "real" Rust trait, thus
+PostgresOrd cannot be used in trait bounds, nor can it be manually implemented.
 */
 #[proc_macro_derive(PostgresOrd, attributes(pgrx))]
-pub fn postgres_ord(input: TokenStream) -> TokenStream {
+pub fn derive_postgres_ord(input: TokenStream) -> TokenStream {
     let ast = parse_macro_input!(input as syn::DeriveInput);
-    impl_postgres_ord(ast).unwrap_or_else(syn::Error::into_compile_error).into()
+    deriving_postgres_ord(ast).unwrap_or_else(syn::Error::into_compile_error).into()
 }
 
 /**
@@ -1025,11 +1033,15 @@ enum DogNames {
 Optionally accepts the following attributes:
 
 * `sql`: Same arguments as [`#[pgrx(sql = ..)]`](macro@pgrx).
+
+# No bounds?
+Unlike some derives, this does not implement a "real" Rust trait, thus
+PostgresHash cannot be used in trait bounds, nor can it be manually implemented.
 */
 #[proc_macro_derive(PostgresHash, attributes(pgrx))]
 pub fn postgres_hash(input: TokenStream) -> TokenStream {
     let ast = parse_macro_input!(input as syn::DeriveInput);
-    impl_postgres_hash(ast).unwrap_or_else(syn::Error::into_compile_error).into()
+    deriving_postgres_hash(ast).unwrap_or_else(syn::Error::into_compile_error).into()
 }
 
 /**

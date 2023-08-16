@@ -14,35 +14,35 @@ use proc_macro2::Ident;
 use quote::{quote, ToTokens};
 use syn::DeriveInput;
 
-fn ident_and_type_path(ast: &DeriveInput) -> (&Ident, proc_macro2::TokenStream) {
+fn ident_and_path(ast: &DeriveInput) -> (&Ident, proc_macro2::TokenStream) {
     let ident = &ast.ident;
     let args = parse_postgres_type_args(&ast.attrs);
-    let type_path = if args.contains(&PostgresTypeAttribute::PgVarlenaInOutFuncs) {
+    let path = if args.contains(&PostgresTypeAttribute::PgVarlenaInOutFuncs) {
         quote! { ::pgrx::datum::PgVarlena<#ident> }
     } else {
         quote! { #ident }
     };
-    (ident, type_path)
+    (ident, path)
 }
 
-pub(crate) fn impl_postgres_eq(ast: DeriveInput) -> syn::Result<proc_macro2::TokenStream> {
+pub(crate) fn deriving_postgres_eq(ast: DeriveInput) -> syn::Result<proc_macro2::TokenStream> {
     let mut stream = proc_macro2::TokenStream::new();
-    let (ident, type_path) = ident_and_type_path(&ast);
-    stream.extend(eq(ident, &type_path));
-    stream.extend(ne(ident, &type_path));
+    let (ident, path) = ident_and_path(&ast);
+    stream.extend(derive_pg_eq(ident, &path));
+    stream.extend(derive_pg_ne(ident, &path));
 
     Ok(stream)
 }
 
-pub(crate) fn impl_postgres_ord(ast: DeriveInput) -> syn::Result<proc_macro2::TokenStream> {
+pub(crate) fn deriving_postgres_ord(ast: DeriveInput) -> syn::Result<proc_macro2::TokenStream> {
     let mut stream = proc_macro2::TokenStream::new();
-    let (ident, type_path) = ident_and_type_path(&ast);
+    let (ident, path) = ident_and_path(&ast);
 
-    stream.extend(lt(ident, &type_path));
-    stream.extend(gt(ident, &type_path));
-    stream.extend(le(ident, &type_path));
-    stream.extend(ge(ident, &type_path));
-    stream.extend(cmp(ident, &type_path));
+    stream.extend(derive_pg_lt(ident, &path));
+    stream.extend(derive_pg_gt(ident, &path));
+    stream.extend(derive_pg_le(ident, &path));
+    stream.extend(derive_pg_ge(ident, &path));
+    stream.extend(derive_pg_cmp(ident, &path));
 
     let sql_graph_entity_item = PostgresOrd::from_derive_input(ast)?;
     sql_graph_entity_item.to_tokens(&mut stream);
@@ -50,11 +50,11 @@ pub(crate) fn impl_postgres_ord(ast: DeriveInput) -> syn::Result<proc_macro2::To
     Ok(stream)
 }
 
-pub(crate) fn impl_postgres_hash(ast: DeriveInput) -> syn::Result<proc_macro2::TokenStream> {
+pub(crate) fn deriving_postgres_hash(ast: DeriveInput) -> syn::Result<proc_macro2::TokenStream> {
     let mut stream = proc_macro2::TokenStream::new();
-    let (ident, type_path) = ident_and_type_path(&ast);
+    let (ident, path) = ident_and_path(&ast);
 
-    stream.extend(hash(ident, &type_path));
+    stream.extend(derive_pg_hash(ident, &path));
 
     let sql_graph_entity_item = PostgresHash::from_derive_input(ast)?;
     sql_graph_entity_item.to_tokens(&mut stream);
@@ -62,40 +62,83 @@ pub(crate) fn impl_postgres_hash(ast: DeriveInput) -> syn::Result<proc_macro2::T
     Ok(stream)
 }
 
-pub fn eq(type_name: &Ident, type_path: &proc_macro2::TokenStream) -> proc_macro2::TokenStream {
-    let pg_name = Ident::new(&format!("{}_eq", type_name).to_lowercase(), type_name.span());
+/// Derive a Postgres `=` operator from Rust `==`
+///
+/// Note this expansion applies a number of assumptions that may not be true:
+/// - PartialEq::eq is referentially transparent (immutable and parallel-safe)
+/// - PartialEq::ne must reverse PartialEq::eq (negator)
+/// - PartialEq::eq is commutative
+///
+/// Postgres swears that these are just ["optimization hints"], and they can be
+/// defined to use regular SQL or PL/pgSQL functions with spurious results.
+///
+/// However, it is entirely plausible these assumptions actually are venomous.
+/// It is deeply unlikely that we can audit the millions of lines of C code in
+/// Postgres to confirm that it avoids using these assumptions in a way that
+/// would lead to UB or unacceptable behavior from PGRX if Eq is incorrectly
+/// implemented, and we have no realistic means of guaranteeing this.
+///
+/// Further, Postgres adds a disclaimer to these "optimization hints":
+///
+/// ```text
+/// But if you provide them, you must be sure that they are right!
+/// Incorrect use of an optimization clause can result in
+/// slow queries, subtly wrong output, or other Bad Things.
+/// ```
+///
+/// In practice, most Eq impls are in fact correct, referentially transparent,
+/// and commutative. So this note could be for nothing. This signpost is left
+/// in order to guide anyone unfortunate enough to be debugging an issue that
+/// finally leads them here.
+///
+/// ["optimization hints"]: https://www.postgresql.org/docs/current/xoper-optimization.html
+pub fn derive_pg_eq(name: &Ident, path: &proc_macro2::TokenStream) -> proc_macro2::TokenStream {
+    let pg_name = Ident::new(&format!("{}_eq", name).to_lowercase(), name.span());
     quote! {
+        #[doc(hidden)]
+        impl ::pgrx::deriving::PostgresEqRequiresTotalEq for #name {}
+
         #[allow(non_snake_case)]
         #[::pgrx::pgrx_macros::pg_operator(immutable, parallel_safe)]
         #[::pgrx::pgrx_macros::opname(=)]
+        #[::pgrx::pgrx_macros::commutator(=)]
         #[::pgrx::pgrx_macros::negator(<>)]
         #[::pgrx::pgrx_macros::restrict(eqsel)]
         #[::pgrx::pgrx_macros::join(eqjoinsel)]
         #[::pgrx::pgrx_macros::merges]
         #[::pgrx::pgrx_macros::hashes]
-        fn #pg_name(left: #type_path, right: #type_path) -> bool {
+        fn #pg_name(left: #path, right: #path) -> bool {
             left == right
         }
     }
 }
 
-pub fn ne(type_name: &Ident, type_path: &proc_macro2::TokenStream) -> proc_macro2::TokenStream {
-    let pg_name = Ident::new(&format!("{}_ne", type_name).to_lowercase(), type_name.span());
+/// Derive a Postgres `<>` operator from Rust `!=`
+///
+/// Note that this expansion applies a number of assumptions that aren't necessarily true:
+/// - PartialEq::ne is referentially transparent (immutable and parallel-safe)
+/// - PartialEq::eq must reverse PartialEq::ne (negator)
+/// - PartialEq::ne is commutative
+///
+/// See `derive_pg_eq` for the implications of this assumption.
+pub fn derive_pg_ne(name: &Ident, path: &proc_macro2::TokenStream) -> proc_macro2::TokenStream {
+    let pg_name = Ident::new(&format!("{}_ne", name).to_lowercase(), name.span());
     quote! {
         #[allow(non_snake_case)]
         #[::pgrx::pgrx_macros::pg_operator(immutable, parallel_safe)]
         #[::pgrx::pgrx_macros::opname(<>)]
+        #[::pgrx::pgrx_macros::commutator(<>)]
         #[::pgrx::pgrx_macros::negator(=)]
         #[::pgrx::pgrx_macros::restrict(neqsel)]
         #[::pgrx::pgrx_macros::join(neqjoinsel)]
-        fn #pg_name(left: #type_path, right: #type_path) -> bool {
+        fn #pg_name(left: #path, right: #path) -> bool {
             left != right
         }
     }
 }
 
-pub fn lt(type_name: &Ident, type_path: &proc_macro2::TokenStream) -> proc_macro2::TokenStream {
-    let pg_name = Ident::new(&format!("{}_lt", type_name).to_lowercase(), type_name.span());
+pub fn derive_pg_lt(name: &Ident, path: &proc_macro2::TokenStream) -> proc_macro2::TokenStream {
+    let pg_name = Ident::new(&format!("{}_lt", name).to_lowercase(), name.span());
     quote! {
         #[allow(non_snake_case)]
         #[::pgrx::pgrx_macros::pg_operator(immutable, parallel_safe)]
@@ -104,15 +147,15 @@ pub fn lt(type_name: &Ident, type_path: &proc_macro2::TokenStream) -> proc_macro
         #[::pgrx::pgrx_macros::commutator(>)]
         #[::pgrx::pgrx_macros::restrict(scalarltsel)]
         #[::pgrx::pgrx_macros::join(scalarltjoinsel)]
-        fn #pg_name(left: #type_path, right: #type_path) -> bool {
+        fn #pg_name(left: #path, right: #path) -> bool {
             left < right
         }
 
     }
 }
 
-pub fn gt(type_name: &Ident, type_path: &proc_macro2::TokenStream) -> proc_macro2::TokenStream {
-    let pg_name = Ident::new(&format!("{}_gt", type_name).to_lowercase(), type_name.span());
+pub fn derive_pg_gt(name: &Ident, path: &proc_macro2::TokenStream) -> proc_macro2::TokenStream {
+    let pg_name = Ident::new(&format!("{}_gt", name).to_lowercase(), name.span());
     quote! {
         #[allow(non_snake_case)]
         #[::pgrx::pgrx_macros::pg_operator(immutable, parallel_safe)]
@@ -121,14 +164,14 @@ pub fn gt(type_name: &Ident, type_path: &proc_macro2::TokenStream) -> proc_macro
         #[::pgrx::pgrx_macros::commutator(<)]
         #[::pgrx::pgrx_macros::restrict(scalargtsel)]
         #[::pgrx::pgrx_macros::join(scalargtjoinsel)]
-        fn #pg_name(left: #type_path, right: #type_path) -> bool {
+        fn #pg_name(left: #path, right: #path) -> bool {
             left > right
         }
     }
 }
 
-pub fn le(type_name: &Ident, type_path: &proc_macro2::TokenStream) -> proc_macro2::TokenStream {
-    let pg_name = Ident::new(&format!("{}_le", type_name).to_lowercase(), type_name.span());
+pub fn derive_pg_le(name: &Ident, path: &proc_macro2::TokenStream) -> proc_macro2::TokenStream {
+    let pg_name = Ident::new(&format!("{}_le", name).to_lowercase(), name.span());
     quote! {
         #[allow(non_snake_case)]
         #[::pgrx::pgrx_macros::pg_operator(immutable, parallel_safe)]
@@ -137,14 +180,14 @@ pub fn le(type_name: &Ident, type_path: &proc_macro2::TokenStream) -> proc_macro
         #[::pgrx::pgrx_macros::commutator(>=)]
         #[::pgrx::pgrx_macros::restrict(scalarlesel)]
         #[::pgrx::pgrx_macros::join(scalarlejoinsel)]
-        fn #pg_name(left: #type_path, right: #type_path) -> bool {
+        fn #pg_name(left: #path, right: #path) -> bool {
             left <= right
         }
     }
 }
 
-pub fn ge(type_name: &Ident, type_path: &proc_macro2::TokenStream) -> proc_macro2::TokenStream {
-    let pg_name = Ident::new(&format!("{}_ge", type_name).to_lowercase(), type_name.span());
+pub fn derive_pg_ge(name: &Ident, path: &proc_macro2::TokenStream) -> proc_macro2::TokenStream {
+    let pg_name = Ident::new(&format!("{}_ge", name).to_lowercase(), name.span());
     quote! {
         #[allow(non_snake_case)]
         #[::pgrx::pgrx_macros::pg_operator(immutable, parallel_safe)]
@@ -153,29 +196,29 @@ pub fn ge(type_name: &Ident, type_path: &proc_macro2::TokenStream) -> proc_macro
         #[::pgrx::pgrx_macros::commutator(<=)]
         #[::pgrx::pgrx_macros::restrict(scalargesel)]
         #[::pgrx::pgrx_macros::join(scalargejoinsel)]
-        fn #pg_name(left: #type_path, right: #type_path) -> bool {
+        fn #pg_name(left: #path, right: #path) -> bool {
             left >= right
         }
     }
 }
 
-pub fn cmp(type_name: &Ident, type_path: &proc_macro2::TokenStream) -> proc_macro2::TokenStream {
-    let pg_name = Ident::new(&format!("{}_cmp", type_name).to_lowercase(), type_name.span());
+pub fn derive_pg_cmp(name: &Ident, path: &proc_macro2::TokenStream) -> proc_macro2::TokenStream {
+    let pg_name = Ident::new(&format!("{}_cmp", name).to_lowercase(), name.span());
     quote! {
         #[allow(non_snake_case)]
         #[::pgrx::pgrx_macros::pg_extern(immutable, parallel_safe)]
-        fn #pg_name(left: #type_path, right: #type_path) -> i32 {
+        fn #pg_name(left: #path, right: #path) -> i32 {
             left.cmp(&right) as i32
         }
     }
 }
 
-pub fn hash(type_name: &Ident, type_path: &proc_macro2::TokenStream) -> proc_macro2::TokenStream {
-    let pg_name = Ident::new(&format!("{}_hash", type_name).to_lowercase(), type_name.span());
+pub fn derive_pg_hash(name: &Ident, path: &proc_macro2::TokenStream) -> proc_macro2::TokenStream {
+    let pg_name = Ident::new(&format!("{}_hash", name).to_lowercase(), name.span());
     quote! {
         #[allow(non_snake_case)]
         #[::pgrx::pgrx_macros::pg_extern(immutable, parallel_safe)]
-        fn #pg_name(value: #type_path) -> i32 {
+        fn #pg_name(value: #path) -> i32 {
             ::pgrx::misc::pgrx_seahash(&value) as i32
         }
     }
