@@ -253,7 +253,7 @@ impl Date {
         !matches!(self.0, pg_sys::DateADT::MIN | pg_sys::DateADT::MAX)
     }
 
-    /// Return the backing [`pg_sy::DateADT`] value.
+    /// Return the backing [`pg_sys::DateADT`] value.
     #[inline]
     pub fn into_inner(self) -> pg_sys::DateADT {
         self.0

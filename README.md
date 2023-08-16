@@ -163,61 +163,63 @@ cargo pgrx init
 
 ### Mapping of Postgres types to Rust
 
-| Postgres Type              | Rust Type (as `Option<T>`)                            |
-|----------------------------|-------------------------------------------------------|
-| `bytea`                    | `Vec<u8>` or `&[u8]` (zero-copy)                      |
-| `text`                     | `String` or `&str` (zero-copy)                        |
-| `varchar`                  | `String` or `&str` (zero-copy) or `char`              |
-| `"char"`                   | `i8`                                                  |
-| `smallint`                 | `i16`                                                 |
-| `integer`                  | `i32`                                                 |
-| `bigint`                   | `i64`                                                 |
-| `oid`                      | `u32`                                                 |
-| `real`                     | `f32`                                                 |
-| `double precision`         | `f64`                                                 |
-| `bool`                     | `bool`                                                |
-| `json`                     | `pgrx::Json(serde_json::Value)`                        |
-| `jsonb`                    | `pgrx::JsonB(serde_json::Value)`                       |
-| `date`                     | `pgrx::Date`                                           |
-| `time`                     | `pgrx::Time`                                           |
-| `timestamp`                | `pgrx::Timestamp`                                      |
-| `time with time zone`      | `pgrx::TimeWithTimeZone`                               |
-| `timestamp with time zone` | `pgrx::TimestampWithTimeZone`                          |
-| `anyarray`                 | `pgrx::AnyArray`                                       |
-| `anyelement`               | `pgrx::AnyElement`                                     |
-| `box`                      | `pgrx::pg_sys::BOX`                                    |
-| `point`                    | `pgrx::pgrx_sys::Point`                                 |
-| `tid`                      | `pgrx::pg_sys::ItemPointerData`                        |
-| `cstring`                  | `&core::ffi::CStr`                                    |
-| `inet`                     | `pgrx::Inet(String)` -- TODO: needs better support     |
+| Postgres Type              | Rust Type (as `Option<T>`)                              |
+|----------------------------|---------------------------------------------------------|
+| `bytea`                    | `Vec<u8>` or `&[u8]` (zero-copy)                        |
+| `text`                     | `String` or `&str` (zero-copy)                          |
+| `varchar`                  | `String` or `&str` (zero-copy) or `char`                |
+| `"char"`                   | `i8`                                                    |
+| `smallint`                 | `i16`                                                   |
+| `integer`                  | `i32`                                                   |
+| `bigint`                   | `i64`                                                   |
+| `oid`                      | `u32`                                                   |
+| `real`                     | `f32`                                                   |
+| `double precision`         | `f64`                                                   |
+| `bool`                     | `bool`                                                  |
+| `json`                     | `pgrx::Json(serde_json::Value)`                         |
+| `jsonb`                    | `pgrx::JsonB(serde_json::Value)`                        |
+| `date`                     | `pgrx::Date`                                            |
+| `time`                     | `pgrx::Time`                                            |
+| `timestamp`                | `pgrx::Timestamp`                                       |
+| `time with time zone`      | `pgrx::TimeWithTimeZone`                                |
+| `timestamp with time zone` | `pgrx::TimestampWithTimeZone`                           |
+| `anyarray`                 | `pgrx::AnyArray`                                        |
+| `anyelement`               | `pgrx::AnyElement`                                      |
+| `box`                      | `pgrx::pg_sys::BOX`                                     |
+| `point`                    | `pgrx::pg_sys::Point`                                   |
+| `tid`                      | `pgrx::pg_sys::ItemPointerData`                         |
+| `cstring`                  | `&core::ffi::CStr`                                      |
+| `inet`                     | `pgrx::Inet(String)` -- TODO: needs better support      |
 | `numeric`                  | `pgrx::Numeric<P, S> or pgrx::AnyNumeric`               |
-| `void`                     | `()`                                                  |
-| `ARRAY[]::<type>`          | `Vec<Option<T>>` or `pgrx::Array<T>` (zero-copy)       |
-| `int4range`                | `pgrx::Range<i32>`                                     |
-| `int8range`                | `pgrx::Range<i64>`                                     |
+| `void`                     | `()`                                                    |
+| `ARRAY[]::<type>`          | `Vec<Option<T>>` or `pgrx::Array<T>` (zero-copy)        |
+| `int4range`                | `pgrx::Range<i32>`                                      |
+| `int8range`                | `pgrx::Range<i64>`                                      |
 | `numrange`                 | `pgrx::Range<Numeric<P, S>>` or `pgrx::Range<AnyRange>` |
 | `daterange`                | `pgrx::Range<pgrx::Date>`                               |
 | `tsrange`                  | `pgrx::Range<pgrx::Timestamp>`                          |
 | `tstzrange`                | `pgrx::Range<pgrx::TimestampWithTimeZone>`              |
-| `NULL`                     | `Option::None`                                        |
-| `internal`                 | `pgrx::PgBox<T>` where `T` is any Rust/Postgres struct |
-| `uuid`                     | `pgrx::Uuid([u8; 16])`                                 |
+| `NULL`                     | `Option::None`                                          |
+| `internal`                 | `pgrx::PgBox<T>` where `T` is any Rust/Postgres struct  |
+| `uuid`                     | `pgrx::Uuid([u8; 16])`                                  |
 
 There are also `IntoDatum` and `FromDatum` traits for implementing additional type conversions,
 along with `#[derive(PostgresType)]` and `#[derive(PostgresEnum)]` for automatic conversion of
 custom types.
 
-Note that `text` and `varchar` are converted to `&str` or `String`, so PGX
-assumes that any Postgres database you use it with has a UTF-8-compatible
-encoding. Currently, PGX will panic if it detects this is incorrect, to inform
-you, the programmer, that you were wrong. However, it is best to not rely on
-this behavior, as UTF-8 validation can be a performance hazard, this event was
-previously assumed to simply not happen, and PGX may decide to change the
-details of how it does UTF-8 validation in the future, as all functions for
-doing so are, in any case, fundamentally `unsafe`. For best results, always use
-PGX with UTF-8, and set database encodings explicitly upon database creation,
-as the default Postgres server encoding, `SQL_ASCII`, will guarantee neither
+Note that `text` and `varchar` are converted to `&str` or `String`, so PGRX
+assumes any Postgres database you use it with has UTF-8-compatible encoding.
+Currently, PGRX will panic if it detects this is incorrect, to inform you, the
+programmer, that you were wrong. However, it is best to not rely on this
+behavior, as UTF-8 validation can be a performance hazard. This problem was
+previously assumed to simply not happen, and PGRX may decide to change the
+details of how it does UTF-8 validation checks in the future in order to
+mitigate performance hazards.
+
+The default Postgres server encoding is `SQL_ASCII`, and it guarantees neither
 ASCII nor UTF-8 (as Postgres will then accept but ignore non-ASCII bytes).
+For best results, always use PGRX with UTF-8, and set database encodings
+explicitly upon database creation.
 
 ## Digging Deeper
 

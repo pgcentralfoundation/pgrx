@@ -352,7 +352,7 @@ fn fixup_homebrew_for_icu(configure_cmd: &mut Command) {
             you may disable ICU support by invoking `cargo pgrx init` with the \
             `--configure-flags=--without-icu` argument, as follows:\n\
             \n\
-            $ cargo pgx init --configure-flag=--without-icu\n\
+            $ cargo pgrx init --configure-flag=--without-icu\n\
             \n\
             However, this is not recommended.\
         ";

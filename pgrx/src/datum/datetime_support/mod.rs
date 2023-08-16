@@ -51,7 +51,7 @@ pub enum DateTimeParts {
 
     /// For timestamp with time zone values, the number of seconds since 1970-01-01 00:00:00 UTC
     /// (negative for timestamps before that); for date and timestamp values, the nominal number of
-    /// seconds since 1970-01-01 00:00:00, without regard to timezone or daylight-savings rules; for
+    /// seconds since 1970-01-01 00:00:00, without regard to time zone or daylight-savings rules; for
     /// interval values, the total number of seconds in the interval
     Epoch,
 
@@ -573,11 +573,11 @@ pub fn get_timezone_offset<Tz: AsRef<str>>(zone: Tz) -> Result<i32, DateTimeConv
 ))]
 pub fn get_timezone_offset<Tz: AsRef<str>>(zone: Tz) -> Result<i32, DateTimeConversionError> {
     /*
-     * Look up the requested timezone.  First we look in the timezone
+     * Look up the requested time zone.  First we look in the time zone
      * abbreviation table (to handle cases like "EST"), and if that fails, we
-     * look in the timezone database (to handle cases like
+     * look in the time zone database (to handle cases like
      * "America/New_York").  (This matches the order in which timestamp input
-     * checks the cases; it's important because the timezone database unwisely
+     * checks the cases; it's important because the time zone database unwisely
      * uses a few zone names that are identical to offset abbreviations.)
      */
     unsafe {
@@ -705,11 +705,11 @@ pub enum DateTimeConversionError {
     FieldOverflow,
     #[error("The date or time is not in the correct format")]
     InvalidFormat,
-    #[error("`{0}` is not a known timezone")]
+    #[error("`{0}` is not a known time zone")]
     UnknownTimezone(String),
-    #[error("`{0} is not a valid timezone offset")]
+    #[error("`{0} is not a valid time zone offset")]
     InvalidTimezoneOffset(Interval),
-    #[error("Encoded timezone string is unknown")]
+    #[error("Encoded time zone string is unknown")]
     CannotParseTimezone,
     /// ERRCODE_DATETIME_VALUE_OUT_OF_RANGE
     #[error("The value is out-of-range for valid instances of this datetime type")]

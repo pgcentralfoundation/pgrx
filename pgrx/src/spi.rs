@@ -196,9 +196,9 @@ pub struct Spi;
 impl Spi {
     /// Determines if the current transaction can still be `read_only = true` for purposes of Spi
     /// queries.  This is detected in such a way that prior mutable commands within this transaction
-    /// (even those not executed via pgx' Spi) will influence whether or not we con consider the
+    /// (even those not executed via pgrx's Spi) will influence whether or not we can consider the
     /// transaction `read_only = true`.  This is what we want as the user will expect an otherwise
-    /// read only statement like SELECT to see the results of prior statements.
+    /// read-only statement like SELECT to see the results of prior statements.
     ///
     /// Postgres docs say:
     ///
@@ -208,7 +208,7 @@ impl Spi {
     ///    would not see the results of any database updates done by the read-write queries.
     ///```
     ///
-    /// pgx interprets this to mean:
+    /// pgrx interprets this to mean:
     /// ```text
     ///    Within a transaction, it's fine to execute Spi commands as `read_only = true` until the
     ///    first mutable statement (DDL or DML).  From that point forward **all** statements
