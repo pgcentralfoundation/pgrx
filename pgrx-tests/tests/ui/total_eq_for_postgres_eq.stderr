@@ -1,0 +1,16 @@
+error[E0277]: the trait bound `BrokenType: std::cmp::Eq` is not satisfied
+ --> tests/ui/total_eq_for_postgres_eq.rs:4:8
+  |
+4 | struct BrokenType {
+  |        ^^^^^^^^^^ the trait `std::cmp::Eq` is not implemented for `BrokenType`
+  |
+note: required by a bound in `PostgresEqRequiresTotalEq`
+ --> $WORKSPACE/pgrx/src/deriving.rs
+  |
+  | pub trait PostgresEqRequiresTotalEq: Eq {}
+  |                                      ^^ required by this bound in `PostgresEqRequiresTotalEq`
+help: consider annotating `BrokenType` with `#[derive(Eq)]`
+  |
+4 + #[derive(Eq)]
+5 | struct BrokenType {
+  |

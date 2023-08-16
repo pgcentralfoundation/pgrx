@@ -43,6 +43,7 @@ pub mod atomics;
 pub mod bgworkers;
 pub mod callbacks;
 pub mod datum;
+pub mod deriving;
 pub mod enum_helper;
 pub mod fcinfo;
 pub mod ffi;

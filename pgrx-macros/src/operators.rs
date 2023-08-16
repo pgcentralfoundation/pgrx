@@ -65,6 +65,9 @@ pub(crate) fn deriving_postgres_hash(ast: DeriveInput) -> syn::Result<proc_macro
 pub fn derive_pg_eq(name: &Ident, path: &proc_macro2::TokenStream) -> proc_macro2::TokenStream {
     let pg_name = Ident::new(&format!("{}_eq", name).to_lowercase(), name.span());
     quote! {
+        #[doc(hidden)]
+        impl ::pgrx::deriving::PostgresEqRequiresTotalEq for #name {}
+
         #[allow(non_snake_case)]
         #[::pgrx::pgrx_macros::pg_operator(immutable, parallel_safe)]
         #[::pgrx::pgrx_macros::opname(=)]
