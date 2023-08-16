@@ -697,11 +697,13 @@ pub enum IntervalConversionError {
     IntervalTooLarge,
 }
 
+/// A problem converting a value into a datetime format
 #[derive(thiserror::Error, Debug, PartialEq, Eq)]
 pub enum DateTimeConversionError {
+    /// ERRCODE_DATETIME_FIELD_OVERFLOW
     #[error("Some part of the date or time is too large")]
     FieldOverflow,
-    #[error("THe date or time is not in the correct format")]
+    #[error("The date or time is not in the correct format")]
     InvalidFormat,
     #[error("`{0}` is not a known timezone")]
     UnknownTimezone(String),
@@ -709,4 +711,7 @@ pub enum DateTimeConversionError {
     InvalidTimezoneOffset(Interval),
     #[error("Encoded timezone string is unknown")]
     CannotParseTimezone,
+    /// ERRCODE_DATETIME_VALUE_OUT_OF_RANGE
+    #[error("The value is out-of-range for valid instances of this datetime type")]
+    OutOfRange,
 }

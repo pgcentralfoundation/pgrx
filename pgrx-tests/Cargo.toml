@@ -24,7 +24,7 @@ edition = "2021"
 crate-type = [ "cdylib", "lib" ]
 
 [features]
-default = [ ]
+default = [ "proptest" ]
 pg11 = [ "pgrx/pg11" ]
 pg12 = [ "pgrx/pg12" ]
 pg13 = [ "pgrx/pg13" ]
@@ -32,11 +32,12 @@ pg14 = [ "pgrx/pg14" ]
 pg15 = [ "pgrx/pg15" ]
 pg16 = [ "pgrx/pg16" ]
 pg_test = [ ]
+proptest = [ "dep:proptest" ]
 cshim = [ "pgrx/cshim" ]
 no-schema-generation = [ "pgrx/no-schema-generation", "pgrx-macros/no-schema-generation" ]
 
 [package.metadata.docs.rs]
-features = ["pg14"]
+features = ["pg14", "proptest"]
 no-default-features = true
 targets = ["x86_64-unknown-linux-gnu"]
 # Enable `#[cfg(docsrs)]` (https://docs.rs/about/builds#cross-compiling)
@@ -51,6 +52,7 @@ libc = "0.2.147"
 pgrx-macros = { path = "../pgrx-macros", version = "=0.10.0-beta.3" }
 pgrx-pg-config = { path = "../pgrx-pg-config", version = "=0.10.0-beta.3" }
 postgres = "0.19.5"
+proptest = { version = "1", optional = true }
 regex = "1.9.3"
 serde = "1.0"
 serde_json = "1.0"

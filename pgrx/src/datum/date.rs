@@ -20,6 +20,11 @@ use crate::{
     TimestampWithTimeZone, ToIsoString,
 };
 
+const JULIAN_DAY_ZERO: i32 = pg_sys::DATETIME_MIN_JULIAN as i32 - POSTGRES_EPOCH_JDATE;
+const LAST_JULIAN_DAY: i32 = pg_sys::DATE_END_JULIAN as i32 - POSTGRES_EPOCH_JDATE - 1;
+const LT_JULIAN_DAY_ZERO: i32 = JULIAN_DAY_ZERO - 1;
+const GT_LAST_JULIAN_DAY: i32 = LAST_JULIAN_DAY + 1;
+
 pub const POSTGRES_EPOCH_JDATE: i32 = pg_sys::POSTGRES_EPOCH_JDATE as i32;
 pub const UNIX_EPOCH_JDATE: i32 = pg_sys::UNIX_EPOCH_JDATE as i32;
 
@@ -27,23 +32,6 @@ pub const UNIX_EPOCH_JDATE: i32 = pg_sys::UNIX_EPOCH_JDATE as i32;
 #[derive(Debug, Copy, Clone)]
 #[repr(transparent)]
 pub struct Date(pg_sys::DateADT);
-
-/// Create a [`Date`] from a [`pg_sys::DateADT`]
-///
-/// Note that [`pg_sys::DateADT`] is an `i32` as a day offset from the "Postgres epoch".
-/// This impl currently allows producing a `Date` that cannot be made via SQL,
-/// such as a date before "Julian day zero".
-///
-/// The details of the encoding may also prove surprising, for instance:
-/// - It is not a Gregorian calendar date, but rather a Julian day
-/// - There is no "year zero", so Postgres defines the offset of -2000 years as 1 BC instead
-/// - Some values such as `i32::MIN` and `i32::MAX` have special meanings as infinities
-impl From<pg_sys::DateADT> for Date {
-    #[inline]
-    fn from(value: pg_sys::DateADT) -> Self {
-        Date(value)
-    }
-}
 
 impl From<Date> for pg_sys::DateADT {
     #[inline]
@@ -61,6 +49,30 @@ impl From<Timestamp> for Date {
 impl From<TimestampWithTimeZone> for Date {
     fn from(value: TimestampWithTimeZone) -> Self {
         unsafe { direct_function_call(pg_sys::timestamptz_date, &[value.into_datum()]).unwrap() }
+    }
+}
+
+/// Create a [`Date`] from a [`pg_sys::DateADT`]
+///
+/// Note that [`pg_sys::DateADT`] is an `i32` as a Julian day offset from the "Postgres epoch".
+///
+/// The details of the encoding may also prove surprising, for instance:
+/// - It is not a Gregorian calendar date, but rather a Julian day
+/// - Despite having the numerical range for it, it does not support values before Julian day 0
+///   (4713 BC, January 1), nor does it support many values far into the future.
+/// - There is no "year zero" in either the Julian or the Gregorian calendars,
+///   so you may have to account for a "skip" from 1 BC to 1 AD
+/// - Some values such as `i32::MIN` and `i32::MAX` have special meanings as infinities
+impl TryFrom<pg_sys::DateADT> for Date {
+    type Error = DateTimeConversionError;
+    #[inline]
+    fn try_from(value: pg_sys::DateADT) -> Result<Self, Self::Error> {
+        match value {
+            i32::MIN | i32::MAX | JULIAN_DAY_ZERO..=LAST_JULIAN_DAY => Ok(Date(value)),
+            // these aren't quite overflows, semantically...
+            ..=LT_JULIAN_DAY_ZERO => Err(DateTimeConversionError::OutOfRange),
+            GT_LAST_JULIAN_DAY.. => Err(DateTimeConversionError::OutOfRange),
+        }
     }
 }
 
@@ -148,6 +160,17 @@ impl Date {
                 &[year.into_datum(), month.into_datum(), day.into_datum()],
             )
             .unwrap()
+        }
+    }
+
+    /// From Date's raw encoding type (`i32`), construct a valid in-range Date by saturating to
+    /// the nearest `infinity` if out-of-bounds.
+    #[inline]
+    pub fn saturating_from_raw(date_int: pg_sys::DateADT) -> Date {
+        match date_int {
+            ..=LT_JULIAN_DAY_ZERO => Date(i32::MIN),
+            JULIAN_DAY_ZERO..=LAST_JULIAN_DAY => Date(date_int),
+            GT_LAST_JULIAN_DAY.. => Date(i32::MAX),
         }
     }
 
