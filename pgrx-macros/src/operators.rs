@@ -220,12 +220,13 @@ pub fn derive_pg_cmp(name: &Ident, path: &proc_macro2::TokenStream) -> proc_macr
 /// To quote the std documentation:
 ///
 /// "When implementing both Hash and Eq, it is important that the following property holds:
-/// ```
+/// ```text
 /// k1 == k2 -> hash(k1) == hash(k2)
 /// ```
 /// In other words, if two keys are equal, their hashes must also be equal. HashMap and HashSet both rely on this behavior."
 ///
-/// Postgres is no different: this hashing is for the explicit purpose of equality checks.
+/// Postgres is no different: this hashing is for the explicit purpose of equality checks,
+/// and it also needs to be able to reason from hash equality to actual equality.
 pub fn derive_pg_hash(name: &Ident, path: &proc_macro2::TokenStream) -> proc_macro2::TokenStream {
     let pg_name = Ident::new(&format!("{}_hash", name).to_lowercase(), name.span());
     quote! {
