@@ -7,7 +7,7 @@ pub struct BrokenType {
 }
 
 impl BrokenType {
-    fn cmp(&mut self, _other: &Self) -> Anything {
+    fn cmp(self, _other: &Self) -> Anything {
         Anything::Whatever
     }
 }
