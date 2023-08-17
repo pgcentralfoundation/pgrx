@@ -1,45 +1,20 @@
-use core::cmp::Ordering;
 use pgrx::prelude::*;
-use serde::{Deserialize, Serialize};
+use serde::{Serialize, Deserialize};
 
-#[derive(Copy, Clone, Serialize, Deserialize, PartialEq, PartialOrd, PostgresType, PostgresOrd)]
+#[derive(Serialize, Deserialize, PartialEq, PartialOrd, PostgresType, PostgresOrd)]
 pub struct BrokenType {
     int: i32,
 }
 
-impl Iterator for BrokenType {
-    type Item = i32;
-
-    fn next(&mut self) -> Option<Self::Item> {
-        todo!()
-    }
-
-    // Previously, this fn could win over Ord::cmp in trait resolution
-    fn cmp<I>(self, _rhs: I) -> Ordering
-    where
-        I: IntoIterator<Item = Self::Item>,
-    {
-        todo!()
+impl BrokenType {
+    fn cmp(&mut self, _other: &Self) -> Anything {
+        Anything::Whatever
     }
 }
 
-impl IntoIterator for &BrokenType {
-    type Item = i32;
-    type IntoIter = BrokenIter;
-
-    fn into_iter(self) -> BrokenIter {
-        todo!()
-    }
-}
-
-pub struct BrokenIter {}
-
-impl Iterator for BrokenIter {
-    type Item = i32;
-
-    fn next(&mut self) -> Option<Self::Item> {
-        todo!()
-    }
+#[repr(u8)]
+enum Anything {
+    Whatever = 0,
 }
 
 fn main() {}
