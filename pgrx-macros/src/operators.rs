@@ -208,7 +208,7 @@ pub fn derive_pg_cmp(name: &Ident, path: &proc_macro2::TokenStream) -> proc_macr
         #[allow(non_snake_case)]
         #[::pgrx::pgrx_macros::pg_extern(immutable, parallel_safe)]
         fn #pg_name(left: #path, right: #path) -> i32 {
-            left.cmp(&right) as i32
+            ::core::cmp::Ord::cmp(&left, &right) as i32
         }
     }
 }
