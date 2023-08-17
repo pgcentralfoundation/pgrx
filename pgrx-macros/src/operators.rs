@@ -213,12 +213,28 @@ pub fn derive_pg_cmp(name: &Ident, path: &proc_macro2::TokenStream) -> proc_macr
     }
 }
 
+/// Derive a Postgres hash operator using a provided hash function
+///
+/// # HashEq?
+///
+/// To quote the std documentation:
+///
+/// "When implementing both Hash and Eq, it is important that the following property holds:
+/// ```
+/// k1 == k2 -> hash(k1) == hash(k2)
+/// ```
+/// In other words, if two keys are equal, their hashes must also be equal. HashMap and HashSet both rely on this behavior."
+///
+/// Postgres is no different: this hashing is for the explicit purpose of equality checks.
 pub fn derive_pg_hash(name: &Ident, path: &proc_macro2::TokenStream) -> proc_macro2::TokenStream {
     let pg_name = Ident::new(&format!("{}_hash", name).to_lowercase(), name.span());
     quote! {
         #[allow(non_snake_case)]
         #[::pgrx::pgrx_macros::pg_extern(immutable, parallel_safe)]
-        fn #pg_name(value: #path) -> i32 {
+        fn #pg_name(value: #path) -> i32
+        where
+            #path: ::core::hash::Hash + ::core::cmp::Eq,
+        {
             ::pgrx::misc::pgrx_seahash(&value) as i32
         }
     }
