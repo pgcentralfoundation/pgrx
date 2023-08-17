@@ -1,7 +1,8 @@
 use pgrx::prelude::*;
+use serde::{Serialize, Deserialize};
 
-#[derive(PartialEq, PostgresEq)]
-struct BrokenType {
+#[derive(Serialize, Deserialize, PartialEq, PostgresType, PostgresEq)]
+pub struct BrokenType {
     int: i32,
 }
 
