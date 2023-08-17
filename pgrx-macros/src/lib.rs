@@ -1039,7 +1039,7 @@ Unlike some derives, this does not implement a "real" Rust trait, thus
 PostgresHash cannot be used in trait bounds, nor can it be manually implemented.
 */
 #[proc_macro_derive(PostgresHash, attributes(pgrx))]
-pub fn postgres_hash(input: TokenStream) -> TokenStream {
+pub fn derive_postgres_hash(input: TokenStream) -> TokenStream {
     let ast = parse_macro_input!(input as syn::DeriveInput);
     deriving_postgres_hash(ast).unwrap_or_else(syn::Error::into_compile_error).into()
 }
