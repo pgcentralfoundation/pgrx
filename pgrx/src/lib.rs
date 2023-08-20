@@ -45,6 +45,8 @@ pub mod callbacks;
 pub mod datum;
 pub mod deriving;
 pub mod enum_helper;
+#[cfg(feature = "cshim")]
+pub mod fcall;
 pub mod fcinfo;
 pub mod ffi;
 pub mod guc;
