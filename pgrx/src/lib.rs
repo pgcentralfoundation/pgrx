@@ -44,6 +44,8 @@ pub mod bgworkers;
 pub mod callbacks;
 pub mod datum;
 pub mod enum_helper;
+#[cfg(feature = "cshim")]
+pub mod fcall;
 pub mod fcinfo;
 pub mod ffi;
 pub mod guc;
