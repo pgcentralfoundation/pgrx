@@ -10,7 +10,7 @@
  
 [package]
 name = "pgrx-sql-entity-graph"
-version = "0.10.0-beta.3"
+version = "0.10.0-beta.4"
 authors = ["PgCentral Foundation, Inc. <contact@pgcentral.org>"]
 license = "MIT"
 description = "Sql Entity Graph for `pgrx`"
@@ -27,9 +27,9 @@ no-schema-generation = []
 [dependencies]
 convert_case = "0.6.0"
 eyre = "0.6.8"
-petgraph = "0.6.3"
+petgraph = "0.6.4"
 proc-macro2 = { version = "1.0.66", features = [ "span-locations" ] }
-quote = "1.0.32"
+quote = "1.0.33"
 syn = { version = "1.0.109", features = [ "extra-traits", "full", "fold", "parsing" ] }
 unescape = "0.1.0"
 
