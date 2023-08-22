@@ -12,8 +12,121 @@
 //! It functions similarly to a Rust [`Vec`][std::vec::Vec], including iterator support, but provides separate
 //! understandings of [`List`][crate::pg_sys::List]s of [`Oid`][crate::pg_sys::Oid]s, Integers, and Pointers.
 
+use pg_sys::NodeTag;
+
 use crate::{is_a, pg_sys, void_mut_ptr};
+use core::ffi;
+use core::ops::{Index, IndexMut};
+use core::ptr::NonNull;
 use std::marker::PhantomData;
+
+/// The List type from Postgres, lifted into Rust
+/// Note: you may want the ListHead type
+pub enum List<T> {
+    Nil,
+    Cons(ListHead<T>),
+}
+
+pub struct ListHead<T> {
+    list: NonNull<pg_sys::List>,
+    _type: PhantomData<[T]>,
+}
+
+mod seal {
+    pub trait Sealed {}
+}
+
+pub unsafe trait Listable: seal::Sealed + Sized {
+    fn matching_tag(tag: pg_sys::NodeTag) -> bool;
+}
+
+impl seal::Sealed for *mut ffi::c_void {}
+unsafe impl Listable for *mut ffi::c_void {
+    fn matching_tag(tag: pg_sys::NodeTag) -> bool {
+        matches!(tag, pg_sys::NodeTag::T_List)
+    }
+}
+
+impl seal::Sealed for ffi::c_int {}
+unsafe impl Listable for ffi::c_int {
+    fn matching_tag(tag: pg_sys::NodeTag) -> bool {
+        matches!(tag, pg_sys::NodeTag::T_IntList)
+    }
+}
+impl seal::Sealed for pg_sys::Oid {}
+unsafe impl Listable for pg_sys::Oid {
+    fn matching_tag(tag: pg_sys::NodeTag) -> bool {
+        matches!(tag, pg_sys::NodeTag::T_OidList)
+    }
+}
+
+#[cfg(feature = "pg16")]
+impl seal::Sealed for pg_sys::TransactionId {}
+#[cfg(feature = "pg16")]
+unsafe impl Listable for pg_sys::TransactionId {
+    fn matching_tag(tag: pg_sys::NodeTag) -> bool {
+        matches!(tag, pg_sys::NodeTag::T_XidList)
+    }
+}
+
+impl<T: Listable> List<T> {
+    /// Attempt to obtain a `List<T>` from a `*mut pg_sys::List`
+    ///
+    /// This may be somewhat confusing:
+    /// A valid List of any type is the null pointer, as in the Lisp `(car, cdr)` representation.
+    /// This remains true even after significant reworks of the List type in Postgres 13, which
+    /// cause it to internally use a "flat array" representation.
+    ///
+    /// Thus, this returns `Some` even if the List is NULL, because it is `Some(List::Nil)`
+    ///
+    /// # Safety
+    /// This assumes the pointer is either NULL or the NodeTag is valid to read
+    pub unsafe fn downcast_nullable(ptr: *mut pg_sys::List) -> Option<List<T>> {
+        match NonNull::new(ptr) {
+            None => Some(List::Nil),
+            Some(list) => T::matching_tag((*ptr).type_)
+                .then_some(List::Cons(ListHead { list, _type: PhantomData })),
+        }
+    }
+}
+
+impl<T: Listable> ListHead<T> {
+    // pub unsafe fn downcast_nullable(list: *mut pg_sys::List) -> Result<ListHead<T>, ListErr> {
+
+    // }
+
+    pub unsafe fn downcast_ptr(list: NonNull<pg_sys::List>) -> Option<ListHead<T>> {
+        T::matching_tag((*list.as_ptr()).type_).then_some(ListHead { list, _type: PhantomData })
+    }
+}
+
+impl<T> Index<usize> for ListHead<T> {
+    type Output = T;
+
+    fn index(&self, index: usize) -> &Self::Output {
+        todo!()
+    }
+}
+
+impl<T> IndexMut<usize> for ListHead<T> {
+    fn index_mut(&mut self, index: usize) -> &mut Self::Output {
+        todo!()
+    }
+}
+
+impl<T> Index<ffi::c_int> for ListHead<T> {
+    type Output = T;
+
+    fn index(&self, index: ffi::c_int) -> &Self::Output {
+        todo!()
+    }
+}
+
+impl<T> IndexMut<ffi::c_int> for ListHead<T> {
+    fn index_mut(&mut self, index: ffi::c_int) -> &mut Self::Output {
+        todo!()
+    }
+}
 
 pub struct PgList<T> {
     list: *mut pg_sys::List,
