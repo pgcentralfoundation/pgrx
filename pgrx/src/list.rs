@@ -12,8 +12,6 @@
 //! It functions similarly to a Rust [`Vec`][std::vec::Vec], including iterator support, but provides separate
 //! understandings of [`List`][crate::pg_sys::List]s of [`Oid`][crate::pg_sys::Oid]s, Integers, and Pointers.
 
-use pg_sys::NodeTag;
-
 use crate::{is_a, pg_sys, void_mut_ptr};
 use core::ffi;
 use core::ops::{Index, IndexMut};
@@ -25,6 +23,12 @@ use std::marker::PhantomData;
 pub enum List<T> {
     Nil,
     Cons(ListHead<T>),
+}
+
+pub enum ListErr {
+    Nil,
+    WrongType,
+    WrongNodeKind,
 }
 
 pub struct ListHead<T> {
@@ -53,6 +57,7 @@ unsafe impl Listable for ffi::c_int {
         matches!(tag, pg_sys::NodeTag::T_IntList)
     }
 }
+
 impl seal::Sealed for pg_sys::Oid {}
 unsafe impl Listable for pg_sys::Oid {
     fn matching_tag(tag: pg_sys::NodeTag) -> bool {
@@ -69,6 +74,14 @@ unsafe impl Listable for pg_sys::TransactionId {
     }
 }
 
+/// Note the absence of `impl Default for ListHead`:
+/// it must initialize at least 1 element to be created at all
+impl<T> Default for List<T> {
+    fn default() -> List<T> {
+        List::Nil
+    }
+}
+
 impl<T: Listable> List<T> {
     /// Attempt to obtain a `List<T>` from a `*mut pg_sys::List`
     ///
@@ -77,11 +90,12 @@ impl<T: Listable> List<T> {
     /// This remains true even after significant reworks of the List type in Postgres 13, which
     /// cause it to internally use a "flat array" representation.
     ///
-    /// Thus, this returns `Some` even if the List is NULL, because it is `Some(List::Nil)`
+    /// Thus, this returns `Some` even if the List is NULL, because it is `Some(List::Nil)`,
+    /// and returns `None` only if the List is non-NULL but has an invalid tag!
     ///
     /// # Safety
     /// This assumes the pointer is either NULL or the NodeTag is valid to read
-    pub unsafe fn downcast_nullable(ptr: *mut pg_sys::List) -> Option<List<T>> {
+    pub unsafe fn from_ptr(ptr: *mut pg_sys::List) -> Option<List<T>> {
         match NonNull::new(ptr) {
             None => Some(List::Nil),
             Some(list) => T::matching_tag((*ptr).type_)
@@ -90,11 +104,28 @@ impl<T: Listable> List<T> {
     }
 }
 
+impl<T> List<T> {
+    pub fn len(&self) -> usize {
+        match self {
+            List::Nil => 0,
+            List::Cons(head) => head.len(),
+        }
+    }
+}
+
+impl<T> ListHead<T> {
+    pub fn len(&self) -> usize {
+        unsafe { self.list.as_ref().length as usize }
+    }
+
+    pub fn capacity(&self) -> usize {
+        unsafe { self.list.as_ref().max_length as usize }
+    }
+}
+// pub unsafe fn downcast_nullable(list: *mut pg_sys::List) -> Result<ListHead<T>, ListErr> {
+
+// }
 impl<T: Listable> ListHead<T> {
-    // pub unsafe fn downcast_nullable(list: *mut pg_sys::List) -> Result<ListHead<T>, ListErr> {
-
-    // }
-
     pub unsafe fn downcast_ptr(list: NonNull<pg_sys::List>) -> Option<ListHead<T>> {
         T::matching_tag((*list.as_ptr()).type_).then_some(ListHead { list, _type: PhantomData })
     }
