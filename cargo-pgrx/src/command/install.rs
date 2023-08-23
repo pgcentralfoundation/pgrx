@@ -161,16 +161,19 @@ pub(crate) fn install_extension(
         };
         dest.push(format!("{}.so", so_name));
 
-        if cfg!(target_os = "macos") {
-            // Remove the existing .so if present. This is a workaround for an
-            // issue highlighted by the following apple documentation:
-            // https://developer.apple.com/documentation/security/updating_mac_software
-            if dest.exists() {
-                std::fs::remove_file(&dest).wrap_err_with(|| {
-                    format!("unable to remove existing file {}", dest.display())
-                })?;
-            }
+        // Remove the existing .so if present. This is a workaround for an
+        // issue highlighted by the following apple documentation:
+        // https://developer.apple.com/documentation/security/updating_mac_software
+        //
+        // for Linux, dlopen(2) will use mmap to load the .so.
+        // if update the file in place, the modification will pass into the running
+        // process which will mash up all pointers in the .TEXT segment.
+        // this simulate linux's install(1) behavior
+        if dest.exists() {
+            std::fs::remove_file(&dest)
+                .wrap_err_with(|| format!("unable to remove existing file {}", dest.display()))?;
         }
+
         copy_file(&shlibpath, &dest, "shared library", false, &package_manifest_path)?;
     }
 
