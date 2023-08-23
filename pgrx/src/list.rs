@@ -38,6 +38,14 @@ mod flat_list {
     /// A strongly-typed ListCell
     #[repr(transparent)]
     pub struct ListCell<T> {
+        // It is important that we are able to treat this union as effectively synonymous with T!
+        // Thus it is important that we
+        // - do not hand out the ability to construct arbitrary ListCell<T>
+        // - do not offer casting between types of List<T> (which offer [ListCell<T>])
+        // - do not even upgrade from pg_sys::{List, ListCell} to pgrx::list::{List, ListCell}
+        // UNLESS the relevant safety invariants are appropriately handled!
+        // It is not even okay to do this for FFI! We must check any *mut pg_sys::List from FFI,
+        // to guarantee it has the expected type tag, otherwise the union cells may be garbage.
         cell: pg_sys::ListCell,
         _type: PhantomData<T>,
     }
@@ -50,16 +58,18 @@ mod flat_list {
         type Target = T;
 
         fn deref(&self) -> &Self::Target {
-            // SAFETY: We perform an upgrade to *mut here, but this doesn't matter:
-            // we started with a proper reference and Enlist::apoptosis is "pure"
-            // pointer arithmetic without any read-at-type assertions
+            // SAFETY: A brief upgrade of readonly &ListCell<T> to writable *mut pg_sys::ListCell
+            // may seem sus, but is fine: Enlist::apoptosis is defined as pure casting/arithmetic.
+            // So the pointer begins and ends without write permission, and
+            // we essentially just reborrowing a ListCell as its inner field type
             unsafe { &*T::apoptosis(&self.cell as *const _ as *mut _) }
         }
     }
 
     impl<T: Enlist> DerefMut for ListCell<T> {
         fn deref_mut(&mut self) -> &mut Self::Target {
-            // SAFETY: We essentially "just" reborrow a ListCell as its inner field type
+            // SAFETY: we essentially just reborrow a ListCell as its inner field type which
+            // only relies on pgrx::list::{Enlist, List, ListCell} maintaining safety invariants
             unsafe { &mut *T::apoptosis(&mut self.cell) }
         }
     }
@@ -79,11 +89,15 @@ mod flat_list {
         pub trait Sealed {}
     }
 
+    /// The bound to describe a type which may be used in a Postgres List
+    /// It must know what an appropriate type tag is, and how to pointer-cast to itself
     pub unsafe trait Enlist: seal::Sealed + Sized {
         fn matching_tag(tag: pg_sys::NodeTag) -> bool;
 
-        /// From a pointer to the `pg_sys::ListCell` union, obtain a pointer to Self
-        /// I think this isn't actually unsafe?
+        /// From a pointer to the pg_sys::ListCell union, obtain a pointer to Self
+        /// I think this isn't actually unsafe, it just has an unsafe impl invariant?
+        /// It must be implemented with ptr::addr_of! or similar, without reborrowing
+        /// so that it may be used without regard to whether a pointer is write-capable
         unsafe fn apoptosis(cell: *mut pg_sys::ListCell) -> *mut Self;
     }
 
