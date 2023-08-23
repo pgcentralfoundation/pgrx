@@ -5,8 +5,8 @@ use std::time::Duration;
 pgrx::pg_module_magic!();
 
 /*
-In order to use this bgworker with pgrx, you'll need to edit the proper `postgresql.conf` file in
-`~/.pgrx/data-PGVER/postgresql.conf` and add this line to the end:
+In order to use this bgworker with a cargo-pgrx managed database, you'll need to add this line to
+"$PGRX_HOME/data-$PGVER/postgresql.conf" if the `shared_preload_libraries` entry is absent:
 
 ```
 shared_preload_libraries = '{name}.so'
@@ -15,7 +15,7 @@ shared_preload_libraries = '{name}.so'
 Background workers *must* be initialized in the extension's `_PG_init()` function, and can *only*
 be started if loaded through the `shared_preload_libraries` configuration setting.
 
-Executing `cargo pgrx run <PGVER>` will, when it restarts the specified Postgres instance, also start
+Executing `cargo pgrx run "$PGVER"` will, when it restarts the specified Postgres instance, also start
 this background worker
 */
 
