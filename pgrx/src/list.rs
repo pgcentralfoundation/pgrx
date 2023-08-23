@@ -16,17 +16,17 @@ use crate::{is_a, pg_sys, void_mut_ptr};
 use std::marker::PhantomData;
 
 #[cfg(any(feature = "pg13", feature = "pg14", feature = "pg15", feature = "pg16"))]
-pub use flat_list::{List, ListHead, Enlist};
+pub use flat_list::{Enlist, List, ListHead};
 
 #[cfg(any(feature = "pg13", feature = "pg14", feature = "pg15", feature = "pg16"))]
 mod flat_list {
+    use crate::pg_sys;
     use core::ffi;
-    use core::ptr::NonNull;
-    use core::ops::{Deref, DerefMut, Index, IndexMut};
     use core::marker::PhantomData;
     use core::mem;
+    use core::ops::{Deref, DerefMut, Index, IndexMut};
+    use core::ptr::NonNull;
     use std::ptr;
-    use crate::pg_sys;
 
     /// The List type from Postgres, lifted into Rust
     /// Note: you may want the ListHead type
@@ -39,7 +39,7 @@ mod flat_list {
     #[repr(transparent)]
     pub struct ListCell<T> {
         cell: pg_sys::ListCell,
-        _type: PhantomData<T>
+        _type: PhantomData<T>,
     }
 
     const _: () = {
@@ -171,7 +171,7 @@ mod flat_list {
                     let len = inner.len();
                     let ptr = (*inner.list.as_ptr()).elements.cast::<ListCell<T>>();
                     std::slice::from_raw_parts(ptr, len)
-                }
+                },
             }
         }
 
@@ -184,7 +184,7 @@ mod flat_list {
                     let len = inner.len();
                     let ptr = (*inner.list.as_ptr()).elements.cast::<ListCell<T>>();
                     std::slice::from_raw_parts_mut(ptr, len)
-                }
+                },
             }
         }
 
@@ -253,7 +253,6 @@ mod flat_list {
         }
     }
 }
-
 
 pub struct PgList<T> {
     list: *mut pg_sys::List,
