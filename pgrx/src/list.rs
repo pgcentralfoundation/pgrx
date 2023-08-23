@@ -16,14 +16,16 @@ use crate::{is_a, pg_sys, void_mut_ptr};
 use std::marker::PhantomData;
 
 #[cfg(any(feature = "pg13", feature = "pg14", feature = "pg15", feature = "pg16"))]
-pub use flat_list::{List, ListHead, Listable};
+pub use flat_list::{List, ListHead, Enlist};
 
 #[cfg(any(feature = "pg13", feature = "pg14", feature = "pg15", feature = "pg16"))]
 mod flat_list {
     use core::ffi;
     use core::ptr::NonNull;
-    use core::ops::{Index, IndexMut};
+    use core::ops::{Deref, DerefMut, Index, IndexMut};
     use core::marker::PhantomData;
+    use core::mem;
+    use std::ptr;
     use crate::pg_sys;
 
     /// The List type from Postgres, lifted into Rust
@@ -31,6 +33,35 @@ mod flat_list {
     pub enum List<T> {
         Nil,
         Cons(ListHead<T>),
+    }
+
+    /// A strongly-typed ListCell
+    #[repr(transparent)]
+    pub struct ListCell<T> {
+        cell: pg_sys::ListCell,
+        _type: PhantomData<T>
+    }
+
+    const _: () = {
+        assert!(mem::size_of::<ListCell<u128>>() == mem::size_of::<pg_sys::ListCell>());
+    };
+
+    impl<T: Enlist> Deref for ListCell<T> {
+        type Target = T;
+
+        fn deref(&self) -> &Self::Target {
+            // SAFETY: We perform an upgrade to *mut here, but this doesn't matter:
+            // we started with a proper reference and Enlist::apoptosis is "pure"
+            // pointer arithmetic without any read-at-type assertions
+            unsafe { &*T::apoptosis(&self.cell as *const _ as *mut _) }
+        }
+    }
+
+    impl<T: Enlist> DerefMut for ListCell<T> {
+        fn deref_mut(&mut self) -> &mut Self::Target {
+            // SAFETY: We essentially "just" reborrow a ListCell as its inner field type
+            unsafe { &mut *T::apoptosis(&mut self.cell) }
+        }
     }
 
     pub enum ListErr {
@@ -48,37 +79,57 @@ mod flat_list {
         pub trait Sealed {}
     }
 
-    pub unsafe trait Listable: seal::Sealed + Sized {
+    pub unsafe trait Enlist: seal::Sealed + Sized {
         fn matching_tag(tag: pg_sys::NodeTag) -> bool;
+
+        /// From a pointer to the `pg_sys::ListCell` union, obtain a pointer to Self
+        /// I think this isn't actually unsafe?
+        unsafe fn apoptosis(cell: *mut pg_sys::ListCell) -> *mut Self;
     }
 
     impl seal::Sealed for *mut ffi::c_void {}
-    unsafe impl Listable for *mut ffi::c_void {
+    unsafe impl Enlist for *mut ffi::c_void {
         fn matching_tag(tag: pg_sys::NodeTag) -> bool {
             matches!(tag, pg_sys::NodeTag::T_List)
+        }
+
+        unsafe fn apoptosis(cell: *mut pg_sys::ListCell) -> *mut *mut ffi::c_void {
+            unsafe { ptr::addr_of_mut!((*cell).ptr_value) }
         }
     }
 
     impl seal::Sealed for ffi::c_int {}
-    unsafe impl Listable for ffi::c_int {
+    unsafe impl Enlist for ffi::c_int {
         fn matching_tag(tag: pg_sys::NodeTag) -> bool {
             matches!(tag, pg_sys::NodeTag::T_IntList)
+        }
+
+        unsafe fn apoptosis(cell: *mut pg_sys::ListCell) -> *mut ffi::c_int {
+            unsafe { ptr::addr_of_mut!((*cell).int_value) }
         }
     }
 
     impl seal::Sealed for pg_sys::Oid {}
-    unsafe impl Listable for pg_sys::Oid {
+    unsafe impl Enlist for pg_sys::Oid {
         fn matching_tag(tag: pg_sys::NodeTag) -> bool {
             matches!(tag, pg_sys::NodeTag::T_OidList)
+        }
+
+        unsafe fn apoptosis(cell: *mut pg_sys::ListCell) -> *mut pg_sys::Oid {
+            unsafe { ptr::addr_of_mut!((*cell).oid_value) }
         }
     }
 
     #[cfg(feature = "pg16")]
     impl seal::Sealed for pg_sys::TransactionId {}
     #[cfg(feature = "pg16")]
-    unsafe impl Listable for pg_sys::TransactionId {
+    unsafe impl Enlist for pg_sys::TransactionId {
         fn matching_tag(tag: pg_sys::NodeTag) -> bool {
             matches!(tag, pg_sys::NodeTag::T_XidList)
+        }
+
+        unsafe fn apoptosis(cell: *mut pg_sys::ListCell) -> *mut pg_sys::TransactionId {
+            unsafe { ptr::addr_of_mut!((*cell).xid_value) }
         }
     }
 
@@ -90,7 +141,7 @@ mod flat_list {
         }
     }
 
-    impl<T: Listable> List<T> {
+    impl<T: Enlist> List<T> {
         /// Attempt to obtain a `List<T>` from a `*mut pg_sys::List`
         ///
         /// This may be somewhat confusing:
@@ -112,37 +163,37 @@ mod flat_list {
         }
 
         // Obtain the inner slice from the List
-        pub fn as_slice(&self) -> &[T] {
+        pub fn as_slice(&self) -> &[ListCell<T>] {
             match self {
                 // No elements? No problem! Return a 0-sized slice
                 List::Nil => unsafe { std::slice::from_raw_parts(self as *const _ as _, 0) },
                 List::Cons(inner) => unsafe {
                     let len = inner.len();
-                    let ptr = (*inner.list.as_ptr()).elements.cast::<T>();
+                    let ptr = (*inner.list.as_ptr()).elements.cast::<ListCell<T>>();
                     std::slice::from_raw_parts(ptr, len)
                 }
             }
         }
 
         // Obtain the inner mutable slice from the List
-        pub fn as_slice_mut(&mut self) -> &mut [T] {
+        pub fn as_slice_mut(&mut self) -> &mut [ListCell<T>] {
             match self {
                 // No elements? No problem! Return a 0-sized slice
                 List::Nil => unsafe { std::slice::from_raw_parts_mut(self as *mut _ as _, 0) },
                 List::Cons(inner) => unsafe {
                     let len = inner.len();
-                    let ptr = (*inner.list.as_ptr()).elements.cast::<T>();
+                    let ptr = (*inner.list.as_ptr()).elements.cast::<ListCell<T>>();
                     std::slice::from_raw_parts_mut(ptr, len)
                 }
             }
         }
 
         pub fn get(&self, index: usize) -> Option<&T> {
-            self.as_slice().get(index)
+            self.as_slice().get(index).map(|cell| cell.deref())
         }
 
         pub fn get_mut(&mut self, index: usize) -> Option<&mut T> {
-            self.as_slice_mut().get_mut(index)
+            self.as_slice_mut().get_mut(index).map(|cell| cell.deref_mut())
         }
     }
 
@@ -168,7 +219,7 @@ mod flat_list {
     // pub unsafe fn downcast_nullable(list: *mut pg_sys::List) -> Result<ListHead<T>, ListErr> {
 
     // }
-    impl<T: Listable> ListHead<T> {
+    impl<T: Enlist> ListHead<T> {
         pub unsafe fn downcast_ptr(list: NonNull<pg_sys::List>) -> Option<ListHead<T>> {
             T::matching_tag((*list.as_ptr()).type_).then_some(ListHead { list, _type: PhantomData })
         }
