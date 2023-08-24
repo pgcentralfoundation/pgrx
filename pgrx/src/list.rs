@@ -191,7 +191,8 @@ mod flat_list {
         /// and returns `None` only if the List is non-NULL but downcasting failed!
         ///
         /// # Safety
-        /// This assumes the pointer is either NULL or the NodeTag is valid to read
+        /// This assumes the pointer is either NULL or the NodeTag is valid to read,
+        /// so it is not okay to call this on pointers to deallocated or uninit data.
         pub unsafe fn downcast_from_ptr(ptr: *mut pg_sys::List) -> Option<List<T>> {
             match NonNull::new(ptr) {
                 None => Some(List::Nil),
