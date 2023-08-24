@@ -100,6 +100,13 @@ mod flat_list {
         /// It must be implemented with ptr::addr_of! or similar, without reborrowing
         /// so that it may be used without regard to whether a pointer is write-capable
         unsafe fn apoptosis(cell: *mut pg_sys::ListCell) -> *mut Self;
+
+        /// Set a value into a `pg_sys::ListCell`
+        ///
+        /// This is used instead of Enlist::apoptosis, as it guarantees initializing the union
+        /// according to the rules of Rust. In practice, this is probably the same,
+        /// but this way I don't have to wonder, as this is a safe function.
+        fn endocytosis(cell: &mut pg_sys::ListCell, value: Self);
     }
 
     impl seal::Sealed for *mut ffi::c_void {}
@@ -110,6 +117,10 @@ mod flat_list {
 
         unsafe fn apoptosis(cell: *mut pg_sys::ListCell) -> *mut *mut ffi::c_void {
             unsafe { ptr::addr_of_mut!((*cell).ptr_value) }
+        }
+
+        fn endocytosis(cell: &mut pg_sys::ListCell, value: Self) {
+            cell.ptr_value = value;
         }
     }
 
@@ -122,6 +133,10 @@ mod flat_list {
         unsafe fn apoptosis(cell: *mut pg_sys::ListCell) -> *mut ffi::c_int {
             unsafe { ptr::addr_of_mut!((*cell).int_value) }
         }
+
+        fn endocytosis(cell: &mut pg_sys::ListCell, value: Self) {
+            cell.int_value = value;
+        }
     }
 
     impl seal::Sealed for pg_sys::Oid {}
@@ -132,6 +147,10 @@ mod flat_list {
 
         unsafe fn apoptosis(cell: *mut pg_sys::ListCell) -> *mut pg_sys::Oid {
             unsafe { ptr::addr_of_mut!((*cell).oid_value) }
+        }
+
+        fn endocytosis(cell: &mut pg_sys::ListCell, value: Self) {
+            cell.oid_value = value;
         }
     }
 
@@ -145,6 +164,10 @@ mod flat_list {
 
         unsafe fn apoptosis(cell: *mut pg_sys::ListCell) -> *mut pg_sys::TransactionId {
             unsafe { ptr::addr_of_mut!((*cell).xid_value) }
+        }
+
+        fn endocytosis(cell: &mut pg_sys::ListCell, value: Self) {
+            cell.xid_value = value;
         }
     }
 
@@ -193,10 +216,10 @@ mod flat_list {
         pub fn try_push(&mut self, value: T) -> Result<&mut ListHead<T>, &mut Self> {
             match self {
                 List::Nil => Err(self),
-                List::Cons(head) => if head.capacity() - self.len() == 0 {
+                List::Cons(head) => if head.capacity() - head.len() == 0 {
                     Err(self)
                 } else {
-                    head.push(value)
+                    Ok(head.push(value))
                 }
             }
         }
@@ -289,7 +312,20 @@ mod flat_list {
 
         pub fn push(&mut self, value: T) -> &mut Self {
             let list = unsafe { self.list.as_mut() };
-            todo!();
+            let pg_sys::List { length, max_length, elements, .. } = list;
+            if *max_length - *length > 0 {
+                // SAFETY: Our list must have been constructed following the list invariants
+                // in order to actually get here, and we have confirmed as in-range of the buffer.
+                let cell = unsafe { &mut *elements.add(*length as _) };
+                T::endocytosis(cell, value);
+                *length += 1;
+            } else {
+                // Reserve in this branch.
+                let more_items = todo!();
+                self.reserve(more_items);
+            }
+
+            // Return `self` for convenience of `List::try_push`
             self
         }
 
