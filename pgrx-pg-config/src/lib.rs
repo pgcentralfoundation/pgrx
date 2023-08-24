@@ -421,8 +421,8 @@ impl PgConfig {
 
                         if pg_config_str == "pg_config" {
                             format!("Unable to find `{}` on the system $PATH", "pg_config".yellow())
-                        } else if pg_config_str.contains('~') {
-                            format!("The specified pg_config binary, `{}`, does not exist.  It contains a `~`, indicating your shell didn't properly expand your home directory", pg_config_str.yellow())
+                        } else if pg_config_str.starts_with('~') {
+                            format!("The specified pg_config binary, {}, does not exist. The shell didn't expand the `~`", pg_config_str.yellow())
                         } else {
                             format!(
                                 "The specified pg_config binary, `{}`, does not exist",
