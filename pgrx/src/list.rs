@@ -331,6 +331,7 @@ mod flat_list {
 
         pub fn reserve(&mut self, size: usize) -> &mut Self {
             let list = unsafe { self.list.as_mut() };
+            let context = pg_sys::GetMemoryChunkContext(list);
             todo!();
             self
         }
@@ -362,6 +363,10 @@ mod flat_list {
         fn index_mut(&mut self, index: ffi::c_int) -> &mut Self::Output {
             todo!()
         }
+    }
+
+    unsafe fn grow_list(list: &mut pg_sys::List, target: usize) {
+        todo!()
     }
 }
 
