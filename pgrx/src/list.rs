@@ -177,6 +177,64 @@ mod flat_list {
             }
         }
 
+        /// Borrow an item from the slice at the index
+        pub fn get(&self, index: usize) -> Option<&T> {
+            self.as_slice().get(index).map(|cell| cell.deref())
+        }
+
+        /// Mutably borrow an item from the slice at the index
+        pub fn get_mut(&mut self, index: usize) -> Option<&mut T> {
+            self.as_slice_mut().get_mut(index).map(|cell| cell.deref_mut())
+        }
+
+        /// Attempt to push or Err if it would allocate
+        ///
+        /// This exists primarily to allow working with a list with maybe-zero capacity.
+        pub fn try_push(&mut self, value: T) -> Result<&mut ListHead<T>, &mut Self> {
+            match self {
+                List::Nil => Err(self),
+                List::Cons(head) => if head.capacity() - self.len() == 0 {
+                    Err(self)
+                } else {
+                    head.push(value)
+                }
+            }
+        }
+
+        /// Try to reserve space for N more items
+        pub fn try_reserve(&mut self, items: usize) -> Result<(), ()> {
+            match self {
+                List::Nil => Err(()),
+                List::Cons(head) => todo!(),
+            }
+        }
+
+        // Pop an item from the list, trying to deallocate.
+        //
+        // Note that if this removes the last item, it deallocates the entire list.
+        // This is to maintain the Postgres List invariant that a 0-len list is always Nil.
+        pub fn pop(&mut self) -> T {
+            // this is going to be a pain in the ass:
+            // if we remove the last item from a list, we gotta pfree the entire damn thing!
+            todo!()
+        }
+    }
+
+    impl<T> List<T> {
+        pub fn len(&self) -> usize {
+            match self {
+                List::Nil => 0,
+                List::Cons(head) => head.len(),
+            }
+        }
+
+        pub fn capacity(&self) -> usize {
+            match self {
+                List::Nil => 0,
+                List::Cons(head) => head.capacity(),
+            }
+        }
+
         /// Borrow the List's slice
         ///
         /// Note that like with Vec, this slice may move after appending to the List!
@@ -209,31 +267,6 @@ mod flat_list {
                 },
             }
         }
-
-        /// Borrow an item from the slice at the index
-        pub fn get(&self, index: usize) -> Option<&T> {
-            self.as_slice().get(index).map(|cell| cell.deref())
-        }
-
-        /// Mutably borrow an item from the slice at the index
-        pub fn get_mut(&mut self, index: usize) -> Option<&mut T> {
-            self.as_slice_mut().get_mut(index).map(|cell| cell.deref_mut())
-        }
-
-        pub fn pop(&mut self) -> T {
-            // this is going to be a pain in the ass:
-            // if we remove the last item from a list, we gotta pfree the entire damn thing!
-            todo!()
-        }
-    }
-
-    impl<T> List<T> {
-        pub fn len(&self) -> usize {
-            match self {
-                List::Nil => 0,
-                List::Cons(head) => head.len(),
-            }
-        }
     }
 
     impl<T> ListHead<T> {
@@ -252,6 +285,18 @@ mod flat_list {
     impl<T: Enlist> ListHead<T> {
         pub unsafe fn downcast_ptr(list: NonNull<pg_sys::List>) -> Option<ListHead<T>> {
             T::matching_tag((*list.as_ptr()).type_).then_some(ListHead { list, _type: PhantomData })
+        }
+
+        pub fn push(&mut self, value: T) -> &mut Self {
+            let list = unsafe { self.list.as_mut() };
+            todo!();
+            self
+        }
+
+        pub fn reserve(&mut self, size: usize) -> &mut Self {
+            let list = unsafe { self.list.as_mut() };
+            todo!();
+            self
         }
     }
 
