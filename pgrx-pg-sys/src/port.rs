@@ -73,7 +73,7 @@ pub const unsafe fn MAXALIGN(len: usize) -> usize {
 /// This function will panic if `pointer` is null, if it's not properly aligned, or if the memory
 /// it points do doesn't have the a header that looks like a memory context pointer
 #[allow(non_snake_case)]
-pub unsafe fn GetMemoryContextChunk(pointer: *mut std::os::raw::c_void) -> pg_sys::MemoryContext {
+pub unsafe fn GetMemoryChunkContext(pointer: *mut std::os::raw::c_void) -> pg_sys::MemoryContext {
     // Postgres versions <16 don't export the "GetMemoryChunkContext" function.  It's a "static inline"
     // function in `memutils.h`, so we port it to Rust right here
     #[cfg(any(
