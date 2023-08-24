@@ -109,19 +109,19 @@ pub unsafe fn GetMemoryChunkContext(pointer: *mut std::os::raw::c_void) -> pg_sy
     context
 }
 
-/// Returns true if memory context is valid, as Postgres determines such a thing.
+/// Returns true if memory context is tagged correctly according to Postgres.
 ///
 /// # Safety
 ///
-/// Caller must determine that the specified `context` pointer, if it's probably a [`MemoryContextData`]
-/// pointer, really is.  This function is a best effort, not a guarantee.
+/// The caller must only attempt this on a pointer to a Node.
+/// This may clarify if the pointee is correctly-initialized [`MemoryContextData`].
 ///
 /// # Implementation Note
 ///
 /// If Postgres adds more memory context types in the future, we need to do that here too.
 #[allow(non_snake_case)]
 #[inline(always)]
-pub unsafe fn MemoryContextIsValid(context: *mut crate::MemoryContextData) -> bool {
+pub unsafe fn MemoryContextIsValid(context: crate::MemoryContext) -> bool {
     // #define MemoryContextIsValid(context) \
     // 	((context) != NULL && \
     // 	 (IsA((context), AllocSetContext) || \
@@ -130,11 +130,12 @@ pub unsafe fn MemoryContextIsValid(context: *mut crate::MemoryContextData) -> bo
 
     !context.is_null()
         && unsafe {
-            // SAFETY:  we just determined that context isn't null, so it's safe to `.as_ref()`
-            // and `.unwrap_unchecked()`
-            (*context).type_ == crate::NodeTag_T_AllocSetContext
-                || (*context).type_ == crate::NodeTag_T_SlabContext
-                || (*context).type_ == crate::NodeTag_T_GenerationContext
+            // SAFETY:  we just determined the pointer isn't null, and
+            // the caller asserts that it is being used on a Node.
+            let tag = (*context.cast::<crate::Node>()).type_;
+            tag == crate::NodeTag_T_AllocSetContext
+                || tag == crate::NodeTag_T_SlabContext
+                || tag == crate::NodeTag_T_GenerationContext
         }
 }
 
