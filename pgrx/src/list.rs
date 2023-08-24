@@ -92,6 +92,7 @@ mod flat_list {
     /// The bound to describe a type which may be used in a Postgres List
     /// It must know what an appropriate type tag is, and how to pointer-cast to itself
     pub unsafe trait Enlist: seal::Sealed + Sized {
+        // fn tag() -> pg_sys::NodeTag;
         fn matching_tag(tag: pg_sys::NodeTag) -> bool;
 
         /// From a pointer to the pg_sys::ListCell union, obtain a pointer to Self
@@ -164,11 +165,11 @@ mod flat_list {
         /// cause it to internally use a "flat array" representation.
         ///
         /// Thus, this returns `Some` even if the List is NULL, because it is `Some(List::Nil)`,
-        /// and returns `None` only if the List is non-NULL but has an invalid tag!
+        /// and returns `None` only if the List is non-NULL but downcasting failed!
         ///
         /// # Safety
         /// This assumes the pointer is either NULL or the NodeTag is valid to read
-        pub unsafe fn from_ptr(ptr: *mut pg_sys::List) -> Option<List<T>> {
+        pub unsafe fn downcast_from_ptr(ptr: *mut pg_sys::List) -> Option<List<T>> {
             match NonNull::new(ptr) {
                 None => Some(List::Nil),
                 Some(list) => T::matching_tag((*ptr).type_)
@@ -176,7 +177,11 @@ mod flat_list {
             }
         }
 
-        // Obtain the inner slice from the List
+        /// Borrow the List's slice
+        ///
+        /// Note that like with Vec, this slice may move after appending to the List!
+        /// Due to lifetimes this isn't a problem until unsafe Rust becomes involved,
+        /// but with Postgres extensions it often does.
         pub fn as_slice(&self) -> &[ListCell<T>] {
             match self {
                 // No elements? No problem! Return a 0-sized slice
@@ -189,7 +194,10 @@ mod flat_list {
             }
         }
 
-        // Obtain the inner mutable slice from the List
+        /// Mutably borrow the List's slice.
+        ///
+        /// Includes the same caveats as with `List::as_slice`, but with "less" problems:
+        /// `&mut` means you should not have other pointers to the list anyways.
         pub fn as_slice_mut(&mut self) -> &mut [ListCell<T>] {
             match self {
                 // No elements? No problem! Return a 0-sized slice
@@ -202,12 +210,20 @@ mod flat_list {
             }
         }
 
+        /// Borrow an item from the slice at the index
         pub fn get(&self, index: usize) -> Option<&T> {
             self.as_slice().get(index).map(|cell| cell.deref())
         }
 
+        /// Mutably borrow an item from the slice at the index
         pub fn get_mut(&mut self, index: usize) -> Option<&mut T> {
             self.as_slice_mut().get_mut(index).map(|cell| cell.deref_mut())
+        }
+
+        pub fn pop(&mut self) -> T {
+            // this is going to be a pain in the ass:
+            // if we remove the last item from a list, we gotta pfree the entire damn thing!
+            todo!()
         }
     }
 
