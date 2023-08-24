@@ -233,10 +233,10 @@ impl PgMemoryContexts {
     pub unsafe fn of(ptr: void_mut_ptr) -> Option<PgMemoryContexts> {
         let parent = unsafe {
             // (un)SAFETY: the caller assumes responsibility for ensuring the provided pointer is
-            // going to be accepted by Postgres `GetMemoryContextChunk`.  Postgres will ERROR
+            // going to be accepted by Postgres `GetMemoryChunkContext`.  Postgres will ERROR
             // if its invariants aren't met, but who really knows when the ptr could have come
             // come from anywhere
-            pg_sys::GetMemoryContextChunk(ptr)
+            pg_sys::GetMemoryChunkContext(ptr)
         };
         let memcxt = NonNull::new(parent)?;
         Some(PgMemoryContexts::Of(OwnerMemoryContext { memcxt }))
