@@ -367,7 +367,16 @@ mod flat_list {
 
     unsafe fn grow_list(list: &mut pg_sys::List, target: usize) {
         let context = pg_sys::GetMemoryContextChunk(list as *mut _ as *mut _);
-        todo!()
+        if list.elements == ptr::addr_of_mut!(list.initial_elements).cast() {
+            // first realloc, we can't dealloc the elements ptr, rather we have to
+            // - alloc fresh
+            // - copy
+            // - maybe zeroize the data idk
+            todo!()
+        } else {
+            // later realloc, standard swap-and-alloc
+            todo!()
+        }
     }
 }
 
