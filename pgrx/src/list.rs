@@ -20,8 +20,6 @@ pub use flat_list::{Enlist, List, ListHead};
 
 #[cfg(any(feature = "pg13", feature = "pg14", feature = "pg15", feature = "pg16"))]
 mod flat_list {
-    use pg_sys::palloc;
-
     use crate::pg_sys;
     use core::ffi;
     use core::marker::PhantomData;
