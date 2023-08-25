@@ -20,6 +20,8 @@ pub use flat_list::{Enlist, List, ListHead};
 
 #[cfg(any(feature = "pg13", feature = "pg14", feature = "pg15", feature = "pg16"))]
 mod flat_list {
+    use pg_sys::palloc;
+
     use crate::pg_sys;
     use core::ffi;
     use core::marker::PhantomData;
@@ -217,10 +219,12 @@ mod flat_list {
         pub fn try_push(&mut self, value: T) -> Result<&mut ListHead<T>, &mut Self> {
             match self {
                 List::Nil => Err(self),
-                List::Cons(head) => if head.capacity() - head.len() == 0 {
-                    Err(self)
-                } else {
-                    Ok(head.push(value))
+                List::Cons(head) => {
+                    if head.capacity() - head.len() == 0 {
+                        Err(self)
+                    } else {
+                        Ok(head.push(value))
+                    }
                 }
             }
         }
@@ -366,17 +370,22 @@ mod flat_list {
     }
 
     unsafe fn grow_list(list: &mut pg_sys::List, target: usize) {
-        let context = pg_sys::GetMemoryContextChunk(list as *mut _ as *mut _);
+        let alloc_size = target * mem::size_of::<pg_sys::ListCell>();
         if list.elements == ptr::addr_of_mut!(list.initial_elements).cast() {
-            // first realloc, we can't dealloc the elements ptr, rather we have to
-            // - alloc fresh
-            // - copy
-            // - maybe zeroize the data idk
-            todo!()
+            // first realloc, we can't dealloc the elements ptr, as it isn't its own alloc
+            let context = pg_sys::GetMemoryContextChunk(list as *mut _ as *mut _);
+            let buf = pg_sys::MemoryContextAlloc(context, alloc_size);
+            ptr::copy_nonoverlapping(list.elements, buf.cast(), list.length as _);
+            // If the old buffer is pointers, we would like everyone dereferencing them to segfault,
+            // if OIDs, Postgres will surface errors quickly on InvalidOid, etc.
+            ptr::write_bytes(list.elements, 0, list.length as _);
+            list.elements = buf.cast();
         } else {
-            // later realloc, standard swap-and-alloc
-            todo!()
+            // We already have a separate buf, making this easy.
+            pg_sys::repalloc(list.elements.cast(), target * mem::size_of::<pg_sys::ListCell>());
         }
+
+        list.max_length = target as _;
     }
 }
 
