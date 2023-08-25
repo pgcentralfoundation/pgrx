@@ -336,6 +336,7 @@ mod flat_list {
 
         pub fn reserve(&mut self, size: usize) -> &mut Self {
             let list = unsafe { self.list.as_mut() };
+            unsafe { grow_list(list, size + list.length as usize) };
             todo!();
             self
         }
