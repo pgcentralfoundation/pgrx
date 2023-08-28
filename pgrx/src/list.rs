@@ -323,6 +323,10 @@ mod flat_list {
         pub fn capacity(&self) -> usize {
             unsafe { self.list.as_ref().max_length as usize }
         }
+
+        pub unsafe fn set_len(&mut self, len: usize) {
+            unsafe { (*self.list.as_ptr()).max_length = len as _ }
+        }
     }
 
     impl<T: Enlist> ListHead<T> {
@@ -406,7 +410,6 @@ mod flat_list {
     impl<T> Drop for Drain<'_, T> {
         fn drop(&mut self) {
             let total_drain = todo!();
-
             if total_drain {
                 unsafe { destroy_list(self.head.list.as_ptr()) }
             }
