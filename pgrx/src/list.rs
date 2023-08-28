@@ -269,13 +269,11 @@ mod flat_list {
         }
 
         fn iter(&self) -> impl Iterator<Item = &T> {
-            self.as_slice()
-                .into_iter()
-                .map(|cell| unsafe { &*T::apoptosis(cell as *const _ as *mut _) })
+            self.as_slice().into_iter().map(Deref::deref)
         }
 
-        fn iter_mut(&self) -> impl Iterator<Item = &mut T> {
-            self.as_slice_mut().into_iter().map(|cell| unsafe { &mut *T::apoptosis(cell) })
+        fn iter_mut(&mut self) -> impl Iterator<Item = &mut T> {
+            self.as_slice_mut().into_iter().map(DerefMut::deref_mut)
         }
     }
 
