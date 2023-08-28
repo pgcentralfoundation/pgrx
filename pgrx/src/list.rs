@@ -187,11 +187,13 @@ mod flat_list {
         /// # Safety
         /// This assumes the pointer is either NULL or the NodeTag is valid to read,
         /// so it is not okay to call this on pointers to deallocated or uninit data.
-        pub unsafe fn downcast_from_ptr(ptr: *mut pg_sys::List) -> Option<List<T>> {
+        ///
+        /// If it returns as `Some`, it also asserts the entire List is, across its length,
+        /// validly initialized as `T` in each ListCell. Assuming it has non-zero length, anyways.
+        pub unsafe fn downcast_from_nullable(ptr: *mut pg_sys::List) -> Option<List<T>> {
             match NonNull::new(ptr) {
                 None => Some(List::Nil),
-                Some(list) => T::matching_tag((*ptr).type_)
-                    .then_some(List::Cons(ListHead { list, _type: PhantomData })),
+                Some(list) => ListHead::downcast_from_ptr(list).map(|head| List::Cons(head)),
             }
         }
 
@@ -330,7 +332,15 @@ mod flat_list {
     }
 
     impl<T: Enlist> ListHead<T> {
-        pub unsafe fn downcast_ptr(list: NonNull<pg_sys::List>) -> Option<ListHead<T>> {
+        /// From a non-nullable pointer that points to a valid List, produce a ListHead of the correct type
+        ///
+        /// # Safety
+        /// This assumes the NodeTag is valid to read, so it is not okay to call this on
+        /// pointers to deallocated or uninit data.
+        ///
+        /// If it returns as `Some`, it also asserts the entire List is, across its length,
+        /// validly initialized as `T` in each ListCell.
+        pub unsafe fn downcast_from_ptr(list: NonNull<pg_sys::List>) -> Option<ListHead<T>> {
             T::matching_tag((*list.as_ptr()).type_).then_some(ListHead { list, _type: PhantomData })
         }
 
