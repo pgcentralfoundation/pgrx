@@ -380,6 +380,14 @@ mod flat_list {
         list.max_length = target as _;
     }
 
+    unsafe fn destroy_list(list: *mut pg_sys::List) {
+        // The only question is if we have two allocations or one?
+        if (*list).elements != ptr::addr_of_mut!((*list).initial_elements).cast() {
+            pg_sys::pfree((*list).elements.cast());
+        }
+        pg_sys::pfree(list.cast());
+    }
+
     pub struct IntoIter<T> {
         head: ListHead<T>,
         i: u32,
@@ -397,7 +405,11 @@ mod flat_list {
 
     impl<T> Drop for Drain<'_, T> {
         fn drop(&mut self) {
-            todo!()
+            let total_drain = todo!();
+
+            if total_drain {
+                unsafe { destroy_list(self.head.list.as_ptr()) }
+            }
         }
     }
 
@@ -431,7 +443,7 @@ mod flat_list {
 
     impl<T> Drop for IntoIter<T> {
         fn drop(&mut self) {
-            todo!()
+            unsafe { destroy_list(self.head.list.as_ptr()) }
         }
     }
 }
