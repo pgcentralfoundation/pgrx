@@ -228,10 +228,10 @@ mod flat_list {
         }
 
         /// Try to reserve space for N more items
-        pub fn try_reserve(&mut self, items: usize) -> Result<(), ()> {
+        pub fn try_reserve(&mut self, items: usize) -> Result<&mut ListHead<T>, &mut Self> {
             match self {
-                List::Nil => Err(()),
-                List::Cons(head) => todo!(),
+                List::Nil => Err(self),
+                List::Cons(head) => Ok(head.reserve(items)),
             }
         }
 
@@ -331,7 +331,9 @@ mod flat_list {
 
         pub fn reserve(&mut self, size: usize) -> &mut Self {
             let list = unsafe { self.list.as_mut() };
-            unsafe { grow_list(list, size + list.length as usize) };
+            if ((list.max_length - list.length) as usize) < size {
+                unsafe { grow_list(list, size + list.length as usize) };
+            };
             self
         }
     }
