@@ -367,6 +367,9 @@ mod flat_list {
         if list.elements == ptr::addr_of_mut!(list.initial_elements).cast() {
             // first realloc, we can't dealloc the elements ptr, as it isn't its own alloc
             let context = pg_sys::GetMemoryContextChunk(list as *mut _ as *mut _);
+            if context == ptr::null_mut() {
+                panic!("Context free list?");
+            }
             let buf = pg_sys::MemoryContextAlloc(context, alloc_size);
             if buf == ptr::null_mut() {
                 panic!("List allocation failure");
