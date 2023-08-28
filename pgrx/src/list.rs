@@ -61,7 +61,7 @@ mod flat_list {
             // SAFETY: A brief upgrade of readonly &ListCell<T> to writable *mut pg_sys::ListCell
             // may seem sus, but is fine: Enlist::apoptosis is defined as pure casting/arithmetic.
             // So the pointer begins and ends without write permission, and
-            // we essentially just reborrowing a ListCell as its inner field type
+            // we essentially just reborrow a ListCell as its inner field type
             unsafe { &*T::apoptosis(&self.cell as *const _ as *mut _) }
         }
     }
