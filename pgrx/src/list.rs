@@ -340,34 +340,6 @@ mod flat_list {
         }
     }
 
-    impl<T> Index<usize> for ListHead<T> {
-        type Output = T;
-
-        fn index(&self, index: usize) -> &Self::Output {
-            todo!()
-        }
-    }
-
-    impl<T> IndexMut<usize> for ListHead<T> {
-        fn index_mut(&mut self, index: usize) -> &mut Self::Output {
-            todo!()
-        }
-    }
-
-    impl<T> Index<ffi::c_int> for ListHead<T> {
-        type Output = T;
-
-        fn index(&self, index: ffi::c_int) -> &Self::Output {
-            todo!()
-        }
-    }
-
-    impl<T> IndexMut<ffi::c_int> for ListHead<T> {
-        fn index_mut(&mut self, index: ffi::c_int) -> &mut Self::Output {
-            todo!()
-        }
-    }
-
     unsafe fn grow_list(list: &mut pg_sys::List, target: usize) {
         let alloc_size = target * mem::size_of::<pg_sys::ListCell>();
         if list.elements == ptr::addr_of_mut!(list.initial_elements).cast() {
