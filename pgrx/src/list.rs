@@ -74,12 +74,6 @@ mod flat_list {
         }
     }
 
-    pub enum ListErr {
-        Nil,
-        WrongType,
-        WrongNodeKind,
-    }
-
     pub struct ListHead<T> {
         list: NonNull<pg_sys::List>,
         _type: PhantomData<[T]>,
