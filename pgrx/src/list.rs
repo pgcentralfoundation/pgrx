@@ -365,6 +365,44 @@ mod flat_list {
 
         list.max_length = target as _;
     }
+
+    pub struct Iter<T> {
+        head: ListHead<T>,
+        i: u32,
+    }
+
+    pub struct Drain<'a, T> {
+        /// Index of tail to preserve
+        pub(super) tail_start: u32,
+        /// Length of tail
+        pub(super) tail_len: u32,
+        /// Current remaining range to remove
+        pub(super) iter: slice::Iter<'a, T>,
+        pub(super) head: ListHead<T>,
+    }
+
+    impl<T> Drop for Drain<T> {
+        fn drop(&mut self) {
+            if self.i as usize >= self.head.len() {}
+        }
+    }
+
+    impl<T: Enlist> Iterator for Iter<T> {
+        type Item = T;
+
+        fn next(&mut self) -> Option<T> {
+            self.head
+        }
+    }
+
+    impl<T: Enlist> IntoIterator for List<T> {
+        type IntoIter = Iter<T>;
+        type Item = T;
+
+        fn into_iter(self) -> Self::IntoIter {
+            ListIter { head: self, i: 0 }
+        }
+    }
 }
 
 pub struct PgList<T> {
