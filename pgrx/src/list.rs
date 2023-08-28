@@ -305,9 +305,6 @@ mod flat_list {
         }
     }
 
-    // pub unsafe fn downcast_nullable(list: *mut pg_sys::List) -> Result<ListHead<T>, ListErr> {
-
-    // }
     impl<T: Enlist> ListHead<T> {
         pub unsafe fn downcast_ptr(list: NonNull<pg_sys::List>) -> Option<ListHead<T>> {
             T::matching_tag((*list.as_ptr()).type_).then_some(ListHead { list, _type: PhantomData })
@@ -324,8 +321,8 @@ mod flat_list {
                 *length += 1;
             } else {
                 // Reserve in this branch.
-                let more_items = todo!();
-                self.reserve(more_items);
+                let new_cap = max_length.saturating_mul(2);
+                self.reserve(new_cap as _);
             }
 
             // Return `self` for convenience of `List::try_push`
@@ -335,7 +332,6 @@ mod flat_list {
         pub fn reserve(&mut self, size: usize) -> &mut Self {
             let list = unsafe { self.list.as_mut() };
             unsafe { grow_list(list, size + list.length as usize) };
-            todo!();
             self
         }
     }
@@ -346,6 +342,9 @@ mod flat_list {
             // first realloc, we can't dealloc the elements ptr, as it isn't its own alloc
             let context = pg_sys::GetMemoryContextChunk(list as *mut _ as *mut _);
             let buf = pg_sys::MemoryContextAlloc(context, alloc_size);
+            if buf == ptr::null_mut() {
+                panic!("List allocation failure");
+            }
             ptr::copy_nonoverlapping(list.elements, buf.cast(), list.length as _);
             // If the old buffer is pointers, we would like everyone dereferencing them to segfault,
             // if OIDs, Postgres will surface errors quickly on InvalidOid, etc.
