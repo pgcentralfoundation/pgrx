@@ -217,13 +217,8 @@ mod flat_list {
         pub fn try_push(&mut self, value: T) -> Result<&mut ListHead<T>, &mut Self> {
             match self {
                 List::Nil => Err(self),
-                List::Cons(head) => {
-                    if head.capacity() - head.len() == 0 {
-                        Err(self)
-                    } else {
-                        Ok(head.push(value))
-                    }
-                }
+                list if list.capacity() - list.len() == 0 => Err(list),
+                List::Cons(head) => Ok(head.push(value)),
             }
         }
 
