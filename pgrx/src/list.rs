@@ -419,7 +419,11 @@ mod flat_list {
             if self.i >= (self.head.len() as _) {
                 None
             } else {
-                Some(unsafe { *T::apoptosis((*self.head.list.as_ptr()).elements.add(self.i as _)) })
+                let i = self.i;
+                self.i += 1;
+                Some(unsafe {
+                    T::apoptosis((*self.head.list.as_ptr()).elements.add(i as _)).read()
+                })
             }
         }
     }
