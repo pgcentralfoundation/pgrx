@@ -235,14 +235,20 @@ mod flat_list {
             }
         }
 
-        // Pop an item from the list, trying to deallocate.
+        // Iterate over part of the List while removing elements from it
         //
         // Note that if this removes the last item, it deallocates the entire list.
         // This is to maintain the Postgres List invariant that a 0-len list is always Nil.
-        pub fn pop(&mut self) -> T {
-            // this is going to be a pain in the ass:
-            // if we remove the last item from a list, we gotta pfree the entire damn thing!
-            todo!()
+        pub fn drain(&mut self, range: R) -> DrainList<'_, T>
+        where
+            R: RangeBounds<usize>,
+        {
+            // SAFETY: The Drain invariants are somewhat easier to maintain for List than Vec
+            match self {
+                List::Nil => DrainList { todo!() },
+                List::Cons(head) => {
+                    DrainList { todo!() }
+                },
         }
     }
 
