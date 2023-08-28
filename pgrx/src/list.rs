@@ -24,9 +24,9 @@ mod flat_list {
     use core::ffi;
     use core::marker::PhantomData;
     use core::mem;
-    use core::ops::{Deref, DerefMut, Index, IndexMut};
-    use core::ptr::NonNull;
-    use std::ptr;
+    use core::ops::{Bound, Deref, DerefMut, RangeBounds};
+    use core::ptr::{self, NonNull};
+    use core::slice;
 
     /// The List type from Postgres, lifted into Rust
     /// Note: you may want the ListHead type
@@ -239,16 +239,43 @@ mod flat_list {
         //
         // Note that if this removes the last item, it deallocates the entire list.
         // This is to maintain the Postgres List invariant that a 0-len list is always Nil.
-        pub fn drain(&mut self, range: R) -> DrainList<'_, T>
+        pub fn drain<R>(&mut self, range: R) -> Drain<'_, T>
         where
             R: RangeBounds<usize>,
         {
-            // SAFETY: The Drain invariants are somewhat easier to maintain for List than Vec
+            // SAFETY: The Drain invariants are somewhat easier to maintain for List than Vec,
+            // however, they have the complication of the Postgres List invariants
             match self {
-                List::Nil => DrainList { todo!() },
+                List::Nil => todo!(),
                 List::Cons(head) => {
-                    DrainList { todo!() }
-                },
+                    let drain_start = match range.start_bound() {
+                        Bound::Unbounded | Bound::Included(0) => 0,
+                        Bound::Included(first) => *first,
+                        Bound::Excluded(point) => point + 1,
+                    };
+                    if drain_start == 0 {
+                        *self = Default::default();
+                    } else {
+                        unsafe { (*head.list.as_ptr()).length = drain_start as _ };
+                    }
+                    let tail_start: u32 = match range.end_bound() {
+                        Bound::Unbounded => i32::MAX as u32,
+                        Bound::Included(last) => (last + 1) as _,
+                        Bound::Excluded(tail) => *tail as _,
+                    };
+                    todo!()
+                }
+            }
+        }
+
+        fn iter(&self) -> impl Iterator<Item = &T> {
+            self.as_slice()
+                .into_iter()
+                .map(|cell| unsafe { &*T::apoptosis(cell as *const _ as *mut _) })
+        }
+
+        fn iter_mut(&self) -> impl Iterator<Item = &mut T> {
+            self.as_slice_mut().into_iter().map(|cell| unsafe { &mut *T::apoptosis(cell) })
         }
     }
 
@@ -366,7 +393,7 @@ mod flat_list {
         list.max_length = target as _;
     }
 
-    pub struct Iter<T> {
+    pub struct IntoIter<T> {
         head: ListHead<T>,
         i: u32,
     }
@@ -381,26 +408,39 @@ mod flat_list {
         pub(super) head: ListHead<T>,
     }
 
-    impl<T> Drop for Drain<T> {
+    impl<T> Drop for Drain<'_, T> {
         fn drop(&mut self) {
-            if self.i as usize >= self.head.len() {}
+            todo!()
         }
     }
 
-    impl<T: Enlist> Iterator for Iter<T> {
+    impl<T: Enlist> Iterator for IntoIter<T> {
         type Item = T;
 
         fn next(&mut self) -> Option<T> {
-            self.head
+            if self.i >= (self.head.len() as _) {
+                None
+            } else {
+                Some(unsafe { *T::apoptosis((*self.head.list.as_ptr()).elements.add(self.i as _)) })
+            }
         }
     }
 
     impl<T: Enlist> IntoIterator for List<T> {
-        type IntoIter = Iter<T>;
+        type IntoIter = IntoIter<T>;
         type Item = T;
 
         fn into_iter(self) -> Self::IntoIter {
-            ListIter { head: self, i: 0 }
+            match self {
+                List::Nil => todo!(),
+                List::Cons(head) => IntoIter { head, i: 0 },
+            }
+        }
+    }
+
+    impl<T> Drop for IntoIter<T> {
+        fn drop(&mut self) {
+            todo!()
         }
     }
 }
