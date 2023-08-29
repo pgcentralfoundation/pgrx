@@ -71,63 +71,57 @@ pub const unsafe fn MAXALIGN(len: usize) -> usize {
 /// # Panics
 ///
 /// This function will panic if `pointer` is null, if it's not properly aligned, or if the memory
-/// it points do doesn't have the a header that looks like a memory context pointer
+/// it points to doesn't have a prefix that looks like a memory context pointer
 #[allow(non_snake_case)]
-pub unsafe fn GetMemoryContextChunk(pointer: *mut std::os::raw::c_void) -> pg_sys::MemoryContext {
+#[cfg(any(
+    feature = "pg11",
+    feature = "pg12",
+    feature = "pg13",
+    feature = "pg14",
+    feature = "pg15"
+))]
+pub unsafe fn GetMemoryChunkContext(pointer: *mut std::os::raw::c_void) -> pg_sys::MemoryContext {
     // Postgres versions <16 don't export the "GetMemoryChunkContext" function.  It's a "static inline"
     // function in `memutils.h`, so we port it to Rust right here
-    #[cfg(any(
-        feature = "pg11",
-        feature = "pg12",
-        feature = "pg13",
-        feature = "pg14",
-        feature = "pg15"
-    ))]
-    {
-        /*
-         * Try to detect bogus pointers handed to us, poorly though we can.
-         * Presumably, a pointer that isn't MAXALIGNED isn't pointing at an
-         * allocated chunk.
-         */
-        assert!(!pointer.is_null());
-        assert_eq!(pointer, MAXALIGN(pointer as usize) as *mut ::std::os::raw::c_void);
+    /*
+     * Try to detect bogus pointers handed to us, poorly though we can.
+     * Presumably, a pointer that isn't MAXALIGNED isn't pointing at an
+     * allocated chunk.
+     */
+    assert!(!pointer.is_null());
+    assert_eq!(pointer, MAXALIGN(pointer as usize) as *mut ::std::os::raw::c_void);
 
-        /*
-         * OK, it's probably safe to look at the context.
-         */
-        // 	context = *(MemoryContext *) (((char *) pointer) - sizeof(void *));
-        let context = unsafe {
-            // SAFETY: the caller has assured us that `pointer` points to palloc'd memory, which
-            // means it'll have this header before it
-            *(pointer
-                .cast::<::std::os::raw::c_char>()
-                .sub(std::mem::size_of::<*mut ::std::os::raw::c_void>())
-                .cast())
-        };
+    /*
+     * OK, it's probably safe to look at the context.
+     */
+    // 	context = *(MemoryContext *) (((char *) pointer) - sizeof(void *));
+    let context = unsafe {
+        // SAFETY: the caller has assured us that `pointer` points to palloc'd memory, which
+        // means it'll have this header before it
+        *(pointer
+            .cast::<::std::os::raw::c_char>()
+            .sub(std::mem::size_of::<*mut ::std::os::raw::c_void>())
+            .cast())
+    };
 
-        assert!(MemoryContextIsValid(context));
+    assert!(MemoryContextIsValid(context));
 
-        context
-    }
-
-    // Postgres 16 does **and** it's implemented different, so we'll just call it now that we can
-    #[cfg(feature = "pg16")]
-    pg_sys::GetMemoryChunkContext(pointer)
+    context
 }
 
-/// Returns true if memory context is valid, as Postgres determines such a thing.
+/// Returns true if memory context is tagged correctly according to Postgres.
 ///
 /// # Safety
 ///
-/// Caller must determine that the specified `context` pointer, if it's probably a [`MemoryContextData`]
-/// pointer, really is.  This function is a best effort, not a guarantee.
+/// The caller must only attempt this on a pointer to a Node.
+/// This may clarify if the pointee is correctly-initialized [`MemoryContextData`].
 ///
 /// # Implementation Note
 ///
 /// If Postgres adds more memory context types in the future, we need to do that here too.
 #[allow(non_snake_case)]
 #[inline(always)]
-pub unsafe fn MemoryContextIsValid(context: *mut crate::MemoryContextData) -> bool {
+pub unsafe fn MemoryContextIsValid(context: crate::MemoryContext) -> bool {
     // #define MemoryContextIsValid(context) \
     // 	((context) != NULL && \
     // 	 (IsA((context), AllocSetContext) || \
@@ -136,11 +130,12 @@ pub unsafe fn MemoryContextIsValid(context: *mut crate::MemoryContextData) -> bo
 
     !context.is_null()
         && unsafe {
-            // SAFETY:  we just determined that context isn't null, so it's safe to `.as_ref()`
-            // and `.unwrap_unchecked()`
-            (*context).type_ == crate::NodeTag_T_AllocSetContext
-                || (*context).type_ == crate::NodeTag_T_SlabContext
-                || (*context).type_ == crate::NodeTag_T_GenerationContext
+            // SAFETY:  we just determined the pointer isn't null, and
+            // the caller asserts that it is being used on a Node.
+            let tag = (*context.cast::<crate::Node>()).type_;
+            tag == crate::NodeTag_T_AllocSetContext
+                || tag == crate::NodeTag_T_SlabContext
+                || tag == crate::NodeTag_T_GenerationContext
         }
 }
 
