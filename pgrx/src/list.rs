@@ -199,12 +199,12 @@ mod flat_list {
 
         /// Borrow an item from the slice at the index
         pub fn get(&self, index: usize) -> Option<&T> {
-            self.as_slice().get(index).map(|cell| cell.deref())
+            self.as_cells().get(index).map(|cell| cell.deref())
         }
 
         /// Mutably borrow an item from the slice at the index
         pub fn get_mut(&mut self, index: usize) -> Option<&mut T> {
-            self.as_slice_mut().get_mut(index).map(|cell| cell.deref_mut())
+            self.as_cells_mut().get_mut(index).map(|cell| cell.deref_mut())
         }
 
         /// Attempt to push or Err if it would allocate
@@ -260,11 +260,11 @@ mod flat_list {
         }
 
         pub fn iter(&self) -> impl Iterator<Item = &T> {
-            self.as_slice().into_iter().map(Deref::deref)
+            self.as_cells().into_iter().map(Deref::deref)
         }
 
         pub fn iter_mut(&mut self) -> impl Iterator<Item = &mut T> {
-            self.as_slice_mut().into_iter().map(DerefMut::deref_mut)
+            self.as_cells_mut().into_iter().map(DerefMut::deref_mut)
         }
     }
 
@@ -283,12 +283,12 @@ mod flat_list {
             }
         }
 
-        /// Borrow the List's slice
+        /// Borrow the List's slice of cells
         ///
         /// Note that like with Vec, this slice may move after appending to the List!
         /// Due to lifetimes this isn't a problem until unsafe Rust becomes involved,
         /// but with Postgres extensions it often does.
-        pub fn as_slice(&self) -> &[ListCell<T>] {
+        pub fn as_cells(&self) -> &[ListCell<T>] {
             match self {
                 // No elements? No problem! Return a 0-sized slice
                 List::Nil => unsafe { std::slice::from_raw_parts(self as *const _ as _, 0) },
@@ -300,11 +300,11 @@ mod flat_list {
             }
         }
 
-        /// Mutably borrow the List's slice.
+        /// Mutably borrow the List's slice of cells
         ///
-        /// Includes the same caveats as with `List::as_slice`, but with "less" problems:
+        /// Includes the same caveats as with `List::as_cells`, but with "less" problems:
         /// `&mut` means you should not have other pointers to the list anyways.
-        pub fn as_slice_mut(&mut self) -> &mut [ListCell<T>] {
+        pub fn as_cells_mut(&mut self) -> &mut [ListCell<T>] {
             match self {
                 // No elements? No problem! Return a 0-sized slice
                 List::Nil => unsafe { std::slice::from_raw_parts_mut(self as *mut _ as _, 0) },
@@ -439,7 +439,7 @@ mod flat_list {
             } else {
                 let ptr = self.ptr.as_ptr();
                 self.ptr = unsafe { NonNull::new_unchecked(ptr.add(1)) };
-                Some(unsafe { ptr::read(T::apoptosis(ptr)) })
+                Some(unsafe { ptr::read(T::apoptosis(ptr.cast())) })
             }
         }
     }
