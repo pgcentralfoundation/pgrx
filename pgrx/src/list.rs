@@ -405,9 +405,10 @@ mod flat_list {
         pg_sys::pfree(list.cast());
     }
 
-    pub struct IntoIter<T> {
-        head: ListHead<T>,
-        i: u32,
+    pub struct ListIter<T> {
+        head: Option<ListHead<T>>,
+        ptr: NonNull<ListCell<T>>,
+        end: NonNull<ListCell<T>>,
     }
 
     pub struct Drain<'a, T> {
@@ -429,37 +430,48 @@ mod flat_list {
         }
     }
 
-    impl<T: Enlist> Iterator for IntoIter<T> {
+    impl<T: Enlist> Iterator for ListIter<T> {
         type Item = T;
 
         fn next(&mut self) -> Option<T> {
-            if self.i >= (self.head.len() as _) {
+            if self.ptr >= self.end {
                 None
             } else {
-                let i = self.i;
-                self.i += 1;
-                Some(unsafe {
-                    T::apoptosis((*self.head.list.as_ptr()).elements.add(i as _)).read()
-                })
+                let ptr = self.ptr.as_ptr();
+                self.ptr = unsafe { NonNull::new_unchecked(ptr.add(1)) };
+                Some(unsafe { ptr::read(T::apoptosis(ptr)) })
             }
         }
     }
 
     impl<T: Enlist> IntoIterator for List<T> {
-        type IntoIter = IntoIter<T>;
+        type IntoIter = ListIter<T>;
         type Item = T;
 
         fn into_iter(self) -> Self::IntoIter {
             match self {
-                List::Nil => todo!(),
-                List::Cons(head) => IntoIter { head, i: 0 },
+                List::Nil => {
+                    ListIter { head: None, ptr: NonNull::dangling(), end: NonNull::dangling() }
+                }
+                List::Cons(head) => {
+                    let len = head.len();
+                    let ptr = unsafe { (*head.list.as_ptr()).elements };
+                    let end = unsafe { ptr.add(len) };
+                    ListIter {
+                        head: Some(head),
+                        ptr: NonNull::new(ptr.cast()).unwrap(),
+                        end: NonNull::new(end.cast()).unwrap(),
+                    }
+                }
             }
         }
     }
 
-    impl<T> Drop for IntoIter<T> {
+    impl<T> Drop for ListIter<T> {
         fn drop(&mut self) {
-            unsafe { destroy_list(self.head.list.as_ptr()) }
+            if let Some(head) = self.head {
+                unsafe { destroy_list(head.list.as_ptr()) }
+            }
         }
     }
 }
