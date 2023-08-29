@@ -417,7 +417,18 @@ impl PgConfig {
                 Ok(output) => Ok(String::from_utf8(output.stdout).unwrap().trim().to_string()),
                 Err(e) => match e.kind() {
                     ErrorKind::NotFound => Err(e).wrap_err_with(|| {
-                        format!("Unable to find `{}` on the system $PATH", "pg_config".yellow())
+                        let pg_config_str = pg_config.display().to_string();
+
+                        if pg_config_str == "pg_config" {
+                            format!("Unable to find `{}` on the system $PATH", "pg_config".yellow())
+                        } else if pg_config_str.starts_with('~') {
+                            format!("The specified pg_config binary, {}, does not exist. The shell didn't expand the `~`", pg_config_str.yellow())
+                        } else {
+                            format!(
+                                "The specified pg_config binary, `{}`, does not exist",
+                                pg_config_str.yellow()
+                            )
+                        }
                     }),
                     _ => Err(e.into()),
                 },
