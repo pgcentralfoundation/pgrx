@@ -417,7 +417,7 @@ mod flat_list {
         /// Length of tail
         pub(super) tail_len: u32,
         /// Current remaining range to remove
-        pub(super) iter: slice::Iter<'a, T>,
+        pub(super) iter: slice::Iter<'a, ListCell<T>>,
         pub(super) list: &'a mut List<T>,
     }
 
@@ -443,7 +443,7 @@ mod flat_list {
         type Item = T;
 
         fn next(&mut self) -> Option<T> {
-            todo!()
+            self.iter.next().map(|cell| unsafe { ptr::read(Deref::deref(cell)) })
         }
     }
 
