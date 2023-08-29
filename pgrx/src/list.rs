@@ -418,15 +418,32 @@ mod flat_list {
         pub(super) tail_len: u32,
         /// Current remaining range to remove
         pub(super) iter: slice::Iter<'a, T>,
-        pub(super) head: ListHead<T>,
+        pub(super) list: &'a mut List<T>,
     }
 
     impl<T> Drop for Drain<'_, T> {
         fn drop(&mut self) {
-            let total_drain = todo!();
-            if total_drain {
-                unsafe { destroy_list(self.head.list.as_ptr()) }
+            // If we've iterated over everything, then just nuke it all
+            if self.tail_len == 0 && self.tail_start == 0 {
+                if let List::Cons(head) = self.list {
+                    unsafe { destroy_list(head.list.as_ptr()) }
+                }
+            } else {
+                let len = self.list.len();
+                let ptr = self.list.as_cells_mut().as_mut_ptr();
+                let src = unsafe { ptr.add(self.tail_start as _) };
+                let dst = unsafe { ptr.add(len) };
+                unsafe { ptr::copy(src, dst, self.tail_len as _) };
+                todo!() // is that it?
             }
+        }
+    }
+
+    impl<T: Enlist> Iterator for Drain<'_, T> {
+        type Item = T;
+
+        fn next(&mut self) -> Option<T> {
+            todo!()
         }
     }
 
