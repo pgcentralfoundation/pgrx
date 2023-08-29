@@ -236,9 +236,11 @@ mod flat_list {
         {
             // SAFETY: The Drain invariants are somewhat easier to maintain for List than Vec,
             // however, they have the complication of the Postgres List invariants
-            match self {
+            let taken = mem::take(self);
+            match taken {
                 List::Nil => todo!(),
                 List::Cons(head) => {
+                    let len = head.len();
                     let drain_start = match range.start_bound() {
                         Bound::Unbounded | Bound::Included(0) => 0,
                         Bound::Included(first) => *first,
@@ -249,12 +251,22 @@ mod flat_list {
                     } else {
                         unsafe { (*head.list.as_ptr()).length = drain_start as _ };
                     }
-                    let tail_start: u32 = match range.end_bound() {
-                        Bound::Unbounded => i32::MAX as u32,
-                        Bound::Included(last) => (last + 1) as _,
-                        Bound::Excluded(tail) => *tail as _,
+                    let tail_start = match range.end_bound() {
+                        Bound::Unbounded => i32::MAX as _,
+                        Bound::Included(last) => last + 1,
+                        Bound::Excluded(tail) => *tail,
                     };
-                    todo!()
+                    let tail_len = len - tail_start;
+                    // need to create raw iterator to solve the lifetime issue
+                    let iter = (&*head.as_cells()[drain_start..tail_start]).into_iter();
+                    let raw = unsafe { head.list.as_ptr() };
+                    Drain {
+                        tail_len: tail_len as _,
+                        tail_start: tail_start as _,
+                        raw,
+                        origin: self,
+                        iter,
+                    }
                 }
             }
         }
@@ -328,6 +340,19 @@ mod flat_list {
 
         pub unsafe fn set_len(&mut self, len: usize) {
             unsafe { (*self.list.as_ptr()).max_length = len as _ }
+        }
+
+        /// Borrow the List's slice of cells
+        ///
+        /// Note that like with Vec, this slice may move after appending to the List!
+        /// Due to lifetimes this isn't a problem until unsafe Rust becomes involved,
+        /// but with Postgres extensions it often does.
+        pub fn as_cells(&self) -> &[ListCell<T>] {
+            unsafe {
+                let len = self.len();
+                let ptr = (*self.list.as_ptr()).elements.cast::<ListCell<T>>();
+                std::slice::from_raw_parts(ptr, len)
+            }
         }
     }
 
@@ -413,24 +438,23 @@ mod flat_list {
 
     pub struct Drain<'a, T> {
         /// Index of tail to preserve
-        pub(super) tail_start: u32,
+        tail_start: u32,
         /// Length of tail
-        pub(super) tail_len: u32,
+        tail_len: u32,
         /// Current remaining range to remove
-        pub(super) iter: slice::Iter<'a, ListCell<T>>,
-        pub(super) list: &'a mut List<T>,
+        iter: slice::Iter<'a, ListCell<T>>,
+        origin: &'a mut List<T>,
+        raw: *mut pg_sys::List,
     }
 
     impl<T> Drop for Drain<'_, T> {
         fn drop(&mut self) {
             // If we've iterated over everything, then just nuke it all
-            if self.tail_len == 0 && self.tail_start == 0 {
-                if let List::Cons(head) = self.list {
-                    unsafe { destroy_list(head.list.as_ptr()) }
-                }
+            if self.tail_len == 0 && self.tail_start == 0 && matches!(self.origin, List::Nil) {
+                unsafe { destroy_list(self.raw) }
             } else {
-                let len = self.list.len();
-                let ptr = self.list.as_cells_mut().as_mut_ptr();
+                let len = self.origin.len();
+                let ptr = self.origin.as_cells_mut().as_mut_ptr();
                 let src = unsafe { ptr.add(self.tail_start as _) };
                 let dst = unsafe { ptr.add(len) };
                 unsafe { ptr::copy(src, dst, self.tail_len as _) };
