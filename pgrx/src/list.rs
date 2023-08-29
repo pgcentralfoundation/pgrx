@@ -469,7 +469,7 @@ mod flat_list {
 
     impl<T> Drop for ListIter<T> {
         fn drop(&mut self) {
-            if let Some(head) = self.head {
+            if let Some(head) = self.head.as_mut() {
                 unsafe { destroy_list(head.list.as_ptr()) }
             }
         }
