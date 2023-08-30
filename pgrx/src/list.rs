@@ -515,6 +515,28 @@ mod flat_list {
             }
         }
     }
+
+    /// I didn't want to have to do this, but otherwise we get an incredibly irritating suite of lifetime issues.
+    #[derive(PartialEq)]
+    struct RawIter<T> {
+        ptr: NonNull<T>,
+        end: NonNull<T>,
+    }
+
+    impl<T> Iterator for RawIter<T> {
+        type Item = T;
+
+        #[inline]
+        fn next(&mut self) -> Option<T> {
+            if self.ptr < self.end {
+                let ptr = self.ptr.as_ptr();
+                self.ptr = unsafe { NonNull::new_unchecked(ptr.add(1)) };
+                Some(unsafe { ptr.read() })
+            } else {
+                None
+            }
+        }
+    }
 }
 
 pub struct PgList<T> {
