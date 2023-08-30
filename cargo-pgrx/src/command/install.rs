@@ -25,7 +25,7 @@ use std::sync::{Arc, Mutex};
 
 /// Type used for memoizing expensive to calculate values.
 /// Arc<Mutex> is needed to get around compiler safety checks.
-type MemoizeKeyValue = Arc<Mutex<HashMap<String, String>>>;
+type MemoizeKeyValue = Arc<Mutex<HashMap<PathBuf, String>>>;
 
 /// Install the extension from the current crate to the Postgres specified by whatever `pg_config` is currently on your $PATH
 #[derive(clap::Args, Debug)]
@@ -404,7 +404,7 @@ pub(crate) fn find_library_file(
 static CARGO_VERSION: Lazy<MemoizeKeyValue> = Lazy::new(|| Arc::new(Mutex::new(HashMap::new())));
 
 pub(crate) fn get_version(manifest_path: impl AsRef<Path>) -> eyre::Result<String> {
-    let path_string = manifest_path.as_ref().display().to_string();
+    let path_string = manifest_path.as_ref().to_owned();
 
     if let Some(version) = CARGO_VERSION.lock().unwrap().get(&path_string) {
         return Ok(version.clone());
@@ -436,7 +436,7 @@ pub(crate) fn get_version(manifest_path: impl AsRef<Path>) -> eyre::Result<Strin
 static GIT_HASH: Lazy<MemoizeKeyValue> = Lazy::new(|| Arc::new(Mutex::new(HashMap::new())));
 
 fn get_git_hash(manifest_path: impl AsRef<Path>) -> eyre::Result<String> {
-    let path_string = manifest_path.as_ref().display().to_string();
+    let path_string = manifest_path.as_ref().to_owned();
 
     if let Some(hash) = GIT_HASH.lock().unwrap().get(&path_string) {
         return Ok(hash.clone());
