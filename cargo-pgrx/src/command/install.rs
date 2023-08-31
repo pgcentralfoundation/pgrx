@@ -13,12 +13,19 @@ use crate::profile::CargoProfile;
 use crate::CommandExecute;
 use cargo_toml::Manifest;
 use eyre::{eyre, WrapErr};
+use once_cell::sync::Lazy;
 use owo_colors::OwoColorize;
 use pgrx_pg_config::{cargo::PgrxManifestExt, get_target_dir, PgConfig, Pgrx};
+use std::collections::HashMap;
 use std::fs;
 use std::io::BufReader;
 use std::path::{Path, PathBuf};
 use std::process::Stdio;
+use std::sync::{Arc, Mutex};
+
+/// Type used for memoizing expensive to calculate values.
+/// Arc<Mutex> is needed to get around compiler safety checks.
+type MemoizeKeyValue = Arc<Mutex<HashMap<PathBuf, String>>>;
 
 /// Install the extension from the current crate to the Postgres specified by whatever `pg_config` is currently on your $PATH
 #[derive(clap::Args, Debug)]
@@ -222,7 +229,6 @@ fn copy_file(
         let input = std::fs::read_to_string(&src)
             .wrap_err_with(|| format!("failed to read `{}`", src.display()))?;
         let input = filter_contents(package_manifest_path, input)?;
-
         std::fs::write(&dest, &input).wrap_err_with(|| {
             format!("failed writing `{}` to `{}`", src.display(), dest.display())
         })?;
@@ -395,8 +401,16 @@ pub(crate) fn find_library_file(
     Ok(library_file_path)
 }
 
+static CARGO_VERSION: Lazy<MemoizeKeyValue> = Lazy::new(|| Arc::new(Mutex::new(HashMap::new())));
+
 pub(crate) fn get_version(manifest_path: impl AsRef<Path>) -> eyre::Result<String> {
-    match get_property(&manifest_path, "default_version")? {
+    let path_string = manifest_path.as_ref().to_owned();
+
+    if let Some(version) = CARGO_VERSION.lock().unwrap().get(&path_string) {
+        return Ok(version.clone());
+    }
+
+    let version = match get_property(&manifest_path, "default_version")? {
         Some(v) => {
             if v == "@CARGO_VERSION@" {
                 let metadata = crate::metadata::metadata(&Default::default(), Some(&manifest_path))
@@ -407,21 +421,36 @@ pub(crate) fn get_version(manifest_path: impl AsRef<Path>) -> eyre::Result<Strin
                 let manifest = Manifest::from_path(&manifest_path)
                     .wrap_err("Couldn't parse manifest")?;
                 let version = manifest.package_version()?;
-                Ok(version)
+                version
             } else {
-                Ok(v)
+                v
             }
         },
-        None => Err(eyre!("cannot determine extension version number.  Is the `default_version` property declared in the control file?")),
-    }
+        None => return Err(eyre!("cannot determine extension version number.  Is the `default_version` property declared in the control file?")),
+    };
+
+    CARGO_VERSION.lock().unwrap().insert(path_string, version.clone());
+    Ok(version)
 }
 
+static GIT_HASH: Lazy<MemoizeKeyValue> = Lazy::new(|| Arc::new(Mutex::new(HashMap::new())));
+
 fn get_git_hash(manifest_path: impl AsRef<Path>) -> eyre::Result<String> {
-    match get_property(manifest_path, "git_hash")? {
-        Some(hash) => Ok(hash),
-        None => Err(eyre!(
-            "unable to determine git hash.  Is git installed and is this project a git repository?"
-        )),
+    let path_string = manifest_path.as_ref().to_owned();
+
+    if let Some(hash) = GIT_HASH.lock().unwrap().get(&path_string) {
+        return Ok(hash.clone());
+    } else {
+        let hash = match get_property(manifest_path, "git_hash")? {
+            Some(hash) => hash,
+            None => return Err(eyre!(
+                "unable to determine git hash.  Is git installed and is this project a git repository?"
+            )),
+        };
+
+        GIT_HASH.lock().unwrap().insert(path_string, hash.clone());
+
+        Ok(hash)
     }
 }
 
