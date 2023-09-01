@@ -148,6 +148,7 @@ impl<'conn> Query<'conn> for &str {
 pub struct PreparedStatement<'conn> {
     pub(super) plan: NonNull<pg_sys::_SPI_plan>,
     pub(super) __marker: PhantomData<&'conn ()>,
+    pub(super) mutating: bool,
 }
 
 /// Static lifetime-bound prepared statement
@@ -214,7 +215,11 @@ impl<'conn> PreparedStatement<'conn> {
         unsafe {
             pg_sys::SPI_keepplan(self.plan.as_ptr());
         }
-        OwnedPreparedStatement(PreparedStatement { __marker: PhantomData, plan: self.plan })
+        OwnedPreparedStatement(PreparedStatement {
+            __marker: PhantomData,
+            plan: self.plan,
+            mutating: self.mutating,
+        })
     }
 }
 
@@ -227,6 +232,9 @@ impl<'conn: 'stmt, 'stmt> Query<'conn> for &'stmt PreparedStatement<'conn> {
         limit: Option<libc::c_long>,
         arguments: Self::Arguments,
     ) -> SpiResult<SpiTupleTable<'conn>> {
+        if self.mutating {
+            Spi::mark_mutable();
+        }
         // SAFETY: no concurrent access
         unsafe {
             pg_sys::SPI_tuptable = std::ptr::null_mut();
@@ -257,6 +265,9 @@ impl<'conn: 'stmt, 'stmt> Query<'conn> for &'stmt PreparedStatement<'conn> {
     }
 
     fn open_cursor(self, _client: &SpiClient<'conn>, args: Self::Arguments) -> SpiCursor<'conn> {
+        if self.mutating {
+            Spi::mark_mutable();
+        }
         let args = args.unwrap_or_default();
 
         let (mut datums, nulls): (Vec<_>, Vec<_>) = args.into_iter().map(prepare_datum).unzip();

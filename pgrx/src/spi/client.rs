@@ -21,6 +21,28 @@ impl<'conn> SpiClient<'conn> {
         query: &str,
         args: Option<Vec<PgOid>>,
     ) -> SpiResult<PreparedStatement<'conn>> {
+        self.make_prepare_statement(query, args, false)
+    }
+
+    /// Prepares a mutating statement that is valid for the lifetime of the client
+    ///
+    /// # Panics
+    ///
+    /// This function will panic if the supplied `query` string contained a NULL byte
+    pub fn prepare_mut(
+        &self,
+        query: &str,
+        args: Option<Vec<PgOid>>,
+    ) -> SpiResult<PreparedStatement<'conn>> {
+        self.make_prepare_statement(query, args, true)
+    }
+
+    fn make_prepare_statement(
+        &self,
+        query: &str,
+        args: Option<Vec<PgOid>>,
+        mutating: bool,
+    ) -> SpiResult<PreparedStatement<'conn>> {
         let src = CString::new(query).expect("query contained a null byte");
         let args = args.unwrap_or_default();
         let nargs = args.len();
@@ -43,6 +65,7 @@ impl<'conn> SpiClient<'conn> {
                 .unwrap()
             })?,
             __marker: PhantomData,
+            mutating,
         })
     }
 
