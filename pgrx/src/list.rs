@@ -239,7 +239,21 @@ mod flat_list {
             // however, they have the complication of the Postgres List invariants
             let taken = mem::take(self);
             match taken {
-                List::Nil => todo!(),
+                List::Nil => {
+                    // this is only valid if:
+                    assert!(matches!(range.start_bound(), Bound::Included(0) | Bound::Unbounded));
+                    assert!(matches!(
+                        range.end_bound(),
+                        Bound::Excluded(0 | 1) | Bound::Included(0) | Bound::Unbounded
+                    ));
+                    Drain {
+                        tail_len: 0,
+                        tail_start: 0,
+                        raw: ptr::null_mut(),
+                        origin: self,
+                        iter: RawIter { ptr: ptr::null_mut(), end: ptr::null_mut() },
+                    }
+                }
                 List::Cons(mut head) => {
                     let len = head.len();
                     let drain_start = match range.start_bound() {
@@ -247,17 +261,23 @@ mod flat_list {
                         Bound::Included(first) => *first,
                         Bound::Excluded(point) => point + 1,
                     };
-                    if drain_start == 0 {
-                        *self = Default::default();
-                    } else {
-                        unsafe { (*head.list.as_ptr()).length = drain_start as _ };
-                    }
                     let tail_start = match range.end_bound() {
                         Bound::Unbounded => cmp::min(i32::MAX as _, len),
                         Bound::Included(last) => last + 1,
                         Bound::Excluded(tail) => *tail,
                     };
                     let tail_len = len - tail_start;
+                    // Let's issue our asserts before mutating state:
+                    assert!(drain_start <= len);
+                    assert!(tail_start <= len);
+                    assert!(drain_start + tail_len == len);
+
+                    if drain_start == 0 {
+                        *self = Default::default();
+                    } else {
+                        unsafe { (*head.list.as_ptr()).length = drain_start as _ };
+                    }
+
                     // need to create raw iterator to solve the lifetime issue
                     let cells_ptr = head.as_mut_cells_ptr();
                     let iter = unsafe {
