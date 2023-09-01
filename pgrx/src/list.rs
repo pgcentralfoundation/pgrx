@@ -258,7 +258,9 @@ mod flat_list {
                     };
                     let tail_len = len - tail_start;
                     // need to create raw iterator to solve the lifetime issue
-                    let iter = (&*head.as_cells()[drain_start..tail_start]).into_iter();
+                    let drain_ptr = todo!();
+                    // let iter = (&*head.as_cells()[drain_start..tail_start]).into_iter();
+                    let iter = todo!();
                     let raw = unsafe { head.list.as_ptr() };
                     Drain {
                         tail_len: tail_len as _,
