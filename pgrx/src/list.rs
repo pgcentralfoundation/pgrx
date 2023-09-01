@@ -305,11 +305,9 @@ mod flat_list {
         pub fn as_cells(&self) -> &[ListCell<T>] {
             match self {
                 // No elements? No problem! Return a 0-sized slice
-                List::Nil => unsafe { std::slice::from_raw_parts(self as *const _ as _, 0) },
+                List::Nil => unsafe { slice::from_raw_parts(self as *const _ as _, 0) },
                 List::Cons(inner) => unsafe {
-                    let len = inner.len();
-                    let ptr = (*inner.list.as_ptr()).elements.cast::<ListCell<T>>();
-                    std::slice::from_raw_parts(ptr, len)
+                    slice::from_raw_parts(inner.as_cells_ptr(), inner.len())
                 },
             }
         }
@@ -321,11 +319,9 @@ mod flat_list {
         pub fn as_cells_mut(&mut self) -> &mut [ListCell<T>] {
             match self {
                 // No elements? No problem! Return a 0-sized slice
-                List::Nil => unsafe { std::slice::from_raw_parts_mut(self as *mut _ as _, 0) },
+                List::Nil => unsafe { slice::from_raw_parts_mut(self as *mut _ as _, 0) },
                 List::Cons(inner) => unsafe {
-                    let len = inner.len();
-                    let ptr = (*inner.list.as_ptr()).elements.cast::<ListCell<T>>();
-                    std::slice::from_raw_parts_mut(ptr, len)
+                    slice::from_raw_parts_mut(inner.as_mut_cells_ptr(), inner.len())
                 },
             }
         }
@@ -350,11 +346,15 @@ mod flat_list {
         /// Due to lifetimes this isn't a problem until unsafe Rust becomes involved,
         /// but with Postgres extensions it often does.
         pub fn as_cells(&self) -> &[ListCell<T>] {
-            unsafe {
-                let len = self.len();
-                let ptr = (*self.list.as_ptr()).elements.cast::<ListCell<T>>();
-                std::slice::from_raw_parts(ptr, len)
-            }
+            unsafe { slice::from_raw_parts(self.as_cells_ptr(), self.len()) }
+        }
+
+        pub fn as_cells_ptr(&self) -> *const ListCell<T> {
+            unsafe { (*self.list.as_ptr()).elements.cast() }
+        }
+
+        pub fn as_mut_cells_ptr(&mut self) -> *mut ListCell<T> {
+            unsafe { (*self.list.as_ptr()).elements.cast() }
         }
     }
 
@@ -455,8 +455,9 @@ mod flat_list {
             if self.tail_len == 0 && self.tail_start == 0 && matches!(self.origin, List::Nil) {
                 unsafe { destroy_list(self.raw) }
             } else {
-                let len = self.origin.len();
-                let ptr = self.origin.as_cells_mut().as_mut_ptr();
+                let List::Cons(head) = self.origin else { return };
+                let len = head.len();
+                let ptr = head.as_mut_cells_ptr();
                 let src = unsafe { ptr.add(self.tail_start as _) };
                 let dst = unsafe { ptr.add(len) };
                 unsafe { ptr::copy(src, dst, self.tail_len as _) };
@@ -496,9 +497,9 @@ mod flat_list {
                 List::Nil => {
                     ListIter { head: None, ptr: NonNull::dangling(), end: NonNull::dangling() }
                 }
-                List::Cons(head) => {
+                List::Cons(mut head) => {
                     let len = head.len();
-                    let ptr = unsafe { (*head.list.as_ptr()).elements };
+                    let ptr = head.as_mut_cells_ptr();
                     let end = unsafe { ptr.add(len) };
                     ListIter {
                         head: Some(head),
