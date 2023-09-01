@@ -273,7 +273,9 @@ mod flat_list {
 
             // Remember to check that our raw ptr is non-null
             if raw != ptr::null_mut() {
-                // If not draining all, then shorten the list.
+                // Shorten the list to prohibit interaction with List's state after drain_start.
+                // Note this breaks List repr invariants in the `drain_start == 0` case, but
+                // we only consider returning the list ptr to `&mut self` if Drop is completed
                 unsafe { (*raw).length = drain_start as _ };
                 let cells_ptr = unsafe { (*raw).elements };
                 let iter = unsafe {
@@ -475,6 +477,7 @@ mod flat_list {
         end: NonNull<ListCell<T>>,
     }
 
+    /// A list being drained.
     pub struct Drain<'a, T> {
         /// Index of tail to preserve
         tail_start: u32,
@@ -488,24 +491,30 @@ mod flat_list {
 
     impl<T> Drop for Drain<'_, T> {
         fn drop(&mut self) {
-            // Remember: the raw repr accepts null ptrs
             if self.raw == ptr::null_mut() {
                 return;
             }
-            todo!();
-            // If we've iterated over everything, then just nuke it all
-            if self.tail_len == 0 && self.tail_start == 0 && matches!(self.origin, List::Nil) {
-                unsafe { destroy_list(self.raw) }
-            } else {
-                // no, we may have wiped the origin but still have a tail
-                let List::Cons(head) = self.origin else { return };
-                let len = head.len();
-                let ptr = head.as_mut_cells_ptr();
-                let src = unsafe { ptr.add(self.tail_start as _) };
-                let dst = unsafe { ptr.add(len) };
-                unsafe { ptr::copy(src, dst, self.tail_len as _) };
-                todo!() // is that it?
-                        // no, we have to restore the list if we yoinked it
+
+            // SAFETY: The raw repr accepts null ptrs, but we just checked it's okay.
+            unsafe {
+                // Note that this may be 0, unlike elsewhere!
+                let len = (*self.raw).length;
+                if len == 0 && self.tail_len == 0 {
+                    // Can't simply leave it be due to Postgres List invariants, else it leaks
+                    destroy_list(self.raw)
+                } else {
+                    // Need to weld over the drained part and fix the length
+                    let src = (*self.raw).elements.add(self.tail_start as _);
+                    let dst = (*self.raw).elements.add(len as _);
+                    ptr::copy(src, dst, self.tail_len as _); // may overlap
+                    (*self.raw).length = len + (self.tail_len as ffi::c_int);
+
+                    // Put it back now that all invariants have been repaired
+                    *self.origin = List::Cons(ListHead {
+                        list: NonNull::new_unchecked(self.raw),
+                        _type: PhantomData,
+                    });
+                }
             }
         }
     }
