@@ -199,12 +199,12 @@ mod flat_list {
 
         /// Borrow an item from the slice at the index
         pub fn get(&self, index: usize) -> Option<&T> {
-            self.as_cells().get(index).map(|cell| cell.deref())
+            self.as_cells().get(index).map(Deref::deref)
         }
 
         /// Mutably borrow an item from the slice at the index
         pub fn get_mut(&mut self, index: usize) -> Option<&mut T> {
-            self.as_cells_mut().get_mut(index).map(|cell| cell.deref_mut())
+            self.as_cells_mut().get_mut(index).map(DerefMut::deref_mut)
         }
 
         /// Attempt to push or Err if it would allocate
