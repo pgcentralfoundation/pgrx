@@ -237,60 +237,68 @@ mod flat_list {
         {
             // SAFETY: The Drain invariants are somewhat easier to maintain for List than Vec,
             // however, they have the complication of the Postgres List invariants
-            let taken = mem::take(self);
-            match taken {
-                List::Nil => {
-                    // this is only valid if:
-                    assert!(matches!(range.start_bound(), Bound::Included(0) | Bound::Unbounded));
-                    assert!(matches!(
-                        range.end_bound(),
-                        Bound::Excluded(0 | 1) | Bound::Included(0) | Bound::Unbounded
-                    ));
-                    Drain {
-                        tail_len: 0,
-                        tail_start: 0,
-                        raw: ptr::null_mut(),
-                        origin: self,
-                        iter: RawIter { ptr: ptr::null_mut(), end: ptr::null_mut() },
-                    }
+            let len = self.len();
+            let drain_start = match range.start_bound() {
+                Bound::Unbounded | Bound::Included(0) => 0,
+                Bound::Included(first) => *first,
+                Bound::Excluded(point) => point + 1,
+            };
+            let tail_start = match range.end_bound() {
+                Bound::Unbounded => cmp::min(ffi::c_int::MAX as _, len),
+                Bound::Included(last) => last + 1,
+                Bound::Excluded(tail) => *tail,
+            };
+            let Some(tail_len) = len.checked_sub(tail_start) else {
+                panic!("index out of bounds of list!")
+            };
+            // Let's issue our asserts before mutating state:
+            assert!(drain_start <= len);
+            assert!(tail_start <= len);
+            assert!(drain_start + tail_len == len);
+
+            // Postgres assumes Lists fit into c_int, check before shrinking
+            assert!(tail_start <= ffi::c_int::MAX as _);
+            assert!(drain_start + tail_len <= ffi::c_int::MAX as _);
+
+            // If draining all, rip it out of place to contain broken invariants from panics
+            let raw = if drain_start == 0 {
+                mem::take(self).as_raw_ptr()
+            } else {
+                // Leave it in place, but we need a pointer:
+                match self {
+                    List::Nil => ptr::null_mut(),
+                    List::Cons(head) => head.list.as_ptr().cast(),
                 }
-                List::Cons(mut head) => {
-                    let len = head.len();
-                    let drain_start = match range.start_bound() {
-                        Bound::Unbounded | Bound::Included(0) => 0,
-                        Bound::Included(first) => *first,
-                        Bound::Excluded(point) => point + 1,
-                    };
-                    let tail_start = match range.end_bound() {
-                        Bound::Unbounded => cmp::min(i32::MAX as _, len),
-                        Bound::Included(last) => last + 1,
-                        Bound::Excluded(tail) => *tail,
-                    };
-                    let tail_len = len - tail_start;
-                    // Let's issue our asserts before mutating state:
-                    assert!(drain_start <= len);
-                    assert!(tail_start <= len);
-                    assert!(drain_start + tail_len == len);
+            };
 
-                    if drain_start == 0 {
-                        *self = Default::default();
-                    } else {
-                        unsafe { (*head.list.as_ptr()).length = drain_start as _ };
+            // Remember to check that our raw ptr is non-null
+            if raw != ptr::null_mut() {
+                // If not draining all, then shorten the list.
+                unsafe { (*raw).length = drain_start as _ };
+                let cells_ptr = unsafe { (*raw).elements };
+                let iter = unsafe {
+                    RawIter {
+                        ptr: cells_ptr.add(drain_start).cast(),
+                        end: cells_ptr.add(tail_start).cast(),
                     }
-
-                    // need to create raw iterator to solve the lifetime issue
-                    let cells_ptr = head.as_mut_cells_ptr();
-                    let iter = unsafe {
-                        RawIter { ptr: cells_ptr.add(drain_start), end: cells_ptr.add(tail_start) }
-                    };
-                    let raw = head.list.as_ptr();
-                    Drain {
-                        tail_len: tail_len as _,
-                        tail_start: tail_start as _,
-                        raw,
-                        origin: self,
-                        iter,
-                    }
+                };
+                Drain {
+                    tail_len: tail_len as _,
+                    tail_start: tail_start as _,
+                    raw,
+                    origin: self,
+                    iter,
+                }
+            } else {
+                // If it's not, produce the only valid choice: a 0-len iterator pointing to null
+                // One last doublecheck for old paranoia's sake:
+                assert!(tail_len == 0 && tail_start == 0 && drain_start == 0);
+                Drain {
+                    tail_len: 0,
+                    tail_start: 0,
+                    raw,
+                    origin: self,
+                    iter: RawIter { ptr: ptr::null_mut(), end: ptr::null_mut() },
                 }
             }
         }
@@ -316,6 +324,13 @@ mod flat_list {
             match self {
                 List::Nil => 0,
                 List::Cons(head) => head.capacity(),
+            }
+        }
+
+        fn as_raw_ptr(self) -> *mut pg_sys::List {
+            match self {
+                List::Nil => ptr::null_mut(),
+                List::Cons(head) => head.list.as_ptr(),
             }
         }
 
@@ -473,10 +488,16 @@ mod flat_list {
 
     impl<T> Drop for Drain<'_, T> {
         fn drop(&mut self) {
+            // Remember: the raw repr accepts null ptrs
+            if self.raw == ptr::null_mut() {
+                return;
+            }
+            todo!();
             // If we've iterated over everything, then just nuke it all
             if self.tail_len == 0 && self.tail_start == 0 && matches!(self.origin, List::Nil) {
                 unsafe { destroy_list(self.raw) }
             } else {
+                // no, we may have wiped the origin but still have a tail
                 let List::Cons(head) = self.origin else { return };
                 let len = head.len();
                 let ptr = head.as_mut_cells_ptr();
@@ -484,6 +505,7 @@ mod flat_list {
                 let dst = unsafe { ptr.add(len) };
                 unsafe { ptr::copy(src, dst, self.tail_len as _) };
                 todo!() // is that it?
+                        // no, we have to restore the list if we yoinked it
             }
         }
     }
