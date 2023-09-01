@@ -21,6 +21,7 @@ pub use flat_list::{Enlist, List, ListHead};
 #[cfg(any(feature = "pg13", feature = "pg14", feature = "pg15", feature = "pg16"))]
 mod flat_list {
     use crate::pg_sys;
+    use core::cmp;
     use core::ffi;
     use core::marker::PhantomData;
     use core::mem;
@@ -239,7 +240,7 @@ mod flat_list {
             let taken = mem::take(self);
             match taken {
                 List::Nil => todo!(),
-                List::Cons(head) => {
+                List::Cons(mut head) => {
                     let len = head.len();
                     let drain_start = match range.start_bound() {
                         Bound::Unbounded | Bound::Included(0) => 0,
@@ -252,16 +253,17 @@ mod flat_list {
                         unsafe { (*head.list.as_ptr()).length = drain_start as _ };
                     }
                     let tail_start = match range.end_bound() {
-                        Bound::Unbounded => i32::MAX as _,
+                        Bound::Unbounded => cmp::min(i32::MAX as _, len),
                         Bound::Included(last) => last + 1,
                         Bound::Excluded(tail) => *tail,
                     };
                     let tail_len = len - tail_start;
                     // need to create raw iterator to solve the lifetime issue
-                    let drain_ptr = todo!();
-                    // let iter = (&*head.as_cells()[drain_start..tail_start]).into_iter();
-                    let iter = todo!();
-                    let raw = unsafe { head.list.as_ptr() };
+                    let cells_ptr = head.as_mut_cells_ptr();
+                    let iter = unsafe {
+                        RawIter { ptr: cells_ptr.add(drain_start), end: cells_ptr.add(tail_start) }
+                    };
+                    let raw = head.list.as_ptr();
                     Drain {
                         tail_len: tail_len as _,
                         tail_start: tail_start as _,
@@ -444,7 +446,7 @@ mod flat_list {
         /// Length of tail
         tail_len: u32,
         /// Current remaining range to remove
-        iter: slice::Iter<'a, ListCell<T>>,
+        iter: RawIter<ListCell<T>>,
         origin: &'a mut List<T>,
         raw: *mut pg_sys::List,
     }
@@ -467,10 +469,10 @@ mod flat_list {
     }
 
     impl<T: Enlist> Iterator for Drain<'_, T> {
-        type Item = T;
+        type Item = ListCell<T>;
 
-        fn next(&mut self) -> Option<T> {
-            self.iter.next().map(|cell| unsafe { ptr::read(Deref::deref(cell)) })
+        fn next(&mut self) -> Option<Self::Item> {
+            self.iter.next()
         }
     }
 
@@ -522,8 +524,8 @@ mod flat_list {
     /// I didn't want to have to do this, but otherwise we get an incredibly irritating suite of lifetime issues.
     #[derive(PartialEq)]
     struct RawIter<T> {
-        ptr: NonNull<T>,
-        end: NonNull<T>,
+        ptr: *mut T,
+        end: *mut T,
     }
 
     impl<T> Iterator for RawIter<T> {
@@ -532,8 +534,8 @@ mod flat_list {
         #[inline]
         fn next(&mut self) -> Option<T> {
             if self.ptr < self.end {
-                let ptr = self.ptr.as_ptr();
-                self.ptr = unsafe { NonNull::new_unchecked(ptr.add(1)) };
+                let ptr = self.ptr;
+                self.ptr = unsafe { ptr.add(1) };
                 Some(unsafe { ptr.read() })
             } else {
                 None
