@@ -256,7 +256,7 @@ mod flat_list {
 
             // If draining all, rip it out of place to contain broken invariants from panics
             let raw = if drain_start == 0 {
-                mem::take(self).as_raw_ptr()
+                mem::take(self).into_nullable()
             } else {
                 // Leave it in place, but we need a pointer:
                 match self {
@@ -317,7 +317,7 @@ mod flat_list {
             }
         }
 
-        fn as_raw_ptr(self) -> *mut pg_sys::List {
+        pub fn into_nullable(self) -> *mut pg_sys::List {
             match self {
                 List::Nil => ptr::null_mut(),
                 List::Cons(head) => head.list.as_ptr(),
@@ -329,13 +329,15 @@ mod flat_list {
         /// Note that like with Vec, this slice may move after appending to the List!
         /// Due to lifetimes this isn't a problem until unsafe Rust becomes involved,
         /// but with Postgres extensions it often does.
+        ///
+        /// Note that if you use this on a 0-item list, you get an empty slice, of course.
         pub fn as_cells(&self) -> &[ListCell<T>] {
-            match self {
-                // No elements? No problem! Return a 0-sized slice
-                List::Nil => unsafe { slice::from_raw_parts(self as *const _ as _, 0) },
-                List::Cons(inner) => unsafe {
-                    slice::from_raw_parts(inner.as_cells_ptr(), inner.len())
-                },
+            unsafe {
+                match self {
+                    // No elements? No problem! Return a 0-sized slice
+                    List::Nil => slice::from_raw_parts(self as *const _ as _, 0),
+                    List::Cons(inner) => slice::from_raw_parts(inner.as_cells_ptr(), inner.len()),
+                }
             }
         }
 
@@ -343,13 +345,24 @@ mod flat_list {
         ///
         /// Includes the same caveats as with `List::as_cells`, but with "less" problems:
         /// `&mut` means you should not have other pointers to the list anyways.
+        ///
+        /// Note that if you use this on a 0-item list, you get an empty slice, of course.
         pub fn as_cells_mut(&mut self) -> &mut [ListCell<T>] {
-            match self {
-                // No elements? No problem! Return a 0-sized slice
-                List::Nil => unsafe { slice::from_raw_parts_mut(self as *mut _ as _, 0) },
-                List::Cons(inner) => unsafe {
-                    slice::from_raw_parts_mut(inner.as_mut_cells_ptr(), inner.len())
-                },
+            // SAFETY: Note it is unsafe to read a union variant, but safe to set a union variant!
+            // This allows access to `&mut pg_sys::ListCell` to mangle a List's type in safe code.
+            // Also note that we can't yield &mut [T] because Postgres Lists aren't tight-packed.
+            // These facts are why the entire List type's interface isn't much simpler.
+            //
+            // This function is safe as long as ListCell<T> offers no way to corrupt the list,
+            // and as long as we correctly maintain the length of the List's type.
+            unsafe {
+                match self {
+                    // No elements? No problem! Return a 0-sized slice
+                    List::Nil => slice::from_raw_parts_mut(self as *mut _ as _, 0),
+                    List::Cons(inner) => {
+                        slice::from_raw_parts_mut(inner.as_mut_cells_ptr(), inner.len())
+                    }
+                }
             }
         }
     }
@@ -536,17 +549,14 @@ mod flat_list {
                     RawCellIter { ptr, end }
                 }
             };
-            ListIter {
-                list: self,
-                iter,
-            }
+            ListIter { list: self, iter }
         }
     }
 
     impl<T> Drop for ListIter<T> {
         fn drop(&mut self) {
             if let List::Cons(head) = &mut self.list {
-                unsafe { destroy_list(head.list.as_ptr() ) }
+                unsafe { destroy_list(head.list.as_ptr()) }
             }
         }
     }
