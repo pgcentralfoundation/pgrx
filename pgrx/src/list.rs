@@ -51,6 +51,8 @@ mod flat_list {
         _type: PhantomData<T>,
     }
 
+    // Note this well: the size of a `ListCell<T>`'s type doesn't matter.
+    // Thus it isn't acceptable to implement Enlist for types larger than `pg_sys::ListCell`.
     const _: () = {
         assert!(mem::size_of::<ListCell<u128>>() == mem::size_of::<pg_sys::ListCell>());
     };
@@ -87,8 +89,8 @@ mod flat_list {
     /// The bound to describe a type which may be used in a Postgres List
     /// It must know what an appropriate type tag is, and how to pointer-cast to itself
     pub unsafe trait Enlist: seal::Sealed + Sized {
-        // fn tag() -> pg_sys::NodeTag;
-        fn matching_tag(tag: pg_sys::NodeTag) -> bool;
+        // The appropriate list tag for this type.
+        const LIST_TAG: pg_sys::NodeTag;
 
         /// From a pointer to the pg_sys::ListCell union, obtain a pointer to Self
         /// I think this isn't actually unsafe, it just has an unsafe impl invariant?
@@ -106,9 +108,7 @@ mod flat_list {
 
     impl seal::Sealed for *mut ffi::c_void {}
     unsafe impl Enlist for *mut ffi::c_void {
-        fn matching_tag(tag: pg_sys::NodeTag) -> bool {
-            matches!(tag, pg_sys::NodeTag::T_List)
-        }
+        const LIST_TAG: pg_sys::NodeTag = pg_sys::NodeTag::T_List;
 
         unsafe fn apoptosis(cell: *mut pg_sys::ListCell) -> *mut *mut ffi::c_void {
             unsafe { ptr::addr_of_mut!((*cell).ptr_value) }
@@ -121,9 +121,7 @@ mod flat_list {
 
     impl seal::Sealed for ffi::c_int {}
     unsafe impl Enlist for ffi::c_int {
-        fn matching_tag(tag: pg_sys::NodeTag) -> bool {
-            matches!(tag, pg_sys::NodeTag::T_IntList)
-        }
+        const LIST_TAG: pg_sys::NodeTag = pg_sys::NodeTag::T_IntList;
 
         unsafe fn apoptosis(cell: *mut pg_sys::ListCell) -> *mut ffi::c_int {
             unsafe { ptr::addr_of_mut!((*cell).int_value) }
@@ -136,9 +134,7 @@ mod flat_list {
 
     impl seal::Sealed for pg_sys::Oid {}
     unsafe impl Enlist for pg_sys::Oid {
-        fn matching_tag(tag: pg_sys::NodeTag) -> bool {
-            matches!(tag, pg_sys::NodeTag::T_OidList)
-        }
+        const LIST_TAG: pg_sys::NodeTag = pg_sys::NodeTag::T_OidList;
 
         unsafe fn apoptosis(cell: *mut pg_sys::ListCell) -> *mut pg_sys::Oid {
             unsafe { ptr::addr_of_mut!((*cell).oid_value) }
@@ -153,9 +149,7 @@ mod flat_list {
     impl seal::Sealed for pg_sys::TransactionId {}
     #[cfg(feature = "pg16")]
     unsafe impl Enlist for pg_sys::TransactionId {
-        fn matching_tag(tag: pg_sys::NodeTag) -> bool {
-            matches!(tag, pg_sys::NodeTag::T_XidList)
-        }
+        const LIST_TAG: pg_sys::NodeTag = pg_sys::NodeTag::T_XidList;
 
         unsafe fn apoptosis(cell: *mut pg_sys::ListCell) -> *mut pg_sys::TransactionId {
             unsafe { ptr::addr_of_mut!((*cell).xid_value) }
@@ -407,7 +401,7 @@ mod flat_list {
         /// If it returns as `Some`, it also asserts the entire List is, across its length,
         /// validly initialized as `T` in each ListCell.
         pub unsafe fn downcast_from_ptr(list: NonNull<pg_sys::List>) -> Option<ListHead<T>> {
-            T::matching_tag((*list.as_ptr()).type_).then_some(ListHead { list, _type: PhantomData })
+            (T::LIST_TAG == (*list.as_ptr()).type_).then_some(ListHead { list, _type: PhantomData })
         }
 
         pub fn push(&mut self, value: T) -> &mut Self {
