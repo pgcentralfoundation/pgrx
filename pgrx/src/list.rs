@@ -460,7 +460,7 @@ mod flat_list {
     }
 
     pub struct ListIter<T> {
-        head: Option<ListHead<T>>,
+        list: List<T>,
         iter: RawCellIter<T>,
     }
 
@@ -526,23 +526,27 @@ mod flat_list {
         type IntoIter = ListIter<T>;
         type Item = T;
 
-        fn into_iter(self) -> Self::IntoIter {
-            match self {
-                List::Nil => ListIter { head: None, iter: Default::default() },
-                List::Cons(mut head) => {
-                    let len = head.len();
+        fn into_iter(mut self) -> Self::IntoIter {
+            let len = self.len();
+            let iter = match &mut self {
+                List::Nil => Default::default(),
+                List::Cons(head) => {
                     let ptr = head.as_mut_cells_ptr();
                     let end = unsafe { ptr.add(len) };
-                    ListIter { head: Some(head), iter: Default::default() }
+                    RawCellIter { ptr, end }
                 }
+            };
+            ListIter {
+                list: self,
+                iter,
             }
         }
     }
 
     impl<T> Drop for ListIter<T> {
         fn drop(&mut self) {
-            if let Some(head) = self.head.as_mut() {
-                unsafe { destroy_list(head.list.as_ptr()) }
+            if let List::Cons(head) = &mut self.list {
+                unsafe { destroy_list(head.list.as_ptr() ) }
             }
         }
     }
