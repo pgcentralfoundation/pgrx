@@ -88,6 +88,13 @@ mod flat_list {
 
     /// The bound to describe a type which may be used in a Postgres List
     /// It must know what an appropriate type tag is, and how to pointer-cast to itself
+    ///
+    /// # Safety
+    /// `List<T>` relies in various ways on this being correctly implemented.
+    /// Incorrect implementation can lead to broken Lists, UB, or "database hilarity".
+    ///
+    /// Only realistically valid to implement for union variants of pg_sys::ListCell.
+    /// It's not even correct to impl for `*mut T`, as `*mut T` may be a fat pointer!
     pub unsafe trait Enlist: seal::Sealed + Sized {
         // The appropriate list tag for this type.
         const LIST_TAG: pg_sys::NodeTag;
@@ -183,8 +190,9 @@ mod flat_list {
         /// This assumes the pointer is either NULL or the NodeTag is valid to read,
         /// so it is not okay to call this on pointers to deallocated or uninit data.
         ///
-        /// If it returns as `Some`, it also asserts the entire List is, across its length,
-        /// validly initialized as `T` in each ListCell. Assuming it has non-zero length, anyways.
+        /// If it returns as `Some` and the List is more than zero length, it also asserts
+        /// that the entire List's `elements: *mut ListCell` is validly initialized as `T`
+        /// in each ListCell and that the List is allocated from a Postgres memory context.
         pub unsafe fn downcast_from_nullable(ptr: *mut pg_sys::List) -> Option<List<T>> {
             match NonNull::new(ptr) {
                 None => Some(List::Nil),
@@ -561,7 +569,14 @@ mod flat_list {
         }
     }
 
-    /// I didn't want to have to do this, but otherwise we get an incredibly irritating suite of lifetime issues.
+    /// Needed because otherwise List hits incredibly irritating lifetime issues.
+    ///
+    /// This must remain a private type, as casual usage of it is wildly unsound.
+    ///
+    /// # Safety
+    /// None. Repent that you made this.
+    ///
+    /// This atrocity assumes pointers passed in are valid.
     #[derive(PartialEq)]
     struct RawCellIter<T> {
         ptr: *mut ListCell<T>,
@@ -581,6 +596,7 @@ mod flat_list {
         fn next(&mut self) -> Option<T> {
             if self.ptr < self.end {
                 let ptr = self.ptr;
+                // SAFETY: It's assumed that the pointers are valid on construction
                 unsafe {
                     self.ptr = ptr.add(1);
                     Some(T::apoptosis(ptr.cast()).read())
