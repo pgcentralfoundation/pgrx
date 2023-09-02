@@ -201,6 +201,9 @@ mod flat_list {
         /// If it returns as `Some` and the List is more than zero length, it also asserts
         /// that the entire List's `elements: *mut ListCell` is validly initialized as `T`
         /// in each ListCell and that the List is allocated from a Postgres memory context.
+        ///
+        /// **Note:** This memory context must last long enough for your purposes.
+        /// YOU are responsible for bounding its lifetime correctly.
         pub unsafe fn downcast_from_nullable(ptr: *mut pg_sys::List) -> Option<List<T>> {
             match NonNull::new(ptr) {
                 None => Some(List::Nil),
