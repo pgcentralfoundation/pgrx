@@ -384,10 +384,6 @@ mod flat_list {
             unsafe { self.list.as_ref().max_length as usize }
         }
 
-        pub unsafe fn set_len(&mut self, len: usize) {
-            unsafe { (*self.list.as_ptr()).max_length = len as _ }
-        }
-
         /// Borrow the List's slice of cells
         ///
         /// Note that like with Vec, this slice may move after appending to the List!
