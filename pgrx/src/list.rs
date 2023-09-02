@@ -619,7 +619,7 @@ mod flat_list {
 }
 
 #[cfg(feature = "cshim")]
-mod old_list;
+pub mod old_list;
 
 #[cfg(feature = "cshim")]
 pub use old_list::*;

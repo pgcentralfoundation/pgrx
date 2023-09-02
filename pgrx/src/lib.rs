@@ -96,7 +96,7 @@ pub use htup::*;
 pub use inoutfuncs::*;
 pub use itemptr::*;
 #[cfg(feature = "cshim")]
-pub use list::*;
+pub use list::old_list::*;
 pub use lwlock::*;
 pub use memcxt::*;
 #[cfg(feature = "cshim")]
