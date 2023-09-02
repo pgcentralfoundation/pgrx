@@ -273,7 +273,7 @@ mod flat_list {
                 unsafe { (*raw).length = drain_start as _ };
                 let cells_ptr = unsafe { (*raw).elements };
                 let iter = unsafe {
-                    RawIter {
+                    RawCellIter {
                         ptr: cells_ptr.add(drain_start).cast(),
                         end: cells_ptr.add(tail_start).cast(),
                     }
@@ -289,13 +289,7 @@ mod flat_list {
                 // If it's not, produce the only valid choice: a 0-len iterator pointing to null
                 // One last doublecheck for old paranoia's sake:
                 assert!(tail_len == 0 && tail_start == 0 && drain_start == 0);
-                Drain {
-                    tail_len: 0,
-                    tail_start: 0,
-                    raw,
-                    origin: self,
-                    iter: RawIter { ptr: ptr::null_mut(), end: ptr::null_mut() },
-                }
+                Drain { tail_len: 0, tail_start: 0, raw, origin: self, iter: Default::default() }
             }
         }
 
@@ -467,8 +461,7 @@ mod flat_list {
 
     pub struct ListIter<T> {
         head: Option<ListHead<T>>,
-        ptr: NonNull<ListCell<T>>,
-        end: NonNull<ListCell<T>>,
+        iter: RawCellIter<T>,
     }
 
     /// A list being drained.
@@ -478,7 +471,7 @@ mod flat_list {
         /// Length of tail
         tail_len: u32,
         /// Current remaining range to remove
-        iter: RawIter<ListCell<T>>,
+        iter: RawCellIter<T>,
         origin: &'a mut List<T>,
         raw: *mut pg_sys::List,
     }
@@ -514,7 +507,7 @@ mod flat_list {
     }
 
     impl<T: Enlist> Iterator for Drain<'_, T> {
-        type Item = ListCell<T>;
+        type Item = T;
 
         fn next(&mut self) -> Option<Self::Item> {
             self.iter.next()
@@ -524,14 +517,8 @@ mod flat_list {
     impl<T: Enlist> Iterator for ListIter<T> {
         type Item = T;
 
-        fn next(&mut self) -> Option<T> {
-            if self.ptr >= self.end {
-                None
-            } else {
-                let ptr = self.ptr.as_ptr();
-                self.ptr = unsafe { NonNull::new_unchecked(ptr.add(1)) };
-                Some(unsafe { ptr::read(T::apoptosis(ptr.cast())) })
-            }
+        fn next(&mut self) -> Option<Self::Item> {
+            self.iter.next()
         }
     }
 
@@ -541,18 +528,12 @@ mod flat_list {
 
         fn into_iter(self) -> Self::IntoIter {
             match self {
-                List::Nil => {
-                    ListIter { head: None, ptr: NonNull::dangling(), end: NonNull::dangling() }
-                }
+                List::Nil => ListIter { head: None, iter: Default::default() },
                 List::Cons(mut head) => {
                     let len = head.len();
                     let ptr = head.as_mut_cells_ptr();
                     let end = unsafe { ptr.add(len) };
-                    ListIter {
-                        head: Some(head),
-                        ptr: NonNull::new(ptr.cast()).unwrap(),
-                        end: NonNull::new(end.cast()).unwrap(),
-                    }
+                    ListIter { head: Some(head), iter: Default::default() }
                 }
             }
         }
@@ -568,20 +549,28 @@ mod flat_list {
 
     /// I didn't want to have to do this, but otherwise we get an incredibly irritating suite of lifetime issues.
     #[derive(PartialEq)]
-    struct RawIter<T> {
-        ptr: *mut T,
-        end: *mut T,
+    struct RawCellIter<T> {
+        ptr: *mut ListCell<T>,
+        end: *mut ListCell<T>,
     }
 
-    impl<T> Iterator for RawIter<T> {
+    impl<T> Default for RawCellIter<T> {
+        fn default() -> Self {
+            RawCellIter { ptr: ptr::null_mut(), end: ptr::null_mut() }
+        }
+    }
+
+    impl<T: Enlist> Iterator for RawCellIter<T> {
         type Item = T;
 
         #[inline]
         fn next(&mut self) -> Option<T> {
             if self.ptr < self.end {
                 let ptr = self.ptr;
-                self.ptr = unsafe { ptr.add(1) };
-                Some(unsafe { ptr.read() })
+                unsafe {
+                    self.ptr = ptr.add(1);
+                    Some(T::apoptosis(ptr.cast()).read())
+                }
             } else {
                 None
             }
