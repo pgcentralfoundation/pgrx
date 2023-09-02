@@ -23,6 +23,7 @@ mod flat_list {
     use crate::pg_sys;
     use core::cmp;
     use core::ffi;
+    use core::fmt::{self, Debug, Formatter};
     use core::marker::PhantomData;
     use core::mem;
     use core::ops::{Bound, Deref, DerefMut, RangeBounds};
@@ -31,6 +32,7 @@ mod flat_list {
 
     /// The List type from Postgres, lifted into Rust
     /// Note: you may want the ListHead type
+    #[derive(Debug)]
     pub enum List<T> {
         Nil,
         Cons(ListHead<T>),
@@ -49,6 +51,14 @@ mod flat_list {
         // to guarantee it has the expected type tag, otherwise the union cells may be garbage.
         cell: pg_sys::ListCell,
         _type: PhantomData<T>,
+    }
+
+    impl<T> Debug for ListCell<T> {
+        fn fmt(&self, f: &mut Formatter<'_>) -> fmt::Result {
+            // interpret the cell as a pointer, assuming pointers are Pod
+            let cell_addr = unsafe { self.cell.ptr_value };
+            f.debug_tuple("ListCell").field(&cell_addr).finish()
+        }
     }
 
     // Note this well: the size of a `ListCell<T>`'s type doesn't matter.
@@ -77,6 +87,7 @@ mod flat_list {
         }
     }
 
+    #[derive(Debug)]
     pub struct ListHead<T> {
         list: NonNull<pg_sys::List>,
         _type: PhantomData<[T]>,
@@ -311,6 +322,7 @@ mod flat_list {
     }
 
     impl<T> List<T> {
+        #[inline]
         pub fn len(&self) -> usize {
             match self {
                 List::Nil => 0,
@@ -318,6 +330,7 @@ mod flat_list {
             }
         }
 
+        #[inline]
         pub fn capacity(&self) -> usize {
             match self {
                 List::Nil => 0,
@@ -376,10 +389,12 @@ mod flat_list {
     }
 
     impl<T> ListHead<T> {
+        #[inline]
         pub fn len(&self) -> usize {
             unsafe { self.list.as_ref().length as usize }
         }
 
+        #[inline]
         pub fn capacity(&self) -> usize {
             unsafe { self.list.as_ref().max_length as usize }
         }
@@ -476,12 +491,14 @@ mod flat_list {
         pg_sys::pfree(list.cast());
     }
 
+    #[derive(Debug)]
     pub struct ListIter<T> {
         list: List<T>,
         iter: RawCellIter<T>,
     }
 
     /// A list being drained.
+    #[derive(Debug)]
     pub struct Drain<'a, T> {
         /// Index of tail to preserve
         tail_start: u32,
@@ -573,7 +590,7 @@ mod flat_list {
     /// None. Repent that you made this.
     ///
     /// This atrocity assumes pointers passed in are valid.
-    #[derive(PartialEq)]
+    #[derive(Debug, PartialEq)]
     struct RawCellIter<T> {
         ptr: *mut ListCell<T>,
         end: *mut ListCell<T>,
