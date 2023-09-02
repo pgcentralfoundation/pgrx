@@ -589,7 +589,7 @@ mod flat_list {
     /// # Safety
     /// None. Repent that you made this.
     ///
-    /// This atrocity assumes pointers passed in are valid.
+    /// This atrocity assumes pointers passed in are valid or that ptr >= end.
     #[derive(Debug, PartialEq)]
     struct RawCellIter<T> {
         ptr: *mut ListCell<T>,
