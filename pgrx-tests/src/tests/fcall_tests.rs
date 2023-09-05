@@ -21,6 +21,11 @@ mod tests {
         l == r
     }
 
+    #[pg_extern]
+    fn arg_might_be_null(v: Option<i32>) -> Option<i32> {
+        v
+    }
+
     extension_sql!(
         r#"
             CREATE FUNCTION tests.sql_int4eq(int4, int4) RETURNS bool STRICT LANGUAGE sql AS $$ SELECT $1 = $2; $$;
@@ -51,6 +56,18 @@ mod tests {
     fn test_sql_int4eq() {
         let result = fcall::<bool>("tests.sql_int4eq", &[&Some(1), &Some(1)]);
         assert_eq!(Ok(Some(true)), result)
+    }
+
+    #[pg_test]
+    fn test_null_arg_some() {
+        let result = fcall::<i32>("tests.arg_might_be_null", &[&Some(1)]);
+        assert_eq!(Ok(Some(1)), result)
+    }
+
+    #[pg_test]
+    fn test_null_arg_none() {
+        let result = fcall::<i32>("tests.arg_might_be_null", &[&Option::<i32>::None]);
+        assert_eq!(Ok(None), result)
     }
 
     #[pg_test]

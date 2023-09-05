@@ -105,7 +105,8 @@ pub fn fcall<T: FromDatum + IntoDatum>(fname: &str, args: &[&dyn FCallArg]) -> R
     // if the function is STRICT and at least one of our argument values is `None` (ie, NULL)...
     // we must return `None` now and not call the function.  Passing a NULL argument to a STRICT
     // function will likely crash Postgres
-    if pg_proc.proisstrict() && arg_datums.iter().any(|d| d.is_none()) {
+    let isstrict = pg_proc.proisstrict();
+    if isstrict && arg_datums.iter().any(|d| d.is_none()) {
         return Ok(None);
     }
 
@@ -140,7 +141,7 @@ pub fn fcall<T: FromDatum + IntoDatum>(fname: &str, args: &[&dyn FCallArg]) -> R
         // setup the argument array
         let args_slice = fcinfo_ref.args.as_mut_slice(args.len());
         for (i, datum) in arg_datums.into_iter().enumerate() {
-            assert!(datum.is_some()); // no NULL datums here, please
+            assert!(!isstrict || (isstrict && datum.is_some())); // no NULL datums if this function is STRICT
 
             let arg = &mut args_slice[i];
             (arg.value, arg.isnull) =
