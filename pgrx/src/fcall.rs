@@ -90,7 +90,7 @@ pub fn fcall<T: FromDatum + IntoDatum>(fname: &str, args: &[&dyn FCallArg]) -> R
         || pg_proc.proargtypes().iter().any(|oid| *oid == pg_sys::INTERNALOID)
     {
         // No idea what to do with the INTERNAL type.  Generally it's just a raw pointer but pgrx
-        // has to way to express that with `IntoDatum`.  And passing around raw pointers seem
+        // has no way to express that with `IntoDatum`.  And passing around raw pointers seem
         // unsafe enough that if someone needs to do that, they probably have the ability to
         // re-implement this function themselves.
         return Err(FCallError::InternalTypeNotSupported);
