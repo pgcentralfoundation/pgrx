@@ -1,24 +1,22 @@
 use pgrx::bgworkers::*;
-use pgrx::datum::{{FromDatum, IntoDatum}};
-use pgrx::log;
 use pgrx::prelude::*;
 use std::time::Duration;
 
 pgrx::pg_module_magic!();
 
 /*
-    In order to use this bgworker with pgrx, you'll need to edit the proper `postgresql.conf` file in
-    `~/.pgrx/data-PGVER/postgresql.conf` and add this line to the end:
+In order to use this bgworker with a cargo-pgrx managed database, you'll need to add this line to
+"$PGRX_HOME/data-$PGVER/postgresql.conf" if the `shared_preload_libraries` entry is absent:
 
-    ```
-    shared_preload_libraries = 'bgworker.so'
-    ```
+```
+shared_preload_libraries = '{name}.so'
+```
 
-    Background workers **must** be initialized in the extension's `_PG_init()` function, and can **only**
-    be started if loaded through the `shared_preload_libraries` configuration setting.
+Background workers *must* be initialized in the extension's `_PG_init()` function, and can *only*
+be started if loaded through the `shared_preload_libraries` configuration setting.
 
-    Executing `cargo pgrx run <PGVER>` will, when it restarts the specified Postgres instance, also start
-    this background worker
+Executing `cargo pgrx run "$PGVER"` will, when it restarts the specified Postgres instance, also start
+this background worker
 */
 
 #[allow(non_snake_case)]
@@ -58,17 +56,17 @@ pub extern "C" fn background_worker_main(arg: pg_sys::Datum) {{
 
         // within a transaction, execute an SQL statement, and log its results
         BackgroundWorker::transaction(|| {{
-            Spi::execute(|client| {{
+            Spi::connect(|client| {{
                 let tuple_table = client.select(
                     "SELECT 'Hi', id, ''||a FROM (SELECT id, 42 from generate_series(1,10) id) a ",
                     None,
                     None,
-                );
+                ).unwrap();
                 tuple_table.for_each(|tuple| {{
-                    let a = tuple.by_ordinal(1).unwrap().value::<String>().unwrap();
-                    let b = tuple.by_ordinal(2).unwrap().value::<i32>().unwrap();
-                    let c = tuple.by_ordinal(3).unwrap().value::<String>().unwrap();
-                    log!("from bgworker: ({{}}, {{}}, {{}})", a, b, c);
+                    let a = tuple.get_datum_by_ordinal(1).unwrap().value::<String>().unwrap();
+                    let b = tuple.get_datum_by_ordinal(2).unwrap().value::<i32>().unwrap();
+                    let c = tuple.get_datum_by_ordinal(3).unwrap().value::<String>().unwrap();
+                    log!("from bgworker: ({{:?}}, {{:?}}, {{:?}})", a, b, c);
                 }});
             }});
         }});
