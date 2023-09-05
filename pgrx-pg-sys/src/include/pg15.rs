@@ -170,7 +170,7 @@ pub const ALIGNOF_LONG: u32 = 8;
 pub const ALIGNOF_PG_INT128_TYPE: u32 = 16;
 pub const ALIGNOF_SHORT: u32 = 2;
 pub const BLCKSZ: u32 = 8192;
-pub const CONFIGURE_ARGS : & [u8 ; 222] = b" '--prefix=/home/atelier/.pgrx/15.3/pgrx-install' '--with-pgport=28815' '--enable-debug' '--enable-cassert' 'CPPFLAGS= -DMEMORY_CONTEXT_CHECKING=1 -DCLOBBER_FREED_MEMORY=1 -DRANDOMIZE_ALLOCATED_MEMORY=1 -DUSE_VALGRIND=1 '\0" ;
+pub const CONFIGURE_ARGS : & [u8 ; 205] = b" '--prefix=/home/zombodb/.pgrx/15.4/pgrx-install' '--with-pgport=28815' '--enable-debug' '--enable-cassert' 'CPPFLAGS= -DMEMORY_CONTEXT_CHECKING=1 -DCLOBBER_FREED_MEMORY=1 -DRANDOMIZE_ALLOCATED_MEMORY=1 '\0" ;
 pub const DEF_PGPORT: u32 = 28815;
 pub const DEF_PGPORT_STR: &[u8; 6] = b"28815\0";
 pub const DLSUFFIX: &[u8; 4] = b".so\0";
@@ -322,19 +322,18 @@ pub const MAXIMUM_ALIGNOF: u32 = 8;
 pub const MEMSET_LOOP_LIMIT: u32 = 1024;
 pub const PACKAGE_BUGREPORT: &[u8; 32] = b"pgsql-bugs@lists.postgresql.org\0";
 pub const PACKAGE_NAME: &[u8; 11] = b"PostgreSQL\0";
-pub const PACKAGE_STRING: &[u8; 16] = b"PostgreSQL 15.3\0";
+pub const PACKAGE_STRING: &[u8; 16] = b"PostgreSQL 15.4\0";
 pub const PACKAGE_TARNAME: &[u8; 11] = b"postgresql\0";
 pub const PACKAGE_URL: &[u8; 28] = b"https://www.postgresql.org/\0";
-pub const PACKAGE_VERSION: &[u8; 5] = b"15.3\0";
+pub const PACKAGE_VERSION: &[u8; 5] = b"15.4\0";
 pub const PG_KRB_SRVNAM: &[u8; 9] = b"postgres\0";
 pub const PG_MAJORVERSION: &[u8; 3] = b"15\0";
 pub const PG_MAJORVERSION_NUM: u32 = 15;
-pub const PG_MINORVERSION_NUM: u32 = 3;
+pub const PG_MINORVERSION_NUM: u32 = 4;
 pub const PG_USE_STDBOOL: u32 = 1;
-pub const PG_VERSION: &[u8; 5] = b"15.3\0";
-pub const PG_VERSION_NUM: u32 = 150003;
-pub const PG_VERSION_STR: &[u8; 86] =
-    b"PostgreSQL 15.3 on x86_64-pc-linux-gnu, compiled by gcc (GCC) 13.1.1 20230714, 64-bit\0";
+pub const PG_VERSION: &[u8; 5] = b"15.4\0";
+pub const PG_VERSION_NUM: u32 = 150004;
+pub const PG_VERSION_STR : & [u8 ; 102] = b"PostgreSQL 15.4 on x86_64-pc-linux-gnu, compiled by gcc (Ubuntu 11.4.0-1ubuntu1~22.04) 11.4.0, 64-bit\0" ;
 pub const RELSEG_SIZE: u32 = 131072;
 pub const SIZEOF_BOOL: u32 = 1;
 pub const SIZEOF_LONG: u32 = 8;
@@ -395,7 +394,6 @@ pub const __USE_ATFILE: u32 = 1;
 pub const __USE_FORTIFY_LEVEL: u32 = 0;
 pub const __GLIBC_USE_DEPRECATED_GETS: u32 = 0;
 pub const __GLIBC_USE_DEPRECATED_SCANF: u32 = 0;
-pub const __GLIBC_USE_C2X_STRTOL: u32 = 0;
 pub const _STDC_PREDEF_H: u32 = 1;
 pub const __STDC_IEC_559__: u32 = 1;
 pub const __STDC_IEC_60559_BFP__: u32 = 201404;
@@ -404,7 +402,7 @@ pub const __STDC_IEC_60559_COMPLEX__: u32 = 201404;
 pub const __STDC_ISO_10646__: u32 = 201706;
 pub const __GNU_LIBRARY__: u32 = 6;
 pub const __GLIBC__: u32 = 2;
-pub const __GLIBC_MINOR__: u32 = 38;
+pub const __GLIBC_MINOR__: u32 = 35;
 pub const _SYS_CDEFS_H: u32 = 1;
 pub const __glibc_c99_flexarr_available: u32 = 1;
 pub const __LDOUBLE_REDIRECTS_TO_FLOAT128_ABI: u32 = 0;
@@ -435,7 +433,6 @@ pub const __struct_FILE_defined: u32 = 1;
 pub const _IO_EOF_SEEN: u32 = 16;
 pub const _IO_ERR_SEEN: u32 = 32;
 pub const _IO_USER_LOCK: u32 = 32768;
-pub const __cookie_io_functions_t_defined: u32 = 1;
 pub const _IOFBF: u32 = 0;
 pub const _IOLBF: u32 = 1;
 pub const _IONBF: u32 = 2;
@@ -445,9 +442,9 @@ pub const SEEK_SET: u32 = 0;
 pub const SEEK_CUR: u32 = 1;
 pub const SEEK_END: u32 = 2;
 pub const P_tmpdir: &[u8; 5] = b"/tmp\0";
+pub const _BITS_STDIO_LIM_H: u32 = 1;
 pub const L_tmpnam: u32 = 20;
 pub const TMP_MAX: u32 = 238328;
-pub const _BITS_STDIO_LIM_H: u32 = 1;
 pub const FILENAME_MAX: u32 = 4096;
 pub const L_ctermid: u32 = 9;
 pub const FOPEN_MAX: u32 = 16;
@@ -777,7 +774,7 @@ pub const PG_BINARY_R: &[u8; 2] = b"r\0";
 pub const PG_BINARY_W: &[u8; 2] = b"w\0";
 pub const _CTYPE_H: u32 = 1;
 pub const PGINVALID_SOCKET: i32 = -1;
-pub const PG_BACKEND_VERSIONSTR: &[u8; 28] = b"postgres (PostgreSQL) 15.3\n\0";
+pub const PG_BACKEND_VERSIONSTR: &[u8; 28] = b"postgres (PostgreSQL) 15.4\n\0";
 pub const EXE: &[u8; 1] = b"\0";
 pub const DEVNULL: &[u8; 10] = b"/dev/null\0";
 pub const USE_REPL_SNPRINTF: u32 = 1;
@@ -961,6 +958,11 @@ pub const POSIX_FADV_SEQUENTIAL: u32 = 2;
 pub const POSIX_FADV_WILLNEED: u32 = 3;
 pub const POSIX_FADV_DONTNEED: u32 = 4;
 pub const POSIX_FADV_NOREUSE: u32 = 5;
+pub const AT_FDCWD: i32 = -100;
+pub const AT_SYMLINK_NOFOLLOW: u32 = 256;
+pub const AT_REMOVEDIR: u32 = 512;
+pub const AT_SYMLINK_FOLLOW: u32 = 1024;
+pub const AT_EACCESS: u32 = 512;
 pub const _BITS_STAT_H: u32 = 1;
 pub const _BITS_STRUCT_STAT_H: u32 = 1;
 pub const __S_IFMT: u32 = 61440;
@@ -1006,11 +1008,6 @@ pub const R_OK: u32 = 4;
 pub const W_OK: u32 = 2;
 pub const X_OK: u32 = 1;
 pub const F_OK: u32 = 0;
-pub const AT_FDCWD: i32 = -100;
-pub const AT_SYMLINK_NOFOLLOW: u32 = 256;
-pub const AT_REMOVEDIR: u32 = 512;
-pub const AT_SYMLINK_FOLLOW: u32 = 1024;
-pub const AT_EACCESS: u32 = 512;
 pub const F_ULOCK: u32 = 0;
 pub const F_LOCK: u32 = 1;
 pub const F_TLOCK: u32 = 2;
@@ -1897,9 +1894,6 @@ pub const SOL_NFC: u32 = 280;
 pub const SOL_KCM: u32 = 281;
 pub const SOL_TLS: u32 = 282;
 pub const SOL_XDP: u32 = 283;
-pub const SOL_MPTCP: u32 = 284;
-pub const SOL_MCTP: u32 = 285;
-pub const SOL_SMC: u32 = 286;
 pub const SOMAXCONN: u32 = 4096;
 pub const _BITS_SOCKADDR_H: u32 = 1;
 pub const _SS_SIZE: u32 = 128;
@@ -1988,9 +1982,6 @@ pub const SO_PREFER_BUSY_POLL: u32 = 69;
 pub const SO_BUSY_POLL_BUDGET: u32 = 70;
 pub const SO_NETNS_COOKIE: u32 = 71;
 pub const SO_BUF_LOCK: u32 = 72;
-pub const SO_RESERVE_MEM: u32 = 73;
-pub const SO_TXREHASH: u32 = 74;
-pub const SO_RCVMARK: u32 = 75;
 pub const SO_TIMESTAMP: u32 = 29;
 pub const SO_TIMESTAMPNS: u32 = 35;
 pub const SO_TIMESTAMPING: u32 = 37;
@@ -2058,7 +2049,6 @@ pub const IP_PMTUDISC_DO: u32 = 2;
 pub const IP_PMTUDISC_PROBE: u32 = 3;
 pub const IP_PMTUDISC_INTERFACE: u32 = 4;
 pub const IP_PMTUDISC_OMIT: u32 = 5;
-pub const IP_LOCAL_PORT_RANGE: u32 = 51;
 pub const SOL_IP: u32 = 0;
 pub const IP_DEFAULT_MULTICAST_TTL: u32 = 1;
 pub const IP_DEFAULT_MULTICAST_LOOP: u32 = 1;
@@ -2638,6 +2628,8 @@ pub const Anum_pg_database_datcollversion: u32 = 15;
 pub const Anum_pg_database_datacl: u32 = 16;
 pub const Natts_pg_database: u32 = 16;
 pub const Template1DbOid: u32 = 1;
+pub const DATCONNLIMIT_UNLIMITED: i32 = -1;
+pub const DATCONNLIMIT_INVALID_DB: i32 = -2;
 pub const EnumRelationId: Oid = Oid(3501);
 pub const EnumOidIndexId: u32 = 3502;
 pub const EnumTypIdLabelIndexId: u32 = 3503;
@@ -3710,39 +3702,6 @@ impl Default for _IO_FILE {
         }
     }
 }
-pub type cookie_read_function_t = ::std::option::Option<
-    unsafe extern "C" fn(
-        __cookie: *mut ::std::os::raw::c_void,
-        __buf: *mut ::std::os::raw::c_char,
-        __nbytes: usize,
-    ) -> __ssize_t,
->;
-pub type cookie_write_function_t = ::std::option::Option<
-    unsafe extern "C" fn(
-        __cookie: *mut ::std::os::raw::c_void,
-        __buf: *const ::std::os::raw::c_char,
-        __nbytes: usize,
-    ) -> __ssize_t,
->;
-pub type cookie_seek_function_t = ::std::option::Option<
-    unsafe extern "C" fn(
-        __cookie: *mut ::std::os::raw::c_void,
-        __pos: *mut __off64_t,
-        __w: ::std::os::raw::c_int,
-    ) -> ::std::os::raw::c_int,
->;
-pub type cookie_close_function_t = ::std::option::Option<
-    unsafe extern "C" fn(__cookie: *mut ::std::os::raw::c_void) -> ::std::os::raw::c_int,
->;
-#[repr(C)]
-#[derive(Debug, Default, Copy, Clone)]
-pub struct _IO_cookie_io_functions_t {
-    pub read: cookie_read_function_t,
-    pub write: cookie_write_function_t,
-    pub seek: cookie_seek_function_t,
-    pub close: cookie_close_function_t,
-}
-pub type cookie_io_functions_t = _IO_cookie_io_functions_t;
 pub type off_t = __off_t;
 pub type fpos_t = __fpos_t;
 pub type _Float32 = f32;
@@ -4167,18 +4126,6 @@ pub struct drand48_data {
 }
 #[pgrx_macros::pg_guard]
 extern "C" {
-    pub fn arc4random() -> __uint32_t;
-}
-#[pgrx_macros::pg_guard]
-extern "C" {
-    pub fn arc4random_buf(__buf: *mut ::std::os::raw::c_void, __size: usize);
-}
-#[pgrx_macros::pg_guard]
-extern "C" {
-    pub fn arc4random_uniform(__upper_bound: __uint32_t) -> __uint32_t;
-}
-#[pgrx_macros::pg_guard]
-extern "C" {
     pub fn alloca(__size: ::std::os::raw::c_ulong) -> *mut ::std::os::raw::c_void;
 }
 #[pgrx_macros::pg_guard]
@@ -4225,22 +4172,6 @@ impl Default for __locale_struct {
 }
 pub type __locale_t = *mut __locale_struct;
 pub type locale_t = __locale_t;
-#[pgrx_macros::pg_guard]
-extern "C" {
-    pub fn strlcpy(
-        __dest: *mut ::std::os::raw::c_char,
-        __src: *const ::std::os::raw::c_char,
-        __n: ::std::os::raw::c_ulong,
-    ) -> ::std::os::raw::c_ulong;
-}
-#[pgrx_macros::pg_guard]
-extern "C" {
-    pub fn strlcat(
-        __dest: *mut ::std::os::raw::c_char,
-        __src: *const ::std::os::raw::c_char,
-        __n: ::std::os::raw::c_ulong,
-    ) -> ::std::os::raw::c_ulong;
-}
 #[repr(C)]
 #[repr(align(16))]
 #[derive(Debug, Default, Copy, Clone)]
@@ -5587,6 +5518,22 @@ pub const FP_ZERO: _bindgen_ty_2 = 2;
 pub const FP_SUBNORMAL: _bindgen_ty_2 = 3;
 pub const FP_NORMAL: _bindgen_ty_2 = 4;
 pub type _bindgen_ty_2 = ::std::os::raw::c_uint;
+#[pgrx_macros::pg_guard]
+extern "C" {
+    pub fn strlcat(
+        dst: *mut ::std::os::raw::c_char,
+        src: *const ::std::os::raw::c_char,
+        siz: usize,
+    ) -> usize;
+}
+#[pgrx_macros::pg_guard]
+extern "C" {
+    pub fn strlcpy(
+        dst: *mut ::std::os::raw::c_char,
+        src: *const ::std::os::raw::c_char,
+        siz: usize,
+    ) -> usize;
+}
 #[pgrx_macros::pg_guard]
 extern "C" {
     pub fn pg_get_user_name(
@@ -18596,7 +18543,7 @@ impl Default for PlanState {
 pub struct EPQState {
     pub parentestate: *mut EState,
     pub epqParam: ::std::os::raw::c_int,
-    pub tuple_table: *mut List,
+    pub epqExtra: *mut EPQStateExtra,
     pub relsubs_slot: *mut *mut TupleTableSlot,
     pub plan: *mut Plan,
     pub arowMarks: *mut List,
@@ -18607,6 +18554,22 @@ pub struct EPQState {
     pub recheckplanstate: *mut PlanState,
 }
 impl Default for EPQState {
+    fn default() -> Self {
+        let mut s = ::std::mem::MaybeUninit::<Self>::uninit();
+        unsafe {
+            ::std::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
+            s.assume_init()
+        }
+    }
+}
+#[repr(C)]
+#[derive(Debug, Copy, Clone)]
+pub struct EPQStateExtra {
+    pub resultRelations: *mut List,
+    pub tuple_table: *mut List,
+    pub relsubs_blocked: *mut bool,
+}
+impl Default for EPQStateExtra {
     fn default() -> Self {
         let mut s = ::std::mem::MaybeUninit::<Self>::uninit();
         unsafe {
@@ -20868,6 +20831,17 @@ extern "C" {
 }
 #[pgrx_macros::pg_guard]
 extern "C" {
+    pub fn EvalPlanQualInitExt(
+        epqstate: *mut EPQState,
+        parentestate: *mut EState,
+        subplan: *mut Plan,
+        auxrowmarks: *mut List,
+        epqParam: ::std::os::raw::c_int,
+        resultRelations: *mut List,
+    );
+}
+#[pgrx_macros::pg_guard]
+extern "C" {
     pub fn EvalPlanQualSetPlan(epqstate: *mut EPQState, subplan: *mut Plan, auxrowmarks: *mut List);
 }
 #[pgrx_macros::pg_guard]
@@ -23101,6 +23075,13 @@ impl Default for ip_opts {
 }
 #[repr(C)]
 #[derive(Debug, Default, Copy, Clone)]
+pub struct ip_mreqn {
+    pub imr_multiaddr: in_addr,
+    pub imr_address: in_addr,
+    pub imr_ifindex: ::std::os::raw::c_int,
+}
+#[repr(C)]
+#[derive(Debug, Default, Copy, Clone)]
 pub struct in_pktinfo {
     pub ipi_ifindex: ::std::os::raw::c_int,
     pub ipi_spec_dst: in_addr,
@@ -23127,7 +23108,6 @@ pub const IPPROTO_BEETPH: _bindgen_ty_16 = 94;
 pub const IPPROTO_ENCAP: _bindgen_ty_16 = 98;
 pub const IPPROTO_PIM: _bindgen_ty_16 = 103;
 pub const IPPROTO_COMP: _bindgen_ty_16 = 108;
-pub const IPPROTO_L2TP: _bindgen_ty_16 = 115;
 pub const IPPROTO_SCTP: _bindgen_ty_16 = 132;
 pub const IPPROTO_UDPLITE: _bindgen_ty_16 = 136;
 pub const IPPROTO_MPLS: _bindgen_ty_16 = 137;
@@ -23233,13 +23213,6 @@ impl Default for sockaddr_in6 {
 pub struct ip_mreq {
     pub imr_multiaddr: in_addr,
     pub imr_interface: in_addr,
-}
-#[repr(C)]
-#[derive(Debug, Default, Copy, Clone)]
-pub struct ip_mreqn {
-    pub imr_multiaddr: in_addr,
-    pub imr_address: in_addr,
-    pub imr_ifindex: ::std::os::raw::c_int,
 }
 #[repr(C)]
 #[derive(Debug, Default, Copy, Clone)]
@@ -24176,6 +24149,13 @@ extern "C" {
 #[pgrx_macros::pg_guard]
 extern "C" {
     pub fn pgstat_have_entry(kind: PgStat_Kind, dboid: Oid, objoid: Oid) -> bool;
+}
+#[pgrx_macros::pg_guard]
+extern "C" {
+    pub fn assign_stats_fetch_consistency(
+        newval: ::std::os::raw::c_int,
+        extra: *mut ::std::os::raw::c_void,
+    );
 }
 #[pgrx_macros::pg_guard]
 extern "C" {
@@ -32802,6 +32782,14 @@ impl Default for FormData_pg_database {
     }
 }
 pub type Form_pg_database = *mut FormData_pg_database;
+#[pgrx_macros::pg_guard]
+extern "C" {
+    pub fn database_is_invalid_form(datform: Form_pg_database) -> bool;
+}
+#[pgrx_macros::pg_guard]
+extern "C" {
+    pub fn database_is_invalid_oid(dboid: Oid) -> bool;
+}
 #[repr(C)]
 #[derive(Debug, Copy, Clone)]
 pub struct FormData_pg_enum {
@@ -44183,6 +44171,11 @@ extern "C" {
 }
 #[pgrx_macros::pg_guard]
 extern "C" {
+    pub fn has_pseudoconstant_clauses(root: *mut PlannerInfo, restrictinfo_list: *mut List)
+        -> bool;
+}
+#[pgrx_macros::pg_guard]
+extern "C" {
     pub fn join_clause_is_movable_to(rinfo: *mut RestrictInfo, baserel: *mut RelOptInfo) -> bool;
 }
 #[pgrx_macros::pg_guard]
@@ -48149,7 +48142,7 @@ extern "C" {
 }
 #[pgrx_macros::pg_guard]
 extern "C" {
-    pub fn logicalrep_message_type(action: LogicalRepMsgType) -> *mut ::std::os::raw::c_char;
+    pub fn logicalrep_message_type(action: LogicalRepMsgType) -> *const ::std::os::raw::c_char;
 }
 pub const CRSSnapshotAction_CRS_EXPORT_SNAPSHOT: CRSSnapshotAction = 0;
 pub const CRSSnapshotAction_CRS_NOEXPORT_SNAPSHOT: CRSSnapshotAction = 1;
