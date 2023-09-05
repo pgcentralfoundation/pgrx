@@ -57,18 +57,23 @@ pub enum FCallError {
 
     #[error("The requested return type `{0}` is not compatible with the actual return type `{1}`")]
     IncompatibleReturnType(pg_sys::Oid, pg_sys::Oid),
+
+    #[error("Function call has more arguments than are supported")]
+    TooManyArguments,
 }
 
 pub type Result<T> = std::result::Result<T, FCallError>;
 
 pub fn fcall<T: FromDatum + IntoDatum>(fname: &str, args: &[&dyn FCallArg]) -> Result<Option<T>> {
+    // ensure we don't have too many arguments
+    let nargs: i16 = args.len().try_into().map_err(|_| FCallError::TooManyArguments)?;
+
     // let Postgres parse the function name -- it could be schema-qualified and Postgres knows
     // the parsing rules better than we do
     let ident_parts = parse_fn_name(&fname)?;
 
     // lookup the function by its identifier
-    let arg_types = args.iter().map(|a| a.type_oid()).collect::<Vec<_>>();
-    let func_oid = lookup_fn(args, arg_types, ident_parts)?;
+    let func_oid = lookup_fn(nargs, args, ident_parts)?;
 
     // lookup the function's pg_proc entry and do some validation
     let pg_proc = PgProc::new(func_oid).ok_or(FCallError::UndefinedFunction)?;
@@ -114,7 +119,7 @@ pub fn fcall<T: FromDatum + IntoDatum>(fname: &str, args: &[&dyn FCallArg]) -> R
     // The following code is Postgres-version specific.  Right now, it's compatible with v12+
     // v11 will need a different implementation.
     //
-    // NB:  Which I don't want to do since it EOLs in 3 months
+    // NB:  Which I don't want to do since it EOLs in November 2023
     //
 
     unsafe {
@@ -136,7 +141,7 @@ pub fn fcall<T: FromDatum + IntoDatum>(fname: &str, args: &[&dyn FCallArg]) -> R
         fcinfo_ref.context = std::ptr::null_mut();
         fcinfo_ref.resultinfo = std::ptr::null_mut();
         fcinfo_ref.isnull = false;
-        fcinfo_ref.nargs = args.len().try_into().unwrap();
+        fcinfo_ref.nargs = nargs;
 
         // setup the argument array
         let args_slice = fcinfo_ref.args.as_mut_slice(args.len());
@@ -163,11 +168,8 @@ pub fn fcall<T: FromDatum + IntoDatum>(fname: &str, args: &[&dyn FCallArg]) -> R
     }
 }
 
-fn lookup_fn(
-    args: &[&dyn FCallArg],
-    arg_types: Vec<pg_sys::Oid>,
-    ident_parts: Array<&str>,
-) -> Result<pg_sys::Oid> {
+fn lookup_fn(nargs: i16, args: &[&dyn FCallArg], ident_parts: Array<&str>) -> Result<pg_sys::Oid> {
+    let arg_types = args.iter().map(|a| a.type_oid()).collect::<Vec<_>>();
     let mut parts_list = PgList::new();
     ident_parts
         .iter_deny_null()
@@ -181,7 +183,7 @@ fn lookup_fn(
     PgTryBuilder::new(AssertUnwindSafe(|| unsafe {
         Ok(pg_sys::LookupFuncName(
             parts_list.as_ptr(),
-            args.len().try_into().unwrap(),
+            nargs.into(),
             arg_types.as_ptr(),
             false, // missing_ok is not ok
         ))

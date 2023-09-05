@@ -86,6 +86,13 @@ mod tests {
         );
     }
 
+    #[pg_test]
+    fn test_too_many_args() {
+        let args: [&dyn FCallArg; 32768] = [&Some(1); 32768];
+        let result = fcall::<bool>("pg_catalog.int4eq", &args);
+        assert_eq!(Err(FCallError::TooManyArguments), result);
+    }
+
     // NB:  I don't see a way for `fcall()` to be ambiguous about which function it wants to call?
     //      Spent about 30m trying to cook up an example and couldn't.
     // #[pg_test]
