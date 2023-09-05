@@ -13,6 +13,7 @@ mod tests {
     #[allow(unused_imports)]
     use crate as pgrx_tests;
 
+    use pgrx::fcall::*;
     use pgrx::prelude::*;
 
     #[pg_extern]
@@ -30,25 +31,68 @@ mod tests {
 
     #[pg_test]
     fn test_int4eq_eq() {
-        let result = pgrx::fcall::fcall::<bool>("int4eq", &[&Some(1), &Some(1)]);
-        assert_eq!(Some(true), result)
+        let result = fcall::<bool>("pg_catalog.int4eq", &[&Some(1), &Some(1)]);
+        assert_eq!(Ok(Some(true)), result)
     }
 
     #[pg_test]
     fn test_int4eq_ne() {
-        let result = pgrx::fcall::fcall::<bool>("int4eq", &[&Some(1), &Some(2)]);
-        assert_eq!(Some(false), result)
+        let result = fcall::<bool>("pg_catalog.int4eq", &[&Some(1), &Some(2)]);
+        assert_eq!(Ok(Some(false)), result)
     }
 
     #[pg_test]
     fn test_my_int4eq() {
-        let result = pgrx::fcall::fcall::<bool>("tests.my_int4eq", &[&Some(1), &Some(1)]);
-        assert_eq!(Some(true), result)
+        let result = fcall::<bool>("tests.my_int4eq", &[&Some(1), &Some(1)]);
+        assert_eq!(Ok(Some(true)), result)
     }
 
     #[pg_test]
     fn test_sql_int4eq() {
-        let result = pgrx::fcall::fcall::<bool>("tests.sql_int4eq", &[&Some(1), &Some(1)]);
-        assert_eq!(Some(true), result)
+        let result = fcall::<bool>("tests.sql_int4eq", &[&Some(1), &Some(1)]);
+        assert_eq!(Ok(Some(true)), result)
+    }
+
+    #[pg_test]
+    fn test_strict() {
+        // calling a STRICT function such as pg_catalog.float4 with a NULL argument will crash Postgres
+        let result = fcall::<f32>("pg_catalog.float4", &[&Option::<AnyNumeric>::None]);
+        assert_eq!(Ok(None), result);
+    }
+
+    #[pg_test]
+    fn test_incompatible_return_type() {
+        let result = fcall::<String>("pg_catalog.int4eq", &[&Some(1), &Some(1)]);
+        assert_eq!(
+            Err(FCallError::IncompatibleReturnType(String::type_oid(), pg_sys::BOOLOID)),
+            result
+        );
+    }
+
+    // NB:  I don't see a way for `fcall()` to be ambiguous about which function it wants to call?
+    //      Spent about 30m trying to cook up an example and couldn't.
+    // #[pg_test]
+    // fn ambiguous_function() {
+    //     let result = fcall::<bool>("tests.ambiguous", &[&Some(42)]);
+    //     assert_eq!(Err(FCallError::AmbiguousFunction), result)
+    // }
+
+    #[pg_test]
+    fn unknown_function() {
+        let result = fcall::<()>("undefined_function", &[]);
+        assert_eq!(Err(FCallError::UndefinedFunction), result)
+    }
+
+    #[pg_test]
+    fn blank_function() {
+        let result = fcall::<()>("", &[]);
+        assert_eq!(Err(FCallError::InvalidIdentifier(String::from(""))), result)
+    }
+
+    #[pg_test]
+    fn invalid_identifier() {
+        let stupid_name = "q234qasf )(A*q2342";
+        let result = fcall::<()>(stupid_name, &[]);
+        assert_eq!(Err(FCallError::InvalidIdentifier(String::from(stupid_name))), result)
     }
 }

@@ -7,6 +7,12 @@
 //LICENSE All rights reserved.
 //LICENSE
 //LICENSE Use of this source code is governed by the MIT license that can be found in the LICENSE file.
+
+use pgrx_pg_sys::errcodes::PgSqlErrorCode;
+use pgrx_pg_sys::PgTryBuilder;
+use std::panic::AssertUnwindSafe;
+
+use crate::pg_catalog::pg_proc::{PgProc, ProArgMode, ProKind};
 use crate::{
     direct_function_call, list::PgList, pg_sys, pg_sys::AsPgCStr, Array, FromDatum, IntoDatum,
 };
@@ -27,78 +33,90 @@ unsafe impl<T: IntoDatum + Clone> FCallArg for Option<T> {
     }
 }
 
-// TODO:  This should return `Result<Option<T>, FCallError>`
-//        We'll want to trap the common errors like ERRCODE_UNDEFINED_FUNCTION and ERRCODE_AMBIGUOUS_FUNCTION
-//        along with making some of our own error types
-pub fn fcall<T: FromDatum>(fname: &str, args: &[&dyn FCallArg]) -> Option<T> {
-    let mut arg_types = Vec::with_capacity(args.len());
-    let mut arg_datums = Vec::with_capacity(args.len());
-    for (oid, datum) in args.iter().map(|a| (a.type_oid(), a.as_datum())) {
-        arg_types.push(oid);
-        arg_datums.push(datum);
+/// [`FCallError`]s represet the set of conditions that could case [`fcall()`] to fail in a
+/// user-recoverable manner.
+#[derive(thiserror::Error, Debug, Clone, Eq, PartialEq)]
+pub enum FCallError {
+    #[error("Invalid identifier: `{0}`")]
+    InvalidIdentifier(String),
+
+    #[error("The specified function does not exist")]
+    UndefinedFunction,
+
+    #[error("The specified function exists, but has overloaded versions which are ambiguous given the argument types provided")]
+    AmbiguousFunction,
+
+    #[error("Can only dymamically call plain functions")]
+    UnsupportedFunctionType,
+
+    #[error("Functions with OUT/IN_OUT/TABLE arguments are not supported")]
+    UnsupportedArgumentModes,
+
+    #[error("Functions with argument or return types of `internal` are not supported")]
+    InternalTypeNotSupported,
+
+    #[error("The requested return type `{0}` is not compatible with the actual return type `{1}`")]
+    IncompatibleReturnType(pg_sys::Oid, pg_sys::Oid),
+}
+
+pub type Result<T> = std::result::Result<T, FCallError>;
+
+pub fn fcall<T: FromDatum + IntoDatum>(fname: &str, args: &[&dyn FCallArg]) -> Result<Option<T>> {
+    // let Postgres parse the function name -- it could be schema-qualified and Postgres knows
+    // the parsing rules better than we do
+    let ident_parts = parse_fn_name(&fname)?;
+
+    // lookup the function by its identifier
+    let arg_types = args.iter().map(|a| a.type_oid()).collect::<Vec<_>>();
+    let func_oid = lookup_fn(args, arg_types, ident_parts)?;
+
+    // lookup the function's pg_proc entry and do some validation
+    let pg_proc = PgProc::new(func_oid).ok_or(FCallError::UndefinedFunction)?;
+    let retoid = pg_proc.prorettype();
+
+    //
+    // do some validation to catch the cases we don't/can't directly call
+    //
+
+    if !matches!(pg_proc.prokind(), ProKind::Function) {
+        // It only makes sense to directly call regular functions.  Calling aggregate or window
+        // functions is nonsensical
+        return Err(FCallError::UnsupportedFunctionType);
+    } else if pg_proc.proargmodes().iter().any(|mode| *mode != ProArgMode::In) {
+        // Right now we only know how to support arguments with the IN mode.  Perhaps in the
+        // future we can support IN_OUT and TABLE return types
+        return Err(FCallError::UnsupportedArgumentModes);
+    } else if retoid == pg_sys::INTERNALOID
+        || pg_proc.proargtypes().iter().any(|oid| *oid == pg_sys::INTERNALOID)
+    {
+        // No idea what to do with the INTERNAL type.  Generally it's just a raw pointer but pgrx
+        // has to way to express that with `IntoDatum`.  And passing around raw pointers seem
+        // unsafe enough that if someone needs to do that, they probably have the ability to
+        // re-implement this function themselves.
+        return Err(FCallError::InternalTypeNotSupported);
+    } else if !T::is_compatible_with(retoid) {
+        // the requested Oid of `T` is not compatible with the actual function return type
+        return Err(FCallError::IncompatibleReturnType(T::type_oid(), retoid));
     }
+
+    // we're likely going to be able to call the function, so convert our arguments into Datums
+    let arg_datums = args.iter().map(|a| a.as_datum()).collect::<Vec<_>>();
+
+    // if the function is STRICT and at least one of our argument values is `None` (ie, NULL)...
+    // we must return `None` now and not call the function.  Passing a NULL argument to a STRICT
+    // function will likely crash Postgres
+    if pg_proc.proisstrict() && arg_datums.iter().any(|d| d.is_none()) {
+        return Ok(None);
+    }
+
+    //
+    // The following code is Postgres-version specific.  Right now, it's compatible with v12+
+    // v11 will need a different implementation.
+    //
+    // NB:  Which I don't want to do since it EOLs in 3 months
+    //
+
     unsafe {
-        // let Postgres parse the function name -- it could be schema-qualified and Postgres knows
-        // the parsing rules better than we do
-        let ident_parts = direct_function_call::<Array<&str>>(
-            pg_sys::parse_ident,
-            &[fname.into_datum(), true.into_datum()],
-        );
-
-        // convert those into a PgList of each part as a `pg_sys::String`
-        let func_oid = {
-            // TODO:  `PgList` requires the "cshim" feature, which is **not** turned on for PL/Rust
-            //         I think we'll need to fully port Postgres' "List" type to Rust...
-            let mut parts_list = PgList::new();
-            ident_parts
-                .unwrap()
-                .iter_deny_null()
-                .map(|part| pg_sys::makeString(part.as_pg_cstr()))
-                .for_each(|part| parts_list.push(part));
-
-            // ask Postgres to find the function.  This will look for the possibly-qualified named
-            // function following the normal SEARCH_PATH rules, ensuring its argument type Oids
-            // exactly match the ones from the user's input arguments.  It does not evaluate the
-            // return type, so we'll have to do that later
-            let func_oid = pg_sys::LookupFuncName(
-                parts_list.as_ptr(),
-                args.len().try_into().unwrap(),
-                arg_types.as_ptr(),
-                false,
-            );
-
-            // free the individual `pg_sys::String` parts we allocated above
-            parts_list.iter_ptr().for_each(|s| {
-                #[cfg(any(
-                    feature = "pg11",
-                    feature = "pg12",
-                    feature = "pg13",
-                    feature = "pg14"
-                ))]
-                pg_sys::pfree((*s).val.str_.cast());
-
-                #[cfg(any(feature = "pg15", feature = "pg16"))]
-                pg_sys::pfree((*s).sval.cast());
-            });
-
-            func_oid
-        };
-
-        //
-        // TODO:  lookup the function's pg_proc entry and do some validation around, at least,
-        //  - STRICT: If the function is STRICT, any `None` argument Datum should return None right now
-        //  - IN/OUT/TABLE arg types: I think we should only support IN in v1 of this
-        //  - Make sure the return type `T` is compatible with the resolved function's return type
-        //  - ??
-        //
-
-        //
-        // The following code is Postgres-version specific.  Right now, it's compatible with v12+
-        // v11 will need a different implementation.
-        //
-        // NB:  Which I don't want to do since it EOLs in 3 months
-        //
-
         // initialize a stack-allocated `FmgrInfo` instance
         let mut flinfo = pg_sys::FmgrInfo::default();
         pg_sys::fmgr_info(func_oid, &mut flinfo);
@@ -122,6 +140,8 @@ pub fn fcall<T: FromDatum>(fname: &str, args: &[&dyn FCallArg]) -> Option<T> {
         // setup the argument array
         let args_slice = fcinfo_ref.args.as_mut_slice(args.len());
         for (i, datum) in arg_datums.into_iter().enumerate() {
+            assert!(datum.is_some()); // no NULL datums here, please
+
             let arg = &mut args_slice[i];
             (arg.value, arg.isnull) =
                 datum.map(|d| (d, false)).unwrap_or_else(|| (pg_sys::Datum::from(0), true));
@@ -138,6 +158,58 @@ pub fn fcall<T: FromDatum>(fname: &str, args: &[&dyn FCallArg]) -> Option<T> {
         // cleanup things we heap allocated
         pg_sys::pfree(fcinfo.cast());
 
-        result
+        Ok(result)
     }
+}
+
+fn lookup_fn(
+    args: &[&dyn FCallArg],
+    arg_types: Vec<pg_sys::Oid>,
+    ident_parts: Array<&str>,
+) -> Result<pg_sys::Oid> {
+    let mut parts_list = PgList::new();
+    ident_parts
+        .iter_deny_null()
+        .map(|part| unsafe { pg_sys::makeString(part.as_pg_cstr()) })
+        .for_each(|part| parts_list.push(part));
+
+    // ask Postgres to find the function.  This will look for the possibly-qualified named
+    // function following the normal SEARCH_PATH rules, ensuring its argument type Oids
+    // exactly match the ones from the user's input arguments.  It does not evaluate the
+    // return type, so we'll have to do that later
+    PgTryBuilder::new(AssertUnwindSafe(|| unsafe {
+        Ok(pg_sys::LookupFuncName(
+            parts_list.as_ptr(),
+            args.len().try_into().unwrap(),
+            arg_types.as_ptr(),
+            false, // missing_ok is not ok
+        ))
+    }))
+    .catch_when(PgSqlErrorCode::ERRCODE_AMBIGUOUS_FUNCTION, |_| Err(FCallError::AmbiguousFunction))
+    .catch_when(PgSqlErrorCode::ERRCODE_UNDEFINED_FUNCTION, |_| Err(FCallError::UndefinedFunction))
+    .finally(|| unsafe {
+        // free the individual `pg_sys::String` parts we allocated above
+        parts_list.iter_ptr().for_each(|s| {
+            #[cfg(any(feature = "pg11", feature = "pg12", feature = "pg13", feature = "pg14"))]
+            pg_sys::pfree((*s).val.str_.cast());
+
+            #[cfg(any(feature = "pg15", feature = "pg16"))]
+            pg_sys::pfree((*s).sval.cast());
+        });
+    })
+    .execute()
+}
+
+fn parse_fn_name(fname: &str) -> Result<Array<&str>> {
+    PgTryBuilder::new(|| unsafe {
+        direct_function_call::<Array<&str>>(
+            pg_sys::parse_ident,
+            &[fname.into_datum(), true.into_datum()],
+        )
+        .ok_or_else(|| FCallError::InvalidIdentifier(fname.to_string()))
+    })
+    .catch_when(PgSqlErrorCode::ERRCODE_INVALID_PARAMETER_VALUE, |_| {
+        Err(FCallError::InvalidIdentifier(fname.to_string()))
+    })
+    .execute()
 }
