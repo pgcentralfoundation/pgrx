@@ -11,12 +11,12 @@ use crate::{
     direct_function_call, list::PgList, pg_sys, pg_sys::AsPgCStr, Array, FromDatum, IntoDatum,
 };
 
-pub trait FCallArg {
+pub unsafe trait FCallArg {
     fn as_datum(&self) -> Option<pg_sys::Datum>;
     fn type_oid(&self) -> pg_sys::Oid;
 }
 
-impl<T: IntoDatum + Clone> FCallArg for Option<T> {
+unsafe impl<T: IntoDatum + Clone> FCallArg for Option<T> {
     fn as_datum(&self) -> Option<pg_sys::Datum> {
         // TODO:  would prefer not to need `Clone`, but that requires changes to `IntoDatum`
         self.as_ref().map(|v| Clone::clone(v).into_datum()).flatten()

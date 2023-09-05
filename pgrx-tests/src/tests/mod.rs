@@ -18,7 +18,7 @@ mod datetime_tests;
 mod default_arg_value_tests;
 mod derive_pgtype_lifetimes;
 mod enum_type_tests;
-#[cfg(feature = "cshim")]
+#[cfg(all(feature = "cshim", not(feature = "pg11")))]
 mod fcall_tests;
 mod fcinfo_tests;
 mod from_into_datum_tests;
