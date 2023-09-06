@@ -15,6 +15,7 @@ pub struct PgProc {
     inner: NonNull<pg_sys::HeapTupleData>,
 }
 
+#[non_exhaustive]
 #[derive(Debug, Copy, Clone, Eq, PartialEq, Ord, PartialOrd, Hash)]
 pub enum ProArgMode {
     In,
@@ -34,11 +35,12 @@ impl From<i8> for ProArgMode {
             b't' => ProArgMode::Table,
 
             // there's just no ability to move forward if given a value that we don't know about
-            _ => panic!("unrecognized `ProArgMode`: `{}`", value),
+            _ => panic!("unrecognized `ProArgMode`: `{}`", value as u8 as char),
         }
     }
 }
 
+#[non_exhaustive]
 #[derive(Debug, Copy, Clone, Eq, PartialEq, Ord, PartialOrd, Hash)]
 pub enum ProKind {
     Function,
@@ -56,11 +58,12 @@ impl From<i8> for ProKind {
             b'w' => ProKind::Window,
 
             // there's just no ability to move forward if given a value that we don't know about
-            _ => panic!("unrecognized `ProKind`: `{}`", value),
+            _ => panic!("unrecognized `ProKind`: `{}`", value as u8 as char),
         }
     }
 }
 
+#[non_exhaustive]
 #[derive(Debug, Copy, Clone, Eq, PartialEq, Ord, PartialOrd, Hash)]
 pub enum ProVolatile {
     Immutable,
@@ -76,11 +79,13 @@ impl From<i8> for ProVolatile {
             b'v' => ProVolatile::Volatile,
 
             // there's just no ability to move forward if given a value that we don't know about
-            _ => panic!("unrecognized `ProVolatile`: `{}`", value),
+            _ => panic!("unrecognized `ProVolatile`: `{}`", value as u8 as char),
         }
     }
 }
 
+#[non_exhaustive]
+#[derive(Debug, Copy, Clone, Eq, PartialEq, Ord, PartialOrd, Hash)]
 pub enum ProParallel {
     Safe,
     Restricted,
@@ -95,7 +100,7 @@ impl From<i8> for ProParallel {
             b'u' => ProParallel::Unsafe,
 
             // there's just no ability to move forward if given a value that we don't know about
-            _ => panic!("unrecognized `ProParallel`: `{}`", value),
+            _ => panic!("unrecognized `ProParallel`: `{}`", value as u8 as char),
         }
     }
 }
@@ -127,20 +132,20 @@ impl PgProc {
 
     /// Owner of the function
     pub fn proowner(&self) -> pg_sys::Oid {
-        // SAFETY:  `proowner` has a NOT NULL constraint
+        // won't panic because `proowner` has a NOT NULL constraint
         self.get_attr(pg_sys::Anum_pg_proc_proowner).unwrap()
     }
 
     /// Estimated execution cost (in units of cpu_operator_cost); if [`proretset()`], this is cost per row
     /// returned
     pub fn procost(&self) -> f32 {
-        // SAFETY:  `procost` has a NOT NULL constraint
+        // won't panic because `procost` has a NOT NULL constraint
         self.get_attr(pg_sys::Anum_pg_proc_procost).unwrap()
     }
 
     /// Estimated number of result rows (zero if not [`proretset()`],)
     pub fn prorows(&self) -> f32 {
-        // SAFETY:  `prorows` has a NOT NULL constraint
+        // won't panic because `prorows` has a NOT NULL constraint, so `.unwrap()` wont panic
         self.get_attr(pg_sys::Anum_pg_proc_prorows).unwrap()
     }
 
@@ -157,19 +162,19 @@ impl PgProc {
     /// Planner support function for this function (see Section 38.11), or zero if none
     #[cfg(not(feature = "pg11"))]
     pub fn prosupport(&self) -> pg_sys::Oid {
-        // SAFETY:  `prosupport` has a NOT NULL constraint
+        // won't panic because `prosupport` has a NOT NULL constraint, so `.unwrap()` wont panic
         self.get_attr(pg_sys::Anum_pg_proc_prosupport).unwrap()
     }
 
     /// The kind of function
     pub fn prokind(&self) -> ProKind {
-        // SAFETY:  `prokind` has a NOT NULL constraint
+        // won't panic because `prokind` has a NOT NULL constraint, so `.unwrap()` wont panic
         ProKind::from(self.get_attr::<i8>(pg_sys::Anum_pg_proc_prokind).unwrap())
     }
 
     /// Returns true if the function is a security definer (i.e., a “setuid” function)
     pub fn prosecdef(&self) -> bool {
-        // SAFETY:  `prosecdef` has a NOT NULL constraint
+        // won't panic because `prosecdef` has a NOT NULL constraint, so `.unwrap()` wont panic
         self.get_attr(pg_sys::Anum_pg_proc_prosecdef).unwrap()
     }
 
@@ -177,13 +182,13 @@ impl PgProc {
     /// the return value. Any function that might throw an error depending on the values of its
     /// arguments is not leak-proof.
     pub fn proleakproof(&self) -> bool {
-        // SAFETY:  `proleakproof` has a NOT NULL constraint
+        // won't panic because `proleakproof` has a NOT NULL constraint, so `.unwrap()` wont panic
         self.get_attr(pg_sys::Anum_pg_proc_proleakproof).unwrap()
     }
 
     /// Implementation language or call interface of this function
     pub fn prolang(&self) -> pg_sys::Oid {
-        // SAFETY:  `prolang` has a NOT NULL constraint
+        // won't panic because `prolang` has a NOT NULL constraint, so `.unwrap()` wont panic
         self.get_attr(pg_sys::Anum_pg_proc_prolang).unwrap()
     }
 
@@ -191,7 +196,7 @@ impl PgProc {
     /// code of the function for interpreted languages, a link symbol, a file name, or just about
     /// anything else, depending on the implementation language/call convention.
     pub fn prosrc(&self) -> String {
-        // SAFETY:  `prosrc` has a NOT NULL constraint
+        // won't panic because `prosrc` has a NOT NULL constraint, so `.unwrap()` wont panic
         self.get_attr(pg_sys::Anum_pg_proc_prosrc).unwrap()
     }
 
@@ -225,13 +230,13 @@ impl PgProc {
 
     /// Number of input arguments
     pub fn pronargs(&self) -> usize {
-        // SAFETY:  `pronargs` has a NOT NULL constraint
+        // won't panic because `pronargs` has a NOT NULL constraint, so `.unwrap()` wont panic
         self.get_attr::<i16>(pg_sys::Anum_pg_proc_pronargs).unwrap() as usize
     }
 
     /// Number of arguments that have defaults
     pub fn pronargdefaults(&self) -> usize {
-        // SAFETY:  `pronargdefaults` has a NOT NULL constraint
+        // won't panic because `pronargdefaults` has a NOT NULL constraint, so `.unwrap()` wont panic
         self.get_attr::<i16>(pg_sys::Anum_pg_proc_pronargdefaults).unwrap() as usize
     }
 
@@ -260,14 +265,14 @@ impl PgProc {
 
     /// Data type of the return value
     pub fn prorettype(&self) -> pg_sys::Oid {
-        // SAFETY:  `prorettype` has a NOT NULL constraint
+        // won't panic because `prorettype` has a NOT NULL constraint, so `.unwrap()` wont panic
         self.get_attr(pg_sys::Anum_pg_proc_prorettype).unwrap()
     }
 
     /// Function returns null if any call argument is null. In that case the function won't actually
     /// be called at all. Functions that are not “strict” must be prepared to handle null inputs.
     pub fn proisstrict(&self) -> bool {
-        // SAFETY: 'proisstrict' has a NOT NULL constraint
+        // 'proisstrict' has a NOT NULL constraint, so `.unwrap()` wont panic
         self.get_attr(pg_sys::Anum_pg_proc_proisstrict).unwrap()
     }
 
@@ -278,7 +283,7 @@ impl PgProc {
     /// change at any time. (Use v also for functions with side-effects, so that calls to them
     /// cannot get optimized away.)
     pub fn provolatile(&self) -> ProVolatile {
-        // SAFETY: 'provolatile' has a NOT NULL constraint
+        // 'provolatile' has a NOT NULL constraint, so `.unwrap()` wont panic
         ProVolatile::from(self.get_attr::<i8>(pg_sys::Anum_pg_proc_provolatile).unwrap())
     }
 
@@ -288,13 +293,13 @@ impl PgProc {
     /// leader; parallel worker processes cannot invoke these functions. It is u for functions which
     /// are unsafe in parallel mode; the presence of such a function forces a serial execution plan.
     pub fn proparallel(&self) -> ProParallel {
-        // SAFETY: 'proparallel' has a NOT NULL constraint
+        // 'proparallel' has a NOT NULL constraint, so `.unwrap()` wont panic
         ProParallel::from(self.get_attr::<i8>(pg_sys::Anum_pg_proc_proparallel).unwrap())
     }
 
     /// Function returns a set (i.e., multiple values of the specified data type)
     pub fn proretset(&self) -> bool {
-        // SAFETY: 'proretset' has a NOT NULL constraint
+        // 'proretset' has a NOT NULL constraint, so `.unwrap()` wont panic
         self.get_attr(pg_sys::Anum_pg_proc_proretset).unwrap()
     }
 
