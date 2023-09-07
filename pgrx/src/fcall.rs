@@ -65,6 +65,14 @@ pub enum FCallError {
 pub type Result<T> = std::result::Result<T, FCallError>;
 
 pub fn fcall<T: FromDatum + IntoDatum>(fname: &str, args: &[&dyn FCallArg]) -> Result<Option<T>> {
+    fcall_with_collation(fname, pg_sys::DEFAULT_COLLATION_OID, args)
+}
+
+pub fn fcall_with_collation<T: FromDatum + IntoDatum>(
+    fname: &str,
+    collation: pg_sys::Oid,
+    args: &[&dyn FCallArg],
+) -> Result<Option<T>> {
     // ensure we don't have too many arguments
     let nargs: i16 = args.len().try_into().map_err(|_| FCallError::TooManyArguments)?;
 
@@ -137,7 +145,7 @@ pub fn fcall<T: FromDatum + IntoDatum>(fname: &str, args: &[&dyn FCallArg]) -> R
         // initialize it
         let fcinfo_ref = fcinfo.as_mut().unwrap();
         fcinfo_ref.flinfo = &mut flinfo;
-        fcinfo_ref.fncollation = pg_sys::InvalidOid; // TODO:  We need to get a collation from somewhere?
+        fcinfo_ref.fncollation = collation;
         fcinfo_ref.context = std::ptr::null_mut();
         fcinfo_ref.resultinfo = std::ptr::null_mut();
         fcinfo_ref.isnull = false;

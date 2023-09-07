@@ -93,6 +93,13 @@ mod tests {
         assert_eq!(Err(FCallError::TooManyArguments), result);
     }
 
+    #[pg_test]
+    fn test_func_with_collation() {
+        // `pg_catalog.texteq` requires a collation, so we use the default
+        let result = fcall::<bool>("pg_catalog.texteq", &[&Some("test"), &Some("test")]);
+        assert_eq!(Ok(Some(true)), result);
+    }
+
     // NB:  I don't see a way for `fcall()` to be ambiguous about which function it wants to call?
     //      Spent about 30m trying to cook up an example and couldn't.
     // #[pg_test]
