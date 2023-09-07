@@ -17,15 +17,18 @@ use crate::{
     direct_function_call, list::PgList, pg_sys, pg_sys::AsPgCStr, Array, FromDatum, IntoDatum,
 };
 
-trait Sealed {}
-impl<T> Sealed for Option<T> {}
+mod seal {
+    pub trait Sealed {}
 
-pub unsafe trait FCallArg: Sealed {
+    impl<T: crate::IntoDatum + Clone> Sealed for T {}
+}
+
+pub unsafe trait FCallArg {
     fn as_datum(&self) -> Option<pg_sys::Datum>;
     fn type_oid(&self) -> pg_sys::Oid;
 }
 
-unsafe impl<T: IntoDatum + Clone> FCallArg for Option<T> {
+unsafe impl<T: IntoDatum + Clone + seal::Sealed> FCallArg for Option<T> {
     fn as_datum(&self) -> Option<pg_sys::Datum> {
         // TODO:  would prefer not to need `Clone`, but that requires changes to `IntoDatum`
         self.as_ref().map(|v| Clone::clone(v).into_datum()).flatten()
