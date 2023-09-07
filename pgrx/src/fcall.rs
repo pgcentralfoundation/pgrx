@@ -17,7 +17,10 @@ use crate::{
     direct_function_call, list::PgList, pg_sys, pg_sys::AsPgCStr, Array, FromDatum, IntoDatum,
 };
 
-pub unsafe trait FCallArg {
+trait Sealed {}
+impl<T> Sealed for Option<T> {}
+
+pub unsafe trait FCallArg: Sealed {
     fn as_datum(&self) -> Option<pg_sys::Datum>;
     fn type_oid(&self) -> pg_sys::Oid;
 }
