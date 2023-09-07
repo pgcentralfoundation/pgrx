@@ -13,6 +13,7 @@ use std::ptr::NonNull;
 /// Provides a safe wrapper around a Postgres "SysCache" entry from `pg_catalog.pg_proc`.
 pub struct PgProc {
     inner: NonNull<pg_sys::HeapTupleData>,
+    oid: pg_sys::Oid,
 }
 
 #[non_exhaustive]
@@ -123,11 +124,16 @@ impl PgProc {
             // Either way, using NonNull::new()? will make the right decision for us
             let entry = pg_sys::SearchSysCache1(
                 pg_sys::SysCacheIdentifier_PROCOID as _,
-                pg_proc_oid.into_datum().unwrap(),
+                pg_proc_oid.into_datum()?,
             );
             let inner = NonNull::new(entry)?;
-            Some(PgProc { inner })
+            Some(PgProc { inner, oid: pg_proc_oid })
         }
+    }
+
+    /// Oid of the function
+    pub fn oid(&self) -> pg_sys::Oid {
+        self.oid
     }
 
     /// Owner of the function

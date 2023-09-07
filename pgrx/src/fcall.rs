@@ -8,6 +8,7 @@
 //LICENSE
 //LICENSE Use of this source code is governed by the MIT license that can be found in the LICENSE file.
 
+use once_cell::unsync::Lazy;
 use pgrx_pg_sys::errcodes::PgSqlErrorCode;
 use pgrx_pg_sys::PgTryBuilder;
 use std::panic::AssertUnwindSafe;
@@ -24,14 +25,23 @@ mod seal {
 }
 
 pub unsafe trait FCallArg {
-    fn as_datum(&self) -> Option<pg_sys::Datum>;
+    fn as_datum(&self, pg_proc: &PgProc, argnum: usize) -> Option<pg_sys::Datum>;
     fn type_oid(&self) -> pg_sys::Oid;
 }
 
-unsafe impl<T: IntoDatum + Clone + seal::Sealed> FCallArg for Option<T> {
-    fn as_datum(&self) -> Option<pg_sys::Datum> {
-        // TODO:  would prefer not to need `Clone`, but that requires changes to `IntoDatum`
-        self.as_ref().map(|v| Clone::clone(v).into_datum()).flatten()
+pub enum Arg<T> {
+    Null,
+    Default,
+    Value(T),
+}
+
+unsafe impl<T: IntoDatum + Clone + seal::Sealed> FCallArg for Arg<T> {
+    fn as_datum(&self, pg_proc: &PgProc, argnum: usize) -> Option<pg_sys::Datum> {
+        match self {
+            Arg::Null => None,
+            Arg::Value(v) => Clone::clone(v).into_datum(),
+            Arg::Default => create_default_value(&pg_proc, argnum, self.type_oid()),
+        }
     }
 
     fn type_oid(&self) -> pg_sys::Oid {
@@ -79,15 +89,8 @@ pub fn fcall_with_collation<T: FromDatum + IntoDatum>(
     collation: pg_sys::Oid,
     args: &[&dyn FCallArg],
 ) -> Result<Option<T>> {
-    // ensure we don't have too many arguments
-    let nargs: i16 = args.len().try_into().map_err(|_| FCallError::TooManyArguments)?;
-
-    // let Postgres parse the function name -- it could be schema-qualified and Postgres knows
-    // the parsing rules better than we do
-    let ident_parts = parse_fn_name(&fname)?;
-
-    // lookup the function by its identifier
-    let func_oid = lookup_fn(nargs, args, ident_parts)?;
+    // lookup the function by its name
+    let func_oid = lookup_fn(fname, args)?;
 
     // lookup the function's pg_proc entry and do some validation
     let pg_proc = PgProc::new(func_oid).ok_or(FCallError::UndefinedFunction)?;
@@ -118,14 +121,35 @@ pub fn fcall_with_collation<T: FromDatum + IntoDatum>(
         return Err(FCallError::IncompatibleReturnType(T::type_oid(), retoid));
     }
 
-    // we're likely going to be able to call the function, so convert our arguments into Datums
-    let arg_datums = args.iter().map(|a| a.as_datum()).collect::<Vec<_>>();
+    // we're likely going to be able to call the function, so convert our arguments into Datums,
+    // filling in any DEFAULT arguments at the end
+    let allargtypes = Lazy::new(|| pg_proc.proallargtypes());
+    let mut null = false;
+    let arg_datums = args
+        .iter()
+        .enumerate()
+        .map(|(i, a)| a.as_datum(&pg_proc, i))
+        .chain({
+            (args.len()..pg_proc.pronargs())
+                .map(|i| create_default_value(&pg_proc, i, allargtypes[i]))
+        })
+        .map(|datum| {
+            null |= datum.is_none();
+            datum
+        })
+        .collect::<Vec<_>>();
+
+    // make sure we don't have too many arguments after possibly filling in DEFAULT argument values
+    let nargs = arg_datums.len();
+    if nargs >= i16::MAX as usize {
+        return Err(FCallError::TooManyArguments);
+    }
 
     // if the function is STRICT and at least one of our argument values is `None` (ie, NULL)...
     // we must return `None` now and not call the function.  Passing a NULL argument to a STRICT
     // function will likely crash Postgres
     let isstrict = pg_proc.proisstrict();
-    if isstrict && arg_datums.iter().any(|d| d.is_none()) {
+    if null && isstrict {
         return Ok(None);
     }
 
@@ -137,7 +161,7 @@ pub fn fcall_with_collation<T: FromDatum + IntoDatum>(
     //
 
     unsafe {
-        // initialize a stack-allocated `FmgrInfo` instance
+        // construct a stack-allocated `FmgrInfo` instance
         let mut flinfo = pg_sys::FmgrInfo::default();
         pg_sys::fmgr_info(func_oid, &mut flinfo);
 
@@ -145,7 +169,7 @@ pub fn fcall_with_collation<T: FromDatum + IntoDatum>(
         // for `args.len()` arguments
         let fcinfo = pg_sys::palloc0(
             std::mem::size_of::<pg_sys::FunctionCallInfoBaseData>()
-                + std::mem::size_of::<pg_sys::NullableDatum>() * args.len(),
+                + std::mem::size_of::<pg_sys::NullableDatum>() * nargs,
         ) as *mut pg_sys::FunctionCallInfoBaseData;
 
         // initialize it
@@ -155,10 +179,10 @@ pub fn fcall_with_collation<T: FromDatum + IntoDatum>(
         fcinfo_ref.context = std::ptr::null_mut();
         fcinfo_ref.resultinfo = std::ptr::null_mut();
         fcinfo_ref.isnull = false;
-        fcinfo_ref.nargs = nargs;
+        fcinfo_ref.nargs = nargs as _;
 
         // setup the argument array
-        let args_slice = fcinfo_ref.args.as_mut_slice(args.len());
+        let args_slice = fcinfo_ref.args.as_mut_slice(nargs);
         for (i, datum) in arg_datums.into_iter().enumerate() {
             assert!(!isstrict || (isstrict && datum.is_some())); // no NULL datums if this function is STRICT
 
@@ -182,29 +206,48 @@ pub fn fcall_with_collation<T: FromDatum + IntoDatum>(
     }
 }
 
-fn lookup_fn(nargs: i16, args: &[&dyn FCallArg], ident_parts: Array<&str>) -> Result<pg_sys::Oid> {
-    let arg_types = args.iter().map(|a| a.type_oid()).collect::<Vec<_>>();
-    let mut parts_list = PgList::new();
-    ident_parts
-        .iter_deny_null()
-        .map(|part| unsafe { pg_sys::makeString(part.as_pg_cstr()) })
-        .for_each(|part| parts_list.push(part));
-
+fn lookup_fn(fname: &str, args: &[&dyn FCallArg]) -> Result<pg_sys::Oid> {
     // ask Postgres to find the function.  This will look for the possibly-qualified named
     // function following the normal SEARCH_PATH rules, ensuring its argument type Oids
     // exactly match the ones from the user's input arguments.  It does not evaluate the
     // return type, so we'll have to do that later
-    PgTryBuilder::new(AssertUnwindSafe(|| unsafe {
-        Ok(pg_sys::LookupFuncName(
-            parts_list.as_ptr(),
-            nargs.into(),
-            arg_types.as_ptr(),
-            false, // missing_ok is not ok
-        ))
+    let mut parts_list = PgList::new();
+    let result = PgTryBuilder::new(AssertUnwindSafe(|| unsafe {
+        let arg_types = args.iter().map(|a| a.type_oid()).collect::<Vec<_>>();
+        let nargs: i16 = arg_types.len().try_into().map_err(|_| FCallError::TooManyArguments)?;
+
+        // parse the function name into its possibly-qualified name aprts
+        let ident_parts = parse_fn_name(&fname)?;
+        ident_parts
+            .iter_deny_null()
+            .map(|part| pg_sys::makeString(part.as_pg_cstr()))
+            .for_each(|part| parts_list.push(part));
+
+        // look up an exact-match function based on the exact number of arguments we have
+        let mut fnoid =
+            pg_sys::LookupFuncName(parts_list.as_ptr(), nargs as _, arg_types.as_ptr(), true);
+
+        if fnoid == pg_sys::InvalidOid {
+            // if that didn't find a function, maybe we've got some defaults in there, so do a lookup
+            // where Postgres will consider that
+            fnoid = pg_sys::LookupFuncName(
+                parts_list.as_ptr(),
+                -1,
+                arg_types.as_ptr(),
+                false, // we want the ERROR here -- could be UNDEFINED_FUNCTION or AMBIGUOUS_FUNCTION
+            );
+        }
+
+        Ok(fnoid)
     }))
+    .catch_when(PgSqlErrorCode::ERRCODE_INVALID_PARAMETER_VALUE, |_| {
+        Err(FCallError::InvalidIdentifier(fname.to_string()))
+    })
     .catch_when(PgSqlErrorCode::ERRCODE_AMBIGUOUS_FUNCTION, |_| Err(FCallError::AmbiguousFunction))
     .catch_when(PgSqlErrorCode::ERRCODE_UNDEFINED_FUNCTION, |_| Err(FCallError::UndefinedFunction))
-    .finally(|| unsafe {
+    .execute();
+
+    unsafe {
         // free the individual `pg_sys::String` parts we allocated above
         parts_list.iter_ptr().for_each(|s| {
             #[cfg(any(feature = "pg11", feature = "pg12", feature = "pg13", feature = "pg14"))]
@@ -213,20 +256,45 @@ fn lookup_fn(nargs: i16, args: &[&dyn FCallArg], ident_parts: Array<&str>) -> Re
             #[cfg(any(feature = "pg15", feature = "pg16"))]
             pg_sys::pfree((*s).sval.cast());
         });
-    })
-    .execute()
+    }
+
+    result
 }
 
 fn parse_fn_name(fname: &str) -> Result<Array<&str>> {
-    PgTryBuilder::new(|| unsafe {
+    unsafe {
         direct_function_call::<Array<&str>>(
             pg_sys::parse_ident,
             &[fname.into_datum(), true.into_datum()],
         )
         .ok_or_else(|| FCallError::InvalidIdentifier(fname.to_string()))
-    })
-    .catch_when(PgSqlErrorCode::ERRCODE_INVALID_PARAMETER_VALUE, |_| {
-        Err(FCallError::InvalidIdentifier(fname.to_string()))
-    })
-    .execute()
+    }
+}
+
+fn create_default_value(
+    pg_proc: &PgProc,
+    argnum: usize,
+    type_oid: pg_sys::Oid,
+) -> Option<pg_sys::Datum> {
+    unsafe {
+        // get the textual representation of this argument's DEFAULT value
+        let default = direct_function_call::<String>(
+            pg_sys::pg_get_function_arg_default,
+            &[pg_proc.oid().into_datum(), ((argnum + 1) as i32).into_datum()],
+        );
+
+        let datum = default.map(|default| {
+            // lookup the "input function" information
+            let mut inputfn_oid = pg_sys::InvalidOid;
+            let mut io_param = pg_sys::InvalidOid;
+            pg_sys::getTypeInputInfo(type_oid, &mut inputfn_oid, &mut io_param);
+
+            // and call it with a char* version of the DEFAULT value
+            let default_cstr = default.as_pg_cstr();
+            let datum = pg_sys::OidInputFunctionCall(inputfn_oid, default_cstr, io_param, -1);
+            pg_sys::pfree(default_cstr.cast());
+            datum
+        });
+        datum
+    }
 }
