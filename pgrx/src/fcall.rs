@@ -25,7 +25,7 @@ mod seal {
 }
 
 pub unsafe trait FCallArg {
-    fn as_datum(&self, pg_proc: &PgProc, argnum: usize) -> Option<pg_sys::Datum>;
+    fn as_datum(&self, pg_proc: &PgProc, argnum: usize) -> Result<Option<pg_sys::Datum>>;
     fn type_oid(&self) -> pg_sys::Oid;
 }
 
@@ -36,10 +36,10 @@ pub enum Arg<T> {
 }
 
 unsafe impl<T: IntoDatum + Clone + seal::Sealed> FCallArg for Arg<T> {
-    fn as_datum(&self, pg_proc: &PgProc, argnum: usize) -> Option<pg_sys::Datum> {
+    fn as_datum(&self, pg_proc: &PgProc, argnum: usize) -> Result<Option<pg_sys::Datum>> {
         match self {
-            Arg::Null => None,
-            Arg::Value(v) => Clone::clone(v).into_datum(),
+            Arg::Null => Ok(None),
+            Arg::Value(v) => Ok(Clone::clone(v).into_datum()),
             Arg::Default => create_default_value(&pg_proc, argnum, self.type_oid()),
         }
     }
@@ -76,6 +76,9 @@ pub enum FCallError {
 
     #[error("Function call has more arguments than are supported")]
     TooManyArguments,
+
+    #[error("Argument does not have a DEFAULT value")]
+    NoDefaultValue,
 }
 
 pub type Result<T> = std::result::Result<T, FCallError>;
@@ -134,10 +137,10 @@ pub fn fcall_with_collation<T: FromDatum + IntoDatum>(
                 .map(|i| create_default_value(&pg_proc, i, allargtypes[i]))
         })
         .map(|datum| {
-            null |= datum.is_none();
+            null |= matches!(datum, Ok(None));
             datum
         })
-        .collect::<Vec<_>>();
+        .collect::<Result<Vec<_>>>()?;
 
     // make sure we don't have too many arguments after possibly filling in DEFAULT argument values
     let nargs = arg_datums.len();
@@ -275,26 +278,30 @@ fn create_default_value(
     pg_proc: &PgProc,
     argnum: usize,
     type_oid: pg_sys::Oid,
-) -> Option<pg_sys::Datum> {
+) -> Result<Option<pg_sys::Datum>> {
+    // NB:  This is all wrong.  We need to somehow evaluate the expression tree
     unsafe {
         // get the textual representation of this argument's DEFAULT value
         let default = direct_function_call::<String>(
             pg_sys::pg_get_function_arg_default,
             &[pg_proc.oid().into_datum(), ((argnum + 1) as i32).into_datum()],
-        );
+        )
+        .ok_or(FCallError::NoDefaultValue)?;
 
-        let datum = default.map(|default| {
-            // lookup the "input function" information
-            let mut inputfn_oid = pg_sys::InvalidOid;
-            let mut io_param = pg_sys::InvalidOid;
-            pg_sys::getTypeInputInfo(type_oid, &mut inputfn_oid, &mut io_param);
+        // if the default clause is `DEFAULT NULL` then so is the Datum repr
+        if default.starts_with("NULL::") {
+            return Ok(None);
+        }
 
-            // and call it with a char* version of the DEFAULT value
-            let default_cstr = default.as_pg_cstr();
-            let datum = pg_sys::OidInputFunctionCall(inputfn_oid, default_cstr, io_param, -1);
-            pg_sys::pfree(default_cstr.cast());
-            datum
-        });
-        datum
+        // lookup the "input function" information
+        let mut inputfn_oid = pg_sys::InvalidOid;
+        let mut io_param = pg_sys::InvalidOid;
+        pg_sys::getTypeInputInfo(type_oid, &mut inputfn_oid, &mut io_param);
+
+        // and call it with a char* version of the DEFAULT value
+        let default_cstr = default.as_pg_cstr();
+        let datum = pg_sys::OidInputFunctionCall(inputfn_oid, default_cstr, io_param, -1);
+        pg_sys::pfree(default_cstr.cast());
+        Ok(Some(datum))
     }
 }

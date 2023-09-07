@@ -37,7 +37,9 @@ mod tests {
             
             CREATE FUNCTION tests.with_two_defaults(int4 DEFAULT 0, int4 DEFAULT 0) RETURNS int4 STRICT LANGUAGE sql AS $$ SELECT $1 + $2; $$;
             
-            CREATE FUNCTION tests.with_arg_and_two_defaults(int4, int4 DEFAULT 0, int4 DEFAULT 0) RETURNS int4 STRICT LANGUAGE sql AS $$ SELECT $1 + $2 + $3; $$;
+            CREATE FUNCTION tests.with_arg_and_two_defaults(int4, int4 DEFAULT 1, int4 DEFAULT 2) RETURNS int4 STRICT LANGUAGE sql AS $$ SELECT $1 + $2 + $3; $$;
+            
+            CREATE FUNCTION tests.with_null_default(text DEFAULT NULL) RETURNS text STRICT LANGUAGE sql AS $$ SELECT $1; $$;
         "#,
         name = "test_funcs",
         requires = [tests]
@@ -141,7 +143,22 @@ mod tests {
     #[pg_test]
     fn test_with_arg_and_two_defaults() {
         let result = fcall::<i32>("tests.with_arg_and_two_defaults", &[]);
-        assert_eq!(Ok(Some(0)), result);
+        assert_eq!(Err(FCallError::NoDefaultValue), result);
+
+        let result = fcall::<i32>("tests.with_arg_and_two_defaults", &[&Arg::Value(42)]);
+        assert_eq!(Ok(Some(45)), result);
+
+        let result =
+            fcall::<i32>("tests.with_arg_and_two_defaults", &[&Arg::Value(42), &Arg::Value(0)]);
+        assert_eq!(Ok(Some(44)), result);
+    }
+    #[pg_test]
+    fn test_with_null_default() {
+        let result = fcall::<&str>("tests.with_null_default", &[]);
+        assert_eq!(Ok(None), result);
+
+        let result = fcall::<&str>("tests.with_null_default", &[&Arg::Value("value")]);
+        assert_eq!(Ok(Some("value")), result);
     }
 
     #[pg_test]
@@ -157,14 +174,6 @@ mod tests {
             fcall::<bool>("pg_catalog.texteq", &[&Arg::Value("test"), &Arg::Value("test")]);
         assert_eq!(Ok(Some(true)), result);
     }
-
-    // NB:  I don't see a way for `fcall()` to be ambiguous about which function it wants to call?
-    //      Spent about 30m trying to cook up an example and couldn't.
-    // #[pg_test]
-    // fn ambiguous_function() {
-    //     let result = fcall::<bool>("tests.ambiguous", &[&Arg::Value(42)]);
-    //     assert_eq!(Err(FCallError::AmbiguousFunction), result)
-    // }
 
     #[pg_test]
     fn unknown_function() {
