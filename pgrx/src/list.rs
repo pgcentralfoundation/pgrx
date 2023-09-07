@@ -473,7 +473,8 @@ mod flat_list {
             ptr::copy_nonoverlapping(list.elements, buf.cast(), list.length as _);
             // If the old buffer is pointers, we would like everyone dereferencing them to segfault,
             // if OIDs, Postgres will surface errors quickly on InvalidOid, etc.
-            ptr::write_bytes(list.elements, 0, list.length as _);
+            #[cfg(debug_assertions)]
+            ptr::write_bytes(list.elements, 0x7F, list.length as _);
             list.elements = buf.cast();
         } else {
             // We already have a separate buf, making this easy.
