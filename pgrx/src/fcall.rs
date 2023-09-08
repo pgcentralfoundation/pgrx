@@ -141,7 +141,14 @@ pub type Result<T> = std::result::Result<T, FCallError>;
 /// and will immediately abort the transaction.  To catch such errors yourself, use [`fcall`] with
 /// [`PgTryBuilder`].
 ///
-/// # Example
+/// # Limitations
+///
+/// Currently, [`fcall`] does not support:
+///     - Functions that `RETURNS SET OF $type` or `RETURNS TABLE(...)`
+///     - Functions with `IN_OUT` or `OUT` arguments
+///     - Postgres 11
+///
+/// # Examples
 ///
 /// ## Calling a UDF
 ///
