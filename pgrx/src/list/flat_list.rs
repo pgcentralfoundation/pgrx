@@ -1,3 +1,4 @@
+use super::{seal, Enlist, List, ListCell, ListHead};
 use crate::pg_sys;
 use core::cmp;
 use core::ffi;
@@ -6,35 +7,6 @@ use core::mem;
 use core::ops::{Bound, Deref, DerefMut, RangeBounds};
 use core::ptr::{self, NonNull};
 use core::slice;
-
-/// The List type from Postgres, lifted into Rust
-/// Note: you may want the ListHead type
-#[derive(Debug)]
-pub enum List<T> {
-    Nil,
-    Cons(ListHead<T>),
-}
-
-/// A strongly-typed ListCell
-#[repr(transparent)]
-pub struct ListCell<T> {
-    // It is important that we are able to treat this union as effectively synonymous with T!
-    // Thus it is important that we
-    // - do not hand out the ability to construct arbitrary ListCell<T>
-    // - do not offer casting between types of List<T> (which offer [ListCell<T>])
-    // - do not even upgrade from pg_sys::{List, ListCell} to pgrx::list::{List, ListCell}
-    // UNLESS the relevant safety invariants are appropriately handled!
-    // It is not even okay to do this for FFI! We must check any *mut pg_sys::List from FFI,
-    // to guarantee it has the expected type tag, otherwise the union cells may be garbage.
-    cell: pg_sys::ListCell,
-    _type: PhantomData<T>,
-}
-
-// Note: the size of `ListCell<T>`'s generic `T` doesn't matter,
-// thus it isn't acceptable to implement Enlist for a `T` larger than `pg_sys::ListCell`.
-const _: () = {
-    assert!(mem::size_of::<ListCell<u128>>() == mem::size_of::<pg_sys::ListCell>());
-};
 
 impl<T: Enlist> Deref for ListCell<T> {
     type Target = T;
@@ -54,43 +26,6 @@ impl<T: Enlist> DerefMut for ListCell<T> {
         // only relies on pgrx::list::{Enlist, List, ListCell} maintaining safety invariants
         unsafe { &mut *T::apoptosis(&mut self.cell) }
     }
-}
-
-#[derive(Debug)]
-pub struct ListHead<T> {
-    list: NonNull<pg_sys::List>,
-    _type: PhantomData<[T]>,
-}
-
-mod seal {
-    pub trait Sealed {}
-}
-
-/// The bound to describe a type which may be used in a Postgres List
-/// It must know what an appropriate type tag is, and how to pointer-cast to itself
-///
-/// # Safety
-/// `List<T>` relies in various ways on this being correctly implemented.
-/// Incorrect implementation can lead to broken Lists, UB, or "database hilarity".
-///
-/// Only realistically valid to implement for union variants of pg_sys::ListCell.
-/// It's not even correct to impl for `*mut T`, as `*mut T` may be a fat pointer!
-pub unsafe trait Enlist: seal::Sealed + Sized {
-    // The appropriate list tag for this type.
-    const LIST_TAG: pg_sys::NodeTag;
-
-    /// From a pointer to the pg_sys::ListCell union, obtain a pointer to Self
-    /// I think this isn't actually unsafe, it just has an unsafe impl invariant?
-    /// It must be implemented with ptr::addr_of! or similar, without reborrowing
-    /// so that it may be used without regard to whether a pointer is write-capable
-    unsafe fn apoptosis(cell: *mut pg_sys::ListCell) -> *mut Self;
-
-    /// Set a value into a `pg_sys::ListCell`
-    ///
-    /// This is used instead of Enlist::apoptosis, as it guarantees initializing the union
-    /// according to the rules of Rust. In practice, this is probably the same,
-    /// but this way I don't have to wonder, as this is a safe function.
-    fn endocytosis(cell: &mut pg_sys::ListCell, value: Self);
 }
 
 impl seal::Sealed for *mut ffi::c_void {}
@@ -144,14 +79,6 @@ unsafe impl Enlist for pg_sys::TransactionId {
 
     fn endocytosis(cell: &mut pg_sys::ListCell, value: Self) {
         cell.xid_value = value;
-    }
-}
-
-/// Note the absence of `impl Default for ListHead`:
-/// it must initialize at least 1 element to be created at all
-impl<T> Default for List<T> {
-    fn default() -> List<T> {
-        List::Nil
     }
 }
 
