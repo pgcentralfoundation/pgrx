@@ -284,7 +284,7 @@ impl<T, AllocatedBy: WhoAllocated> PgBox<T, AllocatedBy> {
     /// ## Examples
     /// ```rust,no_run
     /// use pgrx::{PgBox, pg_sys};
-    /// let create_trigger_statement = unsafe { PgBox::<pg_sys::CreateTrigStmt>::alloc_node(pg_sys::NodeTag_T_CreateTrigStmt) };
+    /// let create_trigger_statement = unsafe { PgBox::<pg_sys::CreateTrigStmt>::alloc_node(pg_sys::NodeTag::T_CreateTrigStmt) };
     /// ```
     ///
     /// # Safety

@@ -54,7 +54,6 @@ pub mod htup;
 pub mod inoutfuncs;
 pub mod itemptr;
 pub mod iter;
-#[cfg(feature = "cshim")]
 pub mod list;
 pub mod lwlock;
 pub mod memcxt;
@@ -97,7 +96,7 @@ pub use htup::*;
 pub use inoutfuncs::*;
 pub use itemptr::*;
 #[cfg(feature = "cshim")]
-pub use list::*;
+pub use list::old_list::*;
 pub use lwlock::*;
 pub use memcxt::*;
 #[cfg(feature = "cshim")]

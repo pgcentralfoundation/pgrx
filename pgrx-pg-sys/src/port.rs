@@ -133,9 +133,8 @@ pub unsafe fn MemoryContextIsValid(context: crate::MemoryContext) -> bool {
             // SAFETY:  we just determined the pointer isn't null, and
             // the caller asserts that it is being used on a Node.
             let tag = (*context.cast::<crate::Node>()).type_;
-            tag == crate::NodeTag_T_AllocSetContext
-                || tag == crate::NodeTag_T_SlabContext
-                || tag == crate::NodeTag_T_GenerationContext
+            use crate::NodeTag::*;
+            matches!(tag, T_AllocSetContext | T_SlabContext | T_GenerationContext)
         }
 }
 

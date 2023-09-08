@@ -742,6 +742,8 @@ fn run_bindgen(
         // Missing on some systems, despite being in their headers.
         .blocklist_function("inet_net_pton.*")
         .size_t_is_usize(true)
+        // The NodeTag enum is closed: additions break existing values in the set, so it is not extensible
+        .rustified_non_exhaustive_enum("NodeTag")
         .formatter(bindgen::Formatter::None)
         .derive_debug(true)
         .derive_copy(true) // necessary to avoid __BindgenUnionField usages -- I don't understand why?

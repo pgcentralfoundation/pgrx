@@ -12,257 +12,155 @@
 //! It functions similarly to a Rust [`Vec`][std::vec::Vec], including iterator support, but provides separate
 //! understandings of [`List`][crate::pg_sys::List]s of [`Oid`][crate::pg_sys::Oid]s, Integers, and Pointers.
 
-use crate::{is_a, pg_sys, void_mut_ptr};
-use std::marker::PhantomData;
+use crate::pg_sys;
+use core::marker::PhantomData;
+use core::mem;
+use core::ptr::{self, NonNull};
 
-pub struct PgList<T> {
-    list: *mut pg_sys::List,
-    allocated_by_pg: bool,
-    _marker: PhantomData<T>,
+/// The List type from Postgres, lifted into Rust
+/// Note: you may want the ListHead type
+#[derive(Debug)]
+pub enum List<T> {
+    Nil,
+    Cons(ListHead<T>),
 }
-impl<T> Default for PgList<T> {
-    fn default() -> Self {
-        Self::new()
+
+#[derive(Debug)]
+pub struct ListHead<T> {
+    list: NonNull<pg_sys::List>,
+    _type: PhantomData<[T]>,
+}
+
+/// A strongly-typed ListCell
+#[repr(transparent)]
+pub struct ListCell<T> {
+    // It is important that we are able to treat this union as effectively synonymous with T!
+    // Thus it is important that we
+    // - do not hand out the ability to construct arbitrary ListCell<T>
+    // - do not offer casting between types of List<T> (which offer [ListCell<T>])
+    // - do not even upgrade from pg_sys::{List, ListCell} to pgrx::list::{List, ListCell}
+    // UNLESS the relevant safety invariants are appropriately handled!
+    // It is not even okay to do this for FFI! We must check any *mut pg_sys::List from FFI,
+    // to guarantee it has the expected type tag, otherwise the union cells may be garbage.
+    cell: pg_sys::ListCell,
+    _type: PhantomData<T>,
+}
+
+// Note: the size of `ListCell<T>`'s generic `T` doesn't matter,
+// thus it isn't acceptable to implement Enlist for a `T` larger than `pg_sys::ListCell`.
+const _: () = {
+    assert!(mem::size_of::<ListCell<u128>>() == mem::size_of::<pg_sys::ListCell>());
+};
+
+mod seal {
+    pub trait Sealed {}
+}
+
+/// The bound to describe a type which may be used in a Postgres List
+/// It must know what an appropriate type tag is, and how to pointer-cast to itself
+///
+/// # Safety
+/// `List<T>` relies in various ways on this being correctly implemented.
+/// Incorrect implementation can lead to broken Lists, UB, or "database hilarity".
+///
+/// Only realistically valid to implement for union variants of pg_sys::ListCell.
+/// It's not even correct to impl for `*mut T`, as `*mut T` may be a fat pointer!
+pub unsafe trait Enlist: seal::Sealed + Sized {
+    /// The appropriate list tag for this type.
+    const LIST_TAG: pg_sys::NodeTag;
+
+    /// From a pointer to the pg_sys::ListCell union, obtain a pointer to Self
+    /// I think this isn't actually unsafe, it just has an unsafe impl invariant?
+    /// It must be implemented with ptr::addr_of! or similar, without reborrowing
+    /// so that it may be used without regard to whether a pointer is write-capable
+    #[doc(hidden)]
+    unsafe fn apoptosis(cell: *mut pg_sys::ListCell) -> *mut Self;
+
+    /// Set a value into a `pg_sys::ListCell`
+    ///
+    /// This is used instead of Enlist::apoptosis, as it guarantees initializing the union
+    /// according to the rules of Rust. In practice, this is probably the same,
+    /// but this way I don't have to wonder, as this is a safe function.
+    #[doc(hidden)]
+    fn endocytosis(cell: &mut pg_sys::ListCell, value: Self);
+
+    #[cfg(any(feature = "pg11", feature = "pg12"))]
+    fn mitosis(cell: &pg_sys::ListCell) -> (&Self, Option<&ListCell<Self>>);
+
+    #[cfg(any(feature = "pg11", feature = "pg12"))]
+    #[doc(hidden)]
+    fn mitosis_mut(cell: &mut pg_sys::ListCell) -> (&mut Self, Option<&mut ListCell<Self>>);
+}
+
+/// Note the absence of `impl Default for ListHead`:
+/// it must initialize at least 1 element to be created at all
+impl<T> Default for List<T> {
+    fn default() -> List<T> {
+        List::Nil
     }
 }
 
-impl<T> PgList<T> {
-    pub fn new() -> Self {
-        PgList {
-            list: std::ptr::null_mut(), // an empty List is NIL
-            allocated_by_pg: false,
-            _marker: PhantomData,
+impl<T: Enlist> List<T> {
+    /// Attempt to obtain a `List<T>` from a `*mut pg_sys::List`
+    ///
+    /// This may be somewhat confusing:
+    /// A valid List of any type is the null pointer, as in the Lisp `(car, cdr)` representation.
+    /// This remains true even after significant reworks of the List type in Postgres 13, which
+    /// cause it to internally use a "flat array" representation.
+    ///
+    /// Thus, this returns `Some` even if the List is NULL, because it is `Some(List::Nil)`,
+    /// and returns `None` only if the List is non-NULL but downcasting failed!
+    ///
+    /// # Safety
+    /// This assumes the pointer is either NULL or the NodeTag is valid to read,
+    /// so it is not okay to call this on pointers to deallocated or uninit data.
+    ///
+    /// If it returns as `Some` and the List is more than zero length, it also asserts
+    /// that the entire List's `elements: *mut ListCell` is validly initialized as `T`
+    /// in each ListCell and that the List is allocated from a Postgres memory context.
+    ///
+    /// **Note:** This memory context must last long enough for your purposes.
+    /// YOU are responsible for bounding its lifetime correctly.
+    pub unsafe fn downcast_ptr(ptr: *mut pg_sys::List) -> Option<List<T>> {
+        match NonNull::new(ptr) {
+            None => Some(List::Nil),
+            Some(list) => ListHead::downcast_ptr(list).map(|head| List::Cons(head)),
         }
     }
+}
 
-    pub unsafe fn from_pg(list: *mut pg_sys::List) -> Self {
-        PgList { list, allocated_by_pg: true, _marker: PhantomData }
-    }
-
-    pub fn as_ptr(&self) -> *mut pg_sys::List {
-        self.list
-    }
-
-    pub fn into_pg(mut self) -> *mut pg_sys::List {
-        self.allocated_by_pg = true;
-        self.list
-    }
-
+impl<T> List<T> {
     #[inline]
     pub fn len(&self) -> usize {
-        if self.list.is_null() {
-            0
-        } else {
-            unsafe { self.list.as_ref() }.unwrap().length as usize
+        match self {
+            List::Nil => 0,
+            List::Cons(head) => head.len(),
         }
     }
 
     #[inline]
-    pub fn is_empty(&self) -> bool {
-        self.len() == 0
-    }
-
-    #[inline]
-    pub fn head(&self) -> Option<*mut T> {
-        if self.list.is_null() {
-            None
-        } else {
-            Some(unsafe { pg_sys::pgrx_list_nth(self.list, 0) } as *mut T)
+    pub fn capacity(&self) -> usize {
+        match self {
+            List::Nil => 0,
+            List::Cons(head) => head.capacity(),
         }
     }
 
-    #[inline]
-    pub fn tail(&self) -> Option<*mut T> {
-        if self.list.is_null() {
-            None
-        } else {
-            Some(unsafe { pg_sys::pgrx_list_nth(self.list, (self.len() - 1) as i32) } as *mut T)
-        }
-    }
-
-    #[inline]
-    pub fn get_ptr(&self, i: usize) -> Option<*mut T> {
-        if !self.is_empty()
-            && unsafe { !is_a(self.list as *mut pg_sys::Node, pg_sys::NodeTag_T_List) }
-        {
-            panic!("PgList does not contain pointers")
-        }
-        if self.list.is_null() || i >= self.len() {
-            None
-        } else {
-            Some(unsafe { pg_sys::pgrx_list_nth(self.list, i as i32) } as *mut T)
-        }
-    }
-
-    #[inline]
-    pub fn get_int(&self, i: usize) -> Option<i32> {
-        if !self.is_empty()
-            && unsafe { !is_a(self.list as *mut pg_sys::Node, pg_sys::NodeTag_T_IntList) }
-        {
-            panic!("PgList does not contain ints")
-        }
-
-        if self.list.is_null() || i >= self.len() {
-            None
-        } else {
-            Some(unsafe { pg_sys::pgrx_list_nth_int(self.list, i as i32) })
-        }
-    }
-
-    #[inline]
-    pub fn get_oid(&self, i: usize) -> Option<pg_sys::Oid> {
-        if !self.is_empty()
-            && unsafe { !is_a(self.list as *mut pg_sys::Node, pg_sys::NodeTag_T_OidList) }
-        {
-            panic!("PgList does not contain oids")
-        }
-
-        if self.list.is_null() || i >= self.len() {
-            None
-        } else {
-            Some(unsafe { pg_sys::pgrx_list_nth_oid(self.list, i as i32) })
-        }
-    }
-
-    #[cfg(any(feature = "pg11", feature = "pg12"))]
-    #[inline]
-    pub unsafe fn replace_ptr(&mut self, i: usize, with: *mut T) {
-        let cell = pg_sys::pgrx_list_nth_cell(self.list, i as i32);
-        cell.as_mut().expect("cell is null").data.ptr_value = with as void_mut_ptr;
-    }
-
-    #[cfg(any(feature = "pg13", feature = "pg14", feature = "pg15", feature = "pg16"))]
-    #[inline]
-    pub unsafe fn replace_ptr(&mut self, i: usize, with: *mut T) {
-        let cell = pg_sys::pgrx_list_nth_cell(self.list, i as i32);
-        cell.as_mut().expect("cell is null").ptr_value = with as void_mut_ptr;
-    }
-
-    #[cfg(any(feature = "pg11", feature = "pg12"))]
-    #[inline]
-    pub fn replace_int(&mut self, i: usize, with: i32) {
-        unsafe {
-            let cell = pg_sys::pgrx_list_nth_cell(self.list, i as i32);
-            cell.as_mut().expect("cell is null").data.int_value = with;
-        }
-    }
-
-    #[cfg(any(feature = "pg13", feature = "pg14", feature = "pg15", feature = "pg16"))]
-    #[inline]
-    pub fn replace_int(&mut self, i: usize, with: i32) {
-        unsafe {
-            let cell = pg_sys::pgrx_list_nth_cell(self.list, i as i32);
-            cell.as_mut().expect("cell is null").int_value = with;
-        }
-    }
-
-    #[cfg(any(feature = "pg11", feature = "pg12"))]
-    #[inline]
-    pub fn replace_oid(&mut self, i: usize, with: pg_sys::Oid) {
-        unsafe {
-            let cell = pg_sys::pgrx_list_nth_cell(self.list, i as i32);
-            cell.as_mut().expect("cell is null").data.oid_value = with;
-        }
-    }
-
-    #[cfg(any(feature = "pg13", feature = "pg14", feature = "pg15", feature = "pg16"))]
-    #[inline]
-    pub fn replace_oid(&mut self, i: usize, with: pg_sys::Oid) {
-        unsafe {
-            let cell = pg_sys::pgrx_list_nth_cell(self.list, i as i32);
-            cell.as_mut().expect("cell is null").oid_value = with;
-        }
-    }
-
-    #[inline]
-    pub fn iter_ptr(&self) -> impl Iterator<Item = *mut T> + '_ {
-        PgListIteratorPtr { list: &self, pos: 0 }
-    }
-
-    #[inline]
-    pub fn iter_oid(&self) -> impl Iterator<Item = pg_sys::Oid> + '_ {
-        PgListIteratorOid { list: &self, pos: 0 }
-    }
-
-    #[inline]
-    pub fn iter_int(&self) -> impl Iterator<Item = i32> + '_ {
-        PgListIteratorInt { list: &self, pos: 0 }
-    }
-
-    /// Add a pointer value to the end of this list
-    ///
-    /// ## Safety
-    ///
-    /// We cannot guarantee the specified pointer is valid, but we assume it is as we only store it,
-    /// we don't dereference it
-    #[inline]
-    pub fn push(&mut self, ptr: *mut T) {
-        self.list = unsafe { pg_sys::lappend(self.list, ptr as void_mut_ptr) };
-    }
-
-    #[inline]
-    pub fn pop(&mut self) -> Option<*mut T> {
-        let tail = self.tail();
-
-        if tail.is_some() {
-            self.list = unsafe { pg_sys::list_truncate(self.list, (self.len() - 1) as i32) };
-        }
-
-        tail
-    }
-}
-
-struct PgListIteratorPtr<'a, T> {
-    list: &'a PgList<T>,
-    pos: usize,
-}
-
-struct PgListIteratorOid<'a, T> {
-    list: &'a PgList<T>,
-    pos: usize,
-}
-
-struct PgListIteratorInt<'a, T> {
-    list: &'a PgList<T>,
-    pos: usize,
-}
-
-impl<'a, T> Iterator for PgListIteratorPtr<'a, T> {
-    type Item = *mut T;
-
-    fn next(&mut self) -> Option<Self::Item> {
-        let result = self.list.get_ptr(self.pos);
-        self.pos += 1;
-        result
-    }
-}
-
-impl<'a, T> Iterator for PgListIteratorOid<'a, T> {
-    type Item = pg_sys::Oid;
-
-    fn next(&mut self) -> Option<Self::Item> {
-        let result = self.list.get_oid(self.pos);
-        self.pos += 1;
-        result
-    }
-}
-
-impl<'a, T> Iterator for PgListIteratorInt<'a, T> {
-    type Item = i32;
-
-    fn next(&mut self) -> Option<Self::Item> {
-        let result = self.list.get_int(self.pos);
-        self.pos += 1;
-        result
-    }
-}
-
-impl<T> Drop for PgList<T> {
-    fn drop(&mut self) {
-        if !self.allocated_by_pg && !self.list.is_null() {
-            unsafe {
-                pg_sys::list_free(self.list);
-            }
+    pub fn into_ptr(self) -> *mut pg_sys::List {
+        match self {
+            List::Nil => ptr::null_mut(),
+            List::Cons(head) => head.list.as_ptr(),
         }
     }
 }
+
+#[cfg(any(feature = "pg13", feature = "pg14", feature = "pg15", feature = "pg16"))]
+mod flat_list;
+#[cfg(any(feature = "pg11", feature = "pg12"))]
+mod node_list;
+
+#[cfg(feature = "cshim")]
+pub mod old_list;
+
+#[cfg(feature = "cshim")]
+pub use old_list::*;
