@@ -20,7 +20,6 @@ mod flat_list {
     use crate::pg_sys;
     use core::cmp;
     use core::ffi;
-    use core::fmt::{self, Debug, Formatter};
     use core::marker::PhantomData;
     use core::mem;
     use core::ops::{Bound, Deref, DerefMut, RangeBounds};
@@ -48,14 +47,6 @@ mod flat_list {
         // to guarantee it has the expected type tag, otherwise the union cells may be garbage.
         cell: pg_sys::ListCell,
         _type: PhantomData<T>,
-    }
-
-    impl<T> Debug for ListCell<T> {
-        fn fmt(&self, f: &mut Formatter<'_>) -> fmt::Result {
-            // interpret the cell as a pointer, assuming pointers are Pod
-            let cell_addr = unsafe { self.cell.ptr_value };
-            f.debug_tuple("ListCell").field(&cell_addr).finish()
-        }
     }
 
     // Note: the size of `ListCell<T>`'s generic `T` doesn't matter,
