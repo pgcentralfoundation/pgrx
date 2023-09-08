@@ -194,10 +194,10 @@ impl<T: Enlist> List<T> {
     ///
     /// **Note:** This memory context must last long enough for your purposes.
     /// YOU are responsible for bounding its lifetime correctly.
-    pub unsafe fn downcast_from_nullable(ptr: *mut pg_sys::List) -> Option<List<T>> {
+    pub unsafe fn downcast_ptr(ptr: *mut pg_sys::List) -> Option<List<T>> {
         match NonNull::new(ptr) {
             None => Some(List::Nil),
-            Some(list) => ListHead::downcast_from_ptr(list).map(|head| List::Cons(head)),
+            Some(list) => ListHead::downcast_ptr(list).map(|head| List::Cons(head)),
         }
     }
 
@@ -233,7 +233,7 @@ impl<T: Enlist> List<T> {
                 (*list).tail = node;
                 (*list).type_ = T::LIST_TAG;
                 (*list).length = 1;
-                *self = Self::downcast_from_nullable(list).unwrap();
+                *self = Self::downcast_ptr(list).unwrap();
                 match self {
                     List::Cons(head) => head,
                     _ => unreachable!(),
@@ -429,7 +429,7 @@ impl<T: Enlist> ListHead<T> {
     ///
     /// If it returns as `Some`, it also asserts the entire List is, across its length,
     /// validly initialized as `T` in each ListCell.
-    pub unsafe fn downcast_from_ptr(list: NonNull<pg_sys::List>) -> Option<ListHead<T>> {
+    pub unsafe fn downcast_ptr(list: NonNull<pg_sys::List>) -> Option<ListHead<T>> {
         (T::LIST_TAG == (*list.as_ptr()).type_).then_some(ListHead { list, _type: PhantomData })
     }
 
