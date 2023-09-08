@@ -97,33 +97,6 @@ unsafe impl Enlist for pg_sys::Oid {
 }
 
 impl<T: Enlist> List<T> {
-    /// Attempt to obtain a `List<T>` from a `*mut pg_sys::List`
-    ///
-    /// This may be somewhat confusing:
-    /// A valid List of any type is the null pointer, as in the Lisp `(car, cdr)` representation.
-    /// This remains true even after significant reworks of the List type in Postgres 13, which
-    /// cause it to internally use a "flat array" representation.
-    ///
-    /// Thus, this returns `Some` even if the List is NULL, because it is `Some(List::Nil)`,
-    /// and returns `None` only if the List is non-NULL but downcasting failed!
-    ///
-    /// # Safety
-    /// This assumes the pointer is either NULL or the NodeTag is valid to read,
-    /// so it is not okay to call this on pointers to deallocated or uninit data.
-    ///
-    /// If it returns as `Some` and the List is more than zero length, it also asserts
-    /// that the entire List's `elements: *mut ListCell` is validly initialized as `T`
-    /// in each ListCell and that the List is allocated from a Postgres memory context.
-    ///
-    /// **Note:** This memory context must last long enough for your purposes.
-    /// YOU are responsible for bounding its lifetime correctly.
-    pub unsafe fn downcast_ptr(ptr: *mut pg_sys::List) -> Option<List<T>> {
-        match NonNull::new(ptr) {
-            None => Some(List::Nil),
-            Some(list) => ListHead::downcast_ptr(list).map(|head| List::Cons(head)),
-        }
-    }
-
     /// Borrow an item from the slice at the index
     pub fn get(&self, index: usize) -> Option<&T> {
         self.iter().nth(index)
@@ -224,7 +197,7 @@ impl<T: Enlist> List<T> {
 
         // If draining all, rip it out of place to contain broken invariants from panics
         let raw = if drain_start == 0 {
-            mem::take(self).into_nullable()
+            mem::take(self).into_ptr()
         } else {
             // Leave it in place, but we need a pointer:
             match self {
@@ -293,31 +266,6 @@ impl<T: Enlist> List<T> {
         match self {
             List::Nil => IterMut { next: None },
             List::Cons(root) => IterMut { next: unsafe { root.as_mut_cells_ptr().as_mut() } },
-        }
-    }
-}
-
-impl<T> List<T> {
-    #[inline]
-    pub fn len(&self) -> usize {
-        match self {
-            List::Nil => 0,
-            List::Cons(head) => head.len(),
-        }
-    }
-
-    #[inline]
-    pub fn capacity(&self) -> usize {
-        match self {
-            List::Nil => 0,
-            List::Cons(head) => head.capacity(),
-        }
-    }
-
-    pub fn into_nullable(self) -> *mut pg_sys::List {
-        match self {
-            List::Nil => ptr::null_mut(),
-            List::Cons(head) => head.list.as_ptr(),
         }
     }
 }
