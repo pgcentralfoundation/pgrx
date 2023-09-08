@@ -58,8 +58,8 @@ mod flat_list {
         }
     }
 
-    // Note this well: the size of a `ListCell<T>`'s type doesn't matter.
-    // Thus it isn't acceptable to implement Enlist for types larger than `pg_sys::ListCell`.
+    // Note: the size of `ListCell<T>`'s generic `T` doesn't matter,
+    // thus it isn't acceptable to implement Enlist for a `T` larger than `pg_sys::ListCell`.
     const _: () = {
         assert!(mem::size_of::<ListCell<u128>>() == mem::size_of::<pg_sys::ListCell>());
     };
