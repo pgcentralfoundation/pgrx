@@ -160,7 +160,7 @@ pub type Result<T> = std::result::Result<T, FCallError>;
 /// use pgrx::fcall::{Arg, fcall};
 ///
 /// let array = vec![1,2,3];
-/// let sum = fcall::<Vec<i32>>("sum_array", &[&Arg::Value(array)]);
+/// let sum = fcall::<i32>("sum_array", &[&Arg::Value(array)]);
 /// assert_eq!(sum, Ok(Some(6)));
 /// ```
 ///
