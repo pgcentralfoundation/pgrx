@@ -217,11 +217,17 @@ impl<T: Enlist> List<T> {
     /// # Safety
     ///
     /// Use the right context, don't play around.
-    pub unsafe fn unstable_push_in_context(&mut self, value: T, context: pg_sys::MemoryContext) -> &mut ListHead<T> {
+    pub unsafe fn unstable_push_in_context(
+        &mut self,
+        value: T,
+        context: pg_sys::MemoryContext,
+    ) -> &mut ListHead<T> {
         match self {
             List::Nil => {
-                let list: *mut pg_sys::List = pg_sys::MemoryContextAlloc(context, mem::size_of::<pg_sys::List>()).cast();
-                let node: *mut pg_sys::ListCell = pg_sys::MemoryContextAlloc(context, mem::size_of::<pg_sys::ListCell>()).cast();
+                let list: *mut pg_sys::List =
+                    pg_sys::MemoryContextAlloc(context, mem::size_of::<pg_sys::List>()).cast();
+                let node: *mut pg_sys::ListCell =
+                    pg_sys::MemoryContextAlloc(context, mem::size_of::<pg_sys::ListCell>()).cast();
                 *T::apoptosis(node) = value;
                 (*list).head = node;
                 (*list).tail = node;
@@ -232,7 +238,7 @@ impl<T: Enlist> List<T> {
                     List::Cons(head) => head,
                     _ => unreachable!(),
                 }
-            },
+            }
             List::Cons(head) => head.push(value),
         }
     }

@@ -199,7 +199,11 @@ impl<T: Enlist> List<T> {
     /// # Safety
     ///
     /// Use the right context, don't play around.
-    pub unsafe fn unstable_push_in_context(&mut self, value: T, context: pg_sys::MemoryContext) -> &mut ListHead<T> {
+    pub unsafe fn unstable_push_in_context(
+        &mut self,
+        value: T,
+        context: pg_sys::MemoryContext,
+    ) -> &mut ListHead<T> {
         match self {
             List::Nil => {
                 // No silly reasoning, simply allocate a cache line for a list.
@@ -207,7 +211,8 @@ impl<T: Enlist> List<T> {
                 let list: *mut pg_sys::List = pg_sys::MemoryContextAlloc(context, list_size).cast();
                 (*list).type_ = T::LIST_TAG;
                 (*list).length = 1;
-                (*list).max_length = ((list_size - mem::size_of::<pg_sys::List>()) / mem::size_of::<pg_sys::ListCell>()) as _;
+                (*list).max_length = ((list_size - mem::size_of::<pg_sys::List>())
+                    / mem::size_of::<pg_sys::ListCell>()) as _;
                 (*list).elements = ptr::addr_of_mut!((*list).initial_elements).cast();
                 T::apoptosis((*list).elements).write(value);
                 *self = Self::downcast_from_nullable(list).unwrap();
@@ -215,7 +220,7 @@ impl<T: Enlist> List<T> {
                     List::Cons(head) => head,
                     _ => unreachable!(),
                 }
-            },
+            }
             List::Cons(head) => head.push(value),
         }
     }
