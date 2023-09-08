@@ -211,6 +211,32 @@ impl<T: Enlist> List<T> {
         self.iter_mut().nth(index)
     }
 
+    /// Push, and if allocation is needed, allocate in a given context
+    /// "Unstable" because this will probably receive breaking changes every week for a few weeks.
+    ///
+    /// # Safety
+    ///
+    /// Use the right context, don't play around.
+    pub unsafe fn unstable_push_in_context(&mut self, value: T, context: pg_sys::MemoryContext) -> &mut ListHead<T> {
+        match self {
+            List::Nil => {
+                let list: *mut pg_sys::List = pg_sys::MemoryContextAlloc(context, mem::size_of::<pg_sys::List>()).cast();
+                let node: *mut pg_sys::ListCell = pg_sys::MemoryContextAlloc(context, mem::size_of::<pg_sys::ListCell>()).cast();
+                *T::apoptosis(node) = value;
+                (*list).head = node;
+                (*list).tail = node;
+                (*list).type_ = T::LIST_TAG;
+                (*list).length = 1;
+                *self = Self::downcast_from_nullable(list).unwrap();
+                match self {
+                    List::Cons(head) => head,
+                    _ => unreachable!(),
+                }
+            },
+            List::Cons(head) => head.push(value),
+        }
+    }
+
     /// Attempt to push or Err if it would allocate
     ///
     /// This exists primarily to allow working with a list with maybe-zero capacity.
