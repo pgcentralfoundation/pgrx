@@ -9,6 +9,7 @@
 //LICENSE Use of this source code is governed by the MIT license that can be found in the LICENSE file.
 
 use pgrx_pg_sys::errcodes::PgSqlErrorCode;
+use pgrx_pg_sys::ffi::pg_guard_ffi_boundary;
 use pgrx_pg_sys::PgTryBuilder;
 use std::panic::AssertUnwindSafe;
 
@@ -309,7 +310,11 @@ pub fn fcall_with_collation<R: FromDatum + IntoDatum>(
             .fn_addr
             .as_ref()
             .expect("function initialization problem: fn_addr not set");
-        let result_datum = func(fcinfo);
+
+        // SAFETY: `func` is most likely a function pointer on the other side of the Postgres FFI
+        // boundary, and we must guard that boundary to ensure any ERRORs will still properly unwind
+        // the stack.
+        let result_datum = pg_guard_ffi_boundary(|| func(fcinfo));
 
         // Postgres' "OidFunctionCall" doesn't support returning null, but we can
         let result = R::from_datum(result_datum, fcinfo_ref.isnull);

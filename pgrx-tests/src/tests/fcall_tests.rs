@@ -12,6 +12,7 @@
 mod tests {
     #[allow(unused_imports)]
     use crate as pgrx_tests;
+    use std::sync::atomic::Ordering;
 
     use pgrx::fcall::*;
     use pgrx::prelude::*;
@@ -43,6 +44,8 @@ mod tests {
             
             CREATE FUNCTION tests.n() RETURNS text IMMUTABLE LANGUAGE sql AS $$ SELECT NULL; $$;
             CREATE FUNCTION tests.with_functional_default(text DEFAULT tests.n()) RETURNS text STRICT LANGUAGE sql AS $$ SELECT $1; $$;
+            
+            CREATE FUNCTION tests.fcall_raise_error(e text) RETURNS void LANGUAGE plpgsql AS $$ BEGIN RAISE EXCEPTION '%', e; END; $$;
         "#,
         name = "test_funcs",
         requires = [tests]
@@ -211,5 +214,32 @@ mod tests {
         let stupid_name = "q234qasf )(A*q2342";
         let result = fcall::<()>(stupid_name, &[]);
         assert_eq!(Err(FCallError::InvalidIdentifier(String::from(stupid_name))), result)
+    }
+
+    #[pg_test(error = "it worked")]
+    fn fn_raises_error() {
+        use std::sync::atomic::AtomicBool;
+
+        static DID_DROP: AtomicBool = AtomicBool::new(false);
+
+        PgTryBuilder::new(|| {
+            struct Tracker;
+            impl Drop for Tracker {
+                fn drop(&mut self) {
+                    DID_DROP.store(true, Ordering::SeqCst);
+                }
+            }
+
+            let _tracker = Tracker;
+            fcall::<()>("tests.fcall_raise_error", &[&Arg::Value("error message")])
+                .expect("fcall failed");
+
+            // NB:  we need the Drop impl for Tracker to run here
+        })
+        .finally(|| {
+            assert_eq!(DID_DROP.load(Ordering::SeqCst), true);
+            panic!("it worked")
+        })
+        .execute();
     }
 }
