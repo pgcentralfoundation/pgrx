@@ -171,7 +171,6 @@ impl<T: Enlist> List<T> {
         // Let's issue our asserts before mutating state:
         assert!(drain_start <= len);
         assert!(tail_start <= len);
-        assert!(drain_start + tail_len == len);
 
         // Postgres assumes Lists fit into c_int, check before shrinking
         assert!(tail_start <= ffi::c_int::MAX as _);
