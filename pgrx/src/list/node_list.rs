@@ -124,6 +124,7 @@ impl<T: Enlist> List<T> {
                     pg_sys::MemoryContextAlloc(context, mem::size_of::<pg_sys::List>()).cast();
                 let node: *mut pg_sys::ListCell =
                     pg_sys::MemoryContextAlloc(context, mem::size_of::<pg_sys::ListCell>()).cast();
+                (*node).next = ptr::null_mut();
                 *T::apoptosis(node) = value;
                 (*list).head = node;
                 (*list).tail = node;
