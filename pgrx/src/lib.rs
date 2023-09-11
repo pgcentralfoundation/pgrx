@@ -43,7 +43,7 @@ pub mod bgworkers;
 pub mod callbacks;
 pub mod datum;
 pub mod enum_helper;
-#[cfg(all(feature = "cshim", not(feature = "pg11")))]
+#[cfg(not(feature = "pg11"))]
 pub mod fcall;
 pub mod fcinfo;
 pub mod ffi;

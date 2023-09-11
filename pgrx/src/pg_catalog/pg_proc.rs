@@ -7,7 +7,8 @@
 //LICENSE All rights reserved.
 //LICENSE
 //LICENSE Use of this source code is governed by the MIT license that can be found in the LICENSE file.
-use crate::{pg_sys, FromDatum, IntoDatum, PgList};
+use crate::list::List;
+use crate::{pg_sys, FromDatum, IntoDatum};
 use std::ptr::NonNull;
 
 /// Provides a safe wrapper around a Postgres "SysCache" entry from `pg_catalog.pg_proc`.
@@ -309,7 +310,7 @@ impl PgProc {
         self.get_attr(pg_sys::Anum_pg_proc_proretset).unwrap()
     }
 
-    pub fn proargdefaults(&self) -> Option<PgList<pg_sys::Node>> {
+    pub fn proargdefaults(&self) -> Option<List<*mut std::ffi::c_void>> {
         unsafe {
             use pgrx_pg_sys::AsPgCStr;
 
@@ -325,7 +326,7 @@ impl PgProc {
             let str = proargdefaults.as_pg_cstr();
             let argdefaults = pg_sys::stringToNode(str).cast::<pg_sys::List>();
             pg_sys::pfree(str.cast());
-            Some(PgList::from_pg(argdefaults))
+            List::downcast_ptr(argdefaults)
         }
     }
 

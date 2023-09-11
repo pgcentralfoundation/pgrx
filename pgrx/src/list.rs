@@ -156,7 +156,18 @@ impl<T> List<T> {
         }
     }
 
-    pub fn into_ptr(self) -> *mut pg_sys::List {
+    pub fn into_ptr(mut self) -> *mut pg_sys::List {
+        self.as_mut_ptr()
+    }
+
+    pub fn as_ptr(&self) -> *const pg_sys::List {
+        match self {
+            List::Nil => ptr::null_mut(),
+            List::Cons(head) => head.list.as_ptr(),
+        }
+    }
+
+    pub fn as_mut_ptr(&mut self) -> *mut pg_sys::List {
         match self {
             List::Nil => ptr::null_mut(),
             List::Cons(head) => head.list.as_ptr(),

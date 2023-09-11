@@ -15,7 +15,7 @@ use std::panic::AssertUnwindSafe;
 
 use crate::pg_catalog::pg_proc::{PgProc, ProArgMode, ProKind};
 use crate::{
-    direct_function_call, is_a, list::PgList, pg_sys, pg_sys::AsPgCStr, Array, FromDatum, IntoDatum,
+    direct_function_call, is_a, list::List, pg_sys, pg_sys::AsPgCStr, Array, FromDatum, IntoDatum,
 };
 
 mod seal {
@@ -333,7 +333,7 @@ fn lookup_fn(fname: &str, args: &[&dyn FCallArg]) -> Result<pg_sys::Oid> {
     // function following the normal SEARCH_PATH rules, ensuring its argument type Oids
     // exactly match the ones from the user's input arguments.  It does not evaluate the
     // return type, so we'll have to do that later
-    let mut parts_list = PgList::new();
+    let mut parts_list = List::<*mut std::ffi::c_void>::default();
     let result = PgTryBuilder::new(AssertUnwindSafe(|| unsafe {
         let arg_types = args.iter().map(|a| a.type_oid()).collect::<Vec<_>>();
         let nargs: i16 = arg_types.len().try_into().map_err(|_| FCallError::TooManyArguments)?;
@@ -346,20 +346,22 @@ fn lookup_fn(fname: &str, args: &[&dyn FCallArg]) -> Result<pg_sys::Oid> {
                 // SAFETY:  `.as_pg_cstr()` palloc's a char* and `makeString` just takes ownership of it
                 pg_sys::makeString(part.as_pg_cstr())
             })
-            .for_each(|part| parts_list.push(part));
+            .for_each(|part| {
+                parts_list.unstable_push_in_context(part.cast(), pg_sys::CurrentMemoryContext);
+            });
 
         // look up an exact match based on the exact number of arguments we have
         //
         // SAFETY:  we've allocated a PgList with the proper String node elements representing its name
         // and we've allocated Vec of argument type oids which can be represented as a pointer.
         let mut fnoid =
-            pg_sys::LookupFuncName(parts_list.as_ptr(), nargs as _, arg_types.as_ptr(), true);
+            pg_sys::LookupFuncName(parts_list.as_mut_ptr(), nargs as _, arg_types.as_ptr(), true);
 
         if fnoid == pg_sys::InvalidOid {
             // if that didn't find a function, maybe we've got some defaults in there, so do a lookup
             // where Postgres will consider that
             fnoid = pg_sys::LookupFuncName(
-                parts_list.as_ptr(),
+                parts_list.as_mut_ptr(),
                 -1,
                 arg_types.as_ptr(),
                 false, // we want the ERROR here -- could be UNDEFINED_FUNCTION or AMBIGUOUS_FUNCTION
@@ -378,7 +380,8 @@ fn lookup_fn(fname: &str, args: &[&dyn FCallArg]) -> Result<pg_sys::Oid> {
     unsafe {
         // SAFETY:  we palloc'd the `pg_sys::String` elements of `parts_list` above and so it's
         // safe for us to free them now that they're no longer being used
-        parts_list.iter_ptr().for_each(|s| {
+        parts_list.drain(..).for_each(|s| {
+            let s = s.cast::<pg_sys::Value>();
             #[cfg(any(feature = "pg11", feature = "pg12", feature = "pg13", feature = "pg14"))]
             pg_sys::pfree((*s).val.str_.cast());
 
@@ -423,7 +426,7 @@ fn create_default_value(pg_proc: &PgProc, argnum: usize) -> Result<Option<pg_sys
     let default_argnum = argnum - non_default_args_cnt;
     let default_value_tree = pg_proc.proargdefaults().ok_or(FCallError::NoDefaultArguments)?;
     let node =
-        default_value_tree.get_ptr(default_argnum).ok_or(FCallError::NotDefaultArgument(argnum))?;
+        default_value_tree.get(default_argnum).ok_or(FCallError::NotDefaultArgument(argnum))?;
 
     unsafe {
         // SAFETY:  `arg_root` is okay to be the null pointer here, which indicates we don't care
@@ -431,10 +434,10 @@ fn create_default_value(pg_proc: &PgProc, argnum: usize) -> Result<Option<pg_sys
         // evaluating `node`.
         //
         // With that, `node` is a valid Node* taken from the PgProc entry
-        let evaluated = pg_sys::eval_const_expressions(std::ptr::null_mut(), node);
+        let evaluated = pg_sys::eval_const_expressions(std::ptr::null_mut(), node.cast());
 
         // SAFETY:  evaluated is a valid Node* as that's all `eval_const_expressions` can return
-        if is_a(evaluated, pg_sys::NodeTag_T_Const) {
+        if is_a(evaluated.cast(), pg_sys::NodeTag::T_Const) {
             let con: *mut pg_sys::Const = evaluated.cast();
             let con_ref = &*con;
 
