@@ -14,6 +14,7 @@ mod tests {
     #[pg_test]
     fn list_length() {
         let mut list = List::Nil;
+        // Make sure the list length grows correctly:
         for i in 0..1000 {
             unsafe {
                 assert_eq!(i as usize, list.len());

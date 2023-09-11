@@ -296,14 +296,12 @@ impl<T: Enlist> ListHead<T> {
             let cell = unsafe { &mut *elements.add(*length as _) };
             T::endocytosis(cell, value);
             *length += 1;
+            self
         } else {
             // Reserve in this branch.
             let new_cap = max_length.saturating_mul(2);
-            self.reserve(new_cap as _);
+            self.reserve(new_cap as _).push(value)
         }
-
-        // Return `self` for convenience of `List::try_push`
-        self
     }
 
     pub fn reserve(&mut self, size: usize) -> &mut Self {
