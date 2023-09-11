@@ -109,13 +109,15 @@ impl<T: Enlist> List<T> {
                 // No silly reasoning, simply allocate a cache line for a list.
                 let list_size = 64;
                 let list: *mut pg_sys::List = pg_sys::MemoryContextAlloc(context, list_size).cast();
+                assert_ne!(list, ptr::null_mut());
                 (*list).type_ = T::LIST_TAG;
                 (*list).length = 1;
                 (*list).max_length = ((list_size - mem::size_of::<pg_sys::List>())
                     / mem::size_of::<pg_sys::ListCell>()) as _;
                 (*list).elements = ptr::addr_of_mut!((*list).initial_elements).cast();
-                T::apoptosis((*list).elements).write(value);
+                T::endocytosis((*list).elements.as_mut().unwrap(), value);
                 *self = Self::downcast_ptr(list).unwrap();
+                assert_eq!(1, self.len());
                 match self {
                     List::Cons(head) => head,
                     _ => unreachable!(),
