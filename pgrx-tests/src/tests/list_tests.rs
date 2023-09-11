@@ -20,5 +20,10 @@ mod tests {
                 list.unstable_push_in_context(i, pg_sys::CurrentMemoryContext);
             }
         }
+
+        let _ = list.drain(100..200);
+        assert_eq!(900, list.len());
+        let _ = list.drain(500..);
+        assert_eq!(500, list.len());
     }
 }
