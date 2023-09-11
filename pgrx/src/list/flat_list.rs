@@ -290,18 +290,17 @@ impl<T: Enlist> ListHead<T> {
     pub fn push(&mut self, value: T) -> &mut Self {
         let list = unsafe { self.list.as_mut() };
         let pg_sys::List { length, max_length, elements, .. } = list;
-        if *max_length - *length > 0 {
-            // SAFETY: Our list must have been constructed following the list invariants
-            // in order to actually get here, and we have confirmed as in-range of the buffer.
-            let cell = unsafe { &mut *elements.add(*length as _) };
-            T::endocytosis(cell, value);
-            *length += 1;
-            self
-        } else {
-            // Reserve in this branch.
-            let new_cap = max_length.saturating_mul(2);
-            self.reserve(new_cap as _).push(value)
+        if *max_length - *length < 1 {
+            // Reserve a constant for now
+            self.reserve(8);
         }
+
+        // SAFETY: Our list must have been constructed following the list invariants
+        // in order to actually get here, and we have confirmed as in-range of the buffer.
+        let cell = unsafe { &mut *elements.add(*length as _) };
+        T::endocytosis(cell, value);
+        *length += 1;
+        self
     }
 
     pub fn reserve(&mut self, size: usize) -> &mut Self {
