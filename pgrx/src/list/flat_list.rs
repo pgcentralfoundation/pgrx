@@ -303,20 +303,25 @@ impl<T: Enlist> ListHead<T> {
         self
     }
 
-    pub fn reserve(&mut self, size: usize) -> &mut Self {
+    pub fn reserve(&mut self, count: usize) -> &mut Self {
         let list = unsafe { self.list.as_mut() };
-        if ((list.max_length - list.length) as usize) < size {
-            unsafe { grow_list(list, size + list.length as usize) };
+        assert!(list.max_length >= list.length);
+        if ((list.max_length - list.length) as usize) < count {
+            let size = i32::try_from(count).unwrap();
+            let size = list.length.checked_add(size).unwrap();
+            let size = usize::try_from(size).unwrap();
+            unsafe { grow_list(list, size) };
         };
         self
     }
 }
 
 unsafe fn grow_list(list: &mut pg_sys::List, target: usize) {
+    assert!((i32::MAX as usize) < target, "Cannot allocate more than c_int::MAX elements");
     let alloc_size = target * mem::size_of::<pg_sys::ListCell>();
     if list.elements == ptr::addr_of_mut!(list.initial_elements).cast() {
         // first realloc, we can't dealloc the elements ptr, as it isn't its own alloc
-        let context = pg_sys::GetMemoryChunkContext(list as *mut _ as *mut _);
+        let context = pg_sys::GetMemoryChunkContext(list as *mut pg_sys::List as *mut _);
         if context == ptr::null_mut() {
             panic!("Context free list?");
         }
@@ -332,7 +337,7 @@ unsafe fn grow_list(list: &mut pg_sys::List, target: usize) {
         list.elements = buf.cast();
     } else {
         // We already have a separate buf, making this easy.
-        pg_sys::repalloc(list.elements.cast(), target * mem::size_of::<pg_sys::ListCell>());
+        pg_sys::repalloc(list.elements.cast(), alloc_size);
     }
 
     list.max_length = target as _;
