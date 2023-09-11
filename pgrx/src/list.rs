@@ -157,7 +157,7 @@ impl<T> List<T> {
 #[cfg(any(feature = "pg13", feature = "pg14", feature = "pg15", feature = "pg16"))]
 mod flat_list;
 #[cfg(any(feature = "pg11", feature = "pg12"))]
-mod node_list;
+mod linked_list;
 
 #[cfg(feature = "cshim")]
 pub mod old_list;
