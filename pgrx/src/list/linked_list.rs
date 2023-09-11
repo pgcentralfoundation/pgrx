@@ -293,7 +293,7 @@ impl<T: Enlist> ListHead<T> {
             let cell = cons_cell(list, value);
             (*list.tail).next = cell;
             list.tail = cell;
-            list.length += list.length;
+            list.length += 1;
         }
 
         // Return `self` for convenience of `List::try_push`

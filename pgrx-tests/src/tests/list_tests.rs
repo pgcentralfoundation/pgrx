@@ -16,7 +16,7 @@ mod tests {
         let mut list = List::Nil;
         for i in 0..1000 {
             unsafe {
-                assert!(i as usize == list.len());
+                assert_eq!(i as usize, list.len());
                 list.unstable_push_in_context(i, pg_sys::CurrentMemoryContext);
             }
         }
