@@ -17,6 +17,16 @@ use core::marker::PhantomData;
 use core::mem;
 use core::ptr::{self, NonNull};
 
+#[cfg(any(feature = "pg13", feature = "pg14", feature = "pg15", feature = "pg16"))]
+mod flat_list;
+#[cfg(any(feature = "pg11", feature = "pg12"))]
+mod linked_list;
+
+#[cfg(feature = "cshim")]
+pub mod old_list;
+#[cfg(feature = "cshim")]
+pub use old_list::*;
+
 /// The List type from Postgres, lifted into Rust
 /// Note: you may want the ListHead type
 #[derive(Debug)]
@@ -153,14 +163,3 @@ impl<T> List<T> {
         }
     }
 }
-
-#[cfg(any(feature = "pg13", feature = "pg14", feature = "pg15", feature = "pg16"))]
-mod flat_list;
-#[cfg(any(feature = "pg11", feature = "pg12"))]
-mod node_list;
-
-#[cfg(feature = "cshim")]
-pub mod old_list;
-
-#[cfg(feature = "cshim")]
-pub use old_list::*;
