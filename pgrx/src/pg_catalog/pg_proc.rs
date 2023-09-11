@@ -310,6 +310,10 @@ impl PgProc {
         self.get_attr(pg_sys::Anum_pg_proc_proretset).unwrap()
     }
 
+    /// Expression trees for default values. This is a [`List`] with `pronargdefaults` elements,
+    /// corresponding to the last N input arguments (i.e., the last N proargtypes positions).
+    ///
+    /// If none of the arguments have defaults, this function returns [`Option::None`].
     pub fn proargdefaults(&self) -> Option<List<*mut std::ffi::c_void>> {
         unsafe {
             use pgrx_pg_sys::AsPgCStr;
