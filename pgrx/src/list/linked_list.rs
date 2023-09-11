@@ -271,11 +271,6 @@ impl<T: Enlist> List<T> {
 }
 
 impl<T> ListHead<T> {
-    #[inline]
-    pub fn len(&self) -> usize {
-        unsafe { self.list.as_ref().length as usize }
-    }
-
     /// Nonsensical question in Postgres 11-12, but answers as if len
     #[inline]
     pub fn capacity(&self) -> usize {

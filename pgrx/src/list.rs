@@ -177,3 +177,9 @@ impl<T: Enlist> ListHead<T> {
         (T::LIST_TAG == (*list.as_ptr()).type_).then_some(ListHead { list, _type: PhantomData })
     }
 }
+impl<T> ListHead<T> {
+    #[inline]
+    pub fn len(&self) -> usize {
+        unsafe { self.list.as_ref().length as usize }
+    }
+}

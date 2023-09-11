@@ -264,11 +264,6 @@ impl<T> List<T> {
 
 impl<T> ListHead<T> {
     #[inline]
-    pub fn len(&self) -> usize {
-        unsafe { self.list.as_ref().length as usize }
-    }
-
-    #[inline]
     pub fn capacity(&self) -> usize {
         unsafe { self.list.as_ref().max_length as usize }
     }
