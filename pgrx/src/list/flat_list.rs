@@ -107,7 +107,7 @@ impl<T: Enlist> List<T> {
         match self {
             List::Nil => {
                 // No silly reasoning, simply allocate a cache line for a list.
-                let list_size = 64;
+                let list_size = 128;
                 let list: *mut pg_sys::List = pg_sys::MemoryContextAlloc(context, list_size).cast();
                 assert_ne!(list, ptr::null_mut());
                 (*list).type_ = T::LIST_TAG;

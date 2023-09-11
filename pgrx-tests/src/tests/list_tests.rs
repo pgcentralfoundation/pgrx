@@ -12,10 +12,10 @@ mod tests {
     use pgrx::prelude::*;
 
     #[pg_test]
-    fn list_length_5() {
+    fn list_length_10() {
         let mut list = List::Nil;
         // Make sure the list length grows correctly:
-        for i in 0..5 {
+        for i in 0..10 {
             unsafe {
                 list.unstable_push_in_context(i, pg_sys::CurrentMemoryContext);
                 assert_eq!(i as usize + 1, list.len());
