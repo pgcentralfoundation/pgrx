@@ -30,6 +30,7 @@ mod internal_tests;
 mod issue1134;
 mod json_tests;
 mod lifetime_tests;
+mod list_tests;
 mod log_tests;
 mod memcxt_tests;
 mod name_tests;

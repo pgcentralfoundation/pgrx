@@ -271,11 +271,6 @@ impl<T: Enlist> List<T> {
 }
 
 impl<T> ListHead<T> {
-    #[inline]
-    pub fn len(&self) -> usize {
-        unsafe { self.list.as_ref().length as usize }
-    }
-
     /// Nonsensical question in Postgres 11-12, but answers as if len
     #[inline]
     pub fn capacity(&self) -> usize {
@@ -292,24 +287,13 @@ impl<T> ListHead<T> {
 }
 
 impl<T: Enlist> ListHead<T> {
-    /// From a non-nullable pointer that points to a valid List, produce a ListHead of the correct type
-    ///
-    /// # Safety
-    /// This assumes the NodeTag is valid to read, so it is not okay to call this on
-    /// pointers to deallocated or uninit data.
-    ///
-    /// If it returns as `Some`, it also asserts the entire List is, across its length,
-    /// validly initialized as `T` in each ListCell.
-    pub unsafe fn downcast_ptr(list: NonNull<pg_sys::List>) -> Option<ListHead<T>> {
-        (T::LIST_TAG == (*list.as_ptr()).type_).then_some(ListHead { list, _type: PhantomData })
-    }
-
     pub fn push(&mut self, value: T) -> &mut Self {
         unsafe {
             let list = self.list.as_mut();
             let cell = cons_cell(list, value);
             (*list.tail).next = cell;
             list.tail = cell;
+            list.length += 1;
         }
 
         // Return `self` for convenience of `List::try_push`

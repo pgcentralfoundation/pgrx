@@ -107,15 +107,17 @@ impl<T: Enlist> List<T> {
         match self {
             List::Nil => {
                 // No silly reasoning, simply allocate a cache line for a list.
-                let list_size = 64;
+                let list_size = 128;
                 let list: *mut pg_sys::List = pg_sys::MemoryContextAlloc(context, list_size).cast();
+                assert_ne!(list, ptr::null_mut());
                 (*list).type_ = T::LIST_TAG;
                 (*list).length = 1;
                 (*list).max_length = ((list_size - mem::size_of::<pg_sys::List>())
                     / mem::size_of::<pg_sys::ListCell>()) as _;
                 (*list).elements = ptr::addr_of_mut!((*list).initial_elements).cast();
-                T::apoptosis((*list).elements).write(value);
+                T::endocytosis((*list).elements.as_mut().unwrap(), value);
                 *self = Self::downcast_ptr(list).unwrap();
+                assert_eq!(1, self.len());
                 match self {
                     List::Cons(head) => head,
                     _ => unreachable!(),
@@ -264,11 +266,6 @@ impl<T> List<T> {
 
 impl<T> ListHead<T> {
     #[inline]
-    pub fn len(&self) -> usize {
-        unsafe { self.list.as_ref().length as usize }
-    }
-
-    #[inline]
     pub fn capacity(&self) -> usize {
         unsafe { self.list.as_ref().max_length as usize }
     }
@@ -292,51 +289,41 @@ impl<T> ListHead<T> {
 }
 
 impl<T: Enlist> ListHead<T> {
-    /// From a non-nullable pointer that points to a valid List, produce a ListHead of the correct type
-    ///
-    /// # Safety
-    /// This assumes the NodeTag is valid to read, so it is not okay to call this on
-    /// pointers to deallocated or uninit data.
-    ///
-    /// If it returns as `Some`, it also asserts the entire List is, across its length,
-    /// validly initialized as `T` in each ListCell.
-    pub unsafe fn downcast_ptr(list: NonNull<pg_sys::List>) -> Option<ListHead<T>> {
-        (T::LIST_TAG == (*list.as_ptr()).type_).then_some(ListHead { list, _type: PhantomData })
-    }
-
     pub fn push(&mut self, value: T) -> &mut Self {
         let list = unsafe { self.list.as_mut() };
         let pg_sys::List { length, max_length, elements, .. } = list;
-        if *max_length - *length > 0 {
-            // SAFETY: Our list must have been constructed following the list invariants
-            // in order to actually get here, and we have confirmed as in-range of the buffer.
-            let cell = unsafe { &mut *elements.add(*length as _) };
-            T::endocytosis(cell, value);
-            *length += 1;
-        } else {
-            // Reserve in this branch.
-            let new_cap = max_length.saturating_mul(2);
-            self.reserve(new_cap as _);
+        if *max_length - *length < 1 {
+            // Reserve a constant for now
+            self.reserve(8);
         }
 
-        // Return `self` for convenience of `List::try_push`
+        // SAFETY: Our list must have been constructed following the list invariants
+        // in order to actually get here, and we have confirmed as in-range of the buffer.
+        let cell = unsafe { &mut *elements.add(*length as _) };
+        T::endocytosis(cell, value);
+        *length += 1;
         self
     }
 
-    pub fn reserve(&mut self, size: usize) -> &mut Self {
+    pub fn reserve(&mut self, count: usize) -> &mut Self {
         let list = unsafe { self.list.as_mut() };
-        if ((list.max_length - list.length) as usize) < size {
-            unsafe { grow_list(list, size + list.length as usize) };
+        assert!(list.max_length >= list.length);
+        if ((list.max_length - list.length) as usize) < count {
+            let size = i32::try_from(count).unwrap();
+            let size = list.length.checked_add(size).unwrap();
+            let size = usize::try_from(size).unwrap();
+            unsafe { grow_list(list, size) };
         };
         self
     }
 }
 
 unsafe fn grow_list(list: &mut pg_sys::List, target: usize) {
+    assert!((i32::MAX as usize) < target, "Cannot allocate more than c_int::MAX elements");
     let alloc_size = target * mem::size_of::<pg_sys::ListCell>();
     if list.elements == ptr::addr_of_mut!(list.initial_elements).cast() {
         // first realloc, we can't dealloc the elements ptr, as it isn't its own alloc
-        let context = pg_sys::GetMemoryChunkContext(list as *mut _ as *mut _);
+        let context = pg_sys::GetMemoryChunkContext(list as *mut pg_sys::List as *mut _);
         if context == ptr::null_mut() {
             panic!("Context free list?");
         }
@@ -352,7 +339,7 @@ unsafe fn grow_list(list: &mut pg_sys::List, target: usize) {
         list.elements = buf.cast();
     } else {
         // We already have a separate buf, making this easy.
-        pg_sys::repalloc(list.elements.cast(), target * mem::size_of::<pg_sys::ListCell>());
+        pg_sys::repalloc(list.elements.cast(), alloc_size);
     }
 
     list.max_length = target as _;
