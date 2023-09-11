@@ -15,9 +15,28 @@ mod tests {
     fn list_length() {
         let mut list = List::Nil;
         // Make sure the list length grows correctly:
-        for i in 0..1000 {
+        for i in 0..100 {
             unsafe {
                 assert_eq!(i as usize, list.len());
+                list.unstable_push_in_context(i, pg_sys::CurrentMemoryContext);
+            }
+        }
+
+        // Want to make sure the list length updates properly in the three major drain cases:
+        // from start of list, from inside the middle of the list, and from middle to tail.
+        let _ = list.drain(0..100);
+        assert_eq!(900, list.len());
+        let _ = list.drain(100..300);
+        assert_eq!(700, list.len());
+        let _ = list.drain(500..);
+        assert_eq!(500, list.len());
+    }
+
+    #[pg_test]
+    fn list_length_drained() {
+        let mut list = List::Nil;
+        for i in 0..100 {
+            unsafe {
                 list.unstable_push_in_context(i, pg_sys::CurrentMemoryContext);
             }
         }
