@@ -106,11 +106,10 @@ impl<T: Enlist> List<T> {
     ) -> &mut ListHead<T> {
         match self {
             List::Nil => {
-                // No silly reasoning, simply allocate a cache line for a list.
+                // No silly reasoning, simply allocate ~2 cache lines for a list
                 let list_size = 128;
                 let list: *mut pg_sys::List = pg_sys::MemoryContextAlloc(context, list_size).cast();
                 assert_ne!(list, ptr::null_mut());
-                *list = mem::zeroed(); // Clean the slate, should be elided but ??? weird bugs
                 (*list).type_ = T::LIST_TAG;
                 (*list).max_length = ((list_size - mem::size_of::<pg_sys::List>())
                     / mem::size_of::<pg_sys::ListCell>()) as _;
@@ -297,8 +296,7 @@ impl<T: Enlist> ListHead<T> {
         assert!(*length > 0);
         assert!(*max_length >= *length);
         if *max_length - *length < 1 {
-            // Reserve a constant for now
-            self.reserve(8);
+            self.reserve(*max_length as _);
         }
 
         // SAFETY: Our list must have been constructed following the list invariants
@@ -344,7 +342,7 @@ unsafe fn grow_list(list: &mut pg_sys::List, target: usize) {
         list.elements = buf.cast();
     } else {
         // We already have a separate buf, making this easy.
-        pg_sys::repalloc(list.elements.cast(), alloc_size);
+        list.elements = pg_sys::repalloc(list.elements.cast(), alloc_size).cast();
     }
 
     list.max_length = target as _;
