@@ -23,34 +23,34 @@ mod tests {
         }
     }
 
-    // #[pg_test]
-    // fn list_length_100() {
-    //     let mut list = List::Nil;
-    //     // Make sure the list length grows correctly:
-    //     for i in 0..100 {
-    //         unsafe {
-    //             list.unstable_push_in_context(i, pg_sys::CurrentMemoryContext);
-    //             assert_eq!(i as usize + 1, list.len());
-    //         }
-    //     }
-    // }
+    #[pg_test]
+    fn list_length_1000() {
+        let mut list = List::Nil;
+        // Make sure the list length grows correctly:
+        for i in 0..1000 {
+            unsafe {
+                list.unstable_push_in_context(i, pg_sys::CurrentMemoryContext);
+                assert_eq!(i as usize + 1, list.len());
+            }
+        }
+    }
 
-    // #[pg_test]
-    // fn list_length_drained() {
-    //     let mut list = List::Nil;
-    //     for i in 0..100 {
-    //         unsafe {
-    //             list.unstable_push_in_context(i, pg_sys::CurrentMemoryContext);
-    //         }
-    //     }
+    #[pg_test]
+    fn list_length_drained() {
+        let mut list = List::Nil;
+        for i in 0..100 {
+            unsafe {
+                list.unstable_push_in_context(i, pg_sys::CurrentMemoryContext);
+            }
+        }
 
-    //     // Want to make sure the list length updates properly in the three major drain cases:
-    //     // from start of list, from inside the middle of the list, and from middle to tail.
-    //     let _ = list.drain(0..10);
-    //     assert_eq!(90, list.len());
-    //     let _ = list.drain(10..30);
-    //     assert_eq!(70, list.len());
-    //     let _ = list.drain(50..);
-    //     assert_eq!(50, list.len());
-    // }
+        // Want to make sure the list length updates properly in the three major drain cases:
+        // from start of list, from inside the middle of the list, and from middle to tail.
+        let _ = list.drain(0..10);
+        assert_eq!(90, list.len());
+        let _ = list.drain(10..30);
+        assert_eq!(70, list.len());
+        let _ = list.drain(50..);
+        assert_eq!(50, list.len());
+    }
 }

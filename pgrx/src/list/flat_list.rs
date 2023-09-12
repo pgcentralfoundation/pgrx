@@ -106,16 +106,16 @@ impl<T: Enlist> List<T> {
     ) -> &mut ListHead<T> {
         match self {
             List::Nil => {
-                // No silly reasoning, simply allocate a cache line for a list.
+                // No silly reasoning, simply allocate ~2 cache lines for a list
                 let list_size = 128;
                 let list: *mut pg_sys::List = pg_sys::MemoryContextAlloc(context, list_size).cast();
                 assert_ne!(list, ptr::null_mut());
                 (*list).type_ = T::LIST_TAG;
-                (*list).length = 1;
                 (*list).max_length = ((list_size - mem::size_of::<pg_sys::List>())
                     / mem::size_of::<pg_sys::ListCell>()) as _;
                 (*list).elements = ptr::addr_of_mut!((*list).initial_elements).cast();
                 T::endocytosis((*list).elements.as_mut().unwrap(), value);
+                (*list).length = 1;
                 *self = Self::downcast_ptr(list).unwrap();
                 assert_eq!(1, self.len());
                 match self {
@@ -292,9 +292,11 @@ impl<T: Enlist> ListHead<T> {
     pub fn push(&mut self, value: T) -> &mut Self {
         let list = unsafe { self.list.as_mut() };
         let pg_sys::List { length, max_length, elements, .. } = list;
+        assert!(*max_length > 0);
+        assert!(*length > 0);
+        assert!(*max_length >= *length);
         if *max_length - *length < 1 {
-            // Reserve a constant for now
-            self.reserve(8);
+            self.reserve(*max_length as _);
         }
 
         // SAFETY: Our list must have been constructed following the list invariants
@@ -307,7 +309,8 @@ impl<T: Enlist> ListHead<T> {
 
     pub fn reserve(&mut self, count: usize) -> &mut Self {
         let list = unsafe { self.list.as_mut() };
-        assert!(list.max_length >= list.length);
+        assert!(list.length > 0);
+        assert!(list.max_length > 0);
         if ((list.max_length - list.length) as usize) < count {
             let size = i32::try_from(count).unwrap();
             let size = list.length.checked_add(size).unwrap();
@@ -319,7 +322,7 @@ impl<T: Enlist> ListHead<T> {
 }
 
 unsafe fn grow_list(list: &mut pg_sys::List, target: usize) {
-    assert!((i32::MAX as usize) < target, "Cannot allocate more than c_int::MAX elements");
+    assert!((i32::MAX as usize) >= target, "Cannot allocate more than c_int::MAX elements");
     let alloc_size = target * mem::size_of::<pg_sys::ListCell>();
     if list.elements == ptr::addr_of_mut!(list.initial_elements).cast() {
         // first realloc, we can't dealloc the elements ptr, as it isn't its own alloc
@@ -334,12 +337,12 @@ unsafe fn grow_list(list: &mut pg_sys::List, target: usize) {
         ptr::copy_nonoverlapping(list.elements, buf.cast(), list.length as _);
         // If the old buffer is pointers, we would like everyone dereferencing them to segfault,
         // if OIDs, Postgres will surface errors quickly on InvalidOid, etc.
-        #[cfg(debug_assertions)]
-        ptr::write_bytes(list.elements, 0x7F, list.length as _);
+        // #[cfg(debug_assertions)]
+        // ptr::write_bytes(list.elements, 0x7F, list.length as _);
         list.elements = buf.cast();
     } else {
         // We already have a separate buf, making this easy.
-        pg_sys::repalloc(list.elements.cast(), alloc_size);
+        list.elements = pg_sys::repalloc(list.elements.cast(), alloc_size).cast();
     }
 
     list.max_length = target as _;
