@@ -12,10 +12,10 @@ mod tests {
     use pgrx::prelude::*;
 
     #[pg_test]
-    fn list_length_10() {
+    fn list_length_25() {
         let mut list = List::Nil;
         // Make sure the list length grows correctly:
-        for i in 0..10 {
+        for i in 0..25 {
             unsafe {
                 list.unstable_push_in_context(i, pg_sys::CurrentMemoryContext);
                 assert_eq!(i as usize + 1, list.len());
@@ -23,17 +23,17 @@ mod tests {
         }
     }
 
-    // #[pg_test]
-    // fn list_length_100() {
-    //     let mut list = List::Nil;
-    //     // Make sure the list length grows correctly:
-    //     for i in 0..100 {
-    //         unsafe {
-    //             list.unstable_push_in_context(i, pg_sys::CurrentMemoryContext);
-    //             assert_eq!(i as usize + 1, list.len());
-    //         }
-    //     }
-    // }
+    #[pg_test]
+    fn list_length_100() {
+        let mut list = List::Nil;
+        // Make sure the list length grows correctly:
+        for i in 0..38 {
+            unsafe {
+                list.unstable_push_in_context(i, pg_sys::CurrentMemoryContext);
+                assert_eq!(i as usize + 1, list.len());
+            }
+        }
+    }
 
     // #[pg_test]
     // fn list_length_drained() {
