@@ -170,7 +170,7 @@ pub const ALIGNOF_LONG: u32 = 8;
 pub const ALIGNOF_PG_INT128_TYPE: u32 = 16;
 pub const ALIGNOF_SHORT: u32 = 2;
 pub const BLCKSZ: u32 = 8192;
-pub const CONFIGURE_ARGS : & [u8 ; 206] = b" '--prefix=/home/zombodb/.pgrx/16rc1/pgrx-install' '--with-pgport=28816' '--enable-debug' '--enable-cassert' 'CPPFLAGS= -DMEMORY_CONTEXT_CHECKING=1 -DCLOBBER_FREED_MEMORY=1 -DRANDOMIZE_ALLOCATED_MEMORY=1 '\0" ;
+pub const CONFIGURE_ARGS : & [u8 ; 205] = b" '--prefix=/home/zombodb/.pgrx/16.0/pgrx-install' '--with-pgport=28816' '--enable-debug' '--enable-cassert' 'CPPFLAGS= -DMEMORY_CONTEXT_CHECKING=1 -DCLOBBER_FREED_MEMORY=1 -DRANDOMIZE_ALLOCATED_MEMORY=1 '\0" ;
 pub const DEF_PGPORT: u32 = 28816;
 pub const DEF_PGPORT_STR: &[u8; 6] = b"28816\0";
 pub const DLSUFFIX: &[u8; 4] = b".so\0";
@@ -277,18 +277,18 @@ pub const MAXIMUM_ALIGNOF: u32 = 8;
 pub const MEMSET_LOOP_LIMIT: u32 = 1024;
 pub const PACKAGE_BUGREPORT: &[u8; 32] = b"pgsql-bugs@lists.postgresql.org\0";
 pub const PACKAGE_NAME: &[u8; 11] = b"PostgreSQL\0";
-pub const PACKAGE_STRING: &[u8; 17] = b"PostgreSQL 16rc1\0";
+pub const PACKAGE_STRING: &[u8; 16] = b"PostgreSQL 16.0\0";
 pub const PACKAGE_TARNAME: &[u8; 11] = b"postgresql\0";
 pub const PACKAGE_URL: &[u8; 28] = b"https://www.postgresql.org/\0";
-pub const PACKAGE_VERSION: &[u8; 6] = b"16rc1\0";
+pub const PACKAGE_VERSION: &[u8; 5] = b"16.0\0";
 pub const PG_KRB_SRVNAM: &[u8; 9] = b"postgres\0";
 pub const PG_MAJORVERSION: &[u8; 3] = b"16\0";
 pub const PG_MAJORVERSION_NUM: u32 = 16;
 pub const PG_MINORVERSION_NUM: u32 = 0;
 pub const PG_USE_STDBOOL: u32 = 1;
-pub const PG_VERSION: &[u8; 6] = b"16rc1\0";
+pub const PG_VERSION: &[u8; 5] = b"16.0\0";
 pub const PG_VERSION_NUM: u32 = 160000;
-pub const PG_VERSION_STR : & [u8 ; 103] = b"PostgreSQL 16rc1 on x86_64-pc-linux-gnu, compiled by gcc (Ubuntu 11.4.0-1ubuntu1~22.04) 11.4.0, 64-bit\0" ;
+pub const PG_VERSION_STR : & [u8 ; 102] = b"PostgreSQL 16.0 on x86_64-pc-linux-gnu, compiled by gcc (Ubuntu 11.4.0-1ubuntu1~22.04) 11.4.0, 64-bit\0" ;
 pub const RELSEG_SIZE: u32 = 131072;
 pub const SIZEOF_BOOL: u32 = 1;
 pub const SIZEOF_LONG: u32 = 8;
@@ -728,7 +728,7 @@ pub const PG_BINARY_R: &[u8; 2] = b"r\0";
 pub const PG_BINARY_W: &[u8; 2] = b"w\0";
 pub const _CTYPE_H: u32 = 1;
 pub const PGINVALID_SOCKET: i32 = -1;
-pub const PG_BACKEND_VERSIONSTR: &[u8; 29] = b"postgres (PostgreSQL) 16rc1\n\0";
+pub const PG_BACKEND_VERSIONSTR: &[u8; 28] = b"postgres (PostgreSQL) 16.0\n\0";
 pub const EXE: &[u8; 1] = b"\0";
 pub const DEVNULL: &[u8; 10] = b"/dev/null\0";
 pub const USE_REPL_SNPRINTF: u32 = 1;
@@ -24324,12 +24324,16 @@ extern "C" {
 }
 #[pgrx_macros::pg_guard]
 extern "C" {
-    pub fn pgstat_fetch_stat_beentry(beid: BackendId) -> *mut PgBackendStatus;
+    pub fn pgstat_get_beentry_by_backend_id(beid: BackendId) -> *mut PgBackendStatus;
 }
 #[pgrx_macros::pg_guard]
 extern "C" {
-    pub fn pgstat_fetch_stat_local_beentry(
-        beid: ::std::os::raw::c_int,
+    pub fn pgstat_get_local_beentry_by_backend_id(beid: BackendId) -> *mut LocalPgBackendStatus;
+}
+#[pgrx_macros::pg_guard]
+extern "C" {
+    pub fn pgstat_get_local_beentry_by_index(
+        idx: ::std::os::raw::c_int,
     ) -> *mut LocalPgBackendStatus;
 }
 #[pgrx_macros::pg_guard]
@@ -47741,11 +47745,13 @@ extern "C" {
     pub static mut logical_decoding_work_mem: ::std::os::raw::c_int;
 }
 extern "C" {
-    pub static mut logical_replication_mode: ::std::os::raw::c_int;
+    pub static mut debug_logical_replication_streaming: ::std::os::raw::c_int;
 }
-pub const LogicalRepMode_LOGICAL_REP_MODE_BUFFERED: LogicalRepMode = 0;
-pub const LogicalRepMode_LOGICAL_REP_MODE_IMMEDIATE: LogicalRepMode = 1;
-pub type LogicalRepMode = ::std::os::raw::c_uint;
+pub const DebugLogicalRepStreamingMode_DEBUG_LOGICAL_REP_STREAMING_BUFFERED:
+    DebugLogicalRepStreamingMode = 0;
+pub const DebugLogicalRepStreamingMode_DEBUG_LOGICAL_REP_STREAMING_IMMEDIATE:
+    DebugLogicalRepStreamingMode = 1;
+pub type DebugLogicalRepStreamingMode = ::std::os::raw::c_uint;
 #[repr(C)]
 #[derive(Debug, Copy, Clone)]
 pub struct ReorderBufferTupleBuf {
