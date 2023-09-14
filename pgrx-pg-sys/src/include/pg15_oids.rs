@@ -235,6 +235,7 @@ pub enum BuiltinOid {
     XID8OID = 5069,
     XIDARRAYOID = 1011,
     XIDOID = 28,
+    XLOG_NEXTOID = 48,
     XMLARRAYOID = 143,
     XMLOID = 142,
 }
@@ -476,6 +477,7 @@ impl BuiltinOid {
             5069 => Ok(BuiltinOid::XID8OID),
             1011 => Ok(BuiltinOid::XIDARRAYOID),
             28 => Ok(BuiltinOid::XIDOID),
+            48 => Ok(BuiltinOid::XLOG_NEXTOID),
             143 => Ok(BuiltinOid::XMLARRAYOID),
             142 => Ok(BuiltinOid::XMLOID),
             _ => Err(NotBuiltinOid::Ambiguous),
