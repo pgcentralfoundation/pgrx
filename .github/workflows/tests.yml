@@ -87,7 +87,6 @@ jobs:
         echo ""
 
     - name: Install release version of PostgreSQL
-      if: matrix.version != 'postgres-16'
       run: |
         echo "----- Set up PostgreSQL Apt repository -----"
         sudo apt-get install -y wget gnupg
@@ -100,22 +99,6 @@ jobs:
           postgresql-$PG_VER \
           postgresql-server-dev-$PG_VER
 
-
-    - name: Install develoment version of PostgreSQL
-      if: matrix.version == 'postgres-16'
-      run: |
-        echo "----- Set up PostgreSQL Apt repository -----"
-        sudo apt-get install -y wget gnupg
-        sudo apt-key adv --keyserver keyserver.ubuntu.com --recv-keys 7FCC7D46ACCC4CF8
-        sudo add-apt-repository "deb https://apt.postgresql.org/pub/repos/apt/ $(lsb_release -s -c)-pgdg-snapshot main 16"
-        sudo add-apt-repository "deb https://apt.postgresql.org/pub/repos/apt/ $(lsb_release -s -c)-pgdg main 16"
-        wget --quiet -O - https://www.postgresql.org/media/keys/ACCC4CF8.asc | sudo apt-key add -
-        sudo apt-get update -y -qq --fix-missing
-        echo ""
-
-        sudo apt-get install -y \
-          postgresql-$PG_VER \
-          postgresql-server-dev-$PG_VER
 
     - name: Set up PostgreSQL permissions
       run: sudo chmod a+rwx `/usr/lib/postgresql/$PG_VER/bin/pg_config --pkglibdir` `/usr/lib/postgresql/$PG_VER/bin/pg_config --sharedir`/extension /var/run/postgresql/
