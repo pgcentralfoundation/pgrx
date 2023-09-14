@@ -10,7 +10,7 @@
  
 [package]
 name = "pgrx-pg-config"
-version = "0.10.0"
+version = "0.10.1"
 authors = ["PgCentral Foundation, Inc. <contact@pgcentral.org>"]
 license = "MIT"
 description = "A Postgres pg_config wrapper for 'pgrx'"
@@ -30,6 +30,6 @@ owo-colors = "3.5.0"
 serde = { version = "1.0", features = [ "derive" ] }
 serde_derive = "1.0"
 serde_json = "1.0"
-toml = "0.7.6"
+toml = "0.8.0"
 url = "2.4.1"
 cargo_toml = "0.15.3"

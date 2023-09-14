@@ -10,7 +10,7 @@
  
 [package]
 name = "cargo-pgrx"
-version = "0.10.0"
+version = "0.10.1"
 authors = ["PgCentral Foundation, Inc. <contact@pgcentral.org>"]
 license = "MIT"
 description = "Cargo subcommand for 'pgrx' to make Postgres extension development easy"
@@ -33,10 +33,10 @@ semver = "1.0.18"
 owo-colors = { version = "3.5.0", features = [ "supports-colors" ] }
 env_proxy = "0.4.1"
 num_cpus = "1.16.0"
-pgrx-pg-config = { path = "../pgrx-pg-config", version = "=0.10.0" }
-pgrx-sql-entity-graph = { path = "../pgrx-sql-entity-graph", version = "=0.10.0" }
-prettyplease = "0.2.14"
-proc-macro2 = { version = "1.0.66", features = [ "span-locations" ] }
+pgrx-pg-config = { path = "../pgrx-pg-config", version = "=0.10.1" }
+pgrx-sql-entity-graph = { path = "../pgrx-sql-entity-graph", version = "=0.10.1" }
+prettyplease = "0.2.15"
+proc-macro2 = { version = "1.0.67", features = [ "span-locations" ] }
 quote = "1.0.33"
 rayon = "1.7.0"
 regex = "1.9.5"

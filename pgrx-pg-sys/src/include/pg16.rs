@@ -2458,6 +2458,24 @@ pub const InvalidLocalTransactionId: u32 = 0;
 pub const MAX_LOCKMODES: u32 = 10;
 pub const DEFAULT_LOCKMETHOD: u32 = 1;
 pub const USER_LOCKMETHOD: u32 = 2;
+pub const PG_CONTROL_VERSION: u32 = 1300;
+pub const MOCK_AUTH_NONCE_LEN: u32 = 32;
+pub const XLOG_CHECKPOINT_SHUTDOWN: u32 = 0;
+pub const XLOG_CHECKPOINT_ONLINE: u32 = 16;
+pub const XLOG_NOOP: u32 = 32;
+pub const XLOG_NEXTOID: Oid = Oid(48);
+pub const XLOG_SWITCH: u32 = 64;
+pub const XLOG_BACKUP_END: u32 = 80;
+pub const XLOG_PARAMETER_CHANGE: u32 = 96;
+pub const XLOG_RESTORE_POINT: u32 = 112;
+pub const XLOG_FPW_CHANGE: u32 = 128;
+pub const XLOG_END_OF_RECOVERY: u32 = 144;
+pub const XLOG_FPI_FOR_HINT: u32 = 160;
+pub const XLOG_FPI: u32 = 176;
+pub const XLOG_OVERWRITE_CONTRECORD: u32 = 208;
+pub const FLOATFORMAT_VALUE: f64 = 1234567.0;
+pub const PG_CONTROL_MAX_SAFE_SIZE: u32 = 512;
+pub const PG_CONTROL_FILE_SIZE: u32 = 8192;
 pub const PERFORM_DELETION_INTERNAL: u32 = 1;
 pub const PERFORM_DELETION_CONCURRENTLY: u32 = 2;
 pub const PERFORM_DELETION_QUIETLY: u32 = 4;
@@ -31170,6 +31188,284 @@ extern "C" {
 #[pgrx_macros::pg_guard]
 extern "C" {
     pub fn AlterTableGetRelOptionsLockLevel(defList: *mut List) -> LOCKMODE;
+}
+#[repr(C)]
+#[derive(Debug, Copy, Clone)]
+pub struct CheckPoint {
+    pub redo: XLogRecPtr,
+    pub ThisTimeLineID: TimeLineID,
+    pub PrevTimeLineID: TimeLineID,
+    pub fullPageWrites: bool,
+    pub nextXid: FullTransactionId,
+    pub nextOid: Oid,
+    pub nextMulti: MultiXactId,
+    pub nextMultiOffset: MultiXactOffset,
+    pub oldestXid: TransactionId,
+    pub oldestXidDB: Oid,
+    pub oldestMulti: MultiXactId,
+    pub oldestMultiDB: Oid,
+    pub time: pg_time_t,
+    pub oldestCommitTsXid: TransactionId,
+    pub newestCommitTsXid: TransactionId,
+    pub oldestActiveXid: TransactionId,
+}
+impl Default for CheckPoint {
+    fn default() -> Self {
+        let mut s = ::std::mem::MaybeUninit::<Self>::uninit();
+        unsafe {
+            ::std::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
+            s.assume_init()
+        }
+    }
+}
+pub const DBState_DB_STARTUP: DBState = 0;
+pub const DBState_DB_SHUTDOWNED: DBState = 1;
+pub const DBState_DB_SHUTDOWNED_IN_RECOVERY: DBState = 2;
+pub const DBState_DB_SHUTDOWNING: DBState = 3;
+pub const DBState_DB_IN_CRASH_RECOVERY: DBState = 4;
+pub const DBState_DB_IN_ARCHIVE_RECOVERY: DBState = 5;
+pub const DBState_DB_IN_PRODUCTION: DBState = 6;
+pub type DBState = ::std::os::raw::c_uint;
+#[repr(C)]
+#[derive(Debug, Copy, Clone)]
+pub struct ControlFileData {
+    pub system_identifier: uint64,
+    pub pg_control_version: uint32,
+    pub catalog_version_no: uint32,
+    pub state: DBState,
+    pub time: pg_time_t,
+    pub checkPoint: XLogRecPtr,
+    pub checkPointCopy: CheckPoint,
+    pub unloggedLSN: XLogRecPtr,
+    pub minRecoveryPoint: XLogRecPtr,
+    pub minRecoveryPointTLI: TimeLineID,
+    pub backupStartPoint: XLogRecPtr,
+    pub backupEndPoint: XLogRecPtr,
+    pub backupEndRequired: bool,
+    pub wal_level: ::std::os::raw::c_int,
+    pub wal_log_hints: bool,
+    pub MaxConnections: ::std::os::raw::c_int,
+    pub max_worker_processes: ::std::os::raw::c_int,
+    pub max_wal_senders: ::std::os::raw::c_int,
+    pub max_prepared_xacts: ::std::os::raw::c_int,
+    pub max_locks_per_xact: ::std::os::raw::c_int,
+    pub track_commit_timestamp: bool,
+    pub maxAlign: uint32,
+    pub floatFormat: f64,
+    pub blcksz: uint32,
+    pub relseg_size: uint32,
+    pub xlog_blcksz: uint32,
+    pub xlog_seg_size: uint32,
+    pub nameDataLen: uint32,
+    pub indexMaxKeys: uint32,
+    pub toast_max_chunk_size: uint32,
+    pub loblksize: uint32,
+    pub float8ByVal: bool,
+    pub data_checksum_version: uint32,
+    pub mock_authentication_nonce: [::std::os::raw::c_char; 32usize],
+    pub crc: pg_crc32c,
+}
+impl Default for ControlFileData {
+    fn default() -> Self {
+        let mut s = ::std::mem::MaybeUninit::<Self>::uninit();
+        unsafe {
+            ::std::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
+            s.assume_init()
+        }
+    }
+}
+pub const RecoveryTargetType_RECOVERY_TARGET_UNSET: RecoveryTargetType = 0;
+pub const RecoveryTargetType_RECOVERY_TARGET_XID: RecoveryTargetType = 1;
+pub const RecoveryTargetType_RECOVERY_TARGET_TIME: RecoveryTargetType = 2;
+pub const RecoveryTargetType_RECOVERY_TARGET_NAME: RecoveryTargetType = 3;
+pub const RecoveryTargetType_RECOVERY_TARGET_LSN: RecoveryTargetType = 4;
+pub const RecoveryTargetType_RECOVERY_TARGET_IMMEDIATE: RecoveryTargetType = 5;
+pub type RecoveryTargetType = ::std::os::raw::c_uint;
+pub const RecoveryTargetTimeLineGoal_RECOVERY_TARGET_TIMELINE_CONTROLFILE:
+    RecoveryTargetTimeLineGoal = 0;
+pub const RecoveryTargetTimeLineGoal_RECOVERY_TARGET_TIMELINE_LATEST: RecoveryTargetTimeLineGoal =
+    1;
+pub const RecoveryTargetTimeLineGoal_RECOVERY_TARGET_TIMELINE_NUMERIC: RecoveryTargetTimeLineGoal =
+    2;
+pub type RecoveryTargetTimeLineGoal = ::std::os::raw::c_uint;
+pub const RecoveryPauseState_RECOVERY_NOT_PAUSED: RecoveryPauseState = 0;
+pub const RecoveryPauseState_RECOVERY_PAUSE_REQUESTED: RecoveryPauseState = 1;
+pub const RecoveryPauseState_RECOVERY_PAUSED: RecoveryPauseState = 2;
+pub type RecoveryPauseState = ::std::os::raw::c_uint;
+extern "C" {
+    pub static mut recoveryTargetInclusive: bool;
+}
+extern "C" {
+    pub static mut recoveryTargetAction: ::std::os::raw::c_int;
+}
+extern "C" {
+    pub static mut recovery_min_apply_delay: ::std::os::raw::c_int;
+}
+extern "C" {
+    pub static mut PrimaryConnInfo: *mut ::std::os::raw::c_char;
+}
+extern "C" {
+    pub static mut PrimarySlotName: *mut ::std::os::raw::c_char;
+}
+extern "C" {
+    pub static mut recoveryEndCommand: *mut ::std::os::raw::c_char;
+}
+extern "C" {
+    pub static mut archiveCleanupCommand: *mut ::std::os::raw::c_char;
+}
+extern "C" {
+    pub static mut recoveryTargetXid: TransactionId;
+}
+extern "C" {
+    pub static mut recovery_target_time_string: *mut ::std::os::raw::c_char;
+}
+extern "C" {
+    pub static mut recoveryTargetTime: TimestampTz;
+}
+extern "C" {
+    pub static mut recoveryTargetName: *const ::std::os::raw::c_char;
+}
+extern "C" {
+    pub static mut recoveryTargetLSN: XLogRecPtr;
+}
+extern "C" {
+    pub static mut recoveryTarget: RecoveryTargetType;
+}
+extern "C" {
+    pub static mut wal_receiver_create_temp_slot: bool;
+}
+extern "C" {
+    pub static mut recoveryTargetTimeLineGoal: RecoveryTargetTimeLineGoal;
+}
+extern "C" {
+    pub static mut recoveryTargetTLIRequested: TimeLineID;
+}
+extern "C" {
+    pub static mut recoveryTargetTLI: TimeLineID;
+}
+extern "C" {
+    pub static mut reachedConsistency: bool;
+}
+#[pgrx_macros::pg_guard]
+extern "C" {
+    pub fn XLogRecoveryShmemSize() -> Size;
+}
+#[pgrx_macros::pg_guard]
+extern "C" {
+    pub fn XLogRecoveryShmemInit();
+}
+#[pgrx_macros::pg_guard]
+extern "C" {
+    pub fn InitWalRecovery(
+        ControlFile: *mut ControlFileData,
+        wasShutdown_ptr: *mut bool,
+        haveBackupLabel_ptr: *mut bool,
+        haveTblspcMap_ptr: *mut bool,
+    );
+}
+#[pgrx_macros::pg_guard]
+extern "C" {
+    pub fn PerformWalRecovery();
+}
+#[repr(C)]
+#[derive(Debug, Copy, Clone)]
+pub struct EndOfWalRecoveryInfo {
+    pub lastRec: XLogRecPtr,
+    pub lastRecTLI: TimeLineID,
+    pub endOfLog: XLogRecPtr,
+    pub endOfLogTLI: TimeLineID,
+    pub lastPageBeginPtr: XLogRecPtr,
+    pub lastPage: *mut ::std::os::raw::c_char,
+    pub abortedRecPtr: XLogRecPtr,
+    pub missingContrecPtr: XLogRecPtr,
+    pub recoveryStopReason: *mut ::std::os::raw::c_char,
+    pub standby_signal_file_found: bool,
+    pub recovery_signal_file_found: bool,
+}
+impl Default for EndOfWalRecoveryInfo {
+    fn default() -> Self {
+        let mut s = ::std::mem::MaybeUninit::<Self>::uninit();
+        unsafe {
+            ::std::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
+            s.assume_init()
+        }
+    }
+}
+#[pgrx_macros::pg_guard]
+extern "C" {
+    pub fn FinishWalRecovery() -> *mut EndOfWalRecoveryInfo;
+}
+#[pgrx_macros::pg_guard]
+extern "C" {
+    pub fn ShutdownWalRecovery();
+}
+#[pgrx_macros::pg_guard]
+extern "C" {
+    pub fn RemovePromoteSignalFiles();
+}
+#[pgrx_macros::pg_guard]
+extern "C" {
+    pub fn HotStandbyActive() -> bool;
+}
+#[pgrx_macros::pg_guard]
+extern "C" {
+    pub fn GetXLogReplayRecPtr(replayTLI: *mut TimeLineID) -> XLogRecPtr;
+}
+#[pgrx_macros::pg_guard]
+extern "C" {
+    pub fn GetRecoveryPauseState() -> RecoveryPauseState;
+}
+#[pgrx_macros::pg_guard]
+extern "C" {
+    pub fn SetRecoveryPause(recoveryPause: bool);
+}
+#[pgrx_macros::pg_guard]
+extern "C" {
+    pub fn GetXLogReceiptTime(rtime: *mut TimestampTz, fromStream: *mut bool);
+}
+#[pgrx_macros::pg_guard]
+extern "C" {
+    pub fn GetLatestXTime() -> TimestampTz;
+}
+#[pgrx_macros::pg_guard]
+extern "C" {
+    pub fn GetCurrentChunkReplayStartTime() -> TimestampTz;
+}
+#[pgrx_macros::pg_guard]
+extern "C" {
+    pub fn GetCurrentReplayRecPtr(replayEndTLI: *mut TimeLineID) -> XLogRecPtr;
+}
+#[pgrx_macros::pg_guard]
+extern "C" {
+    pub fn PromoteIsTriggered() -> bool;
+}
+#[pgrx_macros::pg_guard]
+extern "C" {
+    pub fn CheckPromoteSignal() -> bool;
+}
+#[pgrx_macros::pg_guard]
+extern "C" {
+    pub fn WakeupRecovery();
+}
+#[pgrx_macros::pg_guard]
+extern "C" {
+    pub fn StartupRequestWalReceiverRestart();
+}
+#[pgrx_macros::pg_guard]
+extern "C" {
+    pub fn XLogRequestWalReceiverReply();
+}
+#[pgrx_macros::pg_guard]
+extern "C" {
+    pub fn RecoveryRequiresIntParameter(
+        param_name: *const ::std::os::raw::c_char,
+        currValue: ::std::os::raw::c_int,
+        minValue: ::std::os::raw::c_int,
+    );
+}
+#[pgrx_macros::pg_guard]
+extern "C" {
+    pub fn xlog_outdesc(buf: StringInfo, record: *mut XLogReaderState);
 }
 pub const DependencyType_DEPENDENCY_NORMAL: DependencyType = 110;
 pub const DependencyType_DEPENDENCY_AUTO: DependencyType = 97;

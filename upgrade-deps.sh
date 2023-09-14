@@ -11,8 +11,9 @@
  
 
 # requires:  "cargo install cargo-edit" from https://github.com/killercup/cargo-edit
+EXCLUSIONS="--exclude syn --exclude cargo_metadata --exclude clap --exclude clap-cargo"
 cargo update
-cargo upgrade --incompatible --exclude syn
+cargo upgrade --incompatible $EXCLUSIONS
 cargo generate-lockfile
 
 # examples are their own independent crates, so we have to do them individually.
@@ -20,7 +21,7 @@ for folder in pgrx-examples/*; do
     if [ -d "$folder" ]; then
         cd $folder
         cargo update
-        cargo upgrade --incompatible --exclude syn
+        cargo upgrade --incompatible $EXCLUSIONS
         cargo generate-lockfile
         cargo check || exit $?
         cd -
