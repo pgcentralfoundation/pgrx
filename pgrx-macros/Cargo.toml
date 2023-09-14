@@ -10,7 +10,7 @@
  
 [package]
 name = "pgrx-macros"
-version = "0.10.0"
+version = "0.10.1"
 authors = ["PgCentral Foundation, Inc. <contact@pgcentral.org>"]
 license = "MIT"
 description = "Proc Macros for 'pgrx'"
@@ -31,8 +31,8 @@ rustc-args = ["--cfg", "docsrs"]
 no-schema-generation = ["pgrx-sql-entity-graph/no-schema-generation"]
 
 [dependencies]
-pgrx-sql-entity-graph = { path = "../pgrx-sql-entity-graph", version = "=0.10.0" }
-proc-macro2 = "1.0.66"
+pgrx-sql-entity-graph = { path = "../pgrx-sql-entity-graph", version = "=0.10.1" }
+proc-macro2 = "1.0.67"
 quote = "1.0.33"
 syn = { version = "1.0.109", features = [ "extra-traits", "full", "fold", "parsing" ] }
 
