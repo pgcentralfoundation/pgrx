@@ -24,9 +24,9 @@ mod seal {
     impl<T: crate::IntoDatum + Clone> Sealed for T {}
 }
 
-/// Augments types that can be used as [`fcall`] arguments.  This is only implemented for the
+/// Augments types that can be used as [`fn_call`] arguments.  This is only implemented for the
 /// [`Arg`] enum.
-pub unsafe trait FCallArg {
+pub unsafe trait FnCallArg {
     /// Represent `&self` as a [`pg_sys::Datum`].  This is likely to clone
     fn as_datum(&self, pg_proc: &PgProc, argnum: usize) -> Result<Option<pg_sys::Datum>>;
 
@@ -34,7 +34,7 @@ pub unsafe trait FCallArg {
     fn type_oid(&self) -> pg_sys::Oid;
 }
 
-/// The kinds of [`fcall`] arguments.  
+/// The kinds of [`fn_call`] arguments.  
 pub enum Arg<T> {
     /// The argument value is a SQL NULL
     Null,
@@ -46,7 +46,7 @@ pub enum Arg<T> {
     Value(T),
 }
 
-unsafe impl<T: IntoDatum + Clone + seal::Sealed> FCallArg for Arg<T> {
+unsafe impl<T: IntoDatum + Clone + seal::Sealed> FnCallArg for Arg<T> {
     fn as_datum(&self, pg_proc: &PgProc, argnum: usize) -> Result<Option<pg_sys::Datum>> {
         match self {
             Arg::Null => Ok(None),
@@ -61,10 +61,10 @@ unsafe impl<T: IntoDatum + Clone + seal::Sealed> FCallArg for Arg<T> {
     }
 }
 
-/// [`FCallError`]s represent the set of conditions that could case [`fcall()`] to fail in a
+/// [`FnCallError`]s represent the set of conditions that could case [`fn_call()`] to fail in a
 /// user-recoverable manner.
 #[derive(thiserror::Error, Debug, Clone, Eq, PartialEq)]
-pub enum FCallError {
+pub enum FnCallError {
     #[error("Invalid identifier: `{0}`")]
     InvalidIdentifier(String),
 
@@ -102,7 +102,7 @@ pub enum FCallError {
     DefaultNotConstantExpression,
 }
 
-pub type Result<T> = std::result::Result<T, FCallError>;
+pub type Result<T> = std::result::Result<T, FnCallError>;
 
 /// Dynamically call a named function in the current database.  The function must be one previously
 /// defined by `CREATE FUNCTION`.  Its underlying `LANGUAGE` is irrelevant -- call `LANGUAGE sql`,
@@ -122,29 +122,29 @@ pub type Result<T> = std::result::Result<T, FCallError>;
 ///
 /// Arguments with `DEFAULT` clauses always appear as the last function arguments.  If you want the
 /// default value as defined by the function, either use [`Arg::Default`] or elide the default
-/// arguments entirely -- [`fcall`] will automatically fill them in.
+/// arguments entirely -- [`fn_call`] will automatically fill them in.
 ///
 /// # Returns
 ///
-/// [`fcall`] returns an instantiated Rust type of the return value from the called function.  If
-/// that function returns NULL, [`fcall`] returns `Ok(None)`.
+/// [`fn_call`] returns an instantiated Rust type of the return value from the called function.  If
+/// that function returns NULL, [`fn_call`] returns `Ok(None)`.
 ///
 /// # Errors
 ///
-/// Any of the [`FCallError`] variants could be returned.
+/// Any of the [`FnCallError`] variants could be returned.
 ///
 /// # Panics
 ///
-/// [`fcall`] itself should not panic, but it may raise assertion panics if unexpected conditions are
+/// [`fn_call`] itself should not panic, but it may raise assertion panics if unexpected conditions are
 /// detected.  These would indicate a bug and should be reported.
 ///
-/// Note that if the function being called raises a Postgres ERROR, it is not caught by [`fcall`]
-/// and will immediately abort the transaction.  To catch such errors yourself, use [`fcall`] with
+/// Note that if the function being called raises a Postgres ERROR, it is not caught by [`fn_call`]
+/// and will immediately abort the transaction.  To catch such errors yourself, use [`fn_call`] with
 /// [`PgTryBuilder`].
 ///
 /// # Limitations
 ///
-/// Currently, [`fcall`] does not support:
+/// Currently, [`fn_call`] does not support:
 ///     - Functions that `RETURNS SET OF $type` or `RETURNS TABLE(...)`
 ///     - Functions with `IN_OUT` or `OUT` arguments
 ///     - Postgres 11
@@ -158,18 +158,18 @@ pub type Result<T> = std::result::Result<T, FCallError>;
 /// ```
 ///
 /// ```rust,no_run
-/// use pgrx::fcall::{Arg, fcall};
+/// use pgrx::fcall::{Arg, fn_call};
 ///
 /// let array = vec![1,2,3];
-/// let sum = fcall::<i32>("sum_array", &[&Arg::Value(array)]);
+/// let sum = fn_call::<i32>("sum_array", &[&Arg::Value(array)]);
 /// assert_eq!(sum, Ok(Some(6)));
 /// ```
 ///
 /// ## Calling a built-in
 ///
 /// ```rust,no_run
-/// use pgrx::fcall::{Arg, fcall};
-/// let is_eq = fcall::<bool>("texteq", &[&Arg::Value("hello"), &Arg::Value("world")]);
+/// use pgrx::fcall::{Arg, fn_call};
+/// let is_eq = fn_call::<bool>("texteq", &[&Arg::Value("hello"), &Arg::Value("world")]);
 /// assert!(is_eq == Ok(Some(false)));
 /// ```
 ///
@@ -180,32 +180,35 @@ pub type Result<T> = std::result::Result<T, FCallError>;
 /// ```
 ///
 /// ```rust,no_run
-/// use pgrx::fcall::{Arg, fcall};
+/// use pgrx::fcall::{Arg, fn_call};
 ///
-/// let product = fcall::<i64>("mul_by", &[&Arg::Value(42_i64)]);  // uses the default of `2` for `factor`
+/// let product = fn_call::<i64>("mul_by", &[&Arg::Value(42_i64)]);  // uses the default of `2` for `factor`
 /// assert_eq!(product, Ok(Some(84)));
 ///
-/// let product = fcall::<i64>("mul_by", &[&Arg::Value(42_i64), &Arg::<i64>::Default]);  // uses the default of `2` for `factor`
+/// let product = fn_call::<i64>("mul_by", &[&Arg::Value(42_i64), &Arg::<i64>::Default]);  // uses the default of `2` for `factor`
 /// assert_eq!(product, Ok(Some(84)));
 ///
-/// let product = fcall::<i64>("mul_by", &[&Arg::Value(42_i64), &Arg::Value(3_i64)]);  // specifies an explicit value for `factor`
+/// let product = fn_call::<i64>("mul_by", &[&Arg::Value(42_i64), &Arg::Value(3_i64)]);  // specifies an explicit value for `factor`
 /// assert_eq!(product, Ok(Some(126)));
 ///
 /// ```
-pub fn fcall<R: FromDatum + IntoDatum>(fname: &str, args: &[&dyn FCallArg]) -> Result<Option<R>> {
-    fcall_with_collation(fname, pg_sys::DEFAULT_COLLATION_OID, args)
+pub fn fn_call<R: FromDatum + IntoDatum>(
+    fname: &str,
+    args: &[&dyn FnCallArg],
+) -> Result<Option<R>> {
+    fn_call_with_collation(fname, pg_sys::DEFAULT_COLLATION_OID, args)
 }
 
-pub fn fcall_with_collation<R: FromDatum + IntoDatum>(
+pub fn fn_call_with_collation<R: FromDatum + IntoDatum>(
     fname: &str,
     collation: pg_sys::Oid,
-    args: &[&dyn FCallArg],
+    args: &[&dyn FnCallArg],
 ) -> Result<Option<R>> {
     // lookup the function by its name
     let func_oid = lookup_fn(fname, args)?;
 
     // lookup the function's pg_proc entry and do some validation
-    let pg_proc = PgProc::new(func_oid).ok_or(FCallError::UndefinedFunction)?;
+    let pg_proc = PgProc::new(func_oid).ok_or(FnCallError::UndefinedFunction)?;
     let retoid = pg_proc.prorettype();
 
     //
@@ -215,11 +218,11 @@ pub fn fcall_with_collation<R: FromDatum + IntoDatum>(
     if !matches!(pg_proc.prokind(), ProKind::Function) {
         // It only makes sense to directly call regular functions.  Calling aggregate or window
         // functions is nonsensical
-        return Err(FCallError::UnsupportedFunctionType);
+        return Err(FnCallError::UnsupportedFunctionType);
     } else if pg_proc.proargmodes().iter().any(|mode| *mode != ProArgMode::In) {
         // Right now we only know how to support arguments with the IN mode.  Perhaps in the
         // future we can support IN_OUT and TABLE return types
-        return Err(FCallError::UnsupportedArgumentModes);
+        return Err(FnCallError::UnsupportedArgumentModes);
     } else if retoid == pg_sys::INTERNALOID
         || pg_proc.proargtypes().iter().any(|oid| *oid == pg_sys::INTERNALOID)
     {
@@ -227,10 +230,10 @@ pub fn fcall_with_collation<R: FromDatum + IntoDatum>(
         // has no way to express that with `IntoDatum`.  And passing around raw pointers seem
         // unsafe enough that if someone needs to do that, they probably have the ability to
         // re-implement this function themselves.
-        return Err(FCallError::InternalTypeNotSupported);
+        return Err(FnCallError::InternalTypeNotSupported);
     } else if !R::is_compatible_with(retoid) {
         // the requested Oid of `T` is not compatible with the actual function return type
-        return Err(FCallError::IncompatibleReturnType(R::type_oid(), retoid));
+        return Err(FnCallError::IncompatibleReturnType(R::type_oid(), retoid));
     }
 
     // we're likely going to be able to call the function, so convert our arguments into Datums,
@@ -328,7 +331,7 @@ pub fn fcall_with_collation<R: FromDatum + IntoDatum>(
     }
 }
 
-fn lookup_fn(fname: &str, args: &[&dyn FCallArg]) -> Result<pg_sys::Oid> {
+fn lookup_fn(fname: &str, args: &[&dyn FnCallArg]) -> Result<pg_sys::Oid> {
     // ask Postgres to find the function.  This will look for the possibly-qualified named
     // function following the normal SEARCH_PATH rules, ensuring its argument type Oids
     // exactly match the ones from the user's input arguments.  It does not evaluate the
@@ -336,7 +339,7 @@ fn lookup_fn(fname: &str, args: &[&dyn FCallArg]) -> Result<pg_sys::Oid> {
     let mut parts_list = List::<*mut std::ffi::c_void>::default();
     let result = PgTryBuilder::new(AssertUnwindSafe(|| unsafe {
         let arg_types = args.iter().map(|a| a.type_oid()).collect::<Vec<_>>();
-        let nargs: i16 = arg_types.len().try_into().map_err(|_| FCallError::TooManyArguments)?;
+        let nargs: i16 = arg_types.len().try_into().map_err(|_| FnCallError::TooManyArguments)?;
 
         // parse the function name into its possibly-qualified name parts
         let ident_parts = parse_sql_ident(&fname)?;
@@ -371,10 +374,10 @@ fn lookup_fn(fname: &str, args: &[&dyn FCallArg]) -> Result<pg_sys::Oid> {
         Ok(fnoid)
     }))
     .catch_when(PgSqlErrorCode::ERRCODE_INVALID_PARAMETER_VALUE, |_| {
-        Err(FCallError::InvalidIdentifier(fname.to_string()))
+        Err(FnCallError::InvalidIdentifier(fname.to_string()))
     })
-    .catch_when(PgSqlErrorCode::ERRCODE_AMBIGUOUS_FUNCTION, |_| Err(FCallError::AmbiguousFunction))
-    .catch_when(PgSqlErrorCode::ERRCODE_UNDEFINED_FUNCTION, |_| Err(FCallError::UndefinedFunction))
+    .catch_when(PgSqlErrorCode::ERRCODE_AMBIGUOUS_FUNCTION, |_| Err(FnCallError::AmbiguousFunction))
+    .catch_when(PgSqlErrorCode::ERRCODE_UNDEFINED_FUNCTION, |_| Err(FnCallError::UndefinedFunction))
     .execute();
 
     unsafe {
@@ -398,7 +401,7 @@ fn lookup_fn(fname: &str, args: &[&dyn FCallArg]) -> Result<pg_sys::Oid> {
     result
 }
 
-/// Parses an arbitrary string as if it is a SQL identifier.  If it's not, [`FCallError::InvalidIdentifier`]
+/// Parses an arbitrary string as if it is a SQL identifier.  If it's not, [`FnCallError::InvalidIdentifier`]
 /// is returned
 fn parse_sql_ident(ident: &str) -> Result<Array<&str>> {
     unsafe {
@@ -406,7 +409,7 @@ fn parse_sql_ident(ident: &str) -> Result<Array<&str>> {
             pg_sys::parse_ident,
             &[ident.into_datum(), true.into_datum()],
         )
-        .ok_or_else(|| FCallError::InvalidIdentifier(ident.to_string()))
+        .ok_or_else(|| FnCallError::InvalidIdentifier(ident.to_string()))
     }
 }
 
@@ -420,18 +423,18 @@ fn parse_sql_ident(ident: &str) -> Result<Array<&str>> {
 ///
 /// # Errors
 ///
-/// - [`FCallError::NotDefaultArgument`] if the specified `argnum` does not have a `DEFAULT` clause
-/// - [`FCallError::DefaultNotConstantExpression`] if the `DEFAULT` clause is one we cannot evaluate
+/// - [`FnCallError::NotDefaultArgument`] if the specified `argnum` does not have a `DEFAULT` clause
+/// - [`FnCallError::DefaultNotConstantExpression`] if the `DEFAULT` clause is one we cannot evaluate
 fn create_default_value(pg_proc: &PgProc, argnum: usize) -> Result<Option<pg_sys::Datum>> {
     let non_default_args_cnt = pg_proc.pronargs() - pg_proc.pronargdefaults();
     if argnum < non_default_args_cnt {
-        return Err(FCallError::NotDefaultArgument(argnum));
+        return Err(FnCallError::NotDefaultArgument(argnum));
     }
 
     let default_argnum = argnum - non_default_args_cnt;
-    let default_value_tree = pg_proc.proargdefaults().ok_or(FCallError::NoDefaultArguments)?;
+    let default_value_tree = pg_proc.proargdefaults().ok_or(FnCallError::NoDefaultArguments)?;
     let node =
-        default_value_tree.get(default_argnum).ok_or(FCallError::NotDefaultArgument(argnum))?;
+        default_value_tree.get(default_argnum).ok_or(FnCallError::NotDefaultArgument(argnum))?;
 
     unsafe {
         // SAFETY:  `arg_root` is okay to be the null pointer here, which indicates we don't care
@@ -455,7 +458,7 @@ fn create_default_value(pg_proc: &PgProc, argnum: usize) -> Result<Option<pg_sys
             // NB:  I am not sure this case could ever happen in the context of a function argument
             // `DEFAULT` clause, but if it does, we should let the caller know.  I don't know what
             // they'd do about it other than instead specifying an explicit value for this argnum
-            Err(FCallError::DefaultNotConstantExpression)
+            Err(FnCallError::DefaultNotConstantExpression)
         }
     }
 }

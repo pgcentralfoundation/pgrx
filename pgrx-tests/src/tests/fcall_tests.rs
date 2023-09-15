@@ -53,139 +53,139 @@ mod tests {
 
     #[pg_test]
     fn test_int4eq_eq() {
-        let result = fcall::<bool>("pg_catalog.int4eq", &[&Arg::Value(1), &Arg::Value(1)]);
+        let result = fn_call::<bool>("pg_catalog.int4eq", &[&Arg::Value(1), &Arg::Value(1)]);
         assert_eq!(Ok(Some(true)), result)
     }
 
     #[pg_test]
     fn test_int4eq_ne() {
-        let result = fcall::<bool>("pg_catalog.int4eq", &[&Arg::Value(1), &Arg::Value(2)]);
+        let result = fn_call::<bool>("pg_catalog.int4eq", &[&Arg::Value(1), &Arg::Value(2)]);
         assert_eq!(Ok(Some(false)), result)
     }
 
     #[pg_test]
     fn test_my_int4eq() {
-        let result = fcall::<bool>("tests.my_int4eq", &[&Arg::Value(1), &Arg::Value(1)]);
+        let result = fn_call::<bool>("tests.my_int4eq", &[&Arg::Value(1), &Arg::Value(1)]);
         assert_eq!(Ok(Some(true)), result)
     }
 
     #[pg_test]
     fn test_sql_int4eq() {
-        let result = fcall::<bool>("tests.sql_int4eq", &[&Arg::Value(1), &Arg::Value(1)]);
+        let result = fn_call::<bool>("tests.sql_int4eq", &[&Arg::Value(1), &Arg::Value(1)]);
         assert_eq!(Ok(Some(true)), result)
     }
 
     #[pg_test]
     fn test_null_arg_some() {
-        let result = fcall::<i32>("tests.arg_might_be_null", &[&Arg::Value(1)]);
+        let result = fn_call::<i32>("tests.arg_might_be_null", &[&Arg::Value(1)]);
         assert_eq!(Ok(Some(1)), result)
     }
 
     #[pg_test]
     fn test_null_arg_none() {
-        let result = fcall::<i32>("tests.arg_might_be_null", &[&Arg::<i32>::Null]);
+        let result = fn_call::<i32>("tests.arg_might_be_null", &[&Arg::<i32>::Null]);
         assert_eq!(Ok(None), result)
     }
 
     #[pg_test]
     fn test_strict() {
         // calling a STRICT function such as pg_catalog.float4 with a NULL argument will crash Postgres
-        let result = fcall::<f32>("pg_catalog.float4", &[&Arg::<AnyNumeric>::Null]);
+        let result = fn_call::<f32>("pg_catalog.float4", &[&Arg::<AnyNumeric>::Null]);
         assert_eq!(Ok(None), result);
     }
 
     #[pg_test]
     fn test_incompatible_return_type() {
-        let result = fcall::<String>("pg_catalog.int4eq", &[&Arg::Value(1), &Arg::Value(1)]);
+        let result = fn_call::<String>("pg_catalog.int4eq", &[&Arg::Value(1), &Arg::Value(1)]);
         assert_eq!(
-            Err(FCallError::IncompatibleReturnType(String::type_oid(), pg_sys::BOOLOID)),
+            Err(FnCallError::IncompatibleReturnType(String::type_oid(), pg_sys::BOOLOID)),
             result
         );
     }
 
     #[pg_test]
     fn test_too_many_args() {
-        let args: [&dyn FCallArg; 32768] = [&Arg::Value(1); 32768];
-        let result = fcall::<bool>("pg_catalog.int4eq", &args);
-        assert_eq!(Err(FCallError::TooManyArguments), result);
+        let args: [&dyn FnCallArg; 32768] = [&Arg::Value(1); 32768];
+        let result = fn_call::<bool>("pg_catalog.int4eq", &args);
+        assert_eq!(Err(FnCallError::TooManyArguments), result);
     }
 
     #[pg_test]
     fn test_with_only_default_ambiguous() {
-        let result = fcall::<&str>("tests.with_only_default", &[]);
-        assert_eq!(Err(FCallError::AmbiguousFunction), result);
+        let result = fn_call::<&str>("tests.with_only_default", &[]);
+        assert_eq!(Err(FnCallError::AmbiguousFunction), result);
     }
 
     #[pg_test]
     fn test_with_only_default_int4() {
-        let result = fcall::<&str>("tests.with_only_default", &[&Arg::<i32>::Default]);
+        let result = fn_call::<&str>("tests.with_only_default", &[&Arg::<i32>::Default]);
         assert_eq!(Ok(Some("int4")), result);
     }
 
     #[pg_test]
     fn test_with_only_default_int8() {
-        let result = fcall::<&str>("tests.with_only_default", &[&Arg::<i64>::Default]);
+        let result = fn_call::<&str>("tests.with_only_default", &[&Arg::<i64>::Default]);
         assert_eq!(Ok(Some("int8")), result);
     }
 
     #[pg_test]
     fn test_with_default() {
-        let result = fcall::<i32>("tests.with_default", &[&Arg::Value(42), &Arg::<i32>::Default]);
+        let result = fn_call::<i32>("tests.with_default", &[&Arg::Value(42), &Arg::<i32>::Default]);
         assert_eq!(Ok(Some(42)), result);
     }
 
     #[pg_test]
     fn test_with_two_defaults() {
-        let result = fcall::<i32>("tests.with_two_defaults", &[]);
+        let result = fn_call::<i32>("tests.with_two_defaults", &[]);
         assert_eq!(Ok(Some(0)), result);
 
-        let result = fcall::<i32>("tests.with_two_defaults", &[&Arg::Value(1)]);
+        let result = fn_call::<i32>("tests.with_two_defaults", &[&Arg::Value(1)]);
         assert_eq!(Ok(Some(1)), result);
 
-        let result = fcall::<i32>("tests.with_two_defaults", &[&Arg::Value(1), &Arg::Value(1)]);
+        let result = fn_call::<i32>("tests.with_two_defaults", &[&Arg::Value(1), &Arg::Value(1)]);
         assert_eq!(Ok(Some(2)), result);
     }
 
     #[pg_test]
     fn test_with_arg_and_two_defaults_no_args() {
-        let result = fcall::<i32>("tests.with_arg_and_two_defaults", &[]);
-        assert_eq!(Err(FCallError::NotDefaultArgument(0)), result);
+        let result = fn_call::<i32>("tests.with_arg_and_two_defaults", &[]);
+        assert_eq!(Err(FnCallError::NotDefaultArgument(0)), result);
     }
 
     #[pg_test]
     fn test_with_arg_and_two_defaults_no_args_1_arg() {
-        let result = fcall::<i32>("tests.with_arg_and_two_defaults", &[&Arg::Value(42)]);
+        let result = fn_call::<i32>("tests.with_arg_and_two_defaults", &[&Arg::Value(42)]);
         assert_eq!(Ok(Some(45)), result);
     }
 
     #[pg_test]
     fn test_with_arg_and_two_defaults_no_args_2_args() {
         let result =
-            fcall::<i32>("tests.with_arg_and_two_defaults", &[&Arg::Value(42), &Arg::Value(0)]);
+            fn_call::<i32>("tests.with_arg_and_two_defaults", &[&Arg::Value(42), &Arg::Value(0)]);
         assert_eq!(Ok(Some(44)), result);
     }
 
     #[pg_test]
     fn test_with_null_default() {
-        let result = fcall::<&str>("tests.with_null_default", &[]);
+        let result = fn_call::<&str>("tests.with_null_default", &[]);
         assert_eq!(Ok(None), result);
 
-        let result = fcall::<&str>("tests.with_null_default", &[&Arg::Value("value")]);
+        let result = fn_call::<&str>("tests.with_null_default", &[&Arg::Value("value")]);
         assert_eq!(Ok(Some("value")), result);
     }
 
     #[pg_test]
     fn test_with_functional_default() {
-        let result = fcall::<&str>("tests.with_functional_default", &[]);
+        let result = fn_call::<&str>("tests.with_functional_default", &[]);
         assert_eq!(Ok(None), result);
 
-        let result = fcall::<&str>("tests.with_functional_default", &[&Arg::Value("value")]);
+        let result = fn_call::<&str>("tests.with_functional_default", &[&Arg::Value("value")]);
         assert_eq!(Ok(Some("value")), result);
     }
 
     #[pg_test]
     fn test_with_unspecified_default() {
-        let result = fcall::<i32>("tests.with_default", &[&Arg::Value(42)]);
+        let result = fn_call::<i32>("tests.with_default", &[&Arg::Value(42)]);
         assert_eq!(Ok(Some(42)), result);
     }
 
@@ -193,27 +193,27 @@ mod tests {
     fn test_func_with_collation() {
         // `pg_catalog.texteq` requires a collation, so we use the default
         let result =
-            fcall::<bool>("pg_catalog.texteq", &[&Arg::Value("test"), &Arg::Value("test")]);
+            fn_call::<bool>("pg_catalog.texteq", &[&Arg::Value("test"), &Arg::Value("test")]);
         assert_eq!(Ok(Some(true)), result);
     }
 
     #[pg_test]
     fn unknown_function() {
-        let result = fcall::<()>("undefined_function", &[]);
-        assert_eq!(Err(FCallError::UndefinedFunction), result)
+        let result = fn_call::<()>("undefined_function", &[]);
+        assert_eq!(Err(FnCallError::UndefinedFunction), result)
     }
 
     #[pg_test]
     fn blank_function() {
-        let result = fcall::<()>("", &[]);
-        assert_eq!(Err(FCallError::InvalidIdentifier(String::from(""))), result)
+        let result = fn_call::<()>("", &[]);
+        assert_eq!(Err(FnCallError::InvalidIdentifier(String::from(""))), result)
     }
 
     #[pg_test]
     fn invalid_identifier() {
         let stupid_name = "q234qasf )(A*q2342";
-        let result = fcall::<()>(stupid_name, &[]);
-        assert_eq!(Err(FCallError::InvalidIdentifier(String::from(stupid_name))), result)
+        let result = fn_call::<()>(stupid_name, &[]);
+        assert_eq!(Err(FnCallError::InvalidIdentifier(String::from(stupid_name))), result)
     }
 
     #[pg_test(error = "it worked")]
@@ -231,7 +231,7 @@ mod tests {
             }
 
             let _tracker = Tracker;
-            fcall::<()>("tests.fcall_raise_error", &[&Arg::Value("error message")])
+            fn_call::<()>("tests.fcall_raise_error", &[&Arg::Value("error message")])
                 .expect("fcall failed");
 
             // NB:  we need the Drop impl for Tracker to run here
