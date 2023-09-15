@@ -27,7 +27,6 @@
 #[macro_use]
 extern crate bitflags;
 extern crate alloc;
-extern crate core;
 
 use once_cell::sync::Lazy;
 // expose our various derive macros
@@ -46,6 +45,8 @@ pub mod datum;
 pub mod enum_helper;
 pub mod fcinfo;
 pub mod ffi;
+#[cfg(not(feature = "pg11"))]
+pub mod fn_call;
 pub mod guc;
 pub mod heap_tuple;
 #[cfg(feature = "cshim")]
@@ -61,6 +62,7 @@ pub mod misc;
 #[cfg(feature = "cshim")]
 pub mod namespace;
 pub mod nodes;
+pub mod pg_catalog;
 pub mod pgbox;
 pub mod rel;
 pub mod shmem;

@@ -190,6 +190,17 @@ mod pg_11 {
         unsafe { fcinfo.as_mut() }.unwrap().isnull = true;
         pg_sys::Datum::from(0)
     }
+
+    /// Get the collation the function call shoud use
+    ///
+    /// # Safety
+    ///
+    /// This function is unsafe as we cannot ensure the `fcinfo` argument is a valid
+    /// [`pg_sys::FunctionCallInfo`] pointer.  This is your responsibility.
+    pub unsafe fn pg_get_collation(fcinfo: pg_sys::FunctionCallInfo) -> pg_sys::Oid {
+        let fcinfo = unsafe { fcinfo.as_mut() }.unwrap();
+        fcinfo.fncollation
+    }
 }
 
 #[cfg(any(
@@ -316,6 +327,17 @@ mod pg_12_13_14_15 {
         let fcinfo = unsafe { fcinfo.as_mut() }.unwrap();
         fcinfo.isnull = true;
         pg_sys::Datum::from(0)
+    }
+
+    /// Get the collation the function call shoud use
+    ///
+    /// # Safety
+    ///
+    /// This function is unsafe as we cannot ensure the `fcinfo` argument is a valid
+    /// [`pg_sys::FunctionCallInfo`] pointer.  This is your responsibility.
+    pub unsafe fn pg_get_collation(fcinfo: pg_sys::FunctionCallInfo) -> pg_sys::Oid {
+        let fcinfo = unsafe { fcinfo.as_mut() }.unwrap();
+        fcinfo.fncollation
     }
 }
 

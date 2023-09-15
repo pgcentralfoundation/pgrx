@@ -39,6 +39,7 @@
 #include "catalog/pg_amop.h"
 #include "catalog/pg_authid.h"
 #include "catalog/pg_class.h"
+#include "catalog/pg_collation.h"
 #include "catalog/pg_database.h"
 #include "catalog/pg_enum.h"
 #include "catalog/pg_extension.h"
