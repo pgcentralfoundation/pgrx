@@ -14,7 +14,7 @@ mod tests {
     use crate as pgrx_tests;
     use std::sync::atomic::Ordering;
 
-    use pgrx::fcall::*;
+    use pgrx::fn_call::*;
     use pgrx::prelude::*;
 
     #[pg_extern]

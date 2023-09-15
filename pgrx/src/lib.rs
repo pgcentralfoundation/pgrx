@@ -43,10 +43,10 @@ pub mod bgworkers;
 pub mod callbacks;
 pub mod datum;
 pub mod enum_helper;
-#[cfg(not(feature = "pg11"))]
-pub mod fcall;
 pub mod fcinfo;
 pub mod ffi;
+#[cfg(not(feature = "pg11"))]
+pub mod fn_call;
 pub mod guc;
 pub mod heap_tuple;
 #[cfg(feature = "cshim")]

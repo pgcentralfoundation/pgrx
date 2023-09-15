@@ -158,7 +158,7 @@ pub type Result<T> = std::result::Result<T, FnCallError>;
 /// ```
 ///
 /// ```rust,no_run
-/// use pgrx::fcall::{Arg, fn_call};
+/// use pgrx::fn_call::{Arg, fn_call};
 ///
 /// let array = vec![1,2,3];
 /// let sum = fn_call::<i32>("sum_array", &[&Arg::Value(array)]);
@@ -168,7 +168,7 @@ pub type Result<T> = std::result::Result<T, FnCallError>;
 /// ## Calling a built-in
 ///
 /// ```rust,no_run
-/// use pgrx::fcall::{Arg, fn_call};
+/// use pgrx::fn_call::{Arg, fn_call};
 /// let is_eq = fn_call::<bool>("texteq", &[&Arg::Value("hello"), &Arg::Value("world")]);
 /// assert!(is_eq == Ok(Some(false)));
 /// ```
@@ -180,7 +180,7 @@ pub type Result<T> = std::result::Result<T, FnCallError>;
 /// ```
 ///
 /// ```rust,no_run
-/// use pgrx::fcall::{Arg, fn_call};
+/// use pgrx::fn_call::{Arg, fn_call};
 ///
 /// let product = fn_call::<i64>("mul_by", &[&Arg::Value(42_i64)]);  // uses the default of `2` for `factor`
 /// assert_eq!(product, Ok(Some(84)));
