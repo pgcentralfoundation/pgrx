@@ -25,3 +25,15 @@ extern "C" {
     #[link_name = "pgrx_SpinLockFree"]
     pub fn SpinLockFree(lock: *mut pg_sys::slock_t) -> bool;
 }
+
+/// ```c
+/// #define rt_fetch(rangetable_index, rangetable) \
+///     ((RangeTblEntry *) list_nth(rangetable, (rangetable_index)-1))
+/// ```
+#[inline]
+pub unsafe fn rt_fetch(
+    index: super::Index,
+    range_table: *mut super::List,
+) -> *mut super::RangeTblEntry {
+    pgrx_list_nth(range_table, index as i32 - 1).cast()
+}
