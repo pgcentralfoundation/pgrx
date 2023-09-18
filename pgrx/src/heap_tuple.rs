@@ -367,7 +367,7 @@ impl<'a> PgHeapTuple<'a, AllocatedByRust> {
                             });
                         }
                     } else {
-                        // it's not an array type, so we'll do standard type compatability checks
+                        // it's not an array type, so we'll do standard type compatibility checks
                         let type_oid = T::type_oid();
                         let composite_type_oid = value.composite_type_oid();
                         let is_compatible_composite_types = type_oid == pg_sys::RECORDOID
