@@ -14,6 +14,7 @@ mod attributes_tests;
 mod bgworker_tests;
 mod bytea_tests;
 mod cfg_tests;
+mod composite_type_tests;
 mod datetime_tests;
 mod default_arg_value_tests;
 mod derive_pgtype_lifetimes;
