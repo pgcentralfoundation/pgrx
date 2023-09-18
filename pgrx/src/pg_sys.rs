@@ -12,11 +12,12 @@ pub use pgrx_pg_sys::*;
      ((RangeTblEntry *) list_nth(rangetable, (rangetable_index)-1))
 ```
 */
+#[inline]
 pub unsafe fn rt_fetch(index: Index, range_table: *mut List) -> *mut RangeTblEntry {
     crate::list::List::<*mut core::ffi::c_void>::downcast_ptr(range_table)
-        .unwrap()
+        .expect("rt_fetch used on non-ptr List")
         .get((index - 1) as _)
-        .unwrap()
+        .expect("rt_fetch used out-of-bounds")
         .cast()
 }
 
