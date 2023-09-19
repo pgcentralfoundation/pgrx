@@ -14,8 +14,6 @@ ENV FEDORA_VER=${FEDORA_VER}
 ARG PG_MAJOR_VER
 ENV PG_MAJOR_VER=${PG_MAJOR_VER}
 
-RUN echo "Fedora version: $FEDORA_VER"
-
 RUN dnf install -y https://download.postgresql.org/pub/repos/yum/reporpms/F-"${FEDORA_VER}"-x86_64/pgdg-fedora-repo-latest.noarch.rpm
 RUN dnf install -y \
   clang \
