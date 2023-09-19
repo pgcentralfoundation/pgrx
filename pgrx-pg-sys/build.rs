@@ -15,7 +15,6 @@ use pgrx_pg_config::{
 };
 use quote::{quote, ToTokens};
 use std::collections::{BTreeMap, BTreeSet, HashMap, HashSet};
-use std::fmt::Write;
 use std::fs;
 use std::path::{self, PathBuf}; // disambiguate path::Path and syn::Type::Path
 use std::process::{Command, Output};
