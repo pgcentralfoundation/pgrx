@@ -352,17 +352,34 @@ impl<'a> PgHeapTuple<'a, AllocatedByRust> {
             match self.get_attribute_by_index(attno) {
                 None => return Err(TryFromDatumError::NoSuchAttributeNumber(attno)),
                 Some(att) => {
-                    let type_oid = T::type_oid();
-                    let composite_type_oid = value.composite_type_oid();
-                    let is_compatible_composite_types =
-                        type_oid == pg_sys::RECORDOID && composite_type_oid == Some(att.atttypid);
-                    if !is_compatible_composite_types && !T::is_compatible_with(att.atttypid) {
-                        return Err(TryFromDatumError::IncompatibleTypes {
-                            rust_type: std::any::type_name::<T>(),
-                            rust_oid: att.atttypid,
-                            datum_type: lookup_type_name(type_oid),
-                            datum_oid: type_oid,
-                        });
+                    // if the attribute's type is an array and our incoming value is a composite
+                    // then we need to ensure that the `att.atttypid` is the same as the array type
+                    // of `value`'s type
+                    if pg_sys::type_is_array(att.atttypid) && value.composite_type_oid().is_some() {
+                        let array_of_composite_type_oid = value.composite_type_oid().unwrap();
+
+                        if att.atttypid != array_of_composite_type_oid {
+                            return Err(TryFromDatumError::IncompatibleTypes {
+                                rust_type: std::any::type_name::<T>(),
+                                rust_oid: att.atttypid,
+                                datum_type: lookup_type_name(array_of_composite_type_oid),
+                                datum_oid: array_of_composite_type_oid,
+                            });
+                        }
+                    } else {
+                        // it's not an array type, so we'll do standard type compatibility checks
+                        let type_oid = T::type_oid();
+                        let composite_type_oid = value.composite_type_oid();
+                        let is_compatible_composite_types = type_oid == pg_sys::RECORDOID
+                            && composite_type_oid == Some(att.atttypid);
+                        if !is_compatible_composite_types && !T::is_compatible_with(att.atttypid) {
+                            return Err(TryFromDatumError::IncompatibleTypes {
+                                rust_type: std::any::type_name::<T>(),
+                                rust_oid: att.atttypid,
+                                datum_type: lookup_type_name(type_oid),
+                                datum_oid: type_oid,
+                            });
+                        }
                     }
                 }
             }
