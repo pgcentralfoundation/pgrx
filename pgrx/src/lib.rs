@@ -115,7 +115,7 @@ pub use varlena::*;
 pub use wrappers::*;
 pub use xid::*;
 
-pub use pgrx_pg_sys as pg_sys; // the module only, not its contents
+pub mod pg_sys;
 
 // and re-export these
 pub use pg_sys::elog::PgLogLevel;
