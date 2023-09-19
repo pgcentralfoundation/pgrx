@@ -173,11 +173,12 @@ fn main() -> eyre::Result<()> {
                 ))
             }
         };
+        let found_major = found_ver.major;
         if let Ok(pg_config) = PgConfig::from_env() {
             let major_version = pg_config.major_version()?;
 
-            if major_version != found_ver.major {
-                panic!("Feature flag `pg{found_ver}` does not match version from the environment-described PgConfig (`{major_version}`)")
+            if major_version != found_major {
+                panic!("Feature flag `pg{found_major}` does not match version from the environment-described PgConfig (`{major_version}`)")
             }
             vec![(major_version, pg_config)]
         } else {
