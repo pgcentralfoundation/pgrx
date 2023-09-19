@@ -159,6 +159,7 @@ pub(crate) fn install_extension(
     {
         let mut dest = base_directory.clone();
         dest.push(&pkgdir);
+
         let so_name = if versioned_so {
             let extver = get_version(&package_manifest_path)?;
             // note: versioned so-name format must agree with pgrx-utils
@@ -166,9 +167,17 @@ pub(crate) fn install_extension(
         } else {
             extname.clone()
         };
-        dest.push(format!("{}.so", so_name));
+        // Since Postgres 16, the shared library extension on macOS is `dylib`, not `so`.
+        // Ref https://github.com/postgres/postgres/commit/b55f62abb2c2e07dfae99e19a2b3d7ca9e58dc1a
+        let so_extension = if cfg!(target_os = "macos") && pg_config.major_version().unwrap() >= 16
+        {
+            "dylib"
+        } else {
+            "so"
+        };
+        dest.push(format!("{}.{}", so_name, so_extension));
 
-        // Remove the existing .so if present. This is a workaround for an
+        // Remove the existing shared libraries if present. This is a workaround for an
         // issue highlighted by the following apple documentation:
         // https://developer.apple.com/documentation/security/updating_mac_software
         //

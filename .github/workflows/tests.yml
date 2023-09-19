@@ -385,9 +385,29 @@ jobs:
 
     strategy:
       matrix:
-        os: ["macos-11"]
+        os: ["macos-13"]
+        # Since Postgres 16 on macOS the dynamic library extension is "dylib" (instead of "so" on older versions),
+        # so it's important to test against both versions (with "old" and "new" extensions).
+        #
+        # See https://github.com/pgcentralfoundation/pgrx/pull/1300
+        postgresql: [ 15, 16 ]
 
     steps:
+    - uses: Homebrew/actions/setup-homebrew@master
+
+    # Although we don't use Python per se, if Homebrew has an updated version of Python,
+    # the following steps could fail because GitHub Actions mixed up the linkage.
+    - name: Workaround GitHub Actions Python issues
+      run: brew unlink python && brew link --overwrite python
+
+    - name: brew install postgresql
+      run: |
+        brew install ${FORMULA}
+
+        echo "$(brew --prefix ${FORMULA})/bin" >> $GITHUB_PATH
+      env:
+        FORMULA: postgresql@${{ matrix.postgresql }}
+
     - uses: actions/checkout@v3
 
     - name: Set up prerequisites and environment
