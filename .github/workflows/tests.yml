@@ -151,7 +151,7 @@ jobs:
     - name: Run pgrx-tests with cshim enabled
       run: |
         cargo test \
-          --features "pg$PG_VER cshim" \
+          --features "pg$PG_VER cshim proptest" \
           --package pgrx-tests
 
     - name: Run pgrx-tests with cshim disabled
