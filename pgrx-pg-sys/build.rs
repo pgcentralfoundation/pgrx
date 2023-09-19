@@ -143,37 +143,45 @@ fn main() -> eyre::Result<()> {
             })
             .collect()
     } else {
-        let mut found = None;
+        let mut found = Vec::new();
         for pgver in SUPPORTED_VERSIONS() {
-            if env_tracked(&format!("CARGO_FEATURE_PG{}", pgver.major)).is_none() {
-                continue;
+            if let Some(_) = env_tracked(&format!("CARGO_FEATURE_PG{}", pgver.major)) {
+                found.push(pgver);
             }
-            if found.is_some() {
-                return Err(eyre!("Multiple `pg$VERSION` features found, `--no-default-features` may be required."));
-            }
-            let major = pgver.major;
-            found = Some((pgver, format!("pg{}", major)));
         }
-        let (found_ver, found_feat) = found.ok_or_else(|| {
-            eyre!(
-                "Did not find `pg$VERSION` feature. `pgrx-pg-sys` requires one of {} to be set",
-                SUPPORTED_VERSIONS()
-                    .iter()
-                    .map(|pgver| format!("`pg{}`", pgver.major))
-                    .collect::<Vec<_>>()
-                    .join(", ")
-            )
-        })?;
-
+        let found_ver = match &found[..] {
+            [ver] => ver,
+            [] => {
+                return Err(eyre!(
+                    "Did not find `pg$VERSION` feature. `pgrx-pg-sys` requires one of {} to be set",
+                    SUPPORTED_VERSIONS()
+                        .iter()
+                        .map(|pgver| format!("`pg{}`", pgver.major))
+                        .collect::<Vec<_>>()
+                        .join(", ")
+                ))
+            }
+            versions => {
+                return Err(eyre!(
+                    "Multiple `pg$VERSION` features found.\n`--no-default-features` may be required.\nFound: {}",
+                    versions
+                        .into_iter()
+                        .map(|version| format!("pg{}", version.major))
+                        .collect::<Vec<String>>()
+                        .join(", ")
+                ))
+            }
+        };
+        let found_major = found_ver.major;
         if let Ok(pg_config) = PgConfig::from_env() {
             let major_version = pg_config.major_version()?;
 
-            if major_version != found_ver.major {
-                panic!("Feature flag `pg{found_ver}` does not match version from the environment-described PgConfig (`{major_version}`)")
+            if major_version != found_major {
+                panic!("Feature flag `pg{found_major}` does not match version from the environment-described PgConfig (`{major_version}`)")
             }
             vec![(major_version, pg_config)]
         } else {
-            let specific = Pgrx::from_config()?.get(&found_feat)?;
+            let specific = Pgrx::from_config()?.get(&format!("pg{}", found_ver.major))?;
             vec![(found_ver.major, specific)]
         }
     };
