@@ -573,11 +573,17 @@ impl ToSql for PgExternEntity {
                 Err(err) => return Err(err.into()),
             };
 
+            let schema = self
+                .schema
+                .map(|schema| format!("{}.", schema))
+                .unwrap_or_else(|| context.schema_prefix_for(&self_index));
+
+            eprintln!("schema={schema}");
             let operator_sql = format!("\n\n\
                                                     -- {file}:{line}\n\
                                                     -- {module_path}::{name}\n\
-                                                    CREATE OPERATOR {opname} (\n\
-                                                        \tPROCEDURE=\"{name}\",\n\
+                                                    CREATE OPERATOR {schema}{opname} (\n\
+                                                        \tPROCEDURE={schema}\"{name}\",\n\
                                                         \tLEFTARG={schema_prefix_left}{left_arg}, /* {left_name} */\n\
                                                         \tRIGHTARG={schema_prefix_right}{right_arg}{maybe_comma} /* {right_name} */\n\
                                                         {optionals}\

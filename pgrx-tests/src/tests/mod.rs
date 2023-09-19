@@ -39,6 +39,7 @@ mod name_tests;
 mod numeric_tests;
 mod pg_extern_tests;
 mod pg_guard_tests;
+mod pg_operator_tests;
 mod pg_try_tests;
 mod pgbox_tests;
 mod pgrx_module_qualification;
