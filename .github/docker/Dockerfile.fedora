@@ -7,12 +7,14 @@
 # Note that "PG_MAJOR_VER" build arg in the build step must match the
 # "--features pgXX" in the run step
 
-FROM fedora:36
-
+ARG FEDORA_VER=38
+FROM fedora:${FEDORA_VER}
+ARG FEDORA_VER
+ENV FEDORA_VER=${FEDORA_VER}
 ARG PG_MAJOR_VER
 ENV PG_MAJOR_VER=${PG_MAJOR_VER}
 
-RUN dnf install -y https://download.postgresql.org/pub/repos/yum/reporpms/F-36-x86_64/pgdg-fedora-repo-latest.noarch.rpm
+RUN dnf install -y https://download.postgresql.org/pub/repos/yum/reporpms/F-"${FEDORA_VER}"-x86_64/pgdg-fedora-repo-latest.noarch.rpm
 RUN dnf install -y \
   clang \
   clang-tools-extra \
