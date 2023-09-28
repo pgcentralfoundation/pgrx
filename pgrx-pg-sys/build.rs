@@ -267,12 +267,11 @@ fn generate_bindings(
         .wrap_err_with(|| format!("failed to rewrite items for pg{}", major_version))?;
     let oids = format_builtin_oid_impl(oids);
 
-    let dest_dirs =
-        if is_for_release {
-            vec![build_paths.out_dir.clone(), build_paths.src_dir.clone()]
-        } else {
-            vec![build_paths.out_dir.clone()]
-        };
+    let dest_dirs = if is_for_release {
+        vec![build_paths.out_dir.clone(), build_paths.src_dir.clone()]
+    } else {
+        vec![build_paths.out_dir.clone()]
+    };
     for dest_dir in dest_dirs {
         let mut bindings_file = dest_dir.clone();
         bindings_file.push(&format!("pg{}.rs", major_version));
@@ -450,9 +449,7 @@ fn format_builtin_oid_impl<'a>(
 }
 
 /// Implement our `PgNode` marker trait for `pg_sys::Node` and its "subclasses"
-fn impl_pg_node(
-    items: &Vec<syn::Item>
-) -> eyre::Result<proc_macro2::TokenStream> {
+fn impl_pg_node(items: &Vec<syn::Item>) -> eyre::Result<proc_macro2::TokenStream> {
     let mut pgnode_impls = proc_macro2::TokenStream::new();
 
     // we scope must of the computation so we can borrow `items` and then
