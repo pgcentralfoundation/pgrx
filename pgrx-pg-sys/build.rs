@@ -713,25 +713,34 @@ fn run_bindgen(
     include_h: &PathBuf,
 ) -> eyre::Result<String> {
     eprintln!("Generating bindings for pg{major_version}");
-    let bindings = bindgen::Builder::default()
+    let mut binder = bindgen::Builder::default();
+    binder = add_blocklists(binder);
+    binder = add_derives(binder);
+    let bindings = binder
         .header(include_h.display().to_string())
         .clang_args(&extra_bindgen_clang_args(pg_config)?)
         .clang_args(pg_target_include_flags(major_version, pg_config)?)
         .detect_include_paths(target_env_tracked("PGRX_BINDGEN_NO_DETECT_INCLUDES").is_none())
         .parse_callbacks(Box::new(PgrxOverrides::default()))
-        .blocklist_type("(Nullable)?Datum") // manually wrapping datum types for correctness
+        // The NodeTag enum is closed: additions break existing values in the set, so it is not extensible
+        .rustified_non_exhaustive_enum("NodeTag")
+        .size_t_is_usize(true)
+        .formatter(bindgen::Formatter::None)
+        .layout_tests(false)
+        .generate()
+        .wrap_err_with(|| format!("Unable to generate bindings for pg{}", major_version))?;
+
+    Ok(bindings.to_string())
+}
+
+fn add_blocklists(bind: bindgen::Builder) -> bindgen::Builder {
+    bind.blocklist_type("(Nullable)?Datum") // manually wrapping datum types for correctness
         .blocklist_type("Oid") // "Oid" is not just any u32
         .blocklist_function("varsize_any") // pgrx converts the VARSIZE_ANY macro, so we don't want to also have this function, which is in heaptuple.c
         .blocklist_function("(?:query|expression)_tree_walker")
         .blocklist_function(".*(?:set|long)jmp")
         .blocklist_function("pg_re_throw")
-        .blocklist_function("errstart")
-        .blocklist_function("errcode")
-        .blocklist_function("errmsg")
-        .blocklist_function("errdetail")
-        .blocklist_function("errcontext_msg")
-        .blocklist_function("errhint")
-        .blocklist_function("errfinish")
+        .blocklist_function("err(start|code|msg|detail|context_msg|hint|finish)")
         .blocklist_item("CONFIGURE_ARGS") // configuration during build is hopefully irrelevant
         .blocklist_item("_*(?:HAVE|have)_.*") // header tracking metadata
         .blocklist_item("_[A-Z_]+_H") // more header metadata
@@ -749,23 +758,17 @@ fn run_bindgen(
         .blocklist_function("(?:sigstack|sigreturn|siggetmask|gets|vfork|te?mpnam(?:_r)?|mktemp)")
         // Missing on some systems, despite being in their headers.
         .blocklist_function("inet_net_pton.*")
-        .size_t_is_usize(true)
-        // The NodeTag enum is closed: additions break existing values in the set, so it is not extensible
-        .rustified_non_exhaustive_enum("NodeTag")
-        .formatter(bindgen::Formatter::None)
-        .derive_debug(true)
-        .derive_copy(true) // necessary to avoid __BindgenUnionField usages -- I don't understand why?
+}
+
+fn add_derives(bind: bindgen::Builder) -> bindgen::Builder {
+    bind.derive_debug(true)
+        .derive_copy(true)
         .derive_default(true)
         .derive_eq(false)
         .derive_partialeq(false)
         .derive_hash(false)
         .derive_ord(false)
         .derive_partialord(false)
-        .layout_tests(false)
-        .generate()
-        .wrap_err_with(|| format!("Unable to generate bindings for pg{}", major_version))?;
-
-    Ok(bindings.to_string())
 }
 
 fn env_tracked(s: &str) -> Option<String> {
