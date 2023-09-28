@@ -532,7 +532,7 @@ fn impl_pg_node(
         pgnode_impls.extend(quote! {
             impl ::core::fmt::Display for #struct_name {
                 fn fmt(&self, f: &mut ::core::fmt::Formatter<'_>) -> ::core::fmt::Result {
-                    f.write_str(&self.display_node())
+                    self.display_node().fmt(f)
                 }
             }
         });
