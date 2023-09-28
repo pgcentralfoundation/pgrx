@@ -14,6 +14,7 @@ use pgrx_pg_config::{
     is_supported_major_version, prefix_path, PgConfig, PgConfigSelector, Pgrx, SUPPORTED_VERSIONS,
 };
 use quote::{quote, ToTokens};
+use std::cmp::Ordering;
 use std::collections::{BTreeMap, BTreeSet, HashMap, HashSet};
 use std::fs;
 use std::path::{self, PathBuf}; // disambiguate path::Path and syn::Type::Path
@@ -262,16 +263,15 @@ fn generate_bindings(
         .wrap_err_with(|| format!("bindgen failed for pg{}", major_version))?;
 
     let oids = extract_oids(&bindgen_output);
-    let rewritten_items = rewrite_items(&bindgen_output, &oids, is_for_release)
+    let rewritten_items = rewrite_items(&bindgen_output, &oids)
         .wrap_err_with(|| format!("failed to rewrite items for pg{}", major_version))?;
     let oids = format_builtin_oid_impl(oids);
 
-    let dest_dirs =
-        if env_tracked("PGRX_PG_SYS_GENERATE_BINDINGS_FOR_RELEASE").as_deref() == Some("1") {
-            vec![build_paths.out_dir.clone(), build_paths.src_dir.clone()]
-        } else {
-            vec![build_paths.out_dir.clone()]
-        };
+    let dest_dirs = if is_for_release {
+        vec![build_paths.out_dir.clone(), build_paths.src_dir.clone()]
+    } else {
+        vec![build_paths.out_dir.clone()]
+    };
     for dest_dir in dest_dirs {
         let mut bindings_file = dest_dir.clone();
         bindings_file.push(&format!("pg{}.rs", major_version));
@@ -352,11 +352,10 @@ fn write_rs_file(
 fn rewrite_items(
     file: &syn::File,
     oids: &BTreeMap<syn::Ident, Box<syn::Expr>>,
-    is_for_release: bool,
 ) -> eyre::Result<proc_macro2::TokenStream> {
     let items_vec = rewrite_oid_consts(&file.items, oids);
     let mut items = apply_pg_guard(&items_vec)?;
-    let pgnode_impls = impl_pg_node(&items_vec, is_for_release)?;
+    let pgnode_impls = impl_pg_node(&items_vec)?;
 
     // append the pgnodes to the set of items
     items.extend(pgnode_impls);
@@ -450,10 +449,7 @@ fn format_builtin_oid_impl<'a>(
 }
 
 /// Implement our `PgNode` marker trait for `pg_sys::Node` and its "subclasses"
-fn impl_pg_node(
-    items: &Vec<syn::Item>,
-    is_for_release: bool,
-) -> eyre::Result<proc_macro2::TokenStream> {
+fn impl_pg_node(items: &Vec<syn::Item>) -> eyre::Result<proc_macro2::TokenStream> {
     let mut pgnode_impls = proc_macro2::TokenStream::new();
 
     // we scope must of the computation so we can borrow `items` and then
@@ -500,7 +496,7 @@ fn impl_pg_node(
     }
 
     // the set of types which subclass `Node` according to postgres' object system
-    let mut node_set = HashSet::new();
+    let mut node_set = BTreeSet::new();
     // fill in any children of the roots with a recursive DFS
     // (we are not operating on user input, so it is ok to just
     //  use direct recursion rather than an explicit stack).
@@ -508,18 +504,8 @@ fn impl_pg_node(
         dfs_find_nodes(root, &struct_graph, &mut node_set);
     }
 
-    let nodes: Box<dyn std::iter::Iterator<Item = StructDescriptor>> = if is_for_release {
-        // if it's for release we want to sort by struct name to avoid diff churn
-        let mut set = node_set.into_iter().collect::<Vec<_>>();
-        set.sort_by(|a, b| a.struct_.ident.cmp(&b.struct_.ident));
-        Box::new(set.into_iter())
-    } else {
-        // otherwise we don't care and want to avoid the CPU overhead of sorting
-        Box::new(node_set.into_iter())
-    };
-
     // now we can finally iterate the Nodes and emit out Display impl
-    for node_struct in nodes {
+    for node_struct in node_set.into_iter() {
         let struct_name = &node_struct.struct_.ident;
 
         // impl the PgNode trait for all nodes
@@ -545,7 +531,7 @@ fn impl_pg_node(
 fn dfs_find_nodes<'graph>(
     node: &'graph StructDescriptor<'graph>,
     graph: &'graph StructGraph<'graph>,
-    node_set: &mut HashSet<StructDescriptor<'graph>>,
+    node_set: &mut BTreeSet<StructDescriptor<'graph>>,
 ) {
     node_set.insert(node.clone());
 
@@ -682,6 +668,20 @@ struct StructDescriptor<'a> {
     parent: Option<usize>,
     /// The offsets of the "children" structs (if any).
     children: Vec<usize>,
+}
+
+impl PartialOrd for StructDescriptor<'_> {
+    #[inline]
+    fn partial_cmp(&self, other: &StructDescriptor) -> Option<Ordering> {
+        Some(self.cmp(other))
+    }
+}
+
+impl Ord for StructDescriptor<'_> {
+    #[inline]
+    fn cmp(&self, other: &StructDescriptor) -> Ordering {
+        self.struct_.ident.cmp(&other.struct_.ident)
+    }
 }
 
 fn get_bindings(
