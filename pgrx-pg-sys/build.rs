@@ -725,6 +725,7 @@ fn run_bindgen(
         // The NodeTag enum is closed: additions break existing values in the set, so it is not extensible
         .rustified_non_exhaustive_enum("NodeTag")
         .size_t_is_usize(true)
+        .merge_extern_blocks(true)
         .formatter(bindgen::Formatter::None)
         .layout_tests(false)
         .generate()
@@ -1039,20 +1040,18 @@ fn apply_pg_guard(items: &Vec<syn::Item>) -> eyre::Result<proc_macro2::TokenStre
         match item {
             Item::ForeignMod(block) => {
                 let abi = &block.abi;
-                for item in &block.items {
-                    if is_blocklisted_item(item) {
-                        continue;
-                    }
-                    match item {
-                        ForeignItem::Fn(func) => {
-                            out.extend(quote! {
-                                #[pgrx_macros::pg_guard]
-                                #abi { #func }
-                            });
-                        }
-                        other => out.extend(quote! { #abi { #other } }),
-                    }
-                }
+                let (mut extern_funcs, mut others) = (Vec::new(), Vec::new());
+                block.items.iter().cloned().filter(|item| !is_blocklisted_item(item)).for_each(
+                    |item| match item {
+                        ForeignItem::Fn(func) => extern_funcs.push(func),
+                        item => others.push(item),
+                    },
+                );
+                out.extend(quote! {
+                    #[pgrx_macros::pg_guard]
+                    #abi { #(#extern_funcs)* }
+                });
+                out.extend(quote! { #abi { #(#others)* } });
             }
             _ => {
                 out.extend(item.into_token_stream());
