@@ -10,8 +10,10 @@
 //! Enforces thread-safety in `pgrx`.
 //!
 //! It's UB to call into Postgres functions from multiple threads. We handle
-//! this by remembering the first thread to call into postgres functions, and
-//! panicking if we're called from a different thread.
+//! this by remembering the first thread to call into postgres functions (the
+//! "active thread" in some comments), and panicking if we're called from a
+//! different thread. On some OSes, we (attempt to) verify that the active
+//! thread is actually the main thread too.
 //!
 //! This is called from the current crate from inside the setjmp shim, as that
 //! code is *definitely* unsound to call in the presence of multiple threads.
@@ -38,8 +40,60 @@ pub(crate) fn check_active_thread() {
     }
 }
 
+/// Use OS-specific mechanisms to detect if we're the process main thread, if
+/// supported on the OS. Should return `None` when unsupported, or if there's an
+/// error.
+///
+/// Concretely, it is very important that this not return `Some(false)`
+/// incorrectly, but the other values are less important. Callers generally
+/// should compare the result against `Some(false)`.
+fn is_os_main_thread() -> Option<bool> {
+    #[cfg(any(target_os = "macos", target_os = "openbsd", target_os = "freebsd"))]
+    return unsafe {
+        match libc::pthread_main_np() {
+            1 => Some(true),
+            0 => Some(false),
+            // Note that this returns `-1` in some error conditions.
+            //
+            // In these cases we are almost certainly not the main thread, but
+            // we don't know -- it's better for this function to return `None`
+            // in cases of uncertainty.
+            _ => None,
+        }
+    };
+    #[cfg(target_os = "linux")]
+    return unsafe {
+        // Note: `gettid()` are only in glibc 2.30+ / musl 1.2.2+, which are
+        // somewhat recent (2019 for glibc, late 2020 for musl). I'm unsure what
+        // pgrx's support requirements are, but we have docs about usage on centos7,
+        // which predates glibc 2.30...
+        //
+        // So for now, we just use the raw syscall instead, which is available
+        // in all versions of linux that Rust supports (exposing `gettid()` from
+        // glibc was extremely contentious for various reasons).
+        let tid = libc::syscall(libc::SYS_gettid) as core::ffi::c_long;
+        let pid = libc::getpid() as core::ffi::c_long;
+        Some(tid == pid)
+    };
+    // hacky cfg-if
+    #[allow(unreachable_code)]
+    {
+        None
+    }
+}
+
 #[track_caller]
 fn init_active_thread(tid: NonZeroUsize) {
+    // Check if we're the actual honest-to-god main thread (if we know). Or at
+    // least make sure we detect cases where we're definitely *not* the OS main
+    // thread.
+    //
+    // This avoids a case where Rust and Postgres disagree about the main
+    // thread. Such cases are almost certainly going to fail the thread check
+    // *eventually*.
+    if is_os_main_thread() == Some(false) {
+        panic!("Attempt to initialize `pgrx` active thread from a thread other than the main");
+    }
     match ACTIVE_THREAD.compare_exchange(0, tid.get(), Ordering::Relaxed, Ordering::Relaxed) {
         Ok(_) => unsafe {
             // We won the race. Register an atfork handler to clear the atomic
@@ -59,6 +113,8 @@ fn init_active_thread(tid: NonZeroUsize) {
 #[inline(never)]
 #[track_caller]
 fn thread_id_check_failed() -> ! {
+    // I don't think this can ever happen, but it would be a bug if it could.
+    assert_ne!(is_os_main_thread(), Some(true), "`pgrx` active thread is not the main thread!?");
     panic!(
         "{}:  postgres FFI may not not be called from multiple threads.",
         std::panic::Location::caller()
