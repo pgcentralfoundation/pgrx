@@ -121,6 +121,7 @@ impl CommandExecute for Schema {
             self.dot,
             log_level,
             self.skip_build,
+            &mut vec![],
         )
     }
 }
@@ -192,6 +193,7 @@ pub(crate) fn generate_schema(
     dot: Option<impl AsRef<std::path::Path>>,
     log_level: Option<String>,
     skip_build: bool,
+    output_tracking: &mut Vec<PathBuf>,
 ) -> eyre::Result<()> {
     check_rust_version()?;
     let manifest = Manifest::from_path(&package_manifest_path)?;
@@ -445,6 +447,7 @@ pub(crate) fn generate_schema(
         pgrx_sql
             .to_file(out_path)
             .wrap_err_with(|| eyre!("Could not write SQL to {}", out_path.display()))?;
+        output_tracking.push(out_path.to_path_buf());
     } else {
         eprintln!("{} SQL entities to {}", "     Writing".bold().green(), "/dev/stdout".cyan(),);
         pgrx_sql

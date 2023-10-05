@@ -95,7 +95,8 @@ impl CommandExecute for Install {
             self.test,
             None,
             &self.features,
-        )
+        )?;
+        Ok(())
     }
 }
 
@@ -115,7 +116,8 @@ pub(crate) fn install_extension(
     is_test: bool,
     base_directory: Option<PathBuf>,
     features: &clap_cargo::Features,
-) -> eyre::Result<()> {
+) -> eyre::Result<Vec<PathBuf>> {
+    let mut output_tracking = Vec::new();
     let base_directory = base_directory.unwrap_or_else(|| PathBuf::from("/"));
     tracing::Span::current()
         .record("base_directory", &tracing::field::display(&base_directory.display()));
@@ -153,7 +155,14 @@ pub(crate) fn install_extension(
                 .file_name()
                 .ok_or_else(|| eyre!("Could not get filename for `{}`", control_file.display()))?,
         );
-        copy_file(&control_file, &dest, "control file", true, &package_manifest_path)?;
+        copy_file(
+            &control_file,
+            &dest,
+            "control file",
+            true,
+            &package_manifest_path,
+            &mut output_tracking,
+        )?;
     }
 
     {
@@ -190,7 +199,14 @@ pub(crate) fn install_extension(
                 .wrap_err_with(|| format!("unable to remove existing file {}", dest.display()))?;
         }
 
-        copy_file(&shlibpath, &dest, "shared library", false, &package_manifest_path)?;
+        copy_file(
+            &shlibpath,
+            &dest,
+            "shared library",
+            false,
+            &package_manifest_path,
+            &mut output_tracking,
+        )?;
     }
 
     copy_sql_files(
@@ -204,10 +220,11 @@ pub(crate) fn install_extension(
         &extdir,
         &base_directory,
         true,
+        &mut output_tracking,
     )?;
 
     println!("{} installing {}", "    Finished".bold().green(), extname);
-    Ok(())
+    Ok(output_tracking)
 }
 
 fn copy_file(
@@ -216,6 +233,7 @@ fn copy_file(
     msg: &str,
     do_filter: bool,
     package_manifest_path: impl AsRef<Path>,
+    output_tracking: &mut Vec<PathBuf>,
 ) -> eyre::Result<()> {
     let Some(dest_dir) = dest.parent() else {
         // what fresh hell could ever cause such an error?
@@ -246,6 +264,8 @@ fn copy_file(
             format!("failed copying `{}` to `{}`", src.display(), dest.display())
         })?;
     }
+
+    output_tracking.push(dest.clone());
 
     Ok(())
 }
@@ -332,6 +352,7 @@ fn copy_sql_files(
     extdir: &PathBuf,
     base_directory: &PathBuf,
     skip_build: bool,
+    output_tracking: &mut Vec<PathBuf>,
 ) -> eyre::Result<()> {
     let dest = get_target_sql_file(&package_manifest_path, extdir, base_directory)?;
     let (_, extname) = find_control_file(&package_manifest_path)?;
@@ -348,6 +369,7 @@ fn copy_sql_files(
         Option::<String>::None,
         None,
         skip_build,
+        output_tracking,
     )?;
 
     // now copy all the version upgrade files too
@@ -367,6 +389,7 @@ fn copy_sql_files(
                         "extension schema upgrade file",
                         true,
                         &package_manifest_path,
+                        output_tracking,
                     )?;
                 }
             }

@@ -22,34 +22,33 @@ use std::path::{Path, PathBuf};
 pub(crate) struct Package {
     /// Package to build (see `cargo help pkgid`)
     #[clap(long, short)]
-    package: Option<String>,
+    pub(crate) package: Option<String>,
     /// Path to Cargo.toml
     #[clap(long, value_parser)]
-    manifest_path: Option<PathBuf>,
+    pub(crate) manifest_path: Option<PathBuf>,
     /// Compile for debug mode (default is release)
     #[clap(long, short)]
-    debug: bool,
+    pub(crate) debug: bool,
     /// Specific profile to use (conflicts with `--debug`)
     #[clap(long)]
-    profile: Option<String>,
+    pub(crate) profile: Option<String>,
     /// Build in test mode (for `cargo pgrx test`)
     #[clap(long)]
-    test: bool,
+    pub(crate) test: bool,
     /// The `pg_config` path (default is first in $PATH)
     #[clap(long, short = 'c', value_parser)]
-    pg_config: Option<PathBuf>,
+    pub(crate) pg_config: Option<PathBuf>,
     /// The directory to output the package (default is `./target/[debug|release]/extname-pgXX/`)
     #[clap(long, value_parser)]
-    out_dir: Option<PathBuf>,
+    pub(crate) out_dir: Option<PathBuf>,
     #[clap(flatten)]
-    features: clap_cargo::Features,
+    pub(crate) features: clap_cargo::Features,
     #[clap(from_global, action = ArgAction::Count)]
-    verbose: u8,
+    pub(crate) verbose: u8,
 }
 
-impl CommandExecute for Package {
-    #[tracing::instrument(level = "error", skip(self))]
-    fn execute(mut self) -> eyre::Result<()> {
+impl Package {
+    pub(crate) fn perform(mut self) -> eyre::Result<(PathBuf, Vec<PathBuf>)> {
         let metadata = crate::metadata::metadata(&self.features, self.manifest_path.as_ref())
             .wrap_err("couldn't get cargo metadata")?;
         crate::metadata::validate(self.manifest_path.as_ref(), &metadata)?;
@@ -82,16 +81,27 @@ impl CommandExecute for Package {
         } else {
             build_base_path(&pg_config, &package_manifest_path, &profile)?
         };
-        package_extension(
+
+        let output_files = package_extension(
             self.manifest_path.as_ref(),
             self.package.as_ref(),
             &package_manifest_path,
             &pg_config,
-            out_dir,
+            out_dir.clone(),
             &profile,
             self.test,
             &self.features,
-        )
+        )?;
+
+        Ok((out_dir, output_files))
+    }
+}
+
+impl CommandExecute for Package {
+    #[tracing::instrument(level = "error", skip(self))]
+    fn execute(self) -> eyre::Result<()> {
+        self.perform()?;
+        Ok(())
     }
 }
 
@@ -109,7 +119,7 @@ pub(crate) fn package_extension(
     profile: &CargoProfile,
     is_test: bool,
     features: &clap_cargo::Features,
-) -> eyre::Result<()> {
+) -> eyre::Result<Vec<PathBuf>> {
     let out_dir_exists = out_dir.try_exists().wrap_err_with(|| {
         format!("failed to access {} while packaging extension", out_dir.display())
     })?;
@@ -130,7 +140,7 @@ pub(crate) fn package_extension(
     )
 }
 
-fn build_base_path(
+pub(crate) fn build_base_path(
     pg_config: &PgConfig,
     manifest_path: impl AsRef<Path>,
     profile: &CargoProfile,
