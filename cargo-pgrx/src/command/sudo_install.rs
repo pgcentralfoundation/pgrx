@@ -16,9 +16,9 @@ pub(crate) struct SudoInstall {
     /// Path to Cargo.toml
     #[clap(long, value_parser)]
     manifest_path: Option<PathBuf>,
-    /// Compile for debug mode (default is true)
-    #[clap(long, short, default_value_t = true)]
-    debug: bool,
+    /// Compile for release mode (default is debug)
+    #[clap(long, short)]
+    release: bool,
     /// Specific profile to use (conflicts with `--debug`)
     #[clap(long)]
     profile: Option<String>,
@@ -42,7 +42,7 @@ impl From<SudoInstall> for Package {
         Package {
             package: value.package,
             manifest_path: value.manifest_path,
-            debug: value.debug,
+            debug: !value.release,
             profile: value.profile,
             test: value.test,
             pg_config: value.pg_config,
