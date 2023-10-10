@@ -3,38 +3,38 @@ use std::process::Command;
 
 use owo_colors::OwoColorize;
 
+use crate::command::install::Install;
 use crate::command::package::Package;
 use crate::CommandExecute;
 
 /// Like `cargo pgrx install`, but uses `sudo` to copy the extension files
-#[derive(clap::Args, Debug, Clone)]
-#[clap(author)]
+#[derive(Debug, Clone)]
 pub(crate) struct SudoInstall {
-    /// Package to build (see `cargo help pkgid`)
-    #[clap(long, short)]
     package: Option<String>,
-    /// Path to Cargo.toml
-    #[clap(long, value_parser)]
     manifest_path: Option<PathBuf>,
-    /// Compile for release mode (default is debug)
-    #[clap(long, short)]
     release: bool,
-    /// Specific profile to use (conflicts with `--debug`)
-    #[clap(long)]
     profile: Option<String>,
-    /// Build in test mode (for `cargo pgrx test`)
-    #[clap(long)]
     test: bool,
-    /// The `pg_config` path (default is first in $PATH)
-    #[clap(long, short = 'c', value_parser)]
     pg_config: Option<PathBuf>,
-    /// The directory to output the package (default is `./target/[debug|release]/extname-pgXX/`)
-    #[clap(long, value_parser)]
     out_dir: Option<PathBuf>,
-    #[clap(flatten)]
     features: clap_cargo::Features,
-    #[clap(from_global, action = ArgAction::Count)]
     verbose: u8,
+}
+
+impl From<Install> for SudoInstall {
+    fn from(value: Install) -> Self {
+        Self {
+            package: value.package,
+            manifest_path: value.manifest_path,
+            release: value.release,
+            profile: value.profile,
+            test: value.test,
+            pg_config: value.pg_config.map(|path| PathBuf::from(path)),
+            out_dir: None,
+            features: value.features,
+            verbose: value.verbose,
+        }
+    }
 }
 
 impl From<SudoInstall> for Package {
@@ -73,17 +73,21 @@ impl CommandExecute for SudoInstall {
 
             // we're about to run `sudo` to copy some files, one at a time
             let mut command = Command::new("sudo"); // NB:  If we ever support Windows...
-            command.arg("cp").arg(src).arg(dest);
+            command.arg("cp").arg(&src).arg(&dest);
 
-            println!("{} {:?}", "     Running".bold().green(), command);
-            let output = command.output()?;
-            if !output.status.success() {
-                // it didn't work, so print out sudo's stdout and stderr streams
-                println!("{}", String::from_utf8_lossy(&output.stdout));
-                eprintln!("{}", String::from_utf8_lossy(&output.stderr));
+            println!(
+                "{} sudo cp {} {}",
+                "       Running".bold().green(),
+                src.display(),
+                dest.display()
+            );
+            let mut child = command.spawn()?;
 
-                // and just exit now
-                std::process::exit(output.status.code().unwrap_or(1));
+            let status = child.wait()?;
+            if !status.success() {
+                // sudo failed.  let the user know and get out now
+                eprintln!("sudo command failed with status `{}`", &format!("{status:?}").red());
+                std::process::exit(status.code().unwrap_or(1));
             }
         }
 

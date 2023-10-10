@@ -8,6 +8,7 @@
 //LICENSE
 //LICENSE Use of this source code is governed by the MIT license that can be found in the LICENSE file.
 use crate::command::get::{find_control_file, get_property};
+use crate::command::sudo_install::SudoInstall;
 use crate::manifest::{display_version_info, PgVersionSource};
 use crate::profile::CargoProfile;
 use crate::CommandExecute;
@@ -33,31 +34,41 @@ type MemoizeKeyValue = Arc<Mutex<HashMap<PathBuf, String>>>;
 pub(crate) struct Install {
     /// Package to build (see `cargo help pkgid`)
     #[clap(long, short)]
-    package: Option<String>,
+    pub(crate) package: Option<String>,
     /// Path to Cargo.toml
     #[clap(long, value_parser)]
-    manifest_path: Option<PathBuf>,
+    pub(crate) manifest_path: Option<PathBuf>,
     /// Compile for release mode (default is debug)
     #[clap(long, short)]
-    release: bool,
+    pub(crate) release: bool,
     /// Specific profile to use (conflicts with `--release`)
     #[clap(long)]
-    profile: Option<String>,
+    pub(crate) profile: Option<String>,
     /// Build in test mode (for `cargo pgrx test`)
     #[clap(long)]
-    test: bool,
+    pub(crate) test: bool,
     /// The `pg_config` path (default is first in $PATH)
     #[clap(long, short = 'c')]
-    pg_config: Option<String>,
+    pub(crate) pg_config: Option<String>,
+    /// Use `sudo` to install the extension artifacts
+    #[clap(long, short = 's')]
+    sudo: bool,
     #[clap(flatten)]
-    features: clap_cargo::Features,
+    pub(crate) features: clap_cargo::Features,
     #[clap(from_global, action = ArgAction::Count)]
-    verbose: u8,
+    pub(crate) verbose: u8,
 }
 
 impl CommandExecute for Install {
     #[tracing::instrument(level = "error", skip(self))]
     fn execute(mut self) -> eyre::Result<()> {
+        if self.sudo {
+            // user wishes to use `sudo` to install the extension
+            // so we re-route through the `SudoInstall` type
+            let sudo_install = SudoInstall::from(self);
+            return sudo_install.execute();
+        }
+
         let metadata = crate::metadata::metadata(&self.features, self.manifest_path.as_ref())
             .wrap_err("couldn't get cargo metadata")?;
         crate::metadata::validate(self.manifest_path.as_ref(), &metadata)?;
