@@ -97,6 +97,11 @@ jobs:
           postgresql-$PG_VER \
           postgresql-server-dev-$PG_VER
 
+        echo ""
+        echo "----- pg_config -----"
+        pg_config
+        echo ""
+
 
     - name: Set up PostgreSQL permissions
       run: sudo chmod a+rwx `/usr/lib/postgresql/$PG_VER/bin/pg_config --pkglibdir` `/usr/lib/postgresql/$PG_VER/bin/pg_config --sharedir`/extension /var/run/postgresql/
