@@ -68,6 +68,7 @@
 #include "commands/user.h"
 #include "commands/vacuum.h"
 #include "common/config_info.h"
+#include "common/controldata_utils.h"
 #include "executor/executor.h"
 #include "executor/spi.h"
 #include "executor/tuptable.h"
