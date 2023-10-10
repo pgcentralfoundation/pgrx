@@ -53,22 +53,21 @@ jobs:
         echo ""
 
         echo "----- Remove old postgres -----"
-        sudo apt remove -y '^postgres.*' '^libpq.*'
+        sudo apt remove -y '^postgres.*' '^libpq.*' '^clang.*' '^llvm.*' '^libclang.*' '^libllvm.*' '^mono-llvm.*'
         echo ""
 
         echo "----- Install system dependencies -----"
-        sudo apt-get update && sudo apt-get install -y \
-          clang-11 \
-          llvm-11 \
-          clang \
-          gcc \
-          make \
+        sudo apt-get install -y \
           build-essential \
-          libz-dev \
-          zlib1g-dev \
-          strace \
+          llvm-14-dev libclang-14-dev clang-14 \
+          gcc \
           libssl-dev \
-          pkg-config
+          libz-dev \
+          make \
+          pkg-config \
+          strace \
+          zlib1g-dev
+        echo ""
 
         echo "----- Set up cross compilation -----"
         sudo apt-get install -y --fix-missing crossbuild-essential-arm64
@@ -296,23 +295,21 @@ jobs:
         cat $GITHUB_ENV
         echo ""
 
-        echo "----- Remove existing installations of postgres -----"
-        sudo apt remove -y '^postgres.*' '^libpq.*'
+        echo "----- Remove old postgres -----"
+        sudo apt remove -y '^postgres.*' '^libpq.*' '^clang.*' '^llvm.*' '^libclang.*' '^libllvm.*' '^mono-llvm.*'
         echo ""
 
         echo "----- Install system dependencies -----"
         sudo apt-get install -y \
-          clang-11 \
-          llvm-11 \
-          clang \
-          gcc \
-          make \
           build-essential \
-          libz-dev \
-          zlib1g-dev \
-          strace \
+          llvm-14-dev libclang-14-dev clang-14 \
+          gcc \
           libssl-dev \
-          pkg-config
+          libz-dev \
+          make \
+          pkg-config \
+          strace \
+          zlib1g-dev
         echo ""
 
         echo "----- Output Cargo version -----"
