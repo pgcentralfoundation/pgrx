@@ -8,6 +8,7 @@
 //LICENSE
 //LICENSE Use of this source code is governed by the MIT license that can be found in the LICENSE file.
 use crate::command::get::{find_control_file, get_property};
+use crate::command::sudo_install::SudoInstall;
 use crate::manifest::{display_version_info, PgVersionSource};
 use crate::profile::CargoProfile;
 use crate::CommandExecute;
@@ -33,31 +34,41 @@ type MemoizeKeyValue = Arc<Mutex<HashMap<PathBuf, String>>>;
 pub(crate) struct Install {
     /// Package to build (see `cargo help pkgid`)
     #[clap(long, short)]
-    package: Option<String>,
+    pub(crate) package: Option<String>,
     /// Path to Cargo.toml
     #[clap(long, value_parser)]
-    manifest_path: Option<PathBuf>,
+    pub(crate) manifest_path: Option<PathBuf>,
     /// Compile for release mode (default is debug)
     #[clap(long, short)]
-    release: bool,
+    pub(crate) release: bool,
     /// Specific profile to use (conflicts with `--release`)
     #[clap(long)]
-    profile: Option<String>,
+    pub(crate) profile: Option<String>,
     /// Build in test mode (for `cargo pgrx test`)
     #[clap(long)]
-    test: bool,
+    pub(crate) test: bool,
     /// The `pg_config` path (default is first in $PATH)
     #[clap(long, short = 'c')]
-    pg_config: Option<String>,
+    pub(crate) pg_config: Option<String>,
+    /// Use `sudo` to install the extension artifacts
+    #[clap(long, short = 's')]
+    sudo: bool,
     #[clap(flatten)]
-    features: clap_cargo::Features,
+    pub(crate) features: clap_cargo::Features,
     #[clap(from_global, action = ArgAction::Count)]
-    verbose: u8,
+    pub(crate) verbose: u8,
 }
 
 impl CommandExecute for Install {
     #[tracing::instrument(level = "error", skip(self))]
     fn execute(mut self) -> eyre::Result<()> {
+        if self.sudo {
+            // user wishes to use `sudo` to install the extension
+            // so we re-route through the `SudoInstall` type
+            let sudo_install = SudoInstall::from(self);
+            return sudo_install.execute();
+        }
+
         let metadata = crate::metadata::metadata(&self.features, self.manifest_path.as_ref())
             .wrap_err("couldn't get cargo metadata")?;
         crate::metadata::validate(self.manifest_path.as_ref(), &metadata)?;
@@ -95,7 +106,8 @@ impl CommandExecute for Install {
             self.test,
             None,
             &self.features,
-        )
+        )?;
+        Ok(())
     }
 }
 
@@ -115,7 +127,8 @@ pub(crate) fn install_extension(
     is_test: bool,
     base_directory: Option<PathBuf>,
     features: &clap_cargo::Features,
-) -> eyre::Result<()> {
+) -> eyre::Result<Vec<PathBuf>> {
+    let mut output_tracking = Vec::new();
     let base_directory = base_directory.unwrap_or_else(|| PathBuf::from("/"));
     tracing::Span::current()
         .record("base_directory", &tracing::field::display(&base_directory.display()));
@@ -153,7 +166,14 @@ pub(crate) fn install_extension(
                 .file_name()
                 .ok_or_else(|| eyre!("Could not get filename for `{}`", control_file.display()))?,
         );
-        copy_file(&control_file, &dest, "control file", true, &package_manifest_path)?;
+        copy_file(
+            &control_file,
+            &dest,
+            "control file",
+            true,
+            &package_manifest_path,
+            &mut output_tracking,
+        )?;
     }
 
     {
@@ -190,7 +210,14 @@ pub(crate) fn install_extension(
                 .wrap_err_with(|| format!("unable to remove existing file {}", dest.display()))?;
         }
 
-        copy_file(&shlibpath, &dest, "shared library", false, &package_manifest_path)?;
+        copy_file(
+            &shlibpath,
+            &dest,
+            "shared library",
+            false,
+            &package_manifest_path,
+            &mut output_tracking,
+        )?;
     }
 
     copy_sql_files(
@@ -204,10 +231,11 @@ pub(crate) fn install_extension(
         &extdir,
         &base_directory,
         true,
+        &mut output_tracking,
     )?;
 
     println!("{} installing {}", "    Finished".bold().green(), extname);
-    Ok(())
+    Ok(output_tracking)
 }
 
 fn copy_file(
@@ -216,6 +244,7 @@ fn copy_file(
     msg: &str,
     do_filter: bool,
     package_manifest_path: impl AsRef<Path>,
+    output_tracking: &mut Vec<PathBuf>,
 ) -> eyre::Result<()> {
     let Some(dest_dir) = dest.parent() else {
         // what fresh hell could ever cause such an error?
@@ -246,6 +275,8 @@ fn copy_file(
             format!("failed copying `{}` to `{}`", src.display(), dest.display())
         })?;
     }
+
+    output_tracking.push(dest.clone());
 
     Ok(())
 }
@@ -332,6 +363,7 @@ fn copy_sql_files(
     extdir: &PathBuf,
     base_directory: &PathBuf,
     skip_build: bool,
+    output_tracking: &mut Vec<PathBuf>,
 ) -> eyre::Result<()> {
     let dest = get_target_sql_file(&package_manifest_path, extdir, base_directory)?;
     let (_, extname) = find_control_file(&package_manifest_path)?;
@@ -348,6 +380,7 @@ fn copy_sql_files(
         Option::<String>::None,
         None,
         skip_build,
+        output_tracking,
     )?;
 
     // now copy all the version upgrade files too
@@ -367,6 +400,7 @@ fn copy_sql_files(
                         "extension schema upgrade file",
                         true,
                         &package_manifest_path,
+                        output_tracking,
                     )?;
                 }
             }

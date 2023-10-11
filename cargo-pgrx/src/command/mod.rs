@@ -24,6 +24,7 @@ pub(crate) mod schema;
 pub(crate) mod start;
 pub(crate) mod status;
 pub(crate) mod stop;
+pub(crate) mod sudo_install;
 pub(crate) mod test;
 pub(crate) mod version;
 

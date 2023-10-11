@@ -25,21 +25,22 @@ Cargo subcommand for 'pgrx' to make Postgres extension development easy
 Usage: cargo pgrx [OPTIONS] <COMMAND>
 
 Commands:
-  init     Initialize pgrx development environment for the first time
-  info     Provides information about pgrx-managed development environment
-  start    Start a pgrx-managed Postgres instance
-  stop     Stop a pgrx-managed Postgres instance
-  status   Is a pgrx-managed Postgres instance running?
-  new      Create a new extension crate
-  install  Install the extension from the current crate to the Postgres specified by whatever `pg_config` is currently on your $PATH
-  package  Create an installation package directory
-  schema   Generate extension schema files
-  run      Compile/install extension to a pgrx-managed Postgres instance and start psql
-  connect  Connect, via psql, to a Postgres instance
-  test     Run the test suite for this crate
-  get      Get a property from the extension control file
-  cross    Cargo subcommand for 'pgrx' to make Postgres extension development easy
-  help     Print this message or the help of the given subcommand(s)
+  init          Initialize pgrx development environment for the first time
+  info          Provides information about pgrx-managed development environment
+  start         Start a pgrx-managed Postgres instance
+  stop          Stop a pgrx-managed Postgres instance
+  status        Is a pgrx-managed Postgres instance running?
+  new           Create a new extension crate
+  install       Install the extension from the current crate to the Postgres specified by whatever `pg_config` is currently on your $PATH
+  sudo-install  Like `cargo pgrx install`, but uses `sudo` to copy the extension files
+  package       Create an installation package directory
+  schema        Generate extension schema files
+  run           Compile/install extension to a pgrx-managed Postgres instance and start psql
+  connect       Connect, via psql, to a Postgres instance
+  test          Run the test suite for this crate
+  get           Get a property from the extension control file
+  cross         Cargo subcommand for 'pgrx' to make Postgres extension development easy
+  help          Print this message or the help of the given subcommand(s)
 
 Options:
   -v, --verbose...  Enable info logs, -vv for debug, -vvv for trace
@@ -420,7 +421,9 @@ installing extension
 If for some reason `cargo pgrx run <PG_VERSION>` isn't your style, you can use `cargo pgrx install` to install your extension
 to the Postgres installation described by the `pg_config` tool currently on your `$PATH`.
 
-You'll need write permissions to the directories described by `pg_config --pkglibdir` and `pg_config --sharedir`.
+You'll need write permissions to the directories described by `pg_config --pkglibdir` and `pg_config --sharedir`.  If this
+is problematic, use `cargo pgrx install --sudo` which compiles the extension as the current user and copies the extension
+files to their proper location using `sudo`, prompting you for your password.
 
 By default, `cargo pgrx install` builds your extension in debug mode. Specifying `--release` changes that.
 
@@ -470,6 +473,9 @@ OPTIONS:
 
     -V, --version
             Print version information
+            
+    -s, --sudo
+           Use `sudo` to install the extension artifacts
 ```
 
 ## Testing Your Extension
