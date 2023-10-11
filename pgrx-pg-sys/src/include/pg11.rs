@@ -128,7 +128,7 @@ impl<T> ::std::default::Default for __BindgenUnionField<T> {
 impl<T> ::std::clone::Clone for __BindgenUnionField<T> {
     #[inline]
     fn clone(&self) -> Self {
-        Self::new()
+        *self
     }
 }
 impl<T> ::std::marker::Copy for __BindgenUnionField<T> {}
@@ -184,8 +184,8 @@ pub const HAVE_DECL_FDATASYNC: u32 = 1;
 pub const HAVE_DECL_F_FULLFSYNC: u32 = 0;
 pub const HAVE_DECL_POSIX_FADVISE: u32 = 1;
 pub const HAVE_DECL_SNPRINTF: u32 = 1;
-pub const HAVE_DECL_STRLCAT: u32 = 0;
-pub const HAVE_DECL_STRLCPY: u32 = 0;
+pub const HAVE_DECL_STRLCAT: u32 = 1;
+pub const HAVE_DECL_STRLCPY: u32 = 1;
 pub const HAVE_DECL_STRNLEN: u32 = 1;
 pub const HAVE_DECL_STRTOLL: u32 = 1;
 pub const HAVE_DECL_STRTOULL: u32 = 1;
@@ -257,6 +257,8 @@ pub const HAVE_STRERROR: u32 = 1;
 pub const HAVE_STRERROR_R: u32 = 1;
 pub const HAVE_STRINGS_H: u32 = 1;
 pub const HAVE_STRING_H: u32 = 1;
+pub const HAVE_STRLCAT: u32 = 1;
+pub const HAVE_STRLCPY: u32 = 1;
 pub const HAVE_STRNLEN: u32 = 1;
 pub const HAVE_STRONG_RANDOM: u32 = 1;
 pub const HAVE_STRSIGNAL: u32 = 1;
@@ -319,7 +321,8 @@ pub const PG_KRB_SRVNAM: &[u8; 9] = b"postgres\0";
 pub const PG_MAJORVERSION: &[u8; 3] = b"11\0";
 pub const PG_VERSION: &[u8; 6] = b"11.21\0";
 pub const PG_VERSION_NUM: u32 = 110021;
-pub const PG_VERSION_STR : & [u8 ; 103] = b"PostgreSQL 11.21 on x86_64-pc-linux-gnu, compiled by gcc (Ubuntu 11.4.0-1ubuntu1~22.04) 11.4.0, 64-bit\0" ;
+pub const PG_VERSION_STR: &[u8; 87] =
+    b"PostgreSQL 11.21 on x86_64-pc-linux-gnu, compiled by gcc (GCC) 13.2.1 20230801, 64-bit\0";
 pub const RELSEG_SIZE: u32 = 131072;
 pub const SIZEOF_BOOL: u32 = 1;
 pub const SIZEOF_LONG: u32 = 8;
@@ -381,6 +384,7 @@ pub const __USE_ATFILE: u32 = 1;
 pub const __USE_FORTIFY_LEVEL: u32 = 0;
 pub const __GLIBC_USE_DEPRECATED_GETS: u32 = 0;
 pub const __GLIBC_USE_DEPRECATED_SCANF: u32 = 0;
+pub const __GLIBC_USE_C2X_STRTOL: u32 = 0;
 pub const _STDC_PREDEF_H: u32 = 1;
 pub const __STDC_IEC_559__: u32 = 1;
 pub const __STDC_IEC_60559_BFP__: u32 = 201404;
@@ -389,7 +393,7 @@ pub const __STDC_IEC_60559_COMPLEX__: u32 = 201404;
 pub const __STDC_ISO_10646__: u32 = 201706;
 pub const __GNU_LIBRARY__: u32 = 6;
 pub const __GLIBC__: u32 = 2;
-pub const __GLIBC_MINOR__: u32 = 35;
+pub const __GLIBC_MINOR__: u32 = 38;
 pub const _SYS_CDEFS_H: u32 = 1;
 pub const __glibc_c99_flexarr_available: u32 = 1;
 pub const __LDOUBLE_REDIRECTS_TO_FLOAT128_ABI: u32 = 0;
@@ -420,6 +424,7 @@ pub const __struct_FILE_defined: u32 = 1;
 pub const _IO_EOF_SEEN: u32 = 16;
 pub const _IO_ERR_SEEN: u32 = 32;
 pub const _IO_USER_LOCK: u32 = 32768;
+pub const __cookie_io_functions_t_defined: u32 = 1;
 pub const _IOFBF: u32 = 0;
 pub const _IOLBF: u32 = 1;
 pub const _IONBF: u32 = 2;
@@ -429,9 +434,9 @@ pub const SEEK_SET: u32 = 0;
 pub const SEEK_CUR: u32 = 1;
 pub const SEEK_END: u32 = 2;
 pub const P_tmpdir: &[u8; 5] = b"/tmp\0";
-pub const _BITS_STDIO_LIM_H: u32 = 1;
 pub const L_tmpnam: u32 = 20;
 pub const TMP_MAX: u32 = 238328;
+pub const _BITS_STDIO_LIM_H: u32 = 1;
 pub const FILENAME_MAX: u32 = 4096;
 pub const L_ctermid: u32 = 9;
 pub const FOPEN_MAX: u32 = 16;
@@ -890,6 +895,9 @@ pub const SOL_NFC: u32 = 280;
 pub const SOL_KCM: u32 = 281;
 pub const SOL_TLS: u32 = 282;
 pub const SOL_XDP: u32 = 283;
+pub const SOL_MPTCP: u32 = 284;
+pub const SOL_MCTP: u32 = 285;
+pub const SOL_SMC: u32 = 286;
 pub const SOMAXCONN: u32 = 4096;
 pub const _BITS_SOCKADDR_H: u32 = 1;
 pub const _SS_SIZE: u32 = 128;
@@ -978,6 +986,9 @@ pub const SO_PREFER_BUSY_POLL: u32 = 69;
 pub const SO_BUSY_POLL_BUDGET: u32 = 70;
 pub const SO_NETNS_COOKIE: u32 = 71;
 pub const SO_BUF_LOCK: u32 = 72;
+pub const SO_RESERVE_MEM: u32 = 73;
+pub const SO_TXREHASH: u32 = 74;
+pub const SO_RCVMARK: u32 = 75;
 pub const SO_TIMESTAMP: u32 = 29;
 pub const SO_TIMESTAMPNS: u32 = 35;
 pub const SO_TIMESTAMPING: u32 = 37;
@@ -1043,6 +1054,7 @@ pub const IP_PMTUDISC_DO: u32 = 2;
 pub const IP_PMTUDISC_PROBE: u32 = 3;
 pub const IP_PMTUDISC_INTERFACE: u32 = 4;
 pub const IP_PMTUDISC_OMIT: u32 = 5;
+pub const IP_LOCAL_PORT_RANGE: u32 = 51;
 pub const SOL_IP: u32 = 0;
 pub const IP_DEFAULT_MULTICAST_TTL: u32 = 1;
 pub const IP_DEFAULT_MULTICAST_LOOP: u32 = 1;
@@ -1497,11 +1509,6 @@ pub const POSIX_FADV_SEQUENTIAL: u32 = 2;
 pub const POSIX_FADV_WILLNEED: u32 = 3;
 pub const POSIX_FADV_DONTNEED: u32 = 4;
 pub const POSIX_FADV_NOREUSE: u32 = 5;
-pub const AT_FDCWD: i32 = -100;
-pub const AT_SYMLINK_NOFOLLOW: u32 = 256;
-pub const AT_REMOVEDIR: u32 = 512;
-pub const AT_SYMLINK_FOLLOW: u32 = 1024;
-pub const AT_EACCESS: u32 = 512;
 pub const _BITS_STAT_H: u32 = 1;
 pub const _BITS_STRUCT_STAT_H: u32 = 1;
 pub const __S_IFMT: u32 = 61440;
@@ -1547,6 +1554,11 @@ pub const R_OK: u32 = 4;
 pub const W_OK: u32 = 2;
 pub const X_OK: u32 = 1;
 pub const F_OK: u32 = 0;
+pub const AT_FDCWD: i32 = -100;
+pub const AT_SYMLINK_NOFOLLOW: u32 = 256;
+pub const AT_REMOVEDIR: u32 = 512;
+pub const AT_SYMLINK_FOLLOW: u32 = 1024;
+pub const AT_EACCESS: u32 = 512;
 pub const F_ULOCK: u32 = 0;
 pub const F_LOCK: u32 = 1;
 pub const F_TLOCK: u32 = 2;
@@ -2475,6 +2487,18 @@ pub const PublicationRelPrrelidPrpubidIndexId: u32 = 6113;
 pub const SubscriptionObjectIndexId: u32 = 6114;
 pub const SubscriptionNameIndexId: u32 = 6115;
 pub const SubscriptionRelSrrelidSrsubidIndexId: u32 = 6117;
+pub const AccessMethodRelationId: Oid = Oid(2601);
+pub const Anum_pg_am_amname: u32 = 1;
+pub const Anum_pg_am_amhandler: u32 = 2;
+pub const Anum_pg_am_amtype: u32 = 3;
+pub const Natts_pg_am: u32 = 3;
+pub const AMTYPE_INDEX: u8 = 105u8;
+pub const BTREE_AM_OID: Oid = Oid(403);
+pub const HASH_AM_OID: Oid = Oid(405);
+pub const GIST_AM_OID: Oid = Oid(783);
+pub const GIN_AM_OID: Oid = Oid(2742);
+pub const SPGIST_AM_OID: Oid = Oid(4000);
+pub const BRIN_AM_OID: Oid = Oid(3580);
 pub const AccessMethodOperatorRelationId: Oid = Oid(2602);
 pub const Anum_pg_amop_amopfamily: u32 = 1;
 pub const Anum_pg_amop_amoplefttype: u32 = 2;
@@ -2487,6 +2511,13 @@ pub const Anum_pg_amop_amopsortfamily: u32 = 8;
 pub const Natts_pg_amop: u32 = 8;
 pub const AMOP_SEARCH: u8 = 115u8;
 pub const AMOP_ORDER: u8 = 111u8;
+pub const AccessMethodProcedureRelationId: Oid = Oid(2603);
+pub const Anum_pg_amproc_amprocfamily: u32 = 1;
+pub const Anum_pg_amproc_amproclefttype: u32 = 2;
+pub const Anum_pg_amproc_amprocrighttype: u32 = 3;
+pub const Anum_pg_amproc_amprocnum: u32 = 4;
+pub const Anum_pg_amproc_amproc: u32 = 5;
+pub const Natts_pg_amproc: u32 = 5;
 pub const AuthIdRelationId: Oid = Oid(1260);
 pub const AuthIdRelation_Rowtype_Id: u32 = 2842;
 pub const Anum_pg_authid_rolname: u32 = 1;
@@ -3516,6 +3547,39 @@ impl Default for _IO_FILE {
         }
     }
 }
+pub type cookie_read_function_t = ::std::option::Option<
+    unsafe extern "C" fn(
+        __cookie: *mut ::std::os::raw::c_void,
+        __buf: *mut ::std::os::raw::c_char,
+        __nbytes: usize,
+    ) -> __ssize_t,
+>;
+pub type cookie_write_function_t = ::std::option::Option<
+    unsafe extern "C" fn(
+        __cookie: *mut ::std::os::raw::c_void,
+        __buf: *const ::std::os::raw::c_char,
+        __nbytes: usize,
+    ) -> __ssize_t,
+>;
+pub type cookie_seek_function_t = ::std::option::Option<
+    unsafe extern "C" fn(
+        __cookie: *mut ::std::os::raw::c_void,
+        __pos: *mut __off64_t,
+        __w: ::std::os::raw::c_int,
+    ) -> ::std::os::raw::c_int,
+>;
+pub type cookie_close_function_t = ::std::option::Option<
+    unsafe extern "C" fn(__cookie: *mut ::std::os::raw::c_void) -> ::std::os::raw::c_int,
+>;
+#[repr(C)]
+#[derive(Debug, Default, Copy, Clone)]
+pub struct _IO_cookie_io_functions_t {
+    pub read: cookie_read_function_t,
+    pub write: cookie_write_function_t,
+    pub seek: cookie_seek_function_t,
+    pub close: cookie_close_function_t,
+}
+pub type cookie_io_functions_t = _IO_cookie_io_functions_t;
 pub type off_t = __off_t;
 pub type fpos_t = __fpos_t;
 pub type _Float32 = f32;
@@ -3940,6 +4004,18 @@ pub struct drand48_data {
 }
 #[pgrx_macros::pg_guard]
 extern "C" {
+    pub fn arc4random() -> __uint32_t;
+}
+#[pgrx_macros::pg_guard]
+extern "C" {
+    pub fn arc4random_buf(__buf: *mut ::std::os::raw::c_void, __size: usize);
+}
+#[pgrx_macros::pg_guard]
+extern "C" {
+    pub fn arc4random_uniform(__upper_bound: __uint32_t) -> __uint32_t;
+}
+#[pgrx_macros::pg_guard]
+extern "C" {
     pub fn alloca(__size: ::std::os::raw::c_ulong) -> *mut ::std::os::raw::c_void;
 }
 #[pgrx_macros::pg_guard]
@@ -3986,6 +4062,22 @@ impl Default for __locale_struct {
 }
 pub type __locale_t = *mut __locale_struct;
 pub type locale_t = __locale_t;
+#[pgrx_macros::pg_guard]
+extern "C" {
+    pub fn strlcpy(
+        __dest: *mut ::std::os::raw::c_char,
+        __src: *const ::std::os::raw::c_char,
+        __n: ::std::os::raw::c_ulong,
+    ) -> ::std::os::raw::c_ulong;
+}
+#[pgrx_macros::pg_guard]
+extern "C" {
+    pub fn strlcat(
+        __dest: *mut ::std::os::raw::c_char,
+        __src: *const ::std::os::raw::c_char,
+        __n: ::std::os::raw::c_ulong,
+    ) -> ::std::os::raw::c_ulong;
+}
 #[repr(C)]
 #[repr(align(16))]
 #[derive(Debug, Default, Copy, Clone)]
@@ -4384,13 +4476,6 @@ impl Default for ip_opts {
 }
 #[repr(C)]
 #[derive(Debug, Default, Copy, Clone)]
-pub struct ip_mreqn {
-    pub imr_multiaddr: in_addr,
-    pub imr_address: in_addr,
-    pub imr_ifindex: ::std::os::raw::c_int,
-}
-#[repr(C)]
-#[derive(Debug, Default, Copy, Clone)]
 pub struct in_pktinfo {
     pub ipi_ifindex: ::std::os::raw::c_int,
     pub ipi_spec_dst: in_addr,
@@ -4417,6 +4502,7 @@ pub const IPPROTO_BEETPH: _bindgen_ty_5 = 94;
 pub const IPPROTO_ENCAP: _bindgen_ty_5 = 98;
 pub const IPPROTO_PIM: _bindgen_ty_5 = 103;
 pub const IPPROTO_COMP: _bindgen_ty_5 = 108;
+pub const IPPROTO_L2TP: _bindgen_ty_5 = 115;
 pub const IPPROTO_SCTP: _bindgen_ty_5 = 132;
 pub const IPPROTO_UDPLITE: _bindgen_ty_5 = 136;
 pub const IPPROTO_MPLS: _bindgen_ty_5 = 137;
@@ -4522,6 +4608,13 @@ impl Default for sockaddr_in6 {
 pub struct ip_mreq {
     pub imr_multiaddr: in_addr,
     pub imr_interface: in_addr,
+}
+#[repr(C)]
+#[derive(Debug, Default, Copy, Clone)]
+pub struct ip_mreqn {
+    pub imr_multiaddr: in_addr,
+    pub imr_address: in_addr,
+    pub imr_ifindex: ::std::os::raw::c_int,
 }
 #[repr(C)]
 #[derive(Debug, Default, Copy, Clone)]
@@ -5833,22 +5926,6 @@ pub const FP_ZERO: _bindgen_ty_8 = 2;
 pub const FP_SUBNORMAL: _bindgen_ty_8 = 3;
 pub const FP_NORMAL: _bindgen_ty_8 = 4;
 pub type _bindgen_ty_8 = ::std::os::raw::c_uint;
-#[pgrx_macros::pg_guard]
-extern "C" {
-    pub fn strlcat(
-        dst: *mut ::std::os::raw::c_char,
-        src: *const ::std::os::raw::c_char,
-        siz: usize,
-    ) -> usize;
-}
-#[pgrx_macros::pg_guard]
-extern "C" {
-    pub fn strlcpy(
-        dst: *mut ::std::os::raw::c_char,
-        src: *const ::std::os::raw::c_char,
-        siz: usize,
-    ) -> usize;
-}
 #[pgrx_macros::pg_guard]
 extern "C" {
     pub fn pg_qsort(
@@ -31632,6 +31709,23 @@ extern "C" {
 }
 #[repr(C)]
 #[derive(Debug, Copy, Clone)]
+pub struct FormData_pg_am {
+    pub amname: NameData,
+    pub amhandler: regproc,
+    pub amtype: ::std::os::raw::c_char,
+}
+impl Default for FormData_pg_am {
+    fn default() -> Self {
+        let mut s = ::std::mem::MaybeUninit::<Self>::uninit();
+        unsafe {
+            ::std::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
+            s.assume_init()
+        }
+    }
+}
+pub type Form_pg_am = *mut FormData_pg_am;
+#[repr(C)]
+#[derive(Debug, Copy, Clone)]
 pub struct FormData_pg_amop {
     pub amopfamily: Oid,
     pub amoplefttype: Oid,
@@ -31652,6 +31746,25 @@ impl Default for FormData_pg_amop {
     }
 }
 pub type Form_pg_amop = *mut FormData_pg_amop;
+#[repr(C)]
+#[derive(Debug, Copy, Clone)]
+pub struct FormData_pg_amproc {
+    pub amprocfamily: Oid,
+    pub amproclefttype: Oid,
+    pub amprocrighttype: Oid,
+    pub amprocnum: int16,
+    pub amproc: regproc,
+}
+impl Default for FormData_pg_amproc {
+    fn default() -> Self {
+        let mut s = ::std::mem::MaybeUninit::<Self>::uninit();
+        unsafe {
+            ::std::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
+            s.assume_init()
+        }
+    }
+}
+pub type Form_pg_amproc = *mut FormData_pg_amproc;
 #[repr(C)]
 #[derive(Debug, Copy, Clone)]
 pub struct FormData_pg_authid {
