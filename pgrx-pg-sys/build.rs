@@ -511,9 +511,9 @@ fn impl_pg_node(items: &Vec<syn::Item>) -> eyre::Result<proc_macro2::TokenStream
 
         // impl Rust's Display trait for all nodes
         pgnode_impls.extend(quote! {
-            impl std::fmt::Display for #struct_name {
-                fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-                    write!(f, "{}", self.display_node() )
+            impl ::core::fmt::Display for #struct_name {
+                fn fmt(&self, f: &mut ::core::fmt::Formatter<'_>) -> ::core::fmt::Result {
+                    self.display_node().fmt(f)
                 }
             }
         });
