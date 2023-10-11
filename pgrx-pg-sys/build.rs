@@ -119,12 +119,7 @@ fn main() -> eyre::Result<()> {
 
     emit_rerun_if_changed();
 
-    let pg_configs: Vec<(u16, PgConfig)> = if env_tracked(
-        "PGRX_PG_SYS_GENERATE_BINDINGS_FOR_RELEASE",
-    )
-    .as_deref()
-        == Some("1")
-    {
+    let pg_configs: Vec<(u16, PgConfig)> = if is_for_release {
         Pgrx::from_config()?.iter(PgConfigSelector::All)
             .map(|r| r.expect("invalid pg_config"))
             .map(|c| (c.major_version().expect("invalid major version"), c))
