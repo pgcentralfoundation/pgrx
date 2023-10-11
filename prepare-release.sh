@@ -30,7 +30,7 @@ else
     ./update-versions.sh "${NEW_VERSION}" || exit $?
 
     # sanity check the diffs, but not Cargo.lock files cuz ugh
-    git diff -- . ':(exclude)Cargo.lock'
+    # git diff -- . ':(exclude)Cargo.lock'
 
     # send it all to github
     git commit -a -m "Update version to ${NEW_VERSION}"

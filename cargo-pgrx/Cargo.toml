@@ -10,7 +10,7 @@
  
 [package]
 name = "cargo-pgrx"
-version = "0.10.2"
+version = "0.11.0"
 authors = ["PgCentral Foundation, Inc. <contact@pgcentral.org>"]
 license = "MIT"
 description = "Cargo subcommand for 'pgrx' to make Postgres extension development easy"
@@ -26,21 +26,21 @@ edition = "2021"
 [dependencies]
 atty = "0.2.14"
 cargo_metadata = "0.17.0"
-cargo_toml = "0.16.1"
+cargo_toml = "0.16.3"
 clap = { version = "4.4.2", features = [ "env", "suggestions", "cargo", "derive", "wrap_help" ] }
 clap-cargo = { version = "0.11.0", features = [ "cargo_metadata" ] }
-semver = "1.0.18"
+semver = "1.0.20"
 owo-colors = { version = "3.5.0", features = [ "supports-colors" ] }
 env_proxy = "0.4.1"
 num_cpus = "1.16.0"
-pgrx-pg-config = { path = "../pgrx-pg-config", version = "=0.10.2" }
-pgrx-sql-entity-graph = { path = "../pgrx-sql-entity-graph", version = "=0.10.2" }
+pgrx-pg-config = { path = "../pgrx-pg-config", version = "=0.11.0" }
+pgrx-sql-entity-graph = { path = "../pgrx-sql-entity-graph", version = "=0.11.0" }
 prettyplease = "0.2.15"
-proc-macro2 = { version = "1.0.67", features = [ "span-locations" ] }
+proc-macro2 = { version = "1.0.69", features = [ "span-locations" ] }
 quote = "1.0.33"
-rayon = "1.7.0"
-regex = "1.9.5"
-ureq = "2.7.1"
+rayon = "1.8.0"
+regex = "1.10.0"
+ureq = "2.8.0"
 url = "2.4.1"
 serde = { version = "1.0", features = [ "derive" ] }
 serde_derive = "1.0"
@@ -48,7 +48,7 @@ serde-xml-rs = "0.6.0"
 syn = { version = "2.0.18", features = [ "extra-traits", "full", "fold", "parsing" ] }
 unescape = "0.1.0"
 fork = "0.1.22"
-libloading = "0.8.0"
+libloading = "0.8.1"
 object = "0.32.1"
 once_cell = "1.18.0"
 eyre = "0.6.8"
