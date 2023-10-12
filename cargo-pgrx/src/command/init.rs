@@ -123,7 +123,16 @@ impl CommandExecute for Init {
                         .wrap_err_with(|| format!("{} is not a known Postgres version", pgver))?
                         .clone()
                 } else {
-                    PgConfig::new_with_defaults(pg_config_path.into())
+                    let config = PgConfig::new_with_defaults(pg_config_path.as_str().into());
+                    let label = config.label().ok();
+                    // We allow None in case it's configured via the environment or something.
+                    if label != None && label.as_deref() != Some(pgver) {
+                        return Err(eyre!(
+                            "wrong `pg_config` given to `--{pgver}` `{pg_config_path:?}` is for PostgreSQL {}",
+                            config.major_version()?,
+                        ));
+                    }
+                    config
                 };
                 pgrx.push(config);
             }
