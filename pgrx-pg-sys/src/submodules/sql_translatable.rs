@@ -9,7 +9,7 @@
 //LICENSE Use of this source code is governed by the MIT license that can be found in the LICENSE file.
 use crate::{
     BOX, CIRCLE, Datum, FdwRoutine, FunctionCallInfoBaseData, IndexAmRoutine, ItemPointerData,
-    PlannerInfo, Point, TableAmRoutine,
+    LINE, LSEG, PlannerInfo, Point, TableAmRoutine,
 };
 use pgrx_sql_entity_graph::metadata::{
     ArgumentError, ReturnsError, ReturnsRef, SqlMappingRef, SqlTranslatable, TypeOrigin,
@@ -73,6 +73,22 @@ unsafe impl SqlTranslatable for CIRCLE {
     const ARGUMENT_SQL: Result<SqlMappingRef, ArgumentError> = Ok(SqlMappingRef::literal("circle"));
     const RETURN_SQL: Result<ReturnsRef, ReturnsError> =
         Ok(ReturnsRef::One(SqlMappingRef::literal("circle")));
+}
+
+unsafe impl SqlTranslatable for LINE {
+    const TYPE_IDENT: &'static str = pgrx_sql_entity_graph::pgrx_resolved_type!(LINE);
+    const TYPE_ORIGIN: TypeOrigin = TypeOrigin::External;
+    const ARGUMENT_SQL: Result<SqlMappingRef, ArgumentError> = Ok(SqlMappingRef::literal("line"));
+    const RETURN_SQL: Result<ReturnsRef, ReturnsError> =
+        Ok(ReturnsRef::One(SqlMappingRef::literal("line")));
+}
+
+unsafe impl SqlTranslatable for LSEG {
+    const TYPE_IDENT: &'static str = pgrx_sql_entity_graph::pgrx_resolved_type!(LSEG);
+    const TYPE_ORIGIN: TypeOrigin = TypeOrigin::External;
+    const ARGUMENT_SQL: Result<SqlMappingRef, ArgumentError> = Ok(SqlMappingRef::literal("lseg"));
+    const RETURN_SQL: Result<ReturnsRef, ReturnsError> =
+        Ok(ReturnsRef::One(SqlMappingRef::literal("lseg")));
 }
 
 unsafe impl SqlTranslatable for Point {

@@ -10,6 +10,7 @@
 #![deny(unsafe_op_in_unsafe_fn)]
 //! Helper implementations for returning sets and tables from `#[pg_extern]`-style functions
 
+use crate::datum::geo::{Path, Polygon};
 use crate::datum::{
     AnyArray, AnyElement, AnyNumeric, Date, FromDatum, Inet, Internal, Interval, IntoDatum, Json,
     JsonB, Numeric, PgVarlena, Time, TimeWithTimeZone, Timestamp, TimestampWithTimeZone,
@@ -268,7 +269,8 @@ argue_from_datum! { 'fcx; i8, i16, i32, i64, f32, f64, bool, char, String, Vec<u
 argue_from_datum! { 'fcx; Date, Interval, Time, TimeWithTimeZone, Timestamp, TimestampWithTimeZone }
 argue_from_datum! { 'fcx; AnyArray, AnyElement, AnyNumeric }
 argue_from_datum! { 'fcx; Inet, Internal, Json, JsonB, Uuid, PgRelation }
-argue_from_datum! { 'fcx; pg_sys::BOX, pg_sys::ItemPointerData, pg_sys::Oid, pg_sys::Point, pg_sys::TransactionId }
+argue_from_datum! { 'fcx; pg_sys::BOX, pg_sys::CIRCLE, pg_sys::LINE, pg_sys::LSEG, pg_sys::ItemPointerData, pg_sys::Oid, pg_sys::Point, pg_sys::TransactionId }
+argue_from_datum! { 'fcx; Path, Polygon }
 // We could use the upcoming impl of ArgAbi for `&'fcx T where T: ?Sized + BorrowDatum`
 // to support these types by implementing BorrowDatum for them also, but we reject this.
 // It would greatly complicate other users of BorrowDatum like FlatArray, which want all impls
@@ -571,7 +573,9 @@ impl_repackage_into_datum! {
     String, CString, Vec<u8>, char,
     Json, JsonB, Inet, Uuid, AnyNumeric, AnyArray, AnyElement, Internal,
     Date, Interval, Time, TimeWithTimeZone, Timestamp, TimestampWithTimeZone,
-    pg_sys::BOX, pg_sys::ItemPointerData, pg_sys::Oid, pg_sys::Point, pg_sys::TransactionId
+    pg_sys::BOX, pg_sys::CIRCLE, pg_sys::LINE, pg_sys::LSEG,
+    pg_sys::ItemPointerData, pg_sys::Oid, pg_sys::Point, pg_sys::TransactionId,
+    Path, Polygon
 }
 
 unsafe impl<const P: u32, const S: u32> BoxRet for Numeric<P, S> {

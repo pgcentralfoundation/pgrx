@@ -19,7 +19,7 @@ mod array;
 mod borrow;
 mod bytea_type;
 mod from;
-mod geo;
+pub mod geo;
 mod inet;
 mod internal;
 mod into;
