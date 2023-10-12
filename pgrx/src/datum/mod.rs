@@ -15,7 +15,7 @@ mod array;
 mod date;
 pub mod datetime_support;
 mod from;
-mod geo;
+pub mod geo;
 mod inet;
 mod internal;
 mod interval;
