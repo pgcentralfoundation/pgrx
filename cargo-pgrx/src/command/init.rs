@@ -10,12 +10,14 @@
 use crate::command::stop::stop_postgres;
 use crate::command::version::pgrx_default;
 use crate::CommandExecute;
+use bzip2::bufread::BzDecoder;
 use eyre::{eyre, WrapErr};
 use owo_colors::OwoColorize;
 use pgrx_pg_config::{
     get_c_locale_flags, prefix_path, ConfigToml, PgConfig, PgConfigSelector, Pgrx, PgrxHomeError,
 };
 use rayon::prelude::*;
+use tar::Archive;
 
 use std::collections::HashMap;
 use std::fs::File;
@@ -252,6 +254,24 @@ fn download_postgres(
 }
 
 fn untar(bytes: &[u8], pgrxdir: &PathBuf, pg_config: &PgConfig) -> eyre::Result<PathBuf> {
+    let mut unpackdir = pgrxdir.clone();
+    unpackdir.push(&format!("{}_unpack", pg_config.version()?));
+    if unpackdir.exists() {
+        // delete everything at this path if it already exists
+        println!("{} {}", "     Removing".bold().green(), unpackdir.display());
+        std::fs::remove_dir_all(&unpackdir)?;
+    }
+    std::fs::create_dir_all(&unpackdir)?;
+
+    println!(
+        "{} Postgres v{} to {}",
+        "    Untarring".bold().green(),
+        pg_config.version()?,
+        unpackdir.display()
+    );
+    let mut tar_decoder = Archive::new(BzDecoder::new(bytes));
+    tar_decoder.unpack(&unpackdir)?;
+
     let mut pgdir = pgrxdir.clone();
     pgdir.push(&pg_config.version()?);
     if pgdir.exists() {
@@ -259,57 +279,34 @@ fn untar(bytes: &[u8], pgrxdir: &PathBuf, pg_config: &PgConfig) -> eyre::Result<
         println!("{} {}", "     Removing".bold().green(), pgdir.display());
         std::fs::remove_dir_all(&pgdir)?;
     }
-    std::fs::create_dir_all(&pgdir)?;
 
+    let first_level_dirs = std::fs::read_dir(&unpackdir)?
+        .filter(|entry| {
+            entry
+                .as_ref()
+                .expect("failed to read entry in unpacked dir")
+                .metadata()
+                .expect("failed to stat entry in unpacked dir")
+                .is_dir()
+        })
+        .collect::<Result<Vec<_>, _>>()?;
+    if first_level_dirs.len() != 1 {
+        return Err(eyre!(
+            "Expected exactly one directory in tarball, found {}",
+            first_level_dirs.len()
+        ));
+    }
+    // UNWRAP: length-checked above
+    let first_level_dir = first_level_dirs.first().unwrap().path();
     println!(
-        "{} Postgres v{} to {}",
-        "    Untarring".bold().green(),
-        pg_config.version()?,
+        "{} {} -> {}",
+        "     Renaming".bold().green(),
+        first_level_dir.display(),
         pgdir.display()
     );
-    let mut child = std::process::Command::new("tar")
-        .arg("-C")
-        .arg(&pgdir)
-        .arg("--strip-components=1")
-        .arg("-xjf")
-        .arg("-")
-        .stdout(std::process::Stdio::piped())
-        .stderr(std::process::Stdio::piped())
-        .stdin(std::process::Stdio::piped())
-        .spawn()
-        .wrap_err("failed to spawn `tar`")?;
+    std::fs::rename(first_level_dir, &pgdir)?;
 
-    let stdin = child.stdin.as_mut().expect("failed to get `tar`'s stdin");
-    let mut error = None;
-
-    // In order to capture and report any output from the child's stderr (in the event of an error),
-    // we need to wait until `.wait_with_output()` is called. Bailing early here via `?` or `.expect()`
-    // means only the immediate error is reported, such as "Broken Pipe". The same applies for the subsequent
-    // `.flush()` call immediately after.
-    match stdin.write_all(bytes) {
-        Ok(_) => (),
-        Err(e) => error = Some(e),
-    }
-
-    match stdin.flush() {
-        Ok(_) => (),
-        Err(e) => error = Some(e),
-    }
-
-    let output = child.wait_with_output()?;
-
-    if output.status.success() && error.is_none() {
-        Ok(pgdir)
-    } else {
-        // It's possible to have a "None" error from above, but the child output still reports an error.
-        // We need to handle both of those cases.
-        let command_error = eyre!("Command error: {}", String::from_utf8_lossy(&output.stderr));
-
-        match error {
-            Some(e) => Err(eyre!(e).wrap_err(command_error)),
-            None => Err(command_error),
-        }
-    }
+    Ok(pgdir)
 }
 
 fn fixup_homebrew_for_icu(configure_cmd: &mut Command) {
