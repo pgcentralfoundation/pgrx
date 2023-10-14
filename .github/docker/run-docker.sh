@@ -8,7 +8,7 @@
 #                        blank '' to use "cargo" without "--locked"
 
 # Examples of running this script in CI (currently Github Actions):
-#   ./.github/docker/run-docker.sh 14 debian:bullseye
+#   ./.github/docker/run-docker.sh 14 debian_bullseye
 #   ./.github/docker/run-docker.sh 12 fedora
 
 set -x

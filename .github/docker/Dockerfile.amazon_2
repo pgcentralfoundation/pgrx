@@ -1,5 +1,5 @@
 # Example of how to build this container (ran from pgrx checkout directory):
-#   docker build --build-arg PG_MAJOR_VER=14 -f .github/docker/Dockerfile.amazon\:2 -t pgrx-amazonlinux2 .
+#   docker build --build-arg PG_MAJOR_VER=14 -f .github/docker/Dockerfile.amazon_2 -t pgrx-amazonlinux2 .
 #
 # Example of how to run this container with tests after building the image:
 #   docker run pgrx-amazonlinux2 cargo test --no-default-features --features pg14 --locked
