@@ -338,6 +338,7 @@ dependencies = [
  "eyre",
  "flate2",
  "fork",
+ "jobslot",
  "libloading 0.8.1",
  "nix",
  "num_cpus",
@@ -1087,6 +1088,19 @@ name = "itoa"
 version = "1.0.9"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "af150ab688ff2122fcef229be89cb50dd66af9e01a4ff320cc137eecc9bacc38"
+
+[[package]]
+name = "jobslot"
+version = "0.2.12"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "9d03a2fc28c7a19e689b7e8c3f209c77dac23133d235a80cd9c3f400ecd9a73f"
+dependencies = [
+ "cfg-if",
+ "getrandom",
+ "libc",
+ "scopeguard",
+ "windows-sys",
+]
 
 [[package]]
 name = "js-sys"
