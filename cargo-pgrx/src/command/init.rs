@@ -477,13 +477,10 @@ fn configure_postgres(pg_config: &PgConfig, pgdir: &PathBuf, init: &Init) -> eyr
 }
 
 fn make_postgres(pg_config: &PgConfig, pgdir: &PathBuf, init: &Init) -> eyre::Result<()> {
-    let num_cpus = 1.max(num_cpus::get() / 3);
     println!("{} Postgres v{}", "    Compiling".bold().green(), pg_config.version()?);
     let mut command = std::process::Command::new("make");
 
     command
-        .arg("-j")
-        .arg(num_cpus.to_string())
         .arg("world-bin")
         .stdout(std::process::Stdio::piped())
         .stderr(std::process::Stdio::piped())
