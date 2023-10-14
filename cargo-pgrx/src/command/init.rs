@@ -262,13 +262,20 @@ fn download_postgres(
     }
     let mut buf = Vec::new();
     let _count = http_response.into_reader().read_to_end(&mut buf)?;
-    let pgdir = untar(&buf, pgrx_home, pg_config)?;
+    let pgdir = untar(&buf, pgrx_home, pg_config, &init)?;
     configure_postgres(pg_config, &pgdir, &init)?;
     make_postgres(pg_config, &pgdir, &init)?;
     make_install_postgres(pg_config, &pgdir, init) // returns a new PgConfig object
 }
 
-fn untar(bytes: &[u8], pgrxdir: &PathBuf, pg_config: &PgConfig) -> eyre::Result<PathBuf> {
+fn untar(
+    bytes: &[u8],
+    pgrxdir: &PathBuf,
+    pg_config: &PgConfig,
+    init: &Init,
+) -> eyre::Result<PathBuf> {
+    let _token = init.jobserver.get().unwrap().acquire().unwrap();
+
     let mut pgdir = pgrxdir.clone();
     pgdir.push(&pg_config.version()?);
     if pgdir.exists() {
