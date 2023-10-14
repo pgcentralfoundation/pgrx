@@ -37,7 +37,6 @@ pgrx-sql-entity-graph = { path = "../pgrx-sql-entity-graph", version = "=0.11.0"
 prettyplease = "0.2.15"
 proc-macro2 = { version = "1.0.69", features = [ "span-locations" ] }
 quote = "1.0.33"
-rayon = "1.8.0"
 regex = "1.10.0"
 ureq = "2.8.0"
 url = "2.4.1"

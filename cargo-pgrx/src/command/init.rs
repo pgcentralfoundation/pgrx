@@ -15,7 +15,6 @@ use owo_colors::OwoColorize;
 use pgrx_pg_config::{
     get_c_locale_flags, prefix_path, ConfigToml, PgConfig, PgConfigSelector, Pgrx, PgrxHomeError,
 };
-use rayon::prelude::*;
 
 use std::collections::HashMap;
 use std::fs::File;
@@ -23,7 +22,7 @@ use std::io::{Read, Write};
 use std::num::NonZeroUsize;
 use std::path::PathBuf;
 use std::process::{Command, Stdio};
-use std::sync::{Arc, Mutex, OnceLock};
+use std::sync::OnceLock;
 
 static PROCESS_ENV_DENYLIST: &'static [&'static str] = &[
     "DEBUG",
@@ -176,39 +175,36 @@ pub(crate) fn init_pgrx(pgrx: &Pgrx, init: &Init) -> eyre::Result<()> {
         },
     };
 
-    let output_configs = Arc::new(Mutex::new(Vec::new()));
-
-    let mut pg_configs = Vec::new();
-    for pg_config in pgrx.iter(PgConfigSelector::All) {
-        pg_configs.push(pg_config?);
-    }
-
-    let span = tracing::Span::current();
-    pg_configs
-        .into_par_iter()
-        .map(|pg_config| {
-            let _span = span.clone().entered();
-            let mut pg_config = pg_config.clone();
-            stop_postgres(&pg_config).ok(); // no need to fail on errors trying to stop postgres while initializing
-            if !pg_config.is_real() {
-                pg_config = match download_postgres(&pg_config, &pgrx_home, init) {
-                    Ok(pg_config) => pg_config,
-                    Err(e) => return Err(eyre!(e)),
+    let mut output_configs = std::thread::scope(|s| -> eyre::Result<Vec<_>> {
+        let span = tracing::Span::current();
+        let mut threads = Vec::new();
+        for pg_config in pgrx.iter(PgConfigSelector::All) {
+            let pg_config = pg_config?;
+            let span = span.clone();
+            let pgrx_home = pgrx_home.clone();
+            threads.push(s.spawn(move || {
+                let _span = span.entered();
+                let mut pg_config = pg_config.clone();
+                stop_postgres(&pg_config).ok(); // no need to fail on errors trying to stop postgres while initializing
+                if !pg_config.is_real() {
+                    pg_config = match download_postgres(&pg_config, &pgrx_home, init) {
+                        Ok(pg_config) => pg_config,
+                        Err(e) => return Err(eyre!(e)),
+                    }
                 }
-            }
 
-            let mut mutex = output_configs.lock();
-            // PoisonError doesn't implement std::error::Error, can't `?` it.
-            let output_configs = mutex.as_mut().expect("failed to get output_configs lock");
+                Ok(pg_config)
+            }));
+        }
 
+        let mut output_configs = Vec::with_capacity(threads.len());
+        for thread in threads {
+            let pg_config = thread.join().map_err(|_| eyre!("thread panicked"))??;
             output_configs.push(pg_config);
-            Ok(())
-        })
-        .collect::<eyre::Result<()>>()?;
+        }
 
-    let mut mutex = output_configs.lock();
-    // PoisonError doesn't implement std::error::Error, can't `?` it.
-    let output_configs = mutex.as_mut().unwrap();
+        Ok(output_configs)
+    })?;
 
     output_configs.sort_by(|a, b| {
         a.major_version()
@@ -229,7 +225,7 @@ pub(crate) fn init_pgrx(pgrx: &Pgrx, init: &Init) -> eyre::Result<()> {
         }
     }
 
-    write_config(output_configs, init)?;
+    write_config(&output_configs, init)?;
     Ok(())
 }
 
@@ -268,12 +264,7 @@ fn download_postgres(
     make_install_postgres(pg_config, &pgdir, init) // returns a new PgConfig object
 }
 
-fn untar(
-    bytes: &[u8],
-    pgrxdir: &PathBuf,
-    pg_config: &PgConfig,
-    init: &Init,
-) -> eyre::Result<PathBuf> {
+fn untar(bytes: &[u8], pgrxdir: &PathBuf, pg_config: &PgConfig, init: &Init) -> eyre::Result<PathBuf> {
     let _token = init.jobserver.get().unwrap().acquire().unwrap();
 
     let mut pgdir = pgrxdir.clone();
