@@ -101,7 +101,11 @@ impl<'cx, T: Enlist> List<'cx, T> {
     /// otherwise uses the List's own context.
     ///
     /// "Unstable" because this may receive breaking changes.
-    pub fn unstable_push_in_context(&mut self, value: T, mcx: &MemCx<'_>) -> &mut ListHead<T> {
+    pub fn unstable_push_in_context(
+        &mut self,
+        value: T,
+        mcx: &'cx MemCx<'_>,
+    ) -> &mut ListHead<'cx, T> {
         match self {
             List::Nil => {
                 // No silly reasoning, simply allocate ~2 cache lines for a list
@@ -131,7 +135,7 @@ impl<'cx, T: Enlist> List<'cx, T> {
     /// Attempt to push or Err if it would allocate
     ///
     /// This exists primarily to allow working with a list with maybe-zero capacity.
-    pub fn try_push(&mut self, value: T) -> Result<&mut ListHead<T>, &mut Self> {
+    pub fn try_push(&mut self, value: T) -> Result<&mut ListHead<'cx, T>, &mut Self> {
         match self {
             List::Nil => Err(self),
             list if list.capacity() - list.len() == 0 => Err(list),
@@ -140,7 +144,7 @@ impl<'cx, T: Enlist> List<'cx, T> {
     }
 
     /// Try to reserve space for N more items
-    pub fn try_reserve(&mut self, items: usize) -> Result<&mut ListHead<T>, &mut Self> {
+    pub fn try_reserve(&mut self, items: usize) -> Result<&mut ListHead<'cx, T>, &mut Self> {
         match self {
             List::Nil => Err(self),
             List::Cons(head) => Ok(head.reserve(items)),
@@ -151,7 +155,7 @@ impl<'cx, T: Enlist> List<'cx, T> {
     //
     // Note that if this removes the last item, it deallocates the entire list.
     // This is to maintain the Postgres List invariant that a 0-len list is always Nil.
-    pub fn drain<R>(&mut self, range: R) -> Drain<'_, T>
+    pub fn drain<R>(&'cx mut self, range: R) -> Drain<'cx, T>
     where
         R: RangeBounds<usize>,
     {

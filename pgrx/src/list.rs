@@ -188,7 +188,7 @@ impl<T: Enlist> ListHead<'_, T> {
     /// validly initialized as `T` in each ListCell.
     pub unsafe fn downcast_ptr_in_memcx<'cx>(
         list: NonNull<pg_sys::List>,
-        memcx: &'cx MemCx<'_>,
+        _memcx: &'cx MemCx<'_>,
     ) -> Option<ListHead<'cx, T>> {
         (T::LIST_TAG == (*list.as_ptr()).type_).then_some(ListHead { list, _type: PhantomData })
     }

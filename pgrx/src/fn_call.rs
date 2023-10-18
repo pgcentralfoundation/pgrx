@@ -442,7 +442,10 @@ fn create_default_value(pg_proc: &PgProc, argnum: usize) -> Result<Option<pg_sys
     let node = mem::current_context(|mcx| {
         let default_value_tree =
             pg_proc.proargdefaults(mcx).ok_or(FnCallError::NoDefaultArguments)?;
-        default_value_tree.get(default_argnum).ok_or(FnCallError::NotDefaultArgument(argnum))
+        default_value_tree
+            .get(default_argnum)
+            .ok_or(FnCallError::NotDefaultArgument(argnum))
+            .copied()
     })?;
 
     unsafe {
