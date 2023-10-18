@@ -19,7 +19,6 @@
         inherit system;
         overlays = [
           self.overlay
-          (self: super: { inherit (self.rust-bin.stable.latest) rustc cargo rustdoc rust-std; })
           fenix.overlays.default
         ] ++ extraOverlays;
       });
