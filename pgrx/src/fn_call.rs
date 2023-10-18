@@ -293,7 +293,7 @@ pub fn fn_call_with_collation<R: FromDatum + IntoDatum>(
 
         // setup the argument array
         // SAFETY:  `fcinfo_ref.args` is the over-allocated space we palloc0'd above.  it's an array
-        // of `nargs` `NulalbleDatum` instances.
+        // of `nargs` `NullableDatum` instances.
         let args_slice = fcinfo_ref.args.as_mut_slice(nargs);
         for (i, datum) in arg_datums.into_iter().enumerate() {
             assert!(!isstrict || (isstrict && datum.is_some())); // no NULL datums if this function is STRICT
