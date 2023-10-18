@@ -19,8 +19,7 @@
         inherit system;
         overlays = [
           self.overlay
-          fenix.overlay
-          (self: super: { inherit (self.rust-bin.stable.latest) rustc cargo rustdoc rust-std; })
+          fenix.overlays.default
         ] ++ extraOverlays;
       });
       releaseAndDebug = attr: call: args: {
@@ -85,6 +84,8 @@
             postgresql_12
             postgresql_13
             postgresql_14
+            postgresql_15
+            postgresql_16
           ];
           buildInputs = with pkgs; [
             rustfmt
