@@ -108,35 +108,31 @@ impl<T: Enlist> List<T> {
         self.iter_mut().nth(index)
     }
 
-    /// Push, and if allocation is needed, allocate in a given context
-    /// "Unstable" because this will probably receive breaking changes every week for a few weeks.
+    /// Pushes an item into the List
     ///
-    /// # Safety
+    /// Allocates the entire list in referenced context if it had zero elements,
+    /// otherwise uses the List's own context.
     ///
-    /// Use the right context, don't play around.
-    pub unsafe fn unstable_push_in_context(
-        &mut self,
-        value: T,
-        context: pg_sys::MemoryContext,
-    ) -> &mut ListHead<T> {
+    /// "Unstable" because this may receive breaking changes.
+    pub fn unstable_push_in_context(&mut self, value: T, mcx: &MemCx<'_>) -> &mut ListHead<T> {
         match self {
-            List::Nil => {
+            List::Nil => unsafe {
                 let list: *mut pg_sys::List =
-                    pg_sys::MemoryContextAlloc(context, mem::size_of::<pg_sys::List>()).cast();
+                    mcx.alloc_bytes(context, mem::size_of::<pg_sys::List>()).cast();
                 let node: *mut pg_sys::ListCell =
-                    pg_sys::MemoryContextAlloc(context, mem::size_of::<pg_sys::ListCell>()).cast();
+                    mcx.alloc_bytes(context, mem::size_of::<pg_sys::ListCell>()).cast();
                 (*node).next = ptr::null_mut();
                 *T::apoptosis(node) = value;
                 (*list).head = node;
                 (*list).tail = node;
                 (*list).type_ = T::LIST_TAG;
                 (*list).length = 1;
-                *self = Self::downcast_ptr(list).unwrap();
+                *self = Self::downcast_ptr_in_memcx(list, mcx).unwrap();
                 match self {
                     List::Cons(head) => head,
                     _ => unreachable!(),
                 }
-            }
+            },
             List::Cons(head) => head.push(value),
         }
     }
