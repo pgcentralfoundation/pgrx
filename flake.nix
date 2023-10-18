@@ -85,6 +85,8 @@
             postgresql_12
             postgresql_13
             postgresql_14
+            postgresql_15
+            postgresql_16
           ];
           buildInputs = with pkgs; [
             rustfmt
