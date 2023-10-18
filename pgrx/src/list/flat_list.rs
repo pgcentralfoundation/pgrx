@@ -155,7 +155,7 @@ impl<'cx, T: Enlist> List<'cx, T> {
     //
     // Note that if this removes the last item, it deallocates the entire list.
     // This is to maintain the Postgres List invariant that a 0-len list is always Nil.
-    pub fn drain<R>(&'cx mut self, range: R) -> Drain<'cx, T>
+    pub fn drain<R>(&mut self, range: R) -> Drain<'_, 'cx, T>
     where
         R: RangeBounds<usize>,
     {
@@ -369,18 +369,18 @@ pub struct ListIter<'a, T> {
 
 /// A list being drained.
 #[derive(Debug)]
-pub struct Drain<'a, T> {
+pub struct Drain<'a, 'cx, T> {
     /// Index of tail to preserve
     tail_start: u32,
     /// Length of tail
     tail_len: u32,
     /// Current remaining range to remove
     iter: RawCellIter<T>,
-    origin: &'a mut List<'a, T>,
+    origin: &'a mut List<'cx, T>,
     raw: *mut pg_sys::List,
 }
 
-impl<T> Drop for Drain<'_, T> {
+impl<'a, 'cx, T> Drop for Drain<'a, 'cx, T> {
     fn drop(&mut self) {
         if self.raw == ptr::null_mut() {
             return;
@@ -410,7 +410,7 @@ impl<T> Drop for Drain<'_, T> {
     }
 }
 
-impl<T: Enlist> Iterator for Drain<'_, T> {
+impl<T: Enlist> Iterator for Drain<'_, '_, T> {
     type Item = T;
 
     fn next(&mut self) -> Option<Self::Item> {

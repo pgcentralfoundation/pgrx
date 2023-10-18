@@ -46,11 +46,11 @@ mod tests {
             // Want to make sure the list length updates properly in the three major drain cases:
             // from start of list, from inside the middle of the list, and from middle to tail.
             let _ = list.drain(0..10);
-            // assert_eq!(90, list.len());
-            // let _ = list.drain(10..30);
-            // assert_eq!(70, list.len());
-            // let _ = list.drain(50..);
-            // assert_eq!(50, list.len());
+            assert_eq!(90, list.len());
+            let _ = list.drain(10..30);
+            assert_eq!(70, list.len());
+            let _ = list.drain(50..);
+            assert_eq!(50, list.len());
         })
     }
 }
