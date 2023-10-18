@@ -18,6 +18,14 @@ impl<'mcx> MemCx<'mcx> {
     pub(crate) unsafe fn alloc_bytes(&self, size: usize) -> *mut u8 {
         pg_sys::MemoryContextAlloc(self.ptr.as_ptr(), size).cast()
     }
+
+    /// You probably shouldn't be using this.
+    pub(crate) unsafe fn exec_in<T>(&self, f: impl FnOnce() -> T) -> T {
+        let remembered = pg_sys::MemoryContextSwitchTo(self.ptr.as_ptr());
+        let res = f();
+        pg_sys::MemoryContextSwitchTo(remembered);
+        res
+    }
 }
 
 /// Acquire the current context and operate inside it.
