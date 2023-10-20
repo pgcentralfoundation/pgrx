@@ -264,7 +264,12 @@ fn download_postgres(
     make_install_postgres(pg_config, &pgdir, init) // returns a new PgConfig object
 }
 
-fn untar(bytes: &[u8], pgrxdir: &PathBuf, pg_config: &PgConfig, init: &Init) -> eyre::Result<PathBuf> {
+fn untar(
+    bytes: &[u8],
+    pgrxdir: &PathBuf,
+    pg_config: &PgConfig,
+    init: &Init,
+) -> eyre::Result<PathBuf> {
     let _token = init.jobserver.get().unwrap().acquire().unwrap();
 
     let mut pgdir = pgrxdir.clone();
