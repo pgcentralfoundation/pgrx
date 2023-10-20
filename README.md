@@ -71,8 +71,6 @@
 - `libclang` 5.0 or greater (required by bindgen)
    - Ubuntu: `apt install libclang-dev` or `apt install clang`
    - RHEL: `yum install clang`
-- `tar`
-- `bzip2`
 - GCC 7 or newer
 - [PostgreSQL's build dependencies](https://wiki.postgresql.org/wiki/Compile_and_Install_from_source_code) ‡
 
