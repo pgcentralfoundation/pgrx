@@ -454,13 +454,13 @@ impl Default for Pgrx {
     }
 }
 
-#[derive(Debug, Serialize, Deserialize)]
-struct ConfigToml {
-    configs: HashMap<String, PathBuf>,
+#[derive(Debug, Default, Serialize, Deserialize)]
+pub struct ConfigToml {
+    pub configs: HashMap<String, PathBuf>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    base_port: Option<u16>,
+    pub base_port: Option<u16>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    base_testing_port: Option<u16>,
+    pub base_testing_port: Option<u16>,
 }
 
 pub enum PgConfigSelector<'a> {

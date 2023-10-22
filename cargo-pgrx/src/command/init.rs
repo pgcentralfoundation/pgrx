@@ -13,7 +13,7 @@ use crate::CommandExecute;
 use eyre::{eyre, WrapErr};
 use owo_colors::OwoColorize;
 use pgrx_pg_config::{
-    get_c_locale_flags, prefix_path, PgConfig, PgConfigSelector, Pgrx, PgrxHomeError,
+    get_c_locale_flags, prefix_path, ConfigToml, PgConfig, PgConfigSelector, Pgrx, PgrxHomeError,
 };
 use rayon::prelude::*;
 
@@ -540,26 +540,27 @@ fn validate_pg_config(pg_config: &PgConfig) -> eyre::Result<()> {
 
 fn write_config(pg_configs: &Vec<PgConfig>, init: &Init) -> eyre::Result<()> {
     let config_path = Pgrx::config_toml()?;
-    let mut file = File::create(&config_path)?;
+    let mut config = match std::fs::read_to_string(&config_path) {
+        Ok(file) => toml::from_str::<ConfigToml>(&file)?,
+        Err(e) => {
+            if e.kind() == std::io::ErrorKind::NotFound {
+                ConfigToml::default()
+            } else {
+                Err(e)?
+            }
+        }
+    };
 
-    if let Some(port) = init.base_port {
-        file.write_all(format!("base_port = {}\n", port).as_bytes())?;
-    }
-    if let Some(port) = init.base_testing_port {
-        file.write_all(format!("base_testing_port = {}\n", port).as_bytes())?;
-    }
-
-    file.write_all(b"[configs]\n")?;
+    config.base_port = init.base_port;
+    config.base_testing_port = init.base_testing_port;
     for pg_config in pg_configs {
-        file.write_all(
-            format!(
-                "{}=\"{}\"\n",
-                pg_config.label()?,
-                pg_config.path().ok_or(eyre!("no path for pg_config"))?.display()
-            )
-            .as_bytes(),
-        )?;
+        config
+            .configs
+            .insert(pg_config.label()?, pg_config.path().ok_or(eyre!("no path for pg_config"))?);
     }
+
+    let mut file = File::create(&config_path)?;
+    file.write_all(toml::to_string(&config)?.as_bytes())?;
 
     Ok(())
 }

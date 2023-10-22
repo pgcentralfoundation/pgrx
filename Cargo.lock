@@ -357,6 +357,7 @@ dependencies = [
  "serde_derive",
  "syn 2.0.38",
  "tempfile",
+ "toml",
  "tracing",
  "tracing-error",
  "tracing-subscriber",
