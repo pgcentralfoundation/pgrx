@@ -743,10 +743,7 @@ impl<T: IntoDatum + FromDatum> IntoDatum for Array<'_, T> {
     }
 
     fn composite_type_oid(&self) -> Option<Oid> {
-        // the composite type oid for a vec of composite types is the array type of the base composite type
-        self.get(0)
-            .map(|v| v.composite_type_oid().map(|oid| unsafe { pg_sys::get_array_type(oid) }))
-            .flatten()
+        Some(unsafe { pg_sys::get_array_type(self.raw.oid()) })
     }
 }
 
