@@ -59,6 +59,8 @@ tempfile = "3.8.0"
 nix = { version = "0.27", default-features = false, features = ["user"] }
 toml = "0.8.2"
 jobslot = "0.2.12"
+bzip2 = "0.4.4"
+tar = "0.4.40"
 
 [features]
 default = ["ureq/native-tls"]
