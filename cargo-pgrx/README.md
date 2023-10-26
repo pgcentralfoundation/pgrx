@@ -10,7 +10,7 @@ A video walkthrough of its abilities can be found here: https://www.twitch.tv/vi
 
 Install via crates.io:
 
-```shell script
+```console
 $ cargo install --locked cargo-pgrx
 ```
 
@@ -18,7 +18,7 @@ As new versions of `pgrx` are released, you'll want to make sure you run this co
 
 ## Usage
 
-```shell script
+```console
 $ cargo pgrx --help
 Cargo subcommand for 'pgrx' to make Postgres extension development easy
 
@@ -58,7 +58,7 @@ Options:
 
 ## First Time Initialization
 
-```shell script
+```console
 $ cargo pgrx init
   Discovered Postgres v15.0, v14.5, v13.8, v12.12, v11.17
   Downloading Postgres v15.0 from https://ftp.postgresql.org/pub/source/v15.0/postgresql-15.0.tar.bz2
@@ -100,7 +100,7 @@ $ cargo pgrx init
 
 `cargo pgrx init` is required to be run once to properly configure the `pgrx` development environment.
 
-As shown by the screenshot above, it downloads the latest versions of Postgres v11, v12, v13, v14, v15, configures them, compiles them, and installs them to `~/.pgrx/`, including all [`contrib`](https://www.postgresql.org/docs/current/contrib.html) extensions and tools included with Postgres. Other `pgrx` commands such as `run` and `test` will fully manage and otherwise use these Postgres installations for you.
+As shown by the screenshot above, it downloads the latest releases of supported Postgres versions, configures them, compiles them, and installs them to `~/.pgrx/`, including all [`contrib`](https://www.postgresql.org/docs/current/contrib.html) extensions and tools included with Postgres. Other `pgrx` commands such as `run` and `test` will fully manage and otherwise use these Postgres installations for you.
 
 `pgrx` is designed to support multiple Postgres versions in such a way that during development, you'll know if you're trying to use a Postgres API that isn't common across all versions. It's also designed to make testing your extension against these versions easy. This is why it requires you to have all fully compiled and installed versions of Postgres during development.
 
@@ -125,34 +125,34 @@ Once complete, `cargo pgrx init` also creates a configuration file (`~/.pgrx/con
 
 If a new minor Postgres version is released in the future you can simply run `cargo pgrx init [args]` again, and your local version will be updated, preserving all existing databases and configuration.
 
-```shell script
-cargo-pgrx-init 0.5.0
-PgCentral Foundation, Inc. <contact@pgcentral.org>
+```console
+$ cargo pgrx init -h
 Initialize pgrx development environment for the first time
 
-USAGE:
-    cargo pgrx init [OPTIONS]
+Usage: cargo pgrx init [OPTIONS]
 
-OPTIONS:
-        --base-port <BASE_PORT>
-            Base port number
-
-        --base-testing-port <BASE_TESTING_PORT>
-            Base testing port number
-
-    -h, --help           Print help information
-        --pg11 <PG11>    If installed locally, the path to PG11's `pgconfig` tool, or `download` to
-                         have pgrx download/compile/install it [env: PG11_PG_CONFIG=]
-        --pg12 <PG12>    If installed locally, the path to PG12's `pgconfig` tool, or `download` to
-                         have pgrx download/compile/install it [env: PG12_PG_CONFIG=]
-        --pg13 <PG13>    If installed locally, the path to PG13's `pgconfig` tool, or `download` to
-                         have pgrx download/compile/install it [env: PG13_PG_CONFIG=]
-        --pg14 <PG14>    If installed locally, the path to PG14's `pgconfig` tool, or `download` to
-                         have pgrx download/compile/install it [env: PG14_PG_CONFIG=]
-        --pg15 <PG15>    If installed locally, the path to PG15's `pgconfig` tool, or `download` to
-                         have pgrx download/compile/install it [env: PG15_PG_CONFIG=]
-    -v, --verbose        Enable info logs, -vv for debug, -vvv for trace
-    -V, --version        Print version information
+Options:
+      --pg11 <PG11>                            If installed locally, the path to PG11's `pgconfig` tool, or `download`
+                                               to have pgrx download/compile/install it [env: PG11_PG_CONFIG=]
+      --pg12 <PG12>                            If installed locally, the path to PG12's `pgconfig` tool, or `download`
+                                               to have pgrx download/compile/install it [env: PG12_PG_CONFIG=]
+      --pg13 <PG13>                            If installed locally, the path to PG13's `pgconfig` tool, or `download`
+                                               to have pgrx download/compile/install it [env: PG13_PG_CONFIG=]
+      --pg14 <PG14>                            If installed locally, the path to PG14's `pgconfig` tool, or `download`
+                                               to have pgrx download/compile/install it [env: PG14_PG_CONFIG=]
+      --pg15 <PG15>                            If installed locally, the path to PG15's `pgconfig` tool, or `download`
+                                               to have pgrx download/compile/install it [env: PG15_PG_CONFIG=]
+      --pg16 <PG16>                            If installed locally, the path to PG16's `pgconfig` tool, or `download`
+                                               to have pgrx download/compile/install it [env: PG16_PG_CONFIG=]
+      --base-port <BASE_PORT>                  Base port number
+      --base-testing-port <BASE_TESTING_PORT>  Base testing port number
+      --configure-flag <CONFIGURE_FLAG>        Additional flags to pass to the configure script
+      --valgrind                               Compile PostgreSQL with the necessary flags to detect a good amount of
+                                               memory errors when run under Valgrind
+  -j, --jobs <JOBS>                            Allow N make jobs at once
+  -h, --help                                   Print help (see more with '--help')
+  -v, --verbose...                             Enable info logs, -vv for debug, -vvv for trace
+  -V, --version                                Print version
 ```
 
 ## Creating a new Extension
@@ -173,7 +173,7 @@ If you'd like to create a "background worker" instead, specify the `--bgworker` 
 >
 > If you don't, you may experience unnecessary rebuilds using tools like Rust-Analyzer, as it will use the wrong `rustflags` option.
 
-```shell script
+```console
 $ cargo pgrx new --help
 cargo-pgrx-new 0.5.0
 PgCentral Foundation, Inc. <contact@pgcentral.org>
@@ -194,7 +194,7 @@ OPTIONS:
 
 ## Managing Your Postgres Installations
 
-```shell script
+```console
 $ cargo pgrx status all
 Postgres v11 is stopped
 Postgres v12 is stopped
@@ -234,7 +234,7 @@ Once started, you can connect to them using `psql` (if you have it on your $PATH
 
 ## Compiling and Running Your Extension
 
-```shell script
+```console
 $ cargo pgrx run pg13
 building extension with features ``
 "cargo" "build" "--message-format=json-render-diagnostics"
@@ -289,7 +289,7 @@ When you exit `psql`, the Postgres instance continues to run in the background.
 
 For Postgres installations which are already on your computer, `cargo pgrx run` will need write permissions to the directories described by `pg_config --pkglibdir` and `pg_config --sharedir`. It's up to you to decide how to make that happen. While a single Postgres installation can be started multiple times on different ports and different data directories, it does not support multiple "extension library directories".
 
-```shell script
+```console
 $ cargo pgrx run --help
 cargo-pgrx-run 0.5.0
 PgCentral Foundation, Inc. <contact@pgcentral.org>
@@ -341,7 +341,7 @@ OPTIONS:
 
 ## Connect to a Database
 
-```shell script
+```console
 $ cargo pgrx connect
     Re-using existing database strings
 psql (13.5)
@@ -365,7 +365,7 @@ database name as the final argument.
 If the specified database doesn't exist, `cargo pgrx connect` will create it. Similarly, if
 the specified version of Postgres isn't running, it'll be automatically started.
 
-```shell script
+```console
 cargo-pgrx-connect 0.5.
 PgCentral Foundation, Inc. <contact@pgcentral.org>
 Connect, via psql, to a Postgres instance
@@ -401,7 +401,7 @@ OPTIONS:
 
 ## Installing Your Extension Locally
 
-```shell script
+```console
 $ cargo pgrx install
 building extension with features ``
 "cargo" "build" "--message-format=json-render-diagnostics"
@@ -427,7 +427,7 @@ files to their proper location using `sudo`, prompting you for your password.
 
 By default, `cargo pgrx install` builds your extension in debug mode. Specifying `--release` changes that.
 
-```shell script
+```console
 $ cargo pgrx install --help
 cargo-pgrx-install 0.5.0
 PgCentral Foundation, Inc. <contact@pgcentral.org>
@@ -480,7 +480,7 @@ OPTIONS:
 
 ## Testing Your Extension
 
-```shell script
+```console
 $ cargo pgrx test
 "cargo" "test" "--features" " pg_test"
     Finished test [unoptimized + debuginfo] target(s) in 0.07s
@@ -519,7 +519,7 @@ Rust `#[test]` functions behave normally, while `#[pg_test]` functions are run *
 Additionally, a `#[pg_test]` function runs in a transaction that is aborted when the test is finished. As such, any changes it might
 make to the database are not preserved.
 
-```shell script
+```console
 cargo-pgrx-test 0.5.0
 PgCentral Foundation, Inc. <contact@pgcentral.org>
 Run the test suite for this crate
@@ -569,7 +569,7 @@ OPTIONS:
 
 ## Building an Installation Package
 
-```shell script
+```console
 $ cargo pgrx package
 building extension with features ``
 "cargo" "build" "--release" "--message-format=json-render-diagnostics"
@@ -601,7 +601,7 @@ version of Postgres 12.)
 This command could be useful from Dockerfiles, for example, to automate building installation packages for various Linux
 distobutions or MacOS Postgres installations.
 
-```shell script
+```console
 $ cargo pgrx package --help
 cargo-pgrx-package 0.5.0
 PgCentral Foundation, Inc. <contact@pgcentral.org>
@@ -657,7 +657,7 @@ OPTIONS:
 If you just want to look at the full extension schema that pgrx will generate, use
 `cargo pgrx schema`.
 
-```shell script
+```console
 $ cargo pgrx schema --help
 cargo-pgrx-schema 0.5.0
 PgCentral Foundation, Inc. <contact@pgcentral.org>
@@ -844,7 +844,7 @@ Although this may be relaxed in the future, currently schema generation involves
 `#[repr(Rust)]` types. Generally, the appropriate way to fix this is reinstall
 `cargo-pgrx`, using a command like the following
 
-```shell script
+```console
 $ cargo install --force --locked cargo-pgrx
 ```
 

@@ -16,16 +16,15 @@ use owo_colors::OwoColorize;
 use pgrx_pg_config::{
     get_c_locale_flags, prefix_path, ConfigToml, PgConfig, PgConfigSelector, Pgrx, PgrxHomeError,
 };
-use rayon::prelude::*;
 use tar::Archive;
 
 use std::collections::HashMap;
 use std::fs::File;
 use std::io::{Read, Write};
+use std::num::NonZeroUsize;
 use std::path::PathBuf;
 use std::process::{Command, Stdio};
-
-use std::sync::{Arc, Mutex};
+use std::sync::OnceLock;
 
 static PROCESS_ENV_DENYLIST: &'static [&'static str] = &[
     "DEBUG",
@@ -79,11 +78,28 @@ pub(crate) struct Init {
     /// installed, but the resulting build is usable without valgrind.
     #[clap(long)]
     valgrind: bool,
+    #[clap(long, short, help = "Allow N make jobs at once")]
+    jobs: Option<usize>,
+    #[clap(skip)]
+    jobserver: OnceLock<jobslot::Client>,
 }
 
 impl CommandExecute for Init {
     #[tracing::instrument(level = "error", skip(self))]
     fn execute(self) -> eyre::Result<()> {
+        self.jobserver
+            .set(
+                jobslot::Client::new(
+                    self.jobs
+                        .or_else(|| {
+                            std::thread::available_parallelism().map(NonZeroUsize::get).ok()
+                        })
+                        .unwrap_or(1),
+                )
+                .expect("failed to create jobserver"),
+            )
+            .unwrap();
+
         let mut versions = HashMap::new();
 
         if let Some(ref version) = self.pg11 {
@@ -161,39 +177,36 @@ pub(crate) fn init_pgrx(pgrx: &Pgrx, init: &Init) -> eyre::Result<()> {
         },
     };
 
-    let output_configs = Arc::new(Mutex::new(Vec::new()));
-
-    let mut pg_configs = Vec::new();
-    for pg_config in pgrx.iter(PgConfigSelector::All) {
-        pg_configs.push(pg_config?);
-    }
-
-    let span = tracing::Span::current();
-    pg_configs
-        .into_par_iter()
-        .map(|pg_config| {
-            let _span = span.clone().entered();
-            let mut pg_config = pg_config.clone();
-            stop_postgres(&pg_config).ok(); // no need to fail on errors trying to stop postgres while initializing
-            if !pg_config.is_real() {
-                pg_config = match download_postgres(&pg_config, &pgrx_home, init) {
-                    Ok(pg_config) => pg_config,
-                    Err(e) => return Err(eyre!(e)),
+    let mut output_configs = std::thread::scope(|s| -> eyre::Result<Vec<_>> {
+        let span = tracing::Span::current();
+        let mut threads = Vec::new();
+        for pg_config in pgrx.iter(PgConfigSelector::All) {
+            let pg_config = pg_config?;
+            let span = span.clone();
+            let pgrx_home = pgrx_home.clone();
+            threads.push(s.spawn(move || {
+                let _span = span.entered();
+                let mut pg_config = pg_config.clone();
+                stop_postgres(&pg_config).ok(); // no need to fail on errors trying to stop postgres while initializing
+                if !pg_config.is_real() {
+                    pg_config = match download_postgres(&pg_config, &pgrx_home, init) {
+                        Ok(pg_config) => pg_config,
+                        Err(e) => return Err(eyre!(e)),
+                    }
                 }
-            }
 
-            let mut mutex = output_configs.lock();
-            // PoisonError doesn't implement std::error::Error, can't `?` it.
-            let output_configs = mutex.as_mut().expect("failed to get output_configs lock");
+                Ok(pg_config)
+            }));
+        }
 
+        let mut output_configs = Vec::with_capacity(threads.len());
+        for thread in threads {
+            let pg_config = thread.join().map_err(|_| eyre!("thread panicked"))??;
             output_configs.push(pg_config);
-            Ok(())
-        })
-        .collect::<eyre::Result<()>>()?;
+        }
 
-    let mut mutex = output_configs.lock();
-    // PoisonError doesn't implement std::error::Error, can't `?` it.
-    let output_configs = mutex.as_mut().unwrap();
+        Ok(output_configs)
+    })?;
 
     output_configs.sort_by(|a, b| {
         a.major_version()
@@ -214,7 +227,7 @@ pub(crate) fn init_pgrx(pgrx: &Pgrx, init: &Init) -> eyre::Result<()> {
         }
     }
 
-    write_config(output_configs, init)?;
+    write_config(&output_configs, init)?;
     Ok(())
 }
 
@@ -247,13 +260,20 @@ fn download_postgres(
     }
     let mut buf = Vec::new();
     let _count = http_response.into_reader().read_to_end(&mut buf)?;
-    let pgdir = untar(&buf, pgrx_home, pg_config)?;
-    configure_postgres(pg_config, &pgdir, init)?;
-    make_postgres(pg_config, &pgdir)?;
-    make_install_postgres(pg_config, &pgdir) // returns a new PgConfig object
+    let pgdir = untar(&buf, pgrx_home, pg_config, &init)?;
+    configure_postgres(pg_config, &pgdir, &init)?;
+    make_postgres(pg_config, &pgdir, &init)?;
+    make_install_postgres(pg_config, &pgdir, init) // returns a new PgConfig object
 }
 
-fn untar(bytes: &[u8], pgrxdir: &PathBuf, pg_config: &PgConfig) -> eyre::Result<PathBuf> {
+fn untar(
+    bytes: &[u8],
+    pgrxdir: &PathBuf,
+    pg_config: &PgConfig,
+    init: &Init,
+) -> eyre::Result<PathBuf> {
+    let _token = init.jobserver.get().unwrap().acquire().unwrap();
+
     let mut unpackdir = pgrxdir.clone();
     unpackdir.push(&format!("{}_unpack", pg_config.version()?));
     if unpackdir.exists() {
@@ -382,6 +402,8 @@ fn fixup_homebrew_for_icu(configure_cmd: &mut Command) {
 }
 
 fn configure_postgres(pg_config: &PgConfig, pgdir: &PathBuf, init: &Init) -> eyre::Result<()> {
+    let _token = init.jobserver.get().unwrap().acquire().unwrap();
+
     println!("{} Postgres v{}", "  Configuring".bold().green(), pg_config.version()?);
     let mut configure_path = pgdir.clone();
     configure_path.push("configure");
@@ -447,14 +469,11 @@ fn configure_postgres(pg_config: &PgConfig, pgdir: &PathBuf, init: &Init) -> eyr
     }
 }
 
-fn make_postgres(pg_config: &PgConfig, pgdir: &PathBuf) -> eyre::Result<()> {
-    let num_cpus = 1.max(num_cpus::get() / 3);
+fn make_postgres(pg_config: &PgConfig, pgdir: &PathBuf, init: &Init) -> eyre::Result<()> {
     println!("{} Postgres v{}", "    Compiling".bold().green(), pg_config.version()?);
     let mut command = std::process::Command::new("make");
 
     command
-        .arg("-j")
-        .arg(num_cpus.to_string())
         .arg("world-bin")
         .stdout(std::process::Stdio::piped())
         .stderr(std::process::Stdio::piped())
@@ -467,7 +486,7 @@ fn make_postgres(pg_config: &PgConfig, pgdir: &PathBuf) -> eyre::Result<()> {
 
     let command_str = format!("{:?}", command);
     tracing::debug!(command = %command_str, "Running");
-    let child = command.spawn()?;
+    let child = init.jobserver.get().unwrap().configure_and_run(&mut command, |cmd| cmd.spawn())?;
     let output = child.wait_with_output()?;
     tracing::trace!(status_code = %output.status, command = %command_str, "Finished");
 
@@ -483,7 +502,11 @@ fn make_postgres(pg_config: &PgConfig, pgdir: &PathBuf) -> eyre::Result<()> {
     }
 }
 
-fn make_install_postgres(version: &PgConfig, pgdir: &PathBuf) -> eyre::Result<PgConfig> {
+fn make_install_postgres(
+    version: &PgConfig,
+    pgdir: &PathBuf,
+    init: &Init,
+) -> eyre::Result<PgConfig> {
     println!(
         "{} Postgres v{} to {}",
         "   Installing".bold().green(),
@@ -504,7 +527,7 @@ fn make_install_postgres(version: &PgConfig, pgdir: &PathBuf) -> eyre::Result<Pg
 
     let command_str = format!("{:?}", command);
     tracing::debug!(command = %command_str, "Running");
-    let child = command.spawn()?;
+    let child = init.jobserver.get().unwrap().configure_and_run(&mut command, |cmd| cmd.spawn())?;
     let output = child.wait_with_output()?;
     tracing::trace!(status_code = %output.status, command = %command_str, "Finished");
 

@@ -152,7 +152,7 @@ version = "0.2.14"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "d9b39be18770d11421cdb1b9947a45dd3f37e93092cbf377614828a319d5fee8"
 dependencies = [
- "hermit-abi 0.1.19",
+ "hermit-abi",
  "libc",
  "winapi",
 ]
@@ -360,9 +360,9 @@ dependencies = [
  "eyre",
  "flate2",
  "fork",
+ "jobslot",
  "libloading 0.8.1",
  "nix",
- "num_cpus",
  "object",
  "once_cell",
  "owo-colors",
@@ -371,7 +371,6 @@ dependencies = [
  "prettyplease",
  "proc-macro2",
  "quote",
- "rayon",
  "regex",
  "semver 1.0.20",
  "serde",
@@ -1061,12 +1060,6 @@ dependencies = [
 ]
 
 [[package]]
-name = "hermit-abi"
-version = "0.3.3"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "d77f7ec81a6d05a3abb01ab6eb7590f6083d08449fe5a1c8b1e620283546ccb7"
-
-[[package]]
 name = "hmac"
 version = "0.12.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -1122,6 +1115,19 @@ name = "itoa"
 version = "1.0.9"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "af150ab688ff2122fcef229be89cb50dd66af9e01a4ff320cc137eecc9bacc38"
+
+[[package]]
+name = "jobslot"
+version = "0.2.12"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "9d03a2fc28c7a19e689b7e8c3f209c77dac23133d235a80cd9c3f400ecd9a73f"
+dependencies = [
+ "cfg-if",
+ "getrandom",
+ "libc",
+ "scopeguard",
+ "windows-sys",
+]
 
 [[package]]
 name = "js-sys"
@@ -1378,16 +1384,6 @@ checksum = "39e3200413f237f41ab11ad6d161bc7239c84dcb631773ccd7de3dfe4b5c267c"
 dependencies = [
  "autocfg",
  "libm",
-]
-
-[[package]]
-name = "num_cpus"
-version = "1.16.0"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "4161fcb6d602d4d2081af7c3a45852d875a03dd337a6bfdd6e06407b61342a43"
-dependencies = [
- "hermit-abi 0.3.3",
- "libc",
 ]
 
 [[package]]
