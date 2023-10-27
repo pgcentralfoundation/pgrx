@@ -7,7 +7,7 @@
 //LICENSE All rights reserved.
 //LICENSE
 //LICENSE Use of this source code is governed by the MIT license that can be found in the LICENSE file.
-use crate::datum::{Array, FromDatum};
+use crate::datum::Array;
 use crate::pg_sys;
 use crate::toast::{Toast, Toasty};
 use bitvec::prelude::*;
@@ -273,7 +273,7 @@ impl RawArray {
     /// # Safety
     /// Array must have been made from an ArrayType pointer,
     /// or a null value, as-if [RawArray::from_ptr].
-    pub unsafe fn from_array<T: FromDatum>(arr: Array<T>) -> Option<RawArray> {
+    pub unsafe fn from_array<T>(arr: Array<T>) -> Option<RawArray> {
         let array_type = arr.into_array_type() as *mut _;
         // SAFETY: Validity asserted by the caller.
         let len = unsafe { ARR_NELEMS(array_type) } as usize;
