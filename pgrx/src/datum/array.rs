@@ -732,7 +732,7 @@ impl<'a, T: FromDatum> FromDatum for Array<'a, T> {
     }
 }
 
-impl<T: IntoDatum + FromDatum> IntoDatum for Array<'_, T> {
+impl<T: IntoDatum> IntoDatum for Array<'_, T> {
     #[inline]
     fn into_datum(self) -> Option<Datum> {
         let array_type = self.into_array_type();
@@ -742,7 +742,7 @@ impl<T: IntoDatum + FromDatum> IntoDatum for Array<'_, T> {
 
     #[inline]
     fn type_oid() -> Oid {
-        T::array_type_oid()
+        unsafe { pg_sys::get_array_type(T::type_oid()) }
     }
 
     fn composite_type_oid(&self) -> Option<Oid> {

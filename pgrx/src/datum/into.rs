@@ -34,9 +34,6 @@ pub trait IntoDatum {
     fn composite_type_oid(&self) -> Option<Oid> {
         None
     }
-    fn array_type_oid() -> pg_sys::Oid {
-        unsafe { pg_sys::get_array_type(Self::type_oid()) }
-    }
 
     /// Is a Datum of this type compatible with another Postgres type?
     ///
