@@ -169,25 +169,6 @@ impl IntoDatum for i32 {
     }
 }
 
-/// for oid
-impl IntoDatum for u32 {
-    #[inline]
-    fn into_datum(self) -> Option<pg_sys::Datum> {
-        Some(pg_sys::Datum::from(self))
-    }
-
-    fn type_oid() -> pg_sys::Oid {
-        pg_sys::OIDOID
-    }
-
-    fn is_compatible_with(other: pg_sys::Oid) -> bool {
-        Self::type_oid() == other
-            || i8::type_oid() == other
-            || i16::type_oid() == other
-            || i32::type_oid() == other
-    }
-}
-
 /// for bigint
 impl IntoDatum for i64 {
     #[inline]

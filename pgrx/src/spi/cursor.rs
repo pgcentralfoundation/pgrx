@@ -34,9 +34,9 @@ type CursorName = String;
 /// # fn foo() -> spi::Result<()> {
 /// Spi::connect(|mut client| {
 ///     let mut cursor = client.open_cursor("SELECT * FROM generate_series(1, 5)", None);
-///     assert_eq!(Some(1u32), cursor.fetch(1)?.get_one::<u32>()?);
-///     assert_eq!(Some(2u32), cursor.fetch(2)?.get_one::<u32>()?);
-///     assert_eq!(Some(3u32), cursor.fetch(3)?.get_one::<u32>()?);
+///     assert_eq!(Some(1), cursor.fetch(1)?.get_one::<i32>()?);
+///     assert_eq!(Some(2), cursor.fetch(2)?.get_one::<i32>()?);
+///     assert_eq!(Some(3), cursor.fetch(3)?.get_one::<i32>()?);
 ///     Ok::<_, pgrx::spi::Error>(())
 ///     // <--- all three SpiTupleTable get freed by Spi::connect at this point
 /// })
@@ -49,13 +49,13 @@ type CursorName = String;
 /// # fn foo() -> spi::Result<()> {
 /// let cursor_name = Spi::connect(|mut client| {
 ///     let mut cursor = client.open_cursor("SELECT * FROM generate_series(1, 5)", None);
-///     assert_eq!(Ok(Some(1u32)), cursor.fetch(1)?.get_one::<u32>());
+///     assert_eq!(Ok(Some(1)), cursor.fetch(1)?.get_one::<i32>());
 ///     Ok::<_, spi::Error>(cursor.detach_into_name()) // <-- cursor gets dropped here
 ///     // <--- first SpiTupleTable gets freed by Spi::connect at this point
 /// })?;
 /// Spi::connect(|mut client| {
 ///     let mut cursor = client.find_cursor(&cursor_name)?;
-///     assert_eq!(Ok(Some(2u32)), cursor.fetch(1)?.get_one::<u32>());
+///     assert_eq!(Ok(Some(2)), cursor.fetch(1)?.get_one::<i32>());
 ///     drop(cursor); // <-- cursor gets dropped here
 ///     // ... more code ...
 ///     Ok(())
