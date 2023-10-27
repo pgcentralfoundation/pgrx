@@ -76,10 +76,7 @@ impl<'a> FromDatum for PgHeapTuple<'a, AllocatedByRust> {
         composite: Datum,
         is_null: bool,
         _oid: pg_sys::Oid,
-    ) -> Option<Self>
-    where
-        Self: Sized,
-    {
+    ) -> Option<Self> {
         if is_null {
             None
         } else {
