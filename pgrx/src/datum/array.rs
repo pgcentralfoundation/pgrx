@@ -55,7 +55,7 @@ fn with_vec(elems: Array<String>) {
 }
 ```
 */
-pub struct Array<'a, T: FromDatum> {
+pub struct Array<'a, T> {
     null_slice: NullKind<'a>,
     slide_impl: ChaChaSlideImpl<T>,
     // Rust drops in FIFO order, drop this last
@@ -154,22 +154,6 @@ impl<'a, T: FromDatum> Array<'a, T> {
         Array { raw, slide_impl, null_slice }
     }
 
-    /// Rips out the underlying `pg_sys::ArrayType` pointer.
-    /// Note that Array may have caused Postgres to allocate to unbox the datum,
-    /// and this can hypothetically cause a memory leak if so.
-    #[inline]
-    pub fn into_array_type(self) -> *const pg_sys::ArrayType {
-        // may be worth replacing this function when Toast<T> matures enough
-        // to be used as a public type with a fn(self) -> Toast<RawArray>
-
-        let Array { raw, .. } = self;
-        // Wrap the Toast<RawArray> to prevent it from deallocating itself
-        let mut raw = core::mem::ManuallyDrop::new(raw);
-        let ptr = raw.deref_mut().deref_mut() as *mut RawArray;
-        // SAFETY: Leaks are safe if they aren't use-after-frees!
-        unsafe { ptr.read() }.into_ptr().as_ptr() as _
-    }
-
     /// Return an iterator of `Option<T>`.
     #[inline]
     pub fn iter(&self) -> ArrayIterator<'_, T> {
@@ -189,22 +173,6 @@ impl<'a, T: FromDatum> Array<'a, T> {
 
         let ptr = self.raw.data_ptr();
         ArrayTypedIterator { array: self, curr: 0, ptr }
-    }
-
-    /// Returns `true` if this [`Array`] contains one or more SQL "NULL" values
-    #[inline]
-    pub fn contains_nulls(&self) -> bool {
-        self.null_slice.any()
-    }
-
-    #[inline]
-    pub fn len(&self) -> usize {
-        self.raw.len()
-    }
-
-    #[inline]
-    pub fn is_empty(&self) -> bool {
-        self.raw.len() == 0
     }
 
     #[allow(clippy::option_option)]
@@ -272,6 +240,41 @@ impl<'a, T: FromDatum> Array<'a, T> {
             debug_assert!(ptr.wrapping_add(offset) <= self.raw.end_ptr());
             ptr.add(offset)
         }
+    }
+}
+
+#[deny(unsafe_op_in_unsafe_fn)]
+impl<'a, T> Array<'a, T> {
+    /// Rips out the underlying `pg_sys::ArrayType` pointer.
+    /// Note that Array may have caused Postgres to allocate to unbox the datum,
+    /// and this can hypothetically cause a memory leak if so.
+    #[inline]
+    pub fn into_array_type(self) -> *const pg_sys::ArrayType {
+        // may be worth replacing this function when Toast<T> matures enough
+        // to be used as a public type with a fn(self) -> Toast<RawArray>
+
+        let Array { raw, .. } = self;
+        // Wrap the Toast<RawArray> to prevent it from deallocating itself
+        let mut raw = core::mem::ManuallyDrop::new(raw);
+        let ptr = raw.deref_mut().deref_mut() as *mut RawArray;
+        // SAFETY: Leaks are safe if they aren't use-after-frees!
+        unsafe { ptr.read() }.into_ptr().as_ptr() as _
+    }
+
+    /// Returns `true` if this [`Array`] contains one or more SQL "NULL" values
+    #[inline]
+    pub fn contains_nulls(&self) -> bool {
+        self.null_slice.any()
+    }
+
+    #[inline]
+    pub fn len(&self) -> usize {
+        self.raw.len()
+    }
+
+    #[inline]
+    pub fn is_empty(&self) -> bool {
+        self.raw.len() == 0
     }
 }
 
@@ -362,7 +365,7 @@ impl<'a> Array<'a, i8> {
 }
 
 #[inline(always)]
-fn as_slice<'a, T: Sized + FromDatum>(array: &'a Array<'_, T>) -> Result<&'a [T], ArraySliceError> {
+fn as_slice<'a, T: Sized>(array: &'a Array<'_, T>) -> Result<&'a [T], ArraySliceError> {
     if array.contains_nulls() {
         return Err(ArraySliceError::ContainsNulls);
     }
