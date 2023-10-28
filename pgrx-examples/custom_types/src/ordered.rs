@@ -19,7 +19,6 @@ use std::cmp::Ordering;
     Clone,
     Eq,
     PartialEq,
-    PartialOrd,
     PostgresType,
     PostgresEq,
     PostgresOrd
@@ -48,6 +47,12 @@ impl Ord for OrderedThing {
                 self.item.cmp(&other.item).reverse()
             }
         }
+    }
+}
+
+impl PartialOrd for OrderedThing {
+    fn partial_cmp(&self, other: &Self) -> Option<Ordering> {
+        Some(self.cmp(other))
     }
 }
 
