@@ -125,51 +125,49 @@ pub(crate) fn pg_config_and_version<'a>(
     user_features: Option<&mut Features>,
     verbose: bool,
 ) -> eyre::Result<(PgConfig, PgVersionSource)> {
-    let pg_version = {
-        'outer: loop {
-            if let Some(pg_version) = specified_pg_version {
-                // the user gave us an explicit Postgres version to use, so we will
-                break 'outer Some(PgVersionSource::CliArgument(pg_version));
-            } else if let Some(features) = user_features.as_ref() {
-                // the user did not give us an explicit Postgres version, so see if there's one in the set
-                // of `--feature` flags they gave us
-                for flag in &features.features {
-                    if pgrx.is_feature_flag(flag) {
-                        // use the first feature flag that is a Postgres version we support
-                        break 'outer Some(PgVersionSource::FeatureFlag(flag.clone()));
-                    }
+    let pg_version = || {
+        if let Some(pg_version) = specified_pg_version {
+            // the user gave us an explicit Postgres version to use, so we will
+            return Some(PgVersionSource::CliArgument(pg_version));
+        } else if let Some(features) = user_features.as_ref() {
+            // the user did not give us an explicit Postgres version, so see if there's one in the set
+            // of `--feature` flags they gave us
+            for flag in &features.features {
+                if pgrx.is_feature_flag(flag) {
+                    // use the first feature flag that is a Postgres version we support
+                    return Some(PgVersionSource::FeatureFlag(flag.clone()));
                 }
+            }
 
-                // user didn't give us a feature flag that is a Postgres version
+            // user didn't give us a feature flag that is a Postgres version
 
-                // if they didn't ask for `--no-default-features` lets see if we have a default
-                // postgres version feature specified in the manifest
-                if !features.no_default_features {
-                    if let Some(default_features) = manifest.features.get("default") {
-                        for flag in default_features {
-                            if pgrx.is_feature_flag(flag) {
-                                break 'outer Some(PgVersionSource::DefaultFeature(flag.clone()));
-                            }
-                        }
-                    }
-                }
-            } else {
-                // lets check the manifest for a default feature
+            // if they didn't ask for `--no-default-features` lets see if we have a default
+            // postgres version feature specified in the manifest
+            if !features.no_default_features {
                 if let Some(default_features) = manifest.features.get("default") {
                     for flag in default_features {
                         if pgrx.is_feature_flag(flag) {
-                            break 'outer Some(PgVersionSource::DefaultFeature(flag.clone()));
+                            return Some(PgVersionSource::DefaultFeature(flag.clone()));
                         }
                     }
                 }
             }
-
-            // we cannot determine the Postgres version the user wants to use
-            break 'outer None;
+        } else {
+            // lets check the manifest for a default feature
+            if let Some(default_features) = manifest.features.get("default") {
+                for flag in default_features {
+                    if pgrx.is_feature_flag(flag) {
+                        return Some(PgVersionSource::DefaultFeature(flag.clone()));
+                    }
+                }
+            }
         }
+
+        // we cannot determine the Postgres version the user wants to use
+        None
     };
 
-    match pg_version {
+    match pg_version() {
         Some(pg_version) => {
             // we have determined a Postgres version
 
