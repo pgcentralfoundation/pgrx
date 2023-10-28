@@ -19,7 +19,7 @@ use core::ptr::{self, NonNull};
 
 #[cfg(any(feature = "pg13", feature = "pg14", feature = "pg15", feature = "pg16"))]
 mod flat_list;
-#[cfg(any(feature = "pg11", feature = "pg12"))]
+#[cfg(feature = "pg12")]
 mod linked_list;
 
 #[cfg(feature = "cshim")]
@@ -94,10 +94,10 @@ pub unsafe trait Enlist: seal::Sealed + Sized {
     #[doc(hidden)]
     fn endocytosis(cell: &mut pg_sys::ListCell, value: Self);
 
-    #[cfg(any(feature = "pg11", feature = "pg12"))]
+    #[cfg(feature = "pg12")]
     fn mitosis(cell: &pg_sys::ListCell) -> (&Self, Option<&ListCell<Self>>);
 
-    #[cfg(any(feature = "pg11", feature = "pg12"))]
+    #[cfg(feature = "pg12")]
     #[doc(hidden)]
     fn mitosis_mut(cell: &mut pg_sys::ListCell) -> (&mut Self, Option<&mut ListCell<Self>>);
 }

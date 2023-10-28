@@ -414,21 +414,7 @@ macro_rules! ereport {
 /// Is an interrupt pending?
 #[inline]
 pub fn interrupt_pending() -> bool {
-    #[cfg(any(feature = "pg11"))]
-    unsafe {
-        crate::InterruptPending
-    }
-
-    #[cfg(any(
-        feature = "pg12",
-        feature = "pg13",
-        feature = "pg14",
-        feature = "pg15",
-        feature = "pg16"
-    ))]
-    unsafe {
-        crate::InterruptPending != 0
-    }
+    unsafe { crate::InterruptPending != 0 }
 }
 
 /// If an interrupt is pending (perhaps a user-initiated "cancel query" message to this backend),
@@ -436,21 +422,6 @@ pub fn interrupt_pending() -> bool {
 #[macro_export]
 macro_rules! check_for_interrupts {
     () => {
-        #[cfg(any(feature = "pg11"))]
-        #[allow(unused_unsafe)]
-        unsafe {
-            if $crate::InterruptPending {
-                $crate::ProcessInterrupts();
-            }
-        }
-
-        #[cfg(any(
-            feature = "pg12",
-            feature = "pg13",
-            feature = "pg14",
-            feature = "pg15",
-            feature = "pg16"
-        ))]
         #[allow(unused_unsafe)]
         unsafe {
             if $crate::InterruptPending != 0 {

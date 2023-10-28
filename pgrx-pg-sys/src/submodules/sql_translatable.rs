@@ -27,16 +27,6 @@ unsafe impl SqlTranslatable for crate::FunctionCallInfoBaseData {
     }
 }
 
-#[cfg(any(feature = "pg11"))]
-unsafe impl SqlTranslatable for crate::FunctionCallInfoData {
-    fn argument_sql() -> Result<SqlMapping, ArgumentError> {
-        Ok(SqlMapping::Skip)
-    }
-    fn return_sql() -> Result<Returns, ReturnsError> {
-        Ok(Returns::One(SqlMapping::Skip))
-    }
-}
-
 unsafe impl SqlTranslatable for crate::PlannerInfo {
     fn argument_sql() -> Result<SqlMapping, ArgumentError> {
         Ok(SqlMapping::literal("internal"))

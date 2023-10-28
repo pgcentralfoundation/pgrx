@@ -31,7 +31,7 @@ fn to_iso_string(tsz: TimestampWithTimeZone) -> String {
 /// EDT         | 2023-05-19T12:38:06.343021-04:00
 /// UTC         | 2023-05-19T16:38:06.343021+00:00
 /// ```
-#[cfg(not(any(feature = "pg11", feature = "pg12")))]
+#[cfg(not(any(feature = "pg12")))]
 #[pg_extern(name = "to_iso_string", immutable, parallel_safe)]
 fn to_iso_string_at_timezone(
     tsz: TimestampWithTimeZone,

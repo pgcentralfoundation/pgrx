@@ -167,7 +167,6 @@ impl PgProc {
     }
 
     /// Planner support function for this function (see Section 38.11), or zero if none
-    #[cfg(not(feature = "pg11"))]
     pub fn prosupport(&self) -> pg_sys::Oid {
         // won't panic because `prosupport` has a NOT NULL constraint, so `.unwrap()` wont panic
         self.get_attr(pg_sys::Anum_pg_proc_prosupport).unwrap()

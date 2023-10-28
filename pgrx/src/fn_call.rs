@@ -384,7 +384,7 @@ fn lookup_fn(fname: &str, args: &[&dyn FnCallArg]) -> Result<pg_sys::Oid> {
         // SAFETY:  we palloc'd the `pg_sys::String` elements of `parts_list` above and so it's
         // safe for us to free them now that they're no longer being used
         parts_list.drain(..).for_each(|s| {
-            #[cfg(any(feature = "pg11", feature = "pg12", feature = "pg13", feature = "pg14"))]
+            #[cfg(any(feature = "pg12", feature = "pg13", feature = "pg14"))]
             {
                 let s = s.cast::<pg_sys::Value>();
                 pg_sys::pfree((*s).val.str_.cast());
