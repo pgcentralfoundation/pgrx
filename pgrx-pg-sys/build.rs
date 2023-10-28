@@ -57,6 +57,20 @@ impl PgrxOverrides {
                 "FP_SUBNORMAL".into(),
                 "FP_ZERO".into(),
                 "IPPORT_RESERVED".into(),
+                // These are just annoying due to clippy
+                "M_E".into(),
+                "M_LOG2E".into(),
+                "M_LOG10E".into(),
+                "M_LN2".into(),
+                "M_LN10".into(),
+                "M_PI".into(),
+                "M_PI_2".into(),
+                "M_PI_4".into(),
+                "M_1_PI".into(),
+                "M_2_PI".into(),
+                "M_SQRT2".into(),
+                "M_SQRT1_2".into(),
+                "M_2_SQRTPI".into(),
             ]
             .into_iter()
             .collect(),
@@ -383,15 +397,9 @@ fn extract_oids(code: &syn::File) -> BTreeMap<syn::Ident, Box<syn::Expr>> {
 }
 
 fn is_builtin_oid(name: &str) -> bool {
-    if name.ends_with("OID") && name != "HEAP_HASOID" {
-        true
-    } else if name.ends_with("RelationId") {
-        true
-    } else if name == "TemplateDbOid" {
-        true
-    } else {
-        false
-    }
+    name.ends_with("OID") && name != "HEAP_HASOID"
+        || name.ends_with("RelationId")
+        || name == "TemplateDbOid"
 }
 
 fn rewrite_oid_consts(

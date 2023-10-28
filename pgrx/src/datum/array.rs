@@ -549,7 +549,7 @@ impl<'a, T: FromDatum> VariadicArray<'a, T> {
     }
 }
 
-pub struct ArrayTypedIterator<'a, T: 'a + FromDatum> {
+pub struct ArrayTypedIterator<'a, T: 'a> {
     array: &'a Array<'a, T>,
     curr: usize,
     ptr: *const u8,
@@ -592,7 +592,7 @@ impl<'a, T: FromDatum + serde::Serialize> serde::Serialize for ArrayTypedIterato
     }
 }
 
-pub struct ArrayIterator<'a, T: 'a + FromDatum> {
+pub struct ArrayIterator<'a, T: 'a> {
     array: &'a Array<'a, T>,
     curr: usize,
     ptr: *const u8,
@@ -627,7 +627,7 @@ impl<'a, T: FromDatum> Iterator for ArrayIterator<'a, T> {
 impl<'a, T: FromDatum> ExactSizeIterator for ArrayIterator<'a, T> {}
 impl<'a, T: FromDatum> core::iter::FusedIterator for ArrayIterator<'a, T> {}
 
-pub struct ArrayIntoIterator<'a, T: FromDatum> {
+pub struct ArrayIntoIterator<'a, T> {
     array: Array<'a, T>,
     curr: usize,
     ptr: *const u8,
