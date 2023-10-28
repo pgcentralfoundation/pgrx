@@ -33,10 +33,8 @@ impl Interval {
             if days > 0 || micros > 0 {
                 return Err(IntervalConversionError::MismatchedSigns);
             }
-        } else if months > 0 {
-            if days < 0 || micros < 0 {
-                return Err(IntervalConversionError::MismatchedSigns);
-            }
+        } else if months > 0 && (days < 0 || micros < 0) {
+            return Err(IntervalConversionError::MismatchedSigns);
         }
 
         Ok(Interval(pg_sys::Interval { time: micros, day: days, month: months }))

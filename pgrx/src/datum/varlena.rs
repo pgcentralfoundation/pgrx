@@ -431,7 +431,7 @@ where
     serialized.push_bytes(&[0u8; pg_sys::VARHDRSZ]); // reserve space for the header
     serde_cbor::to_writer(&mut serialized, &input).expect("failed to encode as CBOR");
 
-    let size = serialized.len() as usize;
+    let size = serialized.len();
     let varlena = serialized.into_char_ptr();
     unsafe {
         set_varsize(varlena as *mut pg_sys::varlena, size as i32);
@@ -475,7 +475,7 @@ where
     serialized.push_bytes(&[0u8; pg_sys::VARHDRSZ]); // reserve space for the header
     serde_json::to_writer(&mut serialized, &input).expect("failed to encode as JSON");
 
-    let size = serialized.len() as usize;
+    let size = serialized.len();
     let varlena = serialized.into_char_ptr();
     unsafe {
         set_varsize(varlena as *mut pg_sys::varlena, size as i32);

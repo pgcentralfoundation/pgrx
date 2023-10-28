@@ -336,7 +336,7 @@ impl TimestampWithTimeZone {
         PgTryBuilder::new(|| unsafe {
             Ok(direct_function_call(
                 pg_sys::timestamptz_zone,
-                &[timezone_datum, self.clone().into_datum()],
+                &[timezone_datum, (*self).into_datum()],
             )
             .unwrap())
         })

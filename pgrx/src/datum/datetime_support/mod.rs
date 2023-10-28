@@ -583,16 +583,15 @@ pub fn get_timezone_offset<Tz: AsRef<str>>(zone: Tz) -> Result<i32, DateTimeConv
     unsafe {
         let mut tz = 0;
         let tzname = alloc::ffi::CString::new(zone.as_ref()).unwrap();
-        let lowzone;
-        let tztype: u32;
+
         let mut val = 0;
         let mut tzp: *mut pg_tz = 0 as _;
 
         /* DecodeTimezoneAbbrev requires lowercase input */
-        lowzone =
+        let lowzone =
             pg_sys::downcase_truncate_identifier(tzname.as_ptr(), zone.as_ref().len() as _, false);
 
-        tztype = {
+        let tztype: u32 = {
             #[cfg(any(
                 feature = "pg11",
                 feature = "pg12",
