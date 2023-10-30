@@ -352,7 +352,7 @@ where
                 let lower = RangeBound::from_pg(lower_bound);
                 let upper = RangeBound::from_pg(upper_bound);
 
-                if std::ptr::eq(ptr, range_type.cast()) == false {
+                if !std::ptr::eq(ptr, range_type.cast()) {
                     // SAFETY: range_type was allocated by Postgres in the call to
                     // pg_detoast_datum above, so we know it's a valid pointer and needs to be freed
                     pg_sys::pfree(range_type.cast());

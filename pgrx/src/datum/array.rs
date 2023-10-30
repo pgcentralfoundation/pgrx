@@ -81,7 +81,7 @@ impl NullKind<'_> {
             // Note this flips the bit:
             // Postgres nullbitmaps are 1 for "valid" and 0 for "null"
             Self::Bits(b1) => b1.get(index).map(|b| !b),
-            Self::Strict(len) => index.lt(len).then(|| false),
+            Self::Strict(len) => index.lt(len).then_some(false),
         }
     }
 
@@ -848,8 +848,7 @@ where
     fn composite_type_oid(&self) -> Option<Oid> {
         // the composite type oid for a vec of composite types is the array type of the base composite type
         self.get(0)
-            .map(|v| v.composite_type_oid().map(|oid| unsafe { pg_sys::get_array_type(oid) }))
-            .flatten()
+            .and_then(|v| v.composite_type_oid().map(|oid| unsafe { pg_sys::get_array_type(oid) }))
     }
 
     #[inline]

@@ -82,7 +82,7 @@ impl TryFrom<pg_sys::Datum> for Timestamp {
     type Error = TryFromIntError;
 
     fn try_from(datum: pg_sys::Datum) -> Result<Self, Self::Error> {
-        pg_sys::Timestamp::try_from(datum.value() as isize).map(|d| Timestamp(d))
+        pg_sys::Timestamp::try_from(datum.value() as isize).map(Timestamp)
     }
 }
 

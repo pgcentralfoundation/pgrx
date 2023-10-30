@@ -138,9 +138,8 @@ impl Internal {
     {
         let ptr = self.0.get_or_insert_with(|| {
             let result = f();
-            let datum =
-                PgMemoryContexts::CurrentMemoryContext.leak_and_drop_on_delete(result).into();
-            datum
+
+            PgMemoryContexts::CurrentMemoryContext.leak_and_drop_on_delete(result).into()
         });
         &mut *(ptr.cast_mut_ptr::<T>())
     }

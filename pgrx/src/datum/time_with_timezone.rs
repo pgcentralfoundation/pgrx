@@ -53,7 +53,7 @@ impl From<TimeWithTimeZone> for (pg_sys::TimeADT, i32) {
 impl From<(pg_sys::TimeADT, i32)> for TimeWithTimeZone {
     #[inline]
     fn from(value: (pg_sys::TimeADT, i32)) -> Self {
-        TimeWithTimeZone { 0: pg_sys::TimeTzADT { time: value.0, zone: value.1 } }
+        TimeWithTimeZone(pg_sys::TimeTzADT { time: value.0, zone: value.1 })
     }
 }
 
@@ -267,11 +267,8 @@ impl TimeWithTimeZone {
     ) -> Result<Self, DateTimeConversionError> {
         let timezone_datum = timezone.as_ref().into_datum();
         PgTryBuilder::new(|| unsafe {
-            Ok(direct_function_call(
-                pg_sys::timetz_zone,
-                &[timezone_datum, self.clone().into_datum()],
-            )
-            .unwrap())
+            Ok(direct_function_call(pg_sys::timetz_zone, &[timezone_datum, (*self).into_datum()])
+                .unwrap())
         })
         .catch_when(PgSqlErrorCode::ERRCODE_DATETIME_FIELD_OVERFLOW, |_| {
             Err(DateTimeConversionError::FieldOverflow)
