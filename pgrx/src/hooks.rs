@@ -13,7 +13,7 @@ use crate::prelude::*;
 use crate::{void_mut_ptr, PgBox, PgList};
 use std::ops::Deref;
 
-#[cfg(any(feature = "pg10", feature = "pg11", feature = "pg12", feature = "pg13"))]
+#[cfg(any(feature = "pg12", feature = "pg13"))]
 // JumbleState is not defined prior to postgres v14.
 // This zero-sized type is here to provide an inner type for
 // the option in post_parse_analyze_hook, but prior to v14
@@ -203,13 +203,7 @@ pub unsafe fn register_hook(hook: &'static mut (dyn PgHooks)) {
     if HOOKS.is_some() {
         panic!("PgHook instance already registered");
     }
-    #[cfg(any(
-        feature = "pg11",
-        feature = "pg12",
-        feature = "pg13",
-        feature = "pg14",
-        feature = "pg15"
-    ))]
+    #[cfg(any(feature = "pg12", feature = "pg13", feature = "pg14", feature = "pg15"))]
     let prev_executor_check_perms_hook = pg_sys::ExecutorCheckPerms_hook
         .replace(pgrx_executor_check_perms)
         .or(Some(pgrx_standard_executor_check_perms_wrapper));
@@ -327,13 +321,7 @@ unsafe extern "C" fn pgrx_executor_end(query_desc: *mut pg_sys::QueryDesc) {
     hook.executor_end(PgBox::from_pg(query_desc), prev);
 }
 
-#[cfg(any(
-    feature = "pg11",
-    feature = "pg12",
-    feature = "pg13",
-    feature = "pg14",
-    feature = "pg15"
-))]
+#[cfg(any(feature = "pg12", feature = "pg13", feature = "pg14", feature = "pg15"))]
 #[pg_guard]
 unsafe extern "C" fn pgrx_executor_check_perms(
     range_table: *mut pg_sys::List,
@@ -385,7 +373,7 @@ unsafe extern "C" fn pgrx_executor_check_perms(
     .inner
 }
 
-#[cfg(any(feature = "pg11", feature = "pg12", feature = "pg13"))]
+#[cfg(any(feature = "pg12", feature = "pg13"))]
 #[pg_guard]
 unsafe extern "C" fn pgrx_process_utility(
     pstmt: *mut pg_sys::PlannedStmt,
@@ -484,7 +472,7 @@ unsafe extern "C" fn pgrx_process_utility(
     .inner
 }
 
-#[cfg(any(feature = "pg11", feature = "pg12"))]
+#[cfg(any(feature = "pg12"))]
 #[pg_guard]
 unsafe extern "C" fn pgrx_planner(
     parse: *mut pg_sys::Query,
@@ -519,7 +507,7 @@ unsafe extern "C" fn pgrx_planner_impl(
         bound_params: PgBox<pg_sys::ParamListInfoData>,
     ) -> HookResult<*mut pg_sys::PlannedStmt> {
         HookResult::new(unsafe {
-            #[cfg(any(feature = "pg11", feature = "pg12"))]
+            #[cfg(feature = "pg12")]
             {
                 (HOOKS.as_mut().unwrap().prev_planner_hook.as_ref().unwrap())(
                     parse.into_pg(),
@@ -550,7 +538,7 @@ unsafe extern "C" fn pgrx_planner_impl(
     .inner
 }
 
-#[cfg(any(feature = "pg10", feature = "pg11", feature = "pg12", feature = "pg13"))]
+#[cfg(any(feature = "pg12", feature = "pg13"))]
 #[pg_guard]
 unsafe extern "C" fn pgrx_post_parse_analyze(
     parse_state: *mut pg_sys::ParseState,
@@ -648,13 +636,7 @@ unsafe extern "C" fn pgrx_standard_executor_end_wrapper(query_desc: *mut pg_sys:
     pg_sys::standard_ExecutorEnd(query_desc)
 }
 
-#[cfg(any(
-    feature = "pg11",
-    feature = "pg12",
-    feature = "pg13",
-    feature = "pg14",
-    feature = "pg15"
-))]
+#[cfg(any(feature = "pg12", feature = "pg13", feature = "pg14", feature = "pg15"))]
 #[pg_guard]
 unsafe extern "C" fn pgrx_standard_executor_check_perms_wrapper(
     _range_table: *mut pg_sys::List,
@@ -673,7 +655,7 @@ unsafe extern "C" fn pgrx_standard_executor_check_perms_wrapper(
     true
 }
 
-#[cfg(any(feature = "pg11", feature = "pg12", feature = "pg13"))]
+#[cfg(any(feature = "pg12", feature = "pg13"))]
 #[pg_guard]
 unsafe extern "C" fn pgrx_standard_process_utility_wrapper(
     pstmt: *mut pg_sys::PlannedStmt,
@@ -719,7 +701,7 @@ unsafe extern "C" fn pgrx_standard_process_utility_wrapper(
     )
 }
 
-#[cfg(any(feature = "pg11", feature = "pg12"))]
+#[cfg(feature = "pg12")]
 #[pg_guard]
 unsafe extern "C" fn pgrx_standard_planner_wrapper(
     parse: *mut pg_sys::Query,

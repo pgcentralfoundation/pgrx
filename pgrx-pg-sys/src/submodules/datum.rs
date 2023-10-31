@@ -8,6 +8,7 @@
 //LICENSE
 //LICENSE Use of this source code is governed by the MIT license that can be found in the LICENSE file.
 // Polyfill while #![feature(strict_provenance)] is unstable
+use crate::NullableDatum;
 #[cfg(not(nightly))]
 use sptr::Strict;
 use std::ptr::NonNull;
@@ -194,16 +195,6 @@ impl<T> PartialEq<Datum> for *mut T {
     fn eq(&self, other: &Datum) -> bool {
         self == &other.0.cast()
     }
-}
-
-/// This struct consists of a Datum and a bool, matching Postgres's definition
-/// as of Postgres 12. This isn't efficient in terms of storage size, due to padding,
-/// but sometimes it's more cache-friendly, so sometimes it is the preferred type.
-#[repr(C)]
-#[derive(Debug, Copy, Clone)]
-pub struct NullableDatum {
-    pub value: Datum,
-    pub isnull: bool,
 }
 
 impl TryFrom<NullableDatum> for Datum {

@@ -51,7 +51,7 @@ bitflags! {
         const WL_POSTMASTER_DEATH  = pg_sys::WL_POSTMASTER_DEATH as i32;
         const WL_SOCKET_CONNECTED  = pg_sys::WL_SOCKET_WRITEABLE as i32;
         const WL_SOCKET_MASK       = (pg_sys::WL_SOCKET_READABLE | pg_sys::WL_SOCKET_WRITEABLE | pg_sys::WL_SOCKET_CONNECTED) as i32;
-        #[cfg(any(feature = "pg12"))]
+        #[cfg(feature = "pg12")]
         const WL_EXIT_ON_PM_DEATH  = pg_sys::WL_EXIT_ON_PM_DEATH  as i32;
 
     }
@@ -74,7 +74,6 @@ impl BackgroundWorker {
     /// What is our name?
     pub fn get_name() -> &'static str {
         #[cfg(any(
-            feature = "pg11",
             feature = "pg12",
             feature = "pg13",
             feature = "pg14",
@@ -194,7 +193,6 @@ impl BackgroundWorker {
 
         unsafe {
             #[cfg(any(
-                feature = "pg11",
                 feature = "pg12",
                 feature = "pg13",
                 feature = "pg14",
@@ -617,7 +615,6 @@ impl BackgroundWorkerBuilder {
 impl<'a> Into<pg_sys::BackgroundWorker> for &'a BackgroundWorkerBuilder {
     fn into(self) -> pg_sys::BackgroundWorker {
         #[cfg(any(
-            feature = "pg11",
             feature = "pg12",
             feature = "pg13",
             feature = "pg14",
@@ -660,7 +657,6 @@ fn wait_latch(timeout: libc::c_long, wakeup_flags: WLflags) -> i32 {
 }
 
 #[cfg(any(
-    feature = "pg11",
     feature = "pg12",
     feature = "pg13",
     feature = "pg14",

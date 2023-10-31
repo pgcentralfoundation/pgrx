@@ -368,9 +368,6 @@ impl TimestampWithTimeZone {
     }
 
     /// Truncate [`TimestampWithTimeZone`] to specified units in specified time zone
-    ///
-    /// Not available under Postgres v11
-    #[cfg(not(feature = "pg11"))]
     pub fn truncate_with_time_zone<Tz: AsRef<str>>(self, units: DateTimeParts, zone: Tz) -> Self {
         unsafe {
             direct_function_call(

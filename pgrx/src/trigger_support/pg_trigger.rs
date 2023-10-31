@@ -60,9 +60,7 @@ impl<'a> PgTrigger<'a> {
     /// a safe API to the internal trigger data.
     #[doc(hidden)]
     pub unsafe fn from_fcinfo(
-        #[cfg(feature = "pg11")] fcinfo: &'a pg_sys::FunctionCallInfoData,
-
-        #[cfg(not(feature = "pg11"))] fcinfo: &'a pg_sys::FunctionCallInfoBaseData,
+        fcinfo: &'a pg_sys::FunctionCallInfoBaseData,
     ) -> Result<Self, PgTriggerError> {
         if !called_as_trigger(fcinfo as *const _ as *mut _) {
             return Err(PgTriggerError::NotTrigger);

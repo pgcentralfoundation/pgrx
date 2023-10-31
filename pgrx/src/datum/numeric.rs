@@ -154,7 +154,7 @@ impl AnyNumeric {
     }
 
     /// Calculate the greatest common divisor of this an another [`AnyNumeric`]
-    #[cfg(not(any(feature = "pg11", feature = "pg12")))]
+    #[cfg(not(feature = "pg12"))]
     pub fn gcd(&self, n: &AnyNumeric) -> AnyNumeric {
         unsafe {
             direct_function_call(pg_sys::numeric_gcd, &[self.as_datum(), n.as_datum()]).unwrap()

@@ -27,22 +27,12 @@ pub mod utils;
 mod sql_translatable;
 
 pub use datum::Datum;
-// OnDrop(feature = "pg11"): remove this cfg if all supported versions of Postgres
-// now include NullableDatum.
-#[cfg(any(
-    feature = "pg12",
-    feature = "pg13",
-    feature = "pg14",
-    feature = "pg15",
-    feature = "pg16"
-))]
-pub use datum::NullableDatum;
 
 pub use htup::*;
 pub use oids::*;
 pub use pg_try::*;
+#[cfg(any(feature = "pg12"))]
 pub use polyfill::*;
-pub use tupdesc::*;
 pub use utils::*;
 
 #[cfg(target_os = "linux")]

@@ -22,7 +22,6 @@ edition = "2021"
 
 [features]
 default = [ ]
-pg11 = [ ]
 pg12 = [ ]
 pg13 = [ ]
 pg14 = [ ]

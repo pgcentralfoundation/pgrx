@@ -86,276 +86,122 @@ macro_rules! variadic {
     };
 }
 
-#[cfg(any(feature = "pg11"))]
-mod pg_11 {
-    use crate::{pg_sys, FromDatum};
-
-    /// Get a numbered argument for a `PG_FUNCTION_INFO_V1` function as the specified Rust type.
-    ///
-    /// # Safety
-    ///
-    /// This function is unsafe as we cannot ensure the `fcinfo` argument is a valid
-    /// [`pg_sys::FunctionCallInfo`] pointer.  This is your responsibility.
-    ///
-    /// We also cannot ensure that the specified Rust type `T` is compatible with whatever the
-    /// underlying datum is at the argument `num` position.  This too, is your responsibility
-    #[inline]
-    pub unsafe fn pg_getarg<T: FromDatum>(
-        fcinfo: pg_sys::FunctionCallInfo,
-        num: usize,
-    ) -> Option<T> {
-        // SAFETY:  User has asserted that `fcinfo` is valid
-        let datum = unsafe { fcinfo.as_ref() }.unwrap().arg[num];
-        let isnull = pg_arg_is_null(fcinfo, num);
-
-        unsafe {
-            // SAFETY:  User has asserted that the desired Rust type `T` is compatible with the
-            // underlying Datum, and has asserted that `fcinfo` is valid
-            if T::GET_TYPOID {
-                T::from_polymorphic_datum(datum, isnull, super::pg_getarg_type(fcinfo, num))
-            } else {
-                T::from_datum(datum, isnull)
-            }
-        }
-    }
-
-    /// Is the specified argument for a `PG_FUNCTION_INFO_V1` function NULL?
-    ///
-    /// # Safety
-    ///
-    /// This function is unsafe as we cannot ensure the `fcinfo` argument is a valid
-    /// [`pg_sys::FunctionCallInfo`] pointer.  This is your responsibility.
-    #[inline]
-    pub unsafe fn pg_arg_is_null(fcinfo: pg_sys::FunctionCallInfo, num: usize) -> bool {
-        // SAFETY:  User has asserted that `fcinfo` is valid
-        unsafe { fcinfo.as_ref() }.unwrap().argnull[num] as bool
-    }
-
-    /// Get a numbered argument for a `PG_FUNCTION_INFO_V1` function as an Option containing a
-    /// [`pg_sys::Datum`].
-    ///
-    /// If the specified argument Datum is NULL, returns [`Option::None`].
-    ///
-    /// # Safety
-    ///
-    /// This function is unsafe as we cannot ensure the `fcinfo` argument is a valid
-    /// [`pg_sys::FunctionCallInfo`] pointer.  This is your responsibility.
-    #[inline]
-    pub unsafe fn pg_getarg_datum(
-        fcinfo: pg_sys::FunctionCallInfo,
-        num: usize,
-    ) -> Option<pg_sys::Datum> {
-        if pg_arg_is_null(fcinfo, num) {
-            None
+/// Get a numbered argument for a `PG_FUNCTION_INFO_V1` function as the specified Rust type.
+///
+/// # Safety
+///
+/// This function is unsafe as we cannot ensure the `fcinfo` argument is a valid
+/// [`pg_sys::FunctionCallInfo`] pointer.  This is your responsibility.
+///
+/// We also cannot ensure that the specified Rust type `T` is compatible with whatever the
+/// underlying datum is at the argument `num` position.  This too, is your responsibility
+#[inline]
+pub unsafe fn pg_getarg<T: FromDatum>(fcinfo: pg_sys::FunctionCallInfo, num: usize) -> Option<T> {
+    let datum = get_nullable_datum(fcinfo, num);
+    unsafe {
+        if T::GET_TYPOID {
+            T::from_polymorphic_datum(datum.value, datum.isnull, super::pg_getarg_type(fcinfo, num))
         } else {
-            // SAFETY:  User has asserted that `fcinfo` is valid
-            Some(unsafe { fcinfo.as_ref() }.unwrap().arg[num])
+            T::from_datum(datum.value, datum.isnull)
         }
-    }
-
-    /// Get a numbered argument for a `PG_FUNCTION_INFO_V1` function as a raw [`pg_sys::Datum`].
-    ///
-    /// # Safety
-    ///
-    /// This function is unsafe as we cannot ensure the `fcinfo` argument is a valid
-    /// [`pg_sys::FunctionCallInfo`] pointer.  This is your responsibility.
-    #[inline]
-    pub unsafe fn pg_getarg_datum_raw(
-        fcinfo: pg_sys::FunctionCallInfo,
-        num: usize,
-    ) -> pg_sys::Datum {
-        // SAFETY:  User has asserted that `fcinfo` is valid
-        unsafe { fcinfo.as_ref() }.unwrap().arg[num]
-    }
-
-    /// Modifies the specified `fcinfo` struct to indicate that its return value is null.
-    ///
-    /// # Examples
-    ///
-    /// ```rust,no_run
-    /// use pgrx::pg_return_null;
-    /// use pgrx::prelude::*;
-    /// fn foo(fcinfo: pg_sys::FunctionCallInfo) -> pg_sys::Datum {
-    ///     return unsafe { pg_return_null(fcinfo) };
-    /// }
-    /// ```
-    ///
-    /// # Safety
-    ///
-    /// This function is unsafe as we cannot ensure the `fcinfo` argument is a valid
-    /// [`pg_sys::FunctionCallInfo`] pointer.  This is your responsibility.
-    #[inline]
-    pub unsafe fn pg_return_null(fcinfo: pg_sys::FunctionCallInfo) -> pg_sys::Datum {
-        // SAFETY:  User has asserted that `fcinfo` is valid
-        unsafe { fcinfo.as_mut() }.unwrap().isnull = true;
-        pg_sys::Datum::from(0)
-    }
-
-    /// Get the collation the function call shoud use
-    ///
-    /// # Safety
-    ///
-    /// This function is unsafe as we cannot ensure the `fcinfo` argument is a valid
-    /// [`pg_sys::FunctionCallInfo`] pointer.  This is your responsibility.
-    pub unsafe fn pg_get_collation(fcinfo: pg_sys::FunctionCallInfo) -> pg_sys::Oid {
-        let fcinfo = unsafe { fcinfo.as_mut() }.unwrap();
-        fcinfo.fncollation
     }
 }
 
-#[cfg(any(
-    feature = "pg12",
-    feature = "pg13",
-    feature = "pg14",
-    feature = "pg15",
-    feature = "pg16"
-))]
-mod pg_12_13_14_15 {
-    use crate::{pg_sys, FromDatum};
+/// Is the specified argument for a `PG_FUNCTION_INFO_V1` function NULL?
+///
+/// # Safety
+///
+/// This function is unsafe as we cannot ensure the `fcinfo` argument is a valid
+/// [`pg_sys::FunctionCallInfo`] pointer.  This is your responsibility.
+#[inline]
+pub unsafe fn pg_arg_is_null(fcinfo: pg_sys::FunctionCallInfo, num: usize) -> bool {
+    get_nullable_datum(fcinfo, num).isnull
+}
 
-    /// Get a numbered argument for a `PG_FUNCTION_INFO_V1` function as the specified Rust type.
-    ///
-    /// # Safety
-    ///
-    /// This function is unsafe as we cannot ensure the `fcinfo` argument is a valid
-    /// [`pg_sys::FunctionCallInfo`] pointer.  This is your responsibility.
-    ///
-    /// We also cannot ensure that the specified Rust type `T` is compatible with whatever the
-    /// underlying datum is at the argument `num` position.  This too, is your responsibility
-    #[inline]
-    pub unsafe fn pg_getarg<T: FromDatum>(
-        fcinfo: pg_sys::FunctionCallInfo,
-        num: usize,
-    ) -> Option<T> {
-        let datum = get_nullable_datum(fcinfo, num);
-        unsafe {
-            if T::GET_TYPOID {
-                T::from_polymorphic_datum(
-                    datum.value,
-                    datum.isnull,
-                    super::pg_getarg_type(fcinfo, num),
-                )
-            } else {
-                T::from_datum(datum.value, datum.isnull)
-            }
-        }
-    }
-
-    /// Is the specified argument for a `PG_FUNCTION_INFO_V1` function NULL?
-    ///
-    /// # Safety
-    ///
-    /// This function is unsafe as we cannot ensure the `fcinfo` argument is a valid
-    /// [`pg_sys::FunctionCallInfo`] pointer.  This is your responsibility.
-    #[inline]
-    pub unsafe fn pg_arg_is_null(fcinfo: pg_sys::FunctionCallInfo, num: usize) -> bool {
-        get_nullable_datum(fcinfo, num).isnull
-    }
-
-    /// Get a numbered argument for a `PG_FUNCTION_INFO_V1` function as an Option containing a
-    /// [`pg_sys::Datum`].
-    ///
-    /// If the specified argument Datum is NULL, returns [`Option::None`].
-    ///
-    /// # Safety
-    ///
-    /// This function is unsafe as we cannot ensure the `fcinfo` argument is a valid
-    /// [`pg_sys::FunctionCallInfo`] pointer.  This is your responsibility.
-    #[inline]
-    pub unsafe fn pg_getarg_datum(
-        fcinfo: pg_sys::FunctionCallInfo,
-        num: usize,
-    ) -> Option<pg_sys::Datum> {
-        if pg_arg_is_null(fcinfo, num) {
-            None
-        } else {
-            Some(get_nullable_datum(fcinfo, num).value)
-        }
-    }
-
-    /// Get a numbered argument for a `PG_FUNCTION_INFO_V1` function as a raw [`pg_sys::Datum`].
-    ///
-    /// # Safety
-    ///
-    /// This function is unsafe as we cannot ensure the `fcinfo` argument is a valid
-    /// [`pg_sys::FunctionCallInfo`] pointer.  This is your responsibility.
-    #[inline]
-    pub unsafe fn pg_getarg_datum_raw(
-        fcinfo: pg_sys::FunctionCallInfo,
-        num: usize,
-    ) -> pg_sys::Datum {
-        get_nullable_datum(fcinfo, num).value
-    }
-
-    /// Similar to [`pg_getarg_datum_raw`] but returns Postgres' [`pg_sys::NullableDatum`] tyoe.
-    ///
-    /// # Safety
-    ///
-    /// This function is unsafe as we cannot ensure the `fcinfo` argument is a valid
-    /// [`pg_sys::FunctionCallInfo`] pointer.  This is your responsibility.
-    #[doc(hidden)]
-    #[inline]
-    unsafe fn get_nullable_datum(
-        fcinfo: pg_sys::FunctionCallInfo,
-        num: usize,
-    ) -> pg_sys::NullableDatum {
-        let fcinfo = unsafe { fcinfo.as_mut() }.unwrap();
-        unsafe {
-            let nargs = fcinfo.nargs;
-            fcinfo.args.as_slice(nargs as usize)[num].clone()
-        }
-    }
-
-    /// Modifies the specified `fcinfo` struct to indicate that its return value is null.
-    ///
-    /// # Examples
-    ///
-    /// ```rust,no_run
-    /// use pgrx::pg_return_null;
-    /// use pgrx::prelude::*;
-    /// fn foo(fcinfo: pg_sys::FunctionCallInfo) -> pg_sys::Datum {
-    ///     return unsafe { pg_return_null(fcinfo) };
-    /// }
-    /// ```
-    ///
-    /// # Safety
-    ///
-    /// This function is unsafe as we cannot ensure the `fcinfo` argument is a valid
-    /// [`pg_sys::FunctionCallInfo`] pointer.  This is your responsibility.
-    #[inline]
-    pub unsafe fn pg_return_null(fcinfo: pg_sys::FunctionCallInfo) -> pg_sys::Datum {
-        let fcinfo = unsafe { fcinfo.as_mut() }.unwrap();
-        fcinfo.isnull = true;
-        pg_sys::Datum::from(0)
-    }
-
-    /// Get the collation the function call shoud use
-    ///
-    /// # Safety
-    ///
-    /// This function is unsafe as we cannot ensure the `fcinfo` argument is a valid
-    /// [`pg_sys::FunctionCallInfo`] pointer.  This is your responsibility.
-    pub unsafe fn pg_get_collation(fcinfo: pg_sys::FunctionCallInfo) -> pg_sys::Oid {
-        let fcinfo = unsafe { fcinfo.as_mut() }.unwrap();
-        fcinfo.fncollation
+/// Get a numbered argument for a `PG_FUNCTION_INFO_V1` function as an Option containing a
+/// [`pg_sys::Datum`].
+///
+/// If the specified argument Datum is NULL, returns [`Option::None`].
+///
+/// # Safety
+///
+/// This function is unsafe as we cannot ensure the `fcinfo` argument is a valid
+/// [`pg_sys::FunctionCallInfo`] pointer.  This is your responsibility.
+#[inline]
+pub unsafe fn pg_getarg_datum(
+    fcinfo: pg_sys::FunctionCallInfo,
+    num: usize,
+) -> Option<pg_sys::Datum> {
+    if pg_arg_is_null(fcinfo, num) {
+        None
+    } else {
+        Some(get_nullable_datum(fcinfo, num).value)
     }
 }
 
-//
-// common
-//
+/// Get a numbered argument for a `PG_FUNCTION_INFO_V1` function as a raw [`pg_sys::Datum`].
+///
+/// # Safety
+///
+/// This function is unsafe as we cannot ensure the `fcinfo` argument is a valid
+/// [`pg_sys::FunctionCallInfo`] pointer.  This is your responsibility.
+#[inline]
+pub unsafe fn pg_getarg_datum_raw(fcinfo: pg_sys::FunctionCallInfo, num: usize) -> pg_sys::Datum {
+    get_nullable_datum(fcinfo, num).value
+}
 
-#[cfg(any(feature = "pg11"))]
-pub use pg_11::*;
+/// Similar to [`pg_getarg_datum_raw`] but returns Postgres' [`pg_sys::NullableDatum`] tyoe.
+///
+/// # Safety
+///
+/// This function is unsafe as we cannot ensure the `fcinfo` argument is a valid
+/// [`pg_sys::FunctionCallInfo`] pointer.  This is your responsibility.
+#[doc(hidden)]
+#[inline]
+unsafe fn get_nullable_datum(
+    fcinfo: pg_sys::FunctionCallInfo,
+    num: usize,
+) -> pg_sys::NullableDatum {
+    let fcinfo = unsafe { fcinfo.as_mut() }.unwrap();
+    unsafe {
+        let nargs = fcinfo.nargs;
+        fcinfo.args.as_slice(nargs as usize)[num].clone()
+    }
+}
 
-#[cfg(any(
-    feature = "pg12",
-    feature = "pg13",
-    feature = "pg14",
-    feature = "pg15",
-    feature = "pg16"
-))]
-pub use pg_12_13_14_15::*;
+/// Modifies the specified `fcinfo` struct to indicate that its return value is null.
+///
+/// # Examples
+///
+/// ```rust,no_run
+/// use pgrx::pg_return_null;
+/// use pgrx::prelude::*;
+/// fn foo(fcinfo: pg_sys::FunctionCallInfo) -> pg_sys::Datum {
+///     return unsafe { pg_return_null(fcinfo) };
+/// }
+/// ```
+///
+/// # Safety
+///
+/// This function is unsafe as we cannot ensure the `fcinfo` argument is a valid
+/// [`pg_sys::FunctionCallInfo`] pointer.  This is your responsibility.
+#[inline]
+pub unsafe fn pg_return_null(fcinfo: pg_sys::FunctionCallInfo) -> pg_sys::Datum {
+    let fcinfo = unsafe { fcinfo.as_mut() }.unwrap();
+    fcinfo.isnull = true;
+    pg_sys::Datum::from(0)
+}
+
+/// Get the collation the function call shoud use
+///
+/// # Safety
+///
+/// This function is unsafe as we cannot ensure the `fcinfo` argument is a valid
+/// [`pg_sys::FunctionCallInfo`] pointer.  This is your responsibility.
+pub unsafe fn pg_get_collation(fcinfo: pg_sys::FunctionCallInfo) -> pg_sys::Oid {
+    let fcinfo = unsafe { fcinfo.as_mut() }.unwrap();
+    fcinfo.fncollation
+}
 
 /// Get a numbered argument for a `PG_FUNCTION_INFO_V1` function as raw pointer to a Rust type `T`.
 ///
@@ -530,35 +376,6 @@ pub unsafe fn direct_function_call_as_datum(
     direct_function_call_as_datum_internal(|fcinfo| func(fcinfo), args)
 }
 
-#[cfg(feature = "pg11")]
-unsafe fn direct_function_call_as_datum_internal(
-    func: impl FnOnce(pg_sys::FunctionCallInfo) -> pg_sys::Datum,
-    args: &[Option<pg_sys::Datum>],
-) -> Option<pg_sys::Datum> {
-    let fcinfo_ptr = pg_sys::palloc(std::mem::size_of::<pg_sys::FunctionCallInfoData>())
-        .cast::<pg_sys::FunctionCallInfoData>();
-
-    let fcinfo = fcinfo_ptr.as_mut().unwrap_unchecked();
-    fcinfo.flinfo = std::ptr::null_mut();
-    fcinfo.context = std::ptr::null_mut();
-    fcinfo.resultinfo = std::ptr::null_mut();
-    fcinfo.fncollation = pg_sys::InvalidOid;
-    fcinfo.isnull = false;
-    fcinfo.nargs = args.len() as _;
-
-    for (i, &arg) in args.into_iter().enumerate() {
-        fcinfo.argnull[i] = arg.is_none();
-        fcinfo.arg[i] = arg.unwrap_or(pg_sys::Datum::from(0));
-    }
-
-    let result = func(fcinfo_ptr);
-    let result = if fcinfo.isnull { None } else { Some(result) };
-
-    pg_sys::pfree(fcinfo_ptr.cast());
-    return result;
-}
-
-#[cfg(not(feature = "pg11"))]
 unsafe fn direct_function_call_as_datum_internal(
     func: impl FnOnce(pg_sys::FunctionCallInfo) -> pg_sys::Datum,
     args: &[Option<pg_sys::Datum>],

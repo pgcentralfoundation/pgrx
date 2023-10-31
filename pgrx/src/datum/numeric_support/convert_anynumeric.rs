@@ -75,7 +75,7 @@ macro_rules! anynumeric_from_float {
                 // these versions of Postgres can't represent +/-Infinity as a NUMERIC
                 // so we run through a PgTryBuilder to ask Postgres to do the conversion which will
                 // simply return the proper Error
-                #[cfg(any(feature = "pg11", feature = "pg12", feature = "pg13"))]
+                #[cfg(any(feature = "pg12", feature = "pg13"))]
                 {
                     if value.is_infinite() {
                         return from_primitive_helper::<_, 0, 0>(value, $func).map(|n| n.into());

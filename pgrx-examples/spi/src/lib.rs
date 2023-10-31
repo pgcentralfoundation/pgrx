@@ -40,8 +40,6 @@ fn spi_return_query() -> Result<
     >,
     spi::Error,
 > {
-    #[cfg(feature = "pg11")]
-    let query = "SELECT oid, relname::text || '-pg11' FROM pg_class";
     #[cfg(feature = "pg12")]
     let query = "SELECT oid, relname::text || '-pg12' FROM pg_class";
     #[cfg(feature = "pg13")]

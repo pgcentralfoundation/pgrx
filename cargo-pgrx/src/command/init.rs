@@ -45,9 +45,6 @@ static PROCESS_ENV_DENYLIST: &'static [&'static str] = &[
 #[derive(clap::Args, Debug)]
 #[clap(author)]
 pub(crate) struct Init {
-    /// If installed locally, the path to PG11's `pgconfig` tool, or `download` to have pgrx download/compile/install it
-    #[clap(env = "PG11_PG_CONFIG", long)]
-    pg11: Option<String>,
     /// If installed locally, the path to PG12's `pgconfig` tool, or `download` to have pgrx download/compile/install it
     #[clap(env = "PG12_PG_CONFIG", long)]
     pg12: Option<String>,
@@ -102,9 +99,6 @@ impl CommandExecute for Init {
 
         let mut versions = HashMap::new();
 
-        if let Some(ref version) = self.pg11 {
-            versions.insert("pg11", version.clone());
-        }
         if let Some(ref version) = self.pg12 {
             versions.insert("pg12", version.clone());
         }

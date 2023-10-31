@@ -92,7 +92,6 @@ bitflags! {
         /// Value is in minutes
         const UNIT_MIN = pg_sys::GUC_UNIT_MIN as i32;
         /// Include in `EXPLAIN` output
-        #[cfg(not(feature = "pg11"))]
         const EXPLAIN = pg_sys::GUC_EXPLAIN as i32;
         #[cfg(any(feature = "pg15", feature = "pg16"))]
         /// `RUNTIME_COMPUTED` is intended for runtime-computed GUCs that are only available via

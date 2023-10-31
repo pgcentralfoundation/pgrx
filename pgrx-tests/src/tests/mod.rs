@@ -20,7 +20,6 @@ mod default_arg_value_tests;
 mod derive_pgtype_lifetimes;
 mod enum_type_tests;
 mod fcinfo_tests;
-#[cfg(not(feature = "pg11"))]
 mod fn_call_tests;
 mod from_into_datum_tests;
 mod geo_tests;

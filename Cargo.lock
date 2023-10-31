@@ -359,7 +359,6 @@ dependencies = [
  "env_proxy",
  "eyre",
  "flate2",
- "fork",
  "jobslot",
  "libloading 0.8.1",
  "nix",
@@ -883,15 +882,6 @@ name = "foreign-types-shared"
 version = "0.1.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "00b0228411908ca8685dba7fc2cdd70ec9990a6e753e89b6ac91a84c40fbaf4b"
-
-[[package]]
-name = "fork"
-version = "0.1.22"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "bf2ca97a59201425e7ee4d197c9c4fea282fe87a97d666a580bda889b95b8e88"
-dependencies = [
- "libc",
-]
 
 [[package]]
 name = "form_urlencoded"

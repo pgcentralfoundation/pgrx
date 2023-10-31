@@ -45,7 +45,6 @@ pub mod datum;
 pub mod enum_helper;
 pub mod fcinfo;
 pub mod ffi;
-#[cfg(not(feature = "pg11"))]
 pub mod fn_call;
 pub mod guc;
 pub mod heap_tuple;
@@ -221,7 +220,7 @@ macro_rules! pg_magic_func {
             use core::mem::size_of;
             use pgrx;
 
-            #[cfg(any(feature = "pg11", feature = "pg12"))]
+            #[cfg(feature = "pg12")]
             const MY_MAGIC: pgrx::pg_sys::Pg_magic_struct = pgrx::pg_sys::Pg_magic_struct {
                 len: size_of::<pgrx::pg_sys::Pg_magic_struct>() as i32,
                 version: pgrx::pg_sys::PG_VERSION_NUM as i32 / 100,

@@ -74,9 +74,9 @@ impl<'conn> SpiClient<'conn> {
             status_code: Spi::check_status(status_code)?,
             // SAFETY: no concurrent access
             table: unsafe { pg_sys::SPI_tuptable.as_mut()},
-            #[cfg(any(feature = "pg11", feature = "pg12"))]
+            #[cfg(feature = "pg12")]
             size: unsafe { pg_sys::SPI_processed as usize },
-            #[cfg(not(any(feature = "pg11", feature = "pg12")))]
+            #[cfg(not(feature = "pg12"))]
             // SAFETY: no concurrent access
             size: unsafe {
                 if pg_sys::SPI_tuptable.is_null() {
