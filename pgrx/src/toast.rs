@@ -48,8 +48,8 @@ impl<T: Toasty> Deref for Toast<T> {
 
     fn deref(&self) -> &Self::Target {
         match self {
-            Toast::Stale(t) => &t,
-            Toast::Fresh(t) => &t,
+            Toast::Stale(t) => t,
+            Toast::Fresh(t) => t,
         }
     }
 }

@@ -165,7 +165,7 @@ unsafe fn get_nullable_datum(
     let fcinfo = unsafe { fcinfo.as_mut() }.unwrap();
     unsafe {
         let nargs = fcinfo.nargs;
-        fcinfo.args.as_slice(nargs as usize)[num].clone()
+        fcinfo.args.as_slice(nargs as usize)[num]
     }
 }
 
@@ -218,10 +218,7 @@ pub unsafe fn pg_get_collation(fcinfo: pg_sys::FunctionCallInfo) -> pg_sys::Oid 
 pub unsafe fn pg_getarg_pointer<T>(fcinfo: pg_sys::FunctionCallInfo, num: usize) -> Option<*mut T> {
     unsafe {
         // SAFETY:  The user has asserted that `fcinfo` is valid
-        match pg_getarg_datum(fcinfo, num) {
-            Some(datum) => Some(datum.cast_mut_ptr::<T>()),
-            None => None,
-        }
+        pg_getarg_datum(fcinfo, num).map(|datum| datum.cast_mut_ptr::<T>())
     }
 }
 
@@ -249,10 +246,7 @@ pub unsafe fn pg_getarg_cstr<'a>(
     fcinfo: pg_sys::FunctionCallInfo,
     num: usize,
 ) -> Option<&'a core::ffi::CStr> {
-    match pg_getarg_pointer(fcinfo, num) {
-        Some(ptr) => Some(unsafe { core::ffi::CStr::from_ptr(ptr) }),
-        None => None,
-    }
+    pg_getarg_pointer(fcinfo, num).map(|ptr| unsafe { core::ffi::CStr::from_ptr(ptr) })
 }
 
 /// Indicates that a `PG_FUNCTION_INFO_V1` function is returning a SQL "void".
@@ -326,7 +320,7 @@ pub unsafe fn direct_function_call<R: FromDatum>(
     // TODO: this could take an iterator, but it would break turbofish :(
     args: &[Option<pg_sys::Datum>],
 ) -> Option<R> {
-    direct_function_call_as_datum(func, args).map_or(None, |d| R::from_datum(d, false))
+    direct_function_call_as_datum(func, args).and_then(|d| R::from_datum(d, false))
 }
 
 /// Akin to [direct_function_call], but specifically for calling those functions declared with the
@@ -360,7 +354,7 @@ pub unsafe fn direct_pg_extern_function_call<R: FromDatum>(
     func: unsafe extern "C" fn(pg_sys::FunctionCallInfo) -> pg_sys::Datum,
     args: &[Option<pg_sys::Datum>],
 ) -> Option<R> {
-    direct_pg_extern_function_call_as_datum(func, args).map_or(None, |d| R::from_datum(d, false))
+    direct_pg_extern_function_call_as_datum(func, args).and_then(|d| R::from_datum(d, false))
 }
 
 /// Same as [direct_function_call] but instead returns the direct `Option<pg_sys::Datum>` instead
@@ -396,7 +390,7 @@ unsafe fn direct_function_call_as_datum_internal(
     fcinfo.nargs = nargs;
 
     let arg_slice = fcinfo.args.as_mut_slice(args.len());
-    for (i, &arg) in args.into_iter().enumerate() {
+    for (i, &arg) in args.iter().enumerate() {
         arg_slice[i].isnull = arg.is_none();
         arg_slice[i].value = arg.unwrap_or(pg_sys::Datum::from(0));
     }
@@ -405,7 +399,7 @@ unsafe fn direct_function_call_as_datum_internal(
     let result = if fcinfo.isnull { None } else { Some(result) };
 
     pg_sys::pfree(fcinfo_ptr.cast());
-    return result;
+    result
 }
 
 /// Same as [direct_pg_extern_function_call] but instead returns the direct `Option<pg_sys::Datum>` instead

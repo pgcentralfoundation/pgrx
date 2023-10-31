@@ -230,7 +230,7 @@ impl PgProc {
         self.get_attr::<Vec<i8>>(pg_sys::Anum_pg_proc_proargmodes)
             .unwrap_or_else(|| vec!['i' as i8; self.proargnames().len()])
             .into_iter()
-            .map(|mode| ProArgMode::from(mode))
+            .map(ProArgMode::from)
             .collect::<Vec<_>>()
     }
 

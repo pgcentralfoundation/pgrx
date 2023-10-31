@@ -455,7 +455,7 @@ impl BackgroundWorkerBuilder {
     }
 
     /// What is the type of this BackgroundWorker
-    pub fn set_type(mut self: Self, input: &str) -> Self {
+    pub fn set_type(mut self, input: &str) -> Self {
         self.bgw_type = input.to_string();
         self
     }
@@ -464,7 +464,7 @@ impl BackgroundWorkerBuilder {
     ///
     /// `startup` allows specifying shared memory initialization startup hook. Ignored
     /// if [`BackgroundWorkerBuilder::load_dynamic`] is used.
-    pub fn enable_shmem_access(mut self: Self, startup: Option<unsafe extern "C" fn()>) -> Self {
+    pub fn enable_shmem_access(mut self, startup: Option<unsafe extern "C" fn()>) -> Self {
         self.bgw_flags = self.bgw_flags | BGWflags::BGWORKER_SHMEM_ACCESS;
         self.shared_memory_startup_fn = startup;
         self
@@ -474,7 +474,7 @@ impl BackgroundWorkerBuilder {
     ///
     /// If set, then the configured start time becomes `BgWorkerStartTIme::RecoveryFinished`
     /// as accessing SPI prior to possible database recovery is not possible
-    pub fn enable_spi_access(mut self: Self) -> Self {
+    pub fn enable_spi_access(mut self) -> Self {
         self.bgw_flags = self.bgw_flags
             | BGWflags::BGWORKER_SHMEM_ACCESS
             | BGWflags::BGWORKER_BACKEND_DATABASE_CONNECTION;
@@ -483,7 +483,7 @@ impl BackgroundWorkerBuilder {
     }
 
     /// When should this BackgroundWorker be started by Postgres?
-    pub fn set_start_time(mut self: Self, input: BgWorkerStartTime) -> Self {
+    pub fn set_start_time(mut self, input: BgWorkerStartTime) -> Self {
         self.bgw_start_time = input;
         self
     }
@@ -491,7 +491,7 @@ impl BackgroundWorkerBuilder {
     /// the interval, in seconds, that postgres should wait before restarting the process,
     /// in case it crashes. It can be `Some(any positive duration value), or
     /// `None`, indicating not to restart the process in case of a crash.
-    pub fn set_restart_time(mut self: Self, input: Option<Duration>) -> Self {
+    pub fn set_restart_time(mut self, input: Option<Duration>) -> Self {
         self.bgw_restart_time = input;
         self
     }
@@ -499,7 +499,7 @@ impl BackgroundWorkerBuilder {
     /// What is the library name that contains the "main" function?
     ///
     /// Typically, this will just be your extension's name
-    pub fn set_library(mut self: Self, input: &str) -> Self {
+    pub fn set_library(mut self, input: &str) -> Self {
         self.bgw_library_name = input.to_string();
         self
     }
@@ -522,7 +522,7 @@ impl BackgroundWorkerBuilder {
     /// pub extern "C" fn background_worker_main(_arg: pg_sys::Datum) {
     /// }
     /// ```
-    pub fn set_function(mut self: Self, input: &str) -> Self {
+    pub fn set_function(mut self, input: &str) -> Self {
         self.bgw_function_name = input.to_string();
         self
     }
@@ -557,15 +557,15 @@ impl BackgroundWorkerBuilder {
     ///     .set_argument(42i32.into_datum())
     ///     .load();
     /// ```
-    pub fn set_argument(mut self: Self, input: Option<pg_sys::Datum>) -> Self {
-        self.bgw_main_arg = pg_sys::Datum::from(input.unwrap_or(0.into()));
+    pub fn set_argument(mut self, input: Option<pg_sys::Datum>) -> Self {
+        self.bgw_main_arg = input.unwrap_or(0.into());
         self
     }
 
     /// extra data to be passed to the background worker. Unlike bgw_main_arg, this
     /// data is not passed as an argument to the worker's main function, but it can be
     /// accessed via the `BackgroundWorker` struct.
-    pub fn set_extra(mut self: Self, input: &str) -> Self {
+    pub fn set_extra(mut self, input: &str) -> Self {
         self.bgw_extra = input.to_string();
         self
     }
@@ -575,14 +575,14 @@ impl BackgroundWorkerBuilder {
     /// postmaster startup time, or when the backend registering the worker does not wish
     /// to wait for the worker to start up. Otherwise, it should be initialized to
     /// `pgrx::pg_sys::MyProcPid`
-    pub fn set_notify_pid(mut self: Self, input: i32) -> Self {
+    pub fn set_notify_pid(mut self, input: i32) -> Self {
         self.bgw_notify_pid = input;
         self
     }
 
     /// Once properly configured, call `load()` to get the BackgroundWorker registered and
     /// started at the proper time by Postgres.
-    pub fn load(self: Self) {
+    pub fn load(self) {
         let mut bgw: pg_sys::BackgroundWorker = (&self).into();
 
         unsafe {
@@ -597,7 +597,7 @@ impl BackgroundWorkerBuilder {
     }
 
     /// Once properly configured, call `load_dynamic()` to get the BackgroundWorker registered and started dynamically.
-    pub fn load_dynamic(self: Self) -> DynamicBackgroundWorker {
+    pub fn load_dynamic(self) -> DynamicBackgroundWorker {
         let mut bgw: pg_sys::BackgroundWorker = (&self).into();
         let mut handle: *mut pg_sys::BackgroundWorkerHandle = null_mut();
 
@@ -612,8 +612,8 @@ impl BackgroundWorkerBuilder {
 /// This conversion is useful only in limited context outside of pgrx, such as when this structure is required
 /// by other libraries and the worker is not to be started by pgrx itself. In this case,
 /// the builder is useful for building this structure.
-impl<'a> Into<pg_sys::BackgroundWorker> for &'a BackgroundWorkerBuilder {
-    fn into(self) -> pg_sys::BackgroundWorker {
+impl<'a> From<&'a BackgroundWorkerBuilder> for pg_sys::BackgroundWorker {
+    fn from(builder: &'a BackgroundWorkerBuilder) -> Self {
         #[cfg(any(
             feature = "pg12",
             feature = "pg13",
@@ -622,19 +622,19 @@ impl<'a> Into<pg_sys::BackgroundWorker> for &'a BackgroundWorkerBuilder {
             feature = "pg16"
         ))]
         let bgw = pg_sys::BackgroundWorker {
-            bgw_name: RpgffiChar::from(&self.bgw_name[..]).0,
-            bgw_type: RpgffiChar::from(&self.bgw_type[..]).0,
-            bgw_flags: self.bgw_flags.bits(),
-            bgw_start_time: self.bgw_start_time as u32,
-            bgw_restart_time: match self.bgw_restart_time {
+            bgw_name: RpgffiChar::from(&builder.bgw_name[..]).0,
+            bgw_type: RpgffiChar::from(&builder.bgw_type[..]).0,
+            bgw_flags: builder.bgw_flags.bits(),
+            bgw_start_time: builder.bgw_start_time as u32,
+            bgw_restart_time: match builder.bgw_restart_time {
                 None => -1,
                 Some(d) => d.as_secs() as i32,
             },
-            bgw_library_name: RpgffiChar::from(&self.bgw_library_name[..]).0,
-            bgw_function_name: RpgffiChar::from(&self.bgw_function_name[..]).0,
-            bgw_main_arg: self.bgw_main_arg,
-            bgw_extra: RpgffiChar128::from(&self.bgw_extra[..]).0,
-            bgw_notify_pid: self.bgw_notify_pid,
+            bgw_library_name: RpgffiChar::from(&builder.bgw_library_name[..]).0,
+            bgw_function_name: RpgffiChar::from(&builder.bgw_function_name[..]).0,
+            bgw_main_arg: builder.bgw_main_arg,
+            bgw_extra: RpgffiChar128::from(&builder.bgw_extra[..]).0,
+            bgw_notify_pid: builder.bgw_notify_pid,
         };
 
         bgw

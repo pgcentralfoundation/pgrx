@@ -79,7 +79,7 @@ impl SpiCursor<'_> {
         }
         // SAFETY: SPI functions to create/find cursors fail via elog, so self.ptr is valid if we successfully set it
         unsafe { pg_sys::SPI_cursor_fetch(self.ptr.as_mut(), true, count) }
-        Ok(SpiClient::prepare_tuple_table(SpiOkCodes::Fetch as i32)?)
+        SpiClient::prepare_tuple_table(SpiOkCodes::Fetch as i32)
     }
 
     /// Consume the cursor, returning its name

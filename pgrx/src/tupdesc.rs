@@ -261,7 +261,7 @@ impl<'a> Clone for PgTupleDesc<'a> {
             unsafe { PgBox::from_pg(pg_sys::CreateTupleDescCopyConstr(tupdesc.as_ptr())) };
         Self {
             tupdesc: Some(tupdesc),
-            parent: self.parent.clone(),
+            parent: self.parent,
             need_release: false,
             need_pfree: true,
         }

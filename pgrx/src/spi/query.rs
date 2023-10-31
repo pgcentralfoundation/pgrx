@@ -117,7 +117,7 @@ impl<'conn> Query<'conn> for &str {
             },
         };
 
-        Ok(SpiClient::prepare_tuple_table(status_code)?)
+        SpiClient::prepare_tuple_table(status_code)
     }
 
     fn open_cursor(self, _client: &SpiClient<'conn>, args: Self::Arguments) -> SpiCursor<'conn> {
@@ -254,7 +254,7 @@ impl<'conn: 'stmt, 'stmt> Query<'conn> for &'stmt PreparedStatement<'conn> {
             )
         };
 
-        Ok(SpiClient::prepare_tuple_table(status_code)?)
+        SpiClient::prepare_tuple_table(status_code)
     }
 
     fn open_cursor(self, _client: &SpiClient<'conn>, args: Self::Arguments) -> SpiCursor<'conn> {
