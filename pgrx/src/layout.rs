@@ -104,7 +104,6 @@ impl Align {
 
     #[inline]
     pub(crate) fn pad(self, size: usize) -> usize {
-        let size = size;
         let align = self.as_usize();
         (size + (align - 1)) & !(align - 1)
     }
