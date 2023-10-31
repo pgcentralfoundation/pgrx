@@ -23,7 +23,6 @@ mod ctor;
 mod ops;
 
 pub use ctor::*;
-pub use ops::*;
 
 /// Tags to identify which "part" of a date or time-type value to extract or truncate to
 #[derive(Debug, Copy, Clone, Eq, PartialEq)]
