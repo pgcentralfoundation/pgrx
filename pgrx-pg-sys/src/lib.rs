@@ -22,9 +22,9 @@
 #[cfg(
     any(
         // no features at all will cause problems
-        not(any(feature = "pg11", feature = "pg12", feature = "pg13", feature = "pg14", feature = "pg15", feature = "pg16")),
+        not(any(feature = "pg12", feature = "pg13", feature = "pg14", feature = "pg15", feature = "pg16")),
   ))]
-std::compile_error!("exactly one feature must be provided (pg11, pg12, pg13, pg14, pg15, pg16)");
+std::compile_error!("exactly one feature must be provided (pg12, pg13, pg14, pg15, pg16)");
 
 mod cshim;
 mod cstr;
