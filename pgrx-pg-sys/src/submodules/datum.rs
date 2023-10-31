@@ -214,7 +214,7 @@ impl TryFrom<NullableDatum> for Datum {
 impl From<NullableDatum> for Option<Datum> {
     #[inline]
     fn from(nd: NullableDatum) -> Option<Datum> {
-        Some(Datum::try_from(nd).ok()?)
+        Datum::try_from(nd).ok()
     }
 }
 
@@ -259,6 +259,6 @@ mod test {
 
         let val: usize = 123456;
         let datum = Datum::from(val);
-        assert_eq!(datum.value() as usize, val);
+        assert_eq!({ datum.value() }, val);
     }
 }

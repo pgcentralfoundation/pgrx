@@ -51,7 +51,7 @@ unsafe impl<T: IntoDatum + Clone + seal::Sealed> FnCallArg for Arg<T> {
         match self {
             Arg::Null => Ok(None),
             Arg::Value(v) => Ok(Clone::clone(v).into_datum()),
-            Arg::Default => create_default_value(&pg_proc, argnum),
+            Arg::Default => create_default_value(pg_proc, argnum),
         }
     }
 
@@ -342,7 +342,7 @@ fn lookup_fn(fname: &str, args: &[&dyn FnCallArg]) -> Result<pg_sys::Oid> {
         let nargs: i16 = arg_types.len().try_into().map_err(|_| FnCallError::TooManyArguments)?;
 
         // parse the function name into its possibly-qualified name parts
-        let ident_parts = parse_sql_ident(&fname)?;
+        let ident_parts = parse_sql_ident(fname)?;
         ident_parts
             .iter_deny_null()
             .map(|part| {

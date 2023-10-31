@@ -95,7 +95,7 @@ impl<'conn> SpiClient<'conn> {
     ///
     /// See [`SpiCursor`] docs for usage details.
     pub fn open_cursor<Q: Query<'conn>>(&self, query: Q, args: Q::Arguments) -> SpiCursor<'conn> {
-        query.open_cursor(&self, args)
+        query.open_cursor(self, args)
     }
 
     /// Set up a cursor that will execute the specified update (mutating) query

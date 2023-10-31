@@ -217,7 +217,7 @@ impl PgRelation {
     /// assert_eq!(tupdesc.len(), 12);
     /// ```
     pub fn tuple_desc(&self) -> PgTupleDesc {
-        PgTupleDesc::from_relation(&self)
+        PgTupleDesc::from_relation(self)
     }
 
     /// Number of tuples in this relation (not always up-to-date)
@@ -336,14 +336,10 @@ impl Deref for PgRelation {
 
 impl Drop for PgRelation {
     fn drop(&mut self) {
-        if !self.boxed.is_null() {
-            if self.need_close {
-                match self.lockmode {
-                    None => unsafe { pg_sys::RelationClose(self.boxed.as_ptr()) },
-                    Some(lockmode) => unsafe {
-                        pg_sys::relation_close(self.boxed.as_ptr(), lockmode)
-                    },
-                }
+        if !self.boxed.is_null() && self.need_close {
+            match self.lockmode {
+                None => unsafe { pg_sys::RelationClose(self.boxed.as_ptr()) },
+                Some(lockmode) => unsafe { pg_sys::relation_close(self.boxed.as_ptr(), lockmode) },
             }
         }
     }

@@ -29,7 +29,7 @@ impl<AllocatedBy: WhoAllocated> From<StringInfo<AllocatedBy>> for &'static core:
         unsafe {
             core::ffi::CStr::from_bytes_with_nul_unchecked(std::slice::from_raw_parts(
                 ptr as *const u8,
-                (len + 1) as usize, // +1 to get the trailing null byte
+                len + 1, // +1 to get the trailing null byte
             ))
         }
     }

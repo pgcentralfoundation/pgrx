@@ -224,7 +224,7 @@ impl ErrorReportWithLevel {
 
     /// Returns the name of the function that generated this error report, if we were able to figure it out
     pub fn function_name(&self) -> Option<&str> {
-        self.inner.location.funcname.as_ref().map(|s| s.as_str())
+        self.inner.location.funcname.as_deref()
     }
 
     /// Returns the context message of this error report, if any
@@ -282,12 +282,12 @@ impl ErrorReport {
 
     /// Returns the detail message of this error report
     pub fn detail(&self) -> Option<&str> {
-        self.detail.as_ref().map(|s| s.as_str())
+        self.detail.as_deref()
     }
 
     /// Returns the hint message of this error report
     pub fn hint(&self) -> Option<&str> {
-        self.hint.as_ref().map(|s| s.as_str())
+        self.hint.as_deref()
     }
 
     /// Report this [PgErrorReport], which will ultimately be reported by Postgres at the specified [PgLogLevel]

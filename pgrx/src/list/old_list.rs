@@ -162,17 +162,17 @@ impl<T> PgList<T> {
 
     #[inline]
     pub fn iter_ptr(&self) -> impl Iterator<Item = *mut T> + '_ {
-        PgListIteratorPtr { list: &self, pos: 0 }
+        PgListIteratorPtr { list: self, pos: 0 }
     }
 
     #[inline]
     pub fn iter_oid(&self) -> impl Iterator<Item = pg_sys::Oid> + '_ {
-        PgListIteratorOid { list: &self, pos: 0 }
+        PgListIteratorOid { list: self, pos: 0 }
     }
 
     #[inline]
     pub fn iter_int(&self) -> impl Iterator<Item = i32> + '_ {
-        PgListIteratorInt { list: &self, pos: 0 }
+        PgListIteratorInt { list: self, pos: 0 }
     }
 
     /// Add a pointer value to the end of this list

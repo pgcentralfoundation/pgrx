@@ -259,12 +259,7 @@ impl<'a> Clone for PgTupleDesc<'a> {
         // This will force the pfree() approach upon drop
         let tupdesc =
             unsafe { PgBox::from_pg(pg_sys::CreateTupleDescCopyConstr(tupdesc.as_ptr())) };
-        Self {
-            tupdesc: Some(tupdesc),
-            parent: self.parent.clone(),
-            need_release: false,
-            need_pfree: true,
-        }
+        Self { tupdesc: Some(tupdesc), parent: self.parent, need_release: false, need_pfree: true }
     }
 }
 

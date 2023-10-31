@@ -380,7 +380,7 @@ impl<'conn> SpiHeapTupleData<'conn> {
     pub fn get_datum_by_ordinal(&self, ordinal: usize) -> SpiResult<&SpiHeapTupleDataEntry<'conn>> {
         // Wrapping because `self.entries.get(...)` will bounds check.
         let index = ordinal.wrapping_sub(1);
-        self.entries.get(index).ok_or_else(|| SpiError::SpiError(SpiErrorCodes::NoAttribute))
+        self.entries.get(index).ok_or(SpiError::SpiError(SpiErrorCodes::NoAttribute))
     }
 
     /// Get a raw Datum from this HeapTuple by its field name.
@@ -475,7 +475,7 @@ impl<'conn> SpiHeapTupleDataEntry<'conn> {
                     false,
                     self.type_oid,
                 )
-                .map_err(|e| SpiError::DatumError(e))
+                .map_err(SpiError::DatumError)
             },
             None => Ok(None),
         }

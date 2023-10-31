@@ -159,7 +159,7 @@ impl<'a> PgHeapTuple<'a, AllocatedByPostgres> {
         // from incorrect assignment from the `trigger_data.tg_trigtuple/tg_newtuple` fields above.
         //
         // IOW, we are double-checking that we're using those fields correctly
-        assert_eq!(tuple.is_null(), false, "encountered unexpected NULL trigger tuple");
+        assert!(!tuple.is_null(), "encountered unexpected NULL trigger tuple");
 
         unsafe {
             // SAFETY:  The caller has asserted that `trigger_data` is valid, and that means its
@@ -222,7 +222,7 @@ impl<'a> PgHeapTuple<'a, AllocatedByRust> {
     ) -> Result<PgHeapTuple<'a, AllocatedByRust>, PgHeapTupleError> {
         PgTryBuilder::new(|| {
             let tuple_desc = PgTupleDesc::for_composite_type_by_oid(typoid)
-                .ok_or_else(|| PgHeapTupleError::NotACompositeType(typoid))?;
+                .ok_or(PgHeapTupleError::NotACompositeType(typoid))?;
             let natts = tuple_desc.len();
 
             unsafe {
@@ -381,8 +381,7 @@ impl<'a> PgHeapTuple<'a, AllocatedByRust> {
                 }
             }
 
-            let mut datums =
-                (0..self.tupdesc.len()).map(|i| pg_sys::Datum::from(i)).collect::<Vec<_>>();
+            let mut datums = (0..self.tupdesc.len()).map(pg_sys::Datum::from).collect::<Vec<_>>();
             let mut nulls = (0..self.tupdesc.len()).map(|_| false).collect::<Vec<_>>();
             let mut do_replace = (0..self.tupdesc.len()).map(|_| false).collect::<Vec<_>>();
 

@@ -102,8 +102,7 @@ pub fn pg_test(attr: TokenStream, item: TokenStream) -> TokenStream {
             };
 
             let sql_funcname = func.sig.ident.to_string();
-            let test_func_name =
-                Ident::new(&format!("pg_{}", func.sig.ident.to_string()), func.span());
+            let test_func_name = Ident::new(&format!("pg_{}", func.sig.ident), func.span());
 
             let attributes = func.attrs;
             let mut att_stream = proc_macro2::TokenStream::new();
@@ -1053,7 +1052,7 @@ Functions inside the `impl` may use the [`#[pgrx]`](macro@pgrx) attribute.
 pub fn pg_aggregate(_attr: TokenStream, item: TokenStream) -> TokenStream {
     // We don't care about `_attr` as we can find it in the `ItemMod`.
     fn wrapped(item_impl: ItemImpl) -> Result<TokenStream, syn::Error> {
-        let sql_graph_entity_item = PgAggregate::new(item_impl.into())?;
+        let sql_graph_entity_item = PgAggregate::new(item_impl)?;
 
         Ok(sql_graph_entity_item.to_token_stream().into())
     }
