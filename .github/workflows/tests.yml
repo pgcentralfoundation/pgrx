@@ -28,7 +28,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        version: ["postgres-11", "postgres-12", "postgres-13", "postgres-14", "postgres-15", "postgres-16"]
+        version: ["postgres-12", "postgres-13", "postgres-14", "postgres-15", "postgres-16"]
 
     steps:
     - uses: actions/checkout@v3
