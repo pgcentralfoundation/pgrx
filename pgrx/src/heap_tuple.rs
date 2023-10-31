@@ -381,8 +381,7 @@ impl<'a> PgHeapTuple<'a, AllocatedByRust> {
                 }
             }
 
-            let mut datums =
-                (0..self.tupdesc.len()).map(pg_sys::Datum::from).collect::<Vec<_>>();
+            let mut datums = (0..self.tupdesc.len()).map(pg_sys::Datum::from).collect::<Vec<_>>();
             let mut nulls = (0..self.tupdesc.len()).map(|_| false).collect::<Vec<_>>();
             let mut do_replace = (0..self.tupdesc.len()).map(|_| false).collect::<Vec<_>>();
 

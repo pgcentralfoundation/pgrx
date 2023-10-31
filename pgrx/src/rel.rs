@@ -339,9 +339,7 @@ impl Drop for PgRelation {
         if !self.boxed.is_null() && self.need_close {
             match self.lockmode {
                 None => unsafe { pg_sys::RelationClose(self.boxed.as_ptr()) },
-                Some(lockmode) => unsafe {
-                    pg_sys::relation_close(self.boxed.as_ptr(), lockmode)
-                },
+                Some(lockmode) => unsafe { pg_sys::relation_close(self.boxed.as_ptr(), lockmode) },
             }
         }
     }
