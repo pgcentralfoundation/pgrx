@@ -87,30 +87,15 @@ pub(crate) fn start_postgres(pg_config: &PgConfig) -> eyre::Result<()> {
         port.to_string().bold().cyan()
     );
     let mut command = std::process::Command::new(format!("{}/pg_ctl", bindir.display()));
-    // Unsafe block is for the pre_exec setsid call below
-    //
-    // This is to work around a bug in PG11 which does not call setsid in pg_ctl
-    // This means that when cargo pgrx run dumps a user into psql, pushing ctrl-c will abort
-    // the postgres server started by pgrx
-    unsafe {
-        command
-            .stdout(Stdio::piped())
-            .stderr(Stdio::piped())
-            .arg("start")
-            .arg(format!(
-                "-o -i -p {} -c unix_socket_directories={}",
-                port,
-                Pgrx::home()?.display()
-            ))
-            .arg("-D")
-            .arg(&datadir)
-            .arg("-l")
-            .arg(&logfile)
-            .pre_exec(|| {
-                fork::setsid().expect("setsid call failed for pg_ctl");
-                Ok(())
-            });
-    }
+    command
+        .stdout(Stdio::piped())
+        .stderr(Stdio::piped())
+        .arg("start")
+        .arg(format!("-o -i -p {} -c unix_socket_directories={}", port, Pgrx::home()?.display()))
+        .arg("-D")
+        .arg(&datadir)
+        .arg("-l")
+        .arg(&logfile);
 
     let command_str = format!("{:?}", command);
     let output = command.output()?;
