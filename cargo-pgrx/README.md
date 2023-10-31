@@ -61,45 +61,45 @@ Options:
 ```console
 $ cargo pgrx init
    Discovered Postgres v12.16, v13.12, v14.9, v15.4, v16.0
-  Downloading Postgres v13.12 from https://ftp.postgresql.org/pub/source/v13.12/postgresql-13.12.tar.bz2
-  Downloading Postgres v12.16 from https://ftp.postgresql.org/pub/source/v12.16/postgresql-12.16.tar.bz2
   Downloading Postgres v14.9 from https://ftp.postgresql.org/pub/source/v14.9/postgresql-14.9.tar.bz2
   Downloading Postgres v15.4 from https://ftp.postgresql.org/pub/source/v15.4/postgresql-15.4.tar.bz2
+  Downloading Postgres v12.16 from https://ftp.postgresql.org/pub/source/v12.16/postgresql-12.16.tar.bz2
+  Downloading Postgres v13.12 from https://ftp.postgresql.org/pub/source/v13.12/postgresql-13.12.tar.bz2
   Downloading Postgres v16.0 from https://ftp.postgresql.org/pub/source/v16.0/postgresql-16.0.tar.bz2
      Removing /home/you/.pgrx/12.16_unpack
+     Removing /home/you/.pgrx/14.9_unpack
     Untarring Postgres v12.16 to /home/you/.pgrx/12.16_unpack
-     Removing /home/you/.pgrx/13.12_unpack
-    Untarring Postgres v13.12 to /home/you/.pgrx/13.12_unpack
+    Untarring Postgres v14.9 to /home/you/.pgrx/14.9_unpack
      Removing /home/you/.pgrx/15.4_unpack
     Untarring Postgres v15.4 to /home/you/.pgrx/15.4_unpack
      Removing /home/you/.pgrx/16.0_unpack
     Untarring Postgres v16.0 to /home/you/.pgrx/16.0_unpack
-     Removing /home/you/.pgrx/14.9_unpack
-    Untarring Postgres v14.9 to /home/you/.pgrx/14.9_unpack
+     Removing /home/you/.pgrx/13.12_unpack
+    Untarring Postgres v13.12 to /home/you/.pgrx/13.12_unpack
      Removing /home/you/.pgrx/12.16
-     Removing /home/you/.pgrx/13.12
+     Removing /home/you/.pgrx/14.9
      Renaming /home/you/.pgrx/12.16_unpack/postgresql-12.16 -> /home/you/.pgrx/12.16
   Configuring Postgres v12.16
-     Renaming /home/you/.pgrx/13.12_unpack/postgresql-13.12 -> /home/you/.pgrx/13.12
-  Configuring Postgres v13.12
+     Renaming /home/you/.pgrx/14.9_unpack/postgresql-14.9 -> /home/you/.pgrx/14.9
+  Configuring Postgres v14.9
      Removing /home/you/.pgrx/15.4
      Renaming /home/you/.pgrx/15.4_unpack/postgresql-15.4 -> /home/you/.pgrx/15.4
   Configuring Postgres v15.4
      Removing /home/you/.pgrx/16.0
      Renaming /home/you/.pgrx/16.0_unpack/postgresql-16.0 -> /home/you/.pgrx/16.0
   Configuring Postgres v16.0
-     Removing /home/you/.pgrx/14.9
-     Renaming /home/you/.pgrx/14.9_unpack/postgresql-14.9 -> /home/you/.pgrx/14.9
-  Configuring Postgres v14.9
+     Removing /home/you/.pgrx/13.12
+     Renaming /home/you/.pgrx/13.12_unpack/postgresql-13.12 -> /home/you/.pgrx/13.12
+  Configuring Postgres v13.12
     Compiling Postgres v16.0
-    Compiling Postgres v13.12
     Compiling Postgres v12.16
-    Compiling Postgres v15.4
     Compiling Postgres v14.9
+    Compiling Postgres v15.4
+    Compiling Postgres v13.12
    Installing Postgres v12.16 to /home/you/.pgrx/12.16/pgrx-install
    Installing Postgres v13.12 to /home/you/.pgrx/13.12/pgrx-install
-   Installing Postgres v15.4 to /home/you/.pgrx/15.4/pgrx-install
    Installing Postgres v14.9 to /home/you/.pgrx/14.9/pgrx-install
+   Installing Postgres v15.4 to /home/you/.pgrx/15.4/pgrx-install
    Installing Postgres v16.0 to /home/you/.pgrx/16.0/pgrx-install
    Validating /home/you/.pgrx/12.16/pgrx-install/bin/pg_config
    Validating /home/you/.pgrx/13.12/pgrx-install/bin/pg_config
