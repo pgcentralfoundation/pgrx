@@ -36,7 +36,7 @@ pub(crate) mod pg15;
 
 #[cfg(all(feature = "pg16", not(docsrs)))]
 pub(crate) mod pg16 {
-    #[allow(clippy::all)]
+    #![allow(clippy::all)]
     include!(concat!(env!("OUT_DIR"), "/pg16.rs"));
 }
 #[cfg(all(feature = "pg16", docsrs))]
