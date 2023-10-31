@@ -50,7 +50,7 @@ pub(crate) struct Schema {
     /// Build in test mode (for `cargo pgrx test`)
     #[clap(long)]
     test: bool,
-    /// Do you want to run against Postgres `pg11`, `pg12`, `pg13`, `pg14`, `pg15`?
+    /// Do you want to run against pg12, pg13, pg14, pg15, or pg16?
     pg_version: Option<String>,
     /// Compile for release mode (default is debug)
     #[clap(long, short)]

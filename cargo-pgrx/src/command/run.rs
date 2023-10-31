@@ -25,7 +25,7 @@ use std::process::Command;
 #[derive(clap::Args, Debug)]
 #[clap(author)]
 pub(crate) struct Run {
-    /// Do you want to run against Postgres `pg11`, `pg12`, `pg13`, `pg14`, `pg15`?
+    /// Do you want to run against pg12, pg13, pg14, pg15, or pg16?
     #[clap(env = "PG_VERSION")]
     pg_version: Option<String>,
     /// The database to connect to (and create if the first time).  Defaults to a database with the same name as the current extension name
