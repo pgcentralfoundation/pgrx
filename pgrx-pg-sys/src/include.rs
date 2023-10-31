@@ -4,6 +4,7 @@
 
 #[cfg(all(feature = "pg12", not(docsrs)))]
 pub(crate) mod pg12 {
+    #![allow(clippy::all)]
     include!(concat!(env!("OUT_DIR"), "/pg12.rs"));
 }
 #[cfg(all(feature = "pg12", docsrs))]
@@ -11,6 +12,7 @@ pub(crate) mod pg12;
 
 #[cfg(all(feature = "pg13", not(docsrs)))]
 pub(crate) mod pg13 {
+    #![allow(clippy::all)]
     include!(concat!(env!("OUT_DIR"), "/pg13.rs"));
 }
 #[cfg(all(feature = "pg13", docsrs))]
@@ -18,6 +20,7 @@ pub(crate) mod pg13;
 
 #[cfg(all(feature = "pg14", not(docsrs)))]
 pub(crate) mod pg14 {
+    #![allow(clippy::all)]
     include!(concat!(env!("OUT_DIR"), "/pg14.rs"));
 }
 #[cfg(all(feature = "pg14", docsrs))]
@@ -25,6 +28,7 @@ pub(crate) mod pg14;
 
 #[cfg(all(feature = "pg15", not(docsrs)))]
 pub(crate) mod pg15 {
+    #![allow(clippy::all)]
     include!(concat!(env!("OUT_DIR"), "/pg15.rs"));
 }
 #[cfg(all(feature = "pg15", docsrs))]
@@ -32,6 +36,7 @@ pub(crate) mod pg15;
 
 #[cfg(all(feature = "pg16", not(docsrs)))]
 pub(crate) mod pg16 {
+    #[allow(clippy::all)]
     include!(concat!(env!("OUT_DIR"), "/pg16.rs"));
 }
 #[cfg(all(feature = "pg16", docsrs))]
