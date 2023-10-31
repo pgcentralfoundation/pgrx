@@ -102,7 +102,7 @@ impl<const P: u32, const S: u32> Eq for Numeric<P, S> {}
 impl<const P: u32, const S: u32> PartialOrd for Numeric<P, S> {
     #[inline]
     fn partial_cmp(&self, other: &Self) -> Option<Ordering> {
-        self.as_anynumeric().partial_cmp(other.as_anynumeric())
+        Some(self.cmp(other))
     }
 
     #[inline]

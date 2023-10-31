@@ -433,7 +433,7 @@ where
     }
 
     #[inline(always)]
-    fn in_memory_context<
+    unsafe fn in_memory_context<
         R,
         F: FnOnce(&mut PgMemoryContexts) -> R + std::panic::UnwindSafe + std::panic::RefUnwindSafe,
     >(

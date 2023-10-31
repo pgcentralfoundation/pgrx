@@ -26,7 +26,6 @@ jobs:
       SCCACHE_DIR: /home/runner/.cache/sccache
 
     strategy:
-      fail-fast: false
       matrix:
         version: ["postgres-12", "postgres-13", "postgres-14", "postgres-15", "postgres-16"]
 
@@ -350,6 +349,9 @@ jobs:
 
     - name: Run 'cargo pgrx init' for ${{ matrix.version }}
       run: cargo pgrx init --pg$PG_VER download
+
+    - name: Clippy -Awarnings
+      run: cargo clippy -p pgrx --features pg$PG_VER -- -Awarnings
 
     - name: create new sample extension
       run: cd /tmp/ && cargo pgrx new sample

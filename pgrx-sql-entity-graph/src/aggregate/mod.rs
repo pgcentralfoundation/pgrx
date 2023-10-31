@@ -299,10 +299,12 @@ impl PgAggregate {
                 #[allow(non_snake_case, clippy::too_many_arguments)]
                 #pg_extern_attr
                 fn #fn_name(this: #type_state_without_self, #(#args_with_names),*, fcinfo: ::pgrx::pg_sys::FunctionCallInfo) -> #type_state_without_self {
-                    <#target_path as ::pgrx::aggregate::Aggregate>::in_memory_context(
-                        fcinfo,
-                        move |_context| <#target_path as ::pgrx::aggregate::Aggregate>::state(this, (#(#arg_names),*), fcinfo)
-                    )
+                    unsafe {
+                        <#target_path as ::pgrx::aggregate::Aggregate>::in_memory_context(
+                            fcinfo,
+                            move |_context| <#target_path as ::pgrx::aggregate::Aggregate>::state(this, (#(#arg_names),*), fcinfo)
+                        )
+                    }
                 }
             });
             fn_name
@@ -322,10 +324,12 @@ impl PgAggregate {
                 #[allow(non_snake_case, clippy::too_many_arguments)]
                 #pg_extern_attr
                 fn #fn_name(this: #type_state_without_self, v: #type_state_without_self, fcinfo: ::pgrx::pg_sys::FunctionCallInfo) -> #type_state_without_self {
-                    <#target_path as ::pgrx::aggregate::Aggregate>::in_memory_context(
-                        fcinfo,
-                        move |_context| <#target_path as ::pgrx::aggregate::Aggregate>::combine(this, v, fcinfo)
-                    )
+                    unsafe {
+                        <#target_path as ::pgrx::aggregate::Aggregate>::in_memory_context(
+                            fcinfo,
+                            move |_context| <#target_path as ::pgrx::aggregate::Aggregate>::combine(this, v, fcinfo)
+                        )
+                    }
                 }
             });
             Some(fn_name)
@@ -351,10 +355,12 @@ impl PgAggregate {
                     #[allow(non_snake_case, clippy::too_many_arguments)]
                     #pg_extern_attr
                     fn #fn_name(this: #type_state_without_self, #(#direct_args_with_names),*, fcinfo: ::pgrx::pg_sys::FunctionCallInfo) -> #type_finalize {
-                        <#target_path as ::pgrx::aggregate::Aggregate>::in_memory_context(
-                            fcinfo,
-                            move |_context| <#target_path as ::pgrx::aggregate::Aggregate>::finalize(this, (#(#direct_arg_names),*), fcinfo)
-                        )
+                        unsafe {
+                            <#target_path as ::pgrx::aggregate::Aggregate>::in_memory_context(
+                                fcinfo,
+                                move |_context| <#target_path as ::pgrx::aggregate::Aggregate>::finalize(this, (#(#direct_arg_names),*), fcinfo)
+                            )
+                        }
                     }
                 });
             } else {
@@ -362,10 +368,12 @@ impl PgAggregate {
                     #[allow(non_snake_case, clippy::too_many_arguments)]
                     #pg_extern_attr
                     fn #fn_name(this: #type_state_without_self, fcinfo: ::pgrx::pg_sys::FunctionCallInfo) -> #type_finalize {
-                        <#target_path as ::pgrx::aggregate::Aggregate>::in_memory_context(
-                            fcinfo,
-                            move |_context| <#target_path as ::pgrx::aggregate::Aggregate>::finalize(this, (), fcinfo)
-                        )
+                        unsafe {
+                            <#target_path as ::pgrx::aggregate::Aggregate>::in_memory_context(
+                                fcinfo,
+                                move |_context| <#target_path as ::pgrx::aggregate::Aggregate>::finalize(this, (), fcinfo)
+                            )
+                        }
                     }
                 });
             };
@@ -388,10 +396,12 @@ impl PgAggregate {
                 #[allow(non_snake_case, clippy::too_many_arguments)]
                 #pg_extern_attr
                 fn #fn_name(this: #type_state_without_self, fcinfo: ::pgrx::pg_sys::FunctionCallInfo) -> Vec<u8> {
-                    <#target_path as ::pgrx::aggregate::Aggregate>::in_memory_context(
-                        fcinfo,
-                        move |_context| <#target_path as ::pgrx::aggregate::Aggregate>::serial(this, fcinfo)
-                    )
+                    unsafe {
+                        <#target_path as ::pgrx::aggregate::Aggregate>::in_memory_context(
+                            fcinfo,
+                            move |_context| <#target_path as ::pgrx::aggregate::Aggregate>::serial(this, fcinfo)
+                        )
+                    }
                 }
             });
             Some(fn_name)
@@ -415,10 +425,12 @@ impl PgAggregate {
                 #[allow(non_snake_case, clippy::too_many_arguments)]
                 #pg_extern_attr
                 fn #fn_name(this: #type_state_without_self, buf: Vec<u8>, internal: ::pgrx::pgbox::PgBox<#type_state_without_self>, fcinfo: ::pgrx::pg_sys::FunctionCallInfo) -> ::pgrx::pgbox::PgBox<#type_state_without_self> {
-                    <#target_path as ::pgrx::aggregate::Aggregate>::in_memory_context(
-                        fcinfo,
-                        move |_context| <#target_path as ::pgrx::aggregate::Aggregate>::deserial(this, buf, internal, fcinfo)
-                    )
+                    unsafe {
+                        <#target_path as ::pgrx::aggregate::Aggregate>::in_memory_context(
+                            fcinfo,
+                            move |_context| <#target_path as ::pgrx::aggregate::Aggregate>::deserial(this, buf, internal, fcinfo)
+                        )
+                    }
                 }
             });
             Some(fn_name)
@@ -447,10 +459,12 @@ impl PgAggregate {
                     #(#args_with_names),*,
                     fcinfo: ::pgrx::pg_sys::FunctionCallInfo,
                 ) -> #type_moving_state {
-                    <#target_path as ::pgrx::aggregate::Aggregate>::in_memory_context(
-                        fcinfo,
-                        move |_context| <#target_path as ::pgrx::aggregate::Aggregate>::moving_state(mstate, (#(#arg_names),*), fcinfo)
-                    )
+                    unsafe {
+                        <#target_path as ::pgrx::aggregate::Aggregate>::in_memory_context(
+                            fcinfo,
+                            move |_context| <#target_path as ::pgrx::aggregate::Aggregate>::moving_state(mstate, (#(#arg_names),*), fcinfo)
+                        )
+                    }
                 }
             });
             Some(fn_name)
@@ -483,10 +497,12 @@ impl PgAggregate {
                     #(#args_with_names),*,
                     fcinfo: ::pgrx::pg_sys::FunctionCallInfo,
                 ) -> #type_moving_state {
-                    <#target_path as ::pgrx::aggregate::Aggregate>::in_memory_context(
-                        fcinfo,
-                        move |_context| <#target_path as ::pgrx::aggregate::Aggregate>::moving_state_inverse(mstate, (#(#arg_names),*), fcinfo)
-                    )
+                    unsafe {
+                        <#target_path as ::pgrx::aggregate::Aggregate>::in_memory_context(
+                            fcinfo,
+                            move |_context| <#target_path as ::pgrx::aggregate::Aggregate>::moving_state_inverse(mstate, (#(#arg_names),*), fcinfo)
+                        )
+                    }
                 }
             });
             Some(fn_name)
@@ -517,10 +533,12 @@ impl PgAggregate {
                 #[allow(non_snake_case, clippy::too_many_arguments)]
                 #pg_extern_attr
                 fn #fn_name(mstate: #type_moving_state, #(#direct_args_with_names),* #maybe_comma fcinfo: ::pgrx::pg_sys::FunctionCallInfo) -> #type_finalize {
-                    <#target_path as ::pgrx::aggregate::Aggregate>::in_memory_context(
-                        fcinfo,
-                        move |_context| <#target_path as ::pgrx::aggregate::Aggregate>::moving_finalize(mstate, (#(#direct_arg_names),*), fcinfo)
-                    )
+                    unsafe {
+                        <#target_path as ::pgrx::aggregate::Aggregate>::in_memory_context(
+                            fcinfo,
+                            move |_context| <#target_path as ::pgrx::aggregate::Aggregate>::moving_finalize(mstate, (#(#direct_arg_names),*), fcinfo)
+                        )
+                    }
                 }
             });
             Some(fn_name)

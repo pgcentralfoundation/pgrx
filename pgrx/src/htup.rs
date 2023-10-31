@@ -46,7 +46,7 @@ pub fn heap_tuple_header_get_datum_length(htup_header: pg_sys::HeapTupleHeader) 
 
 /// convert a HeapTupleHeader to a Datum.
 #[inline]
-pub fn heap_tuple_get_datum(heap_tuple: pg_sys::HeapTuple) -> pg_sys::Datum {
+pub unsafe fn heap_tuple_get_datum(heap_tuple: pg_sys::HeapTuple) -> pg_sys::Datum {
     unsafe { pg_sys::HeapTupleHeaderGetDatum((*heap_tuple).t_data) }
 }
 
