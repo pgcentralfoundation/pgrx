@@ -17,7 +17,6 @@ use crate::CommandExecute;
 use eyre::eyre;
 use owo_colors::OwoColorize;
 use pgrx_pg_config::{createdb, PgConfig, Pgrx};
-use std::os::unix::process::CommandExt;
 use std::path::Path;
 use std::process::Command;
 
@@ -133,7 +132,9 @@ pub(crate) fn run(
     exec_psql(pg_config, dbname, pgcli)
 }
 
+#[cfg(unix)]
 pub(crate) fn exec_psql(pg_config: &PgConfig, dbname: &str, pgcli: bool) -> eyre::Result<()> {
+    use std::os::unix::process::CommandExt;
     let mut command = Command::new(match pgcli {
         false => pg_config.psql_path()?.into_os_string(),
         true => "pgcli".to_string().into(),
@@ -151,4 +152,9 @@ pub(crate) fn exec_psql(pg_config: &PgConfig, dbname: &str, pgcli: bool) -> eyre
 
     // we'll never return from here as we've now become psql
     panic!("{}", command.exec());
+}
+
+#[cfg(not(unix))]
+pub(crate) fn exec_psql(pg_config: &PgConfig, dbname: &str, pgcli: bool) -> eyre::Result<()> {
+    panic!("Tried to exec on a platform that doesn't support exec!")
 }

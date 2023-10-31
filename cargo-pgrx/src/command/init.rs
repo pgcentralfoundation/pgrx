@@ -585,9 +585,17 @@ fn get_pg_installdir(pgdir: &PathBuf) -> PathBuf {
     dir
 }
 
+#[cfg(unix)]
 fn is_root_user() -> bool {
     use nix::unistd::Uid;
     Uid::effective().is_root()
+}
+
+/// Incorrectly answers false, reverting pgrx to pre-root-aware behavior,
+/// which is likely incorrect even if the system lacks "root" semantics.
+#[cfg(not(unix))]
+fn is_root_user() -> bool {
+    false
 }
 
 pub(crate) fn initdb(bindir: &PathBuf, datadir: &PathBuf) -> eyre::Result<()> {
