@@ -197,8 +197,7 @@ pub unsafe fn BufferGetBlock(buffer: crate::Buffer) -> crate::Block {
     if BufferIsLocal(buffer) {
         *crate::LocalBufferBlockPointers.offset(((-buffer) - 1) as isize)
     } else {
-        crate::BufferBlocks
-            .offset((((buffer as crate::Size) - 1) * crate::BLCKSZ as usize) as isize)
+        crate::BufferBlocks.add(((buffer as crate::Size) - 1) * crate::BLCKSZ as usize)
             as crate::Block
     }
 }

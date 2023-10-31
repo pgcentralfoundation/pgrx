@@ -155,7 +155,7 @@ fn main() -> eyre::Result<()> {
     } else {
         let mut found = Vec::new();
         for pgver in SUPPORTED_VERSIONS() {
-            if let Some(_) = env_tracked(&format!("CARGO_FEATURE_PG{}", pgver.major)) {
+            if env_tracked(&format!("CARGO_FEATURE_PG{}", pgver.major)).is_some() {
                 found.push(pgver);
             }
         }
@@ -175,7 +175,7 @@ fn main() -> eyre::Result<()> {
                 return Err(eyre!(
                     "Multiple `pg$VERSION` features found.\n`--no-default-features` may be required.\nFound: {}",
                     versions
-                        .into_iter()
+                        .iter()
                         .map(|version| format!("pg{}", version.major))
                         .collect::<Vec<String>>()
                         .join(", ")
@@ -254,7 +254,7 @@ fn emit_rerun_if_changed() {
     println!("cargo:rerun-if-changed=cshim");
 
     if let Ok(pgrx_config) = Pgrx::config_toml() {
-        println!("cargo:rerun-if-changed={}", pgrx_config.display().to_string());
+        println!("cargo:rerun-if-changed={}", pgrx_config.display());
     }
 }
 
@@ -268,7 +268,7 @@ fn generate_bindings(
     include_h.push("include");
     include_h.push(format!("pg{}.h", major_version));
 
-    let bindgen_output = get_bindings(major_version, &pg_config, &include_h)
+    let bindgen_output = get_bindings(major_version, pg_config, &include_h)
         .wrap_err_with(|| format!("bindgen failed for pg{}", major_version))?;
 
     let oids = extract_oids(&bindgen_output);
@@ -350,8 +350,8 @@ fn write_rs_file(
     let mut contents = header;
     contents.extend(code);
 
-    std::fs::write(&file, contents.to_string())?;
-    rust_fmt(&file)
+    std::fs::write(file, contents.to_string())?;
+    rust_fmt(file)
 }
 
 /// Given a token stream representing a file, apply a series of transformations to munge
@@ -405,7 +405,7 @@ fn rewrite_oid_consts(
     oids: &BTreeMap<syn::Ident, Box<syn::Expr>>,
 ) -> Vec<syn::Item> {
     items
-        .into_iter()
+        .iter()
         .map(|item| match item {
             Item::Const(ItemConst { ident, ty, expr, .. })
                 if ty.to_token_stream().to_string() == "u32" && oids.get(ident) == Some(expr) =>
@@ -699,7 +699,7 @@ fn get_bindings(
     } else {
         let bindings = run_bindgen(major_version, pg_config, include_h)?;
         if let Some(path) = env_tracked("PGRX_PG_SYS_EXTRA_OUTPUT_PATH") {
-            std::fs::write(&path, &bindings)?;
+            std::fs::write(path, &bindings)?;
         }
         bindings
     };
@@ -719,7 +719,7 @@ fn run_bindgen(
     binder = add_derives(binder);
     let bindings = binder
         .header(include_h.display().to_string())
-        .clang_args(&extra_bindgen_clang_args(pg_config)?)
+        .clang_args(extra_bindgen_clang_args(pg_config)?)
         .clang_args(pg_target_include_flags(major_version, pg_config)?)
         .detect_include_paths(target_env_tracked("PGRX_BINDGEN_NO_DETECT_INCLUDES").is_none())
         .parse_callbacks(Box::new(PgrxOverrides::default()))
@@ -833,7 +833,7 @@ fn build_shim(shim_src: &PathBuf, shim_dst: &PathBuf, pg_config: &PgConfig) -> e
 
     eprintln!("libpgrx_cshim={}", libpgrx_cshim.display());
     // then build the shim for the version feature currently being built
-    build_shim_for_version(&shim_src, &shim_dst, pg_config)?;
+    build_shim_for_version(shim_src, shim_dst, pg_config)?;
 
     // no matter what, tell rustc to link to the library that was built for the feature we're currently building
     let envvar_name = format!("CARGO_FEATURE_PG{}", major_version);
@@ -1042,7 +1042,7 @@ fn apply_pg_guard(items: &Vec<syn::Item>) -> eyre::Result<proc_macro2::TokenStre
             Item::ForeignMod(block) => {
                 let abi = &block.abi;
                 let (mut extern_funcs, mut others) = (Vec::new(), Vec::new());
-                block.items.iter().cloned().filter(|item| !is_blocklisted_item(item)).for_each(
+                block.items.iter().filter(|&item| !is_blocklisted_item(item)).cloned().for_each(
                     |item| match item {
                         ForeignItem::Fn(func) => extern_funcs.push(func),
                         item => others.push(item),
@@ -1078,6 +1078,6 @@ fn rust_fmt(path: &PathBuf) -> eyre::Result<()> {
         {
             Err(e).wrap_err("Failed to run `rustfmt`, is it installed?")
         }
-        Err(e) => Err(e.into()),
+        Err(e) => Err(e),
     }
 }

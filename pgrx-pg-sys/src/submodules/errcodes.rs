@@ -1280,15 +1280,15 @@ impl From<isize> for PgSqlErrorCode {
 #[allow(non_snake_case)]
 #[inline]
 const fn PGSIXBIT(ch: i32) -> i32 {
-    (((ch) - '0' as i32) & 0x3F) as i32
+    ((ch) - '0' as i32) & 0x3F
 }
 
 #[allow(non_snake_case)]
 #[inline]
 const fn MAKE_SQLSTATE(ch1: char, ch2: char, ch3: char, ch4: char, ch5: char) -> i32 {
-    (PGSIXBIT(ch1 as i32)
+    PGSIXBIT(ch1 as i32)
         + (PGSIXBIT(ch2 as i32) << 6)
         + (PGSIXBIT(ch3 as i32) << 12)
         + (PGSIXBIT(ch4 as i32) << 18)
-        + (PGSIXBIT(ch5 as i32) << 24)) as i32
+        + (PGSIXBIT(ch5 as i32) << 24)
 }

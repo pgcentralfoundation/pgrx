@@ -393,13 +393,11 @@ unsafe fn fastgetattr(
             } else {
                 nocachegetattr(tup, attnum, tupleDesc)
             }
+        } else if att_isnull(attnum - 1, (*(*tup).t_data).t_bits.as_ptr()) {
+            *isnull = true;
+            Datum::from(0) // a NULL pointer
         } else {
-            if att_isnull(attnum - 1, (*(*tup).t_data).t_bits.as_ptr()) {
-                *isnull = true;
-                Datum::from(0) // a NULL pointer
-            } else {
-                nocachegetattr(tup, attnum, tupleDesc)
-            }
+            nocachegetattr(tup, attnum, tupleDesc)
         }
     }
 }

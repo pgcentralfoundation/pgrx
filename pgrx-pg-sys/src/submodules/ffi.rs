@@ -123,7 +123,7 @@ unsafe fn pg_guard_ffi_boundary_impl<T, F: FnOnce() -> T>(f: F) -> T {
             pg_sys::PG_exception_stack = prev_exception_stack;
             pg_sys::error_context_stack = prev_error_context_stack;
 
-            return result;
+            result
         } else {
             // we're back here b/c of a longjmp originating in Postgres
 
@@ -148,13 +148,13 @@ unsafe fn pg_guard_ffi_boundary_impl<T, F: FnOnce() -> T>(f: F) -> T {
                 .is_null()
                 .then(|| String::from("<null error message>"))
                 .unwrap_or_else(|| CStr::from_ptr(errdata.message).to_string_lossy().to_string());
-            let detail = errdata.detail.is_null().then(|| None).unwrap_or_else(|| {
+            let detail = errdata.detail.is_null().then_some(None).unwrap_or_else(|| {
                 Some(CStr::from_ptr(errdata.detail).to_string_lossy().to_string())
             });
-            let hint = errdata.hint.is_null().then(|| None).unwrap_or_else(|| {
+            let hint = errdata.hint.is_null().then_some(None).unwrap_or_else(|| {
                 Some(CStr::from_ptr(errdata.hint).to_string_lossy().to_string())
             });
-            let funcname = errdata.funcname.is_null().then(|| None).unwrap_or_else(|| {
+            let funcname = errdata.funcname.is_null().then_some(None).unwrap_or_else(|| {
                 Some(CStr::from_ptr(errdata.funcname).to_string_lossy().to_string())
             });
             let file =
