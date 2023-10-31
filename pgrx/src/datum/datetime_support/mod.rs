@@ -382,10 +382,10 @@ macro_rules! impl_wrappers {
 
 #[cfg(any(feature = "pg12", feature = "pg13"))]
 const DATE_EXTRACT: unsafe fn(fcinfo: pg_sys::FunctionCallInfo) -> pg_sys::Datum =
-    pg11_13::date_part;
+    pg12_13::date_part;
 
 #[cfg(any(feature = "pg12", feature = "pg13"))]
-mod pg11_13 {
+mod pg12_13 {
     use crate as pgrx; // for [pg_guard]
     use crate::prelude::*;
 
@@ -395,7 +395,7 @@ mod pg11_13 {
         // then call the `timestamp_part` function.
         //
         // this is essentially how the `date_part()` function is declared in the system catalogs
-        // for pg11-13:
+        // for pg12-13:
         /**
             \sf date_part(text, date)
             CREATE OR REPLACE FUNCTION pg_catalog.date_part(text, date)
