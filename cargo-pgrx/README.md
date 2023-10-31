@@ -146,6 +146,7 @@ Options:
                                                to have pgrx download/compile/install it [env: PG12_PG_CONFIG=]
       --pg13 <PG13>                            If installed locally, the path to PG13's `pgconfig` tool, or `download`
                                                to have pgrx download/compile/install it [env: PG13_PG_CONFIG=]
+  -v, --verbose...                             Enable info logs, -vv for debug, -vvv for trace
       --pg14 <PG14>                            If installed locally, the path to PG14's `pgconfig` tool, or `download`
                                                to have pgrx download/compile/install it [env: PG14_PG_CONFIG=]
       --pg15 <PG15>                            If installed locally, the path to PG15's `pgconfig` tool, or `download`
@@ -159,7 +160,6 @@ Options:
                                                memory errors when run under Valgrind
   -j, --jobs <JOBS>                            Allow N make jobs at once
   -h, --help                                   Print help (see more with '--help')
-  -v, --verbose...                             Enable info logs, -vv for debug, -vvv for trace
   -V, --version                                Print version
 ```
 
