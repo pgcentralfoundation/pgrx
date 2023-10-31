@@ -25,7 +25,6 @@ crate-type = [ "cdylib", "lib" ]
 
 [features]
 default = [ "proptest" ]
-pg11 = [ "pgrx/pg11" ]
 pg12 = [ "pgrx/pg12" ]
 pg13 = [ "pgrx/pg13" ]
 pg14 = [ "pgrx/pg14" ]
