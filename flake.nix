@@ -80,7 +80,6 @@
         in
         pkgs.mkShell {
           inputsFrom = with pkgs; [
-            postgresql_11
             postgresql_12
             postgresql_13
             postgresql_14
