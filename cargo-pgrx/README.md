@@ -132,8 +132,6 @@ Initialize pgrx development environment for the first time
 Usage: cargo pgrx init [OPTIONS]
 
 Options:
-      --pg11 <PG11>                            If installed locally, the path to PG11's `pgconfig` tool, or `download`
-                                               to have pgrx download/compile/install it [env: PG11_PG_CONFIG=]
       --pg12 <PG12>                            If installed locally, the path to PG12's `pgconfig` tool, or `download`
                                                to have pgrx download/compile/install it [env: PG12_PG_CONFIG=]
       --pg13 <PG13>                            If installed locally, the path to PG13's `pgconfig` tool, or `download`
@@ -277,7 +275,7 @@ strings=# select strings.to_lowercase('PGRX');
 (1 row)
 ```
 
-`cargo pgrx run <pg11 | pg12 | pg13 | pg14 | pg15>` is the primary interface into compiling and interactively testing/using your extension during development.
+`cargo pgrx run <pg12 | pg13 | pg14 | pg15 | pg16>` is the primary interface into compiling and interactively testing/using your extension during development.
 
 The very first time you execute `cargo pgrx run pgXX`, it needs to compile not only your extension, but pgrx itself, along with all its dependencies. Depending on your computer, this could take a bit of time (`pgrx` is nearly 200k lines of Rust when counting the generated bindings for Postgres). Afterwards, however (as seen in the above screenshot), it's fairly fast.
 
@@ -291,52 +289,26 @@ For Postgres installations which are already on your computer, `cargo pgrx run` 
 
 ```console
 $ cargo pgrx run --help
-cargo-pgrx-run 0.5.0
-PgCentral Foundation, Inc. <contact@pgcentral.org>
 Compile/install extension to a pgrx-managed Postgres instance and start psql
 
-USAGE:
-    cargo pgrx run [OPTIONS] [ARGS]
+Usage: cargo pgrx run [OPTIONS] [PG_VERSION] [DBNAME]
 
-ARGS:
-    <PG_VERSION>    Do you want to run against Postgres `pg11`, `pg12`, `pg13`, `pg14`,
-                    `pg15`? [env: PG_VERSION=]
-    <DBNAME>        The database to connect to (and create if the first time).  Defaults to a
-                    database with the same name as the current extension name
+Arguments:
+  [PG_VERSION]  Do you want to run against pg12, pg13, pg14, pg15, or pg16? [env: PG_VERSION=]
+  [DBNAME]      The database to connect to (and create if the first time).  Defaults to a database with the same name as the current extension name
 
-OPTIONS:
-        --all-features
-            Activate all available features
-
-        --features <FEATURES>
-            Space-separated list of features to activate
-
-    -h, --help
-            Print help information
-
-        --manifest-path <MANIFEST_PATH>
-            Path to Cargo.toml
-
-        --no-default-features
-            Do not activate the `default` feature
-
-    -p, --package <PACKAGE>
-            Package to build (see `cargo help pkgid`)
-
-        --pgcli
-            Use an existing `pgcli` on the $PATH [env: PGRX_PGCLI=]
-
-        --profile <PROFILE>
-            Specific profile to use (conflicts with `--release`)
-
-    -r, --release
-            Compile for release mode (default is debug)
-
-    -v, --verbose
-            Enable info logs, -vv for debug, -vvv for trace
-
-    -V, --version
-            Print version information
+Options:
+  -p, --package <PACKAGE>              Package to build (see `cargo help pkgid`)
+      --manifest-path <MANIFEST_PATH>  Path to Cargo.toml
+  -v, --verbose...                     Enable info logs, -vv for debug, -vvv for trace
+  -r, --release                        Compile for release mode (default is debug)
+      --profile <PROFILE>              Specific profile to use (conflicts with `--release`)
+      --all-features                   Activate all available features
+      --no-default-features            Do not activate the `default` feature
+  -F, --features <FEATURES>            Space-separated list of features to activate
+      --pgcli                          Use an existing `pgcli` on the $PATH [env: PGRX_PGCLI=]
+  -h, --help                           Print help
+  -V, --version                        Print version
 ```
 
 ## Connect to a Database
@@ -357,7 +329,7 @@ strings=#
 ```
 
 If you'd simply like to connect to a managed version of Postgres without re-compiling and installing
-your extension, use `cargo pgrx connect <pg11 | pg12 | pg13 | pg14 | pg15>`.
+your extension, use `cargo pgrx connect <pg12 | pg13 | pg14 | pg15 | pg16>`.
 
 This command will use the default database named for your extension, or you can specify another
 database name as the final argument.
@@ -366,37 +338,22 @@ If the specified database doesn't exist, `cargo pgrx connect` will create it. Si
 the specified version of Postgres isn't running, it'll be automatically started.
 
 ```console
-cargo-pgrx-connect 0.5.
-PgCentral Foundation, Inc. <contact@pgcentral.org>
+$ cargo pgrx connect --help
 Connect, via psql, to a Postgres instance
 
-USAGE:
-    cargo pgrx connect [OPTIONS] [ARGS]
+Usage: cargo pgrx connect [OPTIONS] [PG_VERSION] [DBNAME]
 
-ARGS:
-    <PG_VERSION>    Do you want to run against Postgres `pg11`, `pg12`, `pg13`, `pg14`,
-                    `pg15`? [env: PG_VERSION=]
-    <DBNAME>        The database to connect to (and create if the first time).  Defaults to a
-                    database with the same name as the current extension name [env: DBNAME=]
+Arguments:
+  [PG_VERSION]  Do you want to run against pg12, pg13, pg14, pg15, or pg16? [env: PG_VERSION=]
+  [DBNAME]      The database to connect to (and create if the first time).  Defaults to a database with the same name as the current extension name [env: DBNAME=]
 
-OPTIONS:
-    -h, --help
-            Print help information
-
-        --manifest-path <MANIFEST_PATH>
-            Path to Cargo.toml
-
-    -p, --package <PACKAGE>
-            Package to determine default `pg_version` with (see `cargo help pkgid`)
-
-        --pgcli
-            Use an existing `pgcli` on the $PATH [env: PGRX_PGCLI=]
-
-    -v, --verbose
-            Enable info logs, -vv for debug, -vvv for trace
-
-    -V, --version
-            Print version information
+Options:
+  -p, --package <PACKAGE>              Package to determine default `pg_version` with (see `cargo help pkgid`)
+      --manifest-path <MANIFEST_PATH>  Path to Cargo.toml
+  -v, --verbose...                     Enable info logs, -vv for debug, -vvv for trace
+      --pgcli                          Use an existing `pgcli` on the $PATH [env: PGRX_PGCLI=]
+  -h, --help                           Print help
+  -V, --version                        Print version
 ```
 
 ## Installing Your Extension Locally
@@ -429,53 +386,24 @@ By default, `cargo pgrx install` builds your extension in debug mode. Specifying
 
 ```console
 $ cargo pgrx install --help
-cargo-pgrx-install 0.5.0
-PgCentral Foundation, Inc. <contact@pgcentral.org>
-Install the extension from the current crate to the Postgres specified by whatever `pg_config` is
-currently on your $PATH
+Install the extension from the current crate to the Postgres specified by whatever `pg_config` is currently on your $PATH
 
-USAGE:
-    cargo pgrx install [OPTIONS]
+Usage: cargo pgrx install [OPTIONS]
 
-OPTIONS:
-        --all-features
-            Activate all available features
-
-    -c, --pg-config <PG_CONFIG>
-            The `pg_config` path (default is first in $PATH)
-
-        --features <FEATURES>
-            Space-separated list of features to activate
-
-    -h, --help
-            Print help information
-
-        --manifest-path <MANIFEST_PATH>
-            Path to Cargo.toml
-
-        --no-default-features
-            Do not activate the `default` feature
-
-    -p, --package <PACKAGE>
-            Package to build (see `cargo help pkgid`)
-
-        --profile <PROFILE>
-            Specific profile to use (conflicts with `--release`)
-
-    -r, --release
-            Compile for release mode (default is debug)
-
-        --test
-            Build in test mode (for `cargo pgrx test`)
-
-    -v, --verbose
-            Enable info logs, -vv for debug, -vvv for trace
-
-    -V, --version
-            Print version information
-            
-    -s, --sudo
-           Use `sudo` to install the extension artifacts
+Options:
+  -p, --package <PACKAGE>              Package to build (see `cargo help pkgid`)
+      --manifest-path <MANIFEST_PATH>  Path to Cargo.toml
+  -v, --verbose...                     Enable info logs, -vv for debug, -vvv for trace
+  -r, --release                        Compile for release mode (default is debug)
+      --profile <PROFILE>              Specific profile to use (conflicts with `--release`)
+      --test                           Build in test mode (for `cargo pgrx test`)
+  -c, --pg-config <PG_CONFIG>          The `pg_config` path (default is first in $PATH)
+  -s, --sudo                           Use `sudo` to install the extension artifacts
+      --all-features                   Activate all available features
+      --no-default-features            Do not activate the `default` feature
+  -F, --features <FEATURES>            Space-separated list of features to activate
+  -h, --help                           Print help
+  -V, --version                        Print version
 ```
 
 ## Testing Your Extension
@@ -508,7 +436,7 @@ test result: ok. 2 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; fini
 Stopping Postgres
 ```
 
-`cargo pgrx test [pg11 | pg12 | pg13 | pg14 | pg15]` runs your `#[test]` and `#[pg_test]` annotated functions using cargo's test system.
+`cargo pgrx test [pg12 | pg13 | pg14 | pg15 | pg16]` runs your `#[test]` and `#[pg_test]` annotated functions using cargo's test system.
 
 During the testing process, `pgrx` starts a temporary instance of Postgres with its `PGDATA` directory in `./target/pgrx-test-data-PGVER/`. This Postgres instance is stopped as soon as the test framework has finished. The locale of the temporary instance is `C.UTF-8` (or equivalently, a locale of `C` with a `ctype` of `UTF8` on macOS), or `C` if the `C.UTF-8` locale is unavailable.
 
@@ -520,51 +448,27 @@ Additionally, a `#[pg_test]` function runs in a transaction that is aborted when
 make to the database are not preserved.
 
 ```console
-cargo-pgrx-test 0.5.0
-PgCentral Foundation, Inc. <contact@pgcentral.org>
+$ cargo pgrx test --help
 Run the test suite for this crate
 
-USAGE:
-    cargo pgrx test [OPTIONS] [ARGS]
+Usage: cargo pgrx test [OPTIONS] [PG_VERSION] [TESTNAME]
 
-ARGS:
-    <PG_VERSION>    Do you want to run against Postgres `pg11`, `pg12`, `pg13`, `pg14`,
-                    `pg15`, or `all`? [env: PG_VERSION=]
-    <TESTNAME>      If specified, only run tests containing this string in their names
+Arguments:
+  [PG_VERSION]  Do you want to run against pg12, pg13, pg14, pg15, pg16, or all? [env: PG_VERSION=]
+  [TESTNAME]    If specified, only run tests containing this string in their names
 
-OPTIONS:
-        --all-features
-            Activate all available features
-
-        --features <FEATURES>
-            Space-separated list of features to activate
-
-    -h, --help
-            Print help information
-
-        --manifest-path <MANIFEST_PATH>
-            Path to Cargo.toml
-
-    -n, --no-schema
-            Don't regenerate the schema
-
-        --no-default-features
-            Do not activate the `default` feature
-
-    -p, --package <PACKAGE>
-            Package to build (see `cargo help pkgid`)
-
-        --profile <PROFILE>
-            Specific profile to use (conflicts with `--release`)
-
-    -r, --release
-            compile for release mode (default is debug)
-
-    -v, --verbose
-            Enable info logs, -vv for debug, -vvv for trace
-
-    -V, --version
-            Print version information
+Options:
+  -p, --package <PACKAGE>              Package to build (see `cargo help pkgid`)
+      --manifest-path <MANIFEST_PATH>  Path to Cargo.toml
+  -v, --verbose...                     Enable info logs, -vv for debug, -vvv for trace
+  -r, --release                        compile for release mode (default is debug)
+      --profile <PROFILE>              Specific profile to use (conflicts with `--release`)
+  -n, --no-schema                      Don't regenerate the schema
+      --all-features                   Activate all available features
+      --no-default-features            Do not activate the `default` feature
+  -F, --features <FEATURES>            Space-separated list of features to activate
+  -h, --help                           Print help
+  -V, --version                        Print version
 ```
 
 ## Building an Installation Package
@@ -603,53 +507,24 @@ distobutions or MacOS Postgres installations.
 
 ```console
 $ cargo pgrx package --help
-cargo-pgrx-package 0.5.0
-PgCentral Foundation, Inc. <contact@pgcentral.org>
 Create an installation package directory
 
-USAGE:
-    cargo pgrx package [OPTIONS]
+Usage: cargo pgrx package [OPTIONS]
 
-OPTIONS:
-        --all-features
-            Activate all available features
-
-    -c, --pg-config <PG_CONFIG>
-            The `pg_config` path (default is first in $PATH)
-
-    -d, --debug
-            Compile for debug mode (default is release)
-
-        --features <FEATURES>
-            Space-separated list of features to activate
-
-    -h, --help
-            Print help information
-
-        --manifest-path <MANIFEST_PATH>
-            Path to Cargo.toml
-
-        --no-default-features
-            Do not activate the `default` feature
-
-        --out-dir <OUT_DIR>
-            The directory to output the package (default is
-            `./target/[debug|release]/extname-pgXX/`)
-
-    -p, --package <PACKAGE>
-            Package to build (see `cargo help pkgid`)
-
-        --profile <PROFILE>
-            Specific profile to use (conflicts with `--debug`)
-
-        --test
-            Build in test mode (for `cargo pgrx test`)
-
-    -v, --verbose
-            Enable info logs, -vv for debug, -vvv for trace
-
-    -V, --version
-            Print version information
+Options:
+  -p, --package <PACKAGE>              Package to build (see `cargo help pkgid`)
+      --manifest-path <MANIFEST_PATH>  Path to Cargo.toml
+  -v, --verbose...                     Enable info logs, -vv for debug, -vvv for trace
+  -d, --debug                          Compile for debug mode (default is release)
+      --profile <PROFILE>              Specific profile to use (conflicts with `--debug`)
+      --test                           Build in test mode (for `cargo pgrx test`)
+  -c, --pg-config <PG_CONFIG>          The `pg_config` path (default is first in $PATH)
+      --out-dir <OUT_DIR>              The directory to output the package (default is `./target/[debug|release]/extname-pgXX/`)
+      --all-features                   Activate all available features
+      --no-default-features            Do not activate the `default` feature
+  -F, --features <FEATURES>            Space-separated list of features to activate
+  -h, --help                           Print help
+  -V, --version                        Print version
 ```
 
 ## Inspect your Extension Schema
@@ -659,71 +534,38 @@ If you just want to look at the full extension schema that pgrx will generate, u
 
 ```console
 $ cargo pgrx schema --help
-cargo-pgrx-schema 0.5.0
-PgCentral Foundation, Inc. <contact@pgcentral.org>
 Generate extension schema files
 
-USAGE:
-    cargo pgrx schema [OPTIONS] [PG_VERSION]
+Usage: cargo pgrx schema [OPTIONS] [PG_VERSION]
 
-ARGS:
-    <PG_VERSION>    Do you want to run against Postgres `pg11`, `pg12`, `pg13`, `pg14`,
-                    `pg15`?
+Arguments:
+  [PG_VERSION]  Do you want to run against pg12, pg13, pg14, pg15, or pg16?
 
-OPTIONS:
-        --all-features
-            Activate all available features
-
-    -c, --pg-config <PG_CONFIG>
-            The `pg_config` path (default is first in $PATH)
-
-    -d, --dot <DOT>
-            A path to output a produced GraphViz DOT file
-
-        --features <FEATURES>
-            Space-separated list of features to activate
-
-    -h, --help
-            Print help information
-
-        --manifest-path <MANIFEST_PATH>
-            Path to Cargo.toml
-
-        --no-default-features
-            Do not activate the `default` feature
-
-    -o, --out <OUT>
-            A path to output a produced SQL file (default is `stdout`)
-
-    -p, --package <PACKAGE>
-            Package to build (see `cargo help pkgid`)
-
-        --profile <PROFILE>
-            Specific profile to use (conflicts with `--release`)
-
-    -r, --release
-            Compile for release mode (default is debug)
-
-        --skip-build
-            Skip building a fresh extension shared object
-
-        --test
-            Build in test mode (for `cargo pgrx test`)
-
-    -v, --verbose
-            Enable info logs, -vv for debug, -vvv for trace
-
-    -V, --version
-            Print version information
+Options:
+  -p, --package <PACKAGE>              Package to build (see `cargo help pkgid`)
+      --manifest-path <MANIFEST_PATH>  Path to Cargo.toml
+  -v, --verbose...                     Enable info logs, -vv for debug, -vvv for trace
+      --test                           Build in test mode (for `cargo pgrx test`)
+  -r, --release                        Compile for release mode (default is debug)
+      --profile <PROFILE>              Specific profile to use (conflicts with `--release`)
+  -c, --pg-config <PG_CONFIG>          The `pg_config` path (default is first in $PATH)
+      --all-features                   Activate all available features
+      --no-default-features            Do not activate the `default` feature
+  -F, --features <FEATURES>            Space-separated list of features to activate
+  -o, --out <OUT>                      A path to output a produced SQL file (default is `stdout`)
+  -d, --dot <DOT>                      A path to output a produced GraphViz DOT file
+      --skip-build                     Skip building a fresh extension shared object
+  -h, --help                           Print help
+  -V, --version                        Print version
 ```
 
 ## Information about pgx-managed development environment
 
-```
-$ cargo pgx info --help
-Provides information about pgx-managed development environment
+```console
+$ cargo pgrx info --help
+Provides information about pgrx-managed development environment
 
-Usage: cargo pgx info [OPTIONS] <COMMAND>
+Usage: cargo pgrx info [OPTIONS] <COMMAND>
 
 Commands:
   path       Print path to a base version of Postgres build
