@@ -15,7 +15,6 @@
 use crate::{pg_sys, rust_regtypein, PgBox, PgOid, WhoAllocated};
 use core::fmt::Display;
 use pgrx_pg_sys::panic::ErrorReportable;
-use pgrx_pg_sys::Oid;
 use std::any::Any;
 
 /// Convert a Rust type into a `pg_sys::Datum`.
@@ -31,7 +30,7 @@ pub trait IntoDatum {
     fn into_datum(self) -> Option<pg_sys::Datum>;
     fn type_oid() -> pg_sys::Oid;
 
-    fn composite_type_oid(&self) -> Option<Oid> {
+    fn composite_type_oid(&self) -> Option<pg_sys::Oid> {
         None
     }
 
@@ -255,7 +254,7 @@ impl<'a> IntoDatum for &'a str {
     }
 
     #[inline]
-    fn is_compatible_with(other: Oid) -> bool {
+    fn is_compatible_with(other: pg_sys::Oid) -> bool {
         Self::type_oid() == other || other == pg_sys::VARCHAROID
     }
 }
@@ -271,7 +270,7 @@ impl IntoDatum for String {
     }
 
     #[inline]
-    fn is_compatible_with(other: Oid) -> bool {
+    fn is_compatible_with(other: pg_sys::Oid) -> bool {
         Self::type_oid() == other || other == pg_sys::VARCHAROID
     }
 }
@@ -287,7 +286,7 @@ impl IntoDatum for &String {
     }
 
     #[inline]
-    fn is_compatible_with(other: Oid) -> bool {
+    fn is_compatible_with(other: pg_sys::Oid) -> bool {
         Self::type_oid() == other || other == pg_sys::VARCHAROID
     }
 }
@@ -303,7 +302,7 @@ impl IntoDatum for char {
     }
 
     #[inline]
-    fn is_compatible_with(other: Oid) -> bool {
+    fn is_compatible_with(other: pg_sys::Oid) -> bool {
         Self::type_oid() == other || other == pg_sys::VARCHAROID
     }
 }

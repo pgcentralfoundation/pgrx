@@ -16,7 +16,6 @@ use bitvec::slice::BitSlice;
 use core::fmt::{Debug, Formatter};
 use core::ops::DerefMut;
 use core::ptr::NonNull;
-use pgrx_pg_sys::Oid;
 use pgrx_sql_entity_graph::metadata::{
     ArgumentError, Returns, ReturnsError, SqlMapping, SqlTranslatable,
 };
@@ -741,11 +740,11 @@ impl<T: IntoDatum> IntoDatum for Array<'_, T> {
     }
 
     #[inline]
-    fn type_oid() -> Oid {
+    fn type_oid() -> pg_sys::Oid {
         unsafe { pg_sys::get_array_type(T::type_oid()) }
     }
 
-    fn composite_type_oid(&self) -> Option<Oid> {
+    fn composite_type_oid(&self) -> Option<pg_sys::Oid> {
         Some(unsafe { pg_sys::get_array_type(self.raw.oid()) })
     }
 }
@@ -845,7 +844,7 @@ where
         unsafe { pg_sys::get_array_type(T::type_oid()) }
     }
 
-    fn composite_type_oid(&self) -> Option<Oid> {
+    fn composite_type_oid(&self) -> Option<pg_sys::Oid> {
         // the composite type oid for a vec of composite types is the array type of the base composite type
         self.get(0)
             .and_then(|v| v.composite_type_oid().map(|oid| unsafe { pg_sys::get_array_type(oid) }))

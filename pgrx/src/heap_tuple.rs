@@ -11,7 +11,6 @@
 //!
 //! [`PgHeapTuple`]s also describe composite types as defined by [`pgrx::composite_type!()`][crate::composite_type].
 use crate::datum::lookup_type_name;
-use crate::pg_sys::Oid;
 use crate::{
     heap_getattr_raw, pg_sys, trigger_fired_by_delete, trigger_fired_by_insert,
     trigger_fired_by_update, trigger_fired_for_statement, AllocatedByPostgres, AllocatedByRust,
@@ -419,7 +418,7 @@ impl<'a, AllocatedBy: WhoAllocated> IntoDatum for PgHeapTuple<'a, AllocatedBy> {
         crate::pg_sys::RECORDOID
     }
 
-    fn composite_type_oid(&self) -> Option<Oid> {
+    fn composite_type_oid(&self) -> Option<pg_sys::Oid> {
         Some(self.tupdesc.oid())
     }
 
