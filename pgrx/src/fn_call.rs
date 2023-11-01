@@ -14,19 +14,14 @@ use pgrx_pg_sys::PgTryBuilder;
 use std::panic::AssertUnwindSafe;
 
 use crate::pg_catalog::pg_proc::{PgProc, ProArgMode, ProKind};
+use crate::seal::Sealed;
 use crate::{
     direct_function_call, is_a, list::List, pg_sys, pg_sys::AsPgCStr, Array, FromDatum, IntoDatum,
 };
 
-mod seal {
-    pub trait Sealed {}
-
-    impl<T: crate::IntoDatum + Clone> Sealed for T {}
-}
-
 /// Augments types that can be used as [`fn_call`] arguments.  This is only implemented for the
 /// [`Arg`] enum.
-pub unsafe trait FnCallArg {
+pub unsafe trait FnCallArg: Sealed {
     /// Represent `&self` as a [`pg_sys::Datum`].  This is likely to clone
     fn as_datum(&self, pg_proc: &PgProc, argnum: usize) -> Result<Option<pg_sys::Datum>>;
 
@@ -46,7 +41,9 @@ pub enum Arg<T> {
     Value(T),
 }
 
-unsafe impl<T: IntoDatum + Clone + seal::Sealed> FnCallArg for Arg<T> {
+impl<T> Sealed for Arg<T> {}
+
+unsafe impl<T: IntoDatum + Clone> FnCallArg for Arg<T> {
     fn as_datum(&self, pg_proc: &PgProc, argnum: usize) -> Result<Option<pg_sys::Datum>> {
         match self {
             Arg::Null => Ok(None),

@@ -1,5 +1,6 @@
-use super::{seal, Enlist, List, ListCell, ListHead};
+use super::{Enlist, List, ListCell, ListHead};
 use crate::pg_sys;
+use crate::seal::Sealed;
 use core::cmp;
 use core::ffi;
 use core::marker::PhantomData;
@@ -27,7 +28,7 @@ impl<T: Enlist> DerefMut for ListCell<T> {
     }
 }
 
-impl seal::Sealed for *mut ffi::c_void {}
+impl Sealed for *mut ffi::c_void {}
 unsafe impl Enlist for *mut ffi::c_void {
     const LIST_TAG: pg_sys::NodeTag = pg_sys::NodeTag::T_List;
 
@@ -50,7 +51,7 @@ unsafe impl Enlist for *mut ffi::c_void {
     }
 }
 
-impl seal::Sealed for ffi::c_int {}
+impl Sealed for ffi::c_int {}
 unsafe impl Enlist for ffi::c_int {
     const LIST_TAG: pg_sys::NodeTag = pg_sys::NodeTag::T_IntList;
 
@@ -73,7 +74,7 @@ unsafe impl Enlist for ffi::c_int {
     }
 }
 
-impl seal::Sealed for pg_sys::Oid {}
+impl Sealed for pg_sys::Oid {}
 unsafe impl Enlist for pg_sys::Oid {
     const LIST_TAG: pg_sys::NodeTag = pg_sys::NodeTag::T_OidList;
 

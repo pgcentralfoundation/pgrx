@@ -13,6 +13,7 @@
 //! understandings of [`List`][crate::pg_sys::List]s of [`Oid`][crate::pg_sys::Oid]s, Integers, and Pointers.
 
 use crate::pg_sys;
+use crate::seal::Sealed;
 use core::marker::PhantomData;
 use core::mem;
 use core::ptr::{self, NonNull};
@@ -62,10 +63,6 @@ const _: () = {
     assert!(mem::size_of::<ListCell<u128>>() == mem::size_of::<pg_sys::ListCell>());
 };
 
-mod seal {
-    pub trait Sealed {}
-}
-
 /// The bound to describe a type which may be used in a Postgres List
 /// It must know what an appropriate type tag is, and how to pointer-cast to itself
 ///
@@ -75,7 +72,7 @@ mod seal {
 ///
 /// Only realistically valid to implement for union variants of pg_sys::ListCell.
 /// It's not even correct to impl for `*mut T`, as `*mut T` may be a fat pointer!
-pub unsafe trait Enlist: seal::Sealed + Sized {
+pub unsafe trait Enlist: Sealed + Sized {
     /// The appropriate list tag for this type.
     const LIST_TAG: pg_sys::NodeTag;
 
