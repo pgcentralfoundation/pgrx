@@ -14,7 +14,6 @@ use crate::{
     varsize_any_exhdr, void_mut_ptr, FromDatum, IntoDatum, PgMemoryContexts, PostgresType,
     StringInfo,
 };
-use pgrx_pg_sys::varlena;
 use pgrx_sql_entity_graph::metadata::{
     ArgumentError, Returns, ReturnsError, SqlMapping, SqlTranslatable,
 };
@@ -466,7 +465,7 @@ where
 }
 
 #[allow(dead_code)]
-fn json_encode<T>(input: T) -> *const varlena
+fn json_encode<T>(input: T) -> *const pg_sys::varlena
 where
     T: Serialize,
 {
