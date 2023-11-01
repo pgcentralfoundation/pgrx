@@ -1,5 +1,6 @@
-use super::{seal, Enlist, List, ListCell, ListHead};
+use super::{Enlist, List, ListCell, ListHead};
 use crate::pg_sys;
+use crate::seal::Sealed;
 use core::cmp;
 use core::ffi;
 use core::marker::PhantomData;
