@@ -131,6 +131,11 @@ pub use pg_sys::{
 #[doc(hidden)]
 pub use pgrx_sql_entity_graph;
 
+mod seal {
+    /// A trait you can reference but can't impl externally
+    pub trait Sealed {}
+}
+
 // Postgres v15+ has the concept of an ABI "name".  The default is `b"PostgreSQL\0"` and this is the
 // ABI that pgrx extensions expect to be running under.  We will refuse to compile if it is detected
 // that we're trying to be built against some other kind of "postgres" that has its own ABI name.
