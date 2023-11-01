@@ -8,7 +8,6 @@
 //LICENSE
 //LICENSE Use of this source code is governed by the MIT license that can be found in the LICENSE file.
 use crate::array::RawArray;
-use crate::datum::array::casper::ChaChaSlide;
 use crate::layout::*;
 use crate::toast::Toast;
 use crate::{pg_sys, FromDatum, IntoDatum, PgMemoryContexts};
@@ -67,7 +66,7 @@ impl<'a, T: FromDatum + Debug> Debug for Array<'a, T> {
     }
 }
 
-type ChaChaSlideImpl<T> = Box<dyn ChaChaSlide<T>>;
+type ChaChaSlideImpl<T> = Box<dyn casper::ChaChaSlide<T>>;
 
 enum NullKind<'a> {
     Bits(&'a BitSlice<u8>),
