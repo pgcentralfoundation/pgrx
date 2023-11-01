@@ -4,7 +4,6 @@ use std::ops::Deref;
 use std::ptr::NonNull;
 
 use libc::c_char;
-use pg_sys::{Datum, Oid};
 
 use super::{Spi, SpiClient, SpiCursor, SpiError, SpiResult, SpiTupleTable};
 use crate::pg_sys::{self, PgOid};
@@ -55,7 +54,7 @@ fn prepare_datum(datum: Option<pg_sys::Datum>) -> (pg_sys::Datum, std::os::raw::
 
 fn args_to_datums(
     args: Vec<(PgOid, Option<pg_sys::Datum>)>,
-) -> (Vec<Oid>, Vec<Datum>, Vec<c_char>) {
+) -> (Vec<pg_sys::Oid>, Vec<pg_sys::Datum>, Vec<c_char>) {
     let mut argtypes = Vec::with_capacity(args.len());
     let mut datums = Vec::with_capacity(args.len());
     let mut nulls = Vec::with_capacity(args.len());

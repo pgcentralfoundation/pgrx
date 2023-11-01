@@ -8,7 +8,6 @@
 //LICENSE
 //LICENSE Use of this source code is governed by the MIT license that can be found in the LICENSE file.
 use crate::array::RawArray;
-use crate::datum::array::casper::ChaChaSlide;
 use crate::layout::*;
 use crate::toast::Toast;
 use crate::{pg_sys, FromDatum, IntoDatum, PgMemoryContexts};
@@ -16,7 +15,6 @@ use bitvec::slice::BitSlice;
 use core::fmt::{Debug, Formatter};
 use core::ops::DerefMut;
 use core::ptr::NonNull;
-use pgrx_pg_sys::{Datum, Oid};
 use pgrx_sql_entity_graph::metadata::{
     ArgumentError, Returns, ReturnsError, SqlMapping, SqlTranslatable,
 };
@@ -68,7 +66,7 @@ impl<'a, T: FromDatum + Debug> Debug for Array<'a, T> {
     }
 }
 
-type ChaChaSlideImpl<T> = Box<dyn ChaChaSlide<T>>;
+type ChaChaSlideImpl<T> = Box<dyn casper::ChaChaSlide<T>>;
 
 enum NullKind<'a> {
     Bits(&'a BitSlice<u8>),
@@ -734,18 +732,18 @@ impl<'a, T: FromDatum> FromDatum for Array<'a, T> {
 
 impl<T: IntoDatum> IntoDatum for Array<'_, T> {
     #[inline]
-    fn into_datum(self) -> Option<Datum> {
+    fn into_datum(self) -> Option<pg_sys::Datum> {
         let array_type = self.into_array_type();
-        let datum = Datum::from(array_type);
+        let datum = pg_sys::Datum::from(array_type);
         Some(datum)
     }
 
     #[inline]
-    fn type_oid() -> Oid {
+    fn type_oid() -> pg_sys::Oid {
         unsafe { pg_sys::get_array_type(T::type_oid()) }
     }
 
-    fn composite_type_oid(&self) -> Option<Oid> {
+    fn composite_type_oid(&self) -> Option<pg_sys::Oid> {
         Some(unsafe { pg_sys::get_array_type(self.raw.oid()) })
     }
 }
@@ -845,7 +843,7 @@ where
         unsafe { pg_sys::get_array_type(T::type_oid()) }
     }
 
-    fn composite_type_oid(&self) -> Option<Oid> {
+    fn composite_type_oid(&self) -> Option<pg_sys::Oid> {
         // the composite type oid for a vec of composite types is the array type of the base composite type
         self.get(0)
             .and_then(|v| v.composite_type_oid().map(|oid| unsafe { pg_sys::get_array_type(oid) }))
