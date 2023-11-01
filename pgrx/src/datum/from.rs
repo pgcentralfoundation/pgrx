@@ -13,7 +13,7 @@ use crate::{
     pg_sys, varlena, varlena_to_byte_slice, AllocatedByPostgres, IntoDatum, PgBox, PgMemoryContexts,
 };
 use core::ffi::CStr;
-use pgrx_pg_sys::{Datum, Oid};
+use pgrx_pg_sys::Oid;
 use std::num::NonZeroUsize;
 
 /// If converting a Datum to a Rust type fails, this is the set of possible reasons why.
@@ -450,7 +450,7 @@ impl<'a> FromDatum for &'a core::ffi::CStr {
 
     unsafe fn from_datum_in_memory_context(
         mut memory_context: PgMemoryContexts,
-        datum: Datum,
+        datum: pg_sys::Datum,
         is_null: bool,
         _typoid: Oid,
     ) -> Option<Self>

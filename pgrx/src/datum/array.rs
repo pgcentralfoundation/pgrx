@@ -16,7 +16,7 @@ use bitvec::slice::BitSlice;
 use core::fmt::{Debug, Formatter};
 use core::ops::DerefMut;
 use core::ptr::NonNull;
-use pgrx_pg_sys::{Datum, Oid};
+use pgrx_pg_sys::Oid;
 use pgrx_sql_entity_graph::metadata::{
     ArgumentError, Returns, ReturnsError, SqlMapping, SqlTranslatable,
 };
@@ -734,9 +734,9 @@ impl<'a, T: FromDatum> FromDatum for Array<'a, T> {
 
 impl<T: IntoDatum> IntoDatum for Array<'_, T> {
     #[inline]
-    fn into_datum(self) -> Option<Datum> {
+    fn into_datum(self) -> Option<pg_sys::Datum> {
         let array_type = self.into_array_type();
-        let datum = Datum::from(array_type);
+        let datum = pg_sys::Datum::from(array_type);
         Some(datum)
     }
 

@@ -15,7 +15,7 @@
 use crate::{pg_sys, rust_regtypein, PgBox, PgOid, WhoAllocated};
 use core::fmt::Display;
 use pgrx_pg_sys::panic::ErrorReportable;
-use pgrx_pg_sys::{Datum, Oid};
+use pgrx_pg_sys::Oid;
 use std::any::Any;
 
 /// Convert a Rust type into a `pg_sys::Datum`.
@@ -104,7 +104,7 @@ where
     /// directly raise that as the error.  This enables users to set a specific "sql error code"
     /// for a returned error, along with providing the HINT and DETAIL lines of the error.
     #[inline]
-    fn into_datum(self) -> Option<Datum> {
+    fn into_datum(self) -> Option<pg_sys::Datum> {
         self.report().into_datum()
     }
 
@@ -387,7 +387,7 @@ impl<'a> IntoDatum for &'a [u8] {
                 self.len(),
             );
 
-            Some(Datum::from(varlena))
+            Some(pg_sys::Datum::from(varlena))
         }
     }
 
@@ -414,7 +414,7 @@ impl IntoDatum for () {
     #[inline]
     fn into_datum(self) -> Option<pg_sys::Datum> {
         // VOID isn't very useful, but Postgres represents it as a non-null Datum with a zero value
-        Some(Datum::from(0))
+        Some(pg_sys::Datum::from(0))
     }
 
     fn type_oid() -> pg_sys::Oid {
