@@ -24,8 +24,8 @@ fn trigger_example<'a>(trigger: &'a PgTrigger<'a>) -> Result<
 }
 ```
 
-Trigger functions only accept one argument, a [`PgTrigger`], and they return a [`Result`][std::result::Result] containing
-either a [`PgHeapTuple`][crate::PgHeapTuple] or any error that implements [`impl std::error::Error`][std::error::Error].
+Trigger functions only accept one argument, a [`PgTrigger`], and they return a [`Result`] containing
+either a [`PgHeapTuple`][crate::PgHeapTuple] or any error that implements [`std::error::Error`].
 
 # Use from SQL
 

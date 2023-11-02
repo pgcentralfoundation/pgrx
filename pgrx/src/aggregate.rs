@@ -80,7 +80,7 @@ aggregate=# SELECT DemoSum(value) FROM demo_table;
 ## Multiple Arguments
 
 Sometimes aggregates need to handle multiple arguments. The
-[`Aggregate::Args`](Aggregate::Args) associated type can be a tuple:
+[`Aggregate::Args`] associated type can be a tuple:
 
 ```rust
 # use pgrx::prelude::*;
