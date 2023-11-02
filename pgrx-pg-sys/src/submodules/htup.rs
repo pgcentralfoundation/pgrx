@@ -152,7 +152,7 @@ pub unsafe fn HeapTupleHeaderGetXmin(tup: *const HeapTupleHeaderData) -> Transac
     }
 }
 
-/// How many attributes does the specified [`HeapTupleHeader`] have?
+/// How many attributes does the specified [`HeapTupleHeader`][crate::HeapTupleHeader] have?
 ///
 /// # Safety
 ///
@@ -167,7 +167,7 @@ pub unsafe fn HeapTupleHeaderGetNatts(tup: *const HeapTupleHeaderData) -> u16 {
     }
 }
 
-/// Does the specified [`HeapTuple`] (`tup`) contain nulls?
+/// Does the specified [`HeapTuple`][crate::HeapTuple] contain nulls?
 ///
 /// # Safety
 ///
