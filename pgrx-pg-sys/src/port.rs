@@ -72,6 +72,8 @@ pub const unsafe fn MAXALIGN(len: usize) -> usize {
 ///
 /// This function will panic if `pointer` is null, if it's not properly aligned, or if the memory
 /// it points to doesn't have a prefix that looks like a memory context pointer
+///
+/// [`palloc`]: crate::palloc
 #[allow(non_snake_case)]
 #[cfg(any(feature = "pg12", feature = "pg13", feature = "pg14", feature = "pg15"))]
 pub unsafe fn GetMemoryChunkContext(pointer: *mut std::os::raw::c_void) -> pg_sys::MemoryContext {
@@ -220,6 +222,8 @@ pub unsafe fn BufferIsLocal(buffer: crate::Buffer) -> bool {
 ///
 /// This function cannot verify that the specified `htup` points to a valid [`pg_sys::HeapTuple`] nor
 /// that if it does, that its bytes are bitwise compatible with `T`.
+///
+/// [`FormData_pg_class`]: crate::FormData_pg_class
 #[inline]
 pub unsafe fn heap_tuple_get_struct<T>(htup: super::HeapTuple) -> *mut T {
     if htup.is_null() {
