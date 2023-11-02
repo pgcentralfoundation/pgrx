@@ -515,7 +515,7 @@ impl<'a, T: FromDatum> VariadicArray<'a, T> {
         self.0.into_array_type()
     }
 
-    /// Return an Iterator of Option<T> over the contained Datums.
+    /// Return an Iterator of `Option<T>` over the contained Datums.
     #[inline]
     pub fn iter(&self) -> ArrayIterator<'_, T> {
         self.0.iter()
