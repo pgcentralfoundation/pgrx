@@ -336,7 +336,7 @@ impl<'a> IntoDatum for &'a core::ffi::CStr {
 }
 
 impl IntoDatum for alloc::ffi::CString {
-    /// The [`core::ffi::CString`] is copied to `palloc`'d memory.  That memory will either be freed by
+    /// The [`alloc::ffi::CString`] is copied to `palloc`'d memory.  That memory will either be freed by
     /// Postgres when [`pg_sys::CurrentMemoryContext`] is reset, or when the function you passed the
     /// returned Datum to decides to free it.
     #[inline]

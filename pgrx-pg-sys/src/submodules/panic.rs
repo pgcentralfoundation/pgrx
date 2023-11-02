@@ -235,8 +235,8 @@ impl ErrorReportWithLevel {
 }
 
 impl ErrorReport {
-    /// Create a [PgErrorReport] which can be raised via Rust's [std::panic::panic_any()] or as
-    /// a specific Postgres "ereport()` level via [PgErrorReport::report(self, PgLogLevel)]
+    /// Create an [ErrorReport] which can be raised via Rust's [std::panic::panic_any()] or as
+    /// a specific Postgres "ereport()` level via [ErrorReport::report(self, PgLogLevel)]
     ///
     /// Embedded "file:line:col" location information is taken from the caller's location
     #[track_caller]
@@ -251,8 +251,8 @@ impl ErrorReport {
         Self { sqlerrcode, message: message.into(), hint: None, detail: None, location }
     }
 
-    /// Create a [PgErrorReport] which can be raised via Rust's [std::panic::panic_any()] or as
-    /// a specific Postgres "ereport()` level via [PgErrorReport::report(self, PgLogLevel)].
+    /// Create an [ErrorReport] which can be raised via Rust's [std::panic::panic_any()] or as
+    /// a specific Postgres "ereport()` level via [ErrorReport::report(self, PgLogLevel)].
     ///
     /// For internal use only
     fn with_location<S: Into<String>>(
@@ -290,7 +290,7 @@ impl ErrorReport {
         self.hint.as_deref()
     }
 
-    /// Report this [PgErrorReport], which will ultimately be reported by Postgres at the specified [PgLogLevel]
+    /// Report this [ErrorReport], which will ultimately be reported by Postgres at the specified [PgLogLevel]
     ///
     /// If the provided `level` is >= [`PgLogLevel::ERROR`] this function will not return.
     pub fn report(self, level: PgLogLevel) {
