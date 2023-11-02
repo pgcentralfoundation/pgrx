@@ -149,6 +149,7 @@ fn arr_sort_uniq(arr: Array<i32>) -> Vec<i32> {
     v
 }
 
+// I think I have to fix the PostgresEnum derive to work with UnboxDatum?
 #[derive(Debug, Eq, PartialEq, PostgresEnum, Serialize)]
 pub enum ArrayTestEnum {
     One,

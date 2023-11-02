@@ -114,6 +114,13 @@ pub struct Datum<'dat>(
     PhantomData<&'dat pg_sys::MemoryContext>,
 );
 
+impl<'dat> Datum<'dat> {
+    /// The Datum without its lifetime.
+    pub fn sans_lifetime(self) -> pg_sys::Datum {
+        self.0
+    }
+}
+
 /// A tagging trait to indicate a user type is also meant to be used by Postgres
 /// Implemented automatically by `#[derive(PostgresType)]`
 pub trait PostgresType {}
