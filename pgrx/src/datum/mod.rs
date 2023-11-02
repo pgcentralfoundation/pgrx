@@ -32,6 +32,7 @@ mod time_stamp;
 mod time_stamp_with_timezone;
 mod time_with_timezone;
 mod tuples;
+mod unbox;
 mod uuid;
 mod varlena;
 
@@ -55,6 +56,7 @@ use std::any::TypeId;
 pub use time_stamp::*;
 pub use time_stamp_with_timezone::*;
 pub use time_with_timezone::*;
+pub use unbox::*;
 pub use varlena::*;
 
 use crate::PgBox;
