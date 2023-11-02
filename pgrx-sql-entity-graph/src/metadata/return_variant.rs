@@ -21,7 +21,7 @@ use super::sql_translatable::SqlMapping;
 
 /// Describes the RETURNS of CREATE FUNCTION ... RETURNS ...
 /// See the PostgreSQL documentation for [CREATE FUNCTION]
-/// [CREATE FUNCTION]: https://www.postgresql.org/docs/current/sql-createfunction.html
+/// [CREATE FUNCTION]: <https://www.postgresql.org/docs/current/sql-createfunction.html>
 #[derive(Clone, Debug, Hash, Eq, PartialEq, Ord, PartialOrd)]
 pub enum Returns {
     One(SqlMapping),
