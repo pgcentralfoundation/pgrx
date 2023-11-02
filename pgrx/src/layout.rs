@@ -25,7 +25,7 @@ use crate::pg_sys::{self, TYPALIGN_CHAR, TYPALIGN_DOUBLE, TYPALIGN_INT, TYPALIGN
 use core::mem;
 
 /// Postgres type information, corresponds to part of a row in pg_type
-/// This layout describes T, not &T, even if passbyval: false, which would mean the datum array is effectively &[&T]
+/// This layout describes T, not &T, even if passbyval: false, which would mean the datum array is effectively `&[&T]`
 #[derive(Clone, Copy, Debug)]
 pub(crate) struct Layout {
     // We could add more fields to this if we are curious enough, as the function we call pulls an entire row

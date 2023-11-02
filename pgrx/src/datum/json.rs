@@ -25,7 +25,7 @@ pub struct Json(pub Value);
 #[derive(Debug)]
 pub struct JsonB(pub Value);
 
-/// A wholly Rust-[`String`][std::string::String] owned copy of a `json` type from PostgreSQL
+/// A wholly Rust-[`String`] owned copy of a `json` type from PostgreSQL
 #[derive(Debug)]
 pub struct JsonString(pub String);
 
