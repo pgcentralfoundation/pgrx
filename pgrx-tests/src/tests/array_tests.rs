@@ -64,7 +64,7 @@ fn optional_array_with_default(values: default!(Option<Array<i32>>, "NULL")) -> 
 }
 
 #[pg_extern]
-fn serde_serialize_array(values: Array<&str>) -> Json {
+fn serde_serialize_array<'dat>(values: Array<'dat, &'dat str>) -> Json {
     Json(json! { { "values": values } })
 }
 
