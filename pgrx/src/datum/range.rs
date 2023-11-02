@@ -122,7 +122,7 @@ where
     /// Conversion of an [`Option`] to a [`RangeBound`].  
     ///
     /// `Some` maps to the [`RangeBound::Inclusive`] variant and `None` maps to the
-    /// [`RangeBound::infinite`] value.
+    /// [`RangeBound::Infinite`] value.
     #[inline]
     fn from(value: Option<T>) -> Self {
         match value {

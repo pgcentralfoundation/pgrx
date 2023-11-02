@@ -97,11 +97,14 @@ where
     /// ## Panics
     ///
     /// If this Result represents an error, then that error is raised as a Postgres ERROR, using
-    /// the [`PgSqlErrorCode::ERRCODE_DATA_EXCEPTION`] error code.
+    /// the [`ERRCODE_DATA_EXCEPTION`] error code.
     ///
-    /// If we detect that the `Err()` variant contains `[pg_sys::panic::ErrorReport]`, then we
+    /// If we detect that the `Err()` variant contains [ErrorReport], then we
     /// directly raise that as the error.  This enables users to set a specific "sql error code"
     /// for a returned error, along with providing the HINT and DETAIL lines of the error.
+    ///
+    /// [ErrorReport]: pg_sys::panic::ErrorReport
+    /// [`ERRCODE_DATA_EXCEPTION`]: pg_sys::errcodes::PgSqlErrorCode::ERRCODE_DATA_EXCEPTION
     #[inline]
     fn into_datum(self) -> Option<pg_sys::Datum> {
         self.report().into_datum()

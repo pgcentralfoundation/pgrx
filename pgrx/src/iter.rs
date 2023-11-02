@@ -88,7 +88,7 @@ where
 /// [`TableIterator`] is typically used as the return type of a `#[pg_extern]`-style function,
 /// indicating that the function returns a table of named columns.  [`TableIterator`] is
 /// generic over `T`, but that `T` must be a Rust tuple containing one or more elements.  They
-/// must also be "named" using pgrx' [`name!`] macro.  See the examples below.
+/// must also be "named" using pgrx's [`name!`][crate::name] macro.  See the examples below.
 ///
 /// It is a lightweight wrapper around an iterator, which you provide during construction.  The
 /// iterator *can* borrow from its environment, following Rust's normal borrowing rules.  If no

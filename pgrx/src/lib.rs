@@ -347,7 +347,7 @@ pub(crate) enum Utf8Compat {
 
 /// Initialize the extension with Postgres
 ///
-/// Sets up panic handling with [`register_pg_guard_panic_hook()`] to ensure that a crash within
+/// Sets up panic handling with [`pg_sys::panic::register_pg_guard_panic_hook`] to ensure that a crash within
 /// the extension does not adversely affect the entire server process.
 ///
 /// ## Note
