@@ -58,7 +58,7 @@ struct UpdateFilesArgs {
     #[arg(short, long)]
     include_for_dep_updates: Vec<String>,
 
-    /// Exclude Cargo.toml files from [package] version updates
+    /// Exclude Cargo.toml files from `[package]` version updates
     ///
     /// Add multiple values using --exclude /path/foo/Cargo.toml --exclude /path/bar/Cargo.toml
     #[arg(short, long)]
