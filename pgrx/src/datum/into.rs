@@ -70,7 +70,7 @@ pub trait IntoDatum {
     }
 }
 
-/// for supporting NULL as the None value of an Option<T>
+/// for supporting NULL as the None value of an `Option<T>`
 impl<T> IntoDatum for Option<T>
 where
     T: IntoDatum,
