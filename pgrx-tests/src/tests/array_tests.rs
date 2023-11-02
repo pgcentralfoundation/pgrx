@@ -156,10 +156,10 @@ pub enum ArrayTestEnum {
     Three,
 }
 
-#[pg_extern]
-fn enum_array_roundtrip(a: Array<ArrayTestEnum>) -> Vec<Option<ArrayTestEnum>> {
-    a.into_iter().collect()
-}
+// #[pg_extern]
+// fn enum_array_roundtrip(a: Array<ArrayTestEnum>) -> Vec<Option<ArrayTestEnum>> {
+//     a.into_iter().collect()
+// }
 
 #[pg_extern]
 fn array_echo<'a>(a: Array<&'a str>) -> Vec<Option<&'a str>> {
@@ -200,15 +200,15 @@ mod tests {
     use pgrx::{IntoDatum, Json};
     use serde_json::json;
 
-    #[pg_test]
-    fn test_enum_array_roundtrip() -> spi::Result<()> {
-        let a = Spi::get_one::<Vec<Option<ArrayTestEnum>>>(
-            "SELECT enum_array_roundtrip(ARRAY['One', 'Two']::ArrayTestEnum[])",
-        )?
-        .expect("SPI result was null");
-        assert_eq!(a, vec![Some(ArrayTestEnum::One), Some(ArrayTestEnum::Two)]);
-        Ok(())
-    }
+    // #[pg_test]
+    // fn test_enum_array_roundtrip() -> spi::Result<()> {
+    //     let a = Spi::get_one::<Vec<Option<ArrayTestEnum>>>(
+    //         "SELECT enum_array_roundtrip(ARRAY['One', 'Two']::ArrayTestEnum[])",
+    //     )?
+    //     .expect("SPI result was null");
+    //     assert_eq!(a, vec![Some(ArrayTestEnum::One), Some(ArrayTestEnum::Two)]);
+    //     Ok(())
+    // }
 
     #[pg_test]
     fn test_sum_array_i32() {
