@@ -11,7 +11,7 @@
 
 Rust to SQL mapping support.
 
-> Like all of the [`sql_entity_graph`][crate::pgrx_sql_entity_graph] APIs, this is considered **internal**
+> Like all of the [`sql_entity_graph`][crate] APIs, this is considered **internal**
 to the `pgrx` framework and very subject to change between versions. While you may use this, please do it with caution.
 
 */
