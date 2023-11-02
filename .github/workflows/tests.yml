@@ -353,6 +353,13 @@ jobs:
     - name: Clippy -Awarnings
       run: cargo clippy -p pgrx --features pg$PG_VER -- -Awarnings
 
+    - name: Check doc-links
+      run: |
+        cargo rustdoc -p pgrx --features pg$PG_VER -- \
+          --document-private-items \
+          -Drustdoc::broken-intra-doc-links \
+          -Drustdoc::invalid-html-tags
+
     - name: create new sample extension
       run: cd /tmp/ && cargo pgrx new sample
 
