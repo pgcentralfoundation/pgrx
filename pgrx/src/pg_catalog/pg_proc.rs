@@ -143,14 +143,14 @@ impl PgProc {
         self.get_attr(pg_sys::Anum_pg_proc_proowner).unwrap()
     }
 
-    /// Estimated execution cost (in units of cpu_operator_cost); if [`proretset()`], this is cost per row
-    /// returned
+    /// Estimated execution cost (in units of cpu_operator_cost); if [`proretset()`][PgProc::proretset],
+    /// this is cost per row returned
     pub fn procost(&self) -> f32 {
         // won't panic because `procost` has a NOT NULL constraint
         self.get_attr(pg_sys::Anum_pg_proc_procost).unwrap()
     }
 
-    /// Estimated number of result rows (zero if not [`proretset()`],)
+    /// Estimated number of result rows (zero if not [`proretset()`][PgProc::proretset],)
     pub fn prorows(&self) -> f32 {
         // won't panic because `prorows` has a NOT NULL constraint, so `.unwrap()` wont panic
         self.get_attr(pg_sys::Anum_pg_proc_prorows).unwrap()
