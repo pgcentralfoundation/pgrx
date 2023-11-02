@@ -128,7 +128,7 @@ pub enum DateTimeParts {
 }
 
 impl From<DateTimeParts> for &'static str {
-    /// Convert to Postgres' string representation of a [`DateTimePart`]
+    /// Convert to Postgres' string representation of [`DateTimeParts`]
     #[inline]
     fn from(value: DateTimeParts) -> Self {
         match value {

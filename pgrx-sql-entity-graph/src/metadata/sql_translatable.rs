@@ -11,7 +11,7 @@
 
 A trait denoting a type can possibly be mapped to an SQL type
 
-> Like all of the [`sql_entity_graph`][crate::pgrx_sql_entity_graph] APIs, this is considered **internal**
+> Like all of the [`sql_entity_graph`][crate] APIs, this is considered **internal**
 to the `pgrx` framework and very subject to change between versions. While you may use this, please do it with caution.
 
 */

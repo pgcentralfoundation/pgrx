@@ -24,7 +24,7 @@ pub const MaxTransactionId: super::TransactionId = 0xFFFF_FFFF as super::Transac
 ///
 /// # Safety
 ///
-/// This function cannot determine if the `tuple` argument is really a non-null pointer to a [`HeapTuple`].
+/// This function cannot determine if the `tuple` argument is really a non-null pointer to a [`pg_sys::HeapTuple`].
 #[inline(always)]
 pub unsafe fn GETSTRUCT(tuple: crate::HeapTuple) -> *mut std::os::raw::c_char {
     // #define GETSTRUCT(TUP) ((char *) ((TUP)->t_data) + (TUP)->t_data->t_hoff)
@@ -72,6 +72,8 @@ pub const unsafe fn MAXALIGN(len: usize) -> usize {
 ///
 /// This function will panic if `pointer` is null, if it's not properly aligned, or if the memory
 /// it points to doesn't have a prefix that looks like a memory context pointer
+///
+/// [`palloc`]: crate::palloc
 #[allow(non_snake_case)]
 #[cfg(any(feature = "pg12", feature = "pg13", feature = "pg14", feature = "pg15"))]
 pub unsafe fn GetMemoryChunkContext(pointer: *mut std::os::raw::c_void) -> pg_sys::MemoryContext {
@@ -108,7 +110,7 @@ pub unsafe fn GetMemoryChunkContext(pointer: *mut std::os::raw::c_void) -> pg_sy
 /// # Safety
 ///
 /// The caller must only attempt this on a pointer to a Node.
-/// This may clarify if the pointee is correctly-initialized [`MemoryContextData`].
+/// This may clarify if the pointee is correctly-initialized [`pg_sys::MemoryContextData`].
 ///
 /// # Implementation Note
 ///
@@ -208,18 +210,20 @@ pub unsafe fn BufferIsLocal(buffer: crate::Buffer) -> bool {
     buffer < 0
 }
 
-/// Retrieve the "user data" of the specified [`HeapTuple`] as a specific type. Typically this
+/// Retrieve the "user data" of the specified [`pg_sys::HeapTuple`] as a specific type. Typically this
 /// will be a struct that represents a Postgres system catalog, such as [`FormData_pg_class`].
 ///
 /// # Returns
 ///
-/// A pointer to the [`HeapTuple`]'s "user data", cast as a mutable pointer to `T`.  If the
+/// A pointer to the [`pg_sys::HeapTuple`]'s "user data", cast as a mutable pointer to `T`.  If the
 /// specified `htup` pointer is null, the null pointer is returned.
 ///
 /// # Safety
 ///
-/// This function cannot verify that the specified `htup` points to a valid [`HeapTuple`] nor
+/// This function cannot verify that the specified `htup` points to a valid [`pg_sys::HeapTuple`] nor
 /// that if it does, that its bytes are bitwise compatible with `T`.
+///
+/// [`FormData_pg_class`]: crate::FormData_pg_class
 #[inline]
 pub unsafe fn heap_tuple_get_struct<T>(htup: super::HeapTuple) -> *mut T {
     if htup.is_null() {

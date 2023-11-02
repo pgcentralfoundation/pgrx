@@ -11,7 +11,7 @@
 
 `#[pg_aggregate]` related entities for Rust to SQL translation
 
-> Like all of the [`sql_entity_graph`][crate::pgrx_sql_entity_graph] APIs, this is considered **internal**
+> Like all of the [`sql_entity_graph`][crate] APIs, this is considered **internal**
 to the `pgrx` framework and very subject to change between versions. While you may use this, please do it with caution.
 
 
@@ -48,67 +48,67 @@ pub struct PgAggregateEntity {
 
     /// The `arg_data_type` list.
     ///
-    /// Corresponds to `Args` in [`pgrx::aggregate::Aggregate`].
+    /// Corresponds to `Args` in `pgrx::aggregate::Aggregate`.
     pub args: Vec<AggregateTypeEntity>,
 
     /// The direct argument list, appearing before `ORDER BY` in ordered set aggregates.
     ///
-    /// Corresponds to `OrderBy` in [`pgrx::aggregate::Aggregate`].
+    /// Corresponds to `OrderBy` in `pgrx::aggregate::Aggregate`.
     pub direct_args: Option<Vec<AggregateTypeEntity>>,
 
     /// The `STYPE` and `name` parameter for [`CREATE AGGREGATE`](https://www.postgresql.org/docs/current/sql-createaggregate.html)
     ///
-    /// The implementor of an [`pgrx::aggregate::Aggregate`].
+    /// The implementor of an `pgrx::aggregate::Aggregate`.
     pub stype: AggregateTypeEntity,
 
     /// The `SFUNC` parameter for [`CREATE AGGREGATE`](https://www.postgresql.org/docs/current/sql-createaggregate.html)
     ///
-    /// Corresponds to `state` in [`pgrx::aggregate::Aggregate`].
+    /// Corresponds to `state` in `pgrx::aggregate::Aggregate`.
     pub sfunc: &'static str,
 
     /// The `FINALFUNC` parameter for [`CREATE AGGREGATE`](https://www.postgresql.org/docs/current/sql-createaggregate.html)
     ///
-    /// Corresponds to `finalize` in [`pgrx::aggregate::Aggregate`].
+    /// Corresponds to `finalize` in `pgrx::aggregate::Aggregate`.
     pub finalfunc: Option<&'static str>,
 
     /// The `FINALFUNC_MODIFY` parameter for [`CREATE AGGREGATE`](https://www.postgresql.org/docs/current/sql-createaggregate.html)
     ///
-    /// Corresponds to `FINALIZE_MODIFY` in [`pgrx::aggregate::Aggregate`].
+    /// Corresponds to `FINALIZE_MODIFY` in `pgrx::aggregate::Aggregate`.
     pub finalfunc_modify: Option<FinalizeModify>,
 
     /// The `COMBINEFUNC` parameter for [`CREATE AGGREGATE`](https://www.postgresql.org/docs/current/sql-createaggregate.html)
     ///
-    /// Corresponds to `combine` in [`pgrx::aggregate::Aggregate`].
+    /// Corresponds to `combine` in `pgrx::aggregate::Aggregate`.
     pub combinefunc: Option<&'static str>,
 
     /// The `SERIALFUNC` parameter for [`CREATE AGGREGATE`](https://www.postgresql.org/docs/current/sql-createaggregate.html)
     ///
-    /// Corresponds to `serial` in [`pgrx::aggregate::Aggregate`].
+    /// Corresponds to `serial` in `pgrx::aggregate::Aggregate`.
     pub serialfunc: Option<&'static str>,
 
     /// The `DESERIALFUNC` parameter for [`CREATE AGGREGATE`](https://www.postgresql.org/docs/current/sql-createaggregate.html)
     ///
-    /// Corresponds to `deserial` in [`pgrx::aggregate::Aggregate`].
+    /// Corresponds to `deserial` in `pgrx::aggregate::Aggregate`.
     pub deserialfunc: Option<&'static str>,
 
     /// The `INITCOND` parameter for [`CREATE AGGREGATE`](https://www.postgresql.org/docs/current/sql-createaggregate.html)
     ///
-    /// Corresponds to `INITIAL_CONDITION` in [`pgrx::aggregate::Aggregate`].
+    /// Corresponds to `INITIAL_CONDITION` in `pgrx::aggregate::Aggregate`.
     pub initcond: Option<&'static str>,
 
     /// The `MSFUNC` parameter for [`CREATE AGGREGATE`](https://www.postgresql.org/docs/current/sql-createaggregate.html)
     ///
-    /// Corresponds to `moving_state` in [`pgrx::aggregate::Aggregate`].
+    /// Corresponds to `moving_state` in `pgrx::aggregate::Aggregate`.
     pub msfunc: Option<&'static str>,
 
     /// The `MINVFUNC` parameter for [`CREATE AGGREGATE`](https://www.postgresql.org/docs/current/sql-createaggregate.html)
     ///
-    /// Corresponds to `moving_state_inverse` in [`pgrx::aggregate::Aggregate`].
+    /// Corresponds to `moving_state_inverse` in `pgrx::aggregate::Aggregate`.
     pub minvfunc: Option<&'static str>,
 
     /// The `MSTYPE` parameter for [`CREATE AGGREGATE`](https://www.postgresql.org/docs/current/sql-createaggregate.html)
     ///
-    /// Corresponds to `MovingState` in [`pgrx::aggregate::Aggregate`].
+    /// Corresponds to `MovingState` in `pgrx::aggregate::Aggregate`.
     pub mstype: Option<UsedTypeEntity>,
 
     // The `MSSPACE` parameter for [`CREATE AGGREGATE`](https://www.postgresql.org/docs/current/sql-createaggregate.html)
@@ -117,32 +117,32 @@ pub struct PgAggregateEntity {
     // pub msspace: &'static str,
     /// The `MFINALFUNC` parameter for [`CREATE AGGREGATE`](https://www.postgresql.org/docs/current/sql-createaggregate.html)
     ///
-    /// Corresponds to `moving_state_finalize` in [`pgrx::aggregate::Aggregate`].
+    /// Corresponds to `moving_state_finalize` in `pgrx::aggregate::Aggregate`.
     pub mfinalfunc: Option<&'static str>,
 
     /// The `MFINALFUNC_MODIFY` parameter for [`CREATE AGGREGATE`](https://www.postgresql.org/docs/current/sql-createaggregate.html)
     ///
-    /// Corresponds to `MOVING_FINALIZE_MODIFY` in [`pgrx::aggregate::Aggregate`].
+    /// Corresponds to `MOVING_FINALIZE_MODIFY` in `pgrx::aggregate::Aggregate`.
     pub mfinalfunc_modify: Option<FinalizeModify>,
 
     /// The `MINITCOND` parameter for [`CREATE AGGREGATE`](https://www.postgresql.org/docs/current/sql-createaggregate.html)
     ///
-    /// Corresponds to `MOVING_INITIAL_CONDITION` in [`pgrx::aggregate::Aggregate`].
+    /// Corresponds to `MOVING_INITIAL_CONDITION` in `pgrx::aggregate::Aggregate`.
     pub minitcond: Option<&'static str>,
 
     /// The `SORTOP` parameter for [`CREATE AGGREGATE`](https://www.postgresql.org/docs/current/sql-createaggregate.html)
     ///
-    /// Corresponds to `SORT_OPERATOR` in [`pgrx::aggregate::Aggregate`].
+    /// Corresponds to `SORT_OPERATOR` in `pgrx::aggregate::Aggregate`.
     pub sortop: Option<&'static str>,
 
     /// The `PARALLEL` parameter for [`CREATE AGGREGATE`](https://www.postgresql.org/docs/current/sql-createaggregate.html)
     ///
-    /// Corresponds to `PARALLEL` in [`pgrx::aggregate::Aggregate`].
+    /// Corresponds to `PARALLEL` in `pgrx::aggregate::Aggregate`.
     pub parallel: Option<ParallelOption>,
 
     /// The `HYPOTHETICAL` parameter for [`CREATE AGGREGATE`](https://www.postgresql.org/docs/current/sql-createaggregate.html)
     ///
-    /// Corresponds to `hypothetical` in [`pgrx::aggregate::Aggregate`].
+    /// Corresponds to `hypothetical` in `pgrx::aggregate::Aggregate`.
     pub hypothetical: bool,
     pub to_sql_config: ToSqlConfigEntity,
 }

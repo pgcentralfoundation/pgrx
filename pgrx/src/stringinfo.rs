@@ -188,7 +188,7 @@ impl<AllocatedBy: WhoAllocated> StringInfo<AllocatedBy> {
     ///
     /// # Errors
     ///
-    /// If the contained bytes aren't valid UTF8, a [UTF8Error] is returned.  Postgres StringInfo
+    /// If the contained bytes aren't valid UTF8, a [Utf8Error] is returned.  Postgres StringInfo
     /// is allowed to contain non-UTF8 byte sequences, so this is a real possibility.
     #[inline]
     pub fn as_str(&self) -> Result<&str, Utf8Error> {

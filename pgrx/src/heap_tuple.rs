@@ -107,9 +107,6 @@ impl<'a> PgHeapTuple<'a, AllocatedByPostgres> {
     /// [PgHeapTuple] will be considered by have been allocated by Postgres and is not mutable until
     /// [PgHeapTuple::into_owned] is called.
     ///
-    /// pgrx also invents the concept of a "current" ([`TriggerTuple::Current`]) tuple, which is either
-    /// the new row being inserted or the row being updated (not the new version) or deleted.
-    ///
     /// Asking for a [`TriggerTuple`] that isn't compatible with how the trigger was fired causes
     /// this function to return `None`.  Specifically this means `None` is always returned for
     /// statement-level triggers.

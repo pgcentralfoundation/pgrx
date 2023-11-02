@@ -9,7 +9,7 @@
 //LICENSE Use of this source code is governed by the MIT license that can be found in the LICENSE file.
 /*! Support for writing Rust trigger functions
 
-A "no-op" trigger that gets the current [`PgHeapTuple`][crate::PgHeapTuple],
+A "no-op" trigger that gets the current [`PgHeapTuple`],
 panicking (into a PostgreSQL error) if it doesn't exist:
 
 ```rust,no_run
@@ -24,8 +24,8 @@ fn trigger_example<'a>(trigger: &'a PgTrigger<'a>) -> Result<
 }
 ```
 
-Trigger functions only accept one argument, a [`PgTrigger`], and they return a [`Result`][std::result::Result] containing
-either a [`PgHeapTuple`][crate::PgHeapTuple] or any error that implements [`impl std::error::Error`][std::error::Error].
+Trigger functions only accept one argument, a [`PgTrigger`], and they return a [`Result`] containing
+either a [`PgHeapTuple`] or any error that implements [`impl std::error::Error`][std::error::Error].
 
 # Use from SQL
 
@@ -91,7 +91,7 @@ INSERT INTO test (title, description, payload) VALUES ('Fox', 'a description', '
 
 # Working with [`WhoAllocated`][crate::WhoAllocated]
 
-Trigger functions can return [`PgHeapTuple`][crate::PgHeapTuple]s which are [`AllocatedByRust`][crate::AllocatedByRust]
+Trigger functions can return [`PgHeapTuple`]s which are [`AllocatedByRust`][crate::AllocatedByRust]
 or [`AllocatedByPostgres`][crate::AllocatedByPostgres]. In most cases, it can be inferred by the compiler using
 [`impl WhoAllocated<pg_sys::HeapTupleData>>`][crate::WhoAllocated].
 
@@ -176,8 +176,8 @@ fn example_lifetimes<'a, 'b>(trigger: &'a PgTrigger<'a>) -> Result<
 Unsafe [`pgrx::pg_sys::FunctionCallInfo`][crate::pg_sys::FunctionCallInfo] and
 [`pgrx::pg_sys::TriggerData`][crate::pg_sys::TriggerData] (include its contained
 [`pgrx::pg_sys::Trigger`][crate::pg_sys::Trigger]) accessors are available..
-```
 
+[`PgHeapTuple`]: crate::heap_tuple::PgHeapTuple
  */
 
 mod pg_trigger;

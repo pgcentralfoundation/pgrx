@@ -7,7 +7,9 @@
 //LICENSE All rights reserved.
 //LICENSE
 //LICENSE Use of this source code is governed by the MIT license that can be found in the LICENSE file.
-/// Indicates which trigger tuple to convert into a [crate::PgHeapTuple].
+/// Indicates which trigger tuple to convert into a [`PgHeapTuple`].
+///
+/// [`PgHeapTuple`]: crate::heap_tuple::PgHeapTuple
 #[derive(Debug, Copy, Clone)]
 pub enum TriggerTuple {
     /// Represents the new database row for INSERT/UPDATE operations in row-level triggers.

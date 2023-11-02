@@ -24,7 +24,7 @@ pub trait PgrxManifestExt {
 
     /// Resolved string for target library name, either its lib.name,
     /// or package name with hyphens replaced with underscore.
-    /// https://doc.rust-lang.org/cargo/reference/cargo-targets.html#the-name-field
+    /// <https://doc.rust-lang.org/cargo/reference/cargo-targets.html#the-name-field>
     fn lib_name(&self) -> eyre::Result<String>;
 
     /// Resolved string for target artifact name, used for matching on

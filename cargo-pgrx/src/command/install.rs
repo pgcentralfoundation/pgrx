@@ -25,7 +25,7 @@ use std::process::Stdio;
 use std::sync::{Arc, Mutex};
 
 /// Type used for memoizing expensive to calculate values.
-/// Arc<Mutex> is needed to get around compiler safety checks.
+/// `Arc<Mutex>` is needed to get around compiler safety checks.
 type MemoizeKeyValue = Arc<Mutex<HashMap<PathBuf, String>>>;
 
 /// Install the extension from the current crate to the Postgres specified by whatever `pg_config` is currently on your $PATH
