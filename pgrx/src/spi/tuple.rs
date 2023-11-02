@@ -109,8 +109,8 @@ impl<'conn> SpiTupleTable<'conn> {
     ///
     /// # Errors
     ///
-    /// If the specified ordinal is out of bounds a [`Error::SpiError(SpiError::NoAttribute)`] is returned
-    /// If we have no backing tuple table a [`Error::NoTupleTable`] is returned
+    /// If the specified ordinal is out of bounds an [`SpiError::SpiError(SpiError::NoAttribute)`] is returned
+    /// If we have no backing tuple table an [`SpiError::NoTupleTable`] is returned
     ///
     /// # Panics
     ///
@@ -142,8 +142,8 @@ impl<'conn> SpiTupleTable<'conn> {
     ///
     /// # Errors
     ///
-    /// If the specified name is invalid a [`Error::SpiError(SpiError::NoAttribute)`] is returned
-    /// If we have no backing tuple table a [`Error::NoTupleTable`] is returned
+    /// If the specified name is invalid an [`SpiError::SpiError(SpiError::NoAttribute)`] is returned
+    /// If we have no backing tuple table an [`SpiError::NoTupleTable`] is returned
     pub fn get_by_name<T: IntoDatum + FromDatum, S: AsRef<str>>(
         &self,
         name: S,
@@ -157,8 +157,8 @@ impl<'conn> SpiTupleTable<'conn> {
     ///
     /// # Errors
     ///
-    /// If the specified ordinal is out of bounds a [`Error::SpiError(SpiError::NoAttribute)`] is returned
-    /// If we have no backing tuple table a [`Error::NoTupleTable`] is returned
+    /// If the specified ordinal is out of bounds an [`SpiError::SpiError(SpiError::NoAttribute)`] is returned
+    /// If we have no backing tuple table an [`SpiError::NoTupleTable`] is returned
     pub fn get_datum_by_ordinal(&self, ordinal: usize) -> SpiResult<Option<pg_sys::Datum>> {
         self.check_ordinal_bounds(ordinal)?;
 
@@ -184,8 +184,8 @@ impl<'conn> SpiTupleTable<'conn> {
     ///
     /// # Errors
     ///
-    /// If the specified name is invalid a [`Error::SpiError(SpiError::NoAttribute)`] is returned
-    /// If we have no backing tuple table a [`Error::NoTupleTable`] is returned
+    /// If the specified name is invalid an [`SpiError::SpiError(SpiError::NoAttribute)`] is returned
+    /// If we have no backing tuple table an [`SpiError::NoTupleTable`] is returned
     pub fn get_datum_by_name<S: AsRef<str>>(&self, name: S) -> SpiResult<Option<pg_sys::Datum>> {
         self.get_datum_by_ordinal(self.column_ordinal(name)?)
     }
@@ -226,7 +226,7 @@ impl<'conn> SpiTupleTable<'conn> {
     /// # Errors
     ///
     /// Returns [`Error::SpiError(SpiError::NoAttribute)`] if the specified ordinal value is out of bounds
-    /// If we have no backing tuple table a [`Error::NoTupleTable`] is returned
+    /// If we have no backing tuple table an [`SpiError::NoTupleTable`] is returned
     ///
     /// # Panics
     ///
@@ -255,7 +255,7 @@ impl<'conn> SpiTupleTable<'conn> {
     /// # Errors
     ///
     /// Returns [`Error::SpiError(SpiError::NoAttribute)`] if the specified column name isn't found
-    /// If we have no backing tuple table a [`Error::NoTupleTable`] is returned
+    /// If we have no backing tuple table an [`SpiError::NoTupleTable`] is returned
     ///
     /// # Panics
     ///
@@ -351,7 +351,7 @@ impl<'conn> SpiHeapTupleData<'conn> {
     ///
     /// # Errors
     ///
-    /// Returns a [`Error::DatumError`] if the desired Rust type is incompatible
+    /// Returns an [`SpiError::DatumError`] if the desired Rust type is incompatible
     /// with the underlying Datum
     pub fn get<T: IntoDatum + FromDatum>(&self, ordinal: usize) -> SpiResult<Option<T>> {
         self.get_datum_by_ordinal(ordinal).map(|entry| entry.value())?
@@ -361,7 +361,7 @@ impl<'conn> SpiHeapTupleData<'conn> {
     ///
     /// # Errors
     ///
-    /// Returns a [`Error::DatumError`] if the desired Rust type is incompatible
+    /// Returns an [`SpiError::DatumError`] if the desired Rust type is incompatible
     /// with the underlying Datum
     pub fn get_by_name<T: IntoDatum + FromDatum, S: AsRef<str>>(
         &self,
@@ -376,7 +376,7 @@ impl<'conn> SpiHeapTupleData<'conn> {
     ///
     /// # Errors
     ///
-    /// If the specified ordinal is out of bounds a [`Error::SpiError(SpiError::NoAttribute)`] is returned
+    /// If the specified ordinal is out of bounds an [`SpiError::SpiError(SpiError::NoAttribute)`] is returned
     pub fn get_datum_by_ordinal(&self, ordinal: usize) -> SpiResult<&SpiHeapTupleDataEntry<'conn>> {
         // Wrapping because `self.entries.get(...)` will bounds check.
         let index = ordinal.wrapping_sub(1);
@@ -387,7 +387,7 @@ impl<'conn> SpiHeapTupleData<'conn> {
     ///
     /// # Errors
     ///
-    /// If the specified name isn't valid a [`Error::SpiError(SpiError::NoAttribute)`] is returned
+    /// If the specified name isn't valid an [`SpiError::SpiError(SpiError::NoAttribute)`] is returned
     ///
     /// # Panics
     ///
@@ -427,7 +427,7 @@ impl<'conn> SpiHeapTupleData<'conn> {
     ///
     /// # Errors
     ///
-    /// If the specified name isn't valid a [`Error::SpiError(SpiError::NoAttribute)`] is returned
+    /// If the specified name isn't valid an [`SpiError::SpiError(SpiError::NoAttribute)`] is returned
     ///
     /// # Panics
     ///
