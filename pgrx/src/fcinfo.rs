@@ -202,25 +202,6 @@ pub unsafe fn pg_get_collation(fcinfo: pg_sys::FunctionCallInfo) -> pg_sys::Oid 
     fcinfo.fncollation
 }
 
-/// Get a numbered argument for a `PG_FUNCTION_INFO_V1` function as raw pointer to a Rust type `T`.
-///
-/// If the specified argument Datum is NULL, returns [`Option::None`].
-///
-/// # Safety
-///
-/// This function is unsafe as we cannot ensure the `fcinfo` argument is a valid
-/// [`pg_sys::FunctionCallInfo`] pointer.  This is your responsibility.
-///
-/// It is also your responsibility to ensure the specified type `T` is what the argument Datum
-/// points to.
-#[inline]
-pub unsafe fn pg_getarg_pointer<T>(fcinfo: pg_sys::FunctionCallInfo, num: usize) -> Option<*mut T> {
-    unsafe {
-        // SAFETY:  The user has asserted that `fcinfo` is valid
-        pg_getarg_datum(fcinfo, num).map(|datum| datum.cast_mut_ptr::<T>())
-    }
-}
-
 /// # Safety
 ///
 /// The provided `fcinfo` must be valid otherwise this function results in undefined behavior due
