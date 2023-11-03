@@ -240,17 +240,11 @@ pub unsafe fn pg_getarg_type(fcinfo: pg_sys::FunctionCallInfo, num: usize) -> pg
 /// use pgrx::prelude::*;
 ///
 /// fn foo(fcinfo: pg_sys::FunctionCallInfo) -> pg_sys::Datum {
-///
-///     return unsafe { pg_return_void() };
+///     pg_return_void()
 /// }
 ///```
-///
-/// # Safety
-///
-/// This function is unsafe for symmetry with the other related functions that deal with
-/// `PG_FUNCTION_INFO_V1` functions.  It has no specific safety invariants that must be met.
 #[inline]
-pub unsafe fn pg_return_void() -> pg_sys::Datum {
+pub fn pg_return_void() -> pg_sys::Datum {
     pg_sys::Datum::from(0)
 }
 
