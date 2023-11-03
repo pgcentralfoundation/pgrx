@@ -231,24 +231,6 @@ pub unsafe fn pg_getarg_type(fcinfo: pg_sys::FunctionCallInfo, num: usize) -> pg
     pg_sys::get_fn_expr_argtype(fcinfo.as_ref().unwrap().flinfo, num as std::os::raw::c_int)
 }
 
-/// This is intended for Postgres functions that take an actual `cstring` argument, not for getting
-/// a varlena argument type as a CStr.
-///
-/// # Safety
-///
-/// This function is unsafe as we cannot ensure the `fcinfo` argument is a valid
-/// [`pg_sys::FunctionCallInfo`] pointer.  This is your responsibility.
-///
-/// It is also your responsibility to ensure that the argument Datum is pointing to a valid
-/// [`core::ffi::CStr`].
-#[inline]
-pub unsafe fn pg_getarg_cstr<'a>(
-    fcinfo: pg_sys::FunctionCallInfo,
-    num: usize,
-) -> Option<&'a core::ffi::CStr> {
-    pg_getarg_pointer(fcinfo, num).map(|ptr| unsafe { core::ffi::CStr::from_ptr(ptr) })
-}
-
 /// Indicates that a `PG_FUNCTION_INFO_V1` function is returning a SQL "void".
 ///
 /// # Example
