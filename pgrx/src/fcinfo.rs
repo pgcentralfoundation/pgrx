@@ -97,7 +97,7 @@ macro_rules! variadic {
 /// underlying datum is at the argument `num` position.  This too, is your responsibility
 #[inline]
 pub unsafe fn pg_getarg<T: FromDatum>(fcinfo: pg_sys::FunctionCallInfo, num: usize) -> Option<T> {
-    let datum = get_nullable_datum(fcinfo, num);
+    let datum = pg_get_nullable_datum(fcinfo, num);
     unsafe {
         if T::GET_TYPOID {
             T::from_polymorphic_datum(datum.value, datum.isnull, super::pg_getarg_type(fcinfo, num))
@@ -115,7 +115,7 @@ pub unsafe fn pg_getarg<T: FromDatum>(fcinfo: pg_sys::FunctionCallInfo, num: usi
 /// [`pg_sys::FunctionCallInfo`] pointer.  This is your responsibility.
 #[inline]
 pub unsafe fn pg_arg_is_null(fcinfo: pg_sys::FunctionCallInfo, num: usize) -> bool {
-    get_nullable_datum(fcinfo, num).isnull
+    pg_get_nullable_datum(fcinfo, num).isnull
 }
 
 /// Get a numbered argument for a `PG_FUNCTION_INFO_V1` function as an Option containing a
@@ -135,7 +135,7 @@ pub unsafe fn pg_getarg_datum(
     if pg_arg_is_null(fcinfo, num) {
         None
     } else {
-        Some(get_nullable_datum(fcinfo, num).value)
+        Some(pg_get_nullable_datum(fcinfo, num).value)
     }
 }
 
@@ -147,18 +147,17 @@ pub unsafe fn pg_getarg_datum(
 /// [`pg_sys::FunctionCallInfo`] pointer.  This is your responsibility.
 #[inline]
 pub unsafe fn pg_getarg_datum_raw(fcinfo: pg_sys::FunctionCallInfo, num: usize) -> pg_sys::Datum {
-    get_nullable_datum(fcinfo, num).value
+    pg_get_nullable_datum(fcinfo, num).value
 }
 
-/// Similar to [`pg_getarg_datum_raw`] but returns Postgres' [`pg_sys::NullableDatum`] tyoe.
+/// Returns the [`pg_sys::NullableDatum`] for a given arg.
 ///
 /// # Safety
 ///
 /// This function is unsafe as we cannot ensure the `fcinfo` argument is a valid
 /// [`pg_sys::FunctionCallInfo`] pointer.  This is your responsibility.
-#[doc(hidden)]
 #[inline]
-unsafe fn get_nullable_datum(
+pub unsafe fn pg_get_nullable_datum(
     fcinfo: pg_sys::FunctionCallInfo,
     num: usize,
 ) -> pg_sys::NullableDatum {
