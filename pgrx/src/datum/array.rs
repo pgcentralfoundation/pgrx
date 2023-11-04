@@ -61,10 +61,11 @@ pub struct Array<'dat, T> {
     raw: Toast<RawArray>,
 }
 
-impl<'a, T: FromDatum + Debug> Debug for Array<'a, T> {
+impl<T: UnboxDatum> Debug for Array<'_, T>
+where for<'dat> <T as UnboxDatum>::As<'dat>: Debug {
     fn fmt(&self, f: &mut Formatter<'_>) -> core::fmt::Result {
-        todo!()
-        // f.debug_list().entries(self.iter()).finish()
+        // todo!()
+        f.debug_list().entries(self.iter()).finish()
     }
 }
 
@@ -95,13 +96,14 @@ impl NullKind<'_> {
     }
 }
 
-impl<'dat, T: UnboxDatum<As<'dat> = T> + serde::Serialize> serde::Serialize for Array<'dat, T> {
+impl<T: UnboxDatum> serde::Serialize for Array<'_, T>
+where for<'dat> <T as UnboxDatum>::As<'dat>: serde::Serialize, {
     fn serialize<S>(&self, serializer: S) -> Result<<S as Serializer>::Ok, <S as Serializer>::Error>
     where
         S: Serializer,
     {
-        todo!()
-        // serializer.collect_seq(self.iter())
+        // todo!()
+        serializer.collect_seq(self.iter())
     }
 }
 
@@ -524,16 +526,15 @@ mod casper {
 
 pub struct VariadicArray<'dat, T>(Array<'dat, T>);
 
-impl<'dat, T: UnboxDatum + serde::Serialize> serde::Serialize for VariadicArray<'dat, T>
-where
-    <T as UnboxDatum>::As<'dat>: serde::Serialize,
+impl<T: UnboxDatum> serde::Serialize for VariadicArray<'_, T>
+where for<'dat> <T as UnboxDatum>::As<'dat>: serde::Serialize,
 {
     fn serialize<S>(&self, serializer: S) -> Result<<S as Serializer>::Ok, <S as Serializer>::Error>
     where
         S: Serializer,
     {
-        todo!()
-        // serializer.collect_seq(self.0.iter())
+        // todo!()
+        serializer.collect_seq(self.0.iter())
     }
 }
 
@@ -724,7 +725,7 @@ impl<'a, T: FromDatum + UnboxDatum> FromDatum for VariadicArray<'a, T> {
     }
 }
 
-impl<'a, T: FromDatum + UnboxDatum> FromDatum for Array<'a, T> {
+impl<'a, T: UnboxDatum> FromDatum for Array<'a, T> {
     #[inline]
     unsafe fn from_polymorphic_datum(
         datum: pg_sys::Datum,
@@ -779,7 +780,8 @@ impl<T: IntoDatum> IntoDatum for Array<'_, T> {
     }
 }
 
-impl<'dat, T: FromDatum + UnboxDatum<As<'dat> = T> + 'dat> FromDatum for Vec<T> {
+impl<T> FromDatum for Vec<T>
+where for<'dat> T: UnboxDatum<As<'dat> = T> {
     #[inline]
     unsafe fn from_polymorphic_datum(
         datum: pg_sys::Datum,
@@ -789,9 +791,9 @@ impl<'dat, T: FromDatum + UnboxDatum<As<'dat> = T> + 'dat> FromDatum for Vec<T> 
         if is_null {
             None
         } else {
-            todo!()
-            // Array::<T>::from_polymorphic_datum(datum, is_null, typoid)
-            //     .map(|array| array.iter_deny_null().collect::<Vec<_>>())
+            // todo!()
+            Array::<T>::from_polymorphic_datum(datum, is_null, typoid)
+                .map(|array| array.iter_deny_null().collect::<Vec<_>>())
         }
     }
 
@@ -804,22 +806,23 @@ impl<'dat, T: FromDatum + UnboxDatum<As<'dat> = T> + 'dat> FromDatum for Vec<T> 
     where
         Self: Sized,
     {
-        todo!()
-        // Array::<T>::from_datum_in_memory_context(memory_context, datum, is_null, typoid)
-        //     .map(|array| array.iter_deny_null().collect::<Vec<_>>())
+        // todo!()
+        Array::<T>::from_datum_in_memory_context(memory_context, datum, is_null, typoid)
+            .map(|array| array.iter_deny_null().collect::<Vec<_>>())
     }
 }
 
-impl<'dat, T: FromDatum + UnboxDatum<As<'dat> = T>> FromDatum for Vec<Option<T>> {
+impl<T> FromDatum for Vec<Option<T>> 
+where for<'dat> T: UnboxDatum<As<'dat> = T> {
     #[inline]
     unsafe fn from_polymorphic_datum(
         datum: pg_sys::Datum,
         is_null: bool,
         typoid: pg_sys::Oid,
     ) -> Option<Vec<Option<T>>> {
-        todo!()
-        // Array::<T>::from_polymorphic_datum(datum, is_null, typoid)
-        //     .map(|array| array.iter().collect::<Vec<_>>())
+        // todo!()
+        Array::<T>::from_polymorphic_datum(datum, is_null, typoid)
+            .map(|array| array.iter().collect::<Vec<_>>())
     }
 
     unsafe fn from_datum_in_memory_context(
@@ -831,9 +834,9 @@ impl<'dat, T: FromDatum + UnboxDatum<As<'dat> = T>> FromDatum for Vec<Option<T>>
     where
         Self: Sized,
     {
-        todo!()
-        // Array::<T>::from_datum_in_memory_context(memory_context, datum, is_null, typoid)
-        //     .map(|array| array.iter().collect::<Vec<_>>())
+        // todo!()
+        Array::<T>::from_datum_in_memory_context(memory_context, datum, is_null, typoid)
+            .map(|array| array.iter().collect::<Vec<_>>())
     }
 }
 
