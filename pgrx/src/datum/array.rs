@@ -62,7 +62,9 @@ pub struct Array<'dat, T> {
 }
 
 impl<T: UnboxDatum> Debug for Array<'_, T>
-where for<'dat> <T as UnboxDatum>::As<'dat>: Debug {
+where
+    for<'dat> <T as UnboxDatum>::As<'dat>: Debug,
+{
     fn fmt(&self, f: &mut Formatter<'_>) -> core::fmt::Result {
         // todo!()
         f.debug_list().entries(self.iter()).finish()
@@ -97,7 +99,9 @@ impl NullKind<'_> {
 }
 
 impl<T: UnboxDatum> serde::Serialize for Array<'_, T>
-where for<'dat> <T as UnboxDatum>::As<'dat>: serde::Serialize, {
+where
+    for<'dat> <T as UnboxDatum>::As<'dat>: serde::Serialize,
+{
     fn serialize<S>(&self, serializer: S) -> Result<<S as Serializer>::Ok, <S as Serializer>::Error>
     where
         S: Serializer,
@@ -527,7 +531,8 @@ mod casper {
 pub struct VariadicArray<'dat, T>(Array<'dat, T>);
 
 impl<T: UnboxDatum> serde::Serialize for VariadicArray<'_, T>
-where for<'dat> <T as UnboxDatum>::As<'dat>: serde::Serialize,
+where
+    for<'dat> <T as UnboxDatum>::As<'dat>: serde::Serialize,
 {
     fn serialize<S>(&self, serializer: S) -> Result<<S as Serializer>::Ok, <S as Serializer>::Error>
     where
@@ -781,7 +786,9 @@ impl<T: IntoDatum> IntoDatum for Array<'_, T> {
 }
 
 impl<T> FromDatum for Vec<T>
-where for<'dat> T: UnboxDatum<As<'dat> = T> {
+where
+    for<'dat> T: UnboxDatum<As<'dat> = T>,
+{
     #[inline]
     unsafe fn from_polymorphic_datum(
         datum: pg_sys::Datum,
@@ -812,8 +819,10 @@ where for<'dat> T: UnboxDatum<As<'dat> = T> {
     }
 }
 
-impl<T> FromDatum for Vec<Option<T>> 
-where for<'dat> T: UnboxDatum<As<'dat> = T> {
+impl<T> FromDatum for Vec<Option<T>>
+where
+    for<'dat> T: UnboxDatum<As<'dat> = T>,
+{
     #[inline]
     unsafe fn from_polymorphic_datum(
         datum: pg_sys::Datum,
