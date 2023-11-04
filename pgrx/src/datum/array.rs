@@ -385,7 +385,7 @@ fn as_slice<'a, T: Sized>(array: &'a Array<'_, T>) -> Result<&'a [T], ArraySlice
 mod casper {
     use super::UnboxDatum;
     use crate::layout::Align;
-    use crate::{pg_sys, varlena, Array, FromDatum};
+    use crate::{pg_sys, varlena, Array};
 
     // it's a pop-culture reference (https://en.wikipedia.org/wiki/Cha_Cha_Slide) not some fancy crypto thing you nerd
     /// Describes how to instantiate a value `T` from an [`Array`] and its backing byte array pointer.
@@ -435,7 +435,7 @@ mod casper {
         #[inline(always)]
         unsafe fn bring_it_back_now<'dat>(
             &self,
-            array: &Array<'dat, T>,
+            _array: &Array<'dat, T>,
             ptr: *const u8,
         ) -> Option<T::As<'dat>> {
             // This branch is optimized away (because `N` is constant).
@@ -465,7 +465,7 @@ mod casper {
         #[inline]
         unsafe fn bring_it_back_now<'dat>(
             &self,
-            array: &Array<'dat, T>,
+            _array: &Array<'dat, T>,
             ptr: *const u8,
         ) -> Option<T::As<'dat>> {
             let datum = pg_sys::Datum::from(ptr);
@@ -489,7 +489,7 @@ mod casper {
         #[inline]
         unsafe fn bring_it_back_now<'dat>(
             &self,
-            array: &Array<'dat, T>,
+            _array: &Array<'dat, T>,
             ptr: *const u8,
         ) -> Option<T::As<'dat>> {
             let datum = pg_sys::Datum::from(ptr);
@@ -514,7 +514,7 @@ mod casper {
         #[inline]
         unsafe fn bring_it_back_now<'dat>(
             &self,
-            array: &Array<'dat, T>,
+            _array: &Array<'dat, T>,
             ptr: *const u8,
         ) -> Option<T::As<'dat>> {
             let datum = pg_sys::Datum::from(ptr);

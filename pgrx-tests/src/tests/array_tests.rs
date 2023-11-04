@@ -195,7 +195,6 @@ mod tests {
     #[allow(unused_imports)]
     use crate as pgrx_tests;
 
-    use crate::tests::array_tests::ArrayTestEnum;
     use pgrx::prelude::*;
     use pgrx::{IntoDatum, Json};
     use serde_json::json;
