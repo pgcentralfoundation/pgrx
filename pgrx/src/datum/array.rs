@@ -13,12 +13,13 @@ use crate::toast::Toast;
 use crate::{pg_sys, FromDatum, IntoDatum, PgMemoryContexts};
 use bitvec::slice::BitSlice;
 use core::fmt::{Debug, Formatter};
+use core::iter::FusedIterator;
 use core::ops::DerefMut;
 use core::ptr::NonNull;
 use pgrx_sql_entity_graph::metadata::{
     ArgumentError, Returns, ReturnsError, SqlMapping, SqlTranslatable,
 };
-use serde::Serializer;
+use serde::{Serialize, Serializer};
 
 /** An array of some type (eg. `TEXT[]`, `int[]`)
 
@@ -93,7 +94,7 @@ impl NullKind<'_> {
     }
 }
 
-impl<'a, T: FromDatum + serde::Serialize + 'a> serde::Serialize for Array<'a, T> {
+impl<T: FromDatum + Serialize> Serialize for Array<'_, T> {
     fn serialize<S>(&self, serializer: S) -> Result<<S as Serializer>::Ok, <S as Serializer>::Error>
     where
         S: Serializer,
@@ -242,7 +243,7 @@ impl<'a, T: FromDatum> Array<'a, T> {
 }
 
 #[deny(unsafe_op_in_unsafe_fn)]
-impl<'a, T> Array<'a, T> {
+impl<T> Array<'_, T> {
     /// Rips out the underlying `pg_sys::ArrayType` pointer.
     /// Note that Array may have caused Postgres to allocate to unbox the datum,
     /// and this can hypothetically cause a memory leak if so.
@@ -283,7 +284,7 @@ pub enum ArraySliceError {
 }
 
 #[cfg(target_pointer_width = "64")]
-impl<'a> Array<'a, f64> {
+impl Array<'_, f64> {
     /// Returns a slice of `f64`s which comprise this [`Array`].
     ///
     /// # Errors
@@ -296,7 +297,7 @@ impl<'a> Array<'a, f64> {
     }
 }
 
-impl<'a> Array<'a, f32> {
+impl Array<'_, f32> {
     /// Returns a slice of `f32`s which comprise this [`Array`].
     ///
     /// # Errors
@@ -310,7 +311,7 @@ impl<'a> Array<'a, f32> {
 }
 
 #[cfg(target_pointer_width = "64")]
-impl<'a> Array<'a, i64> {
+impl Array<'_, i64> {
     /// Returns a slice of `i64`s which comprise this [`Array`].
     ///
     /// # Errors
@@ -323,7 +324,7 @@ impl<'a> Array<'a, i64> {
     }
 }
 
-impl<'a> Array<'a, i32> {
+impl Array<'_, i32> {
     /// Returns a slice of `i32`s which comprise this [`Array`].
     ///
     /// # Errors
@@ -336,7 +337,7 @@ impl<'a> Array<'a, i32> {
     }
 }
 
-impl<'a> Array<'a, i16> {
+impl Array<'_, i16> {
     /// Returns a slice of `i16`s which comprise this [`Array`].
     ///
     /// # Errors
@@ -349,7 +350,7 @@ impl<'a> Array<'a, i16> {
     }
 }
 
-impl<'a> Array<'a, i8> {
+impl Array<'_, i8> {
     /// Returns a slice of `i8`s which comprise this [`Array`].
     ///
     /// # Errors
@@ -498,9 +499,9 @@ mod casper {
     }
 }
 
-pub struct VariadicArray<'a, T: FromDatum>(Array<'a, T>);
+pub struct VariadicArray<'a, T>(Array<'a, T>);
 
-impl<'a, T: FromDatum + serde::Serialize> serde::Serialize for VariadicArray<'a, T> {
+impl<T: FromDatum + Serialize> Serialize for VariadicArray<'_, T> {
     fn serialize<S>(&self, serializer: S) -> Result<<S as Serializer>::Ok, <S as Serializer>::Error>
     where
         S: Serializer,
@@ -509,12 +510,7 @@ impl<'a, T: FromDatum + serde::Serialize> serde::Serialize for VariadicArray<'a,
     }
 }
 
-impl<'a, T: FromDatum> VariadicArray<'a, T> {
-    #[inline]
-    pub fn into_array_type(self) -> *const pg_sys::ArrayType {
-        self.0.into_array_type()
-    }
-
+impl<T: FromDatum> VariadicArray<'_, T> {
     /// Return an Iterator of `Option<T>` over the contained Datums.
     #[inline]
     pub fn iter(&self) -> ArrayIterator<'_, T> {
@@ -530,6 +526,19 @@ impl<'a, T: FromDatum> VariadicArray<'a, T> {
         self.0.iter_deny_null()
     }
 
+    #[allow(clippy::option_option)]
+    #[inline]
+    pub fn get(&self, i: usize) -> Option<Option<T>> {
+        self.0.get(i)
+    }
+}
+
+impl<T> VariadicArray<'_, T> {
+    #[inline]
+    pub fn into_array_type(self) -> *const pg_sys::ArrayType {
+        self.0.into_array_type()
+    }
+
     #[inline]
     pub fn len(&self) -> usize {
         self.0.len()
@@ -539,15 +548,9 @@ impl<'a, T: FromDatum> VariadicArray<'a, T> {
     pub fn is_empty(&self) -> bool {
         self.0.is_empty()
     }
-
-    #[allow(clippy::option_option)]
-    #[inline]
-    pub fn get(&self, i: usize) -> Option<Option<T>> {
-        self.0.get(i)
-    }
 }
 
-pub struct ArrayTypedIterator<'a, T: 'a> {
+pub struct ArrayTypedIterator<'a, T> {
     array: &'a Array<'a, T>,
     curr: usize,
     ptr: *const u8,
@@ -579,9 +582,9 @@ impl<'a, T: FromDatum> Iterator for ArrayTypedIterator<'a, T> {
 }
 
 impl<'a, T: FromDatum> ExactSizeIterator for ArrayTypedIterator<'a, T> {}
-impl<'a, T: FromDatum> core::iter::FusedIterator for ArrayTypedIterator<'a, T> {}
+impl<'a, T: FromDatum> FusedIterator for ArrayTypedIterator<'a, T> {}
 
-impl<'a, T: FromDatum + serde::Serialize> serde::Serialize for ArrayTypedIterator<'a, T> {
+impl<'a, T: FromDatum + Serialize> Serialize for ArrayTypedIterator<'a, T> {
     fn serialize<S>(&self, serializer: S) -> Result<<S as Serializer>::Ok, <S as Serializer>::Error>
     where
         S: Serializer,
@@ -590,7 +593,7 @@ impl<'a, T: FromDatum + serde::Serialize> serde::Serialize for ArrayTypedIterato
     }
 }
 
-pub struct ArrayIterator<'a, T: 'a> {
+pub struct ArrayIterator<'a, T> {
     array: &'a Array<'a, T>,
     curr: usize,
     ptr: *const u8,
@@ -623,7 +626,7 @@ impl<'a, T: FromDatum> Iterator for ArrayIterator<'a, T> {
 }
 
 impl<'a, T: FromDatum> ExactSizeIterator for ArrayIterator<'a, T> {}
-impl<'a, T: FromDatum> core::iter::FusedIterator for ArrayIterator<'a, T> {}
+impl<'a, T: FromDatum> FusedIterator for ArrayIterator<'a, T> {}
 
 pub struct ArrayIntoIterator<'a, T> {
     array: Array<'a, T>,
@@ -680,7 +683,7 @@ impl<'a, T: FromDatum> Iterator for ArrayIntoIterator<'a, T> {
 }
 
 impl<'a, T: FromDatum> ExactSizeIterator for ArrayIntoIterator<'a, T> {}
-impl<'a, T: FromDatum> core::iter::FusedIterator for ArrayIntoIterator<'a, T> {}
+impl<'a, T: FromDatum> FusedIterator for ArrayIntoIterator<'a, T> {}
 
 impl<'a, T: FromDatum> FromDatum for VariadicArray<'a, T> {
     #[inline]
@@ -902,9 +905,9 @@ where
     }
 }
 
-unsafe impl<'a, T> SqlTranslatable for Array<'a, T>
+unsafe impl<T> SqlTranslatable for Array<'_, T>
 where
-    T: SqlTranslatable + FromDatum,
+    T: SqlTranslatable,
 {
     fn argument_sql() -> Result<SqlMapping, ArgumentError> {
         match T::argument_sql()? {
@@ -933,9 +936,9 @@ where
     }
 }
 
-unsafe impl<'a, T> SqlTranslatable for VariadicArray<'a, T>
+unsafe impl<T> SqlTranslatable for VariadicArray<'_, T>
 where
-    T: SqlTranslatable + FromDatum,
+    T: SqlTranslatable,
 {
     fn argument_sql() -> Result<SqlMapping, ArgumentError> {
         match T::argument_sql()? {
