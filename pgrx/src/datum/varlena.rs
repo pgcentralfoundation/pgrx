@@ -464,37 +464,6 @@ where
     })
 }
 
-#[allow(dead_code)]
-fn json_encode<T>(input: T) -> *const pg_sys::varlena
-where
-    T: Serialize,
-{
-    let mut serialized = StringInfo::new();
-
-    serialized.push_bytes(&[0u8; pg_sys::VARHDRSZ]); // reserve space for the header
-    serde_json::to_writer(&mut serialized, &input).expect("failed to encode as JSON");
-
-    let size = serialized.len();
-    let varlena = serialized.into_char_ptr();
-    unsafe {
-        set_varsize(varlena as *mut pg_sys::varlena, size as i32);
-    }
-
-    varlena as *const pg_sys::varlena
-}
-
-#[allow(dead_code)]
-unsafe fn json_decode<'de, T>(input: *mut pg_sys::varlena) -> T
-where
-    T: Deserialize<'de>,
-{
-    let varlena = pg_sys::pg_detoast_datum_packed(input as *mut pg_sys::varlena);
-    let len = varsize_any_exhdr(varlena);
-    let data = vardata_any(varlena);
-    let slice = std::slice::from_raw_parts(data as *const u8, len);
-    serde_json::from_slice(slice).expect("failed to decode JSON")
-}
-
 unsafe impl<T> SqlTranslatable for PgVarlena<T>
 where
     T: SqlTranslatable + Copy,
