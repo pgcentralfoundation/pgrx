@@ -1,7 +1,7 @@
 use crate::lwlock::*;
-use crate::{pg_sys, PgAtomic};
 use crate::shmem::PgSharedMemoryInitialization;
-use std::hash::Hash;
+use crate::PgSharedMem;
+use crate::{pg_sys, PGRXSharedMemory};
 use uuid::Uuid;
 
 #[derive(Debug, Eq, PartialEq)]
@@ -10,58 +10,68 @@ pub enum Error {
     HashTableFull,
 }
 
-pub struct PgHTab<K, V> {
-	htab: *mut pg_sys::HTAB,
-	size: i64,
+#[derive(Copy, Clone)]
+pub struct PgHashMapInner {
+    htab: *mut pg_sys::HTAB,
 }
 
-impl<K, V> PgHTab<K, V> {
-	pub fn new(size: i64) -> PgHTab<K, V> {
-		PgHTab::<K, V> {
-			htab: std::ptr::null(),
-			size,
-		}
-	}
+unsafe impl PGRXSharedMemory for PgHashMapInner {}
+unsafe impl Send for PgHashMapInner {}
+unsafe impl Sync for PgHashMapInner {}
 
-	pub fn insert(&mut self, key: &K, value: &V) -> Result<Option<K>, Error> {
-		let void_ptr: *const core::ffi::c_void = &key as *const _ as *const core::ffi::c_void;
-		let mut found = false;
-
-		// Delete entry if exists
-		let entry = unsafe {
-			pg_sys::hash_search(
-				&mut self.htab,
-				void_ptr,
-				pg_sys::HASH_REMOVE,
-				&mut found,
-			)
-		};
-		drop(key);
-		drop(value);
-	}
+impl Default for PgHashMapInner {
+    fn default() -> Self {
+        Self { htab: std::ptr::null_mut() }
+    }
 }
 
-impl<K, V> PgSharedMemoryInitialization for PgHTab<K, V> {
-	fn pg_init(&'static self) {}
-	fn shmem_init(&'static self) {
-		let key_size = std::mem::size_of::<K>();
-		let value_size = std::mem::size_of::<V>();
-		
-		let mut hash_ctl = pg_sys::HASHCTL::default();
-		hash_ctl.keysize  = key_size;
-		hash_ctl.entrysize = value_size;
+pub struct PgHashMap {
+    htab: PgLwLock<PgHashMapInner>,
+    size: u64,
+}
 
-		let shm_name = alloc::ffi::CString::new(Uuid::new_v4().to_string())
-                .expect("CString::new() failed");
+impl PgHashMap {
+    pub const fn new(size: u64) -> PgHashMap {
+        PgHashMap { htab: PgLwLock::new(), size }
+    }
 
-		self.htab = unsafe {
-			pg_sys::ShmemInitHash(
-				shm_name.into_raw(),
-				self.size,
-				self.size,
-				&mut hash_ctl,
-				pg_sys::HASH_ELEM | pg_sys::HASH_BLOBS,
-			)
-		};
-	}
+    pub fn insert(&self, key: &i64, _value: &i64) {
+        let htab = self.htab.exclusive();
+        let void_ptr: *const core::ffi::c_void = key as *const _ as *const core::ffi::c_void;
+        let mut found = false;
+
+        let _entry = unsafe {
+            pg_sys::hash_search(htab.htab, void_ptr, pg_sys::HASHACTION_HASH_ENTER_NULL, &mut found)
+        };
+    }
+}
+
+impl PgSharedMemoryInitialization for PgHashMap {
+    fn pg_init(&'static self) {
+        PgSharedMem::pg_init_locked(&self.htab);
+    }
+
+    fn shmem_init(&'static self) {
+        PgSharedMem::shmem_init_locked(&self.htab);
+        let mut htab = self.htab.exclusive();
+
+        let mut hash_ctl = pg_sys::HASHCTL::default();
+        hash_ctl.keysize = std::mem::size_of::<i64>();
+        hash_ctl.entrysize = std::mem::size_of::<i64>();
+
+        let shm_name =
+            alloc::ffi::CString::new(Uuid::new_v4().to_string()).expect("CString::new() failed");
+
+        let htab_ptr = unsafe {
+            pg_sys::ShmemInitHash(
+                shm_name.into_raw(),
+                self.size.try_into().unwrap(),
+                self.size.try_into().unwrap(),
+                &mut hash_ctl,
+                (pg_sys::HASH_ELEM | pg_sys::HASH_BLOBS).try_into().unwrap(),
+            )
+        };
+
+        htab.htab = htab_ptr;
+    }
 }
