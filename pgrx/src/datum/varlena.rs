@@ -421,7 +421,8 @@ where
     }
 }
 
-fn cbor_encode<T>(input: T) -> *const pg_sys::varlena
+#[doc(hidden)]
+pub unsafe fn cbor_encode<T>(input: T) -> *const pg_sys::varlena
 where
     T: Serialize,
 {
@@ -439,6 +440,7 @@ where
     varlena as *const pg_sys::varlena
 }
 
+#[doc(hidden)]
 pub unsafe fn cbor_decode<'de, T>(input: *mut pg_sys::varlena) -> T
 where
     T: Deserialize<'de>,
@@ -450,6 +452,7 @@ where
     serde_cbor::from_slice(slice).expect("failed to decode CBOR")
 }
 
+#[doc(hidden)]
 pub unsafe fn cbor_decode_into_context<'de, T>(
     mut memory_context: PgMemoryContexts,
     input: *mut pg_sys::varlena,
