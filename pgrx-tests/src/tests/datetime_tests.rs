@@ -481,8 +481,10 @@ mod tests {
     }
 
     #[pg_test]
-    fn test_timezone_offset_edt() {
-        assert_eq!(Ok(-14400), get_timezone_offset("US/Eastern"))
+    fn test_timezone_offset_us_eastern() {
+        let offset = get_timezone_offset("US/Eastern");
+        // EDT vs EST
+        assert!(offset == Ok(-14400) || offset == Ok(-18000), "offset was: {offset:?}");
     }
 
     #[pg_test]
