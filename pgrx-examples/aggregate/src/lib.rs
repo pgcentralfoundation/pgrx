@@ -18,6 +18,7 @@ pgrx::pg_module_magic!();
 
 #[derive(Copy, Clone, PostgresType, Serialize, Deserialize)]
 #[pgvarlena_inoutfuncs]
+#[derive(Default)]
 pub struct IntegerAvgState {
     sum: i32,
     n: i32,
@@ -136,11 +137,7 @@ impl Aggregate for IntegerAvgState {
     // }
 }
 
-impl Default for IntegerAvgState {
-    fn default() -> Self {
-        Self { sum: 0, n: 0 }
-    }
-}
+
 
 #[cfg(any(test, feature = "pg_test"))]
 #[pg_schema]

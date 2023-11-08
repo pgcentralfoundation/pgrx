@@ -33,7 +33,7 @@ fn math() -> Numeric<10, 3> {
 
     n *= 5;
     n -= 2.234;
-    n /= 4 as i128;
+    n /= 4_i128;
     n %= 19;
     n += 99.42;
 
@@ -50,7 +50,7 @@ fn math() -> Numeric<10, 3> {
     n = n + 42.0f64;
     n = n - 42.0f64;
 
-    n = n / AnyNumeric::from(42);
+    n /= AnyNumeric::from(42);
     n = n / Numeric::<1000, 33>::try_from(42).unwrap();
 
     n.rescale().unwrap()

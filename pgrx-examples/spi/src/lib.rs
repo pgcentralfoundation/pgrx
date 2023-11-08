@@ -57,7 +57,7 @@ fn spi_return_query() -> Result<
             .map(|row| (row["oid"].value(), row[2].value()))
             .collect::<Vec<_>>())
     })
-    .map(|results| TableIterator::new(results))
+    .map(TableIterator::new)
 }
 
 #[pg_extern(immutable, parallel_safe)]

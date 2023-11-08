@@ -35,12 +35,12 @@ fn append(mut input: String, extra: &str) -> String {
 
 #[pg_extern]
 fn split(input: &'static str, pattern: &str) -> Vec<&'static str> {
-    input.split_terminator(pattern).into_iter().collect()
+    input.split_terminator(pattern).collect()
 }
 
 #[pg_extern]
 fn split_set<'a>(input: &'a str, pattern: &'a str) -> SetOfIterator<'a, &'a str> {
-    SetOfIterator::new(input.split_terminator(pattern).into_iter())
+    SetOfIterator::new(input.split_terminator(pattern))
 }
 
 #[pg_extern]

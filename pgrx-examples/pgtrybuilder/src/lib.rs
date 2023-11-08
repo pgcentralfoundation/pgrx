@@ -26,7 +26,7 @@ fn is_valid_number(i: i32) -> i32 {
     .finally(|| finished = true)
     .execute();
 
-    assert_eq!(finished, true);
+    assert!(finished);
 
     result
 }
