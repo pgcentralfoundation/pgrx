@@ -103,6 +103,8 @@ impl<K: Copy + Clone, V: Copy + Clone> PgHashMap<K, V> {
             )
         };
 
+        // If we don't do this check, pg will overwrite
+        // some random entry with our key/value...
         if entry.is_null() && htab.elements == self.size {
             return Err(Error::HashTableFull);
         }
