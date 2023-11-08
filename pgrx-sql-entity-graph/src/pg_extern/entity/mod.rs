@@ -238,12 +238,12 @@ impl ToSql for PgExternEntity {
                         .find(|neighbor| match &context.graph[*neighbor] {
                             SqlGraphEntity::Type(neighbor_ty) => neighbor_ty.id_matches(&ty.ty_id),
                             SqlGraphEntity::Enum(neighbor_en) => neighbor_en.id_matches(&ty.ty_id),
-                            SqlGraphEntity::BuiltinType(defined) => &*defined == ty.full_path,
+                            SqlGraphEntity::BuiltinType(defined) => defined == ty.full_path,
                             _ => false,
                         })
                         .ok_or_else(|| eyre!("Could not find return type in graph."))?;
                     let metadata_retval = self.metadata.retval.clone().ok_or_else(|| eyre!("Macro expansion time and SQL resolution time had differing opinions about the return value existing"))?;
-                    let metadata_retval_sql = match metadata_retval.return_sql {
+                    let sql_type = match metadata_retval.return_sql {
                         Ok(Returns::One(SqlMapping::As(ref sql))) => sql.clone(),
                         Ok(Returns::One(SqlMapping::Composite { array_brackets })) => fmt::with_array_brackets(ty.composite_type.unwrap().into(), array_brackets),
                         Ok(Returns::SetOf(SqlMapping::Source { array_brackets })) => fmt::with_array_brackets(context.source_only_to_sql_type(ty.ty_source).unwrap(), array_brackets),
@@ -257,7 +257,6 @@ impl ToSql for PgExternEntity {
                     };
                     format!(
                         "RETURNS {schema_prefix}{sql_type} /* {full_path} */",
-                        sql_type = metadata_retval_sql,
                         schema_prefix = context.schema_prefix_for(&graph_index),
                         full_path = ty.full_path
                     )
@@ -274,7 +273,7 @@ impl ToSql for PgExternEntity {
                         })
                         .ok_or_else(|| eyre!("Could not find return type in graph."))?;
                     let metadata_retval = self.metadata.retval.clone().ok_or_else(|| eyre!("Macro expansion time and SQL resolution time had differing opinions about the return value existing"))?;
-                    let metadata_retval_sql = match metadata_retval.return_sql {
+                    let sql_type = match metadata_retval.return_sql {
                             Ok(Returns::SetOf(SqlMapping::As(ref sql))) => sql.clone(),
                             Ok(Returns::SetOf(SqlMapping::Composite { array_brackets })) => fmt::with_array_brackets(ty.composite_type.unwrap().into(), array_brackets),
                             Ok(Returns::SetOf(SqlMapping::Source { array_brackets })) => fmt::with_array_brackets(context.source_only_to_sql_type(ty.ty_source).unwrap(), array_brackets),
@@ -283,7 +282,6 @@ impl ToSql for PgExternEntity {
                         };
                     format!(
                         "RETURNS SETOF {schema_prefix}{sql_type} /* {full_path} */",
-                        sql_type = metadata_retval_sql,
                         schema_prefix = context.schema_prefix_for(&graph_index),
                         full_path = ty.full_path
                     )
@@ -380,7 +378,6 @@ impl ToSql for PgExternEntity {
             module_path = self.module_path,
             file = self.file,
             line = self.line,
-            fn_sql = fn_sql,
             requires = {
                 let requires_attrs = self
                     .extern_attrs
@@ -544,8 +541,8 @@ impl ToSql for PgExternEntity {
                                                     -- {module_path}::{name}\n\
                                                     CREATE OPERATOR {schema}{opname} (\n\
                                                         \tPROCEDURE={schema}\"{name}\",\n\
-                                                        \tLEFTARG={schema_prefix_left}{left_arg}, /* {left_name} */\n\
-                                                        \tRIGHTARG={schema_prefix_right}{right_arg}{maybe_comma} /* {right_name} */\n\
+                                                        \tLEFTARG={schema_prefix_left}{left_arg_sql}, /* {left_name} */\n\
+                                                        \tRIGHTARG={schema_prefix_right}{right_arg_sql}{maybe_comma} /* {right_name} */\n\
                                                         {optionals}\
                                                     );\
                                                     ",
@@ -557,10 +554,8 @@ impl ToSql for PgExternEntity {
                                                     left_name = left_arg.type_name,
                                                     right_name = right_arg.type_name,
                                                     schema_prefix_left = context.schema_prefix_for(&left_arg_graph_index),
-                                                    left_arg = left_arg_sql,
                                                     schema_prefix_right = context.schema_prefix_for(&right_arg_graph_index),
-                                                    right_arg = right_arg_sql,
-                                                    maybe_comma = if optionals.len() >= 1 { "," } else { "" },
+                                                    maybe_comma = if !optionals.is_empty() { "," } else { "" },
                                                     optionals = if !optionals.is_empty() { optionals.join(",\n") + "\n" } else { "".to_string() },
                                             );
             ext_sql + &operator_sql
