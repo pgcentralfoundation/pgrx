@@ -208,7 +208,7 @@ impl PgRelation {
     ///
     /// ```rust,no_run
     /// use pgrx::{PgRelation, pg_sys};
-    /// # let example_pg_class_oid = |i| { unsafe { pg_sys::Oid::from_u32_unchecked(i) } };
+    /// # let example_pg_class_oid = |i| pg_sys::Oid::from(i);
     /// let oid = example_pg_class_oid(42); // a valid pg_class "oid" value
     /// let relation = unsafe { PgRelation::from_pg(pg_sys::RelationIdGetRelation(oid) ) };
     /// let tupdesc = relation.tuple_desc();
@@ -309,7 +309,7 @@ impl FromDatum for PgRelation {
             None
         } else {
             Some(PgRelation::with_lock(
-                unsafe { pg_sys::Oid::from_u32_unchecked(u32::try_from(datum.value()).ok()?) },
+                pg_sys::Oid::from(u32::try_from(datum.value()).ok()?),
                 pg_sys::AccessShareLock as pg_sys::LOCKMODE,
             ))
         }

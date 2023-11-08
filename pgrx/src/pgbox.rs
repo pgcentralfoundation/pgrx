@@ -73,7 +73,7 @@ use std::ptr::NonNull;
 /// use pgrx::prelude::*;
 ///
 /// pub fn do_something()  {
-/// # let example_rel_oid = |i| { unsafe { pg_sys::Oid::from_u32_unchecked(i) } };
+/// # let example_rel_oid = |i| pg_sys::Oid::from(i);
 ///     // open a relation and project it as a pg_sys::Relation
 ///     let relid: pg_sys::Oid = example_rel_oid(42);
 ///     let lockmode = pg_sys::AccessShareLock as i32;

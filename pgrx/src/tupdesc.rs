@@ -116,7 +116,7 @@ impl<'a> PgTupleDesc<'a> {
     ///
     /// ```rust,no_run
     /// use pgrx::{pg_sys, PgTupleDesc};
-    /// # let example_pg_type_oid = |i| { unsafe { pg_sys::Oid::from_u32_unchecked(i) } };
+    /// # let example_pg_type_oid = |i| pg_sys::Oid::from(i);
     /// let typid = example_pg_type_oid(42); // a valid pg_type Oid
     /// let typmod = 0; // its corresponding typemod value
     /// let tupdesc = unsafe { PgTupleDesc::from_pg_is_copy(pg_sys::lookup_rowtype_tupdesc_copy(typid, typmod)) };
