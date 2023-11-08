@@ -106,7 +106,7 @@ impl std::fmt::Display for ControlFileError {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         match self {
             ControlFileError::MissingField { field } => {
-                write!(f, "Missing field in control file! Please add `{}`.", field)?;
+                write!(f, "Missing field in control file! Please add `{field}`.")?;
             }
         };
         Ok(())
