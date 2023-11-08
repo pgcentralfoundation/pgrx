@@ -752,8 +752,52 @@ fn impl_postgres_type(ast: DeriveInput) -> syn::Result<proc_macro2::TokenStream>
     };
 
     // all #[derive(PostgresType)] need to implement that trait
+    // and also the FromDatum and IntoDatum
     stream.extend(quote! {
-        impl #generics ::pgrx::PostgresType for #name #generics { }
+        impl #generics ::pgrx::datum::PostgresType for #name #generics { }
+
+        impl #generics ::pgrx::datum::IntoDatum for #name #generics {
+            fn into_datum(self) -> Option<::pgrx::pg_sys::Datum> {
+                #[allow(deprecated)]
+                Some(unsafe { ::pgrx::cbor_encode(&self) }.into())
+            }
+
+            fn type_oid() -> ::pgrx::pg_sys::Oid {
+                ::pgrx::wrappers::rust_regtypein::<Self>()
+            }
+        }
+
+        impl #generics ::pgrx::datum::FromDatum for #name #generics {
+            unsafe fn from_polymorphic_datum(
+                datum: ::pgrx::pg_sys::Datum,
+                is_null: bool,
+                _typoid: ::pgrx::pg_sys::Oid,
+            ) -> Option<Self> {
+                if is_null {
+                    None
+                } else {
+                    #[allow(deprecated)]
+                    ::pgrx::cbor_decode(datum.cast_mut_ptr())
+                }
+            }
+
+            unsafe fn from_datum_in_memory_context(
+                mut memory_context: ::pgrx::memcxt::PgMemoryContexts,
+                datum: ::pgrx::pg_sys::Datum,
+                is_null: bool,
+                _typoid: ::pgrx::pg_sys::Oid,
+            ) -> Option<Self> {
+                if is_null {
+                    None
+                } else {
+                    memory_context.switch_to(|_| {
+                        // this gets the varlena Datum copied into this memory context
+                        let varlena = ::pgrx::pg_sys::pg_detoast_datum_copy(datum.cast_mut_ptr());
+                        Self::from_datum(varlena.into(), is_null)
+                    })
+                }
+            }
+        }
     });
 
     // and if we don't have custom inout/funcs, we use the JsonInOutFuncs trait

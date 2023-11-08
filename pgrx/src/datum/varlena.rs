@@ -60,8 +60,9 @@ impl Clone for PallocdVarlena {
 /// use std::str::FromStr;
 ///
 /// use pgrx::prelude::*;
+/// use serde::{Serialize, Deserialize};
 ///
-/// #[derive(Copy, Clone, PostgresType)]
+/// #[derive(Copy, Clone, PostgresType, Serialize, Deserialize)]
 /// #[pgvarlena_inoutfuncs]
 /// struct MyType {
 ///    a: f32,
@@ -378,49 +379,6 @@ where
     }
 }
 
-impl<T> IntoDatum for T
-where
-    T: PostgresType + Serialize,
-{
-    fn into_datum(self) -> Option<pg_sys::Datum> {
-        Some(cbor_encode(&self).into())
-    }
-
-    fn type_oid() -> pg_sys::Oid {
-        crate::rust_regtypein::<T>()
-    }
-}
-
-impl<'de, T> FromDatum for T
-where
-    T: PostgresType + Deserialize<'de>,
-{
-    unsafe fn from_polymorphic_datum(
-        datum: pg_sys::Datum,
-        is_null: bool,
-        _typoid: pg_sys::Oid,
-    ) -> Option<Self> {
-        if is_null {
-            None
-        } else {
-            cbor_decode(datum.cast_mut_ptr())
-        }
-    }
-
-    unsafe fn from_datum_in_memory_context(
-        memory_context: PgMemoryContexts,
-        datum: pg_sys::Datum,
-        is_null: bool,
-        _typoid: pg_sys::Oid,
-    ) -> Option<Self> {
-        if is_null {
-            None
-        } else {
-            cbor_decode_into_context(memory_context, datum.cast_mut_ptr())
-        }
-    }
-}
-
 #[doc(hidden)]
 pub unsafe fn cbor_encode<T>(input: T) -> *const pg_sys::varlena
 where
@@ -453,6 +411,7 @@ where
 }
 
 #[doc(hidden)]
+#[deprecated(since = "0.12.0", note = "just use the FromDatum impl")]
 pub unsafe fn cbor_decode_into_context<'de, T>(
     mut memory_context: PgMemoryContexts,
     input: *mut pg_sys::varlena,
