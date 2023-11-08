@@ -63,6 +63,7 @@ impl Oid {
     /// nor cite SQL statements for misdemeanors, nor even truly stop you from foolishness.
     /// Even "trustworthy" is meant here in a similar sense to how raw pointers can be "trustworthy".
     /// Often, you should still check if it's null.
+    #[deprecated(since = "0.12.0", note = "safely converts via SPI, use pg_sys::Oid::from(u32)")]
     pub const unsafe fn from_u32_unchecked(id: u32) -> Oid {
         Oid(id)
     }
@@ -95,6 +96,13 @@ impl fmt::Display for Oid {
             // no idea? print it anyways!
             PgOid::Custom(oid) => write!(f, "oid=#{}", oid.0),
         }
+    }
+}
+
+/// De facto available via SPI
+impl From<u32> for Oid {
+    fn from(word: u32) -> Oid {
+        Oid(word)
     }
 }
 

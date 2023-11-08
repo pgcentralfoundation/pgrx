@@ -195,11 +195,7 @@ impl FromDatum for pg_sys::Oid {
         if is_null {
             None
         } else {
-            datum
-                .value()
-                .try_into()
-                .ok()
-                .map(|uint| unsafe { pg_sys::Oid::from_u32_unchecked(uint) })
+            datum.value().try_into().ok().map(|uint: u32| pg_sys::Oid::from(uint))
         }
     }
 }
