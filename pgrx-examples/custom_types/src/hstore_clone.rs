@@ -16,8 +16,6 @@ use std::collections::HashMap;
 #[derive(Default)]
 pub struct RustStore(HashMap<String, String>);
 
-
-
 #[pg_extern]
 fn rstore(key: String, value: String) -> RustStore {
     RustStore(hashmap!(key => value))
