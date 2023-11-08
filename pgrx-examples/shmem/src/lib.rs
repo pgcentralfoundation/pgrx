@@ -40,7 +40,7 @@ static HASH: PgLwLock<heapless::FnvIndexMap<i32, i32, 4>> = PgLwLock::new();
 static STRUCT: PgLwLock<Pgtest> = PgLwLock::new();
 static PRIMITIVE: PgLwLock<i32> = PgLwLock::new();
 static ATOMIC: PgAtomic<std::sync::atomic::AtomicBool> = PgAtomic::new();
-static HASH_TABLE: PgHashMap = PgHashMap::new(25);
+static HASH_TABLE: PgHashMap<i64, f32> = PgHashMap::new(2);
 
 #[pg_guard]
 pub extern "C" fn _PG_init() {
@@ -64,8 +64,18 @@ fn vec_count() -> i32 {
 }
 
 #[pg_extern]
-fn hash_table_insert(key: i64, value: i64) {
-    HASH_TABLE.insert(key, value);
+fn hash_table_insert(key: i64, value: f32) {
+    HASH_TABLE.insert(key, value).unwrap();
+}
+
+#[pg_extern]
+fn hash_table_get(key: i64) -> Option<f32> {
+    HASH_TABLE.get(key)
+}
+
+#[pg_extern]
+fn hash_table_remove(key: i64) -> Option<f32> {
+    HASH_TABLE.remove(key)
 }
 
 #[pg_extern]
