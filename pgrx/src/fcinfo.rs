@@ -97,7 +97,7 @@ macro_rules! variadic {
 /// underlying datum is at the argument `num` position.  This too, is your responsibility
 #[inline]
 pub unsafe fn pg_getarg<T: FromDatum>(fcinfo: pg_sys::FunctionCallInfo, num: usize) -> Option<T> {
-    let datum = get_nullable_datum(fcinfo, num);
+    let datum = pg_get_nullable_datum(fcinfo, num);
     unsafe {
         if T::GET_TYPOID {
             T::from_polymorphic_datum(datum.value, datum.isnull, super::pg_getarg_type(fcinfo, num))
@@ -115,7 +115,7 @@ pub unsafe fn pg_getarg<T: FromDatum>(fcinfo: pg_sys::FunctionCallInfo, num: usi
 /// [`pg_sys::FunctionCallInfo`] pointer.  This is your responsibility.
 #[inline]
 pub unsafe fn pg_arg_is_null(fcinfo: pg_sys::FunctionCallInfo, num: usize) -> bool {
-    get_nullable_datum(fcinfo, num).isnull
+    pg_get_nullable_datum(fcinfo, num).isnull
 }
 
 /// Get a numbered argument for a `PG_FUNCTION_INFO_V1` function as an Option containing a
@@ -135,7 +135,7 @@ pub unsafe fn pg_getarg_datum(
     if pg_arg_is_null(fcinfo, num) {
         None
     } else {
-        Some(get_nullable_datum(fcinfo, num).value)
+        Some(pg_get_nullable_datum(fcinfo, num).value)
     }
 }
 
@@ -147,18 +147,17 @@ pub unsafe fn pg_getarg_datum(
 /// [`pg_sys::FunctionCallInfo`] pointer.  This is your responsibility.
 #[inline]
 pub unsafe fn pg_getarg_datum_raw(fcinfo: pg_sys::FunctionCallInfo, num: usize) -> pg_sys::Datum {
-    get_nullable_datum(fcinfo, num).value
+    pg_get_nullable_datum(fcinfo, num).value
 }
 
-/// Similar to [`pg_getarg_datum_raw`] but returns Postgres' [`pg_sys::NullableDatum`] tyoe.
+/// Returns the [`pg_sys::NullableDatum`] for a given arg.
 ///
 /// # Safety
 ///
 /// This function is unsafe as we cannot ensure the `fcinfo` argument is a valid
 /// [`pg_sys::FunctionCallInfo`] pointer.  This is your responsibility.
-#[doc(hidden)]
 #[inline]
-unsafe fn get_nullable_datum(
+pub unsafe fn pg_get_nullable_datum(
     fcinfo: pg_sys::FunctionCallInfo,
     num: usize,
 ) -> pg_sys::NullableDatum {
@@ -203,25 +202,6 @@ pub unsafe fn pg_get_collation(fcinfo: pg_sys::FunctionCallInfo) -> pg_sys::Oid 
     fcinfo.fncollation
 }
 
-/// Get a numbered argument for a `PG_FUNCTION_INFO_V1` function as raw pointer to a Rust type `T`.
-///
-/// If the specified argument Datum is NULL, returns [`Option::None`].
-///
-/// # Safety
-///
-/// This function is unsafe as we cannot ensure the `fcinfo` argument is a valid
-/// [`pg_sys::FunctionCallInfo`] pointer.  This is your responsibility.
-///
-/// It is also your responsibility to ensure the specified type `T` is what the argument Datum
-/// points to.
-#[inline]
-pub unsafe fn pg_getarg_pointer<T>(fcinfo: pg_sys::FunctionCallInfo, num: usize) -> Option<*mut T> {
-    unsafe {
-        // SAFETY:  The user has asserted that `fcinfo` is valid
-        pg_getarg_datum(fcinfo, num).map(|datum| datum.cast_mut_ptr::<T>())
-    }
-}
-
 /// # Safety
 ///
 /// The provided `fcinfo` must be valid otherwise this function results in undefined behavior due
@@ -229,24 +209,6 @@ pub unsafe fn pg_getarg_pointer<T>(fcinfo: pg_sys::FunctionCallInfo, num: usize)
 #[inline]
 pub unsafe fn pg_getarg_type(fcinfo: pg_sys::FunctionCallInfo, num: usize) -> pg_sys::Oid {
     pg_sys::get_fn_expr_argtype(fcinfo.as_ref().unwrap().flinfo, num as std::os::raw::c_int)
-}
-
-/// This is intended for Postgres functions that take an actual `cstring` argument, not for getting
-/// a varlena argument type as a CStr.
-///
-/// # Safety
-///
-/// This function is unsafe as we cannot ensure the `fcinfo` argument is a valid
-/// [`pg_sys::FunctionCallInfo`] pointer.  This is your responsibility.
-///
-/// It is also your responsibility to ensure that the argument Datum is pointing to a valid
-/// [`core::ffi::CStr`].
-#[inline]
-pub unsafe fn pg_getarg_cstr<'a>(
-    fcinfo: pg_sys::FunctionCallInfo,
-    num: usize,
-) -> Option<&'a core::ffi::CStr> {
-    pg_getarg_pointer(fcinfo, num).map(|ptr| unsafe { core::ffi::CStr::from_ptr(ptr) })
 }
 
 /// Indicates that a `PG_FUNCTION_INFO_V1` function is returning a SQL "void".
@@ -258,17 +220,11 @@ pub unsafe fn pg_getarg_cstr<'a>(
 /// use pgrx::prelude::*;
 ///
 /// fn foo(fcinfo: pg_sys::FunctionCallInfo) -> pg_sys::Datum {
-///
-///     return unsafe { pg_return_void() };
+///     pg_return_void()
 /// }
 ///```
-///
-/// # Safety
-///
-/// This function is unsafe for symmetry with the other related functions that deal with
-/// `PG_FUNCTION_INFO_V1` functions.  It has no specific safety invariants that must be met.
 #[inline]
-pub unsafe fn pg_return_void() -> pg_sys::Datum {
+pub fn pg_return_void() -> pg_sys::Datum {
     pg_sys::Datum::from(0)
 }
 
