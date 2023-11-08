@@ -18,9 +18,10 @@ use syn::spanned::Spanned;
 use syn::{parse_macro_input, Attribute, Data, DeriveInput, Item, ItemImpl};
 
 use operators::{deriving_postgres_eq, deriving_postgres_hash, deriving_postgres_ord};
-use pgrx_sql_entity_graph::{
+use pgrx_sql_entity_graph as sql_gen;
+use sql_gen::{
     parse_extern_attributes, CodeEnrichment, ExtensionSql, ExtensionSqlFile, ExternArgs,
-    PgAggregate, PgExtern, PostgresEnum, PostgresType, Schema,
+    PgAggregate, PgExtern, PostgresEnum, Schema,
 };
 
 use crate::rewriter::PgGuardRewriter;
@@ -878,7 +879,7 @@ fn impl_postgres_type(ast: DeriveInput) -> syn::Result<proc_macro2::TokenStream>
         });
     }
 
-    let sql_graph_entity_item = PostgresType::from_derive_input(ast)?;
+    let sql_graph_entity_item = sql_gen::PostgresTypeDerive::from_derive_input(ast)?;
     sql_graph_entity_item.to_tokens(&mut stream);
 
     Ok(stream)

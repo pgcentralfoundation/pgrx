@@ -42,7 +42,7 @@ pub use postgres_hash::PostgresHash;
 pub use postgres_ord::entity::PostgresOrdEntity;
 pub use postgres_ord::PostgresOrd;
 pub use postgres_type::entity::PostgresTypeEntity;
-pub use postgres_type::PostgresType;
+pub use postgres_type::PostgresTypeDerive;
 pub use schema::entity::SchemaEntity;
 pub use schema::Schema;
 pub use to_sql::entity::ToSqlConfigEntity;
