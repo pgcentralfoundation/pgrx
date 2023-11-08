@@ -34,11 +34,11 @@ use crate::{CodeEnrichment, ToSqlConfig};
 /// ```rust
 /// use syn::{Macro, parse::Parse, parse_quote, parse};
 /// use quote::{quote, ToTokens};
-/// use pgrx_sql_entity_graph::PostgresType;
+/// use pgrx_sql_entity_graph::PostgresTypeDerive;
 ///
 /// # fn main() -> eyre::Result<()> {
 /// use pgrx_sql_entity_graph::CodeEnrichment;
-/// let parsed: CodeEnrichment<PostgresType> = parse_quote! {
+/// let parsed: CodeEnrichment<PostgresTypeDerive> = parse_quote! {
 ///     #[derive(PostgresType)]
 ///     struct Example<'a> {
 ///         demo: &'a str,
