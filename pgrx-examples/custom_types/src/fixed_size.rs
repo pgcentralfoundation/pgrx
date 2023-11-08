@@ -11,11 +11,12 @@ use core::ffi::CStr;
 use pgrx::prelude::*;
 use pgrx::{opname, pg_operator, PgVarlena, PgVarlenaInOutFuncs, StringInfo};
 use std::str::FromStr;
+use serde::{Deserialize, Serialize};
 
-#[derive(Copy, Clone, PostgresType)]
+#[derive(Copy, Clone, PostgresType, Serialize, Deserialize)]
 #[pgvarlena_inoutfuncs]
 pub struct FixedF32Array {
-    array: [f32; 91],
+    array: [f32; 32],
 }
 
 impl PgVarlenaInOutFuncs for FixedF32Array {

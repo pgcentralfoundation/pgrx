@@ -13,7 +13,7 @@ use pgrx::{InOutFuncs, PgVarlena, PgVarlenaInOutFuncs, StringInfo};
 use serde::{Deserialize, Serialize};
 use std::str::FromStr;
 
-#[derive(Copy, Clone, PostgresType)]
+#[derive(Copy, Clone, PostgresType, Serialize, Deserialize)]
 #[pgvarlena_inoutfuncs]
 pub struct VarlenaType {
     a: f32,
@@ -38,7 +38,7 @@ impl PgVarlenaInOutFuncs for VarlenaType {
     }
 }
 
-#[derive(Copy, Clone, PostgresType)]
+#[derive(Copy, Clone, PostgresType, Serialize, Deserialize)]
 #[pgvarlena_inoutfuncs]
 pub enum VarlenaEnumType {
     A,
