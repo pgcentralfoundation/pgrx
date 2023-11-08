@@ -18,9 +18,10 @@ use syn::spanned::Spanned;
 use syn::{parse_macro_input, Attribute, Data, DeriveInput, Item, ItemImpl};
 
 use operators::{deriving_postgres_eq, deriving_postgres_hash, deriving_postgres_ord};
-use pgrx_sql_entity_graph::{
+use pgrx_sql_entity_graph as sql_gen;
+use sql_gen::{
     parse_extern_attributes, CodeEnrichment, ExtensionSql, ExtensionSqlFile, ExternArgs,
-    PgAggregate, PgExtern, PostgresEnum, PostgresType, Schema,
+    PgAggregate, PgExtern, PostgresEnum, Schema,
 };
 
 use crate::rewriter::PgGuardRewriter;
@@ -709,7 +710,16 @@ Optionally accepts the following attributes:
 * `pgvarlena_inoutfuncs(some_in_fn, some_out_fn)`: Define custom in/out functions for the `PgVarlena` of this type.
 * `sql`: Same arguments as [`#[pgrx(sql = ..)]`](macro@pgrx).
 */
-#[proc_macro_derive(PostgresType, attributes(inoutfuncs, pgvarlena_inoutfuncs, requires, pgrx))]
+#[proc_macro_derive(
+    PostgresType,
+    attributes(
+        inoutfuncs,
+        pgvarlena_inoutfuncs,
+        bikeshed_postgres_type_manually_impl_from_into_datum,
+        requires,
+        pgrx
+    )
+)]
 pub fn postgres_type(input: TokenStream) -> TokenStream {
     let ast = parse_macro_input!(input as syn::DeriveInput);
 
@@ -752,9 +762,59 @@ fn impl_postgres_type(ast: DeriveInput) -> syn::Result<proc_macro2::TokenStream>
     };
 
     // all #[derive(PostgresType)] need to implement that trait
+    // and also the FromDatum and IntoDatum
     stream.extend(quote! {
-        impl #generics ::pgrx::PostgresType for #name #generics { }
+        impl #generics ::pgrx::datum::PostgresType for #name #generics { }
     });
+
+    if !args.contains(&PostgresTypeAttribute::ManualFromIntoDatum) {
+        stream.extend(
+            quote! {
+                impl #generics ::pgrx::datum::IntoDatum for #name #generics {
+                    fn into_datum(self) -> Option<::pgrx::pg_sys::Datum> {
+                        #[allow(deprecated)]
+                        Some(unsafe { ::pgrx::cbor_encode(&self) }.into())
+                    }
+
+                    fn type_oid() -> ::pgrx::pg_sys::Oid {
+                        ::pgrx::wrappers::rust_regtypein::<Self>()
+                    }
+                }
+
+                impl #generics ::pgrx::datum::FromDatum for #name #generics {
+                    unsafe fn from_polymorphic_datum(
+                        datum: ::pgrx::pg_sys::Datum,
+                        is_null: bool,
+                        _typoid: ::pgrx::pg_sys::Oid,
+                    ) -> Option<Self> {
+                        if is_null {
+                            None
+                        } else {
+                            #[allow(deprecated)]
+                            ::pgrx::cbor_decode(datum.cast_mut_ptr())
+                        }
+                    }
+
+                    unsafe fn from_datum_in_memory_context(
+                        mut memory_context: ::pgrx::memcxt::PgMemoryContexts,
+                        datum: ::pgrx::pg_sys::Datum,
+                        is_null: bool,
+                        _typoid: ::pgrx::pg_sys::Oid,
+                    ) -> Option<Self> {
+                        if is_null {
+                            None
+                        } else {
+                            memory_context.switch_to(|_| {
+                                // this gets the varlena Datum copied into this memory context
+                                let varlena = ::pgrx::pg_sys::pg_detoast_datum_copy(datum.cast_mut_ptr());
+                                Self::from_datum(varlena.into(), is_null)
+                            })
+                        }
+                    }
+                }
+            }
+        )
+    }
 
     // and if we don't have custom inout/funcs, we use the JsonInOutFuncs trait
     // which implements _in and _out #[pg_extern] functions that just return the type itself
@@ -834,7 +894,7 @@ fn impl_postgres_type(ast: DeriveInput) -> syn::Result<proc_macro2::TokenStream>
         });
     }
 
-    let sql_graph_entity_item = PostgresType::from_derive_input(ast)?;
+    let sql_graph_entity_item = sql_gen::PostgresTypeDerive::from_derive_input(ast)?;
     sql_graph_entity_item.to_tokens(&mut stream);
 
     Ok(stream)
@@ -933,6 +993,7 @@ enum PostgresTypeAttribute {
     InOutFuncs,
     PgVarlenaInOutFuncs,
     Default,
+    ManualFromIntoDatum,
 }
 
 fn parse_postgres_type_args(attributes: &[Attribute]) -> HashSet<PostgresTypeAttribute> {
@@ -945,11 +1006,12 @@ fn parse_postgres_type_args(attributes: &[Attribute]) -> HashSet<PostgresTypeAtt
             "inoutfuncs" => {
                 categorized_attributes.insert(PostgresTypeAttribute::InOutFuncs);
             }
-
             "pgvarlena_inoutfuncs" => {
                 categorized_attributes.insert(PostgresTypeAttribute::PgVarlenaInOutFuncs);
             }
-
+            "bikeshed_postgres_type_manually_impl_from_into_datum" => {
+                categorized_attributes.insert(PostgresTypeAttribute::ManualFromIntoDatum);
+            }
             _ => {
                 // we can just ignore attributes we don't understand
             }

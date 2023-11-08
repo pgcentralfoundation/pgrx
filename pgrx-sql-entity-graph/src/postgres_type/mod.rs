@@ -34,11 +34,11 @@ use crate::{CodeEnrichment, ToSqlConfig};
 /// ```rust
 /// use syn::{Macro, parse::Parse, parse_quote, parse};
 /// use quote::{quote, ToTokens};
-/// use pgrx_sql_entity_graph::PostgresType;
+/// use pgrx_sql_entity_graph::PostgresTypeDerive;
 ///
 /// # fn main() -> eyre::Result<()> {
 /// use pgrx_sql_entity_graph::CodeEnrichment;
-/// let parsed: CodeEnrichment<PostgresType> = parse_quote! {
+/// let parsed: CodeEnrichment<PostgresTypeDerive> = parse_quote! {
 ///     #[derive(PostgresType)]
 ///     struct Example<'a> {
 ///         demo: &'a str,
@@ -49,7 +49,7 @@ use crate::{CodeEnrichment, ToSqlConfig};
 /// # }
 /// ```
 #[derive(Debug, Clone)]
-pub struct PostgresType {
+pub struct PostgresTypeDerive {
     name: Ident,
     generics: Generics,
     in_fn: Ident,
@@ -57,7 +57,7 @@ pub struct PostgresType {
     to_sql_config: ToSqlConfig,
 }
 
-impl PostgresType {
+impl PostgresTypeDerive {
     pub fn new(
         name: Ident,
         generics: Generics,
@@ -100,7 +100,7 @@ impl PostgresType {
     }
 }
 
-impl ToEntityGraphTokens for PostgresType {
+impl ToEntityGraphTokens for PostgresTypeDerive {
     fn to_entity_graph_tokens(&self) -> TokenStream2 {
         let name = &self.name;
         let mut static_generics = self.generics.clone();
@@ -211,17 +211,14 @@ impl ToEntityGraphTokens for PostgresType {
     }
 }
 
-impl ToRustCodeTokens for PostgresType {}
+impl ToRustCodeTokens for PostgresTypeDerive {}
 
-impl Parse for CodeEnrichment<PostgresType> {
+impl Parse for CodeEnrichment<PostgresTypeDerive> {
     fn parse(input: ParseStream) -> Result<Self, syn::Error> {
-        let parsed: ItemStruct = input.parse()?;
-        let to_sql_config =
-            ToSqlConfig::from_attributes(parsed.attrs.as_slice())?.unwrap_or_default();
-        let funcname_in =
-            Ident::new(&format!("{}_in", parsed.ident).to_lowercase(), parsed.ident.span());
-        let funcname_out =
-            Ident::new(&format!("{}_out", parsed.ident).to_lowercase(), parsed.ident.span());
-        PostgresType::new(parsed.ident, parsed.generics, funcname_in, funcname_out, to_sql_config)
+        let ItemStruct { attrs, ident, generics, .. } = input.parse()?;
+        let to_sql_config = ToSqlConfig::from_attributes(attrs.as_slice())?.unwrap_or_default();
+        let in_fn = Ident::new(&format!("{}_in", ident).to_lowercase(), ident.span());
+        let out_fn = Ident::new(&format!("{}_out", ident).to_lowercase(), ident.span());
+        PostgresTypeDerive::new(ident, generics, in_fn, out_fn, to_sql_config)
     }
 }
