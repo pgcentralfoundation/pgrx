@@ -559,7 +559,7 @@ impl PgAggregate {
             type_args: type_args_value,
             type_ordered_set_args: type_ordered_set_args_value,
             type_moving_state: type_moving_state_value,
-            type_stype: type_stype,
+            type_stype,
             const_parallel: get_impl_const_by_name(&item_impl_snapshot, "PARALLEL")
                 .map(|x| x.expr.clone()),
             const_finalize_modify: get_impl_const_by_name(&item_impl_snapshot, "FINALIZE_MODIFY")

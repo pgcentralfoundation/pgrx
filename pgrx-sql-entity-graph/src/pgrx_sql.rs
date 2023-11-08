@@ -229,7 +229,7 @@ impl PgrxSql {
         connect_triggers(&mut graph, &mapped_triggers, &mapped_schemas);
 
         let this = Self {
-            control: control,
+            control,
             schemas: mapped_schemas,
             extension_sqls: mapped_extension_sqls,
             externs: mapped_externs,
@@ -240,11 +240,11 @@ impl PgrxSql {
             hashes: mapped_hashes,
             aggregates: mapped_aggregates,
             triggers: mapped_triggers,
-            graph: graph,
+            graph,
             graph_root: root,
             graph_bootstrap: bootstrap,
             graph_finalize: finalize,
-            extension_name: extension_name,
+            extension_name,
             versioned_so,
         };
         Ok(this)
