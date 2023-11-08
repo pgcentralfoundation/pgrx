@@ -112,19 +112,19 @@ mod tests {
             "SELECT '1;2;3;[1,2,3,4,5]'::pgvarlenathing < '2;2;3;[1,2,3,4,5]'::pgvarlenathing",
         )?
         .unwrap();
-        assert_eq!(lt, true);
+        assert!(lt);
 
         let gt = Spi::get_one::<bool>(
             "SELECT '2;2;3;[1,2,3,4,5]'::pgvarlenathing > '1;2;3;[1,2,3,4,5]'::pgvarlenathing",
         )?
         .unwrap();
-        assert_eq!(gt, true);
+        assert!(gt);
 
         let eq = Spi::get_one::<bool>(
             "SELECT '1;2;3;[1,2,3,4,5]'::pgvarlenathing = '1;2;3;[1,2,3,4,5]'::pgvarlenathing",
         )?
         .unwrap();
-        assert_eq!(eq, true);
+        assert!(eq);
 
         Ok(())
     }

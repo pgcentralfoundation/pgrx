@@ -13,13 +13,8 @@ use serde::*;
 use std::collections::HashMap;
 
 #[derive(PostgresType, Serialize, Deserialize, Debug, Eq, PartialEq)]
+#[derive(Default)]
 pub struct RustStore(HashMap<String, String>);
-
-impl Default for RustStore {
-    fn default() -> Self {
-        RustStore(HashMap::default())
-    }
-}
 
 #[pg_extern]
 fn rstore(key: String, value: String) -> RustStore {
@@ -35,7 +30,7 @@ fn rstore_put(rstore: Option<RustStore>, key: String, value: String) -> RustStor
 
 #[pg_extern]
 fn rstore_get(rstore: Option<RustStore>, key: String) -> Option<String> {
-    rstore.map_or(None, |rstore| rstore.0.get(&key).cloned())
+    rstore.and_then(|rstore| rstore.0.get(&key).cloned())
 }
 
 #[pg_extern]
@@ -64,7 +59,7 @@ fn rstore_table(
     rstore: Option<RustStore>,
 ) -> TableIterator<'static, (name!(key, String), name!(value, String))> {
     match rstore {
-        Some(rstore) => TableIterator::new(rstore.0.into_iter()),
+        Some(rstore) => TableIterator::new(rstore.0),
         None => TableIterator::once((String::new(), String::new())),
     }
 }

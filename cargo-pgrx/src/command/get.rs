@@ -40,7 +40,7 @@ impl CommandExecute for Get {
             crate::manifest::manifest_path(&metadata, self.package.as_ref())
                 .wrap_err("Couldn't get manifest path")?;
 
-        if let Some(value) = get_property(&package_manifest_path, &self.name)? {
+        if let Some(value) = get_property(package_manifest_path, &self.name)? {
             println!("{}", value);
         }
         Ok(())
@@ -72,7 +72,7 @@ pub fn get_property(manifest_path: impl AsRef<Path>, name: &str) -> eyre::Result
             continue;
         }
 
-        let (k, v) = (parts.get(0).unwrap().trim(), parts.get(1).unwrap().trim());
+        let (k, v) = (parts.first().unwrap().trim(), parts.get(1).unwrap().trim());
 
         if k == name {
             let v = v.trim_start_matches('\'');

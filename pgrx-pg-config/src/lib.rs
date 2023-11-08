@@ -268,7 +268,7 @@ impl PgConfig {
         } else {
             PgMinorVersion::Release(minor)
         };
-        return Ok((major, minor));
+        Ok((major, minor))
     }
 
     fn get_version(&self) -> eyre::Result<(u16, PgMinorVersion)> {
@@ -611,7 +611,7 @@ impl Pgrx {
     /// such as `pg14` or `pg15`
     pub fn is_feature_flag(&self, label: &str) -> bool {
         for pgver in SUPPORTED_VERSIONS() {
-            if label == &format!("pg{}", pgver.major) {
+            if label == format!("pg{}", pgver.major) {
                 return true;
             }
         }
@@ -738,7 +738,7 @@ fn does_db_exist(pg_config: &PgConfig, dbname: &str) -> eyre::Result<bool> {
         .arg("-c")
         .arg(&format!(
             "select count(*) from pg_database where datname = '{}';",
-            dbname.replace("'", "''")
+            dbname.replace('\'', "''")
         ))
         .stdout(Stdio::piped())
         .stderr(Stdio::piped());
@@ -747,15 +747,15 @@ fn does_db_exist(pg_config: &PgConfig, dbname: &str) -> eyre::Result<bool> {
     let output = command.output()?;
 
     if !output.status.success() {
-        return Err(eyre!(
+        Err(eyre!(
             "problem checking if database '{}' exists: {}\n\n{}{}",
             dbname,
             command_str,
             String::from_utf8(output.stdout).unwrap(),
             String::from_utf8(output.stderr).unwrap()
-        ));
+        ))
     } else {
-        let count = i32::from_str(&String::from_utf8(output.stdout).unwrap().trim())
+        let count = i32::from_str(String::from_utf8(output.stdout).unwrap().trim())
             .wrap_err("result is not a number")?;
         Ok(count > 0)
     }

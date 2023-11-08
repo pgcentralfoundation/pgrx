@@ -22,15 +22,12 @@ pgrx::pg_module_magic!();
 #[derive(Copy, Clone)]
 // This is for general Postgres type support -- not strictly necessary if the type is not exposed via SQL
 #[derive(PostgresType, Serialize, Deserialize)]
+#[derive(Default)]
 pub struct Pgtest {
     value1: i32,
     value2: i32,
 }
-impl Default for Pgtest {
-    fn default() -> Self {
-        Pgtest { value1: 0, value2: 0 }
-    }
-}
+
 unsafe impl PGRXSharedMemory for Pgtest {}
 
 static DEQUE: PgLwLock<heapless::Deque<Pgtest, 400>> = PgLwLock::new();
@@ -52,7 +49,7 @@ pub extern "C" fn _PG_init() {
 
 #[pg_extern]
 fn vec_select() -> SetOfIterator<'static, Pgtest> {
-    SetOfIterator::new(VEC.share().iter().map(|i| *i).collect::<Vec<Pgtest>>().into_iter())
+    SetOfIterator::new(VEC.share().iter().copied().collect::<Vec<Pgtest>>())
 }
 
 #[pg_extern]
@@ -63,9 +60,9 @@ fn vec_count() -> i32 {
 #[pg_extern]
 fn vec_drain() -> SetOfIterator<'static, Pgtest> {
     let mut vec = VEC.exclusive();
-    let r = vec.iter().map(|i| *i).collect::<Vec<Pgtest>>();
+    let r = vec.iter().copied().collect::<Vec<Pgtest>>();
     vec.clear();
-    SetOfIterator::new(r.into_iter())
+    SetOfIterator::new(r)
 }
 
 #[pg_extern]
@@ -80,7 +77,7 @@ fn vec_pop() -> Option<Pgtest> {
 
 #[pg_extern]
 fn deque_select() -> SetOfIterator<'static, Pgtest> {
-    SetOfIterator::new(DEQUE.share().iter().map(|i| *i).collect::<Vec<Pgtest>>().into_iter())
+    SetOfIterator::new(DEQUE.share().iter().copied().collect::<Vec<Pgtest>>())
 }
 
 #[pg_extern]
@@ -91,9 +88,9 @@ fn deque_count() -> i32 {
 #[pg_extern]
 fn deque_drain() -> SetOfIterator<'static, Pgtest> {
     let mut vec = DEQUE.exclusive();
-    let r = vec.iter().map(|i| *i).collect::<Vec<Pgtest>>();
+    let r = vec.iter().copied().collect::<Vec<Pgtest>>();
     vec.clear();
-    SetOfIterator::new(r.into_iter())
+    SetOfIterator::new(r)
 }
 
 #[pg_extern]
@@ -134,7 +131,7 @@ fn hash_get(key: i32) -> Option<i32> {
 
 #[pg_extern]
 fn struct_get() -> Pgtest {
-    STRUCT.share().clone()
+    *STRUCT.share()
 }
 
 #[pg_extern]
@@ -144,7 +141,7 @@ fn struct_set(value1: i32, value2: i32) {
 
 #[pg_extern]
 fn primitive_get() -> i32 {
-    PRIMITIVE.share().clone()
+    *PRIMITIVE.share()
 }
 
 #[pg_extern]

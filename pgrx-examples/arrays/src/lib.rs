@@ -37,7 +37,7 @@ fn default_array() -> Vec<i32> {
 
 #[pg_extern(requires = [ default_array, ])]
 fn sum_array(input: default!(Array<i32>, "default_array()")) -> i64 {
-    let mut sum = 0 as i64;
+    let mut sum = 0_i64;
 
     for i in input {
         sum += i.unwrap_or(-1) as i64;
@@ -48,7 +48,7 @@ fn sum_array(input: default!(Array<i32>, "default_array()")) -> i64 {
 
 #[pg_extern]
 fn sum_vec(mut input: Vec<Option<i32>>) -> i64 {
-    let mut sum = 0 as i64;
+    let mut sum = 0_i64;
 
     input.push(Some(6));
 
@@ -66,14 +66,11 @@ fn static_names() -> Vec<Option<&'static str>> {
 
 #[pg_extern]
 fn static_names_set() -> SetOfIterator<'static, Vec<Option<&'static str>>> {
-    SetOfIterator::new(
-        vec![
-            vec![Some("Brandy"), Some("Sally"), None, Some("Anchovy")],
-            vec![Some("Eric"), Some("David")],
-            vec![Some("ZomboDB"), Some("PostgreSQL"), Some("Elasticsearch")],
-        ]
-        .into_iter(),
-    )
+    SetOfIterator::new(vec![
+        vec![Some("Brandy"), Some("Sally"), None, Some("Anchovy")],
+        vec![Some("Eric"), Some("David")],
+        vec![Some("ZomboDB"), Some("PostgreSQL"), Some("Elasticsearch")],
+    ])
 }
 
 #[pg_extern]
@@ -88,7 +85,7 @@ fn i32_array_with_nulls() -> Vec<Option<i32>> {
 
 #[pg_extern]
 fn strip_nulls(input: Vec<Option<i32>>) -> Vec<i32> {
-    input.into_iter().filter(|i| i.is_some()).map(|i| i.unwrap()).collect()
+    input.into_iter().flatten().collect()
 }
 
 #[derive(PostgresType, Serialize, Deserialize, Debug, Eq, PartialEq)]
@@ -115,17 +112,17 @@ mod vectors {
 
     #[pg_extern]
     fn sum_vector_array(input: Array<f32>) -> f32 {
-        input.iter_deny_null().map(|v| v as f32).sum()
+        input.iter_deny_null().sum()
     }
 
     #[pg_extern]
     fn sum_vector_vec(input: Vec<f32>) -> f32 {
-        input.into_iter().map(|v| v as f32).sum()
+        input.into_iter().sum()
     }
 
     #[pg_extern]
     fn sum_vector_slice(input: Array<f32>) -> Result<f32, ArraySliceError> {
-        Ok(input.as_slice()?.iter().map(|v| *v as f32).sum())
+        Ok(input.as_slice()?.iter().copied().sum())
     }
 
     #[pg_extern]

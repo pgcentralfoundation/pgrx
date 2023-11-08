@@ -56,9 +56,9 @@ fn calculate_human_years() -> Result<
 
     Spi::connect(|client| {
         let mut results = Vec::new();
-        let mut tup_table = client.select(query, None, None)?;
+        let tup_table = client.select(query, None, None)?;
 
-        while let Some(row) = tup_table.next() {
+        for row in tup_table {
             let dog_name = row["dog_name"].value::<String>();
             let dog_age = row["dog_age"].value::<i32>()?.expect("dog_age was null");
             let dog_breed = row["dog_breed"].value::<String>();
@@ -66,7 +66,7 @@ fn calculate_human_years() -> Result<
             results.push((dog_name, dog_age, dog_breed, human_age));
         }
 
-        Ok(TableIterator::new(results.into_iter()))
+        Ok(TableIterator::new(results))
     })
 }
 
@@ -98,7 +98,7 @@ fn filter_by_breed(
         let filtered = tup_table
             .map(|row| (row["dog_name"].value(), row["dog_age"].value(), row["dog_breed"].value()))
             .collect::<Vec<_>>();
-        Ok(TableIterator::new(filtered.into_iter()))
+        Ok(TableIterator::new(filtered))
     })
 }
 

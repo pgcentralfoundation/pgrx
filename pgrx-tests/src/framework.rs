@@ -60,7 +60,7 @@ where
         Option<&[&(dyn postgres::types::ToSql + Sync)]>,
     ) -> Result<T, postgres::Error>,
 {
-    let result = f(query.clone(), query_params.clone());
+    let result = f(query.clone(), query_params);
 
     match result {
         Ok(result) => Ok(result),
@@ -103,7 +103,7 @@ where
 
                 Err(eyre!(message))
             } else {
-                return Err(e).wrap_err("non-DbError");
+                Err(e).wrap_err("non-DbError")
             }
         }
     }
@@ -161,7 +161,7 @@ pub fn run_test(
 
                 (pg_location, rust_location, received_error_message.to_string())
             } else {
-                ("<unknown>".to_string(), "<unknown>".to_string(), format!("{error_as_string}"))
+                ("<unknown>".to_string(), "<unknown>".to_string(), error_as_string.to_string())
             };
 
         // wait a second for Postgres to get log messages written to stderr
@@ -247,7 +247,7 @@ pub fn client() -> eyre::Result<(postgres::Client, String)> {
         .host(pg_config.host())
         .port(pg_config.test_port().expect("unable to determine test port"))
         .user(&get_pg_user())
-        .dbname(&get_pg_dbname())
+        .dbname(get_pg_dbname())
         .connect(postgres::NoTls)
         .wrap_err("Error connecting to Postgres")?;
 
@@ -550,7 +550,7 @@ fn monitor_pg(mut command: Command, cmd_string: String, loglines: LogLines) -> S
         // wait for the database to say its ready to start up
         let reader = BufReader::new(child.stderr.take().expect("couldn't take postmaster stderr"));
 
-        let regex = regex::Regex::new(r#"\[.*?\] \[.*?\] \[(?P<session_id>.*?)\]"#).unwrap();
+        let regex = regex::Regex::new(r"\[.*?\] \[.*?\] \[(?P<session_id>.*?)\]").unwrap();
         let mut is_started_yet = false;
         let mut lines = reader.lines();
         while let Some(Ok(line)) = lines.next() {
@@ -584,7 +584,7 @@ fn monitor_pg(mut command: Command, cmd_string: String, loglines: LogLines) -> S
             // }
 
             let mut loglines = loglines.lock().unwrap();
-            let session_lines = loglines.entry(session_id).or_insert_with(Vec::new);
+            let session_lines = loglines.entry(session_id).or_default();
             session_lines.push(line);
         }
 
@@ -668,7 +668,7 @@ fn get_extension_name() -> eyre::Result<String> {
     // https://github.com/rust-lang/cargo/issues/45
     let path = PathBuf::from(dir).join("Cargo.toml");
     let name = pgrx_pg_config::cargo::read_manifest(path)?.lib_name()?;
-    Ok(name.replace("-", "_"))
+    Ok(name.replace('-', "_"))
 }
 
 fn get_pgdata_path() -> eyre::Result<PathBuf> {
@@ -680,7 +680,7 @@ fn get_pgdata_path() -> eyre::Result<PathBuf> {
 fn get_pid_file() -> eyre::Result<PathBuf> {
     let mut pgdata = get_pgdata_path()?;
     pgdata.push("postmaster.pid");
-    return Ok(pgdata);
+    Ok(pgdata)
 }
 
 pub(crate) fn get_pg_dbname() -> &'static str {
@@ -697,10 +697,7 @@ pub fn get_named_capture(
     name: &'static str,
     against: &str,
 ) -> Option<String> {
-    match regex.captures(against) {
-        Some(cap) => Some(cap[name].to_string()),
-        None => None,
-    }
+    regex.captures(against).map(|cap| cap[name].to_string())
 }
 
 fn get_cargo_test_features() -> eyre::Result<clap_cargo::Features> {
@@ -754,7 +751,7 @@ fn get_cargo_args() -> Vec<String> {
                 && !process.cmd().iter().any(|arg| arg == "pgrx")
             {
                 // ... do we want its args
-                return process.cmd().iter().cloned().collect();
+                return process.cmd().to_vec();
             }
         }
 

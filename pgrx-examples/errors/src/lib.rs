@@ -14,7 +14,7 @@ pgrx::pg_module_magic!();
 
 #[pg_extern]
 fn array_with_null_and_panic(input: Vec<Option<i32>>) -> i64 {
-    let mut sum = 0 as i64;
+    let mut sum = 0_i64;
 
     for i in input {
         sum += i.expect("NULL elements in input array are not supported") as i64;

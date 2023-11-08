@@ -73,7 +73,7 @@ impl CommandExecute for Connect {
             Some(dbname) => dbname,
             None => {
                 // We should infer from package
-                get_property(&package_manifest_path, "extname")
+                get_property(package_manifest_path, "extname")
                     .wrap_err("could not determine extension name")?
                     .ok_or(eyre!("extname not found in control file"))?
             }
@@ -97,5 +97,5 @@ pub(crate) fn connect_psql(pg_config: &PgConfig, dbname: &str, pgcli: bool) -> e
     }
 
     // run psql
-    exec_psql(&pg_config, dbname, pgcli)
+    exec_psql(pg_config, dbname, pgcli)
 }

@@ -32,7 +32,7 @@ impl PgVarlenaInOutFuncs for FixedF32Array {
 
     fn output(&self, buffer: &mut StringInfo) {
         self.array.iter().for_each(|v| {
-            if buffer.len() > 0 {
+            if !buffer.is_empty() {
                 buffer.push(',');
             }
             buffer.push_str(&v.to_string());

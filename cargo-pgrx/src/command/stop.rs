@@ -43,7 +43,7 @@ impl CommandExecute for Stop {
                 me.manifest_path,
             )?;
             let (pg_config, _) =
-                pg_config_and_version(&pgrx, &package_manifest, me.pg_version, None, false)?;
+                pg_config_and_version(pgrx, &package_manifest, me.pg_version, None, false)?;
 
             stop_postgres(&pg_config)
         }
@@ -67,7 +67,7 @@ pub(crate) fn stop_postgres(pg_config: &PgConfig) -> eyre::Result<()> {
     let datadir = pg_config.data_dir()?;
     let bindir = pg_config.bin_dir()?;
 
-    if status_postgres(pg_config)? == false {
+    if !(status_postgres(pg_config)?) {
         // it's not running, no need to stop it
         tracing::debug!("Already stopped");
         return Ok(());

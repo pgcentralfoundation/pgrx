@@ -118,8 +118,8 @@ pub(crate) fn modify_features_for_version(
     }
 }
 
-pub(crate) fn pg_config_and_version<'a>(
-    pgrx: &'a Pgrx,
+pub(crate) fn pg_config_and_version(
+    pgrx: &Pgrx,
     manifest: &Manifest,
     specified_pg_version: Option<String>,
     user_features: Option<&mut Features>,
@@ -172,7 +172,7 @@ pub(crate) fn pg_config_and_version<'a>(
             // we have determined a Postgres version
 
             modify_features_for_version(pgrx, user_features, manifest, &pg_version, false);
-            let pg_config = pgrx.get(&pg_version.label())?;
+            let pg_config = pgrx.get(pg_version.label())?;
 
             if verbose {
                 display_version_info(&pg_config, &pg_version);
@@ -199,7 +199,7 @@ pub(crate) fn get_package_manifest(
     package_nane: Option<&String>,
     manifest_path: Option<impl AsRef<std::path::Path>>,
 ) -> eyre::Result<(Manifest, PathBuf)> {
-    let metadata = crate::metadata::metadata(&features, manifest_path.as_ref())
+    let metadata = crate::metadata::metadata(features, manifest_path.as_ref())
         .wrap_err("couldn't get cargo metadata")?;
     crate::metadata::validate(manifest_path.as_ref(), &metadata)?;
     let package_manifest_path = crate::manifest::manifest_path(&metadata, package_nane)

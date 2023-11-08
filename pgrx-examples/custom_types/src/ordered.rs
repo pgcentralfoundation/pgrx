@@ -40,12 +40,10 @@ impl Ord for OrderedThing {
             } else {
                 std::cmp::Ordering::Greater
             }
+        } else if starts_lower(other) {
+            std::cmp::Ordering::Less
         } else {
-            if starts_lower(other) {
-                std::cmp::Ordering::Less
-            } else {
-                self.item.cmp(&other.item).reverse()
-            }
+            self.item.cmp(&other.item).reverse()
         }
     }
 }
