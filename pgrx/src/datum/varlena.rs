@@ -11,8 +11,7 @@
 use crate::pg_sys::{VARATT_SHORT_MAX, VARHDRSZ_SHORT};
 use crate::{
     pg_sys, rust_regtypein, set_varsize, set_varsize_short, vardata_any, varsize_any,
-    varsize_any_exhdr, void_mut_ptr, FromDatum, IntoDatum, PgMemoryContexts, PostgresType,
-    StringInfo,
+    varsize_any_exhdr, void_mut_ptr, FromDatum, IntoDatum, PgMemoryContexts, StringInfo,
 };
 use pgrx_sql_entity_graph::metadata::{
     ArgumentError, Returns, ReturnsError, SqlMapping, SqlTranslatable,

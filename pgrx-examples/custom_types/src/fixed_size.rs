@@ -10,8 +10,8 @@
 use core::ffi::CStr;
 use pgrx::prelude::*;
 use pgrx::{opname, pg_operator, PgVarlena, PgVarlenaInOutFuncs, StringInfo};
-use std::str::FromStr;
 use serde::{Deserialize, Serialize};
+use std::str::FromStr;
 
 #[derive(Copy, Clone, PostgresType, Serialize, Deserialize)]
 #[pgvarlena_inoutfuncs]
