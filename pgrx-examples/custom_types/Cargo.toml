@@ -29,7 +29,7 @@ no-schema-generation = [ "pgrx/no-schema-generation", "pgrx-tests/no-schema-gene
 [dependencies]
 pgrx = { path = "../../pgrx", default-features = false }
 maplit = "1.0.2"
-serde = { version = "1.0", features = ["derive"] }
+serde = "1.0"
 
 [dev-dependencies]
 pgrx-tests = { path = "../../pgrx-tests" }
