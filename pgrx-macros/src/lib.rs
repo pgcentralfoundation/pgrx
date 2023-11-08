@@ -710,7 +710,16 @@ Optionally accepts the following attributes:
 * `pgvarlena_inoutfuncs(some_in_fn, some_out_fn)`: Define custom in/out functions for the `PgVarlena` of this type.
 * `sql`: Same arguments as [`#[pgrx(sql = ..)]`](macro@pgrx).
 */
-#[proc_macro_derive(PostgresType, attributes(inoutfuncs, pgvarlena_inoutfuncs, requires, pgrx))]
+#[proc_macro_derive(
+    PostgresType,
+    attributes(
+        inoutfuncs,
+        pgvarlena_inoutfuncs,
+        bikeshed_postgres_type_manually_impl_from_into_datum,
+        requires,
+        pgrx
+    )
+)]
 pub fn postgres_type(input: TokenStream) -> TokenStream {
     let ast = parse_macro_input!(input as syn::DeriveInput);
 
@@ -756,50 +765,56 @@ fn impl_postgres_type(ast: DeriveInput) -> syn::Result<proc_macro2::TokenStream>
     // and also the FromDatum and IntoDatum
     stream.extend(quote! {
         impl #generics ::pgrx::datum::PostgresType for #name #generics { }
-
-        impl #generics ::pgrx::datum::IntoDatum for #name #generics {
-            fn into_datum(self) -> Option<::pgrx::pg_sys::Datum> {
-                #[allow(deprecated)]
-                Some(unsafe { ::pgrx::cbor_encode(&self) }.into())
-            }
-
-            fn type_oid() -> ::pgrx::pg_sys::Oid {
-                ::pgrx::wrappers::rust_regtypein::<Self>()
-            }
-        }
-
-        impl #generics ::pgrx::datum::FromDatum for #name #generics {
-            unsafe fn from_polymorphic_datum(
-                datum: ::pgrx::pg_sys::Datum,
-                is_null: bool,
-                _typoid: ::pgrx::pg_sys::Oid,
-            ) -> Option<Self> {
-                if is_null {
-                    None
-                } else {
-                    #[allow(deprecated)]
-                    ::pgrx::cbor_decode(datum.cast_mut_ptr())
-                }
-            }
-
-            unsafe fn from_datum_in_memory_context(
-                mut memory_context: ::pgrx::memcxt::PgMemoryContexts,
-                datum: ::pgrx::pg_sys::Datum,
-                is_null: bool,
-                _typoid: ::pgrx::pg_sys::Oid,
-            ) -> Option<Self> {
-                if is_null {
-                    None
-                } else {
-                    memory_context.switch_to(|_| {
-                        // this gets the varlena Datum copied into this memory context
-                        let varlena = ::pgrx::pg_sys::pg_detoast_datum_copy(datum.cast_mut_ptr());
-                        Self::from_datum(varlena.into(), is_null)
-                    })
-                }
-            }
-        }
     });
+
+    if !args.contains(&PostgresTypeAttribute::ManualFromIntoDatum) {
+        stream.extend(
+            quote! {
+                impl #generics ::pgrx::datum::IntoDatum for #name #generics {
+                    fn into_datum(self) -> Option<::pgrx::pg_sys::Datum> {
+                        #[allow(deprecated)]
+                        Some(unsafe { ::pgrx::cbor_encode(&self) }.into())
+                    }
+
+                    fn type_oid() -> ::pgrx::pg_sys::Oid {
+                        ::pgrx::wrappers::rust_regtypein::<Self>()
+                    }
+                }
+
+                impl #generics ::pgrx::datum::FromDatum for #name #generics {
+                    unsafe fn from_polymorphic_datum(
+                        datum: ::pgrx::pg_sys::Datum,
+                        is_null: bool,
+                        _typoid: ::pgrx::pg_sys::Oid,
+                    ) -> Option<Self> {
+                        if is_null {
+                            None
+                        } else {
+                            #[allow(deprecated)]
+                            ::pgrx::cbor_decode(datum.cast_mut_ptr())
+                        }
+                    }
+
+                    unsafe fn from_datum_in_memory_context(
+                        mut memory_context: ::pgrx::memcxt::PgMemoryContexts,
+                        datum: ::pgrx::pg_sys::Datum,
+                        is_null: bool,
+                        _typoid: ::pgrx::pg_sys::Oid,
+                    ) -> Option<Self> {
+                        if is_null {
+                            None
+                        } else {
+                            memory_context.switch_to(|_| {
+                                // this gets the varlena Datum copied into this memory context
+                                let varlena = ::pgrx::pg_sys::pg_detoast_datum_copy(datum.cast_mut_ptr());
+                                Self::from_datum(varlena.into(), is_null)
+                            })
+                        }
+                    }
+                }
+            }
+        )
+    }
 
     // and if we don't have custom inout/funcs, we use the JsonInOutFuncs trait
     // which implements _in and _out #[pg_extern] functions that just return the type itself
@@ -978,6 +993,7 @@ enum PostgresTypeAttribute {
     InOutFuncs,
     PgVarlenaInOutFuncs,
     Default,
+    ManualFromIntoDatum,
 }
 
 fn parse_postgres_type_args(attributes: &[Attribute]) -> HashSet<PostgresTypeAttribute> {
@@ -990,11 +1006,12 @@ fn parse_postgres_type_args(attributes: &[Attribute]) -> HashSet<PostgresTypeAtt
             "inoutfuncs" => {
                 categorized_attributes.insert(PostgresTypeAttribute::InOutFuncs);
             }
-
             "pgvarlena_inoutfuncs" => {
                 categorized_attributes.insert(PostgresTypeAttribute::PgVarlenaInOutFuncs);
             }
-
+            "bikeshed_postgres_type_manually_impl_from_into_datum" => {
+                categorized_attributes.insert(PostgresTypeAttribute::ManualFromIntoDatum);
+            }
             _ => {
                 // we can just ignore attributes we don't understand
             }
