@@ -65,7 +65,7 @@ fn vec_count() -> i32 {
 
 #[pg_extern]
 fn hash_table_insert(key: i64, value: i64) {
-    HASH_TABLE.insert(&key, &value);
+    HASH_TABLE.insert(key, value);
 }
 
 #[pg_extern]

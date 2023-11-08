@@ -3,6 +3,7 @@ use crate::shmem::PgSharedMemoryInitialization;
 use crate::PgSharedMem;
 use crate::{pg_sys, PGRXSharedMemory};
 use uuid::Uuid;
+use std::ffi::c_void;
 
 #[derive(Debug, Eq, PartialEq)]
 #[non_exhaustive]
@@ -18,6 +19,18 @@ pub struct PgHashMapInner {
 unsafe impl PGRXSharedMemory for PgHashMapInner {}
 unsafe impl Send for PgHashMapInner {}
 unsafe impl Sync for PgHashMapInner {}
+
+#[repr(align(8))]
+#[derive(Copy, Clone, Debug)]
+struct Key {
+	key: i64,
+}
+
+#[repr(align(8))]
+#[derive(Copy, Clone, Debug)]
+struct Value {
+	value: i64,
+}
 
 impl Default for PgHashMapInner {
     fn default() -> Self {
@@ -35,14 +48,33 @@ impl PgHashMap {
         PgHashMap { htab: PgLwLock::new(), size }
     }
 
-    pub fn insert(&self, key: &i64, _value: &i64) {
+    pub fn insert(&self, key: i64, value: i64) {
         let htab = self.htab.exclusive();
-        let void_ptr: *const core::ffi::c_void = key as *const _ as *const core::ffi::c_void;
+        // let void_ptr: *const core::ffi::c_void = key as *const i64 as *const core::ffi::c_void;
         let mut found = false;
 
-        let _entry = unsafe {
-            pg_sys::hash_search(htab.htab, void_ptr, pg_sys::HASHACTION_HASH_ENTER_NULL, &mut found)
+        let mut key_value = Key { key: 0 };
+        unsafe { std::ptr::addr_of_mut!(key_value).write_bytes(0, std::mem::size_of::<Key>()) };
+
+        println!("key: {:?}", key_value);
+
+        key_value.key = key;
+
+        println!("key: {:?}", key_value);
+
+        let key_ptr: *const c_void = std::ptr::addr_of!(key_value) as *const Key as *const c_void;
+
+        println!("Searching key: {:?}", key_ptr);
+        let entry = unsafe {
+            pg_sys::hash_search(htab.htab, key_ptr, pg_sys::HASHACTION_HASH_ENTER_NULL, &mut found)
         };
+
+        if !entry.is_null() {
+        	let value_ptr:	*mut Value = entry as *mut Value;
+			unsafe {
+				std::ptr::write(value_ptr, Value { value });
+			}
+        }
     }
 }
 
@@ -56,8 +88,8 @@ impl PgSharedMemoryInitialization for PgHashMap {
         let mut htab = self.htab.exclusive();
 
         let mut hash_ctl = pg_sys::HASHCTL::default();
-        hash_ctl.keysize = std::mem::size_of::<i64>();
-        hash_ctl.entrysize = std::mem::size_of::<i64>();
+        hash_ctl.keysize = std::mem::size_of::<Key>();
+        hash_ctl.entrysize = std::mem::size_of::<Value>();
 
         let shm_name =
             alloc::ffi::CString::new(Uuid::new_v4().to_string()).expect("CString::new() failed");
