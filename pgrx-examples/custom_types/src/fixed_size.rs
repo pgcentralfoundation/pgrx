@@ -13,6 +13,7 @@ use pgrx::{opname, pg_operator, PgVarlena, PgVarlenaInOutFuncs, StringInfo};
 use std::str::FromStr;
 
 #[derive(Copy, Clone, PostgresType)]
+#[bikeshed_postgres_type_manually_impl_from_into_datum]
 #[pgvarlena_inoutfuncs]
 pub struct FixedF32Array {
     array: [f32; 91],
