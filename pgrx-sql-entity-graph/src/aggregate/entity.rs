@@ -17,6 +17,7 @@ to the `pgrx` framework and very subject to change between versions. While you m
 
 */
 use crate::aggregate::options::{FinalizeModify, ParallelOption};
+use crate::fmt;
 use crate::metadata::SqlMapping;
 use crate::pgrx_sql::PgrxSql;
 use crate::to_sql::entity::ToSqlConfigEntity;
@@ -264,14 +265,14 @@ impl ToSql for PgAggregateEntity {
                 Ok(SqlMapping::As(ref argument_sql)) => Ok(argument_sql.to_string()),
                 Ok(SqlMapping::Composite { array_brackets }) => used_ty
                     .composite_type
-                    .map(|v| if array_brackets { format!("{v}[]") } else { format!("{v}") })
+                    .map(|v| fmt::with_array_brackets(v.into(), array_brackets))
                     .ok_or_else(|| {
                         eyre!("Macro expansion time suggested a composite_type!() in return")
                     }),
                 Ok(SqlMapping::Source { array_brackets }) => {
                     let sql = context
                         .source_only_to_sql_type(used_ty.ty_source)
-                        .map(|v| if array_brackets { format!("{v}[]") } else { format!("{v}") })
+                        .map(|v| fmt::with_array_brackets(v, array_brackets))
                         .ok_or_else(|| {
                             eyre!("Macro expansion time suggested a source only mapping in return")
                         })?;
@@ -378,11 +379,7 @@ impl ToSql for PgAggregateEntity {
                                     arg.used_ty
                                         .composite_type
                                         .map(|v| {
-                                            if array_brackets {
-                                                format!("{v}[]")
-                                            } else {
-                                                format!("{v}")
-                                            }
+                                            fmt::with_array_brackets(v.into(), array_brackets)
                                         })
                                         .ok_or_else(|| {
                                             eyre!(
@@ -396,11 +393,7 @@ impl ToSql for PgAggregateEntity {
                                     let sql = context
                                         .source_only_to_sql_type(arg.used_ty.ty_source)
                                         .map(|v| {
-                                            if array_brackets {
-                                                format!("{v}[]")
-                                            } else {
-                                                format!("{v}")
-                                            }
+                                            fmt::with_array_brackets(v.into(), array_brackets)
                                         })
                                         .ok_or_else(|| {
                                             eyre!(

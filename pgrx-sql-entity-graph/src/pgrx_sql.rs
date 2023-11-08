@@ -325,12 +325,13 @@ impl PgrxSql {
         let generated = Dot::with_attr_getters(
             &self.graph,
             &[petgraph::dot::Config::EdgeNoLabel, petgraph::dot::Config::NodeNoLabel],
-            &|_graph, edge| match edge.weight() {
-                SqlGraphRelationship::RequiredBy => format!(r#"color = "gray""#),
-                SqlGraphRelationship::RequiredByArg => format!(r#"color = "black""#),
-                SqlGraphRelationship::RequiredByReturn => {
-                    format!(r#"dir = "back", color = "black""#)
+            &|_graph, edge| {
+                match edge.weight() {
+                    SqlGraphRelationship::RequiredBy => r#"color = "gray""#,
+                    SqlGraphRelationship::RequiredByArg => r#"color = "black""#,
+                    SqlGraphRelationship::RequiredByReturn => r#"dir = "back", color = "black""#,
                 }
+                .to_owned()
             },
             &|_graph, (_index, node)| {
                 match node {

@@ -23,6 +23,7 @@ pub use argument::PgExternArgumentEntity;
 pub use operator::PgOperatorEntity;
 pub use returning::{PgExternReturnEntity, PgExternReturnEntityIteratedItem};
 
+use crate::fmt;
 use crate::metadata::{Returns, SqlMapping};
 use crate::pgrx_sql::PgrxSql;
 use crate::to_sql::entity::ToSqlConfigEntity;
@@ -155,22 +156,15 @@ impl ToSql for PgExternEntity {
                             args.push(buf);
                         }
                         Ok(SqlMapping::Composite { array_brackets }) => {
-                            let sql =
-                                self.fn_args[idx]
-                                    .used_ty
-                                    .composite_type
-                                    .map(|v| {
-                                        if array_brackets {
-                                            format!("{v}[]")
-                                        } else {
-                                            format!("{v}")
-                                        }
-                                    })
-                                    .ok_or_else(|| {
-                                        eyre!(
+                            let sql = self.fn_args[idx]
+                                .used_ty
+                                .composite_type
+                                .map(|v| fmt::with_array_brackets(v.into(), array_brackets))
+                                .ok_or_else(|| {
+                                    eyre!(
                                     "Macro expansion time suggested a composite_type!() in return"
                                 )
-                                    })?;
+                                })?;
                             let buf = format!("\
                                 \t\"{pattern}\" {variadic}{schema_prefix}{sql_type}{default}{maybe_comma}/* {type_name} */\
                             ",
@@ -186,21 +180,14 @@ impl ToSql for PgExternEntity {
                             args.push(buf);
                         }
                         Ok(SqlMapping::Source { array_brackets }) => {
-                            let sql =
-                                context
-                                    .source_only_to_sql_type(arg.used_ty.ty_source)
-                                    .map(|v| {
-                                        if array_brackets {
-                                            format!("{v}[]")
-                                        } else {
-                                            format!("{v}")
-                                        }
-                                    })
-                                    .ok_or_else(|| {
-                                        eyre!(
+                            let sql = context
+                                .source_only_to_sql_type(arg.used_ty.ty_source)
+                                .map(|v| fmt::with_array_brackets(v, array_brackets))
+                                .ok_or_else(|| {
+                                    eyre!(
                                     "Macro expansion time suggested a source only mapping in return"
                                 )
-                                    })?;
+                                })?;
                             let buf = format!("\
                                 \t\"{pattern}\" {variadic}{schema_prefix}{sql_type}{default}{maybe_comma}/* {type_name} */\
                             ",
@@ -258,18 +245,8 @@ impl ToSql for PgExternEntity {
                     let metadata_retval = self.metadata.retval.clone().ok_or_else(|| eyre!("Macro expansion time and SQL resolution time had differing opinions about the return value existing"))?;
                     let metadata_retval_sql = match metadata_retval.return_sql {
                         Ok(Returns::One(SqlMapping::As(ref sql))) => sql.clone(),
-                        Ok(Returns::One(SqlMapping::Composite { array_brackets })) => ty.composite_type.unwrap().to_string()
-                        + if array_brackets {
-                            "[]"
-                        } else {
-                            ""
-                        },
-                        Ok(Returns::SetOf(SqlMapping::Source { array_brackets })) =>
-                            context.source_only_to_sql_type(ty.ty_source).unwrap().to_string() + if array_brackets {
-                                "[]"
-                            } else {
-                                ""
-                            },
+                        Ok(Returns::One(SqlMapping::Composite { array_brackets })) => fmt::with_array_brackets(ty.composite_type.unwrap().into(), array_brackets),
+                        Ok(Returns::SetOf(SqlMapping::Source { array_brackets })) => fmt::with_array_brackets(context.source_only_to_sql_type(ty.ty_source).unwrap().into(), array_brackets),
                         Ok(other) => return Err(eyre!("Got non-plain mapped/composite return variant SQL in what macro-expansion thought was a type, got: {other:?}")),
                         Err(err) => {
                             match context.source_only_to_sql_type(ty.ty_source) {
@@ -299,18 +276,8 @@ impl ToSql for PgExternEntity {
                     let metadata_retval = self.metadata.retval.clone().ok_or_else(|| eyre!("Macro expansion time and SQL resolution time had differing opinions about the return value existing"))?;
                     let metadata_retval_sql = match metadata_retval.return_sql {
                             Ok(Returns::SetOf(SqlMapping::As(ref sql))) => sql.clone(),
-                            Ok(Returns::SetOf(SqlMapping::Composite { array_brackets })) =>
-                                ty.composite_type.unwrap().to_string() + if array_brackets {
-                                    "[]"
-                                } else {
-                                    ""
-                                },
-                            Ok(Returns::SetOf(SqlMapping::Source { array_brackets })) =>
-                                context.source_only_to_sql_type(ty.ty_source).unwrap().to_string() + if array_brackets {
-                                    "[]"
-                                } else {
-                                    ""
-                                },
+                            Ok(Returns::SetOf(SqlMapping::Composite { array_brackets })) => fmt::with_array_brackets(ty.composite_type.unwrap().into(), array_brackets),
+                            Ok(Returns::SetOf(SqlMapping::Source { array_brackets })) => fmt::with_array_brackets(context.source_only_to_sql_type(ty.ty_source).unwrap().into(), array_brackets),
                             Ok(_other) => return Err(eyre!("Got non-setof mapped/composite return variant SQL in what macro-expansion thought was a setof")),
                             Err(err) => return Err(err).wrap_err("Error mapping return SQL"),
                         };
@@ -332,18 +299,10 @@ impl ToSql for PgExternEntity {
                                         SqlMapping::As(sql) => sql.clone(),
                                         SqlMapping::Composite { array_brackets } => {
                                             let composite = table_items[idx].ty.composite_type.unwrap().to_string();
-                                            composite  + if *array_brackets {
-                                                "[]"
-                                            } else {
-                                                ""
-                                            }
+                                            fmt::with_array_brackets(composite, *array_brackets)
                                         },
                                         SqlMapping::Source { array_brackets } =>
-                                            context.source_only_to_sql_type(table_items[idx].ty.ty_source).unwrap() + if *array_brackets {
-                                                "[]"
-                                            } else {
-                                                ""
-                                            },
+                                        fmt::with_array_brackets(context.source_only_to_sql_type(table_items[idx].ty.ty_source).unwrap(), *array_brackets),
                                         SqlMapping::Skip => todo!(),
                                     };
                                     retval_sqls.push(sql)
