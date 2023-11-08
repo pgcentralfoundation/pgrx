@@ -79,6 +79,11 @@ fn hash_table_remove(key: i64) -> Option<f32> {
 }
 
 #[pg_extern]
+fn hash_table_len() -> i64 {
+    HASH_TABLE.len() as i64
+}
+
+#[pg_extern]
 fn vec_drain() -> SetOfIterator<'static, Pgtest> {
     let mut vec = VEC.exclusive();
     let r = vec.iter().map(|i| *i).collect::<Vec<Pgtest>>();

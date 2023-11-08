@@ -179,6 +179,12 @@ impl<K: Copy + Clone, V: Copy + Clone> PgHashMap<K, V> {
             return None;
         }
     }
+
+    /// Get the number of elements in the HashMap.
+    pub fn len(&self) -> usize {
+        let htab = self.htab.exclusive();
+        htab.elements.try_into().unwrap()
+    }
 }
 
 impl<K: Copy + Clone, V: Copy + Clone> PgSharedMemoryInitialization for PgHashMap<K, V> {
