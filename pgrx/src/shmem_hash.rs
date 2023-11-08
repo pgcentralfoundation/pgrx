@@ -2,8 +2,8 @@ use crate::lwlock::*;
 use crate::shmem::PgSharedMemoryInitialization;
 use crate::PgSharedMem;
 use crate::{pg_sys, PGRXSharedMemory};
-use uuid::Uuid;
 use std::ffi::c_void;
+use uuid::Uuid;
 
 #[derive(Debug, Eq, PartialEq)]
 #[non_exhaustive]
@@ -23,13 +23,13 @@ unsafe impl Sync for PgHashMapInner {}
 #[repr(align(8))]
 #[derive(Copy, Clone, Debug)]
 struct Key {
-	key: i64,
+    key: i64,
 }
 
 #[repr(align(8))]
 #[derive(Copy, Clone, Debug)]
 struct Value {
-	value: i64,
+    value: i64,
 }
 
 impl Default for PgHashMapInner {
@@ -50,30 +50,20 @@ impl PgHashMap {
 
     pub fn insert(&self, key: i64, value: i64) {
         let htab = self.htab.exclusive();
-        // let void_ptr: *const core::ffi::c_void = key as *const i64 as *const core::ffi::c_void;
         let mut found = false;
 
-        let mut key_value = Key { key: 0 };
-        unsafe { std::ptr::addr_of_mut!(key_value).write_bytes(0, std::mem::size_of::<Key>()) };
-
-        println!("key: {:?}", key_value);
-
-        key_value.key = key;
-
-        println!("key: {:?}", key_value);
-
+        let key_value = Key { key };
         let key_ptr: *const c_void = std::ptr::addr_of!(key_value) as *const Key as *const c_void;
 
-        println!("Searching key: {:?}", key_ptr);
         let entry = unsafe {
-            pg_sys::hash_search(htab.htab, key_ptr, pg_sys::HASHACTION_HASH_ENTER_NULL, &mut found)
+            pg_sys::hash_search(htab.htab, key_ptr, pg_sys::HASHACTION_HASH_ENTER, &mut found)
         };
 
         if !entry.is_null() {
-        	let value_ptr:	*mut Value = entry as *mut Value;
-			unsafe {
-				std::ptr::write(value_ptr, Value { value });
-			}
+            let value_ptr: *mut Value = entry as *mut Value;
+            unsafe {
+                std::ptr::write(value_ptr, Value { value });
+            }
         }
     }
 }
