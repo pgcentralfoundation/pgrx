@@ -44,7 +44,7 @@ impl CommandExecute for Start {
                 me.manifest_path,
             )?;
             let (pg_config, _) =
-                pg_config_and_version(&pgrx, &package_manifest, me.pg_version, None, false)?;
+                pg_config_and_version(pgrx, &package_manifest, me.pg_version, None, false)?;
 
             start_postgres(&pg_config)
         }

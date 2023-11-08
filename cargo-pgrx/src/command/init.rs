@@ -26,7 +26,7 @@ use std::path::PathBuf;
 use std::process::{Command, Stdio};
 use std::sync::OnceLock;
 
-static PROCESS_ENV_DENYLIST: &'static [&'static str] = &[
+static PROCESS_ENV_DENYLIST: &[&str] = &[
     "DEBUG",
     "MAKEFLAGS",
     "MAKELEVEL",
@@ -131,14 +131,14 @@ impl CommandExecute for Init {
                     default_pgrx
                         .as_ref()
                         .unwrap() // We just set this
-                        .get(&pgver)
+                        .get(pgver)
                         .wrap_err_with(|| format!("{} is not a known Postgres version", pgver))?
                         .clone()
                 } else {
                     let config = PgConfig::new_with_defaults(pg_config_path.as_str().into());
                     let label = config.label().ok();
                     // We allow None in case it's configured via the environment or something.
-                    if label != None && label.as_deref() != Some(pgver) {
+                    if label.is_some() && label.as_deref() != Some(pgver) {
                         return Err(eyre!(
                             "wrong `pg_config` given to `--{pgver}` `{pg_config_path:?}` is for PostgreSQL {}",
                             config.major_version()?,
@@ -254,9 +254,9 @@ fn download_postgres(
     }
     let mut buf = Vec::new();
     let _count = http_response.into_reader().read_to_end(&mut buf)?;
-    let pgdir = untar(&buf, pgrx_home, pg_config, &init)?;
-    configure_postgres(pg_config, &pgdir, &init)?;
-    make_postgres(pg_config, &pgdir, &init)?;
+    let pgdir = untar(&buf, pgrx_home, pg_config, init)?;
+    configure_postgres(pg_config, &pgdir, init)?;
+    make_postgres(pg_config, &pgdir, init)?;
     make_install_postgres(pg_config, &pgdir, init) // returns a new PgConfig object
 }
 
@@ -431,7 +431,7 @@ fn configure_postgres(pg_config: &PgConfig, pgdir: &PathBuf, init: &Init) -> eyr
         .stderr(std::process::Stdio::piped())
         .stdin(std::process::Stdio::null())
         .env("PATH", prefix_path(pgdir))
-        .current_dir(&pgdir);
+        .current_dir(pgdir);
     for var in PROCESS_ENV_DENYLIST {
         command.env_remove(var);
     }
@@ -472,7 +472,7 @@ fn make_postgres(pg_config: &PgConfig, pgdir: &PathBuf, init: &Init) -> eyre::Re
         .stdout(std::process::Stdio::piped())
         .stderr(std::process::Stdio::piped())
         .stdin(std::process::Stdio::null())
-        .current_dir(&pgdir);
+        .current_dir(pgdir);
 
     for var in PROCESS_ENV_DENYLIST {
         command.env_remove(var);
@@ -514,7 +514,7 @@ fn make_install_postgres(
         .stdout(std::process::Stdio::piped())
         .stderr(std::process::Stdio::piped())
         .stdin(std::process::Stdio::null())
-        .current_dir(&pgdir);
+        .current_dir(pgdir);
     for var in PROCESS_ENV_DENYLIST {
         command.env_remove(var);
     }
@@ -606,7 +606,7 @@ pub(crate) fn initdb(bindir: &PathBuf, datadir: &PathBuf) -> eyre::Result<()> {
         .stderr(Stdio::piped())
         .args(get_c_locale_flags())
         .arg("-D")
-        .arg(&datadir);
+        .arg(datadir);
 
     let command_str = format!("{:?}", command);
     tracing::debug!(command = %command_str, "Running");

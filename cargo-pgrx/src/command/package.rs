@@ -60,7 +60,7 @@ impl Package {
 
         let pg_config = match self.pg_config {
             None => PgConfig::from_path(),
-            Some(config) => PgConfig::new_with_defaults(PathBuf::from(config)),
+            Some(config) => PgConfig::new_with_defaults(config),
         };
         let pg_version = format!("pg{}", pg_config.major_version()?);
 
@@ -74,7 +74,7 @@ impl Package {
         let profile = CargoProfile::from_flags(
             self.profile.as_deref(),
             // NB:  `cargo pgrx package` defaults to "--release" whereas all other commands default to "debug"
-            self.debug.then_some(CargoProfile::Dev).unwrap_or(CargoProfile::Release),
+            if self.debug { CargoProfile::Dev } else { CargoProfile::Release },
         )?;
         let out_dir = if let Some(out_dir) = self.out_dir {
             out_dir
@@ -127,7 +127,7 @@ pub(crate) fn package_extension(
         std::fs::create_dir_all(&out_dir)?;
     }
 
-    display_version_info(pg_config, &PgVersionSource::PgConfig(pg_config.label()?.into()));
+    display_version_info(pg_config, &PgVersionSource::PgConfig(pg_config.label()?));
     install_extension(
         user_manifest_path,
         user_package,

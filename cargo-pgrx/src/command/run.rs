@@ -74,7 +74,7 @@ impl CommandExecute for Run {
         };
         let profile = CargoProfile::from_flags(
             self.profile.as_deref(),
-            self.release.then_some(CargoProfile::Release).unwrap_or(CargoProfile::Dev),
+            if self.release { CargoProfile::Release } else { CargoProfile::Dev },
         )?;
 
         run(

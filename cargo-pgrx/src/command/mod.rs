@@ -30,7 +30,7 @@ pub(crate) mod version;
 
 // Build a ureq::Agent by the given url. Requests from this agent are proxied if we have
 // set the HTTPS_PROXY/HTTP_PROXY environment variables.
-pub(self) fn build_agent_for_url(url: &str) -> eyre::Result<Agent> {
+fn build_agent_for_url(url: &str) -> eyre::Result<Agent> {
     if let Some(proxy_url) = for_url_str(url).to_string() {
         Ok(AgentBuilder::new().proxy(Proxy::new(proxy_url)?).build())
     } else {

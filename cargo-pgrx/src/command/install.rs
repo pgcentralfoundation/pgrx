@@ -85,7 +85,7 @@ impl CommandExecute for Install {
         let pg_version = format!("pg{}", pg_config.major_version()?);
         let profile = CargoProfile::from_flags(
             self.profile.as_deref(),
-            self.release.then_some(CargoProfile::Release).unwrap_or(CargoProfile::Dev),
+            if self.release { CargoProfile::Release } else { CargoProfile::Dev },
         )?;
 
         crate::manifest::modify_features_for_version(
@@ -96,7 +96,7 @@ impl CommandExecute for Install {
             self.test,
         );
 
-        display_version_info(&pg_config, &PgVersionSource::PgConfig(pg_config.label()?.into()));
+        display_version_info(&pg_config, &PgVersionSource::PgConfig(pg_config.label()?));
         install_extension(
             self.manifest_path.as_ref(),
             self.package.as_ref(),
@@ -146,7 +146,7 @@ pub(crate) fn install_extension(
     let versioned_so = get_property(&package_manifest_path, "module_pathname")?.is_none();
 
     let build_command_output =
-        build_extension(user_manifest_path.as_ref(), user_package, &profile, &features)?;
+        build_extension(user_manifest_path.as_ref(), user_package, profile, features)?;
     let build_command_bytes = build_command_output.stdout;
     let build_command_reader = BufReader::new(build_command_bytes.as_slice());
     let build_command_stream = cargo_metadata::Message::parse_stream(build_command_reader);
@@ -162,7 +162,7 @@ pub(crate) fn install_extension(
         let mut dest = base_directory.clone();
         dest.push(&extdir);
         dest.push(
-            &control_file
+            control_file
                 .file_name()
                 .ok_or_else(|| eyre!("Could not get filename for `{}`", control_file.display()))?,
         );
@@ -260,18 +260,18 @@ fn copy_file(
         })?,
     };
 
-    println!("{} {} to {}", "     Copying".bold().green(), msg, format_display_path(&dest)?.cyan());
+    println!("{} {} to {}", "     Copying".bold().green(), msg, format_display_path(dest)?.cyan());
 
     if do_filter {
         // we want to filter the contents of the file we're to copy
-        let input = std::fs::read_to_string(&src)
+        let input = std::fs::read_to_string(src)
             .wrap_err_with(|| format!("failed to read `{}`", src.display()))?;
         let input = filter_contents(package_manifest_path, input)?;
-        std::fs::write(&dest, &input).wrap_err_with(|| {
+        std::fs::write(dest, input).wrap_err_with(|| {
             format!("failed writing `{}` to `{}`", src.display(), dest.display())
         })?;
     } else {
-        std::fs::copy(&src, &dest).wrap_err_with(|| {
+        std::fs::copy(src, dest).wrap_err_with(|| {
             format!("failed copying `{}` to `{}`", src.display(), dest.display())
         })?;
     }
@@ -461,10 +461,10 @@ pub(crate) fn get_version(manifest_path: impl AsRef<Path>) -> eyre::Result<Strin
                 crate::metadata::validate(Some(manifest_path), &metadata)?;
                 let manifest_path = crate::manifest::manifest_path(&metadata, None)
                     .wrap_err("Couldn't get manifest path")?;
-                let manifest = Manifest::from_path(&manifest_path)
+                let manifest = Manifest::from_path(manifest_path)
                     .wrap_err("Couldn't parse manifest")?;
-                let version = manifest.package_version()?;
-                version
+
+                manifest.package_version()?
             } else {
                 v
             }
@@ -482,7 +482,7 @@ fn get_git_hash(manifest_path: impl AsRef<Path>) -> eyre::Result<String> {
     let path_string = manifest_path.as_ref().to_owned();
 
     if let Some(hash) = GIT_HASH.lock().unwrap().get(&path_string) {
-        return Ok(hash.clone());
+        Ok(hash.clone())
     } else {
         let hash = match get_property(manifest_path, "git_hash")? {
             Some(hash) => hash,
@@ -504,7 +504,7 @@ fn make_relative(path: PathBuf) -> PathBuf {
     let mut relative = PathBuf::new();
     let mut components = path.components();
     components.next(); // skip the root
-    while let Some(part) = components.next() {
+    for part in components {
         relative.push(part)
     }
     relative
@@ -514,7 +514,7 @@ pub(crate) fn format_display_path(path: impl AsRef<Path>) -> eyre::Result<String
     let path = path.as_ref();
     let out = path
         .strip_prefix(get_target_dir()?.parent().unwrap())
-        .unwrap_or(&path)
+        .unwrap_or(path)
         .display()
         .to_string();
     Ok(out)

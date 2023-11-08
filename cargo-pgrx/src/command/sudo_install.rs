@@ -29,7 +29,7 @@ impl From<Install> for SudoInstall {
             release: value.release,
             profile: value.profile,
             test: value.test,
-            pg_config: value.pg_config.map(|path| PathBuf::from(path)),
+            pg_config: value.pg_config.map(PathBuf::from),
             out_dir: None,
             features: value.features,
             verbose: value.verbose,

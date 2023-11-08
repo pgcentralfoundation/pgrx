@@ -55,7 +55,7 @@ impl CommandExecute for Test {
             let (package_manifest, _package_manifest_path) =
                 get_package_manifest(&me.features, me.package.as_ref(), me.manifest_path.as_ref())?;
             let (pg_config, _pg_version) = pg_config_and_version(
-                &pgrx,
+                pgrx,
                 &package_manifest,
                 me.pg_version.clone(),
                 Some(&mut features),
@@ -64,7 +64,7 @@ impl CommandExecute for Test {
 
             let profile = CargoProfile::from_flags(
                 me.profile.as_deref(),
-                me.release.then_some(CargoProfile::Release).unwrap_or(CargoProfile::Dev),
+                if me.release { CargoProfile::Release } else { CargoProfile::Dev },
             )?;
 
             test_extension(
@@ -173,11 +173,9 @@ pub fn test_extension(
     tracing::debug!(command = ?command, "Running");
     let status = command.status().wrap_err("failed to run cargo test")?;
     tracing::trace!(status_code = %status, command = ?command, "Finished");
-    if !status.success() {
-        if !status.success() {
-            // We explicitly do not want to return a spantraced error here.
-            std::process::exit(1)
-        }
+    if !status.success() && !status.success() {
+        // We explicitly do not want to return a spantraced error here.
+        std::process::exit(1)
     }
 
     Ok(())

@@ -106,7 +106,7 @@ impl CommandExecute for Schema {
 
         let profile = CargoProfile::from_flags(
             self.profile.as_deref(),
-            self.release.then_some(CargoProfile::Release).unwrap_or(CargoProfile::Dev),
+            if self.release { CargoProfile::Release } else { CargoProfile::Dev },
         )?;
 
         generate_schema(
@@ -306,7 +306,7 @@ pub(crate) fn generate_schema(
 
     let lib_so_data = std::fs::read(&lib_so).wrap_err("couldn't read extension shared object")?;
     let lib_so_obj_file =
-        parse_object(&*lib_so_data).wrap_err("couldn't parse extension shared object")?;
+        parse_object(&lib_so_data).wrap_err("couldn't parse extension shared object")?;
     let lib_so_exports =
         lib_so_obj_file.exports().wrap_err("couldn't get exports from extension shared object")?;
 
@@ -340,11 +340,8 @@ pub(crate) fn generate_schema(
     let mut num_aggregates = 0_usize;
     for func in &fns_to_call {
         if func.starts_with("__pgrx_internals_schema_") {
-            let schema = func
-                .split('_')
-                .skip(5)
-                .next()
-                .expect("Schema extern name was not of expected format");
+            let schema =
+                func.split('_').nth(5).expect("Schema extern name was not of expected format");
             seen_schemas.push(schema);
         } else if func.starts_with("__pgrx_internals_fn_") {
             num_funcs += 1;
@@ -369,8 +366,8 @@ pub(crate) fn generate_schema(
         "{} {} SQL entities: {} schemas ({} unique), {} functions, {} types, {} enums, {} sqls, {} ords, {} hashes, {} aggregates, {} triggers",
         "  Discovered".bold().green(),
         fns_to_call.len().to_string().bold().cyan(),
-        seen_schemas.iter().count().to_string().bold().cyan(),
-        seen_schemas.iter().collect::<std::collections::HashSet<_>>().iter().count().to_string().bold().cyan(),
+        seen_schemas.len().to_string().bold().cyan(),
+        seen_schemas.iter().collect::<std::collections::HashSet<_>>().len().to_string().bold().cyan(),
         num_funcs.to_string().bold().cyan(),
         num_types.to_string().bold().cyan(),
         num_enums.to_string().bold().cyan(),
@@ -502,7 +499,7 @@ fn create_stub(
     }
 
     let postmaster_obj_file =
-        parse_object(&*postmaster_bin_data).wrap_err("couldn't parse postmaster")?;
+        parse_object(&postmaster_bin_data).wrap_err("couldn't parse postmaster")?;
     let postmaster_exports = postmaster_obj_file
         .exports()
         .wrap_err("couldn't get exports from extension shared object")?;
@@ -528,7 +525,7 @@ fn create_stub(
     let mut so_rustc_invocation = crate::env::rustc();
     so_rustc_invocation.stderr(Stdio::inherit());
 
-    if let Some(rustc_flags_str) = std::env::var("RUSTFLAGS").ok() {
+    if let Ok(rustc_flags_str) = std::env::var("RUSTFLAGS") {
         let rustc_flags = rustc_flags_str.split(' ').collect::<Vec<_>>();
         so_rustc_invocation.args(rustc_flags);
     }
@@ -564,20 +561,20 @@ fn create_stub(
 }
 
 fn parse_object(data: &[u8]) -> object::Result<object::File> {
-    let kind = object::FileKind::parse(&*data)?;
+    let kind = object::FileKind::parse(data)?;
 
     match kind {
         FileKind::MachOFat32 => {
             let arch = env::consts::ARCH;
 
-            match slice_arch32(&*data, arch) {
-                Some(slice) => parse_object(&*slice),
+            match slice_arch32(data, arch) {
+                Some(slice) => parse_object(slice),
                 None => {
                     panic!("Failed to slice architecture '{arch}' from universal binary.")
                 }
             }
         }
-        _ => object::File::parse(&*data),
+        _ => object::File::parse(data),
     }
 }
 
@@ -593,10 +590,10 @@ fn slice_arch32<'a>(data: &'a [u8], arch: &str) -> Option<&'a [u8]> {
         _ => Architecture::Unknown,
     };
 
-    let candidates = FatHeader::parse_arch32(&*data).ok()?;
+    let candidates = FatHeader::parse_arch32(data).ok()?;
     let architecture = candidates.iter().find(|a| a.architecture() == target)?;
 
-    architecture.data(&*data).ok()
+    architecture.data(data).ok()
 }
 
 #[cfg(test)]
@@ -629,7 +626,7 @@ mod tests {
 
         let slice = slice_arch32(&bin, "aarch64")
             .expect("Failed to slice architecture 'aarch64' from universal binary.");
-        assert!(parse_object(&slice).is_ok());
+        assert!(parse_object(slice).is_ok());
     }
 
     #[test]
