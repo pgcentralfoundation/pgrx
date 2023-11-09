@@ -1031,17 +1031,11 @@ fn connect_externs(
                                     type_entity.ty_source.to_string(),
                                 ))
                                 .is_some()
-                            {
-                                graph.add_edge(
-                                    *ext_index,
-                                    index,
-                                    SqlGraphRelationship::RequiredByArg,
-                                );
-                            } else if ext_item
-                                .has_sql_declared_entity(&SqlDeclared::Enum(
-                                    type_entity.ty_source.to_string(),
-                                ))
-                                .is_some()
+                                || ext_item
+                                    .has_sql_declared_entity(&SqlDeclared::Enum(
+                                        type_entity.ty_source.to_string(),
+                                    ))
+                                    .is_some()
                             {
                                 graph.add_edge(
                                     *ext_index,
