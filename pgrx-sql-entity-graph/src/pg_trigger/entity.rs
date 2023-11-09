@@ -44,6 +44,7 @@ impl ToSql for PgTriggerEntity {
         let self_index = context.triggers[self];
         let schema = context.schema_prefix_for(&self_index);
 
+        let PgTriggerEntity { file, line, full_path, function_name, .. } = self;
         let sql = format!(
             "\n\
             -- {file}:{line}\n\
@@ -52,11 +53,6 @@ impl ToSql for PgTriggerEntity {
                 \tRETURNS TRIGGER\n\
                 \tLANGUAGE c\n\
                 \tAS 'MODULE_PATHNAME', '{wrapper_function_name}';",
-            schema = schema,
-            file = self.file,
-            line = self.line,
-            full_path = self.full_path,
-            function_name = self.function_name,
             wrapper_function_name = self.wrapper_function_name(),
         );
         Ok(sql)
