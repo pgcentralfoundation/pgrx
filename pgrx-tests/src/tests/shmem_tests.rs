@@ -13,7 +13,7 @@ use std::sync::atomic::AtomicBool;
 
 static ATOMIC: PgAtomic<AtomicBool> = PgAtomic::new();
 static LWLOCK: PgLwLock<bool> = PgLwLock::new();
-static HASH_MAP: PgHashMap<i64, i64> = PgHashMap::new(250);
+static HASH_MAP: PgHashMap<i64, i64> = PgHashMap::new(500);
 
 #[pg_guard]
 pub extern "C" fn _PG_init() {
@@ -58,9 +58,52 @@ mod tests {
     }
 
     #[pg_test]
-    pub fn test_pg_hash_map_insert() {
+    pub fn test_pg_hash_map() {
+        use rand::prelude::IteratorRandom;
+
         for i in 1..250 {
             assert_eq!(HASH_MAP.insert(i, i), Ok(None));
         }
+
+        assert_eq!(HASH_MAP.len(), 249);
+
+        for i in 1..250 {
+            assert_eq!(HASH_MAP.get(i), Some(i));
+        }
+
+        assert_eq!(HASH_MAP.len(), 249);
+
+        for i in 251..500 {
+            assert_eq!(HASH_MAP.get(i), None);
+        }
+
+        assert_eq!(HASH_MAP.len(), 249);
+
+        for i in 1..250 {
+            assert_eq!(HASH_MAP.insert(i, i), Ok(Some(i)));
+        }
+
+        assert_eq!(HASH_MAP.len(), 249);
+
+        for i in 1..250 {
+            assert_eq!(HASH_MAP.remove(i), Some(i));
+        }
+
+        assert_eq!(HASH_MAP.len(), 0);
+
+        for i in 1..250 {
+            assert_eq!(HASH_MAP.get(i), None);
+        }
+
+        assert_eq!(HASH_MAP.len(), 0);
+
+        for _ in 0..25_000 {
+            for key in 0..250 {
+                let value = (0..1000).choose(&mut rand::thread_rng()).unwrap();
+                assert!(HASH_MAP.insert(key, value).is_ok());
+            }
+        }
+
+        assert_eq!(HASH_MAP.len(), 250);
     }
 }

@@ -21,7 +21,7 @@ unsafe impl PGRXSharedMemory for PgHashMapInner {}
 unsafe impl Send for PgHashMapInner {}
 unsafe impl Sync for PgHashMapInner {}
 
-#[repr(align(8))]
+// #[repr(align(8))]
 #[derive(Copy, Clone, Debug)]
 struct Key<K> {
     // We copy it with std::ptr::copy, but we don't actually use the field
@@ -30,9 +30,11 @@ struct Key<K> {
     key: K,
 }
 
-#[repr(align(8))]
+// #[repr(align(8))]
 #[derive(Copy, Clone, Debug)]
-struct Value<V> {
+struct Value<K, V> {
+    #[allow(dead_code)]
+    key: Key<K>,
     value: V,
 }
 
@@ -71,13 +73,9 @@ macro_rules! key {
 }
 
 /// Get the value pointer. It's stored next to the key.
-/// See: <https://github.com/postgres/postgres/blob/1f998863b0bc6fc8ef3d971d9c6d2c29b52d8ba2/src/backend/utils/hash/dynahash.c#L246-L250>
-/// for implementation. `pg_stat_statements` stores the key in the value struct, but this works too.
 macro_rules! value_ptr {
     ($entry:expr) => {{
-        let value_ptr: *mut Value<V> =
-            unsafe { $entry.offset(std::mem::size_of::<Key<K>>().try_into().unwrap()) }
-                as *mut Value<V>;
+        let value_ptr: *mut Value<K, V> = $entry as *mut Value<K, V>;
 
         value_ptr
     }};
@@ -102,7 +100,6 @@ impl<K: Copy + Clone, V: Copy + Clone> PgHashMap<K, V> {
         let mut htab = self.htab.exclusive();
         let (key_ptr, hash_value) = key!(key, htab);
 
-        println!("Find");
         let entry = unsafe {
             pg_sys::hash_search_with_hash_value(
                 htab.htab,
@@ -113,12 +110,9 @@ impl<K: Copy + Clone, V: Copy + Clone> PgHashMap<K, V> {
             )
         };
 
-        println!("Done find");
-
         let return_value = if entry.is_null() {
             None
         } else {
-            println!("Found");
             let value_ptr = value_ptr!(entry);
             let value = unsafe { std::ptr::read(value_ptr) };
             Some(value.value)
@@ -130,7 +124,6 @@ impl<K: Copy + Clone, V: Copy + Clone> PgHashMap<K, V> {
             return Err(Error::HashTableFull);
         }
 
-        println!("Replace");
         let entry = unsafe {
             pg_sys::hash_search_with_hash_value(
                 htab.htab,
@@ -143,12 +136,14 @@ impl<K: Copy + Clone, V: Copy + Clone> PgHashMap<K, V> {
 
         if !entry.is_null() {
             let value_ptr = value_ptr!(entry);
-            let value = Value { value };
-            println!("Insert");
+            let value = Value { key: Key { key }, value };
             unsafe {
                 std::ptr::copy(std::ptr::addr_of!(value), value_ptr, 1);
             }
-            htab.elements += 1;
+            // We inserted a new element, increasing the size of the table.
+            if return_value.is_none() {
+                htab.elements += 1;
+            }
             Ok(return_value)
         } else {
             // OOM. We pre-allocate at server start, so this should never be an issue.
@@ -224,7 +219,7 @@ impl<K: Copy + Clone, V: Copy + Clone> PgSharedMemoryInitialization for PgHashMa
 
         let mut hash_ctl = pg_sys::HASHCTL::default();
         hash_ctl.keysize = std::mem::size_of::<Key<K>>();
-        hash_ctl.entrysize = std::mem::size_of::<Value<V>>();
+        hash_ctl.entrysize = std::mem::size_of::<Value<K, V>>();
 
         let shm_name =
             alloc::ffi::CString::new(Uuid::new_v4().to_string()).expect("CString::new() failed");
