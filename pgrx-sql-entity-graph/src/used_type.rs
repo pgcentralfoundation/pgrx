@@ -385,7 +385,7 @@ fn resolve_vec_inner(
                     let archetype = mac.path.segments.last().expect("No last segment");
                     match archetype.ident.to_string().as_str() {
                         "default" => {
-                            return Err(syn::Error::new(mac.span(), "`Vec<default!(T, default)>` not supported, choose `default!(Vec<T>, ident)` instead"))?;
+                            Err(syn::Error::new(mac.span(), "`Vec<default!(T, default)>` not supported, choose `default!(Vec<T>, ident)` instead"))
                         }
                         "composite_type" => {
                             let sql = Some(handle_composite_type_macro(mac)?);
@@ -402,15 +402,14 @@ fn resolve_vec_inner(
                         arg_type_path.span(),
                         "No last segment in type path",
                     ))?;
-                    match last.ident.to_string().as_str() {
-                        "Option" => {
-                            let (inner_ty, expr) = resolve_option_inner(arg_type_path)?;
-                            let wrapped_ty = syn::parse_quote! {
-                                Vec<#inner_ty>
-                            };
-                            Ok((wrapped_ty, expr))
-                        }
-                        _ => Ok((syn::Type::Path(original), None)),
+                    if last.ident.to_string() == "Option" {
+                        let (inner_ty, expr) = resolve_option_inner(arg_type_path)?;
+                        let wrapped_ty = syn::parse_quote! {
+                            Vec<#inner_ty>
+                        };
+                        Ok((wrapped_ty, expr))
+                    } else {
+                        Ok((syn::Type::Path(original), None))
                     }
                 }
                 _ => Ok((syn::Type::Path(original), None)),
@@ -447,7 +446,7 @@ fn resolve_variadic_array_inner(
                         let archetype = mac.path.segments.last().expect("No last segment");
                         match archetype.ident.to_string().as_str() {
                             "default" => {
-                                return Err(syn::Error::new(mac.span(), "`VariadicArray<default!(T, default)>` not supported, choose `default!(VariadicArray<T>, ident)` instead"))?;
+                                Err(syn::Error::new(mac.span(), "`VariadicArray<default!(T, default)>` not supported, choose `default!(VariadicArray<T>, ident)` instead"))
                             }
                             "composite_type" => {
                                 let sql = Some(handle_composite_type_macro(mac)?);
@@ -464,15 +463,14 @@ fn resolve_variadic_array_inner(
                             arg_type_path.span(),
                             "No last segment in type path",
                         ))?;
-                        match last.ident.to_string().as_str() {
-                            "Option" => {
-                                let (inner_ty, expr) = resolve_option_inner(arg_type_path)?;
-                                let wrapped_ty = syn::parse_quote! {
-                                    ::pgrx::datum::VariadicArray<'static, #inner_ty>
-                                };
-                                Ok((wrapped_ty, expr))
-                            }
-                            _ => Ok((syn::Type::Path(original), None)),
+                        if last.ident.to_string() == "Option" {
+                            let (inner_ty, expr) = resolve_option_inner(arg_type_path)?;
+                            let wrapped_ty = syn::parse_quote! {
+                                ::pgrx::datum::VariadicArray<'static, #inner_ty>
+                            };
+                            Ok((wrapped_ty, expr))
+                        } else {
+                            Ok((syn::Type::Path(original), None))
                         }
                     }
                     _ => Ok((syn::Type::Path(original), None)),
@@ -509,7 +507,7 @@ fn resolve_array_inner(
                         let archetype = mac.path.segments.last().expect("No last segment");
                         match archetype.ident.to_string().as_str() {
                             "default" => {
-                                return Err(syn::Error::new(mac.span(), "`VariadicArray<default!(T, default)>` not supported, choose `default!(VariadicArray<T>, ident)` instead"))?;
+                                Err(syn::Error::new(mac.span(), "`VariadicArray<default!(T, default)>` not supported, choose `default!(VariadicArray<T>, ident)` instead"))
                             }
                             "composite_type" => {
                                 let sql = Some(handle_composite_type_macro(mac)?);
@@ -572,7 +570,7 @@ fn resolve_option_inner(
                                 Ok((ty, sql))
                             },
                             // Option<default!(composite_type!(..))> isn't valid. If the user wanted the default to be `NULL` they just don't need a default.
-                            "default" => return Err(syn::Error::new(mac.span(), "`Option<default!(T, \"my_default\")>` not supported, choose `Option<T>` for a default of `NULL`, or `default!(T, default)` for a non-NULL default"))?,
+                            "default" => Err(syn::Error::new(mac.span(), "`Option<default!(T, \"my_default\")>` not supported, choose `Option<T>` for a default of `NULL`, or `default!(T, default)` for a non-NULL default")),
                             _ => Ok((syn::Type::Path(original), None)),
                         }
                     }
@@ -652,31 +650,39 @@ fn handle_default_macro(mac: &syn::Macro) -> syn::Result<(syn::Type, Option<Stri
                 let value = def.base10_digits();
                 Ok((true_ty, Some("-".to_owned() + value)))
             }
-            _ => {
-                return Err(syn::Error::new(
-                    Span::call_site(),
-                    format!("Unrecognized UnaryExpr in `default!()` macro, got: {:?}", out.expr),
-                ))
-            }
+            _ => Err(syn::Error::new(
+                Span::call_site(),
+                format!("Unrecognized UnaryExpr in `default!()` macro, got: {:?}", out.expr),
+            )),
         },
         syn::Expr::Type(syn::ExprType { ref ty, .. }) => match ty.deref() {
             syn::Type::Path(syn::TypePath { path: syn::Path { segments, .. }, .. }) => {
                 let last = segments.last().expect("No last segment");
                 let last_string = last.ident.to_string();
-                if last_string.as_str() == "NULL" {
+                if last_string == "NULL" {
                     Ok((true_ty, Some(last_string)))
                 } else {
-                    return Err(syn::Error::new(
+                    Err(syn::Error::new(
                         Span::call_site(),
                         format!(
                             "Unable to parse default value of `default!()` macro, got: {:?}",
                             out.expr
                         ),
-                    ));
+                    ))
                 }
             }
-            _ => {
-                return Err(syn::Error::new(
+            _ => Err(syn::Error::new(
+                Span::call_site(),
+                format!("Unable to parse default value of `default!()` macro, got: {:?}", out.expr),
+            )),
+        },
+        syn::Expr::Path(syn::ExprPath { path: syn::Path { ref segments, .. }, .. }) => {
+            let last = segments.last().expect("No last segment");
+            let last_string = last.ident.to_string();
+            if last_string == "NULL" {
+                Ok((true_ty, Some(last_string)))
+            } else {
+                Err(syn::Error::new(
                     Span::call_site(),
                     format!(
                         "Unable to parse default value of `default!()` macro, got: {:?}",
@@ -684,28 +690,11 @@ fn handle_default_macro(mac: &syn::Macro) -> syn::Result<(syn::Type, Option<Stri
                     ),
                 ))
             }
-        },
-        syn::Expr::Path(syn::ExprPath { path: syn::Path { ref segments, .. }, .. }) => {
-            let last = segments.last().expect("No last segment");
-            let last_string = last.ident.to_string();
-            if last_string.as_str() == "NULL" {
-                Ok((true_ty, Some(last_string)))
-            } else {
-                return Err(syn::Error::new(
-                    Span::call_site(),
-                    format!(
-                        "Unable to parse default value of `default!()` macro, got: {:?}",
-                        out.expr
-                    ),
-                ));
-            }
         }
-        _ => {
-            return Err(syn::Error::new(
-                Span::call_site(),
-                format!("Unable to parse default value of `default!()` macro, got: {:?}", out.expr),
-            ))
-        }
+        _ => Err(syn::Error::new(
+            Span::call_site(),
+            format!("Unable to parse default value of `default!()` macro, got: {:?}", out.expr),
+        )),
     }
 }
 

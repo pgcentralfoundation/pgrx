@@ -283,7 +283,7 @@ impl ToSql for PgAggregateEntity {
                 }
                 Err(err) => match context.source_only_to_sql_type(used_ty.ty_source) {
                     Some(source_only_mapping) => Ok(source_only_mapping.to_string()),
-                    None => return Err(err).wrap_err("While mapping argument"),
+                    None => Err(err).wrap_err("While mapping argument"),
                 },
             }
         };

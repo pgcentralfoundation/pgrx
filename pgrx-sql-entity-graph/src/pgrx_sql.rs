@@ -449,14 +449,14 @@ impl PgrxSql {
     }
 
     pub fn get_module_pathname(&self) -> String {
-        return if self.versioned_so {
+        if self.versioned_so {
             let extname = &self.extension_name;
             let extver = &self.control.default_version;
             // Note: versioned so-name format must agree with cargo pgrx
             format!("$libdir/{}-{}", extname, extver)
         } else {
             String::from("MODULE_PATHNAME")
-        };
+        }
     }
 }
 

@@ -297,20 +297,16 @@ impl Returning {
             syn::Type::Macro(ref mut type_macro) => Self::parse_type_macro(type_macro),
             syn::Type::Paren(ref mut type_paren) => match &mut *type_paren.elem {
                 syn::Type::Macro(ref mut type_macro) => Self::parse_type_macro(type_macro),
-                other => {
-                    return Err(syn::Error::new(
-                        other.span(),
-                        &format!("Got unknown return type (type_paren): {type_paren:?}"),
-                    ))
-                }
-            },
-            syn::Type::Group(tg) => return Self::match_type(&tg.elem),
-            other => {
-                return Err(syn::Error::new(
+                other => Err(syn::Error::new(
                     other.span(),
-                    &format!("Got unknown return type (other): {other:?}"),
-                ))
-            }
+                    &format!("Got unknown return type (type_paren): {type_paren:?}"),
+                )),
+            },
+            syn::Type::Group(tg) => Self::match_type(&tg.elem),
+            other => Err(syn::Error::new(
+                other.span(),
+                &format!("Got unknown return type (other): {other:?}"),
+            )),
         }
     }
 }
