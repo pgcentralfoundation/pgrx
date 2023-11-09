@@ -181,12 +181,10 @@ impl PgConfig {
             const PREFIX: &str = "PGRX_PG_CONFIG_";
 
             let mut known_props = BTreeMap::new();
-            for (k, v) in std::env::vars() {
-                if k.starts_with(PREFIX) {
-                    // reformat the key to look like an argument option to `pg_config`
-                    let prop = format!("--{}", k.trim_start_matches(PREFIX).to_lowercase());
-                    known_props.insert(prop, v);
-                }
+            for (k, v) in std::env::vars().filter(|(k, _)| k.starts_with(PREFIX)) {
+                // reformat the key to look like an argument option to `pg_config`
+                let prop = format!("--{}", k.trim_start_matches(PREFIX).to_lowercase());
+                known_props.insert(prop, v);
             }
 
             Ok(Self {
