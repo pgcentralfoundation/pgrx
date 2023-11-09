@@ -324,6 +324,7 @@ impl ToSql for PgAggregateEntity {
             );
             optional_attributes_string += &optional_attribute_string;
         }
+        let PgAggregateEntity { name, full_path, file, line, sfunc, .. } = self;
 
         let sql = format!(
             "\n\
@@ -336,13 +337,6 @@ impl ToSql for PgAggregateEntity {
                     {optional_attributes}\
                 );\
             ",
-            schema = schema,
-            name = self.name,
-            full_path = self.full_path,
-            file = self.file,
-            line = self.line,
-            sfunc = self.sfunc,
-            stype_schema = stype_schema,
             stype = stype_sql,
             stype_full_path = self.stype.used_ty.full_path,
             maybe_comma_after_stype = if optional_attributes.is_empty() { "" } else { "," },
