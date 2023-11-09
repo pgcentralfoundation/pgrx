@@ -436,14 +436,9 @@ impl PgrxSql {
 
     pub fn has_sql_declared_entity(&self, identifier: &SqlDeclared) -> Option<&SqlDeclaredEntity> {
         self.extension_sqls.iter().find_map(|(item, _index)| {
-            let retval = item.creates.iter().find_map(|create_entity| {
-                if create_entity.has_sql_declared_entity(identifier) {
-                    Some(create_entity)
-                } else {
-                    None
-                }
-            });
-            retval
+            item.creates
+                .iter()
+                .find(|create_entity| create_entity.has_sql_declared_entity(identifier))
         })
     }
 
