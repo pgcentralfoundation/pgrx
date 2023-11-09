@@ -978,11 +978,11 @@ fn connect_externs(
                         if ext_item
                             .has_sql_declared_entity(&SqlDeclared::Type(ty.full_path.to_string()))
                             .is_some()
-                        {
-                            graph.add_edge(*ext_index, index, SqlGraphRelationship::RequiredByArg);
-                        } else if ext_item
-                            .has_sql_declared_entity(&SqlDeclared::Enum(ty.full_path.to_string()))
-                            .is_some()
+                            || ext_item
+                                .has_sql_declared_entity(&SqlDeclared::Enum(
+                                    ty.full_path.to_string(),
+                                ))
+                                .is_some()
                         {
                             graph.add_edge(*ext_index, index, SqlGraphRelationship::RequiredByArg);
                         }
