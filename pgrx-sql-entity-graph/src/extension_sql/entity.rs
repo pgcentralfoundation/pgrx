@@ -212,8 +212,8 @@ impl SqlDeclaredEntity {
                 // there are cases where the identifier is
                 // `core::option::Option<Foo>` while the data stores
                 // `Option<Foo>` check again for this
-                let Some(generics_st) = ident_name.find('<') else { return false };
-                let Some(qual_end) = ident_name[..generics_st].rfind("::") else { return false };
+                let Some(generics_start) = ident_name.find('<') else { return false };
+                let Some(qual_end) = ident_name[..generics_start].rfind("::") else { return false };
                 matches(&ident_name[qual_end + 2..])
             }
             _ => false,
