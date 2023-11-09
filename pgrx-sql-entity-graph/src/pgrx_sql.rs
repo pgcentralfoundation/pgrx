@@ -334,51 +334,41 @@ impl PgrxSql {
                 .to_owned()
             },
             &|_graph, (_index, node)| {
+                let dot_id = node.dot_identifier();
                 match node {
                     // Colors derived from https://www.schemecolor.com/touch-of-creativity.php
                     SqlGraphEntity::Schema(_item) => format!(
-                        "label = \"{}\", weight = 6, shape = \"tab\"",
-                        node.dot_identifier()
+                        "label = \"{dot_id}\", weight = 6, shape = \"tab\""
                     ),
                     SqlGraphEntity::Function(_item) => format!(
-                        "label = \"{}\", penwidth = 0, style = \"filled\", fillcolor = \"#ADC7C6\", weight = 4, shape = \"box\"",
-                        node.dot_identifier()
+                        "label = \"{dot_id}\", penwidth = 0, style = \"filled\", fillcolor = \"#ADC7C6\", weight = 4, shape = \"box\"",
                     ),
                     SqlGraphEntity::Type(_item) => format!(
-                        "label = \"{}\", penwidth = 0, style = \"filled\", fillcolor = \"#AE9BBD\", weight = 5, shape = \"oval\"",
-                        node.dot_identifier()
+                        "label = \"{dot_id}\", penwidth = 0, style = \"filled\", fillcolor = \"#AE9BBD\", weight = 5, shape = \"oval\"",
                     ),
                     SqlGraphEntity::BuiltinType(_item) => format!(
-                        "label = \"{}\", shape = \"plain\"",
-                        node.dot_identifier()
+                        "label = \"{dot_id}\", shape = \"plain\""
                     ),
                     SqlGraphEntity::Enum(_item) => format!(
-                        "label = \"{}\", penwidth = 0, style = \"filled\", fillcolor = \"#C9A7C8\", weight = 5, shape = \"oval\"",
-                        node.dot_identifier()
+                        "label = \"{dot_id}\", penwidth = 0, style = \"filled\", fillcolor = \"#C9A7C8\", weight = 5, shape = \"oval\""
                     ),
                     SqlGraphEntity::Ord(_item) => format!(
-                        "label = \"{}\", penwidth = 0, style = \"filled\", fillcolor = \"#FFCFD3\", weight = 5, shape = \"diamond\"",
-                        node.dot_identifier()
+                        "label = \"{dot_id}\", penwidth = 0, style = \"filled\", fillcolor = \"#FFCFD3\", weight = 5, shape = \"diamond\""
                     ),
                     SqlGraphEntity::Hash(_item) => format!(
-                        "label = \"{}\", penwidth = 0, style = \"filled\", fillcolor = \"#FFE4E0\", weight = 5, shape = \"diamond\"",
-                        node.dot_identifier()
+                        "label = \"{dot_id}\", penwidth = 0, style = \"filled\", fillcolor = \"#FFE4E0\", weight = 5, shape = \"diamond\""
                     ),
                     SqlGraphEntity::Aggregate(_item) => format!(
-                        "label = \"{}\", penwidth = 0, style = \"filled\", fillcolor = \"#FFE4E0\", weight = 5, shape = \"diamond\"",
-                        node.dot_identifier()
+                        "label = \"{dot_id}\", penwidth = 0, style = \"filled\", fillcolor = \"#FFE4E0\", weight = 5, shape = \"diamond\""
                     ),
                     SqlGraphEntity::Trigger(_item) => format!(
-                        "label = \"{}\", penwidth = 0, style = \"filled\", fillcolor = \"#FFE4E0\", weight = 5, shape = \"diamond\"",
-                        node.dot_identifier()
+                        "label = \"{dot_id}\", penwidth = 0, style = \"filled\", fillcolor = \"#FFE4E0\", weight = 5, shape = \"diamond\""
                     ),
                     SqlGraphEntity::CustomSql(_item) => format!(
-                        "label = \"{}\", weight = 3, shape = \"signature\"",
-                        node.dot_identifier()
+                        "label = \"{dot_id}\", weight = 3, shape = \"signature\""
                     ),
                     SqlGraphEntity::ExtensionRoot(_item) => format!(
-                        "label = \"{}\", shape = \"cylinder\"",
-                        node.dot_identifier()
+                        "label = \"{dot_id}\", shape = \"cylinder\""
                     ),
                 }
             },
