@@ -367,40 +367,37 @@ impl ToSql for PgExternEntity {
             unaliased_name = self.unaliased_name,
         );
 
+        let PgExternEntity { name, module_path, file, line, .. } = self;
+        let requires = {
+            let requires_attrs = self
+                .extern_attrs
+                .iter()
+                .filter_map(|x| match x {
+                    ExternArgs::Requires(requirements) => Some(requirements),
+                    _ => None,
+                })
+                .flatten()
+                .collect::<Vec<_>>();
+            if !requires_attrs.is_empty() {
+                format!(
+                    "-- requires:\n{}\n",
+                    requires_attrs
+                        .iter()
+                        .map(|i| format!("--   {}", i))
+                        .collect::<Vec<_>>()
+                        .join("\n")
+                )
+            } else {
+                "".to_string()
+            }
+        };
+
         let ext_sql = format!(
             "\n\
-                                -- {file}:{line}\n\
-                                -- {module_path}::{name}\n\
-                                {requires}\
-                                {fn_sql}\
-                            ",
-            name = self.name,
-            module_path = self.module_path,
-            file = self.file,
-            line = self.line,
-            requires = {
-                let requires_attrs = self
-                    .extern_attrs
-                    .iter()
-                    .filter_map(|x| match x {
-                        ExternArgs::Requires(requirements) => Some(requirements),
-                        _ => None,
-                    })
-                    .flatten()
-                    .collect::<Vec<_>>();
-                if !requires_attrs.is_empty() {
-                    format!(
-                        "-- requires:\n{}\n",
-                        requires_attrs
-                            .iter()
-                            .map(|i| format!("--   {}", i))
-                            .collect::<Vec<_>>()
-                            .join("\n")
-                    )
-                } else {
-                    "".to_string()
-                }
-            },
+            -- {file}:{line}\n\
+            -- {module_path}::{name}\n\
+            {requires}\
+            {fn_sql}"
         );
 
         let rendered = if let Some(op) = &self.operator {
