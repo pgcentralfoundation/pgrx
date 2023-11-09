@@ -544,10 +544,6 @@ impl ToSql for PgExternEntity {
                                                     );\
                                                     ",
                                                     opname = op.opname.unwrap(),
-                                                    file = self.file,
-                                                    line = self.line,
-                                                    name = self.name,
-                                                    module_path = self.module_path,
                                                     left_name = left_arg.type_name,
                                                     right_name = right_arg.type_name,
                                                     schema_prefix_left = context.schema_prefix_for(&left_arg_graph_index),
