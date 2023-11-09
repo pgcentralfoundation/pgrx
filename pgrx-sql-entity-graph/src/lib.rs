@@ -54,6 +54,7 @@ pub(crate) mod control_file;
 pub(crate) mod enrich;
 pub(crate) mod extension_sql;
 pub(crate) mod extern_args;
+pub(crate) mod fmt;
 pub mod lifetimes;
 pub(crate) mod mapping;
 pub mod metadata;
@@ -205,10 +206,8 @@ impl ToSql for SqlGraphEntity {
                 if let Some(result) = item.to_sql_config.to_sql(self, context) {
                     return result;
                 }
-                if context
-                    .graph
-                    .neighbors_undirected(context.externs.get(item).unwrap().clone())
-                    .any(|neighbor| {
+                if context.graph.neighbors_undirected(*context.externs.get(item).unwrap()).any(
+                    |neighbor| {
                         let neighbor_item = &context.graph[neighbor];
                         match neighbor_item {
                             SqlGraphEntity::Type(PostgresTypeEntity {
@@ -226,8 +225,8 @@ impl ToSql for SqlGraphEntity {
                             }
                             _ => false,
                         }
-                    })
-                {
+                    },
+                ) {
                     Ok(String::default())
                 } else {
                     item.to_sql(context)
@@ -276,7 +275,7 @@ pub fn ident_is_acceptable_to_postgres(ident: &syn::Ident) -> Result<(), syn::Er
     if ident_string.len() >= POSTGRES_IDENTIFIER_MAX_LEN {
         return Err(syn::Error::new(
             ident.span(),
-            &format!(
+            format!(
                 "Identifier `{}` was {} characters long, PostgreSQL will truncate identifiers with less than \
                 {POSTGRES_IDENTIFIER_MAX_LEN} characters, opt for an identifier which Postgres won't truncate",
                 ident,

@@ -104,9 +104,8 @@ impl PgExtern {
 
         if let Some(ref mut content) = to_sql_config.content {
             let value = content.value();
-            let updated_value = value
-                .replace("@FUNCTION_NAME@", &*(func.sig.ident.to_string() + "_wrapper"))
-                + "\n";
+            let updated_value =
+                value.replace("@FUNCTION_NAME@", &(func.sig.ident.to_string() + "_wrapper")) + "\n";
             *content = syn::LitStr::new(&updated_value, Span::call_site());
         }
 
@@ -194,9 +193,9 @@ impl PgExtern {
                             let sql = retval.get_or_insert_with(String::default);
                             let line = inner.value().trim_start().replace(
                                 "@FUNCTION_NAME@",
-                                &*(self.func.sig.ident.to_string() + "_wrapper"),
+                                &(self.func.sig.ident.to_string() + "_wrapper"),
                             ) + "\n";
-                            sql.push_str(&*line);
+                            sql.push_str(&line);
                         }
                     }
                 }

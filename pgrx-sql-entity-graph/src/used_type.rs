@@ -105,7 +105,7 @@ impl UsedType {
                         ))?;
                     }
                     "composite_type" => {
-                        let composite_type = Some(handle_composite_type_macro(&mac)?);
+                        let composite_type = Some(handle_composite_type_macro(mac)?);
                         let ty = syn::parse_quote! {
                             ::pgrx::heap_tuple::PgHeapTuple<'static, ::pgrx::pgbox::AllocatedByRust>
                         };
@@ -203,14 +203,14 @@ impl UsedType {
                                     }
                                     _ => {
                                         return Err(syn::Error::new(
-                                            type_path.span().clone(),
+                                            type_path.span(),
                                             "Unexpected Item found inside `Result` (expected Type)",
                                         ))
                                     }
                                 }
                             }
                             _ => return Err(syn::Error::new(
-                                type_path.span().clone(),
+                                type_path.span(),
                                 "Unexpected Item found inside `Result` (expected Angle Brackets)",
                             )),
                         }
@@ -262,7 +262,7 @@ impl UsedType {
                                     // Option<T>
                                     _ => {
                                         return Err(syn::Error::new(
-                                            type_path.span().clone(),
+                                            type_path.span(),
                                             "Unexpected Item found inside `Option` (expected Type)",
                                         ))
                                     }
@@ -270,7 +270,7 @@ impl UsedType {
                             }
                             // Option<T>
                             _ => return Err(syn::Error::new(
-                                type_path.span().clone(),
+                                type_path.span(),
                                 "Unexpected Item found inside `Option` (expected Angle Brackets)",
                             )),
                         }
@@ -288,13 +288,9 @@ impl UsedType {
         let mut resolved_ty_inner: Option<syn::Type> = None;
         if result {
             if let syn::Type::Path(tp) = &resolved_ty {
-                if let Some(first_segment) =
-                    tp.path.segments.first().map(|segment| Some(segment)).unwrap_or(None)
-                {
+                if let Some(first_segment) = tp.path.segments.first().map(Some).unwrap_or(None) {
                     if let syn::PathArguments::AngleBracketed(ab) = &first_segment.arguments {
-                        if let Some(first_arg) =
-                            ab.args.first().map(|arg| Some(arg)).unwrap_or(None)
-                        {
+                        if let Some(first_arg) = ab.args.first().map(Some).unwrap_or(None) {
                             if let syn::GenericArgument::Type(ty) = first_arg {
                                 resolved_ty_inner = Some(ty.clone());
                             }
@@ -321,12 +317,12 @@ impl UsedType {
         let mut resolved_ty_inner = self.resolved_ty_inner.clone().unwrap_or(resolved_ty.clone());
         staticize_lifetimes(&mut resolved_ty);
         staticize_lifetimes(&mut resolved_ty_inner);
-        let resolved_ty_string = resolved_ty.to_token_stream().to_string().replace(" ", "");
+        let resolved_ty_string = resolved_ty.to_token_stream().to_string().replace(' ', "");
         let composite_type = self.composite_type.clone().map(|v| v.expr);
         let composite_type_iter = composite_type.iter();
         let variadic = &self.variadic;
         let optional = &self.optional.is_some();
-        let default = (&self.default).iter();
+        let default = self.default.iter();
 
         syn::parse_quote! {
             ::pgrx::pgrx_sql_entity_graph::UsedTypeEntity {
@@ -385,7 +381,7 @@ fn resolve_vec_inner(
                     let archetype = mac.path.segments.last().expect("No last segment");
                     match archetype.ident.to_string().as_str() {
                         "default" => {
-                            return Err(syn::Error::new(mac.span(), "`Vec<default!(T, default)>` not supported, choose `default!(Vec<T>, ident)` instead"))?;
+                            Err(syn::Error::new(mac.span(), "`Vec<default!(T, default)>` not supported, choose `default!(Vec<T>, ident)` instead"))
                         }
                         "composite_type" => {
                             let sql = Some(handle_composite_type_macro(mac)?);
@@ -402,15 +398,14 @@ fn resolve_vec_inner(
                         arg_type_path.span(),
                         "No last segment in type path",
                     ))?;
-                    match last.ident.to_string().as_str() {
-                        "Option" => {
-                            let (inner_ty, expr) = resolve_option_inner(arg_type_path)?;
-                            let wrapped_ty = syn::parse_quote! {
-                                Vec<#inner_ty>
-                            };
-                            Ok((wrapped_ty, expr))
-                        }
-                        _ => Ok((syn::Type::Path(original), None)),
+                    if last.ident == "Option" {
+                        let (inner_ty, expr) = resolve_option_inner(arg_type_path)?;
+                        let wrapped_ty = syn::parse_quote! {
+                            Vec<#inner_ty>
+                        };
+                        Ok((wrapped_ty, expr))
+                    } else {
+                        Ok((syn::Type::Path(original), None))
                     }
                 }
                 _ => Ok((syn::Type::Path(original), None)),
@@ -424,7 +419,7 @@ fn resolve_vec_inner(
 fn resolve_variadic_array_inner(
     mut original: syn::TypePath,
 ) -> syn::Result<(syn::Type, Option<CompositeTypeMacro>)> {
-    let original_span = original.span().clone();
+    let original_span = original.span();
     let last = original
         .path
         .segments
@@ -447,7 +442,7 @@ fn resolve_variadic_array_inner(
                         let archetype = mac.path.segments.last().expect("No last segment");
                         match archetype.ident.to_string().as_str() {
                             "default" => {
-                                return Err(syn::Error::new(mac.span(), "`VariadicArray<default!(T, default)>` not supported, choose `default!(VariadicArray<T>, ident)` instead"))?;
+                                Err(syn::Error::new(mac.span(), "`VariadicArray<default!(T, default)>` not supported, choose `default!(VariadicArray<T>, ident)` instead"))
                             }
                             "composite_type" => {
                                 let sql = Some(handle_composite_type_macro(mac)?);
@@ -464,15 +459,14 @@ fn resolve_variadic_array_inner(
                             arg_type_path.span(),
                             "No last segment in type path",
                         ))?;
-                        match last.ident.to_string().as_str() {
-                            "Option" => {
-                                let (inner_ty, expr) = resolve_option_inner(arg_type_path)?;
-                                let wrapped_ty = syn::parse_quote! {
-                                    ::pgrx::datum::VariadicArray<'static, #inner_ty>
-                                };
-                                Ok((wrapped_ty, expr))
-                            }
-                            _ => Ok((syn::Type::Path(original), None)),
+                        if last.ident == "Option" {
+                            let (inner_ty, expr) = resolve_option_inner(arg_type_path)?;
+                            let wrapped_ty = syn::parse_quote! {
+                                ::pgrx::datum::VariadicArray<'static, #inner_ty>
+                            };
+                            Ok((wrapped_ty, expr))
+                        } else {
+                            Ok((syn::Type::Path(original), None))
                         }
                     }
                     _ => Ok((syn::Type::Path(original), None)),
@@ -487,7 +481,7 @@ fn resolve_variadic_array_inner(
 fn resolve_array_inner(
     mut original: syn::TypePath,
 ) -> syn::Result<(syn::Type, Option<CompositeTypeMacro>)> {
-    let original_span = original.span().clone();
+    let original_span = original.span();
     let last = original
         .path
         .segments
@@ -509,7 +503,7 @@ fn resolve_array_inner(
                         let archetype = mac.path.segments.last().expect("No last segment");
                         match archetype.ident.to_string().as_str() {
                             "default" => {
-                                return Err(syn::Error::new(mac.span(), "`VariadicArray<default!(T, default)>` not supported, choose `default!(VariadicArray<T>, ident)` instead"))?;
+                                Err(syn::Error::new(mac.span(), "`VariadicArray<default!(T, default)>` not supported, choose `default!(VariadicArray<T>, ident)` instead"))
                             }
                             "composite_type" => {
                                 let sql = Some(handle_composite_type_macro(mac)?);
@@ -572,7 +566,7 @@ fn resolve_option_inner(
                                 Ok((ty, sql))
                             },
                             // Option<default!(composite_type!(..))> isn't valid. If the user wanted the default to be `NULL` they just don't need a default.
-                            "default" => return Err(syn::Error::new(mac.span(), "`Option<default!(T, \"my_default\")>` not supported, choose `Option<T>` for a default of `NULL`, or `default!(T, default)` for a non-NULL default"))?,
+                            "default" => Err(syn::Error::new(mac.span(), "`Option<default!(T, \"my_default\")>` not supported, choose `Option<T>` for a default of `NULL`, or `default!(T, default)` for a non-NULL default")),
                             _ => Ok((syn::Type::Path(original), None)),
                         }
                     }
@@ -652,31 +646,39 @@ fn handle_default_macro(mac: &syn::Macro) -> syn::Result<(syn::Type, Option<Stri
                 let value = def.base10_digits();
                 Ok((true_ty, Some("-".to_owned() + value)))
             }
-            _ => {
-                return Err(syn::Error::new(
-                    Span::call_site(),
-                    format!("Unrecognized UnaryExpr in `default!()` macro, got: {:?}", out.expr),
-                ))
-            }
+            _ => Err(syn::Error::new(
+                Span::call_site(),
+                format!("Unrecognized UnaryExpr in `default!()` macro, got: {:?}", out.expr),
+            )),
         },
         syn::Expr::Type(syn::ExprType { ref ty, .. }) => match ty.deref() {
             syn::Type::Path(syn::TypePath { path: syn::Path { segments, .. }, .. }) => {
                 let last = segments.last().expect("No last segment");
                 let last_string = last.ident.to_string();
-                if last_string.as_str() == "NULL" {
+                if last_string == "NULL" {
                     Ok((true_ty, Some(last_string)))
                 } else {
-                    return Err(syn::Error::new(
+                    Err(syn::Error::new(
                         Span::call_site(),
                         format!(
                             "Unable to parse default value of `default!()` macro, got: {:?}",
                             out.expr
                         ),
-                    ));
+                    ))
                 }
             }
-            _ => {
-                return Err(syn::Error::new(
+            _ => Err(syn::Error::new(
+                Span::call_site(),
+                format!("Unable to parse default value of `default!()` macro, got: {:?}", out.expr),
+            )),
+        },
+        syn::Expr::Path(syn::ExprPath { path: syn::Path { ref segments, .. }, .. }) => {
+            let last = segments.last().expect("No last segment");
+            let last_string = last.ident.to_string();
+            if last_string == "NULL" {
+                Ok((true_ty, Some(last_string)))
+            } else {
+                Err(syn::Error::new(
                     Span::call_site(),
                     format!(
                         "Unable to parse default value of `default!()` macro, got: {:?}",
@@ -684,28 +686,11 @@ fn handle_default_macro(mac: &syn::Macro) -> syn::Result<(syn::Type, Option<Stri
                     ),
                 ))
             }
-        },
-        syn::Expr::Path(syn::ExprPath { path: syn::Path { ref segments, .. }, .. }) => {
-            let last = segments.last().expect("No last segment");
-            let last_string = last.ident.to_string();
-            if last_string.as_str() == "NULL" {
-                Ok((true_ty, Some(last_string)))
-            } else {
-                return Err(syn::Error::new(
-                    Span::call_site(),
-                    format!(
-                        "Unable to parse default value of `default!()` macro, got: {:?}",
-                        out.expr
-                    ),
-                ));
-            }
         }
-        _ => {
-            return Err(syn::Error::new(
-                Span::call_site(),
-                format!("Unable to parse default value of `default!()` macro, got: {:?}", out.expr),
-            ))
-        }
+        _ => Err(syn::Error::new(
+            Span::call_site(),
+            format!("Unable to parse default value of `default!()` macro, got: {:?}", out.expr),
+        )),
     }
 }
 

@@ -126,7 +126,7 @@ impl PgAggregate {
         if let Some((_, ref path, _)) = item_impl.trait_ {
             // TODO: Consider checking the path if there is more than one segment to make sure it's pgrx.
             if let Some(last) = path.segments.last() {
-                if last.ident.to_string() != "Aggregate" {
+                if last.ident != "Aggregate" {
                     return Err(syn::Error::new(
                         last.ident.span(),
                         "`#[pg_aggregate]` only works with the `Aggregate` trait.",
@@ -350,7 +350,7 @@ impl PgAggregate {
             );
             let pg_extern_attr = pg_extern_attr(found);
 
-            if direct_args_with_names.len() > 0 {
+            if !direct_args_with_names.is_empty() {
                 pg_externs.push(parse_quote! {
                     #[allow(non_snake_case, clippy::too_many_arguments)]
                     #pg_extern_attr
@@ -527,7 +527,7 @@ impl PgAggregate {
             );
             let pg_extern_attr = pg_extern_attr(found);
             let maybe_comma: Option<syn::Token![,]> =
-                if direct_args_with_names.len() > 0 { Some(parse_quote! {,}) } else { None };
+                if !direct_args_with_names.is_empty() { Some(parse_quote! {,}) } else { None };
 
             pg_externs.push(parse_quote! {
                 #[allow(non_snake_case, clippy::too_many_arguments)]
@@ -559,7 +559,7 @@ impl PgAggregate {
             type_args: type_args_value,
             type_ordered_set_args: type_ordered_set_args_value,
             type_moving_state: type_moving_state_value,
-            type_stype: type_stype,
+            type_stype,
             const_parallel: get_impl_const_by_name(&item_impl_snapshot, "PARALLEL")
                 .map(|x| x.expr.clone()),
             const_finalize_modify: get_impl_const_by_name(&item_impl_snapshot, "FINALIZE_MODIFY")
@@ -725,7 +725,7 @@ fn get_target_path(item_impl: &ItemImpl) -> Result<Path, syn::Error> {
                     "`#[pg_aggregate]` only works with types whose path have a final segment.",
                 )
             })?;
-            if last_segment.ident.to_string() == "PgVarlena" {
+            if last_segment.ident == "PgVarlena" {
                 match &last_segment.arguments {
                     syn::PathArguments::AngleBracketed(angled) => {
                         let first = angled.args.first().ok_or_else(|| syn::Error::new(
@@ -763,7 +763,7 @@ fn pg_extern_attr(item: &ImplItemMethod) -> syn::Attribute {
     let mut found = None;
     for attr in item.attrs.iter() {
         match attr.path.segments.last() {
-            Some(segment) if segment.ident.to_string() == "pgrx" => {
+            Some(segment) if segment.ident == "pgrx" => {
                 found = Some(attr.tokens.clone());
                 break;
             }
@@ -828,7 +828,7 @@ fn get_impl_const_by_name<'a>(item_impl: &'a ItemImpl, name: &str) -> Option<&'a
     needle
 }
 
-fn get_const_litbool<'a>(item: &'a ImplItemConst) -> Option<bool> {
+fn get_const_litbool(item: &ImplItemConst) -> Option<bool> {
     match &item.expr {
         syn::Expr::Lit(expr_lit) => match &expr_lit.lit {
             syn::Lit::Bool(lit) => Some(lit.value()),
@@ -838,7 +838,7 @@ fn get_const_litbool<'a>(item: &'a ImplItemConst) -> Option<bool> {
     }
 }
 
-fn get_const_litstr<'a>(item: &'a ImplItemConst) -> syn::Result<Option<String>> {
+fn get_const_litstr(item: &ImplItemConst) -> syn::Result<Option<String>> {
     match &item.expr {
         syn::Expr::Lit(expr_lit) => match &expr_lit.lit {
             syn::Lit::Str(lit) => Ok(Some(lit.value())),
@@ -849,7 +849,7 @@ fn get_const_litstr<'a>(item: &'a ImplItemConst) -> syn::Result<Option<String>> 
                 let Some(last) = expr_path.path.segments.last() else {
                     return Ok(None);
                 };
-                if last.ident.to_string() == "Some" {
+                if last.ident == "Some" {
                     match expr_call.args.first() {
                         Some(syn::Expr::Lit(expr_lit)) => match &expr_lit.lit {
                             syn::Lit::Str(lit) => Ok(Some(lit.value())),
@@ -871,7 +871,7 @@ fn remap_self_to_target(ty: &mut syn::Type, target: &syn::Ident) {
     match ty {
         Type::Path(ref mut ty_path) => {
             for segment in ty_path.path.segments.iter_mut() {
-                if segment.ident.to_string() == "Self" {
+                if segment.ident == "Self" {
                     segment.ident = target.clone()
                 }
                 use syn::{GenericArgument, PathArguments};

@@ -17,6 +17,7 @@ to the `pgrx` framework and very subject to change between versions. While you m
 
 */
 use crate::aggregate::options::{FinalizeModify, ParallelOption};
+use crate::fmt;
 use crate::metadata::SqlMapping;
 use crate::pgrx_sql::PgrxSql;
 use crate::to_sql::entity::ToSqlConfigEntity;
@@ -264,14 +265,14 @@ impl ToSql for PgAggregateEntity {
                 Ok(SqlMapping::As(ref argument_sql)) => Ok(argument_sql.to_string()),
                 Ok(SqlMapping::Composite { array_brackets }) => used_ty
                     .composite_type
-                    .map(|v| if array_brackets { format!("{v}[]") } else { format!("{v}") })
+                    .map(|v| fmt::with_array_brackets(v.into(), array_brackets))
                     .ok_or_else(|| {
                         eyre!("Macro expansion time suggested a composite_type!() in return")
                     }),
                 Ok(SqlMapping::Source { array_brackets }) => {
                     let sql = context
                         .source_only_to_sql_type(used_ty.ty_source)
-                        .map(|v| if array_brackets { format!("{v}[]") } else { format!("{v}") })
+                        .map(|v| fmt::with_array_brackets(v, array_brackets))
                         .ok_or_else(|| {
                             eyre!("Macro expansion time suggested a source only mapping in return")
                         })?;
@@ -282,7 +283,7 @@ impl ToSql for PgAggregateEntity {
                 }
                 Err(err) => match context.source_only_to_sql_type(used_ty.ty_source) {
                     Some(source_only_mapping) => Ok(source_only_mapping.to_string()),
-                    None => return Err(err).wrap_err("While mapping argument"),
+                    None => Err(err).wrap_err("While mapping argument"),
                 },
             }
         };
@@ -305,7 +306,7 @@ impl ToSql for PgAggregateEntity {
         }
 
         if let Some(value) = &self.mstype {
-            let mstype_sql = map_ty(&value).wrap_err("Mapping moving state type")?;
+            let mstype_sql = map_ty(value).wrap_err("Mapping moving state type")?;
             optional_attributes.push((
                 format!("\tMSTYPE = {}", mstype_sql),
                 format!("/* {}::MovingState = {} */", self.full_path, value.full_path),
@@ -324,6 +325,116 @@ impl ToSql for PgAggregateEntity {
             optional_attributes_string += &optional_attribute_string;
         }
 
+        let args = {
+            let mut args = Vec::new();
+            for (idx, arg) in self.args.iter().enumerate() {
+                let graph_index = context
+                    .graph
+                    .neighbors_undirected(self_index)
+                    .find(|neighbor| match &context.graph[*neighbor] {
+                        SqlGraphEntity::Type(ty) => ty.id_matches(&arg.used_ty.ty_id),
+                        SqlGraphEntity::Enum(en) => en.id_matches(&arg.used_ty.ty_id),
+                        SqlGraphEntity::BuiltinType(defined) => defined == &arg.used_ty.full_path,
+                        _ => false,
+                    })
+                    .ok_or_else(|| {
+                        eyre!("Could not find arg type in graph. Got: {:?}", arg.used_ty)
+                    })?;
+                let needs_comma = idx < (self.args.len() - 1);
+                let buf = format!("\
+                       \t{name}{variadic}{schema_prefix}{sql_type}{maybe_comma}/* {full_path} */\
+                   ",
+                       schema_prefix = context.schema_prefix_for(&graph_index),
+                       // First try to match on [`TypeId`] since it's most reliable.
+                       sql_type = match arg.used_ty.metadata.argument_sql {
+                            Ok(SqlMapping::As(ref argument_sql)) => {
+                                argument_sql.to_string()
+                            }
+                            Ok(SqlMapping::Composite {
+                                array_brackets,
+                            }) => {
+                                arg.used_ty
+                                    .composite_type
+                                    .map(|v| {
+                                        fmt::with_array_brackets(v.into(), array_brackets)
+                                    })
+                                    .ok_or_else(|| {
+                                        eyre!(
+                                        "Macro expansion time suggested a composite_type!() in return"
+                                    )
+                                    })?
+                            }
+                            Ok(SqlMapping::Source {
+                                array_brackets,
+                            }) => context
+                                    .source_only_to_sql_type(arg.used_ty.ty_source)
+                                    .map(|v| {
+                                        fmt::with_array_brackets(v, array_brackets)
+                                    })
+                                    .ok_or_else(|| {
+                                        eyre!(
+                                        "Macro expansion time suggested a source only mapping in return"
+                                    )
+                                    })?,
+                            Ok(SqlMapping::Skip) => return Err(eyre!("Got a skipped SQL translatable type in aggregate args, this is not permitted")),
+                            Err(err) => {
+                                match context.source_only_to_sql_type(arg.used_ty.ty_source) {
+                                    Some(source_only_mapping) => {
+                                        source_only_mapping.to_string()
+                                    }
+                                    None => return Err(err).wrap_err("While mapping argument"),
+                                }
+                            }
+                        },
+                       variadic = if arg.used_ty.variadic { "VARIADIC " } else { "" },
+                       maybe_comma = if needs_comma { ", " } else { " " },
+                       full_path = arg.used_ty.full_path,
+                       name = if let Some(name) = arg.name {
+                           format!(r#""{}" "#, name)
+                       } else { "".to_string() },
+                );
+                args.push(buf);
+            }
+            "\n".to_string() + &args.join("\n") + "\n"
+        };
+        let direct_args = if let Some(direct_args) = &self.direct_args {
+            let mut args = Vec::new();
+            for (idx, arg) in direct_args.iter().enumerate() {
+                let graph_index = context
+                    .graph
+                    .neighbors_undirected(self_index)
+                    .find(|neighbor| match &context.graph[*neighbor] {
+                        SqlGraphEntity::Type(ty) => ty.id_matches(&arg.used_ty.ty_id),
+                        SqlGraphEntity::Enum(en) => en.id_matches(&arg.used_ty.ty_id),
+                        SqlGraphEntity::BuiltinType(defined) => defined == &arg.used_ty.full_path,
+                        _ => false,
+                    })
+                    .ok_or_else(|| eyre!("Could not find arg type in graph. Got: {:?}", arg))?;
+                let needs_comma = idx < (direct_args.len() - 1);
+                let buf = format!(
+                    "\
+                    \t{maybe_name}{schema_prefix}{sql_type}{maybe_comma}/* {full_path} */\
+                   ",
+                    schema_prefix = context.schema_prefix_for(&graph_index),
+                    // First try to match on [`TypeId`] since it's most reliable.
+                    sql_type = map_ty(&arg.used_ty).wrap_err("Mapping direct arg type")?,
+                    maybe_name = if let Some(name) = arg.name {
+                        "\"".to_string() + name + "\" "
+                    } else {
+                        "".to_string()
+                    },
+                    maybe_comma = if needs_comma { ", " } else { " " },
+                    full_path = arg.used_ty.full_path,
+                );
+                args.push(buf);
+            }
+            "\n".to_string() + &args.join("\n") + "\n"
+        } else {
+            String::default()
+        };
+
+        let PgAggregateEntity { name, full_path, file, line, sfunc, .. } = self;
+
         let sql = format!(
             "\n\
                 -- {file}:{line}\n\
@@ -331,146 +442,16 @@ impl ToSql for PgAggregateEntity {
                 CREATE AGGREGATE {schema}{name} ({direct_args}{maybe_order_by}{args})\n\
                 (\n\
                     \tSFUNC = {schema}\"{sfunc}\", /* {full_path}::state */\n\
-                    \tSTYPE = {stype_schema}{stype}{maybe_comma_after_stype} /* {stype_full_path} */\
+                    \tSTYPE = {stype_schema}{stype_sql}{maybe_comma_after_stype} /* {stype_full_path} */\
                     {optional_attributes}\
                 );\
             ",
-            schema = schema,
-            name = self.name,
-            full_path = self.full_path,
-            file = self.file,
-            line = self.line,
-            sfunc = self.sfunc,
-            stype_schema = stype_schema,
-            stype = stype_sql,
             stype_full_path = self.stype.used_ty.full_path,
-            maybe_comma_after_stype = if optional_attributes.len() == 0 { "" } else { "," },
-            args = {
-                let mut args = Vec::new();
-                for (idx, arg) in self.args.iter().enumerate() {
-                    let graph_index = context
-                        .graph
-                        .neighbors_undirected(self_index)
-                        .find(|neighbor| match &context.graph[*neighbor] {
-                            SqlGraphEntity::Type(ty) => ty.id_matches(&arg.used_ty.ty_id),
-                            SqlGraphEntity::Enum(en) => en.id_matches(&arg.used_ty.ty_id),
-                            SqlGraphEntity::BuiltinType(defined) => {
-                                defined == &arg.used_ty.full_path
-                            }
-                            _ => false,
-                        })
-                        .ok_or_else(|| {
-                            eyre!("Could not find arg type in graph. Got: {:?}", arg.used_ty)
-                        })?;
-                    let needs_comma = idx < (self.args.len() - 1);
-                    let buf = format!("\
-                           \t{name}{variadic}{schema_prefix}{sql_type}{maybe_comma}/* {full_path} */\
-                       ",
-                           schema_prefix = context.schema_prefix_for(&graph_index),
-                           // First try to match on [`TypeId`] since it's most reliable.
-                           sql_type = match arg.used_ty.metadata.argument_sql {
-                                Ok(SqlMapping::As(ref argument_sql)) => {
-                                    argument_sql.to_string()
-                                }
-                                Ok(SqlMapping::Composite {
-                                    array_brackets,
-                                }) => {
-                                    arg.used_ty
-                                        .composite_type
-                                        .map(|v| {
-                                            if array_brackets {
-                                                format!("{v}[]")
-                                            } else {
-                                                format!("{v}")
-                                            }
-                                        })
-                                        .ok_or_else(|| {
-                                            eyre!(
-                                            "Macro expansion time suggested a composite_type!() in return"
-                                        )
-                                        })?
-                                }
-                                Ok(SqlMapping::Source {
-                                    array_brackets,
-                                }) => {
-                                    let sql = context
-                                        .source_only_to_sql_type(arg.used_ty.ty_source)
-                                        .map(|v| {
-                                            if array_brackets {
-                                                format!("{v}[]")
-                                            } else {
-                                                format!("{v}")
-                                            }
-                                        })
-                                        .ok_or_else(|| {
-                                            eyre!(
-                                            "Macro expansion time suggested a source only mapping in return"
-                                        )
-                                        })?;
-                                    sql
-                                }
-                                Ok(SqlMapping::Skip) => return Err(eyre!("Got a skipped SQL translatable type in aggregate args, this is not permitted")),
-                                Err(err) => {
-                                    match context.source_only_to_sql_type(arg.used_ty.ty_source) {
-                                        Some(source_only_mapping) => {
-                                            source_only_mapping.to_string()
-                                        }
-                                        None => return Err(err).wrap_err("While mapping argument"),
-                                    }
-                                }
-                            },
-                           variadic = if arg.used_ty.variadic { "VARIADIC " } else { "" },
-                           maybe_comma = if needs_comma { ", " } else { " " },
-                           full_path = arg.used_ty.full_path,
-                           name = if let Some(name) = arg.name {
-                               format!(r#""{}" "#, name)
-                           } else { "".to_string() },
-                    );
-                    args.push(buf);
-                }
-                "\n".to_string() + &args.join("\n") + "\n"
-            },
-            direct_args = if let Some(direct_args) = &self.direct_args {
-                let mut args = Vec::new();
-                for (idx, arg) in direct_args.iter().enumerate() {
-                    let graph_index = context
-                        .graph
-                        .neighbors_undirected(self_index)
-                        .find(|neighbor| match &context.graph[*neighbor] {
-                            SqlGraphEntity::Type(ty) => ty.id_matches(&arg.used_ty.ty_id),
-                            SqlGraphEntity::Enum(en) => en.id_matches(&arg.used_ty.ty_id),
-                            SqlGraphEntity::BuiltinType(defined) => {
-                                defined == &arg.used_ty.full_path
-                            }
-                            _ => false,
-                        })
-                        .ok_or_else(|| eyre!("Could not find arg type in graph. Got: {:?}", arg))?;
-                    let needs_comma = idx < (direct_args.len() - 1);
-                    let buf = format!(
-                        "\
-                        \t{maybe_name}{schema_prefix}{sql_type}{maybe_comma}/* {full_path} */\
-                       ",
-                        schema_prefix = context.schema_prefix_for(&graph_index),
-                        // First try to match on [`TypeId`] since it's most reliable.
-                        sql_type = map_ty(&arg.used_ty).wrap_err("Mapping direct arg type")?,
-                        maybe_name = if let Some(name) = arg.name {
-                            "\"".to_string() + name + "\" "
-                        } else {
-                            "".to_string()
-                        },
-                        maybe_comma = if needs_comma { ", " } else { " " },
-                        full_path = arg.used_ty.full_path,
-                    );
-                    args.push(buf);
-                }
-                "\n".to_string() + &args.join("\n") + "\n"
-            } else {
-                String::default()
-            },
+            maybe_comma_after_stype = if optional_attributes.is_empty() { "" } else { "," },
             maybe_order_by = if self.ordered_set { "\tORDER BY" } else { "" },
             optional_attributes = String::from("\n")
                 + &optional_attributes_string
-                + if optional_attributes.len() == 0 { "" } else { "\n" },
+                + if optional_attributes.is_empty() { "" } else { "\n" },
         );
         Ok(sql)
     }

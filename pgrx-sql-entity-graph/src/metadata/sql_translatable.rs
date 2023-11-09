@@ -182,7 +182,7 @@ where
 {
     fn argument_sql() -> Result<SqlMapping, ArgumentError> {
         match T::type_name() {
-            id if id == u8::type_name() => Ok(SqlMapping::As(format!("bytea"))),
+            id if id == u8::type_name() => Ok(SqlMapping::As("bytea".into())),
             _ => match T::argument_sql() {
                 Ok(SqlMapping::As(val)) => Ok(SqlMapping::As(format!("{val}[]"))),
                 Ok(SqlMapping::Composite { array_brackets: _ }) => {
@@ -199,7 +199,7 @@ where
 
     fn return_sql() -> Result<Returns, ReturnsError> {
         match T::type_name() {
-            id if id == u8::type_name() => Ok(Returns::One(SqlMapping::As(format!("bytea")))),
+            id if id == u8::type_name() => Ok(Returns::One(SqlMapping::As("bytea".into()))),
             _ => match T::return_sql() {
                 Ok(Returns::One(SqlMapping::As(val))) => {
                     Ok(Returns::One(SqlMapping::As(format!("{val}[]"))))

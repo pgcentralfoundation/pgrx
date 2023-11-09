@@ -49,12 +49,7 @@ impl Parse for PgTriggerAttribute {
             e => {
                 return Err(syn::Error::new(
                     Span::call_site(),
-                    format!(
-                        "Invalid option `{}` inside `{} {}`",
-                        e,
-                        ident.to_string(),
-                        input.to_string()
-                    ),
+                    format!("Invalid option `{e}` inside `{ident} {input}`"),
                 ))
             }
         };

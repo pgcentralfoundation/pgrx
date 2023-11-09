@@ -94,7 +94,7 @@ impl ToSqlConfigEntity {
                 Ok(content) => {
                     let module_pathname = &context.get_module_pathname();
 
-                    let content = content.replace("@MODULE_PATHNAME@", &module_pathname);
+                    let content = content.replace("@MODULE_PATHNAME@", module_pathname);
 
                     Some(Ok(format!(
                         "\n\
@@ -115,7 +115,7 @@ impl ToSqlConfigEntity {
 
 impl std::cmp::PartialOrd for ToSqlConfigEntity {
     fn partial_cmp(&self, other: &Self) -> Option<std::cmp::Ordering> {
-        Some(self.cmp(&other))
+        Some(self.cmp(other))
     }
 }
 impl std::cmp::Ord for ToSqlConfigEntity {

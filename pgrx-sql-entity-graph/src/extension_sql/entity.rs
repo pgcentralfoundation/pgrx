@@ -70,6 +70,29 @@ impl SqlGraphIdentifier for ExtensionSqlEntity {
 
 impl ToSql for ExtensionSqlEntity {
     fn to_sql(&self, _context: &PgrxSql) -> eyre::Result<String> {
+        let ExtensionSqlEntity { file, line, sql, creates, requires, .. } = self;
+        let creates = if !creates.is_empty() {
+            let joined =
+                creates.into_iter().map(|i| format!("--   {}", i)).collect::<Vec<_>>().join("\n");
+            format!(
+                "\
+                -- creates:\n\
+                {joined}\n\n"
+            )
+        } else {
+            "".to_string()
+        };
+        let requires = if !requires.is_empty() {
+            let joined =
+                requires.into_iter().map(|i| format!("--   {}", i)).collect::<Vec<_>>().join("\n");
+            format!(
+                "\
+               -- requires:\n\
+                {joined}\n\n"
+            )
+        } else {
+            "".to_string()
+        };
         let sql = format!(
             "\n\
                 -- {file}:{line}\n\
@@ -79,41 +102,8 @@ impl ToSql for ExtensionSqlEntity {
                 {finalize}\
                 {sql}\
                 ",
-            file = self.file,
-            line = self.line,
             bootstrap = if self.bootstrap { "-- bootstrap\n" } else { "" },
-            creates = if !self.creates.is_empty() {
-                format!(
-                    "\
-                    -- creates:\n\
-                    {}\n\
-                ",
-                    self.creates
-                        .iter()
-                        .map(|i| format!("--   {}", i))
-                        .collect::<Vec<_>>()
-                        .join("\n")
-                ) + "\n"
-            } else {
-                "".to_string()
-            },
-            requires = if !self.requires.is_empty() {
-                format!(
-                    "\
-                   -- requires:\n\
-                    {}\n\
-                ",
-                    self.requires
-                        .iter()
-                        .map(|i| format!("--   {}", i))
-                        .collect::<Vec<_>>()
-                        .join("\n")
-                ) + "\n"
-            } else {
-                "".to_string()
-            },
             finalize = if self.finalize { "-- finalize\n" } else { "" },
-            sql = self.sql,
         );
         Ok(sql)
     }
@@ -216,7 +206,7 @@ impl SqlDeclaredEntity {
                         || identifier_name == &data.option_array
                         || identifier_name == &data.varlena
                 };
-                if matches(&*identifier_name) || data.pg_box.contains(&identifier_name) {
+                if matches(identifier_name) || data.pg_box.contains(identifier_name) {
                     return true;
                 }
                 // there are cases where the identifier is

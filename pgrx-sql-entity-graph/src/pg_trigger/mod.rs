@@ -49,7 +49,7 @@ impl PgTrigger {
                 if let Some(ref mut content) = config.content {
                     let value = content.value();
                     let updated_value = value
-                        .replace("@FUNCTION_NAME@", &*(func.sig.ident.to_string() + "_wrapper"))
+                        .replace("@FUNCTION_NAME@", &(func.sig.ident.to_string() + "_wrapper"))
                         + "\n";
                     *content = syn::LitStr::new(&updated_value, Span::call_site());
                 };
@@ -67,7 +67,7 @@ impl PgTrigger {
     pub fn wrapper_tokens(&self) -> Result<ItemFn, syn::Error> {
         let function_ident = &self.func.sig.ident;
         let extern_func_ident = syn::Ident::new(
-            &format!("{}_wrapper", self.func.sig.ident.to_string()),
+            &format!("{}_wrapper", self.func.sig.ident),
             self.func.sig.ident.span(),
         );
         let tokens = quote! {
@@ -122,7 +122,7 @@ impl PgTrigger {
 impl ToEntityGraphTokens for PgTrigger {
     fn to_entity_graph_tokens(&self) -> TokenStream2 {
         let sql_graph_entity_fn_name = syn::Ident::new(
-            &format!("__pgrx_internals_trigger_{}", self.func.sig.ident.to_string()),
+            &format!("__pgrx_internals_trigger_{}", self.func.sig.ident),
             self.func.sig.ident.span(),
         );
         let func_sig_ident = &self.func.sig.ident;

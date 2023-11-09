@@ -91,7 +91,7 @@ impl Returning {
                                     other => {
                                         return Err(syn::Error::new(
                                             other.as_ref().map(|s| s.span()).unwrap_or(args_span),
-                                            &format!(
+                                            format!(
                                                 "Got unexpected generic argument for Option inner: {other:?}"
                                             ),
                                         ))
@@ -101,7 +101,7 @@ impl Returning {
                             other => {
                                 return Err(syn::Error::new(
                                     other.span(),
-                                    &format!(
+                                    format!(
                                         "Got unexpected path argument for Option inner: {other:?}"
                                     ),
                                 ))
@@ -175,7 +175,7 @@ impl Returning {
                                     other => {
                                         return Err(syn::Error::new(
                                             other.span(),
-                                            &format!(
+                                            format!(
                                                 "Got unexpected generic argument for SetOfIterator: {other:?}"
                                             ),
                                         ))
@@ -187,7 +187,7 @@ impl Returning {
                                     other
                                         .map(|s| s.span())
                                         .unwrap_or_else(proc_macro2::Span::call_site),
-                                    &format!(
+                                    format!(
                                         "Got unexpected path argument for SetOfIterator: {other:?}"
                                     ),
                                 ))
@@ -264,7 +264,7 @@ impl Returning {
                                     other => {
                                         return Err(syn::Error::new(
                                             other.span(),
-                                            &format!("Got unexpected generic argument: {other:?}"),
+                                            format!("Got unexpected generic argument: {other:?}"),
                                         ))
                                     }
                                 };
@@ -272,7 +272,7 @@ impl Returning {
                             other => {
                                 return Err(syn::Error::new(
                                     other.span(),
-                                    &format!("Got unexpected path argument: {other:?}"),
+                                    format!("Got unexpected path argument: {other:?}"),
                                 ))
                             }
                         };
@@ -297,20 +297,16 @@ impl Returning {
             syn::Type::Macro(ref mut type_macro) => Self::parse_type_macro(type_macro),
             syn::Type::Paren(ref mut type_paren) => match &mut *type_paren.elem {
                 syn::Type::Macro(ref mut type_macro) => Self::parse_type_macro(type_macro),
-                other => {
-                    return Err(syn::Error::new(
-                        other.span(),
-                        &format!("Got unknown return type (type_paren): {type_paren:?}"),
-                    ))
-                }
-            },
-            syn::Type::Group(tg) => return Self::match_type(&tg.elem),
-            other => {
-                return Err(syn::Error::new(
+                other => Err(syn::Error::new(
                     other.span(),
-                    &format!("Got unknown return type (other): {other:?}"),
-                ))
-            }
+                    format!("Got unknown return type (type_paren): {type_paren:?}"),
+                )),
+            },
+            syn::Type::Group(tg) => Self::match_type(&tg.elem),
+            other => Err(syn::Error::new(
+                other.span(),
+                format!("Got unknown return type (other): {other:?}"),
+            )),
         }
     }
 }
