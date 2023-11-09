@@ -366,6 +366,20 @@ impl PgConfig {
         Ok(path)
     }
 
+    /// a vaguely-parsed "--configure"
+    pub fn configure(&self) -> eyre::Result<BTreeMap<String, String>> {
+        let stdout = self.run("--configure")?;
+        Ok(stdout
+            .split('\'')
+            .filter(|s| s != &"" && s != &" ")
+            .map(|entry| match entry.split_once('=') {
+                Some((k, v)) => (k.to_owned(), v.to_owned()),
+                // some keys are about mere presence
+                None => (entry.to_owned(), String::from("")),
+            })
+            .collect())
+    }
+
     pub fn includedir_server(&self) -> eyre::Result<PathBuf> {
         Ok(self.run("--includedir-server")?.into())
     }

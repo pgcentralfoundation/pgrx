@@ -714,6 +714,8 @@ fn run_bindgen(
     include_h: &PathBuf,
 ) -> eyre::Result<String> {
     eprintln!("Generating bindings for pg{major_version}");
+    let configure = pg_config.configure()?;
+    eprintln!("pg_config --configure: {:?}", configure);
     let mut binder = bindgen::Builder::default();
     binder = add_blocklists(binder);
     binder = add_derives(binder);
