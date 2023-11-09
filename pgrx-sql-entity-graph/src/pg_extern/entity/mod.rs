@@ -299,11 +299,11 @@ impl ToSql for PgExternEntity {
                     let graph_index =
                         context.graph.neighbors_undirected(self_index).find(|neighbor| {
                             match &context.graph[*neighbor] {
-                                SqlGraphEntity::Type(neightbor_ty) => {
-                                    neightbor_ty.id_matches(&ty.ty_id)
+                                SqlGraphEntity::Type(neighbor_ty) => {
+                                    neighbor_ty.id_matches(&ty.ty_id)
                                 }
-                                SqlGraphEntity::Enum(neightbor_en) => {
-                                    neightbor_en.id_matches(&ty.ty_id)
+                                SqlGraphEntity::Enum(neighbor_en) => {
+                                    neighbor_en.id_matches(&ty.ty_id)
                                 }
                                 SqlGraphEntity::BuiltinType(defined) => defined == ty.ty_source,
                                 _ => false,
