@@ -389,9 +389,7 @@ impl ToSql for PgAggregateEntity {
                                 }
                                 Ok(SqlMapping::Source {
                                     array_brackets,
-                                }) => {
-                                    
-                                    context
+                                }) => context
                                         .source_only_to_sql_type(arg.used_ty.ty_source)
                                         .map(|v| {
                                             fmt::with_array_brackets(v, array_brackets)
@@ -400,8 +398,7 @@ impl ToSql for PgAggregateEntity {
                                             eyre!(
                                             "Macro expansion time suggested a source only mapping in return"
                                         )
-                                        })?
-                                }
+                                        })?,
                                 Ok(SqlMapping::Skip) => return Err(eyre!("Got a skipped SQL translatable type in aggregate args, this is not permitted")),
                                 Err(err) => {
                                     match context.source_only_to_sql_type(arg.used_ty.ty_source) {

@@ -288,13 +288,9 @@ impl UsedType {
         let mut resolved_ty_inner: Option<syn::Type> = None;
         if result {
             if let syn::Type::Path(tp) = &resolved_ty {
-                if let Some(first_segment) =
-                    tp.path.segments.first().map(Some).unwrap_or(None)
-                {
+                if let Some(first_segment) = tp.path.segments.first().map(Some).unwrap_or(None) {
                     if let syn::PathArguments::AngleBracketed(ab) = &first_segment.arguments {
-                        if let Some(first_arg) =
-                            ab.args.first().map(Some).unwrap_or(None)
-                        {
+                        if let Some(first_arg) = ab.args.first().map(Some).unwrap_or(None) {
                             if let syn::GenericArgument::Type(ty) = first_arg {
                                 resolved_ty_inner = Some(ty.clone());
                             }

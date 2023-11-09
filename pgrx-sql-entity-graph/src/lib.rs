@@ -206,10 +206,8 @@ impl ToSql for SqlGraphEntity {
                 if let Some(result) = item.to_sql_config.to_sql(self, context) {
                     return result;
                 }
-                if context
-                    .graph
-                    .neighbors_undirected(*context.externs.get(item).unwrap())
-                    .any(|neighbor| {
+                if context.graph.neighbors_undirected(*context.externs.get(item).unwrap()).any(
+                    |neighbor| {
                         let neighbor_item = &context.graph[neighbor];
                         match neighbor_item {
                             SqlGraphEntity::Type(PostgresTypeEntity {
@@ -227,8 +225,8 @@ impl ToSql for SqlGraphEntity {
                             }
                             _ => false,
                         }
-                    })
-                {
+                    },
+                ) {
                     Ok(String::default())
                 } else {
                     item.to_sql(context)
