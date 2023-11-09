@@ -1,7 +1,7 @@
-use crate::lwlock::*;
-use crate::shmem::PgSharedMemoryInitialization;
-use crate::PgSharedMem;
-use crate::{pg_sys, PGRXSharedMemory};
+use crate::{
+    lwlock::*, pg_sys, shmem::PgSharedMemoryInitialization, PGRXSharedMemory, PgSharedMem,
+};
+
 use std::ffi::c_void;
 use uuid::Uuid;
 
@@ -12,7 +12,7 @@ pub enum Error {
 }
 
 #[derive(Copy, Clone)]
-pub struct PgHashMapInner {
+struct PgHashMapInner {
     htab: *mut pg_sys::HTAB,
     elements: u64,
 }
@@ -42,16 +42,24 @@ impl Default for PgHashMapInner {
     }
 }
 
+/// A shared memory HashMap using Postgres' `HTAB`.
+/// This HashMap is used for `pg_stat_statements` and Postgres
+/// internals to store key/value pairs in shared memory.
 pub struct PgHashMap<K: Copy + Clone, V: Copy + Clone> {
+    /// HTAB protected by a LwLock.
     htab: PgLwLock<PgHashMapInner>,
+
+    /// Max size, allocated at server start.
     size: u64,
+
+    // Markers for key/value types.
     phantom_key: std::marker::PhantomData<K>,
     phantom_value: std::marker::PhantomData<V>,
 }
 
-/// Compute the hash for the key and it's pointer
-/// to pass to the hash_search. Lock on HTAB should be taken,
-/// although not strictly required I think.
+/// Compute the hash for the key and its pointer
+/// to pass to `pg_sys::hash_search_with_hash_value`.
+/// Lock on HTAB should be taken, although not strictly required I think.
 macro_rules! key {
     ($key:expr, $htab:expr) => {{
         let key = Key { key: $key };
@@ -63,7 +71,8 @@ macro_rules! key {
 }
 
 /// Get the value pointer. It's stored next to the key.
-/// https://github.com/postgres/postgres/blob/1f998863b0bc6fc8ef3d971d9c6d2c29b52d8ba2/src/backend/utils/hash/dynahash.c#L246-L250
+/// See: <https://github.com/postgres/postgres/blob/1f998863b0bc6fc8ef3d971d9c6d2c29b52d8ba2/src/backend/utils/hash/dynahash.c#L246-L250>
+/// for implementation. `pg_stat_statements` stores the key in the value struct, but this works too.
 macro_rules! value_ptr {
     ($entry:expr) => {{
         let value_ptr: *mut Value<V> =
@@ -75,7 +84,7 @@ macro_rules! value_ptr {
 }
 
 impl<K: Copy + Clone, V: Copy + Clone> PgHashMap<K, V> {
-    /// Create new PgHashMap. This still needs to be allocated with
+    /// Create new `PgHashMap`. This still needs to be allocated with
     /// `pg_shmem_init!` just like any other shared memory structure.
     pub const fn new(size: u64) -> PgHashMap<K, V> {
         PgHashMap {
@@ -86,13 +95,14 @@ impl<K: Copy + Clone, V: Copy + Clone> PgHashMap<K, V> {
         }
     }
 
-    /// Insert a key and value into the HashMap. If the key is already
-    /// present, it will be replaced. If the HashMap is full, return an error.
-    pub fn insert(&self, key: K, value: V) -> Result<(), Error> {
+    /// Insert a key and value into the `PgHashMap`. If the key is already
+    /// present, it will be replaced and returned. If the `PgHashMap` is full, return an error.
+    pub fn insert(&self, key: K, value: V) -> Result<Option<V>, Error> {
         let mut found = false;
         let mut htab = self.htab.exclusive();
         let (key_ptr, hash_value) = key!(key, htab);
 
+        println!("Find");
         let entry = unsafe {
             pg_sys::hash_search_with_hash_value(
                 htab.htab,
@@ -103,12 +113,24 @@ impl<K: Copy + Clone, V: Copy + Clone> PgHashMap<K, V> {
             )
         };
 
+        println!("Done find");
+
+        let return_value = if entry.is_null() {
+            None
+        } else {
+            println!("Found");
+            let value_ptr = value_ptr!(entry);
+            let value = unsafe { std::ptr::read(value_ptr) };
+            Some(value.value)
+        };
+
         // If we don't do this check, pg will overwrite
-        // some random entry with our key/value...
+        // some random entry with our key/value pair...
         if entry.is_null() && htab.elements == self.size {
             return Err(Error::HashTableFull);
         }
 
+        println!("Replace");
         let entry = unsafe {
             pg_sys::hash_search_with_hash_value(
                 htab.htab,
@@ -122,13 +144,14 @@ impl<K: Copy + Clone, V: Copy + Clone> PgHashMap<K, V> {
         if !entry.is_null() {
             let value_ptr = value_ptr!(entry);
             let value = Value { value };
+            println!("Insert");
             unsafe {
                 std::ptr::copy(std::ptr::addr_of!(value), value_ptr, 1);
             }
             htab.elements += 1;
-            Ok(())
+            Ok(return_value)
         } else {
-            // OOM.
+            // OOM. We pre-allocate at server start, so this should never be an issue.
             return Err(Error::HashTableFull);
         }
     }
@@ -158,7 +181,8 @@ impl<K: Copy + Clone, V: Copy + Clone> PgHashMap<K, V> {
         }
     }
 
-    /// Remove the value from the HashMap and return it.
+    /// Remove the value from the `PgHashMap` and return it.
+    /// If the key doesn't exist, return None.
     pub fn remove(&self, key: K) -> Option<V> {
         if let Some(value) = self.get(key) {
             let mut htab = self.htab.exclusive();
@@ -183,9 +207,9 @@ impl<K: Copy + Clone, V: Copy + Clone> PgHashMap<K, V> {
     }
 
     /// Get the number of elements in the HashMap.
-    pub fn len(&self) -> usize {
+    pub fn len(&self) -> u64 {
         let htab = self.htab.exclusive();
-        htab.elements.try_into().unwrap()
+        htab.elements
     }
 }
 
