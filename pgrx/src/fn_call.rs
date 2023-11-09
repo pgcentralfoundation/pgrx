@@ -144,7 +144,6 @@ pub type Result<T> = std::result::Result<T, FnCallError>;
 /// Currently, [`fn_call`] does not support:
 ///     - Functions that `RETURNS SET OF $type` or `RETURNS TABLE(...)`
 ///     - Functions with `IN_OUT` or `OUT` arguments
-///     - Postgres 11
 ///
 /// # Examples
 ///
