@@ -490,8 +490,8 @@ fn initialize_extension_sqls<'a>(
         mapped_extension_sqls.insert(item.clone(), index);
 
         if item.bootstrap {
-            if let Some(exiting_index) = bootstrap {
-                let existing: &SqlGraphEntity = &graph[exiting_index];
+            if let Some(existing_index) = bootstrap {
+                let existing: &SqlGraphEntity = &graph[existing_index];
                 return Err(eyre!(
                     "Cannot have multiple `extension_sql!()` with `bootstrap` positioning, found `{}`, other was `{}`",
                     item.rust_identifier(),
@@ -501,8 +501,8 @@ fn initialize_extension_sqls<'a>(
             bootstrap = Some(index)
         }
         if item.finalize {
-            if let Some(exiting_index) = finalize {
-                let existing: &SqlGraphEntity = &graph[exiting_index];
+            if let Some(existing_index) = finalize {
+                let existing: &SqlGraphEntity = &graph[existing_index];
                 return Err(eyre!(
                     "Cannot have multiple `extension_sql!()` with `finalize` positioning, found `{}`, other was `{}`",
                     item.rust_identifier(),
@@ -548,38 +548,38 @@ pub fn find_positioning_ref_target<'a>(
 
             for (other, other_index) in types {
                 if *last_segment == other.name && other.module_path.ends_with(&module_path) {
-                    return Some(&other_index);
+                    return Some(other_index);
                 }
             }
             for (other, other_index) in enums {
                 if last_segment == &other.name && other.module_path.ends_with(&module_path) {
-                    return Some(&other_index);
+                    return Some(other_index);
                 }
             }
             for (other, other_index) in externs {
                 if *last_segment == other.unaliased_name
                     && other.module_path.ends_with(&module_path)
                 {
-                    return Some(&other_index);
+                    return Some(other_index);
                 }
             }
             for (other, other_index) in schemas {
                 if other.module_path.ends_with(path) {
-                    return Some(&other_index);
+                    return Some(other_index);
                 }
             }
 
             for (other, other_index) in triggers {
                 if last_segment == &other.function_name && other.module_path.ends_with(&module_path)
                 {
-                    return Some(&other_index);
+                    return Some(other_index);
                 }
             }
         }
         PositioningRef::Name(name) => {
             for (other, other_index) in extension_sqls {
-                if other.name == *name {
-                    return Some(&other_index);
+                if other.name == name {
+                    return Some(other_index);
                 }
             }
         }
@@ -621,14 +621,13 @@ fn connect_extension_sqls(
                 return Err(eyre!(
                     "Could not find `requires` target of `{}`{}: {}",
                     item.rust_identifier(),
-                    if let (Some(file), Some(line)) = (item.file(), item.line()) {
-                        format!(" ({}:{})", file, line)
-                    } else {
-                        "".to_string()
+                    match (item.file(), item.line()) {
+                        (Some(file), Some(line)) => format!(" ({file}:{line})"),
+                        _ => "".to_string(),
                     },
                     match requires {
                         PositioningRef::FullPath(path) => path.to_string(),
-                        PositioningRef::Name(name) => format!(r#""{}""#, name),
+                        PositioningRef::Name(name) => format!(r#""{name}""#),
                     },
                 ));
             }
