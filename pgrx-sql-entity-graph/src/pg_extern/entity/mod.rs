@@ -100,9 +100,9 @@ impl ToSql for PgExternEntity {
 
         let module_pathname = &context.get_module_pathname();
         let schema = self
-        .schema
-        .map(|schema| format!("{}.", schema))
-        .unwrap_or_else(|| context.schema_prefix_for(&self_index));
+            .schema
+            .map(|schema| format!("{}.", schema))
+            .unwrap_or_else(|| context.schema_prefix_for(&self_index));
         let arguments = if !self.fn_args.is_empty() {
             let mut args = Vec::new();
             let metadata_without_arg_skips = &self
@@ -118,9 +118,7 @@ impl ToSql for PgExternEntity {
                     .find(|neighbor| match &context.graph[*neighbor] {
                         SqlGraphEntity::Type(ty) => ty.id_matches(&arg.used_ty.ty_id),
                         SqlGraphEntity::Enum(en) => en.id_matches(&arg.used_ty.ty_id),
-                        SqlGraphEntity::BuiltinType(defined) => {
-                            defined == arg.used_ty.full_path
-                        }
+                        SqlGraphEntity::BuiltinType(defined) => defined == arg.used_ty.full_path,
                         _ => false,
                     })
                     .ok_or_else(|| eyre!("Could not find arg type in graph. Got: {:?}", arg))?;
@@ -149,8 +147,8 @@ impl ToSql for PgExternEntity {
                             .map(|v| fmt::with_array_brackets(v.into(), array_brackets))
                             .ok_or_else(|| {
                                 eyre!(
-                                "Macro expansion time suggested a composite_type!() in return"
-                            )
+                                    "Macro expansion time suggested a composite_type!() in return"
+                                )
                             })?;
                         let buf = format!("\
                             \t\"{pattern}\" {variadic}{schema_prefix}{sql_type}{default}{maybe_comma}/* {type_name} */\
@@ -317,14 +315,18 @@ impl ToSql for PgExternEntity {
 
                     let needs_comma = idx < (table_items.len() - 1);
                     let item = format!(
-                            "\n\t{col_name} {schema_prefix}{ty_resolved}{needs_comma} /* {ty_name} */",
-                            col_name = col_name.expect("An iterator of tuples should have `named!()` macro declarations."),
-                            schema_prefix = if let Some(graph_index) = graph_index {
-                                context.schema_prefix_for(&graph_index)
-                            } else { "".into() },
-                            ty_resolved = metadata_retval_sqls[idx],
-                            needs_comma = if needs_comma { ", " } else { " " },
-                            ty_name = ty.full_path
+                        "\n\t{col_name} {schema_prefix}{ty_resolved}{needs_comma} /* {ty_name} */",
+                        col_name = col_name.expect(
+                            "An iterator of tuples should have `named!()` macro declarations."
+                        ),
+                        schema_prefix = if let Some(graph_index) = graph_index {
+                            context.schema_prefix_for(&graph_index)
+                        } else {
+                            "".into()
+                        },
+                        ty_resolved = metadata_retval_sqls[idx],
+                        needs_comma = if needs_comma { ", " } else { " " },
+                        ty_name = ty.full_path
                     );
                     items.push_str(&item);
                 }
