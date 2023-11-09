@@ -105,7 +105,7 @@ impl UsedType {
                         ))?;
                     }
                     "composite_type" => {
-                        let composite_type = Some(handle_composite_type_macro(&mac)?);
+                        let composite_type = Some(handle_composite_type_macro(mac)?);
                         let ty = syn::parse_quote! {
                             ::pgrx::heap_tuple::PgHeapTuple<'static, ::pgrx::pgbox::AllocatedByRust>
                         };
@@ -203,14 +203,14 @@ impl UsedType {
                                     }
                                     _ => {
                                         return Err(syn::Error::new(
-                                            type_path.span().clone(),
+                                            type_path.span(),
                                             "Unexpected Item found inside `Result` (expected Type)",
                                         ))
                                     }
                                 }
                             }
                             _ => return Err(syn::Error::new(
-                                type_path.span().clone(),
+                                type_path.span(),
                                 "Unexpected Item found inside `Result` (expected Angle Brackets)",
                             )),
                         }
@@ -262,7 +262,7 @@ impl UsedType {
                                     // Option<T>
                                     _ => {
                                         return Err(syn::Error::new(
-                                            type_path.span().clone(),
+                                            type_path.span(),
                                             "Unexpected Item found inside `Option` (expected Type)",
                                         ))
                                     }
@@ -270,7 +270,7 @@ impl UsedType {
                             }
                             // Option<T>
                             _ => return Err(syn::Error::new(
-                                type_path.span().clone(),
+                                type_path.span(),
                                 "Unexpected Item found inside `Option` (expected Angle Brackets)",
                             )),
                         }
@@ -289,11 +289,11 @@ impl UsedType {
         if result {
             if let syn::Type::Path(tp) = &resolved_ty {
                 if let Some(first_segment) =
-                    tp.path.segments.first().map(|segment| Some(segment)).unwrap_or(None)
+                    tp.path.segments.first().map(Some).unwrap_or(None)
                 {
                     if let syn::PathArguments::AngleBracketed(ab) = &first_segment.arguments {
                         if let Some(first_arg) =
-                            ab.args.first().map(|arg| Some(arg)).unwrap_or(None)
+                            ab.args.first().map(Some).unwrap_or(None)
                         {
                             if let syn::GenericArgument::Type(ty) = first_arg {
                                 resolved_ty_inner = Some(ty.clone());
@@ -321,12 +321,12 @@ impl UsedType {
         let mut resolved_ty_inner = self.resolved_ty_inner.clone().unwrap_or(resolved_ty.clone());
         staticize_lifetimes(&mut resolved_ty);
         staticize_lifetimes(&mut resolved_ty_inner);
-        let resolved_ty_string = resolved_ty.to_token_stream().to_string().replace(" ", "");
+        let resolved_ty_string = resolved_ty.to_token_stream().to_string().replace(' ', "");
         let composite_type = self.composite_type.clone().map(|v| v.expr);
         let composite_type_iter = composite_type.iter();
         let variadic = &self.variadic;
         let optional = &self.optional.is_some();
-        let default = (&self.default).iter();
+        let default = self.default.iter();
 
         syn::parse_quote! {
             ::pgrx::pgrx_sql_entity_graph::UsedTypeEntity {
@@ -402,7 +402,7 @@ fn resolve_vec_inner(
                         arg_type_path.span(),
                         "No last segment in type path",
                     ))?;
-                    if last.ident.to_string() == "Option" {
+                    if last.ident == "Option" {
                         let (inner_ty, expr) = resolve_option_inner(arg_type_path)?;
                         let wrapped_ty = syn::parse_quote! {
                             Vec<#inner_ty>
@@ -423,7 +423,7 @@ fn resolve_vec_inner(
 fn resolve_variadic_array_inner(
     mut original: syn::TypePath,
 ) -> syn::Result<(syn::Type, Option<CompositeTypeMacro>)> {
-    let original_span = original.span().clone();
+    let original_span = original.span();
     let last = original
         .path
         .segments
@@ -463,7 +463,7 @@ fn resolve_variadic_array_inner(
                             arg_type_path.span(),
                             "No last segment in type path",
                         ))?;
-                        if last.ident.to_string() == "Option" {
+                        if last.ident == "Option" {
                             let (inner_ty, expr) = resolve_option_inner(arg_type_path)?;
                             let wrapped_ty = syn::parse_quote! {
                                 ::pgrx::datum::VariadicArray<'static, #inner_ty>
@@ -485,7 +485,7 @@ fn resolve_variadic_array_inner(
 fn resolve_array_inner(
     mut original: syn::TypePath,
 ) -> syn::Result<(syn::Type, Option<CompositeTypeMacro>)> {
-    let original_span = original.span().clone();
+    let original_span = original.span();
     let last = original
         .path
         .segments

@@ -414,7 +414,7 @@ impl PgrxSql {
     pub fn schema_prefix_for(&self, target: &NodeIndex) -> String {
         self.schema_alias_of(target)
             .map(|v| (v + ".").to_string())
-            .unwrap_or_else(|| "".to_string())
+            .unwrap_or_default()
     }
 
     pub fn to_sql(&self) -> eyre::Result<String> {
@@ -476,8 +476,8 @@ fn build_base_edges(
     }
 }
 
-fn initialize_extension_sqls<'a>(
-    graph: &'a mut StableGraph<SqlGraphEntity, SqlGraphRelationship>,
+fn initialize_extension_sqls(
+    graph: &mut StableGraph<SqlGraphEntity, SqlGraphRelationship>,
     root: NodeIndex,
     extension_sqls: Vec<ExtensionSqlEntity>,
 ) -> eyre::Result<(HashMap<ExtensionSqlEntity, NodeIndex>, Option<NodeIndex>, Option<NodeIndex>)> {
@@ -923,20 +923,20 @@ fn connect_externs(
             if !found {
                 let builtin_index = builtin_types
                     .get(arg.used_ty.full_path)
-                    .expect(&format!("Could not fetch Builtin Type {}.", arg.used_ty.full_path));
+                    .unwrap_or_else(|| panic!("Could not fetch Builtin Type {}.", arg.used_ty.full_path));
                 graph.add_edge(*builtin_index, index, SqlGraphRelationship::RequiredByArg);
             }
             if !found {
                 for (ext_item, ext_index) in extension_sqls {
-                    if let Some(_) = ext_item.has_sql_declared_entity(&SqlDeclared::Type(
+                    if ext_item.has_sql_declared_entity(&SqlDeclared::Type(
                         arg.used_ty.full_path.to_string(),
-                    )) {
+                    )).is_some() {
                         if !has_explicit_requires {
                             graph.add_edge(*ext_index, index, SqlGraphRelationship::RequiredByArg);
                         }
-                    } else if let Some(_) = ext_item.has_sql_declared_entity(&SqlDeclared::Enum(
+                    } else if ext_item.has_sql_declared_entity(&SqlDeclared::Enum(
                         arg.used_ty.full_path.to_string(),
-                    )) {
+                    )).is_some() {
                         graph.add_edge(*ext_index, index, SqlGraphRelationship::RequiredByArg);
                     }
                 }
@@ -965,17 +965,17 @@ fn connect_externs(
                 if !found {
                     let builtin_index = builtin_types
                         .get(&ty.full_path.to_string())
-                        .expect(&format!("Could not fetch Builtin Type {}.", ty.full_path));
+                        .unwrap_or_else(|| panic!("Could not fetch Builtin Type {}.", ty.full_path));
                     graph.add_edge(*builtin_index, index, SqlGraphRelationship::RequiredByReturn);
                 }
                 if !found {
                     for (ext_item, ext_index) in extension_sqls {
-                        if let Some(_) = ext_item
-                            .has_sql_declared_entity(&SqlDeclared::Type(ty.full_path.to_string()))
+                        if ext_item
+                            .has_sql_declared_entity(&SqlDeclared::Type(ty.full_path.to_string())).is_some()
                         {
                             graph.add_edge(*ext_index, index, SqlGraphRelationship::RequiredByArg);
-                        } else if let Some(_) = ext_item
-                            .has_sql_declared_entity(&SqlDeclared::Enum(ty.full_path.to_string()))
+                        } else if ext_item
+                            .has_sql_declared_entity(&SqlDeclared::Enum(ty.full_path.to_string())).is_some()
                         {
                             graph.add_edge(*ext_index, index, SqlGraphRelationship::RequiredByArg);
                         }
@@ -1007,10 +1007,8 @@ fn connect_externs(
                     }
                     if !found {
                         let builtin_index =
-                            builtin_types.get(&type_entity.ty_source.to_string()).expect(&format!(
-                                "Could not fetch Builtin Type {}.",
-                                type_entity.ty_source,
-                            ));
+                            builtin_types.get(&type_entity.ty_source.to_string()).unwrap_or_else(|| panic!("Could not fetch Builtin Type {}.",
+                                type_entity.ty_source));
                         graph.add_edge(
                             *builtin_index,
                             index,
@@ -1019,17 +1017,17 @@ fn connect_externs(
                     }
                     if !found {
                         for (ext_item, ext_index) in extension_sqls {
-                            if let Some(_) = ext_item.has_sql_declared_entity(&SqlDeclared::Type(
+                            if ext_item.has_sql_declared_entity(&SqlDeclared::Type(
                                 type_entity.ty_source.to_string(),
-                            )) {
+                            )).is_some() {
                                 graph.add_edge(
                                     *ext_index,
                                     index,
                                     SqlGraphRelationship::RequiredByArg,
                                 );
-                            } else if let Some(_) = ext_item.has_sql_declared_entity(
+                            } else if ext_item.has_sql_declared_entity(
                                 &SqlDeclared::Enum(type_entity.ty_source.to_string()),
-                            ) {
+                            ).is_some() {
                                 graph.add_edge(
                                     *ext_index,
                                     index,
@@ -1265,7 +1263,7 @@ fn connect_aggregate(
         if !found {
             let builtin_index = builtin_types
                 .get(arg.used_ty.full_path)
-                .expect(&format!("Could not fetch Builtin Type {}.", arg.used_ty.full_path));
+                .unwrap_or_else(|| panic!("Could not fetch Builtin Type {}.", arg.used_ty.full_path));
             graph.add_edge(*builtin_index, index, SqlGraphRelationship::RequiredByArg);
         }
     }
@@ -1283,7 +1281,7 @@ fn connect_aggregate(
         if !found {
             let builtin_index = builtin_types
                 .get(arg.used_ty.full_path)
-                .expect(&format!("Could not fetch Builtin Type {}.", arg.used_ty.full_path));
+                .unwrap_or_else(|| panic!("Could not fetch Builtin Type {}.", arg.used_ty.full_path));
             graph.add_edge(*builtin_index, index, SqlGraphRelationship::RequiredByArg);
         }
     }
@@ -1301,7 +1299,7 @@ fn connect_aggregate(
         if !found {
             let builtin_index = builtin_types
                 .get(arg.full_path)
-                .expect(&format!("Could not fetch Builtin Type {}.", arg.full_path));
+                .unwrap_or_else(|| panic!("Could not fetch Builtin Type {}.", arg.full_path));
             graph.add_edge(*builtin_index, index, SqlGraphRelationship::RequiredByArg);
         }
     }

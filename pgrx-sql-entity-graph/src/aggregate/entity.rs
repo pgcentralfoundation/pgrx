@@ -306,7 +306,7 @@ impl ToSql for PgAggregateEntity {
         }
 
         if let Some(value) = &self.mstype {
-            let mstype_sql = map_ty(&value).wrap_err("Mapping moving state type")?;
+            let mstype_sql = map_ty(value).wrap_err("Mapping moving state type")?;
             optional_attributes.push((
                 format!("\tMSTYPE = {}", mstype_sql),
                 format!("/* {}::MovingState = {} */", self.full_path, value.full_path),
@@ -345,7 +345,7 @@ impl ToSql for PgAggregateEntity {
             stype_schema = stype_schema,
             stype = stype_sql,
             stype_full_path = self.stype.used_ty.full_path,
-            maybe_comma_after_stype = if optional_attributes.len() == 0 { "" } else { "," },
+            maybe_comma_after_stype = if optional_attributes.is_empty() { "" } else { "," },
             args = {
                 let mut args = Vec::new();
                 for (idx, arg) in self.args.iter().enumerate() {
@@ -390,17 +390,17 @@ impl ToSql for PgAggregateEntity {
                                 Ok(SqlMapping::Source {
                                     array_brackets,
                                 }) => {
-                                    let sql = context
+                                    
+                                    context
                                         .source_only_to_sql_type(arg.used_ty.ty_source)
                                         .map(|v| {
-                                            fmt::with_array_brackets(v.into(), array_brackets)
+                                            fmt::with_array_brackets(v, array_brackets)
                                         })
                                         .ok_or_else(|| {
                                             eyre!(
                                             "Macro expansion time suggested a source only mapping in return"
                                         )
-                                        })?;
-                                    sql
+                                        })?
                                 }
                                 Ok(SqlMapping::Skip) => return Err(eyre!("Got a skipped SQL translatable type in aggregate args, this is not permitted")),
                                 Err(err) => {
@@ -463,7 +463,7 @@ impl ToSql for PgAggregateEntity {
             maybe_order_by = if self.ordered_set { "\tORDER BY" } else { "" },
             optional_attributes = String::from("\n")
                 + &optional_attributes_string
-                + if optional_attributes.len() == 0 { "" } else { "\n" },
+                + if optional_attributes.is_empty() { "" } else { "\n" },
         );
         Ok(sql)
     }

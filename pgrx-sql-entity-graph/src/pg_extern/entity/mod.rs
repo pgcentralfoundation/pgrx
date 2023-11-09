@@ -425,12 +425,11 @@ impl ToSql for PgExternEntity {
             };
 
             let left_arg =
-                self.metadata.arguments.get(0).ok_or_else(|| {
+                self.metadata.arguments.first().ok_or_else(|| {
                     eyre!("Did not find `left_arg` for operator `{}`.", self.name)
                 })?;
             let left_fn_arg = self
-                .fn_args
-                .get(0)
+                .fn_args.first()
                 .ok_or_else(|| eyre!("Did not find `left_arg` for operator `{}`.", self.name))?;
             let left_arg_graph_index = context
                 .graph

@@ -41,7 +41,7 @@ impl Parse for PositioningRef {
             Self::Name(litstr.value())
         } else {
             let path: syn::Path = input.parse()?;
-            let path_str = path.to_token_stream().to_string().replace(" ", "");
+            let path_str = path.to_token_stream().to_string().replace(' ', "");
             Self::FullPath(path_str)
         };
         Ok(found)

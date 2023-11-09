@@ -208,7 +208,7 @@ impl ToSql for SqlGraphEntity {
                 }
                 if context
                     .graph
-                    .neighbors_undirected(context.externs.get(item).unwrap().clone())
+                    .neighbors_undirected(*context.externs.get(item).unwrap())
                     .any(|neighbor| {
                         let neighbor_item = &context.graph[neighbor];
                         match neighbor_item {
@@ -277,7 +277,7 @@ pub fn ident_is_acceptable_to_postgres(ident: &syn::Ident) -> Result<(), syn::Er
     if ident_string.len() >= POSTGRES_IDENTIFIER_MAX_LEN {
         return Err(syn::Error::new(
             ident.span(),
-            &format!(
+            format!(
                 "Identifier `{}` was {} characters long, PostgreSQL will truncate identifiers with less than \
                 {POSTGRES_IDENTIFIER_MAX_LEN} characters, opt for an identifier which Postgres won't truncate",
                 ident,

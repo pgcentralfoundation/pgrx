@@ -78,7 +78,7 @@ impl Parse for PgrxOperatorAttributeWithIdent {
 impl ToTokens for PgrxOperatorAttributeWithIdent {
     fn to_tokens(&self, tokens: &mut TokenStream2) {
         let fn_name = &self.fn_name;
-        let operator = fn_name.to_string().replace(" ", "");
+        let operator = fn_name.to_string().replace(' ', "");
         let quoted = quote! {
             #operator
         };
@@ -105,7 +105,7 @@ impl Parse for PgrxOperatorOpName {
 impl ToTokens for PgrxOperatorOpName {
     fn to_tokens(&self, tokens: &mut TokenStream2) {
         let op_name = &self.op_name;
-        let op_string = op_name.to_string().replacen(" ", "", 256);
+        let op_string = op_name.to_string().replacen(' ', "", 256);
         let quoted = quote! {
             #op_string
         };

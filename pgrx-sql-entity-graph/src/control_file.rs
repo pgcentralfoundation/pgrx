@@ -60,7 +60,7 @@ impl ControlFile {
                 continue;
             }
 
-            let (k, v) = (parts.get(0).unwrap().trim(), parts.get(1).unwrap().trim());
+            let (k, v) = (parts.first().unwrap().trim(), parts.get(1).unwrap().trim());
 
             let v = v.trim_start_matches('\'');
             let v = v.trim_end_matches('\'');

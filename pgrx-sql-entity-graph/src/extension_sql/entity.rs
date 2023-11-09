@@ -216,7 +216,7 @@ impl SqlDeclaredEntity {
                         || identifier_name == &data.option_array
                         || identifier_name == &data.varlena
                 };
-                if matches(&*identifier_name) || data.pg_box.contains(&identifier_name) {
+                if matches(identifier_name) || data.pg_box.contains(identifier_name) {
                     return true;
                 }
                 // there are cases where the identifier is
