@@ -52,14 +52,14 @@ jobs:
         echo ""
 
         echo "----- Remove old postgres -----"
-        sudo apt remove -y '^postgres.*' '^libpq.*' '^clang.*' '^llvm.*' '^libclang.*' '^libllvm.*' '^mono-llvm.*'
+        sudo apt remove -y '^postgres.*' '^libpq.*'
         echo ""
 
         echo "----- Install system dependencies -----"
         sudo apt-get install -y \
           build-essential \
-          llvm-14-dev libclang-14-dev clang-14 \
-          gcc \
+          clang \
+          libclang-dev \
           libssl-dev \
           libz-dev \
           make \
