@@ -75,7 +75,6 @@
 #include "executor/tuptable.h"
 #include "foreign/fdwapi.h"
 #include "foreign/foreign.h"
-#include "mb/pg_wchar.h"
 #include "nodes/execnodes.h"
 #include "nodes/extensible.h"
 #include "nodes/makefuncs.h"
