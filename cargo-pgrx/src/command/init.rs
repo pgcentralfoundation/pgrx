@@ -75,6 +75,9 @@ pub(crate) struct Init {
     /// installed, but the resulting build is usable without valgrind.
     #[clap(long)]
     valgrind: bool,
+    /// Patch Postgresql with a given patch file
+    #[clap(long)]
+    patch: Option<PathBuf>,
     #[clap(long, short, help = "Allow N make jobs at once")]
     jobs: Option<usize>,
     #[clap(skip)]
@@ -255,6 +258,7 @@ fn download_postgres(
     let mut buf = Vec::new();
     let _count = http_response.into_reader().read_to_end(&mut buf)?;
     let pgdir = untar(&buf, pgrx_home, pg_config, init)?;
+    patch_postgres(pg_config, &pgdir, init)?;
     configure_postgres(pg_config, &pgdir, init)?;
     make_postgres(pg_config, &pgdir, init)?;
     make_install_postgres(pg_config, &pgdir, init) // returns a new PgConfig object
@@ -392,6 +396,41 @@ fn fixup_homebrew_for_icu(configure_cmd: &mut Command) {
 
     if let Ok(path) = new_var {
         configure_cmd.env("PKG_CONFIG_PATH", path);
+    }
+}
+
+fn patch_postgres(pg_config: &PgConfig, pgdir: &PathBuf, init: &Init) -> eyre::Result<()> {
+    let patch_file = match init.patch {
+        Some(ref patch_file) => patch_file,
+        None => return Ok(()),
+    };
+    println!("{} Postgres v{}", "  Patching".bold().green(), pg_config.version()?);
+
+    let command = std::process::Command::new("patch")
+        .current_dir(pgdir)
+        .args(["-f", "-i"])
+        .arg(patch_file)
+        .stdout(std::process::Stdio::piped())
+        .stderr(std::process::Stdio::piped())
+        .spawn()?;
+
+    let command_str = format!("{:?}", command);
+    tracing::debug!(command = %command_str, "Running");
+    let output = command.wait_with_output()?;
+    tracing::trace!(status_code = %output.status, command = %command_str, "Finished");
+
+    if output.status.success() {
+        Ok(())
+    } else {
+        Err(std::io::Error::new(
+            std::io::ErrorKind::Other,
+            format!(
+                "{}\n{}{}",
+                command_str,
+                String::from_utf8(output.stdout).unwrap(),
+                String::from_utf8(output.stderr).unwrap()
+            ),
+        ))?
     }
 }
 
