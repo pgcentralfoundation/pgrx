@@ -729,8 +729,6 @@ fn run_bindgen(
     };
     let bindings = binder
         .header(include_h.display().to_string())
-        .clang_arg("-v")
-        .clang_arg("-H")
         .clang_args(extra_bindgen_clang_args(pg_config)?)
         .clang_args(pg_target_include_flags(major_version, pg_config)?)
         .detect_include_paths(autodetect)
