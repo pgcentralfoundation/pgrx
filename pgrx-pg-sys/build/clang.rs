@@ -60,6 +60,9 @@ pub(crate) fn detect_include_paths_for(
     // by adjacent, that does not mean it is always immediately so, e.g.
     // - "/usr/lib/x86_64-linux-gnu/libclang-${CLANG_MAJOR}.so.${CLANG_MAJOR}.${CLANG_MINOR}.${CLANG_SUBMINOR}"
     // - "/usr/lib/clang/${CLANG_MAJOR}/include"
+    // or
+    // - "/usr/lib64/libclang-${CLANG_MAJOR}.so.${CLANG_MAJOR}.${CLANG_MINOR}.${CLANG_SUBMINOR}"
+    // - "/usr/lib/clang/${CLANG_MAJOR}/include"
     // so, crawl back up the ancestral tree
     for ancestor in libclang_path.ancestors() {
         paths = WalkDir::new(ancestor)
@@ -74,6 +77,9 @@ pub(crate) fn detect_include_paths_for(
                     entry_contains(entry, "clang")
                         || entry_contains(entry, "include")
                         || entry_contains(entry, &*clang_major_fmt)
+                        // we always want to descend from a lib dir, but only one step
+                        // as we don't really want to search all of /usr/lib's subdirs
+                        || os_str_contains(entry.file_name(), "lib")
                 }
             })
             .filter_map(|e| e.ok()) // be discreet
