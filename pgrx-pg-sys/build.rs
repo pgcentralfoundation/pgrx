@@ -203,26 +203,36 @@ fn main() -> eyre::Result<()> {
         let threads = pg_configs
             .iter()
             .map(|(pg_major_ver, pg_config)| {
-                scope.spawn(|| {
-                    generate_bindings(*pg_major_ver, pg_config, &build_paths, is_for_release)
-                })
+                (
+                    scope.spawn(|| {
+                        generate_bindings(*pg_major_ver, pg_config, &build_paths, is_for_release)
+                    }),
+                    if compile_cshim {
+                        // compile the cshim for each binding
+                        Some(scope.spawn(|| {
+                            build_shim(&build_paths.shim_src, &build_paths.shim_dst, pg_config)
+                        }))
+                    } else {
+                        None
+                    }
+                )
             })
             .collect::<Vec<_>>();
         // Most of the rest of this is just for better error handling --
         // `thread::scope` already joins the threads for us before it returns.
-        let results = threads
+        let (bindings, cshim): (Vec<_>, Vec<_>) = threads
             .into_iter()
-            .map(|thread| thread.join().expect("thread panicked while generating bindings"))
-            .collect::<Vec<eyre::Result<_>>>();
-        results.into_iter().try_for_each(|r| r)
+            .map(|(bind_thread, cshim_thread)| {
+                (
+                    bind_thread.join().expect("thread panicked while generating bindings"),
+                    cshim_thread.map(|thread| {
+                        thread.join().expect("thread panicked while generating cshim")
+                    }),
+                )
+            })
+            .unzip();
+        bindings.into_iter().chain(cshim.into_iter().filter_map(|f| f)).try_for_each(|r| r)
     })?;
-
-    if compile_cshim {
-        // compile the cshim for each binding
-        for (_version, pg_config) in pg_configs {
-            build_shim(&build_paths.shim_src, &build_paths.shim_dst, &pg_config)?;
-        }
-    }
 
     Ok(())
 }
