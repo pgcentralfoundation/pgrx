@@ -719,7 +719,6 @@ fn run_bindgen(
     let preferred_clang: Option<&std::path::Path> = configure.get("CLANG").map(|s| s.as_ref());
     eprintln!("pg_config --configure CLANG = {:?}", preferred_clang);
     let (autodetect, includes) = build::clang::detect_include_paths_for(preferred_clang);
-    eprintln!("passed detect_include_paths_for_correct_clang");
     let mut binder = bindgen::Builder::default();
     binder = add_blocklists(binder);
     binder = add_derives(binder);
