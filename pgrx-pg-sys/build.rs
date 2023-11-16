@@ -214,24 +214,25 @@ fn main() -> eyre::Result<()> {
                         }))
                     } else {
                         None
-                    }
+                    },
                 )
             })
             .collect::<Vec<_>>();
         // Most of the rest of this is just for better error handling --
         // `thread::scope` already joins the threads for us before it returns.
-        let (bindings, cshim): (Vec<_>, Vec<_>) = threads
+        threads
             .into_iter()
-            .map(|(bind_thread, cshim_thread)| {
-                (
+            .flat_map(|(bind_thread, cshim_thread)| {
+                std::iter::once(
                     bind_thread.join().expect("thread panicked while generating bindings"),
+                )
+                .chain(
                     cshim_thread.map(|thread| {
                         thread.join().expect("thread panicked while generating cshim")
                     }),
                 )
             })
-            .unzip();
-        bindings.into_iter().chain(cshim.into_iter().filter_map(|f| f)).try_for_each(|r| r)
+            .try_for_each(|r| r)
     })?;
 
     Ok(())
