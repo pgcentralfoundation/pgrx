@@ -22,7 +22,6 @@
 #include "parser/parsetree.h"
 #include "utils/memutils.h"
 #include "utils/builtins.h"
-#include "utils/array.h"
 #include "storage/spin.h"
 
 PGDLLEXPORT RangeTblEntry *pgrx_planner_rt_fetch(Index index, PlannerInfo *plannerInfo);
