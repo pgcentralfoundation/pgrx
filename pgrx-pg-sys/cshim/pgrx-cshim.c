@@ -18,8 +18,6 @@
 #include "nodes/pathnodes.h"
 #include "nodes/pg_list.h"
 #include "parser/parsetree.h"
-#include "utils/memutils.h"
-#include "utils/builtins.h"
 #include "storage/spin.h"
 
 PGDLLEXPORT RangeTblEntry *pgrx_planner_rt_fetch(Index index, PlannerInfo *plannerInfo);
