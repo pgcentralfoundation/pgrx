@@ -1575,6 +1575,7 @@ name = "pgrx-pg-sys"
 version = "0.11.0"
 dependencies = [
  "bindgen",
+ "clang-sys",
  "eyre",
  "libc",
  "memoffset",
@@ -1588,6 +1589,7 @@ dependencies = [
  "shlex",
  "sptr",
  "syn 1.0.109",
+ "walkdir",
 ]
 
 [[package]]
