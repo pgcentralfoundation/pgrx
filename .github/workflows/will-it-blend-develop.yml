@@ -2,7 +2,7 @@ name: Will It Blend™
 
 on:
   schedule:
-    - cron: '0 7 * * *'
+    - cron: '0 7 * * MON-FRI'
   workflow_dispatch:
 
 env:
