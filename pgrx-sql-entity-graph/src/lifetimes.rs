@@ -117,38 +117,35 @@ pub fn anonymize_lifetimes(value: &mut syn::Type) {
     match value {
         syn::Type::Path(type_path) => {
             for segment in &mut type_path.path.segments {
-                match &mut segment.arguments {
-                    syn::PathArguments::AngleBracketed(bracketed) => {
-                        for arg in &mut bracketed.args {
-                            match arg {
-                                // rename lifetimes to the anonymous lifetime
-                                syn::GenericArgument::Lifetime(lifetime) => {
-                                    lifetime.ident = syn::Ident::new("_", lifetime.ident.span());
-                                }
+                if let syn::PathArguments::AngleBracketed(bracketed) = &mut segment.arguments {
+                    for arg in &mut bracketed.args {
+                        match arg {
+                            // rename lifetimes to the anonymous lifetime
+                            syn::GenericArgument::Lifetime(lifetime) => {
+                                lifetime.ident = syn::Ident::new("_", lifetime.ident.span());
+                            }
 
-                                // recurse
-                                syn::GenericArgument::Type(ty) => anonymize_lifetimes(ty),
-                                syn::GenericArgument::Binding(binding) => {
-                                    anonymize_lifetimes(&mut binding.ty)
-                                }
-                                syn::GenericArgument::Constraint(constraint) => {
-                                    for bound in constraint.bounds.iter_mut() {
-                                        match bound {
-                                            syn::TypeParamBound::Lifetime(lifetime) => {
-                                                lifetime.ident =
-                                                    syn::Ident::new("_", lifetime.ident.span())
-                                            }
-                                            _ => {}
+                            // recurse
+                            syn::GenericArgument::Type(ty) => anonymize_lifetimes(ty),
+                            syn::GenericArgument::Binding(binding) => {
+                                anonymize_lifetimes(&mut binding.ty)
+                            }
+                            syn::GenericArgument::Constraint(constraint) => {
+                                for bound in constraint.bounds.iter_mut() {
+                                    match bound {
+                                        syn::TypeParamBound::Lifetime(lifetime) => {
+                                            lifetime.ident =
+                                                syn::Ident::new("_", lifetime.ident.span())
                                         }
+                                        _ => {}
                                     }
                                 }
-
-                                // nothing to do otherwise
-                                _ => {}
                             }
+
+                            // nothing to do otherwise
+                            _ => {}
                         }
                     }
-                    _ => {}
                 }
             }
         }

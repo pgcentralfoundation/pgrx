@@ -53,15 +53,12 @@ impl SqlGraphIdentifier for SchemaEntity {
 
 impl ToSql for SchemaEntity {
     fn to_sql(&self, _context: &PgrxSql) -> eyre::Result<String> {
+        let SchemaEntity { name, file, line, module_path } = self;
         let sql = format!(
             "\n\
                 -- {file}:{line}\n\
                 CREATE SCHEMA IF NOT EXISTS {name}; /* {module_path} */\
             ",
-            name = self.name,
-            file = self.file,
-            line = self.line,
-            module_path = self.module_path,
         );
         Ok(sql)
     }

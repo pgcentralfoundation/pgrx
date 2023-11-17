@@ -192,9 +192,9 @@ impl SqlDeclaredEntity {
 
     pub fn has_sql_declared_entity(&self, identifier: &SqlDeclared) -> bool {
         match (&identifier, &self) {
-            (SqlDeclared::Type(identifier_name), &SqlDeclaredEntity::Type(data))
-            | (SqlDeclared::Enum(identifier_name), &SqlDeclaredEntity::Enum(data))
-            | (SqlDeclared::Function(identifier_name), &SqlDeclaredEntity::Function(data)) => {
+            (SqlDeclared::Type(ident_name), &SqlDeclaredEntity::Type(data))
+            | (SqlDeclared::Enum(ident_name), &SqlDeclaredEntity::Enum(data))
+            | (SqlDeclared::Function(ident_name), &SqlDeclaredEntity::Function(data)) => {
                 let matches = |identifier_name: &str| {
                     identifier_name == &data.name
                         || identifier_name == &data.option
@@ -206,21 +206,15 @@ impl SqlDeclaredEntity {
                         || identifier_name == &data.option_array
                         || identifier_name == &data.varlena
                 };
-                if matches(identifier_name) || data.pg_box.contains(identifier_name) {
+                if matches(ident_name) || data.pg_box.contains(ident_name) {
                     return true;
                 }
                 // there are cases where the identifier is
                 // `core::option::Option<Foo>` while the data stores
                 // `Option<Foo>` check again for this
-                let generics_start = match identifier_name.find('<') {
-                    None => return false,
-                    Some(idx) => idx,
-                };
-                let qualification_end = match identifier_name[..generics_start].rfind("::") {
-                    None => return false,
-                    Some(idx) => idx,
-                };
-                matches(&identifier_name[qualification_end + 2..])
+                let Some(generics_start) = ident_name.find('<') else { return false };
+                let Some(qual_end) = ident_name[..generics_start].rfind("::") else { return false };
+                matches(&ident_name[qual_end + 2..])
             }
             _ => false,
         }

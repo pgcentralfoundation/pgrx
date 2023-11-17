@@ -110,7 +110,7 @@ pub enum SqlGraphEntity {
 impl SqlGraphEntity {
     pub fn sql_anchor_comment(&self) -> String {
         let maybe_file_and_line = if let (Some(file), Some(line)) = (self.file(), self.line()) {
-            format!("-- {file}:{line}\n", file = file, line = line)
+            format!("-- {file}:{line}\n")
         } else {
             String::default()
         };
@@ -119,7 +119,6 @@ impl SqlGraphEntity {
             {maybe_file_and_line}\
             -- {rust_identifier}\
         ",
-            maybe_file_and_line = maybe_file_and_line,
             rust_identifier = self.rust_identifier(),
         )
     }
@@ -132,7 +131,7 @@ impl SqlGraphIdentifier for SqlGraphEntity {
             SqlGraphEntity::CustomSql(item) => item.dot_identifier(),
             SqlGraphEntity::Function(item) => item.dot_identifier(),
             SqlGraphEntity::Type(item) => item.dot_identifier(),
-            SqlGraphEntity::BuiltinType(item) => format!("preexisting type {}", item),
+            SqlGraphEntity::BuiltinType(item) => format!("preexisting type {item}"),
             SqlGraphEntity::Enum(item) => item.dot_identifier(),
             SqlGraphEntity::Ord(item) => item.dot_identifier(),
             SqlGraphEntity::Hash(item) => item.dot_identifier(),
@@ -268,18 +267,16 @@ impl ToSql for SqlGraphEntity {
 pub fn ident_is_acceptable_to_postgres(ident: &syn::Ident) -> Result<(), syn::Error> {
     // Roughly `pgrx::pg_sys::NAMEDATALEN`
     //
-    // Technically it **should** be that exactly, however this is `pgrx-utils` and a this data is used at macro time.
+    // Technically it **should** be that, but we need to guess at build time
     const POSTGRES_IDENTIFIER_MAX_LEN: usize = 64;
 
-    let ident_string = ident.to_string();
-    if ident_string.len() >= POSTGRES_IDENTIFIER_MAX_LEN {
+    let len = ident.to_string().len();
+    if len >= POSTGRES_IDENTIFIER_MAX_LEN {
         return Err(syn::Error::new(
             ident.span(),
             format!(
-                "Identifier `{}` was {} characters long, PostgreSQL will truncate identifiers with less than \
-                {POSTGRES_IDENTIFIER_MAX_LEN} characters, opt for an identifier which Postgres won't truncate",
-                ident,
-                ident_string.len(),
+                "Identifier `{ident}` was {len} characters long, PostgreSQL will truncate identifiers with less than \
+                {POSTGRES_IDENTIFIER_MAX_LEN} characters, opt for an identifier which Postgres won't truncate"
             )
         ));
     }

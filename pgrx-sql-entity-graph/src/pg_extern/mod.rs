@@ -190,12 +190,11 @@ impl PgExtern {
                         } else if in_commented_sql_block && inner.value().trim() == "```" {
                             in_commented_sql_block = false;
                         } else if in_commented_sql_block {
-                            let sql = retval.get_or_insert_with(String::default);
                             let line = inner.value().trim_start().replace(
                                 "@FUNCTION_NAME@",
                                 &(self.func.sig.ident.to_string() + "_wrapper"),
                             ) + "\n";
-                            sql.push_str(&line);
+                            retval.get_or_insert_with(String::default).push_str(&line);
                         }
                     }
                 }

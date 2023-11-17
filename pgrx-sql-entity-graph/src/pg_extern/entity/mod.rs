@@ -273,11 +273,10 @@ impl ToSql for PgExternEntity {
             PgExternReturnEntity::Iterated { tys: table_items, optional: _, result: _ } => {
                 let mut items = String::new();
                 let metadata_retval = self.metadata.retval.clone().ok_or_else(|| eyre!("Macro expansion time and SQL resolution time had differing opinions about the return value existing"))?;
-                let metadata_retval_sqls = match metadata_retval.return_sql {
+                let metadata_retval_sqls: Vec<String> = match metadata_retval.return_sql {
                         Ok(Returns::Table(variants)) => {
-                            let mut retval_sqls = vec![];
-                            for (idx, variant) in variants.iter().enumerate() {
-                                let sql = match variant {
+                            variants.iter().enumerate().map(|(idx, variant)| {
+                                match variant {
                                     SqlMapping::As(sql) => sql.clone(),
                                     SqlMapping::Composite { array_brackets } => {
                                         let composite = table_items[idx].ty.composite_type.unwrap();
@@ -287,10 +286,8 @@ impl ToSql for PgExternEntity {
                                         fmt::with_array_brackets(context.source_only_to_sql_type(table_items[idx].ty.ty_source).unwrap(), *array_brackets)
                                     }
                                     SqlMapping::Skip => todo!(),
-                                };
-                                retval_sqls.push(sql)
-                            }
-                            retval_sqls
+                                }
+                            }).collect()
                         },
                         Ok(_other) => return Err(eyre!("Got non-table return variant SQL in what macro-expansion thought was a table")),
                         Err(err) => return Err(err).wrap_err("Error mapping return SQL"),
@@ -302,11 +299,11 @@ impl ToSql for PgExternEntity {
                     let graph_index =
                         context.graph.neighbors_undirected(self_index).find(|neighbor| {
                             match &context.graph[*neighbor] {
-                                SqlGraphEntity::Type(neightbor_ty) => {
-                                    neightbor_ty.id_matches(&ty.ty_id)
+                                SqlGraphEntity::Type(neighbor_ty) => {
+                                    neighbor_ty.id_matches(&ty.ty_id)
                                 }
-                                SqlGraphEntity::Enum(neightbor_en) => {
-                                    neightbor_en.id_matches(&ty.ty_id)
+                                SqlGraphEntity::Enum(neighbor_en) => {
+                                    neighbor_en.id_matches(&ty.ty_id)
                                 }
                                 SqlGraphEntity::BuiltinType(defined) => defined == ty.ty_source,
                                 _ => false,
