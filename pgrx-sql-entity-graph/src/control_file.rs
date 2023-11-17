@@ -38,6 +38,7 @@ pub struct ControlFile {
     pub relocatable: bool,
     pub superuser: bool,
     pub schema: Option<String>,
+    pub trusted: bool,
 }
 
 impl ControlFile {
@@ -86,6 +87,10 @@ impl ControlFile {
                 .ok_or(ControlFileError::MissingField { field: "superuser" })?
                 == &"true",
             schema: temp.get("schema").map(|v| v.to_string()),
+            trusted: temp
+                .get("trusted")
+                .ok_or(ControlFileError::MissingField { field: "trusted" })?
+                == &"false",
         })
     }
 }

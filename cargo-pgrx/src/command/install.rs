@@ -173,6 +173,7 @@ pub(crate) fn install_extension(
             true,
             &package_manifest_path,
             &mut output_tracking,
+            &pg_config,
         )?;
     }
 
@@ -217,6 +218,7 @@ pub(crate) fn install_extension(
             false,
             &package_manifest_path,
             &mut output_tracking,
+            &pg_config,
         )?;
     }
 
@@ -245,6 +247,7 @@ fn copy_file(
     do_filter: bool,
     package_manifest_path: impl AsRef<Path>,
     output_tracking: &mut Vec<PathBuf>,
+    pg_config: &PgConfig,
 ) -> eyre::Result<()> {
     let Some(dest_dir) = dest.parent() else {
         // what fresh hell could ever cause such an error?
@@ -266,7 +269,12 @@ fn copy_file(
         // we want to filter the contents of the file we're to copy
         let input = std::fs::read_to_string(src)
             .wrap_err_with(|| format!("failed to read `{}`", src.display()))?;
-        let input = filter_contents(package_manifest_path, input)?;
+        let mut input = filter_contents(package_manifest_path, input)?;
+
+        if src.display().to_string().ends_with(".control") {
+            input = filter_out_fields_in_control(pg_config, input)?;
+        }
+
         std::fs::write(dest, input).wrap_err_with(|| {
             format!("failed writing `{}` to `{}`", src.display(), dest.display())
         })?;
@@ -401,6 +409,7 @@ fn copy_sql_files(
                         true,
                         &package_manifest_path,
                         output_tracking,
+                        &pg_config,
                     )?;
                 }
             }
@@ -529,6 +538,20 @@ fn filter_contents(manifest_path: impl AsRef<Path>, mut input: String) -> eyre::
     }
 
     input = input.replace("@CARGO_VERSION@", &get_version(&manifest_path)?);
+
+    Ok(input)
+}
+
+// remove fields in control for versions not supported
+// `trusted`` in only supported in version 13 and above
+fn filter_out_fields_in_control(pg_config: &PgConfig, mut input: String) -> eyre::Result<String> {
+    if pg_config.major_version().unwrap() < 13 {
+        input = input
+            .lines()
+            .filter(|line| !line.starts_with("trusted"))
+            .collect::<Vec<_>>()
+            .join("\n");
+    }
 
     Ok(input)
 }
