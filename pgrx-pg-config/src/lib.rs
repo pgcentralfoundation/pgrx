@@ -181,12 +181,10 @@ impl PgConfig {
             const PREFIX: &str = "PGRX_PG_CONFIG_";
 
             let mut known_props = BTreeMap::new();
-            for (k, v) in std::env::vars() {
-                if k.starts_with(PREFIX) {
-                    // reformat the key to look like an argument option to `pg_config`
-                    let prop = format!("--{}", k.trim_start_matches(PREFIX).to_lowercase());
-                    known_props.insert(prop, v);
-                }
+            for (k, v) in std::env::vars().filter(|(k, _)| k.starts_with(PREFIX)) {
+                // reformat the key to look like an argument option to `pg_config`
+                let prop = format!("--{}", k.trim_start_matches(PREFIX).to_lowercase());
+                known_props.insert(prop, v);
             }
 
             Ok(Self {
@@ -366,6 +364,20 @@ impl PgConfig {
         let mut path = Pgrx::home()?;
         path.push(format!("{}.log", self.major_version()?));
         Ok(path)
+    }
+
+    /// a vaguely-parsed "--configure"
+    pub fn configure(&self) -> eyre::Result<BTreeMap<String, String>> {
+        let stdout = self.run("--configure")?;
+        Ok(stdout
+            .split('\'')
+            .filter(|s| s != &"" && s != &" ")
+            .map(|entry| match entry.split_once('=') {
+                Some((k, v)) => (k.to_owned(), v.to_owned()),
+                // some keys are about mere presence
+                None => (entry.to_owned(), String::from("")),
+            })
+            .collect())
     }
 
     pub fn includedir_server(&self) -> eyre::Result<PathBuf> {

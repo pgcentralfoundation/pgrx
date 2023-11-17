@@ -24,6 +24,7 @@ use syn::{ForeignItem, Item, ItemConst};
 const BLOCKLISTED_TYPES: [&str; 3] = ["Datum", "NullableDatum", "Oid"];
 
 mod build {
+    pub(super) mod clang;
     pub(super) mod sym_blocklist;
 }
 
@@ -714,14 +715,22 @@ fn run_bindgen(
     include_h: &PathBuf,
 ) -> eyre::Result<String> {
     eprintln!("Generating bindings for pg{major_version}");
+    let configure = pg_config.configure()?;
+    let preferred_clang: Option<&std::path::Path> = configure.get("CLANG").map(|s| s.as_ref());
+    eprintln!("pg_config --configure CLANG = {:?}", preferred_clang);
+    let (autodetect, includes) = build::clang::detect_include_paths_for(preferred_clang);
     let mut binder = bindgen::Builder::default();
     binder = add_blocklists(binder);
     binder = add_derives(binder);
+    if !autodetect {
+        let builtin_includes = includes.iter().filter_map(|p| Some(format!("-I{}", p.to_str()?)));
+        binder = binder.clang_args(builtin_includes);
+    };
     let bindings = binder
         .header(include_h.display().to_string())
         .clang_args(extra_bindgen_clang_args(pg_config)?)
         .clang_args(pg_target_include_flags(major_version, pg_config)?)
-        .detect_include_paths(target_env_tracked("PGRX_BINDGEN_NO_DETECT_INCLUDES").is_none())
+        .detect_include_paths(autodetect)
         .parse_callbacks(Box::new(PgrxOverrides::default()))
         // The NodeTag enum is closed: additions break existing values in the set, so it is not extensible
         .rustified_non_exhaustive_enum("NodeTag")
