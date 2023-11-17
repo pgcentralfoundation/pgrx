@@ -14,15 +14,9 @@
 #define IS_PG_12 (PG_VERSION_NUM >= 120000 && PG_VERSION_NUM < 130000)
 #define IS_PG_13 (PG_VERSION_NUM >= 130000 && PG_VERSION_NUM < 140000)
 
-#include "access/htup.h"
-#include "access/htup_details.h"
-#include "catalog/pg_type.h"
 #include "nodes/pathnodes.h"
 #include "nodes/pg_list.h"
 #include "parser/parsetree.h"
-#include "utils/memutils.h"
-#include "utils/builtins.h"
-#include "utils/array.h"
 #include "storage/spin.h"
 
 PGDLLEXPORT RangeTblEntry *pgrx_planner_rt_fetch(Index index, PlannerInfo *plannerInfo);
