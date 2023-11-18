@@ -1,7 +1,5 @@
-use crate::{
-    lwlock::*, pg_sys, shmem::PgSharedMemoryInitialization, PGRXSharedMemory, PgSharedMem,
-};
-
+use crate::{pg_sys, shmem::PgSharedMemoryInitialization, spinlock::*, PGRXSharedMemory};
+use once_cell::sync::OnceCell;
 use std::ffi::c_void;
 use uuid::Uuid;
 
@@ -11,7 +9,7 @@ pub enum Error {
     HashTableFull,
 }
 
-#[derive(Copy, Clone)]
+#[derive(Copy, Clone, Debug)]
 struct PgHashMapInner {
     htab: *mut pg_sys::HTAB,
     elements: u64,
@@ -21,7 +19,7 @@ unsafe impl PGRXSharedMemory for PgHashMapInner {}
 unsafe impl Send for PgHashMapInner {}
 unsafe impl Sync for PgHashMapInner {}
 
-// #[repr(align(8))]
+#[repr(C)]
 #[derive(Copy, Clone, Debug)]
 struct Key<K> {
     // We copy it with std::ptr::copy, but we don't actually use the field
@@ -30,7 +28,7 @@ struct Key<K> {
     key: K,
 }
 
-// #[repr(align(8))]
+#[repr(C)]
 #[derive(Copy, Clone, Debug)]
 struct Value<K, V> {
     #[allow(dead_code)]
@@ -49,14 +47,14 @@ impl Default for PgHashMapInner {
 /// internals to store key/value pairs in shared memory.
 pub struct PgHashMap<K: Copy + Clone, V: Copy + Clone> {
     /// HTAB protected by a LwLock.
-    htab: PgLwLock<PgHashMapInner>,
+    htab: OnceCell<PgSpinLock<PgHashMapInner>>,
 
     /// Max size, allocated at server start.
     size: u64,
 
     // Markers for key/value types.
-    phantom_key: std::marker::PhantomData<K>,
-    phantom_value: std::marker::PhantomData<V>,
+    _phantom_key: std::marker::PhantomData<K>,
+    _phantom_value: std::marker::PhantomData<V>,
 }
 
 /// Compute the hash for the key and its pointer
@@ -86,10 +84,10 @@ impl<K: Copy + Clone, V: Copy + Clone> PgHashMap<K, V> {
     /// `pg_shmem_init!` just like any other shared memory structure.
     pub const fn new(size: u64) -> PgHashMap<K, V> {
         PgHashMap {
-            htab: PgLwLock::new(),
+            htab: OnceCell::new(),
             size,
-            phantom_key: std::marker::PhantomData,
-            phantom_value: std::marker::PhantomData,
+            _phantom_key: std::marker::PhantomData,
+            _phantom_value: std::marker::PhantomData,
         }
     }
 
@@ -97,7 +95,7 @@ impl<K: Copy + Clone, V: Copy + Clone> PgHashMap<K, V> {
     /// present, it will be replaced and returned. If the `PgHashMap` is full, return an error.
     pub fn insert(&self, key: K, value: V) -> Result<Option<V>, Error> {
         let mut found = false;
-        let mut htab = self.htab.exclusive();
+        let mut htab = self.htab.get().unwrap().lock();
         let (key_ptr, hash_value) = key!(key, htab);
 
         let entry = unsafe {
@@ -154,7 +152,7 @@ impl<K: Copy + Clone, V: Copy + Clone> PgHashMap<K, V> {
     /// Get a value from the HashMap using the key.
     /// If the key doesn't exist, return None.
     pub fn get(&self, key: K) -> Option<V> {
-        let htab = self.htab.exclusive();
+        let htab = self.htab.get().unwrap().lock();
         let (key_ptr, hash_value) = key!(key, htab);
 
         let entry = unsafe {
@@ -180,7 +178,7 @@ impl<K: Copy + Clone, V: Copy + Clone> PgHashMap<K, V> {
     /// If the key doesn't exist, return None.
     pub fn remove(&self, key: K) -> Option<V> {
         if let Some(value) = self.get(key) {
-            let mut htab = self.htab.exclusive();
+            let mut htab = self.htab.get().unwrap().lock();
             let (key_ptr, hash_value) = key!(key, htab);
 
             // Dangling pointer, don't touch it.
@@ -203,19 +201,18 @@ impl<K: Copy + Clone, V: Copy + Clone> PgHashMap<K, V> {
 
     /// Get the number of elements in the HashMap.
     pub fn len(&self) -> u64 {
-        let htab = self.htab.exclusive();
+        let htab = self.htab.get().unwrap().lock();
         htab.elements
     }
 }
 
 impl<K: Copy + Clone, V: Copy + Clone> PgSharedMemoryInitialization for PgHashMap<K, V> {
     fn pg_init(&'static self) {
-        PgSharedMem::pg_init_locked(&self.htab);
+        self.htab.set(PgSpinLock::new(PgHashMapInner::default())).expect("htab cell is not empty");
     }
 
     fn shmem_init(&'static self) {
-        PgSharedMem::shmem_init_locked(&self.htab);
-        let mut htab = self.htab.exclusive();
+        let mut htab = self.htab.get().unwrap().lock();
 
         let mut hash_ctl = pg_sys::HASHCTL::default();
         hash_ctl.keysize = std::mem::size_of::<Key<K>>();

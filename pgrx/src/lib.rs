@@ -65,6 +65,7 @@ pub mod pg_catalog;
 pub mod pgbox;
 pub mod rel;
 pub mod shmem;
+#[cfg(feature = "cshim")]
 pub mod shmem_hash;
 pub mod spi;
 #[cfg(feature = "cshim")]

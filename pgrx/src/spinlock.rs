@@ -28,6 +28,7 @@ use std::{cell::UnsafeCell, marker::PhantomData};
 /// [`storage/spin.h`]:
 ///     https://github.com/postgres/postgres/blob/1f0c4fa255253d223447c2383ad2b384a6f05854/src/include/storage/spin.h
 #[doc(alias = "slock_t")]
+#[derive(Debug)]
 pub struct PgSpinLock<T> {
     item: UnsafeCell<T>,
     lock: UnsafeCell<pg_sys::slock_t>,
