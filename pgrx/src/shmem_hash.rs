@@ -1,3 +1,5 @@
+//! Shared memory hash map implemented with Postgres' internal `HTAB`,
+//! which is used by other extensions like `pg_stat_statements`.
 use crate::{pg_sys, shmem::PgSharedMemoryInitialization, spinlock::*, PGRXSharedMemory};
 use once_cell::sync::OnceCell;
 use std::ffi::c_void;
@@ -6,6 +8,7 @@ use uuid::Uuid;
 #[derive(Debug, Eq, PartialEq)]
 #[non_exhaustive]
 pub enum Error {
+    /// Hash table can't have more entries due to fixed allocation size.
     HashTableFull,
 }
 
@@ -46,7 +49,7 @@ impl Default for PgHashMapInner {
 /// This HashMap is used for `pg_stat_statements` and Postgres
 /// internals to store key/value pairs in shared memory.
 pub struct PgHashMap<K: Copy + Clone, V: Copy + Clone> {
-    /// HTAB protected by a LwLock.
+    /// HTAB protected by a SpinLock.
     htab: OnceCell<PgSpinLock<PgHashMapInner>>,
 
     /// Max size, allocated at server start.
