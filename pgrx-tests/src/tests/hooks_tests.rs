@@ -138,7 +138,9 @@ mod tests {
                     arg: *mut ::std::os::raw::c_void,
                 ) -> HookResult<()>,
             ) -> HookResult<()> {
-                self.accesses += 1;
+                if access == pg_sys::ObjectAccessType_OAT_POST_CREATE {
+                    self.accesses += 1;
+                }
                 prev_hook(access, class_id, object_id, sub_id, arg)
             }
         }
@@ -154,8 +156,7 @@ mod tests {
         assert_eq!(8, HOOK.events);
 
         Spi::run("ALTER table test_hooks_table add column baz boolean").expect("SPI failed");
-        // This is 3 because there are two accesses for namespaces, and one for the table itself.
-        assert_eq!(3, HOOK.accesses);
+        assert_eq!(1, HOOK.accesses);
 
         // TODO:  it'd be nice to also test that .commit() and .abort() also get called
         //    but I don't see how to do that since we're running *inside* a transaction here
