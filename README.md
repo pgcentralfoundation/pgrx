@@ -13,7 +13,7 @@
 
 `pgrx` is a framework for developing PostgreSQL extensions in Rust and strives to be as idiomatic and safe as possible.
 
-`pgrx` supports Postgres v11-v15.
+`pgrx` supports Postgres 12 through Postgres 16.
 
 **Feel free to join our [Discord Server](https://discord.gg/PMrpdJsqcJ).**
 
@@ -27,7 +27,7 @@
    + `cargo pgrx package`: Create installation packages for your extension
    + More in the [`README.md`](cargo-pgrx/README.md)!
 - **Target Multiple Postgres Versions**
-   + Support Postgres v11-v15 from the same codebase
+   + Support from Postgres 12 to Postgres 16 from the same codebase
    + Use Rust feature gating to use version-specific APIs
    + Seamlessly test against all versions
 - **Automatic Schema Generation**
@@ -258,7 +258,7 @@ but rather extend additional support for other kinds of Rust code. These are not
 
 ### "unsafe-postgres": Allow compilation for Postgres forks that have a different ABI
 
-As of Postgres v15, forks are allowed to specify they use a different ABI than canonical Postgres.
+As of Postgres 15, forks are allowed to specify they use a different ABI than canonical Postgres.
 Since pgrx makes countless assumptions about Postgres' internal ABI it is not possible for it to 
 guarantee that a compiled pgrx extension will probably execute within such a Postgres fork.  You,
 dear compiler runner, can make this guarantee for yourself by specifying the `unsafe-postgres` 
