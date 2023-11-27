@@ -40,7 +40,7 @@ static HASH: PgLwLock<heapless::FnvIndexMap<i32, i32, 4>> = PgLwLock::new();
 static STRUCT: PgLwLock<Pgtest> = PgLwLock::new();
 static PRIMITIVE: PgLwLock<i32> = PgLwLock::new();
 static ATOMIC: PgAtomic<std::sync::atomic::AtomicBool> = PgAtomic::new();
-static HASH_TABLE: PgHashMap<i64, i64> = PgHashMap::new(250);
+static HASH_TABLE: ShmemHashMap<i64, i64> = ShmemHashMap::new(250);
 
 #[pg_guard]
 pub extern "C" fn _PG_init() {

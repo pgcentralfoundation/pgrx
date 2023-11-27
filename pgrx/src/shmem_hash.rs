@@ -7,20 +7,20 @@ use uuid::Uuid;
 
 #[derive(Debug, Eq, PartialEq)]
 #[non_exhaustive]
-pub enum Error {
+pub enum ShmemHashMapError {
     /// Hash table can't have more entries due to fixed allocation size.
     HashTableFull,
 }
 
 #[derive(Copy, Clone, Debug)]
-struct PgHashMapInner {
+struct ShmemHashMapInner {
     htab: *mut pg_sys::HTAB,
-    elements: u64,
+    elements: i64,
 }
 
-unsafe impl PGRXSharedMemory for PgHashMapInner {}
-unsafe impl Send for PgHashMapInner {}
-unsafe impl Sync for PgHashMapInner {}
+unsafe impl PGRXSharedMemory for ShmemHashMapInner {}
+unsafe impl Send for ShmemHashMapInner {}
+unsafe impl Sync for ShmemHashMapInner {}
 
 #[repr(C)]
 #[derive(Copy, Clone, Debug)]
@@ -39,7 +39,7 @@ struct Value<K, V> {
     value: V,
 }
 
-impl Default for PgHashMapInner {
+impl Default for ShmemHashMapInner {
     fn default() -> Self {
         Self { htab: std::ptr::null_mut(), elements: 0 }
     }
@@ -48,12 +48,12 @@ impl Default for PgHashMapInner {
 /// A shared memory HashMap using Postgres' `HTAB`.
 /// This HashMap is used for `pg_stat_statements` and Postgres
 /// internals to store key/value pairs in shared memory.
-pub struct PgHashMap<K: Copy + Clone, V: Copy + Clone> {
+pub struct ShmemHashMap<K: Copy + Clone, V: Copy + Clone> {
     /// HTAB protected by a SpinLock.
-    htab: OnceCell<PgSpinLock<PgHashMapInner>>,
+    htab: OnceCell<PgSpinLock<ShmemHashMapInner>>,
 
     /// Max size, allocated at server start.
-    size: u64,
+    size: i64,
 
     // Markers for key/value types.
     _phantom_key: std::marker::PhantomData<K>,
@@ -82,11 +82,19 @@ macro_rules! value_ptr {
     }};
 }
 
-impl<K: Copy + Clone, V: Copy + Clone> PgHashMap<K, V> {
-    /// Create new `PgHashMap`. This still needs to be allocated with
+impl<K: Copy + Clone, V: Copy + Clone> ShmemHashMap<K, V> {
+    /// Create new `ShmemHashMap`. This still needs to be allocated with
     /// `pg_shmem_init!` just like any other shared memory structure.
-    pub const fn new(size: u64) -> PgHashMap<K, V> {
-        PgHashMap {
+    ///
+    /// # Arguments
+    ///
+    /// * `size` - Maximum number of elements in the HashMap. This is allocated
+    ///            at server start and cannot be changed. `i64` is the expected type
+    ///            for `pg_sys::ShmemInitHash`, so we don't attempt runtime conversions
+    ///            unnecessarily.
+    ///
+    pub const fn new(size: i64) -> ShmemHashMap<K, V> {
+        ShmemHashMap {
             htab: OnceCell::new(),
             size,
             _phantom_key: std::marker::PhantomData,
@@ -94,9 +102,10 @@ impl<K: Copy + Clone, V: Copy + Clone> PgHashMap<K, V> {
         }
     }
 
-    /// Insert a key and value into the `PgHashMap`. If the key is already
-    /// present, it will be replaced and returned. If the `PgHashMap` is full, return an error.
-    pub fn insert(&self, key: K, value: V) -> Result<Option<V>, Error> {
+    /// Insert a key and value into the `ShmemHashMap`. If the key is already
+    /// present, it will be replaced and returned. If the `ShmemHashMap` is full,
+    /// an error is returned.
+    pub fn insert(&self, key: K, value: V) -> Result<Option<V>, ShmemHashMapError> {
         let mut found = false;
         let mut htab = self.htab.get().unwrap().lock();
         let (key_ptr, hash_value) = key!(key, htab);
@@ -122,7 +131,7 @@ impl<K: Copy + Clone, V: Copy + Clone> PgHashMap<K, V> {
         // If we don't do this check, pg will overwrite
         // some random entry with our key/value pair...
         if entry.is_null() && htab.elements == self.size {
-            return Err(Error::HashTableFull);
+            return Err(ShmemHashMapError::HashTableFull);
         }
 
         let entry = unsafe {
@@ -148,12 +157,12 @@ impl<K: Copy + Clone, V: Copy + Clone> PgHashMap<K, V> {
             Ok(return_value)
         } else {
             // OOM. We pre-allocate at server start, so this should never be an issue.
-            return Err(Error::HashTableFull);
+            return Err(ShmemHashMapError::HashTableFull);
         }
     }
 
     /// Get a value from the HashMap using the key.
-    /// If the key doesn't exist, return None.
+    /// If the key doesn't exist, return `None`.
     pub fn get(&self, key: K) -> Option<V> {
         let htab = self.htab.get().unwrap().lock();
         let (key_ptr, hash_value) = key!(key, htab);
@@ -177,7 +186,7 @@ impl<K: Copy + Clone, V: Copy + Clone> PgHashMap<K, V> {
         }
     }
 
-    /// Remove the value from the `PgHashMap` and return it.
+    /// Remove the value from the `ShmemHashMap` and return it.
     /// If the key doesn't exist, return None.
     pub fn remove(&self, key: K) -> Option<V> {
         if let Some(value) = self.get(key) {
@@ -203,15 +212,17 @@ impl<K: Copy + Clone, V: Copy + Clone> PgHashMap<K, V> {
     }
 
     /// Get the number of elements in the HashMap.
-    pub fn len(&self) -> u64 {
+    pub fn len(&self) -> i64 {
         let htab = self.htab.get().unwrap().lock();
         htab.elements
     }
 }
 
-impl<K: Copy + Clone, V: Copy + Clone> PgSharedMemoryInitialization for PgHashMap<K, V> {
+impl<K: Copy + Clone, V: Copy + Clone> PgSharedMemoryInitialization for ShmemHashMap<K, V> {
     fn pg_init(&'static self) {
-        self.htab.set(PgSpinLock::new(PgHashMapInner::default())).expect("htab cell is not empty");
+        self.htab
+            .set(PgSpinLock::new(ShmemHashMapInner::default()))
+            .expect("htab cell is not empty");
     }
 
     fn shmem_init(&'static self) {
@@ -227,8 +238,8 @@ impl<K: Copy + Clone, V: Copy + Clone> PgSharedMemoryInitialization for PgHashMa
         let htab_ptr = unsafe {
             pg_sys::ShmemInitHash(
                 shm_name.into_raw(),
-                self.size.try_into().unwrap(),
-                self.size.try_into().unwrap(),
+                self.size,
+                self.size,
                 &mut hash_ctl,
                 (pg_sys::HASH_ELEM | pg_sys::HASH_BLOBS).try_into().unwrap(),
             )
