@@ -38,6 +38,7 @@ pub struct ControlFile {
     pub relocatable: bool,
     pub superuser: bool,
     pub schema: Option<String>,
+    pub trusted: bool,
 }
 
 impl ControlFile {
@@ -67,7 +68,7 @@ impl ControlFile {
 
             temp.insert(k, v);
         }
-        Ok(ControlFile {
+        let control_file = ControlFile {
             comment: temp
                 .get("comment")
                 .ok_or(ControlFileError::MissingField { field: "comment" })?
@@ -86,7 +87,15 @@ impl ControlFile {
                 .ok_or(ControlFileError::MissingField { field: "superuser" })?
                 == &"true",
             schema: temp.get("schema").map(|v| v.to_string()),
-        })
+            trusted: if let Some(v) = temp.get("trusted") { v == &"true" } else { false },
+        };
+
+        if !control_file.superuser && control_file.trusted {
+            // `trusted` is irrelevant if `superuser` is false.
+            return Err(ControlFileError::RedundantField { field: "trusted" });
+        }
+
+        Ok(control_file)
     }
 }
 
@@ -100,6 +109,7 @@ impl From<ControlFile> for SqlGraphEntity {
 #[derive(Debug, Clone)]
 pub enum ControlFileError {
     MissingField { field: &'static str },
+    RedundantField { field: &'static str },
 }
 
 impl std::fmt::Display for ControlFileError {
@@ -107,6 +117,9 @@ impl std::fmt::Display for ControlFileError {
         match self {
             ControlFileError::MissingField { field } => {
                 write!(f, "Missing field in control file! Please add `{field}`.")?;
+            }
+            ControlFileError::RedundantField { field } => {
+                write!(f, "Redundant field in control file! Please remove `{field}`.")?;
             }
         };
         Ok(())
