@@ -8,11 +8,16 @@
 //LICENSE
 //LICENSE Use of this source code is governed by the MIT license that can be found in the LICENSE file.
 use pgrx::prelude::*;
-use pgrx::{pg_shmem_init, PgAtomic, PgHashMap, PgLwLock, PgSharedMemoryInitialization};
+use pgrx::{pg_shmem_init, PgAtomic, PgLwLock, PgSharedMemoryInitialization};
 use std::sync::atomic::AtomicBool;
+
+#[cfg(feature = "cshim")]
+use pgrx::PgHashMap;
 
 static ATOMIC: PgAtomic<AtomicBool> = PgAtomic::new();
 static LWLOCK: PgLwLock<bool> = PgLwLock::new();
+
+#[cfg(feature = "cshim")]
 static HASH_MAP: PgHashMap<i64, i64> = PgHashMap::new(500);
 
 #[pg_guard]
@@ -20,6 +25,8 @@ pub extern "C" fn _PG_init() {
     // This ensures that this functionality works across PostgreSQL versions
     pg_shmem_init!(ATOMIC);
     pg_shmem_init!(LWLOCK);
+
+    #[cfg(feature = "cshim")]
     pg_shmem_init!(HASH_MAP);
 }
 
@@ -29,7 +36,10 @@ mod tests {
     #[allow(unused_imports)]
     use crate as pgrx_tests;
 
-    use crate::tests::shmem_tests::{HASH_MAP, LWLOCK};
+    #[cfg(feature = "cshim")]
+    use crate::tests::shmem_tests::HASH_MAP;
+    use crate::tests::shmem_tests::LWLOCK;
+
     use pgrx::prelude::*;
 
     #[pg_test]
@@ -57,6 +67,7 @@ mod tests {
         let _lock = LWLOCK.exclusive();
     }
 
+    #[cfg(feature = "cshim")]
     #[pg_test]
     pub fn test_pg_hash_map() {
         use rand::prelude::IteratorRandom;
