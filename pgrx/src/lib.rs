@@ -108,6 +108,7 @@ pub use nodes::*;
 pub use pgbox::*;
 pub use rel::*;
 pub use shmem::*;
+#[cfg(feature = "cshim")]
 pub use shmem_hash::*;
 pub use spi::Spi; // only Spi.  We don't want the top-level namespace polluted with spi::Result and spi::Error
 pub use stringinfo::*;
