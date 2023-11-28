@@ -51,3 +51,11 @@ extern void *MemoryContextAllocAligned(MemoryContext context,
 
 Notice that `pfree` only takes the pointer as an argument, effectively meaning every allocation
 must know what context it belongs to in some way.
+
+### `CurrentMemoryContext` makes `impl Deref` hard
+
+<!-- TODO: this segment. -->
+
+### Assigning lifetimes to `palloc` is hard
+
+<!-- TODO: this segment. -->
