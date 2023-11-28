@@ -1,6 +1,6 @@
 # Working with PGRX
 
-The basic idea of pgrx is that a Postgres extension requires
+The idea of pgrx is that writing Postgres extensions with `pgxs.mk` requires
 - writing a bunch of C code that must manually handle many Postgres invariants
 - writing SQL that then loads the extension properly, including many
   [CREATE FUNCTION] and [CREATE TYPE] declarations

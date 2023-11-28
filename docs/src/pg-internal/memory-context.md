@@ -32,6 +32,7 @@ extern void *palloc_aligned(Size size, Size alignto, int flags);
 
 When combined with appropriate type definitions, the `palloc` family of functions are identical to
 calling the following functions and passing the `CurrentMemoryContext` as the first argument:
+
 ```c
 typedef struct MemoryContextData *MemoryContext;
 #define PGDLLIMPORT
@@ -48,4 +49,5 @@ extern void *MemoryContextAllocAligned(MemoryContext context,
                                        Size size, Size alignto, int flags);
 -->
 
-These memory contexts are managed to 
+Notice that `pfree` only takes the pointer as an argument, effectively meaning every allocation
+must know what context it belongs to in some way.
