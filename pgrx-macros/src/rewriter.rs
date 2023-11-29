@@ -16,8 +16,8 @@ use std::str::FromStr;
 use syn::punctuated::Punctuated;
 use syn::spanned::Spanned;
 use syn::{
-    FnArg, ForeignItem, ForeignItemFn, GenericParam, ItemFn, ItemForeignMod, Pat,
-    Signature, Token, Visibility,
+    FnArg, ForeignItem, ForeignItemFn, GenericParam, ItemFn, ItemForeignMod, Pat, Signature, Token,
+    Visibility,
 };
 
 pub fn extern_block(block: ItemForeignMod) -> proc_macro2::TokenStream {
