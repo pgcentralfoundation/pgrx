@@ -16,8 +16,8 @@ use std::str::FromStr;
 use syn::punctuated::Punctuated;
 use syn::spanned::Spanned;
 use syn::{
-    FnArg, ForeignItem, ForeignItemFn, GenericParam, ItemFn, ItemForeignMod, Pat, ReturnType,
-    Signature, Token, Visibility,
+    FnArg, ForeignItem, ForeignItemFn, GenericParam, ItemFn, ItemForeignMod, Pat, Signature, Token,
+    Visibility,
 };
 
 pub fn extern_block(block: ItemForeignMod) -> proc_macro2::TokenStream {
@@ -61,7 +61,7 @@ pub fn item_fn_without_rewrite(mut func: ItemFn) -> syn::Result<proc_macro2::Tok
     func.sig.ident = Ident::new(&format!("{}_inner", func.sig.ident), func.sig.ident.span());
 
     let arg_list = build_arg_list(&sig, false)?;
-    let func_name = build_func_name(&func.sig);
+    let func_name = func.sig.ident.clone();
 
     let prolog = if input_func_name == "__pgrx_private_shmem_hook"
         || input_func_name == "__pgrx_private_shmem_request_hook"
@@ -108,7 +108,7 @@ pub fn item_fn_without_rewrite(mut func: ItemFn) -> syn::Result<proc_macro2::Tok
     })
 }
 
-pub fn foreign_item(item: ForeignItem, abi: &syn::Abi) -> syn::Result<proc_macro2::TokenStream> {
+fn foreign_item(item: ForeignItem, abi: &syn::Abi) -> syn::Result<proc_macro2::TokenStream> {
     match item {
         ForeignItem::Fn(func) => {
             if func.sig.variadic.is_some() {
@@ -121,14 +121,11 @@ pub fn foreign_item(item: ForeignItem, abi: &syn::Abi) -> syn::Result<proc_macro
     }
 }
 
-pub fn foreign_item_fn(
-    func: &ForeignItemFn,
-    abi: &syn::Abi,
-) -> syn::Result<proc_macro2::TokenStream> {
-    let func_name = build_func_name(&func.sig);
+fn foreign_item_fn(func: &ForeignItemFn, abi: &syn::Abi) -> syn::Result<proc_macro2::TokenStream> {
+    let func_name = func.sig.ident.clone();
     let arg_list = rename_arg_list(&func.sig)?;
     let arg_list_with_types = rename_arg_list_with_types(&func.sig)?;
-    let return_type = get_return_type(&func.sig);
+    let return_type = func.sig.output.clone();
 
     Ok(quote! {
         #[track_caller]
@@ -141,15 +138,8 @@ pub fn foreign_item_fn(
     })
 }
 
-pub fn build_func_name(sig: &Signature) -> Ident {
-    sig.ident.clone()
-}
-
 #[allow(clippy::cmp_owned)]
-pub fn build_arg_list(
-    sig: &Signature,
-    suffix_arg_name: bool,
-) -> syn::Result<proc_macro2::TokenStream> {
+fn build_arg_list(sig: &Signature, suffix_arg_name: bool) -> syn::Result<proc_macro2::TokenStream> {
     let mut arg_list = proc_macro2::TokenStream::new();
 
     for arg in &sig.inputs {
@@ -210,7 +200,7 @@ fn rename_arg_list(sig: &Signature) -> syn::Result<proc_macro2::TokenStream> {
     Ok(arg_list)
 }
 
-pub fn rename_arg_list_with_types(sig: &Signature) -> syn::Result<proc_macro2::TokenStream> {
+fn rename_arg_list_with_types(sig: &Signature) -> syn::Result<proc_macro2::TokenStream> {
     let mut arg_list = proc_macro2::TokenStream::new();
 
     for arg in &sig.inputs {
@@ -238,8 +228,4 @@ pub fn rename_arg_list_with_types(sig: &Signature) -> syn::Result<proc_macro2::T
     }
 
     Ok(arg_list)
-}
-
-pub fn get_return_type(sig: &Signature) -> ReturnType {
-    sig.output.clone()
 }
