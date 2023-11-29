@@ -73,7 +73,7 @@ impl ToSql for ExtensionSqlEntity {
         let ExtensionSqlEntity { file, line, sql, creates, requires, .. } = self;
         let creates = if !creates.is_empty() {
             let joined =
-                creates.into_iter().map(|i| format!("--   {}", i)).collect::<Vec<_>>().join("\n");
+                creates.iter().map(|i| format!("--   {}", i)).collect::<Vec<_>>().join("\n");
             format!(
                 "\
                 -- creates:\n\
@@ -84,7 +84,7 @@ impl ToSql for ExtensionSqlEntity {
         };
         let requires = if !requires.is_empty() {
             let joined =
-                requires.into_iter().map(|i| format!("--   {}", i)).collect::<Vec<_>>().join("\n");
+                requires.iter().map(|i| format!("--   {}", i)).collect::<Vec<_>>().join("\n");
             format!(
                 "\
                -- requires:\n\
