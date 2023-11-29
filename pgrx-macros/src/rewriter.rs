@@ -108,7 +108,7 @@ pub fn item_fn_without_rewrite(mut func: ItemFn) -> syn::Result<proc_macro2::Tok
     })
 }
 
-pub fn foreign_item(item: ForeignItem, abi: &syn::Abi) -> syn::Result<proc_macro2::TokenStream> {
+fn foreign_item(item: ForeignItem, abi: &syn::Abi) -> syn::Result<proc_macro2::TokenStream> {
     match item {
         ForeignItem::Fn(func) => {
             if func.sig.variadic.is_some() {
@@ -121,10 +121,7 @@ pub fn foreign_item(item: ForeignItem, abi: &syn::Abi) -> syn::Result<proc_macro
     }
 }
 
-pub fn foreign_item_fn(
-    func: &ForeignItemFn,
-    abi: &syn::Abi,
-) -> syn::Result<proc_macro2::TokenStream> {
+fn foreign_item_fn(func: &ForeignItemFn, abi: &syn::Abi) -> syn::Result<proc_macro2::TokenStream> {
     let func_name = build_func_name(&func.sig);
     let arg_list = rename_arg_list(&func.sig)?;
     let arg_list_with_types = rename_arg_list_with_types(&func.sig)?;
@@ -141,15 +138,12 @@ pub fn foreign_item_fn(
     })
 }
 
-pub fn build_func_name(sig: &Signature) -> Ident {
+fn build_func_name(sig: &Signature) -> Ident {
     sig.ident.clone()
 }
 
 #[allow(clippy::cmp_owned)]
-pub fn build_arg_list(
-    sig: &Signature,
-    suffix_arg_name: bool,
-) -> syn::Result<proc_macro2::TokenStream> {
+fn build_arg_list(sig: &Signature, suffix_arg_name: bool) -> syn::Result<proc_macro2::TokenStream> {
     let mut arg_list = proc_macro2::TokenStream::new();
 
     for arg in &sig.inputs {
@@ -210,7 +204,7 @@ fn rename_arg_list(sig: &Signature) -> syn::Result<proc_macro2::TokenStream> {
     Ok(arg_list)
 }
 
-pub fn rename_arg_list_with_types(sig: &Signature) -> syn::Result<proc_macro2::TokenStream> {
+fn rename_arg_list_with_types(sig: &Signature) -> syn::Result<proc_macro2::TokenStream> {
     let mut arg_list = proc_macro2::TokenStream::new();
 
     for arg in &sig.inputs {
@@ -240,6 +234,6 @@ pub fn rename_arg_list_with_types(sig: &Signature) -> syn::Result<proc_macro2::T
     Ok(arg_list)
 }
 
-pub fn get_return_type(sig: &Signature) -> ReturnType {
+fn get_return_type(sig: &Signature) -> ReturnType {
     sig.output.clone()
 }
