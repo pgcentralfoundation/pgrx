@@ -24,8 +24,6 @@ use sql_gen::{
     PgAggregate, PgExtern, PostgresEnum, Schema,
 };
 
-use crate::rewriter::PgGuardRewriter;
-
 mod operators;
 mod rewriter;
 
@@ -36,15 +34,13 @@ pub fn pg_guard(_attr: TokenStream, item: TokenStream) -> TokenStream {
     // get a usable token stream
     let ast = parse_macro_input!(item as syn::Item);
 
-    let rewriter = PgGuardRewriter::new();
-
     let res = match ast {
         // this is for processing the members of extern "C" { } blocks
         // functions inside the block get wrapped as public, top-level unsafe functions that are not "extern"
-        Item::ForeignMod(block) => Ok(rewriter.extern_block(block)),
+        Item::ForeignMod(block) => Ok(rewriter::extern_block(block)),
 
         // process top-level functions
-        Item::Fn(func) => rewriter.item_fn_without_rewrite(func),
+        Item::Fn(func) => rewriter::item_fn_without_rewrite(func),
         unknown => Err(syn::Error::new(
             unknown.span(),
             "#[pg_guard] can only be applied to extern \"C\" blocks and top-level functions",
