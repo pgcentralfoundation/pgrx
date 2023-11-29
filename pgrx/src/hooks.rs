@@ -472,7 +472,7 @@ unsafe extern "C" fn pgrx_process_utility(
     .inner
 }
 
-#[cfg(any(feature = "pg12"))]
+#[cfg(feature = "pg12")]
 #[pg_guard]
 unsafe extern "C" fn pgrx_planner(
     parse: *mut pg_sys::Query,

@@ -15,5 +15,5 @@ mod typalign {
     pub const TYPALIGN_DOUBLE: u8 = b'd';
 }
 
-#[cfg(any(feature = "pg12"))]
+#[cfg(feature = "pg12")]
 pub use typalign::*;
