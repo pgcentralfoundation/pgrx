@@ -61,7 +61,7 @@ pub fn item_fn_without_rewrite(mut func: ItemFn) -> syn::Result<proc_macro2::Tok
     func.sig.ident = Ident::new(&format!("{}_inner", func.sig.ident), func.sig.ident.span());
 
     let arg_list = build_arg_list(&sig, false)?;
-    let func_name = build_func_name(&func.sig);
+    let func_name = func.sig.ident.clone();
 
     let prolog = if input_func_name == "__pgrx_private_shmem_hook"
         || input_func_name == "__pgrx_private_shmem_request_hook"
@@ -122,7 +122,7 @@ fn foreign_item(item: ForeignItem, abi: &syn::Abi) -> syn::Result<proc_macro2::T
 }
 
 fn foreign_item_fn(func: &ForeignItemFn, abi: &syn::Abi) -> syn::Result<proc_macro2::TokenStream> {
-    let func_name = build_func_name(&func.sig);
+    let func_name = func.sig.ident.clone();
     let arg_list = rename_arg_list(&func.sig)?;
     let arg_list_with_types = rename_arg_list_with_types(&func.sig)?;
     let return_type = func.sig.output.clone();
@@ -136,10 +136,6 @@ fn foreign_item_fn(func: &ForeignItemFn, abi: &syn::Abi) -> syn::Result<proc_mac
             })
         }
     })
-}
-
-fn build_func_name(sig: &Signature) -> Ident {
-    sig.ident.clone()
 }
 
 #[allow(clippy::cmp_owned)]
