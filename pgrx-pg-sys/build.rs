@@ -377,19 +377,15 @@ fn rewrite_items(
 fn extract_oids(code: &syn::File) -> BTreeMap<syn::Ident, Box<syn::Expr>> {
     let mut oids = BTreeMap::new(); // we would like to have a nice sorted set
     for item in &code.items {
-        match item {
-            Item::Const(ItemConst { ident, ty, expr, .. }) => {
-                // Retype as strings for easy comparison
-                let name = ident.to_string();
-                let ty_str = ty.to_token_stream().to_string();
+        let Item::Const(ItemConst { ident, ty, expr, .. }) = item else { continue };
+        // Retype as strings for easy comparison
+        let name = ident.to_string();
+        let ty_str = ty.to_token_stream().to_string();
 
-                // This heuristic identifies "OIDs"
-                // We're going to warp the const declarations to be our newtype Oid
-                if ty_str == "u32" && is_builtin_oid(&name) {
-                    oids.insert(ident.clone(), expr.clone());
-                }
-            }
-            _ => {}
+        // This heuristic identifies "OIDs"
+        // We're going to warp the const declarations to be our newtype Oid
+        if ty_str == "u32" && is_builtin_oid(&name) {
+            oids.insert(ident.clone(), expr.clone());
         }
     }
     oids
