@@ -10,7 +10,6 @@
 use crate::NameMacro;
 use proc_macro2::TokenStream;
 
-
 pub fn staticize_lifetimes_in_type_path(value: syn::TypePath) -> syn::TypePath {
     let mut ty = syn::Type::Path(value);
     staticize_lifetimes(&mut ty);
@@ -25,7 +24,7 @@ pub fn staticize_lifetimes_in_type_path(value: syn::TypePath) -> syn::TypePath {
 pub fn staticize_lifetimes(value: &mut syn::Type) {
     match value {
         syn::Type::Path(type_path) => {
-            for arg in &mut type_path
+            type_path
                 .path
                 .segments
                 .iter_mut()
@@ -34,8 +33,7 @@ pub fn staticize_lifetimes(value: &mut syn::Type) {
                     _ => None,
                 })
                 .flat_map(|bracketed| &mut bracketed.args)
-            {
-                match arg {
+                .for_each(|arg| match arg {
                     // rename lifetimes to the static lifetime so the TypeIds match.
                     syn::GenericArgument::Lifetime(lifetime) => {
                         lifetime.ident = syn::Ident::new("static", lifetime.ident.span());
@@ -52,8 +50,7 @@ pub fn staticize_lifetimes(value: &mut syn::Type) {
                     }
                     // nothing to do otherwise
                     _ => {}
-                }
-            }
+                })
         }
 
         syn::Type::Reference(type_ref) => {
@@ -64,9 +61,7 @@ pub fn staticize_lifetimes(value: &mut syn::Type) {
             }
         }
 
-        syn::Type::Tuple(type_tuple) => {
-            type_tuple.elems.iter_mut().for_each(staticize_lifetimes)
-        }
+        syn::Type::Tuple(type_tuple) => type_tuple.elems.iter_mut().for_each(staticize_lifetimes),
 
         syn::Type::Macro(syn::TypeMacro { mac })
             if mac.path.segments.last().is_some_and(|seg| seg.ident == "name") =>
