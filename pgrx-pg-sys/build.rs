@@ -418,9 +418,7 @@ fn rewrite_oid_consts(
         .collect()
 }
 
-fn format_builtin_oid_impl<'a>(
-    oids: BTreeMap<syn::Ident, Box<syn::Expr>>,
-) -> proc_macro2::TokenStream {
+fn format_builtin_oid_impl(oids: BTreeMap<syn::Ident, Box<syn::Expr>>) -> proc_macro2::TokenStream {
     let enum_variants: proc_macro2::TokenStream;
     let from_impl: proc_macro2::TokenStream;
     (enum_variants, from_impl) = oids
