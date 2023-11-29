@@ -402,7 +402,7 @@ fn is_builtin_oid(name: &str) -> bool {
 }
 
 fn rewrite_oid_consts(
-    items: &Vec<syn::Item>,
+    items: &[syn::Item],
     oids: &BTreeMap<syn::Ident, Box<syn::Expr>>,
 ) -> Vec<syn::Item> {
     items
@@ -449,7 +449,7 @@ fn format_builtin_oid_impl(oids: BTreeMap<syn::Ident, Box<syn::Expr>>) -> proc_m
 }
 
 /// Implement our `PgNode` marker trait for `pg_sys::Node` and its "subclasses"
-fn impl_pg_node(items: &Vec<syn::Item>) -> eyre::Result<proc_macro2::TokenStream> {
+fn impl_pg_node(items: &[syn::Item]) -> eyre::Result<proc_macro2::TokenStream> {
     let mut pgnode_impls = proc_macro2::TokenStream::new();
 
     // we scope must of the computation so we can borrow `items` and then
