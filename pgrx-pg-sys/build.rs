@@ -689,7 +689,7 @@ impl Ord for StructDescriptor<'_> {
 fn get_bindings(
     major_version: u16,
     pg_config: &PgConfig,
-    include_h: &PathBuf,
+    include_h: &path::Path,
 ) -> eyre::Result<syn::File> {
     let bindings = if let Some(info_dir) =
         target_env_tracked(&format!("PGRX_TARGET_INFO_PATH_PG{major_version}"))
@@ -712,7 +712,7 @@ fn get_bindings(
 fn run_bindgen(
     major_version: u16,
     pg_config: &PgConfig,
-    include_h: &PathBuf,
+    include_h: &path::Path,
 ) -> eyre::Result<String> {
     eprintln!("Generating bindings for pg{major_version}");
     let configure = pg_config.configure()?;
