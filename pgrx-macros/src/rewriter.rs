@@ -16,7 +16,7 @@ use std::str::FromStr;
 use syn::punctuated::Punctuated;
 use syn::spanned::Spanned;
 use syn::{
-    FnArg, ForeignItem, ForeignItemFn, GenericParam, ItemFn, ItemForeignMod, Pat, ReturnType,
+    FnArg, ForeignItem, ForeignItemFn, GenericParam, ItemFn, ItemForeignMod, Pat,
     Signature, Token, Visibility,
 };
 
@@ -125,7 +125,7 @@ fn foreign_item_fn(func: &ForeignItemFn, abi: &syn::Abi) -> syn::Result<proc_mac
     let func_name = build_func_name(&func.sig);
     let arg_list = rename_arg_list(&func.sig)?;
     let arg_list_with_types = rename_arg_list_with_types(&func.sig)?;
-    let return_type = get_return_type(&func.sig);
+    let return_type = func.sig.output.clone();
 
     Ok(quote! {
         #[track_caller]
@@ -232,8 +232,4 @@ fn rename_arg_list_with_types(sig: &Signature) -> syn::Result<proc_macro2::Token
     }
 
     Ok(arg_list)
-}
-
-fn get_return_type(sig: &Signature) -> ReturnType {
-    sig.output.clone()
 }
