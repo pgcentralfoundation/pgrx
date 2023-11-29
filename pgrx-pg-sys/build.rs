@@ -828,13 +828,13 @@ fn pg_target_include_flags(pg_version: u16, pg_config: &PgConfig) -> eyre::Resul
     }
 }
 
-fn build_shim(shim_src: &PathBuf, shim_dst: &PathBuf, pg_config: &PgConfig) -> eyre::Result<()> {
+fn build_shim(
+    shim_src: &path::Path,
+    shim_dst: &path::Path,
+    pg_config: &PgConfig,
+) -> eyre::Result<()> {
     let major_version = pg_config.major_version()?;
-    let mut libpgrx_cshim: PathBuf = shim_dst.clone();
 
-    libpgrx_cshim.push(format!("libpgrx-cshim-{}.a", major_version));
-
-    eprintln!("libpgrx_cshim={}", libpgrx_cshim.display());
     // then build the shim for the version feature currently being built
     build_shim_for_version(shim_src, shim_dst, pg_config)?;
 
@@ -849,8 +849,8 @@ fn build_shim(shim_src: &PathBuf, shim_dst: &PathBuf, pg_config: &PgConfig) -> e
 }
 
 fn build_shim_for_version(
-    shim_src: &PathBuf,
-    shim_dst: &PathBuf,
+    shim_src: &path::Path,
+    shim_dst: &path::Path,
     pg_config: &PgConfig,
 ) -> eyre::Result<()> {
     let path_env = prefix_path(pg_config.parent_path());
