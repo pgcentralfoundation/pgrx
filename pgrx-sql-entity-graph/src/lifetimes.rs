@@ -23,12 +23,10 @@ pub fn staticize_lifetimes_in_type_path(value: syn::TypePath) -> syn::TypePath {
 
 pub fn staticize_lifetimes(value: &mut syn::Type) {
     match value {
-        syn::Type::Path(type_path) => {
-            type_path
-                .path
-                .segments
+        syn::Type::Path(syn::TypePath { path: syn::Path { segments, .. }, .. }) => {
+            segments
                 .iter_mut()
-                .filter_map(|seg| match &mut seg.arguments {
+                .filter_map(|segment| match &mut segment.arguments {
                     syn::PathArguments::AngleBracketed(bracketed) => Some(bracketed),
                     _ => None,
                 })
