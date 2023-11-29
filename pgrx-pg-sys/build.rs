@@ -450,7 +450,7 @@ fn impl_pg_node(items: &[syn::Item]) -> eyre::Result<proc_macro2::TokenStream> {
 
     // we scope must of the computation so we can borrow `items` and then
     // extend it at the very end.
-    let struct_graph: StructGraph = StructGraph::from(&items[..]);
+    let struct_graph: StructGraph = StructGraph::from(items);
 
     // collect all the structs with `NodeTag` as their first member,
     // these will serve as roots in our forest of `Node`s
