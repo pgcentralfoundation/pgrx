@@ -83,7 +83,7 @@ impl<'a> PgTrigger<'a> {
         // containing a known good `TriggerData` which also contains a known good `Trigger`... and the user agreed to
         // our `unsafe` constructor safety rules, we choose to trust this is indeed a valid pointer offered to us by
         // PostgreSQL, and that it trusts it.
-        unsafe { PgHeapTuple::from_trigger_data(&*self.trigger_data, TriggerTuple::New) }
+        unsafe { PgHeapTuple::from_trigger_data(self.trigger_data, TriggerTuple::New) }
     }
 
     /// Returns the old database row for UPDATE/DELETE operations in row-level triggers.
@@ -95,7 +95,7 @@ impl<'a> PgTrigger<'a> {
         // containing a known good `TriggerData` which also contains a known good `Trigger`... and the user agreed to
         // our `unsafe` constructor safety rules, we choose to trust this is indeed a valid pointer offered to us by
         // PostgreSQL, and that it trusts it.
-        unsafe { PgHeapTuple::from_trigger_data(&*self.trigger_data, TriggerTuple::Old) }
+        unsafe { PgHeapTuple::from_trigger_data(self.trigger_data, TriggerTuple::Old) }
     }
 
     /// Variable that contains the name of the trigger actually fired
@@ -206,7 +206,7 @@ impl<'a> PgTrigger<'a> {
         let slice: &[*mut c_char] =
             unsafe { core::slice::from_raw_parts(tgargs, tgnargs.try_into()?) };
         let args = slice
-            .into_iter()
+            .iter()
             .map(|v| {
                 // Safety: Given that we have a known good `FunctionCallInfo`, which PostgreSQL has checked is indeed a trigger,
                 // containing a known good `TriggerData` which also contains a known good `Trigger`... and the user agreed to
