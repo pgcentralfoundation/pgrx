@@ -9,7 +9,7 @@
 //LICENSE Use of this source code is governed by the MIT license that can be found in the LICENSE file.
 use crate::NameMacro;
 use proc_macro2::TokenStream;
-use syn::Lifetime;
+
 
 pub fn staticize_lifetimes_in_type_path(value: syn::TypePath) -> syn::TypePath {
     let mut ty = syn::Type::Path(value);
