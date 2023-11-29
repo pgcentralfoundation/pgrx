@@ -9,6 +9,7 @@
 //LICENSE Use of this source code is governed by the MIT license that can be found in the LICENSE file.
 use crate::NameMacro;
 use proc_macro2::TokenStream;
+use syn::Lifetime;
 
 pub fn staticize_lifetimes_in_type_path(value: syn::TypePath) -> syn::TypePath {
     let mut ty = syn::Type::Path(value);
@@ -24,40 +25,36 @@ pub fn staticize_lifetimes_in_type_path(value: syn::TypePath) -> syn::TypePath {
 pub fn staticize_lifetimes(value: &mut syn::Type) {
     match value {
         syn::Type::Path(type_path) => {
-            for segment in &mut type_path.path.segments {
-                match &mut segment.arguments {
-                    syn::PathArguments::AngleBracketed(bracketed) => {
-                        for arg in &mut bracketed.args {
-                            match arg {
-                                // rename lifetimes to the static lifetime so the TypeIds match.
-                                syn::GenericArgument::Lifetime(lifetime) => {
-                                    lifetime.ident =
-                                        syn::Ident::new("static", lifetime.ident.span());
-                                }
-
-                                // recurse
-                                syn::GenericArgument::Type(ty) => staticize_lifetimes(ty),
-                                syn::GenericArgument::Binding(binding) => {
-                                    staticize_lifetimes(&mut binding.ty)
-                                }
-                                syn::GenericArgument::Constraint(constraint) => {
-                                    for bound in constraint.bounds.iter_mut() {
-                                        match bound {
-                                            syn::TypeParamBound::Lifetime(lifetime) => {
-                                                lifetime.ident =
-                                                    syn::Ident::new("static", lifetime.ident.span())
-                                            }
-                                            _ => {}
-                                        }
-                                    }
-                                }
-
-                                // nothing to do otherwise
-                                _ => {}
-                            }
+            for bracketed in
+                &mut type_path.path.segments.iter_mut().filter_map(|seg| match &mut seg.arguments {
+                    syn::PathArguments::AngleBracketed(bracketed) => Some(bracketed),
+                    _ => None,
+                })
+            {
+                for arg in &mut bracketed.args {
+                    match arg {
+                        // rename lifetimes to the static lifetime so the TypeIds match.
+                        syn::GenericArgument::Lifetime(lifetime) => {
+                            lifetime.ident = syn::Ident::new("static", lifetime.ident.span());
                         }
+
+                        // recurse
+                        syn::GenericArgument::Type(ty) => staticize_lifetimes(ty),
+                        syn::GenericArgument::Binding(binding) => {
+                            staticize_lifetimes(&mut binding.ty)
+                        }
+                        syn::GenericArgument::Constraint(constraint) => {
+                            constraint.bounds.iter_mut().for_each(|bound| {
+                                if let syn::TypeParamBound::Lifetime(lifetime) = bound {
+                                    lifetime.ident =
+                                        syn::Ident::new("static", lifetime.ident.span())
+                                }
+                            })
+                        }
+
+                        // nothing to do otherwise
+                        _ => {}
                     }
-                    _ => {}
                 }
             }
         }
