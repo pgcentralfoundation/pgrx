@@ -65,7 +65,7 @@ pub fn staticize_lifetimes(value: &mut syn::Type) {
         }
 
         syn::Type::Tuple(type_tuple) => {
-            type_tuple.elems.iter_mut().for_each(|elem| staticize_lifetimes(elem))
+            type_tuple.elems.iter_mut().for_each(staticize_lifetimes)
         }
 
         syn::Type::Macro(syn::TypeMacro { mac })
