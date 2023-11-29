@@ -580,7 +580,7 @@ impl<'a> From<&'a [syn::Item]> for StructGraph<'a> {
         for item in items.iter() {
             // grab the first field if it is struct
             let (id, first_field) = match &item {
-                &syn::Item::Struct(syn::ItemStruct {
+                syn::Item::Struct(syn::ItemStruct {
                     ident: id,
                     fields: syn::Fields::Named(fields),
                     ..
