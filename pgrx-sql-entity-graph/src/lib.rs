@@ -193,39 +193,36 @@ impl SqlGraphIdentifier for SqlGraphEntity {
 impl ToSql for SqlGraphEntity {
     fn to_sql(&self, context: &PgrxSql) -> eyre::Result<String> {
         match self {
-            SqlGraphEntity::Schema(item) => {
-                if item.name != "public" && item.name != "pg_catalog" {
-                    item.to_sql(context)
-                } else {
-                    Ok(String::default())
-                }
+            SqlGraphEntity::Schema(SchemaEntity { name: "public" | "pg_catalog", .. }) => {
+                Ok(String::default())
             }
+            SqlGraphEntity::Schema(item) => item.to_sql(context),
             SqlGraphEntity::CustomSql(item) => item.to_sql(context),
             SqlGraphEntity::Function(item) => {
                 if let Some(result) = item.to_sql_config.to_sql(self, context) {
-                    return result;
-                }
-                if context.graph.neighbors_undirected(*context.externs.get(item).unwrap()).any(
-                    |neighbor| {
-                        let neighbor_item = &context.graph[neighbor];
-                        match neighbor_item {
-                            SqlGraphEntity::Type(PostgresTypeEntity {
-                                in_fn,
-                                in_fn_module_path,
-                                out_fn,
-                                out_fn_module_path,
-                                ..
-                            }) => {
-                                let is_in_fn = item.full_path.starts_with(in_fn_module_path)
-                                    && item.full_path.ends_with(in_fn);
-                                let is_out_fn = item.full_path.starts_with(out_fn_module_path)
-                                    && item.full_path.ends_with(out_fn);
-                                is_in_fn || is_out_fn
-                            }
-                            _ => false,
-                        }
-                    },
-                ) {
+                    result
+                } else if context
+                    .graph
+                    .neighbors_undirected(*context.externs.get(item).unwrap())
+                    .any(|neighbor| {
+                        let SqlGraphEntity::Type(PostgresTypeEntity {
+                            in_fn,
+                            in_fn_module_path,
+                            out_fn,
+                            out_fn_module_path,
+                            ..
+                        }) = &context.graph[neighbor]
+                        else {
+                            return false;
+                        };
+
+                        let is_in_fn = item.full_path.starts_with(in_fn_module_path)
+                            && item.full_path.ends_with(in_fn);
+                        let is_out_fn = item.full_path.starts_with(out_fn_module_path)
+                            && item.full_path.ends_with(out_fn);
+                        is_in_fn || is_out_fn
+                    })
+                {
                     Ok(String::default())
                 } else {
                     item.to_sql(context)
