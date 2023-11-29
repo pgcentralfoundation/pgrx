@@ -75,26 +75,19 @@ pub fn staticize_lifetimes(value: &mut syn::Type) {
             }
         }
 
-        syn::Type::Macro(type_macro) => {
-            let mac = &type_macro.mac;
-            if let Some(archetype) = mac.path.segments.last() {
-                match archetype.ident.to_string().as_str() {
-                    "name" => {
-                        if let Ok(out) = mac.parse_body::<NameMacro>() {
-                            // We don't particularly care what the identifier is, so we parse a
-                            // raw TokenStream.  Specifically, it's okay for the identifier String,
-                            // which we end up using as a Postgres column name, to be nearly any
-                            // string, which can include Rust reserved words such as "type" or "match"
-                            if let Ok(ident) = syn::parse_str::<TokenStream>(&out.ident) {
-                                let mut ty = out.used_ty.resolved_ty;
+        syn::Type::Macro(syn::TypeMacro { mac }) => {
+            if mac.path.segments.last().is_some_and(|seg| seg.ident == "name") {
+                let Ok(out) = mac.parse_body::<NameMacro>() else { return };
+                // We don't particularly care what the identifier is, so we parse a
+                // raw TokenStream.  Specifically, it's okay for the identifier String,
+                // which we end up using as a Postgres column name, to be nearly any
+                // string, which can include Rust reserved words such as "type" or "match"
+                if let Ok(ident) = syn::parse_str::<TokenStream>(&out.ident) {
+                    let mut ty = out.used_ty.resolved_ty;
 
-                                // rewrite the name!() macro's type so that it has a static lifetime, if any
-                                staticize_lifetimes(&mut ty);
-                                type_macro.mac = syn::parse_quote! {::pgrx::name!(#ident, #ty)};
-                            }
-                        }
-                    }
-                    _ => {}
+                    // rewrite the name!() macro's type so that it has a static lifetime, if any
+                    staticize_lifetimes(&mut ty);
+                    *mac = syn::parse_quote! {::pgrx::name!(#ident, #ty)};
                 }
             }
         }
