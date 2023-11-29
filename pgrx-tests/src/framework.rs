@@ -258,7 +258,7 @@ pub fn client() -> eyre::Result<(postgres::Client, String)> {
     )
     .wrap_err("There was an issue attempting to get the session ID from Postgres")?;
 
-    let session_id = match sid_query_result.get(0) {
+    let session_id = match sid_query_result.first() {
         Some(row) => row.get::<&str, &str>("sid").to_string(),
         None => Err(eyre!("Failed to obtain a client Session ID from Postgres"))?,
     };
