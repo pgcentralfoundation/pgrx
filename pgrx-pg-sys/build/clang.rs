@@ -76,7 +76,7 @@ pub(crate) fn detect_include_paths_for(
                 !is_hidden(entry) && {
                     entry_contains(entry, "clang")
                         || entry_contains(entry, "include")
-                        || entry_contains(entry, &*clang_major_fmt)
+                        || entry_contains(entry, &clang_major_fmt)
                         // we always want to descend from a lib dir, but only one step
                         // as we don't really want to search all of /usr/lib's subdirs
                         || os_str_contains(entry.file_name(), "lib")
@@ -85,7 +85,7 @@ pub(crate) fn detect_include_paths_for(
             .filter_map(|e| e.ok()) // be discreet
             // We now need something that looks like it actually satisfies all our constraints
             .filter(|entry| {
-                entry_contains(entry, &*clang_major_fmt)
+                entry_contains(entry, &clang_major_fmt)
                     && entry_contains(entry, "clang")
                     && entry_contains(entry, "include")
             })
@@ -96,7 +96,7 @@ pub(crate) fn detect_include_paths_for(
             })
             .filter_map(|entry| {
                 let mut pbuf = entry.into_path();
-                if pbuf.pop() && pbuf.is_dir() && os_str_contains(&*pbuf.file_name()?, "include") {
+                if pbuf.pop() && pbuf.is_dir() && os_str_contains(pbuf.file_name()?, "include") {
                     Some(pbuf)
                 } else {
                     None
@@ -104,20 +104,20 @@ pub(crate) fn detect_include_paths_for(
             })
             .collect::<Vec<_>>();
 
-        if paths.len() > 0 {
+        if !paths.is_empty() {
             paths.sort();
             paths.dedup();
             break;
         }
     }
     // If we have anything better to recommend, don't autodetect!
-    let autodetect = paths.len() == 0;
+    let autodetect = paths.is_empty();
     eprintln!("Found include dirs {:?}", paths);
     (autodetect, paths)
 }
 
 fn is_hidden(entry: &DirEntry) -> bool {
-    entry.file_name().to_str().map(|s| s.starts_with(".")).unwrap_or(false)
+    entry.file_name().to_str().map(|s| s.starts_with('.')).unwrap_or(false)
 }
 
 fn entry_contains(entry: &DirEntry, needle: &str) -> bool {

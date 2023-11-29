@@ -297,7 +297,7 @@ pub(crate) fn generate_schema(
     // The next action may take a few seconds, we'd like the user to know we're thinking.
     eprintln!("{} SQL entities", " Discovering".bold().green(),);
 
-    let postmaster_stub_built = create_stub(&postmaster_path, &postmaster_stub_dir)?;
+    let postmaster_stub_built = create_stub(postmaster_path, &postmaster_stub_dir)?;
 
     // Inspect the symbol table for a list of `__pgrx_internals` we should have the generator call
     let mut lib_so = target_dir_with_profile.clone();

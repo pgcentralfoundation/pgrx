@@ -377,19 +377,15 @@ fn rewrite_items(
 fn extract_oids(code: &syn::File) -> BTreeMap<syn::Ident, Box<syn::Expr>> {
     let mut oids = BTreeMap::new(); // we would like to have a nice sorted set
     for item in &code.items {
-        match item {
-            Item::Const(ItemConst { ident, ty, expr, .. }) => {
-                // Retype as strings for easy comparison
-                let name = ident.to_string();
-                let ty_str = ty.to_token_stream().to_string();
+        let Item::Const(ItemConst { ident, ty, expr, .. }) = item else { continue };
+        // Retype as strings for easy comparison
+        let name = ident.to_string();
+        let ty_str = ty.to_token_stream().to_string();
 
-                // This heuristic identifies "OIDs"
-                // We're going to warp the const declarations to be our newtype Oid
-                if ty_str == "u32" && is_builtin_oid(&name) {
-                    oids.insert(ident.clone(), expr.clone());
-                }
-            }
-            _ => {}
+        // This heuristic identifies "OIDs"
+        // We're going to warp the const declarations to be our newtype Oid
+        if ty_str == "u32" && is_builtin_oid(&name) {
+            oids.insert(ident.clone(), expr.clone());
         }
     }
     oids
@@ -402,7 +398,7 @@ fn is_builtin_oid(name: &str) -> bool {
 }
 
 fn rewrite_oid_consts(
-    items: &Vec<syn::Item>,
+    items: &[syn::Item],
     oids: &BTreeMap<syn::Ident, Box<syn::Expr>>,
 ) -> Vec<syn::Item> {
     items
@@ -418,9 +414,7 @@ fn rewrite_oid_consts(
         .collect()
 }
 
-fn format_builtin_oid_impl<'a>(
-    oids: BTreeMap<syn::Ident, Box<syn::Expr>>,
-) -> proc_macro2::TokenStream {
+fn format_builtin_oid_impl(oids: BTreeMap<syn::Ident, Box<syn::Expr>>) -> proc_macro2::TokenStream {
     let enum_variants: proc_macro2::TokenStream;
     let from_impl: proc_macro2::TokenStream;
     (enum_variants, from_impl) = oids
@@ -451,12 +445,12 @@ fn format_builtin_oid_impl<'a>(
 }
 
 /// Implement our `PgNode` marker trait for `pg_sys::Node` and its "subclasses"
-fn impl_pg_node(items: &Vec<syn::Item>) -> eyre::Result<proc_macro2::TokenStream> {
+fn impl_pg_node(items: &[syn::Item]) -> eyre::Result<proc_macro2::TokenStream> {
     let mut pgnode_impls = proc_macro2::TokenStream::new();
 
     // we scope must of the computation so we can borrow `items` and then
     // extend it at the very end.
-    let struct_graph: StructGraph = StructGraph::from(&items[..]);
+    let struct_graph: StructGraph = StructGraph::from(items);
 
     // collect all the structs with `NodeTag` as their first member,
     // these will serve as roots in our forest of `Node`s
@@ -586,7 +580,7 @@ impl<'a> From<&'a [syn::Item]> for StructGraph<'a> {
         for item in items.iter() {
             // grab the first field if it is struct
             let (id, first_field) = match &item {
-                &syn::Item::Struct(syn::ItemStruct {
+                syn::Item::Struct(syn::ItemStruct {
                     ident: id,
                     fields: syn::Fields::Named(fields),
                     ..
@@ -689,7 +683,7 @@ impl Ord for StructDescriptor<'_> {
 fn get_bindings(
     major_version: u16,
     pg_config: &PgConfig,
-    include_h: &PathBuf,
+    include_h: &path::Path,
 ) -> eyre::Result<syn::File> {
     let bindings = if let Some(info_dir) =
         target_env_tracked(&format!("PGRX_TARGET_INFO_PATH_PG{major_version}"))
@@ -712,7 +706,7 @@ fn get_bindings(
 fn run_bindgen(
     major_version: u16,
     pg_config: &PgConfig,
-    include_h: &PathBuf,
+    include_h: &path::Path,
 ) -> eyre::Result<String> {
     eprintln!("Generating bindings for pg{major_version}");
     let configure = pg_config.configure()?;
@@ -834,13 +828,13 @@ fn pg_target_include_flags(pg_version: u16, pg_config: &PgConfig) -> eyre::Resul
     }
 }
 
-fn build_shim(shim_src: &PathBuf, shim_dst: &PathBuf, pg_config: &PgConfig) -> eyre::Result<()> {
+fn build_shim(
+    shim_src: &path::Path,
+    shim_dst: &path::Path,
+    pg_config: &PgConfig,
+) -> eyre::Result<()> {
     let major_version = pg_config.major_version()?;
-    let mut libpgrx_cshim: PathBuf = shim_dst.clone();
 
-    libpgrx_cshim.push(format!("libpgrx-cshim-{}.a", major_version));
-
-    eprintln!("libpgrx_cshim={}", libpgrx_cshim.display());
     // then build the shim for the version feature currently being built
     build_shim_for_version(shim_src, shim_dst, pg_config)?;
 
@@ -855,8 +849,8 @@ fn build_shim(shim_src: &PathBuf, shim_dst: &PathBuf, pg_config: &PgConfig) -> e
 }
 
 fn build_shim_for_version(
-    shim_src: &PathBuf,
-    shim_dst: &PathBuf,
+    shim_src: &path::Path,
+    shim_dst: &path::Path,
     pg_config: &PgConfig,
 ) -> eyre::Result<()> {
     let path_env = prefix_path(pg_config.parent_path());

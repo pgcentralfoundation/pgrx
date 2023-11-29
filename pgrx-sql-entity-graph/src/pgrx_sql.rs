@@ -1108,7 +1108,7 @@ fn connect_hashes(
             enums,
         );
 
-        if let Some((_, extern_index)) = externs.into_iter().find(|(extern_item, _)| {
+        if let Some((_, extern_index)) = externs.iter().find(|(extern_item, _)| {
             item.module_path == extern_item.module_path && extern_item.name == item.fn_name()
         }) {
             graph.add_edge(*extern_index, index, SqlGraphRelationship::RequiredBy);
@@ -1414,7 +1414,7 @@ fn make_extern_connection(
     full_path: &str,
     externs: &HashMap<PgExternEntity, NodeIndex>,
 ) -> eyre::Result<()> {
-    match externs.into_iter().find(|(extern_item, _)| full_path == extern_item.full_path) {
+    match externs.iter().find(|(extern_item, _)| full_path == extern_item.full_path) {
         Some((_, extern_index)) => {
             graph.add_edge(*extern_index, index, SqlGraphRelationship::RequiredBy);
             Ok(())
@@ -1436,11 +1436,11 @@ fn make_type_or_enum_connection(
     types: &HashMap<PostgresTypeEntity, NodeIndex>,
     enums: &HashMap<PostgresEnumEntity, NodeIndex>,
 ) -> bool {
-    let found_ty = types.into_iter().find(|(ty_item, _)| ty_item.id_matches(ty_id));
+    let found_ty = types.iter().find(|(ty_item, _)| ty_item.id_matches(ty_id));
     if let Some((_, ty_index)) = found_ty {
         graph.add_edge(*ty_index, index, SqlGraphRelationship::RequiredBy);
     }
-    let found_enum = enums.into_iter().find(|(ty_item, _)| ty_item.id_matches(ty_id));
+    let found_enum = enums.iter().find(|(ty_item, _)| ty_item.id_matches(ty_id));
     if let Some((_, ty_index)) = found_enum {
         graph.add_edge(*ty_index, index, SqlGraphRelationship::RequiredBy);
     }

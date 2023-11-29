@@ -155,7 +155,7 @@ fn update_files(args: &UpdateFilesArgs) {
     }
 
     // Recursively walk down all directories to extract out any existing Cargo.toml files
-    for entry in WalkDir::new(&current_dir)
+    for entry in WalkDir::new(current_dir)
         .into_iter()
         .filter_entry(|e| is_not_excluded_dir(e))
         .filter_map(|v| v.ok())

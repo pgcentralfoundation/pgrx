@@ -31,7 +31,7 @@ pub use datum::Datum;
 pub use htup::*;
 pub use oids::*;
 pub use pg_try::*;
-#[cfg(any(feature = "pg12"))]
+#[cfg(feature = "pg12")]
 pub use polyfill::*;
 pub use utils::*;
 
