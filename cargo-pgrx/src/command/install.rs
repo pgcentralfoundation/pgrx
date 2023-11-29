@@ -173,7 +173,7 @@ pub(crate) fn install_extension(
             true,
             &package_manifest_path,
             &mut output_tracking,
-            &pg_config,
+            pg_config,
         )?;
     }
 
@@ -218,7 +218,7 @@ pub(crate) fn install_extension(
             false,
             &package_manifest_path,
             &mut output_tracking,
-            &pg_config,
+            pg_config,
         )?;
     }
 
@@ -409,7 +409,7 @@ fn copy_sql_files(
                         true,
                         &package_manifest_path,
                         output_tracking,
-                        &pg_config,
+                        pg_config,
                     )?;
                 }
             }
