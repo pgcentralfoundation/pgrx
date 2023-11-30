@@ -896,7 +896,7 @@ fn get_pgrx_attr_macro(attr_name: impl AsRef<str>, ty: &syn::Type) -> Option<Tok
                     _ => (),
                 }
             }
-            if (ty_macro.mac.path.segments.len() == 1 && found_attr) || (found_pgrx && found_attr) {
+            if (found_pgrx || ty_macro.mac.path.segments.len() == 1) && found_attr {
                 Some(ty_macro.mac.tokens.clone())
             } else {
                 None
