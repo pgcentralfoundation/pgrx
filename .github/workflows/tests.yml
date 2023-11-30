@@ -358,6 +358,9 @@ jobs:
     - name: Clippy -Awarnings
       run: cargo clippy -p pgrx --features pg$PG_VER -- -Awarnings
 
+    - name: Clippy -Dwarnings sql-entity-graph
+      run: cargo clippy -p pgrx-sql-entity-graph -- -Dwarnings
+
     - name: Check doc-links
       run: |
         cargo rustdoc -p pgrx --features pg$PG_VER -- \
