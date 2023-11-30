@@ -120,15 +120,12 @@ impl Returning {
                                 "Option" => match &segment.arguments {
                                     PathArguments::AngleBracketed(bracketed) => {
                                         match bracketed.args.first().unwrap() {
-                                            GenericArgument::Type(ty) => match ty {
-                                                Type::Path(this_path) => {
-                                                    segments = this_path.path.segments.clone();
-                                                    saw_option_ident = true;
-                                                    found_option = true;
-                                                    continue 'outer;
-                                                }
-                                                _ => continue,
-                                            },
+                                            GenericArgument::Type(Type::Path(this_path)) => {
+                                                segments = this_path.path.segments.clone();
+                                                saw_option_ident = true;
+                                                found_option = true;
+                                                continue 'outer;
+                                            }
                                             _ => continue,
                                         };
                                     }
