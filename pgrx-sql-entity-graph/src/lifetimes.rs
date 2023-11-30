@@ -23,33 +23,31 @@ pub fn staticize_lifetimes_in_type_path(value: syn::TypePath) -> syn::TypePath {
 
 pub fn staticize_lifetimes(value: &mut syn::Type) {
     match value {
-        syn::Type::Path(syn::TypePath { path: syn::Path { segments, .. }, .. }) => {
-            segments
-                .iter_mut()
-                .filter_map(|segment| match &mut segment.arguments {
-                    syn::PathArguments::AngleBracketed(bracketed) => Some(bracketed),
-                    _ => None,
-                })
-                .flat_map(|bracketed| &mut bracketed.args)
-                .for_each(|arg| match arg {
-                    // rename lifetimes to the static lifetime so the TypeIds match.
-                    syn::GenericArgument::Lifetime(lifetime) => {
-                        lifetime.ident = syn::Ident::new("static", lifetime.ident.span());
-                    }
-                    // recurse
-                    syn::GenericArgument::Type(ty) => staticize_lifetimes(ty),
-                    syn::GenericArgument::Binding(binding) => staticize_lifetimes(&mut binding.ty),
-                    syn::GenericArgument::Constraint(constraint) => {
-                        constraint.bounds.iter_mut().for_each(|bound| {
-                            if let syn::TypeParamBound::Lifetime(lifetime) = bound {
-                                lifetime.ident = syn::Ident::new("static", lifetime.ident.span())
-                            }
-                        })
-                    }
-                    // nothing to do otherwise
-                    _ => {}
-                })
-        }
+        syn::Type::Path(syn::TypePath { path: syn::Path { segments, .. }, .. }) => segments
+            .iter_mut()
+            .filter_map(|segment| match &mut segment.arguments {
+                syn::PathArguments::AngleBracketed(bracketed) => Some(bracketed),
+                _ => None,
+            })
+            .flat_map(|bracketed| &mut bracketed.args)
+            .for_each(|arg| match arg {
+                // rename lifetimes to the static lifetime so the TypeIds match.
+                syn::GenericArgument::Lifetime(lifetime) => {
+                    lifetime.ident = syn::Ident::new("static", lifetime.ident.span());
+                }
+                // recurse
+                syn::GenericArgument::Type(ty) => staticize_lifetimes(ty),
+                syn::GenericArgument::Binding(binding) => staticize_lifetimes(&mut binding.ty),
+                syn::GenericArgument::Constraint(constraint) => {
+                    constraint.bounds.iter_mut().for_each(|bound| {
+                        if let syn::TypeParamBound::Lifetime(lifetime) = bound {
+                            lifetime.ident = syn::Ident::new("static", lifetime.ident.span())
+                        }
+                    })
+                }
+                // nothing to do otherwise
+                _ => {}
+            }),
 
         syn::Type::Reference(type_ref) => {
             if let Some(lifetime) = &mut type_ref.lifetime {
@@ -93,9 +91,7 @@ pub fn anonymize_lifetimes_in_type_path(value: syn::TypePath) -> syn::TypePath {
 
 pub fn anonymize_lifetimes(value: &mut syn::Type) {
     match value {
-        syn::Type::Path(type_path) => type_path
-            .path
-            .segments
+        syn::Type::Path(syn::TypePath { path: syn::Path { segments, .. }, .. }) => segments
             .iter_mut()
             .filter_map(|segment| match &mut segment.arguments {
                 syn::PathArguments::AngleBracketed(bracketed) => Some(bracketed),
