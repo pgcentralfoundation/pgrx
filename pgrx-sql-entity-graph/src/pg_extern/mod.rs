@@ -175,19 +175,19 @@ impl PgExtern {
             _ => None,
         }) {
             let Meta::NameValue(syn::MetaNameValue { lit, .. }) = meta else { continue };
-            if let syn::Lit::Str(ref inner) = lit {
-                span.get_or_insert(lit.span());
-                if !in_commented_sql_block && inner.value().trim() == "```pgrxsql" {
-                    in_commented_sql_block = true;
-                } else if in_commented_sql_block && inner.value().trim() == "```" {
-                    in_commented_sql_block = false;
-                } else if in_commented_sql_block {
-                    let line = inner.value().trim_start().replace(
-                        "@FUNCTION_NAME@",
-                        &(self.func.sig.ident.to_string() + "_wrapper"),
-                    ) + "\n";
-                    retval.get_or_insert_with(String::default).push_str(&line);
-                }
+            let syn::Lit::Str(ref inner) = lit else { continue };
+            span.get_or_insert(lit.span());
+            if !in_commented_sql_block && inner.value().trim() == "```pgrxsql" {
+                in_commented_sql_block = true;
+            } else if in_commented_sql_block && inner.value().trim() == "```" {
+                in_commented_sql_block = false;
+            } else if in_commented_sql_block {
+                let line = inner
+                    .value()
+                    .trim_start()
+                    .replace("@FUNCTION_NAME@", &(self.func.sig.ident.to_string() + "_wrapper"))
+                    + "\n";
+                retval.get_or_insert_with(String::default).push_str(&line);
             }
         }
         retval.map(|s| syn::LitStr::new(s.as_ref(), span.unwrap()))
