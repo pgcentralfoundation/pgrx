@@ -8,6 +8,7 @@
 //LICENSE
 //LICENSE Use of this source code is governed by the MIT license that can be found in the LICENSE file.
 //! A trait and registration system for hooking Postgres internal operations such as its planner and executor
+#![allow(clippy::unit_arg)]
 use crate as pgrx; // for #[pg_guard] support from within ourself
 use crate::prelude::*;
 use crate::{void_mut_ptr, PgBox, PgList};

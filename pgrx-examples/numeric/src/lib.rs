@@ -7,6 +7,7 @@
 //LICENSE All rights reserved.
 //LICENSE
 //LICENSE Use of this source code is governed by the MIT license that can be found in the LICENSE file.
+#![allow(clippy::assign_op_pattern)]
 use pgrx::prelude::*;
 
 pg_module_magic!();

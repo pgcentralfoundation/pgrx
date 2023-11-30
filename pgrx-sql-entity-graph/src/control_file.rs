@@ -52,6 +52,7 @@ impl ControlFile {
     /// # Ok(())
     /// # }
     /// ```
+    #[allow(clippy::should_implement_trait)]
     pub fn from_str(input: &str) -> Result<Self, ControlFileError> {
         let mut temp = HashMap::new();
         for line in input.lines() {

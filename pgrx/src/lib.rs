@@ -21,8 +21,14 @@
 //! }
 //!
 //! ```
-#![allow(clippy::missing_safety_doc)]
-#![allow(clippy::cast_ptr_alignment)]
+#![allow(
+    clippy::cast_ptr_alignment,
+    clippy::len_without_is_empty,
+    clippy::missing_safety_doc,
+    clippy::too_many_arguments,
+    clippy::type_complexity,
+    clippy::unnecessary_cast
+)]
 
 #[macro_use]
 extern crate bitflags;

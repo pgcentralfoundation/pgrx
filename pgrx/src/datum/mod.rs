@@ -9,6 +9,7 @@
 //LICENSE Use of this source code is governed by the MIT license that can be found in the LICENSE file.
 //! Handing for easily converting Postgres Datum types into their corresponding Rust types
 //! and converting Rust types into their corresponding Postgres types
+#![allow(clippy::unused_unit)]
 mod anyarray;
 mod anyelement;
 mod array;
