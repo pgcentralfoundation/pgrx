@@ -431,7 +431,7 @@ impl ToSql for PgExternEntity {
                 .find(|neighbor| match &context.graph[*neighbor] {
                     SqlGraphEntity::Type(ty) => ty.id_matches(&left_fn_arg.used_ty.ty_id),
                     SqlGraphEntity::Enum(en) => en.id_matches(&left_fn_arg.used_ty.ty_id),
-                    SqlGraphEntity::BuiltinType(defined) => defined == &left_arg.type_name,
+                    SqlGraphEntity::BuiltinType(defined) => defined == left_arg.type_name,
                     _ => false,
                 })
                 .ok_or_else(|| {
@@ -484,7 +484,7 @@ impl ToSql for PgExternEntity {
                 .find(|neighbor| match &context.graph[*neighbor] {
                     SqlGraphEntity::Type(ty) => ty.id_matches(&right_fn_arg.used_ty.ty_id),
                     SqlGraphEntity::Enum(en) => en.id_matches(&right_fn_arg.used_ty.ty_id),
-                    SqlGraphEntity::BuiltinType(defined) => defined == &right_arg.type_name,
+                    SqlGraphEntity::BuiltinType(defined) => defined == right_arg.type_name,
                     _ => false,
                 })
                 .ok_or_else(|| {

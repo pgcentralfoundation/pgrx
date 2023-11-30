@@ -196,15 +196,15 @@ impl SqlDeclaredEntity {
             | (SqlDeclared::Enum(ident_name), &SqlDeclaredEntity::Enum(data))
             | (SqlDeclared::Function(ident_name), &SqlDeclaredEntity::Function(data)) => {
                 let matches = |identifier_name: &str| {
-                    identifier_name == &data.name
-                        || identifier_name == &data.option
-                        || identifier_name == &data.vec
-                        || identifier_name == &data.vec_option
-                        || identifier_name == &data.option_vec
-                        || identifier_name == &data.option_vec_option
-                        || identifier_name == &data.array
-                        || identifier_name == &data.option_array
-                        || identifier_name == &data.varlena
+                    identifier_name == data.name
+                        || identifier_name == data.option
+                        || identifier_name == data.vec
+                        || identifier_name == data.vec_option
+                        || identifier_name == data.option_vec
+                        || identifier_name == data.option_vec_option
+                        || identifier_name == data.array
+                        || identifier_name == data.option_array
+                        || identifier_name == data.varlena
                 };
                 if matches(ident_name) || data.pg_box.contains(ident_name) {
                     return true;
