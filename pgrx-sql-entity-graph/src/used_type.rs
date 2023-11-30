@@ -94,8 +94,7 @@ impl UsedType {
             // composite_type!(..)
             syn::Type::Macro(macro_pat) => {
                 let mac = &macro_pat.mac;
-                let archetype = mac.path.segments.last().expect("No last segment");
-                match archetype.ident.to_string().as_str() {
+                match &*mac.path.segments.last().expect("No last segment").ident.to_string() {
                     "default" => {
                         // If we land here, after already expanding the `default!()` above, the user has written it twice.
                         // This is definitely an issue and we should tell them.
