@@ -43,10 +43,10 @@ use crate::{SqlGraphEntity, SqlGraphIdentifier};
 use super::{PgExternReturnEntity, PgExternReturnEntityIteratedItem};
 
 #[derive(Debug, Clone, Copy, PartialEq, PartialOrd, Eq, Ord)]
-pub enum SqlGraphRelationship {
-    RequiredBy,
-    RequiredByArg,
-    RequiredByReturn,
+pub enum SqlGraphRequires {
+    By,
+    ByArg,
+    ByReturn,
 }
 
 /// A generator for SQL.
@@ -63,7 +63,7 @@ pub enum SqlGraphRelationship {
 #[derive(Debug, Clone)]
 pub struct PgrxSql {
     pub control: ControlFile,
-    pub graph: StableGraph<SqlGraphEntity, SqlGraphRelationship>,
+    pub graph: StableGraph<SqlGraphEntity, SqlGraphRequires>,
     pub graph_root: NodeIndex,
     pub graph_bootstrap: Option<NodeIndex>,
     pub graph_finalize: Option<NodeIndex>,
@@ -327,9 +327,9 @@ impl PgrxSql {
             &[petgraph::dot::Config::EdgeNoLabel, petgraph::dot::Config::NodeNoLabel],
             &|_graph, edge| {
                 match edge.weight() {
-                    SqlGraphRelationship::RequiredBy => r#"color = "gray""#,
-                    SqlGraphRelationship::RequiredByArg => r#"color = "black""#,
-                    SqlGraphRelationship::RequiredByReturn => r#"dir = "back", color = "black""#,
+                    SqlGraphRequires::By => r#"color = "gray""#,
+                    SqlGraphRequires::ByArg => r#"color = "black""#,
+                    SqlGraphRequires::ByReturn => r#"dir = "back", color = "black""#,
                 }
                 .to_owned()
             },
@@ -445,24 +445,24 @@ impl PgrxSql {
 }
 
 fn build_base_edges(
-    graph: &mut StableGraph<SqlGraphEntity, SqlGraphRelationship>,
+    graph: &mut StableGraph<SqlGraphEntity, SqlGraphRequires>,
     index: NodeIndex,
     root: NodeIndex,
     bootstrap: Option<NodeIndex>,
     finalize: Option<NodeIndex>,
 ) {
-    graph.add_edge(root, index, SqlGraphRelationship::RequiredBy);
+    graph.add_edge(root, index, SqlGraphRequires::By);
     if let Some(bootstrap) = bootstrap {
-        graph.add_edge(bootstrap, index, SqlGraphRelationship::RequiredBy);
+        graph.add_edge(bootstrap, index, SqlGraphRequires::By);
     }
     if let Some(finalize) = finalize {
-        graph.add_edge(index, finalize, SqlGraphRelationship::RequiredBy);
+        graph.add_edge(index, finalize, SqlGraphRequires::By);
     }
 }
 
 #[allow(clippy::type_complexity)]
 fn initialize_extension_sqls(
-    graph: &mut StableGraph<SqlGraphEntity, SqlGraphRelationship>,
+    graph: &mut StableGraph<SqlGraphEntity, SqlGraphRequires>,
     root: NodeIndex,
     extension_sqls: Vec<ExtensionSqlEntity>,
 ) -> eyre::Result<(HashMap<ExtensionSqlEntity, NodeIndex>, Option<NodeIndex>, Option<NodeIndex>)> {
@@ -498,15 +498,15 @@ fn initialize_extension_sqls(
         }
     }
     for (item, index) in &mapped_extension_sqls {
-        graph.add_edge(root, *index, SqlGraphRelationship::RequiredBy);
+        graph.add_edge(root, *index, SqlGraphRequires::By);
         if !item.bootstrap {
             if let Some(bootstrap) = bootstrap {
-                graph.add_edge(bootstrap, *index, SqlGraphRelationship::RequiredBy);
+                graph.add_edge(bootstrap, *index, SqlGraphRequires::By);
             }
         }
         if !item.finalize {
             if let Some(finalize) = finalize {
-                graph.add_edge(*index, finalize, SqlGraphRelationship::RequiredBy);
+                graph.add_edge(*index, finalize, SqlGraphRequires::By);
             }
         }
     }
@@ -573,7 +573,7 @@ pub fn find_positioning_ref_target<'a>(
 }
 
 fn connect_extension_sqls(
-    graph: &mut StableGraph<SqlGraphEntity, SqlGraphRelationship>,
+    graph: &mut StableGraph<SqlGraphEntity, SqlGraphRequires>,
     extension_sqls: &HashMap<ExtensionSqlEntity, NodeIndex>,
     schemas: &HashMap<SchemaEntity, NodeIndex>,
     types: &HashMap<PostgresTypeEntity, NodeIndex>,
@@ -601,7 +601,7 @@ fn connect_extension_sqls(
                 extension_sqls,
                 triggers,
             ) {
-                graph.add_edge(*target, index, SqlGraphRelationship::RequiredBy);
+                graph.add_edge(*target, index, SqlGraphRequires::By);
             } else {
                 return Err(eyre!(
                     "Could not find `requires` target of `{}`{}: {}",
@@ -622,7 +622,7 @@ fn connect_extension_sqls(
 }
 
 fn initialize_schemas(
-    graph: &mut StableGraph<SqlGraphEntity, SqlGraphRelationship>,
+    graph: &mut StableGraph<SqlGraphEntity, SqlGraphRequires>,
     bootstrap: Option<NodeIndex>,
     finalize: Option<NodeIndex>,
     schemas: Vec<SchemaEntity>,
@@ -633,27 +633,27 @@ fn initialize_schemas(
         let index = graph.add_node(entity);
         mapped_schemas.insert(item, index);
         if let Some(bootstrap) = bootstrap {
-            graph.add_edge(bootstrap, index, SqlGraphRelationship::RequiredBy);
+            graph.add_edge(bootstrap, index, SqlGraphRequires::By);
         }
         if let Some(finalize) = finalize {
-            graph.add_edge(index, finalize, SqlGraphRelationship::RequiredBy);
+            graph.add_edge(index, finalize, SqlGraphRequires::By);
         }
     }
     Ok(mapped_schemas)
 }
 
 fn connect_schemas(
-    graph: &mut StableGraph<SqlGraphEntity, SqlGraphRelationship>,
+    graph: &mut StableGraph<SqlGraphEntity, SqlGraphRequires>,
     schemas: &HashMap<SchemaEntity, NodeIndex>,
     root: NodeIndex,
 ) {
-    for (_item, &index) in schemas {
-        graph.add_edge(root, index, SqlGraphRelationship::RequiredBy);
+    for index in schemas.values().copied() {
+        graph.add_edge(root, index, SqlGraphRequires::By);
     }
 }
 
 fn initialize_enums(
-    graph: &mut StableGraph<SqlGraphEntity, SqlGraphRelationship>,
+    graph: &mut StableGraph<SqlGraphEntity, SqlGraphRequires>,
     root: NodeIndex,
     bootstrap: Option<NodeIndex>,
     finalize: Option<NodeIndex>,
@@ -670,7 +670,7 @@ fn initialize_enums(
 }
 
 fn connect_enums(
-    graph: &mut StableGraph<SqlGraphEntity, SqlGraphRelationship>,
+    graph: &mut StableGraph<SqlGraphEntity, SqlGraphRequires>,
     enums: &HashMap<PostgresEnumEntity, NodeIndex>,
     schemas: &HashMap<SchemaEntity, NodeIndex>,
 ) {
@@ -687,7 +687,7 @@ fn connect_enums(
 }
 
 fn initialize_types(
-    graph: &mut StableGraph<SqlGraphEntity, SqlGraphRelationship>,
+    graph: &mut StableGraph<SqlGraphEntity, SqlGraphRequires>,
     root: NodeIndex,
     bootstrap: Option<NodeIndex>,
     finalize: Option<NodeIndex>,
@@ -704,7 +704,7 @@ fn initialize_types(
 }
 
 fn connect_types(
-    graph: &mut StableGraph<SqlGraphEntity, SqlGraphRelationship>,
+    graph: &mut StableGraph<SqlGraphEntity, SqlGraphRequires>,
     types: &HashMap<PostgresTypeEntity, NodeIndex>,
     schemas: &HashMap<SchemaEntity, NodeIndex>,
 ) {
@@ -721,7 +721,7 @@ fn connect_types(
 }
 
 fn initialize_externs(
-    graph: &mut StableGraph<SqlGraphEntity, SqlGraphRelationship>,
+    graph: &mut StableGraph<SqlGraphEntity, SqlGraphRequires>,
     root: NodeIndex,
     bootstrap: Option<NodeIndex>,
     finalize: Option<NodeIndex>,
@@ -782,7 +782,7 @@ fn initialize_externs(
 }
 
 fn connect_externs(
-    graph: &mut StableGraph<SqlGraphEntity, SqlGraphRelationship>,
+    graph: &mut StableGraph<SqlGraphEntity, SqlGraphRequires>,
     externs: &HashMap<PgExternEntity, NodeIndex>,
     hashes: &HashMap<PostgresHashEntity, NodeIndex>,
     schemas: &HashMap<SchemaEntity, NodeIndex>,
@@ -808,7 +808,7 @@ fn connect_externs(
                             extension_sqls,
                             triggers,
                         ) {
-                            graph.add_edge(*target, index, SqlGraphRelationship::RequiredBy);
+                            graph.add_edge(*target, index, SqlGraphRequires::By);
                             has_explicit_requires = true;
                         } else {
                             return Err(eyre!("Could not find `requires` target: {:?}", requires));
@@ -818,7 +818,7 @@ fn connect_externs(
                 crate::ExternArgs::Schema(declared_schema_name) => {
                     for (schema, schema_index) in schemas {
                         if schema.name == declared_schema_name {
-                            graph.add_edge(*schema_index, index, SqlGraphRelationship::RequiredBy);
+                            graph.add_edge(*schema_index, index, SqlGraphRequires::By);
                             found_schema_declaration = true;
                         }
                     }
@@ -846,7 +846,7 @@ fn connect_externs(
             if item.module_path == hash_item.module_path
                 && item.name == hash_item.name.to_lowercase() + "_eq"
             {
-                graph.add_edge(index, hash_index, SqlGraphRelationship::RequiredBy);
+                graph.add_edge(index, hash_index, SqlGraphRequires::By);
             }
         }
 
@@ -855,7 +855,7 @@ fn connect_externs(
 
             for (ty_item, &ty_index) in types {
                 if ty_item.id_matches(&arg.used_ty.ty_id) {
-                    graph.add_edge(ty_index, index, SqlGraphRelationship::RequiredByArg);
+                    graph.add_edge(ty_index, index, SqlGraphRequires::ByArg);
                     found = true;
                     break;
                 }
@@ -863,7 +863,7 @@ fn connect_externs(
             if !found {
                 for (enum_item, &enum_index) in enums {
                     if enum_item.id_matches(&arg.used_ty.ty_id) {
-                        graph.add_edge(enum_index, index, SqlGraphRelationship::RequiredByArg);
+                        graph.add_edge(enum_index, index, SqlGraphRequires::ByArg);
                         found = true;
                         break;
                     }
@@ -873,7 +873,7 @@ fn connect_externs(
                 let builtin_index = builtin_types.get(arg.used_ty.full_path).unwrap_or_else(|| {
                     panic!("Could not fetch Builtin Type {}.", arg.used_ty.full_path)
                 });
-                graph.add_edge(*builtin_index, index, SqlGraphRelationship::RequiredByArg);
+                graph.add_edge(*builtin_index, index, SqlGraphRequires::ByArg);
             }
             if !found {
                 for (ext_item, ext_index) in extension_sqls {
@@ -884,7 +884,7 @@ fn connect_externs(
                         .is_some()
                     {
                         if !has_explicit_requires {
-                            graph.add_edge(*ext_index, index, SqlGraphRelationship::RequiredByArg);
+                            graph.add_edge(*ext_index, index, SqlGraphRequires::ByArg);
                         }
                     } else if ext_item
                         .has_sql_declared_entity(&SqlDeclared::Enum(
@@ -892,7 +892,7 @@ fn connect_externs(
                         ))
                         .is_some()
                     {
-                        graph.add_edge(*ext_index, index, SqlGraphRelationship::RequiredByArg);
+                        graph.add_edge(*ext_index, index, SqlGraphRequires::ByArg);
                     }
                 }
             }
@@ -902,7 +902,7 @@ fn connect_externs(
             PgExternReturnEntity::Type { ty, .. } | PgExternReturnEntity::SetOf { ty, .. } => {
                 let found_ty = types.iter().find(|(ty_item, _)| ty_item.id_matches(&ty.ty_id));
                 if let Some((_, &ty_index)) = found_ty {
-                    graph.add_edge(ty_index, index, SqlGraphRelationship::RequiredByReturn);
+                    graph.add_edge(ty_index, index, SqlGraphRequires::ByReturn);
                 }
                 let found_enum = if found_ty.is_none() {
                     enums.iter().find(|(ty_item, _)| ty_item.id_matches(&ty.ty_id))
@@ -910,14 +910,14 @@ fn connect_externs(
                     None
                 };
                 if let Some((_, &ty_index)) = found_enum {
-                    graph.add_edge(ty_index, index, SqlGraphRelationship::RequiredByReturn);
+                    graph.add_edge(ty_index, index, SqlGraphRequires::ByReturn);
                 }
                 if found_ty.is_none() && found_enum.is_none() {
                     let builtin_index =
                         builtin_types.get(&ty.full_path.to_string()).unwrap_or_else(|| {
                             panic!("Could not fetch Builtin Type {}.", ty.full_path)
                         });
-                    graph.add_edge(*builtin_index, index, SqlGraphRelationship::RequiredByReturn);
+                    graph.add_edge(*builtin_index, index, SqlGraphRequires::ByReturn);
                 }
                 if found_ty.is_none() && found_enum.is_none() {
                     for (ext_item, ext_index) in extension_sqls {
@@ -930,7 +930,7 @@ fn connect_externs(
                                 ))
                                 .is_some()
                         {
-                            graph.add_edge(*ext_index, index, SqlGraphRelationship::RequiredByArg);
+                            graph.add_edge(*ext_index, index, SqlGraphRequires::ByArg);
                         }
                     }
                 }
@@ -940,7 +940,7 @@ fn connect_externs(
                     let found_ty =
                         types.iter().find(|(ty_item, _)| ty_item.id_matches(&type_entity.ty_id));
                     if let Some((_, &ty_index)) = found_ty {
-                        graph.add_edge(ty_index, index, SqlGraphRelationship::RequiredByReturn);
+                        graph.add_edge(ty_index, index, SqlGraphRequires::ByReturn);
                     }
                     let found_enum = if found_ty.is_none() {
                         enums.iter().find(|(ty_item, _)| ty_item.id_matches(&type_entity.ty_id))
@@ -948,7 +948,7 @@ fn connect_externs(
                         None
                     };
                     if let Some((_, &ty_index)) = found_enum {
-                        graph.add_edge(ty_index, index, SqlGraphRelationship::RequiredByReturn);
+                        graph.add_edge(ty_index, index, SqlGraphRequires::ByReturn);
                     }
                     if found_ty.is_none() && found_enum.is_none() {
                         let builtin_index = builtin_types
@@ -956,11 +956,7 @@ fn connect_externs(
                             .unwrap_or_else(|| {
                                 panic!("Could not fetch Builtin Type {}.", type_entity.ty_source)
                             });
-                        graph.add_edge(
-                            *builtin_index,
-                            index,
-                            SqlGraphRelationship::RequiredByReturn,
-                        );
+                        graph.add_edge(*builtin_index, index, SqlGraphRequires::ByReturn);
                     }
                     if found_ty.is_none() && found_enum.is_none() {
                         for (ext_item, ext_index) in extension_sqls {
@@ -975,11 +971,7 @@ fn connect_externs(
                                     ))
                                     .is_some()
                             {
-                                graph.add_edge(
-                                    *ext_index,
-                                    index,
-                                    SqlGraphRelationship::RequiredByArg,
-                                );
+                                graph.add_edge(*ext_index, index, SqlGraphRequires::ByArg);
                             }
                         }
                     }
@@ -991,7 +983,7 @@ fn connect_externs(
 }
 
 fn initialize_ords(
-    graph: &mut StableGraph<SqlGraphEntity, SqlGraphRelationship>,
+    graph: &mut StableGraph<SqlGraphEntity, SqlGraphRequires>,
     root: NodeIndex,
     bootstrap: Option<NodeIndex>,
     finalize: Option<NodeIndex>,
@@ -1008,7 +1000,7 @@ fn initialize_ords(
 }
 
 fn connect_ords(
-    graph: &mut StableGraph<SqlGraphEntity, SqlGraphRelationship>,
+    graph: &mut StableGraph<SqlGraphEntity, SqlGraphRequires>,
     ords: &HashMap<PostgresOrdEntity, NodeIndex>,
     schemas: &HashMap<SchemaEntity, NodeIndex>,
     types: &HashMap<PostgresTypeEntity, NodeIndex>,
@@ -1058,14 +1050,14 @@ fn connect_ords(
                 || gt_fn_matches
                 || gte_fn_matches
             {
-                graph.add_edge(extern_index, index, SqlGraphRelationship::RequiredBy);
+                graph.add_edge(extern_index, index, SqlGraphRequires::By);
             }
         }
     }
 }
 
 fn initialize_hashes(
-    graph: &mut StableGraph<SqlGraphEntity, SqlGraphRelationship>,
+    graph: &mut StableGraph<SqlGraphEntity, SqlGraphRequires>,
     root: NodeIndex,
     bootstrap: Option<NodeIndex>,
     finalize: Option<NodeIndex>,
@@ -1082,7 +1074,7 @@ fn initialize_hashes(
 }
 
 fn connect_hashes(
-    graph: &mut StableGraph<SqlGraphEntity, SqlGraphRelationship>,
+    graph: &mut StableGraph<SqlGraphEntity, SqlGraphRequires>,
     hashes: &HashMap<PostgresHashEntity, NodeIndex>,
     schemas: &HashMap<SchemaEntity, NodeIndex>,
     types: &HashMap<PostgresTypeEntity, NodeIndex>,
@@ -1112,13 +1104,13 @@ fn connect_hashes(
         if let Some((_, extern_index)) = externs.iter().find(|(extern_item, _)| {
             item.module_path == extern_item.module_path && extern_item.name == item.fn_name()
         }) {
-            graph.add_edge(*extern_index, index, SqlGraphRelationship::RequiredBy);
+            graph.add_edge(*extern_index, index, SqlGraphRequires::By);
         }
     }
 }
 
 fn initialize_aggregates(
-    graph: &mut StableGraph<SqlGraphEntity, SqlGraphRelationship>,
+    graph: &mut StableGraph<SqlGraphEntity, SqlGraphRequires>,
     root: NodeIndex,
     bootstrap: Option<NodeIndex>,
     finalize: Option<NodeIndex>,
@@ -1164,7 +1156,7 @@ fn initialize_aggregates(
 }
 
 fn connect_aggregate(
-    graph: &mut StableGraph<SqlGraphEntity, SqlGraphRelationship>,
+    graph: &mut StableGraph<SqlGraphEntity, SqlGraphRequires>,
     item: &PgAggregateEntity,
     index: NodeIndex,
     schemas: &HashMap<SchemaEntity, NodeIndex>,
@@ -1206,7 +1198,7 @@ fn connect_aggregate(
             let builtin_index = builtin_types.get(arg.used_ty.full_path).unwrap_or_else(|| {
                 panic!("Could not fetch Builtin Type {}.", arg.used_ty.full_path)
             });
-            graph.add_edge(*builtin_index, index, SqlGraphRelationship::RequiredByArg);
+            graph.add_edge(*builtin_index, index, SqlGraphRequires::ByArg);
         }
     }
 
@@ -1224,7 +1216,7 @@ fn connect_aggregate(
             let builtin_index = builtin_types.get(arg.used_ty.full_path).unwrap_or_else(|| {
                 panic!("Could not fetch Builtin Type {}.", arg.used_ty.full_path)
             });
-            graph.add_edge(*builtin_index, index, SqlGraphRelationship::RequiredByArg);
+            graph.add_edge(*builtin_index, index, SqlGraphRequires::ByArg);
         }
     }
 
@@ -1242,7 +1234,7 @@ fn connect_aggregate(
             let builtin_index = builtin_types
                 .get(arg.full_path)
                 .unwrap_or_else(|| panic!("Could not fetch Builtin Type {}.", arg.full_path));
-            graph.add_edge(*builtin_index, index, SqlGraphRelationship::RequiredByArg);
+            graph.add_edge(*builtin_index, index, SqlGraphRequires::ByArg);
         }
     }
 
@@ -1339,7 +1331,7 @@ fn connect_aggregate(
 }
 
 fn connect_aggregates(
-    graph: &mut StableGraph<SqlGraphEntity, SqlGraphRelationship>,
+    graph: &mut StableGraph<SqlGraphEntity, SqlGraphRequires>,
     aggregates: &HashMap<PgAggregateEntity, NodeIndex>,
     schemas: &HashMap<SchemaEntity, NodeIndex>,
     types: &HashMap<PostgresTypeEntity, NodeIndex>,
@@ -1354,7 +1346,7 @@ fn connect_aggregates(
 }
 
 fn initialize_triggers(
-    graph: &mut StableGraph<SqlGraphEntity, SqlGraphRelationship>,
+    graph: &mut StableGraph<SqlGraphEntity, SqlGraphRequires>,
     root: NodeIndex,
     bootstrap: Option<NodeIndex>,
     finalize: Option<NodeIndex>,
@@ -1372,7 +1364,7 @@ fn initialize_triggers(
 }
 
 fn connect_triggers(
-    graph: &mut StableGraph<SqlGraphEntity, SqlGraphRelationship>,
+    graph: &mut StableGraph<SqlGraphEntity, SqlGraphRequires>,
     triggers: &HashMap<PgTriggerEntity, NodeIndex>,
     schemas: &HashMap<SchemaEntity, NodeIndex>,
 ) {
@@ -1389,7 +1381,7 @@ fn connect_triggers(
 }
 
 fn make_schema_connection(
-    graph: &mut StableGraph<SqlGraphEntity, SqlGraphRelationship>,
+    graph: &mut StableGraph<SqlGraphEntity, SqlGraphRequires>,
     _kind: &str,
     index: NodeIndex,
     _rust_identifier: &str,
@@ -1399,7 +1391,7 @@ fn make_schema_connection(
     let mut found = false;
     for (schema_item, &schema_index) in schemas {
         if module_path == schema_item.module_path {
-            graph.add_edge(schema_index, index, SqlGraphRelationship::RequiredBy);
+            graph.add_edge(schema_index, index, SqlGraphRequires::By);
             found = true;
             break;
         }
@@ -1408,7 +1400,7 @@ fn make_schema_connection(
 }
 
 fn make_extern_connection(
-    graph: &mut StableGraph<SqlGraphEntity, SqlGraphRelationship>,
+    graph: &mut StableGraph<SqlGraphEntity, SqlGraphRequires>,
     _kind: &str,
     index: NodeIndex,
     _rust_identifier: &str,
@@ -1417,7 +1409,7 @@ fn make_extern_connection(
 ) -> eyre::Result<()> {
     match externs.iter().find(|(extern_item, _)| full_path == extern_item.full_path) {
         Some((_, extern_index)) => {
-            graph.add_edge(*extern_index, index, SqlGraphRelationship::RequiredBy);
+            graph.add_edge(*extern_index, index, SqlGraphRequires::By);
             Ok(())
         }
         None => Err(eyre!("Did not find connection `{full_path}` in {:#?}", {
@@ -1429,7 +1421,7 @@ fn make_extern_connection(
 }
 
 fn make_type_or_enum_connection(
-    graph: &mut StableGraph<SqlGraphEntity, SqlGraphRelationship>,
+    graph: &mut StableGraph<SqlGraphEntity, SqlGraphRequires>,
     _kind: &str,
     index: NodeIndex,
     _rust_identifier: &str,
@@ -1439,11 +1431,11 @@ fn make_type_or_enum_connection(
 ) -> bool {
     let found_ty = types.iter().find(|(ty_item, _)| ty_item.id_matches(ty_id));
     if let Some((_, ty_index)) = found_ty {
-        graph.add_edge(*ty_index, index, SqlGraphRelationship::RequiredBy);
+        graph.add_edge(*ty_index, index, SqlGraphRequires::By);
     }
     let found_enum = enums.iter().find(|(ty_item, _)| ty_item.id_matches(ty_id));
     if let Some((_, ty_index)) = found_enum {
-        graph.add_edge(*ty_index, index, SqlGraphRelationship::RequiredBy);
+        graph.add_edge(*ty_index, index, SqlGraphRequires::By);
     }
 
     found_ty.is_some() || found_enum.is_some()

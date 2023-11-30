@@ -55,10 +55,10 @@ impl Returning {
         }
     }
 
-    fn match_type(ty: &Box<Type>) -> Result<Returning, Error> {
-        let mut ty = *ty.clone();
+    fn match_type(ty: &Type) -> Result<Returning, Error> {
+        let mut ty = Box::new(ty.clone());
 
-        match ty {
+        match *ty {
             syn::Type::Path(mut typepath) => {
                 let path = &mut typepath.path;
                 let mut saw_option_ident = false;
@@ -120,15 +120,12 @@ impl Returning {
                                 "Option" => match &segment.arguments {
                                     PathArguments::AngleBracketed(bracketed) => {
                                         match bracketed.args.first().unwrap() {
-                                            GenericArgument::Type(ty) => match ty {
-                                                Type::Path(this_path) => {
-                                                    segments = this_path.path.segments.clone();
-                                                    saw_option_ident = true;
-                                                    found_option = true;
-                                                    continue 'outer;
-                                                }
-                                                _ => continue,
-                                            },
+                                            GenericArgument::Type(Type::Path(this_path)) => {
+                                                segments = this_path.path.segments.clone();
+                                                saw_option_ident = true;
+                                                found_option = true;
+                                                continue 'outer;
+                                            }
                                             _ => continue,
                                         };
                                     }

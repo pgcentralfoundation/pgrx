@@ -782,15 +782,13 @@ fn pg_extern_attr(item: &ImplItemMethod) -> syn::Attribute {
 
 fn get_impl_type_by_name<'a>(item_impl: &'a ItemImpl, name: &str) -> Option<&'a ImplItemType> {
     let mut needle = None;
-    for impl_item in item_impl.items.iter() {
-        match impl_item {
-            syn::ImplItem::Type(impl_item_type) => {
-                let ident_string = impl_item_type.ident.to_string();
-                if ident_string == name {
-                    needle = Some(impl_item_type);
-                }
-            }
-            _ => (),
+    for impl_item_type in item_impl.items.iter().filter_map(|impl_item| match impl_item {
+        syn::ImplItem::Type(iitype) => Some(iitype),
+        _ => None,
+    }) {
+        let ident_string = impl_item_type.ident.to_string();
+        if ident_string == name {
+            needle = Some(impl_item_type);
         }
     }
     needle
@@ -798,15 +796,13 @@ fn get_impl_type_by_name<'a>(item_impl: &'a ItemImpl, name: &str) -> Option<&'a 
 
 fn get_impl_func_by_name<'a>(item_impl: &'a ItemImpl, name: &str) -> Option<&'a ImplItemMethod> {
     let mut needle = None;
-    for impl_item in item_impl.items.iter() {
-        match impl_item {
-            syn::ImplItem::Method(impl_item_method) => {
-                let ident_string = impl_item_method.sig.ident.to_string();
-                if ident_string == name {
-                    needle = Some(impl_item_method);
-                }
-            }
-            _ => (),
+    for impl_item_method in item_impl.items.iter().filter_map(|impl_item| match impl_item {
+        syn::ImplItem::Method(iimethod) => Some(iimethod),
+        _ => None,
+    }) {
+        let ident_string = impl_item_method.sig.ident.to_string();
+        if ident_string == name {
+            needle = Some(impl_item_method);
         }
     }
     needle
@@ -814,15 +810,13 @@ fn get_impl_func_by_name<'a>(item_impl: &'a ItemImpl, name: &str) -> Option<&'a 
 
 fn get_impl_const_by_name<'a>(item_impl: &'a ItemImpl, name: &str) -> Option<&'a ImplItemConst> {
     let mut needle = None;
-    for impl_item in item_impl.items.iter() {
-        match impl_item {
-            syn::ImplItem::Const(impl_item_const) => {
-                let ident_string = impl_item_const.ident.to_string();
-                if ident_string == name {
-                    needle = Some(impl_item_const);
-                }
-            }
-            _ => (),
+    for impl_item_const in item_impl.items.iter().filter_map(|impl_item| match impl_item {
+        syn::ImplItem::Const(iiconst) => Some(iiconst),
+        _ => None,
+    }) {
+        let ident_string = impl_item_const.ident.to_string();
+        if ident_string == name {
+            needle = Some(impl_item_const);
         }
     }
     needle
@@ -868,30 +862,24 @@ fn get_const_litstr(item: &ImplItemConst) -> syn::Result<Option<String>> {
 }
 
 fn remap_self_to_target(ty: &mut syn::Type, target: &syn::Ident) {
-    match ty {
-        Type::Path(ref mut ty_path) => {
-            for segment in ty_path.path.segments.iter_mut() {
-                if segment.ident == "Self" {
-                    segment.ident = target.clone()
-                }
-                use syn::{GenericArgument, PathArguments};
-                match segment.arguments {
-                    PathArguments::AngleBracketed(ref mut angle_args) => {
-                        for arg in angle_args.args.iter_mut() {
-                            match arg {
-                                GenericArgument::Type(inner_ty) => {
-                                    remap_self_to_target(inner_ty, target)
-                                }
-                                _ => (),
-                            }
+    if let Type::Path(ref mut ty_path) = ty {
+        for segment in ty_path.path.segments.iter_mut() {
+            if segment.ident == "Self" {
+                segment.ident = target.clone()
+            }
+            use syn::{GenericArgument, PathArguments};
+            match segment.arguments {
+                PathArguments::AngleBracketed(ref mut angle_args) => {
+                    for arg in angle_args.args.iter_mut() {
+                        if let GenericArgument::Type(inner_ty) = arg {
+                            remap_self_to_target(inner_ty, target)
                         }
                     }
-                    PathArguments::Parenthesized(_) => (),
-                    PathArguments::None => (),
                 }
+                PathArguments::Parenthesized(_) => (),
+                PathArguments::None => (),
             }
         }
-        _ => (),
     }
 }
 
@@ -908,7 +896,7 @@ fn get_pgrx_attr_macro(attr_name: impl AsRef<str>, ty: &syn::Type) -> Option<Tok
                     _ => (),
                 }
             }
-            if (ty_macro.mac.path.segments.len() == 1 && found_attr) || (found_pgrx && found_attr) {
+            if (found_pgrx || ty_macro.mac.path.segments.len() == 1) && found_attr {
                 Some(ty_macro.mac.tokens.clone())
             } else {
                 None
