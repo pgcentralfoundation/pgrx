@@ -461,13 +461,15 @@ impl PgExtern {
             }
             Returning::SetOf { ty: _retval_ty, optional, result } => {
                 let mut ret_expr = quote! { #func_name(#(#arg_pats),*) };
-                if *result { // If it's a result, we need to report it.
+                if *result {
+                    // If it's a result, we need to report it.
                     ret_expr = quote! { #ret_expr.report() };
                 }
-                if !*optional { // If it's not already an option, we need to wrap it.
+                if !*optional {
+                    // If it's not already an option, we need to wrap it.
                     ret_expr = quote! { Some(#ret_expr) };
                 }
-                let import = result.then(|| quote ! { use ::pgrx::pg_sys::panic::ErrorReportable; });
+                let import = result.then(|| quote! { use ::pgrx::pg_sys::panic::ErrorReportable; });
                 let result_handler = quote_spanned! {
                     self.func.sig.span() =>
                         #import
