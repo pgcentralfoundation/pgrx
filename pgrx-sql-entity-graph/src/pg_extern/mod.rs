@@ -284,11 +284,7 @@ impl PgExtern {
         let operator = self.operator.clone().into_iter();
         let to_sql_config = match self.overridden() {
             None => self.to_sql_config.clone(),
-            Some(content) => {
-                let mut config = self.to_sql_config.clone();
-                config.content = Some(content);
-                config
-            }
+            Some(content) => ToSqlConfig { content: Some(content), ..self.to_sql_config.clone() },
         };
 
         let sql_graph_entity_fn_name =
