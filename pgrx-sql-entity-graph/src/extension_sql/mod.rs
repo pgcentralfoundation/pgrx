@@ -226,15 +226,15 @@ impl Parse for CodeEnrichment<ExtensionSql> {
         let sql = input.parse()?;
         let _after_sql_comma: Option<Token![,]> = input.parse()?;
         let attrs = input.parse_terminated(ExtensionSqlAttribute::parse)?;
-        let mut name = None;
-        for attr in &attrs {
-            match attr {
-                ExtensionSqlAttribute::Name(found_name) => {
-                    name = Some(found_name.clone());
-                }
-                _ => (),
-            }
-        }
+        // it's rfind_map
+        let name = attrs
+            .iter()
+            .filter_map(|attr| match attr {
+                ExtensionSqlAttribute::Name(found_name) => Some(found_name),
+                _ => None,
+            })
+            .cloned()
+            .next_back();
         let name =
             name.ok_or_else(|| syn::Error::new(input.span(), "expected `name` to be set"))?;
         Ok(CodeEnrichment(ExtensionSql { sql, attrs, name }))
