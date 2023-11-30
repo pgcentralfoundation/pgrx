@@ -599,13 +599,9 @@ impl ToRustCodeTokens for PgExtern {
 
 impl Parse for CodeEnrichment<PgExtern> {
     fn parse(input: ParseStream) -> Result<Self, syn::Error> {
-        let mut attrs = Vec::new();
-
         let parser = Punctuated::<Attribute, Token![,]>::parse_terminated;
         let punctuated_attrs = input.call(parser).ok().unwrap_or_default();
-        for pair in punctuated_attrs.into_pairs() {
-            attrs.push(pair.into_value())
-        }
+        let attrs = punctuated_attrs.into_pairs().map(|pair| pair.into_value());
         PgExtern::new(quote! {#(#attrs)*}, input.parse()?)
     }
 }
