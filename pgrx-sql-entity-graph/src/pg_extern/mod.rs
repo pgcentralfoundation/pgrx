@@ -89,12 +89,8 @@ impl PgExtern {
         let punctuated_attrs = parser.parse2(attr)?;
         for pair in punctuated_attrs.into_pairs() {
             match pair.into_value() {
-                Attribute::Sql(config) => {
-                    to_sql_config.get_or_insert(config);
-                }
-                attr => {
-                    attrs.push(attr);
-                }
+                Attribute::Sql(config) => to_sql_config = to_sql_config.or(Some(config)),
+                attr => attrs.push(attr),
             }
         }
 
