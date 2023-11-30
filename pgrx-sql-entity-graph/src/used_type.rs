@@ -289,10 +289,8 @@ impl UsedType {
             if let syn::Type::Path(tp) = &resolved_ty {
                 if let Some(first_segment) = tp.path.segments.first() {
                     if let syn::PathArguments::AngleBracketed(ab) = &first_segment.arguments {
-                        if let Some(first_arg) = ab.args.first() {
-                            if let syn::GenericArgument::Type(ty) = first_arg {
-                                resolved_ty_inner = Some(ty.clone());
-                            }
+                        if let Some(syn::GenericArgument::Type(ty)) = ab.args.first() {
+                            resolved_ty_inner = Some(ty.clone());
                         }
                     }
                 }
