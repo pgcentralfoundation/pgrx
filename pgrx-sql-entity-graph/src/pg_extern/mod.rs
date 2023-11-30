@@ -384,6 +384,24 @@ impl PgExtern {
             }
         });
 
+        // Iterators require fancy handling for their retvals
+        let emit_result_handler = |span: Span, optional: bool, result: bool| {
+            let mut ret_expr = quote! { #func_name(#(#arg_pats),*) };
+            if result {
+                // If it's a result, we need to report it.
+                ret_expr = quote! { #ret_expr.report() };
+            }
+            if !optional {
+                // If it's not already an option, we need to wrap it.
+                ret_expr = quote! { Some(#ret_expr) };
+            }
+            let import = result.then(|| quote! { use ::pgrx::pg_sys::panic::ErrorReportable; });
+            quote_spanned! { span =>
+                    #import
+                    #ret_expr
+            }
+        };
+
         match &self.returns {
             Returning::None => quote_spanned! { self.func.sig.span() =>
                   #[no_mangle]
@@ -460,21 +478,7 @@ impl PgExtern {
                 }
             }
             Returning::SetOf { ty: _retval_ty, optional, result } => {
-                let mut ret_expr = quote! { #func_name(#(#arg_pats),*) };
-                if *result {
-                    // If it's a result, we need to report it.
-                    ret_expr = quote! { #ret_expr.report() };
-                }
-                if !*optional {
-                    // If it's not already an option, we need to wrap it.
-                    ret_expr = quote! { Some(#ret_expr) };
-                }
-                let import = result.then(|| quote! { use ::pgrx::pg_sys::panic::ErrorReportable; });
-                let result_handler = quote_spanned! {
-                    self.func.sig.span() =>
-                        #import
-                        #ret_expr
-                };
+                let result_handler = emit_result_handler(self.func.sig.span(), *optional, *result);
 
                 quote_spanned! { self.func.sig.span() =>
                     #[no_mangle]
@@ -495,30 +499,7 @@ impl PgExtern {
                 }
             }
             Returning::Iterated { tys: retval_tys, optional, result } => {
-                let result_handler = if *optional && *result {
-                    // don't need unsafe annotations because of the larger unsafe block coming up
-                    quote_spanned! { self.func.sig.span() =>
-                            use ::pgrx::pg_sys::panic::ErrorReportable;
-                            let unwrapped = #func_name(#(#arg_pats),*).report();
-                            unwrapped
-                    }
-                } else if *optional {
-                    // don't need unsafe annotations because of the larger unsafe block coming up
-                    quote_spanned! { self.func.sig.span() =>
-                        #func_name(#(#arg_pats),*)
-                    }
-                } else if *result {
-                    quote_spanned! { self.func.sig.span() =>
-                        {
-                            use ::pgrx::pg_sys::panic::ErrorReportable;
-                            Some(#func_name(#(#arg_pats),*).report())
-                        }
-                    }
-                } else {
-                    quote_spanned! { self.func.sig.span() =>
-                        Some(#func_name(#(#arg_pats),*))
-                    }
-                };
+                let result_handler = emit_result_handler(self.func.sig.span(), *optional, *result);
 
                 if retval_tys.len() == 1 {
                     // Postgres considers functions returning a 1-field table (`RETURNS TABLE (T)`) to be
