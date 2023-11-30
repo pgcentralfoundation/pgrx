@@ -647,7 +647,7 @@ fn connect_schemas(
     schemas: &HashMap<SchemaEntity, NodeIndex>,
     root: NodeIndex,
 ) {
-    for (_item, &index) in schemas {
+    for index in schemas.values().copied() {
         graph.add_edge(root, index, SqlGraphRequires::By);
     }
 }
