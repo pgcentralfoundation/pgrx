@@ -334,7 +334,7 @@ impl ToSql for PgAggregateEntity {
                     .find(|neighbor| match &context.graph[*neighbor] {
                         SqlGraphEntity::Type(ty) => ty.id_matches(&arg.used_ty.ty_id),
                         SqlGraphEntity::Enum(en) => en.id_matches(&arg.used_ty.ty_id),
-                        SqlGraphEntity::BuiltinType(defined) => defined == &arg.used_ty.full_path,
+                        SqlGraphEntity::BuiltinType(defined) => defined == arg.used_ty.full_path,
                         _ => false,
                     })
                     .ok_or_else(|| {
@@ -406,7 +406,7 @@ impl ToSql for PgAggregateEntity {
                     .find(|neighbor| match &context.graph[*neighbor] {
                         SqlGraphEntity::Type(ty) => ty.id_matches(&arg.used_ty.ty_id),
                         SqlGraphEntity::Enum(en) => en.id_matches(&arg.used_ty.ty_id),
-                        SqlGraphEntity::BuiltinType(defined) => defined == &arg.used_ty.full_path,
+                        SqlGraphEntity::BuiltinType(defined) => defined == arg.used_ty.full_path,
                         _ => false,
                     })
                     .ok_or_else(|| eyre!("Could not find arg type in graph. Got: {:?}", arg))?;

@@ -89,12 +89,8 @@ impl PgExtern {
         let punctuated_attrs = parser.parse2(attr)?;
         for pair in punctuated_attrs.into_pairs() {
             match pair.into_value() {
-                Attribute::Sql(config) => {
-                    to_sql_config.get_or_insert(config);
-                }
-                attr => {
-                    attrs.push(attr);
-                }
+                Attribute::Sql(config) => to_sql_config = to_sql_config.or(Some(config)),
+                attr => attrs.push(attr),
             }
         }
 
@@ -137,8 +133,7 @@ impl PgExtern {
                 match v {
                     syn::FnArg::Receiver(_) => None,
                     syn::FnArg::Typed(pat_ty) => {
-                        let static_ty = pat_ty.ty.clone();
-                        let mut static_ty = match UsedType::new(*static_ty) {
+                        let mut static_ty = match UsedType::new(*pat_ty.ty.clone()) {
                             Ok(v) => v.resolved_ty,
                             Err(e) => return Some(Err(e)),
                         };
@@ -175,29 +170,24 @@ impl PgExtern {
         let mut span = None;
         let mut retval = None;
         let mut in_commented_sql_block = false;
-        for attr in &self.func.attrs {
-            let meta = attr.parse_meta().ok();
-            if let Some(meta) = meta {
-                if meta.path().is_ident("doc") {
-                    let content = match meta {
-                        Meta::Path(_) | Meta::List(_) => continue,
-                        Meta::NameValue(mnv) => mnv,
-                    };
-                    if let syn::Lit::Str(ref inner) = content.lit {
-                        span.get_or_insert(content.lit.span());
-                        if !in_commented_sql_block && inner.value().trim() == "```pgrxsql" {
-                            in_commented_sql_block = true;
-                        } else if in_commented_sql_block && inner.value().trim() == "```" {
-                            in_commented_sql_block = false;
-                        } else if in_commented_sql_block {
-                            let line = inner.value().trim_start().replace(
-                                "@FUNCTION_NAME@",
-                                &(self.func.sig.ident.to_string() + "_wrapper"),
-                            ) + "\n";
-                            retval.get_or_insert_with(String::default).push_str(&line);
-                        }
-                    }
-                }
+        for meta in self.func.attrs.iter().filter_map(|attr| match attr.parse_meta() {
+            Ok(meta) if meta.path().is_ident("doc") => Some(meta),
+            _ => None,
+        }) {
+            let Meta::NameValue(syn::MetaNameValue { lit, .. }) = meta else { continue };
+            let syn::Lit::Str(ref inner) = lit else { continue };
+            span.get_or_insert(lit.span());
+            if !in_commented_sql_block && inner.value().trim() == "```pgrxsql" {
+                in_commented_sql_block = true;
+            } else if in_commented_sql_block && inner.value().trim() == "```" {
+                in_commented_sql_block = false;
+            } else if in_commented_sql_block {
+                let line = inner
+                    .value()
+                    .trim_start()
+                    .replace("@FUNCTION_NAME@", &(self.func.sig.ident.to_string() + "_wrapper"))
+                    + "\n";
+                retval.get_or_insert_with(String::default).push_str(&line);
             }
         }
         retval.map(|s| syn::LitStr::new(s.as_ref(), span.unwrap()))
@@ -294,11 +284,7 @@ impl PgExtern {
         let operator = self.operator.clone().into_iter();
         let to_sql_config = match self.overridden() {
             None => self.to_sql_config.clone(),
-            Some(content) => {
-                let mut config = self.to_sql_config.clone();
-                config.content = Some(content);
-                config
-            }
+            Some(content) => ToSqlConfig { content: Some(content), ..self.to_sql_config.clone() },
         };
 
         let sql_graph_entity_fn_name =
@@ -398,20 +384,47 @@ impl PgExtern {
             }
         });
 
-        match &self.returns {
-            Returning::None => quote_spanned! { self.func.sig.span() =>
-                  #[no_mangle]
-                  #[doc(hidden)]
-                  #[::pgrx::pgrx_macros::pg_guard]
-                  pub unsafe extern "C" fn #func_name_wrapper #func_generics(#fcinfo_ident: ::pgrx::pg_sys::FunctionCallInfo) {
-                      #(
-                          #arg_fetches
-                      )*
+        // Iterators require fancy handling for their retvals
+        let emit_result_handler = |span: Span, optional: bool, result: bool| {
+            let mut ret_expr = quote! { #func_name(#(#arg_pats),*) };
+            if result {
+                // If it's a result, we need to report it.
+                ret_expr = quote! { #ret_expr.report() };
+            }
+            if !optional {
+                // If it's not already an option, we need to wrap it.
+                ret_expr = quote! { Some(#ret_expr) };
+            }
+            let import = result.then(|| quote! { use ::pgrx::pg_sys::panic::ErrorReportable; });
+            quote_spanned! { span =>
+                    #import
+                    #ret_expr
+            }
+        };
 
-                    #[allow(unused_unsafe)] // unwrapped fn might be unsafe
-                    unsafe { #func_name(#(#arg_pats),*) }
+        // This is the generic wrapper fn that everything needs
+        let extern_c_wrapper =
+            |span, returns_datum: bool, wrapped_contents: proc_macro2::TokenStream| {
+                let return_ty = returns_datum.then(|| quote! { -> ::pgrx::pg_sys::Datum });
+                quote_spanned! { span=>
+                    #[no_mangle]
+                    #[doc(hidden)]
+                    #[::pgrx::pgrx_macros::pg_guard]
+                    pub unsafe extern "C" fn #func_name_wrapper #func_generics(#fcinfo_ident: ::pgrx::pg_sys::FunctionCallInfo) #return_ty {
+                        #wrapped_contents
+                    }
                 }
-            },
+            };
+
+        match &self.returns {
+            Returning::None => {
+                let fn_contents = quote! {
+                    #(#arg_fetches)*
+                    #[allow(unused_unsafe)]
+                    unsafe { #func_name(#(#arg_pats),*) }
+                };
+                extern_c_wrapper(self.func.sig.span(), false, fn_contents)
+            }
             Returning::Type(retval_ty) => {
                 let result_ident = syn::Ident::new("result", self.func.sig.span());
                 let retval_transform = if retval_ty.resolved_ty == syn::parse_quote!(()) {
@@ -457,51 +470,40 @@ impl PgExtern {
                     }
                 };
 
-                quote_spanned! { self.func.sig.span() =>
-                    #[no_mangle]
-                    #[doc(hidden)]
-                    #[::pgrx::pgrx_macros::pg_guard]
-                    pub unsafe extern "C" fn #func_name_wrapper #func_generics(#fcinfo_ident: ::pgrx::pg_sys::FunctionCallInfo) -> ::pgrx::pg_sys::Datum {
-                        #(
-                            #arg_fetches
-                        )*
+                let fn_contents = quote! {
+                    #(#arg_fetches)*
 
-                        #[allow(unused_unsafe)] // unwrapped fn might be unsafe
-                        let #result_ident = unsafe { #func_name(#(#arg_pats),*) };
+                    #[allow(unused_unsafe)] // unwrapped fn might be unsafe
+                    let #result_ident = unsafe { #func_name(#(#arg_pats),*) };
 
-                        #retval_transform
-                    }
-                }
+                    #retval_transform
+                };
+                extern_c_wrapper(self.func.sig.span(), true, fn_contents)
             }
             Returning::SetOf { ty: _retval_ty, optional, result } => {
-                let result_handler = if *optional && !*result {
-                    // don't need unsafe annotations because of the larger unsafe block coming up
-                    quote_spanned! { self.func.sig.span() =>
-                        #func_name(#(#arg_pats),*)
-                    }
-                } else if *result {
-                    if *optional {
-                        quote_spanned! { self.func.sig.span() =>
-                            use ::pgrx::pg_sys::panic::ErrorReportable;
-                            #func_name(#(#arg_pats),*).report()
-                        }
-                    } else {
-                        quote_spanned! { self.func.sig.span() =>
-                            use ::pgrx::pg_sys::panic::ErrorReportable;
-                            Some(#func_name(#(#arg_pats),*).report())
-                        }
-                    }
-                } else {
-                    quote_spanned! { self.func.sig.span() =>
-                        Some(#func_name(#(#arg_pats),*))
+                let result_handler = emit_result_handler(self.func.sig.span(), *optional, *result);
+                let setof_closure = quote! {
+                    #[allow(unused_unsafe)]
+                    unsafe {
+                        // SAFETY: the caller has asserted that `fcinfo` is a valid FunctionCallInfo pointer, allocated by Postgres
+                        // with all its fields properly setup.  Unless the user is calling this wrapper function directly, this
+                        // will always be the case
+                        ::pgrx::iter::SetOfIterator::srf_next(#fcinfo_ident, || {
+                            #( #arg_fetches )*
+                            #result_handler
+                        })
                     }
                 };
+                extern_c_wrapper(self.func.sig.span(), true, setof_closure)
+            }
+            Returning::Iterated { tys: retval_tys, optional, result } => {
+                let result_handler = emit_result_handler(self.func.sig.span(), *optional, *result);
 
-                quote_spanned! { self.func.sig.span() =>
-                    #[no_mangle]
-                    #[doc(hidden)]
-                    #[::pgrx::pgrx_macros::pg_guard]
-                    pub unsafe extern "C" fn #func_name_wrapper #func_generics(#fcinfo_ident: ::pgrx::pg_sys::FunctionCallInfo) -> ::pgrx::pg_sys::Datum {
+                let iter_closure = if retval_tys.len() == 1 {
+                    // Postgres considers functions returning a 1-field table (`RETURNS TABLE (T)`) to be
+                    // a function that `RETURNS SETOF T`.  So we write a different wrapper implementation
+                    // that transparently transforms the `TableIterator` returned by the user into a `SetOfIterator`
+                    quote! {
                         #[allow(unused_unsafe)]
                         unsafe {
                             // SAFETY: the caller has asserted that `fcinfo` is a valid FunctionCallInfo pointer, allocated by Postgres
@@ -509,83 +511,30 @@ impl PgExtern {
                             // will always be the case
                             ::pgrx::iter::SetOfIterator::srf_next(#fcinfo_ident, || {
                                 #( #arg_fetches )*
+                                let table_iterator = { #result_handler };
+
+                                // we need to convert the 1-field `TableIterator` provided by the user
+                                // into a SetOfIterator in order to properly handle the case of `RETURNS TABLE (T)`,
+                                // which is a table that returns only 1 field.
+                                table_iterator.map(|i| ::pgrx::iter::SetOfIterator::new(i.into_iter().map(|(v,)| v)))
+                            })
+                        }
+                    }
+                } else {
+                    quote! {
+                        #[allow(unused_unsafe)]
+                        unsafe {
+                            // SAFETY: the caller has asserted that `fcinfo` is a valid FunctionCallInfo pointer, allocated by Postgres
+                            // with all its fields properly setup.  Unless the user is calling this wrapper function directly, this
+                            // will always be the case
+                            ::pgrx::iter::TableIterator::srf_next(#fcinfo_ident, || {
+                                #( #arg_fetches )*
                                 #result_handler
                             })
                         }
                     }
-                }
-            }
-            Returning::Iterated { tys: retval_tys, optional, result } => {
-                let result_handler = if *optional && *result {
-                    // don't need unsafe annotations because of the larger unsafe block coming up
-                    quote_spanned! { self.func.sig.span() =>
-                            use ::pgrx::pg_sys::panic::ErrorReportable;
-                            let unwrapped = #func_name(#(#arg_pats),*).report();
-                            unwrapped
-                    }
-                } else if *optional {
-                    // don't need unsafe annotations because of the larger unsafe block coming up
-                    quote_spanned! { self.func.sig.span() =>
-                        #func_name(#(#arg_pats),*)
-                    }
-                } else if *result {
-                    quote_spanned! { self.func.sig.span() =>
-                        {
-                            use ::pgrx::pg_sys::panic::ErrorReportable;
-                            Some(#func_name(#(#arg_pats),*).report())
-                        }
-                    }
-                } else {
-                    quote_spanned! { self.func.sig.span() =>
-                        Some(#func_name(#(#arg_pats),*))
-                    }
                 };
-
-                if retval_tys.len() == 1 {
-                    // Postgres considers functions returning a 1-field table (`RETURNS TABLE (T)`) to be
-                    // a function that `RETRUNS SETOF T`.  So we write a different wrapper implementation
-                    // that transparently transforms the `TableIterator` returned by the user into a `SetOfIterator`
-                    quote_spanned! { self.func.sig.span() =>
-                        #[no_mangle]
-                        #[doc(hidden)]
-                        #[::pgrx::pgrx_macros::pg_guard]
-                        pub unsafe extern "C" fn #func_name_wrapper #func_generics(#fcinfo_ident: ::pgrx::pg_sys::FunctionCallInfo) -> ::pgrx::pg_sys::Datum {
-                            #[allow(unused_unsafe)]
-                            unsafe {
-                                // SAFETY: the caller has asserted that `fcinfo` is a valid FunctionCallInfo pointer, allocated by Postgres
-                                // with all its fields properly setup.  Unless the user is calling this wrapper function directly, this
-                                // will always be the case
-                                ::pgrx::iter::SetOfIterator::srf_next(#fcinfo_ident, || {
-                                    #( #arg_fetches )*
-                                    let table_iterator = { #result_handler };
-
-                                    // we need to convert the 1-field `TableIterator` provided by the user
-                                    // into a SetOfIterator in order to properly handle the case of `RETURNS TABLE (T)`,
-                                    // which is a table that returns only 1 field.
-                                    table_iterator.map(|i| ::pgrx::iter::SetOfIterator::new(i.into_iter().map(|(v,)| v)))
-                                })
-                            }
-                        }
-                    }
-                } else {
-                    quote_spanned! { self.func.sig.span() =>
-                        #[no_mangle]
-                        #[doc(hidden)]
-                        #[::pgrx::pgrx_macros::pg_guard]
-                        pub unsafe extern "C" fn #func_name_wrapper #func_generics(#fcinfo_ident: ::pgrx::pg_sys::FunctionCallInfo) -> ::pgrx::pg_sys::Datum {
-                            #[allow(unused_unsafe)]
-                            unsafe {
-                                // SAFETY: the caller has asserted that `fcinfo` is a valid FunctionCallInfo pointer, allocated by Postgres
-                                // with all its fields properly setup.  Unless the user is calling this wrapper function directly, this
-                                // will always be the case
-                                ::pgrx::iter::TableIterator::srf_next(#fcinfo_ident, || {
-                                    #( #arg_fetches )*
-                                    #result_handler
-                                })
-                            }
-                        }
-                    }
-                }
+                extern_c_wrapper(self.func.sig.span(), true, iter_closure)
             }
         }
     }
@@ -613,13 +562,9 @@ impl ToRustCodeTokens for PgExtern {
 
 impl Parse for CodeEnrichment<PgExtern> {
     fn parse(input: ParseStream) -> Result<Self, syn::Error> {
-        let mut attrs = Vec::new();
-
         let parser = Punctuated::<Attribute, Token![,]>::parse_terminated;
         let punctuated_attrs = input.call(parser).ok().unwrap_or_default();
-        for pair in punctuated_attrs.into_pairs() {
-            attrs.push(pair.into_value())
-        }
+        let attrs = punctuated_attrs.into_pairs().map(|pair| pair.into_value());
         PgExtern::new(quote! {#(#attrs)*}, input.parse()?)
     }
 }

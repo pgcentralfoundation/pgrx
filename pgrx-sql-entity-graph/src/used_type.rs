@@ -94,8 +94,7 @@ impl UsedType {
             // composite_type!(..)
             syn::Type::Macro(macro_pat) => {
                 let mac = &macro_pat.mac;
-                let archetype = mac.path.segments.last().expect("No last segment");
-                match archetype.ident.to_string().as_str() {
+                match &*mac.path.segments.last().expect("No last segment").ident.to_string() {
                     "default" => {
                         // If we land here, after already expanding the `default!()` above, the user has written it twice.
                         // This is definitely an issue and we should tell them.
@@ -288,12 +287,10 @@ impl UsedType {
         let mut resolved_ty_inner: Option<syn::Type> = None;
         if result {
             if let syn::Type::Path(tp) = &resolved_ty {
-                if let Some(first_segment) = tp.path.segments.first().map(Some).unwrap_or(None) {
+                if let Some(first_segment) = tp.path.segments.first() {
                     if let syn::PathArguments::AngleBracketed(ab) = &first_segment.arguments {
-                        if let Some(first_arg) = ab.args.first().map(Some).unwrap_or(None) {
-                            if let syn::GenericArgument::Type(ty) = first_arg {
-                                resolved_ty_inner = Some(ty.clone());
-                            }
+                        if let Some(syn::GenericArgument::Type(ty)) = ab.args.first() {
+                            resolved_ty_inner = Some(ty.clone());
                         }
                     }
                 }

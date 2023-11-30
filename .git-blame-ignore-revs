@@ -4,6 +4,9 @@
 # adding a rustfmt.toml
 1ded8553fbeff635fcca0cbc8f37034cc124d698
 
+# utils -> sql-entity-graph
+cf6fd6f1c4709491e86f5dc536d5a99adb1f18fc
+
 # the pgrx rename
 8726d4fb5482910ec389b014efa6b999c2208bae
 
