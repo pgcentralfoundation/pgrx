@@ -8,7 +8,7 @@
 //LICENSE
 //LICENSE Use of this source code is governed by the MIT license that can be found in the LICENSE file.
 //! for converting a pg_sys::Datum and a corresponding "is_null" bool into a typed Option
-
+#![allow(clippy::manual_map, clippy::map_clone, clippy::into_iter_on_ref)]
 use crate::{
     pg_sys, varlena, varlena_to_byte_slice, AllocatedByPostgres, IntoDatum, PgBox, PgMemoryContexts,
 };

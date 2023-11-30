@@ -460,6 +460,7 @@ fn build_base_edges(
     }
 }
 
+#[allow(clippy::type_complexity)]
 fn initialize_extension_sqls(
     graph: &mut StableGraph<SqlGraphEntity, SqlGraphRelationship>,
     root: NodeIndex,
