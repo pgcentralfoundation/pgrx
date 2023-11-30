@@ -133,8 +133,7 @@ impl PgExtern {
                 match v {
                     syn::FnArg::Receiver(_) => None,
                     syn::FnArg::Typed(pat_ty) => {
-                        let static_ty = pat_ty.ty.clone();
-                        let mut static_ty = match UsedType::new(*static_ty) {
+                        let mut static_ty = match UsedType::new(*pat_ty.ty.clone()) {
                             Ok(v) => v.resolved_ty,
                             Err(e) => return Some(Err(e)),
                         };
@@ -171,28 +170,23 @@ impl PgExtern {
         let mut span = None;
         let mut retval = None;
         let mut in_commented_sql_block = false;
-        for attr in &self.func.attrs {
-            let meta = attr.parse_meta().ok();
-            if let Some(meta) = meta {
-                if meta.path().is_ident("doc") {
-                    let content = match meta {
-                        Meta::Path(_) | Meta::List(_) => continue,
-                        Meta::NameValue(mnv) => mnv,
-                    };
-                    if let syn::Lit::Str(ref inner) = content.lit {
-                        span.get_or_insert(content.lit.span());
-                        if !in_commented_sql_block && inner.value().trim() == "```pgrxsql" {
-                            in_commented_sql_block = true;
-                        } else if in_commented_sql_block && inner.value().trim() == "```" {
-                            in_commented_sql_block = false;
-                        } else if in_commented_sql_block {
-                            let line = inner.value().trim_start().replace(
-                                "@FUNCTION_NAME@",
-                                &(self.func.sig.ident.to_string() + "_wrapper"),
-                            ) + "\n";
-                            retval.get_or_insert_with(String::default).push_str(&line);
-                        }
-                    }
+        for meta in self.func.attrs.iter().filter_map(|attr| match attr.parse_meta() {
+            Ok(meta) if meta.path().is_ident("doc") => Some(meta),
+            _ => None,
+        }) {
+            let Meta::NameValue(syn::MetaNameValue { lit, .. }) = meta else { continue };
+            if let syn::Lit::Str(ref inner) = lit {
+                span.get_or_insert(lit.span());
+                if !in_commented_sql_block && inner.value().trim() == "```pgrxsql" {
+                    in_commented_sql_block = true;
+                } else if in_commented_sql_block && inner.value().trim() == "```" {
+                    in_commented_sql_block = false;
+                } else if in_commented_sql_block {
+                    let line = inner.value().trim_start().replace(
+                        "@FUNCTION_NAME@",
+                        &(self.func.sig.ident.to_string() + "_wrapper"),
+                    ) + "\n";
+                    retval.get_or_insert_with(String::default).push_str(&line);
                 }
             }
         }
