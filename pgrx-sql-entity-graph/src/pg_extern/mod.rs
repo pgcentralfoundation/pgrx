@@ -460,27 +460,18 @@ impl PgExtern {
                 }
             }
             Returning::SetOf { ty: _retval_ty, optional, result } => {
-                let result_handler = if *optional && !*result {
-                    // don't need unsafe annotations because of the larger unsafe block coming up
-                    quote_spanned! { self.func.sig.span() =>
-                        #func_name(#(#arg_pats),*)
-                    }
-                } else if *result {
-                    if *optional {
-                        quote_spanned! { self.func.sig.span() =>
-                            use ::pgrx::pg_sys::panic::ErrorReportable;
-                            #func_name(#(#arg_pats),*).report()
-                        }
-                    } else {
-                        quote_spanned! { self.func.sig.span() =>
-                            use ::pgrx::pg_sys::panic::ErrorReportable;
-                            Some(#func_name(#(#arg_pats),*).report())
-                        }
-                    }
-                } else {
-                    quote_spanned! { self.func.sig.span() =>
-                        Some(#func_name(#(#arg_pats),*))
-                    }
+                let mut ret_expr = quote! { #func_name(#(#arg_pats),*) };
+                if *result { // If it's a result, we need to report it.
+                    ret_expr = quote! { #ret_expr.report() };
+                }
+                if !*optional { // If it's not already an option, we need to wrap it.
+                    ret_expr = quote! { Some(#ret_expr) };
+                }
+                let import = result.then(|| quote ! { use ::pgrx::pg_sys::panic::ErrorReportable; });
+                let result_handler = quote_spanned! {
+                    self.func.sig.span() =>
+                        #import
+                        #ret_expr
                 };
 
                 quote_spanned! { self.func.sig.span() =>
