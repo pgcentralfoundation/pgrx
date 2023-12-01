@@ -86,7 +86,6 @@ pub extern "C" fn bgworker_return_value(arg: pg_sys::Datum) {
     .expect("bgworker transaction failed");
 }
 
-
 #[pg_guard]
 #[no_mangle]
 /// Simple background worker that waits to be terminated; used to test behaviour in case of worker slots exhaustion
@@ -192,14 +191,16 @@ mod tests {
             .expect("got null for max_worker_processes");
         let available_proc = max_proc - 1; // One worker process for logical replication launcher
 
-        let results = (0..available_proc+1).map(|_| {
-            BackgroundWorkerBuilder::new("dynamic_bgworker")
-                .set_library("pgrx_tests")
-                .set_function("bgworker_sleep")
-                .enable_shmem_access(None)
-                .set_notify_pid(unsafe { pg_sys::MyProcPid })
-                .load_dynamic()
-        }).collect::<Vec<_>>();
+        let results = (0..available_proc + 1)
+            .map(|_| {
+                BackgroundWorkerBuilder::new("dynamic_bgworker")
+                    .set_library("pgrx_tests")
+                    .set_function("bgworker_sleep")
+                    .enable_shmem_access(None)
+                    .set_notify_pid(unsafe { pg_sys::MyProcPid })
+                    .load_dynamic()
+            })
+            .collect::<Vec<_>>();
         let has_failures = results.iter().any(|w| w.is_err());
         for worker in results.into_iter().filter_map(|r| r.ok()) {
             let handle = worker.terminate();
