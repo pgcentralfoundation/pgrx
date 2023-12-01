@@ -598,15 +598,19 @@ impl BackgroundWorkerBuilder {
     }
 
     /// Once properly configured, call `load_dynamic()` to get the BackgroundWorker registered and started dynamically.
-    pub fn load_dynamic(self) -> DynamicBackgroundWorker {
+    /// Start up might fail, e.g. if max_worker_processes is exceeded. In that case an Err is returned.
+    pub fn load_dynamic(self: Self) -> Result<DynamicBackgroundWorker, ()> {
         let mut bgw: pg_sys::BackgroundWorker = (&self).into();
         let mut handle: *mut pg_sys::BackgroundWorkerHandle = null_mut();
 
-        unsafe {
-            pg_sys::RegisterDynamicBackgroundWorker(&mut bgw, &mut handle);
-        };
+        // SAFETY: bgw and handle are set just above, and postgres guarantees to set handle to a valid pointer in case of success
+        let success = unsafe { pg_sys::RegisterDynamicBackgroundWorker(&mut bgw, &mut handle) };
 
-        DynamicBackgroundWorker { handle, notify_pid: bgw.bgw_notify_pid }
+        if !success {
+            Err(())
+        } else {
+            Ok(DynamicBackgroundWorker { handle, notify_pid: bgw.bgw_notify_pid })
+        }
     }
 }
 
