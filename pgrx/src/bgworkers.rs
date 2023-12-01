@@ -602,9 +602,8 @@ impl BackgroundWorkerBuilder {
         let mut bgw: pg_sys::BackgroundWorker = (&self).into();
         let mut handle: *mut pg_sys::BackgroundWorkerHandle = null_mut();
 
-        let success = unsafe {
-            pg_sys::RegisterDynamicBackgroundWorker(&mut bgw, &mut handle)
-        };
+        // SAFETY: bgw and handle are set just above, and postgres guarantees to set handle to a valid pointer in case of success
+        let success = unsafe { pg_sys::RegisterDynamicBackgroundWorker(&mut bgw, &mut handle) };
 
         if !success {
             Err(())
