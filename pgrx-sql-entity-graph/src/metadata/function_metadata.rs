@@ -35,22 +35,22 @@ assert_eq!(
 );
 ```
  */
-pub trait FunctionMetadata<Inputs, Output> {
+pub trait FunctionMetadata<A> {
     fn path(&self) -> &'static str {
         core::any::type_name::<Self>()
     }
     fn entity(&self) -> FunctionMetadataEntity;
 }
 
-impl<Output> FunctionMetadata<(), Output> for fn() -> Output
+impl<R> FunctionMetadata<()> for fn() -> R
 where
-    Output: SqlTranslatable,
+    R: SqlTranslatable,
 {
     fn entity(&self) -> FunctionMetadataEntity {
         FunctionMetadataEntity {
             arguments: vec![],
             retval: {
-                let marker: PhantomData<Output> = PhantomData;
+                let marker: PhantomData<R> = PhantomData;
                 Some(marker.entity())
             },
             path: self.path(),
@@ -58,15 +58,15 @@ where
     }
 }
 
-impl<Output> FunctionMetadata<(), Output> for unsafe fn() -> Output
+impl<R> FunctionMetadata<()> for unsafe fn() -> R
 where
-    Output: SqlTranslatable,
+    R: SqlTranslatable,
 {
     fn entity(&self) -> FunctionMetadataEntity {
         FunctionMetadataEntity {
             arguments: vec![],
             retval: {
-                let marker: PhantomData<Output> = PhantomData;
+                let marker: PhantomData<R> = PhantomData;
                 Some(marker.entity())
             },
             path: self.path(),
@@ -74,13 +74,13 @@ where
     }
 }
 
-impl FunctionMetadata<(), ()> for fn() {
+impl FunctionMetadata<()> for fn() {
     fn entity(&self) -> FunctionMetadataEntity {
         FunctionMetadataEntity { arguments: vec![], retval: None, path: self.path() }
     }
 }
 
-impl FunctionMetadata<(), ()> for unsafe fn() {
+impl FunctionMetadata<()> for unsafe fn() {
     fn entity(&self) -> FunctionMetadataEntity {
         FunctionMetadataEntity { arguments: vec![], retval: None, path: self.path() }
     }
@@ -88,25 +88,25 @@ impl FunctionMetadata<(), ()> for unsafe fn() {
 
 macro_rules! impl_fn {
     ($($T:ident),* $(,)?) => {
-        impl<$($T: SqlTranslatable,)* Output: SqlTranslatable> FunctionMetadata<($($T,)*), Output> for fn($($T,)*) -> Output {
+        impl<$($T: SqlTranslatable,)* R: SqlTranslatable> FunctionMetadata<($($T,)*)> for fn($($T,)*) -> R {
             fn entity(&self) -> FunctionMetadataEntity {
                 FunctionMetadataEntity {
                     arguments: vec![$(PhantomData::<$T>.entity()),+],
-                    retval: Some(PhantomData::<Output>.entity()),
+                    retval: Some(PhantomData::<R>.entity()),
                     path: self.path(),
                 }
             }
         }
-        impl<$($T: SqlTranslatable,)* Output: SqlTranslatable> FunctionMetadata<($($T,)*), Output> for unsafe fn($($T,)*) -> Output {
+        impl<$($T: SqlTranslatable,)* R: SqlTranslatable> FunctionMetadata<($($T,)*)> for unsafe fn($($T,)*) -> R {
             fn entity(&self) -> FunctionMetadataEntity {
                 FunctionMetadataEntity {
                     arguments: vec![$(PhantomData::<$T>.entity()),+],
-                    retval: Some(PhantomData::<Output>.entity()),
+                    retval: Some(PhantomData::<R>.entity()),
                     path: self.path(),
                 }
             }
         }
-        impl<$($T: SqlTranslatable,)*> FunctionMetadata<($($T,)*), ()> for fn($($T,)*) {
+        impl<$($T: SqlTranslatable,)*> FunctionMetadata<($($T,)*)> for fn($($T,)*) {
             fn entity(&self) -> FunctionMetadataEntity {
                 FunctionMetadataEntity {
                     arguments: vec![$(PhantomData::<$T>.entity()),+],
@@ -115,7 +115,7 @@ macro_rules! impl_fn {
                 }
             }
         }
-        impl<$($T: SqlTranslatable,)*> FunctionMetadata<($($T,)*), ()> for unsafe fn($($T,)*) {
+        impl<$($T: SqlTranslatable,)*> FunctionMetadata<($($T,)*)> for unsafe fn($($T,)*) {
             fn entity(&self) -> FunctionMetadataEntity {
                 FunctionMetadataEntity {
                     arguments: vec![$(PhantomData::<$T>.entity()),+],
