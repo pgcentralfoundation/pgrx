@@ -51,7 +51,7 @@ where
             arguments: vec![],
             retval: {
                 let marker: PhantomData<R> = PhantomData;
-                Some(marker.entity())
+                marker.entity()
             },
             path: self.path(),
         }
@@ -67,22 +67,10 @@ where
             arguments: vec![],
             retval: {
                 let marker: PhantomData<R> = PhantomData;
-                Some(marker.entity())
+                marker.entity()
             },
             path: self.path(),
         }
-    }
-}
-
-impl FunctionMetadata<()> for fn() {
-    fn entity(&self) -> FunctionMetadataEntity {
-        FunctionMetadataEntity { arguments: vec![], retval: None, path: self.path() }
-    }
-}
-
-impl FunctionMetadata<()> for unsafe fn() {
-    fn entity(&self) -> FunctionMetadataEntity {
-        FunctionMetadataEntity { arguments: vec![], retval: None, path: self.path() }
     }
 }
 
@@ -92,7 +80,7 @@ macro_rules! impl_fn {
             fn entity(&self) -> FunctionMetadataEntity {
                 FunctionMetadataEntity {
                     arguments: vec![$(PhantomData::<$T>.entity()),+],
-                    retval: Some(PhantomData::<R>.entity()),
+                    retval: PhantomData::<R>.entity(),
                     path: self.path(),
                 }
             }
@@ -101,25 +89,7 @@ macro_rules! impl_fn {
             fn entity(&self) -> FunctionMetadataEntity {
                 FunctionMetadataEntity {
                     arguments: vec![$(PhantomData::<$T>.entity()),+],
-                    retval: Some(PhantomData::<R>.entity()),
-                    path: self.path(),
-                }
-            }
-        }
-        impl<$($T: SqlTranslatable,)*> FunctionMetadata<($($T,)*)> for fn($($T,)*) {
-            fn entity(&self) -> FunctionMetadataEntity {
-                FunctionMetadataEntity {
-                    arguments: vec![$(PhantomData::<$T>.entity()),+],
-                    retval: None,
-                    path: self.path(),
-                }
-            }
-        }
-        impl<$($T: SqlTranslatable,)*> FunctionMetadata<($($T,)*)> for unsafe fn($($T,)*) {
-            fn entity(&self) -> FunctionMetadataEntity {
-                FunctionMetadataEntity {
-                    arguments: vec![$(PhantomData::<$T>.entity()),+],
-                    retval: None,
+                    retval: PhantomData::<R>.entity(),
                     path: self.path(),
                 }
             }

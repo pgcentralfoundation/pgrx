@@ -21,7 +21,7 @@ use super::{ArgumentError, Returns, ReturnsError, SqlMapping};
 #[derive(Clone, Debug, Hash, Eq, PartialEq, Ord, PartialOrd)]
 pub struct FunctionMetadataEntity {
     pub arguments: Vec<FunctionMetadataTypeEntity>,
-    pub retval: Option<FunctionMetadataTypeEntity>,
+    pub retval: FunctionMetadataTypeEntity,
     pub path: &'static str,
 }
 
