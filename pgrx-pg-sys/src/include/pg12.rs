@@ -31587,6 +31587,27 @@ extern "C" {
         typeName: *const ::std::os::raw::c_char,
         typeNamespace: Oid,
     ) -> bool;
+    pub fn RelationCreateStorage(
+        rnode: RelFileNode,
+        relpersistence: ::std::os::raw::c_char,
+    ) -> SMgrRelation;
+    pub fn RelationDropStorage(rel: Relation);
+    pub fn RelationPreserveStorage(rnode: RelFileNode, atCommit: bool);
+    pub fn RelationTruncate(rel: Relation, nblocks: BlockNumber);
+    pub fn RelationCopyStorage(
+        src: SMgrRelation,
+        dst: SMgrRelation,
+        forkNum: ForkNumber,
+        relpersistence: ::std::os::raw::c_char,
+    );
+    pub fn smgrDoPendingDeletes(isCommit: bool);
+    pub fn smgrGetPendingDeletes(
+        forCommit: bool,
+        ptr: *mut *mut RelFileNode,
+    ) -> ::std::os::raw::c_int;
+    pub fn AtSubCommit_smgr();
+    pub fn AtSubAbort_smgr();
+    pub fn PostPrepare_smgr();
     pub fn CommentObject(stmt: *mut CommentStmt) -> ObjectAddress;
     pub fn DeleteComments(oid: Oid, classoid: Oid, subid: int32);
     pub fn CreateComments(
