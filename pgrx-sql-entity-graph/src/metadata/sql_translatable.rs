@@ -65,10 +65,6 @@ pub enum SqlMapping {
     Composite {
         array_brackets: bool,
     },
-    /// Some types are still directly from source
-    Source {
-        array_brackets: bool,
-    },
     /// Placeholder for some types with no simple translation
     Skip,
 }
@@ -185,9 +181,6 @@ where
                 Ok(SqlMapping::Composite { array_brackets: _ }) => {
                     Ok(SqlMapping::Composite { array_brackets: true })
                 }
-                Ok(SqlMapping::Source { array_brackets: _ }) => {
-                    Ok(SqlMapping::Source { array_brackets: true })
-                }
                 Ok(SqlMapping::Skip) => Ok(SqlMapping::Skip),
                 err @ Err(_) => err,
             },
@@ -203,9 +196,6 @@ where
                 }
                 Ok(Returns::One(SqlMapping::Composite { array_brackets: _ })) => {
                     Ok(Returns::One(SqlMapping::Composite { array_brackets: true }))
-                }
-                Ok(Returns::One(SqlMapping::Source { array_brackets: _ })) => {
-                    Ok(Returns::One(SqlMapping::Source { array_brackets: true }))
                 }
                 Ok(Returns::One(SqlMapping::Skip)) => Ok(Returns::One(SqlMapping::Skip)),
                 Ok(Returns::SetOf(_)) => Err(ReturnsError::SetOfInArray),
@@ -234,15 +224,6 @@ unsafe impl SqlTranslatable for i32 {
     }
     fn return_sql() -> Result<Returns, ReturnsError> {
         Ok(Returns::One(SqlMapping::literal("INT")))
-    }
-}
-
-unsafe impl SqlTranslatable for u32 {
-    fn argument_sql() -> Result<SqlMapping, ArgumentError> {
-        Ok(SqlMapping::Source { array_brackets: false })
-    }
-    fn return_sql() -> Result<Returns, ReturnsError> {
-        Ok(Returns::One(SqlMapping::Source { array_brackets: false }))
     }
 }
 
