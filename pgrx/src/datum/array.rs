@@ -915,7 +915,6 @@ where
             SqlMapping::As(sql) => Ok(SqlMapping::As(format!("{sql}[]"))),
             SqlMapping::Skip => Err(ArgumentError::SkipInArray),
             SqlMapping::Composite { .. } => Ok(SqlMapping::Composite { array_brackets: true }),
-            SqlMapping::Source { .. } => Ok(SqlMapping::Source { array_brackets: true }),
         }
     }
 
@@ -926,9 +925,6 @@ where
             }
             Returns::One(SqlMapping::Composite { array_brackets: _ }) => {
                 Ok(Returns::One(SqlMapping::Composite { array_brackets: true }))
-            }
-            Returns::One(SqlMapping::Source { array_brackets: _ }) => {
-                Ok(Returns::One(SqlMapping::Source { array_brackets: true }))
             }
             Returns::One(SqlMapping::Skip) => Err(ReturnsError::SkipInArray),
             Returns::SetOf(_) => Err(ReturnsError::SetOfInArray),
@@ -946,7 +942,6 @@ where
             SqlMapping::As(sql) => Ok(SqlMapping::As(format!("{sql}[]"))),
             SqlMapping::Skip => Err(ArgumentError::SkipInArray),
             SqlMapping::Composite { .. } => Ok(SqlMapping::Composite { array_brackets: true }),
-            SqlMapping::Source { .. } => Ok(SqlMapping::Source { array_brackets: true }),
         }
     }
 
@@ -957,9 +952,6 @@ where
             }
             Returns::One(SqlMapping::Composite { array_brackets: _ }) => {
                 Ok(Returns::One(SqlMapping::Composite { array_brackets: true }))
-            }
-            Returns::One(SqlMapping::Source { array_brackets: _ }) => {
-                Ok(Returns::One(SqlMapping::Source { array_brackets: true }))
             }
             Returns::One(SqlMapping::Skip) => Err(ReturnsError::SkipInArray),
             Returns::SetOf(_) => Err(ReturnsError::SetOfInArray),
