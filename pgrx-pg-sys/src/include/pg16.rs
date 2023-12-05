@@ -34561,6 +34561,34 @@ extern "C" {
         rangeTypeName: *const ::std::os::raw::c_char,
         typeNamespace: Oid,
     ) -> *mut ::std::os::raw::c_char;
+    pub fn RelationCreateStorage(
+        rlocator: RelFileLocator,
+        relpersistence: ::std::os::raw::c_char,
+        register_delete: bool,
+    ) -> SMgrRelation;
+    pub fn RelationDropStorage(rel: Relation);
+    pub fn RelationPreserveStorage(rlocator: RelFileLocator, atCommit: bool);
+    pub fn RelationPreTruncate(rel: Relation);
+    pub fn RelationTruncate(rel: Relation, nblocks: BlockNumber);
+    pub fn RelationCopyStorage(
+        src: SMgrRelation,
+        dst: SMgrRelation,
+        forkNum: ForkNumber,
+        relpersistence: ::std::os::raw::c_char,
+    );
+    pub fn RelFileLocatorSkippingWAL(rlocator: RelFileLocator) -> bool;
+    pub fn EstimatePendingSyncsSpace() -> Size;
+    pub fn SerializePendingSyncs(maxSize: Size, startAddress: *mut ::std::os::raw::c_char);
+    pub fn RestorePendingSyncs(startAddress: *mut ::std::os::raw::c_char);
+    pub fn smgrDoPendingDeletes(isCommit: bool);
+    pub fn smgrDoPendingSyncs(isCommit: bool, isParallelWorker: bool);
+    pub fn smgrGetPendingDeletes(
+        forCommit: bool,
+        ptr: *mut *mut RelFileLocator,
+    ) -> ::std::os::raw::c_int;
+    pub fn AtSubCommit_smgr();
+    pub fn AtSubAbort_smgr();
+    pub fn PostPrepare_smgr();
     pub fn CommentObject(stmt: *mut CommentStmt) -> ObjectAddress;
     pub fn DeleteComments(oid: Oid, classoid: Oid, subid: int32);
     pub fn CreateComments(
@@ -44423,6 +44451,7 @@ extern "C" {
     pub static mut namespace_search_path: *mut ::std::os::raw::c_char;
     pub static mut object_access_hook: object_access_hook_type;
     pub static mut object_access_hook_str: object_access_hook_type_str;
+    pub static mut wal_skip_threshold: ::std::os::raw::c_int;
     pub static mut Array_nulls: bool;
     pub static mut ExplainOneQuery_hook: ExplainOneQuery_hook_type;
     pub static mut explain_get_index_name_hook: explain_get_index_name_hook_type;
