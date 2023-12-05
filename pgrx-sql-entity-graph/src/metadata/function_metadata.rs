@@ -30,7 +30,7 @@ type FunctionPointer = fn(i32) -> String;
 let marker: FunctionPointer = floof;
 let metadata = pgrx_sql_entity_graph::metadata::FunctionMetadata::entity(&marker);
 assert_eq!(
-    metadata.retval.unwrap().return_sql,
+    metadata.retval.return_sql,
     Ok(Returns::One(SqlMapping::As("TEXT".to_string()))),
 );
 ```
