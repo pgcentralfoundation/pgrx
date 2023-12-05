@@ -65,10 +65,6 @@ pub enum SqlMapping {
     Composite {
         array_brackets: bool,
     },
-    /// Some types are still directly from source
-    Source {
-        array_brackets: bool,
-    },
     /// Placeholder for some types with no simple translation
     Skip,
 }

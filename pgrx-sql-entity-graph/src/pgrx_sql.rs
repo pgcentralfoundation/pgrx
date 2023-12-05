@@ -426,12 +426,6 @@ impl PgrxSql {
         })
     }
 
-    pub fn source_only_to_sql_type(&self, _ty_source: &str) -> Option<String> {
-        // HACK for `Result<T, E>`
-        // ...well, actually, nothing!
-        None
-    }
-
     pub fn get_module_pathname(&self) -> String {
         if self.versioned_so {
             let extname = &self.extension_name;
