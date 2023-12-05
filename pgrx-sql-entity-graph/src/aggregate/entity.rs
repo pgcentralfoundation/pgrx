@@ -269,22 +269,10 @@ impl ToSql for PgAggregateEntity {
                     .ok_or_else(|| {
                         eyre!("Macro expansion time suggested a composite_type!() in return")
                     }),
-                Ok(SqlMapping::Source { array_brackets }) => {
-                    let sql = context
-                        .source_only_to_sql_type(used_ty.ty_source)
-                        .map(|v| fmt::with_array_brackets(v, array_brackets))
-                        .ok_or_else(|| {
-                            eyre!("Macro expansion time suggested a source only mapping in return")
-                        })?;
-                    Ok(sql)
-                }
                 Ok(SqlMapping::Skip) => {
                     Err(eyre!("Cannot use skipped SQL translatable type as aggregate const type"))
                 }
-                Err(err) => match context.source_only_to_sql_type(used_ty.ty_source) {
-                    Some(source_only_mapping) => Ok(source_only_mapping.to_string()),
-                    None => Err(err).wrap_err("While mapping argument"),
-                },
+                Err(err) => Err(err).wrap_err("While mapping argument"),
             }
         };
 
@@ -364,27 +352,8 @@ impl ToSql for PgAggregateEntity {
                                     )
                                     })?
                             }
-                            Ok(SqlMapping::Source {
-                                array_brackets,
-                            }) => context
-                                    .source_only_to_sql_type(arg.used_ty.ty_source)
-                                    .map(|v| {
-                                        fmt::with_array_brackets(v, array_brackets)
-                                    })
-                                    .ok_or_else(|| {
-                                        eyre!(
-                                        "Macro expansion time suggested a source only mapping in return"
-                                    )
-                                    })?,
                             Ok(SqlMapping::Skip) => return Err(eyre!("Got a skipped SQL translatable type in aggregate args, this is not permitted")),
-                            Err(err) => {
-                                match context.source_only_to_sql_type(arg.used_ty.ty_source) {
-                                    Some(source_only_mapping) => {
-                                        source_only_mapping.to_string()
-                                    }
-                                    None => return Err(err).wrap_err("While mapping argument"),
-                                }
-                            }
+                            Err(err) => return Err(err).wrap_err("While mapping argument")
                         },
                        variadic = if arg.used_ty.variadic { "VARIADIC " } else { "" },
                        maybe_comma = if needs_comma { ", " } else { " " },
