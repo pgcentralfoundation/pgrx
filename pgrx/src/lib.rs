@@ -228,10 +228,8 @@ macro_rules! pg_magic_func {
         #[link_name = "Pg_magic_func"]
         #[doc(hidden)]
         pub extern "C" fn Pg_magic_func() -> &'static ::pgrx::pg_sys::Pg_magic_struct {
-            use ::core::mem::size_of;
-
             static MY_MAGIC: ::pgrx::pg_sys::Pg_magic_struct = ::pgrx::pg_sys::Pg_magic_struct {
-                len: size_of::<::pgrx::pg_sys::Pg_magic_struct>() as i32,
+                len: ::core::mem::size_of::<::pgrx::pg_sys::Pg_magic_struct>() as i32,
                 version: ::pgrx::pg_sys::PG_VERSION_NUM as i32 / 100,
                 funcmaxargs: ::pgrx::pg_sys::FUNC_MAX_ARGS as i32,
                 indexmaxkeys: ::pgrx::pg_sys::INDEX_MAX_KEYS as i32,
