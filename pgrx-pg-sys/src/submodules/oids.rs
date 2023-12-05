@@ -63,7 +63,7 @@ impl Oid {
     /// nor cite SQL statements for misdemeanors, nor even truly stop you from foolishness.
     /// Even "trustworthy" is meant here in a similar sense to how raw pointers can be "trustworthy".
     /// Often, you should still check if it's null.
-    #[deprecated(since = "0.12.0", note = "safely converts via SPI, use pg_sys::Oid::from(u32)")]
+    #[deprecated(since = "0.11.2", note = "safely converts via SPI, use pg_sys::Oid::from(u32)")]
     pub const unsafe fn from_u32_unchecked(id: u32) -> Oid {
         Oid(id)
     }
