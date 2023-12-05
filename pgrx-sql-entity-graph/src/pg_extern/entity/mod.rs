@@ -226,7 +226,7 @@ impl ToSql for PgExternEntity {
                         _ => false,
                     })
                     .ok_or_else(|| eyre!("Could not find return type in graph."))?;
-                let metadata_retval = self.metadata.retval.clone().ok_or_else(|| eyre!("Macro expansion time and SQL resolution time had differing opinions about the return value existing"))?;
+                let metadata_retval = self.metadata.retval.clone();
                 let sql_type = match metadata_retval.return_sql {
                     Ok(Returns::One(SqlMapping::As(ref sql))) => sql.clone(),
                     Ok(Returns::One(SqlMapping::Composite { array_brackets })) => fmt::with_array_brackets(ty.composite_type.unwrap().into(), array_brackets),
@@ -256,7 +256,7 @@ impl ToSql for PgExternEntity {
                         _ => false,
                     })
                     .ok_or_else(|| eyre!("Could not find return type in graph."))?;
-                let metadata_retval = self.metadata.retval.clone().ok_or_else(|| eyre!("Macro expansion time and SQL resolution time had differing opinions about the return value existing"))?;
+                let metadata_retval = self.metadata.retval.clone();
                 let sql_type = match metadata_retval.return_sql {
                         Ok(Returns::SetOf(SqlMapping::As(ref sql))) => sql.clone(),
                         Ok(Returns::SetOf(SqlMapping::Composite { array_brackets })) => fmt::with_array_brackets(ty.composite_type.unwrap().into(), array_brackets),
@@ -272,7 +272,7 @@ impl ToSql for PgExternEntity {
             }
             PgExternReturnEntity::Iterated { tys: table_items, optional: _, result: _ } => {
                 let mut items = String::new();
-                let metadata_retval = self.metadata.retval.clone().ok_or_else(|| eyre!("Macro expansion time and SQL resolution time had differing opinions about the return value existing"))?;
+                let metadata_retval = self.metadata.retval.clone();
                 let metadata_retval_sqls: Vec<String> = match metadata_retval.return_sql {
                         Ok(Returns::Table(variants)) => {
                             variants.iter().enumerate().map(|(idx, variant)| {

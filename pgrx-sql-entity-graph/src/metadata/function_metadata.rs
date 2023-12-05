@@ -30,96 +30,66 @@ type FunctionPointer = fn(i32) -> String;
 let marker: FunctionPointer = floof;
 let metadata = pgrx_sql_entity_graph::metadata::FunctionMetadata::entity(&marker);
 assert_eq!(
-    metadata.retval.unwrap().return_sql,
+    metadata.retval.return_sql,
     Ok(Returns::One(SqlMapping::As("TEXT".to_string()))),
 );
 ```
  */
-pub trait FunctionMetadata<Inputs, Output> {
+pub trait FunctionMetadata<A> {
     fn path(&self) -> &'static str {
         core::any::type_name::<Self>()
     }
     fn entity(&self) -> FunctionMetadataEntity;
 }
 
-impl<Output> FunctionMetadata<(), Output> for fn() -> Output
+impl<R> FunctionMetadata<()> for fn() -> R
 where
-    Output: SqlTranslatable,
+    R: SqlTranslatable,
 {
     fn entity(&self) -> FunctionMetadataEntity {
         FunctionMetadataEntity {
             arguments: vec![],
             retval: {
-                let marker: PhantomData<Output> = PhantomData;
-                Some(marker.entity())
+                let marker: PhantomData<R> = PhantomData;
+                marker.entity()
             },
             path: self.path(),
         }
     }
 }
 
-impl<Output> FunctionMetadata<(), Output> for unsafe fn() -> Output
+impl<R> FunctionMetadata<()> for unsafe fn() -> R
 where
-    Output: SqlTranslatable,
+    R: SqlTranslatable,
 {
     fn entity(&self) -> FunctionMetadataEntity {
         FunctionMetadataEntity {
             arguments: vec![],
             retval: {
-                let marker: PhantomData<Output> = PhantomData;
-                Some(marker.entity())
+                let marker: PhantomData<R> = PhantomData;
+                marker.entity()
             },
             path: self.path(),
         }
-    }
-}
-
-impl FunctionMetadata<(), ()> for fn() {
-    fn entity(&self) -> FunctionMetadataEntity {
-        FunctionMetadataEntity { arguments: vec![], retval: None, path: self.path() }
-    }
-}
-
-impl FunctionMetadata<(), ()> for unsafe fn() {
-    fn entity(&self) -> FunctionMetadataEntity {
-        FunctionMetadataEntity { arguments: vec![], retval: None, path: self.path() }
     }
 }
 
 macro_rules! impl_fn {
     ($($T:ident),* $(,)?) => {
-        impl<$($T: SqlTranslatable,)* Output: SqlTranslatable> FunctionMetadata<($($T,)*), Output> for fn($($T,)*) -> Output {
+        impl<$($T: SqlTranslatable,)* R: SqlTranslatable> FunctionMetadata<($($T,)*)> for fn($($T,)*) -> R {
             fn entity(&self) -> FunctionMetadataEntity {
                 FunctionMetadataEntity {
                     arguments: vec![$(PhantomData::<$T>.entity()),+],
-                    retval: Some(PhantomData::<Output>.entity()),
+                    retval: PhantomData::<R>.entity(),
                     path: self.path(),
                 }
             }
         }
-        impl<$($T: SqlTranslatable,)* Output: SqlTranslatable> FunctionMetadata<($($T,)*), Output> for unsafe fn($($T,)*) -> Output {
+        impl<$($T: SqlTranslatable,)* R: SqlTranslatable> FunctionMetadata<($($T,)*)> for unsafe fn($($T,)*) -> R {
             fn entity(&self) -> FunctionMetadataEntity {
                 FunctionMetadataEntity {
                     arguments: vec![$(PhantomData::<$T>.entity()),+],
-                    retval: Some(PhantomData::<Output>.entity()),
-                    path: self.path(),
-                }
-            }
-        }
-        impl<$($T: SqlTranslatable,)*> FunctionMetadata<($($T,)*), ()> for fn($($T,)*) {
-            fn entity(&self) -> FunctionMetadataEntity {
-                FunctionMetadataEntity {
-                    arguments: vec![$(PhantomData::<$T>.entity()),+],
-                    retval: None,
-                    path: self.path(),
-                }
-            }
-        }
-        impl<$($T: SqlTranslatable,)*> FunctionMetadata<($($T,)*), ()> for unsafe fn($($T,)*) {
-            fn entity(&self) -> FunctionMetadataEntity {
-                FunctionMetadataEntity {
-                    arguments: vec![$(PhantomData::<$T>.entity()),+],
-                    retval: None,
+                    retval: PhantomData::<R>.entity(),
                     path: self.path(),
                 }
             }

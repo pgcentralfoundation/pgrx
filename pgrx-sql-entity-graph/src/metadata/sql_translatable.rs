@@ -117,10 +117,7 @@ pub unsafe trait SqlTranslatable {
     }
 }
 
-unsafe impl<E> SqlTranslatable for Result<(), E>
-where
-    E: Any + Display,
-{
+unsafe impl SqlTranslatable for () {
     fn argument_sql() -> Result<SqlMapping, ArgumentError> {
         Err(ArgumentError::NotValidAsArgument("()"))
     }
