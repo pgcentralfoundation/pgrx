@@ -75,20 +75,29 @@ where
 }
 
 macro_rules! impl_fn {
-    ($($T:ident),* $(,)?) => {
-        impl<$($T: SqlTranslatable,)* R: SqlTranslatable> FunctionMetadata<($($T,)*)> for fn($($T,)*) -> R {
+    ($($A:ident),* $(,)?) => {
+        impl<$($A,)* R, F> FunctionMetadata<($($A,)*)> for F
+        where
+            $($A: SqlTranslatable,)*
+            R: SqlTranslatable,
+            F: Fn($($A,)*) -> R,
+        {
             fn entity(&self) -> FunctionMetadataEntity {
                 FunctionMetadataEntity {
-                    arguments: vec![$(PhantomData::<$T>.entity()),+],
+                    arguments: vec![$(PhantomData::<$A>.entity()),+],
                     retval: PhantomData::<R>.entity(),
                     path: self.path(),
                 }
             }
         }
-        impl<$($T: SqlTranslatable,)* R: SqlTranslatable> FunctionMetadata<($($T,)*)> for unsafe fn($($T,)*) -> R {
+        impl<$($A,)* R> FunctionMetadata<($($A,)*)> for unsafe fn($($A,)*) -> R
+        where
+            $($A: SqlTranslatable,)*
+            R: SqlTranslatable,
+        {
             fn entity(&self) -> FunctionMetadataEntity {
                 FunctionMetadataEntity {
-                    arguments: vec![$(PhantomData::<$T>.entity()),+],
+                    arguments: vec![$(PhantomData::<$A>.entity()),+],
                     retval: PhantomData::<R>.entity(),
                     path: self.path(),
                 }
