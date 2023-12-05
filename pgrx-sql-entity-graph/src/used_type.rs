@@ -82,7 +82,7 @@ impl UsedType {
                 match archetype.ident.to_string().as_str() {
                     "variadic" => {
                         let ty: syn::Type = syn::parse2(mac.tokens.clone())?;
-                        syn::parse_quote! { ::pgrx::datum::VariadicArray<'static, #ty>}
+                        syn::parse_quote! { ::pgrx::datum::VariadicArray<'_, #ty>}
                     }
                     _ => syn::Type::Macro(macro_pat),
                 }
@@ -105,11 +105,9 @@ impl UsedType {
                         ))?;
                     }
                     "composite_type" => {
-                        let composite_type = Some(handle_composite_type_macro(mac)?);
-                        let ty = syn::parse_quote! {
-                            ::pgrx::heap_tuple::PgHeapTuple<'static, ::pgrx::pgbox::AllocatedByRust>
-                        };
-                        (ty, composite_type)
+                        let composite_macro = handle_composite_type_macro(mac)?;
+                        let ty = composite_macro.expand_with_lifetime();
+                        (ty, Some(composite_macro))
                     }
                     _ => (syn::Type::Macro(macro_pat), None),
                 }
@@ -428,12 +426,12 @@ fn resolve_variadic_array_inner(
 
     match last.arguments {
         syn::PathArguments::AngleBracketed(ref mut path_arg) => {
-            match path_arg.args.first_mut() {
-                Some(syn::GenericArgument::Lifetime(lifetime)) => {
-                    lifetime.ident = syn::Ident::new("static", lifetime.ident.span())
-                }
-                _ => path_arg.args.insert(0, syn::parse_quote!('static)),
-            };
+            // match path_arg.args.first_mut() {
+            //     Some(syn::GenericArgument::Lifetime(lifetime)) => {
+            //         lifetime.ident = syn::Ident::new("static", lifetime.ident.span())
+            //     }
+            //     _ => path_arg.args.insert(0, syn::parse_quote!('static)),
+            // };
             match path_arg.args.last() {
                 // TODO: Lifetime????
                 Some(syn::GenericArgument::Type(ty)) => match ty.clone() {
@@ -492,12 +490,12 @@ fn resolve_array_inner(
 
     match last.arguments {
         syn::PathArguments::AngleBracketed(ref mut path_arg) => {
-            match path_arg.args.first_mut() {
-                Some(syn::GenericArgument::Lifetime(lifetime)) => {
-                    lifetime.ident = syn::Ident::new("static", lifetime.ident.span())
-                }
-                _ => path_arg.args.insert(0, syn::parse_quote!('static)),
-            };
+            // match path_arg.args.first_mut() {
+            //     Some(syn::GenericArgument::Lifetime(lifetime)) => {
+            //         lifetime.ident = syn::Ident::new("static", lifetime.ident.span())
+            //     }
+            //     _ => path_arg.args.insert(0, syn::parse_quote!('static)),
+            // };
             match path_arg.args.last() {
                 Some(syn::GenericArgument::Type(ty)) => match ty.clone() {
                     syn::Type::Macro(macro_pat) => {
@@ -512,7 +510,7 @@ fn resolve_array_inner(
                                 let comp_ty = composite_mac.expand_with_lifetime();
                                 let sql = Some(composite_mac);
                                 let ty = syn::parse_quote! {
-                                    ::pgrx::datum::Array<'static, #comp_ty>
+                                    ::pgrx::datum::Array<'_, #comp_ty>
                                 };
                                 Ok((ty, sql))
                             }
@@ -528,7 +526,7 @@ fn resolve_array_inner(
                             "Option" => {
                                 let (inner_ty, expr) = resolve_option_inner(arg_type_path)?;
                                 let wrapped_ty = syn::parse_quote! {
-                                    ::pgrx::datum::Array<'static, #inner_ty>
+                                    ::pgrx::datum::Array<'_, #inner_ty>
                                 };
                                 Ok((wrapped_ty, expr))
                             }

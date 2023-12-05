@@ -22,6 +22,7 @@ pub fn staticize_lifetimes_in_type_path(value: syn::TypePath) -> syn::TypePath {
 }
 
 pub fn staticize_lifetimes(value: &mut syn::Type) {
+    #[cfg(not)]
     match value {
         syn::Type::Path(syn::TypePath { path: syn::Path { segments, .. }, .. }) => segments
             .iter_mut()
