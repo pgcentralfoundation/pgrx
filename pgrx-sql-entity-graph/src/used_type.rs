@@ -447,7 +447,7 @@ fn resolve_variadic_array_inner(
                                 let comp_ty = composite_mac.expand_with_lifetime();
                                 let sql = Some(composite_mac);
                                 let ty = syn::parse_quote! {
-                                    ::pgrx::datum::VariadicArray<'static, #comp_ty>
+                                    ::pgrx::datum::VariadicArray<'_, #comp_ty>
                                 };
                                 Ok((ty, sql))
                             }
@@ -462,7 +462,7 @@ fn resolve_variadic_array_inner(
                         if last.ident == "Option" {
                             let (inner_ty, expr) = resolve_option_inner(arg_type_path)?;
                             let wrapped_ty = syn::parse_quote! {
-                                ::pgrx::datum::VariadicArray<'static, #inner_ty>
+                                ::pgrx::datum::VariadicArray<'_, #inner_ty>
                             };
                             Ok((wrapped_ty, expr))
                         } else {
