@@ -15,8 +15,6 @@ mod hstore_clone;
 mod ordered;
 mod rust_enum;
 
-use pgrx::prelude::*;
-
 pgrx::pg_module_magic!();
 
 #[cfg(test)]

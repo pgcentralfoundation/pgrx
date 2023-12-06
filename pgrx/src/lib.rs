@@ -227,43 +227,21 @@ macro_rules! pg_magic_func {
         #[allow(unused)]
         #[link_name = "Pg_magic_func"]
         #[doc(hidden)]
-        pub extern "C" fn Pg_magic_func() -> &'static pgrx::pg_sys::Pg_magic_struct {
-            use core::mem::size_of;
-            use pgrx;
-
-            #[cfg(feature = "pg12")]
-            const MY_MAGIC: pgrx::pg_sys::Pg_magic_struct = pgrx::pg_sys::Pg_magic_struct {
-                len: size_of::<pgrx::pg_sys::Pg_magic_struct>() as i32,
-                version: pgrx::pg_sys::PG_VERSION_NUM as i32 / 100,
-                funcmaxargs: pgrx::pg_sys::FUNC_MAX_ARGS as i32,
-                indexmaxkeys: pgrx::pg_sys::INDEX_MAX_KEYS as i32,
-                namedatalen: pgrx::pg_sys::NAMEDATALEN as i32,
-                float4byval: pgrx::pg_sys::USE_FLOAT4_BYVAL as i32,
+        pub extern "C" fn Pg_magic_func() -> &'static ::pgrx::pg_sys::Pg_magic_struct {
+            static MY_MAGIC: ::pgrx::pg_sys::Pg_magic_struct = ::pgrx::pg_sys::Pg_magic_struct {
+                len: ::core::mem::size_of::<::pgrx::pg_sys::Pg_magic_struct>() as i32,
+                version: ::pgrx::pg_sys::PG_VERSION_NUM as i32 / 100,
+                funcmaxargs: ::pgrx::pg_sys::FUNC_MAX_ARGS as i32,
+                indexmaxkeys: ::pgrx::pg_sys::INDEX_MAX_KEYS as i32,
+                namedatalen: ::pgrx::pg_sys::NAMEDATALEN as i32,
+                #[cfg(feature = "pg12")]
+                float4byval: ::pgrx::pg_sys::USE_FLOAT4_BYVAL as i32,
                 float8byval: cfg!(target_pointer_width = "64") as i32,
-            };
-
-            #[cfg(any(feature = "pg13", feature = "pg14"))]
-            const MY_MAGIC: pgrx::pg_sys::Pg_magic_struct = pgrx::pg_sys::Pg_magic_struct {
-                len: size_of::<pgrx::pg_sys::Pg_magic_struct>() as i32,
-                version: pgrx::pg_sys::PG_VERSION_NUM as i32 / 100,
-                funcmaxargs: pgrx::pg_sys::FUNC_MAX_ARGS as i32,
-                indexmaxkeys: pgrx::pg_sys::INDEX_MAX_KEYS as i32,
-                namedatalen: pgrx::pg_sys::NAMEDATALEN as i32,
-                float8byval: cfg!(target_pointer_width = "64") as i32,
-            };
-
-            #[cfg(any(feature = "pg15", feature = "pg16"))]
-            const MY_MAGIC: pgrx::pg_sys::Pg_magic_struct = pgrx::pg_sys::Pg_magic_struct {
-                len: size_of::<pgrx::pg_sys::Pg_magic_struct>() as i32,
-                version: pgrx::pg_sys::PG_VERSION_NUM as i32 / 100,
-                funcmaxargs: pgrx::pg_sys::FUNC_MAX_ARGS as i32,
-                indexmaxkeys: pgrx::pg_sys::INDEX_MAX_KEYS as i32,
-                namedatalen: pgrx::pg_sys::NAMEDATALEN as i32,
-                float8byval: cfg!(target_pointer_width = "64") as i32,
+                #[cfg(any(feature = "pg15", feature = "pg16"))]
                 abi_extra: {
                     // we'll use what the bindings tell us, but if it ain't "PostgreSQL" then we'll
                     // raise a compilation error unless the `unsafe-postgres` feature is set
-                    let magic = pgrx::pg_sys::FMGR_ABI_EXTRA;
+                    let magic = ::pgrx::pg_sys::FMGR_ABI_EXTRA;
                     let mut abi = [0 as ::pgrx::ffi::c_char; 32];
                     let mut i = 0;
                     while i < magic.len() {
@@ -274,9 +252,9 @@ macro_rules! pg_magic_func {
                 },
             };
 
-            // go ahead and register our panic handler since Postgres
-            // calls this function first
-            pgrx::initialize();
+            // since Postgres calls this first, register our panic handler now
+            // so we don't unwind into C / Postgres
+            ::pgrx::pg_sys::panic::register_pg_guard_panic_hook();
 
             // return the magic
             &MY_MAGIC
@@ -349,18 +327,4 @@ pub(crate) enum Utf8Compat {
     Maybe,
     /// An "extended ASCII" encoding, so we're fine if we only touch ASCII
     Ascii,
-}
-
-/// Initialize the extension with Postgres
-///
-/// Sets up panic handling with [`pg_sys::panic::register_pg_guard_panic_hook`] to ensure that a crash within
-/// the extension does not adversely affect the entire server process.
-///
-/// ## Note
-///
-/// This is called automatically by the [`pg_module_magic!()`] macro and need not be called
-/// directly.
-#[allow(unused)]
-pub fn initialize() {
-    pg_sys::panic::register_pg_guard_panic_hook();
 }
