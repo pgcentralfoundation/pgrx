@@ -96,10 +96,17 @@ the alternative is a horrible pile of bash and regexen.
 
 # test suite
 
-Run in CI!
+This should be run in CI for every merge.
 
 ## pgrx-tests
 This currently contains both our test support framework and the actual test suite.
 
+Fortunately, the way this works is _almost_ magic enough to simply happen if you run `cargo test`.
+Unfortunately, due to the way that `#[pg_test]` works, the placement of test code is extremely
+constrained in terms of where it must be in code. Thus we have this additional crate.
+
 ## pgrx-examples
 Various example extensions one can define using pgrx.
+
+New features that introduce a noteworthy "kind" of extension or a feature for extensions not
+defined by the libraries per se should probably have an example added for them here.
