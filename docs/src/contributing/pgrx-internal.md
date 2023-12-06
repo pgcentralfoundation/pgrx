@@ -1,1 +1,106 @@
 # PGRX Internals
+
+There are three major components to pgrx:
+
+- [runtime libraries for extensions](#runtime-libraries)
+- [supporting build tools](#build-tools)
+- [correctness checks via the test suite](#test-suite)
+
+Though given that one component includes a pile of macros, and another component involves
+a rather sophisticated runtime element itself, the distinction often blurs.
+
+# runtime libraries
+
+## pgrx
+
+The main library that offers safe abstractions that wrap pgrx internals.
+
+### About macros and pgrx modules
+
+Currently, pgrx only assumes that pgrx is used as the primary interface. Most pgrx code is
+introduced by being generated via macros, which themselves may get used in odd situations.
+It is thus somewhat important to qualify most code that is introduced via macros using
+`::pgrx` along with some module, so that the actual top level crate named pgrx is used.
+
+Thus most every crate is named `pgrx-{module}` and also introduced as `pgrx::{module}`.
+This only includes other runtime libraries, not the build tooling.
+
+### pgrx::prelude
+
+Previously, the recommended way to use pgrx was to glob-import everything. However, this has
+a problem in that pgrx has over time evolved to have use-cases which do not involve exposing
+all the `unsafe fn` of pgrx and its extensional innards to the "end-user".
+In other words, PL/Rust was born. Thus the prelude was introduced to limit our concerns.
+
+The prelude's contents should thus focus mostly on safe code and common types.
+
+### Designing new abstractions
+
+New abstractions in pgrx should avoid assuming that they are the only interface to Postgres, as
+pgrx-based extensions are often used in combination with C-based extensions, or are backed by
+considerable custom FFI written by a programmer.
+
+## pgrx-pg-sys
+
+This crate comes with an extensive `build.rs` to generate bindings for every Postgres version.
+
+## pgrx-macros
+
+...whether this is a runtime library or a build tool is a philosophical argument.
+
+# build tools
+
+## pgrx-sql-entity-graph
+
+This crate may seem... somewhat distressing. It is a rather lot of code, some of it without
+obvious purpose. One may develop fantasies about deleting it wholesale.  Unfortunately, it serves
+an irreplaceable functionality in pgrx, even if its role could be reduced.
+
+A primary task for pgrx, accomplished via cargo-pgrx and support libraries, is to generate SQL.
+This allows programmers to avoid separately maintaining the SQL that installs the extension when
+`CREATE EXTENSION` runs. This is not merely a convenience: misdeclaring extensions, functions,
+types, and operators can in some cases cause illogical behavior from Postgres. The query executor
+may assume something based on the SQL definitions, causing it to interact with extensions in ways
+that return invalid query results or, depending on the nature of the extension, corrupt a table's
+active rows or index. While Postgres employs various techniques to detect such incorrect behaviors
+and will abort transactions and roll back if it does, and this may not be "undefined behavior" in
+Rust terms, it is at least as equally undesirable!
+
+However, Postgres imposes ordering constraints on how extensions are described to it, by rejecting
+invalid declarations of CREATE TYPE, CREATE FUNCTION, and so on, and has relatively few ways to
+issue any kind of "forward declaration". Thus, while handwritten SQL might tend to be ordered in
+ways that naturally satisfy this ordering, automated SQL generation technique requires sorting the
+SQL declarations to meet these constraints.
+
+Currently, this crate *also* performs the task of reasoning about various lifetime issues in Rust,
+and defining some interfaces for translating Rust types into and from SQL. It may be possible to
+separate this from the code that maintains aforementioned sorting information, at least somewhat.
+Or not.
+
+## cargo-pgrx
+
+Together with `pgrx-sql-entity-graph`, this implements a rather astounding hack:
+
+Various functions are injected into the Rust library, which are then dlopened and called to
+extract the required SQL!
+
+See [Forging SQL from Rust](../articles/forging-sql-from-rust.md) for more.
+
+## pgrx-pg-config
+
+This is effectively support library for the build.rs of pgrx-pg-sys and for cargo-pgrx.
+
+## pgrx-version-updater
+
+This tool just helps us update versions for various toml files in the repo, because
+the alternative is a horrible pile of bash and regexen.
+
+# test suite
+
+Run in CI!
+
+## pgrx-tests
+This currently contains both our test support framework and the actual test suite.
+
+## pgrx-examples
+Various example extensions one can define using pgrx.
