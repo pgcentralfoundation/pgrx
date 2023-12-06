@@ -17,13 +17,12 @@ The main library that offers safe abstractions that wrap pgrx internals.
 
 ### About macros and pgrx modules
 
-Currently, pgrx only assumes that pgrx is used as the primary interface. Most pgrx code is
-introduced by being generated via macros, which themselves may get used in odd situations.
-It is thus somewhat important to qualify most code that is introduced via macros using
-`::pgrx` along with some module, so that the actual top level crate named pgrx is used.
+Currently, PGRX (the collection of libraries and tools) only assumes that this crate is used as
+the primary interface. Most pgrx code is generated via macros, which themselves may get used in
+odd situations. It is thus somewhat important to qualify most code that is introduced via macros
+by using `::pgrx` along with some module, so that the actual top-level crate named pgrx is used.
 
-Thus most every crate is named `pgrx-{module}` and also introduced as `pgrx::{module}`.
-This only includes other runtime libraries, not the build tooling.
+Thus almost every library crate is named `pgrx-{module}` and also introduced as `pgrx::{module}`.
 
 ### pgrx::prelude
 
