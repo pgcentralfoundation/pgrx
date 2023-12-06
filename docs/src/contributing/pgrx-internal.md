@@ -101,9 +101,10 @@ This should be run in CI for every merge.
 ## pgrx-tests
 This currently contains both our test support framework and the actual test suite.
 
-Fortunately, the way this works is _almost_ magic enough to simply happen if you run `cargo test`.
+Fortunately, the way `#[pg_test]` works is magic enough to simply happen if you run `cargo test`.
 Unfortunately, due to the way that `#[pg_test]` works, the placement of test code is extremely
-constrained in terms of where it must be in code. Thus we have this additional crate.
+constrained in terms of where it must be in files. This is part of why we have this
+additional crate.
 
 ## pgrx-examples
 Various example extensions one can define using pgrx.
