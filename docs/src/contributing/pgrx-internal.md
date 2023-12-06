@@ -58,23 +58,26 @@ an irreplaceable functionality in pgrx, even if its role could be reduced.
 A primary task for pgrx, accomplished via cargo-pgrx and support libraries, is to generate SQL.
 This allows programmers to avoid separately maintaining the SQL that installs the extension when
 `CREATE EXTENSION` runs. This is not merely a convenience: misdeclaring extensions, functions,
-types, and operators can in some cases cause illogical behavior from Postgres. The query executor
-may assume something based on the SQL definitions, causing it to interact with extensions in ways
-that return invalid query results or, depending on the nature of the extension, corrupt a table's
-active rows or index. While Postgres employs various techniques to detect such incorrect behaviors
-and will abort transactions and roll back if it does, and this may not be "undefined behavior" in
-Rust terms, it is at least as equally undesirable!
+types, and operators can in some cases cause illogical behavior from Postgres.
 
-However, Postgres imposes ordering constraints on how extensions are described to it, by rejecting
-invalid declarations of CREATE TYPE, CREATE FUNCTION, and so on, and has relatively few ways to
+For instance, Postgres [optimizes queries based on `CREATE OPERATOR` DDL][operator-optimization].
+This means that an incorrect declaration of an operator can return invalid query results.
+An extension can even interact with PostgreSQL in more complicated ways that mean these types of
+assumptions could corrupts a table's active rows or index. Postgres employs various techniques to
+detect such incorrect behaviors, such that it will abort transactions and roll back if it does,
+and this may not be "undefined behavior" in Rust terms, but it is still undesirable!
+
+To limit this sort of problem, Postgres will reject known-invalid declarations of CREATE TYPE,
+CREATE FUNCTION, and so on. This imposes an ordering constraint, however, as "invalid" includes
+"referencing types or functions that do not yet exist", and Postgres has relatively few ways to
 issue any kind of "forward declaration". Thus, while handwritten SQL might tend to be ordered in
 ways that naturally satisfy this ordering, automated SQL generation technique requires sorting the
 SQL declarations to meet these constraints.
 
 Currently, this crate *also* performs the task of reasoning about various lifetime issues in Rust,
-and defining some interfaces for translating Rust types into and from SQL. It may be possible to
-separate this from the code that maintains aforementioned sorting information, at least somewhat.
-Or not.
+defining interfaces for translating Rust types to-and-from SQL, and some Rust code generation.
+It may be possible to separate this from code that maintains aforementioned sorting information,
+at least somewhat. Or not.
 
 ## cargo-pgrx
 
@@ -111,3 +114,8 @@ Various example extensions one can define using pgrx.
 
 New features that introduce a noteworthy "kind" of extension or a feature for extensions not
 defined by the libraries per se should probably have an example added for them here.
+
+
+<!-- Links -->
+
+[operator-optimization]: https://www.postgresql.org/docs/current/xoper-optimization.html
