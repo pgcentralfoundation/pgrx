@@ -1,3 +1,11 @@
+//! Memory Contexts in PostgreSQL, now with lifetimes.
+// "Why isn't this pgrx::mem or pgrx::memcxt?"
+// Postgres actually uses all of:
+// - mcxt
+// - memcxt
+// - mctx
+// Search engines will see "memc[tx]{2}" and assume you mean memcpy!
+// And it's nice-ish to have shorter lifetime names and have 'mcx consistently mean the lifetime.
 use crate::pg_sys;
 use core::{marker::PhantomData, ptr::NonNull};
 
