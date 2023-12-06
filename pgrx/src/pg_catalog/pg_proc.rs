@@ -8,7 +8,7 @@
 //LICENSE
 //LICENSE Use of this source code is governed by the MIT license that can be found in the LICENSE file.
 use crate::list::List;
-use crate::mem::MemCx;
+use crate::memcx::MemCx;
 use crate::{pg_sys, FromDatum, IntoDatum};
 use std::ptr::NonNull;
 

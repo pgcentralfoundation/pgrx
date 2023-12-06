@@ -12,7 +12,7 @@
 //! It functions similarly to a Rust [`Vec`], including iterator support, but provides separate
 //! understandings of [`List`][crate::pg_sys::List]s of [`pg_sys::Oid`]s, Integers, and Pointers.
 
-use crate::mem::MemCx;
+use crate::memcx::MemCx;
 use crate::pg_sys;
 use crate::seal::Sealed;
 use core::marker::PhantomData;

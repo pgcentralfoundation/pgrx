@@ -1,5 +1,5 @@
 use super::{Enlist, List, ListCell, ListHead};
-use crate::mem::MemCx;
+use crate::memcx::MemCx;
 use crate::pg_sys;
 use crate::seal::Sealed;
 use core::cmp;

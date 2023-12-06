@@ -13,7 +13,7 @@ use pgrx_pg_sys::ffi::pg_guard_ffi_boundary;
 use pgrx_pg_sys::PgTryBuilder;
 use std::panic::AssertUnwindSafe;
 
-use crate::mem;
+use crate::memcx;
 use crate::pg_catalog::pg_proc::{PgProc, ProArgMode, ProKind};
 use crate::seal::Sealed;
 use crate::{
@@ -333,7 +333,7 @@ fn lookup_fn(fname: &str, args: &[&dyn FnCallArg]) -> Result<pg_sys::Oid> {
     // function following the normal SEARCH_PATH rules, ensuring its argument type Oids
     // exactly match the ones from the user's input arguments.  It does not evaluate the
     // return type, so we'll have to do that later
-    mem::current_context(|mcx| {
+    memcx::current_context(|mcx| {
         let mut parts_list = List::<*mut std::ffi::c_void>::default();
         let result = PgTryBuilder::new(AssertUnwindSafe(|| unsafe {
             let arg_types = args.iter().map(|a| a.type_oid()).collect::<Vec<_>>();
@@ -439,7 +439,7 @@ fn create_default_value(pg_proc: &PgProc, argnum: usize) -> Result<Option<pg_sys
     }
 
     let default_argnum = argnum - non_default_args_cnt;
-    let node = mem::current_context(|mcx| {
+    let node = memcx::current_context(|mcx| {
         let default_value_tree =
             pg_proc.proargdefaults(mcx).ok_or(FnCallError::NoDefaultArguments)?;
         default_value_tree

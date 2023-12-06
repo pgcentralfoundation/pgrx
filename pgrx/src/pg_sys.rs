@@ -1,7 +1,7 @@
 //! dirty hacks
 
 // Flatten out the contents into here.
-use crate::mem;
+use crate::memcx;
 pub use pgrx_pg_sys::*;
 
 // Interposing here can allow extensions like ZomboDB to skip the cshim,
@@ -15,7 +15,7 @@ pub use pgrx_pg_sys::*;
 */
 #[inline]
 pub unsafe fn rt_fetch(index: Index, range_table: *mut List) -> *mut RangeTblEntry {
-    mem::current_context(|cx| {
+    memcx::current_context(|cx| {
         crate::list::List::<*mut core::ffi::c_void>::downcast_ptr_in_memcx(range_table, cx)
             .expect("rt_fetch used on non-ptr List")
             .get((index - 1) as _)
