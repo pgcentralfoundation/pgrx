@@ -9,11 +9,12 @@
 mod tests {
     use crate as pgrx_tests;
     use pgrx::list::List;
+    use pgrx::memcx;
     use pgrx::prelude::*;
 
     #[pg_test]
     fn list_length_10() {
-        pgrx::mem::current_context(|mcx| {
+        memcx::current_context(|mcx| {
             let mut list = List::Nil;
             // Make sure the list length grows correctly:
             for i in 0..10 {
@@ -25,7 +26,7 @@ mod tests {
 
     #[pg_test]
     fn list_length_1000() {
-        pgrx::mem::current_context(|mcx| {
+        memcx::current_context(|mcx| {
             let mut list = List::Nil;
             // Make sure the list length grows correctly:
             for i in 0..1000 {
@@ -37,7 +38,7 @@ mod tests {
 
     #[pg_test]
     fn list_length_drained() {
-        pgrx::mem::current_context(|mcx| {
+        memcx::current_context(|mcx| {
             let mut list = List::Nil;
             for i in 0..100 {
                 list.unstable_push_in_context(i, mcx);
