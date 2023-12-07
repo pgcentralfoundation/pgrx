@@ -69,9 +69,10 @@ are actually quite realistic!
 
 ## `MemCx<'mcx>`
 
-Fortunately, because the behavior of memory contexts is still deterministic, we do have a strategy
-available to make headway against translating these ambiguous dynamic lifetimes into a world of
-static lifetime constraints:
+Fortunately, the behavior of memory contexts is still deterministic and strictly scope-based,
+rather than using a dynamic graph of references as a garbage-collected language might. So,
+we have a strategy available to make headway on translating ambiguous dynamic lifetimes into a
+world of static lifetime constraints:
 - Internally prefer the `MemoryContextAlloc` family of functions
 - Use the `MemCx<'mcx>` type to "infects" newly allocated types with the lifetime `'mcx`
 - Use functions accepting closures like `current_context` to allow obtaining temporary access to
