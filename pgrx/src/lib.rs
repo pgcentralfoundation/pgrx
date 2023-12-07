@@ -62,6 +62,7 @@ pub mod itemptr;
 pub mod iter;
 pub mod list;
 pub mod lwlock;
+pub mod memcx;
 pub mod memcxt;
 pub mod misc;
 #[cfg(feature = "cshim")]

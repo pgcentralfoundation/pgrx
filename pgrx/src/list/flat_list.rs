@@ -1,4 +1,5 @@
 use super::{Enlist, List, ListCell, ListHead};
+use crate::memcx::MemCx;
 use crate::pg_sys;
 use crate::seal::Sealed;
 use core::cmp;
@@ -83,7 +84,7 @@ unsafe impl Enlist for pg_sys::TransactionId {
     }
 }
 
-impl<T: Enlist> List<T> {
+impl<'cx, T: Enlist> List<'cx, T> {
     /// Borrow an item from the slice at the index
     pub fn get(&self, index: usize) -> Option<&T> {
         self.as_cells().get(index).map(Deref::deref)
@@ -94,34 +95,37 @@ impl<T: Enlist> List<T> {
         self.as_cells_mut().get_mut(index).map(DerefMut::deref_mut)
     }
 
-    /// Push, and if allocation is needed, allocate in a given context
-    /// "Unstable" because this will probably receive breaking changes every week for a few weeks.
+    /// Pushes an item into the List
     ///
-    /// # Safety
+    /// Allocates the entire list in referenced context if it had zero elements,
+    /// otherwise uses the List's own context.
     ///
-    /// Use the right context, don't play around.
-    pub unsafe fn unstable_push_in_context(
+    /// "Unstable" because this may receive breaking changes.
+    pub fn unstable_push_in_context(
         &mut self,
         value: T,
-        context: pg_sys::MemoryContext,
-    ) -> &mut ListHead<T> {
+        mcx: &'cx MemCx<'_>,
+    ) -> &mut ListHead<'cx, T> {
         match self {
             List::Nil => {
                 // No silly reasoning, simply allocate ~2 cache lines for a list
                 let list_size = 128;
-                let list: *mut pg_sys::List = pg_sys::MemoryContextAlloc(context, list_size).cast();
-                assert_ne!(list, ptr::null_mut());
-                (*list).type_ = T::LIST_TAG;
-                (*list).max_length = ((list_size - mem::size_of::<pg_sys::List>())
-                    / mem::size_of::<pg_sys::ListCell>()) as _;
-                (*list).elements = ptr::addr_of_mut!((*list).initial_elements).cast();
-                T::endocytosis((*list).elements.as_mut().unwrap(), value);
-                (*list).length = 1;
-                *self = Self::downcast_ptr(list).unwrap();
-                assert_eq!(1, self.len());
-                match self {
-                    List::Cons(head) => head,
-                    _ => unreachable!(),
+                unsafe {
+                    let list: *mut pg_sys::List = mcx.alloc_bytes(list_size).cast();
+                    assert_ne!(list, ptr::null_mut());
+                    (*list).type_ = T::LIST_TAG;
+                    (*list).max_length = ((list_size - mem::size_of::<pg_sys::List>())
+                        / mem::size_of::<pg_sys::ListCell>())
+                        as _;
+                    (*list).elements = ptr::addr_of_mut!((*list).initial_elements).cast();
+                    T::endocytosis((*list).elements.as_mut().unwrap(), value);
+                    (*list).length = 1;
+                    *self = Self::downcast_ptr_in_memcx(list, mcx).unwrap();
+                    assert_eq!(1, self.len());
+                    match self {
+                        List::Cons(head) => head,
+                        _ => unreachable!(),
+                    }
                 }
             }
             List::Cons(head) => head.push(value),
@@ -131,7 +135,7 @@ impl<T: Enlist> List<T> {
     /// Attempt to push or Err if it would allocate
     ///
     /// This exists primarily to allow working with a list with maybe-zero capacity.
-    pub fn try_push(&mut self, value: T) -> Result<&mut ListHead<T>, &mut Self> {
+    pub fn try_push(&mut self, value: T) -> Result<&mut ListHead<'cx, T>, &mut Self> {
         match self {
             List::Nil => Err(self),
             list if list.capacity() - list.len() == 0 => Err(list),
@@ -140,7 +144,7 @@ impl<T: Enlist> List<T> {
     }
 
     /// Try to reserve space for N more items
-    pub fn try_reserve(&mut self, items: usize) -> Result<&mut ListHead<T>, &mut Self> {
+    pub fn try_reserve(&mut self, items: usize) -> Result<&mut ListHead<'cx, T>, &mut Self> {
         match self {
             List::Nil => Err(self),
             List::Cons(head) => Ok(head.reserve(items)),
@@ -151,7 +155,7 @@ impl<T: Enlist> List<T> {
     //
     // Note that if this removes the last item, it deallocates the entire list.
     // This is to maintain the Postgres List invariant that a 0-len list is always Nil.
-    pub fn drain<R>(&mut self, range: R) -> Drain<'_, T>
+    pub fn drain<R>(&mut self, range: R) -> Drain<'_, 'cx, T>
     where
         R: RangeBounds<usize>,
     {
@@ -212,7 +216,7 @@ impl<T: Enlist> List<T> {
         }
     }
 
-    pub fn iter(&self) -> impl Iterator<Item = &T> {
+    pub fn iter<'a>(&'a self) -> impl Iterator<Item = &'a T> {
         self.as_cells().into_iter().map(Deref::deref)
     }
 
@@ -221,7 +225,7 @@ impl<T: Enlist> List<T> {
     }
 }
 
-impl<T> List<T> {
+impl<T> List<'_, T> {
     /// Borrow the List's slice of cells
     ///
     /// Note that like with Vec, this slice may move after appending to the List!
@@ -265,7 +269,7 @@ impl<T> List<T> {
     }
 }
 
-impl<T> ListHead<T> {
+impl<T> ListHead<'_, T> {
     #[inline]
     pub fn capacity(&self) -> usize {
         unsafe { self.list.as_ref().max_length as usize }
@@ -289,7 +293,7 @@ impl<T> ListHead<T> {
     }
 }
 
-impl<T: Enlist> ListHead<T> {
+impl<T: Enlist> ListHead<'_, T> {
     pub fn push(&mut self, value: T) -> &mut Self {
         let list = unsafe { self.list.as_mut() };
         let pg_sys::List { length, max_length, elements, .. } = list;
@@ -358,25 +362,25 @@ unsafe fn destroy_list(list: *mut pg_sys::List) {
 }
 
 #[derive(Debug)]
-pub struct ListIter<T> {
-    list: List<T>,
+pub struct ListIter<'a, T> {
+    list: List<'a, T>,
     iter: RawCellIter<T>,
 }
 
 /// A list being drained.
 #[derive(Debug)]
-pub struct Drain<'a, T> {
+pub struct Drain<'a, 'cx, T> {
     /// Index of tail to preserve
     tail_start: u32,
     /// Length of tail
     tail_len: u32,
     /// Current remaining range to remove
     iter: RawCellIter<T>,
-    origin: &'a mut List<T>,
+    origin: &'a mut List<'cx, T>,
     raw: *mut pg_sys::List,
 }
 
-impl<T> Drop for Drain<'_, T> {
+impl<'a, 'cx, T> Drop for Drain<'a, 'cx, T> {
     fn drop(&mut self) {
         if self.raw == ptr::null_mut() {
             return;
@@ -406,7 +410,7 @@ impl<T> Drop for Drain<'_, T> {
     }
 }
 
-impl<T: Enlist> Iterator for Drain<'_, T> {
+impl<T: Enlist> Iterator for Drain<'_, '_, T> {
     type Item = T;
 
     fn next(&mut self) -> Option<Self::Item> {
@@ -414,7 +418,7 @@ impl<T: Enlist> Iterator for Drain<'_, T> {
     }
 }
 
-impl<T: Enlist> Iterator for ListIter<T> {
+impl<T: Enlist> Iterator for ListIter<'_, T> {
     type Item = T;
 
     fn next(&mut self) -> Option<Self::Item> {
@@ -422,8 +426,8 @@ impl<T: Enlist> Iterator for ListIter<T> {
     }
 }
 
-impl<T: Enlist> IntoIterator for List<T> {
-    type IntoIter = ListIter<T>;
+impl<'a, T: Enlist> IntoIterator for List<'a, T> {
+    type IntoIter = ListIter<'a, T>;
     type Item = T;
 
     fn into_iter(mut self) -> Self::IntoIter {
@@ -440,7 +444,7 @@ impl<T: Enlist> IntoIterator for List<T> {
     }
 }
 
-impl<T> Drop for ListIter<T> {
+impl<'a, T> Drop for ListIter<'a, T> {
     fn drop(&mut self) {
         if let List::Cons(head) = &mut self.list {
             unsafe { destroy_list(head.list.as_ptr()) }

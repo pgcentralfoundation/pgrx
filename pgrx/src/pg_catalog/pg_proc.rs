@@ -8,6 +8,7 @@
 //LICENSE
 //LICENSE Use of this source code is governed by the MIT license that can be found in the LICENSE file.
 use crate::list::List;
+use crate::memcx::MemCx;
 use crate::{pg_sys, FromDatum, IntoDatum};
 use std::ptr::NonNull;
 
@@ -313,7 +314,10 @@ impl PgProc {
     /// corresponding to the last N input arguments (i.e., the last N proargtypes positions).
     ///
     /// If none of the arguments have defaults, this function returns [`Option::None`].
-    pub fn proargdefaults(&self) -> Option<List<*mut std::ffi::c_void>> {
+    pub fn proargdefaults<'cx>(
+        &self,
+        mcx: &'cx MemCx<'_>,
+    ) -> Option<List<'cx, *mut std::ffi::c_void>> {
         unsafe {
             use pgrx_pg_sys::AsPgCStr;
 
@@ -327,9 +331,9 @@ impl PgProc {
             let proargdefaults = <&str>::from_datum(proargdefaults, is_null)?;
 
             let str = proargdefaults.as_pg_cstr();
-            let argdefaults = pg_sys::stringToNode(str).cast::<pg_sys::List>();
+            let argdefaults = mcx.exec_in(|| pg_sys::stringToNode(str)).cast::<pg_sys::List>();
             pg_sys::pfree(str.cast());
-            List::downcast_ptr(argdefaults)
+            List::downcast_ptr_in_memcx(argdefaults, mcx)
         }
     }
 

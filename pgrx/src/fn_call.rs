@@ -13,6 +13,7 @@ use pgrx_pg_sys::ffi::pg_guard_ffi_boundary;
 use pgrx_pg_sys::PgTryBuilder;
 use std::panic::AssertUnwindSafe;
 
+use crate::memcx;
 use crate::pg_catalog::pg_proc::{PgProc, ProArgMode, ProKind};
 use crate::seal::Sealed;
 use crate::{
@@ -293,7 +294,7 @@ pub fn fn_call_with_collation<R: FromDatum + IntoDatum>(
 
         // setup the argument array
         // SAFETY:  `fcinfo_ref.args` is the over-allocated space we palloc0'd above.  it's an array
-        // of `nargs` `NulalbleDatum` instances.
+        // of `nargs` `NullableDatum` instances.
         let args_slice = fcinfo_ref.args.as_mut_slice(nargs);
         for (i, datum) in arg_datums.into_iter().enumerate() {
             assert!(!isstrict || (isstrict && datum.is_some())); // no NULL datums if this function is STRICT
@@ -332,69 +333,79 @@ fn lookup_fn(fname: &str, args: &[&dyn FnCallArg]) -> Result<pg_sys::Oid> {
     // function following the normal SEARCH_PATH rules, ensuring its argument type Oids
     // exactly match the ones from the user's input arguments.  It does not evaluate the
     // return type, so we'll have to do that later
-    let mut parts_list = List::<*mut std::ffi::c_void>::default();
-    let result = PgTryBuilder::new(AssertUnwindSafe(|| unsafe {
-        let arg_types = args.iter().map(|a| a.type_oid()).collect::<Vec<_>>();
-        let nargs: i16 = arg_types.len().try_into().map_err(|_| FnCallError::TooManyArguments)?;
+    memcx::current_context(|mcx| {
+        let mut parts_list = List::<*mut std::ffi::c_void>::default();
+        let result = PgTryBuilder::new(AssertUnwindSafe(|| unsafe {
+            let arg_types = args.iter().map(|a| a.type_oid()).collect::<Vec<_>>();
+            let nargs: i16 =
+                arg_types.len().try_into().map_err(|_| FnCallError::TooManyArguments)?;
 
-        // parse the function name into its possibly-qualified name parts
-        let ident_parts = parse_sql_ident(fname)?;
-        ident_parts
-            .iter_deny_null()
-            .map(|part| {
-                // SAFETY:  `.as_pg_cstr()` palloc's a char* and `makeString` just takes ownership of it
-                pg_sys::makeString(part.as_pg_cstr())
-            })
-            .for_each(|part| {
-                parts_list.unstable_push_in_context(part.cast(), pg_sys::CurrentMemoryContext);
-            });
+            // parse the function name into its possibly-qualified name parts
+            let ident_parts = parse_sql_ident(fname)?;
+            ident_parts
+                .iter_deny_null()
+                .map(|part| {
+                    // SAFETY:  `.as_pg_cstr()` palloc's a char* and `makeString` just takes ownership of it
+                    pg_sys::makeString(part.as_pg_cstr())
+                })
+                .for_each(|part| {
+                    parts_list.unstable_push_in_context(part.cast(), mcx);
+                });
 
-        // look up an exact match based on the exact number of arguments we have
-        //
-        // SAFETY:  we've allocated a PgList with the proper String node elements representing its name
-        // and we've allocated Vec of argument type oids which can be represented as a pointer.
-        let mut fnoid =
-            pg_sys::LookupFuncName(parts_list.as_mut_ptr(), nargs as _, arg_types.as_ptr(), true);
-
-        if fnoid == pg_sys::InvalidOid {
-            // if that didn't find a function, maybe we've got some defaults in there, so do a lookup
-            // where Postgres will consider that
-            fnoid = pg_sys::LookupFuncName(
+            // look up an exact match based on the exact number of arguments we have
+            //
+            // SAFETY:  we've allocated a PgList with the proper String node elements representing its name
+            // and we've allocated Vec of argument type oids which can be represented as a pointer.
+            let mut fnoid = pg_sys::LookupFuncName(
                 parts_list.as_mut_ptr(),
-                -1,
+                nargs as _,
                 arg_types.as_ptr(),
-                false, // we want the ERROR here -- could be UNDEFINED_FUNCTION or AMBIGUOUS_FUNCTION
+                true,
             );
+
+            if fnoid == pg_sys::InvalidOid {
+                // if that didn't find a function, maybe we've got some defaults in there, so do a lookup
+                // where Postgres will consider that
+                fnoid = pg_sys::LookupFuncName(
+                    parts_list.as_mut_ptr(),
+                    -1,
+                    arg_types.as_ptr(),
+                    false, // we want the ERROR here -- could be UNDEFINED_FUNCTION or AMBIGUOUS_FUNCTION
+                );
+            }
+
+            Ok(fnoid)
+        }))
+        .catch_when(PgSqlErrorCode::ERRCODE_INVALID_PARAMETER_VALUE, |_| {
+            Err(FnCallError::InvalidIdentifier(fname.to_string()))
+        })
+        .catch_when(PgSqlErrorCode::ERRCODE_AMBIGUOUS_FUNCTION, |_| {
+            Err(FnCallError::AmbiguousFunction)
+        })
+        .catch_when(PgSqlErrorCode::ERRCODE_UNDEFINED_FUNCTION, |_| {
+            Err(FnCallError::UndefinedFunction)
+        })
+        .execute();
+
+        unsafe {
+            // SAFETY:  we palloc'd the `pg_sys::String` elements of `parts_list` above and so it's
+            // safe for us to free them now that they're no longer being used
+            parts_list.drain(..).for_each(|s| {
+                #[cfg(any(feature = "pg12", feature = "pg13", feature = "pg14"))]
+                {
+                    let s = s.cast::<pg_sys::Value>();
+                    pg_sys::pfree((*s).val.str_.cast());
+                }
+
+                #[cfg(any(feature = "pg15", feature = "pg16"))]
+                {
+                    let s = s.cast::<pg_sys::String>();
+                    pg_sys::pfree((*s).sval.cast());
+                }
+            });
         }
-
-        Ok(fnoid)
-    }))
-    .catch_when(PgSqlErrorCode::ERRCODE_INVALID_PARAMETER_VALUE, |_| {
-        Err(FnCallError::InvalidIdentifier(fname.to_string()))
+        result
     })
-    .catch_when(PgSqlErrorCode::ERRCODE_AMBIGUOUS_FUNCTION, |_| Err(FnCallError::AmbiguousFunction))
-    .catch_when(PgSqlErrorCode::ERRCODE_UNDEFINED_FUNCTION, |_| Err(FnCallError::UndefinedFunction))
-    .execute();
-
-    unsafe {
-        // SAFETY:  we palloc'd the `pg_sys::String` elements of `parts_list` above and so it's
-        // safe for us to free them now that they're no longer being used
-        parts_list.drain(..).for_each(|s| {
-            #[cfg(any(feature = "pg12", feature = "pg13", feature = "pg14"))]
-            {
-                let s = s.cast::<pg_sys::Value>();
-                pg_sys::pfree((*s).val.str_.cast());
-            }
-
-            #[cfg(any(feature = "pg15", feature = "pg16"))]
-            {
-                let s = s.cast::<pg_sys::String>();
-                pg_sys::pfree((*s).sval.cast());
-            }
-        });
-    }
-
-    result
 }
 
 /// Parses an arbitrary string as if it is a SQL identifier.  If it's not, [`FnCallError::InvalidIdentifier`]
@@ -428,9 +439,14 @@ fn create_default_value(pg_proc: &PgProc, argnum: usize) -> Result<Option<pg_sys
     }
 
     let default_argnum = argnum - non_default_args_cnt;
-    let default_value_tree = pg_proc.proargdefaults().ok_or(FnCallError::NoDefaultArguments)?;
-    let node =
-        default_value_tree.get(default_argnum).ok_or(FnCallError::NotDefaultArgument(argnum))?;
+    let node = memcx::current_context(|mcx| {
+        let default_value_tree =
+            pg_proc.proargdefaults(mcx).ok_or(FnCallError::NoDefaultArguments)?;
+        default_value_tree
+            .get(default_argnum)
+            .ok_or(FnCallError::NotDefaultArgument(argnum))
+            .copied()
+    })?;
 
     unsafe {
         // SAFETY:  `arg_root` is okay to be the null pointer here, which indicates we don't care

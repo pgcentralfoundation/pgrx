@@ -12,6 +12,7 @@
 //! It functions similarly to a Rust [`Vec`], including iterator support, but provides separate
 //! understandings of [`List`][crate::pg_sys::List]s of [`pg_sys::Oid`]s, Integers, and Pointers.
 
+use crate::memcx::MemCx;
 use crate::pg_sys;
 use crate::seal::Sealed;
 use core::marker::PhantomData;
@@ -31,15 +32,15 @@ pub use old_list::*;
 /// The List type from Postgres, lifted into Rust
 /// Note: you may want the ListHead type
 #[derive(Debug)]
-pub enum List<T> {
+pub enum List<'cx, T> {
     Nil,
-    Cons(ListHead<T>),
+    Cons(ListHead<'cx, T>),
 }
 
 #[derive(Debug)]
-pub struct ListHead<T> {
+pub struct ListHead<'cx, T> {
     list: NonNull<pg_sys::List>,
-    _type: PhantomData<[T]>,
+    _type: PhantomData<&'cx [T]>,
 }
 
 /// A strongly-typed ListCell
@@ -101,13 +102,13 @@ pub unsafe trait Enlist: Sealed + Sized {
 
 /// Note the absence of `impl Default for ListHead`:
 /// it must initialize at least 1 element to be created at all
-impl<T> Default for List<T> {
-    fn default() -> List<T> {
+impl<'cx, T> Default for List<'cx, T> {
+    fn default() -> List<'cx, T> {
         List::Nil
     }
 }
 
-impl<T: Enlist> List<T> {
+impl<T: Enlist> List<'_, T> {
     /// Attempt to obtain a `List<T>` from a `*mut pg_sys::List`
     ///
     /// This may be somewhat confusing:
@@ -124,19 +125,23 @@ impl<T: Enlist> List<T> {
     ///
     /// If it returns as `Some` and the List is more than zero length, it also asserts
     /// that the entire List's `elements: *mut ListCell` is validly initialized as `T`
-    /// in each ListCell and that the List is allocated from a Postgres memory context.
+    /// in each ListCell and that the List is allocated from a MemCx that lasts
+    /// at least as long as the current context.
     ///
     /// **Note:** This memory context must last long enough for your purposes.
     /// YOU are responsible for bounding its lifetime correctly.
-    pub unsafe fn downcast_ptr(ptr: *mut pg_sys::List) -> Option<List<T>> {
+    pub unsafe fn downcast_ptr_in_memcx<'cx>(
+        ptr: *mut pg_sys::List,
+        memcx: &'cx MemCx<'_>,
+    ) -> Option<List<'cx, T>> {
         match NonNull::new(ptr) {
             None => Some(List::Nil),
-            Some(list) => ListHead::downcast_ptr(list).map(|head| List::Cons(head)),
+            Some(list) => ListHead::downcast_ptr_in_memcx(list, memcx).map(|head| List::Cons(head)),
         }
     }
 }
 
-impl<T> List<T> {
+impl<'cx, T> List<'cx, T> {
     #[inline]
     pub fn len(&self) -> usize {
         match self {
@@ -172,7 +177,7 @@ impl<T> List<T> {
     }
 }
 
-impl<T: Enlist> ListHead<T> {
+impl<T: Enlist> ListHead<'_, T> {
     /// From a non-nullable pointer that points to a valid List, produce a ListHead of the correct type
     ///
     /// # Safety
@@ -181,11 +186,15 @@ impl<T: Enlist> ListHead<T> {
     ///
     /// If it returns as `Some`, it also asserts the entire List is, across its length,
     /// validly initialized as `T` in each ListCell.
-    pub unsafe fn downcast_ptr(list: NonNull<pg_sys::List>) -> Option<ListHead<T>> {
+    pub unsafe fn downcast_ptr_in_memcx<'cx>(
+        list: NonNull<pg_sys::List>,
+        _memcx: &'cx MemCx<'_>,
+    ) -> Option<ListHead<'cx, T>> {
         (T::LIST_TAG == (*list.as_ptr()).type_).then_some(ListHead { list, _type: PhantomData })
     }
 }
-impl<T> ListHead<T> {
+
+impl<T> ListHead<'_, T> {
     #[inline]
     pub fn len(&self) -> usize {
         unsafe { self.list.as_ref().length as usize }
