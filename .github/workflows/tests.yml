@@ -423,7 +423,7 @@ jobs:
     #       https://github.com/Homebrew/brew/issues/1670#issuecomment-267096602
     - name: brew install postgresql
       run: |
-        HOMEBREW_NO_AUTO_UPDATE=1 brew install ${FORMULA}
+        HOMEBREW_NO_AUTO_UPDATE=1 HOMEBREW_NO_INSTALLED_DEPENDENTS_CHECK=1 brew install ${FORMULA}
 
         echo "$(brew --prefix ${FORMULA})/bin" >> $GITHUB_PATH
       env:
