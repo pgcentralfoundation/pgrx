@@ -34,6 +34,8 @@ jobs:
 
     - name: Set up prerequisites and environment
       run: |
+        sudo apt-get update -y -qq --fix-missing
+
         echo ""
         echo "----- Install sccache -----"
         mkdir -p $HOME/.local/bin
@@ -276,6 +278,8 @@ jobs:
 
     - name: Set up prerequisites and environment
       run: |
+        sudo apt-get update -y -qq --fix-missing
+
         echo ""
 
         echo "----- Install / Set up sccache -----"
@@ -414,9 +418,12 @@ jobs:
     - name: Workaround GitHub Actions Python issues
       run: brew unlink python && brew link --overwrite python
 
+    # install postgres with homebrew, but do't let homebrew do an update too.  The update
+    # process not only takes forever, but it tends to fail when the internet changes
+    #       https://github.com/Homebrew/brew/issues/1670#issuecomment-267096602
     - name: brew install postgresql
       run: |
-        brew install ${FORMULA}
+        HOMEBREW_NO_AUTO_UPDATE=1 HOMEBREW_NO_INSTALLED_DEPENDENTS_CHECK=1 brew install ${FORMULA}
 
         echo "$(brew --prefix ${FORMULA})/bin" >> $GITHUB_PATH
       env:
