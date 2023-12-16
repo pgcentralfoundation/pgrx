@@ -162,7 +162,7 @@ jobs:
     - name: Run pgrx-tests with cshim disabled
       run: |
         cargo test \
-          --features "pg$PG_VER" \
+          --features "pg$PG_VER proptest" \
           --package pgrx-tests
 
     - name: Run aggregate example tests
