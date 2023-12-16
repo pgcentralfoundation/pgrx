@@ -121,7 +121,7 @@ impl ToEntityGraphTokens for PostgresEnum {
         let (_static_impl_generics, static_ty_generics, static_where_clauses) =
             static_generics.split_for_impl();
 
-        let variants = self.variants.iter();
+        let variants = self.variants.iter().map(|variant| variant.ident.clone());
         let sql_graph_entity_fn_name =
             syn::Ident::new(&format!("__pgrx_internals_enum_{}", name), Span::call_site());
 
