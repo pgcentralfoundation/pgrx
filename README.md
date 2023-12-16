@@ -93,14 +93,25 @@ scl enable devtoolset-7 bash
 ## Getting Started
 
 
-First install the `cargo-pgrx` sub-command and initialize the development environment:
+First install the `cargo-pgrx` sub-command.
 
 ```bash
 cargo install --locked cargo-pgrx
+```
+
+**Important:** `cargo-pgrx` **must** be built using the same compiler as you'll use to build the rest of your project. Every time you update your Rust toolchain you have to also manually reinstall `cargo-pgrx`. See [Upgrading](#Upgrading), below.
+
+Once `cargo-pgrx` is ready you can initialize the "PGRX Home" directory:
+
+```bash
 cargo pgrx init
 ```
 
-The `init` command downloads currently supported PostgreSQL versions, compiles them to `~/.pgrx/`, and runs `initdb`. It's also possible to use an existing (user-writable) PostgreSQL install, or install a subset of versions, see the [`README.md` of `cargo-pgrx` for details](cargo-pgrx/README.md#first-time-initialization).
+The `init` command downloads all currently supported PostgreSQL versions, compiles them to `~/.pgrx/`, and runs `initdb`.
+
+It's also possible to use an existing (user-writable) PostgreSQL install, or install a subset of versions, see the [`README.md` of `cargo-pgrx` for details](cargo-pgrx/README.md#first-time-initialization).
+
+Now you can begin work on a specific pgrx extension:
 
 ```bash
 cargo pgrx new my_extension
@@ -159,7 +170,7 @@ As new Postgres versions are supported by `pgrx`, you can re-run the `pgrx init`
 cargo pgrx init
 ```
 
-### Mapping of Postgres types to Rust
+## Mapping of Postgres types to Rust
 
 | Postgres Type              | Rust Type (as `Option<T>`)                              |
 |----------------------------|---------------------------------------------------------|
