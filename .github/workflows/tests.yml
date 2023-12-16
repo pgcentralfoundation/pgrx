@@ -276,6 +276,7 @@ jobs:
 
     - name: Set up prerequisites and environment
       run: |
+        sudo apt-get update -y -qq --fix-missing
         echo ""
 
         echo "----- Install / Set up sccache -----"
@@ -426,6 +427,7 @@ jobs:
 
     - name: Set up prerequisites and environment
       run: |
+        sudo apt-get update -y -qq --fix-missing
         echo ""
 
         echo "----- Install sccache -----"
