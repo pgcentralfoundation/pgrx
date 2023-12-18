@@ -27,5 +27,5 @@ fn main() {
 fn cargo_version() -> Option<String> {
     let cargo = std::env::var_os("CARGO").expect("`CARGO` env var wasn't set!");
     let output = std::process::Command::new(cargo).arg("--version").output().ok()?;
-    std::str::from_utf8(&output.stdout).map(str::to_string).ok()
+    std::str::from_utf8(&output.stdout).map(|s| s.trim().to_string()).ok()
 }
