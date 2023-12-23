@@ -37,6 +37,7 @@ mod log_tests;
 mod memcxt_tests;
 mod name_tests;
 mod numeric_tests;
+mod pg_cast_tests;
 mod pg_extern_tests;
 mod pg_guard_tests;
 mod pg_operator_tests;

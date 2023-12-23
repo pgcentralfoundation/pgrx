@@ -17,14 +17,17 @@ to the `pgrx` framework and very subject to change between versions. While you m
 */
 mod argument;
 mod attribute;
+mod cast;
 pub mod entity;
 mod operator;
 mod returning;
 mod search_path;
 
 pub use argument::PgExternArgument;
+pub use cast::PgCast;
 pub use operator::PgOperator;
 pub use returning::NameMacro;
+use syn::Expr;
 
 use crate::ToSqlConfig;
 use attribute::Attribute;
@@ -74,6 +77,7 @@ pub struct PgExtern {
     func: syn::ItemFn,
     to_sql_config: ToSqlConfig,
     operator: Option<PgOperator>,
+    cast: Option<PgCast>,
     search_path: Option<SearchPathList>,
     inputs: Vec<PgExternArgument>,
     input_types: Vec<syn::Type>,
@@ -109,6 +113,7 @@ impl PgExtern {
             crate::ident_is_acceptable_to_postgres(&func.sig.ident)?;
         }
         let operator = Self::operator(&func)?;
+        let cast = Self::cast(&func)?;
         let search_path = Self::search_path(&func)?;
         let inputs = Self::inputs(&func)?;
         let input_types = Self::input_types(&func)?;
@@ -118,6 +123,7 @@ impl PgExtern {
             func,
             to_sql_config,
             operator,
+            cast,
             search_path,
             inputs,
             input_types,
@@ -230,6 +236,36 @@ impl PgExtern {
         Ok(skel)
     }
 
+    fn cast(func: &syn::ItemFn) -> syn::Result<Option<PgCast>> {
+        let mut skel = Option::<PgCast>::default();
+        for attr in &func.attrs {
+            let last_segment = attr.path.segments.last().unwrap();
+            match last_segment.ident.to_string().as_str() {
+                "pg_cast" => {
+                    let mut cast = PgCast::Default;
+                    if !attr.tokens.is_empty() {
+                        match attr.parse_args::<Expr>() {
+                            Ok(Expr::Path(p)) => {
+                                match p.path.segments.last().unwrap().ident.to_string().as_str() {
+                                    "implicit" => cast = PgCast::Implicit,
+                                    "assignment" => cast = PgCast::Assignment,
+                                    _ => eprintln!("Unrecognized option: {}. Using default cast options.", p.path.to_token_stream()),
+                                }
+                            }
+                            _ => eprintln!(
+                                "Unable to parse attribute to pg_cast as a Rust Expr: {}. Using default cast options.",
+                                attr.tokens
+                            ),
+                        }
+                    }
+                    skel = Some(cast);
+                }
+                _ => (),
+            }
+        }
+        Ok(skel)
+    }
+
     fn search_path(func: &syn::ItemFn) -> syn::Result<Option<SearchPathList>> {
         func.attrs
             .iter()
@@ -282,6 +318,7 @@ impl PgExtern {
         };
 
         let operator = self.operator.clone().into_iter();
+        let cast = self.cast.clone().into_iter();
         let to_sql_config = match self.overridden() {
             None => self.to_sql_config.clone(),
             Some(content) => ToSqlConfig { content: Some(content), ..self.to_sql_config.clone() },
@@ -316,6 +353,7 @@ impl PgExtern {
                     search_path: None #( .unwrap_or_else(|| Some(vec![#search_path])) )*,
                     #[allow(clippy::or_fun_call)]
                     operator: None #( .unwrap_or_else(|| Some(#operator)) )*,
+                    cast: None #( .unwrap_or_else(|| Some(#cast)) )*,
                     to_sql_config: #to_sql_config,
                 };
                 ::pgrx::pgrx_sql_entity_graph::SqlGraphEntity::Function(submission)

@@ -148,6 +148,13 @@ pub fn initialize(_attr: TokenStream, item: TokenStream) -> TokenStream {
     item
 }
 
+/// Declare a function as `#[pg_cast]` to indicate that it represents a Postgres cast
+/// `cargo pgrx schema` will automatically generate the underlying SQL
+#[proc_macro_attribute]
+pub fn pg_cast(_attr: TokenStream, item: TokenStream) -> TokenStream {
+    item
+}
+
 /// Declare a function as `#[pg_operator]` to indicate that it represents a Postgres operator
 /// `cargo pgrx schema` will automatically generate the underlying SQL
 #[proc_macro_attribute]
