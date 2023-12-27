@@ -64,4 +64,7 @@ tar = "0.4.40"
 [features]
 default = ["rustls"]
 native-tls = ["ureq/native-tls"]
-rustls = ["ureq/tls"]
+rustls = [
+    "ureq/tls",
+    "ureq/native-certs" # induces rustls to use the OS-level root of trust
+]
