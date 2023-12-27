@@ -30,14 +30,16 @@ pub struct PgTrigger<'a> {
 }
 
 impl<'a> PgTrigger<'a> {
-    /// Construct a new [`PgTrigger`] from a [`FunctionCallInfo`][pg_sys::FunctionCallInfo]
+    /// Construct a new [`PgTrigger`] from a
+    /// [`FunctionCallInfo`][pg_sys::FunctionCallInfo]
     ///
-    /// Generally this would be automatically done for the user in a [`#[pg_trigger]`][crate::pg_trigger].
+    /// Generally this would be automatically done for the user in a
+    /// [`#[pg_trigger]`][crate::pg_trigger].
     ///
     /// # Safety
     ///
-    /// This constructor attempts to do some checks for validity, but it is ultimately unsafe
-    /// because it must dereference several raw pointers.
+    /// This constructor attempts to do some checks for validity, but it is
+    /// ultimately unsafe because it must dereference several raw pointers.
     ///
     /// Users should ensure the provided `fcinfo` is:
     ///
@@ -45,31 +47,53 @@ impl<'a> PgTrigger<'a> {
     /// * references a relation that has at least a [`pg_sys::AccessShareLock`],
     /// * unharmed (the user has not mutated it since PostgreSQL provided it),
     ///
-    /// If any of these conditions are untrue, this or any other function on this type is
-    /// undefined behavior, hopefully panicking.
+    /// If any of these conditions are untrue, this or any other function on
+    /// this type is undefined behavior, hopefully panicking.
     ///
     /// # Notes
     ///
-    /// This function needs to be public as it is used by the `#[pg_trigger]` macro code generation.
-    /// It is not intended to be used directly by users as its `fcinfo` argument needs to be setup
-    /// by Postgres, not to mention all the various trigger-related state Postgres sets up before
-    /// even calling a trigger function.
+    /// This function needs to be public as it is used by the `#[pg_trigger]`
+    /// macro code generation. It is not intended to be used directly by users
+    /// as its `fcinfo` argument needs to be setup by Postgres, not to mention
+    /// all the various trigger-related state Postgres sets up before even
+    /// calling a trigger function.
     ///
-    /// Marking this function `unsafe` allows us to assume that the provided `fcinfo` argument all
-    /// surrounding Postgres state is correct for the usage context, and as such, allows us to provide
-    /// a safe API to the internal trigger data.
+    /// Marking this function `unsafe` allows us to assume that the provided
+    /// `fcinfo` argument all surrounding Postgres state is correct for the
+    /// usage context, and as such, allows us to provide a safe API to the
+    /// internal trigger data.
+    ///
+    /// ## Safety
+    /// * If the `context` of the `fcinfo` is non-null it must be aligned and
+    ///   point to valid data.
+    /// * When a non-null `context`, used as a `TriggerData`, has a non-null
+    ///   `tg_trigger`, then:
+    ///   * That `tg_trigger` must be aligned
+    ///   * That `tg_trigger`, if non-null, must point to valid data.
     #[doc(hidden)]
     pub unsafe fn from_fcinfo(
         fcinfo: &'a pg_sys::FunctionCallInfoBaseData,
     ) -> Result<Self, PgTriggerError> {
-        if !called_as_trigger(fcinfo as *const _ as *mut _) {
-            return Err(PgTriggerError::NotTrigger);
+        // Safety: `fcinfo` is aligned and points to valid data because it's a
+        // reference, and the rules for the `context` are handled by the caller.
+        unsafe {
+            if !called_as_trigger(fcinfo as *const _ as *mut _) {
+                return Err(PgTriggerError::NotTrigger);
+            }
         }
 
-        let trigger_data = (fcinfo.context as *mut pg_sys::TriggerData)
-            .as_ref()
-            .ok_or(PgTriggerError::NullTriggerData)?;
-        let trigger = trigger_data.tg_trigger.as_ref().ok_or(PgTriggerError::NullTrigger)?;
+        if fcinfo.context.is_null() {
+            return Err(PgTriggerError::NullTriggerData);
+        }
+        // Safety: listed in the rules for the caller
+        let trigger_data: &'a pgrx_pg_sys::TriggerData =
+            unsafe { &*fcinfo.context.cast::<pg_sys::TriggerData>() };
+
+        if (*trigger_data).tg_trigger.is_null() {
+            return Err(PgTriggerError::NullTrigger);
+        }
+        // Safety: listed in the rules for the caller
+        let trigger: &'a pg_sys::Trigger = unsafe { &*(*trigger_data).tg_trigger };
 
         Ok(Self { trigger, trigger_data })
     }
