@@ -188,8 +188,6 @@ mod pg_trigger_option;
 mod pg_trigger_when;
 mod trigger_tuple;
 
-use core::ptr::addr_of;
-
 pub use pg_trigger::PgTrigger;
 pub use pg_trigger_error::PgTriggerError;
 pub use pg_trigger_level::PgTriggerLevel;
