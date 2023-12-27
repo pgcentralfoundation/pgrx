@@ -8,7 +8,7 @@
 //LICENSE
 //LICENSE Use of this source code is governed by the MIT license that can be found in the LICENSE file.
 
-#![allow(unsafe_op_in_unsafe_fn)]
+//#![allow(unsafe_op_in_unsafe_fn)]
 
 use crate::{pg_sys, FromDatum, IntoDatum, PgMemoryContexts};
 use core::fmt::Write;
@@ -44,6 +44,8 @@ impl IntoDatum for Uuid {
 }
 
 impl FromDatum for Uuid {
+    /// ## Safety
+    /// * When `is_null` is false, then `datum` must point to `UUID_BYTES_LEN` initialized bytes.
     #[inline]
     unsafe fn from_polymorphic_datum(
         datum: pg_sys::Datum,
@@ -53,8 +55,10 @@ impl FromDatum for Uuid {
         if is_null {
             None
         } else {
-            let bytes =
-                std::slice::from_raw_parts(datum.cast_mut_ptr::<u8>() as *const u8, UUID_BYTES_LEN);
+            // Safety: Caller ensures the correct ptr/len
+            let bytes = unsafe {
+                std::slice::from_raw_parts(datum.cast_mut_ptr::<u8>() as *const u8, UUID_BYTES_LEN)
+            };
             if let Ok(uuid) = Uuid::from_slice(bytes) {
                 Some(uuid)
             } else {
