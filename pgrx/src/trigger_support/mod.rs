@@ -8,7 +8,6 @@
 //LICENSE
 //LICENSE Use of this source code is governed by the MIT license that can be found in the LICENSE file.
 
-#![allow(unsafe_op_in_unsafe_fn)]
 /*! Support for writing Rust trigger functions
 
 A "no-op" trigger that gets the current [`PgHeapTuple`],
@@ -189,6 +188,8 @@ mod pg_trigger_option;
 mod pg_trigger_when;
 mod trigger_tuple;
 
+use core::ptr::addr_of;
+
 pub use pg_trigger::PgTrigger;
 pub use pg_trigger_error::PgTriggerError;
 pub use pg_trigger_level::PgTriggerLevel;
@@ -253,10 +254,19 @@ impl TriggerEvent {
     }
 }
 
+/// Checks if the fn call info is called as a trigger.
+///
+/// ## Safety
+/// * `fcinfo` must be aligned and point to valid data.
+/// * If the `context` of the `fcinfo` is non-null, it must point to valid data
+///   (See [`is_a`](pgrx::nodes::is_a)).
 #[inline]
 pub unsafe fn called_as_trigger(fcinfo: pg_sys::FunctionCallInfo) -> bool {
-    let fcinfo = fcinfo.as_ref().expect("fcinfo was null");
-    !fcinfo.context.is_null() && is_a(fcinfo.context, pg_sys::NodeTag::T_TriggerData)
+    assert!(!fcinfo.is_null());
+    // Safety: Caller rule 1
+    let context = unsafe { (*fcinfo).context };
+    // Safety: Caller rule 2
+    unsafe { is_a(context, pg_sys::NodeTag::T_TriggerData) }
 }
 
 #[inline]
