@@ -7,7 +7,10 @@
 //LICENSE All rights reserved.
 //LICENSE
 //LICENSE Use of this source code is governed by the MIT license that can be found in the LICENSE file.
+
+#![allow(unsafe_op_in_unsafe_fn)]
 //! Utility functions for working with [`pg_sys::HeapTuple`] and [`pg_sys::HeapTupleHeader`] structs
+
 use crate::*;
 use seq_macro::seq;
 use std::num::NonZeroUsize;

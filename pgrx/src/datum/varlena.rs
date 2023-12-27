@@ -7,7 +7,10 @@
 //LICENSE All rights reserved.
 //LICENSE
 //LICENSE Use of this source code is governed by the MIT license that can be found in the LICENSE file.
+
+#![allow(unsafe_op_in_unsafe_fn)]
 //! Wrapper for Postgres 'varlena' type, over Rust types of a fixed size (ie, `impl Copy`)
+
 use crate::pg_sys::{VARATT_SHORT_MAX, VARHDRSZ_SHORT};
 use crate::{
     pg_sys, rust_regtypein, set_varsize, set_varsize_short, vardata_any, varsize_any,

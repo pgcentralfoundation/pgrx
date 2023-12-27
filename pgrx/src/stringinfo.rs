@@ -7,8 +7,10 @@
 //LICENSE All rights reserved.
 //LICENSE
 //LICENSE Use of this source code is governed by the MIT license that can be found in the LICENSE file.
-//! A safe wrapper around Postgres `StringInfo` structure
+
 #![allow(dead_code, non_snake_case)]
+#![allow(unsafe_op_in_unsafe_fn)]
+//! A safe wrapper around Postgres `StringInfo` structure
 
 use crate::{pg_sys, AllocatedByPostgres, AllocatedByRust, PgBox, WhoAllocated};
 use core::fmt::{Display, Formatter};
