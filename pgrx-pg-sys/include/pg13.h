@@ -145,6 +145,7 @@
 #include "utils/numeric.h"
 #include "utils/palloc.h"
 #include "utils/rel.h"
+#include "utils/regproc.h"
 #include "utils/relcache.h"
 #include "utils/ruleutils.h"
 #include "utils/sampling.h"
