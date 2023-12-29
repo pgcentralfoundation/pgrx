@@ -126,47 +126,44 @@ impl CommandExecute for Schema {
     }
 }
 
-// This is *mostly* a copy of the function in `build.rs`, except using
-// `CARGO`/`cargo` rather than `RUSTC`/`rustc`. It seems too painful to try and
-// share them, given how they're close-but-not-identical.
-fn rust_minor_version() -> Option<u32> {
-    // In order to support `cargo +whatever pgrx`, use `CARGO` here (which
-    // cargo sets for subcommands to allow this), if present.
-    let rustc = std::env::var_os("CARGO").unwrap_or_else(|| "cargo".into());
-    let output = std::process::Command::new(rustc).arg("--version").output().ok()?;
-    let version = std::str::from_utf8(&output.stdout).ok()?;
-    let mut iter = version.split('.');
-    if iter.next() != Some("cargo 1") {
-        None
-    } else {
-        iter.next()?.parse().ok()
-    }
+/// Gets the current `cargo` version.
+///
+/// This is a copy of the function in `build.rs`.
+///
+/// [Environment variables Cargo sets for 3rd party subcommands](https://doc.rust-lang.org/cargo/reference/environment-variables.html#environment-variables-cargo-sets-for-3rd-party-subcommands)
+fn cargo_version() -> Option<String> {
+    let cargo = std::env::var_os("CARGO").expect("`CARGO` env var wasn't set!");
+    let output = std::process::Command::new(cargo).arg("--version").output().ok()?;
+    std::str::from_utf8(&output.stdout).map(|s| s.trim().to_string()).ok()
 }
 
-/// Returns an error if the Rust minor version at build time doesn't match the
-/// one at runtime.
+/// Returns an error if the rust toolchain version used to build `cargo-pgrx`
+/// doesn't match the active toolchain's version.
 ///
 /// This is an error because we `dlopen` rust code that we build, and call
 /// `extern "Rust"` functions on `#[repr(Rust)]` types. This may be relaxed in
 /// the future, but for now is a requirement.
 ///
-/// To waive this, you may set `PGRX_IGNORE_RUST_VERSIONS` in the environment (to
-/// any value other than `"0"`). Also, note that this check is best-effort only,
-/// and is expected to error only if there is a definite mismatch.
+/// To waive this, you may set `PGRX_IGNORE_RUST_VERSIONS` in the environment
+/// (to any value other than `"0"`). Also, note that this check is best-effort
+/// only, and is expected to error only if there is a definite mismatch.
 ///
 /// It also cannot detect versions of `cargo-pgrx` and `pgrx` differing, which
 /// could cause similar issues (in the future this may be detected).
 fn check_rust_version() -> eyre::Result<()> {
-    const COMPILE_TIME_MINOR_VERSION: Option<&str> = option_env!("MINOR_RUST_VERSION");
+    const CARGO_VERSION_DURING_BUILD: &str = env!("CARGO_VERSION_DURING_BUILD");
     if matches!(std::env::var("PGRX_IGNORE_RUST_VERSIONS"), Ok(s) if s != "0") {
         return Ok(());
     }
-    let parsed = COMPILE_TIME_MINOR_VERSION.and_then(|s| s.trim().parse::<u32>().ok());
-    if let (Some(from_env), Some(run_locally)) = (parsed, rust_minor_version()) {
-        if from_env != run_locally {
+    if let (Some(during_build), Some(during_run)) =
+        (Some(CARGO_VERSION_DURING_BUILD), cargo_version())
+    {
+        if during_build != during_run {
             eyre::bail!(
-                "Mismatched rust versions: `cargo-pgrx` was built with Rust `1.{from_env}`, but \
-                Rust `1.{run_locally}` is currently in use.",
+                "Mismatched toolchain versions: \
+                `cargo-pgrx` was built with `{during_build}`, \
+                but `{during_run}` is currently in use. \
+                Set `PGRX_IGNORE_RUST_VERSIONS=1` to override this safety check.",
             );
         }
     }
