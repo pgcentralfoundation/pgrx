@@ -840,7 +840,8 @@ fn impl_postgres_type(ast: DeriveInput) -> syn::Result<proc_macro2::TokenStream>
             pub fn #funcname_out #generics(input: #name #generics) -> &'static ::core::ffi::CStr {
                 let mut buffer = ::pgrx::stringinfo::StringInfo::new();
                 ::pgrx::inoutfuncs::JsonInOutFuncs::output(&input, &mut buffer);
-                buffer.leak_cstr()
+                // SAFETY: We just constructed this StringInfo ourselves
+                unsafe { buffer.leak_cstr() }
             }
 
         });
@@ -863,7 +864,8 @@ fn impl_postgres_type(ast: DeriveInput) -> syn::Result<proc_macro2::TokenStream>
             pub fn #funcname_out #generics(input: #name #generics) -> &'static ::core::ffi::CStr {
                 let mut buffer = ::pgrx::stringinfo::StringInfo::new();
                 ::pgrx::inoutfuncs::InOutFuncs::output(&input, &mut buffer);
-                buffer.leak_cstr()
+                // SAFETY: We just constructed this StringInfo ourselves
+                unsafe { buffer.leak_cstr() }
             }
         });
     } else if args.contains(&PostgresTypeAttribute::PgVarlenaInOutFuncs) {
@@ -885,7 +887,8 @@ fn impl_postgres_type(ast: DeriveInput) -> syn::Result<proc_macro2::TokenStream>
             pub fn #funcname_out #generics(input: ::pgrx::datum::PgVarlena<#name #generics>) -> &'static ::core::ffi::CStr {
                 let mut buffer = ::pgrx::stringinfo::StringInfo::new();
                 ::pgrx::inoutfuncs::PgVarlenaInOutFuncs::output(&*input, &mut buffer);
-                buffer.leak_cstr()
+                // SAFETY: We just constructed this StringInfo ourselves
+                unsafe { buffer.leak_cstr() }
             }
         });
     }

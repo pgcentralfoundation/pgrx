@@ -240,8 +240,17 @@ impl<AllocatedBy: WhoAllocated> StringInfo<AllocatedBy> {
     }
 
     /// Convert this `StringInfo` into a `CStr`
+    /// 
+    /// # Safety
+    /// Postgres can create a StringInfo that does not have `nul` terminated data.
+    /// This function may panic in some cases when it detects incorrect data.
+    /// However, these panics should not be relied on: you must fulfill the safety requirements
+    /// of [`CStr::from_bytes_with_nul`].
+    /// 
+    /// This safety requirement should be fulfilled automatically if you created this StringInfo
+    /// and performed all modifications to it using this type's implemented functions.
     #[inline]
-    pub fn leak_cstr<'a>(self) -> &'a CStr {
+    pub unsafe fn leak_cstr<'a>(self) -> &'a CStr {
         let len = self.len();
         let char_ptr = self.into_char_ptr();
         assert!(!char_ptr.is_null(), "stringinfo char ptr was null");

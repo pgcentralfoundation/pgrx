@@ -118,7 +118,8 @@ fn hexint_in(input: &CStr) -> Result<HexInt, Box<dyn Error>> {
 fn hexint_out(value: HexInt) -> &'static CStr {
     let mut s = StringInfo::new();
     s.push_str(&value.to_string());
-    s.leak_cstr()
+    // SAFETY: We just constructed this StringInfo ourselves
+    unsafe { s.leak_cstr() }
 }
 
 //
