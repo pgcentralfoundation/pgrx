@@ -11,7 +11,9 @@
 #![allow(dead_code, non_snake_case)]
 
 use crate::{pg_sys, AllocatedByPostgres, AllocatedByRust, PgBox, WhoAllocated};
+use core::ffi::CStr;
 use core::fmt::{Display, Formatter};
+use core::slice;
 use core::str::Utf8Error;
 use std::io::Error;
 
@@ -235,6 +237,16 @@ impl<AllocatedBy: WhoAllocated> StringInfo<AllocatedBy> {
             // initialized throughout
             (*sid_ptr).data
         }
+    }
+
+    /// Convert this `StringInfo` into a `CStr`
+    #[inline]
+    pub fn leak_cstr<'a>(self) -> &'a CStr {
+        let len = self.len();
+        let char_ptr = self.into_char_ptr();
+        assert!(!char_ptr.is_null(), "stringinfo char ptr was null");
+        CStr::from_bytes_with_nul(unsafe { slice::from_raw_parts(char_ptr.cast(), len) })
+            .expect("incorrectly constructed stringinfo")
     }
 }
 

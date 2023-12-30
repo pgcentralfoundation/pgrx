@@ -349,7 +349,7 @@ fn complex_in(input: &core::ffi::CStr) -> PgBox<Complex> {
 }
 
 #[pg_extern(immutable)]
-fn complex_out(complex: PgBox<Complex>) -> pg_sys::Datum {
+fn complex_out(complex: PgBox<Complex>) -> &'static ::core::ffi::CStr {
     todo!()
 }
 
@@ -837,10 +837,10 @@ fn impl_postgres_type(ast: DeriveInput) -> syn::Result<proc_macro2::TokenStream>
 
             #[doc(hidden)]
             #[::pgrx::pgrx_macros::pg_extern (immutable,parallel_safe)]
-            pub fn #funcname_out #generics(input: #name #generics) -> ::pgrx::pg_sys::Datum {
+            pub fn #funcname_out #generics(input: #name #generics) -> &'static ::core::ffi::CStr {
                 let mut buffer = ::pgrx::stringinfo::StringInfo::new();
                 ::pgrx::inoutfuncs::JsonInOutFuncs::output(&input, &mut buffer);
-                ::pgrx::pg_sys::Datum::from(buffer.into_char_ptr())
+                buffer.leak_cstr()
             }
 
         });
@@ -860,10 +860,10 @@ fn impl_postgres_type(ast: DeriveInput) -> syn::Result<proc_macro2::TokenStream>
 
             #[doc(hidden)]
             #[::pgrx::pgrx_macros::pg_extern(immutable,parallel_safe)]
-            pub fn #funcname_out #generics(input: #name #generics) -> ::pgrx::pg_sys::Datum {
+            pub fn #funcname_out #generics(input: #name #generics) -> &'static ::core::ffi::CStr {
                 let mut buffer = ::pgrx::stringinfo::StringInfo::new();
                 ::pgrx::inoutfuncs::InOutFuncs::output(&input, &mut buffer);
-                ::pgrx::pg_sys::Datum::from(buffer.into_char_ptr())
+                buffer.leak_cstr()
             }
         });
     } else if args.contains(&PostgresTypeAttribute::PgVarlenaInOutFuncs) {
@@ -882,10 +882,10 @@ fn impl_postgres_type(ast: DeriveInput) -> syn::Result<proc_macro2::TokenStream>
 
             #[doc(hidden)]
             #[::pgrx::pgrx_macros::pg_extern(immutable,parallel_safe)]
-            pub fn #funcname_out #generics(input: ::pgrx::datum::PgVarlena<#name #generics>) -> ::pgrx::pg_sys::Datum {
+            pub fn #funcname_out #generics(input: ::pgrx::datum::PgVarlena<#name #generics>) -> &'static ::core::ffi::CStr {
                 let mut buffer = ::pgrx::stringinfo::StringInfo::new();
                 ::pgrx::inoutfuncs::PgVarlenaInOutFuncs::output(&*input, &mut buffer);
-                ::pgrx::pg_sys::Datum::from(buffer.into_char_ptr())
+                buffer.leak_cstr()
             }
         });
     }

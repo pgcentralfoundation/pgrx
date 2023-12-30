@@ -7,6 +7,7 @@
 //LICENSE All rights reserved.
 //LICENSE
 //LICENSE Use of this source code is governed by the MIT license that can be found in the LICENSE file.
+use core::ffi::CStr;
 use pgrx::pgrx_sql_entity_graph::metadata::{
     ArgumentError, Returns, ReturnsError, SqlMapping, SqlTranslatable,
 };
@@ -76,10 +77,10 @@ fn complex_in(input: &core::ffi::CStr) -> PgBox<Complex, AllocatedByRust> {
 }
 
 #[pg_extern(immutable)]
-fn complex_out(complex: PgBox<Complex>) -> pg_sys::Datum {
+fn complex_out(complex: PgBox<Complex>) -> &'static CStr {
     let mut sb = StringInfo::new();
     sb.push_str(&format!("{}, {}", &complex.x, &complex.y));
-    pg_sys::Datum::from(sb.into_char_ptr())
+    sb.leak_cstr()
 }
 
 extension_sql!(
