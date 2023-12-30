@@ -273,18 +273,3 @@ impl From<&[u8]> for StringInfo<AllocatedByRust> {
         rc
     }
 }
-
-impl<AllocatedBy: WhoAllocated> Drop for StringInfo<AllocatedBy> {
-    fn drop(&mut self) {
-        unsafe {
-            // SAFETY:  self.inner could represent the null pointer, but if it doesn't, then it's
-            // one we can use as self.inner.data will always be allocated if self.inner is.
-            //
-            // It's also prescribed by Postgres that to fully deallocate a StringInfo pointer, the
-            // owner is responsible for freeing its .data member... and that's us
-            if !self.inner.is_null() {
-                AllocatedBy::maybe_pfree(self.inner.data.cast())
-            }
-        }
-    }
-}
