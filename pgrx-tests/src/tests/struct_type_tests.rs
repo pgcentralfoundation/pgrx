@@ -76,10 +76,10 @@ fn complex_in(input: &core::ffi::CStr) -> PgBox<Complex, AllocatedByRust> {
 }
 
 #[pg_extern(immutable)]
-fn complex_out(complex: PgBox<Complex>) -> &'static core::ffi::CStr {
+fn complex_out(complex: PgBox<Complex>) -> pg_sys::Datum {
     let mut sb = StringInfo::new();
     sb.push_str(&format!("{}, {}", &complex.x, &complex.y));
-    sb.into()
+    pg_sys::Datum::from(sb.into_char_ptr())
 }
 
 extension_sql!(

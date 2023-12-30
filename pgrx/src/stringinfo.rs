@@ -233,7 +233,7 @@ impl<AllocatedBy: WhoAllocated> StringInfo<AllocatedBy> {
         unsafe {
             // SAFETY: we just made the StringInfoData pointer so we know it's valid and properly
             // initialized throughout
-            sid_ptr.as_ref().unwrap_unchecked().data
+            (*sid_ptr).data
         }
     }
 }
