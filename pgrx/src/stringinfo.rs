@@ -254,7 +254,7 @@ impl<AllocatedBy: WhoAllocated> StringInfo<AllocatedBy> {
         let len = self.len();
         let char_ptr = self.into_char_ptr();
         assert!(!char_ptr.is_null(), "stringinfo char ptr was null");
-        CStr::from_bytes_with_nul(unsafe { slice::from_raw_parts(char_ptr.cast(), len) })
+        CStr::from_bytes_with_nul(unsafe { slice::from_raw_parts(char_ptr.cast(), len + 1) })
             .expect("incorrectly constructed stringinfo")
     }
 }
