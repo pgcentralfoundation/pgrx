@@ -115,10 +115,11 @@ fn hexint_in(input: &CStr) -> Result<HexInt, Box<dyn Error>> {
 /// `requires = [ "shell_type" ]` indicates that the CREATE FUNCTION SQL for this function must happen
 /// *after* the SQL for the "shell_type" block.
 #[pg_extern(immutable, parallel_safe, requires = [ "shell_type" ])]
-fn hexint_out<'a>(value: HexInt) -> &'a CStr {
+fn hexint_out(value: HexInt) -> &'static CStr {
     let mut s = StringInfo::new();
     s.push_str(&value.to_string());
-    s.into()
+    // SAFETY: We just constructed this StringInfo ourselves
+    unsafe { s.leak_cstr() }
 }
 
 //

@@ -11,7 +11,9 @@
 #![allow(dead_code, non_snake_case)]
 
 use crate::{pg_sys, AllocatedByPostgres, AllocatedByRust, PgBox, WhoAllocated};
+use core::ffi::CStr;
 use core::fmt::{Display, Formatter};
+use core::slice;
 use core::str::Utf8Error;
 use std::io::Error;
 
@@ -19,20 +21,6 @@ use std::io::Error;
 /// memory system, but generally follows Rust's drop semantics
 pub struct StringInfo<AllocatedBy: WhoAllocated = AllocatedByRust> {
     inner: PgBox<pg_sys::StringInfoData, AllocatedBy>,
-}
-
-impl<AllocatedBy: WhoAllocated> From<StringInfo<AllocatedBy>> for &'static core::ffi::CStr {
-    fn from(val: StringInfo<AllocatedBy>) -> Self {
-        let len = val.len();
-        let ptr = val.into_char_ptr();
-
-        unsafe {
-            core::ffi::CStr::from_bytes_with_nul_unchecked(std::slice::from_raw_parts(
-                ptr as *const u8,
-                len + 1, // +1 to get the trailing null byte
-            ))
-        }
-    }
 }
 
 impl<AllocatedBy: WhoAllocated> std::io::Write for StringInfo<AllocatedBy> {
@@ -247,8 +235,27 @@ impl<AllocatedBy: WhoAllocated> StringInfo<AllocatedBy> {
         unsafe {
             // SAFETY: we just made the StringInfoData pointer so we know it's valid and properly
             // initialized throughout
-            sid_ptr.as_ref().unwrap_unchecked().data
+            (*sid_ptr).data
         }
+    }
+
+    /// Convert this `StringInfo` into a `CStr`
+    ///
+    /// # Safety
+    /// Postgres can create a StringInfo that does not have `nul` terminated data.
+    /// This function may panic in some cases when it detects incorrect data.
+    /// However, these panics should not be relied on: you must fulfill the safety requirements
+    /// of [`CStr::from_bytes_with_nul`].
+    ///
+    /// This safety requirement should be fulfilled automatically if you created this StringInfo
+    /// and performed all modifications to it using this type's implemented functions.
+    #[inline]
+    pub unsafe fn leak_cstr<'a>(self) -> &'a CStr {
+        let len = self.len();
+        let char_ptr = self.into_char_ptr();
+        assert!(!char_ptr.is_null(), "stringinfo char ptr was null");
+        CStr::from_bytes_with_nul(unsafe { slice::from_raw_parts(char_ptr.cast(), len + 1) })
+            .expect("incorrectly constructed stringinfo")
     }
 }
 
@@ -285,20 +292,5 @@ impl From<&[u8]> for StringInfo<AllocatedByRust> {
         let mut rc = StringInfo::new();
         rc.push_bytes(v);
         rc
-    }
-}
-
-impl<AllocatedBy: WhoAllocated> Drop for StringInfo<AllocatedBy> {
-    fn drop(&mut self) {
-        unsafe {
-            // SAFETY:  self.inner could represent the null pointer, but if it doesn't, then it's
-            // one we can use as self.inner.data will always be allocated if self.inner is.
-            //
-            // It's also prescribed by Postgres that to fully deallocate a StringInfo pointer, the
-            // owner is responsible for freeing its .data member... and that's us
-            if !self.inner.is_null() {
-                AllocatedBy::maybe_pfree(self.inner.data.cast())
-            }
-        }
     }
 }
