@@ -18,7 +18,7 @@ to the `pgrx` framework and very subject to change between versions. While you m
 use std::ops::Deref;
 
 use crate::composite_type::{handle_composite_type_macro, CompositeTypeMacro};
-use crate::lifetimes::staticize_lifetimes;
+use crate::lifetimes::{anonymize_lifetimes, staticize_lifetimes};
 use proc_macro2::Span;
 use quote::ToTokens;
 use syn::parse::{Parse, ParseStream};
@@ -311,8 +311,13 @@ impl UsedType {
     pub fn entity_tokens(&self) -> syn::Expr {
         let mut resolved_ty = self.resolved_ty.clone();
         let mut resolved_ty_inner = self.resolved_ty_inner.clone().unwrap_or(resolved_ty.clone());
-        staticize_lifetimes(&mut resolved_ty);
-        staticize_lifetimes(&mut resolved_ty_inner);
+        // The lifetimes of these are not relevant. Previously, we solved this by staticizing them
+        // but we want to avoid staticizing in this codebase going forward. Anonymization makes it
+        // easier to name the lifetime-bounded objects without the context for those lifetimes,
+        // without erasing all possible distinctions, since anon lifetimes may still be disunited.
+        // Non-static lifetimes, however, require the use of the NonStaticTypeId hack.
+        anonymize_lifetimes(&mut resolved_ty);
+        anonymize_lifetimes(&mut resolved_ty_inner);
         let resolved_ty_string = resolved_ty.to_token_stream().to_string();
         let composite_type = self.composite_type.clone().map(|v| v.expr);
         let composite_type_iter = composite_type.iter();
