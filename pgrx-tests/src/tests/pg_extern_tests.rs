@@ -31,10 +31,10 @@ mod tests {
 
     // exists just to make sure the code compiles -- tickles the bug behind PR #807
     #[pg_extern]
-    fn returns_named_tuple_with_rust_reserved_keyword<'a>(/*
+    fn returns_named_tuple_with_rust_reserved_keyword(/*
                                  `type` is a reserved Rust keyword, but we still need to be able to parse it for SQL generation 
                                                         */
-    ) -> TableIterator<'a, (name!(type, String), name!(i, i32))> {
+    ) -> TableIterator<'static, (name!(type, String), name!(i, i32))> {
         unimplemented!()
     }
 

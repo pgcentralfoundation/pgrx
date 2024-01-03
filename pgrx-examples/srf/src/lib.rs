@@ -33,15 +33,15 @@ fn random_values(num_rows: i32) -> TableIterator<'static, (name!(index, i32), na
 }
 
 #[pg_extern]
-fn result_table<'a>() -> Result<
-    Option<::pgrx::iter::TableIterator<'a, (name!(a, Option<i32>), name!(b, Option<i32>))>>,
+fn result_table() -> Result<
+    Option<::pgrx::iter::TableIterator<'static, (name!(a, Option<i32>), name!(b, Option<i32>))>>,
     Box<dyn std::error::Error + Send + Sync + 'static>,
 > {
     Ok(Some(TableIterator::new(vec![(Some(1), Some(2))])))
 }
 
 #[pg_extern]
-fn one_col<'a>() -> TableIterator<'a, (name!(a, Option<i32>),)> {
+fn one_col() -> TableIterator<'static, (name!(a, Option<i32>),)> {
     TableIterator::new(std::iter::once((Some(42),)))
 }
 

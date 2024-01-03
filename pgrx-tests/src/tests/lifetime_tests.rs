@@ -24,17 +24,17 @@ fn type_with_lifetime<'s>(_value: Option<CustomType<'s>>) {}
 fn type_ref_with_lifetime<'a>(_value: &'a str) {}
 
 #[pg_extern]
-fn returns_lifetime<'a>() -> Option<CustomType<'a>> {
+fn returns_lifetime() -> Option<CustomType<'static>> {
     None
 }
 
 #[pg_extern]
-fn returns_ref_with_lifetime<'a>() -> &'a str {
+fn returns_ref_with_lifetime() -> &'static str {
     ""
 }
 
 #[pg_extern]
-fn returns_option_ref_with_lifetime<'a>() -> Option<&'a str> {
+fn returns_option_ref_with_lifetime() -> Option<&'static str> {
     None
 }
 
