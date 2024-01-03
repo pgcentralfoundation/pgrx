@@ -313,7 +313,7 @@ impl UsedType {
         let mut resolved_ty_inner = self.resolved_ty_inner.clone().unwrap_or(resolved_ty.clone());
         staticize_lifetimes(&mut resolved_ty);
         staticize_lifetimes(&mut resolved_ty_inner);
-        let resolved_ty_string = resolved_ty.to_token_stream().to_string().replace(' ', "");
+        let resolved_ty_string = resolved_ty.to_token_stream().to_string();
         let composite_type = self.composite_type.clone().map(|v| v.expr);
         let composite_type_iter = composite_type.iter();
         let variadic = &self.variadic;
