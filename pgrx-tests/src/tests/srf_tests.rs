@@ -94,63 +94,64 @@ fn split_table_with_borrow<'a>(
 }
 
 #[pg_extern]
-fn result_table_1<'a>() -> Result<
-    Option<::pgrx::iter::TableIterator<'a, (name!(a, Option<i32>), name!(b, Option<i32>))>>,
+fn result_table_1() -> Result<
+    Option<::pgrx::iter::TableIterator<'static, (name!(a, Option<i32>), name!(b, Option<i32>))>>,
     Box<dyn std::error::Error + Send + Sync + 'static>,
 > {
     Ok(Some(TableIterator::new(vec![(Some(1), Some(2))])))
 }
 
 #[pg_extern]
-fn result_table_2<'a>() -> Result<
-    Option<pgrx::iter::TableIterator<'a, (name!(a, Option<i32>), name!(b, Option<i32>))>>,
+fn result_table_2() -> Result<
+    Option<pgrx::iter::TableIterator<'static, (name!(a, Option<i32>), name!(b, Option<i32>))>>,
     Box<dyn std::error::Error + Send + Sync + 'static>,
 > {
     Ok(Some(TableIterator::new(vec![(Some(1), Some(2))])))
 }
 
 #[pg_extern]
-fn result_table_3<'a>() -> Result<
-    Option<TableIterator<'a, (name!(a, Option<i32>), name!(b, Option<i32>))>>,
+fn result_table_3() -> Result<
+    Option<TableIterator<'static, (name!(a, Option<i32>), name!(b, Option<i32>))>>,
     Box<dyn std::error::Error + Send + Sync + 'static>,
 > {
     Ok(Some(TableIterator::new(vec![(Some(1), Some(2))])))
 }
 
 #[pg_extern]
-fn result_table_4_err<'a>() -> Result<
-    Option<TableIterator<'a, (name!(a, Option<i32>), name!(b, Option<i32>))>>,
+fn result_table_4_err() -> Result<
+    Option<TableIterator<'static, (name!(a, Option<i32>), name!(b, Option<i32>))>>,
     Box<dyn std::error::Error + Send + Sync + 'static>,
 > {
     Err("oh no")?
 }
 
 #[pg_extern]
-fn result_table_5_none<'a>() -> Result<
-    Option<TableIterator<'a, (name!(a, Option<i32>), name!(b, Option<i32>))>>,
+fn result_table_5_none() -> Result<
+    Option<TableIterator<'static, (name!(a, Option<i32>), name!(b, Option<i32>))>>,
     Box<dyn std::error::Error + Send + Sync + 'static>,
 > {
     Ok(None)
 }
 
 #[pg_extern]
-fn one_col<'a>() -> TableIterator<'a, (name!(a, i32),)> {
+fn one_col() -> TableIterator<'static, (name!(a, i32),)> {
     TableIterator::new(std::iter::once((42,)))
 }
 
 #[pg_extern]
-fn one_col_option<'a>() -> Option<TableIterator<'a, (name!(a, i32),)>> {
+fn one_col_option() -> Option<TableIterator<'static, (name!(a, i32),)>> {
     Some(TableIterator::new(std::iter::once((42,))))
 }
 
 #[pg_extern]
-fn one_col_result<'a>() -> Result<TableIterator<'a, (name!(a, i32),)>, Box<dyn std::error::Error>> {
+fn one_col_result() -> Result<TableIterator<'static, (name!(a, i32),)>, Box<dyn std::error::Error>>
+{
     Ok(TableIterator::new(std::iter::once((42,))))
 }
 
 #[pg_extern]
-fn one_col_result_option<'a>(
-) -> Result<Option<TableIterator<'a, (name!(a, i32),)>>, Box<dyn std::error::Error>> {
+fn one_col_result_option(
+) -> Result<Option<TableIterator<'static, (name!(a, i32),)>>, Box<dyn std::error::Error>> {
     Ok(Some(TableIterator::new(std::iter::once((42,)))))
 }
 
