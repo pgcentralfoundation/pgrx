@@ -144,7 +144,8 @@ fn one_col_option() -> Option<TableIterator<'static, (name!(a, i32),)>> {
 }
 
 #[pg_extern]
-fn one_col_result() -> Result<TableIterator<'static, (name!(a, i32),)>, Box<dyn std::error::Error>> {
+fn one_col_result() -> Result<TableIterator<'static, (name!(a, i32),)>, Box<dyn std::error::Error>>
+{
     Ok(TableIterator::new(std::iter::once((42,))))
 }
 
