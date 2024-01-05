@@ -631,7 +631,7 @@ LANGUAGE c /* Rust */
 AS 'MODULE_PATHNAME', 'scritch_wrapper';
 ```
 
-It's possibly to use `composite_type!()` inside a `default!()` macro:
+It's possible to use `composite_type!()` inside a `default!()` macro:
 
 ```rust
 use pgrx::{prelude::*, AllocatedByRust};
@@ -684,7 +684,7 @@ macro_rules! composite_type {
         ::pgrx::heap_tuple::PgHeapTuple<$lt, ::pgrx::AllocatedByRust>
     };
     ($composite_type:expr) => {
-        ::pgrx::heap_tuple::PgHeapTuple<'static, ::pgrx::AllocatedByRust>
+        ::pgrx::heap_tuple::PgHeapTuple<'_, ::pgrx::AllocatedByRust>
     };
 }
 

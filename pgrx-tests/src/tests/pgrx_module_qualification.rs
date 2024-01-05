@@ -72,7 +72,7 @@ mod pgrx_modqual_tests {
     }
 
     #[pg_extern]
-    fn foo_composite() -> ::pgrx::composite_type!("Foo") {
+    fn foo_composite() -> ::pgrx::composite_type!('static, "Foo") {
         todo!()
     }
 
