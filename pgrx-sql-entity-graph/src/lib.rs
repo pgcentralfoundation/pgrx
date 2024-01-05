@@ -51,8 +51,8 @@ pub use to_sql::{ToSql, ToSqlConfig};
 pub use used_type::{UsedType, UsedTypeEntity};
 
 pub(crate) mod aggregate;
-pub(crate) mod control_file;
 pub(crate) mod composite_type;
+pub(crate) mod control_file;
 pub(crate) mod enrich;
 pub(crate) mod extension_sql;
 pub(crate) mod extern_args;

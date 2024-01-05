@@ -17,7 +17,7 @@ to the `pgrx` framework and very subject to change between versions. While you m
 */
 use std::ops::Deref;
 
-use crate::composite_type::{CompositeTypeMacro, handle_composite_type_macro};
+use crate::composite_type::{handle_composite_type_macro, CompositeTypeMacro};
 use crate::lifetimes::staticize_lifetimes;
 use proc_macro2::Span;
 use quote::ToTokens;
