@@ -426,7 +426,10 @@ mod sql_generator_tests {
             name!(dog, Option<::pgrx::composite_type!('static, "Dog")>),
             name!(cat, Option<::pgrx::composite_type!('static, "Cat")>),
             name!(fish, Option<::pgrx::composite_type!('static, "Fish")>),
-            name!(related_edges, Option<Vec<::pgrx::composite_type!('static, "AnimalFriendshipEdge")>>),
+            name!(
+                related_edges,
+                Option<Vec<::pgrx::composite_type!('static, "AnimalFriendshipEdge")>>
+            ),
         ),
     > {
         TableIterator::new(Vec::new().into_iter())
@@ -435,7 +438,10 @@ mod sql_generator_tests {
     #[pg_extern]
     fn iterable_named_table() -> TableIterator<
         'static,
-        (name!(dog, ::pgrx::composite_type!('static, "Dog")), name!(cat, ::pgrx::composite_type!('static, "Cat"))),
+        (
+            name!(dog, ::pgrx::composite_type!('static, "Dog")),
+            name!(cat, ::pgrx::composite_type!('static, "Cat")),
+        ),
     > {
         TableIterator::new(Vec::new().into_iter())
     }
@@ -486,8 +492,8 @@ mod sql_generator_tests {
 
     #[allow(unused_parens)]
     #[pg_extern]
-    fn return_table_single() -> TableIterator<'static, (name!(dog, pgrx::composite_type!('static, "Dog")),)>
-    {
+    fn return_table_single(
+    ) -> TableIterator<'static, (name!(dog, pgrx::composite_type!('static, "Dog")),)> {
         let mut tuple = PgHeapTuple::new_composite_type("Dog").unwrap();
 
         tuple.set_by_name("scritches", 0).unwrap();
@@ -510,7 +516,10 @@ mod sql_generator_tests {
     #[pg_extern]
     fn return_table_two() -> TableIterator<
         'static,
-        (name!(dog, pgrx::composite_type!('static, "Dog")), name!(cat, pgrx::composite_type!('static, "Cat"))),
+        (
+            name!(dog, pgrx::composite_type!('static, "Dog")),
+            name!(cat, pgrx::composite_type!('static, "Cat")),
+        ),
     > {
         let mut dog_tuple = PgHeapTuple::new_composite_type("Dog").unwrap();
 
