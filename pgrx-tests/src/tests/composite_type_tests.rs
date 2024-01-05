@@ -9,7 +9,7 @@ extension_sql!(
 );
 
 #[pg_extern(requires = ["issue1293"])]
-fn create_result() -> pgrx::composite_type!("result") {
+fn create_result() -> pgrx::composite_type!('static, "result") {
     let mut record = PgHeapTuple::new_composite_type("result").unwrap();
     record.set_by_name("score", 0.707).unwrap();
     let mut entity_records: Vec<pgrx::composite_type!("entity")> = Vec::new();
