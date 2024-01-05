@@ -23,7 +23,7 @@ use proc_macro2::Span;
 use quote::ToTokens;
 use syn::parse::{Parse, ParseStream};
 use syn::spanned::Spanned;
-use syn::Token;
+use syn::{Token, Lifetime};
 
 use super::metadata::FunctionMetadataTypeEntity;
 
