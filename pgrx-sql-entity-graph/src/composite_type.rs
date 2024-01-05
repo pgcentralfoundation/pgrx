@@ -3,14 +3,16 @@ pub struct CompositeTypeMacro {
     #[allow(dead_code)]
     pub(crate) lifetime: Option<syn::Lifetime>,
     pub(crate) expr: syn::Expr,
+    pub(crate) span: proc_macro2::Span,
 }
 
 impl syn::parse::Parse for CompositeTypeMacro {
     fn parse(input: syn::parse::ParseStream) -> Result<Self, syn::Error> {
+        let span = input.span();
         let lifetime: Option<syn::Lifetime> = input.parse().ok();
         let _comma: Option<syn::Token![,]> = input.parse().ok();
         let expr = input.parse()?;
-        Ok(Self { lifetime, expr })
+        Ok(Self { lifetime, expr, span })
     }
 }
 
@@ -23,8 +25,8 @@ impl CompositeTypeMacro {
     /// Expands into the appropriate type, explicitly eliding the lifetime
     /// if none is actually given.
     pub fn expand_with_lifetime(&self) -> syn::Type {
-        let CompositeTypeMacro { lifetime, .. } = self;
-        let lifetime = lifetime.clone().unwrap_or_else(|| syn::Lifetime::new("'_", proc_macro2::Span::call_site()));
+        let CompositeTypeMacro { lifetime, span, .. } = self.clone();
+        let lifetime = lifetime.unwrap_or_else(|| syn::Lifetime::new("'_", span));
         syn::parse_quote! {
             ::pgrx::heap_tuple::PgHeapTuple<#lifetime, ::pgrx::pgbox::AllocatedByRust>
         }
