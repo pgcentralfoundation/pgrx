@@ -17,6 +17,7 @@ to the `pgrx` framework and very subject to change between versions. While you m
 */
 use std::ops::Deref;
 
+use crate::composite_type::{CompositeTypeMacro, handle_composite_type_macro};
 use crate::lifetimes::staticize_lifetimes;
 use proc_macro2::Span;
 use quote::ToTokens;
@@ -613,11 +614,6 @@ fn resolve_option_inner(
     }
 }
 
-fn handle_composite_type_macro(mac: &syn::Macro) -> syn::Result<CompositeTypeMacro> {
-    let out: CompositeTypeMacro = mac.parse_body()?;
-    Ok(out)
-}
-
 fn handle_default_macro(mac: &syn::Macro) -> syn::Result<(syn::Type, Option<String>)> {
     let out: DefaultMacro = mac.parse_body()?;
     let true_ty = out.ty;
@@ -703,21 +699,5 @@ impl Parse for DefaultMacro {
         let _comma: Token![,] = input.parse()?;
         let expr = input.parse()?;
         Ok(Self { ty, expr })
-    }
-}
-
-#[derive(Debug, Clone)]
-pub struct CompositeTypeMacro {
-    #[allow(dead_code)]
-    pub(crate) lifetime: Option<syn::Lifetime>,
-    pub(crate) expr: syn::Expr,
-}
-
-impl Parse for CompositeTypeMacro {
-    fn parse(input: ParseStream) -> Result<Self, syn::Error> {
-        let lifetime: Option<syn::Lifetime> = input.parse().ok();
-        let _comma: Option<Token![,]> = input.parse().ok();
-        let expr = input.parse()?;
-        Ok(Self { lifetime, expr })
     }
 }
