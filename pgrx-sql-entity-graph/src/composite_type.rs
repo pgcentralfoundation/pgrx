@@ -4,7 +4,6 @@
 /// Use this so you don't drop the span on the floor.
 #[derive(Debug, Clone)]
 pub struct CompositeTypeMacro {
-    #[allow(dead_code)]
     pub(crate) lifetime: Option<syn::Lifetime>,
     pub(crate) expr: syn::Expr,
     pub(crate) span: proc_macro2::Span,
