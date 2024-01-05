@@ -93,7 +93,7 @@ CREATE FUNCTION create_dog(name TEXT, scritches INT) RETURNS Dog
 ```
 */
 #[pg_extern]
-fn create_dog(name: String, scritches: i32) -> pgrx::composite_type!(DOG_COMPOSITE_TYPE) {
+fn create_dog(name: String, scritches: i32) -> pgrx::composite_type!('static, DOG_COMPOSITE_TYPE) {
     let mut dog = PgHeapTuple::new_composite_type(DOG_COMPOSITE_TYPE).unwrap();
     dog.set_by_name("name", name).unwrap();
     dog.set_by_name("scritches", scritches).unwrap();
@@ -136,7 +136,7 @@ the function.
 fn make_friendship(
     dog: pgrx::composite_type!(DOG_COMPOSITE_TYPE),
     cat: pgrx::composite_type!(CAT_COMPOSITE_TYPE),
-) -> pgrx::composite_type!(CAT_AND_DOG_FRIENDSHIP_COMPOSITE_TYPE) {
+) -> pgrx::composite_type!('static, CAT_AND_DOG_FRIENDSHIP_COMPOSITE_TYPE) {
     let mut friendship =
         PgHeapTuple::new_composite_type(CAT_AND_DOG_FRIENDSHIP_COMPOSITE_TYPE).unwrap();
     friendship.set_by_name("dog", dog).unwrap();
@@ -167,7 +167,7 @@ struct SumScritches;
 impl Aggregate for SumScritches {
     type State = i32;
     const INITIAL_CONDITION: Option<&'static str> = Some("0");
-    type Args = pgrx::name!(value, pgrx::composite_type!("Dog"));
+    type Args = pgrx::name!(value, pgrx::composite_type!('static, "Dog"));
 
     fn state(
         current: Self::State,
@@ -202,7 +202,7 @@ struct ScritchCollector;
 
 #[pg_aggregate]
 impl Aggregate for ScritchCollector {
-    type State = Option<pgrx::composite_type!("Dog")>;
+    type State = Option<pgrx::composite_type!('static, "Dog")>;
     type Args = i32;
 
     fn state(
