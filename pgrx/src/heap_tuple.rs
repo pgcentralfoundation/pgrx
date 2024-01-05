@@ -631,7 +631,7 @@ LANGUAGE c /* Rust */
 AS 'MODULE_PATHNAME', 'scritch_wrapper';
 ```
 
-It's possibly to use `composite_type!()` inside a `default!()` macro:
+It's possible to use `composite_type!()` inside a `default!()` macro:
 
 ```rust
 use pgrx::{prelude::*, AllocatedByRust};
