@@ -17,6 +17,7 @@ to the `pgrx` framework and very subject to change between versions. While you m
 */
 use std::ops::Deref;
 
+use crate::composite_type::{handle_composite_type_macro, CompositeTypeMacro};
 use crate::lifetimes::staticize_lifetimes;
 use proc_macro2::Span;
 use quote::ToTokens;
@@ -381,9 +382,11 @@ fn resolve_vec_inner(
                             Err(syn::Error::new(mac.span(), "`Vec<default!(T, default)>` not supported, choose `default!(Vec<T>, ident)` instead"))
                         }
                         "composite_type" => {
-                            let sql = Some(handle_composite_type_macro(mac)?);
+                            let composite_mac = handle_composite_type_macro(mac)?;
+                            let comp_ty = composite_mac.expand_with_lifetime();
+                            let sql = Some(composite_mac);
                             let ty = syn::parse_quote! {
-                                Vec<::pgrx::heap_tuple::PgHeapTuple<'static, ::pgrx::pgbox::AllocatedByRust>>
+                                Vec<#comp_ty>
                             };
                             Ok((ty, sql))
                         }
@@ -442,9 +445,11 @@ fn resolve_variadic_array_inner(
                                 Err(syn::Error::new(mac.span(), "`VariadicArray<default!(T, default)>` not supported, choose `default!(VariadicArray<T>, ident)` instead"))
                             }
                             "composite_type" => {
-                                let sql = Some(handle_composite_type_macro(mac)?);
+                                let composite_mac = handle_composite_type_macro(mac)?;
+                                let comp_ty = composite_mac.expand_with_lifetime();
+                                let sql = Some(composite_mac);
                                 let ty = syn::parse_quote! {
-                                    ::pgrx::datum::VariadicArray<'static, ::pgrx::heap_tuple::PgHeapTuple<'static, ::pgrx::pgbox::AllocatedByRust>>
+                                    ::pgrx::datum::VariadicArray<'static, #comp_ty>
                                 };
                                 Ok((ty, sql))
                             }
@@ -503,9 +508,11 @@ fn resolve_array_inner(
                                 Err(syn::Error::new(mac.span(), "`VariadicArray<default!(T, default)>` not supported, choose `default!(VariadicArray<T>, ident)` instead"))
                             }
                             "composite_type" => {
-                                let sql = Some(handle_composite_type_macro(mac)?);
+                                let composite_mac = handle_composite_type_macro(mac)?;
+                                let comp_ty = composite_mac.expand_with_lifetime();
+                                let sql = Some(composite_mac);
                                 let ty = syn::parse_quote! {
-                                    ::pgrx::datum::Array<'static, ::pgrx::heap_tuple::PgHeapTuple<'static, ::pgrx::pgbox::AllocatedByRust>>
+                                    ::pgrx::datum::Array<'static, #comp_ty>
                                 };
                                 Ok((ty, sql))
                             }
@@ -556,9 +563,11 @@ fn resolve_option_inner(
                         match archetype.ident.to_string().as_str() {
                             // Option<composite_type!(..)>
                             "composite_type" => {
-                                let sql = Some(handle_composite_type_macro(mac)?);
+                                let composite_mac = handle_composite_type_macro(mac)?;
+                                let comp_ty = composite_mac.expand_with_lifetime();
+                                let sql = Some(composite_mac);
                                 let ty = syn::parse_quote! {
-                                    Option<::pgrx::heap_tuple::PgHeapTuple<'static, ::pgrx::pgbox::AllocatedByRust>>
+                                    Option<#comp_ty>
                                 };
                                 Ok((ty, sql))
                             },
@@ -611,11 +620,6 @@ fn resolve_option_inner(
         },
         _ => Ok((syn::Type::Path(original), None)),
     }
-}
-
-fn handle_composite_type_macro(mac: &syn::Macro) -> syn::Result<CompositeTypeMacro> {
-    let out: CompositeTypeMacro = mac.parse_body()?;
-    Ok(out)
 }
 
 fn handle_default_macro(mac: &syn::Macro) -> syn::Result<(syn::Type, Option<String>)> {
@@ -703,21 +707,5 @@ impl Parse for DefaultMacro {
         let _comma: Token![,] = input.parse()?;
         let expr = input.parse()?;
         Ok(Self { ty, expr })
-    }
-}
-
-#[derive(Debug, Clone)]
-pub struct CompositeTypeMacro {
-    #[allow(dead_code)]
-    pub(crate) lifetime: Option<syn::Lifetime>,
-    pub(crate) expr: syn::Expr,
-}
-
-impl Parse for CompositeTypeMacro {
-    fn parse(input: ParseStream) -> Result<Self, syn::Error> {
-        let lifetime: Option<syn::Lifetime> = input.parse().ok();
-        let _comma: Option<Token![,]> = input.parse().ok();
-        let expr = input.parse()?;
-        Ok(Self { lifetime, expr })
     }
 }
