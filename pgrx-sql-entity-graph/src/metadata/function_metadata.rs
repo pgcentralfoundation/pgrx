@@ -48,7 +48,7 @@ macro_rules! impl_fn {
         where
             $($A: SqlTranslatable,)*
             R: SqlTranslatable,
-            F: Fn($($A,)*) -> R,
+            F: FnMut($($A,)*) -> R,
         {
             fn entity(&self) -> FunctionMetadataEntity {
                 FunctionMetadataEntity {
