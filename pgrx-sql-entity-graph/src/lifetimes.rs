@@ -7,8 +7,8 @@
 //LICENSE All rights reserved.
 //LICENSE
 //LICENSE Use of this source code is governed by the MIT license that can be found in the LICENSE file.
-use crate::NameMacro;
-use proc_macro2::TokenStream;
+
+
 
 pub fn staticize_lifetimes_in_type_path(value: syn::TypePath) -> syn::TypePath {
     let mut ty = syn::Type::Path(value);
@@ -21,7 +21,7 @@ pub fn staticize_lifetimes_in_type_path(value: syn::TypePath) -> syn::TypePath {
     }
 }
 
-pub fn staticize_lifetimes(value: &mut syn::Type) {
+pub fn staticize_lifetimes(_value: &mut syn::Type) {
     #[cfg(not)]
     match value {
         syn::Type::Path(syn::TypePath { path: syn::Path { segments, .. }, .. }) => segments
