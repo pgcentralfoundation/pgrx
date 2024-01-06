@@ -18,12 +18,12 @@ to the `pgrx` framework and very subject to change between versions. While you m
 use std::ops::Deref;
 
 use crate::composite_type::{handle_composite_type_macro, CompositeTypeMacro};
-use crate::lifetimes::{anonymize_lifetimes};
+use crate::lifetimes::anonymize_lifetimes;
 use proc_macro2::Span;
 use quote::ToTokens;
 use syn::parse::{Parse, ParseStream};
 use syn::spanned::Spanned;
-use syn::{Token};
+use syn::Token;
 
 use super::metadata::FunctionMetadataTypeEntity;
 
