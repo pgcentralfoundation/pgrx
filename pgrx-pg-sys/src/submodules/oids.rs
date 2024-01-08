@@ -11,7 +11,6 @@
 use crate as pg_sys;
 use crate::BuiltinOid;
 use crate::Datum;
-use core::fmt;
 use pgrx_sql_entity_graph::metadata::{
     ArgumentError, Returns, ReturnsError, SqlMapping, SqlTranslatable,
 };
