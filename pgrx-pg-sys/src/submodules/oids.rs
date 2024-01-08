@@ -87,18 +87,6 @@ impl Default for Oid {
     }
 }
 
-impl fmt::Display for Oid {
-    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-        match PgOid::from(*self) {
-            PgOid::Invalid => write!(f, "oid={{#0, Invalid OID}}"),
-            // if we think we know the name, include it
-            PgOid::BuiltIn(builtin) => write!(f, "oid={{#{}, builtin: {:?}}}", self.0, builtin),
-            // no idea? print it anyways!
-            PgOid::Custom(oid) => write!(f, "oid=#{}", oid.0),
-        }
-    }
-}
-
 /// De facto available via SPI
 impl From<u32> for Oid {
     fn from(word: u32) -> Oid {
