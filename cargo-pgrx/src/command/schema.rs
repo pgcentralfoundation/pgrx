@@ -401,12 +401,12 @@ pub(crate) fn generate_schema(
             .wrap_err_with(|| format!("Couldn't libload {}", lib_so.display()))?;
 
         let symbol: libloading::os::unix::Symbol<
-            unsafe extern "Rust" fn() -> eyre::Result<pgrx_sql_entity_graph::ControlFile>,
+            unsafe extern "Rust" fn(_: ()) -> pgrx_sql_entity_graph::ControlFile,
         > = lib
             .get("__pgrx_marker".as_bytes())
             .expect("Couldn't call __pgrx_marker");
         let control_file_entity = pgrx_sql_entity_graph::SqlGraphEntity::ExtensionRoot(
-            symbol().expect("Failed to get control file information"),
+            symbol(()),
         );
         entities.push(control_file_entity);
 
