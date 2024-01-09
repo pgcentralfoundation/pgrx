@@ -106,6 +106,7 @@ impl ToEntityGraphTokens for PostgresTypeDerive {
         let generics = self.generics.clone();
         let (impl_generics, ty_generics, where_clauses) = generics.split_for_impl();
 
+        // We need some generics we can use inside a fn without a lifetime for qualified paths.
         let mut anon_generics = generics.clone();
         anon_generics.params = anon_generics
             .params
