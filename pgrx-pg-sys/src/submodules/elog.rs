@@ -103,6 +103,36 @@ impl From<i32> for PgLogLevel {
 ///
 /// The output these logs goes to the PostgreSQL log file at `DEBUG5` level, depending on how the
 /// [PostgreSQL settings](https://www.postgresql.org/docs/current/runtime-config-logging.html) are configured.
+///
+/// ## Adding Details and Hints
+///
+/// Additionally, you can use specify a `detail` and/or `hint` to be included with the report.
+/// After the string literal to be used as the message and any formatting arguments, add a semicolon.
+/// Then assign a string literal to `detail` or `hint`, optionally followed by a list of
+/// comma separated formatting arguments. The `detail` and `hint` options can be used together or
+/// separately but `detail` must come before `hint` and both must end with a semicolon.
+///
+/// ## Examples
+///
+/// ```rust,no_run
+/// // just like `println!` and `format!`
+/// debug5!("a simple message");
+/// debug5!("or a formatted message: {:?}", "pgrx rocks!");
+/// // include details and hints
+/// debug5! {
+///     "add details if you want";
+///     detail = "...";
+/// }
+/// debug5! {
+///     "or a message with just a hint";
+///     hint = "...";
+/// }
+/// debug5! {
+///     "put it all together for {} {}", "great", "success!";
+///     detail = "extra {}", "info";
+///     hint = "{} helpful", "very";
+/// }
+/// ```
 #[macro_export]
 macro_rules! debug5 {
     (
@@ -136,6 +166,36 @@ macro_rules! debug5 {
 ///
 /// The output these logs goes to the PostgreSQL log file at `DEBUG4` level, depending on how the
 /// [PostgreSQL settings](https://www.postgresql.org/docs/current/runtime-config-logging.html) are configured.
+///
+/// ## Adding Details and Hints
+///
+/// Additionally, you can use specify a `detail` and/or `hint` to be included with the report.
+/// After the string literal to be used as the message and any formatting arguments, add a semicolon.
+/// Then assign a string literal to `detail` or `hint`, optionally followed by a list of
+/// comma separated formatting arguments. The `detail` and `hint` options can be used together or
+/// separately but `detail` must come before `hint` and both must end with a semicolon.
+///
+/// ## Examples
+///
+/// ```rust,no_run
+/// // just like `println!` and `format!`
+/// debug4!("a simple message");
+/// debug4!("or a formatted message: {:?}", "pgrx rocks!");
+/// // include details and hints
+/// debug4! {
+///     "add details if you want";
+///     detail = "...";
+/// }
+/// debug4! {
+///     "or a message with just a hint";
+///     hint = "...";
+/// }
+/// debug4! {
+///     "put it all together for {} {}", "great", "success!";
+///     detail = "extra {}", "info";
+///     hint = "{} helpful", "very";
+/// }
+/// ```
 #[macro_export]
 macro_rules! debug4 {
     (
@@ -169,6 +229,36 @@ macro_rules! debug4 {
 ///
 /// The output these logs goes to the PostgreSQL log file at `DEBUG3` level, depending on how the
 /// [PostgreSQL settings](https://www.postgresql.org/docs/current/runtime-config-logging.html) are configured.
+///
+/// ## Adding Details and Hints
+///
+/// Additionally, you can use specify a `detail` and/or `hint` to be included with the report.
+/// After the string literal to be used as the message and any formatting arguments, add a semicolon.
+/// Then assign a string literal to `detail` or `hint`, optionally followed by a list of
+/// comma separated formatting arguments. The `detail` and `hint` options can be used together or
+/// separately but `detail` must come before `hint` and both must end with a semicolon.
+///
+/// ## Examples
+///
+/// ```rust,no_run
+/// // just like `println!` and `format!`
+/// debug3!("a simple message");
+/// debug3!("or a formatted message: {:?}", "pgrx rocks!");
+/// // include details and hints
+/// debug3! {
+///     "add details if you want";
+///     detail = "...";
+/// }
+/// debug3! {
+///     "or a message with just a hint";
+///     hint = "...";
+/// }
+/// debug3! {
+///     "put it all together for {} {}", "great", "success!";
+///     detail = "extra {}", "info";
+///     hint = "{} helpful", "very";
+/// }
+/// ```
 #[macro_export]
 macro_rules! debug3 {
     (
@@ -202,6 +292,36 @@ macro_rules! debug3 {
 ///
 /// The output these logs goes to the PostgreSQL log file at `DEBUG2` level, depending on how the
 /// [PostgreSQL settings](https://www.postgresql.org/docs/current/runtime-config-logging.html) are configured.
+///
+/// ## Adding Details and Hints
+///
+/// Additionally, you can use specify a `detail` and/or `hint` to be included with the report.
+/// After the string literal to be used as the message and any formatting arguments, add a semicolon.
+/// Then assign a string literal to `detail` or `hint`, optionally followed by a list of
+/// comma separated formatting arguments. The `detail` and `hint` options can be used together or
+/// separately but `detail` must come before `hint` and both must end with a semicolon.
+///
+/// ## Examples
+///
+/// ```rust,no_run
+/// // just like `println!` and `format!`
+/// debug2!("a simple message");
+/// debug2!("or a formatted message: {:?}", "pgrx rocks!");
+/// // include details and hints
+/// debug2! {
+///     "add details if you want";
+///     detail = "...";
+/// }
+/// debug2! {
+///     "or a message with just a hint";
+///     hint = "...";
+/// }
+/// debug2! {
+///     "put it all together for {} {}", "great", "success!";
+///     detail = "extra {}", "info";
+///     hint = "{} helpful", "very";
+/// }
+/// ```
 #[macro_export]
 macro_rules! debug2 {
     (
@@ -235,6 +355,36 @@ macro_rules! debug2 {
 ///
 /// The output these logs goes to the PostgreSQL log file at `DEBUG1` level, depending on how the
 /// [PostgreSQL settings](https://www.postgresql.org/docs/current/runtime-config-logging.html) are configured.
+///
+/// ## Adding Details and Hints
+///
+/// Additionally, you can use specify a `detail` and/or `hint` to be included with the report.
+/// After the string literal to be used as the message and any formatting arguments, add a semicolon.
+/// Then assign a string literal to `detail` or `hint`, optionally followed by a list of
+/// comma separated formatting arguments. The `detail` and `hint` options can be used together or
+/// separately but `detail` must come before `hint` and both must end with a semicolon.
+///
+/// ## Examples
+///
+/// ```rust,no_run
+/// // just like `println!` and `format!`
+/// debug1!("a simple message");
+/// debug1!("or a formatted message: {:?}", "pgrx rocks!");
+/// // include details and hints
+/// debug1! {
+///     "add details if you want";
+///     detail = "...";
+/// }
+/// debug1! {
+///     "or a message with just a hint";
+///     hint = "...";
+/// }
+/// debug1! {
+///     "put it all together for {} {}", "great", "success!";
+///     detail = "extra {}", "info";
+///     hint = "{} helpful", "very";
+/// }
+/// ```
 #[macro_export]
 macro_rules! debug1 {
     (
@@ -268,6 +418,36 @@ macro_rules! debug1 {
 ///
 /// The output these logs goes to the PostgreSQL log file at `LOG` level, depending on how the
 /// [PostgreSQL settings](https://www.postgresql.org/docs/current/runtime-config-logging.html) are configured.
+///
+/// ## Adding Details and Hints
+///
+/// Additionally, you can use specify a `detail` and/or `hint` to be included with the report.
+/// After the string literal to be used as the message and any formatting arguments, add a semicolon.
+/// Then assign a string literal to `detail` or `hint`, optionally followed by a list of
+/// comma separated formatting arguments. The `detail` and `hint` options can be used together or
+/// separately but `detail` must come before `hint` and both must end with a semicolon.
+///
+/// ## Examples
+///
+/// ```rust,no_run
+/// // just like `println!` and `format!`
+/// log!("a simple message");
+/// log!("or a formatted message: {:?}", "pgrx rocks!");
+/// // include details and hints
+/// log! {
+///     "add details if you want";
+///     detail = "...";
+/// }
+/// log! {
+///     "or a message with just a hint";
+///     hint = "...";
+/// }
+/// log! {
+///     "put it all together for {} {}", "great", "success!";
+///     detail = "extra {}", "info";
+///     hint = "{} helpful", "very";
+/// }
+/// ```
 #[macro_export]
 macro_rules! log {
     (
@@ -298,6 +478,36 @@ macro_rules! log {
 ///
 /// This macro accepts arguments like the [`println`] and [`format`] macros.
 /// See [`fmt`](std::fmt) for information about options.
+///
+/// ## Adding Details and Hints
+///
+/// Additionally, you can use specify a `detail` and/or `hint` to be included with the report.
+/// After the string literal to be used as the message and any formatting arguments, add a semicolon.
+/// Then assign a string literal to `detail` or `hint`, optionally followed by a list of
+/// comma separated formatting arguments. The `detail` and `hint` options can be used together or
+/// separately but `detail` must come before `hint` and both must end with a semicolon.
+///
+/// ## Examples
+///
+/// ```rust,no_run
+/// // just like `println!` and `format!`
+/// info!("a simple message");
+/// info!("or a formatted message: {:?}", "pgrx rocks!");
+/// // include details and hints
+/// info! {
+///     "add details if you want";
+///     detail = "...";
+/// }
+/// info! {
+///     "or a message with just a hint";
+///     hint = "...";
+/// }
+/// info! {
+///     "put it all together for {} {}", "great", "success!";
+///     detail = "extra {}", "info";
+///     hint = "{} helpful", "very";
+/// }
+/// ```
 #[macro_export]
 macro_rules! info {
     (
@@ -328,6 +538,36 @@ macro_rules! info {
 ///
 /// This macro accepts arguments like the [`println`] and [`format`] macros.
 /// See [`fmt`](std::fmt) for information about options.
+///
+/// ## Adding Details and Hints
+///
+/// Additionally, you can use specify a `detail` and/or `hint` to be included with the report.
+/// After the string literal to be used as the message and any formatting arguments, add a semicolon.
+/// Then assign a string literal to `detail` or `hint`, optionally followed by a list of
+/// comma separated formatting arguments. The `detail` and `hint` options can be used together or
+/// separately but `detail` must come before `hint` and both must end with a semicolon.
+///
+/// ## Examples
+///
+/// ```rust,no_run
+/// // just like `println!` and `format!`
+/// notice!("a simple message");
+/// notice!("or a formatted message: {:?}", "pgrx rocks!");
+/// // include details and hints
+/// notice! {
+///     "add details if you want";
+///     detail = "...";
+/// }
+/// notice! {
+///     "or a message with just a hint";
+///     hint = "...";
+/// }
+/// notice! {
+///     "put it all together for {} {}", "great", "success!";
+///     detail = "extra {}", "info";
+///     hint = "{} helpful", "very";
+/// }
+/// ```
 #[macro_export]
 macro_rules! notice {
     (
@@ -358,6 +598,36 @@ macro_rules! notice {
 ///
 /// This macro accepts arguments like the [`println`] and [`format`] macros.
 /// See [`fmt`](std::fmt) for information about options.
+///
+/// ## Adding Details and Hints
+///
+/// Additionally, you can use specify a `detail` and/or `hint` to be included with the report.
+/// After the string literal to be used as the message and any formatting arguments, add a semicolon.
+/// Then assign a string literal to `detail` or `hint`, optionally followed by a list of
+/// comma separated formatting arguments. The `detail` and `hint` options can be used together or
+/// separately but `detail` must come before `hint` and both must end with a semicolon.
+///
+/// ## Examples
+///
+/// ```rust,no_run
+/// // just like `println!` and `format!`
+/// warning!("a simple message");
+/// warning!("or a formatted message: {:?}", "pgrx rocks!");
+/// // include details and hints
+/// warning! {
+///     "add details if you want";
+///     detail = "...";
+/// }
+/// warning! {
+///     "or a message with just a hint";
+///     hint = "...";
+/// }
+/// warning! {
+///     "put it all together for {} {}", "great", "success!";
+///     detail = "extra {}", "info";
+///     hint = "{} helpful", "very";
+/// }
+/// ```
 #[macro_export]
 macro_rules! warning {
     (
@@ -388,6 +658,36 @@ macro_rules! warning {
 ///
 /// This macro accepts arguments like the [`println`] and [`format`] macros.
 /// See [`fmt`](std::fmt) for information about options.
+///
+/// ## Adding Details and Hints
+///
+/// Additionally, you can use specify a `detail` and/or `hint` to be included with the report.
+/// After the string literal to be used as the message and any formatting arguments, add a semicolon.
+/// Then assign a string literal to `detail` or `hint`, optionally followed by a list of
+/// comma separated formatting arguments. The `detail` and `hint` options can be used together or
+/// separately but `detail` must come before `hint` and both must end with a semicolon.
+///
+/// ## Examples
+///
+/// ```rust,no_run
+/// // just like `println!` and `format!`
+/// error!("a simple message");
+/// error!("or a formatted message: {:?}", "pgrx rocks!");
+/// // include details and hints
+/// error! {
+///     "add details if you want";
+///     detail = "...";
+/// }
+/// error! {
+///     "or a message with just a hint";
+///     hint = "...";
+/// }
+/// error! {
+///     "put it all together for {} {}", "great", "success!";
+///     detail = "extra {}", "info";
+///     hint = "{} helpful", "very";
+/// }
+/// ```
 #[macro_export]
 macro_rules! error {
     (
@@ -420,6 +720,36 @@ macro_rules! error {
 ///
 /// This macro accepts arguments like the [`println`] and [`format`] macros.
 /// See [`fmt`](std::fmt) for information about options.
+///
+/// ## Adding Details and Hints
+///
+/// Additionally, you can use specify a `detail` and/or `hint` to be included with the report.
+/// After the string literal to be used as the message and any formatting arguments, add a semicolon.
+/// Then assign a string literal to `detail` or `hint`, optionally followed by a list of
+/// comma separated formatting arguments. The `detail` and `hint` options can be used together or
+/// separately but `detail` must come before `hint` and both must end with a semicolon.
+///
+/// ## Examples
+///
+/// ```rust,no_run
+/// // just like `println!` and `format!`
+/// FATAL!("a simple message");
+/// FATAL!("or a formatted message: {:?}", "pgrx rocks!");
+/// // include details and hints
+/// FATAL! {
+///     "add details if you want";
+///     detail = "...";
+/// }
+/// FATAL! {
+///     "or a message with just a hint";
+///     hint = "...";
+/// }
+/// FATAL! {
+///     "put it all together for {} {}", "great", "success!";
+///     detail = "extra {}", "info";
+///     hint = "{} helpful", "very";
+/// }
+/// ```
 #[allow(non_snake_case)]
 #[macro_export]
 macro_rules! FATAL {
@@ -453,6 +783,36 @@ macro_rules! FATAL {
 ///
 /// This macro accepts arguments like the [`println`] and [`format`] macros.
 /// See [`fmt`](std::fmt) for information about options.
+///
+/// ## Adding Details and Hints
+///
+/// Additionally, you can use specify a `detail` and/or `hint` to be included with the report.
+/// After the string literal to be used as the message and any formatting arguments, add a semicolon.
+/// Then assign a string literal to `detail` or `hint`, optionally followed by a list of
+/// comma separated formatting arguments. The `detail` and `hint` options can be used together or
+/// separately but `detail` must come before `hint` and both must end with a semicolon.
+///
+/// ## Examples
+///
+/// ```rust,no_run
+/// // just like `println!` and `format!`
+/// PANIC!("a simple message");
+/// PANIC!("or a formatted message: {:?}", "pgrx rocks!");
+/// // include details and hints
+/// PANIC! {
+///     "add details if you want";
+///     detail = "...";
+/// }
+/// PANIC! {
+///     "or a message with just a hint";
+///     hint = "...";
+/// }
+/// PANIC! {
+///     "put it all together for {} {}", "great", "success!";
+///     detail = "extra {}", "info";
+///     hint = "{} helpful", "very";
+/// }
+/// ```
 #[allow(non_snake_case)]
 #[macro_export]
 macro_rules! PANIC {
@@ -508,11 +868,14 @@ macro_rules! function_name {
 /// This macro is necessary when one needs to supply a specific SQL error code as part of their
 /// error message.
 ///
+/// ## Simple Usage
+///
 /// The argument order is:
 /// - `log_level: [PgLogLevel]`
 /// - `error_code: [PgSqlErrorCode]`
 /// - `message: String`
 /// - (optional) `detail: String`
+/// - (optional) `hint: String`
 ///
 /// ## Examples
 ///
@@ -529,6 +892,47 @@ macro_rules! function_name {
 /// # use pgrx_pg_sys::errcodes::PgSqlErrorCode;
 /// ereport!(PgLogLevel::LOG, PgSqlErrorCode::ERRCODE_SUCCESSFUL_COMPLETION, "this is just a message"); // log output only
 /// ```
+///
+/// ## Alternative Usage
+///
+/// Use this invocation style if you need to include a hint but not a detail. This syntax does not prohibit
+/// the use of a detail, but because the simple usage takes it's arguments by position, it isn't possible to
+/// use that syntax and include a hint without a detail.
+///
+/// The argument order is for the first three arguments is the same as the simple usage:
+/// - `log_level: [PgLogLevel]`
+/// - `error_code: [PgSqlErrorCode]`
+/// - `message: String`
+///
+/// After the message, include a semicolon and then assign an expression resulting in a String to `detail` or `hint`.
+///
+/// ## Examples
+///
+/// ```rust,no_run
+/// # use pgrx_pg_sys::ereport;
+/// # use pgrx_pg_sys::elog::PgLogLevel;
+/// # use pgrx_pg_sys::errcodes::PgSqlErrorCode;
+/// // abort the transaction
+/// ereport! {
+///     PgLogLevel::ERROR, PgSqlErrorCode::ERRCODE_INTERNAL_ERROR, "oh noes!";
+///     hint = "check earlier logs for more info";
+/// }
+/// ```
+///
+/// ```rust,no_run
+/// # use pgrx_pg_sys::ereport;
+/// # use pgrx_pg_sys::elog::PgLogLevel;
+/// # use pgrx_pg_sys::errcodes::PgSqlErrorCode;
+/// ereport! {
+///     PgLogLevel::LOG, PgSqlErrorCode::ERRCODE_SUCCESSFUL_COMPLETION, "this is just a message";
+///     detail = "but wait, there's more!";
+///     hint = "there are easier macros to log simple messages like this...";
+/// }
+/// ```
+///
+/// > _**NOTE**: the message/detail/hint arguments don't actually need to result in an owned `String`.
+/// > The trait bounds for the underlying functions are `Into<String>`, so any type that implements
+/// `Into<String>` will work too._
 #[macro_export]
 macro_rules! ereport {
     (ERROR, $errcode:expr, $message:expr $(, $($tt:tt)*)?) => {
