@@ -64,6 +64,29 @@ use pgrx_sql_entity_graph::RustSqlMapping;
 /// Implemented automatically by `#[derive(PostgresType)]`
 pub trait PostgresType {}
 
+/// Obtain a TypeId for T without `T: 'static`
+#[inline]
+#[doc(hidden)]
+pub fn nonstatic_typeid<T: ?Sized>() -> core::any::TypeId {
+    trait NonStaticAny {
+        fn type_id(&self) -> core::any::TypeId
+        where
+            Self: 'static;
+    }
+    impl<T: ?Sized> NonStaticAny for core::marker::PhantomData<T> {
+        #[inline]
+        fn type_id(&self) -> core::any::TypeId
+        where
+            Self: 'static,
+        {
+            core::any::TypeId::of::<T>()
+        }
+    }
+    let it = core::marker::PhantomData::<T>;
+    // There is no excuse for the crimes we have done here, but what jury would convict us?
+    unsafe { core::mem::transmute::<&dyn NonStaticAny, &'static dyn NonStaticAny>(&it).type_id() }
+}
+
 /// A type which can have it's [`core::any::TypeId`]s registered for Rust to SQL mapping.
 ///
 /// An example use of this trait:
@@ -77,9 +100,9 @@ pub trait PostgresType {}
 ///
 /// let mut mappings = Default::default();
 /// let treat_string = stringify!(Treat).to_string();
-/// <Treat<'static> as pgrx::datum::WithTypeIds>::register_with_refs(&mut mappings, treat_string.clone());
+/// <Treat<'_> as pgrx::datum::WithTypeIds>::register_with_refs(&mut mappings, treat_string.clone());
 ///
-/// assert!(mappings.iter().any(|x| x.id == core::any::TypeId::of::<Treat<'static>>()));
+/// assert!(mappings.iter().any(|x| x.id == ::pgrx::datum::nonstatic_typeid::<Treat<'static>>()));
 /// ```
 ///
 /// This trait uses the fact that inherent implementations are a higher priority than trait
@@ -98,10 +121,7 @@ pub trait WithTypeIds {
     const VARLENA_ID: Lazy<Option<TypeId>>;
     const OPTION_VARLENA_ID: Lazy<Option<TypeId>>;
 
-    fn register_with_refs(map: &mut std::collections::HashSet<RustSqlMapping>, single_sql: String)
-    where
-        Self: 'static,
-    {
+    fn register_with_refs(map: &mut std::collections::HashSet<RustSqlMapping>, single_sql: String) {
         Self::register(map, single_sql.clone());
         <&Self as WithTypeIds>::register(map, single_sql.clone());
         <&mut Self as WithTypeIds>::register(map, single_sql);
@@ -110,55 +130,37 @@ pub trait WithTypeIds {
     fn register_sized_with_refs(
         _map: &mut std::collections::HashSet<RustSqlMapping>,
         _single_sql: String,
-    ) where
-        Self: 'static,
-    {
+    ) {
         ()
     }
 
-    fn register_sized(_map: &mut std::collections::HashSet<RustSqlMapping>, _single_sql: String)
-    where
-        Self: 'static,
-    {
+    fn register_sized(_map: &mut std::collections::HashSet<RustSqlMapping>, _single_sql: String) {
         ()
     }
 
     fn register_varlena_with_refs(
         _map: &mut std::collections::HashSet<RustSqlMapping>,
         _single_sql: String,
-    ) where
-        Self: 'static,
-    {
+    ) {
         ()
     }
 
-    fn register_varlena(_map: &mut std::collections::HashSet<RustSqlMapping>, _single_sql: String)
-    where
-        Self: 'static,
-    {
+    fn register_varlena(_map: &mut std::collections::HashSet<RustSqlMapping>, _single_sql: String) {
         ()
     }
 
     fn register_array_with_refs(
         _map: &mut std::collections::HashSet<RustSqlMapping>,
         _single_sql: String,
-    ) where
-        Self: 'static,
-    {
+    ) {
         ()
     }
 
-    fn register_array(_map: &mut std::collections::HashSet<RustSqlMapping>, _single_sql: String)
-    where
-        Self: 'static,
-    {
+    fn register_array(_map: &mut std::collections::HashSet<RustSqlMapping>, _single_sql: String) {
         ()
     }
 
-    fn register(set: &mut std::collections::HashSet<RustSqlMapping>, single_sql: String)
-    where
-        Self: 'static,
-    {
+    fn register(set: &mut std::collections::HashSet<RustSqlMapping>, single_sql: String) {
         let rust = core::any::type_name::<Self>();
         assert!(
             set.insert(RustSqlMapping {
@@ -173,8 +175,8 @@ pub trait WithTypeIds {
     }
 }
 
-impl<T: 'static + ?Sized> WithTypeIds for T {
-    const ITEM_ID: Lazy<TypeId> = Lazy::new(|| TypeId::of::<T>());
+impl<T: ?Sized> WithTypeIds for T {
+    const ITEM_ID: Lazy<TypeId> = Lazy::new(|| nonstatic_typeid::<T>());
     const OPTION_ID: Lazy<Option<TypeId>> = Lazy::new(|| None);
     const VEC_ID: Lazy<Option<TypeId>> = Lazy::new(|| None);
     const VEC_OPTION_ID: Lazy<Option<TypeId>> = Lazy::new(|| None);
@@ -214,20 +216,20 @@ impl<T: 'static + ?Sized> WithTypeIds for T {
 /// implementations.
 pub struct WithSizedTypeIds<T>(pub core::marker::PhantomData<T>);
 
-impl<T: 'static> WithSizedTypeIds<T> {
-    pub const PG_BOX_ID: Lazy<Option<TypeId>> = Lazy::new(|| Some(TypeId::of::<PgBox<T>>()));
+impl<T> WithSizedTypeIds<T> {
+    pub const PG_BOX_ID: Lazy<Option<TypeId>> = Lazy::new(|| Some(nonstatic_typeid::<PgBox<T>>()));
     pub const PG_BOX_OPTION_ID: Lazy<Option<TypeId>> =
-        Lazy::new(|| Some(TypeId::of::<PgBox<Option<T>>>()));
+        Lazy::new(|| Some(nonstatic_typeid::<PgBox<Option<T>>>()));
     pub const PG_BOX_VEC_ID: Lazy<Option<TypeId>> =
-        Lazy::new(|| Some(TypeId::of::<PgBox<Vec<T>>>()));
-    pub const OPTION_ID: Lazy<Option<TypeId>> = Lazy::new(|| Some(TypeId::of::<Option<T>>()));
-    pub const VEC_ID: Lazy<Option<TypeId>> = Lazy::new(|| Some(TypeId::of::<Vec<T>>()));
+        Lazy::new(|| Some(nonstatic_typeid::<PgBox<Vec<T>>>()));
+    pub const OPTION_ID: Lazy<Option<TypeId>> = Lazy::new(|| Some(nonstatic_typeid::<Option<T>>()));
+    pub const VEC_ID: Lazy<Option<TypeId>> = Lazy::new(|| Some(nonstatic_typeid::<Vec<T>>()));
     pub const VEC_OPTION_ID: Lazy<Option<TypeId>> =
-        Lazy::new(|| Some(TypeId::of::<Vec<Option<T>>>()));
+        Lazy::new(|| Some(nonstatic_typeid::<Vec<Option<T>>>()));
     pub const OPTION_VEC_ID: Lazy<Option<TypeId>> =
-        Lazy::new(|| Some(TypeId::of::<Option<Vec<T>>>()));
+        Lazy::new(|| Some(nonstatic_typeid::<Option<Vec<T>>>()));
     pub const OPTION_VEC_OPTION_ID: Lazy<Option<TypeId>> =
-        Lazy::new(|| Some(TypeId::of::<Option<Vec<Option<T>>>>()));
+        Lazy::new(|| Some(nonstatic_typeid::<Option<Vec<Option<T>>>>()));
 
     pub fn register_sized_with_refs(
         map: &mut std::collections::HashSet<RustSqlMapping>,
@@ -333,7 +335,7 @@ impl<T: 'static> WithSizedTypeIds<T> {
 ///     treat_string.clone()
 /// );
 ///
-/// assert!(mappings.iter().any(|x| x.id == core::any::TypeId::of::<Array<Treat>>()));
+/// assert!(mappings.iter().any(|x| x.id == ::pgrx::datum::nonstatic_typeid::<Array<Treat>>()));
 /// ```
 ///
 /// This trait uses the fact that inherent implementations are a higher priority than trait
@@ -341,13 +343,13 @@ impl<T: 'static> WithSizedTypeIds<T> {
 pub struct WithArrayTypeIds<T>(pub core::marker::PhantomData<T>);
 
 impl<T: FromDatum + 'static> WithArrayTypeIds<T> {
-    pub const ARRAY_ID: Lazy<Option<TypeId>> = Lazy::new(|| Some(TypeId::of::<Array<T>>()));
+    pub const ARRAY_ID: Lazy<Option<TypeId>> = Lazy::new(|| Some(nonstatic_typeid::<Array<T>>()));
     pub const OPTION_ARRAY_ID: Lazy<Option<TypeId>> =
-        Lazy::new(|| Some(TypeId::of::<Option<Array<T>>>()));
+        Lazy::new(|| Some(nonstatic_typeid::<Option<Array<T>>>()));
     pub const VARIADICARRAY_ID: Lazy<Option<TypeId>> =
-        Lazy::new(|| Some(TypeId::of::<VariadicArray<T>>()));
+        Lazy::new(|| Some(nonstatic_typeid::<VariadicArray<T>>()));
     pub const OPTION_VARIADICARRAY_ID: Lazy<Option<TypeId>> =
-        Lazy::new(|| Some(TypeId::of::<Option<VariadicArray<T>>>()));
+        Lazy::new(|| Some(nonstatic_typeid::<Option<VariadicArray<T>>>()));
 
     pub fn register_array_with_refs(
         map: &mut std::collections::HashSet<RustSqlMapping>,
@@ -418,7 +420,7 @@ impl<T: FromDatum + 'static> WithArrayTypeIds<T> {
 ///     treat_string.clone()
 /// );
 ///
-/// assert!(mappings.iter().any(|x| x.id == core::any::TypeId::of::<PgVarlena<Treat<'static>>>()));
+/// assert!(mappings.iter().any(|x| x.id == ::pgrx::datum::nonstatic_typeid::<PgVarlena<Treat<'_>>>()));
 /// ```
 ///
 /// This trait uses the fact that inherent implementations are a higher priority than trait
@@ -426,11 +428,12 @@ impl<T: FromDatum + 'static> WithArrayTypeIds<T> {
 pub struct WithVarlenaTypeIds<T>(pub core::marker::PhantomData<T>);
 
 impl<T: Copy + 'static> WithVarlenaTypeIds<T> {
-    pub const VARLENA_ID: Lazy<Option<TypeId>> = Lazy::new(|| Some(TypeId::of::<PgVarlena<T>>()));
+    pub const VARLENA_ID: Lazy<Option<TypeId>> =
+        Lazy::new(|| Some(nonstatic_typeid::<PgVarlena<T>>()));
     pub const PG_BOX_VARLENA_ID: Lazy<Option<TypeId>> =
-        Lazy::new(|| Some(TypeId::of::<PgBox<PgVarlena<T>>>()));
+        Lazy::new(|| Some(nonstatic_typeid::<PgBox<PgVarlena<T>>>()));
     pub const OPTION_VARLENA_ID: Lazy<Option<TypeId>> =
-        Lazy::new(|| Some(TypeId::of::<Option<PgVarlena<T>>>()));
+        Lazy::new(|| Some(nonstatic_typeid::<Option<PgVarlena<T>>>()));
 
     pub fn register_varlena_with_refs(
         map: &mut std::collections::HashSet<RustSqlMapping>,
