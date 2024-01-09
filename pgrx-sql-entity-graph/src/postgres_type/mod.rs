@@ -21,7 +21,7 @@ use crate::enrich::{ToEntityGraphTokens, ToRustCodeTokens};
 use proc_macro2::{Ident, Span, TokenStream as TokenStream2};
 use quote::quote;
 use syn::parse::{Parse, ParseStream};
-use syn::{DeriveInput, Generics, ItemStruct, LifetimeDef, Lifetime};
+use syn::{DeriveInput, Generics, ItemStruct, Lifetime, LifetimeDef};
 
 use crate::{CodeEnrichment, ToSqlConfig};
 
@@ -104,43 +104,26 @@ impl ToEntityGraphTokens for PostgresTypeDerive {
     fn to_entity_graph_tokens(&self) -> TokenStream2 {
         let name = &self.name;
         let mut static_generics = self.generics.clone();
-        static_generics.params = static_generics
-            .params
-            .clone()
-            .into_iter()
-            // .flat_map(|param| match param {
-            //     item @ syn::GenericParam::Type(_) | item @ syn::GenericParam::Const(_) => {
-            //         Some(item)
-            //     }
-            //     syn::GenericParam::Lifetime(mut lifetime) => {
-            //         lifetime.lifetime.ident = Ident::new("static", Span::call_site());
-            //         Some(syn::GenericParam::Lifetime(lifetime))
-            //     }
-            // })
-            .collect();
+        static_generics.params = static_generics.params.clone().into_iter().collect();
         let mut staticless_generics = self.generics.clone();
-        staticless_generics.params = static_generics
-            .params
-            .clone()
-            .into_iter()
-            // .flat_map(|param| match param {
-            //     item @ syn::GenericParam::Type(_) | item @ syn::GenericParam::Const(_) => {
-            //         Some(item)
-            //     }
-            //     syn::GenericParam::Lifetime(_) => None,
-            // })
-            .collect();
-        let (staticless_impl_generics, _staticless_ty_generics, _staticless_where_clauses) =
-            staticless_generics.split_for_impl();
-        let (_static_impl_generics, static_ty_generics, static_where_clauses) =
-            static_generics.split_for_impl();
+        staticless_generics.params = static_generics.params.clone().into_iter().collect();
+        let (staticless_impl_generics, _, _) = staticless_generics.split_for_impl();
+        let (_, static_ty_generics, static_where_clauses) = static_generics.split_for_impl();
 
         let mut anon_generics = static_generics.clone();
-        anon_generics.params = anon_generics.params.into_iter().flat_map(|param| match param {
-                item @ syn::GenericParam::Type(_) | item @ syn::GenericParam::Const(_) => Some(item),
-                syn::GenericParam::Lifetime(lt_def) => Some(syn::GenericParam::Lifetime(LifetimeDef::new(Lifetime::new("'_", lt_def.lifetime.span())))),
-            }).collect();
-        let (anon_impl_gen, anon_ty_gen, anon_wheres) = anon_generics.split_for_impl();
+        anon_generics.params = anon_generics
+            .params
+            .into_iter()
+            .flat_map(|param| match param {
+                item @ syn::GenericParam::Type(_) | item @ syn::GenericParam::Const(_) => {
+                    Some(item)
+                }
+                syn::GenericParam::Lifetime(lt_def) => Some(syn::GenericParam::Lifetime(
+                    LifetimeDef::new(Lifetime::new("'_", lt_def.lifetime.span())),
+                )),
+            })
+            .collect();
+        let (_, anon_ty_gen, _) = anon_generics.split_for_impl();
 
         let in_fn = &self.in_fn;
         let out_fn = &self.out_fn;
