@@ -103,14 +103,10 @@ impl PostgresTypeDerive {
 impl ToEntityGraphTokens for PostgresTypeDerive {
     fn to_entity_graph_tokens(&self) -> TokenStream2 {
         let name = &self.name;
-        let mut static_generics = self.generics.clone();
-        static_generics.params = static_generics.params.clone().into_iter().collect();
-        let mut staticless_generics = self.generics.clone();
-        staticless_generics.params = static_generics.params.clone().into_iter().collect();
-        let (staticless_impl_generics, _, _) = staticless_generics.split_for_impl();
-        let (_, static_ty_generics, static_where_clauses) = static_generics.split_for_impl();
+        let generics = self.generics.clone();
+        let (impl_generics, ty_generics, where_clauses) = generics.split_for_impl();
 
-        let mut anon_generics = static_generics.clone();
+        let mut anon_generics = generics.clone();
         anon_generics.params = anon_generics
             .params
             .into_iter()
@@ -134,7 +130,7 @@ impl ToEntityGraphTokens for PostgresTypeDerive {
         let to_sql_config = &self.to_sql_config;
 
         quote! {
-            unsafe impl #staticless_impl_generics ::pgrx::pgrx_sql_entity_graph::metadata::SqlTranslatable for #name #static_ty_generics #static_where_clauses {
+            unsafe impl #impl_generics ::pgrx::pgrx_sql_entity_graph::metadata::SqlTranslatable for #name #ty_generics #where_clauses {
                 fn argument_sql() -> core::result::Result<::pgrx::pgrx_sql_entity_graph::metadata::SqlMapping, ::pgrx::pgrx_sql_entity_graph::metadata::ArgumentError> {
                     Ok(::pgrx::pgrx_sql_entity_graph::metadata::SqlMapping::As(String::from(stringify!(#name))))
                 }
