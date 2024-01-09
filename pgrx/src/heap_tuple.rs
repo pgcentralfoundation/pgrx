@@ -33,10 +33,10 @@ pub enum PgHeapTupleError {
     #[error("The specified composite type, {0}, does not exist")]
     NoSuchType(String),
 
-    #[error("The specified composite type, {0}, does not exist")]
+    #[error("The specified composite type, {0:?}, does not exist")]
     NoSuchTypeOid(pg_sys::Oid),
 
-    #[error("Oid `{0}` is not a composite type")]
+    #[error("Oid `{0:?}` is not a composite type")]
     NotACompositeType(pg_sys::Oid),
 }
 
@@ -169,7 +169,7 @@ impl<'a> PgHeapTuple<'a, AllocatedByPostgres> {
         }
     }
 
-    /// Consumes a `[PgHeapTuple]` considered to be allocated by Postgres and transforms it into one
+    /// Consumes a [`PgHeapTuple`] considered to be allocated by Postgres and transforms it into one
     /// that is considered allocated by Rust.  This is accomplished by copying the underlying [pg_sys::HeapTupleData].
     pub fn into_owned(self) -> PgHeapTuple<'a, AllocatedByRust> {
         let copy = unsafe { pg_sys::heap_copytuple(self.tuple.into_pg()) };
@@ -244,7 +244,7 @@ impl<'a> PgHeapTuple<'a, AllocatedByRust> {
         .execute()
     }
 
-    /// Create a new [PgHeapTuple] from a [PgTupleDesc] from an iterator of Datums.
+    /// Create a new [PgHeapTuple] from a [PgTupleDesc] and an iterator of Datums.
     ///
     /// ## Errors
     /// - [PgHeapTupleError::IncorrectAttributeCount] if the number of items in the iterator

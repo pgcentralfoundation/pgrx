@@ -11,7 +11,6 @@
 use crate as pg_sys;
 use crate::BuiltinOid;
 use crate::Datum;
-use core::fmt;
 use pgrx_sql_entity_graph::metadata::{
     ArgumentError, Returns, ReturnsError, SqlMapping, SqlTranslatable,
 };
@@ -84,18 +83,6 @@ impl Oid {
 impl Default for Oid {
     fn default() -> Oid {
         Oid::INVALID
-    }
-}
-
-impl fmt::Display for Oid {
-    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-        match PgOid::from(*self) {
-            PgOid::Invalid => write!(f, "oid={{#0, Invalid OID}}"),
-            // if we think we know the name, include it
-            PgOid::BuiltIn(builtin) => write!(f, "oid={{#{}, builtin: {:?}}}", self.0, builtin),
-            // no idea? print it anyways!
-            PgOid::Custom(oid) => write!(f, "oid=#{}", oid.0),
-        }
     }
 }
 

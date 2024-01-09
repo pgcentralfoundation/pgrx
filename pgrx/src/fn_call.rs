@@ -81,7 +81,7 @@ pub enum FnCallError {
     #[error("Functions with argument or return types of `internal` are not supported")]
     InternalTypeNotSupported,
 
-    #[error("The requested return type `{0}` is not compatible with the actual return type `{1}`")]
+    #[error("The requested return type OID `{0:?}` is not compatible with the actual return type OID `{1:?}`")]
     IncompatibleReturnType(pg_sys::Oid, pg_sys::Oid),
 
     #[error("Function call has more arguments than are supported")]
