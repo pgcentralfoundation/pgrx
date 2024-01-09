@@ -115,6 +115,8 @@ impl From<i32> for PgLogLevel {
 /// ## Examples
 ///
 /// ```rust,no_run
+/// use pgrx_pg_sys::debug5;
+///
 /// // just like `println!` and `format!`
 /// debug5!("a simple message");
 /// debug5!("or a formatted message: {:?}", "pgrx rocks!");
@@ -178,6 +180,8 @@ macro_rules! debug5 {
 /// ## Examples
 ///
 /// ```rust,no_run
+/// use pgrx_pg_sys::debug4;
+///
 /// // just like `println!` and `format!`
 /// debug4!("a simple message");
 /// debug4!("or a formatted message: {:?}", "pgrx rocks!");
@@ -241,6 +245,8 @@ macro_rules! debug4 {
 /// ## Examples
 ///
 /// ```rust,no_run
+/// use pgrx_pg_sys::debug3;
+///
 /// // just like `println!` and `format!`
 /// debug3!("a simple message");
 /// debug3!("or a formatted message: {:?}", "pgrx rocks!");
@@ -304,6 +310,8 @@ macro_rules! debug3 {
 /// ## Examples
 ///
 /// ```rust,no_run
+/// use pgrx_pg_sys::debug2;
+///
 /// // just like `println!` and `format!`
 /// debug2!("a simple message");
 /// debug2!("or a formatted message: {:?}", "pgrx rocks!");
@@ -367,6 +375,8 @@ macro_rules! debug2 {
 /// ## Examples
 ///
 /// ```rust,no_run
+/// use pgrx_pg_sys::debug1;
+///
 /// // just like `println!` and `format!`
 /// debug1!("a simple message");
 /// debug1!("or a formatted message: {:?}", "pgrx rocks!");
@@ -430,6 +440,8 @@ macro_rules! debug1 {
 /// ## Examples
 ///
 /// ```rust,no_run
+/// use pgrx_pg_sys::log;
+///
 /// // just like `println!` and `format!`
 /// log!("a simple message");
 /// log!("or a formatted message: {:?}", "pgrx rocks!");
@@ -490,6 +502,8 @@ macro_rules! log {
 /// ## Examples
 ///
 /// ```rust,no_run
+/// use pgrx_pg_sys::info;
+///
 /// // just like `println!` and `format!`
 /// info!("a simple message");
 /// info!("or a formatted message: {:?}", "pgrx rocks!");
@@ -550,6 +564,8 @@ macro_rules! info {
 /// ## Examples
 ///
 /// ```rust,no_run
+/// use pgrx_pg_sys::notice;
+///
 /// // just like `println!` and `format!`
 /// notice!("a simple message");
 /// notice!("or a formatted message: {:?}", "pgrx rocks!");
@@ -610,6 +626,8 @@ macro_rules! notice {
 /// ## Examples
 ///
 /// ```rust,no_run
+/// use pgrx_pg_sys::warning;
+///
 /// // just like `println!` and `format!`
 /// warning!("a simple message");
 /// warning!("or a formatted message: {:?}", "pgrx rocks!");
@@ -670,6 +688,8 @@ macro_rules! warning {
 /// ## Examples
 ///
 /// ```rust,no_run
+/// use pgrx_pg_sys::error;
+///
 /// // just like `println!` and `format!`
 /// error!("a simple message");
 /// error!("or a formatted message: {:?}", "pgrx rocks!");
@@ -732,6 +752,8 @@ macro_rules! error {
 /// ## Examples
 ///
 /// ```rust,no_run
+/// use pgrx_pg_sys::FATAL;
+///
 /// // just like `println!` and `format!`
 /// FATAL!("a simple message");
 /// FATAL!("or a formatted message: {:?}", "pgrx rocks!");
@@ -795,6 +817,8 @@ macro_rules! FATAL {
 /// ## Examples
 ///
 /// ```rust,no_run
+/// use pgrx_pg_sys::PANIC;
+///
 /// // just like `println!` and `format!`
 /// PANIC!("a simple message");
 /// PANIC!("or a formatted message: {:?}", "pgrx rocks!");
