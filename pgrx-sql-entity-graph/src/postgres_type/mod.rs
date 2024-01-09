@@ -21,7 +21,7 @@ use crate::enrich::{ToEntityGraphTokens, ToRustCodeTokens};
 use proc_macro2::{Ident, Span, TokenStream as TokenStream2};
 use quote::quote;
 use syn::parse::{Parse, ParseStream};
-use syn::{DeriveInput, Generics, ItemStruct};
+use syn::{DeriveInput, Generics, ItemStruct, LifetimeDef, Lifetime};
 
 use crate::{CodeEnrichment, ToSqlConfig};
 
@@ -108,32 +108,39 @@ impl ToEntityGraphTokens for PostgresTypeDerive {
             .params
             .clone()
             .into_iter()
-            .flat_map(|param| match param {
-                item @ syn::GenericParam::Type(_) | item @ syn::GenericParam::Const(_) => {
-                    Some(item)
-                }
-                syn::GenericParam::Lifetime(mut lifetime) => {
-                    lifetime.lifetime.ident = Ident::new("static", Span::call_site());
-                    Some(syn::GenericParam::Lifetime(lifetime))
-                }
-            })
+            // .flat_map(|param| match param {
+            //     item @ syn::GenericParam::Type(_) | item @ syn::GenericParam::Const(_) => {
+            //         Some(item)
+            //     }
+            //     syn::GenericParam::Lifetime(mut lifetime) => {
+            //         lifetime.lifetime.ident = Ident::new("static", Span::call_site());
+            //         Some(syn::GenericParam::Lifetime(lifetime))
+            //     }
+            // })
             .collect();
         let mut staticless_generics = self.generics.clone();
         staticless_generics.params = static_generics
             .params
             .clone()
             .into_iter()
-            .flat_map(|param| match param {
-                item @ syn::GenericParam::Type(_) | item @ syn::GenericParam::Const(_) => {
-                    Some(item)
-                }
-                syn::GenericParam::Lifetime(_) => None,
-            })
+            // .flat_map(|param| match param {
+            //     item @ syn::GenericParam::Type(_) | item @ syn::GenericParam::Const(_) => {
+            //         Some(item)
+            //     }
+            //     syn::GenericParam::Lifetime(_) => None,
+            // })
             .collect();
         let (staticless_impl_generics, _staticless_ty_generics, _staticless_where_clauses) =
             staticless_generics.split_for_impl();
         let (_static_impl_generics, static_ty_generics, static_where_clauses) =
             static_generics.split_for_impl();
+
+        let mut anon_generics = static_generics.clone();
+        anon_generics.params = anon_generics.params.into_iter().flat_map(|param| match param {
+                item @ syn::GenericParam::Type(_) | item @ syn::GenericParam::Const(_) => Some(item),
+                syn::GenericParam::Lifetime(lt_def) => Some(syn::GenericParam::Lifetime(LifetimeDef::new(Lifetime::new("'_", lt_def.lifetime.span())))),
+            }).collect();
+        let (anon_impl_gen, anon_ty_gen, anon_wheres) = anon_generics.split_for_impl();
 
         let in_fn = &self.in_fn;
         let out_fn = &self.out_fn;
@@ -166,19 +173,19 @@ impl ToEntityGraphTokens for PostgresTypeDerive {
                 use ::pgrx::datum::WithTypeIds;
 
                 let mut mappings = Default::default();
-                <#name #static_ty_generics as ::pgrx::datum::WithTypeIds>::register_with_refs(
+                <#name #anon_ty_gen as ::pgrx::datum::WithTypeIds>::register_with_refs(
                     &mut mappings,
                     stringify!(#name).to_string()
                 );
-                ::pgrx::datum::WithSizedTypeIds::<#name #static_ty_generics>::register_sized_with_refs(
+                ::pgrx::datum::WithSizedTypeIds::<#name #anon_ty_gen>::register_sized_with_refs(
                     &mut mappings,
                     stringify!(#name).to_string()
                 );
-                ::pgrx::datum::WithArrayTypeIds::<#name #static_ty_generics>::register_array_with_refs(
+                ::pgrx::datum::WithArrayTypeIds::<#name #anon_ty_gen>::register_array_with_refs(
                     &mut mappings,
                     stringify!(#name).to_string()
                 );
-                ::pgrx::datum::WithVarlenaTypeIds::<#name #static_ty_generics>::register_varlena_with_refs(
+                ::pgrx::datum::WithVarlenaTypeIds::<#name #anon_ty_gen>::register_varlena_with_refs(
                     &mut mappings,
                     stringify!(#name).to_string()
                 );
@@ -187,7 +194,7 @@ impl ToEntityGraphTokens for PostgresTypeDerive {
                     file: file!(),
                     line: line!(),
                     module_path: module_path!(),
-                    full_path: core::any::type_name::<#name #static_ty_generics>(),
+                    full_path: core::any::type_name::<#name #anon_ty_gen>(),
                     mappings: mappings.into_iter().collect(),
                     in_fn: stringify!(#in_fn),
                     in_fn_module_path: {
