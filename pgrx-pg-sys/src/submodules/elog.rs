@@ -109,8 +109,7 @@ impl From<i32> for PgLogLevel {
 /// Additionally, you can use specify a `detail` and/or `hint` to be included with the report.
 /// After the string literal to be used as the message and any formatting arguments, add a semicolon.
 /// Then assign a string literal to `detail` or `hint`, optionally followed by a list of
-/// comma separated formatting arguments. The `detail` and `hint` options can be used together or
-/// separately but `detail` must come before `hint` and both must end with a semicolon.
+/// comma separated formatting arguments.
 ///
 /// ## Examples
 ///
@@ -140,16 +139,64 @@ macro_rules! debug5 {
     (
         $msg:literal $(, $msg_args:expr)*;
         $(detail = $detail:literal $(, $detail_args:expr)*)?;
-        $(hint = $hint:literal $(, $hint_args:expr)*)?;
     ) => (
         {
+            extern crate core;
             extern crate alloc;
             $crate::ereport!(
                 $crate::elog::PgLogLevel::DEBUG5,
                 $crate::errcodes::PgSqlErrorCode::ERRCODE_SUCCESSFUL_COMPLETION,
-                alloc::format!($msg $(, $msg_args)*).as_str();
-                $(detail = alloc::format!($detail $(, $detail_args)*).as_str();)?
-                $(hint = alloc::format!($hint $(, $hint_args)*).as_str();)?
+                alloc::format!("{}", core::format_args!($msg $(, $msg_args)*));
+                $(detail = alloc::format!("{}", core::format_args!($detail $(, $detail_args)*));)?
+            );
+        }
+    );
+    (
+        $msg:literal $(, $msg_args:expr)*;
+        $(hint = $hint:literal $(, $hint_args:expr)*)?;
+    ) => (
+        {
+            extern crate core;
+            extern crate alloc;
+            $crate::ereport!(
+                $crate::elog::PgLogLevel::DEBUG5,
+                $crate::errcodes::PgSqlErrorCode::ERRCODE_SUCCESSFUL_COMPLETION,
+                alloc::format!("{}", core::format_args!($msg $(, $msg_args)*));
+                $(hint = alloc::format!("{}", core::format_args!($hint $(, $hint_args)*));)?
+            );
+        }
+    );
+    (
+        $msg:literal $(, $msg_args:expr)*;
+        $(hint = $hint:literal $(, $hint_args:expr)*)?;
+        $(detail = $detail:literal $(, $detail_args:expr)*)?;
+    ) => (
+        {
+            extern crate core;
+            extern crate alloc;
+            $crate::ereport!(
+                $crate::elog::PgLogLevel::DEBUG5,
+                $crate::errcodes::PgSqlErrorCode::ERRCODE_SUCCESSFUL_COMPLETION,
+                alloc::format!("{}", core::format_args!($msg $(, $msg_args)*));
+                $(detail = alloc::format!("{}", core::format_args!($detail $(, $detail_args)*));)?
+                $(hint = alloc::format!("{}", core::format_args!($hint $(, $hint_args)*));)?
+            );
+        }
+    );
+    (
+        $msg:literal $(, $msg_args:expr)*;
+        $(detail = $detail:literal $(, $detail_args:expr)*)?;
+        $(hint = $hint:literal $(, $hint_args:expr)*)?;
+    ) => (
+        {
+            extern crate core;
+            extern crate alloc;
+            $crate::ereport!(
+                $crate::elog::PgLogLevel::DEBUG5,
+                $crate::errcodes::PgSqlErrorCode::ERRCODE_SUCCESSFUL_COMPLETION,
+                alloc::format!("{}", core::format_args!($msg $(, $msg_args)*));
+                $(detail = alloc::format!("{}", core::format_args!($detail $(, $detail_args)*));)?
+                $(hint = alloc::format!("{}", core::format_args!($hint $(, $hint_args)*));)?
             );
         }
     );
@@ -174,8 +221,7 @@ macro_rules! debug5 {
 /// Additionally, you can use specify a `detail` and/or `hint` to be included with the report.
 /// After the string literal to be used as the message and any formatting arguments, add a semicolon.
 /// Then assign a string literal to `detail` or `hint`, optionally followed by a list of
-/// comma separated formatting arguments. The `detail` and `hint` options can be used together or
-/// separately but `detail` must come before `hint` and both must end with a semicolon.
+/// comma separated formatting arguments.
 ///
 /// ## Examples
 ///
@@ -205,16 +251,64 @@ macro_rules! debug4 {
     (
         $msg:literal $(, $msg_args:expr)*;
         $(detail = $detail:literal $(, $detail_args:expr)*)?;
-        $(hint = $hint:literal $(, $hint_args:expr)*)?;
     ) => (
         {
+            extern crate core;
             extern crate alloc;
             $crate::ereport!(
                 $crate::elog::PgLogLevel::DEBUG4,
                 $crate::errcodes::PgSqlErrorCode::ERRCODE_SUCCESSFUL_COMPLETION,
-                alloc::format!($msg $(, $msg_args)*).as_str();
-                $(detail = alloc::format!($detail $(, $detail_args)*).as_str();)?
-                $(hint = alloc::format!($hint $(, $hint_args)*).as_str();)?
+                alloc::format!("{}", core::format_args!($msg $(, $msg_args)*));
+                $(detail = alloc::format!("{}", core::format_args!($detail $(, $detail_args)*));)?
+            );
+        }
+    );
+    (
+        $msg:literal $(, $msg_args:expr)*;
+        $(hint = $hint:literal $(, $hint_args:expr)*)?;
+    ) => (
+        {
+            extern crate core;
+            extern crate alloc;
+            $crate::ereport!(
+                $crate::elog::PgLogLevel::DEBUG4,
+                $crate::errcodes::PgSqlErrorCode::ERRCODE_SUCCESSFUL_COMPLETION,
+                alloc::format!("{}", core::format_args!($msg $(, $msg_args)*));
+                $(hint = alloc::format!("{}", core::format_args!($hint $(, $hint_args)*));)?
+            );
+        }
+    );
+    (
+        $msg:literal $(, $msg_args:expr)*;
+        $(hint = $hint:literal $(, $hint_args:expr)*)?;
+        $(detail = $detail:literal $(, $detail_args:expr)*)?;
+    ) => (
+        {
+            extern crate core;
+            extern crate alloc;
+            $crate::ereport!(
+                $crate::elog::PgLogLevel::DEBUG4,
+                $crate::errcodes::PgSqlErrorCode::ERRCODE_SUCCESSFUL_COMPLETION,
+                alloc::format!("{}", core::format_args!($msg $(, $msg_args)*));
+                $(detail = alloc::format!("{}", core::format_args!($detail $(, $detail_args)*));)?
+                $(hint = alloc::format!("{}", core::format_args!($hint $(, $hint_args)*));)?
+            );
+        }
+    );
+    (
+        $msg:literal $(, $msg_args:expr)*;
+        $(detail = $detail:literal $(, $detail_args:expr)*)?;
+        $(hint = $hint:literal $(, $hint_args:expr)*)?;
+    ) => (
+        {
+            extern crate core;
+            extern crate alloc;
+            $crate::ereport!(
+                $crate::elog::PgLogLevel::DEBUG4,
+                $crate::errcodes::PgSqlErrorCode::ERRCODE_SUCCESSFUL_COMPLETION,
+                alloc::format!("{}", core::format_args!($msg $(, $msg_args)*));
+                $(detail = alloc::format!("{}", core::format_args!($detail $(, $detail_args)*));)?
+                $(hint = alloc::format!("{}", core::format_args!($hint $(, $hint_args)*));)?
             );
         }
     );
@@ -239,8 +333,7 @@ macro_rules! debug4 {
 /// Additionally, you can use specify a `detail` and/or `hint` to be included with the report.
 /// After the string literal to be used as the message and any formatting arguments, add a semicolon.
 /// Then assign a string literal to `detail` or `hint`, optionally followed by a list of
-/// comma separated formatting arguments. The `detail` and `hint` options can be used together or
-/// separately but `detail` must come before `hint` and both must end with a semicolon.
+/// comma separated formatting arguments.
 ///
 /// ## Examples
 ///
@@ -270,16 +363,64 @@ macro_rules! debug3 {
     (
         $msg:literal $(, $msg_args:expr)*;
         $(detail = $detail:literal $(, $detail_args:expr)*)?;
-        $(hint = $hint:literal $(, $hint_args:expr)*)?;
     ) => (
         {
+            extern crate core;
             extern crate alloc;
             $crate::ereport!(
                 $crate::elog::PgLogLevel::DEBUG3,
                 $crate::errcodes::PgSqlErrorCode::ERRCODE_SUCCESSFUL_COMPLETION,
-                alloc::format!($msg $(, $msg_args)*).as_str();
-                $(detail = alloc::format!($detail $(, $detail_args)*).as_str();)?
-                $(hint = alloc::format!($hint $(, $hint_args)*).as_str();)?
+                alloc::format!("{}", core::format_args!($msg $(, $msg_args)*));
+                $(detail = alloc::format!("{}", core::format_args!($detail $(, $detail_args)*));)?
+            );
+        }
+    );
+    (
+        $msg:literal $(, $msg_args:expr)*;
+        $(hint = $hint:literal $(, $hint_args:expr)*)?;
+    ) => (
+        {
+            extern crate core;
+            extern crate alloc;
+            $crate::ereport!(
+                $crate::elog::PgLogLevel::DEBUG3,
+                $crate::errcodes::PgSqlErrorCode::ERRCODE_SUCCESSFUL_COMPLETION,
+                alloc::format!("{}", core::format_args!($msg $(, $msg_args)*));
+                $(hint = alloc::format!("{}", core::format_args!($hint $(, $hint_args)*));)?
+            );
+        }
+    );
+    (
+        $msg:literal $(, $msg_args:expr)*;
+        $(hint = $hint:literal $(, $hint_args:expr)*)?;
+        $(detail = $detail:literal $(, $detail_args:expr)*)?;
+    ) => (
+        {
+            extern crate core;
+            extern crate alloc;
+            $crate::ereport!(
+                $crate::elog::PgLogLevel::DEBUG3,
+                $crate::errcodes::PgSqlErrorCode::ERRCODE_SUCCESSFUL_COMPLETION,
+                alloc::format!("{}", core::format_args!($msg $(, $msg_args)*));
+                $(detail = alloc::format!("{}", core::format_args!($detail $(, $detail_args)*));)?
+                $(hint = alloc::format!("{}", core::format_args!($hint $(, $hint_args)*));)?
+            );
+        }
+    );
+    (
+        $msg:literal $(, $msg_args:expr)*;
+        $(detail = $detail:literal $(, $detail_args:expr)*)?;
+        $(hint = $hint:literal $(, $hint_args:expr)*)?;
+    ) => (
+        {
+            extern crate core;
+            extern crate alloc;
+            $crate::ereport!(
+                $crate::elog::PgLogLevel::DEBUG3,
+                $crate::errcodes::PgSqlErrorCode::ERRCODE_SUCCESSFUL_COMPLETION,
+                alloc::format!("{}", core::format_args!($msg $(, $msg_args)*));
+                $(detail = alloc::format!("{}", core::format_args!($detail $(, $detail_args)*));)?
+                $(hint = alloc::format!("{}", core::format_args!($hint $(, $hint_args)*));)?
             );
         }
     );
@@ -304,8 +445,7 @@ macro_rules! debug3 {
 /// Additionally, you can use specify a `detail` and/or `hint` to be included with the report.
 /// After the string literal to be used as the message and any formatting arguments, add a semicolon.
 /// Then assign a string literal to `detail` or `hint`, optionally followed by a list of
-/// comma separated formatting arguments. The `detail` and `hint` options can be used together or
-/// separately but `detail` must come before `hint` and both must end with a semicolon.
+/// comma separated formatting arguments.
 ///
 /// ## Examples
 ///
@@ -335,16 +475,64 @@ macro_rules! debug2 {
     (
         $msg:literal $(, $msg_args:expr)*;
         $(detail = $detail:literal $(, $detail_args:expr)*)?;
-        $(hint = $hint:literal $(, $hint_args:expr)*)?;
     ) => (
         {
+            extern crate core;
             extern crate alloc;
             $crate::ereport!(
                 $crate::elog::PgLogLevel::DEBUG2,
                 $crate::errcodes::PgSqlErrorCode::ERRCODE_SUCCESSFUL_COMPLETION,
-                alloc::format!($msg $(, $msg_args)*).as_str();
-                $(detail = alloc::format!($detail $(, $detail_args)*).as_str();)?
-                $(hint = alloc::format!($hint $(, $hint_args)*).as_str();)?
+                alloc::format!("{}", core::format_args!($msg $(, $msg_args)*));
+                $(detail = alloc::format!("{}", core::format_args!($detail $(, $detail_args)*));)?
+            );
+        }
+    );
+    (
+        $msg:literal $(, $msg_args:expr)*;
+        $(hint = $hint:literal $(, $hint_args:expr)*)?;
+    ) => (
+        {
+            extern crate core;
+            extern crate alloc;
+            $crate::ereport!(
+                $crate::elog::PgLogLevel::DEBUG2,
+                $crate::errcodes::PgSqlErrorCode::ERRCODE_SUCCESSFUL_COMPLETION,
+                alloc::format!("{}", core::format_args!($msg $(, $msg_args)*));
+                $(hint = alloc::format!("{}", core::format_args!($hint $(, $hint_args)*));)?
+            );
+        }
+    );
+    (
+        $msg:literal $(, $msg_args:expr)*;
+        $(hint = $hint:literal $(, $hint_args:expr)*)?;
+        $(detail = $detail:literal $(, $detail_args:expr)*)?;
+    ) => (
+        {
+            extern crate core;
+            extern crate alloc;
+            $crate::ereport!(
+                $crate::elog::PgLogLevel::DEBUG2,
+                $crate::errcodes::PgSqlErrorCode::ERRCODE_SUCCESSFUL_COMPLETION,
+                alloc::format!("{}", core::format_args!($msg $(, $msg_args)*));
+                $(detail = alloc::format!("{}", core::format_args!($detail $(, $detail_args)*));)?
+                $(hint = alloc::format!("{}", core::format_args!($hint $(, $hint_args)*));)?
+            );
+        }
+    );
+    (
+        $msg:literal $(, $msg_args:expr)*;
+        $(detail = $detail:literal $(, $detail_args:expr)*)?;
+        $(hint = $hint:literal $(, $hint_args:expr)*)?;
+    ) => (
+        {
+            extern crate core;
+            extern crate alloc;
+            $crate::ereport!(
+                $crate::elog::PgLogLevel::DEBUG2,
+                $crate::errcodes::PgSqlErrorCode::ERRCODE_SUCCESSFUL_COMPLETION,
+                alloc::format!("{}", core::format_args!($msg $(, $msg_args)*));
+                $(detail = alloc::format!("{}", core::format_args!($detail $(, $detail_args)*));)?
+                $(hint = alloc::format!("{}", core::format_args!($hint $(, $hint_args)*));)?
             );
         }
     );
@@ -369,8 +557,7 @@ macro_rules! debug2 {
 /// Additionally, you can use specify a `detail` and/or `hint` to be included with the report.
 /// After the string literal to be used as the message and any formatting arguments, add a semicolon.
 /// Then assign a string literal to `detail` or `hint`, optionally followed by a list of
-/// comma separated formatting arguments. The `detail` and `hint` options can be used together or
-/// separately but `detail` must come before `hint` and both must end with a semicolon.
+/// comma separated formatting arguments.
 ///
 /// ## Examples
 ///
@@ -400,16 +587,64 @@ macro_rules! debug1 {
     (
         $msg:literal $(, $msg_args:expr)*;
         $(detail = $detail:literal $(, $detail_args:expr)*)?;
-        $(hint = $hint:literal $(, $hint_args:expr)*)?;
     ) => (
         {
+            extern crate core;
             extern crate alloc;
             $crate::ereport!(
                 $crate::elog::PgLogLevel::DEBUG1,
                 $crate::errcodes::PgSqlErrorCode::ERRCODE_SUCCESSFUL_COMPLETION,
-                alloc::format!($msg $(, $msg_args)*).as_str();
-                $(detail = alloc::format!($detail $(, $detail_args)*).as_str();)?
-                $(hint = alloc::format!($hint $(, $hint_args)*).as_str();)?
+                alloc::format!("{}", core::format_args!($msg $(, $msg_args)*));
+                $(detail = alloc::format!("{}", core::format_args!($detail $(, $detail_args)*));)?
+            );
+        }
+    );
+    (
+        $msg:literal $(, $msg_args:expr)*;
+        $(hint = $hint:literal $(, $hint_args:expr)*)?;
+    ) => (
+        {
+            extern crate core;
+            extern crate alloc;
+            $crate::ereport!(
+                $crate::elog::PgLogLevel::DEBUG1,
+                $crate::errcodes::PgSqlErrorCode::ERRCODE_SUCCESSFUL_COMPLETION,
+                alloc::format!("{}", core::format_args!($msg $(, $msg_args)*));
+                $(hint = alloc::format!("{}", core::format_args!($hint $(, $hint_args)*));)?
+            );
+        }
+    );
+    (
+        $msg:literal $(, $msg_args:expr)*;
+        $(hint = $hint:literal $(, $hint_args:expr)*)?;
+        $(detail = $detail:literal $(, $detail_args:expr)*)?;
+    ) => (
+        {
+            extern crate core;
+            extern crate alloc;
+            $crate::ereport!(
+                $crate::elog::PgLogLevel::DEBUG1,
+                $crate::errcodes::PgSqlErrorCode::ERRCODE_SUCCESSFUL_COMPLETION,
+                alloc::format!("{}", core::format_args!($msg $(, $msg_args)*));
+                $(detail = alloc::format!("{}", core::format_args!($detail $(, $detail_args)*));)?
+                $(hint = alloc::format!("{}", core::format_args!($hint $(, $hint_args)*));)?
+            );
+        }
+    );
+    (
+        $msg:literal $(, $msg_args:expr)*;
+        $(detail = $detail:literal $(, $detail_args:expr)*)?;
+        $(hint = $hint:literal $(, $hint_args:expr)*)?;
+    ) => (
+        {
+            extern crate core;
+            extern crate alloc;
+            $crate::ereport!(
+                $crate::elog::PgLogLevel::DEBUG1,
+                $crate::errcodes::PgSqlErrorCode::ERRCODE_SUCCESSFUL_COMPLETION,
+                alloc::format!("{}", core::format_args!($msg $(, $msg_args)*));
+                $(detail = alloc::format!("{}", core::format_args!($detail $(, $detail_args)*));)?
+                $(hint = alloc::format!("{}", core::format_args!($hint $(, $hint_args)*));)?
             );
         }
     );
@@ -434,8 +669,7 @@ macro_rules! debug1 {
 /// Additionally, you can use specify a `detail` and/or `hint` to be included with the report.
 /// After the string literal to be used as the message and any formatting arguments, add a semicolon.
 /// Then assign a string literal to `detail` or `hint`, optionally followed by a list of
-/// comma separated formatting arguments. The `detail` and `hint` options can be used together or
-/// separately but `detail` must come before `hint` and both must end with a semicolon.
+/// comma separated formatting arguments.
 ///
 /// ## Examples
 ///
@@ -465,16 +699,64 @@ macro_rules! log {
     (
         $msg:literal $(, $msg_args:expr)*;
         $(detail = $detail:literal $(, $detail_args:expr)*)?;
-        $(hint = $hint:literal $(, $hint_args:expr)*)?;
     ) => (
         {
+            extern crate core;
             extern crate alloc;
             $crate::ereport!(
                 $crate::elog::PgLogLevel::LOG,
                 $crate::errcodes::PgSqlErrorCode::ERRCODE_SUCCESSFUL_COMPLETION,
-                alloc::format!($msg $(, $msg_args)*).as_str();
-                $(detail = alloc::format!($detail $(, $detail_args)*).as_str();)?
-                $(hint = alloc::format!($hint $(, $hint_args)*).as_str();)?
+                alloc::format!("{}", core::format_args!($msg $(, $msg_args)*));
+                $(detail = alloc::format!("{}", core::format_args!($detail $(, $detail_args)*));)?
+            );
+        }
+    );
+    (
+        $msg:literal $(, $msg_args:expr)*;
+        $(hint = $hint:literal $(, $hint_args:expr)*)?;
+    ) => (
+        {
+            extern crate core;
+            extern crate alloc;
+            $crate::ereport!(
+                $crate::elog::PgLogLevel::LOG,
+                $crate::errcodes::PgSqlErrorCode::ERRCODE_SUCCESSFUL_COMPLETION,
+                alloc::format!("{}", core::format_args!($msg $(, $msg_args)*));
+                $(hint = alloc::format!("{}", core::format_args!($hint $(, $hint_args)*));)?
+            );
+        }
+    );
+    (
+        $msg:literal $(, $msg_args:expr)*;
+        $(hint = $hint:literal $(, $hint_args:expr)*)?;
+        $(detail = $detail:literal $(, $detail_args:expr)*)?;
+    ) => (
+        {
+            extern crate core;
+            extern crate alloc;
+            $crate::ereport!(
+                $crate::elog::PgLogLevel::LOG,
+                $crate::errcodes::PgSqlErrorCode::ERRCODE_SUCCESSFUL_COMPLETION,
+                alloc::format!("{}", core::format_args!($msg $(, $msg_args)*));
+                $(detail = alloc::format!("{}", core::format_args!($detail $(, $detail_args)*));)?
+                $(hint = alloc::format!("{}", core::format_args!($hint $(, $hint_args)*));)?
+            );
+        }
+    );
+    (
+        $msg:literal $(, $msg_args:expr)*;
+        $(detail = $detail:literal $(, $detail_args:expr)*)?;
+        $(hint = $hint:literal $(, $hint_args:expr)*)?;
+    ) => (
+        {
+            extern crate core;
+            extern crate alloc;
+            $crate::ereport!(
+                $crate::elog::PgLogLevel::LOG,
+                $crate::errcodes::PgSqlErrorCode::ERRCODE_SUCCESSFUL_COMPLETION,
+                alloc::format!("{}", core::format_args!($msg $(, $msg_args)*));
+                $(detail = alloc::format!("{}", core::format_args!($detail $(, $detail_args)*));)?
+                $(hint = alloc::format!("{}", core::format_args!($hint $(, $hint_args)*));)?
             );
         }
     );
@@ -496,8 +778,7 @@ macro_rules! log {
 /// Additionally, you can use specify a `detail` and/or `hint` to be included with the report.
 /// After the string literal to be used as the message and any formatting arguments, add a semicolon.
 /// Then assign a string literal to `detail` or `hint`, optionally followed by a list of
-/// comma separated formatting arguments. The `detail` and `hint` options can be used together or
-/// separately but `detail` must come before `hint` and both must end with a semicolon.
+/// comma separated formatting arguments.
 ///
 /// ## Examples
 ///
@@ -527,16 +808,64 @@ macro_rules! info {
     (
         $msg:literal $(, $msg_args:expr)*;
         $(detail = $detail:literal $(, $detail_args:expr)*)?;
-        $(hint = $hint:literal $(, $hint_args:expr)*)?;
     ) => (
         {
+            extern crate core;
             extern crate alloc;
             $crate::ereport!(
                 $crate::elog::PgLogLevel::INFO,
                 $crate::errcodes::PgSqlErrorCode::ERRCODE_SUCCESSFUL_COMPLETION,
-                alloc::format!($msg $(, $msg_args)*).as_str();
-                $(detail = alloc::format!($detail $(, $detail_args)*).as_str();)?
-                $(hint = alloc::format!($hint $(, $hint_args)*).as_str();)?
+                alloc::format!("{}", core::format_args!($msg $(, $msg_args)*));
+                $(detail = alloc::format!("{}", core::format_args!($detail $(, $detail_args)*));)?
+            );
+        }
+    );
+    (
+        $msg:literal $(, $msg_args:expr)*;
+        $(hint = $hint:literal $(, $hint_args:expr)*)?;
+    ) => (
+        {
+            extern crate core;
+            extern crate alloc;
+            $crate::ereport!(
+                $crate::elog::PgLogLevel::INFO,
+                $crate::errcodes::PgSqlErrorCode::ERRCODE_SUCCESSFUL_COMPLETION,
+                alloc::format!("{}", core::format_args!($msg $(, $msg_args)*));
+                $(hint = alloc::format!("{}", core::format_args!($hint $(, $hint_args)*));)?
+            );
+        }
+    );
+    (
+        $msg:literal $(, $msg_args:expr)*;
+        $(hint = $hint:literal $(, $hint_args:expr)*)?;
+        $(detail = $detail:literal $(, $detail_args:expr)*)?;
+    ) => (
+        {
+            extern crate core;
+            extern crate alloc;
+            $crate::ereport!(
+                $crate::elog::PgLogLevel::INFO,
+                $crate::errcodes::PgSqlErrorCode::ERRCODE_SUCCESSFUL_COMPLETION,
+                alloc::format!("{}", core::format_args!($msg $(, $msg_args)*));
+                $(detail = alloc::format!("{}", core::format_args!($detail $(, $detail_args)*));)?
+                $(hint = alloc::format!("{}", core::format_args!($hint $(, $hint_args)*));)?
+            );
+        }
+    );
+    (
+        $msg:literal $(, $msg_args:expr)*;
+        $(detail = $detail:literal $(, $detail_args:expr)*)?;
+        $(hint = $hint:literal $(, $hint_args:expr)*)?;
+    ) => (
+        {
+            extern crate core;
+            extern crate alloc;
+            $crate::ereport!(
+                $crate::elog::PgLogLevel::INFO,
+                $crate::errcodes::PgSqlErrorCode::ERRCODE_SUCCESSFUL_COMPLETION,
+                alloc::format!("{}", core::format_args!($msg $(, $msg_args)*));
+                $(detail = alloc::format!("{}", core::format_args!($detail $(, $detail_args)*));)?
+                $(hint = alloc::format!("{}", core::format_args!($hint $(, $hint_args)*));)?
             );
         }
     );
@@ -558,8 +887,7 @@ macro_rules! info {
 /// Additionally, you can use specify a `detail` and/or `hint` to be included with the report.
 /// After the string literal to be used as the message and any formatting arguments, add a semicolon.
 /// Then assign a string literal to `detail` or `hint`, optionally followed by a list of
-/// comma separated formatting arguments. The `detail` and `hint` options can be used together or
-/// separately but `detail` must come before `hint` and both must end with a semicolon.
+/// comma separated formatting arguments.
 ///
 /// ## Examples
 ///
@@ -589,16 +917,64 @@ macro_rules! notice {
     (
         $msg:literal $(, $msg_args:expr)*;
         $(detail = $detail:literal $(, $detail_args:expr)*)?;
-        $(hint = $hint:literal $(, $hint_args:expr)*)?;
     ) => (
         {
+            extern crate core;
             extern crate alloc;
             $crate::ereport!(
                 $crate::elog::PgLogLevel::NOTICE,
                 $crate::errcodes::PgSqlErrorCode::ERRCODE_SUCCESSFUL_COMPLETION,
-                alloc::format!($msg $(, $msg_args)*).as_str();
-                $(detail = alloc::format!($detail $(, $detail_args)*).as_str();)?
-                $(hint = alloc::format!($hint $(, $hint_args)*).as_str();)?
+                alloc::format!("{}", core::format_args!($msg $(, $msg_args)*));
+                $(detail = alloc::format!("{}", core::format_args!($detail $(, $detail_args)*));)?
+            );
+        }
+    );
+    (
+        $msg:literal $(, $msg_args:expr)*;
+        $(hint = $hint:literal $(, $hint_args:expr)*)?;
+    ) => (
+        {
+            extern crate core;
+            extern crate alloc;
+            $crate::ereport!(
+                $crate::elog::PgLogLevel::NOTICE,
+                $crate::errcodes::PgSqlErrorCode::ERRCODE_SUCCESSFUL_COMPLETION,
+                alloc::format!("{}", core::format_args!($msg $(, $msg_args)*));
+                $(hint = alloc::format!("{}", core::format_args!($hint $(, $hint_args)*));)?
+            );
+        }
+    );
+    (
+        $msg:literal $(, $msg_args:expr)*;
+        $(hint = $hint:literal $(, $hint_args:expr)*)?;
+        $(detail = $detail:literal $(, $detail_args:expr)*)?;
+    ) => (
+        {
+            extern crate core;
+            extern crate alloc;
+            $crate::ereport!(
+                $crate::elog::PgLogLevel::NOTICE,
+                $crate::errcodes::PgSqlErrorCode::ERRCODE_SUCCESSFUL_COMPLETION,
+                alloc::format!("{}", core::format_args!($msg $(, $msg_args)*));
+                $(detail = alloc::format!("{}", core::format_args!($detail $(, $detail_args)*));)?
+                $(hint = alloc::format!("{}", core::format_args!($hint $(, $hint_args)*));)?
+            );
+        }
+    );
+    (
+        $msg:literal $(, $msg_args:expr)*;
+        $(detail = $detail:literal $(, $detail_args:expr)*)?;
+        $(hint = $hint:literal $(, $hint_args:expr)*)?;
+    ) => (
+        {
+            extern crate core;
+            extern crate alloc;
+            $crate::ereport!(
+                $crate::elog::PgLogLevel::NOTICE,
+                $crate::errcodes::PgSqlErrorCode::ERRCODE_SUCCESSFUL_COMPLETION,
+                alloc::format!("{}", core::format_args!($msg $(, $msg_args)*));
+                $(detail = alloc::format!("{}", core::format_args!($detail $(, $detail_args)*));)?
+                $(hint = alloc::format!("{}", core::format_args!($hint $(, $hint_args)*));)?
             );
         }
     );
@@ -620,8 +996,7 @@ macro_rules! notice {
 /// Additionally, you can use specify a `detail` and/or `hint` to be included with the report.
 /// After the string literal to be used as the message and any formatting arguments, add a semicolon.
 /// Then assign a string literal to `detail` or `hint`, optionally followed by a list of
-/// comma separated formatting arguments. The `detail` and `hint` options can be used together or
-/// separately but `detail` must come before `hint` and both must end with a semicolon.
+/// comma separated formatting arguments.
 ///
 /// ## Examples
 ///
@@ -651,16 +1026,64 @@ macro_rules! warning {
     (
         $msg:literal $(, $msg_args:expr)*;
         $(detail = $detail:literal $(, $detail_args:expr)*)?;
-        $(hint = $hint:literal $(, $hint_args:expr)*)?;
     ) => (
         {
+            extern crate core;
             extern crate alloc;
             $crate::ereport!(
                 $crate::elog::PgLogLevel::WARNING,
                 $crate::errcodes::PgSqlErrorCode::ERRCODE_WARNING,
-                alloc::format!($msg $(, $msg_args)*).as_str();
-                $(detail = alloc::format!($detail $(, $detail_args)*).as_str();)?
-                $(hint = alloc::format!($hint $(, $hint_args)*).as_str();)?
+                alloc::format!("{}", core::format_args!($msg $(, $msg_args)*));
+                $(detail = alloc::format!("{}", core::format_args!($detail $(, $detail_args)*));)?
+            );
+        }
+    );
+    (
+        $msg:literal $(, $msg_args:expr)*;
+        $(hint = $hint:literal $(, $hint_args:expr)*)?;
+    ) => (
+        {
+            extern crate core;
+            extern crate alloc;
+            $crate::ereport!(
+                $crate::elog::PgLogLevel::WARNING,
+                $crate::errcodes::PgSqlErrorCode::ERRCODE_WARNING,
+                alloc::format!("{}", core::format_args!($msg $(, $msg_args)*));
+                $(hint = alloc::format!("{}", core::format_args!($hint $(, $hint_args)*));)?
+            );
+        }
+    );
+    (
+        $msg:literal $(, $msg_args:expr)*;
+        $(hint = $hint:literal $(, $hint_args:expr)*)?;
+        $(detail = $detail:literal $(, $detail_args:expr)*)?;
+    ) => (
+        {
+            extern crate core;
+            extern crate alloc;
+            $crate::ereport!(
+                $crate::elog::PgLogLevel::WARNING,
+                $crate::errcodes::PgSqlErrorCode::ERRCODE_WARNING,
+                alloc::format!("{}", core::format_args!($msg $(, $msg_args)*));
+                $(detail = alloc::format!("{}", core::format_args!($detail $(, $detail_args)*));)?
+                $(hint = alloc::format!("{}", core::format_args!($hint $(, $hint_args)*));)?
+            );
+        }
+    );
+    (
+        $msg:literal $(, $msg_args:expr)*;
+        $(detail = $detail:literal $(, $detail_args:expr)*)?;
+        $(hint = $hint:literal $(, $hint_args:expr)*)?;
+    ) => (
+        {
+            extern crate core;
+            extern crate alloc;
+            $crate::ereport!(
+                $crate::elog::PgLogLevel::WARNING,
+                $crate::errcodes::PgSqlErrorCode::ERRCODE_WARNING,
+                alloc::format!("{}", core::format_args!($msg $(, $msg_args)*));
+                $(detail = alloc::format!("{}", core::format_args!($detail $(, $detail_args)*));)?
+                $(hint = alloc::format!("{}", core::format_args!($hint $(, $hint_args)*));)?
             );
         }
     );
@@ -682,8 +1105,7 @@ macro_rules! warning {
 /// Additionally, you can use specify a `detail` and/or `hint` to be included with the report.
 /// After the string literal to be used as the message and any formatting arguments, add a semicolon.
 /// Then assign a string literal to `detail` or `hint`, optionally followed by a list of
-/// comma separated formatting arguments. The `detail` and `hint` options can be used together or
-/// separately but `detail` must come before `hint` and both must end with a semicolon.
+/// comma separated formatting arguments.
 ///
 /// ## Examples
 ///
@@ -713,16 +1135,67 @@ macro_rules! error {
     (
         $msg:literal $(, $msg_args:expr)*;
         $(detail = $detail:literal $(, $detail_args:expr)*)?;
-        $(hint = $hint:literal $(, $hint_args:expr)*)?;
     ) => (
         {
+            extern crate core;
             extern crate alloc;
             $crate::ereport!(
                 $crate::elog::PgLogLevel::ERROR,
                 $crate::errcodes::PgSqlErrorCode::ERRCODE_INTERNAL_ERROR,
-                alloc::format!($msg $(, $msg_args)*).as_str();
-                $(detail = alloc::format!($detail $(, $detail_args)*).as_str();)?
-                $(hint = alloc::format!($hint $(, $hint_args)*).as_str();)?
+                alloc::format!("{}", core::format_args!($msg $(, $msg_args)*));
+                $(detail = alloc::format!("{}", core::format_args!($detail $(, $detail_args)*));)?
+            );
+            unreachable!()
+        }
+    );
+    (
+        $msg:literal $(, $msg_args:expr)*;
+        $(hint = $hint:literal $(, $hint_args:expr)*)?;
+    ) => (
+        {
+            extern crate core;
+            extern crate alloc;
+            $crate::ereport!(
+                $crate::elog::PgLogLevel::ERROR,
+                $crate::errcodes::PgSqlErrorCode::ERRCODE_INTERNAL_ERROR,
+                alloc::format!("{}", core::format_args!($msg $(, $msg_args)*));
+                $(hint = alloc::format!("{}", core::format_args!($hint $(, $hint_args)*));)?
+            );
+            unreachable!()
+        }
+    );
+    (
+        $msg:literal $(, $msg_args:expr)*;
+        $(hint = $hint:literal $(, $hint_args:expr)*)?;
+        $(detail = $detail:literal $(, $detail_args:expr)*)?;
+    ) => (
+        {
+            extern crate core;
+            extern crate alloc;
+            $crate::ereport!(
+                $crate::elog::PgLogLevel::ERROR,
+                $crate::errcodes::PgSqlErrorCode::ERRCODE_INTERNAL_ERROR,
+                alloc::format!("{}", core::format_args!($msg $(, $msg_args)*));
+                $(detail = alloc::format!("{}", core::format_args!($detail $(, $detail_args)*));)?
+                $(hint = alloc::format!("{}", core::format_args!($hint $(, $hint_args)*));)?
+            );
+            unreachable!()
+        }
+    );
+    (
+        $msg:literal $(, $msg_args:expr)*;
+        $(detail = $detail:literal $(, $detail_args:expr)*)?;
+        $(hint = $hint:literal $(, $hint_args:expr)*)?;
+    ) => (
+        {
+            extern crate core;
+            extern crate alloc;
+            $crate::ereport!(
+                $crate::elog::PgLogLevel::ERROR,
+                $crate::errcodes::PgSqlErrorCode::ERRCODE_INTERNAL_ERROR,
+                alloc::format!("{}", core::format_args!($msg $(, $msg_args)*));
+                $(detail = alloc::format!("{}", core::format_args!($detail $(, $detail_args)*));)?
+                $(hint = alloc::format!("{}", core::format_args!($hint $(, $hint_args)*));)?
             );
             unreachable!()
         }
@@ -746,8 +1219,7 @@ macro_rules! error {
 /// Additionally, you can use specify a `detail` and/or `hint` to be included with the report.
 /// After the string literal to be used as the message and any formatting arguments, add a semicolon.
 /// Then assign a string literal to `detail` or `hint`, optionally followed by a list of
-/// comma separated formatting arguments. The `detail` and `hint` options can be used together or
-/// separately but `detail` must come before `hint` and both must end with a semicolon.
+/// comma separated formatting arguments.
 ///
 /// ## Examples
 ///
@@ -778,16 +1250,67 @@ macro_rules! FATAL {
     (
         $msg:literal $(, $msg_args:expr)*;
         $(detail = $detail:literal $(, $detail_args:expr)*)?;
-        $(hint = $hint:literal $(, $hint_args:expr)*)?;
     ) => (
         {
+            extern crate core;
             extern crate alloc;
             $crate::ereport!(
                 $crate::elog::PgLogLevel::FATAL,
                 $crate::errcodes::PgSqlErrorCode::ERRCODE_INTERNAL_ERROR,
-                alloc::format!($msg $(, $msg_args)*).as_str();
-                $(detail = alloc::format!($detail $(, $detail_args)*).as_str();)?
-                $(hint = alloc::format!($hint $(, $hint_args)*).as_str();)?
+                alloc::format!("{}", core::format_args!($msg $(, $msg_args)*));
+                $(detail = alloc::format!("{}", core::format_args!($detail $(, $detail_args)*));)?
+            );
+            unreachable!()
+        }
+    );
+    (
+        $msg:literal $(, $msg_args:expr)*;
+        $(hint = $hint:literal $(, $hint_args:expr)*)?;
+    ) => (
+        {
+            extern crate core;
+            extern crate alloc;
+            $crate::ereport!(
+                $crate::elog::PgLogLevel::FATAL,
+                $crate::errcodes::PgSqlErrorCode::ERRCODE_INTERNAL_ERROR,
+                alloc::format!("{}", core::format_args!($msg $(, $msg_args)*));
+                $(hint = alloc::format!("{}", core::format_args!($hint $(, $hint_args)*));)?
+            );
+            unreachable!()
+        }
+    );
+    (
+        $msg:literal $(, $msg_args:expr)*;
+        $(hint = $hint:literal $(, $hint_args:expr)*)?;
+        $(detail = $detail:literal $(, $detail_args:expr)*)?;
+    ) => (
+        {
+            extern crate core;
+            extern crate alloc;
+            $crate::ereport!(
+                $crate::elog::PgLogLevel::FATAL,
+                $crate::errcodes::PgSqlErrorCode::ERRCODE_INTERNAL_ERROR,
+                alloc::format!("{}", core::format_args!($msg $(, $msg_args)*));
+                $(detail = alloc::format!("{}", core::format_args!($detail $(, $detail_args)*));)?
+                $(hint = alloc::format!("{}", core::format_args!($hint $(, $hint_args)*));)?
+            );
+            unreachable!()
+        }
+    );
+    (
+        $msg:literal $(, $msg_args:expr)*;
+        $(detail = $detail:literal $(, $detail_args:expr)*)?;
+        $(hint = $hint:literal $(, $hint_args:expr)*)?;
+    ) => (
+        {
+            extern crate core;
+            extern crate alloc;
+            $crate::ereport!(
+                $crate::elog::PgLogLevel::FATAL,
+                $crate::errcodes::PgSqlErrorCode::ERRCODE_INTERNAL_ERROR,
+                alloc::format!("{}", core::format_args!($msg $(, $msg_args)*));
+                $(detail = alloc::format!("{}", core::format_args!($detail $(, $detail_args)*));)?
+                $(hint = alloc::format!("{}", core::format_args!($hint $(, $hint_args)*));)?
             );
             unreachable!()
         }
@@ -811,8 +1334,7 @@ macro_rules! FATAL {
 /// Additionally, you can use specify a `detail` and/or `hint` to be included with the report.
 /// After the string literal to be used as the message and any formatting arguments, add a semicolon.
 /// Then assign a string literal to `detail` or `hint`, optionally followed by a list of
-/// comma separated formatting arguments. The `detail` and `hint` options can be used together or
-/// separately but `detail` must come before `hint` and both must end with a semicolon.
+/// comma separated formatting arguments.
 ///
 /// ## Examples
 ///
@@ -843,16 +1365,67 @@ macro_rules! PANIC {
     (
         $msg:literal $(, $msg_args:expr)*;
         $(detail = $detail:literal $(, $detail_args:expr)*)?;
-        $(hint = $hint:literal $(, $hint_args:expr)*)?;
     ) => (
         {
+            extern crate core;
             extern crate alloc;
             $crate::ereport!(
                 $crate::elog::PgLogLevel::PANIC,
                 $crate::errcodes::PgSqlErrorCode::ERRCODE_INTERNAL_ERROR,
-                alloc::format!($msg $(, $msg_args)*).as_str();
-                $(detail = alloc::format!($detail $(, $detail_args)*).as_str();)?
-                $(hint = alloc::format!($hint $(, $hint_args)*).as_str();)?
+                alloc::format!("{}", core::format_args!($msg $(, $msg_args)*));
+                $(detail = alloc::format!("{}", core::format_args!($detail $(, $detail_args)*));)?
+            );
+            unreachable!()
+        }
+    );
+    (
+        $msg:literal $(, $msg_args:expr)*;
+        $(hint = $hint:literal $(, $hint_args:expr)*)?;
+    ) => (
+        {
+            extern crate core;
+            extern crate alloc;
+            $crate::ereport!(
+                $crate::elog::PgLogLevel::PANIC,
+                $crate::errcodes::PgSqlErrorCode::ERRCODE_INTERNAL_ERROR,
+                alloc::format!("{}", core::format_args!($msg $(, $msg_args)*));
+                $(hint = alloc::format!("{}", core::format_args!($hint $(, $hint_args)*));)?
+            );
+            unreachable!()
+        }
+    );
+    (
+        $msg:literal $(, $msg_args:expr)*;
+        $(hint = $hint:literal $(, $hint_args:expr)*)?;
+        $(detail = $detail:literal $(, $detail_args:expr)*)?;
+    ) => (
+        {
+            extern crate core;
+            extern crate alloc;
+            $crate::ereport!(
+                $crate::elog::PgLogLevel::PANIC,
+                $crate::errcodes::PgSqlErrorCode::ERRCODE_INTERNAL_ERROR,
+                alloc::format!("{}", core::format_args!($msg $(, $msg_args)*));
+                $(detail = alloc::format!("{}", core::format_args!($detail $(, $detail_args)*));)?
+                $(hint = alloc::format!("{}", core::format_args!($hint $(, $hint_args)*));)?
+            );
+            unreachable!()
+        }
+    );
+    (
+        $msg:literal $(, $msg_args:expr)*;
+        $(detail = $detail:literal $(, $detail_args:expr)*)?;
+        $(hint = $hint:literal $(, $hint_args:expr)*)?;
+    ) => (
+        {
+            extern crate core;
+            extern crate alloc;
+            $crate::ereport!(
+                $crate::elog::PgLogLevel::PANIC,
+                $crate::errcodes::PgSqlErrorCode::ERRCODE_INTERNAL_ERROR,
+                alloc::format!("{}", core::format_args!($msg $(, $msg_args)*));
+                $(detail = alloc::format!("{}", core::format_args!($detail $(, $detail_args)*));)?
+                $(hint = alloc::format!("{}", core::format_args!($hint $(, $hint_args)*));)?
             );
             unreachable!()
         }
@@ -1083,6 +1656,17 @@ macro_rules! ereport {
     ) => {
         $crate::panic::ErrorReport::new($errcode, $message, $crate::function_name!())
             .set_detail($detail)
+            .report($loglevel);
+    };
+
+    (
+        $loglevel:expr, $errcode:expr, $message:expr;
+        hint = $hint:expr;
+        detail = $detail:expr;
+    ) => {
+        $crate::panic::ErrorReport::new($errcode, $message, $crate::function_name!())
+            .set_detail($detail)
+            .set_hint($hint)
             .report($loglevel);
     };
 
