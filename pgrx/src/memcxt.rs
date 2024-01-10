@@ -7,6 +7,8 @@
 //LICENSE All rights reserved.
 //LICENSE
 //LICENSE Use of this source code is governed by the MIT license that can be found in the LICENSE file.
+
+#![allow(unsafe_op_in_unsafe_fn)]
 //!
 //! Provides interfacing into Postgres' `MemoryContext` system.
 //!
@@ -14,7 +16,7 @@
 //!
 //! An enum-based interface (`PgMemoryContexts`) around Postgres' various `MemoryContext`s provides
 //! simple accessibility to working with MemoryContexts in a compiler-checked manner
-//!
+
 use crate::pg_sys;
 use crate::pg_sys::AsPgCStr;
 use core::ptr;

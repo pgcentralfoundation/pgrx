@@ -7,14 +7,21 @@
 //LICENSE All rights reserved.
 //LICENSE
 //LICENSE Use of this source code is governed by the MIT license that can be found in the LICENSE file.
+
+#![allow(unsafe_op_in_unsafe_fn)]
 //! Helper functions and such for Postgres' various query tree `Node`s
 
 use crate::pg_sys;
 
+/// Checks if a node "is a" node of the given tag
+/// ```c
 /// #define IsA(nodeptr,_type_)            (nodeTag(nodeptr) == T_##_type_)
+/// ```
+/// ## Safety
+/// * If `nodeptr` is non-null, it must be aligned and point to a valid `Node`
 #[inline]
 pub unsafe fn is_a(nodeptr: *mut pg_sys::Node, tag: pg_sys::NodeTag) -> bool {
-    !nodeptr.is_null() && nodeptr.as_ref().unwrap().type_ == tag
+    !nodeptr.is_null() && (*nodeptr).type_ == tag
 }
 
 /// Convert a [pg_sys::Node] into its textual representation

@@ -29,6 +29,7 @@
     clippy::type_complexity,
     clippy::unnecessary_cast
 )]
+#![deny(unsafe_op_in_unsafe_fn)]
 
 #[macro_use]
 extern crate bitflags;

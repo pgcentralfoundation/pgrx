@@ -7,7 +7,10 @@
 //LICENSE All rights reserved.
 //LICENSE
 //LICENSE Use of this source code is governed by the MIT license that can be found in the LICENSE file.
+
+#![allow(unsafe_op_in_unsafe_fn)]
 #![allow(dead_code)]
+
 use crate::prelude::*;
 use core::marker::PhantomData;
 use core::ptr;

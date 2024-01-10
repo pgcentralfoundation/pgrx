@@ -7,10 +7,13 @@
 //LICENSE All rights reserved.
 //LICENSE
 //LICENSE Use of this source code is governed by the MIT license that can be found in the LICENSE file.
+
+#![allow(unsafe_op_in_unsafe_fn)]
+#![allow(clippy::useless_transmute)]
 //! Safely create Postgres Background Workers, including with full SPI support
 //!
 //! See: [https://www.postgresql.org/docs/current/bgworker.html](https://www.postgresql.org/docs/current/bgworker.html)
-#![allow(clippy::useless_transmute)]
+
 use crate::pg_sys;
 use pgrx_pg_sys::PgTryBuilder;
 use std::convert::TryInto;

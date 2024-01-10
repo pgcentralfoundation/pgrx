@@ -7,6 +7,9 @@
 //LICENSE All rights reserved.
 //LICENSE
 //LICENSE Use of this source code is governed by the MIT license that can be found in the LICENSE file.
+
+#![allow(unsafe_op_in_unsafe_fn)]
+
 use crate::{pg_sys, varsize_any, AnyNumeric, FromDatum, IntoDatum, Numeric};
 
 impl FromDatum for AnyNumeric {

@@ -7,9 +7,11 @@
 //LICENSE All rights reserved.
 //LICENSE
 //LICENSE Use of this source code is governed by the MIT license that can be found in the LICENSE file.
-//! Provides a safe wrapper around Postgres' `pg_sys::TupleDescData` struct
-use crate::{pg_sys, regtypein, void_mut_ptr, PgBox, PgRelation};
 
+#![allow(unsafe_op_in_unsafe_fn)]
+//! Provides a safe wrapper around Postgres' `pg_sys::TupleDescData` struct
+
+use crate::{pg_sys, regtypein, void_mut_ptr, PgBox, PgRelation};
 use pgrx_pg_sys::errcodes::PgSqlErrorCode;
 use pgrx_pg_sys::PgTryBuilder;
 use std::ops::Deref;

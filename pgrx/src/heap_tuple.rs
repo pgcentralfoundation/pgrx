@@ -7,9 +7,12 @@
 //LICENSE All rights reserved.
 //LICENSE
 //LICENSE Use of this source code is governed by the MIT license that can be found in the LICENSE file.
+
+#![allow(unsafe_op_in_unsafe_fn)]
 //! Provides a safe interface to Postgres `HeapTuple` objects.
 //!
 //! [`PgHeapTuple`]s also describe composite types as defined by [`pgrx::composite_type!()`][crate::composite_type].
+
 use crate::datum::lookup_type_name;
 use crate::{
     heap_getattr_raw, pg_sys, trigger_fired_by_delete, trigger_fired_by_insert,
