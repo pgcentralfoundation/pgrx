@@ -27,7 +27,7 @@ error: Invalid invocation
            hint = "plus a hint";
          }
 
-   --> tests/ui/elog/success_cases.rs:110:5
+   --> tests/ui/elog/valid_usage_and_help_messages.rs:110:5
     |
 110 |     log!();
     |     ^^^^^^
@@ -63,7 +63,7 @@ error: Invalid invocation
            hint = "plus a hint";
          }
 
-   --> tests/ui/elog/success_cases.rs:111:5
+   --> tests/ui/elog/valid_usage_and_help_messages.rs:111:5
     |
 111 |     info!();
     |     ^^^^^^^
@@ -99,7 +99,7 @@ error: Invalid invocation
            hint = "plus a hint";
          }
 
-   --> tests/ui/elog/success_cases.rs:112:5
+   --> tests/ui/elog/valid_usage_and_help_messages.rs:112:5
     |
 112 |     notice!();
     |     ^^^^^^^^^
@@ -135,7 +135,7 @@ error: Invalid invocation
            hint = "plus a hint";
          }
 
-   --> tests/ui/elog/success_cases.rs:113:5
+   --> tests/ui/elog/valid_usage_and_help_messages.rs:113:5
     |
 113 |     warning!();
     |     ^^^^^^^^^^
@@ -171,7 +171,7 @@ error: Invalid invocation
            hint = "plus a hint";
          }
 
-   --> tests/ui/elog/success_cases.rs:114:5
+   --> tests/ui/elog/valid_usage_and_help_messages.rs:114:5
     |
 114 |     error!();
     |     ^^^^^^^^
@@ -207,7 +207,7 @@ error: Invalid invocation
            hint = "plus a hint";
          }
 
-   --> tests/ui/elog/success_cases.rs:115:5
+   --> tests/ui/elog/valid_usage_and_help_messages.rs:115:5
     |
 115 |     debug1!();
     |     ^^^^^^^^^
@@ -243,7 +243,7 @@ error: Invalid invocation
            hint = "plus a hint";
          }
 
-   --> tests/ui/elog/success_cases.rs:116:5
+   --> tests/ui/elog/valid_usage_and_help_messages.rs:116:5
     |
 116 |     debug2!();
     |     ^^^^^^^^^
@@ -279,7 +279,7 @@ error: Invalid invocation
            hint = "plus a hint";
          }
 
-   --> tests/ui/elog/success_cases.rs:117:5
+   --> tests/ui/elog/valid_usage_and_help_messages.rs:117:5
     |
 117 |     debug3!();
     |     ^^^^^^^^^
@@ -315,7 +315,7 @@ error: Invalid invocation
            hint = "plus a hint";
          }
 
-   --> tests/ui/elog/success_cases.rs:118:5
+   --> tests/ui/elog/valid_usage_and_help_messages.rs:118:5
     |
 118 |     debug4!();
     |     ^^^^^^^^^
@@ -351,7 +351,7 @@ error: Invalid invocation
            hint = "plus a hint";
          }
 
-   --> tests/ui/elog/success_cases.rs:119:5
+   --> tests/ui/elog/valid_usage_and_help_messages.rs:119:5
     |
 119 |     debug5!();
     |     ^^^^^^^^^
@@ -387,7 +387,7 @@ error: Invalid invocation
            hint = "plus a hint";
          }}
 
-   --> tests/ui/elog/success_cases.rs:120:5
+   --> tests/ui/elog/valid_usage_and_help_messages.rs:120:5
     |
 120 |     ereport!();
     |     ^^^^^^^^^^
