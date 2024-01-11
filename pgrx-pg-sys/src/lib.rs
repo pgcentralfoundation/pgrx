@@ -32,6 +32,15 @@ mod node;
 mod port;
 pub mod submodules;
 
+// Due to the way the `ereport` macros are defined, we need to use a duplicate of `ereport` for internal use... :(
+//
+// ## Compiler Error Message
+//
+// macro-expanded `macro_export` macros from the current crate cannot be referred to by absolute paths
+// this was previously accepted by the compiler but is being phased out; it will become a hard error in a future release!
+// for more information, see issue #52234 <https://github.com/rust-lang/rust/issues/52234>
+pub(crate) use submodules::elog::internal_ereport;
+
 #[cfg(feature = "cshim")]
 pub use cshim::*;
 

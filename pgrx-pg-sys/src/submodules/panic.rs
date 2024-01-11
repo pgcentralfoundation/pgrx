@@ -52,7 +52,11 @@ where
                     any.downcast::<ErrorReport>().unwrap().report(PgLogLevel::ERROR);
                     unreachable!();
                 } else {
-                    ereport!(ERROR, PgSqlErrorCode::ERRCODE_DATA_EXCEPTION, &format!("{}", e));
+                    internal_ereport!(
+                        ERROR,
+                        PgSqlErrorCode::ERRCODE_DATA_EXCEPTION,
+                        format!("{}", e)
+                    );
                 }
             }
         }
