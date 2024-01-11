@@ -16,12 +16,24 @@ use core::ffi::CStr;
 /// UnboxDatum should only be implemented for a type that CAN be directly converted from a Datum,
 /// and it doesn't say whether it can be used directly or if it should be detoasted via MemCx.
 /// It's currently just a possibly-temporary shim to make pgrx work.
+///
+/// # Safety
+/// This trait is used to bound the lifetime of certain types: thus the associated type must be
+/// this type but "infected" by the Datum's lifetime. By implementing this, you verify that you
+/// are implementing this in the way that satisfies that lifetime constraint. There isn't really
+/// a good way to constrain lifetimes correctly without forcing from-Datum types to go through a
+/// wrapper type bound by the lifetime of the Datum. And what would you use as the bound, hmm?
 pub unsafe trait UnboxDatum {
     // TODO: Currently, this doesn't actually get used to identify all the cases where the Datum
     // is actually a pointer type. However, it has been noted that Postgres does yield nullptr
     // on occasion, even when they say something is not supposed to be nullptr. As it is common
     // for Postgres to init [Datum<'_>] with palloc0, it is reasonable to assume nullptr is a risk,
     // even if `is_null == false`.
+    //
+    // Wait, what are you about, Jubilee? In some cases, the chance of nullness doesn't exist!
+    // This is because we are materializing the datums from e.g. pointers to an Array, which
+    // requires you to have had a valid base pointer into an ArrayType to start!
+    // That's why you started using this goofy GAT scheme in the first place!
     type As<'dat>;
     /// Convert from `Datum<'dat>` to `T<'dat>`
     ///
