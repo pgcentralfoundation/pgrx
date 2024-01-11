@@ -1,0 +1,10 @@
+error: The alternative invocation style requires `loglevel` argument to be specified first.
+  --> tests/ui/elog/argument-order/ereport/omit_loglevel.rs:7:5
+   |
+7  | /     ereport!(
+8  | |         errcode = PgSqlErrorCode::ERRCODE_SUCCESSFUL_COMPLETION;
+9  | |         message = "...";
+10 | |     );
+   | |_____^
+   |
+   = note: this error originates in the macro `ereport` (in Nightly builds, run with -Z macro-backtrace for more info)

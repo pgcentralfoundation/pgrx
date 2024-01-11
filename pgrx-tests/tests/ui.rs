@@ -6,4 +6,5 @@ use trybuild::TestCases;
 fn ui() {
     let t = TestCases::new();
     t.compile_fail("tests/ui/*.rs");
+    t.compile_fail("tests/ui/elog/**/*.rs");
 }

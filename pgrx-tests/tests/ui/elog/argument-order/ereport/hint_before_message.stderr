@@ -1,0 +1,12 @@
+error: The alternative invocation style requires `message` argument to be specified after `errcode`.
+  --> tests/ui/elog/argument-order/ereport/hint_before_message.rs:7:5
+   |
+7  | /     ereport!(
+8  | |         loglevel = PgLogLevel::LOG;
+9  | |         errcode = PgSqlErrorCode::ERRCODE_SUCCESSFUL_COMPLETION;
+10 | |         hint = "hint";
+11 | |         message = "...";
+12 | |     );
+   | |_____^
+   |
+   = note: this error originates in the macro `ereport` (in Nightly builds, run with -Z macro-backtrace for more info)

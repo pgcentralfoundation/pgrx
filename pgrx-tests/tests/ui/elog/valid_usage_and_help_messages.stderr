@@ -1,0 +1,395 @@
+error: Invalid invocation
+
+       # Simple Usage
+
+       ## Required arguments:
+         - string literal
+
+       ## Optional arguments:
+         - formatting arguments
+
+       ## Example
+         log!("{}", 42);
+
+       # Alternative Usage
+
+       ## Required arguments:
+         - message: impl Into<String>
+
+       ## Optional arguments:
+         - detail: impl Into<String>
+         - hint: impl Into<String>
+
+       ## Example
+         log! {
+           message = "...";
+           detail = "extra detail";
+           hint = "plus a hint";
+         }
+
+   --> tests/ui/elog/success_cases.rs:110:5
+    |
+110 |     log!();
+    |     ^^^^^^
+    |
+    = note: this error originates in the macro `log` (in Nightly builds, run with -Z macro-backtrace for more info)
+
+error: Invalid invocation
+
+       # Simple Usage
+
+       ## Required arguments:
+         - string literal
+
+       ## Optional arguments:
+         - formatting arguments
+
+       ## Example
+         info!("{}", 42);
+
+       # Alternative Usage
+
+       ## Required arguments:
+         - message: impl Into<String>
+
+       ## Optional arguments:
+         - detail: impl Into<String>
+         - hint: impl Into<String>
+
+       ## Example
+         info! {
+           message = "...";
+           detail = "extra detail";
+           hint = "plus a hint";
+         }
+
+   --> tests/ui/elog/success_cases.rs:111:5
+    |
+111 |     info!();
+    |     ^^^^^^^
+    |
+    = note: this error originates in the macro `info` (in Nightly builds, run with -Z macro-backtrace for more info)
+
+error: Invalid invocation
+
+       # Simple Usage
+
+       ## Required arguments:
+         - string literal
+
+       ## Optional arguments:
+         - formatting arguments
+
+       ## Example
+         notice!("{}", 42);
+
+       # Alternative Usage
+
+       ## Required arguments:
+         - message: impl Into<String>
+
+       ## Optional arguments:
+         - detail: impl Into<String>
+         - hint: impl Into<String>
+
+       ## Example
+         notice! {
+           message = "...";
+           detail = "extra detail";
+           hint = "plus a hint";
+         }
+
+   --> tests/ui/elog/success_cases.rs:112:5
+    |
+112 |     notice!();
+    |     ^^^^^^^^^
+    |
+    = note: this error originates in the macro `notice` (in Nightly builds, run with -Z macro-backtrace for more info)
+
+error: Invalid invocation
+
+       # Simple Usage
+
+       ## Required arguments:
+         - string literal
+
+       ## Optional arguments:
+         - formatting arguments
+
+       ## Example
+         warning!("{}", 42);
+
+       # Alternative Usage
+
+       ## Required arguments:
+         - message: impl Into<String>
+
+       ## Optional arguments:
+         - detail: impl Into<String>
+         - hint: impl Into<String>
+
+       ## Example
+         warning! {
+           message = "...";
+           detail = "extra detail";
+           hint = "plus a hint";
+         }
+
+   --> tests/ui/elog/success_cases.rs:113:5
+    |
+113 |     warning!();
+    |     ^^^^^^^^^^
+    |
+    = note: this error originates in the macro `warning` (in Nightly builds, run with -Z macro-backtrace for more info)
+
+error: Invalid invocation
+
+       # Simple Usage
+
+       ## Required arguments:
+         - string literal
+
+       ## Optional arguments:
+         - formatting arguments
+
+       ## Example
+         error!("{}", 42);
+
+       # Alternative Usage
+
+       ## Required arguments:
+         - message: impl Into<String>
+
+       ## Optional arguments:
+         - detail: impl Into<String>
+         - hint: impl Into<String>
+
+       ## Example
+         error! {
+           message = "...";
+           detail = "extra detail";
+           hint = "plus a hint";
+         }
+
+   --> tests/ui/elog/success_cases.rs:114:5
+    |
+114 |     error!();
+    |     ^^^^^^^^
+    |
+    = note: this error originates in the macro `error` (in Nightly builds, run with -Z macro-backtrace for more info)
+
+error: Invalid invocation
+
+       # Simple Usage
+
+       ## Required arguments:
+         - string literal
+
+       ## Optional arguments:
+         - formatting arguments
+
+       ## Example
+         debug1!("{}", 42);
+
+       # Alternative Usage
+
+       ## Required arguments:
+         - message: impl Into<String>
+
+       ## Optional arguments:
+         - detail: impl Into<String>
+         - hint: impl Into<String>
+
+       ## Example
+         debug1! {
+           message = "...";
+           detail = "extra detail";
+           hint = "plus a hint";
+         }
+
+   --> tests/ui/elog/success_cases.rs:115:5
+    |
+115 |     debug1!();
+    |     ^^^^^^^^^
+    |
+    = note: this error originates in the macro `debug1` (in Nightly builds, run with -Z macro-backtrace for more info)
+
+error: Invalid invocation
+
+       # Simple Usage
+
+       ## Required arguments:
+         - string literal
+
+       ## Optional arguments:
+         - formatting arguments
+
+       ## Example
+         debug2!("{}", 42);
+
+       # Alternative Usage
+
+       ## Required arguments:
+         - message: impl Into<String>
+
+       ## Optional arguments:
+         - detail: impl Into<String>
+         - hint: impl Into<String>
+
+       ## Example
+         debug2! {
+           message = "...";
+           detail = "extra detail";
+           hint = "plus a hint";
+         }
+
+   --> tests/ui/elog/success_cases.rs:116:5
+    |
+116 |     debug2!();
+    |     ^^^^^^^^^
+    |
+    = note: this error originates in the macro `debug2` (in Nightly builds, run with -Z macro-backtrace for more info)
+
+error: Invalid invocation
+
+       # Simple Usage
+
+       ## Required arguments:
+         - string literal
+
+       ## Optional arguments:
+         - formatting arguments
+
+       ## Example
+         debug3!("{}", 42);
+
+       # Alternative Usage
+
+       ## Required arguments:
+         - message: impl Into<String>
+
+       ## Optional arguments:
+         - detail: impl Into<String>
+         - hint: impl Into<String>
+
+       ## Example
+         debug3! {
+           message = "...";
+           detail = "extra detail";
+           hint = "plus a hint";
+         }
+
+   --> tests/ui/elog/success_cases.rs:117:5
+    |
+117 |     debug3!();
+    |     ^^^^^^^^^
+    |
+    = note: this error originates in the macro `debug3` (in Nightly builds, run with -Z macro-backtrace for more info)
+
+error: Invalid invocation
+
+       # Simple Usage
+
+       ## Required arguments:
+         - string literal
+
+       ## Optional arguments:
+         - formatting arguments
+
+       ## Example
+         debug4!("{}", 42);
+
+       # Alternative Usage
+
+       ## Required arguments:
+         - message: impl Into<String>
+
+       ## Optional arguments:
+         - detail: impl Into<String>
+         - hint: impl Into<String>
+
+       ## Example
+         debug4! {
+           message = "...";
+           detail = "extra detail";
+           hint = "plus a hint";
+         }
+
+   --> tests/ui/elog/success_cases.rs:118:5
+    |
+118 |     debug4!();
+    |     ^^^^^^^^^
+    |
+    = note: this error originates in the macro `debug4` (in Nightly builds, run with -Z macro-backtrace for more info)
+
+error: Invalid invocation
+
+       # Simple Usage
+
+       ## Required arguments:
+         - string literal
+
+       ## Optional arguments:
+         - formatting arguments
+
+       ## Example
+         debug5!("{}", 42);
+
+       # Alternative Usage
+
+       ## Required arguments:
+         - message: impl Into<String>
+
+       ## Optional arguments:
+         - detail: impl Into<String>
+         - hint: impl Into<String>
+
+       ## Example
+         debug5! {
+           message = "...";
+           detail = "extra detail";
+           hint = "plus a hint";
+         }
+
+   --> tests/ui/elog/success_cases.rs:119:5
+    |
+119 |     debug5!();
+    |     ^^^^^^^^^
+    |
+    = note: this error originates in the macro `debug5` (in Nightly builds, run with -Z macro-backtrace for more info)
+
+error: Invalid invocation
+
+       ## Required arguments:
+         - loglevel: [PgLogLevel]
+         - errcode: [PgSqlErrorCode]
+         - message: impl Into<String>
+
+       ## Optional arguments:
+         - detail: impl Into<String>
+         - hint: impl Into<String>
+
+       ## Simple Usage
+         ereport!(
+           PgLogLevel::ERROR,
+           PgSqlErrorCode::ERRCODE_INTERNAL_ERROR,
+           "invalid input",
+           "extra detail",
+           "plus a hint",
+         );
+
+       ## Alternative Usage
+         ereport! {{
+           loglevel = PgLogLevel::ERROR;
+           errcode = PgSqlErrorCode::ERRCODE_INTERNAL_ERROR;
+           message = "invalid input";
+           detail = "extra detail";
+           hint = "plus a hint";
+         }}
+
+   --> tests/ui/elog/success_cases.rs:120:5
+    |
+120 |     ereport!();
+    |     ^^^^^^^^^^
+    |
+    = note: this error originates in the macro `ereport` (in Nightly builds, run with -Z macro-backtrace for more info)

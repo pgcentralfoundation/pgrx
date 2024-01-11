@@ -1,0 +1,12 @@
+error: The alternative invocation style requires component sections to be terminated with a semicolon.
+  --> tests/ui/elog/semicolon-terminators/ereport_detail.rs:7:5
+   |
+7  | /     ereport!(
+8  | |         loglevel = PgLogLevel::LOG;
+9  | |         errcode = PgSqlErrorCode::ERRCODE_SUCCESSFUL_COMPLETION;
+10 | |         message = "...";
+11 | |         detail = "detail",
+12 | |     );
+   | |_____^
+   |
+   = note: this error originates in the macro `ereport` (in Nightly builds, run with -Z macro-backtrace for more info)
