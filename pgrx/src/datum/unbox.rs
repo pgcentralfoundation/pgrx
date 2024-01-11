@@ -179,8 +179,15 @@ unsafe impl UnboxDatum for PgHeapTuple<'_, crate::AllocatedByRust> {
 
 unsafe impl<T: FromDatum + UnboxDatum> UnboxDatum for Array<'_, T> {
     type As<'dat> = Array<'dat, T>;
-    unsafe fn unbox<'dat>(d: Datum<'dat>) -> Self::As<'dat> {
+    unsafe fn unbox<'dat>(d: Datum<'dat>) -> Array<'dat, T> {
         Array::from_datum(d.0, false).unwrap()
+    }
+}
+
+unsafe impl<T: FromDatum + UnboxDatum> UnboxDatum for VariadicArray<'_, T> {
+    type As<'dat> = VariadicArray<'dat, T>;
+    unsafe fn unbox<'dat>(d: Datum<'dat>) -> VariadicArray<'dat, T> {
+        VariadicArray::from_datum(d.0, false).unwrap()
     }
 }
 
