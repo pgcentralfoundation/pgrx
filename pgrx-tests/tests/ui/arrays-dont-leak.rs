@@ -1,4 +1,6 @@
 use pgrx::prelude::*;
+use std::process::Command;
+
 fn main() {}
 
 #[pg_extern]
@@ -22,4 +24,3 @@ fn test_leak_after_drop() -> Result<(), Box<dyn std::error::Error>> {
     assert_eq!(top_5, &[Some("1"), Some("2"), Some("3"), Some("4"), Some("5")]);
     Ok(())
 }
-
