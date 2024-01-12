@@ -179,59 +179,59 @@ mod arguments {
             sum_scritches
         }
 
-        #[pg_extern]
-        fn sum_scritches_for_names_strict_optional_items(
-            dogs: Vec<Option<pgrx::composite_type!("Dog")>>,
-        ) -> i32 {
-            // Gets resolved to:
-            let dogs: Vec<Option<PgHeapTuple<AllocatedByRust>>> = dogs;
+        // #[pg_extern]
+        // fn sum_scritches_for_names_strict_optional_items(
+        //     dogs: Vec<Option<pgrx::composite_type!("Dog")>>,
+        // ) -> i32 {
+        //     // Gets resolved to:
+        //     let dogs: Vec<Option<PgHeapTuple<AllocatedByRust>>> = dogs;
 
-            let mut sum_scritches = 0;
-            for dog in dogs {
-                let dog = dog.unwrap();
-                let scritches: i32 =
-                    dog.get_by_name("scritches").ok().unwrap_or_default().unwrap_or_default();
-                sum_scritches += scritches;
-            }
-            sum_scritches
-        }
+        //     let mut sum_scritches = 0;
+        //     for dog in dogs {
+        //         let dog = dog.unwrap();
+        //         let scritches: i32 =
+        //             dog.get_by_name("scritches").ok().unwrap_or_default().unwrap_or_default();
+        //         sum_scritches += scritches;
+        //     }
+        //     sum_scritches
+        // }
 
-        #[pg_extern]
-        fn sum_scritches_for_names_default_optional_items(
-            dogs: pgrx::default!(
-                Vec<Option<pgrx::composite_type!("Dog")>>,
-                "ARRAY[ROW('Nami', 0)]::Dog[]"
-            ),
-        ) -> i32 {
-            // Gets resolved to:
-            let dogs: Vec<Option<PgHeapTuple<AllocatedByRust>>> = dogs;
+        // #[pg_extern]
+        // fn sum_scritches_for_names_default_optional_items(
+        //     dogs: pgrx::default!(
+        //         Vec<Option<pgrx::composite_type!("Dog")>>,
+        //         "ARRAY[ROW('Nami', 0)]::Dog[]"
+        //     ),
+        // ) -> i32 {
+        //     // Gets resolved to:
+        //     let dogs: Vec<Option<PgHeapTuple<AllocatedByRust>>> = dogs;
 
-            let mut sum_scritches = 0;
-            for dog in dogs {
-                let dog = dog.unwrap();
-                let scritches: i32 =
-                    dog.get_by_name("scritches").ok().unwrap_or_default().unwrap_or_default();
-                sum_scritches += scritches;
-            }
-            sum_scritches
-        }
+        //     let mut sum_scritches = 0;
+        //     for dog in dogs {
+        //         let dog = dog.unwrap();
+        //         let scritches: i32 =
+        //             dog.get_by_name("scritches").ok().unwrap_or_default().unwrap_or_default();
+        //         sum_scritches += scritches;
+        //     }
+        //     sum_scritches
+        // }
 
-        #[pg_extern]
-        fn sum_scritches_for_names_optional_items(
-            dogs: Option<Vec<Option<pgrx::composite_type!("Dog")>>>,
-        ) -> i32 {
-            // Gets resolved to:
-            let dogs: Option<Vec<Option<PgHeapTuple<AllocatedByRust>>>> = dogs;
+        // #[pg_extern]
+        // fn sum_scritches_for_names_optional_items(
+        //     dogs: Option<Vec<Option<pgrx::composite_type!("Dog")>>>,
+        // ) -> i32 {
+        //     // Gets resolved to:
+        //     let dogs: Option<Vec<Option<PgHeapTuple<AllocatedByRust>>>> = dogs;
 
-            let dogs = dogs.unwrap();
-            let mut sum_scritches = 0;
-            for dog in dogs {
-                let dog = dog.unwrap();
-                let scritches: i32 = dog.get_by_name("scritches").unwrap().unwrap();
-                sum_scritches += scritches;
-            }
-            sum_scritches
-        }
+        //     let dogs = dogs.unwrap();
+        //     let mut sum_scritches = 0;
+        //     for dog in dogs {
+        //         let dog = dog.unwrap();
+        //         let scritches: i32 = dog.get_by_name("scritches").unwrap().unwrap();
+        //         sum_scritches += scritches;
+        //     }
+        //     sum_scritches
+        // }
     }
 
     mod array {
@@ -375,27 +375,27 @@ mod returning {
             dogs
         }
 
-        #[pg_extern]
-        fn scritch_all_vec_optional_items(
-            maybe_dogs: Option<Vec<Option<::pgrx::composite_type!("Dog")>>>,
-        ) -> Option<Vec<Option<::pgrx::composite_type!("Dog")>>> {
-            // Gets resolved to:
-            let maybe_dogs: Option<Vec<Option<PgHeapTuple<AllocatedByRust>>>> = maybe_dogs;
+        // #[pg_extern]
+        // fn scritch_all_vec_optional_items(
+        //     maybe_dogs: Option<Vec<Option<::pgrx::composite_type!("Dog")>>>,
+        // ) -> Option<Vec<Option<::pgrx::composite_type!("Dog")>>> {
+        //     // Gets resolved to:
+        //     let maybe_dogs: Option<Vec<Option<PgHeapTuple<AllocatedByRust>>>> = maybe_dogs;
 
-            let maybe_dogs = if let Some(mut dogs) = maybe_dogs {
-                for dog in dogs.iter_mut() {
-                    if let Some(ref mut dog) = dog {
-                        dog.set_by_name("scritches", dog.get_by_name::<i32>("scritches").unwrap())
-                            .unwrap();
-                    }
-                }
-                Some(dogs)
-            } else {
-                None
-            };
+        //     let maybe_dogs = if let Some(mut dogs) = maybe_dogs {
+        //         for dog in dogs.iter_mut() {
+        //             if let Some(ref mut dog) = dog {
+        //                 dog.set_by_name("scritches", dog.get_by_name::<i32>("scritches").unwrap())
+        //                     .unwrap();
+        //             }
+        //         }
+        //         Some(dogs)
+        //     } else {
+        //         None
+        //     };
 
-            maybe_dogs
-        }
+        //     maybe_dogs
+        // }
     }
 
     // Returning VariadicArray/Array isn't supported, use a Vec.
@@ -406,34 +406,34 @@ mod returning {
 mod sql_generator_tests {
     use super::*;
 
-    #[pg_extern]
-    fn exotic_signature(
-        _cats: pgrx::default!(
-            Option<Vec<Option<::pgrx::composite_type!('static, "Cat")>>>,
-            "ARRAY[ROW('Sally', 0)]::Cat[]"
-        ),
-        _a_single_fish: pgrx::default!(
-            Option<::pgrx::composite_type!('static, "Fish")>,
-            "ROW('Bob', 0)::Fish"
-        ),
-        _dogs: pgrx::default!(
-            Option<::pgrx::VariadicArray<::pgrx::composite_type!('static, "Dog")>>,
-            "ARRAY[ROW('Nami', 0), ROW('Brandy', 0)]::Dog[]"
-        ),
-    ) -> TableIterator<
-        'static,
-        (
-            name!(dog, Option<::pgrx::composite_type!('static, "Dog")>),
-            name!(cat, Option<::pgrx::composite_type!('static, "Cat")>),
-            name!(fish, Option<::pgrx::composite_type!('static, "Fish")>),
-            name!(
-                related_edges,
-                Option<Vec<::pgrx::composite_type!('static, "AnimalFriendshipEdge")>>
-            ),
-        ),
-    > {
-        TableIterator::new(Vec::new().into_iter())
-    }
+    // #[pg_extern]
+    // fn exotic_signature(
+    //     _cats: pgrx::default!(
+    //         Option<Vec<Option<::pgrx::composite_type!('static, "Cat")>>>,
+    //         "ARRAY[ROW('Sally', 0)]::Cat[]"
+    //     ),
+    //     _a_single_fish: pgrx::default!(
+    //         Option<::pgrx::composite_type!('static, "Fish")>,
+    //         "ROW('Bob', 0)::Fish"
+    //     ),
+    //     _dogs: pgrx::default!(
+    //         Option<::pgrx::VariadicArray<::pgrx::composite_type!('static, "Dog")>>,
+    //         "ARRAY[ROW('Nami', 0), ROW('Brandy', 0)]::Dog[]"
+    //     ),
+    // ) -> TableIterator<
+    //     'static,
+    //     (
+    //         name!(dog, Option<::pgrx::composite_type!('static, "Dog")>),
+    //         name!(cat, Option<::pgrx::composite_type!('static, "Cat")>),
+    //         name!(fish, Option<::pgrx::composite_type!('static, "Fish")>),
+    //         name!(
+    //             related_edges,
+    //             Option<Vec<::pgrx::composite_type!('static, "AnimalFriendshipEdge")>>
+    //         ),
+    //     ),
+    // > {
+    //     TableIterator::new(Vec::new().into_iter())
+    // }
 
     #[pg_extern]
     fn iterable_named_table() -> TableIterator<

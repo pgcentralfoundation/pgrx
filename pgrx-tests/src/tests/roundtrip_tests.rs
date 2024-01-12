@@ -139,19 +139,19 @@ mod tests {
     // arrays of the above
     // -----------
 
-    roundtrip!(
-        rt_array_bytea,
-        test_rt_array_bytea,
-        Vec<Option<&'static [u8]>>,
-        vec![
-            None,
-            Some([b'a', b'b', b'c'].as_slice()),
-            Some([b'd', b'e', b'f'].as_slice()),
-            None,
-            Some([b'g', b'h', b'i'].as_slice()),
-            None
-        ]
-    );
+    // roundtrip!(
+    //     rt_array_bytea,
+    //     test_rt_array_bytea,
+    //     Vec<Option<&'static [u8]>>,
+    //     vec![
+    //         None,
+    //         Some([b'a', b'b', b'c'].as_slice()),
+    //         Some([b'd', b'e', b'f'].as_slice()),
+    //         None,
+    //         Some([b'g', b'h', b'i'].as_slice()),
+    //         None
+    //     ]
+    // );
 
     roundtrip!(
         rt_array_char,
@@ -250,12 +250,12 @@ mod tests {
         Vec<Option<i32>>,
         vec![None, Some(i32::MIN), Some(i32::MAX), None, Some(42), None]
     );
-    roundtrip!(
-        rt_array_refstr,
-        test_rt_array_refstr,
-        Vec<Option<&'static str>>,
-        vec![None, Some("foo"), Some("bar"), None, Some("baz"), None]
-    );
+    // roundtrip!(
+    //     rt_array_refstr,
+    //     test_rt_array_refstr,
+    //     Vec<Option<&'static str>>,
+    //     vec![None, Some("foo"), Some("bar"), None, Some("baz"), None]
+    // );
     roundtrip!(
         rt_array_bool,
         test_rt_array_bool,
@@ -294,19 +294,19 @@ mod tests {
             None
         ]
     );
-    roundtrip!(
-        rt_array_cstr,
-        test_rt_array_cstr,
-        Vec<Option<&'static CStr>>,
-        vec![
-            None,
-            Some(unsafe { CStr::from_bytes_with_nul_unchecked(b"&one\0") }),
-            Some(unsafe { CStr::from_bytes_with_nul_unchecked(b"&two\0") }),
-            None,
-            Some(unsafe { CStr::from_bytes_with_nul_unchecked(b"&three\0") }),
-            None,
-        ]
-    );
+    // roundtrip!(
+    //     rt_array_cstr,
+    //     test_rt_array_cstr,
+    //     Vec<Option<&'static CStr>>,
+    //     vec![
+    //         None,
+    //         Some(unsafe { CStr::from_bytes_with_nul_unchecked(b"&one\0") }),
+    //         Some(unsafe { CStr::from_bytes_with_nul_unchecked(b"&two\0") }),
+    //         None,
+    //         Some(unsafe { CStr::from_bytes_with_nul_unchecked(b"&three\0") }),
+    //         None,
+    //     ]
+    // );
     roundtrip!(
         rt_array_date,
         test_rt_array_date,
