@@ -62,10 +62,10 @@ pub struct Array<'dat, T> {
     raw: Toast<RawArray>,
 }
 
-impl<'a, T: FromDatum + Debug + UnboxDatum<As<'a> = T>> Debug for Array<'a, T> {
+impl<'a, T: FromDatum + Debug> Debug for Array<'a, T> {
     fn fmt(&self, f: &mut Formatter<'_>) -> core::fmt::Result {
-        // todo!()
-        f.debug_list().entries(self.iter()).finish()
+        todo!()
+        // f.debug_list().entries(self.iter()).finish()
     }
 }
 
@@ -101,8 +101,8 @@ impl<'dat, T: UnboxDatum<As<'dat> = T> + serde::Serialize> serde::Serialize for 
     where
         S: Serializer,
     {
-        // todo!()
-        serializer.collect_seq(self.iter())
+        todo!()
+        // serializer.collect_seq(self.iter())
     }
 }
 
@@ -158,7 +158,7 @@ impl<'dat, T: UnboxDatum> Array<'dat, T> {
 
     /// Return an iterator of `Option<T>`.
     #[inline]
-    pub fn iter<'i>(&'i self) -> ArrayIterator<'i, 'dat, T> {
+    pub fn iter(&self) -> ArrayIterator<'_, T> {
         let ptr = self.raw.data_ptr();
         ArrayIterator { array: self, curr: 0, ptr }
     }
@@ -168,7 +168,7 @@ impl<'dat, T: UnboxDatum> Array<'dat, T> {
     /// # Panics
     /// This function will panic when called if the array contains any SQL NULL values.
     #[inline]
-    pub fn iter_deny_null<'i>(&'i self) -> ArrayTypedIterator<'i, 'dat, T> {
+    pub fn iter_deny_null(&self) -> ArrayTypedIterator<'_, T> {
         if self.null_slice.any() {
             panic!("array contains NULL");
         }
@@ -526,22 +526,20 @@ mod casper {
 
 pub struct VariadicArray<'dat, T>(Array<'dat, T>);
 
-impl<'dat, T: FromDatum + Serialize + UnboxDatum<As<'dat> = T> + 'dat> Serialize
-    for VariadicArray<'dat, T>
-{
+impl<T: FromDatum + Serialize> Serialize for VariadicArray<'_, T> {
     fn serialize<S>(&self, serializer: S) -> Result<<S as Serializer>::Ok, <S as Serializer>::Error>
     where
         S: Serializer,
     {
-        // todo!()
-        serializer.collect_seq(self.0.iter())
+        todo!()
+        // serializer.collect_seq(self.0.iter())
     }
 }
 
 impl<'dat, T: UnboxDatum> VariadicArray<'dat, T> {
     /// Return an Iterator of `Option<T>` over the contained Datums.
     #[inline]
-    pub fn iter<'i>(&'i self) -> ArrayIterator<'i, 'dat, T> {
+    pub fn iter(&self) -> ArrayIterator<'_, T> {
         self.0.iter()
     }
 
@@ -550,7 +548,7 @@ impl<'dat, T: UnboxDatum> VariadicArray<'dat, T> {
     /// # Panics
     /// This function will panic when called if the array contains any SQL NULL values.
     #[inline]
-    pub fn iter_deny_null<'i>(&'i self) -> ArrayTypedIterator<'i, 'dat, T> {
+    pub fn iter_deny_null(&self) -> ArrayTypedIterator<'_, T> {
         self.0.iter_deny_null()
     }
 
@@ -578,13 +576,13 @@ impl<T> VariadicArray<'_, T> {
     }
 }
 
-pub struct ArrayTypedIterator<'i, 'dat, T> {
-    array: &'i Array<'dat, T>,
+pub struct ArrayTypedIterator<'a, T> {
+    array: &'a Array<'a, T>,
     curr: usize,
     ptr: *const u8,
 }
 
-impl<'i, 'dat, T: UnboxDatum> Iterator for ArrayTypedIterator<'i, 'dat, T> {
+impl<'dat, T: UnboxDatum> Iterator for ArrayTypedIterator<'dat, T> {
     type Item = T::As<'dat>;
 
     #[inline]
@@ -609,11 +607,10 @@ impl<'i, 'dat, T: UnboxDatum> Iterator for ArrayTypedIterator<'i, 'dat, T> {
     }
 }
 
-impl<'i, 'dat, T: UnboxDatum> ExactSizeIterator for ArrayTypedIterator<'i, 'dat, T> {}
-impl<'i, 'dat, T: UnboxDatum> core::iter::FusedIterator for ArrayTypedIterator<'i, 'dat, T> {}
+impl<'a, T: UnboxDatum> ExactSizeIterator for ArrayTypedIterator<'a, T> {}
+impl<'a, T: UnboxDatum> core::iter::FusedIterator for ArrayTypedIterator<'a, T> {}
 
-impl<'i, 'dat, T: UnboxDatum + serde::Serialize> serde::Serialize
-    for ArrayTypedIterator<'i, 'dat, T>
+impl<'dat, T: UnboxDatum + serde::Serialize> serde::Serialize for ArrayTypedIterator<'dat, T>
 where
     <T as UnboxDatum>::As<'dat>: serde::Serialize,
 {
@@ -625,13 +622,13 @@ where
     }
 }
 
-pub struct ArrayIterator<'iter, 'dat: 'iter, T> {
-    array: &'iter Array<'dat, T>,
+pub struct ArrayIterator<'a, T> {
+    array: &'a Array<'a, T>,
     curr: usize,
     ptr: *const u8,
 }
 
-impl<'iter, 'dat: 'iter, T: UnboxDatum> Iterator for ArrayIterator<'iter, 'dat, T> {
+impl<'dat, T: UnboxDatum> Iterator for ArrayIterator<'dat, T> {
     type Item = Option<T::As<'dat>>;
 
     #[inline]
@@ -657,8 +654,8 @@ impl<'iter, 'dat: 'iter, T: UnboxDatum> Iterator for ArrayIterator<'iter, 'dat, 
     }
 }
 
-impl<'i, 'dat, T: UnboxDatum> ExactSizeIterator for ArrayIterator<'i, 'dat, T> {}
-impl<'i, 'dat, T: UnboxDatum> core::iter::FusedIterator for ArrayIterator<'i, 'dat, T> {}
+impl<'a, T: UnboxDatum> ExactSizeIterator for ArrayIterator<'a, T> {}
+impl<'a, T: UnboxDatum> core::iter::FusedIterator for ArrayIterator<'a, T> {}
 
 pub struct ArrayIntoIterator<'a, T> {
     array: Array<'a, T>,
@@ -793,9 +790,9 @@ impl<'dat, T: FromDatum + UnboxDatum<As<'dat> = T> + 'dat> FromDatum for Vec<T> 
         if is_null {
             None
         } else {
-            // todo!()
-            Array::<T>::from_polymorphic_datum(datum, is_null, typoid)
-                .map(|array| array.iter_deny_null().collect::<Vec<_>>())
+            todo!()
+            // Array::<T>::from_polymorphic_datum(datum, is_null, typoid)
+            //     .map(|array| array.iter_deny_null().collect::<Vec<_>>())
         }
     }
 
@@ -808,9 +805,9 @@ impl<'dat, T: FromDatum + UnboxDatum<As<'dat> = T> + 'dat> FromDatum for Vec<T> 
     where
         Self: Sized,
     {
-        // todo!()
-        Array::<T>::from_datum_in_memory_context(memory_context, datum, is_null, typoid)
-            .map(|array| array.iter_deny_null().collect::<Vec<_>>())
+        todo!()
+        // Array::<T>::from_datum_in_memory_context(memory_context, datum, is_null, typoid)
+        //     .map(|array| array.iter_deny_null().collect::<Vec<_>>())
     }
 }
 
@@ -821,9 +818,9 @@ impl<'dat, T: FromDatum + UnboxDatum<As<'dat> = T>> FromDatum for Vec<Option<T>>
         is_null: bool,
         typoid: pg_sys::Oid,
     ) -> Option<Vec<Option<T>>> {
-        // todo!()
-        Array::<T>::from_polymorphic_datum(datum, is_null, typoid)
-            .map(|array| array.iter().collect::<Vec<_>>())
+        todo!()
+        // Array::<T>::from_polymorphic_datum(datum, is_null, typoid)
+        //     .map(|array| array.iter().collect::<Vec<_>>())
     }
 
     unsafe fn from_datum_in_memory_context(
@@ -835,9 +832,9 @@ impl<'dat, T: FromDatum + UnboxDatum<As<'dat> = T>> FromDatum for Vec<Option<T>>
     where
         Self: Sized,
     {
-        // todo!()
-        Array::<T>::from_datum_in_memory_context(memory_context, datum, is_null, typoid)
-            .map(|array| array.iter().collect::<Vec<_>>())
+        todo!()
+        // Array::<T>::from_datum_in_memory_context(memory_context, datum, is_null, typoid)
+        //     .map(|array| array.iter().collect::<Vec<_>>())
     }
 }
 
