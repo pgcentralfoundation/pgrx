@@ -102,7 +102,7 @@ pub fn item_fn_without_rewrite(mut func: ItemFn) -> syn::Result<proc_macro2::Tok
             #[allow(unused_unsafe)]
             unsafe {
                 // NB: this is purposely not spelled `::pgrx` as pgrx itself uses #[pg_guard]
-                pgrx::pg_sys::submodules::panic::pgrx_extern_c_guard( || #body )
+                pgrx::pg_sys::submodules::panic::pgrx_extern_c_guard(move || #body )
             }
         }
     })
