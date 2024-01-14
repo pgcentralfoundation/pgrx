@@ -817,6 +817,13 @@ fn impl_postgres_type(ast: DeriveInput) -> syn::Result<proc_macro2::TokenStream>
                         }
                     }
                 }
+
+                unsafe impl #generics ::pgrx::datum::UnboxDatum for #name #generics {
+                    type As<'dat> = Self;
+                    unsafe fn unbox<'dat>(datum: ::pgrx::datum::Datum<'dat>) -> Self::As<'dat> {
+                        <Self as ::pgrx::datum::FromDatum>::from_datum(::core::mem::transmute(datum), false).unwrap()
+                    }
+                }
             }
         )
     }

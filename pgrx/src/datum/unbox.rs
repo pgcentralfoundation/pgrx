@@ -264,13 +264,13 @@ unsafe impl<T> UnboxDatum for PgBox<T, AllocatedByPostgres> {
     }
 }
 
-unsafe impl<'de, T: FromDatum> UnboxDatum for T
-where
-    T: PostgresType + serde::Deserialize<'de>,
-{
-    type As<'dat> = T;
-    #[inline]
-    unsafe fn unbox<'dat>(d: Datum<'dat>) -> Self::As<'dat> {
-        T::from_datum(d.0, false).unwrap()
-    }
-}
+// unsafe impl<'de, T: FromDatum> UnboxDatum for T
+// where
+//     T: PostgresType + serde::Deserialize<'de>,
+// {
+//     type As<'dat> = T;
+//     #[inline]
+//     unsafe fn unbox<'dat>(d: Datum<'dat>) -> Self::As<'dat> {
+//         T::from_datum(d.0, false).unwrap()
+//     }
+// }
