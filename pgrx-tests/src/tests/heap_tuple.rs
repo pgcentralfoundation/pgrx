@@ -363,9 +363,9 @@ mod returning {
         }
 
         #[pg_extern]
-        fn scritch_all_vec_strict(
-            dogs: Vec<::pgrx::composite_type!("Dog")>,
-        ) -> Vec<::pgrx::composite_type!("Dog")> {
+        fn scritch_all_vec_strict<'a>(
+            dogs: Vec<::pgrx::composite_type!('a, "Dog")>,
+        ) -> Vec<::pgrx::composite_type!('a, "Dog")> {
             // Gets resolved to:
             let mut dogs: Vec<PgHeapTuple<AllocatedByRust>> = dogs;
 
