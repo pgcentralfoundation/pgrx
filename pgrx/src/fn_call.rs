@@ -343,7 +343,7 @@ fn lookup_fn(fname: &str, args: &[&dyn FnCallArg]) -> Result<pg_sys::Oid> {
             // parse the function name into its possibly-qualified name parts
             let ident_parts = parse_sql_ident(fname)?;
             ident_parts
-                .iter()
+                .iter_deny_null()
                 .map(|part| {
                     // SAFETY:  `.as_pg_cstr()` palloc's a char* and `makeString` just takes ownership of it
                     pg_sys::makeString(part.as_pg_cstr())
@@ -410,9 +410,9 @@ fn lookup_fn(fname: &str, args: &[&dyn FnCallArg]) -> Result<pg_sys::Oid> {
 
 /// Parses an arbitrary string as if it is a SQL identifier.  If it's not, [`FnCallError::InvalidIdentifier`]
 /// is returned
-fn parse_sql_ident(ident: &str) -> Result<Vec<String>> {
+fn parse_sql_ident(ident: &str) -> Result<Array<&str>> {
     unsafe {
-        direct_function_call::<Vec<String>>(
+        direct_function_call::<Array<&str>>(
             pg_sys::parse_ident,
             &[ident.into_datum(), true.into_datum()],
         )

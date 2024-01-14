@@ -10,12 +10,12 @@
 //! Provides a safe interface to Postgres `HeapTuple` objects.
 //!
 //! [`PgHeapTuple`]s also describe composite types as defined by [`pgrx::composite_type!()`][crate::composite_type].
-use crate::datum::lookup_type_name;
+use crate::datum::{lookup_type_name, UnboxDatum};
 use crate::{
     heap_getattr_raw, pg_sys, trigger_fired_by_delete, trigger_fired_by_insert,
     trigger_fired_by_update, trigger_fired_for_statement, AllocatedByPostgres, AllocatedByRust,
     FromDatum, IntoDatum, PgBox, PgMemoryContexts, PgTupleDesc, TriggerTuple, TryFromDatumError,
-    UnboxDatumNoGat, WhoAllocated,
+    WhoAllocated,
 };
 use pgrx_pg_sys::errcodes::PgSqlErrorCode;
 use pgrx_pg_sys::PgTryBuilder;
@@ -508,10 +508,10 @@ impl<'tup, AllocatedBy: WhoAllocated> PgHeapTuple<'tup, AllocatedBy> {
     /// - return [`TryFromDatumError::NoSuchAttributeName`] if the attribute does not exist
     /// - return [`TryFromDatumError::IncompatibleTypes`] if the Rust type of the `value` is not
     /// compatible with the attribute's Postgres type
-    pub fn get_by_name<T>(&self, attname: &str) -> Result<Option<T>, TryFromDatumError>
-    where
-        T: UnboxDatumNoGat<'tup> + FromDatum + IntoDatum,
-    {
+    pub fn get_by_name<T: UnboxDatum<As<'tup> = T> + FromDatum + IntoDatum>(
+        &self,
+        attname: &str,
+    ) -> Result<Option<T>, TryFromDatumError> {
         // find the attribute number by name
         for att in self.tupdesc.iter() {
             if att.name() == attname {
@@ -532,10 +532,10 @@ impl<'tup, AllocatedBy: WhoAllocated> PgHeapTuple<'tup, AllocatedBy> {
     /// - return [`TryFromDatumError::NoSuchAttributeNumber`] if the attribute does not exist
     /// - return [`TryFromDatumError::IncompatibleTypes`] if the Rust type of the `value` is not
     /// compatible with the attribute's Postgres type
-    pub fn get_by_index<T>(&self, attno: NonZeroUsize) -> Result<Option<T>, TryFromDatumError>
-    where
-        T: UnboxDatumNoGat<'tup> + FromDatum + IntoDatum,
-    {
+    pub fn get_by_index<T: UnboxDatum<As<'tup> = T> + FromDatum + IntoDatum>(
+        &self,
+        attno: NonZeroUsize,
+    ) -> Result<Option<T>, TryFromDatumError> {
         unsafe {
             // tuple descriptor attribute numbers are zero-based
             match self.tupdesc.get(attno.get() - 1) {

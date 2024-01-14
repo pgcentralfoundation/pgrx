@@ -15,7 +15,7 @@ use std::collections::HashSet;
 use proc_macro2::Ident;
 use quote::{quote, ToTokens};
 use syn::spanned::Spanned;
-use syn::{parse_macro_input, Attribute, Data, DeriveInput, Item, ItemImpl, LifetimeDef};
+use syn::{parse_macro_input, Attribute, Data, DeriveInput, Item, ItemImpl};
 
 use operators::{deriving_postgres_eq, deriving_postgres_hash, deriving_postgres_ord};
 use pgrx_sql_entity_graph as sql_gen;
@@ -618,24 +618,7 @@ pub fn postgres_enum(input: TokenStream) -> TokenStream {
 fn impl_postgres_enum(ast: DeriveInput) -> syn::Result<proc_macro2::TokenStream> {
     let mut stream = proc_macro2::TokenStream::new();
     let sql_graph_entity_ast = ast.clone();
-    let generics = ast.generics.clone();
-    let obligate_lifetime = generics
-        .params
-        .iter()
-        .find_map(|param| match param {
-            syn::GenericParam::Lifetime(lt) => Some(lt),
-            _ => None,
-        })
-        .cloned();
-    let impl_lt = obligate_lifetime.unwrap_or_else(|| {
-        LifetimeDef::new(syn::Lifetime::new(
-            "'dat",
-            generics.lt_token.map(|lt| lt.spans[0]).unwrap_or_else(proc_macro2::Span::call_site),
-        ))
-    });
-    let mut generics_with_lt = generics.clone();
-    generics_with_lt.params.insert(0, syn::GenericParam::Lifetime(impl_lt.clone()));
-
+    let generics = &ast.generics;
     let enum_ident = &ast.ident;
     let enum_name = enum_ident.to_string();
 
@@ -678,9 +661,10 @@ fn impl_postgres_enum(ast: DeriveInput) -> syn::Result<proc_macro2::TokenStream>
             }
         }
 
-        unsafe impl #generics_with_lt ::pgrx::datum::UnboxDatumNoGat<#impl_lt> for #enum_ident #generics {
+        unsafe impl #generics ::pgrx::datum::UnboxDatum for #enum_ident #generics {
+            type As<'dat> = #enum_ident #generics;
             #[inline]
-            unsafe fn unbox(d: ::pgrx::datum::Datum<#impl_lt>) -> Self {
+            unsafe fn unbox<'dat>(d: ::pgrx::datum::Datum<'dat>) -> Self::As<'dat> {
                 Self::from_datum(d.sans_lifetime(), false).unwrap()
             }
         }
