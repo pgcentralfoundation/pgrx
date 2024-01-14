@@ -61,7 +61,7 @@ pub struct Array<'dat, T> {
     raw: Toast<RawArray>,
 }
 
-impl<'dat, T: UnboxDatumNoGat<'dat> + Debug + 'dat> Debug for Array<'dat, T> {
+impl<'dat, T: UnboxDatumNoGat<'dat> + Debug> Debug for Array<'dat, T> {
     fn fmt(&self, f: &mut Formatter<'_>) -> core::fmt::Result {
         // todo!()
         f.debug_list().entries(self.iter()).finish()
@@ -95,7 +95,7 @@ impl NullKind<'_> {
     }
 }
 
-impl<'i, 'dat, T> serde::Serialize for Array<'dat, T>
+impl<'dat, T> serde::Serialize for Array<'dat, T>
 where
     T: UnboxDatumNoGat<'dat> + Serialize + 'dat,
 {
@@ -163,10 +163,9 @@ where
 
     /// Return an iterator of `Option<T>`.
     #[inline]
-    pub fn iter<'i>(&'i self) -> ArrayIterator<'i, T>
+    pub fn iter(&self) -> ArrayIterator<'dat, T>
     where
-        'i: 'dat,
-        // T: 'dat,
+        T: 'dat,
     {
         let ptr = self.raw.data_ptr();
         ArrayIterator { array: self, curr: 0, ptr }
