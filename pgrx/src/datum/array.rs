@@ -407,10 +407,10 @@ mod casper {
         /// This function is unsafe as it cannot guarantee that `ptr` points to the proper bytes
         /// that represent a `T`, or even that it belongs to `array`.  Both of which must be true
         unsafe fn bring_it_back_now<'arr, 'mcx>(
-            &'arr self,
+            &self,
             array: &'arr Array<'mcx, T>,
             ptr: *const u8,
-        ) -> Option<T::As<'mcx>>;
+        ) -> Option<T::As<'arr>>;
 
         /// Determine how many bytes are used to represent `T`.  This could be fixed size or
         /// even determined at runtime by whatever `ptr` is known to be pointing at.
@@ -472,12 +472,12 @@ mod casper {
     }
     impl<T: UnboxDatum> ChaChaSlide<T> for PassByVarlena {
         #[inline]
-        unsafe fn bring_it_back_now<'dat>(
+        unsafe fn bring_it_back_now<'arr, 'mcx>(
             &self,
             // May need this array param for MemCx reasons?
-            _array: &Array<'dat, T>,
+            _array: &'arr Array<'mcx, T>,
             ptr: *const u8,
-        ) -> Option<T::As<'dat>> {
+        ) -> Option<T::As<'arr>> {
             let datum = pg_sys::Datum::from(ptr);
             Some(T::unbox(core::mem::transmute(datum)))
         }
@@ -497,11 +497,11 @@ mod casper {
     pub(super) struct PassByCStr;
     impl<T: UnboxDatum> ChaChaSlide<T> for PassByCStr {
         #[inline]
-        unsafe fn bring_it_back_now<'dat>(
+        unsafe fn bring_it_back_now<'arr, 'mcx>(
             &self,
-            _array: &Array<'dat, T>,
+            _array: &'arr Array<'mcx, T>,
             ptr: *const u8,
-        ) -> Option<T::As<'dat>> {
+        ) -> Option<T::As<'arr>> {
             let datum = pg_sys::Datum::from(ptr);
             Some(T::unbox(core::mem::transmute(datum)))
         }
@@ -522,11 +522,11 @@ mod casper {
 
     impl<T: UnboxDatum> ChaChaSlide<T> for PassByFixed {
         #[inline]
-        unsafe fn bring_it_back_now<'dat>(
+        unsafe fn bring_it_back_now<'arr, 'mcx>(
             &self,
-            _array: &Array<'dat, T>,
+            _array: &'arr Array<'mcx, T>,
             ptr: *const u8,
-        ) -> Option<T::As<'dat>> {
+        ) -> Option<T::As<'arr>> {
             let datum = pg_sys::Datum::from(ptr);
             Some(T::unbox(core::mem::transmute(datum)))
         }
@@ -538,11 +538,11 @@ mod casper {
     }
 }
 
-pub struct VariadicArray<'dat, T>(Array<'dat, T>);
+pub struct VariadicArray<'mcx, T>(Array<'mcx, T>);
 
-impl<T: UnboxDatum> serde::Serialize for VariadicArray<'_, T>
+impl<'mcx, T: UnboxDatum> serde::Serialize for VariadicArray<'mcx, T>
 where
-    for<'dat> <T as UnboxDatum>::As<'dat>: serde::Serialize,
+    for<'arr> <T as UnboxDatum>::As<'arr>: serde::Serialize,
 {
     fn serialize<S>(&self, serializer: S) -> Result<<S as Serializer>::Ok, <S as Serializer>::Error>
     where
@@ -553,7 +553,7 @@ where
     }
 }
 
-impl<'dat, T: UnboxDatum> VariadicArray<'dat, T> {
+impl<'mcx, T: UnboxDatum> VariadicArray<'mcx, T> {
     /// Return an Iterator of `Option<T>` over the contained Datums.
     #[inline]
     pub fn iter(&self) -> ArrayIterator<'_, T> {
@@ -627,9 +627,9 @@ impl<'arr, T: UnboxDatum> Iterator for ArrayTypedIterator<'arr, T> {
 impl<'a, T: UnboxDatum> ExactSizeIterator for ArrayTypedIterator<'a, T> {}
 impl<'a, T: UnboxDatum> core::iter::FusedIterator for ArrayTypedIterator<'a, T> {}
 
-impl<'dat, T: UnboxDatum + serde::Serialize> serde::Serialize for ArrayTypedIterator<'dat, T>
+impl<'arr, T: UnboxDatum + serde::Serialize> serde::Serialize for ArrayTypedIterator<'arr, T>
 where
-    <T as UnboxDatum>::As<'dat>: serde::Serialize,
+    <T as UnboxDatum>::As<'arr>: serde::Serialize,
 {
     fn serialize<S>(&self, serializer: S) -> Result<<S as Serializer>::Ok, <S as Serializer>::Error>
     where
