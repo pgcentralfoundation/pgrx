@@ -17,6 +17,7 @@ use bitvec::slice::BitSlice;
 use core::fmt::{Debug, Formatter};
 use core::ops::DerefMut;
 use core::ptr::NonNull;
+use std::iter::FusedIterator;
 use pgrx_sql_entity_graph::metadata::{
     ArgumentError, Returns, ReturnsError, SqlMapping, SqlTranslatable,
 };
@@ -101,16 +102,17 @@ impl NullKind<'_> {
     }
 }
 
-impl<'arr, T: UnboxDatum + 'arr> serde::Serialize for Array<'_, T>
+impl<'mcx, T: UnboxDatum> serde::Serialize for Array<'mcx, T>
 where
-    <T as UnboxDatum>::As<'arr>: Serialize,
+    for<'arr> <T as UnboxDatum>::As<'arr>: Serialize,
 {
     fn serialize<S>(&self, serializer: S) -> Result<<S as Serializer>::Ok, <S as Serializer>::Error>
     where
         S: Serializer,
     {
-        todo!()
-        // serializer.collect_seq(self.iter())
+        let iter = self.iter();
+        let result = serializer.collect_seq(iter);
+        result
     }
 }
 
@@ -166,7 +168,7 @@ impl<'mcx, T: UnboxDatum> Array<'mcx, T> {
 
     /// Return an iterator of `Option<T>`.
     #[inline]
-    pub fn iter<'arr>(&'arr self) -> ArrayIterator<'arr, T> {
+    pub fn iter<'arr>(&'arr self) -> ArrayIterator<'arr, 'mcx, T> {
         let ptr = self.raw.data_ptr();
         ArrayIterator { array: self, curr: 0, ptr }
     }
@@ -554,7 +556,7 @@ where
 impl<'dat, T: UnboxDatum> VariadicArray<'dat, T> {
     /// Return an Iterator of `Option<T>` over the contained Datums.
     #[inline]
-    pub fn iter(&self) -> ArrayIterator<'_, T> {
+    pub fn iter<'arr>(&'arr self) -> ArrayIterator<'arr, 'dat, T> {
         self.0.iter()
     }
 
@@ -637,14 +639,14 @@ where
     }
 }
 
-pub struct ArrayIterator<'a, T> {
-    array: &'a Array<'a, T>,
+pub struct ArrayIterator<'arr, 'mcx, T> {
+    array: &'arr Array<'mcx, T>,
     curr: usize,
     ptr: *const u8,
 }
 
-impl<'dat, T: UnboxDatum> Iterator for ArrayIterator<'dat, T> {
-    type Item = Option<T::As<'dat>>;
+impl<'arr, 'mcx, T: UnboxDatum> Iterator for ArrayIterator<'arr, 'mcx, T> {
+    type Item = Option<T::As<'arr>>;
 
     #[inline]
     fn next(&mut self) -> Option<Self::Item> {
@@ -669,8 +671,8 @@ impl<'dat, T: UnboxDatum> Iterator for ArrayIterator<'dat, T> {
     }
 }
 
-impl<'a, T: UnboxDatum> ExactSizeIterator for ArrayIterator<'a, T> {}
-impl<'a, T: UnboxDatum> core::iter::FusedIterator for ArrayIterator<'a, T> {}
+impl<'arr, 'mcx, T: UnboxDatum> ExactSizeIterator for ArrayIterator<'arr, 'mcx, T> {}
+impl<'arr, 'mcx, T: UnboxDatum> FusedIterator for ArrayIterator<'arr, 'mcx, T> {}
 
 pub struct ArrayIntoIterator<'a, T> {
     array: Array<'a, T>,
@@ -678,12 +680,12 @@ pub struct ArrayIntoIterator<'a, T> {
     ptr: *const u8,
 }
 
-impl<'dat, T: UnboxDatum> IntoIterator for Array<'dat, T>
+impl<'mcx, T: UnboxDatum + 'mcx> IntoIterator for Array<'mcx, T> 
 where
-    T: 'dat,
+T: UnboxDatum<As<'mcx> = T> + 'mcx,
 {
-    type Item = Option<T::As<'dat>>;
-    type IntoIter = ArrayIntoIterator<'dat, T>;
+    type Item = Option<T::As<'mcx>>;
+    type IntoIter = ArrayIntoIterator<'mcx, T>;
 
     #[inline]
     fn into_iter(self) -> Self::IntoIter {
@@ -692,12 +694,12 @@ where
     }
 }
 
-impl<'dat, T: UnboxDatum> IntoIterator for VariadicArray<'dat, T>
+impl<'mcx, T> IntoIterator for VariadicArray<'mcx, T>
 where
-    T: 'dat,
+T: UnboxDatum<As<'mcx> = T> + 'mcx,
 {
-    type Item = Option<T::As<'dat>>;
-    type IntoIter = ArrayIntoIterator<'dat, T>;
+    type Item = Option<T::As<'mcx>>;
+    type IntoIter = ArrayIntoIterator<'mcx, T>;
 
     #[inline]
     fn into_iter(self) -> Self::IntoIter {
@@ -706,9 +708,9 @@ where
     }
 }
 
-impl<'dat, T: UnboxDatum> Iterator for ArrayIntoIterator<'dat, T>
+impl<'dat, T> Iterator for ArrayIntoIterator<'dat, T>
 where
-    T: 'dat,
+    T: UnboxDatum<As<'dat> = T> + 'dat,
 {
     type Item = Option<T::As<'dat>>;
 
@@ -717,16 +719,16 @@ where
         let Self { array, curr, ptr } = self;
         let Some(is_null) = array.null_slice.get(*curr) else { return None };
         *curr += 1;
-
-        let element = unsafe { array.bring_it_back_now(*ptr, is_null) };
+        let element = todo!();
+        // let element = unsafe { array.bring_it_back_now(*ptr, is_null) };
         if !is_null {
             // SAFETY: This has to not move for nulls, as they occupy 0 data bytes,
             // and it has to move only after unpacking a non-null varlena element,
             // as the iterator starts by pointing to the first non-null element!
             *ptr = unsafe { array.one_hop_this_time(*ptr) };
         }
-        Some(element);
-        todo!()
+        Some(element)
+        // todo!()
     }
 
     #[inline]
@@ -736,8 +738,10 @@ where
     }
 }
 
-impl<'a, T: UnboxDatum> ExactSizeIterator for ArrayIntoIterator<'a, T> where T: 'a {}
-impl<'a, T: UnboxDatum> core::iter::FusedIterator for ArrayIntoIterator<'a, T> where T: 'a {}
+impl<'mcx, T> ExactSizeIterator for ArrayIntoIterator<'mcx, T> where
+T: UnboxDatum<As<'mcx> = T> + 'mcx, {}
+impl<'mcx, T: UnboxDatum> FusedIterator for ArrayIntoIterator<'mcx, T> where
+T: UnboxDatum<As<'mcx> = T> + 'mcx, {}
 
 impl<'a, T: FromDatum + UnboxDatum> FromDatum for VariadicArray<'a, T> {
     #[inline]
