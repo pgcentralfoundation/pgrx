@@ -53,12 +53,26 @@ mod tests {
     use super::RandomData;
 
     macro_rules! roundtrip {
+        ($fname:ident, $tname:ident, &$lt:lifetime $rtype:ty, $expected:expr) => {
+            #[pg_extern(requires = [ "create_complex_type" ])] // the "Complex" type comes from another crate, and we need its schema fully created before it can be used here
+            fn $fname<$lt>(i: &$lt $rtype) -> &$lt $rtype {
+                i
+            }
+
+            roundtrip_test!($fname, $tname, &'_ $rtype, $expected);
+        };
         ($fname:ident, $tname:ident, $rtype:ty, $expected:expr) => {
             #[pg_extern(requires = [ "create_complex_type" ])] // the "Complex" type comes from another crate, and we need its schema fully created before it can be used here
             fn $fname(i: $rtype) -> $rtype {
                 i
             }
 
+            roundtrip_test!($fname, $tname, $rtype, $expected);
+        };
+    }
+
+    macro_rules! roundtrip_test {
+        ($fname:ident, $tname:ident, $rtype:ty, $expected:expr) => {
             #[pg_test]
             fn $tname() -> Result<(), Box<dyn Error>> {
                 let value: $rtype = $expected;
@@ -75,7 +89,7 @@ mod tests {
         };
     }
 
-    roundtrip!(rt_bytea, test_rt_bytea, &'static [u8], [b'a', b'b', b'c'].as_slice());
+    roundtrip!(rt_bytea, test_rt_bytea, &'a [u8], [b'a', b'b', b'c'].as_slice());
     roundtrip!(rt_char, test_rt_char, char, 'a');
     roundtrip!(rt_i8, test_rt_i8, i8, i8::MAX);
     roundtrip!(rt_point, test_rt_point, pg_sys::Point, pg_sys::Point { x: 1.0, y: 2.0 });
@@ -94,7 +108,7 @@ mod tests {
     );
     roundtrip!(rt_i64, test_rt_i64, i64, i64::MAX);
     roundtrip!(rt_i32, test_rt_i32, i32, i32::MAX);
-    roundtrip!(rt_refstr, test_rt_refstr, &'static str, "foo");
+    roundtrip!(rt_refstr, test_rt_refstr, &'a str, "foo");
     roundtrip!(rt_bool, test_rt_bool, bool, true);
     roundtrip!(rt_f32, test_rt_f32, f32, f32::MAX);
     roundtrip!(rt_numeric, test_rt_numeric, Numeric<100,0>, Numeric::from_str("31241234123412341234").unwrap());
@@ -104,7 +118,7 @@ mod tests {
         AnyNumeric,
         AnyNumeric::from_str("31241234123412341234").unwrap()
     );
-    roundtrip!(rt_cstr, test_rt_cstr, &'static CStr, unsafe {
+    roundtrip!(rt_cstr, test_rt_cstr, &'a CStr, unsafe {
         CStr::from_bytes_with_nul_unchecked(b"&cstr\0")
     });
 
@@ -139,10 +153,13 @@ mod tests {
     // arrays of the above
     // -----------
 
+    // TODO: Need to fix array-of-bytea, array-of-text, and array-of-cstr tests.
+
     // roundtrip!(
     //     rt_array_bytea,
     //     test_rt_array_bytea,
-    //     Vec<Option<&'static [u8]>>,
+    //     'a,
+    //     Vec<Option<&[u8]>>,
     //     vec![
     //         None,
     //         Some([b'a', b'b', b'c'].as_slice()),
@@ -150,6 +167,28 @@ mod tests {
     //         None,
     //         Some([b'g', b'h', b'i'].as_slice()),
     //         None
+    //     ]
+    // );
+
+    // roundtrip!(
+    //     rt_array_refstr,
+    //     test_rt_array_refstr,
+    //     'a,
+    //     Vec<Option<&'a str>>,
+    //     vec![None, Some("foo"), Some("bar"), None, Some("baz"), None]
+    // );
+
+    // roundtrip!(
+    //     rt_array_cstr,
+    //     test_rt_array_cstr,
+    //     Vec<Option<&'static CStr>>,
+    //     vec![
+    //         None,
+    //         Some(unsafe { CStr::from_bytes_with_nul_unchecked(b"&one\0") }),
+    //         Some(unsafe { CStr::from_bytes_with_nul_unchecked(b"&two\0") }),
+    //         None,
+    //         Some(unsafe { CStr::from_bytes_with_nul_unchecked(b"&three\0") }),
+    //         None,
     //     ]
     // );
 
@@ -250,12 +289,6 @@ mod tests {
         Vec<Option<i32>>,
         vec![None, Some(i32::MIN), Some(i32::MAX), None, Some(42), None]
     );
-    // roundtrip!(
-    //     rt_array_refstr,
-    //     test_rt_array_refstr,
-    //     Vec<Option<&'static str>>,
-    //     vec![None, Some("foo"), Some("bar"), None, Some("baz"), None]
-    // );
     roundtrip!(
         rt_array_bool,
         test_rt_array_bool,
@@ -294,19 +327,6 @@ mod tests {
             None
         ]
     );
-    // roundtrip!(
-    //     rt_array_cstr,
-    //     test_rt_array_cstr,
-    //     Vec<Option<&'static CStr>>,
-    //     vec![
-    //         None,
-    //         Some(unsafe { CStr::from_bytes_with_nul_unchecked(b"&one\0") }),
-    //         Some(unsafe { CStr::from_bytes_with_nul_unchecked(b"&two\0") }),
-    //         None,
-    //         Some(unsafe { CStr::from_bytes_with_nul_unchecked(b"&three\0") }),
-    //         None,
-    //     ]
-    // );
     roundtrip!(
         rt_array_date,
         test_rt_array_date,
