@@ -45,10 +45,13 @@ mod arguments {
     use super::*;
 
     mod singleton {
-        use super::*;
+        //! Originally, these tested taking HeapTuple<'a, _> -> &'a str, but that allows data to
+        //! escape the lifetime of its root datum which prevents correct reasoning about lifetimes.
+        //! Perhaps they could eventually test &'tup HeapTuple<'mcx, _> -> &'tup str?
 
+        use super::*;
         #[pg_extern]
-        fn gets_name_field(dog: Option<pgrx::composite_type!("Dog")>) -> Option<&str> {
+        fn gets_name_field(dog: Option<pgrx::composite_type!("Dog")>) -> Option<String> {
             // Gets resolved to:
             let dog: Option<PgHeapTuple<AllocatedByRust>> = dog;
 
@@ -58,7 +61,7 @@ mod arguments {
         #[pg_extern]
         fn gets_name_field_default(
             dog: default!(pgrx::composite_type!("Dog"), "ROW('Nami', 0)::Dog"),
-        ) -> &str {
+        ) -> String {
             // Gets resolved to:
             let dog: PgHeapTuple<AllocatedByRust> = dog;
 
@@ -66,7 +69,7 @@ mod arguments {
         }
 
         #[pg_extern]
-        fn gets_name_field_strict(dog: pgrx::composite_type!("Dog")) -> &str {
+        fn gets_name_field_strict(dog: pgrx::composite_type!("Dog")) -> String {
             // Gets resolved to:
             let dog: PgHeapTuple<AllocatedByRust> = dog;
 

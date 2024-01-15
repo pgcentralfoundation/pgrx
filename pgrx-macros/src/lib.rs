@@ -662,9 +662,9 @@ fn impl_postgres_enum(ast: DeriveInput) -> syn::Result<proc_macro2::TokenStream>
         }
 
         unsafe impl #generics ::pgrx::datum::UnboxDatum for #enum_ident #generics {
-            type As<'dat> = #enum_ident #generics;
+            type As<'dat> = #enum_ident #generics where Self: 'dat;
             #[inline]
-            unsafe fn unbox<'dat>(d: ::pgrx::datum::Datum<'dat>) -> Self::As<'dat> {
+            unsafe fn unbox<'dat>(d: ::pgrx::datum::Datum<'dat>) -> Self::As<'dat> where Self: 'dat {
                 Self::from_datum(d.sans_lifetime(), false).unwrap()
             }
         }
@@ -819,8 +819,8 @@ fn impl_postgres_type(ast: DeriveInput) -> syn::Result<proc_macro2::TokenStream>
                 }
 
                 unsafe impl #generics ::pgrx::datum::UnboxDatum for #name #generics {
-                    type As<'dat> = Self;
-                    unsafe fn unbox<'dat>(datum: ::pgrx::datum::Datum<'dat>) -> Self::As<'dat> {
+                    type As<'dat> = Self where Self: 'dat;
+                    unsafe fn unbox<'dat>(datum: ::pgrx::datum::Datum<'dat>) -> Self::As<'dat> where Self: 'dat {
                         <Self as ::pgrx::datum::FromDatum>::from_datum(::core::mem::transmute(datum), false).unwrap()
                     }
                 }

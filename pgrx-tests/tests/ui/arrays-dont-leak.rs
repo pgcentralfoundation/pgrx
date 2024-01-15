@@ -1,10 +1,16 @@
 use pgrx::prelude::*;
-use std::process::Command;
 
 fn main() {}
 
 #[pg_extern]
-fn array_echo<'a>(a: Array<'a, &'a str>) -> Vec<Option<&'a str>> {
+fn array_echo_a<'a>(a: Array<'a, &'a str>) -> Vec<Option<&'a str>> {
+    let v = a.iter().collect();
+    drop(a);
+    v
+}
+
+#[pg_extern]
+fn array_echo_ab<'a>(a: Array<'a, &'b str>) -> Vec<Option<&'b str>> {
     let v = a.iter().collect();
     drop(a);
     v

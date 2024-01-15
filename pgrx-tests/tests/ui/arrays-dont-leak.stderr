@@ -1,44 +1,33 @@
-warning: unused import: `std::process::Command`
- --> tests/ui/arrays-dont-leak.rs:2:5
-  |
-2 | use std::process::Command;
-  |     ^^^^^^^^^^^^^^^^^^^^^
-  |
-  = note: `#[warn(unused_imports)]` on by default
-
-error[E0505]: cannot move out of `a` because it is borrowed
-  --> tests/ui/arrays-dont-leak.rs:9:10
+error[E0261]: use of undeclared lifetime name `'b`
+  --> tests/ui/arrays-dont-leak.rs:13:36
    |
-7  | fn array_echo<'a>(a: Array<'a, &'a str>) -> Vec<Option<&'a str>> {
-   |               --  - binding `a` declared here
-   |               |
-   |               lifetime `'a` defined here
-8  |     let v = a.iter().collect();
-   |             - borrow of `a` occurs here
-9  |     drop(a);
-   |          ^ move out of `a` occurs here
-10 |     v
-   |     - returning this value requires that `a` is borrowed for `'a`
+12 | #[pg_extern]
+   | - lifetime `'b` is missing in item created through this procedural macro
+13 | fn array_echo_ab<'a>(a: Array<'a, &'b str>) -> Vec<Option<&'b str>> {
+   |   -                                ^^ undeclared lifetime
+   |   |
+   |   help: consider introducing lifetime `'b` here: `<'b>`
 
-error[E0515]: cannot return value referencing function parameter `a`
-  --> tests/ui/arrays-dont-leak.rs:10:5
+error[E0261]: use of undeclared lifetime name `'b`
+  --> tests/ui/arrays-dont-leak.rs:13:60
    |
-8  |     let v = a.iter().collect();
-   |             - `a` is borrowed here
-9  |     drop(a);
-10 |     v
-   |     ^ returns a value referencing data owned by the current function
+12 | #[pg_extern]
+   | - lifetime `'b` is missing in item created through this procedural macro
+13 | fn array_echo_ab<'a>(a: Array<'a, &'b str>) -> Vec<Option<&'b str>> {
+   |   - help: consider introducing lifetime `'b` here: `<'b>`  ^^ undeclared lifetime
 
-error[E0505]: cannot move out of `array` because it is borrowed
-  --> tests/ui/arrays-dont-leak.rs:21:10
+error[E0261]: use of undeclared lifetime name `'b`
+  --> tests/ui/arrays-dont-leak.rs:13:36
    |
-18 |     let array = Spi::get_one::<Array<&str>>("SELECT array_echo(a) FROM test_leak_after_drop")?
-   |         ----- binding `array` declared here
-19 |         .expect("datum was null");
-20 |     let top_5 = array.iter().take(5).collect::<Vec<_>>();
-   |                 ----- borrow of `array` occurs here
-21 |     drop(array);
-   |          ^^^^^ move out of `array` occurs here
-...
-24 |     assert_eq!(top_5, &[Some("1"), Some("2"), Some("3"), Some("4"), Some("5")]);
-   |     --------------------------------------------------------------------------- borrow later used here
+13 | fn array_echo_ab<'a>(a: Array<'a, &'b str>) -> Vec<Option<&'b str>> {
+   |                  -                 ^^ undeclared lifetime
+   |                  |
+   |                  help: consider introducing lifetime `'b` here: `'b,`
+
+error[E0261]: use of undeclared lifetime name `'b`
+  --> tests/ui/arrays-dont-leak.rs:13:60
+   |
+13 | fn array_echo_ab<'a>(a: Array<'a, &'b str>) -> Vec<Option<&'b str>> {
+   |                  -                                         ^^ undeclared lifetime
+   |                  |
+   |                  help: consider introducing lifetime `'b` here: `'b,`
