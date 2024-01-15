@@ -102,7 +102,6 @@ mod arguments {
             names
         }
 
-
         /// TODO: add test which actually calls this maybe???
         #[pg_extern]
         fn gets_name_field_default_variadic(
