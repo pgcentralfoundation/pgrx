@@ -665,7 +665,7 @@ fn impl_postgres_enum(ast: DeriveInput) -> syn::Result<proc_macro2::TokenStream>
             type As<'dat> = #enum_ident #generics where Self: 'dat;
             #[inline]
             unsafe fn unbox<'dat>(d: ::pgrx::datum::Datum<'dat>) -> Self::As<'dat> where Self: 'dat {
-                Self::from_datum(d.sans_lifetime(), false).unwrap()
+                Self::from_datum(::core::mem::transmute(d), false).unwrap()
             }
         }
 
