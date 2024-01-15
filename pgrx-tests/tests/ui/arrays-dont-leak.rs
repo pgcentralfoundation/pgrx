@@ -10,7 +10,14 @@ fn array_echo_a<'a>(a: Array<'a, &'a str>) -> Vec<Option<&'a str>> {
 }
 
 #[pg_extern]
-fn array_echo_ab<'a>(a: Array<'a, &'b str>) -> Vec<Option<&'b str>> {
+fn array_echo_aba<'a, 'b>(a: Array<'a, &'b str>) -> Vec<Option<&'a str>> {
+    let v = a.iter().collect();
+    drop(a);
+    v
+}
+
+#[pg_extern]
+fn array_echo_baa<'a, 'b>(a: Array<'b, &'a str>) -> Vec<Option<&'a str>> {
     let v = a.iter().collect();
     drop(a);
     v
