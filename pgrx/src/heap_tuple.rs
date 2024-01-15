@@ -57,7 +57,7 @@ pub struct PgHeapTuple<'mcx, AllocatedBy: WhoAllocated> {
     tupdesc: PgTupleDesc<'mcx>,
 }
 
-impl<'mcx> FromDatum for PgHeapTuple<'mcx, AllocatedByRust> {
+impl FromDatum for PgHeapTuple<'_, AllocatedByRust> {
     unsafe fn from_polymorphic_datum(
         composite: pg_sys::Datum,
         is_null: bool,
