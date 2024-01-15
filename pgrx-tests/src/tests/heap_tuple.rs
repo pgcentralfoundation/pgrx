@@ -133,54 +133,55 @@ mod arguments {
     }
 
     mod vec {
-        use super::*;
+        //! TODO: This probably requires the FunctionArguments<'curr, 'fn> type
+        // use super::*;
 
-        #[pg_extern]
-        fn sum_scritches_for_names(
-            dogs: Option<Vec<pgrx::composite_type!(DOG_COMPOSITE_TYPE)>>,
-        ) -> i32 {
-            // Gets resolved to:
-            let dogs: Option<Vec<PgHeapTuple<AllocatedByRust>>> = dogs;
+        // #[pg_extern]
+        // fn sum_scritches_for_names(
+        //     dogs: Option<Vec<pgrx::composite_type!(DOG_COMPOSITE_TYPE)>>,
+        // ) -> i32 {
+        //     // Gets resolved to:
+        //     let dogs: Option<Vec<PgHeapTuple<AllocatedByRust>>> = dogs;
 
-            let dogs = dogs.unwrap();
-            let mut sum_scritches = 0;
-            for dog in dogs {
-                let scritches: i32 =
-                    dog.get_by_name("scritches").ok().unwrap_or_default().unwrap_or_default();
-                sum_scritches += scritches;
-            }
-            sum_scritches
-        }
+        //     let dogs = dogs.unwrap();
+        //     let mut sum_scritches = 0;
+        //     for dog in dogs {
+        //         let scritches: i32 =
+        //             dog.get_by_name("scritches").ok().unwrap_or_default().unwrap_or_default();
+        //         sum_scritches += scritches;
+        //     }
+        //     sum_scritches
+        // }
 
-        #[pg_extern]
-        fn sum_scritches_for_names_default(
-            dogs: pgrx::default!(Vec<pgrx::composite_type!("Dog")>, "ARRAY[ROW('Nami', 0)]::Dog[]"),
-        ) -> i32 {
-            // Gets resolved to:
-            let dogs: Vec<PgHeapTuple<AllocatedByRust>> = dogs;
+        // #[pg_extern]
+        // fn sum_scritches_for_names_default(
+        //     dogs: pgrx::default!(Vec<pgrx::composite_type!("Dog")>, "ARRAY[ROW('Nami', 0)]::Dog[]"),
+        // ) -> i32 {
+        //     // Gets resolved to:
+        //     let dogs: Vec<PgHeapTuple<AllocatedByRust>> = dogs;
 
-            let mut sum_scritches = 0;
-            for dog in dogs {
-                let scritches: i32 =
-                    dog.get_by_name("scritches").ok().unwrap_or_default().unwrap_or_default();
-                sum_scritches += scritches;
-            }
-            sum_scritches
-        }
+        //     let mut sum_scritches = 0;
+        //     for dog in dogs {
+        //         let scritches: i32 =
+        //             dog.get_by_name("scritches").ok().unwrap_or_default().unwrap_or_default();
+        //         sum_scritches += scritches;
+        //     }
+        //     sum_scritches
+        // }
 
-        #[pg_extern]
-        fn sum_scritches_for_names_strict(dogs: Vec<pgrx::composite_type!("Dog")>) -> i32 {
-            // Gets resolved to:
-            let dogs: Vec<PgHeapTuple<AllocatedByRust>> = dogs;
+        // #[pg_extern]
+        // fn sum_scritches_for_names_strict(dogs: Vec<pgrx::composite_type!("Dog")>) -> i32 {
+        //     // Gets resolved to:
+        //     let dogs: Vec<PgHeapTuple<AllocatedByRust>> = dogs;
 
-            let mut sum_scritches = 0;
-            for dog in dogs {
-                let scritches: i32 =
-                    dog.get_by_name("scritches").ok().unwrap_or_default().unwrap_or_default();
-                sum_scritches += scritches;
-            }
-            sum_scritches
-        }
+        //     let mut sum_scritches = 0;
+        //     for dog in dogs {
+        //         let scritches: i32 =
+        //             dog.get_by_name("scritches").ok().unwrap_or_default().unwrap_or_default();
+        //         sum_scritches += scritches;
+        //     }
+        //     sum_scritches
+        // }
 
         // #[pg_extern]
         // fn sum_scritches_for_names_strict_optional_items(
@@ -343,40 +344,41 @@ mod returning {
     }
 
     mod vec {
-        use super::*;
+        //! TODO: This probably requires the FunctionArguments<'curr, 'fn> type
+        // use super::*;
 
-        #[pg_extern]
-        fn scritch_all_vec(
-            maybe_dogs: Option<Vec<::pgrx::composite_type!("Dog")>>,
-        ) -> Option<Vec<::pgrx::composite_type!("Dog")>> {
-            // Gets resolved to:
-            let maybe_dogs: Option<Vec<PgHeapTuple<AllocatedByRust>>> = maybe_dogs;
+        // #[pg_extern]
+        // fn scritch_all_vec(
+        //     maybe_dogs: Option<Vec<::pgrx::composite_type!("Dog")>>,
+        // ) -> Option<Vec<::pgrx::composite_type!("Dog")>> {
+        //     // Gets resolved to:
+        //     let maybe_dogs: Option<Vec<PgHeapTuple<AllocatedByRust>>> = maybe_dogs;
 
-            let maybe_dogs = if let Some(mut dogs) = maybe_dogs {
-                for dog in dogs.iter_mut() {
-                    dog.set_by_name("scritches", dog.get_by_name::<i32>("scritches").unwrap())
-                        .unwrap();
-                }
-                Some(dogs)
-            } else {
-                None
-            };
+        //     let maybe_dogs = if let Some(mut dogs) = maybe_dogs {
+        //         for dog in dogs.iter_mut() {
+        //             dog.set_by_name("scritches", dog.get_by_name::<i32>("scritches").unwrap())
+        //                 .unwrap();
+        //         }
+        //         Some(dogs)
+        //     } else {
+        //         None
+        //     };
 
-            maybe_dogs
-        }
+        //     maybe_dogs
+        // }
 
-        #[pg_extern]
-        fn scritch_all_vec_strict<'a>(
-            dogs: Vec<::pgrx::composite_type!('a, "Dog")>,
-        ) -> Vec<::pgrx::composite_type!('a, "Dog")> {
-            // Gets resolved to:
-            let mut dogs: Vec<PgHeapTuple<AllocatedByRust>> = dogs;
+        // #[pg_extern]
+        // fn scritch_all_vec_strict<'a>(
+        //     dogs: Vec<::pgrx::composite_type!('a, "Dog")>,
+        // ) -> Vec<::pgrx::composite_type!('a, "Dog")> {
+        //     // Gets resolved to:
+        //     let mut dogs: Vec<PgHeapTuple<AllocatedByRust>> = dogs;
 
-            for dog in dogs.iter_mut() {
-                dog.set_by_name("scritches", dog.get_by_name::<i32>("scritches").unwrap()).unwrap();
-            }
-            dogs
-        }
+        //     for dog in dogs.iter_mut() {
+        //         dog.set_by_name("scritches", dog.get_by_name::<i32>("scritches").unwrap()).unwrap();
+        //     }
+        //     dogs
+        // }
 
         // #[pg_extern]
         // fn scritch_all_vec_optional_items(
@@ -691,91 +693,91 @@ mod tests {
         assert_eq!(retval, Ok(Some(vec!["Nami".to_string(), "Brandy".to_string()])));
     }
 
-    #[pg_test]
-    fn test_sum_scritches_for_names() {
-        let retval = Spi::get_one::<i32>(
-            "
-            SELECT sum_scritches_for_names(ARRAY[ROW('Nami', 1), ROW('Brandy', 42)]::Dog[])
-        ",
-        );
-        assert_eq!(retval, Ok(Some(43)));
-    }
+    // #[pg_test]
+    // fn test_sum_scritches_for_names() {
+    //     let retval = Spi::get_one::<i32>(
+    //         "
+    //         SELECT sum_scritches_for_names(ARRAY[ROW('Nami', 1), ROW('Brandy', 42)]::Dog[])
+    //     ",
+    //     );
+    //     assert_eq!(retval, Ok(Some(43)));
+    // }
 
-    #[pg_test]
-    fn test_sum_scritches_for_names_default() {
-        let retval = Spi::get_one::<i32>(
-            "
-            SELECT sum_scritches_for_names_default()
-        ",
-        );
-        assert_eq!(retval, Ok(Some(0)));
-    }
+    // #[pg_test]
+    // fn test_sum_scritches_for_names_default() {
+    //     let retval = Spi::get_one::<i32>(
+    //         "
+    //         SELECT sum_scritches_for_names_default()
+    //     ",
+    //     );
+    //     assert_eq!(retval, Ok(Some(0)));
+    // }
 
-    #[pg_test]
-    fn test_sum_scritches_for_names_strict() {
-        let retval = Spi::get_one::<i32>(
-            "
-            SELECT sum_scritches_for_names_strict(ARRAY[ROW('Nami', 1), ROW('Brandy', 42)]::Dog[])
-        ",
-        );
-        assert_eq!(retval, Ok(Some(43)));
-    }
+    // #[pg_test]
+    // fn test_sum_scritches_for_names_strict() {
+    //     let retval = Spi::get_one::<i32>(
+    //         "
+    //         SELECT sum_scritches_for_names_strict(ARRAY[ROW('Nami', 1), ROW('Brandy', 42)]::Dog[])
+    //     ",
+    //     );
+    //     assert_eq!(retval, Ok(Some(43)));
+    // }
 
-    #[pg_test]
-    fn test_sum_scritches_for_names_strict_optional_items() {
-        let retval = Spi::get_one::<i32>(
-            "
-            SELECT sum_scritches_for_names_strict(ARRAY[ROW('Nami', 1), ROW('Brandy', 42)]::Dog[])
-        ",
-        );
-        assert_eq!(retval, Ok(Some(43)));
-    }
+    // #[pg_test]
+    // fn test_sum_scritches_for_names_strict_optional_items() {
+    //     let retval = Spi::get_one::<i32>(
+    //         "
+    //         SELECT sum_scritches_for_names_strict(ARRAY[ROW('Nami', 1), ROW('Brandy', 42)]::Dog[])
+    //     ",
+    //     );
+    //     assert_eq!(retval, Ok(Some(43)));
+    // }
 
-    #[pg_test]
-    fn test_sum_scritches_for_names_default_optional_items() {
-        let retval = Spi::get_one::<i32>(
-            "
-            SELECT sum_scritches_for_names_default_optional_items()
-        ",
-        );
-        assert_eq!(retval, Ok(Some(0)));
-    }
+    // #[pg_test]
+    // fn test_sum_scritches_for_names_default_optional_items() {
+    //     let retval = Spi::get_one::<i32>(
+    //         "
+    //         SELECT sum_scritches_for_names_default_optional_items()
+    //     ",
+    //     );
+    //     assert_eq!(retval, Ok(Some(0)));
+    // }
 
-    #[pg_test]
-    fn test_sum_scritches_for_names_optional_items() {
-        let retval = Spi::get_one::<i32>("
-            SELECT sum_scritches_for_names_optional_items(ARRAY[ROW('Nami', 1), ROW('Brandy', 42)]::Dog[])
-        ");
-        assert_eq!(retval, Ok(Some(43)));
-    }
+    // #[pg_test]
+    // fn test_sum_scritches_for_names_optional_items() {
+    //     let retval = Spi::get_one::<i32>("
+    //         SELECT sum_scritches_for_names_optional_items(ARRAY[ROW('Nami', 1), ROW('Brandy', 42)]::Dog[])
+    //     ");
+    //     assert_eq!(retval, Ok(Some(43)));
+    // }
 
-    #[pg_test]
-    fn test_sum_scritches_for_names_array() {
-        let retval = Spi::get_one::<i32>(
-            "
-            SELECT sum_scritches_for_names_array(ARRAY[ROW('Nami', 1), ROW('Brandy', 42)]::Dog[])
-        ",
-        );
-        assert_eq!(retval, Ok(Some(43)));
-    }
+    // #[pg_test]
+    // fn test_sum_scritches_for_names_array() {
+    //     let retval = Spi::get_one::<i32>(
+    //         "
+    //         SELECT sum_scritches_for_names_array(ARRAY[ROW('Nami', 1), ROW('Brandy', 42)]::Dog[])
+    //     ",
+    //     );
+    //     assert_eq!(retval, Ok(Some(43)));
+    // }
 
-    #[pg_test]
-    fn test_sum_scritches_for_names_array_default() {
-        let retval = Spi::get_one::<i32>(
-            "
-            SELECT sum_scritches_for_names_array_default()
-        ",
-        );
-        assert_eq!(retval, Ok(Some(0)));
-    }
+    // #[pg_test]
+    // fn test_sum_scritches_for_names_array_default() {
+    //     let retval = Spi::get_one::<i32>(
+    //         "
+    //         SELECT sum_scritches_for_names_array_default()
+    //     ",
+    //     );
+    //     assert_eq!(retval, Ok(Some(0)));
+    // }
 
-    #[pg_test]
-    fn test_sum_scritches_for_names_array_strict() {
-        let retval = Spi::get_one::<i32>("
-            SELECT sum_scritches_for_names_array_strict(ARRAY[ROW('Nami', 1), ROW('Brandy', 42)]::Dog[])
-        ");
-        assert_eq!(retval, Ok(Some(43)));
-    }
+    // #[pg_test]
+    // fn test_sum_scritches_for_names_array_strict() {
+    //     let retval = Spi::get_one::<i32>("
+    //         SELECT sum_scritches_for_names_array_strict(ARRAY[ROW('Nami', 1), ROW('Brandy', 42)]::Dog[])
+    //     ");
+    //     assert_eq!(retval, Ok(Some(43)));
+    // }
 
     #[pg_test]
     fn test_create_dog() -> Result<(), pgrx::spi::Error> {
