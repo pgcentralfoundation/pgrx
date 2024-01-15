@@ -79,7 +79,7 @@ mod arguments {
 
     mod variadic_array {
         //! TODO: biggest problem here is the inability to use
-        //! ```rust,no_run
+        //! ```ignore
         //! for dog in dogs {
         //!     todo!()
         //! }
