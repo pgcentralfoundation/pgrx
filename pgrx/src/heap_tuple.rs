@@ -645,7 +645,7 @@ use pgrx::{prelude::*, AllocatedByRust};
 #[pg_extern]
 fn this_dog_name_or_your_favorite_dog_name(
     dog: pgrx::default!(pgrx::composite_type!("Dog"), "ROW('Nami', 0)::Dog"),
-) -> &str {
+) -> String {
     // Gets resolved to:
     let dog: PgHeapTuple<AllocatedByRust> = dog;
 
