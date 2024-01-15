@@ -17,11 +17,11 @@ use bitvec::slice::BitSlice;
 use core::fmt::{Debug, Formatter};
 use core::ops::DerefMut;
 use core::ptr::NonNull;
-use std::iter::FusedIterator;
 use pgrx_sql_entity_graph::metadata::{
     ArgumentError, Returns, ReturnsError, SqlMapping, SqlTranslatable,
 };
 use serde::{Serialize, Serializer};
+use std::iter::FusedIterator;
 
 /** An array of some type (eg. `TEXT[]`, `int[]`)
 
@@ -406,11 +406,11 @@ mod casper {
         ///
         /// This function is unsafe as it cannot guarantee that `ptr` points to the proper bytes
         /// that represent a `T`, or even that it belongs to `array`.  Both of which must be true
-        unsafe fn bring_it_back_now<'dat>(
-            &self,
-            array: &Array<'dat, T>,
+        unsafe fn bring_it_back_now<'arr, 'mcx>(
+            &'arr self,
+            array: &'arr Array<'mcx, T>,
             ptr: *const u8,
-        ) -> Option<T::As<'dat>>;
+        ) -> Option<T::As<'mcx>>;
 
         /// Determine how many bytes are used to represent `T`.  This could be fixed size or
         /// even determined at runtime by whatever `ptr` is known to be pointing at.
@@ -680,9 +680,10 @@ pub struct ArrayIntoIterator<'a, T> {
     ptr: *const u8,
 }
 
-impl<'mcx, T: UnboxDatum + 'mcx> IntoIterator for Array<'mcx, T> 
+// There's nowhere to name the lifetime contraction
+impl<'mcx, T> IntoIterator for Array<'mcx, T>
 where
-T: UnboxDatum<As<'mcx> = T> + 'mcx,
+    for<'arr> T: UnboxDatum<As<'arr> = T> + 'static,
 {
     type Item = Option<T::As<'mcx>>;
     type IntoIter = ArrayIntoIterator<'mcx, T>;
@@ -696,7 +697,7 @@ T: UnboxDatum<As<'mcx> = T> + 'mcx,
 
 impl<'mcx, T> IntoIterator for VariadicArray<'mcx, T>
 where
-T: UnboxDatum<As<'mcx> = T> + 'mcx,
+    for<'arr> T: UnboxDatum<As<'arr> = T> + 'static,
 {
     type Item = Option<T::As<'mcx>>;
     type IntoIter = ArrayIntoIterator<'mcx, T>;
@@ -708,19 +709,19 @@ T: UnboxDatum<As<'mcx> = T> + 'mcx,
     }
 }
 
-impl<'dat, T> Iterator for ArrayIntoIterator<'dat, T>
+impl<'mcx, T> Iterator for ArrayIntoIterator<'mcx, T>
 where
-    T: UnboxDatum<As<'dat> = T> + 'dat,
+    for<'arr> T: UnboxDatum<As<'arr> = T> + 'static,
 {
-    type Item = Option<T::As<'dat>>;
+    type Item = Option<T::As<'mcx>>;
 
     #[inline]
     fn next(&mut self) -> Option<Self::Item> {
         let Self { array, curr, ptr } = self;
         let Some(is_null) = array.null_slice.get(*curr) else { return None };
         *curr += 1;
-        let element = todo!();
-        // let element = unsafe { array.bring_it_back_now(*ptr, is_null) };
+        // let element = todo!();
+        let element = unsafe { array.bring_it_back_now(*ptr, is_null) };
         if !is_null {
             // SAFETY: This has to not move for nulls, as they occupy 0 data bytes,
             // and it has to move only after unpacking a non-null varlena element,
@@ -728,7 +729,6 @@ where
             *ptr = unsafe { array.one_hop_this_time(*ptr) };
         }
         Some(element)
-        // todo!()
     }
 
     #[inline]
@@ -739,9 +739,13 @@ where
 }
 
 impl<'mcx, T> ExactSizeIterator for ArrayIntoIterator<'mcx, T> where
-T: UnboxDatum<As<'mcx> = T> + 'mcx, {}
+    for<'arr> T: UnboxDatum<As<'arr> = T> + 'static
+{
+}
 impl<'mcx, T: UnboxDatum> FusedIterator for ArrayIntoIterator<'mcx, T> where
-T: UnboxDatum<As<'mcx> = T> + 'mcx, {}
+    for<'arr> T: UnboxDatum<As<'arr> = T> + 'static
+{
+}
 
 impl<'a, T: FromDatum + UnboxDatum> FromDatum for VariadicArray<'a, T> {
     #[inline]

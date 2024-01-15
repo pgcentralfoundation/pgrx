@@ -174,7 +174,7 @@ fn validate_cstring_array<'a>(
     a: Array<'a, &'a core::ffi::CStr>,
 ) -> std::result::Result<bool, Box<dyn std::error::Error>> {
     assert_eq!(
-        a.into_iter().collect::<Vec<_>>(),
+        a.iter().collect::<Vec<_>>(),
         vec![
             Some(core::ffi::CStr::from_bytes_with_nul(b"one\0")?),
             Some(core::ffi::CStr::from_bytes_with_nul(b"two\0")?),

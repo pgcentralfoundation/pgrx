@@ -78,42 +78,50 @@ mod arguments {
     }
 
     mod variadic_array {
+        //! TODO: biggest problem here is the inability to use
+        //! ```rust,no_run
+        //! for dog in dogs {
+        //!     todo!()
+        //! }
+        //! ```
         use super::*;
 
-        // #[pg_extern]
-        // fn gets_name_field_variadic(
-        //     dogs: VariadicArray<pgrx::composite_type!(DOG_COMPOSITE_TYPE)>,
-        // ) -> Vec<String> {
-        //     // Gets resolved to:
-        //     let dogs: pgrx::VariadicArray<PgHeapTuple<AllocatedByRust>> = dogs;
+        #[pg_extern]
+        fn gets_name_field_variadic(
+            dogs: VariadicArray<pgrx::composite_type!(DOG_COMPOSITE_TYPE)>,
+        ) -> Vec<String> {
+            // Gets resolved to:
+            let dogs: pgrx::VariadicArray<PgHeapTuple<AllocatedByRust>> = dogs;
 
-        //     let mut names = Vec::with_capacity(dogs.len());
-        //     for dog in dogs {
-        //         let dog = dog.unwrap();
-        //         let name = dog.get_by_name("name").unwrap().unwrap();
-        //         names.push(name);
-        //     }
-        //     names
-        // }
+            let mut names = Vec::with_capacity(dogs.len());
+            for dog in dogs.iter() {
+                let dog = dog.unwrap();
+                let name = dog.get_by_name("name").unwrap().unwrap();
+                names.push(name);
+            }
+            names
+        }
 
-        // #[pg_extern]
-        // fn gets_name_field_default_variadic(
-        //     dogs: default!(
-        //         VariadicArray<pgrx::composite_type!("Dog")>,
-        //         "ARRAY[ROW('Nami', 0)]::Dog[]"
-        //     ),
-        // ) -> Vec<String> {
-        //     // Gets resolved to:
-        //     let dogs: pgrx::VariadicArray<PgHeapTuple<AllocatedByRust>> = dogs;
 
-        //     let mut names = Vec::with_capacity(dogs.len());
-        //     for dog in dogs {
-        //         let dog = dog.unwrap();
-        //         let name = dog.get_by_name("name").unwrap().unwrap();
-        //         names.push(name);
-        //     }
-        //     names
-        // }
+        /// TODO: add test which actually calls this maybe???
+        #[pg_extern]
+        fn gets_name_field_default_variadic(
+            dogs: default!(
+                VariadicArray<pgrx::composite_type!("Dog")>,
+                "ARRAY[ROW('Nami', 0)]::Dog[]"
+            ),
+        ) -> Vec<String> {
+            // Gets resolved to:
+            let dogs: pgrx::VariadicArray<PgHeapTuple<AllocatedByRust>> = dogs;
+
+            let mut names = Vec::with_capacity(dogs.len());
+            for dog in dogs.iter() {
+                let dog = dog.unwrap();
+                let name = dog.get_by_name("name").unwrap().unwrap();
+                names.push(name);
+            }
+            names
+        }
 
         #[pg_extern]
         fn gets_name_field_strict_variadic(
