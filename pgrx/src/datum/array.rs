@@ -168,7 +168,7 @@ impl<'mcx, T: UnboxDatum> Array<'mcx, T> {
 
     /// Return an iterator of `Option<T>`.
     #[inline]
-    pub fn iter<'arr>(&'arr self) -> ArrayIterator<'arr, 'mcx, T> {
+    pub fn iter(&self) -> ArrayIterator<'_, T> {
         let ptr = self.raw.data_ptr();
         ArrayIterator { array: self, curr: 0, ptr }
     }
@@ -556,7 +556,7 @@ where
 impl<'dat, T: UnboxDatum> VariadicArray<'dat, T> {
     /// Return an Iterator of `Option<T>` over the contained Datums.
     #[inline]
-    pub fn iter<'arr>(&'arr self) -> ArrayIterator<'arr, 'dat, T> {
+    pub fn iter(&self) -> ArrayIterator<'_, T> {
         self.0.iter()
     }
 
@@ -639,13 +639,13 @@ where
     }
 }
 
-pub struct ArrayIterator<'arr, 'mcx, T> {
-    array: &'arr Array<'mcx, T>,
+pub struct ArrayIterator<'arr, T> {
+    array: &'arr Array<'arr, T>,
     curr: usize,
     ptr: *const u8,
 }
 
-impl<'arr, 'mcx, T: UnboxDatum> Iterator for ArrayIterator<'arr, 'mcx, T> {
+impl<'arr, T: UnboxDatum> Iterator for ArrayIterator<'arr, T> {
     type Item = Option<T::As<'arr>>;
 
     #[inline]
@@ -671,8 +671,8 @@ impl<'arr, 'mcx, T: UnboxDatum> Iterator for ArrayIterator<'arr, 'mcx, T> {
     }
 }
 
-impl<'arr, 'mcx, T: UnboxDatum> ExactSizeIterator for ArrayIterator<'arr, 'mcx, T> {}
-impl<'arr, 'mcx, T: UnboxDatum> FusedIterator for ArrayIterator<'arr, 'mcx, T> {}
+impl<'arr, T: UnboxDatum> ExactSizeIterator for ArrayIterator<'arr, T> {}
+impl<'arr, T: UnboxDatum> FusedIterator for ArrayIterator<'arr, T> {}
 
 pub struct ArrayIntoIterator<'a, T> {
     array: Array<'a, T>,
