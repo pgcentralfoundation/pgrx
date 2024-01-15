@@ -70,7 +70,6 @@ where
     for<'dat> <T as UnboxDatum>::As<'dat>: Debug,
 {
     fn fmt(&self, f: &mut Formatter<'_>) -> core::fmt::Result {
-        // todo!()
         f.debug_list().entries(self.iter()).finish()
     }
 }
@@ -540,15 +539,14 @@ mod casper {
 
 pub struct VariadicArray<'mcx, T>(Array<'mcx, T>);
 
-impl<'mcx, T: UnboxDatum> serde::Serialize for VariadicArray<'mcx, T>
+impl<'mcx, T: UnboxDatum> Serialize for VariadicArray<'mcx, T>
 where
-    for<'arr> <T as UnboxDatum>::As<'arr>: serde::Serialize,
+    for<'arr> <T as UnboxDatum>::As<'arr>: Serialize,
 {
     fn serialize<S>(&self, serializer: S) -> Result<<S as Serializer>::Ok, <S as Serializer>::Error>
     where
         S: Serializer,
     {
-        // todo!()
         serializer.collect_seq(self.0.iter())
     }
 }
@@ -713,14 +711,13 @@ impl<'mcx, T> Iterator for ArrayIntoIterator<'mcx, T>
 where
     for<'arr> T: UnboxDatum<As<'arr> = T> + 'static,
 {
-    type Item = Option<T::As<'mcx>>;
+    type Item = Option<T::As<'static>>;
 
     #[inline]
     fn next(&mut self) -> Option<Self::Item> {
         let Self { array, curr, ptr } = self;
         let Some(is_null) = array.null_slice.get(*curr) else { return None };
         *curr += 1;
-        // let element = todo!();
         let element = unsafe { array.bring_it_back_now(*ptr, is_null) };
         if !is_null {
             // SAFETY: This has to not move for nulls, as they occupy 0 data bytes,
@@ -826,7 +823,6 @@ where
         if is_null {
             None
         } else {
-            // todo!()
             Array::<T>::from_polymorphic_datum(datum, is_null, typoid)
                 .map(|array| array.iter_deny_null().collect::<Vec<_>>())
         }
@@ -841,7 +837,6 @@ where
     where
         Self: Sized,
     {
-        // todo!()
         Array::<T>::from_datum_in_memory_context(memory_context, datum, is_null, typoid)
             .map(|array| array.iter_deny_null().collect::<Vec<_>>())
     }
@@ -857,7 +852,6 @@ where
         is_null: bool,
         typoid: pg_sys::Oid,
     ) -> Option<Vec<Option<T>>> {
-        // todo!()
         Array::<T>::from_polymorphic_datum(datum, is_null, typoid)
             .map(|array| array.iter().collect::<Vec<_>>())
     }
@@ -871,7 +865,6 @@ where
     where
         Self: Sized,
     {
-        // todo!()
         Array::<T>::from_datum_in_memory_context(memory_context, datum, is_null, typoid)
             .map(|array| array.iter().collect::<Vec<_>>())
     }
