@@ -1,0 +1,62 @@
+error: cannot find attribute `pg_extern` in this scope
+ --> tests/todo/array-serialize-json.rs:2:3
+  |
+2 | #[pg_extern]
+  |   ^^^^^^^^^
+  |
+help: consider importing one of these items
+  |
+2 + use pgrx::pg_extern;
+  |
+2 + use pgrx_macros::pg_extern;
+  |
+
+error: cannot find macro `json` in this scope
+ --> tests/todo/array-serialize-json.rs:4:10
+  |
+4 |     Json(json! { { "values": values } })
+  |          ^^^^
+  |
+help: consider importing this macro
+  |
+2 + use serde_json::json;
+  |
+
+error[E0412]: cannot find type `Array` in this scope
+ --> tests/todo/array-serialize-json.rs:3:40
+  |
+3 | fn serde_serialize_array<'dat>(values: Array<'dat, &'dat str>) -> Json {
+  |                                        ^^^^^ not found in this scope
+  |
+help: consider importing this struct
+  |
+2 + use pgrx::Array;
+  |
+
+error[E0412]: cannot find type `Json` in this scope
+ --> tests/todo/array-serialize-json.rs:3:67
+  |
+3 | fn serde_serialize_array<'dat>(values: Array<'dat, &'dat str>) -> Json {
+  |                                                                   ^^^^ not found in this scope
+  |
+help: consider importing this struct
+  |
+2 + use pgrx::Json;
+  |
+
+error[E0425]: cannot find function, tuple struct or tuple variant `Json` in this scope
+ --> tests/todo/array-serialize-json.rs:4:5
+  |
+4 |     Json(json! { { "values": values } })
+  |     ^^^^ not found in this scope
+  |
+help: consider importing this tuple struct
+  |
+2 + use pgrx::Json;
+  |
+
+error[E0601]: `main` function not found in crate `$CRATE`
+  --> tests/todo/array-serialize-json.rs:28:2
+   |
+28 | }
+   |  ^ consider adding a `main` function to `$DIR/tests/todo/array-serialize-json.rs`
