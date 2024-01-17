@@ -169,18 +169,10 @@ mod array {
     }
 }
 
-#[cfg(any(test, feature = "pg_test"))]
 #[pgrx::pg_schema]
 mod tests {
-    #[cfg(test)]
-    use crate as pgrx_tests;
-    use pgrx::datum::TryFromDatumError;
-    use pgrx::heap_tuple::PgHeapTupleError;
     use pgrx::prelude::*;
-    use pgrx::AllocatedByRust;
-    use std::num::NonZeroUsize;
 
-    #[pg_test]
     fn test_sum_scritches_for_names() {
         let retval = Spi::get_one::<i32>(
             "
@@ -190,7 +182,6 @@ mod tests {
         assert_eq!(retval, Ok(Some(43)));
     }
 
-    #[pg_test]
     fn test_sum_scritches_for_names_default() {
         let retval = Spi::get_one::<i32>(
             "
@@ -200,7 +191,6 @@ mod tests {
         assert_eq!(retval, Ok(Some(0)));
     }
 
-    #[pg_test]
     fn test_sum_scritches_for_names_strict() {
         let retval = Spi::get_one::<i32>(
             "
@@ -210,7 +200,6 @@ mod tests {
         assert_eq!(retval, Ok(Some(43)));
     }
 
-    #[pg_test]
     fn test_sum_scritches_for_names_strict_optional_items() {
         let retval = Spi::get_one::<i32>(
             "
@@ -220,7 +209,6 @@ mod tests {
         assert_eq!(retval, Ok(Some(43)));
     }
 
-    #[pg_test]
     fn test_sum_scritches_for_names_default_optional_items() {
         let retval = Spi::get_one::<i32>(
             "
@@ -230,7 +218,6 @@ mod tests {
         assert_eq!(retval, Ok(Some(0)));
     }
 
-    #[pg_test]
     fn test_sum_scritches_for_names_optional_items() {
         let retval = Spi::get_one::<i32>("
             SELECT sum_scritches_for_names_optional_items(ARRAY[ROW('Nami', 1), ROW('Brandy', 42)]::Dog[])
@@ -238,7 +225,6 @@ mod tests {
         assert_eq!(retval, Ok(Some(43)));
     }
 
-    #[pg_test]
     fn test_sum_scritches_for_names_array() {
         let retval = Spi::get_one::<i32>(
             "
@@ -248,7 +234,6 @@ mod tests {
         assert_eq!(retval, Ok(Some(43)));
     }
 
-    #[pg_test]
     fn test_sum_scritches_for_names_array_default() {
         let retval = Spi::get_one::<i32>(
             "
@@ -258,7 +243,6 @@ mod tests {
         assert_eq!(retval, Ok(Some(0)));
     }
 
-    #[pg_test]
     fn test_sum_scritches_for_names_array_strict() {
         let retval = Spi::get_one::<i32>("
             SELECT sum_scritches_for_names_array_strict(ARRAY[ROW('Nami', 1), ROW('Brandy', 42)]::Dog[])
