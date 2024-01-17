@@ -2,6 +2,8 @@ use pgrx::prelude::*;
 
 fn main() {}
 
+const DOG_COMPOSITE_TYPE: &str = "Dog";
+
 #[pg_extern]
 fn gets_name_field_variadic(
     dogs: VariadicArray<pgrx::composite_type!(DOG_COMPOSITE_TYPE)>,

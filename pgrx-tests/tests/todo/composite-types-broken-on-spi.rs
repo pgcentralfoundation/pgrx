@@ -2,6 +2,8 @@ use pgrx::prelude::*;
 
 fn main() {}
 
+const DOG_COMPOSITE_TYPE: &str = "Dog";
+
 mod vec {
     // ! TODO: This probably requires the FunctionArguments<'curr, 'fn> type
     use super::*;
