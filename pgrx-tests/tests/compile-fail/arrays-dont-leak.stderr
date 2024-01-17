@@ -1,5 +1,5 @@
 error[E0505]: cannot move out of `a` because it is borrowed
- --> tests/ui/arrays-dont-leak.rs:8:10
+ --> tests/compile-fail/arrays-dont-leak.rs:8:10
   |
 6 | fn array_echo_a<'a>(a: Array<'a, &'a str>) -> Vec<Option<&'a str>> {
   |                 --  - binding `a` declared here
@@ -13,7 +13,7 @@ error[E0505]: cannot move out of `a` because it is borrowed
   |     - returning this value requires that `a` is borrowed for `'a`
 
 error[E0515]: cannot return value referencing function parameter `a`
- --> tests/ui/arrays-dont-leak.rs:9:5
+ --> tests/compile-fail/arrays-dont-leak.rs:9:5
   |
 7 |     let v = a.iter().collect();
   |             - `a` is borrowed here
@@ -22,7 +22,7 @@ error[E0515]: cannot return value referencing function parameter `a`
   |     ^ returns a value referencing data owned by the current function
 
 error[E0505]: cannot move out of `a` because it is borrowed
-  --> tests/ui/arrays-dont-leak.rs:15:10
+  --> tests/compile-fail/arrays-dont-leak.rs:15:10
    |
 13 | fn array_echo_aba<'a, 'b>(a: Array<'a, &'b str>) -> Vec<Option<&'a str>> {
    |                   --      - binding `a` declared here
@@ -36,7 +36,7 @@ error[E0505]: cannot move out of `a` because it is borrowed
    |     - returning this value requires that `a` is borrowed for `'a`
 
 error: lifetime may not live long enough
-  --> tests/ui/arrays-dont-leak.rs:16:5
+  --> tests/compile-fail/arrays-dont-leak.rs:16:5
    |
 13 | fn array_echo_aba<'a, 'b>(a: Array<'a, &'b str>) -> Vec<Option<&'a str>> {
    |                   --  -- lifetime `'b` defined here
@@ -49,7 +49,7 @@ error: lifetime may not live long enough
    = help: consider adding the following bound: `'b: 'a`
 
 error[E0515]: cannot return value referencing function parameter `a`
-  --> tests/ui/arrays-dont-leak.rs:16:5
+  --> tests/compile-fail/arrays-dont-leak.rs:16:5
    |
 14 |     let v = a.iter().collect();
    |             - `a` is borrowed here
@@ -58,7 +58,7 @@ error[E0515]: cannot return value referencing function parameter `a`
    |     ^ returns a value referencing data owned by the current function
 
 error[E0505]: cannot move out of `a` because it is borrowed
-  --> tests/ui/arrays-dont-leak.rs:22:10
+  --> tests/compile-fail/arrays-dont-leak.rs:22:10
    |
 20 | fn array_echo_baa<'a, 'b>(a: Array<'b, &'a str>) -> Vec<Option<&'a str>> {
    |                   --      - binding `a` declared here
@@ -72,7 +72,7 @@ error[E0505]: cannot move out of `a` because it is borrowed
    |     - returning this value requires that `a` is borrowed for `'a`
 
 error: lifetime may not live long enough
-  --> tests/ui/arrays-dont-leak.rs:23:5
+  --> tests/compile-fail/arrays-dont-leak.rs:23:5
    |
 20 | fn array_echo_baa<'a, 'b>(a: Array<'b, &'a str>) -> Vec<Option<&'a str>> {
    |                   --  -- lifetime `'b` defined here
@@ -85,7 +85,7 @@ error: lifetime may not live long enough
    = help: consider adding the following bound: `'b: 'a`
 
 error[E0515]: cannot return value referencing function parameter `a`
-  --> tests/ui/arrays-dont-leak.rs:23:5
+  --> tests/compile-fail/arrays-dont-leak.rs:23:5
    |
 21 |     let v = a.iter().collect();
    |             - `a` is borrowed here
@@ -94,7 +94,7 @@ error[E0515]: cannot return value referencing function parameter `a`
    |     ^ returns a value referencing data owned by the current function
 
 error[E0505]: cannot move out of `array` because it is borrowed
-  --> tests/ui/arrays-dont-leak.rs:34:10
+  --> tests/compile-fail/arrays-dont-leak.rs:34:10
    |
 31 |     let array = Spi::get_one::<Array<&str>>("SELECT array_echo(a) FROM test_leak_after_drop")?
    |         ----- binding `array` declared here

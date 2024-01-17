@@ -1,5 +1,5 @@
 error[E0515]: cannot return value referencing temporary value
-  --> tests/ui/heap-tuples-dont-leak.rs:10:5
+  --> tests/compile-fail/heap-tuples-dont-leak.rs:10:5
    |
 10 |     dog?.get_by_name("name").ok()?
    |     ----^^^^^^^^^^^^^^^^^^^^^^^^^^
@@ -8,7 +8,7 @@ error[E0515]: cannot return value referencing temporary value
    |     temporary value created here
 
 error[E0515]: cannot return value referencing local variable `dog`
-  --> tests/ui/heap-tuples-dont-leak.rs:20:5
+  --> tests/compile-fail/heap-tuples-dont-leak.rs:20:5
    |
 20 |     dog.get_by_name("name").unwrap().unwrap()
    |     ---^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
@@ -17,7 +17,7 @@ error[E0515]: cannot return value referencing local variable `dog`
    |     `dog` is borrowed here
 
 error[E0515]: cannot return value referencing local variable `dog`
-  --> tests/ui/heap-tuples-dont-leak.rs:28:5
+  --> tests/compile-fail/heap-tuples-dont-leak.rs:28:5
    |
 28 |     dog.get_by_name("name").unwrap().unwrap()
    |     ---^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
