@@ -1,5 +1,5 @@
 error[E0277]: the trait bound `Vec<Option<&'a str>>: FromDatum` is not satisfied
- --> tests/ui/random-vec-strs-arent-okay.rs:5:1
+ --> tests/todo/random-vec-strs-arent-okay.rs:5:1
   |
 5 | #[pg_extern]
   | ^^^^^^^^^^^^ the trait `FromDatum` is not implemented for `Vec<Option<&'a str>>`

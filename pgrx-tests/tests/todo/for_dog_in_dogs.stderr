@@ -1,0 +1,53 @@
+error[E0425]: cannot find value `DOG_COMPOSITE_TYPE` in this scope
+ --> tests/todo/for_dog_in_dogs.rs:7:47
+  |
+7 |     dogs: VariadicArray<pgrx::composite_type!(DOG_COMPOSITE_TYPE)>,
+  |                                               ^^^^^^^^^^^^^^^^^^ not found in this scope
+
+error[E0277]: the trait bound `pgrx::VariadicArray<'_, pgrx::prelude::PgHeapTuple<'_, pgrx::AllocatedByRust>>: IntoIterator` is not satisfied
+  --> tests/todo/for_dog_in_dogs.rs:13:16
+   |
+13 |     for dog in dogs {
+   |                ^^^^ the trait `IntoIterator` is not implemented for `pgrx::VariadicArray<'_, pgrx::prelude::PgHeapTuple<'_, pgrx::AllocatedByRust>>`
+   |
+   = help: the trait `IntoIterator` is implemented for `pgrx::VariadicArray<'_, pgrx::prelude::PgHeapTuple<'_, pgrx::AllocatedByRust>>`
+
+error[E0277]: the trait bound `pgrx::VariadicArray<'_, pgrx::prelude::PgHeapTuple<'_, pgrx::AllocatedByRust>>: IntoIterator` is not satisfied
+  --> tests/todo/for_dog_in_dogs.rs:30:16
+   |
+30 |     for dog in dogs {
+   |                ^^^^ the trait `IntoIterator` is not implemented for `pgrx::VariadicArray<'_, pgrx::prelude::PgHeapTuple<'_, pgrx::AllocatedByRust>>`
+   |
+   = help: the trait `IntoIterator` is implemented for `pgrx::VariadicArray<'_, pgrx::prelude::PgHeapTuple<'_, pgrx::AllocatedByRust>>`
+
+error[E0277]: the trait bound `pgrx::VariadicArray<'_, pgrx::prelude::PgHeapTuple<'_, pgrx::AllocatedByRust>>: IntoIterator` is not satisfied
+  --> tests/todo/for_dog_in_dogs.rs:46:16
+   |
+46 |     for dog in dogs {
+   |                ^^^^ the trait `IntoIterator` is not implemented for `pgrx::VariadicArray<'_, pgrx::prelude::PgHeapTuple<'_, pgrx::AllocatedByRust>>`
+   |
+   = help: the trait `IntoIterator` is implemented for `pgrx::VariadicArray<'_, pgrx::prelude::PgHeapTuple<'_, pgrx::AllocatedByRust>>`
+
+error[E0277]: the trait bound `Array<'_, pgrx::prelude::PgHeapTuple<'_, pgrx::AllocatedByRust>>: IntoIterator` is not satisfied
+  --> tests/todo/for_dog_in_dogs.rs:63:16
+   |
+63 |     for dog in dogs {
+   |                ^^^^ the trait `IntoIterator` is not implemented for `Array<'_, pgrx::prelude::PgHeapTuple<'_, pgrx::AllocatedByRust>>`
+   |
+   = help: the trait `IntoIterator` is implemented for `Array<'_, pgrx::prelude::PgHeapTuple<'_, pgrx::AllocatedByRust>>`
+
+error[E0277]: the trait bound `Array<'_, pgrx::prelude::PgHeapTuple<'_, pgrx::AllocatedByRust>>: IntoIterator` is not satisfied
+  --> tests/todo/for_dog_in_dogs.rs:83:16
+   |
+83 |     for dog in dogs {
+   |                ^^^^ the trait `IntoIterator` is not implemented for `Array<'_, pgrx::prelude::PgHeapTuple<'_, pgrx::AllocatedByRust>>`
+   |
+   = help: the trait `IntoIterator` is implemented for `Array<'_, pgrx::prelude::PgHeapTuple<'_, pgrx::AllocatedByRust>>`
+
+error[E0277]: the trait bound `Array<'_, pgrx::prelude::PgHeapTuple<'_, pgrx::AllocatedByRust>>: IntoIterator` is not satisfied
+   --> tests/todo/for_dog_in_dogs.rs:100:16
+    |
+100 |     for dog in dogs {
+    |                ^^^^ the trait `IntoIterator` is not implemented for `Array<'_, pgrx::prelude::PgHeapTuple<'_, pgrx::AllocatedByRust>>`
+    |
+    = help: the trait `IntoIterator` is implemented for `Array<'_, pgrx::prelude::PgHeapTuple<'_, pgrx::AllocatedByRust>>`
