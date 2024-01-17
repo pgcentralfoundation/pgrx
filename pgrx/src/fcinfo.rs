@@ -95,6 +95,7 @@ macro_rules! variadic {
 ///
 /// We also cannot ensure that the specified Rust type `T` is compatible with whatever the
 /// underlying datum is at the argument `num` position.  This too, is your responsibility
+// TODO: should relate back to lifetimes and use a bound like T: UnboxDatum<'dat>?
 #[inline]
 pub unsafe fn pg_getarg<T: FromDatum>(fcinfo: pg_sys::FunctionCallInfo, num: usize) -> Option<T> {
     let datum = pg_get_nullable_datum(fcinfo, num);

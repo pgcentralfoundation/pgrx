@@ -1,5 +1,5 @@
 error[E0277]: the trait bound `BrokenType: std::cmp::Eq` is not satisfied
- --> tests/ui/eq_for_postgres_hash.rs:4:48
+ --> tests/compile-fail/eq-for-postgres_hash.rs:4:48
   |
 4 | #[derive(Serialize, Deserialize, PostgresType, PostgresHash)]
   |                                                ^^^^^^^^^^^^ the trait `std::cmp::Eq` is not implemented for `BrokenType`
@@ -13,7 +13,7 @@ help: consider annotating `BrokenType` with `#[derive(Eq)]`
   |
 
 error[E0277]: the trait bound `BrokenType: std::hash::Hash` is not satisfied
- --> tests/ui/eq_for_postgres_hash.rs:4:48
+ --> tests/compile-fail/eq-for-postgres_hash.rs:4:48
   |
 4 | #[derive(Serialize, Deserialize, PostgresType, PostgresHash)]
   |                                                ^^^^^^^^^^^^ the trait `std::hash::Hash` is not implemented for `BrokenType`

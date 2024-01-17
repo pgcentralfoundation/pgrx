@@ -618,6 +618,7 @@ pub fn postgres_enum(input: TokenStream) -> TokenStream {
 fn impl_postgres_enum(ast: DeriveInput) -> syn::Result<proc_macro2::TokenStream> {
     let mut stream = proc_macro2::TokenStream::new();
     let sql_graph_entity_ast = ast.clone();
+    let generics = &ast.generics;
     let enum_ident = &ast.ident;
     let enum_name = enum_ident.to_string();
 
@@ -657,6 +658,14 @@ fn impl_postgres_enum(ast: DeriveInput) -> syn::Result<proc_macro2::TokenStream>
                         _ => panic!("invalid enum value: {}", name)
                     }
                 }
+            }
+        }
+
+        unsafe impl #generics ::pgrx::datum::UnboxDatum for #enum_ident #generics {
+            type As<'dat> = #enum_ident #generics where Self: 'dat;
+            #[inline]
+            unsafe fn unbox<'dat>(d: ::pgrx::datum::Datum<'dat>) -> Self::As<'dat> where Self: 'dat {
+                Self::from_datum(::core::mem::transmute(d), false).unwrap()
             }
         }
 
@@ -806,6 +815,13 @@ fn impl_postgres_type(ast: DeriveInput) -> syn::Result<proc_macro2::TokenStream>
                                 Self::from_datum(varlena.into(), is_null)
                             })
                         }
+                    }
+                }
+
+                unsafe impl #generics ::pgrx::datum::UnboxDatum for #name #generics {
+                    type As<'dat> = Self where Self: 'dat;
+                    unsafe fn unbox<'dat>(datum: ::pgrx::datum::Datum<'dat>) -> Self::As<'dat> where Self: 'dat {
+                        <Self as ::pgrx::datum::FromDatum>::from_datum(::core::mem::transmute(datum), false).unwrap()
                     }
                 }
             }

@@ -34,7 +34,6 @@ use search_path::SearchPathList;
 use crate::enrich::CodeEnrichment;
 use crate::enrich::ToEntityGraphTokens;
 use crate::enrich::ToRustCodeTokens;
-use crate::lifetimes::staticize_lifetimes;
 use proc_macro2::{Ident, Span, TokenStream as TokenStream2};
 use quote::{quote, quote_spanned, ToTokens};
 use syn::parse::{Parse, ParseStream, Parser};
@@ -133,12 +132,11 @@ impl PgExtern {
                 match v {
                     syn::FnArg::Receiver(_) => None,
                     syn::FnArg::Typed(pat_ty) => {
-                        let mut static_ty = match UsedType::new(*pat_ty.ty.clone()) {
+                        let ty = match UsedType::new(*pat_ty.ty.clone()) {
                             Ok(v) => v.resolved_ty,
                             Err(e) => return Some(Err(e)),
                         };
-                        staticize_lifetimes(&mut static_ty);
-                        Some(Ok(static_ty))
+                        Some(Ok(ty))
                     }
                 }
             })
@@ -275,9 +273,8 @@ impl PgExtern {
         let return_type = match &self.func.sig.output {
             syn::ReturnType::Default => None,
             syn::ReturnType::Type(arrow, ty) => {
-                let mut static_ty = ty.clone();
-                staticize_lifetimes(&mut static_ty);
-                Some(syn::ReturnType::Type(*arrow, static_ty))
+                let ty = ty.clone();
+                Some(syn::ReturnType::Type(*arrow, ty))
             }
         };
 
@@ -286,6 +283,20 @@ impl PgExtern {
             None => self.to_sql_config.clone(),
             Some(content) => ToSqlConfig { content: Some(content), ..self.to_sql_config.clone() },
         };
+
+        let lifetimes = self
+            .func
+            .sig
+            .generics
+            .params
+            .iter()
+            .filter_map(|generic| match generic {
+                // syn::GenericParam::Type(_) => todo!(),
+                syn::GenericParam::Lifetime(lt) => Some(lt),
+                _ => None, // syn::GenericParam::Const(_) => todo!(),
+            })
+            .collect::<Vec<_>>();
+        let hrtb = if lifetimes.is_empty() { None } else { Some(quote! { for<#(#lifetimes),*> }) };
 
         let sql_graph_entity_fn_name =
             syn::Ident::new(&format!("__pgrx_internals_fn_{}", ident), Span::call_site());
@@ -297,7 +308,7 @@ impl PgExtern {
                 extern crate alloc;
                 #[allow(unused_imports)]
                 use alloc::{vec, vec::Vec};
-                type FunctionPointer = #unsafety fn(#( #input_types ),*) #return_type;
+                type FunctionPointer = #hrtb #unsafety fn (#( #input_types ),*) #return_type;
                 let metadata: FunctionPointer = #ident;
                 let submission = ::pgrx::pgrx_sql_entity_graph::PgExternEntity {
                     name: #name,

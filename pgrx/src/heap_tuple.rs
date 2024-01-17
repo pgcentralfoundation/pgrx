@@ -10,7 +10,7 @@
 //! Provides a safe interface to Postgres `HeapTuple` objects.
 //!
 //! [`PgHeapTuple`]s also describe composite types as defined by [`pgrx::composite_type!()`][crate::composite_type].
-use crate::datum::lookup_type_name;
+use crate::datum::{lookup_type_name, UnboxDatum};
 use crate::{
     heap_getattr_raw, pg_sys, trigger_fired_by_delete, trigger_fired_by_insert,
     trigger_fired_by_update, trigger_fired_for_statement, AllocatedByPostgres, AllocatedByRust,
@@ -52,12 +52,12 @@ pub enum PgHeapTupleError {
 /// allocated by Postgres, it is not mutable until [`PgHeapTuple::into_owned`] is called.
 ///
 /// [`PgHeapTuple`]s also describe composite types as defined by [`pgrx::composite_type!()`][crate::composite_type].
-pub struct PgHeapTuple<'a, AllocatedBy: WhoAllocated> {
+pub struct PgHeapTuple<'mcx, AllocatedBy: WhoAllocated> {
     tuple: PgBox<pg_sys::HeapTupleData, AllocatedBy>,
-    tupdesc: PgTupleDesc<'a>,
+    tupdesc: PgTupleDesc<'mcx>,
 }
 
-impl<'a> FromDatum for PgHeapTuple<'a, AllocatedByRust> {
+impl FromDatum for PgHeapTuple<'_, AllocatedByRust> {
     unsafe fn from_polymorphic_datum(
         composite: pg_sys::Datum,
         is_null: bool,
@@ -89,7 +89,7 @@ impl<'a> FromDatum for PgHeapTuple<'a, AllocatedByRust> {
     }
 }
 
-impl<'a> PgHeapTuple<'a, AllocatedByPostgres> {
+impl<'mcx> PgHeapTuple<'mcx, AllocatedByPostgres> {
     /// Creates a new [PgHeapTuple] from a [PgTupleDesc] and a [pg_sys::HeapTuple] pointer.  The
     /// returned [PgHeapTuple] will be considered by have been allocated by Postgres and is not mutable
     /// until [PgHeapTuple::into_owned] is called.
@@ -99,7 +99,10 @@ impl<'a> PgHeapTuple<'a, AllocatedByPostgres> {
     /// This function is unsafe as we cannot guarantee that the [pg_sys::HeapTuple] pointer is valid,
     /// nor can we guaratee that the provided [PgTupleDesc] properly describes the structure of
     /// the heap tuple.
-    pub unsafe fn from_heap_tuple(tupdesc: PgTupleDesc<'a>, heap_tuple: pg_sys::HeapTuple) -> Self {
+    pub unsafe fn from_heap_tuple(
+        tupdesc: PgTupleDesc<'mcx>,
+        heap_tuple: pg_sys::HeapTuple,
+    ) -> Self {
         Self { tuple: PgBox::from_pg(heap_tuple), tupdesc }
     }
 
@@ -117,9 +120,9 @@ impl<'a> PgHeapTuple<'a, AllocatedByPostgres> {
     /// argument are valid or that it's being used in the context of a firing trigger, which necessitates
     /// Postgres internal state be correct for executing a trigger.
     pub unsafe fn from_trigger_data(
-        trigger_data: &'a pg_sys::TriggerData,
+        trigger_data: &'mcx pg_sys::TriggerData,
         which_tuple: TriggerTuple,
-    ) -> Option<PgHeapTuple<'a, AllocatedByPostgres>> {
+    ) -> Option<PgHeapTuple<'mcx, AllocatedByPostgres>> {
         if trigger_fired_for_statement(trigger_data.tg_event) {
             // there is no HeapTuple for a statement-level trigger as such triggers aren't run
             // per-row
@@ -171,7 +174,7 @@ impl<'a> PgHeapTuple<'a, AllocatedByPostgres> {
 
     /// Consumes a [`PgHeapTuple`] considered to be allocated by Postgres and transforms it into one
     /// that is considered allocated by Rust.  This is accomplished by copying the underlying [pg_sys::HeapTupleData].
-    pub fn into_owned(self) -> PgHeapTuple<'a, AllocatedByRust> {
+    pub fn into_owned(self) -> PgHeapTuple<'mcx, AllocatedByRust> {
         let copy = unsafe { pg_sys::heap_copytuple(self.tuple.into_pg()) };
         PgHeapTuple {
             tuple: unsafe { PgBox::<pg_sys::HeapTupleData, AllocatedByRust>::from_rust(copy) },
@@ -180,7 +183,7 @@ impl<'a> PgHeapTuple<'a, AllocatedByPostgres> {
     }
 }
 
-impl<'a> PgHeapTuple<'a, AllocatedByRust> {
+impl<'mcx> PgHeapTuple<'mcx, AllocatedByRust> {
     /** Create a new heap tuple in the shape of a defined composite type
 
     ```rust,no_run
@@ -206,7 +209,7 @@ impl<'a> PgHeapTuple<'a, AllocatedByRust> {
     */
     pub fn new_composite_type(
         type_name: &str,
-    ) -> Result<PgHeapTuple<'a, AllocatedByRust>, PgHeapTupleError> {
+    ) -> Result<PgHeapTuple<'mcx, AllocatedByRust>, PgHeapTupleError> {
         let tuple_desc = PgTupleDesc::for_composite_type(type_name)
             .ok_or_else(|| PgHeapTupleError::NoSuchType(type_name.to_string()))?;
 
@@ -215,7 +218,7 @@ impl<'a> PgHeapTuple<'a, AllocatedByRust> {
 
     pub fn new_composite_type_by_oid(
         typoid: pg_sys::Oid,
-    ) -> Result<PgHeapTuple<'a, AllocatedByRust>, PgHeapTupleError> {
+    ) -> Result<PgHeapTuple<'mcx, AllocatedByRust>, PgHeapTupleError> {
         PgTryBuilder::new(|| {
             let tuple_desc = PgTupleDesc::for_composite_type_by_oid(typoid)
                 .ok_or(PgHeapTupleError::NotACompositeType(typoid))?;
@@ -255,9 +258,9 @@ impl<'a> PgHeapTuple<'a, AllocatedByRust> {
     /// This function is unsafe as we cannot guarantee the provided [`pg_sys::Datum`]s are valid
     /// as the specified [`PgTupleDesc`] might expect
     pub unsafe fn from_datums<I: IntoIterator<Item = Option<pg_sys::Datum>>>(
-        tupdesc: PgTupleDesc<'a>,
+        tupdesc: PgTupleDesc<'mcx>,
         datums: I,
-    ) -> Result<PgHeapTuple<'a, AllocatedByRust>, PgHeapTupleError> {
+    ) -> Result<PgHeapTuple<'mcx, AllocatedByRust>, PgHeapTupleError> {
         let iter = datums.into_iter();
         let mut datums = Vec::<pg_sys::Datum>::with_capacity(iter.size_hint().1.unwrap_or(1));
         let mut nulls = Vec::<bool>::with_capacity(iter.size_hint().1.unwrap_or(1));
@@ -404,7 +407,7 @@ impl<'a> PgHeapTuple<'a, AllocatedByRust> {
     }
 }
 
-impl<'a, AllocatedBy: WhoAllocated> IntoDatum for PgHeapTuple<'a, AllocatedBy> {
+impl<'mcx, AllocatedBy: WhoAllocated> IntoDatum for PgHeapTuple<'mcx, AllocatedBy> {
     // Delegate to `into_composite_datum()` as this will normally be used with composite types.
     // See `into_trigger_datum()` if using as a trigger.
     fn into_datum(self) -> Option<pg_sys::Datum> {
@@ -430,7 +433,7 @@ impl<'a, AllocatedBy: WhoAllocated> IntoDatum for PgHeapTuple<'a, AllocatedBy> {
     }
 }
 
-impl<'a, AllocatedBy: WhoAllocated> PgHeapTuple<'a, AllocatedBy> {
+impl<'mcx, AllocatedBy: WhoAllocated> PgHeapTuple<'mcx, AllocatedBy> {
     /// Consume this [`PgHeapTuple`] and return a composite Datum representation, containing the tuple
     /// data and the corresponding tuple descriptor information.
     pub fn into_composite_datum(self) -> Option<pg_sys::Datum> {
@@ -463,8 +466,8 @@ impl<'a, AllocatedBy: WhoAllocated> PgHeapTuple<'a, AllocatedBy> {
     ///
     /// The return value is `(attribute_number: NonZeroUsize, attribute_info: &pg_sys::FormData_pg_attribute)`.
     pub fn attributes(
-        &'a self,
-    ) -> impl std::iter::Iterator<Item = (NonZeroUsize, &'a pg_sys::FormData_pg_attribute)> {
+        &self,
+    ) -> impl std::iter::Iterator<Item = (NonZeroUsize, &pg_sys::FormData_pg_attribute)> {
         self.tupdesc.iter().enumerate().map(|(i, att)| (NonZeroUsize::new(i + 1).unwrap(), att))
     }
 
@@ -473,9 +476,9 @@ impl<'a, AllocatedBy: WhoAllocated> PgHeapTuple<'a, AllocatedBy> {
     /// Returns `None` if the attribute number is out of bounds.
     #[inline]
     pub fn get_attribute_by_index(
-        &'a self,
+        &self,
         index: NonZeroUsize,
-    ) -> Option<&'a pg_sys::FormData_pg_attribute> {
+    ) -> Option<&pg_sys::FormData_pg_attribute> {
         self.tupdesc.get(index.get() - 1)
     }
 
@@ -483,9 +486,9 @@ impl<'a, AllocatedBy: WhoAllocated> PgHeapTuple<'a, AllocatedBy> {
     ///
     /// Returns `None` if the attribute name is not found.
     pub fn get_attribute_by_name(
-        &'a self,
+        &self,
         name: &str,
-    ) -> Option<(NonZeroUsize, &'a pg_sys::FormData_pg_attribute)> {
+    ) -> Option<(NonZeroUsize, &pg_sys::FormData_pg_attribute)> {
         for i in 0..self.len() {
             let i = NonZeroUsize::new(i + 1).unwrap();
             let att = self.get_attribute_by_index(i).unwrap();
@@ -505,10 +508,10 @@ impl<'a, AllocatedBy: WhoAllocated> PgHeapTuple<'a, AllocatedBy> {
     /// - return [`TryFromDatumError::NoSuchAttributeName`] if the attribute does not exist
     /// - return [`TryFromDatumError::IncompatibleTypes`] if the Rust type of the `value` is not
     /// compatible with the attribute's Postgres type
-    pub fn get_by_name<T: FromDatum + IntoDatum + 'static>(
-        &self,
-        attname: &str,
-    ) -> Result<Option<T>, TryFromDatumError> {
+    pub fn get_by_name<'tup, T>(&'tup self, attname: &str) -> Result<Option<T>, TryFromDatumError>
+    where
+        T: FromDatum + IntoDatum + UnboxDatum<As<'tup> = T> + 'tup,
+    {
         // find the attribute number by name
         for att in self.tupdesc.iter() {
             if att.name() == attname {
@@ -529,10 +532,13 @@ impl<'a, AllocatedBy: WhoAllocated> PgHeapTuple<'a, AllocatedBy> {
     /// - return [`TryFromDatumError::NoSuchAttributeNumber`] if the attribute does not exist
     /// - return [`TryFromDatumError::IncompatibleTypes`] if the Rust type of the `value` is not
     /// compatible with the attribute's Postgres type
-    pub fn get_by_index<T: FromDatum + IntoDatum + 'static>(
-        &self,
+    pub fn get_by_index<'tup, T>(
+        &'tup self,
         attno: NonZeroUsize,
-    ) -> Result<Option<T>, TryFromDatumError> {
+    ) -> Result<Option<T>, TryFromDatumError>
+    where
+        T: FromDatum + IntoDatum + UnboxDatum<As<'tup> = T> + 'tup,
+    {
         unsafe {
             // tuple descriptor attribute numbers are zero-based
             match self.tupdesc.get(attno.get() - 1) {
@@ -639,7 +645,7 @@ use pgrx::{prelude::*, AllocatedByRust};
 #[pg_extern]
 fn this_dog_name_or_your_favorite_dog_name(
     dog: pgrx::default!(pgrx::composite_type!("Dog"), "ROW('Nami', 0)::Dog"),
-) -> &str {
+) -> String {
     // Gets resolved to:
     let dog: PgHeapTuple<AllocatedByRust> = dog;
 

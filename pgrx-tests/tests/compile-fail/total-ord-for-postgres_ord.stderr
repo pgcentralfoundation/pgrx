@@ -1,5 +1,5 @@
 error[E0277]: the trait bound `BrokenType: std::cmp::Ord` is not satisfied
- --> tests/ui/total_ord_for_postgres_ord.rs:4:71
+ --> tests/compile-fail/total-ord-for-postgres_ord.rs:4:71
   |
 4 | #[derive(Serialize, Deserialize, PartialEq, PartialOrd, PostgresType, PostgresOrd)]
   |                                                                       ^^^^^^^^^^^ the trait `std::cmp::Ord` is not implemented for `BrokenType`

@@ -1,5 +1,5 @@
 error[E0277]: the trait bound `BrokenType: std::cmp::Eq` is not satisfied
- --> tests/ui/total_eq_for_postgres_eq.rs:4:59
+ --> tests/compile-fail/total-eq-for-postgres_eq.rs:4:59
   |
 4 | #[derive(Serialize, Deserialize, PartialEq, PostgresType, PostgresEq)]
   |                                                           ^^^^^^^^^^ the trait `std::cmp::Eq` is not implemented for `BrokenType`

@@ -32,6 +32,7 @@ mod time_stamp;
 mod time_stamp_with_timezone;
 mod time_with_timezone;
 mod tuples;
+mod unbox;
 mod uuid;
 mod varlena;
 
@@ -55,14 +56,116 @@ use std::any::TypeId;
 pub use time_stamp::*;
 pub use time_stamp_with_timezone::*;
 pub use time_with_timezone::*;
+pub use unbox::*;
 pub use varlena::*;
 
+use crate::memcx::MemCx;
+use crate::pg_sys;
 use crate::PgBox;
+use core::marker::PhantomData;
 use pgrx_sql_entity_graph::RustSqlMapping;
+
+/// How Postgres represents datatypes
+///
+/// The "no-frills" version is [`pg_sys::Datum`], which is abstractly a union of "pointer to void"
+/// with other scalar types that can be packed within a pointer's bytes. In practical use, a "raw"
+/// Datum can prove to have the same risks as a pointer: code may try to use it without knowing
+/// whether its pointee has been deallocated. To lift a Datum into a Rust type requires making
+/// implicit lifetimes into explicit bounds.
+///
+/// Merely having a lifetime does not make `Datum<'src>` "safe" to use. To abstractly represent a
+/// full PostgreSQL value needs at least the tuple (Datum, bool, [`pg_sys::Oid`]): a tagged union.
+/// `Datum<'src>` itself is effectively a dynamically-typed union *without a type tag*. It exists
+/// not to make code manipulating it safe, but to make it possible to write unsafe code correctly,
+/// passing Datums to and from Postgres without having to wonder if the implied `&'src T` would
+/// actually refer to deallocated data.
+///
+/// # Designing safe abstractions
+/// A function must only be declared safe if *all* inputs **cannot** cause [undefined behavior].
+/// Transmuting a raw `pg_sys::Datum` into [`&'a T`] grants a potentially-unbounded lifetime,
+/// breaking the rule borrows must not outlive the borrowed. Avoiding such transmutations infects
+/// even simple generic functions with soundness obligations. Using only `&'a pg_sys::Datum` lasts
+/// only until one must pass by-value, which is the entire point of the original type as Postgres
+/// defined it, but can still be preferable.
+///
+/// `Datum<'src>` makes it theoretically possible to write functions with a signature like
+/// ```
+/// use pgrx::datum::Datum;
+/// # use core::marker::PhantomData;
+/// # use pgrx::memcx::MemCx;
+/// # struct InCx<'mcx, T>(T, PhantomData<&'mcx MemCx<'mcx>>);
+/// fn construct_type_from_datum<'src, T>(
+///     datum: Datum<'src>,
+///     func: impl FnOnce(Datum<'src>) -> InCx<'src, T>
+/// ) -> InCx<'src, T> {
+///    func(datum)
+/// }
+/// ```
+/// However, it is possible for `T<'src>` to be insufficient to represent the real lifetime of the
+/// abstract Postgres type's allocations. Often a Datum must be "detoasted", which may reallocate.
+/// This may demand two constraints on the return type to represent both possible lifetimes, like:
+/// ```
+/// use pgrx::datum::Datum;
+/// use pgrx::memcx::MemCx;
+/// # use core::marker::PhantomData;
+/// # struct Detoasted<'mcx, T>(T, PhantomData<&'mcx MemCx<'mcx>>);
+/// # struct InCx<'mcx, T>(T, PhantomData<&'mcx MemCx<'mcx>>);
+/// fn detoast_type_from_datum<'old, 'new, T>(
+///     datum: Datum<'old>,
+///     memcx: MemCx<'new>,
+/// ) -> Detoasted<'new, InCx<'old, T>> {
+///    todo!()
+/// }
+/// ```
+/// In actual practice, these can be unified into a single lifetime: the lower bound of both.
+/// This is both good and bad: types can use fewer lifetime annotations, even after detoasting.
+/// However, in general, because lifetime unification can be done implicitly by the compiler,
+/// it is often important to name each and every single lifetime involved in functions that
+/// perform these tasks.
+///
+/// [`&'a T`]: reference
+/// [undefined behavior]: https://doc.rust-lang.org/reference/behavior-considered-undefined.html
+pub struct Datum<'src>(
+    pg_sys::Datum,
+    /// if a Datum borrows anything, it's "from" a [`pg_sys::MemoryContext`]
+    /// as a memory context, like an arena, is deallocated "together".
+    /// FIXME: a more-correct inner type later
+    PhantomData<&'src MemCx<'src>>,
+);
+
+impl<'src> Datum<'src> {
+    /// The Datum without its lifetime.
+    pub fn sans_lifetime(self) -> pg_sys::Datum {
+        self.0
+    }
+}
 
 /// A tagging trait to indicate a user type is also meant to be used by Postgres
 /// Implemented automatically by `#[derive(PostgresType)]`
 pub trait PostgresType {}
+
+/// Obtain a TypeId for T without `T: 'static`
+#[inline]
+#[doc(hidden)]
+pub fn nonstatic_typeid<T: ?Sized>() -> core::any::TypeId {
+    trait NonStaticAny {
+        fn type_id(&self) -> core::any::TypeId
+        where
+            Self: 'static;
+    }
+    impl<T: ?Sized> NonStaticAny for core::marker::PhantomData<T> {
+        #[inline]
+        fn type_id(&self) -> core::any::TypeId
+        where
+            Self: 'static,
+        {
+            core::any::TypeId::of::<T>()
+        }
+    }
+    let it = core::marker::PhantomData::<T>;
+    // There is no excuse for the crimes we have done here, but what jury would convict us?
+    unsafe { core::mem::transmute::<&dyn NonStaticAny, &'static dyn NonStaticAny>(&it).type_id() }
+}
 
 /// A type which can have it's [`core::any::TypeId`]s registered for Rust to SQL mapping.
 ///
@@ -77,9 +180,9 @@ pub trait PostgresType {}
 ///
 /// let mut mappings = Default::default();
 /// let treat_string = stringify!(Treat).to_string();
-/// <Treat<'static> as pgrx::datum::WithTypeIds>::register_with_refs(&mut mappings, treat_string.clone());
+/// <Treat<'_> as pgrx::datum::WithTypeIds>::register_with_refs(&mut mappings, treat_string.clone());
 ///
-/// assert!(mappings.iter().any(|x| x.id == core::any::TypeId::of::<Treat<'static>>()));
+/// assert!(mappings.iter().any(|x| x.id == ::pgrx::datum::nonstatic_typeid::<Treat<'static>>()));
 /// ```
 ///
 /// This trait uses the fact that inherent implementations are a higher priority than trait
@@ -98,10 +201,7 @@ pub trait WithTypeIds {
     const VARLENA_ID: Lazy<Option<TypeId>>;
     const OPTION_VARLENA_ID: Lazy<Option<TypeId>>;
 
-    fn register_with_refs(map: &mut std::collections::HashSet<RustSqlMapping>, single_sql: String)
-    where
-        Self: 'static,
-    {
+    fn register_with_refs(map: &mut std::collections::HashSet<RustSqlMapping>, single_sql: String) {
         Self::register(map, single_sql.clone());
         <&Self as WithTypeIds>::register(map, single_sql.clone());
         <&mut Self as WithTypeIds>::register(map, single_sql);
@@ -110,55 +210,37 @@ pub trait WithTypeIds {
     fn register_sized_with_refs(
         _map: &mut std::collections::HashSet<RustSqlMapping>,
         _single_sql: String,
-    ) where
-        Self: 'static,
-    {
+    ) {
         ()
     }
 
-    fn register_sized(_map: &mut std::collections::HashSet<RustSqlMapping>, _single_sql: String)
-    where
-        Self: 'static,
-    {
+    fn register_sized(_map: &mut std::collections::HashSet<RustSqlMapping>, _single_sql: String) {
         ()
     }
 
     fn register_varlena_with_refs(
         _map: &mut std::collections::HashSet<RustSqlMapping>,
         _single_sql: String,
-    ) where
-        Self: 'static,
-    {
+    ) {
         ()
     }
 
-    fn register_varlena(_map: &mut std::collections::HashSet<RustSqlMapping>, _single_sql: String)
-    where
-        Self: 'static,
-    {
+    fn register_varlena(_map: &mut std::collections::HashSet<RustSqlMapping>, _single_sql: String) {
         ()
     }
 
     fn register_array_with_refs(
         _map: &mut std::collections::HashSet<RustSqlMapping>,
         _single_sql: String,
-    ) where
-        Self: 'static,
-    {
+    ) {
         ()
     }
 
-    fn register_array(_map: &mut std::collections::HashSet<RustSqlMapping>, _single_sql: String)
-    where
-        Self: 'static,
-    {
+    fn register_array(_map: &mut std::collections::HashSet<RustSqlMapping>, _single_sql: String) {
         ()
     }
 
-    fn register(set: &mut std::collections::HashSet<RustSqlMapping>, single_sql: String)
-    where
-        Self: 'static,
-    {
+    fn register(set: &mut std::collections::HashSet<RustSqlMapping>, single_sql: String) {
         let rust = core::any::type_name::<Self>();
         assert!(
             set.insert(RustSqlMapping {
@@ -173,8 +255,8 @@ pub trait WithTypeIds {
     }
 }
 
-impl<T: 'static + ?Sized> WithTypeIds for T {
-    const ITEM_ID: Lazy<TypeId> = Lazy::new(|| TypeId::of::<T>());
+impl<T: ?Sized> WithTypeIds for T {
+    const ITEM_ID: Lazy<TypeId> = Lazy::new(|| nonstatic_typeid::<T>());
     const OPTION_ID: Lazy<Option<TypeId>> = Lazy::new(|| None);
     const VEC_ID: Lazy<Option<TypeId>> = Lazy::new(|| None);
     const VEC_OPTION_ID: Lazy<Option<TypeId>> = Lazy::new(|| None);
@@ -214,20 +296,20 @@ impl<T: 'static + ?Sized> WithTypeIds for T {
 /// implementations.
 pub struct WithSizedTypeIds<T>(pub core::marker::PhantomData<T>);
 
-impl<T: 'static> WithSizedTypeIds<T> {
-    pub const PG_BOX_ID: Lazy<Option<TypeId>> = Lazy::new(|| Some(TypeId::of::<PgBox<T>>()));
+impl<T> WithSizedTypeIds<T> {
+    pub const PG_BOX_ID: Lazy<Option<TypeId>> = Lazy::new(|| Some(nonstatic_typeid::<PgBox<T>>()));
     pub const PG_BOX_OPTION_ID: Lazy<Option<TypeId>> =
-        Lazy::new(|| Some(TypeId::of::<PgBox<Option<T>>>()));
+        Lazy::new(|| Some(nonstatic_typeid::<PgBox<Option<T>>>()));
     pub const PG_BOX_VEC_ID: Lazy<Option<TypeId>> =
-        Lazy::new(|| Some(TypeId::of::<PgBox<Vec<T>>>()));
-    pub const OPTION_ID: Lazy<Option<TypeId>> = Lazy::new(|| Some(TypeId::of::<Option<T>>()));
-    pub const VEC_ID: Lazy<Option<TypeId>> = Lazy::new(|| Some(TypeId::of::<Vec<T>>()));
+        Lazy::new(|| Some(nonstatic_typeid::<PgBox<Vec<T>>>()));
+    pub const OPTION_ID: Lazy<Option<TypeId>> = Lazy::new(|| Some(nonstatic_typeid::<Option<T>>()));
+    pub const VEC_ID: Lazy<Option<TypeId>> = Lazy::new(|| Some(nonstatic_typeid::<Vec<T>>()));
     pub const VEC_OPTION_ID: Lazy<Option<TypeId>> =
-        Lazy::new(|| Some(TypeId::of::<Vec<Option<T>>>()));
+        Lazy::new(|| Some(nonstatic_typeid::<Vec<Option<T>>>()));
     pub const OPTION_VEC_ID: Lazy<Option<TypeId>> =
-        Lazy::new(|| Some(TypeId::of::<Option<Vec<T>>>()));
+        Lazy::new(|| Some(nonstatic_typeid::<Option<Vec<T>>>()));
     pub const OPTION_VEC_OPTION_ID: Lazy<Option<TypeId>> =
-        Lazy::new(|| Some(TypeId::of::<Option<Vec<Option<T>>>>()));
+        Lazy::new(|| Some(nonstatic_typeid::<Option<Vec<Option<T>>>>()));
 
     pub fn register_sized_with_refs(
         map: &mut std::collections::HashSet<RustSqlMapping>,
@@ -333,7 +415,7 @@ impl<T: 'static> WithSizedTypeIds<T> {
 ///     treat_string.clone()
 /// );
 ///
-/// assert!(mappings.iter().any(|x| x.id == core::any::TypeId::of::<Array<Treat>>()));
+/// assert!(mappings.iter().any(|x| x.id == ::pgrx::datum::nonstatic_typeid::<Array<Treat>>()));
 /// ```
 ///
 /// This trait uses the fact that inherent implementations are a higher priority than trait
@@ -341,13 +423,13 @@ impl<T: 'static> WithSizedTypeIds<T> {
 pub struct WithArrayTypeIds<T>(pub core::marker::PhantomData<T>);
 
 impl<T: FromDatum + 'static> WithArrayTypeIds<T> {
-    pub const ARRAY_ID: Lazy<Option<TypeId>> = Lazy::new(|| Some(TypeId::of::<Array<T>>()));
+    pub const ARRAY_ID: Lazy<Option<TypeId>> = Lazy::new(|| Some(nonstatic_typeid::<Array<T>>()));
     pub const OPTION_ARRAY_ID: Lazy<Option<TypeId>> =
-        Lazy::new(|| Some(TypeId::of::<Option<Array<T>>>()));
+        Lazy::new(|| Some(nonstatic_typeid::<Option<Array<T>>>()));
     pub const VARIADICARRAY_ID: Lazy<Option<TypeId>> =
-        Lazy::new(|| Some(TypeId::of::<VariadicArray<T>>()));
+        Lazy::new(|| Some(nonstatic_typeid::<VariadicArray<T>>()));
     pub const OPTION_VARIADICARRAY_ID: Lazy<Option<TypeId>> =
-        Lazy::new(|| Some(TypeId::of::<Option<VariadicArray<T>>>()));
+        Lazy::new(|| Some(nonstatic_typeid::<Option<VariadicArray<T>>>()));
 
     pub fn register_array_with_refs(
         map: &mut std::collections::HashSet<RustSqlMapping>,
@@ -418,7 +500,7 @@ impl<T: FromDatum + 'static> WithArrayTypeIds<T> {
 ///     treat_string.clone()
 /// );
 ///
-/// assert!(mappings.iter().any(|x| x.id == core::any::TypeId::of::<PgVarlena<Treat<'static>>>()));
+/// assert!(mappings.iter().any(|x| x.id == ::pgrx::datum::nonstatic_typeid::<PgVarlena<Treat<'_>>>()));
 /// ```
 ///
 /// This trait uses the fact that inherent implementations are a higher priority than trait
@@ -426,11 +508,12 @@ impl<T: FromDatum + 'static> WithArrayTypeIds<T> {
 pub struct WithVarlenaTypeIds<T>(pub core::marker::PhantomData<T>);
 
 impl<T: Copy + 'static> WithVarlenaTypeIds<T> {
-    pub const VARLENA_ID: Lazy<Option<TypeId>> = Lazy::new(|| Some(TypeId::of::<PgVarlena<T>>()));
+    pub const VARLENA_ID: Lazy<Option<TypeId>> =
+        Lazy::new(|| Some(nonstatic_typeid::<PgVarlena<T>>()));
     pub const PG_BOX_VARLENA_ID: Lazy<Option<TypeId>> =
-        Lazy::new(|| Some(TypeId::of::<PgBox<PgVarlena<T>>>()));
+        Lazy::new(|| Some(nonstatic_typeid::<PgBox<PgVarlena<T>>>()));
     pub const OPTION_VARLENA_ID: Lazy<Option<TypeId>> =
-        Lazy::new(|| Some(TypeId::of::<Option<PgVarlena<T>>>()));
+        Lazy::new(|| Some(nonstatic_typeid::<Option<PgVarlena<T>>>()));
 
     pub fn register_varlena_with_refs(
         map: &mut std::collections::HashSet<RustSqlMapping>,

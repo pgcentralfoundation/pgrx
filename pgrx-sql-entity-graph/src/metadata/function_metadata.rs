@@ -42,53 +42,30 @@ pub trait FunctionMetadata<A> {
     fn entity(&self) -> FunctionMetadataEntity;
 }
 
-impl<R> FunctionMetadata<()> for fn() -> R
-where
-    R: SqlTranslatable,
-{
-    fn entity(&self) -> FunctionMetadataEntity {
-        FunctionMetadataEntity {
-            arguments: vec![],
-            retval: {
-                let marker: PhantomData<R> = PhantomData;
-                marker.entity()
-            },
-            path: self.path(),
-        }
-    }
-}
-
-impl<R> FunctionMetadata<()> for unsafe fn() -> R
-where
-    R: SqlTranslatable,
-{
-    fn entity(&self) -> FunctionMetadataEntity {
-        FunctionMetadataEntity {
-            arguments: vec![],
-            retval: {
-                let marker: PhantomData<R> = PhantomData;
-                marker.entity()
-            },
-            path: self.path(),
-        }
-    }
-}
-
 macro_rules! impl_fn {
-    ($($T:ident),* $(,)?) => {
-        impl<$($T: SqlTranslatable,)* R: SqlTranslatable> FunctionMetadata<($($T,)*)> for fn($($T,)*) -> R {
+    ($($A:ident),* $(,)?) => {
+        impl<$($A,)* R, F> FunctionMetadata<($($A,)*)> for F
+        where
+            $($A: SqlTranslatable,)*
+            R: SqlTranslatable,
+            F: FnMut($($A,)*) -> R,
+        {
             fn entity(&self) -> FunctionMetadataEntity {
                 FunctionMetadataEntity {
-                    arguments: vec![$(PhantomData::<$T>.entity()),+],
+                    arguments: vec![$(PhantomData::<$A>.entity()),*],
                     retval: PhantomData::<R>.entity(),
                     path: self.path(),
                 }
             }
         }
-        impl<$($T: SqlTranslatable,)* R: SqlTranslatable> FunctionMetadata<($($T,)*)> for unsafe fn($($T,)*) -> R {
+        impl<$($A,)* R> FunctionMetadata<($($A,)*)> for unsafe fn($($A,)*) -> R
+        where
+            $($A: SqlTranslatable,)*
+            R: SqlTranslatable,
+        {
             fn entity(&self) -> FunctionMetadataEntity {
                 FunctionMetadataEntity {
-                    arguments: vec![$(PhantomData::<$T>.entity()),+],
+                    arguments: vec![$(PhantomData::<$A>.entity()),*],
                     retval: PhantomData::<R>.entity(),
                     path: self.path(),
                 }
@@ -96,7 +73,8 @@ macro_rules! impl_fn {
         }
     };
 }
-// empty tuples are above
+
+impl_fn!();
 impl_fn!(T0);
 impl_fn!(T0, T1);
 impl_fn!(T0, T1, T2);

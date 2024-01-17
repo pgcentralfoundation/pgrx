@@ -8,19 +8,20 @@
 //LICENSE
 //LICENSE Use of this source code is governed by the MIT license that can be found in the LICENSE file.
 #![allow(clippy::question_mark)]
+use super::UnboxDatum;
 use crate::array::RawArray;
 use crate::layout::*;
 use crate::toast::Toast;
 use crate::{pg_sys, FromDatum, IntoDatum, PgMemoryContexts};
 use bitvec::slice::BitSlice;
 use core::fmt::{Debug, Formatter};
-use core::iter::FusedIterator;
 use core::ops::DerefMut;
 use core::ptr::NonNull;
 use pgrx_sql_entity_graph::metadata::{
     ArgumentError, Returns, ReturnsError, SqlMapping, SqlTranslatable,
 };
 use serde::{Serialize, Serializer};
+use std::iter::FusedIterator;
 
 /** An array of some type (eg. `TEXT[]`, `int[]`)
 
@@ -55,14 +56,19 @@ fn with_vec(elems: Array<String>) {
 }
 ```
 */
-pub struct Array<'a, T> {
-    null_slice: NullKind<'a>,
+// An array is a detoasted varlena type, so we reason about the lifetime of
+// the memory context that the varlena is actually detoasted into.
+pub struct Array<'mcx, T> {
+    null_slice: NullKind<'mcx>,
     slide_impl: ChaChaSlideImpl<T>,
     // Rust drops in FIFO order, drop this last
     raw: Toast<RawArray>,
 }
 
-impl<'a, T: FromDatum + Debug> Debug for Array<'a, T> {
+impl<T: UnboxDatum> Debug for Array<'_, T>
+where
+    for<'arr> <T as UnboxDatum>::As<'arr>: Debug,
+{
     fn fmt(&self, f: &mut Formatter<'_>) -> core::fmt::Result {
         f.debug_list().entries(self.iter()).finish()
     }
@@ -95,22 +101,27 @@ impl NullKind<'_> {
     }
 }
 
-impl<T: FromDatum + Serialize> Serialize for Array<'_, T> {
+impl<'mcx, T: UnboxDatum> serde::Serialize for Array<'mcx, T>
+where
+    for<'arr> <T as UnboxDatum>::As<'arr>: Serialize,
+{
     fn serialize<S>(&self, serializer: S) -> Result<<S as Serializer>::Ok, <S as Serializer>::Error>
     where
         S: Serializer,
     {
-        serializer.collect_seq(self.iter())
+        let iter = self.iter();
+        let result = serializer.collect_seq(iter);
+        result
     }
 }
 
 #[deny(unsafe_op_in_unsafe_fn)]
-impl<'a, T: FromDatum> Array<'a, T> {
+impl<'mcx, T: UnboxDatum> Array<'mcx, T> {
     /// # Safety
     ///
     /// This function requires that the RawArray was obtained in a properly-constructed form
     /// (probably from Postgres).
-    unsafe fn deconstruct_from(mut raw: Toast<RawArray>) -> Array<'a, T> {
+    unsafe fn deconstruct_from(mut raw: Toast<RawArray>) -> Array<'mcx, T> {
         let oid = raw.oid();
         let elem_layout = Layout::lookup_oid(oid);
         let nelems = raw.len();
@@ -177,7 +188,7 @@ impl<'a, T: FromDatum> Array<'a, T> {
 
     #[allow(clippy::option_option)]
     #[inline]
-    pub fn get(&self, index: usize) -> Option<Option<T>> {
+    pub fn get<'arr>(&'arr self, index: usize) -> Option<Option<T::As<'arr>>> {
         let Some(is_null) = self.null_slice.get(index) else { return None };
         if is_null {
             return Some(None);
@@ -213,7 +224,11 @@ impl<'a, T: FromDatum> Array<'a, T> {
     /// # Safety
     /// This assumes the pointer is to a valid element of that type.
     #[inline]
-    unsafe fn bring_it_back_now(&self, ptr: *const u8, is_null: bool) -> Option<T> {
+    unsafe fn bring_it_back_now<'arr>(
+        &'arr self,
+        ptr: *const u8,
+        is_null: bool,
+    ) -> Option<T::As<'arr>> {
         match is_null {
             true => None,
             false => unsafe { self.slide_impl.bring_it_back_now(self, ptr) },
@@ -376,20 +391,25 @@ fn as_slice<'a, T: Sized>(array: &'a Array<'_, T>) -> Result<&'a [T], ArraySlice
 }
 
 mod casper {
+    use super::UnboxDatum;
     use crate::layout::Align;
-    use crate::{pg_sys, varlena, Array, FromDatum};
+    use crate::{pg_sys, varlena, Array};
 
     // it's a pop-culture reference (https://en.wikipedia.org/wiki/Cha_Cha_Slide) not some fancy crypto thing you nerd
     /// Describes how to instantiate a value `T` from an [`Array`] and its backing byte array pointer.
     /// It also knows how to determine the size of an [`Array`] element value.
-    pub(super) trait ChaChaSlide<T: FromDatum> {
+    pub(super) trait ChaChaSlide<T: UnboxDatum> {
         /// Instantiate a `T` from the head of `ptr`
         ///
         /// # Safety
         ///
         /// This function is unsafe as it cannot guarantee that `ptr` points to the proper bytes
         /// that represent a `T`, or even that it belongs to `array`.  Both of which must be true
-        unsafe fn bring_it_back_now(&self, array: &Array<T>, ptr: *const u8) -> Option<T>;
+        unsafe fn bring_it_back_now<'arr, 'mcx>(
+            &self,
+            array: &'arr Array<'mcx, T>,
+            ptr: *const u8,
+        ) -> Option<T::As<'arr>>;
 
         /// Determine how many bytes are used to represent `T`.  This could be fixed size or
         /// even determined at runtime by whatever `ptr` is known to be pointing at.
@@ -419,9 +439,13 @@ mod casper {
     /// Fixed-size byval array elements. N should be 1, 2, 4, or 8. Note that
     /// `T` (the rust type) may have a different size than `N`.
     pub(super) struct FixedSizeByVal<const N: usize>;
-    impl<T: FromDatum, const N: usize> ChaChaSlide<T> for FixedSizeByVal<N> {
+    impl<T: UnboxDatum, const N: usize> ChaChaSlide<T> for FixedSizeByVal<N> {
         #[inline(always)]
-        unsafe fn bring_it_back_now(&self, array: &Array<T>, ptr: *const u8) -> Option<T> {
+        unsafe fn bring_it_back_now<'arr, 'mcx>(
+            &self,
+            _array: &'arr Array<'mcx, T>,
+            ptr: *const u8,
+        ) -> Option<T::As<'arr>> {
             // This branch is optimized away (because `N` is constant).
             let datum = match N {
                 // for match with `Datum`, read through that directly to
@@ -432,7 +456,7 @@ mod casper {
                 8 => pg_sys::Datum::from(byval_read::<u64>(ptr)),
                 _ => unreachable!("`N` must be 1, 2, 4, or 8 (got {N})"),
             };
-            T::from_polymorphic_datum(datum, false, array.raw.oid())
+            Some(T::unbox(core::mem::transmute(datum)))
         }
 
         #[inline(always)]
@@ -445,11 +469,16 @@ mod casper {
     pub(super) struct PassByVarlena {
         pub(super) align: Align,
     }
-    impl<T: FromDatum> ChaChaSlide<T> for PassByVarlena {
+    impl<T: UnboxDatum> ChaChaSlide<T> for PassByVarlena {
         #[inline]
-        unsafe fn bring_it_back_now(&self, array: &Array<T>, ptr: *const u8) -> Option<T> {
+        unsafe fn bring_it_back_now<'arr, 'mcx>(
+            &self,
+            // May need this array param for MemCx reasons?
+            _array: &'arr Array<'mcx, T>,
+            ptr: *const u8,
+        ) -> Option<T::As<'arr>> {
             let datum = pg_sys::Datum::from(ptr);
-            unsafe { T::from_polymorphic_datum(datum, false, array.raw.oid()) }
+            Some(T::unbox(core::mem::transmute(datum)))
         }
 
         #[inline]
@@ -465,11 +494,15 @@ mod casper {
 
     /// Array elements are standard C strings (`char *`), which are pass-by-reference
     pub(super) struct PassByCStr;
-    impl<T: FromDatum> ChaChaSlide<T> for PassByCStr {
+    impl<T: UnboxDatum> ChaChaSlide<T> for PassByCStr {
         #[inline]
-        unsafe fn bring_it_back_now(&self, array: &Array<T>, ptr: *const u8) -> Option<T> {
+        unsafe fn bring_it_back_now<'arr, 'mcx>(
+            &self,
+            _array: &'arr Array<'mcx, T>,
+            ptr: *const u8,
+        ) -> Option<T::As<'arr>> {
             let datum = pg_sys::Datum::from(ptr);
-            unsafe { T::from_polymorphic_datum(datum, false, array.raw.oid()) }
+            Some(T::unbox(core::mem::transmute(datum)))
         }
 
         #[inline]
@@ -486,11 +519,15 @@ mod casper {
         pub(super) padded_size: usize,
     }
 
-    impl<T: FromDatum> ChaChaSlide<T> for PassByFixed {
+    impl<T: UnboxDatum> ChaChaSlide<T> for PassByFixed {
         #[inline]
-        unsafe fn bring_it_back_now(&self, array: &Array<T>, ptr: *const u8) -> Option<T> {
+        unsafe fn bring_it_back_now<'arr, 'mcx>(
+            &self,
+            _array: &'arr Array<'mcx, T>,
+            ptr: *const u8,
+        ) -> Option<T::As<'arr>> {
             let datum = pg_sys::Datum::from(ptr);
-            unsafe { T::from_polymorphic_datum(datum, false, array.raw.oid()) }
+            Some(T::unbox(core::mem::transmute(datum)))
         }
 
         #[inline]
@@ -500,9 +537,12 @@ mod casper {
     }
 }
 
-pub struct VariadicArray<'a, T>(Array<'a, T>);
+pub struct VariadicArray<'mcx, T>(Array<'mcx, T>);
 
-impl<T: FromDatum + Serialize> Serialize for VariadicArray<'_, T> {
+impl<'mcx, T: UnboxDatum> Serialize for VariadicArray<'mcx, T>
+where
+    for<'arr> <T as UnboxDatum>::As<'arr>: Serialize,
+{
     fn serialize<S>(&self, serializer: S) -> Result<<S as Serializer>::Ok, <S as Serializer>::Error>
     where
         S: Serializer,
@@ -511,7 +551,7 @@ impl<T: FromDatum + Serialize> Serialize for VariadicArray<'_, T> {
     }
 }
 
-impl<T: FromDatum> VariadicArray<'_, T> {
+impl<'mcx, T: UnboxDatum> VariadicArray<'mcx, T> {
     /// Return an Iterator of `Option<T>` over the contained Datums.
     #[inline]
     pub fn iter(&self) -> ArrayIterator<'_, T> {
@@ -529,7 +569,7 @@ impl<T: FromDatum> VariadicArray<'_, T> {
 
     #[allow(clippy::option_option)]
     #[inline]
-    pub fn get(&self, i: usize) -> Option<Option<T>> {
+    pub fn get<'arr>(&'arr self, i: usize) -> Option<Option<<T as UnboxDatum>::As<'arr>>> {
         self.0.get(i)
     }
 }
@@ -551,14 +591,14 @@ impl<T> VariadicArray<'_, T> {
     }
 }
 
-pub struct ArrayTypedIterator<'a, T> {
-    array: &'a Array<'a, T>,
+pub struct ArrayTypedIterator<'arr, T> {
+    array: &'arr Array<'arr, T>,
     curr: usize,
     ptr: *const u8,
 }
 
-impl<'a, T: FromDatum> Iterator for ArrayTypedIterator<'a, T> {
-    type Item = T;
+impl<'arr, T: UnboxDatum> Iterator for ArrayTypedIterator<'arr, T> {
+    type Item = T::As<'arr>;
 
     #[inline]
     fn next(&mut self) -> Option<Self::Item> {
@@ -582,10 +622,13 @@ impl<'a, T: FromDatum> Iterator for ArrayTypedIterator<'a, T> {
     }
 }
 
-impl<'a, T: FromDatum> ExactSizeIterator for ArrayTypedIterator<'a, T> {}
-impl<'a, T: FromDatum> FusedIterator for ArrayTypedIterator<'a, T> {}
+impl<'a, T: UnboxDatum> ExactSizeIterator for ArrayTypedIterator<'a, T> {}
+impl<'a, T: UnboxDatum> core::iter::FusedIterator for ArrayTypedIterator<'a, T> {}
 
-impl<'a, T: FromDatum + Serialize> Serialize for ArrayTypedIterator<'a, T> {
+impl<'arr, T: UnboxDatum + serde::Serialize> serde::Serialize for ArrayTypedIterator<'arr, T>
+where
+    <T as UnboxDatum>::As<'arr>: serde::Serialize,
+{
     fn serialize<S>(&self, serializer: S) -> Result<<S as Serializer>::Ok, <S as Serializer>::Error>
     where
         S: Serializer,
@@ -594,14 +637,14 @@ impl<'a, T: FromDatum + Serialize> Serialize for ArrayTypedIterator<'a, T> {
     }
 }
 
-pub struct ArrayIterator<'a, T> {
-    array: &'a Array<'a, T>,
+pub struct ArrayIterator<'arr, T> {
+    array: &'arr Array<'arr, T>,
     curr: usize,
     ptr: *const u8,
 }
 
-impl<'a, T: FromDatum> Iterator for ArrayIterator<'a, T> {
-    type Item = Option<T>;
+impl<'arr, T: UnboxDatum> Iterator for ArrayIterator<'arr, T> {
+    type Item = Option<T::As<'arr>>;
 
     #[inline]
     fn next(&mut self) -> Option<Self::Item> {
@@ -626,8 +669,8 @@ impl<'a, T: FromDatum> Iterator for ArrayIterator<'a, T> {
     }
 }
 
-impl<'a, T: FromDatum> ExactSizeIterator for ArrayIterator<'a, T> {}
-impl<'a, T: FromDatum> FusedIterator for ArrayIterator<'a, T> {}
+impl<'arr, T: UnboxDatum> ExactSizeIterator for ArrayIterator<'arr, T> {}
+impl<'arr, T: UnboxDatum> FusedIterator for ArrayIterator<'arr, T> {}
 
 pub struct ArrayIntoIterator<'a, T> {
     array: Array<'a, T>,
@@ -635,9 +678,13 @@ pub struct ArrayIntoIterator<'a, T> {
     ptr: *const u8,
 }
 
-impl<'a, T: FromDatum> IntoIterator for Array<'a, T> {
-    type Item = Option<T>;
-    type IntoIter = ArrayIntoIterator<'a, T>;
+// There's nowhere to name the lifetime contraction
+impl<'mcx, T> IntoIterator for Array<'mcx, T>
+where
+    for<'arr> T: UnboxDatum<As<'arr> = T> + 'static,
+{
+    type Item = Option<T::As<'mcx>>;
+    type IntoIter = ArrayIntoIterator<'mcx, T>;
 
     #[inline]
     fn into_iter(self) -> Self::IntoIter {
@@ -646,9 +693,12 @@ impl<'a, T: FromDatum> IntoIterator for Array<'a, T> {
     }
 }
 
-impl<'a, T: FromDatum> IntoIterator for VariadicArray<'a, T> {
-    type Item = Option<T>;
-    type IntoIter = ArrayIntoIterator<'a, T>;
+impl<'mcx, T> IntoIterator for VariadicArray<'mcx, T>
+where
+    for<'arr> T: UnboxDatum<As<'arr> = T> + 'static,
+{
+    type Item = Option<T::As<'mcx>>;
+    type IntoIter = ArrayIntoIterator<'mcx, T>;
 
     #[inline]
     fn into_iter(self) -> Self::IntoIter {
@@ -657,15 +707,17 @@ impl<'a, T: FromDatum> IntoIterator for VariadicArray<'a, T> {
     }
 }
 
-impl<'a, T: FromDatum> Iterator for ArrayIntoIterator<'a, T> {
-    type Item = Option<T>;
+impl<'mcx, T> Iterator for ArrayIntoIterator<'mcx, T>
+where
+    for<'arr> T: UnboxDatum<As<'arr> = T> + 'static,
+{
+    type Item = Option<T::As<'static>>;
 
     #[inline]
     fn next(&mut self) -> Option<Self::Item> {
         let Self { array, curr, ptr } = self;
         let Some(is_null) = array.null_slice.get(*curr) else { return None };
         *curr += 1;
-
         let element = unsafe { array.bring_it_back_now(*ptr, is_null) };
         if !is_null {
             // SAFETY: This has to not move for nulls, as they occupy 0 data bytes,
@@ -683,10 +735,16 @@ impl<'a, T: FromDatum> Iterator for ArrayIntoIterator<'a, T> {
     }
 }
 
-impl<'a, T: FromDatum> ExactSizeIterator for ArrayIntoIterator<'a, T> {}
-impl<'a, T: FromDatum> FusedIterator for ArrayIntoIterator<'a, T> {}
+impl<'mcx, T> ExactSizeIterator for ArrayIntoIterator<'mcx, T> where
+    for<'arr> T: UnboxDatum<As<'arr> = T> + 'static
+{
+}
+impl<'mcx, T: UnboxDatum> FusedIterator for ArrayIntoIterator<'mcx, T> where
+    for<'arr> T: UnboxDatum<As<'arr> = T> + 'static
+{
+}
 
-impl<'a, T: FromDatum> FromDatum for VariadicArray<'a, T> {
+impl<'a, T: FromDatum + UnboxDatum> FromDatum for VariadicArray<'a, T> {
     #[inline]
     unsafe fn from_polymorphic_datum(
         datum: pg_sys::Datum,
@@ -697,7 +755,7 @@ impl<'a, T: FromDatum> FromDatum for VariadicArray<'a, T> {
     }
 }
 
-impl<'a, T: FromDatum> FromDatum for Array<'a, T> {
+impl<'a, T: UnboxDatum> FromDatum for Array<'a, T> {
     #[inline]
     unsafe fn from_polymorphic_datum(
         datum: pg_sys::Datum,
@@ -752,7 +810,10 @@ impl<T: IntoDatum> IntoDatum for Array<'_, T> {
     }
 }
 
-impl<T: FromDatum> FromDatum for Vec<T> {
+impl<T> FromDatum for Vec<T>
+where
+    for<'arr> T: UnboxDatum<As<'arr> = T> + 'arr,
+{
     #[inline]
     unsafe fn from_polymorphic_datum(
         datum: pg_sys::Datum,
@@ -781,7 +842,10 @@ impl<T: FromDatum> FromDatum for Vec<T> {
     }
 }
 
-impl<T: FromDatum> FromDatum for Vec<Option<T>> {
+impl<T> FromDatum for Vec<Option<T>>
+where
+    for<'arr> T: UnboxDatum<As<'arr> = T> + 'arr,
+{
     #[inline]
     unsafe fn from_polymorphic_datum(
         datum: pg_sys::Datum,

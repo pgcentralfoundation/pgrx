@@ -92,7 +92,7 @@ use std::ptr::NonNull;
 /// ```
 #[repr(transparent)]
 pub struct PgBox<T, AllocatedBy: WhoAllocated = AllocatedByPostgres> {
-    ptr: Option<NonNull<T>>,
+    ptr: Option<NonNull<T>>, // TODO: add this memcx's lifetime
     __marker: PhantomData<AllocatedBy>,
 }
 

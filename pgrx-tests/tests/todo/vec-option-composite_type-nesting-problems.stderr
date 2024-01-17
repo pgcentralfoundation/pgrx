@@ -1,0 +1,47 @@
+error[E0277]: the trait bound `Vec<Option<pgrx::prelude::PgHeapTuple<'_, pgrx::AllocatedByRust>>>: FromDatum` is not satisfied
+  --> tests/todo/vec-option-composite_type-nesting-problems.rs:53:1
+   |
+53 | #[pg_extern]
+   | ^^^^^^^^^^^^ the trait `FromDatum` is not implemented for `Vec<Option<pgrx::prelude::PgHeapTuple<'_, pgrx::AllocatedByRust>>>`
+   |
+   = help: the following other types implement trait `FromDatum`:
+             Vec<u8>
+             Vec<Option<T>>
+             Vec<T>
+note: required by a bound in `pg_getarg`
+  --> $WORKSPACE/pgrx/src/fcinfo.rs
+   |
+   | pub unsafe fn pg_getarg<T: FromDatum>(fcinfo: pg_sys::FunctionCallInfo, num: usize) -> Option<T> {
+   |                            ^^^^^^^^^ required by this bound in `pg_getarg`
+
+error[E0277]: the trait bound `Vec<Option<pgrx::prelude::PgHeapTuple<'_, pgrx::AllocatedByRust>>>: FromDatum` is not satisfied
+  --> tests/todo/vec-option-composite_type-nesting-problems.rs:70:1
+   |
+70 | #[pg_extern]
+   | ^^^^^^^^^^^^ the trait `FromDatum` is not implemented for `Vec<Option<pgrx::prelude::PgHeapTuple<'_, pgrx::AllocatedByRust>>>`
+   |
+   = help: the following other types implement trait `FromDatum`:
+             Vec<u8>
+             Vec<Option<T>>
+             Vec<T>
+note: required by a bound in `pg_getarg`
+  --> $WORKSPACE/pgrx/src/fcinfo.rs
+   |
+   | pub unsafe fn pg_getarg<T: FromDatum>(fcinfo: pg_sys::FunctionCallInfo, num: usize) -> Option<T> {
+   |                            ^^^^^^^^^ required by this bound in `pg_getarg`
+
+error[E0277]: the trait bound `Vec<Option<pgrx::prelude::PgHeapTuple<'_, pgrx::AllocatedByRust>>>: FromDatum` is not satisfied
+  --> tests/todo/vec-option-composite_type-nesting-problems.rs:87:1
+   |
+87 | #[pg_extern]
+   | ^^^^^^^^^^^^ the trait `FromDatum` is not implemented for `Vec<Option<pgrx::prelude::PgHeapTuple<'_, pgrx::AllocatedByRust>>>`
+   |
+   = help: the following other types implement trait `FromDatum`:
+             Vec<u8>
+             Vec<Option<T>>
+             Vec<T>
+note: required by a bound in `pg_getarg`
+  --> $WORKSPACE/pgrx/src/fcinfo.rs
+   |
+   | pub unsafe fn pg_getarg<T: FromDatum>(fcinfo: pg_sys::FunctionCallInfo, num: usize) -> Option<T> {
+   |                            ^^^^^^^^^ required by this bound in `pg_getarg`

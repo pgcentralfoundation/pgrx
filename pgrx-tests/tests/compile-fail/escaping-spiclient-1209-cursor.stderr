@@ -1,5 +1,5 @@
 error: lifetime may not live long enough
-  --> tests/ui/escaping-spiclient-1209-cursor.rs:8:9
+  --> tests/compile-fail/escaping-spiclient-1209-cursor.rs:8:9
    |
 7  |       let mut res = Spi::connect(|c| {
    |                                   -- return type of closure is SpiTupleTable<'2>
@@ -11,7 +11,7 @@ error: lifetime may not live long enough
    | |_____________________^ returning this value requires that `'1` must outlive `'2`
 
 error[E0515]: cannot return value referencing temporary value
-  --> tests/ui/escaping-spiclient-1209-cursor.rs:8:9
+  --> tests/compile-fail/escaping-spiclient-1209-cursor.rs:8:9
    |
 8  |           c.open_cursor("select 'hello world' from generate_series(1, 1000)", None)
    |           ^------------------------------------------------------------------------
@@ -25,7 +25,7 @@ error[E0515]: cannot return value referencing temporary value
    = help: use `.collect()` to allocate the iterator
 
 error: lifetime may not live long enough
-  --> tests/ui/escaping-spiclient-1209-cursor.rs:15:26
+  --> tests/compile-fail/escaping-spiclient-1209-cursor.rs:15:26
    |
 15 |         Spi::connect(|c| c.open_cursor("select 1", None).fetch(1).unwrap());
    |                       -- ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ returning this value requires that `'1` must outlive `'2`
@@ -34,7 +34,7 @@ error: lifetime may not live long enough
    |                       has type `SpiClient<'1>`
 
 error[E0515]: cannot return value referencing temporary value
-  --> tests/ui/escaping-spiclient-1209-cursor.rs:15:26
+  --> tests/compile-fail/escaping-spiclient-1209-cursor.rs:15:26
    |
 15 |         Spi::connect(|c| c.open_cursor("select 1", None).fetch(1).unwrap());
    |                          -------------------------------^^^^^^^^^^^^^^^^^^

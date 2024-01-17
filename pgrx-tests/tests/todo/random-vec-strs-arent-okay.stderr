@@ -1,0 +1,15 @@
+error[E0277]: the trait bound `Vec<Option<&'a str>>: FromDatum` is not satisfied
+ --> tests/todo/random-vec-strs-arent-okay.rs:5:1
+  |
+5 | #[pg_extern]
+  | ^^^^^^^^^^^^ the trait `FromDatum` is not implemented for `Vec<Option<&'a str>>`
+  |
+  = help: the following other types implement trait `FromDatum`:
+            Vec<u8>
+            Vec<Option<T>>
+            Vec<T>
+note: required by a bound in `pg_getarg`
+ --> $WORKSPACE/pgrx/src/fcinfo.rs
+  |
+  | pub unsafe fn pg_getarg<T: FromDatum>(fcinfo: pg_sys::FunctionCallInfo, num: usize) -> Option<T> {
+  |                            ^^^^^^^^^ required by this bound in `pg_getarg`

@@ -366,7 +366,13 @@ impl Spi {
     /// This function will panic if for some reason it's unable to "connect" to Postgres' SPI
     /// system.  At the time of this writing, that's actually impossible as the underlying function
     /// ([`pg_sys::SPI_connect()`]) **always** returns a successful response.
-    pub fn connect<R, F: FnOnce(SpiClient<'_>) -> R>(f: F) -> R {
+    pub fn connect<R, F>(f: F) -> R
+    where
+        F: FnOnce(SpiClient<'_>) -> R, /* TODO: redesign this with 2 lifetimes:
+                                       - 'conn ~= CurrentMemoryContext after connection
+                                       - 'ret ~= SPI_palloc's context
+                                       */
+    {
         // connect to SPI
         //
         // Postgres documents (https://www.postgresql.org/docs/current/spi-spi-connect.html) that
