@@ -153,7 +153,9 @@ mod tests {
     // arrays of the above
     // -----------
 
-    // TODO: Need to fix array-of-bytea, array-of-text, and array-of-cstr tests.
+    // TODO: Need to fix these array-of-bytea, array-of-text, and array-of-cstr tests,
+    // because `impl FromDatum for <Vec<Option<T>>` is broken enough pg_getarg does not work.
+    // This likely requires changing the glue code that fetches arguments.
 
     // roundtrip!(
     //     rt_array_bytea,
