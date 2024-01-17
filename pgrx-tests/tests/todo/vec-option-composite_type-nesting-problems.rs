@@ -1,9 +1,9 @@
+//! TODO: This probably requires the FunctionArguments<'curr, 'fn> type
 use pgrx::prelude::*;
 
 fn main() {}
 
-// ! TODO: This probably requires the FunctionArguments<'curr, 'fn> type
-use super::*;
+const DOG_COMPOSITE_TYPE: &str = "Dog";
 
 #[pg_extern]
 fn sum_scritches_for_names(dogs: Option<Vec<pgrx::composite_type!(DOG_COMPOSITE_TYPE)>>) -> i32 {

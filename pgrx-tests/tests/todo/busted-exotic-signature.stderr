@@ -1,5 +1,5 @@
 error[E0277]: the trait bound `Vec<Option<PgHeapTuple<'static, AllocatedByRust>>>: FromDatum` is not satisfied
-  --> tests/todo/busted_exotic_signature.rs:10:5
+  --> tests/todo/busted-exotic-signature.rs:10:5
    |
 10 |     #[pg_extern]
    |     ^^^^^^^^^^^^ the trait `FromDatum` is not implemented for `Vec<Option<PgHeapTuple<'static, AllocatedByRust>>>`
