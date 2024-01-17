@@ -67,7 +67,7 @@ pub struct Array<'mcx, T> {
 
 impl<T: UnboxDatum> Debug for Array<'_, T>
 where
-    for<'dat> <T as UnboxDatum>::As<'dat>: Debug,
+    for<'arr> <T as UnboxDatum>::As<'arr>: Debug,
 {
     fn fmt(&self, f: &mut Formatter<'_>) -> core::fmt::Result {
         f.debug_list().entries(self.iter()).finish()
@@ -441,11 +441,11 @@ mod casper {
     pub(super) struct FixedSizeByVal<const N: usize>;
     impl<T: UnboxDatum, const N: usize> ChaChaSlide<T> for FixedSizeByVal<N> {
         #[inline(always)]
-        unsafe fn bring_it_back_now<'dat>(
+        unsafe fn bring_it_back_now<'arr, 'mcx>(
             &self,
-            _array: &Array<'dat, T>,
+            _array: &'arr Array<'mcx, T>,
             ptr: *const u8,
-        ) -> Option<T::As<'dat>> {
+        ) -> Option<T::As<'arr>> {
             // This branch is optimized away (because `N` is constant).
             let datum = match N {
                 // for match with `Datum`, read through that directly to
@@ -812,7 +812,7 @@ impl<T: IntoDatum> IntoDatum for Array<'_, T> {
 
 impl<T> FromDatum for Vec<T>
 where
-    for<'dat> T: UnboxDatum<As<'dat> = T> + 'dat,
+    for<'arr> T: UnboxDatum<As<'arr> = T> + 'arr,
 {
     #[inline]
     unsafe fn from_polymorphic_datum(
@@ -844,7 +844,7 @@ where
 
 impl<T> FromDatum for Vec<Option<T>>
 where
-    for<'dat> T: UnboxDatum<As<'dat> = T> + 'dat,
+    for<'arr> T: UnboxDatum<As<'arr> = T> + 'arr,
 {
     #[inline]
     unsafe fn from_polymorphic_datum(

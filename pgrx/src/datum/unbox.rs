@@ -34,10 +34,17 @@ pub unsafe trait UnboxDatum {
     // This is because we are materializing the datums from e.g. pointers to an Array, which
     // requires you to have had a valid base pointer into an ArrayType to start!
     // That's why you started using this goofy GAT scheme in the first place!
-    type As<'dat>
+    /// Self with the lifetime `'src`
+    ///
+    /// The lifetime `'src` represents the lifetime of the "root" source of this Datum, which
+    /// may be a memory context or a shorter-lived type inside that context.
+    ///
+    type As<'src>
     where
-        Self: 'dat;
-    /// Convert from `Datum<'dat>` to `T<'dat>`
+        Self: 'src;
+    /// Convert from `Datum<'src>` to `T::As<'src>`
+    /// 
+    /// This should be the direct conversion in each case. It is very unsafe to use directly.
     ///
     /// # Safety
     /// Due to the absence of an `is_null` parameter, this does not validate "SQL nullness" of
@@ -47,17 +54,17 @@ pub unsafe trait UnboxDatum {
     /// This also should not be used as the primary conversion mechanism if it requires a MemCx,
     /// as this is intended primarily to be used in cases where the datum is guaranteed to be
     /// detoasted already.
-    unsafe fn unbox<'dat>(datum: Datum<'dat>) -> Self::As<'dat>
+    unsafe fn unbox<'src>(datum: Datum<'src>) -> Self::As<'src>
     where
-        Self: 'dat;
+        Self: 'src;
 }
 
 macro_rules! unbox_int {
     ($($int_ty:ty),*) => {
         $(
             unsafe impl UnboxDatum for $int_ty {
-                type As<'dat> = $int_ty;
-                unsafe fn unbox<'dat>(datum: Datum<'dat>) -> Self::As<'dat> where Self: 'dat {
+                type As<'src> = $int_ty;
+                unsafe fn unbox<'src>(datum: Datum<'src>) -> Self::As<'src> where Self: 'src {
                     datum.0.value() as $int_ty
                 }
             }
@@ -70,198 +77,198 @@ unbox_int! {
 }
 
 unsafe impl UnboxDatum for bool {
-    type As<'dat> = bool;
+    type As<'src> = bool;
     #[inline]
-    unsafe fn unbox<'dat>(datum: Datum<'dat>) -> Self::As<'dat>
+    unsafe fn unbox<'src>(datum: Datum<'src>) -> Self::As<'src>
     where
-        Self: 'dat,
+        Self: 'src,
     {
         datum.0.value() != 0
     }
 }
 
 unsafe impl UnboxDatum for f32 {
-    type As<'dat> = f32;
+    type As<'src> = f32;
     #[inline]
-    unsafe fn unbox<'dat>(datum: Datum<'dat>) -> Self::As<'dat>
+    unsafe fn unbox<'src>(datum: Datum<'src>) -> Self::As<'src>
     where
-        Self: 'dat,
+        Self: 'src,
     {
         f32::from_bits(datum.0.value() as u32)
     }
 }
 
 unsafe impl UnboxDatum for f64 {
-    type As<'dat> = f64;
+    type As<'src> = f64;
     #[inline]
-    unsafe fn unbox<'dat>(datum: Datum<'dat>) -> Self::As<'dat>
+    unsafe fn unbox<'src>(datum: Datum<'src>) -> Self::As<'src>
     where
-        Self: 'dat,
+        Self: 'src,
     {
         f64::from_bits(datum.0.value() as u64)
     }
 }
 
 unsafe impl UnboxDatum for str {
-    type As<'dat> = &'dat str;
+    type As<'src> = &'src str;
     #[inline]
-    unsafe fn unbox<'dat>(datum: Datum<'dat>) -> Self::As<'dat>
+    unsafe fn unbox<'src>(datum: Datum<'src>) -> Self::As<'src>
     where
-        Self: 'dat,
+        Self: 'src,
     {
         unsafe { text_to_rust_str_unchecked(datum.0.cast_mut_ptr()) }
     }
 }
 
 unsafe impl UnboxDatum for &str {
-    type As<'dat> = &'dat str where Self: 'dat;
+    type As<'src> = &'src str where Self: 'src;
     #[inline]
-    unsafe fn unbox<'dat>(datum: Datum<'dat>) -> Self::As<'dat>
+    unsafe fn unbox<'src>(datum: Datum<'src>) -> Self::As<'src>
     where
-        Self: 'dat,
+        Self: 'src,
     {
         unsafe { text_to_rust_str_unchecked(datum.0.cast_mut_ptr()) }
     }
 }
 
 unsafe impl UnboxDatum for CStr {
-    type As<'dat> = &'dat CStr;
+    type As<'src> = &'src CStr;
     #[inline]
-    unsafe fn unbox<'dat>(datum: Datum<'dat>) -> Self::As<'dat>
+    unsafe fn unbox<'src>(datum: Datum<'src>) -> Self::As<'src>
     where
-        Self: 'dat,
+        Self: 'src,
     {
         unsafe { CStr::from_ptr(datum.0.cast_mut_ptr()) }
     }
 }
 
 unsafe impl UnboxDatum for &CStr {
-    type As<'dat> = &'dat CStr where Self: 'dat;
+    type As<'src> = &'src CStr where Self: 'src;
     #[inline]
-    unsafe fn unbox<'dat>(datum: Datum<'dat>) -> Self::As<'dat>
+    unsafe fn unbox<'src>(datum: Datum<'src>) -> Self::As<'src>
     where
-        Self: 'dat,
+        Self: 'src,
     {
         unsafe { CStr::from_ptr(datum.0.cast_mut_ptr()) }
     }
 }
 
 unsafe impl UnboxDatum for [u8] {
-    type As<'dat> = &'dat [u8];
+    type As<'src> = &'src [u8];
     #[inline]
-    unsafe fn unbox<'dat>(datum: Datum<'dat>) -> Self::As<'dat>
+    unsafe fn unbox<'src>(datum: Datum<'src>) -> Self::As<'src>
     where
-        Self: 'dat,
+        Self: 'src,
     {
         unsafe { varlena_to_byte_slice(datum.0.cast_mut_ptr()) }
     }
 }
 
 unsafe impl UnboxDatum for &[u8] {
-    type As<'dat> = &'dat [u8] where Self: 'dat;
+    type As<'src> = &'src [u8] where Self: 'src;
     #[inline]
-    unsafe fn unbox<'dat>(datum: Datum<'dat>) -> Self::As<'dat>
+    unsafe fn unbox<'src>(datum: Datum<'src>) -> Self::As<'src>
     where
-        Self: 'dat,
+        Self: 'src,
     {
         unsafe { varlena_to_byte_slice(datum.0.cast_mut_ptr()) }
     }
 }
 
 unsafe impl UnboxDatum for pg_sys::Oid {
-    type As<'dat> = pg_sys::Oid;
+    type As<'src> = pg_sys::Oid;
     #[inline]
-    unsafe fn unbox<'dat>(datum: Datum<'dat>) -> Self::As<'dat>
+    unsafe fn unbox<'src>(datum: Datum<'src>) -> Self::As<'src>
     where
-        Self: 'dat,
+        Self: 'src,
     {
         pg_sys::Oid::from(datum.0.value() as u32)
     }
 }
 
 unsafe impl UnboxDatum for String {
-    type As<'dat> = String;
+    type As<'src> = String;
     #[inline]
-    unsafe fn unbox<'dat>(datum: Datum<'dat>) -> Self::As<'dat>
+    unsafe fn unbox<'src>(datum: Datum<'src>) -> Self::As<'src>
     where
-        Self: 'dat,
+        Self: 'src,
     {
         unsafe { str::unbox(datum) }.to_owned()
     }
 }
 
 unsafe impl UnboxDatum for CString {
-    type As<'dat> = CString;
+    type As<'src> = CString;
     #[inline]
-    unsafe fn unbox<'dat>(datum: Datum<'dat>) -> Self::As<'dat>
+    unsafe fn unbox<'src>(datum: Datum<'src>) -> Self::As<'src>
     where
-        Self: 'dat,
+        Self: 'src,
     {
         unsafe { CStr::unbox(datum) }.to_owned()
     }
 }
 
 unsafe impl UnboxDatum for pg_sys::Datum {
-    type As<'dat> = pg_sys::Datum;
+    type As<'src> = pg_sys::Datum;
     #[inline]
-    unsafe fn unbox<'dat>(datum: Datum<'dat>) -> Self::As<'dat>
+    unsafe fn unbox<'src>(datum: Datum<'src>) -> Self::As<'src>
     where
-        Self: 'dat,
+        Self: 'src,
     {
         datum.0
     }
 }
 
 unsafe impl UnboxDatum for Uuid {
-    type As<'dat> = Uuid;
+    type As<'src> = Uuid;
     #[inline]
-    unsafe fn unbox<'dat>(datum: Datum<'dat>) -> Self::As<'dat>
+    unsafe fn unbox<'src>(datum: Datum<'src>) -> Self::As<'src>
     where
-        Self: 'dat,
+        Self: 'src,
     {
         Uuid::from_bytes(datum.0.cast_mut_ptr::<[u8; 16]>().read())
     }
 }
 
 unsafe impl UnboxDatum for Date {
-    type As<'dat> = Date;
+    type As<'src> = Date;
     #[inline]
-    unsafe fn unbox<'dat>(datum: Datum<'dat>) -> Self::As<'dat>
+    unsafe fn unbox<'src>(datum: Datum<'src>) -> Self::As<'src>
     where
-        Self: 'dat,
+        Self: 'src,
     {
         Date::try_from(i32::unbox(datum)).unwrap_unchecked()
     }
 }
 
 unsafe impl UnboxDatum for Time {
-    type As<'dat> = Time;
+    type As<'src> = Time;
     #[inline]
-    unsafe fn unbox<'dat>(datum: Datum<'dat>) -> Self::As<'dat>
+    unsafe fn unbox<'src>(datum: Datum<'src>) -> Self::As<'src>
     where
-        Self: 'dat,
+        Self: 'src,
     {
         Time::try_from(i64::unbox(datum)).unwrap_unchecked()
     }
 }
 
 unsafe impl UnboxDatum for Timestamp {
-    type As<'dat> = Timestamp;
+    type As<'src> = Timestamp;
     #[inline]
-    unsafe fn unbox<'dat>(datum: Datum<'dat>) -> Self::As<'dat>
+    unsafe fn unbox<'src>(datum: Datum<'src>) -> Self::As<'src>
     where
-        Self: 'dat,
+        Self: 'src,
     {
         Timestamp::try_from(i64::unbox(datum)).unwrap_unchecked()
     }
 }
 
 unsafe impl UnboxDatum for TimestampWithTimeZone {
-    type As<'dat> = TimestampWithTimeZone;
+    type As<'src> = TimestampWithTimeZone;
     #[inline]
-    unsafe fn unbox<'dat>(datum: Datum<'dat>) -> Self::As<'dat>
+    unsafe fn unbox<'src>(datum: Datum<'src>) -> Self::As<'src>
     where
-        Self: 'dat,
+        Self: 'src,
     {
         TimestampWithTimeZone::try_from(i64::unbox(datum)).unwrap_unchecked()
     }
@@ -271,8 +278,8 @@ macro_rules! unbox_with_fromdatum {
     ($($from_ty:ty,)*) => {
         $(
             unsafe impl UnboxDatum for $from_ty {
-                type As<'dat> = $from_ty;
-                unsafe fn unbox<'dat>(datum: Datum<'dat>) -> Self::As<'dat> where Self: 'dat {
+                type As<'src> = $from_ty;
+                unsafe fn unbox<'src>(datum: Datum<'src>) -> Self::As<'src> where Self: 'src {
                     Self::from_datum(datum.0, false).unwrap()
                 }
             }
@@ -285,65 +292,54 @@ unbox_with_fromdatum! {
 }
 
 unsafe impl UnboxDatum for PgHeapTuple<'_, crate::AllocatedByRust> {
-    type As<'dat> = PgHeapTuple<'dat, AllocatedByRust> where Self: 'dat;
+    type As<'src> = PgHeapTuple<'src, AllocatedByRust> where Self: 'src;
     #[inline]
-    unsafe fn unbox<'dat>(d: Datum<'dat>) -> Self::As<'dat>
+    unsafe fn unbox<'src>(d: Datum<'src>) -> Self::As<'src>
     where
-        Self: 'dat,
+        Self: 'src,
     {
         PgHeapTuple::from_datum(d.0, false).unwrap()
     }
 }
 
 unsafe impl<T: FromDatum + UnboxDatum> UnboxDatum for Array<'_, T> {
-    type As<'dat> = Array<'dat, T> where Self: 'dat;
-    unsafe fn unbox<'dat>(d: Datum<'dat>) -> Array<'dat, T>
+    type As<'src> = Array<'src, T> where Self: 'src;
+    unsafe fn unbox<'src>(d: Datum<'src>) -> Array<'src, T>
     where
-        Self: 'dat,
+        Self: 'src,
     {
         Array::from_datum(d.0, false).unwrap()
     }
 }
 
 unsafe impl<T: FromDatum + UnboxDatum> UnboxDatum for VariadicArray<'_, T> {
-    type As<'dat> = VariadicArray<'dat, T> where Self: 'dat;
-    unsafe fn unbox<'dat>(d: Datum<'dat>) -> VariadicArray<'dat, T>
+    type As<'src> = VariadicArray<'src, T> where Self: 'src;
+    unsafe fn unbox<'src>(d: Datum<'src>) -> VariadicArray<'src, T>
     where
-        Self: 'dat,
+        Self: 'src,
     {
         VariadicArray::from_datum(d.0, false).unwrap()
     }
 }
 
 unsafe impl<const P: u32, const S: u32> UnboxDatum for Numeric<P, S> {
-    type As<'dat> = Numeric<P, S>;
+    type As<'src> = Numeric<P, S>;
     #[inline]
-    unsafe fn unbox<'dat>(d: Datum<'dat>) -> Self::As<'dat>
+    unsafe fn unbox<'src>(d: Datum<'src>) -> Self::As<'src>
     where
-        Self: 'dat,
+        Self: 'src,
     {
         Numeric::from_datum(d.0, false).unwrap()
     }
 }
 
 unsafe impl<T> UnboxDatum for PgBox<T, AllocatedByPostgres> {
-    type As<'dat> = PgBox<T> where Self: 'dat;
+    type As<'src> = PgBox<T> where Self: 'src;
     #[inline]
-    unsafe fn unbox<'dat>(d: Datum<'dat>) -> Self::As<'dat>
+    unsafe fn unbox<'src>(d: Datum<'src>) -> Self::As<'src>
     where
-        Self: 'dat,
+        Self: 'src,
     {
         PgBox::from_datum(d.0, false).unwrap()
     }
 }
-
-// unsafe impl<'de, T: FromDatum> UnboxDatum for T
-// where
-//     T: PostgresType + serde::Deserialize<'de>,
-// {
-//     type As<'dat> = T;
-//     #[inline]
-//     unsafe fn unbox<'dat>(d: Datum<'dat>) -> Self::As<'dat> where Self: 'dat {
-//         T::from_datum(d.0, false).unwrap()
-//     }
-// }

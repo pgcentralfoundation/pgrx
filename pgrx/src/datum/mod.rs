@@ -60,8 +60,8 @@ pub use unbox::*;
 pub use varlena::*;
 
 use crate::PgBox;
+use crate::memcx::MemCx;
 use pgrx_sql_entity_graph::RustSqlMapping;
-
 use crate::pg_sys;
 use core::marker::PhantomData;
 
@@ -73,11 +73,11 @@ use core::marker::PhantomData;
 /// whether its pointee has been deallocated. To lift a Datum into a Rust type requires making
 /// implicit lifetimes into explicit bounds.
 ///
-/// Merely having a lifetime does not make `Datum<'dat>` "safe" to use. To abstractly represent a
+/// Merely having a lifetime does not make `Datum<'src>` "safe" to use. To abstractly represent a
 /// full PostgreSQL value needs at least the tuple (Datum, bool, [`pg_sys::Oid`]): a tagged union.
-/// `Datum<'dat>` itself is effectively a dynamically-typed union *without a type tag*. It exists
+/// `Datum<'src>` itself is effectively a dynamically-typed union *without a type tag*. It exists
 /// not to make code manipulating it safe, but to make it possible to write unsafe code correctly,
-/// passing Datums to and from Postgres without having to wonder if the implied `&'dat T` would
+/// passing Datums to and from Postgres without having to wonder if the implied `&'src T` would
 /// actually refer to deallocated data.
 ///
 /// # Designing safe abstractions
@@ -88,33 +88,52 @@ use core::marker::PhantomData;
 /// only until one must pass by-value, which is the entire point of the original type as Postgres
 /// defined it, but can still be preferable.
 ///
-/// `Datum<'dat>` makes it theoretically possible to write functions with a signature like
-/// ```ignore
-/// fn construct_type_from_datum<'dat, T>(
-///     datum: Datum<'dat>,
-///     func: impl FnOnce(Datum<'dat>) -> T<'dat>
-/// ) -> T<'dat> {
+/// `Datum<'src>` makes it theoretically possible to write functions with a signature like
+/// ```
+/// use pgrx::datum::Datum;
+/// # use core::marker::PhantomData;
+/// # use pgrx::memcx::MemCx;
+/// # struct InCx<'mcx, T>(T, PhantomData<&'mcx MemCx<'mcx>>);
+/// fn construct_type_from_datum<'src, T>(
+///     datum: Datum<'src>,
+///     func: impl FnOnce(Datum<'src>) -> InCx<'src, T>
+/// ) -> InCx<'src, T> {
 ///    func(datum)
 /// }
 /// ```
-/// However, it is common for `T<'dat>` to be insufficient to represent the real lifetime of the
+/// However, it is possible for `T<'src>` to be insufficient to represent the real lifetime of the
 /// abstract Postgres type's allocations. Often a Datum must be "detoasted", which may reallocate.
-/// This may demand two constraints on the return type to represent both possible lifetimes:
-/// ```ignore
-/// type Detoasted<'old, 'new, T> = T<'old, 'new>;
+/// This may demand two constraints on the return type to represent both possible lifetimes, like:
 /// ```
+/// use pgrx::datum::Datum;
+/// use pgrx::memcx::MemCx;
+/// # use core::marker::PhantomData;
+/// # struct Detoasted<'mcx, T>(T, PhantomData<&'mcx MemCx<'mcx>>);
+/// # struct InCx<'mcx, T>(T, PhantomData<&'mcx MemCx<'mcx>>);
+/// fn detoast_type_from_datum<'old, 'new, T>(
+///     datum: Datum<'old>,
+///     memcx: MemCx<'new>,
+/// ) -> Detoasted<'new, InCx<'old, T>> {
+///    todo!()
+/// }
+/// ```
+/// In actual practice, these can be unified into a single lifetime: the lower bound of both.
+/// This is both good and bad: types can use fewer lifetime annotations, even after detoasting.
+/// However, in general, because lifetime unification can be done implicitly by the compiler,
+/// it is often important to name each and every single lifetime involved in functions that
+/// perform these tasks.
 ///
 /// [`&'a T`]: reference
 /// [undefined behavior]: https://doc.rust-lang.org/reference/behavior-considered-undefined.html
-pub struct Datum<'dat>(
+pub struct Datum<'src>(
     pg_sys::Datum,
     /// if a Datum borrows anything, it's "from" a [`pg_sys::MemoryContext`]
     /// as a memory context, like an arena, is deallocated "together".
     /// FIXME: a more-correct inner type later
-    PhantomData<&'dat pg_sys::MemoryContext>,
+    PhantomData<&'src MemCx<'src>>,
 );
 
-impl<'dat> Datum<'dat> {
+impl<'src> Datum<'src> {
     /// The Datum without its lifetime.
     pub fn sans_lifetime(self) -> pg_sys::Datum {
         self.0
