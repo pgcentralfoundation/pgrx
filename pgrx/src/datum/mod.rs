@@ -59,11 +59,11 @@ pub use time_with_timezone::*;
 pub use unbox::*;
 pub use varlena::*;
 
-use crate::PgBox;
 use crate::memcx::MemCx;
-use pgrx_sql_entity_graph::RustSqlMapping;
 use crate::pg_sys;
+use crate::PgBox;
 use core::marker::PhantomData;
+use pgrx_sql_entity_graph::RustSqlMapping;
 
 /// How Postgres represents datatypes
 ///

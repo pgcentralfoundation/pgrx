@@ -43,7 +43,7 @@ pub unsafe trait UnboxDatum {
     where
         Self: 'src;
     /// Convert from `Datum<'src>` to `T::As<'src>`
-    /// 
+    ///
     /// This should be the direct conversion in each case. It is very unsafe to use directly.
     ///
     /// # Safety
