@@ -49,8 +49,13 @@ impl CommandExecute for Stop {
         }
 
         let pgrx = Pgrx::from_config()?;
+        let (package_manifest, _) = get_package_manifest(
+            &clap_cargo::Features::default(),
+            self.package.as_ref(),
+            self.manifest_path,
+        )?;
         if self.pg_version == Some("all".into()) {
-            for v in pgrx.iter(PgConfigSelector::All) {
+            for v in crate::manifest::all_pg_in_both_tomls(&package_manifest, &pgrx) {
                 let mut versioned_start = self.clone();
                 versioned_start.pg_version = Some(v?.label()?);
                 perform(versioned_start, &pgrx)?;
