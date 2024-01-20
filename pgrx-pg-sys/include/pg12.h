@@ -158,3 +158,4 @@
 #include "utils/syscache.h"
 #include "utils/typcache.h"
 #include "utils/rangetypes.h"
+#include "utils/varlena.h"
