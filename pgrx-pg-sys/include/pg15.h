@@ -23,6 +23,7 @@
 #include "access/heapam.h"
 #include "access/htup.h"
 #include "access/htup_details.h"
+#include "access/multixact.h"
 #include "access/relation.h"
 #include "access/reloptions.h"
 #include "access/relscan.h"
