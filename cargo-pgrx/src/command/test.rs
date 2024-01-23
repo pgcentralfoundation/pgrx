@@ -8,7 +8,7 @@
 //LICENSE
 //LICENSE Use of this source code is governed by the MIT license that can be found in the LICENSE file.
 use eyre::Context;
-use pgrx_pg_config::{get_target_dir, PgConfig, PgConfigSelector, Pgrx};
+use pgrx_pg_config::{get_target_dir, PgConfig, Pgrx};
 use std::path::{Path, PathBuf};
 use std::process::Stdio;
 
@@ -80,10 +80,15 @@ impl CommandExecute for Test {
             Ok(())
         }
 
+        let (package_manifest, _) = get_package_manifest(
+            &self.features,
+            self.package.as_ref(),
+            self.manifest_path.as_ref(),
+        )?;
         let pgrx = Pgrx::from_config()?;
         if self.pg_version == Some("all".to_string()) {
             // run the tests for **all** the Postgres versions we know about
-            for v in pgrx.iter(PgConfigSelector::All) {
+            for v in crate::manifest::all_pg_in_both_tomls(&package_manifest, &pgrx) {
                 let mut versioned_test = self.clone();
                 versioned_test.pg_version = Some(v?.label()?);
                 perform(versioned_test, &pgrx)?;

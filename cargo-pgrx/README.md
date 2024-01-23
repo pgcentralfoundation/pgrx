@@ -232,13 +232,22 @@ $ cargo pgrx stop all
     Stopping Postgres v15
 ```
 
-`cargo pgrx` has three commands for managing each Postgres installation: `start`, `stop`, and `status`. Additionally, `cargo pgrx run` (see below) will automatically start its target Postgres instance if not already running.
+`cargo pgrx` has three commands for managing Postgres installations: `start`, `stop`, and `status`.
+Additionally, `cargo pgrx run` (see below) will automatically start its target Postgres instance if
+not already running. Note that when directed to use `"all"` Postgres instances, this is interpreted
+in terms of an extension's `pg{MAJOR}` features in its Cargo.toml, except for `cargo pgrx status`.
 
-When starting a Postgres instance, `pgrx` starts it on port `28800 + PG_MAJOR_VERSION`, so Postgres 11 runs on `28811`, 12 on `28812`, etc. Additionally, the first time any of these are started, it'll automatically initialize a `PGDATA` directory in `~/.pgrx/data-[11 | 12 | 13 | 14 | 15]`. Doing so allows `pgrx` to manage either Postgres versions it installed or ones already on your computer, and to make sure that in the latter case, `pgrx` managed versions don't interfere with what might already be running. The locale of the instance is `C.UTF-8` (or equivalently, a locale of `C` with a `ctype` of `UTF8` on macOS), or `C` if the `C.UTF-8` locale is unavailable.
+When starting a Postgres instance, `pgrx` starts it on port `28800 + PG_MAJOR_VERSION`, so
+Postgres 15 runs on `28815`, 16 on `28816`, etc. Additionally, the first time any of these are
+started, it will initialize `PGDATA` directories in `${PGRX_HOME}/data-{12,13,14,15,16}`.
+Doing so allows `pgrx` to manage either Postgres versions it installed or ones already on your
+computer, and ensure that the `pgrx` managed versions don't interfere with what might already
+be running. The locale of the instance is `C.UTF-8` (or equivalently, a locale of `C` with a
+`ctype` of `UTF8` on macOS), or `C` if the `C.UTF-8` locale is unavailable.
 
 `pgrx` doesn't tear down these instances. While they're stored in a hidden directory in your home directory, `pgrx` considers these important and permanent database installations.
 
-Once started, you can connect to them using `psql` (if you have it on your $PATH) like so: `psql -p 28812`. However, you probably just want the `cargo pgrx run` command.
+Once started, you can connect to them using `psql` (if you have it on your $PATH) like so: `psql -p 28816`. However, you probably just want the `cargo pgrx run` command.
 
 ## Compiling and Running Your Extension
 
@@ -446,7 +455,9 @@ test result: ok. 2 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; fini
 Stopping Postgres
 ```
 
-`cargo pgrx test [pg12 | pg13 | pg14 | pg15 | pg16]` runs your `#[test]` and `#[pg_test]` annotated functions using cargo's test system.
+`cargo pgrx test ${VERSION}` runs your `#[test]` and `#[pg_test]` annotated functions using cargo's
+test system. Note that if you request `cargo pgrx test all`, this will only run tests for versions
+configured for control via cargo-pgrx AND set in your extension's Cargo.toml for the pgrx library.
 
 During the testing process, `pgrx` starts a temporary instance of Postgres with its `PGDATA` directory in `./target/pgrx-test-data-PGVER/`. This Postgres instance is stopped as soon as the test framework has finished. The locale of the temporary instance is `C.UTF-8` (or equivalently, a locale of `C` with a `ctype` of `UTF8` on macOS), or `C` if the `C.UTF-8` locale is unavailable.
 

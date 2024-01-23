@@ -135,6 +135,7 @@ fn main() -> eyre::Result<()> {
     emit_rerun_if_changed();
 
     let pg_configs: Vec<(u16, PgConfig)> = if is_for_release {
+        // This does not cross-check config.toml and Cargo.toml versions, as it is release infra.
         Pgrx::from_config()?.iter(PgConfigSelector::All)
             .map(|r| r.expect("invalid pg_config"))
             .map(|c| (c.major_version().expect("invalid major version"), c))

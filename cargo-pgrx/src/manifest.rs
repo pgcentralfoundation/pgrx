@@ -11,7 +11,7 @@ use cargo_metadata::Metadata;
 use cargo_toml::Manifest;
 use clap_cargo::Features;
 use eyre::{eyre, Context};
-use pgrx_pg_config::{PgConfig, Pgrx};
+use pgrx_pg_config::{PgConfig, PgConfigSelector, Pgrx};
 use std::path::PathBuf;
 
 #[derive(Debug, Clone)]
@@ -209,4 +209,25 @@ pub(crate) fn get_package_manifest(
         Manifest::from_path(&package_manifest_path).wrap_err("Couldn't parse manifest")?,
         package_manifest_path,
     ))
+}
+
+pub(crate) fn all_pg_in_both_tomls<'a>(
+    manifest: &'a Manifest,
+    pgrx: &Pgrx,
+) -> impl Iterator<Item = eyre::Result<PgConfig>> + 'a {
+    // Maybe eventually warn when the Cargo.toml has a version our config.toml doesn't,
+    // as it makes sense to further constrain support from the version set pgrx supports,
+    // but it doesn't make sense to e.g. not run tests when admin thought it was requested?
+    pgrx.iter(PgConfigSelector::All).filter(|result| match result {
+        Ok(pg_config) => {
+            if let Ok(ver) = pg_config.major_version() {
+                // Clumsy: we rely on these features enabling `pgrx/pg{ver}` instead of verifying.
+                manifest.features.contains_key(&format!("pg{ver}"))
+            } else {
+                false // Nonsensical to have no major version for a pg_config?
+            }
+        }
+        // Pass errors along
+        _ => true,
+    })
 }

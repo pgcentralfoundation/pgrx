@@ -174,6 +174,9 @@ pub(crate) fn init_pgrx(pgrx: &Pgrx, init: &Init) -> eyre::Result<()> {
     let mut output_configs = std::thread::scope(|s| -> eyre::Result<Vec<_>> {
         let span = tracing::Span::current();
         let mut threads = Vec::new();
+        // This selector does not necessarily match the support expressed in a project's Cargo.toml
+        // the user will template or handwrite. We may wish to check and emit errors then, but we
+        // do not require a project at pgrx init time, so permit these oddities for now.
         for pg_config in pgrx.iter(PgConfigSelector::All) {
             let pg_config = pg_config?;
             let span = span.clone();
