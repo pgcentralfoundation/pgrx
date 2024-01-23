@@ -215,7 +215,9 @@ pub(crate) fn all_pg_in_both_tomls<'a>(
     manifest: &'a Manifest,
     pgrx: &Pgrx,
 ) -> impl Iterator<Item = eyre::Result<PgConfig>> + 'a {
-    // Should we emit warnings here?
+    // Maybe eventually warn when the Cargo.toml has a version our config.toml doesn't,
+    // as it makes sense to further constrain support from the version set pgrx supports,
+    // but it doesn't make sense to e.g. not run tests when admin thought it was requested?
     pgrx.iter(PgConfigSelector::All).filter(|result| match result {
         Ok(pg_config) => {
             if let Ok(ver) = pg_config.major_version() {
