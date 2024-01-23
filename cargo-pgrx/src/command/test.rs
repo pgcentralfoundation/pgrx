@@ -8,7 +8,7 @@
 //LICENSE
 //LICENSE Use of this source code is governed by the MIT license that can be found in the LICENSE file.
 use eyre::Context;
-use pgrx_pg_config::{get_target_dir, PgConfig, PgConfigSelector, Pgrx};
+use pgrx_pg_config::{get_target_dir, PgConfig, Pgrx};
 use std::path::{Path, PathBuf};
 use std::process::Stdio;
 

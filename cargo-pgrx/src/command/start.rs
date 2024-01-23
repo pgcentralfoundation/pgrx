@@ -13,7 +13,7 @@ use crate::manifest::{get_package_manifest, pg_config_and_version};
 use crate::CommandExecute;
 use eyre::eyre;
 use owo_colors::OwoColorize;
-use pgrx_pg_config::{PgConfig, PgConfigSelector, Pgrx};
+use pgrx_pg_config::{PgConfig, Pgrx};
 use std::path::PathBuf;
 use std::process::Stdio;
 
@@ -52,7 +52,7 @@ impl CommandExecute for Start {
         let (package_manifest, _) = get_package_manifest(
             &clap_cargo::Features::default(),
             self.package.as_ref(),
-            self.manifest_path,
+            self.manifest_path.clone(),
         )?;
 
         let pgrx = Pgrx::from_config()?;
