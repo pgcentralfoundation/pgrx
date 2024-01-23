@@ -37,3 +37,5 @@ fn build_agent_for_url(url: &str) -> eyre::Result<Agent> {
         Ok(Agent::new())
     }
 }
+
+// TODO: Abstract over the repeated `fn perform`?
