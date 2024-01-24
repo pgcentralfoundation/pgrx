@@ -28,7 +28,7 @@ eyre.workspace = true
 owo-colors.workspace = true
 url.workspace = true
 
-dirs = "5.0.1"
+home = "0.5.9"
 pathsearch = "0.2.0"
 serde = { version = "1.0", features = [ "derive" ] }
 serde_derive = "1.0"
