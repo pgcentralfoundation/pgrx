@@ -14,6 +14,7 @@
 #include "funcapi.h"
 #include "miscadmin.h"
 #include "pgstat.h"
+#include "varatt.h"
 
 #include "access/amapi.h"
 #include "access/genam.h"
