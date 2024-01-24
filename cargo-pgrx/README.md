@@ -50,7 +50,7 @@ Options:
 
 ## Environment Variables
 
-- `PGRX_HOME` - If set, overrides `pgrx`'s default directory of `~/.pgrx/`
+- `PGRX_HOME` - Defaults to `${HOME}/.pgrx/` if not set.
 - `PGRX_BUILD_FLAGS` - If set during `cargo pgrx run/test/install`, these additional flags are passed to `cargo build` while building the extension
 - `PGRX_BUILD_VERBOSE` - Set to true to enable verbose "build.rs" output -- useful for debugging build issues
 - `HTTPS_PROXY` - If set during `cargo pgrx init`, it will download the Postgres sources using these proxy settings. For more details refer to the [env_proxy crate documentation](https://docs.rs/env_proxy/*/env_proxy/fn.for_url.html).
