@@ -27,7 +27,6 @@ pub use argument::PgExternArgument;
 pub use cast::PgCast;
 pub use operator::PgOperator;
 pub use returning::NameMacro;
-use syn::Expr;
 
 use crate::ToSqlConfig;
 use attribute::Attribute;
@@ -113,7 +112,6 @@ impl PgExtern {
             crate::ident_is_acceptable_to_postgres(&func.sig.ident)?;
         }
         let operator = Self::operator(&func)?;
-        let cast = Self::cast(&func)?;
         let search_path = Self::search_path(&func)?;
         let inputs = Self::inputs(&func)?;
         let input_types = Self::input_types(&func)?;
@@ -123,12 +121,19 @@ impl PgExtern {
             func,
             to_sql_config,
             operator,
-            cast,
+            cast: None,
             search_path,
             inputs,
             input_types,
             returns,
         }))
+    }
+
+    /// Returns a new instance of this `PgExtern` with `cast` overwritten to `pg_cast`.
+    pub fn as_cast(&self, pg_cast: PgCast) -> PgExtern {
+        let mut result = self.clone();
+        result.cast = Some(pg_cast);
+        result
     }
 
     fn input_types(func: &syn::ItemFn) -> syn::Result<Vec<syn::Type>> {
@@ -229,36 +234,6 @@ impl PgExtern {
                 }
                 "merges" => {
                     skel.get_or_insert_with(Default::default).merges = true;
-                }
-                _ => (),
-            }
-        }
-        Ok(skel)
-    }
-
-    fn cast(func: &syn::ItemFn) -> syn::Result<Option<PgCast>> {
-        let mut skel = Option::<PgCast>::default();
-        for attr in &func.attrs {
-            let last_segment = attr.path.segments.last().unwrap();
-            match last_segment.ident.to_string().as_str() {
-                "pg_cast" => {
-                    let mut cast = PgCast::Default;
-                    if !attr.tokens.is_empty() {
-                        match attr.parse_args::<Expr>() {
-                            Ok(Expr::Path(p)) => {
-                                match p.path.segments.last().unwrap().ident.to_string().as_str() {
-                                    "implicit" => cast = PgCast::Implicit,
-                                    "assignment" => cast = PgCast::Assignment,
-                                    _ => eprintln!("Unrecognized option: {}. Using default cast options.", p.path.to_token_stream()),
-                                }
-                            }
-                            _ => eprintln!(
-                                "Unable to parse attribute to pg_cast as a Rust Expr: {}. Using default cast options.",
-                                attr.tokens
-                            ),
-                        }
-                    }
-                    skel = Some(cast);
                 }
                 _ => (),
             }

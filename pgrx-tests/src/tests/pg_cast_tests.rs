@@ -11,10 +11,9 @@ use pgrx::prelude::*;
 
 #[pg_schema]
 mod pg_catalog {
-    use pgrx::{pg_cast, pg_extern};
+    use pgrx::pg_cast;
     use serde_json::Value::Number;
 
-    #[pg_extern]
     #[pg_cast(implicit)]
     fn int4_from_json(value: pgrx::Json) -> i32 {
         if let Number(num) = &value.0 {

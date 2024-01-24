@@ -580,14 +580,11 @@ impl ToSql for PgExternEntity {
                                                     line = self.line,
                                                     name = self.name,
                                                     module_path = self.module_path,
-                                                    source_arg_sql = source_arg_sql,
                                                     schema_prefix_source = context.schema_prefix_for(&source_arg_graph_index),
                                                     source_name = source_arg.type_name,
-                                                    target_arg_sql = target_arg_sql,
                                                     schema_prefix_target = context.schema_prefix_for(&target_arg_graph_index),
                                                     target_name = target_arg.type_name,
                                                     function_name = self.name,
-                                                    optional = optional,
                                             );
             ext_sql + &cast_sql
         } else {
