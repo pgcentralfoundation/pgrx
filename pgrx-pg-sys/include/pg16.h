@@ -14,6 +14,7 @@
 #include "funcapi.h"
 #include "miscadmin.h"
 #include "pgstat.h"
+#include "varatt.h"
 
 #include "access/amapi.h"
 #include "access/genam.h"
@@ -156,7 +157,9 @@
 #include "utils/sampling.h"
 #include "utils/selfuncs.h"
 #include "utils/snapmgr.h"
+#include "utils/sortsupport.h"
 #include "utils/catcache.h"
 #include "utils/syscache.h"
 #include "utils/typcache.h"
 #include "utils/rangetypes.h"
+#include "utils/varlena.h"
