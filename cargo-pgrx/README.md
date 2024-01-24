@@ -31,8 +31,7 @@ Commands:
   stop          Stop a pgrx-managed Postgres instance
   status        Is a pgrx-managed Postgres instance running?
   new           Create a new extension crate
-  install       Install the extension from the current crate to the Postgres specified by whatever `pg_config` is currently on your $PATH
-  sudo-install  Like `cargo pgrx install`, but uses `sudo` to copy the extension files
+  install       Install the crate as an extension into the Postgres specified by `pg_config`
   package       Create an installation package directory
   schema        Generate extension schema files
   run           Compile/install extension to a pgrx-managed Postgres instance and start psql
