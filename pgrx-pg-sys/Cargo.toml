@@ -47,7 +47,7 @@ sptr = "0.3"
 libc = "0.2"
 
 [build-dependencies]
-bindgen = { version = "0.68.1", default-features = false, features = ["runtime"] }
+bindgen = { version = "0.69", default-features = false, features = ["runtime"] }
 clang-sys = { version = "1", features = ["clang_6_0", "runtime"] }
 pgrx-pg-config= { path = "../pgrx-pg-config/", version = "=0.11.2" }
 proc-macro2 = "1.0.69"
