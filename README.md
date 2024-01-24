@@ -84,7 +84,8 @@ those remain untested. So far, some of PGRX's build tooling works on Windows, bu
 
  ⹋ PGRX has not been tested to work on 32-bit: the library assumes an 8-byte `pg_sys::Datum`
 which may result in unexpected behavior on 32-bit, like dropping 4 bytes of data from `int8`
-and `double`. This is not "unsound", but may undermine safety assumptions of PGRX extensions.
+and `double`. This may not be "unsound" in itself, as it is "merely" illogical,
+but it may undermine otherwise-reasonable safety assumptions of PGRX extensions.
 We do not plan to add support without considerable ongoing technical and financial contributions.
 
 <details>
