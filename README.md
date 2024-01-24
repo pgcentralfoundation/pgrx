@@ -66,6 +66,10 @@
 
 ## System Requirements
 
+PGRX has been tested to work on x86_64⹋ and aarch64⹋ Linux and aarch64 macOS targets.
+It is currently expected to work on other "Unix" OS with possible small changes, but
+those remain untested. So far, some of PGRX's build tooling works on Windows, but not all.
+
 - A Rust toolchain: `rustc`, `cargo`, and `rustfmt`. The recommended way to get these is from https://rustup.rs †
 - `git`
 - `libclang` 5.0 or greater (required by bindgen)
@@ -78,9 +82,19 @@
 
  ‡ A local PostgreSQL server installation is not required. `cargo pgrx` can download and compile PostgreSQL versions on its own.
 
+ ⹋ PGRX has not been tested to work on 32-bit: the library assumes an 8-byte `pg_sys::Datum`
+which may result in unexpected behavior on 32-bit, like dropping 4 bytes of data from `int8`
+and `double`. This may not be "unsound" in itself, as it is "merely" illogical,
+but it may undermine otherwise-reasonable safety assumptions of PGRX extensions.
+We do not plan to add support without considerable ongoing technical and financial contributions.
+
 <details>
    <summary>How to: GCC 7 on CentOS 7</summary>
-   
+
+It is not recommended to use CentOS 7 for PGRX development, even if it works.
+
+Recommended Linux distributions include recent Debian, Fedora, and Ubuntu.
+
 In order to use GCC 7, install [`scl`](https://wiki.centos.org/AdditionalResources/Repositories/SCL) and enter the GCC 7 development environment:
 
 ```bash
