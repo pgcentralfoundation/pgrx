@@ -31,8 +31,7 @@ Commands:
   stop          Stop a pgrx-managed Postgres instance
   status        Is a pgrx-managed Postgres instance running?
   new           Create a new extension crate
-  install       Install the extension from the current crate to the Postgres specified by whatever `pg_config` is currently on your $PATH
-  sudo-install  Like `cargo pgrx install`, but uses `sudo` to copy the extension files
+  install       Install the crate as an extension into the Postgres specified by `pg_config`
   package       Create an installation package directory
   schema        Generate extension schema files
   run           Compile/install extension to a pgrx-managed Postgres instance and start psql
@@ -50,7 +49,7 @@ Options:
 
 ## Environment Variables
 
-- `PGRX_HOME` - If set, overrides `pgrx`'s default directory of `~/.pgrx/`
+- `PGRX_HOME` - Defaults to "${HOME}/.pgrx/" if not set.
 - `PGRX_BUILD_FLAGS` - If set during `cargo pgrx run/test/install`, these additional flags are passed to `cargo build` while building the extension
 - `PGRX_BUILD_VERBOSE` - Set to true to enable verbose "build.rs" output -- useful for debugging build issues
 - `HTTPS_PROXY` - If set during `cargo pgrx init`, it will download the Postgres sources using these proxy settings. For more details refer to the [env_proxy crate documentation](https://docs.rs/env_proxy/*/env_proxy/fn.for_url.html).
@@ -110,14 +109,20 @@ $ cargo pgrx init
 
 `cargo pgrx init` is required to be run once to properly configure the `pgrx` development environment.
 
-As shown by the screenshot above, it downloads the latest releases of supported Postgres versions, configures them, compiles them, and installs them to `~/.pgrx/`, including all [`contrib`](https://www.postgresql.org/docs/current/contrib.html) extensions and tools included with Postgres. Other `pgrx` commands such as `run` and `test` will fully manage and otherwise use these Postgres installations for you.
+As shown by the screenshot above, it downloads the latest releases of supported Postgres versions,
+configures them, compiles them, and installs them to "${PGRX_HOME}", including all [`contrib`]
+extensions and tools included with Postgres. Other `pgrx` commands such as `run` and `test` will
+manage and use these Postgres installations on your behalf.
+
+[`contrib`]: https://www.postgresql.org/docs/current/contrib.html
 
 `pgrx` is designed to support multiple Postgres versions in such a way that during development, you'll know if you're trying to use a Postgres API that isn't common across all versions. It's also designed to make testing your extension against these versions easy. This is why it requires you to have all fully compiled and installed versions of Postgres during development.
 
 In cases when default ports pgrx uses to run PostgreSQL within are not available, one can specify
 custom values for these during initialization using `--base-port` and `--base-testing-port`
-options. One of the use cases for this is using multiple installations of pgrx (using `$PGRX_HOME` variable)
-when developing multiple extensions at the same time. These values can be later changed in `$PGRX_HOME/config.toml`.
+options. One of the use cases for this is using multiple installations of pgrx (using different
+"$PGRX_HOME"s) when developing multiple extensions at the same time.
+These values can be later changed in "$PGRX_HOME/config.toml".
 
 If you want to use your operating system's package manager to install Postgres, `cargo pgrx init` has optional arguments that allow you to specify where they're installed (see below).
 
@@ -131,7 +136,8 @@ When the various `--pgXX` options are specified, these are the **only** versions
 
 You'll also want to make sure you have the "postgresql-server-dev" package installed for each version you want to manage yourself. If you need to customize the configuration of the Postgres build, you can use `--configure-flag` to pass optins to the `configure` script. For example, you could use `--configure-flag=--with-ssl=openssl` to enable SSL support or `--configure-flag=--with-libraries=/path/to/libs` to use a non-standard location for dependency libraries. This flag can be used multiple times to pass multiple configuration options.
 
-Once complete, `cargo pgrx init` also creates a configuration file (`~/.pgrx/config.toml`) that describes where to find each version's `pg_config` tool.
+Once complete, `cargo pgrx init` also creates "${PGRX_HOME}/config.toml" which describes where to
+find each version's `pg_config` tool.
 
 If a new minor Postgres version is released in the future you can simply run `cargo pgrx init [args]` again, and your local version will be updated, preserving all existing databases and configuration.
 
@@ -204,32 +210,32 @@ OPTIONS:
 
 ```console
 $ cargo pgrx status all
-Postgres v11 is stopped
 Postgres v12 is stopped
 Postgres v13 is stopped
 Postgres v14 is stopped
 Postgres v15 is stopped
+Postgres v16 is stopped
 
 $ cargo pgrx start all
-    Starting Postgres v11 on port 28811
     Starting Postgres v12 on port 28812
     Starting Postgres v13 on port 28813
     Starting Postgres v14 on port 28814
     Starting Postgres v15 on port 28815
+    Starting Postgres v15 on port 28816
 
 $ cargo pgrx status all
-Postgres v11 is running
 Postgres v12 is running
 Postgres v13 is running
 Postgres v14 is running
 Postgres v15 is running
+Postgres v16 is running
 
 $ cargo pgrx stop all
-    Stopping Postgres v11
     Stopping Postgres v12
     Stopping Postgres v13
     Stopping Postgres v14
     Stopping Postgres v15
+    Stopping Postgres v16
 ```
 
 `cargo pgrx` has three commands for managing Postgres installations: `start`, `stop`, and `status`.
@@ -239,15 +245,17 @@ in terms of an extension's `pg{MAJOR}` features in its Cargo.toml, except for `c
 
 When starting a Postgres instance, `pgrx` starts it on port `28800 + PG_MAJOR_VERSION`, so
 Postgres 15 runs on `28815`, 16 on `28816`, etc. Additionally, the first time any of these are
-started, it will initialize `PGDATA` directories in `${PGRX_HOME}/data-{12,13,14,15,16}`.
+started, it will initialize `PGDATA` directories in `"${PGRX_HOME}"/data-{12,13,14,15,16}`.
 Doing so allows `pgrx` to manage either Postgres versions it installed or ones already on your
 computer, and ensure that the `pgrx` managed versions don't interfere with what might already
 be running. The locale of the instance is `C.UTF-8` (or equivalently, a locale of `C` with a
 `ctype` of `UTF8` on macOS), or `C` if the `C.UTF-8` locale is unavailable.
 
-`pgrx` doesn't tear down these instances. While they're stored in a hidden directory in your home directory, `pgrx` considers these important and permanent database installations.
+`pgrx` doesn't tear down these instances. While `PGRX_HOME` is by default a hidden directory,
+`pgrx` considers these important and permanent database installations.
 
-Once started, you can connect to them using `psql` (if you have it on your $PATH) like so: `psql -p 28816`. However, you probably just want the `cargo pgrx run` command.
+Once started, you can connect using `psql` (if available) like so: `psql -p 28816`.
+However, you probably just want the `cargo pgrx run` command.
 
 ## Compiling and Running Your Extension
 
@@ -397,9 +405,10 @@ installing extension
 If for some reason `cargo pgrx run <PG_VERSION>` isn't your style, you can use `cargo pgrx install` to install your extension
 to the Postgres installation described by the `pg_config` tool currently on your `$PATH`.
 
-You'll need write permissions to the directories described by `pg_config --pkglibdir` and `pg_config --sharedir`.  If this
-is problematic, use `cargo pgrx install --sudo` which compiles the extension as the current user and copies the extension
-files to their proper location using `sudo`, prompting you for your password.
+You'll need write permissions to `pg_config --pkglibdir` and `pg_config --sharedir`.
+If this is problematic, consider using `cargo pgrx install --sudo` which compiles the extension
+as the current user and copies the extension files to their proper location using `sudo`,
+prompting you for your password.
 
 By default, `cargo pgrx install` builds your extension in debug mode. Specifying `--release` changes that.
 

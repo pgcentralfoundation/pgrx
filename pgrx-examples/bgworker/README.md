@@ -2,7 +2,7 @@ A simple Background Worker that uses SPI (connected to a local database named `p
 transaction.
 
 In order to use this bgworker with pgrx, you'll need to edit the proper `postgresql.conf` file in
-`~/.pgrx/data-PGVER/postgresql.conf` and add this line to the end:
+"${PGRX_HOME}/data-$PGVER/postgresql.conf" and add this line to the end:
 
 ```
 shared_preload_libraries = 'bgworker.so'

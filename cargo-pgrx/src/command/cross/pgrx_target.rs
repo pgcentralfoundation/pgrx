@@ -31,7 +31,7 @@ pub(crate) struct PgrxTarget {
     /// The `pg_config` path (default is the first `pg_config` in "$PATH").
     ///
     /// Caveat: Running this against PostgreSQL installations placed in
-    /// `~/.pgrx/$pgver/` by `cargo pgrx init` is probably a mistake in most cases.
+    /// "$PGRX_HOME/$pgver/" by `cargo pgrx init` is probably a mistake in most cases.
     #[arg(long, short = 'c', value_parser)]
     pub pg_config: Option<PathBuf>,
 

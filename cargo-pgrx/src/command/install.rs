@@ -28,7 +28,7 @@ use std::sync::{Arc, Mutex};
 /// `Arc<Mutex>` is needed to get around compiler safety checks.
 type MemoizeKeyValue = Arc<Mutex<HashMap<PathBuf, String>>>;
 
-/// Install the extension from the current crate to the Postgres specified by whatever `pg_config` is currently on your $PATH
+/// Install the crate as an extension into the Postgres specified by `pg_config`
 #[derive(clap::Args, Debug)]
 #[clap(author)]
 pub(crate) struct Install {

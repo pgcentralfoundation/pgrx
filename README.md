@@ -121,7 +121,8 @@ Once `cargo-pgrx` is ready you can initialize the "PGRX Home" directory:
 cargo pgrx init
 ```
 
-The `init` command downloads all currently supported PostgreSQL versions, compiles them to `~/.pgrx/`, and runs `initdb`.
+The `init` command downloads all currently supported PostgreSQL versions, compiles them
+to `${PGRX_HOME}`, and runs `initdb`.
 
 It's also possible to use an existing (user-writable) PostgreSQL install, or install a subset of versions, see the [`README.md` of `cargo-pgrx` for details](cargo-pgrx/README.md#first-time-initialization).
 
