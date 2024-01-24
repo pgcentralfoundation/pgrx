@@ -247,7 +247,8 @@ be running. The locale of the instance is `C.UTF-8` (or equivalently, a locale o
 
 `pgrx` doesn't tear down these instances. While they're stored in a hidden directory in your home directory, `pgrx` considers these important and permanent database installations.
 
-Once started, you can connect to them using `psql` (if you have it on your $PATH) like so: `psql -p 28816`. However, you probably just want the `cargo pgrx run` command.
+Once started, you can connect using `psql` (if available) like so: `psql -p 28816`.
+However, you probably just want the `cargo pgrx run` command.
 
 ## Compiling and Running Your Extension
 
