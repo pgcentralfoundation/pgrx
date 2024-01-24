@@ -204,32 +204,32 @@ OPTIONS:
 
 ```console
 $ cargo pgrx status all
-Postgres v11 is stopped
 Postgres v12 is stopped
 Postgres v13 is stopped
 Postgres v14 is stopped
 Postgres v15 is stopped
+Postgres v16 is stopped
 
 $ cargo pgrx start all
-    Starting Postgres v11 on port 28811
     Starting Postgres v12 on port 28812
     Starting Postgres v13 on port 28813
     Starting Postgres v14 on port 28814
     Starting Postgres v15 on port 28815
+    Starting Postgres v15 on port 28816
 
 $ cargo pgrx status all
-Postgres v11 is running
 Postgres v12 is running
 Postgres v13 is running
 Postgres v14 is running
 Postgres v15 is running
+Postgres v16 is running
 
 $ cargo pgrx stop all
-    Stopping Postgres v11
     Stopping Postgres v12
     Stopping Postgres v13
     Stopping Postgres v14
     Stopping Postgres v15
+    Stopping Postgres v16
 ```
 
 `cargo pgrx` has three commands for managing Postgres installations: `start`, `stop`, and `status`.
