@@ -398,9 +398,10 @@ installing extension
 If for some reason `cargo pgrx run <PG_VERSION>` isn't your style, you can use `cargo pgrx install` to install your extension
 to the Postgres installation described by the `pg_config` tool currently on your `$PATH`.
 
-You'll need write permissions to the directories described by `pg_config --pkglibdir` and `pg_config --sharedir`.  If this
-is problematic, use `cargo pgrx install --sudo` which compiles the extension as the current user and copies the extension
-files to their proper location using `sudo`, prompting you for your password.
+You'll need write permissions to `pg_config --pkglibdir` and `pg_config --sharedir`.
+If this is problematic, consider using `cargo pgrx install --sudo` which compiles the extension
+as the current user and copies the extension files to their proper location using `sudo`,
+prompting you for your password.
 
 By default, `cargo pgrx install` builds your extension in debug mode. Specifying `--release` changes that.
 
