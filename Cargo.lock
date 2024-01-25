@@ -353,7 +353,7 @@ dependencies = [
  "nix",
  "object",
  "once_cell",
- "owo-colors 4.0.0",
+ "owo-colors",
  "pgrx-pg-config",
  "pgrx-sql-entity-graph",
  "prettyplease",
@@ -507,7 +507,7 @@ dependencies = [
  "eyre",
  "indenter",
  "once_cell",
- "owo-colors 3.5.0",
+ "owo-colors",
  "tracing-error",
 ]
 
@@ -518,7 +518,7 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "cd6be1b2a7e382e2b98b43b2adcca6bb0e465af0bdd38123873ae61eb17a72c2"
 dependencies = [
  "once_cell",
- "owo-colors 3.5.0",
+ "owo-colors",
  "tracing-core",
  "tracing-error",
 ]
@@ -1445,12 +1445,6 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "c1b04fb49957986fdce4d6ee7a65027d55d4b6d2265e5848bbb507b58ccfdb6f"
 
 [[package]]
-name = "owo-colors"
-version = "4.0.0"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "caff54706df99d2a78a5a4e3455ff45448d81ef1bb63c22cd14052ca0e993a3f"
-
-[[package]]
 name = "parking_lot"
 version = "0.12.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -1557,7 +1551,7 @@ dependencies = [
  "cargo_toml",
  "dirs",
  "eyre",
- "owo-colors 4.0.0",
+ "owo-colors",
  "pathsearch",
  "serde",
  "serde_derive",
@@ -1594,7 +1588,7 @@ version = "0.11.2"
 dependencies = [
  "convert_case",
  "eyre",
- "owo-colors 4.0.0",
+ "owo-colors",
  "petgraph",
  "proc-macro2",
  "quote",
@@ -1611,7 +1605,7 @@ dependencies = [
  "eyre",
  "libc",
  "once_cell",
- "owo-colors 4.0.0",
+ "owo-colors",
  "pgrx",
  "pgrx-macros",
  "pgrx-pg-config",
@@ -1631,7 +1625,7 @@ name = "pgrx-version-updater"
 version = "0.1.1"
 dependencies = [
  "clap",
- "owo-colors 4.0.0",
+ "owo-colors",
  "toml_edit 0.20.7",
  "walkdir",
 ]
