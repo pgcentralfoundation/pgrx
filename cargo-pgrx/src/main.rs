@@ -18,8 +18,8 @@ mod pgrx_pg_sys_stub;
 pub(crate) mod env;
 pub(crate) mod profile;
 
-use std::io::{self, IsTerminal};
 use clap::Parser;
+use std::io::{self, IsTerminal};
 use tracing_error::ErrorLayer;
 use tracing_subscriber::layer::SubscriberExt;
 use tracing_subscriber::util::SubscriberInitExt;
