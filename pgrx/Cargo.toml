@@ -60,7 +60,7 @@ thiserror = "1.0"
 atomic-traits = "0.3.0" # PgAtomic and shmem init
 bitflags = "2.4.0" # BackgroundWorker
 bitvec = "1.0" # processing array nullbitmaps
-heapless = "0.7.16" # shmem and PgLwLock
+heapless = "0.8" # shmem and PgLwLock
 libc = "0.2.149" # FFI type compat
 seahash = "4.1.0" # derive(PostgresHash)
 serde = { version = "1.0", features = [ "derive" ] } # impls on pub types
