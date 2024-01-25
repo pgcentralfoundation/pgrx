@@ -2517,6 +2517,12 @@ pub const HEAP_INSERT_SKIP_FSM: u32 = 2;
 pub const HEAP_INSERT_FROZEN: u32 = 4;
 pub const HEAP_INSERT_NO_LOGICAL: u32 = 8;
 pub const HEAP_INSERT_SPECULATIVE: u32 = 16;
+pub const NUM_MULTIXACTOFFSET_BUFFERS: u32 = 8;
+pub const NUM_MULTIXACTMEMBER_BUFFERS: u32 = 16;
+pub const XLOG_MULTIXACT_ZERO_OFF_PAGE: u32 = 0;
+pub const XLOG_MULTIXACT_ZERO_MEM_PAGE: u32 = 16;
+pub const XLOG_MULTIXACT_CREATE_ID: u32 = 32;
+pub const XLOG_MULTIXACT_TRUNCATE_ID: u32 = 48;
 pub const LWLOCK_PADDED_SIZE: u32 = 128;
 pub const NUM_INDIVIDUAL_LWLOCKS: u32 = 48;
 pub const NUM_BUFFER_PARTITIONS: u32 = 128;
@@ -2728,6 +2734,17 @@ pub const Anum_pg_extension_extversion: u32 = 6;
 pub const Anum_pg_extension_extconfig: u32 = 7;
 pub const Anum_pg_extension_extcondition: u32 = 8;
 pub const Natts_pg_extension: u32 = 8;
+pub const ForeignDataWrapperRelationId: Oid = Oid(2328);
+pub const ForeignDataWrapperOidIndexId: u32 = 112;
+pub const ForeignDataWrapperNameIndexId: u32 = 548;
+pub const Anum_pg_foreign_data_wrapper_oid: u32 = 1;
+pub const Anum_pg_foreign_data_wrapper_fdwname: u32 = 2;
+pub const Anum_pg_foreign_data_wrapper_fdwowner: u32 = 3;
+pub const Anum_pg_foreign_data_wrapper_fdwhandler: u32 = 4;
+pub const Anum_pg_foreign_data_wrapper_fdwvalidator: u32 = 5;
+pub const Anum_pg_foreign_data_wrapper_fdwacl: u32 = 6;
+pub const Anum_pg_foreign_data_wrapper_fdwoptions: u32 = 7;
+pub const Natts_pg_foreign_data_wrapper: u32 = 7;
 pub const ForeignServerRelationId: Oid = Oid(1417);
 pub const ForeignServerOidIndexId: u32 = 113;
 pub const ForeignServerNameIndexId: u32 = 549;
@@ -3555,6 +3572,12 @@ pub const JB_FOBJECT: u32 = 536870912;
 pub const JB_FARRAY: u32 = 1073741824;
 pub const ATTSTATSSLOT_VALUES: u32 = 1;
 pub const ATTSTATSSLOT_NUMBERS: u32 = 2;
+pub const FORMAT_PROC_INVALID_AS_NULL: u32 = 1;
+pub const FORMAT_PROC_FORCE_QUALIFY: u32 = 2;
+pub const FORMAT_OPERATOR_INVALID_AS_NULL: u32 = 1;
+pub const FORMAT_OPERATOR_FORCE_QUALIFY: u32 = 2;
+pub const RULE_INDEXDEF_PRETTY: u32 = 1;
+pub const RULE_INDEXDEF_KEYS_ONLY: u32 = 2;
 pub const DEFAULT_EQ_SEL: f64 = 0.005;
 pub const DEFAULT_INEQ_SEL: f64 = 0.3333333333333333;
 pub const DEFAULT_RANGE_INEQ_SEL: f64 = 0.005;
@@ -19546,6 +19569,92 @@ pub type HTSV_Result = ::std::os::raw::c_uint;
 pub struct GlobalVisState {
     _unused: [u8; 0],
 }
+pub const SyncRequestType_SYNC_REQUEST: SyncRequestType = 0;
+pub const SyncRequestType_SYNC_UNLINK_REQUEST: SyncRequestType = 1;
+pub const SyncRequestType_SYNC_FORGET_REQUEST: SyncRequestType = 2;
+pub const SyncRequestType_SYNC_FILTER_REQUEST: SyncRequestType = 3;
+pub type SyncRequestType = ::std::os::raw::c_uint;
+pub const SyncRequestHandler_SYNC_HANDLER_MD: SyncRequestHandler = 0;
+pub const SyncRequestHandler_SYNC_HANDLER_CLOG: SyncRequestHandler = 1;
+pub const SyncRequestHandler_SYNC_HANDLER_COMMIT_TS: SyncRequestHandler = 2;
+pub const SyncRequestHandler_SYNC_HANDLER_MULTIXACT_OFFSET: SyncRequestHandler = 3;
+pub const SyncRequestHandler_SYNC_HANDLER_MULTIXACT_MEMBER: SyncRequestHandler = 4;
+pub const SyncRequestHandler_SYNC_HANDLER_NONE: SyncRequestHandler = 5;
+pub type SyncRequestHandler = ::std::os::raw::c_uint;
+#[repr(C)]
+#[derive(Debug, Copy, Clone)]
+pub struct FileTag {
+    pub handler: int16,
+    pub forknum: int16,
+    pub rnode: RelFileNode,
+    pub segno: uint32,
+}
+impl Default for FileTag {
+    fn default() -> Self {
+        let mut s = ::std::mem::MaybeUninit::<Self>::uninit();
+        unsafe {
+            ::std::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
+            s.assume_init()
+        }
+    }
+}
+pub const MultiXactStatus_MultiXactStatusForKeyShare: MultiXactStatus = 0;
+pub const MultiXactStatus_MultiXactStatusForShare: MultiXactStatus = 1;
+pub const MultiXactStatus_MultiXactStatusForNoKeyUpdate: MultiXactStatus = 2;
+pub const MultiXactStatus_MultiXactStatusForUpdate: MultiXactStatus = 3;
+pub const MultiXactStatus_MultiXactStatusNoKeyUpdate: MultiXactStatus = 4;
+pub const MultiXactStatus_MultiXactStatusUpdate: MultiXactStatus = 5;
+pub type MultiXactStatus = ::std::os::raw::c_uint;
+#[repr(C)]
+#[derive(Debug, Copy, Clone)]
+pub struct MultiXactMember {
+    pub xid: TransactionId,
+    pub status: MultiXactStatus,
+}
+impl Default for MultiXactMember {
+    fn default() -> Self {
+        let mut s = ::std::mem::MaybeUninit::<Self>::uninit();
+        unsafe {
+            ::std::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
+            s.assume_init()
+        }
+    }
+}
+#[repr(C)]
+#[derive(Debug)]
+pub struct xl_multixact_create {
+    pub mid: MultiXactId,
+    pub moff: MultiXactOffset,
+    pub nmembers: int32,
+    pub members: __IncompleteArrayField<MultiXactMember>,
+}
+impl Default for xl_multixact_create {
+    fn default() -> Self {
+        let mut s = ::std::mem::MaybeUninit::<Self>::uninit();
+        unsafe {
+            ::std::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
+            s.assume_init()
+        }
+    }
+}
+#[repr(C)]
+#[derive(Debug, Copy, Clone)]
+pub struct xl_multixact_truncate {
+    pub oldestMultiDB: Oid,
+    pub startTruncOff: MultiXactId,
+    pub endTruncOff: MultiXactId,
+    pub startTruncMemb: MultiXactOffset,
+    pub endTruncMemb: MultiXactOffset,
+}
+impl Default for xl_multixact_truncate {
+    fn default() -> Self {
+        let mut s = ::std::mem::MaybeUninit::<Self>::uninit();
+        unsafe {
+            ::std::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
+            s.assume_init()
+        }
+    }
+}
 #[repr(C)]
 #[derive(Debug, Default, Copy, Clone)]
 pub struct LWLock {
@@ -20593,6 +20702,25 @@ impl Default for FormData_pg_extension {
 pub type Form_pg_extension = *mut FormData_pg_extension;
 #[repr(C)]
 #[derive(Debug, Copy, Clone)]
+pub struct FormData_pg_foreign_data_wrapper {
+    pub oid: Oid,
+    pub fdwname: NameData,
+    pub fdwowner: Oid,
+    pub fdwhandler: Oid,
+    pub fdwvalidator: Oid,
+}
+impl Default for FormData_pg_foreign_data_wrapper {
+    fn default() -> Self {
+        let mut s = ::std::mem::MaybeUninit::<Self>::uninit();
+        unsafe {
+            ::std::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
+            s.assume_init()
+        }
+    }
+}
+pub type Form_pg_foreign_data_wrapper = *mut FormData_pg_foreign_data_wrapper;
+#[repr(C)]
+#[derive(Debug, Copy, Clone)]
 pub struct FormData_pg_foreign_server {
     pub oid: Oid,
     pub srvname: NameData,
@@ -21465,35 +21593,6 @@ pub type BgwHandleStatus = ::std::os::raw::c_uint;
 #[derive(Debug, Copy, Clone)]
 pub struct BackgroundWorkerHandle {
     _unused: [u8; 0],
-}
-pub const SyncRequestType_SYNC_REQUEST: SyncRequestType = 0;
-pub const SyncRequestType_SYNC_UNLINK_REQUEST: SyncRequestType = 1;
-pub const SyncRequestType_SYNC_FORGET_REQUEST: SyncRequestType = 2;
-pub const SyncRequestType_SYNC_FILTER_REQUEST: SyncRequestType = 3;
-pub type SyncRequestType = ::std::os::raw::c_uint;
-pub const SyncRequestHandler_SYNC_HANDLER_MD: SyncRequestHandler = 0;
-pub const SyncRequestHandler_SYNC_HANDLER_CLOG: SyncRequestHandler = 1;
-pub const SyncRequestHandler_SYNC_HANDLER_COMMIT_TS: SyncRequestHandler = 2;
-pub const SyncRequestHandler_SYNC_HANDLER_MULTIXACT_OFFSET: SyncRequestHandler = 3;
-pub const SyncRequestHandler_SYNC_HANDLER_MULTIXACT_MEMBER: SyncRequestHandler = 4;
-pub const SyncRequestHandler_SYNC_HANDLER_NONE: SyncRequestHandler = 5;
-pub type SyncRequestHandler = ::std::os::raw::c_uint;
-#[repr(C)]
-#[derive(Debug, Copy, Clone)]
-pub struct FileTag {
-    pub handler: int16,
-    pub forknum: int16,
-    pub rnode: RelFileNode,
-    pub segno: uint32,
-}
-impl Default for FileTag {
-    fn default() -> Self {
-        let mut s = ::std::mem::MaybeUninit::<Self>::uninit();
-        unsafe {
-            ::std::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
-            s.assume_init()
-        }
-    }
 }
 pub type XidStatus = ::std::os::raw::c_int;
 #[repr(C)]
@@ -33142,6 +33241,104 @@ extern "C" {
         buffer: Buffer,
         snapshot: Snapshot,
     );
+    pub fn InitSync();
+    pub fn SyncPreCheckpoint();
+    pub fn SyncPostCheckpoint();
+    pub fn ProcessSyncRequests();
+    pub fn RememberSyncRequest(ftag: *const FileTag, type_: SyncRequestType);
+    pub fn RegisterSyncRequest(
+        ftag: *const FileTag,
+        type_: SyncRequestType,
+        retryOnError: bool,
+    ) -> bool;
+    pub fn MultiXactIdCreate(
+        xid1: TransactionId,
+        status1: MultiXactStatus,
+        xid2: TransactionId,
+        status2: MultiXactStatus,
+    ) -> MultiXactId;
+    pub fn MultiXactIdExpand(
+        multi: MultiXactId,
+        xid: TransactionId,
+        status: MultiXactStatus,
+    ) -> MultiXactId;
+    pub fn MultiXactIdCreateFromMembers(
+        nmembers: ::std::os::raw::c_int,
+        members: *mut MultiXactMember,
+    ) -> MultiXactId;
+    pub fn ReadNextMultiXactId() -> MultiXactId;
+    pub fn ReadMultiXactIdRange(oldest: *mut MultiXactId, next: *mut MultiXactId);
+    pub fn MultiXactIdIsRunning(multi: MultiXactId, isLockOnly: bool) -> bool;
+    pub fn MultiXactIdSetOldestMember();
+    pub fn GetMultiXactIdMembers(
+        multi: MultiXactId,
+        xids: *mut *mut MultiXactMember,
+        allow_old: bool,
+        isLockOnly: bool,
+    ) -> ::std::os::raw::c_int;
+    pub fn MultiXactIdPrecedes(multi1: MultiXactId, multi2: MultiXactId) -> bool;
+    pub fn MultiXactIdPrecedesOrEquals(multi1: MultiXactId, multi2: MultiXactId) -> bool;
+    pub fn multixactoffsetssyncfiletag(
+        ftag: *const FileTag,
+        path: *mut ::std::os::raw::c_char,
+    ) -> ::std::os::raw::c_int;
+    pub fn multixactmemberssyncfiletag(
+        ftag: *const FileTag,
+        path: *mut ::std::os::raw::c_char,
+    ) -> ::std::os::raw::c_int;
+    pub fn AtEOXact_MultiXact();
+    pub fn AtPrepare_MultiXact();
+    pub fn PostPrepare_MultiXact(xid: TransactionId);
+    pub fn MultiXactShmemSize() -> Size;
+    pub fn MultiXactShmemInit();
+    pub fn BootStrapMultiXact();
+    pub fn StartupMultiXact();
+    pub fn TrimMultiXact();
+    pub fn SetMultiXactIdLimit(
+        oldest_datminmxid: MultiXactId,
+        oldest_datoid: Oid,
+        is_startup: bool,
+    );
+    pub fn MultiXactGetCheckptMulti(
+        is_shutdown: bool,
+        nextMulti: *mut MultiXactId,
+        nextMultiOffset: *mut MultiXactOffset,
+        oldestMulti: *mut MultiXactId,
+        oldestMultiDB: *mut Oid,
+    );
+    pub fn CheckPointMultiXact();
+    pub fn GetOldestMultiXactId() -> MultiXactId;
+    pub fn TruncateMultiXact(oldestMulti: MultiXactId, oldestMultiDB: Oid);
+    pub fn MultiXactSetNextMXact(nextMulti: MultiXactId, nextMultiOffset: MultiXactOffset);
+    pub fn MultiXactAdvanceNextMXact(minMulti: MultiXactId, minMultiOffset: MultiXactOffset);
+    pub fn MultiXactAdvanceOldest(oldestMulti: MultiXactId, oldestMultiDB: Oid);
+    pub fn MultiXactMemberFreezeThreshold() -> ::std::os::raw::c_int;
+    pub fn multixact_twophase_recover(
+        xid: TransactionId,
+        info: uint16,
+        recdata: *mut ::std::os::raw::c_void,
+        len: uint32,
+    );
+    pub fn multixact_twophase_postcommit(
+        xid: TransactionId,
+        info: uint16,
+        recdata: *mut ::std::os::raw::c_void,
+        len: uint32,
+    );
+    pub fn multixact_twophase_postabort(
+        xid: TransactionId,
+        info: uint16,
+        recdata: *mut ::std::os::raw::c_void,
+        len: uint32,
+    );
+    pub fn multixact_redo(record: *mut XLogReaderState);
+    pub fn multixact_desc(buf: StringInfo, record: *mut XLogReaderState);
+    pub fn multixact_identify(info: uint8) -> *const ::std::os::raw::c_char;
+    pub fn mxid_to_string(
+        multi: MultiXactId,
+        nmembers: ::std::os::raw::c_int,
+        members: *mut MultiXactMember,
+    ) -> *mut ::std::os::raw::c_char;
     pub fn LWLockAcquire(lock: *mut LWLock, mode: LWLockMode) -> bool;
     pub fn LWLockConditionalAcquire(lock: *mut LWLock, mode: LWLockMode) -> bool;
     pub fn LWLockAcquireOrWait(lock: *mut LWLock, mode: LWLockMode) -> bool;
@@ -35079,16 +35276,6 @@ extern "C" {
     pub fn BackgroundWorkerInitializeConnectionByOid(dboid: Oid, useroid: Oid, flags: uint32);
     pub fn BackgroundWorkerBlockSignals();
     pub fn BackgroundWorkerUnblockSignals();
-    pub fn InitSync();
-    pub fn SyncPreCheckpoint();
-    pub fn SyncPostCheckpoint();
-    pub fn ProcessSyncRequests();
-    pub fn RememberSyncRequest(ftag: *const FileTag, type_: SyncRequestType);
-    pub fn RegisterSyncRequest(
-        ftag: *const FileTag,
-        type_: SyncRequestType,
-        retryOnError: bool,
-    ) -> bool;
     pub fn TransactionIdSetTreeStatus(
         xid: TransactionId,
         nsubxids: ::std::os::raw::c_int,
@@ -35976,6 +36163,56 @@ extern "C" {
         tab: *const ::std::os::raw::c_uchar,
         noError: bool,
     ) -> ::std::os::raw::c_int;
+    pub fn pq_beginmessage(buf: StringInfo, msgtype: ::std::os::raw::c_char);
+    pub fn pq_beginmessage_reuse(buf: StringInfo, msgtype: ::std::os::raw::c_char);
+    pub fn pq_endmessage(buf: StringInfo);
+    pub fn pq_endmessage_reuse(buf: StringInfo);
+    pub fn pq_sendbytes(
+        buf: StringInfo,
+        data: *const ::std::os::raw::c_char,
+        datalen: ::std::os::raw::c_int,
+    );
+    pub fn pq_sendcountedtext(
+        buf: StringInfo,
+        str_: *const ::std::os::raw::c_char,
+        slen: ::std::os::raw::c_int,
+        countincludesself: bool,
+    );
+    pub fn pq_sendtext(
+        buf: StringInfo,
+        str_: *const ::std::os::raw::c_char,
+        slen: ::std::os::raw::c_int,
+    );
+    pub fn pq_sendstring(buf: StringInfo, str_: *const ::std::os::raw::c_char);
+    pub fn pq_send_ascii_string(buf: StringInfo, str_: *const ::std::os::raw::c_char);
+    pub fn pq_sendfloat4(buf: StringInfo, f: float4);
+    pub fn pq_sendfloat8(buf: StringInfo, f: float8);
+    pub fn pq_begintypsend(buf: StringInfo);
+    pub fn pq_endtypsend(buf: StringInfo) -> *mut bytea;
+    pub fn pq_puttextmessage(msgtype: ::std::os::raw::c_char, str_: *const ::std::os::raw::c_char);
+    pub fn pq_putemptymessage(msgtype: ::std::os::raw::c_char);
+    pub fn pq_getmsgbyte(msg: StringInfo) -> ::std::os::raw::c_int;
+    pub fn pq_getmsgint(msg: StringInfo, b: ::std::os::raw::c_int) -> ::std::os::raw::c_uint;
+    pub fn pq_getmsgint64(msg: StringInfo) -> int64;
+    pub fn pq_getmsgfloat4(msg: StringInfo) -> float4;
+    pub fn pq_getmsgfloat8(msg: StringInfo) -> float8;
+    pub fn pq_getmsgbytes(
+        msg: StringInfo,
+        datalen: ::std::os::raw::c_int,
+    ) -> *const ::std::os::raw::c_char;
+    pub fn pq_copymsgbytes(
+        msg: StringInfo,
+        buf: *mut ::std::os::raw::c_char,
+        datalen: ::std::os::raw::c_int,
+    );
+    pub fn pq_getmsgtext(
+        msg: StringInfo,
+        rawbytes: ::std::os::raw::c_int,
+        nbytes: *mut ::std::os::raw::c_int,
+    ) -> *mut ::std::os::raw::c_char;
+    pub fn pq_getmsgstring(msg: StringInfo) -> *const ::std::os::raw::c_char;
+    pub fn pq_getmsgrawstring(msg: StringInfo) -> *const ::std::os::raw::c_char;
+    pub fn pq_getmsgend(msg: StringInfo);
     pub fn RegisterExtensibleNodeMethods(method: *const ExtensibleNodeMethods);
     pub fn GetExtensibleNodeMethods(
         name: *const ::std::os::raw::c_char,
@@ -42789,6 +43026,68 @@ extern "C" {
     pub fn get_index_isreplident(index_oid: Oid) -> bool;
     pub fn get_index_isvalid(index_oid: Oid) -> bool;
     pub fn get_index_isclustered(index_oid: Oid) -> bool;
+    pub fn format_procedure_extended(
+        procedure_oid: Oid,
+        flags: bits16,
+    ) -> *mut ::std::os::raw::c_char;
+    pub fn format_operator_extended(
+        operator_oid: Oid,
+        flags: bits16,
+    ) -> *mut ::std::os::raw::c_char;
+    pub fn stringToQualifiedNameList(string: *const ::std::os::raw::c_char) -> *mut List;
+    pub fn format_procedure(procedure_oid: Oid) -> *mut ::std::os::raw::c_char;
+    pub fn format_procedure_qualified(procedure_oid: Oid) -> *mut ::std::os::raw::c_char;
+    pub fn format_procedure_parts(
+        operator_oid: Oid,
+        objnames: *mut *mut List,
+        objargs: *mut *mut List,
+        missing_ok: bool,
+    );
+    pub fn format_operator(operator_oid: Oid) -> *mut ::std::os::raw::c_char;
+    pub fn format_operator_qualified(operator_oid: Oid) -> *mut ::std::os::raw::c_char;
+    pub fn format_operator_parts(
+        operator_oid: Oid,
+        objnames: *mut *mut List,
+        objargs: *mut *mut List,
+        missing_ok: bool,
+    );
+    pub fn pg_get_indexdef_string(indexrelid: Oid) -> *mut ::std::os::raw::c_char;
+    pub fn pg_get_indexdef_columns(indexrelid: Oid, pretty: bool) -> *mut ::std::os::raw::c_char;
+    pub fn pg_get_indexdef_columns_extended(
+        indexrelid: Oid,
+        flags: bits16,
+    ) -> *mut ::std::os::raw::c_char;
+    pub fn pg_get_querydef(query: *mut Query, pretty: bool) -> *mut ::std::os::raw::c_char;
+    pub fn pg_get_partkeydef_columns(relid: Oid, pretty: bool) -> *mut ::std::os::raw::c_char;
+    pub fn pg_get_partconstrdef_string(
+        partitionId: Oid,
+        aliasname: *mut ::std::os::raw::c_char,
+    ) -> *mut ::std::os::raw::c_char;
+    pub fn pg_get_constraintdef_command(constraintId: Oid) -> *mut ::std::os::raw::c_char;
+    pub fn deparse_expression(
+        expr: *mut Node,
+        dpcontext: *mut List,
+        forceprefix: bool,
+        showimplicit: bool,
+    ) -> *mut ::std::os::raw::c_char;
+    pub fn deparse_context_for(aliasname: *const ::std::os::raw::c_char, relid: Oid) -> *mut List;
+    pub fn deparse_context_for_plan_tree(
+        pstmt: *mut PlannedStmt,
+        rtable_names: *mut List,
+    ) -> *mut List;
+    pub fn set_deparse_context_plan(
+        dpcontext: *mut List,
+        plan: *mut Plan,
+        ancestors: *mut List,
+    ) -> *mut List;
+    pub fn select_rtable_names_for_explain(
+        rtable: *mut List,
+        rels_used: *mut Bitmapset,
+    ) -> *mut List;
+    pub fn generate_collation_name(collid: Oid) -> *mut ::std::os::raw::c_char;
+    pub fn generate_opclass_name(opclass: Oid) -> *mut ::std::os::raw::c_char;
+    pub fn get_range_partbound_string(bound_datums: *mut List) -> *mut ::std::os::raw::c_char;
+    pub fn pg_get_statisticsobjdef_string(statextid: Oid) -> *mut ::std::os::raw::c_char;
     pub fn pg_prng_seed(state: *mut pg_prng_state, seed: uint64);
     pub fn pg_prng_fseed(state: *mut pg_prng_state, fseed: f64);
     pub fn pg_prng_seed_check(state: *mut pg_prng_state) -> bool;
