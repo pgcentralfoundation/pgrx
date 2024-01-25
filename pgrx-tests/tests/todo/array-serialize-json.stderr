@@ -15,7 +15,7 @@ error[E0521]: borrowed data escapes outside of function
    = note: the struct `pgrx::Array<'mcx, T>` is invariant over the parameter `T`
    = help: see <https://doc.rust-lang.org/nomicon/subtyping.html> for more information about variance
 note: due to current limitations in the borrow checker, this implies a `'static` lifetime
-  --> $CARGO/serde_json-1.0.108/src/value/mod.rs
+  --> $CARGO/serde_json-1.0.111/src/value/mod.rs
    |
    |     T: Serialize,
    |        ^^^^^^^^^
