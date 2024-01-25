@@ -18,8 +18,8 @@ mod pgrx_pg_sys_stub;
 pub(crate) mod env;
 pub(crate) mod profile;
 
-use atty::Stream;
 use clap::Parser;
+use std::io::{self, IsTerminal};
 use tracing_error::ErrorLayer;
 use tracing_subscriber::layer::SubscriberExt;
 use tracing_subscriber::util::SubscriberInitExt;
@@ -61,9 +61,10 @@ impl CommandExecute for CargoSubcommands {
 }
 
 fn main() -> color_eyre::Result<()> {
+    let stderr_is_tty = io::stderr().is_terminal();
     env::initialize();
     color_eyre::config::HookBuilder::default()
-        .theme(if !atty::is(Stream::Stderr) {
+        .theme(if stderr_is_tty {
             color_eyre::config::Theme::new()
         } else {
             color_eyre::config::Theme::default()
@@ -74,7 +75,7 @@ fn main() -> color_eyre::Result<()> {
 
     // Initialize tracing with tracing-error, and eyre
     let fmt_layer = tracing_subscriber::fmt::Layer::new()
-        .with_ansi(atty::is(Stream::Stderr))
+        .with_ansi(stderr_is_tty)
         .with_writer(std::io::stderr)
         .pretty();
 
