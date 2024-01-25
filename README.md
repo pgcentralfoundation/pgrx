@@ -66,6 +66,10 @@
 
 ## System Requirements
 
+PGRX has been tested to work on x86_64⹋ and aarch64⹋ Linux and aarch64 macOS targets.
+It is currently expected to work on other "Unix" OS with possible small changes, but
+those remain untested. So far, some of PGRX's build tooling works on Windows, but not all.
+
 - A Rust toolchain: `rustc`, `cargo`, and `rustfmt`. The recommended way to get these is from https://rustup.rs †
 - `git`
 - `libclang` 5.0 or greater (required by bindgen)
@@ -80,9 +84,19 @@
 
  ‡ A local PostgreSQL server installation is not required. `cargo pgrx` can download and compile PostgreSQL versions on its own.
 
+ ⹋ PGRX has not been tested to work on 32-bit: the library assumes an 8-byte `pg_sys::Datum`
+which may result in unexpected behavior on 32-bit, like dropping 4 bytes of data from `int8`
+and `double`. This may not be "unsound" in itself, as it is "merely" illogical,
+but it may undermine otherwise-reasonable safety assumptions of PGRX extensions.
+We do not plan to add support without considerable ongoing technical and financial contributions.
+
 <details>
    <summary>How to: GCC 7 on CentOS 7</summary>
-   
+
+It is not recommended to use CentOS 7 for PGRX development, even if it works.
+
+Recommended Linux distributions include recent Debian, Fedora, and Ubuntu.
+
 In order to use GCC 7, install [`scl`](https://wiki.centos.org/AdditionalResources/Repositories/SCL) and enter the GCC 7 development environment:
 
 ```bash
@@ -95,14 +109,25 @@ scl enable devtoolset-7 bash
 ## Getting Started
 
 
-First install the `cargo-pgrx` sub-command and initialize the development environment:
+First install the `cargo-pgrx` sub-command.
 
 ```bash
 cargo install --locked cargo-pgrx
+```
+
+**Important:** `cargo-pgrx` **must** be built using the same compiler as you'll use to build the rest of your project. Every time you update your Rust toolchain you have to also manually reinstall `cargo-pgrx`. See [Upgrading](#Upgrading), below.
+
+Once `cargo-pgrx` is ready you can initialize the "PGRX Home" directory:
+
+```bash
 cargo pgrx init
 ```
 
-The `init` command downloads currently supported PostgreSQL versions, compiles them to `~/.pgrx/`, and runs `initdb`. It's also possible to use an existing (user-writable) PostgreSQL install, or install a subset of versions, see the [`README.md` of `cargo-pgrx` for details](cargo-pgrx/README.md#first-time-initialization).
+The `init` command downloads all currently supported PostgreSQL versions, compiles them to `~/.pgrx/`, and runs `initdb`.
+
+It's also possible to use an existing (user-writable) PostgreSQL install, or install a subset of versions, see the [`README.md` of `cargo-pgrx` for details](cargo-pgrx/README.md#first-time-initialization).
+
+Now you can begin work on a specific pgrx extension:
 
 ```bash
 cargo pgrx new my_extension
@@ -161,7 +186,7 @@ As new Postgres versions are supported by `pgrx`, you can re-run the `pgrx init`
 cargo pgrx init
 ```
 
-### Mapping of Postgres types to Rust
+## Mapping of Postgres types to Rust
 
 | Postgres Type              | Rust Type (as `Option<T>`)                              |
 |----------------------------|---------------------------------------------------------|

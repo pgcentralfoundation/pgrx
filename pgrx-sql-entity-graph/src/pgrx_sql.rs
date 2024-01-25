@@ -270,7 +270,8 @@ impl PgrxSql {
 
         #[cfg(feature = "syntax-highlighting")]
         {
-            if atty::is(atty::Stream::Stdout) {
+            use std::io::{stdout, IsTerminal};
+            if stdout().is_terminal() {
                 self.write_highlighted(out, &generated)?;
             } else {
                 write!(*out, "{}", generated)?;

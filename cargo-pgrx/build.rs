@@ -9,19 +9,23 @@
 //LICENSE Use of this source code is governed by the MIT license that can be found in the LICENSE file.
 fn main() {
     println!("cargo:rerun-if-changed=build.rs");
-    if let Some(minor_version) = rust_minor_version() {
-        println!("cargo:rustc-env=MINOR_RUST_VERSION={minor_version}");
+    if let Some(cargo_version) = cargo_version() {
+        println!("cargo:rustc-env=CARGO_VERSION_DURING_BUILD={cargo_version}");
     }
 }
 
-fn rust_minor_version() -> Option<u32> {
-    let rustc = std::env::var_os("RUSTC").unwrap_or_else(|| "rustc".into());
-    let output = std::process::Command::new(rustc).arg("--version").output().ok()?;
-    let version = std::str::from_utf8(&output.stdout).ok()?;
-    let mut iter = version.split('.');
-    if iter.next() != Some("rustc 1") {
-        None
-    } else {
-        iter.next()?.parse().ok()
-    }
+/// Gets the current `cargo` version.
+///
+/// Used to check our toolchain version. `cargo` sets the `CARGO` env var both
+/// when running the build script and when running `cargo-pgrx`, so it's easier
+/// to check `cargo` than to check itself `rustc` itself. Also `cargo` will
+/// always have the same version as the `rustc` it goes with, so checking the
+/// `cargo` version is sufficient.
+///
+/// [Reference: Environment variables Cargo sets for build
+/// scripts](https://doc.rust-lang.org/cargo/reference/environment-variables.html#environment-variables-cargo-sets-for-build-scripts)
+fn cargo_version() -> Option<String> {
+    let cargo = std::env::var_os("CARGO").expect("`CARGO` env var wasn't set!");
+    let output = std::process::Command::new(cargo).arg("--version").output().ok()?;
+    std::str::from_utf8(&output.stdout).map(|s| s.trim().to_string()).ok()
 }

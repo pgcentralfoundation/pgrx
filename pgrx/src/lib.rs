@@ -214,8 +214,6 @@ macro_rules! pg_magic_func {
     () => {
         #[no_mangle]
         #[allow(non_snake_case)]
-        #[allow(unused)]
-        #[link_name = "Pg_magic_func"]
         #[doc(hidden)]
         pub extern "C" fn Pg_magic_func() -> &'static pgrx::pg_sys::Pg_magic_struct {
             use core::mem::size_of;

@@ -18,6 +18,6 @@ description = "Standalone tool to update PGRX Cargo.toml versions and dependenci
 
 [dependencies]
 clap = { version = "4.4.2", features = [ "env", "derive" ] }
-owo-colors = "3.5.0"
+owo-colors = "3.5"
 toml_edit = { version = "0.20.2" }
 walkdir = "2"
