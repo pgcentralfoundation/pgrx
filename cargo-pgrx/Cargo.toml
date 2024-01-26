@@ -27,13 +27,14 @@ edition = "2021"
 pgrx-pg-config.workspace = true
 pgrx-sql-entity-graph.workspace = true
 
+cargo_toml.workspace = true
 eyre.workspace = true
 owo-colors.workspace = true
+regex.workspace = true
 unescape.workspace = true
 url.workspace = true
 
 cargo_metadata = "0.17.0"
-cargo_toml = "0.16.3"
 clap = { version = "4.4.2", features = [ "env", "suggestions", "cargo", "derive", "wrap_help" ] }
 clap-cargo = { version = "0.11.0", features = [ "cargo_metadata" ] }
 semver = "1.0.20"
@@ -41,7 +42,6 @@ env_proxy = "0.4.1"
 prettyplease = "0.2.15"
 proc-macro2 = { version = "1.0.69", features = [ "span-locations" ] }
 quote = "1.0.33"
-regex = "1.10.0"
 ureq = { version = "2.8.0", default-features = false, features = [ "gzip" ] }
 serde = { version = "1.0", features = [ "derive" ] }
 serde_derive = "1.0"
