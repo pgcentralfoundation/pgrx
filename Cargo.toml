@@ -61,6 +61,7 @@ eyre = "0.6.9" # simplifies error-handling
 libc = "0.2" # FFI compat
 owo-colors = "3.5" # for output highlighting
 regex = "1.1" # used for build/test
+thiserror = "1"
 unescape = "0.1.0" # for escaped-character-handling
 url = "2.4.1" # the non-existent std::web
 walkdir = "2" # directory recursion
