@@ -58,7 +58,6 @@ thiserror.workspace = true
 owo-colors.workspace = true
 
 clap-cargo = "0.11.0"
-once_cell = "1.18.0"
 postgres = "0.19.7"
 proptest = { version = "1", optional = true }
 serde = "1.0"
