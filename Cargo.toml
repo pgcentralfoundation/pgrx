@@ -59,7 +59,9 @@ pgrx-pg-config= { path = "./pgrx-pg-config/", version = "=0.12.0-alpha.0" }
 eyre = "0.6.9"
 libc = "0.2"
 owo-colors = "3.5" # for output highlighting
+unescape = "0.1.0" # for escaped-character-handling
 url = "2.4.1" # the non-existent std::web
+walkdir = "2" # directory recursion
 
 [profile.dev]
 # Only include line tables in debuginfo. This reduces the size of target/ (after
