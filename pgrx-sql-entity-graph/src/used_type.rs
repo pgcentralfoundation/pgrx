@@ -342,9 +342,8 @@ impl UsedType {
                 /// Set via the type being an `Option`.
                 optional: #optional,
                 metadata: {
-                    use ::pgrx::pgrx_sql_entity_graph::metadata::PhantomDataExt;
-                    let marker: core::marker::PhantomData<#resolved_ty> = core::marker::PhantomData;
-                    marker.entity()
+                    use ::pgrx::pgrx_sql_entity_graph::metadata::SqlTranslatable;
+                    <#resolved_ty>::entity()
                 },
             }
         }

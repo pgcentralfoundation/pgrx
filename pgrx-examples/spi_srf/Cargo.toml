@@ -16,7 +16,7 @@ publish = false
 rust-version = "1.58"
 
 [lib]
-crate-type = ["cdylib"]
+crate-type = ["cdylib", "lib"]
 
 [features]
 default = ["pg13"]

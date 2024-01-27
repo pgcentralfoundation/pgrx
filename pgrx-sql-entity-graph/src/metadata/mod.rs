@@ -19,12 +19,10 @@ to the `pgrx` framework and very subject to change between versions. While you m
 
 mod entity;
 mod function_metadata;
-mod phantomdata_ext;
 mod return_variant;
 mod sql_translatable;
 
 pub use entity::{FunctionMetadataEntity, FunctionMetadataTypeEntity};
 pub use function_metadata::FunctionMetadata;
-pub use phantomdata_ext::PhantomDataExt;
 pub use return_variant::{Returns, ReturnsError};
 pub use sql_translatable::{ArgumentError, SqlMapping, SqlTranslatable};
