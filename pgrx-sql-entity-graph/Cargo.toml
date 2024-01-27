@@ -25,14 +25,15 @@ syntax-highlighting = ["dep:syntect", "dep:owo-colors"]
 no-schema-generation = []
 
 [dependencies]
+eyre.workspace = true
+unescape.workspace = true
+
 convert_case = "0.6.0"
-eyre = "0.6.8"
 petgraph = "0.6.4"
 proc-macro2 = { version = "1.0.69", features = [ "span-locations" ] }
 quote = "1.0.33"
 syn = { version = "1.0.109", features = [ "extra-traits", "full", "fold", "parsing" ] }
-unescape = "0.1.0"
 
 # colorized sql output
-owo-colors = { version = "3.5", optional = true }
+owo-colors = { optional = true, workspace = true }
 syntect = { version = "5.1.0", default-features = false, features = ["default-fancy"], optional = true }

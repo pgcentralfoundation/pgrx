@@ -43,9 +43,11 @@ no-default-features = true
 rustc-args = ["--cfg", "docsrs"]
 
 [dependencies]
-pgrx-macros = { path = "../pgrx-macros", version = "=0.12.0-alpha.0" }
-pgrx-pg-sys = { path = "../pgrx-pg-sys", version = "=0.12.0-alpha.0" }
-pgrx-sql-entity-graph = { path = "../pgrx-sql-entity-graph", version = "=0.12.0-alpha.0" }
+pgrx-macros.workspace = true
+pgrx-pg-sys.workspace = true
+pgrx-sql-entity-graph.workspace = true
+
+thiserror.workspace = true # error handling and logging
 
 # used to internally impl things
 once_cell = "1.18.0" # polyfill until std::lazy::OnceCell stabilizes
@@ -53,15 +55,12 @@ seq-macro = "0.3" # impls loops in macros
 uuid = { version = "1.4.1", features = [ "v4" ] } # PgLwLock and shmem
 enum-map = "2.6.3"
 
-# error handling and logging
-thiserror = "1.0"
-
 # exposed in public API
 atomic-traits = "0.3.0" # PgAtomic and shmem init
 bitflags = "2.4.0" # BackgroundWorker
 bitvec = "1.0" # processing array nullbitmaps
 heapless = "0.8" # shmem and PgLwLock
-libc = "0.2.149" # FFI type compat
+libc.workspace = true # FFI type compat
 seahash = "4.1.0" # derive(PostgresHash)
 serde = { version = "1.0", features = [ "derive" ] } # impls on pub types
 serde_cbor = "0.11.2" # derive(PostgresType)

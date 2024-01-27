@@ -44,27 +44,29 @@ rustc-args = ["--cfg", "docsrs"]
 rustdoc-args = ["--cfg", "docsrs"]
 
 [dependencies]
+pgrx-macros.workspace = true
+pgrx-pg-config.workspace = true
+
+eyre.workspace = true
+libc.workspace = true
+regex.workspace = true
+thiserror.workspace = true
+owo-colors.workspace = true
+
 clap-cargo = "0.11.0"
-owo-colors = "3.5"
 once_cell = "1.18.0"
-libc = "0.2.149"
-pgrx-macros = { path = "../pgrx-macros", version = "=0.12.0-alpha.0" }
-pgrx-pg-config = { path = "../pgrx-pg-config", version = "=0.12.0-alpha.0" }
 postgres = "0.19.7"
 proptest = { version = "1", optional = true }
-regex = "1.10.0"
 serde = "1.0"
 serde_json = "1.0"
 sysinfo = "0.29.10"
-eyre = "0.6.8"
-thiserror = "1.0"
 rand = "0.8.5"
 
-[dev-dependencies]
-eyre = "0.6.8"  # testing functions that return `eyre::Result`
-trybuild = "1"
-
-[dependencies.pgrx]
+[dependencies.pgrx] # Not unified in workspace due to default-features key
 path = "../pgrx"
 default-features = false
 version = "=0.12.0-alpha.0"
+
+[dev-dependencies]
+eyre.workspace = true # testing functions that return `eyre::Result`
+trybuild = "1"
