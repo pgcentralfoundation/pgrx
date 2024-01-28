@@ -63,13 +63,7 @@ impl CommandExecute for CargoSubcommands {
 fn main() -> color_eyre::Result<()> {
     let stderr_is_tty = io::stderr().is_terminal();
     env::initialize();
-    color_eyre::config::HookBuilder::default()
-        .theme(if stderr_is_tty {
-            color_eyre::config::Theme::new()
-        } else {
-            color_eyre::config::Theme::default()
-        })
-        .install()?;
+    color_eyre::config::HookBuilder::default().theme(color_eyre::config::Theme::new()).install()?;
 
     let cargo_cli = CargoCommand::parse();
 
