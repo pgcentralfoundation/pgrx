@@ -633,7 +633,7 @@ impl Pgrx {
     pub fn home() -> Result<PathBuf, PgrxHomeError> {
         let pgrx_home = std::env::var("PGRX_HOME").map_or_else(
             |_| {
-                let mut pgrx_home = match dirs::home_dir() {
+                let mut pgrx_home = match home::home_dir() {
                     Some(home) => home,
                     None => return Err(PgrxHomeError::NoHomeDirectory),
                 };
