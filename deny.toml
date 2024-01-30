@@ -55,7 +55,8 @@ ignore = [
 # The lint level for crates which do not have a detectable license
 unlicensed = "deny"
 # See https://spdx.org/licenses/ for list of possible licenses
-# [possible values: any SPDX 3.11 short identifier (+ optional exception)].
+# This allowlist is a superset of pgrx's allowlist, including the build tools like cargo-pgrx, etc.
+# We are not as concerned about licenses that affect linked code here: most tools aren't shipped.
 allow = [
     "0BSD",
     "Apache-2.0",
@@ -64,15 +65,12 @@ allow = [
     "BSL-1.0",
     "ISC",
     "MIT",
+    "MPL-2.0",
     "Unicode-DFS-2016",
     "Unlicense",
     "Zlib",
-    "MPL-2.0"
 ]
-# [possible values: any SPDX 3.11 short identifier (+ optional exception)].
-deny = [
-    #"Nokia",
-]
+deny = []
 copyleft = "deny" # https://github.com/EmbarkStudios/cargo-deny/issues/354
 default = "deny"
 # The confidence threshold for detecting a license from license text.

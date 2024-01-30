@@ -52,7 +52,7 @@ ignore = [
 # The lint level for crates which do not have a detectable license
 unlicensed = "deny"
 # See https://spdx.org/licenses/ for list of possible licenses
-# [possible values: any SPDX 3.11 short identifier (+ optional exception)].
+# Be more cautious about adding licenses to the library itself, as they can affect all extensions.
 allow = [
     "Apache-2.0",
     "BSD-3-Clause",
@@ -63,10 +63,7 @@ allow = [
     "Unlicense",
     "Zlib",
 ]
-# [possible values: any SPDX 3.11 short identifier (+ optional exception)].
-deny = [
-    #"Nokia",
-]
+deny = []
 copyleft = "deny" # https://github.com/EmbarkStudios/cargo-deny/issues/354
 default = "deny"
 # The confidence threshold for detecting a license from license text.
