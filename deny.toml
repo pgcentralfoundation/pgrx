@@ -64,7 +64,7 @@ allow = [
     "BSL-1.0",
     "ISC",
     "MIT",
-    # "Unicode-DFS-2016",
+    "Unicode-DFS-2016",
     "Unlicense",
     "Zlib",
     "MPL-2.0"
@@ -78,7 +78,7 @@ default = "deny"
 # The confidence threshold for detecting a license from license text.
 # The higher the value, the more closely the license text must be to the
 # canonical license text of a valid SPDX license file.
-confidence-threshold = 0.997 # it isn't six sigma but it'll do
+confidence-threshold = 0.99999 # we got five nines!
 # Allow 1 or more licenses on a per-crate basis.
 exceptions = [
     { allow = ["LicenseRef-Ring"], name = "ring", version = "*" },
