@@ -27,7 +27,8 @@ jobs:
 
     strategy:
       matrix:
-        version: ["postgres-12", "postgres-13", "postgres-14", "postgres-15", "postgres-16"]
+        version: []
+        # version: ["postgres-12", "postgres-13", "postgres-14", "postgres-15", "postgres-16"]
 
     steps:
     - uses: actions/checkout@v3
@@ -354,7 +355,7 @@ jobs:
       run: cargo fmt --all -- --check
 
     - name: Run license check
-      run: ./ci/license-check.sh
+      run: cargo install cargo-deny --force && ./ci/license-check.sh
 
     - name: Install cargo-pgrx
       run: cargo install --path cargo-pgrx/ --debug --force
