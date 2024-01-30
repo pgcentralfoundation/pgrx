@@ -42,10 +42,8 @@ ignore = [
 # Note that CVSS values only measure severity, not risk.
 #severity-threshold =
 
-# If this is true, then cargo deny will use the git executable to fetch advisory database.
+# If this is true, then cargo deny will use the git executable to fetch the advisory database.
 # If this is false, then it uses a built-in git library.
-# Setting this to true can be helpful if you have special authentication requirements that cargo-deny does not support.
-# See Git Authentication for more information about setting up git authentication.
 #git-fetch-with-cli = true
 
 
