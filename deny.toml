@@ -61,7 +61,7 @@ allow = [
     "BSL-1.0",
     "ISC",
     "MIT",
-    "Unicode-DFS-2016",
+    # "Unicode-DFS-2016",
     "Unlicense",
     "Zlib",
     "MPL-2.0"
