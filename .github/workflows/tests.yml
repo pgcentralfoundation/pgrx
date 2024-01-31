@@ -353,6 +353,9 @@ jobs:
     - name: Run rustfmt
       run: cargo fmt --all -- --check
 
+    - name: Run license check
+      run: cargo install cargo-deny --force && ./ci/license-check.sh
+
     - name: Install cargo-pgrx
       run: cargo install --path cargo-pgrx/ --debug --force
 

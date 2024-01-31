@@ -109,7 +109,7 @@ checksum = "080e9890a082662b09c1ad45f567faeeb47f22b5fb23895fbe1e651e718e25ca"
 
 [[package]]
 name = "arrays"
-version = "0.1.0"
+version = "0.0.0"
 dependencies = [
  "pgrx",
  "pgrx-tests",
@@ -277,7 +277,7 @@ checksum = "7f30e7476521f6f8af1a1c4c0b8cc94f0bee37d91763d0ca2665f299b6cd8aec"
 
 [[package]]
 name = "bytea"
-version = "0.1.0"
+version = "0.0.0"
 dependencies = [
  "libflate",
  "pgrx",
@@ -625,7 +625,7 @@ dependencies = [
 
 [[package]]
 name = "custom_libname"
-version = "0.1.0"
+version = "0.0.0"
 dependencies = [
  "pgrx",
  "pgrx-tests",
@@ -642,7 +642,7 @@ dependencies = [
 
 [[package]]
 name = "custom_types"
-version = "0.1.0"
+version = "0.0.0"
 dependencies = [
  "maplit",
  "pgrx",
@@ -658,7 +658,7 @@ checksum = "7762d17f1241643615821a8455a0b2c3e803784b058693d990b11f2dce25a0ca"
 
 [[package]]
 name = "datetime"
-version = "0.1.0"
+version = "0.0.0"
 dependencies = [
  "pgrx",
  "pgrx-tests",
@@ -756,7 +756,7 @@ dependencies = [
 
 [[package]]
 name = "errors"
-version = "0.1.0"
+version = "0.0.0"
 dependencies = [
  "pgrx",
  "pgrx-tests",
@@ -1379,7 +1379,7 @@ dependencies = [
 
 [[package]]
 name = "operators"
-version = "0.1.0"
+version = "0.0.0"
 dependencies = [
  "pgrx",
  "pgrx-tests",
@@ -1586,7 +1586,7 @@ dependencies = [
 
 [[package]]
 name = "pgtrybuilder"
-version = "0.1.0"
+version = "0.0.0"
 dependencies = [
  "pgrx",
  "pgrx-tests",
@@ -1807,7 +1807,7 @@ dependencies = [
 
 [[package]]
 name = "range"
-version = "0.1.0"
+version = "0.0.0"
 dependencies = [
  "pgrx",
  "pgrx-tests",
@@ -2219,7 +2219,7 @@ checksum = "0fda2ff0d084019ba4d7c6f371c95d8fd75ce3524c3cb8fb653a3023f6323e64"
 
 [[package]]
 name = "shmem"
-version = "0.1.0"
+version = "0.0.0"
 dependencies = [
  "heapless",
  "pgrx",
@@ -2288,7 +2288,7 @@ checksum = "3b9b39299b249ad65f3b7e96443bad61c02ca5cd3589f46cb6d610a0fd6c0d6a"
 
 [[package]]
 name = "srf"
-version = "0.1.0"
+version = "0.0.0"
 dependencies = [
  "pgrx",
  "pgrx-tests",
@@ -2320,7 +2320,7 @@ dependencies = [
 
 [[package]]
 name = "strings"
-version = "0.1.0"
+version = "0.0.0"
 dependencies = [
  "pgrx",
  "pgrx-tests",
