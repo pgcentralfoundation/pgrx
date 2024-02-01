@@ -341,7 +341,7 @@ impl ToSql for PgExternEntity {
             }
         };
 
-        let ext_sql = format!(
+        let mut ext_sql = format!(
             "\n\
             -- {file}:{line}\n\
             -- {module_path}::{name}\n\
@@ -349,7 +349,7 @@ impl ToSql for PgExternEntity {
             {fn_sql}"
         );
 
-        let rendered = if let Some(op) = &self.operator {
+        if let Some(op) = &self.operator {
             let mut optionals = vec![];
             if let Some(it) = op.commutator {
                 optionals.push(format!("\tCOMMUTATOR = {}", it));
@@ -473,8 +473,9 @@ impl ToSql for PgExternEntity {
                                                     maybe_comma = if !optionals.is_empty() { "," } else { "" },
                                                     optionals = if !optionals.is_empty() { optionals.join(",\n") + "\n" } else { "".to_string() },
                                             );
-            ext_sql + &operator_sql
-        } else if let Some(cast) = &self.cast {
+            ext_sql += &operator_sql
+        };
+        if let Some(cast) = &self.cast {
             let target_arg = &self.metadata.retval;
             let target_fn_arg = &self.fn_return;
             let target_arg_graph_index = context
@@ -512,13 +513,15 @@ impl ToSql for PgExternEntity {
             };
             if self.metadata.arguments.len() != 1 {
                 return Err(eyre!(
-                    "PG cast function must have exactly one argument, got {}",
+                    "PG cast function ({}) must have exactly one argument, got {}",
+                    self.name,
                     self.metadata.arguments.len()
                 ));
             }
             if self.fn_args.len() != 1 {
                 return Err(eyre!(
-                    "PG cast function must have exactly one argument, got {}",
+                    "PG cast function ({}) must have exactly one argument, got {}",
+                    self.name,
                     self.fn_args.len()
                 ));
             }
@@ -586,10 +589,8 @@ impl ToSql for PgExternEntity {
                                                     target_name = target_arg.type_name,
                                                     function_name = self.name,
                                             );
-            ext_sql + &cast_sql
-        } else {
-            ext_sql
+            ext_sql += &cast_sql
         };
-        Ok(rendered)
+        Ok(ext_sql)
     }
 }
