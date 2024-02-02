@@ -195,7 +195,14 @@ PGRX currently only intentionally supports 64-bit machines,
 and while support for ILP32 or I64LP128 C data models may become possible,
 PGRX will **not** support 16-bit machines in any practical case, even though Rust does.
 
+# Detoasted
+
+This type currently only implements functionality for interacting with a [detoasted] array (i.e.
+that has been made contiguous and decompressed). This is a consequence of ArrayType having an
+aligned varlena header, which will cause undefined behavior if it is interacted with while packed.
+
 [nonnull]: NonNull
+[detoasted]: https://www.postgresql.org/docs/current/storage-toast.html
 */
 #[derive(Debug)]
 pub struct RawArray {
@@ -218,6 +225,7 @@ impl RawArray {
       or no data is actually read at all.
     * This is a unique, "owning pointer" for the varlena, so it won't be aliased while held,
       and it points to data in the Postgres ArrayType format.
+    * The underlying ArrayType has been detoasted and is not stored in a compressed form.
 
     It should be noted that despite all these requirements, RawArray has no lifetime,
     nor produces slices with such, so it can still be racy and unsafe!
