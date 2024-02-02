@@ -110,13 +110,18 @@ $ cargo pgrx init
 `cargo pgrx init` is required to be run once to properly configure the `pgrx` development environment.
 
 As shown by the screenshot above, it downloads the latest releases of supported Postgres versions,
-configures them, compiles them, and installs them to "${PGRX_HOME}", including all [`contrib`]
-extensions and tools included with Postgres. Other `pgrx` commands such as `run` and `test` will
-manage and use these Postgres installations on your behalf.
+configures them for debugging, compiles them with assertions, and installs them to "${PGRX_HOME}".
+These include all [`contrib`] extensions and tools included with Postgres.
+Other `cargo pgrx` commands such as `run` and `test` will manage and use these installations on
+your behalf.
 
 [`contrib`]: https://www.postgresql.org/docs/current/contrib.html
 
-`pgrx` is designed to support multiple Postgres versions in such a way that during development, you'll know if you're trying to use a Postgres API that isn't common across all versions. It's also designed to make testing your extension against these versions easy. This is why it requires you to have all fully compiled and installed versions of Postgres during development.
+`pgrx` is designed to support multiple Postgres versions in such a way that during development,
+you'll know if you're trying to use a Postgres API that isn't common across all versions.
+It is also designed to make testing your extension against these versions easy.
+This is why it enables debug symbols and the database assertions, and why it expects all versions
+of Postgres that your extension supports to be installed during development.
 
 In cases when default ports pgrx uses to run PostgreSQL within are not available, one can specify
 custom values for these during initialization using `--base-port` and `--base-testing-port`
@@ -124,15 +129,21 @@ options. One of the use cases for this is using multiple installations of pgrx (
 "$PGRX_HOME"s) when developing multiple extensions at the same time.
 These values can be later changed in "$PGRX_HOME/config.toml".
 
-If you want to use your operating system's package manager to install Postgres, `cargo pgrx init` has optional arguments that allow you to specify where they're installed (see below).
+If you want to use your operating system's package manager to install Postgres, `cargo pgrx init`
+has optional arguments that allow you to specify where they're installed (see below).
+Be aware, this may result in different behavior than a database compiled by cargo-pgrx, where
+tests that would have been failed by an internal Postgres assertion instead successfully pass.
+This can be problematic if you are using `pgrx-pg-sys` directly, as those assertions are often the
+only thing that will catch directly misusing the Postgres extension API!
 
-What you're telling `cargo pgrx init` is the full path to `pg_config` for each version.
+Each version is specified as `"--pg${VER}` and the full path to `pg_config` for that version.
+For any version you specify, `cargo pgrx init` will forego downloading/compiling/installing it.
+cargo-pgrx will then use that locally-installed version the same way it uses any version it
+compiles and installs itself.
 
-For any version you specify, `cargo pgrx init` will forego downloading/compiling/installing it. `pgrx` will then use that locally-installed version just as it uses any version it downloads/compiles/installs itself.
-
-However, if the "path to pg_config" is the literal string `download`, then `pgrx` will download and compile that version of Postgres for you.
-
-When the various `--pgXX` options are specified, these are the **only** versions of Postgres that `pgrx` will manage for you.
+However, if the "path to pg_config" is the literal string `download`, then cargo-pgrx will download
+and compile that version of Postgres for you. When any `"--pg${VER}"` option is specified,
+these are the **only** versions of Postgres that cargo-pgrx will manage for you.
 
 You'll also want to make sure you have the "postgresql-server-dev" package installed for each version you want to manage yourself. If you need to customize the configuration of the Postgres build, you can use `--configure-flag` to pass optins to the `configure` script. For example, you could use `--configure-flag=--with-ssl=openssl` to enable SSL support or `--configure-flag=--with-libraries=/path/to/libs` to use a non-standard location for dependency libraries. This flag can be used multiple times to pass multiple configuration options.
 
