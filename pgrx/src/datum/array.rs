@@ -189,6 +189,13 @@ impl<'mcx, T: UnboxDatum> Array<'mcx, T> {
     #[allow(clippy::option_option)]
     #[inline]
     pub fn get<'arr>(&'arr self, index: usize) -> Option<Option<T::As<'arr>>> {
+        // Technically this should be covered by the null_slice check, 
+        // but that assumes the null bitmap is well-formed (i.e. equal in
+        // length to the array), which might be worth double-checking in 
+        // debug builds. 
+        #[cfg(debug_assertions)]
+        if index >= self.raw.len() { return None };
+
         let Some(is_null) = self.null_slice.get(index) else { return None };
         if is_null {
             return Some(None);
@@ -231,7 +238,12 @@ impl<'mcx, T: UnboxDatum> Array<'mcx, T> {
     ) -> Option<T::As<'arr>> {
         match is_null {
             true => None,
-            false => unsafe { self.slide_impl.bring_it_back_now(self, ptr) },
+            false => {
+                // Ensure we are not attempting to dereference an element outside
+                // of the array. 
+                debug_assert!(self.is_within_bounds(ptr));
+                unsafe { self.slide_impl.bring_it_back_now(self, ptr) }
+            },
         }
     }
 
@@ -255,6 +267,15 @@ impl<'mcx, T: UnboxDatum> Array<'mcx, T> {
             debug_assert!(ptr.wrapping_add(offset) <= self.raw.end_ptr());
             ptr.add(offset)
         }
+    }
+
+    /// Returns true if the pointer provided is within the bounds of the array.
+    /// Primarily intended for use with debug_assert!()s.
+    /// Note that this will return false for the 1-past-end, which is a valid
+    /// position for a pointer to be in, but not valid to dereference.
+    #[inline]
+    pub(crate) fn is_within_bounds(&self, ptr: *const u8) -> bool {
+        (self.raw.data_ptr() <= ptr) && (ptr < self.raw.end_ptr())
     }
 }
 
