@@ -189,12 +189,14 @@ impl<'mcx, T: UnboxDatum> Array<'mcx, T> {
     #[allow(clippy::option_option)]
     #[inline]
     pub fn get<'arr>(&'arr self, index: usize) -> Option<Option<T::As<'arr>>> {
-        // Technically this should be covered by the null_slice check, 
+        // Technically this should be covered by the null_slice check,
         // but that assumes the null bitmap is well-formed (i.e. equal in
-        // length to the array), which might be worth double-checking in 
-        // debug builds. 
+        // length to the array), which might be worth double-checking in
+        // debug builds.
         #[cfg(debug_assertions)]
-        if index >= self.raw.len() { return None };
+        if index >= self.raw.len() {
+            return None;
+        };
 
         let Some(is_null) = self.null_slice.get(index) else { return None };
         if is_null {
@@ -244,14 +246,12 @@ impl<'mcx, T: UnboxDatum> Array<'mcx, T> {
                 debug_assert!(self.is_within_bounds(ptr));
                 // Prevent a datum that begins inside the array but would end
                 // outside the array from being dereferenced.
-                debug_assert!(
-                    self.is_within_bounds_inclusive(
-                        ptr.wrapping_add(unsafe { self.slide_impl.hop_size(ptr) })
-                    )
-                );
+                debug_assert!(self.is_within_bounds_inclusive(
+                    ptr.wrapping_add(unsafe { self.slide_impl.hop_size(ptr) })
+                ));
 
                 unsafe { self.slide_impl.bring_it_back_now(self, ptr) }
-            },
+            }
         }
     }
 
