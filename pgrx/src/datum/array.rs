@@ -239,9 +239,17 @@ impl<'mcx, T: UnboxDatum> Array<'mcx, T> {
         match is_null {
             true => None,
             false => {
-                // Ensure we are not attempting to dereference an element outside
-                // of the array. 
+                // Ensure we are not attempting to dereference a pointer
+                // outside of the array.
                 debug_assert!(self.is_within_bounds(ptr));
+                // Prevent a datum that begins inside the array but would end
+                // outside the array from being dereferenced.
+                debug_assert!(
+                    self.is_within_bounds_inclusive(
+                        ptr.wrapping_add(unsafe { self.slide_impl.hop_size(ptr) })
+                    )
+                );
+
                 unsafe { self.slide_impl.bring_it_back_now(self, ptr) }
             },
         }
@@ -271,11 +279,17 @@ impl<'mcx, T: UnboxDatum> Array<'mcx, T> {
 
     /// Returns true if the pointer provided is within the bounds of the array.
     /// Primarily intended for use with debug_assert!()s.
-    /// Note that this will return false for the 1-past-end, which is a valid
+    /// Note that this will return false for the 1-past-end, which is a useful
     /// position for a pointer to be in, but not valid to dereference.
     #[inline]
     pub(crate) fn is_within_bounds(&self, ptr: *const u8) -> bool {
         (self.raw.data_ptr() <= ptr) && (ptr < self.raw.end_ptr())
+    }
+    /// Similar to [is_within_bounds()], but also returns true for the
+    /// 1-past-end position.
+    #[inline]
+    pub(crate) fn is_within_bounds_inclusive(&self, ptr: *const u8) -> bool {
+        (self.raw.data_ptr() <= ptr) && (ptr <= self.raw.end_ptr())
     }
 }
 
@@ -739,6 +753,7 @@ where
         let Self { array, curr, ptr } = self;
         let Some(is_null) = array.null_slice.get(*curr) else { return None };
         *curr += 1;
+        debug_assert!(array.is_within_bounds(*ptr));
         let element = unsafe { array.bring_it_back_now(*ptr, is_null) };
         if !is_null {
             // SAFETY: This has to not move for nulls, as they occupy 0 data bytes,
