@@ -136,9 +136,14 @@ tests that would have been failed by an internal Postgres assertion instead succ
 This can be problematic if you are using `pgrx-pg-sys` directly, as those assertions are often the
 only thing that will catch directly misusing the Postgres extension API!
 
-However, if the "path to pg_config" is the literal string `download`, then `pgrx` will download and compile that version of Postgres for you.
+Each version is specified as `"--pg${VER}` and the full path to `pg_config` for that version.
+For any version you specify, `cargo pgrx init` will forego downloading/compiling/installing it.
+cargo-pgrx will then use that locally-installed version the same way it uses any version it
+compiles and installs itself.
 
-When the various `--pgXX` options are specified, these are the **only** versions of Postgres that `pgrx` will manage for you.
+However, if the "path to pg_config" is the literal string `download`, then cargo-pgrx will download
+and compile that version of Postgres for you. When any `"--pg${VER}"` option is specified,
+these are the **only** versions of Postgres that cargo-pgrx will manage for you.
 
 You'll also want to make sure you have the "postgresql-server-dev" package installed for each version you want to manage yourself. If you need to customize the configuration of the Postgres build, you can use `--configure-flag` to pass optins to the `configure` script. For example, you could use `--configure-flag=--with-ssl=openssl` to enable SSL support or `--configure-flag=--with-libraries=/path/to/libs` to use a non-standard location for dependency libraries. This flag can be used multiple times to pass multiple configuration options.
 
