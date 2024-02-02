@@ -16,10 +16,12 @@ to the `pgrx` framework and very subject to change between versions. While you m
 
 */
 mod argument;
+mod cast;
 mod operator;
 mod returning;
 
 pub use argument::PgExternArgumentEntity;
+pub use cast::PgCastEntity;
 pub use operator::PgOperatorEntity;
 pub use returning::{PgExternReturnEntity, PgExternReturnEntityIteratedItem};
 
@@ -49,6 +51,7 @@ pub struct PgExternEntity {
     pub extern_attrs: Vec<ExternArgs>,
     pub search_path: Option<Vec<&'static str>>,
     pub operator: Option<PgOperatorEntity>,
+    pub cast: Option<PgCastEntity>,
     pub to_sql_config: ToSqlConfigEntity,
 }
 
@@ -338,7 +341,7 @@ impl ToSql for PgExternEntity {
             }
         };
 
-        let ext_sql = format!(
+        let mut ext_sql = format!(
             "\n\
             -- {file}:{line}\n\
             -- {module_path}::{name}\n\
@@ -346,7 +349,7 @@ impl ToSql for PgExternEntity {
             {fn_sql}"
         );
 
-        let rendered = if let Some(op) = &self.operator {
+        if let Some(op) = &self.operator {
             let mut optionals = vec![];
             if let Some(it) = op.commutator {
                 optionals.push(format!("\tCOMMUTATOR = {}", it));
@@ -452,7 +455,6 @@ impl ToSql for PgExternEntity {
                 .map(|schema| format!("{}.", schema))
                 .unwrap_or_else(|| context.schema_prefix_for(&self_index));
 
-            eprintln!("schema={schema}");
             let operator_sql = format!("\n\n\
                                                     -- {file}:{line}\n\
                                                     -- {module_path}::{name}\n\
@@ -471,10 +473,124 @@ impl ToSql for PgExternEntity {
                                                     maybe_comma = if !optionals.is_empty() { "," } else { "" },
                                                     optionals = if !optionals.is_empty() { optionals.join(",\n") + "\n" } else { "".to_string() },
                                             );
-            ext_sql + &operator_sql
-        } else {
-            ext_sql
+            ext_sql += &operator_sql
         };
-        Ok(rendered)
+        if let Some(cast) = &self.cast {
+            let target_arg = &self.metadata.retval;
+            let target_fn_arg = &self.fn_return;
+            let target_arg_graph_index = context
+                .graph
+                .neighbors_undirected(self_index)
+                .find(|neighbor| match (&context.graph[*neighbor], target_fn_arg) {
+                    (SqlGraphEntity::Type(ty), PgExternReturnEntity::Type { ty: rty }) => {
+                        ty.id_matches(&rty.ty_id)
+                    }
+                    (SqlGraphEntity::Enum(en), PgExternReturnEntity::Type { ty: rty }) => {
+                        en.id_matches(&rty.ty_id)
+                    }
+                    (SqlGraphEntity::BuiltinType(defined), _) => defined == target_arg.type_name,
+                    _ => false,
+                })
+                .ok_or_else(|| {
+                    eyre!("Could not find source type in graph. Got: {:?}", target_arg)
+                })?;
+            let target_arg_sql = match target_arg.argument_sql {
+                Ok(SqlMapping::As(ref sql)) => sql.clone(),
+                Ok(SqlMapping::Composite { array_brackets }) => {
+                    if array_brackets {
+                        let composite_type = self.fn_args[0].used_ty.composite_type
+                            .ok_or(eyre!("Found a composite type but macro expansion time did not reveal a name, use `pgrx::composite_type!()`"))?;
+                        format!("{composite_type}[]")
+                    } else {
+                        self.fn_args[0].used_ty.composite_type
+                            .ok_or(eyre!("Found a composite type but macro expansion time did not reveal a name, use `pgrx::composite_type!()`"))?.to_string()
+                    }
+                }
+                Ok(SqlMapping::Skip) => {
+                    return Err(eyre!("Found an skipped SQL type in a cast, this is not valid"))
+                }
+                Err(err) => return Err(err.into()),
+            };
+            if self.metadata.arguments.len() != 1 {
+                return Err(eyre!(
+                    "PG cast function ({}) must have exactly one argument, got {}",
+                    self.name,
+                    self.metadata.arguments.len()
+                ));
+            }
+            if self.fn_args.len() != 1 {
+                return Err(eyre!(
+                    "PG cast function ({}) must have exactly one argument, got {}",
+                    self.name,
+                    self.fn_args.len()
+                ));
+            }
+            let source_arg = self
+                .metadata
+                .arguments
+                .first()
+                .ok_or_else(|| eyre!("Did not find source type for cast `{}`.", self.name))?;
+            let source_fn_arg = self
+                .fn_args
+                .first()
+                .ok_or_else(|| eyre!("Did not find source type for cast `{}`.", self.name))?;
+            let source_arg_graph_index = context
+                .graph
+                .neighbors_undirected(self_index)
+                .find(|neighbor| match &context.graph[*neighbor] {
+                    SqlGraphEntity::Type(ty) => ty.id_matches(&source_fn_arg.used_ty.ty_id),
+                    SqlGraphEntity::Enum(en) => en.id_matches(&source_fn_arg.used_ty.ty_id),
+                    SqlGraphEntity::BuiltinType(defined) => defined == source_arg.type_name,
+                    _ => false,
+                })
+                .ok_or_else(|| {
+                    eyre!("Could not find source type in graph. Got: {:?}", source_arg)
+                })?;
+            let source_arg_sql = match source_arg.argument_sql {
+                Ok(SqlMapping::As(ref sql)) => sql.clone(),
+                Ok(SqlMapping::Composite { array_brackets }) => {
+                    if array_brackets {
+                        let composite_type = self.fn_args[0].used_ty.composite_type
+                            .ok_or(eyre!("Found a composite type but macro expansion time did not reveal a name, use `pgrx::composite_type!()`"))?;
+                        format!("{composite_type}[]")
+                    } else {
+                        self.fn_args[0].used_ty.composite_type
+                            .ok_or(eyre!("Found a composite type but macro expansion time did not reveal a name, use `pgrx::composite_type!()`"))?.to_string()
+                    }
+                }
+                Ok(SqlMapping::Skip) => {
+                    return Err(eyre!("Found an skipped SQL type in a cast, this is not valid"))
+                }
+                Err(err) => return Err(err.into()),
+            };
+            let optional = match cast {
+                PgCastEntity::Default => String::from(""),
+                PgCastEntity::Assignment => String::from(" AS ASSIGNMENT"),
+                PgCastEntity::Implicit => String::from(" AS IMPLICIT"),
+            };
+
+            let cast_sql = format!("\n\n\
+                                                    -- {file}:{line}\n\
+                                                    -- {module_path}::{name}\n\
+                                                    CREATE CAST (\n\
+                                                        \t{schema_prefix_source}{source_arg_sql} /* {source_name} */\n\
+                                                        \tAS\n\
+                                                        \t{schema_prefix_target}{target_arg_sql} /* {target_name} */\n\
+                                                    )\n\
+                                                    WITH FUNCTION {function_name}{optional};\
+                                                    ",
+                                                    file = self.file,
+                                                    line = self.line,
+                                                    name = self.name,
+                                                    module_path = self.module_path,
+                                                    schema_prefix_source = context.schema_prefix_for(&source_arg_graph_index),
+                                                    source_name = source_arg.type_name,
+                                                    schema_prefix_target = context.schema_prefix_for(&target_arg_graph_index),
+                                                    target_name = target_arg.type_name,
+                                                    function_name = self.name,
+                                            );
+            ext_sql += &cast_sql
+        };
+        Ok(ext_sql)
     }
 }

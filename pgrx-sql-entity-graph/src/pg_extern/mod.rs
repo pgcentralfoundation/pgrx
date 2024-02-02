@@ -17,12 +17,14 @@ to the `pgrx` framework and very subject to change between versions. While you m
 */
 mod argument;
 mod attribute;
+mod cast;
 pub mod entity;
 mod operator;
 mod returning;
 mod search_path;
 
 pub use argument::PgExternArgument;
+pub use cast::PgCast;
 pub use operator::PgOperator;
 pub use returning::NameMacro;
 
@@ -73,6 +75,7 @@ pub struct PgExtern {
     func: syn::ItemFn,
     to_sql_config: ToSqlConfig,
     operator: Option<PgOperator>,
+    cast: Option<PgCast>,
     search_path: Option<SearchPathList>,
     inputs: Vec<PgExternArgument>,
     input_types: Vec<syn::Type>,
@@ -117,11 +120,19 @@ impl PgExtern {
             func,
             to_sql_config,
             operator,
+            cast: None,
             search_path,
             inputs,
             input_types,
             returns,
         }))
+    }
+
+    /// Returns a new instance of this `PgExtern` with `cast` overwritten to `pg_cast`.
+    pub fn as_cast(&self, pg_cast: PgCast) -> PgExtern {
+        let mut result = self.clone();
+        result.cast = Some(pg_cast);
+        result
     }
 
     fn input_types(func: &syn::ItemFn) -> syn::Result<Vec<syn::Type>> {
@@ -279,6 +290,7 @@ impl PgExtern {
         };
 
         let operator = self.operator.clone().into_iter();
+        let cast = self.cast.clone().into_iter();
         let to_sql_config = match self.overridden() {
             None => self.to_sql_config.clone(),
             Some(content) => ToSqlConfig { content: Some(content), ..self.to_sql_config.clone() },
@@ -327,6 +339,7 @@ impl PgExtern {
                     search_path: None #( .unwrap_or_else(|| Some(vec![#search_path])) )*,
                     #[allow(clippy::or_fun_call)]
                     operator: None #( .unwrap_or_else(|| Some(#operator)) )*,
+                    cast: None #( .unwrap_or_else(|| Some(#cast)) )*,
                     to_sql_config: #to_sql_config,
                 };
                 ::pgrx::pgrx_sql_entity_graph::SqlGraphEntity::Function(submission)
