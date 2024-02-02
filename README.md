@@ -104,6 +104,18 @@ scl enable devtoolset-7 bash
 ```
 </details>
 
+<details>
+   <summary>How to: Homebrew on macOS</summary>
+
+As macOS provides no package manager, it is recommended to use https://brew.sh for C dependencies.
+
+In particular, you will probably need these if you don't have them already:
+
+```zsh
+brew install git icu4c pkg-config
+```
+</details>
+
 ## Getting Started
 
 

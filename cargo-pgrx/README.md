@@ -16,6 +16,10 @@ $ cargo install --locked cargo-pgrx
 
 As new versions of `pgrx` are released, you'll want to make sure you run this command again to update it. You should also reinstall `cargo-pgrx` whenever you update `rustc` so that the same compiler is used to build `cargo-pgrx` and your Postgres extensions. You can force `cargo` to reinstall an existing crate by passing `--force`.
 
+Note that some of the features of PGRX involve compiling C code, including `cargo pgrx init`, and
+as such you will also need a toolchain for doing so and potentially must provide various libraries.
+Normally, Rust requires a C toolchain anyways, but it does not require e.g. pkg-config.
+
 ## Usage
 
 ```console
