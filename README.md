@@ -88,8 +88,8 @@ and `double`. This may not be "unsound" in itself, as it is "merely" illogical,
 but it may undermine otherwise-reasonable safety assumptions of PGRX extensions.
 We do not plan to add support without considerable ongoing technical and financial contributions.
 
-<details>
-   <summary>How to: GCC 7 on CentOS 7</summary>
+<details style="border: 1px solid; padding: 0.25em 0.5em 0;">
+   <summary><i>How to:</i> <b>GCC 7 on CentOS 7</b></summary>
 
 It is not recommended to use CentOS 7 for PGRX development, even if it works.
 
@@ -101,6 +101,18 @@ In order to use GCC 7, install [`scl`](https://wiki.centos.org/AdditionalResourc
 yum install centos-release-scl
 yum install devtoolset-7
 scl enable devtoolset-7 bash
+```
+</details>
+
+<details style="border: 1px solid; padding: 0.25em 0.5em 0;">
+   <summary><i>How to:</i> <b>Homebrew on macOS</b></summary>
+
+As macOS provides no package manager, it is recommended to use https://brew.sh for C dependencies.
+
+In particular, you will probably need these if you don't have them already:
+
+```zsh
+brew install git icu4c pkg-config
 ```
 </details>
 
