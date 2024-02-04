@@ -168,7 +168,7 @@ pub(crate) fn install_extension(
         );
         copy_file(
             &control_file,
-            &dest,
+            dest,
             "control file",
             true,
             &package_manifest_path,
@@ -213,7 +213,7 @@ pub(crate) fn install_extension(
 
         copy_file(
             &shlibpath,
-            &dest,
+            dest,
             "shared library",
             false,
             &package_manifest_path,
@@ -241,8 +241,8 @@ pub(crate) fn install_extension(
 }
 
 fn copy_file(
-    src: &PathBuf,
-    dest: &PathBuf,
+    src: &Path,
+    dest: PathBuf,
     msg: &str,
     do_filter: bool,
     package_manifest_path: impl AsRef<Path>,
@@ -263,7 +263,7 @@ fn copy_file(
         })?,
     };
 
-    println!("{} {} to {}", "     Copying".bold().green(), msg, format_display_path(dest)?.cyan());
+    println!("{} {} to {}", "     Copying".bold().green(), msg, format_display_path(&dest)?.cyan());
 
     if do_filter {
         // we want to filter the contents of the file we're to copy
@@ -275,16 +275,16 @@ fn copy_file(
             input = filter_out_fields_in_control(pg_config, input)?;
         }
 
-        std::fs::write(dest, input).wrap_err_with(|| {
+        std::fs::write(&dest, input).wrap_err_with(|| {
             format!("failed writing `{}` to `{}`", src.display(), dest.display())
         })?;
     } else {
-        std::fs::copy(src, dest).wrap_err_with(|| {
+        std::fs::copy(src, &dest).wrap_err_with(|| {
             format!("failed copying `{}` to `{}`", src.display(), dest.display())
         })?;
     }
 
-    output_tracking.push(dest.clone());
+    output_tracking.push(dest);
 
     Ok(())
 }
@@ -347,7 +347,7 @@ pub(crate) fn build_extension(
 
 fn get_target_sql_file(
     manifest_path: impl AsRef<Path>,
-    extdir: &PathBuf,
+    extdir: &Path,
     base_directory: PathBuf,
 ) -> eyre::Result<PathBuf> {
     let mut dest = base_directory;
@@ -368,7 +368,7 @@ fn copy_sql_files(
     profile: &CargoProfile,
     is_test: bool,
     features: &clap_cargo::Features,
-    extdir: &PathBuf,
+    extdir: &Path,
     base_directory: &Path,
     skip_build: bool,
     output_tracking: &mut Vec<PathBuf>,
@@ -403,7 +403,7 @@ fn copy_sql_files(
 
                 copy_file(
                     &sql.path(),
-                    &dest,
+                    dest,
                     "extension schema upgrade file",
                     true,
                     &package_manifest_path,

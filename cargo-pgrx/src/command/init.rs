@@ -393,11 +393,11 @@ fn fixup_homebrew_for_icu(configure_cmd: &mut Command) {
     }
 }
 
-fn configure_postgres(pg_config: &PgConfig, pgdir: &PathBuf, init: &Init) -> eyre::Result<()> {
+fn configure_postgres(pg_config: &PgConfig, pgdir: &Path, init: &Init) -> eyre::Result<()> {
     let _token = init.jobserver.get().unwrap().acquire().unwrap();
 
     println!("{} Postgres v{}", "  Configuring".bold().green(), pg_config.version()?);
-    let mut configure_path = pgdir.clone();
+    let mut configure_path = pgdir.to_path_buf();
     configure_path.push("configure");
     let mut command = std::process::Command::new(configure_path);
     // Some of these are redundant with `--enable-debug`.
@@ -461,7 +461,7 @@ fn configure_postgres(pg_config: &PgConfig, pgdir: &PathBuf, init: &Init) -> eyr
     }
 }
 
-fn make_postgres(pg_config: &PgConfig, pgdir: &PathBuf, init: &Init) -> eyre::Result<()> {
+fn make_postgres(pg_config: &PgConfig, pgdir: &Path, init: &Init) -> eyre::Result<()> {
     println!("{} Postgres v{}", "    Compiling".bold().green(), pg_config.version()?);
     let mut command = std::process::Command::new("make");
 
@@ -494,11 +494,7 @@ fn make_postgres(pg_config: &PgConfig, pgdir: &PathBuf, init: &Init) -> eyre::Re
     }
 }
 
-fn make_install_postgres(
-    version: &PgConfig,
-    pgdir: &PathBuf,
-    init: &Init,
-) -> eyre::Result<PgConfig> {
+fn make_install_postgres(version: &PgConfig, pgdir: &Path, init: &Init) -> eyre::Result<PgConfig> {
     println!(
         "{} Postgres v{} to {}",
         "   Installing".bold().green(),
@@ -577,8 +573,8 @@ fn write_config(pg_configs: &Vec<PgConfig>, init: &Init) -> eyre::Result<()> {
     Ok(())
 }
 
-fn get_pg_installdir(pgdir: &PathBuf) -> PathBuf {
-    let mut dir = PathBuf::from(pgdir);
+fn get_pg_installdir(pgdir: &Path) -> PathBuf {
+    let mut dir = pgdir.to_path_buf();
     dir.push("pgrx-install");
     dir
 }
@@ -596,7 +592,7 @@ fn is_root_user() -> bool {
     false
 }
 
-pub(crate) fn initdb(bindir: &Path, datadir: &PathBuf) -> eyre::Result<()> {
+pub(crate) fn initdb(bindir: &Path, datadir: &Path) -> eyre::Result<()> {
     println!(" {} data directory at {}", "Initializing".bold().green(), datadir.display());
     let mut command = std::process::Command::new(format!("{}/initdb", bindir.display()));
     command
