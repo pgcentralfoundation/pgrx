@@ -20,7 +20,7 @@ impl Serialize for AnyNumeric {
     where
         S: Serializer,
     {
-        serializer.serialize_str(&format!("{}", self))
+        serializer.collect_str(&format_args!("{self}"))
     }
 }
 
