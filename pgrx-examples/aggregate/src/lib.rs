@@ -10,11 +10,11 @@
 use core::ffi::CStr;
 use pgrx::aggregate::*;
 use pgrx::prelude::*;
-use pgrx::{pgrx, PgVarlena, PgVarlenaInOutFuncs, StringInfo};
+use pgrx::{PgVarlena, PgVarlenaInOutFuncs, StringInfo};
 use serde::{Deserialize, Serialize};
 use std::str::FromStr;
 
-pgrx::pg_module_magic!();
+pg_module_magic!();
 
 #[derive(Copy, Clone, PostgresType, Serialize, Deserialize)]
 #[pgvarlena_inoutfuncs]
