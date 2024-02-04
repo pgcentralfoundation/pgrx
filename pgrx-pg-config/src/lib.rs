@@ -224,7 +224,7 @@ impl PgConfig {
         let version_parts = version_str.split_whitespace().collect::<Vec<&str>>();
         let mut version = version_parts
             .get(1)
-            .ok_or_else(|| eyre!("invalid version string: {}", version_str))?
+            .ok_or_else(|| eyre!("invalid version string: {version_str}"))?
             .split('.')
             .collect::<Vec<&str>>();
 
@@ -242,7 +242,7 @@ impl PgConfig {
                 rc = true;
                 version = first.split("rc").collect();
             } else {
-                return Err(eyre!("invalid version string: {}", version_str));
+                return Err(eyre!("invalid version string: {version_str}"));
             }
         }
 
@@ -258,7 +258,7 @@ impl PgConfig {
         }
         minor = &minor[0..end_index];
         let minor = u16::from_str(minor)
-            .map_err(|e| eyre!("invalid minor version number `{}`: {:?}", minor, e))?;
+            .map_err(|e| eyre!("invalid minor version number `{minor}`: {e:?}"))?;
         let minor = if beta {
             PgMinorVersion::Beta(minor)
         } else if rc {
@@ -616,7 +616,7 @@ impl Pgrx {
                 return Ok(pg_config.clone());
             }
         }
-        Err(eyre!("Postgres `{}` is not managed by pgrx", label))
+        Err(eyre!("Postgres `{label}` is not managed by pgrx"))
     }
 
     /// Returns true if the specified `label` represents a Postgres version number feature flag,

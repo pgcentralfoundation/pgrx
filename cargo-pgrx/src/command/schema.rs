@@ -550,7 +550,7 @@ fn create_stub(
     let code = output.status.code().ok_or(eyre!("could not get status code of build"))?;
     tracing::trace!(status_code = %code, command = %so_rustc_invocation_str, "Finished");
     if code != 0 {
-        return Err(eyre!("rustc exited with code {}", code));
+        return Err(eyre!("rustc exited with code {code}"));
     }
 
     std::fs::write(&postmaster_hash_file, postmaster_bin_hash)

@@ -378,7 +378,7 @@ impl ToSql for PgAggregateEntity {
                         SqlGraphEntity::BuiltinType(defined) => defined == arg.used_ty.full_path,
                         _ => false,
                     })
-                    .ok_or_else(|| eyre!("Could not find arg type in graph. Got: {:?}", arg))?;
+                    .ok_or_else(|| eyre!("Could not find arg type in graph. Got: {arg:?}"))?;
                 let needs_comma = idx < (direct_args.len() - 1);
                 let buf = format!(
                     "\

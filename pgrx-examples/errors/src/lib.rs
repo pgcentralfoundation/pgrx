@@ -43,27 +43,27 @@ fn throw_rust_panic(message: &str) {
 
 #[pg_extern]
 fn raise_pg_info(message: &str) {
-    info!("{}", message);
+    info!("{message}");
 }
 
 #[pg_extern]
 fn raise_pg_warning(message: &str) {
-    warning!("{}", message);
+    warning!("{message}");
 }
 
 #[pg_extern]
 fn throw_pg_error(message: &str) {
-    error!("{}", message);
+    error!("{message}");
 }
 
 #[pg_extern]
 fn throw_pg_panic(message: &str) {
-    PANIC!("{}", message);
+    PANIC!("{message}");
 }
 
 #[pg_extern]
 fn throw_pg_fatal(message: &str) {
-    FATAL!("{}", message);
+    FATAL!("{message}");
 }
 
 #[cfg(any(test, feature = "pg_test"))]

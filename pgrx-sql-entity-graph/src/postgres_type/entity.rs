@@ -85,7 +85,7 @@ impl ToSql for PostgresTypeEntity {
             ..
         }) = item_node
         else {
-            return Err(eyre!("Was not called on a Type. Got: {:?}", item_node));
+            return Err(eyre!("Was not called on a Type. Got: {item_node:?}"));
         };
 
         // The `in_fn`/`out_fn` need to be present in a certain order:
@@ -107,7 +107,7 @@ impl ToSql for PostgresTypeEntity {
             .externs
             .iter()
             .find(|(k, _v)| k.full_path == in_fn_path)
-            .ok_or_else(|| eyre::eyre!("Did not find `in_fn: {}`.", in_fn_path))?;
+            .ok_or_else(|| eyre::eyre!("Did not find `in_fn: {in_fn_path}`."))?;
         let (in_fn_graph_index, in_fn_entity) = context
             .graph
             .neighbors_undirected(self_index)
@@ -133,7 +133,7 @@ impl ToSql for PostgresTypeEntity {
             .externs
             .iter()
             .find(|(k, _v)| k.full_path == out_fn_path)
-            .ok_or_else(|| eyre::eyre!("Did not find `out_fn: {}`.", out_fn_path))?;
+            .ok_or_else(|| eyre::eyre!("Did not find `out_fn: {out_fn_path}`."))?;
         let (out_fn_graph_index, out_fn_entity) = context
             .graph
             .neighbors_undirected(self_index)

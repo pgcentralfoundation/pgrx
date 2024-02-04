@@ -153,7 +153,7 @@ impl SqlDeclaredEntity {
             sql: name
                 .split("::")
                 .last()
-                .ok_or_else(|| eyre::eyre!("Did not get SQL for `{}`", name))?
+                .ok_or_else(|| eyre::eyre!("Did not get SQL for `{name}`"))?
                 .to_string(),
             name: name.to_string(),
             option: format!("Option<{}>", name),

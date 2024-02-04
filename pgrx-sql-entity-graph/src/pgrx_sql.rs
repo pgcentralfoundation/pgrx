@@ -806,7 +806,7 @@ fn connect_externs(
                             graph.add_edge(*target, index, SqlGraphRequires::By);
                             has_explicit_requires = true;
                         } else {
-                            return Err(eyre!("Could not find `requires` target: {:?}", requires));
+                            return Err(eyre!("Could not find `requires` target: {requires:?}"));
                         }
                     }
                 }

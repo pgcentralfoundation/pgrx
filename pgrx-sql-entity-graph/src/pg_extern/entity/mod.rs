@@ -124,7 +124,7 @@ impl ToSql for PgExternEntity {
                         SqlGraphEntity::BuiltinType(defined) => defined == arg.used_ty.full_path,
                         _ => false,
                     })
-                    .ok_or_else(|| eyre!("Could not find arg type in graph. Got: {:?}", arg))?;
+                    .ok_or_else(|| eyre!("Could not find arg type in graph. Got: {arg:?}"))?;
                 let needs_comma = idx < (metadata_without_arg_skips.len().saturating_sub(1));
                 let metadata_argument = &self.metadata.arguments[idx];
                 match metadata_argument.argument_sql {
@@ -387,9 +387,7 @@ impl ToSql for PgExternEntity {
                     SqlGraphEntity::BuiltinType(defined) => defined == left_arg.type_name,
                     _ => false,
                 })
-                .ok_or_else(|| {
-                    eyre!("Could not find left arg type in graph. Got: {:?}", left_arg)
-                })?;
+                .ok_or_else(|| eyre!("Could not find left arg type in graph. Got: {left_arg:?}"))?;
             let left_arg_sql = match left_arg.argument_sql {
                 Ok(SqlMapping::As(ref sql)) => sql.clone(),
                 Ok(SqlMapping::Composite { array_brackets }) => {
@@ -428,7 +426,7 @@ impl ToSql for PgExternEntity {
                     _ => false,
                 })
                 .ok_or_else(|| {
-                    eyre!("Could not find right arg type in graph. Got: {:?}", right_arg)
+                    eyre!("Could not find right arg type in graph. Got: {right_arg:?}")
                 })?;
             let right_arg_sql = match right_arg.argument_sql {
                 Ok(SqlMapping::As(ref sql)) => sql.clone(),
@@ -491,9 +489,7 @@ impl ToSql for PgExternEntity {
                     (SqlGraphEntity::BuiltinType(defined), _) => defined == target_arg.type_name,
                     _ => false,
                 })
-                .ok_or_else(|| {
-                    eyre!("Could not find source type in graph. Got: {:?}", target_arg)
-                })?;
+                .ok_or_else(|| eyre!("Could not find source type in graph. Got: {target_arg:?}"))?;
             let target_arg_sql = match target_arg.argument_sql {
                 Ok(SqlMapping::As(ref sql)) => sql.clone(),
                 Ok(SqlMapping::Composite { array_brackets }) => {
@@ -543,9 +539,7 @@ impl ToSql for PgExternEntity {
                     SqlGraphEntity::BuiltinType(defined) => defined == source_arg.type_name,
                     _ => false,
                 })
-                .ok_or_else(|| {
-                    eyre!("Could not find source type in graph. Got: {:?}", source_arg)
-                })?;
+                .ok_or_else(|| eyre!("Could not find source type in graph. Got: {source_arg:?}"))?;
             let source_arg_sql = match source_arg.argument_sql {
                 Ok(SqlMapping::As(ref sql)) => sql.clone(),
                 Ok(SqlMapping::Composite { array_brackets }) => {

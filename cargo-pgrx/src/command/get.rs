@@ -124,8 +124,7 @@ fn determine_git_hash() -> eyre::Result<Option<String>> {
                 let stderr = String::from_utf8(output.stderr)
                     .expect("`git rev-parse head` did not return valid utf8");
                 return Err(eyre!(
-                    "problem running `git` to determine the current revision hash: {}",
-                    stderr
+                    "problem running `git` to determine the current revision hash: {stderr}"
                 ));
             }
 

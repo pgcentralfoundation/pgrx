@@ -278,7 +278,7 @@ impl SubXactCallbackReceipt {
     /// ```rust,no_run
     /// use pgrx::*;
     ///
-    /// let receipt = register_subxact_callback(PgSubXactCallbackEvent::CommitSub, |my_subid, parent_subid| info!("called after commit-sub: {} {}", my_subid, parent_subid));
+    /// let receipt = register_subxact_callback(PgSubXactCallbackEvent::CommitSub, |my_subid, parent_subid| info!("called after commit-sub: {my_subid} {parent_subid}"));
     ///
     /// let no_longer_necessary = true;
     ///

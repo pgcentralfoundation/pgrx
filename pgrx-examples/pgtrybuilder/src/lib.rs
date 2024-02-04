@@ -65,10 +65,10 @@ fn maybe_panic(panic: bool, trap_it: bool, message: &str) {
         // enum variant with the payload from the originating panic
         if trap_it {
             if let CaughtError::RustPanic { ereport, payload } = &cause {
-                warning!("{:#?}", ereport);
+                warning!("{ereport:#?}");
                 if let Some(s) = payload.downcast_ref::<String>() {
                     // we have access to the panic!() message
-                    warning!("{}", s);
+                    warning!("{s}");
                     return;
                 } else {
                     // this won't happen with this example, but say the `panic_any(42)` was used

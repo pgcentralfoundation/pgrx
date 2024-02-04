@@ -150,14 +150,14 @@ mod tests {
         let first = &list.found[0];
         let first_string = match &first.used_ty.resolved_ty {
             syn::Type::Path(ty_path) => ty_path.path.segments.last().unwrap().ident.to_string(),
-            _ => return Err(eyre_err!("Wrong first.used_ty.resolved_ty: {:?}", first)),
+            _ => return Err(eyre_err!("Wrong first.used_ty.resolved_ty: {first:?}")),
         };
         assert_eq!(first_string, "i32");
 
         let second = &list.found[1];
         let second_string = match &second.used_ty.resolved_ty {
             syn::Type::Path(ty_path) => ty_path.path.segments.last().unwrap().ident.to_string(),
-            _ => return Err(eyre_err!("Wrong second.used_ty.resolved_ty: {:?}", second)),
+            _ => return Err(eyre_err!("Wrong second.used_ty.resolved_ty: {second:?}")),
         };
         assert_eq!(second_string, "i8");
         Ok(())
@@ -175,14 +175,14 @@ mod tests {
         let first = &list.found[0];
         let first_string = match &first.used_ty.resolved_ty {
             syn::Type::Path(ty_path) => ty_path.path.segments.last().unwrap().ident.to_string(),
-            _ => return Err(eyre_err!("Wrong first.used_ty.resolved_ty: {:?}", first)),
+            _ => return Err(eyre_err!("Wrong first.used_ty.resolved_ty: {first:?}")),
         };
         assert_eq!(first_string, "i32");
 
         let second = &list.found[1];
         let second_string = match &second.used_ty.resolved_ty {
             syn::Type::Path(ty_path) => ty_path.path.segments.last().unwrap().ident.to_string(),
-            _ => return Err(eyre_err!("Wrong second.used_ty.resolved_ty: {:?}", second)),
+            _ => return Err(eyre_err!("Wrong second.used_ty.resolved_ty: {second:?}")),
         };
         assert_eq!(second_string, "VariadicArray");
         Ok(())
@@ -200,14 +200,14 @@ mod tests {
         let first = &list.found[0];
         let first_string = match &first.used_ty.resolved_ty {
             syn::Type::Path(ty_path) => ty_path.path.segments.last().unwrap().ident.to_string(),
-            _ => return Err(eyre_err!("Wrong first.ty: {:?}", first)),
+            _ => return Err(eyre_err!("Wrong first.ty: {first:?}")),
         };
         assert_eq!(first_string, "i32");
 
         let second = &list.found[1];
         let second_string = match &second.used_ty.resolved_ty {
             syn::Type::Path(ty_path) => ty_path.path.segments.last().unwrap().ident.to_string(),
-            _ => return Err(eyre_err!("Wrong second.used_ty.resolved_ty: {:?}", second)),
+            _ => return Err(eyre_err!("Wrong second.used_ty.resolved_ty: {second:?}")),
         };
         assert_eq!(second_string, "VariadicArray");
         Ok(())

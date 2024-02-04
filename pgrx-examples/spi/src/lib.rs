@@ -87,7 +87,7 @@ fn spi_query_by_id(id: i64) -> Result<Option<String>, spi::Error> {
         tuptable.get_two::<i64, String>()
     })?;
 
-    info!("id={:?}", returned_id);
+    info!("id={returned_id:?}");
     Ok(title)
 }
 

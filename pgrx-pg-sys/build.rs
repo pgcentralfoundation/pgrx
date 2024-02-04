@@ -887,7 +887,7 @@ fn build_shim_for_version(
     )?;
 
     if rc.status.code().unwrap() != 0 {
-        return Err(eyre!("failed to make pgrx-cshim for v{}", major_version));
+        return Err(eyre!("failed to make pgrx-cshim for v{major_version}"));
     }
 
     Ok(())

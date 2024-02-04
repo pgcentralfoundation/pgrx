@@ -66,7 +66,7 @@ pub extern "C" fn background_worker_main(arg: pg_sys::Datum) {{
                     let a = tuple.get_datum_by_ordinal(1).unwrap().value::<String>().unwrap();
                     let b = tuple.get_datum_by_ordinal(2).unwrap().value::<i32>().unwrap();
                     let c = tuple.get_datum_by_ordinal(3).unwrap().value::<String>().unwrap();
-                    log!("from bgworker: ({{:?}}, {{:?}}, {{:?}})", a, b, c);
+                    log!("from bgworker: ({{a:?}}, {{b:?}}, {{c:?}})");
                 }});
             }});
         }});

@@ -40,6 +40,6 @@ pub fn get_target_dir() -> eyre::Result<PathBuf> {
     let target_dir = json.get("target_directory");
     match target_dir {
         Some(JsonValue::String(target_dir)) => Ok(target_dir.into()),
-        v => Err(eyre!("could not read target dir from `cargo metadata` got: {:?}", v,)),
+        v => Err(eyre!("could not read target dir from `cargo metadata` got: {v:?}")),
     }
 }

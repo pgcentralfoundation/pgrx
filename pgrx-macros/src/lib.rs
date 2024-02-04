@@ -905,7 +905,7 @@ fn impl_postgres_type(ast: DeriveInput) -> syn::Result<proc_macro2::TokenStream>
             pub fn #funcname_in #generics(input: Option<&#lifetime ::core::ffi::CStr>) -> Option<#name #generics> {
                 input.map_or_else(|| {
                     for m in <#name as ::pgrx::inoutfuncs::JsonInOutFuncs>::NULL_ERROR_MESSAGE {
-                        ::pgrx::pg_sys::error!("{}", m);
+                        ::pgrx::pg_sys::error!("{m}");
                     }
                     None
                 }, |i| Some(<#name as ::pgrx::inoutfuncs::JsonInOutFuncs>::input(i)))
@@ -929,7 +929,7 @@ fn impl_postgres_type(ast: DeriveInput) -> syn::Result<proc_macro2::TokenStream>
             pub fn #funcname_in #generics(input: Option<&#lifetime ::core::ffi::CStr>) -> Option<#name #generics> {
                 input.map_or_else(|| {
                     for m in <#name as ::pgrx::inoutfuncs::InOutFuncs>::NULL_ERROR_MESSAGE {
-                        ::pgrx::pg_sys::error!("{}", m);
+                        ::pgrx::pg_sys::error!("{m}");
                     }
                     None
                 }, |i| Some(<#name as ::pgrx::inoutfuncs::InOutFuncs>::input(i)))
@@ -952,7 +952,7 @@ fn impl_postgres_type(ast: DeriveInput) -> syn::Result<proc_macro2::TokenStream>
             pub fn #funcname_in #generics(input: Option<&#lifetime ::core::ffi::CStr>) -> Option<::pgrx::datum::PgVarlena<#name #generics>> {
                 input.map_or_else(|| {
                     for m in <#name as ::pgrx::inoutfuncs::PgVarlenaInOutFuncs>::NULL_ERROR_MESSAGE {
-                        ::pgrx::pg_sys::error!("{}", m);
+                        ::pgrx::pg_sys::error!("{m}");
                     }
                     None
                 }, |i| Some(<#name as ::pgrx::inoutfuncs::PgVarlenaInOutFuncs>::input(i)))

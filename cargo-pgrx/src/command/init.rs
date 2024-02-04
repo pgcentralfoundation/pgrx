@@ -614,7 +614,7 @@ pub(crate) fn initdb(bindir: &PathBuf, datadir: &PathBuf) -> eyre::Result<()> {
     let command_str = format!("{:?}", command);
     tracing::debug!(command = %command_str, "Running");
 
-    let output = command.output().wrap_err_with(|| eyre!("unable to execute: {}", command_str))?;
+    let output = command.output().wrap_err_with(|| eyre!("unable to execute: {command_str}"))?;
     tracing::trace!(command = %command_str, status_code = %output.status, "Finished");
 
     if !output.status.success() {

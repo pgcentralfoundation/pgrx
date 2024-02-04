@@ -709,8 +709,7 @@ fn get_cargo_test_features() -> eyre::Result<clap_cargo::Features> {
             "--no-default-features" => features.no_default_features = true,
             "--features" => {
                 let configured_features = iter.next().ok_or(eyre!(
-                    "no `--features` specified in the cargo argument list: {:?}",
-                    cargo_user_args
+                    "no `--features` specified in the cargo argument list: {cargo_user_args:?}"
                 ))?;
                 features.features = configured_features
                     .split(|c: char| c.is_ascii_whitespace() || c == ',')
