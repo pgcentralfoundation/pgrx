@@ -292,7 +292,7 @@ pub(crate) fn generate_schema(
     let postmaster_path = pg_config.postmaster_path().wrap_err("could not get postmaster path")?;
 
     // The next action may take a few seconds, we'd like the user to know we're thinking.
-    eprintln!("{} SQL entities", " Discovering".bold().green(),);
+    eprintln!("{} SQL entities", " Discovering".bold().green());
 
     let postmaster_stub_built = create_stub(postmaster_path, &postmaster_stub_dir)?;
 
@@ -443,7 +443,7 @@ pub(crate) fn generate_schema(
             .wrap_err_with(|| eyre!("Could not write SQL to {}", out_path.display()))?;
         output_tracking.push(out_path.to_path_buf());
     } else {
-        eprintln!("{} SQL entities to {}", "     Writing".bold().green(), "/dev/stdout".cyan(),);
+        eprintln!("{} SQL entities to {}", "     Writing".bold().green(), "/dev/stdout".cyan());
         pgrx_sql
             .write(&mut std::io::stdout())
             .wrap_err_with(|| eyre!("Could not write SQL to stdout"))?;
@@ -544,7 +544,7 @@ fn create_stub(
     let so_rustc_invocation_str = format!("{:?}", so_rustc_invocation);
     tracing::debug!(command = %so_rustc_invocation_str, "Running");
     let output = so_rustc_invocation.output().wrap_err_with(|| {
-        eyre!("could not invoke `rustc` on {}", &postmaster_stub_file.display())
+        eyre!("could not invoke `rustc` on {}", postmaster_stub_file.display())
     })?;
 
     let code = output.status.code().ok_or(eyre!("could not get status code of build"))?;

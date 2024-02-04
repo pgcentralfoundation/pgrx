@@ -153,7 +153,7 @@ pub(crate) fn install_extension(
     let build_command_messages =
         build_command_stream.collect::<Result<Vec<_>, std::io::Error>>()?;
 
-    println!("{} extension", "  Installing".bold().green(),);
+    println!("{} extension", "  Installing".bold().green());
     let pkgdir = make_relative(pg_config.pkglibdir()?);
     let extdir = make_relative(pg_config.extension_dir()?);
     let shlibpath = find_library_file(&manifest, &build_command_messages)?;
@@ -184,7 +184,7 @@ pub(crate) fn install_extension(
         let so_name = if versioned_so {
             let extver = get_version(&package_manifest_path)?;
             // note: versioned so-name format must agree with pgrx-utils
-            format!("{}-{}", &extname, &extver)
+            format!("{extname}-{extver}")
         } else {
             extname.clone()
         };

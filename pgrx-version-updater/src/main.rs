@@ -116,10 +116,10 @@ fn query_toml(query_args: &QueryCargoVersionArgs) {
 
     // Open the Cargo.toml via toml_edit and parse it out.
     let data = fs::read_to_string(&filepath)
-        .expect(format!("Unable to open file at {}", &filepath.display()).as_str());
+        .expect(format!("Unable to open file at {}", filepath.display()).as_str());
 
     let doc = data.parse::<Document>().expect(
-        format!("File at location {} is an invalid Cargo.toml file", &filepath.display()).as_str(),
+        format!("File at location {} is an invalid Cargo.toml file", filepath.display()).as_str(),
     );
 
     if let Some(package_version) = doc.get("package").and_then(|p| p.get("version")) {
@@ -168,7 +168,7 @@ fn update_files(args: &UpdateFilesArgs) {
             let mut output = format!(
                 "{} Cargo.toml file at {}",
                 "Discovered".bold().green(),
-                &filepath.display().cyan()
+                filepath.display().cyan()
             );
 
             // Extract the package name if possible
@@ -204,7 +204,7 @@ fn update_files(args: &UpdateFilesArgs) {
         let mut output = format!(
             "{} Cargo.toml file at {} for processing",
             " Including".bold().green(),
-            &filepath.display().cyan()
+            filepath.display().cyan()
         );
 
         // Extract the package name if possible
@@ -248,14 +248,14 @@ fn update_files(args: &UpdateFilesArgs) {
         let mut output = format!(
             "{} Cargo.toml file at {}",
             "Processing".bold().green(),
-            &filepath.display().cyan()
+            filepath.display().cyan()
         );
 
         let data = fs::read_to_string(&filepath)
-            .expect(format!("Unable to open file at {}", &filepath.display()).as_str());
+            .expect(format!("Unable to open file at {}", filepath.display()).as_str());
 
         let mut doc = data.parse::<Document>().expect(
-            format!("File at location {} is an invalid Cargo.toml file", &filepath.display())
+            format!("File at location {} is an invalid Cargo.toml file", filepath.display())
                 .as_str(),
         );
 
@@ -458,10 +458,10 @@ fn extract_package_name<P: AsRef<Path>>(filepath: P) -> Option<String> {
     let filepath = filepath.as_ref();
 
     let data = fs::read_to_string(filepath)
-        .expect(format!("Unable to open file at {}", &filepath.display()).as_str());
+        .expect(format!("Unable to open file at {}", filepath.display()).as_str());
 
     let doc = data.parse::<Document>().expect(
-        format!("File at location {} is an invalid Cargo.toml file", &filepath.display()).as_str(),
+        format!("File at location {} is an invalid Cargo.toml file", filepath.display()).as_str(),
     );
 
     doc.get("package")?.as_table()?.get("name")?.as_str().map(|s| s.to_string())

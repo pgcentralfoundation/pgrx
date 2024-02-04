@@ -639,14 +639,11 @@ fn create_extension() -> eyre::Result<()> {
     let (mut client, _) = client()?;
     let extension_name = get_extension_name()?;
 
-    query_wrapper(
-        Some(format!("CREATE EXTENSION {} CASCADE;", &extension_name)),
-        None,
-        |query, _| client.simple_query(query.unwrap().as_str()),
-    )
+    query_wrapper(Some(format!("CREATE EXTENSION {extension_name} CASCADE;")), None, |query, _| {
+        client.simple_query(query.unwrap().as_str())
+    })
     .wrap_err(format!(
-        "There was an issue creating the extension '{}' in Postgres: ",
-        &extension_name
+        "There was an issue creating the extension '{extension_name}' in Postgres: "
     ))?;
 
     Ok(())

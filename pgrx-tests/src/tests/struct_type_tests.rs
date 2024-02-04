@@ -79,7 +79,7 @@ fn complex_in(input: &core::ffi::CStr) -> PgBox<Complex, AllocatedByRust> {
 #[pg_extern(immutable)]
 fn complex_out(complex: PgBox<Complex>) -> &'static CStr {
     let mut sb = StringInfo::new();
-    sb.push_str(&format!("{}, {}", &complex.x, &complex.y));
+    sb.push_str(&format!("{}, {}", complex.x, complex.y));
     unsafe { sb.leak_cstr() }
 }
 

@@ -151,7 +151,7 @@ impl PgProc {
         self.get_attr(pg_sys::Anum_pg_proc_procost).unwrap()
     }
 
-    /// Estimated number of result rows (zero if not [`proretset()`][PgProc::proretset],)
+    /// Estimated number of result rows (zero if not [`proretset()`][PgProc::proretset])
     pub fn prorows(&self) -> f32 {
         // won't panic because `prorows` has a NOT NULL constraint, so `.unwrap()` wont panic
         self.get_attr(pg_sys::Anum_pg_proc_prorows).unwrap()

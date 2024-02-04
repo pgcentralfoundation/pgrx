@@ -214,7 +214,7 @@ pub(crate) fn init_pgrx(pgrx: &Pgrx, init: &Init) -> eyre::Result<()> {
         validate_pg_config(pg_config)?;
 
         if is_root_user() {
-            println!("{} initdb as current user is root user", "   Skipping".bold().green(),);
+            println!("{} initdb as current user is root user", "   Skipping".bold().green());
         } else {
             let datadir = pg_config.data_dir()?;
             let bindir = pg_config.bin_dir()?;

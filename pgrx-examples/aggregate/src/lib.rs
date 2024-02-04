@@ -149,7 +149,7 @@ mod tests {
         let avg_state = IntegerAvgState::state(avg_state, Some(1));
         let avg_state = IntegerAvgState::state(avg_state, Some(2));
         let avg_state = IntegerAvgState::state(avg_state, Some(3));
-        assert_eq!(2, IntegerAvgState::finalize(avg_state),);
+        assert_eq!(2, IntegerAvgState::finalize(avg_state));
     }
 
     #[pg_test]
