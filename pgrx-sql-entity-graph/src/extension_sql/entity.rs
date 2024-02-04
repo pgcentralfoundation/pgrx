@@ -165,9 +165,9 @@ impl SqlDeclaredEntity {
             option_array: format!("Option<{}>", name),
             varlena: format!("Varlena<{}>", name),
             pg_box: vec![
-                format!("pgrx::pgbox::PgBox<{}>", name),
-                format!("pgrx::pgbox::PgBox<{}, pgrx::pgbox::AllocatedByRust>", name),
-                format!("pgrx::pgbox::PgBox<{}, pgrx::pgbox::AllocatedByPostgres>", name),
+                format!("pgrx::pgbox::PgBox<{name}>"),
+                format!("pgrx::pgbox::PgBox<{name}, pgrx::pgbox::AllocatedByRust>"),
+                format!("pgrx::pgbox::PgBox<{name}, pgrx::pgbox::AllocatedByPostgres>"),
             ],
         };
         let retval = match variant.as_ref() {

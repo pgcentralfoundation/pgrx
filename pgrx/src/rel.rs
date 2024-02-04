@@ -60,7 +60,7 @@ impl PgRelation {
         let rel = pg_sys::RelationIdGetRelation(oid);
         if rel.is_null() {
             // relation was recently deleted
-            panic!("Cannot open relation with oid={:?}", oid);
+            panic!("Cannot open relation with oid={oid:?}");
         }
 
         PgRelation { boxed: PgBox::from_pg(rel), need_close: true, lockmode: None }

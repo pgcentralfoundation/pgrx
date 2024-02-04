@@ -134,7 +134,7 @@ fn random_date() -> Date {
             Err(DateTimeConversionError::FieldOverflow) => continue,
 
             // Something really unexpected happened
-            Err(e) => panic!("Error creating random date: {}", e),
+            Err(e) => panic!("Error creating random date: {e}"),
         }
     }
 }

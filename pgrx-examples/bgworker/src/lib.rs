@@ -81,7 +81,7 @@ pub extern "C" fn background_worker_main(arg: pg_sys::Datum) {
                 Ok(())
             })
         });
-        result.unwrap_or_else(|e| panic!("got an error: {}", e))
+        result.unwrap_or_else(|e| panic!("got an error: {e}"))
     }
 
     log!("Goodbye from inside the {} BGWorker! ", BackgroundWorker::get_name());

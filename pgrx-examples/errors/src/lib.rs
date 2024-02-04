@@ -38,7 +38,7 @@ fn cause_pg_error() {
 
 #[pg_extern]
 fn throw_rust_panic(message: &str) {
-    panic!("{}", message);
+    panic!("{message}");
 }
 
 #[pg_extern]

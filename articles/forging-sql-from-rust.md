@@ -874,7 +874,7 @@ impl ToSql for InventoryPostgresEnum {
             variants = self
                 .variants
                 .iter()
-                .map(|variant| format!("\t'{}'", variant))
+                .map(|variant| format!("\t'{variant}'"))
                 .collect::<Vec<_>>()
                 .join(",\n")
                 + "\n",

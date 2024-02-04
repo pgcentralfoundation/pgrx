@@ -56,7 +56,7 @@ fn get_relation_name(oid: pg_sys::Oid) -> String {
 fn maybe_panic(panic: bool, trap_it: bool, message: &str) {
     PgTryBuilder::new(|| {
         if panic {
-            panic!("panic says: {}", message)
+            panic!("panic says: {message}")
             // std::panic::panic_any(42)
         }
     })

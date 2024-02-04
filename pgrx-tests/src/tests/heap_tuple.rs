@@ -850,7 +850,7 @@ mod tests {
             {
                 ()
             }
-            Err(err) => panic!("{}", err),
+            Err(err) => panic!("{err}"),
             Ok(_) => panic!("Able to find what should be a not existing composite type"),
         }
     }

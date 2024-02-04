@@ -171,7 +171,7 @@ mod tests {
         let a = AnyNumeric::try_from(f64::MAX).unwrap();
         match f32::try_from(a) {
             Err(Error::OutOfRange(_)) => {},
-            other => panic!("{:?}", other),
+            other => panic!("{other:?}"),
         }
     }
 

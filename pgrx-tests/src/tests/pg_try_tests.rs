@@ -115,7 +115,7 @@ mod tests {
     fn test_pg_try_execute_with_crash_ignore() {
         PgTryBuilder::new(|| super::crash())
             .catch_when(PgSqlErrorCode::ERRCODE_INTERNAL_ERROR, |_| ())
-            .catch_others(|e| panic!("{:?}", e))
+            .catch_others(|e| panic!("{e:?}"))
             .execute();
     }
 

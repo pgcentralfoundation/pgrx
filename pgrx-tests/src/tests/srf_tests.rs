@@ -199,7 +199,7 @@ mod tests {
                     Some(1) => assert_eq!(Some("a"), value),
                     Some(2) => assert_eq!(Some("b"), value),
                     Some(3) => assert_eq!(Some("c"), value),
-                    _ => panic!("unexpected idx={:?}", idx),
+                    _ => panic!("unexpected idx={idx:?}"),
                 }
             }
 

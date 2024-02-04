@@ -142,7 +142,7 @@ impl<'mcx, T: UnboxDatum> Array<'mcx, T> {
                 Size::Fixed(8) => Box::new(casper::FixedSizeByVal::<8>),
 
                 _ => {
-                    panic!("unrecognized pass-by-value array element layout: {:?}", elem_layout)
+                    panic!("unrecognized pass-by-value array element layout: {elem_layout:?}")
                 }
             },
 

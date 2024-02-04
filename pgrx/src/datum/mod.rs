@@ -248,9 +248,7 @@ pub trait WithTypeIds {
                 rust: rust.to_string(),
                 id: *Self::ITEM_ID,
             }),
-            "Cannot set mapping of `{}` twice, was already `{}`.",
-            rust,
-            single_sql,
+            "Cannot set mapping of `{rust}` twice, was already `{single_sql}`.",
         );
     }
 }
@@ -323,14 +321,13 @@ impl<T> WithSizedTypeIds<T> {
     }
 
     pub fn register_sized(map: &mut std::collections::HashSet<RustSqlMapping>, single_sql: String) {
-        let set_sql = format!("{}[]", single_sql);
+        let set_sql = format!("{single_sql}[]");
 
         if let Some(id) = *WithSizedTypeIds::<T>::PG_BOX_ID {
             let rust = core::any::type_name::<crate::PgBox<T>>().to_string();
             assert!(
                 map.insert(RustSqlMapping { sql: single_sql.clone(), rust: rust.to_string(), id }),
-                "Cannot map `{}` twice.",
-                rust,
+                "Cannot map `{rust}` twice.",
             );
         }
 
@@ -338,8 +335,7 @@ impl<T> WithSizedTypeIds<T> {
             let rust = core::any::type_name::<crate::PgBox<Option<T>>>().to_string();
             assert!(
                 map.insert(RustSqlMapping { sql: single_sql.clone(), rust: rust.to_string(), id }),
-                "Cannot map `{}` twice.",
-                rust,
+                "Cannot map `{rust}` twice.",
             );
         }
 
@@ -347,8 +343,7 @@ impl<T> WithSizedTypeIds<T> {
             let rust = core::any::type_name::<crate::PgBox<Vec<T>>>().to_string();
             assert!(
                 map.insert(RustSqlMapping { sql: set_sql.clone(), rust: rust.to_string(), id }),
-                "Cannot map `{}` twice.",
-                rust,
+                "Cannot map `{rust}` twice.",
             );
         }
 
@@ -356,8 +351,7 @@ impl<T> WithSizedTypeIds<T> {
             let rust = core::any::type_name::<Option<T>>().to_string();
             assert!(
                 map.insert(RustSqlMapping { sql: single_sql.clone(), rust: rust.to_string(), id }),
-                "Cannot map `{}` twice.",
-                rust,
+                "Cannot map `{rust}` twice.",
             );
         }
 
@@ -365,32 +359,28 @@ impl<T> WithSizedTypeIds<T> {
             let rust = core::any::type_name::<T>().to_string();
             assert!(
                 map.insert(RustSqlMapping { sql: set_sql.clone(), rust: rust.to_string(), id }),
-                "Cannot map `{}` twice.",
-                rust,
+                "Cannot map `{rust}` twice.",
             );
         }
         if let Some(id) = *WithSizedTypeIds::<T>::VEC_OPTION_ID {
             let rust = core::any::type_name::<Vec<Option<T>>>();
             assert!(
                 map.insert(RustSqlMapping { sql: set_sql.clone(), rust: rust.to_string(), id }),
-                "Cannot map `{}` twice.",
-                rust,
+                "Cannot map `{rust}` twice.",
             );
         }
         if let Some(id) = *WithSizedTypeIds::<T>::OPTION_VEC_ID {
             let rust = core::any::type_name::<Option<Vec<T>>>();
             assert!(
                 map.insert(RustSqlMapping { sql: set_sql.clone(), rust: rust.to_string(), id }),
-                "Cannot map `{}` twice.",
-                rust,
+                "Cannot map `{rust}` twice.",
             );
         }
         if let Some(id) = *WithSizedTypeIds::<T>::OPTION_VEC_OPTION_ID {
             let rust = core::any::type_name::<Option<Vec<Option<T>>>>();
             assert!(
                 map.insert(RustSqlMapping { sql: set_sql.clone(), rust: rust.to_string(), id }),
-                "Cannot map `{}` twice.",
-                rust,
+                "Cannot map `{rust}` twice.",
             );
         }
     }
@@ -443,22 +433,20 @@ impl<T: FromDatum + 'static> WithArrayTypeIds<T> {
     }
 
     pub fn register_array(map: &mut std::collections::HashSet<RustSqlMapping>, single_sql: String) {
-        let set_sql = format!("{}[]", single_sql);
+        let set_sql = format!("{single_sql}[]");
 
         if let Some(id) = *WithArrayTypeIds::<T>::ARRAY_ID {
             let rust = core::any::type_name::<Array<T>>().to_string();
             assert!(
                 map.insert(RustSqlMapping { sql: set_sql.clone(), rust: rust.to_string(), id }),
-                "Cannot map `{}` twice.",
-                rust,
+                "Cannot map `{rust}` twice.",
             );
         }
         if let Some(id) = *WithArrayTypeIds::<T>::OPTION_ARRAY_ID {
             let rust = core::any::type_name::<Option<Array<T>>>().to_string();
             assert!(
                 map.insert(RustSqlMapping { sql: set_sql.clone(), rust: rust.to_string(), id }),
-                "Cannot map `{}` twice.",
-                rust,
+                "Cannot map `{rust}` twice.",
             );
         }
 
@@ -466,16 +454,14 @@ impl<T: FromDatum + 'static> WithArrayTypeIds<T> {
             let rust = core::any::type_name::<VariadicArray<T>>().to_string();
             assert!(
                 map.insert(RustSqlMapping { sql: set_sql.clone(), rust: rust.to_string(), id }),
-                "Cannot map `{}` twice.",
-                rust,
+                "Cannot map `{rust}` twice.",
             );
         }
         if let Some(id) = *WithArrayTypeIds::<T>::OPTION_VARIADICARRAY_ID {
             let rust = core::any::type_name::<Option<VariadicArray<T>>>().to_string();
             assert!(
                 map.insert(RustSqlMapping { sql: set_sql.clone(), rust: rust.to_string(), id }),
-                "Cannot map `{}` twice.",
-                rust,
+                "Cannot map `{rust}` twice.",
             );
         }
     }
@@ -534,8 +520,7 @@ impl<T: Copy + 'static> WithVarlenaTypeIds<T> {
             let rust = core::any::type_name::<PgVarlena<T>>();
             assert!(
                 map.insert(RustSqlMapping { sql: single_sql.clone(), rust: rust.to_string(), id }),
-                "Cannot map `{}` twice.",
-                rust,
+                "Cannot map `{rust}` twice.",
             );
         }
 
@@ -543,16 +528,14 @@ impl<T: Copy + 'static> WithVarlenaTypeIds<T> {
             let rust = core::any::type_name::<PgBox<PgVarlena<T>>>().to_string();
             assert!(
                 map.insert(RustSqlMapping { sql: single_sql.clone(), rust: rust.to_string(), id }),
-                "Cannot map `{}` twice.",
-                rust,
+                "Cannot map `{rust}` twice.",
             );
         }
         if let Some(id) = *WithVarlenaTypeIds::<T>::OPTION_VARLENA_ID {
             let rust = core::any::type_name::<Option<PgVarlena<T>>>().to_string();
             assert!(
                 map.insert(RustSqlMapping { sql: single_sql.clone(), rust: rust.to_string(), id }),
-                "Cannot map `{}` twice.",
-                rust,
+                "Cannot map `{rust}` twice.",
             );
         }
     }

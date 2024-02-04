@@ -53,7 +53,7 @@ mod test_schema {
                 unaliased_name = func.name,
             ))
         } else {
-            panic!("expected extern function entity, got {:?}", entity);
+            panic!("expected extern function entity, got {entity:?}");
         }
     }
 
@@ -69,7 +69,7 @@ mod test_schema {
                 name = ty.name,
             ))
         } else {
-            panic!("expected type entity, got {:?}", entity);
+            panic!("expected type entity, got {entity:?}");
         }
     }
 }

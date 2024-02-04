@@ -122,7 +122,7 @@ pub fn pg_test(attr: TokenStream, item: TokenStream) -> TokenStream {
                     let res = pgrx_tests::run_test(#sql_funcname, #expected_error, crate::pg_test::postgresql_conf_options());
                     match res {
                         Ok(()) => (),
-                        Err(e) => panic!("{:?}", e)
+                        Err(e) => panic!("{e:?}")
                     }
                 }
             });
@@ -715,7 +715,7 @@ fn impl_postgres_enum(ast: DeriveInput) -> syn::Result<proc_macro2::TokenStream>
                     let (name, _, _) = ::pgrx::enum_helper::lookup_enum_by_oid(unsafe { ::pgrx::pg_sys::Oid::from_datum(datum, is_null)? } );
                     match name.as_str() {
                         #from_datum
-                        _ => panic!("invalid enum value: {}", name)
+                        _ => panic!("invalid enum value: {name}")
                     }
                 }
             }

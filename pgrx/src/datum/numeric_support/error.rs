@@ -28,9 +28,9 @@ pub enum Error {
 impl Display for Error {
     fn fmt(&self, f: &mut Formatter<'_>) -> fmt::Result {
         match self {
-            Error::OutOfRange(s) => write!(f, "{}", s),
-            Error::Invalid(s) => write!(f, "{}", s),
-            Error::ConversionNotSupported(s) => write!(f, "{}", s),
+            Error::OutOfRange(s) => write!(f, "{s}"),
+            Error::Invalid(s) => write!(f, "{s}"),
+            Error::ConversionNotSupported(s) => write!(f, "{s}"),
         }
     }
 }

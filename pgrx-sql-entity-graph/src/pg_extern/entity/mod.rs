@@ -136,7 +136,7 @@ impl ToSql for PgExternEntity {
                                             schema_prefix = context.schema_prefix_for(&graph_index),
                                             // First try to match on [`TypeId`] since it's most reliable.
                                             sql_type = argument_sql,
-                                            default = if let Some(def) = arg.used_ty.default { format!(" DEFAULT {}", def) } else { String::from("") },
+                                            default = if let Some(def) = arg.used_ty.default { format!(" DEFAULT {def}") } else { String::from("") },
                                             variadic = if metadata_argument.variadic { "VARIADIC " } else { "" },
                                             maybe_comma = if needs_comma { ", " } else { " " },
                                             type_name = metadata_argument.type_name,
@@ -160,7 +160,7 @@ impl ToSql for PgExternEntity {
                             schema_prefix = context.schema_prefix_for(&graph_index),
                             // First try to match on [`TypeId`] since it's most reliable.
                             sql_type = sql,
-                            default = if let Some(def) = arg.used_ty.default { format!(" DEFAULT {}", def) } else { String::from("") },
+                            default = if let Some(def) = arg.used_ty.default { format!(" DEFAULT {def}") } else { String::from("") },
                             variadic = if metadata_argument.variadic { "VARIADIC " } else { "" },
                             maybe_comma = if needs_comma { ", " } else { " " },
                             type_name = metadata_argument.type_name,
