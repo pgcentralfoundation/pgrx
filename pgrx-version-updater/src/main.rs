@@ -105,7 +105,7 @@ fn query_toml(query_args: &QueryCargoVersionArgs) {
     // the root of a PGRX checkout directory
     let filepath = match &query_args.file_path {
         Some(path) => {
-            fullpath(path).expect(format!("Could not get full path for file: {}", path).as_str())
+            fullpath(path).expect(format!("Could not get full path for file: {path}").as_str())
         }
         None => {
             let mut current_dir = env::current_dir().expect("Could not get current_dir!");
@@ -150,7 +150,7 @@ fn update_files(args: &UpdateFilesArgs) {
     let mut exclude_version_files = HashSet::new();
     for file in &args.exclude_from_version_change {
         exclude_version_files.insert(
-            fullpath(file).expect(format!("Could not get full path for file: {}", file).as_str()),
+            fullpath(file).expect(format!("Could not get full path for file: {file}").as_str()),
         );
     }
 
@@ -199,7 +199,7 @@ fn update_files(args: &UpdateFilesArgs) {
     // Loop through all files that are included for dependency updates via CLI params
     for file in &args.include_for_dep_updates {
         let filepath =
-            fullpath(file).expect(format!("Could not get full path for file {}", file).as_str());
+            fullpath(file).expect(format!("Could not get full path for file {file}").as_str());
 
         let mut output = format!(
             "{} Cargo.toml file at {} for processing",
@@ -441,12 +441,11 @@ fn parse_new_version(current_version_specifier: &str, new_version: &str) -> Stri
                 result.push_str(new_version);
             } else {
                 panic!(
-                    "Could not find an actual version in specifier: '{}'",
-                    current_version_specifier
+                    "Could not find an actual version in specifier: '{current_version_specifier}'"
                 );
             }
         }
-        None => panic!("Version specifier '{}' is not valid!", current_version_specifier),
+        None => panic!("Version specifier '{current_version_specifier}' is not valid!"),
     }
 
     result

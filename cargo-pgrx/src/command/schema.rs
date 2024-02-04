@@ -257,7 +257,7 @@ pub(crate) fn generate_schema(
         }
 
         let command = command.stderr(Stdio::inherit());
-        let command_str = format!("{:?}", command);
+        let command_str = format!("{command:?}");
         eprintln!(
             "{} for SQL generation with features `{}`",
             "    Building".bold().green(),
@@ -266,7 +266,7 @@ pub(crate) fn generate_schema(
 
         tracing::debug!(command = %command_str, "Running");
         let cargo_output =
-            command.output().wrap_err_with(|| format!("failed to spawn cargo: {}", command_str))?;
+            command.output().wrap_err_with(|| format!("failed to spawn cargo: {command_str}"))?;
         tracing::trace!(status_code = %cargo_output.status, command = %command_str, "Finished");
 
         if !cargo_output.status.success() {
@@ -413,7 +413,7 @@ pub(crate) fn generate_schema(
         for symbol_to_call in fns_to_call {
             let symbol: libloading::os::unix::Symbol<unsafe extern "Rust" fn() -> pgrx_sql_entity_graph::SqlGraphEntity> =
                 lib.get(symbol_to_call.as_bytes()).unwrap_or_else(|_|
-                    panic!("Couldn't call {:#?}", symbol_to_call));
+                    panic!("Couldn't call {symbol_to_call:#?}"));
             let entity = symbol();
             entities.push(entity);
         }
@@ -541,7 +541,7 @@ fn create_stub(
             .ok_or(eyre!("could not call postmaster_stub_file.to_str()"))?,
     ]);
 
-    let so_rustc_invocation_str = format!("{:?}", so_rustc_invocation);
+    let so_rustc_invocation_str = format!("{so_rustc_invocation:?}");
     tracing::debug!(command = %so_rustc_invocation_str, "Running");
     let output = so_rustc_invocation.output().wrap_err_with(|| {
         eyre!("could not invoke `rustc` on {}", &postmaster_stub_file.display())

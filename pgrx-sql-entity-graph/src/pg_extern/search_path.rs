@@ -65,7 +65,7 @@ impl Parse for SearchPathList {
         Ok(Self {
             fields: input
                 .parse_terminated(SearchPath::parse)
-                .unwrap_or_else(|_| panic!("Got {}", input)),
+                .unwrap_or_else(|_| panic!("Got {input}")),
         })
     }
 }

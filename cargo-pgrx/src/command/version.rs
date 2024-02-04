@@ -39,7 +39,7 @@ mod rss {
             let response = http_client
                 .get(VERSIONS_RSS_URL)
                 .call()
-                .wrap_err_with(|| format!("unable to retrieve {}", VERSIONS_RSS_URL))?;
+                .wrap_err_with(|| format!("unable to retrieve {VERSIONS_RSS_URL}"))?;
 
             let rss: Rss = match serde_xml_rs::from_str(&response.into_string()?) {
                 Ok(rss) => rss,
@@ -66,8 +66,7 @@ mod rss {
                         // fill in the latest minor version number and its url
                         known_pgver.minor = PgMinorVersion::Release(minor);
                         known_pgver.url = Some(Url::parse(
-                                &format!("https://ftp.postgresql.org/pub/source/v{major}.{minor}/postgresql-{major}.{minor}.tar.bz2",
-                                         major = major, minor = minor)
+                                &format!("https://ftp.postgresql.org/pub/source/v{major}.{minor}/postgresql-{major}.{minor}.tar.bz2")
                             )?);
                     }
                 }

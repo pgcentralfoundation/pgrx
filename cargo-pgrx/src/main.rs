@@ -83,12 +83,12 @@ fn main() -> color_eyre::Result<()> {
             };
             let filter_layer = EnvFilter::new("warn");
             filter_layer
-                .add_directive(format!("cargo_pgrx={}", log_level).parse()?)
-                .add_directive(format!("pgrx={}", log_level).parse()?)
-                .add_directive(format!("pgrx_macros={}", log_level).parse()?)
-                .add_directive(format!("pgrx_tests={}", log_level).parse()?)
-                .add_directive(format!("pgrx_pg_sys={}", log_level).parse()?)
-                .add_directive(format!("pgrx_utils={}", log_level).parse()?)
+                .add_directive(format!("cargo_pgrx={log_level}").parse()?)
+                .add_directive(format!("pgrx={log_level}").parse()?)
+                .add_directive(format!("pgrx_macros={log_level}").parse()?)
+                .add_directive(format!("pgrx_tests={log_level}").parse()?)
+                .add_directive(format!("pgrx_pg_sys={log_level}").parse()?)
+                .add_directive(format!("pgrx_utils={log_level}").parse()?)
         }
     };
 

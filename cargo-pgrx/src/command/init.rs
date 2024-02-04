@@ -132,7 +132,7 @@ impl CommandExecute for Init {
                         .as_ref()
                         .unwrap() // We just set this
                         .get(pgver)
-                        .wrap_err_with(|| format!("{} is not a known Postgres version", pgver))?
+                        .wrap_err_with(|| format!("{pgver} is not a known Postgres version"))?
                         .clone()
                 } else {
                     let config = PgConfig::new_with_defaults(pg_config_path.as_str().into());
@@ -207,7 +207,7 @@ pub(crate) fn init_pgrx(pgrx: &Pgrx, init: &Init) -> eyre::Result<()> {
 
     output_configs.sort_by(|a, b| {
         a.major_version()
-            .unwrap_or_else(|e| panic!("{e}:  could not determine major version for: `{:?}`", a))
+            .unwrap_or_else(|e| panic!("{e}:  could not determine major version for: `{a:?}`"))
             .cmp(&b.major_version().ok().expect("could not determine major version"))
     });
     for pg_config in output_configs.iter() {
@@ -445,7 +445,7 @@ fn configure_postgres(pg_config: &PgConfig, pgdir: &PathBuf, init: &Init) -> eyr
     if cfg!(target_os = "macos") && pg_config.major_version().unwrap_or(0) == 16 {
         fixup_homebrew_for_icu(&mut command);
     }
-    let command_str = format!("{:?}", command);
+    let command_str = format!("{command:?}");
     tracing::debug!(command = %command_str, "Running");
     let child = command.spawn()?;
     let output = child.wait_with_output()?;
@@ -481,7 +481,7 @@ fn make_postgres(pg_config: &PgConfig, pgdir: &PathBuf, init: &Init) -> eyre::Re
         command.env_remove(var);
     }
 
-    let command_str = format!("{:?}", command);
+    let command_str = format!("{command:?}");
     tracing::debug!(command = %command_str, "Running");
     let child = init.jobserver.get().unwrap().configure_and_run(&mut command, |cmd| cmd.spawn())?;
     let output = child.wait_with_output()?;
@@ -522,7 +522,7 @@ fn make_install_postgres(
         command.env_remove(var);
     }
 
-    let command_str = format!("{:?}", command);
+    let command_str = format!("{command:?}");
     tracing::debug!(command = %command_str, "Running");
     let child = init.jobserver.get().unwrap().configure_and_run(&mut command, |cmd| cmd.spawn())?;
     let output = child.wait_with_output()?;
@@ -611,7 +611,7 @@ pub(crate) fn initdb(bindir: &PathBuf, datadir: &PathBuf) -> eyre::Result<()> {
         .arg("-D")
         .arg(datadir);
 
-    let command_str = format!("{:?}", command);
+    let command_str = format!("{command:?}");
     tracing::debug!(command = %command_str, "Running");
 
     let output = command.output().wrap_err_with(|| eyre!("unable to execute: {}", command_str))?;

@@ -184,12 +184,12 @@ pub fn pg_cast(attr: TokenStream, item: TokenStream) -> TokenStream {
                     {
                         "implicit" => cast = PgCast::Implicit,
                         "assignment" => cast = PgCast::Assignment,
-                        other => panic!("Unrecognized pg_cast option: {}. ", other),
+                        other => panic!("Unrecognized pg_cast option: {other}. "),
                     }
                 }
             }
             Err(err) => {
-                panic!("Failed to parse attribute to pg_cast: {}", err)
+                panic!("Failed to parse attribute to pg_cast: {err}")
             }
         }
         // `pg_cast` does not support other `pg_extern` attributes for now, pass an empty attribute token stream.
@@ -795,8 +795,8 @@ fn impl_postgres_type(ast: DeriveInput) -> syn::Result<proc_macro2::TokenStream>
     let name = &ast.ident;
     let generics = &ast.generics;
     let has_lifetimes = generics.lifetimes().next();
-    let funcname_in = Ident::new(&format!("{}_in", name).to_lowercase(), name.span());
-    let funcname_out = Ident::new(&format!("{}_out", name).to_lowercase(), name.span());
+    let funcname_in = Ident::new(&format!("{name}_in").to_lowercase(), name.span());
+    let funcname_out = Ident::new(&format!("{name}_out").to_lowercase(), name.span());
     let mut args = parse_postgres_type_args(&ast.attrs);
     let mut stream = proc_macro2::TokenStream::new();
 

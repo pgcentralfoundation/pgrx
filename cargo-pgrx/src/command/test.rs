@@ -173,7 +173,7 @@ pub fn test_extension(
         command.arg(testname.as_ref());
     }
 
-    eprintln!("{:?}", command);
+    eprintln!("{command:?}");
 
     tracing::debug!(command = ?command, "Running");
     let status = command.status().wrap_err("failed to run cargo test")?;

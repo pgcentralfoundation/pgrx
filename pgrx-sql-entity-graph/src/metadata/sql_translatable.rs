@@ -51,7 +51,7 @@ impl std::fmt::Display for ArgumentError {
                 write!(f, "A Datum as an argument means that `sql = \"...\"` must be set in the declaration")
             }
             ArgumentError::NotValidAsArgument(type_name) => {
-                write!(f, "`{}` is not able to be used as a function argument", type_name)
+                write!(f, "`{type_name}` is not able to be used as a function argument")
             }
         }
     }

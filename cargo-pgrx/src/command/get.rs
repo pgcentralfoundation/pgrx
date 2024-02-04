@@ -41,7 +41,7 @@ impl CommandExecute for Get {
                 .wrap_err("Couldn't get manifest path")?;
 
         if let Some(value) = get_property(package_manifest_path, &self.name)? {
-            println!("{}", value);
+            println!("{value}");
         }
         Ok(())
     }

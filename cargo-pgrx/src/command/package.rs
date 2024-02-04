@@ -150,6 +150,6 @@ pub(crate) fn build_base_path(
     let extname = get_property(manifest_path, "extname")?
         .ok_or(eyre!("could not determine extension name"))?;
     target_dir.push(profile.target_subdir());
-    target_dir.push(format!("{}-pg{}", extname, pgver));
+    target_dir.push(format!("{extname}-pg{pgver}"));
     Ok(target_dir)
 }

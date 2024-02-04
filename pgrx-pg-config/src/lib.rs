@@ -68,9 +68,9 @@ impl Display for PgMinorVersion {
     fn fmt(&self, f: &mut Formatter<'_>) -> fmt::Result {
         match self {
             PgMinorVersion::Latest => write!(f, ".LATEST"),
-            PgMinorVersion::Release(v) => write!(f, ".{}", v),
-            PgMinorVersion::Beta(v) => write!(f, "beta{}", v),
-            PgMinorVersion::Rc(v) => write!(f, "rc{}", v),
+            PgMinorVersion::Release(v) => write!(f, ".{v}"),
+            PgMinorVersion::Beta(v) => write!(f, "beta{v}"),
+            PgMinorVersion::Rc(v) => write!(f, "rc{v}"),
         }
     }
 }
@@ -294,7 +294,7 @@ impl PgConfig {
             None => {
                 let major = self.major_version()?;
                 let minor = self.minor_version()?;
-                let version = format!("{}{}", major, minor);
+                let version = format!("{major}{minor}");
                 Ok(version)
             }
         }
@@ -713,7 +713,7 @@ pub fn createdb(
         .stdout(Stdio::piped())
         .stderr(Stdio::piped());
 
-    let command_str = format!("{:?}", command);
+    let command_str = format!("{command:?}");
 
     let child = command.spawn().wrap_err_with(|| {
         format!("Failed to spawn process for creating database using command: '{command_str}': ")
@@ -755,7 +755,7 @@ fn does_db_exist(pg_config: &PgConfig, dbname: &str) -> eyre::Result<bool> {
         .stdout(Stdio::piped())
         .stderr(Stdio::piped());
 
-    let command_str = format!("{:?}", command);
+    let command_str = format!("{command:?}");
     let output = command.output()?;
 
     if !output.status.success() {

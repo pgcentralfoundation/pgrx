@@ -261,7 +261,7 @@ impl PgrxSql {
             create_dir_all(parent)?;
         }
         let mut out = File::create(path)?;
-        write!(out, "{}", generated)?;
+        write!(out, "{generated}")?;
         Ok(())
     }
 
@@ -274,13 +274,13 @@ impl PgrxSql {
             if stdout().is_terminal() {
                 self.write_highlighted(out, &generated)?;
             } else {
-                write!(*out, "{}", generated)?;
+                write!(*out, "{generated}")?;
             }
         }
 
         #[cfg(not(feature = "syntax-highlighting"))]
         {
-            write!(*out, "{}", generated)?;
+            write!(*out, "{generated}")?;
         }
 
         Ok(())
@@ -307,7 +307,7 @@ impl PgrxSql {
                 // Concept from https://github.com/sharkdp/bat/blob/1b030dc03b906aa345f44b8266bffeea77d763fe/src/terminal.rs#L6
                 for (style, content) in ranges {
                     if style.foreground.a == 0x01 {
-                        write!(*out, "{}", content)?;
+                        write!(*out, "{content}")?;
                     } else {
                         write!(*out, "{}", content.color(XtermColors::from(style.foreground.r)))?;
                     }
@@ -315,7 +315,7 @@ impl PgrxSql {
                 write!(*out, "\x1b[0m")?;
             }
         } else {
-            write!(*out, "{}", generated)?;
+            write!(*out, "{generated}")?;
         }
         Ok(())
     }
@@ -381,7 +381,7 @@ impl PgrxSql {
             create_dir_all(parent)?;
         }
         let mut out = File::create(path)?;
-        write!(out, "{:?}", generated)?;
+        write!(out, "{generated:?}")?;
         Ok(())
     }
 
@@ -432,7 +432,7 @@ impl PgrxSql {
             let extname = &self.extension_name;
             let extver = &self.control.default_version;
             // Note: versioned so-name format must agree with cargo pgrx
-            format!("$libdir/{}-{}", extname, extver)
+            format!("$libdir/{extname}-{extver}")
         } else {
             String::from("MODULE_PATHNAME")
         }

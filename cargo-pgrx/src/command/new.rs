@@ -79,7 +79,7 @@ fn create_directory_structure(path: &PathBuf) -> Result<(), std::io::Error> {
 fn create_control_file(path: &PathBuf, name: &str) -> Result<(), std::io::Error> {
     let mut filename = path.clone();
 
-    filename.push(format!("{}.control", name));
+    filename.push(format!("{name}.control"));
     let mut file = std::fs::File::create(filename)?;
 
     file.write_all(format!(include_str!("../templates/control"), name = name).as_bytes())?;
