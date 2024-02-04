@@ -51,20 +51,18 @@ pub(crate) fn create_crate_template(
     name: &str,
     is_bgworker: bool,
 ) -> eyre::Result<()> {
-    create_directory_structure(&path)?;
-    create_control_file(&path, name)?;
-    create_cargo_toml(&path, name)?;
-    create_dotcargo_config_toml(&path, name)?;
-    create_lib_rs(&path, name, is_bgworker)?;
-    create_git_ignore(&path, name)?;
-    create_pgrx_embed_rs(&path)?;
+    create_directory_structure(path.clone())?;
+    create_control_file(path.clone(), name)?;
+    create_cargo_toml(path.clone(), name)?;
+    create_dotcargo_config_toml(path.clone(), name)?;
+    create_lib_rs(path.clone(), name, is_bgworker)?;
+    create_git_ignore(path.clone(), name)?;
+    create_pgrx_embed_rs(path)?;
 
     Ok(())
 }
 
-fn create_directory_structure(path: &PathBuf) -> Result<(), std::io::Error> {
-    let mut src_dir = path.clone();
-
+fn create_directory_structure(mut src_dir: PathBuf) -> Result<(), std::io::Error> {
     src_dir.push("src");
     std::fs::create_dir_all(&src_dir)?;
 
@@ -85,9 +83,7 @@ fn create_directory_structure(path: &PathBuf) -> Result<(), std::io::Error> {
     Ok(())
 }
 
-fn create_control_file(path: &PathBuf, name: &str) -> Result<(), std::io::Error> {
-    let mut filename = path.clone();
-
+fn create_control_file(mut filename: PathBuf, name: &str) -> Result<(), std::io::Error> {
     filename.push(format!("{name}.control"));
     let mut file = std::fs::File::create(filename)?;
 
@@ -96,9 +92,7 @@ fn create_control_file(path: &PathBuf, name: &str) -> Result<(), std::io::Error>
     Ok(())
 }
 
-fn create_cargo_toml(path: &PathBuf, name: &str) -> Result<(), std::io::Error> {
-    let mut filename = path.clone();
-
+fn create_cargo_toml(mut filename: PathBuf, name: &str) -> Result<(), std::io::Error> {
     filename.push("Cargo.toml");
     let mut file = std::fs::File::create(filename)?;
 
@@ -107,9 +101,7 @@ fn create_cargo_toml(path: &PathBuf, name: &str) -> Result<(), std::io::Error> {
     Ok(())
 }
 
-fn create_dotcargo_config_toml(path: &PathBuf, _name: &str) -> Result<(), std::io::Error> {
-    let mut filename = path.clone();
-
+fn create_dotcargo_config_toml(mut filename: PathBuf, _name: &str) -> Result<(), std::io::Error> {
     filename.push(".cargo");
     filename.push("config.toml");
     let mut file = std::fs::File::create(filename)?;
@@ -119,9 +111,11 @@ fn create_dotcargo_config_toml(path: &PathBuf, _name: &str) -> Result<(), std::i
     Ok(())
 }
 
-fn create_lib_rs(path: &PathBuf, name: &str, is_bgworker: bool) -> Result<(), std::io::Error> {
-    let mut filename = path.clone();
-
+fn create_lib_rs(
+    mut filename: PathBuf,
+    name: &str,
+    is_bgworker: bool,
+) -> Result<(), std::io::Error> {
     filename.push("src");
     filename.push("lib.rs");
     let mut file = std::fs::File::create(filename)?;
@@ -137,9 +131,7 @@ fn create_lib_rs(path: &PathBuf, name: &str, is_bgworker: bool) -> Result<(), st
     Ok(())
 }
 
-fn create_git_ignore(path: &PathBuf, _name: &str) -> Result<(), std::io::Error> {
-    let mut filename = path.clone();
-
+fn create_git_ignore(mut filename: PathBuf, _name: &str) -> Result<(), std::io::Error> {
     filename.push(".gitignore");
     let mut file = std::fs::File::create(filename)?;
 
@@ -148,8 +140,7 @@ fn create_git_ignore(path: &PathBuf, _name: &str) -> Result<(), std::io::Error> 
     Ok(())
 }
 
-fn create_pgrx_embed_rs(path: &PathBuf) -> Result<(), std::io::Error> {
-    let mut filename = path.clone();
+fn create_pgrx_embed_rs(mut filename: PathBuf) -> Result<(), std::io::Error> {
     filename.push("src");
     filename.push("bin");
     filename.push(format!("pgrx_embed.rs"));

@@ -96,7 +96,7 @@ impl<T> fmt::Debug for PgLwLockInner<T> {
     }
 }
 
-impl<'a, T> PgLwLockInner<T> {
+impl<T> PgLwLockInner<T> {
     fn new(name: &'static str, data: *mut T) -> Self {
         unsafe {
             let lock = alloc::ffi::CString::new(name).expect("CString::new failed");

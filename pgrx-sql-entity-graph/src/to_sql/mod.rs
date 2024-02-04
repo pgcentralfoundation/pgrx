@@ -99,28 +99,22 @@ impl ToSqlConfig {
                     continue;
                 }
 
-                match nv.value {
-                    ArgValue::Path(ref callback_path) => {
-                        return Ok(Some(Self {
-                            enabled: true,
-                            callback: Some(callback_path.clone()),
-                            content: None,
-                        }));
-                    }
+                return match nv.value {
+                    ArgValue::Path(ref callback_path) => Ok(Some(Self {
+                        enabled: true,
+                        callback: Some(callback_path.clone()),
+                        content: None,
+                    })),
                     ArgValue::Lit(Lit::Bool(ref b)) => {
-                        return Ok(Some(Self { enabled: b.value, callback: None, content: None }));
+                        Ok(Some(Self { enabled: b.value, callback: None, content: None }))
                     }
                     ArgValue::Lit(Lit::Str(ref s)) => {
-                        return Ok(Some(Self {
-                            enabled: true,
-                            callback: None,
-                            content: Some(s.clone()),
-                        }));
+                        Ok(Some(Self { enabled: true, callback: None, content: Some(s.clone()) }))
                     }
                     ArgValue::Lit(ref other) => {
-                        return Err(syn::Error::new(other.span(), INVALID_ATTR_CONTENT));
+                        Err(syn::Error::new(other.span(), INVALID_ATTR_CONTENT))
                     }
-                }
+                };
             }
         }
 

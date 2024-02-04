@@ -73,13 +73,7 @@ impl Ord for AnyNumeric {
         let cmp: i32 = unsafe {
             direct_function_call(pg_sys::numeric_cmp, &[self.as_datum(), other.as_datum()]).unwrap()
         };
-        if cmp < 0 {
-            Ordering::Less
-        } else if cmp > 0 {
-            Ordering::Greater
-        } else {
-            Ordering::Equal
-        }
+        cmp.cmp(&0)
     }
 }
 

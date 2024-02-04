@@ -72,7 +72,7 @@ pub enum FnCallError {
     #[error("The specified function exists, but has overloaded versions which are ambiguous given the argument types provided")]
     AmbiguousFunction,
 
-    #[error("Can only dymamically call plain functions")]
+    #[error("Can only dynamically call plain functions")]
     UnsupportedFunctionType,
 
     #[error("Functions with OUT/IN_OUT/TABLE arguments are not supported")]
@@ -297,7 +297,7 @@ pub fn fn_call_with_collation<R: FromDatum + IntoDatum>(
         // of `nargs` `NullableDatum` instances.
         let args_slice = fcinfo_ref.args.as_mut_slice(nargs);
         for (i, datum) in arg_datums.into_iter().enumerate() {
-            assert!(!isstrict || (isstrict && datum.is_some())); // no NULL datums if this function is STRICT
+            assert!(!isstrict || datum.is_some()); // no NULL datums if this function is STRICT
 
             let arg = &mut args_slice[i];
             (arg.value, arg.isnull) =

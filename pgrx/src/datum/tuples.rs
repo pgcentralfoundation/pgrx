@@ -58,19 +58,10 @@ where
         let b = vec.pop().unwrap();
         let a = vec.pop().unwrap();
 
-        let a_datum = if a.is_some() {
-            A::from_polymorphic_datum(a.unwrap(), false, A::type_oid())
-        } else {
-            None
-        };
-
-        let b_datum = if b.is_some() {
-            B::from_polymorphic_datum(b.unwrap(), false, B::type_oid())
-        } else {
-            None
-        };
-
-        Some((a_datum, b_datum))
+        Some((
+            a.and_then(|a| A::from_polymorphic_datum(a, false, A::type_oid())),
+            b.and_then(|b| B::from_polymorphic_datum(b, false, B::type_oid())),
+        ))
     }
 }
 
@@ -94,24 +85,10 @@ where
         let b = vec.pop().unwrap();
         let a = vec.pop().unwrap();
 
-        let a_datum = if a.is_some() {
-            A::from_polymorphic_datum(a.unwrap(), false, A::type_oid())
-        } else {
-            None
-        };
-
-        let b_datum = if b.is_some() {
-            B::from_polymorphic_datum(b.unwrap(), false, B::type_oid())
-        } else {
-            None
-        };
-
-        let c_datum = if c.is_some() {
-            C::from_polymorphic_datum(c.unwrap(), false, C::type_oid())
-        } else {
-            None
-        };
-
-        Some((a_datum, b_datum, c_datum))
+        Some((
+            a.and_then(|a| A::from_polymorphic_datum(a, false, A::type_oid())),
+            b.and_then(|b| B::from_polymorphic_datum(b, false, B::type_oid())),
+            c.and_then(|c| C::from_polymorphic_datum(c, false, C::type_oid())),
+        ))
     }
 }

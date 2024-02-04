@@ -30,10 +30,10 @@ impl IntegerAvgState {
         mut current: <Self as Aggregate>::State,
         arg: <Self as Aggregate>::Args,
     ) -> <Self as Aggregate>::State {
-        arg.map(|a| {
+        if let Some(a) = arg {
             current.sum += a;
             current.n += 1;
-        });
+        }
         current
     }
 

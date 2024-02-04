@@ -70,10 +70,7 @@ impl CommandExecute for SudoInstall {
         for src in output_files {
             let src = src.canonicalize()?;
             let dest_abs = make_absolute(src.strip_prefix(&outdir)?);
-            let dest = match dest_abs.canonicalize() {
-                Ok(path) => path,
-                Err(_) => dest_abs,
-            };
+            let dest = dest_abs.canonicalize().unwrap_or(dest_abs);
 
             // we're about to run `sudo` to copy some files, one at a time
             let mut command = Command::new("sudo"); // NB:  If we ever support Windows...

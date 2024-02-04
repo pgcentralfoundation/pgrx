@@ -15,7 +15,7 @@ use pgrx_sql_entity_graph::metadata::{
 /// The [`anyelement` polymorphic pseudo-type][anyelement].
 ///
 // rustdoc doesn't directly support a warning block: https://github.com/rust-lang/rust/issues/73935
-/// **Warning**: Calling [`FromDatum::from_datum`] with this type will unconditonally panic. Call
+/// **Warning**: Calling [`FromDatum::from_datum`] with this type will unconditionally panic. Call
 /// [`FromDatum::from_polymorphic_datum`] with a type ID instead.
 ///
 /// [anyelement]: https://www.postgresql.org/docs/current/extend-type-system.html#EXTEND-TYPES-POLYMORPHIC

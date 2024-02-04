@@ -148,11 +148,8 @@ mod vectors {
         });
 
         let remainder: f32 = remainder.iter().copied().sum();
+        let reduced: f32 = sum.into_iter().take(LANES).sum();
 
-        let mut reduced = 0.0f32;
-        for i in 0..LANES {
-            reduced += sum[i];
-        }
         Ok(reduced + remainder)
     }
 

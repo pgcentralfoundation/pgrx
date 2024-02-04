@@ -330,6 +330,7 @@ impl<'conn> SpiHeapTupleData<'conn> {
         unsafe {
             // SAFETY:  we know tupdesc is not null
             let natts = (*tupdesc).natts;
+            // BUG: usize::try_from will always succeed here, and is not needed.
             data.entries.reserve(usize::try_from(natts as usize).unwrap_or_default());
             for i in 1..=natts {
                 let mut is_null = false;

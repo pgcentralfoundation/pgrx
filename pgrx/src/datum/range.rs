@@ -246,10 +246,10 @@ where
     /// Returns `true` if the range is "infinite".  This is equivalent to Rust's [`std::ops::RangeFull`] (`(..)`)
     #[inline]
     pub fn is_infinite(&self) -> bool {
-        match (self.lower(), self.upper()) {
-            (Some(RangeBound::Infinite), Some(RangeBound::Infinite)) => true,
-            _ => false,
-        }
+        matches!(
+            (self.lower(), self.upper()),
+            (Some(RangeBound::Infinite), Some(RangeBound::Infinite))
+        )
     }
 
     /// Consumes `self` and returns the internal representation, which can be easily mapped or

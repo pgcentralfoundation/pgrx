@@ -133,7 +133,7 @@ fn hexint_to_int(hexint: HexInt) -> Result<i32, Box<dyn Error>> {
 
 #[pg_extern(immutable, parallel_safe)]
 fn hexint_to_numeric(hexint: HexInt) -> Result<AnyNumeric, Box<dyn Error>> {
-    Ok(hexint.value.try_into()?)
+    Ok(hexint.value.into())
 }
 
 #[pg_extern(immutable, parallel_safe)]

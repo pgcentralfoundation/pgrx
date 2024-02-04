@@ -58,10 +58,7 @@ fn takes_char(i: char) -> char {
 
 #[pg_extern]
 fn takes_option(i: Option<i32>) -> i32 {
-    match i {
-        Some(i) => i,
-        None => -1,
-    }
+    i.unwrap_or(-1)
 }
 
 #[pg_extern]

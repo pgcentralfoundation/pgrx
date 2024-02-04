@@ -87,7 +87,7 @@ Unfortunately, the cross-compilation process is quite distribution specific. We'
 
 Of the mainstream distributions (that is, excluding things like NixOS which apparently are designed to make this easy) the easiest path available is likely to be on Debian-family systems. This is for two reasons:
 
-1. The cross compilation tools can be installed via an easy package like `crossbuild-essential-arm64` (when targetting `aarch64`) or `crossbuild-essential-amd64` (when targetting `x86_64`)
+1. The cross compilation tools can be installed via an easy package like `crossbuild-essential-arm64` (when targeting `aarch64`) or `crossbuild-essential-amd64` (when targeting `x86_64`)
 
 2. The cross compilation sysroot is the same as the normal sysroot -- they're both `/`.
 
@@ -105,7 +105,7 @@ On the steps on Debian-family are as follows:
     - *`target=aarch64`*: `rustup target add aarch64-unknown-linux-gnu`.
     - *`target=x86_64`*: `rustup target add x86_64-unknown-linux-gnu`.
 
-3. Install the `crossbuild-essential-<arch>` package for the architecture you are targetting
+3. Install the `crossbuild-essential-<arch>` package for the architecture you are targeting
     - *`target=aarch64`*: `sudo apt install crossbuild-essential-arm64`.
     - *`target=x86_64`*: `sudo apt install crossbuild-essential-amd64`.
 
@@ -126,7 +126,7 @@ On the steps on Debian-family are as follows:
 
 This will produce a `.so` in `./target/<target>/release/lib$yourext.so`, which you can use.
 
-> *TODO: this seems like it is not quite complete -- we may need things like this (when targetting `aarch64` from `x86_64`)? Needs some slightly further investigation for _why_, though, since most of this should be auto-detected (notably the target and isystem paths...)*
+> *TODO: this seems like it is not quite complete -- we may need things like this (when targeting `aarch64` from `x86_64`)? Needs some slightly further investigation for _why_, though, since most of this should be auto-detected (notably the target and isystem paths...)*
 >
 > ```sh
 > export BINDGEN_EXTRA_CLANG_ARGS_aarch64-unknown-linux-gnu="-target aarch64-unknown-linux-gnu -isystem /usr/aarch64-linux-gnu/include/ -ccc-gcc-name aarch64-linux-gnu-gcc"
@@ -156,7 +156,7 @@ To cross compile, you need a toolchain. This is basically two parts:
 
 Pick well here, since getting a bad one may cause builds that succeed but fail at runtime.
 
-An easy option for targetting `aarch64` (or several other architectures) from `x86_64` is to use one of the ones on <https://toolchains.bootlin.com/releases_aarch64.html> (not an endorsement: they're something I've used for development, I don't know how well-made they are, and they honestly seem kind of idiosyncratic. IOW, I'd want to do a lot more research before putting them into production).
+An easy option for targeting `aarch64` (or several other architectures) from `x86_64` is to use one of the ones on <https://toolchains.bootlin.com/releases_aarch64.html> (not an endorsement: they're something I've used for development, I don't know how well-made they are, and they honestly seem kind of idiosyncratic. IOW, I'd want to do a lot more research before putting them into production).
 
 Sadly, I don't have a good option for an easily downloaded x86_64 toolchain that has tools built for aarch64. I've been using a manually built one, which isn't covered in this guide (TODO?).
 
@@ -173,7 +173,7 @@ Anyway, once you have one of these you may need to put it somewhere specific -- 
 
 ## Use the cross compilation toolchain
 
-Continuing from above, I will assume (without loss of generality) that you're targetting aarch64, have a toolchain directory at `$toolchain_dir` and your sysroot is at `$sysroot_dir` -- try `$toolchain_dir/bin/aarch64-linux-gnu-gcc --print-sysroot`.
+Continuing from above, I will assume (without loss of generality) that you're targeting aarch64, have a toolchain directory at `$toolchain_dir` and your sysroot is at `$sysroot_dir` -- try `$toolchain_dir/bin/aarch64-linux-gnu-gcc --print-sysroot`.
 
 Anyway, set
 

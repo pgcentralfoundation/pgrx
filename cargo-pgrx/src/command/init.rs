@@ -22,7 +22,7 @@ use std::collections::HashMap;
 use std::fs::File;
 use std::io::{Read, Write};
 use std::num::NonZeroUsize;
-use std::path::PathBuf;
+use std::path::{Path, PathBuf};
 use std::process::{Command, Stdio};
 use std::sync::OnceLock;
 
@@ -208,7 +208,7 @@ pub(crate) fn init_pgrx(pgrx: &Pgrx, init: &Init) -> eyre::Result<()> {
     output_configs.sort_by(|a, b| {
         a.major_version()
             .unwrap_or_else(|e| panic!("{e}:  could not determine major version for: `{a:?}`"))
-            .cmp(&b.major_version().ok().expect("could not determine major version"))
+            .cmp(&b.major_version().expect("could not determine major version"))
     });
     for pg_config in output_configs.iter() {
         validate_pg_config(pg_config)?;
@@ -231,7 +231,7 @@ pub(crate) fn init_pgrx(pgrx: &Pgrx, init: &Init) -> eyre::Result<()> {
 #[tracing::instrument(level = "error", skip_all, fields(pg_version = %pg_config.version()?, pgrx_home))]
 fn download_postgres(
     pg_config: &PgConfig,
-    pgrx_home: &PathBuf,
+    pgrx_home: &Path,
     init: &Init,
 ) -> eyre::Result<PgConfig> {
     use crate::command::build_agent_for_url;
@@ -263,15 +263,10 @@ fn download_postgres(
     make_install_postgres(pg_config, &pgdir, init) // returns a new PgConfig object
 }
 
-fn untar(
-    bytes: &[u8],
-    pgrxdir: &PathBuf,
-    pg_config: &PgConfig,
-    init: &Init,
-) -> eyre::Result<PathBuf> {
+fn untar(bytes: &[u8], pgrxdir: &Path, pg_config: &PgConfig, init: &Init) -> eyre::Result<PathBuf> {
     let _token = init.jobserver.get().unwrap().acquire().unwrap();
 
-    let mut unpackdir = pgrxdir.clone();
+    let mut unpackdir = pgrxdir.to_path_buf();
     unpackdir.push(&format!("{}_unpack", pg_config.version()?));
     if unpackdir.exists() {
         // delete everything at this path if it already exists
@@ -289,7 +284,7 @@ fn untar(
     let mut tar_decoder = Archive::new(BzDecoder::new(bytes));
     tar_decoder.unpack(&unpackdir)?;
 
-    let mut pgdir = pgrxdir.clone();
+    let mut pgdir = pgrxdir.to_path_buf();
     pgdir.push(&pg_config.version()?);
     if pgdir.exists() {
         // delete everything at this path if it already exists
@@ -601,7 +596,7 @@ fn is_root_user() -> bool {
     false
 }
 
-pub(crate) fn initdb(bindir: &PathBuf, datadir: &PathBuf) -> eyre::Result<()> {
+pub(crate) fn initdb(bindir: &Path, datadir: &PathBuf) -> eyre::Result<()> {
     println!(" {} data directory at {}", "Initializing".bold().green(), datadir.display());
     let mut command = std::process::Command::new(format!("{}/initdb", bindir.display()));
     command

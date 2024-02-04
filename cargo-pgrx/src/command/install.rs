@@ -348,9 +348,9 @@ pub(crate) fn build_extension(
 fn get_target_sql_file(
     manifest_path: impl AsRef<Path>,
     extdir: &PathBuf,
-    base_directory: &PathBuf,
+    base_directory: PathBuf,
 ) -> eyre::Result<PathBuf> {
-    let mut dest = base_directory.clone();
+    let mut dest = base_directory;
     dest.push(extdir);
 
     let (_, extname) = find_control_file(&manifest_path)?;
@@ -369,11 +369,11 @@ fn copy_sql_files(
     is_test: bool,
     features: &clap_cargo::Features,
     extdir: &PathBuf,
-    base_directory: &PathBuf,
+    base_directory: &Path,
     skip_build: bool,
     output_tracking: &mut Vec<PathBuf>,
 ) -> eyre::Result<()> {
-    let dest = get_target_sql_file(&package_manifest_path, extdir, base_directory)?;
+    let dest = get_target_sql_file(&package_manifest_path, extdir, base_directory.to_path_buf())?;
     let (_, extname) = find_control_file(&package_manifest_path)?;
 
     crate::command::schema::generate_schema(
@@ -392,26 +392,24 @@ fn copy_sql_files(
     )?;
 
     // now copy all the version upgrade files too
-    if let Ok(dir) = std::fs::read_dir("sql/") {
-        for sql in dir {
-            if let Ok(sql) = sql {
-                let filename = sql.file_name().into_string().unwrap();
+    if let Ok(dir) = fs::read_dir("sql/") {
+        for sql in dir.flatten() {
+            let filename = sql.file_name().into_string().unwrap();
 
-                if filename.starts_with(&format!("{extname}--")) && filename.ends_with(".sql") {
-                    let mut dest = base_directory.clone();
-                    dest.push(extdir);
-                    dest.push(filename);
+            if filename.starts_with(&format!("{extname}--")) && filename.ends_with(".sql") {
+                let mut dest = base_directory.to_path_buf();
+                dest.push(extdir);
+                dest.push(filename);
 
-                    copy_file(
-                        &sql.path(),
-                        &dest,
-                        "extension schema upgrade file",
-                        true,
-                        &package_manifest_path,
-                        output_tracking,
-                        pg_config,
-                    )?;
-                }
+                copy_file(
+                    &sql.path(),
+                    &dest,
+                    "extension schema upgrade file",
+                    true,
+                    &package_manifest_path,
+                    output_tracking,
+                    pg_config,
+                )?;
             }
         }
     }

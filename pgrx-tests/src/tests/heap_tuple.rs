@@ -569,7 +569,7 @@ mod sql_generator_tests {
         type OrderedSetArgs = name!(percentile, pgrx::composite_type!('static, "Dog"));
 
         fn state(
-            mut _current: Self::State,
+            _current: Self::State,
             _arg: Self::Args,
             _fcinfo: pg_sys::FunctionCallInfo,
         ) -> Self::State {
@@ -577,7 +577,7 @@ mod sql_generator_tests {
         }
 
         fn finalize(
-            mut _current: Self::State,
+            _current: Self::State,
             _direct_arg: Self::OrderedSetArgs,
             _fcinfo: pg_sys::FunctionCallInfo,
         ) -> Self::Finalize {
@@ -595,7 +595,7 @@ mod sql_generator_tests {
         type MovingState = pgrx::composite_type!('static, "Dog");
 
         fn state(
-            mut _current: Self::State,
+            _current: Self::State,
             _arg: Self::Args,
             _fcinfo: pg_sys::FunctionCallInfo,
         ) -> Self::State {
@@ -611,7 +611,7 @@ mod sql_generator_tests {
         }
 
         fn moving_state_inverse(
-            mut _current: Self::State,
+            _current: Self::State,
             _arg: Self::Args,
             _fcinfo: pg_sys::FunctionCallInfo,
         ) -> Self::MovingState {
@@ -619,7 +619,7 @@ mod sql_generator_tests {
         }
 
         fn combine(
-            mut _first: Self::State,
+            _first: Self::State,
             _second: Self::State,
             _fcinfo: pg_sys::FunctionCallInfo,
         ) -> Self::State {

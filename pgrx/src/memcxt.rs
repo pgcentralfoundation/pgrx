@@ -269,15 +269,12 @@ impl PgMemoryContexts {
     pub unsafe fn set_as_current(&mut self) -> PgMemoryContexts {
         let old_context = pg_sys::CurrentMemoryContext;
 
-        match self {
-            PgMemoryContexts::Owned(mc) => {
-                // If the context is set as current while it's already current,
-                // don't update `previous` as it'll self-reference instead.
-                if old_context != mc.owned {
-                    mc.previous = old_context;
-                }
+        if let PgMemoryContexts::Owned(mc) = self {
+            // If the context is set as current while it's already current,
+            // don't update `previous` as it'll self-reference instead.
+            if old_context != mc.owned {
+                mc.previous = old_context;
             }
-            _ => {}
         }
 
         pg_sys::CurrentMemoryContext = self.value();
