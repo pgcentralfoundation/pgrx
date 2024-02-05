@@ -204,8 +204,8 @@ impl Parse for CodeEnrichment<PostgresTypeDerive> {
     fn parse(input: ParseStream) -> Result<Self, syn::Error> {
         let ItemStruct { attrs, ident, generics, .. } = input.parse()?;
         let to_sql_config = ToSqlConfig::from_attributes(attrs.as_slice())?.unwrap_or_default();
-        let in_fn = Ident::new(&format!("{}_in", ident).to_lowercase(), ident.span());
-        let out_fn = Ident::new(&format!("{}_out", ident).to_lowercase(), ident.span());
+        let in_fn = Ident::new(&format!("{ident}_in").to_lowercase(), ident.span());
+        let out_fn = Ident::new(&format!("{ident}_out").to_lowercase(), ident.span());
         PostgresTypeDerive::new(ident, generics, in_fn, out_fn, to_sql_config)
     }
 }

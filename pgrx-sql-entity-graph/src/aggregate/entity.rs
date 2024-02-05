@@ -177,7 +177,7 @@ impl ToSql for PgAggregateEntity {
 
         if let Some(value) = self.finalfunc {
             optional_attributes.push((
-                format!("\tFINALFUNC = {}\"{}\"", schema, value),
+                format!("\tFINALFUNC = {schema}\"{value}\""),
                 format!("/* {}::final */", self.full_path),
             ));
         }
@@ -189,43 +189,43 @@ impl ToSql for PgAggregateEntity {
         }
         if let Some(value) = self.combinefunc {
             optional_attributes.push((
-                format!("\tCOMBINEFUNC = {}\"{}\"", schema, value),
+                format!("\tCOMBINEFUNC = {schema}\"{value}\""),
                 format!("/* {}::combine */", self.full_path),
             ));
         }
         if let Some(value) = self.serialfunc {
             optional_attributes.push((
-                format!("\tSERIALFUNC = {}\"{}\"", schema, value),
+                format!("\tSERIALFUNC = {schema}\"{value}\""),
                 format!("/* {}::serial */", self.full_path),
             ));
         }
         if let Some(value) = self.deserialfunc {
             optional_attributes.push((
-                format!("\tDESERIALFUNC ={} \"{}\"", schema, value),
+                format!("\tDESERIALFUNC ={schema} \"{value}\""),
                 format!("/* {}::deserial */", self.full_path),
             ));
         }
         if let Some(value) = self.initcond {
             optional_attributes.push((
-                format!("\tINITCOND = '{}'", value),
+                format!("\tINITCOND = '{value}'"),
                 format!("/* {}::INITIAL_CONDITION */", self.full_path),
             ));
         }
         if let Some(value) = self.msfunc {
             optional_attributes.push((
-                format!("\tMSFUNC = {}\"{}\"", schema, value),
+                format!("\tMSFUNC = {schema}\"{value}\""),
                 format!("/* {}::moving_state */", self.full_path),
             ));
         }
         if let Some(value) = self.minvfunc {
             optional_attributes.push((
-                format!("\tMINVFUNC = {}\"{}\"", schema, value),
+                format!("\tMINVFUNC = {schema}\"{value}\""),
                 format!("/* {}::moving_state_inverse */", self.full_path),
             ));
         }
         if let Some(value) = self.mfinalfunc {
             optional_attributes.push((
-                format!("\tMFINALFUNC = {}\"{}\"", schema, value),
+                format!("\tMFINALFUNC = {schema}\"{value}\""),
                 format!("/* {}::moving_state_finalize */", self.full_path),
             ));
         }
@@ -237,13 +237,13 @@ impl ToSql for PgAggregateEntity {
         }
         if let Some(value) = self.minitcond {
             optional_attributes.push((
-                format!("\tMINITCOND = '{}'", value),
+                format!("\tMINITCOND = '{value}'"),
                 format!("/* {}::MOVING_INITIAL_CONDITION */", self.full_path),
             ));
         }
         if let Some(value) = self.sortop {
             optional_attributes.push((
-                format!("\tSORTOP = \"{}\"", value),
+                format!("\tSORTOP = \"{value}\""),
                 format!("/* {}::SORT_OPERATOR */", self.full_path),
             ));
         }
@@ -296,7 +296,7 @@ impl ToSql for PgAggregateEntity {
         if let Some(value) = &self.mstype {
             let mstype_sql = map_ty(value).wrap_err("Mapping moving state type")?;
             optional_attributes.push((
-                format!("\tMSTYPE = {}", mstype_sql),
+                format!("\tMSTYPE = {mstype_sql}"),
                 format!("/* {}::MovingState = {} */", self.full_path, value.full_path),
             ));
         }
@@ -305,9 +305,7 @@ impl ToSql for PgAggregateEntity {
         for (index, (optional_attribute, comment)) in optional_attributes.iter().enumerate() {
             let optional_attribute_string = format!(
                 "{optional_attribute}{maybe_comma} {comment}{maybe_newline}",
-                optional_attribute = optional_attribute,
                 maybe_comma = if index == optional_attributes.len() - 1 { "" } else { "," },
-                comment = comment,
                 maybe_newline = if index == optional_attributes.len() - 1 { "" } else { "\n" }
             );
             optional_attributes_string += &optional_attribute_string;
@@ -359,7 +357,7 @@ impl ToSql for PgAggregateEntity {
                        maybe_comma = if needs_comma { ", " } else { " " },
                        full_path = arg.used_ty.full_path,
                        name = if let Some(name) = arg.name {
-                           format!(r#""{}" "#, name)
+                           format!(r#""{name}" "#)
                        } else { "".to_string() },
                 );
                 args.push(buf);
@@ -378,7 +376,7 @@ impl ToSql for PgAggregateEntity {
                         SqlGraphEntity::BuiltinType(defined) => defined == arg.used_ty.full_path,
                         _ => false,
                     })
-                    .ok_or_else(|| eyre!("Could not find arg type in graph. Got: {:?}", arg))?;
+                    .ok_or_else(|| eyre!("Could not find arg type in graph. Got: {arg:?}"))?;
                 let needs_comma = idx < (direct_args.len() - 1);
                 let buf = format!(
                     "\

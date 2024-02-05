@@ -81,7 +81,6 @@ impl ToSqlConfigEntity {
                 {sql_anchor_comment}\n\
                 {content}\n\
             ",
-                content = content,
                 sql_anchor_comment = entity.sql_anchor_comment()
             )));
         }
@@ -101,7 +100,6 @@ impl ToSqlConfigEntity {
                         {sql_anchor_comment}\n\
                         {content}\
                     ",
-                        content = content,
                         sql_anchor_comment = entity.sql_anchor_comment(),
                     )))
                 }

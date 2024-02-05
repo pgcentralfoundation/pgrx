@@ -311,7 +311,7 @@ impl PgExtern {
         let hrtb = if lifetimes.is_empty() { None } else { Some(quote! { for<#(#lifetimes),*> }) };
 
         let sql_graph_entity_fn_name =
-            syn::Ident::new(&format!("__pgrx_internals_fn_{}", ident), Span::call_site());
+            syn::Ident::new(&format!("__pgrx_internals_fn_{ident}"), Span::call_site());
         quote_spanned! { self.func.sig.span() =>
             #[no_mangle]
             #[doc(hidden)]
@@ -364,10 +364,8 @@ impl PgExtern {
 
     pub fn wrapper_func(&self) -> TokenStream2 {
         let func_name = &self.func.sig.ident;
-        let func_name_wrapper = Ident::new(
-            &format!("{}_wrapper", &self.func.sig.ident.to_string()),
-            self.func.sig.ident.span(),
-        );
+        let func_name_wrapper =
+            Ident::new(&format!("{}_wrapper", self.func.sig.ident), self.func.sig.ident.span());
         let func_generics = &self.func.sig.generics;
         let is_raw = self.extern_attrs().contains(&Attribute::Raw);
         // We use a `_` prefix to make functions with no args more satisfied during linting.

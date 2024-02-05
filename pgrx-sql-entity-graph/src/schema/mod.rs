@@ -78,7 +78,7 @@ impl Schema {
         };
 
         let sql_graph_entity_fn_name = syn::Ident::new(
-            &format!("__pgrx_internals_schema_{}_{}", ident, postfix),
+            &format!("__pgrx_internals_schema_{ident}_{postfix}"),
             proc_macro2::Span::call_site(),
         );
         quote! {
