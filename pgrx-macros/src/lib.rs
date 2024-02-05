@@ -21,7 +21,7 @@ use operators::{deriving_postgres_eq, deriving_postgres_hash, deriving_postgres_
 use pgrx_sql_entity_graph as sql_gen;
 use sql_gen::{
     parse_extern_attributes, CodeEnrichment, ExtensionSql, ExtensionSqlFile, ExternArgs,
-    PgAggregate, PgExtern, PostgresEnum, Schema,
+    PgAggregate, PgCast, PgExtern, PostgresEnum, Schema,
 };
 
 mod operators;
@@ -146,6 +146,66 @@ pub fn pg_test(attr: TokenStream, item: TokenStream) -> TokenStream {
 #[proc_macro_attribute]
 pub fn initialize(_attr: TokenStream, item: TokenStream) -> TokenStream {
     item
+}
+
+/**
+Declare a function as `#[pg_cast]` to indicate that it represents a Postgres [cast](https://www.postgresql.org/docs/current/sql-createcast.html).
+
+* `assignment`: Corresponds to [`AS ASSIGNMENT`](https://www.postgresql.org/docs/current/sql-createcast.html).
+* `implicit`: Corresponds to [`AS IMPLICIT`](https://www.postgresql.org/docs/current/sql-createcast.html).
+
+By default if no attribute is specified, the cast function can only be used in an explicit cast.
+
+Functions MUST accept and return exactly one value whose type MUST be a `pgrx` supported type. `pgrx` supports many PostgreSQL types by default.
+New types can be defined via [`macro@PostgresType`] or [`macro@PostgresEnum`].
+
+Example usage:
+```rust,ignore
+use pgrx::*;
+#[pg_cast(implicit)]
+fn cast_json_to_int(input: Json) -> i32 { todo!() }
+*/
+#[proc_macro_attribute]
+pub fn pg_cast(attr: TokenStream, item: TokenStream) -> TokenStream {
+    fn wrapped(attr: TokenStream, item: TokenStream) -> Result<TokenStream, syn::Error> {
+        use syn::parse::Parser;
+        let mut cast = PgCast::Default;
+        match syn::punctuated::Punctuated::<syn::Path, syn::Token![,]>::parse_terminated.parse(attr)
+        {
+            Ok(paths) => {
+                if paths.len() > 1 {
+                    panic!(
+                        "pg_cast must take either 0 or 1 attribute. Found {}: {}",
+                        paths.len(),
+                        paths.to_token_stream()
+                    )
+                } else if paths.len() == 1 {
+                    match paths.first().unwrap().segments.last().unwrap().ident.to_string().as_str()
+                    {
+                        "implicit" => cast = PgCast::Implicit,
+                        "assignment" => cast = PgCast::Assignment,
+                        other => panic!("Unrecognized pg_cast option: {}. ", other),
+                    }
+                }
+            }
+            Err(err) => {
+                panic!("Failed to parse attribute to pg_cast: {}", err)
+            }
+        }
+        // `pg_cast` does not support other `pg_extern` attributes for now, pass an empty attribute token stream.
+        let pg_extern = PgExtern::new(TokenStream::new().into(), item.clone().into())?.0;
+        Ok(CodeEnrichment(pg_extern.as_cast(cast)).to_token_stream().into())
+    }
+
+    match wrapped(attr, item) {
+        Ok(tokens) => tokens,
+        Err(e) => {
+            let msg = e.to_string();
+            TokenStream::from(quote! {
+              compile_error!(#msg);
+            })
+        }
+    }
 }
 
 /// Declare a function as `#[pg_operator]` to indicate that it represents a Postgres operator

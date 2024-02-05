@@ -23,7 +23,7 @@ use crate::{SqlGraphEntity, SqlGraphIdentifier};
 use std::collections::BTreeSet;
 
 use eyre::eyre;
-/// The output of a [`PostgresType`](crate::postgres_type::PostgresType) from `quote::ToTokens::to_tokens`.
+/// The output of a [`PostgresType`](crate::postgres_type::PostgresTypeDerive) from `quote::ToTokens::to_tokens`.
 #[derive(Debug, Clone, Hash, PartialEq, Eq, PartialOrd, Ord)]
 pub struct PostgresTypeEntity {
     pub name: &'static str,
