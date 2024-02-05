@@ -1,6 +1,7 @@
 use super::{Enlist, List, ListCell, ListHead};
 use crate::memcx::MemCx;
 use crate::pg_sys;
+use crate::ptr::PointerExt;
 use crate::seal::Sealed;
 use core::cmp;
 use core::ffi;
@@ -195,7 +196,7 @@ impl<'cx, T: Enlist> List<'cx, T> {
         };
 
         // Remember to check that our raw ptr is non-null
-        if raw != ptr::null_mut() {
+        if raw.is_non_null() {
             // Shorten the list to prohibit interaction with List's state after drain_start.
             // Note this breaks List repr invariants in the `drain_start == 0` case, but
             // we only consider returning the list ptr to `&mut self` if Drop is completed
@@ -332,11 +333,11 @@ unsafe fn grow_list(list: &mut pg_sys::List, target: usize) {
     if list.elements == ptr::addr_of_mut!(list.initial_elements).cast() {
         // first realloc, we can't dealloc the elements ptr, as it isn't its own alloc
         let context = pg_sys::GetMemoryChunkContext(list as *mut pg_sys::List as *mut _);
-        if context == ptr::null_mut() {
+        if context.is_null() {
             panic!("Context free list?");
         }
         let buf = pg_sys::MemoryContextAlloc(context, alloc_size);
-        if buf == ptr::null_mut() {
+        if buf.is_null() {
             panic!("List allocation failure");
         }
         ptr::copy_nonoverlapping(list.elements, buf.cast(), list.length as _);
@@ -382,7 +383,7 @@ pub struct Drain<'a, 'cx, T> {
 
 impl<'a, 'cx, T> Drop for Drain<'a, 'cx, T> {
     fn drop(&mut self) {
-        if self.raw == ptr::null_mut() {
+        if self.raw.is_null() {
             return;
         }
 
