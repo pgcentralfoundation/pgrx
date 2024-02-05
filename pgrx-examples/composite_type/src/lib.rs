@@ -23,7 +23,7 @@ using composite types.
 use pgrx::{opname, pg_operator, prelude::*, Aggregate};
 
 // All `pgrx` extensions will do this:
-pgrx::pg_module_magic!();
+::pgrx::pg_module_magic!();
 
 /* Composite types must be defined either before they are used.
 

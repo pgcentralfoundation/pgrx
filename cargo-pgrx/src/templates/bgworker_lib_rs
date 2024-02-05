@@ -2,7 +2,7 @@ use pgrx::bgworkers::*;
 use pgrx::prelude::*;
 use std::time::Duration;
 
-pgrx::pg_module_magic!();
+::pgrx::pg_module_magic!();
 
 /*
 In order to use this bgworker with a cargo-pgrx managed database, you'll need to add this line to

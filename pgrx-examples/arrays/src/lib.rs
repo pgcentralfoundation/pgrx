@@ -11,7 +11,7 @@ use pgrx::prelude::*;
 use pgrx::Array;
 use serde::*;
 
-pgrx::pg_module_magic!();
+::pgrx::pg_module_magic!();
 
 #[pg_extern]
 fn sq_euclid_pgrx(a: Array<f32>, b: Array<f32>) -> f32 {

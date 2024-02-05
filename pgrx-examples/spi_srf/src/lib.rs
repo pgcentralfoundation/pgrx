@@ -10,7 +10,7 @@
 use pgrx::prelude::*;
 use pgrx::IntoDatum;
 
-pgrx::pg_module_magic!();
+::pgrx::pg_module_magic!();
 
 extension_sql!(
     r#"

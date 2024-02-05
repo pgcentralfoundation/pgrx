@@ -14,7 +14,7 @@ use std::io::Write;
 use std::panic::catch_unwind;
 use std::process::Command;
 
-pgrx::pg_module_magic!();
+::pgrx::pg_module_magic!();
 
 #[pg_extern]
 fn panic(s: &str) -> bool {
