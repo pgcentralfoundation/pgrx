@@ -26,7 +26,7 @@ pub fn lookup_enum_by_oid(enumval: pg_sys::Oid) -> (String, pg_sys::Oid, f32) {
         ereport!(
             PgLogLevel::ERROR,
             PgSqlErrorCode::ERRCODE_INVALID_BINARY_REPRESENTATION,
-            format!("invalid internal value for enum: {:?}", enumval)
+            format!("invalid internal value for enum: {enumval:?}")
         );
     }
 
@@ -54,7 +54,7 @@ pub fn lookup_enum_by_label(typname: &str, label: &str) -> pg_sys::Datum {
     let enumtypoid = crate::regtypein(typname);
 
     if enumtypoid == pg_sys::InvalidOid {
-        panic!("could not locate type oid for type: {}", typname);
+        panic!("could not locate type oid for type: {typname}");
     }
 
     let tup = unsafe {
@@ -70,10 +70,7 @@ pub fn lookup_enum_by_label(typname: &str, label: &str) -> pg_sys::Datum {
     };
 
     if tup.is_null() {
-        panic!(
-            "could not find heap tuple for enum: {}.{}, typoid={:?}",
-            typname, label, enumtypoid
-        );
+        panic!("could not find heap tuple for enum: {typname}.{label}, typoid={enumtypoid:?}");
     }
 
     // SAFETY:  we know that `tup` is valid because we just got it from Postgres above

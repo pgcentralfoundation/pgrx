@@ -37,7 +37,7 @@ pub(crate) unsafe fn display_node_impl(node: NonNull<crate::Node>) -> String {
 
         let result = match CStr::from_ptr(node_cstr).to_str() {
             Ok(cstr) => cstr.to_string(),
-            Err(e) => format!("<ffi error: {:?}>", e),
+            Err(e) => format!("<ffi error: {e:?}>"),
         };
 
         crate::pfree(node_cstr.cast());

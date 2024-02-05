@@ -319,7 +319,7 @@ impl Spi {
     ) -> Result<Json> {
         Ok(Spi::connect(|mut client| {
             client
-                .update(&format!("EXPLAIN (format json) {}", query), None, args)?
+                .update(&format!("EXPLAIN (format json) {query}"), None, args)?
                 .first()
                 .get_one::<Json>()
         })?

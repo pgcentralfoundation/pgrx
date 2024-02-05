@@ -114,7 +114,7 @@ fn main() -> eyre::Result<()> {
     // dump the environment for debugging if asked
     if env_tracked("PGRX_BUILD_VERBOSE").as_deref() == Some("true") {
         for (k, v) in std::env::vars() {
-            eprintln!("{}={}", k, v);
+            eprintln!("{k}={v}");
         }
     }
 
@@ -268,14 +268,14 @@ fn generate_bindings(
 ) -> eyre::Result<()> {
     let mut include_h = build_paths.manifest_dir.clone();
     include_h.push("include");
-    include_h.push(format!("pg{}.h", major_version));
+    include_h.push(format!("pg{major_version}.h"));
 
     let bindgen_output = get_bindings(major_version, pg_config, &include_h)
-        .wrap_err_with(|| format!("bindgen failed for pg{}", major_version))?;
+        .wrap_err_with(|| format!("bindgen failed for pg{major_version}"))?;
 
     let oids = extract_oids(&bindgen_output);
     let rewritten_items = rewrite_items(&bindgen_output, &oids)
-        .wrap_err_with(|| format!("failed to rewrite items for pg{}", major_version))?;
+        .wrap_err_with(|| format!("failed to rewrite items for pg{major_version}"))?;
     let oids = format_builtin_oid_impl(oids);
 
     let dest_dirs = if is_for_release {
@@ -285,7 +285,7 @@ fn generate_bindings(
     };
     for dest_dir in dest_dirs {
         let mut bindings_file = dest_dir.clone();
-        bindings_file.push(&format!("pg{}.rs", major_version));
+        bindings_file.push(&format!("pg{major_version}.rs"));
         write_rs_file(
             rewritten_items.clone(),
             &bindings_file,
@@ -303,7 +303,7 @@ fn generate_bindings(
         })?;
 
         let mut oids_file = dest_dir.clone();
-        oids_file.push(&format!("pg{}_oids.rs", major_version));
+        oids_file.push(&format!("pg{major_version}_oids.rs"));
         write_rs_file(oids.clone(), &oids_file, quote! {}).wrap_err_with(|| {
             format!(
                 "Unable to write oids file for pg{} to `{}`",
@@ -712,7 +712,7 @@ fn run_bindgen(
     eprintln!("Generating bindings for pg{major_version}");
     let configure = pg_config.configure()?;
     let preferred_clang: Option<&std::path::Path> = configure.get("CLANG").map(|s| s.as_ref());
-    eprintln!("pg_config --configure CLANG = {:?}", preferred_clang);
+    eprintln!("pg_config --configure CLANG = {preferred_clang:?}");
     let (autodetect, includes) = build::clang::detect_include_paths_for(preferred_clang);
     let mut binder = bindgen::Builder::default();
     binder = add_blocklists(binder);
@@ -734,7 +734,7 @@ fn run_bindgen(
         .formatter(bindgen::Formatter::None)
         .layout_tests(false)
         .generate()
-        .wrap_err_with(|| format!("Unable to generate bindings for pg{}", major_version))?;
+        .wrap_err_with(|| format!("Unable to generate bindings for pg{major_version}"))?;
 
     Ok(bindings.to_string())
 }
@@ -840,10 +840,10 @@ fn build_shim(
     build_shim_for_version(shim_src, shim_dst, pg_config)?;
 
     // no matter what, tell rustc to link to the library that was built for the feature we're currently building
-    let envvar_name = format!("CARGO_FEATURE_PG{}", major_version);
+    let envvar_name = format!("CARGO_FEATURE_PG{major_version}");
     if env_tracked(&envvar_name).is_some() {
         println!("cargo:rustc-link-search={}", shim_dst.display());
-        println!("cargo:rustc-link-lib=static=pgrx-cshim-{}", major_version);
+        println!("cargo:rustc-link-lib=static=pgrx-cshim-{major_version}");
     }
 
     Ok(())
@@ -857,7 +857,7 @@ fn build_shim_for_version(
     let path_env = prefix_path(pg_config.parent_path());
     let major_version = pg_config.major_version()?;
 
-    eprintln!("PATH for build_shim={}", path_env);
+    eprintln!("PATH for build_shim={path_env}");
     eprintln!("shim_src={}", shim_src.display());
     eprintln!("shim_dst={}", shim_dst.display());
 
@@ -877,17 +877,17 @@ fn build_shim_for_version(
     let rc = run_command(
         Command::new(make)
             .arg("clean")
-            .arg(&format!("libpgrx-cshim-{}.a", major_version))
-            .env("PG_TARGET_VERSION", format!("{}", major_version))
+            .arg(&format!("libpgrx-cshim-{major_version}.a"))
+            .env("PG_TARGET_VERSION", format!("{major_version}"))
             .env("PATH", path_env)
             .env_remove("TARGET")
             .env_remove("HOST")
             .current_dir(shim_dst),
-        &format!("shim for PG v{}", major_version),
+        &format!("shim for PG v{major_version}"),
     )?;
 
     if rc.status.code().unwrap() != 0 {
-        return Err(eyre!("failed to make pgrx-cshim for v{}", major_version));
+        return Err(eyre!("failed to make pgrx-cshim for v{major_version}"));
     }
 
     Ok(())
@@ -997,8 +997,8 @@ fn run_command(mut command: &mut Command, version: &str) -> eyre::Result<Output>
         .env_remove("OUT_DIR")
         .env_remove("NUM_JOBS");
 
-    eprintln!("[{}] {:?}", version, command);
-    dbg.push_str(&format!("[{}] -------- {:?} -------- \n", version, command));
+    eprintln!("[{version}] {command:?}");
+    dbg.push_str(&format!("[{version}] -------- {command:?} -------- \n"));
 
     let output = command.output()?;
     let rc = output.clone();
@@ -1006,21 +1006,21 @@ fn run_command(mut command: &mut Command, version: &str) -> eyre::Result<Output>
     if !output.stdout.is_empty() {
         for line in String::from_utf8(output.stdout).unwrap().lines() {
             if line.starts_with("cargo:") {
-                dbg.push_str(&format!("{}\n", line));
+                dbg.push_str(&format!("{line}\n"));
             } else {
-                dbg.push_str(&format!("[{}] [stdout] {}\n", version, line));
+                dbg.push_str(&format!("[{version}] [stdout] {line}\n"));
             }
         }
     }
 
     if !output.stderr.is_empty() {
         for line in String::from_utf8(output.stderr).unwrap().lines() {
-            dbg.push_str(&format!("[{}] [stderr] {}\n", version, line));
+            dbg.push_str(&format!("[{version}] [stderr] {line}\n"));
         }
     }
-    dbg.push_str(&format!("[{}] /----------------------------------------\n", version));
+    dbg.push_str(&format!("[{version}] /----------------------------------------\n"));
 
-    eprintln!("{}", dbg);
+    eprintln!("{dbg}");
     Ok(rc)
 }
 

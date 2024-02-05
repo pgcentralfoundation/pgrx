@@ -306,7 +306,7 @@ impl serde::Serialize for TimeWithTimeZone {
     {
         serializer
             .serialize_str(&self.to_iso_string())
-            .map_err(|e| serde::ser::Error::custom(format!("formatting problem: {:?}", e)))
+            .map_err(|e| serde::ser::Error::custom(format!("formatting problem: {e:?}")))
     }
 }
 

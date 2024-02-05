@@ -69,7 +69,7 @@ impl PgXactCallbackEvent {
             pg_sys::XactEvent_XACT_EVENT_PREPARE => PgXactCallbackEvent::Prepare,
             pg_sys::XactEvent_XACT_EVENT_PRE_COMMIT => PgXactCallbackEvent::PreCommit,
             pg_sys::XactEvent_XACT_EVENT_PRE_PREPARE => PgXactCallbackEvent::PrePrepare,
-            unknown => panic!("Unrecognized XactEvent: {}", unknown),
+            unknown => panic!("Unrecognized XactEvent: {unknown}"),
         }
     }
 }
@@ -260,7 +260,7 @@ impl PgSubXactCallbackEvent {
                 PgSubXactCallbackEvent::PreCommitSub
             }
             pg_sys::SubXactEvent_SUBXACT_EVENT_START_SUB => PgSubXactCallbackEvent::StartSub,
-            _ => panic!("Unrecognized SubXactEvent: {}", event),
+            _ => panic!("Unrecognized SubXactEvent: {event}"),
         }
     }
 }
@@ -278,7 +278,7 @@ impl SubXactCallbackReceipt {
     /// ```rust,no_run
     /// use pgrx::*;
     ///
-    /// let receipt = register_subxact_callback(PgSubXactCallbackEvent::CommitSub, |my_subid, parent_subid| info!("called after commit-sub: {} {}", my_subid, parent_subid));
+    /// let receipt = register_subxact_callback(PgSubXactCallbackEvent::CommitSub, |my_subid, parent_subid| info!("called after commit-sub: {my_subid} {parent_subid}"));
     ///
     /// let no_longer_necessary = true;
     ///
