@@ -495,7 +495,7 @@ impl<'a> PgConfigSelector<'a> {
 pub enum PgrxHomeError {
     #[error("You don't seem to have a home directory")]
     NoHomeDirectory,
-    // Do not print PathBuf due to potential security concerns
+    // allow caller to decide whether it is safe to enumerate paths
     #[error("$PGRX_HOME does not exist")]
     MissingPgrxHome(PathBuf),
     #[error(transparent)]
