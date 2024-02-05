@@ -14,7 +14,9 @@ which is the one you will be opening pull requests against in most cases.
 
 After cloning the repository, mostly you can use similar flows as in the README.
 However, if there are any differences in `cargo pgrx` since the last release, then
-the first and most drastic difference in the developer environment vs. the user environment is that you will have to run
+the first and most drastic difference in the developer environment vs. the
+user environment is that you will have to run
+
 ```bash
 cargo install cargo-pgrx --path ./cargo-pgrx \
     --force \
