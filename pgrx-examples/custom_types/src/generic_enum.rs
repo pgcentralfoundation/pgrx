@@ -34,5 +34,5 @@ impl Display for SomeValue {
 
 #[pg_extern]
 fn get_some_value_name(input: SomeValue) -> String {
-    format!("{}", input)
+    format!("{input}")
 }

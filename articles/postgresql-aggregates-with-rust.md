@@ -774,7 +774,7 @@ impl Aggregate for DemoSum {
         arg: Self::Args,
         _fcinfo: pg_sys::FunctionCallInfo,
     ) -> Self::State {
-        pgrx::log!("state({}, {})", current, arg);
+        pgrx::log!("state({current}, {arg})");
         current += arg;
         current
     }
@@ -784,7 +784,7 @@ impl Aggregate for DemoSum {
         arg: Self::Args,
         _fcinfo: pg_sys::FunctionCallInfo,
     ) -> Self::MovingState {
-        pgrx::log!("moving_state({}, {})", current, arg);
+        pgrx::log!("moving_state({current}, {arg})");
         current += arg;
         current
     }
@@ -794,7 +794,7 @@ impl Aggregate for DemoSum {
         arg: Self::Args,
         _fcinfo: pg_sys::FunctionCallInfo,
     ) -> Self::MovingState {
-        pgrx::log!("moving_state_inverse({}, {})", current, arg);
+        pgrx::log!("moving_state_inverse({current}, {arg})");
         current -= arg;
         current
     }
@@ -804,7 +804,7 @@ impl Aggregate for DemoSum {
         second: Self::State,
         _fcinfo: pg_sys::FunctionCallInfo,
     ) -> Self::State {
-        pgrx::log!("combine({}, {})", first, second);
+        pgrx::log!("combine({first}, {second})");
         first += second;
         first
     }
