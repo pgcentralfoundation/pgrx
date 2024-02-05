@@ -14,7 +14,9 @@ which is the one you will be opening pull requests against in most cases.
 
 After cloning the repository, mostly you can use similar flows as in the README.
 However, if there are any differences in `cargo pgrx` since the last release, then
-the first and most drastic difference in the developer environment vs. the user environment is that you will have to run
+the first and most drastic difference in the developer environment vs. the
+user environment is that you will have to run
+
 ```bash
 cargo install cargo-pgrx --path ./cargo-pgrx \
     --force \
@@ -30,6 +32,17 @@ cargo pgrx init # This might take a while. Consider getting a drink.
 - PGRX tests PRs on rustfmt so please run `cargo fmt` before you submit
 - Diffs in Cargo.lock should be checked in
 - HOWEVER, diffs in the bindgen in `pgrx-pg-sys/src/pg*.rs` should **not** be checked in (this is a release task)
+
+### Small Diffs? Big PRs?
+
+In general, it is better to land smaller diffs in pull requests, for making them easy to review.
+However, the pgrx repo is no stranger to "big PRs". This is often because a smaller PR may be
+unjustified or nonfunctional on its own.
+
+Further, large cleanup diffs that merely move around code, format it, or apply lints should be
+landed independently, to allow use of `.git-blame-ignore-revs`. Even these, however, are best if
+they are restrained to a single crate, or a logically-connected set, if they involve altering
+anything that could conceivably affect the code's functionality.
 
 ### Adding Dependencies
 

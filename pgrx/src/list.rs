@@ -11,6 +11,7 @@
 //!
 //! It functions similarly to a Rust [`Vec`], including iterator support, but provides separate
 //! understandings of [`List`][crate::pg_sys::List]s of [`pg_sys::Oid`]s, Integers, and Pointers.
+#![allow(clippy::into_iter_on_ref)] // https://github.com/rust-lang/rust-clippy/issues/12230
 
 use crate::memcx::MemCx;
 use crate::pg_sys;

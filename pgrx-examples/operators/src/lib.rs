@@ -13,7 +13,7 @@ use serde::{Deserialize, Serialize};
 mod derived;
 mod pgvarlena;
 
-pgrx::pg_module_magic!();
+::pgrx::pg_module_magic!();
 
 #[derive(PostgresType, Serialize, Deserialize, Eq, PartialEq)]
 pub struct MyType {

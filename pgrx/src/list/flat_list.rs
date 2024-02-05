@@ -217,7 +217,7 @@ impl<'cx, T: Enlist> List<'cx, T> {
         }
     }
 
-    pub fn iter<'a>(&'a self) -> impl Iterator<Item = &'a T> {
+    pub fn iter(&self) -> impl Iterator<Item = &T> {
         self.as_cells().into_iter().map(Deref::deref)
     }
 

@@ -11,6 +11,7 @@ pub fn nop_date(date: Date) -> Date {
 #[pgrx::pg_schema]
 mod tests {
     use super::*;
+    #[allow(unused)] // I can never tell when this is actually needed.
     use crate as pgrx_tests;
 
     // Property tests consist of 1:

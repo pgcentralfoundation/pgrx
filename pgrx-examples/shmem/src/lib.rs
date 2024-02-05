@@ -16,7 +16,7 @@ use serde::*;
 use std::iter::Iterator;
 use std::sync::atomic::Ordering;
 
-pgrx::pg_module_magic!();
+::pgrx::pg_module_magic!();
 
 // types behind a `LwLock` must derive/implement `Copy` and `Clone`
 #[derive(Copy, Clone)]
