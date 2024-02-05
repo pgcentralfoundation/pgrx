@@ -102,7 +102,7 @@ pub(crate) fn start_postgres(pg_config: &PgConfig) -> eyre::Result<()> {
         .arg("-l")
         .arg(&logfile);
 
-    let command_str = format!("{:?}", command);
+    let command_str = format!("{command:?}");
     let output = command.output()?;
 
     if !output.status.success() {

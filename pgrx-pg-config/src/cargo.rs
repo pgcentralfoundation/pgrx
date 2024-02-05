@@ -96,5 +96,5 @@ impl PgrxManifestExt for Manifest {
 
 /// Helper functions to read `Cargo.toml` and remap error to `eyre::Result`.
 pub fn read_manifest<T: AsRef<Path>>(path: T) -> eyre::Result<Manifest> {
-    Manifest::from_path(path).map_err(|err| eyre!("Couldn't parse manifest: {}", err))
+    Manifest::from_path(path).map_err(|err| eyre!("Couldn't parse manifest: {err}"))
 }

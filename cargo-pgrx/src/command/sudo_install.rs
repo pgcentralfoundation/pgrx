@@ -90,7 +90,7 @@ impl CommandExecute for SudoInstall {
             let status = child.wait()?;
             if !status.success() {
                 // sudo failed.  let the user know and get out now
-                eprintln!("sudo command failed with status `{}`", &format!("{status:?}").red());
+                eprintln!("sudo command failed with status `{}`", format!("{status:?}").red());
                 std::process::exit(status.code().unwrap_or(1));
             }
         }
