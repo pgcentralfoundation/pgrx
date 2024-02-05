@@ -10,6 +10,7 @@
 //! Safely create Postgres Background Workers, including with full SPI support
 //!
 //! See: [https://www.postgresql.org/docs/current/bgworker.html](https://www.postgresql.org/docs/current/bgworker.html)
+#![allow(clippy::assign_op_pattern)]
 #![allow(clippy::useless_transmute)]
 use crate::pg_sys;
 use pgrx_pg_sys::PgTryBuilder;
