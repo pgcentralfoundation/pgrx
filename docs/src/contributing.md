@@ -33,6 +33,17 @@ cargo pgrx init # This might take a while. Consider getting a drink.
 - Diffs in Cargo.lock should be checked in
 - HOWEVER, diffs in the bindgen in `pgrx-pg-sys/src/pg*.rs` should **not** be checked in (this is a release task)
 
+### Small Diffs? Big PRs?
+
+In general, it is better to land smaller diffs in pull requests, for making them easy to review.
+However, the pgrx repo is no stranger to "big PRs". This is often because a smaller PR may be
+unjustified or nonfunctional on its own.
+
+Further, large cleanup diffs that merely move around code, format it, or apply lints should be
+landed independently, to allow use of `.git-blame-ignore-revs`. Even these, however, are best if
+they are restrained to a single crate, or a logically-connected set, if they involve altering
+anything that could conceivably affect the code's functionality.
+
 ### Adding Dependencies
 
 If a new crate dependency is required for a pull request, and it can't or should not be marked optional and behind some kind of feature flag, then it should have its reason for being used stated in the Cargo.toml it is added to. This can be "as a member of a category", in the case of e.g. error handling:
