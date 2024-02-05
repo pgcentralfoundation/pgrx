@@ -167,7 +167,7 @@ pub fn nonstatic_typeid<T: ?Sized>() -> core::any::TypeId {
     unsafe { core::mem::transmute::<&dyn NonStaticAny, &'static dyn NonStaticAny>(&it).type_id() }
 }
 
-/// A type which can have it's [`core::any::TypeId`]s registered for Rust to SQL mapping.
+/// A type which can have its [`core::any::TypeId`]s registered for Rust to SQL mapping.
 ///
 /// An example use of this trait:
 ///
