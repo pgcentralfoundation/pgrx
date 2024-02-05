@@ -911,6 +911,7 @@ where
         unsafe { pg_sys::get_array_type(T::type_oid()) }
     }
 
+    #[allow(clippy::get_first)] // https://github.com/pgcentralfoundation/pgrx/issues/1363
     fn composite_type_oid(&self) -> Option<pg_sys::Oid> {
         // the composite type oid for a vec of composite types is the array type of the base composite type
         self.get(0)
