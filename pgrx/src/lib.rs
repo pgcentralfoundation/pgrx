@@ -88,6 +88,7 @@ pub use once_cell;
 
 /// Not ready for public exposure.
 mod layout;
+mod ptr;
 mod slice;
 mod toast;
 

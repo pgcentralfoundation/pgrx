@@ -1,6 +1,7 @@
 use super::{Enlist, List, ListCell, ListHead};
 use crate::memcx::MemCx;
 use crate::pg_sys;
+use crate::ptr::PointerExt;
 use crate::seal::Sealed;
 use core::cmp;
 use core::ffi;
@@ -209,7 +210,7 @@ impl<'cx, T: Enlist> List<'cx, T> {
         };
 
         // Remember to check that our raw ptr is non-null
-        if raw != ptr::null_mut() {
+        if raw.is_non_null() {
             // Shorten the list to prohibit interaction with List's state after drain_start.
             // Note this breaks List repr invariants in the `drain_start == 0` case, but
             // we only consider returning the list ptr to `&mut self` if Drop is completed
@@ -328,7 +329,7 @@ unsafe fn cons_cell<T: Enlist>(list: &mut pg_sys::List, value: T) -> *mut pg_sys
 
 unsafe fn destroy_list(list: *mut pg_sys::List) {
     let mut cell = (*list).head;
-    while cell != ptr::null_mut() {
+    while cell.is_non_null() {
         let next = (*cell).next;
         pg_sys::pfree(cell.cast());
         cell = next;
@@ -496,7 +497,7 @@ impl<T: Enlist> Iterator for RawCellIter<T> {
 
     #[inline]
     fn next(&mut self) -> Option<T> {
-        if self.ptr != ptr::null_mut() {
+        if self.ptr.is_non_null() {
             let ptr = self.ptr;
             // SAFETY: It's assumed that the pointers are valid on construction
             unsafe {
