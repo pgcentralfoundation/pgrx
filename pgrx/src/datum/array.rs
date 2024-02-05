@@ -186,7 +186,7 @@ impl<'mcx, T: UnboxDatum> Array<'mcx, T> {
 
     #[allow(clippy::option_option)]
     #[inline]
-    pub fn get(&self, index: usize) -> Option<Option<T::As<'_>>> {
+    pub fn get<'arr>(&'arr self, index: usize) -> Option<Option<T::As<'arr>>> {
         let Some(is_null) = self.null_slice.get(index) else { return None };
         if is_null {
             return Some(None);
@@ -226,7 +226,11 @@ impl<'mcx, T: UnboxDatum> Array<'mcx, T> {
     /// # Safety
     /// This assumes the pointer is to a valid element of that type.
     #[inline]
-    unsafe fn bring_it_back_now(&self, ptr: *const u8, is_null: bool) -> Option<T::As<'_>> {
+    unsafe fn bring_it_back_now<'arr>(
+        &'arr self,
+        ptr: *const u8,
+        is_null: bool,
+    ) -> Option<T::As<'arr>> {
         match is_null {
             true => None,
             false => {
@@ -441,9 +445,9 @@ mod casper {
         ///
         /// This function is unsafe as it cannot guarantee that `ptr` points to the proper bytes
         /// that represent a `T`, or even that it belongs to `array`.  Both of which must be true
-        unsafe fn bring_it_back_now<'arr>(
+        unsafe fn bring_it_back_now<'arr, 'mcx>(
             &self,
-            array: &'arr Array<'_, T>,
+            array: &'arr Array<'mcx, T>,
             ptr: *const u8,
         ) -> Option<T::As<'arr>>;
 
@@ -477,9 +481,9 @@ mod casper {
     pub(super) struct FixedSizeByVal<const N: usize>;
     impl<T: UnboxDatum, const N: usize> ChaChaSlide<T> for FixedSizeByVal<N> {
         #[inline(always)]
-        unsafe fn bring_it_back_now<'arr>(
+        unsafe fn bring_it_back_now<'arr, 'mcx>(
             &self,
-            _array: &'arr Array<'_, T>,
+            _array: &'arr Array<'mcx, T>,
             ptr: *const u8,
         ) -> Option<T::As<'arr>> {
             // This branch is optimized away (because `N` is constant).
@@ -507,10 +511,10 @@ mod casper {
     }
     impl<T: UnboxDatum> ChaChaSlide<T> for PassByVarlena {
         #[inline]
-        unsafe fn bring_it_back_now<'arr>(
+        unsafe fn bring_it_back_now<'arr, 'mcx>(
             &self,
             // May need this array param for MemCx reasons?
-            _array: &'arr Array<'_, T>,
+            _array: &'arr Array<'mcx, T>,
             ptr: *const u8,
         ) -> Option<T::As<'arr>> {
             let datum = pg_sys::Datum::from(ptr);
@@ -532,9 +536,9 @@ mod casper {
     pub(super) struct PassByCStr;
     impl<T: UnboxDatum> ChaChaSlide<T> for PassByCStr {
         #[inline]
-        unsafe fn bring_it_back_now<'arr>(
+        unsafe fn bring_it_back_now<'arr, 'mcx>(
             &self,
-            _array: &'arr Array<'_, T>,
+            _array: &'arr Array<'mcx, T>,
             ptr: *const u8,
         ) -> Option<T::As<'arr>> {
             let datum = pg_sys::Datum::from(ptr);
@@ -557,9 +561,9 @@ mod casper {
 
     impl<T: UnboxDatum> ChaChaSlide<T> for PassByFixed {
         #[inline]
-        unsafe fn bring_it_back_now<'arr>(
+        unsafe fn bring_it_back_now<'arr, 'mcx>(
             &self,
-            _array: &'arr Array<'_, T>,
+            _array: &'arr Array<'mcx, T>,
             ptr: *const u8,
         ) -> Option<T::As<'arr>> {
             let datum = pg_sys::Datum::from(ptr);
@@ -605,7 +609,7 @@ impl<'mcx, T: UnboxDatum> VariadicArray<'mcx, T> {
 
     #[allow(clippy::option_option)]
     #[inline]
-    pub fn get(&self, i: usize) -> Option<Option<<T as UnboxDatum>::As<'_>>> {
+    pub fn get<'arr>(&'arr self, i: usize) -> Option<Option<<T as UnboxDatum>::As<'arr>>> {
         self.0.get(i)
     }
 }
@@ -951,7 +955,9 @@ where
     #[allow(clippy::get_first)] // https://github.com/pgcentralfoundation/pgrx/issues/1363
     fn composite_type_oid(&self) -> Option<pg_sys::Oid> {
         // the composite type oid for a vec of composite types is the array type of the base composite type
-        self.first()
+        // the use of first() would have presented a false certainty here: it's not actually relevant that it be the first.
+        #[allow(clippy::get_first)]
+        self.get(0)
             .and_then(|v| v.composite_type_oid().map(|oid| unsafe { pg_sys::get_array_type(oid) }))
     }
 

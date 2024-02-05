@@ -42,10 +42,10 @@ impl TryFrom<TriggerEvent> for PgTriggerWhen {
 
 impl Display for PgTriggerWhen {
     fn fmt(&self, f: &mut Formatter<'_>) -> fmt::Result {
-        match self {
-            PgTriggerWhen::Before => f.write_str("BEFORE"),
-            PgTriggerWhen::After => f.write_str("AFTER"),
-            PgTriggerWhen::InsteadOf => f.write_str("INSTEAD OF"),
-        }
+        f.write_str(match self {
+            PgTriggerWhen::Before => "BEFORE",
+            PgTriggerWhen::After => "AFTER",
+            PgTriggerWhen::InsteadOf => "INSTEAD OF",
+        })
     }
 }

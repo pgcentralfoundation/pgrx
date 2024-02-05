@@ -37,9 +37,9 @@ impl From<TriggerEvent> for PgTriggerLevel {
 
 impl Display for PgTriggerLevel {
     fn fmt(&self, f: &mut Formatter<'_>) -> fmt::Result {
-        match self {
-            PgTriggerLevel::Row => f.write_str("ROW"),
-            PgTriggerLevel::Statement => f.write_str("STATEMENT"),
-        }
+        f.write_str(match self {
+            PgTriggerLevel::Row => "ROW",
+            PgTriggerLevel::Statement => "STATEMENT",
+        })
     }
 }

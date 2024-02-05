@@ -122,13 +122,13 @@ impl std::fmt::Display for Uuid {
     }
 }
 
-impl std::fmt::LowerHex for Uuid {
+impl<'a> std::fmt::LowerHex for Uuid {
     fn fmt(&self, f: &mut std::fmt::Formatter) -> Result<(), std::fmt::Error> {
         self.format(f, UuidFormatCase::Lowercase)
     }
 }
 
-impl std::fmt::UpperHex for Uuid {
+impl<'a> std::fmt::UpperHex for Uuid {
     fn fmt(&self, f: &mut std::fmt::Formatter) -> Result<(), std::fmt::Error> {
         self.format(f, UuidFormatCase::Uppercase)
     }

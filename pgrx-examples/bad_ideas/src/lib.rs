@@ -53,8 +53,8 @@ fn warning(s: &str) -> bool {
 }
 
 #[pg_extern]
-fn exec(
-    command: &str,
+fn exec<'a>(
+    command: &'a str,
     args: default!(Vec<Option<String>>, "ARRAY[]::text[]"),
 ) -> TableIterator<'static, (name!(status, Option<i32>), name!(stdout, String))> {
     let mut command = &mut Command::new(command);

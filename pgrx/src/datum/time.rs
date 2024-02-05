@@ -141,8 +141,8 @@ impl Time {
     ///
     /// This function panics if any part is out-of-bounds
     pub fn new_unchecked(hour: u8, minute: u8, second: f64) -> Time {
-        let hour: i32 = hour.into();
-        let minute: i32 = minute.into();
+        let hour: i32 = hour.try_into().expect("invalid hour");
+        let minute: i32 = minute.try_into().expect("invalid minute");
 
         unsafe {
             direct_function_call(

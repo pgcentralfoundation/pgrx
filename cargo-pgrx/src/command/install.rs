@@ -207,7 +207,7 @@ pub(crate) fn install_extension(
         // process which will mash up all pointers in the .TEXT segment.
         // this simulate linux's install(1) behavior
         if dest.exists() {
-            std::fs::remove_file(&dest)
+            fs::remove_file(&dest)
                 .wrap_err_with(|| format!("unable to remove existing file {}", dest.display()))?;
         }
 
@@ -267,7 +267,7 @@ fn copy_file(
 
     if do_filter {
         // we want to filter the contents of the file we're to copy
-        let input = std::fs::read_to_string(src)
+        let input = fs::read_to_string(src)
             .wrap_err_with(|| format!("failed to read `{}`", src.display()))?;
         let mut input = filter_contents(package_manifest_path, input)?;
 
@@ -275,11 +275,11 @@ fn copy_file(
             input = filter_out_fields_in_control(pg_config, input)?;
         }
 
-        std::fs::write(&dest, input).wrap_err_with(|| {
+        fs::write(&dest, input).wrap_err_with(|| {
             format!("failed writing `{}` to `{}`", src.display(), dest.display())
         })?;
     } else {
-        std::fs::copy(src, &dest).wrap_err_with(|| {
+        fs::copy(src, &dest).wrap_err_with(|| {
             format!("failed copying `{}` to `{}`", src.display(), dest.display())
         })?;
     }
@@ -418,7 +418,7 @@ fn copy_sql_files(
 
 #[tracing::instrument(level = "error", skip_all)]
 pub(crate) fn find_library_file(
-    manifest: &cargo_toml::Manifest,
+    manifest: &Manifest,
     build_command_messages: &Vec<cargo_metadata::Message>,
 ) -> eyre::Result<PathBuf> {
     let target_name = manifest.target_name()?;

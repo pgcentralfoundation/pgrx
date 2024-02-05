@@ -45,11 +45,11 @@ impl TryFrom<TriggerEvent> for PgTriggerOperation {
 
 impl Display for PgTriggerOperation {
     fn fmt(&self, f: &mut Formatter<'_>) -> fmt::Result {
-        match self {
-            PgTriggerOperation::Insert => f.write_str("INSERT"),
-            PgTriggerOperation::Update => f.write_str("UPDATE"),
-            PgTriggerOperation::Delete => f.write_str("DELETE"),
-            PgTriggerOperation::Truncate => f.write_str("TRUNCATE"),
-        }
+        f.write_str(match self {
+            PgTriggerOperation::Insert => "INSERT",
+            PgTriggerOperation::Update => "UPDATE",
+            PgTriggerOperation::Delete => "DELETE",
+            PgTriggerOperation::Truncate => "TRUNCATE",
+        })
     }
 }
