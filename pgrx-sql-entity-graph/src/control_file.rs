@@ -18,6 +18,7 @@ to the `pgrx` framework and very subject to change between versions. While you m
 use super::{SqlGraphEntity, SqlGraphIdentifier, ToSql};
 use core::convert::TryFrom;
 use std::collections::HashMap;
+use thiserror::Error;
 
 /// The parsed contents of a `.control` file.
 ///
@@ -107,27 +108,13 @@ impl From<ControlFile> for SqlGraphEntity {
 }
 
 /// An error met while parsing a `.control` file.
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, Error)]
 pub enum ControlFileError {
+    #[error("Missing field in control file! Please add `{field}`.")]
     MissingField { field: &'static str },
+    #[error("Redundant field in control file! Please remove `{field}`.")]
     RedundantField { field: &'static str },
 }
-
-impl std::fmt::Display for ControlFileError {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        match self {
-            ControlFileError::MissingField { field } => {
-                write!(f, "Missing field in control file! Please add `{field}`.")?;
-            }
-            ControlFileError::RedundantField { field } => {
-                write!(f, "Redundant field in control file! Please remove `{field}`.")?;
-            }
-        };
-        Ok(())
-    }
-}
-
-impl std::error::Error for ControlFileError {}
 
 impl TryFrom<&str> for ControlFile {
     type Error = ControlFileError;

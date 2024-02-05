@@ -391,8 +391,6 @@ impl Display for PgSqlErrorCode {
     }
 }
 
-impl std::error::Error for PgSqlErrorCode {}
-
 impl From<i32> for PgSqlErrorCode {
     fn from(error_code: i32) -> Self {
         (error_code as isize).into()
