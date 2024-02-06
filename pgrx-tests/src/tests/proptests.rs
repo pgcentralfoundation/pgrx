@@ -62,7 +62,7 @@ mod tests {
                 let date_cstr: &std::ffi::CStr =
                     unsafe { pgrx::direct_function_call(pg_sys::date_out, &[datum]).unwrap() };
                 let date_text = date_cstr.to_str().unwrap().to_owned();
-                let spi_select_command = format!("SELECT nop_date('{}')", date_text);
+                let spi_select_command = format!("SELECT nop_date('{date_text}')");
                 let spi_ret: Option<Date> = Spi::get_one(&spi_select_command).unwrap();
                 prop_assert_eq!(date, spi_ret.unwrap());
                 Ok(())

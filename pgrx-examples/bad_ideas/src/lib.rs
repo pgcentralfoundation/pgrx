@@ -19,7 +19,7 @@ use std::process::Command;
 #[pg_extern]
 fn panic(s: &str) -> bool {
     catch_unwind(|| {
-        PANIC!("{}", s);
+        PANIC!("{s}");
     })
     .ok();
     true
@@ -28,7 +28,7 @@ fn panic(s: &str) -> bool {
 #[pg_extern]
 fn fatal(s: &str) -> bool {
     catch_unwind(|| {
-        FATAL!("{}", s);
+        FATAL!("{s}");
     })
     .ok();
     true
@@ -37,7 +37,7 @@ fn fatal(s: &str) -> bool {
 #[pg_extern]
 fn error(s: &str) -> bool {
     catch_unwind(|| {
-        error!("{}", s);
+        error!("{s}");
     })
     .ok();
     true
@@ -46,7 +46,7 @@ fn error(s: &str) -> bool {
 #[pg_extern]
 fn warning(s: &str) -> bool {
     catch_unwind(|| {
-        warning!("{}", s);
+        warning!("{s}");
     })
     .ok();
     true
@@ -113,8 +113,6 @@ fn random_abort() {
 pub unsafe extern "C" fn _PG_init() {
     #[pg_guard]
     extern "C" fn random_abort_callback(event: pg_sys::XactEvent, _arg: *mut std::os::raw::c_void) {
-        // info!("in global xact callback: event={}", event);
-
         if event == pg_sys::XactEvent_XACT_EVENT_PRE_COMMIT && rand::random::<bool>() {
             // panic!("aborting transaction");
         }

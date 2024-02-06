@@ -72,8 +72,7 @@ where
                 let code = dberror.code().code();
                 let severity = dberror.severity();
 
-                let mut message =
-                    format!("{} SQLSTATE[{}]", severity, code).bold().red().to_string();
+                let mut message = format!("{severity} SQLSTATE[{code}]").bold().red().to_string();
 
                 message.push_str(format!(": {}", query_message.bold().white()).as_str());
                 message.push_str(format!("\nquery: {}", query.bold().white()).as_str());
@@ -81,7 +80,7 @@ where
                     format!(
                         "\nparams: {}",
                         match query_params {
-                            Some(params) => format!("{:?}", params),
+                            Some(params) => format!("{params:?}"),
                             None => "None".to_string(),
                         }
                     )
@@ -231,9 +230,9 @@ fn get_pg_config() -> eyre::Result<PgConfig> {
     let pg_version = pg_sys::get_pg_major_version_num();
 
     let pg_config = pgrx
-        .get(&format!("pg{}", pg_version))
+        .get(&format!("pg{pg_version}"))
         .wrap_err_with(|| {
-            format!("Error getting pg_config: {} is not a valid postgres version", pg_version)
+            format!("Error getting pg_config: {pg_version} is not a valid postgres version")
         })
         .unwrap()
         .clone();
@@ -300,7 +299,7 @@ fn install_extension() -> eyre::Result<()> {
     let pgrx = Pgrx::from_config()?;
     let pg_config = pgrx.get(&pg_version)?;
     let cargo_test_args = get_cargo_test_features()?;
-    println!("detected cargo args: {:?}", cargo_test_args);
+    println!("detected cargo args: {cargo_test_args:?}");
 
     features.extend(cargo_test_args.features.iter().cloned());
 
@@ -352,19 +351,15 @@ fn install_extension() -> eyre::Result<()> {
         command.arg("--no-schema");
     }
 
-    let command_str = format!("{:?}", command);
+    let command_str = format!("{command:?}");
 
     let child = command.spawn().wrap_err_with(|| {
-        format!(
-            "Failed to spawn process for installing extension using command: '{}': ",
-            command_str
-        )
+        format!("Failed to spawn process for installing extension using command: '{command_str}': ")
     })?;
 
     let output = child.wait_with_output().wrap_err_with(|| {
         format!(
-            "Failed waiting for spawned process attempting to install extension using command: '{}': ",
-            command_str
+            "Failed waiting for spawned process attempting to install extension using command: '{command_str}': "
         )
     })?;
 
@@ -395,19 +390,17 @@ fn initdb(postgresql_conf: Vec<&'static str>) -> eyre::Result<()> {
             .stdout(Stdio::inherit())
             .stderr(Stdio::inherit());
 
-        let command_str = format!("{:?}", command);
+        let command_str = format!("{command:?}");
 
         let child = command.spawn().wrap_err_with(|| {
             format!(
-                "Failed to spawn process for initializing database using command: '{}': ",
-                command_str
+                "Failed to spawn process for initializing database using command: '{command_str}': "
             )
         })?;
 
         let output = child.wait_with_output().wrap_err_with(|| {
             format!(
-                "Failed waiting for spawned process attempting to initialize database using command: '{}': ",
-                command_str
+                "Failed waiting for spawned process attempting to initialize database using command: '{command_str}': "
             )
         })?;
 
@@ -639,14 +632,11 @@ fn create_extension() -> eyre::Result<()> {
     let (mut client, _) = client()?;
     let extension_name = get_extension_name()?;
 
-    query_wrapper(
-        Some(format!("CREATE EXTENSION {} CASCADE;", &extension_name)),
-        None,
-        |query, _| client.simple_query(query.unwrap().as_str()),
-    )
+    query_wrapper(Some(format!("CREATE EXTENSION {extension_name} CASCADE;")), None, |query, _| {
+        client.simple_query(query.unwrap().as_str())
+    })
     .wrap_err(format!(
-        "There was an issue creating the extension '{}' in Postgres: ",
-        &extension_name
+        "There was an issue creating the extension '{extension_name}' in Postgres: "
     ))?;
 
     Ok(())
@@ -709,8 +699,7 @@ fn get_cargo_test_features() -> eyre::Result<clap_cargo::Features> {
             "--no-default-features" => features.no_default_features = true,
             "--features" => {
                 let configured_features = iter.next().ok_or(eyre!(
-                    "no `--features` specified in the cargo argument list: {:?}",
-                    cargo_user_args
+                    "no `--features` specified in the cargo argument list: {cargo_user_args:?}"
                 ))?;
                 features.features = configured_features
                     .split(|c: char| c.is_ascii_whitespace() || c == ',')
@@ -767,7 +756,7 @@ fn get_cargo_args() -> Vec<String> {
 
 // TODO: this would be a good place to insert a check invoking to see if
 // `cargo-pgrx` is a crate in the local workspace, and use it instead.
-fn cargo_pgrx() -> std::process::Command {
+fn cargo_pgrx() -> Command {
     fn var_path(s: &str) -> Option<PathBuf> {
         std::env::var_os(s).map(PathBuf::from)
     }
@@ -777,7 +766,7 @@ fn cargo_pgrx() -> std::process::Command {
         .or_else(|| find_on_path("cargo-pgrx"))
         .or_else(|| var_path("CARGO"))
         .unwrap_or_else(|| "cargo".into());
-    let mut cmd = std::process::Command::new(cargo_pgrx);
+    let mut cmd = Command::new(cargo_pgrx);
     cmd.arg("pgrx");
     cmd
 }

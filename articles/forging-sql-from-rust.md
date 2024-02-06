@@ -792,7 +792,7 @@ With a graph built, we can topologically sort the graph and transform them to SQ
 pub fn to_sql(&self) -> eyre::Result<String> {
     let mut full_sql = String::new();
     for step_id in petgraph::algo::toposort(&self.graph, None)
-        .map_err(|e| eyre_err!("Failed to toposort SQL entities: {:?}", e))?
+        .map_err(|e| eyre_err!("Failed to toposort SQL entities: {e:?}"))?
     {
         let step = &self.graph[step_id];
 
@@ -874,7 +874,7 @@ impl ToSql for InventoryPostgresEnum {
             variants = self
                 .variants
                 .iter()
-                .map(|variant| format!("\t'{}'", variant))
+                .map(|variant| format!("\t'{variant}'"))
                 .collect::<Vec<_>>()
                 .join(",\n")
                 + "\n",

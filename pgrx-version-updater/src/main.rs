@@ -105,7 +105,7 @@ fn query_toml(query_args: &QueryCargoVersionArgs) {
     // the root of a PGRX checkout directory
     let filepath = match &query_args.file_path {
         Some(path) => {
-            fullpath(path).expect(format!("Could not get full path for file: {}", path).as_str())
+            fullpath(path).expect(format!("Could not get full path for file: {path}").as_str())
         }
         None => {
             let mut current_dir = env::current_dir().expect("Could not get current_dir!");
@@ -116,10 +116,10 @@ fn query_toml(query_args: &QueryCargoVersionArgs) {
 
     // Open the Cargo.toml via toml_edit and parse it out.
     let data = fs::read_to_string(&filepath)
-        .expect(format!("Unable to open file at {}", &filepath.display()).as_str());
+        .expect(format!("Unable to open file at {}", filepath.display()).as_str());
 
     let doc = data.parse::<Document>().expect(
-        format!("File at location {} is an invalid Cargo.toml file", &filepath.display()).as_str(),
+        format!("File at location {} is an invalid Cargo.toml file", filepath.display()).as_str(),
     );
 
     if let Some(package_version) = doc.get("package").and_then(|p| p.get("version")) {
@@ -150,7 +150,7 @@ fn update_files(args: &UpdateFilesArgs) {
     let mut exclude_version_files = HashSet::new();
     for file in &args.exclude_from_version_change {
         exclude_version_files.insert(
-            fullpath(file).expect(format!("Could not get full path for file: {}", file).as_str()),
+            fullpath(file).expect(format!("Could not get full path for file: {file}").as_str()),
         );
     }
 
@@ -168,7 +168,7 @@ fn update_files(args: &UpdateFilesArgs) {
             let mut output = format!(
                 "{} Cargo.toml file at {}",
                 "Discovered".bold().green(),
-                &filepath.display().cyan()
+                filepath.display().cyan()
             );
 
             // Extract the package name if possible
@@ -199,12 +199,12 @@ fn update_files(args: &UpdateFilesArgs) {
     // Loop through all files that are included for dependency updates via CLI params
     for file in &args.include_for_dep_updates {
         let filepath =
-            fullpath(file).expect(format!("Could not get full path for file {}", file).as_str());
+            fullpath(file).expect(format!("Could not get full path for file {file}").as_str());
 
         let mut output = format!(
             "{} Cargo.toml file at {} for processing",
             " Including".bold().green(),
-            &filepath.display().cyan()
+            filepath.display().cyan()
         );
 
         // Extract the package name if possible
@@ -248,14 +248,14 @@ fn update_files(args: &UpdateFilesArgs) {
         let mut output = format!(
             "{} Cargo.toml file at {}",
             "Processing".bold().green(),
-            &filepath.display().cyan()
+            filepath.display().cyan()
         );
 
         let data = fs::read_to_string(&filepath)
-            .expect(format!("Unable to open file at {}", &filepath.display()).as_str());
+            .expect(format!("Unable to open file at {}", filepath.display()).as_str());
 
         let mut doc = data.parse::<Document>().expect(
-            format!("File at location {} is an invalid Cargo.toml file", &filepath.display())
+            format!("File at location {} is an invalid Cargo.toml file", filepath.display())
                 .as_str(),
         );
 
@@ -441,12 +441,11 @@ fn parse_new_version(current_version_specifier: &str, new_version: &str) -> Stri
                 result.push_str(new_version);
             } else {
                 panic!(
-                    "Could not find an actual version in specifier: '{}'",
-                    current_version_specifier
+                    "Could not find an actual version in specifier: '{current_version_specifier}'"
                 );
             }
         }
-        None => panic!("Version specifier '{}' is not valid!", current_version_specifier),
+        None => panic!("Version specifier '{current_version_specifier}' is not valid!"),
     }
 
     result
@@ -458,10 +457,10 @@ fn extract_package_name<P: AsRef<Path>>(filepath: P) -> Option<String> {
     let filepath = filepath.as_ref();
 
     let data = fs::read_to_string(filepath)
-        .expect(format!("Unable to open file at {}", &filepath.display()).as_str());
+        .expect(format!("Unable to open file at {}", filepath.display()).as_str());
 
     let doc = data.parse::<Document>().expect(
-        format!("File at location {} is an invalid Cargo.toml file", &filepath.display()).as_str(),
+        format!("File at location {} is an invalid Cargo.toml file", filepath.display()).as_str(),
     );
 
     doc.get("package")?.as_table()?.get("name")?.as_str().map(|s| s.to_string())

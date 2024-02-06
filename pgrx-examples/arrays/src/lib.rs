@@ -24,7 +24,7 @@ fn approx_distance_pgrx(compressed: Array<i64>, distances: Array<f64>) -> f64 {
         .iter_deny_null()
         .map(|cc| {
             let d = distances.get(cc as usize).unwrap().unwrap();
-            pgrx::info!("cc={}, d={}", cc, d);
+            pgrx::info!("cc={cc}, d={d}");
             d
         })
         .sum()

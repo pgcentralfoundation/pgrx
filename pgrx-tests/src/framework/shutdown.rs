@@ -58,7 +58,7 @@ extern "C" fn run_shutdown_hooks() {
     }
     if any_panicked {
         write_stderr("error: one or more shutdown hooks panicked (see `stderr` for details).\n");
-        std::process::abort()
+        process::abort()
     }
     mem::forget(guard);
 }
