@@ -756,7 +756,7 @@ fn get_cargo_args() -> Vec<String> {
 
 // TODO: this would be a good place to insert a check invoking to see if
 // `cargo-pgrx` is a crate in the local workspace, and use it instead.
-fn cargo_pgrx() -> std::process::Command {
+fn cargo_pgrx() -> Command {
     fn var_path(s: &str) -> Option<PathBuf> {
         std::env::var_os(s).map(PathBuf::from)
     }
@@ -766,7 +766,7 @@ fn cargo_pgrx() -> std::process::Command {
         .or_else(|| find_on_path("cargo-pgrx"))
         .or_else(|| var_path("CARGO"))
         .unwrap_or_else(|| "cargo".into());
-    let mut cmd = std::process::Command::new(cargo_pgrx);
+    let mut cmd = Command::new(cargo_pgrx);
     cmd.arg("pgrx");
     cmd
 }

@@ -60,7 +60,7 @@ unsafe impl SqlTranslatable for Complex {
 }
 
 #[pg_extern(immutable)]
-fn complex_in(input: &core::ffi::CStr) -> PgBox<Complex, AllocatedByRust> {
+fn complex_in(input: &CStr) -> PgBox<Complex, AllocatedByRust> {
     let input_as_str = input.to_str().unwrap();
     let re = regex::Regex::new(
         r#"(?P<x>[-+]?([0-9]*\.[0-9]+|[0-9]+)),\s*(?P<y>[-+]?([0-9]*\.[0-9]+|[0-9]+))"#,
