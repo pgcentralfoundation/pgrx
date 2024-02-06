@@ -200,20 +200,15 @@ impl Spi {
     /// transaction `read_only = true`.  This is what we want as the user will expect an otherwise
     /// read-only statement like SELECT to see the results of prior statements.
     ///
-    /// Postgres docs say:
+    /// Postgres documentation says:
     ///
-    /// ```text
-    ///    It is generally unwise to mix read-only and read-write commands within a single function
-    ///    using SPI; that could result in very confusing behavior, since the read-only queries
-    ///    would not see the results of any database updates done by the read-write queries.
-    ///```
+    /// > It is generally unwise to mix read-only and read-write commands within a single function
+    /// > using SPI; that could result in very confusing behavior, since the read-only queries
+    /// > would not see the results of any database updates done by the read-write queries.
     ///
-    /// pgrx interprets this to mean:
-    /// ```text
-    ///    Within a transaction, it's fine to execute Spi commands as `read_only = true` until the
-    ///    first mutable statement (DDL or DML).  From that point forward **all** statements
-    ///    must be executed as `read_only = false`.
-    /// ```
+    /// PGRX interprets this to mean that within a transaction, it's fine to execute Spi commands
+    /// as `read_only = true` until the first mutable statement (DDL or DML).  From that point
+    /// forward **all** statements must be executed as `read_only = false`.
     fn is_xact_still_immutable() -> bool {
         unsafe {
             // SAFETY:  `pg_sys::GetCurrentTransactionIdIfAny()` will always return a valid

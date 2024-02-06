@@ -80,11 +80,9 @@ pub(crate) fn deriving_postgres_hash(ast: DeriveInput) -> syn::Result<proc_macro
 ///
 /// Further, Postgres adds a disclaimer to these "optimization hints":
 ///
-/// ```text
-/// But if you provide them, you must be sure that they are right!
-/// Incorrect use of an optimization clause can result in
-/// slow queries, subtly wrong output, or other Bad Things.
-/// ```
+/// > But if you provide them, you must be sure that they are right!
+/// > Incorrect use of an optimization clause can result in
+/// > slow queries, subtly wrong output, or other Bad Things.
 ///
 /// In practice, most Eq impls are in fact correct, referentially transparent,
 /// and commutative. So this note could be for nothing. This signpost is left

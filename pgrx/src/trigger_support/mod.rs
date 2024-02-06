@@ -178,7 +178,7 @@ Unsafe [`pgrx::pg_sys::FunctionCallInfo`][crate::pg_sys::FunctionCallInfo] and
 [`pgrx::pg_sys::Trigger`][crate::pg_sys::Trigger]) accessors are available..
 
 [`PgHeapTuple`]: crate::heap_tuple::PgHeapTuple
- */
+*/
 
 mod pg_trigger;
 mod pg_trigger_error;

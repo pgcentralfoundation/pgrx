@@ -218,12 +218,11 @@ impl PgProc {
         self.get_attr(pg_sys::Anum_pg_proc_proconfig)
     }
 
-    /// ```text
-    /// An array of the modes of the function arguments, encoded as i for IN arguments, o for OUT
-    /// arguments, b for INOUT arguments, v for VARIADIC arguments, t for TABLE arguments. If all
-    /// the arguments are IN arguments, this field will be null. Note that subscripts correspond to
-    /// positions of proallargtypes not proargtypes.
-    /// ```
+    /// From <https://www.postgresql.org/docs/current/catalog-pg-proc.html>:
+    /// > An array of the modes of the function arguments, encoded as i for IN arguments, o for OUT
+    /// > arguments, b for INOUT arguments, v for VARIADIC arguments, t for TABLE arguments. If all
+    /// > the arguments are IN arguments, this field will be null. Note that subscripts correspond to
+    /// > positions of proallargtypes not proargtypes.
     ///
     /// In our case, if all the arguments are `IN` arguments, the returned Vec will have the
     /// corresponding `ProArgModes::In` value in each element.
