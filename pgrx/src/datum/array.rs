@@ -193,7 +193,7 @@ impl<'mcx, T: UnboxDatum> Array<'mcx, T> {
         if is_null {
             return Some(None);
         }
-        
+
         // This assertion should only fail if null_slice is longer than the
         // actual array,thanks to the check above.
         debug_assert!(index < self.raw.len());
