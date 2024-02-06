@@ -278,13 +278,25 @@ impl<'mcx, T: UnboxDatum> Array<'mcx, T> {
     /// position for a pointer to be in, but not valid to dereference.
     #[inline]
     pub(crate) fn is_within_bounds(&self, ptr: *const u8) -> bool {
-        (self.raw.data_ptr() <= ptr) && (ptr < self.raw.end_ptr())
+        // Cast to usize, to prevent LLVM from doing counterintuitive things
+        // with pointer equality.
+        // See https://github.com/pgcentralfoundation/pgrx/pull/1514#discussion_r1480447846
+        let ptr: usize = ptr as usize;
+        let data_ptr = self.raw.data_ptr() as usize;
+        let end_ptr = self.raw.end_ptr() as usize;
+        (data_ptr <= ptr) && (ptr < end_ptr)
     }
     /// Similar to [`Self::is_within_bounds()`], but also returns true for the
     /// 1-past-end position.
     #[inline]
     pub(crate) fn is_within_bounds_inclusive(&self, ptr: *const u8) -> bool {
-        (self.raw.data_ptr() <= ptr) && (ptr <= self.raw.end_ptr())
+        // Cast to usize, to prevent LLVM from doing counterintuitive things
+        // with pointer equality.
+        // See https://github.com/pgcentralfoundation/pgrx/pull/1514#discussion_r1480447846
+        let ptr = ptr as usize;
+        let data_ptr = self.raw.data_ptr() as usize;
+        let end_ptr = self.raw.end_ptr() as usize;
+        (data_ptr <= ptr) && (ptr <= end_ptr)
     }
 }
 
