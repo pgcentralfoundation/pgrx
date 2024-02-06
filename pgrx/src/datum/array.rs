@@ -194,6 +194,10 @@ impl<'mcx, T: UnboxDatum> Array<'mcx, T> {
             return Some(None);
         }
 
+        // This assertion should only fail if null_slice is longer than the
+        // actual array,thanks to the check above.
+        debug_assert!(index < self.raw.len());
+
         // This pointer is what's walked over the entire array's data buffer.
         // If the array has varlena or cstr elements, we can't index into the array.
         // If the elements are fixed size, we could, but we do not exploit that optimization yet
@@ -231,7 +235,18 @@ impl<'mcx, T: UnboxDatum> Array<'mcx, T> {
     ) -> Option<T::As<'arr>> {
         match is_null {
             true => None,
-            false => unsafe { self.slide_impl.bring_it_back_now(self, ptr) },
+            false => {
+                // Ensure we are not attempting to dereference a pointer
+                // outside of the array.
+                debug_assert!(self.is_within_bounds(ptr));
+                // Prevent a datum that begins inside the array but would end
+                // outside the array from being dereferenced.
+                debug_assert!(self.is_within_bounds_inclusive(
+                    ptr.wrapping_add(unsafe { self.slide_impl.hop_size(ptr) })
+                ));
+
+                unsafe { self.slide_impl.bring_it_back_now(self, ptr) }
+            }
         }
     }
 
@@ -255,6 +270,33 @@ impl<'mcx, T: UnboxDatum> Array<'mcx, T> {
             debug_assert!(ptr.wrapping_add(offset) <= self.raw.end_ptr());
             ptr.add(offset)
         }
+    }
+
+    /// Returns true if the pointer provided is within the bounds of the array.
+    /// Primarily intended for use with debug_assert!()s.
+    /// Note that this will return false for the 1-past-end, which is a useful
+    /// position for a pointer to be in, but not valid to dereference.
+    #[inline]
+    pub(crate) fn is_within_bounds(&self, ptr: *const u8) -> bool {
+        // Cast to usize, to prevent LLVM from doing counterintuitive things
+        // with pointer equality.
+        // See https://github.com/pgcentralfoundation/pgrx/pull/1514#discussion_r1480447846
+        let ptr: usize = ptr as usize;
+        let data_ptr = self.raw.data_ptr() as usize;
+        let end_ptr = self.raw.end_ptr() as usize;
+        (data_ptr <= ptr) && (ptr < end_ptr)
+    }
+    /// Similar to [`Self::is_within_bounds()`], but also returns true for the
+    /// 1-past-end position.
+    #[inline]
+    pub(crate) fn is_within_bounds_inclusive(&self, ptr: *const u8) -> bool {
+        // Cast to usize, to prevent LLVM from doing counterintuitive things
+        // with pointer equality.
+        // See https://github.com/pgcentralfoundation/pgrx/pull/1514#discussion_r1480447846
+        let ptr = ptr as usize;
+        let data_ptr = self.raw.data_ptr() as usize;
+        let end_ptr = self.raw.end_ptr() as usize;
+        (data_ptr <= ptr) && (ptr <= end_ptr)
     }
 }
 
@@ -718,6 +760,7 @@ where
         let Self { array, curr, ptr } = self;
         let Some(is_null) = array.null_slice.get(*curr) else { return None };
         *curr += 1;
+        debug_assert!(array.is_within_bounds(*ptr));
         let element = unsafe { array.bring_it_back_now(*ptr, is_null) };
         if !is_null {
             // SAFETY: This has to not move for nulls, as they occupy 0 data bytes,
