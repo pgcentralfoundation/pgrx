@@ -189,19 +189,14 @@ impl<'mcx, T: UnboxDatum> Array<'mcx, T> {
     #[allow(clippy::option_option)]
     #[inline]
     pub fn get<'arr>(&'arr self, index: usize) -> Option<Option<T::As<'arr>>> {
-        // Technically this should be covered by the null_slice check,
-        // but that assumes the null bitmap is well-formed (i.e. equal in
-        // length to the array), which might be worth double-checking in
-        // debug builds.
-        #[cfg(debug_assertions)]
-        if index >= self.raw.len() {
-            return None;
-        };
-
         let Some(is_null) = self.null_slice.get(index) else { return None };
         if is_null {
             return Some(None);
         }
+        
+        // This assertion should only fail if null_slice is longer than the
+        // actual array,thanks to the check above.
+        debug_assert!(index < self.raw.len());
 
         // This pointer is what's walked over the entire array's data buffer.
         // If the array has varlena or cstr elements, we can't index into the array.
