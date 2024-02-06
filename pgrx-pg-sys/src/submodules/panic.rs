@@ -426,10 +426,10 @@ pub(crate) fn downcast_panic_payload(e: Box<dyn Any + Send>) -> CaughtError {
         // caught a previously caught CaughtError that is being rethrown
         *e.downcast::<CaughtError>().unwrap()
     } else if e.downcast_ref::<ErrorReportWithLevel>().is_some() {
-        // someone called `panic_any(PgErrorReportWithLevel)`
+        // someone called `panic_any(ErrorReportWithLevel)`
         CaughtError::ErrorReport(*e.downcast().unwrap())
     } else if e.downcast_ref::<ErrorReport>().is_some() {
-        // someone called `panic_any(PgErrorReport)` so we convert it to be PgLogLevel::ERROR
+        // someone called `panic_any(ErrorReport)` so we convert it to be PgLogLevel::ERROR
         CaughtError::ErrorReport(ErrorReportWithLevel {
             level: PgLogLevel::ERROR,
             inner: *e.downcast().unwrap(),

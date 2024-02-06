@@ -20,7 +20,7 @@ use std::ffi::c_char;
 /**
 The datatype accepted by a trigger
 
-A safe structure providing the an API similar to the constants provided in a PL/pgSQL function.
+A safe structure providing an API similar to the constants provided in a PL/pgSQL function.
 
 Usage examples exist in the module level docs.
 */
