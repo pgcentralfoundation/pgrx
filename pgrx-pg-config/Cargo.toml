@@ -26,6 +26,7 @@ edition = "2021"
 cargo_toml.workspace = true
 eyre.workspace = true
 owo-colors.workspace = true
+thiserror.workspace = true
 url.workspace = true
 
 home = "0.5.9"

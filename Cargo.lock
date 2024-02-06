@@ -1510,6 +1510,7 @@ dependencies = [
  "serde",
  "serde_derive",
  "serde_json",
+ "thiserror",
  "toml",
  "url",
 ]
@@ -1548,6 +1549,7 @@ dependencies = [
  "quote",
  "syn 1.0.109",
  "syntect",
+ "thiserror",
  "unescape",
 ]
 

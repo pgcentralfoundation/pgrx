@@ -12,13 +12,13 @@ use eyre::{eyre, WrapErr};
 use owo_colors::OwoColorize;
 use serde_derive::{Deserialize, Serialize};
 use std::collections::{BTreeMap, HashMap};
-use std::error::Error;
 use std::ffi::OsString;
 use std::fmt::{self, Debug, Display, Formatter};
 use std::io::ErrorKind;
 use std::path::PathBuf;
 use std::process::{Command, Stdio};
 use std::str::FromStr;
+use thiserror::Error;
 use url::Url;
 
 pub mod cargo;
@@ -491,17 +491,15 @@ impl<'a> PgConfigSelector<'a> {
     }
 }
 
-#[derive(Debug)]
+#[derive(Debug, Error)]
 pub enum PgrxHomeError {
+    #[error("You don't seem to have a home directory")]
     NoHomeDirectory,
+    // allow caller to decide whether it is safe to enumerate paths
+    #[error("$PGRX_HOME does not exist")]
     MissingPgrxHome(PathBuf),
-    IoError(std::io::Error),
-}
-
-impl From<std::io::Error> for PgrxHomeError {
-    fn from(value: std::io::Error) -> Self {
-        PgrxHomeError::IoError(value)
-    }
+    #[error(transparent)]
+    IoError(#[from] std::io::Error),
 }
 
 impl From<PgrxHomeError> for std::io::Error {
@@ -517,18 +515,6 @@ impl From<PgrxHomeError> for std::io::Error {
         }
     }
 }
-
-impl Display for PgrxHomeError {
-    fn fmt(&self, f: &mut Formatter<'_>) -> fmt::Result {
-        match self {
-            PgrxHomeError::NoHomeDirectory => write!(f, "You don't seem to have a home directory"),
-            PgrxHomeError::MissingPgrxHome(_) => write!(f, "$PGRX_HOME does not exist"),
-            PgrxHomeError::IoError(e) => write!(f, "{e}"),
-        }
-    }
-}
-
-impl Error for PgrxHomeError {}
 
 impl Pgrx {
     pub fn new(base_port: u16, base_testing_port: u16) -> Self {

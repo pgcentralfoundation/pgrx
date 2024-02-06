@@ -16,45 +16,26 @@ to the `pgrx` framework and very subject to change between versions. While you m
 
 */
 use std::any::Any;
-use std::error::Error;
 use std::fmt::Display;
+use thiserror::Error;
 
 use super::return_variant::ReturnsError;
 use super::{FunctionMetadataTypeEntity, Returns};
 
-#[derive(Clone, Copy, Debug, Hash, Ord, PartialOrd, PartialEq, Eq)]
+#[derive(Clone, Copy, Debug, Hash, Ord, PartialOrd, PartialEq, Eq, Error)]
 pub enum ArgumentError {
+    #[error("Cannot use SetOfIterator as an argument")]
     SetOf,
+    #[error("Cannot use TableIterator as an argument")]
     Table,
+    #[error("Cannot use bare u8")]
     BareU8,
+    #[error("SqlMapping::Skip inside Array is not valid")]
     SkipInArray,
+    #[error("A Datum as an argument means that `sql = \"...\"` must be set in the declaration")]
     Datum,
+    #[error("`{0}` is not able to be used as a function argument")]
     NotValidAsArgument(&'static str),
-}
-
-impl std::fmt::Display for ArgumentError {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        match self {
-            ArgumentError::SetOf => {
-                write!(f, "Cannot use SetOfIterator as an argument")
-            }
-            ArgumentError::Table => {
-                write!(f, "Cannot use TableIterator as an argument")
-            }
-            ArgumentError::BareU8 => {
-                write!(f, "Cannot use bare u8")
-            }
-            ArgumentError::SkipInArray => {
-                write!(f, "SqlMapping::Skip inside Array is not valid")
-            }
-            ArgumentError::Datum => {
-                write!(f, "A Datum as an argument means that `sql = \"...\"` must be set in the declaration")
-            }
-            ArgumentError::NotValidAsArgument(type_name) => {
-                write!(f, "`{}` is not able to be used as a function argument", type_name)
-            }
-        }
-    }
 }
 
 /// Describes ways that Rust types are mapped into SQL
@@ -74,8 +55,6 @@ impl SqlMapping {
         SqlMapping::As(String::from(s))
     }
 }
-
-impl Error for ArgumentError {}
 
 /**
 A value which can be represented in SQL
