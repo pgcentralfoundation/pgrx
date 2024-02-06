@@ -206,12 +206,9 @@ impl Spi {
     /// > using SPI; that could result in very confusing behavior, since the read-only queries
     /// > would not see the results of any database updates done by the read-write queries.
     ///
-    /// pgrx interprets this to mean:
-    ///
-    /// > Within a transaction, it's fine to execute Spi commands as `read_only = true` until the
-    /// > first mutable statement (DDL or DML).  From that point forward **all** statements
-    /// > must be executed as `read_only = false`.
-    ///
+    /// PGRX interprets this to mean that within a transaction, it's fine to execute Spi commands
+    /// as `read_only = true` until the first mutable statement (DDL or DML).  From that point
+    /// forward **all** statements must be executed as `read_only = false`.
     fn is_xact_still_immutable() -> bool {
         unsafe {
             // SAFETY:  `pg_sys::GetCurrentTransactionIdIfAny()` will always return a valid
