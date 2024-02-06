@@ -112,7 +112,7 @@ pub(crate) fn detect_include_paths_for(
     }
     // If we have anything better to recommend, don't autodetect!
     let autodetect = paths.is_empty();
-    eprintln!("Found include dirs {:?}", paths);
+    eprintln!("Found include dirs {paths:?}");
     (autodetect, paths)
 }
 

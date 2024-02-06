@@ -257,7 +257,7 @@ pub(crate) fn generate_schema(
         }
 
         let command = command.stderr(Stdio::inherit());
-        let command_str = format!("{:?}", command);
+        let command_str = format!("{command:?}");
         eprintln!(
             "{} for SQL generation with features `{}`",
             "    Building".bold().green(),
@@ -266,7 +266,7 @@ pub(crate) fn generate_schema(
 
         tracing::debug!(command = %command_str, "Running");
         let cargo_output =
-            command.output().wrap_err_with(|| format!("failed to spawn cargo: {}", command_str))?;
+            command.output().wrap_err_with(|| format!("failed to spawn cargo: {command_str}"))?;
         tracing::trace!(status_code = %cargo_output.status, command = %command_str, "Finished");
 
         if !cargo_output.status.success() {
@@ -292,7 +292,7 @@ pub(crate) fn generate_schema(
     let postmaster_path = pg_config.postmaster_path().wrap_err("could not get postmaster path")?;
 
     // The next action may take a few seconds, we'd like the user to know we're thinking.
-    eprintln!("{} SQL entities", " Discovering".bold().green(),);
+    eprintln!("{} SQL entities", " Discovering".bold().green());
 
     let postmaster_stub_built = create_stub(postmaster_path, &postmaster_stub_dir)?;
 
@@ -413,7 +413,7 @@ pub(crate) fn generate_schema(
         for symbol_to_call in fns_to_call {
             let symbol: libloading::os::unix::Symbol<unsafe extern "Rust" fn() -> pgrx_sql_entity_graph::SqlGraphEntity> =
                 lib.get(symbol_to_call.as_bytes()).unwrap_or_else(|_|
-                    panic!("Couldn't call {:#?}", symbol_to_call));
+                    panic!("Couldn't call {symbol_to_call:#?}"));
             let entity = symbol();
             entities.push(entity);
         }
@@ -443,7 +443,7 @@ pub(crate) fn generate_schema(
             .wrap_err_with(|| eyre!("Could not write SQL to {}", out_path.display()))?;
         output_tracking.push(out_path.to_path_buf());
     } else {
-        eprintln!("{} SQL entities to {}", "     Writing".bold().green(), "/dev/stdout".cyan(),);
+        eprintln!("{} SQL entities to {}", "     Writing".bold().green(), "/dev/stdout".cyan());
         pgrx_sql
             .write(&mut std::io::stdout())
             .wrap_err_with(|| eyre!("Could not write SQL to stdout"))?;
@@ -541,16 +541,16 @@ fn create_stub(
             .ok_or(eyre!("could not call postmaster_stub_file.to_str()"))?,
     ]);
 
-    let so_rustc_invocation_str = format!("{:?}", so_rustc_invocation);
+    let so_rustc_invocation_str = format!("{so_rustc_invocation:?}");
     tracing::debug!(command = %so_rustc_invocation_str, "Running");
     let output = so_rustc_invocation.output().wrap_err_with(|| {
-        eyre!("could not invoke `rustc` on {}", &postmaster_stub_file.display())
+        eyre!("could not invoke `rustc` on {}", postmaster_stub_file.display())
     })?;
 
     let code = output.status.code().ok_or(eyre!("could not get status code of build"))?;
     tracing::trace!(status_code = %code, command = %so_rustc_invocation_str, "Finished");
     if code != 0 {
-        return Err(eyre!("rustc exited with code {}", code));
+        return Err(eyre!("rustc exited with code {code}"));
     }
 
     std::fs::write(&postmaster_hash_file, postmaster_bin_hash)

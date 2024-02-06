@@ -54,7 +54,7 @@ pub(crate) fn manifest_path(
             .packages
             .iter()
             .find(|v| v.name == *package_name)
-            .ok_or_else(|| eyre!("Could not find package `{}`", package_name))?;
+            .ok_or_else(|| eyre!("Could not find package `{package_name}`"))?;
         tracing::debug!(manifest_path = %found.manifest_path, "Found workspace package");
         found.manifest_path.clone().into_std_path_buf()
     } else {

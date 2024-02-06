@@ -126,7 +126,7 @@ fn run(c: &mut Command) -> Result<()> {
     c.stdout(Stdio::inherit()).stderr(Stdio::inherit());
     let status = c.status().wrap_err("Unable to create temporary crate")?;
     if !status.success() {
-        Err(eyre!("{:?} failed with exit code: {}", c, status))
+        Err(eyre!("{c:?} failed with exit code: {status}"))
     } else {
         Ok(())
     }

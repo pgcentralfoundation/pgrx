@@ -93,7 +93,7 @@ pub(crate) fn stop_postgres(pg_config: &PgConfig) -> eyre::Result<()> {
     let output = command.output()?;
 
     if !output.status.success() {
-        Err(eyre!("{}", String::from_utf8(output.stderr)?,))
+        Err(eyre!("{}", String::from_utf8(output.stderr)?))
     } else {
         Ok(())
     }
