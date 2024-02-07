@@ -29,6 +29,7 @@ pgrx-sql-entity-graph.workspace = true
 
 cargo_toml.workspace = true
 eyre.workspace = true
+libc.workspace = true
 owo-colors.workspace = true
 regex.workspace = true
 unescape.workspace = true
@@ -54,7 +55,6 @@ tracing-error = "0.2.0"
 tracing-subscriber = { version = "0.3.17", features = [ "env-filter" ] }
 flate2 = { version = "1.0.27", default-features = false, features = ["rust_backend"] }
 tempfile = "3.8.0"
-nix = { version = "0.27", default-features = false, features = ["user"] }
 toml = "0.8.2"
 jobslot = "0.2.12"
 bzip2 = "0.4.4"

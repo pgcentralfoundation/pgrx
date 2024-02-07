@@ -590,8 +590,9 @@ fn get_pg_installdir(pgdir: &PathBuf) -> PathBuf {
 
 #[cfg(unix)]
 fn is_root_user() -> bool {
-    use nix::unistd::Uid;
-    Uid::effective().is_root()
+    // SAFETY: No, the `nix` crate does not do anything more clever:
+    // check if effective user ID is 0, AKA "root"
+    unsafe { libc::geteuid() == 0 }
 }
 
 /// Incorrectly answers false, reverting pgrx to pre-root-aware behavior,
