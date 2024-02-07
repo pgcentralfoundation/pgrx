@@ -7,6 +7,7 @@
 #[cfg(any(test, feature = "pg_test"))]
 #[pgrx::pg_schema]
 mod tests {
+    #[allow(unused)] // I can never tell when this is actually needed.
     use crate as pgrx_tests;
     use pgrx::list::List;
     use pgrx::memcx;

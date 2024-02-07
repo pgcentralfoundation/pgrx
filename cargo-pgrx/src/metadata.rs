@@ -33,7 +33,7 @@ pub fn validate(
     metadata: &Metadata,
 ) -> eyre::Result<()> {
     let cargo_pgrx_version = env!("CARGO_PKG_VERSION");
-    let cargo_pgrx_version_req = VersionReq::parse(&format!("~{}", cargo_pgrx_version))?;
+    let cargo_pgrx_version_req = VersionReq::parse(&format!("~{cargo_pgrx_version}"))?;
 
     let pgrx_packages = metadata.packages.iter().filter(|package| {
         package.name == "pgrx"

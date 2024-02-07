@@ -15,8 +15,12 @@ edition = "2021"
 publish = false
 
 [lib]
-crate-type = ["cdylib"]
+crate-type = ["cdylib", "lib"]
 name = "versioned_othername"
+
+[[bin]]
+name = "pgrx_embed_versioned_custom_libname_so"
+path = "./src/bin/pgrx_embed.rs"
 
 [features]
 default = ["pg13"]

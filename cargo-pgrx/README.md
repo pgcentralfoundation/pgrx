@@ -14,7 +14,7 @@ Install via crates.io:
 $ cargo install --locked cargo-pgrx
 ```
 
-As new versions of `pgrx` are released, you'll want to make sure you run this command again to update it. You should also reinstall `cargo-pgrx` whenever you update `rustc` so that the same compiler is used to build `cargo-pgrx` and your Postgres extensions. You can force `cargo` to reinstall an existing crate by passing `--force`.
+As new versions of `pgrx` are released, you'll want to make sure you run this command again to update it.
 
 Note that some of the features of PGRX involve compiling C code, including `cargo pgrx init`, and
 as such you will also need a toolchain for doing so and potentially must provide various libraries.
@@ -717,30 +717,3 @@ Postgres, so loading two versions of the shared library will cause trouble.
 These scenarios are:
 - when using shared memory
 - when using query planner hooks
-
-## Compiler Version Dependence
-
-The version of the Rust compiler and toolchain used to build `cargo-pgrx` must be
-the same as the version used to build your extension.
-
-Several subcommands (including `cargo pgrx schema`, `cargo pgrx test`, `cargo pgrx
-install`, ...) will produce an error message if these do not match.
-
-Although this may be relaxed in the future, currently schema generation involves
-`dlopen`ing the extension and calling `extern "Rust"` functions on
-`#[repr(Rust)]` types. Generally, the appropriate way to fix this is reinstall
-`cargo-pgrx`, using a command like the following
-
-```console
-$ cargo install --force --locked cargo-pgrx
-```
-
-Possibly with a explicit `--version`, if needed.
-
-If you are certain that in this case, it is fine, you may set
-`PGRX_IGNORE_RUST_VERSIONS` in the environment (to any value other than `"0"`),
-and the check will be bypassed. However, note that while the check is not
-fool-proof, it tries to be fairly liberal in what it allows.
-
-See <https://github.com/pgcentralfoundation/pgrx/issues/774> and <https://github.com/pgcentralfoundation/pgrx/pull/873>
-for further information.

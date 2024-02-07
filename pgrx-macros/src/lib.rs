@@ -122,7 +122,7 @@ pub fn pg_test(attr: TokenStream, item: TokenStream) -> TokenStream {
                     let res = pgrx_tests::run_test(#sql_funcname, #expected_error, crate::pg_test::postgresql_conf_options());
                     match res {
                         Ok(()) => (),
-                        Err(e) => panic!("{:?}", e)
+                        Err(e) => panic!("{e:?}")
                     }
                 }
             });
@@ -184,12 +184,12 @@ pub fn pg_cast(attr: TokenStream, item: TokenStream) -> TokenStream {
                     {
                         "implicit" => cast = PgCast::Implicit,
                         "assignment" => cast = PgCast::Assignment,
-                        other => panic!("Unrecognized pg_cast option: {}. ", other),
+                        other => panic!("Unrecognized pg_cast option: {other}. "),
                     }
                 }
             }
             Err(err) => {
-                panic!("Failed to parse attribute to pg_cast: {}", err)
+                panic!("Failed to parse attribute to pg_cast: {err}")
             }
         }
         // `pg_cast` does not support other `pg_extern` attributes for now, pass an empty attribute token stream.
@@ -715,7 +715,7 @@ fn impl_postgres_enum(ast: DeriveInput) -> syn::Result<proc_macro2::TokenStream>
                     let (name, _, _) = ::pgrx::enum_helper::lookup_enum_by_oid(unsafe { ::pgrx::pg_sys::Oid::from_datum(datum, is_null)? } );
                     match name.as_str() {
                         #from_datum
-                        _ => panic!("invalid enum value: {}", name)
+                        _ => panic!("invalid enum value: {name}")
                     }
                 }
             }
@@ -795,8 +795,8 @@ fn impl_postgres_type(ast: DeriveInput) -> syn::Result<proc_macro2::TokenStream>
     let name = &ast.ident;
     let generics = &ast.generics;
     let has_lifetimes = generics.lifetimes().next();
-    let funcname_in = Ident::new(&format!("{}_in", name).to_lowercase(), name.span());
-    let funcname_out = Ident::new(&format!("{}_out", name).to_lowercase(), name.span());
+    let funcname_in = Ident::new(&format!("{name}_in").to_lowercase(), name.span());
+    let funcname_out = Ident::new(&format!("{name}_out").to_lowercase(), name.span());
     let mut args = parse_postgres_type_args(&ast.attrs);
     let mut stream = proc_macro2::TokenStream::new();
 
@@ -905,7 +905,7 @@ fn impl_postgres_type(ast: DeriveInput) -> syn::Result<proc_macro2::TokenStream>
             pub fn #funcname_in #generics(input: Option<&#lifetime ::core::ffi::CStr>) -> Option<#name #generics> {
                 input.map_or_else(|| {
                     for m in <#name as ::pgrx::inoutfuncs::JsonInOutFuncs>::NULL_ERROR_MESSAGE {
-                        ::pgrx::pg_sys::error!("{}", m);
+                        ::pgrx::pg_sys::error!("{m}");
                     }
                     None
                 }, |i| Some(<#name as ::pgrx::inoutfuncs::JsonInOutFuncs>::input(i)))
@@ -929,7 +929,7 @@ fn impl_postgres_type(ast: DeriveInput) -> syn::Result<proc_macro2::TokenStream>
             pub fn #funcname_in #generics(input: Option<&#lifetime ::core::ffi::CStr>) -> Option<#name #generics> {
                 input.map_or_else(|| {
                     for m in <#name as ::pgrx::inoutfuncs::InOutFuncs>::NULL_ERROR_MESSAGE {
-                        ::pgrx::pg_sys::error!("{}", m);
+                        ::pgrx::pg_sys::error!("{m}");
                     }
                     None
                 }, |i| Some(<#name as ::pgrx::inoutfuncs::InOutFuncs>::input(i)))
@@ -952,7 +952,7 @@ fn impl_postgres_type(ast: DeriveInput) -> syn::Result<proc_macro2::TokenStream>
             pub fn #funcname_in #generics(input: Option<&#lifetime ::core::ffi::CStr>) -> Option<::pgrx::datum::PgVarlena<#name #generics>> {
                 input.map_or_else(|| {
                     for m in <#name as ::pgrx::inoutfuncs::PgVarlenaInOutFuncs>::NULL_ERROR_MESSAGE {
-                        ::pgrx::pg_sys::error!("{}", m);
+                        ::pgrx::pg_sys::error!("{m}");
                     }
                     None
                 }, |i| Some(<#name as ::pgrx::inoutfuncs::PgVarlenaInOutFuncs>::input(i)))

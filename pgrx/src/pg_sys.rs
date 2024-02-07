@@ -2,6 +2,7 @@
 
 // Flatten out the contents into here.
 use crate::memcx;
+use crate::ptr::PointerExt;
 pub use pgrx_pg_sys::*;
 
 // Interposing here can allow extensions like ZomboDB to skip the cshim,
@@ -39,7 +40,7 @@ pub unsafe fn rt_fetch(index: Index, range_table: *mut List) -> *mut RangeTblEnt
 #[inline]
 pub unsafe fn planner_rt_fetch(index: Index, root: *mut PlannerInfo) -> *mut RangeTblEntry {
     unsafe {
-        if (*root).simple_rte_array != core::ptr::null_mut() {
+        if (*root).simple_rte_array.is_non_null() {
             *(*root).simple_rte_array.add(index as _)
         } else {
             rt_fetch(index, (*(*root).parse).rtable).cast()

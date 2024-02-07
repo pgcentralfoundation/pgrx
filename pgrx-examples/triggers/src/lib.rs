@@ -10,7 +10,7 @@
 use pgrx::prelude::*;
 use pgrx::WhoAllocated;
 
-pgrx::pg_module_magic!();
+::pgrx::pg_module_magic!();
 
 #[derive(thiserror::Error, Debug)]
 enum TriggerError {

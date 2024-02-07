@@ -17,12 +17,12 @@ fn returns_tuple_with_attributes(
 
 // Check we can map a `fdw_handler`
 #[pg_extern]
-fn fdw_handler_return() -> pgrx::PgBox<pgrx::pg_sys::FdwRoutine> {
+fn fdw_handler_return() -> PgBox<pg_sys::FdwRoutine> {
     unimplemented!("Not a functional test, just a signature test for SQL generation. Feel free to make a functional test!")
 }
 
 #[cfg(any(test, feature = "pg_test"))]
-#[pgrx::pg_schema]
+#[pg_schema]
 mod tests {
     #[allow(unused_imports)]
     use crate as pgrx_tests;

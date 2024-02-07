@@ -82,6 +82,6 @@ fn version(ver: &str) -> Cow<str> {
     if ver.starts_with("pg") {
         Cow::Borrowed(ver)
     } else {
-        Cow::Owned(format!("pg{}", ver))
+        Cow::Owned(format!("pg{ver}"))
     }
 }

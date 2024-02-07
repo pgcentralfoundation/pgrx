@@ -15,7 +15,7 @@ mod hstore_clone;
 mod ordered;
 mod rust_enum;
 
-pgrx::pg_module_magic!();
+::pgrx::pg_module_magic!();
 
 #[cfg(test)]
 pub mod pg_test {

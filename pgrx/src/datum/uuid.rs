@@ -79,7 +79,7 @@ impl Uuid {
         let len = b.len();
 
         if len != UUID_BYTES_LEN {
-            Err(format!("Expected UUID to be {} bytes, got {}", UUID_BYTES_LEN, len))?;
+            Err(format!("Expected UUID to be {UUID_BYTES_LEN} bytes, got {len}"))?;
         }
 
         let mut bytes = [0; UUID_BYTES_LEN];
@@ -94,8 +94,8 @@ impl Uuid {
                 f.write_char('-')?;
             }
             match case {
-                UuidFormatCase::Lowercase => write!(f, "{:02x}", b)?,
-                UuidFormatCase::Uppercase => write!(f, "{:02X}", b)?,
+                UuidFormatCase::Lowercase => write!(f, "{b:02x}")?,
+                UuidFormatCase::Uppercase => write!(f, "{b:02X}")?,
             };
         }
         Ok(())
@@ -118,7 +118,7 @@ impl DerefMut for Uuid {
 
 impl std::fmt::Display for Uuid {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        write!(f, "{:-x}", self)
+        write!(f, "{self:-x}")
     }
 }
 

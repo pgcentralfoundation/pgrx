@@ -91,7 +91,7 @@ mod arguments {
             dogs: VariadicArray<pgrx::composite_type!(DOG_COMPOSITE_TYPE)>,
         ) -> Vec<String> {
             // Gets resolved to:
-            let dogs: pgrx::VariadicArray<PgHeapTuple<AllocatedByRust>> = dogs;
+            let dogs: VariadicArray<PgHeapTuple<AllocatedByRust>> = dogs;
 
             let mut names = Vec::with_capacity(dogs.len());
             for dog in dogs.iter() {
@@ -111,7 +111,7 @@ mod arguments {
             ),
         ) -> Vec<String> {
             // Gets resolved to:
-            let dogs: pgrx::VariadicArray<PgHeapTuple<AllocatedByRust>> = dogs;
+            let dogs: VariadicArray<PgHeapTuple<AllocatedByRust>> = dogs;
 
             let mut names = Vec::with_capacity(dogs.len());
             for dog in dogs.iter() {
@@ -124,10 +124,10 @@ mod arguments {
 
         #[pg_extern]
         fn gets_name_field_strict_variadic(
-            dogs: pgrx::VariadicArray<pgrx::composite_type!("Dog")>,
+            dogs: VariadicArray<pgrx::composite_type!("Dog")>,
         ) -> Vec<String> {
             // Gets resolved to:
-            let dogs: pgrx::VariadicArray<PgHeapTuple<AllocatedByRust>> = dogs;
+            let dogs: VariadicArray<PgHeapTuple<AllocatedByRust>> = dogs;
 
             let mut names = Vec::with_capacity(dogs.len());
             for dog in dogs.iter() {
@@ -850,7 +850,7 @@ mod tests {
             {
                 ()
             }
-            Err(err) => panic!("{}", err),
+            Err(err) => panic!("{err}"),
             Ok(_) => panic!("Able to find what should be a not existing composite type"),
         }
     }

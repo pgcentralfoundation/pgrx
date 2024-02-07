@@ -103,7 +103,7 @@ fn result_table_1() -> Result<
 
 #[pg_extern]
 fn result_table_2() -> Result<
-    Option<pgrx::iter::TableIterator<'static, (name!(a, Option<i32>), name!(b, Option<i32>))>>,
+    Option<TableIterator<'static, (name!(a, Option<i32>), name!(b, Option<i32>))>>,
     Box<dyn std::error::Error + Send + Sync + 'static>,
 > {
     Ok(Some(TableIterator::new(vec![(Some(1), Some(2))])))
@@ -199,7 +199,7 @@ mod tests {
                     Some(1) => assert_eq!(Some("a"), value),
                     Some(2) => assert_eq!(Some("b"), value),
                     Some(3) => assert_eq!(Some("c"), value),
-                    _ => panic!("unexpected idx={:?}", idx),
+                    _ => panic!("unexpected idx={idx:?}"),
                 }
             }
 

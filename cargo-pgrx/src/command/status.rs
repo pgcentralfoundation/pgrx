@@ -68,7 +68,7 @@ pub(crate) fn status_postgres(pg_config: &PgConfig) -> eyre::Result<bool> {
     pg_ctl.push("pg_ctl");
     let mut command = process::Command::new(pg_ctl);
     command.stdout(Stdio::piped()).stderr(Stdio::piped()).arg("status").arg("-D").arg(&datadir);
-    let command_str = format!("{:?}", command);
+    let command_str = format!("{command:?}");
     tracing::debug!(command = %command_str, "Running");
 
     let output = command.output()?;

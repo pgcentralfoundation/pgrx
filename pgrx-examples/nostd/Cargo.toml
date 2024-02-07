@@ -15,7 +15,11 @@ edition = "2021"
 publish = false
 
 [lib]
-crate-type = ["cdylib"]
+crate-type = ["cdylib", "lib"]
+
+[[bin]]
+name = "pgrx_embed_nostd"
+path = "./src/bin/pgrx_embed.rs"
 
 [features]
 default = ["pg13"]

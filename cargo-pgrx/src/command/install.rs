@@ -153,7 +153,7 @@ pub(crate) fn install_extension(
     let build_command_messages =
         build_command_stream.collect::<Result<Vec<_>, std::io::Error>>()?;
 
-    println!("{} extension", "  Installing".bold().green(),);
+    println!("{} extension", "  Installing".bold().green());
     let pkgdir = make_relative(pg_config.pkglibdir()?);
     let extdir = make_relative(pg_config.extension_dir()?);
     let shlibpath = find_library_file(&manifest, &build_command_messages)?;
@@ -184,7 +184,7 @@ pub(crate) fn install_extension(
         let so_name = if versioned_so {
             let extver = get_version(&package_manifest_path)?;
             // note: versioned so-name format must agree with pgrx-utils
-            format!("{}-{}", &extname, &extver)
+            format!("{extname}-{extver}")
         } else {
             extname.clone()
         };
@@ -196,7 +196,7 @@ pub(crate) fn install_extension(
         } else {
             "so"
         };
-        dest.push(format!("{}.{}", so_name, so_extension));
+        dest.push(format!("{so_name}.{so_extension}"));
 
         // Remove the existing shared libraries if present. This is a workaround for an
         // issue highlighted by the following apple documentation:
@@ -332,11 +332,11 @@ pub(crate) fn build_extension(
     }
 
     let command = command.stderr(Stdio::inherit());
-    let command_str = format!("{:?}", command);
+    let command_str = format!("{command:?}");
     println!("{} extension with features {}", "    Building".bold().green(), features_arg.cyan());
     println!("{} command {}", "     Running".bold().green(), command_str.cyan());
     let cargo_output =
-        command.output().wrap_err_with(|| format!("failed to spawn cargo: {}", command_str))?;
+        command.output().wrap_err_with(|| format!("failed to spawn cargo: {command_str}"))?;
     if !cargo_output.status.success() {
         // We explicitly do not want to return a spantraced error here.
         std::process::exit(1)
@@ -355,7 +355,7 @@ fn get_target_sql_file(
 
     let (_, extname) = find_control_file(&manifest_path)?;
     let version = get_version(&manifest_path)?;
-    dest.push(format!("{}--{}.sql", extname, version));
+    dest.push(format!("{extname}--{version}.sql"));
 
     Ok(dest)
 }
@@ -397,7 +397,7 @@ fn copy_sql_files(
             if let Ok(sql) = sql {
                 let filename = sql.file_name().into_string().unwrap();
 
-                if filename.starts_with(&format!("{}--", extname)) && filename.ends_with(".sql") {
+                if filename.starts_with(&format!("{extname}--")) && filename.ends_with(".sql") {
                     let mut dest = base_directory.clone();
                     dest.push(extdir);
                     dest.push(filename);

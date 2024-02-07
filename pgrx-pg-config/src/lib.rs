@@ -12,13 +12,13 @@ use eyre::{eyre, WrapErr};
 use owo_colors::OwoColorize;
 use serde_derive::{Deserialize, Serialize};
 use std::collections::{BTreeMap, HashMap};
-use std::error::Error;
 use std::ffi::OsString;
 use std::fmt::{self, Debug, Display, Formatter};
 use std::io::ErrorKind;
 use std::path::PathBuf;
 use std::process::{Command, Stdio};
 use std::str::FromStr;
+use thiserror::Error;
 use url::Url;
 
 pub mod cargo;
@@ -68,9 +68,9 @@ impl Display for PgMinorVersion {
     fn fmt(&self, f: &mut Formatter<'_>) -> fmt::Result {
         match self {
             PgMinorVersion::Latest => write!(f, ".LATEST"),
-            PgMinorVersion::Release(v) => write!(f, ".{}", v),
-            PgMinorVersion::Beta(v) => write!(f, "beta{}", v),
-            PgMinorVersion::Rc(v) => write!(f, "rc{}", v),
+            PgMinorVersion::Release(v) => write!(f, ".{v}"),
+            PgMinorVersion::Beta(v) => write!(f, "beta{v}"),
+            PgMinorVersion::Rc(v) => write!(f, "rc{v}"),
         }
     }
 }
@@ -224,7 +224,7 @@ impl PgConfig {
         let version_parts = version_str.split_whitespace().collect::<Vec<&str>>();
         let mut version = version_parts
             .get(1)
-            .ok_or_else(|| eyre!("invalid version string: {}", version_str))?
+            .ok_or_else(|| eyre!("invalid version string: {version_str}"))?
             .split('.')
             .collect::<Vec<&str>>();
 
@@ -242,7 +242,7 @@ impl PgConfig {
                 rc = true;
                 version = first.split("rc").collect();
             } else {
-                return Err(eyre!("invalid version string: {}", version_str));
+                return Err(eyre!("invalid version string: {version_str}"));
             }
         }
 
@@ -258,7 +258,7 @@ impl PgConfig {
         }
         minor = &minor[0..end_index];
         let minor = u16::from_str(minor)
-            .map_err(|e| eyre!("invalid minor version number `{}`: {:?}", minor, e))?;
+            .map_err(|e| eyre!("invalid minor version number `{minor}`: {e:?}"))?;
         let minor = if beta {
             PgMinorVersion::Beta(minor)
         } else if rc {
@@ -294,7 +294,7 @@ impl PgConfig {
             None => {
                 let major = self.major_version()?;
                 let minor = self.minor_version()?;
-                let version = format!("{}{}", major, minor);
+                let version = format!("{major}{minor}");
                 Ok(version)
             }
         }
@@ -491,17 +491,15 @@ impl<'a> PgConfigSelector<'a> {
     }
 }
 
-#[derive(Debug)]
+#[derive(Debug, Error)]
 pub enum PgrxHomeError {
+    #[error("You don't seem to have a home directory")]
     NoHomeDirectory,
+    // allow caller to decide whether it is safe to enumerate paths
+    #[error("$PGRX_HOME does not exist")]
     MissingPgrxHome(PathBuf),
-    IoError(std::io::Error),
-}
-
-impl From<std::io::Error> for PgrxHomeError {
-    fn from(value: std::io::Error) -> Self {
-        PgrxHomeError::IoError(value)
-    }
+    #[error(transparent)]
+    IoError(#[from] std::io::Error),
 }
 
 impl From<PgrxHomeError> for std::io::Error {
@@ -517,18 +515,6 @@ impl From<PgrxHomeError> for std::io::Error {
         }
     }
 }
-
-impl Display for PgrxHomeError {
-    fn fmt(&self, f: &mut Formatter<'_>) -> fmt::Result {
-        match self {
-            PgrxHomeError::NoHomeDirectory => write!(f, "You don't seem to have a home directory"),
-            PgrxHomeError::MissingPgrxHome(_) => write!(f, "$PGRX_HOME does not exist"),
-            PgrxHomeError::IoError(e) => write!(f, "{e}"),
-        }
-    }
-}
-
-impl Error for PgrxHomeError {}
 
 impl Pgrx {
     pub fn new(base_port: u16, base_testing_port: u16) -> Self {
@@ -616,7 +602,7 @@ impl Pgrx {
                 return Ok(pg_config.clone());
             }
         }
-        Err(eyre!("Postgres `{}` is not managed by pgrx", label))
+        Err(eyre!("Postgres `{label}` is not managed by pgrx"))
     }
 
     /// Returns true if the specified `label` represents a Postgres version number feature flag,
@@ -713,7 +699,7 @@ pub fn createdb(
         .stdout(Stdio::piped())
         .stderr(Stdio::piped());
 
-    let command_str = format!("{:?}", command);
+    let command_str = format!("{command:?}");
 
     let child = command.spawn().wrap_err_with(|| {
         format!("Failed to spawn process for creating database using command: '{command_str}': ")
@@ -755,7 +741,7 @@ fn does_db_exist(pg_config: &PgConfig, dbname: &str) -> eyre::Result<bool> {
         .stdout(Stdio::piped())
         .stderr(Stdio::piped());
 
-    let command_str = format!("{:?}", command);
+    let command_str = format!("{command:?}");
     let output = command.output()?;
 
     if !output.status.success() {

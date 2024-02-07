@@ -27,6 +27,7 @@ no-schema-generation = []
 [dependencies]
 eyre.workspace = true
 unescape.workspace = true
+thiserror.workspace = true
 
 convert_case = "0.6.0"
 petgraph = "0.6.4"
