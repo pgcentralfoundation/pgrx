@@ -668,14 +668,11 @@ fn impl_postgres_enum(ast: DeriveInput) -> syn::Result<proc_macro2::TokenStream>
     let enum_name = enum_ident.to_string();
 
     // validate that we're only operating on an enum
-    let enum_data = match ast.data {
-        Data::Enum(e) => e,
-        _ => {
-            return Err(syn::Error::new(
-                ast.span(),
-                "#[derive(PostgresEnum)] can only be applied to enums",
-            ))
-        }
+    let Data::Enum(enum_data) = ast.data else {
+        return Err(syn::Error::new(
+            ast.span(),
+            "#[derive(PostgresEnum)] can only be applied to enums",
+        ));
     };
 
     let mut from_datum = proc_macro2::TokenStream::new();
