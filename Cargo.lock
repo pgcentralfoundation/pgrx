@@ -342,7 +342,6 @@ dependencies = [
  "jobslot",
  "nix",
  "object",
- "once_cell",
  "owo-colors",
  "pgrx-pg-config",
  "pgrx-sql-entity-graph",
