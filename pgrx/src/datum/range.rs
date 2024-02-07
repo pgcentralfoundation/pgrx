@@ -168,12 +168,12 @@ where
             Some((RangeBound::Infinite, RangeBound::Exclusive(v))) => write!(f, "(,{v})"),
 
             Some((RangeBound::Inclusive(v), RangeBound::Infinite)) => write!(f, "[{v},)"),
-            Some((RangeBound::Inclusive(l), RangeBound::Inclusive(u))) => write!(f, "[{l},{u}]"),
-            Some((RangeBound::Inclusive(l), RangeBound::Exclusive(u))) => write!(f, "[{l},{u})"),
+            Some((RangeBound::Inclusive(lo), RangeBound::Inclusive(hi))) => write!(f, "[{lo},{hi}]"),
+            Some((RangeBound::Inclusive(lo), RangeBound::Exclusive(hi))) => write!(f, "[{lo},{hi})"),
 
             Some((RangeBound::Exclusive(v), RangeBound::Infinite)) => write!(f, "({v},)"),
-            Some((RangeBound::Exclusive(l), RangeBound::Inclusive(u))) => write!(f, "({l},{u}]"),
-            Some((RangeBound::Exclusive(l), RangeBound::Exclusive(u))) => write!(f, "({l},{u})"),
+            Some((RangeBound::Exclusive(lo), RangeBound::Inclusive(hi))) => write!(f, "({lo},{hi}]"),
+            Some((RangeBound::Exclusive(lo), RangeBound::Exclusive(hi))) => write!(f, "({lo},{hi})"),
         }
     }
 }
