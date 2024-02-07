@@ -161,7 +161,7 @@ impl From<DateTimeParts> for &'static str {
 impl Display for DateTimeParts {
     fn fmt(&self, f: &mut Formatter<'_>) -> core::fmt::Result {
         let name: &'static str = (*self).into();
-        write!(f, "{}", name)
+        write!(f, "{name}")
     }
 }
 

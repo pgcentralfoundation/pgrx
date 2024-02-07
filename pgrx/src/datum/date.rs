@@ -271,7 +271,7 @@ impl serde::Serialize for Date {
     {
         serializer
             .serialize_str(&self.to_iso_string())
-            .map_err(|e| serde::ser::Error::custom(format!("formatting problem: {:?}", e)))
+            .map_err(|err| serde::ser::Error::custom(format!("formatting problem: {err:?}")))
     }
 }
 

@@ -52,7 +52,7 @@ where
                     any.downcast::<ErrorReport>().unwrap().report(PgLogLevel::ERROR);
                     unreachable!();
                 } else {
-                    ereport!(ERROR, PgSqlErrorCode::ERRCODE_DATA_EXCEPTION, &format!("{}", e));
+                    ereport!(ERROR, PgSqlErrorCode::ERRCODE_DATA_EXCEPTION, &format!("{e}"));
                 }
             }
         }
@@ -95,7 +95,7 @@ impl Display for ErrorReportLocation {
 
         if let Some(backtrace) = &self.backtrace {
             if backtrace.status() == std::backtrace::BacktraceStatus::Captured {
-                write!(f, "\n{}", backtrace)?;
+                write!(f, "\n{backtrace}")?;
             }
         }
 
@@ -136,10 +136,10 @@ impl Display for ErrorReport {
     fn fmt(&self, f: &mut Formatter<'_>) -> std::fmt::Result {
         write!(f, "{}: {}", self.sqlerrcode, self.message)?;
         if let Some(hint) = &self.hint {
-            write!(f, "\nHINT: {}", hint)?;
+            write!(f, "\nHINT: {hint}")?;
         }
         if let Some(detail) = &self.detail {
-            write!(f, "\nDETAIL: {}", detail)?;
+            write!(f, "\nDETAIL: {detail}")?;
         }
         write!(f, "\nLOCATION: {}", self.location)
     }
@@ -191,12 +191,14 @@ impl ErrorReportWithLevel {
     /// Get the detail line with backtrace. If backtrace is not available, it will just return the detail.
     pub fn detail_with_backtrace(&self) -> Option<String> {
         match (self.detail(), self.backtrace()) {
-            (Some(d), Some(bt)) if bt.status() == std::backtrace::BacktraceStatus::Captured => {
-                Some(format!("{}\n{}", d, bt))
+            (Some(detail), Some(bt))
+                if bt.status() == std::backtrace::BacktraceStatus::Captured =>
+            {
+                Some(format!("{detail}\n{bt}"))
             }
             (Some(d), _) => Some(d.to_string()),
             (None, Some(bt)) if bt.status() == std::backtrace::BacktraceStatus::Captured => {
-                Some(format!("\n{}", bt))
+                Some(format!("\n{bt}"))
             }
             (None, _) => None,
         }

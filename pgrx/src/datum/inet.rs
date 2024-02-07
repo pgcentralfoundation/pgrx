@@ -79,7 +79,7 @@ impl<'de> Deserialize<'de> for Inet {
                     Ok(Inet(v.clone()))
                 })
                 .catch_when(PgSqlErrorCode::ERRCODE_INVALID_TEXT_REPRESENTATION, |_| {
-                    Err(Error::custom(format!("invalid inet value: {}", v)))
+                    Err(Error::custom(format!("invalid inet value: {v}")))
                 })
                 .execute()
             }
