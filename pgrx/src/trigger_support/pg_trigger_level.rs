@@ -1,3 +1,5 @@
+use core::fmt::{Display, Formatter};
+use std::fmt;
 //LICENSE Portions Copyright 2019-2021 ZomboDB, LLC.
 //LICENSE
 //LICENSE Portions Copyright 2021-2023 Technology Concepts & Design, Inc.
@@ -33,12 +35,11 @@ impl From<TriggerEvent> for PgTriggerLevel {
     }
 }
 
-impl ToString for PgTriggerLevel {
-    fn to_string(&self) -> String {
-        match self {
-            PgTriggerLevel::Statement => "STATEMENT",
+impl Display for PgTriggerLevel {
+    fn fmt(&self, f: &mut Formatter<'_>) -> fmt::Result {
+        f.write_str(match self {
             PgTriggerLevel::Row => "ROW",
-        }
-        .to_string()
+            PgTriggerLevel::Statement => "STATEMENT",
+        })
     }
 }

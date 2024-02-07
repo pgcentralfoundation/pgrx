@@ -21,10 +21,7 @@ fn default_argument(a: default!(i32, 99)) -> i32 {
 
 #[pg_extern]
 fn option_default_argument(a: default!(Option<&str>, "NULL")) -> &str {
-    match a {
-        Some(a) => a,
-        None => "got default of null",
-    }
+    a.unwrap_or("got default of null")
 }
 
 #[cfg(any(test, feature = "pg_test"))]

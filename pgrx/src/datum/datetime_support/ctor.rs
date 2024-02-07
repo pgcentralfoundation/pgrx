@@ -113,6 +113,8 @@ pub fn to_timestamp(epoch_seconds: f64) -> TimestampWithTimeZone {
 /// SELECT date_bin('15 minutes', TIMESTAMP '2020-02-11 15:44:17', TIMESTAMP '2001-01-01 00:02:30');
 /// Result: 2020-02-11 15:32:30
 /// ```
+///
+/// TODO: See https://github.com/pgcentralfoundation/pgrx/pull/1414
 #[cfg(any(features = "pg14", features = "pg15"))]
 pub fn date_bin(
     stride: crate::datum::interval::Interval,

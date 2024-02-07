@@ -30,7 +30,7 @@ mod tests {
 
     #[pg_extern]
     fn return_a_u64_numeric() -> AnyNumeric {
-        AnyNumeric::try_from(std::u64::MAX).unwrap()
+        AnyNumeric::try_from(u64::MAX).unwrap()
     }
 
     #[pg_test]

@@ -197,15 +197,12 @@ pub fn pg_cast(attr: TokenStream, item: TokenStream) -> TokenStream {
         Ok(CodeEnrichment(pg_extern.as_cast(cast)).to_token_stream().into())
     }
 
-    match wrapped(attr, item) {
-        Ok(tokens) => tokens,
-        Err(e) => {
-            let msg = e.to_string();
-            TokenStream::from(quote! {
-              compile_error!(#msg);
-            })
-        }
-    }
+    wrapped(attr, item).unwrap_or_else(|e| {
+        let msg = e.to_string();
+        TokenStream::from(quote! {
+          compile_error!(#msg);
+        })
+    })
 }
 
 /// Declare a function as `#[pg_operator]` to indicate that it represents a Postgres operator
@@ -291,15 +288,12 @@ pub fn pg_schema(_attr: TokenStream, input: TokenStream) -> TokenStream {
         Ok(pgrx_schema.to_token_stream().into())
     }
 
-    match wrapped(input) {
-        Ok(tokens) => tokens,
-        Err(e) => {
-            let msg = e.to_string();
-            TokenStream::from(quote! {
-              compile_error!(#msg);
-            })
-        }
-    }
+    wrapped(input).unwrap_or_else(|e| {
+        let msg = e.to_string();
+        TokenStream::from(quote! {
+          compile_error!(#msg);
+        })
+    })
 }
 
 /**
@@ -434,15 +428,12 @@ pub fn extension_sql(input: TokenStream) -> TokenStream {
         Ok(ext_sql.to_token_stream().into())
     }
 
-    match wrapped(input) {
-        Ok(tokens) => tokens,
-        Err(e) => {
-            let msg = e.to_string();
-            TokenStream::from(quote! {
-              compile_error!(#msg);
-            })
-        }
-    }
+    wrapped(input).unwrap_or_else(|e| {
+        let msg = e.to_string();
+        TokenStream::from(quote! {
+          compile_error!(#msg);
+        })
+    })
 }
 
 /**
@@ -479,15 +470,12 @@ pub fn extension_sql_file(input: TokenStream) -> TokenStream {
         Ok(ext_sql.to_token_stream().into())
     }
 
-    match wrapped(input) {
-        Ok(tokens) => tokens,
-        Err(e) => {
-            let msg = e.to_string();
-            TokenStream::from(quote! {
-              compile_error!(#msg);
-            })
-        }
-    }
+    wrapped(input).unwrap_or_else(|e| {
+        let msg = e.to_string();
+        TokenStream::from(quote! {
+          compile_error!(#msg);
+        })
+    })
 }
 
 /// Associated macro for `#[pg_extern]` or `#[macro@pg_operator]`.  Used to set the `SEARCH_PATH` option
@@ -642,15 +630,12 @@ pub fn pg_extern(attr: TokenStream, item: TokenStream) -> TokenStream {
         Ok(pg_extern_item.to_token_stream().into())
     }
 
-    match wrapped(attr, item) {
-        Ok(tokens) => tokens,
-        Err(e) => {
-            let msg = e.to_string();
-            TokenStream::from(quote! {
-              compile_error!(#msg);
-            })
-        }
-    }
+    wrapped(attr, item).unwrap_or_else(|e| {
+        let msg = e.to_string();
+        TokenStream::from(quote! {
+          compile_error!(#msg);
+        })
+    })
 }
 
 /**
@@ -683,14 +668,11 @@ fn impl_postgres_enum(ast: DeriveInput) -> syn::Result<proc_macro2::TokenStream>
     let enum_name = enum_ident.to_string();
 
     // validate that we're only operating on an enum
-    let enum_data = match ast.data {
-        Data::Enum(e) => e,
-        _ => {
-            return Err(syn::Error::new(
-                ast.span(),
-                "#[derive(PostgresEnum)] can only be applied to enums",
-            ))
-        }
+    let Data::Enum(enum_data) = ast.data else {
+        return Err(syn::Error::new(
+            ast.span(),
+            "#[derive(PostgresEnum)] can only be applied to enums",
+        ));
     };
 
     let mut from_datum = proc_macro2::TokenStream::new();
@@ -1195,15 +1177,12 @@ pub fn pg_aggregate(_attr: TokenStream, item: TokenStream) -> TokenStream {
     }
 
     let parsed_base = parse_macro_input!(item as syn::ItemImpl);
-    match wrapped(parsed_base) {
-        Ok(tokens) => tokens,
-        Err(e) => {
-            let msg = e.to_string();
-            TokenStream::from(quote! {
-              compile_error!(#msg);
-            })
-        }
-    }
+    wrapped(parsed_base).unwrap_or_else(|e| {
+        let msg = e.to_string();
+        TokenStream::from(quote! {
+          compile_error!(#msg);
+        })
+    })
 }
 
 /**
@@ -1254,13 +1233,10 @@ pub fn pg_trigger(attrs: TokenStream, input: TokenStream) -> TokenStream {
         Ok(trigger_tokens.into())
     }
 
-    match wrapped(attrs, input) {
-        Ok(tokens) => tokens,
-        Err(e) => {
-            let msg = e.to_string();
-            TokenStream::from(quote! {
-              compile_error!(#msg);
-            })
-        }
-    }
+    wrapped(attrs, input).unwrap_or_else(|e| {
+        let msg = e.to_string();
+        TokenStream::from(quote! {
+          compile_error!(#msg);
+        })
+    })
 }

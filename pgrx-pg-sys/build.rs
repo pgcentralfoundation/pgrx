@@ -16,7 +16,7 @@ use quote::{quote, ToTokens};
 use std::cmp::Ordering;
 use std::collections::{BTreeMap, BTreeSet, HashMap, HashSet};
 use std::fs;
-use std::path::{self, PathBuf}; // disambiguate path::Path and syn::Type::Path
+use std::path::{self, Path, PathBuf}; // disambiguate path::Path and syn::Type::Path
 use std::process::{Command, Output};
 use std::sync::OnceLock;
 use syn::{ForeignItem, Item, ItemConst};
@@ -346,13 +346,13 @@ impl BuildPaths {
 
 fn write_rs_file(
     code: proc_macro2::TokenStream,
-    file: &PathBuf,
+    file: &Path,
     header: proc_macro2::TokenStream,
 ) -> eyre::Result<()> {
     let mut contents = header;
     contents.extend(code);
 
-    std::fs::write(file, contents.to_string())?;
+    fs::write(file, contents.to_string())?;
     rust_fmt(file)
 }
 
@@ -1068,7 +1068,7 @@ fn apply_pg_guard(items: &Vec<syn::Item>) -> eyre::Result<proc_macro2::TokenStre
     Ok(out)
 }
 
-fn rust_fmt(path: &PathBuf) -> eyre::Result<()> {
+fn rust_fmt(path: &Path) -> eyre::Result<()> {
     // We shouldn't hit this path in a case where we care about it, but... just
     // in case we probably should respect RUSTFMT.
     let rustfmt = env_tracked("RUSTFMT").unwrap_or_else(|| "rustfmt".into());

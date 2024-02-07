@@ -109,9 +109,7 @@ where
     where
         S: Serializer,
     {
-        let iter = self.iter();
-        let result = serializer.collect_seq(iter);
-        result
+        serializer.collect_seq(self.iter())
     }
 }
 
@@ -957,6 +955,8 @@ where
     #[allow(clippy::get_first)] // https://github.com/pgcentralfoundation/pgrx/issues/1363
     fn composite_type_oid(&self) -> Option<pg_sys::Oid> {
         // the composite type oid for a vec of composite types is the array type of the base composite type
+        // the use of first() would have presented a false certainty here: it's not actually relevant that it be the first.
+        #[allow(clippy::get_first)]
         self.get(0)
             .and_then(|v| v.composite_type_oid().map(|oid| unsafe { pg_sys::get_array_type(oid) }))
     }

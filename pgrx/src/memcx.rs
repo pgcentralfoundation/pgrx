@@ -42,6 +42,6 @@ where
     F: for<'clos> FnOnce(&'clos MemCx<'curr>) -> T,
 {
     let memcx = unsafe { MemCx::from_ptr(pg_sys::CurrentMemoryContext) };
-    let ret = { f(&memcx) };
-    ret
+
+    f(&memcx)
 }

@@ -9,6 +9,7 @@
 //LICENSE Use of this source code is governed by the MIT license that can be found in the LICENSE file.
 use core::ffi::CStr;
 use core::fmt::{Debug, Display, Formatter};
+use std::cmp::Ordering;
 use std::fmt;
 use std::iter::Sum;
 
@@ -104,14 +105,10 @@ impl AnyNumeric {
         if self.is_nan() {
             Sign::NaN
         } else {
-            let zero: AnyNumeric = 0.try_into().unwrap();
-
-            if self < &zero {
-                Sign::Negative
-            } else if self > &zero {
-                Sign::Positive
-            } else {
-                Sign::Zero
+            match self.cmp(&0.into()) {
+                Ordering::Less => Sign::Negative,
+                Ordering::Greater => Sign::Positive,
+                Ordering::Equal => Sign::Zero,
             }
         }
     }

@@ -32,7 +32,7 @@ pg16 = ["pgrx/pg16", "pgrx-tests/pg16" ]
 pg_test = []
 
 [dependencies]
-pgrx = { path = "../../pgrx/", default-features = false }
+pgrx = { path = "../../pgrx", default-features = false }
 
 [dev-dependencies]
 pgrx-tests = { path = "../../pgrx-tests" }

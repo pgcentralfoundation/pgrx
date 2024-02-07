@@ -167,7 +167,7 @@ pub(crate) fn install_extension(
         );
         copy_file(
             &control_file,
-            &dest,
+            dest,
             "control file",
             true,
             &package_manifest_path,
@@ -206,13 +206,13 @@ pub(crate) fn install_extension(
         // process which will mash up all pointers in the .TEXT segment.
         // this simulate linux's install(1) behavior
         if dest.exists() {
-            std::fs::remove_file(&dest)
+            fs::remove_file(&dest)
                 .wrap_err_with(|| format!("unable to remove existing file {}", dest.display()))?;
         }
 
         copy_file(
             &shlibpath,
-            &dest,
+            dest,
             "shared library",
             false,
             &package_manifest_path,
@@ -240,8 +240,8 @@ pub(crate) fn install_extension(
 }
 
 fn copy_file(
-    src: &PathBuf,
-    dest: &PathBuf,
+    src: &Path,
+    dest: PathBuf,
     msg: &str,
     do_filter: bool,
     package_manifest_path: impl AsRef<Path>,
@@ -262,11 +262,11 @@ fn copy_file(
         })?,
     };
 
-    println!("{} {} to {}", "     Copying".bold().green(), msg, format_display_path(dest)?.cyan());
+    println!("{} {} to {}", "     Copying".bold().green(), msg, format_display_path(&dest)?.cyan());
 
     if do_filter {
         // we want to filter the contents of the file we're to copy
-        let input = std::fs::read_to_string(src)
+        let input = fs::read_to_string(src)
             .wrap_err_with(|| format!("failed to read `{}`", src.display()))?;
         let mut input = filter_contents(package_manifest_path, input)?;
 
@@ -274,16 +274,16 @@ fn copy_file(
             input = filter_out_fields_in_control(pg_config, input)?;
         }
 
-        std::fs::write(dest, input).wrap_err_with(|| {
+        fs::write(&dest, input).wrap_err_with(|| {
             format!("failed writing `{}` to `{}`", src.display(), dest.display())
         })?;
     } else {
-        std::fs::copy(src, dest).wrap_err_with(|| {
+        fs::copy(src, &dest).wrap_err_with(|| {
             format!("failed copying `{}` to `{}`", src.display(), dest.display())
         })?;
     }
 
-    output_tracking.push(dest.clone());
+    output_tracking.push(dest);
 
     Ok(())
 }
@@ -346,10 +346,10 @@ pub(crate) fn build_extension(
 
 fn get_target_sql_file(
     manifest_path: impl AsRef<Path>,
-    extdir: &PathBuf,
-    base_directory: &PathBuf,
+    extdir: &Path,
+    base_directory: PathBuf,
 ) -> eyre::Result<PathBuf> {
-    let mut dest = base_directory.clone();
+    let mut dest = base_directory;
     dest.push(extdir);
 
     let (_, extname) = find_control_file(&manifest_path)?;
@@ -367,12 +367,12 @@ fn copy_sql_files(
     profile: &CargoProfile,
     is_test: bool,
     features: &clap_cargo::Features,
-    extdir: &PathBuf,
-    base_directory: &PathBuf,
+    extdir: &Path,
+    base_directory: &Path,
     skip_build: bool,
     output_tracking: &mut Vec<PathBuf>,
 ) -> eyre::Result<()> {
-    let dest = get_target_sql_file(&package_manifest_path, extdir, base_directory)?;
+    let dest = get_target_sql_file(&package_manifest_path, extdir, base_directory.to_path_buf())?;
     let (_, extname) = find_control_file(&package_manifest_path)?;
 
     crate::command::schema::generate_schema(
@@ -391,26 +391,24 @@ fn copy_sql_files(
     )?;
 
     // now copy all the version upgrade files too
-    if let Ok(dir) = std::fs::read_dir("sql/") {
-        for sql in dir {
-            if let Ok(sql) = sql {
-                let filename = sql.file_name().into_string().unwrap();
+    if let Ok(dir) = fs::read_dir("sql/") {
+        for sql in dir.flatten() {
+            let filename = sql.file_name().into_string().unwrap();
 
-                if filename.starts_with(&format!("{extname}--")) && filename.ends_with(".sql") {
-                    let mut dest = base_directory.clone();
-                    dest.push(extdir);
-                    dest.push(filename);
+            if filename.starts_with(&format!("{extname}--")) && filename.ends_with(".sql") {
+                let mut dest = base_directory.to_path_buf();
+                dest.push(extdir);
+                dest.push(filename);
 
-                    copy_file(
-                        &sql.path(),
-                        &dest,
-                        "extension schema upgrade file",
-                        true,
-                        &package_manifest_path,
-                        output_tracking,
-                        pg_config,
-                    )?;
-                }
+                copy_file(
+                    &sql.path(),
+                    dest,
+                    "extension schema upgrade file",
+                    true,
+                    &package_manifest_path,
+                    output_tracking,
+                    pg_config,
+                )?;
             }
         }
     }
@@ -419,7 +417,7 @@ fn copy_sql_files(
 
 #[tracing::instrument(level = "error", skip_all)]
 pub(crate) fn find_library_file(
-    manifest: &cargo_toml::Manifest,
+    manifest: &Manifest,
     build_command_messages: &Vec<cargo_metadata::Message>,
 ) -> eyre::Result<PathBuf> {
     let target_name = manifest.target_name()?;

@@ -257,21 +257,17 @@ unsafe fn fetch_att(T: *mut std::os::raw::c_char, attbyval: bool, attlen: i16) -
 
             // NB:  Compiler should solve this branch for us, and we write it like this to avoid
             // code duplication for the case where a Datum isn't 8 bytes wide
-            if SIZEOF_DATUM == 8 {
-                if attlen == std::mem::size_of::<Datum>() {
-                    return *T.cast::<Datum>();
-                }
+            if SIZEOF_DATUM == 8 && attlen == std::mem::size_of::<Datum>() {
+                return *T.cast::<Datum>();
             }
 
             if attlen == std::mem::size_of::<i32>() {
                 Datum::from(*T.cast::<i32>())
+            } else if attlen == std::mem::size_of::<i16>() {
+                Datum::from(*T.cast::<i16>())
             } else {
-                if attlen == std::mem::size_of::<i16>() {
-                    Datum::from(*T.cast::<i16>())
-                } else {
-                    assert_eq!(attlen, 1);
-                    Datum::from(*T.cast::<std::os::raw::c_char>())
-                }
+                assert_eq!(attlen, 1);
+                Datum::from(*T.cast::<std::os::raw::c_char>())
             }
         } else {
             Datum::from(T.cast::<std::os::raw::c_char>())

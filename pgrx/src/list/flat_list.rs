@@ -113,7 +113,7 @@ impl<'cx, T: Enlist> List<'cx, T> {
                 let list_size = 128;
                 unsafe {
                     let list: *mut pg_sys::List = mcx.alloc_bytes(list_size).cast();
-                    assert_ne!(list, ptr::null_mut());
+                    assert!(list.is_non_null());
                     (*list).type_ = T::LIST_TAG;
                     (*list).max_length = ((list_size - mem::size_of::<pg_sys::List>())
                         / mem::size_of::<pg_sys::ListCell>())

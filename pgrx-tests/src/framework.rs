@@ -549,10 +549,8 @@ fn monitor_pg(mut command: Command, cmd_string: String, loglines: LogLines) -> S
         let mut is_started_yet = false;
         let mut lines = reader.lines();
         while let Some(Ok(line)) = lines.next() {
-            let session_id = match get_named_capture(&regex, "session_id", &line) {
-                Some(sid) => sid,
-                None => "NONE".to_string(),
-            };
+            let session_id = get_named_capture(&regex, "session_id", &line)
+                .unwrap_or_else(|| "NONE".to_string());
 
             if line.contains("database system is ready to accept connections") {
                 // Postgres says it's ready to go

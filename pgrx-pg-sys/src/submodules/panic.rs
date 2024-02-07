@@ -43,19 +43,16 @@ where
     /// be an [`ErrorReport`], then that is specifically raised.  Otherwise it's just a general
     /// [`ereport!`] as a [`PgLogLevel::ERROR`].
     fn report(self) -> Self::Inner {
-        match self {
-            Ok(value) => value,
-            Err(e) => {
-                let any: Box<&dyn Any> = Box::new(&e);
-                if any.downcast_ref::<ErrorReport>().is_some() {
-                    let any: Box<dyn Any> = Box::new(e);
-                    any.downcast::<ErrorReport>().unwrap().report(PgLogLevel::ERROR);
-                    unreachable!();
-                } else {
-                    ereport!(ERROR, PgSqlErrorCode::ERRCODE_DATA_EXCEPTION, &format!("{e}"));
-                }
+        self.unwrap_or_else(|e| {
+            let any: Box<&dyn Any> = Box::new(&e);
+            if any.downcast_ref::<ErrorReport>().is_some() {
+                let any: Box<dyn Any> = Box::new(e);
+                any.downcast::<ErrorReport>().unwrap().report(PgLogLevel::ERROR);
+                unreachable!();
+            } else {
+                ereport!(ERROR, PgSqlErrorCode::ERRCODE_DATA_EXCEPTION, &format!("{e}"));
             }
-        }
+        })
     }
 }
 

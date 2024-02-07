@@ -28,7 +28,7 @@ pub enum PgXactCallbackEvent {
     /// cause the Postgres backend to abort.
     Abort,
 
-    /// Fired when a transcation is committed.  It is mutually exclusive with `PgrxactCallbackEvent::Abort`
+    /// Fired when a transaction is committed.  It is mutually exclusive with `PgrxactCallbackEvent::Abort`
     ///
     /// ## Safety
     ///
@@ -114,7 +114,7 @@ type CallbackMap =
 /// they were registered.
 ///
 /// Registered callbacks only remain registered for the life of a single transaction.  Registration
-/// of permanet callbacks should be done through the unsafe `pg_sys::RegisterXactCallback()` function.
+/// of permanent callbacks should be done through the unsafe `pg_sys::RegisterXactCallback()` function.
 ///
 ///
 /// ## Examples

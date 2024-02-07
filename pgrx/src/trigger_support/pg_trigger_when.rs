@@ -1,3 +1,5 @@
+use core::fmt::{Display, Formatter};
+use std::fmt;
 //LICENSE Portions Copyright 2019-2021 ZomboDB, LLC.
 //LICENSE
 //LICENSE Portions Copyright 2021-2023 Technology Concepts & Design, Inc.
@@ -38,13 +40,12 @@ impl TryFrom<TriggerEvent> for PgTriggerWhen {
     }
 }
 
-impl ToString for PgTriggerWhen {
-    fn to_string(&self) -> String {
-        match self {
+impl Display for PgTriggerWhen {
+    fn fmt(&self, f: &mut Formatter<'_>) -> fmt::Result {
+        f.write_str(match self {
             PgTriggerWhen::Before => "BEFORE",
             PgTriggerWhen::After => "AFTER",
             PgTriggerWhen::InsteadOf => "INSTEAD OF",
-        }
-        .to_string()
+        })
     }
 }

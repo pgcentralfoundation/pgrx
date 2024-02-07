@@ -22,7 +22,7 @@ use std::collections::HashMap;
 use std::fs::File;
 use std::io::{Read, Write};
 use std::num::NonZeroUsize;
-use std::path::PathBuf;
+use std::path::{Path, PathBuf};
 use std::process::{Command, Stdio};
 use std::sync::OnceLock;
 
@@ -208,7 +208,7 @@ pub(crate) fn init_pgrx(pgrx: &Pgrx, init: &Init) -> eyre::Result<()> {
     output_configs.sort_by(|a, b| {
         a.major_version()
             .unwrap_or_else(|e| panic!("{e}:  could not determine major version for: `{a:?}`"))
-            .cmp(&b.major_version().ok().expect("could not determine major version"))
+            .cmp(&b.major_version().expect("could not determine major version"))
     });
     for pg_config in output_configs.iter() {
         validate_pg_config(pg_config)?;
@@ -231,7 +231,7 @@ pub(crate) fn init_pgrx(pgrx: &Pgrx, init: &Init) -> eyre::Result<()> {
 #[tracing::instrument(level = "error", skip_all, fields(pg_version = %pg_config.version()?, pgrx_home))]
 fn download_postgres(
     pg_config: &PgConfig,
-    pgrx_home: &PathBuf,
+    pgrx_home: &Path,
     init: &Init,
 ) -> eyre::Result<PgConfig> {
     use crate::command::build_agent_for_url;
@@ -263,15 +263,10 @@ fn download_postgres(
     make_install_postgres(pg_config, &pgdir, init) // returns a new PgConfig object
 }
 
-fn untar(
-    bytes: &[u8],
-    pgrxdir: &PathBuf,
-    pg_config: &PgConfig,
-    init: &Init,
-) -> eyre::Result<PathBuf> {
+fn untar(bytes: &[u8], pgrxdir: &Path, pg_config: &PgConfig, init: &Init) -> eyre::Result<PathBuf> {
     let _token = init.jobserver.get().unwrap().acquire().unwrap();
 
-    let mut unpackdir = pgrxdir.clone();
+    let mut unpackdir = pgrxdir.to_path_buf();
     unpackdir.push(&format!("{}_unpack", pg_config.version()?));
     if unpackdir.exists() {
         // delete everything at this path if it already exists
@@ -289,7 +284,7 @@ fn untar(
     let mut tar_decoder = Archive::new(BzDecoder::new(bytes));
     tar_decoder.unpack(&unpackdir)?;
 
-    let mut pgdir = pgrxdir.clone();
+    let mut pgdir = pgrxdir.to_path_buf();
     pgdir.push(&pg_config.version()?);
     if pgdir.exists() {
         // delete everything at this path if it already exists
@@ -398,11 +393,11 @@ fn fixup_homebrew_for_icu(configure_cmd: &mut Command) {
     }
 }
 
-fn configure_postgres(pg_config: &PgConfig, pgdir: &PathBuf, init: &Init) -> eyre::Result<()> {
+fn configure_postgres(pg_config: &PgConfig, pgdir: &Path, init: &Init) -> eyre::Result<()> {
     let _token = init.jobserver.get().unwrap().acquire().unwrap();
 
     println!("{} Postgres v{}", "  Configuring".bold().green(), pg_config.version()?);
-    let mut configure_path = pgdir.clone();
+    let mut configure_path = pgdir.to_path_buf();
     configure_path.push("configure");
     let mut command = std::process::Command::new(configure_path);
     // Some of these are redundant with `--enable-debug`.
@@ -454,19 +449,16 @@ fn configure_postgres(pg_config: &PgConfig, pgdir: &PathBuf, init: &Init) -> eyr
     if output.status.success() {
         Ok(())
     } else {
-        Err(std::io::Error::new(
-            std::io::ErrorKind::Other,
-            format!(
-                "{}\n{}{}",
-                command_str,
-                String::from_utf8(output.stdout).unwrap(),
-                String::from_utf8(output.stderr).unwrap()
-            ),
-        ))?
+        Err(std::io::Error::other(format!(
+            "{}\n{}{}",
+            command_str,
+            String::from_utf8(output.stdout).unwrap(),
+            String::from_utf8(output.stderr).unwrap()
+        )))?
     }
 }
 
-fn make_postgres(pg_config: &PgConfig, pgdir: &PathBuf, init: &Init) -> eyre::Result<()> {
+fn make_postgres(pg_config: &PgConfig, pgdir: &Path, init: &Init) -> eyre::Result<()> {
     println!("{} Postgres v{}", "    Compiling".bold().green(), pg_config.version()?);
     let mut command = std::process::Command::new("make");
 
@@ -499,11 +491,7 @@ fn make_postgres(pg_config: &PgConfig, pgdir: &PathBuf, init: &Init) -> eyre::Re
     }
 }
 
-fn make_install_postgres(
-    version: &PgConfig,
-    pgdir: &PathBuf,
-    init: &Init,
-) -> eyre::Result<PgConfig> {
+fn make_install_postgres(version: &PgConfig, pgdir: &Path, init: &Init) -> eyre::Result<PgConfig> {
     println!(
         "{} Postgres v{} to {}",
         "   Installing".bold().green(),
@@ -582,8 +570,8 @@ fn write_config(pg_configs: &Vec<PgConfig>, init: &Init) -> eyre::Result<()> {
     Ok(())
 }
 
-fn get_pg_installdir(pgdir: &PathBuf) -> PathBuf {
-    let mut dir = PathBuf::from(pgdir);
+fn get_pg_installdir(pgdir: &Path) -> PathBuf {
+    let mut dir = pgdir.to_path_buf();
     dir.push("pgrx-install");
     dir
 }
@@ -602,7 +590,7 @@ fn is_root_user() -> bool {
     false
 }
 
-pub(crate) fn initdb(bindir: &PathBuf, datadir: &PathBuf) -> eyre::Result<()> {
+pub(crate) fn initdb(bindir: &Path, datadir: &Path) -> eyre::Result<()> {
     println!(" {} data directory at {}", "Initializing".bold().green(), datadir.display());
     let mut command = std::process::Command::new(format!("{}/initdb", bindir.display()));
     command

@@ -235,7 +235,7 @@ impl<'cx, T: Enlist> List<'cx, T> {
                     }
                 };
                 let iter = RawCellIter {
-                    ptr: if drain_prefix == ptr::null_mut() {
+                    ptr: if drain_prefix.is_null() {
                         (*raw).head.cast()
                     } else {
                         (*drain_prefix).cell.next.cast()
@@ -314,11 +314,11 @@ unsafe fn cons_cell<T: Enlist>(list: &mut pg_sys::List, value: T) -> *mut pg_sys
     // Let's try to maintain all the node cells in the same context, shall we?
     // Even though Postgres won't...
     let context = pg_sys::GetMemoryChunkContext(list as *mut _ as *mut _);
-    if context == ptr::null_mut() {
+    if context.is_null() {
         panic!("Context free list?");
     };
     let buf: *mut pg_sys::ListCell = pg_sys::MemoryContextAlloc(context, alloc_size).cast();
-    if buf == ptr::null_mut() {
+    if buf.is_null() {
         panic!("List allocation failure");
     }
     let cell_ptr = T::apoptosis(buf);
@@ -392,7 +392,7 @@ pub struct Drain<'a, 'cx, T> {
 
 impl<T> Drop for Drain<'_, '_, T> {
     fn drop(&mut self) {
-        if self.raw == ptr::null_mut() {
+        if self.raw.is_null() {
             return;
         }
 
@@ -406,7 +406,7 @@ impl<T> Drop for Drain<'_, '_, T> {
             } else {
                 // Need to weld over the drained part and fix the length
                 // Collect the first deallocation candidate
-                let mut to_dealloc = if self.drain_prefix == ptr::null_mut() {
+                let mut to_dealloc = if self.drain_prefix.is_null() {
                     let dealloc = (*self.raw).head;
                     (*self.raw).head = self.iter.ptr.cast();
                     dealloc
