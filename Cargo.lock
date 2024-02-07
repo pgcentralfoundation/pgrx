@@ -351,7 +351,6 @@ dependencies = [
  "semver 1.0.21",
  "serde",
  "serde-xml-rs",
- "serde_derive",
  "tar",
  "tempfile",
  "toml",

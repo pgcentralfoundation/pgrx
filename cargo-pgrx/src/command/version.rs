@@ -23,7 +23,7 @@ mod rss {
     use eyre::WrapErr;
     use owo_colors::OwoColorize;
     use pgrx_pg_config::{PgMinorVersion, PgVersion};
-    use serde_derive::Deserialize;
+    use serde::Deserialize;
     use std::collections::BTreeMap;
     use url::Url;
 
