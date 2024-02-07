@@ -40,14 +40,12 @@ clap = { version = "4.4.2", features = [ "env", "suggestions", "cargo", "derive"
 clap-cargo = { version = "0.11.0", features = [ "cargo_metadata" ] }
 semver = "1.0.20"
 env_proxy = "0.4.1"
-prettyplease = "0.2.15"
 proc-macro2 = { version = "1.0.69", features = [ "span-locations" ] }
 quote = "1.0.33"
 ureq = { version = "2.8.0", default-features = false, features = [ "gzip" ] }
 serde = { version = "1.0", features = [ "derive" ] }
 serde_derive = "1.0"
 serde-xml-rs = "0.6.0"
-syn = { version = "2.0.18", features = [ "extra-traits", "full", "fold", "parsing" ] }
 object = "0.32.1"
 color-eyre = "0.6.2"
 tracing = "0.1"

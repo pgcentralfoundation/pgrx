@@ -345,7 +345,6 @@ dependencies = [
  "owo-colors",
  "pgrx-pg-config",
  "pgrx-sql-entity-graph",
- "prettyplease",
  "proc-macro2",
  "quote",
  "regex",
@@ -353,7 +352,6 @@ dependencies = [
  "serde",
  "serde-xml-rs",
  "serde_derive",
- "syn 2.0.48",
  "tar",
  "tempfile",
  "toml",
@@ -1676,16 +1674,6 @@ name = "ppv-lite86"
 version = "0.2.17"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "5b40af805b3121feab8a3c29f04d8ad262fa8e0561883e7653e024ae4479e6de"
-
-[[package]]
-name = "prettyplease"
-version = "0.2.16"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "a41cf62165e97c7f814d2221421dbb9afcbcdb0a88068e5ea206e19951c2cbb5"
-dependencies = [
- "proc-macro2",
- "syn 2.0.48",
-]
 
 [[package]]
 name = "proc-macro2"
