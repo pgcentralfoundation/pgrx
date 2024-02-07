@@ -57,7 +57,7 @@ pub(crate) fn create_crate_template(
     create_dotcargo_config_toml(&path, name)?;
     create_lib_rs(&path, name, is_bgworker)?;
     create_git_ignore(&path, name)?;
-    create_pgrx_embed_rs(&path, name)?;
+    create_pgrx_embed_rs(&path)?;
 
     Ok(())
 }
@@ -148,11 +148,11 @@ fn create_git_ignore(path: &PathBuf, _name: &str) -> Result<(), std::io::Error> 
     Ok(())
 }
 
-fn create_pgrx_embed_rs(path: &PathBuf, name: &str) -> Result<(), std::io::Error> {
+fn create_pgrx_embed_rs(path: &PathBuf) -> Result<(), std::io::Error> {
     let mut filename = path.clone();
     filename.push("src");
     filename.push("bin");
-    filename.push(format!("pgrx_embed_{name}.rs"));
+    filename.push(format!("pgrx_embed.rs"));
     let mut file = std::fs::File::create(filename)?;
     file.write_all(include_bytes!("../templates/pgrx_embed_rs"))?;
     Ok(())

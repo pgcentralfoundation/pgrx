@@ -6,6 +6,10 @@ edition = "2021"
 [lib]
 crate-type = ["cdylib", "lib"]
 
+[[bin]]
+name = "pgrx_embed_{name}"
+path = "./src/bin/pgrx_embed.rs"
+
 [features]
 default = ["pg13"]
 pg12 = ["pgrx/pg12", "pgrx-tests/pg12" ]

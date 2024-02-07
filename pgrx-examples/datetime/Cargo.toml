@@ -17,6 +17,10 @@ publish = false
 [lib]
 crate-type = ["cdylib", "lib"]
 
+[[bin]]
+name = "pgrx_embed_datetime"
+path = "./src/bin/pgrx_embed.rs"
+
 [features]
 default = ["pg13"]
 pg12 = ["pgrx/pg12", "pgrx-tests/pg12" ]
