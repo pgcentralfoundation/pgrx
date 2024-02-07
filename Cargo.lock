@@ -338,7 +338,6 @@ dependencies = [
  "color-eyre",
  "env_proxy",
  "eyre",
- "flate2",
  "jobslot",
  "libc",
  "object",
