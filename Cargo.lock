@@ -356,7 +356,6 @@ dependencies = [
  "tracing",
  "tracing-error",
  "tracing-subscriber",
- "unescape",
  "ureq",
  "url",
 ]
