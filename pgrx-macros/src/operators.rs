@@ -91,7 +91,7 @@ pub(crate) fn deriving_postgres_hash(ast: DeriveInput) -> syn::Result<proc_macro
 ///
 /// ["optimization hints"]: https://www.postgresql.org/docs/current/xoper-optimization.html
 pub fn derive_pg_eq(name: &Ident, path: &proc_macro2::TokenStream) -> proc_macro2::TokenStream {
-    let pg_name = Ident::new(&format!("{}_eq", name).to_lowercase(), name.span());
+    let pg_name = Ident::new(&format!("{name}_eq").to_lowercase(), name.span());
     quote! {
         #[allow(non_snake_case)]
         #[::pgrx::pgrx_macros::pg_operator(immutable, parallel_safe)]
@@ -120,7 +120,7 @@ pub fn derive_pg_eq(name: &Ident, path: &proc_macro2::TokenStream) -> proc_macro
 ///
 /// See `derive_pg_eq` for the implications of this assumption.
 pub fn derive_pg_ne(name: &Ident, path: &proc_macro2::TokenStream) -> proc_macro2::TokenStream {
-    let pg_name = Ident::new(&format!("{}_ne", name).to_lowercase(), name.span());
+    let pg_name = Ident::new(&format!("{name}_ne").to_lowercase(), name.span());
     quote! {
         #[allow(non_snake_case)]
         #[::pgrx::pgrx_macros::pg_operator(immutable, parallel_safe)]
@@ -136,7 +136,7 @@ pub fn derive_pg_ne(name: &Ident, path: &proc_macro2::TokenStream) -> proc_macro
 }
 
 pub fn derive_pg_lt(name: &Ident, path: &proc_macro2::TokenStream) -> proc_macro2::TokenStream {
-    let pg_name = Ident::new(&format!("{}_lt", name).to_lowercase(), name.span());
+    let pg_name = Ident::new(&format!("{name}_lt").to_lowercase(), name.span());
     quote! {
         #[allow(non_snake_case)]
         #[::pgrx::pgrx_macros::pg_operator(immutable, parallel_safe)]
@@ -153,7 +153,7 @@ pub fn derive_pg_lt(name: &Ident, path: &proc_macro2::TokenStream) -> proc_macro
 }
 
 pub fn derive_pg_gt(name: &Ident, path: &proc_macro2::TokenStream) -> proc_macro2::TokenStream {
-    let pg_name = Ident::new(&format!("{}_gt", name).to_lowercase(), name.span());
+    let pg_name = Ident::new(&format!("{name}_gt").to_lowercase(), name.span());
     quote! {
         #[allow(non_snake_case)]
         #[::pgrx::pgrx_macros::pg_operator(immutable, parallel_safe)]
@@ -169,7 +169,7 @@ pub fn derive_pg_gt(name: &Ident, path: &proc_macro2::TokenStream) -> proc_macro
 }
 
 pub fn derive_pg_le(name: &Ident, path: &proc_macro2::TokenStream) -> proc_macro2::TokenStream {
-    let pg_name = Ident::new(&format!("{}_le", name).to_lowercase(), name.span());
+    let pg_name = Ident::new(&format!("{name}_le").to_lowercase(), name.span());
     quote! {
         #[allow(non_snake_case)]
         #[::pgrx::pgrx_macros::pg_operator(immutable, parallel_safe)]
@@ -185,7 +185,7 @@ pub fn derive_pg_le(name: &Ident, path: &proc_macro2::TokenStream) -> proc_macro
 }
 
 pub fn derive_pg_ge(name: &Ident, path: &proc_macro2::TokenStream) -> proc_macro2::TokenStream {
-    let pg_name = Ident::new(&format!("{}_ge", name).to_lowercase(), name.span());
+    let pg_name = Ident::new(&format!("{name}_ge").to_lowercase(), name.span());
     quote! {
         #[allow(non_snake_case)]
         #[::pgrx::pgrx_macros::pg_operator(immutable, parallel_safe)]
@@ -201,7 +201,7 @@ pub fn derive_pg_ge(name: &Ident, path: &proc_macro2::TokenStream) -> proc_macro
 }
 
 pub fn derive_pg_cmp(name: &Ident, path: &proc_macro2::TokenStream) -> proc_macro2::TokenStream {
-    let pg_name = Ident::new(&format!("{}_cmp", name).to_lowercase(), name.span());
+    let pg_name = Ident::new(&format!("{name}_cmp").to_lowercase(), name.span());
     quote! {
         #[allow(non_snake_case)]
         #[::pgrx::pgrx_macros::pg_extern(immutable, parallel_safe)]
@@ -226,7 +226,7 @@ pub fn derive_pg_cmp(name: &Ident, path: &proc_macro2::TokenStream) -> proc_macr
 /// Postgres is no different: this hashing is for the explicit purpose of equality checks,
 /// and it also needs to be able to reason from hash equality to actual equality.
 pub fn derive_pg_hash(name: &Ident, path: &proc_macro2::TokenStream) -> proc_macro2::TokenStream {
-    let pg_name = Ident::new(&format!("{}_hash", name).to_lowercase(), name.span());
+    let pg_name = Ident::new(&format!("{name}_hash").to_lowercase(), name.span());
     quote! {
         #[allow(non_snake_case)]
         #[::pgrx::pgrx_macros::pg_extern(immutable, parallel_safe)]
