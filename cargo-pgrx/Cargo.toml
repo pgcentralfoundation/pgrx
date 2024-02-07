@@ -28,9 +28,7 @@ pgrx-pg-config.workspace = true
 pgrx-sql-entity-graph.workspace = true
 
 cargo_toml.workspace = true
-eyre.workspace = true
 libc.workspace = true
-owo-colors.workspace = true
 regex.workspace = true
 unescape.workspace = true
 url.workspace = true
@@ -43,13 +41,17 @@ env_proxy = "0.4.1"
 proc-macro2 = { version = "1.0.69", features = [ "span-locations" ] }
 quote = "1.0.33"
 object = "0.32.1"
-color-eyre = "0.6.2"
-tracing = "0.1"
-tracing-error = "0.2.0"
-tracing-subscriber = { version = "0.3.17", features = [ "env-filter" ] }
 tempfile = "3.8.0"
 toml = "0.8.2"
 jobslot = "0.2.12"
+
+# emit better diagnostics
+color-eyre = "0.6.2"
+eyre.workspace = true
+owo-colors.workspace = true
+tracing = "0.1"
+tracing-error = "0.2.0"
+tracing-subscriber = { version = "0.3.17", features = [ "env-filter" ] }
 
 # for downloading/unpacking things from the Postgres file servers
 bzip2 = "0.4.4"
