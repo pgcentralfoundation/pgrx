@@ -9,7 +9,6 @@
 //LICENSE Use of this source code is governed by the MIT license that can be found in the LICENSE file.
 use bindgen::callbacks::{DeriveTrait, ImplementsTrait, MacroParsingBehavior};
 use eyre::{eyre, WrapErr};
-use once_cell::sync::Lazy;
 use pgrx_pg_config::{
     is_supported_major_version, prefix_path, PgConfig, PgConfigSelector, Pgrx, SUPPORTED_VERSIONS,
 };
@@ -19,6 +18,7 @@ use std::collections::{BTreeMap, BTreeSet, HashMap, HashSet};
 use std::fs;
 use std::path::{self, PathBuf}; // disambiguate path::Path and syn::Type::Path
 use std::process::{Command, Output};
+use std::sync::OnceLock;
 use syn::{ForeignItem, Item, ItemConst};
 
 const BLOCKLISTED_TYPES: [&str; 3] = ["Datum", "NullableDatum", "Oid"];
@@ -1026,8 +1026,7 @@ fn run_command(mut command: &mut Command, version: &str) -> eyre::Result<Output>
 
 // Plausibly it would be better to generate a regex to pass to bindgen for this,
 // but this is less error-prone for now.
-static BLOCKLISTED: Lazy<BTreeSet<&'static str>> =
-    Lazy::new(|| build::sym_blocklist::SYMBOLS.iter().copied().collect::<BTreeSet<&str>>());
+static BLOCKLISTED: OnceLock<BTreeSet<&'static str>> = OnceLock::new();
 fn is_blocklisted_item(item: &ForeignItem) -> bool {
     let sym_name = match item {
         ForeignItem::Fn(f) => &f.sig.ident,
@@ -1036,7 +1035,9 @@ fn is_blocklisted_item(item: &ForeignItem) -> bool {
         ForeignItem::Static(s) => &s.ident,
         _ => return false,
     };
-    BLOCKLISTED.contains(sym_name.to_string().as_str())
+    BLOCKLISTED
+        .get_or_init(|| build::sym_blocklist::SYMBOLS.iter().copied().collect::<BTreeSet<&str>>())
+        .contains(sym_name.to_string().as_str())
 }
 
 fn apply_pg_guard(items: &Vec<syn::Item>) -> eyre::Result<proc_macro2::TokenStream> {

@@ -26,7 +26,6 @@ no-schema-generation = []
 
 [dependencies]
 eyre.workspace = true
-unescape.workspace = true
 thiserror.workspace = true
 
 convert_case = "0.6.0"
@@ -34,6 +33,7 @@ petgraph = "0.6.4"
 proc-macro2 = { version = "1.0.69", features = [ "span-locations" ] }
 quote = "1.0.33"
 syn = { version = "1.0.109", features = [ "extra-traits", "full", "fold", "parsing" ] }
+unescape = "0.1.0" # for escaped-character-handling
 
 # colorized sql output
 owo-colors = { optional = true, workspace = true }

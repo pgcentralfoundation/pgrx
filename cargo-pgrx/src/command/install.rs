@@ -14,7 +14,6 @@ use crate::profile::CargoProfile;
 use crate::CommandExecute;
 use cargo_toml::Manifest;
 use eyre::{eyre, WrapErr};
-use once_cell::sync::Lazy;
 use owo_colors::OwoColorize;
 use pgrx_pg_config::{cargo::PgrxManifestExt, get_target_dir, PgConfig, Pgrx};
 use std::collections::HashMap;
@@ -22,7 +21,7 @@ use std::fs;
 use std::io::BufReader;
 use std::path::{Path, PathBuf};
 use std::process::Stdio;
-use std::sync::{Arc, Mutex};
+use std::sync::{Arc, Mutex, OnceLock};
 
 /// Type used for memoizing expensive to calculate values.
 /// `Arc<Mutex>` is needed to get around compiler safety checks.
@@ -453,12 +452,14 @@ pub(crate) fn find_library_file(
     Ok(library_file_path)
 }
 
-static CARGO_VERSION: Lazy<MemoizeKeyValue> = Lazy::new(|| Arc::new(Mutex::new(HashMap::new())));
+static CARGO_VERSION: OnceLock<MemoizeKeyValue> = OnceLock::new();
 
 pub(crate) fn get_version(manifest_path: impl AsRef<Path>) -> eyre::Result<String> {
     let path_string = manifest_path.as_ref().to_owned();
 
-    if let Some(version) = CARGO_VERSION.lock().unwrap().get(&path_string) {
+    if let Some(version) =
+        CARGO_VERSION.get_or_init(Default::default).lock().unwrap().get(&path_string)
+    {
         return Ok(version.clone());
     }
 
@@ -481,16 +482,20 @@ pub(crate) fn get_version(manifest_path: impl AsRef<Path>) -> eyre::Result<Strin
         None => return Err(eyre!("cannot determine extension version number.  Is the `default_version` property declared in the control file?")),
     };
 
-    CARGO_VERSION.lock().unwrap().insert(path_string, version.clone());
+    CARGO_VERSION
+        .get_or_init(Default::default)
+        .lock()
+        .unwrap()
+        .insert(path_string, version.clone());
     Ok(version)
 }
 
-static GIT_HASH: Lazy<MemoizeKeyValue> = Lazy::new(|| Arc::new(Mutex::new(HashMap::new())));
+static GIT_HASH: OnceLock<MemoizeKeyValue> = OnceLock::new();
 
 fn get_git_hash(manifest_path: impl AsRef<Path>) -> eyre::Result<String> {
     let path_string = manifest_path.as_ref().to_owned();
 
-    if let Some(hash) = GIT_HASH.lock().unwrap().get(&path_string) {
+    if let Some(hash) = GIT_HASH.get_or_init(Default::default).lock().unwrap().get(&path_string) {
         Ok(hash.clone())
     } else {
         let hash = match get_property(manifest_path, "git_hash")? {
@@ -500,7 +505,7 @@ fn get_git_hash(manifest_path: impl AsRef<Path>) -> eyre::Result<String> {
             )),
         };
 
-        GIT_HASH.lock().unwrap().insert(path_string, hash.clone());
+        GIT_HASH.get_or_init(Default::default).lock().unwrap().insert(path_string, hash.clone());
 
         Ok(hash)
     }

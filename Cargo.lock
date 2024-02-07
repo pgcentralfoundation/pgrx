@@ -338,30 +338,24 @@ dependencies = [
  "color-eyre",
  "env_proxy",
  "eyre",
- "flate2",
  "jobslot",
- "nix",
+ "libc",
  "object",
- "once_cell",
  "owo-colors",
  "pgrx-pg-config",
  "pgrx-sql-entity-graph",
- "prettyplease",
  "proc-macro2",
  "quote",
  "regex",
  "semver 1.0.21",
  "serde",
  "serde-xml-rs",
- "serde_derive",
- "syn 2.0.48",
  "tar",
  "tempfile",
  "toml",
  "tracing",
  "tracing-error",
  "tracing-subscriber",
- "unescape",
  "ureq",
  "url",
 ]
@@ -1241,17 +1235,6 @@ dependencies = [
 ]
 
 [[package]]
-name = "nix"
-version = "0.27.1"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "2eb04e9c688eff1c89d72b407f168cf79bb9e867a9d3323ed6c01519eb9cc053"
-dependencies = [
- "bitflags 2.4.2",
- "cfg-if",
- "libc",
-]
-
-[[package]]
 name = "nom"
 version = "7.1.3"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -1516,7 +1499,6 @@ dependencies = [
  "eyre",
  "libc",
  "memoffset",
- "once_cell",
  "pgrx-macros",
  "pgrx-pg-config",
  "pgrx-sql-entity-graph",
@@ -1552,7 +1534,6 @@ dependencies = [
  "clap-cargo",
  "eyre",
  "libc",
- "once_cell",
  "owo-colors",
  "pgrx",
  "pgrx-macros",
@@ -1690,16 +1671,6 @@ name = "ppv-lite86"
 version = "0.2.17"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "5b40af805b3121feab8a3c29f04d8ad262fa8e0561883e7653e024ae4479e6de"
-
-[[package]]
-name = "prettyplease"
-version = "0.2.16"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "a41cf62165e97c7f814d2221421dbb9afcbcdb0a88068e5ea206e19951c2cbb5"
-dependencies = [
- "proc-macro2",
- "syn 2.0.48",
-]
 
 [[package]]
 name = "proc-macro2"

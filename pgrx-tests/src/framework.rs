@@ -11,7 +11,6 @@ use std::collections::HashSet;
 use std::process::{Command, Stdio};
 
 use eyre::{eyre, WrapErr};
-use once_cell::sync::Lazy;
 use owo_colors::OwoColorize;
 use pgrx::prelude::*;
 use pgrx_pg_config::{
@@ -21,7 +20,7 @@ use postgres::error::DbError;
 use std::collections::HashMap;
 use std::io::{BufRead, BufReader, Write};
 use std::path::PathBuf;
-use std::sync::{Arc, Mutex};
+use std::sync::{Arc, Mutex, OnceLock};
 use std::time::Duration;
 use sysinfo::{Pid, ProcessExt, System, SystemExt};
 
@@ -36,13 +35,7 @@ struct SetupState {
     system_session_id: String,
 }
 
-static TEST_MUTEX: Lazy<Mutex<SetupState>> = Lazy::new(|| {
-    Mutex::new(SetupState {
-        installed: false,
-        loglines: Arc::new(Mutex::new(HashMap::new())),
-        system_session_id: "NONE".to_string(),
-    })
-});
+static TEST_MUTEX: OnceLock<Mutex<SetupState>> = OnceLock::new();
 
 // The goal of this closure is to allow "wrapping" of anything that might issue
 // an SQL simple_query or query using either a postgres::Client or
@@ -198,14 +191,23 @@ fn format_loglines(session_id: &str, loglines: &LogLines) -> String {
 fn initialize_test_framework(
     postgresql_conf: Vec<&'static str>,
 ) -> eyre::Result<(LogLines, String)> {
-    let mut state = TEST_MUTEX.lock().unwrap_or_else(|_| {
-        // This used to immediately throw an std::process::exit(1), but it
-        // would consume both stdout and stderr, resulting in error messages
-        // not being displayed unless you were running tests with --nocapture.
-        panic!(
+    let mut state = TEST_MUTEX
+        .get_or_init(|| {
+            Mutex::new(SetupState {
+                installed: false,
+                loglines: Arc::new(Mutex::new(HashMap::new())),
+                system_session_id: "NONE".to_string(),
+            })
+        })
+        .lock()
+        .unwrap_or_else(|_| {
+            // This used to immediately throw an std::process::exit(1), but it
+            // would consume both stdout and stderr, resulting in error messages
+            // not being displayed unless you were running tests with --nocapture.
+            panic!(
             "Could not obtain test mutex. A previous test may have hard-aborted while holding it."
         );
-    });
+        });
 
     if !state.installed {
         shutdown::register_shutdown_hook();
