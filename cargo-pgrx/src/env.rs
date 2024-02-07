@@ -12,11 +12,6 @@ pub(crate) fn cargo() -> std::process::Command {
     std::process::Command::new(cargo)
 }
 
-pub(crate) fn rustc() -> std::process::Command {
-    let rustc = std::env::var_os("RUSTC").unwrap_or_else(|| "rustc".into());
-    std::process::Command::new(rustc)
-}
-
 /// Set some environment variables for use downstream (in `pgrx-test` for
 /// example). Does nothing if already set.
 pub(crate) fn initialize() {

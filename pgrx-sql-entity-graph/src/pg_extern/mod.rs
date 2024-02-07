@@ -320,14 +320,13 @@ impl PgExtern {
                 extern crate alloc;
                 #[allow(unused_imports)]
                 use alloc::{vec, vec::Vec};
-                type FunctionPointer = #hrtb #unsafety fn (#( #input_types ),*) #return_type;
-                let metadata: FunctionPointer = #ident;
+                type FunctionPointer = #hrtb #unsafety fn(#( #input_types ),*) #return_type;
                 let submission = ::pgrx::pgrx_sql_entity_graph::PgExternEntity {
                     name: #name,
                     unaliased_name: stringify!(#ident),
                     module_path: core::module_path!(),
                     full_path: concat!(core::module_path!(), "::", stringify!(#ident)),
-                    metadata: ::pgrx::pgrx_sql_entity_graph::metadata::FunctionMetadata::entity(&metadata),
+                    metadata: <FunctionPointer as ::pgrx::pgrx_sql_entity_graph::metadata::FunctionMetadata::<_>>::entity(),
                     fn_args: vec![#(#inputs_iter),*],
                     fn_return: #returns,
                     #[allow(clippy::or_fun_call)]

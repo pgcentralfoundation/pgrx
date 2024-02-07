@@ -13,7 +13,6 @@
 mod command;
 mod manifest;
 mod metadata;
-mod pgrx_pg_sys_stub;
 
 pub(crate) mod env;
 pub(crate) mod profile;

@@ -184,13 +184,6 @@ For more details on how to manage pgrx extensions see [Managing pgrx extensions]
 
 ## Upgrading
 
-You can upgrade your current `cargo-pgrx` installation by passing the `--force` flag
-to `cargo install`:
-
-```bash
-cargo install --force --locked cargo-pgrx
-```
-
 As new Postgres versions are supported by `pgrx`, you can re-run the `pgrx init` process to download and compile them:
 
 ```bash

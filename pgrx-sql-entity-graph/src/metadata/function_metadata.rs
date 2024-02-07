@@ -16,8 +16,7 @@ to the `pgrx` framework and very subject to change between versions. While you m
 
 
 */
-use super::{FunctionMetadataEntity, PhantomDataExt, SqlTranslatable};
-use core::marker::PhantomData;
+use super::{FunctionMetadataEntity, SqlTranslatable};
 
 /**
 Provide SQL generation related information on functions
@@ -27,8 +26,7 @@ use pgrx_sql_entity_graph::metadata::{FunctionMetadata, Returns, SqlMapping};
 fn floof(i: i32) -> String { todo!() }
 
 type FunctionPointer = fn(i32) -> String;
-let marker: FunctionPointer = floof;
-let metadata = pgrx_sql_entity_graph::metadata::FunctionMetadata::entity(&marker);
+let metadata = FunctionPointer::entity();
 assert_eq!(
     metadata.retval.return_sql,
     Ok(Returns::One(SqlMapping::As("TEXT".to_string()))),
@@ -36,10 +34,10 @@ assert_eq!(
 ```
  */
 pub trait FunctionMetadata<A> {
-    fn path(&self) -> &'static str {
+    fn path() -> &'static str {
         core::any::type_name::<Self>()
     }
-    fn entity(&self) -> FunctionMetadataEntity;
+    fn entity() -> FunctionMetadataEntity;
 }
 
 macro_rules! impl_fn {
@@ -50,11 +48,11 @@ macro_rules! impl_fn {
             R: SqlTranslatable,
             F: FnMut($($A,)*) -> R,
         {
-            fn entity(&self) -> FunctionMetadataEntity {
+            fn entity() -> FunctionMetadataEntity {
                 FunctionMetadataEntity {
-                    arguments: vec![$(PhantomData::<$A>.entity()),*],
-                    retval: PhantomData::<R>.entity(),
-                    path: self.path(),
+                    arguments: vec![$(<$A>::entity()),*],
+                    retval: R::entity(),
+                    path: core::any::type_name::<Self>(),
                 }
             }
         }
@@ -63,11 +61,11 @@ macro_rules! impl_fn {
             $($A: SqlTranslatable,)*
             R: SqlTranslatable,
         {
-            fn entity(&self) -> FunctionMetadataEntity {
+            fn entity() -> FunctionMetadataEntity {
                 FunctionMetadataEntity {
-                    arguments: vec![$(PhantomData::<$A>.entity()),*],
-                    retval: PhantomData::<R>.entity(),
-                    path: self.path(),
+                    arguments: vec![$(<$A>::entity()),*],
+                    retval: R::entity(),
+                    path: core::any::type_name::<Self>(),
                 }
             }
         }

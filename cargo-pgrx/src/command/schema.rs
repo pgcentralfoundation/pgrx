@@ -8,34 +8,20 @@
 //LICENSE
 //LICENSE Use of this source code is governed by the MIT license that can be found in the LICENSE file.
 use crate::command::get::{find_control_file, get_property};
-use crate::command::install::format_display_path;
-use crate::pgrx_pg_sys_stub::PgrxPgSysStub;
 use crate::profile::CargoProfile;
 use crate::CommandExecute;
 use cargo_toml::Manifest;
 use eyre::{eyre, WrapErr};
-use object::read::macho::{FatArch, FatHeader};
-use object::{Architecture, FileKind, Object};
-use once_cell::sync::OnceCell;
 use owo_colors::OwoColorize;
-use pgrx_pg_config::{cargo::PgrxManifestExt, get_target_dir, PgConfig, Pgrx};
-use std::collections::HashSet;
-use std::hash::{Hash, Hasher};
+use pgrx_pg_config::cargo::PgrxManifestExt;
+use pgrx_pg_config::{get_target_dir, PgConfig, Pgrx};
+use std::io::Write;
 use std::path::{Path, PathBuf};
 use std::process::Stdio;
 // Since we support extensions with `#[no_std]`
 extern crate alloc;
 use crate::manifest::{get_package_manifest, pg_config_and_version};
 use alloc::vec::Vec;
-use std::env;
-
-// An apparent bug in `glibc` 2.17 prevents us from safely dropping this
-// otherwise users find issues such as https://github.com/pgcentralfoundation/pgrx/issues/572
-static POSTMASTER_LIBRARY: OnceCell<libloading::os::unix::Library> = OnceCell::new();
-
-// An apparent bug in `glibc` 2.17 prevents us from safely dropping this
-// otherwise users find issues such as https://github.com/pgcentralfoundation/pgrx/issues/572
-static EXTENSION_LIBRARY: OnceCell<libloading::os::unix::Library> = OnceCell::new();
 
 /// Generate extension schema files
 #[derive(clap::Args, Debug)]
@@ -126,50 +112,6 @@ impl CommandExecute for Schema {
     }
 }
 
-/// Gets the current `cargo` version.
-///
-/// This is a copy of the function in `build.rs`.
-///
-/// [Environment variables Cargo sets for 3rd party subcommands](https://doc.rust-lang.org/cargo/reference/environment-variables.html#environment-variables-cargo-sets-for-3rd-party-subcommands)
-fn cargo_version() -> Option<String> {
-    let cargo = std::env::var_os("CARGO").expect("`CARGO` env var wasn't set!");
-    let output = std::process::Command::new(cargo).arg("--version").output().ok()?;
-    std::str::from_utf8(&output.stdout).map(|s| s.trim().to_string()).ok()
-}
-
-/// Returns an error if the rust toolchain version used to build `cargo-pgrx`
-/// doesn't match the active toolchain's version.
-///
-/// This is an error because we `dlopen` rust code that we build, and call
-/// `extern "Rust"` functions on `#[repr(Rust)]` types. This may be relaxed in
-/// the future, but for now is a requirement.
-///
-/// To waive this, you may set `PGRX_IGNORE_RUST_VERSIONS` in the environment
-/// (to any value other than `"0"`). Also, note that this check is best-effort
-/// only, and is expected to error only if there is a definite mismatch.
-///
-/// It also cannot detect versions of `cargo-pgrx` and `pgrx` differing, which
-/// could cause similar issues (in the future this may be detected).
-fn check_rust_version() -> eyre::Result<()> {
-    const CARGO_VERSION_DURING_BUILD: &str = env!("CARGO_VERSION_DURING_BUILD");
-    if matches!(std::env::var("PGRX_IGNORE_RUST_VERSIONS"), Ok(s) if s != "0") {
-        return Ok(());
-    }
-    if let (Some(during_build), Some(during_run)) =
-        (Some(CARGO_VERSION_DURING_BUILD), cargo_version())
-    {
-        if during_build != during_run {
-            eyre::bail!(
-                "Mismatched toolchain versions: \
-                `cargo-pgrx` was built with `{during_build}`, \
-                but `{during_run}` is currently in use. \
-                Set `PGRX_IGNORE_RUST_VERSIONS=1` to override this safety check.",
-            );
-        }
-    }
-    Ok(())
-}
-
 #[tracing::instrument(level = "error", skip_all, fields(
     pg_version = %pg_config.version()?,
     profile = ?profile,
@@ -192,7 +134,6 @@ pub(crate) fn generate_schema(
     skip_build: bool,
     output_tracking: &mut Vec<PathBuf>,
 ) -> eyre::Result<()> {
-    check_rust_version()?;
     let manifest = Manifest::from_path(&package_manifest_path)?;
     let (control_file, _extname) = find_control_file(&package_manifest_path)?;
 
@@ -203,103 +144,89 @@ pub(crate) fn generate_schema(
         ));
     }
 
-    let versioned_so = get_property(&package_manifest_path, "module_pathname")?.is_none();
-
     let flags = std::env::var("PGRX_BUILD_FLAGS").unwrap_or_default();
 
-    let mut target_dir_with_profile = get_target_dir()?;
-    target_dir_with_profile.push(profile.target_subdir());
+    let features_arg = features.features.join(" ");
 
-    // First, build the SQL generator so we can get a look at the symbol table
+    let package_name = if let Some(user_package) = user_package {
+        user_package.clone()
+    } else {
+        manifest.package_name()?
+    };
+    let lib_name = manifest.lib_name()?;
+    let lib_filename = manifest.lib_filename()?;
+
     if !skip_build {
-        let mut command = crate::env::cargo();
-        command.stderr(Stdio::inherit());
-        command.stdout(Stdio::inherit());
-        if is_test {
-            command.arg("test");
-            command.arg("--no-run");
-        } else {
-            command.arg("build");
-        }
-
-        if let Some(user_package) = user_package {
-            command.arg("--package");
-            command.arg(user_package);
-        }
-
-        if let Some(user_manifest_path) = user_manifest_path {
-            command.arg("--manifest-path");
-            command.arg(user_manifest_path.as_ref());
-        }
-
-        command.args(profile.cargo_args());
-
-        if let Some(log_level) = &log_level {
-            command.env("RUST_LOG", log_level);
-        }
-
-        let features_arg = features.features.join(" ");
-        if !features_arg.trim().is_empty() {
-            command.arg("--features");
-            command.arg(&features_arg);
-        }
-
-        if features.no_default_features {
-            command.arg("--no-default-features");
-        }
-
-        if features.all_features {
-            command.arg("--all-features");
-        }
-
-        for arg in flags.split_ascii_whitespace() {
-            command.arg(arg);
-        }
-
-        let command = command.stderr(Stdio::inherit());
-        let command_str = format!("{command:?}");
-        eprintln!(
-            "{} for SQL generation with features `{}`",
-            "    Building".bold().green(),
-            features_arg,
-        );
-
-        tracing::debug!(command = %command_str, "Running");
-        let cargo_output =
-            command.output().wrap_err_with(|| format!("failed to spawn cargo: {command_str}"))?;
-        tracing::trace!(status_code = %cargo_output.status, command = %command_str, "Finished");
-
-        if !cargo_output.status.success() {
-            // We explicitly do not want to return a spantraced error here.
-            std::process::exit(1)
-        }
+        first_build(
+            user_manifest_path.as_ref(),
+            profile,
+            features,
+            log_level.clone(),
+            is_test,
+            &features_arg,
+            &flags,
+            &package_name,
+        )?;
     };
 
-    // Create stubbed `pgrx_pg_sys` bindings for the generator to link with.
-    let mut postmaster_stub_dir =
-        Pgrx::postmaster_stub_dir().wrap_err("couldn't get postmaster stub dir env")?;
+    let symbols = compute_symbols(profile, &lib_filename)?;
 
-    postmaster_stub_dir.push(
-        pg_config
-            .postmaster_path()
-            .wrap_err("couldn't get postmaster path")?
-            .strip_prefix("/")
-            .wrap_err("couldn't make postmaster path relative")?
-            .parent()
-            .ok_or(eyre!("couldn't get postmaster parent dir"))?,
-    );
+    let mut out_path = None;
+    if let Some(path) = path.as_ref() {
+        let x = path.as_ref().to_str().expect("`path` is not a valid UTF8 string.");
+        out_path = Some(x.to_string());
+    }
 
-    let postmaster_path = pg_config.postmaster_path().wrap_err("could not get postmaster path")?;
+    let mut out_dot = None;
+    if let Some(dot) = dot.as_ref() {
+        let x = dot.as_ref().to_str().expect("`dot` is not a valid UTF8 string.");
+        out_dot = Some(x.to_string());
+    };
 
-    // The next action may take a few seconds, we'd like the user to know we're thinking.
-    eprintln!("{} SQL entities", " Discovering".bold().green());
+    let codegen = compute_codegen(package_manifest_path, &symbols, &lib_name, out_path, out_dot)?;
 
-    let postmaster_stub_built = create_stub(postmaster_path, &postmaster_stub_dir)?;
+    let embed = {
+        let mut embed = tempfile::NamedTempFile::new()?;
+        embed.write_all(codegen.as_bytes())?;
+        embed.flush()?;
+        embed
+    };
+
+    if let Some(out_path) = path.as_ref() {
+        if let Some(parent) = out_path.as_ref().parent() {
+            std::fs::create_dir_all(parent).wrap_err("Could not create parent directory")?;
+        }
+        output_tracking.push(out_path.as_ref().to_path_buf());
+    }
+
+    if let Some(dot_path) = dot.as_ref() {
+        tracing::info!(dot = %dot_path.as_ref().display(), "Writing Graphviz DOT");
+    }
+
+    second_build(
+        user_manifest_path.as_ref(),
+        profile,
+        features,
+        log_level.clone(),
+        &features_arg,
+        &flags,
+        embed.path(),
+        &package_name,
+    )?;
+
+    compute_sql(profile, &package_name)?;
+
+    Ok(())
+}
+
+fn compute_symbols(profile: &CargoProfile, lib_filename: &str) -> eyre::Result<Vec<String>> {
+    use object::Object;
+    use std::collections::HashSet;
 
     // Inspect the symbol table for a list of `__pgrx_internals` we should have the generator call
-    let mut lib_so = target_dir_with_profile.clone();
-
-    lib_so.push(manifest.lib_filename()?);
+    let mut lib_so = get_target_dir()?;
+    lib_so.push(profile.target_subdir());
+    lib_so.push(lib_filename);
 
     let lib_so_data = std::fs::read(&lib_so).wrap_err("couldn't read extension shared object")?;
     let lib_so_obj_file =
@@ -376,195 +303,270 @@ pub(crate) fn generate_schema(
     );
 
     tracing::debug!("Collecting {} SQL entities", fns_to_call.len());
-    let mut entities = Vec::default();
 
-    #[rustfmt::skip] // explicit extern "Rust" is more clear here
-    unsafe {
-        // SAFETY: Calls foreign functions with the correct type signatures.
-        // Assumes that repr(Rust) enums are represented the same in this crate as in the external
-        // binary, which is the case in practice when the same compiler is used to compile the
-        // external crate.
+    Ok(fns_to_call.into_iter().collect())
+}
 
-        POSTMASTER_LIBRARY
-            .get_or_try_init(|| {
-                libloading::os::unix::Library::open(
-                    Some(&postmaster_stub_built),
-                    libloading::os::unix::RTLD_NOW | libloading::os::unix::RTLD_GLOBAL,
-                )
-            })
-            .wrap_err_with(|| format!("Couldn't libload {}", postmaster_stub_built.display()))?;
+fn first_build(
+    user_manifest_path: Option<&impl AsRef<Path>>,
+    profile: &CargoProfile,
+    features: &clap_cargo::Features,
+    log_level: Option<String>,
+    is_test: bool,
+    features_arg: &str,
+    flags: &str,
+    package_name: &str,
+) -> eyre::Result<()> {
+    let mut command = crate::env::cargo();
+    command.stdin(Stdio::null());
+    command.stdout(Stdio::null());
+    command.stderr(Stdio::inherit());
 
-        let lib = EXTENSION_LIBRARY
-            .get_or_try_init(|| {
-                libloading::os::unix::Library::open(Some(&lib_so), libloading::os::unix::RTLD_LAZY)
-            })
-            .wrap_err_with(|| format!("Couldn't libload {}", lib_so.display()))?;
-
-        let symbol: libloading::os::unix::Symbol<
-            unsafe extern "Rust" fn(_: ()) -> pgrx_sql_entity_graph::ControlFile,
-        > = lib
-            .get("__pgrx_marker".as_bytes())
-            .expect("Couldn't call __pgrx_marker");
-        let control_file_entity = pgrx_sql_entity_graph::SqlGraphEntity::ExtensionRoot(
-            symbol(()),
-        );
-        entities.push(control_file_entity);
-
-        for symbol_to_call in fns_to_call {
-            let symbol: libloading::os::unix::Symbol<unsafe extern "Rust" fn() -> pgrx_sql_entity_graph::SqlGraphEntity> =
-                lib.get(symbol_to_call.as_bytes()).unwrap_or_else(|_|
-                    panic!("Couldn't call {symbol_to_call:#?}"));
-            let entity = symbol();
-            entities.push(entity);
-        }
-    };
-
-    let pgrx_sql = pgrx_sql_entity_graph::PgrxSql::build(
-        entities.into_iter(),
-        manifest.lib_name()?,
-        versioned_so,
-    )
-    .wrap_err("SQL generation error")?;
-
-    if let Some(out_path) = path {
-        let out_path = out_path.as_ref();
-
-        eprintln!(
-            "{} SQL entities to {}",
-            "     Writing".bold().green(),
-            format_display_path(out_path)?.cyan()
-        );
-
-        if let Some(parent) = out_path.parent() {
-            std::fs::create_dir_all(parent).wrap_err("Could not create parent directory")?
-        }
-        pgrx_sql
-            .to_file(out_path)
-            .wrap_err_with(|| eyre!("Could not write SQL to {}", out_path.display()))?;
-        output_tracking.push(out_path.to_path_buf());
+    if is_test {
+        command.arg("test");
+        command.arg("--no-run");
     } else {
-        eprintln!("{} SQL entities to {}", "     Writing".bold().green(), "/dev/stdout".cyan());
-        pgrx_sql
-            .write(&mut std::io::stdout())
-            .wrap_err_with(|| eyre!("Could not write SQL to stdout"))?;
+        command.arg("build");
     }
 
-    if let Some(dot_path) = dot {
-        let dot_path = dot_path.as_ref();
-        tracing::info!(dot = %dot_path.display(), "Writing Graphviz DOT");
-        pgrx_sql.to_dot(dot_path)?;
+    command.arg("--package");
+    command.arg(format!("{package_name}"));
+
+    if let Some(user_manifest_path) = user_manifest_path.as_ref() {
+        command.arg("--manifest-path");
+        command.arg(user_manifest_path.as_ref());
     }
+
+    command.args(profile.cargo_args());
+
+    if let Some(log_level) = &log_level {
+        command.env("RUST_LOG", log_level);
+    }
+
+    if !features_arg.trim().is_empty() {
+        command.arg("--features");
+        command.arg(&features_arg);
+    }
+
+    if features.no_default_features {
+        command.arg("--no-default-features");
+    }
+
+    if features.all_features {
+        command.arg("--all-features");
+    }
+
+    for arg in flags.split_ascii_whitespace() {
+        command.arg(arg);
+    }
+
+    let command_str = format!("{:?}", command);
+    eprintln!(
+        "{} for SQL generation with features `{}`",
+        "    Building".bold().green(),
+        features_arg,
+    );
+
+    tracing::debug!(command = %command_str, "Running");
+    let cargo_output =
+        command.output().wrap_err_with(|| format!("failed to spawn cargo: {}", command_str))?;
+    tracing::trace!(status_code = %cargo_output.status, command = %command_str, "Finished");
+
+    if !cargo_output.status.success() {
+        // We explicitly do not want to return a spantraced error here.
+        std::process::exit(1)
+    }
+
     Ok(())
 }
 
-#[tracing::instrument(level = "error", skip_all, fields(
-    postmaster_path = %format_display_path(postmaster_path.as_ref())?,
-    postmaster_stub_dir = %format_display_path(postmaster_stub_dir.as_ref())?,
-))]
-fn create_stub(
-    postmaster_path: impl AsRef<Path>,
-    postmaster_stub_dir: impl AsRef<Path>,
-) -> eyre::Result<PathBuf> {
-    let postmaster_path = postmaster_path.as_ref();
-    let postmaster_stub_dir = postmaster_stub_dir.as_ref();
+fn compute_codegen(
+    package_manifest_path: impl AsRef<Path>,
+    symbols: &[String],
+    lib_name: &str,
+    path: Option<String>,
+    dot: Option<String>,
+) -> eyre::Result<String> {
+    use proc_macro2::{Ident, Span, TokenStream};
+    let lib_name_ident = Ident::new(&lib_name, Span::call_site());
 
-    let mut postmaster_stub_file = postmaster_stub_dir.to_path_buf();
-    postmaster_stub_file.push("postmaster_stub.rs");
-
-    let mut postmaster_hash_file = postmaster_stub_dir.to_path_buf();
-    postmaster_hash_file.push("postmaster.hash");
-
-    let mut postmaster_stub_built = postmaster_stub_dir.to_path_buf();
-    postmaster_stub_built.push("postmaster_stub.so");
-
-    let postmaster_bin_data =
-        std::fs::read(postmaster_path).wrap_err("couldn't read postmaster")?;
-
-    let mut hasher = std::collections::hash_map::DefaultHasher::new();
-    postmaster_bin_data.hash(&mut hasher);
-    let postmaster_bin_hash = hasher.finish().to_string().into_bytes();
-
-    let postmaster_hash_data = std::fs::read(&postmaster_hash_file).ok();
-
-    // Determine if we already built this stub.
-    if let Some(postmaster_hash_data) = postmaster_hash_data {
-        if postmaster_hash_data == postmaster_bin_hash && postmaster_stub_built.exists() {
-            // We already built this and it's up to date.
-            tracing::debug!(stub = %postmaster_stub_built.display(), "Existing stub for postmaster");
-            return Ok(postmaster_stub_built);
-        }
-    }
-
-    let postmaster_obj_file =
-        parse_object(&postmaster_bin_data).wrap_err("couldn't parse postmaster")?;
-    let postmaster_exports = postmaster_obj_file
-        .exports()
-        .wrap_err("couldn't get exports from extension shared object")?;
-
-    let mut symbols_to_stub = HashSet::new();
-    for export in postmaster_exports {
-        let name = std::str::from_utf8(export.name())?.to_string();
-        #[cfg(target_os = "macos")]
-        let name = {
-            // Mac will prefix symbols with `_` automatically, so we remove it to avoid getting
-            // two.
-            let mut name = name;
-            let rename = name.split_off(1);
-            assert_eq!(name, "_");
-            rename
+    let inputs = {
+        let mut out = quote::quote! {
+            let mut entities = Vec::new();
+            let control_file_entity = ::pgrx::pgrx_sql_entity_graph::SqlGraphEntity::ExtensionRoot(::#lib_name_ident::__pgrx_marker());
+            entities.push(control_file_entity);
         };
-        symbols_to_stub.insert(name);
-    }
-
-    tracing::debug!("Creating stub of appropriate PostgreSQL symbols");
-    PgrxPgSysStub::from_symbols(&symbols_to_stub)?.write_to_file(&postmaster_stub_file)?;
-
-    let mut so_rustc_invocation = crate::env::rustc();
-    so_rustc_invocation.stderr(Stdio::inherit());
-
-    if let Ok(rustc_flags_str) = std::env::var("RUSTFLAGS") {
-        let rustc_flags = rustc_flags_str.split_whitespace().collect::<Vec<_>>();
-        if !rustc_flags.is_empty() {
-            so_rustc_invocation.args(rustc_flags);
+        for name in symbols.iter() {
+            let name_ident = Ident::new(name, Span::call_site());
+            out.extend(quote::quote! {
+                extern "Rust" {
+                    fn #name_ident() -> ::pgrx::pgrx_sql_entity_graph::SqlGraphEntity;
+                }
+                let entity = unsafe { #name_ident() };
+                entities.push(entity);
+            });
+        }
+        out
+    };
+    let build = {
+        let versioned_so = get_property(&package_manifest_path, "module_pathname")?.is_none();
+        quote::quote! {
+            let pgrx_sql = ::pgrx::pgrx_sql_entity_graph::PgrxSql::build(
+                entities.into_iter(),
+                #lib_name.to_string(),
+                #versioned_so,
+            )
+            .expect("SQL generation error");
+        }
+    };
+    let outputs = {
+        let mut out = TokenStream::new();
+        if let Some(path) = path {
+            let writing = "     Writing".bold().green().to_string();
+            out.extend(quote::quote! {
+                eprintln!("{} SQL entities to {}", #writing, #path);
+                pgrx_sql
+                    .to_file(#path)
+                    .expect(&format!("Could not write SQL to {}", #path));
+            });
+        } else {
+            let writing = "     Writing".bold().green().to_string();
+            out.extend(quote::quote! {
+                eprintln!("{} SQL entities to {}", #writing, "/dev/stdout",);
+                pgrx_sql
+                    .write(&mut std::io::stdout())
+                    .expect("Could not write SQL to stdout");
+            });
+        }
+        if let Some(dot) = dot {
+            out.extend(quote::quote! {
+                pgrx_sql
+                    .to_dot(#dot)
+                    .expect("Could not write Graphviz DOT");
+            });
+        }
+        out
+    };
+    Ok(quote::quote! {
+        fn main() {
+            #inputs
+            #build
+            #outputs
         }
     }
+    .to_string())
+}
 
-    so_rustc_invocation.args([
-        "--crate-type",
-        "cdylib",
-        "-o",
-        postmaster_stub_built
-            .to_str()
-            .ok_or(eyre!("could not call postmaster_stub_built.to_str()"))?,
-        postmaster_stub_file
-            .to_str()
-            .ok_or(eyre!("could not call postmaster_stub_file.to_str()"))?,
-    ]);
+fn second_build(
+    user_manifest_path: Option<&impl AsRef<Path>>,
+    profile: &CargoProfile,
+    features: &clap_cargo::Features,
+    log_level: Option<String>,
+    features_arg: &str,
+    flags: &str,
+    embed_path: impl AsRef<Path>,
+    package_name: &str,
+) -> eyre::Result<()> {
+    let mut command = crate::env::cargo();
+    command.stdin(Stdio::null());
+    command.stdout(Stdio::null());
+    command.stderr(Stdio::inherit());
 
-    let so_rustc_invocation_str = format!("{so_rustc_invocation:?}");
-    tracing::debug!(command = %so_rustc_invocation_str, "Running");
-    let output = so_rustc_invocation.output().wrap_err_with(|| {
-        eyre!("could not invoke `rustc` on {}", postmaster_stub_file.display())
-    })?;
+    // We do pass cfg to the binary and do not pass cfg to dependencies to avoid recompilation
+    // The only cargo command respecting our need is `cargo rustc`
+    command.arg("rustc");
+    command.arg("--bin");
+    command.arg(format!("pgrx_embed_{package_name}"));
 
-    let code = output.status.code().ok_or(eyre!("could not get status code of build"))?;
-    tracing::trace!(status_code = %code, command = %so_rustc_invocation_str, "Finished");
-    if code != 0 {
-        return Err(eyre!("rustc exited with code {code}"));
+    command.arg("--package");
+    command.arg(format!("{package_name}"));
+
+    if let Some(user_manifest_path) = user_manifest_path.as_ref() {
+        command.arg("--manifest-path");
+        command.arg(user_manifest_path.as_ref());
     }
 
-    std::fs::write(&postmaster_hash_file, postmaster_bin_hash)
-        .wrap_err("could not write postmaster stub hash")?;
+    command.args(profile.cargo_args());
 
-    Ok(postmaster_stub_built)
+    if let Some(log_level) = &log_level {
+        command.env("RUST_LOG", log_level);
+    }
+
+    if !features_arg.trim().is_empty() {
+        command.arg("--features");
+        command.arg(&features_arg);
+    }
+
+    if features.no_default_features {
+        command.arg("--no-default-features");
+    }
+
+    if features.all_features {
+        command.arg("--all-features");
+    }
+
+    for arg in flags.split_ascii_whitespace() {
+        command.arg(arg);
+    }
+
+    command.arg("--");
+
+    command.args(["--cfg", "pgrx_embed"]);
+
+    command.env("PGRX_EMBED", embed_path.as_ref());
+
+    let command_str = format!("{:?}", command);
+    eprintln!(
+        "{} for SQL generation with features `{}`",
+        "  Rebuilding".bold().green(),
+        features_arg,
+    );
+
+    tracing::debug!(command = %command_str, "Running");
+    let cargo_output =
+        command.output().wrap_err_with(|| format!("failed to spawn cargo: {}", command_str))?;
+    tracing::trace!(status_code = %cargo_output.status, command = %command_str, "Finished");
+
+    if !cargo_output.status.success() {
+        // We explicitly do not want to return a spantraced error here.
+        std::process::exit(1)
+    }
+
+    Ok(())
+}
+
+fn compute_sql(profile: &CargoProfile, package_name: &str) -> eyre::Result<()> {
+    let mut bin = get_target_dir()?;
+    bin.push(profile.target_subdir());
+    bin.push(format!("pgrx_embed_{package_name}"));
+
+    let mut command = std::process::Command::new(bin);
+    command.stdin(Stdio::inherit());
+    command.stdout(Stdio::inherit());
+    command.stderr(Stdio::inherit());
+
+    let command_str = format!("{:?}", command);
+    tracing::debug!(command = %command_str, "Running");
+    let embed_output = command
+        .output()
+        .wrap_err_with(|| format!("failed to spawn pgrx_embed: {}", command_str))?;
+    tracing::trace!(status_code = %embed_output.status, command = %command_str, "Finished");
+
+    if !embed_output.status.success() {
+        // We do not want to return a spantraced error here, to
+        // (speculative:) reduce the likelihood of emitting errors twice
+        std::process::exit(1)
+    }
+
+    Ok(())
 }
 
 fn parse_object(data: &[u8]) -> object::Result<object::File> {
     let kind = object::FileKind::parse(data)?;
 
     match kind {
-        FileKind::MachOFat32 => {
-            let arch = env::consts::ARCH;
+        object::FileKind::MachOFat32 => {
+            let arch = std::env::consts::ARCH;
 
             match slice_arch32(data, arch) {
                 Some(slice) => parse_object(slice),
@@ -578,6 +580,9 @@ fn parse_object(data: &[u8]) -> object::Result<object::File> {
 }
 
 fn slice_arch32<'a>(data: &'a [u8], arch: &str) -> Option<&'a [u8]> {
+    use object::macho::FatHeader;
+    use object::read::macho::FatArch;
+    use object::Architecture;
     let target = match arch {
         "x86" => Architecture::I386,
         "x86_64" => Architecture::X86_64,

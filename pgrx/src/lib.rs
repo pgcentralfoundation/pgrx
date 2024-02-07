@@ -275,12 +275,8 @@ macro_rules! pg_magic_func {
 macro_rules! pg_sql_graph_magic {
     () => {
         // A marker which must exist in the root of the extension.
-#[no_mangle]
         #[doc(hidden)]
-        #[rustfmt::skip] // explicit extern "Rust" is more clear here
-        pub extern "Rust" fn __pgrx_marker(
-            _: (),
-        ) -> $crate::pgrx_sql_entity_graph::ControlFile {
+        pub fn __pgrx_marker() -> $crate::pgrx_sql_entity_graph::ControlFile {
             use ::core::convert::TryFrom;
             let package_version = env!("CARGO_PKG_VERSION");
             let context = include_str!(concat!(
@@ -327,4 +323,20 @@ pub(crate) enum Utf8Compat {
     Maybe,
     /// An "extended ASCII" encoding, so we're fine if we only touch ASCII
     Ascii,
+}
+
+/// Entry point for cargo-pgrx's schema generation so that PGRX's framework can
+/// generate SQL for its types and functions and topographically sort them into
+/// an order Postgres will accept. Typically written by the `cargo pgrx new`
+/// template, so you probably don't need to worry about this.
+#[macro_export]
+macro_rules! pgrx_embed {
+    () => {
+        #[cfg(not(pgrx_embed))]
+        fn main() {
+            panic!("PGRX_EMBED was not set.");
+        }
+        #[cfg(pgrx_embed)]
+        include!(env!("PGRX_EMBED"));
+    };
 }
