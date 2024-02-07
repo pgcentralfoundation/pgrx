@@ -330,7 +330,7 @@ impl<'conn> SpiHeapTupleData<'conn> {
         unsafe {
             // SAFETY:  we know tupdesc is not null
             let natts = (*tupdesc).natts;
-            data.entries.reserve(usize::try_from(natts as usize).unwrap_or_default());
+            data.entries.reserve(usize::try_from(natts).unwrap());
             for i in 1..=natts {
                 let mut is_null = false;
                 let datum = pg_sys::SPI_getbinval(htup, tupdesc as _, i, &mut is_null);
