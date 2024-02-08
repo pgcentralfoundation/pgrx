@@ -9,8 +9,6 @@
 //LICENSE Use of this source code is governed by the MIT license that can be found in the LICENSE file.
 // Polyfill while #![feature(strict_provenance)] is unstable
 use crate::NullableDatum;
-#[cfg(not(nightly))]
-use sptr::Strict;
 use std::ptr::NonNull;
 
 /// Postgres defines the "Datum" type as uintptr_t, so bindgen decides it is usize.
@@ -64,8 +62,7 @@ impl Datum {
     /// the memory address, interpreting them as an integer.
     #[inline]
     pub fn value(self) -> usize {
-        #[allow(unstable_name_collisions)]
-        self.0.addr()
+        sptr::Strict::addr(self.0)
     }
 
     /// True if the datum is equal to the null pointer.
@@ -78,7 +75,6 @@ impl Datum {
     /// It is recommended to explicitly use `datum.cast_mut_ptr::<T>()`.
     #[inline]
     pub fn cast_mut_ptr<T>(self) -> *mut T {
-        #[allow(unstable_name_collisions)]
         self.0.cast()
     }
 }
@@ -86,16 +82,14 @@ impl Datum {
 impl From<usize> for Datum {
     #[inline]
     fn from(val: usize) -> Datum {
-        #[allow(unstable_name_collisions)]
-        Datum(NonNull::<DatumBlob>::dangling().as_ptr().with_addr(val))
+        Datum(sptr::Strict::with_addr(NonNull::<DatumBlob>::dangling().as_ptr(), val))
     }
 }
 
 impl From<Datum> for usize {
     #[inline]
     fn from(val: Datum) -> usize {
-        #[allow(unstable_name_collisions)]
-        val.0.addr()
+        sptr::Strict::addr(val.0)
     }
 }
 
