@@ -21,7 +21,7 @@ pub unsafe fn set_varsize_4b(ptr: *mut pg_sys::varlena, len: i32) {
     // 	(((varattrib_4b *) (PTR))->va_4byte.va_header = (((uint32) (len)) << 2))
 
     // SAFETY:  A varlena can be safely cast to a varattrib_4b
-    (*ptr.cast::<pg_sys::varattrib_4b>()).va_4byte.as_mut().va_header = (len as u32) << 2;
+    (*ptr.cast::<pg_sys::varattrib_4b>()).va_4byte.va_header = (len as u32) << 2;
 }
 
 /// # Safety

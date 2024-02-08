@@ -366,18 +366,17 @@ impl<'a> IntoDatum for &'a [u8] {
 
             // SAFETY: `varlena` can properly cast into a `varattrib_4b` and all of what it contains is properly
             // allocated thanks to our call to `palloc` above
-            let varattrib_4b = varlena
+            let varattrib_4b: *mut _ = &mut varlena
                 .cast::<pg_sys::varattrib_4b>()
                 .as_mut()
                 .unwrap_unchecked()
-                .va_4byte
-                .as_mut();
+                .va_4byte;
 
             // This is the same as Postgres' `#define SET_VARSIZE_4B` (which have over in
             // `pgrx/src/varlena.rs`), however we're asserting that the input string isn't too big
             // for a Postgres varlena, since it's limited to 32bits -- in reality it's about half
             // that length, but this is good enough
-            varattrib_4b.va_header = <usize as TryInto<u32>>::try_into(len)
+            (*varattrib_4b).va_header = <usize as TryInto<u32>>::try_into(len)
                 .expect("Rust string too large for a Postgres varlena datum")
                 << 2u32;
 
@@ -385,7 +384,7 @@ impl<'a> IntoDatum for &'a [u8] {
             // and the `dest` was freshly allocated, thus non-overlapping
             std::ptr::copy_nonoverlapping(
                 self.as_ptr().cast(),
-                varattrib_4b.va_data.as_mut_ptr(),
+                (*varattrib_4b).va_data.as_mut_ptr(),
                 self.len(),
             );
 
