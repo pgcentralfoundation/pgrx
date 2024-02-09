@@ -15,7 +15,7 @@
 use crate::{pg_sys, rust_regtypein, set_varsize_4b, PgBox, PgOid, WhoAllocated};
 use core::fmt::Display;
 use pgrx_pg_sys::panic::ErrorReportable;
-use std::any::Any;
+use std::{any::Any, ptr::addr_of_mut};
 
 /// Convert a Rust type into a `pg_sys::Datum`.
 ///
@@ -380,7 +380,7 @@ impl<'a> IntoDatum for &'a [u8] {
             // and the `dest` was freshly allocated, thus non-overlapping
             std::ptr::copy_nonoverlapping(
                 self.as_ptr().cast(),
-                (*varattrib_4b).va_data.as_mut_ptr(),
+                addr_of_mut!((*varattrib_4b).va_data),
                 self.len(),
             );
 
