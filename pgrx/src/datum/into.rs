@@ -373,7 +373,7 @@ impl<'a> IntoDatum for &'a [u8] {
             // `pgrx/src/varlena.rs`), however we're asserting that the input string isn't too big
             // for a Postgres varlena, since it's limited to 32bits -- in reality it's about half
             // that length, but this is good enough
-            debug_assert!(len < (i32::MAX as usize));
+            debug_assert!(len < (u32::MAX as usize >> 2));
             set_varsize_4b(varlena, len as i32);
 
             // SAFETY: src and dest pointers are valid, exactly `self.len()` bytes long,
