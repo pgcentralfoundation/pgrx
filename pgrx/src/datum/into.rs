@@ -366,11 +366,8 @@ impl<'a> IntoDatum for &'a [u8] {
 
             // SAFETY: `varlena` can properly cast into a `varattrib_4b` and all of what it contains is properly
             // allocated thanks to our call to `palloc` above
-            let varattrib_4b: *mut _ = &mut varlena
-                .cast::<pg_sys::varattrib_4b>()
-                .as_mut()
-                .unwrap_unchecked()
-                .va_4byte;
+            let varattrib_4b: *mut _ =
+                &mut varlena.cast::<pg_sys::varattrib_4b>().as_mut().unwrap_unchecked().va_4byte;
 
             // This is the same as Postgres' `#define SET_VARSIZE_4B` (which have over in
             // `pgrx/src/varlena.rs`), however we're asserting that the input string isn't too big
