@@ -24,7 +24,7 @@ pub unsafe fn set_varsize_4b(ptr: *mut pg_sys::varlena, len: i32) {
     let header = &mut (*ptr.cast::<pg_sys::varattrib_4b>()).va_4byte.deref_mut().va_header;
     // Using core::ptr::write(), which never calls drop(), to prevent
     // automatically dropping a field of a ManuallyDrop<T>
-    core::ptr::write(header, (len as u32) << 2)
+    core::ptr::write(header, (len as u32) << 2u32)
 }
 
 /// # Safety

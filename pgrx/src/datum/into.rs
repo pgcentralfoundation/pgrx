@@ -12,7 +12,7 @@
 //! Primitive types can never be null, so we do a direct
 //! cast of the primitive type to pg_sys::Datum
 
-use crate::{pg_sys, rust_regtypein, PgBox, PgOid, WhoAllocated};
+use crate::{pg_sys, rust_regtypein, set_varsize_4b, PgBox, PgOid, WhoAllocated};
 use core::fmt::Display;
 use pgrx_pg_sys::panic::ErrorReportable;
 use std::any::Any;
@@ -373,9 +373,8 @@ impl<'a> IntoDatum for &'a [u8] {
             // `pgrx/src/varlena.rs`), however we're asserting that the input string isn't too big
             // for a Postgres varlena, since it's limited to 32bits -- in reality it's about half
             // that length, but this is good enough
-            (*varattrib_4b).va_header = <usize as TryInto<u32>>::try_into(len)
-                .expect("Rust string too large for a Postgres varlena datum")
-                << 2u32;
+            debug_assert!(len < (i32::MAX as usize));
+            set_varsize_4b(varlena, len as i32);
 
             // SAFETY: src and dest pointers are valid, exactly `self.len()` bytes long,
             // and the `dest` was freshly allocated, thus non-overlapping
