@@ -31,21 +31,6 @@ mod build {
 #[derive(Debug)]
 struct PgrxOverrides(HashSet<String>);
 
-fn is_nightly() -> bool {
-    if env_tracked("CARGO_CFG_PLRUSTC").is_some() {
-        return false;
-    }
-    let rustc = env_tracked("RUSTC").map(PathBuf::from).unwrap_or_else(|| "rustc".into());
-    let output = match std::process::Command::new(rustc).arg("--version").output() {
-        Ok(out) if out.status.success() => String::from_utf8_lossy(&out.stdout).trim().to_owned(),
-        _ => return false,
-    };
-    // Output looks like:
-    // - for nightly: `"rustc 1.66.0-nightly (0ca356586 2022-10-06)"`
-    // - for dev (locally built rust toolchain): `"rustc 1.66.0-dev"`
-    output.starts_with("rustc ") && (output.contains("-nightly") || output.contains("-dev"))
-}
-
 impl PgrxOverrides {
     fn default() -> Self {
         // these cause duplicate definition problems on linux
@@ -122,11 +107,6 @@ fn main() -> eyre::Result<()> {
 
     let is_for_release =
         env_tracked("PGRX_PG_SYS_GENERATE_BINDINGS_FOR_RELEASE").as_deref() == Some("1");
-
-    // Do nightly detection to suppress silly warnings.
-    if is_nightly() {
-        println!("cargo:rustc-cfg=nightly")
-    };
 
     let build_paths = BuildPaths::from_env();
 

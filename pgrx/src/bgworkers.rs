@@ -671,6 +671,7 @@ fn wait_latch(timeout: libc::c_long, wakeup_flags: WLflags) -> i32 {
 ))]
 type RpgffiChar = RpgffiChar96;
 
+#[allow(dead_code)]
 struct RpgffiChar64([c_char; 64]);
 
 impl<'a> From<&'a str> for RpgffiChar64 {
