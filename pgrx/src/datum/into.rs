@@ -379,8 +379,8 @@ impl<'a> IntoDatum for &'a [u8] {
             // SAFETY: src and dest pointers are valid, exactly `self.len()` bytes long,
             // and the `dest` was freshly allocated, thus non-overlapping
             std::ptr::copy_nonoverlapping(
-                self.as_ptr().cast(),
-                addr_of_mut!((*varattrib_4b).va_data),
+                self.as_ptr(),
+                addr_of_mut!((*varattrib_4b).va_data).cast::<u8>(),
                 self.len(),
             );
 
