@@ -8,6 +8,7 @@
 //LICENSE
 //LICENSE Use of this source code is governed by the MIT license that can be found in the LICENSE file.
 use bindgen::callbacks::{DeriveTrait, ImplementsTrait, MacroParsingBehavior};
+use bindgen::NonCopyUnionStyle;
 use eyre::{eyre, WrapErr};
 use pgrx_pg_config::{
     is_supported_major_version, prefix_path, PgConfig, PgConfigSelector, Pgrx, SUPPORTED_VERSIONS,
@@ -713,6 +714,7 @@ fn run_bindgen(
         .merge_extern_blocks(true)
         .formatter(bindgen::Formatter::None)
         .layout_tests(false)
+        .default_non_copy_union_style(NonCopyUnionStyle::ManuallyDrop)
         .generate()
         .wrap_err_with(|| format!("Unable to generate bindings for pg{major_version}"))?;
 
