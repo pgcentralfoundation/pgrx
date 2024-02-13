@@ -29,7 +29,6 @@ pgrx-sql-entity-graph.workspace = true
 
 cargo_toml.workspace = true
 libc.workspace = true
-
 regex.workspace = true
 
 cargo_metadata = "0.17.0"
