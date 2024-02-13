@@ -48,6 +48,20 @@ pub enum PgrxArg {
 }
 
 impl Parse for PgrxArg {
+    /// Parse `name = val` in `#[pgrx(name = val)]`
+    ///
+    /// It may seem like we leave this unhandled:
+    /// ```rust
+    /// #[pg_aggregate]
+    /// impl Aggregate for Aggregated {
+    ///     #[pgrx(immutable, parallel_safe)]
+    ///     fn state(current: _, args: _, fcinfo: _) -> Self::State {) {
+    ///         todo!()
+    ///     }
+    /// }
+    /// ```
+    /// However, that actually never reaches this point!
+    /// This parser only handles the direct attributes.
     #[track_caller]
     fn parse(input: ParseStream<'_>) -> syn::Result<Self> {
         let path = input.parse::<syn::Path>()?;
@@ -63,7 +77,7 @@ impl Parse for PgrxArg {
     }
 }
 
-/// This struct is akin to `syn::NameValueMeta`, but allows for more than just `syn::Lit` as a value.m
+/// This struct is akin to `syn::NameValueMeta`, but allows for more than just `syn::Lit` as a value.
 #[derive(Debug)]
 pub struct NameValueArg {
     pub path: syn::Path,
@@ -79,6 +93,7 @@ pub enum ArgValue {
 }
 
 impl Parse for ArgValue {
+    /// Parse `val` in `#[pgrx(name = val)]`
     fn parse(input: ParseStream<'_>) -> syn::Result<Self> {
         if input.peek(syn::Lit) {
             return Ok(Self::Lit(input.parse()?));
