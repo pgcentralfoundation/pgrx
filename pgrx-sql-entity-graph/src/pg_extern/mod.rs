@@ -179,13 +179,18 @@ impl PgExtern {
         let mut span = None;
         let mut retval = None;
         let mut in_commented_sql_block = false;
-        for meta in self.func.attrs.iter().filter_map(|attr| match attr.parse_meta() {
-            Ok(meta) if meta.path().is_ident("doc") => Some(meta),
-            _ => None,
+        for meta in self.func.attrs.iter().filter_map(|attr| {
+            if attr.meta.path().is_ident("doc") {
+                Some(attr.meta.clone())
+            } else {
+                None
+            }
         }) {
-            let Meta::NameValue(syn::MetaNameValue { value, .. }) = meta else { continue };
-            let syn::Lit::Str(ref inner) = lit else { continue };
-            span.get_or_insert(lit.span());
+            let Meta::NameValue(syn::MetaNameValue { ref value, .. }) = meta else { continue };
+            let syn::Expr::Lit(syn::ExprLit { lit: syn::Lit::Str(inner), .. }) = value else {
+                continue;
+            };
+            span.get_or_insert(value.span());
             if !in_commented_sql_block && inner.value().trim() == "```pgrxsql" {
                 in_commented_sql_block = true;
             } else if in_commented_sql_block && inner.value().trim() == "```" {
