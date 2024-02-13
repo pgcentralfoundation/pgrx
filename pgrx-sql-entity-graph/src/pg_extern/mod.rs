@@ -28,6 +28,7 @@ pub use cast::PgCast;
 pub use operator::PgOperator;
 pub use returning::NameMacro;
 
+use crate::fmt::ErrHarder;
 use crate::ToSqlConfig;
 pub(crate) use attribute::Attribute;
 use operator::{PgrxOperatorAttributeWithIdent, PgrxOperatorOpName};
@@ -89,11 +90,9 @@ impl PgExtern {
         let mut to_sql_config: Option<ToSqlConfig> = None;
 
         let parser = Punctuated::<Attribute, Token![,]>::parse_terminated;
-        let punctuated_attrs = parser.parse2(attr).map_err(|e| {
-            let mut e = e.clone();
-            e.combine(syn::Error::new(Span::call_site(), "lol here we go"));
-            e
-        })?;
+        let attr_ts = attr.clone();
+        let punctuated_attrs =
+            parser.parse2(attr).more_error(lazy_err!(attr_ts, "failed parsing pg_extern arguments"))?;
         for pair in punctuated_attrs.into_pairs() {
             match pair.into_value() {
                 Attribute::Sql(config) => to_sql_config = to_sql_config.or(Some(config)),
@@ -220,52 +219,38 @@ impl PgExtern {
         for attr in &func.attrs {
             let last_segment = attr.path().segments.last().unwrap();
             match last_segment.ident.to_string().as_str() {
-                "opname" => {
+                s @ "opname" => {
                     // we've been accepting strings of tokens for a while now
-                    let attr = attr.parse_args::<PgrxOperatorOpName>().map_err(|e| {
-                        let mut e = e.clone();
-                        e.combine(syn::Error::new_spanned(
-                            attr.to_token_stream(),
-                            "bad parse of opname?",
-                        ));
-                        e
-                    })?;
+                    let attr = attr
+                        .parse_args::<PgrxOperatorOpName>()
+                        .more_error(lazy_err!(attr.clone(), "bad parse of {s}?"))?;
                     skel.get_or_insert_with(Default::default).opname.get_or_insert(attr);
                 }
                 s @ "commutator" => {
-                    let attr_ts = attr.to_token_stream();
-                    let attr: PgrxOperatorAttributeWithIdent = attr.parse_args().map_err(|e| {
-                        let mut e = e.clone();
-                        e.combine(syn::Error::new_spanned(attr_ts, format!("bad parse of {s}?")));
-                        e
-                    })?;
+                    let attr: PgrxOperatorAttributeWithIdent = attr
+                        .parse_args()
+                        .more_error(lazy_err!(attr.clone(), "bad parse of {s}?"))?;
+
                     skel.get_or_insert_with(Default::default).commutator.get_or_insert(attr);
                 }
                 s @ "negator" => {
-                    let attr_ts = attr.to_token_stream();
-                    let attr: PgrxOperatorAttributeWithIdent = attr.parse_args().map_err(|e| {
-                        let mut e = e.clone();
-                        e.combine(syn::Error::new_spanned(attr_ts, format!("bad parse of {s}?")));
-                        e
-                    })?;
+                    let attr: PgrxOperatorAttributeWithIdent = attr
+                        .parse_args()
+                        .more_error(lazy_err!(attr.clone(), "bad parse of {s}?"))?;
                     skel.get_or_insert_with(Default::default).negator.get_or_insert(attr);
                 }
                 s @ "join" => {
-                    let attr_ts = attr.to_token_stream();
-                    let attr: PgrxOperatorAttributeWithIdent = attr.parse_args().map_err(|e| {
-                        let mut e = e.clone();
-                        e.combine(syn::Error::new_spanned(attr_ts, format!("bad parse of {s}?")));
-                        e
-                    })?;
+                    let attr: PgrxOperatorAttributeWithIdent = attr
+                        .parse_args()
+                        .more_error(lazy_err!(attr.clone(), "bad parse of {s}?"))?;
+
                     skel.get_or_insert_with(Default::default).join.get_or_insert(attr);
                 }
                 s @ "restrict" => {
-                    let attr_ts = attr.to_token_stream();
-                    let attr: PgrxOperatorAttributeWithIdent = attr.parse_args().map_err(|e| {
-                        let mut e = e.clone();
-                        e.combine(syn::Error::new_spanned(attr_ts, format!("bad parse of {s}?")));
-                        e
-                    })?;
+                    let attr: PgrxOperatorAttributeWithIdent = attr
+                        .parse_args()
+                        .more_error(lazy_err!(attr.clone(), "bad parse of {s}?"))?;
+
                     skel.get_or_insert_with(Default::default).restrict.get_or_insert(attr);
                 }
                 "hashes" => {
