@@ -122,7 +122,7 @@ impl ToSqlConfig {
 
     /// Used to parse a generator config from a set of item attributes
     pub fn from_attributes(attrs: &[Attribute]) -> Result<Option<Self>, syn::Error> {
-        if let Some(attr) = attrs.iter().find(|attr| attr.path.is_ident("pgrx")) {
+        if let Some(attr) = attrs.iter().find(|attr| attr.path().is_ident("pgrx")) {
             Self::from_attribute(attr)
         } else {
             Ok(None)

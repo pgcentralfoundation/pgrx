@@ -762,7 +762,7 @@ fn get_target_path(item_impl: &ItemImpl) -> Result<Path, syn::Error> {
 fn pg_extern_attr(item: &ImplItemFn) -> syn::Attribute {
     let mut found = None;
     for attr in item.attrs.iter() {
-        match attr.path.segments.last() {
+        match attr.path().segments.last() {
             Some(segment) if segment.ident == "pgrx" => {
                 found = Some(attr.tokens.clone());
                 break;

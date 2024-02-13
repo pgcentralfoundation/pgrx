@@ -210,7 +210,7 @@ impl PgExtern {
     fn operator(func: &syn::ItemFn) -> syn::Result<Option<PgOperator>> {
         let mut skel = Option::<PgOperator>::default();
         for attr in &func.attrs {
-            let last_segment = attr.path.segments.last().unwrap();
+            let last_segment = attr.path().segments.last().unwrap();
             match last_segment.ident.to_string().as_str() {
                 "opname" => {
                     let attr: PgrxOperatorOpName = syn::parse2(attr.tokens.clone())?;
@@ -248,7 +248,7 @@ impl PgExtern {
         func.attrs
             .iter()
             .find(|f| {
-                f.path
+                f.path()
                     .segments
                     .first()
                     .map(|f| f.ident == Ident::new("search_path", Span::call_site()))
