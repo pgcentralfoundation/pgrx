@@ -91,8 +91,9 @@ impl PgExtern {
 
         let parser = Punctuated::<Attribute, Token![,]>::parse_terminated;
         let attr_ts = attr.clone();
-        let punctuated_attrs =
-            parser.parse2(attr).more_error(lazy_err!(attr_ts, "failed parsing pg_extern arguments"))?;
+        let punctuated_attrs = parser
+            .parse2(attr)
+            .more_error(lazy_err!(attr_ts, "failed parsing pg_extern arguments"))?;
         for pair in punctuated_attrs.into_pairs() {
             match pair.into_value() {
                 Attribute::Sql(config) => to_sql_config = to_sql_config.or(Some(config)),
