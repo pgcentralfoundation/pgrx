@@ -83,12 +83,17 @@ pub struct PgExtern {
 }
 
 impl PgExtern {
+    #[track_caller]
     pub fn new(attr: TokenStream2, item: TokenStream2) -> Result<CodeEnrichment<Self>, syn::Error> {
         let mut attrs = Vec::new();
         let mut to_sql_config: Option<ToSqlConfig> = None;
 
         let parser = Punctuated::<Attribute, Token![,]>::parse_terminated;
-        let punctuated_attrs = parser.parse2(attr)?;
+        let punctuated_attrs = parser.parse2(attr).map_err(|e| {
+            let mut e = e.clone();
+            e.combine(syn::Error::new(Span::call_site(), "lol here we go"));
+            e
+        })?;
         for pair in punctuated_attrs.into_pairs() {
             match pair.into_value() {
                 Attribute::Sql(config) => to_sql_config = to_sql_config.or(Some(config)),
@@ -135,6 +140,7 @@ impl PgExtern {
         result
     }
 
+    #[track_caller]
     fn input_types(func: &syn::ItemFn) -> syn::Result<Vec<syn::Type>> {
         func.sig
             .inputs
@@ -175,6 +181,7 @@ impl PgExtern {
         self.attrs.as_slice()
     }
 
+    #[track_caller]
     fn overridden(&self) -> Option<syn::LitStr> {
         let mut span = None;
         let mut retval = None;
@@ -213,7 +220,11 @@ impl PgExtern {
             let last_segment = attr.path().segments.last().unwrap();
             match last_segment.ident.to_string().as_str() {
                 "opname" => {
-                    let attr: PgrxOperatorOpName = syn::parse2(attr.to_token_stream())?;
+                    let attr: PgrxOperatorOpName = syn::parse2(attr.to_token_stream()).map_err(|e| {
+                        let mut e = e.clone();
+                        e.combine(syn::Error::new(Span::call_site(), "bad parse of opname?"));
+                        e
+                    })?;
                     skel.get_or_insert_with(Default::default).opname.get_or_insert(attr);
                 }
                 "commutator" => {

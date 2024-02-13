@@ -14,6 +14,7 @@ use proc_macro2::Ident;
 use quote::{quote, ToTokens};
 use syn::DeriveInput;
 
+#[track_caller]
 fn ident_and_path(ast: &DeriveInput) -> (&Ident, proc_macro2::TokenStream) {
     let ident = &ast.ident;
     let args = parse_postgres_type_args(&ast.attrs);
@@ -25,6 +26,7 @@ fn ident_and_path(ast: &DeriveInput) -> (&Ident, proc_macro2::TokenStream) {
     (ident, path)
 }
 
+#[track_caller]
 pub(crate) fn deriving_postgres_eq(ast: DeriveInput) -> syn::Result<proc_macro2::TokenStream> {
     let mut stream = proc_macro2::TokenStream::new();
     let (ident, path) = ident_and_path(&ast);
@@ -34,6 +36,7 @@ pub(crate) fn deriving_postgres_eq(ast: DeriveInput) -> syn::Result<proc_macro2:
     Ok(stream)
 }
 
+#[track_caller]
 pub(crate) fn deriving_postgres_ord(ast: DeriveInput) -> syn::Result<proc_macro2::TokenStream> {
     let mut stream = proc_macro2::TokenStream::new();
     let (ident, path) = ident_and_path(&ast);
@@ -90,6 +93,7 @@ pub(crate) fn deriving_postgres_hash(ast: DeriveInput) -> syn::Result<proc_macro
 /// finally leads them here.
 ///
 /// ["optimization hints"]: https://www.postgresql.org/docs/current/xoper-optimization.html
+#[track_caller]
 pub fn derive_pg_eq(name: &Ident, path: &proc_macro2::TokenStream) -> proc_macro2::TokenStream {
     let pg_name = Ident::new(&format!("{name}_eq").to_lowercase(), name.span());
     quote! {
@@ -119,6 +123,7 @@ pub fn derive_pg_eq(name: &Ident, path: &proc_macro2::TokenStream) -> proc_macro
 /// - PartialEq::ne is commutative
 ///
 /// See `derive_pg_eq` for the implications of this assumption.
+#[track_caller]
 pub fn derive_pg_ne(name: &Ident, path: &proc_macro2::TokenStream) -> proc_macro2::TokenStream {
     let pg_name = Ident::new(&format!("{name}_ne").to_lowercase(), name.span());
     quote! {
@@ -135,6 +140,7 @@ pub fn derive_pg_ne(name: &Ident, path: &proc_macro2::TokenStream) -> proc_macro
     }
 }
 
+#[track_caller]
 pub fn derive_pg_lt(name: &Ident, path: &proc_macro2::TokenStream) -> proc_macro2::TokenStream {
     let pg_name = Ident::new(&format!("{name}_lt").to_lowercase(), name.span());
     quote! {
@@ -152,6 +158,7 @@ pub fn derive_pg_lt(name: &Ident, path: &proc_macro2::TokenStream) -> proc_macro
     }
 }
 
+#[track_caller]
 pub fn derive_pg_gt(name: &Ident, path: &proc_macro2::TokenStream) -> proc_macro2::TokenStream {
     let pg_name = Ident::new(&format!("{name}_gt").to_lowercase(), name.span());
     quote! {
@@ -168,6 +175,7 @@ pub fn derive_pg_gt(name: &Ident, path: &proc_macro2::TokenStream) -> proc_macro
     }
 }
 
+#[track_caller]
 pub fn derive_pg_le(name: &Ident, path: &proc_macro2::TokenStream) -> proc_macro2::TokenStream {
     let pg_name = Ident::new(&format!("{name}_le").to_lowercase(), name.span());
     quote! {
@@ -184,6 +192,7 @@ pub fn derive_pg_le(name: &Ident, path: &proc_macro2::TokenStream) -> proc_macro
     }
 }
 
+#[track_caller]
 pub fn derive_pg_ge(name: &Ident, path: &proc_macro2::TokenStream) -> proc_macro2::TokenStream {
     let pg_name = Ident::new(&format!("{name}_ge").to_lowercase(), name.span());
     quote! {
@@ -200,6 +209,7 @@ pub fn derive_pg_ge(name: &Ident, path: &proc_macro2::TokenStream) -> proc_macro
     }
 }
 
+#[track_caller]
 pub fn derive_pg_cmp(name: &Ident, path: &proc_macro2::TokenStream) -> proc_macro2::TokenStream {
     let pg_name = Ident::new(&format!("{name}_cmp").to_lowercase(), name.span());
     quote! {
@@ -225,6 +235,7 @@ pub fn derive_pg_cmp(name: &Ident, path: &proc_macro2::TokenStream) -> proc_macr
 ///
 /// Postgres is no different: this hashing is for the explicit purpose of equality checks,
 /// and it also needs to be able to reason from hash equality to actual equality.
+#[track_caller]
 pub fn derive_pg_hash(name: &Ident, path: &proc_macro2::TokenStream) -> proc_macro2::TokenStream {
     let pg_name = Ident::new(&format!("{name}_hash").to_lowercase(), name.span());
     quote! {

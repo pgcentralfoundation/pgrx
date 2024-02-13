@@ -624,17 +624,15 @@ fn example_return() -> pg_sys::Oid {
 
 */
 #[proc_macro_attribute]
+#[track_caller]
 pub fn pg_extern(attr: TokenStream, item: TokenStream) -> TokenStream {
     fn wrapped(attr: TokenStream, item: TokenStream) -> Result<TokenStream, syn::Error> {
         let pg_extern_item = PgExtern::new(attr.clone().into(), item.clone().into())?;
         Ok(pg_extern_item.to_token_stream().into())
     }
 
-    wrapped(attr, item).unwrap_or_else(|e| {
-        let msg = e.to_string();
-        TokenStream::from(quote! {
-          compile_error!(#msg);
-        })
+    wrapped(attr, item).unwrap_or_else(|e: syn::Error| {
+        e.to_compile_error().into()
     })
 }
 
