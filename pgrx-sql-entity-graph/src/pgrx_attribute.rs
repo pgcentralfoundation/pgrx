@@ -55,7 +55,7 @@ impl Parse for PgrxArg {
     /// #[pg_aggregate]
     /// impl Aggregate for Aggregated {
     ///     #[pgrx(immutable, parallel_safe)]
-    ///     fn state(current: _, args: _, fcinfo: _) -> Self::State {) {
+    ///     fn state(current: _, args: _, fcinfo: _) -> Self::State {
     ///         todo!()
     ///     }
     /// }
