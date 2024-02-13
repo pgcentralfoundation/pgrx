@@ -73,7 +73,7 @@ pub fn pg_test(attr: TokenStream, item: TokenStream) -> TokenStream {
             let mut non_test_attributes = Vec::new();
 
             for attribute in func.attrs.iter() {
-                if let Some(ident) = attribute.path.get_ident() {
+                if let Some(ident) = attribute.path().get_ident() {
                     let ident_str = ident.to_string();
 
                     if ident_str == "ignore" || ident_str == "should_panic" {
@@ -105,7 +105,7 @@ pub fn pg_test(attr: TokenStream, item: TokenStream) -> TokenStream {
             let mut att_stream = proc_macro2::TokenStream::new();
 
             for a in attributes.iter() {
-                let as_str = a.tokens.to_string();
+                let as_str = a.to_token_stream().to_string();
                 att_stream.extend(quote! {
                     options.push(#as_str);
                 });
@@ -1057,7 +1057,7 @@ fn parse_postgres_type_args(attributes: &[Attribute]) -> HashSet<PostgresTypeAtt
     let mut categorized_attributes = HashSet::new();
 
     for a in attributes {
-        let path = &a.path;
+        let path = &a.path();
         let path = quote! {#path}.to_string();
         match path.as_str() {
             "inoutfuncs" => {
