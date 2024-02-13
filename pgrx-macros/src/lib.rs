@@ -133,7 +133,7 @@ pub fn pg_test(attr: TokenStream, item: TokenStream) -> TokenStream {
                 thing.span(),
                 "#[pg_test] can only be applied to top-level functions",
             )
-            .to_compile_error()
+            .into_compile_error()
             .into()
         }
     }
@@ -197,12 +197,7 @@ pub fn pg_cast(attr: TokenStream, item: TokenStream) -> TokenStream {
         Ok(CodeEnrichment(pg_extern.as_cast(cast)).to_token_stream().into())
     }
 
-    wrapped(attr, item).unwrap_or_else(|e| {
-        let msg = e.to_string();
-        TokenStream::from(quote! {
-          compile_error!(#msg);
-        })
-    })
+    wrapped(attr, item).unwrap_or_else(|e: syn::Error| e.into_compile_error().into())
 }
 
 /// Declare a function as `#[pg_operator]` to indicate that it represents a Postgres operator
@@ -288,12 +283,7 @@ pub fn pg_schema(_attr: TokenStream, input: TokenStream) -> TokenStream {
         Ok(pgrx_schema.to_token_stream().into())
     }
 
-    wrapped(input).unwrap_or_else(|e| {
-        let msg = e.to_string();
-        TokenStream::from(quote! {
-          compile_error!(#msg);
-        })
-    })
+    wrapped(input).unwrap_or_else(|e: syn::Error| e.into_compile_error().into())
 }
 
 /**
@@ -428,12 +418,7 @@ pub fn extension_sql(input: TokenStream) -> TokenStream {
         Ok(ext_sql.to_token_stream().into())
     }
 
-    wrapped(input).unwrap_or_else(|e| {
-        let msg = e.to_string();
-        TokenStream::from(quote! {
-          compile_error!(#msg);
-        })
-    })
+    wrapped(input).unwrap_or_else(|e: syn::Error| e.into_compile_error().into())
 }
 
 /**
@@ -470,12 +455,7 @@ pub fn extension_sql_file(input: TokenStream) -> TokenStream {
         Ok(ext_sql.to_token_stream().into())
     }
 
-    wrapped(input).unwrap_or_else(|e| {
-        let msg = e.to_string();
-        TokenStream::from(quote! {
-          compile_error!(#msg);
-        })
-    })
+    wrapped(input).unwrap_or_else(|e: syn::Error| e.into_compile_error().into())
 }
 
 /// Associated macro for `#[pg_extern]` or `#[macro@pg_operator]`.  Used to set the `SEARCH_PATH` option
@@ -631,7 +611,7 @@ pub fn pg_extern(attr: TokenStream, item: TokenStream) -> TokenStream {
         Ok(pg_extern_item.to_token_stream().into())
     }
 
-    wrapped(attr, item).unwrap_or_else(|e: syn::Error| e.to_compile_error().into())
+    wrapped(attr, item).unwrap_or_else(|e: syn::Error| e.into_compile_error().into())
 }
 
 /**
@@ -653,7 +633,7 @@ enum DogNames {
 pub fn postgres_enum(input: TokenStream) -> TokenStream {
     let ast = parse_macro_input!(input as syn::DeriveInput);
 
-    impl_postgres_enum(ast).unwrap_or_else(|e| e.to_compile_error()).into()
+    impl_postgres_enum(ast).unwrap_or_else(|e| e.into_compile_error()).into()
 }
 
 fn impl_postgres_enum(ast: DeriveInput) -> syn::Result<proc_macro2::TokenStream> {
@@ -766,7 +746,7 @@ Optionally accepts the following attributes:
 pub fn postgres_type(input: TokenStream) -> TokenStream {
     let ast = parse_macro_input!(input as syn::DeriveInput);
 
-    impl_postgres_type(ast).unwrap_or_else(|e| e.to_compile_error()).into()
+    impl_postgres_type(ast).unwrap_or_else(|e| e.into_compile_error()).into()
 }
 
 fn impl_postgres_type(ast: DeriveInput) -> syn::Result<proc_macro2::TokenStream> {
@@ -958,7 +938,7 @@ fn impl_postgres_type(ast: DeriveInput) -> syn::Result<proc_macro2::TokenStream>
 pub fn postgres_guc_enum(input: TokenStream) -> TokenStream {
     let ast = parse_macro_input!(input as syn::DeriveInput);
 
-    impl_guc_enum(ast).unwrap_or_else(|e| e.to_compile_error()).into()
+    impl_guc_enum(ast).unwrap_or_else(|e| e.into_compile_error()).into()
 }
 
 fn impl_guc_enum(ast: DeriveInput) -> syn::Result<proc_macro2::TokenStream> {
@@ -1173,7 +1153,7 @@ pub fn pg_aggregate(_attr: TokenStream, item: TokenStream) -> TokenStream {
     }
 
     let parsed_base = parse_macro_input!(item as syn::ItemImpl);
-    wrapped(parsed_base).unwrap_or_else(|e| e.to_compile_error().into())
+    wrapped(parsed_base).unwrap_or_else(|e| e.into_compile_error().into())
 }
 
 /**
@@ -1224,5 +1204,5 @@ pub fn pg_trigger(attrs: TokenStream, input: TokenStream) -> TokenStream {
         Ok(trigger_tokens.into())
     }
 
-    wrapped(attrs, input).unwrap_or_else(|e| e.to_compile_error().into())
+    wrapped(attrs, input).unwrap_or_else(|e| e.into_compile_error().into())
 }
