@@ -35,7 +35,7 @@ pub fn anonymize_lifetimes(value: &mut syn::Type) {
                 }
                 // recurse
                 syn::GenericArgument::Type(ty) => anonymize_lifetimes(ty),
-                syn::GenericArgument::Binding(binding) => anonymize_lifetimes(&mut binding.ty),
+                syn::GenericArgument::AssocType(binding) => anonymize_lifetimes(&mut binding.ty),
                 syn::GenericArgument::Constraint(constraint) => {
                     constraint.bounds.iter_mut().for_each(|bound| {
                         if let syn::TypeParamBound::Lifetime(lifetime) = bound {
