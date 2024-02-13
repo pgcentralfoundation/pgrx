@@ -15,8 +15,6 @@ Type level metadata for Rust to SQL generation.
 to the `pgrx` framework and very subject to change between versions. While you may use this, please do it with caution.
 
 */
-use std::ops::Deref;
-
 use crate::composite_type::{handle_composite_type_macro, CompositeTypeMacro};
 use crate::lifetimes::anonymize_lifetimes;
 use proc_macro2::Span;
