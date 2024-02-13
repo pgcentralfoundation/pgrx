@@ -183,7 +183,7 @@ impl PgExtern {
             Ok(meta) if meta.path().is_ident("doc") => Some(meta),
             _ => None,
         }) {
-            let Meta::NameValue(syn::MetaNameValue { lit, .. }) = meta else { continue };
+            let Meta::NameValue(syn::MetaNameValue { value, .. }) = meta else { continue };
             let syn::Lit::Str(ref inner) = lit else { continue };
             span.get_or_insert(lit.span());
             if !in_commented_sql_block && inner.value().trim() == "```pgrxsql" {

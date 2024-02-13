@@ -15,6 +15,7 @@
 to the `pgrx` framework and very subject to change between versions. While you may use this, please do it with caution.
 
 */
+use quote::ToTokens;
 use syn::parse::{Parse, ParseStream};
 use syn::punctuated::Punctuated;
 use syn::Token;
