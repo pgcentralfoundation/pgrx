@@ -29,7 +29,7 @@ pub use operator::PgOperator;
 pub use returning::NameMacro;
 
 use crate::ToSqlConfig;
-use attribute::Attribute;
+pub(crate) use attribute::Attribute;
 use operator::{PgrxOperatorAttributeWithIdent, PgrxOperatorOpName};
 use search_path::SearchPathList;
 
@@ -214,6 +214,7 @@ impl PgExtern {
         retval.map(|s| syn::LitStr::new(s.as_ref(), span.unwrap()))
     }
 
+    #[track_caller]
     fn operator(func: &syn::ItemFn) -> syn::Result<Option<PgOperator>> {
         let mut skel = Option::<PgOperator>::default();
         for attr in &func.attrs {

@@ -627,7 +627,7 @@ fn example_return() -> pg_sys::Oid {
 #[track_caller]
 pub fn pg_extern(attr: TokenStream, item: TokenStream) -> TokenStream {
     fn wrapped(attr: TokenStream, item: TokenStream) -> Result<TokenStream, syn::Error> {
-        let pg_extern_item = PgExtern::new(attr.clone().into(), item.clone().into())?;
+        let pg_extern_item = PgExtern::new(attr.into(), item.into())?;
         Ok(pg_extern_item.to_token_stream().into())
     }
 
@@ -1173,12 +1173,7 @@ pub fn pg_aggregate(_attr: TokenStream, item: TokenStream) -> TokenStream {
     }
 
     let parsed_base = parse_macro_input!(item as syn::ItemImpl);
-    wrapped(parsed_base).unwrap_or_else(|e| {
-        let msg = e.to_string();
-        TokenStream::from(quote! {
-          compile_error!(#msg);
-        })
-    })
+    wrapped(parsed_base).unwrap_or_else(|e| e.to_compile_error().into())
 }
 
 /**
@@ -1229,10 +1224,5 @@ pub fn pg_trigger(attrs: TokenStream, input: TokenStream) -> TokenStream {
         Ok(trigger_tokens.into())
     }
 
-    wrapped(attrs, input).unwrap_or_else(|e| {
-        let msg = e.to_string();
-        TokenStream::from(quote! {
-          compile_error!(#msg);
-        })
-    })
+    wrapped(attrs, input).unwrap_or_else(|e| e.to_compile_error().into())
 }

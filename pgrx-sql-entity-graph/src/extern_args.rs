@@ -116,6 +116,8 @@ impl ToTokens for ExternArgs {
     }
 }
 
+// This horror-story should be returning result
+#[track_caller]
 pub fn parse_extern_attributes(attr: TokenStream) -> HashSet<ExternArgs> {
     let mut args = HashSet::<ExternArgs>::new();
     let mut itr = attr.into_iter();

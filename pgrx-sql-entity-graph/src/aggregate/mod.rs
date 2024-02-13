@@ -30,6 +30,7 @@ use convert_case::{Case, Casing};
 use proc_macro2::{Ident, Span, TokenStream as TokenStream2};
 use quote::quote;
 use syn::parse::{Parse, ParseStream};
+use syn::punctuated::Punctuated;
 use syn::spanned::Spanned;
 use syn::{
     parse_quote, Expr, ImplItemConst, ImplItemFn, ImplItemType, ItemFn, ItemImpl, Path, Type,
@@ -764,15 +765,24 @@ fn pg_extern_attr(item: &ImplItemFn) -> syn::Attribute {
     for attr in item.attrs.iter() {
         match attr.path().segments.last() {
             Some(segment) if segment.ident == "pgrx" => {
-                found = Some(quote::ToTokens::to_token_stream(attr));
+                found = Some(attr);
                 break;
             }
             _ => (),
         };
     }
-    match found {
+
+    let attrs = if let Some(attr) = found {
+        let parser = Punctuated::<super::pg_extern::Attribute, syn::Token![,]>::parse_terminated;
+        let attrs = attr.parse_args_with(parser);
+        attrs.ok()
+    } else {
+        None
+    };
+
+    match attrs {
         Some(args) => parse_quote! {
-            #[::pgrx::pg_extern #args]
+            #[::pgrx::pg_extern(#args)]
         },
         None => parse_quote! {
             #[::pgrx::pg_extern]
