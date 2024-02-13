@@ -64,7 +64,7 @@ impl Parse for SearchPathList {
     fn parse(input: ParseStream) -> Result<Self, syn::Error> {
         Ok(Self {
             fields: input
-                .parse_terminated(SearchPath::parse)
+                .parse_terminated(SearchPath::parse, Token![,])
                 .unwrap_or_else(|_| panic!("Got {}", input)),
         })
     }
