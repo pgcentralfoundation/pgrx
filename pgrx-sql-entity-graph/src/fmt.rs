@@ -1,3 +1,5 @@
+/// Evaluate an expression that resolves to any `impl ToTokens`, then produce a closure
+/// for lazily combining errors only on the unhappy path of `syn::Result`
 macro_rules! lazy_err {
     ($span_expr:expr, $lit:literal $(, $tokens:tt),*) => {
         {
