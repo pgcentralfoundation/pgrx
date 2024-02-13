@@ -764,7 +764,7 @@ fn pg_extern_attr(item: &ImplItemFn) -> syn::Attribute {
     for attr in item.attrs.iter() {
         match attr.path().segments.last() {
             Some(segment) if segment.ident == "pgrx" => {
-                found = Some(attr.tokens.clone());
+                found = Some(quote::ToTokens::to_token_stream(attr));
                 break;
             }
             _ => (),

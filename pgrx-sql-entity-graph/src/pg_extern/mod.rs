@@ -213,23 +213,23 @@ impl PgExtern {
             let last_segment = attr.path().segments.last().unwrap();
             match last_segment.ident.to_string().as_str() {
                 "opname" => {
-                    let attr: PgrxOperatorOpName = syn::parse2(attr.tokens.clone())?;
+                    let attr: PgrxOperatorOpName = syn::parse2(attr.to_token_stream())?;
                     skel.get_or_insert_with(Default::default).opname.get_or_insert(attr);
                 }
                 "commutator" => {
-                    let attr: PgrxOperatorAttributeWithIdent = syn::parse2(attr.tokens.clone())?;
+                    let attr: PgrxOperatorAttributeWithIdent = syn::parse2(attr.to_token_stream())?;
                     skel.get_or_insert_with(Default::default).commutator.get_or_insert(attr);
                 }
                 "negator" => {
-                    let attr: PgrxOperatorAttributeWithIdent = syn::parse2(attr.tokens.clone())?;
+                    let attr: PgrxOperatorAttributeWithIdent = syn::parse2(attr.to_token_stream())?;
                     skel.get_or_insert_with(Default::default).negator.get_or_insert(attr);
                 }
                 "join" => {
-                    let attr: PgrxOperatorAttributeWithIdent = syn::parse2(attr.tokens.clone())?;
+                    let attr: PgrxOperatorAttributeWithIdent = syn::parse2(attr.to_token_stream())?;
                     skel.get_or_insert_with(Default::default).join.get_or_insert(attr);
                 }
                 "restrict" => {
-                    let attr: PgrxOperatorAttributeWithIdent = syn::parse2(attr.tokens.clone())?;
+                    let attr: PgrxOperatorAttributeWithIdent = syn::parse2(attr.to_token_stream())?;
                     skel.get_or_insert_with(Default::default).restrict.get_or_insert(attr);
                 }
                 "hashes" => {
