@@ -51,7 +51,7 @@ impl Parse for PgrxArg {
     /// Parse `name = val` in `#[pgrx(name = val)]`
     ///
     /// It may seem like we leave this unhandled:
-    /// ```rust
+    /// ```rust,ignore
     /// #[pg_aggregate]
     /// impl Aggregate for Aggregated {
     ///     #[pgrx(immutable, parallel_safe)]
