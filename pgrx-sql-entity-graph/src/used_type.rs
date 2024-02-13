@@ -640,27 +640,6 @@ fn handle_default_macro(mac: &syn::Macro) -> syn::Result<(syn::Type, Option<Stri
                 format!("Unrecognized UnaryExpr in `default!()` macro, got: {:?}", out.expr),
             )),
         },
-        syn::Expr::Type(syn::ExprType { ref ty, .. }) => match ty.deref() {
-            syn::Type::Path(syn::TypePath { path: syn::Path { segments, .. }, .. }) => {
-                let last = segments.last().expect("No last segment");
-                let last_string = last.ident.to_string();
-                if last_string == "NULL" {
-                    Ok((true_ty, Some(last_string)))
-                } else {
-                    Err(syn::Error::new(
-                        Span::call_site(),
-                        format!(
-                            "Unable to parse default value of `default!()` macro, got: {:?}",
-                            out.expr
-                        ),
-                    ))
-                }
-            }
-            _ => Err(syn::Error::new(
-                Span::call_site(),
-                format!("Unable to parse default value of `default!()` macro, got: {:?}", out.expr),
-            )),
-        },
         syn::Expr::Path(syn::ExprPath { path: syn::Path { ref segments, .. }, .. }) => {
             let last = segments.last().expect("No last segment");
             let last_string = last.ident.to_string();
