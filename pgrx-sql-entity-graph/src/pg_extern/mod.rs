@@ -220,15 +220,25 @@ impl PgExtern {
             let last_segment = attr.path().segments.last().unwrap();
             match last_segment.ident.to_string().as_str() {
                 "opname" => {
-                    let attr: PgrxOperatorOpName = syn::parse2(attr.to_token_stream()).map_err(|e| {
+                    // we've been accepting strings of tokens for a while now
+                    let attr = attr.parse_args::<PgrxOperatorOpName>().map_err(|e| {
                         let mut e = e.clone();
-                        e.combine(syn::Error::new(Span::call_site(), "bad parse of opname?"));
+                        e.combine(syn::Error::new_spanned(
+                            attr.to_token_stream(),
+                            "bad parse of opname?",
+                        ));
                         e
                     })?;
                     skel.get_or_insert_with(Default::default).opname.get_or_insert(attr);
                 }
                 "commutator" => {
-                    let attr: PgrxOperatorAttributeWithIdent = syn::parse2(attr.to_token_stream())?;
+                    let attr_ts = attr.to_token_stream();
+                    let attr: PgrxOperatorAttributeWithIdent = syn::parse2(attr_ts.clone())
+                        .map_err(|e| {
+                            let mut e = e.clone();
+                            e.combine(syn::Error::new_spanned(attr_ts, "bad parse of commutator?"));
+                            e
+                        })?;
                     skel.get_or_insert_with(Default::default).commutator.get_or_insert(attr);
                 }
                 "negator" => {

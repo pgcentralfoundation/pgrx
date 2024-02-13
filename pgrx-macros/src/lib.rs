@@ -631,9 +631,7 @@ pub fn pg_extern(attr: TokenStream, item: TokenStream) -> TokenStream {
         Ok(pg_extern_item.to_token_stream().into())
     }
 
-    wrapped(attr, item).unwrap_or_else(|e: syn::Error| {
-        e.to_compile_error().into()
-    })
+    wrapped(attr, item).unwrap_or_else(|e: syn::Error| e.to_compile_error().into())
 }
 
 /**
