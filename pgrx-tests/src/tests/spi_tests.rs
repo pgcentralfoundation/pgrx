@@ -17,6 +17,7 @@ mod tests {
 
     use pgrx::prelude::*;
     use pgrx::spi;
+    use pgrx::spi::Query;
 
     #[pg_test(error = "syntax error at or near \"THIS\"")]
     fn test_spi_failure() -> Result<(), spi::Error> {
@@ -415,6 +416,26 @@ mod tests {
             client.update("CREATE TABLE a (id INT)", None, None)?;
             // This is supposed to run in read-write
             client.select("INSERT INTO a VALUES (1)", None, None)?;
+            Ok(())
+        })
+    }
+
+    #[pg_test(error = "CREATE TABLE is not allowed in a non-volatile function")]
+    fn test_execute_prepared_statement_in_readonly() -> Result<(), spi::Error> {
+        Spi::connect(|client| {
+            let stmt = client.prepare("CREATE TABLE a ()", None)?;
+            // This is supposed to run in read-only
+            stmt.execute(&client, Some(1), None)?;
+            Ok(())
+        })
+    }
+
+    #[pg_test]
+    fn test_execute_prepared_statement_in_readwrite() -> Result<(), spi::Error> {
+        Spi::connect(|client| {
+            let stmt = client.prepare_mut("CREATE TABLE a ()", None)?;
+            // This is supposed to run in read-write
+            stmt.execute(&client, Some(1), None)?;
             Ok(())
         })
     }

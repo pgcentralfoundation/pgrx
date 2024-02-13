@@ -232,9 +232,6 @@ impl<'conn: 'stmt, 'stmt> Query<'conn> for &'stmt PreparedStatement<'conn> {
         limit: Option<libc::c_long>,
         arguments: Self::Arguments,
     ) -> SpiResult<SpiTupleTable<'conn>> {
-        if self.mutating {
-            Spi::mark_mutable();
-        }
         // SAFETY: no concurrent access
         unsafe {
             pg_sys::SPI_tuptable = std::ptr::null_mut();
@@ -256,7 +253,7 @@ impl<'conn: 'stmt, 'stmt> Query<'conn> for &'stmt PreparedStatement<'conn> {
                 self.plan.as_ptr(),
                 datums.as_mut_ptr(),
                 nulls.as_mut_ptr(),
-                Spi::is_xact_still_immutable(),
+                !self.mutating && Spi::is_xact_still_immutable(),
                 limit.unwrap_or(0),
             )
         };
@@ -265,9 +262,6 @@ impl<'conn: 'stmt, 'stmt> Query<'conn> for &'stmt PreparedStatement<'conn> {
     }
 
     fn open_cursor(self, _client: &SpiClient<'conn>, args: Self::Arguments) -> SpiCursor<'conn> {
-        if self.mutating {
-            Spi::mark_mutable();
-        }
         let args = args.unwrap_or_default();
 
         let (mut datums, nulls): (Vec<_>, Vec<_>) = args.into_iter().map(prepare_datum).unzip();
@@ -280,7 +274,7 @@ impl<'conn: 'stmt, 'stmt> Query<'conn> for &'stmt PreparedStatement<'conn> {
                 self.plan.as_ptr(),
                 datums.as_mut_ptr(),
                 nulls.as_ptr(),
-                Spi::is_xact_still_immutable(),
+                !self.mutating && Spi::is_xact_still_immutable(),
             ))
         };
         SpiCursor { ptr, __marker: PhantomData }
