@@ -17,7 +17,7 @@ to the `pgrx` framework and very subject to change between versions. While you m
 */
 use syn::parse::{Parse, ParseStream};
 use syn::punctuated::Punctuated;
-use syn::{parenthesized, token, Token};
+use syn::Token;
 
 /// This struct is intended to represent the contents of the `#[pgrx]` attribute when parsed.
 ///
@@ -42,35 +42,43 @@ impl Parse for PgrxAttribute {
 
 /// This enum is akin to `syn::Meta`, but supports a custom `NameValue` variant which allows
 /// for bare paths in the value position.
+#[derive(Debug)]
 pub enum PgrxArg {
-    Path(syn::Path),
-    List(syn::MetaList),
     NameValue(NameValueArg),
 }
 
 impl Parse for PgrxArg {
+    /// Parse `name = val` in `#[pgrx(name = val)]`
+    ///
+    /// It may seem like we leave this unhandled:
+    /// ```rust
+    /// #[pg_aggregate]
+    /// impl Aggregate for Aggregated {
+    ///     #[pgrx(immutable, parallel_safe)]
+    ///     fn state(current: _, args: _, fcinfo: _) -> Self::State {) {
+    ///         todo!()
+    ///     }
+    /// }
+    /// ```
+    /// However, that actually never reaches this point!
+    /// This parser only handles the direct attributes.
+    #[track_caller]
     fn parse(input: ParseStream<'_>) -> syn::Result<Self> {
         let path = input.parse::<syn::Path>()?;
-        if input.peek(token::Paren) {
-            let content;
-            Ok(Self::List(syn::MetaList {
-                path,
-                paren_token: parenthesized!(content in input),
-                nested: content.parse_terminated(syn::NestedMeta::parse)?,
-            }))
-        } else if input.peek(Token![=]) {
+        if input.peek(Token![=]) {
             Ok(Self::NameValue(NameValueArg {
                 path,
                 eq_token: input.parse()?,
                 value: input.parse()?,
             }))
         } else {
-            Ok(Self::Path(path))
+            Err(input.error("unsupported argument to #[pgrx] in this context"))
         }
     }
 }
 
 /// This struct is akin to `syn::NameValueMeta`, but allows for more than just `syn::Lit` as a value.
+#[derive(Debug)]
 pub struct NameValueArg {
     pub path: syn::Path,
     pub eq_token: syn::token::Eq,
@@ -78,12 +86,14 @@ pub struct NameValueArg {
 }
 
 /// This is the type of a value that can be used in the value position of a `name = value` attribute argument.
+#[derive(Debug)]
 pub enum ArgValue {
     Path(syn::Path),
     Lit(syn::Lit),
 }
 
 impl Parse for ArgValue {
+    /// Parse `val` in `#[pgrx(name = val)]`
     fn parse(input: ParseStream<'_>) -> syn::Result<Self> {
         if input.peek(syn::Lit) {
             return Ok(Self::Lit(input.parse()?));

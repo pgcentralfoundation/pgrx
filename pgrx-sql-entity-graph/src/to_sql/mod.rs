@@ -94,28 +94,27 @@ impl ToSqlConfig {
 
         let attr = attr.parse_args::<PgrxAttribute>()?;
         for arg in attr.args.iter() {
-            if let PgrxArg::NameValue(ref nv) = arg {
-                if !nv.path.is_ident("sql") {
-                    continue;
-                }
-
-                return match nv.value {
-                    ArgValue::Path(ref callback_path) => Ok(Some(Self {
-                        enabled: true,
-                        callback: Some(callback_path.clone()),
-                        content: None,
-                    })),
-                    ArgValue::Lit(Lit::Bool(ref b)) => {
-                        Ok(Some(Self { enabled: b.value, callback: None, content: None }))
-                    }
-                    ArgValue::Lit(Lit::Str(ref s)) => {
-                        Ok(Some(Self { enabled: true, callback: None, content: Some(s.clone()) }))
-                    }
-                    ArgValue::Lit(ref other) => {
-                        Err(syn::Error::new(other.span(), INVALID_ATTR_CONTENT))
-                    }
-                };
+            let PgrxArg::NameValue(ref nv) = arg;
+            if !nv.path.is_ident("sql") {
+                continue;
             }
+
+            return match nv.value {
+                ArgValue::Path(ref callback_path) => Ok(Some(Self {
+                    enabled: true,
+                    callback: Some(callback_path.clone()),
+                    content: None,
+                })),
+                ArgValue::Lit(Lit::Bool(ref b)) => {
+                    Ok(Some(Self { enabled: b.value, callback: None, content: None }))
+                }
+                ArgValue::Lit(Lit::Str(ref s)) => {
+                    Ok(Some(Self { enabled: true, callback: None, content: Some(s.clone()) }))
+                }
+                ArgValue::Lit(ref other) => {
+                    Err(syn::Error::new(other.span(), INVALID_ATTR_CONTENT))
+                }
+            };
         }
 
         Ok(None)
