@@ -17,9 +17,7 @@ to the `pgrx` framework and very subject to change between versions. While you m
 */
 use proc_macro2::TokenStream as TokenStream2;
 use quote::{quote, ToTokens, TokenStreamExt};
-use syn::parenthesized;
 use syn::parse::{Parse, ParseBuffer};
-use syn::token::Paren;
 
 /// A parsed `#[pg_operator]` operator.
 ///
@@ -61,17 +59,12 @@ impl ToTokens for PgOperator {
 
 #[derive(Debug, Clone)]
 pub struct PgrxOperatorAttributeWithIdent {
-    pub paren_token: Paren,
     pub fn_name: TokenStream2,
 }
 
 impl Parse for PgrxOperatorAttributeWithIdent {
     fn parse(input: &ParseBuffer) -> Result<Self, syn::Error> {
-        let inner;
-        Ok(PgrxOperatorAttributeWithIdent {
-            paren_token: parenthesized!(inner in input),
-            fn_name: inner.parse()?,
-        })
+        Ok(PgrxOperatorAttributeWithIdent { fn_name: input.parse()? })
     }
 }
 
@@ -88,17 +81,12 @@ impl ToTokens for PgrxOperatorAttributeWithIdent {
 
 #[derive(Debug, Clone)]
 pub struct PgrxOperatorOpName {
-    pub paren_token: Paren,
     pub op_name: TokenStream2,
 }
 
 impl Parse for PgrxOperatorOpName {
     fn parse(input: &ParseBuffer) -> Result<Self, syn::Error> {
-        let inner;
-        Ok(PgrxOperatorOpName {
-            paren_token: parenthesized!(inner in input),
-            op_name: inner.parse()?,
-        })
+        Ok(PgrxOperatorOpName { op_name: input.parse()? })
     }
 }
 

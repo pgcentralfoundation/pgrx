@@ -62,11 +62,7 @@ pub struct SearchPathList {
 
 impl Parse for SearchPathList {
     fn parse(input: ParseStream) -> Result<Self, syn::Error> {
-        Ok(Self {
-            fields: input
-                .parse_terminated(SearchPath::parse)
-                .unwrap_or_else(|_| panic!("Got {}", input)),
-        })
+        Ok(Self { fields: input.parse_terminated(SearchPath::parse, Token![,])? })
     }
 }
 

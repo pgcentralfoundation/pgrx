@@ -21,7 +21,7 @@ use crate::enrich::{ToEntityGraphTokens, ToRustCodeTokens};
 use proc_macro2::{Ident, Span, TokenStream as TokenStream2};
 use quote::quote;
 use syn::parse::{Parse, ParseStream};
-use syn::{DeriveInput, Generics, ItemStruct, Lifetime, LifetimeDef};
+use syn::{DeriveInput, Generics, ItemStruct, Lifetime, LifetimeParam};
 
 use crate::{CodeEnrichment, ToSqlConfig};
 
@@ -116,7 +116,7 @@ impl ToEntityGraphTokens for PostgresTypeDerive {
                     Some(item)
                 }
                 syn::GenericParam::Lifetime(lt_def) => Some(syn::GenericParam::Lifetime(
-                    LifetimeDef::new(Lifetime::new("'_", lt_def.lifetime.span())),
+                    LifetimeParam::new(Lifetime::new("'_", lt_def.lifetime.span())),
                 )),
             })
             .collect();

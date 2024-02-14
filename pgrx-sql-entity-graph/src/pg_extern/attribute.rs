@@ -190,7 +190,7 @@ impl Parse for Attribute {
                 let _eq: syn::token::Eq = input.parse()?;
                 let content;
                 let _bracket = syn::bracketed!(content in input);
-                Self::Requires(content.parse_terminated(PositioningRef::parse)?)
+                Self::Requires(content.parse_terminated(PositioningRef::parse, Token![,])?)
             }
             "sql" => {
                 use crate::pgrx_attribute::ArgValue;

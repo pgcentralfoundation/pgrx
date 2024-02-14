@@ -60,7 +60,10 @@ cargo_toml = "0.16" # used for building projects
 eyre = "0.6.9" # simplifies error-handling
 libc = "0.2" # FFI compat
 owo-colors = "3.5" # for output highlighting
+proc-macro2 = { version = "1.0.78", features = [ "span-locations" ] }
+quote = "1.0.33"
 regex = "1.1" # used for build/test
+syn = { version = "2", features = [ "extra-traits", "full", "parsing" ] }
 thiserror = "1"
 unescape = "0.1.0" # for escaped-character-handling
 url = "2.4.1" # the non-existent std::web

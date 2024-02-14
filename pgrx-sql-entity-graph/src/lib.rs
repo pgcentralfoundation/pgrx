@@ -56,6 +56,7 @@ pub(crate) mod control_file;
 pub(crate) mod enrich;
 pub(crate) mod extension_sql;
 pub(crate) mod extern_args;
+#[macro_use]
 pub(crate) mod fmt;
 pub mod lifetimes;
 pub(crate) mod mapping;

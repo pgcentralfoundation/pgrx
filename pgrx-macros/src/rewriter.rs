@@ -40,7 +40,7 @@ pub fn item_fn_without_rewrite(mut func: ItemFn) -> syn::Result<proc_macro2::Tok
 
     let generics = func.sig.generics.clone();
 
-    if attrs.iter().any(|attr| attr.path.is_ident("no_mangle"))
+    if attrs.iter().any(|attr| attr.path().is_ident("no_mangle"))
         && generics.params.iter().any(|p| match p {
             GenericParam::Type(_) => true,
             GenericParam::Lifetime(_) => false,

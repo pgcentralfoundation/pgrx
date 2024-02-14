@@ -15,8 +15,6 @@ Type level metadata for Rust to SQL generation.
 to the `pgrx` framework and very subject to change between versions. While you may use this, please do it with caution.
 
 */
-use std::ops::Deref;
-
 use crate::composite_type::{handle_composite_type_macro, CompositeTypeMacro};
 use crate::lifetimes::anonymize_lifetimes;
 use proc_macro2::Span;
@@ -638,27 +636,6 @@ fn handle_default_macro(mac: &syn::Macro) -> syn::Result<(syn::Type, Option<Stri
             _ => Err(syn::Error::new(
                 Span::call_site(),
                 format!("Unrecognized UnaryExpr in `default!()` macro, got: {:?}", out.expr),
-            )),
-        },
-        syn::Expr::Type(syn::ExprType { ref ty, .. }) => match ty.deref() {
-            syn::Type::Path(syn::TypePath { path: syn::Path { segments, .. }, .. }) => {
-                let last = segments.last().expect("No last segment");
-                let last_string = last.ident.to_string();
-                if last_string == "NULL" {
-                    Ok((true_ty, Some(last_string)))
-                } else {
-                    Err(syn::Error::new(
-                        Span::call_site(),
-                        format!(
-                            "Unable to parse default value of `default!()` macro, got: {:?}",
-                            out.expr
-                        ),
-                    ))
-                }
-            }
-            _ => Err(syn::Error::new(
-                Span::call_site(),
-                format!("Unable to parse default value of `default!()` macro, got: {:?}", out.expr),
             )),
         },
         syn::Expr::Path(syn::ExprPath { path: syn::Path { ref segments, .. }, .. }) => {

@@ -128,7 +128,7 @@ impl Parse for CodeEnrichment<ExtensionSqlFile> {
     fn parse(input: ParseStream) -> Result<Self, syn::Error> {
         let path = input.parse()?;
         let _after_sql_comma: Option<Token![,]> = input.parse()?;
-        let attrs = input.parse_terminated(ExtensionSqlAttribute::parse)?;
+        let attrs = input.parse_terminated(ExtensionSqlAttribute::parse, Token![,])?;
         Ok(CodeEnrichment(ExtensionSqlFile { path, attrs }))
     }
 }
@@ -226,7 +226,7 @@ impl Parse for CodeEnrichment<ExtensionSql> {
     fn parse(input: ParseStream) -> Result<Self, syn::Error> {
         let sql = input.parse()?;
         let _after_sql_comma: Option<Token![,]> = input.parse()?;
-        let attrs = input.parse_terminated(ExtensionSqlAttribute::parse)?;
+        let attrs = input.parse_terminated(ExtensionSqlAttribute::parse, Token![,])?;
         let name = attrs.iter().rev().find_map(|attr| match attr {
             ExtensionSqlAttribute::Name(found_name) => Some(found_name.clone()),
             _ => None,
@@ -260,13 +260,13 @@ impl Parse for ExtensionSqlAttribute {
                 let _eq: syn::token::Eq = input.parse()?;
                 let content;
                 let _bracket = syn::bracketed!(content in input);
-                Self::Creates(content.parse_terminated(SqlDeclared::parse)?)
+                Self::Creates(content.parse_terminated(SqlDeclared::parse, Token![,])?)
             }
             "requires" => {
                 let _eq: syn::token::Eq = input.parse()?;
                 let content;
                 let _bracket = syn::bracketed!(content in input);
-                Self::Requires(content.parse_terminated(PositioningRef::parse)?)
+                Self::Requires(content.parse_terminated(PositioningRef::parse, Token![,])?)
             }
             "bootstrap" => Self::Bootstrap,
             "finalize" => Self::Finalize,

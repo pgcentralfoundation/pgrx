@@ -28,8 +28,9 @@ pub use cast::PgCast;
 pub use operator::PgOperator;
 pub use returning::NameMacro;
 
+use crate::fmt::ErrHarder;
 use crate::ToSqlConfig;
-use attribute::Attribute;
+pub(crate) use attribute::Attribute;
 use operator::{PgrxOperatorAttributeWithIdent, PgrxOperatorOpName};
 use search_path::SearchPathList;
 
@@ -83,12 +84,16 @@ pub struct PgExtern {
 }
 
 impl PgExtern {
+    #[track_caller]
     pub fn new(attr: TokenStream2, item: TokenStream2) -> Result<CodeEnrichment<Self>, syn::Error> {
         let mut attrs = Vec::new();
         let mut to_sql_config: Option<ToSqlConfig> = None;
 
         let parser = Punctuated::<Attribute, Token![,]>::parse_terminated;
-        let punctuated_attrs = parser.parse2(attr)?;
+        let attr_ts = attr.clone();
+        let punctuated_attrs = parser
+            .parse2(attr)
+            .more_error(lazy_err!(attr_ts, "failed parsing pg_extern arguments"))?;
         for pair in punctuated_attrs.into_pairs() {
             match pair.into_value() {
                 Attribute::Sql(config) => to_sql_config = to_sql_config.or(Some(config)),
@@ -135,6 +140,7 @@ impl PgExtern {
         result
     }
 
+    #[track_caller]
     fn input_types(func: &syn::ItemFn) -> syn::Result<Vec<syn::Type>> {
         func.sig
             .inputs
@@ -175,17 +181,23 @@ impl PgExtern {
         self.attrs.as_slice()
     }
 
+    #[track_caller]
     fn overridden(&self) -> Option<syn::LitStr> {
         let mut span = None;
         let mut retval = None;
         let mut in_commented_sql_block = false;
-        for meta in self.func.attrs.iter().filter_map(|attr| match attr.parse_meta() {
-            Ok(meta) if meta.path().is_ident("doc") => Some(meta),
-            _ => None,
+        for meta in self.func.attrs.iter().filter_map(|attr| {
+            if attr.meta.path().is_ident("doc") {
+                Some(attr.meta.clone())
+            } else {
+                None
+            }
         }) {
-            let Meta::NameValue(syn::MetaNameValue { lit, .. }) = meta else { continue };
-            let syn::Lit::Str(ref inner) = lit else { continue };
-            span.get_or_insert(lit.span());
+            let Meta::NameValue(syn::MetaNameValue { ref value, .. }) = meta else { continue };
+            let syn::Expr::Lit(syn::ExprLit { lit: syn::Lit::Str(inner), .. }) = value else {
+                continue;
+            };
+            span.get_or_insert(value.span());
             if !in_commented_sql_block && inner.value().trim() == "```pgrxsql" {
                 in_commented_sql_block = true;
             } else if in_commented_sql_block && inner.value().trim() == "```" {
@@ -202,29 +214,44 @@ impl PgExtern {
         retval.map(|s| syn::LitStr::new(s.as_ref(), span.unwrap()))
     }
 
+    #[track_caller]
     fn operator(func: &syn::ItemFn) -> syn::Result<Option<PgOperator>> {
         let mut skel = Option::<PgOperator>::default();
         for attr in &func.attrs {
-            let last_segment = attr.path.segments.last().unwrap();
+            let last_segment = attr.path().segments.last().unwrap();
             match last_segment.ident.to_string().as_str() {
-                "opname" => {
-                    let attr: PgrxOperatorOpName = syn::parse2(attr.tokens.clone())?;
+                s @ "opname" => {
+                    // we've been accepting strings of tokens for a while now
+                    let attr = attr
+                        .parse_args::<PgrxOperatorOpName>()
+                        .more_error(lazy_err!(attr.clone(), "bad parse of {s}?"))?;
                     skel.get_or_insert_with(Default::default).opname.get_or_insert(attr);
                 }
-                "commutator" => {
-                    let attr: PgrxOperatorAttributeWithIdent = syn::parse2(attr.tokens.clone())?;
+                s @ "commutator" => {
+                    let attr: PgrxOperatorAttributeWithIdent = attr
+                        .parse_args()
+                        .more_error(lazy_err!(attr.clone(), "bad parse of {s}?"))?;
+
                     skel.get_or_insert_with(Default::default).commutator.get_or_insert(attr);
                 }
-                "negator" => {
-                    let attr: PgrxOperatorAttributeWithIdent = syn::parse2(attr.tokens.clone())?;
+                s @ "negator" => {
+                    let attr: PgrxOperatorAttributeWithIdent = attr
+                        .parse_args()
+                        .more_error(lazy_err!(attr.clone(), "bad parse of {s}?"))?;
                     skel.get_or_insert_with(Default::default).negator.get_or_insert(attr);
                 }
-                "join" => {
-                    let attr: PgrxOperatorAttributeWithIdent = syn::parse2(attr.tokens.clone())?;
+                s @ "join" => {
+                    let attr: PgrxOperatorAttributeWithIdent = attr
+                        .parse_args()
+                        .more_error(lazy_err!(attr.clone(), "bad parse of {s}?"))?;
+
                     skel.get_or_insert_with(Default::default).join.get_or_insert(attr);
                 }
-                "restrict" => {
-                    let attr: PgrxOperatorAttributeWithIdent = syn::parse2(attr.tokens.clone())?;
+                s @ "restrict" => {
+                    let attr: PgrxOperatorAttributeWithIdent = attr
+                        .parse_args()
+                        .more_error(lazy_err!(attr.clone(), "bad parse of {s}?"))?;
+
                     skel.get_or_insert_with(Default::default).restrict.get_or_insert(attr);
                 }
                 "hashes" => {
@@ -243,7 +270,7 @@ impl PgExtern {
         func.attrs
             .iter()
             .find(|f| {
-                f.path
+                f.path()
                     .segments
                     .first()
                     .map(|f| f.ident == Ident::new("search_path", Span::call_site()))

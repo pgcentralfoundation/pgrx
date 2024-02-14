@@ -73,7 +73,7 @@ pub fn pg_test(attr: TokenStream, item: TokenStream) -> TokenStream {
             let mut non_test_attributes = Vec::new();
 
             for attribute in func.attrs.iter() {
-                if let Some(ident) = attribute.path.get_ident() {
+                if let Some(ident) = attribute.path().get_ident() {
                     let ident_str = ident.to_string();
 
                     if ident_str == "ignore" || ident_str == "should_panic" {
@@ -105,7 +105,7 @@ pub fn pg_test(attr: TokenStream, item: TokenStream) -> TokenStream {
             let mut att_stream = proc_macro2::TokenStream::new();
 
             for a in attributes.iter() {
-                let as_str = a.tokens.to_string();
+                let as_str = a.to_token_stream().to_string();
                 att_stream.extend(quote! {
                     options.push(#as_str);
                 });
@@ -133,7 +133,7 @@ pub fn pg_test(attr: TokenStream, item: TokenStream) -> TokenStream {
                 thing.span(),
                 "#[pg_test] can only be applied to top-level functions",
             )
-            .to_compile_error()
+            .into_compile_error()
             .into()
         }
     }
@@ -197,12 +197,7 @@ pub fn pg_cast(attr: TokenStream, item: TokenStream) -> TokenStream {
         Ok(CodeEnrichment(pg_extern.as_cast(cast)).to_token_stream().into())
     }
 
-    wrapped(attr, item).unwrap_or_else(|e| {
-        let msg = e.to_string();
-        TokenStream::from(quote! {
-          compile_error!(#msg);
-        })
-    })
+    wrapped(attr, item).unwrap_or_else(|e: syn::Error| e.into_compile_error().into())
 }
 
 /// Declare a function as `#[pg_operator]` to indicate that it represents a Postgres operator
@@ -288,12 +283,7 @@ pub fn pg_schema(_attr: TokenStream, input: TokenStream) -> TokenStream {
         Ok(pgrx_schema.to_token_stream().into())
     }
 
-    wrapped(input).unwrap_or_else(|e| {
-        let msg = e.to_string();
-        TokenStream::from(quote! {
-          compile_error!(#msg);
-        })
-    })
+    wrapped(input).unwrap_or_else(|e: syn::Error| e.into_compile_error().into())
 }
 
 /**
@@ -428,12 +418,7 @@ pub fn extension_sql(input: TokenStream) -> TokenStream {
         Ok(ext_sql.to_token_stream().into())
     }
 
-    wrapped(input).unwrap_or_else(|e| {
-        let msg = e.to_string();
-        TokenStream::from(quote! {
-          compile_error!(#msg);
-        })
-    })
+    wrapped(input).unwrap_or_else(|e: syn::Error| e.into_compile_error().into())
 }
 
 /**
@@ -470,12 +455,7 @@ pub fn extension_sql_file(input: TokenStream) -> TokenStream {
         Ok(ext_sql.to_token_stream().into())
     }
 
-    wrapped(input).unwrap_or_else(|e| {
-        let msg = e.to_string();
-        TokenStream::from(quote! {
-          compile_error!(#msg);
-        })
-    })
+    wrapped(input).unwrap_or_else(|e: syn::Error| e.into_compile_error().into())
 }
 
 /// Associated macro for `#[pg_extern]` or `#[macro@pg_operator]`.  Used to set the `SEARCH_PATH` option
@@ -624,18 +604,14 @@ fn example_return() -> pg_sys::Oid {
 
 */
 #[proc_macro_attribute]
+#[track_caller]
 pub fn pg_extern(attr: TokenStream, item: TokenStream) -> TokenStream {
     fn wrapped(attr: TokenStream, item: TokenStream) -> Result<TokenStream, syn::Error> {
-        let pg_extern_item = PgExtern::new(attr.clone().into(), item.clone().into())?;
+        let pg_extern_item = PgExtern::new(attr.into(), item.into())?;
         Ok(pg_extern_item.to_token_stream().into())
     }
 
-    wrapped(attr, item).unwrap_or_else(|e| {
-        let msg = e.to_string();
-        TokenStream::from(quote! {
-          compile_error!(#msg);
-        })
-    })
+    wrapped(attr, item).unwrap_or_else(|e: syn::Error| e.into_compile_error().into())
 }
 
 /**
@@ -657,7 +633,7 @@ enum DogNames {
 pub fn postgres_enum(input: TokenStream) -> TokenStream {
     let ast = parse_macro_input!(input as syn::DeriveInput);
 
-    impl_postgres_enum(ast).unwrap_or_else(|e| e.to_compile_error()).into()
+    impl_postgres_enum(ast).unwrap_or_else(|e| e.into_compile_error()).into()
 }
 
 fn impl_postgres_enum(ast: DeriveInput) -> syn::Result<proc_macro2::TokenStream> {
@@ -770,7 +746,7 @@ Optionally accepts the following attributes:
 pub fn postgres_type(input: TokenStream) -> TokenStream {
     let ast = parse_macro_input!(input as syn::DeriveInput);
 
-    impl_postgres_type(ast).unwrap_or_else(|e| e.to_compile_error()).into()
+    impl_postgres_type(ast).unwrap_or_else(|e| e.into_compile_error()).into()
 }
 
 fn impl_postgres_type(ast: DeriveInput) -> syn::Result<proc_macro2::TokenStream> {
@@ -962,7 +938,7 @@ fn impl_postgres_type(ast: DeriveInput) -> syn::Result<proc_macro2::TokenStream>
 pub fn postgres_guc_enum(input: TokenStream) -> TokenStream {
     let ast = parse_macro_input!(input as syn::DeriveInput);
 
-    impl_guc_enum(ast).unwrap_or_else(|e| e.to_compile_error()).into()
+    impl_guc_enum(ast).unwrap_or_else(|e| e.into_compile_error()).into()
 }
 
 fn impl_guc_enum(ast: DeriveInput) -> syn::Result<proc_macro2::TokenStream> {
@@ -1057,7 +1033,7 @@ fn parse_postgres_type_args(attributes: &[Attribute]) -> HashSet<PostgresTypeAtt
     let mut categorized_attributes = HashSet::new();
 
     for a in attributes {
-        let path = &a.path;
+        let path = &a.path();
         let path = quote! {#path}.to_string();
         match path.as_str() {
             "inoutfuncs" => {
@@ -1177,12 +1153,7 @@ pub fn pg_aggregate(_attr: TokenStream, item: TokenStream) -> TokenStream {
     }
 
     let parsed_base = parse_macro_input!(item as syn::ItemImpl);
-    wrapped(parsed_base).unwrap_or_else(|e| {
-        let msg = e.to_string();
-        TokenStream::from(quote! {
-          compile_error!(#msg);
-        })
-    })
+    wrapped(parsed_base).unwrap_or_else(|e| e.into_compile_error().into())
 }
 
 /**
@@ -1233,10 +1204,5 @@ pub fn pg_trigger(attrs: TokenStream, input: TokenStream) -> TokenStream {
         Ok(trigger_tokens.into())
     }
 
-    wrapped(attrs, input).unwrap_or_else(|e| {
-        let msg = e.to_string();
-        TokenStream::from(quote! {
-          compile_error!(#msg);
-        })
-    })
+    wrapped(attrs, input).unwrap_or_else(|e| e.into_compile_error().into())
 }

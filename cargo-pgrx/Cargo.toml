@@ -40,9 +40,9 @@ tempfile = "3.8.0"
 toml = "0.8.2" # our config files
 
 # SQL schema generation
-object = "0.32.1"
-proc-macro2 = { version = "1.0.69", features = [ "span-locations" ] }
-quote = "1.0.33"
+object = { version = "0.32.1", default-features = false, features = [ "std" ] }
+proc-macro2.workspace = true
+quote.workspace = true
 
 # emit better diagnostics
 color-eyre = "0.6.2"

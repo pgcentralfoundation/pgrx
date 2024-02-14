@@ -30,9 +30,10 @@ use convert_case::{Case, Casing};
 use proc_macro2::{Ident, Span, TokenStream as TokenStream2};
 use quote::quote;
 use syn::parse::{Parse, ParseStream};
+use syn::punctuated::Punctuated;
 use syn::spanned::Spanned;
 use syn::{
-    parse_quote, Expr, ImplItemConst, ImplItemMethod, ImplItemType, ItemFn, ItemImpl, Path, Type,
+    parse_quote, Expr, ImplItemConst, ImplItemFn, ImplItemType, ItemFn, ItemImpl, Path, Type,
 };
 
 use crate::ToSqlConfig;
@@ -759,20 +760,29 @@ fn get_target_path(item_impl: &ItemImpl) -> Result<Path, syn::Error> {
     Ok(target_ident)
 }
 
-fn pg_extern_attr(item: &ImplItemMethod) -> syn::Attribute {
+fn pg_extern_attr(item: &ImplItemFn) -> syn::Attribute {
     let mut found = None;
     for attr in item.attrs.iter() {
-        match attr.path.segments.last() {
+        match attr.path().segments.last() {
             Some(segment) if segment.ident == "pgrx" => {
-                found = Some(attr.tokens.clone());
+                found = Some(attr);
                 break;
             }
             _ => (),
         };
     }
-    match found {
+
+    let attrs = if let Some(attr) = found {
+        let parser = Punctuated::<super::pg_extern::Attribute, syn::Token![,]>::parse_terminated;
+        let attrs = attr.parse_args_with(parser);
+        attrs.ok()
+    } else {
+        None
+    };
+
+    match attrs {
         Some(args) => parse_quote! {
-            #[::pgrx::pg_extern #args]
+            #[::pgrx::pg_extern(#args)]
         },
         None => parse_quote! {
             #[::pgrx::pg_extern]
@@ -794,15 +804,15 @@ fn get_impl_type_by_name<'a>(item_impl: &'a ItemImpl, name: &str) -> Option<&'a 
     needle
 }
 
-fn get_impl_func_by_name<'a>(item_impl: &'a ItemImpl, name: &str) -> Option<&'a ImplItemMethod> {
+fn get_impl_func_by_name<'a>(item_impl: &'a ItemImpl, name: &str) -> Option<&'a ImplItemFn> {
     let mut needle = None;
-    for impl_item_method in item_impl.items.iter().filter_map(|impl_item| match impl_item {
-        syn::ImplItem::Method(iimethod) => Some(iimethod),
+    for impl_item_fn in item_impl.items.iter().filter_map(|impl_item| match impl_item {
+        syn::ImplItem::Fn(iifn) => Some(iifn),
         _ => None,
     }) {
-        let ident_string = impl_item_method.sig.ident.to_string();
+        let ident_string = impl_item_fn.sig.ident.to_string();
         if ident_string == name {
-            needle = Some(impl_item_method);
+            needle = Some(impl_item_fn);
         }
     }
     needle

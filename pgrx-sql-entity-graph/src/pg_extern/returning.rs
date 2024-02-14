@@ -119,7 +119,12 @@ impl Returning {
                             match ident_string.as_str() {
                                 "Option" => match &segment.arguments {
                                     PathArguments::AngleBracketed(bracketed) => {
-                                        match bracketed.args.first().unwrap() {
+                                        match bracketed.args.first().ok_or_else(|| {
+                                            syn::Error::new_spanned(
+                                                bracketed,
+                                                "where's the generic args?",
+                                            )
+                                        })? {
                                             GenericArgument::Type(Type::Path(this_path)) => {
                                                 segments = this_path.path.segments.clone();
                                                 saw_option_ident = true;
@@ -151,7 +156,7 @@ impl Returning {
                         let last_path_segment = option_inner_path.segments.last();
                         let (used_ty, optional) = match &last_path_segment.map(|ps| &ps.arguments) {
                             Some(syn::PathArguments::AngleBracketed(args)) => {
-                                match args.args.last().unwrap() {
+                                match args.args.last().expect("should have one arg?") {
                                     syn::GenericArgument::Type(ty) => {
                                         match &ty {
                                             syn::Type::Path(path) => {
