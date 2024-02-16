@@ -143,7 +143,7 @@ impl UsedType {
             }
             original => (original, None),
         };
-        
+
         // In this  step, we go look at the resolved type and determine if it is a variadic, optional, result, etc.
         let (resolved_ty, variadic, optional, result) = match resolved_ty {
             syn::Type::Path(type_path) => {
@@ -626,35 +626,31 @@ fn resolve_result_inner(
     // TODO - more robust / idiomatic way of handling this?
     let mut without_type_args = original.path.clone();
     without_type_args.segments.last_mut().unwrap().arguments = syn::PathArguments::None;
- 
-    let (ok_ty, err_ty) = { 
-        if let syn::PathArguments::AngleBracketed(path_arg) = &last.arguments { 
+
+    let (ok_ty, err_ty) = {
+        if let syn::PathArguments::AngleBracketed(path_arg) = &last.arguments {
             if let Some(first_ty) = path_arg.args.first() {
                 // Since `pub type Result<T> = std::error::Result<T, OurError>
-                // is a common pattern, 
+                // is a common pattern,
                 // we should support single-argument Result<T> style.
                 if path_arg.args.len() == 1 {
                     (first_ty.clone(), None)
-                }
-                else if path_arg.args.len() == 2 { 
+                } else if path_arg.args.len() == 2 {
                     (first_ty.clone(), Some(path_arg.args[1].clone()))
-                }
-                else { 
+                } else {
                     return Err(syn::Error::new(
                         last.arguments.span(),
                         "Result<..> with more than two type arguments not supported.",
                     ));
                 }
-            }
-            else { 
+            } else {
                 // Return early, Result<> with no type args.
                 return Err(syn::Error::new(
                     last.arguments.span(),
                     "Cannot return a Result without type generic arguments.",
                 ));
             }
-        }
-        else {
+        } else {
             // Return early, invalid signature for Result<T,E>
             return Err(syn::Error::new(
                 last.arguments.span(),
@@ -666,18 +662,19 @@ fn resolve_result_inner(
     // Inner / nested function for getting a type signature for a Result from
     // the tuple of (ok_type, Option<error_type>)
     fn type_for_args(
-            no_args_path: syn::Path,
-            first_ty: syn::Type,
-            err_ty: Option<GenericArgument>) -> syn::Type {
-        match err_ty { 
-            Some(e) => { 
+        no_args_path: syn::Path,
+        first_ty: syn::Type,
+        err_ty: Option<GenericArgument>,
+    ) -> syn::Type {
+        match err_ty {
+            Some(e) => {
                 syn::parse_quote! {
                     #no_args_path<#first_ty, #e>
                 }
             }
             None => {
                 // Since `pub type Result<T> = std::error::Result<T, OurError>
-                // is a common pattern, 
+                // is a common pattern,
                 // we should support single-argument Result<T> style.
                 syn::parse_quote! {
                     #no_args_path<#first_ty>
