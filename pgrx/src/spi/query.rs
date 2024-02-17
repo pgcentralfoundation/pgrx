@@ -148,6 +148,7 @@ impl<'conn> Query<'conn> for &str {
 pub struct PreparedStatement<'conn> {
     pub(super) plan: NonNull<pg_sys::_SPI_plan>,
     pub(super) __marker: PhantomData<&'conn ()>,
+    pub(super) mutating: bool,
 }
 
 /// Static lifetime-bound prepared statement
@@ -214,7 +215,11 @@ impl<'conn> PreparedStatement<'conn> {
         unsafe {
             pg_sys::SPI_keepplan(self.plan.as_ptr());
         }
-        OwnedPreparedStatement(PreparedStatement { __marker: PhantomData, plan: self.plan })
+        OwnedPreparedStatement(PreparedStatement {
+            __marker: PhantomData,
+            plan: self.plan,
+            mutating: self.mutating,
+        })
     }
 }
 
@@ -248,7 +253,7 @@ impl<'conn: 'stmt, 'stmt> Query<'conn> for &'stmt PreparedStatement<'conn> {
                 self.plan.as_ptr(),
                 datums.as_mut_ptr(),
                 nulls.as_mut_ptr(),
-                Spi::is_xact_still_immutable(),
+                !self.mutating && Spi::is_xact_still_immutable(),
                 limit.unwrap_or(0),
             )
         };
@@ -269,7 +274,7 @@ impl<'conn: 'stmt, 'stmt> Query<'conn> for &'stmt PreparedStatement<'conn> {
                 self.plan.as_ptr(),
                 datums.as_mut_ptr(),
                 nulls.as_ptr(),
-                Spi::is_xact_still_immutable(),
+                !self.mutating && Spi::is_xact_still_immutable(),
             ))
         };
         SpiCursor { ptr, __marker: PhantomData }
