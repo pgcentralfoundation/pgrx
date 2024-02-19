@@ -220,6 +220,6 @@ impl<T: Enlist> ListHead<'_, T> {
 impl<T> ListHead<'_, T> {
     #[inline]
     pub fn len(&self) -> usize {
-        unsafe { self.list.as_ref().length as usize }
+        unsafe { (*self.list.as_ptr()).length as usize }
     }
 }
