@@ -143,25 +143,6 @@ impl<'cx, T: Enlist> List<'cx, T> {
         }
     }
 
-    /// Attempt to push or Err if it would allocate
-    ///
-    /// This exists primarily to allow working with a list with maybe-zero capacity.
-    pub fn try_push(&mut self, value: T) -> Result<&mut ListHead<'cx, T>, &mut Self> {
-        match self {
-            List::Nil => Err(self),
-            list if list.capacity() - list.len() == 0 => Err(list),
-            List::Cons(head) => Ok(head.push(value)),
-        }
-    }
-
-    /// Try to reserve space for N more items
-    pub fn try_reserve(&mut self, items: usize) -> Result<&mut ListHead<'cx, T>, &mut Self> {
-        match self {
-            List::Nil => Err(self),
-            List::Cons(head) => Ok(head.reserve(items)),
-        }
-    }
-
     // Iterate over part of the List while removing elements from it
     //
     // Note that if this removes the last item, it deallocates the entire list.

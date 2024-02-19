@@ -178,6 +178,28 @@ impl<'cx, T> List<'cx, T> {
     }
 }
 
+
+impl<'cx, T: Enlist> List<'cx, T> {
+    /// Attempt to push or Err if it would allocate
+    ///
+    /// This exists primarily to allow working with a list with maybe-zero capacity.
+    pub fn try_push(&mut self, value: T) -> Result<&mut ListHead<'cx, T>, &mut Self> {
+        match self {
+            List::Nil => Err(self),
+            list if list.capacity() - list.len() == 0 => Err(list),
+            List::Cons(head) => Ok(head.push(value)),
+        }
+    }
+
+    /// Try to reserve space for N more items
+    pub fn try_reserve(&mut self, items: usize) -> Result<&mut ListHead<'cx, T>, &mut Self> {
+        match self {
+            List::Nil => Err(self),
+            List::Cons(head) => Ok(head.reserve(items)),
+        }
+    }
+}
+
 impl<T: Enlist> ListHead<'_, T> {
     /// From a non-nullable pointer that points to a valid List, produce a ListHead of the correct type
     ///
