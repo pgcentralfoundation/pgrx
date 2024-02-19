@@ -698,8 +698,10 @@ fn resolve_result_inner(
                             let ty = type_for_args(without_type_args, comp_ty, err_ty);
                             Ok((ty, sql))
                         },
-                        // Option<default!(composite_type!(..))> isn't valid. If the user wanted the default to be `NULL` they just don't need a default.
-                        "default" => Err(syn::Error::new(mac.span(), "`Result<default!(T, \"my_default\"), E>` not supported, choose `Result<T, E>` for a default of `NULL`, or `default!(T, default)` for a non-NULL default")),
+                        // Result<default!(composite_type!(..)), E> 
+                        "default" => {
+                            Err(syn::Error::new(mac.span(), "`Result<default!(T, default), E>` not supported, choose `default!(Result<T, E>, ident)` instead"))
+                        },
                         _ => Ok((syn::Type::Path(original), None)),
                     }
                 }
@@ -737,8 +739,7 @@ fn resolve_result_inner(
                             let wrapped_ty = type_for_args(without_type_args, inner_ty, err_ty);
                             Ok((wrapped_ty, expr))
                         }
-                        // Result<..>
-                        // TODO - evaluate, should this error rather than proceeding?
+                        // Result<T> where T is plain-old-data and not a (supported) container type.
                         _ => Ok((syn::Type::Path(original), None)),
                     }
                 }
