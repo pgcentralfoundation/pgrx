@@ -178,7 +178,6 @@ impl<'cx, T> List<'cx, T> {
     }
 }
 
-
 impl<'cx, T: Enlist> List<'cx, T> {
     /// Attempt to push or Err if it would allocate
     ///
