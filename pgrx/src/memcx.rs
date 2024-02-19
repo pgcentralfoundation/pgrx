@@ -152,3 +152,28 @@ unsafe impl<'mcx> SqlTranslatable for &MemCx<'mcx> {
         Ok(Returns::One(SqlMapping::Skip))
     }
 }
+
+/// A type pallocated in a context
+pub struct PBox<'mcx, T: ?Sized> {
+    ptr: NonNull<T>,
+    _cx: PhantomData<MemCx<'mcx>>,
+}
+
+impl<'mcx, T: ?Sized> PBox<'mcx, T> {
+    pub unsafe fn from_raw_in(ptr: NonNull<T>, _cx: &MemCx<'mcx>) -> PBox<'mcx, T> {
+        PBox { ptr, _cx: PhantomData }
+    }
+}
+
+unsafe impl<'mcx, T> BoxRet for PBox<'mcx, T>
+where
+    T: ?Sized + BorrowDatum,
+{
+    unsafe fn box_into<'fcx>(self, fcinfo: &mut FcInfo<'fcx>) -> Datum<'fcx> {
+        // SAFETY: by proxy
+        unsafe { fcinfo.return_raw_datum(mem::transmute(self.ptr)) }
+    }
+}
+
+/// An "owning" palloc.
+pub struct Palloc<'mcx, T>(T, &'mcx MemCx<'mcx>);
