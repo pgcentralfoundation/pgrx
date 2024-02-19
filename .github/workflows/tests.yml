@@ -112,12 +112,7 @@ jobs:
     - name: Run license check
       run: cargo install cargo-deny && ./ci/license-check.sh
 
-    - name: Install cargo-pgrx # Needed for clippy
-      run: cargo install --path cargo-pgrx
-
-    - name: Clippy -Awarnings
-      run: cargo clippy -p pgrx --features pg$PG_VER -- -Awarnings
-
+    # We can't lint most crates because they require "cargo pgrx init" to build
     - name: Clippy -Dwarnings sql-entity-graph
       run: cargo clippy -p pgrx-sql-entity-graph -- -Dwarnings
 
@@ -470,6 +465,10 @@ jobs:
 
     - name: Run 'cargo pgrx init' for ${{ matrix.version }}
       run: cargo pgrx init --pg$PG_VER download
+
+    # We can't do this with other lints because we need $PGRX_HOME
+    - name: Clippy -Awarnings
+      run: cargo clippy -p pgrx --features pg$PG_VER -- -Awarnings
 
     - name: create new sample extension
       run: cd /tmp/ && cargo pgrx new sample
