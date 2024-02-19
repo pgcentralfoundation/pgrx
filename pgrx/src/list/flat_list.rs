@@ -233,12 +233,12 @@ impl<T> List<'_, T> {
     /// Due to lifetimes this isn't a problem until unsafe Rust becomes involved,
     /// but with Postgres extensions it often does.
     ///
-    /// Note that if you use this on a 0-item list, you get an empty slice, of course.
+    /// Note that if you use this on a 0-item list, you get an empty slice,
+    /// which is not going to be equal to the null pointer.
     pub fn as_cells(&self) -> &[ListCell<T>] {
         unsafe {
             match self {
-                // No elements? No problem! Return a 0-sized slice
-                List::Nil => slice::from_raw_parts(self as *const _ as _, 0),
+                List::Nil => &[],
                 List::Cons(inner) => slice::from_raw_parts(inner.as_cells_ptr(), inner.len()),
             }
         }
@@ -249,7 +249,8 @@ impl<T> List<'_, T> {
     /// Includes the same caveats as with `List::as_cells`, but with "less" problems:
     /// `&mut` means you should not have other pointers to the list anyways.
     ///
-    /// Note that if you use this on a 0-item list, you get an empty slice, of course.
+    /// Note that if you use this on a 0-item list, you get an empty slice,
+    /// which is not going to be equal to the null pointer.
     pub fn as_cells_mut(&mut self) -> &mut [ListCell<T>] {
         // SAFETY: Note it is unsafe to read a union variant, but safe to set a union variant!
         // This allows access to `&mut pg_sys::ListCell` to mangle a List's type in safe code.
@@ -260,8 +261,7 @@ impl<T> List<'_, T> {
         // and as long as we correctly maintain the length of the List's type.
         unsafe {
             match self {
-                // No elements? No problem! Return a 0-sized slice
-                List::Nil => slice::from_raw_parts_mut(self as *mut _ as _, 0),
+                List::Nil => &mut [],
                 List::Cons(inner) => {
                     slice::from_raw_parts_mut(inner.as_mut_cells_ptr(), inner.len())
                 }
