@@ -623,7 +623,6 @@ fn resolve_result_inner(
         .ok_or(syn::Error::new(original.span(), "Could not read last segment of path"))?;
 
     // Get the path of our Result type, to handle crate::module::Result pattern
-    // TODO - more robust / idiomatic way of handling this?
     let mut without_type_args = original.path.clone();
     without_type_args.segments.last_mut().unwrap().arguments = syn::PathArguments::None;
 
