@@ -1,0 +1,43 @@
+error[E0277]: the trait bound `fn(String) -> u32: FunctionMetadata<_>` is not satisfied
+ --> tests/compile-fail/u32_ret_diagnostics.rs:7:1
+  |
+7 | fn u32_world(value: String) -> u32 {
+  | ^^ the trait `FunctionMetadata<_>` is not implemented for `fn(String) -> u32`
+  |
+  = help: the following other types implement trait `FunctionMetadata<A>`:
+            <unsafe fn(T0, T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15, T16) -> R as FunctionMetadata<(T0, T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15, T16)>>
+            <unsafe fn(T0, T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15, T16, T17) -> R as FunctionMetadata<(T0, T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15, T16, T17)>>
+            <unsafe fn(T0, T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15, T16, T17, T18) -> R as FunctionMetadata<(T0, T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15, T16, T17, T18)>>
+            <unsafe fn(T0, T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15, T16, T17, T18, T19) -> R as FunctionMetadata<(T0, T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15, T16, T17, T18, T19)>>
+            <unsafe fn(T0, T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15, T16, T17, T18, T19, T20) -> R as FunctionMetadata<(T0, T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15, T16, T17, T18, T19, T20)>>
+            <unsafe fn(T0, T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15, T16, T17, T18, T19, T20, T21) -> R as FunctionMetadata<(T0, T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15, T16, T17, T18, T19, T20, T21)>>
+            <unsafe fn(T0, T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15, T16, T17, T18, T19, T20, T21, T22) -> R as FunctionMetadata<(T0, T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15, T16, T17, T18, T19, T20, T21, T22)>>
+            <unsafe fn(T0, T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15, T16, T17, T18, T19, T20, T21, T22, T23) -> R as FunctionMetadata<(T0, T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15, T16, T17, T18, T19, T20, T21, T22, T23)>>
+          and $N others
+
+error[E0599]: the function or associated item `entity` exists for type `u32`, but its trait bounds were not satisfied
+ --> tests/compile-fail/u32_ret_diagnostics.rs:6:1
+  |
+6 | #[pg_extern]
+  | ^^^^^^^^^^^^ function or associated item cannot be called on `u32` due to unsatisfied trait bounds
+  |
+  = note: the following trait bounds were not satisfied:
+          `u32: SqlTranslatable`
+          which is required by `&u32: SqlTranslatable`
+  = note: this error originates in the attribute macro `pg_extern` (in Nightly builds, run with -Z macro-backtrace for more info)
+
+error[E0277]: the trait bound `u32: IntoDatum` is not satisfied
+ --> tests/compile-fail/u32_ret_diagnostics.rs:7:1
+  |
+7 | fn u32_world(value: String) -> u32 {
+  | ^^                          - required by a bound introduced by this call
+  | |
+  | the trait `IntoDatum` is not implemented for `u32`
+  |
+  = help: the following other types implement trait `IntoDatum`:
+            i8
+            i16
+            i32
+            i64
+            f32
+            f64
