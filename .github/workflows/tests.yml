@@ -84,49 +84,49 @@ jobs:
         env
         echo ""
 
-  - name: Cache cargo registry
-    uses: actions/cache@v3
-    continue-on-error: false
-    with:
-      path: |
-        ~/.cargo/registry
-        ~/.cargo/git
-      key: pgrx-lintck-cargo-${{ runner.os }}-${{ hashFiles('**/Cargo.lock', '.github/workflows/tests.yml') }}
+    - name: Cache cargo registry
+      uses: actions/cache@v3
+      continue-on-error: false
+      with:
+        path: |
+          ~/.cargo/registry
+          ~/.cargo/git
+        key: pgrx-lintck-cargo-${{ runner.os }}-${{ hashFiles('**/Cargo.lock', '.github/workflows/tests.yml') }}
 
-  - name: Cache sccache directory
-    uses: actions/cache@v3
-    continue-on-error: false
-    with:
-      path: /home/runner/.cache/sccache
-      key: pgrx-lintck-sccache-${{ runner.os }}-${{ hashFiles('**/Cargo.lock', '.github/workflows/tests.yml') }}
+    - name: Cache sccache directory
+      uses: actions/cache@v3
+      continue-on-error: false
+      with:
+        path: /home/runner/.cache/sccache
+        key: pgrx-lintck-sccache-${{ runner.os }}-${{ hashFiles('**/Cargo.lock', '.github/workflows/tests.yml') }}
 
-  - name: Start sccache server
-    run: sccache --start-server
+    - name: Start sccache server
+      run: sccache --start-server
 
-  - name: Print sccache stats (before)
-    run: sccache --show-stats
+    - name: Print sccache stats (before)
+      run: sccache --show-stats
 
-  - name: Run rustfmt
-    run: cargo fmt --all -- --check
+    - name: Run rustfmt
+      run: cargo fmt --all -- --check
 
-  - name: Run license check
-    run: cargo install cargo-deny && ./ci/license-check.sh
+    - name: Run license check
+      run: cargo install cargo-deny && ./ci/license-check.sh
 
-  - name: Clippy -Awarnings
-    run: cargo clippy -p pgrx --features pg$PG_VER -- -Awarnings
+    - name: Clippy -Awarnings
+      run: cargo clippy -p pgrx --features pg$PG_VER -- -Awarnings
 
-  - name: Clippy -Dwarnings sql-entity-graph
-    run: cargo clippy -p pgrx-sql-entity-graph -- -Dwarnings
+    - name: Clippy -Dwarnings sql-entity-graph
+      run: cargo clippy -p pgrx-sql-entity-graph -- -Dwarnings
 
-  - name: Check doc-links
-    run: |
-      cargo rustdoc -p pgrx --features pg$PG_VER -- \
-        --document-private-items \
-        -Drustdoc::broken-intra-doc-links \
-        -Drustdoc::invalid-html-tags
+    - name: Check doc-links
+      run: |
+        cargo rustdoc -p pgrx --features pg$PG_VER -- \
+          --document-private-items \
+          -Drustdoc::broken-intra-doc-links \
+          -Drustdoc::invalid-html-tags
 
-  - name: Stop sccache server
-    run: sccache --stop-server || true
+    - name: Stop sccache server
+      run: sccache --stop-server || true
 
   pgrx_tests:
     name: pgrx-tests & examples
