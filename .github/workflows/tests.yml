@@ -406,7 +406,7 @@ jobs:
 
     strategy:
       matrix:
-        os: ["macos-13"]
+        os: ["macos-13", "macos-14"] # macos-14 is M1
         # Since Postgres 16 on macOS the dynamic library extension is "dylib" (instead of "so" on older versions),
         # so it's important to test against both versions (with "old" and "new" extensions).
         #
@@ -473,14 +473,14 @@ jobs:
       continue-on-error: false
       with:
         path: /Users/runner/Library/Caches/Mozilla.sccache
-        key: pgrx-sccache-macos-11-${{ hashFiles('**/Cargo.lock', '.github/workflows/tests.yml', '.cargo/config.toml') }}
+        key: pgrx-sccache-${{matrix.os}}-${{ hashFiles('**/Cargo.lock', '.github/workflows/tests.yml', '.cargo/config.toml') }}
 
     - name: Cache cargo directory
       uses: actions/cache@v3
       with:
         path: |
           ~/.cargo
-        key: pgrx-cargo-macos-11-tests-${{ hashFiles('**/Cargo.lock', '.github/workflows/tests.yml', '.cargo/config.toml') }}
+        key: pgrx-cargo-${{matrix.os}}-tests-${{ hashFiles('**/Cargo.lock', '.github/workflows/tests.yml', '.cargo/config.toml') }}
 
     - name: Start sccache server
       run: sccache --start-server
