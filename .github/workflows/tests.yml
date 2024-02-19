@@ -18,7 +18,7 @@ env:
 
 jobs:
   lintck:
-    name: rustfmt and clippy
+    name: rustfmt, clippy, et al.
     runs-on: ubuntu-latest
     if: "!contains(github.event.head_commit.message, 'nogha')"
     env:
@@ -111,6 +111,9 @@ jobs:
 
     - name: Run license check
       run: cargo install cargo-deny && ./ci/license-check.sh
+
+    - name: Install cargo-pgrx # Needed for clippy
+      run: cargo install --path cargo-pgrx
 
     - name: Clippy -Awarnings
       run: cargo clippy -p pgrx --features pg$PG_VER -- -Awarnings
