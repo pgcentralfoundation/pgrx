@@ -19,6 +19,7 @@ env:
 jobs:
   pgrx_tests:
     name: pgrx-tests & examples
+    needs: cargo_pgrx_init
     runs-on: ubuntu-latest
     if: "!contains(github.event.head_commit.message, 'nogha')"
     env:
@@ -397,6 +398,7 @@ jobs:
 
   build_mac:
     name: MacOS build & test
+    needs: cargo_pgrx_init
     runs-on: ${{ matrix.os }}
     if: "!contains(github.event.head_commit.message, 'nogha')"
     env:
