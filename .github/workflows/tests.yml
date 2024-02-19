@@ -116,9 +116,9 @@ jobs:
     - name: Clippy -Dwarnings sql-entity-graph
       run: cargo clippy -p pgrx-sql-entity-graph -- -Dwarnings
 
-    - name: Check doc-links
+    - name: Check doc-links in pgrx-macros
       run: |
-        cargo rustdoc -p pgrx --features pg$PG_VER -- \
+        cargo rustdoc -p pgrx-macros --features pg$PG_VER -- \
           --document-private-items \
           -Drustdoc::broken-intra-doc-links \
           -Drustdoc::invalid-html-tags
@@ -469,6 +469,14 @@ jobs:
     # We can't do this with other lints because we need $PGRX_HOME
     - name: Clippy -Awarnings
       run: cargo clippy -p pgrx --features pg$PG_VER -- -Awarnings
+
+    # This also requires $PGRX_HOME
+    - name: Check doc-links
+      run: |
+        cargo rustdoc -p pgrx --features pg$PG_VER -- \
+          --document-private-items \
+          -Drustdoc::broken-intra-doc-links \
+          -Drustdoc::invalid-html-tags
 
     - name: create new sample extension
       run: cd /tmp/ && cargo pgrx new sample
