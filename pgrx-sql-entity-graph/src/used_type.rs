@@ -627,27 +627,22 @@ fn resolve_result_inner(
     without_type_args.segments.last_mut().unwrap().arguments = syn::PathArguments::None;
 
     let (ok_ty, err_ty) = {
-        if let syn::PathArguments::AngleBracketed(path_arg) = &last.arguments {
-            if let Some(first_ty) = path_arg.args.first() {
+        if let syn::PathArguments::AngleBracketed(path_arg) = last.arguments.clone() {
+            let mut iter = path_arg.args.into_iter();
+            match (iter.next(), iter.next()) {
+                (None, _) => {
+                    // Return early, Result<> with no type args.
+                    return Err(syn::Error::new(
+                        last.arguments.span(),
+                        "Cannot return a Result without type generic arguments.",
+                    ));
+                }
                 // Since `pub type Result<T> = std::error::Result<T, OurError>
                 // is a common pattern,
                 // we should support single-argument Result<T> style.
-                if path_arg.args.len() == 1 {
-                    (first_ty.clone(), None)
-                } else if path_arg.args.len() == 2 {
-                    (first_ty.clone(), Some(path_arg.args[1].clone()))
-                } else {
-                    return Err(syn::Error::new(
-                        last.arguments.span(),
-                        "Result<..> with more than two type arguments not supported.",
-                    ));
-                }
-            } else {
-                // Return early, Result<> with no type args.
-                return Err(syn::Error::new(
-                    last.arguments.span(),
-                    "Cannot return a Result without type generic arguments.",
-                ));
+                (Some(first_ty), None) => (first_ty, None),
+                // This is the more common Result<T, E>.
+                (Some(first_ty), Some(second_ty)) => (first_ty, Some(second_ty)),
             }
         } else {
             // Return early, invalid signature for Result<T,E>
