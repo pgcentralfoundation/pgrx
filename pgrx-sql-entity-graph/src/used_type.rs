@@ -21,7 +21,7 @@ use proc_macro2::Span;
 use quote::ToTokens;
 use syn::parse::{Parse, ParseStream};
 use syn::spanned::Spanned;
-use syn::Token;
+use syn::{GenericArgument, Token};
 
 use super::metadata::FunctionMetadataTypeEntity;
 
@@ -87,7 +87,6 @@ impl UsedType {
             }
             original => original,
         };
-
         // Now, resolve any `composite_type` macro
         let (resolved_ty, composite_type) = match resolved_ty {
             // composite_type!(..)
@@ -124,6 +123,12 @@ impl UsedType {
                     // Option<VariadicArray<composite_type!(..)>>
                     // Option<VariadicArray<Option<composite_type!(..)>>>
                     "Option" => resolve_option_inner(path)?,
+                    // Result<composite_type!(..), ..>
+                    // Result<Vec<composite_type!(..)>, ..>
+                    // Result<Vec<Option<composite_type!(..)>>, ..>
+                    // Result<VariadicArray<composite_type!(..)>, ..>
+                    // Result<VariadicArray<Option<composite_type!(..)>>, ..>
+                    "Result" => resolve_result_inner(path)?,
                     // Vec<composite_type!(..)>
                     // Vec<Option<composite_type!(..)>>
                     "Vec" => resolve_vec_inner(path)?,
@@ -604,6 +609,138 @@ fn resolve_option_inner(
             }
             _ => Ok((syn::Type::Path(original), None)),
         },
+        _ => Ok((syn::Type::Path(original), None)),
+    }
+}
+
+fn resolve_result_inner(
+    original: syn::TypePath,
+) -> syn::Result<(syn::Type, Option<CompositeTypeMacro>)> {
+    let segments = &original.path;
+    let last = segments
+        .segments
+        .last()
+        .ok_or(syn::Error::new(original.span(), "Could not read last segment of path"))?;
+
+    // Get the path of our Result type, to handle crate::module::Result pattern
+    let mut without_type_args = original.path.clone();
+    without_type_args.segments.last_mut().unwrap().arguments = syn::PathArguments::None;
+
+    let (ok_ty, err_ty) = {
+        if let syn::PathArguments::AngleBracketed(path_arg) = last.arguments.clone() {
+            let mut iter = path_arg.args.into_iter();
+            match (iter.next(), iter.next()) {
+                (None, _) => {
+                    // Return early, Result<> with no type args.
+                    return Err(syn::Error::new(
+                        last.arguments.span(),
+                        "Cannot return a Result without type generic arguments.",
+                    ));
+                }
+                // Since `pub type Result<T> = std::error::Result<T, OurError>
+                // is a common pattern,
+                // we should support single-argument Result<T> style.
+                (Some(first_ty), None) => (first_ty, None),
+                // This is the more common Result<T, E>.
+                (Some(first_ty), Some(second_ty)) => (first_ty, Some(second_ty)),
+            }
+        } else {
+            // Return early, invalid signature for Result<T,E>
+            return Err(syn::Error::new(
+                last.arguments.span(),
+                "Cannot return a Result without type generic arguments.",
+            ));
+        }
+    };
+
+    // Inner / nested function for getting a type signature for a Result from
+    // the tuple of (ok_type, Option<error_type>)
+    fn type_for_args(
+        no_args_path: syn::Path,
+        first_ty: syn::Type,
+        err_ty: Option<GenericArgument>,
+    ) -> syn::Type {
+        match err_ty {
+            Some(e) => {
+                syn::parse_quote! {
+                    #no_args_path<#first_ty, #e>
+                }
+            }
+            None => {
+                // Since `pub type Result<T> = std::error::Result<T, OurError>
+                // is a common pattern,
+                // we should support single-argument Result<T> style.
+                syn::parse_quote! {
+                    #no_args_path<#first_ty>
+                }
+            }
+        }
+    }
+
+    match &ok_ty {
+        syn::GenericArgument::Type(ty) => {
+            match ty.clone() {
+                syn::Type::Macro(macro_pat) => {
+                    let mac = &macro_pat.mac;
+                    let archetype = mac.path.segments.last().expect("No last segment");
+                    match archetype.ident.to_string().as_str() {
+                        // Result<composite_type!(..), E>
+                        "composite_type" => {
+                            let composite_mac = handle_composite_type_macro(mac)?;
+                            let comp_ty = composite_mac.expand_with_lifetime();
+                            let sql = Some(composite_mac);
+
+                            let ty = type_for_args(without_type_args, comp_ty, err_ty);
+                            Ok((ty, sql))
+                        },
+                        // Result<default!(composite_type!(..)), E> 
+                        "default" => {
+                            Err(syn::Error::new(mac.span(), "`Result<default!(T, default), E>` not supported, choose `default!(Result<T, E>, ident)` instead"))
+                        },
+                        _ => Ok((syn::Type::Path(original), None)),
+                    }
+                }
+                syn::Type::Path(arg_type_path) => {
+                    let last = arg_type_path.path.segments.last().ok_or(syn::Error::new(
+                        arg_type_path.span(),
+                        "No last segment in type path",
+                    ))?;
+                    match last.ident.to_string().as_str() {
+                        // Result<Option<composite_type!(..)>>
+                        // Result<Option<Vec<composite_type!(..)>>>>
+                        "Option" => {
+                            let (inner_ty, expr) = resolve_option_inner(arg_type_path)?;
+                            let wrapped_ty = type_for_args(without_type_args, inner_ty, err_ty);
+                            Ok((wrapped_ty, expr))
+                        }
+                        // Result<Vec<composite_type!(..)>>
+                        // Result<Vec<Option<composite_type!(..)>>>
+                        "Vec" => {
+                            let (inner_ty, expr) = resolve_vec_inner(arg_type_path)?;
+                            let wrapped_ty = type_for_args(without_type_args, inner_ty, err_ty);
+                            Ok((wrapped_ty, expr))
+                        }
+                        // Result<VariadicArray<composite_type!(..)>>
+                        // Result<VariadicArray<Option<composite_type!(..)>>>
+                        "VariadicArray" => {
+                            let (inner_ty, expr) = resolve_variadic_array_inner(arg_type_path)?;
+                            let wrapped_ty = type_for_args(without_type_args, inner_ty, err_ty);
+                            Ok((wrapped_ty, expr))
+                        }
+                        // Result<Array<composite_type!(..)>>
+                        // Result<Array<Option<composite_type!(..)>>>
+                        "Array" => {
+                            let (inner_ty, expr) = resolve_array_inner(arg_type_path)?;
+                            let wrapped_ty = type_for_args(without_type_args, inner_ty, err_ty);
+                            Ok((wrapped_ty, expr))
+                        }
+                        // Result<T> where T is plain-old-data and not a (supported) container type.
+                        _ => Ok((syn::Type::Path(original), None)),
+                    }
+                }
+                _ => Ok((syn::Type::Path(original), None)),
+            }
+        }
         _ => Ok((syn::Type::Path(original), None)),
     }
 }
