@@ -86,12 +86,12 @@ unsafe impl Enlist for pg_sys::TransactionId {
 }
 
 impl<'cx, T: Enlist> List<'cx, T> {
-    /// Borrow an item from the slice at the index
+    /// Borrow an item from the List at the index
     pub fn get(&self, index: usize) -> Option<&T> {
         self.as_cells().get(index).map(Deref::deref)
     }
 
-    /// Mutably borrow an item from the slice at the index
+    /// Mutably borrow an item from the List at the index
     pub fn get_mut(&mut self, index: usize) -> Option<&mut T> {
         self.as_cells_mut().get_mut(index).map(DerefMut::deref_mut)
     }

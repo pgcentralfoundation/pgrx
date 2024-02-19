@@ -100,12 +100,12 @@ unsafe impl Enlist for pg_sys::Oid {
 }
 
 impl<'cx, T: Enlist> List<'cx, T> {
-    /// Borrow an item from the slice at the index
+    /// Borrow an item from the List at the index
     pub fn get(&self, index: usize) -> Option<&T> {
         self.iter().nth(index)
     }
 
-    /// Mutably borrow an item from the slice at the index
+    /// Mutably borrow an item from the List at the index
     pub fn get_mut(&mut self, index: usize) -> Option<&mut T> {
         self.iter_mut().nth(index)
     }
