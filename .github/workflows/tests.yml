@@ -18,71 +18,71 @@ env:
 
 jobs:
   lintck:
-  name: rustfmt and clippy
-  runs-on: ubuntu-latest
-  if: "!contains(github.event.head_commit.message, 'nogha')"
-  env:
-    RUSTC_WRAPPER: sccache
-    SCCACHE_DIR: /home/runner/.cache/sccache
+    name: rustfmt and clippy
+    runs-on: ubuntu-latest
+    if: "!contains(github.event.head_commit.message, 'nogha')"
+    env:
+      RUSTC_WRAPPER: sccache
+      SCCACHE_DIR: /home/runner/.cache/sccache
 
-  strategy:
-    matrix:
-      version: ["postgres-15"]
+    strategy:
+      matrix:
+        version: ["postgres-15"]
 
-  steps:
-  - uses: actions/checkout@v3
+    steps:
+    - uses: actions/checkout@v3
 
-  - name: Set up prerequisites and environment
-    run: |
-      sudo apt-get update -y -qq --fix-missing
+    - name: Set up prerequisites and environment
+      run: |
+        sudo apt-get update -y -qq --fix-missing
 
-      echo ""
+        echo ""
 
-      echo "----- Install / Set up sccache -----"
-      mkdir -p $HOME/.local/bin
-      curl -L https://github.com/mozilla/sccache/releases/download/v0.2.15/sccache-v0.2.15-x86_64-unknown-linux-musl.tar.gz | tar xz
-      mv -f sccache-v0.2.15-x86_64-unknown-linux-musl/sccache $HOME/.local/bin/sccache
-      chmod +x $HOME/.local/bin/sccache
-      echo "$HOME/.local/bin" >> $GITHUB_PATH
-      mkdir -p /home/runner/.cache/sccache
-      echo ""
+        echo "----- Install / Set up sccache -----"
+        mkdir -p $HOME/.local/bin
+        curl -L https://github.com/mozilla/sccache/releases/download/v0.2.15/sccache-v0.2.15-x86_64-unknown-linux-musl.tar.gz | tar xz
+        mv -f sccache-v0.2.15-x86_64-unknown-linux-musl/sccache $HOME/.local/bin/sccache
+        chmod +x $HOME/.local/bin/sccache
+        echo "$HOME/.local/bin" >> $GITHUB_PATH
+        mkdir -p /home/runner/.cache/sccache
+        echo ""
 
-      # https://stackoverflow.com/questions/57968497/how-do-i-set-an-env-var-with-a-bash-expression-in-github-actions/57969570#57969570
+        # https://stackoverflow.com/questions/57968497/how-do-i-set-an-env-var-with-a-bash-expression-in-github-actions/57969570#57969570
 
-      echo "----- Set up MAKEFLAGS -----"
-      echo "MAKEFLAGS=$MAKEFLAGS -j $(grep -c ^processor /proc/cpuinfo)" >> $GITHUB_ENV
-      cat $GITHUB_ENV
-      echo ""
+        echo "----- Set up MAKEFLAGS -----"
+        echo "MAKEFLAGS=$MAKEFLAGS -j $(grep -c ^processor /proc/cpuinfo)" >> $GITHUB_ENV
+        cat $GITHUB_ENV
+        echo ""
 
-      echo "----- Set up PG_VER variable -----"
-      echo "PG_VER=$(echo ${{ matrix.version }} | cut -d '-' -f2)" >> $GITHUB_ENV
-      cat $GITHUB_ENV
-      echo ""
+        echo "----- Set up PG_VER variable -----"
+        echo "PG_VER=$(echo ${{ matrix.version }} | cut -d '-' -f2)" >> $GITHUB_ENV
+        cat $GITHUB_ENV
+        echo ""
 
-      echo "----- Remove old postgres -----"
-      sudo apt remove -y '^postgres.*' '^libpq.*' '^clang.*' '^llvm.*' '^libclang.*' '^libllvm.*' '^mono-llvm.*'
-      echo ""
+        echo "----- Remove old postgres -----"
+        sudo apt remove -y '^postgres.*' '^libpq.*' '^clang.*' '^llvm.*' '^libclang.*' '^libllvm.*' '^mono-llvm.*'
+        echo ""
 
-      echo "----- Install system dependencies -----"
-      sudo apt-get install -y \
-        build-essential \
-        llvm-14-dev libclang-14-dev clang-14 \
-        gcc \
-        libssl-dev \
-        libz-dev \
-        make \
-        pkg-config \
-        strace \
-        zlib1g-dev
-      echo ""
+        echo "----- Install system dependencies -----"
+        sudo apt-get install -y \
+          build-essential \
+          llvm-14-dev libclang-14-dev clang-14 \
+          gcc \
+          libssl-dev \
+          libz-dev \
+          make \
+          pkg-config \
+          strace \
+          zlib1g-dev
+        echo ""
 
-      echo "----- Output Cargo version -----"
-      cargo --version
-      echo ""
+        echo "----- Output Cargo version -----"
+        cargo --version
+        echo ""
 
-      echo "----- Outputting env -----"
-      env
-      echo ""
+        echo "----- Outputting env -----"
+        env
+        echo ""
 
   - name: Cache cargo registry
     uses: actions/cache@v3
