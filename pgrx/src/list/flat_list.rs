@@ -341,10 +341,9 @@ unsafe fn grow_list(list: &mut pg_sys::List, target: usize) {
             panic!("List allocation failure");
         }
         ptr::copy_nonoverlapping(list.elements, buf.cast(), list.length as _);
-        // If the old buffer is pointers, we would like everyone dereferencing them to segfault,
-        // if OIDs, Postgres will surface errors quickly on InvalidOid, etc.
-        // #[cfg(debug_assertions)]
-        // ptr::write_bytes(list.elements, 0x7F, list.length as _);
+        // This is the "clobber pattern" that Postgres uses.
+        #[cfg(debug_assertions)]
+        ptr::write_bytes(list.elements, 0x7F, list.length as _);
         list.elements = buf.cast();
     } else {
         // We already have a separate buf, making this easy.
