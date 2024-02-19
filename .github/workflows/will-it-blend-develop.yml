@@ -15,14 +15,14 @@ env:
 jobs:
   distro_tests:
     name: Distro tests
-    runs-on: PGRX
+    runs-on: ubuntu-latest
     strategy:
       fail-fast: false # We want all of them to run, even if one fails
       matrix:
         pg_version: ["pg12", "pg13", "pg14", "pg15", "pg16"]
         container: ["fedora", "debian_bullseye", "alpine_3.18"]
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
 
       - name: Set up environment variables
         run: |
@@ -36,7 +36,7 @@ jobs:
 
   cargo_unlocked_tests:
     name: Cargo unlocked tests
-    runs-on: PGRX
+    runs-on: ubuntu-latest
     strategy:
       fail-fast: false # We want all of them to run, even if one fails
       matrix:
@@ -54,7 +54,7 @@ jobs:
             echo "NIGHTLY_BUILD_REF=$GITHUB_HEAD_REF" >> $GITHUB_ENV
           fi
 
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
         with:
           ref: ${{ env.NIGHTLY_BUILD_REF }}
 

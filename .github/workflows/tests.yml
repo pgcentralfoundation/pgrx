@@ -17,8 +17,96 @@ env:
   # CARGO_LOG: cargo::core::compiler::fingerprint=info # Uncomment this to output compiler fingerprint info
 
 jobs:
+  lintck:
+    name: rustfmt, clippy, et al.
+    runs-on: ubuntu-latest
+    if: "!contains(github.event.head_commit.message, 'nogha')"
+    env:
+      RUSTC_WRAPPER: sccache
+      SCCACHE_DIR: /home/runner/.cache/sccache
+
+    strategy:
+      matrix:
+        version: ["postgres-15"]
+
+    steps:
+    - uses: actions/checkout@v4
+
+    - name: Set up prerequisites and environment
+      run: |
+        sudo apt-get update -y -qq --fix-missing
+
+        echo ""
+
+        echo "----- Install / Set up sccache -----"
+        mkdir -p $HOME/.local/bin
+        curl -L https://github.com/mozilla/sccache/releases/download/v0.2.15/sccache-v0.2.15-x86_64-unknown-linux-musl.tar.gz | tar xz
+        mv -f sccache-v0.2.15-x86_64-unknown-linux-musl/sccache $HOME/.local/bin/sccache
+        chmod +x $HOME/.local/bin/sccache
+        echo "$HOME/.local/bin" >> $GITHUB_PATH
+        mkdir -p /home/runner/.cache/sccache
+        echo ""
+
+        # https://stackoverflow.com/questions/57968497/how-do-i-set-an-env-var-with-a-bash-expression-in-github-actions/57969570#57969570
+
+        echo "----- Set up MAKEFLAGS -----"
+        echo "MAKEFLAGS=$MAKEFLAGS -j $(grep -c ^processor /proc/cpuinfo)" >> $GITHUB_ENV
+        cat $GITHUB_ENV
+        echo ""
+
+        echo "----- Output Cargo version -----"
+        cargo --version
+        echo ""
+
+        echo "----- Outputting env -----"
+        env
+        echo ""
+
+    - name: Cache cargo registry
+      uses: actions/cache@v4
+      continue-on-error: false
+      with:
+        path: |
+          ~/.cargo/registry
+          ~/.cargo/git
+        key: pgrx-lintck-cargo-${{ runner.os }}-${{ hashFiles('**/Cargo.lock', '.github/workflows/tests.yml') }}
+
+    - name: Cache sccache directory
+      uses: actions/cache@v4
+      continue-on-error: false
+      with:
+        path: /home/runner/.cache/sccache
+        key: pgrx-lintck-sccache-${{ runner.os }}-${{ hashFiles('**/Cargo.lock', '.github/workflows/tests.yml') }}
+
+    - name: Start sccache server
+      run: sccache --start-server
+
+    - name: Print sccache stats (before)
+      run: sccache --show-stats
+
+    - name: Run rustfmt
+      run: cargo fmt --all -- --check
+
+    - name: Run license check
+      run: cargo install cargo-deny && ./ci/license-check.sh
+
+    # We can't lint most crates because they require "cargo pgrx init" to build
+    - name: Clippy -Dwarnings sql-entity-graph
+      run: cargo clippy -p pgrx-sql-entity-graph -- -Dwarnings
+
+    - name: Check doc-links in pgrx-macros
+      run: |
+        cargo rustdoc -p pgrx-macros -- \
+          --document-private-items \
+          -Drustdoc::broken-intra-doc-links \
+          -Drustdoc::invalid-html-tags
+
+    - name: Stop sccache server
+      run: sccache --stop-server || true
+
   pgrx_tests:
     name: pgrx-tests & examples
+    needs: lintck
     runs-on: ubuntu-latest
     if: "!contains(github.event.head_commit.message, 'nogha')"
     env:
@@ -30,7 +118,7 @@ jobs:
         version: ["postgres-12", "postgres-13", "postgres-14", "postgres-15", "postgres-16"]
 
     steps:
-    - uses: actions/checkout@v3
+    - uses: actions/checkout@v4
 
     - name: Set up prerequisites and environment
       run: |
@@ -109,7 +197,7 @@ jobs:
       run: sudo chmod a+rwx `/usr/lib/postgresql/$PG_VER/bin/pg_config --pkglibdir` `/usr/lib/postgresql/$PG_VER/bin/pg_config --sharedir`/extension /var/run/postgresql/
 
     - name: Cache cargo registry
-      uses: actions/cache@v3
+      uses: actions/cache@v4
       continue-on-error: false
       with:
         path: |
@@ -118,7 +206,7 @@ jobs:
         key: pgrx-tests-cargo-${{ runner.os }}-${{ hashFiles('**/Cargo.lock', '.github/workflows/tests.yml') }}
 
     - name: Cache sccache directory
-      uses: actions/cache@v3
+      uses: actions/cache@v4
       continue-on-error: false
       with:
         path: /home/runner/.cache/sccache
@@ -274,7 +362,7 @@ jobs:
         version: ["postgres-15"]
 
     steps:
-    - uses: actions/checkout@v3
+    - uses: actions/checkout@v4
 
     - name: Set up prerequisites and environment
       run: |
@@ -329,7 +417,7 @@ jobs:
         echo ""
 
     - name: Cache cargo registry
-      uses: actions/cache@v3
+      uses: actions/cache@v4
       continue-on-error: false
       with:
         path: |
@@ -338,7 +426,7 @@ jobs:
         key: pgrx-cargo_init_tests-cargo-${{ runner.os }}-${{ hashFiles('**/Cargo.lock', '.github/workflows/tests.yml') }}
 
     - name: Cache sccache directory
-      uses: actions/cache@v3
+      uses: actions/cache@v4
       continue-on-error: false
       with:
         path: /home/runner/.cache/sccache
@@ -350,24 +438,17 @@ jobs:
     - name: Print sccache stats (before)
       run: sccache --show-stats
 
-    - name: Run rustfmt
-      run: cargo fmt --all -- --check
-
-    - name: Run license check
-      run: cargo install cargo-deny --force && ./ci/license-check.sh
-
     - name: Install cargo-pgrx
       run: cargo install --path cargo-pgrx/ --debug --force
 
     - name: Run 'cargo pgrx init' for ${{ matrix.version }}
       run: cargo pgrx init --pg$PG_VER download
 
+    # We can't do this with other lints because we need $PGRX_HOME
     - name: Clippy -Awarnings
       run: cargo clippy -p pgrx --features pg$PG_VER -- -Awarnings
 
-    - name: Clippy -Dwarnings sql-entity-graph
-      run: cargo clippy -p pgrx-sql-entity-graph -- -Dwarnings
-
+    # This also requires $PGRX_HOME
     - name: Check doc-links
       run: |
         cargo rustdoc -p pgrx --features pg$PG_VER -- \
@@ -397,6 +478,7 @@ jobs:
 
   build_mac:
     name: MacOS build & test
+    needs: lintck
     runs-on: ${{ matrix.os }}
     if: "!contains(github.event.head_commit.message, 'nogha')"
     env:
@@ -406,7 +488,7 @@ jobs:
 
     strategy:
       matrix:
-        os: ["macos-13"]
+        os: ["macos-13", "macos-14"] # macos-14 is M1
         # Since Postgres 16 on macOS the dynamic library extension is "dylib" (instead of "so" on older versions),
         # so it's important to test against both versions (with "old" and "new" extensions).
         #
@@ -432,7 +514,7 @@ jobs:
       env:
         FORMULA: postgresql@${{ matrix.postgresql }}
 
-    - uses: actions/checkout@v3
+    - uses: actions/checkout@v4
 
     - name: Set up prerequisites and environment
       run: |
@@ -469,18 +551,18 @@ jobs:
 
 
     - name: Cache sccache directory
-      uses: actions/cache@v3
+      uses: actions/cache@v4
       continue-on-error: false
       with:
         path: /Users/runner/Library/Caches/Mozilla.sccache
-        key: pgrx-sccache-macos-11-${{ hashFiles('**/Cargo.lock', '.github/workflows/tests.yml', '.cargo/config.toml') }}
+        key: pgrx-sccache-${{matrix.os}}-${{ hashFiles('**/Cargo.lock', '.github/workflows/tests.yml', '.cargo/config.toml') }}
 
     - name: Cache cargo directory
-      uses: actions/cache@v3
+      uses: actions/cache@v4
       with:
         path: |
           ~/.cargo
-        key: pgrx-cargo-macos-11-tests-${{ hashFiles('**/Cargo.lock', '.github/workflows/tests.yml', '.cargo/config.toml') }}
+        key: pgrx-cargo-${{matrix.os}}-tests-${{ hashFiles('**/Cargo.lock', '.github/workflows/tests.yml', '.cargo/config.toml') }}
 
     - name: Start sccache server
       run: sccache --start-server
