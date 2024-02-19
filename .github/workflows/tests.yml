@@ -17,9 +17,120 @@ env:
   # CARGO_LOG: cargo::core::compiler::fingerprint=info # Uncomment this to output compiler fingerprint info
 
 jobs:
+  lintck:
+  name: rustfmt && clippy
+  runs-on: ubuntu-latest
+  if: "!contains(github.event.head_commit.message, 'nogha')"
+  env:
+    RUSTC_WRAPPER: sccache
+    SCCACHE_DIR: /home/runner/.cache/sccache
+
+  strategy:
+    matrix:
+      version: ["postgres-15"]
+
+  steps:
+  - uses: actions/checkout@v3
+
+  - name: Set up prerequisites and environment
+    run: |
+      sudo apt-get update -y -qq --fix-missing
+
+      echo ""
+
+      echo "----- Install / Set up sccache -----"
+      mkdir -p $HOME/.local/bin
+      curl -L https://github.com/mozilla/sccache/releases/download/v0.2.15/sccache-v0.2.15-x86_64-unknown-linux-musl.tar.gz | tar xz
+      mv -f sccache-v0.2.15-x86_64-unknown-linux-musl/sccache $HOME/.local/bin/sccache
+      chmod +x $HOME/.local/bin/sccache
+      echo "$HOME/.local/bin" >> $GITHUB_PATH
+      mkdir -p /home/runner/.cache/sccache
+      echo ""
+
+      # https://stackoverflow.com/questions/57968497/how-do-i-set-an-env-var-with-a-bash-expression-in-github-actions/57969570#57969570
+
+      echo "----- Set up MAKEFLAGS -----"
+      echo "MAKEFLAGS=$MAKEFLAGS -j $(grep -c ^processor /proc/cpuinfo)" >> $GITHUB_ENV
+      cat $GITHUB_ENV
+      echo ""
+
+      echo "----- Set up PG_VER variable -----"
+      echo "PG_VER=$(echo ${{ matrix.version }} | cut -d '-' -f2)" >> $GITHUB_ENV
+      cat $GITHUB_ENV
+      echo ""
+
+      echo "----- Remove old postgres -----"
+      sudo apt remove -y '^postgres.*' '^libpq.*' '^clang.*' '^llvm.*' '^libclang.*' '^libllvm.*' '^mono-llvm.*'
+      echo ""
+
+      echo "----- Install system dependencies -----"
+      sudo apt-get install -y \
+        build-essential \
+        llvm-14-dev libclang-14-dev clang-14 \
+        gcc \
+        libssl-dev \
+        libz-dev \
+        make \
+        pkg-config \
+        strace \
+        zlib1g-dev
+      echo ""
+
+      echo "----- Output Cargo version -----"
+      cargo --version
+      echo ""
+
+      echo "----- Outputting env -----"
+      env
+      echo ""
+
+  - name: Cache cargo registry
+    uses: actions/cache@v3
+    continue-on-error: false
+    with:
+      path: |
+        ~/.cargo/registry
+        ~/.cargo/git
+      key: pgrx-lintck-cargo-${{ runner.os }}-${{ hashFiles('**/Cargo.lock', '.github/workflows/tests.yml') }}
+
+  - name: Cache sccache directory
+    uses: actions/cache@v3
+    continue-on-error: false
+    with:
+      path: /home/runner/.cache/sccache
+      key: pgrx-lintck-sccache-${{ runner.os }}-${{ hashFiles('**/Cargo.lock', '.github/workflows/tests.yml') }}
+
+  - name: Start sccache server
+    run: sccache --start-server
+
+  - name: Print sccache stats (before)
+    run: sccache --show-stats
+
+  - name: Run rustfmt
+    run: cargo fmt --all -- --check
+
+  - name: Run license check
+    run: cargo install cargo-deny && ./ci/license-check.sh
+
+  - name: Clippy -Awarnings
+    run: cargo clippy -p pgrx --features pg$PG_VER -- -Awarnings
+
+  - name: Clippy -Dwarnings sql-entity-graph
+    run: cargo clippy -p pgrx-sql-entity-graph -- -Dwarnings
+
+  - name: Check doc-links
+    run: |
+      cargo rustdoc -p pgrx --features pg$PG_VER -- \
+        --document-private-items \
+        -Drustdoc::broken-intra-doc-links \
+        -Drustdoc::invalid-html-tags
+
+  - name: Stop sccache server
+    run: sccache --stop-server || true
+
   pgrx_tests:
     name: pgrx-tests & examples
-    needs: cargo_pgrx_init
+    needs: lintck
     runs-on: ubuntu-latest
     if: "!contains(github.event.head_commit.message, 'nogha')"
     env:
@@ -351,30 +462,11 @@ jobs:
     - name: Print sccache stats (before)
       run: sccache --show-stats
 
-    - name: Run rustfmt
-      run: cargo fmt --all -- --check
-
-    - name: Run license check
-      run: cargo install cargo-deny --force && ./ci/license-check.sh
-
     - name: Install cargo-pgrx
       run: cargo install --path cargo-pgrx/ --debug --force
 
     - name: Run 'cargo pgrx init' for ${{ matrix.version }}
       run: cargo pgrx init --pg$PG_VER download
-
-    - name: Clippy -Awarnings
-      run: cargo clippy -p pgrx --features pg$PG_VER -- -Awarnings
-
-    - name: Clippy -Dwarnings sql-entity-graph
-      run: cargo clippy -p pgrx-sql-entity-graph -- -Dwarnings
-
-    - name: Check doc-links
-      run: |
-        cargo rustdoc -p pgrx --features pg$PG_VER -- \
-          --document-private-items \
-          -Drustdoc::broken-intra-doc-links \
-          -Drustdoc::invalid-html-tags
 
     - name: create new sample extension
       run: cd /tmp/ && cargo pgrx new sample
@@ -398,7 +490,7 @@ jobs:
 
   build_mac:
     name: MacOS build & test
-    needs: cargo_pgrx_init
+    needs: lintck
     runs-on: ${{ matrix.os }}
     if: "!contains(github.event.head_commit.message, 'nogha')"
     env:
