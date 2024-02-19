@@ -18,7 +18,7 @@ env:
 
 jobs:
   lintck:
-  name: rustfmt && clippy
+  name: rustfmt and clippy
   runs-on: ubuntu-latest
   if: "!contains(github.event.head_commit.message, 'nogha')"
   env:
