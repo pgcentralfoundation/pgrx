@@ -54,28 +54,6 @@ jobs:
         cat $GITHUB_ENV
         echo ""
 
-        echo "----- Set up PG_VER variable -----"
-        echo "PG_VER=$(echo ${{ matrix.version }} | cut -d '-' -f2)" >> $GITHUB_ENV
-        cat $GITHUB_ENV
-        echo ""
-
-        echo "----- Remove old postgres -----"
-        sudo apt remove -y '^postgres.*' '^libpq.*' '^clang.*' '^llvm.*' '^libclang.*' '^libllvm.*' '^mono-llvm.*'
-        echo ""
-
-        echo "----- Install system dependencies -----"
-        sudo apt-get install -y \
-          build-essential \
-          llvm-14-dev libclang-14-dev clang-14 \
-          gcc \
-          libssl-dev \
-          libz-dev \
-          make \
-          pkg-config \
-          strace \
-          zlib1g-dev
-        echo ""
-
         echo "----- Output Cargo version -----"
         cargo --version
         echo ""
