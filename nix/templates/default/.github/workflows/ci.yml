@@ -6,16 +6,18 @@ jobs:
       fail-fast: false
       matrix:
         pg_version:
-          - 11
           - 12
           - 13
           - 14
           - 15
+          - 16
         target:
           - os: ubuntu-latest
             platform: x86_64-linux
-          - os: macos-latest
+          - os: macos-13
             platform: x86_64-darwin
+          - os: macos-14
+            platform: aarch64-darwin
     runs-on: ${{ matrix.target.os }}
     steps:
       - name: Checkout
