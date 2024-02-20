@@ -58,7 +58,7 @@ pub fn pg_test(attr: TokenStream, item: TokenStream) -> TokenStream {
 
     let mut expected_error = None;
     args.into_iter().for_each(|v| {
-        if let ExternArgs::Error(message) = v {
+        if let ExternArgs::ShouldPanic(message) = v {
             expected_error = Some(message)
         }
     });

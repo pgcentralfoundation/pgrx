@@ -77,7 +77,7 @@ impl Attribute {
                 quote! { ::pgrx::pgrx_sql_entity_graph::ExternArgs::ParallelRestricted }
             }
             Attribute::Error(s) => {
-                quote! { ::pgrx::pgrx_sql_entity_graph::ExternArgs::Error(String::from(#s)) }
+                quote! { ::pgrx::pgrx_sql_entity_graph::ExternArgs::ShouldPanic(String::from(#s)) }
             }
             Attribute::Schema(s) => {
                 quote! { ::pgrx::pgrx_sql_entity_graph::ExternArgs::Schema(String::from(#s)) }
