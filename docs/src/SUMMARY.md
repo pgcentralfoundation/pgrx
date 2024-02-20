@@ -1,8 +1,11 @@
-# Working with Postgres Extensions
+# The PGRX Book
 
+- [Introduction](./README.md)
 - [Working with PGRX](./extension/README.md)
+  - [Hello, `cargo pgrx`!](./extension/cargo-pgrx.md)
   - [Building Extensions with PGRX](./extension/build.md)
     - [Cross Compiling](./extension/build/cross-compile.md)
+  - [Installing a PGRX Extension](./extension/install.md)
   - [Writing Extensions with PGRX](./extension/write.md)
   - [Testing Extensions with PGRX](./extension/test.md)
     - [Memory Checking](./extension/test/memory-checking.md)
