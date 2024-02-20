@@ -107,7 +107,7 @@ where
     /// [`ERRCODE_DATA_EXCEPTION`]: pg_sys::errcodes::PgSqlErrorCode::ERRCODE_DATA_EXCEPTION
     #[inline]
     fn into_datum(self) -> Option<pg_sys::Datum> {
-        self.report().into_datum()
+        self.unwrap_or_report().into_datum()
     }
 
     #[inline]

@@ -439,7 +439,7 @@ impl PgExtern {
             let mut ret_expr = quote! { #func_name(#(#arg_pats),*) };
             if result {
                 // If it's a result, we need to report it.
-                ret_expr = quote! { #ret_expr.report() };
+                ret_expr = quote! { #ret_expr.unwrap_or_report() };
             }
             if !optional {
                 // If it's not already an option, we need to wrap it.
