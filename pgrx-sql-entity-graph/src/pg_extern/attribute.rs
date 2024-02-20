@@ -37,7 +37,7 @@ pub enum Attribute {
     ParallelSafe,
     ParallelUnsafe,
     ParallelRestricted,
-    Error(syn::LitStr),
+    ShouldPanic(syn::LitStr),
     Schema(syn::LitStr),
     Name(syn::LitStr),
     Cost(syn::Expr),
@@ -76,8 +76,8 @@ impl Attribute {
             Attribute::ParallelRestricted => {
                 quote! { ::pgrx::pgrx_sql_entity_graph::ExternArgs::ParallelRestricted }
             }
-            Attribute::Error(s) => {
-                quote! { ::pgrx::pgrx_sql_entity_graph::ExternArgs::Error(String::from(#s)) }
+            Attribute::ShouldPanic(s) => {
+                quote! { ::pgrx::pgrx_sql_entity_graph::ExternArgs::ShouldPanic(String::from(#s)) }
             }
             Attribute::Schema(s) => {
                 quote! { ::pgrx::pgrx_sql_entity_graph::ExternArgs::Schema(String::from(#s)) }
@@ -125,8 +125,8 @@ impl ToTokens for Attribute {
             Attribute::ParallelRestricted => {
                 quote! { parallel_restricted }
             }
-            Attribute::Error(s) => {
-                quote! { error = #s }
+            Attribute::ShouldPanic(s) => {
+                quote! { expected = #s }
             }
             Attribute::Schema(s) => {
                 quote! { schema = #s }
@@ -166,10 +166,10 @@ impl Parse for Attribute {
             "parallel_safe" => Self::ParallelSafe,
             "parallel_unsafe" => Self::ParallelUnsafe,
             "parallel_restricted" => Self::ParallelRestricted,
-            "error" => {
+            "error" | "expected" => {
                 let _eq: Token![=] = input.parse()?;
                 let literal: syn::LitStr = input.parse()?;
-                Self::Error(literal)
+                Attribute::ShouldPanic(literal)
             }
             "schema" => {
                 let _eq: Token![=] = input.parse()?;

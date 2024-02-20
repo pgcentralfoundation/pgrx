@@ -216,7 +216,7 @@ mod tests {
         assert_eq!(sum, Ok(Some(6)));
     }
 
-    #[pg_test(error = "attempt to add with overflow")]
+    #[pg_test(expected = "attempt to add with overflow")]
     fn test_sum_array_i32_overflow() -> Result<Option<i64>, pgrx::spi::Error> {
         Spi::get_one::<i64>(
             "SELECT sum_array(a) FROM (SELECT array_agg(s) a FROM generate_series(1, 1000000) s) x;",
@@ -241,7 +241,7 @@ mod tests {
         assert_eq!(sum, Ok(Some(6f32)));
     }
 
-    #[pg_test(error = "array contains NULL")]
+    #[pg_test(expected = "array contains NULL")]
     fn test_array_deny_nulls() -> Result<(), spi::Error> {
         Spi::run("SELECT iterate_array_with_deny_null(ARRAY[1,2,3, NULL]::int[])")
     }
@@ -273,7 +273,7 @@ mod tests {
         Ok(())
     }
 
-    #[pg_test(error = "array contains NULL")]
+    #[pg_test(expected = "array contains NULL")]
     fn test_serde_serialize_array_i32_deny_null() -> Result<Option<Json>, pgrx::spi::Error> {
         Spi::get_one::<Json>(
             "SELECT serde_serialize_array_i32_deny_null(ARRAY[1, 2, 3, null, 4, 5])",

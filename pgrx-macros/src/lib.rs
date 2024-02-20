@@ -51,6 +51,10 @@ pub fn pg_guard(_attr: TokenStream, item: TokenStream) -> TokenStream {
 
 /// `#[pg_test]` functions are test functions (akin to `#[test]`), but they run in-process inside
 /// Postgres during `cargo pgrx test`.
+///
+/// This can be combined with test attributes like [`#[should_panic(expected = "..")]`][expected].
+///
+/// [expected]: https://doc.rust-lang.org/reference/attributes/testing.html#the-should_panic-attribute
 #[proc_macro_attribute]
 pub fn pg_test(attr: TokenStream, item: TokenStream) -> TokenStream {
     let mut stream = proc_macro2::TokenStream::new();
@@ -58,7 +62,7 @@ pub fn pg_test(attr: TokenStream, item: TokenStream) -> TokenStream {
 
     let mut expected_error = None;
     args.into_iter().for_each(|v| {
-        if let ExternArgs::Error(message) = v {
+        if let ExternArgs::ShouldPanic(message) = v {
             expected_error = Some(message)
         }
     });

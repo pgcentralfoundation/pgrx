@@ -26,7 +26,7 @@ pub enum ExternArgs {
     ParallelSafe,
     ParallelUnsafe,
     ParallelRestricted,
-    Error(String),
+    ShouldPanic(String),
     Schema(String),
     Name(String),
     Cost(String),
@@ -47,7 +47,7 @@ impl core::fmt::Display for ExternArgs {
             ExternArgs::SecurityDefiner => write!(f, "SECURITY DEFINER"),
             ExternArgs::SecurityInvoker => write!(f, "SECURITY INVOKER"),
             ExternArgs::ParallelRestricted => write!(f, "PARALLEL RESTRICTED"),
-            ExternArgs::Error(_) => Ok(()),
+            ExternArgs::ShouldPanic(_) => Ok(()),
             ExternArgs::NoGuard => Ok(()),
             ExternArgs::Schema(_) => Ok(()),
             ExternArgs::Name(_) => Ok(()),
@@ -72,7 +72,7 @@ impl ToTokens for ExternArgs {
             ExternArgs::ParallelSafe => tokens.append(format_ident!("ParallelSafe")),
             ExternArgs::ParallelUnsafe => tokens.append(format_ident!("ParallelUnsafe")),
             ExternArgs::ParallelRestricted => tokens.append(format_ident!("ParallelRestricted")),
-            ExternArgs::Error(_s) => {
+            ExternArgs::ShouldPanic(_s) => {
                 tokens.append_all(
                     quote! {
                         Error(String::from("#_s"))
@@ -143,7 +143,7 @@ pub fn parse_extern_attributes(attr: TokenStream) -> HashSet<ExternArgs> {
                     "parallel_safe" => args.insert(ExternArgs::ParallelSafe),
                     "parallel_unsafe" => args.insert(ExternArgs::ParallelUnsafe),
                     "parallel_restricted" => args.insert(ExternArgs::ParallelRestricted),
-                    "error" => {
+                    "error" | "expected" => {
                         let _punc = itr.next().unwrap();
                         let literal = itr.next().unwrap();
                         let message = literal.to_string();
@@ -151,7 +151,7 @@ pub fn parse_extern_attributes(attr: TokenStream) -> HashSet<ExternArgs> {
 
                         // trim leading/trailing quotes around the literal
                         let message = message[1..message.len() - 1].to_string();
-                        args.insert(ExternArgs::Error(message.to_string()))
+                        args.insert(ExternArgs::ShouldPanic(message.to_string()))
                     }
                     "schema" => {
                         let _punc = itr.next().unwrap();
@@ -201,6 +201,8 @@ mod tests {
         let ts = proc_macro2::TokenStream::from_str(s).unwrap();
 
         let args = parse_extern_attributes(ts);
-        assert!(args.contains(&ExternArgs::Error("syntax error at or near \"THIS\"".to_string())));
+        assert!(
+            args.contains(&ExternArgs::ShouldPanic("syntax error at or near \"THIS\"".to_string()))
+        );
     }
 }
