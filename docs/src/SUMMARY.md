@@ -1,7 +1,7 @@
 # The PGRX Book
 
 - [Introduction](./README.md)
-- [Working with PGRX](./extension/README.md)
+- [Working with PGRX](./extension.md)
   - [Hello, `cargo pgrx`!](./extension/cargo-pgrx.md)
   - [Building Extensions with PGRX](./extension/build.md)
     - [Cross Compiling](./extension/build/cross-compile.md)
