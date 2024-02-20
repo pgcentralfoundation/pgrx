@@ -100,12 +100,12 @@ unsafe impl Enlist for pg_sys::Oid {
 }
 
 impl<'cx, T: Enlist> List<'cx, T> {
-    /// Borrow an item from the slice at the index
+    /// Borrow an item from the List at the index
     pub fn get(&self, index: usize) -> Option<&T> {
         self.iter().nth(index)
     }
 
-    /// Mutably borrow an item from the slice at the index
+    /// Mutably borrow an item from the List at the index
     pub fn get_mut(&mut self, index: usize) -> Option<&mut T> {
         self.iter_mut().nth(index)
     }
@@ -140,25 +140,6 @@ impl<'cx, T: Enlist> List<'cx, T> {
                 }
             },
             List::Cons(head) => head.push(value),
-        }
-    }
-
-    /// Attempt to push or Err if it would allocate
-    ///
-    /// This exists primarily to allow working with a list with maybe-zero capacity.
-    pub fn try_push(&mut self, value: T) -> Result<&mut ListHead<'cx, T>, &mut Self> {
-        match self {
-            List::Nil => Err(self),
-            list if list.capacity() - list.len() == 0 => Err(list),
-            List::Cons(head) => Ok(head.push(value)),
-        }
-    }
-
-    /// Try to reserve space for N more items
-    pub fn try_reserve(&mut self, items: usize) -> Result<&mut ListHead<'cx, T>, &mut Self> {
-        match self {
-            List::Nil => Err(self),
-            List::Cons(head) => Ok(head.reserve(items)),
         }
     }
 

@@ -86,12 +86,12 @@ unsafe impl Enlist for pg_sys::TransactionId {
 }
 
 impl<'cx, T: Enlist> List<'cx, T> {
-    /// Borrow an item from the slice at the index
+    /// Borrow an item from the List at the index
     pub fn get(&self, index: usize) -> Option<&T> {
         self.as_cells().get(index).map(Deref::deref)
     }
 
-    /// Mutably borrow an item from the slice at the index
+    /// Mutably borrow an item from the List at the index
     pub fn get_mut(&mut self, index: usize) -> Option<&mut T> {
         self.as_cells_mut().get_mut(index).map(DerefMut::deref_mut)
     }
@@ -130,25 +130,6 @@ impl<'cx, T: Enlist> List<'cx, T> {
                 }
             }
             List::Cons(head) => head.push(value),
-        }
-    }
-
-    /// Attempt to push or Err if it would allocate
-    ///
-    /// This exists primarily to allow working with a list with maybe-zero capacity.
-    pub fn try_push(&mut self, value: T) -> Result<&mut ListHead<'cx, T>, &mut Self> {
-        match self {
-            List::Nil => Err(self),
-            list if list.capacity() - list.len() == 0 => Err(list),
-            List::Cons(head) => Ok(head.push(value)),
-        }
-    }
-
-    /// Try to reserve space for N more items
-    pub fn try_reserve(&mut self, items: usize) -> Result<&mut ListHead<'cx, T>, &mut Self> {
-        match self {
-            List::Nil => Err(self),
-            List::Cons(head) => Ok(head.reserve(items)),
         }
     }
 
@@ -233,12 +214,12 @@ impl<T> List<'_, T> {
     /// Due to lifetimes this isn't a problem until unsafe Rust becomes involved,
     /// but with Postgres extensions it often does.
     ///
-    /// Note that if you use this on a 0-item list, you get an empty slice, of course.
+    /// Note that if you use this on a 0-item list, you get an empty slice,
+    /// which is not going to be equal to the null pointer.
     pub fn as_cells(&self) -> &[ListCell<T>] {
         unsafe {
             match self {
-                // No elements? No problem! Return a 0-sized slice
-                List::Nil => slice::from_raw_parts(self as *const _ as _, 0),
+                List::Nil => &[],
                 List::Cons(inner) => slice::from_raw_parts(inner.as_cells_ptr(), inner.len()),
             }
         }
@@ -249,7 +230,8 @@ impl<T> List<'_, T> {
     /// Includes the same caveats as with `List::as_cells`, but with "less" problems:
     /// `&mut` means you should not have other pointers to the list anyways.
     ///
-    /// Note that if you use this on a 0-item list, you get an empty slice, of course.
+    /// Note that if you use this on a 0-item list, you get an empty slice,
+    /// which is not going to be equal to the null pointer.
     pub fn as_cells_mut(&mut self) -> &mut [ListCell<T>] {
         // SAFETY: Note it is unsafe to read a union variant, but safe to set a union variant!
         // This allows access to `&mut pg_sys::ListCell` to mangle a List's type in safe code.
@@ -260,8 +242,7 @@ impl<T> List<'_, T> {
         // and as long as we correctly maintain the length of the List's type.
         unsafe {
             match self {
-                // No elements? No problem! Return a 0-sized slice
-                List::Nil => slice::from_raw_parts_mut(self as *mut _ as _, 0),
+                List::Nil => &mut [],
                 List::Cons(inner) => {
                     slice::from_raw_parts_mut(inner.as_mut_cells_ptr(), inner.len())
                 }
@@ -341,10 +322,9 @@ unsafe fn grow_list(list: &mut pg_sys::List, target: usize) {
             panic!("List allocation failure");
         }
         ptr::copy_nonoverlapping(list.elements, buf.cast(), list.length as _);
-        // If the old buffer is pointers, we would like everyone dereferencing them to segfault,
-        // if OIDs, Postgres will surface errors quickly on InvalidOid, etc.
-        // #[cfg(debug_assertions)]
-        // ptr::write_bytes(list.elements, 0x7F, list.length as _);
+        // This is the "clobber pattern" that Postgres uses.
+        #[cfg(debug_assertions)]
+        ptr::write_bytes(list.elements, 0x7F, list.length as _);
         list.elements = buf.cast();
     } else {
         // We already have a separate buf, making this easy.
