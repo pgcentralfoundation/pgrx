@@ -71,6 +71,7 @@ shared_preload_libraries = '/path/to/compiled_library.extension'
 This is necessary because after Postgres finishes starting up, it then forks, spawning new worker
 processes to parallelize answering queries. If your extension is loaded after this, each process
 will have a different view of its memory. This is fine for most extensions, but it prevents using
-the "singleton" pattern, or interacting with shared memory to communicate with abackground workers.
+the "singleton" pattern to present even a single instance of an immutable object (e.g. OnceLock),
+and prevents interacting with shared memory to communicate with background workers.
 
 [guc-shared-preload]: https://www.postgresql.org/docs/16/runtime-config-client.html#GUC-SHARED-PRELOAD-LIBRARIES
