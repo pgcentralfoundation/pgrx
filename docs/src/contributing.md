@@ -1,3 +1,8 @@
+# Contributing
+
+- [PGRX Internals](./contributing/pgrx-internal.md)
+- [Releases](./contributing/release.md)
+
 ## Dev Environment Setup
 
 System Requirements:

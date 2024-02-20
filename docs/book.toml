@@ -3,4 +3,4 @@ authors = ["Jubilee Young"]
 language = "en"
 multilingual = false
 src = "src"
-title = "Building Postgres Extensions with Rust"
+title = "Postgres Extensions in Rust"

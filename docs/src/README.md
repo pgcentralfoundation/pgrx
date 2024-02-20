@@ -1,13 +1,15 @@
-# Working with PGRX
+# Introduction to PGRX
 
-The idea of pgrx is that writing Postgres extensions with `pgxs.mk` requires
-- writing a bunch of C code that must manually handle many Postgres invariants
-- writing SQL that then loads the extension properly, including many
-  [CREATE FUNCTION] and [CREATE TYPE] declarations
+The core idea of pgrx is that writing Postgres extensions with `pgxs.mk` requires
+- writing C code that correctly binds Postgres headers and is a loadable dynamic library
+- writing many SQL [CREATE FUNCTION] and [CREATE TYPE] declarations
+- correctly handling all C language invariants
+- correctly handling all SQL invariants, since SQL for extensions can be `unsafe`
+- correctly handling all Postgres-specific invariants, like the function argument ABI
 
-This demands programmers who wish to write Postgres extensions to become
-experts in C, SQL, and the inner workings of Postgres, on top of having useful
-domain knowledge for the actual extension.
+This demands expert-level knowledge of C, SQL, and the inner workings of Postgres,
+just to write an extension. All of this is before the programmer can even get to write
+the actual extension's code, which will often require its own specialized domain knowledge!
 
 Alternatively, with Rust, safe abstractions can be designed to encode the
 invariants that Postgres requires in types. Powerful procedural macros can
@@ -31,3 +33,10 @@ It may assume familiarity with C and SQL work, but as long as you have written
 
 [CREATE FUNCTION]: https://www.postgresql.org/docs/current/sql-createfunction.html
 [CREATE TYPE]: https://www.postgresql.org/docs/current/sql-createtype.html
+
+## Table of Contents
+- [Working with PGRX](./extension/README.md)
+- [Basics of Postgres Internals](./pg-internal.md)
+- [Contributing](./contributing.md)
+- [Articles](./articles.md)
+- [Design Decisions](./design-decisions.md)
