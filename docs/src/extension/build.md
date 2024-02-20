@@ -3,4 +3,4 @@
 
 ## Guides
 
-- [Cross Compile](./build/cross-compile.md)
+- [Cross Compiling](./build/cross-compile.md)
