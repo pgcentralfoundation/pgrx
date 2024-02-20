@@ -288,7 +288,7 @@ impl<'conn> Iterator for SpiTupleTable<'conn> {
             None
         } else {
             assert!(self.current >= 0);
-            self.get_heap_tuple().report()
+            self.get_heap_tuple().unwrap_or_report()
         }
     }
 

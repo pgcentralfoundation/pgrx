@@ -28,7 +28,7 @@ pub trait ErrorReportable {
     type Inner;
 
     /// Raise a Postgres ERROR if appropriate, otherwise return a value
-    fn report(self) -> Self::Inner;
+    fn unwrap_or_report(self) -> Self::Inner;
 }
 
 impl<T, E> ErrorReportable for Result<T, E>
@@ -42,7 +42,7 @@ where
     /// If this [`Result`] represents the `Err` variant, raise it as an error.  If it happens to
     /// be an [`ErrorReport`], then that is specifically raised.  Otherwise it's just a general
     /// [`ereport!`] as a [`PgLogLevel::ERROR`].
-    fn report(self) -> Self::Inner {
+    fn unwrap_or_report(self) -> Self::Inner {
         self.unwrap_or_else(|e| {
             let any: Box<&dyn Any> = Box::new(&e);
             if any.downcast_ref::<ErrorReport>().is_some() {
@@ -235,7 +235,7 @@ impl ErrorReportWithLevel {
 
 impl ErrorReport {
     /// Create an [ErrorReport] which can be raised via Rust's [std::panic::panic_any()] or as
-    /// a specific Postgres "ereport()` level via [ErrorReport::report(self, PgLogLevel)]
+    /// a specific Postgres "ereport()` level via [ErrorReport::unwrap_or_report(self, PgLogLevel)]
     ///
     /// Embedded "file:line:col" location information is taken from the caller's location
     #[track_caller]
@@ -251,7 +251,7 @@ impl ErrorReport {
     }
 
     /// Create an [ErrorReport] which can be raised via Rust's [std::panic::panic_any()] or as
-    /// a specific Postgres "ereport()` level via [ErrorReport::report(self, PgLogLevel)].
+    /// a specific Postgres "ereport()` level via [ErrorReport::unwrap_or_report(self, PgLogLevel)].
     ///
     /// For internal use only
     fn with_location<S: Into<String>>(
