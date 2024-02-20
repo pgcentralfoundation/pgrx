@@ -216,7 +216,8 @@ mod tests {
         assert_eq!(Err(FnCallError::InvalidIdentifier(String::from(stupid_name))), result)
     }
 
-    #[pg_test(error = "it worked")]
+    #[pg_test]
+    #[should_panic(expected = "it worked")]
     fn fn_raises_error() {
         use std::sync::atomic::AtomicBool;
 
