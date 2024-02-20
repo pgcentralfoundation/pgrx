@@ -1,6 +1,6 @@
 # Writing Extensions with PGRX
 
-<!-- TODO: write all of this -->
+<!-- TODO: write more of this -->
 
 If you use `cargo pgrx new "${extension_name}"`, you get a new directory set up with that name,
 a Cargo.toml, a .control file, and some templated Rust for that extension.
