@@ -40,7 +40,12 @@ indexes or tables, including creating new kinds at the behest of Postgres, or us
 this is unfixable. There is no "trusted language" that can do these, because a trusted language
 is "trusted" in the sense that it has been defanged: it certainly cannot be trusted with anything
 as sharp as "raw pointers into memory". You can only find a way to obtain superuser privileges.
-This is easiest to do on a computer you already have root access to in general.
+
+The database's idea of a "superuser" is not exactly the same as the operating system's "superuser",
+but obtaining superuser privileges is still easiest to do on computers you already have root access
+to in general. A "managed database" will probably not cut it, though some cloud providers have
+more permissive policies about installing extensions into managed databases and are willing to help
+you with this.
 
 ### When `shared_preload_libraries` is required
 
