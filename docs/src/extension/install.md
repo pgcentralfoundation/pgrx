@@ -1,6 +1,8 @@
 # Installing a PGRX Extension
 
-Some extensions require more or less configuration in order to install on a database server.
+In most cases, you can simply use `cargo pgrx install` and it will take care of everything.
+Some extensions require more configuration than that in order to install on a database server,
+and there are a few caveats to keep in mind.
 
 ## You Must Be Superuser
 
