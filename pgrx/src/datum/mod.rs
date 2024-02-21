@@ -16,6 +16,7 @@
 mod anyarray;
 mod anyelement;
 mod array;
+mod borrow;
 mod date;
 pub mod datetime_support;
 mod from;
@@ -44,6 +45,7 @@ pub use self::uuid::*;
 pub use anyarray::*;
 pub use anyelement::*;
 pub use array::*;
+pub use borrow::*;
 pub use date::*;
 pub use datetime_support::*;
 pub use from::*;
