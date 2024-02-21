@@ -274,7 +274,7 @@ fn generate_bindings(
                 use crate as pg_sys;
                 use crate::{Datum, Oid, PgNode};
             },
-            is_for_release
+            is_for_release,
         )
         .wrap_err_with(|| {
             format!(
