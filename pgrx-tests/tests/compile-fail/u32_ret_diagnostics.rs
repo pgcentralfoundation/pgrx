@@ -14,8 +14,8 @@ mod tests {
     use pgrx::prelude::*;
 
     #[pg_test]
-    fn test_hello_u32() {
-        assert_eq!(10, crate::u32_world("10"));
+    fn test_u32_world() {
+        assert_eq!(10, crate::u32_world("10".to_string()));
     }
 }
 
