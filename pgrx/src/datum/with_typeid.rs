@@ -45,7 +45,7 @@ pub fn nonstatic_typeid<T: ?Sized>() -> core::any::TypeId {
 /// let treat_string = stringify!(Treat).to_string();
 /// <Treat<'_> as pgrx::datum::WithTypeIds>::register_with_refs(&mut mappings, treat_string.clone());
 ///
-/// assert!(mappings.iter().any(|x| x.id == ::pgrx::datum::nonstatic_typeid::<Treat<'static>>()));
+/// # assert!(mappings.iter().any(|x| x.id == ::pgrx::datum::nonstatic_typeid::<Treat<'static>>()));
 /// ```
 ///
 /// This trait uses the fact that inherent implementations are a higher priority than trait
@@ -268,7 +268,7 @@ impl<T> WithSizedTypeIds<T> {
 ///     treat_string.clone()
 /// );
 ///
-/// assert!(mappings.iter().any(|x| x.id == ::pgrx::datum::nonstatic_typeid::<Array<Treat>>()));
+/// # assert!(mappings.iter().any(|x| x.id == ::pgrx::datum::nonstatic_typeid::<Array<Treat>>()));
 /// ```
 ///
 /// This trait uses the fact that inherent implementations are a higher priority than trait
@@ -349,7 +349,7 @@ impl<T: FromDatum + 'static> WithArrayTypeIds<T> {
 ///     treat_string.clone()
 /// );
 ///
-/// assert!(mappings.iter().any(|x| x.id == ::pgrx::datum::nonstatic_typeid::<PgVarlena<Treat<'_>>>()));
+/// # assert!(mappings.iter().any(|x| x.id == ::pgrx::datum::nonstatic_typeid::<PgVarlena<Treat<'_>>>()));
 /// ```
 ///
 /// This trait uses the fact that inherent implementations are a higher priority than trait

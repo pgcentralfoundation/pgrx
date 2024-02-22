@@ -64,6 +64,8 @@ pub use varlena::*;
 use crate::memcx::MemCx;
 use crate::pg_sys;
 use core::marker::PhantomData;
+#[doc(hidden)]
+pub use with_typeid::nonstatic_typeid;
 pub use with_typeid::{WithArrayTypeIds, WithSizedTypeIds, WithTypeIds, WithVarlenaTypeIds};
 
 /// How Postgres represents datatypes
