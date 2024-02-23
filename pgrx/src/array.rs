@@ -8,15 +8,57 @@
 //LICENSE
 //LICENSE Use of this source code is governed by the MIT license that can be found in the LICENSE file.
 #![allow(clippy::precedence)]
-use crate::datum::Array;
+#![allow(unused)]
+use crate::datum::{Array, BorrowDatum, Datum};
+use crate::pgrx_sql_entity_graph::metadata::{
+    ArgumentError, Returns, ReturnsError, SqlMapping, SqlTranslatable,
+};
 use crate::toast::{Toast, Toasty};
 use crate::{layout, pg_sys, varlena};
 use bitvec::ptr::{self as bitptr, BitPtr, BitPtrError, Mut};
 use bitvec::slice::BitSlice;
 use core::ptr::{self, NonNull};
 use core::slice;
+use core::marker::PhantomData;
 
 mod port;
+
+/// &FlatArray is akin to &ArrayType
+#[repr(C)]
+pub struct FlatArray<'mcx, T: ?Sized> {
+    scalar: PhantomData<&'mcx T>,
+    head: pg_sys::ArrayType,
+    tail: [u8],
+}
+
+impl<'mcx, T> FlatArray<'mcx, T>
+where
+    T: ?Sized + BorrowDatum,
+{
+    pub fn get(&self, index: usize) -> Option<&T> {
+        // FIXME: consider nullability
+        self.datum_at(index).map(|datum| unsafe { T::borrow_from(datum) })
+    }
+
+    pub fn get_mut(&mut self, index: usize) -> Option<&mut T> {
+        // FIXME: consider nullability
+        self.datum_mut_at(index).map(|datum| unsafe { T::borrow_mut_from(datum) })
+    }
+
+    fn datum_at(&self, index: usize) -> Option<&Datum<'_>> {
+        let data_ptr = unsafe { ARR_DATA_PTR(ptr::addr_of!(self.head).cast_mut()) };
+        todo!();
+        // FIXME: replace with actual impl instead of something that merely typechecks
+        Some(unsafe { &*(data_ptr as *const Datum<'_>) })
+    }
+
+    fn datum_mut_at(&mut self, index: usize) -> Option<&mut Datum<'_>> {
+        let data_ptr = unsafe { ARR_DATA_PTR(ptr::addr_of_mut!(self.head)) };
+        todo!();
+        // FIXME: replace with actual impl instead of something that merely typechecks
+        Some(unsafe { &mut *(data_ptr as *mut Datum<'_>) })
+    }
+}
 
 /**
 An aligned, dereferenceable `NonNull<ArrayType>` with low-level accessors.
