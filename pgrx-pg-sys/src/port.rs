@@ -134,15 +134,8 @@ pub unsafe fn MemoryContextIsValid(context: crate::MemoryContext) -> bool {
         }
 }
 
-#[inline]
-pub fn VARHDRSZ_EXTERNAL() -> usize {
-    offset_of!(super::varattrib_1b_e, va_data)
-}
-
-#[inline]
-pub fn VARHDRSZ_SHORT() -> usize {
-    offset_of!(super::varattrib_1b, va_data)
-}
+pub const VARHDRSZ_EXTERNAL: usize = offset_of!(super::varattrib_1b_e, va_data);
+pub const VARHDRSZ_SHORT: usize = offset_of!(super::varattrib_1b, va_data);
 
 #[inline]
 pub fn get_pg_major_version_string() -> &'static str {

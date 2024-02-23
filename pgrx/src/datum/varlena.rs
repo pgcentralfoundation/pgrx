@@ -8,7 +8,6 @@
 //LICENSE
 //LICENSE Use of this source code is governed by the MIT license that can be found in the LICENSE file.
 //! Wrapper for Postgres 'varlena' type, over Rust types of a fixed size (ie, `impl Copy`)
-use crate::pg_sys::{VARATT_SHORT_MAX, VARHDRSZ_SHORT};
 use crate::{
     pg_sys, rust_regtypein, set_varsize, set_varsize_short, vardata_any, varsize_any,
     varsize_any_exhdr, void_mut_ptr, FromDatum, IntoDatum, PgMemoryContexts, StringInfo,
@@ -135,9 +134,9 @@ where
 
         // safe: ptr will halready be allocated
         unsafe {
-            if size_of + VARHDRSZ_SHORT() <= VARATT_SHORT_MAX as usize {
+            if size_of + pg_sys::VARHDRSZ_SHORT <= pg_sys::VARATT_SHORT_MAX as usize {
                 // we can use the short header size
-                set_varsize_short(ptr, (size_of + VARHDRSZ_SHORT()) as i32);
+                set_varsize_short(ptr, (size_of + pg_sys::VARHDRSZ_SHORT) as i32);
             } else {
                 // gotta use the full 4-byte header
                 set_varsize(ptr, (size_of + pg_sys::VARHDRSZ) as i32);

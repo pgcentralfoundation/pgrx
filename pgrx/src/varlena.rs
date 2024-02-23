@@ -62,7 +62,7 @@ pub unsafe fn set_varsize_short(ptr: *mut pg_sys::varlena, len: i32) {
 /// ```
 #[inline]
 pub unsafe fn varsize_external(ptr: *const pg_sys::varlena) -> usize {
-    pg_sys::VARHDRSZ_EXTERNAL() + vartag_size(vartag_external(ptr) as pg_sys::vartag_external)
+    pg_sys::VARHDRSZ_EXTERNAL + vartag_size(vartag_external(ptr) as pg_sys::vartag_external)
 }
 
 /// ```c
@@ -232,9 +232,9 @@ pub unsafe fn varsize_any(ptr: *const pg_sys::varlena) -> usize {
 #[inline]
 pub unsafe fn varsize_any_exhdr(ptr: *const pg_sys::varlena) -> usize {
     if varatt_is_1b_e(ptr) {
-        varsize_external(ptr) - pg_sys::VARHDRSZ_EXTERNAL()
+        varsize_external(ptr) - pg_sys::VARHDRSZ_EXTERNAL
     } else if varatt_is_1b(ptr) {
-        varsize_1b(ptr) - pg_sys::VARHDRSZ_SHORT()
+        varsize_1b(ptr) - pg_sys::VARHDRSZ_SHORT
     } else {
         varsize_4b(ptr) - pg_sys::VARHDRSZ
     }
