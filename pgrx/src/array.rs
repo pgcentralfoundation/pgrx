@@ -60,6 +60,25 @@ where
     }
 }
 
+unsafe impl<T> BorrowDatum for FlatArray<'_, T> {
+    unsafe fn borrow_from<'dat>(datum: &'dat Datum<'_>) -> &'dat Self {
+        let ptr = datum as *const Datum<'_> as *const *const pg_sys::varlena;
+        unsafe {
+            let ptr = *ptr;
+            let len = varlena::varsize_any(ptr) - mem::size_of::<pg_sys::ArrayType>();
+            &*(ptr::slice_from_raw_parts(ptr as *const u8, len) as *const Self)
+        }
+    }
+    unsafe fn borrow_mut_from<'dat>(datum: &'dat mut Datum<'_>) -> &'dat mut Self {
+        let ptr = datum as *mut Datum<'_> as *mut *mut pg_sys::varlena;
+        unsafe {
+            let ptr = *ptr;
+            let len = varlena::varsize_any(ptr) - mem::size_of::<pg_sys::ArrayType>();
+            &mut *(ptr::slice_from_raw_parts(ptr as *mut u8, len) as *mut Self)
+        }
+    }
+}
+
 /**
 An aligned, dereferenceable `NonNull<ArrayType>` with low-level accessors.
 
