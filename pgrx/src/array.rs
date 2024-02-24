@@ -45,18 +45,34 @@ where
         self.datum_mut_at(index).map(|datum| unsafe { T::borrow_mut_from(datum) })
     }
 
-    fn datum_at(&self, index: usize) -> Option<&Datum<'_>> {
+    fn datum_at(&self, index: usize) -> Option<&Datum<'mcx>> {
         let data_ptr = unsafe { ARR_DATA_PTR(ptr::addr_of!(self.head).cast_mut()) };
-        todo!();
+        // todo!();
         // FIXME: replace with actual impl instead of something that merely typechecks
-        Some(unsafe { &*(data_ptr as *const Datum<'_>) })
+        Some(unsafe { &*(data_ptr as *const Datum<'mcx>) })
     }
 
-    fn datum_mut_at(&mut self, index: usize) -> Option<&mut Datum<'_>> {
+    fn datum_mut_at(&mut self, index: usize) -> Option<&mut Datum<'mcx>> {
         let data_ptr = unsafe { ARR_DATA_PTR(ptr::addr_of_mut!(self.head)) };
-        todo!();
+        // todo!();
         // FIXME: replace with actual impl instead of something that merely typechecks
-        Some(unsafe { &mut *(data_ptr as *mut Datum<'_>) })
+        Some(unsafe { &mut *(data_ptr as *mut Datum<'mcx>) })
+    }
+
+    fn nullbitmap(&self) -> &[u8] {
+        todo!()
+    }
+
+    /// Obtain a mutable reference to the null bitmap.
+    /// # Safety
+    /// The items set to 1 in the null bitmap are treated as valid.
+    /// If the null bitmap covers any extent, then trailing bits must be set to 0 and
+    /// all elements that have a 1 marking them must be initialized. The null bitmap
+    /// is linear but the layout of elements may be nonlinear, so for some arrays
+    /// the positions of the null bits that must be set or unset cannot be directly
+    /// calculated from the positions of the elements in the array, and vice versa.
+    unsafe fn nullbitmap_mut(&mut self) -> &mut [u8] {
+        todo!()
     }
 }
 
