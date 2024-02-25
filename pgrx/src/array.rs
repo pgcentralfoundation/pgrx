@@ -65,31 +65,26 @@ where
         unsafe { slice::from_raw_parts(dims_ptr, ndims).into_iter().sum::<i32>() as usize }
     }
 
-    fn nullbitmap(&self) -> &[u8] {
-        todo!()
-    }
+    pub fn nulls(&self) -> Option<&[u8]> {
+        let len = self.len() + 7 >> 3; // Obtains 0 if len was 0.
 
-    /// Obtain a mutable reference to the null bitmap.
-    /// # Safety
-    /// The items set to 1 in the null bitmap are treated as valid.
-    /// If the null bitmap covers any extent, then trailing bits must be set to 0 and
-    /// all elements that have a 1 marking them must be initialized. The null bitmap
-    /// is linear but the layout of elements may be nonlinear, so for some arrays
-    /// the positions of the null bits that must be set or unset cannot be directly
-    /// calculated from the positions of the elements in the array, and vice versa.
-    unsafe fn nullbitmap_mut(&mut self) -> &mut [u8] {
-        todo!()
+        // SAFETY: This obtains the nulls pointer from a function that must either
+        // return a null pointer or a pointer to a valid null bitmap.
+        unsafe {
+            let nulls_ptr = ARR_NULLBITMAP(ptr::addr_of!(self.head).cast_mut());
+            ptr::slice_from_raw_parts(nulls_ptr, len).as_ref()
+        }
     }
 
     /**
     Oxidized form of [ARR_NULLBITMAP(ArrayType*)][ARR_NULLBITMAP]
+    If this returns None, the array *cannot* have nulls.
+    Note that unlike the `is_null: bool` that appears elsewhere, 1 is valid and 0 is null.
 
-    If this returns None, the array cannot have nulls.
-    If this returns Some, it points to the bitslice that marks nulls in this array.
-
-    Note that unlike the `is_null: bool` that appears elsewhere, here a 0 bit is null,
-    or possibly out of bounds for the final byte of the bitslice.
-
+    # Safety
+    Trailing bits must be set to 0, and all elements marked as valid (1) must be initialized.
+    The null bitmap is linear but the layout of elements may be nonlinear, so for some arrays
+    these cannot be calculated directly from each other.
     [ARR_NULLBITMAP]: <https://git.postgresql.org/gitweb/?p=postgresql.git;a=blob;f=src/include/utils/array.h;h=4ae6c3be2f8b57afa38c19af2779f67c782e4efc;hb=278273ccbad27a8834dfdf11895da9cd91de4114#l293>
     */
     pub unsafe fn nulls_mut(&mut self) -> Option<&mut [u8]> {
