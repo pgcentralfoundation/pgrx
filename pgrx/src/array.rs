@@ -59,6 +59,12 @@ where
         Some(unsafe { &mut *(data_ptr as *mut Datum<'mcx>) })
     }
 
+    fn len(&self) -> usize {
+        let ndims = self.head.ndim as usize;
+        let dims_ptr = unsafe { ARR_DIMS(ptr::addr_of!(self.head).cast_mut()) };
+        unsafe { slice::from_raw_parts(dims_ptr, ndims).into_iter().sum::<i32>() as usize }
+    }
+
     fn nullbitmap(&self) -> &[u8] {
         todo!()
     }
@@ -73,6 +79,28 @@ where
     /// calculated from the positions of the elements in the array, and vice versa.
     unsafe fn nullbitmap_mut(&mut self) -> &mut [u8] {
         todo!()
+    }
+
+    /**
+    Oxidized form of [ARR_NULLBITMAP(ArrayType*)][ARR_NULLBITMAP]
+
+    If this returns None, the array cannot have nulls.
+    If this returns Some, it points to the bitslice that marks nulls in this array.
+
+    Note that unlike the `is_null: bool` that appears elsewhere, here a 0 bit is null,
+    or possibly out of bounds for the final byte of the bitslice.
+
+    [ARR_NULLBITMAP]: <https://git.postgresql.org/gitweb/?p=postgresql.git;a=blob;f=src/include/utils/array.h;h=4ae6c3be2f8b57afa38c19af2779f67c782e4efc;hb=278273ccbad27a8834dfdf11895da9cd91de4114#l293>
+    */
+    pub unsafe fn nulls_mut(&mut self) -> Option<&mut [u8]> {
+        let len = self.len() + 7 >> 3; // Obtains 0 if len was 0.
+
+        // SAFETY: This obtains the nulls pointer from a function that must either
+        // return a null pointer or a pointer to a valid null bitmap.
+        unsafe {
+            let nulls_ptr = ARR_NULLBITMAP(ptr::addr_of_mut!(self.head));
+            ptr::slice_from_raw_parts_mut(nulls_ptr, len).as_mut()
+        }
     }
 }
 
