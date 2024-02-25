@@ -9,12 +9,12 @@
 //LICENSE Use of this source code is governed by the MIT license that can be found in the LICENSE file.
 #![allow(clippy::precedence)]
 use crate::datum::Array;
-use crate::pg_sys;
 use crate::toast::{Toast, Toasty};
+use crate::{layout, pg_sys, varlena};
 use bitvec::prelude::*;
-use bitvec::ptr::{bitslice_from_raw_parts_mut, BitPtr, BitPtrError, Mut};
-use core::ptr::{slice_from_raw_parts_mut, NonNull};
-use core::slice;
+use bitvec::ptr::{self as bitptr, BitPtr, BitPtrError, Mut};
+use core::ptr::{self, NonNull};
+use core::{mem, slice};
 
 #[allow(non_snake_case)]
 #[inline(always)]
@@ -38,10 +38,8 @@ const fn MAXALIGN(len: usize) -> usize {
 unsafe fn ARR_NDIM(a: *mut pg_sys::ArrayType) -> usize {
     // #define ARR_NDIM(a)				((a)->ndim)
 
-    unsafe {
-        // SAFETY:  caller has asserted that `a` is a properly allocated ArrayType pointer
-        (*a).ndim as usize
-    }
+    // SAFETY:  caller has asserted that `a` is a properly allocated ArrayType pointer
+    unsafe { (*a).ndim as usize }
 }
 
 /// # Safety
@@ -51,10 +49,8 @@ unsafe fn ARR_NDIM(a: *mut pg_sys::ArrayType) -> usize {
 unsafe fn ARR_HASNULL(a: *mut pg_sys::ArrayType) -> bool {
     // #define ARR_HASNULL(a)			((a)->dataoffset != 0)
 
-    unsafe {
-        // SAFETY:  caller has asserted that `a` is a properly allocated ArrayType pointer
-        (*a).dataoffset != 0
-    }
+    // SAFETY:  caller has asserted that `a` is a properly allocated ArrayType pointer
+    unsafe { (*a).dataoffset != 0 }
 }
 
 /// # Safety
@@ -68,10 +64,8 @@ const unsafe fn ARR_DIMS(a: *mut pg_sys::ArrayType) -> *mut i32 {
     // #define ARR_DIMS(a) \
     // ((int *) (((char *) (a)) + sizeof(ArrayType)))
 
-    unsafe {
-        // SAFETY:  caller has asserted that `a` is a properly allocated ArrayType pointer
-        a.cast::<u8>().add(std::mem::size_of::<pg_sys::ArrayType>()).cast::<i32>()
-    }
+    // SAFETY:  caller has asserted that `a` is a properly allocated ArrayType pointer
+    unsafe { a.cast::<u8>().add(mem::size_of::<pg_sys::ArrayType>()).cast::<i32>() }
 }
 
 /// # Safety
@@ -80,10 +74,8 @@ const unsafe fn ARR_DIMS(a: *mut pg_sys::ArrayType) -> *mut i32 {
 #[allow(non_snake_case)]
 #[inline(always)]
 unsafe fn ARR_NELEMS(a: *mut pg_sys::ArrayType) -> usize {
-    unsafe {
-        // SAFETY:  caller has asserted that `a` is a properly allocated ArrayType pointer
-        pg_sys::ArrayGetNItems((*a).ndim, ARR_DIMS(a)) as usize
-    }
+    // SAFETY:  caller has asserted that `a` is a properly allocated ArrayType pointer
+    unsafe { pg_sys::ArrayGetNItems((*a).ndim, ARR_DIMS(a)) as usize }
 }
 
 /// Returns the "null bitmap" of the specified array.  If there isn't one (the array contains no nulls)
@@ -104,15 +96,13 @@ unsafe fn ARR_NULLBITMAP(a: *mut pg_sys::ArrayType) -> *mut pg_sys::bits8 {
     // : (bits8 *) NULL)
     //
 
+    // SAFETY:  caller has asserted that `a` is a properly allocated ArrayType pointer
     unsafe {
-        // SAFETY:  caller has asserted that `a` is a properly allocated ArrayType pointer
         if ARR_HASNULL(a) {
-            a.cast::<u8>().add(
-                std::mem::size_of::<pg_sys::ArrayType>()
-                    + 2 * std::mem::size_of::<i32>() * ARR_NDIM(a),
-            )
+            a.cast::<u8>()
+                .add(mem::size_of::<pg_sys::ArrayType>() + 2 * mem::size_of::<i32>() * ARR_NDIM(a))
         } else {
-            std::ptr::null_mut()
+            ptr::null_mut()
         }
     }
 }
@@ -125,7 +115,7 @@ const fn ARR_OVERHEAD_NONULLS(ndims: usize) -> usize {
     // #define ARR_OVERHEAD_NONULLS(ndims) \
     // MAXALIGN(sizeof(ArrayType) + 2 * sizeof(int) * (ndims))
 
-    MAXALIGN(std::mem::size_of::<pg_sys::ArrayType>() + 2 * std::mem::size_of::<i32>() * ndims)
+    MAXALIGN(mem::size_of::<pg_sys::ArrayType>() + 2 * mem::size_of::<i32>() * ndims)
 }
 
 /// # Safety
@@ -137,8 +127,8 @@ unsafe fn ARR_DATA_OFFSET(a: *mut pg_sys::ArrayType) -> usize {
     // #define ARR_DATA_OFFSET(a) \
     // (ARR_HASNULL(a) ? (a)->dataoffset : ARR_OVERHEAD_NONULLS(ARR_NDIM(a)))
 
+    // SAFETY:  caller has asserted that `a` is a properly allocated ArrayType pointer
     unsafe {
-        // SAFETY:  caller has asserted that `a` is a properly allocated ArrayType pointer
         if ARR_HASNULL(a) {
             (*a).dataoffset as _
         } else {
@@ -253,7 +243,7 @@ impl RawArray {
     #[allow(dead_code)]
     pub(crate) unsafe fn deconstruct(
         &mut self,
-        layout: crate::layout::Layout,
+        layout: layout::Layout,
     ) -> (*mut pg_sys::Datum, *mut bool) {
         let oid = self.oid();
         let array = self.ptr.as_ptr();
@@ -268,7 +258,7 @@ impl RawArray {
                 array,
                 oid,
                 layout.size.as_typlen().into(),
-                matches!(layout.pass, crate::layout::PassBy::Value),
+                matches!(layout.pass, layout::PassBy::Value),
                 layout.align.as_typalign(),
                 &mut elements,
                 &mut nulls,
@@ -412,7 +402,7 @@ impl RawArray {
         This is because, while the initial pointer is NonNull,
         ARR_NULLBITMAP can return a nullptr!
         */
-        NonNull::new(slice_from_raw_parts_mut(self.nulls_mut_ptr(), len))
+        NonNull::new(ptr::slice_from_raw_parts_mut(self.nulls_mut_ptr(), len))
     }
 
     /**
@@ -435,8 +425,7 @@ impl RawArray {
         This is because, while the initial pointer is NonNull,
         ARR_NULLBITMAP can return a nullptr!
         */
-
-        NonNull::new(bitslice_from_raw_parts_mut(self.nulls_bitptr()?, self.len))
+        NonNull::new(bitptr::bitslice_from_raw_parts_mut(self.nulls_bitptr()?, self.len))
     }
 
     /**
@@ -503,7 +492,7 @@ impl RawArray {
         needing only their initial assertion regarding the type being correct.
         */
         unsafe {
-            NonNull::new_unchecked(slice_from_raw_parts_mut(
+            NonNull::new_unchecked(ptr::slice_from_raw_parts_mut(
                 ARR_DATA_PTR(self.ptr.as_ptr()).cast(),
                 self.len,
             ))
@@ -518,7 +507,7 @@ impl RawArray {
     /// "one past the end" pointer for the entire array's bytes
     pub(crate) fn end_ptr(&self) -> *const u8 {
         let ptr = self.ptr.as_ptr().cast::<u8>();
-        ptr.wrapping_add(unsafe { crate::varlena::varsize_any(ptr.cast()) })
+        ptr.wrapping_add(unsafe { varlena::varsize_any(ptr.cast()) })
     }
 }
 
