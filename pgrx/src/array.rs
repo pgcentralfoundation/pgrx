@@ -395,13 +395,6 @@ impl RawArray {
     pub fn nulls(&mut self) -> Option<NonNull<[u8]>> {
         let len = self.len + 7 >> 3; // Obtains 0 if len was 0.
 
-        /*
-        SAFETY: This obtains the nulls pointer, which is valid to obtain because
-        the len was asserted on construction. However, unlike the other cases,
-        it isn't correct to trust it. Instead, this gets null-checked.
-        This is because, while the initial pointer is NonNull,
-        ARR_NULLBITMAP can return a nullptr!
-        */
         NonNull::new(ptr::slice_from_raw_parts_mut(self.nulls_mut_ptr(), len))
     }
 
@@ -418,13 +411,6 @@ impl RawArray {
     [ARR_NULLBITMAP]: <https://git.postgresql.org/gitweb/?p=postgresql.git;a=blob;f=src/include/utils/array.h;h=4ae6c3be2f8b57afa38c19af2779f67c782e4efc;hb=278273ccbad27a8834dfdf11895da9cd91de4114#l293>
     */
     pub fn nulls_bitslice(&mut self) -> Option<NonNull<BitSlice<u8>>> {
-        /*
-        SAFETY: This obtains the nulls pointer, which is valid to obtain because
-        the len was asserted on construction. However, unlike the other cases,
-        it isn't correct to trust it. Instead, this gets null-checked.
-        This is because, while the initial pointer is NonNull,
-        ARR_NULLBITMAP can return a nullptr!
-        */
         NonNull::new(bitptr::bitslice_from_raw_parts_mut(self.nulls_bitptr()?, self.len))
     }
 
