@@ -18,7 +18,7 @@ use crate::{layout, pg_sys, varlena};
 use bitvec::ptr::{self as bitptr, BitPtr, BitPtrError, Mut};
 use bitvec::slice::BitSlice;
 use core::ptr::{self, NonNull};
-use core::slice;
+use core::{slice, mem};
 use core::marker::PhantomData;
 
 mod port;
@@ -54,7 +54,7 @@ where
     }
 
     fn datum_at(&self, index: usize) -> Option<&Datum<'mcx>> {
-        let data_ptr = unsafe { ARR_DATA_PTR(ptr::addr_of!(self.head).cast_mut()) };
+        let data_ptr = unsafe { port::ARR_DATA_PTR(ptr::addr_of!(self.head).cast_mut()) };
         // todo!();
         // FIXME: replace with actual impl instead of something that merely typechecks
         Some(unsafe { &*(data_ptr as *const Datum<'mcx>) })
@@ -66,7 +66,7 @@ where
     /// with the next `&mut Datum`, so it must essentially always be converted.
     /// Consider replacing this with raw pointers.
     unsafe fn datum_mut_at(&mut self, index: usize) -> Option<&mut Datum<'mcx>> {
-        let data_ptr = unsafe { ARR_DATA_PTR(ptr::addr_of_mut!(self.head)) };
+        let data_ptr = unsafe { port::ARR_DATA_PTR(ptr::addr_of_mut!(self.head)) };
         // todo!();
         // FIXME: replace with actual impl instead of something that merely typechecks
         Some(unsafe { &mut *(data_ptr as *mut Datum<'mcx>) })
@@ -77,7 +77,7 @@ where
     /// Note that for many Arrays, this doesn't have a linear relationship with array byte-len.
     fn len(&self) -> usize {
         let ndims = self.head.ndim as usize;
-        let dims_ptr = unsafe { ARR_DIMS(ptr::addr_of!(self.head).cast_mut()) };
+        let dims_ptr = unsafe { port::ARR_DIMS(ptr::addr_of!(self.head).cast_mut()) };
         unsafe { slice::from_raw_parts(dims_ptr, ndims).into_iter().sum::<i32>() as usize }
     }
 
@@ -87,7 +87,7 @@ where
         // SAFETY: This obtains the nulls pointer from a function that must either
         // return a null pointer or a pointer to a valid null bitmap.
         unsafe {
-            let nulls_ptr = ARR_NULLBITMAP(ptr::addr_of!(self.head).cast_mut());
+            let nulls_ptr = port::ARR_NULLBITMAP(ptr::addr_of!(self.head).cast_mut());
             ptr::slice_from_raw_parts(nulls_ptr, len).as_ref()
         }
     }
@@ -109,7 +109,7 @@ where
         // SAFETY: This obtains the nulls pointer from a function that must either
         // return a null pointer or a pointer to a valid null bitmap.
         unsafe {
-            let nulls_ptr = ARR_NULLBITMAP(ptr::addr_of_mut!(self.head));
+            let nulls_ptr = port::ARR_NULLBITMAP(ptr::addr_of_mut!(self.head));
             ptr::slice_from_raw_parts_mut(nulls_ptr, len).as_mut()
         }
     }
