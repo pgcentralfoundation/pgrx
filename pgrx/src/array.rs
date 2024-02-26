@@ -35,13 +35,21 @@ impl<'mcx, T> FlatArray<'mcx, T>
 where
     T: ?Sized + BorrowDatum,
 {
-    pub fn get(&self, index: usize) -> Option<&T> {
+    /// Borrow the nth element.
+    ///
+    /// `FlatArray::nth` may have to iterate the array, thus it is named for `Iterator::nth`.
+    pub fn nth(&self, index: usize) -> Option<&T> {
         // FIXME: consider nullability
+        // FIXME: Become a dispatch to Iterator::nth
         self.datum_at(index).map(|datum| unsafe { T::borrow_from(datum) })
     }
 
-    pub fn get_mut(&mut self, index: usize) -> Option<&mut T> {
+    /// Mutably borrow the nth element.
+    ///
+    /// `FlatArray::nth_mut` may have to iterate the array, thus it is named for `Iterator::nth`.
+    pub fn nth_mut(&mut self, index: usize) -> Option<&mut T> {
         // FIXME: consider nullability
+        // FIXME: Become a dispatch to Iterator::nth
         self.datum_mut_at(index).map(|datum| unsafe { T::borrow_mut_from(datum) })
     }
 
@@ -59,6 +67,9 @@ where
         Some(unsafe { &mut *(data_ptr as *mut Datum<'mcx>) })
     }
 
+    /// Number of elements in the Array
+    ///
+    /// Note that for many Arrays, this doesn't have a linear relationship with array byte-len.
     fn len(&self) -> usize {
         let ndims = self.head.ndim as usize;
         let dims_ptr = unsafe { ARR_DIMS(ptr::addr_of!(self.head).cast_mut()) };
@@ -79,10 +90,10 @@ where
     /**
     Oxidized form of [ARR_NULLBITMAP(ArrayType*)][ARR_NULLBITMAP]
     If this returns None, the array *cannot* have nulls.
-    Note that unlike the `is_null: bool` that appears elsewhere, 1 is valid and 0 is null.
+    Note that unlike the `is_null: bool` that appears elsewhere, 1 is "valid" and 0 is "null".
 
     # Safety
-    Trailing bits must be set to 0, and all elements marked as valid (1) must be initialized.
+    Trailing bits must be set to 0, and all elements marked with 1 must be initialized.
     The null bitmap is linear but the layout of elements may be nonlinear, so for some arrays
     these cannot be calculated directly from each other.
     [ARR_NULLBITMAP]: <https://git.postgresql.org/gitweb/?p=postgresql.git;a=blob;f=src/include/utils/array.h;h=4ae6c3be2f8b57afa38c19af2779f67c782e4efc;hb=278273ccbad27a8834dfdf11895da9cd91de4114#l293>
