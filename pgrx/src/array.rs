@@ -192,10 +192,14 @@ impl RawArray {
         // Calculating the product with i32 mirrors the Postgres implementation,
         // except we can use checked_mul instead of trying to cast to 64 bits and
         // hoping that doesn't also overflow on multiplication.
-        self.dims()
-            .into_iter()
-            .fold(Some(1i32), |prod, &d| prod.and_then(|m| m.checked_mul(d)))
-            .unwrap() as usize
+        let dims = self.dims();
+        if dims.len() == 0 {
+            0
+        } else {
+            dims.into_iter()
+                .fold(Some(1i32), |prod, &d| prod.and_then(|m| m.checked_mul(d)))
+                .expect("Product of array dimensions should be <= i32::MAX") as usize
+        }
     }
 
     /// Accessor for ArrayType's elemtype.
