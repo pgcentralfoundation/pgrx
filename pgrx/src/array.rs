@@ -187,6 +187,9 @@ impl RawArray {
 
     /// The flattened length of the array over every single element.
     /// Includes all items, even the ones that might be null.
+    ///
+    /// # Panics
+    /// Panics if the Array's dimensions, multiplied together, exceed sizes Postgres can handle.
     #[inline]
     pub fn len(&self) -> usize {
         // Calculating the product with i32 mirrors the Postgres implementation,
