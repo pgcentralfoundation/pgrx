@@ -61,7 +61,6 @@ aligned varlena header, which will cause undefined behavior if it is interacted 
 #[derive(Debug)]
 pub struct RawArray {
     ptr: NonNull<pg_sys::ArrayType>,
-    len: usize,
 }
 
 #[deny(unsafe_op_in_unsafe_fn)]
@@ -87,9 +86,7 @@ impl RawArray {
     [the std documentation]: core::ptr#safety
     */
     pub unsafe fn from_ptr(ptr: NonNull<pg_sys::ArrayType>) -> RawArray {
-        // SAFETY: Validity asserted by the caller.
-        let len = unsafe { port::ARR_NELEMS(ptr.as_ptr()) } as usize;
-        RawArray { ptr, len }
+        RawArray { ptr }
     }
 
     pub(crate) unsafe fn detoast_from_varlena(stale: NonNull<pg_sys::varlena>) -> Toast<RawArray> {
@@ -138,9 +135,7 @@ impl RawArray {
     /// or a null value, as-if [RawArray::from_ptr].
     pub unsafe fn from_array<T>(arr: Array<T>) -> Option<RawArray> {
         let array_type = arr.into_array_type() as *mut _;
-        // SAFETY: Validity asserted by the caller.
-        let len = unsafe { port::ARR_NELEMS(array_type) } as usize;
-        Some(RawArray { ptr: NonNull::new(array_type)?, len })
+        Some(RawArray { ptr: NonNull::new(array_type)? })
     }
 
     /// Returns the inner raw pointer to the ArrayType.
@@ -194,7 +189,13 @@ impl RawArray {
     /// Includes all items, even the ones that might be null.
     #[inline]
     pub fn len(&self) -> usize {
-        self.len
+        // Calculating the product with i32 mirrors the Postgres implementation,
+        // except we can use checked_mul instead of trying to cast to 64 bits and
+        // hoping that doesn't also overflow on multiplication.
+        self.dims()
+            .into_iter()
+            .fold(Some(1i32), |prod, &d| prod.and_then(|m| m.checked_mul(d)))
+            .unwrap() as usize
     }
 
     /// Accessor for ArrayType's elemtype.
@@ -257,7 +258,7 @@ impl RawArray {
     [ARR_NULLBITMAP]: <https://git.postgresql.org/gitweb/?p=postgresql.git;a=blob;f=src/include/utils/array.h;h=4ae6c3be2f8b57afa38c19af2779f67c782e4efc;hb=278273ccbad27a8834dfdf11895da9cd91de4114#l293>
     */
     pub fn nulls(&mut self) -> Option<NonNull<[u8]>> {
-        let len = self.len + 7 >> 3; // Obtains 0 if len was 0.
+        let len = self.len() + 7 >> 3; // Obtains 0 if len was 0.
 
         NonNull::new(ptr::slice_from_raw_parts_mut(self.nulls_mut_ptr(), len))
     }
@@ -275,7 +276,7 @@ impl RawArray {
     [ARR_NULLBITMAP]: <https://git.postgresql.org/gitweb/?p=postgresql.git;a=blob;f=src/include/utils/array.h;h=4ae6c3be2f8b57afa38c19af2779f67c782e4efc;hb=278273ccbad27a8834dfdf11895da9cd91de4114#l293>
     */
     pub fn nulls_bitslice(&mut self) -> Option<NonNull<BitSlice<u8>>> {
-        NonNull::new(bitptr::bitslice_from_raw_parts_mut(self.nulls_bitptr()?, self.len))
+        NonNull::new(bitptr::bitslice_from_raw_parts_mut(self.nulls_bitptr()?, self.len()))
     }
 
     /**
@@ -344,7 +345,7 @@ impl RawArray {
         unsafe {
             NonNull::new_unchecked(ptr::slice_from_raw_parts_mut(
                 port::ARR_DATA_PTR(self.ptr.as_ptr()).cast(),
-                self.len,
+                self.len(),
             ))
         }
     }

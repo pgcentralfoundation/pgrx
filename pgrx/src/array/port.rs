@@ -51,15 +51,6 @@ pub(super) const unsafe fn ARR_DIMS(a: *mut pg_sys::ArrayType) -> *mut i32 {
     unsafe { a.cast::<u8>().add(mem::size_of::<pg_sys::ArrayType>()).cast::<i32>() }
 }
 
-/// # Safety
-/// Does a field access and deref but not out of bounds of ArrayType.  The caller asserts that
-/// `a` is a properly allocated [`pg_sys::ArrayType`]
-#[inline(always)]
-pub(super) unsafe fn ARR_NELEMS(a: *mut pg_sys::ArrayType) -> usize {
-    // SAFETY:  caller has asserted that `a` is a properly allocated ArrayType pointer
-    unsafe { pg_sys::ArrayGetNItems((*a).ndim, ARR_DIMS(a)) as usize }
-}
-
 /// Returns the "null bitmap" of the specified array.  If there isn't one (the array contains no nulls)
 /// then the null pointer is returned.
 ///
