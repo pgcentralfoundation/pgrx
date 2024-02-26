@@ -60,7 +60,12 @@ where
         Some(unsafe { &*(data_ptr as *const Datum<'mcx>) })
     }
 
-    fn datum_mut_at(&mut self, index: usize) -> Option<&mut Datum<'mcx>> {
+    /// # Safety
+    /// This is an incredibly naughty function for arrays where *the scalar type is
+    /// smaller than Datum*. This is because when we return `&mut Datum`, that could overlap
+    /// with the next `&mut Datum`, so it must essentially always be converted.
+    /// Consider replacing this with raw pointers.
+    unsafe fn datum_mut_at(&mut self, index: usize) -> Option<&mut Datum<'mcx>> {
         let data_ptr = unsafe { ARR_DATA_PTR(ptr::addr_of_mut!(self.head)) };
         // todo!();
         // FIXME: replace with actual impl instead of something that merely typechecks
