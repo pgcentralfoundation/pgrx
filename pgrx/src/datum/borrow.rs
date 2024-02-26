@@ -14,14 +14,21 @@ use core::ffi;
 pub unsafe trait BorrowDatum {
     /// Lossless zero-unboxing reference conversion.
     ///
-    /// By calling this you assert the Datum is not an SQL Null and, for pass-by-reference types,
-    /// this Datum points to a valid instance of that type.
+    /// # Safety
+    /// * The Datum must not be an SQL Null.
+    /// * For pass-by-reference types, this Datum must point to a valid instance of that type.
     unsafe fn borrow_from<'dat>(datum: &'dat Datum<'_>) -> &'dat Self;
 
     /// Lossless zero-unboxing mutable reference conversion.
     ///
-    /// By calling this you assert the Datum is not an SQL Null and, for pass-by-reference types,
-    /// this Datum points to a valid instance of that type.
+    /// # Safety
+    /// * The Datum must not be an SQL Null.
+    /// * For pass-by-reference types, this Datum must point to a valid instance of that type.
+    ///
+    /// **Design Note:** For pass-by-value types, if you yield two successive `&mut Datum<'_>`,
+    /// and the underlying source is e.g. an ArrayType or one of the many Tuples of Postgres,
+    /// then merely yielding two `&mut Datum<'_>`s in a row is unsound. This is because the bytes
+    /// of one Datum can overlap with the next. Uh... whoops?
     unsafe fn borrow_mut_from<'dat>(datum: &'dat mut Datum<'_>) -> &'dat mut Self;
 }
 
