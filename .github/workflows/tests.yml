@@ -88,7 +88,7 @@ jobs:
       run: cargo fmt --all -- --check
 
     - name: Run license check
-      run: cargo install cargo-deny && ./ci/license-check.sh
+      run: cargo install cargo-deny --locked && ./ci/license-check.sh
 
     # We can't lint most crates because they require "cargo pgrx init" to build
     - name: Clippy -Dwarnings sql-entity-graph
