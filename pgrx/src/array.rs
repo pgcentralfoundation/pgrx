@@ -192,16 +192,21 @@ impl RawArray {
     /// Panics if the Array's dimensions, multiplied together, exceed sizes Postgres can handle.
     #[inline]
     pub fn len(&self) -> usize {
-        // Calculating the product with i32 mirrors the Postgres implementation,
+        // Calculating the product mostly mirrors the Postgres implementation,
         // except we can use checked_mul instead of trying to cast to 64 bits and
         // hoping that doesn't also overflow on multiplication.
+        // Also integer promotion doesn't real, so bitcast negatives.
         let dims = self.dims();
         if dims.len() == 0 {
             0
         } else {
+            // bindgen whiffs MaxArraySize AND MaxAllocSize!
+            const MAX_ARRAY_SIZE: u32 = 0x3fffffff / 8;
             dims.into_iter()
-                .fold(Some(1i32), |prod, &d| prod.and_then(|m| m.checked_mul(d)))
-                .expect("Product of array dimensions should be <= i32::MAX") as usize
+                .map(|i| *i as u32) // treat negatives as huge
+                .fold(Some(1u32), |prod, d| prod.and_then(|m| m.checked_mul(d)))
+                .filter(|prod| prod <= &MAX_ARRAY_SIZE)
+                .expect("product of array dimensions must be < 2.pow(27)") as usize
         }
     }
 
