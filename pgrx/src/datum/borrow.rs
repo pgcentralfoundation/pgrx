@@ -1,48 +1,75 @@
 #![deny(unsafe_op_in_unsafe_fn)]
 use super::*;
-use core::ffi;
+use crate::layout::PassBy;
+use core::{ffi, mem, ptr};
 
-/// Converts `&Datum` to `&T`
+/// Types which can be "borrowed from" [`&Datum<'_>`] via simple cast, deref, or slicing
 ///
-/// Only for types which can be losslessly referenced from a borrow of a Datum, without unboxing.
-/// For instance, you may not borrow `&String` from `&Datum<'_>`: that just doesn't work as it
-/// requires a full unboxing to be performed. You may, however, claim `&str` from the datum.
-/// Implementers are expected to uphold this obligation.
+/// # Safety
+/// Despite its pleasant-sounding name, this implements a fairly low-level detail.
+/// It exists to allow other code to use that nice-sounding BorrowDatum bound.
+/// Outside of the pgrx library, it is probably incorrect to call and rely on this:
+/// instead use the convenience functions available in `pgrx::datum`.
+// TODO: implement those.
 ///
-/// Note that this is unaware of "detoasting".
-// TODO: Implement the DetoastDatum this is supposed to combine with.
+/// Its behavior is trusted for ABI details, and it should not be implemented if any doubt
+/// exists of whether the type would be suitable for passing via Postgres.
 pub unsafe trait BorrowDatum {
-    /// Lossless zero-unboxing reference conversion.
+    /// The "native" passing convention for this type.
     ///
-    /// # Safety
-    /// * The Datum must not be an SQL Null.
-    /// * For pass-by-reference types, this Datum must point to a valid instance of that type.
-    unsafe fn borrow_from<'dat>(datum: &'dat Datum<'_>) -> &'dat Self;
+    /// Use `None` if you are uncertain, as in some cases the answer is ambiguous,
+    /// or dynamic, and callers must correctly handle this.
+    ///
+    /// If this is `Some`:
+    /// - `PassBy::Value` implies [`mem::size_of<T>()`][size_of] <= [`mem::size_of::<Datum>()`][Datum].
+    /// - `PassBy::Ref` means the pointee will occupy at least 1 byte for variable-sized types.
+    ///
+    /// Note that this means a zero-sized type is inappropriate for `BorrowDatum`.
+    const PASS: Option<PassBy>;
 
-    /// Lossless zero-unboxing mutable reference conversion.
+    /// Cast a pointer to this blob of bytes to a pointer to this type.
+    ///
+    /// This is not a simple `ptr.cast()` because it may be *unsizing*, which may require
+    /// reading varlena headers. For all fixed-size types, `ptr.cast()` should be correct.
     ///
     /// # Safety
-    /// * The Datum must not be an SQL Null.
-    /// * For pass-by-reference types, this Datum must point to a valid instance of that type.
+    /// - This must be correctly invoked for the pointee type, as it may deref.
     ///
-    /// **Design Note:** For pass-by-value types, if you yield two successive `&mut Datum<'_>`,
-    /// and the underlying source is e.g. an ArrayType or one of the many Tuples of Postgres,
-    /// then merely yielding two `&mut Datum<'_>`s in a row is unsound. This is because the bytes
-    /// of one Datum can overlap with the next. Uh... whoops?
-    unsafe fn borrow_mut_from<'dat>(datum: &'dat mut Datum<'_>) -> &'dat mut Self;
+    /// ## For Implementors
+    /// While implementing this function, reading the *first* byte is permitted if `T::PASS
+    /// == Some(PassBy::Ref)`. As you are not writing this for CStr, you may then treat that
+    /// byte as a varlena header.
+    ///
+    /// Do not attempt to handle pass-by-value versus pass-by-ref in this fn's body.
+    /// A caller may be in a context where all types are handled by-reference, for instance.
+    unsafe fn point_from(ptr: *mut u8) -> *mut Self;
+
+    /// Cast a pointer to aligned varlena headers to this type
+    ///
+    /// This version allows you to assume alignment and a readable 4-byte header.
+    /// This optimization is not required. When in doubt, avoid implementing it:
+    /// your `point_from` should also correctly handle this case.
+    ///
+    /// # Safety
+    /// - This must be correctly invoked for the pointee type, as it may deref.
+    /// - This must also most definitely be aligned!
+    unsafe fn point_from_align4(ptr: *mut u32) -> *mut Self {
+        unsafe { <Self as BorrowDatum>::point_from(ptr.cast()) }
+    }
 }
 
 macro_rules! borrow_by_value {
     ($($value_ty:ty),*) => {
         $(
             unsafe impl BorrowDatum for $value_ty {
-                /// Directly cast `&Datum as &Self`
-                unsafe fn borrow_from<'dat>(datum: &'dat Datum<'_>) -> &'dat Self {
-                    unsafe { &*(datum as *const Datum<'_> as *const Self) }
-                }
-                /// Directly cast `&mut Datum as &mut Self`
-                unsafe fn borrow_mut_from<'dat>(datum: &'dat mut Datum<'_>) -> &'dat mut Self {
-                    unsafe { &mut *(datum as *mut Datum<'_> as *mut Self) }
+                const PASS: Option<PassBy> = if mem::size_of::<Self>() <= mem::size_of::<Datum>() {
+                    Some(PassBy::Value)
+                } else {
+                    Some(PassBy::Ref)
+                };
+
+                unsafe fn point_from(ptr: *mut u8) -> *mut Self {
+                    ptr.cast()
                 }
             }
         )*
@@ -55,18 +82,11 @@ borrow_by_value! {
 
 /// It is rare to pass CStr via Datums, but not unheard of
 unsafe impl BorrowDatum for ffi::CStr {
-    /// Treat `&Datum` as `&*const ffi::c_char` and then deref-reborrow it,
-    /// with the same constraints as [`ffi::CStr::from_ptr`].
-    unsafe fn borrow_from<'dat>(datum: &'dat Datum<'_>) -> &'dat Self {
-        unsafe { ffi::CStr::from_ptr(*datum.0.cast_mut_ptr()) }
-    }
+    const PASS: Option<PassBy> = Some(PassBy::Ref);
 
-    /// Treat `&mut Datum` as `&mut *mut ffi::c_char` and then deref-reborrow it,
-    /// with the same constraints as [`ffi::CStr::from_ptr`].
-    unsafe fn borrow_mut_from<'dat>(datum: &'dat mut Datum<'_>) -> &'dat mut Self {
-        let char_ptr: *mut ffi::c_char = datum.0.cast_mut_ptr();
+    unsafe fn point_from(ptr: *mut u8) -> *mut Self {
+        let char_ptr: *mut ffi::c_char = ptr.cast();
         let len = unsafe { ffi::CStr::from_ptr(char_ptr).to_bytes().len() };
-        let slice_ptr = core::ptr::slice_from_raw_parts_mut(char_ptr, len + 1);
-        unsafe { &mut *(slice_ptr as *mut ffi::CStr) }
+        ptr::slice_from_raw_parts_mut(char_ptr, len + 1) as *mut Self
     }
 }
