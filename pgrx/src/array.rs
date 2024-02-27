@@ -41,7 +41,8 @@ where
     pub fn nth(&self, index: usize) -> Option<&T> {
         // FIXME: consider nullability
         // FIXME: Become a dispatch to Iterator::nth
-        self.datum_at(index).map(|datum| unsafe { T::borrow_from(datum) })
+        todo!()
+        // self.datum_at(index).map(|datum| unsafe { T::borrow_from(datum) })
     }
 
     /// Mutably borrow the nth element.
@@ -50,14 +51,14 @@ where
     pub fn nth_mut(&mut self, index: usize) -> Option<&mut T> {
         // FIXME: consider nullability
         // FIXME: Become a dispatch to Iterator::nth
-        unsafe { self.datum_mut_at(index).map(|datum| unsafe { T::borrow_mut_from(datum) }) }
+        todo!();
+        // unsafe { self.datum_mut_at(index).map(|datum| unsafe { T::borrow_mut_from(datum) }) }
     }
 
     fn datum_at(&self, index: usize) -> Option<&Datum<'mcx>> {
         let data_ptr = unsafe { port::ARR_DATA_PTR(ptr::addr_of!(self.head).cast_mut()) };
-        // todo!();
+        todo!();
         // FIXME: replace with actual impl instead of something that merely typechecks
-        Some(unsafe { &*(data_ptr as *const Datum<'mcx>) })
     }
 
     /// # Safety
@@ -67,9 +68,8 @@ where
     /// Consider replacing this with raw pointers.
     unsafe fn datum_mut_at(&mut self, index: usize) -> Option<&mut Datum<'mcx>> {
         let data_ptr = unsafe { port::ARR_DATA_PTR(ptr::addr_of_mut!(self.head)) };
-        // todo!();
+        todo!();
         // FIXME: replace with actual impl instead of something that merely typechecks
-        Some(unsafe { &mut *(data_ptr as *mut Datum<'mcx>) })
     }
 
     /// Number of elements in the Array
@@ -116,20 +116,11 @@ where
 }
 
 unsafe impl<T> BorrowDatum for FlatArray<'_, T> {
-    unsafe fn borrow_from<'dat>(datum: &'dat Datum<'_>) -> &'dat Self {
-        let ptr = datum as *const Datum<'_> as *const *const pg_sys::varlena;
+    const PASS: Option<layout::PassBy> = Some(layout::PassBy::Ref);
+    unsafe fn point_from(ptr: *mut u8) -> *mut Self {
         unsafe {
-            let ptr = *ptr;
-            let len = varlena::varsize_any(ptr) - mem::size_of::<pg_sys::ArrayType>();
-            &*(ptr::slice_from_raw_parts(ptr as *const u8, len) as *const Self)
-        }
-    }
-    unsafe fn borrow_mut_from<'dat>(datum: &'dat mut Datum<'_>) -> &'dat mut Self {
-        let ptr = datum as *mut Datum<'_> as *mut *mut pg_sys::varlena;
-        unsafe {
-            let ptr = *ptr;
-            let len = varlena::varsize_any(ptr) - mem::size_of::<pg_sys::ArrayType>();
-            &mut *(ptr::slice_from_raw_parts(ptr as *mut u8, len) as *mut Self)
+            let len = varlena::varsize_any(ptr.cast()) - mem::size_of::<pg_sys::ArrayType>();
+            ptr::slice_from_raw_parts_mut(ptr, len) as *mut Self
         }
     }
 }

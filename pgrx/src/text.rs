@@ -1,4 +1,5 @@
 use crate::datum::{BorrowDatum, Datum};
+use crate::layout::PassBy;
 use crate::pgrx_sql_entity_graph::metadata::{
     ArgumentError, Returns, ReturnsError, SqlMapping, SqlTranslatable,
 };
@@ -35,20 +36,11 @@ impl DerefMut for Text {
 }
 
 unsafe impl BorrowDatum for Text {
-    unsafe fn borrow_from<'dat>(datum: &'dat Datum<'_>) -> &'dat Self {
-        let ptr = datum as *const Datum<'_> as *const *const pg_sys::varlena;
+    const PASS: Option<PassBy> = Some(PassBy::Ref);
+    unsafe fn point_from(ptr: *mut u8) -> *mut Self {
         unsafe {
-            let ptr = *ptr;
-            let len = varlena::varsize_any(ptr);
-            &*(ptr::slice_from_raw_parts(ptr as *const u8, len) as *const Text)
-        }
-    }
-    unsafe fn borrow_mut_from<'dat>(datum: &'dat mut Datum<'_>) -> &'dat mut Self {
-        let ptr = datum as *mut Datum<'_> as *mut *mut pg_sys::varlena;
-        unsafe {
-            let ptr = *ptr;
-            let len = varlena::varsize_any(ptr);
-            &mut *(ptr::slice_from_raw_parts(ptr as *mut u8, len) as *mut Text)
+            let len = varlena::varsize_any(ptr.cast());
+            ptr::slice_from_raw_parts_mut(ptr, len) as *mut Text
         }
     }
 }
