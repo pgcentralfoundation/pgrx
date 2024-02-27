@@ -27,8 +27,12 @@ pub(super) unsafe fn ARR_NDIM(a: *mut pg_sys::ArrayType) -> usize {
     unsafe { (*a).ndim as usize }
 }
 
+/// True if [the array *may* have nulls][array.h]
+///
 /// # Safety
 /// Does a field access, but doesn't deref out of bounds of ArrayType
+///
+/// [array.h]: https://github.com/postgres/postgres/blob/c4bd6ff57c9a7b188cbd93855755f1029d7a5662/src/include/utils/array.h#L9
 #[inline(always)]
 pub(super) unsafe fn ARR_HASNULL(a: *mut pg_sys::ArrayType) -> bool {
     // #define ARR_HASNULL(a)			((a)->dataoffset != 0)
