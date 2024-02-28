@@ -24,6 +24,8 @@ use core::{mem, slice};
 mod port;
 
 /// &FlatArray is akin to &ArrayType
+///
+/// `pgrx::datum::Array` is essentially `&FlatArray`
 #[repr(C)]
 pub struct FlatArray<'mcx, T: ?Sized> {
     scalar: PhantomData<&'mcx T>,
@@ -41,8 +43,7 @@ where
     pub fn nth(&self, index: usize) -> Option<&T> {
         // FIXME: consider nullability
         // FIXME: Become a dispatch to Iterator::nth
-        todo!()
-        // self.datum_at(index).map(|datum| unsafe { T::borrow_from(datum) })
+        self.ptr_to(index).map(|ptr| unsafe { &*T::point_from(ptr.cast_mut()) })
     }
 
     /// Mutably borrow the nth element.
@@ -51,24 +52,22 @@ where
     pub fn nth_mut(&mut self, index: usize) -> Option<&mut T> {
         // FIXME: consider nullability
         // FIXME: Become a dispatch to Iterator::nth
-        todo!();
-        // unsafe { self.datum_mut_at(index).map(|datum| unsafe { T::borrow_mut_from(datum) }) }
+        self.ptr_mut_to(index).map(|ptr| unsafe { &mut *T::point_from(ptr) })
     }
 
-    fn datum_at(&self, index: usize) -> Option<&Datum<'mcx>> {
+    // Obtain a pointer with read-only permissions to the type at this index
+    #[inline]
+    fn ptr_to(&self, index: usize) -> Option<*const u8> {
         let data_ptr = unsafe { port::ARR_DATA_PTR(ptr::addr_of!(self.head).cast_mut()) };
-        todo!();
+        todo!()
         // FIXME: replace with actual impl instead of something that merely typechecks
     }
 
-    /// # Safety
-    /// This is an incredibly naughty function for arrays where *the scalar type is
-    /// smaller than Datum*. This is because when we return `&mut Datum`, that could overlap
-    /// with the next `&mut Datum`, so it must essentially always be converted before exposure.
-    /// Consider replacing this with raw pointers.
-    unsafe fn datum_mut_at(&mut self, index: usize) -> Option<&mut Datum<'mcx>> {
+    // Obtain a pointer with read-write permissions to the type at this index
+    #[inline]
+    fn ptr_mut_to(&mut self, index: usize) -> Option<*mut u8> {
         let data_ptr = unsafe { port::ARR_DATA_PTR(ptr::addr_of_mut!(self.head)) };
-        todo!();
+        todo!()
         // FIXME: replace with actual impl instead of something that merely typechecks
     }
 
