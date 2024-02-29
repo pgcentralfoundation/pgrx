@@ -195,7 +195,7 @@ pub unsafe fn pg_return_null(fcinfo: pg_sys::FunctionCallInfo) -> pg_sys::Datum 
     pg_sys::Datum::from(0)
 }
 
-/// Get the collation the function call shoud use
+/// Get the collation the function call should use
 ///
 /// # Safety
 ///
@@ -250,7 +250,7 @@ pub unsafe fn pg_func_extra<ReturnType, DefaultValue: FnOnce() -> ReturnType>(
 }
 
 /// This mimics the functionality of Postgres' `DirectFunctionCall` macros, allowing you to call
-/// internal Postgres functions using its "V1" calling convention.  Unlike the Postgres' C macros,
+/// internal Postgres functions using its "V1" calling convention.  Unlike the Postgres C macros,
 /// the function is allowed to return a NULL datum.
 ///
 /// ## Safety
