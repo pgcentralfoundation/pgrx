@@ -349,10 +349,15 @@ unsafe fn direct_function_call_as_datum_internal(
     (*fcinfo).nargs = nargs;
 
     let args_ptr: *mut pg_sys::NullableDatum = ptr::addr_of_mut!((*fcinfo).args).cast();
-    let arg_slice = slice::from_raw_parts_mut(args_ptr, args.len());
-    for (n_datum, arg) in arg_slice.iter_mut().zip(args) {
-        n_datum.isnull = arg.is_none();
-        n_datum.value = arg.unwrap_or(pg_sys::Datum::from(0));
+    // This block is necessary for soundness. This way, we confine the slice's lifetime
+    // to the bounds of mutating the arguments. We later will call a function on the fcinfo,
+    // so we want all `&mut T` to be out-of-scope by the time we do that.
+    {
+        let arg_slice = slice::from_raw_parts_mut(args_ptr, args.len());
+        for (n_datum, arg) in arg_slice.iter_mut().zip(args) {
+            n_datum.isnull = arg.is_none();
+            n_datum.value = arg.unwrap_or(pg_sys::Datum::from(0));
+        }
     }
 
     let result = func(fcinfo);
