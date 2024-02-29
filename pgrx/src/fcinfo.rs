@@ -335,30 +335,30 @@ unsafe fn direct_function_call_as_datum_internal(
     args: &[Option<pg_sys::Datum>],
 ) -> Option<pg_sys::Datum> {
     let nargs: i16 = args.len().try_into().expect("too many args passed to function");
-    let fcinfo_ptr = pg_sys::palloc(
+    let fcinfo = pg_sys::palloc0(
         std::mem::size_of::<pg_sys::FunctionCallInfoBaseData>()
             + std::mem::size_of::<pg_sys::NullableDatum>() * args.len(),
     )
     .cast::<pg_sys::FunctionCallInfoBaseData>();
 
-    let fcinfo = fcinfo_ptr.as_mut().unwrap_unchecked();
-    fcinfo.flinfo = std::ptr::null_mut();
-    fcinfo.context = std::ptr::null_mut();
-    fcinfo.resultinfo = std::ptr::null_mut();
-    fcinfo.fncollation = pg_sys::InvalidOid;
-    fcinfo.isnull = false;
-    fcinfo.nargs = nargs;
+    (*fcinfo).flinfo = std::ptr::null_mut();
+    (*fcinfo).context = std::ptr::null_mut();
+    (*fcinfo).resultinfo = std::ptr::null_mut();
+    (*fcinfo).fncollation = pg_sys::InvalidOid;
+    (*fcinfo).isnull = false;
+    (*fcinfo).nargs = nargs;
 
-    let arg_slice = fcinfo.args.as_mut_slice(args.len());
-    for (i, &arg) in args.iter().enumerate() {
-        arg_slice[i].isnull = arg.is_none();
-        arg_slice[i].value = arg.unwrap_or(pg_sys::Datum::from(0));
+    let args_ptr: *mut pg_sys::NullableDatum = ptr::addr_of_mut!((*fcinfo).args).cast();
+    let arg_slice = slice::from_raw_parts_mut(args_ptr, args.len());
+    for (n_datum, arg) in arg_slice.iter_mut().zip(args) {
+        n_datum.isnull = arg.is_none();
+        n_datum.value = arg.unwrap_or(pg_sys::Datum::from(0));
     }
 
-    let result = func(fcinfo_ptr);
-    let result = if fcinfo.isnull { None } else { Some(result) };
+    let result = func(fcinfo);
+    let result = if (*fcinfo).isnull { None } else { Some(result) };
 
-    pg_sys::pfree(fcinfo_ptr.cast());
+    pg_sys::pfree(fcinfo.cast());
     result
 }
 
