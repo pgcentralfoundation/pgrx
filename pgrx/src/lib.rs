@@ -177,12 +177,19 @@ const _: () = {
 ///
 /// </pre></div>
 ///
-/// This calls both [`pg_magic_func!()`](pg_magic_func) and [`pg_sql_graph_magic!()`](pg_sql_graph_magic).
+/// This calls [`pg_magic_func!()`](pg_magic_func).
 #[macro_export]
 macro_rules! pg_module_magic {
     () => {
         $crate::pg_magic_func!();
-        $crate::pg_sql_graph_magic!();
+
+        // A marker function which must exist in the root of the extension for proper linking by the
+        // "pgrx_embed" binary during `cargo-pgrx schema` generation.
+        #[inline(never)] /* we don't want DCE to remove this as it *could* cause the compiler to decide to not link to us */
+        #[doc(hidden)]
+        pub fn __pgrx_marker() {
+            // noop
+        }
     };
 }
 
@@ -255,39 +262,6 @@ macro_rules! pg_magic_func {
 
             // return the magic
             &MY_MAGIC
-        }
-    };
-}
-
-/// Create necessary extension-local internal marker for use with SQL generation.
-///
-/// <div class="example-wrap" style="display:inline-block">
-/// <pre class="ignore" style="white-space:normal;font:inherit;">
-///
-/// **Note**: Generally [`pg_module_magic`] is preferred, and results in this macro being called.
-/// This macro should only be directly called in advanced use cases.
-///
-/// </pre></div>
-#[macro_export]
-macro_rules! pg_sql_graph_magic {
-    () => {
-        // A marker which must exist in the root of the extension.
-        #[doc(hidden)]
-        pub fn __pgrx_marker() -> $crate::pgrx_sql_entity_graph::ControlFile {
-            use ::core::convert::TryFrom;
-            let package_version = env!("CARGO_PKG_VERSION");
-            let context = include_str!(concat!(
-                env!("CARGO_MANIFEST_DIR"),
-                "/",
-                env!("CARGO_CRATE_NAME"),
-                ".control"
-            ))
-            .replace("@CARGO_VERSION@", package_version);
-
-            let control_file =
-                $crate::pgrx_sql_entity_graph::ControlFile::try_from(context.as_str())
-                    .expect("Could not parse control file, is it valid?");
-            control_file
         }
     };
 }

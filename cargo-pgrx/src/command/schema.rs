@@ -183,7 +183,14 @@ pub(crate) fn generate_schema(
         out_dot = Some(x.to_string());
     };
 
-    let codegen = compute_codegen(package_manifest_path, &symbols, &lib_name, out_path, out_dot)?;
+    let codegen = compute_codegen(
+        control_file,
+        package_manifest_path,
+        &symbols,
+        &lib_name,
+        out_path,
+        out_dot,
+    )?;
 
     let embed = {
         let mut embed = tempfile::NamedTempFile::new()?;
@@ -214,7 +221,7 @@ pub(crate) fn generate_schema(
         &package_name,
     )?;
 
-    compute_sql(profile, &package_name)?;
+    compute_sql(profile, &package_name, &manifest)?;
 
     Ok(())
 }
@@ -381,6 +388,7 @@ fn first_build(
 }
 
 fn compute_codegen(
+    control_file_path: impl AsRef<Path>,
     package_manifest_path: impl AsRef<Path>,
     symbols: &[String],
     lib_name: &str,
@@ -391,9 +399,20 @@ fn compute_codegen(
     let lib_name_ident = Ident::new(&lib_name, Span::call_site());
 
     let inputs = {
+        let control_file_path = control_file_path
+            .as_ref()
+            .to_str()
+            .expect(".control file filename should be valid UTF8");
         let mut out = quote::quote! {
+            // call the marker.  Primarily this ensures that rustc will actually link to the library
+            // during the "pgrx_embed" build initiated by `cargo-pgrx schema` generation
+            #lib_name_ident::__pgrx_marker();
+
             let mut entities = Vec::new();
-            let control_file_entity = ::pgrx::pgrx_sql_entity_graph::SqlGraphEntity::ExtensionRoot(::#lib_name_ident::__pgrx_marker());
+            let control_file_path = std::path::PathBuf::from(#control_file_path);
+            let control_file = ::pgrx::pgrx_sql_entity_graph::ControlFile::try_from(control_file_path).expect(".control file should properly formatted");
+            let control_file_entity = ::pgrx::pgrx_sql_entity_graph::SqlGraphEntity::ExtensionRoot(control_file);
+
             entities.push(control_file_entity);
         };
         for name in symbols.iter() {
@@ -535,7 +554,11 @@ fn second_build(
     Ok(())
 }
 
-fn compute_sql(profile: &CargoProfile, package_name: &str) -> eyre::Result<()> {
+fn compute_sql(
+    profile: &CargoProfile,
+    package_name: &str,
+    manifest: &Manifest,
+) -> eyre::Result<()> {
     let mut bin = get_target_dir()?;
     bin.push(profile.target_subdir());
     bin.push(format!("pgrx_embed_{package_name}"));
@@ -544,6 +567,12 @@ fn compute_sql(profile: &CargoProfile, package_name: &str) -> eyre::Result<()> {
     command.stdin(Stdio::inherit());
     command.stdout(Stdio::inherit());
     command.stderr(Stdio::inherit());
+
+    // pass the package version through as an environment variable
+    let cargo_pkg_version = std::env::var("CARGO_PKG_VERSION").unwrap_or_else(|_| {
+        manifest.package_version().expect("`CARGO_PKG_VERSION` should be set, and barring that, `Cargo.toml` should have a package version property")
+    });
+    command.env("CARGO_PKG_VERSION", cargo_pkg_version);
 
     let command_str = format!("{:?}", command);
     tracing::debug!(command = %command_str, "Running");

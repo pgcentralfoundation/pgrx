@@ -338,20 +338,19 @@ for object in archive.objects() {
 }
 ```
 
-This list gets passed into the binary, which dynamically loads the code using something like:
+This list gets passed into the binary, which builds the entity graph structure using something like:
 
 ```rust
 let mut entities = Vec::default();
 // We *must* use this or the extension might not link in.
-let control_file = __pgrx_marker()?;
+let control_file = pgrx_sql_entity_graph::ControlFile:try_from("/the/known/path/to/extname.control")?;
 entities.push(SqlGraphEntity::ExtensionRoot(control_file));
 unsafe {
-    let lib = libloading::os::unix::Library::this();
     for symbol_to_call in symbols_to_call {
-        let symbol: libloading::os::unix::Symbol<
-            unsafe extern fn() -> SqlGraphEntity
-        > = lib.get(symbol_to_call.as_bytes()).unwrap();
-        let entity = symbol();
+        extern "Rust" {
+            fn $symbol_name() -> pgrx_sql_entity_graph::SqlGraphEntity;
+        } 
+        let entity = unsafe { $symbol_name() };
         entities.push(entity);
     }
 };

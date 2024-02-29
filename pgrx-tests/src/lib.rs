@@ -16,7 +16,7 @@ pub use framework::*;
 pub mod proptest;
 
 #[cfg(any(test, feature = "pg_test"))]
-pgrx::pg_sql_graph_magic!();
+pgrx::pg_module_magic!();
 
 #[cfg(test)]
 pub mod pg_test {

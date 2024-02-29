@@ -312,7 +312,7 @@ fn install_extension() -> eyre::Result<()> {
         .arg("--pg-config")
         .arg(pg_config.path().ok_or(eyre!("No pg_config found"))?)
         .stdout(Stdio::inherit())
-        .stderr(Stdio::piped())
+        .stderr(Stdio::inherit())
         .env("CARGO_TARGET_DIR", get_target_dir()?);
 
     if let Ok(manifest_path) = std::env::var("PGRX_MANIFEST_PATH") {

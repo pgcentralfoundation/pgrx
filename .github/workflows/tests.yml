@@ -27,82 +27,82 @@ jobs:
 
     strategy:
       matrix:
-        version: ["postgres-15"]
+        version: [ "postgres-15" ]
 
     steps:
-    - uses: actions/checkout@v4
+      - uses: actions/checkout@v4
 
-    - name: Set up prerequisites and environment
-      run: |
-        sudo apt-get update -y -qq --fix-missing
+      - name: Set up prerequisites and environment
+        run: |
+          sudo apt-get update -y -qq --fix-missing
+          
+          echo ""
+          
+          echo "----- Install / Set up sccache -----"
+          mkdir -p $HOME/.local/bin
+          curl -L https://github.com/mozilla/sccache/releases/download/v0.2.15/sccache-v0.2.15-x86_64-unknown-linux-musl.tar.gz | tar xz
+          mv -f sccache-v0.2.15-x86_64-unknown-linux-musl/sccache $HOME/.local/bin/sccache
+          chmod +x $HOME/.local/bin/sccache
+          echo "$HOME/.local/bin" >> $GITHUB_PATH
+          mkdir -p /home/runner/.cache/sccache
+          echo ""
+          
+          # https://stackoverflow.com/questions/57968497/how-do-i-set-an-env-var-with-a-bash-expression-in-github-actions/57969570#57969570
+          
+          echo "----- Set up MAKEFLAGS -----"
+          echo "MAKEFLAGS=$MAKEFLAGS -j $(grep -c ^processor /proc/cpuinfo)" >> $GITHUB_ENV
+          cat $GITHUB_ENV
+          echo ""
+          
+          echo "----- Output Cargo version -----"
+          cargo --version
+          echo ""
+          
+          echo "----- Outputting env -----"
+          env
+          echo ""
 
-        echo ""
+      - name: Cache cargo registry
+        uses: actions/cache@v4
+        continue-on-error: false
+        with:
+          path: |
+            ~/.cargo/registry
+            ~/.cargo/git
+          key: pgrx-lintck-cargo-${{ runner.os }}-${{ hashFiles('**/Cargo.lock', '.github/workflows/tests.yml') }}
 
-        echo "----- Install / Set up sccache -----"
-        mkdir -p $HOME/.local/bin
-        curl -L https://github.com/mozilla/sccache/releases/download/v0.2.15/sccache-v0.2.15-x86_64-unknown-linux-musl.tar.gz | tar xz
-        mv -f sccache-v0.2.15-x86_64-unknown-linux-musl/sccache $HOME/.local/bin/sccache
-        chmod +x $HOME/.local/bin/sccache
-        echo "$HOME/.local/bin" >> $GITHUB_PATH
-        mkdir -p /home/runner/.cache/sccache
-        echo ""
+      - name: Cache sccache directory
+        uses: actions/cache@v4
+        continue-on-error: false
+        with:
+          path: /home/runner/.cache/sccache
+          key: pgrx-lintck-sccache-${{ runner.os }}-${{ hashFiles('**/Cargo.lock', '.github/workflows/tests.yml') }}
 
-        # https://stackoverflow.com/questions/57968497/how-do-i-set-an-env-var-with-a-bash-expression-in-github-actions/57969570#57969570
+      - name: Start sccache server
+        run: sccache --start-server
 
-        echo "----- Set up MAKEFLAGS -----"
-        echo "MAKEFLAGS=$MAKEFLAGS -j $(grep -c ^processor /proc/cpuinfo)" >> $GITHUB_ENV
-        cat $GITHUB_ENV
-        echo ""
+      - name: Print sccache stats (before)
+        run: sccache --show-stats
 
-        echo "----- Output Cargo version -----"
-        cargo --version
-        echo ""
+      - name: Run rustfmt
+        run: cargo fmt --all -- --check
 
-        echo "----- Outputting env -----"
-        env
-        echo ""
+      - name: Run license check
+        run: cargo install cargo-deny --locked && ./ci/license-check.sh
 
-    - name: Cache cargo registry
-      uses: actions/cache@v4
-      continue-on-error: false
-      with:
-        path: |
-          ~/.cargo/registry
-          ~/.cargo/git
-        key: pgrx-lintck-cargo-${{ runner.os }}-${{ hashFiles('**/Cargo.lock', '.github/workflows/tests.yml') }}
+      # We can't lint most crates because they require "cargo pgrx init" to build
+      - name: Clippy -Dwarnings sql-entity-graph
+        run: cargo clippy -p pgrx-sql-entity-graph -- -Dwarnings
 
-    - name: Cache sccache directory
-      uses: actions/cache@v4
-      continue-on-error: false
-      with:
-        path: /home/runner/.cache/sccache
-        key: pgrx-lintck-sccache-${{ runner.os }}-${{ hashFiles('**/Cargo.lock', '.github/workflows/tests.yml') }}
+      - name: Check doc-links in pgrx-macros
+        run: |
+          cargo rustdoc -p pgrx-macros -- \
+            --document-private-items \
+            -Drustdoc::broken-intra-doc-links \
+            -Drustdoc::invalid-html-tags
 
-    - name: Start sccache server
-      run: sccache --start-server
-
-    - name: Print sccache stats (before)
-      run: sccache --show-stats
-
-    - name: Run rustfmt
-      run: cargo fmt --all -- --check
-
-    - name: Run license check
-      run: cargo install cargo-deny --locked && ./ci/license-check.sh
-
-    # We can't lint most crates because they require "cargo pgrx init" to build
-    - name: Clippy -Dwarnings sql-entity-graph
-      run: cargo clippy -p pgrx-sql-entity-graph -- -Dwarnings
-
-    - name: Check doc-links in pgrx-macros
-      run: |
-        cargo rustdoc -p pgrx-macros -- \
-          --document-private-items \
-          -Drustdoc::broken-intra-doc-links \
-          -Drustdoc::invalid-html-tags
-
-    - name: Stop sccache server
-      run: sccache --stop-server || true
+      - name: Stop sccache server
+        run: sccache --stop-server || true
 
   pgrx_tests:
     name: pgrx-tests & examples
@@ -115,239 +115,242 @@ jobs:
 
     strategy:
       matrix:
-        version: ["postgres-12", "postgres-13", "postgres-14", "postgres-15", "postgres-16"]
+        version: [ "postgres-12", "postgres-13", "postgres-14", "postgres-15", "postgres-16" ]
 
     steps:
-    - uses: actions/checkout@v4
+      - uses: actions/checkout@v4
 
-    - name: Set up prerequisites and environment
-      run: |
-        sudo apt-get update -y -qq --fix-missing
+      - name: Set up prerequisites and environment
+        run: |
+          sudo apt-get update -y -qq --fix-missing
+          
+          echo ""
+          echo "----- Install sccache -----"
+          mkdir -p $HOME/.local/bin
+          curl -L https://github.com/mozilla/sccache/releases/download/v0.2.15/sccache-v0.2.15-x86_64-unknown-linux-musl.tar.gz | tar xz
+          mv -f sccache-v0.2.15-x86_64-unknown-linux-musl/sccache $HOME/.local/bin/sccache
+          chmod +x $HOME/.local/bin/sccache
+          echo "$HOME/.local/bin" >> $GITHUB_PATH
+          mkdir -p /home/runner/.cache/sccache
+          echo ""
+          
+          echo "----- Set up dynamic variables -----"
+          export PG_VER=$(echo ${{ matrix.version }} | cut -d '-' -f2)
+          echo "PG_VER=$PG_VER" >> $GITHUB_ENV
+          echo "MAKEFLAGS=$MAKEFLAGS -j $(grep -c ^processor /proc/cpuinfo)" >> $GITHUB_ENV
+          cat $GITHUB_ENV
+          echo ""
+          
+          echo "----- Remove old postgres -----"
+          sudo apt remove -y '^postgres.*' '^libpq.*' '^clang.*' '^llvm.*' '^libclang.*' '^libllvm.*' '^mono-llvm.*'
+          echo ""
+          
+          echo "----- Install system dependencies -----"
+          sudo apt-get install -y \
+            build-essential \
+            llvm-14-dev libclang-14-dev clang-14 \
+            gcc \
+            libssl-dev \
+            libz-dev \
+            make \
+            pkg-config \
+            strace \
+            zlib1g-dev
+          echo ""
+          
+          echo "----- Set up cross compilation -----"
+          sudo apt-get install -y --fix-missing crossbuild-essential-arm64
+          rustup target add aarch64-unknown-linux-gnu
+          
+          echo 'CARGO_TARGET_AARCH64_UNKNOWN_LINUX_GNU_LINKER=aarch64-linux-gnu-gcc' >> $GITHUB_ENV
+          # TODO: not all of these should be needed, but for now it's likely fine.
+          echo 'BINDGEN_EXTRA_CLANG_ARGS_aarch64-unknown-linux-gnu=-target aarch64-unknown-linux-gnu -isystem /usr/aarch64-linux-gnu/include/ -ccc-gcc-name aarch64-linux-gnu-gcc' >> $GITHUB_ENV
+          
+          echo "----- Print env -----"
+          env
+          echo ""
+          
+          echo "----- Get cargo version -----"
+          cargo --version
+          echo ""
 
-        echo ""
-        echo "----- Install sccache -----"
-        mkdir -p $HOME/.local/bin
-        curl -L https://github.com/mozilla/sccache/releases/download/v0.2.15/sccache-v0.2.15-x86_64-unknown-linux-musl.tar.gz | tar xz
-        mv -f sccache-v0.2.15-x86_64-unknown-linux-musl/sccache $HOME/.local/bin/sccache
-        chmod +x $HOME/.local/bin/sccache
-        echo "$HOME/.local/bin" >> $GITHUB_PATH
-        mkdir -p /home/runner/.cache/sccache
-        echo ""
-
-        echo "----- Set up dynamic variables -----"
-        export PG_VER=$(echo ${{ matrix.version }} | cut -d '-' -f2)
-        echo "PG_VER=$PG_VER" >> $GITHUB_ENV
-        echo "MAKEFLAGS=$MAKEFLAGS -j $(grep -c ^processor /proc/cpuinfo)" >> $GITHUB_ENV
-        cat $GITHUB_ENV
-        echo ""
-
-        echo "----- Remove old postgres -----"
-        sudo apt remove -y '^postgres.*' '^libpq.*' '^clang.*' '^llvm.*' '^libclang.*' '^libllvm.*' '^mono-llvm.*'
-        echo ""
-
-        echo "----- Install system dependencies -----"
-        sudo apt-get install -y \
-          build-essential \
-          llvm-14-dev libclang-14-dev clang-14 \
-          gcc \
-          libssl-dev \
-          libz-dev \
-          make \
-          pkg-config \
-          strace \
-          zlib1g-dev
-        echo ""
-
-        echo "----- Set up cross compilation -----"
-        sudo apt-get install -y --fix-missing crossbuild-essential-arm64
-        rustup target add aarch64-unknown-linux-gnu
-
-        echo 'CARGO_TARGET_AARCH64_UNKNOWN_LINUX_GNU_LINKER=aarch64-linux-gnu-gcc' >> $GITHUB_ENV
-        # TODO: not all of these should be needed, but for now it's likely fine.
-        echo 'BINDGEN_EXTRA_CLANG_ARGS_aarch64-unknown-linux-gnu=-target aarch64-unknown-linux-gnu -isystem /usr/aarch64-linux-gnu/include/ -ccc-gcc-name aarch64-linux-gnu-gcc' >> $GITHUB_ENV
-
-        echo "----- Print env -----"
-        env
-        echo ""
-
-        echo "----- Get cargo version -----"
-        cargo --version
-        echo ""
-
-    - name: Install release version of PostgreSQL
-      run: |
-        echo "----- Set up PostgreSQL Apt repository -----"
-        sudo apt-get install -y wget gnupg
-        sudo sh -c 'echo "deb http://apt.postgresql.org/pub/repos/apt $(lsb_release -cs)-pgdg main" > /etc/apt/sources.list.d/pgdg.list'
-        wget --quiet -O - https://www.postgresql.org/media/keys/ACCC4CF8.asc | sudo apt-key add -
-        sudo apt-get update -y -qq --fix-missing
-        echo ""
-
-        sudo apt-get install -y \
-          postgresql-$PG_VER \
-          postgresql-server-dev-$PG_VER
-
-        echo ""
-        echo "----- pg_config -----"
-        pg_config
-        echo ""
+      - name: Install release version of PostgreSQL
+        run: |
+          echo "----- Set up PostgreSQL Apt repository -----"
+          sudo apt-get install -y wget gnupg
+          sudo sh -c 'echo "deb http://apt.postgresql.org/pub/repos/apt $(lsb_release -cs)-pgdg main" > /etc/apt/sources.list.d/pgdg.list'
+          wget --quiet -O - https://www.postgresql.org/media/keys/ACCC4CF8.asc | sudo apt-key add -
+          sudo apt-get update -y -qq --fix-missing
+          echo ""
+          
+          sudo apt-get install -y \
+            postgresql-$PG_VER \
+            postgresql-server-dev-$PG_VER
+          
+          echo ""
+          echo "----- pg_config -----"
+          pg_config
+          echo ""
 
 
-    - name: Set up PostgreSQL permissions
-      run: sudo chmod a+rwx `/usr/lib/postgresql/$PG_VER/bin/pg_config --pkglibdir` `/usr/lib/postgresql/$PG_VER/bin/pg_config --sharedir`/extension /var/run/postgresql/
+      - name: Set up PostgreSQL permissions
+        run: sudo chmod a+rwx `/usr/lib/postgresql/$PG_VER/bin/pg_config --pkglibdir` `/usr/lib/postgresql/$PG_VER/bin/pg_config --sharedir`/extension /var/run/postgresql/
 
-    - name: Cache cargo registry
-      uses: actions/cache@v4
-      continue-on-error: false
-      with:
-        path: |
-          ~/.cargo/registry
-          ~/.cargo/git
-        key: pgrx-tests-cargo-${{ runner.os }}-${{ hashFiles('**/Cargo.lock', '.github/workflows/tests.yml') }}
+      - name: Cache cargo registry
+        uses: actions/cache@v4
+        continue-on-error: false
+        with:
+          path: |
+            ~/.cargo/registry
+            ~/.cargo/git
+          key: pgrx-tests-cargo-${{ runner.os }}-${{ hashFiles('**/Cargo.lock', '.github/workflows/tests.yml') }}
 
-    - name: Cache sccache directory
-      uses: actions/cache@v4
-      continue-on-error: false
-      with:
-        path: /home/runner/.cache/sccache
-        key: pgrx-tests-sccache-${{ runner.os }}-${{ hashFiles('**/Cargo.lock', '.github/workflows/tests.yml') }}
+      - name: Cache sccache directory
+        uses: actions/cache@v4
+        continue-on-error: false
+        with:
+          path: /home/runner/.cache/sccache
+          key: pgrx-tests-sccache-${{ runner.os }}-${{ hashFiles('**/Cargo.lock', '.github/workflows/tests.yml') }}
 
-    - name: Start sccache server
-      run: sccache --start-server
+      - name: Start sccache server
+        run: sccache --start-server
 
-    - name: Print sccache stats (before run)
-      run: sccache --show-stats
+      - name: Print sccache stats (before run)
+        run: sccache --show-stats
 
-    - name: Install cargo-pgrx
-      run: cargo install --path cargo-pgrx/ --debug --force
+      - name: Install cargo-pgrx
+        run: cargo install --path cargo-pgrx/ --debug --force
 
-    - name: Run 'cargo pgrx init' against system-level ${{ matrix.version }}
-      run: cargo pgrx init --pg$PG_VER /usr/lib/postgresql/$PG_VER/bin/pg_config
+      - name: Run 'cargo pgrx init' against system-level ${{ matrix.version }}
+        run: cargo pgrx init --pg$PG_VER /usr/lib/postgresql/$PG_VER/bin/pg_config
 
-    - name: Run base-level tests
-      run: |
-        cargo test \
-          --features "pg$PG_VER" \
-          --package cargo-pgrx \
-          --package pgrx \
-          --package pgrx-macros \
-          --package pgrx-pg-sys \
-          --package pgrx-sql-entity-graph
+      - name: Run base-level tests
+        run: |
+          cargo test \
+            --features "pg$PG_VER" \
+            --package cargo-pgrx \
+            --package pgrx \
+            --package pgrx-macros \
+            --package pgrx-pg-sys \
+            --package pgrx-sql-entity-graph
 
-    - name: Check that cross-compiled pgrx-tests can build
-      run: |
-        cargo build --tests \
-          --features "pg$PG_VER" \
-          --package pgrx-tests \
-          --target aarch64-unknown-linux-gnu
+      - name: Check that cross-compiled pgrx-tests can build
+        run: |
+          cargo build --tests \
+            --features "pg$PG_VER" \
+            --package pgrx-tests \
+            --target aarch64-unknown-linux-gnu
 
-    - name: Run pgrx-tests with cshim enabled
-      run: |
-        cargo test \
-          --features "pg$PG_VER cshim proptest" \
-          --package pgrx-tests
+      - name: Run pgrx-tests with cshim enabled
+        run: |
+          cargo test \
+            --features "pg$PG_VER cshim proptest" \
+            --package pgrx-tests
 
-    - name: Run pgrx-tests with cshim disabled
-      run: |
-        cargo test \
-          --features "pg$PG_VER proptest" \
-          --package pgrx-tests
+      - name: Run pgrx-tests with cshim disabled
+        run: |
+          cargo test \
+            --features "pg$PG_VER proptest" \
+            --package pgrx-tests
 
-    - name: Run aggregate example tests
-      run: cargo test --package aggregate --features "pg$PG_VER" --no-default-features
+      - name: Run aggregate example tests
+        run: cargo test --package aggregate --features "pg$PG_VER" --no-default-features
 
-    - name: Run arrays example tests
-      run: cargo test --package arrays --features "pg$PG_VER" --no-default-features
+      - name: Run arrays example tests
+        run: cargo test --package arrays --features "pg$PG_VER" --no-default-features
 
-    - name: Run bad_ideas example tests
-      run: cargo test --package bad_ideas --features "pg$PG_VER" --no-default-features
+      - name: Run bad_ideas example tests
+        run: cargo test --package bad_ideas --features "pg$PG_VER" --no-default-features
 
-    - name: Run bgworker example tests
-      run: cargo test --package bgworker --features "pg$PG_VER" --no-default-features
+      - name: Run bgworker example tests
+        run: cargo test --package bgworker --features "pg$PG_VER" --no-default-features
 
-    - name: Run bytea example tests
-      run: cargo test --package bytea --features "pg$PG_VER" --no-default-features
+      - name: Run bytea example tests
+        run: cargo test --package bytea --features "pg$PG_VER" --no-default-features
 
-    - name: Run composite_type example tests
-      run: cargo test --package composite_type --features "pg$PG_VER" --no-default-features
+      - name: Run composite_type example tests
+        run: cargo test --package composite_type --features "pg$PG_VER" --no-default-features
 
-    - name: Run custom_libname example tests
-      run: cargo test --package custom_libname --features "pg$PG_VER" --no-default-features
+      - name: Run custom_libname example tests
+        run: cargo test --package custom_libname --features "pg$PG_VER" --no-default-features
 
-    - name: Run custom_types example tests
-      run: cargo test --package custom_types --features "pg$PG_VER" --no-default-features
+      - name: Run custom_types example tests
+        run: cargo test --package custom_types --features "pg$PG_VER" --no-default-features
 
-    - name: Run custom_types without schema generation example tests
-      run: cargo test --package custom_types --features "pg$PG_VER no-schema-generation" --no-default-features
+      - name: Run custom_types without schema generation example tests
+        run: cargo test --package custom_types --features "pg$PG_VER no-schema-generation" --no-default-features
 
-    - name: Run custom_sql example tests
-      run: cargo test --package custom_sql --features "pg$PG_VER" --no-default-features
+      - name: Run custom_sql example tests
+        run: cargo test --package custom_sql --features "pg$PG_VER" --no-default-features
 
-    - name: Run datetime example tests
-      run: cargo test --package datetime --features "pg$PG_VER" --no-default-features
+      - name: Run datetime example tests
+        run: cargo test --package datetime --features "pg$PG_VER" --no-default-features
 
-    - name: Run errors example tests
-      run: cargo test --package errors --features "pg$PG_VER" --no-default-features
+      - name: Run errors example tests
+        run: cargo test --package errors --features "pg$PG_VER" --no-default-features
 
-    - name: Run nostd example tests
-      run: cargo test --package nostd --features "pg$PG_VER" --no-default-features
+      - name: Run nostd example tests
+        run: cargo test --package nostd --features "pg$PG_VER" --no-default-features
 
-    - name: Run numeric example tests
-      run: cargo test --package numeric --features "pg$PG_VER" --no-default-features
+      - name: Run numeric example tests
+        run: cargo test --package numeric --features "pg$PG_VER" --no-default-features
 
-    - name: Run pgtrybuilder example tests
-      run: cargo test --package pgtrybuilder --features "pg$PG_VER" --no-default-features
+      - name: Run pgtrybuilder example tests
+        run: cargo test --package pgtrybuilder --features "pg$PG_VER" --no-default-features
 
-    - name: Run operators example tests
-      run: cargo test --package operators --features "pg$PG_VER" --no-default-features
+      - name: Run operators example tests
+        run: cargo test --package operators --features "pg$PG_VER" --no-default-features
 
-    - name: Run range example tests
-      run: cargo test --package range --features "pg$PG_VER" --no-default-features
+      - name: Run range example tests
+        run: cargo test --package range --features "pg$PG_VER" --no-default-features
 
-    - name: Run schemas example tests
-      run: cargo test --package schemas --features "pg$PG_VER" --no-default-features
+      - name: Run schemas example tests
+        run: cargo test --package schemas --features "pg$PG_VER" --no-default-features
 
-    - name: Run shmem example tests
-      run: cargo test --package shmem --features "pg$PG_VER" --no-default-features
+      - name: Run shmem example tests
+        run: cargo test --package shmem --features "pg$PG_VER" --no-default-features
 
-    - name: Run spi example tests
-      run: cargo test --package spi --features "pg$PG_VER" --no-default-features
+      - name: Run spi example tests
+        run: cargo test --package spi --features "pg$PG_VER" --no-default-features
 
-    - name: Run spi_srf example tests
-      run: cargo test --package spi_srf --features "pg$PG_VER" --no-default-features
+      - name: Run spi_srf example tests
+        run: cargo test --package spi_srf --features "pg$PG_VER" --no-default-features
 
-    - name: Run srf example tests
-      run: cargo test --package srf --features "pg$PG_VER" --no-default-features
+      - name: Run srf example tests
+        run: cargo test --package srf --features "pg$PG_VER" --no-default-features
 
-    - name: Run strings example tests
-      run: cargo test --package strings --features "pg$PG_VER" --no-default-features
+      - name: Run strings example tests
+        run: cargo test --package strings --features "pg$PG_VER" --no-default-features
 
-    - name: Run triggers example tests
-      run: cargo test --package triggers --features "pg$PG_VER" --no-default-features
+      - name: Run triggers example tests
+        run: cargo test --package triggers --features "pg$PG_VER" --no-default-features
 
-    - name: Run versioned_custom_libname_so example tests
-      run: cargo test --package versioned_custom_libname_so --features "pg$PG_VER" --no-default-features
+      - name: Run versioned_custom_libname_so example tests
+        run: cargo test --package versioned_custom_libname_so --features "pg$PG_VER" --no-default-features
 
-    - name: Run versioned_so example tests
-      run: cargo test --package versioned_so --features "pg$PG_VER" --no-default-features
+      - name: Run versioned_so example tests
+        run: cargo test --package versioned_so --features "pg$PG_VER" --no-default-features
 
-    # Attempt to make the cache payload slightly smaller.
-    - name: Clean up built PGRX files
-      run: |
-        cd target/debug/deps/
-        for built_file in $(find * -type f -executable -print | grep -v "\.so$"); do
-          base_name=$(echo $built_file | cut -d- -f1);
-          for basefile in "$base_name".*; do
-            [ -f "$basefile" ] || continue;
-            echo "Removing $basefile"
-            rm $basefile
-          done;
-          echo "Removing $built_file"
-          rm $built_file
-        done
+      - name: Run `cargo pgrx schema` against the versioned_custom_libname_so example
+        run: cargo pgrx schema pg$PG_VER --package versioned_custom_libname_so
 
-    - name: Stop sccache server
-      run: sccache --stop-server || true
+      # Attempt to make the cache payload slightly smaller.
+      - name: Clean up built PGRX files
+        run: |
+          cd target/debug/deps/
+          for built_file in $(find * -type f -executable -print | grep -v "\.so$"); do
+            base_name=$(echo $built_file | cut -d- -f1);
+            for basefile in "$base_name".*; do
+              [ -f "$basefile" ] || continue;
+              echo "Removing $basefile"
+              rm $basefile
+            done;
+            echo "Removing $built_file"
+            rm $built_file
+          done
+
+      - name: Stop sccache server
+        run: sccache --stop-server || true
 
   cargo_pgrx_init:
     name: cargo pgrx init
@@ -359,122 +362,122 @@ jobs:
 
     strategy:
       matrix:
-        version: ["postgres-15"]
+        version: [ "postgres-15" ]
 
     steps:
-    - uses: actions/checkout@v4
+      - uses: actions/checkout@v4
 
-    - name: Set up prerequisites and environment
-      run: |
-        sudo apt-get update -y -qq --fix-missing
+      - name: Set up prerequisites and environment
+        run: |
+          sudo apt-get update -y -qq --fix-missing
+          
+          echo ""
+          
+          echo "----- Install / Set up sccache -----"
+          mkdir -p $HOME/.local/bin
+          curl -L https://github.com/mozilla/sccache/releases/download/v0.2.15/sccache-v0.2.15-x86_64-unknown-linux-musl.tar.gz | tar xz
+          mv -f sccache-v0.2.15-x86_64-unknown-linux-musl/sccache $HOME/.local/bin/sccache
+          chmod +x $HOME/.local/bin/sccache
+          echo "$HOME/.local/bin" >> $GITHUB_PATH
+          mkdir -p /home/runner/.cache/sccache
+          echo ""
+          
+          # https://stackoverflow.com/questions/57968497/how-do-i-set-an-env-var-with-a-bash-expression-in-github-actions/57969570#57969570
+          
+          echo "----- Set up MAKEFLAGS -----"
+          echo "MAKEFLAGS=$MAKEFLAGS -j $(grep -c ^processor /proc/cpuinfo)" >> $GITHUB_ENV
+          cat $GITHUB_ENV
+          echo ""
+          
+          echo "----- Set up PG_VER variable -----"
+          echo "PG_VER=$(echo ${{ matrix.version }} | cut -d '-' -f2)" >> $GITHUB_ENV
+          cat $GITHUB_ENV
+          echo ""
+          
+          echo "----- Remove old postgres -----"
+          sudo apt remove -y '^postgres.*' '^libpq.*' '^clang.*' '^llvm.*' '^libclang.*' '^libllvm.*' '^mono-llvm.*'
+          echo ""
+          
+          echo "----- Install system dependencies -----"
+          sudo apt-get install -y \
+            build-essential \
+            llvm-14-dev libclang-14-dev clang-14 \
+            gcc \
+            libssl-dev \
+            libz-dev \
+            make \
+            pkg-config \
+            strace \
+            zlib1g-dev
+          echo ""
+          
+          echo "----- Output Cargo version -----"
+          cargo --version
+          echo ""
+          
+          echo "----- Outputting env -----"
+          env
+          echo ""
 
-        echo ""
+      - name: Cache cargo registry
+        uses: actions/cache@v4
+        continue-on-error: false
+        with:
+          path: |
+            ~/.cargo/registry
+            ~/.cargo/git
+          key: pgrx-cargo_init_tests-cargo-${{ runner.os }}-${{ hashFiles('**/Cargo.lock', '.github/workflows/tests.yml') }}
 
-        echo "----- Install / Set up sccache -----"
-        mkdir -p $HOME/.local/bin
-        curl -L https://github.com/mozilla/sccache/releases/download/v0.2.15/sccache-v0.2.15-x86_64-unknown-linux-musl.tar.gz | tar xz
-        mv -f sccache-v0.2.15-x86_64-unknown-linux-musl/sccache $HOME/.local/bin/sccache
-        chmod +x $HOME/.local/bin/sccache
-        echo "$HOME/.local/bin" >> $GITHUB_PATH
-        mkdir -p /home/runner/.cache/sccache
-        echo ""
+      - name: Cache sccache directory
+        uses: actions/cache@v4
+        continue-on-error: false
+        with:
+          path: /home/runner/.cache/sccache
+          key: pgrx-cargo_init_tests-sccache-${{ runner.os }}-${{ hashFiles('**/Cargo.lock', '.github/workflows/tests.yml') }}
 
-        # https://stackoverflow.com/questions/57968497/how-do-i-set-an-env-var-with-a-bash-expression-in-github-actions/57969570#57969570
+      - name: Start sccache server
+        run: sccache --start-server
 
-        echo "----- Set up MAKEFLAGS -----"
-        echo "MAKEFLAGS=$MAKEFLAGS -j $(grep -c ^processor /proc/cpuinfo)" >> $GITHUB_ENV
-        cat $GITHUB_ENV
-        echo ""
+      - name: Print sccache stats (before)
+        run: sccache --show-stats
 
-        echo "----- Set up PG_VER variable -----"
-        echo "PG_VER=$(echo ${{ matrix.version }} | cut -d '-' -f2)" >> $GITHUB_ENV
-        cat $GITHUB_ENV
-        echo ""
+      - name: Install cargo-pgrx
+        run: cargo install --path cargo-pgrx/ --debug --force
 
-        echo "----- Remove old postgres -----"
-        sudo apt remove -y '^postgres.*' '^libpq.*' '^clang.*' '^llvm.*' '^libclang.*' '^libllvm.*' '^mono-llvm.*'
-        echo ""
+      - name: Run 'cargo pgrx init' for ${{ matrix.version }}
+        run: cargo pgrx init --pg$PG_VER download
 
-        echo "----- Install system dependencies -----"
-        sudo apt-get install -y \
-          build-essential \
-          llvm-14-dev libclang-14-dev clang-14 \
-          gcc \
-          libssl-dev \
-          libz-dev \
-          make \
-          pkg-config \
-          strace \
-          zlib1g-dev
-        echo ""
+      # We can't do this with other lints because we need $PGRX_HOME
+      - name: Clippy -Awarnings
+        run: cargo clippy -p pgrx --features pg$PG_VER -- -Awarnings
 
-        echo "----- Output Cargo version -----"
-        cargo --version
-        echo ""
+      # This also requires $PGRX_HOME
+      - name: Check doc-links
+        run: |
+          cargo rustdoc -p pgrx --features pg$PG_VER -- \
+            --document-private-items \
+            -Drustdoc::broken-intra-doc-links \
+            -Drustdoc::invalid-html-tags
 
-        echo "----- Outputting env -----"
-        env
-        echo ""
+      - name: create new sample extension
+        run: cd /tmp/ && cargo pgrx new sample
 
-    - name: Cache cargo registry
-      uses: actions/cache@v4
-      continue-on-error: false
-      with:
-        path: |
-          ~/.cargo/registry
-          ~/.cargo/git
-        key: pgrx-cargo_init_tests-cargo-${{ runner.os }}-${{ hashFiles('**/Cargo.lock', '.github/workflows/tests.yml') }}
+      # hack Cargo.toml to use this version of pgrx from github
+      - name: hack Cargo.toml
+        run: |
+          echo "[patch.crates-io]" >> /tmp/sample/Cargo.toml
+          echo "pgrx        = { path = \"${GITHUB_WORKSPACE}/pgrx\"        }" >> /tmp/sample/Cargo.toml
+          echo "pgrx-macros = { path = \"${GITHUB_WORKSPACE}/pgrx-macros\" }" >> /tmp/sample/Cargo.toml
+          echo "pgrx-tests  = { path = \"${GITHUB_WORKSPACE}/pgrx-tests\"  }" >> /tmp/sample/Cargo.toml
 
-    - name: Cache sccache directory
-      uses: actions/cache@v4
-      continue-on-error: false
-      with:
-        path: /home/runner/.cache/sccache
-        key: pgrx-cargo_init_tests-sccache-${{ runner.os }}-${{ hashFiles('**/Cargo.lock', '.github/workflows/tests.yml') }}
+      - name: show Cargo.toml
+        run: cat /tmp/sample/Cargo.toml
 
-    - name: Start sccache server
-      run: sccache --start-server
+      - name: Test sample for ${{ matrix.version }}
+        run: cd /tmp/sample && cargo pgrx test pg$PG_VER
 
-    - name: Print sccache stats (before)
-      run: sccache --show-stats
-
-    - name: Install cargo-pgrx
-      run: cargo install --path cargo-pgrx/ --debug --force
-
-    - name: Run 'cargo pgrx init' for ${{ matrix.version }}
-      run: cargo pgrx init --pg$PG_VER download
-
-    # We can't do this with other lints because we need $PGRX_HOME
-    - name: Clippy -Awarnings
-      run: cargo clippy -p pgrx --features pg$PG_VER -- -Awarnings
-
-    # This also requires $PGRX_HOME
-    - name: Check doc-links
-      run: |
-        cargo rustdoc -p pgrx --features pg$PG_VER -- \
-          --document-private-items \
-          -Drustdoc::broken-intra-doc-links \
-          -Drustdoc::invalid-html-tags
-
-    - name: create new sample extension
-      run: cd /tmp/ && cargo pgrx new sample
-
-    # hack Cargo.toml to use this version of pgrx from github
-    - name: hack Cargo.toml
-      run: |
-       echo "[patch.crates-io]" >> /tmp/sample/Cargo.toml
-       echo "pgrx        = { path = \"${GITHUB_WORKSPACE}/pgrx\"        }" >> /tmp/sample/Cargo.toml
-       echo "pgrx-macros = { path = \"${GITHUB_WORKSPACE}/pgrx-macros\" }" >> /tmp/sample/Cargo.toml
-       echo "pgrx-tests  = { path = \"${GITHUB_WORKSPACE}/pgrx-tests\"  }" >> /tmp/sample/Cargo.toml
-
-    - name: show Cargo.toml
-      run: cat /tmp/sample/Cargo.toml
-
-    - name: Test sample for ${{ matrix.version }}
-      run: cd /tmp/sample && cargo pgrx test pg$PG_VER
-
-    - name: Stop sccache server
-      run: sccache --stop-server || true
+      - name: Stop sccache server
+        run: sccache --stop-server || true
 
   build_mac:
     name: MacOS build & test
@@ -488,7 +491,7 @@ jobs:
 
     strategy:
       matrix:
-        os: ["macos-13", "macos-14"] # macos-14 is M1
+        os: [ "macos-13", "macos-14" ] # macos-14 is M1
         # Since Postgres 16 on macOS the dynamic library extension is "dylib" (instead of "so" on older versions),
         # so it's important to test against both versions (with "old" and "new" extensions).
         #
@@ -496,96 +499,96 @@ jobs:
         postgresql: [ 15, 16 ]
 
     steps:
-    - uses: Homebrew/actions/setup-homebrew@master
+      - uses: Homebrew/actions/setup-homebrew@master
 
-    # Although we don't use Python per se, if Homebrew has an updated version of Python,
-    # the following steps could fail because GitHub Actions mixed up the linkage.
-    - name: Workaround GitHub Actions Python issues
-      run: brew unlink python && brew link --overwrite python
+      # Although we don't use Python per se, if Homebrew has an updated version of Python,
+      # the following steps could fail because GitHub Actions mixed up the linkage.
+      - name: Workaround GitHub Actions Python issues
+        run: brew unlink python && brew link --overwrite python
 
-    # install postgres with homebrew, but do't let homebrew do an update too.  The update
-    # process not only takes forever, but it tends to fail when the internet changes
-    #       https://github.com/Homebrew/brew/issues/1670#issuecomment-267096602
-    - name: brew install postgresql
-      run: |
-        HOMEBREW_NO_AUTO_UPDATE=1 HOMEBREW_NO_INSTALLED_DEPENDENTS_CHECK=1 brew install ${FORMULA}
+      # install postgres with homebrew, but do't let homebrew do an update too.  The update
+      # process not only takes forever, but it tends to fail when the internet changes
+      #       https://github.com/Homebrew/brew/issues/1670#issuecomment-267096602
+      - name: brew install postgresql
+        run: |
+          HOMEBREW_NO_AUTO_UPDATE=1 HOMEBREW_NO_INSTALLED_DEPENDENTS_CHECK=1 brew install ${FORMULA}
+          
+          echo "$(brew --prefix ${FORMULA})/bin" >> $GITHUB_PATH
+        env:
+          FORMULA: postgresql@${{ matrix.postgresql }}
 
-        echo "$(brew --prefix ${FORMULA})/bin" >> $GITHUB_PATH
-      env:
-        FORMULA: postgresql@${{ matrix.postgresql }}
+      - uses: actions/checkout@v4
 
-    - uses: actions/checkout@v4
-
-    - name: Set up prerequisites and environment
-      run: |
-        echo ""
-
-        echo "----- Install sccache -----"
-        curl -L https://github.com/mozilla/sccache/releases/download/v0.5.4/sccache-v0.5.4-x86_64-apple-darwin.tar.gz | tar xz
-        mv -f sccache-v0.5.4-x86_64-apple-darwin/sccache /usr/local/bin
-        chmod +x /usr/local/bin/sccache
-        mkdir -p $SCCACHE_DIR
-        sccache --version
-
-        # https://stackoverflow.com/questions/57968497/how-do-i-set-an-env-var-with-a-bash-expression-in-github-actions/57969570#57969570
-        echo "----- Getting pre-installed Postgres major version -----"
-        PG_VER=$(pg_config --version | awk '{split($2,a,"."); print a[1]}')
-        echo "PG_VER=$PG_VER" >> $GITHUB_ENV
-        cat $GITHUB_ENV
-
-        echo "----- Set up Postgres permissions -----"
-        sudo chmod a+rwx `$(which pg_config) --pkglibdir` `$(which pg_config) --sharedir`/extension
-        # ls -lath `$(which pg_config) --pkglibdir` `$(which pg_config) --sharedir`/extension
-        echo ""
-
-        echo "----- Stable Rust ----"
-        rustup update stable
-        rustup default stable
-        rustc -vV
-        cargo -vV
-        echo ""
-
-        echo "----- Outputting env -----"
-        env
-        echo ""
+      - name: Set up prerequisites and environment
+        run: |
+          echo ""
+          
+          echo "----- Install sccache -----"
+          curl -L https://github.com/mozilla/sccache/releases/download/v0.5.4/sccache-v0.5.4-x86_64-apple-darwin.tar.gz | tar xz
+          mv -f sccache-v0.5.4-x86_64-apple-darwin/sccache /usr/local/bin
+          chmod +x /usr/local/bin/sccache
+          mkdir -p $SCCACHE_DIR
+          sccache --version
+          
+          # https://stackoverflow.com/questions/57968497/how-do-i-set-an-env-var-with-a-bash-expression-in-github-actions/57969570#57969570
+          echo "----- Getting pre-installed Postgres major version -----"
+          PG_VER=$(pg_config --version | awk '{split($2,a,"."); print a[1]}')
+          echo "PG_VER=$PG_VER" >> $GITHUB_ENV
+          cat $GITHUB_ENV
+          
+          echo "----- Set up Postgres permissions -----"
+          sudo chmod a+rwx `$(which pg_config) --pkglibdir` `$(which pg_config) --sharedir`/extension
+          # ls -lath `$(which pg_config) --pkglibdir` `$(which pg_config) --sharedir`/extension
+          echo ""
+          
+          echo "----- Stable Rust ----"
+          rustup update stable
+          rustup default stable
+          rustc -vV
+          cargo -vV
+          echo ""
+          
+          echo "----- Outputting env -----"
+          env
+          echo ""
 
 
-    - name: Cache sccache directory
-      uses: actions/cache@v4
-      continue-on-error: false
-      with:
-        path: /Users/runner/Library/Caches/Mozilla.sccache
-        key: pgrx-sccache-${{matrix.os}}-${{ hashFiles('**/Cargo.lock', '.github/workflows/tests.yml', '.cargo/config.toml') }}
+      - name: Cache sccache directory
+        uses: actions/cache@v4
+        continue-on-error: false
+        with:
+          path: /Users/runner/Library/Caches/Mozilla.sccache
+          key: pgrx-sccache-${{matrix.os}}-${{ hashFiles('**/Cargo.lock', '.github/workflows/tests.yml', '.cargo/config.toml') }}
 
-    - name: Cache cargo directory
-      uses: actions/cache@v4
-      with:
-        path: |
-          ~/.cargo
-        key: pgrx-cargo-${{matrix.os}}-tests-${{ hashFiles('**/Cargo.lock', '.github/workflows/tests.yml', '.cargo/config.toml') }}
+      - name: Cache cargo directory
+        uses: actions/cache@v4
+        with:
+          path: |
+            ~/.cargo
+          key: pgrx-cargo-${{matrix.os}}-tests-${{ hashFiles('**/Cargo.lock', '.github/workflows/tests.yml', '.cargo/config.toml') }}
 
-    - name: Start sccache server
-      run: sccache --start-server
+      - name: Start sccache server
+        run: sccache --start-server
 
-    - name: Print sccache stats
-      run: sccache --show-stats
+      - name: Print sccache stats
+        run: sccache --show-stats
 
-    - name: Install cargo-pgrx
-      run: cargo install --path cargo-pgrx/ --debug --force
+      - name: Install cargo-pgrx
+        run: cargo install --path cargo-pgrx/ --debug --force
 
-    - name: Print sccache stats
-      run: sccache --show-stats
+      - name: Print sccache stats
+        run: sccache --show-stats
 
-    - name: Run 'cargo pgrx init'
-      run: |
-        set -x
-        cargo pgrx init --pg$PG_VER $(which pg_config)
+      - name: Run 'cargo pgrx init'
+        run: |
+          set -x
+          cargo pgrx init --pg$PG_VER $(which pg_config)
 
-    - name: Run tests
-      run: cargo test --all --features "pg$PG_VER pg_test cshim proptest" --no-default-features
+      - name: Run tests
+        run: cargo test --all --features "pg$PG_VER pg_test cshim proptest" --no-default-features
 
-    - name: Print sccache stats
-      run: sccache --show-stats
+      - name: Print sccache stats
+        run: sccache --show-stats
 
-    - name: Stop sccache server
-      run: sccache --stop-server || true
+      - name: Stop sccache server
+        run: sccache --stop-server || true
