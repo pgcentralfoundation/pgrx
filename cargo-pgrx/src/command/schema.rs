@@ -183,7 +183,14 @@ pub(crate) fn generate_schema(
         out_dot = Some(x.to_string());
     };
 
-    let codegen = compute_codegen(package_manifest_path, &symbols, &lib_name, out_path, out_dot)?;
+    let codegen = compute_codegen(
+        control_file,
+        package_manifest_path,
+        &symbols,
+        &lib_name,
+        out_path,
+        out_dot,
+    )?;
 
     let embed = {
         let mut embed = tempfile::NamedTempFile::new()?;
@@ -381,6 +388,7 @@ fn first_build(
 }
 
 fn compute_codegen(
+    control_file_path: impl AsRef<Path>,
     package_manifest_path: impl AsRef<Path>,
     symbols: &[String],
     lib_name: &str,
@@ -391,9 +399,19 @@ fn compute_codegen(
     let lib_name_ident = Ident::new(&lib_name, Span::call_site());
 
     let inputs = {
+        // read the .control file and do the required variable replacements
+        let control_file_contents = std::fs::read_to_string(control_file_path)?
+            .replace("@CARGO_VERSION@", env!("CARGO_PKG_VERSION"));
+
         let mut out = quote::quote! {
+            // call the marker.  Primarily this ensures that rustc will actually link to the library
+            // during the "pgrx_embed" build initiated by `cargo-pgrx schema` generation
+            #lib_name_ident::__pgrx_marker();
+
             let mut entities = Vec::new();
-            let control_file_entity = ::pgrx::pgrx_sql_entity_graph::SqlGraphEntity::ExtensionRoot(::#lib_name_ident::__pgrx_marker());
+            let control_file = ::pgrx::pgrx_sql_entity_graph::ControlFile::try_from(#control_file_contents).expect(".control file should properly formatted");
+            let control_file_entity = ::pgrx::pgrx_sql_entity_graph::SqlGraphEntity::ExtensionRoot(control_file);
+
             entities.push(control_file_entity);
         };
         for name in symbols.iter() {

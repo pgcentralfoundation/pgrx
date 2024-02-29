@@ -61,5 +61,3 @@ mod variadic_tests;
 mod xact_callback_tests;
 mod xid64_tests;
 mod zero_datum_edge_cases;
-
-pgrx::pg_magic_func!();
