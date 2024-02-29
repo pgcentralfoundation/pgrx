@@ -96,13 +96,13 @@ impl ControlFile {
             relocatable: temp
                 .get("relocatable")
                 .ok_or(ControlFileError::MissingField { field: "relocatable" })?
-                == &"true",
+                == "true",
             superuser: temp
                 .get("superuser")
                 .ok_or(ControlFileError::MissingField { field: "superuser" })?
-                == &"true",
+                == "true",
             schema: temp.get("schema").map(|v| v.to_string()),
-            trusted: if let Some(v) = temp.get("trusted") { v == &"true" } else { false },
+            trusted: if let Some(v) = temp.get("trusted") { v == "true" } else { false },
         };
 
         if !control_file.superuser && control_file.trusted {
