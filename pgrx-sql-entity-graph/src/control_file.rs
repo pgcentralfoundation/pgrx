@@ -18,6 +18,7 @@ to the `pgrx` framework and very subject to change between versions. While you m
 use super::{SqlGraphEntity, SqlGraphIdentifier, ToSql};
 use core::convert::TryFrom;
 use std::collections::HashMap;
+use std::path::PathBuf;
 use thiserror::Error;
 
 /// The parsed contents of a `.control` file.
@@ -43,7 +44,11 @@ pub struct ControlFile {
 }
 
 impl ControlFile {
-    /// Parse a `.control` file.
+    /// Parse a `.control` file, performing all known pgrx dynamic variable substitutions.
+    ///
+    /// # Supported Dynamic Variable Substitutions
+    ///
+    /// `@CARGO_VERSION@`:  Replaced with the value of the environment variable `CARGO_PKG_VERSION`
     ///
     /// ```rust
     /// use pgrx_sql_entity_graph::ControlFile;
@@ -55,6 +60,14 @@ impl ControlFile {
     /// ```
     #[allow(clippy::should_implement_trait)]
     pub fn from_str(input: &str) -> Result<Self, ControlFileError> {
+        fn do_var_replacements(input: &str) -> String {
+            input.replace(
+                "@CARGO_VERSION@",
+                &std::env::var("CARGO_PKG_VERSION")
+                    .expect("`CARGO_PKG_VERSION` environment variable should be set"),
+            )
+        }
+
         let mut temp = HashMap::new();
         for line in input.lines() {
             let parts: Vec<&str> = line.split('=').collect();
@@ -68,7 +81,7 @@ impl ControlFile {
             let v = v.trim_start_matches('\'');
             let v = v.trim_end_matches('\'');
 
-            temp.insert(k, v);
+            temp.insert(k, do_var_replacements(v));
         }
         let control_file = ControlFile {
             comment: temp
@@ -108,12 +121,26 @@ impl From<ControlFile> for SqlGraphEntity {
 }
 
 /// An error met while parsing a `.control` file.
-#[derive(Debug, Clone, Error)]
+#[derive(Debug, Error)]
 pub enum ControlFileError {
+    #[error("Filesystem error reading control file")]
+    IOError {
+        #[from]
+        error: std::io::Error,
+    },
     #[error("Missing field in control file! Please add `{field}`.")]
     MissingField { field: &'static str },
     #[error("Redundant field in control file! Please remove `{field}`.")]
     RedundantField { field: &'static str },
+}
+
+impl TryFrom<PathBuf> for ControlFile {
+    type Error = ControlFileError;
+
+    fn try_from(value: PathBuf) -> Result<Self, Self::Error> {
+        let contents = std::fs::read_to_string(value)?;
+        ControlFile::try_from(contents.as_str())
+    }
 }
 
 impl TryFrom<&str> for ControlFile {
