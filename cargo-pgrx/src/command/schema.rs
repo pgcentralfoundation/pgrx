@@ -569,10 +569,10 @@ fn compute_sql(
     command.stderr(Stdio::inherit());
 
     // pass the package version through as an environment variable
-    command.env(
-        "PGRX_PKG_VERSION",
-        manifest.package_version().expect("`Cargo.toml` is missing the package version property"),
-    );
+    let cargo_pkg_version = std::env::var("CARGO_PKG_VERSION").unwrap_or_else(|_| {
+        manifest.package_version().expect("`CARGO_PKG_VERSION` should be set, and barring that, `Cargo.toml` should have a package version property")
+    });
+    command.env("CARGO_PKG_VERSION", cargo_pkg_version);
 
     let command_str = format!("{:?}", command);
     tracing::debug!(command = %command_str, "Running");

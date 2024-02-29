@@ -27,7 +27,8 @@ use thiserror::Error;
 /// use pgrx_sql_entity_graph::ControlFile;
 /// use std::convert::TryFrom;
 /// # fn main() -> eyre::Result<()> {
-/// let context = include_str!("../../pgrx-examples/custom_types/custom_types.control");
+/// # // arrays.control chosen because it does **NOT** use the @CARGO_VERSION@ variable
+/// let context = include_str!("../../pgrx-examples/arrays/arrays.control");
 /// let _control_file = ControlFile::try_from(context)?;
 /// # Ok(())
 /// # }
@@ -48,26 +49,40 @@ impl ControlFile {
     ///
     /// # Supported Dynamic Variable Substitutions
     ///
-    /// `@CARGO_VERSION@`:  Replaced with the value of the environment variable `PGRX_PKG_VERSION`,
-    ///                     which is set by `cargo-pgrx` using the package version from the extension's
-    ///                     `Cargo.toml` file
+    /// `@CARGO_VERSION@`:  Replaced with the value of the environment variable `CARGO_PKG_VERSION`,
+    ///                     which is set by cargo, or failing that, `cargo-pgrx` using the package
+    ///                     version from the extension's `Cargo.toml` file
+    ///
+    /// # Errors
+    ///
+    /// Returns a `ControlFileError` if any of the required fields are missing from the input string
+    /// or if any required environment variables (for dynamic variable substitution) are missing
     ///
     /// ```rust
     /// use pgrx_sql_entity_graph::ControlFile;
     /// # fn main() -> eyre::Result<()> {
-    /// let context = include_str!("../../pgrx-examples/custom_types/custom_types.control");
+    /// # // arrays.control chosen because it does **NOT** use the @CARGO_VERSION@ variable
+    /// let context = include_str!("../../pgrx-examples/arrays/arrays.control");
     /// let _control_file = ControlFile::from_str(context)?;
     /// # Ok(())
     /// # }
     /// ```
     #[allow(clippy::should_implement_trait)]
     pub fn from_str(input: &str) -> Result<Self, ControlFileError> {
-        fn do_var_replacements(input: &str) -> String {
-            input.replace(
-                "@CARGO_VERSION@",
-                &std::env::var("PGRX_PKG_VERSION")
-                    .expect("`PGRX_PKG_VERSION` environment variable should be set"),
-            )
+        fn do_var_replacements(mut input: String) -> Result<String, ControlFileError> {
+            const CARGO_VERSION: &'static str = "@CARGO_VERSION@";
+
+            // endeavor to not require external values if they're not used by the input
+            if input.contains(CARGO_VERSION) {
+                input = input.replace(
+                    CARGO_VERSION,
+                    &std::env::var("CARGO_PKG_VERSION").map_err(|_| {
+                        ControlFileError::MissingEnvvar("CARGO_PKG_VERSION".to_string())
+                    })?,
+                );
+            }
+
+            Ok(input)
         }
 
         let mut temp = HashMap::new();
@@ -83,7 +98,7 @@ impl ControlFile {
             let v = v.trim_start_matches('\'');
             let v = v.trim_end_matches('\'');
 
-            temp.insert(k, do_var_replacements(v));
+            temp.insert(k, do_var_replacements(v.to_string())?);
         }
         let control_file = ControlFile {
             comment: temp
@@ -134,6 +149,8 @@ pub enum ControlFileError {
     MissingField { field: &'static str },
     #[error("Redundant field in control file! Please remove `{field}`.")]
     RedundantField { field: &'static str },
+    #[error("Missing environment variable: {0}")]
+    MissingEnvvar(String),
 }
 
 impl TryFrom<PathBuf> for ControlFile {
