@@ -48,7 +48,9 @@ impl ControlFile {
     ///
     /// # Supported Dynamic Variable Substitutions
     ///
-    /// `@CARGO_VERSION@`:  Replaced with the value of the environment variable `CARGO_PKG_VERSION`
+    /// `@CARGO_VERSION@`:  Replaced with the value of the environment variable `PGRX_PKG_VERSION`,
+    ///                     which is set by `cargo-pgrx` using the package version from the extension's
+    ///                     `Cargo.toml` file
     ///
     /// ```rust
     /// use pgrx_sql_entity_graph::ControlFile;
@@ -63,8 +65,8 @@ impl ControlFile {
         fn do_var_replacements(input: &str) -> String {
             input.replace(
                 "@CARGO_VERSION@",
-                &std::env::var("PGRX_CARGO_PKG_VERSION")
-                    .expect("`PGRX_CARGO_PKG_VERSION` environment variable should be set"),
+                &std::env::var("PGRX_PKG_VERSION")
+                    .expect("`PGRX_PKG_VERSION` environment variable should be set"),
             )
         }
 

@@ -221,7 +221,7 @@ pub(crate) fn generate_schema(
         &package_name,
     )?;
 
-    compute_sql(profile, &package_name)?;
+    compute_sql(profile, &package_name, &manifest)?;
 
     Ok(())
 }
@@ -554,7 +554,11 @@ fn second_build(
     Ok(())
 }
 
-fn compute_sql(profile: &CargoProfile, package_name: &str) -> eyre::Result<()> {
+fn compute_sql(
+    profile: &CargoProfile,
+    package_name: &str,
+    manifest: &Manifest,
+) -> eyre::Result<()> {
     let mut bin = get_target_dir()?;
     bin.push(profile.target_subdir());
     bin.push(format!("pgrx_embed_{package_name}"));
@@ -564,8 +568,11 @@ fn compute_sql(profile: &CargoProfile, package_name: &str) -> eyre::Result<()> {
     command.stdout(Stdio::inherit());
     command.stderr(Stdio::inherit());
 
-    // carry cargo's CARGO_PKG_VERSION value through to the pgrx_embed binary as our own
-    command.env("PGRX_CARGO_PKG_VERSION", env!("CARGO_PKG_VERSION"));
+    // pass the package version through as an environment variable
+    command.env(
+        "PGRX_PKG_VERSION",
+        manifest.package_version().expect("`Cargo.toml` is missing the package version property"),
+    );
 
     let command_str = format!("{:?}", command);
     tracing::debug!(command = %command_str, "Running");
