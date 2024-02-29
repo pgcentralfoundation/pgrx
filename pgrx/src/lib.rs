@@ -185,6 +185,7 @@ macro_rules! pg_module_magic {
 
         // A marker function which must exist in the root of the extension for proper linking by the
         // "pgrx_embed" binary during `cargo-pgrx schema` generation.
+        #[inline(never)] /* we don't want DCE to remove this as it *could* cause the compiler to decide to not link to us */
         #[doc(hidden)]
         pub fn __pgrx_marker() {
             // noop
