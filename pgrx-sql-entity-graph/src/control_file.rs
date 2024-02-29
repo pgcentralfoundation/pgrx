@@ -70,7 +70,7 @@ impl ControlFile {
     #[allow(clippy::should_implement_trait)]
     pub fn from_str(input: &str) -> Result<Self, ControlFileError> {
         fn do_var_replacements(mut input: String) -> Result<String, ControlFileError> {
-            const CARGO_VERSION: &'static str = "@CARGO_VERSION@";
+            const CARGO_VERSION: &str = "@CARGO_VERSION@";
 
             // endeavor to not require external values if they're not used by the input
             if input.contains(CARGO_VERSION) {
