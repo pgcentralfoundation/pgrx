@@ -332,7 +332,7 @@ jobs:
         run: cargo test --package versioned_so --features "pg$PG_VER" --no-default-features
 
       - name: Run `cargo pgrx schema` against the versioned_custom_libname_so example
-        run: cargo pgrx schema pg{$PG_VER} --package versioned_custom_libname_so
+        run: cargo pgrx schema pg$PG_VER --package versioned_custom_libname_so
 
       # Attempt to make the cache payload slightly smaller.
       - name: Clean up built PGRX files
