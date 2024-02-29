@@ -564,6 +564,9 @@ fn compute_sql(profile: &CargoProfile, package_name: &str) -> eyre::Result<()> {
     command.stdout(Stdio::inherit());
     command.stderr(Stdio::inherit());
 
+    // carry cargo's CARGO_PKG_VERSION value through to the pgrx_embed binary as our own
+    command.env("PGRX_CARGO_PKG_VERSION", env!("CARGO_PKG_VERSION"));
+
     let command_str = format!("{:?}", command);
     tracing::debug!(command = %command_str, "Running");
     let embed_output = command

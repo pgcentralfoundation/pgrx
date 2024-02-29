@@ -63,8 +63,8 @@ impl ControlFile {
         fn do_var_replacements(input: &str) -> String {
             input.replace(
                 "@CARGO_VERSION@",
-                &std::env::var("CARGO_PKG_VERSION")
-                    .expect("`CARGO_PKG_VERSION` environment variable should be set"),
+                &std::env::var("PGRX_CARGO_PKG_VERSION")
+                    .expect("`PGRX_CARGO_PKG_VERSION` environment variable should be set"),
             )
         }
 
