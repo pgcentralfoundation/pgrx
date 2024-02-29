@@ -163,7 +163,7 @@ pub unsafe fn pg_get_nullable_datum(
     fcinfo: pg_sys::FunctionCallInfo,
     num: usize,
 ) -> pg_sys::NullableDatum {
-    let _nullptr_check = ptr::NonNull::new(fcinfo).unwrap();
+    let _nullptr_check = ptr::NonNull::new(fcinfo).expect("fcinfo pointer must be non-null");
     unsafe {
         let nargs = (*fcinfo).nargs;
         let args_ptr: *const pg_sys::NullableDatum = ptr::addr_of!((*fcinfo).args).cast();
