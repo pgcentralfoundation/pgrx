@@ -177,7 +177,7 @@ const _: () = {
 ///
 /// </pre></div>
 ///
-/// This calls both [`pg_magic_func!()`](pg_magic_func) and [`pg_sql_graph_magic!()`](pg_sql_graph_magic).
+/// This calls [`pg_magic_func!()`](pg_magic_func).
 #[macro_export]
 macro_rules! pg_module_magic {
     () => {
