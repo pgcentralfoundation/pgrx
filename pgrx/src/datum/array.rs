@@ -76,13 +76,13 @@ where
 
 type ChaChaSlideImpl<T> = Box<dyn casper::ChaChaSlide<T>>;
 
-enum NullKind<'a> {
+pub(crate) enum NullKind<'a> {
     Bits(&'a BitSlice<u8>),
     Strict(usize),
 }
 
 impl NullKind<'_> {
-    fn get(&self, index: usize) -> Option<bool> {
+    pub(crate) fn get(&self, index: usize) -> Option<bool> {
         match self {
             // Note this flips the bit:
             // Postgres nullbitmaps are 1 for "valid" and 0 for "null"
@@ -91,7 +91,7 @@ impl NullKind<'_> {
         }
     }
 
-    fn any(&self) -> bool {
+    pub(crate) fn any(&self) -> bool {
         match self {
             // Note the reversed polarity:
             // Postgres nullbitmaps are 1 for "valid" and 0 for "null"
