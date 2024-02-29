@@ -400,8 +400,11 @@ fn compute_codegen(
 
     let inputs = {
         // read the .control file and do the required variable replacements
-        let control_file_contents = std::fs::read_to_string(control_file_path)?
-            .replace("@CARGO_VERSION@", env!("CARGO_PKG_VERSION"));
+        let control_file_contents = std::fs::read_to_string(control_file_path)?.replace(
+            "@CARGO_VERSION@",
+            &std::env::var("CARGO_PKG_VERSION")
+                .expect("`CARGO_PGK_VERSION` environment variable should be set"),
+        );
 
         let mut out = quote::quote! {
             // call the marker.  Primarily this ensures that rustc will actually link to the library
