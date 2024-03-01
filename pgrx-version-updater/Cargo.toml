@@ -21,4 +21,4 @@ owo-colors.workspace = true
 walkdir.workspace = true
 
 clap = { version = "4.4.2", features = [ "env", "derive" ] }
-toml_edit = { version = "0.21" }
+toml_edit = { version = "0.22" }
