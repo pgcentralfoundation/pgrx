@@ -1,7 +1,6 @@
 use crate as pg_sys;
 
 use memoffset::*;
-use pgrx_macros::pg_guard;
 use std::str::FromStr;
 
 /// this comes from `postgres_ext.h`
@@ -229,27 +228,68 @@ pub unsafe fn heap_tuple_get_struct<T>(htup: super::HeapTuple) -> *mut T {
     }
 }
 
-#[pg_guard]
+// All of this weird code is in response to Postgres having a relatively cavalier attitude about types:
+// - https://github.com/postgres/postgres/commit/1c27d16e6e5c1f463bbe1e9ece88dda811235165
+//
+// As a result, we redeclare their functions with the arguments they should have on earlier Postgres
+// and we route people to the old symbols they were using before on later ones.
+#[cfg(any(feature = "pg12", feature = "pg13", feature = "pg14", feature = "pg15"))]
+#[::pgrx_macros::pg_guard]
 extern "C" {
     pub fn query_tree_walker(
         query: *mut super::Query,
-        walker: ::std::option::Option<
-            unsafe extern "C" fn(*mut super::Node, *mut ::std::os::raw::c_void) -> bool,
+        walker: ::core::option::Option<
+            unsafe extern "C" fn(*mut super::Node, *mut ::core::ffi::c_void) -> bool,
         >,
-        context: *mut ::std::os::raw::c_void,
-        flags: ::std::os::raw::c_int,
+        context: *mut ::core::ffi::c_void,
+        flags: ::core::ffi::c_int,
+    ) -> bool;
+
+    pub fn expression_tree_walker(
+        node: *mut super::Node,
+        walker: ::core::option::Option<
+            unsafe extern "C" fn(*mut super::Node, *mut ::core::ffi::c_void) -> bool,
+        >,
+        context: *mut ::core::ffi::c_void,
+    ) -> bool;
+
+    pub fn raw_expression_tree_walker(
+        node: *mut super::Node,
+        walker: ::core::option::Option<
+            unsafe extern "C" fn(*mut super::Node, *mut ::core::ffi::c_void) -> bool,
+        >,
+        context: *mut ::core::ffi::c_void,
     ) -> bool;
 }
 
-#[pg_guard]
-extern "C" {
-    pub fn expression_tree_walker(
-        node: *mut super::Node,
-        walker: ::std::option::Option<
-            unsafe extern "C" fn(*mut super::Node, *mut ::std::os::raw::c_void) -> bool,
-        >,
-        context: *mut ::std::os::raw::c_void,
-    ) -> bool;
+#[cfg(feature = "pg16")]
+pub unsafe fn query_tree_walker(
+    query: *mut super::Query,
+    walker: ::core::option::Option<
+        unsafe extern "C" fn(*mut super::Node, *mut ::core::ffi::c_void) -> bool,
+    >,
+    context: *mut ::core::ffi::c_void,
+    flags: ::core::ffi::c_int,
+) -> bool {
+    crate::query_tree_walker_impl(query, walker, context, flags)
+}
+
+#[cfg(feature = "pg16")]
+pub unsafe fn expression_tree_walker(
+    arg_node: *mut crate::Node,
+    arg_walker: Option<unsafe extern "C" fn(*mut crate::Node, *mut ::core::ffi::c_void) -> bool>,
+    arg_context: *mut ::core::ffi::c_void,
+) -> bool {
+    crate::expression_tree_walker_impl(arg_node, arg_walker, arg_context)
+}
+
+#[cfg(feature = "pg16")]
+pub unsafe fn raw_expression_tree_walker(
+    arg_node: *mut crate::Node,
+    arg_walker: Option<unsafe extern "C" fn(*mut crate::Node, *mut ::core::ffi::c_void) -> bool>,
+    arg_context: *mut ::core::ffi::c_void,
+) -> bool {
+    crate::raw_expression_tree_walker_impl(arg_node, arg_walker, arg_context)
 }
 
 #[inline(always)]
