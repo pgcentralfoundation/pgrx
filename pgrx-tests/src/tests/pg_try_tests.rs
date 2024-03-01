@@ -7,48 +7,24 @@
 //LICENSE All rights reserved.
 //LICENSE
 //LICENSE Use of this source code is governed by the MIT license that can be found in the LICENSE file.
+use core::ptr;
 use pgrx::prelude::*;
 
 // if our Postgres ERROR and Rust panic!() handling is incorrect, this little bit of useless code
 // will crash postgres.  If things are correct it'll simply raise an ERROR saying "panic in walker".
 #[pg_extern]
 fn crash() {
-    #[cfg(feature = "cshim")]
-    {
-        use pgrx::PgList;
-        let mut node = PgList::<pg_sys::Node>::new();
-        node.push(PgList::<pg_sys::Node>::new().into_pg() as *mut pg_sys::Node);
+    use pgrx::{list::List, memcx};
+    memcx::current_context(|current| unsafe {
+        let mut list = List::downcast_ptr_in_memcx(ptr::null_mut(), current).unwrap();
+        list.unstable_push_in_context(ptr::null_mut(), current);
 
-        #[cfg(any(feature = "pg12", feature = "pg13", feature = "pg14", feature = "pg15"))]
-        unsafe {
-            pg_sys::raw_expression_tree_walker(
-                node.into_pg() as *mut pg_sys::Node,
-                Some(walker),
-                std::ptr::null_mut(),
-            );
-        }
-
-        #[cfg(feature = "pg16")]
-        error!("panic in walker");
-    }
-
-    #[cfg(not(feature = "cshim"))]
-    {
-        walker();
-    }
+        pg_sys::raw_expression_tree_walker(list.as_mut_ptr().cast(), Some(walker), ptr::null_mut());
+    });
 }
 
-#[cfg(not(feature = "cshim"))]
-fn walker() -> bool {
-    panic!("panic in walker");
-}
-
-#[cfg(all(
-    feature = "cshim",
-    any(feature = "pg12", feature = "pg13", feature = "pg14", feature = "pg15")
-))]
 #[pg_guard]
-extern "C" fn walker() -> bool {
+extern "C" fn walker(_node: *mut pg_sys::Node, _void: *mut ::core::ffi::c_void) -> bool {
     panic!("panic in walker");
 }
 

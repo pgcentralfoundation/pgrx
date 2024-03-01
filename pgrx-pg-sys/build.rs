@@ -741,7 +741,7 @@ fn add_blocklists(bind: bindgen::Builder) -> bindgen::Builder {
     bind.blocklist_type("Datum") // manually wrapping datum for correctness
         .blocklist_type("Oid") // "Oid" is not just any u32
         .blocklist_function("varsize_any") // pgrx converts the VARSIZE_ANY macro, so we don't want to also have this function, which is in heaptuple.c
-        .blocklist_function("(?:query|expression)_tree_walker")
+        .blocklist_function("(?:raw_)?(?:query|expression)_tree_walker")
         .blocklist_function(".*(?:set|long)jmp")
         .blocklist_function("pg_re_throw")
         .blocklist_function("err(start|code|msg|detail|context_msg|hint|finish)")
