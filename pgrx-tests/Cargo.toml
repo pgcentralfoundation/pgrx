@@ -10,7 +10,7 @@
  
 [package]
 name = "pgrx-tests"
-version = "0.12.0-alpha.0"
+version = "0.12.0-alpha.1"
 authors = ["PgCentral Foundation, Inc. <contact@pgcentral.org>"]
 license = "MIT"
 description = "Test framework for 'pgrx'-based Postgres extensions"
@@ -51,13 +51,13 @@ rustdoc-args = ["--cfg", "docsrs"]
 pgrx-macros.workspace = true
 pgrx-pg-config.workspace = true
 
+clap-cargo.workspace = true
 eyre.workspace = true
 libc.workspace = true
+owo-colors.workspace = true
 regex.workspace = true
 thiserror.workspace = true
-owo-colors.workspace = true
 
-clap-cargo = "0.11.0"
 postgres = "0.19.7"
 proptest = { version = "1", optional = true }
 serde = "1.0"
@@ -68,7 +68,7 @@ rand = "0.8.5"
 [dependencies.pgrx] # Not unified in workspace due to default-features key
 path = "../pgrx"
 default-features = false
-version = "=0.12.0-alpha.0"
+version = "=0.12.0-alpha.1"
 
 [dev-dependencies]
 eyre.workspace = true # testing functions that return `eyre::Result`

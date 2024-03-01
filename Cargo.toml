@@ -51,12 +51,14 @@ members = [
 cargo-pgrx = { path = "cargo-pgrx" }
 
 [workspace.dependencies]
-pgrx-macros = { path = "./pgrx-macros", version = "=0.12.0-alpha.0" }
-pgrx-pg-sys = { path = "./pgrx-pg-sys", version = "=0.12.0-alpha.0" }
-pgrx-sql-entity-graph = { path = "./pgrx-sql-entity-graph", version = "=0.12.0-alpha.0" }
-pgrx-pg-config = { path = "./pgrx-pg-config", version = "=0.12.0-alpha.0" }
+pgrx-macros = { path = "./pgrx-macros", version = "=0.12.0-alpha.1" }
+pgrx-pg-sys = { path = "./pgrx-pg-sys", version = "=0.12.0-alpha.1" }
+pgrx-sql-entity-graph = { path = "./pgrx-sql-entity-graph", version = "=0.12.0-alpha.1" }
+pgrx-pg-config = { path = "./pgrx-pg-config", version = "=0.12.0-alpha.1" }
 
-cargo_toml = "0.16" # used for building projects
+cargo_metadata = "0.18.0"
+cargo_toml = "0.19" # used for building projects
+clap-cargo = { version = "0.14.0", features = [ "cargo_metadata" ] }
 eyre = "0.6.9" # simplifies error-handling
 libc = "0.2" # FFI compat
 owo-colors = "3.5" # for output highlighting
@@ -64,6 +66,7 @@ proc-macro2 = { version = "1.0.78", features = [ "span-locations" ] }
 quote = "1.0.33"
 regex = "1.1" # used for build/test
 syn = { version = "2", features = [ "extra-traits", "full", "parsing" ] }
+toml = "0.8" # our config files
 thiserror = "1"
 unescape = "0.1.0" # for escaped-character-handling
 url = "2.4.1" # the non-existent std::web

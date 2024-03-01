@@ -10,7 +10,7 @@
  
 [package]
 name = "pgrx-pg-config"
-version = "0.12.0-alpha.0"
+version = "0.12.0-alpha.1"
 authors = ["PgCentral Foundation, Inc. <contact@pgcentral.org>"]
 license = "MIT"
 description = "A Postgres pg_config wrapper for 'pgrx'"
@@ -27,6 +27,7 @@ cargo_toml.workspace = true
 eyre.workspace = true
 owo-colors.workspace = true
 thiserror.workspace = true
+toml.workspace = true
 url.workspace = true
 
 home = "0.5.9"
@@ -34,4 +35,3 @@ pathsearch = "0.2.0"
 serde = { version = "1.0", features = [ "derive" ] }
 serde_derive = "1.0"
 serde_json = "1.0"
-toml = "0.8.2"

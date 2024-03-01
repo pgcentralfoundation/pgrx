@@ -10,7 +10,7 @@
  
 [package]
 name = "cargo-pgrx"
-version = "0.12.0-alpha.0"
+version = "0.12.0-alpha.1"
 authors = ["PgCentral Foundation, Inc. <contact@pgcentral.org>"]
 license = "MIT"
 description = "Cargo subcommand for 'pgrx' to make Postgres extension development easy"
@@ -27,17 +27,17 @@ edition = "2021"
 pgrx-pg-config.workspace = true
 pgrx-sql-entity-graph.workspace = true
 
+cargo_metadata.workspace = true
 cargo_toml.workspace = true
+clap-cargo.workspace = true
 libc.workspace = true
 regex.workspace = true
+toml.workspace = true
 
-cargo_metadata = "0.17.0"
 clap = { version = "4.4.2", features = [ "env", "suggestions", "cargo", "derive", "wrap_help" ] }
-clap-cargo = { version = "0.11.0", features = [ "cargo_metadata" ] }
 jobslot = "0.2.12" # as seen in gmake -j{N}
 semver = "1.0.20" # checking pgrx versions match
 tempfile = "3.8.0"
-toml = "0.8.2" # our config files
 
 # SQL schema generation
 object = { version = "0.32.1", default-features = false, features = [ "std" ] }
