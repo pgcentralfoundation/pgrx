@@ -59,8 +59,8 @@ fn with_vec(elems: Array<String>) {
 // An array is a detoasted varlena type, so we reason about the lifetime of
 // the memory context that the varlena is actually detoasted into.
 pub struct Array<'mcx, T> {
-    null_slice: NullKind<'mcx>,
-    slide_impl: ChaChaSlideImpl<T>,
+    pub(crate) null_slice: NullKind<'mcx>,
+    pub(crate) slide_impl: ChaChaSlideImpl<T>,
     // Rust drops in FIFO order, drop this last
     raw: Toast<RawArray>,
 }
