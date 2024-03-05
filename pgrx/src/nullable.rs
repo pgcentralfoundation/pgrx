@@ -3,11 +3,11 @@
 //! types which implement nullable (empty slot) behavior in a 
 //! "structure-of-arrays" manner
 
-use std::marker::PhantomData;
+use std::{marker::PhantomData, ops::Index};
 
 use bitvec::slice::BitSlice;
 
-use crate::{memcx::MemCx, Array, Datum, UnboxDatum};
+use crate::{memcx::MemCx, Array, Datum, NullKind, UnboxDatum};
 
 pub trait NullableIter {
 
@@ -85,12 +85,6 @@ impl<T> From<Option<T>> for Nullable<T> {
 /// after undergoing several layers of PGRX's Rust memory safety.
 pub type NullableDatum<'src> = Nullable<Datum<'src>>;
 
-
-pub struct IterNullableValuesWithBitmap<'src, T> {
-    null_slice: &'src mut BitSlice<u8>,
-    values: &'src [T],
-}
-
 /* A null-bitmap array of (from postgres' perspective) length 8 with 3 nulls
     in it has an actual data array size of `size_of<Elem>() * 5` (give or 
     take padding), whereas the bool array nulls implementation will still 
@@ -102,21 +96,11 @@ pub struct IterNullableValuesWithBitmap<'src, T> {
 /// Represents Postgres internal types which describe the layout of where
 /// filled slots (equivalent to Some(T)) are and where nulls (equivalent
 /// to None) are in the array.
-pub trait NullLayout {
-    fn len(&self) -> usize;
-    /// For the given (linear) container index, returns the next index of the
-    /// underlying data buffer that should contain a valid value,
-    /// or `None` if we have reached the end of the container.
-    /// 
-    /// Used to implement the skipping behavior expected with null-bitmap
-    /// -style arrays.
-    fn next_valid_idx(&self, idx: usize) -> Option<usize>;
-
-    /// Returns true if this container skips nulls
-    /// i.e. if a null takes up 0 bits in the underlying data buffer.
-    /* The reason this isn't const is to support implementations like
-       AnyNullLayout */
-    fn can_skip(&self) -> bool;
+/// Note that a NullLayout must also capture the length of the container it
+/// refers to.
+pub trait NullLayout<Idx> 
+        where Idx: PartialEq + PartialOrd {
+    fn len(&self) -> Idx;
 
     /// Returns true if this container has any nulls in it presently.
     /// # Performance
@@ -129,12 +113,31 @@ pub trait NullLayout {
 
     /// Returns Some(true) if the element at `idx`` is valid (non-null),
     /// or `None` if `idx` is out-of-bounds
-    fn is_valid(&self, idx: usize) -> Option<bool>;
-    /// Returns true if the element at idx is null.
-    fn is_null(&self, idx: usize) -> Option<bool> { 
+    /// Implementors should handle bounds-checking. 
+    fn is_valid(&self, idx: Idx) -> Option<bool>;
+    /// Returns true if the element at idx is null,
+    /// or `None` if `idx` is out-of-bounds
+    /// Implementors should handle bounds-checking. 
+    fn is_null(&self, idx: Idx) -> Option<bool> { 
         self.is_valid(idx).map(|v| !v)
     }
 }
+
+pub trait SkippingNullLayout<Idx>: NullLayout<Idx> 
+        where Idx: PartialEq + PartialOrd { 
+    /// For the given (linear) container index, returns the next index of the
+    /// underlying data buffer that should contain a valid value,
+    /// or `None` if we have reached the end of the container.
+    /// 
+    /// Used to implement the skipping behavior expected with null-bitmap
+    /// -style arrays.
+    fn next_valid_idx(&self, idx: Idx) -> Option<Idx>;
+}
+
+/// All non-skipping null layouts. Marker trait for nullable containers that
+/// are nonetheless safe to iterate over linearly. 
+pub trait ContiguousNullLayout<Idx>: NullLayout<Idx> 
+    where Idx: PartialEq + PartialOrd {}
 
 /*
 pub trait NullableContainer<T> { 
@@ -197,18 +200,19 @@ pub trait NullableContainer<T> {
     fn get_mut_raw(&mut self, idx: usize) -> &mut T;
 }*/
 
-pub trait NullableContainer<'mcx, T> {
+pub trait NullableContainer<'mcx, T, Idx> 
+        where Idx: PartialEq + PartialOrd{
     /// Returns Some(true) if the element at `idx`` is valid (non-null),
     /// or `None` if `idx` is out-of-bounds
-    fn is_valid(&'mcx self, idx: usize) -> Option<bool>;
+    fn is_valid(&'mcx self, idx: Idx) -> Option<bool>;
 
     /// Returns true if the element at idx is null.
-    fn is_null(&'mcx self, idx: usize) -> Option<bool>;
+    fn is_null(&'mcx self, idx: Idx) -> Option<bool>;
 
     /// Retrieve the element at idx.
     /// Returns `Some(Valid(&T))` if the element is valid, `Some(Null)` if the
     /// element is null, or `None` if `idx` is out of bounds.
-    fn get(&'mcx self, idx: usize) -> Option<Nullable<T>>;
+    fn get(&'mcx self, idx: Idx) -> Option<Nullable<T>>;
 }
 
 /*
@@ -313,40 +317,66 @@ impl<'a> NullLayout for AnyNullLayout<'a> {
     }
 }*/ 
 
-impl<'a> NullLayout for crate::NullKind<'a> {
+impl NullLayout<usize> for BitSlice<u8> {
+    fn len(&self) -> usize {
+        BitSlice::<u8>::len(&self)
+    }
+
+    fn has_nulls(&self) -> bool {
+        self.not_all()
+    }
+
+    fn is_valid(&self, idx: usize) -> Option<bool> {
+        self.get(idx).map(|b| *b)
+    }
+    fn is_null(&self, idx: usize) -> Option<bool> {
+        self.get(idx).map(|b| !b)
+    }
+}
+
+impl SkippingNullLayout<usize> for BitSlice<u8> {
+    fn next_valid_idx(&self, idx: usize) -> Option<usize> {
+        // Next elem (one after this) would be past the end 
+        // of the container
+        if (idx+1) >= self.len() {
+            return None;
+        }
+        let mut resulting_idx = 0;
+        for bit in &(*self)[(idx+1)..] { 
+            // Postgres nullbitmaps are 1 for "valid" and 0 for "null"
+            resulting_idx += (*bit) as usize;
+        }
+        Some(resulting_idx)
+    }
+}
+
+/// Strict i.e. no nulls.
+/// Useful for using nullable primitives on non-null structures,
+/// especially when this needs to be determined at runtime. 
+#[derive(PartialEq, Eq, PartialOrd, Ord, Hash, Copy, Clone)]
+pub struct StrictNullLayout(usize);
+
+impl NullLayout<usize> for StrictNullLayout {
+    fn len(&self) -> usize { self.0 }
+
+    fn has_nulls(&self) -> bool { false }
+
+    fn is_valid(&self, idx: usize) -> Option<bool> {
+        (idx < self.0).then_some(true)
+    }
+
+    fn is_null(&self, idx: usize) -> Option<bool> {
+        (idx < self.0).then_some(false)
+    }
+}
+// No skipping when there are no nulls.
+impl ContiguousNullLayout<usize> for StrictNullLayout {}
+
+impl<'a> NullLayout<usize> for crate::NullKind<'a> {
     fn len(&self) -> usize {
         match self {
             crate::NullKind::Bits(bit_slice) => bit_slice.len(),
             crate::NullKind::Strict(len) => *len,
-        }
-    }
-
-    fn next_valid_idx(&self, idx: usize) -> Option<usize> {
-        match self { 
-            crate::NullKind::Bits(bits) => {
-                // Next elem (one after this) would be past the end 
-                // of the container
-                if (idx+1) >= bits.len() { 
-                    return None;
-                }
-                let mut resulting_idx = 0;
-                for bit in &(*bits)[(idx+1)..] { 
-                    // Postgres nullbitmaps are 1 for "valid" and 0 for "null"
-                    resulting_idx += (*bit) as usize;
-                }
-                Some(resulting_idx)
-            },
-            crate::NullKind::Strict(len) => {
-                let next_idx = idx+1;
-                (next_idx < *len).then_some(next_idx)
-            },
-        }
-    }
-
-    fn can_skip(&self) -> bool {
-        match self {
-            crate::NullKind::Bits(_) => true,
-            crate::NullKind::Strict(_) => false,
         }
     }
 
@@ -356,20 +386,36 @@ impl<'a> NullLayout for crate::NullKind<'a> {
 
     fn is_valid(&self, idx: usize) -> Option<bool> {
         match *self {
-            crate::NullKind::Bits(bits) => bits.get(idx).map(|b| *b),
+            crate::NullKind::Bits(bits) => bits.is_valid(idx),
+            // TODO wrap in StrictNullLayout
             crate::NullKind::Strict(len) => (idx < len).then_some(true),
         }
     }
     fn is_null(&self, idx: usize) -> Option<bool> {
         match *self {
-            crate::NullKind::Bits(bits) => bits.get(idx).map(|b| !b),
-            crate::NullKind::Strict(len) => (idx < len).then_some(true),
+            crate::NullKind::Bits(bits) => bits.is_null(idx),
+            // TODO wrap in StrictNullLayout
+            crate::NullKind::Strict(len) => (idx < len).then_some(false),
+        }
+    }
+}
+
+impl<'mcx> SkippingNullLayout<usize> for NullKind<'mcx> {
+    fn next_valid_idx(&self, idx: usize) -> Option<usize> {
+        match self { 
+            crate::NullKind::Bits(bits) => {
+                bits.next_valid_idx(idx)
+            },
+            crate::NullKind::Strict(len) => {
+                let next_idx = idx+1;
+                (next_idx < *len).then_some(next_idx)
+            },
         }
     }
 }
 
 #[deny(unsafe_op_in_unsafe_fn)]
-impl<'mcx, T: UnboxDatum> NullableContainer<'mcx, T::As<'mcx>> for Array<'mcx, T> {
+impl<'mcx, T: UnboxDatum> NullableContainer<'mcx, T::As<'mcx>, usize> for Array<'mcx, T> {
     fn is_valid(&'mcx self, idx: usize) -> Option<bool> {
         self.null_slice.is_valid(idx).map(|b| !b)
     }
@@ -379,6 +425,64 @@ impl<'mcx, T: UnboxDatum> NullableContainer<'mcx, T::As<'mcx>> for Array<'mcx, T
     }
 
     fn get(&'mcx self, idx: usize) -> Option<Nullable<T::As<'mcx>>> {
-        self.get(idx).map(|elem| elem.into())
+        Array::get(self, idx).map(|elem| elem.into())
     }
 }
+
+/// Iterates over a layout of null values, returning true for 
+pub struct NullsIter<'a, Idx, Layout: NullLayout<Idx>>
+        where Idx: PartialEq + PartialOrd { 
+    layout: &'a Layout,
+    current: Idx,
+}
+
+impl<'a, Layout: NullLayout<usize>> Iterator for NullsIter<'a, usize, Layout> {
+    type Item = Nullable<()>;
+
+    fn next(&mut self) -> Option<Self::Item> {
+        // is_null() should handle bounds checking internally
+        let result_value = self.layout.is_null(self.current).map(|b| match b { 
+            false => Nullable::Valid(()),
+            true => Nullable::Null,
+        });
+        self.current += 1;
+        result_value
+    }
+}
+
+impl<'a, Layout: NullLayout<usize>, T, C> IntoIterator<Nullable<T>> for C 
+        where C: Index<usize, Output = T> {
+    type Item;
+
+    type IntoIter;
+
+    fn into_iter(self) -> Self::IntoIter {
+        todo!()
+    }
+}
+
+/*
+pub struct IterNullableValuesWithBitmap<'src, Values> {
+    null_slice: &'src BitSlice<u8>,
+    values: Values,
+}
+
+pub struct IterNullable<Nulls, Values, Idx> 
+        where Nulls: NullLayout<Idx>, Values: Index<Idx>, 
+            Idx: PartialEq + PartialOrd {
+    nulls: Nulls,
+    values: Values,
+    __marker: PhantomData<Idx>,
+}
+
+impl<'mcx, Nulls, Values, Idx> IterNullable<Nulls, Values, Idx>
+    where Nulls: NullLayout<Idx>, Values: Index<Idx>, 
+        Idx: PartialEq + PartialOrd {
+    pub fn new(nulls: Nulls, values: Values) -> Self { 
+        Self { 
+            nulls, 
+            values,
+            __marker: PhantomData{}
+        }
+    }
+}*/

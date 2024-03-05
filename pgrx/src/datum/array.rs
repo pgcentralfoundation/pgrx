@@ -60,7 +60,7 @@ fn with_vec(elems: Array<String>) {
 // the memory context that the varlena is actually detoasted into.
 pub struct Array<'mcx, T> {
     pub(crate) null_slice: NullKind<'mcx>,
-    pub(crate) slide_impl: ChaChaSlideImpl<T>,
+    slide_impl: ChaChaSlideImpl<T>,
     // Rust drops in FIFO order, drop this last
     raw: Toast<RawArray>,
 }
