@@ -11,6 +11,7 @@
 use super::UnboxDatum;
 use crate::array::RawArray;
 use crate::layout::*;
+use crate::nullable::{NullLayout, NullableContainer, SkippingNullLayout};
 use crate::toast::Toast;
 use crate::{pg_sys, FromDatum, IntoDatum, PgMemoryContexts};
 use bitvec::slice::BitSlice;
@@ -97,6 +98,12 @@ impl NullKind<'_> {
             // Postgres nullbitmaps are 1 for "valid" and 0 for "null"
             Self::Bits(b1) => !b1.all(),
             Self::Strict(_) => false,
+        }
+    }
+    pub(crate) fn count_nulls(&self) -> usize { 
+        match self {
+            Self::Bits(b1) => b1.count_zeros(), 
+            Self::Strict(_) => 0,
         }
     }
 }
@@ -330,6 +337,86 @@ impl<T> Array<'_, T> {
     #[inline]
     pub fn is_empty(&self) -> bool {
         self.raw.len() == 0
+    }
+}
+
+#[deny(unsafe_op_in_unsafe_fn)]
+impl<'mcx, T: UnboxDatum> NullableContainer<'mcx, usize, T::As<'mcx>> for Array<'mcx, T> {
+    type LAYOUT = NullKind<'mcx>;
+
+    fn get_layout(&'mcx self) -> &'mcx NullKind<'mcx> {
+        &self.null_slice
+    }
+
+    /// Get the contents of the underlying cell at `idx` regardless of logical
+    /// index, null skipping behavior, etc.
+    /// Currently equivalent to Array::get() but ignoring null behavior.
+    /// In a null-bit-slice implementation (skipping nulls) this basically
+    /// gets ValidCells[idx], and so, the length of the array for the purposes
+    /// of this method is `logical_array_length - null_count`
+    fn get_raw(&self, idx: usize) -> &T {
+        // Size of underlying data in cells of T.
+        // Slightly less abstract than self.len(), but not quite as concrete
+        // as self.raw.data_ptr() - end_ptr(),
+        // since T might not be fixed-size (i.e. C-strings)
+        debug_assert!(idx < (self.raw.len() - self.null_slice.count_nulls()));
+
+        // This pointer is what's walked over the entire array's data buffer.
+        // If the array has varlena or cstr elements, we can't index into the array.
+        // If the elements are fixed size, we could, but we do not exploit that optimization yet
+        // as it would significantly complicate the code and impact debugging it.
+        // Such improvements should wait until a later version.
+        let mut at_byte = self.raw.data_ptr();
+        for i in 0..idx {
+            at_byte = unsafe { self.one_hop_this_time(at_byte) };
+        }
+
+        // If this has gotten this far, it is known to be non-null,
+        // all the null values in the array up to this index were skipped,
+        // and the only offsets were via our hopping function.
+        Some(unsafe { self.bring_it_back_now(at_byte, false) })
+    }
+}
+
+impl<'a> NullLayout<usize> for crate::NullKind<'a> {
+    fn len(&self) -> usize {
+        match self {
+            crate::NullKind::Bits(bit_slice) => bit_slice.len(),
+            crate::NullKind::Strict(len) => *len,
+        }
+    }
+
+    fn has_nulls(&self) -> bool {
+        self.any()
+    }
+
+    fn is_valid(&self, idx: usize) -> Option<bool> {
+        match *self {
+            crate::NullKind::Bits(bits) => bits.is_valid(idx),
+            // TODO wrap in StrictNullLayout
+            crate::NullKind::Strict(len) => (idx < len).then_some(true),
+        }
+    }
+    fn is_null(&self, idx: usize) -> Option<bool> {
+        match *self {
+            crate::NullKind::Bits(bits) => bits.is_null(idx),
+            // TODO wrap in StrictNullLayout
+            crate::NullKind::Strict(len) => (idx < len).then_some(false),
+        }
+    }
+}
+
+impl<'mcx> SkippingNullLayout<usize> for NullKind<'mcx> {
+    fn next_valid_idx(&self, idx: usize) -> Option<usize> {
+        match self { 
+            crate::NullKind::Bits(bits) => {
+                bits.next_valid_idx(idx)
+            },
+            crate::NullKind::Strict(len) => {
+                let next_idx = idx+1;
+                (next_idx < *len).then_some(next_idx)
+            },
+        }
     }
 }
 

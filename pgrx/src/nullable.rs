@@ -139,183 +139,18 @@ pub trait SkippingNullLayout<Idx>: NullLayout<Idx>
 pub trait ContiguousNullLayout<Idx>: NullLayout<Idx> 
     where Idx: PartialEq + PartialOrd {}
 
-/*
-pub trait NullableContainer<T> { 
-    type LAYOUT : NullLayout;
+pub trait NullableContainer<'mcx, Idx, T> { 
+    type Layout : NullLayout<Idx>;
 
-    fn get_layout(&self) -> &Self::LAYOUT;
-
-    /// Returns Some(true) if the element at `idx`` is valid (non-null),
-    /// or `None` if `idx` is out-of-bounds
-    fn is_valid(&self, idx: usize) -> Option<bool> { 
-        self.get_layout().is_valid(idx)
-    }
-    /// Returns true if the element at idx is null.
-    fn is_null(&self, idx: usize) -> Option<bool> { 
-        self.get_layout().is_null(idx)
-    }
-
-    /// Retrieve the element at idx.
-    /// Returns `Some(Valid(&T))` if the element is valid, `Some(Null)` if the
-    /// element is null, or `None` if `idx` is out of bounds.
-    fn get(&self, idx: usize) -> Option<Nullable<&T>> {
-        match self.get_layout().is_null(idx) {
-            Some(true) => {
-                todo!("Implement IterNullable and then use it here.")
-            },
-            Some(false) => {
-                Some(Nullable::Valid(self.get_raw(idx)))
-            },
-            // Out-of-bounds idx, return early.
-            None => None,
-        }
-    }
-    
-    /// Retrieve a mutable reference to the element at idx.
-    ///
-    /// Returns `Some(Valid(&mut T))` if the element is valid, `Some(Null)` if
-    /// the element is null, or `None` if `idx` is out of bounds.
-    /// 
-    /// Note that this cannot be used to set the element to Null - the
-    /// mutability here is for mutating the inner value if it is valid.
-    fn get_mut(&mut self, idx: usize) -> Option<Nullable<&mut T>>  {
-        match self.get_layout().is_null(idx) {
-            Some(true) => {
-                todo!("Implement IterNullableMut and then use it here.")
-            },
-            Some(false) => {
-                Some(Nullable::Valid(self.get_mut_raw(idx)))
-            },
-            // Out-of-bounds idx, return early.
-            None => None,
-        }
-    }
+    fn get_layout(&'mcx self) -> &'mcx Self::Layout;
 
     /// For internal use - implement this over underlying data types
     /// Used to implement NullableIter.
     ///
     /// Get the Valid value from the underlying data index of `idx`,
     /// presumably after figuring out things like 
-    fn get_raw(&self, idx: usize) -> &T;
-    fn get_mut_raw(&mut self, idx: usize) -> &mut T;
-}*/
-
-pub trait NullableContainer<'mcx, T, Idx> 
-        where Idx: PartialEq + PartialOrd{
-    /// Returns Some(true) if the element at `idx`` is valid (non-null),
-    /// or `None` if `idx` is out-of-bounds
-    fn is_valid(&'mcx self, idx: Idx) -> Option<bool>;
-
-    /// Returns true if the element at idx is null.
-    fn is_null(&'mcx self, idx: Idx) -> Option<bool>;
-
-    /// Retrieve the element at idx.
-    /// Returns `Some(Valid(&T))` if the element is valid, `Some(Null)` if the
-    /// element is null, or `None` if `idx` is out of bounds.
-    fn get(&'mcx self, idx: Idx) -> Option<Nullable<T>>;
+    fn get_raw(&'mcx self, idx: usize) -> &'mcx T;
 }
-
-/*
-pub enum AnyNullLayout<'a> {
-    /// Bitmap of where null slots are in this container.
-    /// For example, 00001001 would represent: 
-    /// \[value, value, value, value, null, value value, null\]
-    /// However, the underlying data buffer would be: 
-    /// \[value, value, value, value, value, value\]
-    /// because of the skip behavior
-    Bitmap(&'a BitSlice<u8>),
-    // TODO: Find implementation details on this
-    BoolSlice(&'a [bool]),
-    /// Bool map, simply an array of booleans telling you
-    /// No nulls
-    Strict(usize),
-}
-
-impl<'a> NullLayout for AnyNullLayout<'a> {
-    fn len(&self) -> usize { 
-        match self {
-            AnyNullLayout::Bitmap(bits) => bits.len(),
-            AnyNullLayout::BoolSlice(slice) => slice.len(),
-            AnyNullLayout::Strict(len) => *len,
-        }
-    }
-    // For iterating over only the valid elements
-    // Can return None early if idx is the last Valid elem
-    fn next_valid_idx(&self, idx: usize) -> Option<usize> {
-        match self {
-            AnyNullLayout::Bitmap(bits) => {
-                // Next elem (one after this) would be past the end 
-                // of the container
-                if (idx+1) >= bits.len() { 
-                    return None;
-                }
-                let mut resulting_idx = 0;
-                for bit in &(*bits)[(idx+1)..] { 
-                    // Postgres nullbitmaps are 1 for "valid" and 0 for "null"
-                    resulting_idx += (*bit) as usize;
-                }
-                Some(resulting_idx)
-            },
-            AnyNullLayout::BoolSlice(slice) => { 
-                // Next elem (one after this) would be past the end 
-                // of the container
-                if (idx+1) >= slice.len() { 
-                    return None;
-                }
-                for i in (idx+1)..slice.len() { 
-                    // SAFETY: This loop is structured such that it should'nt
-                    // be possible to go beyond self.len().
-                    unsafe { 
-                        // for the bool array,  1 is "null", 0 is "valid".
-                        if !slice.get_unchecked(i) {
-                            return Some(i);
-                        }
-                    }
-                }
-                // There may be more nulls, but there are no more Valid(t)-s
-                return None;
-            },
-            AnyNullLayout::Strict(len) => {
-                let next_idx = idx+1;
-                (next_idx < *len).then_some(next_idx)
-            },
-        }
-    }
-
-    fn can_skip(&self) -> bool {
-        match self {
-            AnyNullLayout::Bitmap(b) => true,
-            AnyNullLayout::BoolSlice(_) => false,
-            AnyNullLayout::Strict(_) => false,
-        }
-    }
-
-    fn has_nulls(&self) -> bool {
-        match self {
-            AnyNullLayout::Bitmap(bits) => { 
-                bits.any()
-            },
-            AnyNullLayout::BoolSlice(slice) => {
-                for elem in *slice {
-                    if *elem { 
-                        return true;
-                    }
-                }
-                return false;
-            },
-            AnyNullLayout::Strict(_) => false,
-        }
-    }
-
-    fn is_valid(&self, idx: usize) -> Option<bool> {
-        match *self {
-            AnyNullLayout::Bitmap(bits) => bits.get(idx).map(|b| *b),
-            // for the bool array,  1 is "null", 0 is "valid".
-            AnyNullLayout::BoolSlice(slice) => slice.get(idx).map(|b| !b),
-            AnyNullLayout::Strict(len) => (idx < len).then_some(true),
-        }
-    }
-}*/ 
 
 impl NullLayout<usize> for BitSlice<u8> {
     fn len(&self) -> usize {
@@ -372,71 +207,14 @@ impl NullLayout<usize> for StrictNullLayout {
 // No skipping when there are no nulls.
 impl ContiguousNullLayout<usize> for StrictNullLayout {}
 
-impl<'a> NullLayout<usize> for crate::NullKind<'a> {
-    fn len(&self) -> usize {
-        match self {
-            crate::NullKind::Bits(bit_slice) => bit_slice.len(),
-            crate::NullKind::Strict(len) => *len,
-        }
-    }
-
-    fn has_nulls(&self) -> bool {
-        self.any()
-    }
-
-    fn is_valid(&self, idx: usize) -> Option<bool> {
-        match *self {
-            crate::NullKind::Bits(bits) => bits.is_valid(idx),
-            // TODO wrap in StrictNullLayout
-            crate::NullKind::Strict(len) => (idx < len).then_some(true),
-        }
-    }
-    fn is_null(&self, idx: usize) -> Option<bool> {
-        match *self {
-            crate::NullKind::Bits(bits) => bits.is_null(idx),
-            // TODO wrap in StrictNullLayout
-            crate::NullKind::Strict(len) => (idx < len).then_some(false),
-        }
-    }
-}
-
-impl<'mcx> SkippingNullLayout<usize> for NullKind<'mcx> {
-    fn next_valid_idx(&self, idx: usize) -> Option<usize> {
-        match self { 
-            crate::NullKind::Bits(bits) => {
-                bits.next_valid_idx(idx)
-            },
-            crate::NullKind::Strict(len) => {
-                let next_idx = idx+1;
-                (next_idx < *len).then_some(next_idx)
-            },
-        }
-    }
-}
-
-#[deny(unsafe_op_in_unsafe_fn)]
-impl<'mcx, T: UnboxDatum> NullableContainer<'mcx, T::As<'mcx>, usize> for Array<'mcx, T> {
-    fn is_valid(&'mcx self, idx: usize) -> Option<bool> {
-        self.null_slice.is_valid(idx).map(|b| !b)
-    }
-
-    fn is_null(&'mcx self, idx: usize) -> Option<bool> {
-        self.null_slice.is_null(idx).map(|b| !b)
-    }
-
-    fn get(&'mcx self, idx: usize) -> Option<Nullable<T::As<'mcx>>> {
-        Array::get(self, idx).map(|elem| elem.into())
-    }
-}
-
-/// Iterates over a layout of null values, returning true for 
+/// Iterates over a layout of null values, returning true for values that are null. 
 pub struct NullsIter<'a, Idx, Layout: NullLayout<Idx>>
         where Idx: PartialEq + PartialOrd { 
     layout: &'a Layout,
     current: Idx,
 }
 
-impl<'a, Layout: NullLayout<usize>> Iterator for NullsIter<'a, usize, Layout> {
+impl<'mcx, Layout: NullLayout<usize>> Iterator for NullsIter<'mcx, usize, Layout> {
     type Item = Nullable<()>;
 
     fn next(&mut self) -> Option<Self::Item> {
@@ -450,14 +228,22 @@ impl<'a, Layout: NullLayout<usize>> Iterator for NullsIter<'a, usize, Layout> {
     }
 }
 
-impl<'a, Layout: NullLayout<usize>, T, C> IntoIterator<Nullable<T>> for C 
-        where C: Index<usize, Output = T> {
-    type Item;
+pub struct NullableIterator<'mcx, T, Idx, A> where A: NullableContainer<'mcx, Idx, T> {
+    nulls: NullsIter<'mcx, Idx, A::Layout>,
+    container_ref: &'mcx A,
+}
 
-    type IntoIter;
+impl<'mcx, T, Idx, A> IntoIterator for A
+        where A: NullableContainer<'mcx, Idx, T> {
+    type Item = Nullable<T>;
+
+    type IntoIter = NullableIterator<'mcx, T, Idx, A>;
 
     fn into_iter(self) -> Self::IntoIter {
-        todo!()
+        NullableIterator {
+            nulls: self.get_layout(),
+            container_ref: &self,
+        }
     }
 }
 
