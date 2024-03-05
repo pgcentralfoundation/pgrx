@@ -8,10 +8,10 @@
 //LICENSE
 //LICENSE Use of this source code is governed by the MIT license that can be found in the LICENSE file.
 #![allow(clippy::question_mark)]
-use super::UnboxDatum;
+use super::{unbox, UnboxDatum};
 use crate::array::RawArray;
 use crate::layout::*;
-use crate::nullable::{NullLayout, NullableContainer, SkippingNullLayout};
+use crate::nullable::{AnyNullLayout, NullLayout, NullableContainer, SkippingNullLayout};
 use crate::toast::Toast;
 use crate::{pg_sys, FromDatum, IntoDatum, PgMemoryContexts};
 use bitvec::slice::BitSlice;
@@ -340,11 +340,12 @@ impl<T> Array<'_, T> {
     }
 }
 
+/*
 #[deny(unsafe_op_in_unsafe_fn)]
 impl<'mcx, T: UnboxDatum> NullableContainer<'mcx, usize, T::As<'mcx>> for Array<'mcx, T> {
-    type LAYOUT = NullKind<'mcx>;
+    type Layout = AnyNullLayout<'mcx>;
 
-    fn get_layout(&'mcx self) -> &'mcx NullKind<'mcx> {
+    fn get_layout(&'mcx self) -> &'mcx AnyNullLayout<'mcx> {
         &self.null_slice
     }
 
@@ -354,7 +355,7 @@ impl<'mcx, T: UnboxDatum> NullableContainer<'mcx, usize, T::As<'mcx>> for Array<
     /// In a null-bit-slice implementation (skipping nulls) this basically
     /// gets ValidCells[idx], and so, the length of the array for the purposes
     /// of this method is `logical_array_length - null_count`
-    fn get_raw(&self, idx: usize) -> &T {
+    fn get_raw(&'mcx self, idx: usize) -> <T as unbox::UnboxDatum>::As<'mcx> {
         // Size of underlying data in cells of T.
         // Slightly less abstract than self.len(), but not quite as concrete
         // as self.raw.data_ptr() - end_ptr(),
@@ -371,54 +372,11 @@ impl<'mcx, T: UnboxDatum> NullableContainer<'mcx, usize, T::As<'mcx>> for Array<
             at_byte = unsafe { self.one_hop_this_time(at_byte) };
         }
 
-        // If this has gotten this far, it is known to be non-null,
-        // all the null values in the array up to this index were skipped,
-        // and the only offsets were via our hopping function.
-        Some(unsafe { self.bring_it_back_now(at_byte, false) })
+        // This function is only intended to retrieve the non-null values from
+        // the container, and as such this should only ever be non-null.
+        unsafe { self.bring_it_back_now(at_byte, false).unwrap_unchecked() }
     }
-}
-
-impl<'a> NullLayout<usize> for crate::NullKind<'a> {
-    fn len(&self) -> usize {
-        match self {
-            crate::NullKind::Bits(bit_slice) => bit_slice.len(),
-            crate::NullKind::Strict(len) => *len,
-        }
-    }
-
-    fn has_nulls(&self) -> bool {
-        self.any()
-    }
-
-    fn is_valid(&self, idx: usize) -> Option<bool> {
-        match *self {
-            crate::NullKind::Bits(bits) => bits.is_valid(idx),
-            // TODO wrap in StrictNullLayout
-            crate::NullKind::Strict(len) => (idx < len).then_some(true),
-        }
-    }
-    fn is_null(&self, idx: usize) -> Option<bool> {
-        match *self {
-            crate::NullKind::Bits(bits) => bits.is_null(idx),
-            // TODO wrap in StrictNullLayout
-            crate::NullKind::Strict(len) => (idx < len).then_some(false),
-        }
-    }
-}
-
-impl<'mcx> SkippingNullLayout<usize> for NullKind<'mcx> {
-    fn next_valid_idx(&self, idx: usize) -> Option<usize> {
-        match self { 
-            crate::NullKind::Bits(bits) => {
-                bits.next_valid_idx(idx)
-            },
-            crate::NullKind::Strict(len) => {
-                let next_idx = idx+1;
-                (next_idx < *len).then_some(next_idx)
-            },
-        }
-    }
-}
+}*/
 
 #[derive(thiserror::Error, Debug, Copy, Clone, Eq, PartialEq)]
 pub enum ArraySliceError {

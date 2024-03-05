@@ -3,20 +3,11 @@
 //! types which implement nullable (empty slot) behavior in a 
 //! "structure-of-arrays" manner
 
-use std::{marker::PhantomData, ops::Index};
+use std::{iter::Enumerate, marker::PhantomData};
 
-use bitvec::slice::BitSlice;
+use bitvec::{slice::BitSlice, vec::IntoIter};
 
-use crate::{memcx::MemCx, Array, Datum, NullKind, UnboxDatum};
-
-pub trait NullableIter {
-
-}
-
-pub struct NullableContainerRef<'src> {
-
-    _marker: PhantomData<&'src MemCx<'src>>,
-}
+use crate::{memcx::MemCx, Datum};
 
 pub enum Nullable<T>{
     Valid(T), 
@@ -79,7 +70,6 @@ impl<T> From<Option<T>> for Nullable<T> {
     }
 }
 
-
 /// This type isn't directly related to [`pg_sys::NullableDatum`], but is
 /// intended to reference the same underlying data as a pg_sys::NullableDatum
 /// after undergoing several layers of PGRX's Rust memory safety.
@@ -135,11 +125,11 @@ pub trait SkippingNullLayout<Idx>: NullLayout<Idx>
 }
 
 /// All non-skipping null layouts. Marker trait for nullable containers that
-/// are nonetheless safe to iterate over linearly. 
+/// are nonetheless safe to iterate over linearly.
 pub trait ContiguousNullLayout<Idx>: NullLayout<Idx> 
     where Idx: PartialEq + PartialOrd {}
 
-pub trait NullableContainer<'mcx, Idx, T> { 
+pub trait NullableContainer<'mcx, Idx, T> where Idx: PartialEq + PartialOrd {
     type Layout : NullLayout<Idx>;
 
     fn get_layout(&'mcx self) -> &'mcx Self::Layout;
@@ -149,35 +139,37 @@ pub trait NullableContainer<'mcx, Idx, T> {
     ///
     /// Get the Valid value from the underlying data index of `idx`,
     /// presumably after figuring out things like 
-    fn get_raw(&'mcx self, idx: usize) -> &'mcx T;
+    fn get_raw(&'mcx self, idx: usize) -> T;
 }
 
-impl NullLayout<usize> for BitSlice<u8> {
+pub struct BitSliceNulls<'a>(&'a BitSlice<u8>);
+
+impl<'a> NullLayout<usize> for BitSliceNulls<'a> {
     fn len(&self) -> usize {
-        BitSlice::<u8>::len(&self)
+        BitSlice::<u8>::len(&self.0)
     }
 
     fn has_nulls(&self) -> bool {
-        self.not_all()
+        self.0.not_all()
     }
 
     fn is_valid(&self, idx: usize) -> Option<bool> {
-        self.get(idx).map(|b| *b)
+        self.0.get(idx).map(|b| *b)
     }
     fn is_null(&self, idx: usize) -> Option<bool> {
-        self.get(idx).map(|b| !b)
+        self.0.get(idx).map(|b| !b)
     }
 }
 
-impl SkippingNullLayout<usize> for BitSlice<u8> {
+impl<'a> SkippingNullLayout<usize> for BitSliceNulls<'a> {
     fn next_valid_idx(&self, idx: usize) -> Option<usize> {
         // Next elem (one after this) would be past the end 
         // of the container
-        if (idx+1) >= self.len() {
+        if (idx+1) >= self.0.len() {
             return None;
         }
         let mut resulting_idx = 0;
-        for bit in &(*self)[(idx+1)..] { 
+        for bit in &(*self.0)[(idx+1)..] { 
             // Postgres nullbitmaps are 1 for "valid" and 0 for "null"
             resulting_idx += (*bit) as usize;
         }
@@ -185,13 +177,48 @@ impl SkippingNullLayout<usize> for BitSlice<u8> {
     }
 }
 
+pub struct BoolSliceNulls<'a>(&'a [bool]);
+
+impl<'a> NullLayout<usize> for BoolSliceNulls<'a> {
+    fn len(&self) -> usize {
+        <[bool]>::len(&self.0)
+    }
+
+    fn has_nulls(&self) -> bool {
+        let mut has_null = false; 
+        for value in self.0 { 
+            if *value {
+                has_null = true;
+            }
+        }
+        has_null
+    }
+    // In a Postgres bool-slice implementation of a null layout,
+    // 1 is "null", 0 is "valid"
+    fn is_valid(&self, idx: usize) -> Option<bool> {
+        if idx < self.0.len() { 
+            // Invert from 0 being valid to 1 being valid. 
+            Some(!self.0[idx])
+        }
+        else {
+            None
+        }
+    }
+}
+
+// Postgres arrays using a bool array to map which values are null and which 
+// values are valid will always be contiguous - that is, the underlying data
+// buffer will actually be big enough to contain layout.len() slots of type T
+// (give or take padding)
+impl<'a> ContiguousNullLayout<usize> for BoolSliceNulls<'a> {}
+
 /// Strict i.e. no nulls.
 /// Useful for using nullable primitives on non-null structures,
 /// especially when this needs to be determined at runtime. 
 #[derive(PartialEq, Eq, PartialOrd, Ord, Hash, Copy, Clone)]
-pub struct StrictNullLayout(usize);
+pub struct StrictNulls(usize);
 
-impl NullLayout<usize> for StrictNullLayout {
+impl NullLayout<usize> for StrictNulls {
     fn len(&self) -> usize { self.0 }
 
     fn has_nulls(&self) -> bool { false }
@@ -205,7 +232,58 @@ impl NullLayout<usize> for StrictNullLayout {
     }
 }
 // No skipping when there are no nulls.
-impl ContiguousNullLayout<usize> for StrictNullLayout {}
+impl ContiguousNullLayout<usize> for StrictNulls {}
+
+// Intended to represent any one of the three nullable container layouts used 
+// by Postgres.
+pub enum AnyNullLayout<'a> {
+    /// Bitmap of where null slots are in this container.
+    /// For example, 00001001 would represent: 
+    /// \[value, value, value, value, null, value value, null\]
+    /// However, the underlying data buffer would be: 
+    /// \[value, value, value, value, value, value\]
+    /// because of the skip behavior
+    Bitmap(BitSliceNulls<'a>),
+    // TODO: Find implementation details on this
+    BoolSlice(BoolSliceNulls<'a>),
+    /// Bool map, simply an array of booleans telling you
+    /// No nulls
+    Strict(StrictNulls),
+}
+
+impl<'a> NullLayout<usize> for AnyNullLayout<'a> {
+    fn len(&self) -> usize {
+        match self {
+            AnyNullLayout::Bitmap(bits) => bits.len(),
+            AnyNullLayout::BoolSlice(bools) => bools.len(),
+            AnyNullLayout::Strict(strict) => strict.len(),
+        }
+    }
+
+    fn has_nulls(&self) -> bool {
+        match self {
+            AnyNullLayout::Bitmap(bits) => bits.has_nulls(),
+            AnyNullLayout::BoolSlice(bools) => bools.has_nulls(),
+            AnyNullLayout::Strict(_strict) => false,
+        }
+    }
+
+    fn is_valid(&self, idx: usize) -> Option<bool> {
+        match self {
+            AnyNullLayout::Bitmap(bits) => bits.is_valid(idx),
+            AnyNullLayout::BoolSlice(bools) => bools.is_valid(idx),
+            AnyNullLayout::Strict(strict) => strict.is_valid(idx),
+        }
+    }
+
+    fn is_null(&self, idx: usize) -> Option<bool> {
+        match self {
+            AnyNullLayout::Bitmap(bits) => bits.is_valid(idx),
+            AnyNullLayout::BoolSlice(bools) => bools.is_valid(idx),
+            AnyNullLayout::Strict(strict) => strict.is_null(idx),
+        }
+    }
+}
 
 /// Iterates over a layout of null values, returning true for values that are null. 
 pub struct NullsIter<'a, Idx, Layout: NullLayout<Idx>>
@@ -228,47 +306,148 @@ impl<'mcx, Layout: NullLayout<usize>> Iterator for NullsIter<'mcx, usize, Layout
     }
 }
 
-pub struct NullableIterator<'mcx, T, Idx, A> where A: NullableContainer<'mcx, Idx, T> {
-    nulls: NullsIter<'mcx, Idx, A::Layout>,
-    container_ref: &'mcx A,
+/// Iterator for Strict containers, 
+/// which is to say, containers which cannot contain nulls
+pub struct NoNullsIter {
+    /// Will be set to container.len() and so a 0 value means we've reached the end.
+    remaining: usize,
 }
 
-impl<'mcx, T, Idx, A> IntoIterator for A
-        where A: NullableContainer<'mcx, Idx, T> {
+impl Iterator for NoNullsIter {
+    type Item = Nullable<()>;
+
+    fn next(&mut self) -> Option<Self::Item> {
+        if self.remaining > 0 {
+            self.remaining -= 1;
+            Some(Nullable::Valid(()))
+        }
+        else { 
+            None
+        }
+    }
+}
+
+pub struct SkippingNullableIterator<'mcx, T, A, I> 
+        where A: NullableContainer<'mcx, usize, T>,
+        I: Iterator<Item = Nullable<()>> {
+    nulls: I,
+    container_ref: &'mcx A,
+    valid_idx: usize,
+    // Required to keep a reference to NullableContainer<T> 
+    __marker: PhantomData<T>,
+}
+
+// SKIPPING (i.e. non-contiguous) implementation
+impl<'mcx, T, A, I> Iterator for SkippingNullableIterator<'mcx, T, A, I>
+        where A: NullableContainer<'mcx, usize, T>,
+        A::Layout: SkippingNullLayout<usize>,
+        I: Iterator<Item = Nullable<()>> {
     type Item = Nullable<T>;
 
-    type IntoIter = NullableIterator<'mcx, T, Idx, A>;
+    fn next(&mut self) -> Option<Self::Item> {
+        match self.nulls.next() {
+            Some(is_null) => {
+                match is_null {
+                    Nullable::Valid(_) => {
+                        let value = self.container_ref.get_raw(self.valid_idx);
+                        self.valid_idx += 1;
+                        Some(Nullable::Valid(value))
+                    },
+                    Nullable::Null => Some(Nullable::Null),
+                }
+            },
+            // End of array (valid array will have a null layout length equal
+            // to the array length)
+            None => None,
+        }
+    }
+}
+
+pub struct ContiguousNullableIterator<'mcx, T, A, I> 
+        where A: NullableContainer<'mcx, usize, T>,
+        I: Iterator<Item = Nullable<()>> {
+    nulls: Enumerate<I>,
+    container_ref: &'mcx A,
+    // Required to keep a reference to NullableContainer<T> 
+    __marker: PhantomData<T>,
+}
+
+// Contiguous (length of null layout = length of underlying) implementation
+impl<'mcx, T, A, I> Iterator for ContiguousNullableIterator<'mcx, T, A, I>
+        where A: NullableContainer<'mcx, usize, T>,
+        A::Layout: ContiguousNullLayout<usize>,
+        I: Iterator<Item = Nullable<()>> {
+    type Item = Nullable<T>;
+
+    fn next(&mut self) -> Option<Self::Item> {
+        match self.nulls.next() {
+            Some((idx, is_null)) => {
+                match is_null {
+                    Nullable::Valid(_) => {
+                        let value = self.container_ref.get_raw(idx);
+                        Some(Nullable::Valid(value))
+                    },
+                    Nullable::Null => Some(Nullable::Null),
+                }
+            },
+            // End of array (valid array will have a null layout length equal
+            // to the array length)
+            None => None,
+        }
+    }
+}
+
+impl<'a, 'b> IntoIterator for &'b BitSliceNulls<'a> {
+    type Item = Nullable<()>;
+
+    type IntoIter = NullsIter<'b, usize, BitSliceNulls<'a>>;
 
     fn into_iter(self) -> Self::IntoIter {
-        NullableIterator {
-            nulls: self.get_layout(),
-            container_ref: &self,
+        NullsIter {
+            layout: self,
+            current: 0,
         }
     }
 }
 
-/*
-pub struct IterNullableValuesWithBitmap<'src, Values> {
-    null_slice: &'src BitSlice<u8>,
-    values: Values,
-}
+impl<'a, 'b> IntoIterator for &'b BoolSliceNulls<'a> {
+    type Item = Nullable<()>;
 
-pub struct IterNullable<Nulls, Values, Idx> 
-        where Nulls: NullLayout<Idx>, Values: Index<Idx>, 
-            Idx: PartialEq + PartialOrd {
-    nulls: Nulls,
-    values: Values,
-    __marker: PhantomData<Idx>,
-}
+    type IntoIter = NullsIter<'b, usize, BoolSliceNulls<'a>>;
 
-impl<'mcx, Nulls, Values, Idx> IterNullable<Nulls, Values, Idx>
-    where Nulls: NullLayout<Idx>, Values: Index<Idx>, 
-        Idx: PartialEq + PartialOrd {
-    pub fn new(nulls: Nulls, values: Values) -> Self { 
-        Self { 
-            nulls, 
-            values,
-            __marker: PhantomData{}
+    fn into_iter(self) -> Self::IntoIter {
+        NullsIter {
+            layout: self,
+            current: 0,
         }
     }
-}*/
+}
+
+impl<'a> IntoIterator for &'a StrictNulls {
+    type Item = Nullable<()>;
+
+    type IntoIter = NoNullsIter;
+
+    fn into_iter(self) -> Self::IntoIter {
+        NoNullsIter {
+            remaining: self.0,
+        }
+    }
+}
+
+impl<'a, 'b> IntoIterator for &'b AnyNullLayout<'a> {
+    type Item = Nullable<()>;
+
+    type IntoIter = NullsIter<'b, usize, AnyNullLayout<'a>>;
+
+    fn into_iter(self) -> Self::IntoIter {
+        NullsIter {
+            layout: self,
+            current: 0,
+        }
+    }
+}
+
+#[cfg(test)]
+mod nullable_tests {
+}
