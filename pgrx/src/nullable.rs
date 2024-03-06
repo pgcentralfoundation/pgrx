@@ -145,7 +145,7 @@ pub trait NullableContainer<'mcx, Idx, T> where Idx: PartialEq + PartialOrd {
     fn get_raw(&'mcx self, idx: usize) -> T;
 }
 
-pub struct BitSliceNulls(pub *mut BitSlice<u8>);
+pub struct BitSliceNulls<'a>(pub &'a BitSlice<u8>);
 
 impl<'a> NullLayout<usize> for BitSliceNulls<'a> {
     fn len(&self) -> usize {
@@ -295,8 +295,8 @@ impl<'a> NullLayout<usize> for AnyNullLayout<'a> {
 
     fn is_null(&self, idx: usize) -> Option<bool> {
         match self {
-            AnyNullLayout::Bitmap(bits) => bits.is_valid(idx),
-            AnyNullLayout::BoolSlice(bools) => bools.is_valid(idx),
+            AnyNullLayout::Bitmap(bits) => bits.is_null(idx),
+            AnyNullLayout::BoolSlice(bools) => bools.is_null(idx),
             AnyNullLayout::Strict(strict) => strict.is_null(idx),
         }
     }
