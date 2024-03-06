@@ -500,14 +500,6 @@ mod tests {
         )?
         .expect("spi result was NULL");
 
-        //println!("{a:?}");
-
-        println!("{:?}", a.get(0));
-        println!("{:?}", a.get(1));
-        println!("{:?}", a.get(2));
-        println!("{:?}", a.get(3));
-        println!("{:?}", a.get(4));
-
         assert_eq!(a.get(0), Some(None));
         assert_eq!(a.get(1), Some(None));
         assert_eq!(a.get(2), Some(None));

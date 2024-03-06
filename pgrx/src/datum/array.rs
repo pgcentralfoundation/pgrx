@@ -8,13 +8,12 @@
 //LICENSE
 //LICENSE Use of this source code is governed by the MIT license that can be found in the LICENSE file.
 #![allow(clippy::question_mark)]
-use super::{unbox, UnboxDatum};
+use super::UnboxDatum;
 use crate::array::RawArray;
-use crate::{layout::*, nullable};
-use crate::nullable::{AnyNullLayout, NullLayout, NullableContainer, SkippingNullLayout};
+use crate::nullable::{AnyNullLayout, NullLayout};
 use crate::toast::Toast;
+use crate::{layout::*, nullable};
 use crate::{pg_sys, FromDatum, IntoDatum, PgMemoryContexts};
-use bitvec::slice::BitSlice;
 use core::fmt::{Debug, Formatter};
 use core::ops::DerefMut;
 use core::ptr::NonNull;
@@ -101,10 +100,9 @@ impl<'mcx, T: UnboxDatum> Array<'mcx, T> {
         let nelems = raw.len();
         let null_slice = raw
             .nulls_bitslice()
-            .map(|nonnull| AnyNullLayout::Bitmap(
-                unsafe { nullable::BitSliceNulls(&*nonnull.as_ptr())
-                }
-            ))
+            .map(|nonnull| {
+                AnyNullLayout::Bitmap(unsafe { nullable::BitSliceNulls(&*nonnull.as_ptr()) })
+            })
             .unwrap_or(AnyNullLayout::Strict(nullable::StrictNulls(nelems)));
 
         // do a little two-step before jumping into the Cha-Cha Slide and figure out
