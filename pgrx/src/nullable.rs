@@ -6,6 +6,7 @@
 use std::{iter::Enumerate, marker::PhantomData};
 
 use bitvec::{slice::BitSlice, vec::IntoIter};
+use enum_map::Enum;
 
 use crate::{memcx::MemCx, Datum};
 
@@ -101,6 +102,8 @@ pub trait NullLayout<Idx>
     /// where n is the length of the container.
     fn has_nulls(&self) -> bool;
 
+    fn count_nulls(&self) -> usize;
+
     /// Returns Some(true) if the element at `idx`` is valid (non-null),
     /// or `None` if `idx` is out-of-bounds
     /// Implementors should handle bounds-checking. 
@@ -142,7 +145,7 @@ pub trait NullableContainer<'mcx, Idx, T> where Idx: PartialEq + PartialOrd {
     fn get_raw(&'mcx self, idx: usize) -> T;
 }
 
-pub struct BitSliceNulls<'a>(&'a BitSlice<u8>);
+pub struct BitSliceNulls(pub *mut BitSlice<u8>);
 
 impl<'a> NullLayout<usize> for BitSliceNulls<'a> {
     fn len(&self) -> usize {
@@ -158,6 +161,10 @@ impl<'a> NullLayout<usize> for BitSliceNulls<'a> {
     }
     fn is_null(&self, idx: usize) -> Option<bool> {
         self.0.get(idx).map(|b| !b)
+    }
+    
+    fn count_nulls(&self) -> usize {
+        self.0.count_zeros()
     }
 }
 
@@ -177,7 +184,7 @@ impl<'a> SkippingNullLayout<usize> for BitSliceNulls<'a> {
     }
 }
 
-pub struct BoolSliceNulls<'a>(&'a [bool]);
+pub struct BoolSliceNulls<'a>(pub &'a [bool]);
 
 impl<'a> NullLayout<usize> for BoolSliceNulls<'a> {
     fn len(&self) -> usize {
@@ -204,6 +211,14 @@ impl<'a> NullLayout<usize> for BoolSliceNulls<'a> {
             None
         }
     }
+    
+    fn count_nulls(&self) -> usize {
+        let mut count = 0; 
+        for elem in self.0 { 
+            count += *elem as usize;
+        }
+        count
+    }
 }
 
 // Postgres arrays using a bool array to map which values are null and which 
@@ -216,7 +231,7 @@ impl<'a> ContiguousNullLayout<usize> for BoolSliceNulls<'a> {}
 /// Useful for using nullable primitives on non-null structures,
 /// especially when this needs to be determined at runtime. 
 #[derive(PartialEq, Eq, PartialOrd, Ord, Hash, Copy, Clone)]
-pub struct StrictNulls(usize);
+pub struct StrictNulls(pub usize);
 
 impl NullLayout<usize> for StrictNulls {
     fn len(&self) -> usize { self.0 }
@@ -230,6 +245,8 @@ impl NullLayout<usize> for StrictNulls {
     fn is_null(&self, idx: usize) -> Option<bool> {
         (idx < self.0).then_some(false)
     }
+    
+    fn count_nulls(&self) -> usize { 0 }
 }
 // No skipping when there are no nulls.
 impl ContiguousNullLayout<usize> for StrictNulls {}
@@ -281,6 +298,14 @@ impl<'a> NullLayout<usize> for AnyNullLayout<'a> {
             AnyNullLayout::Bitmap(bits) => bits.is_valid(idx),
             AnyNullLayout::BoolSlice(bools) => bools.is_valid(idx),
             AnyNullLayout::Strict(strict) => strict.is_null(idx),
+        }
+    }
+    
+    fn count_nulls(&self) -> usize {
+        match self {
+            AnyNullLayout::Bitmap(bits) => bits.count_nulls(),
+            AnyNullLayout::BoolSlice(bools) => bools.count_nulls(),
+            AnyNullLayout::Strict(strict) => strict.count_nulls(),
         }
     }
 }
@@ -450,5 +475,5 @@ impl<'a, 'b> IntoIterator for &'b AnyNullLayout<'a> {
 
 #[cfg(test)]
 mod nullable_tests {
-    
+
 }
