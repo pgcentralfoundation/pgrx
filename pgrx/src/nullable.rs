@@ -307,7 +307,7 @@ impl ContiguousNullLayout<usize> for StrictNulls {}
 // by Postgres.
 pub enum AnyNullLayout<'a> {
     /// Bitmap of where null slots are in this container.
-    /// For example, 00001001 would represent:
+    /// For example, 0b11110110 would represent:
     /// \[value, value, value, value, null, value value, null\]
     /// However, the underlying data buffer would be:
     /// \[value, value, value, value, value, value\]
