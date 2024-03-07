@@ -303,65 +303,6 @@ impl NullLayout<usize> for StrictNulls {
 // No skipping when there are no nulls.
 impl ContiguousNullLayout<usize> for StrictNulls {}
 
-// Intended to represent any one of the three nullable container layouts used
-// by Postgres.
-pub enum AnyNullLayout<'a> {
-    /// Bitmap of where null slots are in this container.
-    /// For example, 0b11110110 would represent:
-    /// \[value, value, value, value, null, value value, null\]
-    /// However, the underlying data buffer would be:
-    /// \[value, value, value, value, value, value\]
-    /// because of the skip behavior
-    Bitmap(BitSliceNulls<'a>),
-    // TODO: Find implementation details on this
-    BoolSlice(BoolSliceNulls<'a>),
-    /// Bool map, simply an array of booleans telling you
-    /// No nulls
-    Strict(StrictNulls),
-}
-
-impl<'a> NullLayout<usize> for AnyNullLayout<'a> {
-    fn len(&self) -> usize {
-        match self {
-            AnyNullLayout::Bitmap(bits) => bits.len(),
-            AnyNullLayout::BoolSlice(bools) => bools.len(),
-            AnyNullLayout::Strict(strict) => strict.len(),
-        }
-    }
-
-    fn has_nulls(&self) -> bool {
-        match self {
-            AnyNullLayout::Bitmap(bits) => bits.has_nulls(),
-            AnyNullLayout::BoolSlice(bools) => bools.has_nulls(),
-            AnyNullLayout::Strict(_strict) => false,
-        }
-    }
-
-    fn is_valid(&self, idx: usize) -> Option<bool> {
-        match self {
-            AnyNullLayout::Bitmap(bits) => bits.is_valid(idx),
-            AnyNullLayout::BoolSlice(bools) => bools.is_valid(idx),
-            AnyNullLayout::Strict(strict) => strict.is_valid(idx),
-        }
-    }
-
-    fn is_null(&self, idx: usize) -> Option<bool> {
-        match self {
-            AnyNullLayout::Bitmap(bits) => bits.is_null(idx),
-            AnyNullLayout::BoolSlice(bools) => bools.is_null(idx),
-            AnyNullLayout::Strict(strict) => strict.is_null(idx),
-        }
-    }
-
-    fn count_nulls(&self) -> usize {
-        match self {
-            AnyNullLayout::Bitmap(bits) => bits.count_nulls(),
-            AnyNullLayout::BoolSlice(bools) => bools.count_nulls(),
-            AnyNullLayout::Strict(strict) => strict.count_nulls(),
-        }
-    }
-}
-
 /// Iterates over a layout of null values, returning true for values that are null.
 pub struct NullsIter<'a, Idx, Layout: NullLayout<Idx>>
 where
@@ -401,6 +342,25 @@ impl Iterator for NoNullsIter {
             Some(Nullable::Valid(()))
         } else {
             None
+        }
+    }
+}
+
+pub enum MaybeNullIter<'a, Idx, Layout: NullLayout<Idx>>
+        where
+            Idx: PartialEq + PartialOrd, { 
+    Nullable(NullsIter<'a, Idx, Layout>), 
+    Strict(NoNullsIter)
+}
+
+impl<'a, Layout> Iterator for MaybeNullIter<'a, usize, Layout>
+        where Layout: NullLayout<usize> {
+    type Item = Nullable<()>;
+
+    fn next(&mut self) -> Option<Self::Item> {
+        match self {
+            MaybeNullIter::Nullable(i) => (*i).next(),
+            MaybeNullIter::Strict(i) => i.next(),
         }
     }
 }
@@ -506,16 +466,6 @@ impl<'a> IntoIterator for &'a StrictNulls {
 
     fn into_iter(self) -> Self::IntoIter {
         NoNullsIter { remaining: self.0 }
-    }
-}
-
-impl<'a, 'b> IntoIterator for &'b AnyNullLayout<'a> {
-    type Item = Nullable<()>;
-
-    type IntoIter = NullsIter<'b, usize, AnyNullLayout<'a>>;
-
-    fn into_iter(self) -> Self::IntoIter {
-        NullsIter { layout: self, current: 0 }
     }
 }
 
