@@ -130,8 +130,6 @@ pub trait NullLayout<Idx>
 where
     Idx: PartialEq + PartialOrd,
 {
-    fn len(&self) -> Idx;
-
     /// Returns true if this container has any nulls in it presently.
     /// # Performance
     /// Different implementors of this type might have wildly varying
@@ -195,10 +193,6 @@ where
 pub struct BitSliceNulls<'a>(pub &'a BitSlice<u8>);
 
 impl<'a> NullLayout<usize> for BitSliceNulls<'a> {
-    fn len(&self) -> usize {
-        BitSlice::<u8>::len(&self.0)
-    }
-
     fn has_nulls(&self) -> bool {
         self.0.not_all()
     }
@@ -234,10 +228,6 @@ impl<'a> SkippingNullLayout<usize> for BitSliceNulls<'a> {
 pub struct BoolSliceNulls<'a>(pub &'a [bool]);
 
 impl<'a> NullLayout<usize> for BoolSliceNulls<'a> {
-    fn len(&self) -> usize {
-        <[bool]>::len(&self.0)
-    }
-
     fn has_nulls(&self) -> bool {
         let mut has_null = false;
         for value in self.0 {
@@ -280,10 +270,6 @@ impl<'a> ContiguousNullLayout<usize> for BoolSliceNulls<'a> {}
 pub struct StrictNulls(pub usize);
 
 impl NullLayout<usize> for StrictNulls {
-    fn len(&self) -> usize {
-        self.0
-    }
-
     fn has_nulls(&self) -> bool {
         false
     }
@@ -330,7 +316,7 @@ impl<'mcx, Layout: NullLayout<usize>> Iterator for NullsIter<'mcx, usize, Layout
 /// which is to say, containers which cannot contain nulls
 pub struct NoNullsIter {
     /// Will be set to container.len() and so a 0 value means we've reached the end.
-    remaining: usize,
+    pub remaining: usize,
 }
 
 impl Iterator for NoNullsIter {
@@ -347,14 +333,17 @@ impl Iterator for NoNullsIter {
 }
 
 pub enum MaybeNullIter<'a, Idx, Layout: NullLayout<Idx>>
-        where
-            Idx: PartialEq + PartialOrd, { 
-    Nullable(NullsIter<'a, Idx, Layout>), 
-    Strict(NoNullsIter)
+where
+    Idx: PartialEq + PartialOrd,
+{
+    Nullable(NullsIter<'a, Idx, Layout>),
+    Strict(NoNullsIter),
 }
 
 impl<'a, Layout> Iterator for MaybeNullIter<'a, usize, Layout>
-        where Layout: NullLayout<usize> {
+where
+    Layout: NullLayout<usize>,
+{
     type Item = Nullable<()>;
 
     fn next(&mut self) -> Option<Self::Item> {
@@ -375,6 +364,15 @@ where
     valid_idx: usize,
     // Required to keep a reference to NullableContainer<T>
     __marker: PhantomData<T>,
+}
+impl<'mcx, T, A, I> SkippingNullableIterator<'mcx, T, A, I>
+where
+    A: NullableContainer<'mcx, usize, T>,
+    I: Iterator<Item = Nullable<()>>,
+{
+    pub fn new(null_iter: I, container: &'mcx A) -> Self {
+        Self { nulls: null_iter, container_ref: container, valid_idx: 0, __marker: PhantomData }
+    }
 }
 
 // SKIPPING (i.e. non-contiguous) implementation
