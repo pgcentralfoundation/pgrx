@@ -4,10 +4,7 @@
 //! "structure-of-arrays" manner
 
 use std::{fmt::Debug, iter::Enumerate, marker::PhantomData};
-
 use bitvec::slice::BitSlice;
-
-use crate::Datum;
 
 pub enum Nullable<T> {
     Valid(T),
@@ -108,11 +105,6 @@ impl<T> From<Option<T>> for Nullable<T> {
     }
 }
 
-/// This type isn't directly related to [`pg_sys::NullableDatum`], but is
-/// intended to reference the same underlying data as a pg_sys::NullableDatum
-/// after undergoing several layers of PGRX's Rust memory safety.
-pub type NullableDatum<'src> = Nullable<Datum<'src>>;
-
 /* A null-bitmap array of (from postgres' perspective) length 8 with 3 nulls
 in it has an actual data array size of `size_of<Elem>() * 5` (give or
 take padding), whereas the bool array nulls implementation will still
@@ -187,7 +179,12 @@ where
     ///
     /// Get the Valid value from the underlying data index of `idx`,
     /// presumably after figuring out things like
-    fn get_raw(&'mcx self, idx: usize) -> T;
+    fn get_raw(&'mcx self, idx: Idx) -> T;
+
+    /// Total array length - doesn't represent the length of the backing array
+    /// (as in, the thing accessed by get_raw) but instead represents the
+    /// length of the array including skipped nulls.
+    fn get_len(&'mcx self) -> usize;
 }
 
 pub struct BitSliceNulls<'a>(pub &'a BitSlice<u8>);
@@ -288,6 +285,53 @@ impl NullLayout<usize> for StrictNulls {
 }
 // No skipping when there are no nulls.
 impl ContiguousNullLayout<usize> for StrictNulls {}
+
+pub struct MaybeStrictNulls<Inner: NullLayout<usize>> { 
+    pub inner: Option<Inner>,
+    // Needed for bounds-checking
+    pub len: usize,
+}
+
+impl<'mcx, Inner> NullLayout<usize> for MaybeStrictNulls<Inner>
+        where Inner: NullLayout<usize> {
+    fn has_nulls(&self) -> bool {
+        match self.inner.as_ref() {
+            Some(inner) => inner.has_nulls(),
+            None => false,
+        }
+    }
+
+    fn count_nulls(&self) -> usize {
+        match self.inner.as_ref() { 
+            Some(inner) => inner.count_nulls(),
+            None => 0,
+        }
+    }
+
+    fn is_valid(&self, idx: usize) -> Option<bool> {
+        match self.inner.as_ref() { 
+            Some(inner) => inner.is_valid(idx),
+            None => (idx < self.len).then_some(true),
+        }
+    }
+
+    fn is_null(&self, idx: usize) -> Option<bool> {
+        match self.inner.as_ref() { 
+            Some(inner) => inner.is_null(idx),
+            None => (idx < self.len).then_some(false),
+        }
+    }
+}
+
+impl<Inner> SkippingNullLayout<usize> for MaybeStrictNulls<Inner> 
+        where Inner: SkippingNullLayout<usize> { 
+    fn next_valid_idx(&self, idx: usize) -> Option<usize> {
+        match self.inner.as_ref() { 
+            Some(inner) => inner.next_valid_idx(idx),
+            None => ((idx+1) < self.len).then_some(idx+1)
+        }
+    }
+}
 
 /// Iterates over a layout of null values, returning true for values that are null.
 pub struct NullsIter<'a, Idx, Layout: NullLayout<Idx>>
@@ -464,6 +508,51 @@ impl<'a> IntoIterator for &'a StrictNulls {
 
     fn into_iter(self) -> Self::IntoIter {
         NoNullsIter { remaining: self.0 }
+    }
+}
+
+pub trait IntoNullableIter<T> {
+    type IntoIter: Iterator<Item=Nullable<T>>;
+
+    fn into_nullable_iter(self) -> Self::IntoIter;
+}
+
+// Layout=MaybeStrictNulls<BitSliceNulls> blanket implementation.
+impl<'mcx, T, U> IntoNullableIter<T> for &'mcx U 
+        where U: NullableContainer<'mcx, 
+                usize, 
+                T, 
+                Layout= MaybeStrictNulls<BitSliceNulls<'mcx>>
+            > {
+
+    type IntoIter=SkippingNullableIterator<
+            'mcx, 
+            // Output type
+            T,
+            // The countainer (self)
+            U,
+            //null slice
+            MaybeNullIter<
+                'mcx, 
+                usize, 
+                BitSliceNulls<'mcx>
+            >
+        >;
+
+    fn into_nullable_iter(self) -> Self::IntoIter {
+        let layout = self.get_layout();
+        let null_slice_iter = match layout.inner.as_ref() {
+            Some(slice) => MaybeNullIter::Nullable({
+                NullsIter { layout: slice, current: 0 }
+            }),
+            None => MaybeNullIter::Strict(NoNullsIter { remaining: self.get_len() }),
+        };
+        SkippingNullableIterator {
+            nulls: null_slice_iter,
+            container_ref: self,
+            valid_idx: 0,
+            __marker: PhantomData,
+        }
     }
 }
 

@@ -145,8 +145,8 @@ impl<'mcx, T: UnboxDatum> Array<'mcx, T> {
 
     /// Return an iterator of `Nullable<T>`
     /// Behavior is identical to ArrayIterator, but with `Nullable<T>`'s,
-    /// syntax, meaning `next()`` returns Option<Nullable<T>>
-    /// instead of Option<Option<T>>.
+    /// syntax, meaning `next()` returns `Option<Nullable<T>>`
+    /// instead of `Option<Option<T>>`.
     pub fn iter_nullable(&self) -> NullableArrayIterator<'_, T> {
         NullableArrayIterator { inner: self.iter() }
     }
@@ -354,7 +354,7 @@ impl<T> Array<'_, T> {
     }
 }
 
-/// Adapter to allow array iteration to use Nullable<T>
+/// Adapter to use `Nullable<T>` for array iteration.
 pub struct NullableArrayIterator<'mcx, T>
 where
     T: UnboxDatum,
