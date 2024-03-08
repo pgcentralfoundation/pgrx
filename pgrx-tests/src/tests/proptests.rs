@@ -1,10 +1,16 @@
 use crate::proptest::PgTestRunner;
+use core::ffi;
 use pgrx::prelude::*;
 use proptest::prelude::*;
 
 #[pg_extern]
 pub fn nop_date(date: Date) -> Date {
     date
+}
+
+#[pg_extern]
+pub fn nop_time(time: Time) -> Time {
+    time
 }
 
 #[cfg(any(test, feature = "pg_test"))]
@@ -59,12 +65,54 @@ mod tests {
         proptest
             .run(&strat, |date| {
                 let datum = date.into_datum();
-                let date_cstr: &std::ffi::CStr =
+                let date_cstr: &ffi::CStr =
                     unsafe { pgrx::direct_function_call(pg_sys::date_out, &[datum]).unwrap() };
                 let date_text = date_cstr.to_str().unwrap().to_owned();
-                let spi_select_command = format!("SELECT nop_date('{date_text}')");
+                let spi_select_command = format!("SELECT nop_date('{}')", date_text);
                 let spi_ret: Option<Date> = Spi::get_one(&spi_select_command).unwrap();
                 prop_assert_eq!(date, spi_ret.unwrap());
+                Ok(())
+            })
+            .unwrap();
+    }
+
+    /// Hypothesis: We can pass random times directly into Postgres functions and get them back.
+    // absolutely not, apparently
+    #[pg_test]
+    pub fn time_spi_roundtrip() {
+        let mut proptest = PgTestRunner::default();
+        let strat = prop::num::i64::ANY.prop_map(Time::from);
+        proptest
+            .run(&strat, |time| {
+                let spi_ret: Time = Spi::get_one_with_args(
+                    "SELECT nop_time($1)",
+                    vec![(PgBuiltInOids::TIMEOID.into(), time.into_datum())],
+                )
+                .unwrap()
+                .unwrap();
+
+                prop_assert_eq!(time, spi_ret);
+                Ok(())
+            })
+            .unwrap();
+    }
+
+    /// Hypothesis: We can ask Postgres to accept a Time from an in-range i32, print its value,
+    /// then get the same Time back after passing it through SPI as a time literal
+    // absolutely not
+    #[pg_test]
+    pub fn time_literal_spi_roundtrip() {
+        let mut proptest = PgTestRunner::default();
+        let strat = prop::num::i64::ANY.prop_map(Time::from);
+        proptest
+            .run(&strat, |time| {
+                let datum = time.into_datum();
+                let time_cstr: &ffi::CStr =
+                    unsafe { pgrx::direct_function_call(pg_sys::time_out, &[datum]).unwrap() };
+                let time_text = time_cstr.to_str().unwrap().to_owned();
+                let spi_select_command = format!("SELECT nop_time('{}')", time_text);
+                let spi_ret: Option<Time> = Spi::get_one(&spi_select_command).unwrap();
+                prop_assert_eq!(time, spi_ret.unwrap());
                 Ok(())
             })
             .unwrap();
