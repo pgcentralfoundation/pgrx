@@ -40,6 +40,7 @@ proptest = [ "dep:proptest" ]
 cshim = [ "pgrx/cshim" ]
 no-schema-generation = [ "pgrx/no-schema-generation", "pgrx-macros/no-schema-generation" ]
 nightly = [ "pgrx/nightly" ]
+chrono = [ "dep:chrono", "pgrx/chrono" ]
 
 [package.metadata.docs.rs]
 features = ["pg14", "proptest"]
@@ -67,6 +68,7 @@ postgres = "0.19.7"
 proptest = { version = "1", optional = true }
 sysinfo = "0.29.10"
 rand = "0.8.5"
+chrono = { workspace = true, optional = true }
 
 [dependencies.pgrx] # Not unified in workspace due to default-features key
 path = "../pgrx"
