@@ -8,6 +8,70 @@ pub fn nop_date(date: Date) -> Date {
     date
 }
 
+macro_rules! pg_proptest_datetime_types {
+    ($datetime_ty:ty, $nop_fn:ident, $prop_strat:expr) => {
+        #[pg_extern]
+        pub fn $nop_fn(datetime: $datetime_ty) -> $datetime_ty {
+            datetime
+        }
+
+        #[cfg(any(test, feature = "pg_test"))]
+        #[pgrx::pg_schema]
+        mod tests {
+            use super::*;
+            #[allow(unused)] // I can never tell when this is actually needed.
+            use crate as pgrx_tests;
+    }
+}
+
+macro_rules! pg_proptest_datetime_roundtrip_tests {
+    ($datetime_ty:ty, $nop_fn:ident, $prop_strat:expr) => {
+        // 2. Constructing the Postgres-adapted test runner
+        let mut proptest = PgTestRunner::default();
+        // 3. A strategy to create and refining values, which is a somewhat aggrandized function.
+        //    In some cases it actually can be replaced directly by a closure, or, in this case,
+        //    it involves using a closure to `prop_map` an existing Strategy for producing
+        //    "any kind of i32" into "any kind of in-range value for a Date".
+        let strat = $prop_strat;
+        proptest
+            .run(&strat, |datetime| {
+                let query = concat!("SELECT ", stringify!($nop_fn), "($1)");
+                let builtin_oid = PgOid::Builtin(BuiltinOid::from_u32(<$datetime_ty as IntoDatum>::oid().as_u32()).unwrap());
+                let args = vec![(builtin_oid, datetime.into_datum())];
+                let spi_ret: $time_ty = Spi::get_one_with_args(query, args).unwrap().unwrap();
+                // 5. A condition on which the test is accepted or rejected:
+                //    this is easily done via `prop_assert!` and its friends,
+                //    which just early-returns a TestCaseError on failure
+                prop_assert_eq!(datetime, spi_ret);
+                Ok(())
+            })
+            .unwrap();
+    }
+    
+    #[pg_test]
+    pub fn date_literal_spi_roundtrip() {
+        let mut proptest = PgTestRunner::default();
+        let strat = $prop_strat;
+        proptest
+            .run(&strat, |date| {
+                let datum = date.into_datum();
+                let date_cstr: &ffi::CStr =
+                    unsafe { pgrx::direct_function_call(pg_sys::date_out, &[datum]).unwrap() };
+                let date_text = date_cstr.to_str().unwrap().to_owned();
+                let spi_select_command = format!("SELECT nop_date('{}')", date_text);
+                let spi_ret: Option<Date> = Spi::get_one(&spi_select_command).unwrap();
+                prop_assert_eq!(date, spi_ret.unwrap());
+                Ok(())
+            })
+            .unwrap();
+    }
+}
+
+#[pg_extern]
+pub fn nop_time(time: Time) -> Time {
+    time
+}
+
 #[pg_extern]
 pub fn nop_time(time: Time) -> Time {
     time
