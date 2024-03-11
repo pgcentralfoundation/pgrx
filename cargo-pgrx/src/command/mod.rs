@@ -39,4 +39,13 @@ fn build_agent_for_url(url: &str) -> eyre::Result<Agent> {
     }
 }
 
+/// Generate the FTP download for a Postgres tarball, given the major and minor versions
+fn generate_ftp_download_url(major: impl ToString, minor: impl ToString) -> String {
+    let major = major.to_string();
+    let minor = minor.to_string();
+    format!(
+        "https://ftp.postgresql.org/pub/source/v{major}.{minor}/postgresql-{major}.{minor}.tar.bz2"
+    )
+}
+
 // TODO: Abstract over the repeated `fn perform`?
