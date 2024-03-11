@@ -7,17 +7,6 @@
 //LICENSE All rights reserved.
 //LICENSE
 //LICENSE Use of this source code is governed by the MIT license that can be found in the LICENSE file.
-use crate::command::stop::stop_postgres;
-use crate::command::version::pgrx_default;
-use crate::CommandExecute;
-use bzip2::bufread::BzDecoder;
-use eyre::{eyre, WrapErr};
-use owo_colors::OwoColorize;
-use pgrx_pg_config::{
-    get_c_locale_flags, prefix_path, ConfigToml, PgConfig, PgConfigSelector, Pgrx, PgrxHomeError,
-};
-use tar::Archive;
-
 use std::collections::HashMap;
 use std::fs::File;
 use std::io::{Read, Write};
@@ -25,6 +14,22 @@ use std::num::NonZeroUsize;
 use std::path::{Path, PathBuf};
 use std::process::{Command, Stdio};
 use std::sync::OnceLock;
+
+use bzip2::bufread::BzDecoder;
+use eyre::{bail, eyre, WrapErr};
+use owo_colors::OwoColorize;
+use pgrx_pg_config::{
+    get_c_locale_flags, prefix_path, ConfigToml, PgConfig, PgConfigSelector, PgMinorVersion,
+    PgVersion, Pgrx, PgrxHomeError,
+};
+use tar::Archive;
+use url::Url;
+
+use crate::command::stop::stop_postgres;
+use crate::command::version::pgrx_default;
+use crate::CommandExecute;
+
+use super::generate_ftp_download_url;
 
 static PROCESS_ENV_DENYLIST: &[&str] = &[
     "DEBUG",
@@ -41,6 +46,109 @@ static PROCESS_ENV_DENYLIST: &[&str] = &[
     "LIBRARY_PATH", // see https://github.com/pgcentralfoundation/pgrx/issues/16
 ];
 
+/// Specifies how to retrieve/init a Postgres version
+pub(crate) enum PostgresRetrievalMethod {
+    /// The path to a postgres pg_config directory
+    PgConfigPath(PathBuf),
+    /// When the postgres version should be downloaded from wherever cargo-pgrx wants
+    ManagedDownload,
+    /// A more fully specified version (possibly a point release, rc or beta)
+    ///
+    /// (ex. `download.1` or `download.beta2`)
+    ManagedDownloadWithMinor(String),
+}
+
+impl PostgresRetrievalMethod {
+    fn from_method_with_minor(m: &str, minor_version: &Option<String>) -> eyre::Result<Self> {
+        match (m, minor_version) {
+            // If the path is 'download' then we can prompt a managed download,
+            // of the latest version by default
+            ("download", None) => Ok(Self::ManagedDownload),
+            // Versions that are specified with dots are likely point releases, betas or RCs
+            ("download", Some(v)) => Ok(Self::ManagedDownloadWithMinor(v.clone())),
+            // If the method is the path to a valid file, then we can use it
+            (p, _) if std::path::Path::new(p).exists() => Ok(Self::PgConfigPath(PathBuf::from(p))),
+            // All other methods should be skipped
+            (m, _) => bail!(
+                "unrecognized input [{m}], please specify a valid PG_CONFIG path, or 'download'"
+            ),
+        }
+    }
+}
+
+/// Default [`Pgrx`] instance that is used by implementation methods
+static DEFAULT_PGRX: OnceLock<eyre::Result<Pgrx>> = OnceLock::new();
+fn get_default_pgrx() -> &'static eyre::Result<Pgrx> {
+    DEFAULT_PGRX.get_or_init(|| pgrx_default())
+}
+
+impl PostgresRetrievalMethod {
+    /// Given a Postgres major version, resolve this version input (which can take many forms)
+    /// into a [`PgConfig`] which can be used as part of a [`Pgrx`]
+    ///
+    /// # Arguments
+    ///
+    /// * `pg_major_version` - Postgres major version, with the 'pg' prefix (ex. `"pg16"`)
+    /// * `pgrx_home` - A Path to the PGRX home directory
+    /// * `pg_init` - Init command configuration
+    fn resolve(
+        &self,
+        pg_major_version: &str,
+        pgrx_home: impl AsRef<Path>,
+        pg_init: &Init,
+    ) -> eyre::Result<PgConfig> {
+        // Build a PgConfig based on the versions that were provided
+        let pg_config = match self {
+            // If a config path was specified, then we can look it up
+            Self::PgConfigPath(pg_config_path) => {
+                PgConfig::new_with_defaults(pg_config_path.clone())
+            }
+            // If 'download' was specified, we can download teh version of
+            Self::ManagedDownload => {
+                let Ok(default_pgrx) = get_default_pgrx().as_ref() else {
+                    bail!("failed to generate default pgrx config");
+                };
+                default_pgrx.get(pg_major_version).wrap_err_with(|| {
+                    format!("{pg_major_version} is not a known Postgres major version")
+                })?
+            }
+            // If a specialized version was used (ex. a point release, beta or rc), then
+            // use that more specified version rather than the simply the major version
+            Self::ManagedDownloadWithMinor(minor) => {
+                let version = PgVersion::try_from((
+                    format!("{pg_major_version}.{minor}").as_ref(),
+                    Some(Url::parse(&generate_ftp_download_url(
+                        pg_major_version.trim_start_matches("pg"),
+                        minor,
+                    ))?),
+                ))?;
+
+                // Beta and RC versions cannot be downloaded this way (sources aren't avaiable via FTP, anyway)
+                if let PgMinorVersion::Rc(_) | PgMinorVersion::Beta(_) = version.minor {
+                    bail!("managed download not supported for Rc and Beta versions");
+                }
+
+                download_postgres(&PgConfig::from(version), pgrx_home.as_ref(), pg_init)?
+            }
+        };
+
+        // Check the label after building, only necessary if we're not doing managed download
+        // to ensure we didn't somehow give a pg_config with the wrong version
+        if let Self::ManagedDownloadWithMinor(_) | Self::PgConfigPath(_) = self {
+            let label = pg_config.label().ok();
+            if label.is_some() && label.as_deref() != Some(pg_major_version) {
+                bail!(
+                    "wrong `pg_config` given to `--{pg_major_version}` `{:?}` is for PostgreSQL {}",
+                    pg_config.path(),
+                    pg_config.major_version()?,
+                );
+            }
+        }
+
+        Ok(pg_config)
+    }
+}
+
 /// Initialize pgrx development environment for the first time
 #[derive(clap::Args, Debug)]
 #[clap(author)]
@@ -48,26 +156,75 @@ pub(crate) struct Init {
     /// If installed locally, the path to PG12's `pgconfig` tool, or `download` to have pgrx download/compile/install it
     #[clap(env = "PG12_PG_CONFIG", long)]
     pg12: Option<String>,
+
+    /// Specify a minor version for PG12
+    #[clap(
+        env = "PG12_MINOR_VERSION",
+        long,
+        help = "Postgres 12 minor version (ex. '1', 'beta2', 'rc3')"
+    )]
+    pg12_minor_version: Option<String>,
+
     /// If installed locally, the path to PG13's `pgconfig` tool, or `download` to have pgrx download/compile/install it
     #[clap(env = "PG13_PG_CONFIG", long)]
     pg13: Option<String>,
+
+    /// Specify a minor version for PG13
+    #[clap(
+        env = "PG13_MINOR_VERSION",
+        long,
+        help = "Postgres 13 minor version (ex. '1', 'beta2', 'rc3')"
+    )]
+    pg13_minor_version: Option<String>,
+
     /// If installed locally, the path to PG14's `pgconfig` tool, or `download` to have pgrx download/compile/install it
     #[clap(env = "PG14_PG_CONFIG", long)]
     pg14: Option<String>,
+
+    /// Specify a minor version for PG14
+    #[clap(
+        env = "PG14_MINOR_VERSION",
+        long,
+        help = "Postgres 14 minor version (ex. '1', 'beta2', 'rc3')"
+    )]
+    pg14_minor_version: Option<String>,
+
     /// If installed locally, the path to PG15's `pgconfig` tool, or `download` to have pgrx download/compile/install it
     #[clap(env = "PG15_PG_CONFIG", long)]
     pg15: Option<String>,
+
+    /// Specify a minor version for PG15
+    #[clap(
+        env = "PG15_MINOR_VERSION",
+        long,
+        help = "Postgres 15 minor version (ex. '1', 'beta2', 'rc3')"
+    )]
+    pg15_minor_version: Option<String>,
+
     /// If installed locally, the path to PG16's `pgconfig` tool, or `download` to have pgrx download/compile/install it
     #[clap(env = "PG16_PG_CONFIG", long)]
     pg16: Option<String>,
+
+    /// Specify a minor version for PG16
+    #[clap(
+        env = "PG16_MINOR_VERSION",
+        long,
+        help = "Postgres 16 minor version (ex. '1', 'beta2', 'rc3')"
+    )]
+    pg16_minor_version: Option<String>,
+
     #[clap(from_global, action = ArgAction::Count)]
     verbose: u8,
+
     #[clap(long, help = "Base port number")]
     base_port: Option<u16>,
+
     #[clap(long, help = "Base testing port number")]
     base_testing_port: Option<u16>,
+
     #[clap(long, help = "Additional flags to pass to the configure script")]
     configure_flag: Vec<String>,
+
     /// Compile PostgreSQL with the necessary flags to detect a good amount of
     /// memory errors when run under Valgrind.
     ///
@@ -75,8 +232,10 @@ pub(crate) struct Init {
     /// installed, but the resulting build is usable without valgrind.
     #[clap(long)]
     valgrind: bool,
+
     #[clap(long, short, help = "Allow N make jobs at once")]
     jobs: Option<usize>,
+
     #[clap(skip)]
     jobserver: OnceLock<jobslot::Client>,
 }
@@ -97,79 +256,86 @@ impl CommandExecute for Init {
             )
             .unwrap();
 
+        // Parse versions provided into a lookup of requested versions (if present) to the
+        // retrieval method that should be used for retreiving them
         let mut versions = HashMap::new();
 
-        if let Some(ref version) = self.pg12 {
-            versions.insert("pg12", version.clone());
+        // Since arguments to options like --pg12 are *methods* of obtaining the source
+        // (i.e. 'download' or a path on disk to a pg_config), we use them to generate a method
+        // which we will later `resolve()`
+        if let Some(ref method) = self.pg12 {
+            versions.insert(
+                "pg12",
+                PostgresRetrievalMethod::from_method_with_minor(method, &self.pg12_minor_version)?,
+            );
         }
-        if let Some(ref version) = self.pg13 {
-            versions.insert("pg13", version.clone());
+        if let Some(ref method) = self.pg13 {
+            versions.insert(
+                "pg13",
+                PostgresRetrievalMethod::from_method_with_minor(method, &self.pg13_minor_version)?,
+            );
         }
-        if let Some(ref version) = self.pg14 {
-            versions.insert("pg14", version.clone());
+        if let Some(ref method) = self.pg14 {
+            versions.insert(
+                "pg14",
+                PostgresRetrievalMethod::from_method_with_minor(method, &self.pg14_minor_version)?,
+            );
         }
-        if let Some(ref version) = self.pg15 {
-            versions.insert("pg15", version.clone());
+        if let Some(ref method) = self.pg15 {
+            versions.insert(
+                "pg15",
+                PostgresRetrievalMethod::from_method_with_minor(method, &self.pg15_minor_version)?,
+            );
         }
-        if let Some(ref version) = self.pg16 {
-            versions.insert("pg16", version.clone());
+        if let Some(ref method) = self.pg16 {
+            versions.insert(
+                "pg16",
+                PostgresRetrievalMethod::from_method_with_minor(method, &self.pg16_minor_version)?,
+            );
         }
 
+        // If versions were not specified at all, install defaults
         if versions.is_empty() {
-            // no arguments specified, so we'll just install our defaults
-            init_pgrx(&pgrx_default()?, &self)
-        } else {
-            // user specified arguments, so we'll only install those versions of Postgres
-            let mut default_pgrx = None;
-            let mut pgrx = Pgrx::default();
-
-            for (pgver, pg_config_path) in versions {
-                let config = if pg_config_path == "download" {
-                    if default_pgrx.is_none() {
-                        default_pgrx = Some(pgrx_default()?);
-                    }
-                    default_pgrx
-                        .as_ref()
-                        .unwrap() // We just set this
-                        .get(pgver)
-                        .wrap_err_with(|| format!("{pgver} is not a known Postgres version"))?
-                        .clone()
-                } else {
-                    let config = PgConfig::new_with_defaults(pg_config_path.as_str().into());
-                    let label = config.label().ok();
-                    // We allow None in case it's configured via the environment or something.
-                    if label.is_some() && label.as_deref() != Some(pgver) {
-                        return Err(eyre!(
-                            "wrong `pg_config` given to `--{pgver}` `{pg_config_path:?}` is for PostgreSQL {}",
-                            config.major_version()?,
-                        ));
-                    }
-                    config
-                };
-                pgrx.push(config);
-            }
-
-            init_pgrx(&pgrx, &self)
+            init_pgrx(
+                get_default_pgrx()
+                    .as_ref()
+                    .map_err(|e| eyre!("failed to retreive default pgrx settings: {e}"))?,
+                &self,
+            )?;
         }
+
+        // Resolve all versions required and then push them into the config
+        let pgrx_home = get_pgrx_home()?;
+        let mut pgrx = Pgrx::default();
+        for (pg_version, version_input) in versions.into_iter() {
+            pgrx.push(version_input.resolve(pg_version, &pgrx_home, &self)?)
+        }
+
+        init_pgrx(&pgrx, &self)
     }
 }
 
-#[tracing::instrument(skip_all)]
-pub(crate) fn init_pgrx(pgrx: &Pgrx, init: &Init) -> eyre::Result<()> {
-    let pgrx_home = match Pgrx::home() {
-        Ok(path) => path,
+/// Determine the home that pgrx should use
+pub(crate) fn get_pgrx_home() -> eyre::Result<PathBuf> {
+    match Pgrx::home() {
+        Ok(path) => Ok(path),
         Err(e) => match e {
-            PgrxHomeError::NoHomeDirectory => return Err(e.into()),
-            PgrxHomeError::IoError(e) => return Err(e.into()),
+            PgrxHomeError::NoHomeDirectory => Err(e.into()),
+            PgrxHomeError::IoError(e) => Err(e.into()),
             PgrxHomeError::MissingPgrxHome(path) => {
                 // $PGRX_HOME doesn't exist, but that's okay as `cargo pgrx init` is the right time
                 // to try and create it
                 println!("{} PGRX_HOME at `{}`", "     Creating".bold().green(), path.display());
                 std::fs::create_dir_all(&path)?;
-                path
+                Ok(path)
             }
         },
-    };
+    }
+}
+
+#[tracing::instrument(skip_all)]
+pub(crate) fn init_pgrx(pgrx: &Pgrx, init: &Init) -> eyre::Result<()> {
+    let pgrx_home = get_pgrx_home()?;
 
     let mut output_configs = std::thread::scope(|s| -> eyre::Result<Vec<_>> {
         let span = tracing::Span::current();
@@ -186,7 +352,7 @@ pub(crate) fn init_pgrx(pgrx: &Pgrx, init: &Init) -> eyre::Result<()> {
                 let mut pg_config = pg_config.clone();
                 stop_postgres(&pg_config).ok(); // no need to fail on errors trying to stop postgres while initializing
                 if !pg_config.is_real() {
-                    pg_config = match download_postgres(&pg_config, &pgrx_home, init) {
+                    pg_config = match download_postgres(&pg_config, pgrx_home.as_path(), init) {
                         Ok(pg_config) => pg_config,
                         Err(e) => return Err(eyre!(e)),
                     }
