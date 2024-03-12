@@ -13,7 +13,6 @@ use pgrx::prelude::*;
 use pgrx::shmem::*;
 use pgrx::{pg_shmem_init, warning};
 use serde::*;
-use std::iter::Iterator;
 use std::sync::atomic::Ordering;
 
 ::pgrx::pg_module_magic!();

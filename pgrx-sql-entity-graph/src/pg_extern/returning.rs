@@ -18,7 +18,6 @@ to the `pgrx` framework and very subject to change between versions. While you m
 use crate::UsedType;
 use proc_macro2::TokenStream as TokenStream2;
 use quote::{quote, ToTokens, TokenStreamExt};
-use std::convert::TryFrom;
 use syn::parse::{Parse, ParseStream};
 use syn::punctuated::Punctuated;
 use syn::spanned::Spanned;

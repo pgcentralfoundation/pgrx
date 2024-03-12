@@ -9,7 +9,6 @@
 //LICENSE Use of this source code is governed by the MIT license that can be found in the LICENSE file.
 use maplit::*;
 use pgrx::prelude::*;
-use pgrx::Array;
 use serde::*;
 use std::collections::HashMap;
 

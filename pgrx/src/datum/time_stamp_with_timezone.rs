@@ -16,7 +16,6 @@ use pgrx_pg_sys::PgTryBuilder;
 use pgrx_sql_entity_graph::metadata::{
     ArgumentError, Returns, ReturnsError, SqlMapping, SqlTranslatable,
 };
-use std::convert::TryFrom;
 use std::panic::{RefUnwindSafe, UnwindSafe};
 
 // taken from /include/datatype/timestamp.h

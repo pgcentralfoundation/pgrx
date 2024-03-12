@@ -14,7 +14,6 @@
 #![allow(clippy::useless_transmute)]
 use crate::pg_sys;
 use pgrx_pg_sys::PgTryBuilder;
-use std::convert::TryInto;
 use std::ffi::{CStr, CString};
 use std::os::raw::c_char;
 use std::ptr::null_mut;
