@@ -10,7 +10,7 @@
 use core::ffi::CStr;
 use pgrx::aggregate::*;
 use pgrx::prelude::*;
-use pgrx::{PgVarlena, PgVarlenaInOutFuncs, StringInfo};
+use pgrx::StringInfo;
 use serde::{Deserialize, Serialize};
 use std::str::FromStr;
 

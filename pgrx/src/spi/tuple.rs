@@ -6,7 +6,6 @@ use std::ptr::NonNull;
 
 use crate::memcxt::PgMemoryContexts;
 use crate::pg_sys::panic::ErrorReportable;
-use crate::pg_sys::{self, PgOid};
 use crate::prelude::*;
 
 use super::{SpiError, SpiErrorCodes, SpiOkCodes, SpiResult};

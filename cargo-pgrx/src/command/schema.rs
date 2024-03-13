@@ -8,6 +8,7 @@
 //LICENSE
 //LICENSE Use of this source code is governed by the MIT license that can be found in the LICENSE file.
 use crate::command::get::{find_control_file, get_property};
+use crate::manifest::{get_package_manifest, pg_config_and_version};
 use crate::profile::CargoProfile;
 use crate::CommandExecute;
 use cargo_toml::Manifest;
@@ -18,10 +19,6 @@ use pgrx_pg_config::{get_target_dir, PgConfig, Pgrx};
 use std::io::Write;
 use std::path::{Path, PathBuf};
 use std::process::Stdio;
-// Since we support extensions with `#[no_std]`
-extern crate alloc;
-use crate::manifest::{get_package_manifest, pg_config_and_version};
-use alloc::vec::Vec;
 
 /// Generate extension schema files
 #[derive(clap::Args, Debug)]

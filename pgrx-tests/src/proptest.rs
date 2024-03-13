@@ -1,8 +1,7 @@
 use pgrx::pg_sys::panic::CaughtError;
 use pgrx::prelude::*;
-use proptest::prelude::*;
 use proptest::strategy::Strategy;
-use proptest::test_runner::{TestCaseResult, TestError, TestRunner};
+use proptest::test_runner::{TestCaseError, TestCaseResult, TestError, TestRunner};
 use std::panic::AssertUnwindSafe;
 
 /** proptest's [`TestRunner`] adapted for `#[pg_test]`

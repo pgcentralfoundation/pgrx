@@ -11,8 +11,8 @@
 use crate::datum::Array;
 use crate::toast::{Toast, Toasty};
 use crate::{layout, pg_sys, varlena};
-use bitvec::prelude::*;
 use bitvec::ptr::{self as bitptr, BitPtr, BitPtrError, Mut};
+use bitvec::slice::BitSlice;
 use core::ptr::{self, NonNull};
 use core::slice;
 

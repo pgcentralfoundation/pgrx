@@ -16,7 +16,6 @@ to the `pgrx` framework and very subject to change between versions. While you m
 
 */
 use super::{SqlGraphEntity, SqlGraphIdentifier, ToSql};
-use core::convert::TryFrom;
 use std::collections::HashMap;
 use std::path::PathBuf;
 use thiserror::Error;

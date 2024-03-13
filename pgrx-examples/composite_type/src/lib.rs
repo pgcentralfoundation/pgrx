@@ -20,7 +20,7 @@ A number of considerations are detailed in the [`pgrx::composite_type`][pgrx::co
 [`PgHeapTuple`][pgrx::PgHeapTuple] documentation which may assist in productionalizing extensions
 using composite types.
 */
-use pgrx::{opname, pg_operator, prelude::*, Aggregate};
+use pgrx::{opname, pg_operator, prelude::*};
 
 // All `pgrx` extensions will do this:
 ::pgrx::pg_module_magic!();

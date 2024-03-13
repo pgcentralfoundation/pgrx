@@ -11,7 +11,7 @@
 #![allow(clippy::unit_arg)]
 use crate as pgrx; // for #[pg_guard] support from within ourself
 use crate::prelude::*;
-use crate::{void_mut_ptr, PgBox, PgList};
+use crate::{void_mut_ptr, PgList};
 use std::ops::Deref;
 
 #[cfg(any(feature = "pg12", feature = "pg13"))]
