@@ -58,6 +58,7 @@ owo-colors.workspace = true
 regex.workspace = true
 thiserror.workspace = true
 
+paste = "1"
 postgres = "0.19.7"
 proptest = { version = "1", optional = true }
 serde = "1.0"
