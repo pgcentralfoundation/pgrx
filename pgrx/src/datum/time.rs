@@ -67,7 +67,7 @@ impl TryFrom<pg_sys::TimeADT> for Time {
     fn try_from(raw: pg_sys::TimeADT) -> Result<Self, Self::Error> {
         match raw {
             0..=86400000 => Ok(Time(raw)),
-            i64::MIN..=-1 | 86400001.. => Err(raw)
+            i64::MIN..=-1 | 86400001.. => Err(raw),
         }
     }
 }
