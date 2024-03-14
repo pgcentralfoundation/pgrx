@@ -41,7 +41,7 @@ pub fn [<$datetime_ty:lower _literal_spi_roundtrip>] () {
         .run(&strat, |datetime| {
             let datum = datetime.into_datum();
             let datetime_cstr: &ffi::CStr =
-                unsafe { pgrx::direct_function_call(pg_sys::date_out, &[datum]).unwrap() };
+                unsafe { pgrx::direct_function_call(pg_sys:: [<$datetime_ty:lower _out>] , &[datum]).unwrap() };
             let datetime_text = datetime_cstr.to_str().unwrap().to_owned();
             let spi_select_command = format!(concat!("SELECT ", stringify!($nop_fn), "('{}')"), datetime_text);
             let spi_ret: Option<$datetime_ty> = Spi::get_one(&spi_select_command).unwrap();
@@ -90,7 +90,8 @@ mod tests {
 
 pg_proptest_datetime_types! {
     Date = prop::num::i32::ANY.prop_map(Date::saturating_from_raw);
-    Time = prop::num::i64::ANY.prop_map(Time::from);
+    // 00:00..=24:00
+    Time = prop::num::i64::ANY.prop_map(|int| Time::try_from((int % 86400000).abs()).unwrap());
     Timestamp = prop::num::i64::ANY.prop_map(Timestamp::from);
     // TimestampTz = prop::num::i64::ANY.prop_map(TimestampTz::from); // This doesn't exist, and that's a good thing.
 }

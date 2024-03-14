@@ -24,18 +24,6 @@ use std::num::TryFromIntError;
 #[repr(transparent)]
 pub struct Time(pg_sys::TimeADT);
 
-/// Create a [`Time`] from a [`pg_sys::TimeADT`]
-///
-/// Note that [`pg_sys::TimeADT`] is just an `i64` as a number of microseconds.
-/// This impl currently allows creating a `Time` that cannot be constructed by SQL,
-/// such as at the time 37:42, which may yield logic bugs if used.
-impl From<pg_sys::TimeADT> for Time {
-    #[inline]
-    fn from(value: pg_sys::TimeADT) -> Self {
-        Time(value)
-    }
-}
-
 impl From<Time> for pg_sys::TimeADT {
     #[inline]
     fn from(value: Time) -> Self {
@@ -65,6 +53,22 @@ impl From<Interval> for Time {
 impl From<TimeWithTimeZone> for Time {
     fn from(value: TimeWithTimeZone) -> Self {
         unsafe { direct_function_call(pg_sys::timetz_time, &[value.into_datum()]).unwrap() }
+    }
+}
+
+/// TimeADT (i64) to Time conversion
+///
+/// It is incorrect to convert a raw i64 to Time, due to out-of-bounds values
+/// resulting in severe logic errors, including database crashes, if used.
+impl TryFrom<pg_sys::TimeADT> for Time {
+    type Error = pg_sys::TimeADT;
+
+    #[inline]
+    fn try_from(raw: pg_sys::TimeADT) -> Result<Self, Self::Error> {
+        match raw {
+            0..=86400000 => Ok(Time(raw)),
+            i64::MIN..=-1 | 86400001.. => Err(raw)
+        }
     }
 }
 
