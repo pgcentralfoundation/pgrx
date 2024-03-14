@@ -90,6 +90,9 @@ mod tests {
 
 pg_proptest_datetime_types! {
     Date = prop::num::i32::ANY.prop_map(Date::saturating_from_raw);
+    Time = prop::num::i64::ANY.prop_map(Time::from);
+    Timestamp = prop::num::i64::ANY.prop_map(Timestamp::from);
+    // TimestampTz = prop::num::i64::ANY.prop_map(TimestampTz::from); // This doesn't exist, and that's a good thing.
 }
 
 // #[cfg(any(test, feature = "pg_test"))]
