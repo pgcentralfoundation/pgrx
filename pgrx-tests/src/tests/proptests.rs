@@ -92,7 +92,7 @@ pg_proptest_datetime_types! {
     Date = prop::num::i32::ANY.prop_map(Date::saturating_from_raw);
     // 00:00..=24:00
     Time = prop::num::i64::ANY.prop_map(|int| Time::try_from((int % 86400000).abs()).unwrap());
-    Timestamp = prop::num::i64::ANY.prop_map(Timestamp::from);
+    Timestamp = prop::num::i64::ANY.prop_map(Timestamp::saturating_from_raw);
     // TimestampTz = prop::num::i64::ANY.prop_map(TimestampTz::from); // This doesn't exist, and that's a good thing.
 }
 

@@ -72,9 +72,16 @@ impl From<Timestamp> for pg_sys::Timestamp {
 /// - The way `Timestamp` translates to/from `TimestampWithTimeZone`, or rather doesn't, is "fun"
 /// - In the past `pg_sys::Timestamp`'s type has changed, so in the future this may change with it
 /// - This is likely to coincide with a change in Timestamp's precision
-impl From<pg_sys::Timestamp> for Timestamp {
-    fn from(value: pgrx_pg_sys::Timestamp) -> Self {
-        Timestamp(value)
+impl TryFrom<pg_sys::Timestamp> for Timestamp {
+    type Error = pg_sys::Timestamp;
+    #[inline]
+    fn try_from(ts: pg_sys::Timestamp) -> Result<Self, Self::Error> {
+        //  #define IS_VALID_TIMESTAMP(t)  (MIN_TIMESTAMP <= (t) && (t) < END_TIMESTAMP)
+        const TS_MAX_INCLUSIVE: pg_sys::Timestamp = 9223371331200000000 - 1;
+        match ts {
+            i64::MIN | i64::MAX | -211813488000000000..=TS_MAX_INCLUSIVE => Ok(Timestamp(ts)),
+            _ => Err(ts),
+        }
     }
 }
 
@@ -191,6 +198,14 @@ impl Timestamp {
                 ],
             )
             .unwrap()
+        }
+    }
+
+    pub fn saturating_from_raw(value: pg_sys::Timestamp) -> Self {
+        match Self::try_from(value) {
+            Ok(ts) => ts,
+            Err(int) if int.is_negative() => Timestamp(Self::NEG_INFINITY),
+            Err(_int) => Timestamp(Self::INFINITY),
         }
     }
 
