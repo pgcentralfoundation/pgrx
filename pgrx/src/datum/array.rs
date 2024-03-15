@@ -10,7 +10,9 @@
 #![allow(clippy::question_mark)]
 use super::{unbox, UnboxDatum};
 use crate::array::RawArray;
-use crate::nullable::{BitSliceNulls, IntoNullableIterator, MaybeStrictNulls, NullLayout, Nullable, NullableContainer};
+use crate::nullable::{
+    BitSliceNulls, IntoNullableIterator, MaybeStrictNulls, NullLayout, Nullable, NullableContainer,
+};
 use crate::toast::Toast;
 use crate::{layout::*, nullable};
 use crate::{pg_sys, FromDatum, IntoDatum, PgMemoryContexts};
@@ -100,7 +102,7 @@ impl<'mcx, T: UnboxDatum> Array<'mcx, T> {
         let null_inner = raw
             .nulls_bitslice()
             .map(|nonnull| unsafe { nullable::BitSliceNulls(&*nonnull.as_ptr()) });
-        let null_slice = MaybeStrictNulls::new(raw.len(), null_inner); 
+        let null_slice = MaybeStrictNulls::new(raw.len(), null_inner);
         // do a little two-step before jumping into the Cha-Cha Slide and figure out
         // which implementation is correct for the type of element in this Array.
         let slide_impl: ChaChaSlideImpl<T> = match elem_layout.pass {
@@ -373,21 +375,20 @@ where
     }
 }
 
-impl<'mcx, T> IntoNullableIterator<<T as unbox::UnboxDatum>::As<'mcx>>
-        for &'mcx Array<'mcx, T>
-        where T: UnboxDatum {
+impl<'mcx, T> IntoNullableIterator<<T as unbox::UnboxDatum>::As<'mcx>> for &'mcx Array<'mcx, T>
+where
+    T: UnboxDatum,
+{
     type Iter = NullableArrayIterator<'mcx, T>;
-    
+
     fn into_nullable_iter(self) -> Self::Iter {
-        NullableArrayIterator {
-            inner: self.iter(),
-        }
+        NullableArrayIterator { inner: self.iter() }
     }
 }
 
-impl<'mcx, T: UnboxDatum> 
-        NullableContainer<'mcx, usize, <T as unbox::UnboxDatum>::As<'mcx>> 
-        for Array<'mcx, T> {
+impl<'mcx, T: UnboxDatum> NullableContainer<'mcx, usize, <T as unbox::UnboxDatum>::As<'mcx>>
+    for Array<'mcx, T>
+{
     type Layout = MaybeStrictNulls<BitSliceNulls<'mcx>>;
 
     fn get_layout(&'mcx self) -> &'mcx Self::Layout {
@@ -395,9 +396,10 @@ impl<'mcx, T: UnboxDatum>
     }
 
     fn get_raw(&'mcx self, idx: usize) -> <T as unbox::UnboxDatum>::As<'_> {
-        self.get_strict_inner(idx)
-            .expect("get_raw() called with an invalid index, bounds-checking\
-            *should* occur before calling this method.")
+        self.get_strict_inner(idx).expect(
+            "get_raw() called with an invalid index, bounds-checking\
+            *should* occur before calling this method.",
+        )
     }
 
     fn len(&'mcx self) -> usize {

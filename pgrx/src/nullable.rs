@@ -3,8 +3,8 @@
 //! types which implement nullable (empty slot) behavior in a
 //! "structure-of-arrays" manner
 
-use std::{fmt::Debug, marker::PhantomData};
 use bitvec::slice::BitSlice;
+use std::{fmt::Debug, marker::PhantomData};
 
 pub enum Nullable<T> {
     Valid(T),
@@ -125,20 +125,23 @@ where
     /// Returns true if this container has any nulls in it presently.
     /// # Performance
     /// Different implementors of this type might have wildly varying
-    /// performance costs for checking this - for a null bitslice -style
+    /// performance costs for checking this - for a null-bitslice-style
     /// container, it should complete in O(log(n)) at worst, but for a
-    /// null boolean array -style implementation, it could be O(n),
+    /// null-boolean-array-style implementation, it could be O(n),
     /// where n is the length of the container.
     fn has_nulls(&self) -> bool;
 
     fn count_nulls(&self) -> usize;
 
-    /// Returns Some(true) if the element at `idx`` is valid (non-null),
-    /// or `None` if `idx` is out-of-bounds
+    /// Returns Some(true) if the element at `idx` is valid (non-null),
+    /// Some(false) if the element at `idx` is null,
+    /// or `None` if `idx` is out-of-bounds.
     /// Implementors should handle bounds-checking.
     fn is_valid(&self, idx: Idx) -> Option<bool>;
-    /// Returns true if the element at idx is null,
-    /// or `None` if `idx` is out-of-bounds
+
+    /// Returns Some(true) if the element at idx is null,
+    /// Some(false) if the element at `idx` is valid (non-null),
+    /// or `None` if `idx` is out-of-bounds.
     /// Implementors should handle bounds-checking.
     fn is_null(&self, idx: Idx) -> Option<bool> {
         self.is_valid(idx).map(|v| !v)
@@ -148,7 +151,8 @@ where
 pub trait SkippingNullLayout<Idx>: NullLayout<Idx>
 where
     Idx: PartialEq + PartialOrd,
-{}
+{
+}
 
 /// All non-skipping null layouts. Marker trait for nullable containers that
 /// are nonetheless safe to iterate over linearly.
@@ -187,9 +191,18 @@ impl<'a> NullLayout<usize> for BitSliceNulls<'a> {
         self.0.not_all()
     }
 
+    /// Returns Some(true) if the element at `idx` is valid (non-null),
+    /// Some(false) if the element at `idx` is null,
+    /// or `None` if `idx` is out-of-bounds.
+    /// Implementors should handle bounds-checking.
     fn is_valid(&self, idx: usize) -> Option<bool> {
+        // For the bitmap array, 1 is "valid", 0 is "null",
         self.0.get(idx).map(|b| *b)
     }
+    /// Returns Some(true) if the element at `idx` is null,
+    /// Some(false) if the element at `idx` is valid (non-null),
+    /// or `None` if `idx` is out-of-bounds.
+    /// Implementors should handle bounds-checking.
     fn is_null(&self, idx: usize) -> Option<bool> {
         self.0.get(idx).map(|b| !b)
     }
@@ -213,12 +226,29 @@ impl<'a> NullLayout<usize> for BoolSliceNulls<'a> {
         }
         has_null
     }
-    // In a Postgres bool-slice implementation of a null layout,
-    // 1 is "null", 0 is "valid"
+
+    /// Returns Some(true) if the element at `idx` is valid (non-null),
+    /// Some(false) if the element at `idx` is null,
+    /// or `None` if `idx` is out-of-bounds.
+    /// Implementors should handle bounds-checking.
     fn is_valid(&self, idx: usize) -> Option<bool> {
+        // In a Postgres bool-slice implementation of a null layout,
+        // 1 is "null", 0 is "valid"
         if idx < self.0.len() {
             // Invert from 0 being valid to 1 being valid.
             Some(!self.0[idx])
+        } else {
+            None
+        }
+    }
+
+    /// Returns Some(true) if the element at `idx` is null,
+    /// Some(false) if the element at `idx` is valid (non-null),
+    /// or `None` if `idx` is out-of-bounds.
+    /// Implementors should handle bounds-checking.
+    fn is_null(&self, idx: usize) -> Option<bool> {
+        if idx < self.0.len() {
+            Some(self.0[idx])
         } else {
             None
         }
@@ -265,33 +295,34 @@ impl NullLayout<usize> for StrictNulls {
 // No skipping when there are no nulls.
 impl ContiguousNullLayout<usize> for StrictNulls {}
 
-pub struct MaybeStrictNulls<Inner: NullLayout<usize>> { 
+pub struct MaybeStrictNulls<Inner: NullLayout<usize>> {
     pub inner: Option<Inner>,
     // Needed for bounds-checking
     pub len: usize,
 }
 
 impl<'mcx, Inner> MaybeStrictNulls<Inner>
-        where Inner: NullLayout<usize> {
+where
+    Inner: NullLayout<usize>,
+{
     pub fn new(len: usize, inner: Option<Inner>) -> Self {
-        Self {
-            inner,
-            len
-        }
+        Self { inner, len }
     }
-    pub fn is_strict(&self) -> bool { 
+    pub fn is_strict(&self) -> bool {
         match self.inner {
             Some(_) => false,
             None => true,
         }
     }
-    pub fn get_inner(&self) -> Option<&Inner> { 
+    pub fn get_inner(&self) -> Option<&Inner> {
         self.inner.as_ref()
     }
 }
 
 impl<'mcx, Inner> NullLayout<usize> for MaybeStrictNulls<Inner>
-        where Inner: NullLayout<usize> {
+where
+    Inner: NullLayout<usize>,
+{
     fn has_nulls(&self) -> bool {
         match self.inner.as_ref() {
             Some(inner) => inner.has_nulls(),
@@ -300,57 +331,63 @@ impl<'mcx, Inner> NullLayout<usize> for MaybeStrictNulls<Inner>
     }
 
     fn count_nulls(&self) -> usize {
-        match self.inner.as_ref() { 
+        match self.inner.as_ref() {
             Some(inner) => inner.count_nulls(),
             None => 0,
         }
     }
 
     fn is_valid(&self, idx: usize) -> Option<bool> {
-        match self.inner.as_ref() { 
+        match self.inner.as_ref() {
             Some(inner) => inner.is_valid(idx),
             None => (idx < self.len).then_some(true),
         }
     }
 
     fn is_null(&self, idx: usize) -> Option<bool> {
-        match self.inner.as_ref() { 
+        match self.inner.as_ref() {
             Some(inner) => inner.is_null(idx),
             None => (idx < self.len).then_some(false),
         }
     }
 }
 
-impl<Inner> SkippingNullLayout<usize> for MaybeStrictNulls<Inner> 
-        where Inner: SkippingNullLayout<usize> {
+impl<Inner> SkippingNullLayout<usize> for MaybeStrictNulls<Inner> where
+    Inner: SkippingNullLayout<usize>
+{
 }
 
-impl<Inner> ContiguousNullLayout<usize> for MaybeStrictNulls<Inner> 
-        where Inner: ContiguousNullLayout<usize> {
+impl<Inner> ContiguousNullLayout<usize> for MaybeStrictNulls<Inner> where
+    Inner: ContiguousNullLayout<usize>
+{
 }
 
 /// Iterator for nullable containers for which the length of the null slice
 /// (in bits) is equal to the length of the underlying data structure (in
-/// elements) which can contain valid elements. 
+/// elements) which can contain valid elements.
 /// Since contiguous nullable structures are simpler than skipping ones,
 /// we can use a blanket implementation.
 pub struct ContiguousNullableIter<'mcx, T, Container>
-        where Container: NullableContainer<'mcx, usize, T>,
-        Container::Layout : ContiguousNullLayout<usize> {
+where
+    Container: NullableContainer<'mcx, usize, T>,
+    Container::Layout: ContiguousNullLayout<usize>,
+{
     container: &'mcx Container,
     current_idx: usize,
     _marker: PhantomData<T>,
 }
 
 impl<'mcx, T: 'mcx, Container> Iterator for ContiguousNullableIter<'mcx, T, Container>
-        where Container: NullableContainer<'mcx, usize, T>,
-        Container::Layout : ContiguousNullLayout<usize> {
-    type Item=Nullable<T>;
+where
+    Container: NullableContainer<'mcx, usize, T>,
+    Container::Layout: ContiguousNullLayout<usize>,
+{
+    type Item = Nullable<T>;
 
     fn next(&mut self) -> Option<Self::Item> {
         let prev_idx = self.current_idx;
 
-        if prev_idx >= self.container.len() { 
+        if prev_idx >= self.container.len() {
             return None;
         }
 
@@ -360,7 +397,7 @@ impl<'mcx, T: 'mcx, Container> Iterator for ContiguousNullableIter<'mcx, T, Cont
             Some(true) => {
                 let value = self.container.get_raw(prev_idx);
                 Some(Nullable::Valid(value))
-            },
+            }
             Some(false) => Some(Nullable::Null),
             // End of array (valid array will have a null layout length equal
             // to the array length)
@@ -371,9 +408,6 @@ impl<'mcx, T: 'mcx, Container> Iterator for ContiguousNullableIter<'mcx, T, Cont
 
 /// IntoIterator-like trait for Nullable elements.
 pub trait IntoNullableIterator<T> {
-    type Iter: Iterator<Item=Nullable<T>>;
+    type Iter: Iterator<Item = Nullable<T>>;
     fn into_nullable_iter(self) -> Self::Iter;
 }
-
-#[cfg(test)]
-mod nullable_tests {}
