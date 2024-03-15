@@ -3,7 +3,7 @@
 //! types which implement nullable (empty slot) behavior in a
 //! "structure-of-arrays" manner
 
-use std::{fmt::Debug, iter::Enumerate, marker::PhantomData};
+use std::{fmt::Debug, marker::PhantomData};
 use bitvec::slice::BitSlice;
 
 pub enum Nullable<T> {
@@ -148,15 +148,7 @@ where
 pub trait SkippingNullLayout<Idx>: NullLayout<Idx>
 where
     Idx: PartialEq + PartialOrd,
-{
-    /// For the given (linear) container index, returns the next index of the
-    /// underlying data buffer that should contain a valid value,
-    /// or `None` if we have reached the end of the container.
-    ///
-    /// Used to implement the skipping behavior expected with null-bitmap
-    /// -style arrays.
-    fn next_valid_idx(&self, idx: Idx) -> Option<Idx>;
-}
+{}
 
 /// All non-skipping null layouts. Marker trait for nullable containers that
 /// are nonetheless safe to iterate over linearly.
@@ -178,17 +170,14 @@ where
     /// Used to implement NullableIter.
     ///
     /// Get the Valid value from the underlying data index of `idx`,
-    /// presumably after figuring out things like
+    /// after figuring out bounds-checking and the correct raw idx
+    /// for this element.
     fn get_raw(&'mcx self, idx: Idx) -> T;
 
     /// Total array length - doesn't represent the length of the backing array
     /// (as in, the thing accessed by get_raw) but instead represents the
     /// length of the array including skipped nulls.
     fn len(&'mcx self) -> usize;
-
-    /// Represents the length of the underlying array - as in, the container
-    /// from which [`NullableContainer::get_raw()`] pulls.
-    fn raw_len(&'mcx self) -> usize;
 }
 
 pub struct BitSliceNulls<'a>(pub &'a BitSlice<u8>);
@@ -210,21 +199,7 @@ impl<'a> NullLayout<usize> for BitSliceNulls<'a> {
     }
 }
 
-impl<'a> SkippingNullLayout<usize> for BitSliceNulls<'a> {
-    fn next_valid_idx(&self, idx: usize) -> Option<usize> {
-        // Next elem (one after this) would be past the end
-        // of the container
-        if (idx + 1) >= self.0.len() {
-            return None;
-        }
-        let mut resulting_idx = 0;
-        for bit in &(*self.0)[(idx + 1)..] {
-            // Postgres nullbitmaps are 1 for "valid" and 0 for "null"
-            resulting_idx += (*bit) as usize;
-        }
-        Some(resulting_idx)
-    }
-}
+impl<'a> SkippingNullLayout<usize> for BitSliceNulls<'a> {}
 
 pub struct BoolSliceNulls<'a>(pub &'a [bool]);
 
@@ -296,6 +271,25 @@ pub struct MaybeStrictNulls<Inner: NullLayout<usize>> {
     pub len: usize,
 }
 
+impl<'mcx, Inner> MaybeStrictNulls<Inner>
+        where Inner: NullLayout<usize> {
+    pub fn new(len: usize, inner: Option<Inner>) -> Self {
+        Self {
+            inner,
+            len
+        }
+    }
+    pub fn is_strict(&self) -> bool { 
+        match self.inner {
+            Some(_) => false,
+            None => true,
+        }
+    }
+    pub fn get_inner(&self) -> Option<&Inner> { 
+        self.inner.as_ref()
+    }
+}
+
 impl<'mcx, Inner> NullLayout<usize> for MaybeStrictNulls<Inner>
         where Inner: NullLayout<usize> {
     fn has_nulls(&self) -> bool {
@@ -328,15 +322,18 @@ impl<'mcx, Inner> NullLayout<usize> for MaybeStrictNulls<Inner>
 }
 
 impl<Inner> SkippingNullLayout<usize> for MaybeStrictNulls<Inner> 
-        where Inner: SkippingNullLayout<usize> { 
-    fn next_valid_idx(&self, idx: usize) -> Option<usize> {
-        match self.inner.as_ref() { 
-            Some(inner) => inner.next_valid_idx(idx),
-            None => ((idx+1) < self.len).then_some(idx+1)
-        }
-    }
+        where Inner: SkippingNullLayout<usize> {
 }
 
+impl<Inner> ContiguousNullLayout<usize> for MaybeStrictNulls<Inner> 
+        where Inner: ContiguousNullLayout<usize> {
+}
+
+/// Iterator for nullable containers for which the length of the null slice
+/// (in bits) is equal to the length of the underlying data structure (in
+/// elements) which can contain valid elements. 
+/// Since contiguous nullable structures are simpler than skipping ones,
+/// we can use a blanket implementation.
 pub struct ContiguousNullableIter<'mcx, T, Container>
         where Container: NullableContainer<'mcx, usize, T>,
         Container::Layout : ContiguousNullLayout<usize> {
@@ -372,86 +369,10 @@ impl<'mcx, T: 'mcx, Container> Iterator for ContiguousNullableIter<'mcx, T, Cont
     }
 }
 
-pub struct SkippingNullableIter<'mcx, T, Container>
-where Container: NullableContainer<'mcx, usize, T>,
-Container::Layout : SkippingNullLayout<usize> {
-    container: &'mcx Container,
-    current_idx: usize,
-    /// Current index in the raw / underlying container
-    current_valid: Option<usize>,
-    _marker: PhantomData<T>,
-}
-
-impl<'mcx, T: 'mcx, Container> Iterator for SkippingNullableIter<'mcx, T, Container>
-        where Container: NullableContainer<'mcx, usize, T>,
-        Container::Layout : SkippingNullLayout<usize> {
-    type Item=Nullable<T>;
-
-    fn next(&mut self) -> Option<Self::Item> {
-        if self.current_idx >= self.container.len() { 
-            return None;
-        }
-        match self.container.get_layout().is_valid(self.current_idx) {
-            // Non-null
-            Some(true) => {
-                let valid_idx = self.current_valid
-                    .expect("Null-layout lists a valid value, however there\
-                        are no more valid elements left to iterate over in the\
-                        underlying array.");
-                let value = self.container.get_raw(valid_idx);
-                // Make sure monotonically-increasing self.current_valid
-                // matches the assumptions of container.layout.next_valid_idx()
-                debug_assert_eq!(
-                    (self.current_idx < self.container.len())
-                        .then_some(self.current_valid + 1),
-                    self.container
-                        .get_layout()
-                        .next_valid_idx(self.current_idx));
-                self.current_valid = self.current_valid + 1; 
-                self.current_idx = self.current_idx + 1;
-                Some(Nullable::Valid(value))
-            },
-            Some(false) => {
-                self.current_idx = self.current_idx + 1;
-                Some(Nullable::Null)
-            },
-            // End of array (valid array will have a null layout length equal
-            // to the array length)
-            None => None,
-        }
-    }
-}
-
-pub trait IntoNullableIterator<'mcx, T, Container, Iter>
-        where Container: NullableContainer<'mcx, usize, T>,
-        Container::Layout : NullLayout<usize>,
-        Iter: Iterator<Item=Nullable<T>> {
-    fn into_nullable_iter(&'mcx self) -> Iter;
-}
-
-impl<'mcx, T: 'mcx, Container> IntoNullableIterator<'mcx, T, Container, ContiguousNullableIter<'mcx, T, Container>>
-        for &'mcx Container where Container: NullableContainer<'mcx, usize, T>,
-        Container::Layout : ContiguousNullLayout<usize> {
-    fn into_nullable_iter(&'mcx self) -> ContiguousNullableIter<'mcx, T, Container> {
-        ContiguousNullableIter {
-            container: self,
-            current_idx: 0,
-            _marker: PhantomData,
-        }
-    }
-}
-
-impl<'mcx, T: 'mcx, Container> IntoNullableIterator<'mcx, T, Container, SkippingNullableIter<'mcx, T, Container>>
-        for &'mcx Container where Container: NullableContainer<'mcx, usize, T>,
-        Container::Layout : SkippingNullLayout<usize> {
-    fn into_nullable_iter(&'mcx self) -> SkippingNullableIter<'mcx, T, Container> {
-        SkippingNullableIter {
-            container: self,
-            current_idx: 0,
-            current_valid: 0,
-            _marker: PhantomData,
-        }
-    }
+/// IntoIterator-like trait for Nullable elements.
+pub trait IntoNullableIterator<T> {
+    type Iter: Iterator<Item=Nullable<T>>;
+    fn into_nullable_iter(self) -> Self::Iter;
 }
 
 #[cfg(test)]

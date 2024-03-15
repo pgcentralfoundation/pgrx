@@ -10,7 +10,7 @@
 #![allow(clippy::question_mark)]
 use super::{unbox, UnboxDatum};
 use crate::array::RawArray;
-use crate::nullable::{BitSliceNulls, NullLayout, Nullable};
+use crate::nullable::{BitSliceNulls, IntoNullableIterator, MaybeStrictNulls, NullLayout, Nullable, NullableContainer};
 use crate::toast::Toast;
 use crate::{layout::*, nullable};
 use crate::{pg_sys, FromDatum, IntoDatum, PgMemoryContexts};
@@ -59,7 +59,7 @@ fn with_vec(elems: Array<String>) {
 // An array is a detoasted varlena type, so we reason about the lifetime of
 // the memory context that the varlena is actually detoasted into.
 pub struct Array<'mcx, T> {
-    null_slice: Option<BitSliceNulls<'mcx>>,
+    null_slice: MaybeStrictNulls<BitSliceNulls<'mcx>>,
     slide_impl: ChaChaSlideImpl<T>,
     // Rust drops in FIFO order, drop this last
     raw: Toast<RawArray>,
@@ -97,10 +97,10 @@ impl<'mcx, T: UnboxDatum> Array<'mcx, T> {
     unsafe fn deconstruct_from(mut raw: Toast<RawArray>) -> Array<'mcx, T> {
         let oid = raw.oid();
         let elem_layout = Layout::lookup_oid(oid);
-        let null_slice = raw
+        let null_inner = raw
             .nulls_bitslice()
             .map(|nonnull| unsafe { nullable::BitSliceNulls(&*nonnull.as_ptr()) });
-
+        let null_slice = MaybeStrictNulls::new(raw.len(), null_inner); 
         // do a little two-step before jumping into the Cha-Cha Slide and figure out
         // which implementation is correct for the type of element in this Array.
         let slide_impl: ChaChaSlideImpl<T> = match elem_layout.pass {
@@ -157,7 +157,7 @@ impl<'mcx, T: UnboxDatum> Array<'mcx, T> {
     /// This function will panic when called if the array contains any SQL NULL values.
     #[inline]
     pub fn iter_deny_null(&self) -> ArrayTypedIterator<'_, T> {
-        if let Some(true) = self.null_slice.as_ref().map(|v| v.has_nulls()) {
+        if self.null_slice.has_nulls() {
             panic!("array contains NULL");
         }
 
@@ -230,7 +230,7 @@ impl<'mcx, T: UnboxDatum> Array<'mcx, T> {
     #[allow(clippy::option_option)]
     #[inline]
     pub fn get<'arr>(&'arr self, index: usize) -> Option<Option<T::As<'arr>>> {
-        match self.null_slice.as_ref().map(|v| (v, v.is_null(index))) {
+        match self.null_slice.get_inner().map(|v| (v, v.is_null(index))) {
             // No null_slice, strict array.
             None => self.get_strict_inner(index).map(|elem| Some(elem)),
             // self.null_slice exists but index is not in bounds.
@@ -340,7 +340,7 @@ impl<T> Array<'_, T> {
     /// Returns `true` if this [`Array`] contains one or more SQL "NULL" values
     #[inline]
     pub fn contains_nulls(&self) -> bool {
-        self.null_slice.as_ref().is_some_and(|slice| slice.has_nulls())
+        self.null_slice.get_inner().is_some_and(|slice| slice.has_nulls())
     }
 
     #[inline]
@@ -370,6 +370,38 @@ where
 
     fn next(&mut self) -> Option<Self::Item> {
         self.inner.next().map(|v| Nullable::from(v))
+    }
+}
+
+impl<'mcx, T> IntoNullableIterator<<T as unbox::UnboxDatum>::As<'mcx>>
+        for &'mcx Array<'mcx, T>
+        where T: UnboxDatum {
+    type Iter = NullableArrayIterator<'mcx, T>;
+    
+    fn into_nullable_iter(self) -> Self::Iter {
+        NullableArrayIterator {
+            inner: self.iter(),
+        }
+    }
+}
+
+impl<'mcx, T: UnboxDatum> 
+        NullableContainer<'mcx, usize, <T as unbox::UnboxDatum>::As<'mcx>> 
+        for Array<'mcx, T> {
+    type Layout = MaybeStrictNulls<BitSliceNulls<'mcx>>;
+
+    fn get_layout(&'mcx self) -> &'mcx Self::Layout {
+        &self.null_slice
+    }
+
+    fn get_raw(&'mcx self, idx: usize) -> <T as unbox::UnboxDatum>::As<'_> {
+        self.get_strict_inner(idx)
+            .expect("get_raw() called with an invalid index, bounds-checking\
+            *should* occur before calling this method.")
+    }
+
+    fn len(&'mcx self) -> usize {
+        self.len()
     }
 }
 
@@ -729,7 +761,7 @@ impl<'arr, T: UnboxDatum> Iterator for ArrayIterator<'arr, T> {
     #[inline]
     fn next(&mut self) -> Option<Self::Item> {
         let Self { array, curr, ptr } = self;
-        let is_null = (match array.null_slice.as_ref().map(|slice| slice.is_null(*curr)) {
+        let is_null = (match array.null_slice.get_inner().map(|slice| slice.is_null(*curr)) {
             // Null slice exists, use its logic for bounds-checking
             // and null status.
             Some(elem) => elem,
@@ -804,7 +836,7 @@ where
     fn next(&mut self) -> Option<Self::Item> {
         let Self { array, curr, ptr } = self;
 
-        let is_null = (match array.null_slice.as_ref().map(|slice| slice.is_null(*curr)) {
+        let is_null = (match array.null_slice.get_inner().map(|slice| slice.is_null(*curr)) {
             // Null slice exists, use its logic for bounds-checking
             // and null status.
             Some(elem) => elem,
