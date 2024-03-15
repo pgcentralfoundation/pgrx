@@ -694,7 +694,7 @@ pub enum DateTimeConversionError {
     #[error("`{0}` is not a known time zone")]
     UnknownTimezone(String),
     #[error("`{0} is not a valid time zone offset")]
-    InvalidTimezoneOffset(Interval),
+    InvalidTimezoneOffset(i32),
     #[error("Encoded time zone string is unknown")]
     CannotParseTimezone,
     /// ERRCODE_DATETIME_VALUE_OUT_OF_RANGE
