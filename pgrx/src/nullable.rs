@@ -4,7 +4,7 @@
 //! "structure-of-arrays" manner
 
 use bitvec::slice::BitSlice;
-use std::{fmt::Debug, marker::PhantomData};
+use std::{borrow::Cow, fmt::Debug, marker::PhantomData};
 
 pub enum Nullable<T> {
     Valid(T),
@@ -15,6 +15,7 @@ impl<T> Debug for Nullable<T>
 where
     T: Debug,
 {
+    #[inline]
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         match self {
             Self::Valid(value) => f.debug_tuple("Valid").field(value).finish(),
@@ -27,6 +28,7 @@ impl<T> Clone for Nullable<T>
 where
     T: Clone,
 {
+    #[inline]
     fn clone(&self) -> Self {
         match self {
             Self::Valid(arg0) => Self::Valid(arg0.clone()),
@@ -39,6 +41,7 @@ impl<T> PartialEq for Nullable<T>
 where
     T: Eq,
 {
+    #[inline]
     fn eq(&self, other: &Self) -> bool {
         match (self, other) {
             (Self::Valid(l_value), Self::Valid(r_value)) => l_value == r_value,
@@ -46,49 +49,110 @@ where
         }
     }
 }
-
 impl<T> Eq for Nullable<T> where T: PartialEq + Eq {}
 
+impl<T> PartialOrd for Nullable<T>
+where
+    T: PartialOrd + PartialEq + Eq,
+{
+    fn partial_cmp(&self, other: &Self) -> Option<std::cmp::Ordering> {
+        match (self, other) {
+            (Nullable::Valid(a), Nullable::Valid(b)) => a.partial_cmp(b),
+            // Null cannot be considered to have a correct ordering.
+            (Nullable::Valid(_), Nullable::Null) => None,
+            (Nullable::Null, Nullable::Valid(_)) => None,
+            (Nullable::Null, Nullable::Null) => None,
+        }
+    }
+}
+
 impl<T> Nullable<T> {
+    #[inline]
     pub fn into_option(self) -> Option<T> {
         match self {
             Nullable::Valid(val) => Some(val),
             Nullable::Null => None,
         }
     }
+    #[inline]
     pub fn as_option<'a>(&'a self) -> Option<&'a T> {
         match self {
             Nullable::Valid(val) => Some(val),
             Nullable::Null => None,
         }
     }
+    #[inline]
     pub fn as_option_mut<'a>(&'a mut self) -> Option<&'a T> {
         match self {
             Nullable::Valid(val) => Some(val),
             Nullable::Null => None,
         }
     }
+    // Returns true if this is a valid value (non-null).
+    #[inline]
     pub fn is_valid(&self) -> bool {
         match self {
             Nullable::Valid(_) => true,
             Nullable::Null => false,
         }
     }
+    // Returns true if this is Null.
+    #[inline]
     pub fn is_null(&self) -> bool {
         !self.is_valid()
     }
+    /// Return `value` if this enum is `Valid(value)`, otherwise panics.
+    #[inline]
     pub fn unwrap(self) -> T {
         self.into_option().unwrap()
     }
-    pub fn expect(self, msg: &'static str) -> T {
-        self.into_option().expect(msg)
+    /// Return `value` if this enum is `Valid(value)`, otherwise panics with
+    /// the error message `msg`.
+    #[inline]
+    pub fn expect<'a, A>(self, msg: &'a A) -> T
+    where
+        &'a A: Into<Cow<'a, str>>,
+    {
+        self.into_option().expect(msg.into().as_ref())
     }
-    pub fn ok_or<E>(self, err: E) -> Result<T, E> {
+    /// Convert to a result, returning `err` if this enum is `Null`.
+    #[inline]
+    pub fn valid_or<E>(self, err: E) -> Result<T, E> {
         self.into_option().ok_or(err)
+    }
+    /// Maps the `T` value inside a `Nullable<T>::Valid` into the U of
+    /// a `Nullable<U>::Valid` using the provided `func` argument,
+    /// or returns `Null` if this enum is `Null`.
+    #[inline]
+    pub fn map<U, F>(self, func: F) -> Nullable<U>
+    where
+        F: FnOnce(T) -> U,
+    {
+        match self {
+            Nullable::Valid(v) => Nullable::Valid(func(v)),
+            Nullable::Null => Nullable::Null,
+        }
+    }
+    /// Returns `Null` if this value is `Null`, or, if this enum is
+    /// `Valid(value)`, it calls `func(value)` and returns `func`'s result.
+    /// This is very similar to [`Nullable::map()`]. However, `map()`
+    /// maps the `value` inside a `Valid(value)` to another `Valid(value)`,
+    /// while `and_then()` can be used to reject a valid value and return
+    /// null anyway.
+    #[inline]
+    pub fn and_then<U, F>(self, func: F) -> Nullable<U>
+    where
+        F: FnOnce(T) -> Nullable<U>,
+    {
+        match self {
+            Nullable::Valid(v) => func(v),
+            Nullable::Null => Nullable::Null,
+        }
     }
 }
 
 impl<T> Into<Option<T>> for Nullable<T> {
+    #[inline]
     fn into(self) -> Option<T> {
         match self {
             Nullable::Valid(val) => Some(val),
@@ -96,11 +160,12 @@ impl<T> Into<Option<T>> for Nullable<T> {
         }
     }
 }
-impl<T> From<Option<T>> for Nullable<T> {
-    fn from(opt: Option<T>) -> Self {
-        match opt {
-            Some(val) => Self::Valid(val),
-            None => Self::Null,
+impl<T> Into<Nullable<T>> for Option<T> {
+    #[inline]
+    fn into(self) -> Nullable<T> {
+        match self {
+            Some(val) => Nullable::Valid(val),
+            None => Nullable::Null,
         }
     }
 }
@@ -122,11 +187,11 @@ pub trait NullLayout<Idx>
 where
     Idx: PartialEq + PartialOrd,
 {
-    /// Returns true if this container has any nulls in it presently.
+    /// Returns true if this container has any nulls, checked at run-time.
     /// # Performance
     /// Different implementors of this type might have wildly varying
     /// performance costs for checking this - for a null-bitslice-style
-    /// container, it should complete in O(log(n)) at worst, but for a
+    /// container, it should complete very quickly, but for a
     /// null-boolean-array-style implementation, it could be O(n),
     /// where n is the length of the container.
     fn has_nulls(&self) -> bool;
@@ -136,13 +201,11 @@ where
     /// Returns Some(true) if the element at `idx` is valid (non-null),
     /// Some(false) if the element at `idx` is null,
     /// or `None` if `idx` is out-of-bounds.
-    /// Implementors should handle bounds-checking.
     fn is_valid(&self, idx: Idx) -> Option<bool>;
 
     /// Returns Some(true) if the element at idx is null,
     /// Some(false) if the element at `idx` is valid (non-null),
     /// or `None` if `idx` is out-of-bounds.
-    /// Implementors should handle bounds-checking.
     fn is_null(&self, idx: Idx) -> Option<bool> {
         self.is_valid(idx).map(|v| !v)
     }
@@ -187,6 +250,11 @@ where
 pub struct BitSliceNulls<'a>(pub &'a BitSlice<u8>);
 
 impl<'a> NullLayout<usize> for BitSliceNulls<'a> {
+    /// Returns true if this container has any nulls, checked at run-time.
+    /// # Performance
+    /// This implementation should be very fast, since all it needs to do
+    /// is check if at least one byte isn't `0b00000000u8`.
+    #[inline]
     fn has_nulls(&self) -> bool {
         self.0.not_all()
     }
@@ -194,7 +262,7 @@ impl<'a> NullLayout<usize> for BitSliceNulls<'a> {
     /// Returns Some(true) if the element at `idx` is valid (non-null),
     /// Some(false) if the element at `idx` is null,
     /// or `None` if `idx` is out-of-bounds.
-    /// Implementors should handle bounds-checking.
+    #[inline]
     fn is_valid(&self, idx: usize) -> Option<bool> {
         // For the bitmap array, 1 is "valid", 0 is "null",
         self.0.get(idx).map(|b| *b)
@@ -202,11 +270,12 @@ impl<'a> NullLayout<usize> for BitSliceNulls<'a> {
     /// Returns Some(true) if the element at `idx` is null,
     /// Some(false) if the element at `idx` is valid (non-null),
     /// or `None` if `idx` is out-of-bounds.
-    /// Implementors should handle bounds-checking.
+    #[inline]
     fn is_null(&self, idx: usize) -> Option<bool> {
         self.0.get(idx).map(|b| !b)
     }
 
+    #[inline]
     fn count_nulls(&self) -> usize {
         self.0.count_zeros()
     }
@@ -217,20 +286,25 @@ impl<'a> SkippingNullLayout<usize> for BitSliceNulls<'a> {}
 pub struct BoolSliceNulls<'a>(pub &'a [bool]);
 
 impl<'a> NullLayout<usize> for BoolSliceNulls<'a> {
+    /// Returns true if this container has any nulls, checked at run-time.
+    /// # Performance
+    /// This implementation requires iterating over one boolean per
+    /// array entry, and so it has linear worst-case time complexity on the
+    /// container's length.
+    #[inline]
     fn has_nulls(&self) -> bool {
-        let mut has_null = false;
         for value in self.0 {
             if *value {
-                has_null = true;
+                return true;
             }
         }
-        has_null
+        false
     }
 
     /// Returns Some(true) if the element at `idx` is valid (non-null),
     /// Some(false) if the element at `idx` is null,
     /// or `None` if `idx` is out-of-bounds.
-    /// Implementors should handle bounds-checking.
+    #[inline]
     fn is_valid(&self, idx: usize) -> Option<bool> {
         // In a Postgres bool-slice implementation of a null layout,
         // 1 is "null", 0 is "valid"
@@ -245,7 +319,7 @@ impl<'a> NullLayout<usize> for BoolSliceNulls<'a> {
     /// Returns Some(true) if the element at `idx` is null,
     /// Some(false) if the element at `idx` is valid (non-null),
     /// or `None` if `idx` is out-of-bounds.
-    /// Implementors should handle bounds-checking.
+    #[inline]
     fn is_null(&self, idx: usize) -> Option<bool> {
         if idx < self.0.len() {
             Some(self.0[idx])
@@ -254,6 +328,7 @@ impl<'a> NullLayout<usize> for BoolSliceNulls<'a> {
         }
     }
 
+    #[inline]
     fn count_nulls(&self) -> usize {
         let mut count = 0;
         for elem in self.0 {
@@ -276,18 +351,22 @@ impl<'a> ContiguousNullLayout<usize> for BoolSliceNulls<'a> {}
 pub struct StrictNulls(pub usize);
 
 impl NullLayout<usize> for StrictNulls {
+    #[inline]
     fn has_nulls(&self) -> bool {
         false
     }
 
+    #[inline]
     fn is_valid(&self, idx: usize) -> Option<bool> {
         (idx < self.0).then_some(true)
     }
 
+    #[inline]
     fn is_null(&self, idx: usize) -> Option<bool> {
         (idx < self.0).then_some(false)
     }
 
+    #[inline]
     fn count_nulls(&self) -> usize {
         0
     }
@@ -305,15 +384,18 @@ impl<'mcx, Inner> MaybeStrictNulls<Inner>
 where
     Inner: NullLayout<usize>,
 {
+    #[inline]
     pub fn new(len: usize, inner: Option<Inner>) -> Self {
         Self { inner, len }
     }
+    #[inline]
     pub fn is_strict(&self) -> bool {
         match self.inner {
             Some(_) => false,
             None => true,
         }
     }
+    #[inline]
     pub fn get_inner(&self) -> Option<&Inner> {
         self.inner.as_ref()
     }
@@ -323,6 +405,7 @@ impl<'mcx, Inner> NullLayout<usize> for MaybeStrictNulls<Inner>
 where
     Inner: NullLayout<usize>,
 {
+    #[inline]
     fn has_nulls(&self) -> bool {
         match self.inner.as_ref() {
             Some(inner) => inner.has_nulls(),
@@ -330,6 +413,7 @@ where
         }
     }
 
+    #[inline]
     fn count_nulls(&self) -> usize {
         match self.inner.as_ref() {
             Some(inner) => inner.count_nulls(),
@@ -337,6 +421,7 @@ where
         }
     }
 
+    #[inline]
     fn is_valid(&self, idx: usize) -> Option<bool> {
         match self.inner.as_ref() {
             Some(inner) => inner.is_valid(idx),
@@ -344,6 +429,7 @@ where
         }
     }
 
+    #[inline]
     fn is_null(&self, idx: usize) -> Option<bool> {
         match self.inner.as_ref() {
             Some(inner) => inner.is_null(idx),
@@ -385,23 +471,29 @@ where
     type Item = Nullable<T>;
 
     fn next(&mut self) -> Option<Self::Item> {
-        let prev_idx = self.current_idx;
-
-        if prev_idx >= self.container.len() {
+        if self.current_idx >= self.container.len() {
             return None;
         }
 
-        self.current_idx = self.current_idx + 1;
-
-        match self.container.get_layout().is_valid(prev_idx) {
+        match self.container.get_layout().is_valid(self.current_idx) {
             Some(true) => {
-                let value = self.container.get_raw(prev_idx);
+                let value = self.container.get_raw(self.current_idx);
+                self.current_idx = self.current_idx + 1;
                 Some(Nullable::Valid(value))
             }
-            Some(false) => Some(Nullable::Null),
+            Some(false) => {
+                self.current_idx = self.current_idx + 1;
+                Some(Nullable::Null)
+            }
             // End of array (valid array will have a null layout length equal
             // to the array length)
-            None => None,
+            None => {
+                // So if it's repeatedly called after a None return, it will
+                // instead fail early at the bounds-check on the top of this
+                // method.
+                self.current_idx = self.current_idx + 1;
+                None
+            }
         }
     }
 }

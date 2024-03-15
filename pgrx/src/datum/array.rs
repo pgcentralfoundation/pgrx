@@ -370,8 +370,9 @@ where
 {
     type Item = Nullable<<T as unbox::UnboxDatum>::As<'mcx>>;
 
+    #[inline]
     fn next(&mut self) -> Option<Self::Item> {
-        self.inner.next().map(|v| Nullable::from(v))
+        self.inner.next().map(|v| v.into())
     }
 }
 
@@ -391,10 +392,12 @@ impl<'mcx, T: UnboxDatum> NullableContainer<'mcx, usize, <T as unbox::UnboxDatum
 {
     type Layout = MaybeStrictNulls<BitSliceNulls<'mcx>>;
 
+    #[inline]
     fn get_layout(&'mcx self) -> &'mcx Self::Layout {
         &self.null_slice
     }
 
+    #[inline]
     fn get_raw(&'mcx self, idx: usize) -> <T as unbox::UnboxDatum>::As<'_> {
         self.get_strict_inner(idx).expect(
             "get_raw() called with an invalid index, bounds-checking\
@@ -402,6 +405,7 @@ impl<'mcx, T: UnboxDatum> NullableContainer<'mcx, usize, <T as unbox::UnboxDatum
         )
     }
 
+    #[inline]
     fn len(&'mcx self) -> usize {
         self.len()
     }
