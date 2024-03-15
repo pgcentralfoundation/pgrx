@@ -3,6 +3,7 @@ use core::ffi;
 use paste::paste;
 use pgrx::prelude::*;
 use proptest::prelude::*;
+use TimeWithTimeZone as TimeTz;
 
 macro_rules! pg_proptest_datetime_roundtrip_tests {
     ($datetime_ty:ty, $nop_fn:ident, $prop_strat:expr) => {
@@ -91,7 +92,8 @@ mod tests {
 pg_proptest_datetime_types! {
     Date = prop::num::i32::ANY.prop_map(Date::saturating_from_raw);
     // 00:00..=24:00
-    Time = prop::num::i64::ANY.prop_map(|int| Time::try_from((int % 86400000).abs()).unwrap());
+    Time = prop::num::i64::ANY.prop_map(|int| Time::try_from(int.rem_euclid(86_400_000)).unwrap());
     Timestamp = prop::num::i64::ANY.prop_map(Timestamp::saturating_from_raw);
     // TimestampTz = prop::num::i64::ANY.prop_map(TimestampTz::from); // This doesn't exist, and that's a good thing.
+    TimeTz = (prop::num::i64::ANY, prop::num::i32::ANY).prop_map(|(time, tz)| TimeTz::try_from((time.rem_euclid(86_400_000), tz.rem_euclid(pg_sys::TZDISP_LIMIT as i32))).unwrap());
 }
