@@ -75,14 +75,14 @@ impl<T> Nullable<T> {
         }
     }
     #[inline]
-    pub fn as_option<'a>(&'a self) -> Option<&'a T> {
+    pub fn as_option(&self) -> Option<&T> {
         match self {
             Nullable::Valid(val) => Some(val),
             Nullable::Null => None,
         }
     }
     #[inline]
-    pub fn as_option_mut<'a>(&'a mut self) -> Option<&'a T> {
+    pub fn as_option_mut(&mut self) -> Option<&mut T> {
         match self {
             Nullable::Valid(val) => Some(val),
             Nullable::Null => None,
@@ -194,7 +194,7 @@ where
     /// container, it should complete very quickly, but for a
     /// null-boolean-array-style implementation, it could be O(n),
     /// where n is the length of the container.
-    fn has_nulls(&self) -> bool;
+    fn contains_nulls(&self) -> bool;
 
     fn count_nulls(&self) -> usize;
 
@@ -247,6 +247,12 @@ where
     fn len(&'mcx self) -> usize;
 }
 
+/// Bitmap of null slots on a container.
+/// For example, 00001001 would represent:
+/// \[valid, valid, valid, valid, null, valid, valid, null\]
+/// However, the underlying data buffer would be:
+/// \[valid, valid, valid, valid, valid, valid\]
+/// because of the skip behavior
 pub struct BitSliceNulls<'a>(pub &'a BitSlice<u8>);
 
 impl<'a> NullLayout<usize> for BitSliceNulls<'a> {
@@ -255,7 +261,7 @@ impl<'a> NullLayout<usize> for BitSliceNulls<'a> {
     /// This implementation should be very fast, since all it needs to do
     /// is check if at least one byte isn't `0b00000000u8`.
     #[inline]
-    fn has_nulls(&self) -> bool {
+    fn contains_nulls(&self) -> bool {
         self.0.not_all()
     }
 
@@ -292,7 +298,7 @@ impl<'a> NullLayout<usize> for BoolSliceNulls<'a> {
     /// array entry, and so it has linear worst-case time complexity on the
     /// container's length.
     #[inline]
-    fn has_nulls(&self) -> bool {
+    fn contains_nulls(&self) -> bool {
         for value in self.0 {
             if *value {
                 return true;
@@ -352,7 +358,7 @@ pub struct StrictNulls(pub usize);
 
 impl NullLayout<usize> for StrictNulls {
     #[inline]
-    fn has_nulls(&self) -> bool {
+    fn contains_nulls(&self) -> bool {
         false
     }
 
@@ -406,9 +412,9 @@ where
     Inner: NullLayout<usize>,
 {
     #[inline]
-    fn has_nulls(&self) -> bool {
+    fn contains_nulls(&self) -> bool {
         match self.inner.as_ref() {
-            Some(inner) => inner.has_nulls(),
+            Some(inner) => inner.contains_nulls(),
             None => false,
         }
     }

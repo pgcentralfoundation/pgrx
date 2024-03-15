@@ -159,7 +159,7 @@ impl<'mcx, T: UnboxDatum> Array<'mcx, T> {
     /// This function will panic when called if the array contains any SQL NULL values.
     #[inline]
     pub fn iter_deny_null(&self) -> ArrayTypedIterator<'_, T> {
-        if self.null_slice.has_nulls() {
+        if self.null_slice.contains_nulls() {
             panic!("array contains NULL");
         }
 
@@ -342,7 +342,7 @@ impl<T> Array<'_, T> {
     /// Returns `true` if this [`Array`] contains one or more SQL "NULL" values
     #[inline]
     pub fn contains_nulls(&self) -> bool {
-        self.null_slice.get_inner().is_some_and(|slice| slice.has_nulls())
+        self.null_slice.get_inner().is_some_and(|slice| slice.contains_nulls())
     }
 
     #[inline]
