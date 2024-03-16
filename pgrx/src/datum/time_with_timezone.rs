@@ -43,15 +43,14 @@ impl TryFrom<(pg_sys::TimeADT, i32)> for TimeWithTimeZone {
     type Error = DateTimeConversionError;
     #[inline]
     fn try_from(raw_vals: (pg_sys::TimeADT, i32)) -> Result<Self, Self::Error> {
-        let time = raw_vals.0.rem_euclid(86_400_000);
-        let zone = raw_vals.1.rem_euclid(pg_sys::TZDISP_LIMIT as i32);
+        let timetz = TimeWithTimeZone::modular_from_raw(raw_vals);
 
-        if time != raw_vals.0 {
+        if timetz.0.time != raw_vals.0 {
             Err(DateTimeConversionError::FieldOverflow)
-        } else if zone != raw_vals.1 {
+        } else if timetz.0.zone != raw_vals.1 {
             Err(DateTimeConversionError::InvalidTimezoneOffset(raw_vals.1))
         } else {
-            Ok(TimeWithTimeZone(pg_sys::TimeTzADT { time, zone }))
+            Ok(timetz)
         }
     }
 }
@@ -144,6 +143,13 @@ impl TimeWithTimeZone {
             )
             .unwrap()
         }
+    }
+
+    pub fn modular_from_raw(tuple: (i64, i32)) -> Self {
+        let time = tuple.0.rem_euclid(86_400_000);
+        let zone = tuple.1.rem_euclid(pg_sys::TZDISP_LIMIT as i32);
+
+        Self(pg_sys::TimeTzADT { time, zone })
     }
 
     /// Construct a new [`TimeWithTimeZone`] from its constituent parts at a specific time zone

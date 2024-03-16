@@ -157,6 +157,10 @@ impl Time {
         }
     }
 
+    pub fn modular_from_raw(time: i64) -> Self {
+        Self(time.rem_euclid(86_400_000))
+    }
+
     /// Return the `hour`
     pub fn hour(&self) -> u8 {
         self.extract_part(DateTimeParts::Hour).unwrap().try_into().unwrap()
