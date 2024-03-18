@@ -39,7 +39,7 @@ where
 
 impl<T> PartialEq for Nullable<T>
 where
-    T: Eq,
+    T: PartialEq,
 {
     #[inline]
     fn eq(&self, other: &Self) -> bool {
