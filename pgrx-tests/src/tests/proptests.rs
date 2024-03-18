@@ -5,6 +5,12 @@ use pgrx::prelude::*;
 use proptest::prelude::*;
 use TimeWithTimeZone as TimeTz;
 
+/// Generate the roundtrip property tests for a datetime type
+///
+/// This macro relies on the fact Postgres has a very regular naming format
+/// for serialization/deserialization functions for most types, always using
+/// - `type_in`
+/// - `type_out`
 macro_rules! pg_proptest_datetime_roundtrip_tests {
     ($datetime_ty:ty, $nop_fn:ident, $prop_strat:expr) => {
 
@@ -16,11 +22,12 @@ paste! {
 pub fn [<$datetime_ty:lower _spi_roundtrip>] () {
     // 2. Constructing the Postgres-adapted test runner
     let mut proptest = PgTestRunner::default();
-    // 3. A strategy to create and refining values, which is a somewhat aggrandized function.
+    // 3. A strategy to create and refine values, which is a somewhat aggrandized function.
     //    In some cases it actually can be replaced directly by a closure, or, in this case,
     //    it involves using a closure to `prop_map` an existing Strategy for producing
     //    "any kind of i32" into "any kind of in-range value for a Date".
     let strat = $prop_strat;
+    // 4. The runner invocation
     proptest
         .run(&strat, |datetime| {
             let query = concat!("SELECT ", stringify!($nop_fn), "($1)");
@@ -95,7 +102,6 @@ mod tests {
 
 pg_proptest_datetime_types! {
     Date = prop::num::i32::ANY.prop_map(Date::saturating_from_raw);
-    // 00:00..=24:00
     Time = prop::num::i64::ANY.prop_map(Time::modular_from_raw);
     Timestamp = prop::num::i64::ANY.prop_map(Timestamp::saturating_from_raw);
     // TimestampTz = prop::num::i64::ANY.prop_map(TimestampTz::from); // This doesn't exist, and that's a good thing.

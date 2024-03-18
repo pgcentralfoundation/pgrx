@@ -58,7 +58,7 @@ impl From<TimeWithTimeZone> for Time {
     }
 }
 
-/// TimeADT (i64) to Time conversion
+/// [`pg_sys::TimeADT`] (i64) to Time conversion
 ///
 /// It is incorrect to convert a raw i64 to Time, due to out-of-bounds values
 /// resulting in severe logic errors, including database crashes, if used.
