@@ -80,7 +80,7 @@ impl TryFrom<pg_sys::Timestamp> for Timestamp {
         const MIN_TIMESTAMP: pg_sys::Timestamp = -211_813_488_000_000_000;
         const END_TIMESTAMP: pg_sys::Timestamp = 9_223_371_331_200_000_000;
         //  #define IS_VALID_TIMESTAMP(t)  (MIN_TIMESTAMP <= (t) && (t) < END_TIMESTAMP)
-        const MAX_TIMESTAMP: pg_sys::Timestamp = TIMESTAMP_END - 1;
+        const MAX_TIMESTAMP: pg_sys::Timestamp = END_TIMESTAMP - 1;
         match ts {
             i64::MIN | i64::MAX | MIN_TIMESTAMP..=MAX_TIMESTAMP => Ok(Timestamp(ts)),
             _ => Err(ts),
