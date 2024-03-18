@@ -9,7 +9,9 @@ macro_rules! pg_proptest_datetime_roundtrip_tests {
     ($datetime_ty:ty, $nop_fn:ident, $prop_strat:expr) => {
 
 paste! {
-
+// A property test consists of
+// 1. Posing a hypothesis
+#[doc = concat!("A value of ", stringify!($datetime_ty), "should be able to be passed to Postgres and back.")]
 #[pg_test]
 pub fn [<$datetime_ty:lower _spi_roundtrip>] () {
     // 2. Constructing the Postgres-adapted test runner
@@ -34,6 +36,8 @@ pub fn [<$datetime_ty:lower _spi_roundtrip>] () {
         .unwrap();
 }
 
+
+#[doc = concat!("A value of ", stringify!($datetime_ty), "should be able to be serialized to text, passed to Postgres, and recovered.")]
 #[pg_test]
 pub fn [<$datetime_ty:lower _literal_spi_roundtrip>] () {
     let mut proptest = PgTestRunner::default();
