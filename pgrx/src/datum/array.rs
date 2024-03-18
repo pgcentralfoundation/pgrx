@@ -398,7 +398,7 @@ impl<'mcx, T: UnboxDatum> NullableContainer<'mcx, usize, <T as unbox::UnboxDatum
     }
 
     #[inline]
-    fn get_raw(&'mcx self, idx: usize) -> <T as unbox::UnboxDatum>::As<'_> {
+    unsafe fn get_raw(&'mcx self, idx: usize) -> <T as unbox::UnboxDatum>::As<'_> {
         self.get_strict_inner(idx).expect(
             "get_raw() called with an invalid index, bounds-checking\
             *should* occur before calling this method.",
