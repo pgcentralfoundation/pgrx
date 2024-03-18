@@ -239,7 +239,11 @@ where
     /// Get the Valid value from the underlying data index of `idx`,
     /// after figuring out bounds-checking and the correct raw idx
     /// for this element.
-    fn get_raw(&'mcx self, idx: Idx) -> T;
+    /// This means that it does not take nulls into account, in the sense of
+    /// what element "idx" refers to, so a skipping nullable container with
+    /// elements `\[Valid(foo), Null, Null, Valid(bar)\]` will return
+    /// `Valid(bar)` for `skipping.get_raw(1)`.
+    unsafe fn get_raw(&'mcx self, idx: Idx) -> T;
 
     /// Total array length - doesn't represent the length of the backing array
     /// (as in, the thing accessed by get_raw) but instead represents the
@@ -483,7 +487,12 @@ where
 
         match self.container.get_layout().is_valid(self.current_idx) {
             Some(true) => {
-                let value = self.container.get_raw(self.current_idx);
+                // SAFETY: Container::Layout has been marked 
+                // ContiguousNullLayout to indicate that the index in 
+                // `get_raw(i)` matches the index in the null layout.
+                let value = unsafe { 
+                    self.container.get_raw(self.current_idx) 
+                };
                 self.current_idx = self.current_idx + 1;
                 Some(Nullable::Valid(value))
             }
