@@ -24,18 +24,7 @@ use std::panic::{RefUnwindSafe, UnwindSafe};
 #[derive(Debug, Copy, Clone)]
 #[repr(transparent)]
 pub struct TimeWithTimeZone(pg_sys::TimeTzADT);
-
-/// Create a [`TimeWithTimeZone`] from a [`pg_sys::TimeTzADT`]
-///
-/// This impl currently allows creating a `TimeWithTimeZone` that cannot be constructed by SQL,
-/// such as at the time 37:42 in the time zone UTC+25:00, which may yield logic bugs if used.
-impl From<pg_sys::TimeTzADT> for TimeWithTimeZone {
-    #[inline]
-    fn from(value: pg_sys::TimeTzADT) -> Self {
-        TimeWithTimeZone(value)
-    }
-}
-
+const MICROSECONDS_PER_DAY: pg_sys::TimeADT = 86_400_000;
 impl From<TimeWithTimeZone> for pg_sys::TimeTzADT {
     #[inline]
     fn from(value: TimeWithTimeZone) -> Self {
@@ -50,10 +39,19 @@ impl From<TimeWithTimeZone> for (pg_sys::TimeADT, i32) {
     }
 }
 
-impl From<(pg_sys::TimeADT, i32)> for TimeWithTimeZone {
+impl TryFrom<(pg_sys::TimeADT, i32)> for TimeWithTimeZone {
+    type Error = DateTimeConversionError;
     #[inline]
-    fn from(value: (pg_sys::TimeADT, i32)) -> Self {
-        TimeWithTimeZone(pg_sys::TimeTzADT { time: value.0, zone: value.1 })
+    fn try_from(raw_vals: (pg_sys::TimeADT, i32)) -> Result<Self, Self::Error> {
+        let timetz = TimeWithTimeZone::modular_from_raw(raw_vals);
+
+        if timetz.0.time != raw_vals.0 {
+            Err(DateTimeConversionError::FieldOverflow)
+        } else if timetz.0.zone != raw_vals.1 {
+            Err(DateTimeConversionError::InvalidTimezoneOffset(raw_vals.1))
+        } else {
+            Ok(timetz)
+        }
     }
 }
 
@@ -147,6 +145,13 @@ impl TimeWithTimeZone {
         }
     }
 
+    pub fn modular_from_raw(tuple: (i64, i32)) -> Self {
+        let time = tuple.0.rem_euclid(MICROSECONDS_PER_DAY);
+        let zone = tuple.1.rem_euclid(pg_sys::TZDISP_LIMIT as i32);
+
+        Self(pg_sys::TimeTzADT { time, zone })
+    }
+
     /// Construct a new [`TimeWithTimeZone`] from its constituent parts at a specific time zone
     ///
     /// # Errors
@@ -204,6 +209,9 @@ impl TimeWithTimeZone {
             Err(DateTimeConversionError::InvalidFormat)
         })
         .catch_when(PgSqlErrorCode::ERRCODE_INVALID_PARAMETER_VALUE, |_| {
+            let tz_off = i32::try_from(timezone_offset.into_inner().time)
+                .map_err(|_| DateTimeConversionError::FieldOverflow)?;
+            let timezone_offset = tz_off.rem_euclid(pg_sys::TZDISP_LIMIT as i32);
             Err(DateTimeConversionError::InvalidTimezoneOffset(timezone_offset))
         })
         .execute()

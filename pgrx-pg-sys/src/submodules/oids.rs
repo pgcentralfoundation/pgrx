@@ -123,6 +123,7 @@ unsafe impl SqlTranslatable for Oid {
 // Actually implemented inside pgXX_oids.rs
 pub type PgBuiltInOids = BuiltinOid;
 
+#[derive(Debug, Clone, Copy)]
 pub enum NotBuiltinOid {
     /// the invalid OID
     Invalid,
