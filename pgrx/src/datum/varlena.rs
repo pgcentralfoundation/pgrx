@@ -9,7 +9,7 @@
 //LICENSE Use of this source code is governed by the MIT license that can be found in the LICENSE file.
 //! Wrapper for Postgres 'varlena' type, over Rust types of a fixed size (ie, `impl Copy`)
 use crate::{
-    pg_sys, rust_regtypein, set_varsize, set_varsize_short, vardata_any, varsize_any,
+    pg_sys, rust_regtypein, set_varsize_4b, set_varsize_short, vardata_any, varsize_any,
     varsize_any_exhdr, void_mut_ptr, FromDatum, IntoDatum, PgMemoryContexts, StringInfo,
 };
 use pgrx_sql_entity_graph::metadata::{
@@ -139,7 +139,7 @@ where
                 set_varsize_short(ptr, (size_of + pg_sys::VARHDRSZ_SHORT) as i32);
             } else {
                 // gotta use the full 4-byte header
-                set_varsize(ptr, (size_of + pg_sys::VARHDRSZ) as i32);
+                set_varsize_4b(ptr, (size_of + pg_sys::VARHDRSZ) as i32);
             }
         }
 
@@ -390,7 +390,7 @@ where
     let size = serialized.len();
     let varlena = serialized.into_char_ptr();
     unsafe {
-        set_varsize(varlena as *mut pg_sys::varlena, size as i32);
+        set_varsize_4b(varlena as *mut pg_sys::varlena, size as i32);
     }
 
     varlena as *const pg_sys::varlena
