@@ -232,6 +232,9 @@ impl<'mcx, T: UnboxDatum> Array<'mcx, T> {
     #[allow(clippy::option_option)]
     #[inline]
     pub fn get<'arr>(&'arr self, index: usize) -> Option<Option<T::As<'arr>>> {
+        if index >= self.len() {
+            return None;
+        }
         match self.null_slice.get_inner().map(|v| (v, v.is_null(index))) {
             // No null_slice, strict array.
             None => self.get_strict_inner(index).map(|elem| Some(elem)),
@@ -767,6 +770,10 @@ impl<'arr, T: UnboxDatum> Iterator for ArrayIterator<'arr, T> {
     #[inline]
     fn next(&mut self) -> Option<Self::Item> {
         let Self { array, curr, ptr } = self;
+
+        if *curr >= array.len() {
+            return None;
+        }
         let is_null = (match array.null_slice.get_inner().map(|slice| slice.is_null(*curr)) {
             // Null slice exists, use its logic for bounds-checking
             // and null status.
@@ -841,6 +848,10 @@ where
     #[inline]
     fn next(&mut self) -> Option<Self::Item> {
         let Self { array, curr, ptr } = self;
+
+        if *curr >= array.len() {
+            return None;
+        }
 
         let is_null = (match array.null_slice.get_inner().map(|slice| slice.is_null(*curr)) {
             // Null slice exists, use its logic for bounds-checking
