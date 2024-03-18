@@ -102,7 +102,7 @@ impl<'mcx, T: UnboxDatum> Array<'mcx, T> {
         let null_inner = raw
             .nulls_bitslice()
             .map(|nonnull| unsafe { nullable::BitSliceNulls(&*nonnull.as_ptr()) });
-        let null_slice = MaybeStrictNulls::new(raw.len(), null_inner);
+        let null_slice = MaybeStrictNulls::new(null_inner);
         // do a little two-step before jumping into the Cha-Cha Slide and figure out
         // which implementation is correct for the type of element in this Array.
         let slide_impl: ChaChaSlideImpl<T> = match elem_layout.pass {
