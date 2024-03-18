@@ -45,15 +45,18 @@ where
     fn eq(&self, other: &Self) -> bool {
         match (self, other) {
             (Self::Valid(l_value), Self::Valid(r_value)) => l_value == r_value,
-            _ => core::mem::discriminant(self) == core::mem::discriminant(other),
+            // In Postgres' model, null is not equal to null.
+            // https://postgresql.org/docs/current/functions-comparison.html
+            // As a result, Null equality is not reflexive, and so we cannot
+            // implement Eq on it.
+            _ => false,
         }
     }
 }
-impl<T> Eq for Nullable<T> where T: PartialEq + Eq {}
 
 impl<T> PartialOrd for Nullable<T>
 where
-    T: PartialOrd + PartialEq + Eq,
+    T: PartialOrd + PartialEq,
 {
     fn partial_cmp(&self, other: &Self) -> Option<std::cmp::Ordering> {
         match (self, other) {
