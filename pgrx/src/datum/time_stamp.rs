@@ -76,10 +76,13 @@ impl TryFrom<pg_sys::Timestamp> for Timestamp {
     type Error = pg_sys::Timestamp;
     #[inline]
     fn try_from(ts: pg_sys::Timestamp) -> Result<Self, Self::Error> {
+        // defined by Postgres, but bindgen doesn't evaluate them for some reason:
+        const MIN_TIMESTAMP: pg_sys::Timestamp = -211_813_488_000_000_000;
+        const END_TIMESTAMP: pg_sys::Timestamp = 9_223_371_331_200_000_000;
         //  #define IS_VALID_TIMESTAMP(t)  (MIN_TIMESTAMP <= (t) && (t) < END_TIMESTAMP)
-        const TS_MAX_INCLUSIVE: pg_sys::Timestamp = 9223371331200000000 - 1;
+        const MAX_TIMESTAMP: pg_sys::Timestamp = TIMESTAMP_END - 1;
         match ts {
-            i64::MIN | i64::MAX | -211813488000000000..=TS_MAX_INCLUSIVE => Ok(Timestamp(ts)),
+            i64::MIN | i64::MAX | MIN_TIMESTAMP..=MAX_TIMESTAMP => Ok(Timestamp(ts)),
             _ => Err(ts),
         }
     }
