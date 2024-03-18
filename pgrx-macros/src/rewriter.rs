@@ -128,6 +128,7 @@ fn foreign_item_fn(func: &ForeignItemFn, abi: &syn::Abi) -> syn::Result<proc_mac
     let return_type = func.sig.output.clone();
 
     Ok(quote! {
+        #[inline]
         #[track_caller]
         pub unsafe fn #func_name ( #arg_list_with_types ) #return_type {
             crate::ffi::pg_guard_ffi_boundary(move || {
