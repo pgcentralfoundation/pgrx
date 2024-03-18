@@ -24,6 +24,8 @@ use std::num::TryFromIntError;
 #[repr(transparent)]
 pub struct Time(pg_sys::TimeADT);
 
+const MICROSECONDS_PER_DAY: pg_sys::TimeADT = 86_400_000;
+
 impl From<Time> for pg_sys::TimeADT {
     #[inline]
     fn from(value: Time) -> Self {
@@ -65,9 +67,10 @@ impl TryFrom<pg_sys::TimeADT> for Time {
 
     #[inline]
     fn try_from(raw: pg_sys::TimeADT) -> Result<Self, Self::Error> {
+        const MORE_THAN_A_DAY: i64 = MICROSECONDS_PER_DAY + 1;
         match raw {
-            0..=86400000 => Ok(Time(raw)),
-            i64::MIN..=-1 | 86400001.. => Err(raw),
+            0..=MICROSECONDS_PER_DAY => Ok(Time(raw)),
+            i64::MIN..=-1 | MORE_THAN_A_DAY.. => Err(raw),
         }
     }
 }
@@ -158,7 +161,7 @@ impl Time {
     }
 
     pub fn modular_from_raw(time: i64) -> Self {
-        Self(time.rem_euclid(86_400_000))
+        Self(time.rem_euclid(MICROSECONDS_PER_DAY))
     }
 
     /// Return the `hour`
