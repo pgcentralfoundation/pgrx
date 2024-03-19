@@ -413,9 +413,14 @@ impl PgrxSql {
         })? {
             let step = &self.graph[step_id];
 
-            let sql = step.to_sql(self).map(|s| s + "\n")?;
-            full_sql.push_str(&sql);
+            let sql = step.to_sql(self)?;
+            full_sql.push_str(sql.trim_matches('\n'));
+
+            if !full_sql.is_empty() && !full_sql.ends_with("\n\n") {
+                full_sql.push_str("\n\n");
+            }
         }
+        let _ = full_sql.pop();
         Ok(full_sql)
     }
 
