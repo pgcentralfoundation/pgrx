@@ -335,7 +335,7 @@ pub unsafe fn heap_getattr(
 ///
 /// # Panics
 ///
-/// Will panic if `attnum` is less than zero
+/// Will panic if `attnum` is less than one
 #[inline(always)]
 unsafe fn fastgetattr(
     tup: *mut HeapTupleData,
