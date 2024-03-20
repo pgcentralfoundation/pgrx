@@ -4,6 +4,7 @@ use trybuild::TestCases;
 
 /// These are tests which are intended to always fail.
 #[test]
+#[cfg(not(feature = "cshim"))]
 fn compile_fail() {
     let t = TestCases::new();
     t.compile_fail("tests/compile-fail/*.rs");
