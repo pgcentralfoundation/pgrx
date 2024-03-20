@@ -214,20 +214,6 @@ where
     }
 }
 
-pub trait SkippingNullLayout<Idx>: NullLayout<Idx>
-where
-    Idx: PartialEq + PartialOrd,
-{
-}
-
-/// All non-skipping null layouts. Marker trait for nullable containers that
-/// are nonetheless safe to iterate over linearly.
-pub trait ContiguousNullLayout<Idx>: NullLayout<Idx>
-where
-    Idx: PartialEq + PartialOrd,
-{
-}
-
 pub trait NullableContainer<'mcx, Idx, T>
 where
     Idx: PartialEq + PartialOrd,
@@ -294,8 +280,6 @@ impl<'a> NullLayout<usize> for BitSliceNulls<'a> {
     }
 }
 
-impl<'a> SkippingNullLayout<usize> for BitSliceNulls<'a> {}
-
 pub struct BoolSliceNulls<'a>(pub &'a [bool]);
 
 impl<'a> NullLayout<usize> for BoolSliceNulls<'a> {
@@ -351,12 +335,6 @@ impl<'a> NullLayout<usize> for BoolSliceNulls<'a> {
     }
 }
 
-// Postgres arrays using a bool array to map which values are null and which
-// values are valid will always be contiguous - that is, the underlying data
-// buffer will actually be big enough to contain layout.len() slots of type T
-// (give or take padding)
-impl<'a> ContiguousNullLayout<usize> for BoolSliceNulls<'a> {}
-
 /// Strict i.e. no nulls.
 /// Useful for using nullable primitives on non-null structures,
 /// especially when this needs to be determined at runtime.
@@ -384,8 +362,6 @@ impl NullLayout<usize> for StrictNulls {
         0
     }
 }
-// No skipping when there are no nulls.
-impl ContiguousNullLayout<usize> for StrictNulls {}
 
 pub struct MaybeStrictNulls<Inner: NullLayout<usize>> {
     pub inner: Option<Inner>,
@@ -447,16 +423,6 @@ where
             None => Some(false),
         }
     }
-}
-
-impl<Inner> SkippingNullLayout<usize> for MaybeStrictNulls<Inner> where
-    Inner: SkippingNullLayout<usize>
-{
-}
-
-impl<Inner> ContiguousNullLayout<usize> for MaybeStrictNulls<Inner> where
-    Inner: ContiguousNullLayout<usize>
-{
 }
 
 /// IntoIterator-like trait for Nullable elements.
