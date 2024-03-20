@@ -145,14 +145,6 @@ impl<'mcx, T: UnboxDatum> Array<'mcx, T> {
         ArrayIterator { array: self, curr: 0, ptr }
     }
 
-    /// Return an iterator of `Nullable<T>`
-    /// Behavior is identical to ArrayIterator, but with `Nullable<T>`'s,
-    /// syntax, meaning `next()` returns `Option<Nullable<T>>`
-    /// instead of `Option<Option<T>>`.
-    pub fn iter_nullable(&self) -> NullableArrayIterator<'_, T> {
-        NullableArrayIterator { inner: self.iter() }
-    }
-
     /// Return an iterator over the Array's elements.
     ///
     /// # Panics
