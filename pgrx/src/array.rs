@@ -10,6 +10,7 @@
 #![allow(clippy::precedence)]
 #![allow(unused)]
 use crate::datum::{Array, BorrowDatum, Datum};
+use crate::nullable::Nullable;
 use crate::pgrx_sql_entity_graph::metadata::{
     ArgumentError, Returns, ReturnsError, SqlMapping, SqlTranslatable,
 };
@@ -37,22 +38,31 @@ impl<'mcx, T> FlatArray<'mcx, T>
 where
     T: ?Sized + BorrowDatum,
 {
+    /// Iterate the array
+    pub fn iter(&self) -> ArrayIter<'mcx, T> {
+        /* ArrayIter {
+
+        } */
+        todo!()
+    }
+
     /// Borrow the nth element.
     ///
-    /// `FlatArray::nth` may have to iterate the array, thus it is named for `Iterator::nth`.
-    pub fn nth(&self, index: usize) -> Option<&T> {
+    /// `FlatArray::nth` may have to iterate the array, thus it is named for `Iterator::nth`,
+    /// as opposed to a constant-time `get`.
+    pub fn nth(&self, index: usize) -> Option<Nullable<&T>> {
         // FIXME: consider nullability
         // FIXME: Become a dispatch to Iterator::nth
-        self.ptr_to(index).map(|ptr| unsafe { &*T::point_from(ptr.cast_mut()) })
+        todo!()
     }
 
     /// Mutably borrow the nth element.
     ///
     /// `FlatArray::nth_mut` may have to iterate the array, thus it is named for `Iterator::nth`.
-    pub fn nth_mut(&mut self, index: usize) -> Option<&mut T> {
+    pub fn nth_mut(&mut self, index: usize) -> Option<Nullable<&mut T>> {
         // FIXME: consider nullability
         // FIXME: Become a dispatch to Iterator::nth
-        self.ptr_mut_to(index).map(|ptr| unsafe { &mut *T::point_from(ptr) })
+        todo!()
     }
 
     // Obtain a pointer with read-only permissions to the type at this index
@@ -120,6 +130,39 @@ unsafe impl<T> BorrowDatum for FlatArray<'_, T> {
         unsafe {
             let len = varlena::varsize_any(ptr.cast()) - mem::size_of::<pg_sys::ArrayType>();
             ptr::slice_from_raw_parts_mut(ptr, len) as *mut Self
+        }
+    }
+}
+
+/// Iterator for arrays
+#[derive(Clone)]
+struct ArrayIter<'arr, T>
+where
+    T: ?Sized + BorrowDatum,
+{
+    arr: &'arr FlatArray<'arr, T>,
+    data: *const u8,
+    nulls: *const u8,
+}
+
+fn is_null(p: *const u8) -> bool {
+    todo!()
+}
+
+impl<'arr, T> Iterator for ArrayIter<'arr, T>
+where
+    T: BorrowDatum,
+{
+    type Item = Nullable<&'arr T>;
+
+    fn next(&mut self) -> Option<Nullable<&'arr T>> {
+        if is_null(self.nulls) {
+            Some(Nullable::Null)
+        } else {
+            unsafe {
+                let ptr = <T as BorrowDatum>::point_from(self.data.cast_mut());
+                Some(Nullable::Valid(&*ptr))
+            }
         }
     }
 }
