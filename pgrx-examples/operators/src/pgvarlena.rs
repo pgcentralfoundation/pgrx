@@ -88,7 +88,7 @@ impl PgVarlenaInOutFuncs for PgVarlenaThing {
     }
 
     fn output(&self, buffer: &mut StringInfo) {
-        buffer.write_fmt(format_args!("{}", self)).unwrap()
+        write!(buffer, "{self}").unwrap()
     }
 }
 

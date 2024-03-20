@@ -387,7 +387,7 @@ pub enum PgSqlErrorCode {
 
 impl Display for PgSqlErrorCode {
     fn fmt(&self, f: &mut Formatter<'_>) -> std::fmt::Result {
-        f.write_str(&format!("{:?}", self))
+        write!(f, "{self:?}")
     }
 }
 
