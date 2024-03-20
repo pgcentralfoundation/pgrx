@@ -74,14 +74,14 @@ where
     /// Number of elements in the Array
     ///
     /// Note that for many Arrays, this doesn't have a linear relationship with array byte-len.
-    fn len(&self) -> usize {
+    pub fn count(&self) -> usize {
         let ndims = self.head.ndim as usize;
         let dims_ptr = unsafe { port::ARR_DIMS(ptr::addr_of!(self.head).cast_mut()) };
         unsafe { slice::from_raw_parts(dims_ptr, ndims).into_iter().sum::<i32>() as usize }
     }
 
     pub fn nulls(&self) -> Option<&[u8]> {
-        let len = self.len() + 7 >> 3; // Obtains 0 if len was 0.
+        let len = self.count() + 7 >> 3; // Obtains 0 if len was 0.
 
         // SAFETY: This obtains the nulls pointer from a function that must either
         // return a null pointer or a pointer to a valid null bitmap.
@@ -103,7 +103,7 @@ where
     [ARR_NULLBITMAP]: <https://git.postgresql.org/gitweb/?p=postgresql.git;a=blob;f=src/include/utils/array.h;h=4ae6c3be2f8b57afa38c19af2779f67c782e4efc;hb=278273ccbad27a8834dfdf11895da9cd91de4114#l293>
     */
     pub unsafe fn nulls_mut(&mut self) -> Option<&mut [u8]> {
-        let len = self.len() + 7 >> 3; // Obtains 0 if len was 0.
+        let len = self.count() + 7 >> 3; // Obtains 0 if len was 0.
 
         // SAFETY: This obtains the nulls pointer from a function that must either
         // return a null pointer or a pointer to a valid null bitmap.
