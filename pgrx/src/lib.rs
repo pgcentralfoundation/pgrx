@@ -68,6 +68,7 @@ pub mod misc;
 #[cfg(feature = "cshim")]
 pub mod namespace;
 pub mod nodes;
+pub mod nullable;
 pub mod pg_catalog;
 pub mod pgbox;
 pub mod rel;

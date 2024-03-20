@@ -8,12 +8,14 @@
 //LICENSE
 //LICENSE Use of this source code is governed by the MIT license that can be found in the LICENSE file.
 #![allow(clippy::question_mark)]
-use super::UnboxDatum;
+use super::{unbox, UnboxDatum};
 use crate::array::RawArray;
-use crate::layout::*;
+use crate::nullable::{
+    BitSliceNulls, IntoNullableIterator, MaybeStrictNulls, NullLayout, Nullable, NullableContainer,
+};
 use crate::toast::Toast;
+use crate::{layout::*, nullable};
 use crate::{pg_sys, FromDatum, IntoDatum, PgMemoryContexts};
-use bitvec::slice::BitSlice;
 use core::fmt::{Debug, Formatter};
 use core::ops::DerefMut;
 use core::ptr::NonNull;
@@ -59,7 +61,7 @@ fn with_vec(elems: Array<String>) {
 // An array is a detoasted varlena type, so we reason about the lifetime of
 // the memory context that the varlena is actually detoasted into.
 pub struct Array<'mcx, T> {
-    null_slice: NullKind<'mcx>,
+    null_slice: MaybeStrictNulls<BitSliceNulls<'mcx>>,
     slide_impl: ChaChaSlideImpl<T>,
     // Rust drops in FIFO order, drop this last
     raw: Toast<RawArray>,
@@ -75,31 +77,6 @@ where
 }
 
 type ChaChaSlideImpl<T> = Box<dyn casper::ChaChaSlide<T>>;
-
-enum NullKind<'a> {
-    Bits(&'a BitSlice<u8>),
-    Strict(usize),
-}
-
-impl NullKind<'_> {
-    fn get(&self, index: usize) -> Option<bool> {
-        match self {
-            // Note this flips the bit:
-            // Postgres nullbitmaps are 1 for "valid" and 0 for "null"
-            Self::Bits(b1) => b1.get(index).map(|b| !b),
-            Self::Strict(len) => index.lt(len).then_some(false),
-        }
-    }
-
-    fn any(&self) -> bool {
-        match self {
-            // Note the reversed polarity:
-            // Postgres nullbitmaps are 1 for "valid" and 0 for "null"
-            Self::Bits(b1) => !b1.all(),
-            Self::Strict(_) => false,
-        }
-    }
-}
 
 impl<'mcx, T: UnboxDatum> serde::Serialize for Array<'mcx, T>
 where
@@ -122,12 +99,10 @@ impl<'mcx, T: UnboxDatum> Array<'mcx, T> {
     unsafe fn deconstruct_from(mut raw: Toast<RawArray>) -> Array<'mcx, T> {
         let oid = raw.oid();
         let elem_layout = Layout::lookup_oid(oid);
-        let nelems = raw.len();
-        let null_slice = raw
+        let null_inner = raw
             .nulls_bitslice()
-            .map(|nonnull| NullKind::Bits(unsafe { &*nonnull.as_ptr() }))
-            .unwrap_or(NullKind::Strict(nelems));
-
+            .map(|nonnull| unsafe { nullable::BitSliceNulls(&*nonnull.as_ptr()) });
+        let null_slice = MaybeStrictNulls::new(null_inner);
         // do a little two-step before jumping into the Cha-Cha Slide and figure out
         // which implementation is correct for the type of element in this Array.
         let slide_impl: ChaChaSlideImpl<T> = match elem_layout.pass {
@@ -176,7 +151,7 @@ impl<'mcx, T: UnboxDatum> Array<'mcx, T> {
     /// This function will panic when called if the array contains any SQL NULL values.
     #[inline]
     pub fn iter_deny_null(&self) -> ArrayTypedIterator<'_, T> {
-        if self.null_slice.any() {
+        if self.null_slice.contains_nulls() {
             panic!("array contains NULL");
         }
 
@@ -184,14 +159,39 @@ impl<'mcx, T: UnboxDatum> Array<'mcx, T> {
         ArrayTypedIterator { array: self, curr: 0, ptr }
     }
 
-    #[allow(clippy::option_option)]
-    #[inline]
-    pub fn get<'arr>(&'arr self, index: usize) -> Option<Option<T::As<'arr>>> {
-        let Some(is_null) = self.null_slice.get(index) else { return None };
-        if is_null {
-            return Some(None);
+    /// Retrieve a value from a known-not-null (strict) array.
+    fn get_strict_inner<'arr>(&'arr self, index: usize) -> Option<T::As<'arr>> {
+        if index >= self.raw.len() {
+            return None;
+        };
+
+        // This pointer is what's walked over the entire array's data buffer.
+        // If the array has varlena or cstr elements, we can't index into the array.
+        // If the elements are fixed size, we could, but we do not exploit that optimization yet
+        // as it would significantly complicate the code and impact debugging it.
+        // Such improvements should wait until a later version.
+        //
+        // This remains true even in a strict array, because, again,
+        // varlena and cstr are variable-length.
+        let mut at_byte = self.raw.data_ptr();
+        for _i in 0..index {
+            // SAFETY: Note this entire function has to be correct,
+            // not just this one call, for this to be correct!
+            at_byte = unsafe { self.one_hop_this_time(at_byte) };
         }
 
+        // If this has gotten this far, it is known to be non-null,
+        // all the null values in the array up to this index were skipped,
+        // and the only offsets were via our hopping function.
+        Some(unsafe { self.bring_it_back_now(at_byte, false).expect("Null value in Strict array") })
+    }
+
+    /// Retrieve a value from a known-nullable (not strict) array.
+    fn get_nullable_inner<'arr>(
+        &'arr self,
+        nulls: &'arr BitSliceNulls,
+        index: usize,
+    ) -> Option<Option<T::As<'arr>>> {
         // This assertion should only fail if null_slice is longer than the
         // actual array,thanks to the check above.
         debug_assert!(index < self.raw.len());
@@ -203,7 +203,7 @@ impl<'mcx, T: UnboxDatum> Array<'mcx, T> {
         // Such improvements should wait until a later version (today's: 0.7.4, preparing 0.8.0).
         let mut at_byte = self.raw.data_ptr();
         for i in 0..index {
-            match self.null_slice.get(i) {
+            match nulls.is_null(i) {
                 None => unreachable!("array was exceeded while walking to known non-null index???"),
                 // Skip nulls: the data buffer has no placeholders for them!
                 Some(true) => continue,
@@ -219,6 +219,24 @@ impl<'mcx, T: UnboxDatum> Array<'mcx, T> {
         // all the null values in the array up to this index were skipped,
         // and the only offsets were via our hopping function.
         Some(unsafe { self.bring_it_back_now(at_byte, false) })
+    }
+
+    #[allow(clippy::option_option)]
+    #[inline]
+    pub fn get<'arr>(&'arr self, index: usize) -> Option<Option<T::As<'arr>>> {
+        if index >= self.len() {
+            return None;
+        }
+        match self.null_slice.get_inner().map(|v| (v, v.is_null(index))) {
+            // No null_slice, strict array.
+            None => self.get_strict_inner(index).map(|elem| Some(elem)),
+            // self.null_slice exists but index is not in bounds.
+            Some((_, None)) => return None,
+            // Elem is null
+            Some((_, Some(true))) => return Some(None),
+            // Elem is not null.
+            Some((nulls, Some(false))) => self.get_nullable_inner(nulls, index),
+        }
     }
 
     /// Extracts an element from a Postgres Array's data buffer
@@ -319,7 +337,7 @@ impl<T> Array<'_, T> {
     /// Returns `true` if this [`Array`] contains one or more SQL "NULL" values
     #[inline]
     pub fn contains_nulls(&self) -> bool {
-        self.null_slice.any()
+        self.null_slice.get_inner().is_some_and(|slice| slice.contains_nulls())
     }
 
     #[inline]
@@ -330,6 +348,61 @@ impl<T> Array<'_, T> {
     #[inline]
     pub fn is_empty(&self) -> bool {
         self.raw.len() == 0
+    }
+}
+
+/// Adapter to use `Nullable<T>` for array iteration.
+pub struct NullableArrayIterator<'mcx, T>
+where
+    T: UnboxDatum,
+{
+    inner: ArrayIterator<'mcx, T>,
+}
+
+impl<'mcx, T> Iterator for NullableArrayIterator<'mcx, T>
+where
+    T: UnboxDatum,
+{
+    type Item = Nullable<<T as unbox::UnboxDatum>::As<'mcx>>;
+
+    #[inline]
+    fn next(&mut self) -> Option<Self::Item> {
+        self.inner.next().map(|v| v.into())
+    }
+}
+
+impl<'mcx, T> IntoNullableIterator<<T as unbox::UnboxDatum>::As<'mcx>> for &'mcx Array<'mcx, T>
+where
+    T: UnboxDatum,
+{
+    type Iter = NullableArrayIterator<'mcx, T>;
+
+    fn into_nullable_iter(self) -> Self::Iter {
+        NullableArrayIterator { inner: self.iter() }
+    }
+}
+
+impl<'mcx, T: UnboxDatum> NullableContainer<'mcx, usize, <T as unbox::UnboxDatum>::As<'mcx>>
+    for Array<'mcx, T>
+{
+    type Layout = MaybeStrictNulls<BitSliceNulls<'mcx>>;
+
+    #[inline]
+    fn get_layout(&'mcx self) -> &'mcx Self::Layout {
+        &self.null_slice
+    }
+
+    #[inline]
+    unsafe fn get_raw(&'mcx self, idx: usize) -> <T as unbox::UnboxDatum>::As<'_> {
+        self.get_strict_inner(idx).expect(
+            "get_raw() called with an invalid index, bounds-checking\
+            *should* occur before calling this method.",
+        )
+    }
+
+    #[inline]
+    fn len(&'mcx self) -> usize {
+        self.len()
     }
 }
 
@@ -689,7 +762,18 @@ impl<'arr, T: UnboxDatum> Iterator for ArrayIterator<'arr, T> {
     #[inline]
     fn next(&mut self) -> Option<Self::Item> {
         let Self { array, curr, ptr } = self;
-        let Some(is_null) = array.null_slice.get(*curr) else { return None };
+
+        if *curr >= array.len() {
+            return None;
+        }
+        let is_null = (match array.null_slice.get_inner().map(|slice| slice.is_null(*curr)) {
+            // Null slice exists, use its logic for bounds-checking
+            // and null status.
+            Some(elem) => elem,
+            // Strict array, no nulls.
+            // Bounds-checking behavior is still needed though.
+            None => (*curr < array.len()).then_some(false),
+        })?;
         *curr += 1;
 
         let element = unsafe { array.bring_it_back_now(*ptr, is_null) };
@@ -756,7 +840,20 @@ where
     #[inline]
     fn next(&mut self) -> Option<Self::Item> {
         let Self { array, curr, ptr } = self;
-        let Some(is_null) = array.null_slice.get(*curr) else { return None };
+
+        if *curr >= array.len() {
+            return None;
+        }
+
+        let is_null = (match array.null_slice.get_inner().map(|slice| slice.is_null(*curr)) {
+            // Null slice exists, use its logic for bounds-checking
+            // and null status.
+            Some(elem) => elem,
+            // Strict array, no nulls.
+            // Bounds-checking behavior is still needed though.
+            None => (*curr < array.len()).then_some(false),
+        })?;
+
         *curr += 1;
         debug_assert!(array.is_within_bounds(*ptr));
         let element = unsafe { array.bring_it_back_now(*ptr, is_null) };
