@@ -154,21 +154,21 @@ impl<T> Nullable<T> {
     }
 }
 
-impl<T> Into<Option<T>> for Nullable<T> {
+impl<T> From<Option<T>> for Nullable<T> {
     #[inline]
-    fn into(self) -> Option<T> {
-        match self {
-            Nullable::Valid(val) => Some(val),
-            Nullable::Null => None,
+    fn from(opt: Option<T>) -> Nullable<T> {
+        match opt {
+            Some(val) => Nullable::Valid(val),
+            None => Nullable::Null,
         }
     }
 }
-impl<T> Into<Nullable<T>> for Option<T> {
+impl<T> From<Nullable<T>> for Option<T> {
     #[inline]
-    fn into(self) -> Nullable<T> {
-        match self {
-            Some(val) => Nullable::Valid(val),
-            None => Nullable::Null,
+    fn from(nullable: Nullable<T>) -> Option<T> {
+        match nullable {
+            Nullable::Valid(val) => Some(val),
+            Nullable::Null => None,
         }
     }
 }
