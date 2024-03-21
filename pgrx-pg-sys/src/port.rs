@@ -1,7 +1,6 @@
 use crate as pg_sys;
-
-use memoffset::*;
-use std::str::FromStr;
+use core::mem::offset_of;
+use core::str::FromStr;
 
 /// this comes from `postgres_ext.h`
 pub const InvalidOid: crate::Oid = crate::Oid::INVALID;
