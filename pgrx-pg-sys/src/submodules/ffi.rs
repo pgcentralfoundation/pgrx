@@ -9,6 +9,8 @@
 //LICENSE Use of this source code is governed by the MIT license that can be found in the LICENSE file.
 #![deny(unsafe_op_in_unsafe_fn)]
 
+use cee_scape::SigJmpBufFields;
+
 /**
 Given a closure that is assumed to be a wrapped Postgres `extern "C"` function, [pg_guard_ffi_boundary]
 works with the Postgres and C runtimes to create a "barrier" that allows Rust to catch Postgres errors
@@ -86,6 +88,7 @@ being converted into a transaction-aborting Postgres `ERROR` by PGRX.
 use crate as pg_sys;
 use crate::panic::{CaughtError, ErrorReport, ErrorReportLocation, ErrorReportWithLevel};
 use core::ffi::CStr;
+use std::mem::MaybeUninit;
 
 #[inline(always)]
 #[track_caller]
@@ -109,23 +112,27 @@ unsafe fn pg_guard_ffi_boundary_impl<T, F: FnOnce() -> T>(f: F) -> T {
         let caller_memxct = pg_sys::CurrentMemoryContext;
         let prev_exception_stack = pg_sys::PG_exception_stack;
         let prev_error_context_stack = pg_sys::error_context_stack;
-        let mut jump_buffer = std::mem::MaybeUninit::uninit();
-        let jump_value = crate::sigsetjmp(jump_buffer.as_mut_ptr(), 0);
-
-        if jump_value == 0 {
-            // first time through, not as the result of a longjmp
-            pg_sys::PG_exception_stack = jump_buffer.as_mut_ptr();
+        let mut result: std::mem::MaybeUninit<T> = MaybeUninit::uninit();
+        let jump_value = cee_scape::call_with_sigsetjmp(false, |jump_buffer| {
+            // Make Postgres' error-handling system aware of our new
+            // setjmp/longjmp restore point.
+            pg_sys::PG_exception_stack = std::mem::transmute(jump_buffer as *const SigJmpBufFields);
 
             // execute the closure, which will be a wrapped internal Postgres function
-            let result = f();
+            result.write(f());
+            0
+        });
 
-            // restore Postgres' understanding of where its next longjmp should go
+        if jump_value == 0 {
+            // Flag is 0, so we've taken the successful return path. We're not
+            // here as the result of a longjmp.
+            // Restore Postgres' understanding of where its next longjmp should go
             pg_sys::PG_exception_stack = prev_exception_stack;
             pg_sys::error_context_stack = prev_error_context_stack;
 
-            result
+            result.assume_init()
         } else {
-            // we're back here b/c of a longjmp originating in Postgres
+            // We've landed here b/c of a longjmp originating in Postgres
 
             // the overhead to get the current [ErrorData] from Postgres and convert
             // it into our [ErrorReportWithLevel] seems worth the user benefit
