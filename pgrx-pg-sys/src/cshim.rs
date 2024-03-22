@@ -26,6 +26,8 @@ extern "C" {
     pub fn SpinLockRelease(lock: *mut pg_sys::slock_t);
     #[link_name = "pgrx_SpinLockFree"]
     pub fn SpinLockFree(lock: *mut pg_sys::slock_t) -> bool;
+    #[link_name = "pgrx_PageGetSpecialPointer"]
+    pub fn PageGetSpecialPointer(page: pg_sys::Page) -> *mut i8;
 }
 
 /// ```c

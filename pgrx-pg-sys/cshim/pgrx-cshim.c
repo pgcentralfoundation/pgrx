@@ -18,6 +18,7 @@
 #include "nodes/pg_list.h"
 #include "parser/parsetree.h"
 #include "storage/spin.h"
+#include "storage/bufpage.h"
 
 PGDLLEXPORT RangeTblEntry *pgrx_planner_rt_fetch(Index index, PlannerInfo *plannerInfo);
 RangeTblEntry *pgrx_planner_rt_fetch(Index index, PlannerInfo *root) {
@@ -62,4 +63,9 @@ void pgrx_SpinLockRelease(volatile slock_t *lock) {
 PGDLLEXPORT bool pgrx_SpinLockFree(slock_t *lock);
 bool pgrx_SpinLockFree(slock_t *lock) {
     return SpinLockFree(lock);
+}
+
+PGDLLEXPORT char * pgrx_PageGetSpecialPointer(Page page);
+char * pgrx_PageGetSpecialPointer(Page page) {
+    return PageGetSpecialPointer(page);
 }
