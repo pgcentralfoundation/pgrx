@@ -46,7 +46,9 @@ jobs:
           echo "$HOME/.local/bin" >> $GITHUB_PATH
           mkdir -p /home/runner/.cache/sccache
           echo ""
-          
+
+          ./ci/rustup.sh
+
           # https://stackoverflow.com/questions/57968497/how-do-i-set-an-env-var-with-a-bash-expression-in-github-actions/57969570#57969570
           
           echo "----- Set up MAKEFLAGS -----"
