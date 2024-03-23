@@ -1,5 +1,5 @@
 echo "---- setup rustc ----"
-# setting default to a release channel syncs to that
+rustup update stable
 rustup default stable
 
 # only needed for cross-compile tests but we want consistent rust configuration
