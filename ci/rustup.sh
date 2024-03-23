@@ -7,4 +7,4 @@ rustup target add aarch64-unknown-linux-gnu
 
 # output full rustc version data
 rustc --version --verbose
-# that this determines what our cargo version is, so don't ask
+# this determines what our cargo version is, so don't ask
