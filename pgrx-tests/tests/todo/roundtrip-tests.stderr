@@ -55,7 +55,11 @@ error[E0277]: the trait bound `Vec<Option<&[u8]>>: FromDatum` is not satisfied
   --> tests/todo/roundtrip-tests.rs:36:38
    |
 36 |                   let result: $rtype = Spi::get_one_with_args(
-   |                                        ^^^^^^^^^^^^^^^^^^^^^^ the trait `FromDatum` is not implemented for `Vec<Option<&[u8]>>`
+   |  ______________________________________^
+37 | |                     &format!("SELECT {}($1)", stringify!(tests.$fname)),
+38 | |                     vec![(PgOid::from(<$rtype>::type_oid()), value.into_datum())],
+39 | |                 )?
+   | |_________________^ the trait `FromDatum` is not implemented for `Vec<Option<&[u8]>>`
 ...
 52 | /     roundtrip!(
 53 | |         rt_array_bytea,
@@ -97,7 +101,11 @@ error[E0277]: the trait bound `Vec<Option<&str>>: FromDatum` is not satisfied
   --> tests/todo/roundtrip-tests.rs:36:38
    |
 36 |                   let result: $rtype = Spi::get_one_with_args(
-   |                                        ^^^^^^^^^^^^^^^^^^^^^^ the trait `FromDatum` is not implemented for `Vec<Option<&str>>`
+   |  ______________________________________^
+37 | |                     &format!("SELECT {}($1)", stringify!(tests.$fname)),
+38 | |                     vec![(PgOid::from(<$rtype>::type_oid()), value.into_datum())],
+39 | |                 )?
+   | |_________________^ the trait `FromDatum` is not implemented for `Vec<Option<&str>>`
 ...
 66 | /     roundtrip!(
 67 | |         rt_array_refstr,
@@ -138,7 +146,11 @@ error[E0277]: the trait bound `Vec<Option<&CStr>>: FromDatum` is not satisfied
   --> tests/todo/roundtrip-tests.rs:36:38
    |
 36 |                   let result: $rtype = Spi::get_one_with_args(
-   |                                        ^^^^^^^^^^^^^^^^^^^^^^ the trait `FromDatum` is not implemented for `Vec<Option<&CStr>>`
+   |  ______________________________________^
+37 | |                     &format!("SELECT {}($1)", stringify!(tests.$fname)),
+38 | |                     vec![(PgOid::from(<$rtype>::type_oid()), value.into_datum())],
+39 | |                 )?
+   | |_________________^ the trait `FromDatum` is not implemented for `Vec<Option<&CStr>>`
 ...
 73 | /     roundtrip!(
 74 | |         rt_array_cstr,
