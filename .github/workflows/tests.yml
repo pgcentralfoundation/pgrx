@@ -46,16 +46,14 @@ jobs:
           echo "$HOME/.local/bin" >> $GITHUB_PATH
           mkdir -p /home/runner/.cache/sccache
           echo ""
-          
+
+          ./ci/rustup.sh
+
           # https://stackoverflow.com/questions/57968497/how-do-i-set-an-env-var-with-a-bash-expression-in-github-actions/57969570#57969570
           
           echo "----- Set up MAKEFLAGS -----"
           echo "MAKEFLAGS=$MAKEFLAGS -j $(grep -c ^processor /proc/cpuinfo)" >> $GITHUB_ENV
           cat $GITHUB_ENV
-          echo ""
-          
-          echo "----- Output Cargo version -----"
-          cargo --version
           echo ""
           
           echo "----- Outputting env -----"
@@ -157,10 +155,11 @@ jobs:
             strace \
             zlib1g-dev
           echo ""
-          
+
+          ./ci/rustup.sh
+
           echo "----- Set up cross compilation -----"
           sudo apt-get install -y --fix-missing crossbuild-essential-arm64
-          rustup target add aarch64-unknown-linux-gnu
           
           echo 'CARGO_TARGET_AARCH64_UNKNOWN_LINUX_GNU_LINKER=aarch64-linux-gnu-gcc' >> $GITHUB_ENV
           # TODO: not all of these should be needed, but for now it's likely fine.
@@ -170,10 +169,6 @@ jobs:
           env
           echo ""
           
-          echo "----- Get cargo version -----"
-          cargo --version
-          echo ""
-
       - name: Install release version of PostgreSQL
         run: |
           echo "----- Set up PostgreSQL Apt repository -----"
@@ -410,11 +405,9 @@ jobs:
             strace \
             zlib1g-dev
           echo ""
-          
-          echo "----- Output Cargo version -----"
-          cargo --version
-          echo ""
-          
+
+          ./ci/rustup.sh
+
           echo "----- Outputting env -----"
           env
           echo ""
@@ -540,14 +533,9 @@ jobs:
           sudo chmod a+rwx `$(which pg_config) --pkglibdir` `$(which pg_config) --sharedir`/extension
           # ls -lath `$(which pg_config) --pkglibdir` `$(which pg_config) --sharedir`/extension
           echo ""
-          
-          echo "----- Stable Rust ----"
-          rustup update stable
-          rustup default stable
-          rustc -vV
-          cargo -vV
-          echo ""
-          
+
+          ./ci/rustup.sh
+
           echo "----- Outputting env -----"
           env
           echo ""
