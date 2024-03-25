@@ -37,6 +37,8 @@ extern "C" {
         allow_strat: bool,
         allow_sync: bool,
     ) -> pg_sys::TableScanDesc;
+    #[link_name = "pgrx_table_endscan"]
+    pub fn table_endscan(scan: pg_sys::TableScanDesc);
 }
 
 /// ```c

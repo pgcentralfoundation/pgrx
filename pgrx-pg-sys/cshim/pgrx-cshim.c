@@ -75,3 +75,8 @@ PGDLLEXPORT TableScanDesc pgrx_table_beginscan_strat(Relation relation, Snapshot
 TableScanDesc pgrx_table_beginscan_strat(Relation relation, Snapshot snapshot, int nkeys, struct ScanKeyData * key, bool allow_strat, bool allow_sync) {
     return table_beginscan_strat(relation, snapshot, nkeys, key, allow_strat, allow_sync);
 }
+
+PGDLLEXPORT void pgrx_table_endscan(TableScanDesc scan);
+void pgrx_table_endscan(TableScanDesc scan) {
+    table_endscan(scan);
+}
