@@ -15,6 +15,7 @@
 #define IS_PG_13 (PG_VERSION_NUM >= 130000 && PG_VERSION_NUM < 140000)
 
 #include "access/tableam.h"
+#include "executor/executor.h"
 #include "nodes/pathnodes.h"
 #include "nodes/pg_list.h"
 #include "parser/parsetree.h"
@@ -79,4 +80,9 @@ TableScanDesc pgrx_table_beginscan_strat(Relation relation, Snapshot snapshot, i
 PGDLLEXPORT void pgrx_table_endscan(TableScanDesc scan);
 void pgrx_table_endscan(TableScanDesc scan) {
     return table_endscan(scan);
+}
+
+PGDLLEXPORT bool pgrx_ExecQual(ExprState * state, ExprContext * econtext);
+bool pgrx_ExecQual(ExprState * state, ExprContext * econtext) {
+    return ExecQual(state, econtext);
 }

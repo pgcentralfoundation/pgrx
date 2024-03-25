@@ -39,6 +39,11 @@ extern "C" {
     ) -> pg_sys::TableScanDesc;
     #[link_name = "pgrx_table_endscan"]
     pub fn table_endscan(scan: pg_sys::TableScanDesc);
+    #[link_name = "pgrx_ExecQual"]
+    pub fn ExecQual(
+        state: *mut pg_sys::ExprState,
+        econtext: *mut pg_sys::EState,
+    ) -> bool;
 }
 
 /// ```c
