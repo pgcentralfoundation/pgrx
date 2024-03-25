@@ -42,7 +42,7 @@ extern "C" {
     #[link_name = "pgrx_ExecQual"]
     pub fn ExecQual(
         state: *mut pg_sys::ExprState,
-        econtext: *mut pg_sys::EState,
+        econtext: *mut pg_sys::ExprContext,
     ) -> bool;
 }
 
