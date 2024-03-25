@@ -78,5 +78,5 @@ TableScanDesc pgrx_table_beginscan_strat(Relation relation, Snapshot snapshot, i
 
 PGDLLEXPORT void pgrx_table_endscan(TableScanDesc scan);
 void pgrx_table_endscan(TableScanDesc scan) {
-    table_endscan(scan);
+    return table_endscan(scan);
 }
