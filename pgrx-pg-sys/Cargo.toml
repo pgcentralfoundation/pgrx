@@ -47,6 +47,9 @@ serde = { version = "1.0", features = [ "derive" ] } # impls on pub types
 # polyfill until #![feature(strict_provenance)] stabilizes
 sptr = "0.3"
 
+# Safer `sigsetjmp` and `siglongjmp`
+cee-scape = "0.2"
+
 [build-dependencies]
 pgrx-pg-config.workspace = true
 
