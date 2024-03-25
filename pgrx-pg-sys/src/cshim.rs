@@ -28,6 +28,15 @@ extern "C" {
     pub fn SpinLockFree(lock: *mut pg_sys::slock_t) -> bool;
     #[link_name = "pgrx_PageGetSpecialPointer"]
     pub fn PageGetSpecialPointer(page: pg_sys::Page) -> *mut i8;
+    #[link_name = "pgrx_table_beginscan_strat"]
+    pub fn table_beginscan_strat(
+        relation: pg_sys::Relation,
+        snapshot: pg_sys::Snapshot,
+        nkeys: i32,
+        keys: *mut pg_sys::ScanKeyData,
+        allow_strat: bool,
+        allow_sync: bool,
+    ) -> pg_sys::TableScanDesc;
 }
 
 /// ```c

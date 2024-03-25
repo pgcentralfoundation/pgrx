@@ -14,6 +14,7 @@
 #define IS_PG_12 (PG_VERSION_NUM >= 120000 && PG_VERSION_NUM < 130000)
 #define IS_PG_13 (PG_VERSION_NUM >= 130000 && PG_VERSION_NUM < 140000)
 
+#include "access/tableam.h"
 #include "nodes/pathnodes.h"
 #include "nodes/pg_list.h"
 #include "parser/parsetree.h"
@@ -68,4 +69,9 @@ bool pgrx_SpinLockFree(slock_t *lock) {
 PGDLLEXPORT char * pgrx_PageGetSpecialPointer(Page page);
 char * pgrx_PageGetSpecialPointer(Page page) {
     return PageGetSpecialPointer(page);
+}
+
+PGDLLEXPORT TableScanDesc pgrx_table_beginscan_strat(Relation relation, Snapshot snapshot, int nkeys, struct ScanKeyData * key, bool allow_strat, bool allow_sync);
+TableScanDesc pgrx_table_beginscan_strat(Relation relation, Snapshot snapshot, int nkeys, struct ScanKeyData * key, bool allow_strat, bool allow_sync) {
+    return table_beginscan_strat(relation, snapshot, nkeys, key, allow_strat, allow_sync);
 }
