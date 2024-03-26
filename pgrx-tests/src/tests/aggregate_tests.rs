@@ -8,7 +8,7 @@
 //LICENSE
 //LICENSE Use of this source code is governed by the MIT license that can be found in the LICENSE file.
 use pgrx::prelude::*;
-use pgrx::{Aggregate, Internal, ParallelOption};
+use pgrx::Internal;
 use serde::{Deserialize, Serialize};
 use std::collections::HashSet;
 

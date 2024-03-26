@@ -65,12 +65,8 @@ impl Parse for PgrxArg {
     #[track_caller]
     fn parse(input: ParseStream<'_>) -> syn::Result<Self> {
         let path = input.parse::<syn::Path>()?;
-        if input.peek(Token![=]) {
-            Ok(Self::NameValue(NameValueArg {
-                path,
-                eq_token: input.parse()?,
-                value: input.parse()?,
-            }))
+        if let Ok(_) = input.parse::<Token![=]>() {
+            Ok(Self::NameValue(NameValueArg { path, value: input.parse()? }))
         } else {
             Err(input.error("unsupported argument to #[pgrx] in this context"))
         }
@@ -81,7 +77,6 @@ impl Parse for PgrxArg {
 #[derive(Debug)]
 pub struct NameValueArg {
     pub path: syn::Path,
-    pub eq_token: syn::token::Eq,
     pub value: ArgValue,
 }
 
