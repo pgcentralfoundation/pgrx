@@ -8,7 +8,7 @@
 //LICENSE
 //LICENSE Use of this source code is governed by the MIT license that can be found in the LICENSE file.
 use pgrx::prelude::*;
-use pgrx::{direct_function_call, AnyArray, IntoDatum, Json};
+use pgrx::{direct_function_call, AnyArray, Json};
 
 #[pg_extern]
 fn anyarray_arg(array: AnyArray) -> Json {

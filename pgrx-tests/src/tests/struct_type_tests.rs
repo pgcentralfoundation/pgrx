@@ -13,7 +13,6 @@ use pgrx::pgrx_sql_entity_graph::metadata::{
 };
 use pgrx::prelude::*;
 use pgrx::stringinfo::StringInfo;
-use pgrx::AllocatedByRust;
 
 use crate::get_named_capture;
 

@@ -9,8 +9,8 @@
 //LICENSE Use of this source code is governed by the MIT license that can be found in the LICENSE file.
 use pgrx::array::RawArray;
 use pgrx::prelude::*;
+use pgrx::Json;
 use pgrx::PostgresEnum;
-use pgrx::{Array, Json};
 use serde::Serialize;
 use serde_json::*;
 
