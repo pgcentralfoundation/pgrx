@@ -27,6 +27,8 @@ mod tests {
         assert_eq!(d.year(), original.year());
         assert_eq!(d.month(), 1);
         assert_eq!(d.day(), 1);
+        let backwards = PgrxDate::try_from(d)?;
+        assert_eq!(backwards, original);
         Ok(())
     }
 }
