@@ -38,6 +38,7 @@ pg_test = [ ]
 proptest = [ "dep:proptest" ]
 cshim = [ "pgrx/cshim" ]
 no-schema-generation = [ "pgrx/no-schema-generation", "pgrx-macros/no-schema-generation" ]
+chrono = [ "dep:chrono", "pgrx/chrono" ]
 
 [package.metadata.docs.rs]
 features = ["pg14", "proptest"]
@@ -65,6 +66,7 @@ serde = "1.0"
 serde_json = "1.0"
 sysinfo = "0.29.10"
 rand = "0.8.5"
+chrono = { workspace = true, optional = true }
 
 [dependencies.pgrx] # Not unified in workspace due to default-features key
 path = "../pgrx"

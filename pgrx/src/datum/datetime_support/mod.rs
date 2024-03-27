@@ -22,6 +22,9 @@ use std::marker::PhantomData;
 mod ctor;
 mod ops;
 
+#[cfg(feature = "chrono")]
+mod chrono;
+
 pub use ctor::*;
 
 /// Tags to identify which "part" of a date or time-type value to extract or truncate to
