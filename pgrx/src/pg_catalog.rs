@@ -213,9 +213,14 @@ macro_rules! define_column {
         paste::paste! {
             impl [<$table:camel>]<'_> {
                 $(#[$column_meta])*
+                /// # Panics
+                ///
+                /// This function panics if the catalog wrapper is created by `Self::new` but there is no `cache_id` provided.
                 pub fn $column(&self) -> Option<$column_type> {
-                    unsafe {
-                        get_attr::<$column_type>(self.inner, self.cache_id, pg_sys::[<Anum_ $table _ $column>])
+                    if let Some(cache_id) = self.cache_id {
+                        unsafe { get_attr::<$column_type>(self.inner, cache_id, pg_sys::[<Anum_ $table _ $column>]) }
+                    } else {
+                        panic!("`cache_id` is not provided")
                     }
                 }
             }
@@ -227,10 +232,15 @@ macro_rules! define_column {
         paste::paste! {
             impl [<$table:camel>]<'_> {
                 $(#[$column_meta])*
+                /// # Panics
+                ///
+                /// This function panics if the catalog wrapper is created by `Self::new` but there is no `cache_id` provided.
                 pub fn $column(&self) -> $column_type {
-                    unsafe {
-                        get_attr::<$column_type>(self.inner, self.cache_id, pg_sys::[<Anum_ $table _ $column>])
-                    }.unwrap()
+                    if let Some(cache_id) = self.cache_id {
+                        unsafe { get_attr::<$column_type>(self.inner, cache_id, pg_sys::[<Anum_ $table _ $column>]).unwrap() }
+                    } else {
+                        panic!("`cache_id` is not provided")
+                    }
                 }
             }
         }
@@ -247,7 +257,21 @@ macro_rules! define_catalog {
             pub struct [<$table:camel>]<'a> {
                 inner: &'a pg_sys::HeapTupleData,
                 #[allow(dead_code)]
-                cache_id: i32,
+                cache_id: Option<i32>,
+            }
+
+            impl<'a> [<$table:camel>]<'a> {
+                /// Create a catalog wrapper by a heap tuple.
+                ///
+                /// # Safety
+                ///
+                /// If `cache_id` is provided, `cache_id` must be an ID for a `syscache` for this catalog.
+                pub unsafe fn new(inner: &'a pg_sys::HeapTupleData, cache_id: Option<i32>) -> Self {
+                    Self {
+                        inner,
+                        cache_id,
+                    }
+                }
             }
 
             #[doc = concat!("The search result for pg_catalog.", stringify!($table), ".")]
@@ -266,7 +290,7 @@ macro_rules! define_catalog {
                     unsafe {
                         Some([<$table:camel>] {
                             inner: self.inner?.as_ref(),
-                            cache_id: self.cache_id,
+                            cache_id: Some(self.cache_id),
                         })
                     }
                 }
@@ -304,7 +328,7 @@ macro_rules! define_catalog {
                     unsafe {
                         Some([<$table:camel>] {
                             inner: syscache_get(self.inner, i)?,
-                            cache_id: self.cache_id
+                            cache_id: Some(self.cache_id)
                         })
                     }
                 }
