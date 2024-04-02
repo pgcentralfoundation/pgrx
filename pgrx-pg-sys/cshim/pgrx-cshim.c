@@ -14,10 +14,13 @@
 #define IS_PG_12 (PG_VERSION_NUM >= 120000 && PG_VERSION_NUM < 130000)
 #define IS_PG_13 (PG_VERSION_NUM >= 130000 && PG_VERSION_NUM < 140000)
 
+#include "access/tableam.h"
+#include "executor/executor.h"
 #include "nodes/pathnodes.h"
 #include "nodes/pg_list.h"
 #include "parser/parsetree.h"
 #include "storage/spin.h"
+#include "storage/bufpage.h"
 
 PGDLLEXPORT RangeTblEntry *pgrx_planner_rt_fetch(Index index, PlannerInfo *plannerInfo);
 RangeTblEntry *pgrx_planner_rt_fetch(Index index, PlannerInfo *root) {
@@ -62,4 +65,24 @@ void pgrx_SpinLockRelease(volatile slock_t *lock) {
 PGDLLEXPORT bool pgrx_SpinLockFree(slock_t *lock);
 bool pgrx_SpinLockFree(slock_t *lock) {
     return SpinLockFree(lock);
+}
+
+PGDLLEXPORT char * pgrx_PageGetSpecialPointer(Page page);
+char * pgrx_PageGetSpecialPointer(Page page) {
+    return PageGetSpecialPointer(page);
+}
+
+PGDLLEXPORT TableScanDesc pgrx_table_beginscan_strat(Relation relation, Snapshot snapshot, int nkeys, struct ScanKeyData * key, bool allow_strat, bool allow_sync);
+TableScanDesc pgrx_table_beginscan_strat(Relation relation, Snapshot snapshot, int nkeys, struct ScanKeyData * key, bool allow_strat, bool allow_sync) {
+    return table_beginscan_strat(relation, snapshot, nkeys, key, allow_strat, allow_sync);
+}
+
+PGDLLEXPORT void pgrx_table_endscan(TableScanDesc scan);
+void pgrx_table_endscan(TableScanDesc scan) {
+    return table_endscan(scan);
+}
+
+PGDLLEXPORT bool pgrx_ExecQual(ExprState * state, ExprContext * econtext);
+bool pgrx_ExecQual(ExprState * state, ExprContext * econtext) {
+    return ExecQual(state, econtext);
 }
