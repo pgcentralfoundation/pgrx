@@ -49,6 +49,7 @@ sptr = "0.3"
 
 # Safer `sigsetjmp` and `siglongjmp`
 cee-scape = "0.2"
+memoffset = "0.9.1"
 
 [build-dependencies]
 pgrx-pg-config.workspace = true
