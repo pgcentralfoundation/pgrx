@@ -12,7 +12,7 @@ use crate::command::sudo_install::SudoInstall;
 use crate::manifest::{display_version_info, PgVersionSource};
 use crate::profile::CargoProfile;
 use crate::CommandExecute;
-use cargo_metadata::{Message as CargoMessage, CompilerMessage, Artifact};
+use cargo_metadata::Message as CargoMessage;
 use cargo_toml::Manifest;
 use eyre::{eyre, WrapErr};
 use owo_colors::OwoColorize;
@@ -148,7 +148,6 @@ pub(crate) fn install_extension(
     let build_command_output =
         build_extension(user_manifest_path.as_ref(), user_package, profile, features)?;
     let build_command_bytes = build_command_output.stdout;
-    // eprintln!("{}", String::from_utf8_lossy(&build_command_bytes));
     let build_command_reader = BufReader::new(build_command_bytes.as_slice());
     let build_command_stream = CargoMessage::parse_stream(build_command_reader);
     let build_command_messages =
@@ -422,55 +421,26 @@ pub(crate) fn find_library_file(
     manifest: &Manifest,
     build_command_messages: &Vec<CargoMessage>,
 ) -> eyre::Result<PathBuf> {
-    let target_name = manifest.target_name()?;
-    let target_name_replaced = target_name.replace("-", "_");
+    let target_name = manifest.target_name()?.replace('-', "_");
     let so_ext = if cfg!(target_os = "macos") { "dylib" } else { "so" };
-    
-    let mut library_file = None;
-    for message in build_command_messages {
-        match message {
-            CargoMessage::CompilerArtifact(artifact) => {
-                let art_name = &artifact.target.name;
-                
-                if art_name.contains(&target_name) {
-                    eprintln!("artifact {art_name} contains {target_name}");
-                    eprintln!("artifact: {artifact:#?}");
-                }
-                if art_name.contains(&target_name_replaced) {
-                    eprintln!("artifact {art_name} contains replaced {target_name}");
-                    eprintln!("artifact: {artifact:#?}");
-                }
-                if target_name.contains(art_name) {
-                    eprintln!("target {target_name} contains {art_name}");
-                    eprintln!("artifact: {artifact:#?}");
-                }
-                if target_name_replaced.contains(art_name) {
-                    eprintln!("replaced target {target_name_replaced} contains {art_name}");
-                    eprintln!("artifact: {artifact:#?}");
-                }
-                if art_name != &target_name && art_name != &target_name_replaced {
-                    continue;
-                }
-                for filename in &artifact.filenames {
-                    if filename.extension() == Some(so_ext) {
-                        library_file = Some(filename.to_string());
-                        break;
-                    }
-                }
-            }
-            CargoMessage::CompilerMessage(notice) => {
-                eprintln!("rustc: {notice:?}");
-            },
-            CargoMessage::TextLine(line) => {
-                eprintln!("{line}");
-            },
-            CargoMessage::BuildScriptExecuted(_)
-            | CargoMessage::BuildFinished(_)
-            | _ => (),
-        }
-    }
-    let library_file =
-        library_file.ok_or_else(|| eyre!("Could not get shared object file `{target_name}.{so_ext}` from Cargo output."))?;
+
+    let library_file = build_command_messages
+        .into_iter()
+        .filter_map(|msg| match msg {
+            CargoMessage::CompilerArtifact(artifact) => Some(artifact),
+            _ => None,
+        })
+        .find(|artifact| target_name == artifact.target.name.replace('-', "_"))
+        .and_then(|artifact| {
+            artifact
+                .filenames
+                .iter()
+                .find(|filename| filename.extension() == Some(so_ext))
+                .map(|filename| filename.to_string())
+        })
+        .ok_or_else(|| {
+            eyre!("Could not get shared object file `{target_name}.{so_ext}` from Cargo output.")
+        })?;
     let library_file_path = PathBuf::from(library_file);
 
     Ok(library_file_path)
