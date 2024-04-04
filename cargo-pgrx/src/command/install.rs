@@ -12,6 +12,7 @@ use crate::command::sudo_install::SudoInstall;
 use crate::manifest::{display_version_info, PgVersionSource};
 use crate::profile::CargoProfile;
 use crate::CommandExecute;
+use cargo_metadata::{Message as CargoMessage, CompilerMessage, Artifact};
 use cargo_toml::Manifest;
 use eyre::{eyre, WrapErr};
 use owo_colors::OwoColorize;
@@ -147,8 +148,9 @@ pub(crate) fn install_extension(
     let build_command_output =
         build_extension(user_manifest_path.as_ref(), user_package, profile, features)?;
     let build_command_bytes = build_command_output.stdout;
+    eprintln!("{}", String::from_utf8_lossy(&build_command_bytes));
     let build_command_reader = BufReader::new(build_command_bytes.as_slice());
-    let build_command_stream = cargo_metadata::Message::parse_stream(build_command_reader);
+    let build_command_stream = CargoMessage::parse_stream(build_command_reader);
     let build_command_messages =
         build_command_stream.collect::<Result<Vec<_>, std::io::Error>>()?;
 
@@ -418,14 +420,23 @@ fn copy_sql_files(
 #[tracing::instrument(level = "error", skip_all)]
 pub(crate) fn find_library_file(
     manifest: &Manifest,
-    build_command_messages: &Vec<cargo_metadata::Message>,
+    build_command_messages: &Vec<CargoMessage>,
 ) -> eyre::Result<PathBuf> {
     let target_name = manifest.target_name()?;
+    
 
     let mut library_file = None;
     for message in build_command_messages {
         match message {
-            cargo_metadata::Message::CompilerArtifact(artifact) => {
+            CargoMessage::CompilerArtifact(artifact) => {
+                let art_name = &artifact.target.name;
+                
+                if art_name.contains(&target_name) {
+                    eprintln!("artifact {art_name} contains {target_name}");
+                }
+                if target_name.contains(art_name) {
+                    eprintln!("target {target_name} contains {art_name}");
+                }
                 if artifact.target.name != *target_name {
                     continue;
                 }
@@ -437,9 +448,14 @@ pub(crate) fn find_library_file(
                     }
                 }
             }
-            cargo_metadata::Message::CompilerMessage(_)
-            | cargo_metadata::Message::BuildScriptExecuted(_)
-            | cargo_metadata::Message::BuildFinished(_)
+            CargoMessage::CompilerMessage(notice) => {
+                eprintln!("rustc: {notice:?}");
+            },
+            CargoMessage::TextLine(line) => {
+                eprintln!("{line}");
+            },
+            CargoMessage::BuildScriptExecuted(_)
+            | CargoMessage::BuildFinished(_)
             | _ => (),
         }
     }
