@@ -77,6 +77,8 @@ those remain untested. So far, some of PGRX's build tooling works on Windows, bu
    - RHEL: `yum install clang`
 - GCC 7 or newer
 - [PostgreSQL's build dependencies](https://wiki.postgresql.org/wiki/Compile_and_Install_from_source_code) ‡
+   - Debian-likes: `sudo apt-get install build-essential libreadline-dev zlib1g-dev flex bison libxml2-dev libxslt-dev libssl-dev libxml2-utils xsltproc ccache pkg-config`
+   - RHEL-likes: `sudo yum install -y bison-devel readline-devel zlib-devel openssl-devel wget ccache && sudo yum groupinstall -y 'Development Tools'`
 
  † PGRX has no MSRV policy, thus may require the latest stable version of Rust, available via Rustup
 
@@ -118,14 +120,13 @@ brew install git icu4c pkg-config
 
 ## Getting Started
 
+Before anything else, install the [system dependencies](#system-requirements).
 
-First install the `cargo-pgrx` sub-command.
+Now install the `cargo-pgrx` sub-command.
 
 ```bash
 cargo install --locked cargo-pgrx
 ```
-
-**Important:** `cargo-pgrx` **must** be built using the same compiler as you'll use to build the rest of your project. Every time you update your Rust toolchain you have to also manually reinstall `cargo-pgrx`. See [Upgrading](#Upgrading), below.
 
 Once `cargo-pgrx` is ready you can initialize the "PGRX Home" directory:
 
