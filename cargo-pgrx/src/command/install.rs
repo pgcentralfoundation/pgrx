@@ -434,9 +434,11 @@ pub(crate) fn find_library_file(
                 
                 if art_name.contains(&target_name) {
                     eprintln!("artifact {art_name} contains {target_name}");
+                    eprintln!("artifact: {artifact:?}");
                 }
                 if target_name.contains(art_name) {
                     eprintln!("target {target_name} contains {art_name}");
+                    eprintln!("artifact: {artifact:?}");
                 }
                 if artifact.target.name != *target_name {
                     continue;
