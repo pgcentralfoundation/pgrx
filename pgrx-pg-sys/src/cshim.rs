@@ -41,6 +41,8 @@ extern "C" {
     pub fn table_endscan(scan: pg_sys::TableScanDesc);
     #[link_name = "pgrx_ExecQual"]
     pub fn ExecQual(state: *mut pg_sys::ExprState, econtext: *mut pg_sys::ExprContext) -> bool;
+    #[link_name = "pgrx_ExecCopySlotHeapTuple"]
+    pub fn ExecCopySlotHeapTuple(slot: pg_sys::TupleTableSlot) -> pg_sys::HeapTuple;
 }
 
 /// ```c
