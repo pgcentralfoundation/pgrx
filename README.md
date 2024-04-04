@@ -128,8 +128,6 @@ Now install the `cargo-pgrx` sub-command.
 cargo install --locked cargo-pgrx
 ```
 
-**Important:** `cargo-pgrx` **must** be built using the same compiler as you'll use to build the rest of your project. Every time you update your Rust toolchain you have to also manually reinstall `cargo-pgrx`. See [Upgrading](#Upgrading), below.
-
 Once `cargo-pgrx` is ready you can initialize the "PGRX Home" directory:
 
 ```bash
