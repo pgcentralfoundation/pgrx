@@ -148,7 +148,7 @@ pub(crate) fn install_extension(
     let build_command_output =
         build_extension(user_manifest_path.as_ref(), user_package, profile, features)?;
     let build_command_bytes = build_command_output.stdout;
-    eprintln!("{}", String::from_utf8_lossy(&build_command_bytes));
+    // eprintln!("{}", String::from_utf8_lossy(&build_command_bytes));
     let build_command_reader = BufReader::new(build_command_bytes.as_slice());
     let build_command_stream = CargoMessage::parse_stream(build_command_reader);
     let build_command_messages =
