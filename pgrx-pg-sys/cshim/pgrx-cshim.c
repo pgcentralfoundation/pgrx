@@ -16,6 +16,7 @@
 
 #include "access/tableam.h"
 #include "executor/executor.h"
+#include "executor/tuptable.h"
 #include "nodes/pathnodes.h"
 #include "nodes/pg_list.h"
 #include "parser/parsetree.h"
@@ -85,4 +86,9 @@ void pgrx_table_endscan(TableScanDesc scan) {
 PGDLLEXPORT bool pgrx_ExecQual(ExprState * state, ExprContext * econtext);
 bool pgrx_ExecQual(ExprState * state, ExprContext * econtext) {
     return ExecQual(state, econtext);
+}
+
+PGDLLEXPORT HeapTuple pgrx_ExecCopySlotHeapTuple(TupleTableSlot * slot);
+HeapTuple pgrx_ExecCopySlotHeapTuple(TupleTableSlot * slot) {
+    return ExecCopySlotHeapTuple(slot);
 }
