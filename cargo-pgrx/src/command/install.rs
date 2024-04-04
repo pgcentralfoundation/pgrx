@@ -423,9 +423,9 @@ pub(crate) fn find_library_file(
     build_command_messages: &Vec<CargoMessage>,
 ) -> eyre::Result<PathBuf> {
     let target_name = manifest.target_name()?;
-    let target_name_replaced = target_name.replace("-", "_");
     let so_ext = if cfg!(target_os = "macos") { "dylib" } else { "so" };
     
+
     let mut library_file = None;
     for message in build_command_messages {
         match message {
@@ -436,19 +436,11 @@ pub(crate) fn find_library_file(
                     eprintln!("artifact {art_name} contains {target_name}");
                     eprintln!("artifact: {artifact:#?}");
                 }
-                if art_name.contains(&target_name_replaced) {
-                    eprintln!("artifact {art_name} contains replaced {target_name}");
-                    eprintln!("artifact: {artifact:#?}");
-                }
                 if target_name.contains(art_name) {
                     eprintln!("target {target_name} contains {art_name}");
                     eprintln!("artifact: {artifact:#?}");
                 }
-                if target_name_replaced.contains(art_name) {
-                    eprintln!("replaced target {target_name_replaced} contains {art_name}");
-                    eprintln!("artifact: {artifact:#?}");
-                }
-                if art_name != &target_name && art_name != &target_name_replaced {
+                if artifact.target.name != *target_name {
                     continue;
                 }
                 for filename in &artifact.filenames {
