@@ -423,6 +423,7 @@ pub(crate) fn find_library_file(
     build_command_messages: &Vec<CargoMessage>,
 ) -> eyre::Result<PathBuf> {
     let target_name = manifest.target_name()?;
+    let so_ext = if cfg!(target_os = "macos") { "dylib" } else { "so" };
     
 
     let mut library_file = None;
@@ -441,8 +442,7 @@ pub(crate) fn find_library_file(
                     continue;
                 }
                 for filename in &artifact.filenames {
-                    let so_extension = if cfg!(target_os = "macos") { "dylib" } else { "so" };
-                    if filename.extension() == Some(so_extension) {
+                    if filename.extension() == Some(so_ext) {
                         library_file = Some(filename.to_string());
                         break;
                     }
@@ -460,7 +460,7 @@ pub(crate) fn find_library_file(
         }
     }
     let library_file =
-        library_file.ok_or(eyre!("Could not get shared object file from Cargo output."))?;
+        library_file.ok_or_else(|| eyre!("Could not get shared object file `{target_name}.{so_ext}` from Cargo output."))?;
     let library_file_path = PathBuf::from(library_file);
 
     Ok(library_file_path)
