@@ -235,8 +235,43 @@ pub unsafe fn heap_tuple_get_struct<T>(htup: super::HeapTuple) -> *mut T {
 #[cfg(any(feature = "pg12", feature = "pg13", feature = "pg14", feature = "pg15"))]
 #[::pgrx_macros::pg_guard]
 extern "C" {
+    pub fn planstate_tree_walker(
+        planstate: *mut super::PlanState,
+        walker: ::core::option::Option<
+            unsafe extern "C" fn(*mut super::PlanState, *mut ::core::ffi::c_void) -> bool,
+        >,
+        context: *mut ::core::ffi::c_void,
+    ) -> bool;
+
     pub fn query_tree_walker(
         query: *mut super::Query,
+        walker: ::core::option::Option<
+            unsafe extern "C" fn(*mut super::Node, *mut ::core::ffi::c_void) -> bool,
+        >,
+        context: *mut ::core::ffi::c_void,
+        flags: ::core::ffi::c_int,
+    ) -> bool;
+
+    pub fn query_or_expression_tree_walker(
+        node: *mut super::Node,
+        walker: ::core::option::Option<
+            unsafe extern "C" fn(*mut super::Node, *mut ::core::ffi::c_void) -> bool,
+        >,
+        context: *mut ::core::ffi::c_void,
+        flags: ::core::ffi::c_int,
+    ) -> bool;
+
+    pub fn range_table_entry_walker(
+        rte: *mut super::RangeTblEntry,
+        walker: ::core::option::Option<
+            unsafe extern "C" fn(*mut super::Node, *mut ::core::ffi::c_void) -> bool,
+        >,
+        context: *mut ::core::ffi::c_void,
+        flags: ::core::ffi::c_int,
+    ) -> bool;
+
+    pub fn range_table_walker(
+        rtable: *mut super::List,
         walker: ::core::option::Option<
             unsafe extern "C" fn(*mut super::Node, *mut ::core::ffi::c_void) -> bool,
         >,
@@ -262,6 +297,17 @@ extern "C" {
 }
 
 #[cfg(feature = "pg16")]
+pub unsafe fn planstate_tree_walker(
+    planstate: *mut super::PlanState,
+    walker: ::core::option::Option<
+        unsafe extern "C" fn(*mut super::PlanState, *mut ::core::ffi::c_void) -> bool,
+    >,
+    context: *mut ::core::ffi::c_void,
+) -> bool {
+    crate::planstate_tree_walker_impl(planstate, walker, context)
+}
+
+#[cfg(feature = "pg16")]
 pub unsafe fn query_tree_walker(
     query: *mut super::Query,
     walker: ::core::option::Option<
@@ -274,21 +320,57 @@ pub unsafe fn query_tree_walker(
 }
 
 #[cfg(feature = "pg16")]
-pub unsafe fn expression_tree_walker(
-    arg_node: *mut crate::Node,
-    arg_walker: Option<unsafe extern "C" fn(*mut crate::Node, *mut ::core::ffi::c_void) -> bool>,
-    arg_context: *mut ::core::ffi::c_void,
+pub unsafe fn query_or_expression_tree_walker(
+    node: *mut super::Node,
+    walker: ::core::option::Option<
+        unsafe extern "C" fn(*mut super::Node, *mut ::core::ffi::c_void) -> bool,
+    >,
+    context: *mut ::core::ffi::c_void,
+    flags: ::core::ffi::c_int,
 ) -> bool {
-    crate::expression_tree_walker_impl(arg_node, arg_walker, arg_context)
+    crate::query_or_expression_tree_walker_impl(node, walker, context, flags)
+}
+
+#[cfg(feature = "pg16")]
+pub unsafe fn expression_tree_walker(
+    node: *mut crate::Node,
+    walker: Option<unsafe extern "C" fn(*mut crate::Node, *mut ::core::ffi::c_void) -> bool>,
+    context: *mut ::core::ffi::c_void,
+) -> bool {
+    crate::expression_tree_walker_impl(node, walker, context)
+}
+
+#[cfg(feature = "pg16")]
+pub unsafe fn range_table_entry_walker(
+    rte: *mut super::RangeTblEntry,
+    walker: ::core::option::Option<
+        unsafe extern "C" fn(*mut super::Node, *mut ::core::ffi::c_void) -> bool,
+    >,
+    context: *mut ::core::ffi::c_void,
+    flags: ::core::ffi::c_int,
+) -> bool {
+    crate::range_table_entry_walker_impl(rte, walker, context, flags)
+}
+
+#[cfg(feature = "pg16")]
+pub unsafe fn range_table_walker(
+    rtable: *mut super::List,
+    walker: ::core::option::Option<
+        unsafe extern "C" fn(*mut super::Node, *mut ::core::ffi::c_void) -> bool,
+    >,
+    context: *mut ::core::ffi::c_void,
+    flags: ::core::ffi::c_int,
+) -> bool {
+    crate::range_table_walker_impl(rtable, walker, context, flags)
 }
 
 #[cfg(feature = "pg16")]
 pub unsafe fn raw_expression_tree_walker(
-    arg_node: *mut crate::Node,
-    arg_walker: Option<unsafe extern "C" fn(*mut crate::Node, *mut ::core::ffi::c_void) -> bool>,
-    arg_context: *mut ::core::ffi::c_void,
+    node: *mut crate::Node,
+    walker: Option<unsafe extern "C" fn(*mut crate::Node, *mut ::core::ffi::c_void) -> bool>,
+    context: *mut ::core::ffi::c_void,
 ) -> bool {
-    crate::raw_expression_tree_walker_impl(arg_node, arg_walker, arg_context)
+    crate::raw_expression_tree_walker_impl(node, walker, context)
 }
 
 #[inline(always)]
