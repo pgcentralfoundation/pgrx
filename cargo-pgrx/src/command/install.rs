@@ -421,15 +421,22 @@ pub(crate) fn find_library_file(
     manifest: &Manifest,
     build_command_messages: &Vec<CargoMessage>,
 ) -> eyre::Result<PathBuf> {
+    // cargo sometimes decides to change whether targets are kebab-case or snake_case in metadata,
+    // so normalize away the difference
     let target_name = manifest.target_name()?.replace('-', "_");
     let so_ext = if cfg!(target_os = "macos") { "dylib" } else { "so" };
 
+    // no hard and fast rule for the lib.so output filename exists, so we implement this routine
+    // which is essentially a cope for cargo's disinterest in writing down any docs so far.
+    // you might think this is being silly but they do periodically change outputs. these changes
+    // often seem to be unintentional, but they're real, so...
     let library_file = build_command_messages
         .into_iter()
         .filter_map(|msg| match msg {
             CargoMessage::CompilerArtifact(artifact) => Some(artifact),
             _ => None,
         })
+        // normalize being flattened and low to the ground
         .find(|artifact| target_name == artifact.target.name.replace('-', "_"))
         .and_then(|artifact| {
             artifact
