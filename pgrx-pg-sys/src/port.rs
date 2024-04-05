@@ -333,11 +333,11 @@ pub unsafe fn query_or_expression_tree_walker(
 
 #[cfg(feature = "pg16")]
 pub unsafe fn expression_tree_walker(
-    arg_node: *mut crate::Node,
-    arg_walker: Option<unsafe extern "C" fn(*mut crate::Node, *mut ::core::ffi::c_void) -> bool>,
-    arg_context: *mut ::core::ffi::c_void,
+    node: *mut crate::Node,
+    walker: Option<unsafe extern "C" fn(*mut crate::Node, *mut ::core::ffi::c_void) -> bool>,
+    context: *mut ::core::ffi::c_void,
 ) -> bool {
-    crate::expression_tree_walker_impl(arg_node, arg_walker, arg_context)
+    crate::expression_tree_walker_impl(node, walker, context)
 }
 
 #[cfg(feature = "pg16")]
@@ -366,11 +366,11 @@ pub unsafe fn range_table_walker(
 
 #[cfg(feature = "pg16")]
 pub unsafe fn raw_expression_tree_walker(
-    arg_node: *mut crate::Node,
-    arg_walker: Option<unsafe extern "C" fn(*mut crate::Node, *mut ::core::ffi::c_void) -> bool>,
-    arg_context: *mut ::core::ffi::c_void,
+    node: *mut crate::Node,
+    walker: Option<unsafe extern "C" fn(*mut crate::Node, *mut ::core::ffi::c_void) -> bool>,
+    context: *mut ::core::ffi::c_void,
 ) -> bool {
-    crate::raw_expression_tree_walker_impl(arg_node, arg_walker, arg_context)
+    crate::raw_expression_tree_walker_impl(node, walker, context)
 }
 
 #[inline(always)]
