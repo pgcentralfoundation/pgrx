@@ -12,6 +12,7 @@ use crate::command::sudo_install::SudoInstall;
 use crate::manifest::{display_version_info, PgVersionSource};
 use crate::profile::CargoProfile;
 use crate::CommandExecute;
+use cargo_metadata::Message as CargoMessage;
 use cargo_toml::Manifest;
 use eyre::{eyre, WrapErr};
 use owo_colors::OwoColorize;
@@ -148,7 +149,7 @@ pub(crate) fn install_extension(
         build_extension(user_manifest_path.as_ref(), user_package, profile, features)?;
     let build_command_bytes = build_command_output.stdout;
     let build_command_reader = BufReader::new(build_command_bytes.as_slice());
-    let build_command_stream = cargo_metadata::Message::parse_stream(build_command_reader);
+    let build_command_stream = CargoMessage::parse_stream(build_command_reader);
     let build_command_messages =
         build_command_stream.collect::<Result<Vec<_>, std::io::Error>>()?;
 
@@ -418,33 +419,35 @@ fn copy_sql_files(
 #[tracing::instrument(level = "error", skip_all)]
 pub(crate) fn find_library_file(
     manifest: &Manifest,
-    build_command_messages: &Vec<cargo_metadata::Message>,
+    build_command_messages: &Vec<CargoMessage>,
 ) -> eyre::Result<PathBuf> {
-    let target_name = manifest.target_name()?;
+    // cargo sometimes decides to change whether targets are kebab-case or snake_case in metadata,
+    // so normalize away the difference
+    let target_name = manifest.target_name()?.replace('-', "_");
+    let so_ext = if cfg!(target_os = "macos") { "dylib" } else { "so" };
 
-    let mut library_file = None;
-    for message in build_command_messages {
-        match message {
-            cargo_metadata::Message::CompilerArtifact(artifact) => {
-                if artifact.target.name != *target_name {
-                    continue;
-                }
-                for filename in &artifact.filenames {
-                    let so_extension = if cfg!(target_os = "macos") { "dylib" } else { "so" };
-                    if filename.extension() == Some(so_extension) {
-                        library_file = Some(filename.to_string());
-                        break;
-                    }
-                }
-            }
-            cargo_metadata::Message::CompilerMessage(_)
-            | cargo_metadata::Message::BuildScriptExecuted(_)
-            | cargo_metadata::Message::BuildFinished(_)
-            | _ => (),
-        }
-    }
-    let library_file =
-        library_file.ok_or(eyre!("Could not get shared object file from Cargo output."))?;
+    // no hard and fast rule for the lib.so output filename exists, so we implement this routine
+    // which is essentially a cope for cargo's disinterest in writing down any docs so far.
+    // you might think this is being silly but they do periodically change outputs. these changes
+    // often seem to be unintentional, but they're real, so...
+    let library_file = build_command_messages
+        .into_iter()
+        .filter_map(|msg| match msg {
+            CargoMessage::CompilerArtifact(artifact) => Some(artifact),
+            _ => None,
+        })
+        // normalize being flattened and low to the ground
+        .find(|artifact| target_name == artifact.target.name.replace('-', "_"))
+        .and_then(|artifact| {
+            artifact
+                .filenames
+                .iter()
+                .find(|filename| filename.extension() == Some(so_ext))
+                .map(|filename| filename.to_string())
+        })
+        .ok_or_else(|| {
+            eyre!("Could not get shared object file `{target_name}.{so_ext}` from Cargo output.")
+        })?;
     let library_file_path = PathBuf::from(library_file);
 
     Ok(library_file_path)
