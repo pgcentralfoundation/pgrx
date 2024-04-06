@@ -24,7 +24,8 @@ use std::num::TryFromIntError;
 #[repr(transparent)]
 pub struct Time(pg_sys::TimeADT);
 
-const MICROSECONDS_PER_DAY: pg_sys::TimeADT = 86_400_000;
+// 86_400_000_000
+const MICROSECONDS_PER_DAY: pg_sys::TimeADT = 24 * 60 * 60 * 1000 /* milli */ * 1000 /* micro */;
 
 impl From<Time> for pg_sys::TimeADT {
     #[inline]
@@ -95,7 +96,7 @@ impl FromDatum for Time {
         if is_null {
             None
         } else {
-            Some(datum.try_into().expect("Error converting time datum"))
+            Some(Time::modular_from_raw(datum.value() as i64))
         }
     }
 }
