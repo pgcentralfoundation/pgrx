@@ -331,6 +331,7 @@ fn first_build(
         command.arg("--no-run");
     } else {
         command.arg("build");
+        command.arg("--lib");
     }
 
     command.arg("--package");
