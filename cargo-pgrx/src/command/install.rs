@@ -299,6 +299,7 @@ pub(crate) fn build_extension(
 
     let mut command = crate::env::cargo();
     command.arg("build");
+    command.arg("--lib");
 
     if let Some(user_manifest_path) = user_manifest_path {
         command.arg("--manifest-path");
