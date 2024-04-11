@@ -16,6 +16,28 @@ use std::str::FromStr;
 
 ::pgrx::pg_module_magic!();
 
+#[pg_extern]
+fn aggregate_test(_record: PgHeapTuple<AllocatedByRust>){}
+
+#[derive(Clone, Default, PostgresType, Serialize, Deserialize)]
+pub struct AggregateIncrementalRecords {
+    attr_count: i16,
+}
+
+#[pg_aggregate]
+impl Aggregate for AggregateIncrementalRecords {
+    const INITIAL_CONDITION: Option<&'static str> = Some(r#"{ "attr_count": 0 }"#);
+    type Args = PgHeapTuple<'static, AllocatedByRust>;
+
+    fn state(
+        current: Self::State,
+        _arg: Self::Args,
+        _fcinfo: pg_sys::FunctionCallInfo
+    ) -> Self::State {
+        return current
+    }
+}
+
 #[derive(Copy, Clone, PostgresType, Serialize, Deserialize)]
 #[pgvarlena_inoutfuncs]
 #[derive(Default)]
