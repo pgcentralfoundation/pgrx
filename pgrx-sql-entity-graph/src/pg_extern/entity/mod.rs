@@ -148,11 +148,8 @@ impl ToSql for PgExternEntity {
                             .used_ty
                             .composite_type
                             .map(|v| fmt::with_array_brackets(v.into(), array_brackets))
-                            .ok_or_else(|| {
-                                eyre!(
-                                    "Macro expansion time suggested a composite_type!() in return while formatting PgExternEntity"
-                                )
-                            })?;
+                            .expect("Macro expansion suggested a composite_type!() while formatting PgExternEntity");
+
                         let buf = format!("\
                             \t\"{pattern}\" {variadic}{schema_prefix}{sql_type}{default}{maybe_comma}/* {type_name} */\
                         ",
