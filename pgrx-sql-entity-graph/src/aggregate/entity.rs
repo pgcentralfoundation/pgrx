@@ -267,7 +267,7 @@ impl ToSql for PgAggregateEntity {
                     .composite_type
                     .map(|v| fmt::with_array_brackets(v.into(), array_brackets))
                     .ok_or_else(|| {
-                        eyre!("Macro expansion time suggested a composite_type!() in return")
+                        eyre!("Macro expansion time suggested a composite_type!() in return while formatting PgAggregateEntity")
                     }),
                 Ok(SqlMapping::Skip) => {
                     Err(eyre!("Cannot use skipped SQL translatable type as aggregate const type"))

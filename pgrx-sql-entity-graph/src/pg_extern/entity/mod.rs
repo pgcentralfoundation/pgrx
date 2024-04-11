@@ -150,7 +150,7 @@ impl ToSql for PgExternEntity {
                             .map(|v| fmt::with_array_brackets(v.into(), array_brackets))
                             .ok_or_else(|| {
                                 eyre!(
-                                    "Macro expansion time suggested a composite_type!() in return"
+                                    "Macro expansion time suggested a composite_type!() in return while formatting PgExternEntity"
                                 )
                             })?;
                         let buf = format!("\
