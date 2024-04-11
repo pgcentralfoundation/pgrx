@@ -17,7 +17,7 @@ use std::str::FromStr;
 ::pgrx::pg_module_magic!();
 
 #[pg_extern]
-fn aggregate_test(_record: PgHeapTuple<AllocatedByRust>){}
+fn aggregate_test(_record: PgHeapTuple<AllocatedByRust>) {}
 
 #[derive(Clone, Default, PostgresType, Serialize, Deserialize)]
 pub struct AggregateIncrementalRecords {
@@ -32,9 +32,9 @@ impl Aggregate for AggregateIncrementalRecords {
     fn state(
         current: Self::State,
         _arg: Self::Args,
-        _fcinfo: pg_sys::FunctionCallInfo
+        _fcinfo: pg_sys::FunctionCallInfo,
     ) -> Self::State {
-        return current
+        return current;
     }
 }
 
