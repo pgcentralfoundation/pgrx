@@ -263,10 +263,10 @@ impl ToSql for PgAggregateEntity {
         let map_ty = |used_ty: &UsedTypeEntity| -> eyre::Result<String> {
             match used_ty.metadata.argument_sql {
                 Ok(SqlMapping::As(ref argument_sql)) => Ok(argument_sql.to_string()),
-                Ok(SqlMapping::Composite { array_brackets }) => used_ty
+                Ok(SqlMapping::Composite { array_brackets }) => Ok(used_ty
                     .composite_type
                     .map(|v| fmt::with_array_brackets(v.into(), array_brackets))
-                    .expect("Macro expansion suggested a composite_type!() while formatting PgAggregateEntity"),
+                    .expect("Macro expansion suggested a composite_type!() while formatting PgAggregateEntity")),
                 Ok(SqlMapping::Skip) => {
                     Err(eyre!("Cannot use skipped SQL translatable type as aggregate const type"))
                 }
