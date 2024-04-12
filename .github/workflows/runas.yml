@@ -23,8 +23,8 @@ jobs:
 
       - name: Install Postgres deps
         run: |
-          apt-get update -y -qq --fix-missing
-          apt-get install -y postgresql-server-dev-14
+          sudo apt-get update -y -qq --fix-missing
+          sudo apt-get install -y postgresql-server-dev-14
 
       - name: Report version
         run: cargo --version
