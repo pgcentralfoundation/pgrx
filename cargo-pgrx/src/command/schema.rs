@@ -12,7 +12,7 @@ use crate::manifest::{get_package_manifest, pg_config_and_version};
 use crate::profile::CargoProfile;
 use crate::CommandExecute;
 use cargo_toml::Manifest;
-use eyre::{eyre, WrapErr};
+use eyre::WrapErr;
 use owo_colors::OwoColorize;
 use pgrx_pg_config::cargo::PgrxManifestExt;
 use pgrx_pg_config::{get_target_dir, PgConfig, Pgrx};
@@ -133,13 +133,6 @@ pub(crate) fn generate_schema(
 ) -> eyre::Result<()> {
     let manifest = Manifest::from_path(&package_manifest_path)?;
     let (control_file, _extname) = find_control_file(&package_manifest_path)?;
-
-    if get_property(&package_manifest_path, "relocatable")? != Some("false".into()) {
-        return Err(eyre!(
-            "{}:  The `relocatable` property MUST be `false`.  Please update your .control file.",
-            control_file.display()
-        ));
-    }
 
     let flags = std::env::var("PGRX_BUILD_FLAGS").unwrap_or_default();
 
