@@ -38,8 +38,21 @@ impl<'mcx, T> FlatArray<'mcx, T>
 where
     T: ?Sized + BorrowDatum,
 {
+    fn as_raw(&self) -> RawArray {
+        unsafe {
+            let ptr = NonNull::new_unchecked(ptr::from_ref(self).cast_mut());
+            RawArray::from_ptr(ptr.cast())
+        }
+    }
+
     /// Iterate the array
     pub fn iter(&self) -> ArrayIter<'mcx, T> {
+        let nulls = self.nulls();
+        let nelems = self.count();
+        let raw = self.as_raw();
+
+        let data_ptr = raw.data_ptr();
+
         /* ArrayIter {
 
         } */
@@ -85,9 +98,7 @@ where
     ///
     /// Note that for many Arrays, this doesn't have a linear relationship with array byte-len.
     pub fn count(&self) -> usize {
-        let ndims = self.head.ndim as usize;
-        let dims_ptr = unsafe { port::ARR_DIMS(ptr::addr_of!(self.head).cast_mut()) };
-        unsafe { slice::from_raw_parts(dims_ptr, ndims).into_iter().sum::<i32>() as usize }
+        self.as_raw().len()
     }
 
     pub fn nulls(&self) -> Option<&[u8]> {
