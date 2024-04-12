@@ -393,7 +393,10 @@ fn initdb(postgresql_conf: Vec<&'static str>) -> eyre::Result<()> {
         }
 
         if let Some(runas) = get_runas() {
-            // NB:  This command has to be run as root to change the permissions from us to the `runas` user
+            // we've been asked to run as a different user.  As such, the PGDATA directory we just created
+            // needs to be owned by that user.
+            //
+            // In order to do that, we have to become "root" to change its ownership.
             let mut chown = Command::new("sudo");
             chown
                 .args(&["-u", "root", "chown", &runas])
