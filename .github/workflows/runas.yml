@@ -24,5 +24,8 @@ jobs:
       - name: Report version
         run: cargo --version
 
+      - name: Install cargo pgrx
+        run: cd cargo-pgrx && cargo install --path . --debug
+
       - name: Test cargo pgrx test --runas
         run: cd pgrx-examples/arrays && cargo pgrx test --runas postgres --pgdata=/tmp/pgdata
