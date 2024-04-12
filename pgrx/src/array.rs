@@ -46,19 +46,27 @@ where
     }
 
     /// Iterate the array
-    pub fn iter(&self) -> ArrayIter<'mcx, T> {
-        let nulls = self.nulls();
+    // this lifetime seems wrong
+    pub fn iter(&'mcx self) -> ArrayIter<'mcx, T> {
+        let nulls = self
+            .nulls()
+            .map(|p| unsafe { NonNull::new_unchecked(ptr::from_ref(p).cast_mut().cast()) });
         let nelems = self.count();
         let raw = self.as_raw();
 
-        let data_ptr = raw.data_ptr();
+        let data = raw.data_ptr();
+        let arr = self;
+        let index = 0;
+        let offset = 0;
 
-        /* ArrayIter {
-
-        } */
-        todo!()
+        ArrayIter { data, nulls, nelems, arr, index, offset }
     }
 
+    /*
+    pub fn iter_mut(&mut self) -> ArrayIterMut<'mcx, T> {
+        ???
+    }
+    */
     /// Borrow the nth element.
     ///
     /// `FlatArray::nth` may have to iterate the array, thus it is named for `Iterator::nth`,
@@ -153,11 +161,18 @@ where
 {
     arr: &'arr FlatArray<'arr, T>,
     data: *const u8,
-    nulls: *const u8,
+    nulls: Option<NonNull<u8>>,
+    nelems: usize,
+    index: usize,
+    offset: usize,
 }
 
-fn is_null(p: *const u8) -> bool {
-    todo!()
+fn is_null(p: Option<NonNull<u8>>) -> bool {
+    if let Some(p) = p {
+        todo!()
+    } else {
+        false
+    }
 }
 
 impl<'arr, T> Iterator for ArrayIter<'arr, T>
