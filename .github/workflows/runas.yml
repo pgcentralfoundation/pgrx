@@ -19,7 +19,12 @@ jobs:
       - uses: actions/checkout@v2
       - uses: Swatinem/rust-cache@v2
         with:
-          prefix-key: "v1-rust"
+          prefix-key: "v1-cargo-pgrx-test--runas"
+
+      - name: Install Postgres deps
+        run: |
+          apt-get update -y -qq --fix-missing
+          apt-get install -y postgresql-server-dev-14
 
       - name: Report version
         run: cargo --version
