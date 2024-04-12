@@ -1,0 +1,28 @@
+name: Test cargo pgrx test --runas
+
+on:
+  push:
+    branches: [ develop ]
+  pull_request:
+    branches: [ develop ]
+
+env:
+  CARGO_TERM_COLOR: always
+  RUST_BACKTRACE: 1
+  RUSTFLAGS: "-C link-args=-Wl,-undefined,dynamic_lookup"   # we don't want target-cpu=native from `.cargo/config` b/c we're caching binaries but we want the other stuff
+
+jobs:
+  ubuntu:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v2
+      - uses: Swatinem/rust-cache@v2
+        with:
+          prefix-key: "v1-rust"
+
+      - name: Report version
+        run: cargo --version
+
+      - name: Test pronto-as-a-library
+        run: cd pgrx-examples/arrays && cargo pgrx test --runas postgres --pgdata=/tmp/pgdata
