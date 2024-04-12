@@ -35,7 +35,7 @@ pub(crate) struct Layout {
 }
 
 #[derive(Clone, Copy, Debug, PartialEq)]
-pub(crate) enum PassBy {
+pub enum PassBy {
     Ref,
     Value,
 }

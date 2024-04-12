@@ -55,6 +55,7 @@ pub mod htup;
 pub mod inoutfuncs;
 pub mod itemptr;
 pub mod iter;
+pub mod layout;
 pub mod list;
 pub mod lwlock;
 pub mod memcx;
@@ -79,7 +80,6 @@ pub mod wrappers;
 pub mod xid;
 
 /// Not ready for public exposure.
-mod layout;
 mod ptr;
 mod slice;
 mod toast;
