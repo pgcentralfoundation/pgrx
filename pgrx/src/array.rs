@@ -16,8 +16,8 @@ use crate::pgrx_sql_entity_graph::metadata::{
 };
 use crate::toast::{Toast, Toasty};
 use crate::{layout, pg_sys, varlena};
-use bitvec::ptr::{self as bitptr, BitPtr, BitPtrError, Mut};
-use bitvec::slice::BitSlice;
+use bitvec::ptr::{self as bitptr, BitPtr, BitPtrError, Const, Mut};
+use bitvec::slice::{self as bitslice, BitSlice};
 use core::marker::PhantomData;
 use core::ptr::{self, NonNull};
 use core::{mem, slice};
@@ -48,11 +48,10 @@ where
     /// Iterate the array
     // this lifetime seems wrong
     pub fn iter(&'mcx self) -> ArrayIter<'mcx, T> {
-        let nulls = self
-            .nulls()
-            .map(|p| unsafe { NonNull::new_unchecked(ptr::from_ref(p).cast_mut().cast()) });
         let nelems = self.count();
         let raw = self.as_raw();
+        let nulls =
+            raw.nulls_bitptr().map(|p| unsafe { bitslice::from_raw_parts(p, nelems).unwrap() });
 
         let data = raw.data_ptr();
         let arr = self;
@@ -145,7 +144,7 @@ where
 {
     arr: &'arr FlatArray<'arr, T>,
     data: *const u8,
-    nulls: Option<NonNull<u8>>,
+    nulls: Option<&'arr BitSlice<u8>>,
     nelems: usize,
     index: usize,
     offset: usize,
@@ -406,11 +405,22 @@ impl RawArray {
     }
 
     #[inline]
-    fn nulls_bitptr(&mut self) -> Option<BitPtr<Mut, u8>> {
+    fn nulls_bitptr(&self) -> Option<BitPtr<Const, u8>> {
+        let nulls_ptr = unsafe { port::ARR_NULLBITMAP(self.ptr.as_ptr()) }.cast_const();
+        match BitPtr::try_from(nulls_ptr) {
+            Ok(ptr) => Some(ptr),
+            Err(BitPtrError::Null(_)) => None,
+            Err(BitPtrError::Misaligned(_)) => unreachable!(),
+        }
+    }
+
+    #[inline]
+    fn nulls_mut_bitptr(&mut self) -> Option<BitPtr<Mut, u8>> {
+        let nulls_ptr = unsafe { port::ARR_NULLBITMAP(self.ptr.as_ptr()) };
         match BitPtr::try_from(self.nulls_mut_ptr()) {
             Ok(ptr) => Some(ptr),
             Err(BitPtrError::Null(_)) => None,
-            Err(BitPtrError::Misaligned(_)) => unreachable!("impossible to misalign *mut u8"),
+            Err(BitPtrError::Misaligned(_)) => unreachable!(),
         }
     }
 
@@ -447,7 +457,7 @@ impl RawArray {
     [ARR_NULLBITMAP]: <https://git.postgresql.org/gitweb/?p=postgresql.git;a=blob;f=src/include/utils/array.h;h=4ae6c3be2f8b57afa38c19af2779f67c782e4efc;hb=278273ccbad27a8834dfdf11895da9cd91de4114#l293>
     */
     pub fn nulls_bitslice(&mut self) -> Option<NonNull<BitSlice<u8>>> {
-        NonNull::new(bitptr::bitslice_from_raw_parts_mut(self.nulls_bitptr()?, self.len()))
+        NonNull::new(bitptr::bitslice_from_raw_parts_mut(self.nulls_mut_bitptr()?, self.len()))
     }
 
     /**
