@@ -72,9 +72,7 @@ where
     /// `FlatArray::nth` may have to iterate the array, thus it is named for `Iterator::nth`,
     /// as opposed to a constant-time `get`.
     pub fn nth(&self, index: usize) -> Option<Nullable<&T>> {
-        // FIXME: consider nullability
-        // FIXME: Become a dispatch to Iterator::nth
-        todo!()
+        self.iter().nth(index)
     }
 
     /// Mutably borrow the nth element.
@@ -177,7 +175,7 @@ fn is_null(p: Option<NonNull<u8>>) -> bool {
 
 impl<'arr, T> Iterator for ArrayIter<'arr, T>
 where
-    T: BorrowDatum,
+    T: ?Sized + BorrowDatum,
 {
     type Item = Nullable<&'arr T>;
 
