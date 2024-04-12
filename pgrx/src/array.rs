@@ -62,6 +62,13 @@ where
     }
 
     /*
+    /**
+    Some problems with the design of an iter_mut for FlatArray:
+    In order to traverse the array, we need to assume well-formedness of e.g. cstring/varlena elements,
+    but &mut would allow safely updating varlenas within their span, e.g. injecting \0 into cstrings.
+    making it so that nothing allows making an ill-formed varlena via &mut seems untenable, also?
+    probably only viable to expose &mut for fixed-size types, then
+    */
     pub fn iter_mut(&mut self) -> ArrayIterMut<'mcx, T> {
         ???
     }
