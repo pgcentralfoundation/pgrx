@@ -75,6 +75,7 @@ where
         self.iter().nth(index)
     }
 
+    /*
     /// Mutably borrow the nth element.
     ///
     /// `FlatArray::nth_mut` may have to iterate the array, thus it is named for `Iterator::nth`.
@@ -83,6 +84,7 @@ where
         // FIXME: Become a dispatch to Iterator::nth
         todo!()
     }
+    */
 
     /// Number of elements in the Array
     ///
@@ -164,7 +166,7 @@ where
     type Item = Nullable<&'arr T>;
 
     fn next(&mut self) -> Option<Nullable<&'arr T>> {
-        if is_null(self.nulls) {
+        if todo!() {
             Some(Nullable::Null)
         } else {
             unsafe {
