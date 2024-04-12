@@ -217,7 +217,7 @@ fn initialize_test_framework(
         let system_session_id = start_pg(state.loglines.clone())?;
         let pg_config = get_pg_config()?;
         dropdb()?;
-        createdb(&pg_config, get_pg_dbname(), true, false)?;
+        createdb(&pg_config, get_pg_dbname(), true, false, get_runas())?;
         create_extension()?;
         state.installed = true;
         state.system_session_id = system_session_id;
@@ -283,7 +283,6 @@ pub fn client() -> eyre::Result<(postgres::Client, String)> {
 }
 
 fn install_extension() -> eyre::Result<()> {
-    eprintln!("installing extension");
     let profile = std::env::var("PGRX_BUILD_PROFILE").unwrap_or("debug".into());
     let no_schema = std::env::var("PGRX_NO_SCHEMA").unwrap_or("false".into()) == "true";
     let mut features = std::env::var("PGRX_FEATURES")
@@ -301,7 +300,6 @@ fn install_extension() -> eyre::Result<()> {
     let pgrx = Pgrx::from_config()?;
     let pg_config = pgrx.get(&pg_version)?;
     let cargo_test_args = get_cargo_test_features()?;
-    println!("detected cargo args: {cargo_test_args:?}");
 
     features.extend(cargo_test_args.features.iter().cloned());
 
@@ -314,6 +312,14 @@ fn install_extension() -> eyre::Result<()> {
         .stdout(Stdio::inherit())
         .stderr(Stdio::inherit())
         .env("CARGO_TARGET_DIR", get_target_dir()?);
+
+    if requires_runas() {
+        // if we're running tests as a different operating-system user we actually need to
+        // install the extension artifacts as "root", as it's the user that'll definitely
+        // be able to write to Postgres' various artifact directories.  "root" is also the default
+        // owner of these directories for distro-managed Postgres extensions
+        command.arg("--sudo");
+    }
 
     if let Ok(manifest_path) = std::env::var("PGRX_MANIFEST_PATH") {
         command.arg("--manifest-path");
@@ -381,19 +387,56 @@ fn initdb(postgresql_conf: Vec<&'static str>) -> eyre::Result<()> {
     let pgdata = get_pgdata_path()?;
 
     if !pgdata.is_dir() {
+        let base = pgdata.parent().unwrap();
+        if !base.exists() {
+            std::fs::create_dir(base)?;
+        }
+
+        if let Some(runas) = get_runas() {
+            // NB:  This command has to be run as root to change the permissions from us to the `runas` user
+            let mut chown = Command::new("sudo");
+            chown
+                .args(&["-u", "root", "chown", &runas])
+                .arg(&base)
+                .stdout(Stdio::piped())
+                .stderr(Stdio::piped());
+
+            let command_str = format!("{:?}", chown);
+            println!("{} {}", "     Running".bold().green(), command_str);
+            let child = chown.spawn()?;
+            let output = child.wait_with_output()?;
+            if !output.status.success() {
+                panic!(
+                    "failed to change ownership of the PGDATA directory at `{}`:\n{}{}",
+                    base.display().yellow(),
+                    String::from_utf8(output.stdout).unwrap(),
+                    String::from_utf8(output.stderr).unwrap()
+                );
+            }
+        }
+
         let pg_config = get_pg_config()?;
-        let mut command =
-            Command::new(pg_config.initdb_path().wrap_err("unable to determine initdb path")?);
+        let initdb_path = pg_config.initdb_path().wrap_err("unable to determine initdb path")?;
+
+        let mut command = if let Some(runas) = get_runas() {
+            let mut cmd = Command::new("sudo");
+            cmd.arg("-u").arg(runas).arg(initdb_path);
+            cmd
+        } else {
+            Command::new(initdb_path)
+        };
 
         command
+            // .current_dir(pgdata.parent().unwrap())
             .args(get_c_locale_flags())
             .arg("-D")
-            .arg(pgdata.to_str().unwrap())
-            .stdout(Stdio::inherit())
-            .stderr(Stdio::inherit());
+            .arg(&pgdata)
+            .stdout(Stdio::piped())
+            .stderr(Stdio::piped());
 
         let command_str = format!("{command:?}");
 
+        println!("{} {}", "     Running".bold().green(), command_str);
         let child = command.spawn().wrap_err_with(|| {
             format!(
                 "Failed to spawn process for initializing database using command: '{command_str}': "
@@ -420,26 +463,42 @@ fn initdb(postgresql_conf: Vec<&'static str>) -> eyre::Result<()> {
 }
 
 fn modify_postgresql_conf(pgdata: PathBuf, postgresql_conf: Vec<&'static str>) -> eyre::Result<()> {
-    let mut postgresql_conf_file = std::fs::OpenOptions::new()
-        .write(true)
-        .truncate(true)
-        .open(format!("{}/postgresql.auto.conf", pgdata.display()))
-        .wrap_err("couldn't open postgresql.auto.conf")?;
-    postgresql_conf_file
-        .write_all("log_line_prefix='[%m] [%p] [%c]: '\n".as_bytes())
-        .wrap_err("couldn't append log_line_prefix")?;
+    let mut contents = String::new();
 
+    contents.push_str("log_line_prefix='[%m] [%p] [%c]: '\n");
+    contents
+        .push_str(&format!("unix_socket_directories = '{}'\n", pgdata.parent().unwrap().display()));
     for setting in postgresql_conf {
-        postgresql_conf_file
-            .write_all(format!("{setting}\n").as_bytes())
-            .wrap_err("couldn't append custom setting to postgresql.conf")?;
+        contents.push_str(&format!("{setting}\n"));
     }
 
-    postgresql_conf_file
-        .write_all(
-            format!("unix_socket_directories = '{}'", Pgrx::home().unwrap().display()).as_bytes(),
-        )
-        .wrap_err("couldn't append `unix_socket_directories` setting to postgresql.conf")?;
+    let postgresql_auto_conf = pgdata.join("postgresql.auto.conf");
+
+    if let Some(runas) = get_runas() {
+        let mut sudo_command = Command::new("sudo")
+            .arg("-u")
+            .arg(&runas)
+            .arg("tee")
+            .arg(postgresql_auto_conf)
+            .stdin(Stdio::piped())
+            .stdout(Stdio::null())
+            .spawn()
+            .wrap_err("Failed to execute sudo command")?;
+
+        if let Some(stdin) = sudo_command.stdin.as_mut() {
+            stdin.write_all(contents.as_bytes())?;
+        } else {
+            return Err(eyre!("Failed to get stdin for sudo command"));
+        }
+
+        let sudo_status = sudo_command.wait()?;
+        if !sudo_status.success() {
+            return Err(eyre!("Failed to write contents with sudo"));
+        }
+    } else {
+        std::fs::write(postgresql_auto_conf, contents.as_bytes())?;
+    }
+
     Ok(())
 }
 
@@ -467,6 +526,11 @@ fn start_pg(loglines: LogLines) -> eyre::Result<String> {
             }
         }
 
+        cmd.arg(postmaster_path);
+        cmd
+    } else if let Some(runas) = get_runas() {
+        let mut cmd = Command::new("sudo");
+        cmd.arg("-u").arg(runas);
         cmd.arg(postmaster_path);
         cmd
     } else {
@@ -530,13 +594,27 @@ fn monitor_pg(mut command: Command, cmd_string: String, loglines: LogLines) -> S
         // exits. TODO: Consider finding a way to handle cases where we fail to
         // clean up due to a SIGNAL?
         add_shutdown_hook(move || unsafe {
-            libc::kill(pid as libc::pid_t, libc::SIGTERM);
-            let message_string = std::ffi::CString::new(
-                format!("stopping postgres (pid={pid})\n").bold().blue().to_string(),
-            )
-            .unwrap();
-            // IMPORTANT: Rust string literals are not naturally null-terminated
-            libc::printf("%s\0".as_ptr().cast(), message_string.as_ptr());
+            if let Some(_runas) = get_runas() {
+                Command::new("sudo")
+                    .arg("-u")
+                    .arg("root") // NB:  we must be "root" to kill the `sudo` process we spawned to start postgres
+                    .arg("kill")
+                    .arg("-s")
+                    .arg("SIGTERM")
+                    .arg(pid.to_string())
+                    .spawn()
+                    .expect("failed to spawn `sudo kill`")
+                    .wait()
+                    .expect("`sudo kill` didn't work");
+            } else {
+                libc::kill(pid as libc::pid_t, libc::SIGTERM);
+                let message_string = std::ffi::CString::new(
+                    format!("stopping postgres (pid={pid})\n").bold().blue().to_string(),
+                )
+                .unwrap();
+                // IMPORTANT: Rust string literals are not naturally null-terminated
+                libc::printf("%s\0".as_ptr().cast(), message_string.as_ptr());
+            }
         });
 
         eprintln!("{cmd}\npid={p}", cmd = cmd_string.bold().blue(), p = pid.to_string().yellow());
@@ -599,7 +677,17 @@ fn monitor_pg(mut command: Command, cmd_string: String, loglines: LogLines) -> S
 
 fn dropdb() -> eyre::Result<()> {
     let pg_config = get_pg_config()?;
-    let output = Command::new(pg_config.dropdb_path().expect("unable to determine dropdb path"))
+
+    let dropdb_path = pg_config.dropdb_path().expect("unable to determine dropdb path");
+    let mut command = if let Some(runas) = get_runas() {
+        let mut cmd = Command::new("sudo");
+        cmd.arg("-u").arg(runas).arg(dropdb_path);
+        cmd
+    } else {
+        Command::new(dropdb_path)
+    };
+
+    let output = command
         .env_remove("PGDATABASE")
         .env_remove("PGHOST")
         .env_remove("PGPORT")
@@ -662,9 +750,18 @@ fn get_extension_name() -> eyre::Result<String> {
 }
 
 fn get_pgdata_path() -> eyre::Result<PathBuf> {
-    let mut target_dir = get_target_dir()?;
-    target_dir.push(&format!("pgrx-test-data-{}", pg_sys::get_pg_major_version_num()));
-    Ok(target_dir)
+    let mut pgdata_base = std::env::var("CARGO_PGRX_TEST_PGDATA")
+        .map(|path| PathBuf::from(path))
+        .unwrap_or_else(|_| {
+            let mut target_dir = get_target_dir()
+                .unwrap_or_else(|e| panic!("Failed to determine the crate target directory: {e}"));
+            target_dir.push("pgrx-test-pgdata");
+            target_dir
+        });
+
+    // append the postgres version number
+    pgdata_base.push(&format!("{}", pg_sys::get_pg_major_version_num()));
+    Ok(pgdata_base)
 }
 
 fn get_pid_file() -> eyre::Result<PathBuf> {
@@ -678,8 +775,18 @@ pub(crate) fn get_pg_dbname() -> &'static str {
 }
 
 pub(crate) fn get_pg_user() -> String {
-    std::env::var("USER")
-        .unwrap_or_else(|_| panic!("USER environment var is unset or invalid UTF-8"))
+    get_runas().unwrap_or_else(|| {
+        std::env::var("USER")
+            .unwrap_or_else(|_| panic!("USER environment var is unset or invalid UTF-8"))
+    })
+}
+
+fn get_runas() -> Option<String> {
+    std::env::var("CARGO_PGRX_TEST_RUNAS").ok()
+}
+
+fn requires_runas() -> bool {
+    get_runas().is_some()
 }
 
 pub fn get_named_capture(
