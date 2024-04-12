@@ -84,22 +84,6 @@ where
         todo!()
     }
 
-    // Obtain a pointer with read-only permissions to the type at this index
-    #[inline]
-    fn ptr_to(&self, index: usize) -> Option<*const u8> {
-        let data_ptr = unsafe { port::ARR_DATA_PTR(ptr::addr_of!(self.head).cast_mut()) };
-        todo!()
-        // FIXME: replace with actual impl instead of something that merely typechecks
-    }
-
-    // Obtain a pointer with read-write permissions to the type at this index
-    #[inline]
-    fn ptr_mut_to(&mut self, index: usize) -> Option<*mut u8> {
-        let data_ptr = unsafe { port::ARR_DATA_PTR(ptr::addr_of_mut!(self.head)) };
-        todo!()
-        // FIXME: replace with actual impl instead of something that merely typechecks
-    }
-
     /// Number of elements in the Array
     ///
     /// Note that for many Arrays, this doesn't have a linear relationship with array byte-len.
