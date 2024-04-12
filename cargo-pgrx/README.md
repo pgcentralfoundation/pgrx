@@ -494,8 +494,8 @@ make to the database are not preserved.
 
 An administrative note is that the `--runas` and `--pgdata` options can be used to control the operating-system user used
 to run the separate `postmaster` process for test execution.  Likely, if `--runas` is used, then `--pgdata` will also need
-to be set to a base directory that is readable and writable by that user -- the default PGDATA directory of `./target/` may
-not be permissive enough.
+to be set to a base directory that is readable and writable by that user -- the default PGDATA directory at `./target/pgrx-test-pgdata` 
+will have the permissions of the user running `cargo pgrx test` and won't be chown-able to the `--runas` user.
 
 ```console
 $ cargo pgrx test --help

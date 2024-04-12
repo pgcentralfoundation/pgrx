@@ -680,7 +680,6 @@ fn monitor_pg(mut command: Command, cmd_string: String, loglines: LogLines) -> S
 
 fn dropdb() -> eyre::Result<()> {
     let pg_config = get_pg_config()?;
-
     let dropdb_path = pg_config.dropdb_path().expect("unable to determine dropdb path");
     let mut command = if let Some(runas) = get_runas() {
         let mut cmd = Command::new("sudo");
