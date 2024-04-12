@@ -36,7 +36,7 @@ pub struct FlatArray<'mcx, T: ?Sized> {
 
 impl<'mcx, T> FlatArray<'mcx, T>
 where
-    T: ?Sized + BorrowDatum,
+    T: ?Sized,
 {
     fn as_raw(&self) -> RawArray {
         unsafe {
@@ -45,6 +45,18 @@ where
         }
     }
 
+    /// Number of elements in the Array
+    ///
+    /// Note that for many Arrays, this doesn't have a linear relationship with array byte-len.
+    pub fn count(&self) -> usize {
+        self.as_raw().len()
+    }
+}
+
+impl<'mcx, T> FlatArray<'mcx, T>
+where
+    T: ?Sized + BorrowDatum,
+{
     /// Iterate the array
     // this lifetime seems wrong
     pub fn iter(&'mcx self) -> ArrayIter<'mcx, T> {
@@ -92,13 +104,6 @@ where
     }
     */
 
-    /// Number of elements in the Array
-    ///
-    /// Note that for many Arrays, this doesn't have a linear relationship with array byte-len.
-    pub fn count(&self) -> usize {
-        self.as_raw().len()
-    }
-
     pub fn nulls(&self) -> Option<&[u8]> {
         let len = self.count() + 7 >> 3; // Obtains 0 if len was 0.
 
@@ -133,7 +138,7 @@ where
     }
 }
 
-unsafe impl<T> BorrowDatum for FlatArray<'_, T> {
+unsafe impl<T: ?Sized> BorrowDatum for FlatArray<'_, T> {
     const PASS: Option<layout::PassBy> = Some(layout::PassBy::Ref);
     unsafe fn point_from(ptr: *mut u8) -> *mut Self {
         unsafe {
