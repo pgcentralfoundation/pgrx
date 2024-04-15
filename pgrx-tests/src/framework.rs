@@ -791,7 +791,9 @@ fn get_runas() -> Option<String> {
         Ok(s) => Some(s),
         Err(e) => match e {
             VarError::NotPresent => None,
-            VarError::NotUnicode(e) => panic!("`CARGO_PGRX_TEST_RUNAS` envar value is not unicode"),
+            VarError::NotUnicode(e) => {
+                panic!("`CARGO_PGRX_TEST_RUNAS` environment var value is not unicode")
+            }
         },
     }
 }
