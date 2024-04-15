@@ -18,7 +18,7 @@ fn main() {
 ///
 /// Used to check our toolchain version. `cargo` sets the `CARGO` env var both
 /// when running the build script and when running `cargo-pgrx`, so it's easier
-/// to check `cargo` than to check itself `rustc` itself. Also `cargo` will
+/// to check `cargo` than to check `rustc` itself. Also `cargo` will
 /// always have the same version as the `rustc` it goes with, so checking the
 /// `cargo` version is sufficient.
 ///
