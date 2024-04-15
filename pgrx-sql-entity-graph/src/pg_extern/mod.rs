@@ -395,6 +395,13 @@ impl PgExtern {
             self.func.sig.ident.span(),
         );
         let func_generics = &self.func.sig.generics;
+        // the wrapper function declaration may contain lifetimes that are not used, since our input type is `FunctionCallInfo` mainly and return type is `Datum`
+        let unused_lifetimes = match func_generics.lifetimes().next() {
+            Some(_) => quote! {
+                #[allow(unused_lifetimes, clippy::extra_unused_lifetimes)]
+            },
+            None => quote! {},
+        };
         let is_raw = self.extern_attrs().contains(&Attribute::Raw);
         // We use a `_` prefix to make functions with no args more satisfied during linting.
         let fcinfo_ident = syn::Ident::new("_fcinfo", self.func.sig.ident.span());
@@ -459,6 +466,7 @@ impl PgExtern {
                 quote_spanned! { span=>
                     #[no_mangle]
                     #[doc(hidden)]
+                    #unused_lifetimes
                     #[::pgrx::pgrx_macros::pg_guard]
                     pub unsafe extern "C" fn #func_name_wrapper #func_generics(#fcinfo_ident: ::pgrx::pg_sys::FunctionCallInfo) #return_ty {
                         #wrapped_contents
