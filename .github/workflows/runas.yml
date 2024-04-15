@@ -1,4 +1,4 @@
-name: Test cargo pgrx test --runas
+name: cargo pgrx test --runas
 
 on:
   push:
