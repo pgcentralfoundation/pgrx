@@ -430,7 +430,7 @@ fn initdb(postgresql_conf: Vec<&'static str>) -> eyre::Result<()> {
         };
 
         command
-            // .current_dir(pgdata.parent().unwrap())
+            .current_dir(pgdata.parent().unwrap())
             .args(get_c_locale_flags())
             .arg("-D")
             .arg(&pgdata)
@@ -772,6 +772,7 @@ fn get_pid_file() -> eyre::Result<PathBuf> {
     Ok(pgdata)
 }
 
+#[inline]
 pub(crate) fn get_pg_dbname() -> &'static str {
     "pgrx_tests"
 }
@@ -783,10 +784,12 @@ pub(crate) fn get_pg_user() -> String {
     })
 }
 
+#[inline]
 fn get_runas() -> Option<String> {
     std::env::var("CARGO_PGRX_TEST_RUNAS").ok()
 }
 
+#[inline]
 fn requires_runas() -> bool {
     get_runas().is_some()
 }

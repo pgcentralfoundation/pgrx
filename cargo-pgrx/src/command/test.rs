@@ -41,10 +41,10 @@ pub(crate) struct Test {
     #[clap(long, short)]
     no_schema: bool,
     /// Use `sudo` to initialize and run the Postgres test instance as this system user
-    #[clap(long)]
+    #[clap(long, value_name = "USER")]
     runas: Option<String>,
     /// Initialize the test database cluster here, instead of the default location.  If used with `--runas`, then it must be writable by the user
-    #[clap(long)]
+    #[clap(long, value_name = "DIR")]
     pgdata: Option<PathBuf>,
     #[clap(flatten)]
     features: clap_cargo::Features,

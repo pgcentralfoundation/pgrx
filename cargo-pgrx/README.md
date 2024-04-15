@@ -514,8 +514,8 @@ Options:
   -r, --release                        compile for release mode (default is debug)
       --profile <PROFILE>              Specific profile to use (conflicts with `--release`)
   -n, --no-schema                      Don't regenerate the schema
-      --runas <RUNAS>                  Use `sudo` to initialize and run the Postgres test instance as this system user
-      --pgdata <PGDATA>                Initialize the test database cluster here, instead of the default location.  If used with `--runas`, then it must be writable by the user
+      --runas <USER>                   Use `sudo` to initialize and run the Postgres test instance as this system user
+      --pgdata <DIR>                   Initialize the test database cluster here, instead of the default location.  If used with `--runas`, then it must be writable by the user
       --all-features                   Activate all available features
       --no-default-features            Do not activate the `default` feature
   -F, --features <FEATURES>            Space-separated list of features to activate
