@@ -18,6 +18,7 @@ use pgrx_pg_config::{
 };
 use postgres::error::DbError;
 use std::collections::HashMap;
+use std::env::VarError;
 use std::io::{BufRead, BufReader, Write};
 use std::path::PathBuf;
 use std::sync::{Arc, Mutex, OnceLock};
@@ -786,7 +787,13 @@ pub(crate) fn get_pg_user() -> String {
 
 #[inline]
 fn get_runas() -> Option<String> {
-    std::env::var("CARGO_PGRX_TEST_RUNAS").ok()
+    match std::env::var("CARGO_PGRX_TEST_RUNAS") {
+        Ok(s) => Some(s),
+        Err(e) => match e {
+            VarError::NotPresent => None,
+            VarError::NotUnicode(e) => panic!("`CARGO_PGRX_TEST_RUNAS` envar value is not unicode"),
+        },
+    }
 }
 
 #[inline]
