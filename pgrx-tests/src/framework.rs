@@ -388,6 +388,7 @@ fn install_extension() -> eyre::Result<()> {
 ///
 /// Returns true if `initdb` should be run against the directory.
 fn maybe_make_pgdata<P: AsRef<Path>>(pgdata: P) -> eyre::Result<bool> {
+    let pgdata = pgdata.as_ref();
     let mut need_initdb = false;
 
     if let Some(runas) = get_runas() {
@@ -402,7 +403,7 @@ fn maybe_make_pgdata<P: AsRef<Path>>(pgdata: P) -> eyre::Result<bool> {
             .arg(&runas)
             .arg("mkdir")
             .arg("-p")
-            .arg(&pgdata)
+            .arg(pgdata)
             .stdout(Stdio::piped())
             .stderr(Stdio::piped());
         let command_str = format!("{:?}", mkdir);
@@ -417,13 +418,15 @@ fn maybe_make_pgdata<P: AsRef<Path>>(pgdata: P) -> eyre::Result<bool> {
                 String::from_utf8(output.stderr).unwrap()
             );
         }
-        need_initdb = false;
+
+        // a PGDATA directory created as a different user will always need `initdb` to be run
+        need_initdb = true;
     } else {
-        // If the directory doesn't exist, make it
+        // if the directory doesn't exist, make it. If it does, then we reuse it
         if !pgdata.exists() {
             std::fs::create_dir_all(&pgdata)?;
 
-            // and indicate that it'll need `initdb` run against it
+            // which is the only time we need to `initdb` it.
             need_initdb = true;
         }
     }
