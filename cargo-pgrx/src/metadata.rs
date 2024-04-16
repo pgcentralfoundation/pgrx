@@ -67,21 +67,24 @@ pub fn validate(
         let many = mismatches.len();
         let mismatches = mismatches
             .into_iter()
-            .map(|(p, v)| format!("`{p} = {v}`"))
+            .map(|(p, v)| format!("{p} = {v}"))
             .collect::<Vec<_>>()
             .join(", ");
 
         let help = if let (true, Some(version)) = (unified, universion) {
             let version = version.clone();
-            format!("{prefix} cargo install --version {version} --locked", prefix = "help:".bold())
+            format!(
+                "{prefix} cargo install cargo-pgrx --version {version} --locked",
+                prefix = "help:".bold()
+            )
         } else {
             String::new()
         };
         return Err(eyre!(
-            "The installed `cargo-pgrx` v{cargo_pgrx_version} \
-            is not compatible with the {mismatches} {} in `{}`. `cargo-pgrx` \
-            and pgrx dependency versions must be identical.
-            {help}",
+            r#"The installed cargo-pgrx {cargo_pgrx_version} is not compatible with the {} in {}:
+{mismatches}
+cargo-pgrx and pgrx library versions must be identical.
+{help}"#,
             if many == 1 { "dependency" } else { "dependencies" },
             path.map(|p| p.as_ref().display().to_string())
                 .unwrap_or_else(|| "./Cargo.toml".to_string())
