@@ -548,7 +548,7 @@ version of Postgres is likely to split `pg_config --pkglibdir` and `pg_config --
 version of Postgres 12.)
 
 This command could be useful from Dockerfiles, for example, to automate building installation packages for various Linux
-distobutions or MacOS Postgres installations.
+distributions or MacOS Postgres installations.
 
 ```console
 $ cargo pgrx package --help
