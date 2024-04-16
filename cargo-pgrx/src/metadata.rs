@@ -43,8 +43,14 @@ pub fn validate(
     });
 
     let mut mismatches = BTreeMap::new();
+    let (mut unified, mut universion) = (true, None);
     for package in pgrx_packages {
         let package_semver = package.version.clone();
+        if unified && universion.as_ref().is_some_and(|v| v != &package_semver) {
+            unified = false;
+        } else if universion.is_none() {
+            universion = Some(package_semver.clone());
+        };
         if !cargo_pgrx_version_req.matches(&package_semver) {
             mismatches.insert(package.name.clone(), package.version.clone());
         } else {
@@ -65,16 +71,21 @@ pub fn validate(
             .collect::<Vec<_>>()
             .join(", ");
 
+        let help = if let (true, Some(version)) = (unified, universion) {
+            let version = version.clone();
+            format!("{prefix} cargo install --version {version} --locked", prefix = "help:".bold())
+        } else {
+            String::new()
+        };
         return Err(eyre!(
             "The installed `cargo-pgrx` v{cargo_pgrx_version} \
             is not compatible with the {mismatches} {} in `{}`. `cargo-pgrx` \
             and pgrx dependency versions must be identical.
-            {help} cargo install --version {mismatches} --locked",
+            {help}",
             if many == 1 { "dependency" } else { "dependencies" },
             path.map(|p| p.as_ref().display().to_string())
                 .unwrap_or_else(|| "./Cargo.toml".to_string())
                 .yellow(),
-            help = "help:".to_string().bold()
         ));
     }
 
