@@ -315,7 +315,7 @@ fn install_extension() -> eyre::Result<()> {
         .env("CARGO_TARGET_DIR", get_target_dir()?);
 
     if requires_runas() {
-        // if we're running tests as a different operating-system user we actually need to
+        // if we're running tests as a different operating-system user we, then actually need to
         // install the extension artifacts as "root", as it's the user that'll definitely
         // be able to write to Postgres' various artifact directories.  "root" is also the default
         // owner of these directories for distro-managed Postgres extensions
@@ -792,7 +792,10 @@ fn get_runas() -> Option<String> {
         Err(e) => match e {
             VarError::NotPresent => None,
             VarError::NotUnicode(e) => {
-                panic!("`CARGO_PGRX_TEST_RUNAS` environment var value is not unicode")
+                panic!(
+                    "`CARGO_PGRX_TEST_RUNAS` environment var value is not unicode:  `{}`",
+                    e.to_string_lossy()
+                )
             }
         },
     }
