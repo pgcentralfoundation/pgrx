@@ -20,7 +20,7 @@ use postgres::error::DbError;
 use std::collections::HashMap;
 use std::env::VarError;
 use std::io::{BufRead, BufReader, Write};
-use std::path::PathBuf;
+use std::path::{Path, PathBuf};
 use std::sync::{Arc, Mutex, OnceLock};
 use std::time::Duration;
 use sysinfo::{Pid, ProcessExt, System, SystemExt};
@@ -384,41 +384,59 @@ fn install_extension() -> eyre::Result<()> {
     Ok(())
 }
 
+/// Maybe make the `$PGDATA` directory, if it doesn't exist.
+///
+/// Returns true if `initdb` should be run against the directory.
+fn maybe_make_pgdata<P: AsRef<Path>>(pgdata: P) -> eyre::Result<bool> {
+    let mut need_initdb = false;
+
+    if let Some(runas) = get_runas() {
+        // we've been asked to run as a different user.  As such, the PGDATA directory we just created
+        // needs to be owned by that user.
+        //
+        // In order to do that, we must become that user to create it
+
+        let mut mkdir = Command::new("sudo");
+        mkdir
+            .arg("-u")
+            .arg(&runas)
+            .arg("mkdir")
+            .arg("-p")
+            .arg(&pgdata)
+            .stdout(Stdio::piped())
+            .stderr(Stdio::piped());
+        let command_str = format!("{:?}", mkdir);
+        println!("{} {}", "     Running".bold().green(), command_str);
+        let child = mkdir.spawn()?;
+        let output = child.wait_with_output()?;
+        if !output.status.success() {
+            panic!(
+                "failed to create the PGDATA directory at `{}`:\n{}{}",
+                pgdata.display().yellow(),
+                String::from_utf8(output.stdout).unwrap(),
+                String::from_utf8(output.stderr).unwrap()
+            );
+        }
+        need_initdb = false;
+    } else {
+        // If the directory doesn't exist, make it
+        if !pgdata.exists() {
+            std::fs::create_dir_all(&pgdata)?;
+
+            // and indicate that it'll need `initdb` run against it
+            need_initdb = true;
+        }
+    }
+
+    Ok(need_initdb)
+}
+
 fn initdb(postgresql_conf: Vec<&'static str>) -> eyre::Result<()> {
     let pgdata = get_pgdata_path()?;
 
-    if !pgdata.is_dir() {
-        let base = pgdata.parent().unwrap();
-        if !base.exists() {
-            std::fs::create_dir(base)?;
-        }
+    let need_initdb = maybe_make_pgdata(&pgdata)?;
 
-        if let Some(runas) = get_runas() {
-            // we've been asked to run as a different user.  As such, the PGDATA directory we just created
-            // needs to be owned by that user.
-            //
-            // In order to do that, we have to become "root" to change its ownership.
-            let mut chown = Command::new("sudo");
-            chown
-                .args(&["-u", "root", "chown", &runas])
-                .arg(&base)
-                .stdout(Stdio::piped())
-                .stderr(Stdio::piped());
-
-            let command_str = format!("{:?}", chown);
-            println!("{} {}", "     Running".bold().green(), command_str);
-            let child = chown.spawn()?;
-            let output = child.wait_with_output()?;
-            if !output.status.success() {
-                panic!(
-                    "failed to change ownership of the PGDATA directory at `{}`:\n{}{}",
-                    base.display().yellow(),
-                    String::from_utf8(output.stdout).unwrap(),
-                    String::from_utf8(output.stderr).unwrap()
-                );
-            }
-        }
-
+    if need_initdb {
         let pg_config = get_pg_config()?;
         let initdb_path = pg_config.initdb_path().wrap_err("unable to determine initdb path")?;
 
