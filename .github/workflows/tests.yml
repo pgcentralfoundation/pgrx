@@ -118,7 +118,6 @@ jobs:
     steps:
       - env:
         PG_VER: ${{ matrix.version.postgres }}
-        RUSTUP_TOOLCHAIN: ${{ matrix.version.rust }}
       - uses: actions/checkout@v4
 
       - name: Set up prerequisites and environment
