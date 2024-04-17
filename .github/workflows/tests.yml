@@ -113,9 +113,12 @@ jobs:
 
     strategy:
       matrix:
-        version: [ "postgres-12", "postgres-13", "postgres-14", "postgres-15", "postgres-16" ]
+        version: [{"postgres": 12}, {"postgres": 13}, {"postgres": 14}, {"postgres": 15}, {"postgres": 16}, {"postgres": 16, "rust": "beta"}]
 
     steps:
+      - env:
+        PG_VER: ${{ matrix.version.postgres }}
+        RUSTUP_TOOLCHAIN: ${{ matrix.version.rust }}
       - uses: actions/checkout@v4
 
       - name: Set up prerequisites and environment
