@@ -104,7 +104,6 @@ jobs:
 
   pgrx_tests:
     name: Linux tests & examples
-    run-name: postgres ${{ matrix.version.postgres }} with rust ${{ matrix.version.rust }}
     needs: lintck
     runs-on: ubuntu-latest
     if: "!contains(github.event.head_commit.message, 'nogha')"
@@ -116,6 +115,7 @@ jobs:
       matrix:
         version: [{"postgres": 12}, {"postgres": 13}, {"postgres": 14}, {"postgres": 15}, {"postgres": 16}, {"postgres": 16, "rust": "beta"}]
 
+    run-name: postgres ${{ matrix.version.postgres }} with rust ${{ matrix.version.rust }}
     steps:
       - uses: actions/checkout@v4
 
