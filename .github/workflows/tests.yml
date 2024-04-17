@@ -116,8 +116,6 @@ jobs:
         version: [{"postgres": 12}, {"postgres": 13}, {"postgres": 14}, {"postgres": 15}, {"postgres": 16}, {"postgres": 16, "rust": "beta"}]
 
     steps:
-      - env:
-        PG_VER: ${{ matrix.version.postgres }}
       - uses: actions/checkout@v4
 
       - name: Set up prerequisites and environment
@@ -135,7 +133,7 @@ jobs:
           echo ""
           
           echo "----- Set up dynamic variables -----"
-          export PG_VER=$(echo ${{ matrix.version }} | cut -d '-' -f2)
+          export PG_VER=${{ matrix.version.postgres }}
           echo "PG_VER=$PG_VER" >> $GITHUB_ENV
           echo "MAKEFLAGS=$MAKEFLAGS -j $(grep -c ^processor /proc/cpuinfo)" >> $GITHUB_ENV
           cat $GITHUB_ENV
