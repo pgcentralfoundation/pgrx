@@ -25,10 +25,6 @@ jobs:
       RUSTC_WRAPPER: sccache
       SCCACHE_DIR: /home/runner/.cache/sccache
 
-    strategy:
-      matrix:
-        postgres: [ 15 ]
-
     steps:
       - uses: actions/checkout@v4
 
@@ -359,11 +355,7 @@ jobs:
     env:
       RUSTC_WRAPPER: sccache
       SCCACHE_DIR: /home/runner/.cache/sccache
-      PG_VER: ${{ matrix.postgres }}
-
-    strategy:
-      matrix:
-        postgres: [15]
+      PG_VER: 15
 
     steps:
       - uses: actions/checkout@v4
@@ -437,7 +429,7 @@ jobs:
       - name: Install cargo-pgrx
         run: cargo install --path cargo-pgrx/ --debug --force
 
-      - name: Run 'cargo pgrx init' for ${{ matrix.postgres }}
+      - name: Run 'cargo pgrx init'
         run: cargo pgrx init --pg$PG_VER download
 
       # We can't do this with other lints because we need $PGRX_HOME
@@ -466,7 +458,7 @@ jobs:
       - name: show Cargo.toml
         run: cat /tmp/sample/Cargo.toml
 
-      - name: Test sample for ${{ matrix.postgres }}
+      - name: Test sample
         run: cd /tmp/sample && cargo pgrx test pg$PG_VER
 
       - name: Stop sccache server
