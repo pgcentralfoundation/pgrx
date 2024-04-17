@@ -25,10 +25,6 @@ jobs:
       RUSTC_WRAPPER: sccache
       SCCACHE_DIR: /home/runner/.cache/sccache
 
-    strategy:
-      matrix:
-        version: [ "postgres-15" ]
-
     steps:
       - uses: actions/checkout@v4
 
@@ -50,12 +46,7 @@ jobs:
           ./ci/rustup.sh
 
           # https://stackoverflow.com/questions/57968497/how-do-i-set-an-env-var-with-a-bash-expression-in-github-actions/57969570#57969570
-          
-          echo "----- Set up MAKEFLAGS -----"
-          echo "MAKEFLAGS=$MAKEFLAGS -j $(grep -c ^processor /proc/cpuinfo)" >> $GITHUB_ENV
-          cat $GITHUB_ENV
-          echo ""
-          
+
           echo "----- Outputting env -----"
           env
           echo ""
@@ -103,17 +94,22 @@ jobs:
         run: sccache --stop-server || true
 
   pgrx_tests:
-    name: pgrx-tests & examples
+    name: Linux tests & examples
     needs: lintck
     runs-on: ubuntu-latest
     if: "!contains(github.event.head_commit.message, 'nogha')"
     env:
       RUSTC_WRAPPER: sccache
       SCCACHE_DIR: /home/runner/.cache/sccache
+      PG_VER: ${{ matrix.postgres }}
+      RUST_TOOLCHAIN: ${{ matrix.rust || 'stable' }}
 
     strategy:
       matrix:
-        version: [ "postgres-12", "postgres-13", "postgres-14", "postgres-15", "postgres-16" ]
+        postgres: [12, 13, 14, 15, 16]
+        include:
+          - postgres: 16
+            rust: "beta"
 
     steps:
       - uses: actions/checkout@v4
@@ -133,9 +129,6 @@ jobs:
           echo ""
           
           echo "----- Set up dynamic variables -----"
-          export PG_VER=$(echo ${{ matrix.version }} | cut -d '-' -f2)
-          echo "PG_VER=$PG_VER" >> $GITHUB_ENV
-          echo "MAKEFLAGS=$MAKEFLAGS -j $(grep -c ^processor /proc/cpuinfo)" >> $GITHUB_ENV
           cat $GITHUB_ENV
           echo ""
           
@@ -160,7 +153,7 @@ jobs:
 
           echo "----- Set up cross compilation -----"
           sudo apt-get install -y --fix-missing crossbuild-essential-arm64
-          
+
           echo 'CARGO_TARGET_AARCH64_UNKNOWN_LINUX_GNU_LINKER=aarch64-linux-gnu-gcc' >> $GITHUB_ENV
           # TODO: not all of these should be needed, but for now it's likely fine.
           echo 'BINDGEN_EXTRA_CLANG_ARGS_aarch64-unknown-linux-gnu=-target aarch64-unknown-linux-gnu -isystem /usr/aarch64-linux-gnu/include/ -ccc-gcc-name aarch64-linux-gnu-gcc' >> $GITHUB_ENV
@@ -216,7 +209,7 @@ jobs:
       - name: Install cargo-pgrx
         run: cargo install --path cargo-pgrx/ --debug --force
 
-      - name: Run 'cargo pgrx init' against system-level ${{ matrix.version }}
+      - name: Run 'cargo pgrx init' against system-level ${{ matrix.postgres }}
         run: cargo pgrx init --pg$PG_VER /usr/lib/postgresql/$PG_VER/bin/pg_config
 
       - name: Run base-level tests
@@ -240,13 +233,21 @@ jobs:
         run: |
           cargo test \
             --features "pg$PG_VER cshim proptest" \
-            --package pgrx-tests
+            --package pgrx-tests --lib
 
       - name: Run pgrx-tests with cshim disabled
         run: |
           cargo test \
             --features "pg$PG_VER proptest" \
-            --package pgrx-tests
+            --package pgrx-tests --lib
+
+      - name: Run UI tests
+        if: ${{ matrix.rust == null }}
+        run: |
+          cargo test \
+            --features "pg$PG_VER proptest" \
+            --package pgrx-tests --test ui
+
 
       - name: Run aggregate example tests
         run: cargo test --package aggregate --features "pg$PG_VER" --no-default-features
@@ -354,10 +355,7 @@ jobs:
     env:
       RUSTC_WRAPPER: sccache
       SCCACHE_DIR: /home/runner/.cache/sccache
-
-    strategy:
-      matrix:
-        version: [ "postgres-15" ]
+      PG_VER: 15
 
     steps:
       - uses: actions/checkout@v4
@@ -376,16 +374,10 @@ jobs:
           echo "$HOME/.local/bin" >> $GITHUB_PATH
           mkdir -p /home/runner/.cache/sccache
           echo ""
-          
-          # https://stackoverflow.com/questions/57968497/how-do-i-set-an-env-var-with-a-bash-expression-in-github-actions/57969570#57969570
-          
-          echo "----- Set up MAKEFLAGS -----"
-          echo "MAKEFLAGS=$MAKEFLAGS -j $(grep -c ^processor /proc/cpuinfo)" >> $GITHUB_ENV
+
           cat $GITHUB_ENV
           echo ""
           
-          echo "----- Set up PG_VER variable -----"
-          echo "PG_VER=$(echo ${{ matrix.version }} | cut -d '-' -f2)" >> $GITHUB_ENV
           cat $GITHUB_ENV
           echo ""
           
@@ -437,7 +429,7 @@ jobs:
       - name: Install cargo-pgrx
         run: cargo install --path cargo-pgrx/ --debug --force
 
-      - name: Run 'cargo pgrx init' for ${{ matrix.version }}
+      - name: Run 'cargo pgrx init'
         run: cargo pgrx init --pg$PG_VER download
 
       # We can't do this with other lints because we need $PGRX_HOME
@@ -466,7 +458,7 @@ jobs:
       - name: show Cargo.toml
         run: cat /tmp/sample/Cargo.toml
 
-      - name: Test sample for ${{ matrix.version }}
+      - name: Test sample
         run: cd /tmp/sample && cargo pgrx test pg$PG_VER
 
       - name: Stop sccache server
@@ -523,7 +515,6 @@ jobs:
           mkdir -p $SCCACHE_DIR
           sccache --version
           
-          # https://stackoverflow.com/questions/57968497/how-do-i-set-an-env-var-with-a-bash-expression-in-github-actions/57969570#57969570
           echo "----- Getting pre-installed Postgres major version -----"
           PG_VER=$(pg_config --version | awk '{split($2,a,"."); print a[1]}')
           echo "PG_VER=$PG_VER" >> $GITHUB_ENV
