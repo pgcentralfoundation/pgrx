@@ -133,6 +133,7 @@ jobs:
           echo ""
           
           echo "----- Set up dynamic variables -----"
+          export RUST_TOOLCHAIN=${{ matrix.version.rust }}
           export PG_VER=${{ matrix.version.postgres }}
           echo "PG_VER=$PG_VER" >> $GITHUB_ENV
           echo "MAKEFLAGS=$MAKEFLAGS -j $(grep -c ^processor /proc/cpuinfo)" >> $GITHUB_ENV
