@@ -54,6 +54,7 @@ In general this is only necessary when returning a `Vec<T: PostgresType>`.  In t
 function's `search_path`.
 
 ### Relocatable extensions
+
 Previously, PGRX would schema-qualify all of the output of `cargo pgrx schema` if there was a `schema = foo` attribute in your
 extension `.control` file, including items outside of a `#[pg_scema]` macro. However, this meant that pgrx could not support [relocatable extensions](https://www.postgresql.org/docs/current/extend-extensions.html#EXTEND-EXTENSIONS-RELOCATION).
 This is because relocatable extensions' defining characteristic is that they can be moved from one schema to another, and that
