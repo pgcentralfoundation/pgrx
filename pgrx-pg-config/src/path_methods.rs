@@ -24,8 +24,12 @@ pub fn prefix_path<P: Into<PathBuf>>(dir: P) -> String {
         .expect("failed to construct path")
 }
 
-// Originally part of `pgrx-utils`
+/// The target dir, or where we think it will be
 pub fn get_target_dir() -> eyre::Result<PathBuf> {
+    if let Some(path) = std::env::var_os("CARGO_TARGET_DIR") {
+        return Ok(path.into());
+    }
+    // if we don't actually have CARGO_TARGET_DIR set, we try to infer it
     let cargo = std::env::var_os("CARGO").unwrap_or_else(|| "cargo".into());
     let mut command = Command::new(cargo);
     command.arg("metadata").arg("--format-version=1").arg("--no-deps");
