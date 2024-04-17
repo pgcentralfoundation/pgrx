@@ -103,7 +103,8 @@ jobs:
         run: sccache --stop-server || true
 
   pgrx_tests:
-    name: pgrx-tests & examples
+    name: Linux tests & examples
+    run-name: postgres ${{ matrix.version.postgres }} with rust ${{ matrix.version.rust }}
     needs: lintck
     runs-on: ubuntu-latest
     if: "!contains(github.event.head_commit.message, 'nogha')"
