@@ -113,9 +113,11 @@ jobs:
 
     strategy:
       matrix:
-        version: [{"postgres": 12}, {"postgres": 13}, {"postgres": 14}, {"postgres": 15}, {"postgres": 16}, {"postgres": 16, "rust": "beta"}]
+        postgres: [12, 13, 14, 15, 16]
+        include:
+          - postgres: 16
+            rust: "beta"
 
-    run-name: postgres ${{ matrix.version.postgres }} with rust ${{ matrix.version.rust }}
     steps:
       - uses: actions/checkout@v4
 
@@ -134,8 +136,8 @@ jobs:
           echo ""
           
           echo "----- Set up dynamic variables -----"
-          export RUST_TOOLCHAIN=${{ matrix.version.rust }}
-          export PG_VER=${{ matrix.version.postgres }}
+          export RUST_TOOLCHAIN=${{ matrix.rust }}
+          export PG_VER=${{ matrix.postgres }}
           echo "PG_VER=$PG_VER" >> $GITHUB_ENV
           echo "MAKEFLAGS=$MAKEFLAGS -j $(grep -c ^processor /proc/cpuinfo)" >> $GITHUB_ENV
           cat $GITHUB_ENV
@@ -218,7 +220,7 @@ jobs:
       - name: Install cargo-pgrx
         run: cargo install --path cargo-pgrx/ --debug --force
 
-      - name: Run 'cargo pgrx init' against system-level ${{ matrix.version }}
+      - name: Run 'cargo pgrx init' against system-level ${{ matrix.postgres }}
         run: cargo pgrx init --pg$PG_VER /usr/lib/postgresql/$PG_VER/bin/pg_config
 
       - name: Run base-level tests
