@@ -157,7 +157,7 @@ jobs:
 
           echo "----- Set up cross compilation -----"
           sudo apt-get install -y --fix-missing crossbuild-essential-arm64
-          
+
           echo 'CARGO_TARGET_AARCH64_UNKNOWN_LINUX_GNU_LINKER=aarch64-linux-gnu-gcc' >> $GITHUB_ENV
           # TODO: not all of these should be needed, but for now it's likely fine.
           echo 'BINDGEN_EXTRA_CLANG_ARGS_aarch64-unknown-linux-gnu=-target aarch64-unknown-linux-gnu -isystem /usr/aarch64-linux-gnu/include/ -ccc-gcc-name aarch64-linux-gnu-gcc' >> $GITHUB_ENV
@@ -382,9 +382,7 @@ jobs:
           echo "$HOME/.local/bin" >> $GITHUB_PATH
           mkdir -p /home/runner/.cache/sccache
           echo ""
-          
-          # https://stackoverflow.com/questions/57968497/how-do-i-set-an-env-var-with-a-bash-expression-in-github-actions/57969570#57969570
-          
+
           cat $GITHUB_ENV
           echo ""
           
@@ -525,7 +523,6 @@ jobs:
           mkdir -p $SCCACHE_DIR
           sccache --version
           
-          # https://stackoverflow.com/questions/57968497/how-do-i-set-an-env-var-with-a-bash-expression-in-github-actions/57969570#57969570
           echo "----- Getting pre-installed Postgres major version -----"
           PG_VER=$(pg_config --version | awk '{split($2,a,"."); print a[1]}')
           echo "PG_VER=$PG_VER" >> $GITHUB_ENV
