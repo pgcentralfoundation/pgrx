@@ -50,12 +50,7 @@ jobs:
           ./ci/rustup.sh
 
           # https://stackoverflow.com/questions/57968497/how-do-i-set-an-env-var-with-a-bash-expression-in-github-actions/57969570#57969570
-          
-          echo "----- Set up MAKEFLAGS -----"
-          echo "MAKEFLAGS=$MAKEFLAGS -j $(grep -c ^processor /proc/cpuinfo)" >> $GITHUB_ENV
-          cat $GITHUB_ENV
-          echo ""
-          
+
           echo "----- Outputting env -----"
           env
           echo ""
@@ -138,7 +133,6 @@ jobs:
           echo ""
           
           echo "----- Set up dynamic variables -----"
-          echo "MAKEFLAGS=$MAKEFLAGS -j $(grep -c ^processor /proc/cpuinfo)" >> $GITHUB_ENV
           cat $GITHUB_ENV
           echo ""
           
@@ -391,8 +385,6 @@ jobs:
           
           # https://stackoverflow.com/questions/57968497/how-do-i-set-an-env-var-with-a-bash-expression-in-github-actions/57969570#57969570
           
-          echo "----- Set up MAKEFLAGS -----"
-          echo "MAKEFLAGS=$MAKEFLAGS -j $(grep -c ^processor /proc/cpuinfo)" >> $GITHUB_ENV
           cat $GITHUB_ENV
           echo ""
           
