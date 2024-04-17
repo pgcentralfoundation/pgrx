@@ -244,13 +244,20 @@ jobs:
         run: |
           cargo test \
             --features "pg$PG_VER cshim proptest" \
-            --package pgrx-tests
+            --package pgrx-tests --lib
 
       - name: Run pgrx-tests with cshim disabled
         run: |
           cargo test \
             --features "pg$PG_VER proptest" \
-            --package pgrx-tests
+            --package pgrx-tests --lib
+
+      - name: Run UI tests
+        run: |
+          cargo test \
+            --features "pg$PG_VER proptest" \
+            --package pgrx-tests --test ui
+
 
       - name: Run aggregate example tests
         run: cargo test --package aggregate --features "pg$PG_VER" --no-default-features
