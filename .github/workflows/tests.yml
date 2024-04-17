@@ -242,7 +242,7 @@ jobs:
             --package pgrx-tests --lib
 
       - name: Run UI tests
-        if: ${{ matrix.rust != null }}
+        if: ${{ matrix.rust == null }}
         run: |
           cargo test \
             --features "pg$PG_VER proptest" \
