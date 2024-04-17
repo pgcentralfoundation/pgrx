@@ -27,7 +27,7 @@ jobs:
 
     strategy:
       matrix:
-        version: [ "postgres-15" ]
+        postgres: [ 15 ]
 
     steps:
       - uses: actions/checkout@v4
@@ -363,7 +363,7 @@ jobs:
 
     strategy:
       matrix:
-        postgres: 15
+        postgres: [15]
 
     steps:
       - uses: actions/checkout@v4
