@@ -1,0 +1,38 @@
+name: cargo pgrx test --runas
+
+on:
+  push:
+    branches: [ develop ]
+  pull_request:
+    branches: [ develop ]
+
+env:
+  CARGO_TERM_COLOR: always
+  RUST_BACKTRACE: 1
+
+jobs:
+  ubuntu:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v2
+      - uses: Swatinem/rust-cache@v2
+        with:
+          prefix-key: "v1-cargo-pgrx-test--runas"
+
+      - name: Install Postgres deps
+        run: |
+          sudo apt-get update -y -qq --fix-missing
+          sudo apt-get install -y postgresql-server-dev-14
+
+      - name: Report version
+        run: cargo --version
+
+      - name: Install cargo pgrx
+        run: cd cargo-pgrx && cargo install --path . --debug
+
+      - name: cargo pgrx init
+        run: cargo pgrx init --pg14=$(which pg_config)
+
+      - name: Test cargo pgrx test --runas
+        run: cd pgrx-examples/arrays && cargo pgrx test pg14 --runas postgres --pgdata=/tmp/pgdata

@@ -519,9 +519,13 @@ Rust `#[test]` functions behave normally, while `#[pg_test]` functions are run *
 Additionally, a `#[pg_test]` function runs in a transaction that is aborted when the test is finished. As such, any changes it might
 make to the database are not preserved.
 
-```shell script
-cargo-pgrx-test 0.5.0
-PgCentral Foundation, Inc. <contact@pgcentral.org>
+An administrative note is that the `--runas` and `--pgdata` options can be used to control the operating-system user used
+to run the separate `postmaster` process for test execution.  Likely, if `--runas` is used, then `--pgdata` will also need
+to be set to a base directory that is readable and writable by that user -- the default PGDATA directory at `./target/pgrx-test-pgdata` 
+will have the permissions of the user running `cargo pgrx test` and won't be chown-able to the `--runas` user.
+
+```console
+$ cargo pgrx test --help
 Run the test suite for this crate
 
 USAGE:
@@ -532,39 +536,20 @@ ARGS:
                     `pg15`, or `all`? [env: PG_VERSION=]
     <TESTNAME>      If specified, only run tests containing this string in their names
 
-OPTIONS:
-        --all-features
-            Activate all available features
-
-        --features <FEATURES>
-            Space-separated list of features to activate
-
-    -h, --help
-            Print help information
-
-        --manifest-path <MANIFEST_PATH>
-            Path to Cargo.toml
-
-    -n, --no-schema
-            Don't regenerate the schema
-
-        --no-default-features
-            Do not activate the `default` feature
-
-    -p, --package <PACKAGE>
-            Package to build (see `cargo help pkgid`)
-
-        --profile <PROFILE>
-            Specific profile to use (conflicts with `--release`)
-
-    -r, --release
-            compile for release mode (default is debug)
-
-    -v, --verbose
-            Enable info logs, -vv for debug, -vvv for trace
-
-    -V, --version
-            Print version information
+Options:
+  -p, --package <PACKAGE>              Package to build (see `cargo help pkgid`)
+      --manifest-path <MANIFEST_PATH>  Path to Cargo.toml
+  -v, --verbose...                     Enable info logs, -vv for debug, -vvv for trace
+  -r, --release                        compile for release mode (default is debug)
+      --profile <PROFILE>              Specific profile to use (conflicts with `--release`)
+  -n, --no-schema                      Don't regenerate the schema
+      --runas <USER>                   Use `sudo` to initialize and run the Postgres test instance as this system user
+      --pgdata <DIR>                   Initialize the test database cluster here, instead of the default location.  If used with `--runas`, then it must be writable by the user
+      --all-features                   Activate all available features
+      --no-default-features            Do not activate the `default` feature
+  -F, --features <FEATURES>            Space-separated list of features to activate
+  -h, --help                           Print help
+  -V, --version                        Print version
 ```
 
 ## Building an Installation Package

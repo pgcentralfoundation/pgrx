@@ -92,7 +92,7 @@ pub(crate) fn connect_psql(pg_config: &PgConfig, dbname: &str, pgcli: bool) -> e
     start_postgres(pg_config)?;
 
     // create the named database
-    if !createdb(pg_config, dbname, false, true)? {
+    if !createdb(pg_config, dbname, false, true, None)? {
         println!("{} existing database {}", "    Re-using".bold().cyan(), dbname);
     }
 
