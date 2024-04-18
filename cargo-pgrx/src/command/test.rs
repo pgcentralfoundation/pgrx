@@ -40,6 +40,12 @@ pub(crate) struct Test {
     /// Don't regenerate the schema
     #[clap(long, short)]
     no_schema: bool,
+    /// Use `sudo` to initialize and run the Postgres test instance as this system user
+    #[clap(long, value_name = "USER")]
+    runas: Option<String>,
+    /// Initialize the test database cluster here, instead of the default location.  If used with `--runas`, then it must be writable by the user
+    #[clap(long, value_name = "DIR")]
+    pgdata: Option<PathBuf>,
     #[clap(flatten)]
     features: clap_cargo::Features,
     #[clap(from_global, action = clap::ArgAction::Count)]
@@ -75,6 +81,8 @@ impl CommandExecute for Test {
                 me.no_schema,
                 &features,
                 me.testname,
+                me.runas,
+                me.pgdata,
             )?;
 
             Ok(())
@@ -115,6 +123,8 @@ pub fn test_extension(
     no_schema: bool,
     features: &clap_cargo::Features,
     testname: Option<impl AsRef<str>>,
+    runas: Option<String>,
+    pgdata: Option<PathBuf>,
 ) -> eyre::Result<()> {
     if let Some(ref testname) = testname {
         tracing::Span::current().record("testname", &tracing::field::display(&testname.as_ref()));
@@ -139,6 +149,14 @@ pub fn test_extension(
         .env("PGRX_ALL_FEATURES", if features.all_features { "true" } else { "false" })
         .env("PGRX_BUILD_PROFILE", profile.name())
         .env("PGRX_NO_SCHEMA", if no_schema { "true" } else { "false" });
+
+    if let Some(runas) = runas {
+        command.env("CARGO_PGRX_TEST_RUNAS", runas);
+    }
+
+    if let Some(pgdata) = pgdata {
+        command.env("CARGO_PGRX_TEST_PGDATA", pgdata);
+    }
 
     if let Ok(rust_log) = std::env::var("RUST_LOG") {
         command.env("RUST_LOG", rust_log);

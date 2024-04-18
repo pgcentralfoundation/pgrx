@@ -675,13 +675,21 @@ pub fn createdb(
     dbname: &str,
     is_test: bool,
     if_not_exists: bool,
+    runas: Option<String>,
 ) -> eyre::Result<bool> {
     if if_not_exists && does_db_exist(pg_config, dbname)? {
         return Ok(false);
     }
 
     println!("{} database {}", "     Creating".bold().green(), dbname);
-    let mut command = Command::new(pg_config.createdb_path()?);
+    let createdb_path = pg_config.createdb_path()?;
+    let mut command = if let Some(runas) = runas {
+        let mut cmd = Command::new("sudo");
+        cmd.arg("-u").arg(runas).arg(createdb_path);
+        cmd
+    } else {
+        Command::new(createdb_path)
+    };
     command
         .env_remove("PGDATABASE")
         .env_remove("PGHOST")
