@@ -398,12 +398,8 @@ fn maybe_make_pgdata<P: AsRef<Path>>(pgdata: P) -> eyre::Result<bool> {
         //
         // In order to do that, we must become that user to create it
 
-        let mut mkdir = sudo_command(&runas)
-            .arg("mkdir")
-            .arg("-p")
-            .arg(pgdata)
-            .stdout(Stdio::piped())
-            .stderr(Stdio::piped());
+        let mut mkdir = sudo_command(&runas);
+        mkdir.arg("mkdir").arg("-p").arg(pgdata).stdout(Stdio::piped()).stderr(Stdio::piped());
         let command_str = format!("{:?}", mkdir);
         println!("{} {}", "     Running".bold().green(), command_str);
         let child = mkdir.spawn()?;
