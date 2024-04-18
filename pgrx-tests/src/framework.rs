@@ -19,6 +19,7 @@ use pgrx_pg_config::{
 use postgres::error::DbError;
 use std::collections::HashMap;
 use std::env::VarError;
+use std::ffi::OsStr;
 use std::io::{BufRead, BufReader, Write};
 use std::path::{Path, PathBuf};
 use std::sync::{Arc, Mutex, OnceLock};
@@ -397,10 +398,7 @@ fn maybe_make_pgdata<P: AsRef<Path>>(pgdata: P) -> eyre::Result<bool> {
         //
         // In order to do that, we must become that user to create it
 
-        let mut mkdir = Command::new("sudo");
-        mkdir
-            .arg("-u")
-            .arg(&runas)
+        let mut mkdir = sudo_command(&runas)
             .arg("mkdir")
             .arg("-p")
             .arg(pgdata)
@@ -444,8 +442,8 @@ fn initdb(postgresql_conf: Vec<&'static str>) -> eyre::Result<()> {
         let initdb_path = pg_config.initdb_path().wrap_err("unable to determine initdb path")?;
 
         let mut command = if let Some(runas) = get_runas() {
-            let mut cmd = Command::new("sudo");
-            cmd.arg("-u").arg(runas).arg(initdb_path);
+            let mut cmd = sudo_command(runas);
+            cmd.arg(initdb_path);
             cmd
         } else {
             Command::new(initdb_path)
@@ -500,9 +498,7 @@ fn modify_postgresql_conf(pgdata: PathBuf, postgresql_conf: Vec<&'static str>) -
     let postgresql_auto_conf = pgdata.join("postgresql.auto.conf");
 
     if let Some(runas) = get_runas() {
-        let mut sudo_command = Command::new("sudo")
-            .arg("-u")
-            .arg(&runas)
+        let mut sudo_command = sudo_command(&runas)
             .arg("tee")
             .arg(postgresql_auto_conf)
             .stdin(Stdio::piped())
@@ -554,8 +550,7 @@ fn start_pg(loglines: LogLines) -> eyre::Result<String> {
         cmd.arg(postmaster_path);
         cmd
     } else if let Some(runas) = get_runas() {
-        let mut cmd = Command::new("sudo");
-        cmd.arg("-u").arg(runas);
+        let mut cmd = sudo_command(runas);
         cmd.arg(postmaster_path);
         cmd
     } else {
@@ -620,9 +615,7 @@ fn monitor_pg(mut command: Command, cmd_string: String, loglines: LogLines) -> S
         // clean up due to a SIGNAL?
         add_shutdown_hook(move || unsafe {
             if let Some(_runas) = get_runas() {
-                Command::new("sudo")
-                    .arg("-u")
-                    .arg("root") // NB:  we must be "root" to kill the `sudo` process we spawned to start postgres
+                sudo_command("root") // NB:  we must be "root" to kill the `sudo` process we spawned to start postgres
                     .arg("kill")
                     .arg("-s")
                     .arg("SIGTERM")
@@ -704,8 +697,8 @@ fn dropdb() -> eyre::Result<()> {
     let pg_config = get_pg_config()?;
     let dropdb_path = pg_config.dropdb_path().expect("unable to determine dropdb path");
     let mut command = if let Some(runas) = get_runas() {
-        let mut cmd = Command::new("sudo");
-        cmd.arg("-u").arg(runas).arg(dropdb_path);
+        let mut cmd = sudo_command(runas);
+        cmd.arg(dropdb_path);
         cmd
     } else {
         Command::new(dropdb_path)
@@ -926,4 +919,12 @@ fn find_on_path(program: &str) -> Option<PathBuf> {
 
 fn use_valgrind() -> bool {
     std::env::var_os("USE_VALGRIND").is_some_and(|s| s.len() > 0)
+}
+
+/// Create a [`Command`] pre-configured to what the caller decides using `sudo`
+fn sudo_command<U: AsRef<OsStr>>(user: U) -> Command {
+    let mut sudo = Command::new("sudo");
+    sudo.arg("-u");
+    sudo.arg(user);
+    sudo
 }
