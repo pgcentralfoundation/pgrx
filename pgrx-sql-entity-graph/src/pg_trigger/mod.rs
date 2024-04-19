@@ -136,7 +136,7 @@ impl ToEntityGraphTokens for PgTrigger {
 
 impl ToRustCodeTokens for PgTrigger {
     fn to_rust_code_tokens(&self) -> TokenStream2 {
-        let wrapper_func = self.wrapper_tokens().expect("Generating wrappper function for trigger");
+        let wrapper_func = self.wrapper_tokens().expect("Generating wrapper function for trigger");
         let finfo_func = finfo_v1_tokens(wrapper_func.sig.ident.clone()).unwrap();
         let func = &self.func;
 
