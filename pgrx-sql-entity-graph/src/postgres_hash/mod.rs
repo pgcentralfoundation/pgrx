@@ -18,7 +18,7 @@ to the `pgrx` framework and very subject to change between versions. While you m
 pub mod entity;
 
 use crate::enrich::{ToEntityGraphTokens, ToRustCodeTokens};
-use proc_macro2::{Span, TokenStream as TokenStream2};
+use proc_macro2::TokenStream as TokenStream2;
 use quote::{format_ident, quote};
 use syn::parse::{Parse, ParseStream};
 use syn::{DeriveInput, Ident};

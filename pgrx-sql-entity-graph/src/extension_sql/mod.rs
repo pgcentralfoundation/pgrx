@@ -21,7 +21,7 @@ pub mod entity;
 use crate::positioning_ref::PositioningRef;
 
 use crate::enrich::{CodeEnrichment, ToEntityGraphTokens, ToRustCodeTokens};
-use proc_macro2::{Ident, Span, TokenStream as TokenStream2};
+use proc_macro2::{Ident, TokenStream as TokenStream2};
 use quote::{format_ident, quote, ToTokens, TokenStreamExt};
 use syn::parse::{Parse, ParseStream};
 use syn::punctuated::Punctuated;
