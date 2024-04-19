@@ -107,6 +107,7 @@ impl PgExtern {
 
         if let Some(ref mut content) = to_sql_config.content {
             let value = content.value();
+            // FIXME: find out if we should be using synthetic spans, issue #1667
             let span = content.span();
             let updated_value =
                 value.replace("@FUNCTION_NAME@", &(func.sig.ident.to_string() + "_wrapper")) + "\n";
@@ -274,6 +275,7 @@ impl PgExtern {
                 f.path()
                     .segments
                     .first()
+                    // FIXME: find out if we should be using synthetic spans, issue #1667
                     .map(|f| f.ident == Ident::new("search_path", func.span()))
                     .unwrap_or_default()
             })
