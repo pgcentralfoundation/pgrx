@@ -9,7 +9,7 @@
 //LICENSE Use of this source code is governed by the MIT license that can be found in the LICENSE file.
 extern crate proc_macro;
 
-use proc_macro2::Ident;
+
 use quote::{format_ident, quote, quote_spanned};
 use std::ops::Deref;
 use std::str::FromStr;
