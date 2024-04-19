@@ -23,7 +23,7 @@ use crate::{CodeEnrichment, ToSqlConfig};
 use attribute::PgTriggerAttribute;
 use proc_macro2::{Span, TokenStream as TokenStream2};
 use quote::{format_ident, quote};
-use syn::{ItemFn, Token};
+use syn::{spanned::Spanned, ItemFn, Token};
 
 #[derive(Debug, Clone)]
 pub struct PgTrigger {
@@ -38,7 +38,7 @@ impl PgTrigger {
     ) -> Result<CodeEnrichment<Self>, syn::Error> {
         if attributes.len() > 1 {
             return Err(syn::Error::new(
-                Span::call_site(),
+                func.span(),
                 "Multiple `sql` arguments found, it must be unique",
             ));
         };
