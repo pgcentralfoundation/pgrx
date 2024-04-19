@@ -16,7 +16,7 @@ to the `pgrx` framework and very subject to change between versions. While you m
 
 */
 use crate::ToSqlConfig;
-use proc_macro2::Span;
+
 use syn::parse::{Parse, ParseStream};
 use syn::Token;
 
@@ -48,9 +48,10 @@ impl Parse for PgTriggerAttribute {
             }
             e => {
                 return Err(syn::Error::new(
-                    Span::call_site(),
+                    // FIXME: add a UI test for this
+                    input.span(),
                     format!("Invalid option `{e}` inside `{ident} {input}`"),
-                ))
+                ));
             }
         };
         Ok(found)

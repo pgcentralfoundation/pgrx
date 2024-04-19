@@ -21,9 +21,9 @@ pub mod entity;
 use crate::enrich::{ToEntityGraphTokens, ToRustCodeTokens};
 use crate::{CodeEnrichment, ToSqlConfig};
 use attribute::PgTriggerAttribute;
-use proc_macro2::{Span, TokenStream as TokenStream2};
+use proc_macro2::TokenStream as TokenStream2;
 use quote::{format_ident, quote};
-use syn::{ItemFn, Token};
+use syn::{spanned::Spanned, ItemFn, Token};
 
 #[derive(Debug, Clone)]
 pub struct PgTrigger {
@@ -37,8 +37,9 @@ impl PgTrigger {
         attributes: syn::punctuated::Punctuated<PgTriggerAttribute, Token![,]>,
     ) -> Result<CodeEnrichment<Self>, syn::Error> {
         if attributes.len() > 1 {
+            // FIXME: add a UI test for this
             return Err(syn::Error::new(
-                Span::call_site(),
+                func.span(),
                 "Multiple `sql` arguments found, it must be unique",
             ));
         };
@@ -48,10 +49,12 @@ impl PgTrigger {
             .map(|PgTriggerAttribute::Sql(mut config)| {
                 if let Some(ref mut content) = config.content {
                     let value = content.value();
+                    // FIXME: find out if we should be using synthetic spans, issue #1667
+                    let span = content.span();
                     let updated_value = value
                         .replace("@FUNCTION_NAME@", &(func.sig.ident.to_string() + "_wrapper"))
                         + "\n";
-                    *content = syn::LitStr::new(&updated_value, Span::call_site());
+                    *content = syn::LitStr::new(&updated_value, span);
                 };
                 config
             })

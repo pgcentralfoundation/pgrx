@@ -107,9 +107,11 @@ impl PgExtern {
 
         if let Some(ref mut content) = to_sql_config.content {
             let value = content.value();
+            // FIXME: find out if we should be using synthetic spans, issue #1667
+            let span = content.span();
             let updated_value =
                 value.replace("@FUNCTION_NAME@", &(func.sig.ident.to_string() + "_wrapper")) + "\n";
-            *content = syn::LitStr::new(&updated_value, Span::call_site());
+            *content = syn::LitStr::new(&updated_value, span);
         }
 
         if !to_sql_config.overrides_default() {
@@ -273,7 +275,8 @@ impl PgExtern {
                 f.path()
                     .segments
                     .first()
-                    .map(|f| f.ident == Ident::new("search_path", Span::call_site()))
+                    // FIXME: find out if we should be using synthetic spans, issue #1667
+                    .map(|f| f.ident == Ident::new("search_path", func.span()))
                     .unwrap_or_default()
             })
             .map(|attr| attr.parse_args::<SearchPathList>())
