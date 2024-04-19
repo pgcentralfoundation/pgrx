@@ -202,6 +202,7 @@ impl Parse for Attribute {
                     ArgValue::Lit(Lit::Bool(b)) => Self::Sql(ToSqlConfig::from(b.value)),
                     ArgValue::Lit(Lit::Str(s)) => Self::Sql(ToSqlConfig::from(s)),
                     ArgValue::Lit(other) => {
+                        // FIXME: add a ui test for this
                         return Err(syn::Error::new(
                             other.span(),
                             "expected boolean, path, or string literal",

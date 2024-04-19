@@ -35,6 +35,7 @@ impl PgExternArgument {
         match &fn_arg {
             syn::FnArg::Typed(pat) => Self::build_from_pat_type(fn_arg.clone(), pat.clone()),
             syn::FnArg::Receiver(_) => {
+                // FIXME: Add a UI test for this
                 Err(syn::Error::new(fn_arg.span(), "Unable to parse FnArg that is Self"))
             }
         }
@@ -48,8 +49,10 @@ impl PgExternArgument {
             Pat::Ident(ref p) => p.ident.clone(),
             Pat::Reference(ref p_ref) => match *p_ref.pat {
                 Pat::Ident(ref inner_ident) => inner_ident.ident.clone(),
+                // FIXME: add a UI test for this
                 _ => return Err(syn::Error::new(value.span(), "Unable to parse FnArg")),
             },
+            // FIXME: add a UI test for this
             _ => return Err(syn::Error::new(value.span(), "Unable to parse FnArg")),
         };
 

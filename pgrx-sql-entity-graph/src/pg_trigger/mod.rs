@@ -37,6 +37,7 @@ impl PgTrigger {
         attributes: syn::punctuated::Punctuated<PgTriggerAttribute, Token![,]>,
     ) -> Result<CodeEnrichment<Self>, syn::Error> {
         if attributes.len() > 1 {
+            // FIXME: add a UI test for this
             return Err(syn::Error::new(
                 func.span(),
                 "Multiple `sql` arguments found, it must be unique",

@@ -770,6 +770,7 @@ fn handle_default_macro(mac: &syn::Macro) -> syn::Result<(syn::Type, Option<Stri
                 let value = def.base10_digits();
                 Ok((true_ty, Some("-".to_owned() + value)))
             }
+            // FIXME: add a UI test for this
             _ => Err(syn::Error::new(
                 mac.span(),
                 format!("Unrecognized UnaryExpr in `default!()` macro, got: {:?}", out.expr),
@@ -781,6 +782,7 @@ fn handle_default_macro(mac: &syn::Macro) -> syn::Result<(syn::Type, Option<Stri
             if last_string == "NULL" {
                 Ok((true_ty, Some(last_string)))
             } else {
+                // FIXME: add a UI test for this
                 Err(syn::Error::new(
                     mac.span(),
                     format!(
@@ -790,6 +792,7 @@ fn handle_default_macro(mac: &syn::Macro) -> syn::Result<(syn::Type, Option<Stri
                 ))
             }
         }
+        // FIXME: add a UI test for this
         _ => Err(syn::Error::new(
             mac.span(),
             format!("Unable to parse default value of `default!()` macro, got: {:?}", out.expr),

@@ -48,6 +48,7 @@ impl Parse for PgTriggerAttribute {
             }
             e => {
                 return Err(syn::Error::new(
+                    // FIXME: add a UI test for this
                     input.span(),
                     format!("Invalid option `{e}` inside `{ident} {input}`"),
                 ))
