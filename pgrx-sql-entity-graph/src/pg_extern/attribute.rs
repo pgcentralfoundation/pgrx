@@ -211,7 +211,7 @@ impl Parse for Attribute {
             }
             e => {
                 return Err(syn::Error::new(
-                    Span::call_site(),
+                    ident.span(),
                     format!("Invalid option `{e}` inside `{ident} {input}`"),
                 ))
             }
