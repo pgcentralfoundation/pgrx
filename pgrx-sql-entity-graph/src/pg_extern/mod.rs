@@ -274,7 +274,7 @@ impl PgExtern {
                 f.path()
                     .segments
                     .first()
-                    .map(|f| f.ident == Ident::new("search_path", Span::call_site()))
+                    .map(|f| f.ident == Ident::new("search_path", func.span()))
                     .unwrap_or_default()
             })
             .map(|attr| attr.parse_args::<SearchPathList>())
