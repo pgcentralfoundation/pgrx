@@ -3,8 +3,8 @@ use syn;
 
 /// Generate the Postgres fn info record
 ///
-/// Equivalent to PG_FUNCTION_INFO_V1, Postgres will call this fn for metadata
-/// so it has to match the relevant fn's name exactly.
+/// Equivalent to PG_FUNCTION_INFO_V1, Postgres will sprintf the fn ident, then `dlsym(so, expected_name)`,
+/// so it is important to pass exactly the ident that you want to have the record associated with!
 pub fn finfo_v1_tokens(ident: proc_macro2::Ident) -> syn::Result<syn::ItemFn> {
     let finfo_name = format_ident!("pg_finfo_{ident}");
     let tokens = quote! {
