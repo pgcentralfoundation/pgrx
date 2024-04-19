@@ -13,7 +13,7 @@ use proc_macro::TokenStream;
 use std::collections::HashSet;
 
 use proc_macro2::Ident;
-use quote::{quote, ToTokens};
+use quote::{format_ident, quote, ToTokens};
 use syn::spanned::Spanned;
 use syn::{parse_macro_input, Attribute, Data, DeriveInput, Item, ItemImpl};
 
@@ -103,7 +103,7 @@ pub fn pg_test(attr: TokenStream, item: TokenStream) -> TokenStream {
             };
 
             let sql_funcname = func.sig.ident.to_string();
-            let test_func_name = Ident::new(&format!("pg_{}", func.sig.ident), func.span());
+            let test_func_name = format_ident!("pg_{}", func.sig.ident);
 
             let attributes = func.attrs;
             let mut att_stream = proc_macro2::TokenStream::new();
