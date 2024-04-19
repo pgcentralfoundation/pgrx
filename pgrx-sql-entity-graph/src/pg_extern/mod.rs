@@ -28,6 +28,7 @@ pub use cast::PgCast;
 pub use operator::PgOperator;
 pub use returning::NameMacro;
 
+use crate::finfo::finfo_v1_tokens;
 use crate::fmt::ErrHarder;
 use crate::ToSqlConfig;
 pub(crate) use attribute::Attribute;
@@ -375,19 +376,6 @@ impl PgExtern {
         }
     }
 
-    fn finfo_tokens(&self) -> Result<syn::ItemFn, syn::Error> {
-        let finfo_name = format_ident!("pg_finfo_{}_wrapper", self.func.sig.ident);
-        let tokens = quote_spanned! { self.func.sig.span() =>
-            #[no_mangle]
-            #[doc(hidden)]
-            pub extern "C" fn #finfo_name() -> &'static ::pgrx::pg_sys::Pg_finfo_record {
-                const V1_API: ::pgrx::pg_sys::Pg_finfo_record = ::pgrx::pg_sys::Pg_finfo_record { api_version: 1 };
-                &V1_API
-            }
-        };
-        syn::parse2(tokens)
-    }
-
     pub fn wrapper_func(&self) -> Result<syn::ItemFn, syn::Error> {
         let func_name = &self.func.sig.ident;
         let func_name_wrapper = format_ident!("{}_wrapper", &self.func.sig.ident);
@@ -603,7 +591,7 @@ impl ToRustCodeTokens for PgExtern {
     fn to_rust_code_tokens(&self) -> TokenStream2 {
         let original_func = &self.func;
         let wrapper_func = self.wrapper_func().unwrap();
-        let finfo_tokens = self.finfo_tokens().unwrap();
+        let finfo_tokens = finfo_v1_tokens(wrapper_func.sig.ident.clone()).unwrap();
 
         quote_spanned! { self.func.sig.span() =>
             #original_func
