@@ -48,6 +48,7 @@ impl PgTrigger {
             .map(|PgTriggerAttribute::Sql(mut config)| {
                 if let Some(ref mut content) = config.content {
                     let value = content.value();
+                    // FIXME: find out if we should be using synthetic spans, issue #1667
                     let span = content.span();
                     let updated_value = value
                         .replace("@FUNCTION_NAME@", &(func.sig.ident.to_string() + "_wrapper"))
