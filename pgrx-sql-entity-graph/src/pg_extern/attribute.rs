@@ -206,15 +206,16 @@ impl Parse for Attribute {
                         return Err(syn::Error::new(
                             other.span(),
                             "expected boolean, path, or string literal",
-                        ))
+                        ));
                     }
                 }
             }
             e => {
+                // FIXME: add a UI test for this
                 return Err(syn::Error::new(
                     ident.span(),
                     format!("Invalid option `{e}` inside `{ident} {input}`"),
-                ))
+                ));
             }
         };
         Ok(found)

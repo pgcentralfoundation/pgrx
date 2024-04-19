@@ -51,7 +51,7 @@ impl Parse for PgTriggerAttribute {
                     // FIXME: add a UI test for this
                     input.span(),
                     format!("Invalid option `{e}` inside `{ident} {input}`"),
-                ))
+                ));
             }
         };
         Ok(found)
