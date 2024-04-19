@@ -56,7 +56,7 @@ function's `search_path`.
 ### Relocatable extensions
 
 Previously, PGRX would schema-qualify all of the output of `cargo pgrx schema` if there was a `schema = foo` attribute in your
-extension `.control` file, including items outside of a `#[pg_scema]` macro. However, this meant that pgrx could not support [relocatable extensions](https://www.postgresql.org/docs/current/extend-extensions.html#EXTEND-EXTENSIONS-RELOCATION).
+extension `.control` file, including items outside of a `#[pg_schema]` macro. However, this meant that pgrx could not support [relocatable extensions](https://www.postgresql.org/docs/current/extend-extensions.html#EXTEND-EXTENSIONS-RELOCATION).
 This is because relocatable extensions' defining characteristic is that they can be moved from one schema to another, and that
 means you absolutely cannot statically determine the schema the extension lives in by reading the control file alone.
 Since this change was implemented, you can now set `relocatable = true` in your control file without issue, and relocatable
