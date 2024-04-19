@@ -5,7 +5,7 @@ If unspecified, that schema is whatever the first schema in the user's `search_p
 it is the schema argument to `CREATE EXTENSION`.
 
 In general, any `pgrx` object (a function, operator, type, etc), regardless of the Rust source
-file it is defined in, is created in that schema unless that object appears in a 
+file it is defined in, is created in that schema unless that object appears in a
 `#[pg_schema] mod modname { ... }` block.  In this case, `pgrx` generates a top-level schema named the
 same as the module, and creates the contained objects within that schema.
 
@@ -21,7 +21,7 @@ This is done via the `#[search_path(...)]` attribute macro applied to the functi
 with `#[pg_extern]` or `#[pg_operator]` or `#[pg_test]`.
 
 For example:
- 
+
 ```rust
 #[derive(PostgresType, Serialize, Deserialize, Debug, Eq, PartialEq)]
 pub struct SomeStruct {}
@@ -50,7 +50,7 @@ fn return_vec_of_customtype() -> Vec<SomeStruct> {
 ```
 
 In general this is only necessary when returning a `Vec<T: PostgresType>`.  In this situation, pgrx needs to know that type's
-`oid` (from the `pg_catalog.pg_type` system catalog) and as such, the schema in which that type lives must be on that 
+`oid` (from the `pg_catalog.pg_type` system catalog) and as such, the schema in which that type lives must be on that
 function's `search_path`.
 
 ### Relocatable extensions
