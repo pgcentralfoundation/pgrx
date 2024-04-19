@@ -390,13 +390,7 @@ impl PgrxSql {
             .neighbors_undirected(*item_index)
             .flat_map(|neighbor_index| match &self.graph[neighbor_index] {
                 SqlGraphEntity::Schema(s) => Some(String::from(s.name)),
-                SqlGraphEntity::ExtensionRoot(control) => {
-                    if !control.relocatable {
-                        control.schema.clone()
-                    } else {
-                        Some(String::from("@extname@"))
-                    }
-                }
+                SqlGraphEntity::ExtensionRoot(_control) => None,
                 _ => None,
             })
             .next()

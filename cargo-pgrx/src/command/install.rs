@@ -136,13 +136,6 @@ pub(crate) fn install_extension(
     let manifest = Manifest::from_path(&package_manifest_path)?;
     let (control_file, extname) = find_control_file(&package_manifest_path)?;
 
-    if get_property(&package_manifest_path, "relocatable")? != Some("false".into()) {
-        return Err(eyre!(
-            "{}:  The `relocatable` property MUST be `false`.  Please update your .control file.",
-            control_file.display()
-        ));
-    }
-
     let versioned_so = get_property(&package_manifest_path, "module_pathname")?.is_none();
 
     let build_command_output =
