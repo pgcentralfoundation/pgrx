@@ -17,7 +17,7 @@ to the `pgrx` framework and very subject to change between versions. While you m
 */
 use crate::composite_type::{handle_composite_type_macro, CompositeTypeMacro};
 use crate::lifetimes::anonymize_lifetimes;
-use proc_macro2::Span;
+
 use quote::ToTokens;
 use syn::parse::{Parse, ParseStream};
 use syn::spanned::Spanned;
@@ -771,7 +771,7 @@ fn handle_default_macro(mac: &syn::Macro) -> syn::Result<(syn::Type, Option<Stri
                 Ok((true_ty, Some("-".to_owned() + value)))
             }
             _ => Err(syn::Error::new(
-                Span::call_site(),
+                mac.span(),
                 format!("Unrecognized UnaryExpr in `default!()` macro, got: {:?}", out.expr),
             )),
         },
@@ -782,7 +782,7 @@ fn handle_default_macro(mac: &syn::Macro) -> syn::Result<(syn::Type, Option<Stri
                 Ok((true_ty, Some(last_string)))
             } else {
                 Err(syn::Error::new(
-                    Span::call_site(),
+                    mac.span(),
                     format!(
                         "Unable to parse default value of `default!()` macro, got: {:?}",
                         out.expr
@@ -791,7 +791,7 @@ fn handle_default_macro(mac: &syn::Macro) -> syn::Result<(syn::Type, Option<Stri
             }
         }
         _ => Err(syn::Error::new(
-            Span::call_site(),
+            mac.span(),
             format!("Unable to parse default value of `default!()` macro, got: {:?}", out.expr),
         )),
     }
