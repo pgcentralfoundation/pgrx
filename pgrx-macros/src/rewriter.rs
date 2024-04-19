@@ -9,8 +9,7 @@
 //LICENSE Use of this source code is governed by the MIT license that can be found in the LICENSE file.
 extern crate proc_macro;
 
-use proc_macro2::Ident;
-use quote::{quote, quote_spanned};
+use quote::{format_ident, quote, quote_spanned};
 use std::ops::Deref;
 use std::str::FromStr;
 use syn::punctuated::Punctuated;
@@ -58,7 +57,7 @@ pub fn item_fn_without_rewrite(mut func: ItemFn) -> syn::Result<proc_macro2::Tok
     // nor do we need a visibility beyond "private"
     func.vis = Visibility::Inherited;
 
-    func.sig.ident = Ident::new(&format!("{}_inner", func.sig.ident), func.sig.ident.span());
+    func.sig.ident = format_ident!("{}_inner", func.sig.ident);
 
     // the wrapper_inner function declaration may contain lifetimes that are not used, since our input type is `FunctionCallInfo` mainly and return type is `Datum`
     let unused_lifetimes = match generics.lifetimes().next() {
@@ -157,7 +156,7 @@ fn build_arg_list(sig: &Signature, suffix_arg_name: bool) -> syn::Result<proc_ma
             FnArg::Typed(ty) => {
                 if let Pat::Ident(ident) = ty.pat.deref() {
                     if suffix_arg_name && ident.ident.to_string() != "fcinfo" {
-                        let ident = Ident::new(&format!("{}_", ident.ident), ident.span());
+                        let ident = format_ident!("{}_", ident.ident);
                         arg_list.extend(quote! { #ident, });
                     } else {
                         arg_list.extend(quote! { #ident, });
@@ -189,7 +188,7 @@ fn rename_arg_list(sig: &Signature) -> syn::Result<proc_macro2::TokenStream> {
             FnArg::Typed(ty) => {
                 if let Pat::Ident(ident) = ty.pat.deref() {
                     // prefix argument name with "arg_""
-                    let name = Ident::new(&format!("arg_{}", ident.ident), ident.ident.span());
+                    let name = format_ident!("arg_{}", ident.ident);
                     arg_list.extend(quote! { #name, });
                 } else {
                     return Err(syn::Error::new(

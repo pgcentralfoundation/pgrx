@@ -38,7 +38,7 @@ use crate::enrich::CodeEnrichment;
 use crate::enrich::ToEntityGraphTokens;
 use crate::enrich::ToRustCodeTokens;
 use proc_macro2::{Ident, Span, TokenStream as TokenStream2};
-use quote::{quote, quote_spanned, ToTokens};
+use quote::{format_ident, quote, quote_spanned, ToTokens};
 use syn::parse::{Parse, ParseStream, Parser};
 use syn::punctuated::Punctuated;
 use syn::spanned::Spanned;
@@ -337,8 +337,7 @@ impl PgExtern {
             .collect::<Vec<_>>();
         let hrtb = if lifetimes.is_empty() { None } else { Some(quote! { for<#(#lifetimes),*> }) };
 
-        let sql_graph_entity_fn_name =
-            syn::Ident::new(&format!("__pgrx_internals_fn_{}", ident), Span::call_site());
+        let sql_graph_entity_fn_name = format_ident!("__pgrx_internals_fn_{}", ident);
         quote_spanned! { self.func.sig.span() =>
             #[no_mangle]
             #[doc(hidden)]
@@ -374,10 +373,7 @@ impl PgExtern {
     }
 
     fn finfo_tokens(&self) -> TokenStream2 {
-        let finfo_name = syn::Ident::new(
-            &format!("pg_finfo_{}_wrapper", self.func.sig.ident),
-            Span::call_site(),
-        );
+        let finfo_name = format_ident!("pg_finfo_{}_wrapper", self.func.sig.ident);
         quote_spanned! { self.func.sig.span() =>
             #[no_mangle]
             #[doc(hidden)]
@@ -390,10 +386,7 @@ impl PgExtern {
 
     pub fn wrapper_func(&self) -> TokenStream2 {
         let func_name = &self.func.sig.ident;
-        let func_name_wrapper = Ident::new(
-            &format!("{}_wrapper", &self.func.sig.ident.to_string()),
-            self.func.sig.ident.span(),
-        );
+        let func_name_wrapper = format_ident!("{}_wrapper", &self.func.sig.ident);
         let func_generics = &self.func.sig.generics;
         // the wrapper function declaration may contain lifetimes that are not used, since our input type is `FunctionCallInfo` mainly and return type is `Datum`
         let unused_lifetimes = match func_generics.lifetimes().next() {
@@ -407,10 +400,7 @@ impl PgExtern {
         let fcinfo_ident = syn::Ident::new("_fcinfo", self.func.sig.ident.span());
 
         let args = &self.inputs;
-        let arg_pats = args
-            .iter()
-            .map(|v| syn::Ident::new(&format!("{}_", &v.pat), self.func.sig.span()))
-            .collect::<Vec<_>>();
+        let arg_pats = args.iter().map(|v| format_ident!("{}_", &v.pat)).collect::<Vec<_>>();
         let arg_fetches = args.iter().enumerate().map(|(idx, arg)| {
             let pat = &arg_pats[idx];
             let resolved_ty = &arg.used_ty.resolved_ty;

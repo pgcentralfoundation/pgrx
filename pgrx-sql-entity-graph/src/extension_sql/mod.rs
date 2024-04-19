@@ -21,8 +21,8 @@ pub mod entity;
 use crate::positioning_ref::PositioningRef;
 
 use crate::enrich::{CodeEnrichment, ToEntityGraphTokens, ToRustCodeTokens};
-use proc_macro2::{Ident, Span, TokenStream as TokenStream2};
-use quote::{quote, ToTokens, TokenStreamExt};
+use proc_macro2::{Ident, TokenStream as TokenStream2};
+use quote::{format_ident, quote, ToTokens, TokenStreamExt};
 use syn::parse::{Parse, ParseStream};
 use syn::punctuated::Punctuated;
 use syn::{LitStr, Token};
@@ -94,8 +94,7 @@ impl ToEntityGraphTokens for ExtensionSqlFile {
         );
         let requires_iter = requires.iter();
         let creates_iter = creates.iter();
-        let sql_graph_entity_fn_name =
-            syn::Ident::new(&format!("__pgrx_internals_sql_{}", name.clone()), Span::call_site());
+        let sql_graph_entity_fn_name = format_ident!("__pgrx_internals_sql_{}", name.clone());
         quote! {
             #[no_mangle]
             #[doc(hidden)]
@@ -192,8 +191,7 @@ impl ToEntityGraphTokens for ExtensionSql {
         let creates_iter = creates.iter();
         let name = &self.name;
 
-        let sql_graph_entity_fn_name =
-            syn::Ident::new(&format!("__pgrx_internals_sql_{}", name.value()), Span::call_site());
+        let sql_graph_entity_fn_name = format_ident!("__pgrx_internals_sql_{}", name.value());
         quote! {
             #[no_mangle]
             #[doc(hidden)]

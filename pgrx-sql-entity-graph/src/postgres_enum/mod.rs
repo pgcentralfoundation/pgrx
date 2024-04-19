@@ -20,7 +20,7 @@ pub mod entity;
 use crate::enrich::{ToEntityGraphTokens, ToRustCodeTokens};
 use crate::{CodeEnrichment, ToSqlConfig};
 use proc_macro2::{Span, TokenStream as TokenStream2};
-use quote::quote;
+use quote::{format_ident, quote};
 use syn::parse::{Parse, ParseStream};
 use syn::punctuated::Punctuated;
 use syn::{DeriveInput, Generics, Ident, ItemEnum, Token};
@@ -122,8 +122,7 @@ impl ToEntityGraphTokens for PostgresEnum {
             static_generics.split_for_impl();
 
         let variants = self.variants.iter().map(|variant| variant.ident.clone());
-        let sql_graph_entity_fn_name =
-            syn::Ident::new(&format!("__pgrx_internals_enum_{}", name), Span::call_site());
+        let sql_graph_entity_fn_name = format_ident!("__pgrx_internals_enum_{}", name);
 
         let to_sql_config = &self.to_sql_config;
 
@@ -140,7 +139,7 @@ impl ToEntityGraphTokens for PostgresEnum {
 
             #[no_mangle]
             #[doc(hidden)]
-            #[allow(unknown_lints, clippy::no_mangle_with_rust_abi)]
+            #[allow(unknown_lints, clippy::no_mangle_with_rust_abi, nonstandard_style)]
             pub extern "Rust" fn  #sql_graph_entity_fn_name() -> ::pgrx::pgrx_sql_entity_graph::SqlGraphEntity {
                 extern crate alloc;
                 use alloc::vec::Vec;

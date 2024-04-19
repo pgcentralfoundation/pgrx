@@ -18,8 +18,8 @@ to the `pgrx` framework and very subject to change between versions. While you m
 pub mod entity;
 
 use crate::enrich::{ToEntityGraphTokens, ToRustCodeTokens};
-use proc_macro2::{Span, TokenStream as TokenStream2};
-use quote::quote;
+use proc_macro2::TokenStream as TokenStream2;
+use quote::{format_ident, quote};
 use syn::parse::{Parse, ParseStream};
 use syn::{DeriveInput, Ident};
 
@@ -100,13 +100,12 @@ impl PostgresOrd {
 impl ToEntityGraphTokens for PostgresOrd {
     fn to_entity_graph_tokens(&self) -> TokenStream2 {
         let name = &self.name;
-        let sql_graph_entity_fn_name =
-            syn::Ident::new(&format!("__pgrx_internals_ord_{}", self.name), Span::call_site());
+        let sql_graph_entity_fn_name = format_ident!("__pgrx_internals_ord_{}", self.name);
         let to_sql_config = &self.to_sql_config;
         quote! {
             #[no_mangle]
             #[doc(hidden)]
-            #[allow(unknown_lints, clippy::no_mangle_with_rust_abi)]
+            #[allow(nonstandard_style, unknown_lints, clippy::no_mangle_with_rust_abi)]
             pub extern "Rust" fn  #sql_graph_entity_fn_name() -> ::pgrx::pgrx_sql_entity_graph::SqlGraphEntity {
                 use core::any::TypeId;
                 extern crate alloc;

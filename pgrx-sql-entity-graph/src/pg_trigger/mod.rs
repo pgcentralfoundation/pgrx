@@ -22,7 +22,7 @@ use crate::enrich::{ToEntityGraphTokens, ToRustCodeTokens};
 use crate::{CodeEnrichment, ToSqlConfig};
 use attribute::PgTriggerAttribute;
 use proc_macro2::{Span, TokenStream as TokenStream2};
-use quote::quote;
+use quote::{format_ident, quote};
 use syn::{ItemFn, Token};
 
 #[derive(Debug, Clone)]
@@ -66,10 +66,7 @@ impl PgTrigger {
 
     pub fn wrapper_tokens(&self) -> Result<ItemFn, syn::Error> {
         let function_ident = &self.func.sig.ident;
-        let extern_func_ident = syn::Ident::new(
-            &format!("{}_wrapper", self.func.sig.ident),
-            self.func.sig.ident.span(),
-        );
+        let extern_func_ident = format_ident!("{}_wrapper", self.func.sig.ident);
         let tokens = quote! {
             #[no_mangle]
             #[::pgrx::pgrx_macros::pg_guard]
@@ -103,10 +100,7 @@ impl PgTrigger {
     }
 
     pub fn finfo_tokens(&self) -> Result<ItemFn, syn::Error> {
-        let finfo_name = syn::Ident::new(
-            &format!("pg_finfo_{}_wrapper", self.func.sig.ident),
-            proc_macro2::Span::call_site(),
-        );
+        let finfo_name = format_ident!("pg_finfo_{}_wrapper", self.func.sig.ident);
         let tokens = quote! {
             #[no_mangle]
             #[doc(hidden)]
@@ -121,18 +115,15 @@ impl PgTrigger {
 
 impl ToEntityGraphTokens for PgTrigger {
     fn to_entity_graph_tokens(&self) -> TokenStream2 {
-        let sql_graph_entity_fn_name = syn::Ident::new(
-            &format!("__pgrx_internals_trigger_{}", self.func.sig.ident),
-            self.func.sig.ident.span(),
-        );
         let func_sig_ident = &self.func.sig.ident;
+        let sql_graph_entity_fn_name = format_ident!("__pgrx_internals_trigger_{}", func_sig_ident);
         let function_name = func_sig_ident.to_string();
         let to_sql_config = &self.to_sql_config;
 
         quote! {
             #[no_mangle]
             #[doc(hidden)]
-            #[allow(unknown_lints, clippy::no_mangle_with_rust_abi)]
+            #[allow(unknown_lints, clippy::no_mangle_with_rust_abi, nonstandard_style)]
             pub extern "Rust" fn #sql_graph_entity_fn_name() -> ::pgrx::pgrx_sql_entity_graph::SqlGraphEntity {
                 use core::any::TypeId;
                 extern crate alloc;
