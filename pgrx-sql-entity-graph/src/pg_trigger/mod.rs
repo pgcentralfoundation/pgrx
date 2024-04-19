@@ -21,7 +21,7 @@ pub mod entity;
 use crate::enrich::{ToEntityGraphTokens, ToRustCodeTokens};
 use crate::{CodeEnrichment, ToSqlConfig};
 use attribute::PgTriggerAttribute;
-use proc_macro2::{Span, TokenStream as TokenStream2};
+use proc_macro2::TokenStream as TokenStream2;
 use quote::{format_ident, quote};
 use syn::{spanned::Spanned, ItemFn, Token};
 

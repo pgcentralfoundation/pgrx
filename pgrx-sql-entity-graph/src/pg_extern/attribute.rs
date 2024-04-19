@@ -17,7 +17,7 @@ to the `pgrx` framework and very subject to change between versions. While you m
 */
 use crate::positioning_ref::PositioningRef;
 use crate::to_sql::ToSqlConfig;
-use proc_macro2::{Span, TokenStream as TokenStream2};
+use proc_macro2::TokenStream as TokenStream2;
 use quote::{quote, ToTokens, TokenStreamExt};
 use syn::parse::{Parse, ParseStream};
 use syn::punctuated::Punctuated;
