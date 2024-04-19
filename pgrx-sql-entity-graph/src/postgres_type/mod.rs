@@ -19,7 +19,7 @@ pub mod entity;
 
 use crate::enrich::{ToEntityGraphTokens, ToRustCodeTokens};
 use proc_macro2::{Ident, Span, TokenStream as TokenStream2};
-use quote::quote;
+use quote::{format_ident, quote};
 use syn::parse::{Parse, ParseStream};
 use syn::{DeriveInput, Generics, ItemStruct, Lifetime, LifetimeParam};
 
@@ -125,8 +125,7 @@ impl ToEntityGraphTokens for PostgresTypeDerive {
         let in_fn = &self.in_fn;
         let out_fn = &self.out_fn;
 
-        let sql_graph_entity_fn_name =
-            syn::Ident::new(&format!("__pgrx_internals_type_{}", self.name), Span::call_site());
+        let sql_graph_entity_fn_name = format_ident!("__pgrx_internals_type_{}", self.name);
 
         let to_sql_config = &self.to_sql_config;
 
