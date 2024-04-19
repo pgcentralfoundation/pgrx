@@ -170,7 +170,7 @@ pub const ALIGNOF_LONG: u32 = 8;
 pub const ALIGNOF_PG_INT128_TYPE: u32 = 16;
 pub const ALIGNOF_SHORT: u32 = 2;
 pub const BLCKSZ: u32 = 8192;
-pub const CONFIGURE_ARGS : & [u8 ; 205] = b" '--prefix=/home/jubilee/.pgrx/16.0/pgrx-install' '--with-pgport=28816' '--enable-debug' '--enable-cassert' 'CPPFLAGS= -DMEMORY_CONTEXT_CHECKING=1 -DCLOBBER_FREED_MEMORY=1 -DRANDOMIZE_ALLOCATED_MEMORY=1 '\0" ;
+pub const CONFIGURE_ARGS : & [u8 ; 205] = b" '--prefix=/home/zombodb/.pgrx/16.1/pgrx-install' '--with-pgport=28816' '--enable-debug' '--enable-cassert' 'CPPFLAGS= -DMEMORY_CONTEXT_CHECKING=1 -DCLOBBER_FREED_MEMORY=1 -DRANDOMIZE_ALLOCATED_MEMORY=1 '\0" ;
 pub const DEF_PGPORT: u32 = 28816;
 pub const DEF_PGPORT_STR: &[u8; 6] = b"28816\0";
 pub const DLSUFFIX: &[u8; 4] = b".so\0";
@@ -184,8 +184,8 @@ pub const HAVE_DECL_F_FULLFSYNC: u32 = 0;
 pub const HAVE_DECL_POSIX_FADVISE: u32 = 1;
 pub const HAVE_DECL_PREADV: u32 = 1;
 pub const HAVE_DECL_PWRITEV: u32 = 1;
-pub const HAVE_DECL_STRLCAT: u32 = 1;
-pub const HAVE_DECL_STRLCPY: u32 = 1;
+pub const HAVE_DECL_STRLCAT: u32 = 0;
+pub const HAVE_DECL_STRLCPY: u32 = 0;
 pub const HAVE_DECL_STRNLEN: u32 = 1;
 pub const HAVE_EXECINFO_H: u32 = 1;
 pub const HAVE_EXPLICIT_BZERO: u32 = 1;
@@ -239,8 +239,6 @@ pub const HAVE_STRCHRNUL: u32 = 1;
 pub const HAVE_STRERROR_R: u32 = 1;
 pub const HAVE_STRINGS_H: u32 = 1;
 pub const HAVE_STRING_H: u32 = 1;
-pub const HAVE_STRLCAT: u32 = 1;
-pub const HAVE_STRLCPY: u32 = 1;
 pub const HAVE_STRNLEN: u32 = 1;
 pub const HAVE_STRSIGNAL: u32 = 1;
 pub const HAVE_STRUCT_OPTION: u32 = 1;
@@ -279,19 +277,18 @@ pub const MAXIMUM_ALIGNOF: u32 = 8;
 pub const MEMSET_LOOP_LIMIT: u32 = 1024;
 pub const PACKAGE_BUGREPORT: &[u8; 32] = b"pgsql-bugs@lists.postgresql.org\0";
 pub const PACKAGE_NAME: &[u8; 11] = b"PostgreSQL\0";
-pub const PACKAGE_STRING: &[u8; 16] = b"PostgreSQL 16.0\0";
+pub const PACKAGE_STRING: &[u8; 16] = b"PostgreSQL 16.1\0";
 pub const PACKAGE_TARNAME: &[u8; 11] = b"postgresql\0";
 pub const PACKAGE_URL: &[u8; 28] = b"https://www.postgresql.org/\0";
-pub const PACKAGE_VERSION: &[u8; 5] = b"16.0\0";
+pub const PACKAGE_VERSION: &[u8; 5] = b"16.1\0";
 pub const PG_KRB_SRVNAM: &[u8; 9] = b"postgres\0";
 pub const PG_MAJORVERSION: &[u8; 3] = b"16\0";
 pub const PG_MAJORVERSION_NUM: u32 = 16;
-pub const PG_MINORVERSION_NUM: u32 = 0;
+pub const PG_MINORVERSION_NUM: u32 = 1;
 pub const PG_USE_STDBOOL: u32 = 1;
-pub const PG_VERSION: &[u8; 5] = b"16.0\0";
-pub const PG_VERSION_NUM: u32 = 160000;
-pub const PG_VERSION_STR: &[u8; 86] =
-    b"PostgreSQL 16.0 on x86_64-pc-linux-gnu, compiled by gcc (GCC) 13.2.1 20230801, 64-bit\0";
+pub const PG_VERSION: &[u8; 5] = b"16.1\0";
+pub const PG_VERSION_NUM: u32 = 160001;
+pub const PG_VERSION_STR : & [u8 ; 102] = b"PostgreSQL 16.1 on x86_64-pc-linux-gnu, compiled by gcc (Ubuntu 11.4.0-1ubuntu1~22.04) 11.4.0, 64-bit\0" ;
 pub const RELSEG_SIZE: u32 = 131072;
 pub const SIZEOF_BOOL: u32 = 1;
 pub const SIZEOF_LONG: u32 = 8;
@@ -352,7 +349,6 @@ pub const __USE_ATFILE: u32 = 1;
 pub const __USE_FORTIFY_LEVEL: u32 = 0;
 pub const __GLIBC_USE_DEPRECATED_GETS: u32 = 0;
 pub const __GLIBC_USE_DEPRECATED_SCANF: u32 = 0;
-pub const __GLIBC_USE_C2X_STRTOL: u32 = 0;
 pub const _STDC_PREDEF_H: u32 = 1;
 pub const __STDC_IEC_559__: u32 = 1;
 pub const __STDC_IEC_60559_BFP__: u32 = 201404;
@@ -361,7 +357,7 @@ pub const __STDC_IEC_60559_COMPLEX__: u32 = 201404;
 pub const __STDC_ISO_10646__: u32 = 201706;
 pub const __GNU_LIBRARY__: u32 = 6;
 pub const __GLIBC__: u32 = 2;
-pub const __GLIBC_MINOR__: u32 = 38;
+pub const __GLIBC_MINOR__: u32 = 35;
 pub const _SYS_CDEFS_H: u32 = 1;
 pub const __glibc_c99_flexarr_available: u32 = 1;
 pub const __LDOUBLE_REDIRECTS_TO_FLOAT128_ABI: u32 = 0;
@@ -373,6 +369,7 @@ pub const __GLIBC_USE_IEC_60559_EXT: u32 = 0;
 pub const __GLIBC_USE_IEC_60559_FUNCS_EXT: u32 = 0;
 pub const __GLIBC_USE_IEC_60559_FUNCS_EXT_C2X: u32 = 0;
 pub const __GLIBC_USE_IEC_60559_TYPES_EXT: u32 = 0;
+pub const __GNUC_VA_LIST: u32 = 1;
 pub const _BITS_TYPES_H: u32 = 1;
 pub const _BITS_TYPESIZES_H: u32 = 1;
 pub const __OFF_T_MATCHES_OFF64_T: u32 = 1;
@@ -391,7 +388,6 @@ pub const __struct_FILE_defined: u32 = 1;
 pub const _IO_EOF_SEEN: u32 = 16;
 pub const _IO_ERR_SEEN: u32 = 32;
 pub const _IO_USER_LOCK: u32 = 32768;
-pub const __cookie_io_functions_t_defined: u32 = 1;
 pub const _IOFBF: u32 = 0;
 pub const _IOLBF: u32 = 1;
 pub const _IONBF: u32 = 2;
@@ -401,9 +397,9 @@ pub const SEEK_SET: u32 = 0;
 pub const SEEK_CUR: u32 = 1;
 pub const SEEK_END: u32 = 2;
 pub const P_tmpdir: &[u8; 5] = b"/tmp\0";
+pub const _BITS_STDIO_LIM_H: u32 = 1;
 pub const L_tmpnam: u32 = 20;
 pub const TMP_MAX: u32 = 238328;
-pub const _BITS_STDIO_LIM_H: u32 = 1;
 pub const FILENAME_MAX: u32 = 4096;
 pub const L_ctermid: u32 = 9;
 pub const FOPEN_MAX: u32 = 16;
@@ -732,7 +728,7 @@ pub const PG_BINARY_R: &[u8; 2] = b"r\0";
 pub const PG_BINARY_W: &[u8; 2] = b"w\0";
 pub const _CTYPE_H: u32 = 1;
 pub const PGINVALID_SOCKET: i32 = -1;
-pub const PG_BACKEND_VERSIONSTR: &[u8; 28] = b"postgres (PostgreSQL) 16.0\n\0";
+pub const PG_BACKEND_VERSIONSTR: &[u8; 28] = b"postgres (PostgreSQL) 16.1\n\0";
 pub const EXE: &[u8; 1] = b"\0";
 pub const DEVNULL: &[u8; 10] = b"/dev/null\0";
 pub const USE_REPL_SNPRINTF: u32 = 1;
@@ -920,6 +916,11 @@ pub const POSIX_FADV_SEQUENTIAL: u32 = 2;
 pub const POSIX_FADV_WILLNEED: u32 = 3;
 pub const POSIX_FADV_DONTNEED: u32 = 4;
 pub const POSIX_FADV_NOREUSE: u32 = 5;
+pub const AT_FDCWD: i32 = -100;
+pub const AT_SYMLINK_NOFOLLOW: u32 = 256;
+pub const AT_REMOVEDIR: u32 = 512;
+pub const AT_SYMLINK_FOLLOW: u32 = 1024;
+pub const AT_EACCESS: u32 = 512;
 pub const _BITS_STAT_H: u32 = 1;
 pub const _BITS_STRUCT_STAT_H: u32 = 1;
 pub const __S_IFMT: u32 = 61440;
@@ -965,11 +966,6 @@ pub const R_OK: u32 = 4;
 pub const W_OK: u32 = 2;
 pub const X_OK: u32 = 1;
 pub const F_OK: u32 = 0;
-pub const AT_FDCWD: i32 = -100;
-pub const AT_SYMLINK_NOFOLLOW: u32 = 256;
-pub const AT_REMOVEDIR: u32 = 512;
-pub const AT_SYMLINK_FOLLOW: u32 = 1024;
-pub const AT_EACCESS: u32 = 512;
 pub const F_ULOCK: u32 = 0;
 pub const F_LOCK: u32 = 1;
 pub const F_TLOCK: u32 = 2;
@@ -1861,9 +1857,6 @@ pub const SOL_NFC: u32 = 280;
 pub const SOL_KCM: u32 = 281;
 pub const SOL_TLS: u32 = 282;
 pub const SOL_XDP: u32 = 283;
-pub const SOL_MPTCP: u32 = 284;
-pub const SOL_MCTP: u32 = 285;
-pub const SOL_SMC: u32 = 286;
 pub const SOMAXCONN: u32 = 4096;
 pub const _BITS_SOCKADDR_H: u32 = 1;
 pub const _SS_SIZE: u32 = 128;
@@ -1952,9 +1945,6 @@ pub const SO_PREFER_BUSY_POLL: u32 = 69;
 pub const SO_BUSY_POLL_BUDGET: u32 = 70;
 pub const SO_NETNS_COOKIE: u32 = 71;
 pub const SO_BUF_LOCK: u32 = 72;
-pub const SO_RESERVE_MEM: u32 = 73;
-pub const SO_TXREHASH: u32 = 74;
-pub const SO_RCVMARK: u32 = 75;
 pub const SO_TIMESTAMP: u32 = 29;
 pub const SO_TIMESTAMPNS: u32 = 35;
 pub const SO_TIMESTAMPING: u32 = 37;
@@ -2023,7 +2013,6 @@ pub const IP_PMTUDISC_DO: u32 = 2;
 pub const IP_PMTUDISC_PROBE: u32 = 3;
 pub const IP_PMTUDISC_INTERFACE: u32 = 4;
 pub const IP_PMTUDISC_OMIT: u32 = 5;
-pub const IP_LOCAL_PORT_RANGE: u32 = 51;
 pub const SOL_IP: u32 = 0;
 pub const IP_DEFAULT_MULTICAST_TTL: u32 = 1;
 pub const IP_DEFAULT_MULTICAST_LOOP: u32 = 1;
@@ -2857,6 +2846,7 @@ pub const BPCHAR_BTREE_FAM_OID: Oid = Oid(426);
 pub const BYTEA_BTREE_FAM_OID: Oid = Oid(428);
 pub const NETWORK_BTREE_FAM_OID: Oid = Oid(1974);
 pub const INTEGER_BTREE_FAM_OID: Oid = Oid(1976);
+pub const INTERVAL_BTREE_FAM_OID: Oid = Oid(1982);
 pub const OID_BTREE_FAM_OID: Oid = Oid(1989);
 pub const TEXT_BTREE_FAM_OID: Oid = Oid(1994);
 pub const TEXT_PATTERN_BTREE_FAM_OID: Oid = Oid(2095);
@@ -3622,6 +3612,7 @@ pub const RANGESTRAT_CONTAINED_BY: u32 = 8;
 pub const RANGESTRAT_CONTAINS_ELEM: u32 = 16;
 pub const RANGESTRAT_EQ: u32 = 18;
 pub type pg_int64 = ::std::os::raw::c_long;
+pub type va_list = __builtin_va_list;
 pub type __gnuc_va_list = __builtin_va_list;
 pub type __u_char = ::std::os::raw::c_uchar;
 pub type __u_short = ::std::os::raw::c_ushort;
@@ -3812,40 +3803,6 @@ impl Default for _IO_FILE {
         }
     }
 }
-pub type cookie_read_function_t = ::std::option::Option<
-    unsafe extern "C" fn(
-        __cookie: *mut ::std::os::raw::c_void,
-        __buf: *mut ::std::os::raw::c_char,
-        __nbytes: usize,
-    ) -> __ssize_t,
->;
-pub type cookie_write_function_t = ::std::option::Option<
-    unsafe extern "C" fn(
-        __cookie: *mut ::std::os::raw::c_void,
-        __buf: *const ::std::os::raw::c_char,
-        __nbytes: usize,
-    ) -> __ssize_t,
->;
-pub type cookie_seek_function_t = ::std::option::Option<
-    unsafe extern "C" fn(
-        __cookie: *mut ::std::os::raw::c_void,
-        __pos: *mut __off64_t,
-        __w: ::std::os::raw::c_int,
-    ) -> ::std::os::raw::c_int,
->;
-pub type cookie_close_function_t = ::std::option::Option<
-    unsafe extern "C" fn(__cookie: *mut ::std::os::raw::c_void) -> ::std::os::raw::c_int,
->;
-#[repr(C)]
-#[derive(Debug, Default, Copy, Clone)]
-pub struct _IO_cookie_io_functions_t {
-    pub read: cookie_read_function_t,
-    pub write: cookie_write_function_t,
-    pub seek: cookie_seek_function_t,
-    pub close: cookie_close_function_t,
-}
-pub type cookie_io_functions_t = _IO_cookie_io_functions_t;
-pub type va_list = __gnuc_va_list;
 pub type off_t = __off_t;
 pub type fpos_t = __fpos_t;
 pub type _Float32 = f32;
@@ -16587,6 +16544,13 @@ impl Default for ip_opts {
 }
 #[repr(C)]
 #[derive(Debug, Default, Copy, Clone)]
+pub struct ip_mreqn {
+    pub imr_multiaddr: in_addr,
+    pub imr_address: in_addr,
+    pub imr_ifindex: ::std::os::raw::c_int,
+}
+#[repr(C)]
+#[derive(Debug, Default, Copy, Clone)]
 pub struct in_pktinfo {
     pub ipi_ifindex: ::std::os::raw::c_int,
     pub ipi_spec_dst: in_addr,
@@ -16613,7 +16577,6 @@ pub const IPPROTO_BEETPH: _bindgen_ty_16 = 94;
 pub const IPPROTO_ENCAP: _bindgen_ty_16 = 98;
 pub const IPPROTO_PIM: _bindgen_ty_16 = 103;
 pub const IPPROTO_COMP: _bindgen_ty_16 = 108;
-pub const IPPROTO_L2TP: _bindgen_ty_16 = 115;
 pub const IPPROTO_SCTP: _bindgen_ty_16 = 132;
 pub const IPPROTO_UDPLITE: _bindgen_ty_16 = 136;
 pub const IPPROTO_MPLS: _bindgen_ty_16 = 137;
@@ -16719,13 +16682,6 @@ impl Default for sockaddr_in6 {
 pub struct ip_mreq {
     pub imr_multiaddr: in_addr,
     pub imr_interface: in_addr,
-}
-#[repr(C)]
-#[derive(Debug, Default, Copy, Clone)]
-pub struct ip_mreqn {
-    pub imr_multiaddr: in_addr,
-    pub imr_address: in_addr,
-    pub imr_ifindex: ::std::os::raw::c_int,
 }
 #[repr(C)]
 #[derive(Debug, Default, Copy, Clone)]
@@ -24669,11 +24625,6 @@ pub type __v2du = [::std::os::raw::c_ulonglong; 2usize];
 pub type __v8hu = [::std::os::raw::c_ushort; 8usize];
 pub type __v16qu = [::std::os::raw::c_uchar; 16usize];
 pub type __v16qs = [::std::os::raw::c_schar; 16usize];
-pub type __v8hf = u128;
-pub type __m128h = u128;
-pub type __m128h_u = u128;
-pub type __v8bf = u128;
-pub type __m128bh = u128;
 pub type Vector8 = __m128i;
 pub type Vector32 = __m128i;
 pub type pg_wchar = ::std::os::raw::c_uint;
@@ -28054,7 +28005,6 @@ pub type ProcessUtility_hook_type = ::std::option::Option<
     ),
 >;
 #[repr(C)]
-#[repr(align(4))]
 #[derive(Debug, Default, Copy, Clone)]
 pub struct WordEntry {
     pub _bitfield_align_1: [u32; 0],
@@ -29238,6 +29188,23 @@ impl Default for RangeBound {
         }
     }
 }
+#[repr(C)]
+#[derive(Debug, Copy, Clone)]
+pub struct ClosestMatchState {
+    pub source: *const ::std::os::raw::c_char,
+    pub min_d: ::std::os::raw::c_int,
+    pub max_d: ::std::os::raw::c_int,
+    pub match_: *const ::std::os::raw::c_char,
+}
+impl Default for ClosestMatchState {
+    fn default() -> Self {
+        let mut s = ::std::mem::MaybeUninit::<Self>::uninit();
+        unsafe {
+            ::std::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
+            s.assume_init()
+        }
+    }
+}
 pub type __builtin_va_list = [__va_list_tag; 1usize];
 #[repr(C)]
 #[derive(Debug, Copy, Clone)]
@@ -29379,9 +29346,6 @@ extern "C" {
         __format: *const ::std::os::raw::c_char,
         __arg: *mut __va_list_tag,
     ) -> ::std::os::raw::c_int;
-    pub fn arc4random() -> __uint32_t;
-    pub fn arc4random_buf(__buf: *mut ::std::os::raw::c_void, __size: usize);
-    pub fn arc4random_uniform(__upper_bound: __uint32_t) -> __uint32_t;
     pub fn alloca(__size: ::std::os::raw::c_ulong) -> *mut ::std::os::raw::c_void;
     pub fn atexit(__func: ::std::option::Option<unsafe extern "C" fn()>) -> ::std::os::raw::c_int;
     pub fn at_quick_exit(
@@ -29392,16 +29356,6 @@ extern "C" {
         __s2: *const ::std::os::raw::c_void,
         __n: usize,
     ) -> ::std::os::raw::c_int;
-    pub fn strlcpy(
-        __dest: *mut ::std::os::raw::c_char,
-        __src: *const ::std::os::raw::c_char,
-        __n: ::std::os::raw::c_ulong,
-    ) -> ::std::os::raw::c_ulong;
-    pub fn strlcat(
-        __dest: *mut ::std::os::raw::c_char,
-        __src: *const ::std::os::raw::c_char,
-        __n: ::std::os::raw::c_ulong,
-    ) -> ::std::os::raw::c_ulong;
     pub fn ExceptionalCondition(
         conditionName: *const ::std::os::raw::c_char,
         fileName: *const ::std::os::raw::c_char,
@@ -29758,6 +29712,16 @@ extern "C" {
     pub fn __fminl(__x: u128, __y: u128) -> u128;
     pub fn __fmal(__x: u128, __y: u128, __z: u128) -> u128;
     pub fn __scalbl(__x: u128, __n: u128) -> u128;
+    pub fn strlcat(
+        dst: *mut ::std::os::raw::c_char,
+        src: *const ::std::os::raw::c_char,
+        siz: usize,
+    ) -> usize;
+    pub fn strlcpy(
+        dst: *mut ::std::os::raw::c_char,
+        src: *const ::std::os::raw::c_char,
+        siz: usize,
+    ) -> usize;
     pub fn pg_get_user_name(
         user_id: uid_t,
         buffer: *mut ::std::os::raw::c_char,
@@ -29953,6 +29917,7 @@ extern "C" {
     pub fn write_csvlog(edata: *mut ErrorData);
     pub fn write_jsonlog(edata: *mut ErrorData);
     pub fn write_stderr(fmt: *const ::std::os::raw::c_char, ...);
+    pub fn write_stderr_signal_safe(fmt: *const ::std::os::raw::c_char);
     pub fn MemoryContextAlloc(context: MemoryContext, size: Size) -> *mut ::std::os::raw::c_void;
     pub fn MemoryContextAllocZero(
         context: MemoryContext,
@@ -36628,19 +36593,12 @@ extern "C" {
         servername: *const ::std::os::raw::c_char,
         missing_ok: bool,
     ) -> Oid;
-    #[doc = " Forces strong memory ordering (serialization) between store\n    instructions preceding this instruction and store instructions following\n    this instruction, ensuring the system completes all previous stores\n    before executing subsequent stores.\n\n \\headerfile <x86intrin.h>\n\n This intrinsic corresponds to the <c> SFENCE </c> instruction.\n"]
     pub fn _mm_sfence();
-    #[doc = " Returns the contents of the MXCSR register as a 32-bit unsigned\n    integer value.\n\n    There are several groups of macros associated with this\n    intrinsic, including:\n    <ul>\n    <li>\n      For checking exception states: _MM_EXCEPT_INVALID, _MM_EXCEPT_DIV_ZERO,\n      _MM_EXCEPT_DENORM, _MM_EXCEPT_OVERFLOW, _MM_EXCEPT_UNDERFLOW,\n      _MM_EXCEPT_INEXACT. There is a convenience wrapper\n      _MM_GET_EXCEPTION_STATE().\n    </li>\n    <li>\n      For checking exception masks: _MM_MASK_UNDERFLOW, _MM_MASK_OVERFLOW,\n      _MM_MASK_INVALID, _MM_MASK_DENORM, _MM_MASK_DIV_ZERO, _MM_MASK_INEXACT.\n      There is a convenience wrapper _MM_GET_EXCEPTION_MASK().\n    </li>\n    <li>\n      For checking rounding modes: _MM_ROUND_NEAREST, _MM_ROUND_DOWN,\n      _MM_ROUND_UP, _MM_ROUND_TOWARD_ZERO. There is a convenience wrapper\n      _MM_GET_ROUNDING_MODE().\n    </li>\n    <li>\n      For checking flush-to-zero mode: _MM_FLUSH_ZERO_ON, _MM_FLUSH_ZERO_OFF.\n      There is a convenience wrapper _MM_GET_FLUSH_ZERO_MODE().\n    </li>\n    <li>\n      For checking denormals-are-zero mode: _MM_DENORMALS_ZERO_ON,\n      _MM_DENORMALS_ZERO_OFF. There is a convenience wrapper\n      _MM_GET_DENORMALS_ZERO_MODE().\n    </li>\n    </ul>\n\n    For example, the following expression checks if an overflow exception has\n    occurred:\n    \\code\n      ( _mm_getcsr() & _MM_EXCEPT_OVERFLOW )\n    \\endcode\n\n    The following expression gets the current rounding mode:\n    \\code\n      _MM_GET_ROUNDING_MODE()\n    \\endcode\n\n \\headerfile <x86intrin.h>\n\n This intrinsic corresponds to the <c> VSTMXCSR / STMXCSR </c> instruction.\n\n \\returns A 32-bit unsigned integer containing the contents of the MXCSR\n    register."]
     pub fn _mm_getcsr() -> ::std::os::raw::c_uint;
-    #[doc = " Sets the MXCSR register with the 32-bit unsigned integer value.\n\n    There are several groups of macros associated with this intrinsic,\n    including:\n    <ul>\n    <li>\n      For setting exception states: _MM_EXCEPT_INVALID, _MM_EXCEPT_DIV_ZERO,\n      _MM_EXCEPT_DENORM, _MM_EXCEPT_OVERFLOW, _MM_EXCEPT_UNDERFLOW,\n      _MM_EXCEPT_INEXACT. There is a convenience wrapper\n      _MM_SET_EXCEPTION_STATE(x) where x is one of these macros.\n    </li>\n    <li>\n      For setting exception masks: _MM_MASK_UNDERFLOW, _MM_MASK_OVERFLOW,\n      _MM_MASK_INVALID, _MM_MASK_DENORM, _MM_MASK_DIV_ZERO, _MM_MASK_INEXACT.\n      There is a convenience wrapper _MM_SET_EXCEPTION_MASK(x) where x is one\n      of these macros.\n    </li>\n    <li>\n      For setting rounding modes: _MM_ROUND_NEAREST, _MM_ROUND_DOWN,\n      _MM_ROUND_UP, _MM_ROUND_TOWARD_ZERO. There is a convenience wrapper\n      _MM_SET_ROUNDING_MODE(x) where x is one of these macros.\n    </li>\n    <li>\n      For setting flush-to-zero mode: _MM_FLUSH_ZERO_ON, _MM_FLUSH_ZERO_OFF.\n      There is a convenience wrapper _MM_SET_FLUSH_ZERO_MODE(x) where x is\n      one of these macros.\n    </li>\n    <li>\n      For setting denormals-are-zero mode: _MM_DENORMALS_ZERO_ON,\n      _MM_DENORMALS_ZERO_OFF. There is a convenience wrapper\n      _MM_SET_DENORMALS_ZERO_MODE(x) where x is one of these macros.\n    </li>\n    </ul>\n\n    For example, the following expression causes subsequent floating-point\n    operations to round up:\n      _mm_setcsr(_mm_getcsr() | _MM_ROUND_UP)\n\n    The following example sets the DAZ and FTZ flags:\n    \\code\n    void setFlags() {\n      _MM_SET_FLUSH_ZERO_MODE(_MM_FLUSH_ZERO_ON);\n      _MM_SET_DENORMALS_ZERO_MODE(_MM_DENORMALS_ZERO_ON);\n    }\n    \\endcode\n\n \\headerfile <x86intrin.h>\n\n This intrinsic corresponds to the <c> VLDMXCSR / LDMXCSR </c> instruction.\n\n \\param __i\n    A 32-bit unsigned integer value to be written to the MXCSR register."]
     pub fn _mm_setcsr(__i: ::std::os::raw::c_uint);
-    #[doc = " The cache line containing \\a __p is flushed and invalidated from all\n    caches in the coherency domain.\n\n \\headerfile <x86intrin.h>\n\n This intrinsic corresponds to the <c> CLFLUSH </c> instruction.\n\n \\param __p\n    A pointer to the memory location used to identify the cache line to be\n    flushed."]
     pub fn _mm_clflush(__p: *const ::std::os::raw::c_void);
-    #[doc = " Forces strong memory ordering (serialization) between load\n    instructions preceding this instruction and load instructions following\n    this instruction, ensuring the system completes all previous loads before\n    executing subsequent loads.\n\n \\headerfile <x86intrin.h>\n\n This intrinsic corresponds to the <c> LFENCE </c> instruction.\n"]
     pub fn _mm_lfence();
-    #[doc = " Forces strong memory ordering (serialization) between load and store\n    instructions preceding this instruction and load and store instructions\n    following this instruction, ensuring that the system completes all\n    previous memory accesses before executing subsequent memory accesses.\n\n \\headerfile <x86intrin.h>\n\n This intrinsic corresponds to the <c> MFENCE </c> instruction.\n"]
     pub fn _mm_mfence();
-    #[doc = " Indicates that a spin loop is being executed for the purposes of\n    optimizing power consumption during the loop.\n\n \\headerfile <x86intrin.h>\n\n This intrinsic corresponds to the <c> PAUSE </c> instruction.\n"]
     pub fn _mm_pause();
     pub fn pg_char_to_encoding(name: *const ::std::os::raw::c_char) -> ::std::os::raw::c_int;
     pub fn pg_encoding_to_char(encoding: ::std::os::raw::c_int) -> *const ::std::os::raw::c_char;
@@ -44519,6 +44477,70 @@ extern "C" {
         output1: *mut *mut RangeType,
         output2: *mut *mut RangeType,
     ) -> bool;
+    pub fn varstr_cmp(
+        arg1: *const ::std::os::raw::c_char,
+        len1: ::std::os::raw::c_int,
+        arg2: *const ::std::os::raw::c_char,
+        len2: ::std::os::raw::c_int,
+        collid: Oid,
+    ) -> ::std::os::raw::c_int;
+    pub fn varstr_sortsupport(ssup: SortSupport, typid: Oid, collid: Oid);
+    pub fn varstr_levenshtein(
+        source: *const ::std::os::raw::c_char,
+        slen: ::std::os::raw::c_int,
+        target: *const ::std::os::raw::c_char,
+        tlen: ::std::os::raw::c_int,
+        ins_c: ::std::os::raw::c_int,
+        del_c: ::std::os::raw::c_int,
+        sub_c: ::std::os::raw::c_int,
+        trusted: bool,
+    ) -> ::std::os::raw::c_int;
+    pub fn varstr_levenshtein_less_equal(
+        source: *const ::std::os::raw::c_char,
+        slen: ::std::os::raw::c_int,
+        target: *const ::std::os::raw::c_char,
+        tlen: ::std::os::raw::c_int,
+        ins_c: ::std::os::raw::c_int,
+        del_c: ::std::os::raw::c_int,
+        sub_c: ::std::os::raw::c_int,
+        max_d: ::std::os::raw::c_int,
+        trusted: bool,
+    ) -> ::std::os::raw::c_int;
+    pub fn textToQualifiedNameList(textval: *mut text) -> *mut List;
+    pub fn SplitIdentifierString(
+        rawstring: *mut ::std::os::raw::c_char,
+        separator: ::std::os::raw::c_char,
+        namelist: *mut *mut List,
+    ) -> bool;
+    pub fn SplitDirectoriesString(
+        rawstring: *mut ::std::os::raw::c_char,
+        separator: ::std::os::raw::c_char,
+        namelist: *mut *mut List,
+    ) -> bool;
+    pub fn SplitGUCList(
+        rawstring: *mut ::std::os::raw::c_char,
+        separator: ::std::os::raw::c_char,
+        namelist: *mut *mut List,
+    ) -> bool;
+    pub fn replace_text_regexp(
+        src_text: *mut text,
+        pattern_text: *mut text,
+        replace_text: *mut text,
+        cflags: ::std::os::raw::c_int,
+        collation: Oid,
+        search_start: ::std::os::raw::c_int,
+        n: ::std::os::raw::c_int,
+    ) -> *mut text;
+    pub fn initClosestMatch(
+        state: *mut ClosestMatchState,
+        source: *const ::std::os::raw::c_char,
+        max_d: ::std::os::raw::c_int,
+    );
+    pub fn updateClosestMatch(
+        state: *mut ClosestMatchState,
+        candidate: *const ::std::os::raw::c_char,
+    );
+    pub fn getClosestMatch(state: *mut ClosestMatchState) -> *const ::std::os::raw::c_char;
 }
 extern "C" {
     pub static mut error_context_stack: *mut ErrorContextCallback;
