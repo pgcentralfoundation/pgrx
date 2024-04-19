@@ -16,9 +16,9 @@ to the `pgrx` framework and very subject to change between versions. While you m
 
 */
 use crate::UsedType;
-use proc_macro2::{Span, TokenStream as TokenStream2};
+use proc_macro2::TokenStream as TokenStream2;
 use quote::{quote, ToTokens, TokenStreamExt};
-use syn::{FnArg, Pat};
+use syn::{spanned::Spanned, FnArg, Pat};
 
 /// A parsed `#[pg_extern]` argument.
 ///
@@ -35,7 +35,7 @@ impl PgExternArgument {
         match &fn_arg {
             syn::FnArg::Typed(pat) => Self::build_from_pat_type(fn_arg.clone(), pat.clone()),
             syn::FnArg::Receiver(_) => {
-                Err(syn::Error::new(Span::call_site(), "Unable to parse FnArg that is Self"))
+                Err(syn::Error::new(fn_arg.span(), "Unable to parse FnArg that is Self"))
             }
         }
     }
@@ -48,9 +48,9 @@ impl PgExternArgument {
             Pat::Ident(ref p) => p.ident.clone(),
             Pat::Reference(ref p_ref) => match *p_ref.pat {
                 Pat::Ident(ref inner_ident) => inner_ident.ident.clone(),
-                _ => return Err(syn::Error::new(Span::call_site(), "Unable to parse FnArg")),
+                _ => return Err(syn::Error::new(value.span(), "Unable to parse FnArg")),
             },
-            _ => return Err(syn::Error::new(Span::call_site(), "Unable to parse FnArg")),
+            _ => return Err(syn::Error::new(value.span(), "Unable to parse FnArg")),
         };
 
         let used_ty = UsedType::new(*value.ty)?;
