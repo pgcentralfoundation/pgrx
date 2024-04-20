@@ -21,9 +21,7 @@ pub trait ToRustCodeTokens {
 
 /// Generates the rust code to tie one of pgrx' supported SQL interfaces into pgrx' schema generator
 pub trait ToEntityGraphTokens {
-    fn to_entity_graph_tokens(&self) -> TokenStream2 {
-        quote! {}
-    }
+    fn to_entity_graph_tokens(&self) -> TokenStream2;
 }
 
 impl<T> ToTokens for CodeEnrichment<T>
