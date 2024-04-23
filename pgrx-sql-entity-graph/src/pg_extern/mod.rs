@@ -28,6 +28,7 @@ pub use cast::PgCast;
 pub use operator::PgOperator;
 pub use returning::NameMacro;
 
+use crate::finfo::finfo_v1_tokens;
 use crate::fmt::ErrHarder;
 use crate::ToSqlConfig;
 pub(crate) use attribute::Attribute;
@@ -375,19 +376,7 @@ impl PgExtern {
         }
     }
 
-    fn finfo_tokens(&self) -> TokenStream2 {
-        let finfo_name = format_ident!("pg_finfo_{}_wrapper", self.func.sig.ident);
-        quote_spanned! { self.func.sig.span() =>
-            #[no_mangle]
-            #[doc(hidden)]
-            pub extern "C" fn #finfo_name() -> &'static ::pgrx::pg_sys::Pg_finfo_record {
-                const V1_API: ::pgrx::pg_sys::Pg_finfo_record = ::pgrx::pg_sys::Pg_finfo_record { api_version: 1 };
-                &V1_API
-            }
-        }
-    }
-
-    pub fn wrapper_func(&self) -> TokenStream2 {
+    pub fn wrapper_func(&self) -> Result<syn::ItemFn, syn::Error> {
         let func_name = &self.func.sig.ident;
         let func_name_wrapper = format_ident!("{}_wrapper", &self.func.sig.ident);
         let func_generics = &self.func.sig.generics;
@@ -456,7 +445,7 @@ impl PgExtern {
         let extern_c_wrapper =
             |span, returns_datum: bool, wrapped_contents: proc_macro2::TokenStream| {
                 let return_ty = returns_datum.then(|| quote! { -> ::pgrx::pg_sys::Datum });
-                quote_spanned! { span=>
+                let tokens = quote_spanned! { span=>
                     #[no_mangle]
                     #[doc(hidden)]
                     #unused_lifetimes
@@ -464,7 +453,8 @@ impl PgExtern {
                     pub unsafe extern "C" fn #func_name_wrapper #func_generics(#fcinfo_ident: ::pgrx::pg_sys::FunctionCallInfo) #return_ty {
                         #wrapped_contents
                     }
-                }
+                };
+                syn::parse2(tokens)
             };
 
         match &self.returns {
@@ -600,8 +590,8 @@ impl ToEntityGraphTokens for PgExtern {
 impl ToRustCodeTokens for PgExtern {
     fn to_rust_code_tokens(&self) -> TokenStream2 {
         let original_func = &self.func;
-        let wrapper_func = self.wrapper_func();
-        let finfo_tokens = self.finfo_tokens();
+        let wrapper_func = self.wrapper_func().unwrap();
+        let finfo_tokens = finfo_v1_tokens(wrapper_func.sig.ident.clone()).unwrap();
 
         quote_spanned! { self.func.sig.span() =>
             #original_func
