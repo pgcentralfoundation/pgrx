@@ -67,6 +67,7 @@ quote = "1.0.33"
 regex = "1.1" # used for build/test
 syn = { version = "2", features = [ "extra-traits", "full", "parsing" ] }
 toml = "0.8" # our config files
+toml_edit = "0.22.12" # format-preserving edits to cargo.toml
 thiserror = "1"
 unescape = "0.1.0" # for escaped-character-handling
 url = "2.4.1" # the non-existent std::web

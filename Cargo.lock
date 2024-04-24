@@ -364,6 +364,7 @@ dependencies = [
  "tar",
  "tempfile",
  "toml",
+ "toml_edit",
  "tracing",
  "tracing-error",
  "tracing-subscriber",
@@ -2565,9 +2566,9 @@ dependencies = [
 
 [[package]]
 name = "toml_edit"
-version = "0.22.6"
+version = "0.22.12"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "2c1b5fd4128cc8d3e0cb74d4ed9a9cc7c7284becd4df68f5f940e1ad123606f6"
+checksum = "d3328d4f68a705b2a4498da1d580585d39a6510f98318a2cec3018a7ec61ddef"
 dependencies = [
  "indexmap",
  "serde",
