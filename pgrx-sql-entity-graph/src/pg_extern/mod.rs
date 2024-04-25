@@ -28,7 +28,7 @@ pub use cast::PgCast;
 pub use operator::PgOperator;
 pub use returning::NameMacro;
 
-use crate::finfo::finfo_v1_tokens;
+use crate::finfo::{finfo_v1_extern_c, finfo_v1_tokens};
 use crate::fmt::ErrHarder;
 use crate::ToSqlConfig;
 pub(crate) use attribute::Attribute;
@@ -378,15 +378,6 @@ impl PgExtern {
 
     pub fn wrapper_func(&self) -> Result<syn::ItemFn, syn::Error> {
         let func_name = &self.func.sig.ident;
-        let func_name_wrapper = format_ident!("{}_wrapper", &self.func.sig.ident);
-        let func_generics = &self.func.sig.generics;
-        // the wrapper function declaration may contain lifetimes that are not used, since our input type is `FunctionCallInfo` mainly and return type is `Datum`
-        let unused_lifetimes = match func_generics.lifetimes().next() {
-            Some(_) => quote! {
-                #[allow(unused_lifetimes, clippy::extra_unused_lifetimes)]
-            },
-            None => quote! {},
-        };
         let is_raw = self.extern_attrs().contains(&Attribute::Raw);
         // We use a `_` prefix to make functions with no args more satisfied during linting.
         let fcinfo_ident = syn::Ident::new("_fcinfo", self.func.sig.ident.span());
@@ -442,17 +433,8 @@ impl PgExtern {
         };
 
         // This is the generic wrapper fn that everything needs
-        let extern_c_wrapper = |span, wrapped_contents: proc_macro2::TokenStream| {
-            let tokens = quote_spanned! { span=>
-                #[no_mangle]
-                #[doc(hidden)]
-                #unused_lifetimes
-                #[::pgrx::pgrx_macros::pg_guard]
-                pub unsafe extern "C" fn #func_name_wrapper #func_generics(#fcinfo_ident: ::pgrx::pg_sys::FunctionCallInfo) -> ::pgrx::pg_sys::Datum {
-                    #wrapped_contents
-                }
-            };
-            syn::parse2(tokens)
+        let extern_c_wrapper = |_span, wrapped_contents: proc_macro2::TokenStream| {
+            finfo_v1_extern_c(&self.func, wrapped_contents)
         };
 
         match &self.returns {
