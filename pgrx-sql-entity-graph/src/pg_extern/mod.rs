@@ -438,6 +438,7 @@ impl PgExtern {
                     #(#arg_fetches)*
                     #[allow(unused_unsafe)]
                     unsafe { #func_name(#(#arg_pats),*) };
+                    // -> () means always returning the zero Datum
                     ::pgrx::pg_sys::Datum::from(0)
                 };
                 finfo_v1_extern_c(&self.func, fn_contents)
