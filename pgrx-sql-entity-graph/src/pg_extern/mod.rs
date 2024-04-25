@@ -441,7 +441,7 @@ impl PgExtern {
                     // -> () means always returning the zero Datum
                     ::pgrx::pg_sys::Datum::from(0)
                 };
-                finfo_v1_extern_c(&self.func, fn_contents)
+                finfo_v1_extern_c(&self.func, fcinfo_ident, fn_contents)
             }
             Returning::Type(retval_ty) => {
                 let result_ident = syn::Ident::new("result", self.func.sig.span());
@@ -496,7 +496,7 @@ impl PgExtern {
 
                     #retval_transform
                 };
-                finfo_v1_extern_c(&self.func, fn_contents)
+                finfo_v1_extern_c(&self.func, fcinfo_ident, fn_contents)
             }
             Returning::SetOf { ty: _retval_ty, optional, result } => {
                 let result_handler = emit_result_handler(self.func.sig.span(), *optional, *result);
@@ -512,7 +512,7 @@ impl PgExtern {
                         })
                     }
                 };
-                finfo_v1_extern_c(&self.func, setof_closure)
+                finfo_v1_extern_c(&self.func, fcinfo_ident, setof_closure)
             }
             Returning::Iterated { tys: retval_tys, optional, result } => {
                 let result_handler = emit_result_handler(self.func.sig.span(), *optional, *result);
@@ -552,7 +552,7 @@ impl PgExtern {
                         }
                     }
                 };
-                finfo_v1_extern_c(&self.func, iter_closure)
+                finfo_v1_extern_c(&self.func, fcinfo_ident, iter_closure)
             }
         }
     }

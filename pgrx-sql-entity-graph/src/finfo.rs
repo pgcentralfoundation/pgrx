@@ -1,4 +1,4 @@
-use proc_macro2::TokenStream;
+use proc_macro2::{Ident, TokenStream};
 use quote::{format_ident, quote, quote_spanned};
 use syn::{self, spanned::Spanned, ItemFn};
 
@@ -19,7 +19,11 @@ pub fn finfo_v1_tokens(ident: proc_macro2::Ident) -> syn::Result<ItemFn> {
     syn::parse2(tokens)
 }
 
-pub fn finfo_v1_extern_c(original: &syn::ItemFn, contents: TokenStream) -> syn::Result<ItemFn> {
+pub fn finfo_v1_extern_c(
+    original: &syn::ItemFn,
+    fcinfo: Ident,
+    contents: TokenStream,
+) -> syn::Result<ItemFn> {
     let original_name = &original.sig.ident;
     let wrapper_symbol = format_ident!("{}_wrapper", original_name);
     let lifetimes = &original.sig.generics;
@@ -37,7 +41,7 @@ pub fn finfo_v1_extern_c(original: &syn::ItemFn, contents: TokenStream) -> syn::
         #[doc(hidden)]
         #unused_lifetimes
         #[::pgrx::pgrx_macros::pg_guard]
-        pub unsafe extern "C" fn #wrapper_symbol #lifetimes(_fcinfo: ::pgrx::pg_sys::FunctionCallInfo) -> ::pgrx::pg_sys::Datum {
+        pub unsafe extern "C" fn #wrapper_symbol #lifetimes(#fcinfo: ::pgrx::pg_sys::FunctionCallInfo) -> ::pgrx::pg_sys::Datum {
             #contents
         }
     };

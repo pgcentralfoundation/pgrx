@@ -22,7 +22,7 @@ use crate::enrich::{ToEntityGraphTokens, ToRustCodeTokens};
 use crate::finfo::{finfo_v1_extern_c, finfo_v1_tokens};
 use crate::{CodeEnrichment, ToSqlConfig};
 use attribute::PgTriggerAttribute;
-use proc_macro2::TokenStream as TokenStream2;
+use proc_macro2::{Ident, TokenStream as TokenStream2};
 use quote::{format_ident, quote};
 use syn::{spanned::Spanned, ItemFn, Token};
 
@@ -70,10 +70,11 @@ impl PgTrigger {
 
     pub fn wrapper_tokens(&self) -> Result<ItemFn, syn::Error> {
         let function_ident = self.func.sig.ident.clone();
+        let fcinfo_ident = Ident::new("_fcinfo", function_ident.span());
         let tokens = quote! {
             let fcinfo_ref = unsafe {
                 // SAFETY:  The caller should be Postgres in this case and it will give us a valid "fcinfo" pointer
-                _fcinfo.as_ref().expect("fcinfo was NULL from Postgres")
+                #fcinfo_ident.as_ref().expect("fcinfo was NULL from Postgres")
             };
             let maybe_pg_trigger = unsafe { ::pgrx::trigger_support::PgTrigger::from_fcinfo(fcinfo_ref) };
             let pg_trigger = maybe_pg_trigger.expect("PgTrigger::from_fcinfo failed");
@@ -95,7 +96,7 @@ impl PgTrigger {
             }
         };
 
-        finfo_v1_extern_c(&self.func, tokens)
+        finfo_v1_extern_c(&self.func, fcinfo_ident, tokens)
     }
 }
 
