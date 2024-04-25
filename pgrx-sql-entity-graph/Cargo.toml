@@ -19,6 +19,7 @@ repository = "https://github.com/pgcentralfoundation/pgrx/"
 documentation = "https://docs.rs/pgrx-sql-entity-graph"
 readme = "README.md"
 edition = "2021"
+include = ["src/**/*", "README.md"]
 
 [features]
 syntax-highlighting = ["dep:syntect", "dep:owo-colors"]

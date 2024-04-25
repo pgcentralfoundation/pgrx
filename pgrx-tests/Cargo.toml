@@ -19,6 +19,7 @@ repository = "https://github.com/pgcentralfoundation/pgrx/"
 documentation = "https://docs.rs/pgrx-tests"
 readme = "README.md"
 edition = "2021"
+include = ["src/**/*", "README.md", "!**/tests/**/*"]
 
 [lib]
 crate-type = [ "cdylib", "lib" ]
