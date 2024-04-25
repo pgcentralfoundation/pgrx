@@ -432,11 +432,6 @@ impl PgExtern {
             }
         };
 
-        // This is the generic wrapper fn that everything needs
-        let extern_c_wrapper = |_span, wrapped_contents: proc_macro2::TokenStream| {
-            finfo_v1_extern_c(&self.func, wrapped_contents)
-        };
-
         match &self.returns {
             Returning::None => {
                 let fn_contents = quote! {
@@ -445,7 +440,7 @@ impl PgExtern {
                     unsafe { #func_name(#(#arg_pats),*) };
                     ::pgrx::pg_sys::Datum::from(0)
                 };
-                extern_c_wrapper(self.func.sig.span(), fn_contents)
+                finfo_v1_extern_c(&self.func, fn_contents)
             }
             Returning::Type(retval_ty) => {
                 let result_ident = syn::Ident::new("result", self.func.sig.span());
@@ -500,7 +495,7 @@ impl PgExtern {
 
                     #retval_transform
                 };
-                extern_c_wrapper(self.func.sig.span(), fn_contents)
+                finfo_v1_extern_c(&self.func, fn_contents)
             }
             Returning::SetOf { ty: _retval_ty, optional, result } => {
                 let result_handler = emit_result_handler(self.func.sig.span(), *optional, *result);
@@ -516,7 +511,7 @@ impl PgExtern {
                         })
                     }
                 };
-                extern_c_wrapper(self.func.sig.span(), setof_closure)
+                finfo_v1_extern_c(&self.func, setof_closure)
             }
             Returning::Iterated { tys: retval_tys, optional, result } => {
                 let result_handler = emit_result_handler(self.func.sig.span(), *optional, *result);
@@ -556,7 +551,7 @@ impl PgExtern {
                         }
                     }
                 };
-                extern_c_wrapper(self.func.sig.span(), iter_closure)
+                finfo_v1_extern_c(&self.func, iter_closure)
             }
         }
     }
