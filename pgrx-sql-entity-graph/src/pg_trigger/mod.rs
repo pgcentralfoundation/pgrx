@@ -73,7 +73,7 @@ impl PgTrigger {
         let tokens = quote! {
             let fcinfo_ref = unsafe {
                 // SAFETY:  The caller should be Postgres in this case and it will give us a valid "fcinfo" pointer
-                fcinfo.as_ref().expect("fcinfo was NULL from Postgres")
+                _fcinfo.as_ref().expect("fcinfo was NULL from Postgres")
             };
             let maybe_pg_trigger = unsafe { ::pgrx::trigger_support::PgTrigger::from_fcinfo(fcinfo_ref) };
             let pg_trigger = maybe_pg_trigger.expect("PgTrigger::from_fcinfo failed");
