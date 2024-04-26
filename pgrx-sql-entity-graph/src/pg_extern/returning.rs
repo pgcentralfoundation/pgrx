@@ -123,13 +123,15 @@ impl Returning {
                             continue 'outer;
                         } else if segments.last_ident_is("SetOfIterator") {
                             is_setof_iter = true;
+                            break;
                         } else if let Some(segment) = segments.filter_last_ident("TableIterator") {
                             if found_option {
-                                segments = Punctuated::from_iter(Some(segment.clone()));
+                                segments = Punctuated::from_iter(std::iter::once(segment.clone()));
                                 found_option = false;
                                 continue 'outer;
                             }
                             is_table_iter = true;
+                            break;
                         } else {
                             break;
                         }
