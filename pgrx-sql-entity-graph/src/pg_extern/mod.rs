@@ -384,8 +384,7 @@ impl PgExtern {
             let pat = &arg_pats[idx];
             let resolved_ty = &arg.used_ty.resolved_ty;
             match resolved_ty {
-                // There's no danger of us misinterpreting FunctionCallInfo's spelling, as the pointer coercion must typecheck:
-                // C might allow casting *mut T to *mut U implicitly, but Rust does not.
+                // There's no danger of misinterpreting the type, as pointer coercions must typecheck!
                 ty @ Type::Path(_) if last_ident_is(ty, "FunctionCallInfo") => quote_spanned! {pat.span()=>
                     let #pat = #fcinfo_ident;
                 },
