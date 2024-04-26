@@ -24,30 +24,26 @@ mod returning;
 mod search_path;
 
 pub use argument::PgExternArgument;
+pub(crate) use attribute::Attribute;
 pub use cast::PgCast;
 pub use operator::PgOperator;
 pub use returning::NameMacro;
 
+use self::returning::Returning;
+use super::UsedType;
+use crate::enrich::{CodeEnrichment, ToEntityGraphTokens, ToRustCodeTokens};
 use crate::finfo::{finfo_v1_extern_c, finfo_v1_tokens};
 use crate::fmt::ErrHarder;
 use crate::ToSqlConfig;
-pub(crate) use attribute::Attribute;
 use operator::{PgrxOperatorAttributeWithIdent, PgrxOperatorOpName};
 use search_path::SearchPathList;
 
-use crate::enrich::CodeEnrichment;
-use crate::enrich::ToEntityGraphTokens;
-use crate::enrich::ToRustCodeTokens;
 use proc_macro2::{Ident, Span, TokenStream as TokenStream2};
 use quote::{format_ident, quote, quote_spanned};
 use syn::parse::{Parse, ParseStream, Parser};
 use syn::punctuated::Punctuated;
 use syn::spanned::Spanned;
 use syn::{Meta, Token, Type};
-
-use self::returning::Returning;
-
-use super::UsedType;
 
 /// A parsed `#[pg_extern]` item.
 ///
