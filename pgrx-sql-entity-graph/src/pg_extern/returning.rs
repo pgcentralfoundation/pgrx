@@ -15,7 +15,9 @@
 to the `pgrx` framework and very subject to change between versions. While you may use this, please do it with caution.
 
 */
+use super::{last_ident_is, LastIdent};
 use crate::UsedType;
+
 use proc_macro2::TokenStream as TokenStream2;
 use quote::{quote, ToTokens, TokenStreamExt};
 use syn::parse::{Parse, ParseStream};
@@ -57,27 +59,16 @@ impl Returning {
     fn match_type(ty: &Type) -> Result<Returning, Error> {
         let mut ty = Box::new(ty.clone());
 
-        match *ty {
-            syn::Type::Path(mut typepath) => {
+        match &mut *ty {
+            syn::Type::Path(typepath) => {
+                let mut is_option = typepath.last_ident_is("Option");
+                let is_result = typepath.last_ident_is("Result");
+                let mut is_setof_iter = typepath.last_ident_is("SetOfIterator");
+                let mut is_table_iter = typepath.last_ident_is("TableIterator");
                 let path = &mut typepath.path;
-                let mut saw_option_ident = false;
-                let mut saw_result_ident = false;
-                let mut saw_setof_iterator = false;
-                let mut saw_table_iterator = false;
 
-                for segment in &mut path.segments {
-                    let ident_string = segment.ident.to_string();
-                    match ident_string.as_str() {
-                        "Option" => saw_option_ident = true,
-                        "Result" => saw_result_ident = true,
-                        "SetOfIterator" => saw_setof_iterator = true,
-                        "TableIterator" => saw_table_iterator = true,
-                        _ => (),
-                    };
-                }
-                if saw_option_ident || saw_result_ident || saw_setof_iterator || saw_table_iterator
-                {
-                    let option_inner_path = if saw_option_ident || saw_result_ident {
+                if is_option || is_result || is_setof_iter || is_table_iter {
+                    let option_inner_path = if is_option || is_result {
                         match path.segments.last_mut().map(|s| &mut s.arguments) {
                             Some(syn::PathArguments::AngleBracketed(args)) => {
                                 let args_span = args.span();
@@ -112,6 +103,7 @@ impl Returning {
 
                     let mut segments = option_inner_path.segments.clone();
                     let mut found_option = false;
+
                     'outer: loop {
                         for segment in &segments {
                             let ident_string = segment.ident.to_string();
@@ -126,7 +118,7 @@ impl Returning {
                                         })? {
                                             GenericArgument::Type(Type::Path(this_path)) => {
                                                 segments = this_path.path.segments.clone();
-                                                saw_option_ident = true;
+                                                is_option = true;
                                                 found_option = true;
                                                 continue 'outer;
                                             }
@@ -135,7 +127,7 @@ impl Returning {
                                     }
                                     _ => continue,
                                 },
-                                "SetOfIterator" => saw_setof_iterator = true,
+                                "SetOfIterator" => is_setof_iter = true,
                                 "TableIterator" => {
                                     if found_option {
                                         segments =
@@ -143,7 +135,7 @@ impl Returning {
                                         found_option = false;
                                         continue 'outer;
                                     }
-                                    saw_table_iterator = true
+                                    is_table_iter = true
                                 }
                                 _ => (),
                             };
@@ -151,7 +143,7 @@ impl Returning {
                         break;
                     }
 
-                    if saw_setof_iterator {
+                    if is_setof_iter {
                         let last_path_segment = option_inner_path.segments.last();
                         let (used_ty, optional) = match &last_path_segment.map(|ps| &ps.arguments) {
                             Some(syn::PathArguments::AngleBracketed(args)) => {
@@ -159,13 +151,13 @@ impl Returning {
                                     syn::GenericArgument::Type(ty) => {
                                         match &ty {
                                             syn::Type::Path(path) => {
-                                                (UsedType::new(syn::Type::Path(path.clone()))?, saw_option_ident)
+                                                (UsedType::new(syn::Type::Path(path.clone()))?, is_option)
                                             }
                                             syn::Type::Macro(type_macro) => {
-                                                (UsedType::new(syn::Type::Macro(type_macro.clone()), )?, saw_option_ident)
+                                                (UsedType::new(syn::Type::Macro(type_macro.clone()), )?, is_option)
                                             },
                                             reference @ syn::Type::Reference(_) => {
-                                                (UsedType::new((*reference).clone(), )?, saw_option_ident)
+                                                (UsedType::new((*reference).clone(), )?, is_option)
                                             },
                                             ty => return Err(syn::Error::new(
                                                 ty.span(),
@@ -194,8 +186,8 @@ impl Returning {
                                 ))
                             }
                         };
-                        Ok(Returning::SetOf { ty: used_ty, optional, result: saw_result_ident })
-                    } else if saw_table_iterator {
+                        Ok(Returning::SetOf { ty: used_ty, optional, result: is_result })
+                    } else if is_table_iter {
                         let last_path_segment = segments.last_mut().unwrap();
                         let mut iterated_items = vec![];
 
@@ -279,8 +271,8 @@ impl Returning {
                         };
                         Ok(Returning::Iterated {
                             tys: iterated_items,
-                            optional: saw_option_ident,
-                            result: saw_result_ident,
+                            optional: is_option,
+                            result: is_result,
                         })
                     } else {
                         let used_ty = UsedType::new(syn::Type::Path(typepath.clone()))?;

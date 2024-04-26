@@ -385,7 +385,7 @@ impl PgExtern {
             let resolved_ty = &arg.used_ty.resolved_ty;
             match resolved_ty {
                 // There's no danger of misinterpreting the type, as pointer coercions must typecheck!
-                ty @ Type::Path(_) if last_ident_is(ty, "FunctionCallInfo") => quote_spanned! {pat.span()=>
+                Type::Path(ty_path) if ty_path.last_ident_is("FunctionCallInfo") => quote_spanned! { pat.span() =>
                     let #pat = #fcinfo_ident;
                 },
                 Type::Tuple(tup) if tup.elems.is_empty() => quote_spanned! { pat.span() =>
@@ -454,7 +454,7 @@ impl PgExtern {
                     quote_spanned! { self.func.sig.output.span() =>
                         ::pgrx::datum::IntoDatum::into_datum(#result_ident).unwrap_or_else(|| panic!("returned Datum was NULL"))
                     }
-                } else if last_ident_is(&retval_ty.resolved_ty, "Datum") {
+                } else if retval_ty.resolved_ty.last_ident_is("Datum") {
                     // As before, we can just throw this in because it must typecheck
                     quote_spanned! { self.func.sig.output.span() =>
                        #result_ident
@@ -544,9 +544,33 @@ impl PgExtern {
     }
 }
 
-fn last_ident_is(ty: &syn::Type, id: &str) -> bool {
-    let syn::Type::Path(syn::TypePath { path, .. }) = ty else { return false };
-    path.segments.last().is_some_and(|segment| segment.ident == id)
+trait LastIdent {
+    fn last_ident_is(&self, id: &str) -> bool;
+}
+
+impl LastIdent for syn::Type {
+    fn last_ident_is(&self, id: &str) -> bool {
+        let syn::Type::Path(syn::TypePath { path, .. }) = self else { return false };
+        path.last_ident_is(id)
+    }
+}
+
+impl LastIdent for syn::TypePath {
+    fn last_ident_is(&self, id: &str) -> bool {
+        let syn::TypePath { path, .. } = self;
+        path.last_ident_is(id)
+    }
+}
+impl LastIdent for syn::Path {
+    fn last_ident_is(&self, id: &str) -> bool {
+        self.segments.last_ident_is(id)
+    }
+}
+
+impl<P> LastIdent for Punctuated<syn::PathSegment, P> {
+    fn last_ident_is(&self, id: &str) -> bool {
+        self.last().is_some_and(|segment| segment.ident == id)
+    }
 }
 
 impl ToEntityGraphTokens for PgExtern {
