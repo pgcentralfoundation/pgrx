@@ -758,7 +758,7 @@ fn initialize_externs(
                     });
                 }
             }
-            PgExternReturnEntity::Iterated { tys: iterated_returns, optional: _, result: _ } => {
+            PgExternReturnEntity::Iterated { tys: iterated_returns, .. } => {
                 for PgExternReturnEntityIteratedItem { ty, .. } in iterated_returns {
                     let found = mapped_types.keys().any(|ty_item| ty_item.id_matches(&ty.ty_id))
                         || mapped_enums.keys().any(|ty_item| ty_item.id_matches(&ty.ty_id));
@@ -929,7 +929,7 @@ fn connect_externs(
                     }
                 }
             }
-            PgExternReturnEntity::Iterated { tys: iterated_returns, optional: _, result: _ } => {
+            PgExternReturnEntity::Iterated { tys: iterated_returns, .. } => {
                 for PgExternReturnEntityIteratedItem { ty: type_entity, .. } in iterated_returns {
                     let found_ty =
                         types.iter().find(|(ty_item, _)| ty_item.id_matches(&type_entity.ty_id));

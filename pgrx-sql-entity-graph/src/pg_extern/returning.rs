@@ -35,8 +35,8 @@ pub struct ReturningIteratedItem {
 pub enum Returning {
     None,
     Type(UsedType),
-    SetOf { ty: UsedType, optional: bool, result: bool },
-    Iterated { tys: Vec<ReturningIteratedItem>, optional: bool, result: bool },
+    SetOf { ty: UsedType, is_option: bool, is_result: bool },
+    Iterated { tys: Vec<ReturningIteratedItem>, is_option: bool, is_result: bool },
     // /// Technically we don't ever create this, single triggers have their own macro.
     // Trigger,
 }
@@ -163,7 +163,7 @@ impl Returning {
                                 ))
                             }
                         };
-                        Ok(Returning::SetOf { ty: used_ty, optional: is_option, result: is_result })
+                        Ok(Returning::SetOf { ty: used_ty, is_option, is_result })
                     } else if is_table_iter {
                         let last_path_segment = segments.last_mut().unwrap();
                         let mut iterated_items = vec![];
@@ -246,11 +246,7 @@ impl Returning {
                                 ))
                             }
                         };
-                        Ok(Returning::Iterated {
-                            tys: iterated_items,
-                            optional: is_option,
-                            result: is_result,
-                        })
+                        Ok(Returning::Iterated { tys: iterated_items, is_option, is_result })
                     } else {
                         let used_ty = UsedType::new(syn::Type::Path(typepath.clone()))?;
                         Ok(Returning::Type(used_ty))
@@ -306,17 +302,17 @@ impl ToTokens for Returning {
                     }
                 }
             }
-            Returning::SetOf { ty: used_ty, optional, result } => {
+            Returning::SetOf { ty: used_ty, is_option, is_result } => {
                 let used_ty_entity_tokens = used_ty.entity_tokens();
                 quote! {
                     ::pgrx::pgrx_sql_entity_graph::PgExternReturnEntity::SetOf {
                         ty: #used_ty_entity_tokens,
-                        optional: #optional,
-                        result: #result
+                        is_option: #is_option,
+                        is_result: #is_result
                     }
                 }
             }
-            Returning::Iterated { tys: items, optional, result } => {
+            Returning::Iterated { tys: items, is_option, is_result } => {
                 let quoted_items = items
                     .iter()
                     .map(|ReturningIteratedItem { used_ty, name }| {
@@ -335,8 +331,8 @@ impl ToTokens for Returning {
                         tys: vec![
                             #(#quoted_items),*
                         ],
-                        optional: #optional,
-                        result: #result
+                        is_option: #is_option,
+                        is_result: #is_result
                     }
                 }
             }

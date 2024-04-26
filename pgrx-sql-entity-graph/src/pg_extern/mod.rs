@@ -484,8 +484,9 @@ impl PgExtern {
                 };
                 finfo_v1_extern_c(&self.func, fcinfo_ident, fn_contents)
             }
-            Returning::SetOf { ty: _retval_ty, optional, result } => {
-                let result_handler = emit_result_handler(self.func.sig.span(), *optional, *result);
+            Returning::SetOf { ty: _retval_ty, is_option, is_result } => {
+                let result_handler =
+                    emit_result_handler(self.func.sig.span(), *is_option, *is_result);
                 let setof_closure = quote! {
                     #[allow(unused_unsafe)]
                     unsafe {
@@ -500,8 +501,9 @@ impl PgExtern {
                 };
                 finfo_v1_extern_c(&self.func, fcinfo_ident, setof_closure)
             }
-            Returning::Iterated { tys: retval_tys, optional, result } => {
-                let result_handler = emit_result_handler(self.func.sig.span(), *optional, *result);
+            Returning::Iterated { tys: retval_tys, is_option, is_result } => {
+                let result_handler =
+                    emit_result_handler(self.func.sig.span(), *is_option, *is_result);
 
                 let iter_closure = if retval_tys.len() == 1 {
                     // Postgres considers functions returning a 1-field table (`RETURNS TABLE (T)`) to be

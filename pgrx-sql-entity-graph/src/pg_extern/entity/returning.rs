@@ -25,13 +25,13 @@ pub enum PgExternReturnEntity {
     },
     SetOf {
         ty: UsedTypeEntity,
-        optional: bool, /* Eg `Option<SetOfIterator<T>>` */
-        result: bool,   /* Eg `Result<SetOfIterator<T>, E>` */
+        is_option: bool, /* Eg `Option<SetOfIterator<T>>` */
+        is_result: bool, /* Eg `Result<SetOfIterator<T>, E>` */
     },
     Iterated {
         tys: Vec<PgExternReturnEntityIteratedItem>,
-        optional: bool, /* Eg `Option<TableIterator<T>>` */
-        result: bool,   /* Eg `Result<TableIterator<T>, E>` */
+        is_option: bool, /* Eg `Option<TableIterator<T>>` */
+        is_result: bool, /* Eg `Result<TableIterator<T>, E>` */
     },
     Trigger,
 }
