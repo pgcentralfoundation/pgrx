@@ -21,7 +21,7 @@ use crate::UsedType;
 use proc_macro2::TokenStream as TokenStream2;
 use quote::{quote, ToTokens, TokenStreamExt};
 use syn::parse::{Parse, ParseStream};
-use syn::punctuated::Punctuated;
+
 use syn::spanned::Spanned;
 use syn::{Error, GenericArgument, PathArguments, Token, Type};
 
@@ -102,9 +102,8 @@ impl Returning {
                     };
 
                     let mut segments = option_inner_path.segments.clone();
-                    let mut found_option = false;
 
-                    'outer: loop {
+                    loop {
                         if let Some(segment) = segments.filter_last_ident("Option") {
                             let PathArguments::AngleBracketed(generics) = &segment.arguments else {
                                 unreachable!()
@@ -117,22 +116,14 @@ impl Returning {
                                     "where's the generic args?",
                                 ));
                             };
-                            segments = this_path.path.segments.clone();
                             is_option = true;
-                            found_option = true;
-                            continue 'outer;
-                        } else if segments.last_ident_is("SetOfIterator") {
-                            is_setof_iter = true;
-                            break;
-                        } else if let Some(segment) = segments.filter_last_ident("TableIterator") {
-                            if found_option {
-                                segments = Punctuated::from_iter(std::iter::once(segment.clone()));
-                                found_option = false;
-                                continue 'outer;
-                            }
-                            is_table_iter = true;
-                            break;
+                            segments = this_path.path.segments.clone(); // recurse deeper
                         } else {
+                            if segments.last_ident_is("SetOfIterator") {
+                                is_setof_iter = true;
+                            } else if segments.last_ident_is("TableIterator") {
+                                is_table_iter = true;
+                            }
                             break;
                         }
                     }
