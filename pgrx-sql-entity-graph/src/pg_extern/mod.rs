@@ -548,28 +548,33 @@ impl PgExtern {
 
 trait LastIdent {
     fn filter_last_ident(&self, id: &str) -> Option<&syn::PathSegment>;
+    #[inline]
     fn last_ident_is(&self, id: &str) -> bool {
         self.filter_last_ident(id).is_some()
     }
 }
 
 impl LastIdent for syn::Type {
+    #[inline]
     fn filter_last_ident(&self, id: &str) -> Option<&syn::PathSegment> {
         let syn::Type::Path(syn::TypePath { path, .. }) = self else { return None };
         path.filter_last_ident(id)
     }
 }
 impl LastIdent for syn::TypePath {
+    #[inline]
     fn filter_last_ident(&self, id: &str) -> Option<&syn::PathSegment> {
         self.path.filter_last_ident(id)
     }
 }
 impl LastIdent for syn::Path {
+    #[inline]
     fn filter_last_ident(&self, id: &str) -> Option<&syn::PathSegment> {
         self.segments.filter_last_ident(id)
     }
 }
 impl<P> LastIdent for Punctuated<syn::PathSegment, P> {
+    #[inline]
     fn filter_last_ident(&self, id: &str) -> Option<&syn::PathSegment> {
         self.last().filter(|segment| segment.ident == id)
     }
