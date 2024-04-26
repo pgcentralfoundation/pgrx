@@ -15,7 +15,7 @@
 to the `pgrx` framework and very subject to change between versions. While you may use this, please do it with caution.
 
 */
-use super::{last_ident_is, LastIdent};
+use super::LastIdent;
 use crate::UsedType;
 
 use proc_macro2::TokenStream as TokenStream2;
@@ -105,42 +105,34 @@ impl Returning {
                     let mut found_option = false;
 
                     'outer: loop {
-                        for segment in &segments {
-                            let ident_string = segment.ident.to_string();
-                            match ident_string.as_str() {
-                                "Option" => match &segment.arguments {
-                                    PathArguments::AngleBracketed(bracketed) => {
-                                        match bracketed.args.first().ok_or_else(|| {
-                                            syn::Error::new_spanned(
-                                                bracketed,
-                                                "where's the generic args?",
-                                            )
-                                        })? {
-                                            GenericArgument::Type(Type::Path(this_path)) => {
-                                                segments = this_path.path.segments.clone();
-                                                is_option = true;
-                                                found_option = true;
-                                                continue 'outer;
-                                            }
-                                            _ => continue,
-                                        };
-                                    }
-                                    _ => continue,
-                                },
-                                "SetOfIterator" => is_setof_iter = true,
-                                "TableIterator" => {
-                                    if found_option {
-                                        segments =
-                                            Punctuated::from_iter(std::iter::once(segment.clone()));
-                                        found_option = false;
-                                        continue 'outer;
-                                    }
-                                    is_table_iter = true
-                                }
-                                _ => (),
+                        if let Some(segment) = segments.filter_last_ident("Option") {
+                            let PathArguments::AngleBracketed(generics) = &segment.arguments else {
+                                unreachable!()
                             };
+                            let Some(GenericArgument::Type(Type::Path(this_path))) =
+                                generics.args.last()
+                            else {
+                                return Err(syn::Error::new_spanned(
+                                    generics,
+                                    "where's the generic args?",
+                                ));
+                            };
+                            segments = this_path.path.segments.clone();
+                            is_option = true;
+                            found_option = true;
+                            continue 'outer;
+                        } else if segments.last_ident_is("SetOfIterator") {
+                            is_setof_iter = true;
+                        } else if let Some(segment) = segments.filter_last_ident("TableIterator") {
+                            if found_option {
+                                segments = Punctuated::from_iter(Some(segment.clone()));
+                                found_option = false;
+                                continue 'outer;
+                            }
+                            is_table_iter = true;
+                        } else {
+                            break;
                         }
-                        break;
                     }
 
                     if is_setof_iter {

@@ -545,31 +545,31 @@ impl PgExtern {
 }
 
 trait LastIdent {
-    fn last_ident_is(&self, id: &str) -> bool;
+    fn filter_last_ident(&self, id: &str) -> Option<&syn::PathSegment>;
+    fn last_ident_is(&self, id: &str) -> bool {
+        self.filter_last_ident(id).is_some()
+    }
 }
 
 impl LastIdent for syn::Type {
-    fn last_ident_is(&self, id: &str) -> bool {
-        let syn::Type::Path(syn::TypePath { path, .. }) = self else { return false };
-        path.last_ident_is(id)
+    fn filter_last_ident(&self, id: &str) -> Option<&syn::PathSegment> {
+        let syn::Type::Path(syn::TypePath { path, .. }) = self else { return None };
+        path.filter_last_ident(id)
     }
 }
-
 impl LastIdent for syn::TypePath {
-    fn last_ident_is(&self, id: &str) -> bool {
-        let syn::TypePath { path, .. } = self;
-        path.last_ident_is(id)
+    fn filter_last_ident(&self, id: &str) -> Option<&syn::PathSegment> {
+        self.path.filter_last_ident(id)
     }
 }
 impl LastIdent for syn::Path {
-    fn last_ident_is(&self, id: &str) -> bool {
-        self.segments.last_ident_is(id)
+    fn filter_last_ident(&self, id: &str) -> Option<&syn::PathSegment> {
+        self.segments.filter_last_ident(id)
     }
 }
-
 impl<P> LastIdent for Punctuated<syn::PathSegment, P> {
-    fn last_ident_is(&self, id: &str) -> bool {
-        self.last().is_some_and(|segment| segment.ident == id)
+    fn filter_last_ident(&self, id: &str) -> Option<&syn::PathSegment> {
+        self.last().filter(|segment| segment.ident == id)
     }
 }
 
