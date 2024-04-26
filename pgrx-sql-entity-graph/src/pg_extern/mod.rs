@@ -388,7 +388,7 @@ impl PgExtern {
                 ty @ Type::Path(_) if last_ident_is(ty, "FunctionCallInfo") => quote_spanned! {pat.span()=>
                     let #pat = #fcinfo_ident;
                 },
-                Type::Tuple(tup) if /* () */ tup.elems.is_empty() => quote_spanned! {pat.span()=>
+                Type::Tuple(tup) if tup.elems.is_empty() => quote_spanned! { pat.span() =>
                     debug_assert!(unsafe { ::pgrx::fcinfo::pg_getarg::<()>(#fcinfo_ident, #idx).is_none() }, "A `()` argument should always receive `NULL`");
                     let #pat = ();
                 },
