@@ -130,20 +130,12 @@ impl Returning {
 
                     if is_setof_iter {
                         let last_path_segment = option_inner_path.segments.last();
-                        let (used_ty, optional) = match &last_path_segment.map(|ps| &ps.arguments) {
+                        let used_ty = match &last_path_segment.map(|ps| &ps.arguments) {
                             Some(syn::PathArguments::AngleBracketed(args)) => {
                                 match args.args.last().expect("should have one arg?") {
                                     syn::GenericArgument::Type(ty) => {
-                                        match &ty {
-                                            syn::Type::Path(path) => {
-                                                (UsedType::new(syn::Type::Path(path.clone()))?, is_option)
-                                            }
-                                            syn::Type::Macro(type_macro) => {
-                                                (UsedType::new(syn::Type::Macro(type_macro.clone()), )?, is_option)
-                                            },
-                                            reference @ syn::Type::Reference(_) => {
-                                                (UsedType::new((*reference).clone(), )?, is_option)
-                                            },
+                                        match ty {
+                                            Type::Path(_) | Type::Macro(_) | Type::Reference(_) => UsedType::new(ty.clone())?,
                                             ty => return Err(syn::Error::new(
                                                 ty.span(),
                                                 "SetOf Iterator must have an item",
@@ -171,7 +163,7 @@ impl Returning {
                                 ))
                             }
                         };
-                        Ok(Returning::SetOf { ty: used_ty, optional, result: is_result })
+                        Ok(Returning::SetOf { ty: used_ty, optional: is_option, result: is_result })
                     } else if is_table_iter {
                         let last_path_segment = segments.last_mut().unwrap();
                         let mut iterated_items = vec![];
