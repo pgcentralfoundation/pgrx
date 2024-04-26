@@ -547,7 +547,7 @@ impl PgExtern {
 }
 
 fn last_ident_is(ty: &syn::Type, id: &str) -> bool {
-    let syn::Type::Path(ty_path) = ty else { unimplemented!("queried a non-path!") };
+    let syn::Type::Path(ty_path) = ty else { return false };
     let syn::TypePath { path, .. } = ty_path;
     path.segments.last().is_some_and(|segment| segment.ident == id)
 }
