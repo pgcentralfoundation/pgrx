@@ -24,30 +24,26 @@ mod returning;
 mod search_path;
 
 pub use argument::PgExternArgument;
+pub(crate) use attribute::Attribute;
 pub use cast::PgCast;
 pub use operator::PgOperator;
 pub use returning::NameMacro;
 
+use self::returning::Returning;
+use super::UsedType;
+use crate::enrich::{CodeEnrichment, ToEntityGraphTokens, ToRustCodeTokens};
 use crate::finfo::{finfo_v1_extern_c, finfo_v1_tokens};
 use crate::fmt::ErrHarder;
 use crate::ToSqlConfig;
-pub(crate) use attribute::Attribute;
 use operator::{PgrxOperatorAttributeWithIdent, PgrxOperatorOpName};
 use search_path::SearchPathList;
 
-use crate::enrich::CodeEnrichment;
-use crate::enrich::ToEntityGraphTokens;
-use crate::enrich::ToRustCodeTokens;
 use proc_macro2::{Ident, Span, TokenStream as TokenStream2};
-use quote::{format_ident, quote, quote_spanned, ToTokens};
+use quote::{format_ident, quote, quote_spanned};
 use syn::parse::{Parse, ParseStream, Parser};
 use syn::punctuated::Punctuated;
 use syn::spanned::Spanned;
-use syn::{Meta, Token};
-
-use self::returning::Returning;
-
-use super::UsedType;
+use syn::{Meta, Token, Type};
 
 /// A parsed `#[pg_extern]` item.
 ///
@@ -387,20 +383,16 @@ impl PgExtern {
         let arg_fetches = args.iter().enumerate().map(|(idx, arg)| {
             let pat = &arg_pats[idx];
             let resolved_ty = &arg.used_ty.resolved_ty;
-            if arg.used_ty.resolved_ty.to_token_stream().to_string() == quote!(pgrx::pg_sys::FunctionCallInfo).to_token_stream().to_string()
-                || arg.used_ty.resolved_ty.to_token_stream().to_string() == quote!(pg_sys::FunctionCallInfo).to_token_stream().to_string()
-                || arg.used_ty.resolved_ty.to_token_stream().to_string() == quote!(::pgrx::pg_sys::FunctionCallInfo).to_token_stream().to_string()
-            {
-                quote_spanned! {pat.span()=>
+            match resolved_ty {
+                // There's no danger of misinterpreting the type, as pointer coercions must typecheck!
+                ty @ Type::Path(_) if last_ident_is(ty, "FunctionCallInfo") => quote_spanned! {pat.span()=>
                     let #pat = #fcinfo_ident;
-                }
-            } else if arg.used_ty.resolved_ty.to_token_stream().to_string() == quote!(()).to_token_stream().to_string() {
-                quote_spanned! {pat.span()=>
+                },
+                Type::Tuple(tup) if tup.elems.is_empty() => quote_spanned! { pat.span() =>
                     debug_assert!(unsafe { ::pgrx::fcinfo::pg_getarg::<()>(#fcinfo_ident, #idx).is_none() }, "A `()` argument should always receive `NULL`");
                     let #pat = ();
-                }
-            } else {
-                match (is_raw, &arg.used_ty.optional) {
+                },
+                _ => match (is_raw, &arg.used_ty.optional) {
                     (true, None) | (true, Some(_)) => quote_spanned! { pat.span() =>
                         let #pat = unsafe { ::pgrx::fcinfo::pg_getarg_datum_raw(#fcinfo_ident, #idx) as #resolved_ty };
                     },
@@ -449,27 +441,21 @@ impl PgExtern {
                     quote_spanned! { self.func.sig.output.span() =>
                        unsafe { ::pgrx::fcinfo::pg_return_void() }
                     }
-                } else if retval_ty.result {
-                    if retval_ty.optional.is_some() {
-                        // returning `Result<Option<T>>`
-                        quote_spanned! {
-                            self.func.sig.output.span() =>
-                                match ::pgrx::datum::IntoDatum::into_datum(#result_ident) {
-                                    Some(datum) => datum,
-                                    None => unsafe { ::pgrx::fcinfo::pg_return_null(#fcinfo_ident) },
-                                }
-                        }
-                    } else {
-                        // returning Result<T>
-                        quote_spanned! {
-                            self.func.sig.output.span() =>
-                                ::pgrx::datum::IntoDatum::into_datum(#result_ident).unwrap_or_else(|| panic!("returned Datum was NULL"))
+                } else if retval_ty.result && retval_ty.optional.is_some() {
+                    // returning `Result<Option<T>>`
+                    quote_spanned! { self.func.sig.output.span() =>
+                        match ::pgrx::datum::IntoDatum::into_datum(#result_ident) {
+                            Some(datum) => datum,
+                            None => unsafe { ::pgrx::fcinfo::pg_return_null(#fcinfo_ident) },
                         }
                     }
-                } else if retval_ty.resolved_ty == syn::parse_quote!(pg_sys::Datum)
-                    || retval_ty.resolved_ty == syn::parse_quote!(pgrx::pg_sys::Datum)
-                    || retval_ty.resolved_ty == syn::parse_quote!(::pgrx::pg_sys::Datum)
-                {
+                } else if retval_ty.result {
+                    // returning Result<T>
+                    quote_spanned! { self.func.sig.output.span() =>
+                        ::pgrx::datum::IntoDatum::into_datum(#result_ident).unwrap_or_else(|| panic!("returned Datum was NULL"))
+                    }
+                } else if last_ident_is(&retval_ty.resolved_ty, "Datum") {
+                    // As before, we can just throw this in because it must typecheck
                     quote_spanned! { self.func.sig.output.span() =>
                        #result_ident
                     }
@@ -556,6 +542,11 @@ impl PgExtern {
             }
         }
     }
+}
+
+fn last_ident_is(ty: &syn::Type, id: &str) -> bool {
+    let syn::Type::Path(syn::TypePath { path, .. }) = ty else { return false };
+    path.segments.last().is_some_and(|segment| segment.ident == id)
 }
 
 impl ToEntityGraphTokens for PgExtern {
