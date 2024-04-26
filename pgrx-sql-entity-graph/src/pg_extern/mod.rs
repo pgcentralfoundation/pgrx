@@ -39,11 +39,11 @@ use crate::enrich::CodeEnrichment;
 use crate::enrich::ToEntityGraphTokens;
 use crate::enrich::ToRustCodeTokens;
 use proc_macro2::{Ident, Span, TokenStream as TokenStream2};
-use quote::{format_ident, quote, quote_spanned, ToTokens};
+use quote::{format_ident, quote, quote_spanned};
 use syn::parse::{Parse, ParseStream, Parser};
 use syn::punctuated::Punctuated;
 use syn::spanned::Spanned;
-use syn::{Meta, Token};
+use syn::{Meta, Token, Type};
 
 use self::returning::Returning;
 
@@ -387,20 +387,18 @@ impl PgExtern {
         let arg_fetches = args.iter().enumerate().map(|(idx, arg)| {
             let pat = &arg_pats[idx];
             let resolved_ty = &arg.used_ty.resolved_ty;
-            if arg.used_ty.resolved_ty.to_token_stream().to_string() == quote!(pgrx::pg_sys::FunctionCallInfo).to_token_stream().to_string()
-                || arg.used_ty.resolved_ty.to_token_stream().to_string() == quote!(pg_sys::FunctionCallInfo).to_token_stream().to_string()
-                || arg.used_ty.resolved_ty.to_token_stream().to_string() == quote!(::pgrx::pg_sys::FunctionCallInfo).to_token_stream().to_string()
-            {
-                quote_spanned! {pat.span()=>
+            match resolved_ty {
+                // There's no danger of us misinterpreting FunctionCallInfo's spelling, as the pointer coercion must typecheck:
+                // C might allow casting *mut T to *mut U implicitly, but Rust does not.
+                ty @ Type::Path(_) if last_ident_is(ty, "FunctionCallInfo") => quote_spanned! {pat.span()=>
                     let #pat = #fcinfo_ident;
-                }
-            } else if arg.used_ty.resolved_ty.to_token_stream().to_string() == quote!(()).to_token_stream().to_string() {
-                quote_spanned! {pat.span()=>
+                },
+                // Unit
+                Type::Tuple(tup) if tup.elems.len() == 0 => quote_spanned! {pat.span()=>
                     debug_assert!(unsafe { ::pgrx::fcinfo::pg_getarg::<()>(#fcinfo_ident, #idx).is_none() }, "A `()` argument should always receive `NULL`");
                     let #pat = ();
-                }
-            } else {
-                match (is_raw, &arg.used_ty.optional) {
+                },
+                _ => match (is_raw, &arg.used_ty.optional) {
                     (true, None) | (true, Some(_)) => quote_spanned! { pat.span() =>
                         let #pat = unsafe { ::pgrx::fcinfo::pg_getarg_datum_raw(#fcinfo_ident, #idx) as #resolved_ty };
                     },
@@ -466,10 +464,8 @@ impl PgExtern {
                                 ::pgrx::datum::IntoDatum::into_datum(#result_ident).unwrap_or_else(|| panic!("returned Datum was NULL"))
                         }
                     }
-                } else if retval_ty.resolved_ty == syn::parse_quote!(pg_sys::Datum)
-                    || retval_ty.resolved_ty == syn::parse_quote!(pgrx::pg_sys::Datum)
-                    || retval_ty.resolved_ty == syn::parse_quote!(::pgrx::pg_sys::Datum)
-                {
+                } else if last_ident_is(&retval_ty.resolved_ty, "Datum") {
+                    // As before, we can just throw this in because it must typecheck
                     quote_spanned! { self.func.sig.output.span() =>
                        #result_ident
                     }
@@ -556,6 +552,12 @@ impl PgExtern {
             }
         }
     }
+}
+
+fn last_ident_is(ty: &syn::Type, id: &str) -> bool {
+    let syn::Type::Path(ty_path) = ty else { unimplemented!("queried a non-path!") };
+    let syn::TypePath { path, .. } = ty_path;
+    path.segments.last().is_some_and(|segment| segment.ident == id)
 }
 
 impl ToEntityGraphTokens for PgExtern {
