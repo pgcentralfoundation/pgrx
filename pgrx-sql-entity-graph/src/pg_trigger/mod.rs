@@ -19,10 +19,10 @@ pub mod attribute;
 pub mod entity;
 
 use crate::enrich::{ToEntityGraphTokens, ToRustCodeTokens};
-use crate::finfo::finfo_v1_tokens;
+use crate::finfo::{finfo_v1_extern_c, finfo_v1_tokens};
 use crate::{CodeEnrichment, ToSqlConfig};
 use attribute::PgTriggerAttribute;
-use proc_macro2::TokenStream as TokenStream2;
+use proc_macro2::{Ident, TokenStream as TokenStream2};
 use quote::{format_ident, quote};
 use syn::{spanned::Spanned, ItemFn, Token};
 
@@ -69,38 +69,34 @@ impl PgTrigger {
     }
 
     pub fn wrapper_tokens(&self) -> Result<ItemFn, syn::Error> {
-        let function_ident = &self.func.sig.ident;
-        let extern_func_ident = format_ident!("{}_wrapper", self.func.sig.ident);
+        let function_ident = self.func.sig.ident.clone();
+        let fcinfo_ident = Ident::new("_fcinfo", function_ident.span());
         let tokens = quote! {
-            #[no_mangle]
-            #[::pgrx::pgrx_macros::pg_guard]
-            unsafe extern "C" fn #extern_func_ident(fcinfo: ::pgrx::pg_sys::FunctionCallInfo) -> ::pgrx::pg_sys::Datum {
-                let fcinfo_ref = unsafe {
-                    // SAFETY:  The caller should be Postgres in this case and it will give us a valid "fcinfo" pointer
-                    fcinfo.as_ref().expect("fcinfo was NULL from Postgres")
-                };
-                let maybe_pg_trigger = unsafe { ::pgrx::trigger_support::PgTrigger::from_fcinfo(fcinfo_ref) };
-                let pg_trigger = maybe_pg_trigger.expect("PgTrigger::from_fcinfo failed");
-                let trigger_fn_result: Result<
-                    Option<::pgrx::heap_tuple::PgHeapTuple<'_, _>>,
-                    _,
-                > = #function_ident(&pg_trigger);
+            let fcinfo_ref = unsafe {
+                // SAFETY:  The caller should be Postgres in this case and it will give us a valid "fcinfo" pointer
+                #fcinfo_ident.as_ref().expect("fcinfo was NULL from Postgres")
+            };
+            let maybe_pg_trigger = unsafe { ::pgrx::trigger_support::PgTrigger::from_fcinfo(fcinfo_ref) };
+            let pg_trigger = maybe_pg_trigger.expect("PgTrigger::from_fcinfo failed");
+            let trigger_fn_result: Result<
+                Option<::pgrx::heap_tuple::PgHeapTuple<'_, _>>,
+                _,
+            > = #function_ident(&pg_trigger);
 
 
-                // The trigger "protocol" allows a function to return the null pointer, but NOT to
-                // set the isnull result flag.  This is why we return `Datum::from(0)` in the None cases
-                let trigger_retval = trigger_fn_result.expect("Trigger function panic");
-                match trigger_retval {
+            // The trigger "protocol" allows a function to return the null pointer, but NOT to
+            // set the isnull result flag.  This is why we return `Datum::from(0)` in the None cases
+            let trigger_retval = trigger_fn_result.expect("Trigger function panic");
+            match trigger_retval {
+                None => unsafe { ::pgrx::pg_sys::Datum::from(0) },
+                Some(trigger_retval) => match trigger_retval.into_trigger_datum() {
                     None => unsafe { ::pgrx::pg_sys::Datum::from(0) },
-                    Some(trigger_retval) => match trigger_retval.into_trigger_datum() {
-                        None => unsafe { ::pgrx::pg_sys::Datum::from(0) },
-                        Some(datum) => datum,
-                    }
+                    Some(datum) => datum,
                 }
             }
-
         };
-        syn::parse2(tokens)
+
+        finfo_v1_extern_c(&self.func, fcinfo_ident, tokens)
     }
 }
 

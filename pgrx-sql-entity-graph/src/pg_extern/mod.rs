@@ -28,7 +28,7 @@ pub use cast::PgCast;
 pub use operator::PgOperator;
 pub use returning::NameMacro;
 
-use crate::finfo::finfo_v1_tokens;
+use crate::finfo::{finfo_v1_extern_c, finfo_v1_tokens};
 use crate::fmt::ErrHarder;
 use crate::ToSqlConfig;
 pub(crate) use attribute::Attribute;
@@ -378,15 +378,6 @@ impl PgExtern {
 
     pub fn wrapper_func(&self) -> Result<syn::ItemFn, syn::Error> {
         let func_name = &self.func.sig.ident;
-        let func_name_wrapper = format_ident!("{}_wrapper", &self.func.sig.ident);
-        let func_generics = &self.func.sig.generics;
-        // the wrapper function declaration may contain lifetimes that are not used, since our input type is `FunctionCallInfo` mainly and return type is `Datum`
-        let unused_lifetimes = match func_generics.lifetimes().next() {
-            Some(_) => quote! {
-                #[allow(unused_lifetimes, clippy::extra_unused_lifetimes)]
-            },
-            None => quote! {},
-        };
         let is_raw = self.extern_attrs().contains(&Attribute::Raw);
         // We use a `_` prefix to make functions with no args more satisfied during linting.
         let fcinfo_ident = syn::Ident::new("_fcinfo", self.func.sig.ident.span());
@@ -441,30 +432,16 @@ impl PgExtern {
             }
         };
 
-        // This is the generic wrapper fn that everything needs
-        let extern_c_wrapper =
-            |span, returns_datum: bool, wrapped_contents: proc_macro2::TokenStream| {
-                let return_ty = returns_datum.then(|| quote! { -> ::pgrx::pg_sys::Datum });
-                let tokens = quote_spanned! { span=>
-                    #[no_mangle]
-                    #[doc(hidden)]
-                    #unused_lifetimes
-                    #[::pgrx::pgrx_macros::pg_guard]
-                    pub unsafe extern "C" fn #func_name_wrapper #func_generics(#fcinfo_ident: ::pgrx::pg_sys::FunctionCallInfo) #return_ty {
-                        #wrapped_contents
-                    }
-                };
-                syn::parse2(tokens)
-            };
-
         match &self.returns {
             Returning::None => {
                 let fn_contents = quote! {
                     #(#arg_fetches)*
                     #[allow(unused_unsafe)]
-                    unsafe { #func_name(#(#arg_pats),*) }
+                    unsafe { #func_name(#(#arg_pats),*) };
+                    // -> () means always returning the zero Datum
+                    ::pgrx::pg_sys::Datum::from(0)
                 };
-                extern_c_wrapper(self.func.sig.span(), false, fn_contents)
+                finfo_v1_extern_c(&self.func, fcinfo_ident, fn_contents)
             }
             Returning::Type(retval_ty) => {
                 let result_ident = syn::Ident::new("result", self.func.sig.span());
@@ -519,7 +496,7 @@ impl PgExtern {
 
                     #retval_transform
                 };
-                extern_c_wrapper(self.func.sig.span(), true, fn_contents)
+                finfo_v1_extern_c(&self.func, fcinfo_ident, fn_contents)
             }
             Returning::SetOf { ty: _retval_ty, optional, result } => {
                 let result_handler = emit_result_handler(self.func.sig.span(), *optional, *result);
@@ -535,7 +512,7 @@ impl PgExtern {
                         })
                     }
                 };
-                extern_c_wrapper(self.func.sig.span(), true, setof_closure)
+                finfo_v1_extern_c(&self.func, fcinfo_ident, setof_closure)
             }
             Returning::Iterated { tys: retval_tys, optional, result } => {
                 let result_handler = emit_result_handler(self.func.sig.span(), *optional, *result);
@@ -575,7 +552,7 @@ impl PgExtern {
                         }
                     }
                 };
-                extern_c_wrapper(self.func.sig.span(), true, iter_closure)
+                finfo_v1_extern_c(&self.func, fcinfo_ident, iter_closure)
             }
         }
     }
