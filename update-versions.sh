@@ -39,7 +39,6 @@ fi
 # still have PGRX dependencies that require updating.
 INCLUDE_FOR_DEP_UPDATES=(
   'cargo-pgrx/src/templates/cargo_toml'
-  'nix/templates/default/Cargo.toml'
 )
 
 # EXCLUDE_FROM_VERSION_BUMP specifies an array of relative paths that point to
@@ -48,7 +47,6 @@ INCLUDE_FOR_DEP_UPDATES=(
 # versions bumped at release time.
 EXCLUDE_FROM_VERSION_BUMP=(
   'cargo-pgrx/src/templates/cargo_toml'
-  'nix/templates/default/Cargo.toml'
   'pgrx-version-updater/Cargo.toml'
 )
 
