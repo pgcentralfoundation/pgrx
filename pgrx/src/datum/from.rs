@@ -413,7 +413,8 @@ impl FromDatum for String {
         typoid: pg_sys::Oid,
     ) -> Option<String> {
         if varlena::varatt_is_1b_e(datum.cast_mut_ptr::<pg_sys::varlena>())
-            || varlena::varatt_is_4b_c(datum.cast_mut_ptr::<pg_sys::varlena>()) {
+            || varlena::varatt_is_4b_c(datum.cast_mut_ptr::<pg_sys::varlena>())
+        {
             let varlena = pg_sys::pg_detoast_datum_packed(datum.cast_mut_ptr());
             let converted_varlena = convert_varlena_to_str_memoized(varlena);
             let ret_string = converted_varlena.to_owned();
