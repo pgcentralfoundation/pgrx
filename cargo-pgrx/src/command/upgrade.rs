@@ -1,10 +1,10 @@
-use std::{fs::OpenOptions, io::Read, path::{Path, PathBuf}};
+use std::path::{Path, PathBuf};
 use cargo_edit::Dependency;
 use eyre::eyre;
 use toml_edit::KeyMut;
 use tracing::{debug, error, info, warn};
 
-use crate::{manifest, CommandExecute};
+use crate::CommandExecute;
 
 /// Upgrade pgrx crate versions in `Cargo.toml`.
 /// Defaults to latest.
@@ -142,7 +142,6 @@ impl CommandExecute for Upgrade {
                 }
             }
         }
-        debug!("New manifest is: {manifest:#?}");
         manifest.write().map_err(|err| { 
             eyre!("Unable to write the updated Cargo.toml to disk: {err}")
         })?;
