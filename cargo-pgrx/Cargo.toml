@@ -28,6 +28,7 @@ pgrx-pg-config.workspace = true
 pgrx-sql-entity-graph.workspace = true
 
 cargo_metadata.workspace = true
+cargo-edit.workspace = true
 cargo_toml.workspace = true
 clap-cargo.workspace = true
 libc.workspace = true

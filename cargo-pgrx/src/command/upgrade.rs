@@ -1,9 +1,10 @@
-use std::{fs::OpenOptions, io::Read, path::PathBuf};
+use std::{fs::OpenOptions, io::Read, path::{Path, PathBuf}};
+use cargo_edit::Dependency;
 use eyre::eyre;
-use toml_edit::{Document, DocumentMut};
+use toml_edit::KeyMut;
+use tracing::{debug, error, info, warn};
 
 use crate::{manifest, CommandExecute};
-
 
 /// Upgrade pgrx crate versions in `Cargo.toml`.
 /// Defaults to latest.
@@ -20,37 +21,156 @@ pub(crate) struct Upgrade {
     #[clap(long, short)]
     pub(crate) path: Option<PathBuf>,
 }
+trait DependencySource {
+    fn set_version<A: AsRef<str>>(&mut self, new_version: A);
+    fn get_version<'a>(&'a self) -> Option<&'a String> ;
+}
+impl DependencySource for cargo_edit::Source {
+    fn set_version<A: AsRef<str>>(&mut self, new_version: A) {
+        match self {
+            cargo_edit::Source::Registry(reg) => {
+                let v = reg.version.as_str();
+                debug!("Version string before change: {v}");
+                reg.version = new_version.as_ref().to_string()
+            },
+            cargo_edit::Source::Path(path) => {
+                let v = path.version.as_ref().map(|s| s.as_str());
+                debug!("Version string before change: {v:#?}");
+                path.version = Some(new_version.as_ref().to_string())
+            },
+            cargo_edit::Source::Git(git) => {
+                let v = git.version.as_ref().map(|s| s.as_str());
+                debug!("Version string before change: {v:#?}");
+                git.version = Some(new_version.as_ref().to_string())
+            },
+            cargo_edit::Source::Workspace(_ws) => {
+                error!("Cannot upgrade the version of \
+                    a package because it is set in the \
+                    workspace, please run `cargo pgrx \
+                    upgrade` in the workspace directory.");
+            },
+        }
+    }
+    fn get_version<'a>(&'a self) -> Option<&'a String> {
+        match self {
+            cargo_edit::Source::Registry(reg) => Some(&reg.version),
+            cargo_edit::Source::Path(path) => path.version.as_ref(),
+            cargo_edit::Source::Git(git) => git.version.as_ref(),
+            cargo_edit::Source::Workspace(_ws) => {
+                error!("Cannot fetch the version of \
+                    a package because it is set in the \
+                    workspace, please run `cargo pgrx \
+                    upgrade` in the workspace directory.");
+                None
+            },
+        }
+    }
+}
+fn replace_version<S>(new_version: &str, crate_root: &Path, key: &mut KeyMut, dep: &mut toml_edit::Item, mut parsed_dep: Dependency, mut source: S) -> eyre::Result<()> where S : Clone + DependencySource, cargo_edit::Source: From<S> { 
+    fn get_decor_mut(item: &mut toml_edit::Item) -> eyre::Result<&mut toml_edit::Decor> {
+        match item {
+            toml_edit::Item::None => return Err(eyre!("Version update produced a \
+                null toml item.")),
+            toml_edit::Item::Value(val) => Ok(val.decor_mut()),
+            toml_edit::Item::Table(table) => Ok(table.decor_mut()),
+            toml_edit::Item::ArrayOfTables(_aot) => return Err(eyre!("A Cargo \
+                dependency structure cannot be an array of tables.")),
+        }
+    }
+    let dep_name = key.get();
+    let ver_maybe = source.get_version();
+    match ver_maybe {
+        Some(v) => {
+            debug!("{dep_name} version is {v}")
+        },
+        None => return Err(eyre!("No version field for {dep_name}, cannot upgrade.")),
+    }
+    source.set_version(new_version);
+    parsed_dep = parsed_dep.set_source(source);
 
-// Locate the version property for an item in a Cargo.toml document. 
-fn find_version_property<'a>(cargo_toml: &'a mut DocumentMut, target_crate: &'static str, section: &'static str) -> eyre::Result<Option<&'a mut toml_edit::Item>> {
-    if let Some(deps_table) = cargo_toml.get_mut(section).map(|item| {
-            item.as_table_like_mut().ok_or(eyre!("The Cargo.toml section [{section}] is not a table."))
-        })
-    {
-        let deps_table = deps_table?;
-        Ok(deps_table.get_mut(target_crate))
-    }
-    else {
-        Ok(None)
-    }
+    let mut new_toml_dep = parsed_dep.update_toml(crate_root, key, dep);
+    // Workaround since update_toml() does not preserve comments.
+    /*let new_decor = get_decor_mut(&mut new_toml_dep).map_err(|e| {
+        eyre!("Encountered an error while updating {dep_name} version: {e}")
+    })?;
+
+    if let Some(source_decor) = decor {
+        debug!("Old decor was: {source_decor:#?}");
+        if let Some(prefix) = source_decor.prefix() { 
+            new_decor.set_prefix(prefix.clone());
+        }
+        if let Some(suffix) = source_decor.suffix() { 
+            new_decor.set_suffix(suffix.clone());
+        }
+    };
+    debug!("New decor is: {new_decor:#?}");*/
+    Ok(())
 }
 
 impl CommandExecute for Upgrade {
     #[tracing::instrument(level = "error", skip(self))]
     fn execute(self) -> eyre::Result<()> {
-        const PGRX_STR: &'static str = "pgrx";
-        let path = self.path.unwrap_or(PathBuf::from("./Cargo.toml"));
-        let mut cargo_toml_string = String::new();
-        let mut file = OpenOptions::new().read(true).open(path)?;
-        file.read_to_string(&mut cargo_toml_string)?;
-        // Assume working directory
-        let mut manifest = cargo_toml_string.parse::<DocumentMut>()?;
-        let table = manifest.as_table_mut();
-        println!("Table is: {:#?}", table);
-        
-        let pgrx_property = find_version_property(&mut manifest, "pgrx", "dependencies")?;
+        const RELEVANT_PACKAGES: [&'static str; 3] = ["pgrx",
+            "pgrx-macros",
+            "pgrx-test"];
+        // Canonicalize because cargo-edit does not accept relative paths.
+        let path = std::fs::canonicalize(
+            self.path.unwrap_or(PathBuf::from("./Cargo.toml"))
+        )?;
 
-        println!("pgrx dependency is: {:#?}", pgrx_property);
+        let mut manifest = cargo_edit::LocalManifest::find(Some(&path))
+            .map_err(|e| eyre!("Error opening manifest: {e}"))?;
+
+        for dep_table in manifest.get_dependency_tables_mut() {
+            for dep_name in RELEVANT_PACKAGES {
+                let decor = dep_table.key_decor(dep_name).cloned();
+                if let Some((mut key, dep)) = dep_table.get_key_value_mut(dep_name) {
+                    debug!("Decor for {dep_name} is: {decor:#?}");
+                    let parsed_dep: Dependency = match Dependency::from_toml(
+                            path.as_path(),
+                            &key,
+                            dep) {
+                        Ok(dependency) => dependency, 
+                        Err(e) => return Err(eyre!("Could not parse dependency \
+                            entry for {dep_name} due to error: {e}")),
+                    };
+                    if let Some(source) = parsed_dep.source().cloned() {
+                        debug!("Found dependency {dep_name} with current \
+                            source {source:#?}");
+                        if let cargo_edit::Source::Workspace(_) = &source {
+                                error!("Cannot upgrade the version of \
+                                    {dep_name} because it is set in the \
+                                    workspace, please run `cargo pgrx \
+                                    upgrade` in the workspace directory.");
+                        }
+                        else if source.get_version().is_some() {
+                            replace_version("test", path.as_path(), &mut key, dep, parsed_dep, source)?;
+                            // Workaround to preserve comments
+                            dep_table.key_decor_mut(dep_name).map(|dec| {
+                                if let Some(prefix) = decor.as_ref().and_then(|val| val.prefix().cloned()) {
+                                    dec.set_prefix(prefix)
+                                }
+                                if let Some(suffix) = decor.as_ref().and_then(|val| val.suffix().cloned()) { 
+                                    dec.set_suffix(suffix)
+                                }
+                            });
+                            
+                        }
+                        else {
+                            info!("No version specified for {dep_name}, not upgrading.");
+                        }
+                    }
+                }
+                else {
+                    debug!("Manifest does not contain a dependency entry for \
+                        {dep_name}");
+                }
+            }
+        }
+        debug!("New manifest is: {manifest:#?}");
+        manifest.write().map_err(|err| { 
+            eyre!("Unable to write the updated Cargo.toml to disk: {err}")
+        })?;
         Ok(())
     }
 }
