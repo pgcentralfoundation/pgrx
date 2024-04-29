@@ -424,7 +424,7 @@ impl FromDatum for String {
             // of the string.
             pg_sys::pfree(varlena.cast());
 
-            ret_string
+            Some(ret_string)
         } else {
             FromDatum::from_polymorphic_datum(datum, is_null, typoid).map(|s: &str| s.to_owned())
         }
