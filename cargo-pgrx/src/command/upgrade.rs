@@ -29,18 +29,12 @@ impl DependencySource for cargo_edit::Source {
     fn set_version<A: AsRef<str>>(&mut self, new_version: A) {
         match self {
             cargo_edit::Source::Registry(reg) => {
-                let v = reg.version.as_str();
-                debug!("Version string before change: {v}");
                 reg.version = new_version.as_ref().to_string()
             },
             cargo_edit::Source::Path(path) => {
-                let v = path.version.as_ref().map(|s| s.as_str());
-                debug!("Version string before change: {v:#?}");
                 path.version = Some(new_version.as_ref().to_string())
             },
             cargo_edit::Source::Git(git) => {
-                let v = git.version.as_ref().map(|s| s.as_str());
-                debug!("Version string before change: {v:#?}");
                 git.version = Some(new_version.as_ref().to_string())
             },
             cargo_edit::Source::Workspace(_ws) => {
@@ -100,7 +94,6 @@ impl CommandExecute for Upgrade {
             for dep_name in RELEVANT_PACKAGES {
                 let decor = dep_table.key_decor(dep_name).cloned();
                 if let Some((mut key, dep)) = dep_table.get_key_value_mut(dep_name) {
-                    debug!("Decor for {dep_name} is: {decor:#?}");
                     let parsed_dep: Dependency = match Dependency::from_toml(
                             path.as_path(),
                             &key,
