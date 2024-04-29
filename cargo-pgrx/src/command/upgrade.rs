@@ -66,17 +66,7 @@ impl DependencySource for cargo_edit::Source {
         }
     }
 }
-fn replace_version<S>(new_version: &str, crate_root: &Path, key: &mut KeyMut, dep: &mut toml_edit::Item, mut parsed_dep: Dependency, mut source: S) -> eyre::Result<()> where S : Clone + DependencySource, cargo_edit::Source: From<S> { 
-    fn get_decor_mut(item: &mut toml_edit::Item) -> eyre::Result<&mut toml_edit::Decor> {
-        match item {
-            toml_edit::Item::None => return Err(eyre!("Version update produced a \
-                null toml item.")),
-            toml_edit::Item::Value(val) => Ok(val.decor_mut()),
-            toml_edit::Item::Table(table) => Ok(table.decor_mut()),
-            toml_edit::Item::ArrayOfTables(_aot) => return Err(eyre!("A Cargo \
-                dependency structure cannot be an array of tables.")),
-        }
-    }
+fn replace_version<S>(new_version: &str, crate_root: &Path, key: &mut KeyMut, dep: &mut toml_edit::Item, mut parsed_dep: Dependency, mut source: S) -> eyre::Result<()> where S : Clone + DependencySource, cargo_edit::Source: From<S> {
     let dep_name = key.get();
     let ver_maybe = source.get_version();
     match ver_maybe {
@@ -88,22 +78,7 @@ fn replace_version<S>(new_version: &str, crate_root: &Path, key: &mut KeyMut, de
     source.set_version(new_version);
     parsed_dep = parsed_dep.set_source(source);
 
-    let mut new_toml_dep = parsed_dep.update_toml(crate_root, key, dep);
-    // Workaround since update_toml() does not preserve comments.
-    /*let new_decor = get_decor_mut(&mut new_toml_dep).map_err(|e| {
-        eyre!("Encountered an error while updating {dep_name} version: {e}")
-    })?;
-
-    if let Some(source_decor) = decor {
-        debug!("Old decor was: {source_decor:#?}");
-        if let Some(prefix) = source_decor.prefix() { 
-            new_decor.set_prefix(prefix.clone());
-        }
-        if let Some(suffix) = source_decor.suffix() { 
-            new_decor.set_suffix(suffix.clone());
-        }
-    };
-    debug!("New decor is: {new_decor:#?}");*/
+    parsed_dep.update_toml(crate_root, key, dep);
     Ok(())
 }
 
@@ -145,7 +120,7 @@ impl CommandExecute for Upgrade {
                         }
                         else if source.get_version().is_some() {
                             replace_version("test", path.as_path(), &mut key, dep, parsed_dep, source)?;
-                            // Workaround to preserve comments
+                            // Workaround since update_toml() doesn't preserve comments
                             dep_table.key_decor_mut(dep_name).map(|dec| {
                                 if let Some(prefix) = decor.as_ref().and_then(|val| val.prefix().cloned()) {
                                     dec.set_prefix(prefix)
