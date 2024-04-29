@@ -169,7 +169,7 @@ pub unsafe fn varatt_is_4b_u(ptr: *const pg_sys::varlena) -> bool {
 /// ((((varattrib_1b *) (PTR))->va_header & 0x03) == 0x02)
 /// ```
 #[inline]
-pub unsafe fn varatt_is_b8_c(ptr: *const pg_sys::varlena) -> bool {
+pub unsafe fn varatt_is_4b_c(ptr: *const pg_sys::varlena) -> bool {
     let va1b = ptr as *const pg_sys::varattrib_1b;
     (*va1b).va_header & 0x03 == 0x02
 }
