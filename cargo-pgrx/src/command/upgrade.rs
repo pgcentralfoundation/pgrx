@@ -85,7 +85,7 @@ impl CommandExecute for Upgrade {
     fn execute(self) -> eyre::Result<()> {
         const RELEVANT_PACKAGES: [&'static str; 3] = ["pgrx",
             "pgrx-macros",
-            "pgrx-test"];
+            "pgrx-tests"];
         // Canonicalize because cargo-edit does not accept relative paths.
         let path = std::fs::canonicalize(
             self.path.unwrap_or(PathBuf::from("./Cargo.toml"))
