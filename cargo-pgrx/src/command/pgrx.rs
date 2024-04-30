@@ -42,10 +42,10 @@ enum CargoPgrxSubCommands {
     Test(super::test::Test),
     Get(super::get::Get),
     Cross(super::cross::Cross),
-    Upgrade(super::upgrade::Upgrade)
+    Upgrade(super::upgrade::Upgrade),
 }
 
-    //Upgrade(super::upgrade::Upgrade)
+//Upgrade(super::upgrade::Upgrade)
 
 impl CommandExecute for CargoPgrxSubCommands {
     fn execute(self) -> eyre::Result<()> {
