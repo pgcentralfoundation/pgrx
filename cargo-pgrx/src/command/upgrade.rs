@@ -1,10 +1,10 @@
-use std::path::{Path, PathBuf};
-use cargo_edit::Dependency;
+use std::{collections::HashMap, path::{Path, PathBuf}};
+use cargo_edit::{registry_url, Dependency};
 use eyre::eyre;
 use toml_edit::KeyMut;
 use tracing::{debug, error, info, warn};
 
-use crate::CommandExecute;
+use crate::{manifest::manifest_path, CommandExecute};
 
 /// Upgrade pgrx crate versions in `Cargo.toml`.
 /// Defaults to latest.
@@ -20,6 +20,10 @@ pub(crate) struct Upgrade {
     /// "./Cargo.toml" in the working directory.
     #[clap(long, short)]
     pub(crate) path: Option<PathBuf>,
+
+    // Flag to permit pre-release builds
+    #[clap(long, short)]
+    pub(crate) allow_prerelease: bool,
 }
 trait DependencySource {
     fn set_version<A: AsRef<str>>(&mut self, new_version: A);
@@ -102,6 +106,34 @@ impl CommandExecute for Upgrade {
                         Err(e) => return Err(eyre!("Could not parse dependency \
                             entry for {dep_name} due to error: {e}")),
                     };
+                    let reg_url = registry_url(&path, parsed_dep.registry())
+                        .map_err(|e| {
+                            eyre!("Unable to fetch registry URL for path: {e}")
+                        })?;
+                    let target_version = match self.target_version {
+                        Some(ref ver) => Some(ver.clone()),
+                        None => {
+                            cargo_edit::get_latest_dependency(
+                                dep_name,
+                                self.allow_prerelease,
+                                None,
+                                &path,
+                                Some(&reg_url))
+                                .map_err(|e| {
+                                    eyre!("Unable to fetch the latest version \
+                                    for crate {dep_name} due to {e}")
+                                })?
+                                .version()
+                                .map(|s| s.to_string())
+                        },
+                    };
+                    let target_version = match target_version {
+                        Some(ver) => ver,
+                        None => return Err(eyre!("Unable to update {dep_name} \
+                            , no provided crate version and a latest version \
+                            could not be retrieved from the registry.")),
+                    };
+
                     if let Some(source) = parsed_dep.source().cloned() {
                         debug!("Found dependency {dep_name} with current \
                             source {source:#?}");
@@ -112,7 +144,7 @@ impl CommandExecute for Upgrade {
                                     upgrade` in the workspace directory.");
                         }
                         else if source.get_version().is_some() {
-                            replace_version("test", path.as_path(), &mut key, dep, parsed_dep, source)?;
+                            replace_version(target_version.as_str(), path.as_path(), &mut key, dep, parsed_dep, source)?;
                             // Workaround since update_toml() doesn't preserve comments
                             dep_table.key_decor_mut(dep_name).map(|dec| {
                                 if let Some(prefix) = decor.as_ref().and_then(|val| val.prefix().cloned()) {
