@@ -17,6 +17,61 @@ use crate::{
 use core::ops::ControlFlow;
 use core::ptr;
 
+/// Unboxing for arguments
+///
+/// This bound is necessary to distinguish things which can be passed into `#[pg_extern] fn`.
+/// It is strictly a mistake to use the BorrowDatum/UnboxDatum/DetoastDatum traits for this bound!
+/// PGRX allows "phantom arguments" which are not actually present in the C function but are passed
+/// to the Rust function anyways.
+pub trait UnboxArg {
+    /// indicates range of args that may be consumed
+    fn arg_width(&self) -> (usize, usize);
+}
+
+/// Boxing for return values
+///
+/// This bound is necessary to distinguish things which can be passed in/out of `#[pg_extern] fn`.
+/// It is strictly a mistake to use IntoDatum or any derived traits for this bound!
+/// PGRX allows complex return values which are nonsensical outside of function boundaries,
+/// e.g. for implementing the value-per-call convention for set-returning functions.
+pub trait BoxRet {
+    // "is first call" for SRFs, but for other fns is unconditional
+    fn call_wrapped(&self, fcinfo: pg_sys::FunctionCallInfo) -> bool {
+        true
+    }
+
+    fn ret_val(&self, fcinfo: pg_sys::FunctionCallInfo) -> bool {
+        true
+    }
+}
+
+pub struct ArgInfo<T>(T);
+#[cfg(no)]
+impl<T: UnboxArg> UnboxArg for ArgInfo<T> {
+    fn arg_width(&self) -> (_, _) {
+        todo!()
+    }
+}
+
+impl<'a, T> BoxRet for TableIterator<'a, T> {
+    fn call_wrapped(&self, fcinfo: pg_sys::FunctionCallInfo) -> bool {
+        unsafe { srf_is_first_call(fcinfo) }
+    }
+}
+
+impl<'a, T> BoxRet for SetOfIterator<'a, T> {
+    fn call_wrapped(&self, fcinfo: pg_sys::FunctionCallInfo) -> bool {
+        unsafe { srf_is_first_call(fcinfo) }
+    }
+}
+
+pub struct RetInfo<T>(T);
+#[cfg(no)]
+impl<T: BoxRet> BoxRet for RetInfo<T> {}
+
+// struct ValuePerCall?
+// struct MaterializeTable?
+
 impl<'a, T: IntoDatum> SetOfIterator<'a, T> {
     #[doc(hidden)]
     pub unsafe fn srf_next(
