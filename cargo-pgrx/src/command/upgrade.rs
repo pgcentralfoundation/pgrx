@@ -9,8 +9,8 @@
 //LICENSE Use of this source code is governed by the MIT license that can be found in the LICENSE file.
 use cargo_edit::{registry_url, Dependency};
 use eyre::eyre;
-use toml_edit::KeyMut;
 use std::path::{Path, PathBuf};
+use toml_edit::KeyMut;
 use tracing::{debug, error, info, warn};
 
 use crate::CommandExecute;
@@ -97,19 +97,24 @@ where
     parsed_dep.update_toml(crate_root, key, dep);
     Ok(())
 }
-impl Upgrade { 
-    fn update_dep(&self, path: &PathBuf, mut key: KeyMut, dep: &mut toml_edit::Item) -> eyre::Result<()> { 
+impl Upgrade {
+    fn update_dep(
+        &self,
+        path: &PathBuf,
+        mut key: KeyMut,
+        dep: &mut toml_edit::Item,
+    ) -> eyre::Result<()> {
         let dep_name_string = key.get().to_string();
         let dep_name = dep_name_string.as_str();
         let parsed_dep: Dependency = match Dependency::from_toml(path.as_path(), dep_name, dep) {
-                Ok(dependency) => dependency,
-                Err(e) => {
-                    return Err(eyre!(
-                        "Could not parse dependency \
+            Ok(dependency) => dependency,
+            Err(e) => {
+                return Err(eyre!(
+                    "Could not parse dependency \
                 entry for {dep_name} due to error: {e}"
-                    ))
-                }
-            };
+                ))
+            }
+        };
         let reg_url = registry_url(path, parsed_dep.registry())
             .map_err(|e| eyre!("Unable to fetch registry URL for path: {e}"))?;
         let target_version = match self.target_version {
@@ -140,7 +145,7 @@ impl Upgrade {
                 ))
             }
         };
-    
+
         if let Some(source) = parsed_dep.source().cloned() {
             debug!(
                 "Found dependency {dep_name} with current \
@@ -175,7 +180,8 @@ impl CommandExecute for Upgrade {
     fn execute(self) -> eyre::Result<()> {
         const RELEVANT_PACKAGES: [&str; 3] = ["pgrx", "pgrx-macros", "pgrx-tests"];
         // Canonicalize because cargo-edit does not accept relative paths.
-        let path = std::fs::canonicalize(self.path.clone().unwrap_or(PathBuf::from("./Cargo.toml")))?;
+        let path =
+            std::fs::canonicalize(self.path.clone().unwrap_or(PathBuf::from("./Cargo.toml")))?;
 
         let mut manifest = cargo_edit::LocalManifest::find(Some(&path))
             .map_err(|e| eyre!("Error opening manifest: {e}"))?;
@@ -187,14 +193,10 @@ impl CommandExecute for Upgrade {
                     self.update_dep(&path, key, dep)?;
                     // Workaround since update_toml() doesn't preserve comments
                     dep_table.key_decor_mut(dep_name).map(|dec| {
-                        if let Some(prefix) =
-                            decor.as_ref().and_then(|val| val.prefix().cloned())
-                        {
+                        if let Some(prefix) = decor.as_ref().and_then(|val| val.prefix().cloned()) {
                             dec.set_prefix(prefix)
                         }
-                        if let Some(suffix) =
-                            decor.as_ref().and_then(|val| val.suffix().cloned())
-                        {
+                        if let Some(suffix) = decor.as_ref().and_then(|val| val.suffix().cloned()) {
                             dec.set_suffix(suffix)
                         }
                     });
