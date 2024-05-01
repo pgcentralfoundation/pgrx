@@ -27,7 +27,7 @@ pub(crate) struct Upgrade {
 }
 trait DependencySource {
     fn set_version<A: AsRef<str>>(&mut self, new_version: A);
-    fn get_version<'a>(&'a self) -> Option<&'a String>;
+    fn get_version(&self) -> Option<&String>;
 }
 impl DependencySource for cargo_edit::Source {
     fn set_version<A: AsRef<str>>(&mut self, new_version: A) {
@@ -45,7 +45,7 @@ impl DependencySource for cargo_edit::Source {
             }
         }
     }
-    fn get_version<'a>(&'a self) -> Option<&'a String> {
+    fn get_version(&self) -> Option<&String> {
         match self {
             cargo_edit::Source::Registry(reg) => Some(&reg.version),
             cargo_edit::Source::Path(path) => path.version.as_ref(),
@@ -101,7 +101,7 @@ impl Upgrade {
                     ))
                 }
             };
-        let reg_url = registry_url(&path, parsed_dep.registry())
+        let reg_url = registry_url(path, parsed_dep.registry())
             .map_err(|e| eyre!("Unable to fetch registry URL for path: {e}"))?;
         let target_version = match self.target_version {
             Some(ref ver) => Some(ver.clone()),
@@ -109,7 +109,7 @@ impl Upgrade {
                 dep_name,
                 self.allow_prerelease,
                 None,
-                &path,
+                path,
                 Some(&reg_url),
             )
             .map_err(|e| {
@@ -164,7 +164,7 @@ impl Upgrade {
 impl CommandExecute for Upgrade {
     #[tracing::instrument(level = "error", skip(self))]
     fn execute(self) -> eyre::Result<()> {
-        const RELEVANT_PACKAGES: [&'static str; 3] = ["pgrx", "pgrx-macros", "pgrx-tests"];
+        const RELEVANT_PACKAGES: [&str; 3] = ["pgrx", "pgrx-macros", "pgrx-tests"];
         // Canonicalize because cargo-edit does not accept relative paths.
         let path = std::fs::canonicalize(self.path.clone().unwrap_or(PathBuf::from("./Cargo.toml")))?;
 
