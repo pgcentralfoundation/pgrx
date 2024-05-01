@@ -385,7 +385,7 @@ impl PgExtern {
             let resolved_ty = &arg.used_ty.resolved_ty;
             match resolved_ty {
                 // There's no danger of misinterpreting the type, as pointer coercions must typecheck!
-                ty @ Type::Path(_) if last_ident_is(ty, "FunctionCallInfo") => quote_spanned! {pat.span()=>
+                Type::Path(ty_path) if ty_path.last_ident_is("FunctionCallInfo") => quote_spanned! { pat.span() =>
                     let #pat = #fcinfo_ident;
                 },
                 Type::Tuple(tup) if tup.elems.is_empty() => quote_spanned! { pat.span() =>
@@ -454,7 +454,7 @@ impl PgExtern {
                     quote_spanned! { self.func.sig.output.span() =>
                         ::pgrx::datum::IntoDatum::into_datum(#result_ident).unwrap_or_else(|| panic!("returned Datum was NULL"))
                     }
-                } else if last_ident_is(&retval_ty.resolved_ty, "Datum") {
+                } else if retval_ty.resolved_ty.last_ident_is("Datum") {
                     // As before, we can just throw this in because it must typecheck
                     quote_spanned! { self.func.sig.output.span() =>
                        #result_ident
@@ -484,8 +484,9 @@ impl PgExtern {
                 };
                 finfo_v1_extern_c(&self.func, fcinfo_ident, fn_contents)
             }
-            Returning::SetOf { ty: _retval_ty, optional, result } => {
-                let result_handler = emit_result_handler(self.func.sig.span(), *optional, *result);
+            Returning::SetOf { ty: _retval_ty, is_option, is_result } => {
+                let result_handler =
+                    emit_result_handler(self.func.sig.span(), *is_option, *is_result);
                 let setof_closure = quote! {
                     #[allow(unused_unsafe)]
                     unsafe {
@@ -500,8 +501,9 @@ impl PgExtern {
                 };
                 finfo_v1_extern_c(&self.func, fcinfo_ident, setof_closure)
             }
-            Returning::Iterated { tys: retval_tys, optional, result } => {
-                let result_handler = emit_result_handler(self.func.sig.span(), *optional, *result);
+            Returning::Iterated { tys: retval_tys, is_option, is_result } => {
+                let result_handler =
+                    emit_result_handler(self.func.sig.span(), *is_option, *is_result);
 
                 let iter_closure = if retval_tys.len() == 1 {
                     // Postgres considers functions returning a 1-field table (`RETURNS TABLE (T)`) to be
@@ -544,9 +546,38 @@ impl PgExtern {
     }
 }
 
-fn last_ident_is(ty: &syn::Type, id: &str) -> bool {
-    let syn::Type::Path(syn::TypePath { path, .. }) = ty else { return false };
-    path.segments.last().is_some_and(|segment| segment.ident == id)
+trait LastIdent {
+    fn filter_last_ident(&self, id: &str) -> Option<&syn::PathSegment>;
+    #[inline]
+    fn last_ident_is(&self, id: &str) -> bool {
+        self.filter_last_ident(id).is_some()
+    }
+}
+
+impl LastIdent for syn::Type {
+    #[inline]
+    fn filter_last_ident(&self, id: &str) -> Option<&syn::PathSegment> {
+        let syn::Type::Path(syn::TypePath { path, .. }) = self else { return None };
+        path.filter_last_ident(id)
+    }
+}
+impl LastIdent for syn::TypePath {
+    #[inline]
+    fn filter_last_ident(&self, id: &str) -> Option<&syn::PathSegment> {
+        self.path.filter_last_ident(id)
+    }
+}
+impl LastIdent for syn::Path {
+    #[inline]
+    fn filter_last_ident(&self, id: &str) -> Option<&syn::PathSegment> {
+        self.segments.filter_last_ident(id)
+    }
+}
+impl<P> LastIdent for Punctuated<syn::PathSegment, P> {
+    #[inline]
+    fn filter_last_ident(&self, id: &str) -> Option<&syn::PathSegment> {
+        self.last().filter(|segment| segment.ident == id)
+    }
 }
 
 impl ToEntityGraphTokens for PgExtern {
