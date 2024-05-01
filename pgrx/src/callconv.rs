@@ -8,7 +8,11 @@
 //LICENSE
 //LICENSE Use of this source code is governed by the MIT license that can be found in the LICENSE file.
 #![doc(hidden)]
+#![allow(unused)]
 //! Helper implementations for returning sets and tables from `#[pg_extern]`-style functions
+use std::marker::PhantomData;
+use std::ops::ControlFlow;
+
 use crate::iter::{SetOfIterator, TableIterator};
 use crate::{
     pg_return_null, pg_sys, srf_is_first_call, srf_return_done, srf_return_next, IntoDatum,
@@ -21,11 +25,20 @@ use core::ptr;
 ///
 /// This bound is necessary to distinguish things which can be passed into `#[pg_extern] fn`.
 /// It is strictly a mistake to use the BorrowDatum/UnboxDatum/DetoastDatum traits for this bound!
-/// PGRX allows "phantom arguments" which are not actually present in the C function but are passed
-/// to the Rust function anyways.
+/// PGRX allows "phantom arguments" which are not actually present in the C function, and are also
+/// omitted in the SQL, but are passed to the Rust function anyways.
 pub trait UnboxArg {
-    /// indicates range of args that may be consumed
-    fn arg_width(&self) -> (usize, usize);
+    /// indicates min/max number of args that may be consumed if statically known
+    fn arg_width(&self, fcinfo: pg_sys::FunctionCallInfo) -> Option<(usize, usize)> {
+        todo!()
+    }
+
+    fn try_unbox(&self, fcinfo: pg_sys::FunctionCallInfo, current: usize) -> ControlFlow<Self, ()>
+    where
+        Self: Sized,
+    {
+        todo!()
+    }
 }
 
 /// Boxing for return values
@@ -35,17 +48,38 @@ pub trait UnboxArg {
 /// PGRX allows complex return values which are nonsensical outside of function boundaries,
 /// e.g. for implementing the value-per-call convention for set-returning functions.
 pub trait BoxRet {
+    /// The actual type returned from the call
+    type CallRet: Sized;
+
     // "is first call" for SRFs, but for other fns is unconditional
     fn call_wrapped(&self, fcinfo: pg_sys::FunctionCallInfo) -> bool {
         true
     }
 
-    fn ret_val(&self, fcinfo: pg_sys::FunctionCallInfo) -> bool {
-        true
+    // if a complex return must be prepared, this performs the setup
+    fn prepare_ret(&mut self, fcinfo: pg_sys::FunctionCallInfo) -> ! {
+        todo!()
+    }
+
+    fn identity_or_iter(self) -> ControlFlow<Self::CallRet, (Self, Self::CallRet)>
+    where
+        Self: Sized,
+    {
+        todo!()
+    }
+
+    // box the return value
+    fn box_datum_ret(
+        &mut self,
+        fcinfo: pg_sys::FunctionCallInfo,
+        ret: Self::CallRet,
+    ) -> pg_sys::Datum {
+        todo!()
     }
 }
 
-pub struct ArgInfo<T>(T);
+/// Query implementation details about an argument before it's unboxed
+pub struct ArgInfo<T>(PhantomData<T>);
 #[cfg(no)]
 impl<T: UnboxArg> UnboxArg for ArgInfo<T> {
     fn arg_width(&self) -> (_, _) {
@@ -53,21 +87,17 @@ impl<T: UnboxArg> UnboxArg for ArgInfo<T> {
     }
 }
 
-impl<'a, T> BoxRet for TableIterator<'a, T> {
-    fn call_wrapped(&self, fcinfo: pg_sys::FunctionCallInfo) -> bool {
-        unsafe { srf_is_first_call(fcinfo) }
-    }
-}
-
 impl<'a, T> BoxRet for SetOfIterator<'a, T> {
+    type CallRet = <Self as Iterator>::Item;
     fn call_wrapped(&self, fcinfo: pg_sys::FunctionCallInfo) -> bool {
         unsafe { srf_is_first_call(fcinfo) }
     }
 }
 
-pub struct RetInfo<T>(T);
-#[cfg(no)]
-impl<T: BoxRet> BoxRet for RetInfo<T> {}
+pub struct RetInfo<T>(PhantomData<T>);
+impl<T: BoxRet> BoxRet for RetInfo<T> {
+    type CallRet = T::CallRet;
+}
 
 // struct ValuePerCall?
 // struct MaterializeTable?
@@ -98,6 +128,13 @@ impl<'a, T: IntoDatum> SetOfIterator<'a, T> {
             }
             None => empty_srf(fcinfo),
         }
+    }
+}
+
+impl<'a, T> BoxRet for TableIterator<'a, T> {
+    type CallRet = <Self as Iterator>::Item;
+    fn call_wrapped(&self, fcinfo: pg_sys::FunctionCallInfo) -> bool {
+        unsafe { srf_is_first_call(fcinfo) }
     }
 }
 
