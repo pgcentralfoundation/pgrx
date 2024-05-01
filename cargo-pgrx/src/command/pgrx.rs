@@ -45,8 +45,6 @@ enum CargoPgrxSubCommands {
     Upgrade(super::upgrade::Upgrade),
 }
 
-//Upgrade(super::upgrade::Upgrade)
-
 impl CommandExecute for CargoPgrxSubCommands {
     fn execute(self) -> eyre::Result<()> {
         use CargoPgrxSubCommands::*;
