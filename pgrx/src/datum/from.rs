@@ -412,7 +412,20 @@ impl FromDatum for String {
         is_null: bool,
         typoid: pg_sys::Oid,
     ) -> Option<String> {
-        FromDatum::from_polymorphic_datum(datum, is_null, typoid).map(|s: &str| s.to_owned())
+        let varlena = pg_sys::pg_detoast_datum_packed(datum.cast_mut_ptr());
+        let converted_varlena = convert_varlena_to_str_memoized(varlena);
+        let ret_string = converted_varlena.to_owned();
+
+        // If the datum is EXTERNAL or COMPRESSED, then detoasting creates a pfree-able chunk
+        // that needs to be freed. We can free it because `to_owned` above creates a Rust copy
+        // of the string.
+        if varlena::varatt_is_1b_e(datum.cast_mut_ptr())
+            || varlena::varatt_is_4b_c(datum.cast_mut_ptr())
+        {
+            pg_sys::pfree(varlena.cast());
+        }
+
+        Some(ret_string)
     }
 }
 
