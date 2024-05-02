@@ -56,8 +56,8 @@ pub trait BoxRet {
     type CallRet: Sized;
 
     /// check the fcinfo state, initialize if necessary, and pick calling the wrapped fn or restoring Self
-    fn prepare_call(fcinfo: pg_sys::FunctionCallInfo) -> PickCall {
-        PickCall::WrappedFn
+    fn prepare_call(fcinfo: pg_sys::FunctionCallInfo) -> CallCx {
+        CallCx::WrappedFn(unsafe { pg_sys::CurrentMemoryContext })
     }
 
     /// answer what kind and how many returns happen from this type
@@ -94,23 +94,26 @@ pub trait BoxRet {
     }
 }
 
-#[repr(u8)]
-pub enum PickCall {
-    RestoreCx = 0,
-    WrappedFn = 1,
+pub enum CallCx {
+    RestoreCx,
+    WrappedFn(pg_sys::MemoryContext),
+}
+
+fn prepare_value_per_call_srf(fcinfo: pg_sys::FunctionCallInfo) -> CallCx {
+    unsafe {
+        if srf_is_first_call(fcinfo) {
+            let fn_call_cx = pg_sys::init_MultiFuncCall(fcinfo);
+            CallCx::WrappedFn((*fn_call_cx).multi_call_memory_ctx)
+        } else {
+            CallCx::RestoreCx
+        }
+    }
 }
 
 impl<'a, T> BoxRet for SetOfIterator<'a, T> {
     type CallRet = Option<<Self as Iterator>::Item>;
-    fn prepare_call(fcinfo: pg_sys::FunctionCallInfo) -> PickCall {
-        unsafe {
-            if srf_is_first_call(fcinfo) {
-                srf_first_call_init(fcinfo);
-                PickCall::WrappedFn
-            } else {
-                PickCall::RestoreCx
-            }
-        }
+    fn prepare_call(fcinfo: pg_sys::FunctionCallInfo) -> CallCx {
+        prepare_value_per_call_srf(fcinfo)
     }
 
     unsafe fn into_ret(self) -> Ret<Self>
@@ -168,15 +171,8 @@ impl<'a, T: IntoDatum> SetOfIterator<'a, T> {
 impl<'a, T> BoxRet for TableIterator<'a, T> {
     type CallRet = Option<<Self as Iterator>::Item>;
 
-    fn prepare_call(fcinfo: pg_sys::FunctionCallInfo) -> PickCall {
-        unsafe {
-            if srf_is_first_call(fcinfo) {
-                srf_first_call_init(fcinfo);
-                PickCall::WrappedFn
-            } else {
-                PickCall::RestoreCx
-            }
-        }
+    fn prepare_call(fcinfo: pg_sys::FunctionCallInfo) -> CallCx {
+        prepare_value_per_call_srf(fcinfo)
     }
 
     unsafe fn into_ret(self) -> Ret<Self>
