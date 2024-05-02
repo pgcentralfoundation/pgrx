@@ -11,12 +11,13 @@
 #![allow(unused)]
 //! Helper implementations for returning sets and tables from `#[pg_extern]`-style functions
 use std::marker::PhantomData;
-use std::ops::ControlFlow;
+use std::mem::{self, ManuallyDrop};
 
 use crate::iter::{SetOfIterator, TableIterator};
 use crate::{
-    pg_return_null, pg_sys, srf_is_first_call, srf_return_done, srf_return_next, IntoDatum,
-    IntoHeapTuple, PgMemoryContexts,
+    nonstatic_typeid, pg_return_null, pg_sys, srf_first_call_init, srf_is_first_call,
+    srf_per_call_setup, srf_return_done, srf_return_next, IntoDatum, IntoHeapTuple,
+    PgMemoryContexts,
 };
 use core::ops::ControlFlow;
 use core::ptr;
@@ -29,11 +30,14 @@ use core::ptr;
 /// omitted in the SQL, but are passed to the Rust function anyways.
 pub trait UnboxArg {
     /// indicates min/max number of args that may be consumed if statically known
-    fn arg_width(&self, fcinfo: pg_sys::FunctionCallInfo) -> Option<(usize, usize)> {
+    fn arg_width(fcinfo: pg_sys::FunctionCallInfo) -> Option<(usize, usize)> {
         todo!()
     }
 
-    fn try_unbox(&self, fcinfo: pg_sys::FunctionCallInfo, current: usize) -> ControlFlow<Self, ()>
+    /// try to unbox the next argument
+    ///
+    /// should play into a quasi-iterator somehow?
+    fn try_unbox(fcinfo: pg_sys::FunctionCallInfo, current: usize) -> ControlFlow<Self, ()>
     where
         Self: Sized,
     {
@@ -51,52 +55,82 @@ pub trait BoxRet {
     /// The actual type returned from the call
     type CallRet: Sized;
 
-    // "is first call" for SRFs, but for other fns is unconditional
-    fn call_wrapped(&self, fcinfo: pg_sys::FunctionCallInfo) -> bool {
-        true
+    /// check the fcinfo state, initialize if necessary, and pick calling the wrapped fn or restoring Self
+    fn prepare_call(fcinfo: pg_sys::FunctionCallInfo) -> PickCall {
+        PickCall::WrappedFn
     }
 
-    // if a complex return must be prepared, this performs the setup
-    fn prepare_ret(&mut self, fcinfo: pg_sys::FunctionCallInfo) -> ! {
-        todo!()
-    }
-
-    fn identity_or_iter(self) -> ControlFlow<Self::CallRet, (Self, Self::CallRet)>
+    /// answer what kind and how many returns happen from this type
+    ///
+    /// must be overridden if `Self != Self::CallRet`
+    unsafe fn into_ret(self) -> Ret<Self>
     where
-        Self: Sized,
+        Self: Sized;
+    // morally I should be allowed to supply a default impl >:(
+    /* this default impl would work, but at what cost?
     {
+        if nonstatic_typeid::<Self>() == nonstatic_typeid::<Self::CallRet>() {
+            // SAFETY: We materialize a copy, then evaporate the original without dropping it,
+            // but only when we know that the original Self is the same type as Self::CallRet!
+            unsafe {
+                let ret = Ret::Once(::core::mem::transmute_copy(&self));
+                ::core::mem::forget(self);
+                ret
+            }
+        } else {
+            panic!("`BoxRet::into_ret` must be overridden for {}", ::core::any::type_name::<Self>())
+        }
+    }
+    */
+
+    /// box the return value
+    fn box_return(fcinfo: pg_sys::FunctionCallInfo, ret: Self::CallRet) -> pg_sys::Datum {
         todo!()
     }
 
-    // box the return value
-    fn box_datum_ret(
-        &mut self,
-        fcinfo: pg_sys::FunctionCallInfo,
-        ret: Self::CallRet,
-    ) -> pg_sys::Datum {
-        todo!()
+    /// for multi-call types, how to restore them from the multi-call context, for all others: panic
+    unsafe fn restore_from_context<'a>(fcinfo: pg_sys::FunctionCallInfo) -> &'a mut Self {
+        unimplemented!()
     }
 }
 
-/// Query implementation details about an argument before it's unboxed
-pub struct ArgInfo<T>(PhantomData<T>);
-#[cfg(no)]
-impl<T: UnboxArg> UnboxArg for ArgInfo<T> {
-    fn arg_width(&self) -> (_, _) {
-        todo!()
-    }
+#[repr(u8)]
+pub enum PickCall {
+    RestoreCx = 0,
+    WrappedFn = 1,
 }
 
 impl<'a, T> BoxRet for SetOfIterator<'a, T> {
-    type CallRet = <Self as Iterator>::Item;
-    fn call_wrapped(&self, fcinfo: pg_sys::FunctionCallInfo) -> bool {
-        unsafe { srf_is_first_call(fcinfo) }
+    type CallRet = Option<<Self as Iterator>::Item>;
+    fn prepare_call(fcinfo: pg_sys::FunctionCallInfo) -> PickCall {
+        unsafe {
+            if srf_is_first_call(fcinfo) {
+                srf_first_call_init(fcinfo);
+                PickCall::WrappedFn
+            } else {
+                PickCall::RestoreCx
+            }
+        }
+    }
+
+    unsafe fn into_ret(self) -> Ret<Self>
+    where
+        Self: Sized,
+    {
+        let mut iter = self;
+        let ret = iter.next();
+        if ret.is_none() {
+            Ret::Zero
+        } else {
+            Ret::Many(iter, ret)
+        }
     }
 }
 
-pub struct RetInfo<T>(PhantomData<T>);
-impl<T: BoxRet> BoxRet for RetInfo<T> {
-    type CallRet = T::CallRet;
+pub enum Ret<T: BoxRet> {
+    Zero,
+    Once(T::CallRet),
+    Many(T, T::CallRet),
 }
 
 // struct ValuePerCall?
@@ -132,9 +166,30 @@ impl<'a, T: IntoDatum> SetOfIterator<'a, T> {
 }
 
 impl<'a, T> BoxRet for TableIterator<'a, T> {
-    type CallRet = <Self as Iterator>::Item;
-    fn call_wrapped(&self, fcinfo: pg_sys::FunctionCallInfo) -> bool {
-        unsafe { srf_is_first_call(fcinfo) }
+    type CallRet = Option<<Self as Iterator>::Item>;
+
+    fn prepare_call(fcinfo: pg_sys::FunctionCallInfo) -> PickCall {
+        unsafe {
+            if srf_is_first_call(fcinfo) {
+                srf_first_call_init(fcinfo);
+                PickCall::WrappedFn
+            } else {
+                PickCall::RestoreCx
+            }
+        }
+    }
+
+    unsafe fn into_ret(self) -> Ret<Self>
+    where
+        Self: Sized,
+    {
+        let mut iter = self;
+        let ret = iter.next();
+        if ret.is_none() {
+            Ret::Zero
+        } else {
+            Ret::Many(iter, ret)
+        }
     }
 }
 
