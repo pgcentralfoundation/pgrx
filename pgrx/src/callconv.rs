@@ -23,9 +23,10 @@ impl<'a, T: IntoDatum> SetOfIterator<'a, T> {
         fcinfo: pg_sys::FunctionCallInfo,
         wrapped_fn: impl FnOnce() -> Option<SetOfIterator<'a, T>>,
     ) -> pg_sys::Datum {
-        if let ControlFlow::Continue(funcctx) = init_value_per_call_srf(fcinfo) {
+        if fcx_needs_setup(fcinfo) {
+            let fcx = deref_fcx(fcinfo);
             // first off, ask the user's function to do the needful and return Option<SetOfIterator<T>>
-            let setof_iterator = srf_memcx(funcctx).switch_to(|_| wrapped_fn());
+            let setof_iterator = srf_memcx(fcx).switch_to(|_| wrapped_fn());
             if let ControlFlow::Break(datum) = finish_srf_init(setof_iterator, fcinfo) {
                 return datum;
             }
@@ -53,8 +54,9 @@ impl<'a, T: IntoHeapTuple> TableIterator<'a, T> {
         fcinfo: pg_sys::FunctionCallInfo,
         wrapped_fn: impl FnOnce() -> Option<TableIterator<'a, T>>,
     ) -> pg_sys::Datum {
-        if let ControlFlow::Continue(funcctx) = init_value_per_call_srf(fcinfo) {
-            let table_iterator = srf_memcx(funcctx).switch_to(|_| {
+        if fcx_needs_setup(fcinfo) {
+            let fcx = deref_fcx(fcinfo);
+            let table_iterator = srf_memcx(fcx).switch_to(|_| {
                 // first off, ask the user's function to do the needful and return Option<TableIterator<T>>
                 let table_iterator = wrapped_fn();
 
@@ -68,7 +70,7 @@ impl<'a, T: IntoHeapTuple> TableIterator<'a, T> {
                     pg_sys::error!("return type must be a row type");
                 }
                 pg_sys::BlessTupleDesc(tupdesc);
-                (*funcctx).tuple_desc = tupdesc;
+                (*fcx).tuple_desc = tupdesc;
 
                 table_iterator
             });
@@ -95,15 +97,12 @@ impl<'a, T: IntoHeapTuple> TableIterator<'a, T> {
     }
 }
 
-fn init_value_per_call_srf(
-    fcinfo: pg_sys::FunctionCallInfo,
-) -> ControlFlow<(), *mut pg_sys::FuncCallContext> {
-    if unsafe { srf_is_first_call(fcinfo) } {
-        let fcx = unsafe { pg_sys::init_MultiFuncCall(fcinfo) };
-        ControlFlow::Continue(fcx)
-    } else {
-        ControlFlow::Break(())
+fn fcx_needs_setup(fcinfo: pg_sys::FunctionCallInfo) -> bool {
+    let need = unsafe { srf_is_first_call(fcinfo) };
+    if need {
+        unsafe { pg_sys::init_MultiFuncCall(fcinfo) };
     }
+    need
 }
 
 fn empty_srf(fcinfo: pg_sys::FunctionCallInfo) -> pg_sys::Datum {
