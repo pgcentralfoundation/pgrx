@@ -25,16 +25,14 @@ impl<'a, T: IntoDatum> SetOfIterator<'a, T> {
     ) -> pg_sys::Datum {
         if let ControlFlow::Continue(funcctx) = init_value_per_call_srf(fcinfo) {
             // first off, ask the user's function to do the needful and return Option<SetOfIterator<T>>
-            let setof_iterator =
-                PgMemoryContexts::For((*funcctx).multi_call_memory_ctx).switch_to(|_| wrapped_fn());
+            let setof_iterator = srf_memcx(funcctx).switch_to(|_| wrapped_fn());
 
             let setof_iterator = match setof_iterator {
                 // user's function returned None, so there's nothing for us to later iterate
                 None => return empty_srf(fcinfo),
                 // user's function returned Some(SetOfIterator), so we need to leak it into the
                 // memory context Postgres has decided is to be used for multi-call SRF functions
-                Some(iter) => PgMemoryContexts::For((*funcctx).multi_call_memory_ctx)
-                    .leak_and_drop_on_delete(iter),
+                Some(iter) => srf_memcx(funcctx).leak_and_drop_on_delete(iter),
             };
 
             // it's the first call so we need to finish setting up `funcctx`
@@ -64,25 +62,24 @@ impl<'a, T: IntoHeapTuple> TableIterator<'a, T> {
         wrapped_fn: impl FnOnce() -> Option<TableIterator<'a, T>>,
     ) -> pg_sys::Datum {
         if let ControlFlow::Continue(funcctx) = init_value_per_call_srf(fcinfo) {
-            let table_iterator =
-                PgMemoryContexts::For((*funcctx).multi_call_memory_ctx).switch_to(|_| {
-                    // first off, ask the user's function to do the needful and return Option<TableIterator<T>>
-                    let table_iterator = wrapped_fn();
+            let table_iterator = srf_memcx(funcctx).switch_to(|_| {
+                // first off, ask the user's function to do the needful and return Option<TableIterator<T>>
+                let table_iterator = wrapped_fn();
 
-                    // and if we're here, it worked, so carry on with the initial SRF setup dance
+                // and if we're here, it worked, so carry on with the initial SRF setup dance
 
-                    // Build a tuple descriptor for our result type
-                    let mut tupdesc = std::ptr::null_mut();
-                    if pg_sys::get_call_result_type(fcinfo, std::ptr::null_mut(), &mut tupdesc)
-                        != pg_sys::TypeFuncClass_TYPEFUNC_COMPOSITE
-                    {
-                        pg_sys::error!("return type must be a row type");
-                    }
-                    pg_sys::BlessTupleDesc(tupdesc);
-                    (*funcctx).tuple_desc = tupdesc;
+                // Build a tuple descriptor for our result type
+                let mut tupdesc = std::ptr::null_mut();
+                if pg_sys::get_call_result_type(fcinfo, std::ptr::null_mut(), &mut tupdesc)
+                    != pg_sys::TypeFuncClass_TYPEFUNC_COMPOSITE
+                {
+                    pg_sys::error!("return type must be a row type");
+                }
+                pg_sys::BlessTupleDesc(tupdesc);
+                (*funcctx).tuple_desc = tupdesc;
 
-                    table_iterator
-                });
+                table_iterator
+            });
 
             let table_iterator = match table_iterator {
                 // user's function returned None, so there's nothing for us to later iterate
@@ -90,8 +87,7 @@ impl<'a, T: IntoHeapTuple> TableIterator<'a, T> {
 
                 // user's function returned Some(TableIterator), so we need to leak it into the
                 // memory context Postgres has decided is to be used for multi-call SRF functions
-                Some(iter) => PgMemoryContexts::For((*funcctx).multi_call_memory_ctx)
-                    .leak_and_drop_on_delete(iter),
+                Some(iter) => srf_memcx(funcctx).leak_and_drop_on_delete(iter),
             };
 
             // it's the first call so we need to finish setting up `funcctx`
@@ -137,4 +133,8 @@ fn empty_srf(fcinfo: pg_sys::FunctionCallInfo) -> pg_sys::Datum {
 /// "per_MultiFuncCall" but no FFI cost
 fn deref_fcx(fcinfo: pg_sys::FunctionCallInfo) -> *mut pg_sys::FuncCallContext {
     unsafe { (*(*fcinfo).flinfo).fn_extra.cast() }
+}
+
+fn srf_memcx(fcx: *mut pg_sys::FuncCallContext) -> PgMemoryContexts {
+    unsafe { PgMemoryContexts::For((*fcx).multi_call_memory_ctx) }
 }
