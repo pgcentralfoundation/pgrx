@@ -26,17 +26,9 @@ impl<'a, T: IntoDatum> SetOfIterator<'a, T> {
         if let ControlFlow::Continue(funcctx) = init_value_per_call_srf(fcinfo) {
             // first off, ask the user's function to do the needful and return Option<SetOfIterator<T>>
             let setof_iterator = srf_memcx(funcctx).switch_to(|_| wrapped_fn());
-
-            let setof_iterator = match setof_iterator {
-                // user's function returned None, so there's nothing for us to later iterate
-                None => return empty_srf(fcinfo),
-                // user's function returned Some(SetOfIterator), so we need to leak it into the
-                // memory context Postgres has decided is to be used for multi-call SRF functions
-                Some(iter) => srf_memcx(funcctx).leak_and_drop_on_delete(iter),
-            };
-
-            // it's the first call so we need to finish setting up `funcctx`
-            (*funcctx).user_fctx = setof_iterator.cast();
+            if let ControlFlow::Break(datum) = finish_srf_init(setof_iterator, fcinfo) {
+                return datum;
+            }
         }
 
         let fcx = deref_fcx(fcinfo);
@@ -81,17 +73,9 @@ impl<'a, T: IntoHeapTuple> TableIterator<'a, T> {
                 table_iterator
             });
 
-            let table_iterator = match table_iterator {
-                // user's function returned None, so there's nothing for us to later iterate
-                None => return empty_srf(fcinfo),
-
-                // user's function returned Some(TableIterator), so we need to leak it into the
-                // memory context Postgres has decided is to be used for multi-call SRF functions
-                Some(iter) => srf_memcx(funcctx).leak_and_drop_on_delete(iter),
-            };
-
-            // it's the first call so we need to finish setting up `funcctx`
-            (*funcctx).user_fctx = table_iterator.cast();
+            if let ControlFlow::Break(datum) = finish_srf_init(table_iterator, fcinfo) {
+                return datum;
+            }
         }
 
         let fcx = deref_fcx(fcinfo);
@@ -137,4 +121,25 @@ fn deref_fcx(fcinfo: pg_sys::FunctionCallInfo) -> *mut pg_sys::FuncCallContext {
 
 fn srf_memcx(fcx: *mut pg_sys::FuncCallContext) -> PgMemoryContexts {
     unsafe { PgMemoryContexts::For((*fcx).multi_call_memory_ctx) }
+}
+
+fn finish_srf_init<T>(
+    arg: Option<T>,
+    fcinfo: pg_sys::FunctionCallInfo,
+) -> ControlFlow<pg_sys::Datum, ()> {
+    match arg {
+        // user's function returned None, so there's nothing for us to later iterate
+        None => ControlFlow::Break(empty_srf(fcinfo)),
+        // user's function returned Some(T), so we need to leak it into the
+        // memory context Postgres has decided is to be used for multi-call SRF functions
+        Some(value) => {
+            let fcx = deref_fcx(fcinfo);
+            unsafe {
+                let ptr = srf_memcx(fcx).leak_and_drop_on_delete(value);
+                // it's the first call so we need to finish setting up `funcctx`
+                (*fcx).user_fctx = ptr.cast();
+            }
+            ControlFlow::Continue(())
+        }
+    }
 }
