@@ -49,8 +49,7 @@ impl<'a, T: IntoDatum> SetOfIterator<'a, T> {
 
         // SAFETY: we created `funcctx.user_fctx` on the first call into this function so
         // we know it's valid
-        let setof_iterator =
-            (*funcctx).user_fctx.cast::<SetOfIterator<T>>().as_mut().unwrap_unchecked();
+        let setof_iterator = &mut *(*funcctx).user_fctx.cast::<SetOfIterator<T>>();
 
         match setof_iterator.next() {
             Some(datum) => {
@@ -117,8 +116,7 @@ impl<'a, T: IntoHeapTuple> TableIterator<'a, T> {
 
         // SAFETY: we created `funcctx.user_fctx` on the first call into this function so
         // we know it's valid
-        let table_iterator =
-            (*funcctx).user_fctx.cast::<TableIterator<T>>().as_mut().unwrap_unchecked();
+        let table_iterator = &mut *(*funcctx).user_fctx.cast::<TableIterator<T>>();
 
         match table_iterator.next() {
             Some(tuple) => {
