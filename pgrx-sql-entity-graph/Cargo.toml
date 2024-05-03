@@ -39,3 +39,6 @@ unescape = "0.1.0" # for escaped-character-handling
 # colorized sql output
 owo-colors = { optional = true, workspace = true }
 syntect = { version = "5.1.0", default-features = false, features = ["default-fancy"], optional = true }
+
+[lints.clippy]
+assigning-clones = "allow" # wrong diagnosis and wrong suggestions
