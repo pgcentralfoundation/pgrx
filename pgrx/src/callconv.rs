@@ -35,7 +35,7 @@ impl<'a, T: IntoDatum> SetOfIterator<'a, T> {
                     return pg_return_null(fcinfo);
                 }
 
-                // user's function returned Some(TableIterator), so we need to leak it into the
+                // user's function returned Some(SetOfIterator), so we need to leak it into the
                 // memory context Postgres has decided is to be used for multi-call SRF functions
                 Some(iter) => PgMemoryContexts::For((*funcctx).multi_call_memory_ctx)
                     .leak_and_drop_on_delete(iter),
