@@ -78,9 +78,7 @@ impl<'a, T: IntoHeapTuple> TableIterator<'a, T> {
                     // first off, ask the user's function to do the needful and return Option<TableIterator<T>>
                     let table_iterator = first_call_func();
 
-                    //
                     // and if we're here, it worked, so carry on with the initial SRF setup dance
-                    //
 
                     // Build a tuple descriptor for our result type
                     let mut tupdesc = std::ptr::null_mut();
