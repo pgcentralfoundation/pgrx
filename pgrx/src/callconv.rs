@@ -83,7 +83,7 @@ impl<'a, T: IntoHeapTuple> TableIterator<'a, T> {
         if srf_is_first_call(fcinfo) {
             let funcctx = pg_sys::init_MultiFuncCall(fcinfo);
 
-            let (table_iterator, tupdesc, memcxt) =
+            let table_iterator =
                 PgMemoryContexts::For((*funcctx).multi_call_memory_ctx).switch_to(|_| {
                     // first off, ask the user's function to do the needful and return Option<TableIterator<T>>
                     let table_iterator = first_call_func();
@@ -100,9 +100,9 @@ impl<'a, T: IntoHeapTuple> TableIterator<'a, T> {
                         pg_sys::error!("return type must be a row type");
                     }
                     pg_sys::BlessTupleDesc(tupdesc);
+                    (*funcctx).tuple_desc = tupdesc;
 
-                    // allocate and return a Context for holding our SrfIterator which is used on every call
-                    (table_iterator, tupdesc, (*funcctx).multi_call_memory_ctx)
+                    table_iterator
                 });
 
             let table_iterator = match table_iterator {
@@ -119,7 +119,6 @@ impl<'a, T: IntoHeapTuple> TableIterator<'a, T> {
             };
 
             // it's the first call so we need to finish setting up `funcctx`
-            (*funcctx).tuple_desc = tupdesc;
             (*funcctx).user_fctx = table_iterator.cast();
         }
 
