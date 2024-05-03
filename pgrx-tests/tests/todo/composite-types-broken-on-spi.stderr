@@ -46,26 +46,56 @@ note: required by a bound in `pg_getarg`
    | pub unsafe fn pg_getarg<T: FromDatum>(fcinfo: pg_sys::FunctionCallInfo, num: usize) -> Option<T> {
    |                            ^^^^^^^^^ required by this bound in `pg_getarg`
 
-error[E0277]: the trait bound `Array<'_, pgrx::prelude::PgHeapTuple<'_, pgrx::AllocatedByRust>>: IntoIterator` is not satisfied
+error[E0277]: `Array<'_, pgrx::prelude::PgHeapTuple<'_, pgrx::AllocatedByRust>>` is not an iterator
    --> tests/todo/composite-types-broken-on-spi.rs:125:20
     |
 125 |         for dog in dogs {
-    |                    ^^^^ the trait `IntoIterator` is not implemented for `Array<'_, pgrx::prelude::PgHeapTuple<'_, pgrx::AllocatedByRust>>`
+    |                    ^^^^ `Array<'_, pgrx::prelude::PgHeapTuple<'_, pgrx::AllocatedByRust>>` is not an iterator
     |
+    = help: the trait `IntoIterator` is not implemented for `Array<'_, pgrx::prelude::PgHeapTuple<'_, pgrx::AllocatedByRust>>`
     = help: the trait `IntoIterator` is implemented for `Array<'_, pgrx::prelude::PgHeapTuple<'_, pgrx::AllocatedByRust>>`
 
-error[E0277]: the trait bound `Array<'_, pgrx::prelude::PgHeapTuple<'_, pgrx::AllocatedByRust>>: IntoIterator` is not satisfied
+error[E0277]: `Array<'_, pgrx::prelude::PgHeapTuple<'_, pgrx::AllocatedByRust>>` is not an iterator
    --> tests/todo/composite-types-broken-on-spi.rs:145:20
     |
 145 |         for dog in dogs {
-    |                    ^^^^ the trait `IntoIterator` is not implemented for `Array<'_, pgrx::prelude::PgHeapTuple<'_, pgrx::AllocatedByRust>>`
+    |                    ^^^^ `Array<'_, pgrx::prelude::PgHeapTuple<'_, pgrx::AllocatedByRust>>` is not an iterator
     |
+    = help: the trait `IntoIterator` is not implemented for `Array<'_, pgrx::prelude::PgHeapTuple<'_, pgrx::AllocatedByRust>>`
     = help: the trait `IntoIterator` is implemented for `Array<'_, pgrx::prelude::PgHeapTuple<'_, pgrx::AllocatedByRust>>`
 
-error[E0277]: the trait bound `Array<'_, pgrx::prelude::PgHeapTuple<'_, pgrx::AllocatedByRust>>: IntoIterator` is not satisfied
+error[E0277]: `Array<'_, pgrx::prelude::PgHeapTuple<'_, pgrx::AllocatedByRust>>` is not an iterator
    --> tests/todo/composite-types-broken-on-spi.rs:162:20
     |
 162 |         for dog in dogs {
-    |                    ^^^^ the trait `IntoIterator` is not implemented for `Array<'_, pgrx::prelude::PgHeapTuple<'_, pgrx::AllocatedByRust>>`
+    |                    ^^^^ `Array<'_, pgrx::prelude::PgHeapTuple<'_, pgrx::AllocatedByRust>>` is not an iterator
     |
+    = help: the trait `IntoIterator` is not implemented for `Array<'_, pgrx::prelude::PgHeapTuple<'_, pgrx::AllocatedByRust>>`
     = help: the trait `IntoIterator` is implemented for `Array<'_, pgrx::prelude::PgHeapTuple<'_, pgrx::AllocatedByRust>>`
+
+error[E0308]: mismatched types
+  --> tests/todo/composite-types-broken-on-spi.rs:13:9
+   |
+13 |         dogs: Option<Vec<pgrx::composite_type!(DOG_COMPOSITE_TYPE)>>,
+   |         ^^^^ one type is more general than the other
+   |
+   = note: expected struct `pgrx::prelude::PgHeapTuple<'arr, _>`
+              found struct `pgrx::prelude::PgHeapTuple<'_, _>`
+
+error[E0308]: mismatched types
+  --> tests/todo/composite-types-broken-on-spi.rs:30:9
+   |
+30 |         dogs: pgrx::default!(Vec<pgrx::composite_type!("Dog")>, "ARRAY[ROW('Nami', 0)]::Dog[]"),
+   |         ^^^^ one type is more general than the other
+   |
+   = note: expected struct `pgrx::prelude::PgHeapTuple<'arr, _>`
+              found struct `pgrx::prelude::PgHeapTuple<'_, _>`
+
+error[E0308]: mismatched types
+  --> tests/todo/composite-types-broken-on-spi.rs:45:39
+   |
+45 |     fn sum_scritches_for_names_strict(dogs: Vec<pgrx::composite_type!("Dog")>) -> i32 {
+   |                                       ^^^^ one type is more general than the other
+   |
+   = note: expected struct `pgrx::prelude::PgHeapTuple<'arr, _>`
+              found struct `pgrx::prelude::PgHeapTuple<'_, _>`

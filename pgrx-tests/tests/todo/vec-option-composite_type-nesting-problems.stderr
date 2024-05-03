@@ -45,3 +45,30 @@ note: required by a bound in `pg_getarg`
    |
    | pub unsafe fn pg_getarg<T: FromDatum>(fcinfo: pg_sys::FunctionCallInfo, num: usize) -> Option<T> {
    |                            ^^^^^^^^^ required by this bound in `pg_getarg`
+
+error[E0308]: mismatched types
+ --> tests/todo/vec-option-composite_type-nesting-problems.rs:9:28
+  |
+9 | fn sum_scritches_for_names(dogs: Option<Vec<pgrx::composite_type!(DOG_COMPOSITE_TYPE)>>) -> i32 {
+  |                            ^^^^ one type is more general than the other
+  |
+  = note: expected struct `pgrx::prelude::PgHeapTuple<'arr, _>`
+             found struct `pgrx::prelude::PgHeapTuple<'_, _>`
+
+error[E0308]: mismatched types
+  --> tests/todo/vec-option-composite_type-nesting-problems.rs:25:5
+   |
+25 |     dogs: pgrx::default!(Vec<pgrx::composite_type!("Dog")>, "ARRAY[ROW('Nami', 0)]::Dog[]"),
+   |     ^^^^ one type is more general than the other
+   |
+   = note: expected struct `pgrx::prelude::PgHeapTuple<'arr, _>`
+              found struct `pgrx::prelude::PgHeapTuple<'_, _>`
+
+error[E0308]: mismatched types
+  --> tests/todo/vec-option-composite_type-nesting-problems.rs:40:35
+   |
+40 | fn sum_scritches_for_names_strict(dogs: Vec<pgrx::composite_type!("Dog")>) -> i32 {
+   |                                   ^^^^ one type is more general than the other
+   |
+   = note: expected struct `pgrx::prelude::PgHeapTuple<'arr, _>`
+              found struct `pgrx::prelude::PgHeapTuple<'_, _>`
