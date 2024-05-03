@@ -17,16 +17,16 @@ use crate::{
 
 impl<'a, T: IntoDatum> SetOfIterator<'a, T> {
     #[doc(hidden)]
-    pub unsafe fn srf_next<F: FnOnce() -> Option<SetOfIterator<'a, T>>>(
+    pub unsafe fn srf_next(
         fcinfo: pg_sys::FunctionCallInfo,
-        first_call_func: F,
+        wrapped_fn: impl FnOnce() -> Option<SetOfIterator<'a, T>>,
     ) -> pg_sys::Datum {
         if srf_is_first_call(fcinfo) {
             let funcctx = pg_sys::init_MultiFuncCall(fcinfo);
 
             // first off, ask the user's function to do the needful and return Option<SetOfIterator<T>>
-            let setof_iterator = PgMemoryContexts::For((*funcctx).multi_call_memory_ctx)
-                .switch_to(|_| first_call_func());
+            let setof_iterator =
+                PgMemoryContexts::For((*funcctx).multi_call_memory_ctx).switch_to(|_| wrapped_fn());
 
             let setof_iterator = match setof_iterator {
                 // user's function returned None, so there's nothing for us to later iterate
@@ -66,9 +66,9 @@ impl<'a, T: IntoDatum> SetOfIterator<'a, T> {
 
 impl<'a, T: IntoHeapTuple> TableIterator<'a, T> {
     #[doc(hidden)]
-    pub unsafe fn srf_next<F: FnOnce() -> Option<TableIterator<'a, T>>>(
+    pub unsafe fn srf_next(
         fcinfo: pg_sys::FunctionCallInfo,
-        first_call_func: F,
+        wrapped_fn: impl FnOnce() -> Option<TableIterator<'a, T>>,
     ) -> pg_sys::Datum {
         if srf_is_first_call(fcinfo) {
             let funcctx = pg_sys::init_MultiFuncCall(fcinfo);
@@ -76,7 +76,7 @@ impl<'a, T: IntoHeapTuple> TableIterator<'a, T> {
             let table_iterator =
                 PgMemoryContexts::For((*funcctx).multi_call_memory_ctx).switch_to(|_| {
                     // first off, ask the user's function to do the needful and return Option<TableIterator<T>>
-                    let table_iterator = first_call_func();
+                    let table_iterator = wrapped_fn();
 
                     // and if we're here, it worked, so carry on with the initial SRF setup dance
 
