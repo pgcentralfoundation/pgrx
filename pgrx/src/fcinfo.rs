@@ -386,6 +386,7 @@ pub unsafe fn srf_is_first_call(fcinfo: pg_sys::FunctionCallInfo) -> bool {
 }
 
 #[inline]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::init_MultiFuncCall")]
 pub unsafe fn srf_first_call_init(
     fcinfo: pg_sys::FunctionCallInfo,
 ) -> *mut pg_sys::FuncCallContext {
@@ -393,6 +394,7 @@ pub unsafe fn srf_first_call_init(
 }
 
 #[inline]
+#[deprecated(since = "0.12.0", note = "you want pg_sys::per_MultiFuncCall")]
 pub unsafe fn srf_per_call_setup(fcinfo: pg_sys::FunctionCallInfo) -> *mut pg_sys::FuncCallContext {
     pg_sys::per_MultiFuncCall(fcinfo)
 }
