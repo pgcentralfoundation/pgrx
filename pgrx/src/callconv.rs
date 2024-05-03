@@ -11,8 +11,8 @@
 //! Helper implementations for returning sets and tables from `#[pg_extern]`-style functions
 use crate::iter::{SetOfIterator, TableIterator};
 use crate::{
-    pg_return_null, pg_sys, srf_first_call_init, srf_is_first_call, srf_per_call_setup,
-    srf_return_done, srf_return_next, IntoDatum, IntoHeapTuple, PgMemoryContexts,
+    pg_return_null, pg_sys, srf_is_first_call, srf_return_done, srf_return_next, IntoDatum,
+    IntoHeapTuple, PgMemoryContexts,
 };
 
 impl<'a, T: IntoDatum> SetOfIterator<'a, T> {
@@ -22,7 +22,7 @@ impl<'a, T: IntoDatum> SetOfIterator<'a, T> {
         first_call_func: F,
     ) -> pg_sys::Datum {
         if srf_is_first_call(fcinfo) {
-            let funcctx = srf_first_call_init(fcinfo);
+            let funcctx = pg_sys::init_MultiFuncCall(fcinfo);
 
             let (setof_iterator, memcxt) = PgMemoryContexts::For((*funcctx).multi_call_memory_ctx)
                 .switch_to(|_| {
@@ -53,7 +53,7 @@ impl<'a, T: IntoDatum> SetOfIterator<'a, T> {
             (*funcctx).user_fctx = setof_iterator.cast();
         }
 
-        let funcctx = srf_per_call_setup(fcinfo);
+        let funcctx = pg_sys::per_MultiFuncCall(fcinfo);
 
         // SAFETY: we created `funcctx.user_fctx` on the first call into this function so
         // we know it's valid
@@ -80,7 +80,7 @@ impl<'a, T: IntoHeapTuple> TableIterator<'a, T> {
         first_call_func: F,
     ) -> pg_sys::Datum {
         if srf_is_first_call(fcinfo) {
-            let funcctx = srf_first_call_init(fcinfo);
+            let funcctx = pg_sys::init_MultiFuncCall(fcinfo);
 
             let (table_iterator, tupdesc, memcxt) =
                 PgMemoryContexts::For((*funcctx).multi_call_memory_ctx).switch_to(|_| {
@@ -121,7 +121,7 @@ impl<'a, T: IntoHeapTuple> TableIterator<'a, T> {
             (*funcctx).user_fctx = table_iterator.cast();
         }
 
-        let funcctx = srf_per_call_setup(fcinfo);
+        let funcctx = pg_sys::per_MultiFuncCall(fcinfo);
 
         // SAFETY: we created `funcctx.user_fctx` on the first call into this function so
         // we know it's valid
