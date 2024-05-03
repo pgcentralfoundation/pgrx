@@ -30,11 +30,7 @@ impl<'a, T: IntoDatum> SetOfIterator<'a, T> {
 
             let setof_iterator = match setof_iterator {
                 // user's function returned None, so there's nothing for us to later iterate
-                None => {
-                    srf_return_done(fcinfo, funcctx);
-                    return pg_return_null(fcinfo);
-                }
-
+                None => return empty_srf(fcinfo),
                 // user's function returned Some(SetOfIterator), so we need to leak it into the
                 // memory context Postgres has decided is to be used for multi-call SRF functions
                 Some(iter) => PgMemoryContexts::For((*funcctx).multi_call_memory_ctx)
@@ -56,10 +52,7 @@ impl<'a, T: IntoDatum> SetOfIterator<'a, T> {
                 srf_return_next(fcinfo, funcctx);
                 datum.into_datum().unwrap_or_else(|| pg_return_null(fcinfo))
             }
-            None => {
-                srf_return_done(fcinfo, funcctx);
-                pg_return_null(fcinfo)
-            }
+            None => empty_srf(fcinfo),
         }
     }
 }
@@ -93,10 +86,7 @@ impl<'a, T: IntoHeapTuple> TableIterator<'a, T> {
 
             let table_iterator = match table_iterator {
                 // user's function returned None, so there's nothing for us to later iterate
-                None => {
-                    srf_return_done(fcinfo, funcctx);
-                    return pg_return_null(fcinfo);
-                }
+                None => return empty_srf(fcinfo),
 
                 // user's function returned Some(TableIterator), so we need to leak it into the
                 // memory context Postgres has decided is to be used for multi-call SRF functions
@@ -120,10 +110,7 @@ impl<'a, T: IntoHeapTuple> TableIterator<'a, T> {
                 srf_return_next(fcinfo, funcctx);
                 pg_sys::HeapTupleHeaderGetDatum((*heap_tuple).t_data)
             }
-            None => {
-                srf_return_done(fcinfo, funcctx);
-                pg_return_null(fcinfo)
-            }
+            None => empty_srf(fcinfo),
         }
     }
 }
@@ -136,5 +123,13 @@ fn init_value_per_call_srf(
         ControlFlow::Continue(fcx)
     } else {
         ControlFlow::Break(())
+    }
+}
+
+fn empty_srf(fcinfo: pg_sys::FunctionCallInfo) -> pg_sys::Datum {
+    unsafe {
+        let fcx = unsafe { (*(*fcinfo).flinfo).fn_extra };
+        srf_return_done(fcinfo, fcx.cast());
+        pg_return_null(fcinfo)
     }
 }
