@@ -9,13 +9,13 @@
 //LICENSE Use of this source code is governed by the MIT license that can be found in the LICENSE file.
 #![doc(hidden)]
 //! Helper implementations for returning sets and tables from `#[pg_extern]`-style functions
-use std::ops::ControlFlow;
-
 use crate::iter::{SetOfIterator, TableIterator};
 use crate::{
     pg_return_null, pg_sys, srf_is_first_call, srf_return_done, srf_return_next, IntoDatum,
     IntoHeapTuple, PgMemoryContexts,
 };
+use core::ops::ControlFlow;
+use core::ptr;
 
 impl<'a, T: IntoDatum> SetOfIterator<'a, T> {
     #[doc(hidden)]
@@ -33,9 +33,7 @@ impl<'a, T: IntoDatum> SetOfIterator<'a, T> {
         }
 
         let fcx = deref_fcx(fcinfo);
-
-        // SAFETY: we created `fcx.user_fctx` on the first call into this function so
-        // we know it's valid
+        // SAFETY: fcx.user_fctx was set earlier, immediately before or in a prior call
         let setof_iterator = &mut *(*fcx).user_fctx.cast::<SetOfIterator<T>>();
 
         match setof_iterator.next() {
@@ -60,13 +58,10 @@ impl<'a, T: IntoHeapTuple> TableIterator<'a, T> {
                 // first off, ask the user's function to do the needful and return Option<TableIterator<T>>
                 let table_iterator = wrapped_fn();
 
-                // and if we're here, it worked, so carry on with the initial SRF setup dance
-
                 // Build a tuple descriptor for our result type
-                let mut tupdesc = std::ptr::null_mut();
-                if pg_sys::get_call_result_type(fcinfo, std::ptr::null_mut(), &mut tupdesc)
-                    != pg_sys::TypeFuncClass_TYPEFUNC_COMPOSITE
-                {
+                let mut tupdesc = ptr::null_mut();
+                let ty_class = pg_sys::get_call_result_type(fcinfo, ptr::null_mut(), &mut tupdesc);
+                if ty_class != pg_sys::TypeFuncClass_TYPEFUNC_COMPOSITE {
                     pg_sys::error!("return type must be a row type");
                 }
                 pg_sys::BlessTupleDesc(tupdesc);
@@ -81,9 +76,7 @@ impl<'a, T: IntoHeapTuple> TableIterator<'a, T> {
         }
 
         let fcx = deref_fcx(fcinfo);
-
-        // SAFETY: we created `fcx.user_fctx` on the first call into this function so
-        // we know it's valid
+        // SAFETY: fcx.user_fctx was set earlier, immediately before or in a prior call
         let table_iterator = &mut *(*fcx).user_fctx.cast::<TableIterator<T>>();
 
         match table_iterator.next() {
@@ -127,15 +120,14 @@ fn finish_srf_init<T>(
     fcinfo: pg_sys::FunctionCallInfo,
 ) -> ControlFlow<pg_sys::Datum, ()> {
     match arg {
-        // user's function returned None, so there's nothing for us to later iterate
+        // nothing to iterate?
         None => ControlFlow::Break(empty_srf(fcinfo)),
-        // user's function returned Some(T), so we need to leak it into the
-        // memory context Postgres has decided is to be used for multi-call SRF functions
+        // must be saved for the next call by leaking it into the multi-call memory context
         Some(value) => {
             let fcx = deref_fcx(fcinfo);
             unsafe {
                 let ptr = srf_memcx(fcx).leak_and_drop_on_delete(value);
-                // it's the first call so we need to finish setting up `funcctx`
+                // it's the first call so we need to finish setting up fcx
                 (*fcx).user_fctx = ptr.cast();
             }
             ControlFlow::Continue(())
