@@ -41,15 +41,15 @@ impl<'a, T: IntoDatum> SetOfIterator<'a, T> {
             (*funcctx).user_fctx = setof_iterator.cast();
         }
 
-        let funcctx = pg_sys::per_MultiFuncCall(fcinfo);
+        let fcx = deref_fcx(fcinfo);
 
-        // SAFETY: we created `funcctx.user_fctx` on the first call into this function so
+        // SAFETY: we created `fcx.user_fctx` on the first call into this function so
         // we know it's valid
-        let setof_iterator = &mut *(*funcctx).user_fctx.cast::<SetOfIterator<T>>();
+        let setof_iterator = &mut *(*fcx).user_fctx.cast::<SetOfIterator<T>>();
 
         match setof_iterator.next() {
             Some(datum) => {
-                srf_return_next(fcinfo, funcctx);
+                srf_return_next(fcinfo, fcx);
                 datum.into_datum().unwrap_or_else(|| pg_return_null(fcinfo))
             }
             None => empty_srf(fcinfo),
@@ -98,16 +98,16 @@ impl<'a, T: IntoHeapTuple> TableIterator<'a, T> {
             (*funcctx).user_fctx = table_iterator.cast();
         }
 
-        let funcctx = pg_sys::per_MultiFuncCall(fcinfo);
+        let fcx = deref_fcx(fcinfo);
 
-        // SAFETY: we created `funcctx.user_fctx` on the first call into this function so
+        // SAFETY: we created `fcx.user_fctx` on the first call into this function so
         // we know it's valid
-        let table_iterator = &mut *(*funcctx).user_fctx.cast::<TableIterator<T>>();
+        let table_iterator = &mut *(*fcx).user_fctx.cast::<TableIterator<T>>();
 
         match table_iterator.next() {
             Some(tuple) => {
-                let heap_tuple = tuple.into_heap_tuple((*funcctx).tuple_desc);
-                srf_return_next(fcinfo, funcctx);
+                let heap_tuple = tuple.into_heap_tuple((*fcx).tuple_desc);
+                srf_return_next(fcinfo, fcx);
                 pg_sys::HeapTupleHeaderGetDatum((*heap_tuple).t_data)
             }
             None => empty_srf(fcinfo),
@@ -128,8 +128,13 @@ fn init_value_per_call_srf(
 
 fn empty_srf(fcinfo: pg_sys::FunctionCallInfo) -> pg_sys::Datum {
     unsafe {
-        let fcx = unsafe { (*(*fcinfo).flinfo).fn_extra };
-        srf_return_done(fcinfo, fcx.cast());
+        let fcx = deref_fcx(fcinfo);
+        srf_return_done(fcinfo, fcx);
         pg_return_null(fcinfo)
     }
+}
+
+/// "per_MultiFuncCall" but no FFI cost
+fn deref_fcx(fcinfo: pg_sys::FunctionCallInfo) -> *mut pg_sys::FuncCallContext {
+    unsafe { (*(*fcinfo).flinfo).fn_extra.cast() }
 }
