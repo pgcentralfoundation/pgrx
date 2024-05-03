@@ -46,7 +46,8 @@ impl<'a, T: IntoDatum> SetOfIterator<'a, T> {
 
                 // user's function returned Some(TableIterator), so we need to leak it into the
                 // memory context Postgres has decided is to be used for multi-call SRF functions
-                Some(iter) => PgMemoryContexts::For(memcxt).leak_and_drop_on_delete(iter),
+                Some(iter) => PgMemoryContexts::For((*funcctx).multi_call_memory_ctx)
+                    .leak_and_drop_on_delete(iter),
             };
 
             // it's the first call so we need to finish setting up `funcctx`
@@ -113,7 +114,8 @@ impl<'a, T: IntoHeapTuple> TableIterator<'a, T> {
 
                 // user's function returned Some(TableIterator), so we need to leak it into the
                 // memory context Postgres has decided is to be used for multi-call SRF functions
-                Some(iter) => PgMemoryContexts::For(memcxt).leak_and_drop_on_delete(iter),
+                Some(iter) => PgMemoryContexts::For((*funcctx).multi_call_memory_ctx)
+                    .leak_and_drop_on_delete(iter),
             };
 
             // it's the first call so we need to finish setting up `funcctx`
