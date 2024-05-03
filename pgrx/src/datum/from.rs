@@ -409,8 +409,8 @@ impl FromDatum for String {
     #[inline]
     unsafe fn from_polymorphic_datum(
         datum: pg_sys::Datum,
-        is_null: bool,
-        typoid: pg_sys::Oid,
+        _is_null: bool,
+        _typoid: pg_sys::Oid,
     ) -> Option<String> {
         let varlena = pg_sys::pg_detoast_datum_packed(datum.cast_mut_ptr());
         let converted_varlena = convert_varlena_to_str_memoized(varlena);

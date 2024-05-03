@@ -18,7 +18,6 @@ where
 }
 
 pub(crate) trait Toasty: Sized {
-    fn detoast(self) -> Toast<Self>;
     /// Why does it always land butter-side down?
     unsafe fn drop_toast(&mut self);
 }
