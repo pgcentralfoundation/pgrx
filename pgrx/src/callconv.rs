@@ -9,6 +9,8 @@
 //LICENSE Use of this source code is governed by the MIT license that can be found in the LICENSE file.
 #![doc(hidden)]
 //! Helper implementations for returning sets and tables from `#[pg_extern]`-style functions
+use std::ops::ControlFlow;
+
 use crate::iter::{SetOfIterator, TableIterator};
 use crate::{
     pg_return_null, pg_sys, srf_is_first_call, srf_return_done, srf_return_next, IntoDatum,
@@ -21,9 +23,7 @@ impl<'a, T: IntoDatum> SetOfIterator<'a, T> {
         fcinfo: pg_sys::FunctionCallInfo,
         wrapped_fn: impl FnOnce() -> Option<SetOfIterator<'a, T>>,
     ) -> pg_sys::Datum {
-        if srf_is_first_call(fcinfo) {
-            let funcctx = pg_sys::init_MultiFuncCall(fcinfo);
-
+        if let ControlFlow::Continue(funcctx) = init_value_per_call_srf(fcinfo) {
             // first off, ask the user's function to do the needful and return Option<SetOfIterator<T>>
             let setof_iterator =
                 PgMemoryContexts::For((*funcctx).multi_call_memory_ctx).switch_to(|_| wrapped_fn());
@@ -70,9 +70,7 @@ impl<'a, T: IntoHeapTuple> TableIterator<'a, T> {
         fcinfo: pg_sys::FunctionCallInfo,
         wrapped_fn: impl FnOnce() -> Option<TableIterator<'a, T>>,
     ) -> pg_sys::Datum {
-        if srf_is_first_call(fcinfo) {
-            let funcctx = pg_sys::init_MultiFuncCall(fcinfo);
-
+        if let ControlFlow::Continue(funcctx) = init_value_per_call_srf(fcinfo) {
             let table_iterator =
                 PgMemoryContexts::For((*funcctx).multi_call_memory_ctx).switch_to(|_| {
                     // first off, ask the user's function to do the needful and return Option<TableIterator<T>>
@@ -127,5 +125,16 @@ impl<'a, T: IntoHeapTuple> TableIterator<'a, T> {
                 pg_return_null(fcinfo)
             }
         }
+    }
+}
+
+fn init_value_per_call_srf(
+    fcinfo: pg_sys::FunctionCallInfo,
+) -> ControlFlow<(), *mut pg_sys::FuncCallContext> {
+    if unsafe { srf_is_first_call(fcinfo) } {
+        let fcx = unsafe { pg_sys::init_MultiFuncCall(fcinfo) };
+        ControlFlow::Continue(fcx)
+    } else {
+        ControlFlow::Break(())
     }
 }
