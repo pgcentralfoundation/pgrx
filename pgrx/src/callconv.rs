@@ -24,18 +24,9 @@ impl<'a, T: IntoDatum> SetOfIterator<'a, T> {
         if srf_is_first_call(fcinfo) {
             let funcctx = pg_sys::init_MultiFuncCall(fcinfo);
 
-            let (setof_iterator, memcxt) = PgMemoryContexts::For((*funcctx).multi_call_memory_ctx)
-                .switch_to(|_| {
-                    // first off, ask the user's function to do the needful and return Option<SetOfIterator<T>>
-                    let setof_iterator = first_call_func();
-
-                    //
-                    // and if we're here, it worked, so carry on with the initial SRF setup dance
-                    //
-
-                    // allocate and return a Context for holding our SrfIterator which is used on every call
-                    (setof_iterator, (*funcctx).multi_call_memory_ctx)
-                });
+            // first off, ask the user's function to do the needful and return Option<SetOfIterator<T>>
+            let setof_iterator = PgMemoryContexts::For((*funcctx).multi_call_memory_ctx)
+                .switch_to(|_| first_call_func());
 
             let setof_iterator = match setof_iterator {
                 // user's function returned None, so there's nothing for us to later iterate
