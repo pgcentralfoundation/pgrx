@@ -138,30 +138,39 @@ impl Upgrade {
             }
         };
 
-        if let Some(source) = parsed_dep.source().cloned() {
-            debug!(
-                "Found dependency {dep_name} with current \
-                source {source:#?}"
-            );
-            if let cargo_edit::Source::Workspace(_) = &source {
-                error!(
-                    "Cannot upgrade the version of \
-                        {dep_name} because it is set in the \
-                        workspace, please run `cargo pgrx \
-                        upgrade` in the workspace directory."
-                );
-            } else if get_dep_source_version(&source).is_some() {
-                replace_version(
-                    target_version.as_str(),
-                    path.as_path(),
-                    &mut key,
-                    dep,
-                    parsed_dep,
-                    source,
-                )?;
-            } else {
-                info!("No version specified for {dep_name}, not upgrading.");
+        // As of cargo-edit version 0.12.2, dep.source will always be a Some()
+        // if the Dependency struct was instantiated via from_toml().
+        let source = match parsed_dep.source().cloned() {
+            Some(src) => src,
+            None => {
+                return Err(eyre!(
+                    "Dependency {dep_name}'s source was \
+                parsed as None by cargo-edit."
+                ))
             }
+        };
+        debug!(
+            "Found dependency {dep_name} with current \
+            source {source:#?}"
+        );
+        if let cargo_edit::Source::Workspace(_) = &source {
+            error!(
+                "Cannot upgrade the version of \
+                    {dep_name} because it is set in the \
+                    workspace, please run `cargo pgrx \
+                    upgrade` in the workspace directory."
+            );
+        } else if get_dep_source_version(&source).is_some() {
+            replace_version(
+                target_version.as_str(),
+                path.as_path(),
+                &mut key,
+                dep,
+                parsed_dep,
+                source,
+            )?;
+        } else {
+            info!("No version specified for {dep_name}, not upgrading.");
         }
         Ok(())
     }
