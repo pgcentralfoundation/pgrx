@@ -153,24 +153,41 @@ impl Upgrade {
             "Found dependency {dep_name} with current \
             source {source:#?}"
         );
-        if let cargo_edit::Source::Workspace(_) = &source {
-            error!(
-                "Cannot upgrade the version of \
-                    {dep_name} because it is set in the \
-                    workspace, please run `cargo pgrx \
-                    upgrade` in the workspace directory."
-            );
-        } else if get_dep_source_version(&source).is_some() {
-            replace_version(
-                target_version.as_str(),
-                path.as_path(),
-                &mut key,
-                dep,
-                parsed_dep,
-                source,
-            )?;
-        } else {
-            info!("No version specified for {dep_name}, not upgrading.");
+        match &source {
+            cargo_edit::Source::Registry(_) => {
+                if get_dep_source_version(&source).is_some() {
+                    replace_version(
+                        target_version.as_str(),
+                        path.as_path(),
+                        &mut key,
+                        dep,
+                        parsed_dep,
+                        source,
+                    )?;
+                } else {
+                    info!("No version specified for {dep_name}, not upgrading.");
+                }
+            }
+            cargo_edit::Source::Path(_) => {
+                warn!(
+                    "Cannot upgrade the version of \
+                        {dep_name} because it is a path (local) dependency."
+                )
+            }
+            cargo_edit::Source::Git(_) => {
+                warn!(
+                    "Cannot upgrade the version of \
+                        {dep_name} because it is a git dependency."
+                )
+            }
+            cargo_edit::Source::Workspace(_) => {
+                warn!(
+                    "Cannot upgrade the version of \
+                        {dep_name} because it is set in the \
+                        workspace, please run `cargo pgrx \
+                        upgrade` in the workspace directory."
+                )
+            }
         }
         Ok(())
     }
