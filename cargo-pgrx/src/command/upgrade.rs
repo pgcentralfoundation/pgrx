@@ -27,71 +27,63 @@ pub(crate) struct Upgrade {
 
     /// Path to the manifest file (usually Cargo.toml). Defaults to
     /// "./Cargo.toml" in the working directory.
-    #[clap(long, short)]
-    pub(crate) path: Option<PathBuf>,
+    #[clap(long = "manifest-path", short)]
+    pub(crate) manifest_path: Option<PathBuf>,
 
     // Flag to permit pre-release builds
     #[clap(long, short)]
     pub(crate) allow_prerelease: bool,
 }
-trait DependencySource {
-    fn set_version<A: AsRef<str>>(&mut self, new_version: A);
-    fn get_version(&self) -> Option<&String>;
-}
-impl DependencySource for cargo_edit::Source {
-    fn set_version<A: AsRef<str>>(&mut self, new_version: A) {
-        match self {
-            cargo_edit::Source::Registry(reg) => reg.version = new_version.as_ref().to_string(),
-            cargo_edit::Source::Path(path) => path.version = Some(new_version.as_ref().to_string()),
-            cargo_edit::Source::Git(git) => git.version = Some(new_version.as_ref().to_string()),
-            cargo_edit::Source::Workspace(_ws) => {
-                error!(
-                    "Cannot upgrade the version of \
-                    a package because it is set in the \
-                    workspace, please run `cargo pgrx \
-                    upgrade` in the workspace directory."
-                );
-            }
-        }
-    }
-    fn get_version(&self) -> Option<&String> {
-        match self {
-            cargo_edit::Source::Registry(reg) => Some(&reg.version),
-            cargo_edit::Source::Path(path) => path.version.as_ref(),
-            cargo_edit::Source::Git(git) => git.version.as_ref(),
-            cargo_edit::Source::Workspace(_ws) => {
-                error!(
-                    "Cannot fetch the version of \
-                    a package because it is set in the \
-                    workspace, please run `cargo pgrx \
-                    upgrade` in the workspace directory."
-                );
-                None
-            }
+
+fn set_dep_source_version<A: AsRef<str>>(src: &mut cargo_edit::Source, new_version: A) {
+    match src {
+        cargo_edit::Source::Registry(reg) => reg.version = new_version.as_ref().to_string(),
+        cargo_edit::Source::Path(path) => path.version = Some(new_version.as_ref().to_string()),
+        cargo_edit::Source::Git(git) => git.version = Some(new_version.as_ref().to_string()),
+        cargo_edit::Source::Workspace(_ws) => {
+            error!(
+                "Cannot upgrade the version of \
+                a package because it is set in the \
+                workspace, please run `cargo pgrx \
+                upgrade` in the workspace directory."
+            );
         }
     }
 }
-fn replace_version<S>(
+fn get_dep_source_version(src: &cargo_edit::Source) -> Option<&String> {
+    match src {
+        cargo_edit::Source::Registry(reg) => Some(&reg.version),
+        cargo_edit::Source::Path(path) => path.version.as_ref(),
+        cargo_edit::Source::Git(git) => git.version.as_ref(),
+        cargo_edit::Source::Workspace(_ws) => {
+            error!(
+                "Cannot fetch the version of \
+                a package because it is set in the \
+                workspace, please run `cargo pgrx \
+                upgrade` in the workspace directory."
+            );
+            None
+        }
+    }
+}
+
+fn replace_version(
     new_version: &str,
     crate_root: &Path,
     key: &mut toml_edit::KeyMut,
     dep: &mut toml_edit::Item,
     mut parsed_dep: Dependency,
-    mut source: S,
-) -> eyre::Result<()>
-where
-    S: Clone + DependencySource,
-    cargo_edit::Source: From<S>,
-{
+    mut source: cargo_edit::Source,
+) -> eyre::Result<()> {
     let dep_name = key.get();
-    let ver_maybe = source.get_version();
+    let ver_maybe = get_dep_source_version(&source);
     match ver_maybe {
         Some(v) => {
             debug!("{dep_name} version is {v}")
         }
         None => return Err(eyre!("No version field for {dep_name}, cannot upgrade.")),
     }
-    source.set_version(new_version);
+    set_dep_source_version(&mut source, &new_version);
     parsed_dep = parsed_dep.set_source(source);
 
     parsed_dep.update_toml(crate_root, key, dep);
@@ -158,7 +150,7 @@ impl Upgrade {
                         workspace, please run `cargo pgrx \
                         upgrade` in the workspace directory."
                 );
-            } else if source.get_version().is_some() {
+            } else if get_dep_source_version(&source).is_some() {
                 replace_version(
                     target_version.as_str(),
                     path.as_path(),
@@ -180,8 +172,9 @@ impl CommandExecute for Upgrade {
     fn execute(self) -> eyre::Result<()> {
         const RELEVANT_PACKAGES: [&str; 3] = ["pgrx", "pgrx-macros", "pgrx-tests"];
         // Canonicalize because cargo-edit does not accept relative paths.
-        let path =
-            std::fs::canonicalize(self.path.clone().unwrap_or(PathBuf::from("./Cargo.toml")))?;
+        let path = std::fs::canonicalize(
+            self.manifest_path.clone().unwrap_or(PathBuf::from("./Cargo.toml")),
+        )?;
 
         let mut manifest = cargo_edit::LocalManifest::find(Some(&path))
             .map_err(|e| eyre!("Error opening manifest: {e}"))?;
