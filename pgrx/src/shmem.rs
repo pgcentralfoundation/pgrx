@@ -7,6 +7,7 @@
 //LICENSE All rights reserved.
 //LICENSE
 //LICENSE Use of this source code is governed by the MIT license that can be found in the LICENSE file.
+#![deny(unsafe_op_in_unsafe_fn)]
 use crate::lwlock::*;
 use crate::{pg_sys, PgAtomic};
 use std::hash::Hash;
@@ -65,8 +66,8 @@ macro_rules! pg_shmem_init {
                     if let Some(i) = PREV_SHMEM_STARTUP_HOOK {
                         i();
                     }
+                    $thing.shmem_init();
                 }
-                $thing.shmem_init();
             }
         }
     };
@@ -87,8 +88,8 @@ macro_rules! pg_shmem_init {
                     if let Some(i) = PREV_SHMEM_REQUEST_HOOK {
                         i();
                     }
+                    $thing.pg_init();
                 }
-                $thing.pg_init();
             }
         }
 
@@ -103,8 +104,8 @@ macro_rules! pg_shmem_init {
                     if let Some(i) = PREV_SHMEM_STARTUP_HOOK {
                         i();
                     }
+                    $thing.shmem_init();
                 }
-                $thing.shmem_init();
             }
         }
     };
@@ -118,7 +119,8 @@ pub trait PgSharedMemoryInitialization {
 
     /// Automatically called by the `pg_shmem_init!()` macro, when Postgres is initializing its
     /// shared memory system
-    fn shmem_init(&'static self);
+    /// SAFETY: Must only be called from inside the Postgres shared memory init hook
+    unsafe fn shmem_init(&'static self);
 }
 
 impl<T> PgSharedMemoryInitialization for PgLwLock<T>
@@ -129,8 +131,11 @@ where
         PgSharedMem::pg_init_locked(self);
     }
 
-    fn shmem_init(&'static self) {
-        PgSharedMem::shmem_init_locked(self);
+    /// SAFETY: Must only be called from inside the Postgres shared memory init hook
+    unsafe fn shmem_init(&'static self) {
+        unsafe {
+            PgSharedMem::shmem_init_locked(self);
+        }
     }
 }
 
@@ -142,8 +147,11 @@ where
         PgSharedMem::pg_init_atomic(self);
     }
 
-    fn shmem_init(&'static self) {
-        PgSharedMem::shmem_init_atomic(self);
+    /// SAFETY: Must only be called from inside the Postgres shared memory init hook
+    unsafe fn shmem_init(&'static self) {
+        unsafe {
+            PgSharedMem::shmem_init_atomic(self);
+        }
     }
 }
 
@@ -168,7 +176,8 @@ impl PgSharedMem {
     }
 
     /// Must be run from the shared memory init hook, use for types which are guarded by a `LWLock`
-    pub fn shmem_init_locked<T: Default + PGRXSharedMemory>(lock: &PgLwLock<T>) {
+    /// SAFETY: Must only be called from inside the Postgres shared memory init hook
+    pub unsafe fn shmem_init_locked<T: Default + PGRXSharedMemory>(lock: &PgLwLock<T>) {
         let mut found = false;
         unsafe {
             let shm_name = alloc::ffi::CString::new(lock.get_name()).expect("CString::new failed");
@@ -188,7 +197,8 @@ impl PgSharedMem {
     }
 
     /// Must be run from the shared memory init hook, use for rust atomics behind `PgAtomic`
-    pub fn shmem_init_atomic<T: atomic_traits::Atomic + Default>(atomic: &PgAtomic<T>) {
+    /// SAFETY: Must only be called from inside the Postgres shared memory init hook
+    pub unsafe fn shmem_init_atomic<T: atomic_traits::Atomic + Default>(atomic: &PgAtomic<T>) {
         unsafe {
             let shm_name = alloc::ffi::CString::new(Uuid::new_v4().to_string())
                 .expect("CString::new() failed");
