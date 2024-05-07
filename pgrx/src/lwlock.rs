@@ -11,6 +11,7 @@
 use crate::pg_sys;
 use core::ops::{Deref, DerefMut};
 use once_cell::sync::OnceCell;
+use std::cell::UnsafeCell;
 use std::fmt;
 use uuid::Uuid;
 
@@ -32,7 +33,7 @@ use uuid::Uuid;
 /// This lock can not be poisoned from Rust. Panic and Abort are handled by
 /// PostgreSQL cleanly.
 pub struct PgLwLock<T> {
-    inner: OnceCell<PgLwLockInner<T>>,
+    inner: UnsafeCell<PgLwLockInner<T>>,
     name: OnceCell<&'static str>,
 }
 
@@ -43,14 +44,13 @@ impl<T> PgLwLock<T> {
     /// Create an empty lock which can be created as a global with None as a
     /// sentinel value
     pub const fn new() -> Self {
-        PgLwLock { inner: OnceCell::new(), name: OnceCell::new() }
+        PgLwLock { inner: UnsafeCell::new(PgLwLockInner::empty()), name: OnceCell::new() }
     }
 
     /// Create a new lock for T by attaching a LWLock, which is looked up by name
     pub fn from_named(input_name: &'static str, value: *mut T) -> Self {
-        let inner = OnceCell::new();
         let name = OnceCell::new();
-        inner.set(PgLwLockInner::<T>::new(input_name, value)).unwrap();
+        let inner = UnsafeCell::new(PgLwLockInner::<T>::new(input_name, value));
         name.set(input_name).unwrap();
         PgLwLock { inner, name }
     }
@@ -69,19 +69,18 @@ impl<T> PgLwLock<T> {
 
     /// Obtain a shared lock (which comes with `&T` access)
     pub fn share(&self) -> PgLwLockShareGuard<T> {
-        self.inner.get().expect("Can't give out share, lock is in an empty state").share()
+        unsafe { self.inner.get().as_ref().unwrap().share() }
     }
 
     /// Obtain an exclusive lock (which comes with `&mut T` access)
     pub fn exclusive(&self) -> PgLwLockExclusiveGuard<T> {
-        self.inner.get().expect("Can't give out exclusive, lock is in an empty state").exclusive()
+        unsafe { self.inner.get().as_ref().unwrap().exclusive() }
     }
 
     /// Attach an empty PgLwLock lock to a LWLock, and wrap T
-    pub fn attach(&self, value: *mut T) {
-        self.inner
-            .set(PgLwLockInner::<T>::new(self.get_name(), value))
-            .expect("Can't attach, lock is not in an empty state");
+    /// SAFETY: Must only be called from inside the Postgres shared memory init hook
+    pub unsafe fn attach(&self, value: *mut T) {
+        *self.inner.get() = PgLwLockInner::<T>::new(self.get_name(), value);
     }
 }
 
@@ -107,7 +106,14 @@ impl<'a, T> PgLwLockInner<T> {
         }
     }
 
+    const fn empty() -> Self {
+        PgLwLockInner { lock_ptr: std::ptr::null_mut(), data: std::ptr::null_mut() }
+    }
+
     fn share(&self) -> PgLwLockShareGuard<T> {
+        if self.lock_ptr.is_null() {
+            panic!("PgLwLock is not initialized");
+        }
         unsafe {
             pg_sys::LWLockAcquire(self.lock_ptr, pg_sys::LWLockMode_LW_SHARED);
 
@@ -116,6 +122,9 @@ impl<'a, T> PgLwLockInner<T> {
     }
 
     fn exclusive(&self) -> PgLwLockExclusiveGuard<T> {
+        if self.lock_ptr.is_null() {
+            panic!("PgLwLock is not initialized");
+        }
         unsafe {
             pg_sys::LWLockAcquire(self.lock_ptr, pg_sys::LWLockMode_LW_EXCLUSIVE);
 

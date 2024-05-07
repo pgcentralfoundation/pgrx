@@ -7,15 +7,16 @@
 //LICENSE All rights reserved.
 //LICENSE
 //LICENSE Use of this source code is governed by the MIT license that can be found in the LICENSE file.
-use once_cell::sync::OnceCell;
+#![deny(unsafe_op_in_unsafe_fn)]
+use std::cell::UnsafeCell;
 
 pub struct PgAtomic<T> {
-    inner: OnceCell<*mut T>,
+    inner: UnsafeCell<*mut T>,
 }
 
 impl<T> PgAtomic<T> {
     pub const fn new() -> Self {
-        Self { inner: OnceCell::new() }
+        Self { inner: UnsafeCell::new(std::ptr::null_mut()) }
     }
 }
 
@@ -23,14 +24,15 @@ impl<T> PgAtomic<T>
 where
     T: atomic_traits::Atomic + Default,
 {
-    pub fn attach(&self, value: *mut T) {
-        self.inner.set(value).expect("This PgAtomic is not empty, can't re-attach");
+    /// SAFETY: Must only be called from inside the Postgres shared memory init hook
+    pub unsafe fn attach(&self, value: *mut T) {
+        unsafe {
+            *self.inner.get() = value;
+        }
     }
 
     pub fn get(&self) -> &T {
-        unsafe {
-            self.inner.get().expect("This PgAtomic as not been initialized").as_ref().unwrap()
-        }
+        unsafe { (*self.inner.get()).as_ref().expect("PgAtomic was not initialized") }
     }
 }
 
