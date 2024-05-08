@@ -139,6 +139,9 @@ pub enum Ret<T: BoxRet> {
 // struct ValuePerCall?
 // struct MaterializeTable?
 
+fn wrapper_fn(fcinfo: pg_sys::FunctionCallInfo) -> pg_sys::Datum {
+    unsafe { pg_return_null(fcinfo) }
+}
 impl<'a, T: IntoDatum> SetOfIterator<'a, T> {
     #[doc(hidden)]
     pub unsafe fn srf_next(
