@@ -51,7 +51,7 @@ pub trait UnboxArg {
 /// It is strictly a mistake to use IntoDatum or any derived traits for this bound!
 /// PGRX allows complex return values which are nonsensical outside of function boundaries,
 /// e.g. for implementing the value-per-call convention for set-returning functions.
-pub trait BoxRet {
+pub trait BoxRet: Sized {
     /// The actual type returned from the call
     type CallRet: Sized;
 
@@ -89,9 +89,11 @@ pub trait BoxRet {
     }
 
     /// for multi-call types, how to restore them from the multi-call context, for all others: panic
-    unsafe fn restore_from_context<'a>(fcinfo: pg_sys::FunctionCallInfo) -> &'a mut Self {
+    unsafe fn ret_from_context(fcinfo: pg_sys::FunctionCallInfo) -> Ret<Self> {
         unimplemented!()
     }
+
+    fn finish_call(_fcinfo: pg_sys::FunctionCallInfo) {}
 }
 
 pub enum CallCx {
@@ -128,6 +130,11 @@ impl<'a, T> BoxRet for SetOfIterator<'a, T> {
             Ret::Many(iter, ret)
         }
     }
+
+    fn finish_call(fcinfo: pg_sys::FunctionCallInfo) {
+        let fcx = deref_fcx(fcinfo);
+        unsafe { srf_return_done(fcinfo, fcx) }
+    }
 }
 
 pub enum Ret<T: BoxRet> {
@@ -136,12 +143,6 @@ pub enum Ret<T: BoxRet> {
     Many(T, T::CallRet),
 }
 
-// struct ValuePerCall?
-// struct MaterializeTable?
-
-fn wrapper_fn(fcinfo: pg_sys::FunctionCallInfo) -> pg_sys::Datum {
-    unsafe { pg_return_null(fcinfo) }
-}
 impl<'a, T: IntoDatum> SetOfIterator<'a, T> {
     #[doc(hidden)]
     pub unsafe fn srf_next(
@@ -189,6 +190,11 @@ impl<'a, T> BoxRet for TableIterator<'a, T> {
         } else {
             Ret::Many(iter, ret)
         }
+    }
+
+    fn finish_call(fcinfo: pg_sys::FunctionCallInfo) {
+        let fcx = deref_fcx(fcinfo);
+        unsafe { srf_return_done(fcinfo, fcx) }
     }
 }
 

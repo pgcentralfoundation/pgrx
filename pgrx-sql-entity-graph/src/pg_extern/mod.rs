@@ -490,13 +490,35 @@ impl PgExtern {
                 let setof_closure = quote! {
                     #[allow(unused_unsafe)]
                     unsafe {
-                        // SAFETY: the caller has asserted that `fcinfo` is a valid FunctionCallInfo pointer, allocated by Postgres
-                        // with all its fields properly setup.  Unless the user is calling this wrapper function directly, this
-                        // will always be the case
-                        ::pgrx::iter::SetOfIterator::srf_next(#fcinfo_ident, || {
-                            #( #arg_fetches )*
-                            #result_handler
-                        })
+                        let fcinfo = #fcinfo_ident;
+                        let result = match ::pgrx::callconv::BoxRet::prepare_call(fcinfo) {
+                            ::pgrx::callconv::CallCx::WrappedFn(mcx) => {
+                                let args = ();
+                                let mcx = ::pgrx::PgMemoryContexts::For(mcx);
+                                let call_result = mcx.switch_to(|_| wrapped_fn( #(#arg_fetches)* ) );
+                                ::pgrx::callconv::BoxRet::into_ret(call_result)
+                            }
+                            ::pgrx::callconv::CallCx::RestoreCx => ::pgrx::callconv::BoxRet::ret_from_context(fcinfo),
+                        };
+                        match result {
+                            // Single-call fn or value-per-call iteration
+                            ::pgrx::callconv::Ret::Once(ret) => ::pgrx::callconv::BoxRet::box_return(fcinfo, ret),
+                            // Value-per-call first-time
+                            ::pgrx::callconv::Ret::Many(iter, ret) => {
+                                let fcx = deref_fcx(fcinfo);
+                                unsafe {
+                                    let ptr = srf_memcx(fcx).leak_and_drop_on_delete(iter);
+                                    // it's the first call so we need to finish setting up fcx
+                                    (*fcx).user_fctx = ptr.cast();
+                                }
+                                ::pgrx::callconv::BoxRet::box_return(fcinfo, ret)
+                            }
+                            // Value-per-call last-time
+                            ::pgrx::callconv::Ret::Zero => {
+                                ::pgrx::callconv::BoxRet::finish_call(fcinfo);
+                                ::pgrx::pg_return_null(fcinfo)
+                            }
+                        }
                     }
                 };
                 finfo_v1_extern_c(&self.func, fcinfo_ident, setof_closure)
