@@ -84,9 +84,7 @@ pub trait BoxRet: Sized {
     */
 
     /// box the return value
-    fn box_return(fcinfo: pg_sys::FunctionCallInfo, ret: Self::CallRet) -> pg_sys::Datum {
-        todo!()
-    }
+    fn box_return(fcinfo: pg_sys::FunctionCallInfo, ret: Self::CallRet) -> pg_sys::Datum;
 
     /// for multi-call types, how to restore them from the multi-call context, for all others: panic
     unsafe fn ret_from_context(fcinfo: pg_sys::FunctionCallInfo) -> Ret<Self> {
@@ -94,6 +92,31 @@ pub trait BoxRet: Sized {
     }
 
     fn finish_call(_fcinfo: pg_sys::FunctionCallInfo) {}
+}
+
+pub unsafe fn handle_ret<T: BoxRet>(
+    fcinfo: pg_sys::FunctionCallInfo,
+    ret: Ret<T>,
+) -> pg_sys::Datum {
+    match ret {
+        // Single-call fn or value-per-call iteration
+        Ret::Once(value) => <T as BoxRet>::box_return(fcinfo, value),
+        // Value-per-call first-time
+        Ret::Many(iter, value) => {
+            let fcx = deref_fcx(fcinfo);
+            unsafe {
+                let ptr = srf_memcx(fcx).leak_and_drop_on_delete(iter);
+                // it's the first call so we need to finish setting up fcx
+                (*fcx).user_fctx = ptr.cast();
+            }
+            <T as BoxRet>::box_return(fcinfo, value)
+        }
+        // Value-per-call last-time
+        Ret::Zero => {
+            <T as BoxRet>::finish_call(fcinfo);
+            unsafe { pg_return_null(fcinfo) }
+        }
+    }
 }
 
 pub enum CallCx {
@@ -112,7 +135,10 @@ fn prepare_value_per_call_srf(fcinfo: pg_sys::FunctionCallInfo) -> CallCx {
     }
 }
 
-impl<'a, T> BoxRet for SetOfIterator<'a, T> {
+impl<'a, T> BoxRet for SetOfIterator<'a, T>
+where
+    T: BoxRet<CallRet = T> + IntoDatum,
+{
     type CallRet = Option<<Self as Iterator>::Item>;
     fn prepare_call(fcinfo: pg_sys::FunctionCallInfo) -> CallCx {
         prepare_value_per_call_srf(fcinfo)
@@ -129,6 +155,10 @@ impl<'a, T> BoxRet for SetOfIterator<'a, T> {
         } else {
             Ret::Many(iter, ret)
         }
+    }
+
+    fn box_return(fcinfo: pg_sys::FunctionCallInfo, ret: Self::CallRet) -> pg_sys::Datum {
+        <Self::CallRet as BoxRet>::box_return(fcinfo, ret)
     }
 
     fn finish_call(fcinfo: pg_sys::FunctionCallInfo) {
@@ -172,7 +202,10 @@ impl<'a, T: IntoDatum> SetOfIterator<'a, T> {
     }
 }
 
-impl<'a, T> BoxRet for TableIterator<'a, T> {
+impl<'a, T> BoxRet for TableIterator<'a, T>
+where
+    T: BoxRet<CallRet = T> + IntoDatum,
+{
     type CallRet = Option<<Self as Iterator>::Item>;
 
     fn prepare_call(fcinfo: pg_sys::FunctionCallInfo) -> CallCx {
@@ -190,6 +223,10 @@ impl<'a, T> BoxRet for TableIterator<'a, T> {
         } else {
             Ret::Many(iter, ret)
         }
+    }
+
+    fn box_return(fcinfo: pg_sys::FunctionCallInfo, ret: Self::CallRet) -> pg_sys::Datum {
+        <Self::CallRet as BoxRet>::box_return(fcinfo, ret)
     }
 
     fn finish_call(fcinfo: pg_sys::FunctionCallInfo) {
@@ -283,6 +320,23 @@ fn finish_srf_init<T>(
                 (*fcx).user_fctx = ptr.cast();
             }
             ControlFlow::Continue(())
+        }
+    }
+}
+
+impl<T: IntoDatum> BoxRet for T {
+    type CallRet = T;
+    unsafe fn into_ret(self) -> Ret<Self>
+    where
+        Self: Sized,
+    {
+        Ret::Once(self)
+    }
+
+    fn box_return(fcinfo: pg_sys::FunctionCallInfo, ret: T) -> pg_sys::Datum {
+        match IntoDatum::into_datum(ret) {
+            None => unsafe { pg_return_null(fcinfo) },
+            Some(datum) => datum,
         }
     }
 }

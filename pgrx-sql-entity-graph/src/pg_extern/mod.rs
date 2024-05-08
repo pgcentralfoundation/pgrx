@@ -485,40 +485,25 @@ impl PgExtern {
                 finfo_v1_extern_c(&self.func, fcinfo_ident, fn_contents)
             }
             Returning::SetOf { ty: _retval_ty, is_option, is_result } => {
-                let result_handler =
-                    emit_result_handler(self.func.sig.span(), *is_option, *is_result);
-                let setof_closure = quote! {
+                let ret_ty = &_retval_ty.resolved_ty;
+                let setof_closure = quote_spanned! { self.func.block.span() =>
                     #[allow(unused_unsafe)]
                     unsafe {
                         let fcinfo = #fcinfo_ident;
-                        let result = match ::pgrx::callconv::BoxRet::prepare_call(fcinfo) {
+                        type SetIter<'a> = ::pgrx::iter::SetOfIterator<'a, #ret_ty>;
+                        type RetIter<'a> = ::pgrx::callconv::Ret<::pgrx::iter::SetOfIterator<'a, #ret_ty>>;
+                        let result: RetIter<'_> = match <SetIter<'_> as ::pgrx::callconv::BoxRet>::prepare_call(fcinfo) {
                             ::pgrx::callconv::CallCx::WrappedFn(mcx) => {
-                                let args = ();
-                                let mcx = ::pgrx::PgMemoryContexts::For(mcx);
-                                let call_result = mcx.switch_to(|_| wrapped_fn( #(#arg_fetches)* ) );
-                                ::pgrx::callconv::BoxRet::into_ret(call_result)
+                                let mut mcx = ::pgrx::PgMemoryContexts::For(mcx);
+                                let call_result: SetIter<'_> = mcx.switch_to(|_| {
+                                    #(#arg_fetches)*
+                                    #func_name( #(#arg_pats),* )
+                                });
+                                <SetIter<'_> as ::pgrx::callconv::BoxRet>::into_ret(call_result)
                             }
-                            ::pgrx::callconv::CallCx::RestoreCx => ::pgrx::callconv::BoxRet::ret_from_context(fcinfo),
+                            ::pgrx::callconv::CallCx::RestoreCx => <SetIter<'_> as ::pgrx::callconv::BoxRet>::ret_from_context(fcinfo),
                         };
-                        match result {
-                            // Single-call fn or value-per-call iteration
-                            ::pgrx::callconv::Ret::Once(ret) => ::pgrx::callconv::BoxRet::box_return(fcinfo, ret),
-                            // Value-per-call first-time
-                            ::pgrx::callconv::Ret::Many(iter, ret) => {
-                                let fcx = deref_fcx(fcinfo);
-                                unsafe {
-                                    let ptr = srf_memcx(fcx).leak_and_drop_on_delete(iter);
-                                    // it's the first call so we need to finish setting up fcx
-                                    (*fcx).user_fctx = ptr.cast();
-                                }
-                                ::pgrx::callconv::BoxRet::box_return(fcinfo, ret)
-                            }
-                            // Value-per-call last-time
-                            ::pgrx::callconv::Ret::Zero => {
-                                ::pgrx::callconv::BoxRet::finish_call(fcinfo);
-                                ::pgrx::pg_return_null(fcinfo)
-                            }
-                        }
+                        unsafe { ::pgrx::callconv::handle_ret(fcinfo, result) }
                     }
                 };
                 finfo_v1_extern_c(&self.func, fcinfo_ident, setof_closure)
