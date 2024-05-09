@@ -500,8 +500,29 @@ macro_rules! impl_boxret_via_intodatum {
     }
 }
 
+impl<'a> BoxRet for &'a str {
+    type CallRet = Self;
+    fn into_ret(self) -> Ret<Self>
+    where
+        Self: Sized,
+    {
+        Ret::Once(self)
+    }
+
+    fn box_return(fcinfo: pg_sys::FunctionCallInfo, ret: Ret<Self>) -> pg_sys::Datum {
+        match ret {
+            Ret::Zero => unsafe { pg_return_null(fcinfo) },
+            Ret::Once(value) => match value.into_datum() {
+                None => unsafe { pg_return_null(fcinfo) },
+                Some(datum) => datum,
+            },
+            Ret::Many(_, _) => unreachable!(),
+        }
+    }
+}
+
 impl_boxret_via_intodatum! {
-    &str, String
+String
 }
 
 impl<T> BoxRet for Vec<Option<T>>
