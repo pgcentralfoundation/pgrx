@@ -409,6 +409,39 @@ where
     }
 }
 
+impl<T, E> BoxRet for Result<T, E>
+where
+    T: BoxRet,
+    T::CallRet: BoxRet,
+    E: core::any::Any + core::fmt::Display,
+{
+    type CallRet = T::CallRet;
+    fn into_ret(self) -> Ret<Self>
+    where
+        Self: Sized,
+    {
+        match self {
+            Ok(value) => match T::into_ret(value) {
+                Ret::Zero => Ret::Zero,
+                Ret::Once(value) => Ret::Once(value),
+                Ret::Many(iter, value) => Ret::Many(Ok(iter), value),
+            },
+            Err(error) => Ret::Zero,
+        }
+    }
+
+    fn box_return(fcinfo: pg_sys::FunctionCallInfo, ret: Ret<Self>) -> pg_sys::Datum {
+        match ret {
+            Ret::Zero => unsafe { pg_return_null(fcinfo) },
+            Ret::Once(value) => T::CallRet::box_return(fcinfo, value.into_ret()),
+            Ret::Many(iter, value) => {
+                let iter = pg_sys::panic::ErrorReportable::unwrap_or_report(iter);
+                BoxRet::box_return(fcinfo, Ret::Many(iter, value))
+            }
+        }
+    }
+}
+
 macro_rules! impl_boxret_for_primitives {
     ($($scalar:ty),*) => {
         $(
