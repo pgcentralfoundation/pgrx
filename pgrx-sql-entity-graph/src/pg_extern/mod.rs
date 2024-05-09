@@ -485,24 +485,23 @@ impl PgExtern {
                 finfo_v1_extern_c(&self.func, fcinfo_ident, fn_contents)
             }
             Returning::SetOf { ty: _retval_ty, is_option, is_result } => {
-                let ret_ty = &_retval_ty.resolved_ty;
+                let syn::ReturnType::Type(_, ret_ty) = &self.func.sig.output else {
+                    unreachable!()
+                };
                 let setof_closure = quote_spanned! { self.func.block.span() =>
                     #[allow(unused_unsafe)]
                     unsafe {
-                        use ::pgrx::callconv::BoxRet;
                         let fcinfo = #fcinfo_ident;
-                        type SetIter<'a> = ::pgrx::iter::SetOfIterator<'a, #ret_ty>;
-                        type RetIter<'a, T> = ::pgrx::callconv::Ret<::pgrx::iter::SetOfIterator<'a, T>>;
-                        let result: RetIter<'_, _> = match <SetIter<'_> as ::pgrx::callconv::BoxRet>::prepare_call(fcinfo) {
+                        let result: ::pgrx::callconv::Ret<#ret_ty> = match <#ret_ty as ::pgrx::callconv::BoxRet>::prepare_call(fcinfo) {
                             ::pgrx::callconv::CallCx::WrappedFn(mcx) => {
                                 let mut mcx = ::pgrx::PgMemoryContexts::For(mcx);
-                                let call_result: SetIter<'_> = mcx.switch_to(|_| {
+                                let call_result: #ret_ty = mcx.switch_to(|_| {
                                     #(#arg_fetches)*
                                     #func_name( #(#arg_pats),* )
                                 });
-                                call_result.into_ret()
+                                ::pgrx::callconv::BoxRet::into_ret(call_result)
                             }
-                            ::pgrx::callconv::CallCx::RestoreCx => <SetIter<'_> as ::pgrx::callconv::BoxRet>::ret_from_context(fcinfo),
+                            ::pgrx::callconv::CallCx::RestoreCx => ::pgrx::callconv::BoxRet::ret_from_context(fcinfo),
                         };
                         unsafe { ::pgrx::callconv::BoxRet::box_return(fcinfo, result) }
                     }
