@@ -489,21 +489,22 @@ impl PgExtern {
                 let setof_closure = quote_spanned! { self.func.block.span() =>
                     #[allow(unused_unsafe)]
                     unsafe {
+                        use ::pgrx::callconv::BoxRet;
                         let fcinfo = #fcinfo_ident;
                         type SetIter<'a> = ::pgrx::iter::SetOfIterator<'a, #ret_ty>;
-                        type RetIter<'a> = ::pgrx::callconv::Ret<::pgrx::iter::SetOfIterator<'a, #ret_ty>>;
-                        let result: RetIter<'_> = match <SetIter<'_> as ::pgrx::callconv::BoxRet>::prepare_call(fcinfo) {
+                        type RetIter<'a, T> = ::pgrx::callconv::Ret<::pgrx::iter::SetOfIterator<'a, T>>;
+                        let result: RetIter<'_, _> = match <SetIter<'_> as ::pgrx::callconv::BoxRet>::prepare_call(fcinfo) {
                             ::pgrx::callconv::CallCx::WrappedFn(mcx) => {
                                 let mut mcx = ::pgrx::PgMemoryContexts::For(mcx);
                                 let call_result: SetIter<'_> = mcx.switch_to(|_| {
                                     #(#arg_fetches)*
                                     #func_name( #(#arg_pats),* )
                                 });
-                                <SetIter<'_> as ::pgrx::callconv::BoxRet>::into_ret(call_result)
+                                call_result.into_ret()
                             }
                             ::pgrx::callconv::CallCx::RestoreCx => <SetIter<'_> as ::pgrx::callconv::BoxRet>::ret_from_context(fcinfo),
                         };
-                        unsafe { ::pgrx::callconv::handle_ret(fcinfo, result) }
+                        unsafe { ::pgrx::callconv::BoxRet::box_return(fcinfo, result) }
                     }
                 };
                 finfo_v1_extern_c(&self.func, fcinfo_ident, setof_closure)

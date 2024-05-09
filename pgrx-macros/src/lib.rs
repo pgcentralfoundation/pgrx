@@ -808,6 +808,25 @@ fn impl_postgres_type(ast: DeriveInput) -> syn::Result<proc_macro2::TokenStream>
                     }
                 }
 
+                impl #generics ::pgrx::callconv::BoxRet for #name #generics {
+                    type CallRet = Self;
+                    fn into_ret(self) -> ::pgrx::callconv::Ret<Self> {
+                        ::pgrx::callconv::Ret::Once(self)
+                    }
+                    fn box_return(fcinfo: ::pgrx::pg_sys::FunctionCallInfo, ret: ::pgrx::callconv::Ret<Self>) -> ::pgrx::pg_sys::Datum {
+                        unsafe {
+                            match ret {
+                                ::pgrx::callconv::Ret::Zero => ::pgrx::fcinfo::pg_return_null(fcinfo),
+                                ::pgrx::callconv::Ret::Once(value) => match ::pgrx::datum::IntoDatum::into_datum(value) {
+                                    None => ::pgrx::fcinfo::pg_return_null(fcinfo),
+                                    Some(datum) => datum,
+                                }
+                                _ => unreachable!()
+                            }
+                        }
+                    }
+                }
+
                 impl #generics ::pgrx::datum::FromDatum for #name #generics {
                     unsafe fn from_polymorphic_datum(
                         datum: ::pgrx::pg_sys::Datum,
