@@ -13,6 +13,7 @@
 use std::marker::PhantomData;
 use std::mem::{self, ManuallyDrop};
 
+use crate::heap_tuple::PgHeapTuple;
 use crate::iter::{SetOfIterator, TableIterator};
 use crate::{
     nonstatic_typeid, pg_return_null, pg_sys, srf_first_call_init, srf_is_first_call,
@@ -506,33 +507,19 @@ impl BoxRet for f64 {
     }
 }
 
-macro_rules! impl_boxret_via_intodatum {
-    ($($boxable:ty),*) => {
-        $(
-        impl BoxRet for $boxable {
-            type CallRet = Self;
-            fn into_ret(self) -> Ret<Self>
-            where
-                Self: Sized,
-            {
-                Ret::Once(self)
-            }
-
-            fn box_return(fcinfo: pg_sys::FunctionCallInfo, ret: Ret<Self>) -> pg_sys::Datum {
-                match ret {
-                    Ret::Zero => unsafe { pg_return_null(fcinfo) },
-                    Ret::Once(value) => match value.into_datum() {
-                        None => unsafe { pg_return_null(fcinfo) },
-                        Some(datum) => datum,
-                    }
-                    Ret::Many(_, _) => unreachable!()
-                }
-            }
-        }
-        )*
+fn boxret_via_into_datum<T: BoxRet<CallRet: IntoDatum>>(
+    fcinfo: pg_sys::FunctionCallInfo,
+    ret: Ret<T>,
+) -> pg_sys::Datum {
+    match ret {
+        Ret::Zero => unsafe { pg_return_null(fcinfo) },
+        Ret::Once(value) => match value.into_datum() {
+            None => unsafe { pg_return_null(fcinfo) },
+            Some(datum) => datum,
+        },
+        Ret::Many(_, _) => unreachable!(),
     }
 }
-
 impl<'a> BoxRet for &'a str {
     type CallRet = Self;
     fn into_ret(self) -> Ret<Self>
@@ -543,19 +530,39 @@ impl<'a> BoxRet for &'a str {
     }
 
     fn box_return(fcinfo: pg_sys::FunctionCallInfo, ret: Ret<Self>) -> pg_sys::Datum {
-        match ret {
-            Ret::Zero => unsafe { pg_return_null(fcinfo) },
-            Ret::Once(value) => match value.into_datum() {
-                None => unsafe { pg_return_null(fcinfo) },
-                Some(datum) => datum,
-            },
-            Ret::Many(_, _) => unreachable!(),
-        }
+        boxret_via_into_datum(fcinfo, ret)
     }
 }
 
-impl_boxret_via_intodatum! {
-String
+impl BoxRet for String {
+    type CallRet = Self;
+    fn into_ret(self) -> Ret<Self>
+    where
+        Self: Sized,
+    {
+        Ret::Once(self)
+    }
+
+    fn box_return(fcinfo: pg_sys::FunctionCallInfo, ret: Ret<Self>) -> pg_sys::Datum {
+        boxret_via_into_datum(fcinfo, ret)
+    }
+}
+
+impl<'mcx, T> BoxRet for PgHeapTuple<'mcx, T>
+where
+    T: crate::WhoAllocated,
+{
+    type CallRet = Self;
+    fn into_ret(self) -> Ret<Self>
+    where
+        Self: Sized,
+    {
+        Ret::Once(self)
+    }
+
+    fn box_return(fcinfo: pg_sys::FunctionCallInfo, ret: Ret<Self>) -> pg_sys::Datum {
+        boxret_via_into_datum(fcinfo, ret)
+    }
 }
 
 impl<T> BoxRet for Vec<Option<T>>
