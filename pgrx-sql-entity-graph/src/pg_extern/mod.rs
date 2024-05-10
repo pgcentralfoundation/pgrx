@@ -430,7 +430,7 @@ impl PgExtern {
                     syn::ReturnType::Default => syn::parse_quote! { () },
                     syn::ReturnType::Type(_, ret_ty) => ret_ty.clone(),
                 };
-                let setof_closure = quote_spanned! { self.func.block.span() =>
+                let wrapper_code = quote_spanned! { self.func.block.span() =>
                     #[allow(unused_unsafe)]
                     unsafe {
                         let fcinfo = #fcinfo_ident;
@@ -448,7 +448,7 @@ impl PgExtern {
                         unsafe { ::pgrx::callconv::BoxRet::box_return(fcinfo, result) }
                     }
                 };
-                finfo_v1_extern_c(&self.func, fcinfo_ident, setof_closure)
+                finfo_v1_extern_c(&self.func, fcinfo_ident, wrapper_code)
             }
             Returning::Iterated { tys: retval_tys, is_option, is_result } => {
                 let result_handler =
