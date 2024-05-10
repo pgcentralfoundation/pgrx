@@ -17,7 +17,6 @@
 #![allow(non_upper_case_globals)]
 #![allow(improper_ctypes)]
 #![allow(clippy::unneeded_field_pattern)]
-#![cfg_attr(nightly, feature(strict_provenance))]
 
 #[cfg(
     // no features at all will cause problems
