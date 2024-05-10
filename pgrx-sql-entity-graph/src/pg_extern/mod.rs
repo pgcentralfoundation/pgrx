@@ -435,56 +435,56 @@ impl PgExtern {
                 };
                 finfo_v1_extern_c(&self.func, fcinfo_ident, fn_contents)
             }
-            Returning::Type(retval_ty) => {
-                let result_ident = syn::Ident::new("result", self.func.sig.span());
-                let retval_transform = if retval_ty.resolved_ty == syn::parse_quote!(()) {
-                    quote_spanned! { self.func.sig.output.span() =>
-                       unsafe { ::pgrx::fcinfo::pg_return_void() }
-                    }
-                } else if retval_ty.result && retval_ty.optional.is_some() {
-                    // returning `Result<Option<T>>`
-                    quote_spanned! { self.func.sig.output.span() =>
-                        match ::pgrx::datum::IntoDatum::into_datum(#result_ident) {
-                            Some(datum) => datum,
-                            None => unsafe { ::pgrx::fcinfo::pg_return_null(#fcinfo_ident) },
-                        }
-                    }
-                } else if retval_ty.result {
-                    // returning Result<T>
-                    quote_spanned! { self.func.sig.output.span() =>
-                        ::pgrx::datum::IntoDatum::into_datum(#result_ident).unwrap_or_else(|| panic!("returned Datum was NULL"))
-                    }
-                } else if retval_ty.resolved_ty.last_ident_is("Datum") {
-                    // As before, we can just throw this in because it must typecheck
-                    quote_spanned! { self.func.sig.output.span() =>
-                       #result_ident
-                    }
-                } else if retval_ty.optional.is_some() {
-                    quote_spanned! { self.func.sig.output.span() =>
-                        match #result_ident {
-                            Some(result) => {
-                                ::pgrx::datum::IntoDatum::into_datum(result).unwrap_or_else(|| panic!("returned Option<T> was NULL"))
-                            },
-                            None => unsafe { ::pgrx::fcinfo::pg_return_null(#fcinfo_ident) }
-                        }
-                    }
-                } else {
-                    quote_spanned! { self.func.sig.output.span() =>
-                        ::pgrx::datum::IntoDatum::into_datum(#result_ident).unwrap_or_else(|| panic!("returned Datum was NULL"))
-                    }
-                };
+            // Returning::Type(retval_ty) => {
+            //     let result_ident = syn::Ident::new("result", self.func.sig.span());
+            //     let retval_transform = if retval_ty.resolved_ty == syn::parse_quote!(()) {
+            //         quote_spanned! { self.func.sig.output.span() =>
+            //            unsafe { ::pgrx::fcinfo::pg_return_void() }
+            //         }
+            //     } else if retval_ty.result && retval_ty.optional.is_some() {
+            //         // returning `Result<Option<T>>`
+            //         quote_spanned! { self.func.sig.output.span() =>
+            //             match ::pgrx::datum::IntoDatum::into_datum(#result_ident) {
+            //                 Some(datum) => datum,
+            //                 None => unsafe { ::pgrx::fcinfo::pg_return_null(#fcinfo_ident) },
+            //             }
+            //         }
+            //     } else if retval_ty.result {
+            //         // returning Result<T>
+            //         quote_spanned! { self.func.sig.output.span() =>
+            //             ::pgrx::datum::IntoDatum::into_datum(#result_ident).unwrap_or_else(|| panic!("returned Datum was NULL"))
+            //         }
+            //     } else if retval_ty.resolved_ty.last_ident_is("Datum") {
+            //         // As before, we can just throw this in because it must typecheck
+            //         quote_spanned! { self.func.sig.output.span() =>
+            //            #result_ident
+            //         }
+            //     } else if retval_ty.optional.is_some() {
+            //         quote_spanned! { self.func.sig.output.span() =>
+            //             match #result_ident {
+            //                 Some(result) => {
+            //                     ::pgrx::datum::IntoDatum::into_datum(result).unwrap_or_else(|| panic!("returned Option<T> was NULL"))
+            //                 },
+            //                 None => unsafe { ::pgrx::fcinfo::pg_return_null(#fcinfo_ident) }
+            //             }
+            //         }
+            //     } else {
+            //         quote_spanned! { self.func.sig.output.span() =>
+            //             ::pgrx::datum::IntoDatum::into_datum(#result_ident).unwrap_or_else(|| panic!("returned Datum was NULL"))
+            //         }
+            //     };
 
-                let fn_contents = quote! {
-                    #(#arg_fetches)*
+            //     let fn_contents = quote! {
+            //         #(#arg_fetches)*
 
-                    #[allow(unused_unsafe)] // unwrapped fn might be unsafe
-                    let #result_ident = unsafe { #func_name(#(#arg_pats),*) };
+            //         #[allow(unused_unsafe)] // unwrapped fn might be unsafe
+            //         let #result_ident = unsafe { #func_name(#(#arg_pats),*) };
 
-                    #retval_transform
-                };
-                finfo_v1_extern_c(&self.func, fcinfo_ident, fn_contents)
-            }
-            Returning::SetOf { ty: _retval_ty, .. } => {
+            //         #retval_transform
+            //     };
+            //     finfo_v1_extern_c(&self.func, fcinfo_ident, fn_contents)
+            // }
+            Returning::Type(_) | Returning::SetOf { .. } => {
                 let syn::ReturnType::Type(_, ret_ty) = &self.func.sig.output else {
                     unreachable!()
                 };

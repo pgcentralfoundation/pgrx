@@ -10,6 +10,7 @@
 #![doc(hidden)]
 #![allow(unused)]
 //! Helper implementations for returning sets and tables from `#[pg_extern]`-style functions
+use std::ffi::{CStr, CString};
 use std::marker::PhantomData;
 use std::mem::{self, ManuallyDrop};
 
@@ -17,7 +18,8 @@ use crate::heap_tuple::PgHeapTuple;
 use crate::iter::{SetOfIterator, TableIterator};
 use crate::{
     nonstatic_typeid, pg_return_null, pg_sys, srf_is_first_call, srf_return_done, srf_return_next,
-    IntoDatum, IntoHeapTuple, PgMemoryContexts,
+    AnyNumeric, Date, Inet, Internal, Interval, IntoDatum, IntoHeapTuple, Json, PgBox,
+    PgMemoryContexts, PgVarlena, Time, TimeWithTimeZone, Timestamp, TimestampWithTimeZone, Uuid,
 };
 use core::ops::ControlFlow;
 use core::ptr;
@@ -528,6 +530,20 @@ impl_boxret_for_primitives! {
     i8, i16, i32, i64, bool
 }
 
+impl BoxRet for () {
+    type CallRet = Self;
+    fn into_ret(self) -> Ret<Self>
+    where
+        Self: Sized,
+    {
+        Ret::Zero
+    }
+
+    fn box_return(fcinfo: pg_sys::FunctionCallInfo, ret: Ret<Self>) -> pg_sys::Datum {
+        pg_sys::Datum::from(0)
+    }
+}
+
 impl BoxRet for f32 {
     type CallRet = Self;
     fn into_ret(self) -> Ret<Self>
@@ -577,6 +593,21 @@ fn boxret_via_into_datum<T: BoxRet<CallRet: IntoDatum>>(
         Ret::Many(_, _) => unreachable!(),
     }
 }
+
+impl<'a> BoxRet for &'a [u8] {
+    type CallRet = Self;
+    fn into_ret(self) -> Ret<Self>
+    where
+        Self: Sized,
+    {
+        Ret::Once(self)
+    }
+
+    fn box_return(fcinfo: pg_sys::FunctionCallInfo, ret: Ret<Self>) -> pg_sys::Datum {
+        boxret_via_into_datum(fcinfo, ret)
+    }
+}
+
 impl<'a> BoxRet for &'a str {
     type CallRet = Self;
     fn into_ret(self) -> Ret<Self>
@@ -591,7 +622,7 @@ impl<'a> BoxRet for &'a str {
     }
 }
 
-impl BoxRet for String {
+impl<'a> BoxRet for &'a CStr {
     type CallRet = Self;
     fn into_ret(self) -> Ret<Self>
     where
@@ -605,9 +636,49 @@ impl BoxRet for String {
     }
 }
 
-impl<'mcx, T> BoxRet for PgHeapTuple<'mcx, T>
+macro_rules! impl_boxret_via_intodatum {
+    ($($boxable:ty),*) => {
+        $(
+        impl BoxRet for $boxable {
+            type CallRet = Self;
+            fn into_ret(self) -> Ret<Self>
+            where
+                Self: Sized,
+            {
+                Ret::Once(self)
+            }
+
+            fn box_return(fcinfo: pg_sys::FunctionCallInfo, ret: Ret<Self>) -> pg_sys::Datum {
+                boxret_via_into_datum(fcinfo, ret)
+            }
+        })*
+    };
+}
+
+impl_boxret_via_intodatum! {
+    String, CString, Json, Inet, Uuid, AnyNumeric, Vec<u8>,
+    Date, Interval, Time, TimeWithTimeZone, Timestamp, TimestampWithTimeZone,
+    pg_sys::Oid, pg_sys::BOX, pg_sys::Point, char,
+    Internal
+}
+
+impl<const P: u32, const S: u32> BoxRet for crate::Numeric<P, S> {
+    type CallRet = Self;
+    fn into_ret(self) -> Ret<Self>
+    where
+        Self: Sized,
+    {
+        Ret::Once(self)
+    }
+
+    fn box_return(fcinfo: pg_sys::FunctionCallInfo, ret: Ret<Self>) -> pg_sys::Datum {
+        boxret_via_into_datum(fcinfo, ret)
+    }
+}
+
+impl<T> BoxRet for crate::Range<T>
 where
-    T: crate::WhoAllocated,
+    T: IntoDatum + crate::RangeSubType,
 {
     type CallRet = Self;
     fn into_ret(self) -> Ret<Self>
@@ -622,7 +693,7 @@ where
     }
 }
 
-impl<T> BoxRet for Vec<Option<T>>
+impl<T> BoxRet for Vec<T>
 where
     T: IntoDatum,
 {
@@ -635,13 +706,54 @@ where
     }
 
     fn box_return(fcinfo: pg_sys::FunctionCallInfo, ret: Ret<Self>) -> pg_sys::Datum {
-        match ret {
-            Ret::Zero => unsafe { pg_return_null(fcinfo) },
-            Ret::Once(value) => match value.into_datum() {
-                None => unsafe { pg_return_null(fcinfo) },
-                Some(datum) => datum,
-            },
-            Ret::Many(_, _) => unreachable!(),
-        }
+        boxret_via_into_datum(fcinfo, ret)
+    }
+}
+
+impl<T: Copy> BoxRet for PgVarlena<T> {
+    type CallRet = Self;
+    fn into_ret(self) -> Ret<Self>
+    where
+        Self: Sized,
+    {
+        Ret::Once(self)
+    }
+
+    fn box_return(fcinfo: pg_sys::FunctionCallInfo, ret: Ret<Self>) -> pg_sys::Datum {
+        boxret_via_into_datum(fcinfo, ret)
+    }
+}
+
+impl<'mcx, A> BoxRet for PgHeapTuple<'mcx, A>
+where
+    A: crate::WhoAllocated,
+{
+    type CallRet = Self;
+    fn into_ret(self) -> Ret<Self>
+    where
+        Self: Sized,
+    {
+        Ret::Once(self)
+    }
+
+    fn box_return(fcinfo: pg_sys::FunctionCallInfo, ret: Ret<Self>) -> pg_sys::Datum {
+        boxret_via_into_datum(fcinfo, ret)
+    }
+}
+
+impl<T, A> BoxRet for PgBox<T, A>
+where
+    A: crate::WhoAllocated,
+{
+    type CallRet = Self;
+    fn into_ret(self) -> Ret<Self>
+    where
+        Self: Sized,
+    {
+        Ret::Once(self)
+    }
+
+    fn box_return(fcinfo: pg_sys::FunctionCallInfo, ret: Ret<Self>) -> pg_sys::Datum {
+        boxret_via_into_datum(fcinfo, ret)
     }
 }

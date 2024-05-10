@@ -7,6 +7,7 @@
 //LICENSE All rights reserved.
 //LICENSE
 //LICENSE Use of this source code is governed by the MIT license that can be found in the LICENSE file.
+use pgrx::callconv::{BoxRet, Ret};
 use pgrx::pg_sys::{Datum, Oid};
 use pgrx::pgrx_sql_entity_graph::metadata::{
     ArgumentError, Returns, ReturnsError, SqlMapping, SqlTranslatable,
@@ -90,6 +91,23 @@ impl IntoDatum for HexInt {
 
     fn type_oid() -> Oid {
         rust_regtypein::<Self>()
+    }
+}
+
+impl BoxRet for HexInt {
+    type CallRet = Self;
+    fn into_ret(self) -> Ret<Self>
+    where
+        Self: Sized,
+    {
+        Ret::Once(self)
+    }
+
+    fn box_return(fcinfo: pg_sys::FunctionCallInfo, ret: Ret<Self>) -> pg_sys::Datum {
+        match ret {
+            Ret::Once(inner) => Datum::from(inner.value),
+            _ => unreachable!(),
+        }
     }
 }
 

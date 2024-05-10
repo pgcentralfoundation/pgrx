@@ -704,6 +704,24 @@ fn impl_postgres_enum(ast: DeriveInput) -> syn::Result<proc_macro2::TokenStream>
             }
 
         }
+
+        impl ::pgrx::callconv::BoxRet for #enum_ident {
+            type CallRet = Self;
+            fn into_ret(self) -> ::pgrx::callconv::Ret<Self>
+            where
+                Self: Sized,
+            {
+                ::pgrx::callconv::Ret::Once(self)
+            }
+
+            fn box_return(fcinfo: ::pgrx::pg_sys::FunctionCallInfo, ret: ::pgrx::callconv::Ret<Self>) -> ::pgrx::pg_sys::Datum {
+                match ret {
+                    ::pgrx::callconv::Ret::Zero => unsafe { ::pgrx::pg_return_null(fcinfo) },
+                    ::pgrx::callconv::Ret::Once(value) => value.into_datum().unwrap(),
+                    ::pgrx::callconv::Ret::Many(iter, value) => unreachable!(),
+                }
+            }
+        }
     });
 
     let sql_graph_entity_item = PostgresEnum::from_derive_input(sql_graph_entity_ast)?;
