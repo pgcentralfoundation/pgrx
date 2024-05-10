@@ -183,6 +183,16 @@ where
         }
     }
 
+    unsafe fn ret_from_context(fcinfo: pg_sys::FunctionCallInfo) -> Ret<Self> {
+        let fcx = deref_fcx(fcinfo);
+        // SAFETY: fcx.user_fctx was set earlier, immediately before or in a prior call
+        let mut iter = &mut *(*fcx).user_fctx.cast::<TableIterator<T>>();
+        match iter.next() {
+            None => Ret::Zero,
+            Some(value) => Ret::Once(value),
+        }
+    }
+
     fn finish_call(fcinfo: pg_sys::FunctionCallInfo) {
         let fcx = deref_fcx(fcinfo);
         unsafe { srf_return_done(fcinfo, fcx) }
@@ -269,6 +279,16 @@ where
             let ptr = srf_memcx(fcx).leak_and_drop_on_delete(self);
             // it's the first call so we need to finish setting up fcx
             (*fcx).user_fctx = ptr.cast();
+        }
+    }
+
+    unsafe fn ret_from_context(fcinfo: pg_sys::FunctionCallInfo) -> Ret<Self> {
+        let fcx = deref_fcx(fcinfo);
+        // SAFETY: fcx.user_fctx was set earlier, immediately before or in a prior call
+        let mut iter = &mut *(*fcx).user_fctx.cast::<TableIterator<T>>();
+        match iter.next() {
+            None => Ret::Zero,
+            Some(value) => Ret::Once(value),
         }
     }
 
@@ -374,6 +394,10 @@ where
 {
     type CallRet = T::CallRet;
 
+    fn prepare_call(fcinfo: pg_sys::FunctionCallInfo) -> CallCx {
+        T::prepare_call(fcinfo)
+    }
+
     fn into_ret(self) -> Ret<Self>
     where
         Self: Sized,
@@ -389,18 +413,28 @@ where
     }
 
     fn box_return(fcinfo: pg_sys::FunctionCallInfo, ret: Ret<Self>) -> pg_sys::Datum {
-        match ret {
-            Ret::Zero => unsafe { pg_return_null(fcinfo) },
-            Ret::Once(value) => <T::CallRet>::box_return(fcinfo, value.into_ret()),
-            Ret::Many(Some(iter), value) => BoxRet::box_return(fcinfo, Ret::Many(iter, value)),
-            Ret::Many(_, _) => todo!(),
-        }
+        let inner = match ret {
+            Ret::Zero => Ret::Zero,
+            Ret::Once(value) => Ret::Once(value),
+            Ret::Many(Some(iter), value) => Ret::Many(iter, value),
+            Ret::Many(None, _) => Ret::Zero,
+        };
+
+        T::box_return(fcinfo, inner)
     }
 
     fn into_context(self, fcinfo: pg_sys::FunctionCallInfo) {
         match self {
             None => (),
             Some(value) => value.into_context(fcinfo),
+        }
+    }
+
+    unsafe fn ret_from_context(fcinfo: pg_sys::FunctionCallInfo) -> Ret<Self> {
+        match T::ret_from_context(fcinfo) {
+            Ret::Many(iter, value) => Ret::Many(Some(iter), value),
+            Ret::Once(value) => Ret::Once(value),
+            Ret::Zero => Ret::Zero,
         }
     }
 
@@ -416,6 +450,11 @@ where
     E: core::any::Any + core::fmt::Display,
 {
     type CallRet = T::CallRet;
+
+    fn prepare_call(fcinfo: pg_sys::FunctionCallInfo) -> CallCx {
+        T::prepare_call(fcinfo)
+    }
+
     fn into_ret(self) -> Ret<Self>
     where
         Self: Sized,
@@ -439,6 +478,25 @@ where
                 BoxRet::box_return(fcinfo, Ret::Many(iter, value))
             }
         }
+    }
+
+    fn into_context(self, fcinfo: pg_sys::FunctionCallInfo) {
+        match self {
+            Err(_) => (),
+            Ok(value) => value.into_context(fcinfo),
+        }
+    }
+
+    unsafe fn ret_from_context(fcinfo: pg_sys::FunctionCallInfo) -> Ret<Self> {
+        match T::ret_from_context(fcinfo) {
+            Ret::Many(iter, value) => Ret::Many(Ok(iter), value),
+            Ret::Once(value) => Ret::Once(value),
+            Ret::Zero => Ret::Zero,
+        }
+    }
+
+    fn finish_call(fcinfo: pg_sys::FunctionCallInfo) {
+        T::finish_call(fcinfo)
     }
 }
 
