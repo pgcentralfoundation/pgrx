@@ -9,7 +9,6 @@
 //LICENSE Use of this source code is governed by the MIT license that can be found in the LICENSE file.
 //! Utility functions for working with [`pg_sys::HeapTuple`] and [`pg_sys::HeapTupleHeader`] structs
 use crate::*;
-use seq_macro::seq;
 use std::num::NonZeroUsize;
 
 /// Given a `pg_sys::Datum` representing a composite row type, return a boxed `HeapTupleData`,
@@ -187,30 +186,3 @@ pub trait IntoHeapTuple {
         tupdesc: *mut pg_sys::TupleDescData,
     ) -> *mut pg_sys::HeapTupleData;
 }
-
-seq!(I in 0..32 {
-    #(
-        seq!(N in 0..I {
-            impl<#(T~N: IntoDatum,)*> IntoHeapTuple for (#(T~N,)*) {
-                unsafe fn into_heap_tuple(self, tupdesc: pg_sys::TupleDesc) -> *mut pg_sys::HeapTupleData {
-                    let mut datums = [pg_sys::Datum::from(0); I];
-                    let mut nulls = [false; I];
-
-                    #(
-                        match self.N.into_datum() {
-                            Some(datum) => datums[N] = datum,
-                            None => nulls[N] = true,
-                        }
-                    )*
-
-                    unsafe {
-                        // SAFETY:  Caller has asserted that `tupdesc` is valid, and we just went
-                        // through a little bit of effort to setup properly sized arrays for
-                        // `datums` and `nulls`
-                        pg_sys::heap_form_tuple(tupdesc, datums.as_mut_ptr(), nulls.as_mut_ptr())
-                    }
-                }
-            }
-        });
-    )*
-});

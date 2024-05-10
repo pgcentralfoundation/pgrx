@@ -52,7 +52,6 @@ thiserror.workspace = true # error handling and logging
 
 # used to internally impl things
 once_cell = "1.18.0" # polyfill until std::lazy::OnceCell stabilizes
-seq-macro = "0.3" # impls loops in macros
 uuid = { version = "1.4.1", features = [ "v4" ] } # PgLwLock and shmem
 enum-map = "2.6.3"
 

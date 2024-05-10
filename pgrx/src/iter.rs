@@ -10,7 +10,7 @@
 #![allow(clippy::vec_init_then_push)]
 use std::iter::once;
 
-use crate::IntoHeapTuple;
+use crate::{pg_sys, IntoDatum, IntoHeapTuple};
 use pgrx_sql_entity_graph::metadata::{
     ArgumentError, Returns, ReturnsError, SqlMapping, SqlTranslatable,
 };
@@ -155,31 +155,120 @@ impl<'a, T> Iterator for TableIterator<'a, T> {
     }
 }
 
-seq_macro::seq!(I in 0..=32 {
-    #(
-        seq_macro::seq!(N in 0..=I {
-            unsafe impl<'a, #(Input~N,)*> SqlTranslatable for TableIterator<'a, (#(Input~N,)*)>
-            where
-                #(
-                    Input~N: SqlTranslatable + 'a,
+macro_rules! impl_table_iter {
+    ($($C:ident),* $(,)?) => {
+        unsafe impl<'iter, $($C,)*> SqlTranslatable for TableIterator<'iter, ($($C,)*)>
+        where
+            $($C: SqlTranslatable + 'iter,)*
+        {
+            fn argument_sql() -> Result<SqlMapping, ArgumentError> {
+                Err(ArgumentError::Table)
+            }
+            fn return_sql() -> Result<Returns, ReturnsError> {
+                let vec = vec![
+                $(
+                    match $C::return_sql() {
+                        Ok(Returns::One(sql)) => sql,
+                        Ok(Returns::SetOf(_)) => return Err(ReturnsError::TableContainingSetOf),
+                        Ok(Returns::Table(_)) => return Err(ReturnsError::NestedTable),
+                        err => return err,
+                    },
                 )*
-            {
-                fn argument_sql() -> Result<SqlMapping, ArgumentError> {
-                    Err(ArgumentError::Table)
-                }
-                fn return_sql() -> Result<Returns, ReturnsError> {
-                    let mut vec = Vec::new();
-                    #(
-                        vec.push(match Input~N::return_sql() {
-                            Ok(Returns::One(sql)) => sql,
-                            Ok(Returns::SetOf(_)) => return Err(ReturnsError::TableContainingSetOf),
-                            Ok(Returns::Table(_)) => return Err(ReturnsError::NestedTable),
-                            Err(err) => return Err(err),
-                        });
-                    )*
-                    Ok(Returns::Table(vec))
+                ];
+                Ok(Returns::Table(vec))
+            }
+        }
+
+        impl<$($C: IntoDatum),*> IntoHeapTuple for ($($C,)*) {
+            unsafe fn into_heap_tuple(self, tupdesc: pg_sys::TupleDesc) -> *mut pg_sys::HeapTupleData {
+                // shadowing the type names with these identifiers
+                #[allow(nonstandard_style)]
+                let ($($C,)*) = self;
+                let datums = [$($C.into_datum(),)*];
+                let mut nulls = datums.map(|option| option.is_none());
+                let mut datums = datums.map(|option| option.unwrap_or(pg_sys::Datum::from(0)));
+
+
+                unsafe {
+                    // SAFETY:  Caller has asserted that `tupdesc` is valid, and we just went
+                    // through a little bit of effort to setup properly sized arrays for
+                    // `datums` and `nulls`
+                    pg_sys::heap_form_tuple(tupdesc, datums.as_mut_ptr(), nulls.as_mut_ptr())
                 }
             }
-        });
-    )*
-});
+        }
+
+    }
+}
+
+impl_table_iter!(T0);
+impl_table_iter!(T0, T1);
+impl_table_iter!(T0, T1, T2);
+impl_table_iter!(T0, T1, T2, T3);
+impl_table_iter!(T0, T1, T2, T3, T4);
+impl_table_iter!(T0, T1, T2, T3, T4, T5);
+impl_table_iter!(T0, T1, T2, T3, T4, T5, T6);
+impl_table_iter!(T0, T1, T2, T3, T4, T5, T6, T7);
+impl_table_iter!(T0, T1, T2, T3, T4, T5, T6, T7, T8);
+impl_table_iter!(T0, T1, T2, T3, T4, T5, T6, T7, T8, T9);
+impl_table_iter!(T0, T1, T2, T3, T4, T5, T6, T7, T8, T9, T10);
+impl_table_iter!(T0, T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11);
+impl_table_iter!(T0, T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12);
+impl_table_iter!(T0, T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13);
+impl_table_iter!(T0, T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14);
+impl_table_iter!(T0, T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15);
+impl_table_iter!(T0, T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15, T16);
+impl_table_iter!(T0, T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15, T16, T17);
+impl_table_iter!(
+    T0, T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15, T16, T17, T18
+);
+impl_table_iter!(
+    T0, T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15, T16, T17, T18, T19
+);
+impl_table_iter!(
+    T0, T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15, T16, T17, T18, T19, T20
+);
+impl_table_iter!(
+    T0, T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15, T16, T17, T18, T19, T20,
+    T21
+);
+impl_table_iter!(
+    T0, T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15, T16, T17, T18, T19, T20,
+    T21, T22
+);
+impl_table_iter!(
+    T0, T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15, T16, T17, T18, T19, T20,
+    T21, T22, T23
+);
+impl_table_iter!(
+    T0, T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15, T16, T17, T18, T19, T20,
+    T21, T22, T23, T24
+);
+impl_table_iter!(
+    T0, T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15, T16, T17, T18, T19, T20,
+    T21, T22, T23, T24, T25
+);
+impl_table_iter!(
+    T0, T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15, T16, T17, T18, T19, T20,
+    T21, T22, T23, T24, T25, T26
+);
+impl_table_iter!(
+    T0, T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15, T16, T17, T18, T19, T20,
+    T21, T22, T23, T24, T25, T26, T27
+);
+impl_table_iter!(
+    T0, T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15, T16, T17, T18, T19, T20,
+    T21, T22, T23, T24, T25, T26, T27, T28
+);
+impl_table_iter!(
+    T0, T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15, T16, T17, T18, T19, T20,
+    T21, T22, T23, T24, T25, T26, T27, T28, T29
+);
+impl_table_iter!(
+    T0, T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15, T16, T17, T18, T19, T20,
+    T21, T22, T23, T24, T25, T26, T27, T28, T29, T30
+);
+impl_table_iter!(
+    T0, T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15, T16, T17, T18, T19, T20,
+    T21, T22, T23, T24, T25, T26, T27, T28, T29, T30, T31
+);
