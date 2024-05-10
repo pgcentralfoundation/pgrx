@@ -1564,6 +1564,7 @@ dependencies = [
  "regex",
  "serde",
  "serde_json",
+ "shlex",
  "sysinfo",
  "thiserror",
  "trybuild",
