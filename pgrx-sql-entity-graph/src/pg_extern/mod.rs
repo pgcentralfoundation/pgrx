@@ -425,7 +425,38 @@ impl PgExtern {
         };
 
         match &self.returns {
-            Returning::None | Returning::Type(_) | Returning::SetOf { .. } => {
+            Returning::Iterated { tys: retval_tys, is_option, is_result }
+                if retval_tys.len() == 1 =>
+            {
+                let result_handler =
+                    emit_result_handler(self.func.sig.span(), *is_option, *is_result);
+
+                // Postgres considers functions returning a 1-field table (`RETURNS TABLE (T)`) to be
+                // a function that `RETURNS SETOF T`.  So we write a different wrapper implementation
+                // that transparently transforms the `TableIterator` returned by the user into a `SetOfIterator`
+                let iter_closure = quote! {
+                    #[allow(unused_unsafe)]
+                    unsafe {
+                        // SAFETY: the caller has asserted that `fcinfo` is a valid FunctionCallInfo pointer, allocated by Postgres
+                        // with all its fields properly setup.  Unless the user is calling this wrapper function directly, this
+                        // will always be the case
+                        ::pgrx::iter::SetOfIterator::srf_next(#fcinfo_ident, || {
+                            #( #arg_fetches )*
+                            let table_iterator = { #result_handler };
+
+                            // we need to convert the 1-field `TableIterator` provided by the user
+                            // into a SetOfIterator in order to properly handle the case of `RETURNS TABLE (T)`,
+                            // which is a table that returns only 1 field.
+                            table_iterator.map(|i| ::pgrx::iter::SetOfIterator::new(i.into_iter().map(|(v,)| v)))
+                        })
+                    }
+                };
+                finfo_v1_extern_c(&self.func, fcinfo_ident, iter_closure)
+            }
+            Returning::None
+            | Returning::Type(_)
+            | Returning::SetOf { .. }
+            | Returning::Iterated { .. } => {
                 let ret_ty = match &self.func.sig.output {
                     syn::ReturnType::Default => syn::parse_quote! { () },
                     syn::ReturnType::Type(_, ret_ty) => ret_ty.clone(),
@@ -449,47 +480,6 @@ impl PgExtern {
                     }
                 };
                 finfo_v1_extern_c(&self.func, fcinfo_ident, wrapper_code)
-            }
-            Returning::Iterated { tys: retval_tys, is_option, is_result } => {
-                let result_handler =
-                    emit_result_handler(self.func.sig.span(), *is_option, *is_result);
-
-                let iter_closure = if retval_tys.len() == 1 {
-                    // Postgres considers functions returning a 1-field table (`RETURNS TABLE (T)`) to be
-                    // a function that `RETURNS SETOF T`.  So we write a different wrapper implementation
-                    // that transparently transforms the `TableIterator` returned by the user into a `SetOfIterator`
-                    quote! {
-                        #[allow(unused_unsafe)]
-                        unsafe {
-                            // SAFETY: the caller has asserted that `fcinfo` is a valid FunctionCallInfo pointer, allocated by Postgres
-                            // with all its fields properly setup.  Unless the user is calling this wrapper function directly, this
-                            // will always be the case
-                            ::pgrx::iter::SetOfIterator::srf_next(#fcinfo_ident, || {
-                                #( #arg_fetches )*
-                                let table_iterator = { #result_handler };
-
-                                // we need to convert the 1-field `TableIterator` provided by the user
-                                // into a SetOfIterator in order to properly handle the case of `RETURNS TABLE (T)`,
-                                // which is a table that returns only 1 field.
-                                table_iterator.map(|i| ::pgrx::iter::SetOfIterator::new(i.into_iter().map(|(v,)| v)))
-                            })
-                        }
-                    }
-                } else {
-                    quote! {
-                        #[allow(unused_unsafe)]
-                        unsafe {
-                            // SAFETY: the caller has asserted that `fcinfo` is a valid FunctionCallInfo pointer, allocated by Postgres
-                            // with all its fields properly setup.  Unless the user is calling this wrapper function directly, this
-                            // will always be the case
-                            ::pgrx::iter::TableIterator::srf_next(#fcinfo_ident, || {
-                                #( #arg_fetches )*
-                                #result_handler
-                            })
-                        }
-                    }
-                };
-                finfo_v1_extern_c(&self.func, fcinfo_ident, iter_closure)
             }
         }
     }
