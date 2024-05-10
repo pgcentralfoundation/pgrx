@@ -484,7 +484,7 @@ impl PgExtern {
                 };
                 finfo_v1_extern_c(&self.func, fcinfo_ident, fn_contents)
             }
-            Returning::SetOf { ty: _retval_ty, is_option, is_result } => {
+            Returning::SetOf { ty: _retval_ty, .. } => {
                 let syn::ReturnType::Type(_, ret_ty) = &self.func.sig.output else {
                     unreachable!()
                 };
