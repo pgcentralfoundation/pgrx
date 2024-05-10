@@ -16,9 +16,8 @@ use std::mem::{self, ManuallyDrop};
 use crate::heap_tuple::PgHeapTuple;
 use crate::iter::{SetOfIterator, TableIterator};
 use crate::{
-    nonstatic_typeid, pg_return_null, pg_sys, srf_first_call_init, srf_is_first_call,
-    srf_per_call_setup, srf_return_done, srf_return_next, IntoDatum, IntoHeapTuple,
-    PgMemoryContexts,
+    nonstatic_typeid, pg_return_null, pg_sys, srf_is_first_call, srf_return_done, srf_return_next,
+    IntoDatum, IntoHeapTuple, PgMemoryContexts,
 };
 use core::ops::ControlFlow;
 use core::ptr;
