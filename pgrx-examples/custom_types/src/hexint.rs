@@ -103,7 +103,7 @@ impl BoxRet for HexInt {
         Ret::Once(self)
     }
 
-    fn box_return(fcinfo: pg_sys::FunctionCallInfo, ret: Ret<Self>) -> pg_sys::Datum {
+    fn box_return(_fcinfo: pg_sys::FunctionCallInfo, ret: Ret<Self>) -> pg_sys::Datum {
         match ret {
             Ret::Once(inner) => Datum::from(inner.value),
             _ => unreachable!(),
