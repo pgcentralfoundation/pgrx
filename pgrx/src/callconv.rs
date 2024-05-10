@@ -459,25 +459,25 @@ where
     where
         Self: Sized,
     {
-        match self {
-            Ok(value) => match T::into_ret(value) {
-                Ret::Zero => Ret::Zero,
-                Ret::Once(value) => Ret::Once(value),
-                Ret::Many(iter, value) => Ret::Many(Ok(iter), value),
-            },
-            Err(error) => Ret::Zero,
+        let value = pg_sys::panic::ErrorReportable::unwrap_or_report(self);
+        match T::into_ret(value) {
+            Ret::Zero => Ret::Zero,
+            Ret::Once(value) => Ret::Once(value),
+            Ret::Many(iter, value) => Ret::Many(Ok(iter), value),
         }
     }
 
     fn box_return(fcinfo: pg_sys::FunctionCallInfo, ret: Ret<Self>) -> pg_sys::Datum {
-        match ret {
-            Ret::Zero => unsafe { pg_return_null(fcinfo) },
-            Ret::Once(value) => T::CallRet::box_return(fcinfo, value.into_ret()),
+        let ret = match ret {
+            Ret::Zero => Ret::Zero,
+            Ret::Once(value) => Ret::Once(value),
             Ret::Many(iter, value) => {
                 let iter = pg_sys::panic::ErrorReportable::unwrap_or_report(iter);
-                BoxRet::box_return(fcinfo, Ret::Many(iter, value))
+                Ret::Many(iter, value)
             }
-        }
+        };
+
+        T::box_return(fcinfo, ret)
     }
 
     fn into_context(self, fcinfo: pg_sys::FunctionCallInfo) {
