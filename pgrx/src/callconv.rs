@@ -16,6 +16,7 @@ use std::mem::{self, ManuallyDrop};
 
 use crate::heap_tuple::PgHeapTuple;
 use crate::iter::{SetOfIterator, TableIterator};
+use crate::ptr::PointerExt;
 use crate::{
     nonstatic_typeid, pg_return_null, pg_sys, srf_is_first_call, srf_return_done, srf_return_next,
     AnyNumeric, Date, Inet, Internal, Interval, IntoDatum, IntoHeapTuple, Json, PgBox,
@@ -298,7 +299,9 @@ where
                 let mut tupdesc = ptr::null_mut();
                 let mut oid = pg_sys::Oid::default();
                 let ty_class = pg_sys::get_call_result_type(fcinfo, &mut oid, &mut tupdesc);
-                pg_sys::BlessTupleDesc(tupdesc);
+                if tupdesc.is_non_null() {
+                    pg_sys::BlessTupleDesc(tupdesc);
+                }
                 (*fcx).tuple_desc = tupdesc;
                 mcx.leak_and_drop_on_delete(self)
             });

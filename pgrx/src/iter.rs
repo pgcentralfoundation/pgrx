@@ -164,6 +164,58 @@ impl<'a, T> Iterator for TableIterator<'a, T> {
     }
 }
 
+unsafe impl<'iter, C> SqlTranslatable for TableIterator<'iter, (C,)>
+where
+    C: SqlTranslatable + 'iter,
+{
+    fn argument_sql() -> Result<SqlMapping, ArgumentError> {
+        Err(ArgumentError::Table)
+    }
+    fn return_sql() -> Result<Returns, ReturnsError> {
+        let vec = vec![match C::return_sql() {
+            Ok(Returns::One(sql)) => sql,
+            Ok(Returns::SetOf(_)) => return Err(ReturnsError::TableContainingSetOf),
+            Ok(Returns::Table(_)) => return Err(ReturnsError::NestedTable),
+            err => return err,
+        }];
+        Ok(Returns::Table(vec))
+    }
+}
+
+impl<C: IntoDatum> IntoHeapTuple for (C,) {
+    unsafe fn into_heap_tuple(self, _tupdesc: pg_sys::TupleDesc) -> *mut pg_sys::HeapTupleData {
+        unimplemented!()
+    }
+}
+
+unsafe impl<C> BoxRet for (C,)
+where
+    C: BoxRet,
+    Self: IntoHeapTuple,
+{
+    type CallRet = Self;
+
+    fn into_ret(self) -> Ret<Self>
+    where
+        Self: Sized,
+    {
+        Ret::Once(self)
+    }
+
+    unsafe fn box_return(fcinfo: pg_sys::FunctionCallInfo, ret: Ret<Self>) -> pg_sys::Datum {
+        let value = match ret {
+            Ret::Zero => return empty_srf(fcinfo),
+            Ret::Once(value) => value,
+            Ret::Many(iter, value) => {
+                iter.into_context(fcinfo);
+                value
+            }
+        };
+
+        unsafe { C::box_return(fcinfo, value.0.into_ret()) }
+    }
+}
+
 macro_rules! impl_table_iter {
     ($($C:ident),* $(,)?) => {
         unsafe impl<'iter, $($C,)*> SqlTranslatable for TableIterator<'iter, ($($C,)*)>
@@ -208,7 +260,10 @@ macro_rules! impl_table_iter {
         }
 
         unsafe impl<$($C),*> BoxRet for ($($C,)*)
-        where Self: IntoHeapTuple {
+        where
+             $($C: BoxRet,)*
+             Self: IntoHeapTuple,
+        {
             type CallRet = Self;
 
             fn into_ret(self) -> Ret<Self>
@@ -234,14 +289,11 @@ macro_rules! impl_table_iter {
                     pg_sys::HeapTupleHeaderGetDatum((*heap_tuple).t_data)
                 }
             }
-
-
         }
 
     }
 }
 
-impl_table_iter!(T0);
 impl_table_iter!(T0, T1);
 impl_table_iter!(T0, T1, T2);
 impl_table_iter!(T0, T1, T2, T3);
