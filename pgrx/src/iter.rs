@@ -11,7 +11,7 @@
 use std::iter;
 
 use crate::{
-    callconv::{BoxRet, Ret, *},
+    callconv::{Ret, ReturnShipping, *},
     pg_sys, IntoDatum, IntoHeapTuple,
 };
 use pgrx_sql_entity_graph::metadata::{
@@ -188,14 +188,14 @@ impl<C: IntoDatum> IntoHeapTuple for (C,) {
     }
 }
 
-unsafe impl<C> BoxRet for (C,)
+unsafe impl<C> ReturnShipping for (C,)
 where
-    C: BoxRet,
+    C: ReturnShipping,
     Self: IntoHeapTuple,
 {
     type CallRet = Self;
 
-    fn into_ret(self) -> Ret<Self> {
+    fn label_ret(self) -> Ret<Self> {
         Ret::Once(self)
     }
 
@@ -209,7 +209,7 @@ where
             }
         };
 
-        unsafe { C::box_return(fcinfo, value.0.into_ret()) }
+        unsafe { C::box_return(fcinfo, value.0.label_ret()) }
     }
 }
 
@@ -256,14 +256,14 @@ macro_rules! impl_table_iter {
             }
         }
 
-        unsafe impl<$($C),*> BoxRet for ($($C,)*)
+        unsafe impl<$($C),*> ReturnShipping for ($($C,)*)
         where
-             $($C: BoxRet,)*
+             $($C: ReturnShipping,)*
              Self: IntoHeapTuple,
         {
             type CallRet = Self;
 
-            fn into_ret(self) -> Ret<Self> {
+            fn label_ret(self) -> Ret<Self> {
                 Ret::Once(self)
             }
 

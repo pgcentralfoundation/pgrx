@@ -705,15 +705,11 @@ fn impl_postgres_enum(ast: DeriveInput) -> syn::Result<proc_macro2::TokenStream>
 
         }
 
-        unsafe impl ::pgrx::callconv::BoxRet for #enum_ident {
+        unsafe impl ::pgrx::callconv::ReturnShipping for #enum_ident {
             type CallRet = Self;
-            fn into_ret(self) -> ::pgrx::callconv::Ret<Self>
-            where
-                Self: Sized,
-            {
+            fn label_ret(self) -> ::pgrx::callconv::Ret<Self> {
                 ::pgrx::callconv::Ret::Once(self)
             }
-
             unsafe fn box_return(fcinfo: ::pgrx::pg_sys::FunctionCallInfo, ret: ::pgrx::callconv::Ret<Self>) -> ::pgrx::pg_sys::Datum {
                 match ret {
                     ::pgrx::callconv::Ret::Zero => unsafe { ::pgrx::pg_return_null(fcinfo) },
@@ -826,9 +822,9 @@ fn impl_postgres_type(ast: DeriveInput) -> syn::Result<proc_macro2::TokenStream>
                     }
                 }
 
-                unsafe impl #generics ::pgrx::callconv::BoxRet for #name #generics {
+                unsafe impl #generics ::pgrx::callconv::ReturnShipping for #name #generics {
                     type CallRet = Self;
-                    fn into_ret(self) -> ::pgrx::callconv::Ret<Self> {
+                    fn label_ret(self) -> ::pgrx::callconv::Ret<Self> {
                         ::pgrx::callconv::Ret::Once(self)
                     }
                     unsafe fn box_return(fcinfo: ::pgrx::pg_sys::FunctionCallInfo, ret: ::pgrx::callconv::Ret<Self>) -> ::pgrx::pg_sys::Datum {

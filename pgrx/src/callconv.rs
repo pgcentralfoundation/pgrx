@@ -48,13 +48,13 @@ pub trait UnboxArg {
     }
 }
 
-/// Boxing for return values
+/// How to return a value from Rust to Postgres
 ///
 /// This bound is necessary to distinguish things which can be passed in/out of `#[pg_extern] fn`.
-/// It is strictly a mistake to use IntoDatum or any derived traits for this bound!
-/// PGRX allows complex return values which are nonsensical outside of function boundaries,
-/// e.g. for implementing the value-per-call convention for set-returning functions.
-pub unsafe trait BoxRet: Sized {
+/// This bound is not accurately described by IntoDatum or similar traits, as value conversions are
+/// handled in a special way at function return boundaries, and may require mutating multiple fields
+/// behind the FunctionCallInfo. The most exceptional case are set-returning functions.
+pub unsafe trait ReturnShipping: Sized {
     /// The actual type returned from the call
     type CallRet: Sized;
 
@@ -70,7 +70,7 @@ pub unsafe trait BoxRet: Sized {
     /// answer what kind and how many returns happen from this type
     ///
     /// must be overridden if `Self != Self::CallRet`
-    fn into_ret(self) -> Ret<Self>;
+    fn label_ret(self) -> Ret<Self>;
 
     // morally I should be allowed to supply a default impl >:(
     /* this default impl would work, but at what cost?
@@ -132,16 +132,16 @@ fn prepare_value_per_call_srf(fcinfo: pg_sys::FunctionCallInfo) -> CallCx {
     }
 }
 
-unsafe impl<'a, T> BoxRet for SetOfIterator<'a, T>
+unsafe impl<'a, T> ReturnShipping for SetOfIterator<'a, T>
 where
-    T: BoxRet,
+    T: ReturnShipping,
 {
     type CallRet = <Self as Iterator>::Item;
     unsafe fn prepare_call(fcinfo: pg_sys::FunctionCallInfo) -> CallCx {
         prepare_value_per_call_srf(fcinfo)
     }
 
-    fn into_ret(self) -> Ret<Self> {
+    fn label_ret(self) -> Ret<Self> {
         let mut iter = self;
         let ret = iter.next();
         match ret {
@@ -164,7 +164,7 @@ where
         unsafe {
             let fcx = deref_fcx(fcinfo);
             srf_return_next(fcinfo, fcx);
-            T::box_return(fcinfo, value.into_ret())
+            T::box_return(fcinfo, value.label_ret())
         }
     }
 
@@ -193,15 +193,15 @@ where
     }
 }
 
-pub enum Ret<T: BoxRet> {
+pub enum Ret<T: ReturnShipping> {
     Zero,
     Once(T::CallRet),
     Many(T, T::CallRet),
 }
 
-unsafe impl<'a, T> BoxRet for TableIterator<'a, T>
+unsafe impl<'a, T> ReturnShipping for TableIterator<'a, T>
 where
-    T: BoxRet,
+    T: ReturnShipping,
 {
     type CallRet = <Self as Iterator>::Item;
 
@@ -209,7 +209,7 @@ where
         prepare_value_per_call_srf(fcinfo)
     }
 
-    fn into_ret(self) -> Ret<Self> {
+    fn label_ret(self) -> Ret<Self> {
         let mut iter = self;
         let ret = iter.next();
         match ret {
@@ -231,7 +231,7 @@ where
         unsafe {
             let fcx = deref_fcx(fcinfo);
             srf_return_next(fcinfo, fcx);
-            T::box_return(fcinfo, value.into_ret())
+            T::box_return(fcinfo, value.label_ret())
         }
     }
 
@@ -315,10 +315,10 @@ fn finish_srf_init<T>(
     }
 }
 
-unsafe impl<T> BoxRet for Option<T>
+unsafe impl<T> ReturnShipping for Option<T>
 where
-    T: BoxRet,
-    T::CallRet: BoxRet,
+    T: ReturnShipping,
+    T::CallRet: ReturnShipping,
 {
     type CallRet = T::CallRet;
 
@@ -326,10 +326,10 @@ where
         T::prepare_call(fcinfo)
     }
 
-    fn into_ret(self) -> Ret<Self> {
+    fn label_ret(self) -> Ret<Self> {
         match self {
             None => Ret::Zero,
-            Some(value) => match value.into_ret() {
+            Some(value) => match value.label_ret() {
                 Ret::Many(iter, value) => Ret::Many(Some(iter), value),
                 Ret::Once(value) => Ret::Once(value),
                 Ret::Zero => Ret::Zero,
@@ -368,10 +368,10 @@ where
     }
 }
 
-unsafe impl<T, E> BoxRet for Result<T, E>
+unsafe impl<T, E> ReturnShipping for Result<T, E>
 where
-    T: BoxRet,
-    T::CallRet: BoxRet,
+    T: ReturnShipping,
+    T::CallRet: ReturnShipping,
     E: core::any::Any + core::fmt::Display,
 {
     type CallRet = T::CallRet;
@@ -380,9 +380,9 @@ where
         T::prepare_call(fcinfo)
     }
 
-    fn into_ret(self) -> Ret<Self> {
+    fn label_ret(self) -> Ret<Self> {
         let value = pg_sys::panic::ErrorReportable::unwrap_or_report(self);
-        match T::into_ret(value) {
+        match T::label_ret(value) {
             Ret::Zero => Ret::Zero,
             Ret::Once(value) => Ret::Once(value),
             Ret::Many(iter, value) => Ret::Many(Ok(iter), value),
@@ -425,9 +425,9 @@ where
 macro_rules! impl_boxret_for_primitives {
     ($($scalar:ty),*) => {
         $(
-        unsafe impl BoxRet for $scalar {
+        unsafe impl ReturnShipping for $scalar {
             type CallRet = Self;
-            fn into_ret(self) -> Ret<Self> {
+            fn label_ret(self) -> Ret<Self> {
                 Ret::Once(self)
             }
 
@@ -447,9 +447,9 @@ impl_boxret_for_primitives! {
     i8, i16, i32, i64, bool
 }
 
-unsafe impl BoxRet for () {
+unsafe impl ReturnShipping for () {
     type CallRet = Self;
-    fn into_ret(self) -> Ret<Self> {
+    fn label_ret(self) -> Ret<Self> {
         Ret::Zero
     }
 
@@ -458,9 +458,9 @@ unsafe impl BoxRet for () {
     }
 }
 
-unsafe impl BoxRet for f32 {
+unsafe impl ReturnShipping for f32 {
     type CallRet = Self;
-    fn into_ret(self) -> Ret<Self> {
+    fn label_ret(self) -> Ret<Self> {
         Ret::Once(self)
     }
 
@@ -473,9 +473,9 @@ unsafe impl BoxRet for f32 {
     }
 }
 
-unsafe impl BoxRet for f64 {
+unsafe impl ReturnShipping for f64 {
     type CallRet = Self;
-    fn into_ret(self) -> Ret<Self> {
+    fn label_ret(self) -> Ret<Self> {
         Ret::Once(self)
     }
 
@@ -490,8 +490,8 @@ unsafe impl BoxRet for f64 {
 
 fn boxret_via_into_datum<T>(fcinfo: pg_sys::FunctionCallInfo, ret: Ret<T>) -> pg_sys::Datum
 where
-    T: BoxRet,
-    <T as BoxRet>::CallRet: IntoDatum,
+    T: ReturnShipping,
+    <T as ReturnShipping>::CallRet: IntoDatum,
 {
     match ret {
         Ret::Zero => unsafe { pg_return_null(fcinfo) },
@@ -503,9 +503,9 @@ where
     }
 }
 
-unsafe impl<'a> BoxRet for &'a [u8] {
+unsafe impl<'a> ReturnShipping for &'a [u8] {
     type CallRet = Self;
-    fn into_ret(self) -> Ret<Self> {
+    fn label_ret(self) -> Ret<Self> {
         Ret::Once(self)
     }
 
@@ -514,9 +514,9 @@ unsafe impl<'a> BoxRet for &'a [u8] {
     }
 }
 
-unsafe impl<'a> BoxRet for &'a str {
+unsafe impl<'a> ReturnShipping for &'a str {
     type CallRet = Self;
-    fn into_ret(self) -> Ret<Self> {
+    fn label_ret(self) -> Ret<Self> {
         Ret::Once(self)
     }
 
@@ -525,9 +525,9 @@ unsafe impl<'a> BoxRet for &'a str {
     }
 }
 
-unsafe impl<'a> BoxRet for &'a CStr {
+unsafe impl<'a> ReturnShipping for &'a CStr {
     type CallRet = Self;
-    fn into_ret(self) -> Ret<Self> {
+    fn label_ret(self) -> Ret<Self> {
         Ret::Once(self)
     }
 
@@ -539,9 +539,9 @@ unsafe impl<'a> BoxRet for &'a CStr {
 macro_rules! impl_boxret_via_intodatum {
     ($($boxable:ty),*) => {
         $(
-        unsafe impl BoxRet for $boxable {
+        unsafe impl ReturnShipping for $boxable {
             type CallRet = Self;
-            fn into_ret(self) -> Ret<Self> {
+            fn label_ret(self) -> Ret<Self> {
                 Ret::Once(self)
             }
 
@@ -559,9 +559,9 @@ impl_boxret_via_intodatum! {
     Internal
 }
 
-unsafe impl<const P: u32, const S: u32> BoxRet for crate::Numeric<P, S> {
+unsafe impl<const P: u32, const S: u32> ReturnShipping for crate::Numeric<P, S> {
     type CallRet = Self;
-    fn into_ret(self) -> Ret<Self> {
+    fn label_ret(self) -> Ret<Self> {
         Ret::Once(self)
     }
 
@@ -570,12 +570,12 @@ unsafe impl<const P: u32, const S: u32> BoxRet for crate::Numeric<P, S> {
     }
 }
 
-unsafe impl<T> BoxRet for crate::Range<T>
+unsafe impl<T> ReturnShipping for crate::Range<T>
 where
     T: IntoDatum + crate::RangeSubType,
 {
     type CallRet = Self;
-    fn into_ret(self) -> Ret<Self> {
+    fn label_ret(self) -> Ret<Self> {
         Ret::Once(self)
     }
 
@@ -584,12 +584,12 @@ where
     }
 }
 
-unsafe impl<T> BoxRet for Vec<T>
+unsafe impl<T> ReturnShipping for Vec<T>
 where
     T: IntoDatum,
 {
     type CallRet = Self;
-    fn into_ret(self) -> Ret<Self> {
+    fn label_ret(self) -> Ret<Self> {
         Ret::Once(self)
     }
 
@@ -598,9 +598,9 @@ where
     }
 }
 
-unsafe impl<T: Copy> BoxRet for PgVarlena<T> {
+unsafe impl<T: Copy> ReturnShipping for PgVarlena<T> {
     type CallRet = Self;
-    fn into_ret(self) -> Ret<Self> {
+    fn label_ret(self) -> Ret<Self> {
         Ret::Once(self)
     }
 
@@ -609,12 +609,12 @@ unsafe impl<T: Copy> BoxRet for PgVarlena<T> {
     }
 }
 
-unsafe impl<'mcx, A> BoxRet for PgHeapTuple<'mcx, A>
+unsafe impl<'mcx, A> ReturnShipping for PgHeapTuple<'mcx, A>
 where
     A: crate::WhoAllocated,
 {
     type CallRet = Self;
-    fn into_ret(self) -> Ret<Self> {
+    fn label_ret(self) -> Ret<Self> {
         Ret::Once(self)
     }
 
@@ -623,12 +623,12 @@ where
     }
 }
 
-unsafe impl<T, A> BoxRet for PgBox<T, A>
+unsafe impl<T, A> ReturnShipping for PgBox<T, A>
 where
     A: crate::WhoAllocated,
 {
     type CallRet = Self;
-    fn into_ret(self) -> Ret<Self> {
+    fn label_ret(self) -> Ret<Self> {
         Ret::Once(self)
     }
 
