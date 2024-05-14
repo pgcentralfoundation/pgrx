@@ -7,7 +7,7 @@
 //LICENSE All rights reserved.
 //LICENSE
 //LICENSE Use of this source code is governed by the MIT license that can be found in the LICENSE file.
-use cargo_edit::{registry_url, Dependency};
+use cargo_edit::{registry_url, update_registry_index, Dependency, LocalManifest};
 use eyre::eyre;
 use std::path::{Path, PathBuf};
 use toml_edit::KeyMut;
@@ -23,16 +23,28 @@ pub(crate) struct Upgrade {
     /// Specify a version to upgrade to, rather than defaulting to the latest
     /// version.
     #[clap(long, short)]
-    pub(crate) target_version: Option<String>, //TODO: typed version not string
+    pub(crate) target_version: Option<String>, //TODO: semver not string
 
     /// Path to the manifest file (usually Cargo.toml). Defaults to
     /// "./Cargo.toml" in the working directory.
     #[clap(long = "manifest-path", short)]
     pub(crate) manifest_path: Option<PathBuf>,
 
-    // Flag to permit pre-release builds
+    /// Flag for upgrading PGRX to pre-release versions.
+    #[clap(long = "include-prereleases")]
+    pub(crate) include_prereleases: bool,
+
+    /// Select a package within the current workspace within which to upgrade
+    /// pgrx package versions. Defaults to the root manifest in the working
+    /// directory.
     #[clap(long, short)]
-    pub(crate) allow_prerelease: bool,
+    pub(crate) package: Option<String>,
+
+    /// Dry-run - if this flag is set, Cargo.toml will not be modified.
+    /// Instead, this command will print the text of the new Cargo.toml
+    /// that would have been generated if it was modified.
+    #[clap(long="dry-run", short)]
+    pub(crate) dry_run: bool,
 }
 
 fn set_dep_source_version<A: AsRef<str>>(src: &mut cargo_edit::Source, new_version: A) {
@@ -67,6 +79,7 @@ fn get_dep_source_version(src: &cargo_edit::Source) -> Option<&String> {
     }
 }
 
+#[tracing::instrument(level = "error")]
 fn replace_version(
     new_version: &str,
     crate_root: &Path,
@@ -90,6 +103,7 @@ fn replace_version(
     Ok(())
 }
 impl Upgrade {
+    #[tracing::instrument(level = "error", skip(self))]
     fn update_dep(
         &self,
         path: &PathBuf,
@@ -109,11 +123,13 @@ impl Upgrade {
         };
         let reg_url = registry_url(path, parsed_dep.registry())
             .map_err(|e| eyre!("Unable to fetch registry URL for path: {e}"))?;
+        update_registry_index(&reg_url, false).map_err(|e|
+            eyre!("Unable to update registry index: {e}"))?;
         let target_version = match self.target_version {
             Some(ref ver) => Some(ver.clone()),
             None => cargo_edit::get_latest_dependency(
                 dep_name,
-                self.allow_prerelease,
+                self.include_prereleases,
                 None,
                 path,
                 Some(&reg_url),
@@ -191,19 +207,17 @@ impl Upgrade {
         }
         Ok(())
     }
-}
-
-impl CommandExecute for Upgrade {
-    #[tracing::instrument(level = "error", skip(self))]
-    fn execute(self) -> eyre::Result<()> {
-        const RELEVANT_PACKAGES: [&str; 3] = ["pgrx", "pgrx-macros", "pgrx-tests"];
-        // Canonicalize because cargo-edit does not accept relative paths.
-        let path = std::fs::canonicalize(
-            self.manifest_path.clone().unwrap_or(PathBuf::from("./Cargo.toml")),
-        )?;
-
-        let mut manifest = cargo_edit::LocalManifest::find(Some(&path))
-            .map_err(|e| eyre!("Error opening manifest: {e}"))?;
+    fn process_manifest(&self, path: &PathBuf, manifest: &mut LocalManifest) -> eyre::Result<()> {
+        const RELEVANT_PACKAGES: [&str; 8] = [
+            "cargo-pgrx",
+            "pgrx",
+            "pgrx-macros",
+            "pgrx-pg-config",
+            "pgrx-pg-sys",
+            "pgrx-sql-entity-graph",
+            "pgrx-tests",
+            "pgrx-version-updater",
+        ];
 
         for dep_table in manifest.get_dependency_tables_mut() {
             for dep_name in RELEVANT_PACKAGES {
@@ -227,9 +241,76 @@ impl CommandExecute for Upgrade {
                 }
             }
         }
-        manifest
-            .write()
-            .map_err(|err| eyre!("Unable to write the updated Cargo.toml to disk: {err}"))?;
+        if !self.dry_run {
+            manifest
+                .write()
+                .map_err(|err| eyre!("Unable to write the updated Cargo.toml to disk: {err}"))?;
+        }
+        else {
+            let generated_toml = manifest.to_string();
+            println!("{generated_toml}");
+        }
+        Ok(())
+    }
+}
+
+impl CommandExecute for Upgrade {
+    #[tracing::instrument(level = "error", skip(self))]
+    fn execute(self) -> eyre::Result<()> {
+
+        // Canonicalize because cargo-edit does not accept relative paths.
+        let path = std::fs::canonicalize(
+            self.manifest_path.clone().unwrap_or(PathBuf::from("./Cargo.toml")),
+        )?;
+
+        let mut manifest = cargo_edit::LocalManifest::find(Some(&path))
+            .map_err(|e| eyre!("Error opening manifest: {e}"))?;
+
+        // Attempt to determine if this is a workspace and, if so, should we
+        // navigate to a crate contained within.
+        let parse_workspace = cargo_toml::Manifest::from_path(&path)
+            .map_err(|e| eyre!("Failed to parse workspace manifest using cargo_toml: {e}"))?;
+
+        if let Some(package) = self.package.clone() {
+            // Equivalent to manifest.manifest.data.contains_table("workspace"); but more robust
+            let workspace = &parse_workspace.workspace;
+
+            match (parse_workspace.package.map(|pak| pak.name() == package.as_str()), workspace) {
+                // Name of the package matches the name of the root workspace 
+                // crate, do not dig for a contained package.
+                (Some(true), _) => {
+                    self.process_manifest(&path, &mut manifest)?;
+                },
+                // Contained package specified and this is a workspace,
+                // OR workspace has no root package name.
+                // find the correct manifest for the child crate.
+                (Some(false), Some(work))
+                | (None, Some(work)) => {
+                    println!("{:#?}", work.members);
+                    todo!()
+                },
+                // No name and this is not a workspace, why is a package name
+                // specified?
+                (None, None) => {
+                    return Err(eyre!("Package argument provided but the
+                        manifest at the path {path:#?} has no name and 
+                        is not a workspace, please check Cargo.toml's 
+                        validity."))
+                },
+                // Non-workspace crate, and the name does not match.
+                (Some(false), None) => {
+                    return Err(eyre!("Package argument provided but the
+                        manifest at the path {path:#?} appears to be a regular
+                        single-crate workspace, with no child crates."))
+                }
+            }
+        }
+        else {
+            // No specified package, go right to the manifest at the
+            // specified directory.
+            self.process_manifest(&path, &mut manifest)?;
+        }
+
         Ok(())
     }
 }
