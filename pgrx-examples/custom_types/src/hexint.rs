@@ -94,7 +94,7 @@ impl IntoDatum for HexInt {
     }
 }
 
-impl BoxRet for HexInt {
+unsafe impl BoxRet for HexInt {
     type CallRet = Self;
     fn into_ret(self) -> Ret<Self>
     where
@@ -103,7 +103,7 @@ impl BoxRet for HexInt {
         Ret::Once(self)
     }
 
-    fn box_return(_fcinfo: pg_sys::FunctionCallInfo, ret: Ret<Self>) -> pg_sys::Datum {
+    unsafe fn box_return(_fcinfo: pg_sys::FunctionCallInfo, ret: Ret<Self>) -> pg_sys::Datum {
         match ret {
             Ret::Once(inner) => Datum::from(inner.value),
             _ => unreachable!(),

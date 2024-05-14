@@ -152,12 +152,12 @@ fn prepare_value_per_call_srf(fcinfo: pg_sys::FunctionCallInfo) -> CallCx {
     }
 }
 
-impl<'a, T> BoxRet for SetOfIterator<'a, T>
+unsafe impl<'a, T> BoxRet for SetOfIterator<'a, T>
 where
     T: BoxRet,
 {
     type CallRet = <Self as Iterator>::Item;
-    fn prepare_call(fcinfo: pg_sys::FunctionCallInfo) -> CallCx {
+    unsafe fn prepare_call(fcinfo: pg_sys::FunctionCallInfo) -> CallCx {
         prepare_value_per_call_srf(fcinfo)
     }
 
@@ -173,7 +173,7 @@ where
         }
     }
 
-    fn box_return(fcinfo: pg_sys::FunctionCallInfo, ret: Ret<Self>) -> pg_sys::Datum {
+    unsafe fn box_return(fcinfo: pg_sys::FunctionCallInfo, ret: Ret<Self>) -> pg_sys::Datum {
         let fcx = deref_fcx(fcinfo);
         let value = match ret {
             Ret::Zero => return empty_srf(fcinfo),
@@ -191,7 +191,7 @@ where
         }
     }
 
-    fn into_context(self, fcinfo: pg_sys::FunctionCallInfo) {
+    unsafe fn into_context(self, fcinfo: pg_sys::FunctionCallInfo) {
         let fcx = deref_fcx(fcinfo);
         unsafe {
             let ptr = srf_memcx(fcx).leak_and_drop_on_delete(self);
@@ -210,7 +210,7 @@ where
         }
     }
 
-    fn finish_call(fcinfo: pg_sys::FunctionCallInfo) {
+    unsafe fn finish_call(fcinfo: pg_sys::FunctionCallInfo) {
         let fcx = deref_fcx(fcinfo);
         unsafe { srf_return_done(fcinfo, fcx) }
     }
@@ -251,13 +251,13 @@ impl<'a, T: IntoDatum> SetOfIterator<'a, T> {
     }
 }
 
-impl<'a, T> BoxRet for TableIterator<'a, T>
+unsafe impl<'a, T> BoxRet for TableIterator<'a, T>
 where
     T: BoxRet,
 {
     type CallRet = <Self as Iterator>::Item;
 
-    fn prepare_call(fcinfo: pg_sys::FunctionCallInfo) -> CallCx {
+    unsafe fn prepare_call(fcinfo: pg_sys::FunctionCallInfo) -> CallCx {
         prepare_value_per_call_srf(fcinfo)
     }
 
@@ -273,7 +273,7 @@ where
         }
     }
 
-    fn box_return(fcinfo: pg_sys::FunctionCallInfo, ret: Ret<Self>) -> pg_sys::Datum {
+    unsafe fn box_return(fcinfo: pg_sys::FunctionCallInfo, ret: Ret<Self>) -> pg_sys::Datum {
         let value = match ret {
             Ret::Zero => return empty_srf(fcinfo),
             Ret::Once(value) => value,
@@ -290,7 +290,7 @@ where
         }
     }
 
-    fn into_context(self, fcinfo: pg_sys::FunctionCallInfo) {
+    unsafe fn into_context(self, fcinfo: pg_sys::FunctionCallInfo) {
         let fcx = deref_fcx(fcinfo);
         unsafe {
             let ptr = srf_memcx(fcx).leak_and_drop_on_delete(self);
@@ -309,7 +309,7 @@ where
         }
     }
 
-    fn finish_call(fcinfo: pg_sys::FunctionCallInfo) {
+    unsafe fn finish_call(fcinfo: pg_sys::FunctionCallInfo) {
         let fcx = deref_fcx(fcinfo);
         unsafe { srf_return_done(fcinfo, fcx) }
     }
@@ -404,14 +404,14 @@ fn finish_srf_init<T>(
     }
 }
 
-impl<T> BoxRet for Option<T>
+unsafe impl<T> BoxRet for Option<T>
 where
     T: BoxRet,
     T::CallRet: BoxRet,
 {
     type CallRet = T::CallRet;
 
-    fn prepare_call(fcinfo: pg_sys::FunctionCallInfo) -> CallCx {
+    unsafe fn prepare_call(fcinfo: pg_sys::FunctionCallInfo) -> CallCx {
         T::prepare_call(fcinfo)
     }
 
@@ -429,7 +429,7 @@ where
         }
     }
 
-    fn box_return(fcinfo: pg_sys::FunctionCallInfo, ret: Ret<Self>) -> pg_sys::Datum {
+    unsafe fn box_return(fcinfo: pg_sys::FunctionCallInfo, ret: Ret<Self>) -> pg_sys::Datum {
         let inner = match ret {
             Ret::Zero => Ret::Zero,
             Ret::Once(value) => Ret::Once(value),
@@ -440,7 +440,7 @@ where
         T::box_return(fcinfo, inner)
     }
 
-    fn into_context(self, fcinfo: pg_sys::FunctionCallInfo) {
+    unsafe fn into_context(self, fcinfo: pg_sys::FunctionCallInfo) {
         match self {
             None => (),
             Some(value) => value.into_context(fcinfo),
@@ -455,12 +455,12 @@ where
         }
     }
 
-    fn finish_call(fcinfo: pg_sys::FunctionCallInfo) {
-        T::finish_call(fcinfo)
+    unsafe fn finish_call(fcinfo: pg_sys::FunctionCallInfo) {
+        unsafe { T::finish_call(fcinfo) }
     }
 }
 
-impl<T, E> BoxRet for Result<T, E>
+unsafe impl<T, E> BoxRet for Result<T, E>
 where
     T: BoxRet,
     T::CallRet: BoxRet,
@@ -468,7 +468,7 @@ where
 {
     type CallRet = T::CallRet;
 
-    fn prepare_call(fcinfo: pg_sys::FunctionCallInfo) -> CallCx {
+    unsafe fn prepare_call(fcinfo: pg_sys::FunctionCallInfo) -> CallCx {
         T::prepare_call(fcinfo)
     }
 
@@ -484,7 +484,7 @@ where
         }
     }
 
-    fn box_return(fcinfo: pg_sys::FunctionCallInfo, ret: Ret<Self>) -> pg_sys::Datum {
+    unsafe fn box_return(fcinfo: pg_sys::FunctionCallInfo, ret: Ret<Self>) -> pg_sys::Datum {
         let ret = match ret {
             Ret::Zero => Ret::Zero,
             Ret::Once(value) => Ret::Once(value),
@@ -497,7 +497,7 @@ where
         T::box_return(fcinfo, ret)
     }
 
-    fn into_context(self, fcinfo: pg_sys::FunctionCallInfo) {
+    unsafe fn into_context(self, fcinfo: pg_sys::FunctionCallInfo) {
         match self {
             Err(_) => (),
             Ok(value) => value.into_context(fcinfo),
@@ -512,7 +512,7 @@ where
         }
     }
 
-    fn finish_call(fcinfo: pg_sys::FunctionCallInfo) {
+    unsafe fn finish_call(fcinfo: pg_sys::FunctionCallInfo) {
         T::finish_call(fcinfo)
     }
 }
@@ -520,7 +520,7 @@ where
 macro_rules! impl_boxret_for_primitives {
     ($($scalar:ty),*) => {
         $(
-        impl BoxRet for $scalar {
+        unsafe impl BoxRet for $scalar {
             type CallRet = Self;
             fn into_ret(self) -> Ret<Self>
             where
@@ -529,7 +529,7 @@ macro_rules! impl_boxret_for_primitives {
                 Ret::Once(self)
             }
 
-            fn box_return(fcinfo: pg_sys::FunctionCallInfo, ret: Ret<Self>) -> pg_sys::Datum {
+            unsafe fn box_return(fcinfo: pg_sys::FunctionCallInfo, ret: Ret<Self>) -> pg_sys::Datum {
                 match ret {
                     Ret::Zero => unsafe { pg_return_null(fcinfo) },
                     Ret::Once(value) => $crate::pg_sys::Datum::from(value),
@@ -545,7 +545,7 @@ impl_boxret_for_primitives! {
     i8, i16, i32, i64, bool
 }
 
-impl BoxRet for () {
+unsafe impl BoxRet for () {
     type CallRet = Self;
     fn into_ret(self) -> Ret<Self>
     where
@@ -554,12 +554,12 @@ impl BoxRet for () {
         Ret::Zero
     }
 
-    fn box_return(fcinfo: pg_sys::FunctionCallInfo, ret: Ret<Self>) -> pg_sys::Datum {
+    unsafe fn box_return(fcinfo: pg_sys::FunctionCallInfo, ret: Ret<Self>) -> pg_sys::Datum {
         pg_sys::Datum::from(0)
     }
 }
 
-impl BoxRet for f32 {
+unsafe impl BoxRet for f32 {
     type CallRet = Self;
     fn into_ret(self) -> Ret<Self>
     where
@@ -568,7 +568,7 @@ impl BoxRet for f32 {
         Ret::Once(self)
     }
 
-    fn box_return(fcinfo: pg_sys::FunctionCallInfo, ret: Ret<Self>) -> pg_sys::Datum {
+    unsafe fn box_return(fcinfo: pg_sys::FunctionCallInfo, ret: Ret<Self>) -> pg_sys::Datum {
         match ret {
             Ret::Zero => unsafe { pg_return_null(fcinfo) },
             Ret::Once(value) => pg_sys::Datum::from(value.to_bits()),
@@ -577,7 +577,7 @@ impl BoxRet for f32 {
     }
 }
 
-impl BoxRet for f64 {
+unsafe impl BoxRet for f64 {
     type CallRet = Self;
     fn into_ret(self) -> Ret<Self>
     where
@@ -586,7 +586,7 @@ impl BoxRet for f64 {
         Ret::Once(self)
     }
 
-    fn box_return(fcinfo: pg_sys::FunctionCallInfo, ret: Ret<Self>) -> pg_sys::Datum {
+    unsafe fn box_return(fcinfo: pg_sys::FunctionCallInfo, ret: Ret<Self>) -> pg_sys::Datum {
         match ret {
             Ret::Zero => unsafe { pg_return_null(fcinfo) },
             Ret::Once(value) => pg_sys::Datum::from(value.to_bits()),
@@ -609,7 +609,7 @@ fn boxret_via_into_datum<T: BoxRet<CallRet: IntoDatum>>(
     }
 }
 
-impl<'a> BoxRet for &'a [u8] {
+unsafe impl<'a> BoxRet for &'a [u8] {
     type CallRet = Self;
     fn into_ret(self) -> Ret<Self>
     where
@@ -618,12 +618,12 @@ impl<'a> BoxRet for &'a [u8] {
         Ret::Once(self)
     }
 
-    fn box_return(fcinfo: pg_sys::FunctionCallInfo, ret: Ret<Self>) -> pg_sys::Datum {
+    unsafe fn box_return(fcinfo: pg_sys::FunctionCallInfo, ret: Ret<Self>) -> pg_sys::Datum {
         boxret_via_into_datum(fcinfo, ret)
     }
 }
 
-impl<'a> BoxRet for &'a str {
+unsafe impl<'a> BoxRet for &'a str {
     type CallRet = Self;
     fn into_ret(self) -> Ret<Self>
     where
@@ -632,12 +632,12 @@ impl<'a> BoxRet for &'a str {
         Ret::Once(self)
     }
 
-    fn box_return(fcinfo: pg_sys::FunctionCallInfo, ret: Ret<Self>) -> pg_sys::Datum {
+    unsafe fn box_return(fcinfo: pg_sys::FunctionCallInfo, ret: Ret<Self>) -> pg_sys::Datum {
         boxret_via_into_datum(fcinfo, ret)
     }
 }
 
-impl<'a> BoxRet for &'a CStr {
+unsafe impl<'a> BoxRet for &'a CStr {
     type CallRet = Self;
     fn into_ret(self) -> Ret<Self>
     where
@@ -646,7 +646,7 @@ impl<'a> BoxRet for &'a CStr {
         Ret::Once(self)
     }
 
-    fn box_return(fcinfo: pg_sys::FunctionCallInfo, ret: Ret<Self>) -> pg_sys::Datum {
+    unsafe fn box_return(fcinfo: pg_sys::FunctionCallInfo, ret: Ret<Self>) -> pg_sys::Datum {
         boxret_via_into_datum(fcinfo, ret)
     }
 }
@@ -654,7 +654,7 @@ impl<'a> BoxRet for &'a CStr {
 macro_rules! impl_boxret_via_intodatum {
     ($($boxable:ty),*) => {
         $(
-        impl BoxRet for $boxable {
+        unsafe impl BoxRet for $boxable {
             type CallRet = Self;
             fn into_ret(self) -> Ret<Self>
             where
@@ -663,7 +663,7 @@ macro_rules! impl_boxret_via_intodatum {
                 Ret::Once(self)
             }
 
-            fn box_return(fcinfo: pg_sys::FunctionCallInfo, ret: Ret<Self>) -> pg_sys::Datum {
+            unsafe fn box_return(fcinfo: pg_sys::FunctionCallInfo, ret: Ret<Self>) -> pg_sys::Datum {
                 boxret_via_into_datum(fcinfo, ret)
             }
         })*
@@ -677,7 +677,7 @@ impl_boxret_via_intodatum! {
     Internal
 }
 
-impl<const P: u32, const S: u32> BoxRet for crate::Numeric<P, S> {
+unsafe impl<const P: u32, const S: u32> BoxRet for crate::Numeric<P, S> {
     type CallRet = Self;
     fn into_ret(self) -> Ret<Self>
     where
@@ -686,12 +686,12 @@ impl<const P: u32, const S: u32> BoxRet for crate::Numeric<P, S> {
         Ret::Once(self)
     }
 
-    fn box_return(fcinfo: pg_sys::FunctionCallInfo, ret: Ret<Self>) -> pg_sys::Datum {
+    unsafe fn box_return(fcinfo: pg_sys::FunctionCallInfo, ret: Ret<Self>) -> pg_sys::Datum {
         boxret_via_into_datum(fcinfo, ret)
     }
 }
 
-impl<T> BoxRet for crate::Range<T>
+unsafe impl<T> BoxRet for crate::Range<T>
 where
     T: IntoDatum + crate::RangeSubType,
 {
@@ -703,12 +703,12 @@ where
         Ret::Once(self)
     }
 
-    fn box_return(fcinfo: pg_sys::FunctionCallInfo, ret: Ret<Self>) -> pg_sys::Datum {
+    unsafe fn box_return(fcinfo: pg_sys::FunctionCallInfo, ret: Ret<Self>) -> pg_sys::Datum {
         boxret_via_into_datum(fcinfo, ret)
     }
 }
 
-impl<T> BoxRet for Vec<T>
+unsafe impl<T> BoxRet for Vec<T>
 where
     T: IntoDatum,
 {
@@ -720,12 +720,12 @@ where
         Ret::Once(self)
     }
 
-    fn box_return(fcinfo: pg_sys::FunctionCallInfo, ret: Ret<Self>) -> pg_sys::Datum {
+    unsafe fn box_return(fcinfo: pg_sys::FunctionCallInfo, ret: Ret<Self>) -> pg_sys::Datum {
         boxret_via_into_datum(fcinfo, ret)
     }
 }
 
-impl<T: Copy> BoxRet for PgVarlena<T> {
+unsafe impl<T: Copy> BoxRet for PgVarlena<T> {
     type CallRet = Self;
     fn into_ret(self) -> Ret<Self>
     where
@@ -734,12 +734,12 @@ impl<T: Copy> BoxRet for PgVarlena<T> {
         Ret::Once(self)
     }
 
-    fn box_return(fcinfo: pg_sys::FunctionCallInfo, ret: Ret<Self>) -> pg_sys::Datum {
+    unsafe fn box_return(fcinfo: pg_sys::FunctionCallInfo, ret: Ret<Self>) -> pg_sys::Datum {
         boxret_via_into_datum(fcinfo, ret)
     }
 }
 
-impl<'mcx, A> BoxRet for PgHeapTuple<'mcx, A>
+unsafe impl<'mcx, A> BoxRet for PgHeapTuple<'mcx, A>
 where
     A: crate::WhoAllocated,
 {
@@ -751,12 +751,12 @@ where
         Ret::Once(self)
     }
 
-    fn box_return(fcinfo: pg_sys::FunctionCallInfo, ret: Ret<Self>) -> pg_sys::Datum {
+    unsafe fn box_return(fcinfo: pg_sys::FunctionCallInfo, ret: Ret<Self>) -> pg_sys::Datum {
         boxret_via_into_datum(fcinfo, ret)
     }
 }
 
-impl<T, A> BoxRet for PgBox<T, A>
+unsafe impl<T, A> BoxRet for PgBox<T, A>
 where
     A: crate::WhoAllocated,
 {
@@ -768,7 +768,7 @@ where
         Ret::Once(self)
     }
 
-    fn box_return(fcinfo: pg_sys::FunctionCallInfo, ret: Ret<Self>) -> pg_sys::Datum {
+    unsafe fn box_return(fcinfo: pg_sys::FunctionCallInfo, ret: Ret<Self>) -> pg_sys::Datum {
         boxret_via_into_datum(fcinfo, ret)
     }
 }
