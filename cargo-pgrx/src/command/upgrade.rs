@@ -294,7 +294,7 @@ impl CommandExecute for Upgrade {
                             ))?;
                             let member_path =
                                 root_path.join(PathBuf::from(member)).join("Cargo.toml");
-                            println!("Generated child path {:#?}", &member_path);
+                            debug!("Generated child path {:#?}", &member_path);
                             child_path_maybe = Some(member_path);
                         }
                     }
