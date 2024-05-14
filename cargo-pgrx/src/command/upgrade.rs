@@ -43,7 +43,7 @@ pub(crate) struct Upgrade {
     /// Dry-run - if this flag is set, Cargo.toml will not be modified.
     /// Instead, this command will print the text of the new Cargo.toml
     /// that would have been generated if it was modified.
-    #[clap(long="dry-run", short)]
+    #[clap(long = "dry-run", short)]
     pub(crate) dry_run: bool,
 }
 
@@ -96,7 +96,7 @@ fn replace_version(
         }
         None => return Err(eyre!("No version field for {dep_name}, cannot upgrade.")),
     }
-    set_dep_source_version(&mut source, &new_version);
+    set_dep_source_version(&mut source, new_version);
     parsed_dep = parsed_dep.set_source(source);
 
     parsed_dep.update_toml(crate_root, key, dep);
@@ -123,8 +123,8 @@ impl Upgrade {
         };
         let reg_url = registry_url(path, parsed_dep.registry())
             .map_err(|e| eyre!("Unable to fetch registry URL for path: {e}"))?;
-        update_registry_index(&reg_url, false).map_err(|e|
-            eyre!("Unable to update registry index: {e}"))?;
+        update_registry_index(&reg_url, false)
+            .map_err(|e| eyre!("Unable to update registry index: {e}"))?;
         let target_version = match self.target_version {
             Some(ref ver) => Some(ver.clone()),
             None => cargo_edit::get_latest_dependency(
@@ -223,7 +223,7 @@ impl Upgrade {
             for dep_name in RELEVANT_PACKAGES {
                 let decor = dep_table.key_decor(dep_name).cloned();
                 if let Some((key, dep)) = dep_table.get_key_value_mut(dep_name) {
-                    self.update_dep(&path, key, dep)?;
+                    self.update_dep(path, key, dep)?;
                     // Workaround since update_toml() doesn't preserve comments
                     dep_table.key_decor_mut(dep_name).map(|dec| {
                         if let Some(prefix) = decor.as_ref().and_then(|val| val.prefix().cloned()) {
@@ -245,8 +245,7 @@ impl Upgrade {
             manifest
                 .write()
                 .map_err(|err| eyre!("Unable to write the updated Cargo.toml to disk: {err}"))?;
-        }
-        else {
+        } else {
             let generated_toml = manifest.to_string();
             println!("{generated_toml}");
         }
@@ -257,7 +256,6 @@ impl Upgrade {
 impl CommandExecute for Upgrade {
     #[tracing::instrument(level = "error", skip(self))]
     fn execute(self) -> eyre::Result<()> {
-
         // Canonicalize because cargo-edit does not accept relative paths.
         let path = std::fs::canonicalize(
             self.manifest_path.clone().unwrap_or(PathBuf::from("./Cargo.toml")),
@@ -276,59 +274,54 @@ impl CommandExecute for Upgrade {
             let workspace = &parse_workspace.workspace;
 
             match (parse_workspace.package.map(|pak| pak.name() == package.as_str()), workspace) {
-                // Name of the package matches the name of the root workspace 
+                // Name of the package matches the name of the root workspace
                 // crate, do not dig for a contained package.
-                (Some(true), _) => {
-                    self.process_manifest(&path, &mut manifest)
-                },
+                (Some(true), _) => self.process_manifest(&path, &mut manifest),
                 // Contained package specified and this is a workspace,
                 // OR workspace has no root package name.
                 // find the correct manifest for the child crate.
-                (Some(false), Some(work))
-                | (None, Some(work)) => {
+                (Some(false), Some(work)) | (None, Some(work)) => {
                     // Unfortunately cargo_toml::Workspace provides the member
                     // list as directories but not as package names, so we have
-                    // to do a little bit of finagling here. 
+                    // to do a little bit of finagling here.
                     let mut child_path_maybe = None;
                     for member in &work.members {
-                        if member == &package { 
+                        if member == &package {
                             // Canonicalized, should have a parent path
-                            let root_path = path.parent()
-                                .ok_or(eyre!("Failed to canonicalize path, no \
-                                parent directory found."))?;
-                            let member_path = root_path
-                                .join(PathBuf::from(member))
-                                .join("Cargo.toml");
+                            let root_path = path.parent().ok_or(eyre!(
+                                "Failed to canonicalize path, no \
+                                parent directory found."
+                            ))?;
+                            let member_path =
+                                root_path.join(PathBuf::from(member)).join("Cargo.toml");
                             println!("Generated child path {:#?}", &member_path);
                             child_path_maybe = Some(member_path);
                         }
-                    };
-                    let child_path = child_path_maybe.ok_or(
-                        eyre!("Package {package} not found in workspace {path:#?}")
-                    )?;
+                    }
+                    let child_path = child_path_maybe
+                        .ok_or(eyre!("Package {package} not found in workspace {path:#?}"))?;
 
                     let mut child_manifest = LocalManifest::find(Some(&child_path))
                         .map_err(|e| eyre!("Error opening manifest: {e}"))?;
 
                     self.process_manifest(&child_path, &mut child_manifest)
-                },
+                }
                 // No name and this is not a workspace, why is a package name
                 // specified?
-                (None, None) => {
-                    Err(eyre!("Package argument provided but the
+                (None, None) => Err(eyre!(
+                    "Package argument provided but the
                         manifest at the path {path:#?} has no name and 
                         is not a workspace, please check Cargo.toml's 
-                        validity."))
-                },
+                        validity."
+                )),
                 // Non-workspace crate, and the name does not match.
-                (Some(false), None) => {
-                    Err(eyre!("Package argument provided but the
+                (Some(false), None) => Err(eyre!(
+                    "Package argument provided but the
                         manifest at the path {path:#?} appears to be a regular
-                        single-crate workspace, with no child crates."))
-                }
+                        single-crate workspace, with no child crates."
+                )),
             }
-        }
-        else {
+        } else {
             // No specified package, go right to the manifest at the
             // specified directory.
             self.process_manifest(&path, &mut manifest)?;
