@@ -705,17 +705,9 @@ fn impl_postgres_enum(ast: DeriveInput) -> syn::Result<proc_macro2::TokenStream>
 
         }
 
-        unsafe impl ::pgrx::callconv::ReturnShipping for #enum_ident {
-            type CallRet = Self;
-            fn label_ret(self) -> ::pgrx::callconv::Ret<Self> {
-                ::pgrx::callconv::Ret::Once(self)
-            }
-            unsafe fn box_return(fcinfo: ::pgrx::pg_sys::FunctionCallInfo, ret: ::pgrx::callconv::Ret<Self>) -> ::pgrx::pg_sys::Datum {
-                match ret {
-                    ::pgrx::callconv::Ret::Zero => unsafe { ::pgrx::pg_return_null(fcinfo) },
-                    ::pgrx::callconv::Ret::Once(value) => value.into_datum().unwrap(),
-                    ::pgrx::callconv::Ret::Many(iter, value) => unreachable!(),
-                }
+        unsafe impl ::pgrx::callconv::RetPackage for #enum_ident {
+            unsafe fn package_ret(self, fcinfo: ::pgrx::pg_sys::FunctionCallInfo) -> ::pgrx::pg_sys::Datum {
+                ::pgrx::datum::IntoDatum::into_datum(self).unwrap()
             }
         }
     });
@@ -822,21 +814,11 @@ fn impl_postgres_type(ast: DeriveInput) -> syn::Result<proc_macro2::TokenStream>
                     }
                 }
 
-                unsafe impl #generics ::pgrx::callconv::ReturnShipping for #name #generics {
-                    type CallRet = Self;
-                    fn label_ret(self) -> ::pgrx::callconv::Ret<Self> {
-                        ::pgrx::callconv::Ret::Once(self)
-                    }
-                    unsafe fn box_return(fcinfo: ::pgrx::pg_sys::FunctionCallInfo, ret: ::pgrx::callconv::Ret<Self>) -> ::pgrx::pg_sys::Datum {
-                        unsafe {
-                            match ret {
-                                ::pgrx::callconv::Ret::Zero => ::pgrx::fcinfo::pg_return_null(fcinfo),
-                                ::pgrx::callconv::Ret::Once(value) => match ::pgrx::datum::IntoDatum::into_datum(value) {
-                                    None => ::pgrx::fcinfo::pg_return_null(fcinfo),
-                                    Some(datum) => datum,
-                                }
-                                _ => unreachable!()
-                            }
+                unsafe impl #generics ::pgrx::callconv::RetPackage for #name #generics {
+                    unsafe fn package_ret(self, fcinfo: ::pgrx::pg_sys::FunctionCallInfo) -> ::pgrx::pg_sys::Datum {
+                        match ::pgrx::datum::IntoDatum::into_datum(self) {
+                            None => ::pgrx::fcinfo::pg_return_null(fcinfo),
+                            Some(datum) => datum,
                         }
                     }
                 }
