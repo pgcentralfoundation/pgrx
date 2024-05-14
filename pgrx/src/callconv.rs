@@ -117,26 +117,6 @@ pub unsafe trait BoxRet: Sized {
     unsafe fn finish_call(_fcinfo: pg_sys::FunctionCallInfo) {}
 }
 
-// pub unsafe fn handle_ret<T: BoxRet>(
-//     fcinfo: pg_sys::FunctionCallInfo,
-//     ret: Ret<T>,
-// ) -> pg_sys::Datum {
-//     match ret {
-//         // Single-call fn or value-per-call iteration
-//         Ret::Once(value) => <T as BoxRet>::box_return(fcinfo, value),
-//         // Value-per-call first-time
-//         Ret::Many(iter, value) => {
-//             iter.into_context(fcinfo);
-//             <T as BoxRet>::box_return(fcinfo, value)
-//         }
-//         // Value-per-call last-time
-//         Ret::Zero => {
-//             <T as BoxRet>::finish_call(fcinfo);
-//             unsafe { pg_return_null(fcinfo) }
-//         }
-//     }
-// }
-
 pub enum CallCx {
     RestoreCx,
     WrappedFn(pg_sys::MemoryContext),
