@@ -253,7 +253,7 @@ impl<'a, T: IntoDatum> SetOfIterator<'a, T> {
 
 unsafe impl<'a, T> BoxRet for TableIterator<'a, T>
 where
-    T: BoxRet,
+    T: IntoHeapTuple,
 {
     type CallRet = <Self as Iterator>::Item;
 
@@ -285,15 +285,32 @@ where
 
         unsafe {
             let fcx = deref_fcx(fcinfo);
+            let heap_tuple = value.into_heap_tuple((*fcx).tuple_desc);
             srf_return_next(fcinfo, fcx);
-            T::box_return(fcinfo, value.into_ret())
+            pg_sys::HeapTupleHeaderGetDatum((*heap_tuple).t_data)
         }
     }
 
     unsafe fn into_context(self, fcinfo: pg_sys::FunctionCallInfo) {
+        // let mut tupdesc = ptr::null_mut();
+        // let ty_class = pg_sys::get_call_result_type(fcinfo, ptr::null_mut(), &mut tupdesc);
+        // if ty_class != pg_sys::TypeFuncClass_TYPEFUNC_COMPOSITE {
+        //     pg_sys::error!("return type must be a row type");
+        // }
+        // pg_sys::BlessTupleDesc(tupdesc);
+        // (*fcx).tuple_desc = tupdesc;
+
+        // table_iterator
         let fcx = deref_fcx(fcinfo);
         unsafe {
-            let ptr = srf_memcx(fcx).leak_and_drop_on_delete(self);
+            let ptr = srf_memcx(fcx).switch_to(move |mcx| {
+                let mut tupdesc = ptr::null_mut();
+                let mut oid = pg_sys::Oid::default();
+                let ty_class = pg_sys::get_call_result_type(fcinfo, &mut oid, &mut tupdesc);
+                pg_sys::BlessTupleDesc(tupdesc);
+                (*fcx).tuple_desc = tupdesc;
+                mcx.leak_and_drop_on_delete(self)
+            });
             // it's the first call so we need to finish setting up fcx
             (*fcx).user_fctx = ptr.cast();
         }
