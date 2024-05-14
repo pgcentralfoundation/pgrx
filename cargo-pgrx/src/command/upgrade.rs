@@ -279,27 +279,50 @@ impl CommandExecute for Upgrade {
                 // Name of the package matches the name of the root workspace 
                 // crate, do not dig for a contained package.
                 (Some(true), _) => {
-                    self.process_manifest(&path, &mut manifest)?;
+                    self.process_manifest(&path, &mut manifest)
                 },
                 // Contained package specified and this is a workspace,
                 // OR workspace has no root package name.
                 // find the correct manifest for the child crate.
                 (Some(false), Some(work))
                 | (None, Some(work)) => {
-                    println!("{:#?}", work.members);
-                    todo!()
+                    // Unfortunately cargo_toml::Workspace provides the member
+                    // list as directories but not as package names, so we have
+                    // to do a little bit of finagling here. 
+                    let mut child_path_maybe = None;
+                    for member in &work.members {
+                        if member == &package { 
+                            // Canonicalized, should have a parent path
+                            let root_path = path.parent()
+                                .ok_or(eyre!("Failed to canonicalize path, no \
+                                parent directory found."))?;
+                            let member_path = root_path
+                                .join(PathBuf::from(member))
+                                .join("Cargo.toml");
+                            println!("Generated child path {:#?}", &member_path);
+                            child_path_maybe = Some(member_path);
+                        }
+                    };
+                    let child_path = child_path_maybe.ok_or(
+                        eyre!("Package {package} not found in workspace {path:#?}")
+                    )?;
+
+                    let mut child_manifest = LocalManifest::find(Some(&child_path))
+                        .map_err(|e| eyre!("Error opening manifest: {e}"))?;
+
+                    self.process_manifest(&child_path, &mut child_manifest)
                 },
                 // No name and this is not a workspace, why is a package name
                 // specified?
                 (None, None) => {
-                    return Err(eyre!("Package argument provided but the
+                    Err(eyre!("Package argument provided but the
                         manifest at the path {path:#?} has no name and 
                         is not a workspace, please check Cargo.toml's 
                         validity."))
                 },
                 // Non-workspace crate, and the name does not match.
                 (Some(false), None) => {
-                    return Err(eyre!("Package argument provided but the
+                    Err(eyre!("Package argument provided but the
                         manifest at the path {path:#?} appears to be a regular
                         single-crate workspace, with no child crates."))
                 }
@@ -309,8 +332,7 @@ impl CommandExecute for Upgrade {
             // No specified package, go right to the manifest at the
             // specified directory.
             self.process_manifest(&path, &mut manifest)?;
+            Ok(())
         }
-
-        Ok(())
     }
 }
