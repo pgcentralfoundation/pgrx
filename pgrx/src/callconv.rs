@@ -116,6 +116,43 @@ pub unsafe trait ReturnShipping: Sized {
     unsafe fn finish_call(_fcinfo: pg_sys::FunctionCallInfo) {}
 }
 
+pub unsafe trait RetPackage: Sized {
+    unsafe fn package_ret(self, fcinfo: pg_sys::FunctionCallInfo) -> pg_sys::Datum;
+}
+
+unsafe impl<T> ReturnShipping for T
+where
+    T: RetPackage,
+{
+    type CallRet = Self;
+    fn label_ret(self) -> Ret<Self> {
+        Ret::Once(self)
+    }
+
+    unsafe fn box_return(fcinfo: pg_sys::FunctionCallInfo, ret: Ret<Self>) -> pg_sys::Datum {
+        let ret = match ret {
+            Ret::Zero => unsafe { return pg_return_null(fcinfo) },
+            Ret::Once(ret) => ret,
+            Ret::Many(_, _) => unreachable!(),
+        };
+
+        ret.package_ret(fcinfo)
+    }
+
+    unsafe fn prepare_call(fcinfo: pg_sys::FunctionCallInfo) -> CallCx {
+        CallCx::WrappedFn(pg_sys::CurrentMemoryContext)
+    }
+    unsafe fn into_context(self, fcinfo: pg_sys::FunctionCallInfo) {
+        unimplemented!()
+    }
+
+    unsafe fn ret_from_context(fcinfo: pg_sys::FunctionCallInfo) -> Ret<Self> {
+        unimplemented!()
+    }
+
+    unsafe fn finish_call(_fcinfo: pg_sys::FunctionCallInfo) {}
+}
+
 pub enum CallCx {
     RestoreCx,
     WrappedFn(pg_sys::MemoryContext),
@@ -425,18 +462,9 @@ where
 macro_rules! impl_boxret_for_primitives {
     ($($scalar:ty),*) => {
         $(
-        unsafe impl ReturnShipping for $scalar {
-            type CallRet = Self;
-            fn label_ret(self) -> Ret<Self> {
-                Ret::Once(self)
-            }
-
-            unsafe fn box_return(fcinfo: pg_sys::FunctionCallInfo, ret: Ret<Self>) -> pg_sys::Datum {
-                match ret {
-                    Ret::Zero => unsafe { pg_return_null(fcinfo) },
-                    Ret::Once(value) => $crate::pg_sys::Datum::from(value),
-                    Ret::Many(_, _) => unreachable!()
-                }
+        unsafe impl RetPackage for $scalar {
+            unsafe fn package_ret(self, fcinfo: pg_sys::FunctionCallInfo) -> pg_sys::Datum {
+                $crate::pg_sys::Datum::from(self)
             }
         }
         )*
@@ -447,106 +475,58 @@ impl_boxret_for_primitives! {
     i8, i16, i32, i64, bool
 }
 
-unsafe impl ReturnShipping for () {
-    type CallRet = Self;
-    fn label_ret(self) -> Ret<Self> {
-        Ret::Zero
-    }
-
-    unsafe fn box_return(fcinfo: pg_sys::FunctionCallInfo, ret: Ret<Self>) -> pg_sys::Datum {
+unsafe impl RetPackage for () {
+    unsafe fn package_ret(self, fcinfo: pg_sys::FunctionCallInfo) -> pg_sys::Datum {
         pg_sys::Datum::from(0)
     }
 }
 
-unsafe impl ReturnShipping for f32 {
-    type CallRet = Self;
-    fn label_ret(self) -> Ret<Self> {
-        Ret::Once(self)
-    }
-
-    unsafe fn box_return(fcinfo: pg_sys::FunctionCallInfo, ret: Ret<Self>) -> pg_sys::Datum {
-        match ret {
-            Ret::Zero => unsafe { pg_return_null(fcinfo) },
-            Ret::Once(value) => pg_sys::Datum::from(value.to_bits()),
-            Ret::Many(_, _) => unreachable!(),
-        }
+unsafe impl RetPackage for f32 {
+    unsafe fn package_ret(self, fcinfo: pg_sys::FunctionCallInfo) -> pg_sys::Datum {
+        pg_sys::Datum::from(self.to_bits())
     }
 }
 
-unsafe impl ReturnShipping for f64 {
-    type CallRet = Self;
-    fn label_ret(self) -> Ret<Self> {
-        Ret::Once(self)
-    }
-
-    unsafe fn box_return(fcinfo: pg_sys::FunctionCallInfo, ret: Ret<Self>) -> pg_sys::Datum {
-        match ret {
-            Ret::Zero => unsafe { pg_return_null(fcinfo) },
-            Ret::Once(value) => pg_sys::Datum::from(value.to_bits()),
-            Ret::Many(_, _) => unreachable!(),
-        }
+unsafe impl RetPackage for f64 {
+    unsafe fn package_ret(self, fcinfo: pg_sys::FunctionCallInfo) -> pg_sys::Datum {
+        pg_sys::Datum::from(self.to_bits())
     }
 }
 
-fn boxret_via_into_datum<T>(fcinfo: pg_sys::FunctionCallInfo, ret: Ret<T>) -> pg_sys::Datum
+fn repackage_into_datum<T>(fcinfo: pg_sys::FunctionCallInfo, ret: T) -> pg_sys::Datum
 where
-    T: ReturnShipping,
-    <T as ReturnShipping>::CallRet: IntoDatum,
+    T: RetPackage + IntoDatum,
 {
-    match ret {
-        Ret::Zero => unsafe { pg_return_null(fcinfo) },
-        Ret::Once(value) => match value.into_datum() {
-            None => unsafe { pg_return_null(fcinfo) },
-            Some(datum) => datum,
-        },
-        Ret::Many(_, _) => unreachable!(),
+    match ret.into_datum() {
+        None => unsafe { pg_return_null(fcinfo) },
+        Some(datum) => datum,
     }
 }
 
-unsafe impl<'a> ReturnShipping for &'a [u8] {
-    type CallRet = Self;
-    fn label_ret(self) -> Ret<Self> {
-        Ret::Once(self)
-    }
-
-    unsafe fn box_return(fcinfo: pg_sys::FunctionCallInfo, ret: Ret<Self>) -> pg_sys::Datum {
-        boxret_via_into_datum(fcinfo, ret)
+unsafe impl<'a> RetPackage for &'a [u8] {
+    unsafe fn package_ret(self, fcinfo: pg_sys::FunctionCallInfo) -> pg_sys::Datum {
+        repackage_into_datum(fcinfo, self)
     }
 }
 
-unsafe impl<'a> ReturnShipping for &'a str {
-    type CallRet = Self;
-    fn label_ret(self) -> Ret<Self> {
-        Ret::Once(self)
-    }
-
-    unsafe fn box_return(fcinfo: pg_sys::FunctionCallInfo, ret: Ret<Self>) -> pg_sys::Datum {
-        boxret_via_into_datum(fcinfo, ret)
+unsafe impl<'a> RetPackage for &'a str {
+    unsafe fn package_ret(self, fcinfo: pg_sys::FunctionCallInfo) -> pg_sys::Datum {
+        repackage_into_datum(fcinfo, self)
     }
 }
 
-unsafe impl<'a> ReturnShipping for &'a CStr {
-    type CallRet = Self;
-    fn label_ret(self) -> Ret<Self> {
-        Ret::Once(self)
-    }
-
-    unsafe fn box_return(fcinfo: pg_sys::FunctionCallInfo, ret: Ret<Self>) -> pg_sys::Datum {
-        boxret_via_into_datum(fcinfo, ret)
+unsafe impl<'a> RetPackage for &'a CStr {
+    unsafe fn package_ret(self, fcinfo: pg_sys::FunctionCallInfo) -> pg_sys::Datum {
+        repackage_into_datum(fcinfo, self)
     }
 }
 
 macro_rules! impl_boxret_via_intodatum {
     ($($boxable:ty),*) => {
         $(
-        unsafe impl ReturnShipping for $boxable {
-            type CallRet = Self;
-            fn label_ret(self) -> Ret<Self> {
-                Ret::Once(self)
-            }
-
-            unsafe fn box_return(fcinfo: pg_sys::FunctionCallInfo, ret: Ret<Self>) -> pg_sys::Datum {
-                boxret_via_into_datum(fcinfo, ret)
+        unsafe impl RetPackage for $boxable {
+            unsafe fn package_ret(self, fcinfo: pg_sys::FunctionCallInfo) -> pg_sys::Datum {
+                repackage_into_datum(fcinfo, self)
             }
         })*
     };
@@ -559,80 +539,50 @@ impl_boxret_via_intodatum! {
     Internal
 }
 
-unsafe impl<const P: u32, const S: u32> ReturnShipping for crate::Numeric<P, S> {
-    type CallRet = Self;
-    fn label_ret(self) -> Ret<Self> {
-        Ret::Once(self)
-    }
-
-    unsafe fn box_return(fcinfo: pg_sys::FunctionCallInfo, ret: Ret<Self>) -> pg_sys::Datum {
-        boxret_via_into_datum(fcinfo, ret)
+unsafe impl<const P: u32, const S: u32> RetPackage for crate::Numeric<P, S> {
+    unsafe fn package_ret(self, fcinfo: pg_sys::FunctionCallInfo) -> pg_sys::Datum {
+        repackage_into_datum(fcinfo, self)
     }
 }
 
-unsafe impl<T> ReturnShipping for crate::Range<T>
+unsafe impl<T> RetPackage for crate::Range<T>
 where
     T: IntoDatum + crate::RangeSubType,
 {
-    type CallRet = Self;
-    fn label_ret(self) -> Ret<Self> {
-        Ret::Once(self)
-    }
-
-    unsafe fn box_return(fcinfo: pg_sys::FunctionCallInfo, ret: Ret<Self>) -> pg_sys::Datum {
-        boxret_via_into_datum(fcinfo, ret)
+    unsafe fn package_ret(self, fcinfo: pg_sys::FunctionCallInfo) -> pg_sys::Datum {
+        repackage_into_datum(fcinfo, self)
     }
 }
 
-unsafe impl<T> ReturnShipping for Vec<T>
+unsafe impl<T> RetPackage for Vec<T>
 where
     T: IntoDatum,
 {
-    type CallRet = Self;
-    fn label_ret(self) -> Ret<Self> {
-        Ret::Once(self)
-    }
-
-    unsafe fn box_return(fcinfo: pg_sys::FunctionCallInfo, ret: Ret<Self>) -> pg_sys::Datum {
-        boxret_via_into_datum(fcinfo, ret)
+    unsafe fn package_ret(self, fcinfo: pg_sys::FunctionCallInfo) -> pg_sys::Datum {
+        repackage_into_datum(fcinfo, self)
     }
 }
 
-unsafe impl<T: Copy> ReturnShipping for PgVarlena<T> {
-    type CallRet = Self;
-    fn label_ret(self) -> Ret<Self> {
-        Ret::Once(self)
-    }
-
-    unsafe fn box_return(fcinfo: pg_sys::FunctionCallInfo, ret: Ret<Self>) -> pg_sys::Datum {
-        boxret_via_into_datum(fcinfo, ret)
+unsafe impl<T: Copy> RetPackage for PgVarlena<T> {
+    unsafe fn package_ret(self, fcinfo: pg_sys::FunctionCallInfo) -> pg_sys::Datum {
+        repackage_into_datum(fcinfo, self)
     }
 }
 
-unsafe impl<'mcx, A> ReturnShipping for PgHeapTuple<'mcx, A>
+unsafe impl<'mcx, A> RetPackage for PgHeapTuple<'mcx, A>
 where
     A: crate::WhoAllocated,
 {
-    type CallRet = Self;
-    fn label_ret(self) -> Ret<Self> {
-        Ret::Once(self)
-    }
-
-    unsafe fn box_return(fcinfo: pg_sys::FunctionCallInfo, ret: Ret<Self>) -> pg_sys::Datum {
-        boxret_via_into_datum(fcinfo, ret)
+    unsafe fn package_ret(self, fcinfo: pg_sys::FunctionCallInfo) -> pg_sys::Datum {
+        repackage_into_datum(fcinfo, self)
     }
 }
 
-unsafe impl<T, A> ReturnShipping for PgBox<T, A>
+unsafe impl<T, A> RetPackage for PgBox<T, A>
 where
     A: crate::WhoAllocated,
 {
-    type CallRet = Self;
-    fn label_ret(self) -> Ret<Self> {
-        Ret::Once(self)
-    }
-
-    unsafe fn box_return(fcinfo: pg_sys::FunctionCallInfo, ret: Ret<Self>) -> pg_sys::Datum {
-        boxret_via_into_datum(fcinfo, ret)
+    unsafe fn package_ret(self, fcinfo: pg_sys::FunctionCallInfo) -> pg_sys::Datum {
+        repackage_into_datum(fcinfo, self)
     }
 }
