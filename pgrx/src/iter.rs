@@ -193,7 +193,7 @@ where
     C: ReturnShipping, // so we support TableIterator<'a, (Option<T>,)> as well
     Self: IntoHeapTuple,
 {
-    type CallRet = Self;
+    type Item = Self;
 
     fn label_ret(self) -> Ret<Self> {
         Ret::Once(self)
@@ -262,7 +262,7 @@ macro_rules! impl_table_iter {
              $($C: ReturnShipping,)*
              Self: IntoHeapTuple,
         {
-            type CallRet = Self;
+            type Item = Self;
 
             fn label_ret(self) -> Ret<Self> {
                 Ret::Once(self)

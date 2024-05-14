@@ -53,7 +53,7 @@ pub trait UnboxArg {
 /// behind the FunctionCallInfo. The most exceptional case are set-returning functions.
 pub unsafe trait ReturnShipping: Sized {
     /// The actual type returned from the call
-    type CallRet: Sized;
+    type Item: Sized;
 
     /// check the fcinfo state, initialize if necessary, and pick calling the wrapped fn or restoring Self
     ///
@@ -65,8 +65,6 @@ pub unsafe trait ReturnShipping: Sized {
     }
 
     /// answer what kind and how many returns happen from this type
-    ///
-    /// must be overridden if `Self != Self::CallRet`
     fn label_ret(self) -> Ret<Self>;
 
     /// box the return value
@@ -104,7 +102,7 @@ unsafe impl<T> ReturnShipping for T
 where
     T: RetPackage,
 {
-    type CallRet = Self;
+    type Item = Self;
     fn label_ret(self) -> Ret<Self> {
         Ret::Once(self)
     }
@@ -153,7 +151,7 @@ unsafe impl<'a, T> ReturnShipping for SetOfIterator<'a, T>
 where
     T: ReturnShipping,
 {
-    type CallRet = <Self as Iterator>::Item;
+    type Item = <Self as Iterator>::Item;
     unsafe fn prepare_call(fcinfo: pg_sys::FunctionCallInfo) -> CallCx {
         prepare_value_per_call_srf(fcinfo)
     }
@@ -211,15 +209,15 @@ where
 
 pub enum Ret<T: ReturnShipping> {
     Zero,
-    Once(T::CallRet),
-    Many(T, T::CallRet),
+    Once(T::Item),
+    Many(T, T::Item),
 }
 
 unsafe impl<'a, T> ReturnShipping for TableIterator<'a, T>
 where
     T: ReturnShipping,
 {
-    type CallRet = <Self as Iterator>::Item;
+    type Item = <Self as Iterator>::Item;
 
     unsafe fn prepare_call(fcinfo: pg_sys::FunctionCallInfo) -> CallCx {
         prepare_value_per_call_srf(fcinfo)
@@ -306,9 +304,9 @@ pub(crate) fn srf_memcx(fcx: *mut pg_sys::FuncCallContext) -> PgMemoryContexts {
 unsafe impl<T> ReturnShipping for Option<T>
 where
     T: ReturnShipping,
-    T::CallRet: ReturnShipping,
+    T::Item: ReturnShipping,
 {
-    type CallRet = T::CallRet;
+    type Item = T::Item;
 
     unsafe fn prepare_call(fcinfo: pg_sys::FunctionCallInfo) -> CallCx {
         T::prepare_call(fcinfo)
@@ -359,10 +357,10 @@ where
 unsafe impl<T, E> ReturnShipping for Result<T, E>
 where
     T: ReturnShipping,
-    T::CallRet: ReturnShipping,
+    T::Item: ReturnShipping,
     E: core::any::Any + core::fmt::Display,
 {
-    type CallRet = T::CallRet;
+    type Item = T::Item;
 
     unsafe fn prepare_call(fcinfo: pg_sys::FunctionCallInfo) -> CallCx {
         T::prepare_call(fcinfo)
