@@ -38,7 +38,7 @@ use crate::ToSqlConfig;
 use operator::{PgrxOperatorAttributeWithIdent, PgrxOperatorOpName};
 use search_path::SearchPathList;
 
-use proc_macro2::{Ident, Span, TokenStream as TokenStream2};
+use proc_macro2::{Ident, TokenStream as TokenStream2};
 use quote::{format_ident, quote, quote_spanned};
 use syn::parse::{Parse, ParseStream, Parser};
 use syn::punctuated::Punctuated;
@@ -405,24 +405,6 @@ impl PgExtern {
                 }
             }
         });
-
-        // Iterators require fancy handling for their retvals
-        let emit_result_handler = |span: Span, optional: bool, result: bool| {
-            let mut ret_expr = quote! { #func_name(#(#arg_pats),*) };
-            if result {
-                // If it's a result, we need to report it.
-                ret_expr = quote! { #ret_expr.unwrap_or_report() };
-            }
-            if !optional {
-                // If it's not already an option, we need to wrap it.
-                ret_expr = quote! { Some(#ret_expr) };
-            }
-            let import = result.then(|| quote! { use ::pgrx::pg_sys::panic::ErrorReportable; });
-            quote_spanned! { span =>
-                    #import
-                    #ret_expr
-            }
-        };
 
         match &self.returns {
             Returning::None
