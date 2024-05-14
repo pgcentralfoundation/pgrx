@@ -39,7 +39,7 @@ note: required by a bound in `brokentype_hash`
   |                                                ^^^^^^^^^^^^ required by this bound in `brokentype_hash`
 5 | pub struct BrokenType {
   |            ---------- required by a bound in this function
-  = note: this error originates in the attribute macro `::pgrx::pgrx_macros::pg_extern` which comes from the expansion of the derive macro `PostgresHash` (in Nightly builds, run with -Z macro-backtrace for more info)
+  = note: this error originates in the derive macro `PostgresHash` (in Nightly builds, run with -Z macro-backtrace for more info)
 help: consider annotating `BrokenType` with `#[derive(Hash)]`
   |
 5 + #[derive(Hash)]
@@ -59,7 +59,7 @@ note: required by a bound in `brokentype_hash`
   |                                                ^^^^^^^^^^^^ required by this bound in `brokentype_hash`
 5 | pub struct BrokenType {
   |            ---------- required by a bound in this function
-  = note: this error originates in the attribute macro `::pgrx::pgrx_macros::pg_extern` which comes from the expansion of the derive macro `PostgresHash` (in Nightly builds, run with -Z macro-backtrace for more info)
+  = note: this error originates in the derive macro `PostgresHash` (in Nightly builds, run with -Z macro-backtrace for more info)
 help: consider annotating `BrokenType` with `#[derive(Eq)]`
   |
 5 + #[derive(Eq)]
