@@ -606,10 +606,11 @@ unsafe impl BoxRet for f64 {
     }
 }
 
-fn boxret_via_into_datum<T: BoxRet<CallRet: IntoDatum>>(
-    fcinfo: pg_sys::FunctionCallInfo,
-    ret: Ret<T>,
-) -> pg_sys::Datum {
+fn boxret_via_into_datum<T>(fcinfo: pg_sys::FunctionCallInfo, ret: Ret<T>) -> pg_sys::Datum
+where
+    T: BoxRet,
+    <T as BoxRet>::CallRet: IntoDatum,
+{
     match ret {
         Ret::Zero => unsafe { pg_return_null(fcinfo) },
         Ret::Once(value) => match value.into_datum() {
