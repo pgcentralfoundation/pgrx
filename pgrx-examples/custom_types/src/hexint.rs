@@ -7,7 +7,7 @@
 //LICENSE All rights reserved.
 //LICENSE
 //LICENSE Use of this source code is governed by the MIT license that can be found in the LICENSE file.
-use pgrx::callconv::{Ret, ReturnShipping};
+use pgrx::callconv::RetPackage;
 use pgrx::pg_sys::{Datum, Oid};
 use pgrx::pgrx_sql_entity_graph::metadata::{
     ArgumentError, Returns, ReturnsError, SqlMapping, SqlTranslatable,
@@ -94,20 +94,9 @@ impl IntoDatum for HexInt {
     }
 }
 
-unsafe impl ReturnShipping for HexInt {
-    type CallRet = Self;
-    fn label_ret(self) -> Ret<Self>
-    where
-        Self: Sized,
-    {
-        Ret::Once(self)
-    }
-
-    unsafe fn box_return(_fcinfo: pg_sys::FunctionCallInfo, ret: Ret<Self>) -> pg_sys::Datum {
-        match ret {
-            Ret::Once(inner) => Datum::from(inner.value),
-            _ => unreachable!(),
-        }
+unsafe impl RetPackage for HexInt {
+    unsafe fn package_ret(self, _fcinfo: pg_sys::FunctionCallInfo) -> pg_sys::Datum {
+        Datum::from(self.value)
     }
 }
 
