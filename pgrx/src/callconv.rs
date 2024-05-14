@@ -408,7 +408,7 @@ where
     }
 }
 
-macro_rules! impl_boxret_for_primitives {
+macro_rules! return_packaging_for_primitives {
     ($($scalar:ty),*) => {
         $(
         unsafe impl RetPackage for $scalar {
@@ -420,7 +420,7 @@ macro_rules! impl_boxret_for_primitives {
     }
 }
 
-impl_boxret_for_primitives! {
+return_packaging_for_primitives! {
     i8, i16, i32, i64, bool
 }
 
@@ -470,7 +470,7 @@ unsafe impl<'a> RetPackage for &'a CStr {
     }
 }
 
-macro_rules! impl_boxret_via_intodatum {
+macro_rules! impl_repackage_into_datum {
     ($($boxable:ty),*) => {
         $(
         unsafe impl RetPackage for $boxable {
@@ -481,7 +481,7 @@ macro_rules! impl_boxret_via_intodatum {
     };
 }
 
-impl_boxret_via_intodatum! {
+impl_repackage_into_datum! {
     String, CString, Json, Inet, Uuid, AnyNumeric, Vec<u8>,
     Date, Interval, Time, TimeWithTimeZone, Timestamp, TimestampWithTimeZone,
     pg_sys::Oid, pg_sys::BOX, pg_sys::Point, char,
