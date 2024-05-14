@@ -8,19 +8,16 @@
 //LICENSE
 //LICENSE Use of this source code is governed by the MIT license that can be found in the LICENSE file.
 #![doc(hidden)]
-#![allow(unused)]
 //! Helper implementations for returning sets and tables from `#[pg_extern]`-style functions
 use std::ffi::{CStr, CString};
-use std::marker::PhantomData;
-use std::mem::{self, ManuallyDrop};
 
 use crate::heap_tuple::PgHeapTuple;
 use crate::iter::{SetOfIterator, TableIterator};
 use crate::ptr::PointerExt;
 use crate::{
-    nonstatic_typeid, pg_return_null, pg_sys, srf_is_first_call, srf_return_done, srf_return_next,
-    AnyNumeric, Date, Inet, Internal, Interval, IntoDatum, IntoHeapTuple, Json, PgBox,
-    PgMemoryContexts, PgVarlena, Time, TimeWithTimeZone, Timestamp, TimestampWithTimeZone, Uuid,
+    pg_return_null, pg_sys, srf_is_first_call, srf_return_done, srf_return_next, AnyNumeric, Date,
+    Inet, Internal, Interval, IntoDatum, Json, PgBox, PgMemoryContexts, PgVarlena, Time,
+    TimeWithTimeZone, Timestamp, TimestampWithTimeZone, Uuid,
 };
 use core::ops::ControlFlow;
 use core::ptr;
@@ -33,14 +30,14 @@ use core::ptr;
 /// omitted in the SQL, but are passed to the Rust function anyways.
 pub trait UnboxArg {
     /// indicates min/max number of args that may be consumed if statically known
-    fn arg_width(fcinfo: pg_sys::FunctionCallInfo) -> Option<(usize, usize)> {
+    fn arg_width(_fcinfo: pg_sys::FunctionCallInfo) -> Option<(usize, usize)> {
         todo!()
     }
 
     /// try to unbox the next argument
     ///
     /// should play into a quasi-iterator somehow?
-    fn try_unbox(fcinfo: pg_sys::FunctionCallInfo, current: usize) -> ControlFlow<Self, ()>
+    fn try_unbox(_fcinfo: pg_sys::FunctionCallInfo, _current: usize) -> ControlFlow<Self, ()>
     where
         Self: Sized,
     {
@@ -63,7 +60,7 @@ pub unsafe trait ReturnShipping: Sized {
     /// the implementer must pick the correct memory context for the wrapped fn's allocations
     /// # safety
     /// must be called with a valid fcinfo
-    unsafe fn prepare_call(fcinfo: pg_sys::FunctionCallInfo) -> CallCx {
+    unsafe fn prepare_call(_fcinfo: pg_sys::FunctionCallInfo) -> CallCx {
         CallCx::WrappedFn(unsafe { pg_sys::CurrentMemoryContext })
     }
 
@@ -71,23 +68,6 @@ pub unsafe trait ReturnShipping: Sized {
     ///
     /// must be overridden if `Self != Self::CallRet`
     fn label_ret(self) -> Ret<Self>;
-
-    // morally I should be allowed to supply a default impl >:(
-    /* this default impl would work, but at what cost?
-    {
-        if nonstatic_typeid::<Self>() == nonstatic_typeid::<Self::CallRet>() {
-            // SAFETY: We materialize a copy, then evaporate the original without dropping it,
-            // but only when we know that the original Self is the same type as Self::CallRet!
-            unsafe {
-                let ret = Ret::Once(::core::mem::transmute_copy(&self));
-                ::core::mem::forget(self);
-                ret
-            }
-        } else {
-            panic!("`BoxRet::into_ret` must be overridden for {}", ::core::any::type_name::<Self>())
-        }
-    }
-    */
 
     /// box the return value
     /// # Safety
@@ -99,7 +79,7 @@ pub unsafe trait ReturnShipping: Sized {
     /// for all others: panic
     /// # Safety
     /// must be called with a valid fcinfo
-    unsafe fn into_context(self, fcinfo: pg_sys::FunctionCallInfo) {
+    unsafe fn into_context(self, _fcinfo: pg_sys::FunctionCallInfo) {
         unimplemented!()
     }
 
@@ -108,7 +88,7 @@ pub unsafe trait ReturnShipping: Sized {
     /// for all others: panic
     /// # Safety
     /// must be called with a valid fcinfo
-    unsafe fn ret_from_context(fcinfo: pg_sys::FunctionCallInfo) -> Ret<Self> {
+    unsafe fn ret_from_context(_fcinfo: pg_sys::FunctionCallInfo) -> Ret<Self> {
         unimplemented!()
     }
 
@@ -139,14 +119,14 @@ where
         ret.package_ret(fcinfo)
     }
 
-    unsafe fn prepare_call(fcinfo: pg_sys::FunctionCallInfo) -> CallCx {
-        CallCx::WrappedFn(pg_sys::CurrentMemoryContext)
+    unsafe fn prepare_call(_fcinfo: pg_sys::FunctionCallInfo) -> CallCx {
+        CallCx::WrappedFn(unsafe { pg_sys::CurrentMemoryContext })
     }
-    unsafe fn into_context(self, fcinfo: pg_sys::FunctionCallInfo) {
+    unsafe fn into_context(self, _fcinfo: pg_sys::FunctionCallInfo) {
         unimplemented!()
     }
 
-    unsafe fn ret_from_context(fcinfo: pg_sys::FunctionCallInfo) -> Ret<Self> {
+    unsafe fn ret_from_context(_fcinfo: pg_sys::FunctionCallInfo) -> Ret<Self> {
         unimplemented!()
     }
 
@@ -188,7 +168,6 @@ where
     }
 
     unsafe fn box_return(fcinfo: pg_sys::FunctionCallInfo, ret: Ret<Self>) -> pg_sys::Datum {
-        let fcx = deref_fcx(fcinfo);
         let value = match ret {
             Ret::Zero => return empty_srf(fcinfo),
             Ret::Once(value) => value,
@@ -217,7 +196,7 @@ where
     unsafe fn ret_from_context(fcinfo: pg_sys::FunctionCallInfo) -> Ret<Self> {
         let fcx = deref_fcx(fcinfo);
         // SAFETY: fcx.user_fctx was set earlier, immediately before or in a prior call
-        let mut iter = &mut *(*fcx).user_fctx.cast::<TableIterator<T>>();
+        let iter = &mut *(*fcx).user_fctx.cast::<TableIterator<T>>();
         match iter.next() {
             None => Ret::Zero,
             Some(value) => Ret::Once(value),
@@ -294,7 +273,7 @@ where
     unsafe fn ret_from_context(fcinfo: pg_sys::FunctionCallInfo) -> Ret<Self> {
         let fcx = deref_fcx(fcinfo);
         // SAFETY: fcx.user_fctx was set earlier, immediately before or in a prior call
-        let mut iter = &mut *(*fcx).user_fctx.cast::<TableIterator<T>>();
+        let iter = &mut *(*fcx).user_fctx.cast::<TableIterator<T>>();
         match iter.next() {
             None => Ret::Zero,
             Some(value) => Ret::Once(value),
@@ -305,14 +284,6 @@ where
         let fcx = deref_fcx(fcinfo);
         unsafe { srf_return_done(fcinfo, fcx) }
     }
-}
-
-fn fcx_needs_setup(fcinfo: pg_sys::FunctionCallInfo) -> bool {
-    let need = unsafe { srf_is_first_call(fcinfo) };
-    if need {
-        unsafe { pg_sys::init_MultiFuncCall(fcinfo) };
-    }
-    need
 }
 
 pub(crate) fn empty_srf(fcinfo: pg_sys::FunctionCallInfo) -> pg_sys::Datum {
@@ -330,26 +301,6 @@ pub(crate) fn deref_fcx(fcinfo: pg_sys::FunctionCallInfo) -> *mut pg_sys::FuncCa
 
 pub(crate) fn srf_memcx(fcx: *mut pg_sys::FuncCallContext) -> PgMemoryContexts {
     unsafe { PgMemoryContexts::For((*fcx).multi_call_memory_ctx) }
-}
-
-fn finish_srf_init<T>(
-    arg: Option<T>,
-    fcinfo: pg_sys::FunctionCallInfo,
-) -> ControlFlow<pg_sys::Datum, ()> {
-    match arg {
-        // nothing to iterate?
-        None => ControlFlow::Break(empty_srf(fcinfo)),
-        // must be saved for the next call by leaking it into the multi-call memory context
-        Some(value) => {
-            let fcx = deref_fcx(fcinfo);
-            unsafe {
-                let ptr = srf_memcx(fcx).leak_and_drop_on_delete(value);
-                // it's the first call so we need to finish setting up fcx
-                (*fcx).user_fctx = ptr.cast();
-            }
-            ControlFlow::Continue(())
-        }
-    }
 }
 
 unsafe impl<T> ReturnShipping for Option<T>
@@ -463,7 +414,7 @@ macro_rules! impl_boxret_for_primitives {
     ($($scalar:ty),*) => {
         $(
         unsafe impl RetPackage for $scalar {
-            unsafe fn package_ret(self, fcinfo: pg_sys::FunctionCallInfo) -> pg_sys::Datum {
+            unsafe fn package_ret(self, _fcinfo: pg_sys::FunctionCallInfo) -> pg_sys::Datum {
                 $crate::pg_sys::Datum::from(self)
             }
         }
@@ -476,19 +427,19 @@ impl_boxret_for_primitives! {
 }
 
 unsafe impl RetPackage for () {
-    unsafe fn package_ret(self, fcinfo: pg_sys::FunctionCallInfo) -> pg_sys::Datum {
+    unsafe fn package_ret(self, _fcinfo: pg_sys::FunctionCallInfo) -> pg_sys::Datum {
         pg_sys::Datum::from(0)
     }
 }
 
 unsafe impl RetPackage for f32 {
-    unsafe fn package_ret(self, fcinfo: pg_sys::FunctionCallInfo) -> pg_sys::Datum {
+    unsafe fn package_ret(self, _fcinfo: pg_sys::FunctionCallInfo) -> pg_sys::Datum {
         pg_sys::Datum::from(self.to_bits())
     }
 }
 
 unsafe impl RetPackage for f64 {
-    unsafe fn package_ret(self, fcinfo: pg_sys::FunctionCallInfo) -> pg_sys::Datum {
+    unsafe fn package_ret(self, _fcinfo: pg_sys::FunctionCallInfo) -> pg_sys::Datum {
         pg_sys::Datum::from(self.to_bits())
     }
 }
