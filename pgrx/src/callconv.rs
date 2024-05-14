@@ -203,35 +203,6 @@ pub enum Ret<T: BoxRet> {
     Many(T, T::CallRet),
 }
 
-impl<'a, T: IntoDatum> SetOfIterator<'a, T> {
-    #[doc(hidden)]
-    pub unsafe fn srf_next(
-        fcinfo: pg_sys::FunctionCallInfo,
-        wrapped_fn: impl FnOnce() -> Option<SetOfIterator<'a, T>>,
-    ) -> pg_sys::Datum {
-        if fcx_needs_setup(fcinfo) {
-            let fcx = deref_fcx(fcinfo);
-            // first off, ask the user's function to do the needful and return Option<SetOfIterator<T>>
-            let setof_iterator = srf_memcx(fcx).switch_to(|_| wrapped_fn());
-            if let ControlFlow::Break(datum) = finish_srf_init(setof_iterator, fcinfo) {
-                return datum;
-            }
-        }
-
-        let fcx = deref_fcx(fcinfo);
-        // SAFETY: fcx.user_fctx was set earlier, immediately before or in a prior call
-        let setof_iterator = &mut *(*fcx).user_fctx.cast::<SetOfIterator<T>>();
-
-        match setof_iterator.next() {
-            Some(datum) => {
-                srf_return_next(fcinfo, fcx);
-                datum.into_datum().unwrap_or_else(|| pg_return_null(fcinfo))
-            }
-            None => empty_srf(fcinfo),
-        }
-    }
-}
-
 unsafe impl<'a, T> BoxRet for TableIterator<'a, T>
 where
     T: BoxRet,
@@ -303,50 +274,6 @@ where
     unsafe fn finish_call(fcinfo: pg_sys::FunctionCallInfo) {
         let fcx = deref_fcx(fcinfo);
         unsafe { srf_return_done(fcinfo, fcx) }
-    }
-}
-
-impl<'a, T: IntoHeapTuple> TableIterator<'a, T> {
-    #[doc(hidden)]
-    pub unsafe fn srf_next(
-        fcinfo: pg_sys::FunctionCallInfo,
-        wrapped_fn: impl FnOnce() -> Option<TableIterator<'a, T>>,
-    ) -> pg_sys::Datum {
-        if fcx_needs_setup(fcinfo) {
-            let fcx = deref_fcx(fcinfo);
-            let table_iterator = srf_memcx(fcx).switch_to(|_| {
-                // first off, ask the user's function to do the needful and return Option<TableIterator<T>>
-                let table_iterator = wrapped_fn();
-
-                // Build a tuple descriptor for our result type
-                let mut tupdesc = ptr::null_mut();
-                let ty_class = pg_sys::get_call_result_type(fcinfo, ptr::null_mut(), &mut tupdesc);
-                if ty_class != pg_sys::TypeFuncClass_TYPEFUNC_COMPOSITE {
-                    pg_sys::error!("return type must be a row type");
-                }
-                pg_sys::BlessTupleDesc(tupdesc);
-                (*fcx).tuple_desc = tupdesc;
-
-                table_iterator
-            });
-
-            if let ControlFlow::Break(datum) = finish_srf_init(table_iterator, fcinfo) {
-                return datum;
-            }
-        }
-
-        let fcx = deref_fcx(fcinfo);
-        // SAFETY: fcx.user_fctx was set earlier, immediately before or in a prior call
-        let table_iterator = &mut *(*fcx).user_fctx.cast::<TableIterator<T>>();
-
-        match table_iterator.next() {
-            Some(tuple) => {
-                let heap_tuple = tuple.into_heap_tuple((*fcx).tuple_desc);
-                srf_return_next(fcinfo, fcx);
-                pg_sys::HeapTupleHeaderGetDatum((*heap_tuple).t_data)
-            }
-            None => empty_srf(fcinfo),
-        }
     }
 }
 
