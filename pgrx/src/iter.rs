@@ -10,7 +10,10 @@
 #![allow(clippy::vec_init_then_push)]
 use std::iter;
 
-use crate::{pg_sys, IntoDatum, IntoHeapTuple};
+use crate::{
+    callconv::{BoxRet, Ret, *},
+    pg_sys, IntoDatum, IntoHeapTuple,
+};
 use pgrx_sql_entity_graph::metadata::{
     ArgumentError, Returns, ReturnsError, SqlMapping, SqlTranslatable,
 };
@@ -202,6 +205,37 @@ macro_rules! impl_table_iter {
                     pg_sys::heap_form_tuple(tupdesc, datums.as_mut_ptr(), nulls.as_mut_ptr())
                 }
             }
+        }
+
+        unsafe impl<$($C),*> BoxRet for ($($C,)*)
+        where Self: IntoHeapTuple {
+            type CallRet = Self;
+
+            fn into_ret(self) -> Ret<Self>
+            where
+                Self: Sized,
+            {
+                Ret::Once(self)
+            }
+
+            unsafe fn box_return(fcinfo: pg_sys::FunctionCallInfo, ret: Ret<Self>) -> pg_sys::Datum {
+                let value = match ret {
+                    Ret::Zero => return empty_srf(fcinfo),
+                    Ret::Once(value) => value,
+                    Ret::Many(iter, value) => {
+                        iter.into_context(fcinfo);
+                        value
+                    }
+                };
+
+                unsafe {
+                    let fcx = deref_fcx(fcinfo);
+                    let heap_tuple = value.into_heap_tuple((*fcx).tuple_desc);
+                    pg_sys::HeapTupleHeaderGetDatum((*heap_tuple).t_data)
+                }
+            }
+
+
         }
 
     }

@@ -253,7 +253,7 @@ impl<'a, T: IntoDatum> SetOfIterator<'a, T> {
 
 unsafe impl<'a, T> BoxRet for TableIterator<'a, T>
 where
-    T: IntoHeapTuple,
+    T: BoxRet,
 {
     type CallRet = <Self as Iterator>::Item;
 
@@ -285,22 +285,13 @@ where
 
         unsafe {
             let fcx = deref_fcx(fcinfo);
-            let heap_tuple = value.into_heap_tuple((*fcx).tuple_desc);
             srf_return_next(fcinfo, fcx);
-            pg_sys::HeapTupleHeaderGetDatum((*heap_tuple).t_data)
+            T::box_return(fcinfo, value.into_ret())
         }
     }
 
     unsafe fn into_context(self, fcinfo: pg_sys::FunctionCallInfo) {
-        // let mut tupdesc = ptr::null_mut();
-        // let ty_class = pg_sys::get_call_result_type(fcinfo, ptr::null_mut(), &mut tupdesc);
-        // if ty_class != pg_sys::TypeFuncClass_TYPEFUNC_COMPOSITE {
-        //     pg_sys::error!("return type must be a row type");
-        // }
-        // pg_sys::BlessTupleDesc(tupdesc);
-        // (*fcx).tuple_desc = tupdesc;
-
-        // table_iterator
+        // FIXME: this is assigned here but used in the tuple impl?
         let fcx = deref_fcx(fcinfo);
         unsafe {
             let ptr = srf_memcx(fcx).switch_to(move |mcx| {
@@ -384,7 +375,7 @@ fn fcx_needs_setup(fcinfo: pg_sys::FunctionCallInfo) -> bool {
     need
 }
 
-fn empty_srf(fcinfo: pg_sys::FunctionCallInfo) -> pg_sys::Datum {
+pub(crate) fn empty_srf(fcinfo: pg_sys::FunctionCallInfo) -> pg_sys::Datum {
     unsafe {
         let fcx = deref_fcx(fcinfo);
         srf_return_done(fcinfo, fcx);
@@ -393,11 +384,11 @@ fn empty_srf(fcinfo: pg_sys::FunctionCallInfo) -> pg_sys::Datum {
 }
 
 /// "per_MultiFuncCall" but no FFI cost
-fn deref_fcx(fcinfo: pg_sys::FunctionCallInfo) -> *mut pg_sys::FuncCallContext {
+pub(crate) fn deref_fcx(fcinfo: pg_sys::FunctionCallInfo) -> *mut pg_sys::FuncCallContext {
     unsafe { (*(*fcinfo).flinfo).fn_extra.cast() }
 }
 
-fn srf_memcx(fcx: *mut pg_sys::FuncCallContext) -> PgMemoryContexts {
+pub(crate) fn srf_memcx(fcx: *mut pg_sys::FuncCallContext) -> PgMemoryContexts {
     unsafe { PgMemoryContexts::For((*fcx).multi_call_memory_ctx) }
 }
 
