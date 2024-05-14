@@ -9,6 +9,8 @@
 //LICENSE Use of this source code is governed by the MIT license that can be found in the LICENSE file.
 use pgrx::prelude::*;
 
+use Result as Consequences;
+
 #[pg_extern]
 fn example_generate_series(
     start: i32,
@@ -65,15 +67,15 @@ fn return_none_setof_iterator() -> Option<SetOfIterator<'static, i32>> {
 
 #[pg_extern]
 fn return_none_result_setof_iterator(
-) -> Result<Option<SetOfIterator<'static, String>>, Box<dyn std::error::Error>> {
+) -> Consequences<Option<SetOfIterator<'static, String>>, Box<dyn std::error::Error>> {
     Ok(None)
 }
 
-// TODO:  We don't yet support returning Result<Option<TableIterator>> because the code generator
+// TODO:  We don't yet support returning Consequences<Option<TableIterator>> because the code generator
 //        is inscrutable. But when we do, this function will help ensure it works
 //
 // #[pg_extern]
-// fn return_none_result_tableiterator_iterator() -> Result<
+// fn return_none_result_tableiterator_iterator() -> Consequences<
 //     Option<TableIterator<'static, (name!(idx, i32), name!(some_value, &'static str))>>,
 //     Box<dyn std::error::Error>,
 // > {
@@ -94,7 +96,7 @@ fn split_table_with_borrow<'a>(
 }
 
 #[pg_extern]
-fn result_table_1() -> Result<
+fn result_table_1() -> Consequences<
     Option<::pgrx::iter::TableIterator<'static, (name!(a, Option<i32>), name!(b, Option<i32>))>>,
     Box<dyn std::error::Error + Send + Sync + 'static>,
 > {
@@ -102,7 +104,7 @@ fn result_table_1() -> Result<
 }
 
 #[pg_extern]
-fn result_table_2() -> Result<
+fn result_table_2() -> Consequences<
     Option<TableIterator<'static, (name!(a, Option<i32>), name!(b, Option<i32>))>>,
     Box<dyn std::error::Error + Send + Sync + 'static>,
 > {
@@ -110,7 +112,7 @@ fn result_table_2() -> Result<
 }
 
 #[pg_extern]
-fn result_table_3() -> Result<
+fn result_table_3() -> Consequences<
     Option<TableIterator<'static, (name!(a, Option<i32>), name!(b, Option<i32>))>>,
     Box<dyn std::error::Error + Send + Sync + 'static>,
 > {
@@ -118,7 +120,7 @@ fn result_table_3() -> Result<
 }
 
 #[pg_extern]
-fn result_table_4_err() -> Result<
+fn result_table_4_err() -> Consequences<
     Option<TableIterator<'static, (name!(a, Option<i32>), name!(b, Option<i32>))>>,
     Box<dyn std::error::Error + Send + Sync + 'static>,
 > {
@@ -126,7 +128,7 @@ fn result_table_4_err() -> Result<
 }
 
 #[pg_extern]
-fn result_table_5_none() -> Result<
+fn result_table_5_none() -> Consequences<
     Option<TableIterator<'static, (name!(a, Option<i32>), name!(b, Option<i32>))>>,
     Box<dyn std::error::Error + Send + Sync + 'static>,
 > {
@@ -144,14 +146,14 @@ fn one_col_option() -> Option<TableIterator<'static, (name!(a, i32),)>> {
 }
 
 #[pg_extern]
-fn one_col_result() -> Result<TableIterator<'static, (name!(a, i32),)>, Box<dyn std::error::Error>>
-{
+fn one_col_result(
+) -> Consequences<TableIterator<'static, (name!(a, i32),)>, Box<dyn std::error::Error>> {
     Ok(TableIterator::new(std::iter::once((42,))))
 }
 
 #[pg_extern]
 fn one_col_result_option(
-) -> Result<Option<TableIterator<'static, (name!(a, i32),)>>, Box<dyn std::error::Error>> {
+) -> Consequences<Option<TableIterator<'static, (name!(a, i32),)>>, Box<dyn std::error::Error>> {
     Ok(Some(TableIterator::new(std::iter::once((42,)))))
 }
 
@@ -291,9 +293,10 @@ mod tests {
     }
 
     #[pg_test(error = "column \"cause_an_error\" does not exist")]
-    pub fn spi_in_iterator(
-    ) -> TableIterator<'static, (name!(id, i32), name!(relname, Result<Option<String>, spi::Error>))>
-    {
+    pub fn spi_in_iterator() -> TableIterator<
+        'static,
+        (name!(id, i32), name!(relname, Consequences<Option<String>, spi::Error>)),
+    > {
         let oids = vec![1213, 1214, 1232, 1233, 1247, 1249, 1255];
 
         TableIterator::new(oids.into_iter().map(|oid| {
@@ -302,7 +305,7 @@ mod tests {
     }
 
     #[pg_test(error = "column \"cause_an_error\" does not exist")]
-    pub fn spi_in_setof() -> SetOfIterator<'static, Result<Option<String>, spi::Error>> {
+    pub fn spi_in_setof() -> SetOfIterator<'static, Consequences<Option<String>, spi::Error>> {
         let oids = vec![1213, 1214, 1232, 1233, 1247, 1249, 1255];
 
         SetOfIterator::new(oids.into_iter().map(|oid| {
