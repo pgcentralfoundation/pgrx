@@ -53,12 +53,16 @@ pub trait UnboxArg {
 /// It is strictly a mistake to use IntoDatum or any derived traits for this bound!
 /// PGRX allows complex return values which are nonsensical outside of function boundaries,
 /// e.g. for implementing the value-per-call convention for set-returning functions.
-pub trait BoxRet: Sized {
+pub unsafe trait BoxRet: Sized {
     /// The actual type returned from the call
     type CallRet: Sized;
 
     /// check the fcinfo state, initialize if necessary, and pick calling the wrapped fn or restoring Self
-    fn prepare_call(fcinfo: pg_sys::FunctionCallInfo) -> CallCx {
+    ///
+    /// the implementer must pick the correct memory context for the wrapped fn's allocations
+    /// # safety
+    /// must be called with a valid fcinfo
+    unsafe fn prepare_call(fcinfo: pg_sys::FunctionCallInfo) -> CallCx {
         CallCx::WrappedFn(unsafe { pg_sys::CurrentMemoryContext })
     }
 
@@ -86,19 +90,30 @@ pub trait BoxRet: Sized {
     */
 
     /// box the return value
-    fn box_return(fcinfo: pg_sys::FunctionCallInfo, ret: Ret<Self>) -> pg_sys::Datum;
+    /// # Safety
+    /// must be called with a valid fcinfo
+    unsafe fn box_return(fcinfo: pg_sys::FunctionCallInfo, ret: Ret<Self>) -> pg_sys::Datum;
 
     /// for multi-call types, how to init them in the multi-call context, for all others: panic
-    fn into_context(self, fcinfo: pg_sys::FunctionCallInfo) {
+    ///
+    /// for all others: panic
+    /// # Safety
+    /// must be called with a valid fcinfo
+    unsafe fn into_context(self, fcinfo: pg_sys::FunctionCallInfo) {
         unimplemented!()
     }
 
-    /// for multi-call types, how to restore them from the multi-call context, for all others: panic
+    /// for multi-call types, how to restore them from the multi-call context
+    ///
+    /// for all others: panic
+    /// # Safety
+    /// must be called with a valid fcinfo
     unsafe fn ret_from_context(fcinfo: pg_sys::FunctionCallInfo) -> Ret<Self> {
         unimplemented!()
     }
 
-    fn finish_call(_fcinfo: pg_sys::FunctionCallInfo) {}
+    /// must be called with a valid fcinfo
+    unsafe fn finish_call(_fcinfo: pg_sys::FunctionCallInfo) {}
 }
 
 // pub unsafe fn handle_ret<T: BoxRet>(
