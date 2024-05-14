@@ -70,9 +70,8 @@ pub unsafe trait BoxRet: Sized {
     /// answer what kind and how many returns happen from this type
     ///
     /// must be overridden if `Self != Self::CallRet`
-    fn into_ret(self) -> Ret<Self>
-    where
-        Self: Sized;
+    fn into_ret(self) -> Ret<Self>;
+
     // morally I should be allowed to supply a default impl >:(
     /* this default impl would work, but at what cost?
     {
@@ -142,10 +141,7 @@ where
         prepare_value_per_call_srf(fcinfo)
     }
 
-    fn into_ret(self) -> Ret<Self>
-    where
-        Self: Sized,
-    {
+    fn into_ret(self) -> Ret<Self> {
         let mut iter = self;
         let ret = iter.next();
         match ret {
@@ -213,10 +209,7 @@ where
         prepare_value_per_call_srf(fcinfo)
     }
 
-    fn into_ret(self) -> Ret<Self>
-    where
-        Self: Sized,
-    {
+    fn into_ret(self) -> Ret<Self> {
         let mut iter = self;
         let ret = iter.next();
         match ret {
@@ -333,10 +326,7 @@ where
         T::prepare_call(fcinfo)
     }
 
-    fn into_ret(self) -> Ret<Self>
-    where
-        Self: Sized,
-    {
+    fn into_ret(self) -> Ret<Self> {
         match self {
             None => Ret::Zero,
             Some(value) => match value.into_ret() {
@@ -390,10 +380,7 @@ where
         T::prepare_call(fcinfo)
     }
 
-    fn into_ret(self) -> Ret<Self>
-    where
-        Self: Sized,
-    {
+    fn into_ret(self) -> Ret<Self> {
         let value = pg_sys::panic::ErrorReportable::unwrap_or_report(self);
         match T::into_ret(value) {
             Ret::Zero => Ret::Zero,
@@ -440,10 +427,7 @@ macro_rules! impl_boxret_for_primitives {
         $(
         unsafe impl BoxRet for $scalar {
             type CallRet = Self;
-            fn into_ret(self) -> Ret<Self>
-            where
-                Self: Sized,
-            {
+            fn into_ret(self) -> Ret<Self> {
                 Ret::Once(self)
             }
 
@@ -465,10 +449,7 @@ impl_boxret_for_primitives! {
 
 unsafe impl BoxRet for () {
     type CallRet = Self;
-    fn into_ret(self) -> Ret<Self>
-    where
-        Self: Sized,
-    {
+    fn into_ret(self) -> Ret<Self> {
         Ret::Zero
     }
 
@@ -479,10 +460,7 @@ unsafe impl BoxRet for () {
 
 unsafe impl BoxRet for f32 {
     type CallRet = Self;
-    fn into_ret(self) -> Ret<Self>
-    where
-        Self: Sized,
-    {
+    fn into_ret(self) -> Ret<Self> {
         Ret::Once(self)
     }
 
@@ -497,10 +475,7 @@ unsafe impl BoxRet for f32 {
 
 unsafe impl BoxRet for f64 {
     type CallRet = Self;
-    fn into_ret(self) -> Ret<Self>
-    where
-        Self: Sized,
-    {
+    fn into_ret(self) -> Ret<Self> {
         Ret::Once(self)
     }
 
@@ -530,10 +505,7 @@ where
 
 unsafe impl<'a> BoxRet for &'a [u8] {
     type CallRet = Self;
-    fn into_ret(self) -> Ret<Self>
-    where
-        Self: Sized,
-    {
+    fn into_ret(self) -> Ret<Self> {
         Ret::Once(self)
     }
 
@@ -544,10 +516,7 @@ unsafe impl<'a> BoxRet for &'a [u8] {
 
 unsafe impl<'a> BoxRet for &'a str {
     type CallRet = Self;
-    fn into_ret(self) -> Ret<Self>
-    where
-        Self: Sized,
-    {
+    fn into_ret(self) -> Ret<Self> {
         Ret::Once(self)
     }
 
@@ -558,10 +527,7 @@ unsafe impl<'a> BoxRet for &'a str {
 
 unsafe impl<'a> BoxRet for &'a CStr {
     type CallRet = Self;
-    fn into_ret(self) -> Ret<Self>
-    where
-        Self: Sized,
-    {
+    fn into_ret(self) -> Ret<Self> {
         Ret::Once(self)
     }
 
@@ -575,10 +541,7 @@ macro_rules! impl_boxret_via_intodatum {
         $(
         unsafe impl BoxRet for $boxable {
             type CallRet = Self;
-            fn into_ret(self) -> Ret<Self>
-            where
-                Self: Sized,
-            {
+            fn into_ret(self) -> Ret<Self> {
                 Ret::Once(self)
             }
 
@@ -598,10 +561,7 @@ impl_boxret_via_intodatum! {
 
 unsafe impl<const P: u32, const S: u32> BoxRet for crate::Numeric<P, S> {
     type CallRet = Self;
-    fn into_ret(self) -> Ret<Self>
-    where
-        Self: Sized,
-    {
+    fn into_ret(self) -> Ret<Self> {
         Ret::Once(self)
     }
 
@@ -615,10 +575,7 @@ where
     T: IntoDatum + crate::RangeSubType,
 {
     type CallRet = Self;
-    fn into_ret(self) -> Ret<Self>
-    where
-        Self: Sized,
-    {
+    fn into_ret(self) -> Ret<Self> {
         Ret::Once(self)
     }
 
@@ -632,10 +589,7 @@ where
     T: IntoDatum,
 {
     type CallRet = Self;
-    fn into_ret(self) -> Ret<Self>
-    where
-        Self: Sized,
-    {
+    fn into_ret(self) -> Ret<Self> {
         Ret::Once(self)
     }
 
@@ -646,10 +600,7 @@ where
 
 unsafe impl<T: Copy> BoxRet for PgVarlena<T> {
     type CallRet = Self;
-    fn into_ret(self) -> Ret<Self>
-    where
-        Self: Sized,
-    {
+    fn into_ret(self) -> Ret<Self> {
         Ret::Once(self)
     }
 
@@ -663,10 +614,7 @@ where
     A: crate::WhoAllocated,
 {
     type CallRet = Self;
-    fn into_ret(self) -> Ret<Self>
-    where
-        Self: Sized,
-    {
+    fn into_ret(self) -> Ret<Self> {
         Ret::Once(self)
     }
 
@@ -680,10 +628,7 @@ where
     A: crate::WhoAllocated,
 {
     type CallRet = Self;
-    fn into_ret(self) -> Ret<Self>
-    where
-        Self: Sized,
-    {
+    fn into_ret(self) -> Ret<Self> {
         Ret::Once(self)
     }
 
