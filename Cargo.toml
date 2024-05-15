@@ -57,6 +57,7 @@ pgrx-sql-entity-graph = { path = "./pgrx-sql-entity-graph", version = "=0.12.0-a
 pgrx-pg-config = { path = "./pgrx-pg-config", version = "=0.12.0-alpha.1" }
 
 cargo_metadata = "0.18.0"
+cargo-edit = "0.12.2" # format-preserving edits to cargo.toml
 cargo_toml = "0.19" # used for building projects
 clap-cargo = { version = "0.14.0", features = [ "cargo_metadata" ] }
 eyre = "~0.6.12" # simplifies error-handling
@@ -67,6 +68,7 @@ quote = "1.0.33"
 regex = "1.1" # used for build/test
 syn = { version = "2", features = [ "extra-traits", "full", "parsing" ] }
 toml = "0.8" # our config files
+toml_edit = "0.19.14" # format-preserving edits to toml files, used with cargo-edit
 thiserror = "1"
 unescape = "0.1.0" # for escaped-character-handling
 url = "2.4.1" # the non-existent std::web

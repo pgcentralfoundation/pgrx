@@ -28,11 +28,13 @@ pgrx-pg-config.workspace = true
 pgrx-sql-entity-graph.workspace = true
 
 cargo_metadata.workspace = true
+cargo-edit.workspace = true
 cargo_toml.workspace = true
 clap-cargo.workspace = true
 libc.workspace = true
 regex.workspace = true
 toml.workspace = true
+toml_edit.workspace = true
 
 clap = { version = "4.4.2", features = [ "env", "suggestions", "cargo", "derive", "wrap_help" ] }
 jobslot = "0.2.12" # as seen in gmake -j{N}

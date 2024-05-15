@@ -26,6 +26,7 @@ pub(crate) mod status;
 pub(crate) mod stop;
 pub(crate) mod sudo_install;
 pub(crate) mod test;
+pub(crate) mod upgrade;
 pub(crate) mod version;
 
 // Build a ureq::Agent by the given url. Requests from this agent are proxied if we have
