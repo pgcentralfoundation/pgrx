@@ -301,56 +301,15 @@ pub(crate) fn srf_memcx(fcx: *mut pg_sys::FuncCallContext) -> PgMemoryContexts {
     unsafe { PgMemoryContexts::For((*fcx).multi_call_memory_ctx) }
 }
 
-unsafe impl<T> ReturnShipping for Option<T>
+unsafe impl<T> RetPackage for Option<T>
 where
-    T: ReturnShipping,
-    T::Item: ReturnShipping,
+    T: RetPackage,
 {
-    type Item = T::Item;
-
-    unsafe fn prepare_call(fcinfo: pg_sys::FunctionCallInfo) -> CallCx {
-        T::prepare_call(fcinfo)
-    }
-
-    fn label_ret(self) -> Ret<Self> {
+    unsafe fn package_ret(self, fcinfo: pg_sys::FunctionCallInfo) -> pg_sys::Datum {
         match self {
-            None => Ret::Zero,
-            Some(value) => match value.label_ret() {
-                Ret::Many(iter, value) => Ret::Many(Some(iter), value),
-                Ret::Once(value) => Ret::Once(value),
-                Ret::Zero => Ret::Zero,
-            },
+            None => unsafe { return pg_return_null(fcinfo) },
+            Some(value) => value.package_ret(fcinfo),
         }
-    }
-
-    unsafe fn box_return(fcinfo: pg_sys::FunctionCallInfo, ret: Ret<Self>) -> pg_sys::Datum {
-        let inner = match ret {
-            Ret::Zero => Ret::Zero,
-            Ret::Once(value) => Ret::Once(value),
-            Ret::Many(Some(iter), value) => Ret::Many(iter, value),
-            Ret::Many(None, _) => Ret::Zero,
-        };
-
-        T::box_return(fcinfo, inner)
-    }
-
-    unsafe fn into_context(self, fcinfo: pg_sys::FunctionCallInfo) {
-        match self {
-            None => (),
-            Some(value) => value.into_context(fcinfo),
-        }
-    }
-
-    unsafe fn ret_from_context(fcinfo: pg_sys::FunctionCallInfo) -> Ret<Self> {
-        match T::ret_from_context(fcinfo) {
-            Ret::Many(iter, value) => Ret::Many(Some(iter), value),
-            Ret::Once(value) => Ret::Once(value),
-            Ret::Zero => Ret::Zero,
-        }
-    }
-
-    unsafe fn finish_call(fcinfo: pg_sys::FunctionCallInfo) {
-        unsafe { T::finish_call(fcinfo) }
     }
 }
 

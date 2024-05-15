@@ -190,7 +190,7 @@ impl<C: IntoDatum> IntoHeapTuple for (C,) {
 
 unsafe impl<C> ReturnShipping for (C,)
 where
-    C: ReturnShipping, // so we support TableIterator<'a, (Option<T>,)> as well
+    C: RetPackage, // so we support TableIterator<'a, (Option<T>,)> as well
     Self: IntoHeapTuple,
 {
     type Item = Self;
@@ -259,7 +259,7 @@ macro_rules! impl_table_iter {
 
         unsafe impl<$($C),*> ReturnShipping for ($($C,)*)
         where
-             $($C: ReturnShipping,)*
+             $($C: RetPackage,)*
              Self: IntoHeapTuple,
         {
             type Item = Self;
