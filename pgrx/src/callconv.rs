@@ -24,7 +24,7 @@ use core::ops::ControlFlow;
 /// It is strictly a mistake to use the BorrowDatum/UnboxDatum/DetoastDatum traits for this bound!
 /// PGRX allows "phantom arguments" which are not actually present in the C function, and are also
 /// omitted in the SQL, but are passed to the Rust function anyways.
-pub trait UnboxArg {
+pub trait UnboxArg: Sized {
     /// indicates min/max number of args that may be consumed if statically known
     fn arg_width(_fcinfo: pg_sys::FunctionCallInfo) -> Option<(usize, usize)> {
         todo!()
@@ -33,10 +33,7 @@ pub trait UnboxArg {
     /// try to unbox the next argument
     ///
     /// should play into a quasi-iterator somehow?
-    fn try_unbox(_fcinfo: pg_sys::FunctionCallInfo, _current: usize) -> ControlFlow<Self, ()>
-    where
-        Self: Sized,
-    {
+    fn try_unbox(_fcinfo: pg_sys::FunctionCallInfo, _current: usize) -> ControlFlow<Self, ()> {
         todo!()
     }
 }
@@ -204,19 +201,15 @@ where
 
 macro_rules! return_packaging_for_primitives {
     ($($scalar:ty),*) => {
-        $(
-        unsafe impl RetPackage for $scalar {
-            unsafe fn package_ret(self, _fcinfo: pg_sys::FunctionCallInfo) -> pg_sys::Datum {
-                $crate::pg_sys::Datum::from(self)
-            }
-        }
-        )*
+        $(unsafe impl RetPackage for $scalar {
+              unsafe fn package_ret(self, _fcinfo: pg_sys::FunctionCallInfo) -> pg_sys::Datum {
+                  $crate::pg_sys::Datum::from(self)
+              }
+        })*
     }
 }
 
-return_packaging_for_primitives! {
-    i8, i16, i32, i64, bool
-}
+return_packaging_for_primitives!(i8, i16, i32, i64, bool);
 
 unsafe impl RetPackage for () {
     unsafe fn package_ret(self, _fcinfo: pg_sys::FunctionCallInfo) -> pg_sys::Datum {
@@ -236,55 +229,44 @@ unsafe impl RetPackage for f64 {
     }
 }
 
-fn repackage_into_datum<T>(fcinfo: pg_sys::FunctionCallInfo, ret: T) -> pg_sys::Datum
-where
-    T: RetPackage + IntoDatum,
-{
-    match ret.into_datum() {
-        None => unsafe { pg_return_null(fcinfo) },
-        Some(datum) => datum,
-    }
-}
-
 unsafe impl<'a> RetPackage for &'a [u8] {
     unsafe fn package_ret(self, fcinfo: pg_sys::FunctionCallInfo) -> pg_sys::Datum {
-        repackage_into_datum(fcinfo, self)
+        self.into_datum().unwrap_or_else(|| unsafe { pg_return_null(fcinfo) })
     }
 }
 
 unsafe impl<'a> RetPackage for &'a str {
     unsafe fn package_ret(self, fcinfo: pg_sys::FunctionCallInfo) -> pg_sys::Datum {
-        repackage_into_datum(fcinfo, self)
+        self.into_datum().unwrap_or_else(|| unsafe { pg_return_null(fcinfo) })
     }
 }
 
 unsafe impl<'a> RetPackage for &'a CStr {
     unsafe fn package_ret(self, fcinfo: pg_sys::FunctionCallInfo) -> pg_sys::Datum {
-        repackage_into_datum(fcinfo, self)
+        self.into_datum().unwrap_or_else(|| unsafe { pg_return_null(fcinfo) })
     }
 }
 
 macro_rules! impl_repackage_into_datum {
     ($($boxable:ty),*) => {
-        $(
-        unsafe impl RetPackage for $boxable {
-            unsafe fn package_ret(self, fcinfo: pg_sys::FunctionCallInfo) -> pg_sys::Datum {
-                repackage_into_datum(fcinfo, self)
-            }
-        })*
+        $(unsafe impl RetPackage for $boxable {
+              unsafe fn package_ret(self, fcinfo: pg_sys::FunctionCallInfo) -> pg_sys::Datum {
+                  self.into_datum().unwrap_or_else(|| unsafe { pg_return_null(fcinfo) })
+              }
+          })*
     };
 }
 
 impl_repackage_into_datum! {
-    String, CString, Json, Inet, Uuid, AnyNumeric, Vec<u8>,
+    String, CString, Vec<u8>, char,
+    Json, Inet, Uuid, AnyNumeric, Internal,
     Date, Interval, Time, TimeWithTimeZone, Timestamp, TimestampWithTimeZone,
-    pg_sys::Oid, pg_sys::BOX, pg_sys::Point, char,
-    Internal
+    pg_sys::Oid, pg_sys::BOX, pg_sys::Point
 }
 
 unsafe impl<const P: u32, const S: u32> RetPackage for crate::Numeric<P, S> {
     unsafe fn package_ret(self, fcinfo: pg_sys::FunctionCallInfo) -> pg_sys::Datum {
-        repackage_into_datum(fcinfo, self)
+        self.into_datum().unwrap_or_else(|| unsafe { pg_return_null(fcinfo) })
     }
 }
 
@@ -293,7 +275,7 @@ where
     T: IntoDatum + crate::RangeSubType,
 {
     unsafe fn package_ret(self, fcinfo: pg_sys::FunctionCallInfo) -> pg_sys::Datum {
-        repackage_into_datum(fcinfo, self)
+        self.into_datum().unwrap_or_else(|| unsafe { pg_return_null(fcinfo) })
     }
 }
 
@@ -302,13 +284,13 @@ where
     T: IntoDatum,
 {
     unsafe fn package_ret(self, fcinfo: pg_sys::FunctionCallInfo) -> pg_sys::Datum {
-        repackage_into_datum(fcinfo, self)
+        self.into_datum().unwrap_or_else(|| unsafe { pg_return_null(fcinfo) })
     }
 }
 
 unsafe impl<T: Copy> RetPackage for PgVarlena<T> {
     unsafe fn package_ret(self, fcinfo: pg_sys::FunctionCallInfo) -> pg_sys::Datum {
-        repackage_into_datum(fcinfo, self)
+        self.into_datum().unwrap_or_else(|| unsafe { pg_return_null(fcinfo) })
     }
 }
 
@@ -317,7 +299,7 @@ where
     A: crate::WhoAllocated,
 {
     unsafe fn package_ret(self, fcinfo: pg_sys::FunctionCallInfo) -> pg_sys::Datum {
-        repackage_into_datum(fcinfo, self)
+        self.into_datum().unwrap_or_else(|| unsafe { pg_return_null(fcinfo) })
     }
 }
 
@@ -326,6 +308,6 @@ where
     A: crate::WhoAllocated,
 {
     unsafe fn package_ret(self, fcinfo: pg_sys::FunctionCallInfo) -> pg_sys::Datum {
-        repackage_into_datum(fcinfo, self)
+        self.into_datum().unwrap_or_else(|| unsafe { pg_return_null(fcinfo) })
     }
 }
