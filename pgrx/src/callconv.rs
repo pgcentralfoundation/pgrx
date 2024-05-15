@@ -192,7 +192,7 @@ where
     unsafe fn ret_from_context(fcinfo: pg_sys::FunctionCallInfo) -> Ret<Self> {
         let fcx = deref_fcx(fcinfo);
         // SAFETY: fcx.user_fctx was set earlier, immediately before or in a prior call
-        let iter = &mut *(*fcx).user_fctx.cast::<TableIterator<T>>();
+        let iter = &mut *(*fcx).user_fctx.cast::<SetOfIterator<'_, T>>();
         match iter.next() {
             None => Ret::Zero,
             Some(value) => Ret::Once(value),
