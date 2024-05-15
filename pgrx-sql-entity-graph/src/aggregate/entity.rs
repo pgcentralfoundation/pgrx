@@ -319,12 +319,7 @@ impl ToSql for PgAggregateEntity {
                 let graph_index = context
                     .graph
                     .neighbors_undirected(self_index)
-                    .find(|neighbor| match &context.graph[*neighbor] {
-                        SqlGraphEntity::Type(ty) => ty.id_matches(&arg.used_ty.ty_id),
-                        SqlGraphEntity::Enum(en) => en.id_matches(&arg.used_ty.ty_id),
-                        SqlGraphEntity::BuiltinType(defined) => defined == arg.used_ty.full_path,
-                        _ => false,
-                    })
+                    .find(|neighbor| context.graph[*neighbor].type_matches(&arg.used_ty))
                     .ok_or_else(|| {
                         eyre!("Could not find arg type in graph. Got: {:?}", arg.used_ty)
                     })?;
@@ -372,12 +367,7 @@ impl ToSql for PgAggregateEntity {
                 let graph_index = context
                     .graph
                     .neighbors_undirected(self_index)
-                    .find(|neighbor| match &context.graph[*neighbor] {
-                        SqlGraphEntity::Type(ty) => ty.id_matches(&arg.used_ty.ty_id),
-                        SqlGraphEntity::Enum(en) => en.id_matches(&arg.used_ty.ty_id),
-                        SqlGraphEntity::BuiltinType(defined) => defined == arg.used_ty.full_path,
-                        _ => false,
-                    })
+                    .find(|neighbor| context.graph[*neighbor].type_matches(&arg.used_ty))
                     .ok_or_else(|| eyre!("Could not find arg type in graph. Got: {:?}", arg))?;
                 let needs_comma = idx < (direct_args.len() - 1);
                 let buf = format!(

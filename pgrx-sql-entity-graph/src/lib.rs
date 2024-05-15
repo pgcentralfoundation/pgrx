@@ -127,6 +127,24 @@ impl SqlGraphEntity {
             rust_identifier = self.rust_identifier(),
         )
     }
+
+    pub fn id_or_name_matches(&self, ty_id: &::core::any::TypeId, name: &str) -> bool {
+        match self {
+            SqlGraphEntity::Enum(entity) => entity.id_matches(ty_id),
+            SqlGraphEntity::Type(entity) => entity.id_matches(ty_id),
+            SqlGraphEntity::BuiltinType(string) => string == name,
+            _ => false,
+        }
+    }
+
+    pub fn type_matches(&self, arg: &dyn TypeIdentifiable) -> bool {
+        self.id_or_name_matches(arg.ty_id(), arg.ty_name())
+    }
+}
+
+pub trait TypeIdentifiable {
+    fn ty_id(&self) -> &core::any::TypeId;
+    fn ty_name(&self) -> &str;
 }
 
 impl SqlGraphIdentifier for SqlGraphEntity {

@@ -118,12 +118,7 @@ impl ToSql for PgExternEntity {
                 let graph_index = context
                     .graph
                     .neighbors_undirected(self_index)
-                    .find(|neighbor| match &context.graph[*neighbor] {
-                        SqlGraphEntity::Type(ty) => ty.id_matches(&arg.used_ty.ty_id),
-                        SqlGraphEntity::Enum(en) => en.id_matches(&arg.used_ty.ty_id),
-                        SqlGraphEntity::BuiltinType(defined) => defined == arg.used_ty.full_path,
-                        _ => false,
-                    })
+                    .find(|neighbor| context.graph[*neighbor].type_matches(&arg.used_ty))
                     .ok_or_else(|| eyre!("Could not find arg type in graph. Got: {:?}", arg))?;
                 let needs_comma = idx < (metadata_without_arg_skips.len().saturating_sub(1));
                 let metadata_argument = &self.metadata.arguments[idx];
@@ -182,12 +177,7 @@ impl ToSql for PgExternEntity {
                 let graph_index = context
                     .graph
                     .neighbors_undirected(self_index)
-                    .find(|neighbor| match &context.graph[*neighbor] {
-                        SqlGraphEntity::Type(neighbor_ty) => neighbor_ty.id_matches(&ty.ty_id),
-                        SqlGraphEntity::Enum(neighbor_en) => neighbor_en.id_matches(&ty.ty_id),
-                        SqlGraphEntity::BuiltinType(defined) => defined == ty.full_path,
-                        _ => false,
-                    })
+                    .find(|neighbor| context.graph[*neighbor].type_matches(ty))
                     .ok_or_else(|| eyre!("Could not find return type in graph."))?;
                 let metadata_retval = self.metadata.retval.clone();
                 let sql_type = match metadata_retval.return_sql {
@@ -206,12 +196,7 @@ impl ToSql for PgExternEntity {
                 let graph_index = context
                     .graph
                     .neighbors_undirected(self_index)
-                    .find(|neighbor| match &context.graph[*neighbor] {
-                        SqlGraphEntity::Type(neighbor_ty) => neighbor_ty.id_matches(&ty.ty_id),
-                        SqlGraphEntity::Enum(neighbor_en) => neighbor_en.id_matches(&ty.ty_id),
-                        SqlGraphEntity::BuiltinType(defined) => defined == ty.full_path,
-                        _ => false,
-                    })
+                    .find(|neighbor| context.graph[*neighbor].type_matches(ty))
                     .ok_or_else(|| eyre!("Could not find return type in graph."))?;
                 let metadata_retval = self.metadata.retval.clone();
                 let sql_type = match metadata_retval.return_sql {

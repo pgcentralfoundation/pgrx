@@ -367,6 +367,15 @@ pub struct UsedTypeEntity {
     pub metadata: FunctionMetadataTypeEntity,
 }
 
+impl crate::TypeIdentifiable for UsedTypeEntity {
+    fn ty_id(&self) -> &core::any::TypeId {
+        &self.ty_id
+    }
+    fn ty_name(&self) -> &str {
+        self.full_path
+    }
+}
+
 fn resolve_vec_inner(
     original: syn::TypePath,
 ) -> syn::Result<(syn::Type, Option<CompositeTypeMacro>)> {
