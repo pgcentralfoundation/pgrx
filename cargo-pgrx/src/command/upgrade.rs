@@ -209,7 +209,6 @@ impl Upgrade {
     }
     fn process_manifest(&self, path: &PathBuf, manifest: &mut LocalManifest) -> eyre::Result<()> {
         const RELEVANT_PACKAGES: [&str; 8] = [
-            "cargo-pgrx",
             "pgrx",
             "pgrx-macros",
             "pgrx-pg-config",
