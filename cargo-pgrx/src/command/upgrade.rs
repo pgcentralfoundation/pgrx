@@ -22,8 +22,8 @@ use crate::CommandExecute;
 pub(crate) struct Upgrade {
     /// Specify a version to upgrade to, rather than defaulting to the latest
     /// version.
-    #[clap(long, short)]
-    pub(crate) target_version: Option<String>, //TODO: semver not string
+    #[clap(long)]
+    pub(crate) to: Option<String>, //TODO: semver not string
 
     /// Path to the manifest file (usually Cargo.toml). Defaults to
     /// "./Cargo.toml" in the working directory.
