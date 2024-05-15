@@ -172,12 +172,11 @@ where
         Err(ArgumentError::Table)
     }
     fn return_sql() -> Result<Returns, ReturnsError> {
-        let vec = vec![match C::return_sql() {
-            Ok(Returns::One(sql)) => sql,
-            Ok(Returns::SetOf(_)) => return Err(ReturnsError::TableContainingSetOf),
-            Ok(Returns::Table(_)) => return Err(ReturnsError::NestedTable),
-            err => return err,
-        }];
+        let vec = vec![C::return_sql().and_then(|sql| match sql {
+            Returns::One(sql) => Ok(sql),
+            Returns::SetOf(_) => Err(ReturnsError::TableContainingSetOf),
+            Returns::Table(_) => Err(ReturnsError::NestedTable),
+        })?];
         Ok(Returns::Table(vec))
     }
 }
@@ -226,12 +225,11 @@ macro_rules! impl_table_iter {
             fn return_sql() -> Result<Returns, ReturnsError> {
                 let vec = vec![
                 $(
-                    match $C::return_sql() {
-                        Ok(Returns::One(sql)) => sql,
-                        Ok(Returns::SetOf(_)) => return Err(ReturnsError::TableContainingSetOf),
-                        Ok(Returns::Table(_)) => return Err(ReturnsError::NestedTable),
-                        err => return err,
-                    },
+                    $C::return_sql().and_then(|sql| match sql {
+                        Returns::One(sql) => Ok(sql),
+                        Returns::SetOf(_) => Err(ReturnsError::TableContainingSetOf),
+                        Returns::Table(_) => Err(ReturnsError::NestedTable),
+                    })?,
                 )*
                 ];
                 Ok(Returns::Table(vec))
@@ -246,7 +244,6 @@ macro_rules! impl_table_iter {
                 let datums = [$($C.into_datum(),)*];
                 let mut nulls = datums.map(|option| option.is_none());
                 let mut datums = datums.map(|option| option.unwrap_or(pg_sys::Datum::from(0)));
-
 
                 unsafe {
                     // SAFETY:  Caller has asserted that `tupdesc` is valid, and we just went

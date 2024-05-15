@@ -103,31 +103,29 @@ where
     T: RetPackage,
 {
     type Item = Self;
+
     fn label_ret(self) -> Ret<Self> {
         Ret::Once(self)
     }
 
     unsafe fn box_return(fcinfo: pg_sys::FunctionCallInfo, ret: Ret<Self>) -> pg_sys::Datum {
-        let ret = match ret {
-            Ret::Zero => unsafe { return pg_return_null(fcinfo) },
-            Ret::Once(ret) => ret,
+        match ret {
+            Ret::Zero => unsafe { pg_return_null(fcinfo) },
+            Ret::Once(ret) => ret.package_ret(fcinfo),
             Ret::Many(_, _) => unreachable!(),
-        };
-
-        ret.package_ret(fcinfo)
+        }
     }
 
     unsafe fn prepare_call(_fcinfo: pg_sys::FunctionCallInfo) -> CallCx {
         CallCx::WrappedFn(unsafe { pg_sys::CurrentMemoryContext })
     }
+
     unsafe fn into_context(self, _fcinfo: pg_sys::FunctionCallInfo) {
         unimplemented!()
     }
-
     unsafe fn ret_from_context(_fcinfo: pg_sys::FunctionCallInfo) -> Ret<Self> {
         unimplemented!()
     }
-
     unsafe fn finish_call(_fcinfo: pg_sys::FunctionCallInfo) {}
 }
 
@@ -307,7 +305,7 @@ where
 {
     unsafe fn package_ret(self, fcinfo: pg_sys::FunctionCallInfo) -> pg_sys::Datum {
         match self {
-            None => unsafe { return pg_return_null(fcinfo) },
+            None => unsafe { pg_return_null(fcinfo) },
             Some(value) => value.package_ret(fcinfo),
         }
     }
