@@ -8,12 +8,12 @@
 //LICENSE
 //LICENSE Use of this source code is governed by the MIT license that can be found in the LICENSE file.
 #![allow(clippy::vec_init_then_push)]
-use std::iter;
+use core::{iter, ptr};
 
-use crate::{
-    callconv::{Ret, ReturnShipping, *},
-    pg_sys, IntoDatum, IntoHeapTuple,
-};
+use crate::callconv::{CallCx, Ret, RetPackage, ReturnShipping};
+use crate::fcinfo::{pg_return_null, srf_is_first_call, srf_return_done, srf_return_next};
+use crate::ptr::PointerExt;
+use crate::{pg_sys, IntoDatum, IntoHeapTuple, PgMemoryContexts};
 use pgrx_sql_entity_graph::metadata::{
     ArgumentError, Returns, ReturnsError, SqlMapping, SqlTranslatable,
 };
@@ -179,6 +179,165 @@ where
         })?];
         Ok(Returns::Table(vec))
     }
+}
+
+unsafe impl<'a, T> ReturnShipping for SetOfIterator<'a, T>
+where
+    T: ReturnShipping,
+{
+    type Item = <Self as Iterator>::Item;
+    unsafe fn prepare_call(fcinfo: pg_sys::FunctionCallInfo) -> CallCx {
+        prepare_value_per_call_srf(fcinfo)
+    }
+
+    fn label_ret(self) -> Ret<Self> {
+        let mut iter = self;
+        let ret = iter.next();
+        match ret {
+            None => Ret::Zero,
+            Some(value) => Ret::Many(iter, value),
+        }
+    }
+
+    unsafe fn box_return(fcinfo: pg_sys::FunctionCallInfo, ret: Ret<Self>) -> pg_sys::Datum {
+        let value = match ret {
+            Ret::Zero => return empty_srf(fcinfo),
+            Ret::Once(value) => value,
+            Ret::Many(iter, value) => {
+                iter.into_context(fcinfo);
+                value
+            }
+        };
+
+        unsafe {
+            let fcx = deref_fcx(fcinfo);
+            srf_return_next(fcinfo, fcx);
+            T::box_return(fcinfo, value.label_ret())
+        }
+    }
+
+    unsafe fn into_context(self, fcinfo: pg_sys::FunctionCallInfo) {
+        let fcx = deref_fcx(fcinfo);
+        unsafe {
+            let ptr = srf_memcx(fcx).leak_and_drop_on_delete(self);
+            // it's the first call so we need to finish setting up fcx
+            (*fcx).user_fctx = ptr.cast();
+        }
+    }
+
+    unsafe fn ret_from_context(fcinfo: pg_sys::FunctionCallInfo) -> Ret<Self> {
+        let fcx = deref_fcx(fcinfo);
+        // SAFETY: fcx.user_fctx was set earlier, immediately before or in a prior call
+        let iter = &mut *(*fcx).user_fctx.cast::<SetOfIterator<'_, T>>();
+        match iter.next() {
+            None => Ret::Zero,
+            Some(value) => Ret::Once(value),
+        }
+    }
+
+    unsafe fn finish_call(fcinfo: pg_sys::FunctionCallInfo) {
+        let fcx = deref_fcx(fcinfo);
+        unsafe { srf_return_done(fcinfo, fcx) }
+    }
+}
+
+unsafe impl<'a, T> ReturnShipping for TableIterator<'a, T>
+where
+    T: ReturnShipping,
+{
+    type Item = <Self as Iterator>::Item;
+
+    unsafe fn prepare_call(fcinfo: pg_sys::FunctionCallInfo) -> CallCx {
+        prepare_value_per_call_srf(fcinfo)
+    }
+
+    fn label_ret(self) -> Ret<Self> {
+        let mut iter = self;
+        let ret = iter.next();
+        match ret {
+            None => Ret::Zero,
+            Some(value) => Ret::Many(iter, value),
+        }
+    }
+
+    unsafe fn box_return(fcinfo: pg_sys::FunctionCallInfo, ret: Ret<Self>) -> pg_sys::Datum {
+        let value = match ret {
+            Ret::Zero => return empty_srf(fcinfo),
+            Ret::Once(value) => value,
+            Ret::Many(iter, value) => {
+                iter.into_context(fcinfo);
+                value
+            }
+        };
+
+        unsafe {
+            let fcx = deref_fcx(fcinfo);
+            srf_return_next(fcinfo, fcx);
+            T::box_return(fcinfo, value.label_ret())
+        }
+    }
+
+    unsafe fn into_context(self, fcinfo: pg_sys::FunctionCallInfo) {
+        // FIXME: this is assigned here but used in the tuple impl?
+        let fcx = deref_fcx(fcinfo);
+        unsafe {
+            let ptr = srf_memcx(fcx).switch_to(move |mcx| {
+                let mut tupdesc = ptr::null_mut();
+                let mut oid = pg_sys::Oid::default();
+                let ty_class = pg_sys::get_call_result_type(fcinfo, &mut oid, &mut tupdesc);
+                if tupdesc.is_non_null() {
+                    pg_sys::BlessTupleDesc(tupdesc);
+                }
+                (*fcx).tuple_desc = tupdesc;
+                mcx.leak_and_drop_on_delete(self)
+            });
+            // it's the first call so we need to finish setting up fcx
+            (*fcx).user_fctx = ptr.cast();
+        }
+    }
+
+    unsafe fn ret_from_context(fcinfo: pg_sys::FunctionCallInfo) -> Ret<Self> {
+        let fcx = deref_fcx(fcinfo);
+        // SAFETY: fcx.user_fctx was set earlier, immediately before or in a prior call
+        let iter = &mut *(*fcx).user_fctx.cast::<TableIterator<T>>();
+        match iter.next() {
+            None => Ret::Zero,
+            Some(value) => Ret::Once(value),
+        }
+    }
+
+    unsafe fn finish_call(fcinfo: pg_sys::FunctionCallInfo) {
+        let fcx = deref_fcx(fcinfo);
+        unsafe { srf_return_done(fcinfo, fcx) }
+    }
+}
+
+fn prepare_value_per_call_srf(fcinfo: pg_sys::FunctionCallInfo) -> CallCx {
+    unsafe {
+        if srf_is_first_call(fcinfo) {
+            let fn_call_cx = pg_sys::init_MultiFuncCall(fcinfo);
+            CallCx::WrappedFn((*fn_call_cx).multi_call_memory_ctx)
+        } else {
+            CallCx::RestoreCx
+        }
+    }
+}
+
+pub(crate) fn empty_srf(fcinfo: pg_sys::FunctionCallInfo) -> pg_sys::Datum {
+    unsafe {
+        let fcx = deref_fcx(fcinfo);
+        srf_return_done(fcinfo, fcx);
+        pg_return_null(fcinfo)
+    }
+}
+
+/// "per_MultiFuncCall" but no FFI cost
+pub(crate) fn deref_fcx(fcinfo: pg_sys::FunctionCallInfo) -> *mut pg_sys::FuncCallContext {
+    unsafe { (*(*fcinfo).flinfo).fn_extra.cast() }
+}
+
+pub(crate) fn srf_memcx(fcx: *mut pg_sys::FuncCallContext) -> PgMemoryContexts {
+    unsafe { PgMemoryContexts::For((*fcx).multi_call_memory_ctx) }
 }
 
 impl<C: IntoDatum> IntoHeapTuple for (C,) {
