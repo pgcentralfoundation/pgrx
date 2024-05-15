@@ -43,7 +43,7 @@ pub(crate) struct Upgrade {
     /// Dry-run - if this flag is set, Cargo.toml will not be modified.
     /// Instead, this command will print the text of the new Cargo.toml
     /// that would have been generated if it was modified.
-    #[clap(long = "dry-run", short)]
+    #[clap(long = "dry-run", short = "n")]
     pub(crate) dry_run: bool,
 }
 
