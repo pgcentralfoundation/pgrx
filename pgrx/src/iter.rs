@@ -50,10 +50,7 @@ pub struct SetOfIterator<'a, T> {
 }
 
 impl<'a, T: 'a> SetOfIterator<'a, T> {
-    pub fn new<I>(iter: I) -> Self
-    where
-        I: IntoIterator<Item = T> + 'a,
-    {
+    pub fn new(iter: impl IntoIterator<Item = T> + 'a) -> Self {
         Self { iter: Box::new(iter.into_iter()) }
     }
 
@@ -142,10 +139,7 @@ impl<'a, T> TableIterator<'a, T>
 where
     T: IntoHeapTuple + 'a,
 {
-    pub fn new<I>(iter: I) -> Self
-    where
-        I: IntoIterator<Item = T> + 'a,
-    {
+    pub fn new(iter: impl IntoIterator<Item = T> + 'a) -> Self {
         Self { iter: Box::new(iter.into_iter()) }
     }
 
