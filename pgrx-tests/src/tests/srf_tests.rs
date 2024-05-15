@@ -160,6 +160,7 @@ fn one_col_result_option(
 #[cfg(any(test, feature = "pg_test"))]
 #[pgrx::pg_schema]
 mod tests {
+    use super::*;
     #[allow(unused_imports)]
     use crate as pgrx_tests;
 
