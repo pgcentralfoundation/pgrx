@@ -109,11 +109,9 @@ mod tests {
     use crate::calculate_human_years;
     use pgrx::prelude::*;
 
-    #[rustfmt::skip]
     #[pg_test]
     fn test_calculate_human_years() -> Result<(), pgrx::spi::Error> {
-        let mut results =
-            Vec::new();
+        let mut results = Vec::new();
 
         results.push((Some("Fido".to_string()), 3, Some("Labrador".to_string()), 21));
         results.push((Some("Spot".to_string()), 5, Some("Poodle".to_string()), 35));
