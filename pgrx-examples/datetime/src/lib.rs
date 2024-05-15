@@ -190,10 +190,5 @@ fn all_times() -> TableIterator<
         name!(clock_timestamp, TimestampWithTimeZone),
     ),
 > {
-    TableIterator::new(std::iter::once((
-        now(),
-        transaction_timestamp(),
-        statement_timestamp(),
-        clock_timestamp(),
-    )))
+    TableIterator::once((now(), transaction_timestamp(), statement_timestamp(), clock_timestamp()))
 }
