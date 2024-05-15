@@ -43,7 +43,7 @@ pub(crate) struct Upgrade {
     /// Dry-run - if this flag is set, Cargo.toml will not be modified.
     /// Instead, this command will print the text of the new Cargo.toml
     /// that would have been generated if it was modified.
-    #[clap(long = "dry-run", short = "n")]
+    #[clap(long = "dry-run", short = 'n')]
     pub(crate) dry_run: bool,
 }
 
@@ -125,7 +125,7 @@ impl Upgrade {
             .map_err(|e| eyre!("Unable to fetch registry URL for path: {e}"))?;
         update_registry_index(&reg_url, false)
             .map_err(|e| eyre!("Unable to update registry index: {e}"))?;
-        let target_version = match self.target_version {
+        let target_version = match self.to {
             Some(ref ver) => Some(ver.clone()),
             None => cargo_edit::get_latest_dependency(
                 dep_name,
@@ -208,7 +208,7 @@ impl Upgrade {
         Ok(())
     }
     fn process_manifest(&self, path: &PathBuf, manifest: &mut LocalManifest) -> eyre::Result<()> {
-        const RELEVANT_PACKAGES: [&str; 8] = [
+        const RELEVANT_PACKAGES: [&str; 6] = [
             "pgrx",
             "pgrx-macros",
             "pgrx-pg-config",
@@ -290,8 +290,7 @@ impl CommandExecute for Upgrade {
                                 "Failed to canonicalize path, no \
                                 parent directory found."
                             ))?;
-                            let member_path =
-                                root_path.join(PathBuf::from(member)).join("Cargo.toml");
+                            let member_path = root_path.join(member).join("Cargo.toml");
                             debug!("Generated child path {:#?}", &member_path);
                             child_path_maybe = Some(member_path);
                         }
