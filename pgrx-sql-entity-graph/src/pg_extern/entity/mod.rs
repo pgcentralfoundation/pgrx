@@ -236,16 +236,7 @@ impl ToSql for PgExternEntity {
                 {
                     let graph_index =
                         context.graph.neighbors_undirected(self_index).find(|neighbor| {
-                            match &context.graph[*neighbor] {
-                                SqlGraphEntity::Type(neighbor_ty) => {
-                                    neighbor_ty.id_matches(&ty.ty_id)
-                                }
-                                SqlGraphEntity::Enum(neighbor_en) => {
-                                    neighbor_en.id_matches(&ty.ty_id)
-                                }
-                                SqlGraphEntity::BuiltinType(defined) => defined == ty.ty_source,
-                                _ => false,
-                            }
+                            context.graph[*neighbor].id_or_name_matches(&ty.ty_id, ty.ty_source)
                         });
 
                     let needs_comma = idx < (table_items.len() - 1);
@@ -366,11 +357,9 @@ impl ToSql for PgExternEntity {
             let left_arg_graph_index = context
                 .graph
                 .neighbors_undirected(self_index)
-                .find(|neighbor| match &context.graph[*neighbor] {
-                    SqlGraphEntity::Type(ty) => ty.id_matches(&left_fn_arg.used_ty.ty_id),
-                    SqlGraphEntity::Enum(en) => en.id_matches(&left_fn_arg.used_ty.ty_id),
-                    SqlGraphEntity::BuiltinType(defined) => defined == left_arg.type_name,
-                    _ => false,
+                .find(|neighbor| {
+                    context.graph[*neighbor]
+                        .id_or_name_matches(&left_fn_arg.used_ty.ty_id, left_arg.type_name)
                 })
                 .ok_or_else(|| {
                     eyre!("Could not find left arg type in graph. Got: {:?}", left_arg)
@@ -406,11 +395,9 @@ impl ToSql for PgExternEntity {
             let right_arg_graph_index = context
                 .graph
                 .neighbors_undirected(self_index)
-                .find(|neighbor| match &context.graph[*neighbor] {
-                    SqlGraphEntity::Type(ty) => ty.id_matches(&right_fn_arg.used_ty.ty_id),
-                    SqlGraphEntity::Enum(en) => en.id_matches(&right_fn_arg.used_ty.ty_id),
-                    SqlGraphEntity::BuiltinType(defined) => defined == right_arg.type_name,
-                    _ => false,
+                .find(|neighbor| {
+                    context.graph[*neighbor]
+                        .id_or_name_matches(&right_fn_arg.used_ty.ty_id, right_arg.type_name)
                 })
                 .ok_or_else(|| {
                     eyre!("Could not find right arg type in graph. Got: {:?}", right_arg)
@@ -522,11 +509,9 @@ impl ToSql for PgExternEntity {
             let source_arg_graph_index = context
                 .graph
                 .neighbors_undirected(self_index)
-                .find(|neighbor| match &context.graph[*neighbor] {
-                    SqlGraphEntity::Type(ty) => ty.id_matches(&source_fn_arg.used_ty.ty_id),
-                    SqlGraphEntity::Enum(en) => en.id_matches(&source_fn_arg.used_ty.ty_id),
-                    SqlGraphEntity::BuiltinType(defined) => defined == source_arg.type_name,
-                    _ => false,
+                .find(|neighbor| {
+                    context.graph[*neighbor]
+                        .id_or_name_matches(&source_fn_arg.used_ty.ty_id, source_arg.type_name)
                 })
                 .ok_or_else(|| {
                     eyre!("Could not find source type in graph. Got: {:?}", source_arg)
