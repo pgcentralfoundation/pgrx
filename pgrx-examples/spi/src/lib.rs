@@ -30,13 +30,7 @@ INSERT INTO spi_example (title) VALUES ('I like pudding');
 
 #[pg_extern]
 fn spi_return_query() -> Result<
-    TableIterator<
-        'static,
-        (
-            name!(oid, Result<Option<pg_sys::Oid>, pgrx::spi::Error>),
-            name!(name, Result<Option<String>, pgrx::spi::Error>),
-        ),
-    >,
+    TableIterator<'static, (name!(oid, Option<pg_sys::Oid>), name!(name, Option<String>))>,
     spi::Error,
 > {
     #[cfg(feature = "pg12")]
@@ -51,10 +45,10 @@ fn spi_return_query() -> Result<
     let query = "SELECT oid, relname::text || '-pg16' FROM pg_class";
 
     Spi::connect(|client| {
-        Ok(client
+        client
             .select(query, None, None)?
-            .map(|row| (row["oid"].value(), row[2].value()))
-            .collect::<Vec<_>>())
+            .map(|row| Ok((row["oid"].value()?, row[2].value()?)))
+            .collect::<Result<Vec<_>, _>>()
     })
     .map(TableIterator::new)
 }
