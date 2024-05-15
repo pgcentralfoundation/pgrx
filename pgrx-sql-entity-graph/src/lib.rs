@@ -142,6 +142,14 @@ impl SqlGraphEntity {
     }
 }
 
+pub trait TypeMatch {
+    fn id_matches(&self, arg: &core::any::TypeId) -> bool;
+}
+
+pub fn type_keyed<'a, 'b, A: TypeMatch, B>((a, b): (&'a A, &'b B)) -> (&'a dyn TypeMatch, &'b B) {
+    (a, b)
+}
+
 pub trait TypeIdentifiable {
     fn ty_id(&self) -> &core::any::TypeId;
     fn ty_name(&self) -> &str;

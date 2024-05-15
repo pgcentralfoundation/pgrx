@@ -30,8 +30,7 @@ use crate::metadata::{Returns, SqlMapping};
 use crate::pgrx_sql::PgrxSql;
 use crate::to_sql::entity::ToSqlConfigEntity;
 use crate::to_sql::ToSql;
-use crate::ExternArgs;
-use crate::{SqlGraphEntity, SqlGraphIdentifier};
+use crate::{ExternArgs, SqlGraphEntity, SqlGraphIdentifier, TypeMatch};
 
 use eyre::{eyre, WrapErr};
 

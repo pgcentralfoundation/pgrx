@@ -22,7 +22,8 @@ use crate::metadata::SqlMapping;
 use crate::pgrx_sql::PgrxSql;
 use crate::to_sql::entity::ToSqlConfigEntity;
 use crate::to_sql::ToSql;
-use crate::{SqlGraphEntity, SqlGraphIdentifier, UsedTypeEntity};
+use crate::type_keyed;
+use crate::{SqlGraphEntity, SqlGraphIdentifier, TypeMatch, UsedTypeEntity};
 use core::any::TypeId;
 use eyre::{eyre, WrapErr};
 
@@ -277,21 +278,14 @@ impl ToSql for PgAggregateEntity {
         };
 
         let stype_sql = map_ty(&self.stype.used_ty).wrap_err("Mapping state type")?;
-        let mut stype_schema = String::from("");
-        for (ty_item, ty_index) in context.types.iter() {
-            if ty_item.id_matches(&self.stype.used_ty.ty_id) {
-                stype_schema = context.schema_prefix_for(ty_index);
-                break;
-            }
-        }
-        if String::is_empty(&stype_schema) {
-            for (ty_item, ty_index) in context.enums.iter() {
-                if ty_item.id_matches(&self.stype.used_ty.ty_id) {
-                    stype_schema = context.schema_prefix_for(ty_index);
-                    break;
-                }
-            }
-        }
+        let stype_schema = context
+            .types
+            .iter()
+            .map(type_keyed)
+            .chain(context.enums.iter().map(type_keyed))
+            .find(|(ty, _)| ty.id_matches(&self.stype.used_ty.ty_id))
+            .map(|(_, ty_index)| context.schema_prefix_for(ty_index))
+            .unwrap_or_default();
 
         if let Some(value) = &self.mstype {
             let mstype_sql = map_ty(value).wrap_err("Mapping moving state type")?;
