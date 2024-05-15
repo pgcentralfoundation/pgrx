@@ -23,7 +23,7 @@ use crate::pgrx_sql::PgrxSql;
 use crate::to_sql::entity::ToSqlConfigEntity;
 use crate::to_sql::ToSql;
 use crate::type_keyed;
-use crate::{SqlGraphEntity, SqlGraphIdentifier, TypeMatch, UsedTypeEntity};
+use crate::{SqlGraphEntity, SqlGraphIdentifier, UsedTypeEntity};
 use core::any::TypeId;
 use eyre::{eyre, WrapErr};
 
