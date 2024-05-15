@@ -215,7 +215,6 @@ impl Upgrade {
             "pgrx-pg-sys",
             "pgrx-sql-entity-graph",
             "pgrx-tests",
-            "pgrx-version-updater",
         ];
 
         for dep_table in manifest.get_dependency_tables_mut() {
