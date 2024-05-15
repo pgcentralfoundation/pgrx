@@ -37,16 +37,7 @@ fn return_some_iterator(
 #[pg_extern]
 fn return_none_iterator(
 ) -> Option<TableIterator<'static, (name!(idx, i32), name!(some_value, &'static str))>> {
-    if true {
-        None
-    } else {
-        Some(TableIterator::new(
-            vec!["a", "b", "c"]
-                .into_iter()
-                .enumerate()
-                .map(|(idx, value)| ((idx + 1) as i32, value)),
-        ))
-    }
+    None
 }
 
 #[pg_extern]
@@ -56,11 +47,7 @@ fn return_some_setof_iterator() -> Option<SetOfIterator<'static, i32>> {
 
 #[pg_extern]
 fn return_none_setof_iterator() -> Option<SetOfIterator<'static, i32>> {
-    if true {
-        None
-    } else {
-        Some(SetOfIterator::new(vec![1, 2, 3].into_iter()))
-    }
+    None
 }
 
 #[pg_extern]
@@ -135,24 +122,24 @@ fn result_table_5_none() -> Result<
 
 #[pg_extern]
 fn one_col() -> TableIterator<'static, (name!(a, i32),)> {
-    TableIterator::new(std::iter::once((42,)))
+    TableIterator::once((42,))
 }
 
 #[pg_extern]
 fn one_col_option() -> Option<TableIterator<'static, (name!(a, i32),)>> {
-    Some(TableIterator::new(std::iter::once((42,))))
+    Some(TableIterator::once((42,)))
 }
 
 #[pg_extern]
 fn one_col_result() -> Result<TableIterator<'static, (name!(a, i32),)>, Box<dyn std::error::Error>>
 {
-    Ok(TableIterator::new(std::iter::once((42,))))
+    Ok(TableIterator::once((42,)))
 }
 
 #[pg_extern]
 fn one_col_result_option(
 ) -> Result<Option<TableIterator<'static, (name!(a, i32),)>>, Box<dyn std::error::Error>> {
-    Ok(Some(TableIterator::new(std::iter::once((42,)))))
+    Ok(Some(TableIterator::once((42,))))
 }
 
 #[cfg(any(test, feature = "pg_test"))]

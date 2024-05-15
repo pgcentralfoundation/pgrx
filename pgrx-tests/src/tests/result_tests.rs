@@ -77,7 +77,7 @@ mod tests {
     #[pg_extern]
     fn return_result_table_iterator(
     ) -> Result<TableIterator<'static, (name!(a, i32), name!(b, i32))>, pgrx::spi::Error> {
-        Ok(TableIterator::new(std::iter::once((1, 2))))
+        Ok(TableIterator::once((1, 2)))
     }
 
     #[pg_extern]
@@ -88,7 +88,7 @@ mod tests {
 
     #[pg_extern]
     fn return_result_set_of() -> Result<SetOfIterator<'static, i32>, pgrx::spi::Error> {
-        Ok(SetOfIterator::new(std::iter::once(1)))
+        Ok(SetOfIterator::once(1))
     }
 
     #[pg_extern]

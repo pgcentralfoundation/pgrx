@@ -42,7 +42,7 @@ fn result_table() -> Result<
 
 #[pg_extern]
 fn one_col() -> TableIterator<'static, (name!(a, Option<i32>),)> {
-    TableIterator::new(std::iter::once((Some(42),)))
+    TableIterator::once((Some(42),))
 }
 
 #[cfg(any(test, feature = "pg_test"))]

@@ -8,7 +8,7 @@
 //LICENSE
 //LICENSE Use of this source code is governed by the MIT license that can be found in the LICENSE file.
 #![allow(clippy::vec_init_then_push)]
-use std::iter::once;
+use std::iter;
 
 use crate::{pg_sys, IntoDatum, IntoHeapTuple};
 use pgrx_sql_entity_graph::metadata::{
@@ -49,12 +49,17 @@ pub struct SetOfIterator<'a, T> {
     iter: Box<dyn Iterator<Item = T> + 'a>,
 }
 
-impl<'a, T> SetOfIterator<'a, T> {
-    pub fn new<I>(iter: I) -> Self
-    where
-        I: IntoIterator<Item = T> + 'a,
-    {
+impl<'a, T: 'a> SetOfIterator<'a, T> {
+    pub fn new(iter: impl IntoIterator<Item = T> + 'a) -> Self {
         Self { iter: Box::new(iter.into_iter()) }
+    }
+
+    pub fn empty() -> Self {
+        Self::new(iter::empty())
+    }
+
+    pub fn once(value: T) -> Self {
+        Self::new(iter::once(value))
     }
 }
 
@@ -134,15 +139,16 @@ impl<'a, T> TableIterator<'a, T>
 where
     T: IntoHeapTuple + 'a,
 {
-    pub fn new<I>(iter: I) -> Self
-    where
-        I: IntoIterator<Item = T> + 'a,
-    {
+    pub fn new(iter: impl IntoIterator<Item = T> + 'a) -> Self {
         Self { iter: Box::new(iter.into_iter()) }
     }
 
+    pub fn empty() -> Self {
+        Self::new(iter::empty())
+    }
+
     pub fn once(value: T) -> Self {
-        Self::new(once(value))
+        Self::new(iter::once(value))
     }
 }
 
