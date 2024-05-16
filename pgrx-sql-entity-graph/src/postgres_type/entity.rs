@@ -19,7 +19,7 @@ use crate::mapping::RustSqlMapping;
 use crate::pgrx_sql::PgrxSql;
 use crate::to_sql::entity::ToSqlConfigEntity;
 use crate::to_sql::ToSql;
-use crate::{SqlGraphEntity, SqlGraphIdentifier};
+use crate::{SqlGraphEntity, SqlGraphIdentifier, TypeMatch};
 use std::collections::BTreeSet;
 
 use eyre::eyre;
@@ -39,8 +39,8 @@ pub struct PostgresTypeEntity {
     pub to_sql_config: ToSqlConfigEntity,
 }
 
-impl PostgresTypeEntity {
-    pub fn id_matches(&self, candidate: &core::any::TypeId) -> bool {
+impl TypeMatch for PostgresTypeEntity {
+    fn id_matches(&self, candidate: &core::any::TypeId) -> bool {
         self.mappings.iter().any(|tester| *candidate == tester.id)
     }
 }

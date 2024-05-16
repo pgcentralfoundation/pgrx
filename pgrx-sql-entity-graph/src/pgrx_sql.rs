@@ -38,7 +38,8 @@ use crate::postgres_ord::entity::PostgresOrdEntity;
 use crate::postgres_type::entity::PostgresTypeEntity;
 use crate::schema::entity::SchemaEntity;
 use crate::to_sql::ToSql;
-use crate::{SqlGraphEntity, SqlGraphIdentifier};
+use crate::type_keyed;
+use crate::{SqlGraphEntity, SqlGraphIdentifier, TypeMatch};
 
 use super::{PgExternReturnEntity, PgExternReturnEntityIteratedItem};
 
@@ -845,83 +846,57 @@ fn connect_externs(
         }
 
         for arg in &item.fn_args {
-            let mut found = false;
-
-            for (ty_item, &ty_index) in types {
-                if ty_item.id_matches(&arg.used_ty.ty_id) {
-                    graph.add_edge(ty_index, index, SqlGraphRequires::ByArg);
-                    found = true;
-                    break;
-                }
-            }
-            if !found {
-                for (enum_item, &enum_index) in enums {
-                    if enum_item.id_matches(&arg.used_ty.ty_id) {
-                        graph.add_edge(enum_index, index, SqlGraphRequires::ByArg);
-                        found = true;
-                        break;
-                    }
-                }
-            }
-            if !found {
+            let found = types
+                .iter()
+                .map(type_keyed)
+                .chain(enums.iter().map(type_keyed))
+                .find(|(item, _)| item.id_matches(&arg.used_ty.ty_id));
+            if let Some((_, ty_index)) = found {
+                graph.add_edge(*ty_index, index, SqlGraphRequires::ByArg);
+            } else {
                 let builtin_index = builtin_types.get(arg.used_ty.full_path).unwrap_or_else(|| {
                     panic!("Could not fetch Builtin Type {}.", arg.used_ty.full_path)
                 });
                 graph.add_edge(*builtin_index, index, SqlGraphRequires::ByArg);
             }
-            if !found {
-                for (ext_item, ext_index) in extension_sqls {
-                    if ext_item
-                        .has_sql_declared_entity(&SqlDeclared::Type(
-                            arg.used_ty.full_path.to_string(),
-                        ))
-                        .is_some()
-                    {
-                        if !has_explicit_requires {
-                            graph.add_edge(*ext_index, index, SqlGraphRequires::ByArg);
-                        }
-                    } else if ext_item
-                        .has_sql_declared_entity(&SqlDeclared::Enum(
-                            arg.used_ty.full_path.to_string(),
-                        ))
-                        .is_some()
-                    {
+            for (ext_item, ext_index) in extension_sqls {
+                if ext_item
+                    .has_sql_declared_entity(&SqlDeclared::Type(arg.used_ty.full_path.to_string()))
+                    .is_some()
+                {
+                    if !has_explicit_requires {
                         graph.add_edge(*ext_index, index, SqlGraphRequires::ByArg);
                     }
+                } else if ext_item
+                    .has_sql_declared_entity(&SqlDeclared::Enum(arg.used_ty.full_path.to_string()))
+                    .is_some()
+                {
+                    graph.add_edge(*ext_index, index, SqlGraphRequires::ByArg);
                 }
             }
         }
+
         match &item.fn_return {
             PgExternReturnEntity::None | PgExternReturnEntity::Trigger => (),
             PgExternReturnEntity::Type { ty, .. } | PgExternReturnEntity::SetOf { ty, .. } => {
-                let found_ty = types.iter().find(|(ty_item, _)| ty_item.id_matches(&ty.ty_id));
-                if let Some((_, &ty_index)) = found_ty {
-                    graph.add_edge(ty_index, index, SqlGraphRequires::ByReturn);
-                }
-                let found_enum = if found_ty.is_none() {
-                    enums.iter().find(|(ty_item, _)| ty_item.id_matches(&ty.ty_id))
+                let found_index =
+                    types.iter().map(type_keyed).chain(enums.iter().map(type_keyed)).find_map(
+                        |(ty_item, index)| ty_item.id_matches(&ty.ty_id).then_some(index),
+                    );
+                if let Some(ty_index) = found_index {
+                    graph.add_edge(*ty_index, index, SqlGraphRequires::ByReturn);
                 } else {
-                    None
-                };
-                if let Some((_, &ty_index)) = found_enum {
-                    graph.add_edge(ty_index, index, SqlGraphRequires::ByReturn);
-                }
-                if found_ty.is_none() && found_enum.is_none() {
                     let builtin_index =
                         builtin_types.get(&ty.full_path.to_string()).unwrap_or_else(|| {
                             panic!("Could not fetch Builtin Type {}.", ty.full_path)
                         });
                     graph.add_edge(*builtin_index, index, SqlGraphRequires::ByReturn);
-                }
-                if found_ty.is_none() && found_enum.is_none() {
                     for (ext_item, ext_index) in extension_sqls {
                         if ext_item
-                            .has_sql_declared_entity(&SqlDeclared::Type(ty.full_path.to_string()))
+                            .has_sql_declared_entity(&SqlDeclared::Type(ty.full_path.into()))
                             .is_some()
                             || ext_item
-                                .has_sql_declared_entity(&SqlDeclared::Enum(
-                                    ty.full_path.to_string(),
-                                ))
+                                .has_sql_declared_entity(&SqlDeclared::Enum(ty.full_path.into()))
                                 .is_some()
                         {
                             graph.add_edge(*ext_index, index, SqlGraphRequires::ByArg);
@@ -930,38 +905,27 @@ fn connect_externs(
                 }
             }
             PgExternReturnEntity::Iterated { tys: iterated_returns, .. } => {
-                for PgExternReturnEntityIteratedItem { ty: type_entity, .. } in iterated_returns {
-                    let found_ty =
-                        types.iter().find(|(ty_item, _)| ty_item.id_matches(&type_entity.ty_id));
-                    if let Some((_, &ty_index)) = found_ty {
-                        graph.add_edge(ty_index, index, SqlGraphRequires::ByReturn);
-                    }
-                    let found_enum = if found_ty.is_none() {
-                        enums.iter().find(|(ty_item, _)| ty_item.id_matches(&type_entity.ty_id))
+                for PgExternReturnEntityIteratedItem { ty, .. } in iterated_returns {
+                    let found_index =
+                        types.iter().map(type_keyed).chain(enums.iter().map(type_keyed)).find_map(
+                            |(ty_item, index)| ty_item.id_matches(&ty.ty_id).then_some(index),
+                        );
+                    if let Some(ty_index) = found_index {
+                        graph.add_edge(*ty_index, index, SqlGraphRequires::ByReturn);
                     } else {
-                        None
-                    };
-                    if let Some((_, &ty_index)) = found_enum {
-                        graph.add_edge(ty_index, index, SqlGraphRequires::ByReturn);
-                    }
-                    if found_ty.is_none() && found_enum.is_none() {
-                        let builtin_index = builtin_types
-                            .get(&type_entity.ty_source.to_string())
-                            .unwrap_or_else(|| {
-                                panic!("Could not fetch Builtin Type {}.", type_entity.ty_source)
-                            });
+                        let builtin_index = builtin_types.get(ty.ty_source).unwrap_or_else(|| {
+                            panic!("Could not fetch Builtin Type {}.", ty.ty_source)
+                        });
                         graph.add_edge(*builtin_index, index, SqlGraphRequires::ByReturn);
-                    }
-                    if found_ty.is_none() && found_enum.is_none() {
                         for (ext_item, ext_index) in extension_sqls {
                             if ext_item
                                 .has_sql_declared_entity(&SqlDeclared::Type(
-                                    type_entity.ty_source.to_string(),
+                                    ty.ty_source.to_string(),
                                 ))
                                 .is_some()
                                 || ext_item
                                     .has_sql_declared_entity(&SqlDeclared::Enum(
-                                        type_entity.ty_source.to_string(),
+                                        ty.ty_source.to_string(),
                                     ))
                                     .is_some()
                             {
@@ -1119,20 +1083,13 @@ fn initialize_aggregates(
         let index = graph.add_node(entity);
 
         for arg in &item.args {
-            let mut found = false;
-            for (ty_item, &_ty_index) in mapped_types {
-                if ty_item.id_matches(&arg.used_ty.ty_id) {
-                    found = true;
-                    break;
-                }
-            }
-            for (ty_item, &_ty_index) in mapped_enums {
-                if ty_item.id_matches(&arg.used_ty.ty_id) {
-                    found = true;
-                    break;
-                }
-            }
-            if !found {
+            let found = mapped_types
+                .iter()
+                .map(type_keyed)
+                .chain(mapped_enums.iter().map(type_keyed))
+                .find(|(item, _)| item.id_matches(&arg.used_ty.ty_id));
+
+            if found.is_none() {
                 mapped_builtin_types.entry(arg.used_ty.full_path.to_string()).or_insert_with(
                     || {
                         graph.add_node(SqlGraphEntity::BuiltinType(
@@ -1423,14 +1380,11 @@ fn make_type_or_enum_connection(
     types: &HashMap<PostgresTypeEntity, NodeIndex>,
     enums: &HashMap<PostgresEnumEntity, NodeIndex>,
 ) -> bool {
-    let found_ty = types.iter().find(|(ty_item, _)| ty_item.id_matches(ty_id));
-    if let Some((_, ty_index)) = found_ty {
-        graph.add_edge(*ty_index, index, SqlGraphRequires::By);
-    }
-    let found_enum = enums.iter().find(|(ty_item, _)| ty_item.id_matches(ty_id));
-    if let Some((_, ty_index)) = found_enum {
-        graph.add_edge(*ty_index, index, SqlGraphRequires::By);
-    }
-
-    found_ty.is_some() || found_enum.is_some()
+    types
+        .iter()
+        .map(type_keyed)
+        .chain(enums.iter().map(type_keyed))
+        .find(|(ty, _)| ty.id_matches(ty_id))
+        .map(|(_, ty_index)| graph.add_edge(*ty_index, index, SqlGraphRequires::By))
+        .is_some()
 }

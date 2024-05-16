@@ -19,7 +19,7 @@ use crate::mapping::RustSqlMapping;
 use crate::pgrx_sql::PgrxSql;
 use crate::to_sql::entity::ToSqlConfigEntity;
 use crate::to_sql::ToSql;
-use crate::{SqlGraphEntity, SqlGraphIdentifier};
+use crate::{SqlGraphEntity, SqlGraphIdentifier, TypeMatch};
 use std::collections::BTreeSet;
 
 /// The output of a [`PostgresEnum`](crate::postgres_enum::PostgresEnum) from `quote::ToTokens::to_tokens`.
@@ -35,8 +35,8 @@ pub struct PostgresEnumEntity {
     pub to_sql_config: ToSqlConfigEntity,
 }
 
-impl PostgresEnumEntity {
-    pub fn id_matches(&self, candidate: &core::any::TypeId) -> bool {
+impl TypeMatch for PostgresEnumEntity {
+    fn id_matches(&self, candidate: &core::any::TypeId) -> bool {
         self.mappings.iter().any(|tester| *candidate == tester.id)
     }
 }
