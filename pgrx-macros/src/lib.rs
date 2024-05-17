@@ -705,8 +705,8 @@ fn impl_postgres_enum(ast: DeriveInput) -> syn::Result<proc_macro2::TokenStream>
 
         }
 
-        unsafe impl ::pgrx::callconv::RetPackage for #enum_ident {
-            unsafe fn package_ret(self, fcinfo: ::pgrx::pg_sys::FunctionCallInfo) -> ::pgrx::pg_sys::Datum {
+        unsafe impl ::pgrx::callconv::BoxRet for #enum_ident {
+            unsafe fn box_in_fcinfo(self, fcinfo: ::pgrx::pg_sys::FunctionCallInfo) -> ::pgrx::pg_sys::Datum {
                 ::pgrx::datum::IntoDatum::into_datum(self).unwrap()
             }
         }
@@ -814,8 +814,8 @@ fn impl_postgres_type(ast: DeriveInput) -> syn::Result<proc_macro2::TokenStream>
                     }
                 }
 
-                unsafe impl #generics ::pgrx::callconv::RetPackage for #name #generics {
-                    unsafe fn package_ret(self, fcinfo: ::pgrx::pg_sys::FunctionCallInfo) -> ::pgrx::pg_sys::Datum {
+                unsafe impl #generics ::pgrx::callconv::BoxRet for #name #generics {
+                    unsafe fn box_in_fcinfo(self, fcinfo: ::pgrx::pg_sys::FunctionCallInfo) -> ::pgrx::pg_sys::Datum {
                         match ::pgrx::datum::IntoDatum::into_datum(self) {
                             None => ::pgrx::fcinfo::pg_return_null(fcinfo),
                             Some(datum) => datum,

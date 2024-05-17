@@ -9,7 +9,7 @@
 //LICENSE Use of this source code is governed by the MIT license that can be found in the LICENSE file.
 use core::{iter, ptr};
 
-use crate::callconv::{CallCx, Ret, RetPackage, ReturnShipping};
+use crate::callconv::{BoxRet, CallCx, Ret, RetAbi};
 use crate::fcinfo::{pg_return_null, srf_is_first_call, srf_return_done, srf_return_next};
 use crate::ptr::PointerExt;
 use crate::{pg_sys, IntoDatum, IntoHeapTuple, PgMemoryContexts};
@@ -180,12 +180,12 @@ where
     }
 }
 
-unsafe impl<'a, T> ReturnShipping for SetOfIterator<'a, T>
+unsafe impl<'a, T> RetAbi for SetOfIterator<'a, T>
 where
-    T: ReturnShipping,
+    T: RetAbi,
 {
     type Item = <Self as Iterator>::Item;
-    unsafe fn prepare_call(fcinfo: pg_sys::FunctionCallInfo) -> CallCx {
+    unsafe fn check_fcinfo_and_prepare(fcinfo: pg_sys::FunctionCallInfo) -> CallCx {
         prepare_value_per_call_srf(fcinfo)
     }
 
@@ -198,12 +198,12 @@ where
         }
     }
 
-    unsafe fn box_return(fcinfo: pg_sys::FunctionCallInfo, ret: Ret<Self>) -> pg_sys::Datum {
+    unsafe fn box_ret_in_fcinfo(fcinfo: pg_sys::FunctionCallInfo, ret: Ret<Self>) -> pg_sys::Datum {
         let value = match ret {
             Ret::Zero => return empty_srf(fcinfo),
             Ret::Once(value) => value,
             Ret::Many(iter, value) => {
-                iter.into_context(fcinfo);
+                iter.fill_fcinfo_fcx(fcinfo);
                 value
             }
         };
@@ -211,11 +211,11 @@ where
         unsafe {
             let fcx = deref_fcx(fcinfo);
             srf_return_next(fcinfo, fcx);
-            T::box_return(fcinfo, value.label_ret())
+            T::box_ret_in_fcinfo(fcinfo, value.label_ret())
         }
     }
 
-    unsafe fn into_context(self, fcinfo: pg_sys::FunctionCallInfo) {
+    unsafe fn fill_fcinfo_fcx(self, fcinfo: pg_sys::FunctionCallInfo) {
         let fcx = deref_fcx(fcinfo);
         unsafe {
             let ptr = srf_memcx(fcx).leak_and_drop_on_delete(self);
@@ -224,7 +224,7 @@ where
         }
     }
 
-    unsafe fn ret_from_context(fcinfo: pg_sys::FunctionCallInfo) -> Ret<Self> {
+    unsafe fn ret_from_fcinfo_fcx(fcinfo: pg_sys::FunctionCallInfo) -> Ret<Self> {
         let fcx = deref_fcx(fcinfo);
         // SAFETY: fcx.user_fctx was set earlier, immediately before or in a prior call
         let iter = &mut *(*fcx).user_fctx.cast::<SetOfIterator<'_, T>>();
@@ -234,19 +234,19 @@ where
         }
     }
 
-    unsafe fn finish_call(fcinfo: pg_sys::FunctionCallInfo) {
+    unsafe fn finish_call_fcinfo(fcinfo: pg_sys::FunctionCallInfo) {
         let fcx = deref_fcx(fcinfo);
         unsafe { srf_return_done(fcinfo, fcx) }
     }
 }
 
-unsafe impl<'a, T> ReturnShipping for TableIterator<'a, T>
+unsafe impl<'a, T> RetAbi for TableIterator<'a, T>
 where
-    T: ReturnShipping,
+    T: RetAbi,
 {
     type Item = <Self as Iterator>::Item;
 
-    unsafe fn prepare_call(fcinfo: pg_sys::FunctionCallInfo) -> CallCx {
+    unsafe fn check_fcinfo_and_prepare(fcinfo: pg_sys::FunctionCallInfo) -> CallCx {
         prepare_value_per_call_srf(fcinfo)
     }
 
@@ -259,12 +259,12 @@ where
         }
     }
 
-    unsafe fn box_return(fcinfo: pg_sys::FunctionCallInfo, ret: Ret<Self>) -> pg_sys::Datum {
+    unsafe fn box_ret_in_fcinfo(fcinfo: pg_sys::FunctionCallInfo, ret: Ret<Self>) -> pg_sys::Datum {
         let value = match ret {
             Ret::Zero => return empty_srf(fcinfo),
             Ret::Once(value) => value,
             Ret::Many(iter, value) => {
-                iter.into_context(fcinfo);
+                iter.fill_fcinfo_fcx(fcinfo);
                 value
             }
         };
@@ -272,11 +272,11 @@ where
         unsafe {
             let fcx = deref_fcx(fcinfo);
             srf_return_next(fcinfo, fcx);
-            T::box_return(fcinfo, value.label_ret())
+            T::box_ret_in_fcinfo(fcinfo, value.label_ret())
         }
     }
 
-    unsafe fn into_context(self, fcinfo: pg_sys::FunctionCallInfo) {
+    unsafe fn fill_fcinfo_fcx(self, fcinfo: pg_sys::FunctionCallInfo) {
         // FIXME: this is assigned here but used in the tuple impl?
         let fcx = deref_fcx(fcinfo);
         unsafe {
@@ -295,7 +295,7 @@ where
         }
     }
 
-    unsafe fn ret_from_context(fcinfo: pg_sys::FunctionCallInfo) -> Ret<Self> {
+    unsafe fn ret_from_fcinfo_fcx(fcinfo: pg_sys::FunctionCallInfo) -> Ret<Self> {
         let fcx = deref_fcx(fcinfo);
         // SAFETY: fcx.user_fctx was set earlier, immediately before or in a prior call
         let iter = &mut *(*fcx).user_fctx.cast::<TableIterator<T>>();
@@ -305,7 +305,7 @@ where
         }
     }
 
-    unsafe fn finish_call(fcinfo: pg_sys::FunctionCallInfo) {
+    unsafe fn finish_call_fcinfo(fcinfo: pg_sys::FunctionCallInfo) {
         let fcx = deref_fcx(fcinfo);
         unsafe { srf_return_done(fcinfo, fcx) }
     }
@@ -345,9 +345,9 @@ impl<C: IntoDatum> IntoHeapTuple for (C,) {
     }
 }
 
-unsafe impl<C> ReturnShipping for (C,)
+unsafe impl<C> RetAbi for (C,)
 where
-    C: RetPackage, // so we support TableIterator<'a, (Option<T>,)> as well
+    C: BoxRet, // so we support TableIterator<'a, (Option<T>,)> as well
     Self: IntoHeapTuple,
 {
     type Item = Self;
@@ -357,17 +357,17 @@ where
     }
 
     /// Returning a "row" of only one column is identical to returning that single type
-    unsafe fn box_return(fcinfo: pg_sys::FunctionCallInfo, ret: Ret<Self>) -> pg_sys::Datum {
+    unsafe fn box_ret_in_fcinfo(fcinfo: pg_sys::FunctionCallInfo, ret: Ret<Self>) -> pg_sys::Datum {
         let value = match ret {
             Ret::Zero => return empty_srf(fcinfo),
             Ret::Once(value) => value,
             Ret::Many(iter, value) => {
-                iter.into_context(fcinfo);
+                iter.fill_fcinfo_fcx(fcinfo);
                 value
             }
         };
 
-        unsafe { C::box_return(fcinfo, value.0.label_ret()) }
+        unsafe { C::box_ret_in_fcinfo(fcinfo, value.0.label_ret()) }
     }
 }
 
@@ -412,9 +412,9 @@ macro_rules! impl_table_iter {
             }
         }
 
-        unsafe impl<$($C),*> ReturnShipping for ($($C,)*)
+        unsafe impl<$($C),*> RetAbi for ($($C,)*)
         where
-             $($C: RetPackage,)*
+             $($C: BoxRet,)*
              Self: IntoHeapTuple,
         {
             type Item = Self;
@@ -423,12 +423,12 @@ macro_rules! impl_table_iter {
                 Ret::Once(self)
             }
 
-            unsafe fn box_return(fcinfo: pg_sys::FunctionCallInfo, ret: Ret<Self>) -> pg_sys::Datum {
+            unsafe fn box_ret_in_fcinfo(fcinfo: pg_sys::FunctionCallInfo, ret: Ret<Self>) -> pg_sys::Datum {
                 let value = match ret {
                     Ret::Zero => return empty_srf(fcinfo),
                     Ret::Once(value) => value,
                     Ret::Many(iter, value) => {
-                        iter.into_context(fcinfo);
+                        iter.fill_fcinfo_fcx(fcinfo);
                         value
                     }
                 };

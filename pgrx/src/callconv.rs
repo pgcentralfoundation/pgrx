@@ -44,7 +44,7 @@ pub trait UnboxArg: Sized {
 /// This bound is not accurately described by IntoDatum or similar traits, as value conversions are
 /// handled in a special way at function return boundaries, and may require mutating multiple fields
 /// behind the FunctionCallInfo. The most exceptional case are set-returning functions.
-pub unsafe trait ReturnShipping: Sized {
+pub unsafe trait RetAbi: Sized {
     /// The actual type returned from the call
     type Item: Sized;
 
@@ -53,7 +53,7 @@ pub unsafe trait ReturnShipping: Sized {
     /// the implementer must pick the correct memory context for the wrapped fn's allocations
     /// # safety
     /// must be called with a valid fcinfo
-    unsafe fn prepare_call(_fcinfo: pg_sys::FunctionCallInfo) -> CallCx {
+    unsafe fn check_fcinfo_and_prepare(_fcinfo: pg_sys::FunctionCallInfo) -> CallCx {
         CallCx::WrappedFn(unsafe { pg_sys::CurrentMemoryContext })
     }
 
@@ -63,14 +63,14 @@ pub unsafe trait ReturnShipping: Sized {
     /// box the return value
     /// # Safety
     /// must be called with a valid fcinfo
-    unsafe fn box_return(fcinfo: pg_sys::FunctionCallInfo, ret: Ret<Self>) -> pg_sys::Datum;
+    unsafe fn box_ret_in_fcinfo(fcinfo: pg_sys::FunctionCallInfo, ret: Ret<Self>) -> pg_sys::Datum;
 
     /// for multi-call types, how to init them in the multi-call context, for all others: panic
     ///
     /// for all others: panic
     /// # Safety
     /// must be called with a valid fcinfo
-    unsafe fn into_context(self, _fcinfo: pg_sys::FunctionCallInfo) {
+    unsafe fn fill_fcinfo_fcx(self, _fcinfo: pg_sys::FunctionCallInfo) {
         unimplemented!()
     }
 
@@ -79,21 +79,21 @@ pub unsafe trait ReturnShipping: Sized {
     /// for all others: panic
     /// # Safety
     /// must be called with a valid fcinfo
-    unsafe fn ret_from_context(_fcinfo: pg_sys::FunctionCallInfo) -> Ret<Self> {
+    unsafe fn ret_from_fcinfo_fcx(_fcinfo: pg_sys::FunctionCallInfo) -> Ret<Self> {
         unimplemented!()
     }
 
     /// must be called with a valid fcinfo
-    unsafe fn finish_call(_fcinfo: pg_sys::FunctionCallInfo) {}
+    unsafe fn finish_call_fcinfo(_fcinfo: pg_sys::FunctionCallInfo) {}
 }
 
-pub unsafe trait RetPackage: Sized {
-    unsafe fn package_ret(self, fcinfo: pg_sys::FunctionCallInfo) -> pg_sys::Datum;
+pub unsafe trait BoxRet: Sized {
+    unsafe fn box_in_fcinfo(self, fcinfo: pg_sys::FunctionCallInfo) -> pg_sys::Datum;
 }
 
-unsafe impl<T> ReturnShipping for T
+unsafe impl<T> RetAbi for T
 where
-    T: RetPackage,
+    T: BoxRet,
 {
     type Item = Self;
 
@@ -101,25 +101,25 @@ where
         Ret::Once(self)
     }
 
-    unsafe fn box_return(fcinfo: pg_sys::FunctionCallInfo, ret: Ret<Self>) -> pg_sys::Datum {
+    unsafe fn box_ret_in_fcinfo(fcinfo: pg_sys::FunctionCallInfo, ret: Ret<Self>) -> pg_sys::Datum {
         match ret {
             Ret::Zero => unsafe { pg_return_null(fcinfo) },
-            Ret::Once(ret) => ret.package_ret(fcinfo),
+            Ret::Once(ret) => ret.box_in_fcinfo(fcinfo),
             Ret::Many(_, _) => unreachable!(),
         }
     }
 
-    unsafe fn prepare_call(_fcinfo: pg_sys::FunctionCallInfo) -> CallCx {
+    unsafe fn check_fcinfo_and_prepare(_fcinfo: pg_sys::FunctionCallInfo) -> CallCx {
         CallCx::WrappedFn(unsafe { pg_sys::CurrentMemoryContext })
     }
 
-    unsafe fn into_context(self, _fcinfo: pg_sys::FunctionCallInfo) {
+    unsafe fn fill_fcinfo_fcx(self, _fcinfo: pg_sys::FunctionCallInfo) {
         unimplemented!()
     }
-    unsafe fn ret_from_context(_fcinfo: pg_sys::FunctionCallInfo) -> Ret<Self> {
+    unsafe fn ret_from_fcinfo_fcx(_fcinfo: pg_sys::FunctionCallInfo) -> Ret<Self> {
         unimplemented!()
     }
-    unsafe fn finish_call(_fcinfo: pg_sys::FunctionCallInfo) {}
+    unsafe fn finish_call_fcinfo(_fcinfo: pg_sys::FunctionCallInfo) {}
 }
 
 pub enum CallCx {
@@ -127,34 +127,34 @@ pub enum CallCx {
     WrappedFn(pg_sys::MemoryContext),
 }
 
-pub enum Ret<T: ReturnShipping> {
+pub enum Ret<T: RetAbi> {
     Zero,
     Once(T::Item),
     Many(T, T::Item),
 }
 
-unsafe impl<T> RetPackage for Option<T>
+unsafe impl<T> BoxRet for Option<T>
 where
-    T: RetPackage,
+    T: BoxRet,
 {
-    unsafe fn package_ret(self, fcinfo: pg_sys::FunctionCallInfo) -> pg_sys::Datum {
+    unsafe fn box_in_fcinfo(self, fcinfo: pg_sys::FunctionCallInfo) -> pg_sys::Datum {
         match self {
             None => unsafe { pg_return_null(fcinfo) },
-            Some(value) => value.package_ret(fcinfo),
+            Some(value) => value.box_in_fcinfo(fcinfo),
         }
     }
 }
 
-unsafe impl<T, E> ReturnShipping for Result<T, E>
+unsafe impl<T, E> RetAbi for Result<T, E>
 where
-    T: ReturnShipping,
-    T::Item: ReturnShipping,
+    T: RetAbi,
+    T::Item: RetAbi,
     E: core::any::Any + core::fmt::Display,
 {
     type Item = T::Item;
 
-    unsafe fn prepare_call(fcinfo: pg_sys::FunctionCallInfo) -> CallCx {
-        T::prepare_call(fcinfo)
+    unsafe fn check_fcinfo_and_prepare(fcinfo: pg_sys::FunctionCallInfo) -> CallCx {
+        T::check_fcinfo_and_prepare(fcinfo)
     }
 
     fn label_ret(self) -> Ret<Self> {
@@ -166,7 +166,7 @@ where
         }
     }
 
-    unsafe fn box_return(fcinfo: pg_sys::FunctionCallInfo, ret: Ret<Self>) -> pg_sys::Datum {
+    unsafe fn box_ret_in_fcinfo(fcinfo: pg_sys::FunctionCallInfo, ret: Ret<Self>) -> pg_sys::Datum {
         let ret = match ret {
             Ret::Zero => Ret::Zero,
             Ret::Once(value) => Ret::Once(value),
@@ -176,33 +176,33 @@ where
             }
         };
 
-        T::box_return(fcinfo, ret)
+        T::box_ret_in_fcinfo(fcinfo, ret)
     }
 
-    unsafe fn into_context(self, fcinfo: pg_sys::FunctionCallInfo) {
+    unsafe fn fill_fcinfo_fcx(self, fcinfo: pg_sys::FunctionCallInfo) {
         match self {
             Err(_) => (),
-            Ok(value) => value.into_context(fcinfo),
+            Ok(value) => value.fill_fcinfo_fcx(fcinfo),
         }
     }
 
-    unsafe fn ret_from_context(fcinfo: pg_sys::FunctionCallInfo) -> Ret<Self> {
-        match T::ret_from_context(fcinfo) {
+    unsafe fn ret_from_fcinfo_fcx(fcinfo: pg_sys::FunctionCallInfo) -> Ret<Self> {
+        match T::ret_from_fcinfo_fcx(fcinfo) {
             Ret::Many(iter, value) => Ret::Many(Ok(iter), value),
             Ret::Once(value) => Ret::Once(value),
             Ret::Zero => Ret::Zero,
         }
     }
 
-    unsafe fn finish_call(fcinfo: pg_sys::FunctionCallInfo) {
-        T::finish_call(fcinfo)
+    unsafe fn finish_call_fcinfo(fcinfo: pg_sys::FunctionCallInfo) {
+        T::finish_call_fcinfo(fcinfo)
     }
 }
 
 macro_rules! return_packaging_for_primitives {
     ($($scalar:ty),*) => {
-        $(unsafe impl RetPackage for $scalar {
-              unsafe fn package_ret(self, _fcinfo: pg_sys::FunctionCallInfo) -> pg_sys::Datum {
+        $(unsafe impl BoxRet for $scalar {
+              unsafe fn box_in_fcinfo(self, _fcinfo: pg_sys::FunctionCallInfo) -> pg_sys::Datum {
                   $crate::pg_sys::Datum::from(self)
               }
         })*
@@ -211,46 +211,46 @@ macro_rules! return_packaging_for_primitives {
 
 return_packaging_for_primitives!(i8, i16, i32, i64, bool);
 
-unsafe impl RetPackage for () {
-    unsafe fn package_ret(self, _fcinfo: pg_sys::FunctionCallInfo) -> pg_sys::Datum {
+unsafe impl BoxRet for () {
+    unsafe fn box_in_fcinfo(self, _fcinfo: pg_sys::FunctionCallInfo) -> pg_sys::Datum {
         pg_sys::Datum::from(0)
     }
 }
 
-unsafe impl RetPackage for f32 {
-    unsafe fn package_ret(self, _fcinfo: pg_sys::FunctionCallInfo) -> pg_sys::Datum {
+unsafe impl BoxRet for f32 {
+    unsafe fn box_in_fcinfo(self, _fcinfo: pg_sys::FunctionCallInfo) -> pg_sys::Datum {
         pg_sys::Datum::from(self.to_bits())
     }
 }
 
-unsafe impl RetPackage for f64 {
-    unsafe fn package_ret(self, _fcinfo: pg_sys::FunctionCallInfo) -> pg_sys::Datum {
+unsafe impl BoxRet for f64 {
+    unsafe fn box_in_fcinfo(self, _fcinfo: pg_sys::FunctionCallInfo) -> pg_sys::Datum {
         pg_sys::Datum::from(self.to_bits())
     }
 }
 
-unsafe impl<'a> RetPackage for &'a [u8] {
-    unsafe fn package_ret(self, fcinfo: pg_sys::FunctionCallInfo) -> pg_sys::Datum {
+unsafe impl<'a> BoxRet for &'a [u8] {
+    unsafe fn box_in_fcinfo(self, fcinfo: pg_sys::FunctionCallInfo) -> pg_sys::Datum {
         self.into_datum().unwrap_or_else(|| unsafe { pg_return_null(fcinfo) })
     }
 }
 
-unsafe impl<'a> RetPackage for &'a str {
-    unsafe fn package_ret(self, fcinfo: pg_sys::FunctionCallInfo) -> pg_sys::Datum {
+unsafe impl<'a> BoxRet for &'a str {
+    unsafe fn box_in_fcinfo(self, fcinfo: pg_sys::FunctionCallInfo) -> pg_sys::Datum {
         self.into_datum().unwrap_or_else(|| unsafe { pg_return_null(fcinfo) })
     }
 }
 
-unsafe impl<'a> RetPackage for &'a CStr {
-    unsafe fn package_ret(self, fcinfo: pg_sys::FunctionCallInfo) -> pg_sys::Datum {
+unsafe impl<'a> BoxRet for &'a CStr {
+    unsafe fn box_in_fcinfo(self, fcinfo: pg_sys::FunctionCallInfo) -> pg_sys::Datum {
         self.into_datum().unwrap_or_else(|| unsafe { pg_return_null(fcinfo) })
     }
 }
 
 macro_rules! impl_repackage_into_datum {
     ($($boxable:ty),*) => {
-        $(unsafe impl RetPackage for $boxable {
-              unsafe fn package_ret(self, fcinfo: pg_sys::FunctionCallInfo) -> pg_sys::Datum {
+        $(unsafe impl BoxRet for $boxable {
+              unsafe fn box_in_fcinfo(self, fcinfo: pg_sys::FunctionCallInfo) -> pg_sys::Datum {
                   self.into_datum().unwrap_or_else(|| unsafe { pg_return_null(fcinfo) })
               }
           })*
@@ -264,50 +264,50 @@ impl_repackage_into_datum! {
     pg_sys::Oid, pg_sys::BOX, pg_sys::Point
 }
 
-unsafe impl<const P: u32, const S: u32> RetPackage for crate::Numeric<P, S> {
-    unsafe fn package_ret(self, fcinfo: pg_sys::FunctionCallInfo) -> pg_sys::Datum {
+unsafe impl<const P: u32, const S: u32> BoxRet for crate::Numeric<P, S> {
+    unsafe fn box_in_fcinfo(self, fcinfo: pg_sys::FunctionCallInfo) -> pg_sys::Datum {
         self.into_datum().unwrap_or_else(|| unsafe { pg_return_null(fcinfo) })
     }
 }
 
-unsafe impl<T> RetPackage for crate::Range<T>
+unsafe impl<T> BoxRet for crate::Range<T>
 where
     T: IntoDatum + crate::RangeSubType,
 {
-    unsafe fn package_ret(self, fcinfo: pg_sys::FunctionCallInfo) -> pg_sys::Datum {
+    unsafe fn box_in_fcinfo(self, fcinfo: pg_sys::FunctionCallInfo) -> pg_sys::Datum {
         self.into_datum().unwrap_or_else(|| unsafe { pg_return_null(fcinfo) })
     }
 }
 
-unsafe impl<T> RetPackage for Vec<T>
+unsafe impl<T> BoxRet for Vec<T>
 where
     T: IntoDatum,
 {
-    unsafe fn package_ret(self, fcinfo: pg_sys::FunctionCallInfo) -> pg_sys::Datum {
+    unsafe fn box_in_fcinfo(self, fcinfo: pg_sys::FunctionCallInfo) -> pg_sys::Datum {
         self.into_datum().unwrap_or_else(|| unsafe { pg_return_null(fcinfo) })
     }
 }
 
-unsafe impl<T: Copy> RetPackage for PgVarlena<T> {
-    unsafe fn package_ret(self, fcinfo: pg_sys::FunctionCallInfo) -> pg_sys::Datum {
+unsafe impl<T: Copy> BoxRet for PgVarlena<T> {
+    unsafe fn box_in_fcinfo(self, fcinfo: pg_sys::FunctionCallInfo) -> pg_sys::Datum {
         self.into_datum().unwrap_or_else(|| unsafe { pg_return_null(fcinfo) })
     }
 }
 
-unsafe impl<'mcx, A> RetPackage for PgHeapTuple<'mcx, A>
+unsafe impl<'mcx, A> BoxRet for PgHeapTuple<'mcx, A>
 where
     A: crate::WhoAllocated,
 {
-    unsafe fn package_ret(self, fcinfo: pg_sys::FunctionCallInfo) -> pg_sys::Datum {
+    unsafe fn box_in_fcinfo(self, fcinfo: pg_sys::FunctionCallInfo) -> pg_sys::Datum {
         self.into_datum().unwrap_or_else(|| unsafe { pg_return_null(fcinfo) })
     }
 }
 
-unsafe impl<T, A> RetPackage for PgBox<T, A>
+unsafe impl<T, A> BoxRet for PgBox<T, A>
 where
     A: crate::WhoAllocated,
 {
-    unsafe fn package_ret(self, fcinfo: pg_sys::FunctionCallInfo) -> pg_sys::Datum {
+    unsafe fn box_in_fcinfo(self, fcinfo: pg_sys::FunctionCallInfo) -> pg_sys::Datum {
         self.into_datum().unwrap_or_else(|| unsafe { pg_return_null(fcinfo) })
     }
 }

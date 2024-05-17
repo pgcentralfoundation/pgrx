@@ -419,18 +419,18 @@ impl PgExtern {
                     #[allow(unused_unsafe)]
                     unsafe {
                         let fcinfo = #fcinfo_ident;
-                        let result: ::pgrx::callconv::Ret<#ret_ty> = match <#ret_ty as ::pgrx::callconv::ReturnShipping>::prepare_call(fcinfo) {
+                        let result: ::pgrx::callconv::Ret<#ret_ty> = match <#ret_ty as ::pgrx::callconv::RetAbi>::check_fcinfo_and_prepare(fcinfo) {
                             ::pgrx::callconv::CallCx::WrappedFn(mcx) => {
                                 let mut mcx = ::pgrx::PgMemoryContexts::For(mcx);
                                 let call_result: #ret_ty = mcx.switch_to(|_| {
                                     #(#arg_fetches)*
                                     #func_name( #(#arg_pats),* )
                                 });
-                                ::pgrx::callconv::ReturnShipping::label_ret(call_result)
+                                ::pgrx::callconv::RetAbi::label_ret(call_result)
                             }
-                            ::pgrx::callconv::CallCx::RestoreCx => ::pgrx::callconv::ReturnShipping::ret_from_context(fcinfo),
+                            ::pgrx::callconv::CallCx::RestoreCx => ::pgrx::callconv::RetAbi::ret_from_fcinfo_fcx(fcinfo),
                         };
-                        unsafe { ::pgrx::callconv::ReturnShipping::box_return(fcinfo, result) }
+                        unsafe { ::pgrx::callconv::RetAbi::box_ret_in_fcinfo(fcinfo, result) }
                     }
                 };
                 finfo_v1_extern_c(&self.func, fcinfo_ident, wrapper_code)
