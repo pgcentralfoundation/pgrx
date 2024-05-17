@@ -16,27 +16,6 @@ use crate::{
     pg_return_null, pg_sys, AnyNumeric, Date, Inet, Internal, Interval, IntoDatum, Json, PgBox,
     PgVarlena, Time, TimeWithTimeZone, Timestamp, TimestampWithTimeZone, Uuid,
 };
-use core::ops::ControlFlow;
-
-/// Unboxing for arguments
-///
-/// This bound is necessary to distinguish things which can be passed into `#[pg_extern] fn`.
-/// It is strictly a mistake to use the BorrowDatum/UnboxDatum/DetoastDatum traits for this bound!
-/// PGRX allows "phantom arguments" which are not actually present in the C function, and are also
-/// omitted in the SQL, but are passed to the Rust function anyways.
-pub trait UnboxArg: Sized {
-    /// indicates min/max number of args that may be consumed if statically known
-    fn arg_width(_fcinfo: pg_sys::FunctionCallInfo) -> Option<(usize, usize)> {
-        todo!()
-    }
-
-    /// try to unbox the next argument
-    ///
-    /// should play into a quasi-iterator somehow?
-    fn try_unbox(_fcinfo: pg_sys::FunctionCallInfo, _current: usize) -> ControlFlow<Self, ()> {
-        todo!()
-    }
-}
 
 /// How to return a value from Rust to Postgres
 ///
