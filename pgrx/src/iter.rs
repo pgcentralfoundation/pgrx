@@ -401,7 +401,6 @@ macro_rules! impl_table_iter {
 
                 unsafe {
                     let fcx = deref_fcx(fcinfo);
-                    // FIXME: we only know this is here due to our clairvoyant powers
                     let heap_tuple = value.into_heap_tuple((*fcx).tuple_desc);
                     pg_sys::HeapTupleHeaderGetDatum((*heap_tuple).t_data)
                 }
