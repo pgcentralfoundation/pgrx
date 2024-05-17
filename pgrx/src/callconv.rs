@@ -19,10 +19,11 @@ use crate::{
 
 /// How to return a value from Rust to Postgres
 ///
-/// This bound is necessary to distinguish things which can be passed in/out of `#[pg_extern] fn`.
+/// This bound is necessary to distinguish things which can be returned from a `#[pg_extern] fn`.
 /// This bound is not accurately described by IntoDatum or similar traits, as value conversions are
 /// handled in a special way at function return boundaries, and may require mutating multiple fields
-/// behind the FunctionCallInfo. The most exceptional case are set-returning functions.
+/// behind the FunctionCallInfo. The most exceptional case are set-returning functions, which
+/// require special handling for the fcinfo and also for certain inner types.
 pub unsafe trait RetAbi: Sized {
     /// The actual type returned from the call
     type Item: Sized;
@@ -44,12 +45,12 @@ pub unsafe trait RetAbi: Sized {
     /// must be called with a valid fcinfo
     unsafe fn box_ret_in_fcinfo(fcinfo: pg_sys::FunctionCallInfo, ret: Ret<Self>) -> pg_sys::Datum;
 
-    /// Some types require filling the fcinfo so they can later be restored
+    /// Multi-call types want to be in the fcinfo so they can be restored
     /// # Safety
     /// must be called with a valid fcinfo
     unsafe fn move_into_fcinfo_fcx(self, _fcinfo: pg_sys::FunctionCallInfo);
 
-    /// Some types require filling the fcinfo so they can later be restored
+    /// Other types want to add metadata to the fcinfo
     /// # Safety
     /// must be called with a valid fcinfo
     unsafe fn fill_fcinfo_fcx(&self, _fcinfo: pg_sys::FunctionCallInfo);
