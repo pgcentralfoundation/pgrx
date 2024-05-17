@@ -48,13 +48,12 @@ use pgrx_sql_entity_graph::metadata::{
 ///     SetOfIterator::new(input.split_whitespace())
 /// }
 /// ```
-pub struct SetOfIterator<'a, T> {
-    iter: Box<dyn Iterator<Item = T> + 'a>,
-}
+#[repr(transparent)]
+pub struct SetOfIterator<'a, T>(TableIterator<'a, (T,)>);
 
 impl<'a, T: 'a> SetOfIterator<'a, T> {
     pub fn new(iter: impl IntoIterator<Item = T> + 'a) -> Self {
-        Self { iter: Box::new(iter.into_iter()) }
+        Self(TableIterator::new(iter.into_iter().map(|c| (c,))))
     }
 
     pub fn empty() -> Self {
@@ -71,7 +70,7 @@ impl<'a, T> Iterator for SetOfIterator<'a, T> {
 
     #[inline]
     fn next(&mut self) -> Option<Self::Item> {
-        self.iter.next()
+        self.0.next().map(|(val,)| val)
     }
 }
 
@@ -138,10 +137,7 @@ pub struct TableIterator<'a, T> {
     iter: Box<dyn Iterator<Item = T> + 'a>,
 }
 
-impl<'a, T> TableIterator<'a, T>
-where
-    T: IntoHeapTuple + 'a,
-{
+impl<'a, T: 'a> TableIterator<'a, T> {
     pub fn new(iter: impl IntoIterator<Item = T> + 'a) -> Self {
         Self { iter: Box::new(iter.into_iter()) }
     }
@@ -183,64 +179,46 @@ where
 
 unsafe impl<'a, T> RetAbi for SetOfIterator<'a, T>
 where
-    T: RetAbi,
+    T: BoxRet,
 {
     type Item = <Self as Iterator>::Item;
     unsafe fn check_fcinfo_and_prepare(fcinfo: pg_sys::FunctionCallInfo) -> CallCx {
-        prepare_value_per_call_srf(fcinfo)
+        TableIterator::<(T,)>::check_fcinfo_and_prepare(fcinfo)
     }
 
     fn label_ret(self) -> Ret<Self> {
         let mut iter = self;
-        let ret = iter.next();
-        match ret {
+        match iter.next() {
             None => Ret::Zero,
             Some(value) => Ret::Many(iter, value),
         }
     }
 
     unsafe fn box_ret_in_fcinfo(fcinfo: pg_sys::FunctionCallInfo, ret: Ret<Self>) -> pg_sys::Datum {
-        let value = match ret {
-            Ret::Zero => return empty_srf(fcinfo),
-            Ret::Once(value) => value,
-            Ret::Many(iter, value) => {
-                // Move the iterator in and don't worry about putting it back
-                iter.move_into_fcinfo_fcx(fcinfo);
-                value.fill_fcinfo_fcx(fcinfo);
-                value
-            }
+        let ret = match ret {
+            Ret::Zero => Ret::Zero,
+            Ret::Once(value) => Ret::Once((value,)),
+            Ret::Many(iter, value) => Ret::Many(iter.0, (value,)),
         };
-
-        unsafe {
-            let fcx = deref_fcx(fcinfo);
-            srf_return_next(fcinfo, fcx);
-            T::box_ret_in_fcinfo(fcinfo, value.label_ret())
-        }
+        TableIterator::<(T,)>::box_ret_in_fcinfo(fcinfo, ret)
     }
 
     unsafe fn fill_fcinfo_fcx(&self, _fcinfo: pg_sys::FunctionCallInfo) {}
 
     unsafe fn move_into_fcinfo_fcx(self, fcinfo: pg_sys::FunctionCallInfo) {
-        let fcx = deref_fcx(fcinfo);
-        unsafe {
-            let ptr = srf_memcx(fcx).leak_and_drop_on_delete(self);
-            // it's the first call so we need to finish setting up fcx
-            (*fcx).user_fctx = ptr.cast();
-        }
+        self.0.move_into_fcinfo_fcx(fcinfo)
     }
+
     unsafe fn ret_from_fcinfo_fcx(fcinfo: pg_sys::FunctionCallInfo) -> Ret<Self> {
-        let fcx = deref_fcx(fcinfo);
-        // SAFETY: fcx.user_fctx was set earlier, immediately before or in a prior call
-        let iter = &mut *(*fcx).user_fctx.cast::<SetOfIterator<'_, T>>();
-        match iter.next() {
-            None => Ret::Zero,
-            Some(value) => Ret::Once(value),
+        match TableIterator::<(T,)>::ret_from_fcinfo_fcx(fcinfo) {
+            Ret::Once((item,)) => Ret::Once(item),
+            Ret::Zero => Ret::Zero,
+            Ret::Many(iter, (value,)) => Ret::Many(Self(iter), value),
         }
     }
 
     unsafe fn finish_call_fcinfo(fcinfo: pg_sys::FunctionCallInfo) {
-        let fcx = deref_fcx(fcinfo);
-        unsafe { srf_return_done(fcinfo, fcx) }
+        TableIterator::<(T,)>::finish_call_fcinfo(fcinfo)
     }
 }
 
@@ -251,13 +229,19 @@ where
     type Item = <Self as Iterator>::Item;
 
     unsafe fn check_fcinfo_and_prepare(fcinfo: pg_sys::FunctionCallInfo) -> CallCx {
-        prepare_value_per_call_srf(fcinfo)
+        unsafe {
+            if srf_is_first_call(fcinfo) {
+                let fn_call_cx = pg_sys::init_MultiFuncCall(fcinfo);
+                CallCx::WrappedFn((*fn_call_cx).multi_call_memory_ctx)
+            } else {
+                CallCx::RestoreCx
+            }
+        }
     }
 
     fn label_ret(self) -> Ret<Self> {
         let mut iter = self;
-        let ret = iter.next();
-        match ret {
+        match iter.next() {
             None => Ret::Zero,
             Some(value) => Ret::Many(iter, value),
         }
@@ -309,17 +293,6 @@ where
     }
 }
 
-fn prepare_value_per_call_srf(fcinfo: pg_sys::FunctionCallInfo) -> CallCx {
-    unsafe {
-        if srf_is_first_call(fcinfo) {
-            let fn_call_cx = pg_sys::init_MultiFuncCall(fcinfo);
-            CallCx::WrappedFn((*fn_call_cx).multi_call_memory_ctx)
-        } else {
-            CallCx::RestoreCx
-        }
-    }
-}
-
 pub(crate) fn empty_srf(fcinfo: pg_sys::FunctionCallInfo) -> pg_sys::Datum {
     unsafe {
         let fcx = deref_fcx(fcinfo);
@@ -337,16 +310,9 @@ pub(crate) fn srf_memcx(fcx: *mut pg_sys::FuncCallContext) -> PgMemoryContexts {
     unsafe { PgMemoryContexts::For((*fcx).multi_call_memory_ctx) }
 }
 
-impl<C: IntoDatum> IntoHeapTuple for (C,) {
-    unsafe fn into_heap_tuple(self, _tupdesc: pg_sys::TupleDesc) -> *mut pg_sys::HeapTupleData {
-        unimplemented!()
-    }
-}
-
 unsafe impl<C> RetAbi for (C,)
 where
     C: BoxRet, // so we support TableIterator<'a, (Option<T>,)> as well
-    Self: IntoHeapTuple,
 {
     type Item = Self;
 
