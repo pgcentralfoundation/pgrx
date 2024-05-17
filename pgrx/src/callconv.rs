@@ -65,14 +65,15 @@ pub unsafe trait RetAbi: Sized {
     /// must be called with a valid fcinfo
     unsafe fn box_ret_in_fcinfo(fcinfo: pg_sys::FunctionCallInfo, ret: Ret<Self>) -> pg_sys::Datum;
 
-    /// for multi-call types, how to init them in the multi-call context, for all others: panic
-    ///
-    /// for all others: panic
+    /// Some types require filling the fcinfo so they can later be restored
     /// # Safety
     /// must be called with a valid fcinfo
-    unsafe fn fill_fcinfo_fcx(self, _fcinfo: pg_sys::FunctionCallInfo) {
-        unimplemented!()
-    }
+    unsafe fn move_into_fcinfo_fcx(self, _fcinfo: pg_sys::FunctionCallInfo);
+
+    /// Some types require filling the fcinfo so they can later be restored
+    /// # Safety
+    /// must be called with a valid fcinfo
+    unsafe fn fill_fcinfo_fcx(&self, _fcinfo: pg_sys::FunctionCallInfo);
 
     /// for multi-call types, how to restore them from the multi-call context
     ///
@@ -113,9 +114,8 @@ where
         CallCx::WrappedFn(unsafe { pg_sys::CurrentMemoryContext })
     }
 
-    unsafe fn fill_fcinfo_fcx(self, _fcinfo: pg_sys::FunctionCallInfo) {
-        unimplemented!()
-    }
+    unsafe fn fill_fcinfo_fcx(&self, _fcinfo: pg_sys::FunctionCallInfo) {}
+    unsafe fn move_into_fcinfo_fcx(self, _fcinfo: pg_sys::FunctionCallInfo) {}
     unsafe fn ret_from_fcinfo_fcx(_fcinfo: pg_sys::FunctionCallInfo) -> Ret<Self> {
         unimplemented!()
     }
@@ -178,11 +178,17 @@ where
 
         T::box_ret_in_fcinfo(fcinfo, ret)
     }
-
-    unsafe fn fill_fcinfo_fcx(self, fcinfo: pg_sys::FunctionCallInfo) {
+    unsafe fn fill_fcinfo_fcx(&self, fcinfo: pg_sys::FunctionCallInfo) {
         match self {
-            Err(_) => (),
             Ok(value) => value.fill_fcinfo_fcx(fcinfo),
+            Err(_) => (),
+        }
+    }
+
+    unsafe fn move_into_fcinfo_fcx(self, fcinfo: pg_sys::FunctionCallInfo) {
+        match self {
+            Ok(value) => value.move_into_fcinfo_fcx(fcinfo),
+            Err(_) => (),
         }
     }
 

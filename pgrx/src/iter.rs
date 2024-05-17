@@ -13,6 +13,7 @@ use crate::callconv::{BoxRet, CallCx, Ret, RetAbi};
 use crate::fcinfo::{pg_return_null, srf_is_first_call, srf_return_done, srf_return_next};
 use crate::ptr::PointerExt;
 use crate::{pg_sys, IntoDatum, IntoHeapTuple, PgMemoryContexts};
+use pgrx_pg_sys::TypeFuncClass_TYPEFUNC_COMPOSITE;
 use pgrx_sql_entity_graph::metadata::{
     ArgumentError, Returns, ReturnsError, SqlMapping, SqlTranslatable,
 };
@@ -203,7 +204,9 @@ where
             Ret::Zero => return empty_srf(fcinfo),
             Ret::Once(value) => value,
             Ret::Many(iter, value) => {
-                iter.fill_fcinfo_fcx(fcinfo);
+                // Move the iterator in and don't worry about putting it back
+                iter.move_into_fcinfo_fcx(fcinfo);
+                value.fill_fcinfo_fcx(fcinfo);
                 value
             }
         };
@@ -215,7 +218,9 @@ where
         }
     }
 
-    unsafe fn fill_fcinfo_fcx(self, fcinfo: pg_sys::FunctionCallInfo) {
+    unsafe fn fill_fcinfo_fcx(&self, _fcinfo: pg_sys::FunctionCallInfo) {}
+
+    unsafe fn move_into_fcinfo_fcx(self, fcinfo: pg_sys::FunctionCallInfo) {
         let fcx = deref_fcx(fcinfo);
         unsafe {
             let ptr = srf_memcx(fcx).leak_and_drop_on_delete(self);
@@ -223,7 +228,6 @@ where
             (*fcx).user_fctx = ptr.cast();
         }
     }
-
     unsafe fn ret_from_fcinfo_fcx(fcinfo: pg_sys::FunctionCallInfo) -> Ret<Self> {
         let fcx = deref_fcx(fcinfo);
         // SAFETY: fcx.user_fctx was set earlier, immediately before or in a prior call
@@ -264,7 +268,9 @@ where
             Ret::Zero => return empty_srf(fcinfo),
             Ret::Once(value) => value,
             Ret::Many(iter, value) => {
-                iter.fill_fcinfo_fcx(fcinfo);
+                // Move the iterator in and don't worry about putting it back
+                iter.move_into_fcinfo_fcx(fcinfo);
+                value.fill_fcinfo_fcx(fcinfo);
                 value
             }
         };
@@ -276,20 +282,12 @@ where
         }
     }
 
-    unsafe fn fill_fcinfo_fcx(self, fcinfo: pg_sys::FunctionCallInfo) {
-        // FIXME: this is assigned here but used in the tuple impl?
+    unsafe fn fill_fcinfo_fcx(&self, _fcinfo: pg_sys::FunctionCallInfo) {}
+
+    unsafe fn move_into_fcinfo_fcx(self, fcinfo: pg_sys::FunctionCallInfo) {
         let fcx = deref_fcx(fcinfo);
         unsafe {
-            let ptr = srf_memcx(fcx).switch_to(move |mcx| {
-                let mut tupdesc = ptr::null_mut();
-                let mut oid = pg_sys::Oid::default();
-                let ty_class = pg_sys::get_call_result_type(fcinfo, &mut oid, &mut tupdesc);
-                if tupdesc.is_non_null() {
-                    pg_sys::BlessTupleDesc(tupdesc);
-                }
-                (*fcx).tuple_desc = tupdesc;
-                mcx.leak_and_drop_on_delete(self)
-            });
+            let ptr = srf_memcx(fcx).leak_and_drop_on_delete(self);
             // it's the first call so we need to finish setting up fcx
             (*fcx).user_fctx = ptr.cast();
         }
@@ -361,14 +359,17 @@ where
         let value = match ret {
             Ret::Zero => return empty_srf(fcinfo),
             Ret::Once(value) => value,
-            Ret::Many(iter, value) => {
-                iter.fill_fcinfo_fcx(fcinfo);
-                value
+            Ret::Many(_, _) => {
+                unreachable!()
             }
         };
 
         unsafe { C::box_ret_in_fcinfo(fcinfo, value.0.label_ret()) }
     }
+
+    unsafe fn fill_fcinfo_fcx(&self, _fcinfo: pg_sys::FunctionCallInfo) {}
+
+    unsafe fn move_into_fcinfo_fcx(self, _fcinfo: pg_sys::FunctionCallInfo) {}
 }
 
 macro_rules! impl_table_iter {
@@ -427,9 +428,8 @@ macro_rules! impl_table_iter {
                 let value = match ret {
                     Ret::Zero => return empty_srf(fcinfo),
                     Ret::Once(value) => value,
-                    Ret::Many(iter, value) => {
-                        iter.fill_fcinfo_fcx(fcinfo);
-                        value
+                    Ret::Many(_, _) => {
+                        unreachable!()
                     }
                 };
 
@@ -438,6 +438,24 @@ macro_rules! impl_table_iter {
                     // FIXME: we only know this is here due to our clairvoyant powers
                     let heap_tuple = value.into_heap_tuple((*fcx).tuple_desc);
                     pg_sys::HeapTupleHeaderGetDatum((*heap_tuple).t_data)
+                }
+            }
+
+            unsafe fn move_into_fcinfo_fcx(self, _fcinfo: pg_sys::FunctionCallInfo) {}
+
+            unsafe fn fill_fcinfo_fcx(&self, fcinfo: pg_sys::FunctionCallInfo) {
+                // Pure side effect, leave the value in place.
+                let fcx = deref_fcx(fcinfo);
+                unsafe {
+                    srf_memcx(fcx).switch_to(|_| {
+                        let mut tupdesc = ptr::null_mut();
+                        let mut oid = pg_sys::Oid::default();
+                        let ty_class = pg_sys::get_call_result_type(fcinfo, &mut oid, &mut tupdesc);
+                        if tupdesc.is_non_null() && ty_class == TypeFuncClass_TYPEFUNC_COMPOSITE {
+                            pg_sys::BlessTupleDesc(tupdesc);
+                            (*fcx).tuple_desc = tupdesc;
+                        }
+                    });
                 }
             }
         }
