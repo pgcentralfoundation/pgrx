@@ -23,6 +23,9 @@ pub(crate) struct New {
     /// Create a background worker template
     #[clap(long, short)]
     bgworker: bool,
+    /// The name of the PostgreSQL extension (optional)
+    #[clap(long)]
+    extension_name: Option<String>,
     #[clap(from_global, action = ArgAction::Count)]
     verbose: u8,
 }
@@ -30,9 +33,10 @@ pub(crate) struct New {
 impl CommandExecute for New {
     #[tracing::instrument(level = "error", skip(self))]
     fn execute(self) -> eyre::Result<()> {
-        validate_extension_name(&self.name)?;
+        let extension_name = self.extension_name.unwrap_or_else(|| self.name.clone());
+        validate_extension_name(&extension_name)?;
         let path = PathBuf::from_str(&format!("{}/", self.name)).unwrap();
-        create_crate_template(path, &self.name, self.bgworker)
+        create_crate_template(path, &self.name, &extension_name, self.bgworker)
     }
 }
 
@@ -49,13 +53,14 @@ fn validate_extension_name(extname: &str) -> eyre::Result<()> {
 pub(crate) fn create_crate_template(
     path: PathBuf,
     name: &str,
+    extension_name: &str,
     is_bgworker: bool,
 ) -> eyre::Result<()> {
     create_directory_structure(path.clone())?;
-    create_control_file(path.clone(), name)?;
+    create_control_file(path.clone(), extension_name)?;
     create_cargo_toml(path.clone(), name)?;
     create_dotcargo_config_toml(path.clone(), name)?;
-    create_lib_rs(path.clone(), name, is_bgworker)?;
+    create_lib_rs(path.clone(), extension_name, is_bgworker)?;
     create_git_ignore(path.clone(), name)?;
     create_pgrx_embed_rs(path)?;
 
@@ -83,11 +88,11 @@ fn create_directory_structure(mut src_dir: PathBuf) -> Result<(), std::io::Error
     Ok(())
 }
 
-fn create_control_file(mut filename: PathBuf, name: &str) -> Result<(), std::io::Error> {
-    filename.push(format!("{name}.control"));
+fn create_control_file(mut filename: PathBuf, extension_name: &str) -> Result<(), std::io::Error> {
+    filename.push(format!("{extension_name}.control"));
     let mut file = std::fs::File::create(filename)?;
 
-    file.write_all(format!(include_str!("../templates/control"), name = name).as_bytes())?;
+    file.write_all(format!(include_str!("../templates/control"), name = extension_name).as_bytes())?;
 
     Ok(())
 }
@@ -113,7 +118,7 @@ fn create_dotcargo_config_toml(mut filename: PathBuf, _name: &str) -> Result<(),
 
 fn create_lib_rs(
     mut filename: PathBuf,
-    name: &str,
+    extension_name: &str,
     is_bgworker: bool,
 ) -> Result<(), std::io::Error> {
     filename.push("src");
@@ -122,10 +127,10 @@ fn create_lib_rs(
 
     if is_bgworker {
         file.write_all(
-            format!(include_str!("../templates/bgworker_lib_rs"), name = name).as_bytes(),
+            format!(include_str!("../templates/bgworker_lib_rs"), extension_name = extension_name).as_bytes(),
         )?;
     } else {
-        file.write_all(format!(include_str!("../templates/lib_rs"), name = name).as_bytes())?;
+        file.write_all(format!(include_str!("../templates/lib_rs"), extension_name = extension_name).as_bytes())?;
     }
 
     Ok(())

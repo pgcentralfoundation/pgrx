@@ -9,7 +9,7 @@ In order to use this bgworker with a cargo-pgrx managed database, you'll need to
 "$PGRX_HOME/data-$PGVER/postgresql.conf" if the `shared_preload_libraries` entry is absent:
 
 ```
-shared_preload_libraries = '{name}.so'
+shared_preload_libraries = '{extension_name}.so'
 ```
 
 Background workers *must* be initialized in the extension's `_PG_init()` function, and can *only*
@@ -22,9 +22,9 @@ this background worker
 #[allow(non_snake_case)]
 #[pg_guard]
 pub extern "C" fn _PG_init() {{
-    BackgroundWorkerBuilder::new("{name}")
+    BackgroundWorkerBuilder::new("{extension_name}")
         .set_function("background_worker_main")
-        .set_library("{name}")
+        .set_library("{extension_name}")
         .set_argument(42i32.into_datum())
         .enable_spi_access()
         .load();
