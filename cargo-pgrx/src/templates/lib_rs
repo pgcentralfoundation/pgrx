@@ -2,21 +2,36 @@ use pgrx::prelude::*;
 
 ::pgrx::pg_module_magic!();
 
-#[pg_extern]
-fn hello_{extension_name}() -> &'static str {{
-    "Hello, {extension_name}"
-}}
-
-#[cfg(any(test, feature = "pg_test"))]
 #[pg_schema]
-mod tests {{
-    use pgrx::prelude::*;
+mod {extension_name} {{
+    use super::*;
 
-    #[pg_test]
-    fn test_hello_{extension_name}() {{
-        assert_eq!("Hello, {extension_name}", crate::hello_{extension_name}());
+    #[pg_extern]
+    fn hello_world() -> &'static str {{
+        "Hello, world!"
     }}
 
+    #[pg_extern]
+    fn hello_name(name: &str) -> String {{
+        format!("Hello, {{}}!", name)
+    }}
+
+    #[cfg(any(test, feature = "pg_test"))]
+    #[pg_schema]
+    mod tests {{
+        use pgrx::prelude::*;
+
+        #[pg_test]
+        fn test_hello_world() {{
+            assert_eq!("Hello, world!", crate::{extension_name}::hello_world());
+        }}
+
+        #[pg_test]
+        fn test_hello_name() {{
+            assert_eq!("Hello, Alice!", crate::{extension_name}::hello_name("Alice"));
+        }}
+
+    }}
 }}
 
 /// This module is required by `cargo pgrx test` invocations.
