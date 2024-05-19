@@ -92,7 +92,9 @@ fn create_control_file(mut filename: PathBuf, extension_name: &str) -> Result<()
     filename.push(format!("{extension_name}.control"));
     let mut file = std::fs::File::create(filename)?;
 
-    file.write_all(format!(include_str!("../templates/control"), name = extension_name).as_bytes())?;
+    file.write_all(
+        format!(include_str!("../templates/control"), name = extension_name).as_bytes(),
+    )?;
 
     Ok(())
 }
@@ -127,10 +129,14 @@ fn create_lib_rs(
 
     if is_bgworker {
         file.write_all(
-            format!(include_str!("../templates/bgworker_lib_rs"), extension_name = extension_name).as_bytes(),
+            format!(include_str!("../templates/bgworker_lib_rs"), extension_name = extension_name)
+                .as_bytes(),
         )?;
     } else {
-        file.write_all(format!(include_str!("../templates/lib_rs"), extension_name = extension_name).as_bytes())?;
+        file.write_all(
+            format!(include_str!("../templates/lib_rs"), extension_name = extension_name)
+                .as_bytes(),
+        )?;
     }
 
     Ok(())
