@@ -49,10 +49,14 @@ use pgrx_sql_entity_graph::metadata::{
 /// }
 /// ```
 #[repr(transparent)]
-pub struct SetOfIterator<'a, T>(TableIterator<'a, (T,)>);
+pub struct SetOfIterator<'a, T>(
+    // Postgres uses the same ABI for `returns setof` and 1-column `returns table`
+    TableIterator<'a, (T,)>,
+);
 
 impl<'a, T: 'a> SetOfIterator<'a, T> {
     pub fn new(iter: impl IntoIterator<Item = T> + 'a) -> Self {
+        // Forward the impl using remapping to minimize `unsafe` code and keep them in sync
         Self(TableIterator::new(iter.into_iter().map(|c| (c,))))
     }
 
@@ -74,6 +78,7 @@ impl<'a, T> Iterator for SetOfIterator<'a, T> {
     }
 }
 
+/// `SetOfIterator<'_, T>` differs from `TableIterator<'a, (T,)>` in generated SQL
 unsafe impl<'a, T> SqlTranslatable for SetOfIterator<'a, T>
 where
     T: SqlTranslatable,
@@ -310,6 +315,13 @@ pub(crate) fn srf_memcx(fcx: *mut pg_sys::FuncCallContext) -> PgMemoryContexts {
     unsafe { PgMemoryContexts::For((*fcx).multi_call_memory_ctx) }
 }
 
+/// Return ABI for single-column tuples
+///
+/// Postgres extended SQL with `returns setof $ty` before SQL had `returns table($($ident $ty),*)`.
+/// Due to this history, single-column `returns table` reuses the internals of `returns setof`.
+/// This lets them simply return a simple Datum instead of handling a TupleDesc and HeapTuple, but
+/// means we need to have this distinct impl, as the return type is not `TYPEFUNC_COMPOSITE`!
+/// Fortunately, RetAbi lets `TableIterator<'a, Tup>` handle this by calling `<Tup as RetAbi>`.
 unsafe impl<C> RetAbi for (C,)
 where
     C: BoxRet, // so we support TableIterator<'a, (Option<T>,)> as well
