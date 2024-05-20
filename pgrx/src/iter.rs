@@ -138,12 +138,12 @@ where
 ///     TableIterator::new(input.split_whitespace().enumerate().map(|(n, w)| (n as i32, w)))
 /// }
 /// ```
-pub struct TableIterator<'a, T> {
-    iter: Box<dyn Iterator<Item = T> + 'a>,
+pub struct TableIterator<'a, Row> {
+    iter: Box<dyn Iterator<Item = Row> + 'a>,
 }
 
-impl<'a, T: 'a> TableIterator<'a, T> {
-    pub fn new(iter: impl IntoIterator<Item = T> + 'a) -> Self {
+impl<'a, Row: 'a> TableIterator<'a, Row> {
+    pub fn new(iter: impl IntoIterator<Item = Row> + 'a) -> Self {
         Self { iter: Box::new(iter.into_iter()) }
     }
 
@@ -151,13 +151,13 @@ impl<'a, T: 'a> TableIterator<'a, T> {
         Self::new(iter::empty())
     }
 
-    pub fn once(value: T) -> Self {
+    pub fn once(value: Row) -> Self {
         Self::new(iter::once(value))
     }
 }
 
-impl<'a, T> Iterator for TableIterator<'a, T> {
-    type Item = T;
+impl<'a, Row> Iterator for TableIterator<'a, Row> {
+    type Item = Row;
 
     #[inline]
     fn next(&mut self) -> Option<Self::Item> {
@@ -227,9 +227,9 @@ where
     }
 }
 
-unsafe impl<'a, T> RetAbi for TableIterator<'a, T>
+unsafe impl<'a, Row> RetAbi for TableIterator<'a, Row>
 where
-    T: RetAbi,
+    Row: RetAbi,
 {
     type Item = <Self as Iterator>::Item;
 
@@ -267,7 +267,7 @@ where
         unsafe {
             let fcx = deref_fcx(fcinfo);
             srf_return_next(fcinfo, fcx);
-            T::box_ret_in_fcinfo(fcinfo, value.label_ret())
+            <Row as RetAbi>::box_ret_in_fcinfo(fcinfo, value.label_ret())
         }
     }
 
@@ -285,7 +285,7 @@ where
     unsafe fn ret_from_fcinfo_fcx(fcinfo: pg_sys::FunctionCallInfo) -> Ret<Self> {
         let fcx = deref_fcx(fcinfo);
         // SAFETY: fcx.user_fctx was set earlier, immediately before or in a prior call
-        let iter = &mut *(*fcx).user_fctx.cast::<TableIterator<T>>();
+        let iter = &mut *(*fcx).user_fctx.cast::<TableIterator<Row>>();
         match iter.next() {
             None => Ret::Zero,
             Some(value) => Ret::Once(value),
