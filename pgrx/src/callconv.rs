@@ -23,16 +23,21 @@ use std::ffi::{CStr, CString};
 /// handled in a special way at function return boundaries, and may require mutating multiple fields
 /// behind the FunctionCallInfo. The most exceptional case are set-returning functions, which
 /// require special handling for the fcinfo and also for certain inner types.
+///
+/// This trait is exposed to external code so macro-generated wrapper fn may expand to calls to it.
+/// The number of invariants implementers must uphold is unlikely to be adequately documented.
+/// Prefer to use RetAbi as a trait bound instead of implementing it, or even calling it, yourself.
 pub unsafe trait RetAbi: Sized {
-    /// The actual type returned from the call
+    /// Type returned to Postgres
     type Item: Sized;
+    /// Driver for complex returns
     type Ret;
 
-    /// check the fcinfo state, initialize if necessary, and pick calling the wrapped fn or restoring Self
+    /// Initialize the FunctionCallInfo for returns
     ///
-    /// the implementer must pick the correct memory context for the wrapped fn's allocations
-    /// # safety
-    /// must be called with a valid fcinfo
+    /// The implementer must pick the correct memory context for the wrapped fn's allocations.
+    /// # Safety
+    /// Requires a valid FunctionCallInfo.
     unsafe fn check_fcinfo_and_prepare(_fcinfo: pg_sys::FunctionCallInfo) -> CallCx {
         CallCx::WrappedFn(unsafe { pg_sys::CurrentMemoryContext })
     }
@@ -68,6 +73,7 @@ pub unsafe trait RetAbi: Sized {
     unsafe fn finish_call_fcinfo(_fcinfo: pg_sys::FunctionCallInfo) {}
 }
 
+/// A simplified blanket RetAbi
 pub unsafe trait BoxRet: Sized {
     unsafe fn box_in_fcinfo(self, fcinfo: pg_sys::FunctionCallInfo) -> pg_sys::Datum;
 }
