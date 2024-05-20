@@ -8,6 +8,7 @@
 //LICENSE
 //LICENSE Use of this source code is governed by the MIT license that can be found in the LICENSE file.
 #![doc(hidden)]
+#![deny(unsafe_op_in_unsafe_fn)]
 //! Helper implementations for returning sets and tables from `#[pg_extern]`-style functions
 use crate::heap_tuple::PgHeapTuple;
 use crate::{
@@ -90,7 +91,7 @@ where
     }
 
     unsafe fn box_ret_in_fcinfo(fcinfo: pg_sys::FunctionCallInfo, ret: Self::Ret) -> pg_sys::Datum {
-        ret.box_in_fcinfo(fcinfo)
+        unsafe { ret.box_in_fcinfo(fcinfo) }
     }
 
     unsafe fn check_fcinfo_and_prepare(_fcinfo: pg_sys::FunctionCallInfo) -> CallCx {
@@ -116,9 +117,11 @@ where
     T: BoxRet,
 {
     unsafe fn box_in_fcinfo(self, fcinfo: pg_sys::FunctionCallInfo) -> pg_sys::Datum {
-        match self {
-            None => unsafe { pg_return_null(fcinfo) },
-            Some(value) => value.box_in_fcinfo(fcinfo),
+        unsafe {
+            match self {
+                None => pg_return_null(fcinfo),
+                Some(value) => value.box_in_fcinfo(fcinfo),
+            }
         }
     }
 }
@@ -133,7 +136,7 @@ where
     type Ret = T::Ret;
 
     unsafe fn check_fcinfo_and_prepare(fcinfo: pg_sys::FunctionCallInfo) -> CallCx {
-        T::check_fcinfo_and_prepare(fcinfo)
+        unsafe { T::check_fcinfo_and_prepare(fcinfo) }
     }
 
     fn to_ret(self) -> Self::Ret {
@@ -142,29 +145,29 @@ where
     }
 
     unsafe fn box_ret_in_fcinfo(fcinfo: pg_sys::FunctionCallInfo, ret: Self::Ret) -> pg_sys::Datum {
-        T::box_ret_in_fcinfo(fcinfo, ret)
+        unsafe { T::box_ret_in_fcinfo(fcinfo, ret) }
     }
 
     unsafe fn fill_fcinfo_fcx(&self, fcinfo: pg_sys::FunctionCallInfo) {
         match self {
-            Ok(value) => value.fill_fcinfo_fcx(fcinfo),
+            Ok(value) => unsafe { value.fill_fcinfo_fcx(fcinfo) },
             Err(_) => (),
         }
     }
 
     unsafe fn move_into_fcinfo_fcx(self, fcinfo: pg_sys::FunctionCallInfo) {
         match self {
-            Ok(value) => value.move_into_fcinfo_fcx(fcinfo),
+            Ok(value) => unsafe { value.move_into_fcinfo_fcx(fcinfo) },
             Err(_) => (),
         }
     }
 
     unsafe fn ret_from_fcinfo_fcx(fcinfo: pg_sys::FunctionCallInfo) -> Self::Ret {
-        T::ret_from_fcinfo_fcx(fcinfo)
+        unsafe { T::ret_from_fcinfo_fcx(fcinfo) }
     }
 
     unsafe fn finish_call_fcinfo(fcinfo: pg_sys::FunctionCallInfo) {
-        T::finish_call_fcinfo(fcinfo)
+        unsafe { T::finish_call_fcinfo(fcinfo) }
     }
 }
 

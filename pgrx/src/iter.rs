@@ -7,6 +7,7 @@
 //LICENSE All rights reserved.
 //LICENSE
 //LICENSE Use of this source code is governed by the MIT license that can be found in the LICENSE file.
+#![deny(unsafe_op_in_unsafe_fn)]
 use core::{iter, ptr};
 
 use crate::callconv::{BoxRet, CallCx, RetAbi};
@@ -190,7 +191,7 @@ where
     type Ret = IterRet<Self>;
 
     unsafe fn check_fcinfo_and_prepare(fcinfo: pg_sys::FunctionCallInfo) -> CallCx {
-        TableIterator::<(T,)>::check_fcinfo_and_prepare(fcinfo)
+        unsafe { TableIterator::<(T,)>::check_fcinfo_and_prepare(fcinfo) }
     }
 
     fn to_ret(self) -> Self::Ret {
@@ -207,17 +208,17 @@ where
             Step::Once(value) => Step::Once((value,)),
             Step::Init(iter, value) => Step::Init(iter.0, (value,)),
         };
-        TableIterator::<(T,)>::box_ret_in_fcinfo(fcinfo, IterRet(ret))
+        unsafe { TableIterator::<(T,)>::box_ret_in_fcinfo(fcinfo, IterRet(ret)) }
     }
 
     unsafe fn fill_fcinfo_fcx(&self, _fcinfo: pg_sys::FunctionCallInfo) {}
 
     unsafe fn move_into_fcinfo_fcx(self, fcinfo: pg_sys::FunctionCallInfo) {
-        self.0.move_into_fcinfo_fcx(fcinfo)
+        unsafe { self.0.move_into_fcinfo_fcx(fcinfo) }
     }
 
     unsafe fn ret_from_fcinfo_fcx(fcinfo: pg_sys::FunctionCallInfo) -> Self::Ret {
-        let step = match TableIterator::<(T,)>::ret_from_fcinfo_fcx(fcinfo).0 {
+        let step = match unsafe { TableIterator::<(T,)>::ret_from_fcinfo_fcx(fcinfo).0 } {
             Step::Done => Step::Done,
             Step::Once((item,)) => Step::Once(item),
             Step::Init(iter, (value,)) => Step::Init(Self(iter), value),
@@ -226,7 +227,7 @@ where
     }
 
     unsafe fn finish_call_fcinfo(fcinfo: pg_sys::FunctionCallInfo) {
-        TableIterator::<(T,)>::finish_call_fcinfo(fcinfo)
+        unsafe { TableIterator::<(T,)>::finish_call_fcinfo(fcinfo) }
     }
 }
 
@@ -257,14 +258,16 @@ where
     }
 
     unsafe fn box_ret_in_fcinfo(fcinfo: pg_sys::FunctionCallInfo, ret: Self::Ret) -> pg_sys::Datum {
-        let value = match ret.0 {
-            Step::Done => return empty_srf(fcinfo),
-            Step::Once(value) => value,
-            Step::Init(iter, value) => {
-                // Move the iterator in and don't worry about putting it back
-                iter.move_into_fcinfo_fcx(fcinfo);
-                value.fill_fcinfo_fcx(fcinfo);
-                value
+        let value = unsafe {
+            match ret.0 {
+                Step::Done => return empty_srf(fcinfo),
+                Step::Once(value) => value,
+                Step::Init(iter, value) => {
+                    // Move the iterator in and don't worry about putting it back
+                    iter.move_into_fcinfo_fcx(fcinfo);
+                    value.fill_fcinfo_fcx(fcinfo);
+                    value
+                }
             }
         };
 
@@ -278,8 +281,8 @@ where
     unsafe fn fill_fcinfo_fcx(&self, _fcinfo: pg_sys::FunctionCallInfo) {}
 
     unsafe fn move_into_fcinfo_fcx(self, fcinfo: pg_sys::FunctionCallInfo) {
-        let fcx = deref_fcx(fcinfo);
         unsafe {
+            let fcx = deref_fcx(fcinfo);
             let ptr = srf_memcx(fcx).leak_and_drop_on_delete(self);
             // it's the first call so we need to finish setting up fcx
             (*fcx).user_fctx = ptr.cast();
@@ -287,9 +290,11 @@ where
     }
 
     unsafe fn ret_from_fcinfo_fcx(fcinfo: pg_sys::FunctionCallInfo) -> Self::Ret {
-        let fcx = deref_fcx(fcinfo);
         // SAFETY: fcx.user_fctx was set earlier, immediately before or in a prior call
-        let iter = &mut *(*fcx).user_fctx.cast::<TableIterator<Row>>();
+        let iter = unsafe {
+            let fcx = deref_fcx(fcinfo);
+            &mut *(*fcx).user_fctx.cast::<TableIterator<Row>>()
+        };
         IterRet(match iter.next() {
             None => Step::Done,
             Some(value) => Step::Once(value),
@@ -297,8 +302,10 @@ where
     }
 
     unsafe fn finish_call_fcinfo(fcinfo: pg_sys::FunctionCallInfo) {
-        let fcx = deref_fcx(fcinfo);
-        unsafe { srf_return_done(fcinfo, fcx) }
+        unsafe {
+            let fcx = deref_fcx(fcinfo);
+            srf_return_done(fcinfo, fcx)
+        }
     }
 }
 
@@ -312,7 +319,7 @@ enum Step<T: RetAbi> {
     Init(T, T::Item),
 }
 
-pub(crate) fn empty_srf(fcinfo: pg_sys::FunctionCallInfo) -> pg_sys::Datum {
+pub(crate) unsafe fn empty_srf(fcinfo: pg_sys::FunctionCallInfo) -> pg_sys::Datum {
     unsafe {
         let fcx = deref_fcx(fcinfo);
         srf_return_done(fcinfo, fcx);
@@ -321,11 +328,11 @@ pub(crate) fn empty_srf(fcinfo: pg_sys::FunctionCallInfo) -> pg_sys::Datum {
 }
 
 /// "per_MultiFuncCall" but no FFI cost
-pub(crate) fn deref_fcx(fcinfo: pg_sys::FunctionCallInfo) -> *mut pg_sys::FuncCallContext {
+pub(crate) unsafe fn deref_fcx(fcinfo: pg_sys::FunctionCallInfo) -> *mut pg_sys::FuncCallContext {
     unsafe { (*(*fcinfo).flinfo).fn_extra.cast() }
 }
 
-pub(crate) fn srf_memcx(fcx: *mut pg_sys::FuncCallContext) -> PgMemoryContexts {
+pub(crate) unsafe fn srf_memcx(fcx: *mut pg_sys::FuncCallContext) -> PgMemoryContexts {
     unsafe { PgMemoryContexts::For((*fcx).multi_call_memory_ctx) }
 }
 
@@ -422,8 +429,8 @@ macro_rules! impl_table_iter {
 
             unsafe fn fill_fcinfo_fcx(&self, fcinfo: pg_sys::FunctionCallInfo) {
                 // Pure side effect, leave the value in place.
-                let fcx = deref_fcx(fcinfo);
                 unsafe {
+                    let fcx = deref_fcx(fcinfo);
                     srf_memcx(fcx).switch_to(|_| {
                         let mut tupdesc = ptr::null_mut();
                         let mut oid = pg_sys::Oid::default();
