@@ -302,8 +302,10 @@ where
     }
 }
 
+/// How iterators are returned
 pub struct IterRet<T: RetAbi>(Step<T>);
 
+/// ValuePerCall SRF steps
 enum Step<T: RetAbi> {
     Done,
     Once(T::Item),

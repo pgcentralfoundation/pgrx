@@ -105,6 +105,7 @@ where
     unsafe fn finish_call_fcinfo(_fcinfo: pg_sys::FunctionCallInfo) {}
 }
 
+/// Control flow for RetAbi
 pub enum CallCx {
     RestoreCx,
     WrappedFn(pg_sys::MemoryContext),
