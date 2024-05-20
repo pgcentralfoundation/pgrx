@@ -38,7 +38,7 @@ use crate::ToSqlConfig;
 use operator::{PgrxOperatorAttributeWithIdent, PgrxOperatorOpName};
 use search_path::SearchPathList;
 
-use proc_macro2::{Ident, Span, TokenStream as TokenStream2};
+use proc_macro2::{Ident, TokenStream as TokenStream2};
 use quote::{format_ident, quote, quote_spanned};
 use syn::parse::{Parse, ParseStream, Parser};
 use syn::punctuated::Punctuated;
@@ -406,141 +406,33 @@ impl PgExtern {
             }
         });
 
-        // Iterators require fancy handling for their retvals
-        let emit_result_handler = |span: Span, optional: bool, result: bool| {
-            let mut ret_expr = quote! { #func_name(#(#arg_pats),*) };
-            if result {
-                // If it's a result, we need to report it.
-                ret_expr = quote! { #ret_expr.unwrap_or_report() };
-            }
-            if !optional {
-                // If it's not already an option, we need to wrap it.
-                ret_expr = quote! { Some(#ret_expr) };
-            }
-            let import = result.then(|| quote! { use ::pgrx::pg_sys::panic::ErrorReportable; });
-            quote_spanned! { span =>
-                    #import
-                    #ret_expr
-            }
-        };
-
         match &self.returns {
-            Returning::None => {
-                let fn_contents = quote! {
-                    #(#arg_fetches)*
-                    #[allow(unused_unsafe)]
-                    unsafe { #func_name(#(#arg_pats),*) };
-                    // -> () means always returning the zero Datum
-                    ::pgrx::pg_sys::Datum::from(0)
+            Returning::None
+            | Returning::Type(_)
+            | Returning::SetOf { .. }
+            | Returning::Iterated { .. } => {
+                let ret_ty = match &self.func.sig.output {
+                    syn::ReturnType::Default => syn::parse_quote! { () },
+                    syn::ReturnType::Type(_, ret_ty) => ret_ty.clone(),
                 };
-                finfo_v1_extern_c(&self.func, fcinfo_ident, fn_contents)
-            }
-            Returning::Type(retval_ty) => {
-                let result_ident = syn::Ident::new("result", self.func.sig.span());
-                let retval_transform = if retval_ty.resolved_ty == syn::parse_quote!(()) {
-                    quote_spanned! { self.func.sig.output.span() =>
-                       unsafe { ::pgrx::fcinfo::pg_return_void() }
-                    }
-                } else if retval_ty.result && retval_ty.optional.is_some() {
-                    // returning `Result<Option<T>>`
-                    quote_spanned! { self.func.sig.output.span() =>
-                        match ::pgrx::datum::IntoDatum::into_datum(#result_ident) {
-                            Some(datum) => datum,
-                            None => unsafe { ::pgrx::fcinfo::pg_return_null(#fcinfo_ident) },
-                        }
-                    }
-                } else if retval_ty.result {
-                    // returning Result<T>
-                    quote_spanned! { self.func.sig.output.span() =>
-                        ::pgrx::datum::IntoDatum::into_datum(#result_ident).unwrap_or_else(|| panic!("returned Datum was NULL"))
-                    }
-                } else if retval_ty.resolved_ty.last_ident_is("Datum") {
-                    // As before, we can just throw this in because it must typecheck
-                    quote_spanned! { self.func.sig.output.span() =>
-                       #result_ident
-                    }
-                } else if retval_ty.optional.is_some() {
-                    quote_spanned! { self.func.sig.output.span() =>
-                        match #result_ident {
-                            Some(result) => {
-                                ::pgrx::datum::IntoDatum::into_datum(result).unwrap_or_else(|| panic!("returned Option<T> was NULL"))
-                            },
-                            None => unsafe { ::pgrx::fcinfo::pg_return_null(#fcinfo_ident) }
-                        }
-                    }
-                } else {
-                    quote_spanned! { self.func.sig.output.span() =>
-                        ::pgrx::datum::IntoDatum::into_datum(#result_ident).unwrap_or_else(|| panic!("returned Datum was NULL"))
-                    }
-                };
-
-                let fn_contents = quote! {
-                    #(#arg_fetches)*
-
-                    #[allow(unused_unsafe)] // unwrapped fn might be unsafe
-                    let #result_ident = unsafe { #func_name(#(#arg_pats),*) };
-
-                    #retval_transform
-                };
-                finfo_v1_extern_c(&self.func, fcinfo_ident, fn_contents)
-            }
-            Returning::SetOf { ty: _retval_ty, is_option, is_result } => {
-                let result_handler =
-                    emit_result_handler(self.func.sig.span(), *is_option, *is_result);
-                let setof_closure = quote! {
+                let wrapper_code = quote_spanned! { self.func.block.span() =>
                     #[allow(unused_unsafe)]
                     unsafe {
-                        // SAFETY: the caller has asserted that `fcinfo` is a valid FunctionCallInfo pointer, allocated by Postgres
-                        // with all its fields properly setup.  Unless the user is calling this wrapper function directly, this
-                        // will always be the case
-                        ::pgrx::iter::SetOfIterator::srf_next(#fcinfo_ident, || {
-                            #( #arg_fetches )*
-                            #result_handler
-                        })
+                        let fcinfo = #fcinfo_ident;
+                        let result = match <#ret_ty as ::pgrx::callconv::RetAbi>::check_fcinfo_and_prepare(fcinfo) {
+                            ::pgrx::callconv::CallCx::WrappedFn(mcx) => {
+                                let mut mcx = ::pgrx::PgMemoryContexts::For(mcx);
+                                ::pgrx::callconv::RetAbi::to_ret(mcx.switch_to(|_| {
+                                    #(#arg_fetches)*
+                                    #func_name( #(#arg_pats),* )
+                                }))
+                            }
+                            ::pgrx::callconv::CallCx::RestoreCx => <#ret_ty as ::pgrx::callconv::RetAbi>::ret_from_fcinfo_fcx(fcinfo),
+                        };
+                        unsafe { <#ret_ty as ::pgrx::callconv::RetAbi>::box_ret_in_fcinfo(fcinfo, result) }
                     }
                 };
-                finfo_v1_extern_c(&self.func, fcinfo_ident, setof_closure)
-            }
-            Returning::Iterated { tys: retval_tys, is_option, is_result } => {
-                let result_handler =
-                    emit_result_handler(self.func.sig.span(), *is_option, *is_result);
-
-                let iter_closure = if retval_tys.len() == 1 {
-                    // Postgres considers functions returning a 1-field table (`RETURNS TABLE (T)`) to be
-                    // a function that `RETURNS SETOF T`.  So we write a different wrapper implementation
-                    // that transparently transforms the `TableIterator` returned by the user into a `SetOfIterator`
-                    quote! {
-                        #[allow(unused_unsafe)]
-                        unsafe {
-                            // SAFETY: the caller has asserted that `fcinfo` is a valid FunctionCallInfo pointer, allocated by Postgres
-                            // with all its fields properly setup.  Unless the user is calling this wrapper function directly, this
-                            // will always be the case
-                            ::pgrx::iter::SetOfIterator::srf_next(#fcinfo_ident, || {
-                                #( #arg_fetches )*
-                                let table_iterator = { #result_handler };
-
-                                // we need to convert the 1-field `TableIterator` provided by the user
-                                // into a SetOfIterator in order to properly handle the case of `RETURNS TABLE (T)`,
-                                // which is a table that returns only 1 field.
-                                table_iterator.map(|i| ::pgrx::iter::SetOfIterator::new(i.into_iter().map(|(v,)| v)))
-                            })
-                        }
-                    }
-                } else {
-                    quote! {
-                        #[allow(unused_unsafe)]
-                        unsafe {
-                            // SAFETY: the caller has asserted that `fcinfo` is a valid FunctionCallInfo pointer, allocated by Postgres
-                            // with all its fields properly setup.  Unless the user is calling this wrapper function directly, this
-                            // will always be the case
-                            ::pgrx::iter::TableIterator::srf_next(#fcinfo_ident, || {
-                                #( #arg_fetches )*
-                                #result_handler
-                            })
-                        }
-                    }
-                };
-                finfo_v1_extern_c(&self.func, fcinfo_ident, iter_closure)
+                finfo_v1_extern_c(&self.func, fcinfo_ident, wrapper_code)
             }
         }
     }

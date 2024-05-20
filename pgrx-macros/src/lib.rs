@@ -704,6 +704,12 @@ fn impl_postgres_enum(ast: DeriveInput) -> syn::Result<proc_macro2::TokenStream>
             }
 
         }
+
+        unsafe impl ::pgrx::callconv::BoxRet for #enum_ident {
+            unsafe fn box_in_fcinfo(self, fcinfo: ::pgrx::pg_sys::FunctionCallInfo) -> ::pgrx::pg_sys::Datum {
+                ::pgrx::datum::IntoDatum::into_datum(self).unwrap()
+            }
+        }
     });
 
     let sql_graph_entity_item = PostgresEnum::from_derive_input(sql_graph_entity_ast)?;
@@ -805,6 +811,15 @@ fn impl_postgres_type(ast: DeriveInput) -> syn::Result<proc_macro2::TokenStream>
 
                     fn type_oid() -> ::pgrx::pg_sys::Oid {
                         ::pgrx::wrappers::rust_regtypein::<Self>()
+                    }
+                }
+
+                unsafe impl #generics ::pgrx::callconv::BoxRet for #name #generics {
+                    unsafe fn box_in_fcinfo(self, fcinfo: ::pgrx::pg_sys::FunctionCallInfo) -> ::pgrx::pg_sys::Datum {
+                        match ::pgrx::datum::IntoDatum::into_datum(self) {
+                            None => ::pgrx::fcinfo::pg_return_null(fcinfo),
+                            Some(datum) => datum,
+                        }
                     }
                 }
 

@@ -38,9 +38,9 @@ fn calculate_human_years() -> Result<
     TableIterator<
         'static,
         (
-            name!(dog_name, Result<Option<String>, pgrx::spi::Error>),
+            name!(dog_name, Option<String>),
             name!(dog_age, i32),
-            name!(dog_breed, Result<Option<String>, pgrx::spi::Error>),
+            name!(dog_breed, Option<String>),
             name!(human_age, i32),
         ),
     >,
@@ -62,7 +62,7 @@ fn calculate_human_years() -> Result<
             let dog_age = row["dog_age"].value::<i32>()?.expect("dog_age was null");
             let dog_breed = row["dog_breed"].value::<String>();
             let human_age = dog_age * 7;
-            results.push((dog_name, dog_age, dog_breed, human_age));
+            results.push((dog_name?, dog_age, dog_breed?, human_age));
         }
 
         Ok(TableIterator::new(results))
@@ -76,9 +76,9 @@ fn filter_by_breed(
     TableIterator<
         'static,
         (
-            name!(dog_name, Result<Option<String>, pgrx::spi::Error>),
-            name!(dog_age, Result<Option<i32>, pgrx::spi::Error>),
-            name!(dog_breed, Result<Option<String>, pgrx::spi::Error>),
+            name!(dog_name, Option<String>),
+            name!(dog_age, Option<i32>),
+            name!(dog_breed, Option<String>),
         ),
     >,
     spi::Error,
@@ -95,9 +95,11 @@ fn filter_by_breed(
         let tup_table = client.select(query, None, Some(args))?;
 
         let filtered = tup_table
-            .map(|row| (row["dog_name"].value(), row["dog_age"].value(), row["dog_breed"].value()))
-            .collect::<Vec<_>>();
-        Ok(TableIterator::new(filtered))
+            .map(|row| {
+                Ok((row["dog_name"].value()?, row["dog_age"].value()?, row["dog_breed"].value()?))
+            })
+            .collect::<Result<Vec<_>, _>>();
+        filtered.map(|v| TableIterator::new(v))
     })
 }
 
@@ -107,19 +109,17 @@ mod tests {
     use crate::calculate_human_years;
     use pgrx::prelude::*;
 
-    #[rustfmt::skip]
     #[pg_test]
     fn test_calculate_human_years() -> Result<(), pgrx::spi::Error> {
-        let mut results: Vec<(Result<Option<String>, _>, i32, Result<Option<String>, _>, i32)> =
-            Vec::new();
+        let mut results = Vec::new();
 
-        results.push((Ok(Some("Fido".to_string())), 3, Ok(Some("Labrador".to_string())), 21));
-        results.push((Ok(Some("Spot".to_string())), 5, Ok(Some("Poodle".to_string())), 35));
-        results.push((Ok(Some("Rover".to_string())), 7, Ok(Some("Golden Retriever".to_string())), 49));
-        results.push((Ok(Some("Snoopy".to_string())), 9, Ok(Some("Beagle".to_string())), 63));
-        results.push((Ok(Some("Lassie".to_string())), 11, Ok(Some("Collie".to_string())), 77));
-        results.push((Ok(Some("Scooby".to_string())), 13, Ok(Some("Great Dane".to_string())), 91));
-        results.push((Ok(Some("Moomba".to_string())), 15, Ok(Some("Labrador".to_string())), 105));
+        results.push((Some("Fido".to_string()), 3, Some("Labrador".to_string()), 21));
+        results.push((Some("Spot".to_string()), 5, Some("Poodle".to_string()), 35));
+        results.push((Some("Rover".to_string()), 7, Some("Golden Retriever".to_string()), 49));
+        results.push((Some("Snoopy".to_string()), 9, Some("Beagle".to_string()), 63));
+        results.push((Some("Lassie".to_string()), 11, Some("Collie".to_string()), 77));
+        results.push((Some("Scooby".to_string()), 13, Some("Great Dane".to_string()), 91));
+        results.push((Some("Moomba".to_string()), 15, Some("Labrador".to_string()), 105));
         let func_results = calculate_human_years()?;
 
         for (expected, actual) in results.iter().zip(func_results) {

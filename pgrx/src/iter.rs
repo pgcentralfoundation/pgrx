@@ -7,10 +7,14 @@
 //LICENSE All rights reserved.
 //LICENSE
 //LICENSE Use of this source code is governed by the MIT license that can be found in the LICENSE file.
-#![allow(clippy::vec_init_then_push)]
-use std::iter;
+#![deny(unsafe_op_in_unsafe_fn)]
+use core::{iter, ptr};
 
-use crate::{pg_sys, IntoDatum, IntoHeapTuple};
+use crate::callconv::{BoxRet, CallCx, RetAbi};
+use crate::fcinfo::{pg_return_null, srf_is_first_call, srf_return_done, srf_return_next};
+use crate::ptr::PointerExt;
+use crate::{pg_sys, IntoDatum, IntoHeapTuple, PgMemoryContexts};
+use pgrx_pg_sys::TypeFuncClass_TYPEFUNC_COMPOSITE;
 use pgrx_sql_entity_graph::metadata::{
     ArgumentError, Returns, ReturnsError, SqlMapping, SqlTranslatable,
 };
@@ -45,13 +49,16 @@ use pgrx_sql_entity_graph::metadata::{
 ///     SetOfIterator::new(input.split_whitespace())
 /// }
 /// ```
-pub struct SetOfIterator<'a, T> {
-    iter: Box<dyn Iterator<Item = T> + 'a>,
-}
+#[repr(transparent)]
+pub struct SetOfIterator<'a, T>(
+    // Postgres uses the same ABI for `returns setof` and 1-column `returns table`
+    TableIterator<'a, (T,)>,
+);
 
 impl<'a, T: 'a> SetOfIterator<'a, T> {
     pub fn new(iter: impl IntoIterator<Item = T> + 'a) -> Self {
-        Self { iter: Box::new(iter.into_iter()) }
+        // Forward the impl using remapping to minimize `unsafe` code and keep them in sync
+        Self(TableIterator::new(iter.into_iter().map(|c| (c,))))
     }
 
     pub fn empty() -> Self {
@@ -68,10 +75,11 @@ impl<'a, T> Iterator for SetOfIterator<'a, T> {
 
     #[inline]
     fn next(&mut self) -> Option<Self::Item> {
-        self.iter.next()
+        self.0.next().map(|(val,)| val)
     }
 }
 
+/// `SetOfIterator<'_, T>` differs from `TableIterator<'a, (T,)>` in generated SQL
 unsafe impl<'a, T> SqlTranslatable for SetOfIterator<'a, T>
 where
     T: SqlTranslatable,
@@ -131,15 +139,12 @@ where
 ///     TableIterator::new(input.split_whitespace().enumerate().map(|(n, w)| (n as i32, w)))
 /// }
 /// ```
-pub struct TableIterator<'a, T> {
-    iter: Box<dyn Iterator<Item = T> + 'a>,
+pub struct TableIterator<'a, Row> {
+    iter: Box<dyn Iterator<Item = Row> + 'a>,
 }
 
-impl<'a, T> TableIterator<'a, T>
-where
-    T: IntoHeapTuple + 'a,
-{
-    pub fn new(iter: impl IntoIterator<Item = T> + 'a) -> Self {
+impl<'a, Row: 'a> TableIterator<'a, Row> {
+    pub fn new(iter: impl IntoIterator<Item = Row> + 'a) -> Self {
         Self { iter: Box::new(iter.into_iter()) }
     }
 
@@ -147,18 +152,216 @@ where
         Self::new(iter::empty())
     }
 
-    pub fn once(value: T) -> Self {
+    pub fn once(value: Row) -> Self {
         Self::new(iter::once(value))
     }
 }
 
-impl<'a, T> Iterator for TableIterator<'a, T> {
-    type Item = T;
+impl<'a, Row> Iterator for TableIterator<'a, Row> {
+    type Item = Row;
 
     #[inline]
     fn next(&mut self) -> Option<Self::Item> {
         self.iter.next()
     }
+}
+
+unsafe impl<'iter, C> SqlTranslatable for TableIterator<'iter, (C,)>
+where
+    C: SqlTranslatable + 'iter,
+{
+    fn argument_sql() -> Result<SqlMapping, ArgumentError> {
+        Err(ArgumentError::Table)
+    }
+    fn return_sql() -> Result<Returns, ReturnsError> {
+        let vec = vec![C::return_sql().and_then(|sql| match sql {
+            Returns::One(sql) => Ok(sql),
+            Returns::SetOf(_) => Err(ReturnsError::TableContainingSetOf),
+            Returns::Table(_) => Err(ReturnsError::NestedTable),
+        })?];
+        Ok(Returns::Table(vec))
+    }
+}
+
+unsafe impl<'a, T> RetAbi for SetOfIterator<'a, T>
+where
+    T: BoxRet,
+{
+    type Item = <Self as Iterator>::Item;
+    type Ret = IterRet<Self>;
+
+    unsafe fn check_fcinfo_and_prepare(fcinfo: pg_sys::FunctionCallInfo) -> CallCx {
+        unsafe { TableIterator::<(T,)>::check_fcinfo_and_prepare(fcinfo) }
+    }
+
+    fn to_ret(self) -> Self::Ret {
+        let mut iter = self;
+        IterRet(match iter.next() {
+            None => Step::Done,
+            Some(value) => Step::Init(iter, value),
+        })
+    }
+
+    unsafe fn box_ret_in_fcinfo(fcinfo: pg_sys::FunctionCallInfo, ret: Self::Ret) -> pg_sys::Datum {
+        let ret = match ret.0 {
+            Step::Done => Step::Done,
+            Step::Once(value) => Step::Once((value,)),
+            Step::Init(iter, value) => Step::Init(iter.0, (value,)),
+        };
+        unsafe { TableIterator::<(T,)>::box_ret_in_fcinfo(fcinfo, IterRet(ret)) }
+    }
+
+    unsafe fn fill_fcinfo_fcx(&self, _fcinfo: pg_sys::FunctionCallInfo) {}
+
+    unsafe fn move_into_fcinfo_fcx(self, fcinfo: pg_sys::FunctionCallInfo) {
+        unsafe { self.0.move_into_fcinfo_fcx(fcinfo) }
+    }
+
+    unsafe fn ret_from_fcinfo_fcx(fcinfo: pg_sys::FunctionCallInfo) -> Self::Ret {
+        let step = match unsafe { TableIterator::<(T,)>::ret_from_fcinfo_fcx(fcinfo).0 } {
+            Step::Done => Step::Done,
+            Step::Once((item,)) => Step::Once(item),
+            Step::Init(iter, (value,)) => Step::Init(Self(iter), value),
+        };
+        IterRet(step)
+    }
+
+    unsafe fn finish_call_fcinfo(fcinfo: pg_sys::FunctionCallInfo) {
+        unsafe { TableIterator::<(T,)>::finish_call_fcinfo(fcinfo) }
+    }
+}
+
+unsafe impl<'a, Row> RetAbi for TableIterator<'a, Row>
+where
+    Row: RetAbi,
+{
+    type Item = <Self as Iterator>::Item;
+    type Ret = IterRet<Self>;
+
+    unsafe fn check_fcinfo_and_prepare(fcinfo: pg_sys::FunctionCallInfo) -> CallCx {
+        unsafe {
+            if srf_is_first_call(fcinfo) {
+                let fn_call_cx = pg_sys::init_MultiFuncCall(fcinfo);
+                CallCx::WrappedFn((*fn_call_cx).multi_call_memory_ctx)
+            } else {
+                CallCx::RestoreCx
+            }
+        }
+    }
+
+    fn to_ret(self) -> Self::Ret {
+        let mut iter = self;
+        IterRet(match iter.next() {
+            None => Step::Done,
+            Some(value) => Step::Init(iter, value),
+        })
+    }
+
+    unsafe fn box_ret_in_fcinfo(fcinfo: pg_sys::FunctionCallInfo, ret: Self::Ret) -> pg_sys::Datum {
+        let value = unsafe {
+            match ret.0 {
+                Step::Done => return empty_srf(fcinfo),
+                Step::Once(value) => value,
+                Step::Init(iter, value) => {
+                    // Move the iterator in and don't worry about putting it back
+                    iter.move_into_fcinfo_fcx(fcinfo);
+                    value.fill_fcinfo_fcx(fcinfo);
+                    value
+                }
+            }
+        };
+
+        unsafe {
+            let fcx = deref_fcx(fcinfo);
+            srf_return_next(fcinfo, fcx);
+            <Row as RetAbi>::box_ret_in_fcinfo(fcinfo, value.to_ret())
+        }
+    }
+
+    unsafe fn fill_fcinfo_fcx(&self, _fcinfo: pg_sys::FunctionCallInfo) {}
+
+    unsafe fn move_into_fcinfo_fcx(self, fcinfo: pg_sys::FunctionCallInfo) {
+        unsafe {
+            let fcx = deref_fcx(fcinfo);
+            let ptr = srf_memcx(fcx).leak_and_drop_on_delete(self);
+            // it's the first call so we need to finish setting up fcx
+            (*fcx).user_fctx = ptr.cast();
+        }
+    }
+
+    unsafe fn ret_from_fcinfo_fcx(fcinfo: pg_sys::FunctionCallInfo) -> Self::Ret {
+        // SAFETY: fcx.user_fctx was set earlier, immediately before or in a prior call
+        let iter = unsafe {
+            let fcx = deref_fcx(fcinfo);
+            &mut *(*fcx).user_fctx.cast::<TableIterator<Row>>()
+        };
+        IterRet(match iter.next() {
+            None => Step::Done,
+            Some(value) => Step::Once(value),
+        })
+    }
+
+    unsafe fn finish_call_fcinfo(fcinfo: pg_sys::FunctionCallInfo) {
+        unsafe {
+            let fcx = deref_fcx(fcinfo);
+            srf_return_done(fcinfo, fcx)
+        }
+    }
+}
+
+/// How iterators are returned
+pub struct IterRet<T: RetAbi>(Step<T>);
+
+/// ValuePerCall SRF steps
+enum Step<T: RetAbi> {
+    Done,
+    Once(T::Item),
+    Init(T, T::Item),
+}
+
+pub(crate) unsafe fn empty_srf(fcinfo: pg_sys::FunctionCallInfo) -> pg_sys::Datum {
+    unsafe {
+        let fcx = deref_fcx(fcinfo);
+        srf_return_done(fcinfo, fcx);
+        pg_return_null(fcinfo)
+    }
+}
+
+/// "per_MultiFuncCall" but no FFI cost
+pub(crate) unsafe fn deref_fcx(fcinfo: pg_sys::FunctionCallInfo) -> *mut pg_sys::FuncCallContext {
+    unsafe { (*(*fcinfo).flinfo).fn_extra.cast() }
+}
+
+pub(crate) unsafe fn srf_memcx(fcx: *mut pg_sys::FuncCallContext) -> PgMemoryContexts {
+    unsafe { PgMemoryContexts::For((*fcx).multi_call_memory_ctx) }
+}
+
+/// Return ABI for single-column tuples
+///
+/// Postgres extended SQL with `returns setof $ty` before SQL had `returns table($($ident $ty),*)`.
+/// Due to this history, single-column `returns table` reuses the internals of `returns setof`.
+/// This lets them simply return a simple Datum instead of handling a TupleDesc and HeapTuple, but
+/// means we need to have this distinct impl, as the return type is not `TYPEFUNC_COMPOSITE`!
+/// Fortunately, RetAbi lets `TableIterator<'a, Tup>` handle this by calling `<Tup as RetAbi>`.
+unsafe impl<C> RetAbi for (C,)
+where
+    C: BoxRet, // so we support TableIterator<'a, (Option<T>,)> as well
+{
+    type Item = C;
+    type Ret = C;
+
+    fn to_ret(self) -> Self::Ret {
+        self.0
+    }
+
+    /// Returning a "row" of only one column is identical to returning that single type
+    unsafe fn box_ret_in_fcinfo(fcinfo: pg_sys::FunctionCallInfo, ret: Self::Ret) -> pg_sys::Datum {
+        unsafe { C::box_ret_in_fcinfo(fcinfo, ret.to_ret()) }
+    }
+
+    unsafe fn fill_fcinfo_fcx(&self, _fcinfo: pg_sys::FunctionCallInfo) {}
+
+    unsafe fn move_into_fcinfo_fcx(self, _fcinfo: pg_sys::FunctionCallInfo) {}
 }
 
 macro_rules! impl_table_iter {
@@ -173,12 +376,11 @@ macro_rules! impl_table_iter {
             fn return_sql() -> Result<Returns, ReturnsError> {
                 let vec = vec![
                 $(
-                    match $C::return_sql() {
-                        Ok(Returns::One(sql)) => sql,
-                        Ok(Returns::SetOf(_)) => return Err(ReturnsError::TableContainingSetOf),
-                        Ok(Returns::Table(_)) => return Err(ReturnsError::NestedTable),
-                        err => return err,
-                    },
+                    $C::return_sql().and_then(|sql| match sql {
+                        Returns::One(sql) => Ok(sql),
+                        Returns::SetOf(_) => Err(ReturnsError::TableContainingSetOf),
+                        Returns::Table(_) => Err(ReturnsError::NestedTable),
+                    })?,
                 )*
                 ];
                 Ok(Returns::Table(vec))
@@ -194,7 +396,6 @@ macro_rules! impl_table_iter {
                 let mut nulls = datums.map(|option| option.is_none());
                 let mut datums = datums.map(|option| option.unwrap_or(pg_sys::Datum::from(0)));
 
-
                 unsafe {
                     // SAFETY:  Caller has asserted that `tupdesc` is valid, and we just went
                     // through a little bit of effort to setup properly sized arrays for
@@ -204,10 +405,48 @@ macro_rules! impl_table_iter {
             }
         }
 
+        unsafe impl<$($C),*> RetAbi for ($($C,)*)
+        where
+             $($C: BoxRet,)*
+             Self: IntoHeapTuple,
+        {
+            type Item = Self;
+            type Ret = Self;
+
+            fn to_ret(self) -> Self::Ret {
+                self
+            }
+
+            unsafe fn box_ret_in_fcinfo(fcinfo: pg_sys::FunctionCallInfo, ret: Self::Ret) -> pg_sys::Datum {
+                unsafe {
+                    let fcx = deref_fcx(fcinfo);
+                    let heap_tuple = ret.into_heap_tuple((*fcx).tuple_desc);
+                    pg_sys::HeapTupleHeaderGetDatum((*heap_tuple).t_data)
+                }
+            }
+
+            unsafe fn move_into_fcinfo_fcx(self, _fcinfo: pg_sys::FunctionCallInfo) {}
+
+            unsafe fn fill_fcinfo_fcx(&self, fcinfo: pg_sys::FunctionCallInfo) {
+                // Pure side effect, leave the value in place.
+                unsafe {
+                    let fcx = deref_fcx(fcinfo);
+                    srf_memcx(fcx).switch_to(|_| {
+                        let mut tupdesc = ptr::null_mut();
+                        let mut oid = pg_sys::Oid::default();
+                        let ty_class = pg_sys::get_call_result_type(fcinfo, &mut oid, &mut tupdesc);
+                        if tupdesc.is_non_null() && ty_class == TypeFuncClass_TYPEFUNC_COMPOSITE {
+                            pg_sys::BlessTupleDesc(tupdesc);
+                            (*fcx).tuple_desc = tupdesc;
+                        }
+                    });
+                }
+            }
+        }
+
     }
 }
 
-impl_table_iter!(T0);
 impl_table_iter!(T0, T1);
 impl_table_iter!(T0, T1, T2);
 impl_table_iter!(T0, T1, T2, T3);

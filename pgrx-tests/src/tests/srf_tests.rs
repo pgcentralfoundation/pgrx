@@ -27,33 +27,33 @@ fn example_composite_set() -> TableIterator<'static, (name!(idx, i32), name!(val
 }
 
 #[pg_extern]
-fn return_some_iterator(
-) -> Option<TableIterator<'static, (name!(idx, i32), name!(some_value, &'static str))>> {
-    Some(TableIterator::new(
+fn return_table_iterator(
+) -> TableIterator<'static, (name!(idx, i32), name!(some_value, &'static str))> {
+    TableIterator::new(
         vec!["a", "b", "c"].into_iter().enumerate().map(|(idx, value)| ((idx + 1) as i32, value)),
-    ))
+    )
 }
 
 #[pg_extern]
-fn return_none_iterator(
-) -> Option<TableIterator<'static, (name!(idx, i32), name!(some_value, &'static str))>> {
-    None
+fn return_empty_iterator(
+) -> TableIterator<'static, (name!(idx, i32), name!(some_value, &'static str))> {
+    TableIterator::empty()
 }
 
 #[pg_extern]
-fn return_some_setof_iterator() -> Option<SetOfIterator<'static, i32>> {
-    Some(SetOfIterator::new(vec![1, 2, 3].into_iter()))
+fn return_setof_iterator() -> SetOfIterator<'static, i32> {
+    SetOfIterator::new(vec![1, 2, 3].into_iter())
 }
 
 #[pg_extern]
-fn return_none_setof_iterator() -> Option<SetOfIterator<'static, i32>> {
-    None
+fn return_empty_setof_iterator() -> SetOfIterator<'static, i32> {
+    SetOfIterator::empty()
 }
 
 #[pg_extern]
-fn return_none_result_setof_iterator(
-) -> Result<Option<SetOfIterator<'static, String>>, Box<dyn std::error::Error>> {
-    Ok(None)
+fn return_empty_result_setof_iterator(
+) -> Result<SetOfIterator<'static, String>, Box<dyn std::error::Error>> {
+    Ok(SetOfIterator::empty())
 }
 
 // TODO:  We don't yet support returning Result<Option<TableIterator>> because the code generator
@@ -82,31 +82,31 @@ fn split_table_with_borrow<'a>(
 
 #[pg_extern]
 fn result_table_1() -> Result<
-    Option<::pgrx::iter::TableIterator<'static, (name!(a, Option<i32>), name!(b, Option<i32>))>>,
+    ::pgrx::iter::TableIterator<'static, (name!(a, Option<i32>), name!(b, Option<i32>))>,
     Box<dyn std::error::Error + Send + Sync + 'static>,
 > {
-    Ok(Some(TableIterator::new(vec![(Some(1), Some(2))])))
+    Ok(TableIterator::new(vec![(Some(1), Some(2))]))
 }
 
 #[pg_extern]
 fn result_table_2() -> Result<
-    Option<TableIterator<'static, (name!(a, Option<i32>), name!(b, Option<i32>))>>,
+    TableIterator<'static, (name!(a, Option<i32>), name!(b, Option<i32>))>,
     Box<dyn std::error::Error + Send + Sync + 'static>,
 > {
-    Ok(Some(TableIterator::new(vec![(Some(1), Some(2))])))
+    Ok(TableIterator::new(vec![(Some(1), Some(2))]))
 }
 
 #[pg_extern]
 fn result_table_3() -> Result<
-    Option<TableIterator<'static, (name!(a, Option<i32>), name!(b, Option<i32>))>>,
+    TableIterator<'static, (name!(a, Option<i32>), name!(b, Option<i32>))>,
     Box<dyn std::error::Error + Send + Sync + 'static>,
 > {
-    Ok(Some(TableIterator::new(vec![(Some(1), Some(2))])))
+    Ok(TableIterator::new(vec![(Some(1), Some(2))]))
 }
 
 #[pg_extern]
 fn result_table_4_err() -> Result<
-    Option<TableIterator<'static, (name!(a, Option<i32>), name!(b, Option<i32>))>>,
+    TableIterator<'static, (name!(a, Option<i32>), name!(b, Option<i32>))>,
     Box<dyn std::error::Error + Send + Sync + 'static>,
 > {
     Err("oh no")?
@@ -114,10 +114,10 @@ fn result_table_4_err() -> Result<
 
 #[pg_extern]
 fn result_table_5_none() -> Result<
-    Option<TableIterator<'static, (name!(a, Option<i32>), name!(b, Option<i32>))>>,
+    TableIterator<'static, (name!(a, Option<i32>), name!(b, Option<i32>))>,
     Box<dyn std::error::Error + Send + Sync + 'static>,
 > {
-    Ok(None)
+    Ok(TableIterator::empty())
 }
 
 #[pg_extern]
@@ -126,8 +126,8 @@ fn one_col() -> TableIterator<'static, (name!(a, i32),)> {
 }
 
 #[pg_extern]
-fn one_col_option() -> Option<TableIterator<'static, (name!(a, i32),)>> {
-    Some(TableIterator::once((42,)))
+fn one_col_option() -> TableIterator<'static, (name!(a, i32),)> {
+    TableIterator::once((42,))
 }
 
 #[pg_extern]
@@ -138,8 +138,8 @@ fn one_col_result() -> Result<TableIterator<'static, (name!(a, i32),)>, Box<dyn 
 
 #[pg_extern]
 fn one_col_result_option(
-) -> Result<Option<TableIterator<'static, (name!(a, i32),)>>, Box<dyn std::error::Error>> {
-    Ok(Some(TableIterator::once((42,))))
+) -> Result<TableIterator<'static, (name!(a, i32),)>, Box<dyn std::error::Error>> {
+    Ok(TableIterator::once((42,)))
 }
 
 #[cfg(any(test, feature = "pg_test"))]
@@ -198,9 +198,9 @@ mod tests {
     }
 
     #[pg_test]
-    fn test_return_some_iterator() {
+    fn test_return_table_iterator() {
         let cnt = Spi::connect(|client| {
-            let table = client.select("SELECT * from return_some_iterator();", None, None)?;
+            let table = client.select("SELECT * from return_table_iterator();", None, None)?;
 
             Ok::<_, spi::Error>(table.len() as i64)
         });
@@ -209,9 +209,9 @@ mod tests {
     }
 
     #[pg_test]
-    fn test_return_none_iterator() {
+    fn test_return_empty_iterator() {
         let cnt = Spi::connect(|client| {
-            let table = client.select("SELECT * from return_none_iterator();", None, None)?;
+            let table = client.select("SELECT * from return_empty_iterator();", None, None)?;
 
             Ok::<_, spi::Error>(table.len() as i64)
         });
@@ -220,9 +220,9 @@ mod tests {
     }
 
     #[pg_test]
-    fn test_return_some_setof_iterator() {
+    fn test_return_setof_iterator() {
         let cnt = Spi::connect(|client| {
-            let table = client.select("SELECT * from return_some_setof_iterator();", None, None)?;
+            let table = client.select("SELECT * from return_setof_iterator();", None, None)?;
 
             Ok::<_, spi::Error>(table.len() as i64)
         });
@@ -231,9 +231,10 @@ mod tests {
     }
 
     #[pg_test]
-    fn test_return_none_setof_iterator() {
+    fn test_return_empty_setof_iterator() {
         let cnt = Spi::connect(|client| {
-            let table = client.select("SELECT * from return_none_setof_iterator();", None, None)?;
+            let table =
+                client.select("SELECT * from return_empty_setof_iterator();", None, None)?;
 
             Ok::<_, spi::Error>(table.len() as i64)
         });
@@ -279,22 +280,33 @@ mod tests {
 
     #[pg_test(error = "column \"cause_an_error\" does not exist")]
     pub fn spi_in_iterator(
-    ) -> TableIterator<'static, (name!(id, i32), name!(relname, Result<Option<String>, spi::Error>))>
+    ) -> Result<TableIterator<'static, (name!(id, i32), name!(relname, Option<String>))>, spi::Error>
     {
         let oids = vec![1213, 1214, 1232, 1233, 1247, 1249, 1255];
-
-        TableIterator::new(oids.into_iter().map(|oid| {
-            (oid, Spi::get_one(&format!("SELECT CAUSE_AN_ERROR FROM pg_class WHERE oid = {oid}")))
-        }))
+        let result = oids
+            .into_iter()
+            .map(|oid| {
+                Ok((
+                    oid,
+                    Spi::get_one(&format!(
+                        "SELECT CAUSE_AN_ERROR FROM pg_class WHERE oid = {oid}"
+                    ))?,
+                ))
+            })
+            .collect::<Result<Vec<_>, _>>();
+        result.map(|v| TableIterator::new(v))
     }
 
     #[pg_test(error = "column \"cause_an_error\" does not exist")]
-    pub fn spi_in_setof() -> SetOfIterator<'static, Result<Option<String>, spi::Error>> {
+    pub fn spi_in_setof() -> Result<SetOfIterator<'static, Option<String>>, spi::Error> {
         let oids = vec![1213, 1214, 1232, 1233, 1247, 1249, 1255];
-
-        SetOfIterator::new(oids.into_iter().map(|oid| {
-            Spi::get_one(&format!("SELECT CAUSE_AN_ERROR FROM pg_class WHERE oid = {oid}"))
-        }))
+        let result = oids
+            .into_iter()
+            .map(|oid| {
+                Spi::get_one(&format!("SELECT CAUSE_AN_ERROR FROM pg_class WHERE oid = {oid}"))
+            })
+            .collect::<Result<Vec<Option<_>>, _>>();
+        result.map(SetOfIterator::new)
     }
 
     #[pg_test]

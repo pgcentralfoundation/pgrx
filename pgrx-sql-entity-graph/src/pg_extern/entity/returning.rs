@@ -20,19 +20,9 @@ use crate::UsedTypeEntity;
 #[derive(Debug, Clone, Hash, PartialEq, Eq, PartialOrd, Ord)]
 pub enum PgExternReturnEntity {
     None,
-    Type {
-        ty: UsedTypeEntity,
-    },
-    SetOf {
-        ty: UsedTypeEntity,
-        is_option: bool, /* Eg `Option<SetOfIterator<T>>` */
-        is_result: bool, /* Eg `Result<SetOfIterator<T>, E>` */
-    },
-    Iterated {
-        tys: Vec<PgExternReturnEntityIteratedItem>,
-        is_option: bool, /* Eg `Option<TableIterator<T>>` */
-        is_result: bool, /* Eg `Result<TableIterator<T>, E>` */
-    },
+    Type { ty: UsedTypeEntity },
+    SetOf { ty: UsedTypeEntity },
+    Iterated { tys: Vec<PgExternReturnEntityIteratedItem> },
     Trigger,
 }
 
