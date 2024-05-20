@@ -218,8 +218,8 @@ where
 
     unsafe fn ret_from_fcinfo_fcx(fcinfo: pg_sys::FunctionCallInfo) -> Self::Ret {
         let step = match TableIterator::<(T,)>::ret_from_fcinfo_fcx(fcinfo).0 {
-            Step::Once((item,)) => Step::Once(item),
             Step::Done => Step::Done,
+            Step::Once((item,)) => Step::Once(item),
             Step::Init(iter, (value,)) => Step::Init(Self(iter), value),
         };
         IterRet(step)
