@@ -9,13 +9,12 @@
 //LICENSE Use of this source code is governed by the MIT license that can be found in the LICENSE file.
 #![doc(hidden)]
 //! Helper implementations for returning sets and tables from `#[pg_extern]`-style functions
-use std::ffi::{CStr, CString};
-
 use crate::heap_tuple::PgHeapTuple;
 use crate::{
     pg_return_null, pg_sys, AnyNumeric, Date, Inet, Internal, Interval, IntoDatum, Json, PgBox,
     PgVarlena, Time, TimeWithTimeZone, Timestamp, TimestampWithTimeZone, Uuid,
 };
+use std::ffi::{CStr, CString};
 
 /// How to return a value from Rust to Postgres
 ///
@@ -27,6 +26,7 @@ use crate::{
 pub unsafe trait RetAbi: Sized {
     /// The actual type returned from the call
     type Item: Sized;
+    type Ret;
 
     /// check the fcinfo state, initialize if necessary, and pick calling the wrapped fn or restoring Self
     ///
@@ -38,12 +38,12 @@ pub unsafe trait RetAbi: Sized {
     }
 
     /// answer what kind and how many returns happen from this type
-    fn label_ret(self) -> Ret<Self>;
+    fn to_ret(self) -> Self::Ret;
 
     /// box the return value
     /// # Safety
     /// must be called with a valid fcinfo
-    unsafe fn box_ret_in_fcinfo(fcinfo: pg_sys::FunctionCallInfo, ret: Ret<Self>) -> pg_sys::Datum;
+    unsafe fn box_ret_in_fcinfo(fcinfo: pg_sys::FunctionCallInfo, ret: Self::Ret) -> pg_sys::Datum;
 
     /// Multi-call types want to be in the fcinfo so they can be restored
     /// # Safety
@@ -60,7 +60,7 @@ pub unsafe trait RetAbi: Sized {
     /// for all others: panic
     /// # Safety
     /// must be called with a valid fcinfo
-    unsafe fn ret_from_fcinfo_fcx(_fcinfo: pg_sys::FunctionCallInfo) -> Ret<Self> {
+    unsafe fn ret_from_fcinfo_fcx(_fcinfo: pg_sys::FunctionCallInfo) -> Self::Ret {
         unimplemented!()
     }
 
@@ -77,17 +77,14 @@ where
     T: BoxRet,
 {
     type Item = Self;
+    type Ret = Self;
 
-    fn label_ret(self) -> Ret<Self> {
-        Ret::Once(self)
+    fn to_ret(self) -> Self::Ret {
+        self
     }
 
-    unsafe fn box_ret_in_fcinfo(fcinfo: pg_sys::FunctionCallInfo, ret: Ret<Self>) -> pg_sys::Datum {
-        match ret {
-            Ret::Zero => unsafe { pg_return_null(fcinfo) },
-            Ret::Once(ret) => ret.box_in_fcinfo(fcinfo),
-            Ret::Many(_, _) => unreachable!(),
-        }
+    unsafe fn box_ret_in_fcinfo(fcinfo: pg_sys::FunctionCallInfo, ret: Self::Ret) -> pg_sys::Datum {
+        ret.box_in_fcinfo(fcinfo)
     }
 
     unsafe fn check_fcinfo_and_prepare(_fcinfo: pg_sys::FunctionCallInfo) -> CallCx {
@@ -96,7 +93,7 @@ where
 
     unsafe fn fill_fcinfo_fcx(&self, _fcinfo: pg_sys::FunctionCallInfo) {}
     unsafe fn move_into_fcinfo_fcx(self, _fcinfo: pg_sys::FunctionCallInfo) {}
-    unsafe fn ret_from_fcinfo_fcx(_fcinfo: pg_sys::FunctionCallInfo) -> Ret<Self> {
+    unsafe fn ret_from_fcinfo_fcx(_fcinfo: pg_sys::FunctionCallInfo) -> Self::Ret {
         unimplemented!()
     }
     unsafe fn finish_call_fcinfo(_fcinfo: pg_sys::FunctionCallInfo) {}
@@ -105,12 +102,6 @@ where
 pub enum CallCx {
     RestoreCx,
     WrappedFn(pg_sys::MemoryContext),
-}
-
-pub enum Ret<T: RetAbi> {
-    Zero,
-    Once(T::Item),
-    Many(T, T::Item),
 }
 
 unsafe impl<T> BoxRet for Option<T>
@@ -132,32 +123,21 @@ where
     E: core::any::Any + core::fmt::Display,
 {
     type Item = T::Item;
+    type Ret = T::Ret;
 
     unsafe fn check_fcinfo_and_prepare(fcinfo: pg_sys::FunctionCallInfo) -> CallCx {
         T::check_fcinfo_and_prepare(fcinfo)
     }
 
-    fn label_ret(self) -> Ret<Self> {
+    fn to_ret(self) -> Self::Ret {
         let value = pg_sys::panic::ErrorReportable::unwrap_or_report(self);
-        match T::label_ret(value) {
-            Ret::Zero => Ret::Zero,
-            Ret::Once(value) => Ret::Once(value),
-            Ret::Many(iter, value) => Ret::Many(Ok(iter), value),
-        }
+        value.to_ret()
     }
 
-    unsafe fn box_ret_in_fcinfo(fcinfo: pg_sys::FunctionCallInfo, ret: Ret<Self>) -> pg_sys::Datum {
-        let ret = match ret {
-            Ret::Zero => Ret::Zero,
-            Ret::Once(value) => Ret::Once(value),
-            Ret::Many(iter, value) => {
-                let iter = pg_sys::panic::ErrorReportable::unwrap_or_report(iter);
-                Ret::Many(iter, value)
-            }
-        };
-
+    unsafe fn box_ret_in_fcinfo(fcinfo: pg_sys::FunctionCallInfo, ret: Self::Ret) -> pg_sys::Datum {
         T::box_ret_in_fcinfo(fcinfo, ret)
     }
+
     unsafe fn fill_fcinfo_fcx(&self, fcinfo: pg_sys::FunctionCallInfo) {
         match self {
             Ok(value) => value.fill_fcinfo_fcx(fcinfo),
@@ -172,12 +152,8 @@ where
         }
     }
 
-    unsafe fn ret_from_fcinfo_fcx(fcinfo: pg_sys::FunctionCallInfo) -> Ret<Self> {
-        match T::ret_from_fcinfo_fcx(fcinfo) {
-            Ret::Many(iter, value) => Ret::Many(Ok(iter), value),
-            Ret::Once(value) => Ret::Once(value),
-            Ret::Zero => Ret::Zero,
-        }
+    unsafe fn ret_from_fcinfo_fcx(fcinfo: pg_sys::FunctionCallInfo) -> Self::Ret {
+        T::ret_from_fcinfo_fcx(fcinfo)
     }
 
     unsafe fn finish_call_fcinfo(fcinfo: pg_sys::FunctionCallInfo) {
