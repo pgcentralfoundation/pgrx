@@ -67,6 +67,7 @@ pub unsafe trait ArgAbi: Sized {
 // some notes:
 // defaults come last
 // defaults are presented by postgres, we don't gotta worry about them, except maybe bounding
+// can't actually implement the nice version without `adt_const_params`, thinking about it
 #[repr(transparent)]
 pub struct Defaulted<T>(T);
 
@@ -81,6 +82,7 @@ where
 
 // basically intended to be the new version of the `name!` macro
 // adt_const_params aren't stable, do we have to macro-expand a new Named every time?
+// this one doesn't actually need adt_const_params because we have arrays
 #[repr(transparent)]
 pub struct Named<T>(T);
 
