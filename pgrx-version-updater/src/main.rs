@@ -21,7 +21,7 @@ use std::io::{BufRead, Write};
 use std::path::Path;
 use std::process::{Command, Stdio};
 use std::{env, path::PathBuf};
-use toml_edit::{value, Document, Entry, Item};
+use toml_edit::{value, DocumentMut, Entry, Item};
 use walkdir::{DirEntry, WalkDir};
 
 #[derive(Parser)]
@@ -118,7 +118,7 @@ fn query_toml(query_args: &QueryCargoVersionArgs) {
     let data = fs::read_to_string(&filepath)
         .expect(format!("Unable to open file at {}", filepath.display()).as_str());
 
-    let doc = data.parse::<Document>().expect(
+    let doc = data.parse::<DocumentMut>().expect(
         format!("File at location {} is an invalid Cargo.toml file", filepath.display()).as_str(),
     );
 
@@ -254,7 +254,7 @@ fn update_files(args: &UpdateFilesArgs) {
         let data = fs::read_to_string(&filepath)
             .expect(format!("Unable to open file at {}", filepath.display()).as_str());
 
-        let mut doc = data.parse::<Document>().expect(
+        let mut doc = data.parse::<DocumentMut>().expect(
             format!("File at location {} is an invalid Cargo.toml file", filepath.display())
                 .as_str(),
         );
@@ -459,7 +459,7 @@ fn extract_package_name<P: AsRef<Path>>(filepath: P) -> Option<String> {
     let data = fs::read_to_string(filepath)
         .expect(format!("Unable to open file at {}", filepath.display()).as_str());
 
-    let doc = data.parse::<Document>().expect(
+    let doc = data.parse::<DocumentMut>().expect(
         format!("File at location {} is an invalid Cargo.toml file", filepath.display()).as_str(),
     );
 
