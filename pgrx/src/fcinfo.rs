@@ -80,6 +80,7 @@ macro_rules! name {
     };
 }
 
+#[deprecated(since = "0.12.0", note = "try VariadicArray")]
 #[macro_export]
 macro_rules! variadic {
     ($ty:ty) => {
