@@ -70,23 +70,6 @@ impl UsedType {
             original => (original, None),
         };
 
-        // Resolve any `variadic` macro
-        // We do this first as it's **always** in the first position. It's not valid deeper in the type.
-        let resolved_ty = match resolved_ty {
-            // variadic!(..)
-            syn::Type::Macro(macro_pat) => {
-                let mac = &macro_pat.mac;
-                let archetype = mac.path.segments.last().expect("No last segment");
-                match archetype.ident.to_string().as_str() {
-                    "variadic" => {
-                        let ty: syn::Type = syn::parse2(mac.tokens.clone())?;
-                        syn::parse_quote! { ::pgrx::datum::VariadicArray<'_, #ty>}
-                    }
-                    _ => syn::Type::Macro(macro_pat),
-                }
-            }
-            original => original,
-        };
         // Now, resolve any `composite_type` macro
         let (resolved_ty, composite_type) = match resolved_ty {
             // composite_type!(..)
