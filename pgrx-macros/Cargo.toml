@@ -40,4 +40,4 @@ syn.workspace = true
 
 
 [dev-dependencies]
-serde = { version = "1.0", features = ["derive"] } # for Documentation examples
+serde.workspace = true # for Documentation examples

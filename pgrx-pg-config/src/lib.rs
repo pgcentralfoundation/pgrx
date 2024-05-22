@@ -10,7 +10,7 @@
 //! Wrapper around Postgres' `pg_config` command-line tool
 use eyre::{eyre, WrapErr};
 use owo_colors::OwoColorize;
-use serde_derive::{Deserialize, Serialize};
+use serde::{Deserialize, Serialize};
 use std::collections::{BTreeMap, HashMap};
 use std::ffi::OsString;
 use std::fmt::{self, Debug, Display, Formatter};

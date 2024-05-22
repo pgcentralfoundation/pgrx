@@ -44,7 +44,7 @@ pgrx-sql-entity-graph.workspace = true
 
 libc.workspace = true
 
-serde = { version = "1.0", features = [ "derive" ] } # impls on pub types
+serde.workspace = true # impls on pub types
 # polyfill until #![feature(strict_provenance)] stabilizes
 sptr = "0.3"
 
