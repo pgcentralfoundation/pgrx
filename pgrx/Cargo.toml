@@ -62,6 +62,6 @@ bitvec = "1.0" # processing array nullbitmaps
 heapless = "0.8" # shmem and PgLwLock
 libc.workspace = true # FFI type compat
 seahash = "4.1.0" # derive(PostgresHash)
-serde = { version = "1.0", features = [ "derive" ] } # impls on pub types
+serde.workspace = true # impls on pub types
 serde_cbor = "0.11.2" # derive(PostgresType)
-serde_json = "1.0" # everything JSON
+serde_json.workspace = true # everything JSON
