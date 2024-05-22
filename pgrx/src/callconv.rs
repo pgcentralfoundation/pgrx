@@ -33,6 +33,80 @@ pub struct Fcinfo<'a>(pub pg_sys::FunctionCallInfo, pub PhantomData<&'a mut Fcin
 impl<'fcx> UnwindSafe for Fcinfo<'fcx> {}
 impl<'fcx> RefUnwindSafe for Fcinfo<'fcx> {}
 
+/// How to pass a value from Postgres to Rust
+///
+/// This bound is necessary to distinguish things which can be passed into a `#[pg_extern] fn`.
+/// This bound is not accurately described by FromDatum or similar traits, as value conversions are
+/// handled in a special way at function argument boundaries and some types are never arguments,
+/// due to Postgres not enforcing the type's described constraints.
+///
+/// In addition, this trait does more than traverse the Postgres boundary from caller to callee.
+/// It allows requesting "virtual" arguments that are not part of the Postgres function arguments.
+/// These virtual arguments typically have no representation in pgrx's generated SQL. Instead,
+/// they can be found in the FunctionCallInfo or via various calls to Postgres on function entry.
+/// When you include a virtual argument in the Rust function signature, acquiring the value is
+/// handled automatically without you personally having to write the unsafe code.
+///
+/// This trait is exposed to external code so macro-generated wrapper fn may expand to calls to it.
+/// The number of invariants implementers must uphold is unlikely to be adequately documented.
+/// Prefer to use ArgAbi as a trait bound instead of implementing it, or even calling it, yourself.
+pub unsafe trait ArgAbi: Sized {
+    /// unbox the type from the `pg_sys::FunctionCallInfo`, and advance the index 0..N steps
+    ///
+    /// this weird signature allows variadic arguments to work correctly
+    // FIXME: use an iterator or something?
+    unsafe fn unbox_from_fcinfo_index(fcinfo: pg_sys::FunctionCallInfo, index: &mut usize) -> Self;
+
+    unsafe fn uhh() -> () {}
+}
+
+// problem: our macros?
+// idea: new structs? only expand to them sometimes? maybe? idk
+
+// basically intended to be the new version of the `default!` macro
+// some notes:
+// defaults come last
+// defaults are presented by postgres, we don't gotta worry about them, except maybe bounding
+#[repr(transparent)]
+pub struct Defaulted<T>(T);
+
+unsafe impl<T> ArgAbi for Defaulted<T>
+where
+    T: ArgAbi,
+{
+    unsafe fn unbox_from_fcinfo_index(fcinfo: pg_sys::FunctionCallInfo, index: &mut usize) -> Self {
+        Defaulted(unsafe { <T as ArgAbi>::unbox_from_fcinfo_index(fcinfo, index) })
+    }
+}
+
+// basically intended to be the new version of the `name!` macro
+// adt_const_params aren't stable, do we have to macro-expand a new Named every time?
+#[repr(transparent)]
+pub struct Named<T>(T);
+
+unsafe impl<T> ArgAbi for Named<T>
+where
+    T: ArgAbi,
+{
+    unsafe fn unbox_from_fcinfo_index(fcinfo: pg_sys::FunctionCallInfo, index: &mut usize) -> Self {
+        Named(unsafe { <T as ArgAbi>::unbox_from_fcinfo_index(fcinfo, index) })
+    }
+}
+
+// basically intended to be the new version of the `composite_type!` macro
+// how even?
+#[repr(transparent)]
+pub struct CompositeType<T>(T);
+
+unsafe impl<T> ArgAbi for CompositeType<T>
+where
+    T: ArgAbi,
+{
+    unsafe fn unbox_from_fcinfo_index(fcinfo: pg_sys::FunctionCallInfo, index: &mut usize) -> Self {
+        CompositeType(unsafe { <T as ArgAbi>::unbox_from_fcinfo_index(fcinfo, index) })
+    }
+}
+
 /// How to return a value from Rust to Postgres
 ///
 /// This bound is necessary to distinguish things which can be returned from a `#[pg_extern] fn`.
