@@ -100,7 +100,7 @@ impl PgTrigger {
             ::pgrx::pg_sys::submodules::panic::pgrx_extern_c_guard(move || _internal(#fcinfo_ident))
         };
 
-        finfo_v1_extern_c(&self.func, fcinfo_ident, fc_ltparam, tokens)
+        finfo_v1_extern_c(&self.func, fcinfo_ident, tokens)
     }
 }
 

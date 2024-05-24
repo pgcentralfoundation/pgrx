@@ -1,4 +1,4 @@
-use proc_macro2::{Ident, Span, TokenStream};
+use proc_macro2::{Ident, TokenStream};
 use quote::{format_ident, quote, quote_spanned};
 use syn::{self, spanned::Spanned, ItemFn};
 
@@ -22,15 +22,11 @@ pub fn finfo_v1_tokens(ident: proc_macro2::Ident) -> syn::Result<ItemFn> {
 pub fn finfo_v1_extern_c(
     original: &syn::ItemFn,
     fcinfo: Ident,
-    fc_ltparam: syn::LifetimeParam,
     contents: TokenStream,
 ) -> syn::Result<ItemFn> {
     let original_name = &original.sig.ident;
     let wrapper_symbol = format_ident!("{}_wrapper", original_name);
-    let mut lifetimes = original.sig.generics.clone();
-    let fc_lt = fc_ltparam.lifetime.clone();
-    lifetimes.params.push(syn::GenericParam::Lifetime(fc_ltparam));
-
+    let lifetimes = &original.sig.generics;
     // the wrapper function declaration may contain lifetimes that are not used, since
     // our input type is FunctionCallInfo and our return type is Datum
     let unused_lifetimes = match lifetimes.lifetimes().next() {
@@ -40,7 +36,7 @@ pub fn finfo_v1_extern_c(
         None => quote! {},
     };
 
-    let tokens = quote_spanned! { Span::call_site() =>
+    let tokens = quote_spanned! { original.sig.span() =>
         #[no_mangle]
         #[doc(hidden)]
         #unused_lifetimes
