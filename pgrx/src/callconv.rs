@@ -27,6 +27,12 @@ pub struct Fcinfo<'a>(pub pg_sys::FunctionCallInfo, pub PhantomData<&'a mut Fcin
 impl<'fcx> UnwindSafe for Fcinfo<'fcx> {}
 impl<'fcx> RefUnwindSafe for Fcinfo<'fcx> {}
 
+type FcinfoData = pg_sys::FunctionCallInfoBaseData;
+#[repr(transparent)]
+pub struct Fcinfo<'a>(pub pg_sys::FunctionCallInfo, PhantomData<&'a mut FcinfoData>);
+impl<'fcx> UnwindSafe for Fcinfo<'fcx> {}
+impl<'fcx> RefUnwindSafe for Fcinfo<'fcx> {}
+
 /// How to return a value from Rust to Postgres
 ///
 /// This bound is necessary to distinguish things which can be returned from a `#[pg_extern] fn`.
