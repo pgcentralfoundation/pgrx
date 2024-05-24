@@ -99,7 +99,7 @@ impl PgTrigger {
             }
         };
 
-        finfo_v1_extern_c(&self.func, fcinfo_ident, fc_ltparam, tokens)
+        finfo_v1_extern_c(&self.func, fcinfo_ident, tokens)
     }
 }
 

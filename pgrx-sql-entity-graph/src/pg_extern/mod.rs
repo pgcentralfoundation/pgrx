@@ -434,7 +434,7 @@ impl PgExtern {
                         unsafe { <#ret_ty as ::pgrx::callconv::RetAbi>::box_ret_in_fcinfo(fcinfo, result) }
                     }
                 };
-                finfo_v1_extern_c(&self.func, fcinfo_ident, fc_ltparam, wrapper_code)
+                finfo_v1_extern_c(&self.func, fcinfo_ident, wrapper_code)
             }
         }
     }
