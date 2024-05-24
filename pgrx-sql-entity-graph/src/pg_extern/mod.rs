@@ -377,6 +377,8 @@ impl PgExtern {
         let is_raw = self.extern_attrs().contains(&Attribute::Raw);
         // We use a `_` prefix to make functions with no args more satisfied during linting.
         let fcinfo_ident = syn::Ident::new("_fcinfo", self.func.sig.ident.span());
+        let fc_lt = syn::Lifetime::new("'fcx", self.func.sig.generics.span());
+        let fc_ltparam = syn::LifetimeParam::new(fc_lt);
 
         let args = &self.inputs;
         let arg_pats = args.iter().map(|v| format_ident!("{}_", &v.pat)).collect::<Vec<_>>();
@@ -432,7 +434,7 @@ impl PgExtern {
                         unsafe { <#ret_ty as ::pgrx::callconv::RetAbi>::box_ret_in_fcinfo(fcinfo, result) }
                     }
                 };
-                finfo_v1_extern_c(&self.func, fcinfo_ident, wrapper_code)
+                finfo_v1_extern_c(&self.func, fcinfo_ident, fc_ltparam, wrapper_code)
             }
         }
     }

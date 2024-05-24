@@ -71,6 +71,9 @@ impl PgTrigger {
     pub fn wrapper_tokens(&self) -> Result<ItemFn, syn::Error> {
         let function_ident = self.func.sig.ident.clone();
         let fcinfo_ident = Ident::new("_fcinfo", function_ident.span());
+        let fc_lt = syn::Lifetime::new("'fcx", self.func.sig.generics.span());
+        let fc_ltparam = syn::LifetimeParam::new(fc_lt);
+
         let tokens = quote! {
             let fcinfo_ref = unsafe {
                 // SAFETY:  The caller should be Postgres in this case and it will give us a valid "fcinfo" pointer
@@ -96,7 +99,7 @@ impl PgTrigger {
             }
         };
 
-        finfo_v1_extern_c(&self.func, fcinfo_ident, tokens)
+        finfo_v1_extern_c(&self.func, fcinfo_ident, fc_ltparam, tokens)
     }
 }
 
