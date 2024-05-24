@@ -461,6 +461,23 @@ jobs:
       - name: Test sample
         run: cd /tmp/sample && cargo pgrx test pg$PG_VER
 
+      - name: create new sample extension using --extension-name
+        run: cd /tmp/ && cargo pgrx new --extension-name sample pg-sample
+
+      # hack Cargo.toml to use this version of pgrx from github
+      - name: hack Cargo.toml
+        run: |
+          echo "[patch.crates-io]" >> /tmp/pg-sample/Cargo.toml
+          echo "pgrx        = { path = \"${GITHUB_WORKSPACE}/pgrx\"        }" >> /tmp/pg-sample/Cargo.toml
+          echo "pgrx-macros = { path = \"${GITHUB_WORKSPACE}/pgrx-macros\" }" >> /tmp/pg-sample/Cargo.toml
+          echo "pgrx-tests  = { path = \"${GITHUB_WORKSPACE}/pgrx-tests\"  }" >> /tmp/pg-sample/Cargo.toml
+
+      - name: show Cargo.toml
+        run: cat /tmp/pg-sample/Cargo.toml
+
+      - name: Test pg-sample
+        run: cd /tmp/pg-sample && cargo pgrx test pg$PG_VER
+
       - name: Stop sccache server
         run: sccache --stop-server || true
 
