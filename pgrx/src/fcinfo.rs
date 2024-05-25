@@ -93,26 +93,28 @@ macro_rules! variadic {
 
 type FcInfoData = pg_sys::FunctionCallInfoBaseData;
 
-pub struct FcInfoWrapper<'fcx>(FunctionCallInfo, PhantomData<&'fcx mut FcInfoData>,);
+pub struct FcInfoWrapper<'fcx>(FunctionCallInfo, PhantomData<&'fcx mut FcInfoData>);
 
 // when talking about this, there's the lifetime for setreturningfunction, and then there's the current context's lifetime.
 // Potentially <'srf, 'curr, 'ret: 'curr + 'srf> -> <'ret> but don't start with that.
-// at first <'curr> or <'fcx> 
+// at first <'curr> or <'fcx>
 // It's a heap-allocated stack frame for your function.
 // 'fcx would apply to the arguments into this whole thing.
-// PgHeapTuple is super not ideal and this enables a replacement of that. 
-// ArgAbi and unbox from fcinfo index 
+// PgHeapTuple is super not ideal and this enables a replacement of that.
+// ArgAbi and unbox from fcinfo index
 // Just this and the accessors, something that goes from raw_args(&'a self) -> &'fcx [NullableDatum]? &'a [NullableDatum]?
-// Callconv should perhaps be the file. 
-// Most of the fcinfo functions could have a safe variant. 
+// Callconv should perhaps be the file.
+// Most of the fcinfo functions could have a safe variant.
 // constructor is pub unsafe fn asssume_valid<'a>(pg_sys::FucntionCallInfo)-> &'a Self
-impl <'fcx> FcInfoWrapper<'fcx> {
+impl<'fcx> FcInfoWrapper<'fcx> {
     /// Constructor, used to wrap a raw FunctionCallInfo provided by Postgres.
     pub unsafe fn assume_valid(val: pg_sys::FunctionCallInfo) -> FcInfoWrapper<'fcx> {
         Self(val, PhantomData)
     }
-    pub fn raw_args<'a>(&'a self) -> &'fcx [NullableDatum] 
-    where 'a: 'fcx {
+    pub fn raw_args<'a>(&'a self) -> &'fcx [NullableDatum]
+    where
+        'a: 'fcx,
+    {
         let _nullptr_check = ptr::NonNull::new(self.0).expect("fcinfo pointer must be non-null");
         unsafe {
             let arg_len = (*self.0).nargs;
