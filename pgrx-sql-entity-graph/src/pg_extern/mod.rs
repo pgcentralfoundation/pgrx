@@ -418,10 +418,11 @@ impl PgExtern {
                     syn::ReturnType::Type(_, ret_ty) => ret_ty.clone(),
                 };
                 let wrapper_code = quote_spanned! { self.func.block.span() =>
+                    fn _internal_wrapper<'a>(fcinfo: ::pgrx::callconv::Fcinfo<'a>) -> ::pgrx::datum::Datum<'a> {
                     #[allow(unused_unsafe)]
-                    unsafe {
-                        let fcinfo = #fcinfo_ident;
-                        let result = match <#ret_ty as ::pgrx::callconv::RetAbi>::check_fcinfo_and_prepare(fcinfo) {
+                     unsafe {
+                        let #fcinfo_ident = fcinfo.0;
+                        let result = match <#ret_ty as ::pgrx::callconv::RetAbi>::check_fcinfo_and_prepare(#fcinfo_ident) {
                             ::pgrx::callconv::CallCx::WrappedFn(mcx) => {
                                 let mut mcx = ::pgrx::PgMemoryContexts::For(mcx);
                                 ::pgrx::callconv::RetAbi::to_ret(mcx.switch_to(|_| {
@@ -429,10 +430,13 @@ impl PgExtern {
                                     #func_name( #(#arg_pats),* )
                                 }))
                             }
-                            ::pgrx::callconv::CallCx::RestoreCx => <#ret_ty as ::pgrx::callconv::RetAbi>::ret_from_fcinfo_fcx(fcinfo),
+                            ::pgrx::callconv::CallCx::RestoreCx => <#ret_ty as ::pgrx::callconv::RetAbi>::ret_from_fcinfo_fcx(#fcinfo_ident),
                         };
-                        unsafe { <#ret_ty as ::pgrx::callconv::RetAbi>::box_ret_in_fcinfo(fcinfo, result) }
-                    }
+                        ::core::mem::transmute(unsafe { <#ret_ty as ::pgrx::callconv::RetAbi>::box_ret_in_fcinfo(#fcinfo_ident, result) })
+                    }}
+                    let fcinfo = ::pgrx::callconv::Fcinfo(#fcinfo_ident, ::core::marker::PhantomData);
+                    let datum = _internal_wrapper(fcinfo);
+                    datum.sans_lifetime()
                 };
                 finfo_v1_extern_c(&self.func, fcinfo_ident, wrapper_code)
             }
