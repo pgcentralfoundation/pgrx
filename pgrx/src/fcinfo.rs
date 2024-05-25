@@ -109,13 +109,13 @@ pub struct FcInfoWrapper<'fcx>(FunctionCallInfo, PhantomData<&'fcx mut FcInfoDat
 impl<'fcx> FcInfoWrapper<'fcx> {
     /// Constructor, used to wrap a raw FunctionCallInfo provided by Postgres.
     pub unsafe fn assume_valid(val: pg_sys::FunctionCallInfo) -> FcInfoWrapper<'fcx> {
+        let _nullptr_check = ptr::NonNull::new(val).expect("fcinfo pointer must be non-null");
         Self(val, PhantomData)
     }
     pub fn raw_args<'a>(&'a self) -> &'fcx [NullableDatum]
     where
         'a: 'fcx,
     {
-        let _nullptr_check = ptr::NonNull::new(self.0).expect("fcinfo pointer must be non-null");
         unsafe {
             let arg_len = (*self.0).nargs;
             let args_ptr: *const pg_sys::NullableDatum = ptr::addr_of!((*self.0).args).cast();
