@@ -296,7 +296,10 @@ where
 type FcInfoData = pg_sys::FunctionCallInfoBaseData;
 
 #[derive(Clone)]
-pub struct FcInfo<'fcx>(pgrx_pg_sys::FunctionCallInfo, std::marker::PhantomData<&'fcx mut FcInfoData>);
+pub struct FcInfo<'fcx>(
+    pgrx_pg_sys::FunctionCallInfo,
+    std::marker::PhantomData<&'fcx mut FcInfoData>,
+);
 
 // when talking about this, there's the lifetime for setreturningfunction, and then there's the current context's lifetime.
 // Potentially <'srf, 'curr, 'ret: 'curr + 'srf> -> <'ret> but don't start with that.
@@ -319,7 +322,7 @@ impl<'fcx> FcInfo<'fcx> {
     where
         'a: 'fcx,
     {
-        // Null pointer check already performed on immutable pointer 
+        // Null pointer check already performed on immutable pointer
         // at construction time.
         unsafe {
             let arg_len = (*self.0).nargs;
@@ -329,4 +332,4 @@ impl<'fcx> FcInfo<'fcx> {
             std::slice::from_raw_parts(args_ptr, arg_len as _)
         }
     }
-} 
+}

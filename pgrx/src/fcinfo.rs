@@ -117,7 +117,7 @@ impl<'fcx> FcInfo<'fcx> {
     where
         'a: 'fcx,
     {
-        // Null pointer check already performed on immutable pointer 
+        // Null pointer check already performed on immutable pointer
         // at construction time.
         unsafe {
             let arg_len = (*self.0).nargs;
