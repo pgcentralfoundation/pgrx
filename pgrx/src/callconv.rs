@@ -292,3 +292,41 @@ where
         self.into_datum().unwrap_or_else(|| unsafe { pg_return_null(fcinfo) })
     }
 }
+
+type FcInfoData = pg_sys::FunctionCallInfoBaseData;
+
+#[derive(Clone)]
+pub struct FcInfo<'fcx>(pgrx_pg_sys::FunctionCallInfo, std::marker::PhantomData<&'fcx mut FcInfoData>);
+
+// when talking about this, there's the lifetime for setreturningfunction, and then there's the current context's lifetime.
+// Potentially <'srf, 'curr, 'ret: 'curr + 'srf> -> <'ret> but don't start with that.
+// at first <'curr> or <'fcx>
+// It's a heap-allocated stack frame for your function.
+// 'fcx would apply to the arguments into this whole thing.
+// PgHeapTuple is super not ideal and this enables a replacement of that.
+// ArgAbi and unbox from fcinfo index
+// Just this and the accessors, something that goes from raw_args(&'a self) -> &'fcx [NullableDatum]? &'a [NullableDatum]?
+// Callconv should perhaps be the file.
+// Most of the fcinfo functions could have a safe variant.
+// constructor is pub unsafe fn asssume_valid<'a>(pg_sys::FucntionCallInfo)-> &'a Self
+impl<'fcx> FcInfo<'fcx> {
+    /// Constructor, used to wrap a raw FunctionCallInfo provided by Postgres.
+    pub unsafe fn assume_valid(val: pg_sys::FunctionCallInfo) -> FcInfo<'fcx> {
+        let _nullptr_check = std::ptr::NonNull::new(val).expect("fcinfo pointer must be non-null");
+        Self(val, std::marker::PhantomData)
+    }
+    pub fn raw_args<'a>(&'a self) -> &'fcx [pgrx_pg_sys::NullableDatum]
+    where
+        'a: 'fcx,
+    {
+        // Null pointer check already performed on immutable pointer 
+        // at construction time.
+        unsafe {
+            let arg_len = (*self.0).nargs;
+            let args_ptr: *const pg_sys::NullableDatum = std::ptr::addr_of!((*self.0).args).cast();
+            // A valid FcInfoWrapper constructed from a valid FuntionCallInfo should always have
+            // at least nargs elements of NullableDatum.
+            std::slice::from_raw_parts(args_ptr, arg_len as _)
+        }
+    }
+} 
