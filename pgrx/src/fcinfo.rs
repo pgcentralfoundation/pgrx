@@ -93,6 +93,7 @@ macro_rules! variadic {
 
 type FcInfoData = pg_sys::FunctionCallInfoBaseData;
 
+#[derive(Clone)]
 pub struct FcInfo<'fcx>(FunctionCallInfo, PhantomData<&'fcx mut FcInfoData>);
 
 // when talking about this, there's the lifetime for setreturningfunction, and then there's the current context's lifetime.
