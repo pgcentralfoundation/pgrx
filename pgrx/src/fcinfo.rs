@@ -93,7 +93,7 @@ macro_rules! variadic {
 
 type FcInfoData = pg_sys::FunctionCallInfoBaseData;
 
-pub struct FcInfoWrapper<'fcx>(FunctionCallInfo, PhantomData<&'fcx mut FcInfoData>);
+pub struct FcInfo<'fcx>(FunctionCallInfo, PhantomData<&'fcx mut FcInfoData>);
 
 // when talking about this, there's the lifetime for setreturningfunction, and then there's the current context's lifetime.
 // Potentially <'srf, 'curr, 'ret: 'curr + 'srf> -> <'ret> but don't start with that.
@@ -106,9 +106,9 @@ pub struct FcInfoWrapper<'fcx>(FunctionCallInfo, PhantomData<&'fcx mut FcInfoDat
 // Callconv should perhaps be the file.
 // Most of the fcinfo functions could have a safe variant.
 // constructor is pub unsafe fn asssume_valid<'a>(pg_sys::FucntionCallInfo)-> &'a Self
-impl<'fcx> FcInfoWrapper<'fcx> {
+impl<'fcx> FcInfo<'fcx> {
     /// Constructor, used to wrap a raw FunctionCallInfo provided by Postgres.
-    pub unsafe fn assume_valid(val: pg_sys::FunctionCallInfo) -> FcInfoWrapper<'fcx> {
+    pub unsafe fn assume_valid(val: pg_sys::FunctionCallInfo) -> FcInfo<'fcx> {
         let _nullptr_check = ptr::NonNull::new(val).expect("fcinfo pointer must be non-null");
         Self(val, PhantomData)
     }
@@ -116,11 +116,13 @@ impl<'fcx> FcInfoWrapper<'fcx> {
     where
         'a: 'fcx,
     {
+        // Null pointer check already performed on immutable pointer 
+        // at construction time.
         unsafe {
             let arg_len = (*self.0).nargs;
             let args_ptr: *const pg_sys::NullableDatum = ptr::addr_of!((*self.0).args).cast();
             // A valid FcInfoWrapper constructed from a valid FuntionCallInfo should always have
-            // at least nargs elements of NullableDatum
+            // at least nargs elements of NullableDatum.
             slice::from_raw_parts(args_ptr, arg_len as _)
         }
     }
