@@ -40,7 +40,6 @@ pub fn finfo_v1_extern_c(
         #[no_mangle]
         #[doc(hidden)]
         #unused_lifetimes
-        #[::pgrx::pgrx_macros::pg_guard]
         pub unsafe extern "C" fn #wrapper_symbol #lifetimes(#fcinfo: ::pgrx::pg_sys::FunctionCallInfo) -> ::pgrx::pg_sys::Datum {
             #contents
         }

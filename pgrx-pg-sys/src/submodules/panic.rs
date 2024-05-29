@@ -377,11 +377,13 @@ enum GuardAction<R> {
 ///
 /// [trivially-deallocated stack frames](https://github.com/rust-lang/rfcs/blob/master/text/2945-c-unwind-abi.md#plain-old-frames)
 #[doc(hidden)]
-pub unsafe fn pgrx_extern_c_guard<Func, R: Copy>(f: Func) -> R
+// FIXME: previously, R was bounded on Copy, but this prevents using move-only POD types
+// what we really want is a bound of R: !Drop, but negative bounds don't exist yet
+pub unsafe fn pgrx_extern_c_guard<Func, R>(f: Func) -> R
 where
     Func: FnOnce() -> R + UnwindSafe + RefUnwindSafe,
 {
-    match run_guarded(f) {
+    match unsafe { run_guarded(f) } {
         GuardAction::Return(r) => r,
         GuardAction::ReThrow => {
             extern "C" /* "C-unwind" */ {
@@ -399,8 +401,9 @@ where
     }
 }
 
+// SAFETY: similar constraints as pgrx_extern_c_guard
 #[inline(never)]
-fn run_guarded<F, R: Copy>(f: F) -> GuardAction<R>
+unsafe fn run_guarded<F, R>(f: F) -> GuardAction<R>
 where
     F: FnOnce() -> R + UnwindSafe + RefUnwindSafe,
 {
