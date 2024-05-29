@@ -21,6 +21,18 @@ error[E0261]: use of undeclared lifetime name `'a`
 error[E0261]: use of undeclared lifetime name `'a`
   --> tests/todo/roundtrip-tests.rs:69:21
    |
+22 |               fn $fname(i: $rtype) -> $rtype {
+   |  ____________________________________________-
+23 | |                 i
+24 | |             }
+   | |_____________- lifetime `'a` is missing in item created through this procedural macro
+...
+69 |           Vec<Option<&'a str>>,
+   |                       ^^ undeclared lifetime
+
+error[E0261]: use of undeclared lifetime name `'a`
+  --> tests/todo/roundtrip-tests.rs:69:21
+   |
 68 |         test_rt_array_refstr,
    |                             - help: consider introducing lifetime `'a` here: `<'a>`
 69 |         Vec<Option<&'a str>>,
