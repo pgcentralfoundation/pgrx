@@ -13,8 +13,7 @@
 
 use crate::heap_tuple::PgHeapTuple;
 use crate::{
-    pg_return_null, pg_sys, AnyNumeric, Date, Inet, Internal, Interval, IntoDatum, Json, PgBox,
-    PgVarlena, Time, TimeWithTimeZone, Timestamp, TimestampWithTimeZone, Uuid,
+    pg_return_null, pg_sys, AnyNumeric, Date, Inet, Internal, Interval, IntoDatum, Json, PgBox, PgMemoryContexts, PgVarlena, Time, TimeWithTimeZone, Timestamp, TimestampWithTimeZone, Uuid
 };
 use core::marker::PhantomData;
 use core::panic::{RefUnwindSafe, UnwindSafe};
@@ -309,15 +308,19 @@ pub struct FcInfo<'fcx>(
 // PgHeapTuple is super not ideal and this enables a replacement of that.
 // ArgAbi and unbox from fcinfo index
 // Just this and the accessors, something that goes from raw_args(&'a self) -> &'fcx [NullableDatum]? &'a [NullableDatum]?
-// Callconv should perhaps be the file.
-// Most of the fcinfo functions could have a safe variant.
-// constructor is pub unsafe fn asssume_valid<'a>(pg_sys::FucntionCallInfo)-> &'a Self
 impl<'fcx> FcInfo<'fcx> {
     /// Constructor, used to wrap a raw FunctionCallInfo provided by Postgres.
-    pub unsafe fn assume_valid(val: pg_sys::FunctionCallInfo) -> FcInfo<'fcx> {
-        let _nullptr_check = std::ptr::NonNull::new(val).expect("fcinfo pointer must be non-null");
-        Self(val, std::marker::PhantomData)
+    /// 
+    /// # Safety
+    ///
+    /// This function is unsafe as we cannot ensure the `fcinfo` argument is a valid
+    /// [`pg_sys::FunctionCallInfo`] pointer.  This is your responsibility.
+    pub unsafe fn assume_valid(fcinfo: pg_sys::FunctionCallInfo) -> FcInfo<'fcx> {
+        let _nullptr_check = std::ptr::NonNull::new(fcinfo).expect("fcinfo pointer must be non-null");
+        Self(fcinfo, std::marker::PhantomData)
     }
+    /// Retrieve the arguments to this function call as a slice of [`pgrx_pg_sys::NullableDatum`]
+    #[inline]
     pub fn raw_args<'a>(&'a self) -> &'fcx [pgrx_pg_sys::NullableDatum]
     where
         'a: 'fcx,
@@ -330,6 +333,116 @@ impl<'fcx> FcInfo<'fcx> {
             // A valid FcInfoWrapper constructed from a valid FuntionCallInfo should always have
             // at least nargs elements of NullableDatum.
             std::slice::from_raw_parts(args_ptr, arg_len as _)
+        }
+    }
+
+    /// Modifies the contained `fcinfo` struct to flag its return value as null.
+    ///
+    /// # Examples
+    ///
+    /// ```rust,no_run
+    /// use pgrx::pg_return_null;
+    /// use pgrx::prelude::*;
+    /// fn foo(fcinfo: pg_sys::FunctionCallInfo) -> pg_sys::Datum {
+    ///     return unsafe { pg_return_null(fcinfo) };
+    /// }
+    /// ```
+    #[inline]
+    pub unsafe fn pg_return_null(&mut self) -> pg_sys::Datum {
+        let fcinfo = unsafe { self.0.as_mut() }.unwrap();
+        fcinfo.isnull = true;
+        pg_sys::Datum::from(0)
+    }
+
+    /// Get the collation the function call should use
+    #[inline]
+    pub unsafe fn pg_get_collation(&self) -> pg_sys::Oid {
+        let fcinfo = unsafe { self.0.as_mut() }.unwrap();
+        fcinfo.fncollation
+    }
+    
+    /// Retrieve the type (as an Oid) of argument number `num`.
+    /// In other words, the type of `self.raw_args()[num]`
+    #[inline]
+    pub fn pg_getarg_type(&self, num: usize) -> pg_sys::Oid {
+        // Safety: User must supply a valid fcinfo to assume_valid() in order
+        // to construct a FcInfo. If that constraint is maintained, this should
+        // be safe. 
+        unsafe {
+            pg_sys::get_fn_expr_argtype(self.0.as_ref().unwrap().flinfo, num as std::os::raw::c_int)
+        }
+    }
+
+    /// Retrieve the `.flinfo.fn_extra` pointer (as a PgBox'd type) from [`pg_sys::FunctionCallInfo`].
+    pub fn pg_func_extra<ReturnType, DefaultValue: FnOnce() -> ReturnType>(
+        &self,
+        default: DefaultValue,
+    ) -> PgBox<ReturnType> {
+        // Safety: User must supply a valid fcinfo to assume_valid() in order
+        // to construct a FcInfo. If that constraint is maintained, this should
+        // be safe. 
+        unsafe {
+            let fcinfo = PgBox::from_pg(self.0);
+            let mut flinfo = PgBox::from_pg(fcinfo.flinfo);
+            if flinfo.fn_extra.is_null() {
+                flinfo.fn_extra = PgMemoryContexts::For(flinfo.fn_mcxt).leak_and_drop_on_delete(default())
+                    as crate::void_mut_ptr;
+            }
+
+            PgBox::from_pg(flinfo.fn_extra as *mut ReturnType)
+        }
+    }
+
+    #[inline]
+    pub fn srf_is_first_call(&self) -> bool {
+        // Safety: User must supply a valid fcinfo to assume_valid() in order
+        // to construct a FcInfo. If that constraint is maintained, this should
+        // be safe.
+        unsafe {
+            (*(*self.0).flinfo).fn_extra.is_null()
+        }
+    }
+
+    /// Thin wrapper around [`pg_sys::init_MultiFuncCall`], made necessary
+    /// because this structure's FunctionCallInfo is a private field. 
+    #[inline]
+    pub unsafe fn init_multi_func_call(&mut self) -> *mut pg_sys::FuncCallContext {
+        unsafe { 
+            pg_sys::init_MultiFuncCall(self.0)
+        }
+    }
+    
+    /// Thin wrapper around [`pg_sys::per_MultiFuncCall`], made necessary
+    /// because this structure's FunctionCallInfo is a private field.
+    #[inline]
+    pub unsafe fn per_multi_func_call(&mut self) -> *mut pg_sys::FuncCallContext {
+        unsafe {
+            pg_sys::per_MultiFuncCall(self.0)
+        }
+    }
+    
+
+    #[inline]
+    pub unsafe fn srf_return_next(
+        &mut self,
+        funcctx: *mut pg_sys::FuncCallContext,
+    ) {
+        unsafe {
+            (*funcctx).call_cntr += 1;
+            (*((*self.0).resultinfo as *mut pg_sys::ReturnSetInfo)).isDone =
+                pg_sys::ExprDoneCond_ExprMultipleResult;
+        }
+    }
+
+    #[inline]
+    pub unsafe fn srf_return_done(
+        &mut self,
+        funcctx: *mut pg_sys::FuncCallContext,
+    ) {
+        unsafe {
+            pg_sys::end_MultiFuncCall(self.0, funcctx);
+            (*((*self.0).resultinfo as *mut pg_sys::ReturnSetInfo)).isDone =
+                pg_sys::ExprDoneCond_ExprEndResult;
         }
     }
 }
