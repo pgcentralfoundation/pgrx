@@ -9,8 +9,12 @@
 //LICENSE Use of this source code is governed by the MIT license that can be found in the LICENSE file.
 #![doc(hidden)]
 #![deny(unsafe_op_in_unsafe_fn)]
+#![allow(unused)]
 //! Helper implementations for returning sets and tables from `#[pg_extern]`-style functions
 
+use pgrx_sql_entity_graph::metadata::FunctionMetadata;
+
+use crate::datum::Datum;
 use crate::heap_tuple::PgHeapTuple;
 use crate::{
     pg_return_null, pg_sys, AnyNumeric, Date, Inet, Internal, Interval, IntoDatum, Json, PgBox,
@@ -50,12 +54,12 @@ impl<'fcx> RefUnwindSafe for Fcinfo<'fcx> {}
 /// This trait is exposed to external code so macro-generated wrapper fn may expand to calls to it.
 /// The number of invariants implementers must uphold is unlikely to be adequately documented.
 /// Prefer to use ArgAbi as a trait bound instead of implementing it, or even calling it, yourself.
-pub unsafe trait ArgAbi: Sized {
+pub unsafe trait ArgAbi<'fcx>: Sized {
     /// unbox the type from the `pg_sys::FunctionCallInfo`, and advance the index 0..N steps
     ///
     /// this weird signature allows variadic arguments to work correctly
     // FIXME: use an iterator or something?
-    unsafe fn unbox_from_fcinfo_index(fcinfo: pg_sys::FunctionCallInfo, index: &mut usize) -> Self;
+    unsafe fn unbox_from_fcinfo_index(fcinfo: Fcinfo<'fcx>, index: &mut usize) -> Self;
 
     unsafe fn uhh() -> () {}
 }
@@ -71,11 +75,11 @@ pub unsafe trait ArgAbi: Sized {
 #[repr(transparent)]
 pub struct Defaulted<T>(T);
 
-unsafe impl<T> ArgAbi for Defaulted<T>
+unsafe impl<'fcx, T> ArgAbi<'fcx> for Defaulted<T>
 where
-    T: ArgAbi,
+    T: ArgAbi<'fcx>,
 {
-    unsafe fn unbox_from_fcinfo_index(fcinfo: pg_sys::FunctionCallInfo, index: &mut usize) -> Self {
+    unsafe fn unbox_from_fcinfo_index(fcinfo: Fcinfo<'fcx>, index: &mut usize) -> Self {
         Defaulted(unsafe { <T as ArgAbi>::unbox_from_fcinfo_index(fcinfo, index) })
     }
 }
@@ -86,12 +90,12 @@ where
 #[repr(transparent)]
 pub struct Named<T>(T);
 
-unsafe impl<T> ArgAbi for Named<T>
+unsafe impl<'fcx, T> ArgAbi<'fcx> for Named<T>
 where
-    T: ArgAbi,
+    T: ArgAbi<'fcx>,
 {
-    unsafe fn unbox_from_fcinfo_index(fcinfo: pg_sys::FunctionCallInfo, index: &mut usize) -> Self {
-        Named(unsafe { <T as ArgAbi>::unbox_from_fcinfo_index(fcinfo, index) })
+    unsafe fn unbox_from_fcinfo_index(fcinfo: Fcinfo<'fcx>, index: &mut usize) -> Self {
+        Named(unsafe { <T as ArgAbi<'fcx>>::unbox_from_fcinfo_index(fcinfo, index) })
     }
 }
 
@@ -100,11 +104,11 @@ where
 #[repr(transparent)]
 pub struct CompositeType<T>(T);
 
-unsafe impl<T> ArgAbi for CompositeType<T>
+unsafe impl<'fcx, T> ArgAbi<'fcx> for CompositeType<T>
 where
-    T: ArgAbi,
+    T: ArgAbi<'fcx>,
 {
-    unsafe fn unbox_from_fcinfo_index(fcinfo: pg_sys::FunctionCallInfo, index: &mut usize) -> Self {
+    unsafe fn unbox_from_fcinfo_index(fcinfo: Fcinfo<'fcx>, index: &mut usize) -> Self {
         CompositeType(unsafe { <T as ArgAbi>::unbox_from_fcinfo_index(fcinfo, index) })
     }
 }
