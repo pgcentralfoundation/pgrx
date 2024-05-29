@@ -421,7 +421,7 @@ impl PgExtern {
                     syn::ReturnType::Type(_, ret_ty) => ret_ty.clone(),
                 };
                 let wrapper_code = quote_spanned! { self.func.block.span() =>
-                    fn _internal_wrapper<'a>(fcinfo: ::pgrx::callconv::Fcinfo<'a>) -> ::pgrx::datum::Datum<'a> {
+                    fn _internal_wrapper<#fc_ltparam, #lifetimes>(fcinfo: ::pgrx::callconv::Fcinfo<#fc_lt>) -> ::pgrx::datum::Datum<#fc_lt> {
                     #[allow(unused_unsafe)]
                      unsafe {
                         let #fcinfo_ident = fcinfo.0;
