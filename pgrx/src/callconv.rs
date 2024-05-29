@@ -28,6 +28,7 @@ impl<'fcx> UnwindSafe for Fcinfo<'fcx> {}
 impl<'fcx> RefUnwindSafe for Fcinfo<'fcx> {}
 
 type FcinfoData = pg_sys::FunctionCallInfoBaseData;
+// FIXME: replace with a real implementation
 pub struct Fcinfo<'a>(pub pg_sys::FunctionCallInfo, pub PhantomData<&'a mut FcinfoData>);
 impl<'fcx> UnwindSafe for Fcinfo<'fcx> {}
 impl<'fcx> RefUnwindSafe for Fcinfo<'fcx> {}
