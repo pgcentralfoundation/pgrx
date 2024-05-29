@@ -64,6 +64,61 @@ pub unsafe trait ArgAbi<'fcx>: Sized {
     unsafe fn uhh() -> () {}
 }
 
+pub fn wrap_fn<'fcx, A, F: FunctionMetadata<A>>(fcinfo: Fcinfo<'fcx>, f: F) -> Datum<'fcx> {
+    todo!()
+}
+
+unsafe impl<'fcx, T> ArgAbi<'fcx> for crate::datum::Array<'fcx, T>
+where
+    T: ArgAbi<'fcx>,
+{
+    unsafe fn unbox_from_fcinfo_index(fcinfo: Fcinfo<'fcx>, index: &mut usize) -> Self {
+        todo!()
+    }
+}
+
+unsafe impl<'fcx, W> ArgAbi<'fcx> for PgHeapTuple<'fcx, W>
+where
+    W: crate::WhoAllocated + 'fcx,
+{
+    unsafe fn unbox_from_fcinfo_index(fcinfo: Fcinfo<'fcx>, index: &mut usize) -> Self {
+        todo!()
+    }
+}
+
+unsafe impl<'fcx, T> ArgAbi<'fcx> for Option<T>
+where
+    T: ArgAbi<'fcx>,
+{
+    unsafe fn unbox_from_fcinfo_index(fcinfo: Fcinfo<'fcx>, index: &mut usize) -> Self {
+        // check null
+        if true {
+            *index += 1;
+            None
+        } else {
+            Some(unsafe { <T as ArgAbi>::unbox_from_fcinfo_index(fcinfo, index) })
+        }
+    }
+}
+
+macro_rules! argue_from_datum {
+    ($($unboxable:ty),*) => {
+        $(unsafe impl<'fcx> ArgAbi<'fcx> for $unboxable {
+            unsafe fn unbox_from_fcinfo_index(fcinfo: Fcinfo<'fcx>, index: &mut usize) -> Self {
+                unsafe {
+                    let pg_sys::NullableDatum { value, isnull } = crate::fcinfo::pg_get_nullable_datum(fcinfo.0, *index);
+                    let value: Self = crate::datum::FromDatum::from_datum(value, isnull)
+                        .unwrap_or_else(|| panic!("argument {index} must not be null"));
+                    *index += 1;
+                    value
+                }
+            }
+        })*
+    };
+}
+
+argue_from_datum! { i8, i16, i32, i64, f32, f64, bool, String }
+
 // problem: our macros?
 // idea: new structs? only expand to them sometimes? maybe? idk
 
