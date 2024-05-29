@@ -13,7 +13,8 @@
 
 use crate::heap_tuple::PgHeapTuple;
 use crate::{
-    pg_return_null, pg_sys, AnyNumeric, Date, Inet, Internal, Interval, IntoDatum, Json, PgBox, PgMemoryContexts, PgVarlena, Time, TimeWithTimeZone, Timestamp, TimestampWithTimeZone, Uuid
+    pg_return_null, pg_sys, AnyNumeric, Date, Inet, Internal, Interval, IntoDatum, Json, PgBox,
+    PgMemoryContexts, PgVarlena, Time, TimeWithTimeZone, Timestamp, TimestampWithTimeZone, Uuid,
 };
 use core::marker::PhantomData;
 use core::panic::{RefUnwindSafe, UnwindSafe};
@@ -310,13 +311,14 @@ pub struct FcInfo<'fcx>(
 // Just this and the accessors, something that goes from raw_args(&'a self) -> &'fcx [NullableDatum]? &'a [NullableDatum]?
 impl<'fcx> FcInfo<'fcx> {
     /// Constructor, used to wrap a raw FunctionCallInfo provided by Postgres.
-    /// 
+    ///
     /// # Safety
     ///
     /// This function is unsafe as we cannot ensure the `fcinfo` argument is a valid
     /// [`pg_sys::FunctionCallInfo`] pointer.  This is your responsibility.
     pub unsafe fn assume_valid(fcinfo: pg_sys::FunctionCallInfo) -> FcInfo<'fcx> {
-        let _nullptr_check = std::ptr::NonNull::new(fcinfo).expect("fcinfo pointer must be non-null");
+        let _nullptr_check =
+            std::ptr::NonNull::new(fcinfo).expect("fcinfo pointer must be non-null");
         Self(fcinfo, std::marker::PhantomData)
     }
     /// Retrieve the arguments to this function call as a slice of [`pgrx_pg_sys::NullableDatum`]
@@ -360,14 +362,14 @@ impl<'fcx> FcInfo<'fcx> {
         let fcinfo = unsafe { self.0.as_mut() }.unwrap();
         fcinfo.fncollation
     }
-    
+
     /// Retrieve the type (as an Oid) of argument number `num`.
     /// In other words, the type of `self.raw_args()[num]`
     #[inline]
     pub fn pg_getarg_type(&self, num: usize) -> pg_sys::Oid {
         // Safety: User must supply a valid fcinfo to assume_valid() in order
         // to construct a FcInfo. If that constraint is maintained, this should
-        // be safe. 
+        // be safe.
         unsafe {
             pg_sys::get_fn_expr_argtype(self.0.as_ref().unwrap().flinfo, num as std::os::raw::c_int)
         }
@@ -380,12 +382,13 @@ impl<'fcx> FcInfo<'fcx> {
     ) -> PgBox<ReturnType> {
         // Safety: User must supply a valid fcinfo to assume_valid() in order
         // to construct a FcInfo. If that constraint is maintained, this should
-        // be safe. 
+        // be safe.
         unsafe {
             let fcinfo = PgBox::from_pg(self.0);
             let mut flinfo = PgBox::from_pg(fcinfo.flinfo);
             if flinfo.fn_extra.is_null() {
-                flinfo.fn_extra = PgMemoryContexts::For(flinfo.fn_mcxt).leak_and_drop_on_delete(default())
+                flinfo.fn_extra = PgMemoryContexts::For(flinfo.fn_mcxt)
+                    .leak_and_drop_on_delete(default())
                     as crate::void_mut_ptr;
             }
 
@@ -398,50 +401,34 @@ impl<'fcx> FcInfo<'fcx> {
         // Safety: User must supply a valid fcinfo to assume_valid() in order
         // to construct a FcInfo. If that constraint is maintained, this should
         // be safe.
-        unsafe {
-            (*(*self.0).flinfo).fn_extra.is_null()
-        }
+        unsafe { (*(*self.0).flinfo).fn_extra.is_null() }
     }
 
     /// Thin wrapper around [`pg_sys::init_MultiFuncCall`], made necessary
-    /// because this structure's FunctionCallInfo is a private field. 
+    /// because this structure's FunctionCallInfo is a private field.
     #[inline]
     pub unsafe fn init_multi_func_call(&mut self) -> FcContext<'fcx> {
-        unsafe {
-            FcContext::assume_valid(
-                pg_sys::init_MultiFuncCall(self.0)
-            )
-        }
+        unsafe { FcContext::assume_valid(pg_sys::init_MultiFuncCall(self.0)) }
     }
-    
+
     /// Thin wrapper around [`pg_sys::per_MultiFuncCall`], made necessary
     /// because this structure's FunctionCallInfo is a private field.
     #[inline]
     pub unsafe fn per_multi_func_call(&mut self) -> FcContext<'fcx> {
-        unsafe {
-            FcContext::assume_valid(
-                pg_sys::per_MultiFuncCall(self.0)
-            )
-        }
+        unsafe { FcContext::assume_valid(pg_sys::per_MultiFuncCall(self.0)) }
     }
-    /// Equivalent to "per_MultiFuncCall" with no FFI cost, and a lifetime 
+    /// Equivalent to "per_MultiFuncCall" with no FFI cost, and a lifetime
     /// constraint.
-    /// 
+    ///
     /// Safety: This is only equivalent to the current (as of Postgres 16.3)
     /// implementation of [`pg_sys::per_MultiFuncCall`], and future changes
     /// to the complexity of the calling convention may break this method.
     pub(crate) unsafe fn deref_fcx(&mut self) -> FcContext<'fcx> {
-        unsafe { 
-            FcContext::assume_valid(
-                (*(*self.0).flinfo).fn_extra.cast() 
-            )
-        }
+        unsafe { FcContext::assume_valid((*(*self.0).flinfo).fn_extra.cast()) }
     }
 
     #[inline]
-    pub unsafe fn srf_return_next(
-        &mut self
-    ) {
+    pub unsafe fn srf_return_next(&mut self) {
         unsafe {
             let mut fncctx = self.deref_fcx();
             (*fncctx.get_inner()).call_cntr += 1;
@@ -451,9 +438,7 @@ impl<'fcx> FcInfo<'fcx> {
     }
 
     #[inline]
-    pub unsafe fn srf_return_done(
-        &mut self
-    ) {
+    pub unsafe fn srf_return_done(&mut self) {
         unsafe {
             let mut fncctx = self.deref_fcx();
             pg_sys::end_MultiFuncCall(self.0, fncctx.get_inner());
@@ -471,7 +456,7 @@ pub struct FcContext<'fcx>(
 
 impl<'fcx> FcContext<'fcx> {
     /// Constructor, used to wrap a raw FunctionCallInfo provided by Postgres.
-    /// 
+    ///
     /// # Safety
     ///
     /// This function is unsafe as we cannot ensure the `ctx` argument is a valid
@@ -479,7 +464,7 @@ impl<'fcx> FcContext<'fcx> {
     pub(super) unsafe fn assume_valid(ctx: *mut pg_sys::FuncCallContext) -> FcContext<'fcx> {
         Self(ctx, std::marker::PhantomData)
     }
-    pub fn get_inner(&mut self) -> *mut pgrx_pg_sys::FuncCallContext { 
+    pub fn get_inner(&mut self) -> *mut pgrx_pg_sys::FuncCallContext {
         self.0
     }
     pub fn srf_memcx(&mut self) -> PgMemoryContexts {
