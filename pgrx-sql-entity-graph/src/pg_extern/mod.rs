@@ -423,7 +423,7 @@ impl PgExtern {
                 let wrapper_code = quote_spanned! { self.func.block.span() =>
                     fn _internal_wrapper<#fc_ltparam, #lifetimes>(fcinfo: ::pgrx::callconv::Fcinfo<#fc_lt>) -> ::pgrx::datum::Datum<#fc_lt> {
                     #[allow(unused_unsafe)]
-                     unsafe {
+                    unsafe {
                         let #fcinfo_ident = fcinfo.0;
                         let result = match <#ret_ty as ::pgrx::callconv::RetAbi>::check_fcinfo_and_prepare(#fcinfo_ident) {
                             ::pgrx::callconv::CallCx::WrappedFn(mcx) => {
