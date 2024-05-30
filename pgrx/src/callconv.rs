@@ -395,11 +395,11 @@ impl<'fcx> FcInfo<'fcx> {
     }
 
     #[inline]
-    pub fn srf_is_first_call(&self) -> bool {
+    pub fn srf_is_initialized(&self) -> bool {
         // Safety: User must supply a valid fcinfo to assume_valid() in order
         // to construct a FcInfo. If that constraint is maintained, this should
         // be safe.
-        unsafe { (*(*self.0).flinfo).fn_extra.is_null() }
+        unsafe { !(*(*self.0).flinfo).fn_extra.is_null() }
     }
 
     /// Thin wrapper around [`pg_sys::init_MultiFuncCall`], made necessary
@@ -416,9 +416,7 @@ impl<'fcx> FcInfo<'fcx> {
     /// Equivalent to "per_MultiFuncCall" with no FFI cost, and a lifetime
     /// constraint.
     ///
-    /// Safety: This is only equivalent to the current (as of Postgres 16.3)
-    /// implementation of [`pg_sys::per_MultiFuncCall`], and future changes
-    /// to the complexity of the calling convention may break this method.
+    /// Safety: Assumes self.0.flinfo.fn_extra is non-null
     pub(crate) unsafe fn deref_fcx(&mut self) -> &'fcx mut pg_sys::FuncCallContext {
         unsafe {
             let fcx: *mut pg_sys::FuncCallContext = (*(*self.0).flinfo).fn_extra.cast();
