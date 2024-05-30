@@ -407,31 +407,32 @@ impl<'fcx> FcInfo<'fcx> {
     /// Thin wrapper around [`pg_sys::init_MultiFuncCall`], made necessary
     /// because this structure's FunctionCallInfo is a private field.
     #[inline]
-    pub unsafe fn init_multi_func_call(&mut self) -> FcContext<'fcx> {
-        unsafe { FcContext::assume_valid(pg_sys::init_MultiFuncCall(self.0)) }
+    pub unsafe fn init_multi_func_call(&mut self) -> &'fcx mut pg_sys::FuncCallContext {
+        unsafe {
+            let fcx: *mut pg_sys::FuncCallContext = pg_sys::init_MultiFuncCall(self.0);
+            debug_assert!(fcx.is_null() == false);
+            &mut *fcx
+        }
     }
 
-    /// Thin wrapper around [`pg_sys::per_MultiFuncCall`], made necessary
-    /// because this structure's FunctionCallInfo is a private field.
-    #[inline]
-    pub unsafe fn per_multi_func_call(&mut self) -> FcContext<'fcx> {
-        unsafe { FcContext::assume_valid(pg_sys::per_MultiFuncCall(self.0)) }
-    }
     /// Equivalent to "per_MultiFuncCall" with no FFI cost, and a lifetime
     /// constraint.
     ///
     /// Safety: This is only equivalent to the current (as of Postgres 16.3)
     /// implementation of [`pg_sys::per_MultiFuncCall`], and future changes
     /// to the complexity of the calling convention may break this method.
-    pub(crate) unsafe fn deref_fcx(&mut self) -> FcContext<'fcx> {
-        unsafe { FcContext::assume_valid((*(*self.0).flinfo).fn_extra.cast()) }
+    pub(crate) unsafe fn deref_fcx(&mut self) -> &'fcx mut pg_sys::FuncCallContext {
+        unsafe {
+            let fcx: *mut pg_sys::FuncCallContext = (*(*self.0).flinfo).fn_extra.cast();
+            debug_assert!(fcx.is_null() == false);
+            &mut *fcx
+        }
     }
 
     #[inline]
     pub unsafe fn srf_return_next(&mut self) {
         unsafe {
-            let mut fncctx = self.deref_fcx();
-            (*fncctx.get_inner()).call_cntr += 1;
+            self.deref_fcx().call_cntr += 1;
             (*((*self.0).resultinfo as *mut pg_sys::ReturnSetInfo)).isDone =
                 pg_sys::ExprDoneCond_ExprMultipleResult;
         }
@@ -440,34 +441,9 @@ impl<'fcx> FcInfo<'fcx> {
     #[inline]
     pub unsafe fn srf_return_done(&mut self) {
         unsafe {
-            let mut fncctx = self.deref_fcx();
-            pg_sys::end_MultiFuncCall(self.0, fncctx.get_inner());
+            pg_sys::end_MultiFuncCall(self.0, self.deref_fcx());
             (*((*self.0).resultinfo as *mut pg_sys::ReturnSetInfo)).isDone =
                 pg_sys::ExprDoneCond_ExprEndResult;
         }
-    }
-}
-
-#[derive(Clone)]
-pub struct FcContext<'fcx>(
-    *mut pgrx_pg_sys::FuncCallContext,
-    std::marker::PhantomData<&'fcx mut pgrx_pg_sys::FuncCallContext>,
-);
-
-impl<'fcx> FcContext<'fcx> {
-    /// Constructor, used to wrap a raw FunctionCallInfo provided by Postgres.
-    ///
-    /// # Safety
-    ///
-    /// This function is unsafe as we cannot ensure the `ctx` argument is a valid
-    /// [`pg_sys::FunctionCallInfo`] pointer.  This is your responsibility.
-    pub(super) unsafe fn assume_valid(ctx: *mut pg_sys::FuncCallContext) -> FcContext<'fcx> {
-        Self(ctx, std::marker::PhantomData)
-    }
-    pub fn get_inner(&mut self) -> *mut pgrx_pg_sys::FuncCallContext {
-        self.0
-    }
-    pub fn srf_memcx(&mut self) -> PgMemoryContexts {
-        unsafe { PgMemoryContexts::For((*self.0).multi_call_memory_ctx) }
     }
 }
