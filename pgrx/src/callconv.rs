@@ -367,9 +367,7 @@ impl<'fcx> FcInfo<'fcx> {
     /// In other words, the type of `self.raw_args()[num]`
     #[inline]
     pub fn pg_getarg_type(&self, num: usize) -> pg_sys::Oid {
-        // Safety: User must supply a valid fcinfo to assume_valid() in order
-        // to construct a FcInfo. If that constraint is maintained, this should
-        // be safe.
+        // SAFETY: see FcInfo::assume_valid
         unsafe {
             pg_sys::get_fn_expr_argtype(self.0.as_ref().unwrap().flinfo, num as std::os::raw::c_int)
         }
