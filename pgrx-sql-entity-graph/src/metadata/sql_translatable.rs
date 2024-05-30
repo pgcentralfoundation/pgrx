@@ -46,7 +46,7 @@ pub enum SqlMapping {
     Composite {
         array_brackets: bool,
     },
-    /// Placeholder for some types with no simple translation
+    /// A type which does not actually appear in SQL
     Skip,
 }
 

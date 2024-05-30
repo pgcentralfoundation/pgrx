@@ -28,6 +28,7 @@ pub(crate) use attribute::Attribute;
 pub use cast::PgCast;
 pub use operator::PgOperator;
 pub use returning::NameMacro;
+use syn::token::Comma;
 
 use self::returning::Returning;
 use super::UsedType;
@@ -38,7 +39,7 @@ use crate::ToSqlConfig;
 use operator::{PgrxOperatorAttributeWithIdent, PgrxOperatorOpName};
 use search_path::SearchPathList;
 
-use proc_macro2::{Ident, TokenStream as TokenStream2};
+use proc_macro2::{Ident, Span, TokenStream as TokenStream2};
 use quote::{format_ident, quote, quote_spanned};
 use syn::parse::{Parse, ParseStream, Parser};
 use syn::punctuated::Punctuated;
@@ -377,6 +378,10 @@ impl PgExtern {
         let is_raw = self.extern_attrs().contains(&Attribute::Raw);
         // We use a `_` prefix to make functions with no args more satisfied during linting.
         let fcinfo_ident = syn::Ident::new("_fcinfo", self.func.sig.ident.span());
+        let lifetimes =
+            self.func.sig.generics.lifetimes().collect::<syn::punctuated::Punctuated<_, Comma>>();
+        let fc_lt = syn::Lifetime::new("'fcx", Span::mixed_site());
+        let fc_ltparam = syn::LifetimeParam::new(fc_lt.clone());
 
         let args = &self.inputs;
         let arg_pats = args.iter().map(|v| format_ident!("{}_", &v.pat)).collect::<Vec<_>>();
@@ -416,10 +421,11 @@ impl PgExtern {
                     syn::ReturnType::Type(_, ret_ty) => ret_ty.clone(),
                 };
                 let wrapper_code = quote_spanned! { self.func.block.span() =>
+                    fn _internal_wrapper<#fc_ltparam, #lifetimes>(fcinfo: ::pgrx::callconv::Fcinfo<#fc_lt>) -> ::pgrx::datum::Datum<#fc_lt> {
                     #[allow(unused_unsafe)]
                     unsafe {
-                        let fcinfo = #fcinfo_ident;
-                        let result = match <#ret_ty as ::pgrx::callconv::RetAbi>::check_fcinfo_and_prepare(fcinfo) {
+                        let #fcinfo_ident = fcinfo.0;
+                        let result = match <#ret_ty as ::pgrx::callconv::RetAbi>::check_fcinfo_and_prepare(#fcinfo_ident) {
                             ::pgrx::callconv::CallCx::WrappedFn(mcx) => {
                                 let mut mcx = ::pgrx::PgMemoryContexts::For(mcx);
                                 ::pgrx::callconv::RetAbi::to_ret(mcx.switch_to(|_| {
@@ -427,10 +433,14 @@ impl PgExtern {
                                     #func_name( #(#arg_pats),* )
                                 }))
                             }
-                            ::pgrx::callconv::CallCx::RestoreCx => <#ret_ty as ::pgrx::callconv::RetAbi>::ret_from_fcinfo_fcx(fcinfo),
+                            ::pgrx::callconv::CallCx::RestoreCx => <#ret_ty as ::pgrx::callconv::RetAbi>::ret_from_fcinfo_fcx(#fcinfo_ident),
                         };
-                        unsafe { <#ret_ty as ::pgrx::callconv::RetAbi>::box_ret_in_fcinfo(fcinfo, result) }
-                    }
+                        ::core::mem::transmute(unsafe { <#ret_ty as ::pgrx::callconv::RetAbi>::box_ret_in_fcinfo(#fcinfo_ident, result) })
+                    }}
+                    let fcinfo = ::pgrx::callconv::Fcinfo(#fcinfo_ident, ::core::marker::PhantomData);
+                    // We preserve the invariants
+                    let datum = unsafe { ::pgrx::pg_sys::submodules::panic::pgrx_extern_c_guard(move || _internal_wrapper(fcinfo)) };
+                    datum.sans_lifetime()
                 };
                 finfo_v1_extern_c(&self.func, fcinfo_ident, wrapper_code)
             }

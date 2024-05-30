@@ -10,12 +10,21 @@
 #![doc(hidden)]
 #![deny(unsafe_op_in_unsafe_fn)]
 //! Helper implementations for returning sets and tables from `#[pg_extern]`-style functions
+
 use crate::heap_tuple::PgHeapTuple;
 use crate::{
     pg_return_null, pg_sys, AnyNumeric, Date, Inet, Internal, Interval, IntoDatum, Json, PgBox,
     PgVarlena, Time, TimeWithTimeZone, Timestamp, TimestampWithTimeZone, Uuid,
 };
+use core::marker::PhantomData;
+use core::panic::{RefUnwindSafe, UnwindSafe};
 use std::ffi::{CStr, CString};
+
+type FcinfoData = pg_sys::FunctionCallInfoBaseData;
+// FIXME: replace with a real implementation
+pub struct Fcinfo<'a>(pub pg_sys::FunctionCallInfo, pub PhantomData<&'a mut FcinfoData>);
+impl<'fcx> UnwindSafe for Fcinfo<'fcx> {}
+impl<'fcx> RefUnwindSafe for Fcinfo<'fcx> {}
 
 /// How to return a value from Rust to Postgres
 ///
