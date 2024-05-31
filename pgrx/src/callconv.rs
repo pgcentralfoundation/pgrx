@@ -405,7 +405,7 @@ impl<'fcx> FcInfo<'fcx> {
 
     /// Thin wrapper around [`pg_sys::init_MultiFuncCall`], made necessary
     /// because this structure's FunctionCallInfo is a private field.
-    /// 
+    ///
     /// This should initialize `self.0.flinfo.fn_extra`
     #[inline]
     pub unsafe fn init_multi_func_call(&mut self) -> &'fcx mut pg_sys::FuncCallContext {
