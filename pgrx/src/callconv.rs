@@ -384,10 +384,10 @@ impl<'fcx> FcInfo<'fcx> {
 
     /// Retrieve the `.flinfo.fn_extra` pointer (as a PgBox'd type) from [`pg_sys::FunctionCallInfo`].
     /// If it was not already initialized, initialize it with `default`
-    pub fn get_or_init_func_extra<ReturnType, DefaultValue: FnOnce() -> ReturnType>(
+    pub fn get_or_init_func_extra<DefaultValue: FnOnce() -> *mut pg_sys::FuncCallContext>(
         &self,
         default: DefaultValue,
-    ) -> NonNull<ReturnType> {
+    ) -> NonNull<pg_sys::FuncCallContext> {
         // Safety: User must supply a valid fcinfo to assume_valid() in order
         // to construct a FcInfo. If that constraint is maintained, this should
         // be safe.
@@ -400,7 +400,7 @@ impl<'fcx> FcInfo<'fcx> {
             }
 
             // Safety: can new_unchecked() here because we just initialized it.
-            NonNull::new_unchecked(flinfo.as_mut().fn_extra as *mut ReturnType)
+            NonNull::new_unchecked(flinfo.as_mut().fn_extra as *mut pg_sys::FuncCallContext)
         }
     }
 
