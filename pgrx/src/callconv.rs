@@ -354,7 +354,7 @@ impl<'fcx> FcInfo<'fcx> {
     /// use pgrx::callconv::FcInfo;
     /// use pgrx::prelude::*;
     /// fn foo<'a>(fcinfo: FcInfo<'a>) -> pg_sys::Datum {
-    ///     return unsafe { fcinfo.set_return_null(fcinfo) };
+    ///     return unsafe { fcinfo.set_return_null() };
     /// }
     /// ```
     #[inline]
