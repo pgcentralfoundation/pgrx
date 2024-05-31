@@ -19,6 +19,7 @@ use crate::{
 use core::marker::PhantomData;
 use core::panic::{RefUnwindSafe, UnwindSafe};
 use std::ffi::{CStr, CString};
+use std::ptr::NonNull;
 
 type FcinfoData = pg_sys::FunctionCallInfoBaseData;
 // FIXME: replace with a real implementation
@@ -340,17 +341,24 @@ impl<'fcx> FcInfo<'fcx> {
 
     /// Modifies the contained `fcinfo` struct to flag its return value as null.
     ///
+    /// Returns a null-pointer Datum for use with the calling function's return value.
+    ///
+    /// Safety: If this flag is set, regardless of what your function actually returns,
+    /// Postgress will presume it is null and discard it. This means that, if you call this
+    /// method and then return a value anyway, *your extension will leak memory.* Please
+    /// ensure this method is only called for functions which, very definitely, returns null.
+    ///
     /// # Examples
     ///
     /// ```rust,no_run
     /// use pgrx::pg_return_null;
     /// use pgrx::prelude::*;
-    /// fn foo(fcinfo: pg_sys::FunctionCallInfo) -> pg_sys::Datum {
-    ///     return unsafe { pg_return_null(fcinfo) };
+    /// fn foo(fcinfo: FcInfo) -> pg_sys::Datum {
+    ///     return unsafe { fcinfo.set_return_null(fcinfo) };
     /// }
     /// ```
     #[inline]
-    pub unsafe fn pg_return_null(&mut self) -> pg_sys::Datum {
+    pub unsafe fn set_return_null(&mut self) -> pg_sys::Datum {
         let fcinfo = unsafe { self.0.as_mut() }.unwrap();
         fcinfo.isnull = true;
         pg_sys::Datum::from(0)
@@ -358,7 +366,8 @@ impl<'fcx> FcInfo<'fcx> {
 
     /// Get the collation the function call should use
     #[inline]
-    pub unsafe fn pg_get_collation(&self) -> pg_sys::Oid {
+    pub fn get_collation(&self) -> pg_sys::Oid {
+        // SAFETY: see FcInfo::assume_valid
         let fcinfo = unsafe { self.0.as_mut() }.unwrap();
         fcinfo.fncollation
     }
@@ -366,7 +375,7 @@ impl<'fcx> FcInfo<'fcx> {
     /// Retrieve the type (as an Oid) of argument number `num`.
     /// In other words, the type of `self.raw_args()[num]`
     #[inline]
-    pub fn pg_getarg_type(&self, num: usize) -> pg_sys::Oid {
+    pub fn get_arg_type(&self, num: usize) -> pg_sys::Oid {
         // SAFETY: see FcInfo::assume_valid
         unsafe {
             pg_sys::get_fn_expr_argtype(self.0.as_ref().unwrap().flinfo, num as std::os::raw::c_int)
@@ -378,20 +387,20 @@ impl<'fcx> FcInfo<'fcx> {
     pub fn get_or_init_func_extra<ReturnType, DefaultValue: FnOnce() -> ReturnType>(
         &self,
         default: DefaultValue,
-    ) -> PgBox<ReturnType> {
+    ) -> NonNull<ReturnType> {
         // Safety: User must supply a valid fcinfo to assume_valid() in order
         // to construct a FcInfo. If that constraint is maintained, this should
         // be safe.
         unsafe {
-            let fcinfo = PgBox::from_pg(self.0);
-            let mut flinfo = PgBox::from_pg(fcinfo.flinfo);
-            if flinfo.fn_extra.is_null() {
-                flinfo.fn_extra = PgMemoryContexts::For(flinfo.fn_mcxt)
+            let mut flinfo = NonNull::new((*self.0).flinfo).unwrap();
+            if flinfo.as_ref().fn_extra.is_null() {
+                flinfo.as_mut().fn_extra = PgMemoryContexts::For(flinfo.as_ref().fn_mcxt)
                     .leak_and_drop_on_delete(default())
                     as crate::void_mut_ptr;
             }
 
-            PgBox::from_pg(flinfo.fn_extra as *mut ReturnType)
+            // Safety: can new_unchecked() here because we just initialized it.
+            NonNull::new_unchecked(flinfo.as_mut().fn_extra as *mut ReturnType)
         }
     }
 
