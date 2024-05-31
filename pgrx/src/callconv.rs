@@ -374,7 +374,8 @@ impl<'fcx> FcInfo<'fcx> {
     }
 
     /// Retrieve the `.flinfo.fn_extra` pointer (as a PgBox'd type) from [`pg_sys::FunctionCallInfo`].
-    pub fn pg_func_extra<ReturnType, DefaultValue: FnOnce() -> ReturnType>(
+    /// If it was not already initialized, initialize it with `default`
+    pub fn get_or_init_func_extra<ReturnType, DefaultValue: FnOnce() -> ReturnType>(
         &self,
         default: DefaultValue,
     ) -> PgBox<ReturnType> {
@@ -404,6 +405,8 @@ impl<'fcx> FcInfo<'fcx> {
 
     /// Thin wrapper around [`pg_sys::init_MultiFuncCall`], made necessary
     /// because this structure's FunctionCallInfo is a private field.
+    /// 
+    /// This should initialize `self.0.flinfo.fn_extra`
     #[inline]
     pub unsafe fn init_multi_func_call(&mut self) -> &'fcx mut pg_sys::FuncCallContext {
         unsafe {
@@ -416,7 +419,8 @@ impl<'fcx> FcInfo<'fcx> {
     /// Equivalent to "per_MultiFuncCall" with no FFI cost, and a lifetime
     /// constraint.
     ///
-    /// Safety: Assumes self.0.flinfo.fn_extra is non-null
+    /// Safety: Assumes `self.0.flinfo.fn_extra` is non-null
+    /// i.e. [`FcInfo::srf_is_initialized()`] would be `true`.
     pub(crate) unsafe fn deref_fcx(&mut self) -> &'fcx mut pg_sys::FuncCallContext {
         unsafe {
             let fcx: *mut pg_sys::FuncCallContext = (*(*self.0).flinfo).fn_extra.cast();
@@ -425,6 +429,8 @@ impl<'fcx> FcInfo<'fcx> {
         }
     }
 
+    /// Safety: Assumes `self.0.flinfo.fn_extra` is non-null
+    /// i.e. [`FcInfo::srf_is_initialized()`] would be `true`.
     #[inline]
     pub unsafe fn srf_return_next(&mut self) {
         unsafe {
@@ -434,6 +440,8 @@ impl<'fcx> FcInfo<'fcx> {
         }
     }
 
+    /// Safety: Assumes `self.0.flinfo.fn_extra` is non-null
+    /// i.e. [`FcInfo::srf_is_initialized()`] would be `true`.
     #[inline]
     pub unsafe fn srf_return_done(&mut self) {
         unsafe {
