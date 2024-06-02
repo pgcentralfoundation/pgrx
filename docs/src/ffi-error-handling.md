@@ -22,8 +22,10 @@ used memory, release locks, and whatever else might be necessary.
 
 # High-level Rust Error Handling Overview
 
-Rust, on the other hand, aborts the current process whenever `panic!()` is called.  This is, quite clearly, incompatible
-with Postgres' error handling approach.  
+Rust, on the other hand, will call its panic hook and then run its panic handler when `panic!()` is called.
+The panic handler itself will either *unwind* the stack or *abort* the current process.
+This is, quite clearly, incompatible with Postgres' error handling approach:
+unwinding destroys `sigsetjmp` checkpoints, and aborting shuts down the entire database!
 
 It's technically incompatible, it's spiritually incompatible, and it robs Postgres of the opportunity to cleanly rollback 
 the current transaction (Postgres is supposed to be tolerant of such situations, but who wants to test Postgres' 
