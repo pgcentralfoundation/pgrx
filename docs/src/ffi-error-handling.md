@@ -49,7 +49,7 @@ it to later call) via a standard function pointer.
 
 ## Guarding Postgres Internal Functions
 
-pgrx uses the `bindgen` tool to generate "bindings" for exported Postgres symbols.  Postgres' source header files (`*.h`)
+pgrx uses the [`bindgen`] tool to generate "bindings" for exported Postgres symbols.  Postgres' source header files (`*.h`)
 are read, parsed, and transformed, as much as bindgen knows how, into Rust declarations.  In the case of exported functions,
 bindgen generates blocks similar to:
 
