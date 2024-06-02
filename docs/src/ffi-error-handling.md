@@ -136,7 +136,7 @@ extern "C" fn foo() -> bool {
 ```
 
 Behind the scenes, `pgrx_extern_c_guard(|| ...)` executes the closure argument inside a rust `std::panic::catch_unwind(|| ...)`
-block.  Doing so allows pgrx to capture any Rust `panic!()` and contain it its stack unwinding to the `catch_unwind()` block
+block.  Doing so allows pgrx to capture any Rust `panic!()` and contain its stack unwinding to within the [`catch_unwind`]
 which allows for Rust destructors to be run, Rust to free memory, and for pgrx to ensure we don't end up aborting the
 backend process.
 
