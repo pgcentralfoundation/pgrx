@@ -44,7 +44,7 @@ they're both called `#[pg_guard]`.
 
 Essentially, pgrx needs to guard two styles of `extern "C"` functions.  One style is the [`extern "C" {}` block][extern-blocks] that 
 declares a function lives "somewhere else" (in our case, the Postgres process in which the pgrx extension is loaded).
-The other style is `extern "C" fn foo() { ... }` functions that are written in Rust and might be passed to Postgres (for
+The other style is [`extern "C" fn foo() { ... }` functions][extern-fn] that are written in Rust and might be passed to Postgres (for
 it to later call) via a standard function pointer.
 
 ## Guarding Postgres Internal Functions
