@@ -29,7 +29,7 @@ It's technically incompatible, it's spiritually incompatible, and it robs Postgr
 the current transaction (Postgres is supposed to be tolerant of such situations, but who wants to test Postgres' 
 recoverability in production?).
 
-Conversely, Postgres' `sigsetjmp/siglongjmp` approach is as egregiously incompatible with Rust.  `siglongjmp` will blindly
+Conversely, Postgres' `sigsetjmp`/`siglongjmp` approach is as egregiously incompatible with Rust.  `siglongjmp` will blindly
 jump over Rust stack frames, leaking Rust-allocated memory, ignoring `trait Drop` implementations, and denying Rust code 
 any opportunity to participate in error handling.
 
