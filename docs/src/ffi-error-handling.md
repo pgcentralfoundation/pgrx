@@ -249,3 +249,9 @@ Combined, we're ensuring that if any of the Postgres functions (`relation_open`/
 to an invalid Oid value), `pg_guard_ffi_boundary` will catch that and convert into a Rust panic.  Then ultimately, the top-level
 `pgrx_extern_c_guard` call will convert it back into a Postgres ERROR once the Rust stack has properly unwound and drop
 impls have been called.
+
+[`mem::forget`]: https://doc.rust-lang.org/std/mem/fn.forget.html
+[`catch_unwind`]: https://doc.rust-lang.org/std/panic/fn.catch_unwind.html
+[`bindgen`]: https://rust-lang.github.io/rust-bindgen/
+[extern-blocks]: https://doc.rust-lang.org/reference/items/external-blocks.html
+[extern-fn]: https://doc.rust-lang.org/reference/items/functions.html#extern-function-qualifier
