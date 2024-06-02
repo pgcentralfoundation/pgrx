@@ -8,7 +8,8 @@ There are many other concerns across this boundary such as function call ABIs an
 # High-level Postgres Error Handling Overview
 
 Most Postgres internal functions (those accessible via the `pg_sys` module) are capable of raising an `ERROR`.  This "error"
-comes into existence when, internally, Postgres calls `errstart()`, which does the work to instantiate the error.
+comes into existence when, internally, Postgres code calls the `ereport()` (or `elog()`) macro.  `ereport()` does the work
+to instantiate the error by first calling the `errstart()` function.
 
 Code execution then finds its way to `errfinish()` where, finally, `siglongjmp()` is called to instantly move the stack 
 back to the frame where Postgres began the current transaction (where it previously created a `sigsetjmp()` point).  
@@ -91,12 +92,21 @@ function.  This function sets up pgrx' own `sigsetjmp` point, lies to Postgres' 
 going to jump to in case of an ERROR, calls the function via the closure argument, then restores Postgres' exception handling
 stack.
 
+"Lies to Postgres" is a little curious here, but Postgres doesn't expect that whenever it raises an ERROR it'll be jumping
+into a Rust-created stack frame.  In fact, it doesn't have *any* expectations about where it's jumping other than, eventually,
+the raised ERROR will either rollback the current transaction, be re-thrown, or in some cases, simply ignored.
+
 As it relates to this document, the specific workings of this process is more of an implementation detail, but the gist of
 the process is that we set up our own `sigsetjmp` point so that we can trap, in Rust, any ERROR Postgres might raise while
 calling the internal Postgres function.  This then allows us to convert that error into a Rust panic and have it propagated
-through the call stack so that Rust's stack properly unwinds and type destructors are called.  
+through the call stack so that Rust's stack properly unwinds and type destructors are called.
+
+We make sure to limit the amount of `sigsetjmp`-protected code to only be the internal Postgres function being called.
+Doing so ensures we're doing the minimal amount of work necessary to properly protect from a Postgres ERROR and not also
+accidentally defeating Rust's stack unwinding.
 
 While Rust doesn't guarantee that `drop()` will get called for any instantiated type, we do our best to encourage it.
+Of course, using `std::mem::forget()` on an instantiated type will never have its drop implementation called.
 
 Ultimately, at the top of the Rust callstack, the panic raised from a Postgres ERROR is then converted back into a normal
 Postgres ERROR using its internal facility for raising errors.
