@@ -8,7 +8,7 @@ There are many other concerns across this boundary such as function call ABIs an
 # High-level Postgres Error Handling Overview
 
 Most Postgres internal functions (those accessible via the `pg_sys` module) are capable of raising an `ERROR`.  This "error"
-comes into existence when, internally, Postgres calls `errstart()`, which does the work instantiate the error.
+comes into existence when, internally, Postgres calls `errstart()`, which does the work to instantiate the error.
 
 Code execution then finds its way to `errfinish()` where, finally, `siglongjmp()` is called to instantly move the stack 
 back to the frame where Postgres began the current transaction (where it previously created a `sigsetjmp()` point).  
