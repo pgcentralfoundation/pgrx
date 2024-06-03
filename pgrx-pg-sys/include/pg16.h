@@ -125,6 +125,7 @@
 #include "plpgsql.h"
 #include "postmaster/bgworker.h"
 #include "postmaster/postmaster.h"
+#include "postmaster/syslogger.h"
 #include "replication/logical.h"
 #include "replication/output_plugin.h"
 #include "rewrite/rewriteHandler.h"
