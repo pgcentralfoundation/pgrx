@@ -15,6 +15,7 @@
   - [Memory Contexts](./pg-internal/memory-context.md)
   - [Varlena Types](./pg-internal/varlena.md)
   - [`sigsetjmp` & `siglongjmp`](./pg-internal/setjmp-longjmp.md)
+- [FFI Error Handling](./ffi-error-handling.md)
 - [Contributing](./contributing.md)
   - [PGRX Internals](./contributing/pgrx-internal.md)
   - [Releases](./contributing/release.md)
