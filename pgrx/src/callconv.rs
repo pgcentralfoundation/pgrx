@@ -10,6 +10,7 @@
 #![doc(hidden)]
 #![deny(unsafe_op_in_unsafe_fn)]
 //! Helper implementations for returning sets and tables from `#[pg_extern]`-style functions
+use pgrx_pg_sys::FunctionCallInfo;
 
 use crate::heap_tuple::PgHeapTuple;
 use crate::{
@@ -317,6 +318,7 @@ impl<'fcx> FcInfo<'fcx> {
     ///
     /// This function is unsafe as we cannot ensure the `fcinfo` argument is a valid
     /// [`pg_sys::FunctionCallInfo`] pointer.  This is your responsibility.
+    #[inline]
     pub unsafe fn assume_valid(fcinfo: pg_sys::FunctionCallInfo) -> FcInfo<'fcx> {
         let _nullptr_check =
             std::ptr::NonNull::new(fcinfo).expect("fcinfo pointer must be non-null");
@@ -339,6 +341,14 @@ impl<'fcx> FcInfo<'fcx> {
         }
     }
 
+    /// Retrieves the internal [`pg_sys::FunctionCallInfo`] wrapped by this type. 
+    /// A FunctionCallInfo is a mutable pointer to a FunctionCallInfoBaseData already, and so
+    /// that type is sufficient.
+    #[inline]
+    pub unsafe fn as_mut_ptr(&self) -> FunctionCallInfo { 
+        self.0
+    }
+
     /// Modifies the contained `fcinfo` struct to flag its return value as null.
     ///
     /// Returns a null-pointer Datum for use with the calling function's return value.
@@ -358,27 +368,32 @@ impl<'fcx> FcInfo<'fcx> {
     /// }
     /// ```
     #[inline]
-    pub unsafe fn set_return_null(&mut self) -> pg_sys::Datum {
+    pub unsafe fn set_return_null(&mut self) -> crate::datum::Datum<'fcx> {
         let fcinfo = unsafe { self.0.as_mut() }.unwrap();
         fcinfo.isnull = true;
-        pg_sys::Datum::from(0)
+        crate::datum::Datum::null()
     }
 
-    /// Get the collation the function call should use
+    /// Get the collation the function call should use.
+    /// If the OID is 0 (invalid or no-type) this method will return None,
+    /// otherwise it will return Some(oid).
     #[inline]
-    pub fn get_collation(&self) -> pg_sys::Oid {
+    pub fn get_collation(&self) -> Option<pg_sys::Oid> {
         // SAFETY: see FcInfo::assume_valid
         let fcinfo = unsafe { self.0.as_mut() }.unwrap();
-        fcinfo.fncollation
+        (fcinfo.fncollation.as_u32() != 0).then_some(fcinfo.fncollation)
     }
 
     /// Retrieve the type (as an Oid) of argument number `num`.
     /// In other words, the type of `self.raw_args()[num]`
     #[inline]
-    pub fn get_arg_type(&self, num: usize) -> pg_sys::Oid {
+    pub fn get_arg_type(&self, num: usize) -> Option<pg_sys::Oid> {
         // SAFETY: see FcInfo::assume_valid
         unsafe {
-            pg_sys::get_fn_expr_argtype(self.0.as_ref().unwrap().flinfo, num as std::os::raw::c_int)
+            // bool::then() is lazy-evaluated, then_some is not.
+            (num < ((*self.0).nargs as usize)).then( #[inline] || {
+                pg_sys::get_fn_expr_argtype(self.0.as_ref().unwrap().flinfo, num as std::os::raw::c_int)
+            })
         }
     }
 
@@ -455,8 +470,14 @@ impl<'fcx> FcInfo<'fcx> {
     pub unsafe fn srf_return_done(&mut self) {
         unsafe {
             pg_sys::end_MultiFuncCall(self.0, self.deref_fcx());
-            (*((*self.0).resultinfo as *mut pg_sys::ReturnSetInfo)).isDone =
+            (*self.get_result_info()).isDone =
                 pg_sys::ExprDoneCond_ExprEndResult;
+        }
+    }
+
+    pub unsafe fn get_result_info(&self) -> *mut pg_sys::ReturnSetInfo { 
+        unsafe {
+            (*self.0).resultinfo as *mut pg_sys::ReturnSetInfo
         }
     }
 }
