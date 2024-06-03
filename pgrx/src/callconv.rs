@@ -345,7 +345,7 @@ impl<'fcx> FcInfo<'fcx> {
     /// A FunctionCallInfo is a mutable pointer to a FunctionCallInfoBaseData already, and so
     /// that type is sufficient.
     #[inline]
-    pub unsafe fn as_mut_ptr(&self) -> FunctionCallInfo { 
+    pub unsafe fn as_mut_ptr(&self) -> pg_sys::FunctionCallInfo {
         self.0
     }
 
