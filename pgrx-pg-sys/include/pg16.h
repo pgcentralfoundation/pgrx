@@ -150,6 +150,7 @@
 #include "utils/datetime.h"
 #include "utils/elog.h"
 #include "utils/float.h"
+#include "utils/fmgroids.h"
 #include "utils/fmgrprotos.h"
 #include "utils/geo_decls.h"
 #include "utils/guc.h"
