@@ -474,7 +474,9 @@ impl<'fcx> FcInfo<'fcx> {
                 pg_sys::ExprDoneCond_ExprEndResult;
         }
     }
-
+    
+    /// # Safety
+    /// Do not corrupt the `pg_sys::ReturnSetInfo` struct's data.
     #[inline]
     pub unsafe fn get_result_info(&self) -> *mut pg_sys::ReturnSetInfo { 
         unsafe {
