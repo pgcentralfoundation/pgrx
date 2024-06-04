@@ -10,7 +10,6 @@
 #![doc(hidden)]
 #![deny(unsafe_op_in_unsafe_fn)]
 //! Helper implementations for returning sets and tables from `#[pg_extern]`-style functions
-use pgrx_pg_sys::FunctionCallInfo;
 
 use crate::heap_tuple::PgHeapTuple;
 use crate::{
@@ -445,6 +444,7 @@ impl<'fcx> FcInfo<'fcx> {
     ///
     /// Safety: Assumes `self.0.flinfo.fn_extra` is non-null
     /// i.e. [`FcInfo::srf_is_initialized()`] would be `true`.
+    #[inline]
     pub(crate) unsafe fn deref_fcx(&mut self) -> &'fcx mut pg_sys::FuncCallContext {
         unsafe {
             let fcx: *mut pg_sys::FuncCallContext = (*(*self.0).flinfo).fn_extra.cast();
@@ -475,6 +475,7 @@ impl<'fcx> FcInfo<'fcx> {
         }
     }
 
+    #[inline]
     pub unsafe fn get_result_info(&self) -> *mut pg_sys::ReturnSetInfo { 
         unsafe {
             (*self.0).resultinfo as *mut pg_sys::ReturnSetInfo
