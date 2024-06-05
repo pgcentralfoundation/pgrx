@@ -385,28 +385,40 @@ impl PgExtern {
 
         let args = &self.inputs;
         let arg_pats = args.iter().map(|v| format_ident!("{}_", &v.pat)).collect::<Vec<_>>();
+        let new_unboxing = {
+            // false
+            true
+        };
         let arg_fetches = args.iter().enumerate().map(|(idx, arg)| {
-            let pat = &arg_pats[idx];
-            let resolved_ty = &arg.used_ty.resolved_ty;
-            match resolved_ty {
-                // There's no danger of misinterpreting the type, as pointer coercions must typecheck!
-                Type::Path(ty_path) if ty_path.last_ident_is("FunctionCallInfo") => quote_spanned! { pat.span() =>
-                    let #pat = #fcinfo_ident;
-                },
-                Type::Tuple(tup) if tup.elems.is_empty() => quote_spanned! { pat.span() =>
-                    debug_assert!(unsafe { ::pgrx::fcinfo::pg_getarg::<()>(#fcinfo_ident, #idx).is_none() }, "A `()` argument should always receive `NULL`");
-                    let #pat = ();
-                },
-                _ => match (is_raw, &arg.used_ty.optional) {
-                    (true, None) | (true, Some(_)) => quote_spanned! { pat.span() =>
-                        let #pat = unsafe { ::pgrx::fcinfo::pg_getarg_datum_raw(#fcinfo_ident, #idx) as #resolved_ty };
+            if new_unboxing {
+                let pat = &arg_pats[idx];
+                let resolved_ty = &arg.used_ty.resolved_ty;
+                quote_spanned!{ pat.span() => 
+                    let #pat = <#resolved_ty as ::pgrx::callconv::ArgAbi>::unbox_from_fcinfo_index(#fcinfo_ident, &mut #idx);
+                }
+            } else {
+                let pat = &arg_pats[idx];
+                let resolved_ty = &arg.used_ty.resolved_ty;
+                match resolved_ty {
+                    // There's no danger of misinterpreting the type, as pointer coercions must typecheck!
+                    Type::Path(ty_path) if ty_path.last_ident_is("FunctionCallInfo") => quote_spanned! { pat.span() =>
+                        let #pat = #fcinfo_ident;
                     },
-                    (false, None) => quote_spanned! { pat.span() =>
-                        let #pat = unsafe { ::pgrx::fcinfo::pg_getarg::<#resolved_ty>(#fcinfo_ident, #idx).unwrap_or_else(|| panic!("{} is null", stringify!{#pat})) };
+                    Type::Tuple(tup) if tup.elems.is_empty() => quote_spanned! { pat.span() =>
+                        debug_assert!(unsafe { ::pgrx::fcinfo::pg_getarg::<()>(#fcinfo_ident, #idx).is_none() }, "A `()` argument should always receive `NULL`");
+                        let #pat = ();
                     },
-                    (false, Some(inner)) => quote_spanned! { pat.span() =>
-                        let #pat = unsafe { ::pgrx::fcinfo::pg_getarg::<#inner>(#fcinfo_ident, #idx) };
-                    },
+                    _ => match (is_raw, &arg.used_ty.optional) {
+                        (true, None) | (true, Some(_)) => quote_spanned! { pat.span() =>
+                            let #pat = unsafe { ::pgrx::fcinfo::pg_getarg_datum_raw(#fcinfo_ident, #idx) as #resolved_ty };
+                        },
+                        (false, None) => quote_spanned! { pat.span() =>
+                            let #pat = unsafe { ::pgrx::fcinfo::pg_getarg::<#resolved_ty>(#fcinfo_ident, #idx).unwrap_or_else(|| panic!("{} is null", stringify!{#pat})) };
+                        },
+                        (false, Some(inner)) => quote_spanned! { pat.span() =>
+                            let #pat = unsafe { ::pgrx::fcinfo::pg_getarg::<#inner>(#fcinfo_ident, #idx) };
+                        },
+                    }
                 }
             }
         });
@@ -421,25 +433,26 @@ impl PgExtern {
                     syn::ReturnType::Type(_, ret_ty) => ret_ty.clone(),
                 };
                 let wrapper_code = quote_spanned! { self.func.block.span() =>
-                    fn _internal_wrapper<#fc_ltparam, #lifetimes>(fcinfo: ::pgrx::callconv::Fcinfo<#fc_lt>) -> ::pgrx::datum::Datum<#fc_lt> {
-                    #[allow(unused_unsafe)]
-                    unsafe {
-                        let #fcinfo_ident = fcinfo.0;
-                        let result = match <#ret_ty as ::pgrx::callconv::RetAbi>::check_fcinfo_and_prepare(#fcinfo_ident) {
-                            ::pgrx::callconv::CallCx::WrappedFn(mcx) => {
-                                let mut mcx = ::pgrx::PgMemoryContexts::For(mcx);
-                                ::pgrx::callconv::RetAbi::to_ret(mcx.switch_to(|_| {
-                                    #(#arg_fetches)*
-                                    #func_name( #(#arg_pats),* )
-                                }))
-                            }
-                            ::pgrx::callconv::CallCx::RestoreCx => <#ret_ty as ::pgrx::callconv::RetAbi>::ret_from_fcinfo_fcx(#fcinfo_ident),
-                        };
-                        ::core::mem::transmute(unsafe { <#ret_ty as ::pgrx::callconv::RetAbi>::box_ret_in_fcinfo(#fcinfo_ident, result) })
-                    }}
-                    let fcinfo = ::pgrx::callconv::Fcinfo(#fcinfo_ident, ::core::marker::PhantomData);
+                    fn _internal_wrapper<#fc_ltparam, #lifetimes>(fcinfo: &mut ::pgrx::callconv::Fcinfo<#fc_lt>) -> ::pgrx::datum::Datum<#fc_lt> {
+                        #[allow(unused_unsafe)]
+                        unsafe {
+                            let #fcinfo_ident = fcinfo;
+                            let result = match <#ret_ty as ::pgrx::callconv::RetAbi>::check_and_prepare(#fcinfo_ident) {
+                                ::pgrx::callconv::CallCx::WrappedFn(mcx) => {
+                                    let mut mcx = ::pgrx::PgMemoryContexts::For(mcx);
+                                    ::pgrx::callconv::RetAbi::to_ret(mcx.switch_to(|_| {
+                                        #(#arg_fetches)*
+                                        #func_name( #(#arg_pats),* )
+                                    }))
+                                }
+                                ::pgrx::callconv::CallCx::RestoreCx => <#ret_ty as ::pgrx::callconv::RetAbi>::ret_from_fcx(#fcinfo_ident),
+                            };
+                            ::core::mem::transmute(unsafe { <#ret_ty as ::pgrx::callconv::RetAbi>::box_ret_in(#fcinfo_ident, result) })
+                        }
+                    }
+                    let mut fcinfo = ::pgrx::callconv::Fcinfo(#fcinfo_ident, ::core::marker::PhantomData);
                     // We preserve the invariants
-                    let datum = unsafe { ::pgrx::pg_sys::submodules::panic::pgrx_extern_c_guard(move || _internal_wrapper(fcinfo)) };
+                    let datum = unsafe { ::pgrx::pg_sys::submodules::panic::pgrx_extern_c_guard(|| _internal_wrapper(&mut fcinfo)) };
                     datum.sans_lifetime()
                 };
                 finfo_v1_extern_c(&self.func, fcinfo_ident, wrapper_code)
