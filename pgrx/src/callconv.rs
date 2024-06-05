@@ -459,8 +459,7 @@ impl<'fcx> FcInfo<'fcx> {
     pub unsafe fn srf_return_next(&mut self) {
         unsafe {
             self.deref_fcx().call_cntr += 1;
-            (*((*self.0).resultinfo as *mut pg_sys::ReturnSetInfo)).isDone =
-                pg_sys::ExprDoneCond_ExprMultipleResult;
+            self.get_result_info().set_is_done(pg_sys::ExprDoneCond_ExprMultipleResult);
         }
     }
 
@@ -470,17 +469,99 @@ impl<'fcx> FcInfo<'fcx> {
     pub unsafe fn srf_return_done(&mut self) {
         unsafe {
             pg_sys::end_MultiFuncCall(self.0, self.deref_fcx());
-            (*self.get_result_info()).isDone =
-                pg_sys::ExprDoneCond_ExprEndResult;
+            self.get_result_info().set_is_done(pg_sys::ExprDoneCond_ExprEndResult);
         }
     }
-    
+
     /// # Safety
     /// Do not corrupt the `pg_sys::ReturnSetInfo` struct's data.
     #[inline]
-    pub unsafe fn get_result_info(&self) -> *mut pg_sys::ReturnSetInfo { 
+    pub unsafe fn get_result_info(&self) -> ReturnSetInfoWrapper<'fcx> { 
         unsafe {
-            (*self.0).resultinfo as *mut pg_sys::ReturnSetInfo
+            ReturnSetInfoWrapper::assume_valid((*self.0).resultinfo as *mut pg_sys::ReturnSetInfo)
+        }
+    }
+}
+
+#[derive(Clone)]
+pub struct ReturnSetInfoWrapper<'fcx>(
+    *mut pg_sys::ReturnSetInfo,
+    std::marker::PhantomData<&'fcx mut pg_sys::ReturnSetInfo>,
+);
+
+impl<'fcx> ReturnSetInfoWrapper<'fcx> {
+    /// Constructor, used to wrap a ReturnSetInfo provided by Postgres.
+    ///
+    /// # Safety
+    ///
+    /// This function is unsafe as we cannot ensure the `retinfo` argument is a valid
+    /// [`pg_sys::ReturnSetInfo`] pointer.  This is your responsibility.
+    #[inline]
+    pub unsafe fn assume_valid(retinfo: *mut pg_sys::ReturnSetInfo) -> ReturnSetInfoWrapper<'fcx> {
+        let _nullptr_check =
+            std::ptr::NonNull::new(retinfo).expect("fcinfo pointer must be non-null");
+        Self(retinfo, std::marker::PhantomData)
+    }
+    /*
+    /* result status from function (but pre-initialized by caller): */
+	SetFunctionReturnMode returnMode;	/* actual return mode */
+	ExprDoneCond isDone;		/* status for ValuePerCall mode */
+	/* fields filled by function in Materialize return mode: */
+	Tuplestorestate *setResult; /* holds the complete returned tuple set */
+	TupleDesc	setDesc;		/* actual descriptor for returned tuples */
+    */
+    // These four fields are, in-practice, owned by the callee.
+    /// Status for ValuePerCall mode.
+    pub fn set_is_done(&mut self, value: pg_sys::ExprDoneCond) { 
+        unsafe {
+            (*self.0).isDone = value;
+        }
+    }
+    /// Status for ValuePerCall mode.
+    pub fn get_is_done(&self) -> pg_sys::ExprDoneCond {
+        unsafe {
+            (*self.0).isDone
+        }
+    }
+    /// Actual return mode. 
+    pub fn set_return_mode(&mut self, return_mode: pgrx_pg_sys::SetFunctionReturnMode) {
+        unsafe {
+            (*self.0).returnMode = return_mode;
+        }
+    }
+    /// Actual return mode. 
+    pub fn get_return_mode(&self) -> pgrx_pg_sys::SetFunctionReturnMode {
+        unsafe {
+            (*self.0).returnMode
+        }
+    }
+    /// Holds the complete returned tuple set.
+    pub fn set_tuple_result(&mut self, set_result: *mut pgrx_pg_sys::Tuplestorestate) {
+        unsafe { 
+            (*self.0).setResult = set_result;
+        }
+    }
+    /// Holds the complete returned tuple set.
+    /// 
+    /// Safety: There is no guarantee this has been initialized. 
+    /// This may be a null pointer.
+    pub fn get_tuple_result(&self) -> *mut pgrx_pg_sys::Tuplestorestate {
+        unsafe { 
+            (*self.0).setResult
+        }
+    }
+
+    /// Actual descriptor for returned tuples.
+    pub fn set_tuple_desc(&mut self, desc: *mut pgrx_pg_sys::TupleDescData) { 
+        unsafe{
+            (*self.0).setDesc = desc;
+        }
+    }
+
+    /// Actual descriptor for returned tuples.
+    pub fn get_tuple_desc(&mut self) -> *mut pgrx_pg_sys::TupleDescData { 
+        unsafe{
+            (*self.0).setDesc
         }
     }
 }
