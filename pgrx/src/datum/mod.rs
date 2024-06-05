@@ -142,8 +142,8 @@ impl<'src> Datum<'src> {
         self.0
     }
     /// Construct a Datum containing only a null pointer.
-    pub fn null() -> Datum<'src> { 
-        Self (pg_sys::Datum::from(0), PhantomData)
+    pub fn null() -> Datum<'src> {
+        Self(pg_sys::Datum::from(0), PhantomData)
     }
 }
 

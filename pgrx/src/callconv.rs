@@ -340,7 +340,7 @@ impl<'fcx> FcInfo<'fcx> {
         }
     }
 
-    /// Retrieves the internal [`pg_sys::FunctionCallInfo`] wrapped by this type. 
+    /// Retrieves the internal [`pg_sys::FunctionCallInfo`] wrapped by this type.
     /// A FunctionCallInfo is a mutable pointer to a FunctionCallInfoBaseData already, and so
     /// that type is sufficient.
     #[inline]
@@ -390,9 +390,15 @@ impl<'fcx> FcInfo<'fcx> {
         // SAFETY: see FcInfo::assume_valid
         unsafe {
             // bool::then() is lazy-evaluated, then_some is not.
-            (num < ((*self.0).nargs as usize)).then( #[inline] || {
-                pg_sys::get_fn_expr_argtype(self.0.as_ref().unwrap().flinfo, num as std::os::raw::c_int)
-            })
+            (num < ((*self.0).nargs as usize)).then(
+                #[inline]
+                || {
+                    pg_sys::get_fn_expr_argtype(
+                        self.0.as_ref().unwrap().flinfo,
+                        num as std::os::raw::c_int,
+                    )
+                },
+            )
         }
     }
 
@@ -476,7 +482,7 @@ impl<'fcx> FcInfo<'fcx> {
     /// # Safety
     /// Do not corrupt the `pg_sys::ReturnSetInfo` struct's data.
     #[inline]
-    pub unsafe fn get_result_info(&self) -> ReturnSetInfoWrapper<'fcx> { 
+    pub unsafe fn get_result_info(&self) -> ReturnSetInfoWrapper<'fcx> {
         unsafe {
             ReturnSetInfoWrapper::assume_valid((*self.0).resultinfo as *mut pg_sys::ReturnSetInfo)
         }
@@ -504,64 +510,56 @@ impl<'fcx> ReturnSetInfoWrapper<'fcx> {
     }
     /*
     /* result status from function (but pre-initialized by caller): */
-	SetFunctionReturnMode returnMode;	/* actual return mode */
-	ExprDoneCond isDone;		/* status for ValuePerCall mode */
-	/* fields filled by function in Materialize return mode: */
-	Tuplestorestate *setResult; /* holds the complete returned tuple set */
-	TupleDesc	setDesc;		/* actual descriptor for returned tuples */
+    SetFunctionReturnMode returnMode;	/* actual return mode */
+    ExprDoneCond isDone;		/* status for ValuePerCall mode */
+    /* fields filled by function in Materialize return mode: */
+    Tuplestorestate *setResult; /* holds the complete returned tuple set */
+    TupleDesc	setDesc;		/* actual descriptor for returned tuples */
     */
     // These four fields are, in-practice, owned by the callee.
     /// Status for ValuePerCall mode.
-    pub fn set_is_done(&mut self, value: pg_sys::ExprDoneCond) { 
+    pub fn set_is_done(&mut self, value: pg_sys::ExprDoneCond) {
         unsafe {
             (*self.0).isDone = value;
         }
     }
     /// Status for ValuePerCall mode.
     pub fn get_is_done(&self) -> pg_sys::ExprDoneCond {
-        unsafe {
-            (*self.0).isDone
-        }
+        unsafe { (*self.0).isDone }
     }
-    /// Actual return mode. 
+    /// Actual return mode.
     pub fn set_return_mode(&mut self, return_mode: pgrx_pg_sys::SetFunctionReturnMode) {
         unsafe {
             (*self.0).returnMode = return_mode;
         }
     }
-    /// Actual return mode. 
+    /// Actual return mode.
     pub fn get_return_mode(&self) -> pgrx_pg_sys::SetFunctionReturnMode {
-        unsafe {
-            (*self.0).returnMode
-        }
+        unsafe { (*self.0).returnMode }
     }
     /// Holds the complete returned tuple set.
     pub fn set_tuple_result(&mut self, set_result: *mut pgrx_pg_sys::Tuplestorestate) {
-        unsafe { 
+        unsafe {
             (*self.0).setResult = set_result;
         }
     }
     /// Holds the complete returned tuple set.
-    /// 
-    /// Safety: There is no guarantee this has been initialized. 
+    ///
+    /// Safety: There is no guarantee this has been initialized.
     /// This may be a null pointer.
     pub fn get_tuple_result(&self) -> *mut pgrx_pg_sys::Tuplestorestate {
-        unsafe { 
-            (*self.0).setResult
-        }
+        unsafe { (*self.0).setResult }
     }
 
     /// Actual descriptor for returned tuples.
-    pub fn set_tuple_desc(&mut self, desc: *mut pgrx_pg_sys::TupleDescData) { 
-        unsafe{
+    pub fn set_tuple_desc(&mut self, desc: *mut pgrx_pg_sys::TupleDescData) {
+        unsafe {
             (*self.0).setDesc = desc;
         }
     }
 
     /// Actual descriptor for returned tuples.
-    pub fn get_tuple_desc(&mut self) -> *mut pgrx_pg_sys::TupleDescData { 
-        unsafe{
-            (*self.0).setDesc
-        }
+    pub fn get_tuple_desc(&mut self) -> *mut pgrx_pg_sys::TupleDescData {
+        unsafe { (*self.0).setDesc }
     }
 }
