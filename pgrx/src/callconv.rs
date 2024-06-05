@@ -318,7 +318,7 @@ impl<'fcx> FcInfo<'fcx> {
     /// This function is unsafe as we cannot ensure the `fcinfo` argument is a valid
     /// [`pg_sys::FunctionCallInfo`] pointer.  This is your responsibility.
     #[inline]
-    pub unsafe fn assume_valid(fcinfo: pg_sys::FunctionCallInfo) -> FcInfo<'fcx> {
+    pub unsafe fn from_ptr(fcinfo: pg_sys::FunctionCallInfo) -> FcInfo<'fcx> {
         let _nullptr_check =
             std::ptr::NonNull::new(fcinfo).expect("fcinfo pointer must be non-null");
         Self(fcinfo, std::marker::PhantomData)
@@ -378,7 +378,7 @@ impl<'fcx> FcInfo<'fcx> {
     /// otherwise it will return Some(oid).
     #[inline]
     pub fn get_collation(&self) -> Option<pg_sys::Oid> {
-        // SAFETY: see FcInfo::assume_valid
+        // SAFETY: see FcInfo::from_ptr
         let fcinfo = unsafe { self.0.as_mut() }.unwrap();
         (fcinfo.fncollation.as_u32() != 0).then_some(fcinfo.fncollation)
     }
@@ -387,7 +387,7 @@ impl<'fcx> FcInfo<'fcx> {
     /// In other words, the type of `self.raw_args()[num]`
     #[inline]
     pub fn get_arg_type(&self, num: usize) -> Option<pg_sys::Oid> {
-        // SAFETY: see FcInfo::assume_valid
+        // SAFETY: see FcInfo::from_ptr
         unsafe {
             // bool::then() is lazy-evaluated, then_some is not.
             (num < ((*self.0).nargs as usize)).then(
@@ -408,7 +408,7 @@ impl<'fcx> FcInfo<'fcx> {
         &self,
         default: DefaultValue,
     ) -> NonNull<pg_sys::FuncCallContext> {
-        // Safety: User must supply a valid fcinfo to assume_valid() in order
+        // Safety: User must supply a valid fcinfo to from_ptr() in order
         // to construct a FcInfo. If that constraint is maintained, this should
         // be safe.
         unsafe {
@@ -426,7 +426,7 @@ impl<'fcx> FcInfo<'fcx> {
 
     #[inline]
     pub fn srf_is_initialized(&self) -> bool {
-        // Safety: User must supply a valid fcinfo to assume_valid() in order
+        // Safety: User must supply a valid fcinfo to from_ptr() in order
         // to construct a FcInfo. If that constraint is maintained, this should
         // be safe.
         unsafe { !(*(*self.0).flinfo).fn_extra.is_null() }
@@ -484,7 +484,7 @@ impl<'fcx> FcInfo<'fcx> {
     #[inline]
     pub unsafe fn get_result_info(&self) -> ReturnSetInfoWrapper<'fcx> {
         unsafe {
-            ReturnSetInfoWrapper::assume_valid((*self.0).resultinfo as *mut pg_sys::ReturnSetInfo)
+            ReturnSetInfoWrapper::from_ptr((*self.0).resultinfo as *mut pg_sys::ReturnSetInfo)
         }
     }
 }
@@ -503,7 +503,7 @@ impl<'fcx> ReturnSetInfoWrapper<'fcx> {
     /// This function is unsafe as we cannot ensure the `retinfo` argument is a valid
     /// [`pg_sys::ReturnSetInfo`] pointer.  This is your responsibility.
     #[inline]
-    pub unsafe fn assume_valid(retinfo: *mut pg_sys::ReturnSetInfo) -> ReturnSetInfoWrapper<'fcx> {
+    pub unsafe fn from_ptr(retinfo: *mut pg_sys::ReturnSetInfo) -> ReturnSetInfoWrapper<'fcx> {
         let _nullptr_check =
             std::ptr::NonNull::new(retinfo).expect("fcinfo pointer must be non-null");
         Self(retinfo, std::marker::PhantomData)
