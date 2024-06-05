@@ -26,18 +26,6 @@ use core::panic::{RefUnwindSafe, UnwindSafe};
 use std::ffi::{CStr, CString};
 use std::ptr::NonNull;
 
-type FcinfoData = pg_sys::FunctionCallInfoBaseData;
-// FIXME: replace with a real implementation
-pub struct Fcinfo<'a>(pub pg_sys::FunctionCallInfo, pub PhantomData<&'a mut FcinfoData>);
-impl<'fcx> UnwindSafe for Fcinfo<'fcx> {}
-impl<'fcx> RefUnwindSafe for Fcinfo<'fcx> {}
-
-type FcinfoData = pg_sys::FunctionCallInfoBaseData;
-// FIXME: replace with a real implementation
-pub struct Fcinfo<'a>(pub pg_sys::FunctionCallInfo, pub PhantomData<&'a mut FcinfoData>);
-impl<'fcx> UnwindSafe for Fcinfo<'fcx> {}
-impl<'fcx> RefUnwindSafe for Fcinfo<'fcx> {}
-
 /// How to pass a value from Postgres to Rust
 ///
 /// This bound is necessary to distinguish things which can be passed into a `#[pg_extern] fn`.
@@ -60,12 +48,12 @@ pub unsafe trait ArgAbi<'fcx>: Sized {
     ///
     /// this weird signature allows variadic arguments to work correctly
     // FIXME: use an iterator or something?
-    unsafe fn unbox_from_fcinfo_index(fcinfo: &mut Fcinfo<'fcx>, index: &mut usize) -> Self;
+    unsafe fn unbox_from_fcinfo_index(fcinfo: &mut FcInfo<'fcx>, index: &mut usize) -> Self;
 
     unsafe fn uhh() -> () {}
 }
 
-pub fn wrap_fn<'fcx, A, F: FunctionMetadata<A>>(fcinfo: &mut Fcinfo<'fcx>, f: F) -> Datum<'fcx> {
+pub fn wrap_fn<'fcx, A, F: FunctionMetadata<A>>(fcinfo: &mut FcInfo<'fcx>, f: F) -> Datum<'fcx> {
     todo!()
 }
 
@@ -73,7 +61,7 @@ unsafe impl<'fcx, T> ArgAbi<'fcx> for crate::datum::Array<'fcx, T>
 where
     T: ArgAbi<'fcx>,
 {
-    unsafe fn unbox_from_fcinfo_index(fcinfo: &mut Fcinfo<'fcx>, index: &mut usize) -> Self {
+    unsafe fn unbox_from_fcinfo_index(fcinfo: &mut FcInfo<'fcx>, index: &mut usize) -> Self {
         todo!()
     }
 }
@@ -82,7 +70,7 @@ unsafe impl<'fcx, W> ArgAbi<'fcx> for PgHeapTuple<'fcx, W>
 where
     W: crate::WhoAllocated + 'fcx,
 {
-    unsafe fn unbox_from_fcinfo_index(fcinfo: &mut Fcinfo<'fcx>, index: &mut usize) -> Self {
+    unsafe fn unbox_from_fcinfo_index(fcinfo: &mut FcInfo<'fcx>, index: &mut usize) -> Self {
         todo!()
     }
 }
@@ -91,7 +79,7 @@ unsafe impl<'fcx, T> ArgAbi<'fcx> for Option<T>
 where
     T: ArgAbi<'fcx>,
 {
-    unsafe fn unbox_from_fcinfo_index(fcinfo: &mut Fcinfo<'fcx>, index: &mut usize) -> Self {
+    unsafe fn unbox_from_fcinfo_index(fcinfo: &mut FcInfo<'fcx>, index: &mut usize) -> Self {
         // check null
         if true {
             *index += 1;
@@ -105,7 +93,7 @@ where
 macro_rules! argue_from_datum {
     ($($unboxable:ty),*) => {
         $(unsafe impl<'fcx> ArgAbi<'fcx> for $unboxable {
-            unsafe fn unbox_from_fcinfo_index(fcinfo: &mut Fcinfo<'fcx>, index: &mut usize) -> Self {
+            unsafe fn unbox_from_fcinfo_index(fcinfo: &mut FcInfo<'fcx>, index: &mut usize) -> Self {
                 unsafe {
                     let pg_sys::NullableDatum { value, isnull } = crate::fcinfo::pg_get_nullable_datum(fcinfo.0, *index);
                     let value: Self = crate::datum::FromDatum::from_datum(value, isnull)
@@ -135,7 +123,7 @@ unsafe impl<'fcx, T> ArgAbi<'fcx> for Defaulted<T>
 where
     T: ArgAbi<'fcx>,
 {
-    unsafe fn unbox_from_fcinfo_index(fcinfo: &mut Fcinfo<'fcx>, index: &mut usize) -> Self {
+    unsafe fn unbox_from_fcinfo_index(fcinfo: &mut FcInfo<'fcx>, index: &mut usize) -> Self {
         Defaulted(unsafe { <T as ArgAbi>::unbox_from_fcinfo_index(fcinfo, index) })
     }
 }
@@ -150,7 +138,7 @@ unsafe impl<'fcx, T> ArgAbi<'fcx> for Named<T>
 where
     T: ArgAbi<'fcx>,
 {
-    unsafe fn unbox_from_fcinfo_index(fcinfo: &mut Fcinfo<'fcx>, index: &mut usize) -> Self {
+    unsafe fn unbox_from_fcinfo_index(fcinfo: &mut FcInfo<'fcx>, index: &mut usize) -> Self {
         Named(unsafe { <T as ArgAbi<'fcx>>::unbox_from_fcinfo_index(fcinfo, index) })
     }
 }
@@ -164,7 +152,7 @@ unsafe impl<'fcx, T> ArgAbi<'fcx> for CompositeType<T>
 where
     T: ArgAbi<'fcx>,
 {
-    unsafe fn unbox_from_fcinfo_index(fcinfo: &mut Fcinfo<'fcx>, index: &mut usize) -> Self {
+    unsafe fn unbox_from_fcinfo_index(fcinfo: &mut FcInfo<'fcx>, index: &mut usize) -> Self {
         CompositeType(unsafe { <T as ArgAbi>::unbox_from_fcinfo_index(fcinfo, index) })
     }
 }
@@ -195,7 +183,7 @@ pub unsafe trait RetAbi: Sized {
         CallCx::WrappedFn(unsafe { pg_sys::CurrentMemoryContext })
     }
 
-    fn check_and_prepare<'fcx>(fcinfo: &mut Fcinfo<'fcx>) -> CallCx {
+    fn check_and_prepare<'fcx>(fcinfo: &mut FcInfo<'fcx>) -> CallCx {
         unsafe { Self::check_fcinfo_and_prepare(fcinfo.0) }
     }
 
@@ -203,7 +191,7 @@ pub unsafe trait RetAbi: Sized {
     fn to_ret(self) -> Self::Ret;
 
     // move into the function context and obtain a Datum
-    fn box_ret_in<'fcx>(fcinfo: &mut Fcinfo<'fcx>, ret: Self::Ret) -> Datum<'fcx> {
+    fn box_ret_in<'fcx>(fcinfo: &mut FcInfo<'fcx>, ret: Self::Ret) -> Datum<'fcx> {
         let fcinfo = fcinfo.0;
         unsafe { mem::transmute(unsafe { Self::box_ret_in_fcinfo(fcinfo, ret) }) }
     }
@@ -232,7 +220,7 @@ pub unsafe trait RetAbi: Sized {
         unimplemented!()
     }
 
-    fn ret_from_fcx<'fcx>(fcinfo: &mut Fcinfo<'fcx>) -> Self::Ret {
+    fn ret_from_fcx<'fcx>(fcinfo: &mut FcInfo<'fcx>) -> Self::Ret {
         let fcinfo = fcinfo.0;
         unsafe { Self::ret_from_fcinfo_fcx(fcinfo) }
     }
