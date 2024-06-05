@@ -141,6 +141,10 @@ impl<'src> Datum<'src> {
     pub fn sans_lifetime(self) -> pg_sys::Datum {
         self.0
     }
+    /// Construct a Datum containing only a null pointer.
+    pub fn null() -> Datum<'src> {
+        Self(pg_sys::Datum::from(0), PhantomData)
+    }
 }
 
 /// A tagging trait to indicate a user type is also meant to be used by Postgres
