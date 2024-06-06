@@ -643,7 +643,7 @@ pub fn postgres_enum(input: TokenStream) -> TokenStream {
 fn impl_postgres_enum(ast: DeriveInput) -> syn::Result<proc_macro2::TokenStream> {
     let mut stream = proc_macro2::TokenStream::new();
     let sql_graph_entity_ast = ast.clone();
-    let generics = &ast.generics;
+    let generics = &ast.generics.clone();
     let enum_ident = &ast.ident;
     let enum_name = enum_ident.to_string();
 
@@ -666,6 +666,24 @@ fn impl_postgres_enum(ast: DeriveInput) -> syn::Result<proc_macro2::TokenStream>
         into_datum.extend(quote! { #enum_ident::#label_ident => Some(::pgrx::enum_helper::lookup_enum_by_label(#enum_name, #label_string)), });
     }
 
+    // We need another variant of the params for the ArgAbi impl
+    let fcx_lt = syn::Lifetime::new("'fcx", proc_macro2::Span::mixed_site());
+    let mut generics_with_fcx = generics.clone();
+    // so that we can bound on Self: 'fcx
+    generics_with_fcx.make_where_clause().predicates.push(syn::WherePredicate::Type(
+        syn::PredicateType {
+            lifetimes: None,
+            bounded_ty: syn::parse_quote! { Self },
+            colon_token: syn::Token![:](proc_macro2::Span::mixed_site()),
+            bounds: syn::parse_quote! { #fcx_lt },
+        },
+    ));
+    let (impl_gens, ty_gens, where_clause) = generics_with_fcx.split_for_impl();
+    let mut impl_gens: syn::Generics = syn::parse_quote! { #impl_gens };
+    impl_gens
+        .params
+        .insert(0, syn::GenericParam::Lifetime(syn::LifetimeParam::new(fcx_lt.clone())));
+
     stream.extend(quote! {
         impl ::pgrx::datum::FromDatum for #enum_ident {
             #[inline]
@@ -679,6 +697,19 @@ fn impl_postgres_enum(ast: DeriveInput) -> syn::Result<proc_macro2::TokenStream>
                         #from_datum
                         _ => panic!("invalid enum value: {name}")
                     }
+                }
+            }
+        }
+
+        unsafe impl #impl_gens ::pgrx::callconv::ArgAbi<#fcx_lt> for #enum_ident #ty_gens #where_clause {
+            unsafe fn unbox_from_fcinfo_index(fcinfo: &mut ::pgrx::callconv::FcInfo<#fcx_lt>, index: &mut usize) -> Self {
+                let Some(pg_sys::NullableDatum { value, isnull }) = fcinfo.raw_args().get(*index) else {
+                    panic!("{index} is out of bounds of fcinfo!")
+                };
+                *index += 1;
+                unsafe {
+                    <Self as ::pgrx::datum::FromDatum>::from_datum(*value, *isnull)
+                        .unwrap_or_else(|| panic!("argument {index} must not be null"))
                 }
             }
         }
@@ -761,7 +792,7 @@ pub fn postgres_type(input: TokenStream) -> TokenStream {
 
 fn impl_postgres_type(ast: DeriveInput) -> syn::Result<proc_macro2::TokenStream> {
     let name = &ast.ident;
-    let generics = &ast.generics;
+    let generics = &ast.generics.clone();
     let has_lifetimes = generics.lifetimes().next();
     let funcname_in = Ident::new(&format!("{name}_in").to_lowercase(), name.span());
     let funcname_out = Ident::new(&format!("{name}_out").to_lowercase(), name.span());
@@ -793,6 +824,24 @@ fn impl_postgres_type(ast: DeriveInput) -> syn::Result<proc_macro2::TokenStream>
         Some(lifetime) => quote! {#lifetime},
         None => quote! {'_},
     };
+
+    // We need another variant of the params for the ArgAbi impl
+    let fcx_lt = syn::Lifetime::new("'fcx", proc_macro2::Span::mixed_site());
+    let mut generics_with_fcx = generics.clone();
+    // so that we can bound on Self: 'fcx
+    generics_with_fcx.make_where_clause().predicates.push(syn::WherePredicate::Type(
+        syn::PredicateType {
+            lifetimes: None,
+            bounded_ty: syn::parse_quote! { Self },
+            colon_token: syn::Token![:](proc_macro2::Span::mixed_site()),
+            bounds: syn::parse_quote! { #fcx_lt },
+        },
+    ));
+    let (impl_gens, ty_gens, where_clause) = generics_with_fcx.split_for_impl();
+    let mut impl_gens: syn::Generics = syn::parse_quote! { #impl_gens };
+    impl_gens
+        .params
+        .insert(0, syn::GenericParam::Lifetime(syn::LifetimeParam::new(fcx_lt.clone())));
 
     // all #[derive(PostgresType)] need to implement that trait
     // and also the FromDatum and IntoDatum
@@ -859,6 +908,20 @@ fn impl_postgres_type(ast: DeriveInput) -> syn::Result<proc_macro2::TokenStream>
                     type As<'dat> = Self where Self: 'dat;
                     unsafe fn unbox<'dat>(datum: ::pgrx::datum::Datum<'dat>) -> Self::As<'dat> where Self: 'dat {
                         <Self as ::pgrx::datum::FromDatum>::from_datum(::core::mem::transmute(datum), false).unwrap()
+                    }
+                }
+
+                unsafe impl #impl_gens ::pgrx::callconv::ArgAbi<#fcx_lt> for #name #ty_gens #where_clause
+                {
+                    unsafe fn unbox_from_fcinfo_index(fcinfo: &mut ::pgrx::callconv::FcInfo<#fcx_lt>, index: &mut usize) -> Self {
+                        let Some(pg_sys::NullableDatum { value, isnull }) = fcinfo.raw_args().get(*index) else {
+                            panic!("{index} is out of bounds of fcinfo!")
+                        };
+                        *index += 1;
+                        unsafe {
+                            <Self as ::pgrx::datum::FromDatum>::from_datum(*value, *isnull)
+                                .unwrap_or_else(|| panic!("argument {index} must not be null"))
+                        }
                     }
                 }
             }

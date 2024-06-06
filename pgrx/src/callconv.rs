@@ -17,8 +17,9 @@ use pgrx_sql_entity_graph::metadata::FunctionMetadata;
 use crate::datum::Datum;
 use crate::heap_tuple::PgHeapTuple;
 use crate::{
-    pg_return_null, pg_sys, AnyNumeric, Date, Inet, Internal, Interval, IntoDatum, Json, PgBox,
-    PgMemoryContexts, PgVarlena, Time, TimeWithTimeZone, Timestamp, TimestampWithTimeZone, Uuid,
+    pg_return_null, pg_sys, AnyNumeric, Date, FromDatum, Inet, Internal, Interval, IntoDatum, Json,
+    PgBox, PgMemoryContexts, PgVarlena, Time, TimeWithTimeZone, Timestamp, TimestampWithTimeZone,
+    UnboxDatum, Uuid,
 };
 use core::marker::PhantomData;
 use core::mem;
@@ -68,7 +69,7 @@ where
 
 unsafe impl<'fcx, W> ArgAbi<'fcx> for PgHeapTuple<'fcx, W>
 where
-    W: crate::WhoAllocated + 'fcx,
+    W: crate::WhoAllocated,
 {
     unsafe fn unbox_from_fcinfo_index(fcinfo: &mut FcInfo<'fcx>, index: &mut usize) -> Self {
         todo!()
@@ -90,13 +91,69 @@ where
     }
 }
 
+unsafe impl<'fcx, T> ArgAbi<'fcx> for crate::Range<T>
+where
+    T: FromDatum + crate::RangeSubType,
+{
+    unsafe fn unbox_from_fcinfo_index(fcinfo: &mut FcInfo<'fcx>, index: &mut usize) -> Self {
+        let Some(pg_sys::NullableDatum { value, isnull }) = fcinfo.raw_args().get(*index) else {
+            panic!("{index} is out of bounds of fcinfo!")
+        };
+        *index += 1;
+        unsafe {
+            crate::Range::<T>::from_datum(*value, *isnull)
+                .unwrap_or_else(|| panic!("argument {index} must not be null"))
+        }
+    }
+}
+
+unsafe impl<'fcx, T> ArgAbi<'fcx> for Vec<T>
+where
+    for<'mcx> T: FromDatum + UnboxDatum<As<'mcx> = T> + 'mcx,
+{
+    unsafe fn unbox_from_fcinfo_index(fcinfo: &mut FcInfo<'fcx>, index: &mut usize) -> Self {
+        let Some(pg_sys::NullableDatum { value, isnull }) = fcinfo.raw_args().get(*index) else {
+            panic!("{index} is out of bounds of fcinfo!")
+        };
+        *index += 1;
+        unsafe {
+            Vec::<T>::from_datum(*value, *isnull)
+                .unwrap_or_else(|| panic!("argument {index} must not be null"))
+        }
+    }
+}
+
+unsafe impl<'fcx, T: Copy> ArgAbi<'fcx> for PgVarlena<T> {
+    unsafe fn unbox_from_fcinfo_index(fcinfo: &mut FcInfo<'fcx>, index: &mut usize) -> Self {
+        let Some(pg_sys::NullableDatum { value, isnull }) = fcinfo.raw_args().get(*index) else {
+            panic!("{index} is out of bounds of fcinfo!")
+        };
+        *index += 1;
+        assert_eq!(*isnull, false, "PgVarlena from argument {index} must not be null");
+        unsafe { Self::from_datum(*value) }
+    }
+}
+
+unsafe impl<'fcx, const P: u32, const S: u32> ArgAbi<'fcx> for crate::Numeric<P, S> {
+    unsafe fn unbox_from_fcinfo_index(fcinfo: &mut FcInfo<'fcx>, index: &mut usize) -> Self {
+        let Some(pg_sys::NullableDatum { value, isnull }) = fcinfo.raw_args().get(*index) else {
+            panic!("{index} is out of bounds of fcinfo!")
+        };
+        *index += 1;
+        unsafe {
+            Self::from_datum(*value, *isnull)
+                .unwrap_or_else(|| panic!("argument {index} must not be null"))
+        }
+    }
+}
+
 macro_rules! argue_from_datum {
-    ($($unboxable:ty),*) => {
-        $(unsafe impl<'fcx> ArgAbi<'fcx> for $unboxable {
-            unsafe fn unbox_from_fcinfo_index(fcinfo: &mut FcInfo<'fcx>, index: &mut usize) -> Self {
+    ($lt:lifetime; $($unboxable:ty),*) => {
+        $(unsafe impl<$lt> ArgAbi<$lt> for $unboxable {
+            unsafe fn unbox_from_fcinfo_index(fcinfo: &mut FcInfo<$lt>, index: &mut usize) -> Self {
                 unsafe {
                     let pg_sys::NullableDatum { value, isnull } = crate::fcinfo::pg_get_nullable_datum(fcinfo.0, *index);
-                    let value: Self = crate::datum::FromDatum::from_datum(value, isnull)
+                    let value: Self = FromDatum::from_datum(value, isnull)
                         .unwrap_or_else(|| panic!("argument {index} must not be null"));
                     *index += 1;
                     value
@@ -106,7 +163,10 @@ macro_rules! argue_from_datum {
     };
 }
 
-argue_from_datum! { i8, i16, i32, i64, f32, f64, bool, String }
+argue_from_datum! { 'fcx; i8, i16, i32, i64, f32, f64, bool, String }
+argue_from_datum! { 'fcx; Date, Interval, Time, TimeWithTimeZone, Timestamp, TimestampWithTimeZone }
+argue_from_datum! { 'fcx; AnyNumeric, pg_sys::Oid }
+argue_from_datum! { 'fcx; &'fcx str, &'fcx CStr, &'fcx [u8] }
 
 // problem: our macros?
 // idea: new structs? only expand to them sometimes? maybe? idk
