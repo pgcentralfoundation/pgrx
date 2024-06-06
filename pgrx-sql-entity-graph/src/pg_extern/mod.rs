@@ -450,9 +450,11 @@ impl PgExtern {
                             ::core::mem::transmute(unsafe { <#ret_ty as ::pgrx::callconv::RetAbi>::box_ret_in(#fcinfo_ident, result) })
                         }
                     }
-                    let mut fcinfo = unsafe { ::pgrx::callconv::FcInfo::from_ptr(#fcinfo_ident) };
                     // We preserve the invariants
-                    let datum = unsafe { ::pgrx::pg_sys::submodules::panic::pgrx_extern_c_guard(|| _internal_wrapper(&mut fcinfo)) };
+                    let datum = unsafe { ::pgrx::pg_sys::submodules::panic::pgrx_extern_c_guard(|| {
+                        let mut fcinfo = ::pgrx::callconv::FcInfo::from_ptr(#fcinfo_ident) ;
+                        _internal_wrapper(&mut fcinfo)
+                    })};
                     datum.sans_lifetime()
                 };
                 finfo_v1_extern_c(&self.func, fcinfo_ident, wrapper_code)
