@@ -1,0 +1,18 @@
+error: cannot find attribute `pg_extern` in this scope
+ --> tests/compile-fail/postgres-strings-arent-immortal.rs:1:3
+  |
+1 | #[pg_extern]
+  |   ^^^^^^^^^
+  |
+help: consider importing one of these items
+  |
+1 + use pgrx::pg_extern;
+  |
+1 + use pgrx_macros::pg_extern;
+  |
+
+error[E0601]: `main` function not found in crate `$CRATE`
+ --> tests/compile-fail/postgres-strings-arent-immortal.rs:4:2
+  |
+4 | }
+  |  ^ consider adding a `main` function to `$DIR/tests/compile-fail/postgres-strings-arent-immortal.rs`
