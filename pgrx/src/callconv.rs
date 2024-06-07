@@ -181,7 +181,7 @@ macro_rules! argue_from_datum {
     };
 }
 
-argue_from_datum! { 'fcx; i8, i16, i32, i64, f32, f64, bool, char, String }
+argue_from_datum! { 'fcx; i8, i16, i32, i64, f32, f64, bool, char, String, Vec<u8> }
 argue_from_datum! { 'fcx; Date, Interval, Time, TimeWithTimeZone, Timestamp, TimestampWithTimeZone }
 argue_from_datum! { 'fcx; AnyArray, AnyElement, AnyNumeric }
 argue_from_datum! { 'fcx; Inet, Internal, Json, Uuid }
