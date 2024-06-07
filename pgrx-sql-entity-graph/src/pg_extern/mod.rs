@@ -390,7 +390,7 @@ impl PgExtern {
             .filter(|lt| lt.ident != "static")
             .unwrap_or(syn::Lifetime::new("'fcx", Span::mixed_site()));
         let fc_ltparam = syn::LifetimeParam::new(fc_lt.clone());
-        if lifetimes.first() != Some(&&fc_ltparam) {
+        if lifetimes.first() != Some(&fc_ltparam) {
             lifetimes.insert(0, fc_ltparam)
         }
 
