@@ -393,7 +393,7 @@ impl PgExtern {
             if new_unboxing {
                 let pat = &arg_pats[idx];
                 let resolved_ty = &arg.used_ty.resolved_ty;
-                quote_spanned!{ pat.span() => 
+                quote_spanned!{ pat.span() =>
                     let #pat = <#resolved_ty as ::pgrx::callconv::ArgAbi>::unbox_from_fcinfo_index(#fcinfo_ident, &mut #idx);
                 }
             } else {
