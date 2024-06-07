@@ -14,6 +14,8 @@
 //! and `serde_cbor` to serialize internally as a `varlena *` for storage on disk.
 
 use crate::*;
+#[doc(hidden)]
+pub use serde_json::{from_slice as json_from_slice, to_vec as json_to_vec};
 
 /// `#[derive(Copy, Clone, PostgresType)]` types need to implement this trait to provide the text
 /// input/output functions for that type
@@ -45,28 +47,6 @@ pub trait InOutFuncs {
 
     /// Convert `Self` into text by writing to the supplied `StringInfo` buffer
     fn output(&self, buffer: &mut StringInfo);
-
-    /// If PostgreSQL calls the conversion function with NULL as an argument, what
-    /// error message should be generated?
-    const NULL_ERROR_MESSAGE: Option<&'static str> = None;
-}
-
-/// Automatically implemented for `#[derive(Serialize, Deserialize, PostgresType)]` types that do
-/// **not** also have the `#[inoutfuncs]` attribute macro
-pub trait JsonInOutFuncs<'de>: serde::de::Deserialize<'de> + serde::ser::Serialize {
-    /// Uses `serde_json` to deserialize the input, which is assumed to be JSON
-    fn input(input: &'de core::ffi::CStr) -> Self {
-        serde_json::from_str(input.to_str().expect("text input is not valid UTF8"))
-            .expect("failed to deserialize json")
-    }
-
-    /// Users `serde_json` to serialize `Self` into JSON
-    fn output(&self, buffer: &mut StringInfo)
-    where
-        Self: serde::ser::Serialize,
-    {
-        serde_json::to_writer(buffer, self).expect("failed to serialize to json")
-    }
 
     /// If PostgreSQL calls the conversion function with NULL as an argument, what
     /// error message should be generated?

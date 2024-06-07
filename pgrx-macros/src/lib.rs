@@ -791,7 +791,7 @@ fn impl_postgres_type(ast: DeriveInput) -> syn::Result<proc_macro2::TokenStream>
 
     let lifetime = match has_lifetimes {
         Some(lifetime) => quote! {#lifetime},
-        None => quote! {'static},
+        None => quote! {'_},
     };
 
     // all #[derive(PostgresType)] need to implement that trait
@@ -868,35 +868,22 @@ fn impl_postgres_type(ast: DeriveInput) -> syn::Result<proc_macro2::TokenStream>
     // and if we don't have custom inout/funcs, we use the JsonInOutFuncs trait
     // which implements _in and _out #[pg_extern] functions that just return the type itself
     if args.contains(&PostgresTypeAttribute::Default) {
-        let inout_generics = if has_lifetimes.is_some() {
-            quote! {#generics}
-        } else {
-            quote! {<'_>}
-        };
-
         stream.extend(quote! {
-            impl #generics ::pgrx::inoutfuncs::JsonInOutFuncs #inout_generics for #name #generics {}
-
             #[doc(hidden)]
             #[::pgrx::pgrx_macros::pg_extern(immutable,parallel_safe)]
             pub fn #funcname_in #generics(input: Option<&#lifetime ::core::ffi::CStr>) -> Option<#name #generics> {
-                input.map_or_else(|| {
-                    for m in <#name as ::pgrx::inoutfuncs::JsonInOutFuncs>::NULL_ERROR_MESSAGE {
-                        ::pgrx::pg_sys::error!("{m}");
-                    }
-                    None
-                }, |i| Some(<#name as ::pgrx::inoutfuncs::JsonInOutFuncs>::input(i)))
+                use ::pgrx::inoutfuncs::json_from_slice;
+                input.map(|cstr| json_from_slice(cstr.to_bytes()).ok()).flatten()
             }
 
             #[doc(hidden)]
             #[::pgrx::pgrx_macros::pg_extern (immutable,parallel_safe)]
-            pub fn #funcname_out #generics(input: #name #generics) -> &'static ::core::ffi::CStr {
-                let mut buffer = ::pgrx::stringinfo::StringInfo::new();
-                ::pgrx::inoutfuncs::JsonInOutFuncs::output(&input, &mut buffer);
-                // SAFETY: We just constructed this StringInfo ourselves
-                unsafe { buffer.leak_cstr() }
+            pub fn #funcname_out #generics(input: #name #generics) -> ::pgrx::ffi::CString {
+                use ::pgrx::inoutfuncs::json_to_vec;
+                let mut bytes = json_to_vec(&input).unwrap();
+                bytes.push(0); // terminate
+                ::pgrx::ffi::CString::from_vec_with_nul(bytes).unwrap()
             }
-
         });
     } else if args.contains(&PostgresTypeAttribute::InOutFuncs) {
         // otherwise if it's InOutFuncs our _in/_out functions use an owned type instance
