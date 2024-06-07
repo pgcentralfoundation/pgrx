@@ -374,14 +374,25 @@ impl PgExtern {
     }
 
     pub fn wrapper_func(&self) -> Result<syn::ItemFn, syn::Error> {
-        let func_name = &self.func.sig.ident;
+        let signature = &self.func.sig;
+        let func_name = &signature.ident;
         let is_raw = self.extern_attrs().contains(&Attribute::Raw);
         // We use a `_` prefix to make functions with no args more satisfied during linting.
-        let fcinfo_ident = syn::Ident::new("_fcinfo", self.func.sig.ident.span());
-        let lifetimes =
-            self.func.sig.generics.lifetimes().collect::<syn::punctuated::Punctuated<_, Comma>>();
-        let fc_lt = syn::Lifetime::new("'fcx", Span::mixed_site());
+        let fcinfo_ident = syn::Ident::new("_fcinfo", signature.ident.span());
+        let mut lifetimes = signature
+            .generics
+            .lifetimes()
+            .cloned()
+            .collect::<syn::punctuated::Punctuated<_, Comma>>();
+        let fc_lt = lifetimes
+            .first()
+            .map(|lt_p| lt_p.lifetime.clone())
+            .filter(|lt| lt.ident != "static")
+            .unwrap_or(syn::Lifetime::new("'fcx", Span::mixed_site()));
         let fc_ltparam = syn::LifetimeParam::new(fc_lt.clone());
+        if lifetimes.first() != Some(&&fc_ltparam) {
+            lifetimes.insert(0, fc_ltparam)
+        }
 
         let args = &self.inputs;
         let arg_pats = args.iter().map(|v| format_ident!("{}_", &v.pat)).collect::<Vec<_>>();
@@ -428,12 +439,12 @@ impl PgExtern {
             | Returning::Type(_)
             | Returning::SetOf { .. }
             | Returning::Iterated { .. } => {
-                let ret_ty = match &self.func.sig.output {
+                let ret_ty = match &signature.output {
                     syn::ReturnType::Default => syn::parse_quote! { () },
                     syn::ReturnType::Type(_, ret_ty) => ret_ty.clone(),
                 };
                 let wrapper_code = quote_spanned! { self.func.block.span() =>
-                    fn _internal_wrapper<#fc_ltparam, #lifetimes>(fcinfo: &mut ::pgrx::callconv::FcInfo<#fc_lt>) -> ::pgrx::datum::Datum<#fc_lt> {
+                    fn _internal_wrapper<#lifetimes>(fcinfo: &mut ::pgrx::callconv::FcInfo<#fc_lt>) -> ::pgrx::datum::Datum<#fc_lt> {
                         #[allow(unused_unsafe)]
                         unsafe {
                             let #fcinfo_ident = fcinfo;
