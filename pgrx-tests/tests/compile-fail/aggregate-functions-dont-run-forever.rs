@@ -1,3 +1,10 @@
+use pgrx::aggregate::*;
+use pgrx::prelude::*;
+
+const DOG_COMPOSITE_TYPE: &str = "Dog";
+
+struct SumScritches {}
+
 #[pg_aggregate]
 impl Aggregate for SumScritches {
     type State = i32;
@@ -54,3 +61,5 @@ impl Aggregate for ScritchCollector {
         Some(current)
     }
 }
+
+fn main() {}
