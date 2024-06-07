@@ -147,6 +147,12 @@ unsafe impl<'fcx, const P: u32, const S: u32> ArgAbi<'fcx> for crate::Numeric<P,
     }
 }
 
+unsafe impl<'fcx> ArgAbi<'fcx> for pg_sys::FunctionCallInfo {
+    unsafe fn unbox_from_fcinfo_index(fcinfo: &mut FcInfo<'fcx>, index: &mut usize) -> Self {
+        unsafe { fcinfo.as_mut_ptr() }
+    }
+}
+
 macro_rules! argue_from_datum {
     ($lt:lifetime; $($unboxable:ty),*) => {
         $(unsafe impl<$lt> ArgAbi<$lt> for $unboxable {
