@@ -703,7 +703,7 @@ fn impl_postgres_enum(ast: DeriveInput) -> syn::Result<proc_macro2::TokenStream>
 
         unsafe impl #impl_gens ::pgrx::callconv::ArgAbi<#fcx_lt> for #enum_ident #ty_gens #where_clause {
             unsafe fn unbox_from_fcinfo_index(fcinfo: &mut ::pgrx::callconv::FcInfo<#fcx_lt>, index: &mut usize) -> Self {
-                let Some(pg_sys::NullableDatum { value, isnull }) = fcinfo.raw_args().get(*index) else {
+                let Some(::pgrx::pg_sys::NullableDatum { value, isnull }) = fcinfo.raw_args().get(*index) else {
                     panic!("{index} is out of bounds of fcinfo!")
                 };
                 *index += 1;
