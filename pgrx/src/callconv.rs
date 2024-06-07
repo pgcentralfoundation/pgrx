@@ -128,17 +128,10 @@ where
 
 unsafe impl<'fcx, T> ArgAbi<'fcx> for Vec<T>
 where
-    for<'mcx> T: FromDatum + UnboxDatum<As<'mcx> = T> + 'mcx,
+    T: ArgAbi<'fcx>,
 {
     unsafe fn unbox_from_fcinfo_index(fcinfo: &mut FcInfo<'fcx>, index: &mut usize) -> Self {
-        let Some(pg_sys::NullableDatum { value, isnull }) = fcinfo.raw_args().get(*index) else {
-            panic!("{index} is out of bounds of fcinfo!")
-        };
-        *index += 1;
-        unsafe {
-            Vec::<T>::from_datum(*value, *isnull)
-                .unwrap_or_else(|| panic!("argument {index} must not be null"))
-        }
+        todo!()
     }
 }
 
