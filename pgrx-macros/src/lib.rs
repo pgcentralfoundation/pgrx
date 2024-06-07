@@ -890,7 +890,7 @@ fn impl_postgres_type(ast: DeriveInput) -> syn::Result<proc_macro2::TokenStream>
         stream.extend(quote! {
             #[doc(hidden)]
             #[::pgrx::pgrx_macros::pg_extern(immutable,parallel_safe)]
-            pub fn #funcname_in #generics(input: Option<&#lifetime ::core::ffi::CStr>) -> Option<#name #generics> {
+            pub fn #funcname_in #generics(input: Option<&::core::ffi::CStr>) -> Option<#name #generics> {
                 input.map_or_else(|| {
                     for m in <#name as ::pgrx::inoutfuncs::InOutFuncs>::NULL_ERROR_MESSAGE {
                         ::pgrx::pg_sys::error!("{m}");
@@ -901,11 +901,11 @@ fn impl_postgres_type(ast: DeriveInput) -> syn::Result<proc_macro2::TokenStream>
 
             #[doc(hidden)]
             #[::pgrx::pgrx_macros::pg_extern(immutable,parallel_safe)]
-            pub fn #funcname_out #generics(input: #name #generics) -> &'static ::core::ffi::CStr {
+            pub fn #funcname_out #generics(input: #name #generics) -> ::pgrx::ffi::CString {
                 let mut buffer = ::pgrx::stringinfo::StringInfo::new();
                 ::pgrx::inoutfuncs::InOutFuncs::output(&input, &mut buffer);
                 // SAFETY: We just constructed this StringInfo ourselves
-                unsafe { buffer.leak_cstr() }
+                unsafe { buffer.leak_cstr().to_owned() }
             }
         });
     } else if args.contains(&PostgresTypeAttribute::PgVarlenaInOutFuncs) {
@@ -913,7 +913,7 @@ fn impl_postgres_type(ast: DeriveInput) -> syn::Result<proc_macro2::TokenStream>
         stream.extend(quote! {
             #[doc(hidden)]
             #[::pgrx::pgrx_macros::pg_extern(immutable,parallel_safe)]
-            pub fn #funcname_in #generics(input: Option<&#lifetime ::core::ffi::CStr>) -> Option<::pgrx::datum::PgVarlena<#name #generics>> {
+            pub fn #funcname_in #generics(input: Option<&::core::ffi::CStr>) -> Option<::pgrx::datum::PgVarlena<#name #generics>> {
                 input.map_or_else(|| {
                     for m in <#name as ::pgrx::inoutfuncs::PgVarlenaInOutFuncs>::NULL_ERROR_MESSAGE {
                         ::pgrx::pg_sys::error!("{m}");
@@ -924,11 +924,11 @@ fn impl_postgres_type(ast: DeriveInput) -> syn::Result<proc_macro2::TokenStream>
 
             #[doc(hidden)]
             #[::pgrx::pgrx_macros::pg_extern(immutable,parallel_safe)]
-            pub fn #funcname_out #generics(input: ::pgrx::datum::PgVarlena<#name #generics>) -> &'static ::core::ffi::CStr {
+            pub fn #funcname_out #generics(input: ::pgrx::datum::PgVarlena<#name #generics>) -> ::pgrx::ffi::CString {
                 let mut buffer = ::pgrx::stringinfo::StringInfo::new();
                 ::pgrx::inoutfuncs::PgVarlenaInOutFuncs::output(&*input, &mut buffer);
                 // SAFETY: We just constructed this StringInfo ourselves
-                unsafe { buffer.leak_cstr() }
+                unsafe { buffer.leak_cstr().to_owned() }
             }
         });
     }
