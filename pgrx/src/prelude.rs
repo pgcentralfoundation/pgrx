@@ -32,7 +32,7 @@ pub use crate::datum::{
     Numeric, PgVarlena, PostgresType, Range, RangeBound, RangeSubType, Time, TimeWithTimeZone,
     Timestamp, TimestampWithTimeZone, VariadicArray,
 };
-pub use crate::inoutfuncs::{InOutFuncs, JsonInOutFuncs, PgVarlenaInOutFuncs};
+pub use crate::inoutfuncs::{InOutFuncs, PgVarlenaInOutFuncs};
 
 // Trigger support
 pub use crate::trigger_support::{

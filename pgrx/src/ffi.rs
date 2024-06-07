@@ -8,4 +8,5 @@
 //LICENSE
 //LICENSE Use of this source code is governed by the MIT license that can be found in the LICENSE file.
 //! Reexport FFI definitions here.
+pub use alloc::ffi::CString;
 pub use libc::c_char;
