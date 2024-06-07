@@ -17,9 +17,9 @@ use pgrx_sql_entity_graph::metadata::FunctionMetadata;
 use crate::datum::Datum;
 use crate::heap_tuple::PgHeapTuple;
 use crate::{
-    pg_return_null, pg_sys, AnyNumeric, Date, FromDatum, Inet, Internal, Interval, IntoDatum, Json,
-    PgBox, PgMemoryContexts, PgVarlena, Time, TimeWithTimeZone, Timestamp, TimestampWithTimeZone,
-    UnboxDatum, Uuid,
+    pg_return_null, pg_sys, AnyArray, AnyElement, AnyNumeric, Date, FromDatum, Inet, Internal,
+    Interval, IntoDatum, Json, PgBox, PgMemoryContexts, PgVarlena, Time, TimeWithTimeZone,
+    Timestamp, TimestampWithTimeZone, UnboxDatum, Uuid,
 };
 use core::marker::PhantomData;
 use core::mem;
@@ -66,6 +66,25 @@ where
         todo!()
     }
 }
+
+unsafe impl<'fcx, T> ArgAbi<'fcx> for crate::datum::VariadicArray<'fcx, T>
+where
+    T: ArgAbi<'fcx>,
+{
+    unsafe fn unbox_from_fcinfo_index(fcinfo: &mut FcInfo<'fcx>, index: &mut usize) -> Self {
+        todo!()
+    }
+}
+
+// no, not sure...
+// unsafe impl<'fcx, T> ArgAbi<'fcx> for crate::PgBox<T>
+// where
+//     T: ArgAbi<'fcx>,
+// {
+//     unsafe fn unbox_from_fcinfo_index(fcinfo: &mut FcInfo<'fcx>, index: &mut usize) -> Self {
+//         todo!()
+//     }
+// }
 
 unsafe impl<'fcx, W> ArgAbi<'fcx> for PgHeapTuple<'fcx, W>
 where
@@ -169,9 +188,11 @@ macro_rules! argue_from_datum {
     };
 }
 
-argue_from_datum! { 'fcx; i8, i16, i32, i64, f32, f64, bool, String }
+argue_from_datum! { 'fcx; i8, i16, i32, i64, f32, f64, bool, char, String }
 argue_from_datum! { 'fcx; Date, Interval, Time, TimeWithTimeZone, Timestamp, TimestampWithTimeZone }
-argue_from_datum! { 'fcx; AnyNumeric, pg_sys::Oid }
+argue_from_datum! { 'fcx; AnyArray, AnyElement, AnyNumeric }
+argue_from_datum! { 'fcx; Inet, Internal, Json, Uuid }
+argue_from_datum! { 'fcx; pg_sys::Oid, pg_sys::Point, pg_sys::BOX  }
 argue_from_datum! { 'fcx; &'fcx str, &'fcx CStr, &'fcx [u8] }
 
 // problem: our macros?
