@@ -1,0 +1,16 @@
+error[E0521]: borrowed data escapes outside of function
+ --> tests/compile-fail/table-iterators-arent-immortal.rs:5:5
+  |
+3 |   #[pg_extern]
+  |   ------------ lifetime `'fcx` defined here
+4 |   fn returns_tuple_with_lifetime(
+5 |       value: &'static str,
+  |       ^^^^^
+  |       |
+  |       `fcinfo` escapes the function body here
+  |       argument requires that `'fcx` must outlive `'static`
+6 |   ) -> TableIterator<(name!(a, &'static str), name!(b, Option<&'static str>))> {
+  |  ______________________________________________________________________________-
+7 | |     TableIterator::once((value, Some(value)))
+8 | | }
+  | |_- `fcinfo` is a reference that is only valid in the function body
