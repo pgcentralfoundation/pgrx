@@ -76,15 +76,12 @@ where
     }
 }
 
-// no, not sure...
-// unsafe impl<'fcx, T> ArgAbi<'fcx> for crate::PgBox<T>
-// where
-//     T: ArgAbi<'fcx>,
-// {
-//     unsafe fn unbox_from_fcinfo_index(fcinfo: &mut FcInfo<'fcx>, index: &mut usize) -> Self {
-//         todo!()
-//     }
-// }
+// not sure how this is gonna work
+unsafe impl<'fcx, T> ArgAbi<'fcx> for crate::PgBox<T> {
+    unsafe fn unbox_from_fcinfo_index(fcinfo: &mut FcInfo<'fcx>, index: &mut usize) -> Self {
+        todo!()
+    }
+}
 
 unsafe impl<'fcx, W> ArgAbi<'fcx> for PgHeapTuple<'fcx, W>
 where
