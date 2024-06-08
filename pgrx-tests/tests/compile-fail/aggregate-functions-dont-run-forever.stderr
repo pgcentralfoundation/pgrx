@@ -1,22 +1,22 @@
 error[E0521]: borrowed data escapes outside of function
-  --> tests/compile-fail/aggregate-functions-dont-run-forever.rs:12:36
+  --> tests/compile-fail/aggregate-functions-dont-run-forever.rs:14:36
    |
-8  | #[pg_aggregate]
+10 | #[pg_aggregate]
    | ---------------
    | |
    | `fcinfo` is a reference that is only valid in the function body
    | lifetime `'fcx` defined here
 ...
-12 |     type Args = pgrx::name!(value, pgrx::composite_type!('static, "Dog"));
+14 |     type Args = pgrx::name!(value, pgrx::composite_type!('static, "Dog"));
    |                                    ^^^^
    |                                    |
    |                                    `fcinfo` escapes the function body here
    |                                    argument requires that `'fcx` must outlive `'static`
 
 error[E0521]: borrowed data escapes outside of function
-  --> tests/compile-fail/aggregate-functions-dont-run-forever.rs:45:1
+  --> tests/compile-fail/aggregate-functions-dont-run-forever.rs:47:1
    |
-45 | #[pg_aggregate]
+47 | #[pg_aggregate]
    | ^^^^^^^^^^^^^^^
    | |
    | `fcinfo` is a reference that is only valid in the function body
@@ -25,3 +25,44 @@ error[E0521]: borrowed data escapes outside of function
    | argument requires that `'fcx` must outlive `'static`
    |
    = note: this error originates in the attribute macro `pg_aggregate` (in Nightly builds, run with -Z macro-backtrace for more info)
+
+error[E0521]: borrowed data escapes outside of function
+  --> tests/compile-fail/aggregate-functions-dont-run-forever.rs:72:17
+   |
+70 | #[pg_aggregate]
+   | ---------------
+   | |
+   | `fcinfo` is a reference that is only valid in the function body
+   | lifetime `'fcx` defined here
+71 | impl Aggregate for DemoUnique {
+72 |     type Args = &'static str;
+   |                 ^
+   |                 |
+   |                 `fcinfo` escapes the function body here
+   |                 argument requires that `'fcx` must outlive `'static`
+
+error[E0521]: borrowed data escapes outside of function
+   --> tests/compile-fail/aggregate-functions-dont-run-forever.rs:113:1
+    |
+113 | #[pg_aggregate]
+    | ^^^^^^^^^^^^^^^
+    | |
+    | `fcinfo` is a reference that is only valid in the function body
+    | `fcinfo` escapes the function body here
+    | lifetime `'fcx` defined here
+    | argument requires that `'fcx` must outlive `'static`
+    |
+    = note: this error originates in the attribute macro `pg_aggregate` (in Nightly builds, run with -Z macro-backtrace for more info)
+
+error[E0521]: borrowed data escapes outside of function
+   --> tests/compile-fail/aggregate-functions-dont-run-forever.rs:141:1
+    |
+141 | #[pg_aggregate]
+    | ^^^^^^^^^^^^^^^
+    | |
+    | `fcinfo` is a reference that is only valid in the function body
+    | `fcinfo` escapes the function body here
+    | lifetime `'fcx` defined here
+    | argument requires that `'fcx` must outlive `'static`
+    |
+    = note: this error originates in the attribute macro `pg_aggregate` (in Nightly builds, run with -Z macro-backtrace for more info)
