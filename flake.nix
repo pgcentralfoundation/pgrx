@@ -35,7 +35,7 @@
             inherit (craneLib.crateNameFromCargoToml {cargoToml = ./cargo-pgrx/Cargo.toml;}) pname version;
             cargoExtraArgs = "--package cargo-pgrx";
             nativeBuildInputs = [pkgs.pkg-config];
-            buildInputs = [pkgs.openssl] ++ lib.optionals pkgs.stdenv.isDarwin [pkgs.Security];
+            buildInputs = [pkgs.openssl] ++ lib.optionals pkgs.stdenv.isDarwin [pkgs.darwin.apple_sdk.frameworks.Security pkgs.libiconv];
             # fixes to enable running pgrx tests
             preCheck = ''
               export PGRX_HOME=$(mktemp -d)
