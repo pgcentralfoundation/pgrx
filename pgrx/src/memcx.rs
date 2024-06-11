@@ -27,8 +27,10 @@ impl<'mcx> MemCx<'mcx> {
         pg_sys::MemoryContextAlloc(self.ptr.as_ptr(), size).cast()
     }
 
-    /// You probably shouldn't be using this.
-    pub(crate) unsafe fn exec_in<T>(&self, f: impl FnOnce() -> T) -> T {
+    /// Stores the current global memory context, switches to *this* memory context,
+    /// and executes the closure `f`.
+    /// Once `f` completes, the previous global memory context is restored.
+    pub unsafe fn exec_in<T>(&self, f: impl FnOnce() -> T) -> T {
         let remembered = pg_sys::MemoryContextSwitchTo(self.ptr.as_ptr());
         let res = f();
         pg_sys::MemoryContextSwitchTo(remembered);
@@ -36,7 +38,7 @@ impl<'mcx> MemCx<'mcx> {
     }
 }
 
-/// Acquire the current context and operate inside it.
+/// Acquire the current global context and operate inside it.
 pub fn current_context<'curr, F, T>(f: F) -> T
 where
     F: for<'clos> FnOnce(&'clos MemCx<'curr>) -> T,
