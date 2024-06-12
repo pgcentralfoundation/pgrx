@@ -107,6 +107,10 @@ where
             value
         }
     }
+
+    unsafe fn unbox_argument(args: &mut ::pgrx::callconv::Arguments<'_, 'fcx>) -> Option<Self> {
+        args.next().and_then(|arg| arg.unbox_arg_using_from_datum())
+    }
 }
 
 unsafe impl BoxRet for HexInt {

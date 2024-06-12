@@ -400,12 +400,13 @@ impl PgExtern {
             // false
             true
         };
+        let args_ident = proc_macro2::Ident::new("_args", Span::call_site());
         let arg_fetches = args.iter().enumerate().map(|(idx, arg)| {
             if new_unboxing {
                 let pat = &arg_pats[idx];
                 let resolved_ty = &arg.used_ty.resolved_ty;
                 quote_spanned!{ pat.span() =>
-                    let #pat = <#resolved_ty as ::pgrx::callconv::ArgAbi>::unbox_from_fcinfo_index(#fcinfo_ident, &mut #idx);
+                    let #pat = <#resolved_ty as ::pgrx::callconv::ArgAbi>::unbox_argument(#args_ident).unwrap();
                 }
             } else {
                 let pat = &arg_pats[idx];
@@ -448,13 +449,18 @@ impl PgExtern {
                         #[allow(unused_unsafe)]
                         unsafe {
                             let #fcinfo_ident = fcinfo;
-                            let result = match <#ret_ty as ::pgrx::callconv::RetAbi>::check_and_prepare(#fcinfo_ident) {
+                            let call_flow = <#ret_ty as ::pgrx::callconv::RetAbi>::check_and_prepare(#fcinfo_ident);
+                            let result = match call_flow {
                                 ::pgrx::callconv::CallCx::WrappedFn(mcx) => {
                                     let mut mcx = ::pgrx::PgMemoryContexts::For(mcx);
-                                    ::pgrx::callconv::RetAbi::to_ret(mcx.switch_to(|_| {
+                                    let fcinfo = &*#fcinfo_ident;
+                                    let mut args = fcinfo.arguments();
+                                    let #args_ident= &mut args;
+                                    let call_result = mcx.switch_to(|_| {
                                         #(#arg_fetches)*
                                         #func_name( #(#arg_pats),* )
-                                    }))
+                                    });
+                                    ::pgrx::callconv::RetAbi::to_ret(call_result)
                                 }
                                 ::pgrx::callconv::CallCx::RestoreCx => <#ret_ty as ::pgrx::callconv::RetAbi>::ret_from_fcx(#fcinfo_ident),
                             };
