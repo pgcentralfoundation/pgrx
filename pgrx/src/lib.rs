@@ -30,6 +30,8 @@
     clippy::unnecessary_cast
 )]
 
+#![cfg_attr(feature = "nightly", feature(allocator_api))]
+
 #[macro_use]
 extern crate bitflags;
 extern crate alloc;
