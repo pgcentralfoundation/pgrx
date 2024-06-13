@@ -49,74 +49,78 @@ where
     f(&memcx)
 }
 
-#[cfg(feature="nightly")]
+#[cfg(feature = "nightly")]
 use std::alloc::Layout;
 
 /// Does alignment / padding logic for pre-Postgres16 8-byte alignment.
-#[cfg(feature="nightly")]
-fn layout_for_pre16(layout: Layout) -> Result<Layout, std::alloc::AllocError> { 
-    Ok(layout.align_to(8)
-        .map_err(| _e | std::alloc::AllocError)?
-        .pad_to_align())
+#[cfg(feature = "nightly")]
+fn layout_for_pre16(layout: Layout) -> Result<Layout, std::alloc::AllocError> {
+    Ok(layout.align_to(8).map_err(|_e| std::alloc::AllocError)?.pad_to_align())
 }
 
-#[cfg(feature="nightly")]
+#[cfg(feature = "nightly")]
 unsafe impl<'mcx> std::alloc::Allocator for MemCx<'mcx> {
-    fn allocate(&self, layout: std::alloc::Layout) -> Result<NonNull<[u8]>, std::alloc::AllocError> {
+    fn allocate(
+        &self,
+        layout: std::alloc::Layout,
+    ) -> Result<NonNull<[u8]>, std::alloc::AllocError> {
         // Future-proofing - currently only pg16 supports arbitrary alignment, but that is likely
         // to change, whereas old versions are unlikely to lose 8-byte alignment.
-        if cfg!(any(feature = "pg12", feature = "pg13", feature = "pg14", feature = "pg15")) { 
+        if cfg!(any(feature = "pg12", feature = "pg13", feature = "pg14", feature = "pg15")) {
             // On versions before Postgres 16, alignment is always 8 byte / 64 bit.
             let layout = layout_for_pre16(layout)?;
             unsafe {
                 let ptr = pgrx_pg_sys::MemoryContextAlloc(self.ptr.as_ptr(), layout.size());
                 let slice: &mut [u8] = slice::from_raw_parts_mut(ptr.cast(), layout.size());
-                Ok(
-                    NonNull::new_unchecked(slice)
-                )
+                Ok(NonNull::new_unchecked(slice))
             }
-        }
-        else {
+        } else {
             // Postgres 16 and newer permit any arbitrary power-of-2 alignment
-            unsafe { 
+            unsafe {
                 // TODO - deep dive on what that last bitflag argument is used for.
-                let ptr = pgrx_pg_sys::MemoryContextAllocAligned(self.ptr.as_ptr(), layout.size(), layout.align(), 0);
+                let ptr = pgrx_pg_sys::MemoryContextAllocAligned(
+                    self.ptr.as_ptr(),
+                    layout.size(),
+                    layout.align(),
+                    0,
+                );
                 let slice: &mut [u8] = slice::from_raw_parts_mut(ptr.cast(), layout.size());
-                Ok(
-                    NonNull::new_unchecked(slice)
-                )
+                Ok(NonNull::new_unchecked(slice))
             }
         }
     }
 
     unsafe fn deallocate(&self, ptr: NonNull<u8>, _layout: std::alloc::Layout) {
-        // TODO: Find faster free for use when MemoryContext is known. 
+        // TODO: Find faster free for use when MemoryContext is known.
         // This is the global function that looks up the relevant Memory Context by address range.
         pgrx_pg_sys::pfree(ptr.as_ptr().cast())
     }
-    
-    fn allocate_zeroed(&self, layout: std::alloc::Layout) -> Result<NonNull<[u8]>, std::alloc::AllocError> {
+
+    fn allocate_zeroed(
+        &self,
+        layout: std::alloc::Layout,
+    ) -> Result<NonNull<[u8]>, std::alloc::AllocError> {
         // Overriding default function here to use Postgres' zeroing implementation.
-        if cfg!(any(feature = "pg12", feature = "pg13", feature = "pg14", feature = "pg15")) { 
+        if cfg!(any(feature = "pg12", feature = "pg13", feature = "pg14", feature = "pg15")) {
             // On versions before Postgres 16, alignment is always 8 byte / 64 bit.
             let layout = layout_for_pre16(layout)?;
             unsafe {
                 let ptr = pgrx_pg_sys::MemoryContextAllocZero(self.ptr.as_ptr(), layout.size());
                 let slice: &mut [u8] = slice::from_raw_parts_mut(ptr.cast(), layout.size());
-                Ok(
-                    NonNull::new_unchecked(slice)
-                )
+                Ok(NonNull::new_unchecked(slice))
             }
-        }
-        else {
+        } else {
             // Postgres 16 and newer permit any arbitrary power-of-2 alignment
-            unsafe { 
+            unsafe {
                 // TODO - deep dive on what that last bitflag argument is used for.
-                let ptr = pgrx_pg_sys::MemoryContextAllocAligned(self.ptr.as_ptr(), layout.size(), layout.align(), 0);
+                let ptr = pgrx_pg_sys::MemoryContextAllocAligned(
+                    self.ptr.as_ptr(),
+                    layout.size(),
+                    layout.align(),
+                    0,
+                );
                 let slice: &mut [u8] = slice::from_raw_parts_mut(ptr.cast(), layout.size());
-                Ok(
-                    NonNull::new_unchecked(slice)
-                )
+                Ok(NonNull::new_unchecked(slice))
             }
         }
     }
