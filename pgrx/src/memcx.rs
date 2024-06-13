@@ -8,7 +8,7 @@
 // And it's nice-ish to have shorter lifetime names and have 'mcx consistently mean the lifetime.
 use crate::pg_sys;
 use core::{marker::PhantomData, ptr::NonNull};
-use std::{os::raw::c_void, slice};
+use std::slice;
 
 /// A borrowed memory context.
 pub struct MemCx<'mcx> {
@@ -49,12 +49,15 @@ where
     f(&memcx)
 }
 
+#[cfg(feature="nightly")]
+use std::alloc::Layout;
+
 /// Does alignment / padding logic for pre-Postgres16 8-byte alignment.
 #[cfg(feature="nightly")]
-const fn layout_for_pre16(layout: Layout) -> Layout { 
-    layout.align_to(8)
+fn layout_for_pre16(layout: Layout) -> Result<Layout, std::alloc::AllocError> { 
+    Ok(layout.align_to(8)
         .map_err(| _e | std::alloc::AllocError)?
-        .pad_to_align()
+        .pad_to_align())
 }
 
 #[cfg(feature="nightly")]
@@ -62,9 +65,9 @@ unsafe impl<'mcx> std::alloc::Allocator for MemCx<'mcx> {
     fn allocate(&self, layout: std::alloc::Layout) -> Result<NonNull<[u8]>, std::alloc::AllocError> {
         // Future-proofing - currently only pg16 supports arbitrary alignment, but that is likely
         // to change, whereas old versions are unlikely to lose 8-byte alignment.
-        if cfg!(feature = "pg12") || cfg!(feature = "pg13") || cfg!(feature = "pg14") || cfg!(feature = "pg15") { 
+        if cfg!(any(feature = "pg12", feature = "pg13", feature = "pg14", feature = "pg15")) { 
             // On versions before Postgres 16, alignment is always 8 byte / 64 bit.
-            let layout = layout_for_pre16(layout);
+            let layout = layout_for_pre16(layout)?;
             unsafe {
                 let ptr = pgrx_pg_sys::MemoryContextAlloc(self.ptr.as_ptr(), layout.size());
                 let slice: &mut [u8] = slice::from_raw_parts_mut(ptr.cast(), layout.size());
@@ -74,9 +77,15 @@ unsafe impl<'mcx> std::alloc::Allocator for MemCx<'mcx> {
             }
         }
         else {
-            //pg_sys::MemoryContextAllocAligned();
-            // Postgres 16 and newer permit arbitrary (power-of-2) alignments
-            todo!()
+            // Postgres 16 and newer permit any arbitrary power-of-2 alignment
+            unsafe { 
+                // TODO - deep dive on what that last bitflag argument is used for.
+                let ptr = pgrx_pg_sys::MemoryContextAllocAligned(self.ptr.as_ptr(), layout.size(), layout.align(), 0);
+                let slice: &mut [u8] = slice::from_raw_parts_mut(ptr.cast(), layout.size());
+                Ok(
+                    NonNull::new_unchecked(slice)
+                )
+            }
         }
     }
 
@@ -88,9 +97,9 @@ unsafe impl<'mcx> std::alloc::Allocator for MemCx<'mcx> {
     
     fn allocate_zeroed(&self, layout: std::alloc::Layout) -> Result<NonNull<[u8]>, std::alloc::AllocError> {
         // Overriding default function here to use Postgres' zeroing implementation.
-        if cfg!(feature = "pg12") || cfg!(feature = "pg13") || cfg!(feature = "pg14") || cfg!(feature = "pg15") { 
+        if cfg!(any(feature = "pg12", feature = "pg13", feature = "pg14", feature = "pg15")) { 
             // On versions before Postgres 16, alignment is always 8 byte / 64 bit.
-            let layout = layout_for_pre16(layout);
+            let layout = layout_for_pre16(layout)?;
             unsafe {
                 let ptr = pgrx_pg_sys::MemoryContextAllocZero(self.ptr.as_ptr(), layout.size());
                 let slice: &mut [u8] = slice::from_raw_parts_mut(ptr.cast(), layout.size());
@@ -100,9 +109,15 @@ unsafe impl<'mcx> std::alloc::Allocator for MemCx<'mcx> {
             }
         }
         else {
-            //pg_sys::MemoryContextAllocAligned();
-            // Postgres 16 and newer permit arbitrary (power-of-2) alignments
-            todo!()
+            // Postgres 16 and newer permit any arbitrary power-of-2 alignment
+            unsafe { 
+                // TODO - deep dive on what that last bitflag argument is used for.
+                let ptr = pgrx_pg_sys::MemoryContextAllocAligned(self.ptr.as_ptr(), layout.size(), layout.align(), 0);
+                let slice: &mut [u8] = slice::from_raw_parts_mut(ptr.cast(), layout.size());
+                Ok(
+                    NonNull::new_unchecked(slice)
+                )
+            }
         }
     }
 }
