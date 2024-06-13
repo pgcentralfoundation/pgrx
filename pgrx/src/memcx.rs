@@ -77,7 +77,10 @@ unsafe impl<'mcx> std::alloc::Allocator for MemCx<'mcx> {
         } else {
             // Postgres 16 and newer permit any arbitrary power-of-2 alignment
             unsafe {
-                // TODO - deep dive on what that last bitflag argument is used for.
+                // Bitflags for MemoryContextAllocAligned:
+                // #define MCXT_ALLOC_HUGE    0x01 /* allow huge allocation (> 1 GB) */
+                // #define MCXT_ALLOC_NO_OOM  0x02 /* no failure if out-of-memory */
+                // #define MCXT_ALLOC_ZERO    0x04 /* zero allocated memory */
                 let ptr = pgrx_pg_sys::MemoryContextAllocAligned(
                     self.ptr.as_ptr(),
                     layout.size(),
@@ -112,12 +115,15 @@ unsafe impl<'mcx> std::alloc::Allocator for MemCx<'mcx> {
         } else {
             // Postgres 16 and newer permit any arbitrary power-of-2 alignment
             unsafe {
-                // TODO - deep dive on what that last bitflag argument is used for.
+                // Bitflags for MemoryContextAllocAligned:
+                // #define MCXT_ALLOC_HUGE    0x01 /* allow huge allocation (> 1 GB) */
+                // #define MCXT_ALLOC_NO_OOM  0x02 /* no failure if out-of-memory */
+                // #define MCXT_ALLOC_ZERO    0x04 /* zero allocated memory */
                 let ptr = pgrx_pg_sys::MemoryContextAllocAligned(
                     self.ptr.as_ptr(),
                     layout.size(),
                     layout.align(),
-                    0,
+                    4,
                 );
                 let slice: &mut [u8] = slice::from_raw_parts_mut(ptr.cast(), layout.size());
                 Ok(NonNull::new_unchecked(slice))
