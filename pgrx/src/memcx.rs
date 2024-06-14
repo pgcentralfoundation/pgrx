@@ -49,47 +49,52 @@ where
     f(&memcx)
 }
 
-#[cfg(feature = "nightly")]
+#[cfg(all(feature = "nightly", any(feature = "pg12", feature = "pg13", feature = "pg14", feature = "pg15")))]
 use std::alloc::Layout;
 
 /// Does alignment / padding logic for pre-Postgres16 8-byte alignment.
-#[cfg(feature = "nightly")]
+#[cfg(all(feature = "nightly", any(feature = "pg12", feature = "pg13", feature = "pg14", feature = "pg15")))]
 fn layout_for_pre16(layout: Layout) -> Result<Layout, std::alloc::AllocError> {
     Ok(layout.align_to(8).map_err(|_e| std::alloc::AllocError)?.pad_to_align())
 }
 
 #[cfg(feature = "nightly")]
-unsafe impl<'mcx> std::alloc::Allocator for MemCx<'mcx> {
+unsafe impl<'mcx> std::alloc::Allocator for &MemCx<'mcx> {
+    // Future-proofing - currently only pg16 supports arbitrary alignment, but that is likely
+    // to change, whereas old versions are unlikely to lose 8-byte alignment.
+    #[cfg(any(feature = "pg12", feature = "pg13", feature = "pg14", feature = "pg15"))]
     fn allocate(
         &self,
         layout: std::alloc::Layout,
     ) -> Result<NonNull<[u8]>, std::alloc::AllocError> {
-        // Future-proofing - currently only pg16 supports arbitrary alignment, but that is likely
-        // to change, whereas old versions are unlikely to lose 8-byte alignment.
-        if cfg!(any(feature = "pg12", feature = "pg13", feature = "pg14", feature = "pg15")) {
-            // On versions before Postgres 16, alignment is always 8 byte / 64 bit.
-            let layout = layout_for_pre16(layout)?;
-            unsafe {
-                let ptr = pgrx_pg_sys::MemoryContextAlloc(self.ptr.as_ptr(), layout.size());
-                let slice: &mut [u8] = slice::from_raw_parts_mut(ptr.cast(), layout.size());
-                Ok(NonNull::new_unchecked(slice))
-            }
-        } else {
-            // Postgres 16 and newer permit any arbitrary power-of-2 alignment
-            unsafe {
-                // Bitflags for MemoryContextAllocAligned:
-                // #define MCXT_ALLOC_HUGE    0x01 /* allow huge allocation (> 1 GB) */
-                // #define MCXT_ALLOC_NO_OOM  0x02 /* no failure if out-of-memory */
-                // #define MCXT_ALLOC_ZERO    0x04 /* zero allocated memory */
-                let ptr = pgrx_pg_sys::MemoryContextAllocAligned(
-                    self.ptr.as_ptr(),
-                    layout.size(),
-                    layout.align(),
-                    0,
-                );
-                let slice: &mut [u8] = slice::from_raw_parts_mut(ptr.cast(), layout.size());
-                Ok(NonNull::new_unchecked(slice))
-            }
+        // On versions before Postgres 16, alignment is always 8 byte / 64 bit.
+        let layout = layout_for_pre16(layout)?;
+        unsafe {
+            let ptr = pgrx_pg_sys::MemoryContextAlloc(self.ptr.as_ptr(), layout.size());
+            let slice: &mut [u8] = slice::from_raw_parts_mut(ptr.cast(), layout.size());
+            Ok(NonNull::new_unchecked(slice))
+        }
+    }
+
+    #[cfg(not(any(feature = "pg12", feature = "pg13", feature = "pg14", feature = "pg15")))]
+    fn allocate(
+        &self,
+        layout: std::alloc::Layout,
+    ) -> Result<NonNull<[u8]>, std::alloc::AllocError> {
+        // Postgres 16 and newer permit any arbitrary power-of-2 alignment
+        unsafe {
+            // Bitflags for MemoryContextAllocAligned:
+            // #define MCXT_ALLOC_HUGE    0x01 /* allow huge allocation (> 1 GB) */
+            // #define MCXT_ALLOC_NO_OOM  0x02 /* no failure if out-of-memory */
+            // #define MCXT_ALLOC_ZERO    0x04 /* zero allocated memory */
+            let ptr = pgrx_pg_sys::MemoryContextAllocAligned(
+                self.ptr.as_ptr(),
+                layout.size(),
+                layout.align(),
+                0,
+            );
+            let slice: &mut [u8] = slice::from_raw_parts_mut(ptr.cast(), layout.size());
+            Ok(NonNull::new_unchecked(slice))
         }
     }
 
@@ -99,35 +104,41 @@ unsafe impl<'mcx> std::alloc::Allocator for MemCx<'mcx> {
         pgrx_pg_sys::pfree(ptr.as_ptr().cast())
     }
 
+    #[cfg(any(feature = "pg12", feature = "pg13", feature = "pg14", feature = "pg15"))]
     fn allocate_zeroed(
         &self,
         layout: std::alloc::Layout,
     ) -> Result<NonNull<[u8]>, std::alloc::AllocError> {
         // Overriding default function here to use Postgres' zeroing implementation.
-        if cfg!(any(feature = "pg12", feature = "pg13", feature = "pg14", feature = "pg15")) {
-            // On versions before Postgres 16, alignment is always 8 byte / 64 bit.
-            let layout = layout_for_pre16(layout)?;
-            unsafe {
-                let ptr = pgrx_pg_sys::MemoryContextAllocZero(self.ptr.as_ptr(), layout.size());
-                let slice: &mut [u8] = slice::from_raw_parts_mut(ptr.cast(), layout.size());
-                Ok(NonNull::new_unchecked(slice))
-            }
-        } else {
-            // Postgres 16 and newer permit any arbitrary power-of-2 alignment
-            unsafe {
-                // Bitflags for MemoryContextAllocAligned:
-                // #define MCXT_ALLOC_HUGE    0x01 /* allow huge allocation (> 1 GB) */
-                // #define MCXT_ALLOC_NO_OOM  0x02 /* no failure if out-of-memory */
-                // #define MCXT_ALLOC_ZERO    0x04 /* zero allocated memory */
-                let ptr = pgrx_pg_sys::MemoryContextAllocAligned(
-                    self.ptr.as_ptr(),
-                    layout.size(),
-                    layout.align(),
-                    4,
-                );
-                let slice: &mut [u8] = slice::from_raw_parts_mut(ptr.cast(), layout.size());
-                Ok(NonNull::new_unchecked(slice))
-            }
+        // On versions before Postgres 16, alignment is always 8 byte / 64 bit.
+        let layout = layout_for_pre16(layout)?;
+        unsafe {
+            let ptr = pgrx_pg_sys::MemoryContextAllocZero(self.ptr.as_ptr(), layout.size());
+            let slice: &mut [u8] = slice::from_raw_parts_mut(ptr.cast(), layout.size());
+            Ok(NonNull::new_unchecked(slice))
+        }
+            
+    }
+    #[cfg(not(any(feature = "pg12", feature = "pg13", feature = "pg14", feature = "pg15")))]
+    fn allocate_zeroed(
+        &self,
+        layout: std::alloc::Layout,
+    ) -> Result<NonNull<[u8]>, std::alloc::AllocError> {
+        // Overriding default function here to use Postgres' zeroing implementation.
+        // Postgres 16 and newer permit any arbitrary power-of-2 alignment
+        unsafe {
+            // Bitflags for MemoryContextAllocAligned:
+            // #define MCXT_ALLOC_HUGE    0x01 /* allow huge allocation (> 1 GB) */
+            // #define MCXT_ALLOC_NO_OOM  0x02 /* no failure if out-of-memory */
+            // #define MCXT_ALLOC_ZERO    0x04 /* zero allocated memory */
+            let ptr = pgrx_pg_sys::MemoryContextAllocAligned(
+                self.ptr.as_ptr(),
+                layout.size(),
+                layout.align(),
+                4,
+            );
+            let slice: &mut [u8] = slice::from_raw_parts_mut(ptr.cast(), layout.size());
+            Ok(NonNull::new_unchecked(slice))
         }
     }
 }

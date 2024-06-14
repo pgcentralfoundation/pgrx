@@ -13,6 +13,7 @@ mod tests {
     #[allow(unused_imports)]
     use crate as pgrx_tests;
 
+    use pgrx::pg_test;
     use pgrx::prelude::*;
     use pgrx::PgMemoryContexts;
     use std::sync::atomic::{AtomicBool, Ordering};
@@ -96,5 +97,81 @@ mod tests {
         }
         drop(ctx);
         assert_eq!(unsafe { pg_sys::CurrentMemoryContext }, ctx_parent);
+    }
+
+    #[cfg(feature="nightly")]
+    #[pg_test]
+    #[no_mangle]
+    fn memcx_allocator_test_string_vecs() {
+        use pgrx::memcx::{current_context, MemCx};
+        current_context(|mcx: &MemCx| {
+            let str1 = "The Quick Brown Fox ";
+            let str2 = "Jumped Over ";
+            let str3 = "The Lazy Dog";
+
+            let mut list: Vec<String, &MemCx> = Vec::new_in(mcx);
+
+            assert_eq!(list, vec![] as Vec<String>);
+            list.push(String::from(str1));
+            assert_eq!(list, vec![String::from(str1)]);
+            list.push(String::from(str2));
+            assert_eq!(list, vec![String::from(str1), String::from(str2)]);
+
+            let mut list_2: Vec<String, &MemCx> = Vec::new_in(mcx);
+            assert_eq!(list_2, vec![] as Vec<String>);
+            list_2.push(String::from(str3));
+            assert_eq!(list_2, vec![String::from(str3)]);
+
+            list.append(&mut list_2);
+            assert_eq!(list_2, vec![] as Vec<String>);
+            drop(list_2);
+            assert_eq!(list, vec![String::from(str1), String::from(str2), String::from(str3)]);
+
+            let mut list_3 = list.clone(); 
+
+            let str4 = "The Quick Brown Ferret ";
+
+            *list_3.get_mut(0).unwrap() = String::from(str4);
+            assert_eq!(list_3, vec![String::from(str4), String::from(str2), String::from(str3)]);
+            drop(list);
+            assert_eq!(list_3, vec![String::from(str4), String::from(str2), String::from(str3)]);
+        })
+    }
+
+    #[cfg(feature="nightly")]
+    #[pg_test]
+    #[no_mangle]
+    fn memcx_allocator_test_random_bytes() { 
+        use pgrx::memcx::{current_context, MemCx};
+        current_context(|mcx: &MemCx| {
+            let mut byte_buffers: Vec<Box<Vec<u8, &MemCx>, &MemCx>, &MemCx> = Vec::new_in(mcx);
+            for _ in 0..32 { 
+                let mut current_buffer = Vec::new_in(mcx);
+                for _ in 0..256 {
+                    let number = rand::random();
+                    current_buffer.push(number);
+                }
+                byte_buffers.push(Box::new_in(current_buffer, mcx));
+            }
+            assert_eq!(byte_buffers.len(), 32);
+
+            for buf in byte_buffers.iter_mut() { 
+                assert_eq!(buf.len(), 256);
+                for byte in buf.iter_mut() { 
+                    *byte = rand::random();
+                }
+                let a: [u8; 20] = rand::random();
+                buf.extend_from_slice(&a);
+                assert_eq!(buf.len(), 276);
+            }
+
+            byte_buffers.truncate(16);
+            assert_eq!(byte_buffers.len(), 16);
+            for buf in byte_buffers.iter_mut() {
+                assert_eq!(buf.len(), 276);
+                buf.truncate(77);
+                assert_eq!(buf.len(), 77);
+            }
+        })
     }
 }

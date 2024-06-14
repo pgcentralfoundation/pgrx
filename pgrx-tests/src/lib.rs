@@ -7,6 +7,9 @@
 //LICENSE All rights reserved.
 //LICENSE
 //LICENSE Use of this source code is governed by the MIT license that can be found in the LICENSE file.
+
+#![cfg_attr(feature = "nightly", feature(allocator_api))]
+
 mod framework;
 #[cfg(any(test, feature = "pg_test"))]
 mod tests;
