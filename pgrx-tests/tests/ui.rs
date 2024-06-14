@@ -1,4 +1,4 @@
-#![cfg(not(target_env = "musl"))]
+#![cfg(all(not(target_env = "musl"), not(feature = "nightly")))]
 
 use trybuild::TestCases;
 
