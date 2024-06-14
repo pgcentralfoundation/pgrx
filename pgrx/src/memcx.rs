@@ -49,11 +49,17 @@ where
     f(&memcx)
 }
 
-#[cfg(all(feature = "nightly", any(feature = "pg12", feature = "pg13", feature = "pg14", feature = "pg15")))]
+#[cfg(all(
+    feature = "nightly",
+    any(feature = "pg12", feature = "pg13", feature = "pg14", feature = "pg15")
+))]
 use std::alloc::Layout;
 
 /// Does alignment / padding logic for pre-Postgres16 8-byte alignment.
-#[cfg(all(feature = "nightly", any(feature = "pg12", feature = "pg13", feature = "pg14", feature = "pg15")))]
+#[cfg(all(
+    feature = "nightly",
+    any(feature = "pg12", feature = "pg13", feature = "pg14", feature = "pg15")
+))]
 fn layout_for_pre16(layout: Layout) -> Result<Layout, std::alloc::AllocError> {
     Ok(layout.align_to(8).map_err(|_e| std::alloc::AllocError)?.pad_to_align())
 }
@@ -117,7 +123,6 @@ unsafe impl<'mcx> std::alloc::Allocator for &MemCx<'mcx> {
             let slice: &mut [u8] = slice::from_raw_parts_mut(ptr.cast(), layout.size());
             Ok(NonNull::new_unchecked(slice))
         }
-            
     }
     #[cfg(not(any(feature = "pg12", feature = "pg13", feature = "pg14", feature = "pg15")))]
     fn allocate_zeroed(

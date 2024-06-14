@@ -99,7 +99,7 @@ mod tests {
         assert_eq!(unsafe { pg_sys::CurrentMemoryContext }, ctx_parent);
     }
 
-    #[cfg(feature="nightly")]
+    #[cfg(feature = "nightly")]
     #[pg_test]
     #[no_mangle]
     fn memcx_allocator_test_string_vecs() {
@@ -127,7 +127,7 @@ mod tests {
             drop(list_2);
             assert_eq!(list, vec![String::from(str1), String::from(str2), String::from(str3)]);
 
-            let mut list_3 = list.clone(); 
+            let mut list_3 = list.clone();
 
             let str4 = "The Quick Brown Ferret ";
 
@@ -138,14 +138,14 @@ mod tests {
         })
     }
 
-    #[cfg(feature="nightly")]
+    #[cfg(feature = "nightly")]
     #[pg_test]
     #[no_mangle]
-    fn memcx_allocator_test_random_bytes() { 
+    fn memcx_allocator_test_random_bytes() {
         use pgrx::memcx::{current_context, MemCx};
         current_context(|mcx: &MemCx| {
             let mut byte_buffers: Vec<Box<Vec<u8, &MemCx>, &MemCx>, &MemCx> = Vec::new_in(mcx);
-            for _ in 0..32 { 
+            for _ in 0..32 {
                 let mut current_buffer = Vec::new_in(mcx);
                 for _ in 0..256 {
                     let number = rand::random();
@@ -155,9 +155,9 @@ mod tests {
             }
             assert_eq!(byte_buffers.len(), 32);
 
-            for buf in byte_buffers.iter_mut() { 
+            for buf in byte_buffers.iter_mut() {
                 assert_eq!(buf.len(), 256);
-                for byte in buf.iter_mut() { 
+                for byte in buf.iter_mut() {
                     *byte = rand::random();
                 }
                 let a: [u8; 20] = rand::random();
