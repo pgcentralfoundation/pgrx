@@ -8,6 +8,7 @@
 // And it's nice-ish to have shorter lifetime names and have 'mcx consistently mean the lifetime.
 use crate::pg_sys;
 use core::{marker::PhantomData, ptr::NonNull};
+#[cfg(feature = "nightly")]
 use std::slice;
 
 /// A borrowed memory context.
