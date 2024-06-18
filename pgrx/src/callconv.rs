@@ -123,6 +123,12 @@ where
     }
 
     unsafe fn unbox_argument(args: &mut Arguments<'_, 'fcx>) -> Option<Self> {
+        // if true {
+        //     *index += 1;
+        //     None
+        // } else {
+        //     Some(unsafe { <T as ArgAbi>::unbox_from_fcinfo_index(fcinfo, index) })
+        // };
         todo!()
     }
 }
@@ -766,7 +772,10 @@ impl<'fcx> FcInfo<'fcx> {
 
     #[inline]
     pub fn arguments<'arg>(&'arg self) -> Arguments<'arg, 'fcx> {
-        Arguments { iter: self.raw_args().iter().enumerate(), fcinfo: self }
+        Arguments {
+            iter: InternalArguments { iter: self.raw_args().iter().enumerate(), fcinfo: self }
+                .peekable(),
+        }
     }
 }
 
@@ -783,18 +792,40 @@ impl<'a, 'fcx> Argument<'a, 'fcx> {
         let pg_sys::NullableDatum { isnull, value } = *self.2;
         unsafe { FromDatum::from_datum(value, isnull) }
     }
+
+    pub fn is_null(&self) -> bool {
+        self.2.isnull
+    }
 }
 
 pub struct Arguments<'a, 'fcx> {
+    iter: iter::Peekable<InternalArguments<'a, 'fcx>>,
+}
+
+struct InternalArguments<'a, 'fcx> {
     iter: iter::Enumerate<slice::Iter<'a, pg_sys::NullableDatum>>,
     fcinfo: &'a FcInfo<'fcx>,
+}
+
+impl<'a, 'fcx> Iterator for InternalArguments<'a, 'fcx> {
+    type Item = Argument<'a, 'fcx>;
+
+    fn next(&mut self) -> Option<Self::Item> {
+        self.iter.next().map(|(i, dat)| Argument(self.fcinfo, i, dat))
+    }
 }
 
 impl<'a, 'fcx> Iterator for Arguments<'a, 'fcx> {
     type Item = Argument<'a, 'fcx>;
 
     fn next(&mut self) -> Option<Self::Item> {
-        self.iter.next().map(|(i, dat)| Argument(self.fcinfo, i, dat))
+        self.iter.next()
+    }
+}
+
+impl<'a, 'fcx> Arguments<'a, 'fcx> {
+    pub fn peek(&mut self) -> Option<&Argument<'a, 'fcx>> {
+        self.iter.peek()
     }
 }
 
