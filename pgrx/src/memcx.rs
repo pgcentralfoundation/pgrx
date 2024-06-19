@@ -18,14 +18,20 @@ pub struct MemCx<'mcx> {
 }
 
 impl<'mcx> MemCx<'mcx> {
-    /// You probably shouldn't be using this.
+    /// Wrap the provided [`pg_sys::MemoryContext`]
+    /// 
+    /// # Safety:
+    /// Assumes the provided [`pg_sys::MemoryContext`] is valid and properly initialized.
+    /// This method does check to ensure the pointer is non-null, but that is the only sanity
+    /// check that is performed.
     pub(crate) unsafe fn from_ptr(raw: pg_sys::MemoryContext) -> MemCx<'mcx> {
         let ptr = NonNull::new(raw).expect("memory context must be non-null");
         MemCx { ptr, _marker: PhantomData }
     }
 
-    /// You probably shouldn't be using this.
-    pub(crate) unsafe fn alloc_bytes(&self, size: usize) -> *mut u8 {
+    /// Allocate a raw byte buffer `size` bytes in length 
+    /// and returns a pointer to the new allocation.
+    pub unsafe fn alloc_bytes(&self, size: usize) -> *mut u8 {
         pg_sys::MemoryContextAlloc(self.ptr.as_ptr(), size).cast()
     }
 
@@ -50,18 +56,12 @@ where
     f(&memcx)
 }
 
-#[cfg(all(
-    feature = "nightly",
-    any(feature = "pg12", feature = "pg13", feature = "pg14", feature = "pg15")
-))]
-use std::alloc::Layout;
-
 /// Does alignment / padding logic for pre-Postgres16 8-byte alignment.
 #[cfg(all(
     feature = "nightly",
     any(feature = "pg12", feature = "pg13", feature = "pg14", feature = "pg15")
 ))]
-fn layout_for_pre16(layout: Layout) -> Result<Layout, std::alloc::AllocError> {
+fn layout_for_pre16(layout: std::alloc::Layout) -> Result<std::alloc::Layout, std::alloc::AllocError> {
     Ok(layout.align_to(8).map_err(|_e| std::alloc::AllocError)?.pad_to_align())
 }
 
@@ -125,6 +125,7 @@ unsafe impl<'mcx> std::alloc::Allocator for &MemCx<'mcx> {
             Ok(NonNull::new_unchecked(slice))
         }
     }
+
     #[cfg(not(any(feature = "pg12", feature = "pg13", feature = "pg14", feature = "pg15")))]
     fn allocate_zeroed(
         &self,
