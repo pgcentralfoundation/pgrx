@@ -19,7 +19,7 @@ pub struct MemCx<'mcx> {
 
 impl<'mcx> MemCx<'mcx> {
     /// Wrap the provided [`pg_sys::MemoryContext`]
-    /// 
+    ///
     /// # Safety:
     /// Assumes the provided [`pg_sys::MemoryContext`] is valid and properly initialized.
     /// This method does check to ensure the pointer is non-null, but that is the only sanity
@@ -29,7 +29,7 @@ impl<'mcx> MemCx<'mcx> {
         MemCx { ptr, _marker: PhantomData }
     }
 
-    /// Allocate a raw byte buffer `size` bytes in length 
+    /// Allocate a raw byte buffer `size` bytes in length
     /// and returns a pointer to the new allocation.
     pub unsafe fn alloc_bytes(&self, size: usize) -> *mut u8 {
         pg_sys::MemoryContextAlloc(self.ptr.as_ptr(), size).cast()
@@ -61,7 +61,9 @@ where
     feature = "nightly",
     any(feature = "pg12", feature = "pg13", feature = "pg14", feature = "pg15")
 ))]
-fn layout_for_pre16(layout: std::alloc::Layout) -> Result<std::alloc::Layout, std::alloc::AllocError> {
+fn layout_for_pre16(
+    layout: std::alloc::Layout,
+) -> Result<std::alloc::Layout, std::alloc::AllocError> {
     Ok(layout.align_to(8).map_err(|_e| std::alloc::AllocError)?.pad_to_align())
 }
 
