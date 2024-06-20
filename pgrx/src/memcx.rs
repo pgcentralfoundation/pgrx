@@ -20,7 +20,7 @@ pub struct MemCx<'mcx> {
 impl<'mcx> MemCx<'mcx> {
     /// Wrap the provided [`pg_sys::MemoryContext`]
     ///
-    /// # Safety:
+    /// # Safety
     /// Assumes the provided [`pg_sys::MemoryContext`] is valid and properly initialized.
     /// This method does check to ensure the pointer is non-null, but that is the only sanity
     /// check that is performed.
@@ -35,9 +35,16 @@ impl<'mcx> MemCx<'mcx> {
         pg_sys::MemoryContextAlloc(self.ptr.as_ptr(), size).cast()
     }
 
-    /// Stores the current global memory context, switches to *this* memory context,
+    /// Stores the current memory context, switches to *this* memory context,
     /// and executes the closure `f`.
-    /// Once `f` completes, the previous global memory context is restored.
+    /// Once `f` completes, the previous current memory context is restored.
+    /// 
+    /// # Safety
+    /// If `f` panics, the current memory context will remain set to this MemCx,
+    /// and the previous current memory context will not be restored, leaving the entire
+    /// Postgres environment in an invalid state.
+    /// Please do not use this method with closures that can panic (of course, this is
+    /// less of a concern for unit tests).
     pub unsafe fn exec_in<T>(&self, f: impl FnOnce() -> T) -> T {
         let remembered = pg_sys::MemoryContextSwitchTo(self.ptr.as_ptr());
         let res = f();
@@ -46,7 +53,7 @@ impl<'mcx> MemCx<'mcx> {
     }
 }
 
-/// Acquire the current global context and operate inside it.
+/// Acquire the current context and operate inside it.
 pub fn current_context<'curr, F, T>(f: F) -> T
 where
     F: for<'clos> FnOnce(&'clos MemCx<'curr>) -> T,
@@ -56,28 +63,17 @@ where
     f(&memcx)
 }
 
-/// Does alignment / padding logic for pre-Postgres16 8-byte alignment.
-#[cfg(all(
-    feature = "nightly",
-    any(feature = "pg12", feature = "pg13", feature = "pg14", feature = "pg15")
-))]
-fn layout_for_pre16(
-    layout: std::alloc::Layout,
-) -> Result<std::alloc::Layout, std::alloc::AllocError> {
-    Ok(layout.align_to(8).map_err(|_e| std::alloc::AllocError)?.pad_to_align())
-}
-
 #[cfg(feature = "nightly")]
 unsafe impl<'mcx> std::alloc::Allocator for &MemCx<'mcx> {
-    // Future-proofing - currently only pg16 supports arbitrary alignment, but that is likely
-    // to change, whereas old versions are unlikely to lose 8-byte alignment.
-    #[cfg(any(feature = "pg12", feature = "pg13", feature = "pg14", feature = "pg15"))]
+    #[cfg(not(feature = "pg16"))]
     fn allocate(
         &self,
         layout: std::alloc::Layout,
     ) -> Result<NonNull<[u8]>, std::alloc::AllocError> {
         // On versions before Postgres 16, alignment is always 8 byte / 64 bit.
-        let layout = layout_for_pre16(layout)?;
+        if layout.align() != 8 { 
+            return Err(std::alloc::AllocError)
+        }
         unsafe {
             let ptr = pgrx_pg_sys::MemoryContextAlloc(self.ptr.as_ptr(), layout.size());
             let slice: &mut [u8] = slice::from_raw_parts_mut(ptr.cast(), layout.size());
@@ -85,7 +81,7 @@ unsafe impl<'mcx> std::alloc::Allocator for &MemCx<'mcx> {
         }
     }
 
-    #[cfg(not(any(feature = "pg12", feature = "pg13", feature = "pg14", feature = "pg15")))]
+    #[cfg(feature = "pg16")]
     fn allocate(
         &self,
         layout: std::alloc::Layout,
@@ -113,14 +109,16 @@ unsafe impl<'mcx> std::alloc::Allocator for &MemCx<'mcx> {
         pgrx_pg_sys::pfree(ptr.as_ptr().cast())
     }
 
-    #[cfg(any(feature = "pg12", feature = "pg13", feature = "pg14", feature = "pg15"))]
+    #[cfg(not(feature = "pg16"))]
     fn allocate_zeroed(
         &self,
         layout: std::alloc::Layout,
     ) -> Result<NonNull<[u8]>, std::alloc::AllocError> {
         // Overriding default function here to use Postgres' zeroing implementation.
         // On versions before Postgres 16, alignment is always 8 byte / 64 bit.
-        let layout = layout_for_pre16(layout)?;
+        if layout.align() != 8 { 
+            return Err(std::alloc::AllocError)
+        }
         unsafe {
             let ptr = pgrx_pg_sys::MemoryContextAllocZero(self.ptr.as_ptr(), layout.size());
             let slice: &mut [u8] = slice::from_raw_parts_mut(ptr.cast(), layout.size());
@@ -128,7 +126,7 @@ unsafe impl<'mcx> std::alloc::Allocator for &MemCx<'mcx> {
         }
     }
 
-    #[cfg(not(any(feature = "pg12", feature = "pg13", feature = "pg14", feature = "pg15")))]
+    #[cfg(feature = "pg16")]
     fn allocate_zeroed(
         &self,
         layout: std::alloc::Layout,
