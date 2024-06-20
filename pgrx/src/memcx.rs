@@ -38,7 +38,7 @@ impl<'mcx> MemCx<'mcx> {
     /// Stores the current memory context, switches to *this* memory context,
     /// and executes the closure `f`.
     /// Once `f` completes, the previous current memory context is restored.
-    /// 
+    ///
     /// # Safety
     /// If `f` panics, the current memory context will remain set to this MemCx,
     /// and the previous current memory context will not be restored, leaving the entire
@@ -71,8 +71,8 @@ unsafe impl<'mcx> std::alloc::Allocator for &MemCx<'mcx> {
         layout: std::alloc::Layout,
     ) -> Result<NonNull<[u8]>, std::alloc::AllocError> {
         // On versions before Postgres 16, alignment is always 8 byte / 64 bit.
-        if layout.align() != 8 { 
-            return Err(std::alloc::AllocError)
+        if layout.align() != 8 {
+            return Err(std::alloc::AllocError);
         }
         unsafe {
             let ptr = pgrx_pg_sys::MemoryContextAlloc(self.ptr.as_ptr(), layout.size());
@@ -116,8 +116,8 @@ unsafe impl<'mcx> std::alloc::Allocator for &MemCx<'mcx> {
     ) -> Result<NonNull<[u8]>, std::alloc::AllocError> {
         // Overriding default function here to use Postgres' zeroing implementation.
         // On versions before Postgres 16, alignment is always 8 byte / 64 bit.
-        if layout.align() != 8 { 
-            return Err(std::alloc::AllocError)
+        if layout.align() != 8 {
+            return Err(std::alloc::AllocError);
         }
         unsafe {
             let ptr = pgrx_pg_sys::MemoryContextAllocZero(self.ptr.as_ptr(), layout.size());
