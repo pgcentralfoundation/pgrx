@@ -63,30 +63,12 @@ where
     f(&memcx)
 }
 
-#[cfg(feature = "nightly")]
+#[cfg(all(feature = "nightly", feature = "pg16"))]
 unsafe impl<'mcx> std::alloc::Allocator for &MemCx<'mcx> {
-    #[cfg(not(feature = "pg16"))]
     fn allocate(
         &self,
         layout: std::alloc::Layout,
     ) -> Result<NonNull<[u8]>, std::alloc::AllocError> {
-        // On versions before Postgres 16, alignment is always 8 byte / 64 bit.
-        if layout.align() != 8 {
-            return Err(std::alloc::AllocError);
-        }
-        unsafe {
-            let ptr = pgrx_pg_sys::MemoryContextAlloc(self.ptr.as_ptr(), layout.size());
-            let slice: &mut [u8] = slice::from_raw_parts_mut(ptr.cast(), layout.size());
-            Ok(NonNull::new_unchecked(slice))
-        }
-    }
-
-    #[cfg(feature = "pg16")]
-    fn allocate(
-        &self,
-        layout: std::alloc::Layout,
-    ) -> Result<NonNull<[u8]>, std::alloc::AllocError> {
-        // Postgres 16 and newer permit any arbitrary power-of-2 alignment
         unsafe {
             // Bitflags for MemoryContextAllocAligned:
             // #define MCXT_ALLOC_HUGE    0x01 /* allow huge allocation (> 1 GB) */
@@ -109,24 +91,6 @@ unsafe impl<'mcx> std::alloc::Allocator for &MemCx<'mcx> {
         pgrx_pg_sys::pfree(ptr.as_ptr().cast())
     }
 
-    #[cfg(not(feature = "pg16"))]
-    fn allocate_zeroed(
-        &self,
-        layout: std::alloc::Layout,
-    ) -> Result<NonNull<[u8]>, std::alloc::AllocError> {
-        // Overriding default function here to use Postgres' zeroing implementation.
-        // On versions before Postgres 16, alignment is always 8 byte / 64 bit.
-        if layout.align() != 8 {
-            return Err(std::alloc::AllocError);
-        }
-        unsafe {
-            let ptr = pgrx_pg_sys::MemoryContextAllocZero(self.ptr.as_ptr(), layout.size());
-            let slice: &mut [u8] = slice::from_raw_parts_mut(ptr.cast(), layout.size());
-            Ok(NonNull::new_unchecked(slice))
-        }
-    }
-
-    #[cfg(feature = "pg16")]
     fn allocate_zeroed(
         &self,
         layout: std::alloc::Layout,
