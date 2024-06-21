@@ -833,7 +833,7 @@ impl<'a, 'fcx> Iterator for Arguments<'a, 'fcx> {
 }
 
 impl<'a, 'fcx> Arguments<'a, 'fcx> {
-    unsafe fn unbox_next_unchecked<T: ArgAbi<'fcx>>(&mut self) -> Option<T> {
+    pub unsafe fn unbox_next_unchecked<T: ArgAbi<'fcx>>(&mut self) -> Option<T> {
         match T::unbox_virtual_argument(self) {
             None => self.iter.next().map(|arg| unsafe { T::unbox_argument(arg) }),
             some @ Some(_) => some,

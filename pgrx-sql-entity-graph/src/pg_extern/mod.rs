@@ -406,7 +406,7 @@ impl PgExtern {
                 let pat = &arg_pats[idx];
                 let resolved_ty = &arg.used_ty.resolved_ty;
                 quote_spanned!{ pat.span() =>
-                    let #pat = <#resolved_ty as ::pgrx::callconv::ArgAbi>::unbox_argument(#args_ident).unwrap();
+                    let #pat = #args_ident.unbox_next_unchecked::<#resolved_ty>().unwrap();
                 }
             } else {
                 let pat = &arg_pats[idx];

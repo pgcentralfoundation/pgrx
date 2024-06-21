@@ -108,8 +108,8 @@ where
         }
     }
 
-    unsafe fn unbox_argument(args: &mut ::pgrx::callconv::Arguments<'_, 'fcx>) -> Option<Self> {
-        args.next().and_then(|arg| arg.unbox_arg_using_from_datum())
+    unsafe fn unbox_argument(arg: ::pgrx::callconv::Argument<'_, 'fcx>) -> Self {
+        unsafe { arg.unbox_arg_using_from_datum().unwrap() }
     }
 }
 

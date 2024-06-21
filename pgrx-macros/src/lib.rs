@@ -713,8 +713,8 @@ fn impl_postgres_enum(ast: DeriveInput) -> syn::Result<proc_macro2::TokenStream>
                 }
             }
 
-            unsafe fn unbox_argument(args: &mut ::pgrx::callconv::Arguments<'_, #fcx_lt>) -> Option<Self> {
-                args.next().and_then(|arg| arg.unbox_arg_using_from_datum())
+            unsafe fn unbox_argument(arg: ::pgrx::callconv::Argument<'_, #fcx_lt>) -> Self {
+                unsafe { arg.unbox_arg_using_from_datum().unwrap() }
             }
 
         }
@@ -928,8 +928,8 @@ fn impl_postgres_type(ast: DeriveInput) -> syn::Result<proc_macro2::TokenStream>
                                 .unwrap_or_else(|| panic!("argument {index} must not be null"))
                         }
                     }
-                    unsafe fn unbox_argument(args: &mut ::pgrx::callconv::Arguments<'_, #fcx_lt>) -> Option<Self> {
-                        args.next().and_then(|arg| unsafe { arg.unbox_arg_using_from_datum() })
+                    unsafe fn unbox_argument(arg: ::pgrx::callconv::Argument<'_, #fcx_lt>) -> Self {
+                        unsafe { arg.unbox_arg_using_from_datum().unwrap() }
                     }
                 }
             }
