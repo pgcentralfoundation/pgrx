@@ -51,7 +51,18 @@ pub unsafe trait ArgAbi<'fcx>: Sized {
     // FIXME: use an iterator or something?
     unsafe fn unbox_from_fcinfo_index(fcinfo: &mut FcInfo<'fcx>, index: &mut usize) -> Self;
 
-    unsafe fn unbox_argument(args: &mut Arguments<'_, 'fcx>) -> Option<Self>;
+    unsafe fn unbox_next_argument(args: &mut Arguments<'_, 'fcx>) -> Option<Self> {
+        match Self::unbox_virtual_argument(args) {
+            None => args.next().map(|arg| unsafe { Self::unbox_argument(arg) }),
+            some @ Some(_) => some,
+        }
+    }
+
+    unsafe fn unbox_argument(args: Argument<'_, 'fcx>) -> Self;
+
+    fn unbox_virtual_argument(arg: &mut Arguments<'_, 'fcx>) -> Option<Self> {
+        None
+    }
 }
 
 pub fn wrap_fn<'fcx, A, F: FunctionMetadata<A>>(fcinfo: &mut FcInfo<'fcx>, f: F) -> Datum<'fcx> {
@@ -66,7 +77,7 @@ where
         todo!()
     }
 
-    unsafe fn unbox_argument(args: &mut Arguments<'_, 'fcx>) -> Option<Self> {
+    unsafe fn unbox_argument(arg: Argument<'_, 'fcx>) -> Self {
         todo!()
     }
 }
@@ -79,7 +90,7 @@ where
         todo!()
     }
 
-    unsafe fn unbox_argument(args: &mut Arguments<'_, 'fcx>) -> Option<Self> {
+    unsafe fn unbox_argument(arg: Argument<'_, 'fcx>) -> Self {
         todo!()
     }
 }
@@ -90,7 +101,7 @@ unsafe impl<'fcx, T> ArgAbi<'fcx> for crate::PgBox<T> {
         todo!()
     }
 
-    unsafe fn unbox_argument(args: &mut Arguments<'_, 'fcx>) -> Option<Self> {
+    unsafe fn unbox_argument(arg: Argument<'_, 'fcx>) -> Self {
         todo!()
     }
 }
@@ -103,7 +114,7 @@ where
         todo!()
     }
 
-    unsafe fn unbox_argument(args: &mut Arguments<'_, 'fcx>) -> Option<Self> {
+    unsafe fn unbox_argument(arg: Argument<'_, 'fcx>) -> Self {
         todo!()
     }
 }
@@ -122,7 +133,7 @@ where
         }
     }
 
-    unsafe fn unbox_argument(args: &mut Arguments<'_, 'fcx>) -> Option<Self> {
+    unsafe fn unbox_argument(arg: Argument<'_, 'fcx>) -> Self {
         // if true {
         //     *index += 1;
         //     None
@@ -148,8 +159,8 @@ where
         }
     }
 
-    unsafe fn unbox_argument(args: &mut Arguments<'_, 'fcx>) -> Option<Self> {
-        args.next().and_then(|arg| unsafe { arg.unbox_arg_using_from_datum() })
+    unsafe fn unbox_argument(arg: Argument<'_, 'fcx>) -> Self {
+        unsafe { arg.unbox_arg_using_from_datum().unwrap() }
     }
 }
 
@@ -161,7 +172,7 @@ where
         todo!()
     }
 
-    unsafe fn unbox_argument(args: &mut Arguments<'_, 'fcx>) -> Option<Self> {
+    unsafe fn unbox_argument(arg: Argument<'_, 'fcx>) -> Self {
         todo!()
     }
 }
@@ -176,7 +187,7 @@ unsafe impl<'fcx, T: Copy> ArgAbi<'fcx> for PgVarlena<T> {
         unsafe { Self::from_datum(*value) }
     }
 
-    unsafe fn unbox_argument(args: &mut Arguments<'_, 'fcx>) -> Option<Self> {
+    unsafe fn unbox_argument(arg: Argument<'_, 'fcx>) -> Self {
         todo!()
     }
 }
@@ -193,8 +204,8 @@ unsafe impl<'fcx, const P: u32, const S: u32> ArgAbi<'fcx> for crate::Numeric<P,
         }
     }
 
-    unsafe fn unbox_argument(args: &mut Arguments<'_, 'fcx>) -> Option<Self> {
-        args.next().and_then(|arg| unsafe { arg.unbox_arg_using_from_datum() })
+    unsafe fn unbox_argument(arg: Argument<'_, 'fcx>) -> Self {
+        unsafe { arg.unbox_arg_using_from_datum().unwrap() }
     }
 }
 
@@ -203,7 +214,7 @@ unsafe impl<'fcx> ArgAbi<'fcx> for pg_sys::FunctionCallInfo {
         unsafe { fcinfo.as_mut_ptr() }
     }
 
-    unsafe fn unbox_argument(args: &mut Arguments<'_, 'fcx>) -> Option<Self> {
+    unsafe fn unbox_argument(arg: Argument<'_, 'fcx>) -> Self {
         todo!()
     }
 }
@@ -221,8 +232,8 @@ macro_rules! argue_from_datum {
                 }
             }
 
-            unsafe fn unbox_argument(args: &mut Arguments<'_, 'fcx>) -> Option<Self> {
-                args.next().and_then(|arg| unsafe { arg.unbox_arg_using_from_datum() })
+            unsafe fn unbox_argument(arg: Argument<'_, 'fcx>) -> Self {
+                unsafe { arg.unbox_arg_using_from_datum().unwrap() }
             }
         })*
     };
@@ -254,7 +265,7 @@ where
         Defaulted(unsafe { <T as ArgAbi>::unbox_from_fcinfo_index(fcinfo, index) })
     }
 
-    unsafe fn unbox_argument(args: &mut Arguments<'_, 'fcx>) -> Option<Self> {
+    unsafe fn unbox_argument(arg: Argument<'_, 'fcx>) -> Self {
         todo!()
     }
 }
@@ -273,12 +284,10 @@ where
         Named(unsafe { <T as ArgAbi<'fcx>>::unbox_from_fcinfo_index(fcinfo, index) })
     }
 
-    unsafe fn unbox_argument(args: &mut Arguments<'_, 'fcx>) -> Option<Self> {
+    unsafe fn unbox_argument(arg: Argument<'_, 'fcx>) -> Self {
         todo!()
     }
 }
-
-// basically intended to be the new version of the `composite_type!` macro
 // how even?
 #[repr(transparent)]
 pub struct CompositeType<T>(T);
@@ -291,7 +300,7 @@ where
         CompositeType(unsafe { <T as ArgAbi>::unbox_from_fcinfo_index(fcinfo, index) })
     }
 
-    unsafe fn unbox_argument(args: &mut Arguments<'_, 'fcx>) -> Option<Self> {
+    unsafe fn unbox_argument(arg: Argument<'_, 'fcx>) -> Self {
         todo!()
     }
 }
@@ -824,6 +833,13 @@ impl<'a, 'fcx> Iterator for Arguments<'a, 'fcx> {
 }
 
 impl<'a, 'fcx> Arguments<'a, 'fcx> {
+    unsafe fn unbox_next_unchecked<T: ArgAbi<'fcx>>(&mut self) -> Option<T> {
+        match T::unbox_virtual_argument(self) {
+            None => self.iter.next().map(|arg| unsafe { T::unbox_argument(arg) }),
+            some @ Some(_) => some,
+        }
+    }
+
     pub fn peek(&mut self) -> Option<&Argument<'a, 'fcx>> {
         self.iter.peek()
     }
