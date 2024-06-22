@@ -27,6 +27,19 @@ use core::{iter, mem, slice};
 use std::ffi::{CStr, CString};
 use std::ptr::NonNull;
 
+struct ReadOnly<T>(T);
+
+impl<T> ReadOnly<T> {
+    unsafe fn refer_to(&self) -> &T {
+        &self.0
+    }
+}
+
+unsafe impl<T> Sync for ReadOnly<T> {}
+
+static VIRTUAL_ARGUMENT: ReadOnly<pg_sys::NullableDatum> =
+    ReadOnly(pg_sys::NullableDatum { value: pg_sys::Datum::null(), isnull: true });
+
 /// How to pass a value from Postgres to Rust
 ///
 /// This bound is necessary to distinguish things which can be passed into a `#[pg_extern] fn`.
@@ -51,17 +64,11 @@ pub unsafe trait ArgAbi<'fcx>: Sized {
     // FIXME: use an iterator or something?
     unsafe fn unbox_from_fcinfo_index(fcinfo: &mut FcInfo<'fcx>, index: &mut usize) -> Self;
 
-    unsafe fn unbox_next_argument(args: &mut Arguments<'_, 'fcx>) -> Option<Self> {
-        match Self::unbox_virtual_argument(args) {
-            None => args.next().map(|arg| unsafe { Self::unbox_argument(arg) }),
-            some @ Some(_) => some,
-        }
-    }
-
     unsafe fn unbox_argument(args: Argument<'_, 'fcx>) -> Self;
 
-    fn unbox_virtual_argument(arg: &mut Arguments<'_, 'fcx>) -> Option<Self> {
-        None
+    /// "Is this a virtual arg?"
+    fn is_virtual_arg() -> bool {
+        false
     }
 }
 
@@ -134,13 +141,17 @@ where
     }
 
     unsafe fn unbox_argument(arg: Argument<'_, 'fcx>) -> Self {
-        // if true {
-        //     *index += 1;
-        //     None
-        // } else {
-        //     Some(unsafe { <T as ArgAbi>::unbox_from_fcinfo_index(fcinfo, index) })
-        // };
-        todo!()
+        if Self::is_virtual_arg() {
+            unsafe { Some(T::unbox_argument(arg)) }
+        } else if arg.is_null() {
+            None
+        } else {
+            unsafe { Some(T::unbox_argument(arg)) }
+        }
+    }
+
+    fn is_virtual_arg() -> bool {
+        T::is_virtual_arg()
     }
 }
 
@@ -781,10 +792,7 @@ impl<'fcx> FcInfo<'fcx> {
 
     #[inline]
     pub fn arguments<'arg>(&'arg self) -> Arguments<'arg, 'fcx> {
-        Arguments {
-            iter: InternalArguments { iter: self.raw_args().iter().enumerate(), fcinfo: self }
-                .peekable(),
-        }
+        Arguments { iter: self.raw_args().iter().enumerate(), fcinfo: self }
     }
 }
 
@@ -808,40 +816,31 @@ impl<'a, 'fcx> Argument<'a, 'fcx> {
 }
 
 pub struct Arguments<'a, 'fcx> {
-    iter: iter::Peekable<InternalArguments<'a, 'fcx>>,
-}
-
-struct InternalArguments<'a, 'fcx> {
     iter: iter::Enumerate<slice::Iter<'a, pg_sys::NullableDatum>>,
     fcinfo: &'a FcInfo<'fcx>,
-}
-
-impl<'a, 'fcx> Iterator for InternalArguments<'a, 'fcx> {
-    type Item = Argument<'a, 'fcx>;
-
-    fn next(&mut self) -> Option<Self::Item> {
-        self.iter.next().map(|(i, dat)| Argument(self.fcinfo, i, dat))
-    }
 }
 
 impl<'a, 'fcx> Iterator for Arguments<'a, 'fcx> {
     type Item = Argument<'a, 'fcx>;
 
     fn next(&mut self) -> Option<Self::Item> {
-        self.iter.next()
+        self.iter.next().map(|(a, b)| Argument(self.fcinfo, a, b))
     }
 }
 
 impl<'a, 'fcx> Arguments<'a, 'fcx> {
-    pub unsafe fn unbox_next_unchecked<T: ArgAbi<'fcx>>(&mut self) -> Option<T> {
-        match T::unbox_virtual_argument(self) {
-            None => self.iter.next().map(|arg| unsafe { T::unbox_argument(arg) }),
-            some @ Some(_) => some,
-        }
+    // generate an Argument for use by virtual args
+    fn synthesize_virtual_arg(&self) -> Argument<'a, 'fcx> {
+        Argument(self.fcinfo, usize::MAX, unsafe { VIRTUAL_ARGUMENT.refer_to() })
     }
-
-    pub fn peek(&mut self) -> Option<&Argument<'a, 'fcx>> {
-        self.iter.peek()
+    pub unsafe fn unbox_next_unchecked<T: ArgAbi<'fcx>>(&mut self) -> Option<T> {
+        if T::is_virtual_arg() {
+            // SAFETY: trivial condition
+            unsafe { Some(T::unbox_argument(self.synthesize_virtual_arg())) }
+        } else {
+            // SAFETY: caller upholds
+            unsafe { self.next().map(|next| T::unbox_argument(next)) }
+        }
     }
 }
 
