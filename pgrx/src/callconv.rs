@@ -78,27 +78,44 @@ pub fn wrap_fn<'fcx, A, F: FunctionMetadata<A>>(fcinfo: &mut FcInfo<'fcx>, f: F)
 
 unsafe impl<'fcx, T> ArgAbi<'fcx> for crate::datum::Array<'fcx, T>
 where
-    T: ArgAbi<'fcx>,
+    T: ArgAbi<'fcx> + UnboxDatum,
 {
     unsafe fn unbox_from_fcinfo_index(fcinfo: &mut FcInfo<'fcx>, index: &mut usize) -> Self {
         todo!()
     }
 
     unsafe fn unbox_argument(arg: Argument<'_, 'fcx>) -> Self {
-        todo!()
+        if arg.is_null() {
+            panic!("{} was null", arg.1);
+        }
+        let raw_array = unsafe {
+            crate::array::RawArray::detoast_from_varlena(
+                NonNull::new(arg.2.value.cast_mut_ptr()).unwrap(),
+            )
+        };
+        unsafe { crate::datum::Array::deconstruct_from(raw_array) }
     }
 }
 
 unsafe impl<'fcx, T> ArgAbi<'fcx> for crate::datum::VariadicArray<'fcx, T>
 where
-    T: ArgAbi<'fcx>,
+    T: ArgAbi<'fcx> + UnboxDatum,
 {
     unsafe fn unbox_from_fcinfo_index(fcinfo: &mut FcInfo<'fcx>, index: &mut usize) -> Self {
         todo!()
     }
 
     unsafe fn unbox_argument(arg: Argument<'_, 'fcx>) -> Self {
-        todo!()
+        if arg.is_null() {
+            panic!("{} was null", arg.1);
+        }
+        let raw_array = unsafe {
+            crate::array::RawArray::detoast_from_varlena(
+                NonNull::new(arg.2.value.cast_mut_ptr()).unwrap(),
+            )
+        };
+        let array = unsafe { crate::datum::Array::deconstruct_from(raw_array) };
+        crate::datum::VariadicArray::wrap_array(array)
     }
 }
 
