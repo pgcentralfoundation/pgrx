@@ -243,7 +243,7 @@ unsafe impl<'fcx> ArgAbi<'fcx> for pg_sys::FunctionCallInfo {
     }
 
     unsafe fn unbox_argument(arg: Argument<'_, 'fcx>) -> Self {
-        todo!()
+        unsafe { arg.0.as_mut_ptr() }
     }
 }
 
