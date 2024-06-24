@@ -10,6 +10,7 @@
 extern crate proc_macro;
 
 use quote::{format_ident, quote, quote_spanned};
+use std::mem::take;
 use std::ops::Deref;
 use std::str::FromStr;
 use syn::punctuated::Punctuated;
@@ -35,8 +36,7 @@ pub fn item_fn_without_rewrite(mut func: ItemFn) -> syn::Result<proc_macro2::Tok
     let input_func_name = func.sig.ident.to_string();
     let sig = func.sig.clone();
     let vis = func.vis.clone();
-    let attrs = func.attrs.clone();
-
+    let mut attrs = take(&mut func.attrs);
     let generics = func.sig.generics.clone();
 
     if attrs.iter().any(|attr| attr.path().is_ident("no_mangle"))
@@ -49,10 +49,12 @@ pub fn item_fn_without_rewrite(mut func: ItemFn) -> syn::Result<proc_macro2::Tok
         panic!("#[pg_guard] for function with generic parameters must not be combined with #[no_mangle]");
     }
 
+    attrs.push(syn::parse_quote!(#[automatically_derived]));
+    attrs.push(syn::parse_quote!(#[allow(clippy::used_underscore_binding)]));
+
     // but for the inner function (the one we're wrapping) we don't need any kind of
     // abi classification
     func.sig.abi = None;
-    func.attrs.clear();
 
     // nor do we need a visibility beyond "private"
     func.vis = Visibility::Inherited;
