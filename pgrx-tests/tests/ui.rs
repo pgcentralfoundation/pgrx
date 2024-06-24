@@ -7,7 +7,7 @@ use trybuild::TestCases;
 #[test]
 fn compile_fail() {
     let t = TestCases::new();
-    t.compile_fail("tests/stable/compile-fail/*.rs");
+    t.compile_fail("tests/compile-fail/*.rs");
 }
 
 /// These are tests which currently fail, but should be fixed later.
@@ -15,7 +15,7 @@ fn compile_fail() {
 #[test]
 fn todo() {
     let t = TestCases::new();
-    t.compile_fail("tests/stable/todo/*.rs");
+    t.compile_fail("tests/todo/*.rs");
 }
 
 /// These are tests which are intended to always fail.
