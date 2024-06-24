@@ -194,7 +194,20 @@ where
 
 unsafe impl<'fcx, T> ArgAbi<'fcx> for Vec<T>
 where
-    T: ArgAbi<'fcx>,
+    for<'arr> T: UnboxDatum<As<'arr> = T> + 'arr,
+{
+    unsafe fn unbox_from_fcinfo_index(fcinfo: &mut FcInfo<'fcx>, index: &mut usize) -> Self {
+        todo!()
+    }
+
+    unsafe fn unbox_argument(arg: Argument<'_, 'fcx>) -> Self {
+        todo!()
+    }
+}
+
+unsafe impl<'fcx, T> ArgAbi<'fcx> for Vec<Option<T>>
+where
+    for<'arr> T: UnboxDatum<As<'arr> = T> + 'arr,
 {
     unsafe fn unbox_from_fcinfo_index(fcinfo: &mut FcInfo<'fcx>, index: &mut usize) -> Self {
         todo!()
