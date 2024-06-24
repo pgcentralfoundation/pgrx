@@ -1,5 +1,5 @@
 error[E0277]: the trait bound `BrokenType: std::cmp::Eq` is not satisfied
- --> tests/compile-fail/total-eq-for-postgres_eq.rs:4:59
+ --> tests/nightly/compile-fail/total-eq-for-postgres_eq.rs:4:59
   |
 4 | #[derive(Serialize, Deserialize, PartialEq, PostgresType, PostgresEq)]
   |                                                           ^^^^^^^^^^ the trait `std::cmp::Eq` is not implemented for `BrokenType`
@@ -11,15 +11,19 @@ help: consider annotating `BrokenType` with `#[derive(Eq)]`
 5 + #[derive(Eq)]
 6 | pub struct BrokenType {
   |
+help: add `#![feature(trivial_bounds)]` to the crate attributes to enable
+  |
+1 + #![feature(trivial_bounds)]
+  |
 
 error[E0277]: the trait bound `BrokenType: std::cmp::Eq` is not satisfied
- --> tests/compile-fail/total-eq-for-postgres_eq.rs:4:59
+ --> tests/nightly/compile-fail/total-eq-for-postgres_eq.rs:4:59
   |
 4 | #[derive(Serialize, Deserialize, PartialEq, PostgresType, PostgresEq)]
   |                                                           ^^^^^^^^^^ the trait `std::cmp::Eq` is not implemented for `BrokenType`
   |
 note: required by a bound in `brokentype_eq`
- --> tests/compile-fail/total-eq-for-postgres_eq.rs:4:59
+ --> tests/nightly/compile-fail/total-eq-for-postgres_eq.rs:4:59
   |
 4 | #[derive(Serialize, Deserialize, PartialEq, PostgresType, PostgresEq)]
   |                                                           ^^^^^^^^^^ required by this bound in `brokentype_eq`
