@@ -58,12 +58,6 @@ static VIRTUAL_ARGUMENT: ReadOnly<pg_sys::NullableDatum> =
 /// The number of invariants implementers must uphold is unlikely to be adequately documented.
 /// Prefer to use ArgAbi as a trait bound instead of implementing it, or even calling it, yourself.
 pub unsafe trait ArgAbi<'fcx>: Sized {
-    /// unbox the type from the `pg_sys::FunctionCallInfo`, and advance the index 0..N steps
-    ///
-    /// this weird signature allows variadic arguments to work correctly
-    // FIXME: use an iterator or something?
-    unsafe fn unbox_from_fcinfo_index(fcinfo: &mut FcInfo<'fcx>, index: &mut usize) -> Self;
-
     unsafe fn unbox_argument(args: Argument<'_, 'fcx>) -> Self;
 
     /// "Is this a virtual arg?"
@@ -80,10 +74,6 @@ unsafe impl<'fcx, T> ArgAbi<'fcx> for crate::datum::Array<'fcx, T>
 where
     T: ArgAbi<'fcx> + UnboxDatum,
 {
-    unsafe fn unbox_from_fcinfo_index(fcinfo: &mut FcInfo<'fcx>, index: &mut usize) -> Self {
-        todo!()
-    }
-
     unsafe fn unbox_argument(arg: Argument<'_, 'fcx>) -> Self {
         if arg.is_null() {
             panic!("{} was null", arg.1);
@@ -101,10 +91,6 @@ unsafe impl<'fcx, T> ArgAbi<'fcx> for crate::datum::VariadicArray<'fcx, T>
 where
     T: ArgAbi<'fcx> + UnboxDatum,
 {
-    unsafe fn unbox_from_fcinfo_index(fcinfo: &mut FcInfo<'fcx>, index: &mut usize) -> Self {
-        todo!()
-    }
-
     unsafe fn unbox_argument(arg: Argument<'_, 'fcx>) -> Self {
         if arg.is_null() {
             panic!("{} was null", arg.1);
@@ -120,10 +106,6 @@ where
 }
 
 unsafe impl<'fcx, T> ArgAbi<'fcx> for crate::PgBox<T> {
-    unsafe fn unbox_from_fcinfo_index(fcinfo: &mut FcInfo<'fcx>, index: &mut usize) -> Self {
-        todo!()
-    }
-
     unsafe fn unbox_argument(arg: Argument<'_, 'fcx>) -> Self {
         let index = arg.index();
         unsafe {
@@ -134,10 +116,6 @@ unsafe impl<'fcx, T> ArgAbi<'fcx> for crate::PgBox<T> {
 }
 
 unsafe impl<'fcx> ArgAbi<'fcx> for PgHeapTuple<'fcx, crate::AllocatedByRust> {
-    unsafe fn unbox_from_fcinfo_index(fcinfo: &mut FcInfo<'fcx>, index: &mut usize) -> Self {
-        todo!()
-    }
-
     unsafe fn unbox_argument(arg: Argument<'_, 'fcx>) -> Self {
         let index = arg.index();
         unsafe {
@@ -151,16 +129,6 @@ unsafe impl<'fcx, T> ArgAbi<'fcx> for Option<T>
 where
     T: ArgAbi<'fcx>,
 {
-    unsafe fn unbox_from_fcinfo_index(fcinfo: &mut FcInfo<'fcx>, index: &mut usize) -> Self {
-        // check null
-        if true {
-            *index += 1;
-            None
-        } else {
-            Some(unsafe { <T as ArgAbi>::unbox_from_fcinfo_index(fcinfo, index) })
-        }
-    }
-
     unsafe fn unbox_argument(arg: Argument<'_, 'fcx>) -> Self {
         if Self::is_virtual_arg() {
             unsafe { Some(T::unbox_argument(arg)) }
@@ -180,17 +148,6 @@ unsafe impl<'fcx, T> ArgAbi<'fcx> for crate::Range<T>
 where
     T: FromDatum + crate::RangeSubType,
 {
-    unsafe fn unbox_from_fcinfo_index(fcinfo: &mut FcInfo<'fcx>, index: &mut usize) -> Self {
-        let Some(pg_sys::NullableDatum { value, isnull }) = fcinfo.raw_args().get(*index) else {
-            panic!("{index} is out of bounds of fcinfo!")
-        };
-        *index += 1;
-        unsafe {
-            crate::Range::<T>::from_datum(*value, *isnull)
-                .unwrap_or_else(|| panic!("argument {index} must not be null"))
-        }
-    }
-
     unsafe fn unbox_argument(arg: Argument<'_, 'fcx>) -> Self {
         let index = arg.index();
         unsafe {
@@ -204,10 +161,6 @@ unsafe impl<'fcx, T> ArgAbi<'fcx> for Vec<T>
 where
     for<'arr> T: UnboxDatum<As<'arr> = T> + FromDatum + 'arr,
 {
-    unsafe fn unbox_from_fcinfo_index(fcinfo: &mut FcInfo<'fcx>, index: &mut usize) -> Self {
-        todo!()
-    }
-
     unsafe fn unbox_argument(arg: Argument<'_, 'fcx>) -> Self {
         unsafe {
             if <T as FromDatum>::GET_TYPOID {
@@ -223,10 +176,6 @@ unsafe impl<'fcx, T> ArgAbi<'fcx> for Vec<Option<T>>
 where
     for<'arr> T: UnboxDatum<As<'arr> = T> + FromDatum + 'arr,
 {
-    unsafe fn unbox_from_fcinfo_index(fcinfo: &mut FcInfo<'fcx>, index: &mut usize) -> Self {
-        todo!()
-    }
-
     unsafe fn unbox_argument(arg: Argument<'_, 'fcx>) -> Self {
         unsafe {
             if <T as FromDatum>::GET_TYPOID {
@@ -239,42 +188,18 @@ where
 }
 
 unsafe impl<'fcx, T: Copy> ArgAbi<'fcx> for PgVarlena<T> {
-    unsafe fn unbox_from_fcinfo_index(fcinfo: &mut FcInfo<'fcx>, index: &mut usize) -> Self {
-        let Some(pg_sys::NullableDatum { value, isnull }) = fcinfo.raw_args().get(*index) else {
-            panic!("{index} is out of bounds of fcinfo!")
-        };
-        *index += 1;
-        assert_eq!(*isnull, false, "PgVarlena from argument {index} must not be null");
-        unsafe { Self::from_datum(*value) }
-    }
-
     unsafe fn unbox_argument(arg: Argument<'_, 'fcx>) -> Self {
         unsafe { FromDatum::from_datum(arg.2.value, arg.is_null()).expect("unboxing pgvarlena") }
     }
 }
 
 unsafe impl<'fcx, const P: u32, const S: u32> ArgAbi<'fcx> for crate::Numeric<P, S> {
-    unsafe fn unbox_from_fcinfo_index(fcinfo: &mut FcInfo<'fcx>, index: &mut usize) -> Self {
-        let Some(pg_sys::NullableDatum { value, isnull }) = fcinfo.raw_args().get(*index) else {
-            panic!("{index} is out of bounds of fcinfo!")
-        };
-        *index += 1;
-        unsafe {
-            Self::from_datum(*value, *isnull)
-                .unwrap_or_else(|| panic!("argument {index} must not be null"))
-        }
-    }
-
     unsafe fn unbox_argument(arg: Argument<'_, 'fcx>) -> Self {
         unsafe { arg.unbox_arg_using_from_datum().unwrap() }
     }
 }
 
 unsafe impl<'fcx> ArgAbi<'fcx> for pg_sys::FunctionCallInfo {
-    unsafe fn unbox_from_fcinfo_index(fcinfo: &mut FcInfo<'fcx>, index: &mut usize) -> Self {
-        unsafe { fcinfo.as_mut_ptr() }
-    }
-
     unsafe fn unbox_argument(arg: Argument<'_, 'fcx>) -> Self {
         unsafe { arg.0.as_mut_ptr() }
     }
@@ -287,15 +212,7 @@ unsafe impl<'fcx> ArgAbi<'fcx> for pg_sys::FunctionCallInfo {
 macro_rules! argue_from_datum {
     ($lt:lifetime; $($unboxable:ty),*) => {
         $(unsafe impl<$lt> ArgAbi<$lt> for $unboxable {
-            unsafe fn unbox_from_fcinfo_index(fcinfo: &mut FcInfo<$lt>, index: &mut usize) -> Self {
-                unsafe {
-                    let pg_sys::NullableDatum { value, isnull } = crate::fcinfo::pg_get_nullable_datum(fcinfo.0, *index);
-                    let value: Self = FromDatum::from_datum(value, isnull)
-                        .unwrap_or_else(|| panic!("argument {index} must not be null"));
-                    *index += 1;
-                    value
-                }
-            }
+
 
             unsafe fn unbox_argument(arg: Argument<'_, 'fcx>) -> Self {
                 let index = arg.index();
@@ -306,10 +223,6 @@ macro_rules! argue_from_datum {
 }
 
 unsafe impl<'a, 'fcx> ArgAbi<'fcx> for &'fcx CStr {
-    unsafe fn unbox_from_fcinfo_index(fcinfo: &mut FcInfo<'fcx>, index: &mut usize) -> Self {
-        todo!()
-    }
-
     unsafe fn unbox_argument(arg: Argument<'_, 'fcx>) -> Self {
         let datum = arg.2.value.value();
         let index = arg.index();
@@ -347,10 +260,6 @@ unsafe impl<'fcx, T> ArgAbi<'fcx> for Defaulted<T>
 where
     T: ArgAbi<'fcx>,
 {
-    unsafe fn unbox_from_fcinfo_index(fcinfo: &mut FcInfo<'fcx>, index: &mut usize) -> Self {
-        Defaulted(unsafe { <T as ArgAbi>::unbox_from_fcinfo_index(fcinfo, index) })
-    }
-
     unsafe fn unbox_argument(arg: Argument<'_, 'fcx>) -> Self {
         todo!()
     }
@@ -366,10 +275,6 @@ unsafe impl<'fcx, T> ArgAbi<'fcx> for Named<T>
 where
     T: ArgAbi<'fcx>,
 {
-    unsafe fn unbox_from_fcinfo_index(fcinfo: &mut FcInfo<'fcx>, index: &mut usize) -> Self {
-        Named(unsafe { <T as ArgAbi<'fcx>>::unbox_from_fcinfo_index(fcinfo, index) })
-    }
-
     unsafe fn unbox_argument(arg: Argument<'_, 'fcx>) -> Self {
         todo!()
     }
@@ -382,10 +287,6 @@ unsafe impl<'fcx, T> ArgAbi<'fcx> for CompositeType<T>
 where
     T: ArgAbi<'fcx>,
 {
-    unsafe fn unbox_from_fcinfo_index(fcinfo: &mut FcInfo<'fcx>, index: &mut usize) -> Self {
-        CompositeType(unsafe { <T as ArgAbi>::unbox_from_fcinfo_index(fcinfo, index) })
-    }
-
     unsafe fn unbox_argument(arg: Argument<'_, 'fcx>) -> Self {
         todo!()
     }
