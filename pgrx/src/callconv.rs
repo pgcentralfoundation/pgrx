@@ -125,7 +125,11 @@ unsafe impl<'fcx, T> ArgAbi<'fcx> for crate::PgBox<T> {
     }
 
     unsafe fn unbox_argument(arg: Argument<'_, 'fcx>) -> Self {
-        unsafe { Self::from_datum(arg.2.value, arg.is_null()).unwrap() }
+        let index = arg.index();
+        unsafe {
+            Self::from_datum(arg.2.value, arg.is_null())
+                .unwrap_or_else(|| panic!("argument {} must not be null", index))
+        }
     }
 }
 
@@ -135,7 +139,11 @@ unsafe impl<'fcx> ArgAbi<'fcx> for PgHeapTuple<'fcx, crate::AllocatedByRust> {
     }
 
     unsafe fn unbox_argument(arg: Argument<'_, 'fcx>) -> Self {
-        unsafe { FromDatum::from_datum(arg.2.value, arg.is_null()).unwrap() }
+        let index = arg.index();
+        unsafe {
+            FromDatum::from_datum(arg.2.value, arg.is_null())
+                .unwrap_or_else(|| panic!("argument {} must not be null", index))
+        }
     }
 }
 
@@ -184,7 +192,11 @@ where
     }
 
     unsafe fn unbox_argument(arg: Argument<'_, 'fcx>) -> Self {
-        unsafe { arg.unbox_arg_using_from_datum().unwrap() }
+        let index = arg.index();
+        unsafe {
+            arg.unbox_arg_using_from_datum()
+                .unwrap_or_else(|| panic!("argument {} must not be null", index))
+        }
     }
 }
 
@@ -286,7 +298,8 @@ macro_rules! argue_from_datum {
             }
 
             unsafe fn unbox_argument(arg: Argument<'_, 'fcx>) -> Self {
-                unsafe { arg.unbox_arg_using_from_datum().unwrap() }
+                let index = arg.index();
+                unsafe { arg.unbox_arg_using_from_datum().unwrap_or_else(|| panic!("argument {index} must not be null")) }
             }
         })*
     };
@@ -860,6 +873,10 @@ impl<'a, 'fcx> Argument<'a, 'fcx> {
 
     pub fn is_null(&self) -> bool {
         self.2.isnull
+    }
+
+    pub fn index(&self) -> usize {
+        self.1
     }
 }
 
