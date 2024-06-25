@@ -174,4 +174,55 @@ mod tests {
             }
         })
     }
+
+    #[cfg(feature = "nightly")]
+    #[pg_test]
+    #[no_mangle]
+    fn highly_aligned_type() { 
+        use pgrx::memcx::{current_context, MemCx};
+        const BUF_SIZE: usize = 3319;
+
+        #[repr(align(4096))]
+        struct Foo {
+            pub cool_id: u8,
+            pub words: String,
+            pub buf: [u8; BUF_SIZE],
+        }
+        impl Foo { 
+            // mcx used only for vec-building for buf, here.
+            pub fn new(id: u8, memcx: &MemCx) -> Self { 
+                let mut buf_vec: Vec<u8, &MemCx> = Vec::new_in(memcx);
+                for i in 0 .. BUF_SIZE { 
+                    buf_vec.push( Self::buf_value_for(id, i) );
+                }
+                Foo {
+                    cool_id: id,
+                    words: format!("Buffer_{id}"),
+                    buf: buf_vec.try_into().unwrap(),
+                }
+            }
+            pub fn buf_value_for(id: u8, buffer_index: usize) -> u8 { 
+                ((buffer_index as u64 + id as u64) % 256) as u8
+            }
+            pub fn validate_content(&self) { 
+                assert_eq!(self.words, format!("Buffer_{}", self.cool_id));
+                for (i, byte) in self.buf.iter().enumerate() { 
+                    assert_eq!(*byte, Self::buf_value_for(self.cool_id, i));
+                }
+            }
+        }
+        current_context(|mcx: &MemCx| {
+            //Initialize
+            let mut structures: Vec<Foo, &MemCx> = Vec::new_in(mcx);
+            for i in 0..32 {
+                let foo = Foo::new(i, mcx);
+                structures.push(foo);
+            }
+            for foo in structures.iter() { 
+                foo.validate_content();
+                let addr = (foo as *const Foo) as usize;
+                assert!((addr % 4096) == 0);
+            }
+        });
+    }
 }
