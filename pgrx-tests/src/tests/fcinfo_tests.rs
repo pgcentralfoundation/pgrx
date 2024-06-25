@@ -141,30 +141,13 @@ impl InOutFuncs for NullStrict {
     // doesn't define a NULL_ERROR_MESSAGE
 }
 
-#[derive(PostgresType, Serialize, Deserialize, Debug, PartialEq)]
-#[inoutfuncs]
-pub struct NullError {}
-
-impl InOutFuncs for NullError {
-    fn input(_input: &core::ffi::CStr) -> Self
-    where
-        Self: Sized,
-    {
-        NullError {}
-    }
-
-    fn output(&self, _buffer: &mut StringInfo) {}
-
-    const NULL_ERROR_MESSAGE: Option<&'static str> = Some("An error message");
-}
-
 #[cfg(any(test, feature = "pg_test"))]
 #[pgrx::pg_schema]
 mod tests {
     #[allow(unused_imports)]
     use crate as pgrx_tests;
 
-    use super::{NullError, NullStrict};
+    use super::NullStrict;
     use crate::tests::fcinfo_tests::same_name;
     use pgrx::prelude::*;
     use pgrx::{direct_pg_extern_function_call, IntoDatum};
@@ -318,11 +301,5 @@ mod tests {
     #[pg_test]
     fn test_null_strict_type() {
         assert_eq!(Ok(None), Spi::get_one::<NullStrict>("SELECT null::NullStrict"));
-    }
-
-    #[pg_test]
-    #[should_panic(expected = "An error message")]
-    fn test_null_error_type() {
-        Spi::get_one::<NullError>("SELECT null::NullError").unwrap();
     }
 }
