@@ -170,14 +170,6 @@ mod tests {
     }
 
     #[pg_test]
-    fn aggregate_demo_unique() {
-        let retval = Spi::get_one::<i32>(
-            "SELECT DemoUnique(value) FROM UNNEST(ARRAY ['a', 'a', 'b']) as value;",
-        );
-        assert_eq!(retval, Ok(Some(2)));
-    }
-
-    #[pg_test]
     fn aggregate_demo_percentile_disc() {
         // Example from https://www.postgresql.org/docs/current/xaggr.html#XAGGR-ORDERED-SET-AGGREGATES
         let retval = Spi::get_one::<i32>(

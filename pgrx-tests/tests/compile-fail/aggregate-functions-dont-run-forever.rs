@@ -180,6 +180,8 @@ impl Aggregate for AggregateWithMovingState {
 #[cfg(any(test, feature = "pg_test"))]
 #[pg_schema]
 mod tests {
+    #[allow(unused_imports)]
+    use pgrx::prelude::*;
 
     #[pg_test]
     fn test_scritch_collector() {
@@ -187,6 +189,33 @@ mod tests {
             "SELECT (scritch_collector(value)).scritches FROM UNNEST(ARRAY [1,2,3]) as value;",
         );
         assert_eq!(retval, Ok(Some(6)));
+    }
+
+    #[pg_test]
+    fn aggregate_demo_sum() {
+        let retval =
+            Spi::get_one::<i32>("SELECT demo_sum(value) FROM UNNEST(ARRAY [1, 1, 2]) as value;");
+        assert_eq!(retval, Ok(Some(4)));
+
+        // Moving-aggregate mode
+        let retval = Spi::get_one::<Vec<i32>>(
+            "
+            SELECT array_agg(calculated) FROM (
+                SELECT demo_sum(value) OVER (
+                    ROWS BETWEEN 1 PRECEDING AND CURRENT ROW
+                ) as calculated FROM UNNEST(ARRAY [1, 20, 300, 4000]) as value
+            ) as results;
+        ",
+        );
+        assert_eq!(retval, Ok(Some(vec![1, 21, 320, 4300])));
+    }
+
+    #[pg_test]
+    fn aggregate_demo_unique() {
+        let retval = Spi::get_one::<i32>(
+            "SELECT DemoUnique(value) FROM UNNEST(ARRAY ['a', 'a', 'b']) as value;",
+        );
+        assert_eq!(retval, Ok(Some(2)));
     }
 }
 fn main() {}
