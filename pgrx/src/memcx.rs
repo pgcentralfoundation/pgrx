@@ -31,8 +31,8 @@ impl<'mcx> MemCx<'mcx> {
 
     /// Allocate a raw byte buffer `size` bytes in length
     /// and returns a pointer to the new allocation.
-    pub unsafe fn alloc_bytes(&self, size: usize) -> *mut u8 {
-        pg_sys::MemoryContextAlloc(self.ptr.as_ptr(), size).cast()
+    pub fn alloc_bytes(&self, size: usize) -> *mut u8 {
+        unsafe { pg_sys::MemoryContextAlloc(self.ptr.as_ptr(), size).cast() }
     }
 
     /// Stores the current memory context, switches to *this* memory context,
