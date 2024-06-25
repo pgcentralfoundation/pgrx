@@ -119,27 +119,23 @@ where
     }
 }
 
-// not sure how this is gonna work
 unsafe impl<'fcx, T> ArgAbi<'fcx> for crate::PgBox<T> {
     unsafe fn unbox_from_fcinfo_index(fcinfo: &mut FcInfo<'fcx>, index: &mut usize) -> Self {
         todo!()
     }
 
     unsafe fn unbox_argument(arg: Argument<'_, 'fcx>) -> Self {
-        todo!()
+        unsafe { Self::from_datum(arg.2.value, arg.is_null()).unwrap() }
     }
 }
 
-unsafe impl<'fcx, W> ArgAbi<'fcx> for PgHeapTuple<'fcx, W>
-where
-    W: crate::WhoAllocated,
-{
+unsafe impl<'fcx> ArgAbi<'fcx> for PgHeapTuple<'fcx, crate::AllocatedByRust> {
     unsafe fn unbox_from_fcinfo_index(fcinfo: &mut FcInfo<'fcx>, index: &mut usize) -> Self {
         todo!()
     }
 
     unsafe fn unbox_argument(arg: Argument<'_, 'fcx>) -> Self {
-        todo!()
+        unsafe { FromDatum::from_datum(arg.2.value, arg.is_null()).unwrap() }
     }
 }
 
@@ -241,7 +237,7 @@ unsafe impl<'fcx, T: Copy> ArgAbi<'fcx> for PgVarlena<T> {
     }
 
     unsafe fn unbox_argument(arg: Argument<'_, 'fcx>) -> Self {
-        todo!()
+        unsafe { FromDatum::from_datum(arg.2.value, arg.is_null()).expect("unboxing pgvarlena") }
     }
 }
 
@@ -269,6 +265,10 @@ unsafe impl<'fcx> ArgAbi<'fcx> for pg_sys::FunctionCallInfo {
 
     unsafe fn unbox_argument(arg: Argument<'_, 'fcx>) -> Self {
         unsafe { arg.0.as_mut_ptr() }
+    }
+
+    fn is_virtual_arg() -> bool {
+        true
     }
 }
 

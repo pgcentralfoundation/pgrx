@@ -406,7 +406,7 @@ impl PgExtern {
                 let pat = &arg_pats[idx];
                 let resolved_ty = &arg.used_ty.resolved_ty;
                 quote_spanned!{ pat.span() =>
-                    let #pat = #args_ident.unbox_next_unchecked::<#resolved_ty>().unwrap();
+                    let #pat = #args_ident.unbox_next_unchecked::<#resolved_ty>().unwrap_or_else(|| panic!("unboxing {} argument failed", stringify!(#pat)));
                 }
             } else {
                 let pat = &arg_pats[idx];
