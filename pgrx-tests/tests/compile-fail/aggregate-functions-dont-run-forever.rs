@@ -177,4 +177,16 @@ impl Aggregate for AggregateWithMovingState {
     }
 }
 
+#[cfg(any(test, feature = "pg_test"))]
+#[pg_schema]
+mod tests {
+
+    #[pg_test]
+    fn test_scritch_collector() {
+        let retval = Spi::get_one::<i32>(
+            "SELECT (scritch_collector(value)).scritches FROM UNNEST(ARRAY [1,2,3]) as value;",
+        );
+        assert_eq!(retval, Ok(Some(6)));
+    }
+}
 fn main() {}

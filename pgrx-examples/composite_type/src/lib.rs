@@ -243,14 +243,6 @@ mod tests {
     }
 
     #[pg_test]
-    fn test_scritch_collector() {
-        let retval = Spi::get_one::<i32>(
-            "SELECT (scritchcollector(value)).scritches FROM UNNEST(ARRAY [1,2,3]) as value;",
-        );
-        assert_eq!(retval, Ok(Some(6)));
-    }
-
-    #[pg_test]
     fn test_dog_add_operator() {
         let retval = Spi::get_one::<i32>("SELECT (ROW('Nami', 0)::Dog + 1).scritches;");
         assert_eq!(retval, Ok(Some(1)));
