@@ -194,27 +194,39 @@ where
 
 unsafe impl<'fcx, T> ArgAbi<'fcx> for Vec<T>
 where
-    for<'arr> T: UnboxDatum<As<'arr> = T> + 'arr,
+    for<'arr> T: UnboxDatum<As<'arr> = T> + FromDatum + 'arr,
 {
     unsafe fn unbox_from_fcinfo_index(fcinfo: &mut FcInfo<'fcx>, index: &mut usize) -> Self {
         todo!()
     }
 
     unsafe fn unbox_argument(arg: Argument<'_, 'fcx>) -> Self {
-        todo!()
+        unsafe {
+            if <T as FromDatum>::GET_TYPOID {
+                Self::from_polymorphic_datum(arg.2.value, arg.is_null(), arg.raw_oid()).unwrap()
+            } else {
+                Self::from_datum(arg.2.value, arg.is_null()).unwrap()
+            }
+        }
     }
 }
 
 unsafe impl<'fcx, T> ArgAbi<'fcx> for Vec<Option<T>>
 where
-    for<'arr> T: UnboxDatum<As<'arr> = T> + 'arr,
+    for<'arr> T: UnboxDatum<As<'arr> = T> + FromDatum + 'arr,
 {
     unsafe fn unbox_from_fcinfo_index(fcinfo: &mut FcInfo<'fcx>, index: &mut usize) -> Self {
         todo!()
     }
 
     unsafe fn unbox_argument(arg: Argument<'_, 'fcx>) -> Self {
-        todo!()
+        unsafe {
+            if <T as FromDatum>::GET_TYPOID {
+                Self::from_polymorphic_datum(arg.2.value, arg.is_null(), arg.raw_oid()).unwrap()
+            } else {
+                Self::from_datum(arg.2.value, arg.is_null()).unwrap()
+            }
+        }
     }
 }
 
@@ -830,6 +842,7 @@ impl<'fcx> FcInfo<'fcx> {
 pub struct Argument<'a, 'fcx>(&'a FcInfo<'fcx>, usize, &'a pg_sys::NullableDatum);
 
 impl<'a, 'fcx> Argument<'a, 'fcx> {
+    /// Note: some overhead
     pub fn raw_oid(&self) -> pg_sys::Oid {
         // we can just unwrap here because we know we were created using a valid index
         self.0.get_arg_type(self.1).unwrap()
