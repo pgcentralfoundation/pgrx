@@ -57,30 +57,6 @@ error[E0515]: cannot return value referencing function parameter `a`
 16 |     v
    |     ^ returns a value referencing data owned by the current function
 
-error: lifetime may not live long enough
-  --> tests/compile-fail/arrays-dont-leak.rs:13:27
-   |
-13 | fn array_echo_aba<'a, 'b>(a: Array<'a, &'b str>) -> Vec<Option<&'a str>> {
-   |                   --  --  ^ argument requires that `'a` must outlive `'b`
-   |                   |   |
-   |                   |   lifetime `'b` defined here
-   |                   lifetime `'a` defined here
-   |
-   = help: consider adding the following bound: `'a: 'b`
-
-error: lifetime may not live long enough
-  --> tests/compile-fail/arrays-dont-leak.rs:13:27
-   |
-13 | fn array_echo_aba<'a, 'b>(a: Array<'a, &'b str>) -> Vec<Option<&'a str>> {
-   |                   --  --  ^ argument requires that `'b` must outlive `'a`
-   |                   |   |
-   |                   |   lifetime `'b` defined here
-   |                   lifetime `'a` defined here
-   |
-   = help: consider adding the following bound: `'b: 'a`
-
-help: `'a` and `'b` must be the same: replace one with the other
-
 error[E0505]: cannot move out of `a` because it is borrowed
   --> tests/compile-fail/arrays-dont-leak.rs:22:10
    |
@@ -116,28 +92,6 @@ error[E0515]: cannot return value referencing function parameter `a`
 22 |     drop(a);
 23 |     v
    |     ^ returns a value referencing data owned by the current function
-
-error: lifetime may not live long enough
-  --> tests/compile-fail/arrays-dont-leak.rs:20:27
-   |
-20 | fn array_echo_baa<'a, 'b>(a: Array<'b, &'a str>) -> Vec<Option<&'a str>> {
-   |                   --  --  ^ argument requires that `'a` must outlive `'b`
-   |                   |   |
-   |                   |   lifetime `'b` defined here
-   |                   lifetime `'a` defined here
-   |
-   = help: consider adding the following bound: `'a: 'b`
-
-error: lifetime may not live long enough
-  --> tests/compile-fail/arrays-dont-leak.rs:20:27
-   |
-20 | fn array_echo_baa<'a, 'b>(a: Array<'b, &'a str>) -> Vec<Option<&'a str>> {
-   |                   --  --  ^ argument requires that `'b` must outlive `'a`
-   |                   |   |
-   |                   |   lifetime `'b` defined here
-   |                   lifetime `'a` defined here
-   |
-   = help: consider adding the following bound: `'b: 'a`
 
 error[E0505]: cannot move out of `array` because it is borrowed
   --> tests/compile-fail/arrays-dont-leak.rs:34:10
