@@ -404,9 +404,8 @@ impl PgExtern {
         let arg_fetches = args.iter().enumerate().map(|(idx, arg)| {
             if new_unboxing {
                 let pat = &arg_pats[idx];
-                let resolved_ty = &arg.used_ty.resolved_ty;
                 quote_spanned!{ pat.span() =>
-                    let #pat = #args_ident.unbox_next_unchecked::<#resolved_ty>().unwrap_or_else(|| panic!("unboxing {} argument failed", stringify!(#pat)));
+                    let #pat = #args_ident.unbox_next_unchecked().unwrap_or_else(|| panic!("unboxing {} argument failed", stringify!(#pat)));
                 }
             } else {
                 let pat = &arg_pats[idx];

@@ -305,12 +305,32 @@ macro_rules! argue_from_datum {
     };
 }
 
+unsafe impl<'a, 'fcx> ArgAbi<'fcx> for &'fcx CStr {
+    unsafe fn unbox_from_fcinfo_index(fcinfo: &mut FcInfo<'fcx>, index: &mut usize) -> Self {
+        todo!()
+    }
+
+    unsafe fn unbox_argument(arg: Argument<'_, 'fcx>) -> Self {
+        let datum = arg.2.value.value();
+        let index = arg.index();
+        let null = arg.is_null();
+        unsafe {
+            arg.unbox_arg_using_from_datum().unwrap_or_else(|| {
+                panic!(
+                    "CStr argument {index} is {}null, was actually {datum}",
+                    if null { "" } else { "non" }
+                )
+            })
+        }
+    }
+}
+
 argue_from_datum! { 'fcx; i8, i16, i32, i64, f32, f64, bool, char, String, Vec<u8> }
 argue_from_datum! { 'fcx; Date, Interval, Time, TimeWithTimeZone, Timestamp, TimestampWithTimeZone }
 argue_from_datum! { 'fcx; AnyArray, AnyElement, AnyNumeric }
 argue_from_datum! { 'fcx; Inet, Internal, Json, Uuid }
 argue_from_datum! { 'fcx; pg_sys::Oid, pg_sys::Point, pg_sys::BOX  }
-argue_from_datum! { 'fcx; &'fcx str, &'fcx CStr, &'fcx [u8] }
+argue_from_datum! { 'fcx; &'fcx str, &'fcx [u8] }
 
 // problem: our macros?
 // idea: new structs? only expand to them sometimes? maybe? idk
