@@ -849,8 +849,13 @@ impl<'a, 'fcx> Argument<'a, 'fcx> {
     }
 
     pub unsafe fn unbox_arg_using_from_datum<T: FromDatum>(self) -> Option<T> {
-        let pg_sys::NullableDatum { isnull, value } = *self.2;
-        unsafe { FromDatum::from_datum(value, isnull) }
+        unsafe {
+            if <T as FromDatum>::GET_TYPOID {
+                T::from_polymorphic_datum(self.2.value, self.is_null(), self.raw_oid())
+            } else {
+                T::from_datum(self.2.value, self.is_null())
+            }
+        }
     }
 
     pub fn is_null(&self) -> bool {
