@@ -9,10 +9,7 @@
 //LICENSE Use of this source code is governed by the MIT license that can be found in the LICENSE file.
 #![doc(hidden)]
 #![deny(unsafe_op_in_unsafe_fn)]
-#![allow(unused)]
 //! Helper implementations for returning sets and tables from `#[pg_extern]`-style functions
-
-use pgrx_sql_entity_graph::metadata::FunctionMetadata;
 
 use crate::datum::Datum;
 use crate::heap_tuple::PgHeapTuple;
@@ -22,8 +19,7 @@ use crate::{
     Timestamp, TimestampWithTimeZone, UnboxDatum, Uuid,
 };
 use core::marker::PhantomData;
-use core::panic::{RefUnwindSafe, UnwindSafe};
-use core::{iter, mem, slice};
+use core::{iter, mem, ptr, slice};
 use std::ffi::{CStr, CString};
 use std::ptr::NonNull;
 
@@ -64,10 +60,6 @@ pub unsafe trait ArgAbi<'fcx>: Sized {
     fn is_virtual_arg() -> bool {
         false
     }
-}
-
-pub fn wrap_fn<'fcx, A, F: FunctionMetadata<A>>(fcinfo: &mut FcInfo<'fcx>, f: F) -> Datum<'fcx> {
-    todo!()
 }
 
 unsafe impl<'fcx, T> ArgAbi<'fcx> for crate::datum::Array<'fcx, T>
@@ -222,75 +214,12 @@ macro_rules! argue_from_datum {
     };
 }
 
-unsafe impl<'a, 'fcx> ArgAbi<'fcx> for &'fcx CStr {
-    unsafe fn unbox_argument(arg: Argument<'_, 'fcx>) -> Self {
-        let datum = arg.2.value.value();
-        let index = arg.index();
-        let null = arg.is_null();
-        unsafe {
-            arg.unbox_arg_using_from_datum().unwrap_or_else(|| {
-                panic!(
-                    "CStr argument {index} is {}null, was actually {datum}",
-                    if null { "" } else { "non" }
-                )
-            })
-        }
-    }
-}
-
 argue_from_datum! { 'fcx; i8, i16, i32, i64, f32, f64, bool, char, String, Vec<u8> }
 argue_from_datum! { 'fcx; Date, Interval, Time, TimeWithTimeZone, Timestamp, TimestampWithTimeZone }
 argue_from_datum! { 'fcx; AnyArray, AnyElement, AnyNumeric }
 argue_from_datum! { 'fcx; Inet, Internal, Json, Uuid }
 argue_from_datum! { 'fcx; pg_sys::Oid, pg_sys::Point, pg_sys::BOX  }
-argue_from_datum! { 'fcx; &'fcx str, &'fcx [u8] }
-
-// problem: our macros?
-// idea: new structs? only expand to them sometimes? maybe? idk
-
-// basically intended to be the new version of the `default!` macro
-// some notes:
-// defaults come last
-// defaults are presented by postgres, we don't gotta worry about them, except maybe bounding
-// can't actually implement the nice version without `adt_const_params`, thinking about it
-#[repr(transparent)]
-pub struct Defaulted<T>(T);
-
-unsafe impl<'fcx, T> ArgAbi<'fcx> for Defaulted<T>
-where
-    T: ArgAbi<'fcx>,
-{
-    unsafe fn unbox_argument(arg: Argument<'_, 'fcx>) -> Self {
-        todo!()
-    }
-}
-
-// basically intended to be the new version of the `name!` macro
-// adt_const_params aren't stable, do we have to macro-expand a new Named every time?
-// this one doesn't actually need adt_const_params because we have arrays
-#[repr(transparent)]
-pub struct Named<T>(T);
-
-unsafe impl<'fcx, T> ArgAbi<'fcx> for Named<T>
-where
-    T: ArgAbi<'fcx>,
-{
-    unsafe fn unbox_argument(arg: Argument<'_, 'fcx>) -> Self {
-        todo!()
-    }
-}
-// how even?
-#[repr(transparent)]
-pub struct CompositeType<T>(T);
-
-unsafe impl<'fcx, T> ArgAbi<'fcx> for CompositeType<T>
-where
-    T: ArgAbi<'fcx>,
-{
-    unsafe fn unbox_argument(arg: Argument<'_, 'fcx>) -> Self {
-        todo!()
-    }
-}
+argue_from_datum! { 'fcx; &'fcx str, &'fcx CStr, &'fcx [u8] }
 
 /// How to return a value from Rust to Postgres
 ///
@@ -328,7 +257,7 @@ pub unsafe trait RetAbi: Sized {
     // move into the function context and obtain a Datum
     fn box_ret_in<'fcx>(fcinfo: &mut FcInfo<'fcx>, ret: Self::Ret) -> Datum<'fcx> {
         let fcinfo = fcinfo.0;
-        unsafe { mem::transmute(unsafe { Self::box_ret_in_fcinfo(fcinfo, ret) }) }
+        unsafe { mem::transmute(Self::box_ret_in_fcinfo(fcinfo, ret)) }
     }
 
     /// box the return value
@@ -577,10 +506,7 @@ where
 type FcInfoData = pg_sys::FunctionCallInfoBaseData;
 
 #[derive(Clone)]
-pub struct FcInfo<'fcx>(
-    pgrx_pg_sys::FunctionCallInfo,
-    std::marker::PhantomData<&'fcx mut FcInfoData>,
-);
+pub struct FcInfo<'fcx>(pgrx_pg_sys::FunctionCallInfo, PhantomData<&'fcx mut FcInfoData>);
 
 // when talking about this, there's the lifetime for setreturningfunction, and then there's the current context's lifetime.
 // Potentially <'srf, 'curr, 'ret: 'curr + 'srf> -> <'ret> but don't start with that.
@@ -599,9 +525,8 @@ impl<'fcx> FcInfo<'fcx> {
     /// [`pg_sys::FunctionCallInfo`] pointer.  This is your responsibility.
     #[inline]
     pub unsafe fn from_ptr(fcinfo: pg_sys::FunctionCallInfo) -> FcInfo<'fcx> {
-        let _nullptr_check =
-            std::ptr::NonNull::new(fcinfo).expect("fcinfo pointer must be non-null");
-        Self(fcinfo, std::marker::PhantomData)
+        let _nullptr_check = NonNull::new(fcinfo).expect("fcinfo pointer must be non-null");
+        Self(fcinfo, PhantomData)
     }
     /// Retrieve the arguments to this function call as a slice of [`pgrx_pg_sys::NullableDatum`]
     #[inline]
@@ -610,7 +535,7 @@ impl<'fcx> FcInfo<'fcx> {
         // at construction time.
         unsafe {
             let arg_len = (*self.0).nargs;
-            let args_ptr: *const pg_sys::NullableDatum = std::ptr::addr_of!((*self.0).args).cast();
+            let args_ptr: *const pg_sys::NullableDatum = ptr::addr_of!((*self.0).args).cast();
             // A valid FcInfoWrapper constructed from a valid FuntionCallInfo should always have
             // at least nargs elements of NullableDatum.
             std::slice::from_raw_parts(args_ptr, arg_len as _)
@@ -833,7 +758,7 @@ impl<'a, 'fcx> Arguments<'a, 'fcx> {
 #[derive(Clone)]
 pub struct ReturnSetInfoWrapper<'fcx>(
     *mut pg_sys::ReturnSetInfo,
-    std::marker::PhantomData<&'fcx mut pg_sys::ReturnSetInfo>,
+    PhantomData<&'fcx mut pg_sys::ReturnSetInfo>,
 );
 
 impl<'fcx> ReturnSetInfoWrapper<'fcx> {
@@ -845,9 +770,8 @@ impl<'fcx> ReturnSetInfoWrapper<'fcx> {
     /// [`pg_sys::ReturnSetInfo`] pointer.  This is your responsibility.
     #[inline]
     pub unsafe fn from_ptr(retinfo: *mut pg_sys::ReturnSetInfo) -> ReturnSetInfoWrapper<'fcx> {
-        let _nullptr_check =
-            std::ptr::NonNull::new(retinfo).expect("fcinfo pointer must be non-null");
-        Self(retinfo, std::marker::PhantomData)
+        let _nullptr_check = NonNull::new(retinfo).expect("fcinfo pointer must be non-null");
+        Self(retinfo, PhantomData)
     }
     /*
     /* result status from function (but pre-initialized by caller): */
