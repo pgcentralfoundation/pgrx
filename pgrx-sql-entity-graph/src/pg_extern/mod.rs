@@ -44,7 +44,7 @@ use quote::{format_ident, quote, quote_spanned};
 use syn::parse::{Parse, ParseStream, Parser};
 use syn::punctuated::Punctuated;
 use syn::spanned::Spanned;
-use syn::{Meta, Token, Type};
+use syn::{Meta, Token};
 
 /// A parsed `#[pg_extern]` item.
 ///
@@ -376,7 +376,6 @@ impl PgExtern {
     pub fn wrapper_func(&self) -> Result<syn::ItemFn, syn::Error> {
         let signature = &self.func.sig;
         let func_name = &signature.ident;
-        let is_raw = self.extern_attrs().contains(&Attribute::Raw);
         // We use a `_` prefix to make functions with no args more satisfied during linting.
         let fcinfo_ident = syn::Ident::new("_fcinfo", signature.ident.span());
         let mut lifetimes = signature
@@ -396,43 +395,13 @@ impl PgExtern {
 
         let args = &self.inputs;
         let arg_pats = args.iter().map(|v| format_ident!("{}_", &v.pat)).collect::<Vec<_>>();
-        let new_unboxing = {
-            // false
-            true
-        };
         let args_ident = proc_macro2::Ident::new("_args", Span::call_site());
-        let arg_fetches = args.iter().enumerate().map(|(idx, arg)| {
-            if new_unboxing {
-                let pat = &arg_pats[idx];
+        let arg_fetches = arg_pats.iter().map(|pat| {
                 quote_spanned!{ pat.span() =>
                     let #pat = #args_ident.unbox_next_unchecked().unwrap_or_else(|| panic!("unboxing {} argument failed", stringify!(#pat)));
                 }
-            } else {
-                let pat = &arg_pats[idx];
-                let resolved_ty = &arg.used_ty.resolved_ty;
-                match resolved_ty {
-                    // There's no danger of misinterpreting the type, as pointer coercions must typecheck!
-                    Type::Path(ty_path) if ty_path.last_ident_is("FunctionCallInfo") => quote_spanned! { pat.span() =>
-                        let #pat = #fcinfo_ident;
-                    },
-                    Type::Tuple(tup) if tup.elems.is_empty() => quote_spanned! { pat.span() =>
-                        debug_assert!(unsafe { ::pgrx::fcinfo::pg_getarg::<()>(#fcinfo_ident, #idx).is_none() }, "A `()` argument should always receive `NULL`");
-                        let #pat = ();
-                    },
-                    _ => match (is_raw, &arg.used_ty.optional) {
-                        (true, None) | (true, Some(_)) => quote_spanned! { pat.span() =>
-                            let #pat = unsafe { ::pgrx::fcinfo::pg_getarg_datum_raw(#fcinfo_ident, #idx) as #resolved_ty };
-                        },
-                        (false, None) => quote_spanned! { pat.span() =>
-                            let #pat = unsafe { ::pgrx::fcinfo::pg_getarg::<#resolved_ty>(#fcinfo_ident, #idx).unwrap_or_else(|| panic!("{} is null", stringify!{#pat})) };
-                        },
-                        (false, Some(inner)) => quote_spanned! { pat.span() =>
-                            let #pat = unsafe { ::pgrx::fcinfo::pg_getarg::<#inner>(#fcinfo_ident, #idx) };
-                        },
-                    }
-                }
             }
-        });
+        );
 
         match &self.returns {
             Returning::None
