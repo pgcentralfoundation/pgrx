@@ -416,30 +416,29 @@ impl PgExtern {
                     fn _internal_wrapper<#lifetimes>(fcinfo: &mut ::pgrx::callconv::FcInfo<#fc_lt>) -> ::pgrx::datum::Datum<#fc_lt> {
                         #[allow(unused_unsafe)]
                         unsafe {
-                            let #fcinfo_ident = fcinfo;
-                            let call_flow = <#ret_ty as ::pgrx::callconv::RetAbi>::check_and_prepare(#fcinfo_ident);
+                            let call_flow = <#ret_ty as ::pgrx::callconv::RetAbi>::check_and_prepare(fcinfo);
                             let result = match call_flow {
                                 ::pgrx::callconv::CallCx::WrappedFn(mcx) => {
                                     let mut mcx = ::pgrx::PgMemoryContexts::For(mcx);
-                                    let fcinfo = &*#fcinfo_ident;
-                                    let mut args = fcinfo.arguments();
-                                    let #args_ident= &mut args;
+                                    let #args_ident = &mut fcinfo.arguments();
                                     let call_result = mcx.switch_to(|_| {
                                         #(#arg_fetches)*
                                         #func_name( #(#arg_pats),* )
                                     });
                                     ::pgrx::callconv::RetAbi::to_ret(call_result)
                                 }
-                                ::pgrx::callconv::CallCx::RestoreCx => <#ret_ty as ::pgrx::callconv::RetAbi>::ret_from_fcx(#fcinfo_ident),
+                                ::pgrx::callconv::CallCx::RestoreCx => <#ret_ty as ::pgrx::callconv::RetAbi>::ret_from_fcx(fcinfo),
                             };
-                            ::core::mem::transmute(unsafe { <#ret_ty as ::pgrx::callconv::RetAbi>::box_ret_in(#fcinfo_ident, result) })
+                            ::core::mem::transmute(unsafe { <#ret_ty as ::pgrx::callconv::RetAbi>::box_ret_in(fcinfo, result) })
                         }
                     }
                     // We preserve the invariants
-                    let datum = unsafe { ::pgrx::pg_sys::submodules::panic::pgrx_extern_c_guard(|| {
-                        let mut fcinfo = ::pgrx::callconv::FcInfo::from_ptr(#fcinfo_ident) ;
-                        _internal_wrapper(&mut fcinfo)
-                    })};
+                    let datum = unsafe {
+                        ::pgrx::pg_sys::submodules::panic::pgrx_extern_c_guard(|| {
+                            let mut fcinfo = ::pgrx::callconv::FcInfo::from_ptr(#fcinfo_ident);
+                            _internal_wrapper(&mut fcinfo)
+                        })
+                    };
                     datum.sans_lifetime()
                 };
                 finfo_v1_extern_c(&self.func, fcinfo_ident, wrapper_code)
