@@ -376,8 +376,8 @@ impl PgExtern {
     pub fn wrapper_func(&self) -> Result<syn::ItemFn, syn::Error> {
         let signature = &self.func.sig;
         let func_name = &signature.ident;
-        // We use a `_` prefix to make functions with no args more satisfied during linting.
-        let fcinfo_ident = syn::Ident::new("_fcinfo", signature.ident.span());
+        // we have to do this slightly odd dance so we can pass the same ident between macros that don't know each other
+        let fcinfo_ident = syn::Ident::new("fcinfo", signature.ident.span());
         let mut lifetimes = signature
             .generics
             .lifetimes()
