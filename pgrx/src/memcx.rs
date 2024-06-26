@@ -8,8 +8,6 @@
 // And it's nice-ish to have shorter lifetime names and have 'mcx consistently mean the lifetime.
 use crate::pg_sys;
 use core::{marker::PhantomData, ptr::NonNull};
-#[cfg(feature = "nightly")]
-use std::slice;
 
 /// A borrowed memory context.
 pub struct MemCx<'mcx> {
@@ -64,7 +62,11 @@ where
 }
 
 #[cfg(all(feature = "nightly", feature = "pg16"))]
-unsafe impl<'mcx> std::alloc::Allocator for &MemCx<'mcx> {
+mod nightly {
+    use std::slice;
+    use super::*;
+
+    unsafe impl<'mcx> std::alloc::Allocator for &MemCx<'mcx> {
     fn allocate(
         &self,
         layout: std::alloc::Layout,
@@ -74,7 +76,7 @@ unsafe impl<'mcx> std::alloc::Allocator for &MemCx<'mcx> {
             // #define MCXT_ALLOC_HUGE    0x01 /* allow huge allocation (> 1 GB) */
             // #define MCXT_ALLOC_NO_OOM  0x02 /* no failure if out-of-memory */
             // #define MCXT_ALLOC_ZERO    0x04 /* zero allocated memory */
-            let ptr = pgrx_pg_sys::MemoryContextAllocAligned(
+            let ptr = pg_sys::MemoryContextAllocAligned(
                 self.ptr.as_ptr(),
                 layout.size(),
                 layout.align(),
@@ -88,7 +90,7 @@ unsafe impl<'mcx> std::alloc::Allocator for &MemCx<'mcx> {
     unsafe fn deallocate(&self, ptr: NonNull<u8>, _layout: std::alloc::Layout) {
         // TODO: Find faster free for use when MemoryContext is known.
         // This is the global function that looks up the relevant Memory Context by address range.
-        pgrx_pg_sys::pfree(ptr.as_ptr().cast())
+        pg_sys::pfree(ptr.as_ptr().cast())
     }
 
     fn allocate_zeroed(
@@ -102,7 +104,7 @@ unsafe impl<'mcx> std::alloc::Allocator for &MemCx<'mcx> {
             // #define MCXT_ALLOC_HUGE    0x01 /* allow huge allocation (> 1 GB) */
             // #define MCXT_ALLOC_NO_OOM  0x02 /* no failure if out-of-memory */
             // #define MCXT_ALLOC_ZERO    0x04 /* zero allocated memory */
-            let ptr = pgrx_pg_sys::MemoryContextAllocAligned(
+            let ptr = pg_sys::MemoryContextAllocAligned(
                 self.ptr.as_ptr(),
                 layout.size(),
                 layout.align(),
@@ -110,6 +112,7 @@ unsafe impl<'mcx> std::alloc::Allocator for &MemCx<'mcx> {
             );
             let slice: &mut [u8] = slice::from_raw_parts_mut(ptr.cast(), layout.size());
             Ok(NonNull::new_unchecked(slice))
+            }
         }
     }
 }
