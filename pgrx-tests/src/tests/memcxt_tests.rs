@@ -101,7 +101,6 @@ mod tests {
 
     #[cfg(feature = "nightly")]
     #[pg_test]
-    #[no_mangle]
     fn memcx_allocator_test_string_vecs() {
         use pgrx::memcx::{current_context, MemCx};
         current_context(|mcx: &MemCx| {
@@ -140,7 +139,6 @@ mod tests {
 
     #[cfg(feature = "nightly")]
     #[pg_test]
-    #[no_mangle]
     fn memcx_allocator_test_random_bytes() {
         use pgrx::memcx::{current_context, MemCx};
         current_context(|mcx: &MemCx| {
@@ -177,7 +175,6 @@ mod tests {
 
     #[cfg(feature = "nightly")]
     #[pg_test]
-    #[no_mangle]
     fn highly_aligned_type() {
         use pgrx::memcx::{current_context, MemCx};
         const BUF_SIZE: usize = 3319;
