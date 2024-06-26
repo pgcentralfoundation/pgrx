@@ -63,55 +63,55 @@ where
 
 #[cfg(all(feature = "nightly", feature = "pg16"))]
 mod nightly {
-    use std::slice;
     use super::*;
+    use std::slice;
 
     unsafe impl<'mcx> std::alloc::Allocator for &MemCx<'mcx> {
-    fn allocate(
-        &self,
-        layout: std::alloc::Layout,
-    ) -> Result<NonNull<[u8]>, std::alloc::AllocError> {
-        unsafe {
-            // Bitflags for MemoryContextAllocAligned:
-            // #define MCXT_ALLOC_HUGE    0x01 /* allow huge allocation (> 1 GB) */
-            // #define MCXT_ALLOC_NO_OOM  0x02 /* no failure if out-of-memory */
-            // #define MCXT_ALLOC_ZERO    0x04 /* zero allocated memory */
-            let ptr = pg_sys::MemoryContextAllocAligned(
-                self.ptr.as_ptr(),
-                layout.size(),
-                layout.align(),
-                0,
-            );
-            let slice: &mut [u8] = slice::from_raw_parts_mut(ptr.cast(), layout.size());
-            Ok(NonNull::new_unchecked(slice))
+        fn allocate(
+            &self,
+            layout: std::alloc::Layout,
+        ) -> Result<NonNull<[u8]>, std::alloc::AllocError> {
+            unsafe {
+                // Bitflags for MemoryContextAllocAligned:
+                // #define MCXT_ALLOC_HUGE    0x01 /* allow huge allocation (> 1 GB) */
+                // #define MCXT_ALLOC_NO_OOM  0x02 /* no failure if out-of-memory */
+                // #define MCXT_ALLOC_ZERO    0x04 /* zero allocated memory */
+                let ptr = pg_sys::MemoryContextAllocAligned(
+                    self.ptr.as_ptr(),
+                    layout.size(),
+                    layout.align(),
+                    0,
+                );
+                let slice: &mut [u8] = slice::from_raw_parts_mut(ptr.cast(), layout.size());
+                Ok(NonNull::new_unchecked(slice))
+            }
         }
-    }
 
-    unsafe fn deallocate(&self, ptr: NonNull<u8>, _layout: std::alloc::Layout) {
-        // TODO: Find faster free for use when MemoryContext is known.
-        // This is the global function that looks up the relevant Memory Context by address range.
-        pg_sys::pfree(ptr.as_ptr().cast())
-    }
+        unsafe fn deallocate(&self, ptr: NonNull<u8>, _layout: std::alloc::Layout) {
+            // TODO: Find faster free for use when MemoryContext is known.
+            // This is the global function that looks up the relevant Memory Context by address range.
+            pg_sys::pfree(ptr.as_ptr().cast())
+        }
 
-    fn allocate_zeroed(
-        &self,
-        layout: std::alloc::Layout,
-    ) -> Result<NonNull<[u8]>, std::alloc::AllocError> {
-        // Overriding default function here to use Postgres' zeroing implementation.
-        // Postgres 16 and newer permit any arbitrary power-of-2 alignment
-        unsafe {
-            // Bitflags for MemoryContextAllocAligned:
-            // #define MCXT_ALLOC_HUGE    0x01 /* allow huge allocation (> 1 GB) */
-            // #define MCXT_ALLOC_NO_OOM  0x02 /* no failure if out-of-memory */
-            // #define MCXT_ALLOC_ZERO    0x04 /* zero allocated memory */
-            let ptr = pg_sys::MemoryContextAllocAligned(
-                self.ptr.as_ptr(),
-                layout.size(),
-                layout.align(),
-                4,
-            );
-            let slice: &mut [u8] = slice::from_raw_parts_mut(ptr.cast(), layout.size());
-            Ok(NonNull::new_unchecked(slice))
+        fn allocate_zeroed(
+            &self,
+            layout: std::alloc::Layout,
+        ) -> Result<NonNull<[u8]>, std::alloc::AllocError> {
+            // Overriding default function here to use Postgres' zeroing implementation.
+            // Postgres 16 and newer permit any arbitrary power-of-2 alignment
+            unsafe {
+                // Bitflags for MemoryContextAllocAligned:
+                // #define MCXT_ALLOC_HUGE    0x01 /* allow huge allocation (> 1 GB) */
+                // #define MCXT_ALLOC_NO_OOM  0x02 /* no failure if out-of-memory */
+                // #define MCXT_ALLOC_ZERO    0x04 /* zero allocated memory */
+                let ptr = pg_sys::MemoryContextAllocAligned(
+                    self.ptr.as_ptr(),
+                    layout.size(),
+                    layout.align(),
+                    4,
+                );
+                let slice: &mut [u8] = slice::from_raw_parts_mut(ptr.cast(), layout.size());
+                Ok(NonNull::new_unchecked(slice))
             }
         }
     }
