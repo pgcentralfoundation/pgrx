@@ -54,6 +54,9 @@ static VIRTUAL_ARGUMENT: ReadOnly<pg_sys::NullableDatum> =
 /// The number of invariants implementers must uphold is unlikely to be adequately documented.
 /// Prefer to use ArgAbi as a trait bound instead of implementing it, or even calling it, yourself.
 pub unsafe trait ArgAbi<'fcx>: Sized {
+    /// # Safety
+    /// The argument's datum must have the matching "logical type" that can be "unboxed" from the
+    /// datum's object type.
     unsafe fn unbox_argument(args: Argument<'_, 'fcx>) -> Self;
 
     /// "Is this a virtual arg?"
@@ -707,6 +710,9 @@ impl<'a, 'fcx> Argument<'a, 'fcx> {
         self.0.get_arg_type(self.1).unwrap()
     }
 
+    /// # Safety
+    /// The argument's datum must have the matching "logical type" that can be "unboxed" from the
+    /// datum's object type.
     pub unsafe fn unbox_arg_using_from_datum<T: FromDatum>(self) -> Option<T> {
         unsafe {
             if <T as FromDatum>::GET_TYPOID {
@@ -744,6 +750,10 @@ impl<'a, 'fcx> Arguments<'a, 'fcx> {
     fn synthesize_virtual_arg(&self) -> Argument<'a, 'fcx> {
         Argument(self.fcinfo, usize::MAX, unsafe { VIRTUAL_ARGUMENT.refer_to() })
     }
+
+    /// # Safety
+    /// The argument's datum must have the matching "logical type" that can be "unboxed" from the
+    /// datum's object type.
     pub unsafe fn unbox_next_unchecked<T: ArgAbi<'fcx>>(&mut self) -> Option<T> {
         if T::is_virtual_arg() {
             // SAFETY: trivial condition
