@@ -376,24 +376,28 @@ impl PgExtern {
     pub fn wrapper_func(&self) -> Result<syn::ItemFn, syn::Error> {
         let signature = &self.func.sig;
         let func_name = &signature.ident;
-        // we have to do this slightly odd dance so we can pass the same ident between macros that don't know each other
+        // we do this odd dance so we can pass the same ident to macros that don't know each other
         let fcinfo_ident = syn::Ident::new("fcinfo", signature.ident.span());
         let mut lifetimes = signature
             .generics
             .lifetimes()
             .cloned()
             .collect::<syn::punctuated::Punctuated<_, Comma>>();
+        // we pick an arbitrary lifetime from the provided signature of the fn, if available,
+        // so lifetime-bound fn are easier to write with pgrx
         let fc_lt = lifetimes
             .first()
             .map(|lt_p| lt_p.lifetime.clone())
             .filter(|lt| lt.ident != "static")
             .unwrap_or(syn::Lifetime::new("'fcx", Span::mixed_site()));
+        // we need the bare lifetime later, but we also jam it into the bounds if it is new
         let fc_ltparam = syn::LifetimeParam::new(fc_lt.clone());
         if lifetimes.first() != Some(&fc_ltparam) {
             lifetimes.insert(0, fc_ltparam)
         }
 
         let args = &self.inputs;
+        // for unclear reasons the linker vomits if we don't do this
         let arg_pats = args.iter().map(|v| format_ident!("{}_", &v.pat)).collect::<Vec<_>>();
         let args_ident = proc_macro2::Ident::new("_args", Span::call_site());
         let arg_fetches = arg_pats.iter().map(|pat| {
