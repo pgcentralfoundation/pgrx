@@ -25,11 +25,3 @@ fn compile_fail() {
     let t = TestCases::new();
     t.compile_fail("tests/nightly/compile-fail/*.rs");
 }
-
-/// These are tests which currently fail, but should be fixed later.
-#[cfg(feature = "nightly")]
-#[test]
-fn todo() {
-    let t = TestCases::new();
-    t.compile_fail("tests/nightly/todo/*.rs");
-}
