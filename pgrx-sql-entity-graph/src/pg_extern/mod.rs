@@ -433,7 +433,7 @@ impl PgExtern {
                                 }
                                 ::pgrx::callconv::CallCx::RestoreCx => <#ret_ty as ::pgrx::callconv::RetAbi>::ret_from_fcx(fcinfo),
                             };
-                            ::core::mem::transmute(unsafe { <#ret_ty as ::pgrx::callconv::RetAbi>::box_ret_in(fcinfo, result) })
+                            unsafe { <#ret_ty as ::pgrx::callconv::RetAbi>::box_ret_in(fcinfo, result) }
                         }
                     }
                     // We preserve the invariants
