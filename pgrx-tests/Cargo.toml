@@ -39,6 +39,7 @@ pg_test = [ ]
 proptest = [ "dep:proptest" ]
 cshim = [ "pgrx/cshim" ]
 no-schema-generation = [ "pgrx/no-schema-generation", "pgrx-macros/no-schema-generation" ]
+nightly = [ "pgrx/nightly" ]
 
 [package.metadata.docs.rs]
 features = ["pg14", "proptest"]
