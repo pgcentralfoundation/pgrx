@@ -96,7 +96,7 @@ impl<'mcx, T: UnboxDatum> Array<'mcx, T> {
     ///
     /// This function requires that the RawArray was obtained in a properly-constructed form
     /// (probably from Postgres).
-    unsafe fn deconstruct_from(mut raw: Toast<RawArray>) -> Array<'mcx, T> {
+    pub(crate) unsafe fn deconstruct_from(mut raw: Toast<RawArray>) -> Array<'mcx, T> {
         let oid = raw.oid();
         let elem_layout = Layout::lookup_oid(oid);
         let null_inner = raw
@@ -665,6 +665,10 @@ where
 }
 
 impl<'mcx, T: UnboxDatum> VariadicArray<'mcx, T> {
+    pub(crate) fn wrap_array(arr: Array<'mcx, T>) -> Self {
+        VariadicArray(arr)
+    }
+
     /// Return an Iterator of `Option<T>` over the contained Datums.
     #[inline]
     pub fn iter(&self) -> ArrayIterator<'_, T> {

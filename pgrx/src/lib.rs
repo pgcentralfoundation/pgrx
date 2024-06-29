@@ -16,7 +16,7 @@
 //!
 //! // Convert the input string to lowercase and return
 //! #[pg_extern]
-//! fn my_to_lowercase(input: &'static str) -> String {
+//! fn my_to_lowercase(input: &str) -> String {
 //!     input.to_lowercase()
 //! }
 //!

@@ -4,6 +4,9 @@
 //! "structure-of-arrays" manner
 
 use bitvec::slice::BitSlice;
+use pgrx_sql_entity_graph::metadata::{
+    ArgumentError, Returns, ReturnsError, SqlMapping, SqlTranslatable,
+};
 use std::{borrow::Cow, fmt::Debug};
 
 pub enum Nullable<T> {
@@ -429,4 +432,19 @@ where
 pub trait IntoNullableIterator<T> {
     type Iter: Iterator<Item = Nullable<T>>;
     fn into_nullable_iter(self) -> Self::Iter;
+}
+
+unsafe impl<T> SqlTranslatable for Nullable<T>
+where
+    T: SqlTranslatable,
+{
+    fn argument_sql() -> Result<SqlMapping, ArgumentError> {
+        T::argument_sql()
+    }
+    fn return_sql() -> Result<Returns, ReturnsError> {
+        T::return_sql()
+    }
+    fn optional() -> bool {
+        true
+    }
 }

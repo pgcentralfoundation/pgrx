@@ -7,7 +7,7 @@
 //LICENSE All rights reserved.
 //LICENSE
 //LICENSE Use of this source code is governed by the MIT license that can be found in the LICENSE file.
-use pgrx::callconv::BoxRet;
+use pgrx::callconv::{ArgAbi, BoxRet};
 use pgrx::pg_sys::{Datum, Oid};
 use pgrx::pgrx_sql_entity_graph::metadata::{
     ArgumentError, Returns, ReturnsError, SqlMapping, SqlTranslatable,
@@ -91,6 +91,15 @@ impl IntoDatum for HexInt {
 
     fn type_oid() -> Oid {
         rust_regtypein::<Self>()
+    }
+}
+
+unsafe impl<'fcx> ArgAbi<'fcx> for HexInt
+where
+    Self: 'fcx,
+{
+    unsafe fn unbox_arg_unchecked(arg: ::pgrx::callconv::Arg<'_, 'fcx>) -> Self {
+        unsafe { arg.unbox_arg_using_from_datum().unwrap() }
     }
 }
 

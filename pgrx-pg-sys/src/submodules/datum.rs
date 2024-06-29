@@ -65,6 +65,11 @@ impl Datum {
         sptr::Strict::addr(self.0)
     }
 
+    #[inline]
+    pub const fn null() -> Datum {
+        Datum(core::ptr::null_mut())
+    }
+
     /// True if the datum is equal to the null pointer.
     #[inline]
     pub fn is_null(self) -> bool {

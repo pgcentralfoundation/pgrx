@@ -44,7 +44,7 @@ use quote::{format_ident, quote, quote_spanned};
 use syn::parse::{Parse, ParseStream, Parser};
 use syn::punctuated::Punctuated;
 use syn::spanned::Spanned;
-use syn::{Meta, Token, Type};
+use syn::{Meta, Token};
 
 /// A parsed `#[pg_extern]` item.
 ///
@@ -374,72 +374,75 @@ impl PgExtern {
     }
 
     pub fn wrapper_func(&self) -> Result<syn::ItemFn, syn::Error> {
-        let func_name = &self.func.sig.ident;
-        let is_raw = self.extern_attrs().contains(&Attribute::Raw);
-        // We use a `_` prefix to make functions with no args more satisfied during linting.
-        let fcinfo_ident = syn::Ident::new("_fcinfo", self.func.sig.ident.span());
-        let lifetimes =
-            self.func.sig.generics.lifetimes().collect::<syn::punctuated::Punctuated<_, Comma>>();
-        let fc_lt = syn::Lifetime::new("'fcx", Span::mixed_site());
+        let signature = &self.func.sig;
+        let func_name = &signature.ident;
+        // we do this odd dance so we can pass the same ident to macros that don't know each other
+        let fcinfo_ident = syn::Ident::new("fcinfo", signature.ident.span());
+        let mut lifetimes = signature
+            .generics
+            .lifetimes()
+            .cloned()
+            .collect::<syn::punctuated::Punctuated<_, Comma>>();
+        // we pick an arbitrary lifetime from the provided signature of the fn, if available,
+        // so lifetime-bound fn are easier to write with pgrx
+        let fc_lt = lifetimes
+            .first()
+            .map(|lt_p| lt_p.lifetime.clone())
+            .filter(|lt| lt.ident != "static")
+            .unwrap_or(syn::Lifetime::new("'fcx", Span::mixed_site()));
+        // we need the bare lifetime later, but we also jam it into the bounds if it is new
         let fc_ltparam = syn::LifetimeParam::new(fc_lt.clone());
+        if lifetimes.first() != Some(&fc_ltparam) {
+            lifetimes.insert(0, fc_ltparam)
+        }
 
         let args = &self.inputs;
+        // for unclear reasons the linker vomits if we don't do this
         let arg_pats = args.iter().map(|v| format_ident!("{}_", &v.pat)).collect::<Vec<_>>();
-        let arg_fetches = args.iter().enumerate().map(|(idx, arg)| {
-            let pat = &arg_pats[idx];
-            let resolved_ty = &arg.used_ty.resolved_ty;
-            match resolved_ty {
-                // There's no danger of misinterpreting the type, as pointer coercions must typecheck!
-                Type::Path(ty_path) if ty_path.last_ident_is("FunctionCallInfo") => quote_spanned! { pat.span() =>
-                    let #pat = #fcinfo_ident;
-                },
-                Type::Tuple(tup) if tup.elems.is_empty() => quote_spanned! { pat.span() =>
-                    debug_assert!(unsafe { ::pgrx::fcinfo::pg_getarg::<()>(#fcinfo_ident, #idx).is_none() }, "A `()` argument should always receive `NULL`");
-                    let #pat = ();
-                },
-                _ => match (is_raw, &arg.used_ty.optional) {
-                    (true, None) | (true, Some(_)) => quote_spanned! { pat.span() =>
-                        let #pat = unsafe { ::pgrx::fcinfo::pg_getarg_datum_raw(#fcinfo_ident, #idx) as #resolved_ty };
-                    },
-                    (false, None) => quote_spanned! { pat.span() =>
-                        let #pat = unsafe { ::pgrx::fcinfo::pg_getarg::<#resolved_ty>(#fcinfo_ident, #idx).unwrap_or_else(|| panic!("{} is null", stringify!{#pat})) };
-                    },
-                    (false, Some(inner)) => quote_spanned! { pat.span() =>
-                        let #pat = unsafe { ::pgrx::fcinfo::pg_getarg::<#inner>(#fcinfo_ident, #idx) };
-                    },
+        let args_ident = proc_macro2::Ident::new("_args", Span::call_site());
+        let arg_fetches = arg_pats.iter().map(|pat| {
+                quote_spanned!{ pat.span() =>
+                    let #pat = #args_ident.next_arg_unchecked().unwrap_or_else(|| panic!("unboxing {} argument failed", stringify!(#pat)));
                 }
             }
-        });
+        );
 
         match &self.returns {
             Returning::None
             | Returning::Type(_)
             | Returning::SetOf { .. }
             | Returning::Iterated { .. } => {
-                let ret_ty = match &self.func.sig.output {
+                let ret_ty = match &signature.output {
                     syn::ReturnType::Default => syn::parse_quote! { () },
                     syn::ReturnType::Type(_, ret_ty) => ret_ty.clone(),
                 };
                 let wrapper_code = quote_spanned! { self.func.block.span() =>
-                    fn _internal_wrapper<#fc_ltparam, #lifetimes>(fcinfo: ::pgrx::callconv::Fcinfo<#fc_lt>) -> ::pgrx::datum::Datum<#fc_lt> {
-                    #[allow(unused_unsafe)]
-                    unsafe {
-                        let #fcinfo_ident = fcinfo.0;
-                        let result = match <#ret_ty as ::pgrx::callconv::RetAbi>::check_fcinfo_and_prepare(#fcinfo_ident) {
-                            ::pgrx::callconv::CallCx::WrappedFn(mcx) => {
-                                let mut mcx = ::pgrx::PgMemoryContexts::For(mcx);
-                                ::pgrx::callconv::RetAbi::to_ret(mcx.switch_to(|_| {
-                                    #(#arg_fetches)*
-                                    #func_name( #(#arg_pats),* )
-                                }))
-                            }
-                            ::pgrx::callconv::CallCx::RestoreCx => <#ret_ty as ::pgrx::callconv::RetAbi>::ret_from_fcinfo_fcx(#fcinfo_ident),
-                        };
-                        ::core::mem::transmute(unsafe { <#ret_ty as ::pgrx::callconv::RetAbi>::box_ret_in_fcinfo(#fcinfo_ident, result) })
-                    }}
-                    let fcinfo = ::pgrx::callconv::Fcinfo(#fcinfo_ident, ::core::marker::PhantomData);
+                    fn _internal_wrapper<#lifetimes>(fcinfo: &mut ::pgrx::callconv::FcInfo<#fc_lt>) -> ::pgrx::datum::Datum<#fc_lt> {
+                        #[allow(unused_unsafe)]
+                        unsafe {
+                            let call_flow = <#ret_ty as ::pgrx::callconv::RetAbi>::check_and_prepare(fcinfo);
+                            let result = match call_flow {
+                                ::pgrx::callconv::CallCx::WrappedFn(mcx) => {
+                                    let mut mcx = ::pgrx::PgMemoryContexts::For(mcx);
+                                    let #args_ident = &mut fcinfo.args();
+                                    let call_result = mcx.switch_to(|_| {
+                                        #(#arg_fetches)*
+                                        #func_name( #(#arg_pats),* )
+                                    });
+                                    ::pgrx::callconv::RetAbi::to_ret(call_result)
+                                }
+                                ::pgrx::callconv::CallCx::RestoreCx => <#ret_ty as ::pgrx::callconv::RetAbi>::ret_from_fcx(fcinfo),
+                            };
+                            unsafe { <#ret_ty as ::pgrx::callconv::RetAbi>::box_ret_in(fcinfo, result) }
+                        }
+                    }
                     // We preserve the invariants
-                    let datum = unsafe { ::pgrx::pg_sys::submodules::panic::pgrx_extern_c_guard(move || _internal_wrapper(fcinfo)) };
+                    let datum = unsafe {
+                        ::pgrx::pg_sys::submodules::panic::pgrx_extern_c_guard(|| {
+                            let mut fcinfo = ::pgrx::callconv::FcInfo::from_ptr(#fcinfo_ident);
+                            _internal_wrapper(&mut fcinfo)
+                        })
+                    };
                     datum.sans_lifetime()
                 };
                 finfo_v1_extern_c(&self.func, fcinfo_ident, wrapper_code)

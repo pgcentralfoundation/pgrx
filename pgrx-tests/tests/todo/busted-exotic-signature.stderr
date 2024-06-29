@@ -1,15 +1,16 @@
-error[E0277]: the trait bound `Vec<Option<PgHeapTuple<'static, AllocatedByRust>>>: FromDatum` is not satisfied
-  --> tests/todo/busted-exotic-signature.rs:10:5
+error[E0277]: the trait bound `Vec<Option<PgHeapTuple<'_, AllocatedByRust>>>: ArgAbi<'_>` is not satisfied
+  --> tests/todo/busted-exotic-signature.rs:12:9
    |
-10 |     #[pg_extern]
-   |     ^^^^^^^^^^^^ the trait `FromDatum` is not implemented for `Vec<Option<PgHeapTuple<'static, AllocatedByRust>>>`
+12 |         _cats: pgrx::default!(
+   |         ^^^^^ the trait `ArgAbi<'_>` is not implemented for `Vec<Option<PgHeapTuple<'_, AllocatedByRust>>>`, which is required by `Option<Vec<Option<PgHeapTuple<'_, AllocatedByRust>>>>: ArgAbi<'_>`
    |
-   = help: the following other types implement trait `FromDatum`:
+   = help: the following other types implement trait `ArgAbi<'fcx>`:
              Vec<Option<T>>
              Vec<T>
              Vec<u8>
-note: required by a bound in `pg_getarg`
-  --> $WORKSPACE/pgrx/src/fcinfo.rs
+   = note: required for `Option<Vec<Option<PgHeapTuple<'_, AllocatedByRust>>>>` to implement `ArgAbi<'_>`
+note: required by a bound in `pgrx::callconv::Args::<'a, 'fcx>::next_arg_unchecked`
+  --> $WORKSPACE/pgrx/src/callconv.rs
    |
-   | pub unsafe fn pg_getarg<T: FromDatum>(fcinfo: pg_sys::FunctionCallInfo, num: usize) -> Option<T> {
-   |                            ^^^^^^^^^ required by this bound in `pg_getarg`
+   |     pub unsafe fn next_arg_unchecked<T: ArgAbi<'fcx>>(&mut self) -> Option<T> {
+   |                                         ^^^^^^^^^^^^ required by this bound in `Args::<'a, 'fcx>::next_arg_unchecked`

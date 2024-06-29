@@ -11,21 +11,256 @@
 #![deny(unsafe_op_in_unsafe_fn)]
 //! Helper implementations for returning sets and tables from `#[pg_extern]`-style functions
 
+use crate::datum::Datum;
 use crate::heap_tuple::PgHeapTuple;
+use crate::nullable::Nullable;
 use crate::{
-    pg_return_null, pg_sys, AnyNumeric, Date, Inet, Internal, Interval, IntoDatum, Json, PgBox,
-    PgMemoryContexts, PgVarlena, Time, TimeWithTimeZone, Timestamp, TimestampWithTimeZone, Uuid,
+    pg_return_null, pg_sys, AnyArray, AnyElement, AnyNumeric, Date, FromDatum, Inet, Internal,
+    Interval, IntoDatum, Json, PgBox, PgMemoryContexts, PgVarlena, Time, TimeWithTimeZone,
+    Timestamp, TimestampWithTimeZone, UnboxDatum, Uuid,
 };
 use core::marker::PhantomData;
-use core::panic::{RefUnwindSafe, UnwindSafe};
+use core::{iter, mem, ptr, slice};
 use std::ffi::{CStr, CString};
 use std::ptr::NonNull;
 
-type FcinfoData = pg_sys::FunctionCallInfoBaseData;
-// FIXME: replace with a real implementation
-pub struct Fcinfo<'a>(pub pg_sys::FunctionCallInfo, pub PhantomData<&'a mut FcinfoData>);
-impl<'fcx> UnwindSafe for Fcinfo<'fcx> {}
-impl<'fcx> RefUnwindSafe for Fcinfo<'fcx> {}
+struct ReadOnly<T>(T);
+
+impl<T> ReadOnly<T> {
+    unsafe fn refer_to(&self) -> &T {
+        &self.0
+    }
+}
+
+unsafe impl<T> Sync for ReadOnly<T> {}
+
+static VIRTUAL_ARGUMENT: ReadOnly<pg_sys::NullableDatum> =
+    ReadOnly(pg_sys::NullableDatum { value: pg_sys::Datum::null(), isnull: true });
+
+/// How to pass a value from Postgres to Rust
+///
+/// This bound is necessary to distinguish things which can be passed into a `#[pg_extern] fn`.
+/// This bound is not accurately described by FromDatum or similar traits, as value conversions are
+/// handled in a special way at function argument boundaries and some types are never arguments,
+/// due to Postgres not enforcing the type's described constraints.
+///
+/// In addition, this trait does more than traverse the Postgres boundary from caller to callee.
+/// It allows requesting "virtual" arguments that are not part of the Postgres function arguments.
+/// These virtual arguments typically have no representation in pgrx's generated SQL. Instead,
+/// they can be found in the FunctionCallInfo or via various calls to Postgres on function entry.
+/// When you include a virtual argument in the Rust function signature, acquiring the value is
+/// handled automatically without you personally having to write the unsafe code.
+///
+/// This trait is exposed to external code so macro-generated wrapper fn may expand to calls to it.
+/// The number of invariants implementers must uphold is unlikely to be adequately documented.
+/// Prefer to use ArgAbi as a trait bound instead of implementing it, or even calling it, yourself.
+pub unsafe trait ArgAbi<'fcx>: Sized {
+    /// Unbox an argument with a matching type.
+    ///
+    /// # Safety
+    /// - The argument's datum must have the matching "logical type" that can be "unboxed" from the
+    /// datum's object type.
+    /// - Calling this with a null argument and a non-null type is *undefined behavior*.
+    unsafe fn unbox_arg_unchecked(arg: Arg<'_, 'fcx>) -> Self;
+
+    /// Unbox a nullable arg
+    ///
+    /// # Safety
+    /// - The argument's datum must have the matching "logical type" that can be "unboxed" from the
+    /// datum's object type.
+    /// - Calling this with a null argument and a non-null type is *undefined behavior*.
+    ///
+    /// # Note to implementers
+    /// This function exists because Postgres conflates "SQL null" with "nullptr" in some cases.
+    /// Override the default implementation for a by-reference type, returning `Nullable::Null`
+    /// for nullptr.
+    unsafe fn unbox_nullable_arg(arg: Arg<'_, 'fcx>) -> Nullable<Self> {
+        if arg.is_null() {
+            Nullable::Null
+        } else {
+            Nullable::Valid(unsafe { arg.unbox_unchecked() })
+        }
+    }
+
+    /// "Is this a virtual arg?"
+    fn is_virtual_arg() -> bool {
+        false
+    }
+}
+
+unsafe impl<'fcx, T> ArgAbi<'fcx> for crate::datum::Array<'fcx, T>
+where
+    T: ArgAbi<'fcx> + UnboxDatum,
+{
+    unsafe fn unbox_arg_unchecked(arg: Arg<'_, 'fcx>) -> Self {
+        if arg.is_null() {
+            panic!("{} was null", arg.1);
+        }
+        let raw_array = unsafe {
+            crate::array::RawArray::detoast_from_varlena(
+                NonNull::new(arg.2.value.cast_mut_ptr()).unwrap(),
+            )
+        };
+        unsafe { crate::datum::Array::deconstruct_from(raw_array) }
+    }
+}
+
+unsafe impl<'fcx, T> ArgAbi<'fcx> for crate::datum::VariadicArray<'fcx, T>
+where
+    T: ArgAbi<'fcx> + UnboxDatum,
+{
+    unsafe fn unbox_arg_unchecked(arg: Arg<'_, 'fcx>) -> Self {
+        if arg.is_null() {
+            panic!("{} was null", arg.1);
+        }
+        let raw_array = unsafe {
+            crate::array::RawArray::detoast_from_varlena(
+                NonNull::new(arg.2.value.cast_mut_ptr()).unwrap(),
+            )
+        };
+        let array = unsafe { crate::datum::Array::deconstruct_from(raw_array) };
+        crate::datum::VariadicArray::wrap_array(array)
+    }
+}
+
+unsafe impl<'fcx, T> ArgAbi<'fcx> for crate::PgBox<T> {
+    unsafe fn unbox_arg_unchecked(arg: Arg<'_, 'fcx>) -> Self {
+        let index = arg.index();
+        unsafe {
+            Self::from_datum(arg.2.value, arg.is_null())
+                .unwrap_or_else(|| panic!("argument {} must not be null", index))
+        }
+    }
+}
+
+unsafe impl<'fcx> ArgAbi<'fcx> for PgHeapTuple<'fcx, crate::AllocatedByRust> {
+    unsafe fn unbox_arg_unchecked(arg: Arg<'_, 'fcx>) -> Self {
+        let index = arg.index();
+        unsafe {
+            FromDatum::from_datum(arg.2.value, arg.is_null())
+                .unwrap_or_else(|| panic!("argument {} must not be null", index))
+        }
+    }
+}
+
+unsafe impl<'fcx, T> ArgAbi<'fcx> for Option<T>
+where
+    T: ArgAbi<'fcx>,
+{
+    unsafe fn unbox_arg_unchecked(arg: Arg<'_, 'fcx>) -> Self {
+        if Self::is_virtual_arg() {
+            unsafe { Some(T::unbox_arg_unchecked(arg)) }
+        } else if arg.is_null() {
+            None
+        } else {
+            unsafe { Some(T::unbox_nullable_arg(arg).into_option()).flatten() }
+        }
+    }
+
+    fn is_virtual_arg() -> bool {
+        T::is_virtual_arg()
+    }
+}
+
+unsafe impl<'fcx, T> ArgAbi<'fcx> for Nullable<T>
+where
+    T: ArgAbi<'fcx>,
+{
+    unsafe fn unbox_arg_unchecked(arg: Arg<'_, 'fcx>) -> Self {
+        unsafe { T::unbox_nullable_arg(arg) }
+    }
+
+    fn is_virtual_arg() -> bool {
+        T::is_virtual_arg()
+    }
+}
+
+unsafe impl<'fcx, T> ArgAbi<'fcx> for crate::Range<T>
+where
+    T: FromDatum + crate::RangeSubType,
+{
+    unsafe fn unbox_arg_unchecked(arg: Arg<'_, 'fcx>) -> Self {
+        let index = arg.index();
+        unsafe {
+            arg.unbox_arg_using_from_datum()
+                .unwrap_or_else(|| panic!("argument {} must not be null", index))
+        }
+    }
+}
+
+unsafe impl<'fcx, T> ArgAbi<'fcx> for Vec<T>
+where
+    for<'arr> T: UnboxDatum<As<'arr> = T> + FromDatum + 'arr,
+{
+    unsafe fn unbox_arg_unchecked(arg: Arg<'_, 'fcx>) -> Self {
+        unsafe {
+            if <T as FromDatum>::GET_TYPOID {
+                Self::from_polymorphic_datum(arg.2.value, arg.is_null(), arg.raw_oid()).unwrap()
+            } else {
+                Self::from_datum(arg.2.value, arg.is_null()).unwrap()
+            }
+        }
+    }
+}
+
+unsafe impl<'fcx, T> ArgAbi<'fcx> for Vec<Option<T>>
+where
+    for<'arr> T: UnboxDatum<As<'arr> = T> + FromDatum + 'arr,
+{
+    unsafe fn unbox_arg_unchecked(arg: Arg<'_, 'fcx>) -> Self {
+        unsafe {
+            if <T as FromDatum>::GET_TYPOID {
+                Self::from_polymorphic_datum(arg.2.value, arg.is_null(), arg.raw_oid()).unwrap()
+            } else {
+                Self::from_datum(arg.2.value, arg.is_null()).unwrap()
+            }
+        }
+    }
+}
+
+unsafe impl<'fcx, T: Copy> ArgAbi<'fcx> for PgVarlena<T> {
+    unsafe fn unbox_arg_unchecked(arg: Arg<'_, 'fcx>) -> Self {
+        unsafe { FromDatum::from_datum(arg.2.value, arg.is_null()).expect("unboxing pgvarlena") }
+    }
+}
+
+unsafe impl<'fcx, const P: u32, const S: u32> ArgAbi<'fcx> for crate::Numeric<P, S> {
+    unsafe fn unbox_arg_unchecked(arg: Arg<'_, 'fcx>) -> Self {
+        unsafe { arg.unbox_arg_using_from_datum().unwrap() }
+    }
+}
+
+unsafe impl<'fcx> ArgAbi<'fcx> for pg_sys::FunctionCallInfo {
+    unsafe fn unbox_arg_unchecked(arg: Arg<'_, 'fcx>) -> Self {
+        unsafe { arg.0.as_mut_ptr() }
+    }
+
+    fn is_virtual_arg() -> bool {
+        true
+    }
+}
+
+macro_rules! argue_from_datum {
+    ($lt:lifetime; $($unboxable:ty),*) => {
+        $(unsafe impl<$lt> ArgAbi<$lt> for $unboxable {
+            unsafe fn unbox_arg_unchecked(arg: Arg<'_, 'fcx>) -> Self {
+                let index = arg.index();
+                unsafe { arg.unbox_arg_using_from_datum().unwrap_or_else(|| panic!("argument {index} must not be null")) }
+            }
+
+            unsafe fn unbox_nullable_arg(arg: Arg<'_, 'fcx>) -> Nullable<Self> {
+                unsafe { arg.unbox_arg_using_from_datum().into() }
+            }
+        })*
+    };
+}
+
+argue_from_datum! { 'fcx; i8, i16, i32, i64, f32, f64, bool, char, String, Vec<u8> }
+argue_from_datum! { 'fcx; Date, Interval, Time, TimeWithTimeZone, Timestamp, TimestampWithTimeZone }
+argue_from_datum! { 'fcx; AnyArray, AnyElement, AnyNumeric }
+argue_from_datum! { 'fcx; Inet, Internal, Json, Uuid }
+argue_from_datum! { 'fcx; pg_sys::Oid, pg_sys::Point, pg_sys::BOX  }
+argue_from_datum! { 'fcx; &'fcx str, &'fcx CStr, &'fcx [u8] }
 
 /// How to return a value from Rust to Postgres
 ///
@@ -53,8 +288,18 @@ pub unsafe trait RetAbi: Sized {
         CallCx::WrappedFn(unsafe { pg_sys::CurrentMemoryContext })
     }
 
+    fn check_and_prepare(fcinfo: &mut FcInfo<'_>) -> CallCx {
+        unsafe { Self::check_fcinfo_and_prepare(fcinfo.0) }
+    }
+
     /// answer what kind and how many returns happen from this type
     fn to_ret(self) -> Self::Ret;
+
+    // move into the function context and obtain a Datum
+    fn box_ret_in<'fcx>(fcinfo: &mut FcInfo<'fcx>, ret: Self::Ret) -> Datum<'fcx> {
+        let fcinfo = fcinfo.0;
+        unsafe { mem::transmute(Self::box_ret_in_fcinfo(fcinfo, ret)) }
+    }
 
     /// box the return value
     /// # Safety
@@ -78,6 +323,11 @@ pub unsafe trait RetAbi: Sized {
     /// must be called with a valid fcinfo
     unsafe fn ret_from_fcinfo_fcx(_fcinfo: pg_sys::FunctionCallInfo) -> Self::Ret {
         unimplemented!()
+    }
+
+    fn ret_from_fcx(fcinfo: &mut FcInfo<'_>) -> Self::Ret {
+        let fcinfo = fcinfo.0;
+        unsafe { Self::ret_from_fcinfo_fcx(fcinfo) }
     }
 
     /// must be called with a valid fcinfo
@@ -131,6 +381,20 @@ where
             match self {
                 None => pg_return_null(fcinfo),
                 Some(value) => value.box_in_fcinfo(fcinfo),
+            }
+        }
+    }
+}
+
+unsafe impl<T> BoxRet for Nullable<T>
+where
+    T: BoxRet,
+{
+    unsafe fn box_in_fcinfo(self, fcinfo: pg_sys::FunctionCallInfo) -> pg_sys::Datum {
+        unsafe {
+            match self {
+                Nullable::Null => pg_return_null(fcinfo),
+                Nullable::Valid(value) => value.box_in_fcinfo(fcinfo),
             }
         }
     }
@@ -297,10 +561,7 @@ where
 type FcInfoData = pg_sys::FunctionCallInfoBaseData;
 
 #[derive(Clone)]
-pub struct FcInfo<'fcx>(
-    pgrx_pg_sys::FunctionCallInfo,
-    std::marker::PhantomData<&'fcx mut FcInfoData>,
-);
+pub struct FcInfo<'fcx>(pgrx_pg_sys::FunctionCallInfo, PhantomData<&'fcx mut FcInfoData>);
 
 // when talking about this, there's the lifetime for setreturningfunction, and then there's the current context's lifetime.
 // Potentially <'srf, 'curr, 'ret: 'curr + 'srf> -> <'ret> but don't start with that.
@@ -319,21 +580,17 @@ impl<'fcx> FcInfo<'fcx> {
     /// [`pg_sys::FunctionCallInfo`] pointer.  This is your responsibility.
     #[inline]
     pub unsafe fn from_ptr(fcinfo: pg_sys::FunctionCallInfo) -> FcInfo<'fcx> {
-        let _nullptr_check =
-            std::ptr::NonNull::new(fcinfo).expect("fcinfo pointer must be non-null");
-        Self(fcinfo, std::marker::PhantomData)
+        let _nullptr_check = NonNull::new(fcinfo).expect("fcinfo pointer must be non-null");
+        Self(fcinfo, PhantomData)
     }
     /// Retrieve the arguments to this function call as a slice of [`pgrx_pg_sys::NullableDatum`]
     #[inline]
-    pub fn raw_args<'a>(&'a self) -> &'fcx [pgrx_pg_sys::NullableDatum]
-    where
-        'a: 'fcx,
-    {
+    pub fn raw_args(&self) -> &[pgrx_pg_sys::NullableDatum] {
         // Null pointer check already performed on immutable pointer
         // at construction time.
         unsafe {
             let arg_len = (*self.0).nargs;
-            let args_ptr: *const pg_sys::NullableDatum = std::ptr::addr_of!((*self.0).args).cast();
+            let args_ptr: *const pg_sys::NullableDatum = ptr::addr_of!((*self.0).args).cast();
             // A valid FcInfoWrapper constructed from a valid FuntionCallInfo should always have
             // at least nargs elements of NullableDatum.
             std::slice::from_raw_parts(args_ptr, arg_len as _)
@@ -488,12 +745,109 @@ impl<'fcx> FcInfo<'fcx> {
             ReturnSetInfoWrapper::from_ptr((*self.0).resultinfo as *mut pg_sys::ReturnSetInfo)
         }
     }
+
+    #[inline]
+    pub fn args<'arg>(&'arg self) -> Args<'arg, 'fcx> {
+        Args { iter: self.raw_args().iter().enumerate(), fcinfo: self }
+    }
+}
+
+// TODO: rebadge this as AnyElement
+pub struct Arg<'a, 'fcx>(&'a FcInfo<'fcx>, usize, &'a pg_sys::NullableDatum);
+
+impl<'a, 'fcx> Arg<'a, 'fcx> {
+    /// # Performance note
+    /// This uses an FFI call to obtain the Oid, so avoid calling it if not necessary.
+    pub fn raw_oid(&self) -> pg_sys::Oid {
+        // we can just unwrap here because we know we were created using a valid index
+        self.0.get_arg_type(self.1).unwrap()
+    }
+
+    #[doc(hidden)]
+    /// # Safety
+    /// The argument's datum must have the matching "logical type" that can be "unboxed" from the
+    /// datum's object type.
+    pub unsafe fn unbox_arg_using_from_datum<T: FromDatum>(self) -> Option<T> {
+        unsafe {
+            if <T as FromDatum>::GET_TYPOID {
+                T::from_polymorphic_datum(self.2.value, self.is_null(), self.raw_oid())
+            } else {
+                T::from_datum(self.2.value, self.is_null())
+            }
+        }
+    }
+
+    /// # Safety
+    /// - The argument's datum must have the matching "logical type" that can be "unboxed" from the
+    /// datum's object type.
+    /// - If `T` cannot represent null arguments, calling this if the next arg is null is
+    /// *undefined behavior*.
+    /// - If `T` is pass-by-reference, calling this if the next arg is null is *undefined behavior*.
+    pub unsafe fn unbox_unchecked<T: ArgAbi<'fcx>>(self) -> T {
+        unsafe { <T as ArgAbi<'fcx>>::unbox_arg_unchecked(self) }
+    }
+
+    pub fn is_null(&self) -> bool {
+        self.2.isnull
+    }
+
+    pub fn index(&self) -> usize {
+        self.1
+    }
+}
+
+pub struct Args<'a, 'fcx> {
+    iter: iter::Enumerate<slice::Iter<'a, pg_sys::NullableDatum>>,
+    fcinfo: &'a FcInfo<'fcx>,
+}
+
+impl<'a, 'fcx> Iterator for Args<'a, 'fcx> {
+    type Item = Arg<'a, 'fcx>;
+
+    fn next(&mut self) -> Option<Self::Item> {
+        self.iter.next().map(|(a, b)| Arg(self.fcinfo, a, b))
+    }
+}
+
+impl<'a, 'fcx> Args<'a, 'fcx> {
+    // generate an argument for use by virtual args
+    fn synthesize_virtual_arg(&self) -> Arg<'a, 'fcx> {
+        Arg(self.fcinfo, usize::MAX, unsafe { VIRTUAL_ARGUMENT.refer_to() })
+    }
+
+    /// # Safety
+    /// - The argument's datum must have the matching "logical type" that can be "unboxed" from the
+    /// datum's object type.
+    /// - In particular, if `T` cannot represent null arguments, calling this if the next arg is null is
+    /// *undefined behavior*.
+    pub unsafe fn next_arg_unchecked<T: ArgAbi<'fcx>>(&mut self) -> Option<T> {
+        if T::is_virtual_arg() {
+            // SAFETY: trivial condition
+            unsafe { Some(T::unbox_arg_unchecked(self.synthesize_virtual_arg())) }
+        } else {
+            // SAFETY: caller upholds
+            unsafe { self.next().map(|next| T::unbox_arg_unchecked(next)) }
+        }
+    }
+
+    /// # Safety
+    /// - The argument's datum must have the matching "logical type" that can be "unboxed" from the
+    /// datum's object type.
+    pub unsafe fn next_arg<T: ArgAbi<'fcx>>(&mut self) -> Option<Nullable<T>> {
+        if T::is_virtual_arg() {
+            // SAFETY: trivial condition
+            unsafe { Some(T::unbox_nullable_arg(self.synthesize_virtual_arg())) }
+        } else {
+            // SAFETY: caller upholds
+            unsafe { self.next().map(|next| T::unbox_nullable_arg(next)) }
+        }
+    }
 }
 
 #[derive(Clone)]
 pub struct ReturnSetInfoWrapper<'fcx>(
     *mut pg_sys::ReturnSetInfo,
-    std::marker::PhantomData<&'fcx mut pg_sys::ReturnSetInfo>,
+    PhantomData<&'fcx mut pg_sys::ReturnSetInfo>,
 );
 
 impl<'fcx> ReturnSetInfoWrapper<'fcx> {
@@ -505,9 +859,8 @@ impl<'fcx> ReturnSetInfoWrapper<'fcx> {
     /// [`pg_sys::ReturnSetInfo`] pointer.  This is your responsibility.
     #[inline]
     pub unsafe fn from_ptr(retinfo: *mut pg_sys::ReturnSetInfo) -> ReturnSetInfoWrapper<'fcx> {
-        let _nullptr_check =
-            std::ptr::NonNull::new(retinfo).expect("fcinfo pointer must be non-null");
-        Self(retinfo, std::marker::PhantomData)
+        let _nullptr_check = NonNull::new(retinfo).expect("fcinfo pointer must be non-null");
+        Self(retinfo, PhantomData)
     }
     /*
     /* result status from function (but pre-initialized by caller): */

@@ -34,7 +34,7 @@ fn append(mut input: String, extra: &str) -> String {
 }
 
 #[pg_extern]
-fn split(input: &'static str, pattern: &str) -> Vec<&'static str> {
+fn split<'a>(input: &'a str, pattern: &str) -> Vec<&'a str> {
     input.split_terminator(pattern).collect()
 }
 
