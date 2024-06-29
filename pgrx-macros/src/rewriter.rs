@@ -36,7 +36,7 @@ pub fn item_fn_without_rewrite(mut func: ItemFn) -> syn::Result<proc_macro2::Tok
     let input_func_name = func.sig.ident.to_string();
     let sig = func.sig.clone();
     let vis = func.vis.clone();
-    let mut attrs = mem::take(&mut func.attrs);
+    let attrs = mem::take(&mut func.attrs);
     let generics = func.sig.generics.clone();
 
     if attrs.iter().any(|attr| attr.path().is_ident("no_mangle"))
