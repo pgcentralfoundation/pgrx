@@ -7,17 +7,6 @@
 //LICENSE All rights reserved.
 //LICENSE
 //LICENSE Use of this source code is governed by the MIT license that can be found in the LICENSE file.
-//
-// we allow improper_ctypes just to eliminate these warnings:
-//      = note: `#[warn(improper_ctypes)]` on by default
-//      = note: 128-bit integers don't currently have a known stable ABI
-#![allow(non_camel_case_types)]
-#![allow(non_snake_case)]
-#![allow(dead_code)]
-#![allow(non_upper_case_globals)]
-#![allow(improper_ctypes)]
-#![allow(clippy::unneeded_field_pattern)]
-
 #[cfg(
     // no features at all will cause problems
     not(any(feature = "pg12", feature = "pg13", feature = "pg14", feature = "pg15", feature = "pg16")),
