@@ -162,6 +162,19 @@ where
     }
 }
 
+unsafe impl<'fcx, T> ArgAbi<'fcx> for Nullable<T>
+where
+    T: ArgAbi<'fcx>,
+{
+    unsafe fn unbox_arg_unchecked(arg: Argument<'_, 'fcx>) -> Self {
+        unsafe { T::unbox_nullable_arg(arg) }
+    }
+
+    fn is_virtual_arg() -> bool {
+        T::is_virtual_arg()
+    }
+}
+
 unsafe impl<'fcx, T> ArgAbi<'fcx> for crate::Range<T>
 where
     T: FromDatum + crate::RangeSubType,
@@ -368,6 +381,20 @@ where
             match self {
                 None => pg_return_null(fcinfo),
                 Some(value) => value.box_in_fcinfo(fcinfo),
+            }
+        }
+    }
+}
+
+unsafe impl<T> BoxRet for Nullable<T>
+where
+    T: BoxRet,
+{
+    unsafe fn box_in_fcinfo(self, fcinfo: pg_sys::FunctionCallInfo) -> pg_sys::Datum {
+        unsafe {
+            match self {
+                Nullable::Null => pg_return_null(fcinfo),
+                Nullable::Valid(value) => value.box_in_fcinfo(fcinfo),
             }
         }
     }

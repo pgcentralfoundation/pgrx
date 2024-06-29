@@ -7,6 +7,7 @@
 //LICENSE All rights reserved.
 //LICENSE
 //LICENSE Use of this source code is governed by the MIT license that can be found in the LICENSE file.
+use pgrx::nullable::Nullable;
 use pgrx::prelude::*;
 use pgrx::StringInfo;
 use serde::{Deserialize, Serialize};
@@ -79,6 +80,16 @@ fn returns_some() -> Option<i32> {
 #[pg_extern]
 fn returns_none() -> Option<i32> {
     None
+}
+
+#[pg_extern]
+fn returns_null() -> Nullable<i32> {
+    Nullable::Null
+}
+
+#[pg_extern]
+fn passes_null(null: Nullable<i32>) -> Nullable<i32> {
+    null
 }
 
 #[pg_extern]
