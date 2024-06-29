@@ -26,21 +26,11 @@ pub fn finfo_v1_extern_c(
 ) -> syn::Result<ItemFn> {
     let original_name = &original.sig.ident;
     let wrapper_symbol = format_ident!("{}_wrapper", original_name);
-    let lifetimes = &original.sig.generics;
-    // the wrapper function declaration may contain lifetimes that are not used, since
-    // our input type is FunctionCallInfo and our return type is Datum
-    let unused_lifetimes = match lifetimes.lifetimes().next() {
-        Some(_) => quote! {
-            #[allow(unused_lifetimes, clippy::extra_unused_lifetimes)]
-        },
-        None => quote! {},
-    };
 
     let tokens = quote_spanned! { original.sig.span() =>
         #[no_mangle]
         #[doc(hidden)]
-        #unused_lifetimes
-        pub unsafe extern "C" fn #wrapper_symbol #lifetimes(#fcinfo: ::pgrx::pg_sys::FunctionCallInfo) -> ::pgrx::pg_sys::Datum {
+        pub unsafe extern "C" fn #wrapper_symbol(#fcinfo: ::pgrx::pg_sys::FunctionCallInfo) -> ::pgrx::pg_sys::Datum {
             #contents
         }
     };
