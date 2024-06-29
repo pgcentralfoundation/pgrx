@@ -756,7 +756,8 @@ impl<'fcx> FcInfo<'fcx> {
 pub struct Arg<'a, 'fcx>(&'a FcInfo<'fcx>, usize, &'a pg_sys::NullableDatum);
 
 impl<'a, 'fcx> Arg<'a, 'fcx> {
-    /// Note: some overhead
+    /// # Performance note
+    /// This uses an FFI call to obtain the Oid, so avoid calling it if not necessary.
     pub fn raw_oid(&self) -> pg_sys::Oid {
         // we can just unwrap here because we know we were created using a valid index
         self.0.get_arg_type(self.1).unwrap()
