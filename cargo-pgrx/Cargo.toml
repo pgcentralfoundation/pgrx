@@ -70,3 +70,6 @@ rustls = [
     "ureq/tls",
     "ureq/native-certs" # induces rustls to use the OS-level root of trust
 ]
+
+[lints.clippy]
+or-fun-call = "allow" # kinda sus lint imo
