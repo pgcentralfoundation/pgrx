@@ -79,3 +79,4 @@ trybuild = "1"
 
 [lints]
 rust.unused-lifetimes = "deny"
+clippy.used-underscore-parameter = "deny"
