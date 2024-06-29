@@ -21,14 +21,6 @@
 //! }
 //!
 //! ```
-#![allow(
-    clippy::cast_ptr_alignment,
-    clippy::len_without_is_empty,
-    clippy::missing_safety_doc,
-    clippy::too_many_arguments,
-    clippy::type_complexity,
-    clippy::unnecessary_cast
-)]
 #![cfg_attr(feature = "nightly", feature(allocator_api))]
 
 #[macro_use]

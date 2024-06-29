@@ -66,3 +66,11 @@ seahash = "4.1.0" # derive(PostgresHash)
 serde.workspace = true # impls on pub types
 serde_cbor = "0.11.2" # derive(PostgresType)
 serde_json.workspace = true # everything JSON
+
+[lints]
+clippy.cast_ptr_alignment = "allow"
+clippy.len_without_is_empty = "allow"
+clippy.missing_safety_doc = "allow"
+clippy.too_many_arguments = "allow"
+clippy.type_complexity = "allow"
+clippy.unnecessary_cast = "allow"

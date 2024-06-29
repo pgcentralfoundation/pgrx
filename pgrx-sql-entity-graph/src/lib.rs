@@ -15,8 +15,6 @@ Rust to SQL mapping support.
 to the `pgrx` framework and very subject to change between versions. While you may use this, please do it with caution.
 
 */
-#![allow(clippy::too_many_arguments)]
-#![allow(clippy::redundant_pattern_matching)]
 pub use aggregate::entity::{AggregateTypeEntity, PgAggregateEntity};
 pub use aggregate::{
     AggregateType, AggregateTypeList, FinalizeModify, ParallelOption, PgAggregate,

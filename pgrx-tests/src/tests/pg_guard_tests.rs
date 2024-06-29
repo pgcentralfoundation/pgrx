@@ -34,6 +34,7 @@ extern "C" fn extern_func_impl_1() -> bool {
 // and [no_mangle]
 #[pg_guard]
 #[no_mangle]
+#[allow(unused_lifetimes)]
 extern "C" fn extern_func_impl_2<'a>() -> bool {
     true
 }

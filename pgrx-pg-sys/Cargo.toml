@@ -63,3 +63,13 @@ bindgen = { version = "0.69", default-features = false, features = ["runtime"] }
 clang-sys = { version = "1", features = ["clang_6_0", "runtime"] }
 quote = "1.0.33"
 shlex = "1.3" # shell lexing, also used by many of our deps
+
+[lints]
+# we allow improper_ctypes just to eliminate these warnings:
+#      = note: `#[warn(improper_ctypes)]` on by default
+#      = note: 128-bit integers don't currently have a known stable ABI
+rust.non_camel_case_types = "allow"
+rust.non_snake_case = "allow"
+rust.dead_code = "allow"
+rust.non_upper_case_globals = "allow"
+rust.improper_ctypes = "allow"

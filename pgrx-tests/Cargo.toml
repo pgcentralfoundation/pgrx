@@ -76,3 +76,7 @@ version = "=0.12.0-alpha.1"
 [dev-dependencies]
 eyre.workspace = true # testing functions that return `eyre::Result`
 trybuild = "1"
+
+[lints]
+rust.unused-lifetimes = "deny"
+clippy.used-underscore-binding = "deny"
