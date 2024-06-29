@@ -702,9 +702,7 @@ fn impl_postgres_enum(ast: DeriveInput) -> syn::Result<proc_macro2::TokenStream>
         }
 
         unsafe impl #impl_gens ::pgrx::callconv::ArgAbi<#fcx_lt> for #enum_ident #ty_gens #where_clause {
-
-
-            unsafe fn unbox_argument(arg: ::pgrx::callconv::Argument<'_, #fcx_lt>) -> Self {
+            unsafe fn unbox_arg_unchecked(arg: ::pgrx::callconv::Argument<'_, #fcx_lt>) -> Self {
                 let index = arg.index();
                 unsafe { arg.unbox_arg_using_from_datum().unwrap_or_else(|| panic!("argument {index} must not be null")) }
             }
@@ -910,8 +908,7 @@ fn impl_postgres_type(ast: DeriveInput) -> syn::Result<proc_macro2::TokenStream>
 
                 unsafe impl #impl_gens ::pgrx::callconv::ArgAbi<#fcx_lt> for #name #ty_gens #where_clause
                 {
-
-                    unsafe fn unbox_argument(arg: ::pgrx::callconv::Argument<'_, #fcx_lt>) -> Self {
+                        unsafe fn unbox_arg_unchecked(arg: ::pgrx::callconv::Argument<'_, #fcx_lt>) -> Self {
                         let index = arg.index();
                         unsafe { arg.unbox_arg_using_from_datum().unwrap_or_else(|| panic!("argument {index} must not be null")) }
                     }

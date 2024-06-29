@@ -98,7 +98,7 @@ unsafe impl<'fcx> ArgAbi<'fcx> for HexInt
 where
     Self: 'fcx,
 {
-    unsafe fn unbox_argument(arg: ::pgrx::callconv::Argument<'_, 'fcx>) -> Self {
+    unsafe fn unbox_arg_unchecked(arg: ::pgrx::callconv::Argument<'_, 'fcx>) -> Self {
         unsafe { arg.unbox_arg_using_from_datum().unwrap() }
     }
 }

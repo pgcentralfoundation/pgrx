@@ -402,7 +402,7 @@ impl PgExtern {
         let args_ident = proc_macro2::Ident::new("_args", Span::call_site());
         let arg_fetches = arg_pats.iter().map(|pat| {
                 quote_spanned!{ pat.span() =>
-                    let #pat = #args_ident.unbox_next_unchecked().unwrap_or_else(|| panic!("unboxing {} argument failed", stringify!(#pat)));
+                    let #pat = #args_ident.next_arg_unchecked().unwrap_or_else(|| panic!("unboxing {} argument failed", stringify!(#pat)));
                 }
             }
         );
