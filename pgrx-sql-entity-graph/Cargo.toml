@@ -42,5 +42,4 @@ syntect = { version = "5.1.0", default-features = false, features = ["default-fa
 
 [lints.clippy]
 assigning-clones = "allow" # wrong diagnosis and wrong suggestions
-redundant-pattern-matching = "allow"
 too-many-arguments = "allow" # I argue with myself all the time
