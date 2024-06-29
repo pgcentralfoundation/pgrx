@@ -61,7 +61,7 @@ pub unsafe trait ArgAbi<'fcx>: Sized {
     /// - The argument's datum must have the matching "logical type" that can be "unboxed" from the
     /// datum's object type.
     /// - Calling this with a null argument and a non-null type is *undefined behavior*.
-    unsafe fn unbox_arg_unchecked(arg: Argument<'_, 'fcx>) -> Self;
+    unsafe fn unbox_arg_unchecked(arg: Arg<'_, 'fcx>) -> Self;
 
     /// Unbox a nullable arg
     ///
@@ -74,7 +74,7 @@ pub unsafe trait ArgAbi<'fcx>: Sized {
     /// This function exists because Postgres conflates "SQL null" with "nullptr" in some cases.
     /// Override the default implementation for a by-reference type, returning `Nullable::Null`
     /// for nullptr.
-    unsafe fn unbox_nullable_arg(arg: Argument<'_, 'fcx>) -> Nullable<Self> {
+    unsafe fn unbox_nullable_arg(arg: Arg<'_, 'fcx>) -> Nullable<Self> {
         if arg.is_null() {
             Nullable::Null
         } else {
@@ -92,7 +92,7 @@ unsafe impl<'fcx, T> ArgAbi<'fcx> for crate::datum::Array<'fcx, T>
 where
     T: ArgAbi<'fcx> + UnboxDatum,
 {
-    unsafe fn unbox_arg_unchecked(arg: Argument<'_, 'fcx>) -> Self {
+    unsafe fn unbox_arg_unchecked(arg: Arg<'_, 'fcx>) -> Self {
         if arg.is_null() {
             panic!("{} was null", arg.1);
         }
@@ -109,7 +109,7 @@ unsafe impl<'fcx, T> ArgAbi<'fcx> for crate::datum::VariadicArray<'fcx, T>
 where
     T: ArgAbi<'fcx> + UnboxDatum,
 {
-    unsafe fn unbox_arg_unchecked(arg: Argument<'_, 'fcx>) -> Self {
+    unsafe fn unbox_arg_unchecked(arg: Arg<'_, 'fcx>) -> Self {
         if arg.is_null() {
             panic!("{} was null", arg.1);
         }
@@ -124,7 +124,7 @@ where
 }
 
 unsafe impl<'fcx, T> ArgAbi<'fcx> for crate::PgBox<T> {
-    unsafe fn unbox_arg_unchecked(arg: Argument<'_, 'fcx>) -> Self {
+    unsafe fn unbox_arg_unchecked(arg: Arg<'_, 'fcx>) -> Self {
         let index = arg.index();
         unsafe {
             Self::from_datum(arg.2.value, arg.is_null())
@@ -134,7 +134,7 @@ unsafe impl<'fcx, T> ArgAbi<'fcx> for crate::PgBox<T> {
 }
 
 unsafe impl<'fcx> ArgAbi<'fcx> for PgHeapTuple<'fcx, crate::AllocatedByRust> {
-    unsafe fn unbox_arg_unchecked(arg: Argument<'_, 'fcx>) -> Self {
+    unsafe fn unbox_arg_unchecked(arg: Arg<'_, 'fcx>) -> Self {
         let index = arg.index();
         unsafe {
             FromDatum::from_datum(arg.2.value, arg.is_null())
@@ -147,7 +147,7 @@ unsafe impl<'fcx, T> ArgAbi<'fcx> for Option<T>
 where
     T: ArgAbi<'fcx>,
 {
-    unsafe fn unbox_arg_unchecked(arg: Argument<'_, 'fcx>) -> Self {
+    unsafe fn unbox_arg_unchecked(arg: Arg<'_, 'fcx>) -> Self {
         if Self::is_virtual_arg() {
             unsafe { Some(T::unbox_arg_unchecked(arg)) }
         } else if arg.is_null() {
@@ -166,7 +166,7 @@ unsafe impl<'fcx, T> ArgAbi<'fcx> for Nullable<T>
 where
     T: ArgAbi<'fcx>,
 {
-    unsafe fn unbox_arg_unchecked(arg: Argument<'_, 'fcx>) -> Self {
+    unsafe fn unbox_arg_unchecked(arg: Arg<'_, 'fcx>) -> Self {
         unsafe { T::unbox_nullable_arg(arg) }
     }
 
@@ -179,7 +179,7 @@ unsafe impl<'fcx, T> ArgAbi<'fcx> for crate::Range<T>
 where
     T: FromDatum + crate::RangeSubType,
 {
-    unsafe fn unbox_arg_unchecked(arg: Argument<'_, 'fcx>) -> Self {
+    unsafe fn unbox_arg_unchecked(arg: Arg<'_, 'fcx>) -> Self {
         let index = arg.index();
         unsafe {
             arg.unbox_arg_using_from_datum()
@@ -192,7 +192,7 @@ unsafe impl<'fcx, T> ArgAbi<'fcx> for Vec<T>
 where
     for<'arr> T: UnboxDatum<As<'arr> = T> + FromDatum + 'arr,
 {
-    unsafe fn unbox_arg_unchecked(arg: Argument<'_, 'fcx>) -> Self {
+    unsafe fn unbox_arg_unchecked(arg: Arg<'_, 'fcx>) -> Self {
         unsafe {
             if <T as FromDatum>::GET_TYPOID {
                 Self::from_polymorphic_datum(arg.2.value, arg.is_null(), arg.raw_oid()).unwrap()
@@ -207,7 +207,7 @@ unsafe impl<'fcx, T> ArgAbi<'fcx> for Vec<Option<T>>
 where
     for<'arr> T: UnboxDatum<As<'arr> = T> + FromDatum + 'arr,
 {
-    unsafe fn unbox_arg_unchecked(arg: Argument<'_, 'fcx>) -> Self {
+    unsafe fn unbox_arg_unchecked(arg: Arg<'_, 'fcx>) -> Self {
         unsafe {
             if <T as FromDatum>::GET_TYPOID {
                 Self::from_polymorphic_datum(arg.2.value, arg.is_null(), arg.raw_oid()).unwrap()
@@ -219,19 +219,19 @@ where
 }
 
 unsafe impl<'fcx, T: Copy> ArgAbi<'fcx> for PgVarlena<T> {
-    unsafe fn unbox_arg_unchecked(arg: Argument<'_, 'fcx>) -> Self {
+    unsafe fn unbox_arg_unchecked(arg: Arg<'_, 'fcx>) -> Self {
         unsafe { FromDatum::from_datum(arg.2.value, arg.is_null()).expect("unboxing pgvarlena") }
     }
 }
 
 unsafe impl<'fcx, const P: u32, const S: u32> ArgAbi<'fcx> for crate::Numeric<P, S> {
-    unsafe fn unbox_arg_unchecked(arg: Argument<'_, 'fcx>) -> Self {
+    unsafe fn unbox_arg_unchecked(arg: Arg<'_, 'fcx>) -> Self {
         unsafe { arg.unbox_arg_using_from_datum().unwrap() }
     }
 }
 
 unsafe impl<'fcx> ArgAbi<'fcx> for pg_sys::FunctionCallInfo {
-    unsafe fn unbox_arg_unchecked(arg: Argument<'_, 'fcx>) -> Self {
+    unsafe fn unbox_arg_unchecked(arg: Arg<'_, 'fcx>) -> Self {
         unsafe { arg.0.as_mut_ptr() }
     }
 
@@ -243,12 +243,12 @@ unsafe impl<'fcx> ArgAbi<'fcx> for pg_sys::FunctionCallInfo {
 macro_rules! argue_from_datum {
     ($lt:lifetime; $($unboxable:ty),*) => {
         $(unsafe impl<$lt> ArgAbi<$lt> for $unboxable {
-            unsafe fn unbox_arg_unchecked(arg: Argument<'_, 'fcx>) -> Self {
+            unsafe fn unbox_arg_unchecked(arg: Arg<'_, 'fcx>) -> Self {
                 let index = arg.index();
                 unsafe { arg.unbox_arg_using_from_datum().unwrap_or_else(|| panic!("argument {index} must not be null")) }
             }
 
-            unsafe fn unbox_nullable_arg(arg: Argument<'_, 'fcx>) -> Nullable<Self> {
+            unsafe fn unbox_nullable_arg(arg: Arg<'_, 'fcx>) -> Nullable<Self> {
                 unsafe { arg.unbox_arg_using_from_datum().into() }
             }
         })*
@@ -747,15 +747,15 @@ impl<'fcx> FcInfo<'fcx> {
     }
 
     #[inline]
-    pub fn arguments<'arg>(&'arg self) -> Arguments<'arg, 'fcx> {
-        Arguments { iter: self.raw_args().iter().enumerate(), fcinfo: self }
+    pub fn args<'arg>(&'arg self) -> Args<'arg, 'fcx> {
+        Args { iter: self.raw_args().iter().enumerate(), fcinfo: self }
     }
 }
 
 // TODO: rebadge this as AnyElement
-pub struct Argument<'a, 'fcx>(&'a FcInfo<'fcx>, usize, &'a pg_sys::NullableDatum);
+pub struct Arg<'a, 'fcx>(&'a FcInfo<'fcx>, usize, &'a pg_sys::NullableDatum);
 
-impl<'a, 'fcx> Argument<'a, 'fcx> {
+impl<'a, 'fcx> Arg<'a, 'fcx> {
     /// Note: some overhead
     pub fn raw_oid(&self) -> pg_sys::Oid {
         // we can just unwrap here because we know we were created using a valid index
@@ -795,23 +795,23 @@ impl<'a, 'fcx> Argument<'a, 'fcx> {
     }
 }
 
-pub struct Arguments<'a, 'fcx> {
+pub struct Args<'a, 'fcx> {
     iter: iter::Enumerate<slice::Iter<'a, pg_sys::NullableDatum>>,
     fcinfo: &'a FcInfo<'fcx>,
 }
 
-impl<'a, 'fcx> Iterator for Arguments<'a, 'fcx> {
-    type Item = Argument<'a, 'fcx>;
+impl<'a, 'fcx> Iterator for Args<'a, 'fcx> {
+    type Item = Arg<'a, 'fcx>;
 
     fn next(&mut self) -> Option<Self::Item> {
-        self.iter.next().map(|(a, b)| Argument(self.fcinfo, a, b))
+        self.iter.next().map(|(a, b)| Arg(self.fcinfo, a, b))
     }
 }
 
-impl<'a, 'fcx> Arguments<'a, 'fcx> {
-    // generate an Argument for use by virtual args
-    fn synthesize_virtual_arg(&self) -> Argument<'a, 'fcx> {
-        Argument(self.fcinfo, usize::MAX, unsafe { VIRTUAL_ARGUMENT.refer_to() })
+impl<'a, 'fcx> Args<'a, 'fcx> {
+    // generate an argument for use by virtual args
+    fn synthesize_virtual_arg(&self) -> Arg<'a, 'fcx> {
+        Arg(self.fcinfo, usize::MAX, unsafe { VIRTUAL_ARGUMENT.refer_to() })
     }
 
     /// # Safety

@@ -424,7 +424,7 @@ impl PgExtern {
                             let result = match call_flow {
                                 ::pgrx::callconv::CallCx::WrappedFn(mcx) => {
                                     let mut mcx = ::pgrx::PgMemoryContexts::For(mcx);
-                                    let #args_ident = &mut fcinfo.arguments();
+                                    let #args_ident = &mut fcinfo.args();
                                     let call_result = mcx.switch_to(|_| {
                                         #(#arg_fetches)*
                                         #func_name( #(#arg_pats),* )
