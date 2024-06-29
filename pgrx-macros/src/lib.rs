@@ -923,9 +923,9 @@ fn impl_postgres_type(ast: DeriveInput) -> syn::Result<proc_macro2::TokenStream>
         stream.extend(quote! {
             #[doc(hidden)]
             #[::pgrx::pgrx_macros::pg_extern(immutable,parallel_safe)]
-            pub fn #funcname_in #generics(input: &#lifetime ::core::ffi::CStr) -> Option<#name #generics> {
+            pub fn #funcname_in #generics(input: Option<&#lifetime ::core::ffi::CStr>) -> Option<#name #generics> {
                 use ::pgrx::inoutfuncs::json_from_slice;
-                json_from_slice(input.to_bytes()).ok()
+                input.map(|cstr| json_from_slice(cstr.to_bytes()).ok()).flatten()
             }
 
             #[doc(hidden)]
@@ -942,8 +942,13 @@ fn impl_postgres_type(ast: DeriveInput) -> syn::Result<proc_macro2::TokenStream>
         stream.extend(quote! {
             #[doc(hidden)]
             #[::pgrx::pgrx_macros::pg_extern(immutable,parallel_safe)]
-            pub fn #funcname_in #generics(input: &::core::ffi::CStr) -> Option<#name #generics> {
-                Some(<#name as ::pgrx::inoutfuncs::InOutFuncs>::input(input))
+            pub fn #funcname_in #generics(input: Option<&::core::ffi::CStr>) -> Option<#name #generics> {
+                input.map_or_else(|| {
+                    for m in <#name as ::pgrx::inoutfuncs::InOutFuncs>::NULL_ERROR_MESSAGE {
+                        ::pgrx::pg_sys::error!("{m}");
+                    }
+                    None
+                }, |i| Some(<#name as ::pgrx::inoutfuncs::InOutFuncs>::input(i)))
             }
 
             #[doc(hidden)]
@@ -960,8 +965,13 @@ fn impl_postgres_type(ast: DeriveInput) -> syn::Result<proc_macro2::TokenStream>
         stream.extend(quote! {
             #[doc(hidden)]
             #[::pgrx::pgrx_macros::pg_extern(immutable,parallel_safe)]
-            pub fn #funcname_in #generics(input: &::core::ffi::CStr) -> Option<::pgrx::datum::PgVarlena<#name #generics>> {
-                Some(<#name as ::pgrx::inoutfuncs::PgVarlenaInOutFuncs>::input(input))
+            pub fn #funcname_in #generics(input: Option<&::core::ffi::CStr>) -> Option<::pgrx::datum::PgVarlena<#name #generics>> {
+                input.map_or_else(|| {
+                    for m in <#name as ::pgrx::inoutfuncs::PgVarlenaInOutFuncs>::NULL_ERROR_MESSAGE {
+                        ::pgrx::pg_sys::error!("{m}");
+                    }
+                    None
+                }, |i| Some(<#name as ::pgrx::inoutfuncs::PgVarlenaInOutFuncs>::input(i)))
             }
 
             #[doc(hidden)]
