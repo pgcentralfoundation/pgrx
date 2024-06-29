@@ -9,8 +9,8 @@ error[E0277]: the trait bound `Vec<Option<PgHeapTuple<'_, AllocatedByRust>>>: Ar
              Vec<T>
              Vec<u8>
    = note: required for `Option<Vec<Option<PgHeapTuple<'_, AllocatedByRust>>>>` to implement `ArgAbi<'_>`
-note: required by a bound in `pgrx::callconv::Arguments::<'a, 'fcx>::next_arg_unchecked`
+note: required by a bound in `pgrx::callconv::Args::<'a, 'fcx>::next_arg_unchecked`
   --> $WORKSPACE/pgrx/src/callconv.rs
    |
    |     pub unsafe fn next_arg_unchecked<T: ArgAbi<'fcx>>(&mut self) -> Option<T> {
-   |                                         ^^^^^^^^^^^^ required by this bound in `Arguments::<'a, 'fcx>::next_arg_unchecked`
+   |                                         ^^^^^^^^^^^^ required by this bound in `Args::<'a, 'fcx>::next_arg_unchecked`
