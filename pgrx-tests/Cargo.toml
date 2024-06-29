@@ -78,4 +78,4 @@ eyre.workspace = true # testing functions that return `eyre::Result`
 trybuild = "1"
 
 [lints]
-unused-lifetimes = "deny"
+rust.unused-lifetimes = "deny"

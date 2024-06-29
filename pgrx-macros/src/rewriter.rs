@@ -58,14 +58,6 @@ pub fn item_fn_without_rewrite(mut func: ItemFn) -> syn::Result<proc_macro2::Tok
 
     func.sig.ident = format_ident!("{}_inner", func.sig.ident);
 
-    // the wrapper_inner function declaration may contain lifetimes that are not used, since our input type is `FunctionCallInfo` mainly and return type is `Datum`
-    let unused_lifetimes = match generics.lifetimes().next() {
-        Some(_) => quote! {
-            #[allow(unused_lifetimes, clippy::extra_unused_lifetimes)]
-        },
-        None => quote! {},
-    };
-
     let arg_list = build_arg_list(&sig, false)?;
     let func_name = func.sig.ident.clone();
 
@@ -103,7 +95,6 @@ pub fn item_fn_without_rewrite(mut func: ItemFn) -> syn::Result<proc_macro2::Tok
         #(#attrs)*
         #vis #sig {
             #[allow(non_snake_case)]
-            #unused_lifetimes
             #func
 
             #[allow(unused_unsafe)]
