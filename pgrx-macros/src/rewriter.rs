@@ -9,7 +9,7 @@
 //LICENSE Use of this source code is governed by the MIT license that can be found in the LICENSE file.
 extern crate proc_macro;
 
-use quote::{format_ident, quote, quote_spanned};
+use quote::{quote, quote_spanned};
 use std::mem;
 use std::ops::Deref;
 use std::str::FromStr;
@@ -19,6 +19,14 @@ use syn::{
     FnArg, ForeignItem, ForeignItemFn, GenericParam, ItemFn, ItemForeignMod, Pat, Signature, Token,
     Visibility,
 };
+
+macro_rules! format_ident {
+    ($s:literal, $e:expr) => {{
+        let mut synthetic = $e.clone();
+        synthetic.set_span(proc_macro2::Span::call_site().located_at($e.span()));
+        quote::format_ident!($s, synthetic)
+    }};
+}
 
 pub fn extern_block(block: ItemForeignMod) -> proc_macro2::TokenStream {
     let mut stream = proc_macro2::TokenStream::new();
@@ -60,6 +68,7 @@ pub fn item_fn_without_rewrite(mut func: ItemFn) -> syn::Result<proc_macro2::Tok
 
     let arg_list = build_arg_list(&sig, false)?;
     let func_name = func.sig.ident.clone();
+    let func_name = format_ident!("{}", func_name);
 
     let prolog = if input_func_name == "__pgrx_private_shmem_hook"
         || input_func_name == "__pgrx_private_shmem_request_hook"
@@ -90,7 +99,9 @@ pub fn item_fn_without_rewrite(mut func: ItemFn) -> syn::Result<proc_macro2::Tok
         quote! { #func_name::<#ty>(#arg_list) }
     };
 
-    Ok(quote_spanned! {func.span()=>
+    let synthetic = proc_macro2::Span::mixed_site().located_at(func.span());
+
+    Ok(quote_spanned! {synthetic=>
         #prolog
         #(#attrs)*
         #vis #sig {
@@ -149,6 +160,7 @@ fn build_arg_list(sig: &Signature, suffix_arg_name: bool) -> syn::Result<proc_ma
                         let ident = format_ident!("{}_", ident.ident);
                         arg_list.extend(quote! { #ident, });
                     } else {
+                        let ident = format_ident!("{}", ident.ident);
                         arg_list.extend(quote! { #ident, });
                     }
                 } else {
