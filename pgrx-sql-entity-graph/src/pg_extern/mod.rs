@@ -40,11 +40,29 @@ use operator::{PgrxOperatorAttributeWithIdent, PgrxOperatorOpName};
 use search_path::SearchPathList;
 
 use proc_macro2::{Ident, Span, TokenStream as TokenStream2};
-use quote::{format_ident, quote, quote_spanned};
+use quote::quote;
 use syn::parse::{Parse, ParseStream, Parser};
 use syn::punctuated::Punctuated;
 use syn::spanned::Spanned;
 use syn::{Meta, Token};
+
+macro_rules! quote_spanned {
+    ($span:expr=> $($expansion:tt)*) => {
+        {
+            let synthetic = Span::mixed_site();
+            let synthetic = synthetic.located_at($span);
+            quote::quote_spanned! {synthetic=> $($expansion)* }
+        }
+    };
+}
+
+macro_rules! format_ident {
+    ($s:literal, $e:expr) => {{
+        let mut synthetic = $e.clone();
+        synthetic.set_span(Span::call_site().located_at($e.span()));
+        quote::format_ident!($s, synthetic)
+    }};
+}
 
 /// A parsed `#[pg_extern]` item.
 ///
@@ -377,7 +395,8 @@ impl PgExtern {
         let signature = &self.func.sig;
         let func_name = &signature.ident;
         // we do this odd dance so we can pass the same ident to macros that don't know each other
-        let fcinfo_ident = syn::Ident::new("fcinfo", signature.ident.span());
+        let synthetic_ident_span = Span::mixed_site().located_at(signature.ident.span());
+        let fcinfo_ident = syn::Ident::new("fcinfo", synthetic_ident_span);
         let mut lifetimes = signature
             .generics
             .lifetimes()
