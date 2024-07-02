@@ -16,7 +16,7 @@ use std::cell::Cell;
 use std::fmt::{Display, Formatter};
 use std::hint::unreachable_unchecked;
 use std::panic::{
-    catch_unwind, panic_any, resume_unwind, Location, PanicInfo, RefUnwindSafe, UnwindSafe,
+    catch_unwind, panic_any, resume_unwind, AssertUnwindSafe, Location, PanicInfo, UnwindSafe,
 };
 
 use crate::elog::PgLogLevel;
@@ -381,9 +381,9 @@ enum GuardAction<R> {
 // what we really want is a bound of R: !Drop, but negative bounds don't exist yet
 pub unsafe fn pgrx_extern_c_guard<Func, R>(f: Func) -> R
 where
-    Func: FnOnce() -> R + UnwindSafe + RefUnwindSafe,
+    Func: FnOnce() -> R,
 {
-    match unsafe { run_guarded(f) } {
+    match unsafe { run_guarded(AssertUnwindSafe(f)) } {
         GuardAction::Return(r) => r,
         GuardAction::ReThrow => {
             extern "C" /* "C-unwind" */ {
@@ -405,7 +405,7 @@ where
 #[inline(never)]
 unsafe fn run_guarded<F, R>(f: F) -> GuardAction<R>
 where
-    F: FnOnce() -> R + UnwindSafe + RefUnwindSafe,
+    F: FnOnce() -> R + UnwindSafe,
 {
     match catch_unwind(f) {
         Ok(v) => GuardAction::Return(v),
