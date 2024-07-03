@@ -30,44 +30,44 @@ mod build {
 }
 
 #[derive(Debug)]
-struct PgrxOverrides(HashSet<String>);
+struct BindingOverride {
+    ignore_macros: HashSet<&'static str>,
+}
 
-impl PgrxOverrides {
-    fn default() -> Self {
+impl BindingOverride {
+    fn new() -> Self {
         // these cause duplicate definition problems on linux
         // see: https://github.com/rust-lang/rust-bindgen/issues/687
-        PgrxOverrides(
-            vec![
-                "FP_INFINITE".into(),
-                "FP_NAN".into(),
-                "FP_NORMAL".into(),
-                "FP_SUBNORMAL".into(),
-                "FP_ZERO".into(),
-                "IPPORT_RESERVED".into(),
+        BindingOverride {
+            ignore_macros: HashSet::from_iter([
+                "FP_INFINITE",
+                "FP_NAN",
+                "FP_NORMAL",
+                "FP_SUBNORMAL",
+                "FP_ZERO",
+                "IPPORT_RESERVED",
                 // These are just annoying due to clippy
-                "M_E".into(),
-                "M_LOG2E".into(),
-                "M_LOG10E".into(),
-                "M_LN2".into(),
-                "M_LN10".into(),
-                "M_PI".into(),
-                "M_PI_2".into(),
-                "M_PI_4".into(),
-                "M_1_PI".into(),
-                "M_2_PI".into(),
-                "M_SQRT2".into(),
-                "M_SQRT1_2".into(),
-                "M_2_SQRTPI".into(),
-            ]
-            .into_iter()
-            .collect(),
-        )
+                "M_E",
+                "M_LOG2E",
+                "M_LOG10E",
+                "M_LN2",
+                "M_LN10",
+                "M_PI",
+                "M_PI_2",
+                "M_PI_4",
+                "M_1_PI",
+                "M_2_PI",
+                "M_SQRT2",
+                "M_SQRT1_2",
+                "M_2_SQRTPI",
+            ]),
+        }
     }
 }
 
-impl bindgen::callbacks::ParseCallbacks for PgrxOverrides {
+impl bindgen::callbacks::ParseCallbacks for BindingOverride {
     fn will_parse_macro(&self, name: &str) -> MacroParsingBehavior {
-        if self.0.contains(name) {
+        if self.ignore_macros.contains(name) {
             bindgen::callbacks::MacroParsingBehavior::Ignore
         } else {
             bindgen::callbacks::MacroParsingBehavior::Default
@@ -89,6 +89,32 @@ impl bindgen::callbacks::ParseCallbacks for PgrxOverrides {
             _ => ImplementsTrait::No,
         };
         Some(implements_trait)
+    }
+
+    // FIXME: alter types on some int macros to the actually-used types so we can stop as-casting them
+    fn int_macro(&self, _name: &str, _value: i64) -> Option<bindgen::callbacks::IntKind> {
+        None
+    }
+
+    // FIXME: implement a... C compiler?
+    fn func_macro(&self, _name: &str, _value: &[&[u8]]) {}
+
+    // FIXME: impl temporary migration code
+    fn enum_variant_behavior(
+        &self,
+        _enum_name: Option<&str>,
+        _original_variant_name: &str,
+        _variant_value: bindgen::callbacks::EnumVariantValue,
+    ) -> Option<bindgen::callbacks::EnumVariantCustomBehavior> {
+        None
+    }
+
+    // FIXME: hide nodetag fields and default them to appropriate values
+    fn field_visibility(
+        &self,
+        _info: bindgen::callbacks::FieldInfo<'_>,
+    ) -> Option<bindgen::FieldVisibilityKind> {
+        None
     }
 }
 
@@ -723,7 +749,7 @@ fn run_bindgen(
         .clang_args(extra_bindgen_clang_args(pg_config)?)
         .clang_args(pg_target_include_flags(major_version, pg_config)?)
         .detect_include_paths(autodetect)
-        .parse_callbacks(Box::new(PgrxOverrides::default()))
+        .parse_callbacks(Box::new(BindingOverride::new()))
         // The NodeTag enum is closed: additions break existing values in the set, so it is not extensible
         .rustified_non_exhaustive_enum("NodeTag")
         .size_t_is_usize(true)
