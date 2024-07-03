@@ -18,7 +18,7 @@ mod tests {
     #[pg_test]
     #[ignore = "This test should be ignored."]
     fn test_for_ignore_attribute() {
-        assert_eq!(true, true);
+        assert_eq!(true, false);
     }
 
     #[pg_test]

@@ -27,7 +27,10 @@ pub fn finfo_v1_extern_c(
     let original_name = &original.sig.ident;
     let wrapper_symbol = format_ident!("{}_wrapper", original_name);
 
-    let tokens = quote_spanned! { original.sig.span() =>
+    let synthetic = proc_macro2::Span::mixed_site();
+    let synthetic = synthetic.located_at(original.sig.span());
+
+    let tokens = quote_spanned! { synthetic =>
         #[no_mangle]
         #[doc(hidden)]
         pub unsafe extern "C" fn #wrapper_symbol(#fcinfo: ::pgrx::pg_sys::FunctionCallInfo) -> ::pgrx::pg_sys::Datum {

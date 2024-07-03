@@ -434,7 +434,7 @@ jobs:
 
       # We can't do this with other lints because we need $PGRX_HOME
       - name: Clippy -Awarnings
-        run: cargo clippy -p pgrx --features pg$PG_VER -- -Awarnings
+        run: cargo clippy --tests --features pg$PG_VER --no-default-features -- -Awarnings
 
       # This also requires $PGRX_HOME
       - name: Check doc-links
