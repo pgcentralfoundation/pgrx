@@ -116,7 +116,7 @@ fn thread_id_check_failed() -> ! {
     // I don't think this can ever happen, but it would be a bug if it could.
     assert_ne!(is_os_main_thread(), Some(true), "`pgrx` active thread is not the main thread!?");
     panic!(
-        "{}:  postgres FFI may not not be called from multiple threads.",
+        "{}:  postgres FFI may not be called from multiple threads.",
         std::panic::Location::caller()
     );
 }
