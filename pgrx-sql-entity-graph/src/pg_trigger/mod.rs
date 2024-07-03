@@ -22,7 +22,7 @@ use crate::enrich::{ToEntityGraphTokens, ToRustCodeTokens};
 use crate::finfo::{finfo_v1_extern_c, finfo_v1_tokens};
 use crate::{CodeEnrichment, ToSqlConfig};
 use attribute::PgTriggerAttribute;
-use proc_macro2::{Ident, TokenStream as TokenStream2};
+use proc_macro2::{Ident, Span, TokenStream as TokenStream2};
 use quote::{format_ident, quote};
 use syn::{spanned::Spanned, ItemFn, Token};
 
@@ -70,7 +70,8 @@ impl PgTrigger {
 
     pub fn wrapper_tokens(&self) -> Result<ItemFn, syn::Error> {
         let function_ident = self.func.sig.ident.clone();
-        let fcinfo_ident = Ident::new("_fcinfo", function_ident.span());
+        let fcinfo_ident =
+            Ident::new("_fcinfo", Span::mixed_site().located_at(function_ident.span()));
 
         let tokens = quote! {
             fn _internal(fcinfo: ::pgrx::pg_sys::FunctionCallInfo) -> ::pgrx::pg_sys::Datum {
