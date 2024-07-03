@@ -47,7 +47,7 @@ pub(crate) fn check_active_thread() {
 /// Concretely, it is very important that this not return `Some(false)`
 /// incorrectly, but the other values are less important. Callers generally
 /// should compare the result against `Some(false)`.
-fn is_os_main_thread() -> Option<bool> {
+pub(super) fn is_os_main_thread() -> Option<bool> {
     #[cfg(any(target_os = "macos", target_os = "openbsd", target_os = "freebsd"))]
     return unsafe {
         match libc::pthread_main_np() {
