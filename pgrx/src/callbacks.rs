@@ -58,17 +58,16 @@ pub enum PgXactCallbackEvent {
 
 impl PgXactCallbackEvent {
     fn translate_pg_event(pg_event: pg_sys::XactEvent::Type) -> Self {
+        use pg_sys::XactEvent::*;
         match pg_event {
-            pg_sys::XactEvent::XACT_EVENT_ABORT => PgXactCallbackEvent::Abort,
-            pg_sys::XactEvent::XACT_EVENT_COMMIT => PgXactCallbackEvent::Commit,
-            pg_sys::XactEvent::XACT_EVENT_PARALLEL_ABORT => PgXactCallbackEvent::ParallelAbort,
-            pg_sys::XactEvent::XACT_EVENT_PARALLEL_COMMIT => PgXactCallbackEvent::ParallelCommit,
-            pg_sys::XactEvent::XACT_EVENT_PARALLEL_PRE_COMMIT => {
-                PgXactCallbackEvent::ParallelPreCommit
-            }
-            pg_sys::XactEvent::XACT_EVENT_PREPARE => PgXactCallbackEvent::Prepare,
-            pg_sys::XactEvent::XACT_EVENT_PRE_COMMIT => PgXactCallbackEvent::PreCommit,
-            pg_sys::XactEvent::XACT_EVENT_PRE_PREPARE => PgXactCallbackEvent::PrePrepare,
+            XACT_EVENT_ABORT => PgXactCallbackEvent::Abort,
+            XACT_EVENT_COMMIT => PgXactCallbackEvent::Commit,
+            XACT_EVENT_PARALLEL_ABORT => PgXactCallbackEvent::ParallelAbort,
+            XACT_EVENT_PARALLEL_COMMIT => PgXactCallbackEvent::ParallelCommit,
+            XACT_EVENT_PARALLEL_PRE_COMMIT => PgXactCallbackEvent::ParallelPreCommit,
+            XACT_EVENT_PREPARE => PgXactCallbackEvent::Prepare,
+            XACT_EVENT_PRE_COMMIT => PgXactCallbackEvent::PreCommit,
+            XACT_EVENT_PRE_PREPARE => PgXactCallbackEvent::PrePrepare,
             unknown => panic!("Unrecognized XactEvent: {unknown}"),
         }
     }
@@ -256,13 +255,12 @@ pub enum PgSubXactCallbackEvent {
 
 impl PgSubXactCallbackEvent {
     fn translate_pg_event(event: pg_sys::SubXactEvent::Type) -> Self {
+        use pg_sys::SubXactEvent::*;
         match event {
-            pg_sys::SubXactEvent::SUBXACT_EVENT_ABORT_SUB => PgSubXactCallbackEvent::AbortSub,
-            pg_sys::SubXactEvent::SUBXACT_EVENT_COMMIT_SUB => PgSubXactCallbackEvent::CommitSub,
-            pg_sys::SubXactEvent::SUBXACT_EVENT_PRE_COMMIT_SUB => {
-                PgSubXactCallbackEvent::PreCommitSub
-            }
-            pg_sys::SubXactEvent::SUBXACT_EVENT_START_SUB => PgSubXactCallbackEvent::StartSub,
+            SUBXACT_EVENT_ABORT_SUB => PgSubXactCallbackEvent::AbortSub,
+            SUBXACT_EVENT_COMMIT_SUB => PgSubXactCallbackEvent::CommitSub,
+            SUBXACT_EVENT_PRE_COMMIT_SUB => PgSubXactCallbackEvent::PreCommitSub,
+            SUBXACT_EVENT_START_SUB => PgSubXactCallbackEvent::StartSub,
             _ => panic!("Unrecognized SubXactEvent: {event}"),
         }
     }

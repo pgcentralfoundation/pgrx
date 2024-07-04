@@ -300,11 +300,12 @@ pub enum BackgroundWorkerStatus {
 
 impl From<pg_sys::BgwHandleStatus::Type> for BackgroundWorkerStatus {
     fn from(s: pg_sys::BgwHandleStatus::Type) -> Self {
+        use pg_sys::BgwHandleStatus::*;
         match s {
-            pg_sys::BgwHandleStatus::BGWH_STARTED => BackgroundWorkerStatus::Started,
-            pg_sys::BgwHandleStatus::BGWH_NOT_YET_STARTED => BackgroundWorkerStatus::NotYetStarted,
-            pg_sys::BgwHandleStatus::BGWH_STOPPED => BackgroundWorkerStatus::Stopped,
-            pg_sys::BgwHandleStatus::BGWH_POSTMASTER_DIED => BackgroundWorkerStatus::PostmasterDied,
+            BGWH_STARTED => BackgroundWorkerStatus::Started,
+            BGWH_NOT_YET_STARTED => BackgroundWorkerStatus::NotYetStarted,
+            BGWH_STOPPED => BackgroundWorkerStatus::Stopped,
+            BGWH_POSTMASTER_DIED => BackgroundWorkerStatus::PostmasterDied,
             _ => unreachable!(),
         }
     }
