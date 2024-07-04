@@ -872,23 +872,23 @@ impl<'fcx> ReturnSetInfoWrapper<'fcx> {
     */
     // These four fields are, in-practice, owned by the callee.
     /// Status for ValuePerCall mode.
-    pub fn set_is_done(&mut self, value: pg_sys::ExprDoneCond) {
+    pub fn set_is_done(&mut self, value: pg_sys::ExprDoneCond::Type) {
         unsafe {
             (*self.0).isDone = value;
         }
     }
     /// Status for ValuePerCall mode.
-    pub fn get_is_done(&self) -> pg_sys::ExprDoneCond {
+    pub fn get_is_done(&self) -> pg_sys::ExprDoneCond::Type {
         unsafe { (*self.0).isDone }
     }
     /// Actual return mode.
-    pub fn set_return_mode(&mut self, return_mode: pgrx_pg_sys::SetFunctionReturnMode) {
+    pub fn set_return_mode(&mut self, return_mode: pgrx_pg_sys::SetFunctionReturnMode::Type) {
         unsafe {
             (*self.0).returnMode = return_mode;
         }
     }
     /// Actual return mode.
-    pub fn get_return_mode(&self) -> pgrx_pg_sys::SetFunctionReturnMode {
+    pub fn get_return_mode(&self) -> pgrx_pg_sys::SetFunctionReturnMode::Type {
         unsafe { (*self.0).returnMode }
     }
     /// Holds the complete returned tuple set.

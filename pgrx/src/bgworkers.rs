@@ -298,8 +298,8 @@ pub enum BackgroundWorkerStatus {
     },
 }
 
-impl From<pg_sys::BgwHandleStatus> for BackgroundWorkerStatus {
-    fn from(s: pg_sys::BgwHandleStatus) -> Self {
+impl From<pg_sys::BgwHandleStatus::Type> for BackgroundWorkerStatus {
+    fn from(s: pg_sys::BgwHandleStatus::Type) -> Self {
         match s {
             pg_sys::BgwHandleStatus_BGWH_STARTED => BackgroundWorkerStatus::Started,
             pg_sys::BgwHandleStatus_BGWH_NOT_YET_STARTED => BackgroundWorkerStatus::NotYetStarted,

@@ -15,7 +15,7 @@ use crate::{ereport, pg_sys, PgLogLevel, PgSqlErrorCode};
 pub fn lookup_enum_by_oid(enumval: pg_sys::Oid) -> (String, pg_sys::Oid, f32) {
     let tup = unsafe {
         pg_sys::SearchSysCache(
-            pg_sys::SysCacheIdentifier_ENUMOID as i32,
+            pg_sys::SysCacheIdentifier::ENUMOID as i32,
             pg_sys::Datum::from(enumval),
             pg_sys::Datum::from(0),
             pg_sys::Datum::from(0),
@@ -61,7 +61,7 @@ pub fn lookup_enum_by_label(typname: &str, label: &str) -> pg_sys::Datum {
         let label =
             alloc::ffi::CString::new(label).expect("failed to convert enum typname to a CString");
         pg_sys::SearchSysCache(
-            pg_sys::SysCacheIdentifier_ENUMTYPOIDNAME as i32,
+            pg_sys::SysCacheIdentifier::ENUMTYPOIDNAME as i32,
             pg_sys::Datum::from(enumtypoid),
             pg_sys::Datum::from(label.as_ptr()),
             pg_sys::Datum::from(0usize),

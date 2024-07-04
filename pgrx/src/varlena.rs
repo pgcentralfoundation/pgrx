@@ -65,7 +65,7 @@ pub unsafe fn set_varsize_short(ptr: *mut pg_sys::varlena, len: i32) {
 /// ```
 #[inline]
 pub unsafe fn varsize_external(ptr: *const pg_sys::varlena) -> usize {
-    pg_sys::VARHDRSZ_EXTERNAL + vartag_size(vartag_external(ptr) as pg_sys::vartag_external)
+    pg_sys::VARHDRSZ_EXTERNAL + vartag_size(vartag_external(ptr) as pg_sys::vartag_external::Type)
 }
 
 /// ```c
@@ -81,7 +81,7 @@ pub unsafe fn vartag_external(ptr: *const pg_sys::varlena) -> u8 {
 ///      (((tag) & ~1) == VARTAG_EXPANDED_RO)
 /// ```
 #[inline]
-pub unsafe fn vartag_is_expanded(tag: pg_sys::vartag_external) -> bool {
+pub unsafe fn vartag_is_expanded(tag: pg_sys::vartag_external::Type) -> bool {
     (tag & !1) == pg_sys::vartag_external_VARTAG_EXPANDED_RO
 }
 
@@ -93,7 +93,7 @@ pub unsafe fn vartag_is_expanded(tag: pg_sys::vartag_external) -> bool {
 ///       TrapMacro(true, "unrecognized TOAST vartag"))
 /// ```
 #[inline]
-pub unsafe fn vartag_size(tag: pg_sys::vartag_external) -> usize {
+pub unsafe fn vartag_size(tag: pg_sys::vartag_external::Type) -> usize {
     if tag == pg_sys::vartag_external_VARTAG_INDIRECT {
         std::mem::size_of::<pg_sys::varatt_indirect>()
     } else if vartag_is_expanded(tag) {

@@ -57,7 +57,7 @@ pub enum PgXactCallbackEvent {
 }
 
 impl PgXactCallbackEvent {
-    fn translate_pg_event(pg_event: pg_sys::XactEvent) -> Self {
+    fn translate_pg_event(pg_event: pg_sys::XactEvent::Type) -> Self {
         match pg_event {
             pg_sys::XactEvent_XACT_EVENT_ABORT => PgXactCallbackEvent::Abort,
             pg_sys::XactEvent_XACT_EVENT_COMMIT => PgXactCallbackEvent::Commit,
@@ -164,7 +164,10 @@ where
 
     // internal function that we register as an XactCallback
     #[pg_guard]
-    unsafe extern "C" fn callback(event: pg_sys::XactEvent, _arg: *mut ::std::os::raw::c_void) {
+    unsafe extern "C" fn callback(
+        event: pg_sys::XactEvent::Type,
+        _arg: *mut ::std::os::raw::c_void,
+    ) {
         let which_event = PgXactCallbackEvent::translate_pg_event(event);
 
         let hooks = match which_event {
@@ -252,7 +255,7 @@ pub enum PgSubXactCallbackEvent {
 }
 
 impl PgSubXactCallbackEvent {
-    fn translate_pg_event(event: pg_sys::SubXactEvent) -> Self {
+    fn translate_pg_event(event: pg_sys::SubXactEvent::Type) -> Self {
         match event {
             pg_sys::SubXactEvent_SUBXACT_EVENT_ABORT_SUB => PgSubXactCallbackEvent::AbortSub,
             pg_sys::SubXactEvent_SUBXACT_EVENT_COMMIT_SUB => PgSubXactCallbackEvent::CommitSub,
@@ -317,7 +320,7 @@ where
 
     #[pg_guard]
     unsafe extern "C" fn callback(
-        event: pg_sys::SubXactEvent,
+        event: pg_sys::SubXactEvent::Type,
         my_subid: pg_sys::SubTransactionId,
         parent_subid: pg_sys::SubTransactionId,
         _arg: *mut ::std::os::raw::c_void,
