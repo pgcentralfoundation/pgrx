@@ -18,11 +18,11 @@ pub enum GucContext {
     /// cannot be set by the user at all, but only through
     /// internal processes ("server_version" is an example).  These are GUC
     /// variables only so they can be shown by SHOW, etc.
-    Internal = pg_sys::GucContext_PGC_INTERNAL as isize,
+    Internal = pg_sys::GucContext::PGC_INTERNAL as isize,
 
     /// can only be set when the postmaster starts,
     /// either from the configuration file or the command line.
-    Postmaster = pg_sys::GucContext_PGC_POSTMASTER as isize,
+    Postmaster = pg_sys::GucContext::PGC_POSTMASTER as isize,
 
     /// can only be set at postmaster startup or by changing
     /// the configuration file and sending the HUP signal to the postmaster
@@ -30,26 +30,26 @@ pub enum GucContext {
     /// evaluated immediately. The postmaster and the backend check it at a
     /// certain point in their main loop. It's safer to wait than to read a
     /// file asynchronously.)
-    Sighup = pg_sys::GucContext_PGC_SIGHUP as isize,
+    Sighup = pg_sys::GucContext::PGC_SIGHUP as isize,
 
     /// can only be set at postmaster startup, from the configuration file, or by
     /// client request in the connection startup packet (e.g., from libpq's PGOPTIONS
     /// variable).  
-    SuBackend = pg_sys::GucContext_PGC_SU_BACKEND as isize,
+    SuBackend = pg_sys::GucContext::PGC_SU_BACKEND as isize,
 
     /// can be set from the startup packet only when the user is a
     /// superuser.  Furthermore, an already-started backend will ignore changes
     /// to such an option in the configuration file.  The idea is that these
     /// options are fixed for a given backend once it's started, but they can
     /// vary across backends.
-    Backend = pg_sys::GucContext_PGC_BACKEND as isize,
+    Backend = pg_sys::GucContext::PGC_BACKEND as isize,
 
     /// can be set at postmaster startup, with the SIGHUP
     /// mechanism, or from the startup packet or SQL if you're a superuser.
-    Suset = pg_sys::GucContext_PGC_SUSET as isize,
+    Suset = pg_sys::GucContext::PGC_SUSET as isize,
 
     /// can be set by anyone any time.
-    Userset = pg_sys::GucContext_PGC_USERSET as isize,
+    Userset = pg_sys::GucContext::PGC_USERSET as isize,
 }
 
 bitflags! {

@@ -82,7 +82,7 @@ pub unsafe fn vartag_external(ptr: *const pg_sys::varlena) -> u8 {
 /// ```
 #[inline]
 pub unsafe fn vartag_is_expanded(tag: pg_sys::vartag_external::Type) -> bool {
-    (tag & !1) == pg_sys::vartag_external_VARTAG_EXPANDED_RO
+    (tag & !1) == pg_sys::vartag_external::VARTAG_EXPANDED_RO
 }
 
 /// ```c
@@ -94,11 +94,11 @@ pub unsafe fn vartag_is_expanded(tag: pg_sys::vartag_external::Type) -> bool {
 /// ```
 #[inline]
 pub unsafe fn vartag_size(tag: pg_sys::vartag_external::Type) -> usize {
-    if tag == pg_sys::vartag_external_VARTAG_INDIRECT {
+    if tag == pg_sys::vartag_external::VARTAG_INDIRECT {
         std::mem::size_of::<pg_sys::varatt_indirect>()
     } else if vartag_is_expanded(tag) {
         std::mem::size_of::<pg_sys::varatt_expanded>()
-    } else if tag == pg_sys::vartag_external_VARTAG_ONDISK {
+    } else if tag == pg_sys::vartag_external::VARTAG_ONDISK {
         std::mem::size_of::<pg_sys::varatt_external>()
     } else {
         panic!("unrecognized TOAST vartag")

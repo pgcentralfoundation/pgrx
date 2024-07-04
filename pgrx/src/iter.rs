@@ -14,7 +14,6 @@ use crate::callconv::{BoxRet, CallCx, RetAbi};
 use crate::fcinfo::{pg_return_null, srf_is_first_call, srf_return_done, srf_return_next};
 use crate::ptr::PointerExt;
 use crate::{pg_sys, IntoDatum, IntoHeapTuple, PgMemoryContexts};
-use pgrx_pg_sys::TypeFuncClass_TYPEFUNC_COMPOSITE;
 use pgrx_sql_entity_graph::metadata::{
     ArgumentError, Returns, ReturnsError, SqlMapping, SqlTranslatable,
 };
@@ -435,7 +434,7 @@ macro_rules! impl_table_iter {
                         let mut tupdesc = ptr::null_mut();
                         let mut oid = pg_sys::Oid::default();
                         let ty_class = pg_sys::get_call_result_type(fcinfo, &mut oid, &mut tupdesc);
-                        if tupdesc.is_non_null() && ty_class == TypeFuncClass_TYPEFUNC_COMPOSITE {
+                        if tupdesc.is_non_null() && ty_class == pg_sys::TypeFuncClass::TYPEFUNC_COMPOSITE {
                             pg_sys::BlessTupleDesc(tupdesc);
                             (*fcx).tuple_desc = tupdesc;
                         }

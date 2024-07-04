@@ -723,7 +723,7 @@ impl<'fcx> FcInfo<'fcx> {
     pub unsafe fn srf_return_next(&mut self) {
         unsafe {
             self.deref_fcx().call_cntr += 1;
-            self.get_result_info().set_is_done(pg_sys::ExprDoneCond_ExprMultipleResult);
+            self.get_result_info().set_is_done(pg_sys::ExprDoneCond::ExprMultipleResult);
         }
     }
 
@@ -733,7 +733,7 @@ impl<'fcx> FcInfo<'fcx> {
     pub unsafe fn srf_return_done(&mut self) {
         unsafe {
             pg_sys::end_MultiFuncCall(self.0, self.deref_fcx());
-            self.get_result_info().set_is_done(pg_sys::ExprDoneCond_ExprEndResult);
+            self.get_result_info().set_is_done(pg_sys::ExprDoneCond::ExprEndResult);
         }
     }
 

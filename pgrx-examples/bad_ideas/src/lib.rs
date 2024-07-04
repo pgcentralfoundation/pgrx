@@ -114,7 +114,7 @@ pub unsafe extern "C" fn _PG_init() {
         event: pg_sys::XactEvent::Type,
         _arg: *mut std::os::raw::c_void,
     ) {
-        if event == pg_sys::XactEvent_XACT_EVENT_PRE_COMMIT && rand::random::<bool>() {
+        if event == pg_sys::XactEvent::XACT_EVENT_PRE_COMMIT && rand::random::<bool>() {
             // panic!("aborting transaction");
         }
     }

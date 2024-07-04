@@ -115,7 +115,7 @@ impl<'a, T> PgLwLockInner<T> {
             panic!("PgLwLock is not initialized");
         }
         unsafe {
-            pg_sys::LWLockAcquire(self.lock_ptr, pg_sys::LWLockMode_LW_SHARED);
+            pg_sys::LWLockAcquire(self.lock_ptr, pg_sys::LWLockMode::LW_SHARED);
 
             PgLwLockShareGuard { data: self.data.as_ref().unwrap(), lock: self.lock_ptr }
         }
@@ -126,7 +126,7 @@ impl<'a, T> PgLwLockInner<T> {
             panic!("PgLwLock is not initialized");
         }
         unsafe {
-            pg_sys::LWLockAcquire(self.lock_ptr, pg_sys::LWLockMode_LW_EXCLUSIVE);
+            pg_sys::LWLockAcquire(self.lock_ptr, pg_sys::LWLockMode::LW_EXCLUSIVE);
 
             PgLwLockExclusiveGuard { data: self.data.as_mut().unwrap(), lock: self.lock_ptr }
         }
