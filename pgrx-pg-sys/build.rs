@@ -784,6 +784,7 @@ fn run_bindgen(
         .wrap_err_with(|| format!("Unable to generate bindings for pg{major_version}"))?;
     let mut binding_str = bindings.to_string();
     drop(bindings); // So the Rc::into_inner can unwrap
+
     // FIXME: do this for the Node graph instead of reparsing?
     let enum_names: EnumMap = Rc::into_inner(enum_names).unwrap().into_inner();
     binding_str.extend(enum_names.into_iter().flat_map(|(name, variants)| {
