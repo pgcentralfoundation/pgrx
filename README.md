@@ -251,6 +251,9 @@ ASCII nor UTF-8 (as Postgres will then accept but ignore non-ASCII bytes).
 For best results, always use PGRX with UTF-8, and set database encodings
 explicitly upon database creation.
 
+To easily convert `pgrx` temporal types (`pgrx::TimestampWithTimezone`, etc)
+to [`chrono`] compatible types, enable the `chrono` feature.
+
 ## Digging Deeper
 
  - [cargo-pgrx sub-command](cargo-pgrx/)

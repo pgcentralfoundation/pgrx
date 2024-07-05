@@ -75,6 +75,7 @@ thiserror = "1"
 unescape = "0.1.0" # for escaped-character-handling
 url = "2.4.1" # the non-existent std::web
 walkdir = "2" # directory recursion
+chrono = "0.4.35" # conversions to chrono data structures
 
 [profile.dev]
 # Only include line tables in debuginfo. This reduces the size of target/ (after
