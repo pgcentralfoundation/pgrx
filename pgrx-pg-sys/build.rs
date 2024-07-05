@@ -106,6 +106,7 @@ impl bindgen::callbacks::ParseCallbacks for BindingOverride {
     // FIXME: implement a... C compiler?
     fn func_macro(&self, _name: &str, _value: &[&[u8]]) {}
 
+    /// Intentionally doesn't do anything, just updates internal state.
     fn enum_variant_behavior(
         &self,
         enum_name: Option<&str>,
@@ -113,6 +114,7 @@ impl bindgen::callbacks::ParseCallbacks for BindingOverride {
         variant_value: bindgen::callbacks::EnumVariantValue,
     ) -> Option<bindgen::callbacks::EnumVariantCustomBehavior> {
         enum_name.inspect(|name| match name.strip_prefix("enum").unwrap_or(name).trim() {
+            // specifically overridden enum
             "NodeTag" => return,
             name if name.contains("unnamed at") => return,
             // to prevent problems with BuiltinOid
@@ -781,8 +783,9 @@ fn run_bindgen(
         .generate()
         .wrap_err_with(|| format!("Unable to generate bindings for pg{major_version}"))?;
     let mut binding_str = bindings.to_string();
-    drop(bindings);
-    let enum_names = Rc::into_inner(enum_names).unwrap().into_inner();
+    drop(bindings); // So the Rc::into_inner can unwrap
+    // FIXME: do this for the Node graph instead of reparsing?
+    let enum_names: EnumMap = Rc::into_inner(enum_names).unwrap().into_inner();
     binding_str.extend(enum_names.into_iter().flat_map(|(name, variants)| {
         const MIN_I32: i64 = i32::MIN as _;
         const MAX_I32: i64 = i32::MAX as _;
@@ -799,7 +802,7 @@ fn run_bindgen(
                 r#"
 #[deprecated(since = "0.12.0", note = "you want pg_sys::{module}::{variant}")]
 pub const {module}_{variant}: {ty} = {value};"#,
-                module = &*name,
+                module = &*name, // imprecise closure capture
             )
         })
     }));
