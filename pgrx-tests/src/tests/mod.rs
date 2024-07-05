@@ -16,6 +16,8 @@ mod bytea_tests;
 mod cfg_tests;
 #[cfg(feature = "chrono")]
 mod chrono_tests;
+#[cfg(feature = "chrono")]
+mod chrono_proptests;
 mod composite_type_tests;
 mod datetime_tests;
 mod default_arg_value_tests;
